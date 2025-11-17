@@ -1,11 +1,15 @@
+import type { DetailedSensor } from '@ootk/src/main';
+import { EventBus } from '../events/event-bus';
+import { EventBusEvent } from '../events/event-bus-events';
 import { errorManagerInstance } from './errorManager';
 
 export enum StorageKey {
-  // OfflineMode Only
+  // User Data
   CURRENT_SENSOR = 'v2-keepTrack-currentSensor',
   WATCHLIST_LIST = 'v2-keepTrack-watchlistList',
+  CUSTOM_SENSORS = 'v2-keepTrack-customSensors',
 
-  // Others
+  // Preferences (Settings)
   SETTINGS_MANAGER_COLORS = 'v2-settingsManager-colors',
   SETTINGS_DOT_COLORS = 'v2-keepTrack-settings-dotColors',
   IS_ADVICE_ENABLED = 'v2-isAdviceEnabled',
@@ -69,20 +73,150 @@ export enum StorageKey {
   SENSOR_TIMELINE_ENABLED_SENSORS = 'v2-sensor-timeline-enabled-sensors',
 
   VERSION = 'v2-version',
+
+  // Aggregated storage keys
+  PREFERENCES = 'v2-keepTrack-preferences',
+  USER_DATA = 'v2-keepTrack-userData',
 }
+
+/**
+ * User-specific data structure
+ */
+export interface UserData {
+  watchlist: { id: number; inView: boolean }[];
+  currentSensor: DetailedSensor | string | null;
+  customSensors: DetailedSensor[];
+}
+
+/**
+ * Preferences (settings) data structure
+ */
+export interface Preferences {
+  colors?: Record<string, unknown>;
+  dotColors?: Record<string, unknown>;
+  isAdviceEnabled?: boolean;
+  lastMap?: string;
+  colorScheme?: string;
+  drawCameraWidget?: boolean;
+  drawOrbits?: boolean;
+  drawECF?: boolean;
+  drawInCoverageLines?: boolean;
+  drawBlackEarth?: boolean;
+  drawAtmosphere?: boolean;
+  drawMilkyWay?: boolean;
+  graySkybox?: boolean;
+  eciOnHover?: boolean;
+  hos?: boolean;
+  demoMode?: boolean;
+  satLabelMode?: string;
+  freezePropRateOnDrag?: boolean;
+  disableTimeMachineToasts?: boolean;
+  searchLimit?: number;
+  drawTrailingOrbits?: boolean;
+  drawAurora?: boolean;
+  drawSun?: boolean;
+  confidenceLevels?: boolean;
+  drawCovarianceEllipsoid?: boolean;
+  godraysSamples?: number;
+  godraysDecay?: number;
+  godraysExposure?: number;
+  godraysDensity?: number;
+  godraysWeight?: number;
+  godraysIlluminationDecay?: number;
+  earthDayResolution?: string;
+  earthNightResolution?: string;
+  filterPayloads?: boolean;
+  filterRocketBodies?: boolean;
+  filterDebris?: boolean;
+  filterUnknownType?: boolean;
+  filterAgencies?: boolean;
+  filterVLEO?: boolean;
+  filterLEO?: boolean;
+  filterHEO?: boolean;
+  filterMEO?: boolean;
+  filterGEO?: boolean;
+  filterXGEO?: boolean;
+  filterVimpel?: boolean;
+  filterCelestrak?: boolean;
+  filterNotional?: boolean;
+  filterUnitedStates?: boolean;
+  filterUnitedKingdom?: boolean;
+  filterFrance?: boolean;
+  filterGermany?: boolean;
+  filterJapan?: boolean;
+  filterChina?: boolean;
+  filterIndia?: boolean;
+  filterRussia?: boolean;
+  filterUSSR?: boolean;
+  filterSouthKorea?: boolean;
+  filterAustralia?: boolean;
+  filterOtherCountries?: boolean;
+  filterStarlink?: boolean;
+  sensorTimelineEnabledSensors?: string[];
+  [key: string]: unknown;
+}
+
 export class PersistenceManager {
   private readonly storage_: Storage;
-
   private static instance_: PersistenceManager;
+
+  private preferences_: Preferences = {};
+  private userData_: UserData = {
+    watchlist: [],
+    currentSensor: null,
+    customSensors: [],
+  };
+
+  private isUseLocalStorage_ = false;
+  private isUseRemoteStorage_ = false;
+  private debounceTimer_: ReturnType<typeof setTimeout> | null = null;
+  private hasChanges_ = false;
+  private isInitialized_ = false;
+  private readonly DEBOUNCE_DELAY_MS = 3000;
 
   private constructor() {
     this.storage_ = localStorage;
-    this.validateStorage();
-    this.verifyStorage();
+    this.loadFromLocalStorage_();
+    this.setupEventListeners_();
+    this.isInitialized_ = true;
   }
 
   get storage(): Storage {
     return this.storage_;
+  }
+
+  get preferences(): Preferences {
+    return this.preferences_;
+  }
+
+  set preferences(value: Preferences) {
+    this.preferences_ = value;
+    this.markChanged_();
+  }
+
+  get userData(): UserData {
+    return this.userData_;
+  }
+
+  set userData(value: UserData) {
+    this.userData_ = value;
+    this.markChanged_();
+  }
+
+  get isUseLocalStorage(): boolean {
+    return this.isUseLocalStorage_;
+  }
+
+  set isUseLocalStorage(value: boolean) {
+    this.isUseLocalStorage_ = value;
+  }
+
+  get isUseRemoteStorage(): boolean {
+    return this.isUseRemoteStorage_;
+  }
+
+  set isUseRemoteStorage(value: boolean) {
+    this.isUseRemoteStorage_ = value;
   }
 
   static getInstance(): PersistenceManager {
@@ -93,127 +227,176 @@ export class PersistenceManager {
     return PersistenceManager.instance_;
   }
 
-  validateStorage(): void {
-    const currentVersion = this.storage_.getItem(StorageKey.VERSION);
+  /**
+   * Set up event listeners for data and preferences updates
+   */
+  private setupEventListeners_(): void {
+    const eventBus = EventBus.getInstance();
 
-    if (
-      typeof currentVersion === 'string' &&
-      typeof settingsManager.versionNumber === 'string' &&
-      this.compareSemver_(currentVersion, settingsManager.versionNumber) < 0
-    ) {
-      // Handle version mismatch
-      console.warn(`Version mismatch: ${currentVersion} < ${settingsManager.versionNumber}`);
-      console.warn('Clearing local storage...');
-      // Perform any necessary migration or cleanup
-      this.storage_.clear();
-    }
+    // Listen for data updates (watchlist, sensor changes, etc.)
+    eventBus.on(EventBusEvent.buildDataUpdate, () => {
+      this.buildUserData_();
+    });
 
-    // Save the current version to storage
-    this.storage_.setItem(StorageKey.VERSION, settingsManager.versionNumber);
+    // Listen for preferences updates (settings changes)
+    eventBus.on(EventBusEvent.buildPreferencesUpdate, () => {
+      this.buildPreferences_();
+    });
+
+    // Listen to specific events that trigger data updates
+    eventBus.on(EventBusEvent.onWatchlistAdd, () => {
+      this.buildUserData_();
+    });
+
+    eventBus.on(EventBusEvent.onWatchlistRemove, () => {
+      this.buildUserData_();
+    });
+
+    eventBus.on(EventBusEvent.setSensor, () => {
+      this.buildUserData_();
+    });
+
+    // Listen to settings save event
+    eventBus.on(EventBusEvent.saveSettings, () => {
+      this.buildPreferences_();
+    });
   }
 
   /**
-   * Compares two semantic version strings.
-   *
-   * Splits each version string by '.' and compares each numeric part sequentially.
-   * Returns -1 if `a` is less than `b`, 1 if `a` is greater than `b`, and 0 if they are equal.
-   * Handles versions of different lengths by treating missing parts as 0.
-   *
-   * @param a - The first semantic version string (e.g., "1.2.3").
-   * @param b - The second semantic version string (e.g., "1.2.4").
-   * @returns A number indicating the comparison result:
-   *          -1 if `a` < `b`, 1 if `a` > `b`, 0 if equal.
+   * Build user data from current application state
    */
-  private compareSemver_(a: string, b: string): number {
-    const pa = a.split('.').map(Number);
-    const pb = b.split('.').map(Number);
-
-    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
-      const na = pa[i] || 0;
-      const nb = pb[i] || 0;
-
-      if (na < nb) {
-        return -1;
-      }
-      if (na > nb) {
-        return 1;
-      }
-    }
-
-    return 0;
+  private buildUserData_(): void {
+    // This will be populated by plugins/managers via the userData setter
+    // or by directly accessing the userData object and modifying it
+    this.markChanged_();
   }
 
-  verifyStorage(): void {
-    for (let i = 0; i < this.storage_.length; i++) {
-      const key = this.storage_.key(i);
-
-      if (!Object.values(StorageKey).includes(key as StorageKey)) {
-        // Delete any keys that are not in the StorageKey enum
-        this.storage_.removeItem(key as string);
-      }
-    }
+  /**
+   * Build preferences from current application state
+   */
+  private buildPreferences_(): void {
+    // This will be populated by settings manager via the preferences setter
+    // or by directly accessing the preferences object and modifying it
+    this.markChanged_();
   }
 
-  getItem(key: string): string | null {
-    if (settingsManager.isBlockPersistence) {
-      return null;
-    }
-    PersistenceManager.verifyKey_(key);
-
-    const value = this.storage_.getItem(key);
-
-    if (value === null) {
-      return null;
-    }
-
-    return value;
-  }
-
-  checkIfEnabled(key: string, fallback: boolean | undefined): boolean | undefined {
-    PersistenceManager.verifyKey_(key);
-
-    const value = this.storage_.getItem(key);
-
-    if (value === null) {
-      return fallback;
-    }
-
-    return value === 'true';
-  }
-
-  saveItem(key: string, value: string): void {
-    if (settingsManager.isBlockPersistence) {
+  /**
+   * Mark that changes have occurred and trigger debounced sync
+   */
+  private markChanged_(): void {
+    if (!this.isInitialized_) {
       return;
     }
 
-    if (value === null || typeof value === 'undefined') {
-      this.removeItem(key);
+    this.hasChanges_ = true;
 
+    // Only run sync loop if at least one storage method is enabled
+    if (this.isUseLocalStorage_ || this.isUseRemoteStorage_) {
+      this.debouncedSync_();
+    }
+  }
+
+  /**
+   * Debounced sync - waits 3 seconds after last change before syncing
+   */
+  private debouncedSync_(): void {
+    if (this.debounceTimer_) {
+      clearTimeout(this.debounceTimer_);
+    }
+
+    this.debounceTimer_ = setTimeout(() => {
+      this.sync_();
+    }, this.DEBOUNCE_DELAY_MS);
+  }
+
+  /**
+   * Perform the actual sync operation
+   */
+  private sync_(): void {
+    if (!this.hasChanges_) {
       return;
     }
 
-    PersistenceManager.verifyKey_(key);
+    // Save to localStorage if enabled
+    if (this.isUseLocalStorage_) {
+      this.saveToLocalStorage_();
+    }
+
+    // Emit event for external systems (e.g., user-account plugin for Supabase sync)
+    EventBus.getInstance().emit(EventBusEvent.debouncedSync);
+
+    this.hasChanges_ = false;
+  }
+
+  /**
+   * Load preferences and userData from localStorage
+   */
+  private loadFromLocalStorage_(): void {
     try {
-      this.storage_.setItem(key, value);
-    } catch {
-      errorManagerInstance.debug(`Failed to save to local storage: ${key}=${value}`);
+      // Load preferences
+      const prefsData = this.storage_.getItem(StorageKey.PREFERENCES);
+
+      if (prefsData) {
+        this.preferences_ = JSON.parse(prefsData);
+      }
+
+      // Load user data
+      const userDataStr = this.storage_.getItem(StorageKey.USER_DATA);
+
+      if (userDataStr) {
+        this.userData_ = JSON.parse(userDataStr);
+      }
+    } catch (error) {
+      errorManagerInstance.error(error as Error, 'PersistenceManager.loadFromLocalStorage_', 'Failed to load from localStorage');
     }
   }
 
+  /**
+   * Save preferences and userData to localStorage
+   */
+  private saveToLocalStorage_(): void {
+    try {
+      // Serialize and save preferences
+      const prefsData = JSON.stringify(this.preferences_);
+
+      this.storage_.setItem(StorageKey.PREFERENCES, prefsData);
+
+      // Serialize and save user data
+      const userDataStr = JSON.stringify(this.userData_);
+
+      this.storage_.setItem(StorageKey.USER_DATA, userDataStr);
+    } catch (error) {
+      errorManagerInstance.error(error as Error, 'PersistenceManager.saveToLocalStorage_', 'Failed to save to localStorage');
+    }
+  }
+
+  /**
+   * Clear all stored data
+   */
   clear(): void {
-    for (const key of Object.values(StorageKey)) {
-      this.storage_.removeItem(key);
+    this.preferences_ = {};
+    this.userData_ = {
+      watchlist: [],
+      currentSensor: null,
+      customSensors: [],
+    };
+
+    if (this.isUseLocalStorage_) {
+      this.storage_.removeItem(StorageKey.PREFERENCES);
+      this.storage_.removeItem(StorageKey.USER_DATA);
     }
+
+    this.hasChanges_ = false;
   }
 
-  removeItem(key: string): void {
-    PersistenceManager.verifyKey_(key);
-    this.storage_.removeItem(key);
-  }
-
-  private static verifyKey_(key: string) {
-    if (!Object.values(StorageKey).includes(key as StorageKey)) {
-      throw new Error(`Invalid key: ${key}`);
+  /**
+   * Force an immediate sync (bypassing debounce)
+   */
+  forceSync(): void {
+    if (this.debounceTimer_) {
+      clearTimeout(this.debounceTimer_);
+      this.debounceTimer_ = null;
     }
+    this.sync_();
   }
 }

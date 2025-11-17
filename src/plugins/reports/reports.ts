@@ -577,7 +577,12 @@ export class ReportsPlugin extends KeepTrackPlugin {
     }
 
     // For higher orbits, use more detailed check
-    const perpDist = Math.abs(satPos.x * sunPos.y - satPos.y * sunPos.x) / Math.sqrt(sunPos.x * sunPos.x + sunPos.y * sunPos.y);
+    const crossX = satPos.y * sunPos.z - satPos.z * sunPos.y;
+    const crossY = satPos.z * sunPos.x - satPos.x * sunPos.z;
+    const crossZ = satPos.x * sunPos.y - satPos.y * sunPos.x;
+    const crossMag = Math.sqrt(crossX * crossX + crossY * crossY + crossZ * crossZ);
+    const sunMag = Math.sqrt(sunPos.x * sunPos.x + sunPos.y * sunPos.y + sunPos.z * sunPos.z);
+    const perpDist = crossMag / sunMag;
 
     return perpDist > earthRadius;
   }

@@ -21,12 +21,11 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/engine/utils/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import {
-  DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue, eci2lla,
+  BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue, eci2lla,
 } from '@ootk/src/main';
 import { mat4, vec3 } from 'gl-matrix';
 import { SatMath } from '../../app/analysis/sat-math';
@@ -301,15 +300,17 @@ export class Camera {
    * Set up the camera's view matrix for rendering
    */
   draw(sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null): void {
-    let target = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
+    let target: BaseObject | null = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj ?? null;
 
     // TODO: This should be handled better
-    target ??= <DetailedSatellite>(<unknown>{
-      id: -1,
-      missile: false,
-      type: SpaceObjectType.UNKNOWN,
-      static: false,
-    });
+    if (!target) {
+      target = <BaseObject>(<unknown>{
+        id: -1,
+        missile: false,
+        type: SpaceObjectType.UNKNOWN,
+        static: false,
+      });
+    }
 
     const sensorPosition: SensorPosition | null = sensorPos ? {
       lat: sensorPos.lat,

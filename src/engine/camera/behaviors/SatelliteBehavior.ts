@@ -20,9 +20,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { DEG2RAD, DetailedSatellite, Degrees, Milliseconds, SpaceObjectType } from '@ootk/src/main';
+import { DEG2RAD, Degrees, Milliseconds, SpaceObjectType, BaseObject } from '@ootk/src/main';
 import { mat4, quat, vec3 } from 'gl-matrix';
-import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { BaseCameraBehavior } from './BaseCameraBehavior';
 import type { SensorPosition } from './ICameraBehavior';
 
@@ -53,12 +52,12 @@ export class SatelliteBehavior extends BaseCameraBehavior {
     }
   }
 
-  validate(_sensorPos: SensorPosition | null, target: DetailedSatellite | MissileObject | null): boolean {
+  validate(_sensorPos: SensorPosition | null, target: BaseObject | null): boolean {
     // Satellite mode requires a valid target that is not a star
     return target !== null && target.id !== -1 && target.type !== SpaceObjectType.STAR;
   }
 
-  draw(_sensorPos: SensorPosition | null, target: DetailedSatellite | MissileObject | null): void {
+  draw(_sensorPos: SensorPosition | null, target: BaseObject | null): void {
     if (!target) {
       return;
     }

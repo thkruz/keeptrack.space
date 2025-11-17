@@ -22,8 +22,7 @@
 
 import type { Camera } from '../camera';
 import type { ICameraBehavior, SensorPosition } from './ICameraBehavior';
-import type { DetailedSatellite, Milliseconds } from '@ootk/src/main';
-import type { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import type { BaseObject, Milliseconds } from '@ootk/src/main';
 
 /**
  * Base class for camera behaviors.
@@ -67,12 +66,12 @@ export abstract class BaseCameraBehavior implements ICameraBehavior {
   /**
    * Draw must be implemented by subclasses
    */
-  abstract draw(sensorPos: SensorPosition | null, target: DetailedSatellite | MissileObject | null): void;
+  abstract draw(sensorPos: SensorPosition | null, target: BaseObject | null): void;
 
   /**
    * Default validation always returns true - override in subclasses if needed
    */
-  validate(_sensorPos: SensorPosition | null, _target: DetailedSatellite | MissileObject | null): boolean {
+  validate(_sensorPos: SensorPosition | null, _target: BaseObject | null): boolean {
     return true;
   }
 

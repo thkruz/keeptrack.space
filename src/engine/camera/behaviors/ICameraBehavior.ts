@@ -20,8 +20,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import type { DetailedSatellite, GreenwichMeanSiderealTime, Milliseconds } from '@ootk/src/main';
-import type { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import type { BaseObject, GreenwichMeanSiderealTime, Milliseconds } from '@ootk/src/main';
 
 export interface SensorPosition {
   lat: number;
@@ -48,16 +47,16 @@ export interface ICameraBehavior {
    * Set up the camera's view matrix for rendering.
    * This method modifies the camera's matrixWorldInverse to position the camera correctly.
    * @param sensorPos Optional sensor position data (required for Planetarium/Astronomy modes)
-   * @param target Optional satellite/missile target (required for satellite-tracking modes)
+   * @param target Optional space object target (required for satellite-tracking modes)
    */
-  draw(sensorPos: SensorPosition | null, target: DetailedSatellite | MissileObject | null): void;
+  draw(sensorPos: SensorPosition | null, target: BaseObject | null): void;
 
   /**
    * Validate that this camera behavior can be activated.
    * For example, Planetarium mode requires a sensor to be selected.
    * @returns true if the camera behavior can be used, false otherwise
    */
-  validate(sensorPos: SensorPosition | null, target: DetailedSatellite | MissileObject | null): boolean;
+  validate(sensorPos: SensorPosition | null, target: BaseObject | null): boolean;
 
   /**
    * Called when this behavior becomes active (camera type switches to this behavior).

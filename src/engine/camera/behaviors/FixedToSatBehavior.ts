@@ -20,15 +20,15 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { DetailedSatellite, Milliseconds, SpaceObjectType } from '@ootk/src/main';
+import { Milliseconds, SpaceObjectType } from '@ootk/src/main';
 import { mat4, vec3 } from 'gl-matrix';
 import { SatMath } from '@app/app/analysis/sat-math';
-import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { alt2zoom } from '@app/engine/utils/transforms';
 import { normalizeAngle } from '@app/engine/utils/transforms';
 import { BaseCameraBehavior } from './BaseCameraBehavior';
 import type { SensorPosition } from './ICameraBehavior';
+import type { BaseObject } from '@ootk/src/main';
 
 /**
  * Fixed-to-Satellite camera behavior.
@@ -42,7 +42,7 @@ export class FixedToSatBehavior extends BaseCameraBehavior {
     this.state.ftsYaw = this.state.camYaw;
   }
 
-  validate(_sensorPos: SensorPosition | null, target: DetailedSatellite | MissileObject | null): boolean {
+  validate(_sensorPos: SensorPosition | null, target: BaseObject | null): boolean {
     // Cannot track invalid targets or stars
     if (!target || target.id === -1 || target.type === SpaceObjectType.STAR) {
       return false;
@@ -51,7 +51,7 @@ export class FixedToSatBehavior extends BaseCameraBehavior {
     return true;
   }
 
-  draw(sensorPos: SensorPosition | null, target: DetailedSatellite | MissileObject | null): void {
+  draw(sensorPos: SensorPosition | null, target: BaseObject | null): void {
     if (!target) {
       return;
     }

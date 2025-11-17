@@ -85,6 +85,7 @@ export type KeepTrackPluginsConfiguration = {
   updateSelectBox?: PluginConfiguration;
   WatchlistPlugin?: PluginConfiguration;
   WatchlistOverlay?: PluginConfiguration;
+  SatelliteListsPlugin?: PluginConfiguration;
   ReportsPlugin?: PluginConfiguration;
   PolarPlotPlugin?: PluginConfiguration;
   GraphicsMenuPlugin?: PluginConfiguration;

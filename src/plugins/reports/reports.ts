@@ -29,15 +29,15 @@ import { getEl } from '@app/engine/utils/get-el';
 import analysisPng from '@public/img/icons/reports.png';
 
 
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, DetailedSatellite, DetailedSensor, MILLISECONDS_PER_SECOND, Degrees, EciVec3, Kilometers, LlaVec3 } from '@ootk/src/main';
+import { BaseObject, DetailedSatellite, DetailedSensor, EciVec3, Kilometers, MILLISECONDS_PER_SECOND } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 interface ReportData {
   filename: string;
@@ -242,6 +242,10 @@ export class ReportsPlugin extends KeepTrackPlugin {
           time = new Date(time.getTime() + MILLISECONDS_PER_SECOND * 30);
           const rae = sensor.rae(sat, time);
 
+          if (!rae) {
+            continue;
+          }
+
           if (rae.el > 0) {
             isInCoverage = true;
             body += `${this.formatTime_(time)},${rae.az.toFixed(3)},${rae.el.toFixed(3)},${rae.rng.toFixed(3)}\n`;
@@ -279,6 +283,10 @@ export class ReportsPlugin extends KeepTrackPlugin {
           time = new Date(time.getTime() + 30 * MILLISECONDS_PER_SECOND);
           const lla = sat.lla(time);
 
+          if (!lla) {
+            continue;
+          }
+
           body += `${this.formatTime_(time)},${lla.lat.toFixed(3)},${lla.lon.toFixed(3)},${lla.alt.toFixed(3)}\n`;
         }
 
@@ -306,6 +314,10 @@ export class ReportsPlugin extends KeepTrackPlugin {
           time = new Date(time.getTime() + 30 * MILLISECONDS_PER_SECOND);
           const eci = sat.eci(time);
 
+          if (!eci) {
+            continue;
+          }
+
           body += `${this.formatTime_(time)},${eci.position.x.toFixed(3)},${eci.position.y.toFixed(3)},${eci.position.z.toFixed(3)},` +
             `${eci.velocity.x.toFixed(3)},${eci.velocity.y.toFixed(3)},${eci.velocity.z.toFixed(3)}\n`;
         }
@@ -326,7 +338,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
       name: 'Classical Orbital Elements',
       description: 'Generate classical orbital elements at current epoch',
       requiresSensor: false,
-      generate: (sat: DetailedSatellite, _sensor: DetailedSensor | null, _startTime: Date): ReportData => {
+      generate: (sat: DetailedSatellite): ReportData => {
         const header = `Classic Orbit Elements Report\n-------------------------------\n${this.createHeader_(sat)}`;
         const classicalEls = sat.toJ2000().toClassicalElements();
         const body = '' +
@@ -376,6 +388,10 @@ export class ReportsPlugin extends KeepTrackPlugin {
         for (let t = 0; t < durationInSeconds; t += 10) {
           time = new Date(startTime.getTime() + t * MILLISECONDS_PER_SECOND);
           const rae = sensor.rae(sat, time);
+
+          if (!rae) {
+            continue;
+          }
 
           if (rae.el > 0 && !inPass) {
             // Pass start
@@ -431,14 +447,18 @@ export class ReportsPlugin extends KeepTrackPlugin {
         const durationInSeconds = 3 * 24 * 60 * 60; // 3 days
         let time = new Date(startTime.getTime());
         let wasIlluminated = true;
-        let eclipseEntryTime: Date | null = null;
-        let sunlightEntryTime: Date | null = null;
+        // let eclipseEntryTime: Date | null = null;
+        // let sunlightEntryTime: Date | null = null;
 
         for (let t = 0; t < durationInSeconds; t += 60) {
           time = new Date(startTime.getTime() + t * MILLISECONDS_PER_SECOND);
 
           // Calculate if satellite is illuminated by the sun
-          const satPos = sat.eci(time).position;
+          const satPos = sat.eci(time)?.position;
+
+          if (!satPos) {
+            continue;
+          }
           const sunPos = this.getSunPosition_(time);
           const earthRadius = 6371; // km
 
@@ -455,9 +475,9 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
           // Track transitions
           if (!isIlluminated && wasIlluminated) {
-            eclipseEntryTime = time;
+            // eclipseEntryTime = time;
           } else if (isIlluminated && !wasIlluminated) {
-            sunlightEntryTime = time;
+            // sunlightEntryTime = time;
           }
 
           wasIlluminated = isIlluminated;
@@ -519,11 +539,11 @@ export class ReportsPlugin extends KeepTrackPlugin {
    */
   private isSatelliteIlluminated_(satPos: EciVec3<Kilometers>, sunPos: EciVec3<Kilometers>, earthRadius: number): boolean {
     // Vector from satellite to sun
-    const toSun = {
-      x: sunPos.x - satPos.x,
-      y: sunPos.y - satPos.y,
-      z: sunPos.z - satPos.z,
-    };
+    // const toSun = {
+    //   x: sunPos.x - satPos.x,
+    //   y: sunPos.y - satPos.y,
+    //   z: sunPos.z - satPos.z,
+    // };
 
     // Check if satellite is on the dark side of Earth
     const dotProduct = satPos.x * sunPos.x + satPos.y * sunPos.y + satPos.z * sunPos.z;
@@ -565,7 +585,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   /**
    * Determine the type of eclipse (penumbral, umbral, etc.)
    */
-  private getEclipseType_(satPos: EciVec3<Kilometers>, sunPos: EciVec3<Kilometers>, earthRadius: number): string {
+  private getEclipseType_(satPos: EciVec3<Kilometers>, _sunPos: EciVec3<Kilometers>, earthRadius: number): string {
     const satDistance = Math.sqrt(satPos.x * satPos.x + satPos.y * satPos.y + satPos.z * satPos.z);
 
     // Simplified eclipse type determination

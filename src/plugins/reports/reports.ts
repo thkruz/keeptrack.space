@@ -459,7 +459,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
         const header = `Sun/Eclipse Analysis Report\n-------------------------------\n${this.createHeader_(sat)}`;
         let body = 'Time (UTC),Sun Illuminated,Eclipse Type,Sun Angle(°)\n';
         const durationInSeconds = 3 * 24 * 60 * 60; // 3 days
-        let time = new Date(startTime.getTime());
+        let time: Date;
         let wasIlluminated = true;
         // let eclipseEntryTime: Date | null = null;
         // let sunlightEntryTime: Date | null = null;

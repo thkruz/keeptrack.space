@@ -1,13 +1,13 @@
-import { SatMath } from '@app/app/analysis/sat-math';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { getDayOfYear, GreenwichMeanSiderealTime, Milliseconds } from '@ootk/src/main';
+import { getDayOfYear, GreenwichMeanSiderealTime, MILLISECONDS_TO_DAYS, Milliseconds, Sgp4 } from '@ootk/src/main';
 import { keepTrackApi } from '../../keepTrackApi';
 import { DateTimeManager } from '../../plugins/date-time-manager/date-time-manager';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { getEl } from '../utils/get-el';
+import { jday } from '../utils/transforms';
 
 export class TimeManager {
   datetimeInputDOM: HTMLInputElement | null = null;
@@ -193,10 +193,13 @@ export class TimeManager {
   }
 
   update() {
-    const { gmst, j } = SatMath.calculateTimeVariables(this.simulationTimeObj);
+    // Calculate Julian day and GMST from simulation time
+    const now = this.simulationTimeObj;
 
-    this.gmst = gmst;
-    this.j = j;
+    this.j =
+      jday(now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds()) +
+      now.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
+    this.gmst = Sgp4.gstime(this.j);
   }
 
   private initializeKeyboardBindings_() {

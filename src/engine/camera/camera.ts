@@ -25,7 +25,7 @@ import { ToastMsgType } from '@app/engine/core/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/engine/utils/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import {
-  BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, MILLISECONDS_TO_DAYS, Milliseconds, Radians, Sgp4, SpaceObjectType, Star, TAU, ZoomValue, eci2lla,
+  BaseObject, DEG2RAD, Degrees, EciVec3, GreenwichMeanSiderealTime, Kilometers, MILLISECONDS_TO_DAYS, Milliseconds, Radians, Sgp4, SpaceObjectType, Star, TAU, ZoomValue, eci2lla,
 } from '@ootk/src/main';
 import { mat4, vec3 } from 'gl-matrix';
 import { keepTrackApi } from '../../keepTrackApi';
@@ -103,8 +103,6 @@ export class Camera {
     this.behavior_?.onExit?.();
 
     // Update camera type
-    const oldType = this.cameraType_;
-
     this.cameraType_ = type;
 
     // Create and set new behavior
@@ -548,7 +546,7 @@ export class Camera {
    *
    * Splitting it into subfunctions would not be optimal
    */
-  snapToSat(sat: DetailedSatellite | MissileObject, simulationTime: Date) {
+  snapToSat(sat: BaseObject, _simulationTime?: Date) {
     if (typeof sat === 'undefined' || sat === null) {
       return;
     }

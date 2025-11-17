@@ -20,10 +20,10 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { BaseObject, GreenwichMeanSiderealTime, Kilometers, MILLISECONDS_TO_DAYS, Milliseconds, Sgp4, SpaceObjectType } from '@ootk/src/main';
+import { BaseObject, Kilometers, Milliseconds, SpaceObjectType } from '@ootk/src/main';
 import { mat4, vec3 } from 'gl-matrix';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
-import { alt2zoom, jday } from '@app/engine/utils/transforms';
+import { alt2zoom } from '@app/engine/utils/transforms';
 import { normalizeAngle } from '@app/engine/utils/transforms';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { settingsManager } from '@app/settings/settings';
@@ -51,31 +51,12 @@ export class FixedToSatBehavior extends BaseCameraBehavior {
     return true;
   }
 
-  draw(sensorPos: SensorPosition | null, target: BaseObject | null): void {
+  draw(_sensorPos: SensorPosition | null, target: BaseObject | null): void {
     if (!target) {
       return;
     }
 
     // Ensure we don't zoom in too close to the satellite
-    let gmst: GreenwichMeanSiderealTime;
-
-    if (sensorPos?.gmst) {
-      gmst = sensorPos.gmst;
-    } else {
-      // Calculate gmst from current time
-      const now = new Date();
-      const j = jday(
-        now.getUTCFullYear(),
-        now.getUTCMonth() + 1,
-        now.getUTCDate(),
-        now.getUTCHours(),
-        now.getUTCMinutes(),
-        now.getUTCSeconds(),
-      ) + now.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
-
-      gmst = Sgp4.gstime(j);
-    }
-
     // Get position relative to center body
     const centerBody = keepTrackApi.getScene().getBodyById(settingsManager.centerBody)!;
     const centerBodyPosition = centerBody.position;

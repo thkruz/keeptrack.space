@@ -1,9 +1,8 @@
 // app/keeptrack/camera/camera-state.ts
-import { ServiceLocator } from '@app/engine/core/service-locator';
-import { alt2zoom, jday } from '@app/engine/utils/transforms';
+import { alt2zoom } from '@app/engine/utils/transforms';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { Degrees, Kilometers, MILLISECONDS_TO_DAYS, Radians, Sgp4 } from '@ootk/src/main';
+import { Degrees, Kilometers, Radians } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 
 /**

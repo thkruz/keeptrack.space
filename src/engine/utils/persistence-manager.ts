@@ -3,93 +3,61 @@ import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { errorManagerInstance } from './errorManager';
 
-export enum StorageKey {
-  // User Data
-  CURRENT_SENSOR = 'v2-keepTrack-currentSensor',
-  WATCHLIST_LIST = 'v2-keepTrack-watchlistList',
-  CUSTOM_SENSORS = 'v2-keepTrack-customSensors',
-
-  // Preferences (Settings)
-  SETTINGS_MANAGER_COLORS = 'v2-settingsManager-colors',
-  SETTINGS_DOT_COLORS = 'v2-keepTrack-settings-dotColors',
-  IS_ADVICE_ENABLED = 'v2-isAdviceEnabled',
-  LAST_MAP = 'v2-keepTrack-earthTexture',
-  COLOR_SCHEME = 'v2-keepTrack-colorScheme',
-  SETTINGS_DRAW_CAMERA_WIDGET = 'v2-keepTrack-settings-drawCameraWidget',
-  SETTINGS_DRAW_ORBITS = 'v2-keepTrack-settings-drawOrbits',
-  SETTINGS_DRAW_ECF = 'v2-keepTrack-settings-drawECF',
-  SETTINGS_DRAW_IN_COVERAGE_LINES = 'v2-keepTrack-settings-drawInCoverageLines',
-  SETTINGS_DRAW_BLACK_EARTH = 'v2-keepTrack-settings-drawBlackEarth',
-  SETTINGS_DRAW_ATMOSPHERE = 'v2-keepTrack-settings-drawAtmosphere',
-  SETTINGS_DRAW_MILKY_WAY = 'v2-keepTrack-settings-drawMilkyWay',
-  SETTINGS_GRAY_SKYBOX = 'v2-keepTrack-settings-graySkybox',
-  SETTINGS_ECI_ON_HOVER = 'v2-keepTrack-settings-eciOnHover',
-  SETTINGS_HOS = 'v2-keepTrack-settings-hos',
-  SETTINGS_DEMO_MODE = 'v2-keepTrack-settings-demoMode',
-  SETTINGS_SAT_LABEL_MODE = 'v2-keepTrack-settings-satLabelMode',
-  SETTINGS_FREEZE_PROP_RATE_ON_DRAG = 'v2-keepTrack-settings-freezePropRateOnDrag',
-  SETTINGS_DISABLE_TIME_MACHINE_TOASTS = 'v2-keepTrack-settings-disableTimeMachineToasts',
-  SETTINGS_SEARCH_LIMIT = 'v2-keepTrack-settings-searchLimit',
-  SETTINGS_DRAW_TRAILING_ORBITS = 'v2-keepTrack-settings-drawTrailingOrbits',
-  SETTINGS_DRAW_AURORA = 'v2-keepTrack-settings-drawAurora',
-  SETTINGS_DRAW_SUN = 'v2-keepTrack-settings-drawSun',
-  SETTINGS_CONFIDENCE_LEVELS = 'v2-keepTrack-settings-confidenceLevels',
-  SETTINGS_DRAW_COVARIANCE_ELLIPSOID = 'v2-keepTrack-settings-drawCovarianceEllipsoid',
-  GRAPHICS_SETTINGS_GODRAYS_SAMPLES = 'v2-keepTrack-graphicsSettings-godraysSamples',
-  GRAPHICS_SETTINGS_GODRAYS_DECAY = 'v2-keepTrack-graphicsSettings-godraysDecay',
-  GRAPHICS_SETTINGS_GODRAYS_EXPOSURE = 'v2-keepTrack-graphicsSettings-godraysExposure',
-  GRAPHICS_SETTINGS_GODRAYS_DENSITY = 'v2-keepTrack-graphicsSettings-godraysDensity',
-  GRAPHICS_SETTINGS_GODRAYS_WEIGHT = 'v2-keepTrack-graphicsSettings-godraysWeight',
-  GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY = 'v2-keepTrack-graphicsSettings-godraysIlluminationDecay',
-  GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION = 'v2-keepTrack-graphicsSettings-earthDayResolution',
-  GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION = 'v2-keepTrack-graphicsSettings-earthNightResolution',
-  FILTER_SETTINGS_PAYLOADS = 'v2-filter-settings-payload',
-  FILTER_SETTINGS_ROCKET_BODIES = 'v2-filter-settings-rocket-bodies',
-  FILTER_SETTINGS_DEBRIS = 'v2-filter-settings-debris',
-  FILTER_SETTINGS_UNKNOWN_TYPE = 'v2-filter-settings-unknown-type',
-  FILTER_SETTINGS_AGENCIES = 'v2-filter-settings-agencies',
-  FILTER_SETTINGS_VLEO = 'v2-filter-settings-vleo',
-  FILTER_SETTINGS_LEO = 'v2-filter-settings-leo',
-  FILTER_SETTINGS_HEO = 'v2-filter-settings-heo',
-  FILTER_SETTINGS_MEO = 'v2-filter-settings-meo',
-  FILTER_SETTINGS_GEO = 'v2-filter-settings-geo',
-  FILTER_SETTINGS_X_GEO = 'v2-filter-settings-x-geo',
-  FILTER_SETTINGS_VIMPEL = 'v2-filter-settings-vimpel',
-  FILTER_SETTINGS_CELESTRAK = 'v2-filter-settings-celestrak',
-  FILTER_SETTINGS_NOTIONAL = 'v2-filter-settings-notional',
-  FILTER_SETTINGS_UNITED_STATES = 'v2-filter-settings-united-states',
-  FILTER_SETTINGS_UNITED_KINGDOM = 'v2-filter-settings-united-kingdom',
-  FILTER_SETTINGS_FRANCE = 'v2-filter-settings-france',
-  FILTER_SETTINGS_GERMANY = 'v2-filter-settings-germany',
-  FILTER_SETTINGS_JAPAN = 'v2-filter-settings-japan',
-  FILTER_SETTINGS_CHINA = 'v2-filter-settings-china',
-  FILTER_SETTINGS_INDIA = 'v2-filter-settings-india',
-  FILTER_SETTINGS_RUSSIA = 'v2-filter-settings-russia',
-  FILTER_SETTINGS_USSR = 'v2-filter-settings-ussr',
-  FILTER_SETTINGS_SOUTH_KOREA = 'v2-filter-settings-south-korea',
-  FILTER_SETTINGS_AUSTRALIA = 'v2-filter-settings-australia',
-  FILTER_SETTINGS_OTHER_COUNTRIES = 'v2-filter-settings-other-countries',
-  FILTER_SETTINGS_STARLINK = 'v2-filter-settings-starlink',
-  SENSOR_TIMELINE_ENABLED_SENSORS = 'v2-sensor-timeline-enabled-sensors',
-
-  VERSION = 'v2-version',
-
+/**
+ * Core storage keys used by the persistence manager
+ * Plugins should NOT modify this object - use the registration system instead
+ */
+export const STORAGE_KEYS = {
   // Aggregated storage keys
-  PREFERENCES = 'v2-keepTrack-preferences',
-  USER_DATA = 'v2-keepTrack-userData',
+  PREFERENCES: 'v2-keepTrack-preferences',
+  USER_DATA: 'v2-keepTrack-userData',
+
+  // Legacy keys (for backward compatibility)
+  VERSION: 'v2-version',
+} as const;
+
+/**
+ * Type for storage keys - can be core keys or any string
+ */
+export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS] | string;
+
+/**
+ * Registration information for a preference or userData key
+ */
+interface KeyRegistration {
+  key: string;
+  type: 'preference' | 'userData';
+  pluginId: string;
 }
 
 /**
  * User-specific data structure
+ * Plugins can extend this interface using module augmentation:
+ *
+ * @example
+ * declare module '@app/engine/utils/persistence-manager' {
+ *   interface UserData {
+ *     myPluginData?: MyCustomType;
+ *   }
+ * }
  */
 export interface UserData {
-  watchlist: { id: number; inView: boolean }[];
-  currentSensor: DetailedSensor | string | null;
-  customSensors: DetailedSensor[];
+  watchlist?: { id: number; inView: boolean }[];
+  currentSensor?: DetailedSensor | string | null;
+  customSensors?: DetailedSensor[];
+  [key: string]: unknown;
 }
 
 /**
  * Preferences (settings) data structure
+ * Plugins can extend this interface using module augmentation:
+ *
+ * @example
+ * declare module '@app/engine/utils/persistence-manager' {
+ *   interface Preferences {
+ *     myPluginSetting?: boolean;
+ *   }
+ * }
  */
 export interface Preferences {
   colors?: Record<string, unknown>;
@@ -161,11 +129,7 @@ export class PersistenceManager {
   private static instance_: PersistenceManager;
 
   private preferences_: Preferences = {};
-  private userData_: UserData = {
-    watchlist: [],
-    currentSensor: null,
-    customSensors: [],
-  };
+  private userData_: UserData = {};
 
   private isUseLocalStorage_ = false;
   private isUseRemoteStorage_ = false;
@@ -173,6 +137,9 @@ export class PersistenceManager {
   private hasChanges_ = false;
   private isInitialized_ = false;
   private readonly DEBOUNCE_DELAY_MS = 3000;
+
+  // Key registration system
+  private keyRegistry_ = new Map<string, KeyRegistration>();
 
   private constructor() {
     this.storage_ = localStorage;
@@ -225,6 +192,71 @@ export class PersistenceManager {
     }
 
     return PersistenceManager.instance_;
+  }
+
+  /**
+   * Register a key for use in preferences or userData
+   * This helps prevent key collisions between plugins
+   *
+   * @param key - The key name to register
+   * @param type - Whether this is a 'preference' or 'userData' key
+   * @param pluginId - The ID of the plugin registering this key
+   * @throws Error in debug mode if key is already registered
+   *
+   * @example
+   * // In your plugin's init method:
+   * PersistenceManager.getInstance().registerKey('myPluginEnabled', 'preference', 'MyPlugin');
+   * PersistenceManager.getInstance().registerKey('myPluginData', 'userData', 'MyPlugin');
+   *
+   * // Then use it:
+   * const pm = PersistenceManager.getInstance();
+   * pm.preferences.myPluginEnabled = true;
+   * pm.userData.myPluginData = { foo: 'bar' };
+   */
+  registerKey(key: string, type: 'preference' | 'userData', pluginId: string): void {
+    const existing = this.keyRegistry_.get(key);
+
+    if (existing) {
+      const errorMsg = `[PersistenceManager] Duplicate key registration: "${key}" already registered by "${existing.pluginId}" (attempted by "${pluginId}")`;
+
+      if (errorManagerInstance.isDebug) {
+        throw new Error(errorMsg);
+      }
+      errorManagerInstance.warn(errorMsg);
+
+      return;
+    }
+
+    this.keyRegistry_.set(key, { key, type, pluginId });
+    errorManagerInstance.debug(`[PersistenceManager] Registered ${type} key "${key}" for plugin "${pluginId}"`);
+  }
+
+  /**
+   * Unregister a previously registered key
+   *
+   * @param key - The key to unregister
+   */
+  unregisterKey(key: string): void {
+    this.keyRegistry_.delete(key);
+  }
+
+  /**
+   * Check if a key is registered
+   *
+   * @param key - The key to check
+   * @returns true if the key is registered
+   */
+  isKeyRegistered(key: string): boolean {
+    return this.keyRegistry_.has(key);
+  }
+
+  /**
+   * Get all registered keys for debugging
+   *
+   * @returns Array of all registered keys with their metadata
+   */
+  getRegisteredKeys(): KeyRegistration[] {
+    return Array.from(this.keyRegistry_.values());
   }
 
   /**
@@ -334,14 +366,14 @@ export class PersistenceManager {
   private loadFromLocalStorage_(): void {
     try {
       // Load preferences
-      const prefsData = this.storage_.getItem(StorageKey.PREFERENCES);
+      const prefsData = this.storage_.getItem(STORAGE_KEYS.PREFERENCES);
 
       if (prefsData) {
         this.preferences_ = JSON.parse(prefsData);
       }
 
       // Load user data
-      const userDataStr = this.storage_.getItem(StorageKey.USER_DATA);
+      const userDataStr = this.storage_.getItem(STORAGE_KEYS.USER_DATA);
 
       if (userDataStr) {
         this.userData_ = JSON.parse(userDataStr);
@@ -359,12 +391,12 @@ export class PersistenceManager {
       // Serialize and save preferences
       const prefsData = JSON.stringify(this.preferences_);
 
-      this.storage_.setItem(StorageKey.PREFERENCES, prefsData);
+      this.storage_.setItem(STORAGE_KEYS.PREFERENCES, prefsData);
 
       // Serialize and save user data
       const userDataStr = JSON.stringify(this.userData_);
 
-      this.storage_.setItem(StorageKey.USER_DATA, userDataStr);
+      this.storage_.setItem(STORAGE_KEYS.USER_DATA, userDataStr);
     } catch (error) {
       errorManagerInstance.error(error as Error, 'PersistenceManager.saveToLocalStorage_', 'Failed to save to localStorage');
     }
@@ -375,15 +407,11 @@ export class PersistenceManager {
    */
   clear(): void {
     this.preferences_ = {};
-    this.userData_ = {
-      watchlist: [],
-      currentSensor: null,
-      customSensors: [],
-    };
+    this.userData_ = {};
 
     if (this.isUseLocalStorage_) {
-      this.storage_.removeItem(StorageKey.PREFERENCES);
-      this.storage_.removeItem(StorageKey.USER_DATA);
+      this.storage_.removeItem(STORAGE_KEYS.PREFERENCES);
+      this.storage_.removeItem(STORAGE_KEYS.USER_DATA);
     }
 
     this.hasChanges_ = false;

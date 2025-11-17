@@ -79,6 +79,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
    * Other plugins can register their reports by calling ReportsPlugin.registerReport()
    */
   private static reportRegistry_: Map<string, ReportGenerator> = new Map();
+  private buttons_: string;
 
   /**
    * Register a new report generator
@@ -113,6 +114,19 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
     // Register built-in reports
     this.registerBuiltInReports_();
+
+    this.buttons_ = ReportsPlugin.getRegisteredReports()
+      .map((report) => `
+          <button
+              id="${report.id}-btn"
+              class="btn btn-ui waves-effect waves-light"
+              type="button"
+              name="action"
+              title="${report.description || report.name}">
+            ${report.name} &#9658;
+          </button>
+      `)
+      .join('');
   }
 
   isRequireSatelliteSelected = true;
@@ -127,39 +141,39 @@ export class ReportsPlugin extends KeepTrackPlugin {
   /**
    * Dynamically generate the side menu HTML based on registered reports
    */
-  get sideMenuElementHtml(): string {
-    const buttons = ReportsPlugin.getRegisteredReports()
-      .map((report) => `
-          <button
-              id="${report.id}-btn"
-              class="btn btn-ui waves-effect waves-light"
-              type="button"
-              name="action"
-              title="${report.description || report.name}">
-            ${report.name} &#9658;
-          </button>
-      `)
-      .join('');
-
-    return html`
+  sideMenuElementHtml: string = html`
       <div id="reports-menu" class="side-menu-parent start-hidden text-select">
         <div id="reports-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">Reports</h5>
             <div class="divider"></div>
-            <div class="center-align" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px; margin-left: 10px; margin-right: 10px;">
-              ${buttons}
+            <div id="reports-buttons" class="center-align" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px; margin-left: 10px; margin-right: 10px;">
             </div>
           </div>
         </div>
       </div>
     `;
-  }
 
   dragOptions: ClickDragOptions = {
     isDraggable: false,
     minWidth: 320,
   };
+
+  addHtml(): void {
+    super.addHtml();
+
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerInit,
+      () => {
+        // Insert the dynamically generated buttons into the side menu
+        const buttonsContainer = getEl('reports-buttons');
+
+        if (buttonsContainer) {
+          buttonsContainer.innerHTML = this.buttons_;
+        }
+      },
+    );
+  }
 
   addJs(): void {
     super.addJs();

@@ -25,10 +25,9 @@ import { ToastMsgType } from '@app/engine/core/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/engine/utils/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import {
-  BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue, eci2lla,
+  BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, MILLISECONDS_TO_DAYS, Milliseconds, Radians, Sgp4, SpaceObjectType, Star, TAU, ZoomValue, eci2lla,
 } from '@ootk/src/main';
 import { mat4, vec3 } from 'gl-matrix';
-import { SatMath } from '../../app/analysis/sat-math';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SettingsManager } from '../../settings/settings';
 import { Scene } from '../core/scene';
@@ -39,7 +38,7 @@ import { CelestialBody } from '../rendering/draw-manager/celestial-bodies/celest
 import { Earth } from '../rendering/draw-manager/earth';
 import type { OrbitManager } from '../rendering/orbitManager';
 import { errorManagerInstance } from '../utils/errorManager';
-import { lat2pitch, lon2yaw, normalizeAngle } from '../utils/transforms';
+import { jday, lat2pitch, lon2yaw, normalizeAngle } from '../utils/transforms';
 import { CameraInputHandler } from './camera-input-handler';
 import { CameraState } from './state/camera-state';
 import type { ICameraBehavior } from './behaviors/ICameraBehavior';
@@ -444,9 +443,10 @@ export class Camera {
     let targetDistanceFromEarth = 0;
 
     if (target) {
-      const gmst = keepTrackApi.getTimeManager().gmst;
+      // Calculate altitude: distance from center minus radius
+      const distanceFromCenter = Math.sqrt(target.x ** 2 + target.y ** 2 + target.z ** 2);
 
-      this.state.camSnapToSat.altitude = SatMath.getAlt(target, gmst, centerBody.RADIUS as Kilometers);
+      this.state.camSnapToSat.altitude = <Kilometers>(distanceFromCenter - (centerBody.RADIUS as Kilometers));
       targetDistanceFromEarth = this.state.camSnapToSat.altitude + RADIUS_OF_EARTH;
     }
     const radius = this.calcDistanceBasedOnZoom() - targetDistanceFromEarth;
@@ -493,7 +493,16 @@ export class Camera {
   }
 
   lookAtPosition(pos: EciVec3, isFaceEarth: boolean, selectedDate: Date): void {
-    const gmst = SatMath.calculateTimeVariables(selectedDate).gmst;
+    // Calculate GMST from selected date
+    const j = jday(
+      selectedDate.getUTCFullYear(),
+      selectedDate.getUTCMonth() + 1,
+      selectedDate.getUTCDate(),
+      selectedDate.getUTCHours(),
+      selectedDate.getUTCMinutes(),
+      selectedDate.getUTCSeconds(),
+    ) + selectedDate.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
+    const gmst = Sgp4.gstime(j);
     const lla = eci2lla(pos, gmst);
     const latModifier = isFaceEarth ? 1 : -1;
     const lonModifier = isFaceEarth ? 0 : 180;
@@ -591,8 +600,6 @@ export class Camera {
     if (this.state.camZoomSnappedOnSat && !settingsManager.isAutoZoomIn && !settingsManager.isAutoZoomOut) {
       if (sat.active) {
         // if this is a satellite not a missile
-        const { gmst } = SatMath.calculateTimeVariables(simulationTime);
-
         const centerBodyPosition = keepTrackApi.getScene().getBodyById(settingsManager.centerBody)!.position;
         const relativePosition = {
           x: sat.position.x - centerBodyPosition[0] as Kilometers,
@@ -601,7 +608,10 @@ export class Camera {
         };
         const centerBody = keepTrackApi.getScene().getBodyById(settingsManager.centerBody)!;
 
-        this.state.camSnapToSat.altitude = SatMath.getAlt(relativePosition, gmst, centerBody.RADIUS as Kilometers);
+        // Calculate altitude: distance from center minus radius
+        const distanceFromCenter = Math.sqrt(relativePosition.x ** 2 + relativePosition.y ** 2 + relativePosition.z ** 2);
+
+        this.state.camSnapToSat.altitude = <Kilometers>(distanceFromCenter - (centerBody.RADIUS as Kilometers));
       }
       if (this.state.camSnapToSat.altitude) {
         this.state.camSnapToSat.camDistTarget = this.state.camSnapToSat.altitude + RADIUS_OF_EARTH + this.state.camDistBuffer;

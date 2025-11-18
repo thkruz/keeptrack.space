@@ -29,7 +29,9 @@ import { getEl } from '@app/engine/utils/get-el';
 import analysisPng from '@public/img/icons/reports.png';
 
 
+import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -78,8 +80,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
    * Static registry of all available report generators
    * Other plugins can register their reports by calling ReportsPlugin.registerReport()
    */
-  private static reportRegistry_: Map<string, ReportGenerator> = new Map();
-  private buttons_: string;
+  private static readonly reportRegistry_: Map<string, ReportGenerator> = new Map();
+  private readonly buttons_: string;
 
   /**
    * Register a new report generator
@@ -378,7 +380,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
       },
     });
 
-    // NEW: Visibility Windows Report
+    // Visibility Windows Report
     ReportsPlugin.registerReport({
       id: 'visibility-windows-report',
       name: 'Visibility Windows',
@@ -407,19 +409,19 @@ export class ReportsPlugin extends KeepTrackPlugin {
             continue;
           }
 
-          if (rae.el > 0 && !inPass) {
+          if (sensor.isRaeInFov(rae) && !inPass) {
             // Pass start
             inPass = true;
             riseTime = new Date(time.getTime());
             maxEl = rae.el;
             maxElTime = new Date(time.getTime());
-          } else if (rae.el > 0 && inPass) {
+          } else if (sensor.isRaeInFov(rae) && inPass) {
             // During pass - track max elevation
             if (rae.el > maxEl) {
               maxEl = rae.el;
               maxElTime = new Date(time.getTime());
             }
-          } else if (rae.el <= 0 && inPass) {
+          } else if (!sensor.isRaeInFov(rae) && inPass) {
             // Pass end
             inPass = false;
             passNumber++;
@@ -449,7 +451,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
       },
     });
 
-    // NEW: Sun/Eclipse Report
+    // Sun/Eclipse Report
     ReportsPlugin.registerReport({
       id: 'sun-eclipse-report',
       name: 'Sun/Eclipse Analysis',
@@ -460,41 +462,57 @@ export class ReportsPlugin extends KeepTrackPlugin {
         let body = 'Time (UTC),Sun Illuminated,Eclipse Type,Sun Angle(°)\n';
         const durationInSeconds = 3 * 24 * 60 * 60; // 3 days
         let time = new Date(startTime.getTime());
-        let wasIlluminated = true;
-        // let eclipseEntryTime: Date | null = null;
-        // let sunlightEntryTime: Date | null = null;
 
         for (let t = 0; t < durationInSeconds; t += 60) {
           time = new Date(startTime.getTime() + t * MILLISECONDS_PER_SECOND);
 
           // Calculate if satellite is illuminated by the sun
-          const satPos = sat.eci(time)?.position;
+          const stateVector = sat.eci(time);
 
-          if (!satPos) {
+          if (!stateVector) {
             continue;
           }
-          const sunPos = this.getSunPosition_(time);
-          const earthRadius = 6371; // km
+          const sunPosArr = Scene.getInstance().sun.getEci(time);
+          const sunPos = { x: sunPosArr[0], y: sunPosArr[1], z: sunPosArr[2] } as EciVec3<Kilometers>;
 
           // Calculate if satellite is in Earth's shadow
-          const isIlluminated = this.isSatelliteIlluminated_(satPos, sunPos, earthRadius);
-
+          const sunStatus = SatMath.calculateIsInSun(stateVector, sunPos);
           // Calculate sun angle (angle between satellite and sun from Earth center)
-          const sunAngle = this.calculateSunAngle_(satPos, sunPos);
+          const sunAngle = SatMath.sunSatEarthAngle(stateVector.position, sunPos);
 
-          const illuminationStatus = isIlluminated ? 'Yes' : 'No';
-          const eclipseType = isIlluminated ? 'None' : this.getEclipseType_(satPos, sunPos, earthRadius);
+          let illuminationStatus;
+          let eclipseType;
 
-          body += `${this.formatTime_(time)},${illuminationStatus},${eclipseType},${sunAngle.toFixed(3)}\n`;
-
-          // Track transitions
-          if (!isIlluminated && wasIlluminated) {
-            // eclipseEntryTime = time;
-          } else if (isIlluminated && !wasIlluminated) {
-            // sunlightEntryTime = time;
+          switch (sunStatus) {
+            case SunStatus.SUN:
+              illuminationStatus = 'Yes';
+              break;
+            case SunStatus.PENUMBRAL:
+              illuminationStatus = 'Partial';
+              break;
+            case SunStatus.UMBRAL:
+              illuminationStatus = 'No';
+              break;
+            default:
+              illuminationStatus = 'Unknown';
+              break;
           }
 
-          wasIlluminated = isIlluminated;
+          switch (sunStatus) {
+            case SunStatus.SUN:
+              eclipseType = 'None';
+              break;
+            case SunStatus.PENUMBRAL:
+              eclipseType = 'Penumbral';
+              break;
+            case SunStatus.UMBRAL:
+              eclipseType = 'Umbral';
+              break;
+            default:
+              eclipseType = 'Unknown';
+          }
+
+          body += `${this.formatTime_(time)},${illuminationStatus},${eclipseType},${sunAngle.toFixed(3)}\n`;
         }
 
         return {
@@ -516,100 +534,6 @@ export class ReportsPlugin extends KeepTrackPlugin {
     const timeOut = timeSplit[0];
 
     return `${date} ${timeOut}`;
-  }
-
-  /**
-   * Get the sun's position in ECI coordinates at a given time
-   * Simplified solar position algorithm
-   */
-  private getSunPosition_(time: Date): EciVec3<Kilometers> {
-    const J2000 = new Date('2000-01-01T12:00:00Z').getTime();
-    const msPerDay = 24 * 60 * 60 * 1000;
-    const days = (time.getTime() - J2000) / msPerDay;
-
-    // Mean anomaly
-    const M = (357.5291 + 0.98560028 * days) % 360;
-    const Mrad = (M * Math.PI) / 180;
-
-    // Ecliptic longitude
-    const C = 1.9148 * Math.sin(Mrad) + 0.02 * Math.sin(2 * Mrad) + 0.0003 * Math.sin(3 * Mrad);
-    const L = (280.4665 + 0.98564736 * days + C) % 360;
-    const Lrad = (L * Math.PI) / 180;
-
-    // Distance to sun (AU to km)
-    const distance = 149597870.7; // 1 AU in km
-
-    // Convert to ECI coordinates (simplified)
-    const x = distance * Math.cos(Lrad);
-    const y = distance * Math.sin(Lrad);
-    const z = 0; // Simplified - sun is in ecliptic plane
-
-    return { x, y, z } as EciVec3<Kilometers>;
-  }
-
-  /**
-   * Calculate if satellite is illuminated by the sun
-   * Uses simple cylindrical shadow model
-   */
-  private isSatelliteIlluminated_(satPos: EciVec3<Kilometers>, sunPos: EciVec3<Kilometers>, earthRadius: number): boolean {
-    // Vector from satellite to sun
-    // const toSun = {
-    //   x: sunPos.x - satPos.x,
-    //   y: sunPos.y - satPos.y,
-    //   z: sunPos.z - satPos.z,
-    // };
-
-    // Check if satellite is on the dark side of Earth
-    const dotProduct = satPos.x * sunPos.x + satPos.y * sunPos.y + satPos.z * sunPos.z;
-
-    if (dotProduct > 0) {
-      // Satellite is on the sunlit side
-      return true;
-    }
-
-    // Calculate distance from Earth center to satellite
-    const satDistance = Math.sqrt(satPos.x * satPos.x + satPos.y * satPos.y + satPos.z * satPos.z);
-
-    // Simple cylindrical shadow check
-    // If satellite is below LEO altitude and on dark side, it's in shadow
-    if (satDistance < earthRadius + 1000) {
-      return dotProduct > 0;
-    }
-
-    // For higher orbits, use more detailed check
-    const perpDist = Math.abs(satPos.x * sunPos.y - satPos.y * sunPos.x) / Math.sqrt(sunPos.x * sunPos.x + sunPos.y * sunPos.y);
-
-    return perpDist > earthRadius;
-  }
-
-  /**
-   * Calculate the angle between satellite and sun as seen from Earth center
-   */
-  private calculateSunAngle_(satPos: EciVec3<Kilometers>, sunPos: EciVec3<Kilometers>): number {
-    const satMag = Math.sqrt(satPos.x * satPos.x + satPos.y * satPos.y + satPos.z * satPos.z);
-    const sunMag = Math.sqrt(sunPos.x * sunPos.x + sunPos.y * sunPos.y + sunPos.z * sunPos.z);
-    const dotProduct = satPos.x * sunPos.x + satPos.y * sunPos.y + satPos.z * sunPos.z;
-
-    const cosAngle = dotProduct / (satMag * sunMag);
-    const angle = Math.acos(Math.max(-1, Math.min(1, cosAngle)));
-
-    return (angle * 180) / Math.PI;
-  }
-
-  /**
-   * Determine the type of eclipse (penumbral, umbral, etc.)
-   */
-  private getEclipseType_(satPos: EciVec3<Kilometers>, _sunPos: EciVec3<Kilometers>, earthRadius: number): string {
-    const satDistance = Math.sqrt(satPos.x * satPos.x + satPos.y * satPos.y + satPos.z * satPos.z);
-
-    // Simplified eclipse type determination
-    if (satDistance < earthRadius + 200) {
-      return 'Umbral';
-    } else if (satDistance < earthRadius + 500) {
-      return 'Penumbral';
-    }
-
-    return 'Umbral';
   }
 
   private createHeader_(sat: DetailedSatellite, sensor?: DetailedSensor) {
@@ -677,9 +601,23 @@ export class ReportsPlugin extends KeepTrackPlugin {
         .join('\n');
 
       // Create a download button at the top so you can download the report as a .txt file
-      win.document.write(`<a href="data:text/plain;charset=utf-8,${encodeURIComponent(header + formattedReport)}" download="${filename}.txt">Download Report</a><br>`);
+      // Avoid using deprecated document.write by creating elements directly
+      win.document.open();
+      win.document.close();
 
-      win.document.write(`<plaintext>${header}${formattedReport}`);
+      const downloadLink = win.document.createElement('a');
+
+      downloadLink.href = `data:text/plain;charset=utf-8,${encodeURIComponent(header + formattedReport)}`;
+      downloadLink.download = `${filename}.txt`;
+      downloadLink.textContent = 'Download Report';
+      win.document.body.appendChild(downloadLink);
+      win.document.body.appendChild(win.document.createElement('br'));
+
+      const pre = win.document.createElement('pre');
+
+      pre.textContent = `${header}${formattedReport}`;
+      win.document.body.appendChild(pre);
+
       win.document.title = filename;
       win.history.replaceState(null, filename, `/${filename}.txt`);
     } else {

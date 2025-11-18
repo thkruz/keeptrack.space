@@ -1,0 +1,14 @@
+#sat-add-to-list,
+#sat-remove-from-list {
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+}
+
+#sat-add-to-list {
+  filter: hue-rotate(275deg) brightness(1.2);
+}
+
+#sat-remove-from-list {
+  filter: invert(52%) sepia(130%) saturate(7323%) hue-rotate(353deg) brightness(100%) contrast(86%);
+}

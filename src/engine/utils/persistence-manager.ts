@@ -4,6 +4,7 @@ export enum StorageKey {
   // OfflineMode Only
   CURRENT_SENSOR = 'v2-keepTrack-currentSensor',
   WATCHLIST_LIST = 'v2-keepTrack-watchlistList',
+  SATELLITE_LISTS = 'v2-keepTrack-satelliteLists',
 
   // Others
   SETTINGS_MANAGER_COLORS = 'v2-settingsManager-colors',

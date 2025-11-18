@@ -1,0 +1,9 @@
+{
+  "plugins": {
+    "SatelliteListsPlugin": {
+      "bottomIconLabel": "卫星列表",
+      "title": "卫星列表",
+      "helpBody": "“卫星列表”插件允许您创建和管理多个命名的卫星列表，以便在地球仪上主动监视并显示这些卫星。"
+    }
+  }
+}

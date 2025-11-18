@@ -83,6 +83,7 @@ import { VideoDirectorPlugin } from './video-director/video-director';
 import { ViewInfoRmbPlugin } from './view-info-rmb/view-info-rmb';
 import { WatchlistPlugin } from './watchlist/watchlist';
 import { WatchlistOverlay } from './watchlist/watchlist-overlay';
+import { SatelliteListsPlugin } from './satellite-lists/satellite-lists';
 
 export class PluginManager {
   // Register all core modules
@@ -183,6 +184,7 @@ export class PluginManager {
         { init: () => new SatelliteTimeline().init(), config: plugins.SatelliteTimeline },
         { init: () => new WatchlistPlugin().init(), config: plugins.WatchlistPlugin },
         { init: () => new WatchlistOverlay().init(), config: plugins.WatchlistOverlay },
+        { init: () => new SatelliteListsPlugin().init(), config: plugins.SatelliteListsPlugin },
         { init: () => new ReportsPlugin().init(), config: plugins.ReportsPlugin },
         { init: () => new PolarPlotPlugin().init(), config: plugins.PolarPlotPlugin },
         { init: () => new NextLaunchesPlugin().init(), config: plugins.NextLaunchesPlugin },

@@ -1,0 +1,9 @@
+{
+  "plugins": {
+    "SatelliteListsPlugin": {
+      "bottomIconLabel": "Listes de satellites",
+      "title": "Listes de satellites",
+      "helpBody": "Le plugin Listes de satellites vous permet de créer et de gérer plusieurs listes nommées de satellites à surveiller activement et à afficher sur le globe."
+    }
+  }
+}

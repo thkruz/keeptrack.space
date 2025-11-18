@@ -1,0 +1,9 @@
+{
+  "plugins": {
+    "SatelliteListsPlugin": {
+      "bottomIconLabel": "Listas de satélites",
+      "title": "Listas de satélites",
+      "helpBody": "El complemento Listas de satélites te permite crear y gestionar múltiples listas de satélites con nombre para supervisarlas y mostrarlas activamente en el globo."
+    }
+  }
+}

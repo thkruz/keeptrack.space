@@ -42,7 +42,7 @@ export class EclipseSolarAnalysis extends KeepTrackPlugin {
   isIconDisabled = true;
   isIconDisabledOnLoad = true;
 
-  menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.EXPERIMENTAL, MenuMode.ALL];
 
   bottomIconImg = dayNightPng;
   bottomIconLabel = 'Eclipse Analysis';

@@ -60,7 +60,7 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
     this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager;
   }
 
-  menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ADVANCED, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.EXPERIMENTAL, MenuMode.ALL];
 
   isRequireSatelliteSelected = true;
   isRequireSensorSelected = true;

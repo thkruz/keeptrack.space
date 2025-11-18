@@ -51,7 +51,6 @@ export class TocaPocaPlugin extends KeepTrackPlugin {
   readonly id = 'TocaPocaPlugin';
   dependencies_ = [SelectSatManager.name];
 
-  private selectSatManager_: SelectSatManager;
   private targetSatellite_: DetailedSatellite | null = null;
   private primarySatellite_: DetailedSatellite | null = null;
   private tocaPocaList_: TocaPocaEvent[] = [];
@@ -90,11 +89,6 @@ export class TocaPocaPlugin extends KeepTrackPlugin {
     minWidth: 600,
     maxWidth: 800,
   };
-
-  constructor() {
-    super();
-    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager;
-  }
 
   bottomIconCallback: () => void = () => {
     if (this.isMenuButtonActive) {
@@ -150,9 +144,9 @@ export class TocaPocaPlugin extends KeepTrackPlugin {
 
     // Handle "Set as Target Satellite" button
     getEl(`${this.id}-set-target-btn`)!.addEventListener('click', () => {
-      const selectedSat = this.selectSatManager_.getSelectedSat();
+      const selectedSat = PluginRegistry.getPlugin(SelectSatManager)?.getSelectedSat();
 
-      if (!selectedSat || !selectedSat.isSatellite()) {
+      if (!selectedSat?.isSatellite()) {
         errorManagerInstance.warn('Please select a satellite first!');
 
         return;

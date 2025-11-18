@@ -767,7 +767,7 @@ export class SatelliteListsPlugin extends KeepTrackPlugin {
     select.innerHTML = optionsHtml;
 
     // Re-initialize Materialize select
-    if (window.M) {
+    if (window.M?.AutoInit) {
       // eslint-disable-next-line new-cap
       window.M.AutoInit();
     }

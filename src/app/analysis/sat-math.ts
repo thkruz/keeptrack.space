@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
@@ -986,5 +987,37 @@ export abstract class SatMath {
     const angle = this.getAngleBetweenSatellitesAndSun(hoverSat as DetailedSatellite, secondaryObj as DetailedSatellite, sunEci);
 
     return angle * RAD2DEG as Degrees;
+  }
+
+  /**
+     * Calculate the angle between Sun, Satellite, and Earth with vertex at the
+     * satellite: angle(Sun - Satellite - Earth).
+     *
+     * This computes the angle between the vector from the satellite to the Sun
+     * and the vector from the satellite to the Earth (Earth is at origin).
+     */
+  static sunSatEarthAngle(satPos: EciVec3<Kilometers>, sunPos: EciVec3<Kilometers>): number {
+    // Vector from satellite to Sun
+    const s2sunX = sunPos.x - satPos.x;
+    const s2sunY = sunPos.y - satPos.y;
+    const s2sunZ = sunPos.z - satPos.z;
+
+    // Vector from satellite to Earth (Earth at origin -> -satPos)
+    const s2earthX = -satPos.x;
+    const s2earthY = -satPos.y;
+    const s2earthZ = -satPos.z;
+
+    const mag1 = Math.hypot(s2sunX, s2sunY, s2sunZ);
+    const mag2 = Math.hypot(s2earthX, s2earthY, s2earthZ);
+
+    if (mag1 === 0 || mag2 === 0) {
+      return NaN;
+    }
+
+    const dot = s2sunX * s2earthX + s2sunY * s2earthY + s2sunZ * s2earthZ;
+    const cosAngle = dot / (mag1 * mag2);
+    const angle = Math.acos(Math.max(-1, Math.min(1, cosAngle)));
+
+    return (angle * 180) / Math.PI;
   }
 }

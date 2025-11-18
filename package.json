@@ -97,7 +97,7 @@
     "@testing-library/user-event": "^14.5.2",
     "@types/agent-base": "^4.2.2",
     "@types/dotenv-webpack": "^7.0.8",
-    "@types/draggabilly": "^2.1.6",
+    "@types/draggabilly": "^3.0.0",
     "@types/file-saver": "^2.0.7",
     "@types/jest": "^29.5.5",
     "@types/materialize-css": "^1.0.11",

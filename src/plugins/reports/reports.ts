@@ -321,7 +321,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
       description: 'Generate ECI position and velocity vectors over time',
       requiresSensor: false,
       generate: (sat: DetailedSatellite, _sensor: DetailedSensor | null, startTime: Date): ReportData => {
-        const header = `Earth Centered Intertial Report\n-------------------------------\n${this.createHeader_(sat)}`;
+        const header = `Earth Centered Inertial Report\n-------------------------------\n${this.createHeader_(sat)}`;
         let body = 'Time (UTC),Position X(km),Position Y(km),Position Z(km),Velocity X(km/s),Velocity Y(km/s),Velocity Z(km/s)\n';
         const durationInSeconds = 72 * 60 * 60;
         let time = new Date(startTime.getTime());
@@ -394,7 +394,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
         const header = `Visibility Windows Report\n-------------------------------\n${this.createHeader_(sat, sensor)}`;
         let body = 'Pass #,Rise Time (UTC),Set Time (UTC),Duration (min),Max Elevation(°),Max Elevation Time (UTC)\n';
         const durationInSeconds = 7 * 24 * 60 * 60; // 7 days
-        let time = new Date(startTime.getTime());
+        let time: Date;
         let passNumber = 0;
         let inPass = false;
         let riseTime: Date | null = null;
@@ -461,7 +461,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
         const header = `Sun/Eclipse Analysis Report\n-------------------------------\n${this.createHeader_(sat)}`;
         let body = 'Time (UTC),Sun Illuminated,Eclipse Type,Sun Angle(°)\n';
         const durationInSeconds = 3 * 24 * 60 * 60; // 3 days
-        let time = new Date(startTime.getTime());
+        let time: Date;
 
         for (let t = 0; t < durationInSeconds; t += 60) {
           time = new Date(startTime.getTime() + t * MILLISECONDS_PER_SECOND);

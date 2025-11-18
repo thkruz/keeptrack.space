@@ -1,3 +1,5 @@
+@import url("./loading-screen.common.css");
+
 :root {
   --colorTertiary: #4a4a4a !important;
   --color-dark-background: #1f1f1f !important;

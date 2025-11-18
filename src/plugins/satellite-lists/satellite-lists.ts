@@ -83,7 +83,7 @@ export class SatelliteListsPlugin extends KeepTrackPlugin {
   bottomIconElementName: string = 'menu-satellite-lists';
   bottomIconImg = bookmarksPng;
 
-  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.EXPERIMENTAL, MenuMode.ALL];
 
   // Store all lists
   lists: SatelliteList[] = [];

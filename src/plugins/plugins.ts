@@ -55,7 +55,6 @@ import { SatInfoBoxSensor } from './sat-info-box-sensor/sat-info-box-sensor';
 import { SatInfoBox } from './sat-info-box/sat-info-box';
 import { SatelliteFov } from './satellite-fov/satellite-fov';
 import { SatellitePhotos } from './satellite-photos/satellite-photos';
-import { SatelliteSelection } from './satellite-selection/satellite-selection';
 import { ScenarioManagementPlugin } from './scenario-management/scenario-management';
 import { ScreenRecorder } from './screen-recorder/screen-recorder';
 import { Screenshot } from './screenshot/screenshot';
@@ -74,6 +73,7 @@ import { TimeMachine } from './time-machine/time-machine';
 import { TimeSlider } from './time-slider/time-slider';
 import { SatelliteTimeline } from './timeline-satellite/satellite-timeline';
 import { SensorTimeline } from './timeline-sensor/sensor-timeline';
+import { TocaPocaPlugin } from './toca-poca-plugin/toca-poca-plugin';
 import { TooltipsPlugin } from './tooltips/tooltips';
 import { TrackingImpactPredict } from './tracking-impact-predict/tracking-impact-predict';
 import { TransponderChannelData } from './transponder-channel-data/transponder-channel-data';
@@ -188,7 +188,7 @@ export class PluginManager {
         { init: () => new ProximityOps().init(), config: plugins.ProximityOps },
         { init: () => new OrbitReferences().init(), config: plugins.OrbitReferences },
         { init: () => new Collisions().init(), config: plugins.Collisions },
-        { init: () => new SatelliteSelection().init(), config: plugins.SatelliteSelection },
+        { init: () => new TocaPocaPlugin().init(), config: plugins.TocaPocaPlugin },
         { init: () => new OrbitGuardMenuPlugin().init(), config: plugins.OrbitGuardMenuPlugin },
         { init: () => new TrackingImpactPredict().init(), config: plugins.TrackingImpactPredict },
         { init: () => new Breakup().init(), config: plugins.Breakup },

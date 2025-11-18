@@ -21,21 +21,22 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { dateFormat } from '@app/engine/utils/dateFormat';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
-import { dateFormat } from '@app/engine/utils/dateFormat';
-import { DetailedSatellite, EciVec3, Kilometers, RIC } from '@ootk/src/main';
+import { BaseObject, DetailedSatellite, EciVec3, Kilometers, RIC } from '@ootk/src/main';
+import SatelliteSelectionPng from '@public/img/icons/satellite-selection.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import SatelliteSelectionPng from '@public/img/icons/satellite-selection.png';
-import './satellite-selection.css';
+import './toca-poca-plugin.css';
 
 export interface TocaPocaEvent {
   time: Date;
@@ -46,8 +47,8 @@ export interface TocaPocaEvent {
   relativeVelocity: number;
 }
 
-export class SatelliteSelection extends KeepTrackPlugin {
-  readonly id = 'SatelliteSelection';
+export class TocaPocaPlugin extends KeepTrackPlugin {
+  readonly id = 'TocaPocaPlugin';
   dependencies_ = [SelectSatManager.name];
 
   private selectSatManager_: SelectSatManager;
@@ -55,6 +56,8 @@ export class SatelliteSelection extends KeepTrackPlugin {
   private primarySatellite_: DetailedSatellite | null = null;
   private tocaPocaList_: TocaPocaEvent[] = [];
   private selectSatIdOnCruncher_: number | null = null;
+
+  menuMode: MenuMode[] = [MenuMode.EXPERIMENTAL, MenuMode.ALL];
 
   // Configuration
   private readonly propagationDays_ = 7; // Look ahead 7 days
@@ -88,8 +91,6 @@ export class SatelliteSelection extends KeepTrackPlugin {
     maxWidth: 800,
   };
 
-  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
-
   constructor() {
     super();
     this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager;
@@ -109,8 +110,8 @@ export class SatelliteSelection extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
 
-    EventBus.getInstance().on(EventBusEvent.selectSatData, (sat: DetailedSatellite) => {
-      if (sat.isSatellite()) {
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (sat: DetailedSatellite | BaseObject | OemSatellite) => {
+      if (sat instanceof DetailedSatellite) {
         this.primarySatellite_ = sat;
         if (this.isMenuButtonActive) {
           this.updateSatelliteInfo_();
@@ -153,6 +154,7 @@ export class SatelliteSelection extends KeepTrackPlugin {
 
       if (!selectedSat || !selectedSat.isSatellite()) {
         errorManagerInstance.warn('Please select a satellite first!');
+
         return;
       }
 
@@ -207,11 +209,12 @@ export class SatelliteSelection extends KeepTrackPlugin {
   private calculateTocaPoca_() {
     if (!this.primarySatellite_ || !this.targetSatellite_) {
       errorManagerInstance.warn('Please select both a primary and target satellite!');
+
       return;
     }
 
     try {
-      const events: TocaPocaEvent[] = [];
+      // const events: TocaPocaEvent[] = [];
       const timeManagerInstance = ServiceLocator.getTimeManager();
       const propagationSeconds = this.propagationDays_ * 24 * 60 * 60;
 
@@ -245,7 +248,7 @@ export class SatelliteSelection extends KeepTrackPlugin {
               sat1Position: sat1J2000.position,
               sat2Position: sat2J2000.position,
               relativeVelocity: Math.sqrt(
-                ric.velocity.x ** 2 + ric.velocity.y ** 2 + ric.velocity.z ** 2
+                ric.velocity.x ** 2 + ric.velocity.y ** 2 + ric.velocity.z ** 2,
               ),
             });
           }
@@ -271,7 +274,7 @@ export class SatelliteSelection extends KeepTrackPlugin {
         this.createTable_();
       }
     } catch (error) {
-      errorManagerInstance.error(`Error calculating TOCA/POCA: ${error}`, 'satellite-selection.ts');
+      errorManagerInstance.error(error, 'satellite-selection.ts', `Error calculating TOCA/POCA: ${error}`);
       this.clearTable_();
     }
   }
@@ -279,6 +282,7 @@ export class SatelliteSelection extends KeepTrackPlugin {
   private createTable_(): void {
     try {
       const tbl = <HTMLTableElement>getEl(`${this.id}-table`);
+
       tbl.innerHTML = '';
 
       this.createHeaders_(tbl);
@@ -290,6 +294,7 @@ export class SatelliteSelection extends KeepTrackPlugin {
 
   private clearTable_(): void {
     const tbl = <HTMLTableElement>getEl(`${this.id}-table`);
+
     tbl.innerHTML = '';
   }
 
@@ -299,6 +304,7 @@ export class SatelliteSelection extends KeepTrackPlugin {
 
     for (const name of names) {
       const column = tr.insertCell();
+
       column.appendChild(document.createTextNode(name));
       column.setAttribute('style', 'text-decoration: underline; font-weight: bold;');
     }
@@ -338,6 +344,7 @@ export class SatelliteSelection extends KeepTrackPlugin {
 
   private createCell_(tr: HTMLTableRowElement, text: string): void {
     const cell = tr.insertCell();
+
     cell.appendChild(document.createTextNode(text));
   }
 }

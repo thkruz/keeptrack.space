@@ -65,6 +65,9 @@ export interface EngineEventMap {
   [EventBusEvent.userLogout]: []; // no arguments
   [EventBusEvent.SceneReady]: []; // no arguments
   [EventBusEvent.highPerformanceRender]: [Milliseconds]; // delta time
+  [EventBusEvent.buildDataUpdate]: []; // no arguments
+  [EventBusEvent.buildPreferencesUpdate]: []; // no arguments
+  [EventBusEvent.debouncedSync]: []; // no arguments
 }
 
 interface EventBusRegisterParams<T extends EventBusEvent> {

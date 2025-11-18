@@ -87,4 +87,16 @@ export enum EventBusEvent {
   onLinesCleared = 'onLinesCleared',
   selectedDateChange = 'selectedDateChange',
   calculateSimulationTime = 'calculateSimulationTime',
+  /**
+   * Run when user data needs to be updated (watchlist, current sensor, custom sensors)
+   */
+  buildDataUpdate = 'buildDataUpdate',
+  /**
+   * Run when preferences need to be updated (settings)
+   */
+  buildPreferencesUpdate = 'buildPreferencesUpdate',
+  /**
+   * Run after debounced sync completes to notify external systems
+   */
+  debouncedSync = 'debouncedSync',
 }

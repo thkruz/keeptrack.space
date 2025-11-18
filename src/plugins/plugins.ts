@@ -75,6 +75,7 @@ import { TimeMachine } from './time-machine/time-machine';
 import { TimeSlider } from './time-slider/time-slider';
 import { SatelliteTimeline } from './timeline-satellite/satellite-timeline';
 import { SensorTimeline } from './timeline-sensor/sensor-timeline';
+import { TocaPocaPlugin } from './toca-poca-plugin/toca-poca-plugin';
 import { TooltipsPlugin } from './tooltips/tooltips';
 import { TrackingImpactPredict } from './tracking-impact-predict/tracking-impact-predict';
 import { TransponderChannelData } from './transponder-channel-data/transponder-channel-data';
@@ -192,6 +193,7 @@ export class PluginManager {
         { init: () => new ProximityOps().init(), config: plugins.ProximityOps },
         { init: () => new OrbitReferences().init(), config: plugins.OrbitReferences },
         { init: () => new Collisions().init(), config: plugins.Collisions },
+        { init: () => new TocaPocaPlugin().init(), config: plugins.TocaPocaPlugin },
         { init: () => new OrbitGuardMenuPlugin().init(), config: plugins.OrbitGuardMenuPlugin },
         { init: () => new TrackingImpactPredict().init(), config: plugins.TrackingImpactPredict },
         { init: () => new Breakup().init(), config: plugins.Breakup },

@@ -1,0 +1,60 @@
+/**
+ * Styling for the Satellite Selection (TOCA/POCA) Plugin
+ */
+
+#SatelliteSelection-menu {
+  min-width: 600px;
+}
+
+#SatelliteSelection-table {
+  line-height: 1.5;
+  font-size: 14px;
+  margin-top: 15px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+#SatelliteSelection-table td {
+  text-align: center;
+  padding: 8px 5px;
+}
+
+#SatelliteSelection-table th {
+  text-align: center;
+  padding: 8px 5px;
+}
+
+#SatelliteSelection-satellite-info {
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+}
+
+#SatelliteSelection-satellite-info p {
+  margin: 5px 0;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+#SatelliteSelection-primary-sat {
+  color: #4CAF50;
+}
+
+#SatelliteSelection-target-sat {
+  color: #2196F3;
+}
+
+#SatelliteSelection-set-target-btn {
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+
+.SatelliteSelection-event {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.SatelliteSelection-event:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}

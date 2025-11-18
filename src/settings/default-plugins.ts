@@ -112,6 +112,10 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 81,
   },
+  TocaPocaPlugin: {
+    enabled: true,
+    order: 82,
+  },
   Collisions: {
     enabled: true,
     order: 90,

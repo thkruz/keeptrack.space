@@ -1,0 +1,9 @@
+{
+  "plugins": {
+    "SatelliteListsPlugin": {
+      "bottomIconLabel": "위성 목록",
+      "title": "위성 목록",
+      "helpBody": "Satellite Lists 플러그인을 사용하면 지구본에서 실시간으로 모니터링하고 표시할 여러 이름의 위성 목록을 생성하고 관리할 수 있습니다."
+    }
+  }
+}

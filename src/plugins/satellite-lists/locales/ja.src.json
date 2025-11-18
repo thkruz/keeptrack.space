@@ -1,0 +1,9 @@
+{
+  "plugins": {
+    "SatelliteListsPlugin": {
+      "bottomIconLabel": "衛星リスト",
+      "title": "衛星リスト",
+      "helpBody": "Satellite Lists プラグインでは、地球儀上で監視・表示するための複数の名前付き衛星リストを作成および管理できます。"
+    }
+  }
+}

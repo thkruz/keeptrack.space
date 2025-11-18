@@ -34,7 +34,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
-import { BaseObject, CatalogSource, DetailedSatellite } from '@ootk/src/main';
+import { BaseObject, CatalogSource } from '@ootk/src/main';
 import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import bookmarksPng from '@public/img/icons/bookmarks.png';
@@ -45,6 +45,10 @@ import { EL as SAT_INFO_EL } from '../sat-info-box/sat-info-box-html';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
+import listAddPng from './list-add.png';
+import listEditPng from './list-edit.png';
+import listRemovePng from './list-remove.png';
+import './satellite-lists.css';
 
 interface SatelliteList {
   name: string;
@@ -91,6 +95,21 @@ export class SatelliteListsPlugin extends KeepTrackPlugin {
         <div class="row">
           <h5 class="center-align">Satellite Lists</h5>
 
+          <!-- List Management -->
+          <div class="center-align row" style="display: flex;justify-content: center;gap: 10px;">
+            <button id="satellite-lists-new-list" class="btn btn-ui waves-effect waves-light" type="button" kt-tooltip="Create New List">
+              <img src="" delayedsrc="${listAddPng}" alt="new" style="height: 34px;vertical-align: middle;margin: -8px;filter: brightness(10);" />
+            </button>
+
+            <button id="satellite-lists-rename-list" class="btn btn-ui waves-effect waves-light" type="button" kt-tooltip="Rename Current List">
+              <img src="" delayedsrc="${listEditPng}" alt="rename" style="height: 34px;vertical-align: middle;margin: -8px;filter: brightness(10);" />
+            </button>
+
+            <button id="satellite-lists-delete-list" class="btn btn-ui waves-effect waves-light" type="button" kt-tooltip="Delete Current List">
+              <img src="" delayedsrc="${listRemovePng}" alt="remove" style="height: 34px;vertical-align: middle;margin: -8px;filter: brightness(10);" />
+            </button>
+          </div>
+
           <!-- List Selection -->
           <div class="row">
             <div class="input-field col s12">
@@ -101,26 +120,8 @@ export class SatelliteListsPlugin extends KeepTrackPlugin {
             </div>
           </div>
 
-          <!-- List Management -->
-          <div class="center-align row">
-            <button id="satellite-lists-new-list" class="btn btn-ui waves-effect waves-light" type="button">
-              Create New List &#9658;
-            </button>
-          </div>
-
-          <div class="center-align row">
-            <button id="satellite-lists-rename-list" class="btn btn-ui waves-effect waves-light" type="button">
-              Rename List &#9658;
-            </button>
-          </div>
-
-          <div class="center-align row">
-            <button id="satellite-lists-delete-list" class="btn btn-ui waves-effect waves-light" type="button">
-              Delete List &#9658;
-            </button>
-          </div>
-
-          <hr />
+          <h5 class="center-align side-menu-row-header">Current List</h5>
+          <div class="divider flow5out" style="padding: 0.75em !important;"></div>
 
           <!-- Current List Display -->
           <h6 class="center-align" id="satellite-lists-current-name">No List Selected</h6>
@@ -143,23 +144,20 @@ export class SatelliteListsPlugin extends KeepTrackPlugin {
             </div>
           </div>
 
-          <hr />
-
           <!-- Export/Import Individual List -->
-          <div class="center-align row">
-            <button id="satellite-lists-export-current" class="btn btn-ui waves-effect waves-light" type="button">
-              Export Current List &#9658;
-            </button>
-          </div>
-
-          <div class="center-align row">
+          <div class="center-align row" style="display: flex;justify-content: center;gap: 10px;">
             <button id="satellite-lists-import-single" class="btn btn-ui waves-effect waves-light" type="button">
-              Import Single List &#9658;
+              Import &#9658;
             </button>
             <input id="satellite-lists-import-single-file" type="file" accept=".json" style="display: none;" />
+            <button id="satellite-lists-export-current" class="btn btn-ui waves-effect waves-light" type="button">
+              Export &#9658;
+            </button>
           </div>
 
-          <hr />
+          <div class="divider flow5out" style="padding: 0.75em !important;"></div>
+          <h5 class="center-align side-menu-row-header">Manage Lists</h5>
+          <div class="divider flow5out" style="padding: 0.75em !important;"></div>
 
           <!-- Export/Import All Lists -->
           <div class="center-align row">
@@ -282,8 +280,14 @@ export class SatelliteListsPlugin extends KeepTrackPlugin {
     ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
     if (this.isOnCurrentList(id)) {
       this.removeSatFromCurrentList(id);
+      // Update css class
+      getEl(this.EL.REMOVE_FROM_LIST)!.style.display = 'none';
+      getEl(this.EL.ADD_TO_LIST)!.style.display = 'block';
     } else {
       this.addSatToCurrentList(id);
+      // Update css class
+      getEl(this.EL.ADD_TO_LIST)!.style.display = 'none';
+      getEl(this.EL.REMOVE_FROM_LIST)!.style.display = 'block';
     }
   }
 
@@ -763,8 +767,9 @@ export class SatelliteListsPlugin extends KeepTrackPlugin {
     select.innerHTML = optionsHtml;
 
     // Re-initialize Materialize select
-    if (window.M?.FormSelect) {
-      window.M.FormSelect.init(select);
+    if (window.M) {
+      // eslint-disable-next-line new-cap
+      window.M.AutoInit();
     }
   }
 
@@ -819,6 +824,8 @@ export class SatelliteListsPlugin extends KeepTrackPlugin {
     }
 
     ServiceLocator.getColorSchemeManager().calculateColorBuffers(true);
+
+    this.updateListSelector();
   }
 
   selectSat(id: number) {

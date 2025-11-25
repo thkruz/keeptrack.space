@@ -14,7 +14,12 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { BaseObject, cKmPerMs, DEG2RAD, DetailedSatellite, eci2lla, eci2rae, RfSensor, SpaceObjectType, Sun, SunTime } from '@ootk/src/main';
+import {
+  BaseObject, cKmPerMs, DEG2RAD, DetailedSatellite, eci2lla, eci2rae,
+  RadecTopocentric,
+  RfSensor,
+  SpaceObjectType, Sun, SunTime
+} from '@ootk/src/main';
 import type { SensorManager } from '../../app/sensors/sensorManager';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { missileManager } from '../missile/missile-manager';
@@ -30,6 +35,8 @@ const EL = {
   RANGE: 'sat-range',
   AZIMUTH: 'sat-azimuth',
   ELEVATION: 'sat-elevation',
+  RA: 'sat-ra',
+  DEC: 'sat-dec',
   BEAMWIDTH: 'sat-beamwidth',
   MAX_TMX: 'sat-maxTmx',
   SUN: 'sat-sun',
@@ -72,6 +79,8 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       { key: 'Range', id: EL.RANGE, tooltip: 'Distance from the Sensor', value: 'xxxx km' },
       { key: 'Azimuth', id: EL.AZIMUTH, tooltip: 'Angle (Left/Right) from the Sensor', value: 'XX deg' },
       { key: 'Elevation', id: EL.ELEVATION, tooltip: 'Angle (Up/Down) from the Sensor', value: 'XX deg' },
+      { key: 'RA', id: EL.RA, tooltip: 'Right Ascension', value: 'XX deg' },
+      { key: 'Dec', id: EL.DEC, tooltip: 'Declination', value: 'XX deg' },
       { key: 'Beam Width', id: EL.BEAMWIDTH, tooltip: 'Linear Width at Target\'s Range', value: 'xxxx km' },
       { key: 'Max Tmx Time', id: EL.MAX_TMX, tooltip: 'Time for RF/Light to Reach Target and Back', value: 'xxxx ms' },
       { key: 'Sun', id: EL.SUN, tooltip: 'Does the Sun Impact the Sensor', value: 'Sun Stuff' },
@@ -357,6 +366,8 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       az: getEl('sat-azimuth'),
       el: getEl('sat-elevation'),
       rng: getEl('sat-range'),
+      ra: getEl('sat-ra'),
+      dec: getEl('sat-dec'),
       vmag: getEl('sat-vmag'),
       beamwidth: getEl('sat-beamwidth'),
       maxTmx: getEl('sat-maxTmx'),
@@ -371,7 +382,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
 
   private updateSatTearrOutFov_(elements: {
     az: HTMLElement | null; el: HTMLElement | null; rng: HTMLElement | null; vmag: HTMLElement | null; beamwidth: HTMLElement | null;
-    maxTmx: HTMLElement | null;
+    maxTmx: HTMLElement | null; ra: HTMLElement | null; dec: HTMLElement | null;
   }, sensorManagerInstance: SensorManager) {
     if (elements.vmag) {
       elements.vmag.innerHTML = 'Out of FOV';
@@ -409,6 +420,13 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       }
     }
 
+    if (elements.ra) {
+      elements.ra.innerHTML = 'Out of FOV';
+    }
+    if (elements.dec) {
+      elements.dec.innerHTML = 'Out of FOV';
+    }
+
     let beamwidthString = 'Unknown';
 
     if (sensorManagerInstance.currentSensors[0] instanceof RfSensor) {
@@ -427,7 +445,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
 
   private updateSatTearrInFov_(elements: {
     az: HTMLElement | null; el: HTMLElement | null; rng: HTMLElement | null; vmag: HTMLElement | null; beamwidth: HTMLElement | null;
-    maxTmx: HTMLElement | null;
+    maxTmx: HTMLElement | null; ra: HTMLElement | null; dec: HTMLElement | null;
   }, obj: BaseObject, sensorManagerInstance: SensorManager, timeManagerInstance: TimeManager) {
     if (elements.az) {
       const az = ServiceLocator.getSensorManager().currentTEARR.az;
@@ -455,35 +473,51 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       } else {
         elements.rng.innerHTML = 'Unknown';
       }
-      const sun = ServiceLocator.getScene().sun;
+    }
 
-      if (elements.vmag) {
-        if (obj.isMissile()) {
-          elements.vmag.innerHTML = 'N/A';
-        } else {
-          const sat = obj as DetailedSatellite;
+    const currentSat = PluginRegistry.getPlugin(SelectSatManager)!.getSelectedSat() as DetailedSatellite;
+    const currentSensor = sensorManagerInstance.currentSensors[0];
 
-          elements.vmag.innerHTML = SatMath.calculateVisMag(sat, sensorManagerInstance.currentSensors[0], timeManagerInstance.simulationTimeObj, sun).toFixed(2);
-        }
+    const raDec = RadecTopocentric.fromStateVector(currentSat.toJ2000(), currentSensor.toJ2000());
+
+    if (elements.ra) {
+      const rawRa = raDec.rightAscensionDegrees;
+      const rightAscensionDegrees = ((rawRa % 360) + 360) % 360;
+
+      elements.ra.innerHTML = `${(rightAscensionDegrees).toFixed(4)}°`;
+    }
+    if (elements.dec) {
+      elements.dec.innerHTML = `${(raDec.declinationDegrees).toFixed(4)}°`;
+    }
+
+    const sun = ServiceLocator.getScene().sun;
+
+    if (elements.vmag) {
+      if (obj.isMissile()) {
+        elements.vmag.innerHTML = 'N/A';
+      } else {
+        const sat = obj as DetailedSatellite;
+
+        elements.vmag.innerHTML = SatMath.calculateVisMag(sat, sensorManagerInstance.currentSensors[0], timeManagerInstance.simulationTimeObj, sun).toFixed(2);
       }
-      let beamwidthString = 'Unknown';
+    }
+    let beamwidthString = 'Unknown';
 
-      if (sensorManagerInstance.currentSensors[0] instanceof RfSensor) {
-        const currentRange = ServiceLocator.getSensorManager().currentTEARR.rng;
+    if (sensorManagerInstance.currentSensors[0] instanceof RfSensor) {
+      const currentRange = ServiceLocator.getSensorManager().currentTEARR.rng;
 
-        beamwidthString = sensorManagerInstance.currentSensors[0].beamwidth && currentRange
-          ? `${(currentRange * Math.sin(DEG2RAD * sensorManagerInstance.currentSensors[0].beamwidth)).toFixed(2)} km`
-          : 'Unknown';
-      }
-      if (elements.beamwidth) {
-        elements.beamwidth.innerHTML = beamwidthString;
-      }
-      if (elements.maxTmx) {
-        const currentRange = ServiceLocator.getSensorManager().currentTEARR.rng;
-        // Time for RF to hit target and bounce back
+      beamwidthString = sensorManagerInstance.currentSensors[0].beamwidth && currentRange
+        ? `${(currentRange * Math.sin(DEG2RAD * sensorManagerInstance.currentSensors[0].beamwidth)).toFixed(2)} km`
+        : 'Unknown';
+    }
+    if (elements.beamwidth) {
+      elements.beamwidth.innerHTML = beamwidthString;
+    }
+    if (elements.maxTmx) {
+      const currentRange = ServiceLocator.getSensorManager().currentTEARR.rng;
+      // Time for RF to hit target and bounce back
 
-        elements.maxTmx.innerHTML = currentRange ? `${((currentRange / cKmPerMs) * 2).toFixed(2)} ms` : 'Unknown';
-      }
+      elements.maxTmx.innerHTML = currentRange ? `${((currentRange / cKmPerMs) * 2).toFixed(2)} ms` : 'Unknown';
     }
   }
 }

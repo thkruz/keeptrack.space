@@ -3,4 +3,4 @@
 /**
  * The current application version
  */
-export const VERSION = '11.0.1';
+export const VERSION = '11.0.3';

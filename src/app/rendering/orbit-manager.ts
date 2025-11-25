@@ -446,7 +446,13 @@ export class OrbitManager {
 
     if (hoverId !== -1 && hoverId !== this.currentSelectId_ && !ServiceLocator.getCatalogManager().getObject(hoverId, GetSatType.EXTRA_ONLY)?.isStatic()) {
       OrbitManager.checkColorBuffersValidity_(hoverId, colorSchemeManagerInstance.colorData);
-      this.lineManagerInstance_.setColorUniforms(settingsManager.orbitHoverColor);
+      const sat = ServiceLocator.getCatalogManager().getObject(hoverId, GetSatType.EXTRA_ONLY);
+
+      if (sat instanceof OemSatellite) {
+        this.lineManagerInstance_.setColorUniforms(sat.dotColor ?? settingsManager.orbitHoverColor);
+      } else {
+        this.lineManagerInstance_.setColorUniforms(settingsManager.orbitHoverColor);
+      }
       this.writePathToGpu_(hoverId);
     }
   }

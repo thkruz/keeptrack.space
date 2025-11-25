@@ -101,7 +101,7 @@ export class CelestrakColorScheme extends ColorScheme {
 
     if (((obj as OemSatellite).source ?? '') === 'OEM Import') {
       return {
-        color: [1.0, 0.5, 0.0, 1.0],
+        color: (obj as OemSatellite).dotColor,
         pickable: Pickable.Yes,
       };
     }

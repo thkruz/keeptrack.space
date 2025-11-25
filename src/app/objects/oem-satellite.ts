@@ -1,4 +1,4 @@
-import { SolarBody } from '@app/engine/core/interfaces';
+import { rgbaArray, SolarBody } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -6,6 +6,7 @@ import { LagrangeInterpolator } from '@app/engine/ootk/src/interpolator/Lagrange
 import { LineColors } from '@app/engine/rendering/line-manager/line';
 import { OrbitPathLine } from '@app/engine/rendering/line-manager/orbit-path';
 import { BaseObject, J2000, Kilometers, Seconds, SpaceObjectType, TEME } from '@ootk/src/main';
+import { vec4 } from 'gl-matrix';
 import { SatelliteModels } from '../rendering/mesh/model-resolver';
 
 export interface OemHeader {
@@ -73,6 +74,9 @@ export class OemSatellite extends BaseObject {
   pointsTeme: [number, number, number, number][] = [];
   pointsJ2000: [number, number, number, number][] = [];
   moonPositionCache_: { [key: number]: { position: { x: number; y: number; z: number } } } = {};
+
+  orbitColor: vec4 = LineColors.GREEN;
+  dotColor: rgbaArray = [0, 255, 0, 1];
 
   eci(date: Date): { position: { x: number; y: number; z: number }; velocity: { x: number; y: number; z: number } } | null {
     const posAndVel = this.updatePosAndVel(date.getTime() / 1000 as Seconds);
@@ -526,7 +530,7 @@ export class OemSatellite extends BaseObject {
       this.orbitHistoryLine.isGarbage = true;
     }
 
-    this.orbitHistoryLine = lineManager.createOrbitPath(points, LineColors.GREEN, SolarBody.Earth);
+    this.orbitHistoryLine = lineManager.createOrbitPath(points, this.orbitColor ?? LineColors.GREEN, SolarBody.Earth);
   }
 
   removeOrbitHistory(): void {

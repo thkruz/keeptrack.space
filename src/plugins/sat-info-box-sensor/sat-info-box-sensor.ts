@@ -18,7 +18,7 @@ import {
   BaseObject, cKmPerMs, DEG2RAD, DetailedSatellite, eci2lla, eci2rae,
   RadecTopocentric,
   RfSensor,
-  SpaceObjectType, Sun, SunTime
+  SpaceObjectType, Sun, SunTime,
 } from '@ootk/src/main';
 import type { SensorManager } from '../../app/sensors/sensorManager';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';

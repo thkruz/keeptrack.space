@@ -3,6 +3,7 @@ import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { Planet } from '@app/app/objects/planet';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
@@ -11,7 +12,6 @@ import { BaseObject, DetailedSatellite, SpaceObjectType, Star } from '@ootk/src/
 import { CameraType } from '../../camera/camera';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export interface ObjectTypeColorSchemeColorMap extends ColorSchemeColorMap {
   payload: rgbaArray;
@@ -104,7 +104,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
 
     if (((obj as OemSatellite).source ?? '') === 'OEM Import') {
       return {
-        color: [1.0, 0.5, 0.0, 1.0],
+        color: (obj as OemSatellite).dotColor,
         pickable: Pickable.Yes,
       };
     }

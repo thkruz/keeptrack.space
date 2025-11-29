@@ -5,7 +5,7 @@ import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
 import { t7e, TranslationKey } from '@app/locales/keys';
 import { BaseObject } from '@ootk/src/main';
 import Module from 'module';
-import type { SelectSatManager } from '../../plugins/select-sat-manager/select-sat-manager';
+import { SelectSatManager } from '../../plugins/select-sat-manager/select-sat-manager';
 import { SoundNames } from '../../plugins/sounds/sounds';
 import { PluginRegistry } from '../core/plugin-registry';
 import { ServiceLocator } from '../core/service-locator';
@@ -17,7 +17,6 @@ import { errorManagerInstance } from '../utils/errorManager';
 import { getEl, hideEl } from '../utils/get-el';
 import { shake } from '../utils/shake';
 import { slideInRight, slideOutLeft } from '../utils/slide';
-// TODO: Utilize the event bus to remove dependencies
 
 export interface ClickDragOptions {
   leftOffset?: number;
@@ -543,7 +542,7 @@ export abstract class KeepTrackPlugin {
 
   static hideUnusedMenuModes(): void {
     for (const menuMode in Object.keys(KeepTrackPlugin.registeredMenus)) {
-      if (Object.prototype.hasOwnProperty.call(KeepTrackPlugin.registeredMenus, menuMode)) {
+      if (Object.hasOwn(KeepTrackPlugin.registeredMenus, menuMode)) {
         const menuElements = KeepTrackPlugin.registeredMenus[menuMode];
 
         if (menuElements.length === 0) {
@@ -750,7 +749,7 @@ export abstract class KeepTrackPlugin {
      * const searchDom = getEl('search', true);
      * if (!selectSatManagerInstance || (selectSatManagerInstance?.selectedSat === -1 && (!searchDom || (<HTMLInputElement>searchDom).value === ''))) {
      */
-    if (!(((PluginRegistry.getPluginByName('SelectSatManager') as SelectSatManager)?.selectedSat ?? -1) > -1)) {
+    if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) <= -1) {
       errorManagerInstance.warn(t7e('errorMsgs.SelectSatelliteFirst'), true);
       shake(getEl(this.bottomIconElementName));
 

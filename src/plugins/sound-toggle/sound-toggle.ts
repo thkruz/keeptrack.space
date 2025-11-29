@@ -3,6 +3,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
+import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import soundOffPng from '@public/img/icons/sound-off.png';
@@ -12,6 +13,15 @@ import { TopMenu } from '../top-menu/top-menu';
 export class SoundToggle extends KeepTrackPlugin {
   readonly id = 'SoundToggle';
   dependencies_ = ['TopMenu'];
+
+  getKeyboardShortcuts(): IKeyboardShortcut[] {
+    return [
+      {
+        key: 'M',
+        callback: () => this.toggleMute(),
+      },
+    ];
+  }
 
   init() {
     super.init();
@@ -33,22 +43,24 @@ export class SoundToggle extends KeepTrackPlugin {
       const soundBtn = getEl('sound-btn');
 
       if (soundBtn) {
-        soundBtn.onclick = () => {
-          const soundManager = ServiceLocator.getSoundManager();
-
-          if (!soundManager) {
-            errorManagerInstance.warn('SoundManager is not enabled. Check your settings!');
-
-            return;
-          }
-
-          soundManager.toggleMute();
-        };
+        soundBtn.onclick = () => this.toggleMute();
       }
     });
   }
 
-  private onMuteChanged_(isMuted: boolean) {
+  toggleMute(): void {
+    const soundManager = ServiceLocator.getSoundManager();
+
+    if (!soundManager) {
+      errorManagerInstance.warn('SoundManager is not enabled. Check your settings!');
+
+      return;
+    }
+
+    soundManager.toggleMute();
+  }
+
+  private onMuteChanged_(isMuted: boolean): void {
     const soundIcon = getEl('sound-icon') as HTMLImageElement;
     const soundBtn = getEl('sound-btn');
 

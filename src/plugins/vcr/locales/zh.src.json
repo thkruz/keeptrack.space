@@ -1,0 +1,9 @@
+{
+  "VcrPlugin": {
+    "scenarioEnded": "场景结束",
+    "clickToPlay": "点击播放",
+    "clickToPause": "点击暂停",
+    "clickToResume": "点击继续",
+    "endOfScenario": "无法播放：模拟时间已到达场景末端。"
+  }
+}

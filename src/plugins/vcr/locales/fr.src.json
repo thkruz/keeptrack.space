@@ -1,0 +1,9 @@
+{
+  "VcrPlugin": {
+    "scenarioEnded": "Scénario terminé",
+    "clickToPlay": "Cliquer pour lire",
+    "clickToPause": "Cliquer pour mettre en pause",
+    "clickToResume": "Cliquer pour reprendre",
+    "endOfScenario": "Impossible de lire : Le temps de simulation est à la fin du scénario."
+  }
+}

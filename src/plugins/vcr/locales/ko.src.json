@@ -1,0 +1,9 @@
+{
+  "VcrPlugin": {
+    "scenarioEnded": "시나리오 종료",
+    "clickToPlay": "클릭하여 재생",
+    "clickToPause": "클릭하여 일시 정지",
+    "clickToResume": "클릭하여 재개",
+    "endOfScenario": "재생할 수 없음: 시뮬레이션 시간이 시나리오 끝에 있습니다."
+  }
+}

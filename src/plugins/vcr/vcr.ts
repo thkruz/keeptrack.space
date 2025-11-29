@@ -20,16 +20,18 @@ export class VcrPlugin extends KeepTrackPlugin {
   readonly id = 'VcrPlugin';
   dependencies_ = [TopMenu.name];
 
-  forwardRewindSpeed = 60; // seconds per second when rewinding or fast-forwarding
+  private static readonly DEFAULT_FORWARD_REWIND_SPEED_ = 60;
 
-  isRewinding: boolean = false;
-  isPlaying: boolean = true;
-  isFastForwarding: boolean = false;
+  forwardRewindSpeed = VcrPlugin.DEFAULT_FORWARD_REWIND_SPEED_;
 
-  rewindBtn: HTMLElement | null = null;
-  playPauseBtn: HTMLElement | null = null;
-  fastForwardBtn: HTMLElement | null = null;
-  scenario: ScenarioData | null = null;
+  isRewinding = false;
+  isPlaying = true;
+  isFastForwarding = false;
+
+  private rewindBtn_: HTMLElement | null = null;
+  private playPauseBtn_: HTMLElement | null = null;
+  private fastForwardBtn_: HTMLElement | null = null;
+  private scenario_: ScenarioData | null = null;
 
   getKeyboardShortcuts(): IKeyboardShortcut[] {
     return [
@@ -48,7 +50,7 @@ export class VcrPlugin extends KeepTrackPlugin {
     ];
   }
 
-  addHtml() {
+  addHtml(): void {
     super.addHtml();
     EventBus.getInstance().on(
       EventBusEvent.uiManagerInit,
@@ -75,19 +77,21 @@ export class VcrPlugin extends KeepTrackPlugin {
     );
   }
 
-  addJs() {
+  addJs(): void {
     super.addJs();
 
-    this.scenario = PluginRegistry.getPlugin(ScenarioManagementPlugin)?.scenario ?? null;
+    this.scenario_ = PluginRegistry.getPlugin(ScenarioManagementPlugin)?.scenario ?? null;
+    this.forwardRewindSpeed =
+      (settingsManager.plugins?.[this.id] as { forwardRewindSpeed?: number })?.forwardRewindSpeed ?? VcrPlugin.DEFAULT_FORWARD_REWIND_SPEED_;
 
     EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
-      this.rewindBtn = document.getElementById('vcr-rewind-btn');
-      this.playPauseBtn = document.getElementById('vcr-play-pause-btn');
-      this.fastForwardBtn = document.getElementById('vcr-fast-forward-btn');
+      this.rewindBtn_ = document.getElementById('vcr-rewind-btn');
+      this.playPauseBtn_ = document.getElementById('vcr-play-pause-btn');
+      this.fastForwardBtn_ = document.getElementById('vcr-fast-forward-btn');
 
-      this.rewindBtn?.addEventListener('click', this.handleRewind.bind(this));
-      this.playPauseBtn?.addEventListener('click', this.handlePlayPause.bind(this));
-      this.fastForwardBtn?.addEventListener('click', this.handleFastForward.bind(this));
+      this.rewindBtn_?.addEventListener('click', this.handleRewind.bind(this));
+      this.playPauseBtn_?.addEventListener('click', this.handlePlayPause.bind(this));
+      this.fastForwardBtn_?.addEventListener('click', this.handleFastForward.bind(this));
     });
 
     EventBus.getInstance().on(EventBusEvent.propRateChanged, this.onPropRateChanged_.bind(this));
@@ -96,9 +100,9 @@ export class VcrPlugin extends KeepTrackPlugin {
   }
 
   verifyTimeControl(): boolean {
-    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const timeManager = ServiceLocator.getTimeManager();
 
-    if (!timeManagerInstance.isTimeChangingEnabled) {
+    if (!timeManager.isTimeChangingEnabled) {
       ServiceLocator.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
 
       return false;
@@ -107,148 +111,173 @@ export class VcrPlugin extends KeepTrackPlugin {
     return true;
   }
 
-  handlePlayPause() {
-    if (!this.verifyTimeControl()) {
+  handlePlayPause(): void {
+    if (!this.verifyTimeControl() || !this.playPauseBtn_) {
       return;
     }
 
-    if (!this.playPauseBtn) {
-      return;
-    }
-    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const timeManager = ServiceLocator.getTimeManager();
 
-    if (ServiceLocator.getTimeManager().simulationTimeObj.getTime() === this.scenario!.endTime?.getTime()) {
-      ServiceLocator.getUiManager().toast('Cannot Play: Simulation time is at the end of the scenario.', ToastMsgType.caution, true);
+    if (this.isAtScenarioEnd_(timeManager)) {
+      ServiceLocator.getUiManager().toast(t7e('VcrPlugin.endOfScenario'), ToastMsgType.caution, true);
 
       return;
     }
 
-    if (timeManagerInstance.propRate === 1) {
-      timeManagerInstance.changePropRate(0);
+    if (timeManager.propRate === 1) {
+      timeManager.changePropRate(0);
     } else {
-      timeManagerInstance.changePropRate(1);
+      timeManager.changePropRate(1);
     }
 
-    this.updatePausePlayBtn();
-    this.stopRewind();
-    this.stopFastForward();
+    this.updatePausePlayBtn_();
+    this.stopRewind_();
+    this.stopFastForward_();
   }
 
-  handleRewind() {
+  handleRewind(): void {
     if (!this.verifyTimeControl()) {
       return;
     }
 
-    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const timeManager = ServiceLocator.getTimeManager();
 
     if (this.isRewinding) {
-      this.stopRewind();
-      timeManagerInstance.changePropRate(1);
-      this.rewindBtn?.classList.remove('bmenu-item-selected');
+      this.stopRewind_();
+      timeManager.changePropRate(1);
+      this.rewindBtn_?.classList.remove('bmenu-item-selected');
     } else {
       this.isRewinding = true;
-      timeManagerInstance.changePropRate(-this.forwardRewindSpeed);
-      this.rewindBtn?.classList.add('bmenu-item-selected');
+      timeManager.changePropRate(-this.forwardRewindSpeed);
+      this.rewindBtn_?.classList.add('bmenu-item-selected');
     }
 
-    this.stopFastForward();
-    this.updatePausePlayBtn();
+    this.stopFastForward_();
+    this.updatePausePlayBtn_();
   }
 
-  handleFastForward() {
+  handleFastForward(): void {
     if (!this.verifyTimeControl()) {
       return;
     }
 
-    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const timeManager = ServiceLocator.getTimeManager();
 
     if (this.isFastForwarding) {
-      this.stopFastForward();
-      timeManagerInstance.changePropRate(1);
-      this.fastForwardBtn?.classList.remove('bmenu-item-selected');
+      this.stopFastForward_();
+      timeManager.changePropRate(1);
+      this.fastForwardBtn_?.classList.remove('bmenu-item-selected');
     } else {
       this.isFastForwarding = true;
-      timeManagerInstance.changePropRate(this.forwardRewindSpeed);
-      this.fastForwardBtn?.classList.add('bmenu-item-selected');
+      timeManager.changePropRate(this.forwardRewindSpeed);
+      this.fastForwardBtn_?.classList.add('bmenu-item-selected');
     }
 
-    this.stopRewind();
-    this.updatePausePlayBtn();
+    this.stopRewind_();
+    this.updatePausePlayBtn_();
   }
 
-  private stopRewind() {
+  private isAtScenarioEnd_(timeManager: ReturnType<typeof ServiceLocator.getTimeManager>): boolean {
+    const scenarioEndTime = this.scenario_?.endTime?.getTime();
+
+    if (typeof scenarioEndTime !== 'number') {
+      return false;
+    }
+
+    return timeManager.simulationTimeObj.getTime() === scenarioEndTime;
+  }
+
+  private stopRewind_(): void {
     if (this.isRewinding) {
       this.isRewinding = false;
-      this.rewindBtn?.classList.remove('bmenu-item-selected');
+      this.rewindBtn_?.classList.remove('bmenu-item-selected');
     }
   }
 
-  private stopFastForward() {
+  private stopFastForward_(): void {
     if (this.isFastForwarding) {
       this.isFastForwarding = false;
-      this.fastForwardBtn?.classList.remove('bmenu-item-selected');
+      this.fastForwardBtn_?.classList.remove('bmenu-item-selected');
     }
   }
 
-  private updatePausePlayBtn() {
-    const timeManagerInstance = ServiceLocator.getTimeManager();
-
-    this.playPauseBtn?.classList.remove('bmenu-item-help');
-
-    if (timeManagerInstance.propRate === 0) {
-      this.isPlaying = false;
-      this.playPauseBtn!.innerHTML = html`<img class="top-menu-icons__blue-img" src="${playPng}">`;
-      if (timeManagerInstance.simulationTimeObj.getTime() === this.scenario!.endTime?.getTime()) {
-        // Change tooltip to indicate end of scenario
-        this.playPauseBtn?.classList.add('bmenu-item-help');
-        this.playPauseBtn!.innerHTML = html`<img class="top-menu-icons__blue-img" src="${playPng}">`;
-        this.playPauseBtn!.setAttribute('kt-tooltip', 'Scenario Ended');
-      } else {
-        this.playPauseBtn?.classList.add('bmenu-item-selected');
-        this.playPauseBtn!.setAttribute('kt-tooltip', 'Click to Play');
-      }
-    } else if (timeManagerInstance.propRate === 1) {
-      this.isPlaying = true;
-      this.playPauseBtn!.innerHTML = html`<img class="top-menu-icons__blue-img" src="${pausePng}">`;
-      this.playPauseBtn!.setAttribute('kt-tooltip', 'Click to Pause');
-      this.playPauseBtn?.classList.add('bmenu-item-selected');
-    } else {
-      this.isPlaying = false;
-      this.playPauseBtn!.innerHTML = html`<img class="top-menu-icons__blue-img" src="${resumePng}">`;
-      this.playPauseBtn!.setAttribute('kt-tooltip', 'Click to Resume');
-      this.playPauseBtn?.classList.remove('bmenu-item-selected');
+  private updatePausePlayBtn_(): void {
+    if (!this.playPauseBtn_) {
+      return;
     }
+
+    const timeManager = ServiceLocator.getTimeManager();
+
+    this.playPauseBtn_.classList.remove('bmenu-item-help');
+
+    if (timeManager.propRate === 0) {
+      this.updateButtonForPaused_(timeManager);
+    } else if (timeManager.propRate === 1) {
+      this.updateButtonForPlaying_();
+    } else {
+      this.updateButtonForFastMode_();
+    }
+  }
+
+  private updateButtonForPaused_(timeManager: ReturnType<typeof ServiceLocator.getTimeManager>): void {
+    this.isPlaying = false;
+    this.playPauseBtn_!.innerHTML = html`<img class="top-menu-icons__blue-img" src="${playPng}">`;
+
+    if (this.isAtScenarioEnd_(timeManager)) {
+      this.playPauseBtn_!.classList.add('bmenu-item-help');
+      this.playPauseBtn_!.setAttribute('kt-tooltip', t7e('VcrPlugin.scenarioEnded'));
+    } else {
+      this.playPauseBtn_!.classList.add('bmenu-item-selected');
+      this.playPauseBtn_!.setAttribute('kt-tooltip', t7e('VcrPlugin.clickToPlay'));
+    }
+  }
+
+  private updateButtonForPlaying_(): void {
+    this.isPlaying = true;
+    this.playPauseBtn_!.innerHTML = html`<img class="top-menu-icons__blue-img" src="${pausePng}">`;
+    this.playPauseBtn_!.setAttribute('kt-tooltip', t7e('VcrPlugin.clickToPause'));
+    this.playPauseBtn_!.classList.add('bmenu-item-selected');
+  }
+
+  private updateButtonForFastMode_(): void {
+    this.isPlaying = false;
+    this.playPauseBtn_!.innerHTML = html`<img class="top-menu-icons__blue-img" src="${resumePng}">`;
+    this.playPauseBtn_!.setAttribute('kt-tooltip', t7e('VcrPlugin.clickToResume'));
+    this.playPauseBtn_!.classList.remove('bmenu-item-selected');
   }
 
   private onStaticOffsetChanged_(): void {
-    if ((this.scenario?.endTime?.getTime() ?? -Infinity) >= ServiceLocator.getTimeManager().simulationTimeObj.getTime()) {
-      this.updatePausePlayBtn();
+    const timeManager = ServiceLocator.getTimeManager();
+    const scenarioEndTime = this.scenario_?.endTime?.getTime() ?? -Infinity;
+
+    if (scenarioEndTime >= timeManager.simulationTimeObj.getTime()) {
+      this.updatePausePlayBtn_();
     }
   }
 
   private onPropRateChanged_(propRate?: number): void {
-    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const timeManager = ServiceLocator.getTimeManager();
 
-    propRate ??= timeManagerInstance.propRate;
+    propRate ??= timeManager.propRate;
 
     if (propRate === 0 || propRate === 1) {
       this.isFastForwarding = false;
       this.isRewinding = false;
-      this.fastForwardBtn?.classList.remove('bmenu-item-selected');
-      this.rewindBtn?.classList.remove('bmenu-item-selected');
-      this.updatePausePlayBtn();
+      this.fastForwardBtn_?.classList.remove('bmenu-item-selected');
+      this.rewindBtn_?.classList.remove('bmenu-item-selected');
+      this.updatePausePlayBtn_();
     } else if (propRate > 1) {
       this.isFastForwarding = true;
       this.isRewinding = false;
-      this.fastForwardBtn?.classList.add('bmenu-item-selected');
-      this.rewindBtn?.classList.remove('bmenu-item-selected');
-      this.updatePausePlayBtn();
+      this.fastForwardBtn_?.classList.add('bmenu-item-selected');
+      this.rewindBtn_?.classList.remove('bmenu-item-selected');
+      this.updatePausePlayBtn_();
     } else if (propRate <= -1) {
       this.isRewinding = true;
       this.isFastForwarding = false;
-      this.rewindBtn?.classList.add('bmenu-item-selected');
-      this.fastForwardBtn?.classList.remove('bmenu-item-selected');
-      this.updatePausePlayBtn();
+      this.rewindBtn_?.classList.add('bmenu-item-selected');
+      this.fastForwardBtn_?.classList.remove('bmenu-item-selected');
+      this.updatePausePlayBtn_();
     }
   }
 }

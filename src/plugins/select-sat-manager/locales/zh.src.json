@@ -1,0 +1,6 @@
+{
+  "SelectSatManager": {
+    "objectInsideEarth": "对象位于地球内部，无法选择",
+    "noSatellitesFound": "未找到该所有者/制造商的卫星"
+  }
+}

@@ -8,7 +8,9 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { createSampleCovarianceFromTle, DetailedSatellite, DetailedSensor, Kilometers, LandObject, RADIUS_OF_EARTH, SpaceObjectType } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
@@ -42,10 +44,29 @@ export class SelectSatManager extends KeepTrackPlugin {
   secondarySatCovMatrix: vec3;
   private lastSelectedSat_ = -1;
 
+  getKeyboardShortcuts(): IKeyboardShortcut[] {
+    return [
+      {
+        key: '[',
+        callback: () => this.switchPrimarySecondary(),
+      },
+      {
+        key: ']',
+        callback: () => this.switchPrimarySecondary(),
+      },
+      {
+        key: '{',
+        callback: () => this.selectPrevSat(),
+      },
+      {
+        key: '}',
+        callback: () => this.selectNextSat(),
+      },
+    ];
+  }
+
   addJs(): void {
     super.addJs();
-
-    this.registerKeyboardEvents_();
 
     EventBus.getInstance().on(EventBusEvent.updateLoop, this.checkIfSelectSatVisible.bind(this));
 
@@ -117,7 +138,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     } else {
 
       if (obj.position.x === 0 && obj.position.y === 0 && obj.position.z === 0 && obj.name !== SolarBody.Earth) {
-        ServiceLocator.getUiManager().toast('Object is inside the Earth, cannot select it', ToastMsgType.caution);
+        ServiceLocator.getUiManager().toast(t7e('SelectSatManager.objectInsideEarth'), ToastMsgType.caution);
 
         return;
       }
@@ -331,7 +352,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       .join(',');
 
     if (searchStr.length === 0) {
-      ServiceLocator.getUiManager().toast('No satellites found for this owner/manufacturer', ToastMsgType.caution, false);
+      ServiceLocator.getUiManager().toast(t7e('SelectSatManager.noSatellitesFound'), ToastMsgType.caution, false);
     } else {
       ServiceLocator.getUiManager().searchManager.doSearch(searchStr);
       ServiceLocator.getMainCamera().changeZoom(0.9);
@@ -488,17 +509,4 @@ export class SelectSatManager extends KeepTrackPlugin {
     this.setSelectedSat_(_secondary);
   }
 
-  private registerKeyboardEvents_() {
-    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
-      if ((key === '[' || key === ']') && !isRepeat) {
-        this.switchPrimarySecondary();
-      }
-      if (key === '{' && !isRepeat) {
-        this.selectPrevSat();
-      }
-      if (key === '}' && !isRepeat) {
-        this.selectNextSat();
-      }
-    });
-  }
 }

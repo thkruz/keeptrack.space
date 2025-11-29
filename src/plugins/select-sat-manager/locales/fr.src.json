@@ -1,0 +1,6 @@
+{
+  "SelectSatManager": {
+    "objectInsideEarth": "L'objet est à l'intérieur de la Terre, sélection impossible",
+    "noSatellitesFound": "Aucun satellite trouvé pour ce propriétaire/fabricant"
+  }
+}

@@ -33,3 +33,6 @@ export * from './secondary-menu';
 
 // Help Component
 export * from './help';
+
+// Keyboard Component
+export * from './keyboard';

@@ -22,6 +22,7 @@ import { slideInRight, slideOutLeft } from '../utils/slide';
 import { BottomIconComponent } from './components/bottom-icon/bottom-icon-component';
 import { ContextMenuComponent } from './components/context-menu/context-menu-component';
 import { HelpComponent } from './components/help/help-component';
+import { KeyboardComponent } from './components/keyboard/keyboard-component';
 import { SecondaryMenuComponent } from './components/secondary-menu/secondary-menu-component';
 import { SideMenuComponent } from './components/side-menu/side-menu-component';
 
@@ -32,6 +33,7 @@ import {
   hasDownload,
   hasFormSubmit,
   hasHelp,
+  hasKeyboardShortcuts,
   hasSecondaryMenu,
   hasSideMenu,
 } from './core/plugin-capabilities';
@@ -281,6 +283,11 @@ export abstract class KeepTrackPlugin {
   protected helpComponent_: HelpComponent | null = null;
 
   /**
+   * Keyboard component instance (when using composition pattern).
+   */
+  protected keyboardComponent_: KeyboardComponent | null = null;
+
+  /**
    * Whether this plugin uses the new composition-based architecture.
    * This is automatically set based on the presence of config methods.
    */
@@ -366,7 +373,8 @@ export abstract class KeepTrackPlugin {
   private detectAndInitializeComponents_(): void {
     // Check for any config methods to determine if using composition pattern
     this.usesCompositionPattern_ = hasBottomIcon(this) || hasSideMenu(this) ||
-      hasSecondaryMenu(this) || hasContextMenu(this) || hasHelp(this);
+      hasSecondaryMenu(this) || hasContextMenu(this) || hasHelp(this) ||
+      hasKeyboardShortcuts(this);
 
     if (!this.usesCompositionPattern_) {
       return;
@@ -500,6 +508,14 @@ export abstract class KeepTrackPlugin {
           },
         },
       );
+    }
+
+    // Initialize keyboard component if config method exists
+    if (hasKeyboardShortcuts(this)) {
+      const shortcuts = this.getKeyboardShortcuts();
+
+      this.keyboardComponent_ = new KeyboardComponent(this.id, shortcuts);
+      this.keyboardComponent_.init();
     }
 
     // Sync form submit callback if present

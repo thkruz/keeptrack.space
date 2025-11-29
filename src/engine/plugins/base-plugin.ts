@@ -18,6 +18,24 @@ import { getEl, hideEl } from '../utils/get-el';
 import { shake } from '../utils/shake';
 import { slideInRight, slideOutLeft } from '../utils/slide';
 
+// Component imports for composition-based architecture
+import { BottomIconComponent } from './components/bottom-icon/bottom-icon-component';
+import { ContextMenuComponent } from './components/context-menu/context-menu-component';
+import { HelpComponent } from './components/help/help-component';
+import { SecondaryMenuComponent } from './components/secondary-menu/secondary-menu-component';
+import { SideMenuComponent } from './components/side-menu/side-menu-component';
+
+// Type guard imports for capability detection
+import {
+  hasBottomIcon,
+  hasContextMenu,
+  hasDownload,
+  hasFormSubmit,
+  hasHelp,
+  hasSecondaryMenu,
+  hasSideMenu,
+} from './core/plugin-capabilities';
+
 export interface ClickDragOptions {
   leftOffset?: number;
   isDraggable?: boolean;
@@ -232,6 +250,42 @@ export abstract class KeepTrackPlugin {
   static readonly MAX_BOTTOM_ICON_ORDER: number = 600;
   private isInitialized_ = false;
 
+  // ============================================================================
+  // Component instances for composition-based architecture
+  // These are initialized when config methods are detected on the plugin
+  // ============================================================================
+
+  /**
+   * Bottom icon component instance (when using composition pattern).
+   */
+  protected bottomIconComponent_: BottomIconComponent | null = null;
+
+  /**
+   * Side menu component instance (when using composition pattern).
+   */
+  protected sideMenuComponent_: SideMenuComponent | null = null;
+
+  /**
+   * Secondary menu component instance (when using composition pattern).
+   */
+  protected secondaryMenuComponent_: SecondaryMenuComponent | null = null;
+
+  /**
+   * Context menu component instance (when using composition pattern).
+   */
+  protected contextMenuComponent_: ContextMenuComponent | null = null;
+
+  /**
+   * Help component instance (when using composition pattern).
+   */
+  protected helpComponent_: HelpComponent | null = null;
+
+  /**
+   * Whether this plugin uses the new composition-based architecture.
+   * This is automatically set based on the presence of config methods.
+   */
+  protected usesCompositionPattern_ = false;
+
   /**
    * Creates a new instance of the KeepTrackPlugin class.
    * @param pluginName The name of the plugin.
@@ -278,10 +332,23 @@ export abstract class KeepTrackPlugin {
 
     this.bottomIconOrder = settingsManager.plugins?.[this.id]?.order ?? null;
 
+    // Check if this plugin uses the new composition-based architecture
+    this.detectAndInitializeComponents_();
+
     this.addHtml();
     this.addJs();
 
-    if (this.helpTitle && this.helpBody) {
+    // Register help - prefer config method, fall back to properties
+    if (hasHelp(this)) {
+      const helpConfig = this.getHelpConfig();
+
+      this.helpComponent_ = new HelpComponent(
+        this.id,
+        helpConfig,
+        () => this.isMenuButtonActive,
+      );
+      this.helpComponent_.init();
+    } else if (this.helpTitle && this.helpBody) {
       this.registerHelp(this.helpTitle, this.helpBody);
     } else if (this.helpBody) {
       throw new Error(`${this.id} help title and body must both be defined.`);
@@ -290,6 +357,160 @@ export abstract class KeepTrackPlugin {
     PluginRegistry.addPlugin(this);
 
     this.isInitialized_ = true;
+  }
+
+  /**
+   * Detect if this plugin uses config methods and initialize components accordingly.
+   * This enables the composition-based architecture when config methods are present.
+   */
+  private detectAndInitializeComponents_(): void {
+    // Check for any config methods to determine if using composition pattern
+    this.usesCompositionPattern_ = hasBottomIcon(this) || hasSideMenu(this) ||
+      hasSecondaryMenu(this) || hasContextMenu(this) || hasHelp(this);
+
+    if (!this.usesCompositionPattern_) {
+      return;
+    }
+
+    // Initialize bottom icon component if config method exists
+    if (hasBottomIcon(this)) {
+      const config = this.getBottomIconConfig();
+
+      // Sync with legacy properties for backwards compatibility
+      this.bottomIconElementName = config.elementName;
+      this.bottomIconLabel = config.label;
+      this.bottomIconImg = config.image as unknown as Module;
+      this.isIconDisabledOnLoad = config.isDisabledOnLoad ?? false;
+      if (config.menuMode) {
+        this.menuMode = config.menuMode;
+      }
+      if (config.order !== undefined) {
+        this.bottomIconOrder = config.order;
+      }
+
+      this.bottomIconComponent_ = new BottomIconComponent(
+        this.id,
+        config,
+        {
+          onClick: () => {
+            if ('onBottomIconClick' in this && typeof this.onBottomIconClick === 'function') {
+              return this.onBottomIconClick();
+            }
+
+            return undefined;
+          },
+          onDeselect: () => {
+            if ('onBottomIconDeselect' in this && typeof this.onBottomIconDeselect === 'function') {
+              this.onBottomIconDeselect();
+            }
+          },
+        },
+      );
+    }
+
+    // Initialize side menu component if config method exists
+    if (hasSideMenu(this)) {
+      const config = this.getSideMenuConfig();
+
+      // Sync with legacy properties for backwards compatibility
+      this.sideMenuElementName = config.elementName;
+      this.sideMenuTitle = config.title;
+      this.sideMenuElementHtml = config.html;
+      if (config.dragOptions) {
+        this.dragOptions = config.dragOptions as ClickDragOptions;
+      }
+
+      this.sideMenuComponent_ = new SideMenuComponent(
+        this.id,
+        config,
+        {
+          onOpen: () => {
+            if ('onSideMenuOpen' in this && typeof this.onSideMenuOpen === 'function') {
+              this.onSideMenuOpen();
+            }
+          },
+          onClose: () => {
+            if ('onSideMenuClose' in this && typeof this.onSideMenuClose === 'function') {
+              this.onSideMenuClose();
+            }
+          },
+        },
+      );
+    }
+
+    // Initialize secondary menu component if config method exists
+    if (hasSecondaryMenu(this) && hasSideMenu(this)) {
+      const config = this.getSecondaryMenuConfig();
+      const sideMenuConfig = this.getSideMenuConfig();
+
+      // Sync with legacy properties for backwards compatibility
+      this.sideMenuSecondaryHtml = config.html;
+      this.sideMenuSecondaryOptions = {
+        width: config.width ?? 300,
+        leftOffset: config.leftOffset ?? null,
+        zIndex: config.zIndex ?? 3,
+      };
+      if (config.icon) {
+        this.secondaryMenuIcon = config.icon;
+      }
+      if (config.dragOptions) {
+        this.dragOptionsSecondary = config.dragOptions as ClickDragOptions;
+      }
+
+      this.secondaryMenuComponent_ = new SecondaryMenuComponent(
+        this.id,
+        sideMenuConfig.elementName,
+        config,
+        {
+          onOpen: () => {
+            if ('onSecondaryMenuOpen' in this && typeof this.onSecondaryMenuOpen === 'function') {
+              this.onSecondaryMenuOpen();
+            }
+          },
+          onClose: () => {
+            if ('onSecondaryMenuClose' in this && typeof this.onSecondaryMenuClose === 'function') {
+              this.onSecondaryMenuClose();
+            }
+          },
+          onDownload: hasDownload(this) ? () => this.onDownload() : undefined,
+        },
+      );
+    }
+
+    // Initialize context menu component if config method exists
+    if (hasContextMenu(this)) {
+      const config = this.getContextMenuConfig();
+
+      // Sync with legacy properties for backwards compatibility
+      this.rmbL1Html = config.level1Html;
+      this.rmbL1ElementName = config.level1ElementName;
+      this.rmbL2Html = config.level2Html;
+      this.rmbL2ElementName = config.level2ElementName;
+      this.rmbMenuOrder = config.order ?? 100;
+      this.isRmbOnEarth = config.isVisibleOnEarth ?? false;
+      this.isRmbOffEarth = config.isVisibleOffEarth ?? false;
+      this.isRmbOnSat = config.isVisibleOnSatellite ?? false;
+
+      this.contextMenuComponent_ = new ContextMenuComponent(
+        this.id,
+        config,
+        {
+          onAction: (targetId: string, clickedSatId?: number) => {
+            this.onContextMenuAction(targetId, clickedSatId);
+          },
+        },
+      );
+    }
+
+    // Sync form submit callback if present
+    if (hasFormSubmit(this)) {
+      this.submitCallback = () => this.onFormSubmit();
+    }
+
+    // Sync download callback if present (and no secondary menu to handle it)
+    if (hasDownload(this) && !hasSecondaryMenu(this)) {
+      this.downloadIconCb = () => this.onDownload();
+    }
   }
 
   protected isSettingsMenuEnabled_ = true;

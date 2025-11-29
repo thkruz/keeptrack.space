@@ -1,12 +1,13 @@
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
+import { t7e } from '@app/locales/keys';
 import fullscreenPng from '@public/img/icons/fullscreen.png';
 import helpPng from '@public/img/icons/help.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class TopMenu extends KeepTrackPlugin {
   readonly id = 'TopMenu';
@@ -24,21 +25,21 @@ export class TopMenu extends KeepTrackPlugin {
     classInner?: string;
     tooltip: string;
   }[] = [
-      {
-        id: 'tutorial-btn',
-        order: 3,
-        class: 'bmenu-item-help bmenu-item-disabled',
-        icon: helpPng,
-        tooltip: 'Show Help',
-      },
-      {
-        id: 'fullscreen-icon',
-        order: 4,
-        class: 'top-menu-icons__blue-img',
-        icon: fullscreenPng,
-        tooltip: 'Toggle Fullscreen',
-      },
-    ];
+    {
+      id: 'tutorial-btn',
+      order: 3,
+      class: 'bmenu-item-help bmenu-item-disabled',
+      icon: helpPng,
+      tooltip: t7e('TopMenu.showHelp'),
+    },
+    {
+      id: 'fullscreen-icon',
+      order: 4,
+      class: 'top-menu-icons__blue-img',
+      icon: fullscreenPng,
+      tooltip: t7e('TopMenu.toggleFullscreen'),
+    },
+  ];
 
   addHtml() {
     super.addHtml();
@@ -70,7 +71,7 @@ export class TopMenu extends KeepTrackPlugin {
                 `)
               .join('')}
             <div id="search-holder" class="menu-item search-slide-up">
-              <input id="search" type="search" name="search" placeholder="Search.." required />
+              <input id="search" type="search" name="search" placeholder="${t7e('TopMenu.searchPlaceholder')}" required />
             </div>
           </ul>
               </div>

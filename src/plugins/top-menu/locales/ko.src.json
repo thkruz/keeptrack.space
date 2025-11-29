@@ -1,0 +1,7 @@
+{
+  "TopMenu": {
+    "showHelp": "도움말 표시",
+    "toggleFullscreen": "전체 화면 전환",
+    "searchPlaceholder": "검색..."
+  }
+}

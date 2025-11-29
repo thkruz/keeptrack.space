@@ -15,7 +15,7 @@ import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plu
 import { DateTimeManager } from '../date-time-manager/date-time-manager';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SoundNames } from '../sounds/sounds';
+import { SoundNames } from '@app/engine/audio/sounds';
 import { keepTrackApi } from './../../keepTrackApi';
 import './sensor-list.css';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';

@@ -1,6 +1,6 @@
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, showEl } from '@app/engine/utils/get-el';
-import { SoundNames } from '@app/plugins/sounds/sounds';
+import { SoundNames } from '@app/engine/audio/sounds';
 import Draggabilly from 'draggabilly';
 import { html } from '../utils/development/formatter';
 import './engine-ui.css';

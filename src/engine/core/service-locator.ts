@@ -6,7 +6,7 @@ import type { HoverManager } from '@app/app/ui/hover-manager';
 import type { UiManager } from '@app/app/ui/ui-manager';
 import { Container } from '@app/engine/core/container';
 import { Singletons } from '@app/engine/core/interfaces';
-import type { SoundManager } from '@app/plugins/sounds/sound-manager';
+import type { SoundManager } from '@app/engine/audio/sound-manager';
 import type { OrbitManager } from '../../app/rendering/orbit-manager';
 import type { Camera } from '../camera/camera';
 import type { InputManager } from '../input/input-manager';

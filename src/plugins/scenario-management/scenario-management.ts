@@ -9,7 +9,7 @@ import { isThisNode } from '@app/engine/utils/isThisNode';
 import landscape3Png from '@public/img/icons/landscape3.png';
 import { saveAs } from 'file-saver';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { SoundNames } from '../sounds/sounds';
+import { SoundNames } from '@app/engine/audio/sounds';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,8 @@
 import { CountriesMenu } from '@app/plugins/countries/countries';
 import { FindSatPlugin } from '@app/plugins/find-sat/find-sat';
 import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view';
-import { SoundManager } from '@app/plugins/sounds/sound-manager';
+import { SoundManager } from '@app/engine/audio/sound-manager';
+import { SoundToggle } from '@app/plugins/sound-toggle/sound-toggle';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -162,6 +163,7 @@ export class PluginManager {
 
         { init: () => new ClassificationBar().init(), config: plugins.ClassificationBar },
         { init: () => new SoundManager().init(), config: plugins.SoundManager },
+        { init: () => new SoundToggle().init(), config: plugins.SoundManager },
 
         {
           init: async () => {

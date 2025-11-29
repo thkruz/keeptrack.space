@@ -10,7 +10,7 @@ import { saveCsv } from '@app/engine/utils/saveVariable';
 import { truncateString } from '@app/engine/utils/truncate-string';
 import calendar2Png from '@public/img/icons/calendar2.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { SoundNames } from '../sounds/sounds';
+import { SoundNames } from '@app/engine/audio/sounds';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 
 interface LaunchInfoData {

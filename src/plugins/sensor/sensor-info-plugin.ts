@@ -10,7 +10,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { RfSensor, SpaceObjectType } from '@ootk/src/main';
 import sensorInfoPng from '@public/img/icons/sensor-info.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { SoundNames } from '../sounds/sounds';
+import { SoundNames } from '@app/engine/audio/sounds';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {

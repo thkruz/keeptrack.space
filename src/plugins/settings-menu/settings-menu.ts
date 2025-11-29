@@ -13,7 +13,7 @@ import { rgbCss } from '@app/engine/utils/rgbCss';
 import { SettingsManager } from '@app/settings/settings';
 import settingsPng from '@public/img/icons/settings.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { SoundNames } from '../sounds/sounds';
+import { SoundNames } from '@app/engine/audio/sounds';
 import { TimeMachine } from '../time-machine/time-machine';
 import { OrbitCruncherMsgType } from '@app/webworker/orbit-cruncher-interfaces';
 

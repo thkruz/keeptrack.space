@@ -87,4 +87,5 @@ export enum EventBusEvent {
   onLinesCleared = 'onLinesCleared',
   selectedDateChange = 'selectedDateChange',
   calculateSimulationTime = 'calculateSimulationTime',
+  soundMuteChanged = 'audio:muteChanged',
 }

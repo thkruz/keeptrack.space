@@ -65,6 +65,7 @@ export interface EngineEventMap {
   [EventBusEvent.userLogout]: []; // no arguments
   [EventBusEvent.SceneReady]: []; // no arguments
   [EventBusEvent.highPerformanceRender]: [Milliseconds]; // delta time
+  [EventBusEvent.soundMuteChanged]: [boolean]; // isMuted
 }
 
 interface EventBusRegisterParams<T extends EventBusEvent> {

@@ -7,7 +7,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { SoundNames } from '@app/plugins/sounds/sounds';
+import { SoundNames } from '@app/engine/audio/sounds';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Kilometers, eci2lla } from '@ootk/src/main';
 import { closeColorbox } from '../../utils/colorbox';

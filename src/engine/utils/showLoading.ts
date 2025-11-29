@@ -1,6 +1,6 @@
 import { SplashScreen } from '@app/app/ui/splash-screen';
 import { t7e, TranslationKey } from '@app/locales/keys';
-import { SoundNames } from '@app/plugins/sounds/sounds';
+import { SoundNames } from '@app/engine/audio/sounds';
 import { fadeIn, fadeOut } from './fade';
 import { getEl } from './get-el';
 import { ServiceLocator } from '../core/service-locator';

@@ -4,13 +4,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import soundOffPng from '@public/img/icons/sound-off.png';
-import soundOnPng from '@public/img/icons/sound-on.png';
-import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { TopMenu } from '../top-menu/top-menu';
 import { SoundNames, sounds } from './sounds';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 interface PlayingSound {
   source: AudioBufferSourceNode;
@@ -18,11 +12,10 @@ interface PlayingSound {
   startTime: number;
 }
 
-export class SoundManager extends KeepTrackPlugin {
+export class SoundManager {
   readonly id = 'SoundManager';
-  dependencies_ = [];
   lastLongAudioTime = 0;
-  isMute = false;
+  private isMute_ = false;
   private readonly currentChatterClip_ = 0;
   voices: SpeechSynthesisVoice[] = [];
   nextChatter: ReturnType<typeof setTimeout>;
@@ -43,9 +36,24 @@ export class SoundManager extends KeepTrackPlugin {
   private readonly LONG_AUDIO_COOLDOWN_MS = 30000;
   private readonly CHATTER_REPEAT_DELAY_MS = 10000;
 
-  constructor() {
-    super();
+  get isMute(): boolean {
+    return this.isMute_;
+  }
 
+  set isMute(value: boolean) {
+    if (this.isMute_ !== value) {
+      this.isMute_ = value;
+      EventBus.getInstance().emit(EventBusEvent.soundMuteChanged, value);
+    }
+  }
+
+  toggleMute(): boolean {
+    this.isMute = !this.isMute_;
+
+    return this.isMute_;
+  }
+
+  constructor() {
     // Find the maxClickClip_
     Object.keys(sounds).forEach((key) => {
       if (key.startsWith('click')) {
@@ -64,8 +72,6 @@ export class SoundManager extends KeepTrackPlugin {
     }
 
     try {
-      super.init();
-      this.setupTopMenu();
       // Initialize Web Audio Context
       this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -79,45 +85,14 @@ export class SoundManager extends KeepTrackPlugin {
       this.preloadHtmlAudio();
       this.isAudioReady = true;
     }
-  }
 
-  private setupTopMenu() {
-    const eventBus = EventBus.getInstance();
+    // Register with Container
+    Container.getInstance().registerSingleton<SoundManager>(Singletons.SoundManager, this);
 
-    // This needs to happen immediately so the sound button is in the menu
-    PluginRegistry.getPlugin(TopMenu)?.navItems.push({
-      id: 'sound-btn',
-      order: 1,
-      classInner: 'bmenu-item-selected',
-      icon: soundOnPng,
-      tooltip: 'Toggle Sound On/Off',
+    // Voice initialization via EventBus
+    EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
+      this.voices = speechSynthesis.getVoices();
     });
-
-    eventBus.on(EventBusEvent.uiManagerFinal, () => {
-      getEl('sound-btn')!.onclick = () => {
-        const soundIcon = <HTMLImageElement>getEl('sound-icon');
-        const soundManager = ServiceLocator.getSoundManager();
-
-        if (!soundManager) {
-          errorManagerInstance.warn('SoundManager is not enabled. Check your settings!');
-
-          return;
-        }
-
-        if (!soundManager.isMute) {
-          soundManager.isMute = true;
-          soundIcon.src = soundOffPng;
-          soundIcon.parentElement!.classList.remove('bmenu-item-selected');
-          soundIcon.parentElement!.classList.add('bmenu-item-error');
-        } else {
-          soundManager.isMute = false;
-          soundIcon.src = soundOnPng;
-          soundIcon.parentElement!.classList.add('bmenu-item-selected');
-          soundIcon.parentElement!.classList.remove('bmenu-item-error');
-        }
-      };
-    },
-    );
   }
 
   private async preloadAllAudio(): Promise<void> {
@@ -246,16 +221,6 @@ export class SoundManager extends KeepTrackPlugin {
 
     return true;
   }
-
-  addJs = (): void => {
-    super.addJs();
-
-    Container.getInstance().registerSingleton<SoundManager>(Singletons.SoundManager, this);
-
-    EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
-      this.voices = speechSynthesis.getVoices();
-    });
-  };
 
   /**
    * Wait for all audio to be ready for playback

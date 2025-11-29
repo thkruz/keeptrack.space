@@ -26,7 +26,7 @@ import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { slideInRight, slideOutLeft } from '@app/engine/utils/slide';
-import { SoundNames } from '@app/plugins/sounds/sounds';
+import { SoundNames } from '@app/engine/audio/sounds';
 import { ISecondaryMenuConfig } from '../../core/plugin-capabilities';
 import { SideMenuComponent } from '../side-menu/side-menu-component';
 

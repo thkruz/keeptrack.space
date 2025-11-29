@@ -7,7 +7,7 @@ import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-ma
 import { t7e } from '@app/locales/keys';
 import filterPng from '@public/img/icons/filter.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { SoundNames } from '../sounds/sounds';
+import { SoundNames } from '@app/engine/audio/sounds';
 import { TopMenu } from '../top-menu/top-menu';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 

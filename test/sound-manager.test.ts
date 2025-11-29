@@ -1,8 +1,7 @@
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { SoundManager } from '@app/plugins/sounds/sound-manager';
-import { SoundNames, sounds } from '@app/plugins/sounds/sounds';
+import { SoundManager } from '@app/engine/audio/sound-manager';
+import { SoundNames, sounds } from '@app/engine/audio/sounds';
 import { setupStandardEnvironment } from './environment/standard-env';
-import { standardPluginSuite } from './generic-tests';
 import { EventBus } from '@app/engine/events/event-bus';
 
 describe('Sound Manager', () => {
@@ -13,7 +12,9 @@ describe('Sound Manager', () => {
     soundManagerPlugin = new SoundManager();
   });
 
-  standardPluginSuite(SoundManager, 'SoundManager');
+  it('should have a valid id', () => {
+    expect(soundManagerPlugin.id).toBe('SoundManager');
+  });
 
   it('should_play_sound', () => {
     expect(sounds).toBeDefined();

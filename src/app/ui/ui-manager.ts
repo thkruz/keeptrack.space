@@ -30,7 +30,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { isThisNode } from '@app/engine/utils/isThisNode';
-import { SoundNames } from '@app/plugins/sounds/sounds';
+import { SoundNames } from '@app/engine/audio/sounds';
 import '@materializecss/materialize';
 import { BaseObject, DetailedSatellite, Milliseconds, MILLISECONDS_PER_SECOND } from '@ootk/src/main';
 import { ColorScheme } from '../../engine/rendering/color-schemes/color-scheme';

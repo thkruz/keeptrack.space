@@ -23,7 +23,7 @@ import { LineManager } from '@app/engine/rendering/line-manager';
 import { KeepTrack } from '@app/keeptrack';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { SoundManager } from '@app/plugins/sounds/sound-manager';
+import { SoundManager } from '@app/engine/audio/sound-manager';
 import { SettingsManager } from '@app/settings/settings';
 import { mat4 } from 'gl-matrix';
 import { OrbitManager } from '../../src/app/rendering/orbit-manager';

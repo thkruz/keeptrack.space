@@ -26,7 +26,7 @@ import type { DotsManager } from './engine/rendering/dots-manager';
 import type { LineManager } from './engine/rendering/line-manager';
 import type { MeshManager } from './engine/rendering/mesh-manager';
 import type { WebGLRenderer } from './engine/rendering/webgl-renderer';
-import type { SoundManager } from './plugins/sounds/sound-manager';
+import type { SoundManager } from './engine/audio/sound-manager';
 
 
 declare global {

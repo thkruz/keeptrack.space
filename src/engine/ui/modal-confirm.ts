@@ -1,4 +1,4 @@
-import { SoundNames } from '@app/plugins/sounds/sounds';
+import { SoundNames } from '@app/engine/audio/sounds';
 import { html } from '../utils/development/formatter';
 import { DraggableModal } from './draggable-modal';
 import { ServiceLocator } from '../core/service-locator';

@@ -6,7 +6,7 @@ import { t7e, TranslationKey } from '@app/locales/keys';
 import { BaseObject } from '@ootk/src/main';
 import Module from 'module';
 import { SelectSatManager } from '../../plugins/select-sat-manager/select-sat-manager';
-import { SoundNames } from '../../plugins/sounds/sounds';
+import { SoundNames } from '@app/engine/audio/sounds';
 import { PluginRegistry } from '../core/plugin-registry';
 import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';

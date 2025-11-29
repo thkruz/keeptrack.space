@@ -3,6 +3,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
@@ -29,6 +30,23 @@ export class VcrPlugin extends KeepTrackPlugin {
   playPauseBtn: HTMLElement | null = null;
   fastForwardBtn: HTMLElement | null = null;
   scenario: ScenarioData | null = null;
+
+  getKeyboardShortcuts(): IKeyboardShortcut[] {
+    return [
+      {
+        key: ' ',
+        callback: () => this.handlePlayPause(),
+      },
+      {
+        key: 'ArrowLeft',
+        callback: () => this.handleRewind(),
+      },
+      {
+        key: 'ArrowRight',
+        callback: () => this.handleFastForward(),
+      },
+    ];
+  }
 
   addHtml() {
     super.addHtml();

@@ -1,20 +1,50 @@
 @import url('style.common.css');
 
+:root {
+  /* Core Palette */
+  --color-background-light: white;
+  --color-border-dark: #0f1928;
+  /* Value from style.common.css */
+
+  /* Functional Colors (via filter) */
+  --filter-icon-blue: hue-rotate(163deg) brightness(0.7) saturate(4);
+  --filter-icon-blue-hover: hue-rotate(163deg) brightness(0.85) saturate(4);
+  --filter-icon-error-hover: invert(52%) sepia(130%) saturate(7323%) hue-rotate(353deg) brightness(120%) contrast(86%);
+
+  /* Text Colors */
+  --color-text-light: #f5f5f5;
+  --color-text-accent: var(--color-dark-text-accent);
+  /* from style.common.css */
+
+  /* Sizing & Spacing */
+  --spacing-none: 0px;
+  --spacing-xs: 3px;
+  --spacing-s: 6px;
+  --spacing-m: 10px;
+  --spacing-xl: 20px;
+
+  /* Borders */
+  --border-radius-m: 5px;
+  --border-width-l: 10px;
+  --border-width-m: 5px;
+  --border-style-default: solid;
+}
+
 
 /* File-specific CSS rules */
 
 .top-menu-icons__blue-img,
 .bmenu-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help) .bmenu-item-inner *,
 .bmenu-filter-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help) .bmenu-filter-item-inner * {
-  filter: hue-rotate(163deg) brightness(0.7) saturate(4);
+  filter: var(--filter-icon-blue);
 }
 
 .top-menu-icons__blue-img:hover {
-  filter: hue-rotate(163deg) brightness(0.85) saturate(4);
+  filter: var(--filter-icon-blue-hover);
 }
 
 .top-menu-icons.bmenu-item-selected .bmenu-item-error:hover img {
-  filter: invert(52%) sepia(130%) saturate(7323%) hue-rotate(353deg) brightness(120%) contrast(86%);
+  filter: var(--filter-icon-error-hover);
 }
 
 .top-menu-icons__blue-img:active *,
@@ -25,22 +55,22 @@
 }
 
 #colorbox-container {
-  background-color: 'white';
+  background-color: var(--color-background-light);
   transform: translateX(-200%);
   transition: transform 1s ease-in-out 0s;
   display: block;
   z-index: 100;
   width: 95%;
   height: 95%;
-  margin: 0px;
+  margin: var(--spacing-none);
   border-color: var(--color-dark-border);
-  border-width: 10px;
-  border-style: solid;
-  border-radius: 5px;
+  border-width: var(--border-width-l);
+  border-style: var(--border-style-default);
+  border-radius: var(--border-radius-m);
 }
 
 .top-menu-icons {
-  padding: 0px;
+  padding: var(--spacing-none);
   height: 100%;
   display: flex;
   align-items: center;

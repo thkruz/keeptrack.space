@@ -11,11 +11,11 @@
   --bottom-filter-width: 185px;
   --search-box-bottom: 0px;
   --nav-bar-height: 35px;
-  
+
   --top-menu-height: calc(var(--nav-bar-height) + var(--classification-bar-height) + var(--time-slider-height));
-  
+
   --classification-bar-height: 0px;
-  
+
   --time-slider-height: 0px;
 }
 
@@ -1616,24 +1616,24 @@ body {
   background-color: var(--color-dark-background);
   border: 2px solid var(--color-primary);
   width: 16px;
-  
+
   height: 16px;
   border-radius: 50%;
   position: absolute;
   top: -5px;
-  
+
   transform: translateX(-50%);
-  
+
   cursor: pointer;
 }
 
 .ui-slider .ui-slider-range {
   background-color: #1a2433;
-  
+
   border-radius: 10px;
-  
+
   height: 8px;
-  
+
   position: absolute;
   z-index: 1;
   font-size: 0.7em;
@@ -2185,7 +2185,7 @@ button.ui-button::-moz-focus-inner {
   display: block;
   width: 120px;
   margin-left: -60px;
-  
+
   overflow: visible;
 
   background-color: var(--color-dark-background);
@@ -2509,14 +2509,17 @@ button.ui-button::-moz-focus-inner {
 }
 
 .bmenu-item-selected img {
+  transition: none;
   filter: hue-rotate(275deg) brightness(1.2);
 }
 
 .bmenu-item-selected:hover .status-icon {
+  transition: none;
   filter: brightness(1.8);
 }
 
 .bmenu-item-selected:hover img {
+  transition: none;
   filter: hue-rotate(275deg) brightness(1.8);
 }
 
@@ -2736,16 +2739,12 @@ nav a.sidenav-trigger i {
   border-left: 0;
   border-right: 0;
   border-bottom: 0;
-  
+
   background: rgba(255, 255, 255, 0.85);
   color: white;
-  
+
   z-index: 99999999;
   padding: 0;
-}
-
-#nav-top-right a:hover {
-  filter: brightness(3);
 }
 
 .bmenu-item {
@@ -3534,7 +3533,7 @@ nav a.sidenav-trigger i {
   width: fit-content;
   background: var(--color-dark-background);
   border: 5px solid var(--color-dark-border);
-  
+
   display: grid !important;
   grid-template-columns: repeat(6, 1fr);
   grid-row-gap: 15px;
@@ -3589,7 +3588,7 @@ nav a.sidenav-trigger i {
 #datetime-input-tb {
   color: white;
   font-family: 'Open Sans', sans-serif;
-  
+
   height: 0px !important;
   margin: 0 0 55px 0 !important;
 }
@@ -3649,7 +3648,7 @@ input:focus {
   width: 100%;
   height: 5px;
   top: 0px;
-  
+
   z-index: 2;
   background-color: var(--color-dark-border) !important;
 }
@@ -3746,7 +3745,7 @@ input:focus {
 
 #keeptrack-canvas {
   background: var(--colorBlack);
-  
+
   position: absolute;
   z-index: -1;
   top: 0;
@@ -3765,7 +3764,7 @@ input:focus {
   overflow: hidden;
   touch-action: none;
   -webkit-overflow-scrolling: none;
-  
+
   overscroll-behavior: none;
 }
 

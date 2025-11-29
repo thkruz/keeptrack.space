@@ -26,6 +26,7 @@ export default {
     '^@ootk(.*)$': '<rootDir>/src/engine/ootk/$1',
     '^@public(.*)$': '<rootDir>/public/$1',
     '^@css(.*)$': '<rootDir>/public/css/$1',
+    '^@test(.*)$': '<rootDir>/test/$1',
   },
   coverageReporters: ['lcov', 'html', 'text'],
   coveragePathIgnorePatterns: ['/node_modules/', '/src/lib/external/', '/test/', '/dist/', '/src/engine/ootk/'],

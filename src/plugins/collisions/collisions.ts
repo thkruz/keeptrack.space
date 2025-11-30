@@ -1,18 +1,23 @@
-import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import CollisionsPng from '@public/img/icons/collisions.png';
-import './collisions.css';
-
 import { MenuMode } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
+import {
+  IBottomIconConfig,
+  IDragOptions,
+  IHelpConfig,
+  ISideMenuConfig,
+} from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
-import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import CollisionsPng from '@public/img/icons/collisions.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
-import { ServiceLocator } from '@app/engine/core/service-locator';
+import './collisions.css';
 
 //  Updated to match KeepTrack API v2
 export interface CollisionEvent {
@@ -35,37 +40,78 @@ export interface CollisionEvent {
 export class Collisions extends KeepTrackPlugin {
   readonly id = 'Collisions';
   dependencies_ = [];
-  private readonly collisionDataSrc = 'https://api.keeptrack.space/v2/socrates/latest';
+  private readonly collisionDataSrc_ = 'https://api.keeptrack.space/v2/socrates/latest';
   private selectSatIdOnCruncher_: number | null = null;
-  private collisionList_ = <CollisionEvent[]>[];
+  private collisionList_: CollisionEvent[] = [];
 
-  bottomIconElementName: string = 'menu-satellite-collision';
-  bottomIconImg = CollisionsPng;
-  sideMenuElementName: string = `${this.id}-menu`;
-  sideMenuElementHtml = html`
-  <div id="${this.id}-menu" class="side-menu-parent start-hidden text-select">
-    <div id="${this.id}-content" class="side-menu">
-      <div class="row">
-        <h5 class="center-align">Possible Collisions</h5>
-        <table id="${this.id}-table" class="center-align"></table>
-        <sub class="center-align">*Collision data provided by CelesTrak via <a href="https://celestrak.org/SOCRATES/" target="_blank" rel="noreferrer">SOCRATES</a>.</sub>
-      </div>
-    </div>
-  </div>`;
+  // =========================================================================
+  // Composition-based configuration methods
+  // =========================================================================
 
-  dragOptions: ClickDragOptions = {
-    isDraggable: true,
-    minWidth: 575,
-    maxWidth: 700,
-  };
+  getBottomIconConfig(): IBottomIconConfig {
+    return {
+      elementName: 'menu-satellite-collision',
+      label: t7e('plugins.Collisions.bottomIconLabel'),
+      image: CollisionsPng,
+      menuMode: [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL],
+    };
+  }
 
-  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
-
-  bottomIconCallback: () => void = () => {
+  /**
+   * Called when the bottom icon is clicked.
+   */
+  onBottomIconClick(): void {
     if (this.isMenuButtonActive) {
       this.parseCollisionData_();
     }
+  }
+
+  // Bridge for legacy event system (per CLAUDE.md)
+  bottomIconCallback = (): void => {
+    this.onBottomIconClick();
   };
+
+  getSideMenuConfig(): ISideMenuConfig {
+    return {
+      elementName: 'Collisions-menu',
+      title: t7e('plugins.Collisions.title'),
+      html: this.buildSideMenuHtml_(),
+      dragOptions: this.getDragOptions_(),
+    };
+  }
+
+  private getDragOptions_(): IDragOptions {
+    return {
+      isDraggable: true,
+      minWidth: 575,
+      maxWidth: 700,
+    };
+  }
+
+  private buildSideMenuHtml_(): string {
+    return html`
+      <div id="Collisions-menu" class="side-menu-parent start-hidden text-select">
+        <div id="Collisions-content" class="side-menu">
+          <div class="row">
+            <h5 class="center-align">${t7e('plugins.Collisions.title')}</h5>
+            <table id="Collisions-table" class="center-align"></table>
+            <sub class="center-align">*Collision data provided by CelesTrak via <a href="https://celestrak.org/SOCRATES/" target="_blank" rel="noreferrer">SOCRATES</a>.</sub>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: t7e('plugins.Collisions.title'),
+      body: t7e('plugins.Collisions.helpBody'),
+    };
+  }
+
+  // =========================================================================
+  // Lifecycle methods
+  // =========================================================================
 
   addJs(): void {
     super.addJs();
@@ -83,10 +129,10 @@ export class Collisions extends KeepTrackPlugin {
   }
 
   private uiManagerFinal_() {
-    getEl(this.sideMenuElementName)!.addEventListener('click', (evt: MouseEvent) => {
+    getEl('Collisions-menu')!.addEventListener('click', (evt: MouseEvent) => {
       const el = (<HTMLElement>evt.target).parentElement;
 
-      if (!el!.classList.contains(`${this.id}-object`)) {
+      if (!el!.classList.contains('Collisions-object')) {
         return;
       }
       // Might be better code for this.
@@ -103,13 +149,13 @@ export class Collisions extends KeepTrackPlugin {
   private parseCollisionData_() {
     if (this.collisionList_.length === 0) {
       // Only generate the table if receiving the -1 argument for the first time
-      fetch(this.collisionDataSrc).then((response) => {
+      fetch(this.collisionDataSrc_).then((response) => {
         response.json().then((collisionList: CollisionEvent[]) => {
           this.collisionList_ = collisionList;
           this.createTable_();
 
           if (this.collisionList_.length === 0) {
-            errorManagerInstance.warn(t7e('errorMsgs.Collisions.noCollisionsData'));
+            errorManagerInstance.warn(t7e('plugins.Collisions.errorMsgs.noCollisionsData'));
           }
         });
       });
@@ -133,7 +179,7 @@ export class Collisions extends KeepTrackPlugin {
 
   private createTable_(): void {
     try {
-      const tbl = <HTMLTableElement>getEl(`${this.id}-table`); // Identify the table to update
+      const tbl = <HTMLTableElement>getEl('Collisions-table');
 
       tbl.innerHTML = ''; // Clear the table from old object data
 
@@ -141,7 +187,7 @@ export class Collisions extends KeepTrackPlugin {
 
       this.createBody_(tbl);
     } catch {
-      errorManagerInstance.warn(t7e('errorMsgs.Collisions.errorProcessingCollisions'));
+      errorManagerInstance.warn(t7e('plugins.Collisions.errorMsgs.errorProcessingCollisions'));
     }
   }
 

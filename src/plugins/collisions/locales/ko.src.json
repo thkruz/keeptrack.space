@@ -1,0 +1,13 @@
+{
+  "plugins": {
+    "Collisions": {
+      "bottomIconLabel": "충돌",
+      "title": "충돌 메뉴",
+      "helpBody": "충돌 메뉴는 충돌 가능성이 높은 위성을 보여줍니다. <br><br> 행을 클릭하면 충돌과 관련된 두 위성이 선택되고 시간이 충돌 시간으로 변경됩니다.",
+      "errorMsgs": {
+        "noCollisionsData": "충돌 데이터를 찾을 수 없습니다!",
+        "errorProcessingCollisions": "SOCRATES 데이터 처리 중 오류 발생!"
+      }
+    }
+  }
+}

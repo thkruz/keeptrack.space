@@ -1,0 +1,13 @@
+{
+  "plugins": {
+    "Collisions": {
+      "bottomIconLabel": "Collisions",
+      "title": "Menu Collisions",
+      "helpBody": "Le menu Collisions affiche les satellites avec une forte probabilité de collision. <br><br> Cliquer sur une ligne sélectionne les deux satellites impliqués et change l'heure à celle de la collision.",
+      "errorMsgs": {
+        "noCollisionsData": "Aucune donnée de collision trouvée !",
+        "errorProcessingCollisions": "Erreur lors du traitement des données SOCRATES !"
+      }
+    }
+  }
+}

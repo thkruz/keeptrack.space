@@ -1,0 +1,13 @@
+{
+  "plugins": {
+    "Collisions": {
+      "bottomIconLabel": "衝突",
+      "title": "衝突メニュー",
+      "helpBody": "衝突メニューは、衝突確率が高い衛星を表示します。<br><br>行をクリックすると、衝突に関与する2つの衛星が選択され、時間が衝突時間に変更されます。",
+      "errorMsgs": {
+        "noCollisionsData": "衝突データが見つかりません！",
+        "errorProcessingCollisions": "SOCRATESデータの処理中にエラーが発生しました！"
+      }
+    }
+  }
+}

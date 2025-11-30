@@ -1,0 +1,13 @@
+{
+  "plugins": {
+    "Collisions": {
+      "bottomIconLabel": "Colisiones",
+      "title": "Menú de Colisiones",
+      "helpBody": "El Menú de Colisiones muestra satélites con alta probabilidad de colisión. <br><br> Hacer clic en una fila seleccionará los dos satélites involucrados en la colisión y cambiará el tiempo al momento de la colisión.",
+      "errorMsgs": {
+        "noCollisionsData": "¡No se encontraron datos de colisión!",
+        "errorProcessingCollisions": "¡Error al procesar los datos de SOCRATES!"
+      }
+    }
+  }
+}

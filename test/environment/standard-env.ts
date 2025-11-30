@@ -7,6 +7,7 @@ import { SensorManager } from '@app/app/sensors/sensorManager';
 import { BottomMenu } from '@app/app/ui/bottom-menu';
 import { SearchManager } from '@app/app/ui/search-manager';
 import { UiManager } from '@app/app/ui/ui-manager';
+import { SoundManager } from '@app/engine/audio/sound-manager';
 import { Camera } from '@app/engine/camera/camera';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
@@ -23,7 +24,6 @@ import { LineManager } from '@app/engine/rendering/line-manager';
 import { KeepTrack } from '@app/keeptrack';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { SoundManager } from '@app/engine/audio/sound-manager';
 import { SettingsManager } from '@app/settings/settings';
 import { mat4 } from 'gl-matrix';
 import { OrbitManager } from '../../src/app/rendering/orbit-manager';
@@ -304,7 +304,7 @@ export const mockUiManager: UiManager = <UiManager>(<unknown>{
 
 export const mockCameraManager = <Camera>(<unknown>{
   camAngleSnappedOnSat: false,
-  camMatrix: mat4.create().fill(0),
+  camMatrix: mat4.create(),
   camPitch: null,
   camPitchSpeed: 0,
   camPitchTarget: null,

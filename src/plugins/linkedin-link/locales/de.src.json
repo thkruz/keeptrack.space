@@ -1,0 +1,7 @@
+{
+  "plugins": {
+    "LinkedInLinkPlugin": {
+      "tooltip": "Auf LinkedIn ansehen"
+    }
+  }
+}

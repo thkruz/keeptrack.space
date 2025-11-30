@@ -1,0 +1,7 @@
+{
+  "plugins": {
+    "LinkedInLinkPlugin": {
+      "tooltip": "LinkedInで見る"
+    }
+  }
+}

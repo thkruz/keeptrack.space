@@ -1,4 +1,5 @@
 import { TopMenuPlugin } from '@app/engine/plugins/top-menu-plugin';
+import { t7e } from '@app/locales/keys';
 import linkedInPng from '@public/img/icons/linkedin.png';
 
 /**
@@ -15,7 +16,11 @@ export class LinkedInLinkPlugin extends TopMenuPlugin {
   readonly id = 'LinkedInLinkPlugin';
 
   protected image = linkedInPng;
-  protected tooltipText: string = 'View on LinkedIn';
+
+  addHtml(): void {
+    this.tooltipText = t7e('plugins.LinkedInLinkPlugin.tooltip');
+    super.addHtml();
+  }
 
   protected onClick_(): void {
     window.open('https://www.linkedin.com/company/keeptrackspace/', '_blank', 'noopener,noreferrer');

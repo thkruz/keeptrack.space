@@ -1,0 +1,7 @@
+{
+  "plugins": {
+    "LinkedInLinkPlugin": {
+      "tooltip": "在LinkedIn上查看"
+    }
+  }
+}

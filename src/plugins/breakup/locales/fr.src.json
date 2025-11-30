@@ -1,0 +1,17 @@
+{
+  "plugins": {
+    "Breakup": {
+      "bottomIconLabel": "Créer une fragmentation",
+      "title": "Menu Fragmentation",
+      "helpBody": "Le menu Fragmentation est un outil pour simuler la fragmentation d'un satellite. <br><br> En dupliquant et modifiant l'orbite d'un satellite, on peut modéliser sa fragmentation. Après avoir sélectionné un satellite et ouvert le menu, l'utilisateur peut choisir : <ul style=\"margin-left: 40px;\"> <li>Variation d'inclinaison</li> <li>Variation du RAAN</li> <li>Variation de période</li> <li>Nombre de fragments</li> </ul> Plus la variation est grande, plus la dispersion de la fragmentation simulée est importante. Les variations par défaut suffisent à simuler une fragmentation raisonnable.",
+      "errorMsgs": {
+        "SatelliteNotFound": "Satellite introuvable !",
+        "CannotCreateBreakupForNonCircularOrbits": "Impossible de créer une fragmentation pour des orbites non circulaires. Correction en cours.",
+        "CannotCalcDirectionOfSatellite": "Impossible de calculer la direction du satellite. Veuillez réessayer plus tard.",
+        "ErrorCreatingBreakup": "Erreur lors de la création de la fragmentation !",
+        "InvalidStartNum": "Numéro de départ du satellite invalide ! Valeur par défaut : 90000 !",
+        "BreakupGeneratorFailed": "Échec du générateur de fragmentation !"
+      }
+    }
+  }
+}

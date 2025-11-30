@@ -66,7 +66,7 @@ export class Breakup extends KeepTrackPlugin {
     const sat = obj as DetailedSatellite;
 
     if (sat?.apogee - sat?.perigee > this.maxDifApogeeVsPerigee_) {
-      errorManagerInstance.warn(t7e('errorMsgs.Breakup.CannotCreateBreakupForNonCircularOrbits'));
+      errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.CannotCreateBreakupForNonCircularOrbits'));
       this.closeSideMenu();
       this.setBottomIconToDisabled();
 
@@ -235,7 +235,7 @@ export class Breakup extends KeepTrackPlugin {
       } else if ((sat as DetailedSatellite)?.apogee - (sat as DetailedSatellite)?.perigee > this.maxDifApogeeVsPerigee_) {
         if (this.isMenuButtonActive) {
           this.closeSideMenu();
-          errorManagerInstance.warn(t7e('errorMsgs.Breakup.CannotCreateBreakupForNonCircularOrbits'));
+          errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.CannotCreateBreakupForNonCircularOrbits'));
         }
         this.setBottomIconToUnselected();
         this.setBottomIconToDisabled();
@@ -274,7 +274,7 @@ export class Breakup extends KeepTrackPlugin {
     const mainsat = catalogManagerInstance.getSat(satId ?? -1);
 
     if (!mainsat || satId === null) {
-      errorManagerInstance.warn(t7e('errorMsgs.Breakup.SatelliteNotFound'));
+      errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.SatelliteNotFound'));
 
       return;
     }
@@ -290,7 +290,7 @@ export class Breakup extends KeepTrackPlugin {
     const upOrDown = SatMath.getDirection(mainsat, simulationTimeObj);
 
     if (upOrDown === 'Error') {
-      errorManagerInstance.warn(t7e('errorMsgs.Breakup.CannotCalcDirectionOfSatellite'));
+      errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.CannotCalcDirectionOfSatellite'));
     }
 
     const currentEpoch = TimeManager.currentEpoch(simulationTimeObj);
@@ -300,7 +300,7 @@ export class Breakup extends KeepTrackPlugin {
     ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
 
     if (mainsat.apogee - mainsat.perigee > this.maxDifApogeeVsPerigee_) {
-      errorManagerInstance.warn(t7e('errorMsgs.Breakup.CannotCreateBreakupForNonCircularOrbits'));
+      errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.CannotCreateBreakupForNonCircularOrbits'));
 
       return;
     }
@@ -312,7 +312,7 @@ export class Breakup extends KeepTrackPlugin {
 
     if (tle1 === 'Error') {
       // console.error(tle2);
-      errorManagerInstance.warn(t7e('errorMsgs.Breakup.ErrorCreatingBreakup'));
+      errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.ErrorCreatingBreakup'));
 
       return;
     }
@@ -371,7 +371,7 @@ export class Breakup extends KeepTrackPlugin {
         iTLEs = new OrbitFinder(sat, launchLat, launchLon, <'N' | 'S'>upOrDown, new Date(simulationTimeObj.getTime() + 1), newAlt as Kilometers, rascOffset).rotateOrbitToLatLon();
         if (iTLEs[0] === 'Error') {
           // console.error(iTLEs[1]);
-          errorManagerInstance.warn(t7e('errorMsgs.Breakup.ErrorCreatingBreakup'));
+          errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.ErrorCreatingBreakup'));
 
           return;
         }
@@ -409,7 +409,7 @@ export class Breakup extends KeepTrackPlugin {
         const satId = catalogManagerInstance.sccNum2Id(a5Num);
 
         if (!satId) {
-          errorManagerInstance.warn(t7e('errorMsgs.Breakup.SatelliteNotFound'));
+          errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.SatelliteNotFound'));
 
           return;
         }
@@ -438,7 +438,7 @@ export class Breakup extends KeepTrackPlugin {
             },
           });
         } catch (e) {
-          errorManagerInstance.error(e, 'breakup.ts', t7e('errorMsgs.Breakup.ErrorCreatingBreakup'));
+          errorManagerInstance.error(e, 'breakup.ts', t7e('plugins.Breakup.errorMsgs.ErrorCreatingBreakup'));
 
           return;
         }
@@ -454,7 +454,7 @@ export class Breakup extends KeepTrackPlugin {
           });
           orbitManagerInstance.changeOrbitBufferData(satId, iTle1, iTle2);
         } else {
-          errorManagerInstance.warn(t7e('errorMsgs.Breakup.BreakupGeneratorFailed'));
+          errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.BreakupGeneratorFailed'));
         }
       }
     }
@@ -474,7 +474,7 @@ export class Breakup extends KeepTrackPlugin {
     let startNum = parseInt((<HTMLInputElement>getEl('hc-startNum')).value);
 
     if (isNaN(startNum)) {
-      errorManagerInstance.warn(t7e('errorMsgs.Breakup.InvalidStartNum'));
+      errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.InvalidStartNum'));
       startNum = 90000;
     }
 

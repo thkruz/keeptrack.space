@@ -1,0 +1,7 @@
+{
+  "plugins": {
+    "GithubLinkPlugin": {
+      "tooltip": "GitHub에서 보기"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "plugins": {
+    "ColorMenu": {
+      "bottomIconLabel": "Colores",
+      "title": "Esquemas de Color",
+      "rmbLabel": "Esquema de Color",
+      "helpBody": "El Menú de Colores le permite cambiar cómo se muestran los satélites en la pantalla. Diferentes esquemas de color resaltan diferentes características de los satélites, como el país de origen, el tipo de órbita o el tipo de objeto."
+    }
+  }
+}

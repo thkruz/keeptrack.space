@@ -1,0 +1,10 @@
+{
+  "plugins": {
+    "ColorMenu": {
+      "bottomIconLabel": "Farben",
+      "title": "Farbschemata",
+      "rmbLabel": "Farbschema",
+      "helpBody": "Das Farbmenü ermöglicht es Ihnen, die Darstellung der Satelliten auf dem Display zu ändern. Verschiedene Farbschemata heben unterschiedliche Satelliteneigenschaften hervor, wie Herkunftsland, Orbittyp oder Objekttyp."
+    }
+  }
+}

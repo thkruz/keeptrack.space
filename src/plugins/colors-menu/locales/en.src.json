@@ -1,0 +1,10 @@
+{
+  "plugins": {
+    "ColorMenu": {
+      "bottomIconLabel": "Colors",
+      "title": "Color Schemes",
+      "rmbLabel": "Color Scheme",
+      "helpBody": "The Color Menu allows you to change how satellites are colored on the display. Different color schemes highlight different satellite characteristics such as country of origin, orbit type, or object type."
+    }
+  }
+}

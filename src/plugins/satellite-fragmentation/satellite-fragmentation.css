@@ -1,0 +1,56 @@
+/* Satellite Fragmentation Plugin Styles */
+
+#satellite-fragmentation-menu {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+#satellite-fragmentation-content {
+  min-width: 400px;
+  max-width: 500px;
+}
+
+.fragmentation-info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fragmentation-info-key {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  flex: 0 0 45%;
+}
+
+.fragmentation-info-value {
+  color: #00e676;
+  text-align: right;
+  flex: 0 0 55%;
+  word-wrap: break-word;
+}
+
+#fragmentation-parent-select {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 5px;
+  border-radius: 4px;
+}
+
+#satellite-fragmentation-menu .divider {
+  background-color: rgba(255, 255, 255, 0.2);
+  margin: 15px 0;
+}
+
+#satellite-fragmentation-menu h6 {
+  color: #64b5f6;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+#frag-show-debris-btn,
+#frag-select-parent-btn {
+  width: 90%;
+  margin: 5px auto;
+}

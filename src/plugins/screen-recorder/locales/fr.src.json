@@ -1,0 +1,6 @@
+{
+  "ScreenRecorder": {
+    "recordingUnavailable": "Enregistrement indisponible en raison de problèmes de compatibilité !",
+    "compatibilityError": "Erreur de compatibilité avec l'enregistrement !"
+  }
+}

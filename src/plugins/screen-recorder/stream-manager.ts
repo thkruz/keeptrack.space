@@ -19,13 +19,13 @@ export class StreamManager {
   private mediaRecorder_ = null as MediaRecorder | null;
   private recordedBlobs = [] as Blob[];
   private supportedType: string | undefined;
-  private videoBitsPerSec_ = null as number | null;
+  private readonly videoBitsPerSec_ = null as number | null;
 
   public isVideoRecording = false;
   private stream_: MediaStream;
-  private onError_: () => void;
-  private onMinorError_: () => void;
-  private onStop_: () => void;
+  private readonly onError_: () => void;
+  private readonly onMinorError_: () => void;
+  private readonly onStop_: () => void;
 
   constructor(videoBitsPerSec: number, onStop: () => void, onMinorError: () => void, onError: () => void) {
     this.videoBitsPerSec_ = videoBitsPerSec;
@@ -170,14 +170,12 @@ export class StreamManager {
           return;
         }
 
-        errorManagerInstance.debug(`Created MediaRecorder ${this.mediaRecorder_} with options ${options}`);
         this.mediaRecorder_.onstop = this.stop.bind(this);
         this.mediaRecorder_.ondataavailable = this.handleDataAvailable.bind(this);
         this.mediaRecorder_.start(100); // collect 100ms of data blobs
-        errorManagerInstance.debug(`Created MediaRecorder ${this.mediaRecorder_}`);
       })
       .catch(() => {
-        // errorManagerInstance.warn('Error:' + err);
+        // Do nothing, errors are handled in getStream
       });
   }
 }

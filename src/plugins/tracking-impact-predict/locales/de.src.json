@@ -1,0 +1,16 @@
+{
+  "plugins": {
+    "TrackingImpactPredict": {
+      "bottomIconLabel": "TIP Nachrichten",
+      "title": "Wiedereintritts-Vorhersagen",
+      "helpBody": "Das Tracking and Impact Prediction (TIP) Menu zeigt aktuelle und bevorstehende Satelliten-Wiedereintritts-Vorhersagen des US Space Command. <br><br> Durch Klicken auf eine Zeile wird der Satellit ausgewahlt und die Zeit auf den vorhergesagten Zerfallszeitpunkt geandert.",
+      "dataSource": "Tracking and Impact Prediction (TIP) Nachrichten bereitgestellt vom US Space Command (USSPACECOM).",
+      "errorMsgs": {
+        "noTipData": "Keine TIP-Daten gefunden!",
+        "errorFetching": "Fehler beim Abrufen der Wiedereintrittsdaten!",
+        "errorProcessing": "Fehler beim Verarbeiten der Wiedereintrittsdaten!",
+        "satelliteDecayed": "Satellit scheint bereits verglüht zu sein!"
+      }
+    }
+  }
+}

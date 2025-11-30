@@ -1,0 +1,16 @@
+{
+  "plugins": {
+    "TrackingImpactPredict": {
+      "bottomIconLabel": "Mensajes TIP",
+      "title": "Predicciones de Reentrada",
+      "helpBody": "El menu de Seguimiento y Prediccion de Impacto (TIP) muestra predicciones recientes y proximas de reentrada de satelites del Comando Espacial de EE.UU. <br><br> Al hacer clic en una fila se seleccionara el satelite y cambiara la hora al momento de decaimiento previsto.",
+      "dataSource": "Mensajes de Seguimiento y Prediccion de Impacto (TIP) proporcionados por el Comando Espacial de EE.UU. (USSPACECOM).",
+      "errorMsgs": {
+        "noTipData": "No se encontraron datos TIP!",
+        "errorFetching": "Error al obtener datos de reentrada!",
+        "errorProcessing": "Error al procesar datos de reentrada!",
+        "satelliteDecayed": "El satelite parece haber decaido!"
+      }
+    }
+  }
+}

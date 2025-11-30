@@ -1,0 +1,16 @@
+{
+  "plugins": {
+    "TrackingImpactPredict": {
+      "bottomIconLabel": "Messages TIP",
+      "title": "Predictions de Reentree",
+      "helpBody": "Le menu de Suivi et Prediction d'Impact (TIP) affiche les predictions recentes et a venir de reentree de satellites du Commandement spatial americain. <br><br> Cliquer sur une ligne selectionnera le satellite et changera l'heure au moment de desintegration prevu.",
+      "dataSource": "Messages de Suivi et Prediction d'Impact (TIP) fournis par le Commandement spatial americain (USSPACECOM).",
+      "errorMsgs": {
+        "noTipData": "Aucune donnee TIP trouvee!",
+        "errorFetching": "Erreur lors de la recuperation des donnees de reentree!",
+        "errorProcessing": "Erreur lors du traitement des donnees de reentree!",
+        "satelliteDecayed": "Le satellite semble avoir brule!"
+      }
+    }
+  }
+}

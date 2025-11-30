@@ -1,0 +1,16 @@
+{
+  "plugins": {
+    "TrackingImpactPredict": {
+      "bottomIconLabel": "TIP 메시지",
+      "title": "재진입 예측",
+      "helpBody": "추적 및 충돌 예측(TIP) 메뉴는 미 우주사령부의 최근 및 예정된 위성 재진입 예측을 보여줍니다. <br><br> 행을 클릭하면 해당 위성이 선택되고 예측된 붕괴 시간으로 시간이 변경됩니다.",
+      "dataSource": "추적 및 충돌 예측(TIP) 메시지는 미 우주사령부(USSPACECOM)에서 제공합니다.",
+      "errorMsgs": {
+        "noTipData": "TIP 데이터를 찾을 수 없습니다!",
+        "errorFetching": "재진입 데이터를 가져오는 중 오류 발생!",
+        "errorProcessing": "재진입 데이터를 처리하는 중 오류 발생!",
+        "satelliteDecayed": "위성이 이미 추락한 것 같습니다!"
+      }
+    }
+  }
+}

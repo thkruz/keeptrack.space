@@ -1,0 +1,16 @@
+{
+  "plugins": {
+    "TrackingImpactPredict": {
+      "bottomIconLabel": "TIPメッセージ",
+      "title": "再突入予測",
+      "helpBody": "追跡・衝突予測(TIP)メニューは、米宇宙軍からの最近および今後の衛星再突入予測を表示します。<br><br>行をクリックすると、その衛星が選択され、予測された減衰時間に時刻が変更されます。",
+      "dataSource": "追跡・衝突予測(TIP)メッセージは米宇宙軍(USSPACECOM)から提供されています。",
+      "errorMsgs": {
+        "noTipData": "TIPデータが見つかりません!",
+        "errorFetching": "再突入データの取得エラー!",
+        "errorProcessing": "再突入データの処理エラー!",
+        "satelliteDecayed": "衛星は既に落下したようです!"
+      }
+    }
+  }
+}

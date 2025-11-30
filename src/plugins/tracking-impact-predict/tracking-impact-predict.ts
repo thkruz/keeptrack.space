@@ -1,19 +1,25 @@
-import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import sputnickPng from '@public/img/icons/sputnick.png';
-import './tracking-impact-predict.css';
-
 import { SatMath } from '@app/app/analysis/sat-math';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
-import { EventBus } from '@app/engine/events/event-bus';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { html } from '@app/engine/utils/development/formatter';
-import { getEl } from '@app/engine/utils/get-el';
-import { showLoading } from '@app/engine/utils/showLoading';
-import { RAD2DEG } from '@ootk/src/main';
-import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
+import {
+  IBottomIconConfig,
+  IDragOptions,
+  IHelpConfig,
+  ISideMenuConfig,
+} from '@app/engine/plugins/core/plugin-capabilities';
+import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
+import { showLoading } from '@app/engine/utils/showLoading';
+import { t7e } from '@app/locales/keys';
+import sputnickPng from '@public/img/icons/sputnick.png';
+import { RAD2DEG } from '@ootk/src/main';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import './tracking-impact-predict.css';
 
 export interface TipMsg {
   NORAD_CAT_ID: string;
@@ -35,36 +41,78 @@ export interface TipMsg {
 export class TrackingImpactPredict extends KeepTrackPlugin {
   readonly id = 'TrackingImpactPredict';
   dependencies_ = [];
-  private readonly tipDataSrc = 'https://r2.keeptrack.space/spacetrack-tip.json';
+  private readonly tipDataSrc_ = 'https://r2.keeptrack.space/spacetrack-tip.json';
   private selectSatIdOnCruncher_: number | null = null;
-  private tipList_ = <TipMsg[]>[];
+  private tipList_: TipMsg[] = [];
 
-  bottomIconImg = sputnickPng;
-  sideMenuElementName: string = 'tip-menu';
-  sideMenuElementHtml = html`
-  <div id="tip-menu" class="side-menu-parent start-hidden text-select">
-    <div id="tip-content" class="side-menu">
-      <div class="row">
-        <h5 class="center-align">Recent and Upcoming Reentry Predictions</h5>
-        <table id="tip-table" class="center-align"></table>
-        <sub class="center-align">*Tracking and Impact Prediction (TIP) messages provided by the US Space Command (USSPACECOM).</sub>
-      </div>
-    </div>
-  </div>`;
+  // =========================================================================
+  // Composition-based configuration methods
+  // =========================================================================
 
-  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
+  getBottomIconConfig(): IBottomIconConfig {
+    return {
+      elementName: 'tip-bottom-icon',
+      label: t7e('plugins.TrackingImpactPredict.bottomIconLabel'),
+      image: sputnickPng,
+      menuMode: [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL],
+    };
+  }
 
-  dragOptions: ClickDragOptions = {
-    isDraggable: true,
-    minWidth: 1200,
-    maxWidth: 1500,
-  };
-
-  bottomIconCallback: () => void = () => {
+  /**
+   * Called when the bottom icon is clicked.
+   */
+  onBottomIconClick(): void {
     if (this.isMenuButtonActive) {
-      this.parsetipData_();
+      this.parseTipData_();
     }
+  }
+
+  // Bridge for legacy event system (per CLAUDE.md)
+  bottomIconCallback = (): void => {
+    this.onBottomIconClick();
   };
+
+  getSideMenuConfig(): ISideMenuConfig {
+    return {
+      elementName: 'tip-menu',
+      title: t7e('plugins.TrackingImpactPredict.title'),
+      html: this.buildSideMenuHtml_(),
+      dragOptions: this.getDragOptions_(),
+    };
+  }
+
+  private getDragOptions_(): IDragOptions {
+    return {
+      isDraggable: true,
+      minWidth: 1200,
+      maxWidth: 1500,
+    };
+  }
+
+  private buildSideMenuHtml_(): string {
+    return html`
+      <div id="tip-menu" class="side-menu-parent start-hidden text-select">
+        <div id="tip-content" class="side-menu">
+          <div class="row">
+            <h5 class="center-align">${t7e('plugins.TrackingImpactPredict.title')}</h5>
+            <table id="tip-table" class="center-align"></table>
+            <sub class="center-align">*${t7e('plugins.TrackingImpactPredict.dataSource')}</sub>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: t7e('plugins.TrackingImpactPredict.title'),
+      body: t7e('plugins.TrackingImpactPredict.helpBody'),
+    };
+  }
+
+  // =========================================================================
+  // Lifecycle methods
+  // =========================================================================
 
   addJs(): void {
     super.addJs();
@@ -106,21 +154,21 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
     });
   }
 
-  private parsetipData_() {
+  private parseTipData_() {
     if (this.tipList_.length === 0) {
       // Only generate the table if receiving the -1 argument for the first time
-      fetch(this.tipDataSrc)
+      fetch(this.tipDataSrc_)
         .then((response) => response.json())
         .then((tipList: TipMsg[]) => {
           this.setTipList_(tipList);
           this.createTable_();
 
           if (this.tipList_.length === 0) {
-            errorManagerInstance.warn('No tip data found!');
+            errorManagerInstance.warn(t7e('plugins.TrackingImpactPredict.errorMsgs.noTipData'));
           }
         })
         .catch(() => {
-          errorManagerInstance.warn('Error fetching reentry data!');
+          errorManagerInstance.warn(t7e('plugins.TrackingImpactPredict.errorMsgs.errorFetching'));
         });
     }
   }
@@ -138,7 +186,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
     const sat = ServiceLocator.getCatalogManager().sccNum2Sat(parseInt(this.tipList_[row].NORAD_CAT_ID));
 
     if (!sat) {
-      ServiceLocator.getUiManager().toast('Satellite appears to have decayed!', ToastMsgType.caution);
+      ServiceLocator.getUiManager().toast(t7e('plugins.TrackingImpactPredict.errorMsgs.satelliteDecayed'), ToastMsgType.caution);
 
       return;
     }
@@ -174,7 +222,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
 
       this.createBody_(tbl);
     } catch {
-      errorManagerInstance.warn('Error processing reentry data!');
+      errorManagerInstance.warn(t7e('plugins.TrackingImpactPredict.errorMsgs.errorProcessing'));
     }
   }
 

@@ -1,0 +1,16 @@
+{
+  "plugins": {
+    "TrackingImpactPredict": {
+      "bottomIconLabel": "TIP消息",
+      "title": "再入预测",
+      "helpBody": "跟踪和撞击预测(TIP)菜单显示美国太空司令部最近和即将进行的卫星再入预测。<br><br>点击某一行将选择该卫星并将时间更改为预测的衰减时间。",
+      "dataSource": "跟踪和撞击预测(TIP)消息由美国太空司令部(USSPACECOM)提供。",
+      "errorMsgs": {
+        "noTipData": "未找到TIP数据!",
+        "errorFetching": "获取再入数据时出错!",
+        "errorProcessing": "处理再入数据时出错!",
+        "satelliteDecayed": "卫星似乎已经坠毁!"
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "plugins": {
+    "CountriesMenu": {
+      "bottomIconLabel": "国別",
+      "title": "国別メニュー",
+      "helpBody": "国別メニューでは、衛星を原産国によってフィルタリングできます。"
+    }
+  }
+}

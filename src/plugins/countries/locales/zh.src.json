@@ -1,0 +1,9 @@
+{
+  "plugins": {
+    "CountriesMenu": {
+      "bottomIconLabel": "国家",
+      "title": "国家菜单",
+      "helpBody": "国家菜单允许您按原籍国筛选卫星。"
+    }
+  }
+}

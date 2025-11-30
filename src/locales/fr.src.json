@@ -243,11 +243,6 @@
       "title": "Menu Constellations",
       "helpBody": "Le menu Constellations permet de visualiser des groupes de satellites. <br><br> Pour certaines constellations, des liaisons montantes/descendantes ou inter-satellites notionnelles seront affichées."
     },
-    "CountriesMenu": {
-      "bottomIconLabel": "Pays",
-      "title": "Menu Pays",
-      "helpBody": "Le menu Pays permet de filtrer les satellites par pays d’origine."
-    },
     "ColorMenu": {
       "bottomIconLabel": "Schémas de couleurs",
       "title": "Menu Schéma de couleurs",

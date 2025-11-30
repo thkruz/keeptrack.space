@@ -243,11 +243,6 @@
       "title": "Menú de Constelaciones",
       "helpBody": "El menú de Constelaciones te permite ver grupos de satélites. <br><br> Para algunas constelaciones, se dibujarán enlaces ascendentes/descendentes y/o enlaces cruzados nocionales entre los satélites de la constelación."
     },
-    "CountriesMenu": {
-      "bottomIconLabel": "Países",
-      "title": "Menú de Países",
-      "helpBody": "El Menú de Países te permite filtrar los satélites por país de origen."
-    },
     "ColorMenu": {
       "bottomIconLabel": "Esquemas de Color",
       "title": "Menú de Esquema de Color",

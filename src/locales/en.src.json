@@ -243,11 +243,6 @@
       "title": "Constellations Menu",
       "helpBody": "The Constellations menu allows you to view groups of satellites. <br><br> For some constellations, notional uplink/downlinks and/or crosslinks will be drawn between satellites in the constellation."
     },
-    "CountriesMenu": {
-      "bottomIconLabel": "Countries",
-      "title": "Countries Menu",
-      "helpBody": "The Countries Menu allows you to filter the satellites by country of origin."
-    },
     "ColorMenu": {
       "bottomIconLabel": "Color Schemes",
       "title": "Color Scheme Menu",

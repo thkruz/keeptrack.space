@@ -246,11 +246,6 @@
       "title": "Konstellationen-Menü",
       "helpBody": "Das Konstellationen-Menü ermöglicht es Ihnen, Gruppen von Satelliten anzuzeigen. <br><br> Für einige Konstellationen werden fiktive Uplinks/Downlinks und/oder Crosslinks zwischen Satelliten in der Konstellation gezeichnet."
     },
-    "CountriesMenu": {
-      "bottomIconLabel": "Länder",
-      "title": "Länder-Menü",
-      "helpBody": "Das Länder-Menü ermöglicht es Ihnen, die Satelliten nach Herkunftsland zu filtern."
-    },
     "ColorMenu": {
       "bottomIconLabel": "Farbschemata",
       "title": "Farbschema-Menü",

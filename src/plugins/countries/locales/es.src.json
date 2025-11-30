@@ -1,0 +1,9 @@
+{
+  "plugins": {
+    "CountriesMenu": {
+      "bottomIconLabel": "Países",
+      "title": "Menú de Países",
+      "helpBody": "El Menú de Países te permite filtrar los satélites por país de origen."
+    }
+  }
+}

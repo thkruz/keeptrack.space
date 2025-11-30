@@ -1,0 +1,15 @@
+{
+  "Breakup": {
+    "bottomIconLabel": "Crear Desintegración",
+    "title": "Menú de Desintegración",
+    "helpBody": "El Menú de Desintegración es una herramienta para simular la desintegración de un satélite. <br><br> Al modificar, duplicar y modificar la órbita de un satélite, podemos modelar la desintegración de un satélite. Después de seleccionar un satélite y abrir el menú, el usuario puede seleccionar: <ul style=\"margin-left: 40px;\"> <li>Variación de Inclinación</li> <li>Variación de RAAN</li> <li>Variación de Período</li> <li>Número de Piezas de Desintegración</li> </ul> Cuanto mayor sea la variación, mayor será la dispersión en la desintegración simulada. Las variaciones predeterminadas son suficientes para simular una desintegración con una dispersión razonable.",
+    "errorMsgs": {
+      "SatelliteNotFound": "¡Satélite no encontrado!",
+      "CannotCreateBreakupForNonCircularOrbits": "No se puede crear una ruptura para órbitas no circulares. Estamos trabajando en una solución.",
+      "CannotCalcDirectionOfSatellite": "No se puede calcular la dirección del satélite. Intente de nuevo más tarde.",
+      "ErrorCreatingBreakup": "¡Error al crear la ruptura!",
+      "InvalidStartNum": "¡Número de inicio de satélite inválido! ¡Restableciendo a 90000!",
+      "BreakupGeneratorFailed": "¡El generador de ruptura falló!"
+    }
+  }
+}

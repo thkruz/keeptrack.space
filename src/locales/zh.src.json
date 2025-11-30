@@ -65,14 +65,6 @@
       "disablingMilkyWay": "您的计算机运行困难！正在禁用银河系。",
       "disablingSun": "您的计算机运行困难！正在禁用太阳。"
     },
-    "Breakup": {
-      "CannotCreateBreakupForNonCircularOrbits": "无法为非圆形轨道创建解体。正在修复中。",
-      "CannotCalcDirectionOfSatellite": "无法计算卫星方向。请稍后再试。",
-      "ErrorCreatingBreakup": "创建解体时出错！",
-      "InvalidStartNum": "无效的卫星起始编号！默认为90000！",
-      "BreakupGeneratorFailed": "解体生成器失败！",
-      "SatelliteNotFound": "未找到卫星！"
-    },
     "Collisions": {
       "noCollisionsData": "未找到碰撞数据！",
       "errorProcessingCollisions": "处理SOCRATES数据时出错！"
@@ -235,11 +227,6 @@
       "bottomIconLabel": "再入预测",
       "title": "跟踪与再入预测菜单",
       "helpBody": "跟踪与再入预测（TIP）菜单显示卫星的最新跟踪与再入预测信息。表格包含以下列：<br><br><b>NORAD</b>：卫星的NORAD目录编号。<br><br><b>衰减日期</b>：预测的卫星衰减日期。<br><br><b>纬度</b>：卫星衰减时的纬度。<br><br><b>经度</b>：卫星衰减时的经度。<br><br><b>窗口（分钟）</b>：预测时间窗口（分钟）。<br><br><b>下次报告（小时）</b>：距离下次报告的时间（小时）。<br><br><b>再入角（度）</b>：卫星再入角度（度）。<br><br><b>雷达截面积（平方米）</b>：卫星的雷达截面积。<br><br><b>GP数据龄（小时）</b>：最新轨道参数集的时效（小时）。<br><br><b>干质量（千克）</b>：卫星干质量。<br><br><b>体积（立方米）</b>：卫星估算体积。"
-    },
-    "Breakup": {
-      "bottomIconLabel": "创建解体",
-      "title": "解体菜单",
-      "helpBody": "解体菜单用于模拟卫星解体。<br><br>通过复制并修改卫星轨道，可对卫星解体进行建模。选择卫星并打开菜单后，可设置：<ul style=\"margin-left: 40px;\"> <li>倾角变化</li> <li>升交点赤经变化</li> <li>周期变化</li> <li>解体碎片数量</li> </ul>变化越大，模拟解体的碎片分布越广。默认参数足以模拟合理的解体分布。"
     },
     "DebrisScreening": {
       "bottomIconLabel": "碎片筛查",

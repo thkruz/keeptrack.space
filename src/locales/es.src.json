@@ -65,14 +65,6 @@
       "disablingMilkyWay": "¡Tu computadora está teniendo problemas! Desactivando la Vía Láctea.",
       "disablingSun": "¡Tu computadora está teniendo problemas! Desactivando el sol."
     },
-    "Breakup": {
-      "CannotCreateBreakupForNonCircularOrbits": "No se puede crear una ruptura para órbitas no circulares. Estamos trabajando en una solución.",
-      "CannotCalcDirectionOfSatellite": "No se puede calcular la dirección del satélite. Intente de nuevo más tarde.",
-      "ErrorCreatingBreakup": "¡Error al crear la ruptura!",
-      "InvalidStartNum": "¡Número de inicio de satélite inválido! ¡Restableciendo a 90000!",
-      "BreakupGeneratorFailed": "¡El generador de ruptura falló!",
-      "SatelliteNotFound": "¡Satélite no encontrado!"
-    },
     "Collisions": {
       "noCollisionsData": "¡No se encontraron datos de colisión!",
       "errorProcessingCollisions": "¡Error al procesar los datos de SOCRATES!"
@@ -204,11 +196,6 @@
       "bottomIconLabel": "Predicción de Reentrada",
       "title": "Menú de Seguimiento y Predicción de Impacto",
       "helpBody": "El menú de Seguimiento y Predicción de Impacto (TIP) muestra los últimos mensajes de seguimiento y predicción de impacto para satélites. La tabla muestra las siguientes columnas:<br><br> <b>NORAD</b>: El ID de catálogo NORAD del satélite.<br><br> <b>Fecha de Decaimiento</b>: La fecha de la predicción de decaimiento del satélite.<br><br> <b>Latitud</b>: La latitud del satélite en el momento del decaimiento.<br><br> <b>Longitud</b>: La longitud del satélite en el momento del decaimiento.<br><br> <b>Ventana (min)</b>: La ventana de tiempo en minutos para la predicción.<br><br> <b>Próximo Informe (hrs)</b>: El tiempo en horas hasta el próximo informe.<br><br> <b>Ángulo de Reentrada (deg)</b>: El ángulo de reentrada del satélite en grados.<br><br> <b>RCS (m²)</b>: La sección transversal de radar del satélite en metros cuadrados.<br><br> <b>Edad del GP (hrs)</b>: La edad del último conjunto de elementos en horas.<br><br> <b>Masa en Seco (kg)</b>: La masa en seco del satélite en kilogramos.<br><br> <b>Volumen (m³)</b>: El volumen estimado del satélite en metros cúbicos.<br><br>"
-    },
-    "Breakup": {
-      "bottomIconLabel": "Crear Desintegración",
-      "title": "Menú de Desintegración",
-      "helpBody": "El Menú de Desintegración es una herramienta para simular la desintegración de un satélite. <br><br> Al modificar, duplicar y modificar la órbita de un satélite, podemos modelar la desintegración de un satélite. Después de seleccionar un satélite y abrir el menú, el usuario puede seleccionar: <ul style=\"margin-left: 40px;\"> <li>Variación de Inclinación</li> <li>Variación de RAAN</li> <li>Variación de Período</li> <li>Número de Piezas de Desintegración</li> </ul> Cuanto mayor sea la variación, mayor será la dispersión en la desintegración simulada. Las variaciones predeterminadas son suficientes para simular una desintegración con una dispersión razonable."
     },
     "DebrisScreening": {
       "bottomIconLabel": "Detección de Escombros",

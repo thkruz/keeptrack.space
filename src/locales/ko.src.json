@@ -65,14 +65,6 @@
       "disablingMilkyWay": "컴퓨터 성능이 부족합니다! 은하수를 비활성화합니다.",
       "disablingSun": "컴퓨터 성능이 부족합니다! 태양을 비활성화합니다."
     },
-    "Breakup": {
-      "SatelliteNotFound": "위성을 찾을 수 없습니다!",
-      "CannotCreateBreakupForNonCircularOrbits": "비원형 궤도에 대한 파편화를 생성할 수 없습니다. 수정 중입니다.",
-      "CannotCalcDirectionOfSatellite": "위성의 방향을 계산할 수 없습니다. 나중에 다시 시도하세요.",
-      "ErrorCreatingBreakup": "파편화 생성 오류!",
-      "InvalidStartNum": "잘못된 위성 시작 번호입니다! 기본값 90000으로 설정합니다!",
-      "BreakupGeneratorFailed": "파편화 생성기 실패!"
-    },
     "Collisions": {
       "noCollisionsData": "충돌 데이터를 찾을 수 없습니다!",
       "errorProcessingCollisions": "SOCRATES 데이터 처리 중 오류 발생!"
@@ -204,11 +196,6 @@
       "bottomIconLabel": "재진입 예측",
       "title": "추적 및 충격 예측 메뉴",
       "helpBody": "추적 및 충격 예측(TIP) 메뉴는 위성에 대한 최신 추적 및 충격 예측 메시지를 표시합니다. 표에는 다음 열이 표시됩니다:<br><br> <b>NORAD</b>: 위성의 NORAD 카탈로그 ID.<br><br> <b>Decay Date</b>: 위성의 예측 소멸 날짜.<br><br> <b>Latitude</b>: 소멸 시 위성의 위도.<br><br> <b>Longitude</b>: 소멸 시 위성의 경도.<br><br> <b>Window (min)</b>: 예측의 시간 창(분).<br><br> <b>Next Report (hrs)</b>: 다음 보고서까지의 시간(시간).<br><br> <b>Reentry Angle (deg)</b>: 위성의 재진입 각도(도).<br><br> <b>RCS (m²)</b>: 위성의 레이더 단면적(제곱미터).<br><br> <b>GP Age (hrs)</b>: 최신 요소 세트의 나이(시간).<br><br> <b>Dry Mass (kg)</b>: 위성의 건조 질량(킬로그램).<br><br> <b>Volume (m³)</b>: 위성의 추정 부피(입방미터).<br><br>"
-    },
-    "Breakup": {
-      "bottomIconLabel": "파편화 생성",
-      "title": "파편화 메뉴",
-      "helpBody": "파편화 메뉴는 위성의 파편화를 시뮬레이션하는 도구입니다. <br><br> 위성의 궤도를 복제하고 수정하여 위성의 파편화를 모델링할 수 있습니다. 위성을 선택하고 메뉴를 연 후 사용자는 다음을 선택할 수 있습니다: <ul style='margin-left: 40px;'> <li>경사각 변화</li> <li>RAAN 변화</li> <li>주기 변화</li> <li>파편화 조각 수</li> </ul> 변화가 클수록 시뮬레이션된 파편화의 분산이 커집니다. 기본 변화는 합리적인 분산으로 파편화를 시뮬레이션하기에 충분합니다."
     },
     "DebrisScreening": {
       "bottomIconLabel": "파편 스크리닝",

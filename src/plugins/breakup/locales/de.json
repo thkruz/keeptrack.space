@@ -1,0 +1,15 @@
+{
+  "Breakup": {
+    "bottomIconLabel": "Zerfall erstellen",
+    "title": "Zerfall-Menü",
+    "helpBody": "Das Zerfall-Menü ist ein Werkzeug zur Simulation des Zerfalls eines Satelliten. <br><br> Durch Duplizieren und Modifizieren der Umlaufbahn eines Satelliten können wir den Zerfall eines Satelliten modellieren. Nach Auswahl eines Satelliten und Öffnen des Menüs kann der Benutzer Folgendes auswählen: <ul style=\"margin-left: 40px;\"> <li>Inklinationsvariation</li> <li>RAAN-Variation</li> <li>Periodenvariation</li> <li>Anzahl der Zerfallsteile</li> </ul> Je größer die Variation, desto größer ist die Streuung im simulierten Zerfall. Die Standardvariationen reichen aus, um einen Zerfall mit angemessener Streuung zu simulieren.",
+    "errorMsgs": {
+      "SatelliteNotFound": "Satellit nicht gefunden!",
+      "CannotCreateBreakupForNonCircularOrbits": "Für nicht-kreisförmige Umlaufbahnen kann kein Zerfall erstellt werden. Wir arbeiten an einer Lösung.",
+      "CannotCalcDirectionOfSatellite": "Die Richtung des Satelliten kann nicht berechnet werden. Versuchen Sie es später erneut.",
+      "ErrorCreatingBreakup": "Fehler beim Erstellen des Zerfalls!",
+      "InvalidStartNum": "Ungültige Satellitenstartnummer! Standardmäßig auf 90000 gesetzt!",
+      "BreakupGeneratorFailed": "Zerfallsgenerator fehlgeschlagen!"
+    }
+  }
+}

@@ -65,14 +65,6 @@
       "disablingMilkyWay": "Votre ordinateur a des difficultés ! Désactivation de la Voie lactée.",
       "disablingSun": "Votre ordinateur a des difficultés ! Désactivation du Soleil."
     },
-    "Breakup": {
-      "SatelliteNotFound": "Satellite introuvable !",
-      "CannotCreateBreakupForNonCircularOrbits": "Impossible de créer une fragmentation pour des orbites non circulaires. Correction en cours.",
-      "CannotCalcDirectionOfSatellite": "Impossible de calculer la direction du satellite. Veuillez réessayer plus tard.",
-      "ErrorCreatingBreakup": "Erreur lors de la création de la fragmentation !",
-      "InvalidStartNum": "Numéro de départ du satellite invalide ! Valeur par défaut : 90000 !",
-      "BreakupGeneratorFailed": "Échec du générateur de fragmentation !"
-    },
     "Collisions": {
       "noCollisionsData": "Aucune donnée de collision trouvée !",
       "errorProcessingCollisions": "Erreur lors du traitement des données SOCRATES !"
@@ -204,11 +196,6 @@
       "bottomIconLabel": "Prédiction de rentrée",
       "title": "Menu Prédiction de suivi et d'impact",
       "helpBody": "Le menu Prédiction de suivi et d'impact (TIP) affiche les derniers messages de suivi et de prédiction d'impact pour les satellites. Le tableau affiche les colonnes suivantes :<br><br> <b>NORAD</b> : L’ID catalogue NORAD du satellite.<br><br> <b>Date de désintégration</b> : La date prévue de désintégration du satellite.<br><br> <b>Latitude</b> : La latitude du satellite au moment de la désintégration.<br><br> <b>Longitude</b> : La longitude du satellite au moment de la désintégration.<br><br> <b>Fenêtre (min)</b> : La fenêtre temporelle en minutes pour la prédiction.<br><br> <b>Prochain rapport (h)</b> : Le temps en heures avant le prochain rapport.<br><br> <b>Angle de rentrée (°)</b> : L’angle de rentrée du satellite en degrés.<br><br> <b>RCS (m²)</b> : La section efficace radar du satellite en mètres carrés.<br><br> <b>Âge GP (h)</b> : L’âge du dernier jeu d’éléments en heures.<br><br> <b>Masse à vide (kg)</b> : La masse à vide du satellite en kilogrammes.<br><br> <b>Volume (m³)</b> : Le volume estimé du satellite en mètres cubes.<br><br>"
-    },
-    "Breakup": {
-      "bottomIconLabel": "Créer une fragmentation",
-      "title": "Menu Fragmentation",
-      "helpBody": "Le menu Fragmentation est un outil pour simuler la fragmentation d’un satellite. <br><br> En dupliquant et modifiant l’orbite d’un satellite, on peut modéliser sa fragmentation. Après avoir sélectionné un satellite et ouvert le menu, l’utilisateur peut choisir : <ul style=\"margin-left: 40px;\"> <li>Variation d’inclinaison</li> <li>Variation du RAAN</li> <li>Variation de période</li> <li>Nombre de fragments</li> </ul> Plus la variation est grande, plus la dispersion de la fragmentation simulée est importante. Les variations par défaut suffisent à simuler une fragmentation raisonnable."
     },
     "DebrisScreening": {
       "bottomIconLabel": "Filtrage des débris",

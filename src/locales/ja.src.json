@@ -65,14 +65,6 @@
       "disablingMilkyWay": "コンピューターの処理が遅くなっています！天の川を無効にします。",
       "disablingSun": "コンピューターの処理が遅くなっています！太陽を無効にします。"
     },
-    "Breakup": {
-      "CannotCreateBreakupForNonCircularOrbits": "非円形軌道では分裂を作成できません。修正中です。",
-      "CannotCalcDirectionOfSatellite": "衛星の方向を計算できません。後でやり直してください。",
-      "ErrorCreatingBreakup": "分裂の作成中にエラーが発生しました！",
-      "InvalidStartNum": "無効な衛星開始番号です！デフォルトで90000に設定します！",
-      "BreakupGeneratorFailed": "分裂ジェネレーターが失敗しました！",
-      "SatelliteNotFound": "衛星が見つかりません！"
-    },
     "Collisions": {
       "noCollisionsData": "衝突データが見つかりません！",
       "errorProcessingCollisions": "SOCRATESデータの処理中にエラーが発生しました！"
@@ -235,11 +227,6 @@
       "bottomIconLabel": "再突入予測",
       "title": "追跡と影響予測メニュー",
       "helpBody": "追跡と影響予測（TIP）メニューは、衛星の最新の追跡と影響予測メッセージを表示します。テーブルには以下の列が表示されています：<br><br><b>NORAD</b>：衛星のNORADカタログID。<br><br><b>減衰日</b>：衛星の予測減衰日。<br><br><b>緯度</b>：減衰時の衛星の緯度。<br><br><b>経度</b>：減衰時の衛星の経度。<br><br><b>ウィンドウ（分）</b>：予測の時間ウィンドウ（分単位）。<br><br><b>次のレポート（時間）</b>：次のレポートまでの時間（時間単位）。<br><br><b>再突入角度（度）</b>：衛星の再突入角度（度単位）。<br><br><b>RCS（m²）</b>：衛星のレーダー断面積（平方メートル単位）。<br><br><b>GP年齢（時間）</b>：最新の軌道要素セットの年齢（時間単位）。<br><br><b>乾燥質量（kg）</b>：衛星の乾燥質量（キログラム単位）。<br><br><b>体積（m³）</b>：衛星の推定体積（立方メートル単位）。<br><br>"
-    },
-    "Breakup": {
-      "bottomIconLabel": "分裂を作成",
-      "title": "分裂メニュー",
-      "helpBody": "分裂メニューは、衛星の分裂をシミュレートするためのツールです。<br><br>衛星の軌道を複製して修正することで、衛星の分裂をモデル化できます。衛星を選択してメニューを開いた後、ユーザーは以下を選択できます：<ul style=\"margin-left: 40px;\"><li>傾斜角の変動</li><li>昇交点赤経の変動</li><li>周期の変動</li><li>分裂片の数</li></ul>変動が大きいほど、シミュレートされた分裂の広がりが大きくなります。デフォルトの変動は、合理的な広がりを持つ分裂をシミュレートするのに十分です。"
     },
     "DebrisScreening": {
       "bottomIconLabel": "デブリスクリーニング",

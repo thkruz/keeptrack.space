@@ -85,5 +85,34 @@
   "sonarlint.connectedMode.project": {
     "connectionId": "http-localhost-9000",
     "projectKey": "keeptrack"
-  }
+  },
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "text": "Format: <type>: :emoji: <description>"
+    },
+    {
+      "text": "ALWAYS include the emoji - this is required"
+    },
+    {
+      "text": "Emoji mapping by type: feat=:sparkles:, fix=:bug:, refactor=:recycle:, docs=:memo:, test=:white_check_mark:, chore=:wrench:, perf=:zap:, style=:art:"
+    },
+    {
+      "text": "Special emojis: localization=:globe_with_meridians:, move/rename=:truck:, breaking=:boom:, security=:lock:, remove=:fire:, UI/UX=:children_crossing:"
+    },
+    {
+      "text": "Use imperative present tense: 'add', 'update', 'fix', not 'added' or 'fixes'"
+    },
+    {
+      "text": "Keep description concise - aim for < 50 chars, max 72. Omit filler words like 'functionality', 'to enhance', 'for better'"
+    },
+    {
+      "text": "No trailing period. No scope needed unless clarifying ambiguity"
+    },
+    {
+      "text": "Good: 'feat: :sparkles: add keyboard shortcuts for VCR plugin' Bad: 'feat: add keyboard shortcuts functionality for play, rewind, and fast forward in VCR plugin'"
+    },
+    {
+      "text": "Only add body for breaking changes, complex reasoning, or issue references"
+    }
+  ],
 }

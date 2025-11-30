@@ -2,9 +2,18 @@ import { OrbitFinder } from '@app/app/analysis/orbit-finder';
 import { SatMath } from '@app/app/analysis/sat-math';
 import { CatalogManager } from '@app/app/data/catalog-manager';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { TimeManager } from '@app/engine/core/time-manager';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
+import {
+  IBottomIconConfig,
+  IDragOptions,
+  IHelpConfig,
+  ISideMenuConfig,
+} from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -13,31 +22,41 @@ import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, DetailedSatellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla } from '@ootk/src/main';
 import streamPng from '@public/img/icons/stream.png';
-import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class Breakup extends KeepTrackPlugin {
   readonly id = 'Breakup';
   dependencies_ = [SelectSatManager.name];
   private readonly selectSatManager_: SelectSatManager;
-
-  constructor() {
-    super();
-    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
-  }
+  private readonly maxDifApogeeVsPerigee_ = 1000;
 
   isRequireSatelliteSelected = true;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
 
-  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
+  constructor() {
+    super();
+    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager;
+  }
 
-  bottomIconImg = streamPng;
-  private readonly maxDifApogeeVsPerigee_ = 1000;
+  // =========================================================================
+  // Composition-based configuration methods
+  // =========================================================================
 
-  bottomIconCallback = (): void => {
+  getBottomIconConfig(): IBottomIconConfig {
+    return {
+      elementName: 'breakup-bottom-icon',
+      label: 'Create Breakup',
+      image: streamPng,
+      menuMode: [MenuMode.ADVANCED, MenuMode.ALL],
+      isDisabledOnLoad: true,
+    };
+  }
+
+  /**
+   * Called when the bottom icon is clicked.
+   */
+  onBottomIconClick(): void {
     const obj = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
 
     if (!obj?.isSatellite()) {
@@ -54,144 +73,184 @@ export class Breakup extends KeepTrackPlugin {
       return;
     }
     this.updateSccNumInMenu_();
+  }
+
+  // Bridge for legacy event system (per CLAUDE.md)
+  bottomIconCallback = (): void => {
+    this.onBottomIconClick();
   };
 
-  dragOptions: ClickDragOptions = {
-    isDraggable: true,
-  };
+  getSideMenuConfig(): ISideMenuConfig {
+    return {
+      elementName: 'breakup-menu',
+      title: 'Breakup Simulator',
+      html: this.buildSideMenuHtml_(),
+      dragOptions: this.getDragOptions_(),
+    };
+  }
 
-  sideMenuElementName: string = 'breakup-menu';
-  sideMenuElementHtml: string = html`
-  <div id="breakup-menu" class="side-menu-parent start-hidden text-select">
-    <div id="breakup-content" class="side-menu">
-      <div class="row">
-        <h5 class="center-align">Breakup Simulator</h5>
-        <form id="breakup" class="col s12">
-          <div class="input-field col s12">
-            <input disabled value="00005" id="hc-scc" type="text" />
-            <label for="disabled" class="active">Satellite SCC#</label>
+  private getDragOptions_(): IDragOptions {
+    return {
+      isDraggable: true,
+    };
+  }
+
+  private buildSideMenuHtml_(): string {
+    return html`
+      <div id="breakup-menu" class="side-menu-parent start-hidden text-select">
+        <div id="breakup-content" class="side-menu">
+          <div class="row">
+            <h5 class="center-align">Breakup Simulator</h5>
+            <form id="breakup" class="col s12">
+              <div class="input-field col s12">
+                <input disabled value="00005" id="hc-scc" type="text" />
+                <label for="disabled" class="active">Satellite SCC#</label>
+              </div>
+              <div class="input-field col s12">
+                <input id="hc-startNum" type="text" value="90000" />
+                <label for="hc-startNum" class="active">Initial Satellite Number</label>
+              </div>
+              <div class="input-field col s12">
+                <select id="hc-inc">
+                  <option value="0">0 Degrees</option>
+                  <option value="0.005">0.005 Degrees</option>
+                  <option value="0.025">0.025 Degrees</option>
+                  <option value="0.05" selected>0.05 Degrees</option>
+                  <option value="0.1">0.1 Degrees</option>
+                  <option value="0.2">0.2 Degrees</option>
+                  <option value="0.3">0.3 Degrees</option>
+                  <option value="0.4">0.4 Degrees</option>
+                  <option value="0.5">0.5 Degrees</option>
+                  <option value="0.6">0.6 Degrees</option>
+                  <option value="0.7">0.7 Degrees</option>
+                  <option value="0.8">0.8 Degrees</option>
+                  <option value="0.9">0.9 Degrees</option>
+                  <option value="1">1 Degrees</option>
+                </select>
+                <label>Inclination Variation</label>
+              </div>
+              <div class="input-field col s12">
+                <select id="hc-per">
+                  <option value="0">0 Minutes</option>
+                  <option value="0.1" selected>0.1 Minutes</option>
+                  <option value="0.15">0.15 Minutes</option>
+                  <option value="0.25">0.25 Minutes</option>
+                  <option value="0.3">0.3 Minutes</option>
+                  <option value="0.5">0.5 Minutes</option>
+                  <option value="0.75">0.75 Minutes</option>
+                  <option value="1">1 Minute</option>
+                  <option value="1.5">1.5 Minutes</option>
+                  <option value="2">2 Minutes</option>
+                  <option value="2.5">2.5 Minutes</option>
+                  <option value="3">3 Minutes</option>
+                  <option value="4">4 Minutes</option>
+                  <option value="5">5 Minutes</option>
+                </select>
+                <label>Period Variation</label>
+              </div>
+              <div class="input-field col s12">
+                <select id="hc-raan">
+                  <option value="0">0 Degrees</option>
+                  <option value="0.005">0.005 Degrees</option>
+                  <option value="0.025">0.025 Degrees</option>
+                  <option value="0.05" selected>0.05 Degrees</option>
+                  <option value="0.1">0.1 Degrees</option>
+                  <option value="0.2">0.2 Degrees</option>
+                  <option value="0.3">0.3 Degrees</option>
+                  <option value="0.4">0.4 Degrees</option>
+                  <option value="0.5">0.5 Degrees</option>
+                  <option value="0.6">0.6 Degrees</option>
+                  <option value="0.7">0.7 Degrees</option>
+                  <option value="0.8">0.8 Degrees</option>
+                  <option value="0.9">0.9 Degrees</option>
+                  <option value="1">1 Degrees</option>
+                </select>
+                <label>Right Ascension Variation</label>
+              </div>
+              <div class="input-field col s12">
+                <select id="hc-count">
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="25" selected>25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                  <option value="200">250</option>
+                  <option value="500">500</option>
+                  <option value="750">750</option>
+                  <option value="1000">1000</option>
+                </select>
+                <label>Pieces</label>
+              </div>
+              <div class="center-align">
+                <button class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create Breakup &#9658;</button>
+              </div>
+            </form>
           </div>
-          <div class="input-field col s12">
-            <input id="hc-startNum" type="text" value="90000" />
-            <label for="hc-startNum" class="active">Initial Satellite Number</label>
-          </div>
-          <div class="input-field col s12">
-            <select id="hc-inc">
-              <option value="0">0 Degrees</option>
-              <option value="0.005">0.005 Degrees</option>
-              <option value="0.025">0.025 Degrees</option>
-              <option value="0.05" selected>0.05 Degrees</option>
-              <option value="0.1">0.1 Degrees</option>
-              <option value="0.2">0.2 Degrees</option>
-              <option value="0.3">0.3 Degrees</option>
-              <option value="0.4">0.4 Degrees</option>
-              <option value="0.5">0.5 Degrees</option>
-              <option value="0.6">0.6 Degrees</option>
-              <option value="0.7">0.7 Degrees</option>
-              <option value="0.8">0.8 Degrees</option>
-              <option value="0.9">0.9 Degrees</option>
-              <option value="1">1 Degrees</option>
-            </select>
-            <label>Inclination Variation</label>
-          </div>
-          <div class="input-field col s12">
-            <select id="hc-per">
-              <option value="0">0 Minutes</option>
-              <option value="0.1" selected>0.1 Minutes</option>
-              <option value="0.15">0.15 Minutes</option>
-              <option value="0.25">0.25 Minutes</option>
-              <option value="0.3">0.3 Minutes</option>
-              <option value="0.5">0.5 Minutes</option>
-              <option value="0.75">0.75 Minutes</option>
-              <option value="1">1 Minute</option>
-              <option value="1.5">1.5 Minutes</option>
-              <option value="2">2 Minutes</option>
-              <option value="2.5">2.5 Minutes</option>
-              <option value="3">3 Minutes</option>
-              <option value="4">4 Minutes</option>
-              <option value="5">5 Minutes</option>
-            </select>
-            <label>Period Variation</label>
-          </div>
-          <div class="input-field col s12">
-            <select id="hc-raan">
-            <option value="0">0 Degrees</option>
-              <option value="0.005">0.005 Degrees</option>
-              <option value="0.025">0.025 Degrees</option>
-              <option value="0.05" selected>0.05 Degrees</option>
-              <option value="0.1">0.1 Degrees</option>
-              <option value="0.2">0.2 Degrees</option>
-              <option value="0.3">0.3 Degrees</option>
-              <option value="0.4">0.4 Degrees</option>
-              <option value="0.5">0.5 Degrees</option>
-              <option value="0.6">0.6 Degrees</option>
-              <option value="0.7">0.7 Degrees</option>
-              <option value="0.8">0.8 Degrees</option>
-              <option value="0.9">0.9 Degrees</option>
-              <option value="1">1 Degrees</option>
-            </select>
-            <label>Right Ascension Variation</label>
-          </div>
-          <div class="input-field col s12">
-            <select id="hc-count">
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="25" selected>25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-              <option value="200">250</option>
-              <option value="500">500</option>
-              <option value="750">750</option>
-              <option value="1000">1000</option>
-            </select>
-            <label>Pieces</label>
-          </div>
-          <div class="center-align">
-            <button class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create Breakup &#9658;</button>
-          </div>
-        </form>
+        </div>
       </div>
-    </div>
-  </div>`;
+    `;
+  }
+
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: 'Breakup Menu',
+      body: html`
+        The Breakup Menu is a tool for simulating the breakup of a satellite. <br /><br />
+        By modifying duplicating and modifying a satellite's orbit we can model the breakup of a satellite. After selecting a satellite and opening the
+        menu, the user can select:
+        <ul style="margin-left: 40px;">
+          <li>Inclination Variation</li>
+          <li>RAAN Variation</li>
+          <li>Period Variation</li>
+          <li>Number of Breakup Pieces</li>
+        </ul>
+        The larger the variation the bigger the spread in the simulated breakup. The default variations are sufficient to simulate a breakup with a
+        reasonable spread.
+      `,
+    };
+  }
+
+  // =========================================================================
+  // Lifecycle methods
+  // =========================================================================
 
   addHtml(): void {
     super.addHtml();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        getEl('breakup')!.addEventListener('submit', (e: Event) => {
-          e.preventDefault();
-          showLoading(() => this.onSubmit_());
-        });
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      getEl('breakup')!.addEventListener('submit', (e: Event) => {
+        e.preventDefault();
+        showLoading(() => this.onSubmit_());
+      });
+    });
 
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (sat: BaseObject) => {
-        if (!sat?.isSatellite()) {
-          if (this.isMenuButtonActive) {
-            this.closeSideMenu();
-          }
-          this.setBottomIconToUnselected();
-          this.setBottomIconToDisabled();
-        } else if ((sat as DetailedSatellite)?.apogee - (sat as DetailedSatellite)?.perigee > this.maxDifApogeeVsPerigee_) {
-          if (this.isMenuButtonActive) {
-            this.closeSideMenu();
-            errorManagerInstance.warn(t7e('errorMsgs.Breakup.CannotCreateBreakupForNonCircularOrbits'));
-          }
-          this.setBottomIconToUnselected();
-          this.setBottomIconToDisabled();
-        } else {
-          this.setBottomIconToEnabled();
-          if (this.isMenuButtonActive) {
-            this.updateSccNumInMenu_();
-          }
+    // Custom satellite selection handling - KEEP: Custom plugin logic
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (sat: BaseObject) => {
+      if (!sat?.isSatellite()) {
+        if (this.isMenuButtonActive) {
+          this.closeSideMenu();
         }
-      },
-    );
+        this.setBottomIconToUnselected();
+        this.setBottomIconToDisabled();
+      } else if ((sat as DetailedSatellite)?.apogee - (sat as DetailedSatellite)?.perigee > this.maxDifApogeeVsPerigee_) {
+        if (this.isMenuButtonActive) {
+          this.closeSideMenu();
+          errorManagerInstance.warn(t7e('errorMsgs.Breakup.CannotCreateBreakupForNonCircularOrbits'));
+        }
+        this.setBottomIconToUnselected();
+        this.setBottomIconToDisabled();
+      } else {
+        this.setBottomIconToEnabled();
+        if (this.isMenuButtonActive) {
+          this.updateSccNumInMenu_();
+        }
+      }
+    });
   }
+
+  // =========================================================================
+  // Private methods
+  // =========================================================================
 
   private updateSccNumInMenu_() {
     if (!this.isMenuButtonActive) {
@@ -207,8 +266,9 @@ export class Breakup extends KeepTrackPlugin {
 
   // eslint-disable-next-line max-statements
   private onSubmit_(): void {
-    const { simulationTimeObj } = ServiceLocator.getTimeManager();
+    const timeManager = ServiceLocator.getTimeManager();
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const { simulationTimeObj } = timeManager;
 
     const { satId, breakupCount, rascVariation, incVariation, meanmoVariation, startNum } = Breakup.getFormData_(catalogManagerInstance);
     const mainsat = catalogManagerInstance.getSat(satId ?? -1);
@@ -222,7 +282,7 @@ export class Breakup extends KeepTrackPlugin {
     const origsat = mainsat;
 
     // Launch Points are the Satellites Current Location
-    const gmst = ServiceLocator.getTimeManager().gmst;
+    const gmst = timeManager.gmst;
     const lla = eci2lla(mainsat.position, gmst);
     const launchLat = lla.lat;
     const launchLon = lla.lon;

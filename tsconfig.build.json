@@ -14,13 +14,6 @@
     "src/**/*.png",
     "src/**/*.mp3",
     "src/**/*.jpg",
-    "test/**/*.ts",
-    "test/**/*.tsx",
-    "test/**/*.js",
-    "test/**/*.jsx",
-    "test/**/*.png",
-    "test/**/*.mp3",
-    "test/**/*.jpg",
     "public/analysis/js/analysis-tools.js"
   ],
   "exclude": [
@@ -34,7 +27,8 @@
     "src/tools/**/*",
     "test/**/*",
     "src/engine/ootk/examples/**/*",
-    "src/engine/ootk/test/**/*"
+    "src/engine/ootk/test/**/*",
+    "src/engine/ootk/**/__tests__/**/*"
   ],
   "filesGlob": [
     "src/**/*.ts",

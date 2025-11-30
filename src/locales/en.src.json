@@ -65,10 +65,6 @@
       "disablingMilkyWay": "Your computer is struggling! Disabling Milky Way.",
       "disablingSun": "Your computer is struggling! Disabling Sun."
     },
-    "Collisions": {
-      "noCollisionsData": "No collision data found!",
-      "errorProcessingCollisions": "Error processing SOCRATES data!"
-    },
     "EditSat": {
       "errorReadingFile": "Error while reading file!",
       "satelliteNotFound": "Satellite {{sccNum}} not found!"
@@ -186,11 +182,6 @@
       "bottomIconLabel": "Short Term Fence",
       "title": "Short Term Fences (STF) Menu",
       "helpBody": "The Short Term Fences (STF) Menu is used for visualizing sensor search boxes. <br><br> This is unlikely to be very helpful unless you own/operate a sensor with a search box functionality."
-    },
-    "Collisions": {
-      "bottomIconLabel": "Collisions",
-      "title": "Collisions Menu",
-      "helpBody": "The Collisions Menu shows satellites with a high probability of collision. <br><br> Clicking on a row will select the two satellites involved in the collision and change the time to the time of the collision."
     },
     "TrackingImpactPredict": {
       "bottomIconLabel": "Reentry Prediction",

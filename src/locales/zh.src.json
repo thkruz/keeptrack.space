@@ -65,10 +65,6 @@
       "disablingMilkyWay": "您的计算机运行困难！正在禁用银河系。",
       "disablingSun": "您的计算机运行困难！正在禁用太阳。"
     },
-    "Collisions": {
-      "noCollisionsData": "未找到碰撞数据！",
-      "errorProcessingCollisions": "处理SOCRATES数据时出错！"
-    },
     "EditSat": {
       "errorReadingFile": "读取文件时出错！",
       "satelliteNotFound": "未找到卫星！"
@@ -217,11 +213,6 @@
       "bottomIconLabel": "短期搜索框",
       "title": "短期搜索框（STF）菜单",
       "helpBody": "短期搜索框（STF）菜单用于可视化传感器搜索区域。<br><br>除非您拥有/操作带有搜索框功能的传感器，否则该功能可能用处不大。"
-    },
-    "Collisions": {
-      "bottomIconLabel": "碰撞",
-      "title": "碰撞菜单",
-      "helpBody": "碰撞菜单显示高碰撞概率的卫星。<br><br>点击某一行会选中涉及碰撞的两颗卫星，并将时间切换到碰撞发生时刻。"
     },
     "TrackingImpactPredict": {
       "bottomIconLabel": "再入预测",

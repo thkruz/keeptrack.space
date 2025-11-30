@@ -65,10 +65,6 @@
       "disablingMilkyWay": "Votre ordinateur a des difficultés ! Désactivation de la Voie lactée.",
       "disablingSun": "Votre ordinateur a des difficultés ! Désactivation du Soleil."
     },
-    "Collisions": {
-      "noCollisionsData": "Aucune donnée de collision trouvée !",
-      "errorProcessingCollisions": "Erreur lors du traitement des données SOCRATES !"
-    },
     "EditSat": {
       "errorReadingFile": "Erreur lors de la lecture du fichier !",
       "satelliteNotFound": "Satellite {{sccNum}} introuvable !"
@@ -185,12 +181,7 @@
     "ShortTermFences": {
       "bottomIconLabel": "Barrière court terme",
       "title": "Menu Barrières court terme (STF)",
-      "helpBody": "Le menu Barrières court terme (STF) permet de visualiser les zones de recherche des capteurs. <br><br> Ceci n’est probablement utile que si vous possédez/exploitez un capteur avec cette fonctionnalité."
-    },
-    "Collisions": {
-      "bottomIconLabel": "Collisions",
-      "title": "Menu Collisions",
-      "helpBody": "Le menu Collisions affiche les satellites avec une forte probabilité de collision. <br><br> Cliquer sur une ligne sélectionne les deux satellites impliqués et change l’heure à celle de la collision."
+      "helpBody": "Le menu Barrières court terme (STF) permet de visualiser les zones de recherche des capteurs. <br><br> Ceci n'est probablement utile que si vous possédez/exploitez un capteur avec cette fonctionnalité."
     },
     "TrackingImpactPredict": {
       "bottomIconLabel": "Prédiction de rentrée",

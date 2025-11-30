@@ -65,10 +65,6 @@
       "disablingMilkyWay": "컴퓨터 성능이 부족합니다! 은하수를 비활성화합니다.",
       "disablingSun": "컴퓨터 성능이 부족합니다! 태양을 비활성화합니다."
     },
-    "Collisions": {
-      "noCollisionsData": "충돌 데이터를 찾을 수 없습니다!",
-      "errorProcessingCollisions": "SOCRATES 데이터 처리 중 오류 발생!"
-    },
     "EditSat": {
       "errorReadingFile": "파일 읽기 중 오류 발생!",
       "satelliteNotFound": "위성 {{sccNum}}을(를) 찾을 수 없습니다!"
@@ -186,11 +182,6 @@
       "bottomIconLabel": "단기 펜스",
       "title": "단기 펜스(STF) 메뉴",
       "helpBody": "단기 펜스(STF) 메뉴는 센서 검색 상자를 시각화하는 데 사용됩니다. <br><br> 검색 상자 기능이 있는 센서를 소유/운영하지 않는 한 이 기능은 크게 도움이 되지 않을 수 있습니다."
-    },
-    "Collisions": {
-      "bottomIconLabel": "충돌",
-      "title": "충돌 메뉴",
-      "helpBody": "충돌 메뉴는 충돌 가능성이 높은 위성을 보여줍니다. <br><br> 행을 클릭하면 충돌과 관련된 두 위성이 선택되고 시간이 충돌 시간으로 변경됩니다."
     },
     "TrackingImpactPredict": {
       "bottomIconLabel": "재진입 예측",

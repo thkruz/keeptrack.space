@@ -65,10 +65,6 @@
       "disablingMilkyWay": "コンピューターの処理が遅くなっています！天の川を無効にします。",
       "disablingSun": "コンピューターの処理が遅くなっています！太陽を無効にします。"
     },
-    "Collisions": {
-      "noCollisionsData": "衝突データが見つかりません！",
-      "errorProcessingCollisions": "SOCRATESデータの処理中にエラーが発生しました！"
-    },
     "EditSat": {
       "errorReadingFile": "ファイル読み込み中にエラーが発生しました！",
       "satelliteNotFound": "衛星が見つかりません！"
@@ -217,11 +213,6 @@
       "bottomIconLabel": "短期フェンス",
       "title": "短期フェンス（STF）メニュー",
       "helpBody": "短期フェンス（STF）メニューは、センサー検索ボックスを視覚化するために使用されます。<br><br>これは、検索ボックス機能を持つセンサーを所有/操作していない限り、あまり役に立たない可能性があります。"
-    },
-    "Collisions": {
-      "bottomIconLabel": "衝突",
-      "title": "衝突メニュー",
-      "helpBody": "衝突メニューは、衝突確率が高い衛星を表示します。<br><br>行をクリックすると、衝突に関与する2つの衛星が選択され、時間が衝突時間に変更されます。"
     },
     "TrackingImpactPredict": {
       "bottomIconLabel": "再突入予測",

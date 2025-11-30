@@ -65,10 +65,6 @@
       "disablingMilkyWay": "¡Tu computadora está teniendo problemas! Desactivando la Vía Láctea.",
       "disablingSun": "¡Tu computadora está teniendo problemas! Desactivando el sol."
     },
-    "Collisions": {
-      "noCollisionsData": "¡No se encontraron datos de colisión!",
-      "errorProcessingCollisions": "¡Error al procesar los datos de SOCRATES!"
-    },
     "EditSat": {
       "errorReadingFile": "¡Error al leer el archivo!",
       "satelliteNotFound": "¡Satélite no encontrado!"
@@ -186,11 +182,6 @@
       "bottomIconLabel": "Cerca a Corto Plazo",
       "title": "Menú de Cercas a Corto Plazo (STF)",
       "helpBody": "El Menú de Cercas a Corto Plazo (STF) se usa para visualizar cajas de búsqueda de sensores. <br><br> Es poco probable que esto sea muy útil a menos que poseas/operes un sensor con funcionalidad de caja de búsqueda."
-    },
-    "Collisions": {
-      "bottomIconLabel": "Colisiones",
-      "title": "Menú de Colisiones",
-      "helpBody": "El Menú de Colisiones muestra satélites con alta probabilidad de colisión. <br><br> Hacer clic en una fila seleccionará los dos satélites involucrados en la colisión y cambiará el tiempo al momento de la colisión."
     },
     "TrackingImpactPredict": {
       "bottomIconLabel": "Predicción de Reentrada",

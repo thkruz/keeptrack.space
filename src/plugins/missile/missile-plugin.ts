@@ -12,7 +12,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class MissilePlugin extends KeepTrackPlugin {
   readonly id = 'MissilePlugin';
-  dependencies_ = [];
+  dependencies = [];
 
   menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
@@ -178,28 +178,28 @@ export class MissilePlugin extends KeepTrackPlugin {
     isDraggable: true,
   };
   /** Is a submarine selected */
-  private isSub_: boolean = false;
-  private i_: number;
+  private isSub: boolean = false;
+  private i: number;
 
   addHtml(): void {
     super.addHtml();
-    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal.bind(this));
   }
 
   addJs(): void {
     super.addJs();
 
     // Missile orbits have to be updated every draw or they quickly become inaccurate
-    EventBus.getInstance().on(EventBusEvent.updateLoop, this.updateLoop_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.updateLoop, this.updateLoop.bind(this));
   }
 
-  private searchForRvs_() {
+  private searchForRvs() {
     const uiManagerInstance = ServiceLocator.getUiManager();
 
     uiManagerInstance.doSearch('RV_');
   }
 
-  private missileSubmit_(): void {
+  private missileSubmit(): void {
     // eslint-disable-next-line max-statements
     showLoading(() => {
       const timeManagerInstance = ServiceLocator.getTimeManager();
@@ -269,7 +269,7 @@ export class MissilePlugin extends KeepTrackPlugin {
           tgtLon = <number>missileManager.globalBMTargets[target * 3 + 1];
         }
 
-        if (this.isSub_) {
+        if (this.isSub) {
           if (isNaN(lauLat)) {
             uiManagerInstance.toast('Invalid Launch Latitude!', ToastMsgType.critical);
             hideLoading();
@@ -460,43 +460,43 @@ export class MissilePlugin extends KeepTrackPlugin {
     });
   }
 
-  private uiManagerFinal_(): void {
+  private uiManagerFinal(): void {
     clickAndDragWidth(getEl(`${this.id}-menu`));
     getEl(`${this.id}-form`)!.addEventListener('submit', (e: Event): void => {
       e.preventDefault();
-      this.missileSubmit_();
+      this.missileSubmit();
     });
-    getEl('ms-attacker')!.addEventListener('change', this.msAttackerChange_);
-    getEl('ms-target')!.addEventListener('change', this.msTargetChange_);
-    getEl('ms-error')!.addEventListener('click', this.msErrorClick_);
-    getEl(`${this.id}-form`)!.addEventListener('change', this.missileChange_);
-    getEl('searchRvBtn')!.addEventListener('click', this.searchForRvs_);
+    getEl('ms-attacker')!.addEventListener('change', this.msAttackerChange);
+    getEl('ms-target')!.addEventListener('change', this.msTargetChange);
+    getEl('ms-error')!.addEventListener('click', this.msErrorClick);
+    getEl(`${this.id}-form`)!.addEventListener('change', this.missileChange);
+    getEl('searchRvBtn')!.addEventListener('click', this.searchForRvs);
 
-    this.msAttackerChange_();
-    this.msTargetChange_();
+    this.msAttackerChange();
+    this.msTargetChange();
   }
 
-  private updateLoop_(): void {
+  private updateLoop(): void {
     if (typeof missileManager !== 'undefined' && missileManager.missileArray.length > 0) {
       const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
-      for (this.i_ = 0; this.i_ < missileManager.missileArray.length; this.i_++) {
-        orbitManagerInstance.updateOrbitBuffer(missileManager.missileArray[this.i_].id);
+      for (this.i = 0; this.i < missileManager.missileArray.length; this.i++) {
+        orbitManagerInstance.updateOrbitBuffer(missileManager.missileArray[this.i].id);
       }
     }
   }
 
-  private missileChange_(): void {
+  private missileChange(): void {
     if (parseFloat((<HTMLInputElement>getEl('ms-type')).value) !== 0) {
       getEl('ms-custom-opt')!.style.display = 'none';
     } else {
       getEl('ms-custom-opt')!.style.display = 'block';
     }
   }
-  private msErrorClick_(): void {
+  private msErrorClick(): void {
     getEl('ms-error')!.style.display = 'none';
   }
-  private msTargetChange_() {
+  private msTargetChange() {
     if (parseInt((<HTMLInputElement>getEl('ms-target')).value) !== -1) {
       getEl('ms-tgt-holder-lat')!.style.display = 'none';
       getEl('ms-tgt-holder-lon')!.style.display = 'none';
@@ -506,16 +506,16 @@ export class MissilePlugin extends KeepTrackPlugin {
     }
   }
 
-  private msAttackerChange_() {
-    this.isSub_ = false;
+  private msAttackerChange() {
+    this.isSub = false;
     const subList = [100, 600, 213, 214, 215, 321, 500, 400];
 
     for (const sub of subList) {
       if (sub === parseInt((<HTMLInputElement>getEl('ms-attacker')).value)) {
-        this.isSub_ = true;
+        this.isSub = true;
       }
     }
-    if (!this.isSub_) {
+    if (!this.isSub) {
       getEl('ms-lau-holder-lat')!.style.display = 'none';
       getEl('ms-lau-holder-lon')!.style.display = 'none';
     } else {

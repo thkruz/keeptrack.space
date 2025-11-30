@@ -15,7 +15,7 @@ import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
 import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, globalBMTargets, ukSLBM } from './missile-data';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 
-let BurnRate: number, EarthMass: number, EarthRadius: number, FuelDensity: number, G: number, R: number, WarheadMass: number, h: number;
+let burnRate: number, earthMass: number, earthRadius: number, fuelDensity: number, g: number, r: number, warheadMass: number, h: number;
 const missileArray: MissileObject[] = [];
 
 let isMassRaidLoaded = false;
@@ -265,7 +265,7 @@ export const Missile = (
   const LatList = [];
   const LongList = [];
 
-  const [EstLatList, EstLongList, , ArcLength, EstDistanceList, GoalDistance] = calculateCoordinates_(CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude);
+  const [EstLatList, EstLongList, , ArcLength, EstDistanceList, GoalDistance] = calculateCoordinates(CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude);
 
   if (ArcLength < 320000) {
     missileManager.lastMissileErrorType = ToastMsgType.critical;
@@ -325,7 +325,7 @@ export const Missile = (
 
   let NozzleAltitude2, NozzleAltitude3;
 
-  const AngleCoefficient = calculateAngle_(
+  const AngleCoefficient = calculateAngle(
     FuelArea1,
     FuelArea2,
     FuelMass,
@@ -346,7 +346,7 @@ export const Missile = (
   );
 
   while (FuelMass / FuelDensity / FuelVolume > 0.4 && Altitude >= 0) {
-    const iterationFunOutput = launchDetailed_(
+    const iterationFunOutput = launchDetailed(
       FuelArea1,
       FuelMass,
       RocketArea,
@@ -389,7 +389,7 @@ export const Missile = (
   }
 
   while (FuelMass / FuelDensity / FuelVolume > 0.19 && Altitude >= 0) {
-    const iterationFunOutput = launchDetailed_(
+    const iterationFunOutput = launchDetailed(
       FuelArea1,
       FuelMass,
       RocketArea,
@@ -432,7 +432,7 @@ export const Missile = (
   }
 
   while (FuelMass / FuelDensity / FuelVolume > 0 && Altitude >= 0) {
-    const iterationFunOutput = launchDetailed_(
+    const iterationFunOutput = launchDetailed(
       FuelArea2,
       FuelMass,
       RocketArea,
@@ -474,7 +474,7 @@ export const Missile = (
 
   while (Altitude > 0) {
     FuelMass = 0;
-    const iterationFunOutput = launchDetailed_(
+    const iterationFunOutput = launchDetailed(
       FuelArea2,
       FuelMass,
       RocketArea,
@@ -543,9 +543,9 @@ export const Missile = (
   }
 
   if (missileObj) {
-    missileObj.altList = smoothList_(AltitudeList, 35);
-    missileObj.latList = smoothList_(LatList, 35);
-    missileObj.lonList = smoothList_(LongList, 35);
+    missileObj.altList = smoothList(AltitudeList, 35);
+    missileObj.latList = smoothList(LatList, 35);
+    missileObj.lonList = smoothList(LongList, 35);
     missileObj.active = true;
     missileObj.type = SpaceObjectType.BALLISTIC_MISSILE;
     missileObj.id = MissileObjectNum;
@@ -596,7 +596,7 @@ export const Missile = (
  * @param list A list of points along a rough parabolic path.
  * @param smoothingFactor  A smoothed list of points along a parabolic path.
  */
-export const smoothList_ = <T extends number>(list: T[], smoothingFactor: number): T[] => {
+export const smoothList = <T extends number>(list: T[], smoothingFactor: number): T[] => {
   const newList: T[] = [];
 
   for (let i = 0; i < list.length; i++) {
@@ -2215,7 +2215,7 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: Sensor[]) => {
  */
 
 // Internal Functions
-export const calculatePressure_ = (Altitude: number) => {
+export const calculatePressure = (Altitude: number) => {
   /*
    * This function calculates the atmospheric pressure. The only iMathut is the
    * Altitude. The constiables in the function are:
@@ -2225,7 +2225,7 @@ export const calculatePressure_ = (Altitude: number) => {
    * Po:   Atmospheric pressure at sea level
    * mol:  Amount of air in one gram
    * Tsea: Temperature at sea level
-   * R:    Gas constant for air
+   * r:    Gas constant for air
    * g:    Gravitational constant
    */
 
@@ -2240,7 +2240,7 @@ export const calculatePressure_ = (Altitude: number) => {
 
   return Po * Math.exp((-mol * g * Altitude) / (_R * Tsea)); // (Pa)
 };
-export const calculateTemperature_ = (Altitude: number) => {
+export const calculateTemperature = (Altitude: number) => {
   /*
    * This function calculates the atmospheric temperature at any given altitude.
    * The function has one iMathut for altitude. Because atmospheric temperature can not
@@ -2282,7 +2282,7 @@ export const calculateTemperature_ = (Altitude: number) => {
   // Catch All
   return -894.0 + 10.6 * 120; // (K)
 };
-export const calculateDrag_ = (M: number) => {
+export const calculateDrag = (M: number) => {
   /*
    * This function calculates the drag coefficient of the rocket. This function is based
    * off of a plot that relates the drag coefficient with the mach number of the rocket.
@@ -2309,7 +2309,7 @@ export const calculateDrag_ = (M: number) => {
   // Catch All
   return 0.25;
 };
-export const calculateThrust_ = (MassOut: number, Altitude: any, FuelArea: number, NozzleAltitude: any) => {
+export const calculateThrust = (MassOut: number, Altitude: any, FuelArea: number, NozzleAltitude: any) => {
   /*
    * This function calculates the thrust force of the rocket by maximizing the efficiency
    * through designing the correct shaped nozzle for the given rocket scenario. For this
@@ -2354,8 +2354,8 @@ export const calculateThrust_ = (MassOut: number, Altitude: any, FuelArea: numbe
   const Pc = 25 * 10 ** 6; // Chamber Pressure (Pa)
   const Mw = 22; // Molecular Weight
   const q = MassOut; // Mass Flow Rate (kg/s)
-  const Pa = calculatePressure_(NozzleAltitude); // Ambient pressure used to calculate nozzle (Pa)
-  const Pe = calculatePressure_(Altitude); // Actual Atmospheric Pressure (Pa)
+  const Pa = calculatePressure(NozzleAltitude); // Ambient pressure used to calculate nozzle (Pa)
+  const Pe = calculatePressure(Altitude); // Actual Atmospheric Pressure (Pa)
   const Pt = (Pc * (1 + (k - 1) / 2)) ** (-k / (k - 1)); // Throat Pressure (Pa)
   const Tt = Tc / (1 + (k - 1) / 2); // Throat Temperature (k)
   const At = (q / Pt) * Math.sqrt((Ru * Tt) / (Mw * k)); // Throat Area (m^2)
@@ -2373,7 +2373,7 @@ export const calculateThrust_ = (MassOut: number, Altitude: any, FuelArea: numbe
 };
 
 // prettier-ignore
-export const calculateCoordinates_ = (
+export const calculateCoordinates = (
   CurrentLatitude: number,
   CurrentLongitude: number,
   TargetLatitude: number,
@@ -2499,7 +2499,7 @@ export const calculateCoordinates_ = (
 };
 
 // prettier-ignore
-export const launchDetailed_ = (
+export const launchDetailed = (
   FuelArea: number,
   FuelMass: number,
   RocketArea: number,
@@ -2589,20 +2589,20 @@ export const launchDetailed_ = (
   }
 
   const RocketMass = FuelMass + RocketCasingMass + WarheadMass; // (Kg)
-  const Tatm = calculateTemperature_(Altitude); // (K)
-  const Patm = calculatePressure_(Altitude); // (pa)
+  const Tatm = calculateTemperature(Altitude); // (K)
+  const Patm = calculatePressure(Altitude); // (pa)
   const AirDensity = Patm / (R * Tatm); // (kg/m^3)
 
   // This calculates the drag coeficiant
   const c = (1.4 * R * Tatm) ** (1 / 2); // (m/s)
   const M = Math.sqrt(drdt ** 2 + dthetadt ** 2) / c; // (Unitless)
-  const cD = calculateDrag_(Math.abs(M)); // (Unitless)
+  const cD = calculateDrag(Math.abs(M)); // (Unitless)
 
   // This calculates all the forces acting upon the missile
   let Thrust = 0;
 
   if (FuelMass > 0) {
-    Thrust = calculateThrust_(MassOut, Altitude, FuelArea, NozzleAltitude);
+    Thrust = calculateThrust(MassOut, Altitude, FuelArea, NozzleAltitude);
   } // (N)
 
   const DragForce = (1 / 2) * AirDensity * (drdt ** 2 + dthetadt ** 2) * RocketArea * cD; // (N)
@@ -2631,7 +2631,7 @@ export const launchDetailed_ = (
 };
 
 // prettier-ignore
-export const calculateAngle_ = (
+export const calculateAngle = (
   FuelArea1: number,
   FuelArea2: number,
   FuelMass: number,
@@ -2690,7 +2690,7 @@ export const calculateAngle_ = (
   for (let i = 0; i < Steps; i++) {
     AngleCoefficient = (i * 1) / Steps / 2 + 0.5;
     DistanceSteps.push(
-      launchSimple_(
+      launchSimple(
         FuelArea1,
         FuelArea2,
         FuelMass,
@@ -2733,7 +2733,7 @@ export const calculateAngle_ = (
   AC1 = (DistanceClosePossition - 2) / Steps / 2 + 0.5;
   AC2 = (DistanceClosePossition + 2) / Steps / 2 + 0.5;
   let ACNew: number = (AC1 + AC2) / 2;
-  const qRunACNew = launchSimple_(
+  const qRunACNew = launchSimple(
     FuelArea1,
     FuelArea2,
     FuelMass,
@@ -2758,7 +2758,7 @@ export const calculateAngle_ = (
     error =
       Math.abs(
         (GoalDistance -
-          launchSimple_(
+          launchSimple(
             FuelArea1,
             FuelArea2,
             FuelMass,
@@ -2779,7 +2779,7 @@ export const calculateAngle_ = (
         GoalDistance,
       ) * 100;
     if (
-      launchSimple_(
+      launchSimple(
         FuelArea1,
         FuelArea2,
         FuelMass,
@@ -2809,7 +2809,7 @@ export const calculateAngle_ = (
 };
 
 // prettier-ignore
-export const launchSimple_ = (
+export const launchSimple = (
   FuelArea1: any,
   FuelArea2: any,
   FuelMass: number,
@@ -2857,7 +2857,7 @@ export const launchSimple_ = (
   const MaxAltitude = [];
 
   while (FuelMass / FuelDensity / FuelVolume > 0.4 && Altitude >= 0) {
-    iterationFunOutput = launchDetailed_(
+    iterationFunOutput = launchDetailed(
       FuelArea1,
       FuelMass,
       RocketArea,
@@ -2881,7 +2881,7 @@ export const launchSimple_ = (
     NozzleAltitude2 = Altitude;
   }
   while (FuelMass / FuelDensity / FuelVolume > 0.19 && Altitude >= 0) {
-    iterationFunOutput = launchDetailed_(
+    iterationFunOutput = launchDetailed(
       FuelArea1,
       FuelMass,
       RocketArea,
@@ -2905,7 +2905,7 @@ export const launchSimple_ = (
     NozzleAltitude3 = Altitude;
   }
   while (FuelMass / FuelDensity / FuelVolume > 0 && Altitude >= 0) {
-    iterationFunOutput = launchDetailed_(
+    iterationFunOutput = launchDetailed(
       FuelArea2,
       FuelMass,
       RocketArea,
@@ -2929,7 +2929,7 @@ export const launchSimple_ = (
   }
   while (Altitude > 0) {
     FuelMass = 0;
-    iterationFunOutput = launchDetailed_(
+    iterationFunOutput = launchDetailed(
       FuelArea2,
       FuelMass,
       RocketArea,

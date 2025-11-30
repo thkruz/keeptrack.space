@@ -1,4 +1,4 @@
-import { sensors } from '@app/app/data/catalogs/sensors';
+import { sensors } from '@app/app/data/catalogs/sensorLoader';
 import { CameraType } from '@app/engine/camera/camera';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';

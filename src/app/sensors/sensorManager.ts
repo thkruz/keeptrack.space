@@ -24,7 +24,7 @@
  */
 
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
-import { sensors } from '@app/app/data/catalogs/sensors';
+import { sensors } from '@app/app/data/catalogs/sensorLoader';
 import type { TearrData } from '@app/app/sensors/sensor-math';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';

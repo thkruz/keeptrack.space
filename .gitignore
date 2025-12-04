@@ -55,6 +55,8 @@ jspm_packages
 !.vscode/extensions.json
 *.code-workspace
 .idea/
+CLAUDE.md
+.github/copilot-instructions.md
 
 # Prettier
 .prettierignore
@@ -135,4 +137,4 @@ src/locales/*.json
 
 **/*.notes.md
 
-plans/
+#plans/

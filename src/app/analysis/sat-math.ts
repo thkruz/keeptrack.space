@@ -35,6 +35,7 @@ import {
   GreenwichMeanSiderealTime,
   Kilometers,
   KilometersPerSecond,
+  linearDistance,
   MILLISECONDS_TO_DAYS,
   MINUTES_PER_DAY,
   PosVel,
@@ -46,7 +47,9 @@ import {
   Sgp4,
   SpaceObjectType,
   StateVectorSgp4,
+  Sun as OotkSun,
   TAU,
+  Vector3D,
   ecf2eci,
   ecfRad2rae,
   eci2ecf,
@@ -57,7 +60,7 @@ import { vec3 } from 'gl-matrix';
 import numeric from 'numeric';
 import { EciArr3 } from '../../engine/core/interfaces';
 import type { Sun } from '../../engine/rendering/draw-manager/sun';
-import { DISTANCE_TO_SUN, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '../../engine/utils/constants';
+import { DISTANCE_TO_SUN } from '../../engine/utils/constants';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { jday, lon2yaw } from '../../engine/utils/transforms';
 import { CoordinateTransforms } from './coordinate-transforms';
@@ -177,19 +180,20 @@ export abstract class SatMath {
 
   /**
    * Calculates whether a satellite is in the sun's shadow (umbra), in the penumbra, or in sunlight.
+   * Uses ootk's Sun.lightingRatio() for accurate eclipse calculations.
    * @param obj The satellite object.
    * @param sunECI The position of the sun in ECI coordinates.
    * @returns A value indicating whether the satellite is in the sun's shadow (umbra), in the penumbra, or in sunlight.
    */
   static calculateIsInSun(obj: BaseObject | StateVectorSgp4, sunECI: EciVec3): SunStatus {
-    let x: Kilometers;
-    let y: Kilometers;
-    let z: Kilometers;
-
     if (!obj) {
       return SunStatus.UNKNOWN;
     }
 
+    // Extract position from various object types
+    let x: Kilometers;
+    let y: Kilometers;
+    let z: Kilometers;
 
     if (obj instanceof BaseObject || !(obj.position instanceof Boolean)) {
       if (!obj?.position) {
@@ -202,20 +206,13 @@ export abstract class SatMath {
       x = obj.position.x;
       y = obj.position.y;
       z = obj.position.z;
-
-    } else if ((typeof obj.position === 'boolean' || (
+    } else if (
+      typeof obj.position !== 'boolean' &&
       obj.position &&
       typeof obj.position.x === 'number' &&
       typeof obj.position.y === 'number' &&
       typeof obj.position.z === 'number'
-    )) &&
-      (typeof obj.velocity === 'boolean' || (
-        obj.velocity &&
-        typeof obj.velocity.x === 'number' &&
-        typeof obj.velocity.y === 'number' &&
-        typeof obj.velocity.z === 'number'
-      )) && typeof obj.position !== 'boolean') {
-
+    ) {
       x = obj.position.x;
       y = obj.position.y;
       z = obj.position.z;
@@ -223,38 +220,21 @@ export abstract class SatMath {
       return SunStatus.UNKNOWN;
     }
 
-    /*
-     * NOTE: Code is mashed to save memory when used on the whole catalog
-     * Position needs to be relative to satellite NOT ECI
-     * const distSatEarthX = Math.pow(-sat.position.x, 2);
-     * const distSatEarthY = Math.pow(-sat.position.y, 2);
-     * const distSatEarthZ = Math.pow(-sat.position.z, 2);
-     * const distSatEarth = Math.sqrt(distSatEarthX + distSatEarthY + distSatEarthZ);
-     * const semiDiamEarth = Math.asin(RADIUS_OF_EARTH/distSatEarth) * RAD2DEG;
-     */
-    const semiDiamEarth = Math.asin(RADIUS_OF_EARTH / Math.sqrt((-x) ** 2 + (-y) ** 2 + (-z) ** 2)) * RAD2DEG;
+    // Convert to Vector3D for ootk's Sun.lightingRatio
+    const satPos = new Vector3D(x, y, z);
+    const sunPos = new Vector3D(sunECI.x, sunECI.y, sunECI.z);
 
-    /*
-     * Position needs to be relative to satellite NOT ECI
-     * const distSatSunX = Math.pow(-sat.position.x + sunECI.x, 2);
-     * const distSatSunY = Math.pow(-sat.position.y + sunECI.y, 2);
-     * const distSatSunZ = Math.pow(-sat.position.z + sunECI.z, 2);
-     * const distSatSun = Math.sqrt(distSatSunX + distSatSunY + distSatSunZ);
-     * const semiDiamSun = Math.asin(RADIUS_OF_SUN/distSatSun) * RAD2DEG;
-     */
-    const semiDiamSun =
-      Math.asin(RADIUS_OF_SUN / Math.sqrt((-x + sunECI.x) ** 2 + (-y + sunECI.y) ** 2 + (-z + sunECI.z) ** 2)) * RAD2DEG;
+    // Use ootk's lighting ratio calculation
+    const ratio = OotkSun.lightingRatio(satPos, sunPos);
 
-    // Angle between earth and sun
-    const theta = Math.acos(
-      <number>numeric.dot([-x, -y, -z], [-x + sunECI.x, -y + sunECI.y, -z + sunECI.z]) /
-      (Math.sqrt((-x) ** 2 + (-y) ** 2 + (-z) ** 2) * Math.sqrt((-x + sunECI.x) ** 2 + (-y + sunECI.y) ** 2 + (-z + sunECI.z) ** 2))) * RAD2DEG;
-
-    if (semiDiamEarth > semiDiamSun && theta < semiDiamEarth - semiDiamSun) {
+    // Map ratio to SunStatus:
+    // 0.0 = fully eclipsed (umbra)
+    // 0.0 < ratio < 1.0 = partial illumination (penumbra)
+    // 1.0 = fully illuminated (sun)
+    if (ratio === 0) {
       return SunStatus.UMBRAL;
     }
-
-    if (semiDiamSun > semiDiamEarth || theta < semiDiamSun - semiDiamEarth || (Math.abs(semiDiamEarth - semiDiamSun) < theta && theta < semiDiamEarth + semiDiamSun)) {
+    if (ratio < 1) {
       return SunStatus.PENUMBRAL;
     }
 
@@ -387,9 +367,10 @@ export abstract class SatMath {
    * @param obj1 The first object's ECI coordinates.
    * @param obj2 The second object's ECI coordinates.
    * @returns The distance between the two objects in kilometers.
+   * @deprecated Use linearDistance() from ootk instead.
    */
   static distance(obj1: EciVec3, obj2: EciVec3): Kilometers {
-    return <Kilometers>Math.sqrt((obj1.x - obj2.x) ** 2 + (obj1.y - obj2.y) ** 2 + (obj1.z - obj2.z) ** 2);
+    return linearDistance(obj1, obj2);
   }
 
   /**
@@ -850,10 +831,12 @@ export abstract class SatMath {
   }
 
   /**
-   *Calculates the direction of the sun in the sky based on the Julian date.
-   *The function returns an array of three numbers representing the x, y, and z components of the sun's direction vector.
+   * Calculates the direction of the sun in the sky based on the Julian date.
+   * The function returns an array of three numbers representing the x, y, and z components of the sun's direction vector.
    * @param jd Julian Day
    * @returns ECI position of the Sun
+   * @deprecated For new code, use Sun.position(epoch) from ootk which returns a Vector3D.
+   * This function is retained for caching compatibility with KeepTrack's scene.
    */
   static getSunDirection(jd: number): EciArr3 {
     if (!jd) {

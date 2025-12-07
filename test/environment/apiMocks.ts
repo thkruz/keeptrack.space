@@ -2,7 +2,7 @@
 
 
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
-import { Operators } from '@app/app/data/catalogs/sensors';
+import { Operators } from '@app/app/data/catalogs/sensorLoader';
 import { PositionCruncherIncomingMsg, PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CatalogSource, CommLink, Degrees, DetailedSatellite, Kilometers, Milliseconds, RfSensor, SpaceObjectType, TleLine1, TleLine2, ZoomValue } from '@ootk/src/main';
 

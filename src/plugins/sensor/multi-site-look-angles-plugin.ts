@@ -1,5 +1,5 @@
 import { SatMath } from '@app/app/analysis/sat-math';
-import { sensors } from '@app/app/data/catalogs/sensors';
+import { sensors } from '@app/app/data/catalogs/sensorLoader';
 import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';

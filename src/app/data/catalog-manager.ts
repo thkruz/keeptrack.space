@@ -27,7 +27,7 @@
 
 import { controlSites } from '@app/app/data/catalogs/control-sites';
 import { launchSiteObjects, launchSites } from '@app/app/data/catalogs/launch-sites';
-import { sensors } from '@app/app/data/catalogs/sensors';
+import { sensors } from '@app/app/data/catalogs/sensorLoader';
 import { stars } from '@app/app/data/catalogs/stars';
 import { GetSatType, MissileParams } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';

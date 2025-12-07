@@ -55,7 +55,8 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { html } from '@app/engine/utils/development/formatter';
-import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, LlaVec3, calcGmst, eci2lla } from '@ootk/src/main';
+import { BaseObject, Degrees, Satellite, Kilometers, LlaVec3, calcGmst, eci2lla, TemeVec3 } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '@app/engine/audio/sounds';
@@ -207,7 +208,7 @@ export class StereoMap extends KeepTrackPlugin {
     return html;
   }
 
-  private static getMapPoints_(now: Date, sat: DetailedSatellite, sensorList: DetailedSensor[]): { lla: LlaVec3<Degrees, Kilometers>; overallView: boolean; time: string } {
+  private static getMapPoints_(now: Date, sat: Satellite, sensorList: DetailedSensor[]): { lla: LlaVec3<Degrees, Kilometers>; overallView: boolean; time: string } {
     const time = dateFormat(now, 'isoDateTime', true);
     let overallView: boolean = false;
     const { gmst } = calcGmst(now);
@@ -399,8 +400,9 @@ export class StereoMap extends KeepTrackPlugin {
       return;
     }
 
+    const satWithPos = sat as unknown as { position: TemeVec3 };
     const gmst = ServiceLocator.getTimeManager().gmst;
-    const lla = eci2lla(sat.position, gmst);
+    const lla = eci2lla(satWithPos.position, gmst);
     const map = {
       x: ((lla.lon + 180) / 360) * settingsManager.mapWidth,
       y: settingsManager.mapHeight - ((lla.lat + 90) / 180) * settingsManager.mapHeight,

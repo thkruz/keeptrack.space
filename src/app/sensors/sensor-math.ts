@@ -4,24 +4,24 @@ import {
   BaseObject,
   DEG2RAD,
   Degrees,
-  DetailedSatellite,
-  DetailedSensor,
-  EciVec3,
-  EpochUTC,
   Kilometers,
+  KilometersPerSecond,
   MINUTES_PER_DAY,
-  RfSensor,
+  Satellite,
   SatelliteRecord,
+  Sensor,
   Sgp4,
   SpaceObjectType,
   Sun,
   TAU,
+  TemeVec3,
   calcGmst,
-  ecfRad2rae,
-  eci2ecf,
+  ecefRad2rae,
+  eci2ecef,
   eci2lla,
   lla2eci,
 } from '@ootk/src/main';
+import { DetailedSensor } from './DetailedSensor';
 import { dateFormat } from '../../engine/utils/dateFormat';
 import { SatMath, SunStatus } from '../analysis/sat-math';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -151,7 +151,7 @@ export class SensorMath {
   /**
    * @deprecated - Use ootk instead
    */
-  static getTearr(sat: DetailedSatellite, sensors: DetailedSensor[], propTime?: Date): TearrData {
+  static getTearr(sat: Satellite, sensors: DetailedSensor[], propTime?: Date): TearrData {
     const timeManagerInstance = ServiceLocator.getTimeManager();
 
     const tearr = <TearrData>{}; // Most current TEARR data that is set in satellite object and returned.
@@ -165,7 +165,7 @@ export class SensorMath {
     // Set default timing settings. These will be changed to find look angles at different times in future.
     const now = typeof propTime !== 'undefined' ? propTime : timeManagerInstance.simulationTimeObj;
     const { m, gmst } = SatMath.calculateTimeVariables(now, sat.satrec);
-    const positionEci = <EciVec3>Sgp4.propagate(sat.satrec, m!).position;
+    const positionEci = <TemeVec3>Sgp4.propagate(sat.satrec, m!).position;
 
     if (!positionEci) {
       errorManagerInstance.debug(`No ECI position for ${sat.satrec.satnum} at ${now}`);
@@ -183,8 +183,8 @@ export class SensorMath {
       tearr.alt = gpos.alt;
       tearr.lon = gpos.lon;
       tearr.lat = gpos.lat;
-      const positionEcf = eci2ecf(positionEci, gmst);
-      const lookAngles = ecfRad2rae(sensor.llaRad(), positionEcf);
+      const positionEcf = eci2ecef(positionEci, gmst);
+      const lookAngles = ecefRad2rae(sensor.llaRad(), positionEcf);
 
       tearr.az = lookAngles.az;
       tearr.el = lookAngles.el;
@@ -207,7 +207,7 @@ export class SensorMath {
     return tearr;
   }
 
-  static distanceString(hoverSat: BaseObject, secondaryObj?: DetailedSensor | DetailedSatellite): string {
+  static distanceString(hoverSat: BaseObject, secondaryObj?: DetailedSensor | Satellite): string {
     // Sanity Check
     if (!hoverSat || !secondaryObj) {
       return '';
@@ -228,8 +228,15 @@ export class SensorMath {
       return '';
     }
 
-    // Calculate Distance
-    const distanceApart = SatMath.distance(hoverSat.position, secondaryObj.position).toFixed(2);
+    // Calculate Distance - need to check if objects have position property
+    const hoverPos = 'position' in hoverSat ? (hoverSat as { position: TemeVec3 }).position : null;
+    const secondaryPos = 'position' in secondaryObj ? (secondaryObj as { position: TemeVec3 }).position : null;
+
+    if (!hoverPos || !secondaryPos) {
+      return '';
+    }
+
+    const distanceApart = SatMath.distance(hoverPos, secondaryPos).toFixed(2);
 
     // Calculate if same beam
     let sameBeamStr = '';
@@ -242,7 +249,7 @@ export class SensorMath {
 
         const firstSensor = sensorManagerInstance.currentSensors[0];
 
-        if (firstSensor instanceof RfSensor && parseFloat(distanceApart) < sensorManagerInstance.currentTEARR.rng! * Math.sin(DEG2RAD * firstSensor.beamwidth)) {
+        if (firstSensor instanceof Sensor && firstSensor.beamwidth && parseFloat(distanceApart) < sensorManagerInstance.currentTEARR.rng! * Math.sin(DEG2RAD * firstSensor.beamwidth)) {
           if (sensorManagerInstance.currentTEARR.rng! < sensorManagerInstance.currentSensors[0].maxRng && sensorManagerInstance.currentTEARR.rng! > 0) {
             sameBeamStr = ' (Within One Beam)';
           }
@@ -255,7 +262,7 @@ export class SensorMath {
     return `<br />Range: ${distanceApart} km${sameBeamStr}`;
   }
 
-  static velocityString(hoverSat: BaseObject, secondaryObj?: DetailedSensor | DetailedSatellite): string {
+  static velocityString(hoverSat: BaseObject, secondaryObj?: DetailedSensor | Satellite): string {
     // Sanity Check
     if (!hoverSat || !secondaryObj) {
       return '';
@@ -269,13 +276,20 @@ export class SensorMath {
       return '';
     }
 
-    // Calculate Velocities
-    const velApart = SatMath.velocity(hoverSat.velocity, secondaryObj.velocity).toFixed(3);
+    // Calculate Velocities - need to check if objects have velocity property
+    const hoverVel = 'velocity' in hoverSat ? (hoverSat as { velocity: TemeVec3<KilometersPerSecond> }).velocity : null;
+    const secondaryVel = 'velocity' in secondaryObj ? (secondaryObj as { velocity: TemeVec3<KilometersPerSecond> }).velocity : null;
+
+    if (!hoverVel || !secondaryVel) {
+      return '';
+    }
+
+    const velApart = SatMath.velocity(hoverVel, secondaryVel).toFixed(3);
 
     return `<br />Relative velocity: ${velApart} km/s`;
   }
 
-  static getSunTimes(sat: DetailedSatellite, sensors?: DetailedSensor[], searchLength = 2, interval = 30) {
+  static getSunTimes(sat: Satellite, sensors?: DetailedSensor[], searchLength = 2, interval = 30) {
     const timeManagerInstance = ServiceLocator.getTimeManager();
     const sensorManagerInstance = ServiceLocator.getSensorManager();
 
@@ -300,7 +314,7 @@ export class SensorMath {
       const now = timeManagerInstance.getOffsetTimeObj(offset);
       const { m, j, gmst } = SatMath.calculateTimeVariables(now, sat.satrec);
       const [sunX, sunY, sunZ] = SatMath.getSunDirection(j);
-      const eci = <EciVec3>Sgp4.propagate(sat.satrec, m!).position;
+      const eci = <TemeVec3>Sgp4.propagate(sat.satrec, m!).position;
 
       if (!eci) {
         errorManagerInstance.debug(`No ECI position for ${sat.satrec?.satnum} at ${now}`);
@@ -312,8 +326,8 @@ export class SensorMath {
       const distZ = (sunZ - eci.z) ** 2;
       const dist = Math.sqrt(distX + distY + distZ);
 
-      const positionEcf = eci2ecf(eci, gmst);
-      const lookAngles = ecfRad2rae(sensor.llaRad(), positionEcf);
+      const positionEcf = eci2ecef(eci, gmst);
+      const lookAngles = ecefRad2rae(sensor.llaRad(), positionEcf);
       const { az, el, rng } = lookAngles;
 
       if (sensor.minAz > sensor.maxAz) {
@@ -336,7 +350,7 @@ export class SensorMath {
     }
   }
 
-  static nextNpasses(sat: DetailedSatellite, sensors: DetailedSensor[], searchLength: number, interval: number, numPasses: number): Date[] {
+  static nextNpasses(sat: Satellite, sensors: DetailedSensor[], searchLength: number, interval: number, numPasses: number): Date[] {
     const timeManagerInstance = ServiceLocator.getTimeManager();
     const sensorManagerInstance = ServiceLocator.getSensorManager();
 
@@ -379,7 +393,7 @@ export class SensorMath {
     return passTimesArray;
   }
 
-  static nextpass(sat: DetailedSatellite, sensors?: DetailedSensor[], searchLength?: number, interval?: number) {
+  static nextpass(sat: Satellite, sensors?: DetailedSensor[], searchLength?: number, interval?: number) {
     const timeManagerInstance = ServiceLocator.getTimeManager();
     const sensorManagerInstance = ServiceLocator.getSensorManager();
 
@@ -419,7 +433,7 @@ export class SensorMath {
 
   }
 
-  static nextpassList(satArray: DetailedSatellite[], sensorArray: DetailedSensor[], interval?: number, days = 7): SatPassTimes[] {
+  static nextpassList(satArray: Satellite[], sensorArray: DetailedSensor[], interval?: number, days = 7): SatPassTimes[] {
     const nextPassArray: SatPassTimes[] = [];
     const nextNPassesCount = settingsManager ? settingsManager.nextNPassesCount : 1;
 
@@ -437,9 +451,9 @@ export class SensorMath {
     return nextPassArray;
   }
 
-  static checkIfVisibleForOptical(sat: DetailedSatellite, sensor: DetailedSensor, now: Date): boolean {
+  static checkIfVisibleForOptical(sat: Satellite, sensor: DetailedSensor, now: Date): boolean {
     const { gmst } = calcGmst(now);
-    const sunPos = Sun.position(EpochUTC.fromDateTime(now));
+    const sunPos = Sun.eci(now);
     const sensorPos = lla2eci(sensor.llaRad(), gmst);
 
     sensor.position = sensorPos;

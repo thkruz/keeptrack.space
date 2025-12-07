@@ -3,12 +3,12 @@ import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
 
 describe('NightToggle_class', () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let nightToggle: NightToggle;
+  let _nightToggle: NightToggle;
 
   beforeEach(() => {
     setupStandardEnvironment();
-    nightToggle = new NightToggle();
+    _nightToggle = new NightToggle();
+    void _nightToggle; // Variable is used indirectly by plugin suite tests
   });
 
   standardPluginSuite(NightToggle, 'NightToggle');

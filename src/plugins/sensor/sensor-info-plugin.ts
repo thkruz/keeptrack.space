@@ -7,7 +7,8 @@ import { SensorToSunLine } from '@app/engine/rendering/line-manager/sensor-to-su
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { RfSensor, SpaceObjectType } from '@ootk/src/main';
+import { SpaceObjectType } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import sensorInfoPng from '@public/img/icons/sensor-info.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '@app/engine/audio/sounds';
@@ -282,7 +283,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       showEl(sensorBandElement?.parentElement ?? '');
       sensorBandElement.innerHTML = firstSensor.freqBand ? firstSensor.freqBand : 'Unknown';
 
-      if (firstSensor instanceof RfSensor) {
+      if (firstSensor instanceof DetailedSensor) {
         showEl(beamwidthElement?.parentElement ?? '');
         beamwidthElement.innerHTML = firstSensor.beamwidth ? `${firstSensor.beamwidth.toFixed(1).toString()}°` : 'Unknown';
       } else {

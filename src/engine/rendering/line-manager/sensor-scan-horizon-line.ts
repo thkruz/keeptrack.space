@@ -1,5 +1,6 @@
 import { EciArr3 } from '@app/engine/core/interfaces';
-import { Degrees, DetailedSensor, ecf2eci, rae2ecf } from '@ootk/src/main';
+import { Degrees, ecef2eci, rae2ecef } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { vec4 } from 'gl-matrix';
 import { Line, LineColors } from './line';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -58,8 +59,8 @@ export class SensorScanHorizonLine extends Line {
     const lla = this.sensor.lla();
 
 
-    const eci = ecf2eci(
-      rae2ecf(
+    const eci = ecef2eci(
+      rae2ecef(
         {
           rng: this.sensor.maxRng,
           az: this.az_,

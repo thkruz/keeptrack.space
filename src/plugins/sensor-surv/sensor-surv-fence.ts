@@ -22,7 +22,7 @@
 import { MenuMode } from '@app/engine/core/interfaces';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { DetailedSensor } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import fencePng from '@public/img/icons/fence.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SensorFov } from '../sensor-fov/sensor-fov';

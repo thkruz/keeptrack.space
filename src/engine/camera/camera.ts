@@ -27,7 +27,7 @@ import { ToastMsgType } from '@app/engine/core/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/engine/utils/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import {
-  DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue, eci2lla,
+  DEG2RAD, Degrees, Satellite, TemeVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue, eci2lla,
 } from '@ootk/src/main';
 import { mat4, quat, vec3 } from 'gl-matrix';
 import { SatMath } from '../../app/analysis/sat-math';
@@ -194,7 +194,7 @@ export class Camera {
       this.state.isLocalRotateReset = true;
       settingsManager.fieldOfView = 0.6 as Radians;
       renderer.glInit();
-      if ((selectSatManagerInstance?.selectedSat ?? -1) > -1) {
+      if ((selectSatManagerInstance?.selectedSat ?? '-1') !== '-1') {
         this.state.camZoomSnappedOnSat = true;
         this.cameraType = CameraType.FIXED_TO_SAT;
       } else {
@@ -218,7 +218,7 @@ export class Camera {
     const isCameraCloseToCovarianceBubble = settingsManager.isDrawCovarianceEllipsoid &&
       this.state.camDistBuffer < maxCovarianceDistance;
 
-    if (settingsManager.isZoomStopsSnappedOnSat || (selectSatManagerInstance?.selectedSat ?? -1) === -1) {
+    if (settingsManager.isZoomStopsSnappedOnSat || (selectSatManagerInstance?.selectedSat ?? '-1') === '-1') {
       this.state.zoomTarget += delta / 100 / 25 / this.state.speedModifier; // delta is +/- 100
     } else if ((isCameraCloseToSatellite || isCameraCloseToCovarianceBubble) ||
       this.state.zoomLevel === -1) {
@@ -271,8 +271,8 @@ export class Camera {
     let target = PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj;
 
     // TODO: This should be handled better
-    target ??= <DetailedSatellite>(<unknown>{
-      id: -1,
+    target ??= <Satellite>(<unknown>{
+      id: '-1',
       missile: false,
       type: SpaceObjectType.UNKNOWN,
       static: false,
@@ -465,7 +465,7 @@ export class Camera {
     return vec3.fromValues(0, 0, 0);
   }
 
-  getCameraRadius(target: EciVec3, centerBody: CelestialBody | Earth) {
+  getCameraRadius(target: TemeVec3, centerBody: CelestialBody | Earth) {
     let targetDistanceFromEarth = 0;
 
     if (target) {
@@ -515,7 +515,7 @@ export class Camera {
     this.camSnap(lat2pitch(lat), lon2yaw(lon, date));
   }
 
-  lookAtPosition(pos: EciVec3, isFaceEarth: boolean, selectedDate: Date): void {
+  lookAtPosition(pos: TemeVec3, isFaceEarth: boolean, selectedDate: Date): void {
     const gmst = SatMath.calculateTimeVariables(selectedDate).gmst;
     const lla = eci2lla(pos, gmst);
     const latModifier = isFaceEarth ? 1 : -1;
@@ -540,7 +540,7 @@ export class Camera {
 
     lineManagerInstance.clear();
     this.cameraType = CameraType.FIXED_TO_EARTH; // Earth will block the view of the star
-    this.lookAtPosition(sat.position, false, timeManagerInstance.selectedDate);
+    this.lookAtPosition((sat as unknown as { position: TemeVec3 }).position, false, timeManagerInstance.selectedDate);
   }
 
   setCameraType(val: CameraType) {
@@ -562,7 +562,7 @@ export class Camera {
    *
    * Splitting it into subfunctions would not be optimal
    */
-  snapToSat(sat: DetailedSatellite | MissileObject, simulationTime: Date) {
+  snapToSat(sat: Satellite | MissileObject, simulationTime: Date) {
     if (typeof sat === 'undefined' || sat === null) {
       return;
     }
@@ -799,7 +799,7 @@ export class Camera {
     mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [this.state.fpsPos[0], this.state.fpsPos[1], -this.state.fpsPos[2]]);
   }
 
-  private drawFixedToSatellite_(target: DetailedSatellite | MissileObject | OemSatellite) {
+  private drawFixedToSatellite_(target: Satellite | MissileObject | OemSatellite) {
     /*
      * mat4 commands are run in reverse order
      * 1. Move to the satellite position
@@ -887,7 +887,7 @@ export class Camera {
     }
   }
 
-  private drawSatellite_(target: DetailedSatellite | MissileObject | OemSatellite) {
+  private drawSatellite_(target: Satellite | MissileObject | OemSatellite) {
     const targetPositionTemp = vec3.fromValues(-target.position.x, -target.position.y, -target.position.z);
 
     mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, targetPositionTemp);
@@ -1162,7 +1162,7 @@ export class Camera {
         this.state.panDif.z = this.state.screenDragPoint[1] - this.state.mouseY;
 
         // Slow down the panning if a satellite is selected
-        if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
+        if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? '-1') !== '-1') {
           this.state.panDif.x /= 30;
           this.state.panDif.y /= 30;
           this.state.panDif.z /= 30;

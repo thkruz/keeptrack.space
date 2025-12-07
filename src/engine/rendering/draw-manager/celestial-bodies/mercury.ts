@@ -20,7 +20,7 @@
  */
 
 import { SolarBody } from '@app/engine/core/interfaces';
-import { EciVec3, Kilometers, Seconds } from '@ootk/src/main';
+import { TemeVec3, Kilometers, Seconds } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
@@ -38,7 +38,7 @@ export class Mercury extends CelestialBody {
   color = PlanetColors.MERCURY;
   orbitalPeriod = 0.2408467 * 365 * 24 * 3600 as Seconds;
   meanDistanceToSun = 57909227 as Kilometers;
-  eci: EciVec3;
+  eci: TemeVec3;
   textureQuality: MercuryTextureQuality = MercuryTextureQuality.POTATO;
 
   getTexturePath(): string {

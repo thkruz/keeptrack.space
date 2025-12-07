@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { html } from '@app/engine/utils/development/formatter';
-import { BaseObject, DetailedSatellite } from '@ootk/src/main';
+import { BaseObject, Satellite } from '@ootk/src/main';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
 
 export interface MissionColorSchemeColorMap extends ColorSchemeColorMap {
@@ -51,16 +51,16 @@ export class MissionColorScheme extends ColorScheme {
   }
 
   update(obj: BaseObject): ColorInformation {
-    if (!(obj instanceof DetailedSatellite)) {
+    if (!(obj instanceof Satellite)) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
 
-    const mission = this.missionCache.get(obj.id) ?? this.categorizeSatelliteMission_(obj.mission);
+    const mission = this.missionCache.get(Number(obj.id)) ?? this.categorizeSatelliteMission_(obj.mission);
 
-    this.missionCache.set(obj.id, mission);
+    this.missionCache.set(Number(obj.id), mission);
 
     switch (mission) {
       case 'Military':

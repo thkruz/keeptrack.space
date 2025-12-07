@@ -2,7 +2,7 @@ import { EChartsData, GetSatType } from '@app/engine/core/interfaces';
 import { SatMathApi } from '@app/engine/math/sat-math-api';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
-import { Degrees, DetailedSatellite, SpaceObjectType } from '@ootk/src/main';
+import { Degrees, Satellite, SpaceObjectType } from '@ootk/src/main';
 import scatterPlot4Png from '@public/img/icons/scatter-plot4.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
@@ -61,7 +61,7 @@ export class Lat2LonPlots extends KeepTrackPlugin {
       // Setup Configuration
       this.chart = echarts.init(chartDom);
       this.chart.on('click', (event) => {
-        if ((event.data as unknown as { id: number })?.id > -1) {
+        if ((event.data as unknown as { id: string })?.id) {
           this.selectSatManager_.selectSat((event.data as unknown as { id: number })?.id);
         }
       });
@@ -175,7 +175,7 @@ export class Lat2LonPlots extends KeepTrackPlugin {
       if (obj.type !== SpaceObjectType.PAYLOAD) {
         return;
       }
-      let sat = obj as DetailedSatellite;
+      let sat = obj as Satellite;
 
       // Only GEO objects
       if (sat.eccentricity > Lat2LonPlots.maxEccentricity_) {
@@ -192,7 +192,7 @@ export class Lat2LonPlots extends KeepTrackPlugin {
       }
 
       // Compute LLA for each object
-      sat = ServiceLocator.getCatalogManager().getObject(sat.id, GetSatType.POSITION_ONLY) as DetailedSatellite;
+      sat = ServiceLocator.getCatalogManager().getObject(sat.id, GetSatType.POSITION_ONLY) as Satellite;
       const plotPoints = SatMathApi.getLlaOfCurrentOrbit(sat, 24);
       const plotData: [number, Degrees, Degrees][] = [];
 

@@ -227,7 +227,7 @@ export class CameraState {
     const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager);
     const maxCovarianceDistance = Math.min((selectSatManagerInstance?.primarySatCovMatrix?.[2] ?? 0) * 10, 10000);
 
-    if ((settingsManager.isZoomStopsSnappedOnSat || (selectSatManagerInstance?.selectedSat ?? -1) === -1) || (this.camDistBuffer >= settingsManager.nearZoomLevel)) {
+    if ((settingsManager.isZoomStopsSnappedOnSat || (selectSatManagerInstance?.selectedSat ?? '-1') === '-1') || (this.camDistBuffer >= settingsManager.nearZoomLevel)) {
 
       settingsManager.selectedColor = settingsManager.selectedColorFallback;
       ServiceLocator.getRenderer().setFarRenderer();

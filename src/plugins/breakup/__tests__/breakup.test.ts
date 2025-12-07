@@ -187,7 +187,7 @@ describe('Breakup_class', () => {
       expect(() => breakupPlugin['onSubmit_']()).not.toThrow();
     });
 
-    it('should handle DetailedSatellite creation error in onSubmit', () => {
+    it('should handle Satellite creation error in onSubmit', () => {
       const breakupPlugin = new Breakup();
 
       websiteInit(breakupPlugin);
@@ -200,15 +200,15 @@ describe('Breakup_class', () => {
           }) as OrbitFinderFile.OrbitFinder,
       );
 
-      const originalDetailedSatellite = (global as any).DetailedSatellite;
+      const originalSatellite = (global as any).Satellite;
 
-      (global as any).DetailedSatellite = jest.fn(() => {
+      (global as any).Satellite = jest.fn(() => {
         throw new Error('Test error');
       });
 
       expect(() => breakupPlugin['onSubmit_']()).not.toThrow();
 
-      (global as any).DetailedSatellite = originalDetailedSatellite;
+      (global as any).Satellite = originalSatellite;
     });
 
     it('should handle non-circular orbit in onSubmit after initial checks', () => {

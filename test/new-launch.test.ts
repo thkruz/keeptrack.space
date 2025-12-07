@@ -39,7 +39,7 @@ describe('NewLaunch_form', () => {
   it('should have working buttons', () => {
     websiteInit(newLaunchPlugin);
     ServiceLocator.getCatalogManager().getObject = jest.fn().mockReturnValue({ ...defaultSat, isInGroup: true, isSatellite: () => true });
-    PluginRegistry.getPlugin(SelectSatManager).selectedSat = defaultSat.id;
+    PluginRegistry.getPlugin(SelectSatManager)!.selectedSat = defaultSat.id;
     ServiceLocator.getCatalogManager().objectCache = Array(50).fill({ ...defaultSat, isInGroup: true, isSatellite: () => true });
     ServiceLocator.getCatalogManager().isLaunchSiteManagerLoaded = true;
     ServiceLocator.getCatalogManager().launchSites = {

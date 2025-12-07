@@ -359,16 +359,16 @@ export class SatelliteListsPlugin extends KeepTrackPlugin {
       const target = <HTMLElement>evt.target;
 
       if (target.classList.contains('sat-name')) {
-        const satId = target.dataset.satId;
+        const satIdStr = target.dataset.satId;
 
-        if (satId) {
-          this.selectSat(parseInt(satId));
+        if (satIdStr) {
+          this.selectSat(parseInt(satIdStr, 10));
         }
       } else if (target.classList.contains('satellite-list-remove')) {
-        const satId = target.dataset.satId;
+        const satIdStr = target.dataset.satId;
 
-        if (satId) {
-          this.removeSatFromCurrentList(parseInt(satId));
+        if (satIdStr) {
+          this.removeSatFromCurrentList(parseInt(satIdStr, 10));
         }
       }
     });

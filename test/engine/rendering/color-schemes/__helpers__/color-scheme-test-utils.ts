@@ -1,6 +1,6 @@
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { ColorScheme } from '@app/engine/rendering/color-schemes/color-scheme';
-import { DetailedSatellite, PayloadStatus, SpaceObjectType, TleLine1, TleLine2 } from '@ootk/src/main';
+import { Satellite, PayloadStatus, SpaceObjectType, TleLine1, TleLine2 } from '@ootk/src/main';
 
 /**
  * Utility functions for testing color schemes
@@ -40,8 +40,8 @@ export class ColorSchemeTestUtils {
   /**
    * Create a mock satellite with specified properties
    */
-  static createMockSatellite(options: Partial<DetailedSatellite> = {}): DetailedSatellite {
-    const defaultSat = new DetailedSatellite({
+  static createMockSatellite(options: Partial<Satellite> = {}): Satellite {
+    const defaultSat = new Satellite({
       id: options.id ?? 1,
       name: options.name ?? 'TEST SAT',
       tle1: '1 25544U 98067A   25341.54791667  .00016717  00000-0  10270-3 0  9004' as TleLine1,
@@ -64,7 +64,7 @@ export class ColorSchemeTestUtils {
   /**
    * Create a collection of test satellites with various properties
    */
-  static createTestSatelliteCollection(): DetailedSatellite[] {
+  static createTestSatelliteCollection(): Satellite[] {
     return [
       // Active payload
       this.createMockSatellite({
@@ -136,9 +136,9 @@ export class ColorSchemeTestUtils {
    */
   static testColorSchemeWithSatellites<T extends ColorScheme>(
     colorScheme: T,
-    satellites: DetailedSatellite[],
-    testFn: (sat: DetailedSatellite, colorScheme: T) => ColorInformation,
-    additionalAssertions?: (sat: DetailedSatellite, result: ColorInformation) => void,
+    satellites: Satellite[],
+    testFn: (sat: Satellite, colorScheme: T) => ColorInformation,
+    additionalAssertions?: (sat: Satellite, result: ColorInformation) => void,
   ): void {
     satellites.forEach((sat) => {
       const result = testFn(sat, colorScheme);

@@ -20,7 +20,7 @@
  */
 
 import { SolarBody } from '@app/engine/core/interfaces';
-import { EciVec3, Kilometers, Seconds } from '@ootk/src/main';
+import { TemeVec3, Kilometers, Seconds } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
@@ -38,7 +38,7 @@ export class Venus extends CelestialBody {
   color = PlanetColors.VENUS;
   orbitalPeriod = 0.61519726 * 365 * 24 * 3600 as Seconds;
   meanDistanceToSun = 108209475 as Kilometers;
-  eci: EciVec3;
+  eci: TemeVec3;
   textureQuality: VenusTextureQuality = VenusTextureQuality.POTATO;
 
   getTexturePath(): string {

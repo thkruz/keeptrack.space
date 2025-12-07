@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { html } from '@app/engine/utils/development/formatter';
-import { BaseObject, DetailedSatellite, SpaceObjectType } from '@ootk/src/main';
+import { BaseObject, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { ColorScheme } from './color-scheme';
 
 export class SmallSatColorScheme extends ColorScheme {
@@ -30,7 +30,7 @@ export class SmallSatColorScheme extends ColorScheme {
       return { color: this.colorTheme.transparent, pickable: Pickable.No };
     }
 
-    const sat = obj as DetailedSatellite;
+    const sat = obj as Satellite;
 
     // Check if it is a small payload
     if (sat.rcs && sat.rcs < 0.5 && sat.type === SpaceObjectType.PAYLOAD) {

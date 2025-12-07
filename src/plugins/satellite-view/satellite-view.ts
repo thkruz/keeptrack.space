@@ -26,7 +26,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { shake } from '@app/engine/utils/shake';
 import { t7e } from '@app/locales/keys';
-import { DetailedSatellite } from '@ootk/src/main';
+import { Satellite } from '@ootk/src/main';
 import viewInAirPng from '@public/img/icons/view-in-air.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -55,7 +55,7 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
     EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (obj) => {
-        if (obj instanceof DetailedSatellite) {
+        if (obj instanceof Satellite) {
           this.setBottomIconToEnabled();
         } else {
           this.setBottomIconToDisabled();

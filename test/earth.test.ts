@@ -9,7 +9,7 @@ describe('Earth', () => {
     const earth = new Earth();
     const gmst = 0.5 as GreenwichMeanSiderealTime;
 
-    earth.update(gmst);
+    earth.update();
     const expected = mat4.create();
 
     mat4.identity(expected);

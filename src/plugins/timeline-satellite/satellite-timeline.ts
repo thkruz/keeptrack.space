@@ -4,13 +4,14 @@ import { getEl } from '@app/engine/utils/get-el';
 import viewTimelinePng from '@public/img/icons/view_timeline2.png';
 
 import { SatMath } from '@app/app/analysis/sat-math';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { shake } from '@app/engine/utils/shake';
-import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Hours, Kilometers, MILLISECONDS_PER_SECOND, SatelliteRecord, Seconds } from '@ootk/src/main';
+import { BaseObject, Degrees, Hours, Kilometers, MILLISECONDS_PER_SECOND, Satellite, SatelliteRecord, Seconds } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '../watchlist/watchlist';
@@ -21,17 +22,17 @@ interface Pass {
 }
 
 interface SatellitePasses {
-  satellite: DetailedSatellite;
+  satellite: Satellite;
   passes: Pass[];
 }
 
 export class SatelliteTimeline extends KeepTrackPlugin {
   readonly id = 'SatelliteTimeline';
   dependencies_ = [SelectSatManager.name];
-  private canvas_: HTMLCanvasElement;
-  private ctx_: CanvasRenderingContext2D;
-  private canvasStatic_: HTMLCanvasElement;
-  private ctxStatic_: CanvasRenderingContext2D;
+  private canvas_!: HTMLCanvasElement;
+  private ctx_!: CanvasRenderingContext2D;
+  private canvasStatic_!: HTMLCanvasElement;
+  private ctxStatic_!: CanvasRenderingContext2D;
   private drawEvents_: { [key: string]: (mouseX: number, mouseY: number) => boolean } = {};
   private lengthOfLookAngles_ = 6 as Hours;
   private lengthOfBadPass_ = 120 as Seconds;
@@ -50,7 +51,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       return;
     }
 
-    if (PluginRegistry.getPlugin(WatchlistPlugin).watchlistList.length === 0 && PluginRegistry.getPlugin(SelectSatManager).selectedSat === -1) {
+    if (PluginRegistry.getPlugin(WatchlistPlugin)?.watchlistList.length === 0 && PluginRegistry.getPlugin(SelectSatManager)?.selectedSat === -1) {
       ServiceLocator.getUiManager().toast('Add Satellites to Watchlist or Select a Satellite', ToastMsgType.caution);
       shake(getEl(this.bottomIconElementName));
 
@@ -114,7 +115,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     const link = document.createElement('a');
 
     link.href = image;
-    link.download = `sensor-${ServiceLocator.getSensorManager().getSensor().uiName}-timeline.png`;
+    link.download = `sensor-${ServiceLocator.getSensorManager().getSensor()?.uiName ?? 'unknown'}-timeline.png`;
     link.click();
   };
 
@@ -126,8 +127,8 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       () => {
         this.canvas_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas');
         this.canvasStatic_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas-static');
-        this.ctx_ = this.canvas_.getContext('2d');
-        this.ctxStatic_ = this.canvasStatic_.getContext('2d');
+        this.ctx_ = this.canvas_.getContext('2d')!;
+        this.ctxStatic_ = this.canvasStatic_.getContext('2d')!;
 
         getEl('satellite-timeline-setting-total-length')!.addEventListener('change', () => {
           this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-total-length')).value) as Hours;
@@ -209,10 +210,20 @@ export class SatelliteTimeline extends KeepTrackPlugin {
   private calculatePasses_(): SatellitePasses[] {
     const satellitePasses: SatellitePasses[] = [];
     const sensor = ServiceLocator.getSensorManager().getSensor();
-    const satellites = PluginRegistry.getPlugin(WatchlistPlugin).getSatellites().concat(PluginRegistry.getPlugin(SelectSatManager).selectedSat).filter((sat) => sat !== -1);
+
+    if (!sensor) {
+      return satellitePasses;
+    }
+
+    const satellites = PluginRegistry.getPlugin(WatchlistPlugin)?.getSatellites().concat(PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1).filter((sat) => sat !== -1) ?? [];
 
     for (const sat of satellites) {
       const satellite = ServiceLocator.getCatalogManager().getSat(sat);
+
+      if (!satellite) {
+        continue;
+      }
+
       const sensorPass: SatellitePasses = {
         satellite,
         passes: [],
@@ -230,7 +241,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       let isInView = false;
       let isEnterView = false;
       let isExitView = false;
-      let startTime = null;
+      let startTime: Date | null = null;
 
 
       for (let i = 0; i < durationInSeconds; i += this.angleCalculationInterval_) {
@@ -255,7 +266,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
 
         if ((isEnterView && isExitView) || (isEnterView && i === durationInSeconds - this.angleCalculationInterval_)) {
           sensorPass.passes.push({
-            start: startTime,
+            start: startTime!,
             end: now,
           });
           isEnterView = false;
@@ -298,9 +309,9 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     const oldCanvas = this.canvas_;
     const newCanvas = oldCanvas.cloneNode(true) as HTMLCanvasElement;
 
-    oldCanvas.parentNode.replaceChild(newCanvas, oldCanvas);
+    oldCanvas.parentNode?.replaceChild(newCanvas, oldCanvas);
     this.canvas_ = newCanvas;
-    this.ctx_ = this.canvas_.getContext('2d');
+    this.ctx_ = this.canvas_.getContext('2d')!;
 
     // Clear the events list
     this.drawEvents_ = {};
@@ -432,7 +443,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
 
             timeManagerInstance.changeStaticOffset(new Date(passStart).getTime() - timeManagerInstance.realTime);
             timeManagerInstance.calculateSimulationTime();
-            PluginRegistry.getPlugin(SelectSatManager).selectSat(satellitePass.satellite.id);
+            PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satellitePass.satellite.id);
           }
         });
       });
@@ -480,7 +491,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     });
 
     // Save initial state as staticCtx_ so we can redraw the static elements without clearing the canvas
-    this.ctxStatic_ = this.canvasStatic_.getContext('2d');
+    this.ctxStatic_ = this.canvasStatic_.getContext('2d')!;
     this.ctxStatic_.drawImage(this.canvas_, 0, 0);
   }
 
@@ -514,6 +525,10 @@ export class SatelliteTimeline extends KeepTrackPlugin {
   private resizeCanvas_(isForceWidescreen?: boolean): void {
     isForceWidescreen ??= false;
     const timelineMenuDOM = getEl('satellite-timeline-menu');
+
+    if (!timelineMenuDOM) {
+      return;
+    }
 
     // if the canvas is not visible, don't resize it
     if (timelineMenuDOM.style.display === 'none') {

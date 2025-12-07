@@ -8,15 +8,18 @@ import { getEl } from '@app/engine/utils/get-el';
 import viewTimelinePng from '@public/img/icons/view_timeline.png';
 
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { SoundNames } from '@app/engine/audio/sounds';
 import {
-  BaseObject, calcGmst, DEG2RAD, Degrees, DetailedSatellite, DetailedSensor, EpochUTC, Hours, Kilometers, lla2eci, Milliseconds, MILLISECONDS_PER_SECOND, Radians,
+  BaseObject, calcGmst, DEG2RAD, Degrees,
+  Hours, Kilometers, lla2eci, Milliseconds, MILLISECONDS_PER_SECOND, Radians,
+  Satellite,
   SatelliteRecord,
-  Seconds, SpaceObjectType, Sun,
+  Seconds, SpaceObjectType, Sun
 } from '@ootk/src/main';
 import { SensorManager } from '../../app/sensors/sensorManager';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SoundNames } from '@app/engine/audio/sounds';
 
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -59,7 +62,7 @@ interface weatherReport {
 }
 
 type WeatherDataInput = {
-  id: number;
+  id: number | undefined;
   lat: number;
   lon: number;
 }[];
@@ -210,7 +213,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     link.href = URL.createObjectURL(blob);
 
     // Set the download attribute with a dynamically generated filename
-    link.download = `sat-${(PluginRegistry.getPlugin(SelectSatManager)!.getSelectedSat() as DetailedSatellite).sccNum6}-timeline.csv`;
+    link.download = `sat-${(PluginRegistry.getPlugin(SelectSatManager)!.getSelectedSat() as Satellite).sccNum6}-timeline.csv`;
 
     // Simulate a click on the link to trigger the download
     link.click();
@@ -416,7 +419,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     const AllSatinSuns: Passes[] = [];
     const AllSensorNights: Passes[] = [];
     const AllClearSkies: Passes[] = [];
-    const satellite = PluginRegistry.getPlugin(SelectSatManager)!.getSelectedSat() as DetailedSatellite;
+    const satellite = PluginRegistry.getPlugin(SelectSatManager)!.getSelectedSat() as Satellite;
     const startDate = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
 
     startDate.setMinutes(0, 0, 0);
@@ -721,7 +724,7 @@ export class SensorTimeline extends KeepTrackPlugin {
 
   }
 
-  static checkObservable(now: Date, satellite: DetailedSatellite, sensor: DetailedSensor) {
+  static checkObservable(now: Date, satellite: Satellite, sensor: DetailedSensor) {
 
 
     if (sensor.type !== SpaceObjectType.OPTICAL) {
@@ -735,7 +738,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     };
 
     const { gmst } = calcGmst(now);
-    const sunPos = Sun.position(EpochUTC.fromDateTime(now));
+    const sunPos = Sun.eci(now);
     const sensorPos = lla2eci(lla, gmst);
 
     sensor.position = sensorPos;
@@ -760,7 +763,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     };
 
     const { gmst } = calcGmst(now);
-    const sunPos = Sun.position(EpochUTC.fromDateTime(now));
+    const sunPos = Sun.eci(now);
     const sensorPos = lla2eci(lla, gmst);
 
     sensor.position = sensorPos;
@@ -775,8 +778,8 @@ export class SensorTimeline extends KeepTrackPlugin {
 
   }
 
-  static checkSatinSun(now: Date, satellite: DetailedSatellite) {
-    const sunPos = Sun.position(EpochUTC.fromDateTime(now));
+  static checkSatinSun(now: Date, satellite: Satellite) {
+    const sunPos = Sun.eci(now);
     const satPos = SatMath.getEci(satellite, now);
     const satInSun = SatMath.calculateIsInSun(satPos, sunPos);
 

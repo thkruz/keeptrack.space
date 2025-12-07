@@ -1,6 +1,7 @@
 import {
-  Degrees, GreenwichMeanSiderealTime, Kilometers, LlaVec3, MILLISECONDS_TO_DAYS, PI, RAD2DEG, Radians, RaeVec3, Sensor, Sgp4, SpaceObjectType, rae2eci,
+  Degrees, GreenwichMeanSiderealTime, GroundStation, Kilometers, LlaVec3, MILLISECONDS_TO_DAYS, PI, RAD2DEG, Radians, RaeVec3, Sensor, Sgp4, SpaceObjectType, rae2eci,
 } from '@ootk/src/main';
+// Note: Sensor is still imported for the sensors parameter type in setupTimeVariables
 import { SensorObjectCruncher } from '../../engine/core/interfaces';
 import { A } from '../../engine/utils/external/meuusjs';
 import { jday } from '../../engine/utils/transforms';
@@ -17,7 +18,7 @@ export const propTime = (dynamicOffsetEpoch: number, staticOffset: number, propR
 };
 
 export const checkSunExclusion = (
-  sensor: Sensor,
+  sensor: GroundStation,
   j: number,
   gmst: GreenwichMeanSiderealTime,
   now: Date,
@@ -81,7 +82,7 @@ export const isInFov = (sensor: SensorObjectCruncher, lookangles?: RaeVec3): one
   return 0;
 };
 
-export const setupTimeVariables = (dynamicOffsetEpoch: number, staticOffset: number, propRate: number, isSunlightView: boolean, sensors: Sensor[] | null) => {
+export const setupTimeVariables = (dynamicOffsetEpoch: number, staticOffset: number, propRate: number, isSunlightView: boolean, sensors: (Sensor | GroundStation)[] | null) => {
   const now = propTime(dynamicOffsetEpoch, staticOffset, propRate);
 
   const j =
@@ -102,7 +103,7 @@ export const setupTimeVariables = (dynamicOffsetEpoch: number, staticOffset: num
 
   if (isSunlightView && sensors?.length === 1) {
     // TODO: Sun exclusion should be calculated for each sensor
-    [isSunExclusion, sunEci] = checkSunExclusion(sensors[0], j, gmst, now);
+    [isSunExclusion, sunEci] = checkSunExclusion(sensors[0] as GroundStation, j, gmst, now);
   }
 
   const j2 =

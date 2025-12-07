@@ -33,12 +33,12 @@ describe('EditSatPlugin_class', () => {
     standardSelectSat();
     const toggleButton = getEl(editSatPlugin.bottomIconElementName);
 
-    toggleButton.click();
+    toggleButton!.click();
     ServiceLocator.getCatalogManager().sccNum2Id = () => 0;
     ServiceLocator.getCatalogManager().getObject = () => defaultSat;
     const button = getEl('editSat-newTLE');
 
-    button.click();
+    button!.click();
     jest.advanceTimersByTime(1000);
   });
 
@@ -49,12 +49,12 @@ describe('EditSatPlugin_class', () => {
     standardSelectSat();
     const toggleButton = getEl(editSatPlugin.bottomIconElementName);
 
-    toggleButton.click();
+    toggleButton!.click();
     ServiceLocator.getCatalogManager().sccNum2Id = () => 0;
     ServiceLocator.getCatalogManager().getObject = () => defaultSat;
     const button = getEl('editSat-save');
 
-    button.click();
+    button!.click();
     jest.advanceTimersByTime(1000);
   });
 });

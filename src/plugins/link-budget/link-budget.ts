@@ -15,7 +15,8 @@ import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveCsv } from '@app/engine/utils/saveVariable';
 import { showLoading } from '@app/engine/utils/showLoading';
-import { Degrees, DetailedSatellite, DetailedSensor, eci2rae, EpochUTC, Seconds } from '@ootk/src/main';
+import { Degrees, Satellite, eci2rae, EpochUTC, Seconds } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import satcomPng from '@public/img/icons/satcom.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import {
@@ -734,7 +735,7 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
   /**
    * Find next satellite pass over sensor
    */
-  private findNextPass_(sat: DetailedSatellite, sensor: DetailedSensor, startTime: EpochUTC): PassAnalysis | null {
+  private findNextPass_(sat: Satellite, sensor: DetailedSensor, startTime: EpochUTC): PassAnalysis | null {
     const dt = 10; // Sample every 10 seconds
     const maxLookAhead = 24 * 3600; // Look ahead 24 hours
     const minElevation = sensor.minEl || 10 as Degrees;

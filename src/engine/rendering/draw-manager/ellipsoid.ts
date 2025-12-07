@@ -2,7 +2,7 @@ import { Scene } from '@app/engine/core/scene';
 import { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
 import { mat3, mat4, vec3, vec4 } from 'gl-matrix';
-import { BaseObject, EciVec3 } from '@ootk/src/main';
+import { BaseObject, TemeVec3 } from '@ootk/src/main';
 import { GlUtils } from '../gl-utils';
 import { glsl } from '@app/engine/utils/development/formatter';
 
@@ -61,7 +61,7 @@ export class Ellipsoid {
     this.init(gl);
   }
 
-  setDrawPosition(eci: EciVec3) {
+  setDrawPosition(eci: TemeVec3) {
     this.drawPosition[0] = eci.x;
     this.drawPosition[1] = eci.y;
     this.drawPosition[2] = eci.z;
@@ -129,7 +129,9 @@ export class Ellipsoid {
     if (!this.isLoaded_ || !settingsManager.isDrawCovarianceEllipsoid) {
       return;
     }
-    if (!obj?.position) {
+    const objWithPos = obj as unknown as { position?: TemeVec3; velocity?: TemeVec3 };
+
+    if (!objWithPos?.position) {
       this.drawPosition[0] = 0;
       this.drawPosition[1] = 0;
       this.drawPosition[2] = 0;
@@ -137,15 +139,15 @@ export class Ellipsoid {
       return;
     }
 
-    this.drawPosition[0] = obj.position.x;
-    this.drawPosition[1] = obj.position.y;
-    this.drawPosition[2] = obj.position.z;
+    this.drawPosition[0] = objWithPos.position.x;
+    this.drawPosition[1] = objWithPos.position.y;
+    this.drawPosition[2] = objWithPos.position.z;
 
     this.mvMatrix_ = mat4.create();
     mat4.identity(this.mvMatrix_);
     mat4.translate(this.mvMatrix_, this.mvMatrix_, this.drawPosition);
 
-    const lookAtPos = [obj.position.x + obj.velocity.x, obj.position.y + obj.velocity.y, obj.position.z + obj.velocity.z];
+    const lookAtPos = [objWithPos.position.x + (objWithPos.velocity?.x ?? 0), objWithPos.position.y + (objWithPos.velocity?.y ?? 0), objWithPos.position.z + (objWithPos.velocity?.z ?? 0)];
     const up = vec3.normalize(vec3.create(), this.drawPosition);
 
     mat4.targetTo(this.mvMatrix_, this.drawPosition, lookAtPos, up);

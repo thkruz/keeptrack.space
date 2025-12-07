@@ -11,7 +11,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { getUnique } from '@app/engine/utils/get-unique';
 import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
-import { BaseObject, Degrees, DetailedSatellite, Hours, Kilometers, Minutes, eci2rae } from '@ootk/src/main';
+import { BaseObject, Degrees, Hours, Kilometers, Minutes, Satellite, eci2rae } from '@ootk/src/main';
 import findSatPng from '@public/img/icons/database-search.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 
@@ -44,7 +44,7 @@ export interface SearchSatParams {
 
 export class FindSatPlugin extends KeepTrackPlugin {
   readonly id = 'FindSatPlugin';
-  private lastResults_ = <DetailedSatellite[]>[];
+  private lastResults_ = <Satellite[]>[];
 
   dragOptions: ClickDragOptions = {
     isDraggable: true,
@@ -254,7 +254,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
       });
     });
 
-    getUnique(satData.filter((obj: BaseObject) => (obj as DetailedSatellite)?.bus).map((obj) => (obj as DetailedSatellite).bus))
+    getUnique(satData.filter((obj: BaseObject) => (obj as Satellite)?.bus).map((obj) => (obj as Satellite).bus))
       // Sort using lower case
       .sort((a, b) => (a).toLowerCase().localeCompare((b).toLowerCase()))
       .forEach((bus) => {
@@ -265,23 +265,23 @@ export class FindSatPlugin extends KeepTrackPlugin {
       getEl('fbl-country')!.insertAdjacentHTML('beforeend', `<option value="${countryCodeList[countryName]}">${countryName}</option>`);
     });
 
-    getUnique(satData.filter((obj: BaseObject) => (obj as DetailedSatellite)?.shape).map((obj) => (obj as DetailedSatellite).shape))
+    getUnique(satData.filter((obj: BaseObject) => (obj as Satellite)?.shape).map((obj) => (obj as Satellite).shape))
       // Sort using lower case
       .sort((a, b) => (a).toLowerCase().localeCompare((b).toLowerCase()))
       .forEach((shape) => {
         getEl('fbl-shape')!.insertAdjacentHTML('beforeend', `<option value="${shape}">${shape}</option>`);
       });
 
-    getUnique(satData.filter((obj: BaseObject) => (obj as DetailedSatellite)?.source).map((obj) => (obj as DetailedSatellite).source))
+    getUnique(satData.filter((obj: BaseObject) => (obj as Satellite)?.source).map((obj) => (obj as Satellite).source))
       // Sort using lower case
       .sort((a, b) => (a).toLowerCase().localeCompare((b).toLowerCase()))
       .forEach((source) => {
         getEl('fbl-source')!.insertAdjacentHTML('beforeend', `<option value="${source}">${source}</option>`);
       });
     const payloadPartials = satData
-      .filter((obj: BaseObject) => (obj as DetailedSatellite)?.payload)
+      .filter((obj: BaseObject) => (obj as Satellite)?.payload)
       .map((obj) =>
-        (obj as DetailedSatellite).payload
+        (obj as Satellite).payload
           .split(' ')[0]
           .split('-')[0]
           .replace(/[^a-zA-Z]/gu, ''),
@@ -382,7 +382,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     });
   }
 
-  private static checkAz_(posAll: DetailedSatellite[], min: number, max: number) {
+  private static checkAz_(posAll: Satellite[], min: number, max: number) {
     return posAll.filter((pos) => {
       if (!pos.isSatellite() && !pos.isMissile()) {
         return false;
@@ -405,7 +405,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     });
   }
 
-  private static checkEl_(posAll: DetailedSatellite[], min: number, max: number) {
+  private static checkEl_(posAll: Satellite[], min: number, max: number) {
     return posAll.filter((pos) => {
       if (!pos.isSatellite() && !pos.isMissile()) {
         return false;
@@ -428,18 +428,18 @@ export class FindSatPlugin extends KeepTrackPlugin {
     });
   }
 
-  private static checkInview_(posAll: DetailedSatellite[]) {
+  private static checkInview_(posAll: Satellite[]) {
     const dotsManagerInstance = ServiceLocator.getDotsManager();
 
 
     return posAll.filter((pos) => dotsManagerInstance.inViewData[pos.id] === 1);
   }
 
-  private static checkObjtype_(posAll: DetailedSatellite[], objtype: number) {
+  private static checkObjtype_(posAll: Satellite[], objtype: number) {
     return posAll.filter((pos) => pos.type === objtype);
   }
 
-  private static checkRange_(posAll: DetailedSatellite[], min: number, max: number) {
+  private static checkRange_(posAll: Satellite[], min: number, max: number) {
     return posAll.filter((pos) => {
       if (!pos.isSatellite() && !pos.isMissile()) {
         return false;
@@ -462,7 +462,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     });
   }
 
-  private static limitPossibles_(possibles: DetailedSatellite[], limit: number): DetailedSatellite[] {
+  private static limitPossibles_(possibles: Satellite[], limit: number): Satellite[] {
     const uiManagerInstance = ServiceLocator.getUiManager();
 
     if (possibles.length >= limit) {
@@ -473,7 +473,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     return possibles;
   }
 
-  private static searchSats_(searchParams: SearchSatParams): DetailedSatellite[] {
+  private static searchSats_(searchParams: SearchSatParams): Satellite[] {
     let {
       az,
       el,
@@ -583,22 +583,22 @@ export class FindSatPlugin extends KeepTrackPlugin {
       // Remove duplicates and undefined
 
       country = country.filter((item, index) => item && country.indexOf(item) === index);
-      res = res.filter((obj: BaseObject) => country.includes((obj as DetailedSatellite).country));
+      res = res.filter((obj: BaseObject) => country.includes((obj as Satellite).country));
     }
     if (bus !== 'All') {
-      res = res.filter((obj: BaseObject) => (obj as DetailedSatellite).bus === bus);
+      res = res.filter((obj: BaseObject) => (obj as Satellite).bus === bus);
     }
     if (shape !== 'All') {
-      res = res.filter((obj: BaseObject) => (obj as DetailedSatellite).shape === shape);
+      res = res.filter((obj: BaseObject) => (obj as Satellite).shape === shape);
     }
     if (source !== 'All') {
-      res = res.filter((obj: BaseObject) => (obj as DetailedSatellite).source === source);
+      res = res.filter((obj: BaseObject) => (obj as Satellite).source === source);
     }
 
     if (payload !== 'All') {
       res = res.filter(
         (obj: BaseObject) =>
-          (obj as DetailedSatellite).payload
+          (obj as Satellite).payload
             ?.split(' ')[0]
             ?.split('-')[0]
             ?.replace(/[^a-zA-Z]/gu, '') === payload,
@@ -610,7 +610,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     let result = '';
 
     res.forEach((obj: BaseObject, i: number) => {
-      result += i < res.length - 1 ? `${(obj as DetailedSatellite).sccNum},` : `${(obj as DetailedSatellite).sccNum}`;
+      result += i < res.length - 1 ? `${(obj as Satellite).sccNum},` : `${(obj as Satellite).sccNum}`;
     });
 
     (<HTMLInputElement>getEl('search')).value = result;
@@ -621,19 +621,19 @@ export class FindSatPlugin extends KeepTrackPlugin {
     return res;
   }
 
-  private static checkArgPe_(possibles: DetailedSatellite[], min: Degrees, max: Degrees) {
+  private static checkArgPe_(possibles: Satellite[], min: Degrees, max: Degrees) {
     return possibles.filter((possible) => possible.argOfPerigee < max && possible.argOfPerigee > min);
   }
 
-  private static checkInc_(possibles: DetailedSatellite[], min: Degrees, max: Degrees) {
+  private static checkInc_(possibles: Satellite[], min: Degrees, max: Degrees) {
     return possibles.filter((possible) => possible.inclination < max && possible.inclination > min);
   }
 
-  private static checkPeriod_(possibles: DetailedSatellite[], minPeriod: Minutes, maxPeriod: Minutes) {
+  private static checkPeriod_(possibles: Satellite[], minPeriod: Minutes, maxPeriod: Minutes) {
     return possibles.filter((possible) => possible.period > minPeriod && possible.period < maxPeriod);
   }
 
-  private static checkTleAge_(possibles: DetailedSatellite[], minTleAge_: Hours, maxTleAge: Hours) {
+  private static checkTleAge_(possibles: Satellite[], minTleAge_: Hours, maxTleAge: Hours) {
     const minTleAge = minTleAge_ < 0 ? 0 : minTleAge_;
     const now = new Date();
 
@@ -645,11 +645,11 @@ export class FindSatPlugin extends KeepTrackPlugin {
     });
   }
 
-  private static checkRightAscension_(possibles: DetailedSatellite[], min: Degrees, max: Degrees) {
+  private static checkRightAscension_(possibles: Satellite[], min: Degrees, max: Degrees) {
     return possibles.filter((possible) => possible.rightAscension < max && possible.rightAscension > min);
   }
 
-  private static checkRcs_(possibles: DetailedSatellite[], minRcs: number, maxRcs: number) {
+  private static checkRcs_(possibles: Satellite[], minRcs: number, maxRcs: number) {
     return possibles.filter((possible) => (possible?.rcs ?? -Infinity) > minRcs && (possible?.rcs ?? Infinity) < maxRcs);
   }
 }

@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { BottomIconComponent, BottomIconCallbacks } from '@app/engine/plugins/components/bottom-icon/bottom-icon-component';
+import { BottomIconComponent } from '@app/engine/plugins/components/bottom-icon/bottom-icon-component';
 import { IBottomIconConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { EventBus } from '@app/engine/events/event-bus';

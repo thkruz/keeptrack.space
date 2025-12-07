@@ -42,21 +42,21 @@ export type oneOrZero = 0 | 1;
 
 // Code
 export const defaultGd = {
-  lat: <Radians>null,
-  lon: <Radians>0,
-  alt: <Kilometers>0,
+  lat: 0 as Radians,
+  lon: 0 as Radians,
+  alt: 0 as Kilometers,
 };
 
 export const emptySensor: SensorObjectCruncher = {
   observerGd: {
-    lat: <Radians>null,
-    lon: <Radians>0,
-    alt: <Kilometers>0,
+    lat: 0 as Radians,
+    lon: 0 as Radians,
+    alt: 0 as Kilometers,
   },
-  alt: null,
+  alt: 0 as Kilometers,
   country: '',
-  lat: null,
-  lon: null,
+  lat: 0 as Degrees,
+  lon: 0 as Degrees,
   name: '',
   maxAz: <Degrees>0,
   maxEl: <Degrees>0,

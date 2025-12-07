@@ -3,14 +3,15 @@
 
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { Operators } from '@app/app/data/catalogs/sensors';
+import { RfSensor } from '@app/app/sensors/DetailedSensor';
 import { PositionCruncherIncomingMsg, PositionCruncherOutgoingMsg } from '@app/webworker/constants';
-import { CatalogSource, CommLink, Degrees, DetailedSatellite, Kilometers, Milliseconds, RfSensor, SpaceObjectType, TleLine1, TleLine2, ZoomValue } from '@ootk/src/main';
+import { CatalogSource, CommLink, Degrees, Kilometers, Milliseconds, Satellite, SpaceObjectType, TleLine1, TleLine2, ZoomValue } from '@ootk/src/main';
 
 const fakeTimeObj = new Date(2022, 0, 1);
 
 fakeTimeObj.setUTCHours(0, 0, 0, 0);
 
-export const defaultSat: DetailedSatellite = new DetailedSatellite({
+export const defaultSat: Satellite = new Satellite({
   id: 0,
   active: true,
   sccNum: '00005',
@@ -313,7 +314,7 @@ export const keepTrackApiStubs = {
       pickingColorData: null,
       pickingFrameBuffer: null,
       createPickingProgram: jest.fn(),
-      sensorMarkerArray: new Float32Array([0, 0, 0]),
+      sensorMarkerArray: ['0'],
     },
     groups: null,
     soundManager: {
@@ -375,7 +376,7 @@ export const keepTrackApiStubs = {
       clearInViewOrbit: jest.fn(),
       removeInViewOrbit: jest.fn(),
       historyOfSatellitesPlay: jest.fn(),
-      program: <WebGLProgram>null,
+      program: <WebGLProgram><unknown>null,
       attribs: {
         aPos: 0,
         uColor: [0, 0, 0, 0],
@@ -442,8 +443,8 @@ export const keepTrackApiStubs = {
     controlSiteManager: {},
     catalogManager: {
       isLaunchSiteManagerLoaded: true,
-      lasthoveringSat: 0,
-      lastSelectedSat: () => 1,
+      lasthoveringSat: '0',
+      lastSelectedSat: () => '1',
       extractCountry: () => 'India',
       setHoveringSat: jest.fn(),
       setLasthoveringSat: jest.fn(),
@@ -457,14 +458,14 @@ export const keepTrackApiStubs = {
       setSecondarySat: jest.fn(),
       setSelectedSat_: jest.fn(),
       staticSet: {
-        id: 0,
+        id: '0',
       },
       analSatSet: [defaultSat],
       missileSet: {
-        id: 0,
+        id: '0',
       },
       fieldOfViewSet: {
-        id: 0,
+        id: '0',
       },
       satLinkManager: {
         idToSatnum: jest.fn(),
@@ -483,14 +484,14 @@ export const keepTrackApiStubs = {
       getIdFromEci: jest.fn(),
       selectSat: jest.fn(),
       satData: [
-        { ...defaultSat, ...{ id: 0 } },
+        { ...defaultSat, ...{ id: '0' } },
         defaultSat,
-        { id: 2, type: SpaceObjectType.STAR, name: 'test' },
-        { id: 3, type: SpaceObjectType.PHASED_ARRAY_RADAR, static: true, name: 'test' },
+        { id: '2', type: SpaceObjectType.STAR, name: 'test' },
+        { id: '3', type: SpaceObjectType.PHASED_ARRAY_RADAR, static: true, name: 'test' },
       ],
       convertIdArrayToSatnumArray: jest.fn(),
-      getIdFromObjNum: () => 0,
-      getSensorFromSensorName: () => 0,
+      getIdFromObjNum: () => '0',
+      getSensorFromSensorName: () => '0',
       getSatExtraOnly: () => defaultSat,
       getSatFromObjNum: () => defaultSat,
       getSat: () => defaultSat,
@@ -613,8 +614,8 @@ export const keepTrackApiStubs = {
         checkMobileMode: jest.fn(),
       },
       uiInput: {
-        getSatIdFromCoord: () => 0,
-        mouseSat: 0,
+        getSatIdFromCoord: () => '0',
+        mouseSat: '0',
       },
     },
     watchlist: {
@@ -625,13 +626,13 @@ export const keepTrackApiStubs = {
 
 keepTrackApiStubs.programs.uiManager.searchBox = keepTrackApiStubs.programs.searchBox as unknown as typeof keepTrackApiStubs.programs.searchBox;
 
-keepTrackApiStubs.programs.groupsManager.Canada = keepTrackApiStubs.programs.groupsManager.SpaceStations;
-keepTrackApiStubs.programs.groupsManager.Japan = keepTrackApiStubs.programs.groupsManager.SpaceStations;
-keepTrackApiStubs.programs.groupsManager.France = keepTrackApiStubs.programs.groupsManager.SpaceStations;
-keepTrackApiStubs.programs.groupsManager.China = keepTrackApiStubs.programs.groupsManager.SpaceStations;
-keepTrackApiStubs.programs.groupsManager.India = keepTrackApiStubs.programs.groupsManager.SpaceStations;
-keepTrackApiStubs.programs.groupsManager.Israel = keepTrackApiStubs.programs.groupsManager.SpaceStations;
-keepTrackApiStubs.programs.groupsManager.Russia = keepTrackApiStubs.programs.groupsManager.SpaceStations;
-keepTrackApiStubs.programs.groupsManager.UnitedKingdom = keepTrackApiStubs.programs.groupsManager.SpaceStations;
-keepTrackApiStubs.programs.groupsManager.UnitedStates = keepTrackApiStubs.programs.groupsManager.SpaceStations;
-keepTrackApiStubs.programs.groups = keepTrackApiStubs.programs.groupsManager;
+(keepTrackApiStubs.programs.groupsManager as Record<string, unknown>).Canada = keepTrackApiStubs.programs.groupsManager.SpaceStations;
+(keepTrackApiStubs.programs.groupsManager as Record<string, unknown>).Japan = keepTrackApiStubs.programs.groupsManager.SpaceStations;
+(keepTrackApiStubs.programs.groupsManager as Record<string, unknown>).France = keepTrackApiStubs.programs.groupsManager.SpaceStations;
+(keepTrackApiStubs.programs.groupsManager as Record<string, unknown>).China = keepTrackApiStubs.programs.groupsManager.SpaceStations;
+(keepTrackApiStubs.programs.groupsManager as Record<string, unknown>).India = keepTrackApiStubs.programs.groupsManager.SpaceStations;
+(keepTrackApiStubs.programs.groupsManager as Record<string, unknown>).Israel = keepTrackApiStubs.programs.groupsManager.SpaceStations;
+(keepTrackApiStubs.programs.groupsManager as Record<string, unknown>).Russia = keepTrackApiStubs.programs.groupsManager.SpaceStations;
+(keepTrackApiStubs.programs.groupsManager as Record<string, unknown>).UnitedKingdom = keepTrackApiStubs.programs.groupsManager.SpaceStations;
+(keepTrackApiStubs.programs.groupsManager as Record<string, unknown>).UnitedStates = keepTrackApiStubs.programs.groupsManager.SpaceStations;
+(keepTrackApiStubs.programs as Record<string, unknown>).groups = keepTrackApiStubs.programs.groupsManager;

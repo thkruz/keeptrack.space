@@ -1,4 +1,4 @@
-import { BaseObject, Degrees, DetailedSatellite, Kilometers, Meters, Milliseconds, Radians, SpaceObjectType, Vec3Flat, ZoomValue } from '@ootk/src/main';
+import { BaseObject, Degrees, Satellite, Kilometers, Meters, Milliseconds, Radians, SpaceObjectType, Vec3Flat, ZoomValue } from '@ootk/src/main';
 import type { ColorSchemeParams } from '../rendering/color-schemes/color-scheme';
 
 /** Array of ECI Coordinates [x, y, z] */
@@ -129,7 +129,7 @@ export type lookanglesRow = {
 };
 
 export type SatPassTimes = {
-  sat: DetailedSatellite;
+  sat: Satellite;
   time: Date;
 };
 

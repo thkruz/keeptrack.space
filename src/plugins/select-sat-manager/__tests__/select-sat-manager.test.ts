@@ -4,7 +4,8 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
-import { DetailedSatellite, DetailedSensor, Kilometers, SpaceObjectType } from '@ootk/src/main';
+import { Satellite, Kilometers, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { defaultSat, defaultSensor } from '../../../../test/environment/apiMocks';
 import { setupStandardEnvironment } from '../../../../test/environment/standard-env';
 import { standardPluginSuite, websiteInit } from '../../../../test/generic-tests';
@@ -27,7 +28,7 @@ describe('SelectSatManager_dots', () => {
           y: 10000,
           z: 10000,
         },
-      } as DetailedSatellite,
+      } as Satellite,
     ];
     ServiceLocator.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array<ArrayBuffer>;
     ServiceLocator.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
@@ -58,17 +59,17 @@ describe('SelectSatManager_class', () => {
     selectSatManager = new SelectSatManager();
 
     ServiceLocator.getCatalogManager().objectCache = [
-      new DetailedSatellite(defaultSat),
-      new DetailedSatellite({ ...defaultSat, id: 1 }),
+      new Satellite(defaultSat),
+      new Satellite({ ...defaultSat, id: 1 }),
     ];
     // Set all satellites to active
     ServiceLocator.getCatalogManager().objectCache.forEach((sat) => {
       sat.active = true;
-      sat.position = {
+      (sat as unknown as { position: TemeVec3 }).position = {
         x: 10000 as Kilometers,
         y: 10000 as Kilometers,
         z: 10000 as Kilometers,
-      };
+      } as TemeVec3;
     });
   });
 
@@ -116,14 +117,14 @@ describe('SelectSatManager_class', () => {
   it('should update dot size and color when a satellite is selected', () => {
     const updateDotSizeAndColorSpy = jest.spyOn(selectSatManager as any, 'updateDotSizeAndColor_');
 
-    ServiceLocator.getCatalogManager().objectCache = [new DetailedSatellite({ ...defaultSat, ...{ id: 0, type: SpaceObjectType.PAYLOAD } })];
+    ServiceLocator.getCatalogManager().objectCache = [new Satellite({ ...defaultSat, ...{ id: 0, type: SpaceObjectType.PAYLOAD } })];
     ServiceLocator.getCatalogManager().objectCache.forEach((sat) => {
       sat.active = true;
-      sat.position = {
+      (sat as unknown as { position: TemeVec3 }).position = {
         x: 10000 as Kilometers,
         y: 10000 as Kilometers,
         z: 10000 as Kilometers,
-      };
+      } as TemeVec3;
     });
 
     selectSatManager.selectSat(0);
@@ -132,7 +133,7 @@ describe('SelectSatManager_class', () => {
   });
 
   it('should not select a satellite inside the Earth', () => {
-    ServiceLocator.getCatalogManager().objectCache = [{ id: 0, position: { x: 0, y: 0, z: 0 }, type: SpaceObjectType.PAYLOAD } as DetailedSatellite];
+    ServiceLocator.getCatalogManager().objectCache = [{ id: 0, position: { x: 0, y: 0, z: 0 }, type: SpaceObjectType.PAYLOAD } as Satellite];
 
     const toastSpy = jest.spyOn(ServiceLocator.getUiManager(), 'toast');
 
@@ -151,11 +152,11 @@ describe('SelectSatManager_class', () => {
   });
 
   it('should clear selected orbit when deselecting a satellite', () => {
-    ServiceLocator.getCatalogManager().objectCache[0].position = {
+    (ServiceLocator.getCatalogManager().objectCache[0] as unknown as { position: TemeVec3 }).position = {
       x: 10000 as Kilometers,
       y: 10000 as Kilometers,
       z: 10000 as Kilometers,
-    };
+    } as TemeVec3;
     const clearSelectOrbitSpy = jest.spyOn(ServiceLocator.getOrbitManager(), 'clearSelectOrbit');
 
     selectSatManager.selectSat(0);
@@ -282,7 +283,7 @@ describe('SelectSatManager_class', () => {
   });
 
   it('should handle invalid covariance matrix for primary satellite', () => {
-    const invalidSat = new DetailedSatellite({
+    const invalidSat = new Satellite({
       ...defaultSat,
       id: 0,
       type: SpaceObjectType.PAYLOAD,

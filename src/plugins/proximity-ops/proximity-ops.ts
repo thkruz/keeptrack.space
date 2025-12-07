@@ -9,7 +9,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, CatalogSource, Degrees, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, Seconds, Sgp4, StateVectorSgp4 } from '@ootk/src/main';
+import { BaseObject, CatalogSource, Degrees, Satellite, TemeVec3, Kilometers, KilometersPerSecond, Seconds, Sgp4, StateVectorSgp4 } from '@ootk/src/main';
 import rpo from '@public/img/icons/rpo.png';
 import { vec3 } from 'gl-matrix';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
@@ -195,7 +195,7 @@ export class ProximityOps extends KeepTrackPlugin {
     EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (obj: BaseObject) => {
-        if (this.isMenuButtonActive && obj?.isSatellite() && (obj as DetailedSatellite).sccNum !== (<HTMLInputElement>getEl('proximity-ops-norad')).value) {
+        if (this.isMenuButtonActive && obj?.isSatellite() && (obj as Satellite).sccNum !== (<HTMLInputElement>getEl('proximity-ops-norad')).value) {
           this.updateNoradId_();
         }
       },
@@ -369,7 +369,7 @@ export class ProximityOps extends KeepTrackPlugin {
         return [];
       }
 
-      const primarySatId = satelliteId.toString();
+      const primarySatId = satelliteId;
       const sats = this.findSatsById_(primarySatId, type, duration);
 
       RPOs = this.findRPOs_(sats, maxDis, maxVel, duration, isAvaChecked);
@@ -387,7 +387,7 @@ export class ProximityOps extends KeepTrackPlugin {
    *
    * Finds and returns a list of Rendezvous and Proximity Operations (RPOs) between satellites based on distance, velocity, and other criteria.
    *
-   * @param sats - An array of `DetailedSatellite` objects to be checked for potential RPOs.
+   * @param sats - An array of `Satellite` objects to be checked for potential RPOs.
    * @param maxDis - The maximum allowed distance (in kilometers) between satellites for an RPO to be considered.
    * @param maxVel - The maximum allowed relative velocity (in km/s or m/s, depending on implementation) for an RPO to be considered.
    * @param duration - The time duration (in seconds) over which to search for the closest approach.
@@ -395,7 +395,7 @@ export class ProximityOps extends KeepTrackPlugin {
    * @param satPairs - (Optional) An array of satellite ID pairs to exclude from RPO consideration if `isAvaChecked` is `true`.
    * @returns An array of `RPO` objects representing the detected RPOs that meet the specified criteria.
    */
-  private findRPOs_(sats: DetailedSatellite[], maxDis: number, maxVel: number, duration: Seconds, isAvaChecked: boolean, satPairs?: number[][]) {
+  private findRPOs_(sats: Satellite[], maxDis: number, maxVel: number, duration: Seconds, isAvaChecked: boolean, satPairs?: number[][]) {
 
     const RPOs: ProximityOpsEvent[] = [];
     const nowDate = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
@@ -404,7 +404,11 @@ export class ProximityOps extends KeepTrackPlugin {
 
       sats.forEach((primarySat, i) => {
         sats.slice(i + 1).forEach((secondarySat) => {
-          if (!(satPairs.includes([primarySat.id, secondarySat.id]) || satPairs.includes([secondarySat.id, primarySat.id]))) {
+          const pairExists = satPairs.some(pair =>
+            (pair[0] === primarySat.id && pair[1] === secondarySat.id) ||
+            (pair[0] === secondarySat.id && pair[1] === primarySat.id)
+          );
+          if (!pairExists) {
 
             // if (!((secondarySat.perigee > primarySat.apogee + maxDis|| primarySat.perigee > secondarySat.apogee ))) {
             if (((secondarySat.perigee - primarySat.apogee) > maxDis || (primarySat.perigee - secondarySat.apogee) > maxDis)) {
@@ -448,18 +452,18 @@ export class ProximityOps extends KeepTrackPlugin {
    * @param primarySatID - The ID of the primary satellite to search around.
    * @param type - The type of rendezvous proximity operation (RPO), e.g., GEO or LEO.
    * @param duration - The duration (in seconds) to consider for proximity calculations.
-   * @returns An array of `DetailedSatellite` objects, with the primary satellite as the first element, followed by satellites matching the proximity criteria.
+   * @returns An array of `Satellite` objects, with the primary satellite as the first element, followed by satellites matching the proximity criteria.
    *
    * @remarks
    * - For GEO type, satellites are filtered based on longitude proximity and orbital period.
    * - For LEO type, satellites are filtered based on perigee/apogee separation, inclination, and right ascension proximity.
    * - Throws an error via `errorManagerInstance` if an unknown orbit type is provided.
    */
-  private findSatsById_(primarySatID: string, type: string, duration: Seconds): DetailedSatellite[] {
+  private findSatsById_(primarySatID: number, type: string, duration: Seconds): Satellite[] {
     const allSats = this.getFilteredSatellites();
-    const primarySat = ServiceLocator.getCatalogManager().getSat(parseInt(primarySatID))!;
+    const primarySat = ServiceLocator.getCatalogManager().getSat(primarySatID)!;
 
-    let sats: DetailedSatellite[] = [];
+    let sats: Satellite[] = [];
 
     if (type === RPOType.GEO) {
       const lla = primarySat.lla();
@@ -485,7 +489,7 @@ export class ProximityOps extends KeepTrackPlugin {
              * all possible "fly-by" RPOs depends on length of search
              */
             (180 - Math.abs(Math.abs(lla.lon - lla2.lon) - 180)) < 3 * duration / (24 * 60 ** 2) &&
-            sat.id.toString() !== primarySatID;
+            sat.id !== primarySatID;
         });
     } else if (type === RPOType.LEO) {
       const nowDate = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
@@ -499,7 +503,7 @@ export class ProximityOps extends KeepTrackPlugin {
           return sat.tle1 &&
             (180 - Math.abs(Math.abs(primarySat.inclination - sat.inclination) - 180)) < 5 &&
             (360 - Math.abs(Math.abs(raan1 - raan2) - 360)) < 5 &&
-            sat.id.toString() !== primarySatID;
+            sat.id !== primarySatID;
         });
     } else {
       errorManagerInstance.error(new Error('Unknown orbit type!'), 'ProximityOps');
@@ -524,9 +528,9 @@ export class ProximityOps extends KeepTrackPlugin {
    *
    * @param inc - The target inclination in degrees.
    * @param raan - The target right ascension of the ascending node in degrees.
-   * @returns An array of `DetailedSatellite` objects matching the specified orbital parameters.
+   * @returns An array of `Satellite` objects matching the specified orbital parameters.
    */
-  private findSatsAvALeo_(inc: Degrees, raan: Degrees): DetailedSatellite[] {
+  private findSatsAvALeo_(inc: Degrees, raan: Degrees): Satellite[] {
     const allSats = this.getFilteredSatellites();
 
     const sats = allSats
@@ -550,9 +554,9 @@ export class ProximityOps extends KeepTrackPlugin {
    * - Are located within 1 degree of the specified longitude, accounting for longitude wrapping.
    *
    * @param lon - The longitude (in degrees) to search for available geostationary satellites.
-   * @returns An array of `DetailedSatellite` objects that match the criteria.
+   * @returns An array of `Satellite` objects that match the criteria.
    */
-  private findSatsAvAGeo_(lon: Degrees): DetailedSatellite[] {
+  private findSatsAvAGeo_(lon: Degrees): Satellite[] {
     const allSats = this.getFilteredSatellites();
 
     const sats = allSats
@@ -581,7 +585,7 @@ export class ProximityOps extends KeepTrackPlugin {
    *
    * The filtering is performed efficiently in a single pass if either filter is active.
    */
-  private getFilteredSatellites(): DetailedSatellite[] {
+  private getFilteredSatellites(): Satellite[] {
     let allSats = ServiceLocator.getCatalogManager().getSats();
     const isPayloadOnlyChecked = (<HTMLInputElement>getEl('proximity-ops-payload-only')).checked;
     const isVimpelChecked = (<HTMLInputElement>getEl('proximity-ops-no-vimpel')).checked;
@@ -694,7 +698,7 @@ export class ProximityOps extends KeepTrackPlugin {
 
     const uiManagerInstance = ServiceLocator.getUiManager();
 
-    if (!settingsManager.isOrbitCruncherInEcf && (this.selectSatManagerInstance.primarySatObj as DetailedSatellite).perigee > 6000) {
+    if (!settingsManager.isOrbitCruncherInEcf && (this.selectSatManagerInstance.primarySatObj as Satellite).perigee > 6000) {
       uiManagerInstance.toast('GEO Orbits displayed in ECF', ToastMsgType.normal);
       settingsManager.isOrbitCruncherInEcf = true;
     } else if (settingsManager.isOrbitCruncherInEcf) {
@@ -718,10 +722,10 @@ export class ProximityOps extends KeepTrackPlugin {
    * - If the selected satellite is from the Vimpel catalog, displays a message indicating unsupported status.
    * - Otherwise, sets the NORAD ID field to the satellite's SCC number.
    *
-   * Assumes that the relevant DOM elements exist and that the selected satellite is of type `DetailedSatellite`.
+   * Assumes that the relevant DOM elements exist and that the selected satellite is of type `Satellite`.
    */
   private updateNoradId_() {
-    const satellite = PluginRegistry.getPlugin(SelectSatManager)!.getSelectedSat() as DetailedSatellite;
+    const satellite = PluginRegistry.getPlugin(SelectSatManager)!.getSelectedSat() as Satellite;
 
     if (!satellite?.isSatellite()) {
       return;
@@ -749,7 +753,7 @@ export class ProximityOps extends KeepTrackPlugin {
     (<HTMLInputElement>getEl('proximity-ops-norad')).value = satellite.sccNum;
   }
 
-  getRIC(pos1: EciVec3, vel1: EciVec3<KilometersPerSecond>, pos2: EciVec3, vel2: EciVec3<KilometersPerSecond>) {
+  getRIC(pos1: TemeVec3, vel1: TemeVec3<KilometersPerSecond>, pos2: TemeVec3, vel2: TemeVec3<KilometersPerSecond>) {
 
     const sat1 = { position: pos1, velocity: vel1 };
     const sat2 = { position: pos2, velocity: vel2 };
@@ -759,7 +763,7 @@ export class ProximityOps extends KeepTrackPlugin {
     return ric;
   }
 
-  findClosestApproach(sat1: DetailedSatellite, sat2: DetailedSatellite, start: Date, duration: Seconds): ProximityOpsEvent {
+  findClosestApproach(sat1: Satellite, sat2: Satellite, start: Date, duration: Seconds): ProximityOpsEvent {
 
     /**
      * This is the minimum distance between the two satellites at closest approach
@@ -776,8 +780,8 @@ export class ProximityOps extends KeepTrackPlugin {
 
     let sat1State: StateVectorSgp4;
     let sat2State: StateVectorSgp4;
-    let pos1: EciVec3;
-    let pos2: EciVec3;
+    let pos1: TemeVec3;
+    let pos2: TemeVec3;
 
     const shortestPeriod = ((sat1.period > sat2.period) ? sat2.period : sat1.period) * 60;
 
@@ -852,8 +856,8 @@ export class ProximityOps extends KeepTrackPlugin {
       m = SatMath.calculateTimeVariables(now, sat2.satrec).m;
       sat2State = Sgp4.propagate(sat2.satrec, m as number);
 
-      pos1 = <EciVec3>sat1State.position;
-      pos2 = <EciVec3>sat2State.position;
+      pos1 = <TemeVec3>sat1State.position;
+      pos2 = <TemeVec3>sat2State.position;
 
       currentDist = SatMath.distance(pos2, pos1);
 
@@ -862,8 +866,8 @@ export class ProximityOps extends KeepTrackPlugin {
         minDistAtToca = currentDist;
         toca = now;
 
-        const vel1 = sat1State.velocity as EciVec3<KilometersPerSecond>;
-        const vel2 = sat2State.velocity as EciVec3<KilometersPerSecond>;
+        const vel1 = sat1State.velocity as TemeVec3<KilometersPerSecond>;
+        const vel2 = sat2State.velocity as TemeVec3<KilometersPerSecond>;
 
         relVelNormAtToca = SatMath.velocity(vel2, vel1);
 
@@ -910,7 +914,7 @@ export class ProximityOps extends KeepTrackPlugin {
     return rpo;
   }
 
-  private getCurrentDist_(now: Date, sat1: DetailedSatellite, sat2: DetailedSatellite) {
+  private getCurrentDist_(now: Date, sat1: Satellite, sat2: Satellite) {
     const m1 = SatMath.calculateTimeVariables(now, sat1.satrec).m as number;
     const m2 = SatMath.calculateTimeVariables(now, sat2.satrec).m as number;
     const sv1 = Sgp4.propagate(sat1.satrec, m1);
@@ -937,7 +941,7 @@ export class ProximityOps extends KeepTrackPlugin {
       };
     }
 
-    const currentDist = SatMath.distance(sv2.position as EciVec3, sv1.position as EciVec3);
+    const currentDist = SatMath.distance(sv2.position as TemeVec3, sv1.position as TemeVec3);
 
     return { sat1State: sv1, sat2State: sv2, currentDist };
   }

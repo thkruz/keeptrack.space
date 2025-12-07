@@ -3,7 +3,8 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { Degrees, DetailedSensor, Kilometers, ZoomValue } from '@ootk/src/main';
+import { Degrees, Kilometers, ZoomValue } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
 import { lat2pitch, lon2yaw } from '../../engine/utils/transforms';
@@ -48,7 +49,9 @@ export class UiGeolocation {
       mainCameraInstance.changeZoom(ZoomValue.LEO);
     }
 
-    mainCameraInstance.camSnap(lat2pitch(lat), lon2yaw(lon, timeManagerInstance.simulationTimeObj));
+    if (lat !== null && lon !== null) {
+      mainCameraInstance.camSnap(lat2pitch(lat), lon2yaw(lon, timeManagerInstance.simulationTimeObj));
+    }
   }
 
   static updateSettingsManager(position: GeolocationPosition): SensorGeolocation {
@@ -71,7 +74,7 @@ export class UiGeolocation {
        * Access to the users geolocation is explicitly for allowing them to use the
        * lat lon information when creating a custom sensor.
        */
-      navigator.geolocation.getCurrentPosition(UiGeolocation.updateSensorPosition);
+      navigator.geolocation.getCurrentPosition(UiGeolocation.updateSensorPosition as PositionCallback);
     }
   }
 
@@ -109,12 +112,12 @@ export class UiGeolocation {
       (<HTMLInputElement>getEl('cs-minrange')).disabled = true;
       (<HTMLInputElement>getEl('cs-maxrange')).disabled = true;
 
-      getEl('cs-minaz-div').style.display = 'none';
-      getEl('cs-maxaz-div').style.display = 'none';
-      getEl('cs-minel-div').style.display = 'none';
-      getEl('cs-maxel-div').style.display = 'none';
-      getEl('cs-minrange-div').style.display = 'none';
-      getEl('cs-maxrange-div').style.display = 'none';
+      getEl('cs-minaz-div')!.style.display = 'none';
+      getEl('cs-maxaz-div')!.style.display = 'none';
+      getEl('cs-minel-div')!.style.display = 'none';
+      getEl('cs-maxel-div')!.style.display = 'none';
+      getEl('cs-minrange-div')!.style.display = 'none';
+      getEl('cs-maxrange-div')!.style.display = 'none';
       (<HTMLInputElement>getEl('cs-minaz')).value = '0';
       (<HTMLInputElement>getEl('cs-maxaz')).value = '360';
       (<HTMLInputElement>getEl('cs-minel')).value = '10';
@@ -122,9 +125,9 @@ export class UiGeolocation {
       (<HTMLInputElement>getEl('cs-minrange')).value = '100';
       (<HTMLInputElement>getEl('cs-maxrange')).value = '50000';
 
-      getEl('sensor-type').innerHTML = 'Telescope';
-      getEl('sensor-info-title').innerHTML = 'Custom Sensor';
-      getEl('sensor-country').innerHTML = 'Custom Sensor';
+      getEl('sensor-type')!.innerHTML = 'Telescope';
+      getEl('sensor-info-title')!.innerHTML = 'Custom Sensor';
+      getEl('sensor-country')!.innerHTML = 'Custom Sensor';
     } catch {
       // Optional UI elements - don't throw an error if they don't exist
       errorManagerInstance.debug('Error updating custom sensor UI. Is the plugin loaded?');

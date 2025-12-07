@@ -16,7 +16,7 @@ import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { DEG2RAD, EciVec3, EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, SpaceObjectType, TEME, Vector3D } from '@ootk/src/main';
+import { DEG2RAD, TemeVec3, EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, SpaceObjectType, TEME, Vector3D } from '@ootk/src/main';
 import { Body, KM_PER_AU, BackdatePosition as backdatePosition, RotationAxis as rotationAxis } from 'astronomy-engine';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { DepthManager } from '../../depth-manager';
@@ -55,7 +55,7 @@ export abstract class CelestialBody {
   mesh: Mesh;
   type: SpaceObjectType = SpaceObjectType.TERRESTRIAL_PLANET;
   planetObject: Planet | null = null;
-  relativeSatPos: EciVec3 = { x: 0 as Kilometers, y: 0 as Kilometers, z: 0 as Kilometers };
+  relativeSatPos: TemeVec3 = { x: 0 as Kilometers, y: 0 as Kilometers, z: 0 as Kilometers };
 
   orbitPathSegments_ = 8192;
   orbitalPeriod: Seconds;
@@ -277,9 +277,9 @@ export abstract class CelestialBody {
     const positionData = ServiceLocator.getDotsManager().positionData;
 
     if (positionData && this.planetObject?.id) {
-      positionData[this.planetObject.id * 3] = this.position[0];
-      positionData[this.planetObject.id * 3 + 1] = this.position[1];
-      positionData[this.planetObject.id * 3 + 2] = this.position[2];
+      positionData[Number(this.planetObject.id) * 3] = this.position[0];
+      positionData[Number(this.planetObject.id) * 3 + 1] = this.position[1];
+      positionData[Number(this.planetObject.id) * 3 + 2] = this.position[2];
     }
   }
 

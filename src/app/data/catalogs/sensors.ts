@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
-import { CommLink, Degrees, DetailedSensor, Kilometers, Milliseconds, RfSensor, SpaceObjectType, ZoomValue } from '@ootk/src/main';
+import { CommLink, Degrees, Kilometers, Milliseconds, SpaceObjectType, ZoomValue } from '@ootk/src/main';
+import { DetailedSensor, RfSensor } from '@app/app/sensors/DetailedSensor';
 
 export interface SensorList {
   [key: string]: DetailedSensor;

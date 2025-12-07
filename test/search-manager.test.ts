@@ -4,7 +4,7 @@ import { SearchManager } from '@app/app/ui/search-manager';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { DotsManager } from '@app/engine/rendering/dots-manager';
-import { DetailedSatellite } from '@ootk/src/main';
+import { Satellite } from '@ootk/src/main';
 import { defaultSat } from './environment/apiMocks';
 
 describe('SearchManager', () => {
@@ -88,10 +88,10 @@ describe('SearchManager', () => {
   it('should perform a search and populate results', () => {
     const mockCatalogManager = {
       objectCache: [
-        new DetailedSatellite({ ...defaultSat, id: 0, name: 'Satellite A' }),
-        new DetailedSatellite({ ...defaultSat, id: 1, name: 'Satellite B' }),
+        new Satellite({ ...defaultSat, id: 0, name: 'Satellite A' }),
+        new Satellite({ ...defaultSat, id: 1, name: 'Satellite B' }),
       ],
-      getObject: jest.fn().mockReturnValue(new DetailedSatellite({ ...defaultSat, id: 0, name: 'Satellite A' })),
+      getObject: jest.fn().mockReturnValue(new Satellite({ ...defaultSat, id: 0, name: 'Satellite A' })),
     } as unknown as CatalogManager;
     const mockDotsManager = {
       updateSizeBuffer: jest.fn(),

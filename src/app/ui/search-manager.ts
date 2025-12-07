@@ -7,7 +7,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { DetailedSatellite, SpaceObjectType, Star } from '@ootk/src/main';
+import { Satellite, SpaceObjectType, Star } from '@ootk/src/main';
 import searchPng from '@public/img/icons/search.png';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
@@ -81,7 +81,7 @@ export class SearchManager {
     getEl('search-results')?.addEventListener('click', (evt: Event) => {
       const satId = SearchManager.getSatIdFromSearchResults_(evt);
 
-      if (isNaN(satId) || satId === -1) {
+      if (satId === -1) {
         return;
       }
 
@@ -97,7 +97,7 @@ export class SearchManager {
     getEl('search-results')?.addEventListener('mouseover', (evt) => {
       const satId = SearchManager.getSatIdFromSearchResults_(evt);
 
-      if (isNaN(satId) || satId === -1) {
+      if (satId === -1) {
         return;
       }
 
@@ -123,21 +123,21 @@ export class SearchManager {
     });
   }
 
-  private static getSatIdFromSearchResults_(evt: Event) {
+  private static getSatIdFromSearchResults_(evt: Event): number {
     let satId = -1;
 
     if ((<HTMLElement>evt.target).classList.contains('search-result')) {
       const satIdStr = (<HTMLElement>evt.target).dataset.objId;
 
-      satId = satIdStr ? parseInt(satIdStr) : -1;
+      satId = satIdStr ? parseInt(satIdStr, 10) : -1;
     } else if ((<HTMLElement>evt.target).parentElement?.classList.contains('search-result')) {
       const satIdStr = (<HTMLElement>evt.target).parentElement?.dataset.objId;
 
-      satId = satIdStr ? parseInt(satIdStr) : -1;
+      satId = satIdStr ? parseInt(satIdStr, 10) : -1;
     } else if ((<HTMLElement>evt.target).parentElement?.parentElement?.classList.contains('search-result')) {
       const satIdStr = (<HTMLElement>evt.target).parentElement?.parentElement?.dataset.objId;
 
-      satId = satIdStr ? parseInt(satIdStr) : -1;
+      satId = satIdStr ? parseInt(satIdStr, 10) : -1;
     }
 
     return satId;
@@ -193,7 +193,7 @@ export class SearchManager {
 
   static doArraySearch(catalogManagerInstance: CatalogManager, array: number[]) {
     return array.reduce((searchStr, i) => {
-      const detailedSatellite = <DetailedSatellite>catalogManagerInstance.objectCache[i];
+      const detailedSatellite = catalogManagerInstance.objectCache[i] as Satellite;
 
       // Use the sccNum unless it is missing (Vimpel), then use name
       return detailedSatellite?.sccNum.length > 0 ? `${searchStr}${detailedSatellite.sccNum},` : `${searchStr}${detailedSatellite.name},`;
@@ -272,7 +272,7 @@ export class SearchManager {
     results = results.splice(0, settingsManager.searchLimit);
 
     // Make a group to hilight results
-    const idList = results.map((sat) => sat.id);
+    const idList = results.map((sat) => Number(sat.id));
 
     settingsManager.lastSearchResults = idList;
 
@@ -308,7 +308,7 @@ export class SearchManager {
     settingsManager.lastSearch = searchList;
 
     // Initialize search results
-    const satData = SearchManager.getSearchableObjects_(true) as (DetailedSatellite & MissileObject)[];
+    const satData = SearchManager.getSearchableObjects_(true) as (Satellite & MissileObject)[];
 
     searchList.forEach((searchStringIn) => {
       satData.every((sat) => {
@@ -437,7 +437,7 @@ export class SearchManager {
     settingsManager.lastSearch = searchList;
 
     // Initialize search results
-    const satData = (SearchManager.getSearchableObjects_(false) as DetailedSatellite[]).sort((a, b) => parseInt(a.sccNum6) - parseInt(b.sccNum6));
+    const satData = (SearchManager.getSearchableObjects_(false) as Satellite[]).sort((a, b) => parseInt(a.sccNum6) - parseInt(b.sccNum6));
 
     let i = 0;
     let lastFoundI = 0;
@@ -487,7 +487,7 @@ export class SearchManager {
     return results;
   }
 
-  private static getSearchableObjects_(isIncludeMissiles = true): (DetailedSatellite | MissileObject)[] | DetailedSatellite[] {
+  private static getSearchableObjects_(isIncludeMissiles = true): (Satellite | MissileObject)[] | Satellite[] {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const searchableObjects = (
       catalogManagerInstance.objectCache.filter((obj) => {
@@ -502,7 +502,7 @@ export class SearchManager {
         if (!(obj as MissileObject).active) {
           return false;
         } // Skip inactive missiles.
-        if ((obj as DetailedSatellite).country === 'ANALSAT' && !obj.active) {
+        if ((obj as Satellite).country === 'ANALSAT' && !obj.active) {
           return false;
         } // Skip Fake Analyst satellites
         if (!obj.name) {
@@ -510,18 +510,18 @@ export class SearchManager {
         } // Everything has a name. If it doesn't then assume it isn't what we are searching for.
 
         return true;
-      }) as (DetailedSatellite & MissileObject)[]
+      }) as (Satellite & MissileObject)[]
     ).sort((a, b) => {
       // Sort by sccNum
-      if ((a as DetailedSatellite).sccNum && (b as DetailedSatellite).sccNum) {
-        return parseInt((a as DetailedSatellite).sccNum) - parseInt((b as DetailedSatellite).sccNum);
+      if ((a as Satellite).sccNum && (b as Satellite).sccNum) {
+        return parseInt((a as Satellite).sccNum) - parseInt((b as Satellite).sccNum);
       }
 
       return 0;
 
     });
 
-    return isIncludeMissiles ? (searchableObjects as (DetailedSatellite | MissileObject)[]) : (searchableObjects as DetailedSatellite[]);
+    return isIncludeMissiles ? (searchableObjects as (Satellite | MissileObject)[]) : (searchableObjects as Satellite[]);
   }
 
   fillResultBox(results: SearchResult[], catalogManagerInstance: CatalogManager) {
@@ -531,7 +531,7 @@ export class SearchManager {
 
     const resultsBox = getEl('search-results', true);
     const htmlStr = results.reduce((html, result) => {
-      const obj = <DetailedSatellite | OemSatellite | MissileObject>satData[result.id];
+      const obj = <Satellite | OemSatellite | MissileObject>satData[result.id];
 
       html += `<div class="search-result" data-obj-id="${obj.id}">`;
       html += '<div class="truncate-search">';
@@ -547,7 +547,7 @@ export class SearchManager {
         html += '</span>';
         html += obj.name.substring(result.strIndex + result.patlen);
       } else if (obj.isSatellite() && result.searchType === SearchResultType.ALT_NAME) {
-        const sat = obj as DetailedSatellite;
+        const sat = obj as Satellite;
 
         // If the alternate name matched - highlight it
         html += sat.altName.substring(0, result.strIndex);
@@ -566,7 +566,7 @@ export class SearchManager {
       switch (result.searchType) {
         case SearchResultType.NORAD_ID:
           {
-            const sat = obj as DetailedSatellite;
+            const sat = obj as Satellite;
 
             // If the object number matched
             result.strIndex = result.strIndex || 0;
@@ -581,7 +581,7 @@ export class SearchManager {
           break;
         case SearchResultType.INTLDES:
           {
-            const sat = obj as DetailedSatellite;
+            const sat = obj as Satellite;
             // If the international designator matched
 
             result.strIndex = result.strIndex || 0;
@@ -596,7 +596,7 @@ export class SearchManager {
           break;
         case SearchResultType.BUS:
           {
-            const sat = obj as DetailedSatellite;
+            const sat = obj as Satellite;
             // If the object number matched
 
             result.strIndex = result.strIndex || 0;
@@ -611,7 +611,7 @@ export class SearchManager {
           break;
         case SearchResultType.LAUNCH_VEHICLE:
           {
-            const sat = obj as DetailedSatellite;
+            const sat = obj as Satellite;
 
             result.strIndex = result.strIndex || 0;
             result.patlen = result.patlen || 5;
@@ -641,7 +641,7 @@ export class SearchManager {
           } else if (obj instanceof OemSatellite) {
             html += (obj as OemSatellite).OemDataBlocks[0]?.metadata.OBJECT_ID;
           } else {
-            html += (obj as DetailedSatellite).sccNum;
+            html += (obj as Satellite).sccNum;
           }
           break;
       }

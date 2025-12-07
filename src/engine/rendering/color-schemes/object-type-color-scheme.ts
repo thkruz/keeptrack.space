@@ -8,7 +8,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { hideEl } from '@app/engine/utils/get-el';
-import { BaseObject, DetailedSatellite, SpaceObjectType, Star } from '@ootk/src/main';
+import { BaseObject, Satellite, SpaceObjectType, Star } from '@ootk/src/main';
 import { CameraType } from '../../camera/camera';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
@@ -189,7 +189,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const sensorManagerInstance = ServiceLocator.getSensorManager();
     const dotsManagerInstance = ServiceLocator.getDotsManager();
-    const sat = obj as DetailedSatellite;
+    const sat = obj as Satellite;
 
     if (
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&

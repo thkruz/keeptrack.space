@@ -8,18 +8,16 @@ import { CruncerMessageTypes, CruncherSat } from '@app/webworker/positionCrunche
 import {
   BaseObject,
   CatalogSource,
-  DetailedSatellite,
-  DetailedSensor,
   LandObject,
   Marker,
   PayloadStatus,
-  Sensor,
+  Satellite,
   SpaceObjectType,
   Star,
   Tle,
   TleLine1,
-  TleLine2,
-} from '@ootk/src/main';
+  TleLine2} from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { SettingsManager } from '../../settings/settings';
 import { Planet } from '../objects/planet';
 import { CatalogManager } from './catalog-manager';
@@ -135,7 +133,7 @@ export interface KeepTrackTLEFile {
 
 export class CatalogLoader {
   static filterTLEDatabase(resp: KeepTrackTLEFile[], extraSats: ExtraSat[] | null, asciiCatalog: AsciiTleSat[] | null, jsCatalog: JsSat[] | null): void {
-    let tempObjData: DetailedSatellite[] = [];
+    let tempObjData: Satellite[] = [];
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     catalogManagerInstance.sccIndex = <{ [key: string]: number }>{};
@@ -382,7 +380,7 @@ export class CatalogLoader {
     catalogManagerInstance.numSatellites = tempObjData.length;
 
     for (let i = 0; i < settingsManager.maxOemSatellites; i++) {
-      tempObjData.push(new BaseObject({
+      tempObjData.push(new Planet({
         id: tempObjData.length,
         name: `OEM Satellite ${i + 1}`,
       }));
@@ -660,8 +658,8 @@ export class CatalogLoader {
         // Order matters here
         if (obj.isSatellite()) {
           data = {
-            tle1: (obj as DetailedSatellite).tle1,
-            tle2: (obj as DetailedSatellite).tle2,
+            tle1: (obj as Satellite).tle1,
+            tle2: (obj as Satellite).tle2,
             active: obj.active,
           };
         } else if (obj.isMissile()) {
@@ -677,11 +675,11 @@ export class CatalogLoader {
           data = {
             isMarker: true,
           };
-        } else if ((obj as Sensor | LandObject).isStatic()) {
+        } else if ((obj as DetailedSensor | LandObject).isStatic()) {
           data = {
-            lat: (obj as Sensor | LandObject).lat,
-            lon: (obj as Sensor | LandObject).lon,
-            alt: (obj as Sensor | LandObject).alt,
+            lat: (obj as DetailedSensor | LandObject).lat,
+            lon: (obj as DetailedSensor | LandObject).lon,
+            alt: (obj as DetailedSensor | LandObject).alt,
           };
         } else {
           throw new Error('Unknown object type');
@@ -692,7 +690,7 @@ export class CatalogLoader {
     );
   }
 
-  private static makeDebris(notionalDebris: DetailedSatellite, meanAnom: number, notionalSatNum: number, tempSatData: BaseObject[]) {
+  private static makeDebris(notionalDebris: Satellite, meanAnom: number, notionalSatNum: number, tempSatData: BaseObject[]) {
     const debris = { ...notionalDebris };
 
     debris.id = tempSatData.length;
@@ -727,7 +725,7 @@ export class CatalogLoader {
       StringPad.pad0(meanAnom.toFixed(4), 8) + // New Mean Anomaly
       debris.tle2.substr(51) as TleLine2; // Columns 51-69
 
-    const debrisObj = new DetailedSatellite(debris);
+    const debrisObj = new Satellite(debris);
 
     tempSatData.push(debrisObj);
   }
@@ -810,7 +808,7 @@ export class CatalogLoader {
       let isAddedToCatalog = false;
 
       try {
-        const satellite = new DetailedSatellite({
+        const satellite = new Satellite({
           ...resp[i],
           id: tempObjData.length,
           tle1: resp[i].tle1,
@@ -831,7 +829,7 @@ export class CatalogLoader {
     }
 
     if (settingsManager.isNotionalDebris && resp[i].type === SpaceObjectType.DEBRIS) {
-      const notionalDebris = new DetailedSatellite({
+      const notionalDebris = new Satellite({
         id: 0,
         name: `${resp[i].name} (1cm Notional)`,
         tle1: resp[i].tle1,
@@ -874,7 +872,7 @@ export class CatalogLoader {
     }
   }
 
-  private static processAsciiCatalogKnown_(catalogManagerInstance: CatalogManager, element: AsciiTleSat, tempSatData: DetailedSatellite[]) {
+  private static processAsciiCatalogKnown_(catalogManagerInstance: CatalogManager, element: AsciiTleSat, tempSatData: Satellite[]) {
     const i = catalogManagerInstance.sccIndex[`${element.SCC}`];
 
     tempSatData[i].tle1 = element.TLE1;
@@ -887,7 +885,7 @@ export class CatalogLoader {
     tempSatData[i].altId = 'EXTERNAL_SAT'; // TODO: This is a hack to make sure the satellite is not removed by the filter
 
     try {
-      const satellite = new DetailedSatellite(tempSatData[i]);
+      const satellite = new Satellite(tempSatData[i]);
 
       tempSatData[i] = satellite;
     } catch {
@@ -930,7 +928,7 @@ export class CatalogLoader {
     catalogManagerInstance.cosparIndex[`${intlDes}`] = tempSatData.length;
 
     try {
-      const satellite = new DetailedSatellite({
+      const satellite = new Satellite({
         ...asciiSatInfo,
         tle1: asciiSatInfo.tle1,
         tle2: asciiSatInfo.tle2,
@@ -945,7 +943,7 @@ export class CatalogLoader {
     }
   }
 
-  private static processAsciiCatalog_(asciiCatalog: AsciiTleSat[], catalogManagerInstance: CatalogManager, tempSatData: DetailedSatellite[]) {
+  private static processAsciiCatalog_(asciiCatalog: AsciiTleSat[], catalogManagerInstance: CatalogManager, tempSatData: Satellite[]) {
     if (settingsManager.dataSources.externalTLEs) {
       if (settingsManager.dataSources.externalTLEs !== 'https://storage.keeptrack.space/data/celestrak.txt') {
         errorManagerInstance.log(`Processing ${settingsManager.dataSources.externalTLEs}`);
@@ -993,7 +991,7 @@ export class CatalogLoader {
     return tempSatData;
   }
 
-  private static processExtraSats_(extraSats: ExtraSat[], catalogManagerInstance: CatalogManager, tempSatData: DetailedSatellite[]) {
+  private static processExtraSats_(extraSats: ExtraSat[], catalogManagerInstance: CatalogManager, tempSatData: Satellite[]) {
     // If extra catalogue
     for (const element of extraSats) {
       if (!element.SCC || !element.TLE1 || !element.TLE2) {
@@ -1032,7 +1030,7 @@ export class CatalogLoader {
         catalogManagerInstance.sccIndex[`${element.SCC.toString()}`] = tempSatData.length;
         catalogManagerInstance.cosparIndex[`${intlDes}`] = tempSatData.length;
 
-        const satellite = new DetailedSatellite({
+        const satellite = new Satellite({
           ...extrasSatInfo,
           tle1: extrasSatInfo.tle1,
           tle2: extrasSatInfo.tle2,
@@ -1086,7 +1084,7 @@ export class CatalogLoader {
             id: tempObjData.length,
           };
 
-          const satellite = new DetailedSatellite({
+          const satellite = new Satellite({
             tle1: jsSatInfo.TLE1 as TleLine1,
             tle2: jsSatInfo.TLE2 as TleLine2,
             ...jsSatInfo,

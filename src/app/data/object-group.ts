@@ -1,4 +1,4 @@
-import { BaseObject, DetailedSatellite } from '@ootk/src/main';
+import { BaseObject, Satellite } from '@ootk/src/main';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { CatalogSearch } from './catalog-search';
 import { getCountryMapList } from './catalogs/countries';
@@ -54,20 +54,20 @@ export class ObjectGroup<T extends GroupType> {
       case GroupType.YEAR:
         this.ids = CatalogSearch.year(ServiceLocator.getCatalogManager().getSats(), data as GroupData[GroupType.YEAR])
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .filter((sat: DetailedSatellite) => typeof sat.id !== 'undefined' && !sat.isStatic())
-          .map((sat: DetailedSatellite) => sat.id);
+          .filter((sat: Satellite) => typeof sat.id !== 'undefined' && !sat.isStatic())
+          .map((sat: Satellite) => sat.id);
         break;
       case GroupType.YEAR_OR_LESS:
         this.ids = CatalogSearch.yearOrLess(ServiceLocator.getCatalogManager().getSats(), data as GroupData[GroupType.YEAR_OR_LESS])
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .filter((sat: DetailedSatellite) => typeof sat.id !== 'undefined' && !sat.isStatic())
-          .map((sat: DetailedSatellite) => sat.id);
+          .filter((sat: Satellite) => typeof sat.id !== 'undefined' && !sat.isStatic())
+          .map((sat: Satellite) => sat.id);
         break;
       case GroupType.INTLDES:
         this.ids = (data as GroupData[GroupType.INTLDES])
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .map((intlDes: string) => ServiceLocator.getCatalogManager().intlDes2id(intlDes))
-          .filter((id: number | null) => id !== null);
+          .filter((id: number | null): id is number => id !== null);
         break;
       case GroupType.NAME_REGEX:
         this.ids = CatalogSearch.objectName(objData, data as GroupData[GroupType.NAME_REGEX])
@@ -77,8 +77,8 @@ export class ObjectGroup<T extends GroupType> {
       case GroupType.PAYLOAD_NAME_REGEX:
         this.ids = CatalogSearch.objectName(objData, data as GroupData[GroupType.PAYLOAD_NAME_REGEX])
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .map((obj: BaseObject) => obj.id)
-          .filter((id: number) => objData[id].isPayload());
+          .filter((obj: BaseObject) => obj.isPayload())
+          .map((obj: BaseObject) => obj.id);
         break;
       case GroupType.COUNTRY:
         this.createGroupByCountry_(data as GroupData[GroupType.COUNTRY], ServiceLocator.getCatalogManager().getSats());
@@ -91,18 +91,18 @@ export class ObjectGroup<T extends GroupType> {
       case GroupType.SHAPE_STRING:
         this.ids = CatalogSearch.shape(ServiceLocator.getCatalogManager().getSats(), data as GroupData[GroupType.SHAPE_STRING])
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .map((sat: DetailedSatellite) => sat.id);
+          .map((sat: Satellite) => sat.id);
         break;
       case GroupType.BUS_STRING:
         this.ids = CatalogSearch.bus(ServiceLocator.getCatalogManager().getSats(), data as GroupData[GroupType.BUS_STRING])
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .map((sat: DetailedSatellite) => sat.id);
+          .map((sat: Satellite) => sat.id);
         break;
       case GroupType.SCC_NUM:
         this.ids = (data as GroupData[GroupType.SCC_NUM])
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sccNum: number) => ServiceLocator.getCatalogManager().sccNum2Id(sccNum))
-          .filter((id: number | null) => id !== null);
+          .filter((id: number | null): id is number => id !== null);
         break;
       case GroupType.ID_LIST:
         this.ids = (data as GroupData[GroupType.ID_LIST]).slice(0, settingsManager.maxOribtsDisplayed).map((id: number) => id);
@@ -131,17 +131,17 @@ export class ObjectGroup<T extends GroupType> {
     return this;
   };
 
-  private createGroupByCountry_(data: GroupData[GroupType.COUNTRY], satData: DetailedSatellite[]) {
+  private createGroupByCountry_(data: GroupData[GroupType.COUNTRY], satData: Satellite[]) {
     // Map country name to country code
     const expandedData = data.split('|').map((countryName: string) => getCountryMapList()[countryName]);
     // Concat data with expandedData using | as a delimiter
 
     data = `${data}|${expandedData.join('|')}`;
     this.ids = satData
-      .filter((sat: DetailedSatellite) => data.split('|').includes(sat.country) && !sat.sccNum5.startsWith('T'))
+      .filter((sat: Satellite) => data.split('|').includes(sat.country) && !sat.sccNum5.startsWith('T'))
       // .slice(0, settingsManager.maxOribtsDisplayed)
       // eslint-disable-next-line arrow-body-style
-      .map((sat: DetailedSatellite) => {
+      .map((sat: Satellite) => {
         return sat.id;
       });
   }

@@ -5,6 +5,7 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { SensorMath } from '@app/app/sensors/sensor-math';
+import { SolarBody } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -13,8 +14,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, DetailedSatellite, eci2lla, Kilometers, MINUTES_PER_DAY } from '@ootk/src/main';
-import { Body } from 'astronomy-engine';
+import { BaseObject, Satellite, eci2lla, Kilometers, MINUTES_PER_DAY } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -107,7 +107,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       return;
     }
 
-    if (obj instanceof DetailedSatellite) {
+    if (obj instanceof Satellite) {
       setInnerHtml(EL.APOGEE, `${obj.apogee.toFixed(0)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
       setInnerHtml(EL.PERIGEE, `${obj.perigee.toFixed(0)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
       setInnerHtml(EL.INCLINATION, `${obj.inclination.toFixed(2)}°`);
@@ -170,10 +170,10 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
     if (satAltitudeElement && satVelocityElement) {
 
-      if (obj instanceof DetailedSatellite || obj instanceof OemSatellite) {
+      if (obj instanceof Satellite || obj instanceof OemSatellite) {
         const gmst = ServiceLocator.getTimeManager().gmst;
 
-        if (((obj as OemSatellite).centerBody ?? Body.Earth) !== Body.Earth) {
+        if (((obj as OemSatellite).centerBody ?? SolarBody.Earth) !== SolarBody.Earth) {
           const centerBody = ServiceLocator.getScene().getBodyById((obj as OemSatellite).centerBody) as CelestialBody | null;
 
           if (!centerBody) {
@@ -239,7 +239,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     const secondarySatObj = PluginRegistry.getPlugin(SelectSatManager)!.secondarySatObj;
 
     if (secondarySatObj && obj.isSatellite()) {
-      const sat = obj as DetailedSatellite;
+      const sat = obj as Satellite;
       const ric = CoordinateTransforms.sat2ric(secondarySatObj, sat);
       const dist = SensorMath.distanceString(sat, secondarySatObj).split(' ')[2];
 

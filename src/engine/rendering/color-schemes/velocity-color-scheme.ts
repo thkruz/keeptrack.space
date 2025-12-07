@@ -69,19 +69,21 @@ export class VelocityColorScheme extends ColorScheme {
       };
 
     }
-    if (obj.totalVelocity > 5.5 && this.objectTypeFlags.velocityFast === false) {
+    const totalVelocity = (obj as unknown as { totalVelocity: number }).totalVelocity;
+
+    if (totalVelocity > 5.5 && this.objectTypeFlags.velocityFast === false) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
-    if (obj.totalVelocity >= 2.5 && obj.totalVelocity <= 5.5 && this.objectTypeFlags.velocityMed === false) {
+    if (totalVelocity >= 2.5 && totalVelocity <= 5.5 && this.objectTypeFlags.velocityMed === false) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
-    if (obj.totalVelocity < 2.5 && this.objectTypeFlags.velocitySlow === false) {
+    if (totalVelocity < 2.5 && this.objectTypeFlags.velocitySlow === false) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -89,7 +91,7 @@ export class VelocityColorScheme extends ColorScheme {
     }
 
     return {
-      color: [1.0 - Math.min(obj.totalVelocity / 15, 1.0), Math.min(obj.totalVelocity / 15, 1.0), 0.0, 1.0],
+      color: [1.0 - Math.min(totalVelocity / 15, 1.0), Math.min(totalVelocity / 15, 1.0), 0.0, 1.0],
       pickable: Pickable.Yes,
     };
   }

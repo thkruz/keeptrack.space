@@ -1,7 +1,7 @@
 import { EChartsData, GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
-import { DetailedSatellite, SpaceObjectType } from '@ootk/src/main';
+import { Satellite, SpaceObjectType } from '@ootk/src/main';
 import waterfall2Png from '@public/img/icons/waterfall2.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
@@ -58,7 +58,7 @@ export class Inc2AltPlots extends KeepTrackPlugin {
       // Setup Configuration
       this.chart = echarts.init(chartDom);
       this.chart.on('click', (event) => {
-        if ((event.data as unknown as { id: number })?.id > -1) {
+        if ((event.data as unknown as { id: string })?.id) {
           this.selectSatManager_.selectSat((event.data as unknown as { id: number })?.id);
         }
       });
@@ -209,7 +209,7 @@ export class Inc2AltPlots extends KeepTrackPlugin {
         return;
       }
 
-      let sat = obj as DetailedSatellite;
+      let sat = obj as Satellite;
 
       if (sat.period > 250) {
         return;

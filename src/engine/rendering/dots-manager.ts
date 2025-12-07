@@ -5,7 +5,7 @@ import { GlUtils } from './gl-utils';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, Seconds, SpaceObjectType } from '@ootk/src/main';
+import { BaseObject, Satellite, TemeVec3, Kilometers, KilometersPerSecond, Seconds, SpaceObjectType } from '@ootk/src/main';
 import { mat4 } from 'gl-matrix';
 import { SettingsManager } from '../../settings/settings';
 import { CameraType } from '../camera/camera';
@@ -572,14 +572,19 @@ export class DotsManager {
      * TODO: Remove this once we figure out why this is happening
      */
 
-    object.velocity = { x: 0, y: 0, z: 0 } as EciVec3<KilometersPerSecond>;
-    object.totalVelocity = 0;
+    // Type assertion: only SpaceObject and its subclasses have velocity and position
+    const spaceObject = object as unknown as { velocity: TemeVec3<KilometersPerSecond>; position: TemeVec3 };
 
-    const isChanged = object.velocity.x !== this.velocityData[i * 3] || object.velocity.y !== this.velocityData[i * 3 + 1] || object.velocity.z !== this.velocityData[i * 3 + 2];
+    spaceObject.velocity = { x: 0, y: 0, z: 0 } as TemeVec3<KilometersPerSecond>;
 
-    object.velocity.x = (this.velocityData[i * 3] as KilometersPerSecond) || (0 as KilometersPerSecond);
-    object.velocity.y = (this.velocityData[i * 3 + 1] as KilometersPerSecond) || (0 as KilometersPerSecond);
-    object.velocity.z = (this.velocityData[i * 3 + 2] as KilometersPerSecond) || (0 as KilometersPerSecond);
+    const isChanged = spaceObject.velocity.x !== this.velocityData[i * 3] || spaceObject.velocity.y !== this.velocityData[i * 3 + 1] || spaceObject.velocity.z !== this.velocityData[i * 3 + 2];
+
+    spaceObject.velocity.x = (this.velocityData[i * 3] as KilometersPerSecond) || (0 as KilometersPerSecond);
+    spaceObject.velocity.y = (this.velocityData[i * 3 + 1] as KilometersPerSecond) || (0 as KilometersPerSecond);
+    spaceObject.velocity.z = (this.velocityData[i * 3 + 2] as KilometersPerSecond) || (0 as KilometersPerSecond);
+
+    // Missiles have their own mutable totalVelocity that needs smoothing
+    // Other SpaceObjects use a computed getter that auto-calculates from velocity
     if (object.type === SpaceObjectType.BALLISTIC_MISSILE) {
       const missile = object as MissileObject;
       const newVel = Math.sqrt(missile.velocity.x ** 2 + missile.velocity.y ** 2 + missile.velocity.z ** 2);
@@ -589,11 +594,9 @@ export class DotsManager {
       } else if (isChanged) {
         missile.totalVelocity = missile.totalVelocity * 0.9 + newVel * 0.1;
       }
-    } else {
-      object.totalVelocity = Math.sqrt(object.velocity.x ** 2 + object.velocity.y ** 2 + object.velocity.z ** 2);
     }
 
-    object.position = {
+    spaceObject.position = {
       x: <Kilometers>this.positionData[i * 3],
       y: <Kilometers>this.positionData[i * 3 + 1],
       z: <Kilometers>this.positionData[i * 3 + 2],
@@ -616,23 +619,23 @@ export class DotsManager {
     // TODO: Decouple OEM logic from TLE logic
 
     if (!settingsManager.lowPerf && (renderer.dtAdjusted > settingsManager.minimumDrawDt || Math.abs(this.lastUpdateSimTime - simTime) > 1000)) {
-      if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
-        const obj = ServiceLocator.getCatalogManager().objectCache[PluginRegistry.getPlugin(SelectSatManager)!.selectedSat] as DetailedSatellite | MissileObject;
+      if (Number(PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
+        const obj = ServiceLocator.getCatalogManager().objectCache[PluginRegistry.getPlugin(SelectSatManager)!.selectedSat] as Satellite | MissileObject;
 
-        if (obj instanceof DetailedSatellite) {
-          const sat = obj as DetailedSatellite;
+        if (obj instanceof Satellite) {
+          const sat = obj as Satellite;
           const now = ServiceLocator.getTimeManager().simulationTimeObj;
           const pv = sat.eci(now);
 
           if (!pv) {
             return;
           }
-          this.positionData[sat.id * 3] = pv.position.x;
-          this.positionData[sat.id * 3 + 1] = pv.position.y;
-          this.positionData[sat.id * 3 + 2] = pv.position.z;
-          this.velocityData[sat.id * 3] = pv.velocity.x;
-          this.velocityData[sat.id * 3 + 1] = pv.velocity.y;
-          this.velocityData[sat.id * 3 + 2] = pv.velocity.z;
+          this.positionData[Number(sat.id) * 3] = pv.position.x;
+          this.positionData[Number(sat.id) * 3 + 1] = pv.position.y;
+          this.positionData[Number(sat.id) * 3 + 2] = pv.position.z;
+          this.velocityData[Number(sat.id) * 3] = pv.velocity.x;
+          this.velocityData[Number(sat.id) * 3 + 1] = pv.velocity.y;
+          this.velocityData[Number(sat.id) * 3 + 2] = pv.velocity.z;
         } else if (obj instanceof OemSatellite) {
           const sat = obj as OemSatellite;
           const now = ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000 as Seconds;
@@ -642,12 +645,12 @@ export class DotsManager {
           if (!pv) {
             return;
           }
-          this.positionData[sat.id * 3] = pv[0];
-          this.positionData[sat.id * 3 + 1] = pv[1];
-          this.positionData[sat.id * 3 + 2] = pv[2];
-          this.velocityData[sat.id * 3] = pv[3];
-          this.velocityData[sat.id * 3 + 1] = pv[4];
-          this.velocityData[sat.id * 3 + 2] = pv[5];
+          this.positionData[Number(sat.id) * 3] = pv[0];
+          this.positionData[Number(sat.id) * 3 + 1] = pv[1];
+          this.positionData[Number(sat.id) * 3 + 2] = pv[2];
+          this.velocityData[Number(sat.id) * 3] = pv[3];
+          this.velocityData[Number(sat.id) * 3 + 1] = pv[4];
+          this.velocityData[Number(sat.id) * 3 + 2] = pv[5];
         }
       }
 
@@ -712,8 +715,8 @@ export class DotsManager {
 
     const selectedSat = PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1;
 
-    if (selectedSat > -1) {
-      this.sizeData[selectedSat] = 1.0;
+    if (Number(selectedSat) > -1) {
+      this.sizeData[Number(selectedSat)] = 1.0;
     }
 
     /*
@@ -897,12 +900,12 @@ export class DotsManager {
         continue;
       }
 
-      this.positionData[oemSat.id * 3] = pv[0];
-      this.positionData[oemSat.id * 3 + 1] = pv[1];
-      this.positionData[oemSat.id * 3 + 2] = pv[2];
-      this.velocityData[oemSat.id * 3] = pv[3];
-      this.velocityData[oemSat.id * 3 + 1] = pv[4];
-      this.velocityData[oemSat.id * 3 + 2] = pv[5];
+      this.positionData[Number(oemSat.id) * 3] = pv[0];
+      this.positionData[Number(oemSat.id) * 3 + 1] = pv[1];
+      this.positionData[Number(oemSat.id) * 3 + 2] = pv[2];
+      this.velocityData[Number(oemSat.id) * 3] = pv[3];
+      this.velocityData[Number(oemSat.id) * 3 + 1] = pv[4];
+      this.velocityData[Number(oemSat.id) * 3 + 2] = pv[5];
     }
   }
 }

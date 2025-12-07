@@ -2,7 +2,7 @@
 import { DensityBin } from '@app/app/data/catalog-manager';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { html } from '@app/engine/utils/development/formatter';
-import { BaseObject, DetailedSatellite, Star } from '@ootk/src/main';
+import { BaseObject, Satellite, Star } from '@ootk/src/main';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 
@@ -95,7 +95,7 @@ export class SpatialDensityColorScheme extends ColorScheme {
       };
     }
 
-    const sat = obj as DetailedSatellite;
+    const sat = obj as Satellite;
     const altitude = (sat.apogee + sat.perigee) / 2;
     /*
      * orbit density bins are 25km apart starting at 75 and end at 1050. Find the bin

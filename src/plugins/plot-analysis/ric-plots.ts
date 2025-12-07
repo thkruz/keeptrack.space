@@ -6,7 +6,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, DetailedSatellite } from '@ootk/src/main';
+import { BaseObject, Satellite } from '@ootk/src/main';
 import scatterPlot3Png from '@public/img/icons/scatter-plot3.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
@@ -255,7 +255,7 @@ export class RicPlot extends KeepTrackPlugin {
       return [];
     }
 
-    const satP = ServiceLocator.getCatalogManager().getObject(this.selectSatManager_.selectedSat) as DetailedSatellite;
+    const satP = ServiceLocator.getCatalogManager().getObject(this.selectSatManager_.selectedSat) as Satellite;
     const satS = this.selectSatManager_.secondarySatObj;
 
     if (!satP || !satS) {

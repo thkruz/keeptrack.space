@@ -88,7 +88,7 @@ describe('UrlManager_class', () => {
 
     selectedSatelliteManager.selectSat = jest.fn();
     catalogManagerInstance.intlDes2id = () => 10;
-    catalogManagerInstance.getObject = () => ({ id: 10, sccNum: '25544', active: true }) as unknown as BaseObject;
+    catalogManagerInstance.getObject = () => ({ id: '10', sccNum: '25544', active: true }) as unknown as BaseObject;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 

@@ -32,7 +32,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
-import { BaseObject, DetailedSatellite, EciVec3, Kilometers, RIC } from '@ootk/src/main';
+import { BaseObject, Satellite, TemeVec3, Kilometers, RIC } from '@ootk/src/main';
 import SatelliteSelectionPng from '@public/img/icons/satellite-selection.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -42,8 +42,8 @@ export interface TocaPocaEvent {
   time: Date;
   offset: number;
   distance: Kilometers;
-  sat1Position: EciVec3;
-  sat2Position: EciVec3;
+  sat1Position: TemeVec3;
+  sat2Position: TemeVec3;
   relativeVelocity: number;
 }
 
@@ -51,8 +51,8 @@ export class TocaPocaPlugin extends KeepTrackPlugin {
   readonly id = 'TocaPocaPlugin';
   dependencies_ = [SelectSatManager.name];
 
-  private targetSatellite_: DetailedSatellite | null = null;
-  private primarySatellite_: DetailedSatellite | null = null;
+  private targetSatellite_: Satellite | null = null;
+  private primarySatellite_: Satellite | null = null;
   private tocaPocaList_: TocaPocaEvent[] = [];
   private selectSatIdOnCruncher_: number | null = null;
 
@@ -104,8 +104,8 @@ export class TocaPocaPlugin extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
 
-    EventBus.getInstance().on(EventBusEvent.selectSatData, (sat: DetailedSatellite | BaseObject | OemSatellite) => {
-      if (sat instanceof DetailedSatellite) {
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (sat: Satellite | BaseObject | OemSatellite) => {
+      if (sat instanceof Satellite) {
         this.primarySatellite_ = sat;
         if (this.isMenuButtonActive) {
           this.updateSatelliteInfo_();
@@ -152,7 +152,7 @@ export class TocaPocaPlugin extends KeepTrackPlugin {
         return;
       }
 
-      this.targetSatellite_ = selectedSat as DetailedSatellite;
+      this.targetSatellite_ = selectedSat as Satellite;
       this.updateSatelliteInfo_();
 
       if (this.primarySatellite_ && this.targetSatellite_) {

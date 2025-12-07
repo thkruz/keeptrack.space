@@ -10,6 +10,10 @@ export class Planet extends BaseObject {
     const dotsManagerInstance = ServiceLocator.getDotsManager();
 
     gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.buffers.size);
-    gl.bufferSubData(gl.ARRAY_BUFFER, this.id, new Int8Array([size]));
+    gl.bufferSubData(gl.ARRAY_BUFFER, Number(this.id), new Int8Array([size]));
+  }
+
+  protected serializeSpecific(): Record<string, unknown> {
+    return {};
   }
 }

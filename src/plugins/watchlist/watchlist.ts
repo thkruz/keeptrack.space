@@ -22,6 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { SoundNames } from '@app/engine/audio/sounds';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -34,7 +35,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
-import { BaseObject, CatalogSource, DetailedSatellite } from '@ootk/src/main';
+import { BaseObject, CatalogSource, Satellite } from '@ootk/src/main';
 import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import bookmarksPng from '@public/img/icons/bookmarks.png';
@@ -43,7 +44,6 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { EL as SAT_INFO_EL } from '../sat-info-box/sat-info-box-html';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SoundNames } from '@app/engine/audio/sounds';
 import { TopMenu } from '../top-menu/top-menu';
 
 interface UpdateWatchlistParams {
@@ -244,18 +244,17 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     let newWatchlist: { id: number, inView: boolean }[];
     // We save it as an array of sccNums
     const savedSatList: string[] = this.unserialize(watchlistString);
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     if (savedSatList.length > 0) {
       // We need to convert it to an array of objects
-      newWatchlist = savedSatList.map((sccNum: string) => ({ id: parseInt(sccNum), inView: false }));
+      newWatchlist = savedSatList.map((sccNum: string) => ({ id: catalogManagerInstance.sccNum2Id(parseInt(sccNum)) ?? -1, inView: false }));
     } else {
       newWatchlist = [];
     }
 
-    const catalogManagerInstance = ServiceLocator.getCatalogManager();
-
     for (const obj of newWatchlist) {
-      const sat = catalogManagerInstance.getObject(catalogManagerInstance.sccNum2Id(obj.id), GetSatType.EXTRA_ONLY);
+      const sat = catalogManagerInstance.getObject(obj.id, GetSatType.EXTRA_ONLY);
 
       if (sat !== null) {
         obj.id = sat.id;
@@ -324,7 +323,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
         const satName = (<HTMLElement>evt.target).dataset.satName;
 
         if (satName) {
-          this.selectSat(parseInt(satName));
+          this.selectSat(parseInt(satName, 10));
         } else {
           errorManagerInstance.debug('sat-name is null');
         }
@@ -332,7 +331,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
         const satId = (<HTMLElement>evt.target).dataset.satId;
 
         if (satId) {
-          this.removeSat(parseInt(satId));
+          this.removeSat(parseInt(satId, 10));
         } else {
           errorManagerInstance.debug('sat-id is null');
         }
@@ -383,7 +382,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     this.isWatchlistChanged = this.isWatchlistChanged !== null;
     let watchlistString = '';
     let watchlistListHTML = '';
-    let sat: DetailedSatellite | null;
+    let sat: Satellite | null;
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     for (let i = 0; i < this.watchlistList.length; i++) {
@@ -536,10 +535,10 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     const sats = (<HTMLInputElement>getEl('watchlist-new')).value.split(/[\s,]+/u);
 
     sats.forEach((satNum: string) => {
-      const id = ServiceLocator.getCatalogManager().sccNum2Id(parseInt(satNum));
+      const id = ServiceLocator.getCatalogManager().sccNum2Id(parseInt(satNum)) ?? -1;
 
-      if (id === null) {
-        errorManagerInstance.warn(`Sat ${id} not found!`, true);
+      if (id === -1) {
+        errorManagerInstance.warn(`Sat ${satNum} not found!`, true);
 
         return;
       }
@@ -608,7 +607,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       return;
     }
 
-    let newWatchlist: { id: number, inView: boolean }[];
+    let newWatchlist: { id: string, inView: boolean }[];
 
     try {
       // We save it as an array of sccNums
@@ -616,7 +615,9 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
       if (savedSatList.length > 0) {
         // We need to convert it to an array of objects
-        newWatchlist = savedSatList.map((sccNum: string) => ({ id: parseInt(sccNum), inView: false }));
+        const catalogManagerInstance = ServiceLocator.getCatalogManager();
+
+        newWatchlist = savedSatList.map((sccNum: string) => ({ id: String(catalogManagerInstance.sccNum2Id(parseInt(sccNum)) ?? '-1'), inView: false }));
       } else {
         newWatchlist = [];
       }
@@ -636,9 +637,9 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     for (const obj of newWatchlist) {
-      const sat = catalogManagerInstance.getObject(catalogManagerInstance.sccNum2Id(obj.id), GetSatType.EXTRA_ONLY);
+      const sat = catalogManagerInstance.getObject(obj.id, GetSatType.EXTRA_ONLY);
 
-      if (sat !== null && sat.id > 0) {
+      if (sat !== null && sat.id !== -1) {
         this.watchlistList.push({ id: sat.id, inView: false });
       } else {
         errorManagerInstance.warn(`Sat ${obj.id} not found!`, true);

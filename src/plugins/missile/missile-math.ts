@@ -4,10 +4,9 @@
 /* eslint-disable complexity */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
-import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
-import { Kilometers, Meters, SpaceObjectType } from '@ootk/src/main';
+import { Degrees, Kilometers, Meters, SpaceObjectType } from '@ootk/src/main';
 import { missileManager } from './missile-manager';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 
@@ -89,14 +88,14 @@ export class Missile {
     const DeltaSigma02 = DeltaSigma01 + DeltaTheta12; // (Rad)
     const Lambda01 = Math.atan2(Math.sin(Alphao) * Math.sin(DeltaSigma01), Math.cos(DeltaSigma01)); // (Rad)
     const Lambdao = Lambda1 - Lambda01; // (Rad)
-    const EstLatList = [];
-    const LatList1 = [];
-    const LatList2 = [];
-    const LatList3 = [];
-    const EstLongList = [];
-    const LongList1 = [];
-    const LongList2 = [];
-    const LongList3 = [];
+    const EstLatList: number[] = [];
+    const LatList1: number[] = [];
+    const LatList2: number[] = [];
+    const LatList3: number[] = [];
+    const EstLongList: number[] = [];
+    const LongList1: number[] = [];
+    const LongList2: number[] = [];
+    const LongList3: number[] = [];
     const EstDistanceList: number[] = [];
     let GoalDistance;
 
@@ -209,8 +208,8 @@ export class Missile {
     WarheadMass,
   ) {
     let NozzleAltitude2, NozzleAltitude3;
-    let iterationFunOutput = [];
-    const MaxAltitude = [];
+    let iterationFunOutput: any[] = [];
+    const MaxAltitude: number[] = [];
 
     while (FuelMass / FuelDensity / FuelVolume > 0.4 && Altitude >= 0) {
       iterationFunOutput = Missile.iterationFun_(
@@ -400,7 +399,7 @@ export class Missile {
     BurnRate,
     WarheadMass,
   ) {
-    const DistanceSteps = [];
+    const DistanceSteps: number[] = [];
     let AngleCoefficient = 0;
     let DistanceClosePossition = 0;
     let AC1 = 0;
@@ -910,7 +909,7 @@ export class Missile {
     TargetLatitude: number;
     TargetLongitude: number;
     NumberWarheads: number;
-    MissileObjectNum: any;
+    MissileObjectNum: string | number;
     CurrentTime: any;
     MissileDesc: any;
     Length: number;
@@ -921,7 +920,11 @@ export class Missile {
     minAltitude: number;
   }) {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
-    const missileObj: MissileObject = catalogManagerInstance.getMissile(MissileObjectNum);
+    const missileObj = catalogManagerInstance.getMissile(MissileObjectNum);
+
+    if (!missileObj) {
+      return null;
+    }
 
     // Dimensions of the rocket
     Length = Length || 17; // (m)
@@ -958,8 +961,8 @@ export class Missile {
     }
 
     // This function will calculate the path the rocket will take in terms of coordinates
-    const LatList = [];
-    const LongList = [];
+    const LatList: number[] = [];
+    const LongList: number[] = [];
 
     const [EstLatList, EstLongList, , ArcLength, EstDistanceList, GoalDistance] = Missile.calcCoordinates_(CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude);
 
@@ -1016,9 +1019,9 @@ export class Missile {
     Missile.h = 1;
 
     // Here are the definitions for all the lists
-    const AltitudeList = [];
+    const AltitudeList: number[] = [];
 
-    const hList = [];
+    const hList: number[] = [];
 
     let NozzleAltitude2, NozzleAltitude3;
 
@@ -1253,12 +1256,12 @@ export class Missile {
       return null;
     }
 
-    missileObj.altList = AltitudeList;
-    missileObj.latList = LatList;
-    missileObj.lonList = LongList;
+    missileObj.altList = AltitudeList as Kilometers[];
+    missileObj.latList = LatList as Degrees[];
+    missileObj.lonList = LongList as Degrees[];
     missileObj.active = true;
     missileObj.type = SpaceObjectType.UNKNOWN;
-    missileObj.id = MissileObjectNum;
+    missileObj.id = typeof MissileObjectNum === 'string' ? parseInt(MissileObjectNum, 10) : MissileObjectNum;
     missileObj.name = `RV_${missileObj.id}`;
     // maxAlt is used for zoom controls
     missileObj.maxAlt = MaxAltitude;

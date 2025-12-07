@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { SideMenuComponent, SideMenuCallbacks } from '@app/engine/plugins/components/side-menu/side-menu-component';
+import { SideMenuComponent } from '@app/engine/plugins/components/side-menu/side-menu-component';
 import { ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';

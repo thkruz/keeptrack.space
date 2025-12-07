@@ -2,7 +2,7 @@
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { html } from '@app/engine/utils/development/formatter';
-import { BaseObject, DetailedSatellite, PayloadStatus, SpaceObjectType } from '@ootk/src/main';
+import { BaseObject, Satellite, PayloadStatus, SpaceObjectType } from '@ootk/src/main';
 import { CameraType } from '../../camera/camera';
 import { ColorScheme } from './color-scheme';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -84,7 +84,7 @@ export class StarlinkColorScheme extends ColorScheme {
     }
 
     if (obj.name.toLocaleLowerCase().startsWith('starlink') && obj.type === SpaceObjectType.PAYLOAD) {
-      if ((obj as DetailedSatellite).status === PayloadStatus.OPERATIONAL) {
+      if ((obj as Satellite).status === PayloadStatus.OPERATIONAL) {
         if (this.objectTypeFlags.starlinkOperational === false) {
           return {
             color: this.colorTheme.deselected,
@@ -98,7 +98,7 @@ export class StarlinkColorScheme extends ColorScheme {
         };
       }
 
-      if ((obj as DetailedSatellite).status !== PayloadStatus.OPERATIONAL) {
+      if ((obj as Satellite).status !== PayloadStatus.OPERATIONAL) {
         if (this.objectTypeFlags.starlinkOther === false) {
           return {
             color: this.colorTheme.deselected,

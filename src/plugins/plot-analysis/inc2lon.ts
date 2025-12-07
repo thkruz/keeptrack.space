@@ -1,7 +1,7 @@
 import { EChartsData, MenuMode } from '@app/engine/core/interfaces';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
-import { DetailedSatellite, SpaceObjectType } from '@ootk/src/main';
+import { Satellite, SpaceObjectType } from '@ootk/src/main';
 import barChart4BarsPng from '@public/img/icons/bar-chart-4-bars.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
@@ -60,8 +60,10 @@ export class Inc2LonPlots extends KeepTrackPlugin {
       // Setup Configuration
       this.chart = echarts.init(chartDom);
       this.chart.on('click', (event) => {
-        if ((event.data as unknown as { id: number })?.id > -1) {
-          this.selectSatManager_.selectSat((event.data as unknown as { id: number })?.id);
+        const id = (event.data as unknown as { id: number })?.id;
+
+        if (id !== undefined) {
+          this.selectSatManager_.selectSat(id);
         }
       });
     }
@@ -212,7 +214,7 @@ export class Inc2LonPlots extends KeepTrackPlugin {
       if (obj.type !== SpaceObjectType.PAYLOAD) {
         return;
       }
-      const sat = obj as DetailedSatellite;
+      const sat = obj as Satellite;
 
       // Only GEO objects
       if (sat.eccentricity > Inc2LonPlots.maxEccentricity_) {
@@ -231,6 +233,10 @@ export class Inc2LonPlots extends KeepTrackPlugin {
       // Update Position
       const now = ServiceLocator.getTimeManager().simulationTimeObj;
       const lla = sat.lla(now);
+
+      if (!lla) {
+        return;
+      }
 
       switch (sat.country) {
         case 'US':

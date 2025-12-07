@@ -15,11 +15,11 @@ import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
 import { keepTrackApi } from '@app/keepTrackApi';
 import {
-  BaseObject, cKmPerMs, DEG2RAD, DetailedSatellite, eci2lla, eci2rae,
+  BaseObject, cKmPerMs, DEG2RAD, Satellite, eci2lla, eci2rae,
   RadecTopocentric,
-  RfSensor,
   SpaceObjectType, Sun, SunTime,
 } from '@ootk/src/main';
+import { RfSensor } from '@app/app/sensors/DetailedSensor';
 import type { SensorManager } from '../../app/sensors/sensorManager';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { missileManager } from '../missile/missile-manager';
@@ -226,7 +226,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       const timeManagerInstance = ServiceLocator.getTimeManager();
       const sensorManagerInstance = ServiceLocator.getSensorManager();
 
-      if (obj instanceof DetailedSatellite) {
+      if (obj instanceof Satellite) {
         if (!obj.position?.x || !obj.position?.y || !obj.position?.z || isNaN(obj.position?.x) || isNaN(obj.position?.y) || isNaN(obj.position?.z)) {
           const newPosition = SatMath.getEci(obj, timeManagerInstance.simulationTimeObj).position as { x: number; y: number; z: number };
 
@@ -250,7 +250,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
           const sensor = ServiceLocator.getSensorManager().currentSensors[0];
 
           rae = sensor.rae(obj, timeManagerInstance.simulationTimeObj);
-          isInView = sensor.isRaeInFov(rae);
+          isInView = sensor.isRaeInFov(rae.az, rae.el, rae.rng);
         } else {
           rae = {
             az: 0,
@@ -281,7 +281,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
           const sensor = ServiceLocator.getSensorManager().currentSensors[0];
 
           rae = eci2rae(timeManagerInstance.simulationTimeObj, obj.position, sensor);
-          isInView = sensor.isRaeInFov(rae);
+          isInView = sensor.isRaeInFov(rae.az, rae.el, rae.rng);
         } else {
           rae = {
             az: 0,
@@ -335,7 +335,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
             sensorManagerInstance.currentSensors[0].objName !== uiManagerInstance.lastNextPassCalcSensorShortName) &&
           !obj.isMissile()
         ) {
-          const sat = obj as DetailedSatellite;
+          const sat = obj as Satellite;
 
           if (sat.perigee > sensorManagerInstance.currentSensors[0].maxRng) {
             if (nextPassElement) {
@@ -475,7 +475,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       }
     }
 
-    const currentSat = PluginRegistry.getPlugin(SelectSatManager)!.getSelectedSat() as DetailedSatellite;
+    const currentSat = PluginRegistry.getPlugin(SelectSatManager)!.getSelectedSat() as Satellite;
     const currentSensor = sensorManagerInstance.currentSensors[0];
 
     const raDec = RadecTopocentric.fromStateVector(currentSat.toJ2000(), currentSensor.toJ2000());
@@ -496,7 +496,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       if (obj.isMissile()) {
         elements.vmag.innerHTML = 'N/A';
       } else {
-        const sat = obj as DetailedSatellite;
+        const sat = obj as Satellite;
 
         elements.vmag.innerHTML = SatMath.calculateVisMag(sat, sensorManagerInstance.currentSensors[0], timeManagerInstance.simulationTimeObj, sun).toFixed(2);
       }

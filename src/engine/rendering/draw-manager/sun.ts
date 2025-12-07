@@ -30,7 +30,7 @@ import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { glsl } from '@app/engine/utils/development/formatter';
-import { DEG2RAD, EciVec3, Kilometers } from '@ootk/src/main';
+import { DEG2RAD, TemeVec3, Kilometers } from '@ootk/src/main';
 import { Body, RotationAxis as rotationAxis } from 'astronomy-engine';
 import { mat3, mat4, vec2, vec3 } from 'gl-matrix';
 import { DepthManager } from '../depth-manager';
@@ -62,7 +62,7 @@ export class Sun {
   private readonly normalMatrix_ = mat3.create();
 
   /** The position of the sun in TEME ECI coordinates. */
-  eci: EciVec3 = { x: 0 as Kilometers, y: 0 as Kilometers, z: 0 as Kilometers };
+  eci: TemeVec3 = { x: 0 as Kilometers, y: 0 as Kilometers, z: 0 as Kilometers };
   /** The mesh for the sun. */
   mesh: Mesh;
   /** The position of the sun in WebGL coordinates accounting for worldShift

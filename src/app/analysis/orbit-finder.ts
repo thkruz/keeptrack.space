@@ -1,4 +1,4 @@
-import { Degrees, DetailedSatellite, EciVec3, Kilometers, Sgp4, TleLine1, TleLine2, eci2lla } from '@ootk/src/main';
+import { Degrees, Satellite, TemeVec3, Kilometers, Sgp4, TleLine1, TleLine2, eci2lla } from '@ootk/src/main';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { SatMath } from './sat-math';
 
@@ -27,7 +27,7 @@ export class OrbitFinder {
   static readonly COARSE_STEP = 1.0; // degrees
   static readonly FINE_STEP = 0.005; // degrees
 
-  private readonly sat: DetailedSatellite;
+  private readonly sat: Satellite;
   private readonly goalParams: OrbitParameters;
   private readonly now: Date;
   private readonly goalDirection: 'N' | 'S';
@@ -36,7 +36,7 @@ export class OrbitFinder {
   private currentDirection: 'N' | 'S' | null = null;
 
   constructor(
-    sat: DetailedSatellite,
+    sat: Satellite,
     goalLat: Degrees,
     goalLon: Degrees,
     goalDirection: 'N' | 'S',
@@ -69,7 +69,7 @@ export class OrbitFinder {
       throw new Error('Invalid time variables');
     }
 
-    const positionEci = <EciVec3>Sgp4.propagate(this.sat.satrec, m).position;
+    const positionEci = <TemeVec3>Sgp4.propagate(this.sat.satrec, m).position;
     const { lat, lon, alt } = eci2lla(positionEci, gmst);
 
     return {
@@ -128,7 +128,7 @@ export class OrbitFinder {
     if (m === null) {
       throw new Error('Invalid time variables');
     }
-    const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
+    const positionEci = <TemeVec3>Sgp4.propagate(satrec, m).position;
     const { lat, lon, alt } = eci2lla(positionEci, gmst);
 
     // Update direction
@@ -197,7 +197,7 @@ export class OrbitFinder {
     if (m === null) {
       return PropagationResults.Error;
     }
-    const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
+    const positionEci = <TemeVec3>Sgp4.propagate(satrec, m).position;
     const { lat } = eci2lla(positionEci, gmst);
 
     // Update direction
@@ -312,7 +312,7 @@ export class OrbitFinder {
     if (m === null) {
       throw new Error('Invalid time variables');
     }
-    const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
+    const positionEci = <TemeVec3>Sgp4.propagate(satrec, m).position;
     const { lat, lon, alt } = eci2lla(positionEci, gmst);
 
     // Update current parameters
@@ -462,7 +462,7 @@ export class OrbitFinder {
       if (m === null) {
         throw new Error('Invalid time variables');
       }
-      const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
+      const positionEci = <TemeVec3>Sgp4.propagate(satrec, m).position;
       const { lat, lon, alt } = eci2lla(positionEci, gmst);
 
       if (alt < lowestAltitude) {

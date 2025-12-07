@@ -10,7 +10,7 @@ import { LineColors } from '@app/engine/rendering/line-manager/line';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { hideEl } from '@app/engine/utils/get-el';
-import { DetailedSatellite, Kilometers } from '@ootk/src/main';
+import { Satellite, Kilometers } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -45,10 +45,10 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
   isRmbOnSat = true;
 
   rmbCallback = (targetId: string, clickedSat?: number): void => {
-    let clickSatObj: DetailedSatellite | MissileObject | OemSatellite | null = null;
+    let clickSatObj: Satellite | MissileObject | OemSatellite | null = null;
     const obj = ServiceLocator.getCatalogManager().getObject(clickedSat);
 
-    if ((obj instanceof DetailedSatellite) || (obj instanceof OemSatellite) || (obj instanceof MissileObject)) {
+    if ((obj instanceof Satellite) || (obj instanceof OemSatellite) || (obj instanceof MissileObject)) {
       clickSatObj = obj;
     }
 
@@ -131,7 +131,7 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
         hideEl('line-eci-axis-rmb');
       }
 
-      if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) === -1) {
+      if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? '-1') === '-1') {
         hideEl('line-sat-sat-rmb');
       }
 

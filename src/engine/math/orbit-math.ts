@@ -1,11 +1,11 @@
-import { EciVec3, FormatTle, Kilometers, MINUTES_PER_DAY, Meters, RAD2DEG, TAU } from '@ootk/src/main';
+import { TemeVec3, FormatTle, Kilometers, MINUTES_PER_DAY, Meters, RAD2DEG, TAU } from '@ootk/src/main';
 import { StringifiedNumber } from '../../app/analysis/sat-math';
 import { TimeManager } from '../core/time-manager';
 import { EARTHS_GRAV_CONST, MASS_OF_EARTH } from '../utils/constants';
 import { StringPad } from '../utils/stringPad';
 
 export abstract class OrbitMath {
-  public static stateVector2Tle(sv: { position: EciVec3; velocity: EciVec3; date: Date }): { tle1: string; tle2: string } {
+  public static stateVector2Tle(sv: { position: TemeVec3; velocity: TemeVec3; date: Date }): { tle1: string; tle2: string } {
     const pad0 = StringPad.pad0;
     const pos = [sv.position.x, sv.position.y, sv.position.z];
     const vel = [sv.velocity.x, sv.velocity.y, sv.velocity.z];
@@ -99,7 +99,7 @@ export abstract class OrbitMath {
   }
 
   private static arctan2(y: number, x: number): number {
-    let u: number;
+    let u = 0;
 
     if (x !== 0) {
       u = Math.atan(y / x);
@@ -112,13 +112,10 @@ export abstract class OrbitMath {
     } else {
       if (y < 0) {
         u = -Math.PI / 2;
-      }
-      if (y === 0) {
-        u = 0;
-      }
-      if (y > 0) {
+      } else if (y > 0) {
         u = Math.PI / 2;
       }
+      // if y === 0, u remains 0
     }
 
     return u;

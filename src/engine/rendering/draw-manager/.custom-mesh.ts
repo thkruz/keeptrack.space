@@ -81,7 +81,7 @@ export class CustomMesh {
 
   private vao: WebGLVertexArrayObject;
 
-  public eci: Ootk.EciVec3;
+  public eci: Ootk.TemeVec3;
 
   public draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
     if (!this.isLoaded_) {

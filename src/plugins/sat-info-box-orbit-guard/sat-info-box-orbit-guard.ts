@@ -8,7 +8,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, setInnerHtml, showEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, DetailedSatellite, RADIUS_OF_EARTH } from '@ootk/src/main';
+import { BaseObject, Satellite, RADIUS_OF_EARTH } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { EL, SECTIONS } from './sat-info-box-orbit-guard-html';
@@ -508,7 +508,7 @@ export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
   }
 
   private updateManeuverData_(obj?: BaseObject) {
-    if (!(obj instanceof DetailedSatellite)) {
+    if (!(obj instanceof Satellite)) {
       hideEl(`${SECTIONS.MANEUVER}`);
 
       return;

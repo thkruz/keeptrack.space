@@ -6,7 +6,8 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import { Degrees, DetailedSensor, ecf2eci, eci2ecf, eci2rae, Kilometers, rae2eci, RaeVec3, Vector3D } from '@ootk/src/main';
+import { Degrees, ecef2eci, eci2ecef, eci2rae, Kilometers, rae2eci, RaeVec3, Vector3D } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 
@@ -396,7 +397,7 @@ export class Calculator extends KeepTrackPlugin {
     const ecf = new Vector3D<Kilometers>(Number(x.value) as Kilometers, Number(y.value) as Kilometers, Number(z.value) as Kilometers);
     const date = ServiceLocator.getTimeManager().simulationTimeObj;
     const gmst = ServiceLocator.getTimeManager().gmst;
-    const eci = ecf2eci(ecf, gmst);
+    const eci = ecef2eci(ecf, gmst);
 
     (getEl('calc-j2000-x-input') as HTMLInputElement).value = eci.x.toString();
     (getEl('calc-j2000-y-input') as HTMLInputElement).value = eci.y.toString();
@@ -435,7 +436,7 @@ export class Calculator extends KeepTrackPlugin {
     const eci = new Vector3D<Kilometers>(Number(x.value) as Kilometers, Number(y.value) as Kilometers, Number(z.value) as Kilometers);
     const date = ServiceLocator.getTimeManager().simulationTimeObj;
     const gmst = ServiceLocator.getTimeManager().gmst;
-    const ecf = eci2ecf(eci, gmst);
+    const ecf = eci2ecef(eci, gmst);
 
     (getEl('calc-itrf-x-input') as HTMLInputElement).value = ecf.x.toString();
     (getEl('calc-itrf-y-input') as HTMLInputElement).value = ecf.y.toString();
@@ -490,7 +491,7 @@ export class Calculator extends KeepTrackPlugin {
     (getEl('calc-j2000-y-input') as HTMLInputElement).value = eci.y.toString();
     (getEl('calc-j2000-z-input') as HTMLInputElement).value = eci.z.toString();
 
-    const ecf = eci2ecf(eci, ServiceLocator.getTimeManager().gmst);
+    const ecf = eci2ecef(eci, ServiceLocator.getTimeManager().gmst);
 
     (getEl('calc-itrf-x-input') as HTMLInputElement).value = ecf.x.toString();
     (getEl('calc-itrf-y-input') as HTMLInputElement).value = ecf.y.toString();

@@ -16,7 +16,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, ZoomValue, eci2lla } from '@ootk/src/main';
+import { BaseObject, Satellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, ZoomValue, eci2lla } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '@app/engine/audio/sounds';
@@ -192,7 +192,7 @@ export class EditSat extends KeepTrackPlugin {
             this.closeSideMenu();
           }
           this.setBottomIconToDisabled();
-        } else if (this.isMenuButtonActive && obj.isSatellite() && (obj as DetailedSatellite).sccNum !== (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value) {
+        } else if (this.isMenuButtonActive && obj.isSatellite() && (obj as Satellite).sccNum !== (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value) {
           this.populateSideMenu_();
         }
       },
@@ -306,7 +306,7 @@ export class EditSat extends KeepTrackPlugin {
       return;
     }
 
-    const sat = obj as DetailedSatellite;
+    const sat = obj as Satellite;
 
     (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value = sat.sccNum;
     (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-country`)).value = sat.country;
@@ -347,7 +347,7 @@ export class EditSat extends KeepTrackPlugin {
         return;
       }
 
-      const mainsat = obj as DetailedSatellite;
+      const mainsat = obj as Satellite;
       // Launch Points are the Satellites Current Location
       const gmst = ServiceLocator.getTimeManager().gmst;
       const lla = eci2lla(mainsat.position, gmst);
@@ -407,7 +407,7 @@ export class EditSat extends KeepTrackPlugin {
         return;
       }
 
-      const sat = obj2 as DetailedSatellite;
+      const sat = obj2 as Satellite;
 
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value = sat.sccNum;
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-country`)).value = sat.country;
@@ -452,7 +452,7 @@ export class EditSat extends KeepTrackPlugin {
       return;
     }
 
-    const sat = obj as DetailedSatellite;
+    const sat = obj as Satellite;
     const country = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-country`)).value;
     const intl = sat.tle1.substr(9, 8);
     const inc = <StringifiedNumber>(<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value;
@@ -507,7 +507,7 @@ export class EditSat extends KeepTrackPlugin {
     try {
       const scc = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value;
       const satId = catalogManagerInstance.sccNum2Id(parseInt(scc));
-      const sat = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY) as DetailedSatellite;
+      const sat = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY) as Satellite;
       const sat2 = {
         tle1: sat.tle1,
         tle2: sat.tle2,

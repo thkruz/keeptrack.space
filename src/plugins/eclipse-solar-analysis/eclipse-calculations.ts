@@ -22,7 +22,7 @@
 
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { Degrees, DetailedSatellite, EciVec3, Kilometers, Milliseconds, RAD2DEG, StateVectorSgp4 } from '@ootk/src/main';
+import { Degrees, Satellite, TemeVec3, Kilometers, Milliseconds, RAD2DEG, StateVectorSgp4 } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import {
   BetaAngleDataPoint,
@@ -39,7 +39,7 @@ export class EclipseCalculations {
    * Predict eclipse transitions for a satellite over a time range
    */
   static predictEclipseTransitions(
-    satellite: DetailedSatellite,
+    satellite: Satellite,
     startTime: Date,
     config: EclipsePredictionConfig,
   ): { events: EclipseEvent[]; periods: EclipsePeriod[] } {
@@ -75,7 +75,7 @@ export class EclipseCalculations {
 
       // Get sun position
       const sunEci = ServiceLocator.getScene().sun.getEci(currentTime);
-      const sunEciVec: EciVec3 = {
+      const sunEciVec: TemeVec3 = {
         x: sunEci[0] as Kilometers,
         y: sunEci[1] as Kilometers,
         z: sunEci[2] as Kilometers,
@@ -208,7 +208,7 @@ export class EclipseCalculations {
    * Calculate solar beta angle for a satellite at a given time
    * Beta angle is the angle between the orbital plane and the sun vector
    */
-  static calculateSolarBetaAngle(satellite: DetailedSatellite, time: Date): Degrees {
+  static calculateSolarBetaAngle(satellite: Satellite, time: Date): Degrees {
     // Get satellite position and velocity
     const posvel = SatMath.getEci(satellite, time);
 
@@ -244,7 +244,7 @@ export class EclipseCalculations {
    * Calculate beta angle trend over a time period
    */
   static calculateBetaAngleTrend(
-    satellite: DetailedSatellite,
+    satellite: Satellite,
     startTime: Date,
     durationHours: number,
     numPoints: number = 100,
@@ -268,7 +268,7 @@ export class EclipseCalculations {
   /**
    * Calculate sun-target-satellite geometry
    */
-  static calculateSunGeometry(satellite: DetailedSatellite, targetPosition: EciVec3, time: Date): SunGeometry {
+  static calculateSunGeometry(satellite: Satellite, targetPosition: TemeVec3, time: Date): SunGeometry {
     // Get satellite position
     const posvel = SatMath.getEci(satellite, time);
 
@@ -325,7 +325,7 @@ export class EclipseCalculations {
     const sunAzimuth = (Math.atan2(azimuthX, azimuthY) * RAD2DEG) as Degrees;
 
     // Check if target and satellite are illuminated
-    const sunEciVec: EciVec3 = {
+    const sunEciVec: TemeVec3 = {
       x: sunEci[0] as Kilometers,
       y: sunEci[1] as Kilometers,
       z: sunEci[2] as Kilometers,
@@ -394,7 +394,7 @@ export class EclipseCalculations {
   /**
    * Calculate orbital period from satellite TLE
    */
-  private static calculateOrbitalPeriod(satellite: DetailedSatellite): Milliseconds {
+  private static calculateOrbitalPeriod(satellite: Satellite): Milliseconds {
     if (!satellite.satrec) {
       return 0 as Milliseconds;
     }
@@ -415,7 +415,7 @@ export class EclipseCalculations {
   /**
    * Get current eclipse status for a satellite
    */
-  static getCurrentEclipseStatus(satellite: DetailedSatellite, time: Date): SunStatus {
+  static getCurrentEclipseStatus(satellite: Satellite, time: Date): SunStatus {
     const posvel = SatMath.getEci(satellite, time);
 
     if (!posvel?.position) {
@@ -423,7 +423,7 @@ export class EclipseCalculations {
     }
 
     const sunEci = ServiceLocator.getScene().sun.getEci(time);
-    const sunEciVec: EciVec3 = {
+    const sunEciVec: TemeVec3 = {
       x: sunEci[0] as Kilometers,
       y: sunEci[1] as Kilometers,
       z: sunEci[2] as Kilometers,
@@ -436,7 +436,7 @@ export class EclipseCalculations {
    * Find the next eclipse event for a satellite
    */
   static findNextEclipse(
-    satellite: DetailedSatellite,
+    satellite: Satellite,
     startTime: Date,
     maxSearchHours: number = 24,
   ): { event: EclipseEvent; period: EclipsePeriod } | null {

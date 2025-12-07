@@ -1,5 +1,5 @@
 import { saveCsv } from '@app/engine/utils/saveVariable';
-import { BaseObject, DetailedSatellite } from '@ootk/src/main';
+import { BaseObject, Satellite } from '@ootk/src/main';
 import { saveAs } from 'file-saver';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -35,7 +35,7 @@ export class CatalogExporter {
   static exportTle2Csv(objData: BaseObject[], isDeleteAnalysts = true) {
     try {
       const catalogTLE2 = [] as CatalogExportCsvFields[];
-      const satOnlyData = objData.filter((obj: BaseObject) => obj.isSatellite() && (obj as DetailedSatellite).tle1) as DetailedSatellite[];
+      const satOnlyData = objData.filter((obj: BaseObject) => obj.isSatellite() && (obj as Satellite).tle1) as Satellite[];
 
       if (satOnlyData.length === 0) {
         errorManagerInstance.info('No TLE data to export');
@@ -88,9 +88,9 @@ export class CatalogExporter {
 
   static exportSatInFov2Csv(objData: BaseObject[]) {
     const data = objData
-      .filter((obj) => obj.isSatellite() && (obj as DetailedSatellite).tle1 && ServiceLocator.getDotsManager().inViewData?.[obj.id] === 1)
+      .filter((obj) => obj.isSatellite() && (obj as Satellite).tle1 && ServiceLocator.getDotsManager().inViewData?.[obj.id] === 1)
       .map((obj) => {
-        const sat = obj as DetailedSatellite;
+        const sat = obj as Satellite;
 
 
         return {
@@ -108,7 +108,7 @@ export class CatalogExporter {
   static exportTle2Txt(objData: BaseObject[], numberOfLines = 2, isDeleteAnalysts = true) {
     try {
       const catalogTLE2 = [] as string[];
-      const satOnlyData = objData.filter((obj: BaseObject) => obj.isSatellite() && (obj as DetailedSatellite).tle1) as DetailedSatellite[];
+      const satOnlyData = objData.filter((obj: BaseObject) => obj.isSatellite() && (obj as Satellite).tle1) as Satellite[];
 
       if (satOnlyData.length === 0) {
         errorManagerInstance.info('No TLE data to export');

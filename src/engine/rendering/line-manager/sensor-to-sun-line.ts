@@ -1,5 +1,5 @@
 import { EciArr3 } from '@app/engine/core/interfaces';
-import { DetailedSensor } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { Line, LineColors } from './line';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 

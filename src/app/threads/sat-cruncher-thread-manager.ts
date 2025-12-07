@@ -3,7 +3,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { SpaceObjectType } from '@app/engine/ootk/src/main';
-import { DetailedSatellite } from '@app/engine/ootk/src/objects';
+import { Satellite } from '@app/engine/ootk/src/objects';
 import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 
@@ -21,7 +21,7 @@ export class SatCruncherThreadManager extends WebWorkerThreadManager {
         const id = mData.badObjectId;
 
         if (id !== null) {
-          const sat = ServiceLocator.getCatalogManager().objectCache[id] as DetailedSatellite;
+          const sat = ServiceLocator.getCatalogManager().objectCache[id] as Satellite;
 
           sat.active = false;
           /*
@@ -75,11 +75,11 @@ export class SatCruncherThreadManager extends WebWorkerThreadManager {
     const stars = ServiceLocator.getCatalogManager().objectCache.filter((sat) => sat?.type === SpaceObjectType.STAR);
 
     if (stars.length > 0) {
-      stars.sort((a, b) => a.id - b.id);
+      stars.sort((a, b) => Number(a.id) - Number(b.id));
       // this is the smallest id
-      ServiceLocator.getDotsManager().starIndex1 = stars[0].id;
+      ServiceLocator.getDotsManager().starIndex1 = Number(stars[0].id);
       // this is the largest id
-      ServiceLocator.getDotsManager().starIndex2 = stars[stars.length - 1].id;
+      ServiceLocator.getDotsManager().starIndex2 = Number(stars[stars.length - 1].id);
       ServiceLocator.getDotsManager().updateSizeBuffer();
     }
 

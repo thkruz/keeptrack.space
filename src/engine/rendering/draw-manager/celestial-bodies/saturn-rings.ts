@@ -22,7 +22,7 @@
 import { SolarBody } from '@app/engine/core/interfaces';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { DEG2RAD, EciVec3 } from '@ootk/src/main';
+import { DEG2RAD, TemeVec3 } from '@ootk/src/main';
 import { BackdatePosition as backdatePosition, Body, KM_PER_AU, RotationAxis as rotationAxis } from 'astronomy-engine';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
@@ -47,7 +47,7 @@ export class SaturnRings extends CelestialBody {
   protected readonly NUM_HEIGHT_SEGS = 256;
   protected readonly NUM_WIDTH_SEGS = 256;
   private readonly saturn_: Saturn;
-  eci: EciVec3;
+  eci: TemeVec3;
 
   constructor(saturn_: Saturn) {
     super();

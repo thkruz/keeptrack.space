@@ -25,4 +25,15 @@ export class ControlSite extends BaseObject {
   isStatic(): boolean {
     return true;
   }
+
+  protected serializeSpecific(): Record<string, unknown> {
+    return {
+      TStop: this.TStop,
+      linkAehf: this.linkAehf,
+      linkWgs: this.linkWgs,
+      linkIridium: this.linkIridium,
+      linkGalileo: this.linkGalileo,
+      linkStarlink: this.linkStarlink,
+    };
+  }
 }

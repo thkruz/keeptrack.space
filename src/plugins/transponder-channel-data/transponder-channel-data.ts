@@ -6,7 +6,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveCsv } from '@app/engine/utils/saveVariable';
-import { BaseObject, DetailedSatellite } from '@ootk/src/main';
+import { BaseObject, Satellite } from '@ootk/src/main';
 import transponderChannelDataPng from '@public/img/icons/sat-channel-freq.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatConstellations } from '../sat-constellations/sat-constellations';
@@ -38,7 +38,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
       !selectedSat ||
       selectedSat.id === -1 ||
       !selectedSat.isSatellite() ||
-      !this.satsWithChannels_.includes((selectedSat as DetailedSatellite).sccNum)
+      !this.satsWithChannels_.includes((selectedSat as Satellite).sccNum)
     ) {
       errorManagerInstance.warn('Satellite does not have channel information');
 
@@ -96,7 +96,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
           !obj ||
           obj.id === -1 ||
           !obj.isSatellite() ||
-          !this.satsWithChannels_.includes((obj as DetailedSatellite).sccNum)
+          !this.satsWithChannels_.includes((obj as Satellite).sccNum)
         ) {
           if (this.isMenuButtonActive) {
             this.closeSideMenu();
@@ -143,10 +143,10 @@ export class TransponderChannelData extends KeepTrackPlugin {
 
   showTable() {
     const selectedObj = PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj;
-    let selectedSat: DetailedSatellite;
+    let selectedSat: Satellite;
 
     if (selectedObj?.isSatellite()) {
-      selectedSat = selectedObj as DetailedSatellite;
+      selectedSat = selectedObj as Satellite;
     } else {
       errorManagerInstance.warn('Selected object is not a satellite');
 

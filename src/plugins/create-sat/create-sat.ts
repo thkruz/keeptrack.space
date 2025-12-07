@@ -1,7 +1,7 @@
 import {
-  DetailedSatellite,
-  DetailedSatelliteParams,
-  EciVec3,
+  Satellite,
+  SatelliteParams,
+  TemeVec3,
   FormatTle,
   KilometersPerSecond,
   SatelliteRecord,
@@ -537,7 +537,7 @@ export class CreateSat extends KeepTrackPlugin {
         return;
       }
 
-      const sat = obj as DetailedSatellite;
+      const sat = obj as Satellite;
       const country = inputParams.country;
       const type = parseInt(inputParams.type);
       const intl = `${inputParams.epochyr}69B`; // International designator
@@ -590,11 +590,11 @@ export class CreateSat extends KeepTrackPlugin {
 
       // Propagate satellite to get position and velocity
       const spg4vec = Sgp4.propagate(satrec, 0);
-      const pos = spg4vec.position as EciVec3;
-      const vel = spg4vec.velocity as EciVec3<KilometersPerSecond>;
+      const pos = spg4vec.position as TemeVec3;
+      const vel = spg4vec.velocity as TemeVec3<KilometersPerSecond>;
 
       // Create new satellite object
-      const info: DetailedSatelliteParams = {
+      const info: SatelliteParams = {
         id: satId,
         type,
         country,
@@ -603,7 +603,7 @@ export class CreateSat extends KeepTrackPlugin {
         name: inputParams.name,
       };
 
-      const newSat = new DetailedSatellite({
+      const newSat = new Satellite({
         ...info,
         ...{
           position: pos,
@@ -661,7 +661,7 @@ export class CreateSat extends KeepTrackPlugin {
     try {
       const scc = (getEl(`${CreateSat.elementPrefix}-scc`) as HTMLInputElement).value;
       const satId = catalogManagerInstance.sccNum2Id(parseInt(scc));
-      const sat = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY) as DetailedSatellite;
+      const sat = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY) as Satellite;
 
       if (!sat || !sat.tle1 || !sat.tle2) {
         ServiceLocator.getUiManager().toast('No valid TLE to export', ToastMsgType.error, true);

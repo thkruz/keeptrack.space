@@ -1,5 +1,5 @@
 import numeric from 'numeric';
-import { AzEl, DEG2RAD, Degrees, DetailedSatellite, Kilometers, MILLISECONDS_PER_SECOND, ecf2rae, eci2ecf } from '@ootk/src/main';
+import { AzEl, DEG2RAD, Degrees, Satellite, Kilometers, MILLISECONDS_PER_SECOND, ecef2rae, eci2ecef } from '@ootk/src/main';
 import { SatMath } from '../../app/analysis/sat-math';
 import { dateFormat } from '../utils/dateFormat';
 import { getEl } from '../utils/get-el';
@@ -69,7 +69,7 @@ export abstract class DopMath {
    * @returns An object containing the calculated DOP values.
    * @throws An error if the latitude or longitude is undefined.
    */
-  public static getDops(propTime: Date, gpsSatObjects: DetailedSatellite[], lat: Degrees, lon: Degrees, alt?: Kilometers, gpsElevationMask = <Degrees>10) {
+  public static getDops(propTime: Date, gpsSatObjects: Satellite[], lat: Degrees, lon: Degrees, alt?: Kilometers, gpsElevationMask = <Degrees>10) {
     if (typeof lat === 'undefined' || typeof lon === 'undefined') {
       return { pdop: 'N/A', hdop: 'N/A', gdop: 'N/A', vdop: 'N/A', tdop: 'N/A' };
     }
@@ -80,8 +80,8 @@ export abstract class DopMath {
 
     const inViewList = <AzEl<Degrees>[]>[];
 
-    gpsSatObjects.forEach((sat: DetailedSatellite) => {
-      const lookAngles = ecf2rae({ lon, lat, alt }, eci2ecf(sat.position, gmst));
+    gpsSatObjects.forEach((sat: Satellite) => {
+      const lookAngles = ecef2rae({ lon, lat, alt }, eci2ecef(sat.position, gmst));
       const azel = {
         az: lookAngles.az,
         el: lookAngles.el,
@@ -141,7 +141,7 @@ export abstract class DopMath {
     }
   }
 
-  public static getDopsList(getOffsetTimeObj: (offset: number) => Date, gpsSats: DetailedSatellite[], lat: Degrees, lon: Degrees, alt: Kilometers, el: Degrees): DopList {
+  public static getDopsList(getOffsetTimeObj: (offset: number) => Date, gpsSats: Satellite[], lat: Degrees, lon: Degrees, alt: Kilometers, el: Degrees): DopList {
     const dopsResults = [] as DopList;
 
     for (let t = 0; t < 1440; t++) {

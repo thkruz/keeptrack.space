@@ -1,6 +1,6 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
-import { BaseObject, Days, DetailedSatellite, getDayOfYear, Star } from '@ootk/src/main';
+import { BaseObject, Days, Satellite, getDayOfYear, Star } from '@ootk/src/main';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
 import { html } from '@app/engine/utils/development/formatter';
@@ -104,7 +104,7 @@ export class GpAgeColorScheme extends ColorScheme {
       };
     }
 
-    const sat = obj as DetailedSatellite;
+    const sat = obj as Satellite;
     const epochYearShort = parseInt(sat.tle1.substring(18, 20), 10);
     const epochDay = parseFloat(sat.tle1.substring(20, 32));
 

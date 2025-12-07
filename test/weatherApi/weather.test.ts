@@ -2,7 +2,8 @@
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SensorTimeline } from '@app/plugins/timeline-sensor/sensor-timeline';
-import { DetailedSatellite, DetailedSensor, Hours } from '@ootk/src/main';
+import { Satellite, Hours } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { setupStandardEnvironment } from '../environment/standard-env';
 import { websiteInit } from '../generic-tests';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -28,9 +29,9 @@ describe('SensorTimeline Weather Integration', () => {
       sensorTimelinePlugin['enabledSensors_'].push(new DetailedSensor({ ...enabledSensors[i] } as unknown as DetailedSensor));
     }
 
-    ServiceLocator.getCatalogManager().objectCache[0] = new DetailedSatellite({
+    ServiceLocator.getCatalogManager().objectCache[0] = new Satellite({
       ...selectedSat,
-    } as unknown as DetailedSatellite);
+    } as unknown as Satellite);
 
     sensorTimelinePlugin['getWeather_'] = jest.fn().mockResolvedValue(weatherDataOutput);
     ServiceLocator.getTimeManager().getOffsetTimeObj = jest.fn().mockReturnValue(new Date(1745200420463));

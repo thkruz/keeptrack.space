@@ -6,7 +6,7 @@ import polarPlotPng from '@public/img/icons/polar-plot.png';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
-import { BaseObject, Degrees, DetailedSatellite, MILLISECONDS_PER_SECOND, secondsPerDay } from '@ootk/src/main';
+import { BaseObject, Degrees, Satellite, MILLISECONDS_PER_SECOND, secondsPerDay } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '@app/engine/audio/sounds';
@@ -77,7 +77,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
           const link = document.createElement('a');
 
           link.href = image;
-          link.download = `sat-${(this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum6}-polar-plot.png`;
+          link.download = `sat-${(this.selectSatManager_.getSelectedSat() as Satellite).sccNum6}-polar-plot.png`;
           link.click();
         });
       },
@@ -115,7 +115,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'P' && !isRepeat) {
-        if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) === -1) {
+        if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? '-1') === '-1') {
           return;
         }
 
@@ -157,7 +157,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     this.passStopTime_ = null;
 
     const sensor = ServiceLocator.getSensorManager().getSensor();
-    const sat = this.selectSatManager_.getSelectedSat() as DetailedSatellite;
+    const sat = this.selectSatManager_.getSelectedSat() as Satellite;
 
     if (!sensor?.isSensor()) {
       return false;
@@ -214,7 +214,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     this.ctx_.textAlign = 'left';
     this.ctx_.textBaseline = 'top';
     const sensorName = ServiceLocator.getSensorManager().getSensor()?.name ?? 'Unknown Sensor';
-    const satNum = (this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum;
+    const satNum = (this.selectSatManager_.getSelectedSat() as Satellite).sccNum;
     const timeRange = `${this.passStartTime_?.toISOString().slice(11, 19) ?? 'Unknown Start Time'} - ${this.passStopTime_?.toISOString().slice(11, 19) ?? 'Unknown Stop Time'}`;
 
     this.ctx_.fillText(sensorName, 10, 10);

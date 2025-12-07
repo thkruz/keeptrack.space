@@ -8,7 +8,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { hideEl } from '@app/engine/utils/get-el';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, DetailedSatellite, Star } from '@ootk/src/main';
+import { BaseObject, Satellite, Star } from '@ootk/src/main';
 import { ColorScheme } from './color-scheme';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 
@@ -86,7 +86,7 @@ export class SunlightColorScheme extends ColorScheme {
   update(obj: BaseObject): ColorInformation {
     const dotsManagerInstance = ServiceLocator.getDotsManager();
 
-    if ((dotsManagerInstance.inSunData?.length ?? -1) < obj.id) {
+    if ((dotsManagerInstance.inSunData?.length ?? -1) < Number(obj.id)) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -150,7 +150,7 @@ export class SunlightColorScheme extends ColorScheme {
     }
 
     // Not in FOV
-    const sat = obj as DetailedSatellite;
+    const sat = obj as Satellite;
 
     if (!dotsManagerInstance.inViewData?.[sat.id]) {
       if (dotsManagerInstance.inSunData[sat.id] === SunStatus.SUN && this.objectTypeFlags.satHi) {

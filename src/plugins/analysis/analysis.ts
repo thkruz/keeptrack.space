@@ -37,7 +37,8 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getUnique } from '@app/engine/utils/get-unique';
 import { saveCsv } from '@app/engine/utils/saveVariable';
-import { DetailedSatellite, DetailedSensor, eci2rae, EciVec3, Kilometers, MILLISECONDS_PER_SECOND, MINUTES_PER_DAY, RaeVec3, SatelliteRecord, TAU } from '@ootk/src/main';
+import { Satellite, eci2rae, TemeVec3, Kilometers, MILLISECONDS_PER_SECOND, MINUTES_PER_DAY, RaeVec3, SatelliteRecord, TAU } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import folderCodePng from '@public/img/icons/folder-code.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { WatchlistPlugin } from '../watchlist/watchlist';
@@ -310,7 +311,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     return searchStr; // csoListUnique;
   }
 
-  private static getActualCSOs_(csoListUnique: { sat1: DetailedSatellite; sat2: DetailedSatellite }[], searchRadius: number) {
+  private static getActualCSOs_(csoListUnique: { sat1: Satellite; sat2: Satellite }[], searchRadius: number) {
     const csoStrArr = [] as string[]; // Clear CSO List
 
     // Loop through the possible CSOs
@@ -322,7 +323,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
       if (eci.position && typeof eci.position !== 'boolean' && eci.position.x === 0 && eci.position.y === 0 && eci.position.z === 0) {
         continue;
       }
-      posCso.sat1.position = eci.position as EciVec3;
+      posCso.sat1.position = eci.position as TemeVec3;
 
       // Calculate the second CSO's position 30 minutes later
       sat = posCso.sat2;
@@ -330,8 +331,8 @@ export class AnalysisMenu extends KeepTrackPlugin {
       if (eci.position && typeof eci.position !== 'boolean' && eci.position.x === 0 && eci.position.y === 0 && eci.position.z === 0) {
         continue;
       }
-      sat.position = eci.position as EciVec3;
-      posCso.sat2.position = eci.position as EciVec3;
+      sat.position = eci.position as TemeVec3;
+      posCso.sat2.position = eci.position as TemeVec3;
     }
 
     // Loop through the CSOs
@@ -370,8 +371,8 @@ export class AnalysisMenu extends KeepTrackPlugin {
     return csoStrArr;
   }
 
-  private static getPossibleCSOs_(satList: DetailedSatellite[], searchRadius: number) {
-    const csoList = [] as { sat1: DetailedSatellite; sat2: DetailedSatellite }[]; // Clear CSO List
+  private static getPossibleCSOs_(satList: Satellite[], searchRadius: number) {
+    const csoList = [] as { sat1: Satellite; sat2: Satellite }[]; // Clear CSO List
     // Loop through all the satellites with valid positions
 
     for (let i = 0; i < satList.length; i++) {
@@ -413,7 +414,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
   }
 
   private static getValidSats_() {
-    const satList = <DetailedSatellite[]>[];
+    const satList = <Satellite[]>[];
 
     // Loop through all the satellites
     for (let i = 0; i < ServiceLocator.getCatalogManager().orbitalSats; i++) {
@@ -430,7 +431,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
        * Find where the satellite is right now
        */
       if (typeof sat.position === 'undefined') {
-        sat.position = <EciVec3>SatMath.getEci(sat, new Date()).position || { x: <Kilometers>0, y: <Kilometers>0, z: <Kilometers>0 };
+        sat.position = <TemeVec3>SatMath.getEci(sat, new Date()).position || { x: <Kilometers>0, y: <Kilometers>0, z: <Kilometers>0 };
       }
       // If it fails, skip it
       if (isNaN(sat.position.x) || isNaN(sat.position.y) || isNaN(sat.position.z)) {
@@ -446,7 +447,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     return satList;
   }
 
-  private static findBestPass_(sat: DetailedSatellite, sensors: DetailedSensor[]): lookanglesRow[] {
+  private static findBestPass_(sat: Satellite, sensors: DetailedSensor[]): lookanglesRow[] {
     const timeManagerInstance = ServiceLocator.getTimeManager();
 
     // Check if there is a sensor
@@ -689,7 +690,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
   }
 
   private static findRaBtnClick_() {
-    const searchStr = CatalogSearch.findReentry(<DetailedSatellite[]>ServiceLocator.getCatalogManager().objectCache).join(',');
+    const searchStr = CatalogSearch.findReentry(<Satellite[]>ServiceLocator.getCatalogManager().objectCache).join(',');
 
     ServiceLocator.getUiManager().doSearch(searchStr);
   }

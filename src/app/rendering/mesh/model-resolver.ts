@@ -1,7 +1,7 @@
 import type { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import type { MeshModel } from '@app/engine/rendering/mesh-manager';
-import { BaseObject, DetailedSatellite, SpaceObjectType } from '@ootk/src/main';
+import { BaseObject, Satellite, SpaceObjectType } from '@ootk/src/main';
 
 export const SatelliteModels = {
   aehf: 'aehf',
@@ -113,7 +113,7 @@ export class ModelResolver {
       // Currently no specific model for OEM satellites - default to aehf
       return SatelliteModels.aehf;
     } else {
-      const sat = obj as DetailedSatellite;
+      const sat = obj as Satellite;
 
       switch (sat.type) {
         case SpaceObjectType.PAYLOAD:
@@ -141,7 +141,7 @@ export class ModelResolver {
   }
 
   // eslint-disable-next-line complexity
-  private resolveSatModelName_(sat: DetailedSatellite): string {
+  private resolveSatModelName_(sat: Satellite): string {
     const knownSatelliteModel = this.resolveByName_(sat.name);
 
     if (knownSatelliteModel) {

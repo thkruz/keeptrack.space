@@ -6,7 +6,8 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { LineManager } from '@app/engine/rendering/line-manager';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { DetailedSatellite, DetailedSensor, RAD2DEG } from '@ootk/src/main';
+import { Satellite, RAD2DEG } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import numeric from 'numeric';
 import type { ControlSite } from './ControlSite';
 
@@ -27,29 +28,27 @@ export enum LinkType {
 }
 
 export class SatLinkManager {
-  aehfUsers: string[] = [];
-  wgsUsers: string[] = [];
-  iridiumUsers: string[] = [];
-  starlinkUsers: string[] = [];
-  galileoUsers: string[] = [];
-  aehf = [22988, 23712, 26715, 27168, 27711, 36868, 38254, 39256, 43651, 44481, 45465]; // Milstar and AEHF
-  dscs = [25019, 26052, 27691, 27875]; // Dead: 22915, 23628
-  wgs = [32258, 34713, 36108, 38070, 39168, 39222, 40746, 41879, 42075, 44071];
-  iridium = [
+  aehfUsers: number[] = [];
+  wgsUsers: number[] = [];
+  iridiumUsers: number[] = [];
+  starlinkUsers: number[] = [];
+  galileoUsers: number[] = [];
+  // Satellite catalog numbers - converted to string IDs at runtime via idToSatnum_()
+  private aehfSatnums_: number[] = [22988, 23712, 26715, 27168, 27711, 36868, 38254, 39256, 43651, 44481, 45465]; // Milstar and AEHF
+  private dscsSatnums_: number[] = [25019, 26052, 27691, 27875]; // Dead: 22915, 23628
+  private wgsSatnums_: number[] = [32258, 34713, 36108, 38070, 39168, 39222, 40746, 41879, 42075, 44071];
+  private iridiumSatnums_: number[] = [
     24841, 24870, 41917, 41918, 41919, 41920, 41921, 41922, 41923, 41924, 41925, 41926, 42803, 42804, 42805, 42806, 42807, 42808, 42809, 42810, 42811, 42812, 43569, 43570, 43571,
     43572, 43573, 43754, 43575, 43576, 24903, 24907, 24944, 24948, 25105, 25527, 24946, 24967, 25042, 25043, 24796, 25077, 25078, 25104, 24795, 25262, 25273, 25286, 25319, 24793,
     25320, 25344, 25467, 24836, 24842, 24871, 24873,
   ];
-
-  galileo = [
+  private galileoSatnums_: number[] = [
     37846, 37847, 38857, 38858, 40128, 40129, 40544, 40545, 40889, 40890, 41174, 41175, 41549, 41550, 41859, 41860, 41861, 41862, 43055, 43056, 43057, 43058, 43564, 43565, 43566,
     43567,
   ];
-
-  sbirs = [37481, 39120, 43162, 41937, 48618, 53355];
-  dsp = [4630, 5204, 5851, 6691, 8482, 8916, 9803, 11397, 12339, 13086, 14930, 15453, 18583, 20066, 20929, 21805, 23435, 24737, 26356, 26880, 28158];
-
-  starlink = [
+  private sbirsSatnums_: number[] = [37481, 39120, 43162, 41937, 48618, 53355];
+  private dspSatnums_: number[] = [4630, 5204, 5851, 6691, 8482, 8916, 9803, 11397, 12339, 13086, 14930, 15453, 18583, 20066, 20929, 21805, 23435, 24737, 26356, 26880, 28158];
+  private starlinkSatnums_: number[] = [
     44235, 44236, 44237, 44238, 44239, 44240, 44241, 44242, 44243, 44244, 44245, 44247, 44248, 44249, 44250, 44251, 44252, 44253, 44254, 44255, 44256, 44257, 44258, 44259, 44260,
     44261, 44262, 44263, 44264, 44265, 44266, 44267, 44268, 44269, 44270, 44271, 44272, 44273, 44274, 44275, 44276, 44277, 44278, 44279, 44280, 44281, 44282, 44283, 44284, 44285,
     44286, 44287, 44288, 44289, 44290, 44291, 44292, 44293, 44294, 44713, 44714, 44715, 44716, 44717, 44718, 44719, 44720, 44721, 44722, 44723, 44724, 44725, 44726, 44727, 44728,
@@ -68,17 +67,27 @@ export class SatLinkManager {
     45575, 45583, 45535, 45543, 45551, 45560, 45568, 45576, 45584, 45536, 45544, 45552, 45561, 45569, 45577, 45585, 45537, 45545, 45553, 45562, 45570, 45578, 45586, 45538, 45546,
   ];
 
+  // Number IDs populated at runtime
+  aehf: number[] = [];
+  dscs: number[] = [];
+  wgs: number[] = [];
+  iridium: number[] = [];
+  galileo: number[] = [];
+  sbirs: number[] = [];
+  dsp: number[] = [];
+  starlink: number[] = [];
+
   private idToSatnum_(): void {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
-    this.aehf = catalogManagerInstance.satnums2ids(this.aehf);
-    this.dscs = catalogManagerInstance.satnums2ids(this.dscs);
-    this.wgs = catalogManagerInstance.satnums2ids(this.wgs);
-    this.iridium = catalogManagerInstance.satnums2ids(this.iridium);
-    this.galileo = catalogManagerInstance.satnums2ids(this.galileo);
-    this.sbirs = catalogManagerInstance.satnums2ids(this.sbirs);
-    this.dsp = catalogManagerInstance.satnums2ids(this.dsp);
-    this.starlink = catalogManagerInstance.satnums2ids(this.starlink);
+    this.aehf = catalogManagerInstance.satnums2ids(this.aehfSatnums_);
+    this.dscs = catalogManagerInstance.satnums2ids(this.dscsSatnums_);
+    this.wgs = catalogManagerInstance.satnums2ids(this.wgsSatnums_);
+    this.iridium = catalogManagerInstance.satnums2ids(this.iridiumSatnums_);
+    this.galileo = catalogManagerInstance.satnums2ids(this.galileoSatnums_);
+    this.sbirs = catalogManagerInstance.satnums2ids(this.sbirsSatnums_);
+    this.dsp = catalogManagerInstance.satnums2ids(this.dspSatnums_);
+    this.starlink = catalogManagerInstance.satnums2ids(this.starlinkSatnums_);
   }
 
   init(controlSiteList: ControlSite[]) {
@@ -98,19 +107,19 @@ export class SatLinkManager {
         }
 
         if (controlSiteList[controlSite].linkAehf) {
-          this.aehfUsers.push(controlSiteList[controlSite].name);
+          this.aehfUsers.push(controlSiteList[controlSite].id);
         }
         if (controlSiteList[controlSite].linkWgs) {
-          this.wgsUsers.push(controlSiteList[controlSite].name);
+          this.wgsUsers.push(controlSiteList[controlSite].id);
         }
         if (controlSiteList[controlSite].linkIridium) {
-          this.wgsUsers.push(controlSiteList[controlSite].name);
+          this.wgsUsers.push(controlSiteList[controlSite].id);
         }
         if (controlSiteList[controlSite].linkGalileo) {
-          this.galileoUsers.push(controlSiteList[controlSite].name);
+          this.galileoUsers.push(controlSiteList[controlSite].id);
         }
         if (controlSiteList[controlSite].linkStarlink) {
-          this.starlinkUsers.push(controlSiteList[controlSite].name);
+          this.starlinkUsers.push(controlSiteList[controlSite].id);
         }
       }
     } catch {
@@ -146,7 +155,7 @@ export class SatLinkManager {
     lineManager.clear();
 
     let satlist: number[];
-    let userlist: string[] = [];
+    let userlist: number[] = [];
     let minTheta: number;
     let elevationMask: number;
     let linkType: LinkType;
@@ -250,12 +259,16 @@ export class SatLinkManager {
 
         for (const sensorName of userlist) {
           const id = catalogManagerInstance.getSensorFromSensorName(sensorName.toString());
-          const user = catalogManagerInstance.getObject(id) as DetailedSensor;
-          let bestSat = null as unknown as DetailedSatellite;
+          const user = catalogManagerInstance.getObject(id) as DetailedSensor | null;
+
+          if (!user) {
+            continue;
+          }
+          let bestSat = null as unknown as Satellite;
           let bestRange = 1000000;
 
           for (const satId of satlist) {
-            const sat = catalogManagerInstance.getObject(satId) as DetailedSatellite;
+            const sat = catalogManagerInstance.getObject(satId) as Satellite;
             const tearr = SensorMath.getTearr(sat, [user], timeManager.simulationTimeObj);
 
             if ((tearr.el ?? -Infinity) > elevationMask) {
@@ -281,18 +294,18 @@ export class SatLinkManager {
 
         for (const sensorName of userlist) {
           // Select the current user
-          const user = catalogManagerInstance.getObject(catalogManagerInstance.getSensorFromSensorName(sensorName.toString())) as DetailedSensor;
+          const user = catalogManagerInstance.getObject(catalogManagerInstance.getSensorFromSensorName(sensorName.toString())) as DetailedSensor | null;
 
           if (!user) {
             continue;
           }
           // Loop through all of the satellites
-          let bestSat = null as unknown as DetailedSatellite;
+          let bestSat = null as unknown as Satellite;
           let bestRange = 1000000;
 
           for (const satId of satlist) {
             // Select the current satelltie
-            const sat = catalogManagerInstance.getObject(satId) as DetailedSatellite;
+            const sat = catalogManagerInstance.getObject(satId) as Satellite;
             /*
              * Calculate Time, Elevation, Azimuth, Range, and Range Rate data
              * of the current satellite relevant to the current user. This allows

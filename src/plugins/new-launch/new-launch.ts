@@ -20,8 +20,8 @@ import { t7e } from '@app/locales/keys';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import {
-  BaseObject, Degrees, DetailedSatellite, DetailedSatelliteParams, EciVec3, FormatTle, KilometersPerSecond,
-  LandObject, SatelliteRecord, Sgp4, SpaceObjectType, TleLine1, TleLine2,
+  BaseObject, Degrees, Satellite, SatelliteParams, TemeVec3, FormatTle, KilometersPerSecond,
+  SatelliteRecord, Sgp4, SpaceObjectType, TleLine1, TleLine2,
 } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -51,10 +51,10 @@ export class NewLaunch extends KeepTrackPlugin {
       return;
     }
 
-    const sat = ServiceLocator.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
+    const sat = ServiceLocator.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as Satellite;
 
     // Validate satellite before changing DOM
-    if (!(sat instanceof DetailedSatellite) || !sat.sccNum || !sat.inclination || isNaN(sat.inclination)) {
+    if (!(sat instanceof Satellite) || !sat.sccNum || !sat.inclination || isNaN(sat.inclination)) {
       return;
     }
 
@@ -171,7 +171,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     const sccNum = (<HTMLInputElement>getEl('nl-scc')).value;
     const inputSat = catalogManagerInstance.sccNum2Sat(parseInt(sccNum))!;
-    let nominalSat: DetailedSatellite | null = null;
+    let nominalSat: Satellite | null = null;
     let id = -1;
 
     // TODO: Next available analyst satellite should be a function in the catalog manager
@@ -333,12 +333,12 @@ export class NewLaunch extends KeepTrackPlugin {
       EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         if (obj?.isSatellite()) {
-          const sat = obj as DetailedSatellite;
+          const sat = obj as Satellite;
 
           (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
           this.setBottomIconToEnabled();
         } else if (obj?.type === SpaceObjectType.LAUNCH_SITE) {
-          this.selectLaunchSite(obj as LandObject);
+          this.selectLaunchSite(obj as LaunchSite);
         } else {
           this.setBottomIconToDisabled();
         }
@@ -374,7 +374,7 @@ export class NewLaunch extends KeepTrackPlugin {
     }
   }
 
-  private preValidate_(sat: DetailedSatellite): void {
+  private preValidate_(sat: Satellite): void {
     // Get Current LaunchSiteOptionValue
     const launchSiteOptionValue = (<HTMLInputElement>getEl('nl-facility')).value;
     const lat = launchSites[launchSiteOptionValue].lat;
@@ -393,7 +393,7 @@ export class NewLaunch extends KeepTrackPlugin {
     }
   }
 
-  private createNominalSat_(inputParams: DetailedSatellite, scc: string, id: number): DetailedSatellite | null {
+  private createNominalSat_(inputParams: Satellite, scc: string, id: number): Satellite | null {
     const country = inputParams.country;
     const type = inputParams.type;
     const intl = `${inputParams.epochYear}69B`; // International designator
@@ -470,11 +470,11 @@ export class NewLaunch extends KeepTrackPlugin {
 
     // Propagate satellite to get position and velocity
     const spg4vec = Sgp4.propagate(satrec, 0);
-    const pos = spg4vec.position as EciVec3;
-    const vel = spg4vec.velocity as EciVec3<KilometersPerSecond>;
+    const pos = spg4vec.position as TemeVec3;
+    const vel = spg4vec.velocity as TemeVec3<KilometersPerSecond>;
 
     // Create new satellite object
-    const info: DetailedSatelliteParams = {
+    const info: SatelliteParams = {
       id,
       type,
       country,
@@ -483,7 +483,7 @@ export class NewLaunch extends KeepTrackPlugin {
       name: 'New Launch Nominal',
     };
 
-    const newSat = new DetailedSatellite({
+    const newSat = new Satellite({
       ...info,
       ...{
         position: pos,

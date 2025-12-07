@@ -1,4 +1,4 @@
-import { DEG2RAD, eci2ecf, EciVec3, Sgp4, TAU } from '@ootk/src/main';
+import { DEG2RAD, eci2ecef, TemeVec3, Sgp4, TAU } from '@ootk/src/main';
 import { RADIUS_OF_EARTH } from '../engine/utils/constants';
 import { jday } from '../engine/utils/transforms';
 import {
@@ -191,10 +191,10 @@ const drawTleOrbitSegmentTrail_ = (now: number, i: number, timeslice: number, id
     return;
   }
 
-  let pos = sv.position as EciVec3;
+  let pos = sv.position as TemeVec3;
 
   if (isEcfOutput) {
-    pos = eci2ecf(pos, (i * timeslice * TAU) / period);
+    pos = eci2ecef(pos, (i * timeslice * TAU) / period);
   }
   pointsOut[i * 4] = pos.x;
   pointsOut[i * 4 + 1] = pos.y;
@@ -215,10 +215,10 @@ const drawTleOrbitSegment_ = (now: number, i: number, timeslice: number, id: num
     return;
   }
 
-  let pos = sv.position as EciVec3;
+  let pos = sv.position as TemeVec3;
 
   if (isEcfOutput) {
-    pos = eci2ecf(pos, (i * timeslice * TAU) / period);
+    pos = eci2ecef(pos, (i * timeslice * TAU) / period);
   }
   pointsOut[i * 4] = pos.x;
   pointsOut[i * 4 + 1] = pos.y;

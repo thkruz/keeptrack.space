@@ -175,9 +175,9 @@ describe('ContextMenuComponent', () => {
       const component = new ContextMenuComponent('test-plugin', createConfig(), { onAction });
 
       component.init();
-      eventBus.emit(EventBusEvent.rmbMenuActions, 'some-action');
+      eventBus.emit(EventBusEvent.rmbMenuActions, 'some-action', -1);
 
-      expect(onAction).toHaveBeenCalledWith('some-action', undefined);
+      expect(onAction).toHaveBeenCalledWith('some-action', -1);
     });
   });
 

@@ -40,6 +40,6 @@ describe('truncateString_function', () => {
 
   // Tests that the function returns 'Unknown' if the input string is undefined
   it('test_undefined_string', () => {
-    expect(truncateString(null, 5)).toBe('Unknown');
+    expect(truncateString(null as unknown as string, 5)).toBe('Unknown');
   });
 });

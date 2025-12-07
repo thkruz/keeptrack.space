@@ -64,7 +64,7 @@ export class Moon extends CelestialBody {
     }
     this.updatePosition(simTime);
     this.modelViewMatrix_ = mat4.clone(this.mesh.geometry.localMvMatrix);
-    if (settingsManager.centerBody !== this.getName() || (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) !== -1) {
+    if (settingsManager.centerBody !== this.getName() || (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? '-1') !== '-1') {
       mat4.translate(this.modelViewMatrix_, this.modelViewMatrix_, this.position);
       const worldShift = Scene.getInstance().worldShift;
 

@@ -9,7 +9,8 @@ import { openColorbox } from '@app/engine/utils/colorbox';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { hideEl, showEl } from '@app/engine/utils/get-el';
-import { DetailedSatellite, DetailedSensor, eci2lla } from '@ootk/src/main';
+import { Satellite, eci2lla } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SensorInfoPlugin } from '../sensor/sensor-info-plugin';
@@ -98,7 +99,7 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin {
       }
       const sat = ServiceLocator.getCatalogManager().getObject(clickedSatId);
 
-      if (sat instanceof DetailedSatellite === false) {
+      if (sat instanceof Satellite === false) {
         hideEl('view-sat-info-rmb');
         hideEl('view-related-sats-rmb');
       } else {

@@ -32,7 +32,7 @@ import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { SoundNames } from '@app/engine/audio/sounds';
 import '@materializecss/materialize';
-import { BaseObject, DetailedSatellite, Milliseconds, MILLISECONDS_PER_SECOND } from '@ootk/src/main';
+import { BaseObject, Satellite, Milliseconds, MILLISECONDS_PER_SECOND } from '@ootk/src/main';
 import { ColorScheme } from '../../engine/rendering/color-schemes/color-scheme';
 import { clickAndDragHeight, clickAndDragWidth } from '../../engine/utils/click-and-drag';
 import { closeColorbox } from '../../engine/utils/colorbox';
@@ -57,7 +57,7 @@ export class UiManager {
   isCurrentlyTyping = false;
   isUiVisible = true;
   lastBoxUpdateTime = 0;
-  lastNextPassCalcSatId = 0;
+  lastNextPassCalcSatId = -1;
   lastNextPassCalcSensorShortName: string;
   lastToast: string;
   searchManager: SearchManager;
@@ -450,7 +450,7 @@ export class UiManager {
       return;
     }
 
-    const sat = obj as DetailedSatellite;
+    const sat = obj as Satellite;
 
     if (realTime * 1 > lastBoxUpdateTime * 1 + this.updateInterval) {
       EventBus.getInstance().emit(EventBusEvent.updateSelectBox, sat);

@@ -6,7 +6,7 @@ import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfac
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { BaseObject, DetailedSatellite, PayloadStatus, SpaceObjectType, Star } from '@app/engine/ootk/src/main';
+import { BaseObject, Satellite, PayloadStatus, SpaceObjectType, Star } from '@app/engine/ootk/src/main';
 import { html } from '@app/engine/utils/development/formatter';
 import { hideEl } from '@app/engine/utils/get-el';
 import { CameraType } from '../../camera/camera';
@@ -186,7 +186,7 @@ export class CelestrakColorScheme extends ColorScheme {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const sensorManagerInstance = ServiceLocator.getSensorManager();
     const dotsManagerInstance = ServiceLocator.getDotsManager();
-    const sat = obj as DetailedSatellite;
+    const sat = obj as Satellite;
 
     if (
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&

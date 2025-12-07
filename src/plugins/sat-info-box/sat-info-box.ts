@@ -11,7 +11,7 @@ import { DraggableBox } from '@app/engine/ui/draggable-box';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl, setInnerHtml, showEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
-import { BaseObject, CatalogSource, DetailedSatellite } from '@ootk/src/main';
+import { BaseObject, CatalogSource, Satellite } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '@app/engine/audio/sounds';
@@ -267,12 +267,12 @@ export class SatInfoBox extends KeepTrackPlugin {
       return;
     }
 
-    const isHasAltName: boolean = !!((obj as DetailedSatellite)?.altName && (obj as DetailedSatellite).altName !== '');
-    const isHasAltId: boolean = !!((obj as DetailedSatellite)?.altId && (obj as DetailedSatellite).altId !== '');
+    const isHasAltName: boolean = !!((obj as Satellite)?.altName && (obj as Satellite).altName !== '');
+    const isHasAltId: boolean = !!((obj as Satellite)?.altId && (obj as Satellite).altId !== '');
 
     setInnerHtml(EL.NAME, obj.name);
 
-    if (obj instanceof DetailedSatellite) {
+    if (obj instanceof Satellite) {
       KeepTrack.getInstance().containerRoot.querySelectorAll('.sat-only-info')?.forEach((el) => {
         (<HTMLElement>el).style.display = 'flex';
       });
@@ -281,10 +281,10 @@ export class SatInfoBox extends KeepTrackPlugin {
     const flagEl = getEl(EL.FLAG, true);
 
     if (flagEl) {
-      if (obj.isSatellite() && (obj as DetailedSatellite).sccNum5 === '25544') {
+      if (obj.isSatellite() && (obj as Satellite).sccNum5 === '25544') {
         flagEl.classList.value = 'fi fi-iss';
       } else {
-        flagEl.classList.value = `fi ${country2flagIcon((obj as DetailedSatellite).country)}`;
+        flagEl.classList.value = `fi ${country2flagIcon((obj as Satellite).country)}`;
       }
     }
 
@@ -293,7 +293,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
       if (altNameEl && altNameEl.parentElement) {
         showEl(altNameEl.parentElement, 'flex');
-        altNameEl.innerHTML = (obj as DetailedSatellite).altName;
+        altNameEl.innerHTML = (obj as Satellite).altName;
       }
     } else {
       const altNameEl = getEl(EL.ALT_NAME, true);
@@ -308,7 +308,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
       if (altIdEl && altIdEl.parentElement) {
         showEl(altIdEl.parentElement, 'flex');
-        altIdEl.innerHTML = (obj as DetailedSatellite).altId;
+        altIdEl.innerHTML = (obj as Satellite).altId;
       }
     } else {
       const altIdEl = getEl(EL.ALT_ID, true);
@@ -328,7 +328,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       setInnerHtml(EL.OBJNUM, 'N/A');
       setInnerHtml(EL.SOURCE, 'N/A');
     } else {
-      const sat = obj as DetailedSatellite;
+      const sat = obj as Satellite;
 
       setInnerHtml(EL.INTL_DES, sat.intlDes === 'none' ? 'N/A' : sat.intlDes);
       if (sat.source && sat.source === CatalogSource.VIMPEL) {
@@ -345,7 +345,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
   }
 
-  private updateConfidenceDom_(sat: DetailedSatellite) {
+  private updateConfidenceDom_(sat: Satellite) {
     if (!sat || sat.isStatic() || sat.isSensor()) {
       return;
     }

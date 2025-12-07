@@ -212,7 +212,7 @@ const pad = (num: number, length: number): string => String(num).padStart(length
 export const dateFormat = (date: string | Date, mask: string, utc = false) => {
   if (typeof date === 'string' && !(/\d/u).test(date)) {
     mask = date;
-    date = null;
+    date = undefined as unknown as string | Date;
   }
 
   if (!date) {
@@ -266,7 +266,7 @@ export const dateFormat = (date: string | Date, mask: string, utc = false) => {
     tt: H < 12 ? 'am' : 'pm',
     T: H < 12 ? 'A' : 'P',
     TT: H < 12 ? 'AM' : 'PM',
-    Z: utc ? 'UTC' : (String(date).match(timezone) || ['']).pop().replace(timezoneClip, ''),
+    Z: utc ? 'UTC' : ((String(date).match(timezone) || ['']).pop() ?? '').replace(timezoneClip, ''),
     o: (o > 0 ? '-' : '+') + pad(Math.floor(Math.abs(o) / 60) * 100 + (Math.abs(o) % 60), 4),
     S: ['th', 'st', 'nd', 'rd'][d % 10 > 3 || (d % 100) - (d % 10) === 10 ? 0 : d % 10],
   };

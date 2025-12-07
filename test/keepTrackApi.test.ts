@@ -3,7 +3,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { expect } from '@jest/globals';
-import { DetailedSatellite } from '@ootk/src/main';
+import { Satellite } from '@ootk/src/main';
 import { defaultSat } from './environment/apiMocks';
 
 test('keepTrackApi Unit Testing', () => {
@@ -71,7 +71,7 @@ test('keepTrackApi Unit Testing', () => {
     // Do nothing
   });
 
-  EventBus.getInstance().emit(EventBusEvent.updateSelectBox, 'test' as unknown as DetailedSatellite);
+  EventBus.getInstance().emit(EventBusEvent.updateSelectBox, 'test' as unknown as Satellite);
   EventBus.getInstance().emit(EventBusEvent.onCruncherReady);
   EventBus.getInstance().emit(EventBusEvent.onCruncherMessage);
   EventBus.getInstance().emit(EventBusEvent.uiManagerInit);

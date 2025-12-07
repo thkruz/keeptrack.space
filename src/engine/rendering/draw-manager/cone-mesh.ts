@@ -64,7 +64,7 @@ export class ConeMesh extends CustomMesh {
     const positionData = ServiceLocator.getDotsManager()?.positionData;
     const id = this.obj.id;
 
-    this.pos = vec3.fromValues(positionData[id * 3], positionData[id * 3 + 1], positionData[id * 3 + 2]);
+    this.pos = vec3.fromValues(positionData[Number(id) * 3], positionData[Number(id) * 3 + 1], positionData[Number(id) * 3 + 2]);
   }
 
   update() {

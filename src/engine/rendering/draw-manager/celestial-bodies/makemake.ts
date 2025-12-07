@@ -20,7 +20,7 @@
  */
 
 import { SolarBody } from '@app/engine/core/interfaces';
-import { EciVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
+import { TemeVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
 import { KM_PER_AU } from 'astronomy-engine';
 import { PlanetColors } from './celestial-body';
 import { DwarfPlanet } from './dwarf-planet';
@@ -39,7 +39,7 @@ export class Makemake extends DwarfPlanet {
   orbitalPeriod = 306.70 * 365.25 * 24 * 3600 as Seconds;
   meanDistanceToSun = 45.499 * KM_PER_AU as Kilometers;
   type: SpaceObjectType = SpaceObjectType.DWARF_PLANET;
-  eci: EciVec3;
+  eci: TemeVec3;
   rotation = [0, 0, Math.PI * 7 / 10];
   color = PlanetColors.MAKEMAKE;
   textureQuality: MakemakeTextureQuality = MakemakeTextureQuality.POTATO;

@@ -37,4 +37,15 @@ export class LaunchSite extends BaseObject {
   isStatic(): boolean {
     return true;
   }
+
+  protected serializeSpecific(): Record<string, unknown> {
+    return {
+      lat: this.lat,
+      lon: this.lon,
+      alt: this.alt,
+      site: this.site,
+      country: this.country,
+      wikiUrl: this.wikiUrl,
+    };
+  }
 }

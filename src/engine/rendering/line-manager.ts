@@ -6,7 +6,8 @@ import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { Singletons, SolarBody } from '@app/engine/core/interfaces';
 import { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
-import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, RaeVec3 } from '@ootk/src/main';
+import { BaseObject, Degrees, Satellite, Kilometers, RaeVec3 } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { Container } from '../core/container';
 import { Scene } from '../core/scene';
@@ -63,8 +64,8 @@ export class LineManager {
     EventBus.getInstance().emit(EventBusEvent.onLineAdded, this);
   }
 
-  createSatRicFrame(sat: DetailedSatellite | MissileObject | OemSatellite | null): void {
-    if (!sat || !(sat instanceof DetailedSatellite)) {
+  createSatRicFrame(sat: Satellite | MissileObject | OemSatellite | null): void {
+    if (!sat || !(sat instanceof Satellite)) {
       return;
     }
 
@@ -73,24 +74,24 @@ export class LineManager {
     this.add(new SatRicLine(sat, 'C', LineColors.BLUE));
   }
 
-  createSatToRef(sat: DetailedSatellite | OemSatellite | MissileObject | null, ref: vec3, color = LineColors.PURPLE): void {
-    if (!sat || !(sat instanceof DetailedSatellite || sat instanceof OemSatellite)) {
+  createSatToRef(sat: Satellite | OemSatellite | MissileObject | null, ref: vec3, color = LineColors.PURPLE): void {
+    if (!sat || !(sat instanceof Satellite || sat instanceof OemSatellite)) {
       return;
     }
 
     this.add(new SatToRefLine(sat, ref, color));
   }
 
-  createSat2Sun(sat: DetailedSatellite | MissileObject | OemSatellite | null): void {
-    if (!sat || !(sat instanceof DetailedSatellite || sat instanceof OemSatellite)) {
+  createSat2Sun(sat: Satellite | MissileObject | OemSatellite | null): void {
+    if (!sat || !(sat instanceof Satellite || sat instanceof OemSatellite)) {
       return;
     }
 
     this.add(new SatToSunLine(sat));
   }
 
-  createSat2CelestialBody(sat: DetailedSatellite | MissileObject | OemSatellite | null, body: SolarBody): void {
-    if (!sat || !(sat instanceof DetailedSatellite || sat instanceof OemSatellite)) {
+  createSat2CelestialBody(sat: Satellite | MissileObject | OemSatellite | null, body: SolarBody): void {
+    if (!sat || !(sat instanceof Satellite || sat instanceof OemSatellite)) {
       return;
     }
 
@@ -127,7 +128,7 @@ export class LineManager {
     this.add(new SensorToMoonLine(sensor));
   }
 
-  createSatScanEarth(sat: DetailedSatellite | null, color?: vec4): void {
+  createSatScanEarth(sat: Satellite | null, color?: vec4): void {
     if (!sat) {
       return;
     }
@@ -150,22 +151,22 @@ export class LineManager {
     this.add(new SensorToRaeLine(sensor, rae, color));
   }
 
-  createSensorToSat(sensor: DetailedSensor | null, sat: DetailedSatellite | MissileObject | OemSatellite | null, color?: vec4): void {
-    if (!sensor || !sat || !(sat instanceof DetailedSatellite || sat instanceof OemSatellite)) {
+  createSensorToSat(sensor: DetailedSensor | null, sat: Satellite | MissileObject | OemSatellite | null, color?: vec4): void {
+    if (!sensor || !sat || !(sat instanceof Satellite || sat instanceof OemSatellite)) {
       return;
     }
 
     this.add(new SensorToSatLine(sensor, sat, color));
   }
 
-  createObjToObj(obj1: DetailedSatellite | OemSatellite | MissileObject | null, obj2: DetailedSatellite | MissileObject | OemSatellite | null, color?: vec4): void {
+  createObjToObj(obj1: Satellite | OemSatellite | MissileObject | null, obj2: Satellite | MissileObject | OemSatellite | null, color?: vec4): void {
     if (!obj1 || !obj2) {
       return;
     }
     this.add(new ObjToObjLine(obj1, obj2, color));
   }
 
-  createSensorToSatFovOnly(sensor: DetailedSensor | null, sat: DetailedSatellite | null, color?: vec4): void {
+  createSensorToSatFovOnly(sensor: DetailedSensor | null, sat: Satellite | null, color?: vec4): void {
     if (!sensor || !sat) {
       return;
     }
@@ -176,8 +177,8 @@ export class LineManager {
     this.add(line);
   }
 
-  createSensorToSatFovAndSelectedOnly(sensor: DetailedSensor | null, sat: DetailedSatellite | null, color?: vec4): void {
-    if (!sensor || !sat || !(sat instanceof DetailedSatellite)) {
+  createSensorToSatFovAndSelectedOnly(sensor: DetailedSensor | null, sat: Satellite | null, color?: vec4): void {
+    if (!sensor || !sat || !(sat instanceof Satellite)) {
       return;
     }
 
@@ -188,7 +189,7 @@ export class LineManager {
     this.add(line);
   }
 
-  createSensorsToSatFovOnly(sat: DetailedSatellite, color?: vec4): void {
+  createSensorsToSatFovOnly(sat: Satellite, color?: vec4): void {
     const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     for (const sensor of sensorManagerInstance.getAllSensors()) {
@@ -503,7 +504,7 @@ export class LineManager {
         if (sat) {
           const sensor = ServiceLocator.getSensorManager().getSensor();
 
-          this.createSensorToSatFovAndSelectedOnly(sensor, sat as DetailedSatellite);
+          this.createSensorToSatFovAndSelectedOnly(sensor, sat as Satellite);
         }
       },
     );

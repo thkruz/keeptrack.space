@@ -1,3 +1,5 @@
+import type { ClassicalElements } from '@app/engine/ootk/src/coordinate/ClassicalElements';
+import type { ITRF } from '@app/engine/ootk/src/coordinate/ITRF';
 import { rgbaArray, SolarBody } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -5,7 +7,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { LagrangeInterpolator } from '@app/engine/ootk/src/interpolator/LagrangeInterpolator';
 import { LineColors } from '@app/engine/rendering/line-manager/line';
 import { OrbitPathLine } from '@app/engine/rendering/line-manager/orbit-path';
-import { BaseObject, J2000, Kilometers, Seconds, SpaceObjectType, TEME } from '@ootk/src/main';
+import { SpaceObject, J2000, Kilometers, KilometersPerSecond, Seconds, SpaceObjectType, TEME, Degrees, EcefVec3, LlaVec3, PosVel, calcGmst, eci2ecef, eci2lla, TemeVec3 } from '@ootk/src/main';
 import { vec4 } from 'gl-matrix';
 import { SatelliteModels } from '../rendering/mesh/model-resolver';
 
@@ -55,7 +57,7 @@ export interface ParsedOem {
 }
 
 
-export class OemSatellite extends BaseObject {
+export class OemSatellite extends SpaceObject {
   header: OemHeader;
   OemDataBlocks: OemDataBlock[];
   model: keyof typeof SatelliteModels = SatelliteModels.aehf;
@@ -78,16 +80,25 @@ export class OemSatellite extends BaseObject {
   orbitColor: vec4 = LineColors.GREEN;
   dotColor: rgbaArray = [0, 255, 0, 1];
 
-  eci(date: Date): { position: { x: number; y: number; z: number }; velocity: { x: number; y: number; z: number } } | null {
-    const posAndVel = this.updatePosAndVel(date.getTime() / 1000 as Seconds);
+  eci(date?: Date): PosVel | null {
+    const effectiveDate = date ?? ServiceLocator.getTimeManager().simulationTimeObj;
+    const posAndVel = this.updatePosAndVel(effectiveDate.getTime() / 1000 as Seconds);
 
     if (!posAndVel) {
       return null;
     }
 
     return {
-      position: { x: posAndVel[0], y: posAndVel[1], z: posAndVel[2] },
-      velocity: { x: posAndVel[3], y: posAndVel[4], z: posAndVel[5] },
+      position: {
+        x: posAndVel[0] as Kilometers,
+        y: posAndVel[1] as Kilometers,
+        z: posAndVel[2] as Kilometers,
+      },
+      velocity: {
+        x: posAndVel[3] as KilometersPerSecond,
+        y: posAndVel[4] as KilometersPerSecond,
+        z: posAndVel[5] as KilometersPerSecond,
+      },
     };
   }
 
@@ -568,5 +579,100 @@ export class OemSatellite extends BaseObject {
       this.orbitFullPathLine.isGarbage = true;
       this.orbitFullPathLine = null;
     }
+  }
+
+  // ==================== SpaceObject Abstract Method Implementations ====================
+
+  ecef(date?: Date): EcefVec3<Kilometers> | null {
+    const eciResult = this.eci(date);
+
+    if (!eciResult) {
+      return null;
+    }
+
+    const effectiveDate = date ?? ServiceLocator.getTimeManager().simulationTimeObj;
+    const { gmst } = calcGmst(effectiveDate);
+
+    return eci2ecef(eciResult.position, gmst);
+  }
+
+  lla(date?: Date): LlaVec3<Degrees, Kilometers> | null {
+    const eciResult = this.eci(date);
+
+    if (!eciResult) {
+      return null;
+    }
+
+    const effectiveDate = date ?? ServiceLocator.getTimeManager().simulationTimeObj;
+    const { gmst } = calcGmst(effectiveDate);
+    const eciPos: TemeVec3 = {
+      x: eciResult.position.x,
+      y: eciResult.position.y,
+      z: eciResult.position.z,
+    };
+
+    return eci2lla(eciPos, gmst);
+  }
+
+  toJ2000(date?: Date): J2000 {
+    const effectiveDate = date ?? ServiceLocator.getTimeManager().simulationTimeObj;
+    const posix = effectiveDate.getTime() / 1000;
+
+    // Find the closest state vector to the requested time
+    for (const block of this.OemDataBlocks) {
+      for (const stateVector of block.ephemeris) {
+        if (stateVector.epoch.posix >= posix) {
+          return stateVector;
+        }
+      }
+    }
+
+    // Return the last state vector if time is beyond the ephemeris
+    const lastBlock = this.OemDataBlocks[this.OemDataBlocks.length - 1];
+
+    return lastBlock.ephemeris[lastBlock.ephemeris.length - 1];
+  }
+
+  toITRF(_date?: Date): ITRF {
+    throw new Error('OemSatellite does not yet support ITRF coordinate conversion. Use ecef() for Earth-fixed coordinates.');
+  }
+
+  toClassicalElements(_date?: Date): ClassicalElements {
+    throw new Error('OemSatellite does not support classical orbital elements conversion. Use toJ2000() to get state vectors.');
+  }
+
+  clone(_options?: Record<string, unknown>): OemSatellite {
+    const parsedOem: ParsedOem = {
+      header: { ...this.header },
+      dataBlocks: this.OemDataBlocks.map((block) => ({
+        metadata: { ...block.metadata },
+        ephemeris: [...block.ephemeris],
+        covariance: block.covariance ? [...block.covariance] : null,
+      })),
+    };
+
+    const cloned = new OemSatellite(parsedOem);
+
+    cloned.model = this.model;
+    cloned.source = this.source;
+    cloned.centerBody = this.centerBody;
+    cloned.isInertialMoonFrame = this.isInertialMoonFrame;
+    cloned.orbitColor = vec4.clone(this.orbitColor);
+    cloned.dotColor = [...this.dotColor] as rgbaArray;
+
+    return cloned;
+  }
+
+  protected serializeSpecific(): Record<string, unknown> {
+    return {
+      header: this.header,
+      OemDataBlocks: this.OemDataBlocks,
+      model: this.model,
+      source: this.source,
+      centerBody: this.centerBody,
+      isInertialMoonFrame: this.isInertialMoonFrame,
+      orbitColor: Array.from(this.orbitColor),
+      dotColor: this.dotColor,
+    };
   }
 }

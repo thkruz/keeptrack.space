@@ -6,7 +6,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { SettingsManager } from '@app/settings/settings';
 import { OrbitCruncherMsgType, OrbitDrawTypes } from '@app/webworker/orbit-cruncher-interfaces';
-import { BaseObject, Degrees, DetailedSatellite, Kilometers } from '@ootk/src/main';
+import { BaseObject, Degrees, Satellite, Kilometers } from '@ootk/src/main';
 import { mat4 } from 'gl-matrix';
 import { Camera, CameraType } from '../../engine/camera/camera';
 import { GetSatType } from '../../engine/core/interfaces';
@@ -127,12 +127,12 @@ export class OrbitManager {
     gl.enable(gl.DEPTH_TEST);
 
     if (settingsManager.enableConstantSelectedSatRedraw) {
-      if ((selectSatManagerInstance?.selectedSat ?? -1) > -1) {
+      if ((selectSatManagerInstance?.selectedSat ?? -1) !== -1) {
         this.clearSelectOrbit(false);
         this.setSelectOrbit(selectSatManagerInstance?.selectedSat ?? -1, false);
       }
 
-      if ((selectSatManagerInstance?.secondarySat ?? -1) > -1) {
+      if ((selectSatManagerInstance?.secondarySat ?? -1) !== -1) {
         this.clearSelectOrbit(true);
         this.setSelectOrbit(selectSatManagerInstance?.secondarySat ?? -1, true);
       }
@@ -321,7 +321,7 @@ export class OrbitManager {
       if (obj.isMissile()) {
         this.orbitThreadMgr.postMessage({
           type: OrbitCruncherMsgType.MISSILE_UPDATE,
-          id,
+          id: Number(id),
           dynamicOffsetEpoch: timeManagerInstance.dynamicOffsetEpoch,
           staticOffset: timeManagerInstance.staticOffset,
           propRate: timeManagerInstance.propRate,
@@ -336,7 +336,7 @@ export class OrbitManager {
         // Then it is a satellite
         this.orbitThreadMgr.postMessage({
           type: OrbitCruncherMsgType.SATELLITE_UPDATE,
-          id,
+          id: Number(id),
           dynamicOffsetEpoch: timeManagerInstance.dynamicOffsetEpoch,
           staticOffset: timeManagerInstance.staticOffset,
           propRate: timeManagerInstance.propRate,
@@ -359,8 +359,8 @@ export class OrbitManager {
         }
 
         return {
-          tle1: (obj as DetailedSatellite).tle1,
-          tle2: (obj as DetailedSatellite).tle2,
+          tle1: (obj as Satellite).tle1,
+          tle2: (obj as Satellite).tle2,
         };
       }),
     );

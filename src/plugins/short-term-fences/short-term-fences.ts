@@ -7,7 +7,8 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { BaseObject, DEG2RAD, Degrees, DetailedSensor, EpochUTC, Kilometers, RAE, Radians, SpaceObjectType, ZoomValue, eci2rae } from '@ootk/src/main';
+import { BaseObject, DEG2RAD, Degrees, EpochUTC, Kilometers, RAE, Radians, SpaceObjectType, ZoomValue, eci2rae } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -263,16 +264,8 @@ export class ShortTermFences extends KeepTrackPlugin {
     });
 
     if (
-      !curSensor.isRaeInFov({
-        az: minaz,
-        el: minel,
-        rng: minrange,
-      }) ||
-      !curSensor.isRaeInFov({
-        az: maxaz,
-        el: maxel,
-        rng: maxrange,
-      })
+      !curSensor.isRaeInFov(minaz, minel, minrange) ||
+      !curSensor.isRaeInFov(maxaz, maxel, maxrange)
     ) {
       errorManagerInstance.warn('STF is not in view of the sensor!');
 

@@ -3,17 +3,18 @@ import { EciArr3 } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { DetailedSatellite, DetailedSensor, eci2rae } from '@ootk/src/main';
+import { Satellite, eci2rae } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { vec4 } from 'gl-matrix';
 import { Line, LineColors } from './line';
 
 export class SensorToSatLine extends Line {
-  sat: DetailedSatellite | OemSatellite;
+  sat: Satellite | OemSatellite;
   sensor: DetailedSensor;
   private isDrawFovOnly_ = false;
   private isDrawSelectedOnly_ = false;
 
-  constructor(sensor: DetailedSensor, sat: DetailedSatellite | OemSatellite, color?: vec4) {
+  constructor(sensor: DetailedSensor, sat: Satellite | OemSatellite, color?: vec4) {
     super();
     this.sat = sat;
     this.sensor = sensor;
@@ -31,7 +32,7 @@ export class SensorToSatLine extends Line {
   update(): void {
     const posData = ServiceLocator.getDotsManager().positionData;
     const id = this.sat.id;
-    const eciArr = [posData[id * 3], posData[id * 3 + 1], posData[id * 3 + 2]] as EciArr3;
+    const eciArr = [posData[Number(id) * 3], posData[Number(id) * 3 + 1], posData[Number(id) * 3 + 2]] as EciArr3;
 
     const sensorEci = this.sensor.eci(ServiceLocator.getTimeManager().simulationTimeObj);
     const sensorEciArr = [sensorEci.x, sensorEci.y, sensorEci.z] as EciArr3;
@@ -44,8 +45,8 @@ export class SensorToSatLine extends Line {
       if (this.sat instanceof OemSatellite) {
         const rae = eci2rae(ServiceLocator.getTimeManager().simulationTimeObj, this.sat.position, this.sensor);
 
-        isInFov = this.sensor.isRaeInFov(rae);
-      } else if (this.sat instanceof DetailedSatellite) {
+        isInFov = this.sensor.isRaeInFov(rae.az, rae.el, rae.rng);
+      } else if (this.sat instanceof Satellite) {
         isInFov = this.sensor.isSatInFov(this.sat, ServiceLocator.getTimeManager().simulationTimeObj);
       }
 
@@ -56,7 +57,7 @@ export class SensorToSatLine extends Line {
     }
 
     if (this.isDrawSelectedOnly_) {
-      if (this.sat.id !== PluginRegistry.getPlugin(SelectSatManager).selectedSat) {
+      if (this.sat.id !== PluginRegistry.getPlugin(SelectSatManager)?.selectedSat) {
         this.isDraw_ = false;
         this.isGarbage = true;
       }

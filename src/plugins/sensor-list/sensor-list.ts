@@ -8,7 +8,8 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getClass } from '@app/engine/utils/get-class';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
-import { BaseObject, DetailedSatellite, DetailedSensor, ZoomValue } from '@ootk/src/main';
+import { BaseObject, Satellite, ZoomValue } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import sensorPng from '@public/img/icons/sensor.png';
 import { SensorGroup, sensorGroups } from '../../app/data/catalogs/sensor-groups';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -156,7 +157,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
               return;
             }
 
-            ServiceLocator.getLineManager().createSensorsToSatFovOnly(sat as DetailedSatellite);
+            ServiceLocator.getLineManager().createSensorsToSatFovOnly(sat as Satellite);
           });
           this.isSensorLinksAdded = true;
         }

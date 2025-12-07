@@ -291,7 +291,7 @@ export class Earth {
    */
   update(): void {
     const gmst = ServiceLocator.getTimeManager().gmst;
-    const sunPos = Sun.position(EpochUTC.fromDateTime(ServiceLocator.getTimeManager().simulationTimeObj));
+    const sunPos = Sun.eci(ServiceLocator.getTimeManager().simulationTimeObj);
 
     if (this.isDrawOrbitPath && (settingsManager.centerBody !== SolarBody.Earth && settingsManager.centerBody !== SolarBody.Moon)) {
       this.drawFullOrbitPath();
@@ -302,7 +302,7 @@ export class Earth {
 
     this.modelViewMatrix_ = mat4.copy(mat4.create(), this.surfaceMesh.geometry.localMvMatrix);
 
-    if (settingsManager.centerBody !== SolarBody.Earth || (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) !== -1) {
+    if (settingsManager.centerBody !== SolarBody.Earth || (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? '-1') !== '-1') {
       const worldShift = Scene.getInstance().worldShift;
 
       mat4.translate(this.modelViewMatrix_, this.modelViewMatrix_, vec3.fromValues(worldShift[0], worldShift[1], worldShift[2]));

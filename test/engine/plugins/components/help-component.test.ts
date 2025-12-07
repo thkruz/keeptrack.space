@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { HelpComponent, IsActiveCallback } from '@app/engine/plugins/components/help/help-component';
+import { HelpComponent } from '@app/engine/plugins/components/help/help-component';
 import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -101,7 +101,6 @@ describe('HelpComponent', () => {
 
     it('should not show help when plugin is not active', () => {
       const showAdviceMock = adviceManagerInstance.showAdvice as jest.Mock;
-      const callCountBefore = showAdviceMock.mock.calls.length;
 
       const isActive = jest.fn().mockReturnValue(false);
       const component = new HelpComponent('test-plugin', createConfig({

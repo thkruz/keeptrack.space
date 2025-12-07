@@ -28,8 +28,8 @@ describe('OrbitReferences', () => {
     expect(() => EventBus.getInstance().emit(EventBusEvent.selectSatData, defaultSat, 0)).not.toThrow();
 
     ServiceLocator.getCatalogManager().analSatSet = [defaultSat];
-    PluginRegistry.getPlugin(SelectSatManager).selectSat(0);
+    PluginRegistry.getPlugin(SelectSatManager)!.selectSat(0);
     ServiceLocator.getCatalogManager().addAnalystSat = () => defaultSat;
-    getEl('orbit-references-link').click();
+    getEl('orbit-references-link')!.click();
   });
 });

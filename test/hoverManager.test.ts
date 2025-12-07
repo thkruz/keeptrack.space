@@ -40,15 +40,12 @@ import { setupStandardEnvironment } from './environment/standard-env';
 describe('code_snippet', () => {
   let hoverManager: HoverManager;
   let orbitManagerInstance: OrbitManager;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let catalogManagerInstance: CatalogManager;
-
-  // eslint-disable-next-line no-console
-  console.debug(catalogManagerInstance);
 
   beforeAll(() => {
     orbitManagerInstance = ServiceLocator.getOrbitManager();
     catalogManagerInstance = ServiceLocator.getCatalogManager();
+    void catalogManagerInstance; // Variable is used indirectly by test utilities
     orbitManagerInstance.setHoverOrbit = jest.fn();
 
     // orbitManagerInstance.setHoverOrbit = jest.fn();

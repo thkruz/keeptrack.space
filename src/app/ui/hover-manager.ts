@@ -8,7 +8,8 @@ import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { CatalogSource, DetailedSatellite, DetailedSensor, KM_PER_AU, LandObject, SpaceObjectType, spaceObjType2Str, Star } from '@ootk/src/main';
+import { CatalogSource, Satellite, KM_PER_AU, LandObject, SpaceObjectType, spaceObjType2Str, Star } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import i18next from 'i18next';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
@@ -75,7 +76,7 @@ export class HoverManager {
     }
   }
 
-  private controlFacility_(obj: LandObject) {
+  private controlFacility_(obj: LandObject | LaunchSite) {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     this.satHoverBoxNode1.textContent = obj.name;
@@ -158,7 +159,7 @@ export class HoverManager {
       if (obj.isMissile()) {
         this.missile_(obj as MissileObject);
       } else if (obj.isSatellite()) {
-        this.satObj_(obj as DetailedSatellite);
+        this.satObj_(obj as Satellite);
       } else {
         this.staticObj_(obj as LandObject);
       }
@@ -184,7 +185,7 @@ export class HoverManager {
     this.satHoverBoxNode3.textContent = launchSite.country ?? 'Unknown Country';
   }
 
-  private launchFacility_(landObj: LandObject) {
+  private launchFacility_(landObj: LandObject | LaunchSite) {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     const launchSite = StringExtractor.extractLaunchSite(landObj.name);
@@ -224,7 +225,7 @@ export class HoverManager {
     return false;
   }
 
-  private satObj_(sat: DetailedSatellite) {
+  private satObj_(sat: Satellite) {
     if (!settingsManager.enableHoverOverlay) {
       return;
     }
@@ -283,7 +284,7 @@ export class HoverManager {
     }
   }
 
-  private updateSatObjMinimal_(sat: DetailedSatellite) {
+  private updateSatObjMinimal_(sat: Satellite) {
     this.satHoverBoxNode1.textContent = sat.name;
     this.satHoverBoxNode2.textContent = settingsManager.isEPFL ? HoverManager.getLaunchYear(sat) : sat.sccNum;
     let country = StringExtractor.extractCountry(sat.country);
@@ -299,7 +300,7 @@ export class HoverManager {
     getEl('hoverbox-fi')!.classList.value = `fi ${country2flagIcon(sat.country)}`;
   }
 
-  private static getLaunchYear(sat: DetailedSatellite) {
+  private static getLaunchYear(sat: Satellite) {
     if (sat.type === SpaceObjectType.NOTIONAL) {
       return t7e('hoverManager.launchedPlanned');
     }
@@ -329,7 +330,7 @@ export class HoverManager {
 
   }
 
-  private showEciVel_(sat: DetailedSatellite) {
+  private showEciVel_(sat: Satellite) {
     this.satHoverBoxNode3.innerHTML = `
       <div style="display: flex; gap: 32px;">
         <div>
@@ -368,13 +369,13 @@ export class HoverManager {
     }
   }
 
-  private staticObj_(obj: DetailedSensor | LandObject | Star) {
+  private staticObj_(obj: DetailedSensor | LandObject | LaunchSite | Star) {
     if (obj.type === SpaceObjectType.LAUNCH_SITE) {
-      this.launchSite_(obj as LandObject);
+      this.launchSite_(obj as LaunchSite);
     } else if (obj.type === SpaceObjectType.LAUNCH_FACILITY) {
-      this.launchFacility_(obj as LandObject);
+      this.launchFacility_(obj as LaunchSite);
     } else if (obj.type === SpaceObjectType.CONTROL_FACILITY) {
-      this.controlFacility_(obj as LandObject);
+      this.controlFacility_(obj as LaunchSite);
     } else if (
       obj.type === SpaceObjectType.TERRESTRIAL_PLANET ||
       obj.type === SpaceObjectType.GAS_GIANT ||
@@ -415,7 +416,7 @@ export class HoverManager {
   }
 
   setHover(i: number): void {
-    if (typeof i === 'undefined' || i === null || isNaN(i)) {
+    if (typeof i === 'undefined' || i === null) {
       errorManagerInstance.debug('setHover called with no id');
 
       return;

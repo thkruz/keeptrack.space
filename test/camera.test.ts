@@ -1,7 +1,7 @@
 import { SatMath } from '@app/app/analysis/sat-math';
 import { Camera, CameraType } from '@app/engine/camera/camera';
 import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/engine/utils/constants';
-import { DEG2RAD, DetailedSatellite, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians } from '@ootk/src/main';
+import { DEG2RAD, Satellite, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians } from '@ootk/src/main';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 
 const testFuncWithAllCameraTypes = (testFunc: () => void, cameraInstance: Camera) => {
@@ -263,7 +263,7 @@ describe('Camera snapToSat', () => {
 
   // test snapToSat with no target
   it('test_snap_to_sat_no_target', () => {
-    const testFunc = () => cameraInstance.snapToSat(null as unknown as DetailedSatellite, new Date());
+    const testFunc = () => cameraInstance.snapToSat(null as unknown as Satellite, new Date());
 
     expect(testFunc).not.toThrow();
   });

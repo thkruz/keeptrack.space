@@ -10,7 +10,8 @@ import { MissileParams, ToastMsgType } from '@app/engine/core/interfaces';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { jday } from '@app/engine/utils/transforms';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { DEG2RAD, Degrees, EciVec3, Kilometers, KilometersPerSecond, MILLISECONDS_TO_DAYS, RAD2DEG, Sensor, Sgp4, SpaceObjectType, ecfRad2rae, eci2ecf, eci2lla } from '@ootk/src/main';
+import { DEG2RAD, Degrees, TemeVec3, Kilometers, KilometersPerSecond, MILLISECONDS_TO_DAYS, RAD2DEG, Sgp4, SpaceObjectType, ecefRad2rae, eci2ecef, eci2lla } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
 import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, globalBMTargets, ukSLBM } from './missile-data';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -42,10 +43,12 @@ export const MassRaidPre = async (time: number, simFile: string) => {
 
         // Add the missile to the catalog
         catalogManagerInstance.objectCache[x] = newMissileArray[i];
-        if (!catalogManagerInstance.objectCache[x].velocity?.x && !catalogManagerInstance.objectCache[x].velocity?.y && !catalogManagerInstance.objectCache[x].velocity?.z) {
-          catalogManagerInstance.objectCache[x].velocity = { x: 0, y: 0, z: 0 } as EciVec3<KilometersPerSecond>;
+        const cachedObj = catalogManagerInstance.objectCache[x] as unknown as { velocity?: TemeVec3<KilometersPerSecond>; totalVelocity?: number };
+
+        if (!cachedObj.velocity?.x && !cachedObj.velocity?.y && !cachedObj.velocity?.z) {
+          cachedObj.velocity = { x: 0, y: 0, z: 0 } as TemeVec3<KilometersPerSecond>;
         }
-        catalogManagerInstance.objectCache[x].totalVelocity ??= 0;
+        cachedObj.totalVelocity ??= 0;
 
         // Convert legacy format to new MissileObject class
         const missileObjData = catalogManagerInstance.getObject(x) as MissileObject;
@@ -115,8 +118,10 @@ export const clearMissiles = () => {
 
     catalogManagerInstance.objectCache[x] = missileObj;
     // Set the velocity to 0 if it doesn't exist
-    catalogManagerInstance.objectCache[x].velocity ??= { x: 0, y: 0, z: 0 } as EciVec3<KilometersPerSecond>;
-    catalogManagerInstance.objectCache[x].totalVelocity ??= 0;
+    const cachedMissile = catalogManagerInstance.objectCache[x] as unknown as { velocity?: TemeVec3<KilometersPerSecond>; totalVelocity?: number };
+
+    cachedMissile.velocity ??= { x: 0, y: 0, z: 0 } as TemeVec3<KilometersPerSecond>;
+    cachedMissile.totalVelocity ??= 0;
 
     catalogManagerInstance.satCruncher.postMessage({
       id: missileObj.id,
@@ -262,8 +267,8 @@ export const Missile = (
   EarthMass = 5.9726 * 10 ** 24; // (kg)
 
   // This function will calculate the path the rocket will take in terms of coordinates
-  const LatList = [];
-  const LongList = [];
+  const LatList: Degrees[] = [];
+  const LongList: Degrees[] = [];
 
   const [EstLatList, EstLongList, , ArcLength, EstDistanceList, GoalDistance] = calculateCoordinates_(CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude);
 
@@ -319,9 +324,9 @@ export const Missile = (
 
   // Here are the definitions for all the lists
 
-  const AltitudeList = [];
+  const AltitudeList: Kilometers[] = [];
 
-  const hList = [];
+  const hList: number[] = [];
 
   let NozzleAltitude2, NozzleAltitude3;
 
@@ -370,12 +375,12 @@ export const Missile = (
     dthetadt = iterationFunOutput[18];
     NozzleAltitude2 = Altitude;
 
-    AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2);
+    AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2 as Kilometers);
 
     for (let i = 0; i < EstDistanceList.length; i++) {
       if (EstDistanceList[i] <= Distance / 1000 && (EstDistanceList[i + 1] > Distance / 1000)) {
-        LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2);
-        LongList.push(Math.round(EstLongList[i] * 1e2) / 1e2);
+        LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2 as Degrees);
+        LongList.push(Math.round(EstLongList[i] * 1e2) / 1e2 as Degrees);
         break;
       }
     }
@@ -413,12 +418,12 @@ export const Missile = (
     dthetadt = iterationFunOutput[18];
     NozzleAltitude3 = Altitude;
 
-    AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2);
+    AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2 as Kilometers);
 
     for (let i = 0; i < EstDistanceList.length; i++) {
       if (EstDistanceList[i] <= Distance / 1000 && (EstDistanceList[i + 1] > Distance / 1000)) {
-        LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2);
-        LongList.push(Math.round(EstLongList[i] * 1e2) / 1e2);
+        LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2 as Degrees);
+        LongList.push(Math.round(EstLongList[i] * 1e2) / 1e2 as Degrees);
         break;
       }
     }
@@ -454,12 +459,12 @@ export const Missile = (
     ArcDistance = iterationFunOutput[16];
     dthetadt = iterationFunOutput[18];
 
-    AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2);
+    AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2 as Kilometers);
 
     for (let i = 0; i < EstDistanceList.length; i++) {
       if (EstDistanceList[i] <= Distance / 1000 && (EstDistanceList[i + 1] > Distance / 1000)) {
-        LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2);
-        LongList.push(Math.round(EstLongList[i] * 1e2) / 1e2);
+        LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2 as Degrees);
+        LongList.push(Math.round(EstLongList[i] * 1e2) / 1e2 as Degrees);
         break;
       }
     }
@@ -496,12 +501,12 @@ export const Missile = (
     ArcDistance = iterationFunOutput[16];
     dthetadt = iterationFunOutput[18];
 
-    AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2);
+    AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2 as Kilometers);
 
     for (let i = 0; i < EstDistanceList.length; i++) {
       if (EstDistanceList[i] <= Distance / 1000 && (EstDistanceList[i + 1] > Distance / 1000)) {
-        LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2);
-        LongList.push(Math.round(EstLongList[i] * 1e2) / 1e2);
+        LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2 as Degrees);
+        LongList.push(Math.round(EstLongList[i] * 1e2) / 1e2 as Degrees);
         break;
       }
     }
@@ -621,7 +626,7 @@ export const smoothList_ = <T extends number>(list: T[], smoothingFactor: number
  * @param sensors - An optional array of sensor objects to use for the calculation. If not provided, the current sensor(s) will be used.
  * @returns An object containing the current TEARR data for the missile.
  */
-export const getMissileTEARR = (missile: MissileObject, sensors?: Sensor[]) => {
+export const getMissileTEARR = (missile: MissileObject, sensors?: DetailedSensor[]) => {
   const timeManagerInstance = ServiceLocator.getTimeManager();
 
   const currentTEARR = {
@@ -687,8 +692,8 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: Sensor[]) => {
     currentTEARR.alt = gpos.alt;
     currentTEARR.lon = gpos.lon;
     currentTEARR.lat = gpos.lat;
-    positionEcf = eci2ecf({ x, y, z }, gmst);
-    lookAngles = ecfRad2rae(sensor.llaRad(), positionEcf);
+    positionEcf = eci2ecef({ x, y, z }, gmst);
+    lookAngles = ecefRad2rae(sensor.llaRad(), positionEcf);
     currentTEARR.az = lookAngles.az * RAD2DEG as Degrees;
     currentTEARR.el = lookAngles.el * RAD2DEG as Degrees;
     currentTEARR.rng = lookAngles.rng;
@@ -702,40 +707,42 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: Sensor[]) => {
   }
 
   // Check if satellite is in field of view of a sensor.
+  const hasSecondaryFov = sensor.minAz2 !== undefined && sensor.maxAz2 !== undefined &&
+    sensor.minEl2 !== undefined && sensor.maxEl2 !== undefined &&
+    sensor.minRng2 !== undefined && sensor.maxRng2 !== undefined;
+
   if (sensor.minAz > sensor.maxAz) {
-    if (
-      ((currentTEARR.az >= sensor.minAz || currentTEARR.az <= sensor.maxAz) &&
-        currentTEARR.el >= sensor.minEl &&
-        currentTEARR.el <= sensor.maxEl &&
-        currentTEARR.rng <= sensor.maxRng &&
-        currentTEARR.rng >= sensor.minRng) ||
-      ((currentTEARR.az >= sensor.minAz2 || currentTEARR.az <= sensor.maxAz2) &&
-        currentTEARR.el >= sensor.minEl2 &&
-        currentTEARR.el <= sensor.maxEl2 &&
-        currentTEARR.rng <= sensor.maxRng2 &&
-        currentTEARR.rng >= sensor.minRng2)
-    ) {
-      currentTEARR.inView = true;
-    } else {
-      currentTEARR.inView = false;
-    }
-  } else if (
-    (currentTEARR.az >= sensor.minAz &&
+    const inPrimaryFov = (currentTEARR.az >= sensor.minAz || currentTEARR.az <= sensor.maxAz) &&
+      currentTEARR.el >= sensor.minEl &&
+      currentTEARR.el <= sensor.maxEl &&
+      currentTEARR.rng <= sensor.maxRng &&
+      currentTEARR.rng >= sensor.minRng;
+
+    const inSecondaryFov = hasSecondaryFov &&
+      (currentTEARR.az >= sensor.minAz2! || currentTEARR.az <= sensor.maxAz2!) &&
+      currentTEARR.el >= sensor.minEl2! &&
+      currentTEARR.el <= sensor.maxEl2! &&
+      currentTEARR.rng <= sensor.maxRng2! &&
+      currentTEARR.rng >= sensor.minRng2!;
+
+    currentTEARR.inView = inPrimaryFov || inSecondaryFov;
+  } else {
+    const inPrimaryFov = currentTEARR.az >= sensor.minAz &&
       currentTEARR.az <= sensor.maxAz &&
       currentTEARR.el >= sensor.minEl &&
       currentTEARR.el <= sensor.maxEl &&
       currentTEARR.rng <= sensor.maxRng &&
-      currentTEARR.rng >= sensor.minRng) ||
-    (currentTEARR.az >= sensor.minAz2 &&
-      currentTEARR.az <= sensor.maxAz2 &&
-      currentTEARR.el >= sensor.minEl2 &&
-      currentTEARR.el <= sensor.maxEl2 &&
-      currentTEARR.rng <= sensor.maxRng2 &&
-      currentTEARR.rng >= sensor.minRng2)
-  ) {
-    currentTEARR.inView = true;
-  } else {
-    currentTEARR.inView = false;
+      currentTEARR.rng >= sensor.minRng;
+
+    const inSecondaryFov = hasSecondaryFov &&
+      currentTEARR.az >= sensor.minAz2! &&
+      currentTEARR.az <= sensor.maxAz2! &&
+      currentTEARR.el >= sensor.minEl2! &&
+      currentTEARR.el <= sensor.maxEl2! &&
+      currentTEARR.rng <= sensor.maxRng2! &&
+      currentTEARR.rng >= sensor.minRng2!;
+
+    currentTEARR.inView = inPrimaryFov || inSecondaryFov;
   }
 
   const sensorManagerInstance = ServiceLocator.getSensorManager();
@@ -2442,14 +2449,14 @@ export const calculateCoordinates_ = (
   const DeltaSigma02 = DeltaSigma01 + DeltaTheta12; // (Rad)
   const Lambda01 = Math.atan2(Math.sin(Alphao) * Math.sin(DeltaSigma01), Math.cos(DeltaSigma01)); // (Rad)
   const Lambdao = Lambda1 - Lambda01; // (Rad)
-  const EstLatList = [];
-  const latList1 = [];
-  const latList2 = [];
-  const latList3 = [];
-  const EstLongList = [];
-  const lonList1 = [];
-  const lonList2 = [];
-  const lonList3 = [];
+  const EstLatList: number[] = [];
+  const latList1: number[] = [];
+  const latList2: number[] = [];
+  const latList3: number[] = [];
+  const EstLongList: number[] = [];
+  const lonList1: number[] = [];
+  const lonList2: number[] = [];
+  const lonList3: number[] = [];
   const EstDistanceList: number[] = [];
   let GoalDistance;
 
@@ -2680,7 +2687,7 @@ export const calculateAngle_ = (
    * AngleCoefficient:  The angle coefficient which directs the missile directly to it's target
    */
 
-  const DistanceSteps = [];
+  const DistanceSteps: number[] = [];
   let AngleCoefficient = 0;
   let DistanceClosePossition = 0;
   let AC1 = 0;
@@ -2853,8 +2860,8 @@ export const launchSimple_ = (
    * var RocketMass, Tatm, Patm, AirDensity, c, M, cD, Thrust, DragForce, WeightForce, dr2dt, ArcVelocity, theta2dt;
    */
   let NozzleAltitude2, NozzleAltitude3;
-  let iterationFunOutput = [];
-  const MaxAltitude = [];
+  let iterationFunOutput: number[] = [];
+  const MaxAltitude: number[] = [];
 
   while (FuelMass / FuelDensity / FuelVolume > 0.4 && Altitude >= 0) {
     iterationFunOutput = launchDetailed_(

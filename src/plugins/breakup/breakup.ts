@@ -20,7 +20,7 @@ import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, DetailedSatellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla } from '@ootk/src/main';
+import { BaseObject, Satellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla } from '@ootk/src/main';
 import streamPng from '@public/img/icons/stream.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -63,7 +63,7 @@ export class Breakup extends KeepTrackPlugin {
       return;
     }
 
-    const sat = obj as DetailedSatellite;
+    const sat = obj as Satellite;
 
     if (sat?.apogee - sat?.perigee > this.maxDifApogeeVsPerigee_) {
       errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.CannotCreateBreakupForNonCircularOrbits'));
@@ -232,7 +232,7 @@ export class Breakup extends KeepTrackPlugin {
         }
         this.setBottomIconToUnselected();
         this.setBottomIconToDisabled();
-      } else if ((sat as DetailedSatellite)?.apogee - (sat as DetailedSatellite)?.perigee > this.maxDifApogeeVsPerigee_) {
+      } else if ((sat as Satellite)?.apogee - (sat as Satellite)?.perigee > this.maxDifApogeeVsPerigee_) {
         if (this.isMenuButtonActive) {
           this.closeSideMenu();
           errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.CannotCreateBreakupForNonCircularOrbits'));
@@ -261,7 +261,7 @@ export class Breakup extends KeepTrackPlugin {
     if (!obj?.isSatellite()) {
       return;
     }
-    (<HTMLInputElement>getEl('hc-scc')).value = (obj as DetailedSatellite).sccNum;
+    (<HTMLInputElement>getEl('hc-scc')).value = (obj as Satellite).sccNum;
   }
 
   // eslint-disable-next-line max-statements
@@ -317,7 +317,7 @@ export class Breakup extends KeepTrackPlugin {
       return;
     }
 
-    const newSat = new DetailedSatellite({
+    const newSat = new Satellite({
       ...mainsat,
       ...{
         id: satId,
@@ -424,10 +424,10 @@ export class Breakup extends KeepTrackPlugin {
           throw new Error(`Invalid tle1: length is not 69 - ${iTle2}`);
         }
 
-        let newSat: DetailedSatellite;
+        let newSat: Satellite;
 
         try {
-          newSat = new DetailedSatellite({
+          newSat = new Satellite({
             ...catalogManagerInstance.objectCache[satId],
             ...{
               id: satId,

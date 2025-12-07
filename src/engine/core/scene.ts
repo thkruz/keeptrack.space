@@ -247,7 +247,7 @@ export class Scene {
         // Draw a black object mesh on top of the sun in the godrays frame buffer
         if (
           !settingsManager.modelsOnSatelliteViewOverride &&
-          (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1 &&
+          Number(PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1 &&
           ServiceLocator.getMainCamera().state.camDistBuffer <= settingsManager.nearZoomLevel
         ) {
           renderer.meshManager.drawOcclusion(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.programs.occlusion, this.frameBuffers.godrays);
@@ -351,7 +351,7 @@ export class Scene {
     ServiceLocator.getLineManager().draw(renderer.projectionCameraMatrix, renderer.postProcessingManager.curBuffer);
 
     // Draw Satellite Model if a satellite is selected and meshManager is loaded
-    if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
+    if (Number(PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
       if (!settingsManager.modelsOnSatelliteViewOverride && camera.state.camDistBuffer <= settingsManager.nearZoomLevel) {
         renderer.meshManager.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
       }
@@ -365,11 +365,11 @@ export class Scene {
       return;
     }
 
-    if (selectedSatelliteManager.selectedSat > -1) {
+    if (Number(selectedSatelliteManager.selectedSat) > -1) {
       this.searchBox.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
       this.primaryCovBubble.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
     }
-    if (selectedSatelliteManager.secondarySat > -1) {
+    if (Number(selectedSatelliteManager.secondarySat) > -1) {
       this.secondaryCovBubble.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
     }
   }

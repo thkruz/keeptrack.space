@@ -3,7 +3,7 @@ import { CatalogManager } from '@app/app/data/catalog-manager';
 import { CatalogSearch } from '@app/app/data/catalog-search';
 import { GetSatType } from '@app/engine/core/interfaces';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { BaseObject, Degrees, DetailedSatellite, Kilometers, Minutes, SpaceObjectType } from '@ootk/src/main';
+import { BaseObject, Degrees, Satellite, Kilometers, Minutes, SpaceObjectType } from '@ootk/src/main';
 import { defaultSat } from './environment/apiMocks';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -82,7 +82,7 @@ describe('calcSatrec', () => {
 
     jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
 
-    const satData = CatalogSearch.findObjsByOrbit(catalogManagerInstance.objectCache as DetailedSatellite[], defaultSat);
+    const satData = CatalogSearch.findObjsByOrbit(catalogManagerInstance.objectCache as Satellite[], defaultSat);
 
     expect(satData).toStrictEqual([0, 1]);
   });
@@ -116,7 +116,7 @@ describe('calcSatrec', () => {
       correctResult.push(matchSat.sccNum);
     }
 
-    const satData = CatalogSearch.findReentry(catalogManagerInstance.objectCache as DetailedSatellite[]);
+    const satData = CatalogSearch.findReentry(catalogManagerInstance.objectCache as Satellite[]);
 
     expect(satData).toStrictEqual(correctResult);
   });

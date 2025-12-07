@@ -11,7 +11,8 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveCsv } from '@app/engine/utils/saveVariable';
 import { showLoading } from '@app/engine/utils/showLoading';
-import { BaseObject, DetailedSatellite, DetailedSensor, SpaceObjectType } from '@ootk/src/main';
+import { BaseObject, Satellite, SpaceObjectType } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import tableChartPng from '@public/img/icons/table-chart.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -131,7 +132,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       Sensor: sensorDisplayName,
     }));
 
-    saveCsv(csvData, `${sensorDisplayName ?? 'unk'}-${(this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum6}-look-angles`);
+    saveCsv(csvData, `${sensorDisplayName ?? 'unk'}-${(this.selectSatManager_.getSelectedSat() as Satellite).sccNum6}-look-angles`);
   };
   sideMenuSecondaryOptions = {
     width: 300,
@@ -181,7 +182,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     if (obj?.isSatellite() && ServiceLocator.getSensorManager().isSensorSelected()) {
       this.setBottomIconToEnabled();
       if (this.isMenuButtonActive && obj) {
-        this.getlookangles_(obj as DetailedSatellite);
+        this.getlookangles_(obj as Satellite);
       }
     } else {
       if (this.isMenuButtonActive) {
@@ -199,12 +200,12 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
         if (!obj.isSatellite()) {
           return;
         }
-        this.getlookangles_(obj as DetailedSatellite);
+        this.getlookangles_(obj as Satellite);
       });
     }
   }
 
-  private getlookangles_(sat: DetailedSatellite, sensors?: DetailedSensor[]): TearrData[] {
+  private getlookangles_(sat: Satellite, sensors?: DetailedSensor[]): TearrData[] {
     const timeManagerInstance = ServiceLocator.getTimeManager();
 
     if (!sensors) {

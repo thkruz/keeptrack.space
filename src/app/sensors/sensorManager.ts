@@ -25,6 +25,7 @@
 
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { sensors } from '@app/app/data/catalogs/sensors';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import type { TearrData } from '@app/app/sensors/sensor-math';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -41,7 +42,7 @@ import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { t7e } from '@app/locales/keys';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { DEG2RAD, DetailedSensor, EpochUTC, GreenwichMeanSiderealTime, Radians, SpaceObjectType, Sun, ZoomValue, calcGmst, lla2eci, spaceObjType2Str } from '@ootk/src/main';
+import { DEG2RAD, GreenwichMeanSiderealTime, Radians, SpaceObjectType, Sun, ZoomValue, calcGmst, lla2eci, spaceObjType2Str } from '@ootk/src/main';
 import { SensorFov } from '../../plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../../plugins/sensor-surv/sensor-surv-fence';
 import { LookAnglesPlugin } from '../../plugins/sensor/look-angles-plugin';
@@ -560,7 +561,7 @@ export class SensorManager {
       alt: sensor.alt,
     };
     const { gmst } = calcGmst(now);
-    const sunPos = Sun.position(EpochUTC.fromDateTime(now));
+    const sunPos = Sun.eci(now);
     const sensorPos = lla2eci(lla, gmst);
 
     sensor.position = sensorPos;

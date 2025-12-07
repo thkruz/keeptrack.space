@@ -37,7 +37,8 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, DetailedSatellite, DetailedSensor, EciVec3, Kilometers, MILLISECONDS_PER_SECOND } from '@ootk/src/main';
+import { BaseObject, Satellite, TemeVec3, Kilometers, MILLISECONDS_PER_SECOND } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -68,7 +69,7 @@ export interface ReportGenerator {
    * @param startTime The start time for the report
    * @returns The report data to be written
    */
-  generate(sat: DetailedSatellite, sensor: DetailedSensor | null, startTime: Date): ReportData;
+  generate(sat: Satellite, sensor: DetailedSensor | null, startTime: Date): ReportData;
 }
 
 export class ReportsPlugin extends KeepTrackPlugin {
@@ -243,7 +244,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
       name: 'Azimuth Elevation Range',
       description: 'Generate azimuth, elevation, and range data for satellite passes',
       requiresSensor: true,
-      generate: (sat: DetailedSatellite, sensor: DetailedSensor | null, startTime: Date): ReportData => {
+      generate: (sat: Satellite, sensor: DetailedSensor | null, startTime: Date): ReportData => {
         if (!sensor) {
           throw new Error('Sensor is required for AER report');
         }
@@ -289,7 +290,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
       name: 'Latitude Longitude Altitude',
       description: 'Generate latitude, longitude, and altitude data over time',
       requiresSensor: false,
-      generate: (sat: DetailedSatellite, _sensor: DetailedSensor | null, startTime: Date): ReportData => {
+      generate: (sat: Satellite, _sensor: DetailedSensor | null, startTime: Date): ReportData => {
         const header = `Latitude Longitude Altitude Report\n-------------------------------\n${this.createHeader_(sat)}`;
         let body = 'Time (UTC),Latitude(°),Longitude(°),Altitude(km)\n';
         const durationInSeconds = 72 * 60 * 60;
@@ -320,7 +321,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
       name: 'Earth Centered Inertial',
       description: 'Generate ECI position and velocity vectors over time',
       requiresSensor: false,
-      generate: (sat: DetailedSatellite, _sensor: DetailedSensor | null, startTime: Date): ReportData => {
+      generate: (sat: Satellite, _sensor: DetailedSensor | null, startTime: Date): ReportData => {
         const header = `Earth Centered Inertial Report\n-------------------------------\n${this.createHeader_(sat)}`;
         let body = 'Time (UTC),Position X(km),Position Y(km),Position Z(km),Velocity X(km/s),Velocity Y(km/s),Velocity Z(km/s)\n';
         const durationInSeconds = 72 * 60 * 60;
@@ -354,7 +355,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
       name: 'Classical Orbital Elements',
       description: 'Generate classical orbital elements at current epoch',
       requiresSensor: false,
-      generate: (sat: DetailedSatellite): ReportData => {
+      generate: (sat: Satellite): ReportData => {
         const header = `Classic Orbit Elements Report\n-------------------------------\n${this.createHeader_(sat)}`;
         const classicalEls = sat.toJ2000().toClassicalElements();
         const body = '' +
@@ -386,7 +387,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
       name: 'Visibility Windows',
       description: 'Generate visibility windows with rise/set times and pass duration',
       requiresSensor: true,
-      generate: (sat: DetailedSatellite, sensor: DetailedSensor | null, startTime: Date): ReportData => {
+      generate: (sat: Satellite, sensor: DetailedSensor | null, startTime: Date): ReportData => {
         if (!sensor) {
           throw new Error('Sensor is required for Visibility Windows report');
         }
@@ -409,19 +410,19 @@ export class ReportsPlugin extends KeepTrackPlugin {
             continue;
           }
 
-          if (sensor.isRaeInFov(rae) && !inPass) {
+          if (sensor.isRaeInFov(rae.az, rae.el, rae.rng) && !inPass) {
             // Pass start
             inPass = true;
             riseTime = new Date(time.getTime());
             maxEl = rae.el;
             maxElTime = new Date(time.getTime());
-          } else if (sensor.isRaeInFov(rae) && inPass) {
+          } else if (sensor.isRaeInFov(rae.az, rae.el, rae.rng) && inPass) {
             // During pass - track max elevation
             if (rae.el > maxEl) {
               maxEl = rae.el;
               maxElTime = new Date(time.getTime());
             }
-          } else if (!sensor.isRaeInFov(rae) && inPass) {
+          } else if (!sensor.isRaeInFov(rae.az, rae.el, rae.rng) && inPass) {
             // Pass end
             inPass = false;
             passNumber++;
@@ -457,7 +458,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
       name: 'Sun/Eclipse Analysis',
       description: 'Generate sun visibility and eclipse entry/exit times for power and thermal analysis',
       requiresSensor: false,
-      generate: (sat: DetailedSatellite, _sensor: DetailedSensor | null, startTime: Date): ReportData => {
+      generate: (sat: Satellite, _sensor: DetailedSensor | null, startTime: Date): ReportData => {
         const header = `Sun/Eclipse Analysis Report\n-------------------------------\n${this.createHeader_(sat)}`;
         let body = 'Time (UTC),Sun Illuminated,Eclipse Type,Sun Angle(°)\n';
         const durationInSeconds = 3 * 24 * 60 * 60; // 3 days
@@ -473,7 +474,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
             continue;
           }
           const sunPosArr = Scene.getInstance().sun.getEci(time);
-          const sunPos = { x: sunPosArr[0], y: sunPosArr[1], z: sunPosArr[2] } as EciVec3<Kilometers>;
+          const sunPos = { x: sunPosArr[0], y: sunPosArr[1], z: sunPosArr[2] } as TemeVec3<Kilometers>;
 
           // Calculate if satellite is in Earth's shadow
           const sunStatus = SatMath.calculateIsInSun(stateVector, sunPos);
@@ -536,7 +537,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     return `${date} ${timeOut}`;
   }
 
-  private createHeader_(sat: DetailedSatellite, sensor?: DetailedSensor) {
+  private createHeader_(sat: Satellite, sensor?: DetailedSensor) {
     const satData = '' +
       `Date: ${new Date().toISOString()}\n` +
       `Satellite: ${sat.name}\n` +
@@ -635,8 +636,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
     return time;
   }
 
-  private getSat_(): DetailedSatellite | null {
-    const sat = this.selectSatManager_.primarySatObj as DetailedSatellite;
+  private getSat_(): Satellite | null {
+    const sat = this.selectSatManager_.primarySatObj as Satellite;
 
     if (!sat) {
       errorManagerInstance.warn(t7e('errorMsgs.SelectSatelliteFirst'));
@@ -644,8 +645,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
       return null;
     }
 
-    if (!(sat instanceof DetailedSatellite)) {
-      errorManagerInstance.warn(t7e('errorMsgs.SatelliteNotDetailedSatellite'));
+    if (!(sat instanceof Satellite)) {
+      errorManagerInstance.warn('Selected object is not a satellite');
 
       return null;
     }

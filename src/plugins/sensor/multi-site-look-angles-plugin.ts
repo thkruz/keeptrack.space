@@ -14,13 +14,13 @@ import { saveCsv } from '@app/engine/utils/saveVariable';
 import { showLoading } from '@app/engine/utils/showLoading';
 import {
   BaseObject,
-  Degrees, DetailedSatellite, DetailedSensor,
+  Degrees, Satellite,
   Kilometers,
   MINUTES_PER_DAY,
   SatelliteRecord, Seconds,
   SpaceObjectType,
-  TAU,
-} from '@ootk/src/main';
+  TAU} from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import tableRowsPng from '@public/img/icons/table-rows.png';
 import { sensorGroups } from '../../app/data/catalogs/sensor-groups';
 import { SensorManager } from '../../app/sensors/sensorManager';
@@ -73,7 +73,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     if (!sat?.isSatellite()) {
       return;
     }
-    this.refreshSideMenuData(sat as DetailedSatellite);
+    this.refreshSideMenuData(sat as Satellite);
   };
 
 
@@ -104,13 +104,13 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     const exportData = ServiceLocator.getSensorManager().lastMultiSiteArray.map((look) => ({
       time: look.time,
       sensor: look.objName,
-      az: look.az.toFixed(2),
-      el: look.el.toFixed(2),
-      rng: look.rng.toFixed(2),
+      az: look.az?.toFixed(2) ?? 'N/A',
+      el: look.el?.toFixed(2) ?? 'N/A',
+      rng: look.rng?.toFixed(2) ?? 'N/A',
       visible: look.visible,
     }));
 
-    saveCsv(exportData, `multisite-${(this.selectSatManager_?.getSelectedSat() as DetailedSatellite | undefined)?.sccNum6 ?? '000000'}-look-angles`);
+    saveCsv(exportData, `multisite-${(this.selectSatManager_?.getSelectedSat() as Satellite | undefined)?.sccNum6 ?? '000000'}-look-angles`);
   };
   sideMenuSecondaryOptions: SideMenuSettingsOptions = {
     width: 300,
@@ -133,7 +133,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     if (obj?.isSatellite() && ServiceLocator.getSensorManager().isSensorSelected()) {
       this.setBottomIconToEnabled();
       if (this.isMenuButtonActive && obj) {
-        this.refreshSideMenuData(obj as DetailedSatellite);
+        this.refreshSideMenuData(obj as Satellite);
       }
     } else {
       if (this.isMenuButtonActive) {
@@ -153,12 +153,12 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
         if (!sat?.isSatellite()) {
           return;
         }
-        this.refreshSideMenuData(sat as DetailedSatellite);
+        this.refreshSideMenuData(sat as Satellite);
       },
     );
   }
 
-  private refreshSideMenuData(sat: DetailedSatellite) {
+  private refreshSideMenuData(sat: Satellite) {
     if (this.isMenuButtonActive) {
       if (sat) {
         showLoading(() => {
@@ -223,7 +223,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     }
   }
 
-  private getlookanglesMultiSite_(sat: DetailedSatellite, sensors?: DetailedSensor[]): void {
+  private getlookanglesMultiSite_(sat: Satellite, sensors?: DetailedSensor[]): void {
     const timeManagerInstance = ServiceLocator.getTimeManager();
     const sensorManagerInstance = ServiceLocator.getSensorManager();
     const staticSet = ServiceLocator.getCatalogManager().staticSet;
@@ -383,11 +383,11 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       tdT = tr.insertCell();
       tdT.appendChild(document.createTextNode(dateFormat(entry.time, 'isoDateTime', true)));
       tdE = tr.insertCell();
-      tdE.appendChild(document.createTextNode(entry.el.toFixed(1)));
+      tdE.appendChild(document.createTextNode(entry.el?.toFixed(1) ?? 'N/A'));
       tdA = tr.insertCell();
-      tdA.appendChild(document.createTextNode(entry.az.toFixed(0)));
+      tdA.appendChild(document.createTextNode(entry.az?.toFixed(0) ?? 'N/A'));
       tdR = tr.insertCell();
-      tdR.appendChild(document.createTextNode(entry.rng.toFixed(0)));
+      tdR.appendChild(document.createTextNode(entry.rng?.toFixed(0) ?? 'N/A'));
       tdS = tr.insertCell();
       tdS.appendChild(document.createTextNode(sensor.uiName ?? sensor.shortName ?? sensor.objName ?? ''));
       tdV = tr.insertCell();

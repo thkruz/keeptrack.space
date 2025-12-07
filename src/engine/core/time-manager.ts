@@ -16,14 +16,14 @@ export class TimeManager {
   /**
    * The real time at the moment when dynamicOffset or propRate changes
    */
-  dynamicOffsetEpoch = <number>null;
-  lastPropRate = <number>1;
+  dynamicOffsetEpoch = 0;
+  lastPropRate = 1;
   propFrozen = 0;
   propOffset = 0;
   /**
    * The rate of change applied to the dynamicOffset
    */
-  propRate = <number>null;
+  propRate = 0;
   /**
    * The time in the real world
    */
@@ -110,10 +110,12 @@ export class TimeManager {
 
     const toggleTimeDOM = getEl('toggle-time-rmb');
 
-    if (ServiceLocator.getTimeManager().propRate === 0) {
-      toggleTimeDOM.childNodes[0].textContent = 'Start Clock';
-    } else {
-      toggleTimeDOM.childNodes[0].textContent = 'Pause Clock';
+    if (toggleTimeDOM) {
+      if (ServiceLocator.getTimeManager().propRate === 0) {
+        toggleTimeDOM.childNodes[0].textContent = 'Start Clock';
+      } else {
+        toggleTimeDOM.childNodes[0].textContent = 'Pause Clock';
+      }
     }
 
     const uiManagerInstance = ServiceLocator.getUiManager();

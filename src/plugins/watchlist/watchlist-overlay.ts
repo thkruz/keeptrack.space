@@ -11,7 +11,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { shake } from '@app/engine/utils/shake';
 import { showLoading } from '@app/engine/utils/showLoading';
-import { DetailedSatellite, MILLISECONDS_PER_DAY } from '@ootk/src/main';
+import { Satellite, MILLISECONDS_PER_DAY } from '@ootk/src/main';
 import pictureInPicturePng from '@public/img/icons/picture-in-picture.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -108,7 +108,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     this.updateFovLines_();
   }
 
-  private updateFovLinesMulti_(sat: DetailedSatellite) {
+  private updateFovLinesMulti_(sat: Satellite) {
     const idx = this.watchlistPlugin_.watchlistList.findIndex((el) => el.id === sat.id);
 
     ServiceLocator.getOrbitManager().removeInViewOrbit(this.watchlistPlugin_.watchlistList[idx].id);
@@ -117,7 +117,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     }
   }
 
-  private updateFovLinesSingle_(sat: DetailedSatellite) {
+  private updateFovLinesSingle_(sat: Satellite) {
     const inView = ServiceLocator.getDotsManager().inViewData[sat.id];
     const uiManagerInstance = ServiceLocator.getUiManager();
     const idx = this.watchlistPlugin_.watchlistList.findIndex((el) => el.id === sat.id);
@@ -179,7 +179,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       showLoading(() => {
         const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
-        const satArray: DetailedSatellite[] = [];
+        const satArray: Satellite[] = [];
 
         for (const obj of this.watchlistPlugin_.watchlistList) {
           const satellite = catalogManagerInstance.getSat(obj.id, GetSatType.EXTRA_ONLY);

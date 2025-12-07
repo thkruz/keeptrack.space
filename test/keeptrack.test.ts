@@ -2,7 +2,7 @@ import { CatalogManager } from '@app/app/data/catalog-manager';
 import { Container } from '@app/engine/core/container';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SettingsManagerOverride } from '@app/settings/settings';
-import { DetailedSatellite, Milliseconds, Satellite } from '@ootk/src/main';
+import { Satellite, Milliseconds } from '@ootk/src/main';
 import { CatalogLoader } from '../src/app/data/catalog-loader';
 import { OrbitManager } from '../src/app/rendering/orbit-manager';
 import { UiManager } from '../src/app/ui/ui-manager';
@@ -64,8 +64,8 @@ const setupStandardEnvironment = () => {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     catalogManagerInstance.objectCache = [
-      new DetailedSatellite({ ...defaultSat, ...{ id: 0, type: 1 } }),
-      new DetailedSatellite({ ...defaultSat, ...{ id: 1, type: 2 } }),
+      new Satellite({ ...defaultSat, ...{ id: 0, type: 1 } }),
+      new Satellite({ ...defaultSat, ...{ id: 1, type: 2 } }),
     ] as Satellite[];
     catalogManagerInstance.satCruncher = {
       postMessage: jest.fn(),

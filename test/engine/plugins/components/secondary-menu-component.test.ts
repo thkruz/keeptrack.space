@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { SecondaryMenuComponent, SecondaryMenuCallbacks } from '@app/engine/plugins/components/secondary-menu/secondary-menu-component';
+import { SecondaryMenuComponent } from '@app/engine/plugins/components/secondary-menu/secondary-menu-component';
 import { ISecondaryMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';

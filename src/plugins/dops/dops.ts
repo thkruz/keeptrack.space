@@ -12,7 +12,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { DopMath } from '@app/engine/math/dop-math';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from '@ootk/src/main';
+import { Degrees, Satellite, TemeVec3, Kilometers, eci2lla } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 
@@ -113,7 +113,7 @@ export class DopsPlugin extends KeepTrackPlugin {
                 x: dragPosition[0],
                 y: dragPosition[1],
                 z: dragPosition[2],
-              } as EciVec3,
+              } as TemeVec3,
               gmst,
             );
           }
@@ -185,12 +185,12 @@ export class DopsPlugin extends KeepTrackPlugin {
     DopMath.updateDopsTable(dopsList);
   }
 
-  static getGpsSats(catalogManagerInstance: CatalogManager, groupManagerInstance: GroupsManager): DetailedSatellite[] {
+  static getGpsSats(catalogManagerInstance: CatalogManager, groupManagerInstance: GroupsManager): Satellite[] {
     if (!groupManagerInstance.groupList.GPSGroup) {
       groupManagerInstance.groupList.GPSGroup = groupManagerInstance.createGroup(GroupType.NAME_REGEX, /NAVSTAR/iu, 'GPSGroup');
     }
     const gpsSats = groupManagerInstance.groupList.GPSGroup;
-    const gpsSatObjects = [] as DetailedSatellite[];
+    const gpsSatObjects = [] as Satellite[];
 
     gpsSats.ids.forEach((id: number) => {
       const sat = catalogManagerInstance.getSat(id);

@@ -1,7 +1,7 @@
 import { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
 import { mat3, mat4, vec3, vec4 } from 'gl-matrix';
-import { BaseObject, EciVec3, Kilometers } from '@ootk/src/main';
+import { BaseObject, TemeVec3, Kilometers, KilometersPerSecond } from '@ootk/src/main';
 import { GlUtils } from '../gl-utils';
 import { glsl } from '@app/engine/utils/development/formatter';
 
@@ -79,7 +79,7 @@ export class Box {
   private vao: WebGLVertexArrayObject;
 
   drawPosition = [0, 0, 0] as vec3;
-  eci: EciVec3;
+  eci: TemeVec3;
 
   setColor(color: vec4) {
     this.color_[0] = color[0];
@@ -143,7 +143,11 @@ export class Box {
     if (!this.isLoaded_) {
       return;
     }
-    if (!obj?.position) {
+
+    // Type assertion: only SpaceObject and its subclasses have position and velocity
+    const spaceObj = obj as { position?: TemeVec3; velocity?: TemeVec3<KilometersPerSecond> } | null;
+
+    if (!spaceObj?.position) {
       this.drawPosition[0] = 0;
       this.drawPosition[1] = 0;
       this.drawPosition[2] = 0;
@@ -151,16 +155,16 @@ export class Box {
       return;
     }
 
-    this.drawPosition[0] = obj.position.x;
-    this.drawPosition[1] = obj.position.y;
-    this.drawPosition[2] = obj.position.z;
+    this.drawPosition[0] = spaceObj.position.x;
+    this.drawPosition[1] = spaceObj.position.y;
+    this.drawPosition[2] = spaceObj.position.z;
 
     this.mvMatrix_ = mat4.create();
     mat4.identity(this.mvMatrix_);
     mat4.translate(this.mvMatrix_, this.mvMatrix_, this.drawPosition);
 
     // Calculate a position to look at along the satellite's velocity vector
-    const lookAtPos = [obj.position.x + obj.velocity.x, obj.position.y + obj.velocity.y, obj.position.z + obj.velocity.z];
+    const lookAtPos = [spaceObj.position.x + (spaceObj.velocity?.x ?? 0), spaceObj.position.y + (spaceObj.velocity?.y ?? 0), spaceObj.position.z + (spaceObj.velocity?.z ?? 0)];
 
     // Normalize an up vector to the satellite's position from the center of the earth
     const up = vec3.normalize(vec3.create(), this.drawPosition);

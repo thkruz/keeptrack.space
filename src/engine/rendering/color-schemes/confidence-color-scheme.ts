@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { html } from '@app/engine/utils/development/formatter';
-import { BaseObject, DetailedSatellite } from '@ootk/src/main';
+import { BaseObject, Satellite } from '@ootk/src/main';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
 
 export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
@@ -43,7 +43,7 @@ export class ConfidenceColorScheme extends ColorScheme {
         pickable: Pickable.No,
       };
     }
-    const sat = obj as DetailedSatellite;
+    const sat = obj as Satellite;
 
     const confidenceScore = parseInt(sat.tle1.substring(64, 65)) || 0;
     let pickable: Pickable;

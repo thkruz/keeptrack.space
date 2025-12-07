@@ -20,7 +20,7 @@
  */
 
 import { SolarBody } from '@app/engine/core/interfaces';
-import { EciVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
+import { TemeVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
@@ -38,7 +38,7 @@ export class Neptune extends CelestialBody {
   orbitalPeriod = 164.8 * 365.25 * 24 * 3600 as Seconds;
   meanDistanceToSun = 4498396441 as Kilometers;
   type = SpaceObjectType.ICE_GIANT;
-  eci: EciVec3;
+  eci: TemeVec3;
   color = PlanetColors.NEPTUNE;
   textureQuality: NeptuneTextureQuality = NeptuneTextureQuality.POTATO;
 

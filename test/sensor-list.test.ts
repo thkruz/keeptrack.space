@@ -2,7 +2,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
 import { SensorListPlugin } from '@app/plugins/sensor-list/sensor-list';
-import { DetailedSensor } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 
 describe('SensorListPlugin', () => {
   let plugin: SensorListPlugin;
@@ -57,7 +57,7 @@ describe('SensorListPlugin', () => {
 
   it.skip('should throw error if no sensors are found in createLiForSensor_', () => {
     expect(() => {
-      SensorListPlugin.createLiForSensor_({} as DetailedSensor);
+      (SensorListPlugin as unknown as { createLiForSensor_: (sensor: DetailedSensor) => void }).createLiForSensor_({} as DetailedSensor);
     }).toThrow('No sensors found');
   });
 });

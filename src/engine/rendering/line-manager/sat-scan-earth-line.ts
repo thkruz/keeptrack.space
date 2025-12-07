@@ -1,15 +1,15 @@
 import { EciArr3 } from '@app/engine/core/interfaces';
-import { Degrees, DetailedSatellite, ecf2rae, eci2ecf, Kilometers, lla2ecf } from '@ootk/src/main';
+import { Degrees, Satellite, ecef2rae, eci2ecef, Kilometers, lla2ecef } from '@ootk/src/main';
 import { vec4 } from 'gl-matrix';
 import { Line, LineColors } from './line';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SatScanEarthLine extends Line {
-  private sat: DetailedSatellite;
+  private sat: Satellite;
   private lat_: Degrees = -90 as Degrees;
   private lon_: Degrees = 0 as Degrees;
 
-  constructor(sat: DetailedSatellite, color: vec4 = LineColors.GREEN) {
+  constructor(sat: Satellite, color: vec4 = LineColors.GREEN) {
     super();
     this.sat = sat;
 
@@ -19,6 +19,10 @@ export class SatScanEarthLine extends Line {
 
   update(): void {
     const eci = this.sat.eci(ServiceLocator.getTimeManager().simulationTimeObj);
+
+    if (!eci) {
+      return;
+    }
     const eciArr = [eci.position.x, eci.position.y, eci.position.z] as EciArr3;
 
     let t = 0;
@@ -28,12 +32,12 @@ export class SatScanEarthLine extends Line {
       this.updateLatitude_();
 
       const lla = { lat: this.lat_, lon: this.lon_, alt: <Kilometers>0.05 };
-      const ecf = eci2ecf(this.sat.position, 0);
-      const rae = ecf2rae(lla, ecf);
+      const ecf = eci2ecef(this.sat.position, 0);
+      const rae = ecef2rae(lla, ecf);
       const el = rae.el;
 
       if (el > settingsManager.lineScanMinEl) {
-        const pos = lla2ecf(lla);
+        const pos = lla2ecef(lla);
         const eciArr2 = [pos.x, pos.y, pos.z] as EciArr3;
 
         this.updateVertBuf([eciArr, eciArr2]);

@@ -27,7 +27,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
-import { BaseObject, DetailedSatellite, Milliseconds } from '@ootk/src/main';
+import { BaseObject, Satellite, Milliseconds } from '@ootk/src/main';
 import dayNightPng from '@public/img/icons/day-night.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -146,7 +146,7 @@ export class EclipseSolarAnalysis extends KeepTrackPlugin {
     </div>
   `;
 
-  private currentSatellite_: DetailedSatellite | null = null;
+  private currentSatellite_: Satellite | null = null;
   private currentEclipsePeriods_: EclipsePeriod[] = [];
   private updateInterval_: NodeJS.Timeout | null = null;
   private stateStartTime_: number | null = null;
@@ -176,7 +176,7 @@ export class EclipseSolarAnalysis extends KeepTrackPlugin {
     // Listen for satellite selection changes
     EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
       if (obj?.isSatellite()) {
-        this.handleSatelliteSelected_(obj as DetailedSatellite);
+        this.handleSatelliteSelected_(obj as Satellite);
       }
     });
 
@@ -206,7 +206,7 @@ export class EclipseSolarAnalysis extends KeepTrackPlugin {
   /**
    * Handle satellite selection
    */
-  private handleSatelliteSelected_(satellite: DetailedSatellite): void {
+  private handleSatelliteSelected_(satellite: Satellite): void {
     this.currentSatellite_ = satellite;
     this.currentEclipsePeriods_ = [];
     this.stateStartTime_ = null;

@@ -5,7 +5,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
-import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime, Kilometers, Milliseconds } from '@ootk/src/main';
+import { BaseObject, CatalogSource, Satellite, GreenwichMeanSiderealTime, Kilometers, Milliseconds, TemeVec3 } from '@ootk/src/main';
 import { mat4, vec2, vec4 } from 'gl-matrix';
 import { GroupType } from '../../app/data/object-group';
 import { SettingsManager } from '../../settings/settings';
@@ -294,7 +294,9 @@ export class WebGLRenderer {
        * @todo Reuse hoverBoxOnSatMini DOM Elements
        * @body Currently are writing and deleting the nodes every draw element. Reusuing them with a transition effect will make it smoother
        */
-      this.hoverBoxOnSatMiniElements_.innerHTML = '';
+      if (this.hoverBoxOnSatMiniElements_) {
+        this.hoverBoxOnSatMiniElements_.innerHTML = '';
+      }
       if (ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM) {
         const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
@@ -304,7 +306,7 @@ export class WebGLRenderer {
           if (!obj?.isSatellite()) {
             continue;
           }
-          const sat = <DetailedSatellite>obj;
+          const sat = <Satellite>obj;
           const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
           if (colorSchemeManagerInstance.isPayloadOff(sat)) {
@@ -376,7 +378,7 @@ export class WebGLRenderer {
           this.satHoverMiniDOM_.style.left = `${satScreenPositionArray.x + 20}px`;
           this.satHoverMiniDOM_.style.top = `${satScreenPositionArray.y}px`;
 
-          this.hoverBoxOnSatMiniElements_.appendChild(this.satHoverMiniDOM_);
+          this.hoverBoxOnSatMiniElements_?.appendChild(this.satHoverMiniDOM_);
           this.labelCount_++;
         }
       } else {
@@ -388,7 +390,7 @@ export class WebGLRenderer {
         }
 
         watchlistPluginInstance?.watchlistList.forEach(({ id }) => {
-          const obj = catalogManagerInstance.getObject(id, GetSatType.POSITION_ONLY) as DetailedSatellite;
+          const obj = catalogManagerInstance.getObject(id, GetSatType.POSITION_ONLY) as Satellite;
 
           if (dotsManagerInstance.inViewData[id] === 0) {
             return;
@@ -428,7 +430,7 @@ export class WebGLRenderer {
           this.satHoverMiniDOM_.style.left = `${satScreenPositionArray.x + 20}px`;
           this.satHoverMiniDOM_.style.top = `${satScreenPositionArray.y}px`;
 
-          this.hoverBoxOnSatMiniElements_.appendChild(this.satHoverMiniDOM_);
+          this.hoverBoxOnSatMiniElements_?.appendChild(this.satHoverMiniDOM_);
           this.labelCount_++;
         });
       }
@@ -487,7 +489,8 @@ export class WebGLRenderer {
     const screenPos = { x: 0, y: 0, z: 0, error: false };
 
     try {
-      const pos = obj.position;
+      const objWithPos = obj as unknown as { position: TemeVec3 };
+      const pos = objWithPos.position;
 
       if (!pos) {
         throw new Error(`No Position for Sat ${obj.id}`);
@@ -617,7 +620,7 @@ export class WebGLRenderer {
 
     if (this.selectSatManager_?.primarySatObj.id !== -1) {
       const timeManagerInstance = ServiceLocator.getTimeManager();
-      const primarySat = ServiceLocator.getCatalogManager().getObject(this.selectSatManager_.primarySatObj.id, GetSatType.POSITION_ONLY) as DetailedSatellite | MissileObject;
+      const primarySat = ServiceLocator.getCatalogManager().getObject(this.selectSatManager_.primarySatObj.id, GetSatType.POSITION_ONLY) as Satellite | MissileObject;
       const satelliteOffset = ServiceLocator.getDotsManager().getPositionArray(this.selectSatManager_.primarySatObj.id).map((coord) => -coord);
 
       sceneInstance.worldShift = satelliteOffset as [number, number, number];
@@ -625,7 +628,7 @@ export class WebGLRenderer {
       // sceneInstance.worldShift[1] = satelliteOffset[1] - sceneInstance.worldShift[1];
       // sceneInstance.worldShift[2] = satelliteOffset[2] - sceneInstance.worldShift[2];
 
-      this.meshManager.update(timeManagerInstance.selectedDate, primarySat as DetailedSatellite);
+      this.meshManager.update(timeManagerInstance.selectedDate, primarySat as Satellite);
       ServiceLocator.getMainCamera().snapToSat(primarySat, timeManagerInstance.simulationTimeObj);
       if (primarySat.isMissile()) {
         ServiceLocator.getOrbitManager().setSelectOrbit(primarySat.id);
@@ -643,14 +646,14 @@ export class WebGLRenderer {
         // ServiceLocator.getOrbitManager().updateOrbitBuffer(this.selectSatManager_.primarySatObj.id);
 
         // Now we can fix this draw call
-        const firstPointOut = ServiceLocator.getDotsManager().getPositionArray(this.selectSatManager_.primarySatObj.id);
+        const firstPointOut = ServiceLocator.getDotsManager().getPositionArray(Number(this.selectSatManager_.primarySatObj.id));
         const firstRelativePointOut = SatMath.getPositionFromCenterBody({
           x: firstPointOut[0] as Kilometers,
           y: firstPointOut[1] as Kilometers,
           z: firstPointOut[2] as Kilometers,
         });
 
-        if (primarySat instanceof DetailedSatellite) {
+        if (primarySat instanceof Satellite) {
           ServiceLocator.getOrbitManager().alignOrbitSelectedObject(
             this.selectSatManager_.primarySatObj.id, [firstRelativePointOut.x, firstRelativePointOut.y, firstRelativePointOut.z],
           );

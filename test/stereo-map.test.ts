@@ -16,7 +16,7 @@ describe('StereoMapPlugin_class', () => {
     ServiceLocator.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
     ServiceLocator.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
     ServiceLocator.getCatalogManager().objectCache = [defaultSat];
-    PluginRegistry.getPlugin(SelectSatManager).selectSat(0);
+    PluginRegistry.getPlugin(SelectSatManager)!.selectSat(0);
   });
 
   standardPluginSuite(StereoMap);

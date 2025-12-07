@@ -52,7 +52,7 @@ describe('SatConstellations_test_all_links', () => {
 
     const groupList = {};
 
-    ServiceLocator.getGroupsManager = () =>
+    jest.spyOn(ServiceLocator, 'getGroupsManager').mockReturnValue(
       ({
         createGroup: (_type: GroupType, _listOfSats: number[], name: string) => {
           groupList[name] = {
@@ -63,7 +63,8 @@ describe('SatConstellations_test_all_links', () => {
           // Do nothing
         },
         groupList,
-      }) as unknown as GroupsManager;
+      }) as unknown as GroupsManager,
+    );
   });
 
   links.forEach((element) => {

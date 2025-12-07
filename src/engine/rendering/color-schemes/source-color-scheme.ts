@@ -2,7 +2,7 @@
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { html } from '@app/engine/utils/development/formatter';
-import { BaseObject, DetailedSatellite, Star } from '@ootk/src/main';
+import { BaseObject, Satellite, Star } from '@ootk/src/main';
 import { CameraType } from '../../camera/camera';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -78,7 +78,7 @@ export class SourceColorScheme extends ColorScheme {
     }
 
     // Check the source of the data
-    const sat = obj as DetailedSatellite;
+    const sat = obj as Satellite;
 
     if (sat.source) {
       switch (sat.source) {

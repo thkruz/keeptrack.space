@@ -1,6 +1,7 @@
 import type { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import type { User } from '@supabase/supabase-js';
-import type { BaseObject, DetailedSatellite, DetailedSensor, Milliseconds } from '@ootk/src/main';
+import type { BaseObject, Satellite, Milliseconds } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import type { PanTouchEvent, TapTouchEvent } from '../input/input-manager/touch-input';
 import type { LineManager } from '../rendering/line-manager';
 import { errorManagerInstance } from '../utils/errorManager';
@@ -41,11 +42,11 @@ export interface EngineEventMap {
   [EventBusEvent.onCruncherReady]: [];
   [EventBusEvent.onHelpMenuClick]: [];
   [EventBusEvent.onKeepTrackReady]: [];
-  [EventBusEvent.selectSatData]: [DetailedSatellite | MissileObject | BaseObject, number];
-  [EventBusEvent.setSecondarySat]: [DetailedSatellite | null, number];
+  [EventBusEvent.selectSatData]: [Satellite | MissileObject | BaseObject, number];
+  [EventBusEvent.setSecondarySat]: [Satellite | null, number];
   [EventBusEvent.uiManagerInit]: [];
   [EventBusEvent.uiManagerOnReady]: [];
-  [EventBusEvent.updateSelectBox]: [DetailedSatellite | MissileObject];
+  [EventBusEvent.updateSelectBox]: [Satellite | MissileObject];
   [EventBusEvent.ConeMeshUpdate]: [];
   [EventBusEvent.bottomMenuModeChange]: [];
   [EventBusEvent.saveSettings]: [];

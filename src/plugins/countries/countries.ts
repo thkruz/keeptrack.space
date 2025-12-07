@@ -176,7 +176,7 @@ export class CountriesMenu extends KeepTrackPlugin {
 
     searchDOM.value = groupManagerInstance.groupList[groupName].ids.reduce((acc: string, id: number) => `${acc}${catalogManagerInstance.getSat(id)?.sccNum},`, '').slice(0, -1);
     uiManagerInstance.searchManager.fillResultBox(
-      groupManagerInstance.groupList[groupName].ids.map((id: number) => <SearchResult>{ id }),
+      groupManagerInstance.groupList[groupName].ids.map((id: number) => ({ id }) as SearchResult),
       catalogManagerInstance,
     );
 

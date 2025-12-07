@@ -7,7 +7,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { DetailedSatellite, Hours, Kilometers, Milliseconds, Minutes, PosVel, Seconds, Sgp4 } from '@ootk/src/main';
+import { Satellite, Hours, Kilometers, Milliseconds, Minutes, PosVel, Seconds, Sgp4 } from '@ootk/src/main';
 import frameInspectPng from '@public/img/icons/frame-inspect.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -32,7 +32,7 @@ export class DebrisScreening extends KeepTrackPlugin {
     if (this.isMenuButtonActive) {
       const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
-      const sat = catalogManagerInstance.getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
+      const sat = catalogManagerInstance.getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as Satellite;
 
       (<HTMLInputElement>getEl(`${this.formPrefix_}-scc`)).value = sat.sccNum;
     }
@@ -166,7 +166,7 @@ export class DebrisScreening extends KeepTrackPlugin {
     const vVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-v`)).value);
     const wVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-w`)).value);
     const timeVal = <Hours>parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-time`)).value);
-    const sat = ServiceLocator.getCatalogManager().getObject(satId, GetSatType.SKIP_POS_VEL) as DetailedSatellite;
+    const sat = ServiceLocator.getCatalogManager().getObject(satId, GetSatType.SKIP_POS_VEL) as Satellite;
 
     const possibleSats = keepTrackApi
       .getCatalogManager()
@@ -174,7 +174,7 @@ export class DebrisScreening extends KeepTrackPlugin {
         if (!obj2.isSatellite()) {
           return false;
         }
-        const sat2 = obj2 as DetailedSatellite;
+        const sat2 = obj2 as Satellite;
 
         if (sat2.perigee > sat.apogee) {
           return false;
@@ -208,7 +208,7 @@ export class DebrisScreening extends KeepTrackPlugin {
           continue;
         }
 
-        const sat2 = obj2 as DetailedSatellite;
+        const sat2 = obj2 as Satellite;
         const { m } = SatMath.calculateTimeVariables(now, sat2.satrec) as { m: number };
         const sat2Sv = Sgp4.propagate(sat2.satrec, m);
 

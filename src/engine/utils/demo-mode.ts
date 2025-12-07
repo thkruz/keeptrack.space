@@ -1,4 +1,4 @@
-import { DetailedSatellite, Milliseconds } from '@ootk/src/main';
+import { Satellite, Milliseconds } from '@ootk/src/main';
 
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
@@ -43,7 +43,7 @@ export class DemoManager {
 
     this.lastTime_ = realTime;
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
-    const activeSats = catalogManagerInstance.objectCache.filter((sat) => sat.isSatellite() && sat.active) as DetailedSatellite[];
+    const activeSats = catalogManagerInstance.objectCache.filter((sat) => sat.isSatellite() && sat.active) as Satellite[];
     const lastSatId = activeSats[activeSats.length - 1].id;
 
     for (this.satellite; this.satellite < lastSatId;) {
@@ -51,7 +51,7 @@ export class DemoManager {
         this.satellite = Math.floor(Math.random() * lastSatId);
       }
 
-      const sat = satData[this.satellite] as DetailedSatellite;
+      const sat = satData[this.satellite] as Satellite;
 
       if (
         !sat.isSatellite() ||

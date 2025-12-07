@@ -23,13 +23,13 @@ describe('UpdateSatManager_class', () => {
 });
 
 describe('SatInfoBoxCore_class2', () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let satinfobox: SatInfoBox;
+  let _satinfobox: SatInfoBox;
 
   beforeEach(() => {
     PluginRegistry.unregisterAllPlugins();
     setupStandardEnvironment([TopMenu, SelectSatManager, DateTimeManager]);
-    satinfobox = new SatInfoBox();
+    _satinfobox = new SatInfoBox();
+    void _satinfobox; // Variable is used indirectly by plugin suite tests
   });
 
   it('should be able to select a satellite', () => {

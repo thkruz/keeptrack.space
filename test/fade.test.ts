@@ -44,7 +44,7 @@ describe('fadeIn_function', () => {
   // Tests that the function throws an error when the element is null
   it('test_element_null', () => {
     expect(() => {
-      fadeIn(null);
+      fadeIn(null as unknown as HTMLElement);
     }).not.toThrow();
   });
 
@@ -76,7 +76,7 @@ describe('fadeIn_function', () => {
     const el = document.createElement('div');
     const spy = jest.fn();
 
-    fadeIn(el, 'block', null, spy);
+    fadeIn(el, 'block', null as unknown as number, spy);
     jest.advanceTimersByTime(999);
     expect(spy).not.toHaveBeenCalled();
     jest.advanceTimersByTime(1);
@@ -162,7 +162,7 @@ describe('fadeOut_function', () => {
   // Tests that a missing element does not throw an error
   it('test_missing_element_does_not_throw_error', () => {
     expect(() => {
-      fadeOut(null);
+      fadeOut(null as unknown as HTMLElement);
     }).not.toThrow();
   });
 

@@ -118,7 +118,7 @@ export abstract class ColorScheme {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   updateGroup(obj: BaseObject, _params?): ColorInformation {
-    if (!ServiceLocator.getGroupsManager().selectedGroup.hasObject(obj.id)) {
+    if (!ServiceLocator.getGroupsManager().selectedGroup?.hasObject(obj.id)) {
       // Hide Everything Else
       return {
         color: settingsManager.colors.transparent ?? this.colorTheme.transparent,

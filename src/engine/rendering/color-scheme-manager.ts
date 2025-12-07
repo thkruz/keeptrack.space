@@ -33,7 +33,7 @@ import { UrlManager } from '@app/engine/input/url-manager';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
-import { CatalogSource, DetailedSatellite, SpaceObjectType } from '@ootk/src/main';
+import { CatalogSource, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
@@ -287,10 +287,10 @@ export class ColorSchemeManager {
   }
 
   isInView(obj: BaseObject) {
-    return ServiceLocator.getDotsManager().inViewData?.[obj.id] === 1 && this.currentColorScheme?.objectTypeFlags.inFOV;
+    return ServiceLocator.getDotsManager().inViewData?.[Number(obj.id)] === 1 && this.currentColorScheme?.objectTypeFlags.inFOV;
   }
   isInViewOff(obj: BaseObject) {
-    return ServiceLocator.getDotsManager().inViewData?.[obj.id] === 1 && !this.currentColorScheme?.objectTypeFlags.inFOV;
+    return ServiceLocator.getDotsManager().inViewData?.[Number(obj.id)] === 1 && !this.currentColorScheme?.objectTypeFlags.inFOV;
   }
   isPayloadOff(obj: BaseObject) {
     return settingsManager.filter?.payloads === false && obj.type === SpaceObjectType.PAYLOAD;
@@ -308,69 +308,69 @@ export class ColorSchemeManager {
     return settingsManager.filter?.notionalSatellites === false && obj.type === SpaceObjectType.NOTIONAL;
   }
   isvLeoSatOff(obj: BaseObject) {
-    return settingsManager.filter?.vLEOSatellites === false && (obj as DetailedSatellite).apogee < 400;
+    return settingsManager.filter?.vLEOSatellites === false && (obj as Satellite).apogee < 400;
   }
   isLeoSatOff(obj: BaseObject) {
-    return settingsManager.filter?.lEOSatellites === false && (obj as DetailedSatellite).apogee < 6000 && (obj as DetailedSatellite).apogee >= 400;
+    return settingsManager.filter?.lEOSatellites === false && (obj as Satellite).apogee < 6000 && (obj as Satellite).apogee >= 400;
   }
   isMeoSatOff(obj: BaseObject) {
-    return settingsManager.filter?.mEOSatellites === false && (obj as DetailedSatellite).eccentricity < 0.1 && ((obj as DetailedSatellite).apogee >= 6000 &&
-      (obj as DetailedSatellite).apogee < 34786);
+    return settingsManager.filter?.mEOSatellites === false && (obj as Satellite).eccentricity < 0.1 && ((obj as Satellite).apogee >= 6000 &&
+      (obj as Satellite).apogee < 34786);
   }
   isHeoSatOff(obj: BaseObject) {
     return settingsManager.filter?.hEOSatellites === false &&
-      (obj as DetailedSatellite).eccentricity >= 0.1 && ((obj as DetailedSatellite).apogee <= 39786);
+      (obj as Satellite).eccentricity >= 0.1 && ((obj as Satellite).apogee <= 39786);
   }
   isGeoSatOff(obj: BaseObject) {
-    return settingsManager.filter?.gEOSatellites === false && (obj as DetailedSatellite).eccentricity < 0.1 && ((obj as DetailedSatellite).apogee >= 34786 &&
-      (obj as DetailedSatellite).apogee < 36786);
+    return settingsManager.filter?.gEOSatellites === false && (obj as Satellite).eccentricity < 0.1 && ((obj as Satellite).apogee >= 34786 &&
+      (obj as Satellite).apogee < 36786);
   }
   isXGeoSatOff(obj: BaseObject) {
     return settingsManager.filter?.xGEOSatellites === false &&
-      (((obj as DetailedSatellite).eccentricity < 0.1 && ((obj as DetailedSatellite).apogee > 36786)) || ((obj as DetailedSatellite).apogee > 39786));
+      (((obj as Satellite).eccentricity < 0.1 && ((obj as Satellite).apogee > 36786)) || ((obj as Satellite).apogee > 39786));
   }
   isUnitedStatesOff(obj: BaseObject) {
-    return settingsManager.filter?.unitedStates === false && (obj as DetailedSatellite)?.country === 'US';
+    return settingsManager.filter?.unitedStates === false && (obj as Satellite)?.country === 'US';
   }
   isUnitedKingdomOff(obj: BaseObject) {
-    return settingsManager.filter?.unitedKingdom === false && (obj as DetailedSatellite)?.country === 'UK';
+    return settingsManager.filter?.unitedKingdom === false && (obj as Satellite)?.country === 'UK';
   }
   isFranceOff(obj: BaseObject) {
-    return settingsManager.filter?.france === false && (obj as DetailedSatellite)?.country === 'F';
+    return settingsManager.filter?.france === false && (obj as Satellite)?.country === 'F';
   }
   isGermanyOff(obj: BaseObject) {
-    return settingsManager.filter?.germany === false && (obj as DetailedSatellite)?.country === 'D';
+    return settingsManager.filter?.germany === false && (obj as Satellite)?.country === 'D';
   }
   isJapanOff(obj: BaseObject) {
-    return settingsManager.filter?.japan === false && (obj as DetailedSatellite)?.country === 'J';
+    return settingsManager.filter?.japan === false && (obj as Satellite)?.country === 'J';
   }
   isChinaOff(obj: BaseObject) {
-    return settingsManager.filter?.china === false && (obj as DetailedSatellite)?.country === 'CN';
+    return settingsManager.filter?.china === false && (obj as Satellite)?.country === 'CN';
   }
   isIndiaOff(obj: BaseObject) {
-    return settingsManager.filter?.india === false && (obj as DetailedSatellite)?.country === 'IN';
+    return settingsManager.filter?.india === false && (obj as Satellite)?.country === 'IN';
   }
   isRussiaOff(obj: BaseObject) {
-    return settingsManager.filter?.russia === false && (obj as DetailedSatellite)?.country === 'RU';
+    return settingsManager.filter?.russia === false && (obj as Satellite)?.country === 'RU';
   }
   isUssrOff(obj: BaseObject) {
-    return settingsManager.filter?.uSSR === false && (obj as DetailedSatellite)?.country === 'SU';
+    return settingsManager.filter?.uSSR === false && (obj as Satellite)?.country === 'SU';
   }
   isSouthKoreaOff(obj: BaseObject) {
-    return settingsManager.filter?.southKorea === false && (obj as DetailedSatellite)?.country === 'KR';
+    return settingsManager.filter?.southKorea === false && (obj as Satellite)?.country === 'KR';
   }
   isAustraliaOff(obj: BaseObject) {
-    return settingsManager.filter?.australia === false && (obj as DetailedSatellite)?.country === 'AU';
+    return settingsManager.filter?.australia === false && (obj as Satellite)?.country === 'AU';
   }
   isOtherCountriesOff(obj: BaseObject) {
     return settingsManager.filter?.otherCountries === false &&
-      !['US', 'UK', 'F', 'D', 'J', 'CN', 'IN', 'RU', 'SU', 'KR', 'AU'].includes((obj as DetailedSatellite)?.country);
+      !['US', 'UK', 'F', 'D', 'J', 'CN', 'IN', 'RU', 'SU', 'KR', 'AU'].includes((obj as Satellite)?.country);
   }
   isJscVimpelSatOff(obj: BaseObject) {
-    return settingsManager.filter?.vimpelSatellites === false && (obj as DetailedSatellite)?.source === CatalogSource.VIMPEL;
+    return settingsManager.filter?.vimpelSatellites === false && (obj as Satellite)?.source === CatalogSource.VIMPEL;
   }
   isCelestrakSatOff(obj: BaseObject) {
-    return settingsManager.filter?.celestrakSatellites === false && (obj as DetailedSatellite)?.source === CatalogSource.CELESTRAK;
+    return settingsManager.filter?.celestrakSatellites === false && (obj as Satellite)?.source === CatalogSource.CELESTRAK;
   }
   isStarlinkSatOff(obj: BaseObject) {
     return settingsManager.filter?.starlinkSatellites === false && obj.name?.includes('STARLINK');
@@ -429,7 +429,7 @@ export class ColorSchemeManager {
   }
 
   private getColorIfDisabledSat_(objectData: BaseObject[], i: number): ColorInformation | null {
-    const sat = objectData[i] as DetailedSatellite;
+    const sat = objectData[i] as Satellite;
 
     // Optimize for the most common cases first
 
@@ -626,7 +626,7 @@ export class ColorSchemeManager {
     params: ColorSchemeParams,
   ) {
     for (let i = firstDotToColor; i < lastDotToColor; i++) {
-      satData[i].totalVelocity = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
+      (satData[i] as unknown as { totalVelocity: number }).totalVelocity = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
       this.calculateBufferData_(i, satData, params);
     }
   }
@@ -749,12 +749,14 @@ export class ColorSchemeManager {
   private setSelectedAndHoverBuffer_() {
     const selSat = PluginRegistry.getPlugin(SelectSatManager)?.selectedSat;
 
-    if (typeof selSat !== 'undefined' && selSat > -1) {
+    if (typeof selSat !== 'undefined' && selSat !== -1) {
       // Selected satellites are always one color so forget whatever we just did
-      this.colorData[selSat * 4] = settingsManager.selectedColor[0]; // R
-      this.colorData[selSat * 4 + 1] = settingsManager.selectedColor[1]; // G
-      this.colorData[selSat * 4 + 2] = settingsManager.selectedColor[2]; // B
-      this.colorData[selSat * 4 + 3] = settingsManager.selectedColor[3]; // A
+      const selSatNum = selSat;
+
+      this.colorData[selSatNum * 4] = settingsManager.selectedColor[0]; // R
+      this.colorData[selSatNum * 4 + 1] = settingsManager.selectedColor[1]; // G
+      this.colorData[selSatNum * 4 + 2] = settingsManager.selectedColor[2]; // B
+      this.colorData[selSatNum * 4 + 3] = settingsManager.selectedColor[3]; // A
     }
 
     const hovSat = ServiceLocator.getHoverManager().hoveringSat;
@@ -766,9 +768,11 @@ export class ColorSchemeManager {
      * Hover satellites are always one color so forget whatever we just did
      * We check this last so you can hover over the selected satellite
      */
-    this.colorData[hovSat * 4] = settingsManager.hoverColor[0]; // R
-    this.colorData[hovSat * 4 + 1] = settingsManager.hoverColor[1]; // G
-    this.colorData[hovSat * 4 + 2] = settingsManager.hoverColor[2]; // B
-    this.colorData[hovSat * 4 + 3] = settingsManager.hoverColor[3];
+    const hovSatNum = hovSat;
+
+    this.colorData[hovSatNum * 4] = settingsManager.hoverColor[0]; // R
+    this.colorData[hovSatNum * 4 + 1] = settingsManager.hoverColor[1]; // G
+    this.colorData[hovSatNum * 4 + 2] = settingsManager.hoverColor[2]; // B
+    this.colorData[hovSatNum * 4 + 3] = settingsManager.hoverColor[3];
   }
 }

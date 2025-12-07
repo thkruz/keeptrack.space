@@ -2,7 +2,7 @@ import { EChartsData, MenuMode } from '@app/engine/core/interfaces';
 import { SatMathApi } from '@app/engine/math/sat-math-api';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
-import { DetailedSatellite } from '@ootk/src/main';
+import { Satellite } from '@ootk/src/main';
 import scatterPlotPng from '@public/img/icons/scatter-plot.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
@@ -207,7 +207,7 @@ export class EcfPlot extends KeepTrackPlugin {
 
     // Time management
     const now = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
-    const curSatObj = catalogManagerInstance.getObject(this.selectSatManager_.selectedSat) as DetailedSatellite;
+    const curSatObj = catalogManagerInstance.getObject(this.selectSatManager_.selectedSat) as Satellite;
 
     const timeData: Date[] = [];
 
@@ -240,7 +240,7 @@ export class EcfPlot extends KeepTrackPlugin {
     const lastSatId = this.selectSatManager_.lastSelectedSat();
 
     if (lastSatId !== -1) {
-      const lastSatObj = catalogManagerInstance.getObject(lastSatId) as DetailedSatellite;
+      const lastSatObj = catalogManagerInstance.getObject(lastSatId) as Satellite;
 
       for (let i = 0; i < NUMBER_OF_POINTS; i++) {
         const date = new Date(now + lastSatObj.period * 60 * i / (NUMBER_OF_POINTS) * 1000);

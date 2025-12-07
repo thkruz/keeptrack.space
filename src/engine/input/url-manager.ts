@@ -2,7 +2,7 @@ import { ToastMsgType } from '@app/engine/core/interfaces';
 import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager, settingsManager } from '@app/settings/settings';
-import { DEG2RAD, Degrees, DetailedSatellite, RAD2DEG, Radians } from '@ootk/src/main';
+import { DEG2RAD, Degrees, Satellite, RAD2DEG, Radians } from '@ootk/src/main';
 import { PluginRegistry } from '../core/plugin-registry';
 import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
@@ -12,7 +12,7 @@ import { getEl } from '../utils/get-el';
 import { OrbitCruncherMsgType } from '@app/webworker/orbit-cruncher-interfaces';
 
 export abstract class UrlManager {
-  private static selectedSat_: DetailedSatellite | null = null;
+  private static selectedSat_: Satellite | null = null;
   private static searchString_: string = '';
   private static propRate_: number;
   private static readonly colorSchemeDefinitions_ = {
@@ -35,7 +35,7 @@ export abstract class UrlManager {
 
   static {
     EventBus.getInstance().on(EventBusEvent.selectSatData, (sat) => {
-      if (sat instanceof DetailedSatellite) {
+      if (sat instanceof Satellite) {
         this.selectedSat_ = sat;
       } else {
         this.selectedSat_ = null;

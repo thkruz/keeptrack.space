@@ -29,15 +29,17 @@ import {
   BaseObject,
   DEG2RAD,
   Degrees,
+  estimateRcs as ootkEstimateRcs,
   GreenwichMeanSiderealTime,
   Kilometers,
   KilometersPerSecond,
   linearDistance,
+  mag2db as ootkMag2db,
   MILLISECONDS_TO_DAYS,
   MINUTES_PER_DAY,
   PosVel,
   RAD2DEG,
-  RIC,
+  relativeVelocity as ootkRelativeVelocity,
   Radians,
   Satellite,
   SatelliteRecord,
@@ -45,6 +47,7 @@ import {
   SpaceObjectType,
   StateVectorSgp4,
   Sun as OotkSun,
+  SunStatus,
   TAU,
   TemeVec3,
   Vector3D,
@@ -70,78 +73,29 @@ if (!global) {
 
 export type StringifiedNumber = `${number}.${number}`;
 
-export enum SunStatus {
-  UNKNOWN = -1,
-  UMBRAL = 0,
-  PENUMBRAL = 1,
-  SUN = 2,
-}
+// Re-export SunStatus from ootk for backward compatibility
+export { SunStatus } from '@ootk/src/main';
 
 export abstract class SatMath {
   /**
    * Converts magnitude to decibels.
    * @param magnitude The magnitude to convert.
+   * @deprecated Use mag2db() from ootk instead.
    */
   static mag2db(magnitude: number) {
-    return 10 * Math.log10(magnitude);
+    if (magnitude <= 0) {
+      return NaN; // KeepTrack returns NaN instead of throwing
+    }
+
+    return ootkMag2db(magnitude);
   }
 
+  /**
+   * Estimates the Radar Cross Section (RCS) of an object based on its dimensions and shape.
+   * @deprecated Use estimateRcs() from ootk instead.
+   */
   static estimateRcs(length: number, width: number, height: number, shape: string): number {
-    // If shape contains the word "sphere", then use the sphere RCS formula
-    if (shape.toLowerCase().includes('sphere')) {
-      // RCS=πr^2
-      const rcs = Math.PI * (length / 2) ** 2;
-
-
-      return (Math.sqrt(rcs) * 3) / 2;
-    }
-
-    // If shape contains the word "cylinder", then use the cylinder RCS formula
-    if (shape.toLowerCase().includes('cyl')) {
-      // RCS=length*2r
-      const minRcs = length * 2 * (width / 2);
-      // RCS=πr^2
-      const maxRcs = Math.PI * (length / 2) ** 2;
-      const rcs = (minRcs + maxRcs) / 2;
-
-
-      return (Math.sqrt(rcs) * 3) / 2;
-    }
-
-    // If shape contains the word "cone", then use the cone RCS formula
-    if (shape.toLowerCase().includes('cone')) {
-      // PI * r ** 2 / 2
-      const rcs = (Math.PI * (width / 2) ** 2) / 2;
-
-
-      return (Math.sqrt(rcs) * 3) / 2;
-    }
-
-    // If shape contains the word "hexagon", then use the hexagon RCS formula
-    if (shape.toLowerCase().includes('hex')) {
-      const minLength = Math.min(length * width, length * height, width * height);
-      const minRcs = (3 * ((Math.sqrt(3) / 2) * minLength ** 2)) / 4;
-      const maxLength = Math.max(length * width, length * height, width * height);
-      const maxRcs = (3 * ((Math.sqrt(3) / 2) * maxLength ** 2)) / 2;
-      const rcs = (minRcs + maxRcs) / 2;
-
-
-      return (Math.sqrt(rcs) * 3) / 2;
-    }
-
-    // Assume everything else is a cube
-
-    /*
-     * If shape contains the word "cube", then use the cube RCS formula
-     * if (shape.toLowerCase().includes('cube') || shape.toLowerCase().includes('box')) {
-     */
-    const minRcs = Math.min(length * width, length * height, width * height);
-    const maxRcs = Math.max(length * width, length * height, width * height);
-    const rcs = (minRcs + maxRcs) / 2;
-
-
-    return (Math.sqrt(rcs) * 3) / 2;
-    // }
+    return ootkEstimateRcs(length, width, height, shape);
   }
 
   /**
@@ -376,8 +330,12 @@ export abstract class SatMath {
    * @param obj2 The second object's velocity in ECI coordinates.
    * @returns The velocity between the two objects in kilometers/s.
    */
+  /**
+   * Calculates the relative velocity between two objects.
+   * @deprecated Use relativeVelocity() from ootk instead.
+   */
   static velocity(obj1: TemeVec3<KilometersPerSecond>, obj2: TemeVec3<KilometersPerSecond>): KilometersPerSecond {
-    return <KilometersPerSecond>Math.sqrt((obj1.x - obj2.x) ** 2 + (obj1.y - obj2.y) ** 2 + (obj1.z - obj2.z) ** 2);
+    return ootkRelativeVelocity(obj1, obj2);
   }
 
 
@@ -389,6 +347,9 @@ export abstract class SatMath {
    * @returns An object containing the offset time (in milliseconds), the distance between the satellites (in kilometers), and the relative position and velocity vectors in RIC
    * coordinates.
    */
+  /**
+   * @deprecated Use sat1.findClosestApproach(sat2, startDate, duration, stepSize) instead.
+   */
   static findClosestApproachTime(
     sat1: Satellite,
     sat2: Satellite,
@@ -398,39 +359,18 @@ export abstract class SatMath {
     dist: number;
     ric: { position: [number, number, number]; velocity: [number, number, number] };
   } {
-    let offset = 0;
+    propLength ??= 1440 * 60; // 1 Day (in seconds)
 
-    propLength ??= 1440 * 60; // 1 Day
-    let minDist = 1000000;
-    let result = {
-      offset: <number | null>null,
-      dist: <number | null>null,
-      ric: <StateVectorSgp4 | null>null,
-    };
+    const result = sat1.findClosestApproach(sat2, new Date(), propLength, 1);
 
-    for (let t = 0; t < propLength; t++) {
-      offset = t * 1000; // Offset in seconds (msec * 1000)
-
-      const ric = RIC.fromJ2000(sat1.toJ2000(new Date(Date.now() + offset)), sat2.toJ2000(new Date(Date.now() + offset)));
-
-      if (ric.range < minDist && !(ric.position.x === 0 && ric.position.y === 0 && ric.position.z === 0)) {
-        minDist = ric.range;
-        result = {
-          offset,
-          dist: ric.range,
-          ric: { position: ric.position, velocity: ric.velocity },
-        };
-      }
-    }
-
-    if (result.dist === null) {
-      throw new Error('No closest approach found');
-    }
-
-    return result as unknown as {
-      offset: number;
-      dist: number;
-      ric: { position: [number, number, number]; velocity: [number, number, number] };
+    // Adapt result format for backward compatibility
+    return {
+      offset: result.offset,
+      dist: result.distance,
+      ric: {
+        position: [result.ric.position.x, result.ric.position.y, result.ric.position.z],
+        velocity: [result.ric.velocity.x, result.ric.velocity.y, result.ric.velocity.z],
+      },
     };
   }
 
@@ -520,10 +460,8 @@ export abstract class SatMath {
 
   /**
    * Calculates the azimuth and elevation angles between two satellites based on their positions and velocities.
-   * @param sat1 The first satellite object.
-   * @param sat2 The second satellite object.
-   * @returns An object containing the azimuth and elevation angles between the two satellites.
-   * @throws An error if either satellite's position or velocity is undefined.
+   * @deprecated Use sat1.angleTo(sat2, date) instead. Note: this method uses pre-propagated positions,
+   * while the ootk method propagates to the specified date.
    */
   static getAngleBetweenTwoSatellites(sat1: Satellite, sat2: Satellite): { az: number; el: number } {
     const { position: pos1, velocity: vel1 } = sat1;
@@ -563,12 +501,9 @@ export abstract class SatMath {
   }
 
   /**
-   * Calculates the angle between 2 satellites and the Sun
-   * @param sat1 The first satellite object.
-   * @param sat2 The second satellite object.
-   * @param sunVec The sun ECI vector.
-   * @returns The sun angle in rad.
-   * @throws An error if either satellite's position or velocity is undefined.
+   * Calculates the angle between 2 satellites and the Sun.
+   * @deprecated Use sat1.sunAngleTo(sat2, sunPosition, date) instead. Note: this method uses pre-propagated
+   * positions, while the ootk method propagates to the specified date.
    */
   static getAngleBetweenSatellitesAndSun(sat1: Satellite, sat2: Satellite, sunVec: TemeVec3): number {
     const { position: pos1 } = sat1;
@@ -599,45 +534,17 @@ export abstract class SatMath {
    * @param simulationTime The current simulation time.
    * @returns A string indicating the direction of the satellite's movement ('N' for north, 'S' for south, or 'Error' if there was an error in the calculation).
    */
-  static getDirection(sat: Satellite, simulationTime: Date) {
-    const gmst = SatMath.calculateTimeVariables(simulationTime).gmst;
+  /**
+   * @deprecated Use sat.getDirection() instead.
+   */
+  static getDirection(sat: Satellite, simulationTime: Date): string {
+    try {
+      return sat.getDirection(simulationTime);
+    } catch (e) {
+      errorManagerInstance.log(`Sat Direction Calculation Error: ${e}`);
 
-    const FIVE_SECONDS = 5000;
-    const fiveSecLaterTime = new Date(simulationTime.getTime() + FIVE_SECONDS);
-    const fiveSecLaterPos = SatMath.getEci(sat, fiveSecLaterTime).position || { x: <Kilometers>0, y: <Kilometers>0, z: <Kilometers>0 };
-    const gmstFiveSecLater = SatMath.calculateTimeVariables(fiveSecLaterTime).gmst;
-
-    if (fiveSecLaterPos) {
-      const nowLat = eci2lla(sat.position, gmst).lat;
-      const futLat = eci2lla(<TemeVec3>fiveSecLaterPos, gmstFiveSecLater).lat;
-
-      if (nowLat < futLat) {
-        return 'N';
-      }
-      if (nowLat > futLat) {
-        return 'S';
-      }
+      return 'Error';
     }
-
-    const tenSecLaterTime = new Date(simulationTime.getTime() + FIVE_SECONDS * 2);
-    const tenSecLaterPos = SatMath.getEci(sat, tenSecLaterTime).position || { x: <Kilometers>0, y: <Kilometers>0, z: <Kilometers>0 };
-    const gmstTenSecLater = SatMath.calculateTimeVariables(tenSecLaterTime).gmst;
-
-    if (tenSecLaterPos) {
-      const nowLat = eci2lla(sat.position, gmst).lat;
-      const futLat = eci2lla(<TemeVec3>tenSecLaterPos, gmstTenSecLater).lat;
-
-      if (nowLat < futLat) {
-        return 'N';
-      }
-      if (nowLat > futLat) {
-        return 'S';
-      }
-    }
-
-    errorManagerInstance.log('Sat Direction Calculation Error - By Pole?');
-
-    return 'Error';
   }
 
   /**
@@ -896,55 +803,18 @@ export abstract class SatMath {
    * @param now - The current date used to calculate the number of days since the satellite's epoch.
    * @returns The normalized RAAN value within the 0-360 degree range.
    */
+  /**
+   * @deprecated Use sat.normalizeRaan() instead.
+   */
   static normalizeRaan(sat: Satellite, now: Date): number {
-    const precessionRate = this.getNodalPrecessionRate(sat);
-    const daysSinceEpoch = sat.ageOfElset(now);
-    let normalizedRaan = sat.rightAscension + (precessionRate * daysSinceEpoch);
-
-    // Ensure RAAN stays within 0-360 range
-    normalizedRaan = ((normalizedRaan % 360) + 360) % 360;
-
-    return normalizedRaan;
+    return sat.normalizeRaan(now);
   }
 
   /**
-   * Calculates the nodal precession rate of a satellite.
-   *
-   * @param {Satellite} s - The satellite object containing its orbital parameters.
-   * @returns {number} The nodal precession rate in degrees per day.
-   *
-   * @remarks
-   * The nodal precession rate is influenced by the Earth's oblateness (J2), the satellite's
-   * semi-major axis, eccentricity, inclination, and orbital period. This function converts
-   * the inclination from degrees to radians and the semi-major axis from kilometers to meters
-   * before performing the calculation.
-   *
-   * @example
-   * ```typescript
-   * const satellite = {
-   *   period: 90, // in minutes
-   *   semiMajorAxis: 7000, // in kilometers
-   *   eccentricity: 0.001,
-   *   inclination: 98.7 // in degrees
-   * };
-   * const precessionRate = getNodalPrecessionRate(satellite);
-   * console.log(precessionRate); // Output: nodal precession rate in degrees per day
-   * ```
+   * @deprecated Use sat.getNodalPrecessionRate() instead.
    */
   static getNodalPrecessionRate(s: Satellite): number {
-    const Re = 6378137; // Earth radius in meters
-    const J2 = 1.082626680e-3; // Earth's second dynamic form factor
-    const period = s.period * 60; // Convert period from minutes to seconds
-    const omega = (2 * Math.PI) / period; // Angular velocity in rad/s
-    const a = s.semiMajorAxis * 1000; // Convert semi-major axis from km to meters
-    const e = s.eccentricity;
-    const i = s.inclination * Math.PI / 180; // Convert inclination to radians
-
-    // Calculate precession rate in rad/s
-    const omegaP = (-3 / 2) * (Re / a) ** 2 / (1 - e * e) ** 2 * J2 * omega * Math.cos(i);
-
-    // Convert to degrees per day
-    return omegaP * (180 / Math.PI) * 86400;
+    return s.getNodalPrecessionRate();
   }
 
   /**

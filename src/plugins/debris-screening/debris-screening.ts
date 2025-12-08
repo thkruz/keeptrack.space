@@ -1,4 +1,3 @@
-import { CoordinateTransforms } from '@app/app/analysis/coordinate-transforms';
 import { SatMath } from '@app/app/analysis/sat-math';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -7,7 +6,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { Satellite, Hours, Kilometers, Milliseconds, Minutes, PosVel, Seconds, Sgp4 } from '@ootk/src/main';
+import { Hours, Kilometers, Milliseconds, Minutes, PosVel, RIC, Satellite, Seconds, Sgp4 } from '@ootk/src/main';
 import frameInspectPng from '@public/img/icons/frame-inspect.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -218,9 +217,9 @@ export class DebrisScreening extends KeepTrackPlugin {
           break;
         }
 
-        const ric = CoordinateTransforms.sat2ric(satSv as PosVel, sat2Sv as PosVel);
+        const ric = RIC.fromPosVel(satSv as PosVel, sat2Sv as PosVel);
 
-        if (Math.abs(ric.position[0]) < uVal && Math.abs(ric.position[1]) < vVal && Math.abs(ric.position[2]) < wVal) {
+        if (Math.abs(ric.position.x) < uVal && Math.abs(ric.position.y) < vVal && Math.abs(ric.position.z) < wVal) {
           searchList.push(sat2.sccNum);
           // Remove from possible sats
           possibleSats.splice(idx, 1);

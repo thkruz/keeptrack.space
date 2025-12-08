@@ -429,7 +429,6 @@ export const keepTrackApiStubs = {
       }),
       updateDopsTable: jest.fn(),
       map: () => ({ lat: 0, lon: 0 }),
-      sat2ric: () => ({ position: [0, 0, 0], velocity: [0, 0, 0] }),
       getTEARR: () => ({
         az: 0,
         el: 0,

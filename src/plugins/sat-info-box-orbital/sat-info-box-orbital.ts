@@ -1,6 +1,5 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-lines */
-import { CoordinateTransforms } from '@app/app/analysis/coordinate-transforms';
 import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
@@ -240,7 +239,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
     if (secondarySatObj && obj.isSatellite()) {
       const sat = obj as Satellite;
-      const ric = CoordinateTransforms.sat2ric(secondarySatObj, sat);
+      const ric = secondarySatObj.toRIC(sat);
       const dist = SensorMath.distanceString(sat, secondarySatObj).split(' ')[2];
 
       const satDistanceElement = getEl('sat-sec-dist');
@@ -250,9 +249,9 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
       if (satDistanceElement && satRadiusElement && satInTrackElement && satCrossTrackElement) {
         satDistanceElement.innerHTML = `${dist} km`;
-        satRadiusElement.innerHTML = `${ric.position[0].toFixed(2)}km`;
-        satInTrackElement.innerHTML = `${ric.position[1].toFixed(2)}km`;
-        satCrossTrackElement.innerHTML = `${ric.position[2].toFixed(2)}km`;
+        satRadiusElement.innerHTML = `${ric.position.x.toFixed(2)}km`;
+        satInTrackElement.innerHTML = `${ric.position.y.toFixed(2)}km`;
+        satCrossTrackElement.innerHTML = `${ric.position.z.toFixed(2)}km`;
       } else {
         errorManagerInstance.debug('Error updating secondary satellite info!');
       }

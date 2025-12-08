@@ -1,7 +1,6 @@
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { getEl } from '@app/engine/utils/get-el';
 
-import { CoordinateTransforms } from '@app/app/analysis/coordinate-transforms';
 import { SatMath, StringifiedNumber } from '@app/app/analysis/sat-math';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -9,9 +8,8 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, CatalogSource, Degrees, Satellite, TemeVec3, Kilometers, KilometersPerSecond, Seconds, Sgp4, StateVectorSgp4 } from '@ootk/src/main';
+import { BaseObject, CatalogSource, Degrees, Kilometers, KilometersPerSecond, RIC, Satellite, Seconds, Sgp4, StateVectorSgp4, TemeVec3 } from '@ootk/src/main';
 import rpo from '@public/img/icons/rpo.png';
-import { vec3 } from 'gl-matrix';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
@@ -30,10 +28,7 @@ interface ProximityOpsEvent {
   sat2Id: number,
   sat2SccNum: string,
   sat2Name?: string,
-  ric: {
-    position: vec3;
-    velocity: vec3;
-  },
+  ric: RIC,
   dist: number | Kilometers,
   vel: number,
   date: Date,
@@ -260,12 +255,12 @@ export class ProximityOps extends KeepTrackPlugin {
         rpo.sat2SccNum,
         rpo.sat2Name,
         rpo.date.toISOString(), // Convert the date to a string
-        rpo.ric.position[0],
-        rpo.ric.position[1],
-        rpo.ric.position[2],
-        rpo.ric.velocity[0],
-        rpo.ric.velocity[1],
-        rpo.ric.velocity[2],
+        rpo.ric.position.x,
+        rpo.ric.position.y,
+        rpo.ric.position.z,
+        rpo.ric.velocity.x,
+        rpo.ric.velocity.y,
+        rpo.ric.velocity.z,
         rpo.dist,
         rpo.vel,
       ];
@@ -753,14 +748,12 @@ export class ProximityOps extends KeepTrackPlugin {
     (<HTMLInputElement>getEl('proximity-ops-norad')).value = satellite.sccNum;
   }
 
-  getRIC(pos1: TemeVec3, vel1: TemeVec3<KilometersPerSecond>, pos2: TemeVec3, vel2: TemeVec3<KilometersPerSecond>) {
+  getRIC(pos1: TemeVec3, vel1: TemeVec3<KilometersPerSecond>, pos2: TemeVec3, vel2: TemeVec3<KilometersPerSecond>): RIC {
 
     const sat1 = { position: pos1, velocity: vel1 };
     const sat2 = { position: pos2, velocity: vel2 };
 
-    const ric = CoordinateTransforms.sat2ric(sat1, sat2);
-
-    return ric;
+    return RIC.fromPosVel(sat1, sat2);
   }
 
   findClosestApproach(sat1: Satellite, sat2: Satellite, start: Date, duration: Seconds): ProximityOpsEvent {
@@ -840,10 +833,10 @@ export class ProximityOps extends KeepTrackPlugin {
     start = new Date(toca.getTime() - shortestPeriod / 4 * 1000);
     duration = shortestPeriod / 2 as Seconds;
 
-    let ric = {
-      position: vec3.fromValues(0, 0, 0),
-      velocity: vec3.fromValues(0, 0, 0),
-    };
+    let ric = RIC.fromPosVel(
+      { position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } },
+      { position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } },
+    );
 
     for (let t = 0; t < duration; t += veryLittleStep) {
 

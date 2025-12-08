@@ -56,6 +56,7 @@ import {
   eci2ecef,
   eci2lla,
   eci2rae,
+  RIC,
 } from '@ootk/src/main';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { vec3 } from 'gl-matrix';
@@ -65,7 +66,6 @@ import type { Sun } from '../../engine/rendering/draw-manager/sun';
 import { DISTANCE_TO_SUN } from '../../engine/utils/constants';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { jday, lon2yaw } from '../../engine/utils/transforms';
-import { CoordinateTransforms } from './coordinate-transforms';
 
 if (!global) {
   window._numeric = numeric; // numeric will break if it is not available globally
@@ -621,10 +621,10 @@ export abstract class SatMath {
         sat.velocity = vel1;
         sat2.position = params.eciPts2;
         sat2.velocity = vel2;
-        const ric = CoordinateTransforms.sat2ric(sat, sat2).position;
+        const ric = RIC.fromPosVel(sat, sat2).position;
 
 
-        return { x: ric[0], y: ric[1], z: ric[2] };
+        return { x: ric.x, y: ric.y, z: ric.z };
       },
       sat2,
       orbits,

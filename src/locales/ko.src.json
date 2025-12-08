@@ -69,9 +69,6 @@
       "errorReadingFile": "파일 읽기 중 오류 발생!",
       "satelliteNotFound": "위성 {{sccNum}}을(를) 찾을 수 없습니다!"
     },
-    "CreateSat": {
-      "errorCreatingSat": "위성 생성 중 오류 발생!"
-    },
     "Reports": {
       "popupBlocker": "보고서를 보려면 이 사이트의 팝업을 허용해 주세요."
     },
@@ -292,11 +289,6 @@
       "bottomIconLabel": "비디오 디렉터",
       "title": "비디오 디렉터 메뉴",
       "helpBody": "비디오 디렉터 메뉴는 비디오를 만들기 위해 장면의 카메라와 객체를 조작하는 데 사용됩니다."
-    },
-    "CreateSat": {
-      "bottomIconLabel": "위성 생성",
-      "title": "위성 생성",
-      "helpBody": "위성 생성 메뉴는 케플러 요소에서 위성을 생성하는 데 사용됩니다"
     },
     "DopsPlugin": {
       "bottomIconLabel": "DOP 보기",

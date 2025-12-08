@@ -69,9 +69,6 @@
       "errorReadingFile": "读取文件时出错！",
       "satelliteNotFound": "未找到卫星！"
     },
-    "CreateSat": {
-      "errorCreatingSat": "创建卫星时出错！"
-    },
     "Reports": {
       "popupBlocker": "请允许此网站的弹出窗口以查看报告。"
     },
@@ -323,11 +320,6 @@
       "bottomIconLabel": "视频导演",
       "title": "视频导演菜单",
       "helpBody": "视频导演菜单用于操作场景中的摄像机和对象以创建视频。"
-    },
-    "CreateSat": {
-      "bottomIconLabel": "创建卫星",
-      "title": "创建卫星",
-      "helpBody": "创建卫星菜单用于根据开普勒元素创建卫星。"
     },
     "DopsPlugin": {
       "bottomIconLabel": "查看DOP",

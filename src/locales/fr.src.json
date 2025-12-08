@@ -69,9 +69,6 @@
       "errorReadingFile": "Erreur lors de la lecture du fichier !",
       "satelliteNotFound": "Satellite {{sccNum}} introuvable !"
     },
-    "CreateSat": {
-      "errorCreatingSat": "Erreur lors de la création du satellite !"
-    },
     "Reports": {
       "popupBlocker": "Veuillez autoriser les pop-ups pour ce site afin de voir les rapports."
     },
@@ -292,11 +289,6 @@
       "bottomIconLabel": "Réalisateur vidéo",
       "title": "Menu Réalisateur vidéo",
       "helpBody": "Le menu Réalisateur vidéo permet de manipuler la caméra et les objets de la scène pour créer une vidéo."
-    },
-    "CreateSat": {
-      "bottomIconLabel": "Créer un satellite",
-      "title": "Créer un satellite",
-      "helpBody": "Le menu Créer un satellite permet de créer un satellite à partir de ses éléments képlériens."
     },
     "DopsPlugin": {
       "bottomIconLabel": "Voir les DOPs",

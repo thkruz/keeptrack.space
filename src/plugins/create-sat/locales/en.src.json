@@ -1,0 +1,12 @@
+{
+  "plugins": {
+    "CreateSat": {
+      "bottomIconLabel": "Create Satellite",
+      "title": "Create Satellite",
+      "helpBody": "The Create Satellite menu is used to create a satellite from its keplerian elements",
+      "errorMsgs": {
+        "errorCreatingSat": "Error creating satellite!"
+      }
+    }
+  }
+}

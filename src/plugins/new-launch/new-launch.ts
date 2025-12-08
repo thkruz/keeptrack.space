@@ -435,7 +435,7 @@ export class NewLaunch extends KeepTrackPlugin {
       errorManagerInstance.error(
         new Error(tle2),
         'create-sat.ts',
-        t7e('errorMsgs.CreateSat.errorCreatingSat'),
+        t7e('plugins.CreateSat.errorMsgs.errorCreatingSat'),
       );
 
       return null;

@@ -1,0 +1,12 @@
+{
+  "plugins": {
+    "CreateSat": {
+      "bottomIconLabel": "创建卫星",
+      "title": "创建卫星",
+      "helpBody": "创建卫星菜单用于根据开普勒元素创建卫星。",
+      "errorMsgs": {
+        "errorCreatingSat": "创建卫星时出错！"
+      }
+    }
+  }
+}

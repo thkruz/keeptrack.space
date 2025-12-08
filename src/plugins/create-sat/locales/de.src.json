@@ -1,0 +1,12 @@
+{
+  "plugins": {
+    "CreateSat": {
+      "bottomIconLabel": "Satellit erstellen",
+      "title": "Satellit erstellen",
+      "helpBody": "Das Menü 'Satellit erstellen' wird verwendet, um einen Satelliten aus seinen Kepler-Elementen zu erstellen",
+      "errorMsgs": {
+        "errorCreatingSat": "Fehler beim Erstellen des Satelliten!"
+      }
+    }
+  }
+}

@@ -2166,6 +2166,37 @@ button.ui-button::-moz-focus-inner {
 }
 
 
+/* ========== Materialize Tabs Dark Theme Override ========== */
+
+.tabs {
+  background-color: var(--color-dark-background);
+}
+
+.tabs .tab a {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.tabs .tab a:hover,
+.tabs .tab a.active {
+  color: var(--colorWhite);
+  background-color: transparent;
+}
+
+.tabs .tab a:focus,
+.tabs .tab a:focus.active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.tabs .indicator {
+  background-color: var(--color-primary);
+}
+
+.tabs .tab.disabled a,
+.tabs .tab.disabled a:hover {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+
 /* ========== Tooltips ========== */
 
 .material-tooltip {

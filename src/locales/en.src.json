@@ -69,9 +69,6 @@
       "errorReadingFile": "Error while reading file!",
       "satelliteNotFound": "Satellite {{sccNum}} not found!"
     },
-    "CreateSat": {
-      "errorCreatingSat": "Error creating satellite!"
-    },
     "Reports": {
       "popupBlocker": "Please allow popups for this site to view reports."
     },
@@ -292,11 +289,6 @@
       "bottomIconLabel": "Video Director",
       "title": "Video Director Menu",
       "helpBody": "The Video Director Menu is used to manipulate the camera and objects in the scene to create a video."
-    },
-    "CreateSat": {
-      "bottomIconLabel": "Create Satellite",
-      "title": "Create Satellite",
-      "helpBody": "The Create Satellite menu is used to create a satellite from its keplerian elements"
     },
     "DopsPlugin": {
       "bottomIconLabel": "View DOPs",

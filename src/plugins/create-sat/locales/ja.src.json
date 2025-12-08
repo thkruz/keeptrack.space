@@ -1,0 +1,12 @@
+{
+  "plugins": {
+    "CreateSat": {
+      "bottomIconLabel": "衛星を作成",
+      "title": "衛星を作成",
+      "helpBody": "衛星作成メニューは、ケプラー要素から衛星を作成するために使用されます。",
+      "errorMsgs": {
+        "errorCreatingSat": "衛星の作成中にエラーが発生しました！"
+      }
+    }
+  }
+}

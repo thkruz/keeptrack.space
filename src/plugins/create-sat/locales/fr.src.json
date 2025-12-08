@@ -1,0 +1,12 @@
+{
+  "plugins": {
+    "CreateSat": {
+      "bottomIconLabel": "Créer un satellite",
+      "title": "Créer un satellite",
+      "helpBody": "Le menu Créer un satellite permet de créer un satellite à partir de ses éléments képlériens.",
+      "errorMsgs": {
+        "errorCreatingSat": "Erreur lors de la création du satellite !"
+      }
+    }
+  }
+}

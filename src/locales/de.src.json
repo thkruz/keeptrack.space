@@ -69,9 +69,6 @@
       "errorReadingFile": "Fehler beim Lesen der Datei!",
       "satelliteNotFound": "Satellit nicht gefunden!"
     },
-    "CreateSat": {
-      "errorCreatingSat": "Fehler beim Erstellen des Satelliten!"
-    },
     "Reports": {
       "popupBlocker": "Bitte erlauben Sie Popups für diese Seite, um Berichte anzuzeigen."
     },
@@ -295,11 +292,6 @@
       "bottomIconLabel": "Video-Direktor",
       "title": "Video-Direktor-Menü",
       "helpBody": "Das Video-Direktor-Menü wird verwendet, um die Kamera und Objekte in der Szene zu manipulieren, um ein Video zu erstellen."
-    },
-    "CreateSat": {
-      "bottomIconLabel": "Satellit erstellen",
-      "title": "Satellit erstellen",
-      "helpBody": "Das Menü 'Satellit erstellen' wird verwendet, um einen Satelliten aus seinen Kepler-Elementen zu erstellen"
     },
     "DopsPlugin": {
       "bottomIconLabel": "DOPs anzeigen",

@@ -1,0 +1,12 @@
+{
+  "plugins": {
+    "CreateSat": {
+      "bottomIconLabel": "위성 생성",
+      "title": "위성 생성",
+      "helpBody": "위성 생성 메뉴는 케플러 요소에서 위성을 생성하는 데 사용됩니다",
+      "errorMsgs": {
+        "errorCreatingSat": "위성 생성 중 오류 발생!"
+      }
+    }
+  }
+}

@@ -69,9 +69,6 @@
       "errorReadingFile": "¡Error al leer el archivo!",
       "satelliteNotFound": "¡Satélite no encontrado!"
     },
-    "CreateSat": {
-      "errorCreatingSat": "¡Error al crear el satélite!"
-    },
     "Reports": {
       "popupBlocker": "Por favor, permita las ventanas emergentes en este sitio para ver los informes."
     },
@@ -292,11 +289,6 @@
       "bottomIconLabel": "Director de Video",
       "title": "Menú de Director de Video",
       "helpBody": "El Menú de Director de Video se usa para manipular la cámara y los objetos en la escena para crear un video."
-    },
-    "CreateSat": {
-      "bottomIconLabel": "Crear Satélite",
-      "title": "Crear Satélite",
-      "helpBody": "El menú de Crear Satélite se utiliza para crear un satélite a partir de sus elementos keplerianos"
     },
     "DopsPlugin": {
       "bottomIconLabel": "Ver DOPs",

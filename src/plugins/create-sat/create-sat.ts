@@ -1,20 +1,25 @@
 import {
-  Satellite,
-  SatelliteParams,
-  TemeVec3,
+  IBottomIconConfig,
+  ISideMenuConfig,
+} from '@app/engine/plugins/core/plugin-capabilities';
+import {
   FormatTle,
   KilometersPerSecond,
+  Satellite,
+  SatelliteParams,
   SatelliteRecord,
   Sgp4,
+  TemeVec3,
   Tle,
 } from '@ootk/src/main';
 import addSatellitePnng from '@public/img/icons/add-satellite.png';
-import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 import { SatMath } from '@app/app/analysis/sat-math';
 import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
@@ -23,7 +28,6 @@ import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { saveAs } from 'file-saver';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 /**
  * Interface for TLE input parameters
@@ -52,103 +56,273 @@ export class CreateSat extends KeepTrackPlugin {
   readonly id = 'CreateSat';
   dependencies_ = [SelectSatManager.name];
 
-  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
-
   isRequireSatelliteSelected = false;
-  isIconDisabledOnLoad = false;
-  isIconDisabled = false;
 
   static readonly elementPrefix = 'createSat';
-  bottomIconImg = addSatellitePnng;
-  sideMenuElementName = 'createSat-menu';
+
+  // Orbital mechanics constants
+  private static readonly EARTH_RADIUS_KM_ = 6378.137;
+  private static readonly EARTH_MU_ = 398600.4418; // km³/s²
 
   constructor() {
     super();
   }
 
+  dragOptions: ClickDragOptions = {
+    isDraggable: true,
+    maxWidth: 700,
+    minWidth: 400,
+  };
+
+  // =========================================================================
+  // Orbital calculation methods
+  // =========================================================================
+
+  /**
+   * Calculate orbital elements from apogee/perigee altitudes
+   */
+  private static calculateFromAltitudes_(apogeeAlt: number, perigeeAlt: number): {
+    eccentricity: number;
+    semimajorAxis: number;
+    meanMotion: number;
+  } {
+    const Ra = apogeeAlt + CreateSat.EARTH_RADIUS_KM_; // Apogee radius
+    const Rp = perigeeAlt + CreateSat.EARTH_RADIUS_KM_; // Perigee radius
+    const a = (Ra + Rp) / 2; // Semi-major axis
+    const e = (Ra - Rp) / (Ra + Rp); // Eccentricity
+
+    // Mean motion in rev/day
+    const n = Math.sqrt(CreateSat.EARTH_MU_ / (a * a * a)) * 86400 / (2 * Math.PI);
+
+    return { eccentricity: e, semimajorAxis: a, meanMotion: n };
+  }
+
+  /**
+   * Calculate derived parameters from mean motion and eccentricity
+   */
+  private static calculateDerivedParams_(meanMotion: number, eccentricity: number): {
+    apogee: number;
+    perigee: number;
+    semimajorAxis: number;
+    velocity: number;
+  } {
+    // Mean motion (rev/day) to semi-major axis
+    const n = meanMotion * 2 * Math.PI / 86400; // rad/s
+    const a = (CreateSat.EARTH_MU_ / (n * n)) ** (1 / 3); // km
+
+    const apogee = a * (1 + eccentricity) - CreateSat.EARTH_RADIUS_KM_;
+    const perigee = a * (1 - eccentricity) - CreateSat.EARTH_RADIUS_KM_;
+    const velocity = Math.sqrt(CreateSat.EARTH_MU_ / a); // Circular approximation
+
+    return { apogee, perigee, semimajorAxis: a, velocity };
+  }
+
+  // =========================================================================
+  // Composition-based configuration methods
+  // =========================================================================
+
+  getBottomIconConfig(): IBottomIconConfig {
+    return {
+      elementName: 'create-satellite-bottom-icon',
+      label: 'Create Satellite',
+      image: addSatellitePnng,
+      menuMode: [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL],
+      isDisabledOnLoad: false,
+    };
+  }
+
+  getSideMenuConfig(): ISideMenuConfig {
+    return {
+      elementName: 'createSat-menu',
+      title: 'Create Satellite',
+      html: this.buildSideMenuHtml_(),
+    };
+  }
+
   /**
    * HTML template for the side menu
    */
-  sideMenuElementHtml = html`
+  private buildSideMenuHtml_(): string {
+    return html`
     <div id="createSat-menu" class="side-menu-parent start-hidden text-select">
-      <div id="createSat-content" class="side-menu">
+      <div id="createSat-content" class="side-menu" style="scrollbar-gutter: stable;">
         <div class="row">
           <h5 class="center-align">Create Satellite</h5>
-          <form id="createSat">
-            <div class="input-field col s12">
-              <input value="90000" id="${CreateSat.elementPrefix}-scc" type="text" maxlength="5" />
-              <label for="${CreateSat.elementPrefix}-scc" class="active">Satellite NORAD ID (90000-99999)</label>
+          <div class="row" style="margin-bottom: 0;">
+            <div class="col s12">
+              <ul id="createSat-tabs" class="tabs">
+                <li class="tab col s6"><a class="active" href="#createSat-basic-tab">Basic</a></li>
+                <li class="tab col s6"><a href="#createSat-advanced-tab">Advanced</a></li>
+              </ul>
             </div>
-            <div class="input-field col s12">
-              <select value=1 id="${CreateSat.elementPrefix}-type" type="text">
-                <option value=1>Payload</option>
-                <option value=2>Rocket Body</option>
-                <option value=3>Debris</option>
-                <option value=4>Special</option>
-              </select>
-              <label for="${CreateSat.elementPrefix}-type">Object Type</label>
-            </div>
-            <div class="input-field col s12">
-              <select value="TBD" id="${CreateSat.elementPrefix}-country" type="text">
-                <option value="TBD">Unknown</option>
-              </select>
-              <label for="${CreateSat.elementPrefix}-country">Country</label>
-            </div>
-            <div class="input-field col s12">
-              <input placeholder="AA" id="${CreateSat.elementPrefix}-year" type="text" maxlength="2" />
-              <label for="${CreateSat.elementPrefix}-year" class="active">Epoch Year</label>
-            </div>
-            <div class="input-field col s12">
-              <input placeholder="AAA.AAAAAAAA" id="${CreateSat.elementPrefix}-day" type="text" maxlength="12" />
-              <label for="${CreateSat.elementPrefix}-day" class="active">Epoch Day</label>
-            </div>
-            <div class="input-field col s12">
-              <input placeholder="AAA.AAAA" id="${CreateSat.elementPrefix}-inc" type="text" maxlength="8" />
-              <label for="${CreateSat.elementPrefix}-inc" class="active">Inclination</label>
-            </div>
-            <div class="input-field col s12">
-              <input placeholder="AAA.AAAA" id="${CreateSat.elementPrefix}-rasc" type="text" maxlength="8" />
-              <label for="${CreateSat.elementPrefix}-rasc" class="active">Right Ascension</label>
-            </div>
-            <div class="input-field col s12">
-              <input placeholder="AA.AAAAAAAA" id="${CreateSat.elementPrefix}-ecen" type="text" maxlength="7" />
-              <label for="${CreateSat.elementPrefix}-ecen" class="active">Eccentricity</label>
-            </div>
-            <div class="input-field col s12">
-              <input placeholder="AA.AAAAAAAA" id="${CreateSat.elementPrefix}-argPe" type="text" maxlength="8" />
-              <label for="${CreateSat.elementPrefix}-argPe" class="active">Argument of Perigee</label>
-            </div>
-            <div class="input-field col s12">
-              <input placeholder="AAA.AAAA" id="${CreateSat.elementPrefix}-meana" type="text" maxlength="8" />
-              <label for="${CreateSat.elementPrefix}-meana" class="active">Mean Anomaly</label>
-            </div>
-            <div class="input-field col s12">
-              <input placeholder="AAA.AAAA" id="${CreateSat.elementPrefix}-meanmo" type="text" maxlength="11" />
-              <label for="${CreateSat.elementPrefix}-meanmo" class="active">Mean Motion</label>
-            </div>
-            <div class="input-field col s12">
-              <input placeholder="AA.AAAA" id="${CreateSat.elementPrefix}-per" type="text" maxlength="11" />
-              <label for="${CreateSat.elementPrefix}-per" class="active">Period</label>
-            </div>
-            <div class="input-field col s12">
-              <input placeholder="" id="${CreateSat.elementPrefix}-src" type="text" maxlength="24" />
-              <label for="${CreateSat.elementPrefix}-src" class="active">Data source</label>
-            </div>
-            <div class="input-field col s12">
-              <input placeholder="" id="${CreateSat.elementPrefix}-name" type="text" maxlength="24" />
-              <label for="${CreateSat.elementPrefix}-name" class="active">Satellite Name</label>
-            </div>
-            <div class="center-align row">
-              <button id="createSat-submit" class="btn btn-ui waves-effect waves-light" type="button" name="action">Create Satellite &#9658;</button>
-            </div>
-            <div class="center-align row">
-              <button id="createSat-save" class="btn btn-ui waves-effect waves-light" type="button" name="action">Save TLE &#9658;</button>
-            </div>
-          </form>
+          </div>
+
+          <!-- Basic Tab -->
+          <div id="createSat-basic-tab" class="col s12">
+            <form id="createSat-basic-form">
+              <div class="input-field col s12">
+                <input value="90000" id="${CreateSat.elementPrefix}-basic-scc" type="text" maxlength="5" />
+                <label for="${CreateSat.elementPrefix}-basic-scc" class="active">Satellite NORAD ID (90000-99999)</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="" id="${CreateSat.elementPrefix}-basic-name" type="text" maxlength="24" />
+                <label for="${CreateSat.elementPrefix}-basic-name" class="active">Satellite Name</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="51.6" id="${CreateSat.elementPrefix}-basic-inc" type="text" />
+                <label for="${CreateSat.elementPrefix}-basic-inc" class="active">Inclination (degrees)</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="400" id="${CreateSat.elementPrefix}-basic-apogee" type="text" />
+                <label for="${CreateSat.elementPrefix}-basic-apogee" class="active">Apogee Altitude (km)</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="400" id="${CreateSat.elementPrefix}-basic-perigee" type="text" />
+                <label for="${CreateSat.elementPrefix}-basic-perigee" class="active">Perigee Altitude (km)</label>
+              </div>
+              <div class="center-align row" style="padding: 10px; margin: 10px 0;">
+                <button id="createSat-basic-submit" class="btn btn-ui waves-effect waves-light" type="button" name="action">Create Satellite &#9658;</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Advanced Tab -->
+          <div id="createSat-advanced-tab" class="col s12" style="scrollbar-gutter: stable;">
+            <form id="createSat">
+              <div class="input-field col s12">
+                <input value="90000" id="${CreateSat.elementPrefix}-scc" type="text" maxlength="5" />
+                <label for="${CreateSat.elementPrefix}-scc" class="active">Satellite NORAD ID (90000-99999)</label>
+              </div>
+              <div class="input-field col s12">
+                <select value=1 id="${CreateSat.elementPrefix}-type" type="text">
+                  <option value=1>Payload</option>
+                  <option value=2>Rocket Body</option>
+                  <option value=3>Debris</option>
+                  <option value=4>Special</option>
+                </select>
+                <label for="${CreateSat.elementPrefix}-type">Object Type</label>
+              </div>
+              <div class="input-field col s12">
+                <select value="TBD" id="${CreateSat.elementPrefix}-country" type="text">
+                  <option value="TBD">Unknown</option>
+                </select>
+                <label for="${CreateSat.elementPrefix}-country">Country</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="AA" id="${CreateSat.elementPrefix}-year" type="text" maxlength="2" />
+                <label for="${CreateSat.elementPrefix}-year" class="active">Epoch Year</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="AAA.AAAAAAAA" id="${CreateSat.elementPrefix}-day" type="text" maxlength="12" />
+                <label for="${CreateSat.elementPrefix}-day" class="active">Epoch Day</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="AAA.AAAA" id="${CreateSat.elementPrefix}-inc" type="text" maxlength="8" />
+                <label for="${CreateSat.elementPrefix}-inc" class="active">Inclination</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="AAA.AAAA" id="${CreateSat.elementPrefix}-rasc" type="text" maxlength="8" />
+                <label for="${CreateSat.elementPrefix}-rasc" class="active">Right Ascension</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="AA.AAAAAAAA" id="${CreateSat.elementPrefix}-ecen" type="text" maxlength="7" />
+                <label for="${CreateSat.elementPrefix}-ecen" class="active">Eccentricity</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="AA.AAAAAAAA" id="${CreateSat.elementPrefix}-argPe" type="text" maxlength="8" />
+                <label for="${CreateSat.elementPrefix}-argPe" class="active">Argument of Perigee</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="AAA.AAAA" id="${CreateSat.elementPrefix}-meana" type="text" maxlength="8" />
+                <label for="${CreateSat.elementPrefix}-meana" class="active">Mean Anomaly</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="AAA.AAAA" id="${CreateSat.elementPrefix}-meanmo" type="text" maxlength="11" />
+                <label for="${CreateSat.elementPrefix}-meanmo" class="active">Mean Motion</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="AA.AAAA" id="${CreateSat.elementPrefix}-per" type="text" maxlength="11" />
+                <label for="${CreateSat.elementPrefix}-per" class="active">Period</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="" id="${CreateSat.elementPrefix}-src" type="text" maxlength="24" />
+                <label for="${CreateSat.elementPrefix}-src" class="active">Data source</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="" id="${CreateSat.elementPrefix}-name" type="text" maxlength="24" />
+                <label for="${CreateSat.elementPrefix}-name" class="active">Satellite Name</label>
+              </div>
+
+              <!-- Derived Parameters Section -->
+              <div id="createSat-derived" style="padding: 10px; margin: 10px 0;">
+                <div class="center-align" style="margin-bottom: 10px; font-weight: bold;">Calculated Parameters</div>
+                <div class="row" style="margin-bottom: 0;">
+                  <div class="input-field col s6">
+                    <input disabled id="${CreateSat.elementPrefix}-calc-apogee" type="text" />
+                    <label for="${CreateSat.elementPrefix}-calc-apogee" class="active">Apogee (km)</label>
+                  </div>
+                  <div class="input-field col s6">
+                    <input disabled id="${CreateSat.elementPrefix}-calc-perigee" type="text" />
+                    <label for="${CreateSat.elementPrefix}-calc-perigee" class="active">Perigee (km)</label>
+                  </div>
+                </div>
+                <div class="row" style="margin-bottom: 0;">
+                  <div class="input-field col s6">
+                    <input disabled id="${CreateSat.elementPrefix}-calc-sma" type="text" />
+                    <label for="${CreateSat.elementPrefix}-calc-sma" class="active">Semi-Major Axis (km)</label>
+                  </div>
+                  <div class="input-field col s6">
+                    <input disabled id="${CreateSat.elementPrefix}-calc-velocity" type="text" />
+                    <label for="${CreateSat.elementPrefix}-calc-velocity" class="active">Orbital Velocity (km/s)</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="center-align row">
+                <button id="createSat-submit" class="btn btn-ui waves-effect waves-light" type="button" name="action">Create Satellite &#9658;</button>
+              </div>
+              <div class="center-align row">
+                <button id="createSat-save" class="btn btn-ui waves-effect waves-light" type="button" name="action">Save TLE &#9658;</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
   `;
+  }
+
+  // =========================================================================
+  // Lifecycle methods
+  // =========================================================================
+
+  // Bridge for onBottomIconClick to connect to legacy event system
+  bottomIconCallback = (): void => {
+    this.onBottomIconClick();
+  };
+
+  /**
+   * Called when the bottom icon is clicked and the side menu becomes visible.
+   * Updates the Materialize tabs indicator which requires the element to be visible.
+   */
+  onBottomIconClick(): void {
+    // Use setTimeout to ensure the menu is visible before updating the indicator
+    setTimeout(() => {
+      const tabsEl = document.querySelector('#createSat-tabs');
+
+      if (tabsEl) {
+        const tabsInstance = (window.M as unknown as {
+          Tabs: {
+            getInstance: (el: Element) => { updateTabIndicator: () => void } | null;
+          };
+        }).Tabs.getInstance(tabsEl);
+
+        if (tabsInstance) {
+          tabsInstance.updateTabIndicator();
+        }
+      }
+    }, 0);
+  }
 
   /**
    * Add HTML and register events
@@ -162,12 +336,25 @@ export class CreateSat extends KeepTrackPlugin {
    * Initialize all event listeners for the UI
    */
   private uiManagerFinal_(): void {
+    // Initialize Materialize tabs
+    const tabsEl = document.querySelector('#createSat-tabs');
+
+    if (tabsEl) {
+      (window.M as unknown as { Tabs: { init: (el: Element) => void } }).Tabs.init(tabsEl);
+    }
+
     // Period and mean motion converter
     this.setupPeriodMeanMotionConverters_();
 
-    // Submit and save buttons
+    // Setup derived parameter updates for Advanced tab
+    this.setupDerivedParamsUpdates_();
+
+    // Submit and save buttons for Advanced tab
     getEl('createSat-submit')!.addEventListener('click', CreateSat.createSatSubmit_);
     getEl('createSat-save')!.addEventListener('click', CreateSat.exportTLE_);
+
+    // Submit button for Basic tab
+    getEl('createSat-basic-submit')!.addEventListener('click', this.createSatBasicSubmit_.bind(this));
 
     countryNameList.forEach((countryName: string) => {
       let countryCode = countryCodeList[countryName];
@@ -181,6 +368,126 @@ export class CreateSat extends KeepTrackPlugin {
 
     // Populate default values
     this.populateSideMenu_();
+    this.populateBasicTabDefaults_();
+
+    // Trigger initial derived params calculation
+    getEl(`${CreateSat.elementPrefix}-meanmo`)?.dispatchEvent(new Event('input'));
+  }
+
+  /**
+   * Setup event listeners to update derived parameters in real-time
+   */
+  private setupDerivedParamsUpdates_(): void {
+    const updateDerived = (): void => {
+      const meanmoEl = getEl(`${CreateSat.elementPrefix}-meanmo`) as HTMLInputElement;
+      const ecenEl = getEl(`${CreateSat.elementPrefix}-ecen`) as HTMLInputElement;
+
+      if (!meanmoEl || !ecenEl) {
+        return;
+      }
+
+      const meanmo = parseFloat(meanmoEl.value);
+      const ecen = parseFloat(ecenEl.value) / 1e7;
+
+      if (isNaN(meanmo) || isNaN(ecen) || meanmo <= 0) {
+        return;
+      }
+
+      const derived = CreateSat.calculateDerivedParams_(meanmo, ecen);
+
+      const apogeeEl = getEl(`${CreateSat.elementPrefix}-calc-apogee`) as HTMLInputElement;
+      const perigeeEl = getEl(`${CreateSat.elementPrefix}-calc-perigee`) as HTMLInputElement;
+      const smaEl = getEl(`${CreateSat.elementPrefix}-calc-sma`) as HTMLInputElement;
+      const velocityEl = getEl(`${CreateSat.elementPrefix}-calc-velocity`) as HTMLInputElement;
+
+      if (apogeeEl) {
+        apogeeEl.value = derived.apogee.toFixed(1);
+      }
+      if (perigeeEl) {
+        perigeeEl.value = derived.perigee.toFixed(1);
+      }
+      if (smaEl) {
+        smaEl.value = derived.semimajorAxis.toFixed(1);
+      }
+      if (velocityEl) {
+        velocityEl.value = derived.velocity.toFixed(3);
+      }
+    };
+
+    getEl(`${CreateSat.elementPrefix}-meanmo`)?.addEventListener('input', updateDerived);
+    getEl(`${CreateSat.elementPrefix}-ecen`)?.addEventListener('input', updateDerived);
+
+    // Also update on change events for when the period<->meanmo converter runs
+    getEl(`${CreateSat.elementPrefix}-meanmo`)?.addEventListener('change', updateDerived);
+    getEl(`${CreateSat.elementPrefix}-ecen`)?.addEventListener('change', updateDerived);
+  }
+
+  /**
+   * Populate Basic tab with default values
+   */
+  private populateBasicTabDefaults_(): void {
+    (getEl(`${CreateSat.elementPrefix}-basic-scc`) as HTMLInputElement).value = '90000';
+    (getEl(`${CreateSat.elementPrefix}-basic-name`) as HTMLInputElement).value = 'New Satellite';
+    (getEl(`${CreateSat.elementPrefix}-basic-inc`) as HTMLInputElement).value = '51.6';
+    (getEl(`${CreateSat.elementPrefix}-basic-apogee`) as HTMLInputElement).value = '400';
+    (getEl(`${CreateSat.elementPrefix}-basic-perigee`) as HTMLInputElement).value = '400';
+  }
+
+  /**
+   * Create satellite from Basic tab inputs
+   */
+  private createSatBasicSubmit_(): void {
+    const sccEl = getEl(`${CreateSat.elementPrefix}-basic-scc`) as HTMLInputElement;
+    const nameEl = getEl(`${CreateSat.elementPrefix}-basic-name`) as HTMLInputElement;
+    const incEl = getEl(`${CreateSat.elementPrefix}-basic-inc`) as HTMLInputElement;
+    const apogeeEl = getEl(`${CreateSat.elementPrefix}-basic-apogee`) as HTMLInputElement;
+    const perigeeEl = getEl(`${CreateSat.elementPrefix}-basic-perigee`) as HTMLInputElement;
+
+    const apogee = parseFloat(apogeeEl.value);
+    const perigee = parseFloat(perigeeEl.value);
+    const inc = parseFloat(incEl.value);
+
+    // Validate Basic tab inputs
+    if (isNaN(apogee) || isNaN(perigee) || isNaN(inc)) {
+      ServiceLocator.getUiManager().toast('Please enter valid numeric values', ToastMsgType.error, true);
+
+      return;
+    }
+
+    if (perigee < 100) {
+      ServiceLocator.getUiManager().toast('Perigee too low - satellite would decay rapidly', ToastMsgType.caution, true);
+
+      return;
+    }
+
+    if (apogee < perigee) {
+      ServiceLocator.getUiManager().toast('Apogee must be >= Perigee', ToastMsgType.error, true);
+
+      return;
+    }
+
+    if (inc < 0 || inc > 180) {
+      ServiceLocator.getUiManager().toast('Inclination must be between 0 and 180 degrees', ToastMsgType.error, true);
+
+      return;
+    }
+
+    // Calculate orbital elements from altitudes
+    const { eccentricity, meanMotion } = CreateSat.calculateFromAltitudes_(apogee, perigee);
+
+    // Calculate period from mean motion
+    const period = 1440 / meanMotion;
+
+    // Populate Advanced tab fields with calculated values
+    (getEl(`${CreateSat.elementPrefix}-scc`) as HTMLInputElement).value = sccEl.value.trim().padStart(5, '0');
+    (getEl(`${CreateSat.elementPrefix}-name`) as HTMLInputElement).value = nameEl.value || 'New Satellite';
+    (getEl(`${CreateSat.elementPrefix}-inc`) as HTMLInputElement).value = inc.toFixed(4).padStart(8, '0');
+    (getEl(`${CreateSat.elementPrefix}-ecen`) as HTMLInputElement).value = (eccentricity * 1e7).toFixed(0).padStart(7, '0');
+    (getEl(`${CreateSat.elementPrefix}-meanmo`) as HTMLInputElement).value = meanMotion.toFixed(5).padStart(8, '0');
+    (getEl(`${CreateSat.elementPrefix}-per`) as HTMLInputElement).value = period.toFixed(4).padStart(8, '0');
+
+    // Use existing submit logic
+    CreateSat.createSatSubmit_();
   }
 
   /**
@@ -561,7 +868,7 @@ export class CreateSat extends KeepTrackPlugin {
 
       // Check if TLE generation failed
       if (tle1 === 'Error') {
-        errorManagerInstance.warn(t7e('errorMsgs.CreateSat.errorCreatingSat'));
+        errorManagerInstance.warn(t7e('plugins.CreateSat.errorMsgs.errorCreatingSat'));
 
         return;
       }

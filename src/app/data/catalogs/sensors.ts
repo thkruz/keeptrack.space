@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
-import { CommLink, Degrees, Kilometers, Milliseconds, SpaceObjectType, ZoomValue } from '@ootk/src/main';
 import { DetailedSensor, RfSensor } from '@app/app/sensors/DetailedSensor';
+import { CommLink, Degrees, Kilometers, Milliseconds, SpaceObjectType, ZoomValue } from '@ootk/src/main';
 
 export interface SensorList {
   [key: string]: DetailedSensor;
@@ -44,7 +44,7 @@ export const sensors = <SensorList>{
     alt: <Kilometers>0.060966,
     minAz: <Degrees>347,
     maxAz: <Degrees>227,
-    boresightAz: [47 as Degrees, 227 as Degrees],
+    boresightAz: [47 as Degrees, 167 as Degrees],
     minEl: <Degrees>3,
     maxEl: <Degrees>85,
     boresightEl: [20 as Degrees, 20 as Degrees],

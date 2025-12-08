@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 /**
  * DetailedSensor Compatibility Layer
  *
@@ -11,11 +12,14 @@
 import {
   CommLink,
   Degrees,
+  FieldOfView,
   FieldOfViewParams,
   GroundStation,
   GroundStationParams,
   Kilometers,
+  MechanicalRadar,
   Milliseconds,
+  OpticalSensor,
   PhasedArrayRadar,
   Satellite,
   Sensor,
@@ -129,19 +133,31 @@ export class DetailedSensor extends GroundStation {
   freqBand?: string;
 
   // Primary FOV constraints (legacy properties)
+  /** @deprecated Use getFieldOfView() instead */
   minAz: Degrees;
+  /** @deprecated Use getFieldOfView() instead */
   maxAz: Degrees;
+  /** @deprecated Use getFieldOfView() instead */
   minEl: Degrees;
+  /** @deprecated Use getFieldOfView() instead */
   maxEl: Degrees;
+  /** @deprecated Use getFieldOfView() instead */
   minRng: Kilometers;
+  /** @deprecated Use getFieldOfView() instead */
   maxRng: Kilometers;
 
   // Secondary FOV constraints
+  /** @deprecated Use getFaceFovs() for multi-face sensors */
   minAz2?: Degrees;
+  /** @deprecated Use getFaceFovs() for multi-face sensors */
   maxAz2?: Degrees;
+  /** @deprecated Use getFaceFovs() for multi-face sensors */
   minEl2?: Degrees;
+  /** @deprecated Use getFaceFovs() for multi-face sensors */
   maxEl2?: Degrees;
+  /** @deprecated Use getFaceFovs() for multi-face sensors */
   minRng2?: Kilometers;
+  /** @deprecated Use getFaceFovs() for multi-face sensors */
   maxRng2?: Kilometers;
 
   // Radar properties
@@ -232,26 +248,71 @@ export class DetailedSensor extends GroundStation {
     const fovParams = this.buildFieldOfViewParams_();
 
     // Determine sensor type based on SpaceObjectType
-    if (this.type === SpaceObjectType.PHASED_ARRAY_RADAR && this.boresightAz?.length) {
-      this.sensor_ = new PhasedArrayRadar({
-        id: this.id,
-        name: this.name,
-        sensorType: SensorType.PHASED_ARRAY_RADAR,
-        fieldOfView: fovParams,
-        beamwidth: this.beamwidth ?? (2 as Degrees),
-        boresightAz: this.boresightAz,
-        boresightEl: this.boresightEl ?? this.boresightAz.map(() => 45 as Degrees),
-        shortName: this.shortName,
-        system: this.system,
-        country: this.country,
-        operator: this.operator,
-        freqBand: this.freqBand,
-        isVolumetric: this.isVolumetric,
-        url: this.url,
-      });
+    switch (this.type) {
+      case SpaceObjectType.PHASED_ARRAY_RADAR:
+        this.sensor_ = new PhasedArrayRadar({
+          id: this.id,
+          name: this.name,
+          sensorType: SensorType.PHASED_ARRAY_RADAR,
+          fieldOfView: fovParams,
+          beamwidth: this.beamwidth ?? (2 as Degrees),
+          boresightAz: this.boresightAz ?? [this.calculateBoresightAz_()],
+          boresightEl: this.boresightEl ?? [this.calculateBoresightEl_()],
+          shortName: this.shortName,
+          system: this.system,
+          country: this.country,
+          operator: this.operator,
+          freqBand: this.freqBand,
+          isVolumetric: this.isVolumetric,
+          url: this.url,
+        });
+        break;
+
+      case SpaceObjectType.MECHANICAL:
+        this.sensor_ = new MechanicalRadar({
+          id: this.id,
+          name: this.name,
+          sensorType: SensorType.MECHANICAL_RADAR,
+          fieldOfView: fovParams,
+          beamwidth: this.beamwidth ?? (2 as Degrees),
+          shortName: this.shortName,
+          system: this.system,
+          country: this.country,
+          operator: this.operator,
+          freqBand: this.freqBand,
+          isVolumetric: this.isVolumetric,
+          url: this.url,
+        });
+        break;
+
+      case SpaceObjectType.OPTICAL:
+      case SpaceObjectType.OBSERVER:
+        this.sensor_ = new OpticalSensor({
+          id: this.id,
+          name: this.name,
+          sensorType: SensorType.OPTICAL,
+          fieldOfView: fovParams,
+          shortName: this.shortName,
+          system: this.system,
+          country: this.country,
+          operator: this.operator,
+          url: this.url,
+        });
+        break;
+
+      default:
+        // For other types (GROUND_SENSOR_STATION, etc.), create a basic optical sensor
+        // to ensure FOV checking works
+        this.sensor_ = new OpticalSensor({
+          id: this.id,
+          name: this.name,
+          sensorType: SensorType.OPTICAL,
+          fieldOfView: fovParams,
+        });
+        break;
     }
 
-    // Attach sensor to this ground station if created
+    // Attach sensor to this ground station
     if (this.sensor_) {
       this.addSensor(this.sensor_);
       this.sensor_.setParent(this);
@@ -260,18 +321,77 @@ export class DetailedSensor extends GroundStation {
 
   /**
    * Build FieldOfViewParams from legacy FOV properties.
+   * Converts legacy azimuth-sector FOV to ootk boresight-centric cone.
    */
   private buildFieldOfViewParams_(): FieldOfViewParams {
-    // Calculate half-angle from az/el ranges
-    // For hemisphere-style FOV (old DetailedSensor), use 90 degrees
-    const halfAngle = 90 as Degrees;
+    // Calculate boresight from center of azimuth sector
+    const boresightAz = this.calculateBoresightAz_();
+    const boresightEl = this.calculateBoresightEl_();
+
+    // Calculate half-angle from sector width, divided by face count
+    const azSpan = this.getAzimuthSpan_();
+    // Clamp maxEl to valid range (some sensors have maxEl > 90)
+    const clampedMaxEl = Math.min(90, this.maxEl);
+    const clampedMinEl = Math.max(-90, this.minEl);
+    const elSpan = clampedMaxEl - clampedMinEl;
+
+    // Derive halfAngle from face count:
+    // - If multi-face (boresightAz array), divide azimuth span by face count
+    // - Single face or no boresight: use full azimuth span
+    const faceCount = this.boresightAz?.length ?? 1;
+    const faceAzSpan = azSpan / faceCount;
+    const halfAngle = Math.min(90, Math.max(faceAzSpan / 2, elSpan / 2)) as Degrees;
 
     return {
+      boresightAz,
+      boresightEl,
       halfAngle,
+      minorHalfAngle: Math.min(90, elSpan / 2) as Degrees,
       minRange: this.minRng,
       maxRange: this.maxRng,
-      minElevation: this.minEl,
+      minElevation: clampedMinEl as Degrees,
     };
+  }
+
+  /**
+   * Calculate boresight azimuth from legacy minAz/maxAz.
+   * Handles wraparound (e.g., minAz=347, maxAz=227).
+   */
+  private calculateBoresightAz_(): Degrees {
+    if (this.minAz > this.maxAz) {
+      // Wraparound case (e.g., 347° to 227°)
+      const span = (360 - this.minAz) + this.maxAz;
+
+      return ((this.minAz + span / 2) % 360) as Degrees;
+    }
+
+    // Normal case
+    return ((this.minAz + this.maxAz) / 2) as Degrees;
+  }
+
+  /**
+   * Calculate boresight elevation from legacy minEl/maxEl.
+   * Clamps to valid range (-90 to 90) for ootk FieldOfView.
+   */
+  private calculateBoresightEl_(): Degrees {
+    // Clamp values to valid elevation range
+    const clampedMinEl = Math.max(-90, this.minEl);
+    const clampedMaxEl = Math.min(90, this.maxEl);
+
+    return ((clampedMinEl + clampedMaxEl) / 2) as Degrees;
+  }
+
+  /**
+   * Get the azimuth span (angular width) of the FOV.
+   * Handles wraparound cases.
+   */
+  private getAzimuthSpan_(): number {
+    if (this.minAz > this.maxAz) {
+      // Wraparound case
+      return (360 - this.minAz) + this.maxAz;
+    }
+
+    return this.maxAz - this.minAz;
   }
 
   /**
@@ -282,6 +402,29 @@ export class DetailedSensor extends GroundStation {
   }
 
   /**
+   * Gets the FieldOfView from the internal sensor.
+   * Returns undefined if no internal sensor exists.
+   */
+  getFieldOfView(): FieldOfView | undefined {
+    return this.sensor_?.fieldOfView;
+  }
+
+  /**
+   * Gets the FieldOfView array for multi-face sensors (like PhasedArrayRadar).
+   * For single-face sensors, returns an array with one element.
+   * Returns undefined if no internal sensor exists.
+   */
+  getFaceFovs(): FieldOfView[] | undefined {
+    if (this.sensor_ instanceof PhasedArrayRadar) {
+      return this.sensor_.faceFovs;
+    }
+
+    const fov = this.sensor_?.fieldOfView;
+
+    return fov ? [fov] : undefined;
+  }
+
+  /**
    * Check if this is a sensor object (always true for DetailedSensor).
    */
   isSensor(): boolean {
@@ -289,10 +432,22 @@ export class DetailedSensor extends GroundStation {
   }
 
   /**
-   * Check if RAE coordinates are within sensor FOV (legacy method).
-   * Uses the old min/max azimuth/elevation/range checks.
+   * Check if RAE coordinates are within sensor FOV.
+   * Uses legacy azimuth-sector bounds checking because the ootk FieldOfView
+   * uses a boresight-centric cone model which is geometrically incompatible
+   * with the azimuth-sector FOV used in the sensor catalog.
    */
   isRaeInFov(az: Degrees, el: Degrees, rng: Kilometers): boolean {
+    // Always use legacy bounds checking - ootk cone model is geometrically
+    // incompatible with azimuth-sector FOV used in sensor catalog
+    return this.checkFovBoundsLegacy_(az, el, rng);
+  }
+
+  /**
+   * Legacy FOV checking using min/max azimuth/elevation/range bounds.
+   * @deprecated Use isRaeInFov() which delegates to ootk sensor.
+   */
+  private checkFovBoundsLegacy_(az: Degrees, el: Degrees, rng: Kilometers): boolean {
     // Primary FOV check
     const inPrimaryFov = this.checkFovBounds_(
       az, el, rng,

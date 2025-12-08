@@ -6,7 +6,6 @@ import rocketLaunchPng from '@public/img/icons/rocket-launch.png';
 
 import { SatMath } from '@app/app/analysis/sat-math';
 
-import { OrbitFinder } from '@app/app/analysis/orbit-finder';
 import { CatalogManager } from '@app/app/data/catalog-manager';
 import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
 import { launchSites } from '@app/app/data/catalogs/launch-sites';
@@ -21,7 +20,7 @@ import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import {
   BaseObject, Degrees, Satellite, SatelliteParams, TemeVec3, FormatTle, KilometersPerSecond,
-  SatelliteRecord, Sgp4, SpaceObjectType, TleLine1, TleLine2,
+  SatelliteRecord, Sgp4, SpaceObjectType, TleLine1, TleLine2, OrbitFinder,
 } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';

@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
-import * as OrbitFinderFile from '@app/app/analysis/orbit-finder';
+import * as OrbitFinderFile from '@ootk/src/orbit-design/OrbitFinder';
 import { SatMath } from '@app/app/analysis/sat-math';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { Kilometers } from '@app/engine/ootk/src/main';

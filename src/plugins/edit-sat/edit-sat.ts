@@ -6,7 +6,6 @@ import { StringPad } from '@app/engine/utils/stringPad';
 import editSatellitePng from '@public/img/icons/edit-satellite.png';
 import { saveAs } from 'file-saver';
 
-import { OrbitFinder } from '@app/app/analysis/orbit-finder';
 import { SatMath, StringifiedNumber } from '@app/app/analysis/sat-math';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -16,7 +15,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, Satellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, ZoomValue, eci2lla } from '@ootk/src/main';
+import { BaseObject, Satellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, ZoomValue, eci2lla, OrbitFinder } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '@app/engine/audio/sounds';

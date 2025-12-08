@@ -1,4 +1,3 @@
-import { OrbitFinder } from '@app/app/analysis/orbit-finder';
 import { SatMath } from '@app/app/analysis/sat-math';
 import { CatalogManager } from '@app/app/data/catalog-manager';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
@@ -20,7 +19,7 @@ import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, Satellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla } from '@ootk/src/main';
+import { BaseObject, Satellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla, OrbitFinder } from '@ootk/src/main';
 import streamPng from '@public/img/icons/stream.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 

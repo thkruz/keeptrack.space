@@ -272,7 +272,7 @@ export class Camera {
 
     // TODO: This should be handled better
     target ??= <Satellite>(<unknown>{
-      id: '-1',
+      id: -1,
       missile: false,
       type: SpaceObjectType.UNKNOWN,
       static: false,

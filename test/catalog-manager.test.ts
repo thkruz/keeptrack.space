@@ -89,14 +89,18 @@ describe('calcSatrec', () => {
 
   // should find reentries
   it('find_reentries', () => {
-    defaultSat.period = 100 as Minutes;
+    Object.defineProperty(defaultSat, 'period', { value: 100 as Minutes, configurable: true });
     const matchSat = defaultSat.clone();
 
-    matchSat.perigee = 200 as Kilometers;
+    // ootk clone() doesn't preserve type, so we must set it explicitly
+    matchSat.type = SpaceObjectType.PAYLOAD;
+    // perigee is a computed getter in ootk, so we need to override it with defineProperty
+    Object.defineProperty(matchSat, 'perigee', { value: 200 as Kilometers, configurable: true });
     matchSat.sccNum = '00001';
     const nonmatchSat = defaultSat.clone();
 
-    nonmatchSat.perigee = 0 as Kilometers;
+    nonmatchSat.type = SpaceObjectType.PAYLOAD;
+    Object.defineProperty(nonmatchSat, 'perigee', { value: 0 as Kilometers, configurable: true });
     nonmatchSat.sccNum = '00002';
     const nonmatchSat2 = defaultSat.clone();
 
@@ -104,7 +108,8 @@ describe('calcSatrec', () => {
     nonmatchSat2.sccNum = '00002';
     const nonmatchSat3 = defaultSat.clone();
 
-    nonmatchSat3.perigee = 300 as Kilometers;
+    nonmatchSat3.type = SpaceObjectType.PAYLOAD;
+    Object.defineProperty(nonmatchSat3, 'perigee', { value: 300 as Kilometers, configurable: true });
     nonmatchSat3.sccNum = '00002';
 
     catalogManagerInstance.objectCache = [];

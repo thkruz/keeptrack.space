@@ -31,35 +31,35 @@ describe('FormatTle_class', () => {
   it('test_inclination_invalid_length', () => {
     expect(() => {
       FormatTle.inclination('123456789');
-    }).toThrow('inc length is not 8');
+    }).toThrow('Inclination must be 8 characters');
   });
 
   // Test that an error is thrown if meana length is not 8
   it('test_mean_anomaly_invalid_length', () => {
     expect(() => {
       FormatTle.meanAnomaly('123456789');
-    }).toThrow('meana length is not 8');
+    }).toThrow('Mean anomaly must be 8 characters');
   });
 
   // Test that an error is thrown if meanmo length is not 11
   it('test_mean_motion_invalid_length', () => {
     expect(() => {
       FormatTle.meanMotion('123456789012');
-    }).toThrow('meanmo length is not 11');
+    }).toThrow('Mean motion must be 11 characters');
   });
 
   // Test that an error is thrown if rasc length is not 8
   it('test_right_ascension_invalid_length', () => {
     expect(() => {
       FormatTle.rightAscension('123456789');
-    }).toThrow('rasc length is not 8');
+    }).toThrow('Right ascension must be 8 characters');
   });
 
   // Test that an error is thrown if argPe length is not 8
   it('test_argument_of_perigee_invalid_length', () => {
     expect(() => {
       FormatTle.argumentOfPerigee('123456789');
-    }).toThrow('argPe length is not 8');
+    }).toThrow('Argument of perigee must be 8 characters');
   });
 
   // Test that TLE1Ending is correctly modified with explicit positive/negative signs when input is invalid

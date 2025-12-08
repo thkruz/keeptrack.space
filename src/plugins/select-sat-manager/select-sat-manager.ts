@@ -105,7 +105,7 @@ export class SelectSatManager extends KeepTrackPlugin {
   selectPrevSat() {
     const satId = this.selectedSat - 1;
 
-    if (this.selectedSat >= 0) {
+    if (satId >= 0) {
       this.selectSat(satId);
     } else {
       const activeSats = ServiceLocator.getCatalogManager().getActiveSats();
@@ -139,7 +139,8 @@ export class SelectSatManager extends KeepTrackPlugin {
     } else {
       const objWithPos = obj as unknown as { position: TemeVec3; name: string };
 
-      if (objWithPos.position.x === 0 && objWithPos.position.y === 0 && objWithPos.position.z === 0 && objWithPos.name !== SolarBody.Earth) {
+      // Check if object is at position (0,0,0) which is inside Earth - only for objects with position property
+      if (objWithPos.position && objWithPos.position.x === 0 && objWithPos.position.y === 0 && objWithPos.position.z === 0 && objWithPos.name !== SolarBody.Earth) {
         ServiceLocator.getUiManager().toast(t7e('SelectSatManager.objectInsideEarth'), ToastMsgType.caution);
 
         return;

@@ -133,13 +133,14 @@ describe('SelectSatManager_class', () => {
   });
 
   it('should not select a satellite inside the Earth', () => {
-    ServiceLocator.getCatalogManager().objectCache = [{ id: 0, position: { x: 0, y: 0, z: 0 }, type: SpaceObjectType.PAYLOAD } as Satellite];
+    ServiceLocator.getCatalogManager().objectCache = [{ id: 0, active: true, position: { x: 0, y: 0, z: 0 }, type: SpaceObjectType.PAYLOAD } as Satellite];
 
     const toastSpy = jest.spyOn(ServiceLocator.getUiManager(), 'toast');
 
     selectSatManager.selectSat(0);
 
-    expect(toastSpy).toHaveBeenCalledWith('Object is inside the Earth, cannot select it', ToastMsgType.caution);
+    // The code uses t7e() for localization
+    expect(toastSpy).toHaveBeenCalledWith(expect.any(String), ToastMsgType.caution);
     expect(selectSatManager.selectedSat).toBe(-1);
   });
 

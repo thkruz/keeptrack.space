@@ -103,6 +103,8 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
     addEventListener: jest.fn(),
   } as unknown as Worker;
   catalogManagerInstance.objectCache = [defaultSat];
+  // Set up sccIndex so sccNum2Id can find satellites by their catalog number
+  catalogManagerInstance.sccIndex = { '00005': 0 };
   catalogManagerInstance.satLinkManager = new SatLinkManager();
   Container.getInstance().registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
 

@@ -34,8 +34,10 @@ export class AdviceManager {
   private tutIconDOM: HTMLElement;
 
   public clearAdvice(): void {
-    this.helpHeaderDOM.classList.remove('help-header-sel');
-    this.helpHeaderDOM.onclick = null;
+    this.helpHeaderDOM?.classList.remove('help-header-sel');
+    if (this.helpHeaderDOM) {
+      this.helpHeaderDOM.onclick = null;
+    }
   }
 
   public init() {
@@ -116,6 +118,11 @@ export class AdviceManager {
     this.isAdviceOpen = true;
 
     this.clearAdvice();
+
+    // DOM elements may not exist in test environments
+    if (!this.helpOuterDOM || !this.helpHeaderDOM || !this.helpTextDOM) {
+      return;
+    }
 
     this.helpOuterDOM.style.display = 'block';
     this.helpHeaderDOM.innerHTML = header;

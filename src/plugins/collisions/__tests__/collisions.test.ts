@@ -159,8 +159,11 @@ describe('Collisions_class', () => {
       // Call onBottomIconClick which triggers parseCollisionData_
       plugin.onBottomIconClick();
 
-      // Wait for async operations
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      // Wait for async operations - use jest timers and flush promises
+      jest.advanceTimersByTime(100);
+      await Promise.resolve();
+      jest.advanceTimersByTime(100);
+      await Promise.resolve();
 
       expect(plugin['collisionList_'].length).toBe(2);
     });

@@ -158,8 +158,12 @@ describe('TrackingImpactPredict_class', () => {
       // Call onBottomIconClick which triggers parseTipData_
       plugin.onBottomIconClick();
 
-      // Wait for async operations
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      // Wait for async operations - flush promise queue multiple times for chained .then() calls
+      // fetch() -> .then(json) -> .then(setTipList) requires at least 3 microtask flushes
+      await Promise.resolve(); // Resolve fetch()
+      await Promise.resolve(); // Resolve json()
+      await Promise.resolve(); // Resolve setTipList_
+      await Promise.resolve(); // Extra safety flush
 
       expect(plugin['tipList_'].length).toBe(2);
     });

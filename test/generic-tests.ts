@@ -103,6 +103,9 @@ export const websiteInit = (plugin: KeepTrackPlugin) => {
     addEventListener: jest.fn(),
     postMessage: jest.fn(),
   } as unknown as Worker;
+  // Set up sccIndex so sccNum2Id can find satellites by their catalog number
+  ServiceLocator.getCatalogManager().objectCache = [defaultSat];
+  ServiceLocator.getCatalogManager().sccIndex = { '00005': 0 };
 };
 
 export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugin>, pluginName?: string) => {

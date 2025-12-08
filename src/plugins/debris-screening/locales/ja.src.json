@@ -1,0 +1,29 @@
+{
+  "plugins": {
+    "DebrisScreening": {
+      "bottomIconLabel": "デブリスクリーニング",
+      "title": "デブリスクリーニング",
+      "helpBody": "デブリスクリーニングツールは、選択した衛星をカタログと照合して潜在的なコンジャンクションを特定します。<br><br>評価時間ウィンドウを設定し、「デブリをスクリーニング」をクリックして分析を実行します。結果はテーブルに表示されます：<ul style=\"margin-left: 40px;\"><li><b>TCA</b> - 最接近時刻</li><li><b>ミス距離</b> - 総合およびRIC成分</li><li><b>Pc</b> - 衝突確率</li><li><b>リスクレベル</b> - Pcに基づく重大/高/中/低</li></ul>",
+      "resultsTitle": "スクリーニング結果",
+      "resultsCount": "{count}件のコンジャンクションが見つかりました",
+      "exportCsv": "CSVエクスポート",
+      "riskLevels": {
+        "critical": "重大",
+        "high": "高",
+        "medium": "中",
+        "low": "低",
+        "unknown": "N/A"
+      },
+      "uLabel": "U (半径方向)",
+      "vLabel": "V (軌道方向)",
+      "wLabel": "W (交差方向)",
+      "drawBox": "ボックス描画",
+      "clearBox": "ボックス消去",
+      "errorMsgs": {
+        "InvalidSatellite": "無効な衛星が選択されました",
+        "ScreeningFailed": "スクリーニング失敗",
+        "NoResultsToExport": "エクスポートする結果がありません"
+      }
+    }
+  }
+}

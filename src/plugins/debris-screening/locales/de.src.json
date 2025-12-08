@@ -1,0 +1,29 @@
+{
+  "plugins": {
+    "DebrisScreening": {
+      "bottomIconLabel": "Trummer-Screening",
+      "title": "Trummer-Screening",
+      "helpBody": "Das Trummer-Screening-Tool pruft einen ausgewahlten Satelliten gegen den Katalog, um potenzielle Konjunktionen zu identifizieren. <br><br> Konfigurieren Sie das Bewertungszeitfenster und klicken Sie auf 'Screening fur Trummer', um die Analyse durchzufuhren. Die Ergebnisse werden in einer Tabelle angezeigt: <ul style=\"margin-left: 40px;\"> <li><b>TCA</b> - Zeitpunkt der engsten Annaherung</li> <li><b>Fehlabstand</b> - Gesamt- und RIC-Komponenten</li> <li><b>Pc</b> - Kollisionswahrscheinlichkeit</li> <li><b>Risikostufe</b> - Kritisch/Hoch/Mittel/Niedrig basierend auf Pc</li> </ul>",
+      "resultsTitle": "Screening-Ergebnisse",
+      "resultsCount": "{count} Konjunktionen gefunden",
+      "exportCsv": "CSV exportieren",
+      "riskLevels": {
+        "critical": "Kritisch",
+        "high": "Hoch",
+        "medium": "Mittel",
+        "low": "Niedrig",
+        "unknown": "N/V"
+      },
+      "uLabel": "U (Radial)",
+      "vLabel": "V (In-Track)",
+      "wLabel": "W (Cross-Track)",
+      "drawBox": "Box Zeichnen",
+      "clearBox": "Box Löschen",
+      "errorMsgs": {
+        "InvalidSatellite": "Ungultiger Satellit ausgewahlt",
+        "ScreeningFailed": "Screening fehlgeschlagen",
+        "NoResultsToExport": "Keine Ergebnisse zum Exportieren"
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "plugins": {
+    "DebrisScreening": {
+      "bottomIconLabel": "잔해물 스크리닝",
+      "title": "잔해물 스크리닝",
+      "helpBody": "잔해물 스크리닝 도구는 선택한 위성을 카탈로그와 대조하여 잠재적인 접근을 식별합니다. <br><br> 평가 시간 창을 구성하고 '잔해물 스크리닝'을 클릭하여 분석을 실행합니다. 결과는 테이블에 표시됩니다: <ul style=\"margin-left: 40px;\"> <li><b>TCA</b> - 최근접 시간</li> <li><b>미스 거리</b> - 총합 및 RIC 구성요소</li> <li><b>Pc</b> - 충돌 확률</li> <li><b>위험 수준</b> - Pc 기반 위험/높음/중간/낮음</li> </ul>",
+      "resultsTitle": "스크리닝 결과",
+      "resultsCount": "{count}개의 접근이 발견됨",
+      "exportCsv": "CSV 내보내기",
+      "riskLevels": {
+        "critical": "위험",
+        "high": "높음",
+        "medium": "중간",
+        "low": "낮음",
+        "unknown": "N/A"
+      },
+      "uLabel": "U (반경방향)",
+      "vLabel": "V (진행방향)",
+      "wLabel": "W (교차방향)",
+      "drawBox": "상자 그리기",
+      "clearBox": "상자 지우기",
+      "errorMsgs": {
+        "InvalidSatellite": "잘못된 위성이 선택됨",
+        "ScreeningFailed": "스크리닝 실패",
+        "NoResultsToExport": "내보낼 결과가 없습니다"
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "plugins": {
+    "DebrisScreening": {
+      "bottomIconLabel": "Debris Screening",
+      "title": "Debris Screening",
+      "helpBody": "The Debris Screening tool screens a selected satellite against the catalog to identify potential conjunctions. <br><br> Configure the assessment time window and click 'Screen for Debris' to run the analysis. Results will be displayed in a table showing: <ul style=\"margin-left: 40px;\"> <li><b>TCA</b> - Time of Closest Approach</li> <li><b>Miss Distance</b> - Total and RIC components (Radial, In-track, Cross-track)</li> <li><b>Pc</b> - Probability of Collision</li> <li><b>Risk Level</b> - Critical/High/Medium/Low based on Pc</li> </ul> Click on any satellite ID to select it. Export results to CSV using the download button.",
+      "resultsTitle": "Screening Results",
+      "resultsCount": "{count} conjunctions found",
+      "exportCsv": "Export CSV",
+      "riskLevels": {
+        "critical": "Critical",
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low",
+        "unknown": "N/A"
+      },
+      "uLabel": "U (Radial)",
+      "vLabel": "V (In-track)",
+      "wLabel": "W (Cross-track)",
+      "drawBox": "Draw Box",
+      "clearBox": "Clear Box",
+      "errorMsgs": {
+        "InvalidSatellite": "Invalid satellite selected",
+        "ScreeningFailed": "Screening failed",
+        "NoResultsToExport": "No results to export"
+      }
+    }
+  }
+}

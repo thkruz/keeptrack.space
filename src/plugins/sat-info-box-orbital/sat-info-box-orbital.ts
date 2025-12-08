@@ -5,6 +5,7 @@ import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { SensorMath } from '@app/app/sensors/sensor-math';
 import { SolarBody } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -13,12 +14,11 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, Satellite, eci2lla, Kilometers, MINUTES_PER_DAY } from '@ootk/src/main';
+import { BaseObject, eci2lla, Kilometers, MINUTES_PER_DAY, Satellite } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { EL, SECTIONS } from './sat-info-box-orbital-html';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
 
 export class SatInfoBoxOrbital extends KeepTrackPlugin {
   readonly id = 'SatInfoBoxOrbital';
@@ -239,7 +239,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
     if (secondarySatObj && obj.isSatellite()) {
       const sat = obj as Satellite;
-      const ric = secondarySatObj.toRIC(sat);
+      const ric = secondarySatObj.toRIC(sat, ServiceLocator.getTimeManager().simulationTimeObj);
       const dist = SensorMath.distanceString(sat, secondarySatObj).split(' ')[2];
 
       const satDistanceElement = getEl('sat-sec-dist');

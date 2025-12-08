@@ -1,0 +1,94 @@
+/**
+ * Styling for the Debris Screening Plugin
+ */
+
+/* Side Menu Form */
+#debris-screening-menu-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  #ds-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+
+/* Secondary Menu (Results Panel) */
+.debris-screening-results {
+
+  /* Header row with count and export button */
+  & .ds-header-row {
+    margin-bottom: 5px;
+  }
+
+  & .ds-results-count {
+    line-height: 36px;
+  }
+
+  /* Table container */
+  & .ds-table-container {
+    overflow-y: auto;
+    margin: 0;
+  }
+}
+
+/* Results Table */
+#ds-results-table {
+  font-size: 11px;
+
+  & th,
+  & td {
+    padding: 4px;
+  }
+
+  & tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  /* Secondary satellite link styling */
+  & .ds-secondary-link {
+    color: var(--colorTertiary);
+    text-decoration: underline;
+  }
+}
+
+/* Risk Level Badges */
+.ds-risk-badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 10px;
+
+  &.risk-critical {
+    background-color: #d32f2f;
+    color: white;
+  }
+
+  &.risk-high {
+    background-color: #f57c00;
+    color: white;
+  }
+
+  &.risk-medium {
+    background-color: #fbc02d;
+    color: black;
+  }
+
+  &.risk-low {
+    background-color: #388e3c;
+    color: white;
+  }
+
+  &.risk-unknown {
+    background-color: #757575;
+    color: white;
+  }
+}

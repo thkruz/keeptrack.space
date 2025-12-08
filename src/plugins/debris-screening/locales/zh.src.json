@@ -1,0 +1,29 @@
+{
+  "plugins": {
+    "DebrisScreening": {
+      "bottomIconLabel": "碎片筛查",
+      "title": "碎片筛查",
+      "helpBody": "碎片筛查工具将选定的卫星与目录进行对照，以识别潜在的交会事件。<br><br>配置评估时间窗口并点击「筛查碎片」来运行分析。结果将显示在表格中：<ul style=\"margin-left: 40px;\"><li><b>TCA</b> - 最近接近时间</li><li><b>错过距离</b> - 总体和RIC分量</li><li><b>Pc</b> - 碰撞概率</li><li><b>风险等级</b> - 基于Pc的严重/高/中/低</li></ul>",
+      "resultsTitle": "筛查结果",
+      "resultsCount": "发现 {count} 个交会事件",
+      "exportCsv": "导出CSV",
+      "riskLevels": {
+        "critical": "严重",
+        "high": "高",
+        "medium": "中",
+        "low": "低",
+        "unknown": "不适用"
+      },
+      "uLabel": "U (径向)",
+      "vLabel": "V (沿迹)",
+      "wLabel": "W (交叉)",
+      "drawBox": "绘制框",
+      "clearBox": "清除框",
+      "errorMsgs": {
+        "InvalidSatellite": "选择的卫星无效",
+        "ScreeningFailed": "筛查失败",
+        "NoResultsToExport": "没有可导出的结果"
+      }
+    }
+  }
+}

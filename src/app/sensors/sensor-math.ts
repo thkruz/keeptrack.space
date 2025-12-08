@@ -1,4 +1,5 @@
 import { SatPassTimes } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import {
   BaseObject,
@@ -19,12 +20,12 @@ import {
   ecefRad2rae,
   eci2ecef,
   eci2lla,
+  linearDistance,
   lla2eci,
 } from '@ootk/src/main';
-import { DetailedSensor } from './DetailedSensor';
 import { dateFormat } from '../../engine/utils/dateFormat';
 import { SatMath, SunStatus } from '../analysis/sat-math';
-import { ServiceLocator } from '@app/engine/core/service-locator';
+import { DetailedSensor } from './DetailedSensor';
 
 export enum TearrType {
   RISE,
@@ -236,7 +237,7 @@ export class SensorMath {
       return '';
     }
 
-    const distanceApart = SatMath.distance(hoverPos, secondaryPos).toFixed(2);
+    const distanceApart = linearDistance(hoverPos, secondaryPos).toFixed(2);
 
     // Calculate if same beam
     let sameBeamStr = '';

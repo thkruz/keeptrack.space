@@ -1,0 +1,29 @@
+{
+  "plugins": {
+    "DebrisScreening": {
+      "bottomIconLabel": "Detection de Debris",
+      "title": "Detection de Debris",
+      "helpBody": "L'outil de Detection de Debris analyse un satellite selectionne par rapport au catalogue pour identifier les conjonctions potentielles. <br><br> Configurez la fenetre de temps d'evaluation et cliquez sur 'Rechercher des Debris' pour executer l'analyse. Les resultats seront affiches dans un tableau: <ul style=\"margin-left: 40px;\"> <li><b>TCA</b> - Temps d'Approche la Plus Proche</li> <li><b>Distance de Passage</b> - Composantes totales et RIC</li> <li><b>Pc</b> - Probabilite de Collision</li> <li><b>Niveau de Risque</b> - Critique/Eleve/Moyen/Faible base sur Pc</li> </ul>",
+      "resultsTitle": "Resultats de l'Analyse",
+      "resultsCount": "{count} conjonctions trouvees",
+      "exportCsv": "Exporter CSV",
+      "riskLevels": {
+        "critical": "Critique",
+        "high": "Eleve",
+        "medium": "Moyen",
+        "low": "Faible",
+        "unknown": "N/D"
+      },
+      "uLabel": "U (Radial)",
+      "vLabel": "V (In-Track)",
+      "wLabel": "W (Cross-Track)",
+      "drawBox": "Dessiner Boîte",
+      "clearBox": "Effacer Boîte",
+      "errorMsgs": {
+        "InvalidSatellite": "Satellite selectionne invalide",
+        "ScreeningFailed": "Analyse echouee",
+        "NoResultsToExport": "Aucun resultat a exporter"
+      }
+    }
+  }
+}

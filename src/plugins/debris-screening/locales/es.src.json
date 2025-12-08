@@ -1,0 +1,29 @@
+{
+  "plugins": {
+    "DebrisScreening": {
+      "bottomIconLabel": "Deteccion de Escombros",
+      "title": "Deteccion de Escombros",
+      "helpBody": "La herramienta de Deteccion de Escombros analiza un satelite seleccionado contra el catalogo para identificar posibles conjunciones. <br><br> Configure la ventana de tiempo de evaluacion y haga clic en 'Buscar Escombros' para ejecutar el analisis. Los resultados se mostraran en una tabla: <ul style=\"margin-left: 40px;\"> <li><b>TCA</b> - Tiempo de Aproximacion Mas Cercana</li> <li><b>Distancia de Fallo</b> - Componentes totales y RIC</li> <li><b>Pc</b> - Probabilidad de Colision</li> <li><b>Nivel de Riesgo</b> - Critico/Alto/Medio/Bajo basado en Pc</li> </ul>",
+      "resultsTitle": "Resultados del Analisis",
+      "resultsCount": "{count} conjunciones encontradas",
+      "exportCsv": "Exportar CSV",
+      "riskLevels": {
+        "critical": "Critico",
+        "high": "Alto",
+        "medium": "Medio",
+        "low": "Bajo",
+        "unknown": "N/D"
+      },
+      "uLabel": "U (Radial)",
+      "vLabel": "V (In-Track)",
+      "wLabel": "W (Cross-Track)",
+      "drawBox": "Dibujar Caja",
+      "clearBox": "Borrar Caja",
+      "errorMsgs": {
+        "InvalidSatellite": "Satelite seleccionado invalido",
+        "ScreeningFailed": "Analisis fallido",
+        "NoResultsToExport": "Sin resultados para exportar"
+      }
+    }
+  }
+}

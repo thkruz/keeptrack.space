@@ -3,7 +3,8 @@
     "FilterMenuPlugin": {
       "title": "필터 메뉴",
       "bottomIconLabel": "필터 메뉴",
-      "helpBody": "이 메뉴에서는 객체 유형, 궤도 영역 및 데이터 출처에 따라 지구본에 표시되는 객체를 필터링할 수 있습니다."
+      "helpBody": "이 메뉴에서는 객체 유형, 궤도 영역 및 데이터 출처에 따라 지구본에 표시되는 객체를 필터링할 수 있습니다.",
+      "resetToDefaults": "기본값으로 재설정"
     }
   },
   "filterMenu": {
@@ -69,15 +70,74 @@
       "category": "궤도 영역",
       "tooltip": "이심률이 0.1 미만이고 최고점이 36786km 이상이거나, 이심률이 0.1 이상이고 최고점이 39786km 이상인 초정지궤도 위성입니다."
     },
+    "source": {
+      "category": "출처"
+    },
     "vimpelSatellites": {
       "name": "Vimpel 위성",
-      "category": "출처",
       "tooltip": "Vimpel 위성 카탈로그는 러시아의 JSC Vimpel과 Keldysh 응용수학연구소가 공동으로 관리합니다."
     },
     "celestrakSatellites": {
       "name": "Celestrak 위성",
-      "category": "출처",
       "tooltip": "Celestrak은 다양한 위성과 파편의 궤도 데이터를 제공하는 인기 있는 소스입니다."
+    },
+    "countries": {
+      "category": "국가",
+      "unitedStates": {
+        "name": "미국",
+        "tooltip": "미국의 위성을 포함합니다."
+      },
+      "unitedKingdom": {
+        "name": "영국",
+        "tooltip": "영국의 위성을 포함합니다."
+      },
+      "france": {
+        "name": "프랑스",
+        "tooltip": "프랑스의 위성을 포함합니다."
+      },
+      "germany": {
+        "name": "독일",
+        "tooltip": "독일의 위성을 포함합니다."
+      },
+      "japan": {
+        "name": "일본",
+        "tooltip": "일본의 위성을 포함합니다."
+      },
+      "china": {
+        "name": "중국",
+        "tooltip": "중국의 위성을 포함합니다."
+      },
+      "india": {
+        "name": "인도",
+        "tooltip": "인도의 위성을 포함합니다."
+      },
+      "russia": {
+        "name": "러시아",
+        "tooltip": "러시아의 위성을 포함합니다."
+      },
+      "ussr": {
+        "name": "소련",
+        "tooltip": "구 소련에서 발사한 위성의 역사적 명칭입니다."
+      },
+      "southKorea": {
+        "name": "대한민국",
+        "tooltip": "대한민국의 위성을 포함합니다."
+      },
+      "australia": {
+        "name": "호주",
+        "tooltip": "호주의 위성을 포함합니다."
+      },
+      "otherCountries": {
+        "name": "기타 국가",
+        "tooltip": "위에 나열되지 않은 국가의 위성을 포함합니다."
+      }
+    },
+    "miscellaneous": {
+      "category": "기타",
+      "starlinkSatellites": {
+        "name": "스타링크 위성",
+        "tooltip": "전세계 광대역 인터넷 서비스를 목표로 하는 SpaceX의 스타링크 성좌를 구성하는 위성입니다."
+      }
     }
   }
 }

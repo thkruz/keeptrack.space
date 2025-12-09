@@ -3,7 +3,8 @@
     "FilterMenuPlugin": {
       "title": "フィルタメニュー",
       "bottomIconLabel": "フィルタメニュー",
-      "helpBody": "このメニューでは、種類、軌道領域、データソースに基づいて地球儀に表示されるオブジェクトをフィルタリングできます。"
+      "helpBody": "このメニューでは、種類、軌道領域、データソースに基づいて地球儀に表示されるオブジェクトをフィルタリングできます。",
+      "resetToDefaults": "デフォルトにリセット"
     }
   },
   "filterMenu": {
@@ -69,15 +70,74 @@
       "category": "軌道領域",
       "tooltip": "離心率が0.1未満で遠地点が36786km以上、または離心率が0.1以上で遠地点が39786km以上の超静止軌道衛星です。"
     },
+    "source": {
+      "category": "ソース"
+    },
     "vimpelSatellites": {
       "name": "ヴィンペル衛星",
-      "category": "ソース",
       "tooltip": "ヴィンペル衛星カタログは、ロシアの株式会社JSCヴィンペルがケルディシュ応用数学研究所と協力して管理しています。"
     },
     "celestrakSatellites": {
       "name": "セレストラック衛星",
-      "category": "ソース",
       "tooltip": "セレストラックは、幅広い衛星やデブリの軌道データ（TLE）を提供する人気のある情報源です。"
+    },
+    "countries": {
+      "category": "国",
+      "unitedStates": {
+        "name": "アメリカ合衆国",
+        "tooltip": "アメリカ合衆国からの衛星を含みます。"
+      },
+      "unitedKingdom": {
+        "name": "イギリス",
+        "tooltip": "イギリスからの衛星を含みます。"
+      },
+      "france": {
+        "name": "フランス",
+        "tooltip": "フランスからの衛星を含みます。"
+      },
+      "germany": {
+        "name": "ドイツ",
+        "tooltip": "ドイツからの衛星を含みます。"
+      },
+      "japan": {
+        "name": "日本",
+        "tooltip": "日本からの衛星を含みます。"
+      },
+      "china": {
+        "name": "中国",
+        "tooltip": "中国からの衛星を含みます。"
+      },
+      "india": {
+        "name": "インド",
+        "tooltip": "インドからの衛星を含みます。"
+      },
+      "russia": {
+        "name": "ロシア",
+        "tooltip": "ロシアからの衛星を含みます。"
+      },
+      "ussr": {
+        "name": "ソ連",
+        "tooltip": "旧ソビエト連邦によって打ち上げられた衛星の歴史的な名称です。"
+      },
+      "southKorea": {
+        "name": "韓国",
+        "tooltip": "韓国からの衛星を含みます。"
+      },
+      "australia": {
+        "name": "オーストラリア",
+        "tooltip": "オーストラリアからの衛星を含みます。"
+      },
+      "otherCountries": {
+        "name": "その他の国",
+        "tooltip": "上記に記載されていない国からの衛星を含みます。"
+      }
+    },
+    "miscellaneous": {
+      "category": "その他",
+      "starlinkSatellites": {
+        "name": "スターリンク衛星",
+        "tooltip": "世界規模のブロードバンドインターネット網を提供することを目指すSpaceXのスターリンク・コンステレーションの一部である衛星です。"
+      }
     }
   }
 }

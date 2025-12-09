@@ -3,7 +3,8 @@
     "FilterMenuPlugin": {
       "title": "Filter Menu",
       "bottomIconLabel": "Filter Menu",
-      "helpBody": "This menu allows you to filter the objects displayed on the globe based on their type, orbital regime, and data source."
+      "helpBody": "This menu allows you to filter the objects displayed on the globe based on their type, orbital regime, and data source.",
+      "resetToDefaults": "Reset to Defaults"
     }
   },
   "filterMenu": {
@@ -69,15 +70,74 @@
       "category": "Orbital Regimes",
       "tooltip": "Ex-Geosynchronous Orbit satellites with an eccentricity below 0.1 and an apogee above 36786 km, or an eccentricity of 0.1 or greater and an apogee above 39786 km."
     },
+    "source": {
+      "category": "Source"
+    },
     "vimpelSatellites": {
       "name": "Vimpel Satellites",
-      "category": "Source",
       "tooltip": "Vimpel satellite catalog is maintained by the Russian joint-stock company JSC Vimpel, in cooperation with the Keldysh Institute of Applied Mathematics."
     },
     "celestrakSatellites": {
       "name": "Celestrak Satellites",
-      "category": "Source",
       "tooltip": "Celestrak is a popular source for satellite orbital data, providing TLEs for a wide range of satellites and debris."
+    },
+    "countries": {
+      "category": "Countries",
+      "unitedStates": {
+        "name": "United States",
+        "tooltip": "Includes satellites from the United States of America."
+      },
+      "unitedKingdom": {
+        "name": "United Kingdom",
+        "tooltip": "Includes satellites from the United Kingdom."
+      },
+      "france": {
+        "name": "France",
+        "tooltip": "Includes satellites from France."
+      },
+      "germany": {
+        "name": "Germany",
+        "tooltip": "Includes satellites from Germany."
+      },
+      "japan": {
+        "name": "Japan",
+        "tooltip": "Includes satellites from Japan."
+      },
+      "china": {
+        "name": "China",
+        "tooltip": "Includes satellites from China."
+      },
+      "india": {
+        "name": "India",
+        "tooltip": "Includes satellites from India."
+      },
+      "russia": {
+        "name": "Russia",
+        "tooltip": "Includes satellites from Russia."
+      },
+      "ussr": {
+        "name": "USSR",
+        "tooltip": "Historical designation for satellites launched by the former Soviet Union."
+      },
+      "southKorea": {
+        "name": "South Korea",
+        "tooltip": "Includes satellites from South Korea."
+      },
+      "australia": {
+        "name": "Australia",
+        "tooltip": "Includes satellites from Australia."
+      },
+      "otherCountries": {
+        "name": "Other Countries",
+        "tooltip": "Includes satellites from countries not listed above."
+      }
+    },
+    "miscellaneous": {
+      "category": "Miscellaneous",
+      "starlinkSatellites": {
+        "name": "Starlink Satellites",
+        "tooltip": "Satellites that are part of SpaceX's Starlink constellation, which aims to provide global broadband internet coverage."
+      }
     }
   }
 }

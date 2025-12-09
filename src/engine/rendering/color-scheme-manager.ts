@@ -35,6 +35,8 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CatalogSource, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
+import { PluginRegistry } from '../core/plugin-registry';
+import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { BaseObject } from '../ootk/src/objects';
@@ -56,8 +58,6 @@ import { StarlinkColorScheme } from './color-schemes/starlink-color-scheme';
 import { SunlightColorScheme } from './color-schemes/sunlight-color-scheme';
 import { VelocityColorScheme } from './color-schemes/velocity-color-scheme';
 import { WebGLRenderer } from './webgl-renderer';
-import { PluginRegistry } from '../core/plugin-registry';
-import { ServiceLocator } from '../core/service-locator';
 
 export class ColorSchemeManager {
   // This is where you confiure addon color schemes
@@ -626,7 +626,9 @@ export class ColorSchemeManager {
     params: ColorSchemeParams,
   ) {
     for (let i = firstDotToColor; i < lastDotToColor; i++) {
-      (satData[i] as unknown as { totalVelocity: number }).totalVelocity = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
+      (satData[i] as unknown as { totalVelocity: number }).totalVelocity = Math.sqrt(
+        satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2],
+      );
       this.calculateBufferData_(i, satData, params);
     }
   }

@@ -3,7 +3,8 @@
     "FilterMenuPlugin": {
       "title": "过滤菜单",
       "bottomIconLabel": "过滤菜单",
-      "helpBody": "此菜单允许您根据对象的类型、轨道类型和数据来源筛选地球仪上显示的对象。"
+      "helpBody": "此菜单允许您根据对象的类型、轨道类型和数据来源筛选地球仪上显示的对象。",
+      "resetToDefaults": "重置为默认值"
     }
   },
   "filterMenu": {
@@ -69,15 +70,74 @@
       "category": "轨道类型",
       "tooltip": "偏心率低于0.1且远地点高于36786公里，或偏心率大于等于0.1且远地点高于39786公里的超同步轨道卫星。"
     },
+    "source": {
+      "category": "来源"
+    },
     "vimpelSatellites": {
       "name": "Vimpel 卫星",
-      "category": "来源",
       "tooltip": "Vimpel 卫星目录由俄罗斯股份公司 JSC Vimpel 与 Keldysh 应用数学研究所合作维护。"
     },
     "celestrakSatellites": {
       "name": "Celestrak 卫星",
-      "category": "来源",
       "tooltip": "Celestrak 是卫星轨道数据的热门来源，提供各种卫星和碎片的 TLE 数据。"
+    },
+    "countries": {
+      "category": "国家",
+      "unitedStates": {
+        "name": "美国",
+        "tooltip": "包括来自美国的卫星。"
+      },
+      "unitedKingdom": {
+        "name": "英国",
+        "tooltip": "包括来自英国的卫星。"
+      },
+      "france": {
+        "name": "法国",
+        "tooltip": "包括来自法国的卫星。"
+      },
+      "germany": {
+        "name": "德国",
+        "tooltip": "包括来自德国的卫星。"
+      },
+      "japan": {
+        "name": "日本",
+        "tooltip": "包括来自日本的卫星。"
+      },
+      "china": {
+        "name": "中国",
+        "tooltip": "包括来自中国的卫星。"
+      },
+      "india": {
+        "name": "印度",
+        "tooltip": "包括来自印度的卫星。"
+      },
+      "russia": {
+        "name": "俄罗斯",
+        "tooltip": "包括来自俄罗斯的卫星。"
+      },
+      "ussr": {
+        "name": "苏联",
+        "tooltip": "由前苏联发射的卫星的历史名称。"
+      },
+      "southKorea": {
+        "name": "韩国",
+        "tooltip": "包括来自韩国的卫星。"
+      },
+      "australia": {
+        "name": "澳大利亚",
+        "tooltip": "包括来自澳大利亚的卫星。"
+      },
+      "otherCountries": {
+        "name": "其他国家",
+        "tooltip": "包括来自上述未列出国家的卫星。"
+      }
+    },
+    "miscellaneous": {
+      "category": "其他",
+      "starlinkSatellites": {
+        "name": "星链卫星",
+        "tooltip": "SpaceX 星链星座的组成部分，旨在提供全球宽带互联网覆盖。"
+      }
     }
   }
 }

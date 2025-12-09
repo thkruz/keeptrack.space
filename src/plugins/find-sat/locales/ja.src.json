@@ -1,0 +1,44 @@
+{
+  "plugins": {
+    "FindSatPlugin": {
+      "bottomIconLabel": "衛星を検索",
+      "title": "衛星を検索",
+      "helpBody": "衛星検索メニューでは、さまざまな条件で衛星を検索できます：<br><br><ul style=\"margin-left: 40px;\"><li><strong>オブジェクトタイプ</strong> - ペイロード、ロケット本体、デブリでフィルタ</li><li><strong>国</strong> - 打ち上げ国でフィルタ</li><li><strong>衛星バス/ペイロード/形状/ソース</strong> - 衛星特性でフィルタ</li><li><strong>方位角/仰角/距離</strong> - 視野角で検索（センサーが必要）</li><li><strong>軌道パラメータ</strong> - 傾斜角、周期、昇交点赤経、近地点引数</li><li><strong>TLE経過時間</strong> - TLEの更新時間でフィルタ</li><li><strong>RCS</strong> - レーダー断面積でフィルタ</li></ul><br>結果は検索バーに表示されます。エクスポートボタンを使用して結果をCSVとして保存できます。",
+      "labels": {
+        "objectType": "オブジェクトタイプ",
+        "country": "国",
+        "satelliteBus": "衛星バス",
+        "payload": "ペイロード",
+        "shape": "形状",
+        "source": "ソース",
+        "azimuth": "方位角（度）",
+        "azimuthMargin": "マージン（度）",
+        "elevation": "仰角（度）",
+        "elevationMargin": "マージン（度）",
+        "range": "距離（km）",
+        "rangeMargin": "マージン（km）",
+        "inclination": "傾斜角（度）",
+        "inclinationMargin": "マージン（度）",
+        "period": "周期（分）",
+        "periodMargin": "マージン（分）",
+        "tleAge": "TLE経過時間（時間）",
+        "tleAgeMargin": "マージン（時間）",
+        "rcs": "RCS（m²）",
+        "rcsMargin": "マージン（m²）",
+        "rightAscension": "昇交点赤経（度）",
+        "rightAscensionMargin": "マージン（度）",
+        "argOfPerigee": "近地点引数（度）",
+        "argOfPerigeeMargin": "マージン（度）",
+        "all": "すべて",
+        "findSatellites": "衛星を検索",
+        "exportData": "データをエクスポート"
+      },
+      "errorMsgs": {
+        "NoSatellitesFound": "衛星が見つかりません",
+        "NoSearchCriteriaEntered": "検索条件が入力されていません",
+        "TooManyResults": "結果が多すぎます。{limit}件に制限されました",
+        "TryFindingFirst": "まず衛星を検索してください！"
+      }
+    }
+  }
+}

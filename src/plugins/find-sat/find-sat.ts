@@ -6,14 +6,22 @@ import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces'
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
+import {
+  IBottomIconConfig,
+  IDragOptions,
+  IHelpConfig,
+  IKeyboardShortcut,
+  ISideMenuConfig,
+} from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { getUnique } from '@app/engine/utils/get-unique';
 import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
+import { t7e } from '@app/locales/keys';
 import { BaseObject, Degrees, Hours, Kilometers, Minutes, Satellite, eci2rae } from '@ootk/src/main';
 import findSatPng from '@public/img/icons/database-search.png';
-import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 
 export interface SearchSatParams {
   argPe: Degrees;
@@ -45,188 +53,242 @@ export interface SearchSatParams {
 export class FindSatPlugin extends KeepTrackPlugin {
   readonly id = 'FindSatPlugin';
   private lastResults_ = <Satellite[]>[];
+  private hasSearchBeenRun_ = false;
 
-  dragOptions: ClickDragOptions = {
-    isDraggable: true,
-    minWidth: 500,
-    maxWidth: 700,
-  };
+  // =========================================================================
+  // Composition-based configuration methods
+  // =========================================================================
 
-  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
+  getBottomIconConfig(): IBottomIconConfig {
+    return {
+      elementName: 'find-satellite-bottom-icon',
+      label: 'Find Satellite',
+      image: findSatPng,
+      menuMode: [MenuMode.ADVANCED, MenuMode.ALL],
+    };
+  }
 
-  sideMenuElementName: string = 'findByLooks-menu';
-  sideMenuElementHtml: string = html`
-  <div id="findByLooks-menu" class="side-menu-parent start-hidden text-select">
-    <div id="findByLooks-content" class="side-menu">
-      <div class="row">
-        <h5 class="center-align">Find Satellite</h5>
-        <form id="findByLooks-form">
+
+  getSideMenuConfig(): ISideMenuConfig {
+    return {
+      elementName: 'findByLooks-menu',
+      title: 'Find Satellite',
+      html: this.buildSideMenuHtml_(),
+      dragOptions: this.getDragOptions_(),
+    };
+  }
+
+  private getDragOptions_(): IDragOptions {
+    return {
+      isDraggable: true,
+      minWidth: 500,
+      maxWidth: 700,
+    };
+  }
+
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: t7e('plugins.FindSatPlugin.title'),
+      body: t7e('plugins.FindSatPlugin.helpBody'),
+    };
+  }
+
+  getKeyboardShortcuts(): IKeyboardShortcut[] {
+    return [
+      {
+        key: 'F',
+        ctrl: true,
+        callback: () => this.bottomMenuClicked(),
+      },
+    ];
+  }
+
+  onDownload(): void {
+    if (!this.hasSearchBeenRun_) {
+      errorManagerInstance.warn(t7e('plugins.FindSatPlugin.errorMsgs.TryFindingFirst'));
+
+      return;
+    }
+    CatalogExporter.exportTle2Csv(this.lastResults_);
+  }
+
+  private buildSideMenuHtml_(): string {
+    const l = (key: string) => t7e(`plugins.FindSatPlugin.labels.${key}` as Parameters<typeof t7e>[0]);
+
+    return html`
+      <div id="findByLooks-menu" class="side-menu-parent start-hidden text-select">
+        <div id="findByLooks-content" class="side-menu">
           <div class="row">
-            <div class="input-field col s12">
-              <select value=0 id="fbl-type" type="text">
-                <option value=0>All</option>
-                <option value=1>Payload</option>
-                <option value=2>Rocket Body</option>
-                <option value=3>Debris</option>
-              </select>
-              <label for="disabled">Object Type</label>
+            <h5 class="center-align">${t7e('plugins.FindSatPlugin.title')}</h5>
+            <form id="findByLooks-menu-form">
+              <div class="row">
+                <div class="input-field col s12">
+                  <select value=0 id="fbl-type" type="text">
+                    <option value=0>${l('all')}</option>
+                    <option value=1>Payload</option>
+                    <option value=2>Rocket Body</option>
+                    <option value=3>Debris</option>
+                  </select>
+                  <label for="disabled">${l('objectType')}</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <select value=0 id="fbl-country" type="text">
+                    <option value='All'>${l('all')}</option>
+                  </select>
+                  <label for="disabled">${l('country')}</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <select value=0 id="fbl-bus" type="text">
+                    <option value='All'>${l('all')}</option>
+                  </select>
+                  <label for="disabled">${l('satelliteBus')}</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <select value=0 id="fbl-payload" type="text">
+                    <option value='All'>${l('all')}</option>
+                  </select>
+                  <label for="disabled">${l('payload')}</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <select value=0 id="fbl-shape" type="text">
+                    <option value='All'>${l('all')}</option>
+                  </select>
+                  <label for="disabled">${l('shape')}</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <select value=0 id="fbl-source" type="text">
+                    <option value='All'>${l('all')}</option>
+                  </select>
+                  <label for="disabled">${l('source')}</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="xxx.x" id="fbl-azimuth" type="text">
+                  <label for="fbl-azimuth" class="active">${l('azimuth')}</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="5" id="fbl-azimuth-margin" type="text">
+                  <label for="fbl-azimuth-margin" class="active">${l('azimuthMargin')}</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX.X" id="fbl-elevation" type="text">
+                  <label for="fbl-elevation" class="active">${l('elevation')}</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="5" id="fbl-elevation-margin" type="text">
+                  <label for="fbl-elevation-margin" class="active">${l('elevationMargin')}</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="xxxx.x" id="fbl-range" type="text">
+                  <label for="fbl-range" class="active">${l('range')}</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="500" id="fbl-range-margin" type="text">
+                  <label for="fbl-range-margin" class="active">${l('rangeMargin')}</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX.X" id="fbl-inc" type="text">
+                  <label for="fbl-inc" class="active">${l('inclination')}</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input value="0.5" placeholder="0.5" id="fbl-inc-margin" type="text">
+                  <label for="fbl-inc-margin" class="active">${l('inclinationMargin')}</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX.X" id="fbl-period" type="text">
+                  <label for="fbl-period" class="active">${l('period')}</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input value="10" placeholder="10" id="fbl-period-margin" type="text">
+                  <label for="fbl-period-margin" class="active">${l('periodMargin')}</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX.X" id="fbl-tleAge" type="text">
+                  <label for="fbl-tleAge" class="active">${l('tleAge')}</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input value="1" placeholder="1" id="fbl-tleAge-margin" type="text">
+                  <label for="fbl-tleAge-margin" class="active">${l('tleAgeMargin')}</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX.X" id="fbl-rcs" type="text">
+                  <label for="fbl-rcs" class="active">${l('rcs')}</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input value="10" placeholder="10" id="fbl-rcs-margin" type="text">
+                  <label for="fbl-rcs-margin" class="active">${l('rcsMargin')}</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX.X" id="fbl-raan" type="text">
+                  <label for="fbl-raan" class="active">${l('rightAscension')}</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input value="0.5" placeholder="0.5" id="fbl-raan-margin" type="text">
+                  <label for="fbl-raan-margin" class="active">${l('rightAscensionMargin')}</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX.X" id="fbl-argPe" type="text">
+                  <label for="fbl-argPe" class="active">${l('argOfPerigee')}</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input value="0.5" placeholder="0.5" id="fbl-argPe-margin" type="text">
+                  <label for="fbl-argPe-margin" class="active">${l('argOfPerigeeMargin')}</label>
+                </div>
+              </div>
+              <div class="row">
+                <center>
+                  <button id="findByLooks-submit" class="btn btn-ui waves-effect waves-light" type="submit"
+                    name="action">${l('findSatellites')} &#9658;
+                  </button>
+                </center>
+              </div>
+              <div class="row">
+                <center>
+                  <button id="findByLooks-export" class="btn btn-ui waves-effect waves-light" type="button"
+                    name="action">${l('exportData')} &#9658;
+                  </button>
+                </center>
+              </div>
+            </form>
+            <div class="row center-align" style="margin-top:20px;">
+              <span id="fbl-error" class="menu-selectable"></span>
             </div>
           </div>
-          <div class="row">
-            <div class="input-field col s12">
-              <select value=0 id="fbl-country" type="text">
-                <option value='All'>All</option>
-              </select>
-              <label for="disabled">Country</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12">
-              <select value=0 id="fbl-bus" type="text">
-                <option value='All'>All</option>
-              </select>
-              <label for="disabled">Satellite Bus</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12">
-              <select value=0 id="fbl-payload" type="text">
-                <option value='All'>All</option>
-              </select>
-              <label for="disabled">Payload</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12">
-              <select value=0 id="fbl-shape" type="text">
-                <option value='All'>All</option>
-              </select>
-              <label for="disabled">Shape</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12">
-              <select value=0 id="fbl-source" type="text">
-                <option value='All'>All</option>
-              </select>
-              <label for="disabled">Source</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12 m6 l6">
-              <input placeholder="xxx.x" id="fbl-azimuth" type="text">
-              <label for="fbl-azimuth" class="active">Azimuth (deg)</label>
-            </div>
-            <div class="input-field col s12 m6 l6">
-              <input placeholder="5" id="fbl-azimuth-margin" type="text">
-              <label for="fbl-azimuth-margin "class="active">Margin (deg)</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12 m6 l6">
-              <input placeholder="XX.X" id="fbl-elevation" type="text">
-              <label for="fbl-elevation "class="active">Elevation (deg)</label>
-            </div>
-            <div class="input-field col s12 m6 l6">
-              <input placeholder="5" id="fbl-elevation-margin" type="text">
-              <label for="fbl-elevation-margin "class="active">Margin (deg)</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12 m6 l6">
-              <input placeholder="xxxx.x" id="fbl-range" type="text">
-              <label for="fbl-range "class="active">Range (km)</label>
-            </div>
-            <div class="input-field col s12 m6 l6">
-              <input placeholder="500" id="fbl-range-margin" type="text">
-              <label for="fbl-range-margin "class="active">Margin (km)</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12 m6 l6">
-              <input placeholder="XX.X" id="fbl-inc" type="text">
-              <label for="fbl-inc "class="active">Inclination (deg)</label>
-            </div>
-            <div class="input-field col s12 m6 l6">
-              <input value="0.5" placeholder="0.5" id="fbl-inc-margin" type="text">
-              <label for="fbl-inc-margin "class="active">Margin (deg)</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12 m6 l6">
-              <input placeholder="XX.X" id="fbl-period" type="text">
-              <label for="fbl-period "class="active">Period (min)</label>
-            </div>
-            <div class="input-field col s12 m6 l6">
-              <input value="10" placeholder="10" id="fbl-period-margin" type="text">
-              <label for="fbl-period-margin "class="active">Margin (min)</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12 m6 l6">
-              <input placeholder="XX.X" id="fbl-tleAge" type="text">
-              <label for="fbl-tleAge "class="active">TLE Age (hours)</label>
-            </div>
-            <div class="input-field col s12 m6 l6">
-              <input value="1" placeholder="1" id="fbl-tleAge-margin" type="text">
-              <label for="fbl-tleAge-margin "class="active">Margin (hours)</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12 m6 l6">
-              <input placeholder="XX.X" id="fbl-rcs" type="text">
-              <!-- RCS in meters squared -->
-              <label for="fbl-rcs "class="active">RCS (m<sup>2</sup>)</label>
-            </div>
-            <div class="input-field col s12 m6 l6">
-              <input value="10" placeholder="10" id="fbl-rcs-margin" type="text">
-              <label for="fbl-rcs-margin "class="active">Margin (m<sup>2</sup>)</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12 m6 l6">
-              <input placeholder="XX.X" id="fbl-raan" type="text">
-              <label for="fbl-raan "class="active">Right Ascension (deg)</label>
-            </div>
-            <div class="input-field col s12 m6 l6">
-              <input value="0.5" placeholder="0.5" id="fbl-raan-margin" type="text">
-              <label for="fbl-raan-margin "class="active">Margin (deg)</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="input-field col s12 m6 l6">
-              <input placeholder="XX.X" id="fbl-argPe" type="text">
-              <label for="fbl-argPe "class="active">Arg of Perigee (deg)</label>
-            </div>
-            <div class="input-field col s12 m6 l6">
-              <input value="0.5" placeholder="0.5" id="fbl-argPe-margin" type="text">
-              <label for="fbl-argPe-margin "class="active">Margin (deg)</label>
-            </div>
-          </div>
-          <div class="row">
-          <center>
-            <button id="findByLooks-submit" class="btn btn-ui waves-effect waves-light" type="submit"
-              name="action">Find Satellite(s) &#9658;
-              </button>
-            </center>
-          </div>
-          <div class="row">
-          <center>
-          <button id="findByLooks-export" class="btn btn-ui waves-effect waves-light" type="button"
-            name="action">Export data &#9658;
-            </button>
-          </center>
-          </div>
-        </form>
-        <div class="row center-align" style="margin-top:20px;">
-          <span id="fbl-error" class="menu-selectable"></span>
         </div>
       </div>
-    </div>
-  </div>`;
+    `;
+  }
 
-  bottomIconImg = findSatPng;
-  private hasSearchBeenRun_ = false;
+  // =========================================================================
+  // Lifecycle methods
+  // =========================================================================
 
   addJs(): void {
     super.addJs();
@@ -245,7 +307,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
       getEl('fbl-error')!.style.display = 'none';
     });
 
-    getEl('findByLooks-form')!.addEventListener('submit', (e: Event) => {
+    getEl('findByLooks-menu-form')!.addEventListener('submit', (e: Event) => {
       e.preventDefault();
       showLoading(() => {
         this.findByLooksSubmit_().then(() => {
@@ -301,12 +363,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
     // Export data
     getEl('findByLooks-export')?.addEventListener('click', () => {
-      if (!this.hasSearchBeenRun_) {
-        errorManagerInstance.warn('Try finding satellites first!');
-
-        return;
-      }
-      CatalogExporter.exportTle2Csv(this.lastResults_);
+      this.onDownload();
     });
   }
 
@@ -372,11 +429,11 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
         this.lastResults_ = FindSatPlugin.searchSats_(searchParams as SearchSatParams);
         if (this.lastResults_.length === 0) {
-          uiManagerInstance.toast('No Satellites Found', ToastMsgType.critical);
+          uiManagerInstance.toast(t7e('plugins.FindSatPlugin.errorMsgs.NoSatellitesFound'), ToastMsgType.critical);
         }
       } catch (e) {
         if (e.message === 'No Search Criteria Entered') {
-          uiManagerInstance.toast('No Search Criteria Entered', ToastMsgType.critical);
+          uiManagerInstance.toast(t7e('plugins.FindSatPlugin.errorMsgs.NoSearchCriteriaEntered'), ToastMsgType.critical);
         }
       }
     });
@@ -466,7 +523,9 @@ export class FindSatPlugin extends KeepTrackPlugin {
     const uiManagerInstance = ServiceLocator.getUiManager();
 
     if (possibles.length >= limit) {
-      uiManagerInstance.toast(`Too many results, limited to ${limit}`, ToastMsgType.serious);
+      const msg = t7e('plugins.FindSatPlugin.errorMsgs.TooManyResults').replace('{limit}', limit.toString());
+
+      uiManagerInstance.toast(msg, ToastMsgType.serious);
     }
     possibles = possibles.slice(0, limit);
 
@@ -638,7 +697,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     const now = new Date();
 
     return possibles.filter((possible) => {
-      const ageHours = possible.ageOfElset(now);
+      const ageHours = possible.ageOfElset(now, 'hours');
 
 
       return ageHours >= minTleAge && ageHours <= maxTleAge;

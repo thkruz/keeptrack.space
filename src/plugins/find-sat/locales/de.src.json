@@ -1,0 +1,44 @@
+{
+  "plugins": {
+    "FindSatPlugin": {
+      "bottomIconLabel": "Satellit suchen",
+      "title": "Satellit suchen",
+      "helpBody": "Das Menü \"Satellit suchen\" ermöglicht die Suche nach Satelliten anhand verschiedener Kriterien:<br><br><ul style=\"margin-left: 40px;\"><li><strong>Objekttyp</strong> - Filtern nach Nutzlast, Raketenkörper oder Trümmer</li><li><strong>Land</strong> - Filtern nach Startland</li><li><strong>Satellitenbus/Nutzlast/Form/Quelle</strong> - Filtern nach Satelliteneigenschaften</li><li><strong>Azimut/Elevation/Reichweite</strong> - Suche nach Blickwinkeln (erfordert Sensor)</li><li><strong>Bahnparameter</strong> - Inklination, Periode, RAAN, Argument des Perigäums</li><li><strong>TLE-Alter</strong> - Filtern nach Aktualität der TLE</li><li><strong>RCS</strong> - Filtern nach Radarquerschnitt</li></ul><br>Ergebnisse werden in der Suchleiste angezeigt. Verwenden Sie die Export-Schaltfläche, um Ergebnisse als CSV zu speichern.",
+      "labels": {
+        "objectType": "Objekttyp",
+        "country": "Land",
+        "satelliteBus": "Satellitenbus",
+        "payload": "Nutzlast",
+        "shape": "Form",
+        "source": "Quelle",
+        "azimuth": "Azimut (Grad)",
+        "azimuthMargin": "Toleranz (Grad)",
+        "elevation": "Elevation (Grad)",
+        "elevationMargin": "Toleranz (Grad)",
+        "range": "Reichweite (km)",
+        "rangeMargin": "Toleranz (km)",
+        "inclination": "Inklination (Grad)",
+        "inclinationMargin": "Toleranz (Grad)",
+        "period": "Periode (min)",
+        "periodMargin": "Toleranz (min)",
+        "tleAge": "TLE-Alter (Stunden)",
+        "tleAgeMargin": "Toleranz (Stunden)",
+        "rcs": "RCS (m²)",
+        "rcsMargin": "Toleranz (m²)",
+        "rightAscension": "Rektaszension (Grad)",
+        "rightAscensionMargin": "Toleranz (Grad)",
+        "argOfPerigee": "Argument des Perigäums (Grad)",
+        "argOfPerigeeMargin": "Toleranz (Grad)",
+        "all": "Alle",
+        "findSatellites": "Satellit(en) suchen",
+        "exportData": "Daten exportieren"
+      },
+      "errorMsgs": {
+        "NoSatellitesFound": "Keine Satelliten gefunden",
+        "NoSearchCriteriaEntered": "Keine Suchkriterien eingegeben",
+        "TooManyResults": "Zu viele Ergebnisse, begrenzt auf {limit}",
+        "TryFindingFirst": "Versuchen Sie zuerst, Satelliten zu finden!"
+      }
+    }
+  }
+}

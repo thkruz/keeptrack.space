@@ -1,0 +1,44 @@
+{
+  "plugins": {
+    "FindSatPlugin": {
+      "bottomIconLabel": "Find Satellite",
+      "title": "Find Satellite",
+      "helpBody": "The Find Satellite menu allows you to search for satellites based on various criteria:<br><br><ul style=\"margin-left: 40px;\"><li><strong>Object Type</strong> - Filter by Payload, Rocket Body, or Debris</li><li><strong>Country</strong> - Filter by launching country</li><li><strong>Satellite Bus/Payload/Shape/Source</strong> - Filter by satellite characteristics</li><li><strong>Azimuth/Elevation/Range</strong> - Search by look angles (requires sensor)</li><li><strong>Orbital Parameters</strong> - Inclination, Period, RAAN, Arg of Perigee</li><li><strong>TLE Age</strong> - Filter by how recently the TLE was updated</li><li><strong>RCS</strong> - Filter by Radar Cross Section</li></ul><br>Results are displayed in the search bar. Use the Export button to save results as CSV.",
+      "labels": {
+        "objectType": "Object Type",
+        "country": "Country",
+        "satelliteBus": "Satellite Bus",
+        "payload": "Payload",
+        "shape": "Shape",
+        "source": "Source",
+        "azimuth": "Azimuth (deg)",
+        "azimuthMargin": "Margin (deg)",
+        "elevation": "Elevation (deg)",
+        "elevationMargin": "Margin (deg)",
+        "range": "Range (km)",
+        "rangeMargin": "Margin (km)",
+        "inclination": "Inclination (deg)",
+        "inclinationMargin": "Margin (deg)",
+        "period": "Period (min)",
+        "periodMargin": "Margin (min)",
+        "tleAge": "TLE Age (hours)",
+        "tleAgeMargin": "Margin (hours)",
+        "rcs": "RCS (m²)",
+        "rcsMargin": "Margin (m²)",
+        "rightAscension": "Right Ascension (deg)",
+        "rightAscensionMargin": "Margin (deg)",
+        "argOfPerigee": "Arg of Perigee (deg)",
+        "argOfPerigeeMargin": "Margin (deg)",
+        "all": "All",
+        "findSatellites": "Find Satellite(s)",
+        "exportData": "Export data"
+      },
+      "errorMsgs": {
+        "NoSatellitesFound": "No Satellites Found",
+        "NoSearchCriteriaEntered": "No Search Criteria Entered",
+        "TooManyResults": "Too many results, limited to {limit}",
+        "TryFindingFirst": "Try finding satellites first!"
+      }
+    }
+  }
+}

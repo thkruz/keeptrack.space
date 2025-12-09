@@ -1,0 +1,44 @@
+{
+  "plugins": {
+    "FindSatPlugin": {
+      "bottomIconLabel": "查找卫星",
+      "title": "查找卫星",
+      "helpBody": "查找卫星菜单允许您根据各种条件搜索卫星：<br><br><ul style=\"margin-left: 40px;\"><li><strong>对象类型</strong> - 按有效载荷、火箭体或碎片过滤</li><li><strong>国家</strong> - 按发射国家过滤</li><li><strong>卫星平台/有效载荷/形状/来源</strong> - 按卫星特性过滤</li><li><strong>方位角/仰角/距离</strong> - 按视角搜索（需要传感器）</li><li><strong>轨道参数</strong> - 倾角、周期、升交点赤经、近地点幅角</li><li><strong>TLE年龄</strong> - 按TLE更新时间过滤</li><li><strong>雷达截面积</strong> - 按雷达截面积过滤</li></ul><br>结果显示在搜索栏中。使用导出按钮将结果保存为CSV。",
+      "labels": {
+        "objectType": "对象类型",
+        "country": "国家",
+        "satelliteBus": "卫星平台",
+        "payload": "有效载荷",
+        "shape": "形状",
+        "source": "来源",
+        "azimuth": "方位角（度）",
+        "azimuthMargin": "容差（度）",
+        "elevation": "仰角（度）",
+        "elevationMargin": "容差（度）",
+        "range": "距离（公里）",
+        "rangeMargin": "容差（公里）",
+        "inclination": "倾角（度）",
+        "inclinationMargin": "容差（度）",
+        "period": "周期（分钟）",
+        "periodMargin": "容差（分钟）",
+        "tleAge": "TLE年龄（小时）",
+        "tleAgeMargin": "容差（小时）",
+        "rcs": "雷达截面积（平方米）",
+        "rcsMargin": "容差（平方米）",
+        "rightAscension": "升交点赤经（度）",
+        "rightAscensionMargin": "容差（度）",
+        "argOfPerigee": "近地点幅角（度）",
+        "argOfPerigeeMargin": "容差（度）",
+        "all": "全部",
+        "findSatellites": "查找卫星",
+        "exportData": "导出数据"
+      },
+      "errorMsgs": {
+        "NoSatellitesFound": "未找到卫星",
+        "NoSearchCriteriaEntered": "未输入搜索条件",
+        "TooManyResults": "结果太多，限制为{limit}",
+        "TryFindingFirst": "请先尝试查找卫星！"
+      }
+    }
+  }
+}

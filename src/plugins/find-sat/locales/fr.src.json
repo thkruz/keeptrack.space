@@ -1,0 +1,44 @@
+{
+  "plugins": {
+    "FindSatPlugin": {
+      "bottomIconLabel": "Trouver satellite",
+      "title": "Trouver satellite",
+      "helpBody": "Le menu Trouver satellite vous permet de rechercher des satellites selon divers critères:<br><br><ul style=\"margin-left: 40px;\"><li><strong>Type d'objet</strong> - Filtrer par charge utile, corps de fusée ou débris</li><li><strong>Pays</strong> - Filtrer par pays de lancement</li><li><strong>Bus/Charge utile/Forme/Source du satellite</strong> - Filtrer par caractéristiques du satellite</li><li><strong>Azimut/Élévation/Portée</strong> - Rechercher par angles de visée (nécessite un capteur)</li><li><strong>Paramètres orbitaux</strong> - Inclinaison, période, RAAN, argument du périgée</li><li><strong>Âge du TLE</strong> - Filtrer par actualité du TLE</li><li><strong>SER</strong> - Filtrer par section efficace radar</li></ul><br>Les résultats s'affichent dans la barre de recherche. Utilisez le bouton Exporter pour enregistrer les résultats en CSV.",
+      "labels": {
+        "objectType": "Type d'objet",
+        "country": "Pays",
+        "satelliteBus": "Bus satellite",
+        "payload": "Charge utile",
+        "shape": "Forme",
+        "source": "Source",
+        "azimuth": "Azimut (degrés)",
+        "azimuthMargin": "Marge (degrés)",
+        "elevation": "Élévation (degrés)",
+        "elevationMargin": "Marge (degrés)",
+        "range": "Portée (km)",
+        "rangeMargin": "Marge (km)",
+        "inclination": "Inclinaison (degrés)",
+        "inclinationMargin": "Marge (degrés)",
+        "period": "Période (min)",
+        "periodMargin": "Marge (min)",
+        "tleAge": "Âge du TLE (heures)",
+        "tleAgeMargin": "Marge (heures)",
+        "rcs": "SER (m²)",
+        "rcsMargin": "Marge (m²)",
+        "rightAscension": "Ascension droite (degrés)",
+        "rightAscensionMargin": "Marge (degrés)",
+        "argOfPerigee": "Argument du périgée (degrés)",
+        "argOfPerigeeMargin": "Marge (degrés)",
+        "all": "Tous",
+        "findSatellites": "Trouver satellite(s)",
+        "exportData": "Exporter données"
+      },
+      "errorMsgs": {
+        "NoSatellitesFound": "Aucun satellite trouvé",
+        "NoSearchCriteriaEntered": "Aucun critère de recherche saisi",
+        "TooManyResults": "Trop de résultats, limité à {limit}",
+        "TryFindingFirst": "Essayez d'abord de trouver des satellites!"
+      }
+    }
+  }
+}

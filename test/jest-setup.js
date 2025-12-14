@@ -88,6 +88,32 @@ window.M = {
   updateTextFields: jest.fn(),
 };
 
+// Mock echarts to avoid noisy console warnings and side effects during tests
+jest.mock('echarts', () => {
+  const setOption = jest.fn();
+  const resize = jest.fn();
+  const dispose = jest.fn();
+  const getZr = jest.fn(() => ({ dispose: jest.fn() }));
+  const chartInstance = { setOption, resize, dispose, getZr };
+  const init = jest.fn(() => chartInstance);
+  const use = jest.fn();
+  const registerTheme = jest.fn();
+  const registerLocale = jest.fn();
+  const graphic = {};
+
+  return {
+    __esModule: true,
+    default: { init, use, registerTheme, registerLocale, graphic },
+    init,
+    use,
+    registerTheme,
+    registerLocale,
+    graphic,
+  };
+});
+
+jest.mock('echarts-gl', () => ({}));
+
 global.requestAnimationFrame = function requestAnimationFrame(cb) {
   return setTimeout(cb, 0);
 };
@@ -102,7 +128,7 @@ global.console = {
   debug: jest.fn(),
 };
 
-// TODO: Make a PR to fix this warning in the echarts-gl codebase
+// Note: echarts-gl warning filtered below during tests
 
 // If console.warn tries to warn "geo3D exists." ignore it.
 const consoleWarn = global.console.warn;
@@ -126,8 +152,6 @@ window.HTMLMediaElement.prototype.pause = () => {
 window.HTMLMediaElement.prototype.addTextTrack = () => {
   /* do nothing */
 };
-
-// global.document.canvas.addEventListener = () => true;
 
 /*
  * Eruda is a console for mobile web browsers

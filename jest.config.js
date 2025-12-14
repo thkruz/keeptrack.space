@@ -7,6 +7,10 @@ export default {
   },
   // preset: 'ts-jest',
   testEnvironment: 'jsdom',
+  reporters: [
+    'default',
+    ['jest-spec-reporter', { displayStacktrace: 'summary' }],
+  ],
   transform: {
     '\\.(js|ts|jsx|tsx)$': 'babel-jest',
   },

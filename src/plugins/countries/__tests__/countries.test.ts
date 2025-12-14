@@ -2,10 +2,13 @@
 /* eslint-disable dot-notation */
 import { GroupsManager } from '@app/app/data/groups-manager';
 import { GroupType, ObjectGroup } from '@app/app/data/object-group';
+import { StringExtractor } from '@app/app/ui/string-extractor';
 import { Container } from '@app/engine/core/container';
 import { MenuMode, Singletons } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { CountriesMenu } from '@app/plugins/countries/countries';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
@@ -13,22 +16,26 @@ import { defaultSat } from '@test/environment/apiMocks';
 import { mockUiManager, setupDefaultHtml } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from '@test/generic-tests';
 
-describe('CountriesMenu_class', () => {
+const setupCountriesMenuTestEnvironment = () => {
+  setupDefaultHtml();
+
+  const mockGroupsManager = new GroupsManager();
+  const topMenu = new TopMenu();
+
+  topMenu.init();
+
+  mockGroupsManager.groupList.F = {
+    groupName: 'F',
+    ids: [],
+    updateIsInGroup: jest.fn(),
+    updateOrbits: jest.fn(),
+  } as unknown as ObjectGroup<GroupType.ALL>;
+  Container.getInstance().registerSingleton(Singletons.GroupsManager, mockGroupsManager);
+};
+
+describe('CountriesMenu', () => {
   beforeEach(() => {
-    setupDefaultHtml();
-
-    const mockGroupsManager = new GroupsManager();
-    const topMenu = new TopMenu();
-
-    topMenu.init();
-
-    mockGroupsManager.groupList.F = {
-      groupName: 'F',
-      ids: [],
-      updateIsInGroup: jest.fn(),
-      updateOrbits: jest.fn(),
-    } as unknown as ObjectGroup<GroupType.ALL>;
-    Container.getInstance().registerSingleton(Singletons.GroupsManager, mockGroupsManager);
+    setupCountriesMenuTestEnvironment();
   });
 
   afterEach(() => {
@@ -37,6 +44,20 @@ describe('CountriesMenu_class', () => {
 
   standardPluginSuite(CountriesMenu, 'CountriesMenu');
   standardPluginMenuButtonTests(CountriesMenu, 'CountriesMenu');
+
+  describe('Plugin identity', () => {
+    it('should have correct plugin name', () => {
+      const plugin = new CountriesMenu();
+
+      expect(plugin.id).toBe(CountriesMenu.name);
+    });
+
+    it('should have TopMenu as dependency', () => {
+      const plugin = new CountriesMenu();
+
+      expect(plugin.dependencies_).toContain('TopMenu');
+    });
+  });
 
   describe('Configuration methods', () => {
     it('should return correct bottom icon config', () => {
@@ -90,6 +111,25 @@ describe('CountriesMenu_class', () => {
 
       expect(html).toContain('center-align');
       expect(html).toContain('divider');
+    });
+
+    it('should merge country codes by display name and skip ANALSAT', () => {
+      const catalogManagerInstance = ServiceLocator.getCatalogManager();
+
+      catalogManagerInstance.getSats = jest.fn().mockReturnValue([
+        { country: 'US' },
+        { country: 'USA' },
+        { country: 'ANALSAT' },
+      ]);
+      jest
+        .spyOn(StringExtractor, 'extractCountry')
+        .mockImplementation((code: string) => (code === 'US' || code === 'USA' ? 'United States' : code));
+
+      const plugin = new CountriesMenu();
+      const html = plugin['generateCountryList_']();
+
+      expect(html).toContain('data-group="US|USA"');
+      expect(html).not.toContain('ANALSAT');
     });
   });
 
@@ -156,29 +196,66 @@ describe('CountriesMenu_class', () => {
     it('should handle undefined group name', () => {
       const plugin = new CountriesMenu();
 
-      // Should not throw for undefined group
+      // eslint-disable-next-line no-undefined
       expect(() => plugin['groupSelected_'](undefined as any)).not.toThrow();
     });
 
     it('should handle non-existent group', () => {
       const plugin = new CountriesMenu();
 
-      // Should not throw for non-existent group
       expect(() => plugin['groupSelected_']('NONEXISTENT')).not.toThrow();
     });
   });
 
-  describe('Plugin identity', () => {
-    it('should have correct plugin name', () => {
+  describe('uiManagerFinal_', () => {
+    it('should bind click listeners to country list items', () => {
       const plugin = new CountriesMenu();
+      const countryMenuClickSpy = jest
+        .spyOn(plugin as any, 'countryMenuClick_')
+        // eslint-disable-next-line
+        .mockImplementation(() => undefined);
 
-      expect(plugin.id).toBe(CountriesMenu.name);
+      jest
+        .spyOn(plugin as any, 'generateCountryList_')
+        .mockReturnValue('<li class="menu-selectable country-option" data-group="US">United States</li>');
+      document.body.innerHTML = `
+              <div id="country-menu">
+                <ul id="country-list"></ul>
+              </div>
+            `;
+
+      plugin['uiManagerFinal_']();
+
+      const listItem = document.querySelector('#country-menu li');
+
+      expect(listItem).not.toBeNull();
+
+      listItem?.dispatchEvent(new Event('click'));
+      expect(countryMenuClickSpy).toHaveBeenCalledWith('US');
     });
 
-    it('should have TopMenu as dependency', () => {
+    it('should no-op when country menu elements are missing', () => {
       const plugin = new CountriesMenu();
+      const generateSpy = jest.spyOn(plugin as any, 'generateCountryList_');
 
-      expect(plugin.dependencies_).toContain('TopMenu');
+      document.body.innerHTML = '';
+
+      plugin['uiManagerFinal_']();
+
+      expect(generateSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Lifecycle', () => {
+    it('should register uiManagerFinal handler on addHtml', () => {
+      const plugin = new CountriesMenu();
+      const uiFinalSpy = jest.spyOn(plugin as any, 'uiManagerFinal_').mockImplementation();
+      const onSpy = jest.spyOn(EventBus.getInstance(), 'on');
+
+      plugin.addHtml();
+
+      expect(onSpy).toHaveBeenCalledWith(EventBusEvent.uiManagerFinal, expect.any(Function));
+      expect(uiFinalSpy).not.toHaveBeenCalled();
     });
   });
 });

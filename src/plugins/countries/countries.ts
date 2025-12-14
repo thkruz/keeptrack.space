@@ -21,6 +21,20 @@ import flagPng from '@public/img/icons/flag.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { TopMenu } from '../top-menu/top-menu';
 
+/**
+ * Countries Menu Plugin
+ *
+ * This plugin adds a side menu that allows users to filter satellites by country.
+ * Unlike the filter menu, this menu creates groups based on countries, enabling users to
+ * view all satellites from a specific country in one go.
+ *
+ * Selected countries are stored as groups, and populate the search box with the corresponding satellite SCC numbers.
+ *
+ * Usage:
+ * 1. Click on the flag icon in the bottom menu to open the Countries Menu.
+ * 2. Select a country from the list to filter satellites by that country.
+ * 3. The search box will be populated with the SCC numbers of the satellites from the selected country.
+ */
 export class CountriesMenu extends KeepTrackPlugin {
   readonly id = 'CountriesMenu';
   dependencies_ = [TopMenu.name];
@@ -85,8 +99,8 @@ export class CountriesMenu extends KeepTrackPlugin {
   }
 
   private uiManagerFinal_(): void {
-    const countryListEl = getEl('country-list');
-    const countryMenuEl = getEl('country-menu');
+    const countryListEl = getEl('country-list', true);
+    const countryMenuEl = getEl('country-menu', true);
 
     if (!countryListEl || !countryMenuEl) {
       return;

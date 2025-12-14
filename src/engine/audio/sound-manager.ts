@@ -342,7 +342,7 @@ export class SoundManager {
       return;
     }
 
-    if (getEl('loading-screen')?.classList.contains('fullscreen')) {
+    if (getEl('loading-screen', true)?.classList.contains('fullscreen')) {
       return;
     }
 

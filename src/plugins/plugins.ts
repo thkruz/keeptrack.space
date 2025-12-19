@@ -14,10 +14,12 @@ import { getEl } from '../engine/utils/get-el';
 import { AnalysisMenu } from './analysis/analysis';
 import { Breakup } from './breakup/breakup';
 import { Calculator } from './calculator/calculator';
+import { CameraMenuPlugin } from './camera-menu/camera-menu';
 import { ClassificationBar } from './classification-bar/classification-bar';
 import { Collisions } from './collisions/collisions';
 import { ColorMenu } from './colors-menu/colors-menu';
 import { CreateSat } from './create-sat/create-sat';
+import { DataMenuPlugin } from './data-menu/data-menu';
 import { DateTimeManager } from './date-time-manager/date-time-manager';
 import { DebrisScreening } from './debris-screening/debris-screening';
 import { DopsPlugin } from './dops/dops';
@@ -36,6 +38,7 @@ import { NextLaunchesPlugin } from './next-launches/next-launches';
 import { NightToggle } from './night-toggle/night-toggle';
 import { OrbitGuardMenuPlugin } from './orbit-guard-menu/orbit-guard-menu';
 import { OrbitReferences } from './orbit-references/orbit-references';
+import { PerformanceMenuPlugin } from './performance-menu/performance-menu';
 import { PlanetsMenuPlugin } from './planets-menu/planets-menu';
 import { EcfPlot } from './plot-analysis/ecf-plots';
 import { EciPlot } from './plot-analysis/eci-plots';
@@ -256,6 +259,9 @@ export class PluginManager {
         { init: () => new Inc2LonPlots().init(), config: plugins.Inc2LonPlots },
         { init: () => new FilterMenuPlugin().init(), config: plugins.FilterMenuPlugin },
         { init: () => new SettingsMenuPlugin().init(), config: plugins.SettingsMenuPlugin },
+        { init: () => new CameraMenuPlugin().init(), config: plugins.SettingsMenuPlugin },
+        { init: () => new PerformanceMenuPlugin().init(), config: plugins.SettingsMenuPlugin },
+        { init: () => new DataMenuPlugin().init(), config: plugins.SettingsMenuPlugin },
         {
           init: async () => {
             const proPlugin = await import('../plugins-pro/graphics-menu/graphics-menu');

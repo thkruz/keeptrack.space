@@ -4,6 +4,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { Kilometers } from '@app/engine/ootk/src/main';
 import { ColorPick } from '@app/engine/utils/color-pick';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl } from '@app/engine/utils/get-el';
@@ -11,11 +12,11 @@ import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-ma
 import { parseRgba } from '@app/engine/utils/rgba';
 import { rgbCss } from '@app/engine/utils/rgbCss';
 import { SettingsManager } from '@app/settings/settings';
+import { OrbitCruncherMsgType } from '@app/webworker/orbit-cruncher-interfaces';
 import settingsPng from '@public/img/icons/settings.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
 import { TimeMachine } from '../time-machine/time-machine';
-import { OrbitCruncherMsgType } from '@app/webworker/orbit-cruncher-interfaces';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -267,6 +268,101 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
               </label>
             </div>
           </div>
+          <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
+          <div id="settings-advanced-orbital" class="row">
+            <h5 class="center-align">Advanced Orbital Settings</h5>
+            <div class="row">
+              <div class="input-field col s12">
+                <select id="settings-covarianceConfidenceLevel">
+                  <option value="1">1 (68.27%)</option>
+                  <option value="2" selected>2 (95.45%)</option>
+                  <option value="3">3 (99.73%)</option>
+                </select>
+                <label>Covariance Confidence Level</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <input value="15" id="settings-coneDistanceFromEarth" type="number" step="1" min="-100" max="1000" data-position="top" data-delay="50"
+                data-tooltip="Distance the FOV cone is drawn from Earth (km)" />
+                <label for="settings-coneDistanceFromEarth" class="active">Cone Distance from Earth (km)</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <input value="255" id="settings-orbitSegments" type="number" step="1" min="32" max="512" data-position="top" data-delay="50"
+                data-tooltip="Number of line segments in orbit (higher = smoother)" />
+                <label for="settings-orbitSegments" class="active">Orbit Segments</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <input value="0.6" id="settings-orbitFadeFactor" type="number" step="0.1" min="0.0" max="1.0" data-position="top" data-delay="50"
+                data-tooltip="How much orbits fade over time (0.0 = invisible, 1.0 = no fade)" />
+                <label for="settings-orbitFadeFactor" class="active">Orbit Fade Factor</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <input value="5" id="settings-lineScanMinEl" type="number" step="1" min="0" max="90" data-position="top" data-delay="50"
+                data-tooltip="Minimum elevation for line scan" />
+                <label for="settings-lineScanMinEl" class="active">Line Scan Min Elevation (°)</label>
+              </div>
+            </div>
+          </div>
+          <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
+          <div id="settings-advanced-ui" class="row">
+            <h5 class="center-align">Advanced UI Settings</h5>
+            <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Show splash screen with images on startup">
+                <input id="settings-showSplashScreen" type="checkbox" checked/>
+                <span class="lever"></span>
+                Show Splash Screen
+              </label>
+            </div>
+            <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Show loading hints on splash screen">
+                <input id="settings-showLoadingHints" type="checkbox" checked/>
+                <span class="lever"></span>
+                Show Loading Hints
+              </label>
+            </div>
+            <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Show the primary logo">
+                <input id="settings-showPrimaryLogo" type="checkbox" checked/>
+                <span class="lever"></span>
+                Show Primary Logo
+              </label>
+            </div>
+            <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Load the last used sensor on startup">
+                <input id="settings-loadLastSensor" type="checkbox" checked/>
+                <span class="lever"></span>
+                Load Last Sensor
+              </label>
+            </div>
+            <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Load the last used map on startup">
+                <input id="settings-loadLastMap" type="checkbox" checked/>
+                <span class="lever"></span>
+                Load Last Map
+              </label>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <input value="800" id="settings-mapWidth" type="number" step="100" min="400" max="4000" data-position="top" data-delay="50"
+                  data-tooltip="Map width resolution (affects performance)" />
+                <label for="settings-mapWidth" class="active">Map Width (px)</label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <input value="600" id="settings-mapHeight" type="number" step="100" min="300" max="3000" data-position="top" data-delay="50"
+                  data-tooltip="Map height resolution (affects performance)" />
+                <label for="settings-mapHeight" class="active">Map Height (px)</label>
+              </div>
+            </div>
+          </div>
         </form>
       </div>
     </div>
@@ -435,6 +531,80 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     if (maxSearchSatsEl) {
       maxSearchSatsEl.value = settingsManager.searchLimit.toString();
     }
+
+    // Advanced Orbital Settings
+    const covarianceConfidenceLevelEl = <HTMLInputElement>getEl('settings-covarianceConfidenceLevel');
+
+    if (covarianceConfidenceLevelEl) {
+      covarianceConfidenceLevelEl.value = settingsManager.covarianceConfidenceLevel.toString();
+    }
+
+    const coneDistanceFromEarthEl = <HTMLInputElement>getEl('settings-coneDistanceFromEarth');
+
+    if (coneDistanceFromEarthEl) {
+      coneDistanceFromEarthEl.value = settingsManager.coneDistanceFromEarth.toString();
+    }
+
+    const orbitSegmentsEl = <HTMLInputElement>getEl('settings-orbitSegments');
+
+    if (orbitSegmentsEl) {
+      orbitSegmentsEl.value = settingsManager.orbitSegments.toString();
+    }
+
+    const orbitFadeFactorEl = <HTMLInputElement>getEl('settings-orbitFadeFactor');
+
+    if (orbitFadeFactorEl) {
+      orbitFadeFactorEl.value = settingsManager.orbitFadeFactor.toString();
+    }
+
+    const lineScanMinElEl = <HTMLInputElement>getEl('settings-lineScanMinEl');
+
+    if (lineScanMinElEl) {
+      lineScanMinElEl.value = settingsManager.lineScanMinEl.toString();
+    }
+
+    // Advanced UI Settings
+    const showSplashScreenEl = <HTMLInputElement>getEl('settings-showSplashScreen');
+
+    if (showSplashScreenEl) {
+      showSplashScreenEl.checked = settingsManager.isShowSplashScreen;
+    }
+
+    const showLoadingHintsEl = <HTMLInputElement>getEl('settings-showLoadingHints');
+
+    if (showLoadingHintsEl) {
+      showLoadingHintsEl.checked = settingsManager.isShowLoadingHints;
+    }
+
+    const showPrimaryLogoEl = <HTMLInputElement>getEl('settings-showPrimaryLogo');
+
+    if (showPrimaryLogoEl) {
+      showPrimaryLogoEl.checked = settingsManager.isShowPrimaryLogo;
+    }
+
+    const loadLastSensorEl = <HTMLInputElement>getEl('settings-loadLastSensor');
+
+    if (loadLastSensorEl) {
+      loadLastSensorEl.checked = settingsManager.isLoadLastSensor;
+    }
+
+    const loadLastMapEl = <HTMLInputElement>getEl('settings-loadLastMap');
+
+    if (loadLastMapEl) {
+      loadLastMapEl.checked = settingsManager.isLoadLastMap;
+    }
+
+    const mapWidthEl = <HTMLInputElement>getEl('settings-mapWidth');
+
+    if (mapWidthEl) {
+      mapWidthEl.value = settingsManager.mapWidth.toString();
+    }
+
+    const mapHeightEl = <HTMLInputElement>getEl('settings-mapHeight');
+
+    if (mapHeightEl) {
+      mapHeightEl.value = settingsManager.mapHeight.toString();
+    }
   }
 
   private onColorSelected_(context: ColorPick, colorStr: string) {
@@ -486,6 +656,11 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       case 'settings-freeze-drag':
       case 'settings-time-machine-toasts':
       case 'settings-snp':
+      case 'settings-showSplashScreen':
+      case 'settings-showLoadingHints':
+      case 'settings-showPrimaryLogo':
+      case 'settings-loadLastSensor':
+      case 'settings-loadLastMap':
         if ((<HTMLInputElement>getEl((<HTMLInputElement>e.target)?.id ?? ''))?.checked) {
           // Play sound for enabling option
           ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
@@ -527,6 +702,23 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isFreezePropRateOnDrag = false;
     settingsManager.isDisableTimeMachineToasts = false;
     settingsManager.searchLimit = 600;
+
+    // Advanced Orbital Settings
+    settingsManager.covarianceConfidenceLevel = 2;
+    settingsManager.coneDistanceFromEarth = 15 as Kilometers;
+    settingsManager.orbitSegments = 255;
+    settingsManager.orbitFadeFactor = 0.6;
+    settingsManager.lineScanMinEl = 5;
+
+    // Advanced UI Settings
+    settingsManager.isShowSplashScreen = true;
+    settingsManager.isShowLoadingHints = true;
+    settingsManager.isShowPrimaryLogo = true;
+    settingsManager.isLoadLastSensor = true;
+    settingsManager.isLoadLastMap = true;
+    settingsManager.mapWidth = 800;
+    settingsManager.mapHeight = 600;
+
     PersistenceManager.getInstance().removeItem(StorageKey.SETTINGS_DOT_COLORS);
     SettingsManager.preserveSettings();
     SettingsMenuPlugin.syncOnLoad();
@@ -630,6 +822,56 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
 
     colorSchemeManagerInstance.calculateColorBuffers(true);
+
+    // Advanced Orbital Settings
+    const covarianceConfidenceLevel = parseInt((<HTMLInputElement>getEl('settings-covarianceConfidenceLevel')).value);
+
+    if (!isNaN(covarianceConfidenceLevel) && covarianceConfidenceLevel >= 1 && covarianceConfidenceLevel <= 3) {
+      settingsManager.covarianceConfidenceLevel = covarianceConfidenceLevel;
+    }
+
+    const coneDistanceFromEarth = parseFloat((<HTMLInputElement>getEl('settings-coneDistanceFromEarth')).value);
+
+    if (!isNaN(coneDistanceFromEarth)) {
+      settingsManager.coneDistanceFromEarth = coneDistanceFromEarth as Kilometers;
+    }
+
+    const orbitSegments = parseInt((<HTMLInputElement>getEl('settings-orbitSegments')).value);
+
+    if (!isNaN(orbitSegments) && orbitSegments >= 32 && orbitSegments <= 512) {
+      settingsManager.orbitSegments = orbitSegments;
+    }
+
+    const orbitFadeFactor = parseFloat((<HTMLInputElement>getEl('settings-orbitFadeFactor')).value);
+
+    if (!isNaN(orbitFadeFactor) && orbitFadeFactor >= 0.0 && orbitFadeFactor <= 1.0) {
+      settingsManager.orbitFadeFactor = orbitFadeFactor;
+    }
+
+    const lineScanMinEl = parseInt((<HTMLInputElement>getEl('settings-lineScanMinEl')).value);
+
+    if (!isNaN(lineScanMinEl) && lineScanMinEl >= 0 && lineScanMinEl <= 90) {
+      settingsManager.lineScanMinEl = lineScanMinEl;
+    }
+
+    // Advanced UI Settings
+    settingsManager.isShowSplashScreen = (<HTMLInputElement>getEl('settings-showSplashScreen')).checked;
+    settingsManager.isShowLoadingHints = (<HTMLInputElement>getEl('settings-showLoadingHints')).checked;
+    settingsManager.isShowPrimaryLogo = (<HTMLInputElement>getEl('settings-showPrimaryLogo')).checked;
+    settingsManager.isLoadLastSensor = (<HTMLInputElement>getEl('settings-loadLastSensor')).checked;
+    settingsManager.isLoadLastMap = (<HTMLInputElement>getEl('settings-loadLastMap')).checked;
+
+    const mapWidth = parseInt((<HTMLInputElement>getEl('settings-mapWidth')).value);
+
+    if (!isNaN(mapWidth) && mapWidth >= 400 && mapWidth <= 4000) {
+      settingsManager.mapWidth = mapWidth;
+    }
+
+    const mapHeight = parseInt((<HTMLInputElement>getEl('settings-mapHeight')).value);
+
+    if (!isNaN(mapHeight) && mapHeight >= 300 && mapHeight <= 3000) {
+      settingsManager.mapHeight = mapHeight;
+    }
 
     SettingsManager.preserveSettings();
   }

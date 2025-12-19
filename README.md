@@ -1,6 +1,16 @@
-![Latest Version](https://img.shields.io/badge/version-11.0.3-darkgreen?style=flat-square) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/thkruz/keeptrack.space?style=flat-square) ![language](https://img.shields.io/github/languages/top/thkruz/keeptrack.space?style=flat-square) ![Languages](https://img.shields.io/github/languages/count/thkruz/keeptrack.space?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues/thkruz/keeptrack.space?style=flat-square) ![License](https://img.shields.io/github/license/thkruz/keeptrack.space?style=flat-square)
+![Latest Version](https://img.shields.io/badge/version-11.0.3-darkgreen?style=flat-square) 
+[![Discord](https://img.shields.io/discord/1451232817517166816?color=5865F2&label=discord&logo=discord&logoColor=white&style=flat-square)](https://discord.gg/G4tJfSkmzx)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/thkruz/keeptrack.space?style=flat-square) 
+![language](https://img.shields.io/github/languages/top/thkruz/keeptrack.space?style=flat-square) 
+![Languages](https://img.shields.io/github/languages/count/thkruz/keeptrack.space?style=flat-square) 
+![GitHub issues](https://img.shields.io/github/issues/thkruz/keeptrack.space?style=flat-square) 
+![License](https://img.shields.io/github/license/thkruz/keeptrack.space?style=flat-square)
 
-<img src="./public/img/logo.png" width='100%' alt="KeepTrack.Space" align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./public/img/logo.png">
+  <source media="(prefers-color-scheme: light)" srcset="./public/img/logo-inverted.png">
+  <img src="./public/img/logo.png" width='100%' alt="KeepTrack.Space">
+</picture>
 
 # KeepTrack.space™
 
@@ -18,7 +28,7 @@
 - 📱 Works on mobile, tablet, and desktop
 - 🆓 Free, open source, runs offline
 
-[Try it live](https://app.keeptrack.space) | [Installation](#installation) | [Screenshots](#screenshots)
+[Try it live](https://app.keeptrack.space) | [Installation](#installation) | [Join Discord](https://discord.gg/G4tJfSkmzx) | [Screenshots](#screenshots)
 
 ---
 
@@ -381,10 +391,11 @@ For changes to the engine, rendering pipeline, or core architecture:
 
 ## Getting Help
 
-- **Questions?** Open a [Discussion](https://github.com/thkruz/keeptrack.space/discussions)
-- **Bugs?** File an [Issue](https://github.com/thkruz/keeptrack.space/issues)
-- **Major changes?** Open an issue to discuss before implementing
-- **Security issues?** Email <admin@keeptrack.space> privately
+- 💬 **Chat with the community** - Join our [Discord server](https://discord.gg/G4tJfSkmzx)
+- ❓ **Questions?** Open a [Discussion](https://github.com/thkruz/keeptrack.space/discussions)
+- 🐛 **Bugs?** File an [Issue](https://github.com/thkruz/keeptrack.space/issues)
+- 🚀 **Major changes?** Open an issue to discuss before implementing
+- 🔒 **Security issues?** Email <admin@keeptrack.space> privately
 
 ---
 
@@ -629,6 +640,7 @@ Disagree with this approach? You're free to fork and maintain your version of Ke
 
 <p align="center">
   <a href="https://keeptrack.space">Website</a> •
+  <a href="https://discord.gg/G4tJfSkmzx">Discord</a> •
   <a href="https://github.com/thkruz/keeptrack.space/issues">Issues</a> •
   <a href="https://github.com/thkruz/keeptrack.space/discussions">Discussions</a> •
   <a href="mailto:theodore.kruczek@gmail.com">Contact</a>

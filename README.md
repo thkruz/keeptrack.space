@@ -8,7 +8,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./public/img/logo.png">
-  <source media="(prefers-color-scheme: light)" srcset="./public/img/logo-inverted.png">
+  <source media="(prefers-color-scheme: light)" srcset="./public/img/logo-light.png">
   <img src="./public/img/logo.png" width='100%' alt="KeepTrack.Space">
 </picture>
 

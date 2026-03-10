@@ -110,7 +110,7 @@
     "clean-terminal-webpack-plugin": "^3.0.0",
     "coverage-istanbul-loader": "^3.0.5",
     "cross-env": "^7.0.3",
-    "css-loader": "^6.8.1",
+    "css-loader": "^7.1.4",
     "dotenv-webpack": "^8.1.1",
     "eslint": "^8.57.0",
     "happy-dom": "^20.5.0",

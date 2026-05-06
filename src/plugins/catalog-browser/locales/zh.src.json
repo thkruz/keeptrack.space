@@ -22,7 +22,7 @@
       },
       "entries": {
         "defaultCatalog": "默认目录",
-        "celestrakOnly": "仅 CelesTrack",
+        "celestrakOnly": "仅 CelesTrak",
         "vimpelOnly": "仅 JSC Vimpel",
         "last30days": "最近30天发射",
         "stations": "空间站",
@@ -87,7 +87,7 @@
       "toasts": {
         "loaded": "已加载{catalog}",
         "defaultLoaded": "默认目录已恢复",
-        "celestrakLoaded": "CelesTrack 目录已加载",
+        "celestrakLoaded": "CelesTrak 目录已加载",
         "vimpelLoaded": "JSC Vimpel 目录已加载"
       },
       "commands": {
@@ -95,7 +95,11 @@
       },
       "errorMsgs": {
         "FetchFailed": "获取目录失败",
-        "DefaultFailed": "恢复默认目录失败"
+        "DefaultFailed": "恢复默认目录失败",
+        "Forbidden": "CelesTrak rejected the request (HTTP 403). This is usually a Cloudflare rate-limit — wait a minute and try again.",
+        "RateLimited": "Too many catalog requests. Please wait a minute before trying again.",
+        "ServerError": "CelesTrak is temporarily unavailable. Please try again in a few minutes.",
+        "NetworkError": "Could not reach CelesTrak. Check your network connection."
       }
     }
   }

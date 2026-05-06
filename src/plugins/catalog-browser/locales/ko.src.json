@@ -22,7 +22,7 @@
       },
       "entries": {
         "defaultCatalog": "기본 카탈로그",
-        "celestrakOnly": "CelesTrack만",
+        "celestrakOnly": "CelesTrak만",
         "vimpelOnly": "JSC Vimpel만",
         "last30days": "최근 30일 발사",
         "stations": "우주 정거장",
@@ -87,7 +87,7 @@
       "toasts": {
         "loaded": "{catalog} 로드 완료",
         "defaultLoaded": "기본 카탈로그 복원됨",
-        "celestrakLoaded": "CelesTrack 카탈로그 로드됨",
+        "celestrakLoaded": "CelesTrak 카탈로그 로드됨",
         "vimpelLoaded": "JSC Vimpel 카탈로그 로드됨"
       },
       "commands": {
@@ -95,7 +95,11 @@
       },
       "errorMsgs": {
         "FetchFailed": "카탈로그를 가져오지 못했습니다",
-        "DefaultFailed": "기본 카탈로그를 복원하지 못했습니다"
+        "DefaultFailed": "기본 카탈로그를 복원하지 못했습니다",
+        "Forbidden": "CelesTrak rejected the request (HTTP 403). This is usually a Cloudflare rate-limit — wait a minute and try again.",
+        "RateLimited": "Too many catalog requests. Please wait a minute before trying again.",
+        "ServerError": "CelesTrak is temporarily unavailable. Please try again in a few minutes.",
+        "NetworkError": "Could not reach CelesTrak. Check your network connection."
       }
     }
   }

@@ -22,7 +22,7 @@
       },
       "entries": {
         "defaultCatalog": "Domyślny katalog",
-        "celestrakOnly": "Tylko CelesTrack",
+        "celestrakOnly": "Tylko CelesTrak",
         "vimpelOnly": "Tylko JSC Vimpel",
         "last30days": "Starty z ostatnich 30 dni",
         "stations": "Stacje kosmiczne",
@@ -87,7 +87,7 @@
       "toasts": {
         "loaded": "Załadowano {catalog}",
         "defaultLoaded": "Przywrócono domyślny katalog",
-        "celestrakLoaded": "Załadowano katalog CelesTrack",
+        "celestrakLoaded": "Załadowano katalog CelesTrak",
         "vimpelLoaded": "Załadowano katalog JSC Vimpel"
       },
       "commands": {
@@ -95,7 +95,11 @@
       },
       "errorMsgs": {
         "FetchFailed": "Nie udało się pobrać katalogu",
-        "DefaultFailed": "Nie udało się przywrócić domyślnego katalogu"
+        "DefaultFailed": "Nie udało się przywrócić domyślnego katalogu",
+        "Forbidden": "CelesTrak rejected the request (HTTP 403). This is usually a Cloudflare rate-limit — wait a minute and try again.",
+        "RateLimited": "Too many catalog requests. Please wait a minute before trying again.",
+        "ServerError": "CelesTrak is temporarily unavailable. Please try again in a few minutes.",
+        "NetworkError": "Could not reach CelesTrak. Check your network connection."
       }
     }
   }

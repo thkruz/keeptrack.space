@@ -48,6 +48,10 @@ export class DateTimeManager extends KeepTrackPlugin {
   }
 
   updateDateTime(date: Date) {
+    if (!date || isNaN(date.getTime())) {
+      return;
+    }
+
     const dateTimeInputTb = document.getElementById(this.dateTimeInputTbId_) as HTMLInputElement;
 
     if (dateTimeInputTb && !isThisNode()) {

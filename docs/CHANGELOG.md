@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v12.2.1](https://github.com/thkruz/keeptrack.space/compare/v12.2.0...v12.2.1)
+
+>  
+
+- chore: :wrench: update dependencies for improved stability [`efd944f`](https://github.com/thkruz/keeptrack.space/commit/efd944f4592eef653fa7d84b20137e0ad30680fa)
+- chore(profile.env): :wrench: remove unused environment variables [`17c1245`](https://github.com/thkruz/keeptrack.space/commit/17c1245851e4fe9ca9a9bfed8903c40385701c4b)
+
 #### [v12.2.0](https://github.com/thkruz/keeptrack.space/compare/v12.1.2...v12.2.0)
 
 >  

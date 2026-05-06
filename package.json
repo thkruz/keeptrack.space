@@ -84,7 +84,7 @@
     "@babel/preset-env": "^7.25.3",
     "@babel/preset-typescript": "^7.23.0",
     "@playwright/test": "^1.58.2",
-    "@rspack/cli": "^1.4.11",
+    "@rspack/cli": "^2.0.1",
     "@rspack/core": "^1.4.11",
     "@testing-library/dom": "^9.3.3",
     "@testing-library/user-event": "^14.5.2",
@@ -158,7 +158,7 @@
     "openmeteo": "^1.2.0",
     "requestidlecallback-polyfill": "^1.0.2",
     "resizable": "^1.2.1",
-    "uuid": "^11.1.0",
+    "uuid": "^14.0.0",
     "webgl-obj-loader": "^2.0.8"
   },
   "volta": {

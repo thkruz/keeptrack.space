@@ -308,7 +308,11 @@ export abstract class UrlManager {
 
     // Handle Time First
     if (isMaxData || timeManagerInstance.staticOffset < -1000 || timeManagerInstance.staticOffset > 1000) {
-      paramSlices.push(`date=${new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset).toISOString()}`);
+      const epochMs = timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset;
+
+      if (Number.isFinite(epochMs)) {
+        paramSlices.push(`date=${new Date(epochMs).toISOString()}`);
+      }
     }
 
     if (this.propRate_ < 0.99 || this.propRate_ > 1.01) {
@@ -464,7 +468,7 @@ export abstract class UrlManager {
       const date = new Date(val);
 
       if (isNaN(date.getTime())) {
-        ServiceLocator.getUiManager().toast(`Date value of "${val}" is not a proper ISO 8601 date string!`, ToastMsgType.caution, true);
+        errorManagerInstance.warn(`Date value of "${val}" is not a proper ISO 8601 date string!`);
 
         return;
       }
@@ -472,12 +476,12 @@ export abstract class UrlManager {
       settingsManager.simulationTime = date;
     } else {
       if (val.length !== 13) {
-        ServiceLocator.getUiManager().toast(`Date value of "${val}" is not a proper unix timestamp!`, ToastMsgType.caution, true);
+        errorManagerInstance.warn(`Date value of "${val}" is not a proper unix timestamp!`);
 
         return;
       }
       if (isNaN(parseInt(val))) {
-        ServiceLocator.getUiManager().toast(`Date value of "${val}" is not a proper unix timestamp!`, ToastMsgType.caution, true);
+        errorManagerInstance.warn(`Date value of "${val}" is not a proper unix timestamp!`);
 
         return;
       }
@@ -491,7 +495,7 @@ export abstract class UrlManager {
     let rate = parseFloat(val);
 
     if (isNaN(rate)) {
-      ServiceLocator.getUiManager().toast(`Propagation rate of "${rate}" is not a valid float!`, ToastMsgType.caution, true);
+      errorManagerInstance.warn(`Propagation rate of "${rate}" is not a valid float!`);
 
       return;
     }

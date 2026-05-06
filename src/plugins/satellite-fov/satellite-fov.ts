@@ -28,7 +28,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ConeMesh } from '@app/engine/rendering/draw-manager/cone-mesh';
 import { buildSideMenuTabsHtml, initSideMenuTabs, updateSideMenuTabIndicator } from '@app/engine/ui/side-menu-tabs';
 import { html } from '@app/engine/utils/development/formatter';
-import { getEl } from '@app/engine/utils/get-el';
+import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { BaseObject, Degrees } from '@ootk/src/main';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import satelliteFovPng from '@public/img/icons/satellite-fov.png';
@@ -531,10 +531,10 @@ export class SatelliteFov extends KeepTrackPlugin {
       getEl('reset-sat-fov-cones-button')!.removeAttribute('disabled');
     }
 
-    getEl('sat-fov-active-cones')!.innerHTML = meshes
+    setInnerHtml('sat-fov-active-cones', meshes
       .sort((a, b) => a.obj.id - b.obj.id)
       .map((mesh) => SatelliteFov.renderEarthCenterConeRow_(mesh))
-      .join('');
+      .join(''));
 
     SatelliteFov.bindConeListEvents_(
       '#sat-fov-earth-center-tab .remove-sensor',
@@ -553,10 +553,10 @@ export class SatelliteFov extends KeepTrackPlugin {
       getEl('reset-sat-fov-s2s-cones-button')!.removeAttribute('disabled');
     }
 
-    getEl('sat-fov-s2s-active-cones')!.innerHTML = meshes
+    setInnerHtml('sat-fov-s2s-active-cones', meshes
       .sort((a, b) => a.obj.id - b.obj.id)
       .map((mesh) => SatelliteFov.renderSatToSatConeRow_(mesh))
-      .join('');
+      .join(''));
 
     SatelliteFov.bindConeListEvents_(
       '#sat-fov-s2s-tab .remove-s2s-sensor',

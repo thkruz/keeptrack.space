@@ -3,7 +3,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl } from '@app/engine/utils/get-el';
+import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { settingsManager } from '@app/settings/settings';
 import { Milliseconds } from '@ootk/src/main';
@@ -66,9 +66,9 @@ export class DateTimeManager extends KeepTrackPlugin {
     if (settingsManager.isUseJdayOnTopMenu) {
       const jday = ServiceLocator.getTimeManager().getUTCDayOfYear(ServiceLocator.getTimeManager().simulationTimeObj);
 
-      getEl('jday')!.innerHTML = jday.toString();
+      setInnerHtml('jday', jday.toString());
     } else {
-      getEl('jday')!.innerHTML = ServiceLocator.getTimeManager().simulationTimeObj.toLocaleDateString();
+      setInnerHtml('jday', ServiceLocator.getTimeManager().simulationTimeObj.toLocaleDateString());
     }
 
     const timeManagerInstance = ServiceLocator.getTimeManager();

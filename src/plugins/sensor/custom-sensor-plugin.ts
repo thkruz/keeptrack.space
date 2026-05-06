@@ -7,7 +7,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl, hideEl } from '@app/engine/utils/get-el';
+import { getEl, hideEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { slideInRight } from '@app/engine/utils/slide';
 import { triggerSubmit } from '@app/engine/utils/trigger-submit';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
@@ -435,7 +435,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       : [] as DetailedSensor[];
     const sensors = primarySensor.concat(ServiceLocator.getSensorManager().secondarySensors);
 
-    getEl('custom-sensors-sensor-list')!.innerHTML = sensors.map((sensor) => `
+    setInnerHtml('custom-sensors-sensor-list', sensors.map((sensor) => `
       <div class="row" style="height: 100%; display: flex; align-items: center; margin: 20px 0px;">
         <div class="col s10 m10 l10">
           <div><strong>${l('sensorName')}:</strong> ${sensor.uiName}</div>
@@ -451,7 +451,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         </div>
       </div>
       <div class="divider"></div>
-      `).join('');
+      `).join(''));
 
     document.querySelectorAll('.remove-sensor').forEach((el) => {
       el.addEventListener('click', (e) => {

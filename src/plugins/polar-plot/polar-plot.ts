@@ -1,5 +1,5 @@
 import { MenuMode } from '@app/engine/core/interfaces';
-import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { getEl, hideEl, setInnerHtml, showEl } from '@app/engine/utils/get-el';
 import polarPlotPng from '@public/img/icons/polar-plot.png';
 
 
@@ -157,7 +157,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
       showEl('polar-plot-warning');
       hideEl('polar-plot');
       hideEl('polar-plot-save');
-      getEl('polar-plot-warning')!.innerHTML = `Satellite is not in view for the next ${(this.plotDuration_ * 24).toFixed(0)} hours`;
+      setInnerHtml('polar-plot-warning', `Satellite is not in view for the next ${(this.plotDuration_ * 24).toFixed(0)} hours`);
     }
   }
 

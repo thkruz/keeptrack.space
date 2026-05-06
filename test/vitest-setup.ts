@@ -215,6 +215,15 @@ global.requestAnimationFrame = function requestAnimationFrame(cb) {
   return setTimeout(cb, 0);
 };
 
+// JSDOM does not implement requestIdleCallback; setInnerHtml() and other
+// production code rely on it. Polyfill via setTimeout so deferred work runs
+// on the next tick during tests.
+global.requestIdleCallback = ((cb: IdleRequestCallback) => setTimeout(() => cb({
+  didTimeout: false,
+  timeRemaining: () => 0,
+}), 0)) as unknown as typeof requestIdleCallback;
+global.cancelIdleCallback = ((handle: number) => clearTimeout(handle)) as unknown as typeof cancelIdleCallback;
+
 global.console = {
   error: console.error.bind(console),
   warn: console.warn.bind(console),

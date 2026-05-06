@@ -14,6 +14,7 @@
     "SpatialDensityColorScheme": { "label": "Densità spaziale" },
     "StarlinkColorScheme": { "label": "Starlink" },
     "SunlightColorScheme": { "label": "Stato luce solare" },
-    "VelocityColorScheme": { "label": "Velocità" }
+    "VelocityColorScheme": { "label": "Velocità" },
+    "VisualMagnitudeColorScheme": { "label": "Magnitudine visuale" }
   }
 }

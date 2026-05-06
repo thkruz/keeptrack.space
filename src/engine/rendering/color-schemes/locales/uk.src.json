@@ -14,6 +14,7 @@
     "SpatialDensityColorScheme": { "label": "Просторова щільність" },
     "StarlinkColorScheme": { "label": "Starlink" },
     "SunlightColorScheme": { "label": "Стан освітленості" },
-    "VelocityColorScheme": { "label": "Швидкість" }
+    "VelocityColorScheme": { "label": "Швидкість" },
+    "VisualMagnitudeColorScheme": { "label": "Видима зоряна величина" }
   }
 }

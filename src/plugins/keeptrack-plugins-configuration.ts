@@ -17,6 +17,7 @@ export type KeepTrackPluginsConfiguration = {
   Telemetry?: PluginConfiguration;
   SelectSatManager?: PluginConfiguration;
   StarsPlugin?: PluginConfiguration;
+  VmagDatabasePlugin?: PluginConfiguration;
   ScenarioManagementPlugin?: PluginConfiguration;
   ScenarioManagementMenu?: PluginConfiguration;
   TopMenu?: PluginConfiguration;

@@ -165,6 +165,12 @@ export class WebpackManager {
             },
           },
           {
+            // Bundle plain-text data files inline as strings (e.g. McCants vmag database)
+            test: /\.txt$/u,
+            include: [/src/u],
+            type: 'asset/source',
+          },
+          {
             test: /\.css$/iu,
             include: [/node_modules/u, /src/u, /public/u, /configs/u],
             use: ['style-loader', 'css-loader'],

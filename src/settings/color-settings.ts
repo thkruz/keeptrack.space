@@ -81,6 +81,9 @@ export class ColorSettings {
     CovarianceColorScheme: {
       enabled: true,
     },
+    VisualMagnitudeColorScheme: {
+      enabled: true,
+    },
   };
 
   /**

@@ -475,6 +475,9 @@ const settingsOverride = {
     DeepSpaceMissionsPlugin: {
       enabled: false,
     },
+    VmagDatabasePlugin: {
+      enabled: false,
+    },
   },
   dataSources: {
     tle: 'https://api.keeptrack.space/v4/sats',

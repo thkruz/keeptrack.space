@@ -86,4 +86,12 @@ export const defaultColorSettings = {
   notional: [1, 0, 0, 0.8] as rgbaArray,
   starlink: [0.0, 0.8, 0.0, 0.8] as rgbaArray,
   starlinkNot: [0.8, 0.0, 0.0, 0.8] as rgbaArray,
+  vmagBright: [0, 1.0, 0, 0.9] as rgbaArray,
+  vmagBright2: [0.6, 0.996, 0, 0.9] as rgbaArray,
+  vmagMed1: [0.8, 1.0, 0, 0.9] as rgbaArray,
+  vmagMed2: [1.0, 1.0, 0, 0.9] as rgbaArray,
+  vmagDim1: [1.0, 0.8, 0, 0.9] as rgbaArray,
+  vmagDim2: [1.0, 0.6, 0, 0.9] as rgbaArray,
+  vmagFaint: [1.0, 0, 0, 0.9] as rgbaArray,
+  vmagUnknown: [0.5, 0.5, 0.5, 0.6] as rgbaArray,
 };

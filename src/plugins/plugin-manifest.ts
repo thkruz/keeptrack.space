@@ -39,6 +39,12 @@ export const pluginManifest: PluginDescriptor[] = [
     proClassName: 'StarsPlugin',
     defaultConfig: { enabled: true },
   },
+  {
+    configKey: 'VmagDatabasePlugin',
+    proImport: __IS_PRO__ ? () => import('../plugins-pro/vmag-database/vmag-database-plugin') : undefined,
+    proClassName: 'VmagDatabasePlugin',
+    defaultConfig: { enabled: true },
+  },
 
   // ── Core UI ────────────────────────────────────────────────────────────────
   {

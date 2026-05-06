@@ -45,6 +45,14 @@ export class DataSettings {
     constellations: 'https://r2.keeptrack.space/data/constellations.json',
     covariance: 'https://r2.keeptrack.space/data/covariance.json',
     orgs: 'https://r2.keeptrack.space/data/orgs.json',
+    /**
+     * URL of the McCants-format visual magnitude database (used by the VmagDatabasePlugin
+     * to back-fill `sat.vmag` for satellites missing it from the primary TLE source).
+     *
+     * Empty by default — set this to enable the database. The file may be hosted on R2,
+     * served from `public/data/`, or anywhere reachable via fetch.
+     */
+    vmagDatabase: '',
     satDetail: 'https://api.keeptrack.space/v4/sat/',
     /** This determines if tle source is loaded to supplement externalTLEs  */
     isSupplementExternal: false,

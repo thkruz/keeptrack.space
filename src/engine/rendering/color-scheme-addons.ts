@@ -13,6 +13,7 @@ import { SpatialDensityColorScheme } from './color-schemes/spatial-density-color
 import { StarlinkColorScheme } from './color-schemes/starlink-color-scheme';
 import { SunlightColorScheme } from './color-schemes/sunlight-color-scheme';
 import { VelocityColorScheme } from './color-schemes/velocity-color-scheme';
+import { VisualMagnitudeColorScheme } from './color-schemes/visual-magnitude-color-scheme';
 
 export const addonColorSchemes = [
   ObjectTypeColorScheme,
@@ -30,4 +31,5 @@ export const addonColorSchemes = [
   VelocityColorScheme,
   StarlinkColorScheme,
   SmallSatColorScheme,
+  VisualMagnitudeColorScheme,
 ];

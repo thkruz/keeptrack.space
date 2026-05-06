@@ -6,6 +6,7 @@ import { DateTimeManager } from '../../plugins/date-time-manager/date-time-manag
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { KeyboardComponent } from '../plugins/components/keyboard/keyboard-component';
+import { errorManagerInstance } from '../utils/errorManager';
 import { getEl } from '../utils/get-el';
 import { PluginRegistry } from './plugin-registry';
 import { ServiceLocator } from './service-locator';
@@ -146,6 +147,11 @@ export class TimeManager {
   }
 
   changeStaticOffset(staticOffset: number) {
+    if (!Number.isFinite(staticOffset)) {
+      errorManagerInstance.warn(`changeStaticOffset received non-finite value: ${staticOffset}`);
+
+      return;
+    }
     this.dynamicOffsetEpoch = Date.now();
     this.staticOffset = staticOffset;
     this.calculateSimulationTime();
@@ -378,8 +384,15 @@ export class TimeManager {
 
   synchronize() {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const simDate = new Date(this.dynamicOffsetEpoch + this.staticOffset);
 
-    EventBus.getInstance().emit(EventBusEvent.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+    if (isNaN(simDate.getTime())) {
+      errorManagerInstance.warn(`synchronize() produced Invalid Date - epoch=${this.dynamicOffsetEpoch}, offset=${this.staticOffset}`);
+
+      return;
+    }
+
+    EventBus.getInstance().emit(EventBusEvent.updateDateTime, simDate);
 
     // eslint-disable-next-line no-sync
     catalogManagerInstance.satCruncherThread.sendTimeSync(this.staticOffset, this.dynamicOffsetEpoch, this.propRate);

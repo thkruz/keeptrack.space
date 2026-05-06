@@ -1180,6 +1180,11 @@ export class DotsManager {
   }
 
   interpolatePositionsOfOemSatellites() {
+    // Don't update positions until positionCruncher finishes its first loop and creates data in position and velocity data arrays
+    if (!this.positionData || !this.velocityData) {
+      return;
+    }
+
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const simTime = (ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000) as Seconds;
 

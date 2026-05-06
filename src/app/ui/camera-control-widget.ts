@@ -86,6 +86,7 @@ export class CameraControlWidget {
     this.canvas_.style.right = '10px';
     this.canvas_.style.zIndex = '100';
     this.canvas_.style.pointerEvents = 'none';
+    this.canvas_.style.display = settingsManager.drawCameraWidget ? 'block' : 'none';
     document.getElementById('canvas-holder')?.appendChild(this.canvas_);
 
     this.ctx_ = this.canvas_.getContext('2d');
@@ -449,10 +450,12 @@ export class CameraControlWidget {
 
   private draw_() {
     if (!settingsManager.drawCameraWidget || !this.ctx_) {
+      this.canvas_.style.display = 'none';
       this.canvas_.style.pointerEvents = 'none';
 
       return;
     }
+    this.canvas_.style.display = 'block';
     this.canvas_.style.pointerEvents = 'auto';
     this.ctx_.clearRect(0, 0, this.canvas_.width, this.canvas_.height);
 

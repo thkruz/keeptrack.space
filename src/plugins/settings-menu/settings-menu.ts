@@ -236,12 +236,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       drawCameraWidgetEl.checked = settingsManager.drawCameraWidget;
     }
 
-    const cameraControlWidgetEl = getEl('camera-control-widget');
-
-    if (cameraControlWidgetEl) {
-      cameraControlWidgetEl.style.display = settingsManager.drawCameraWidget ? 'block' : 'none';
-    }
-
     const settingsElements = [
       { id: 'settings-drawOrbits', setting: 'isDrawOrbits' },
       { id: 'settings-drawTrailingOrbits', setting: 'isDrawTrailingOrbits' },
@@ -366,15 +360,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.enableHoverOverlay = (<HTMLInputElement>getEl('settings-enableHoverOverlay')).checked;
     settingsManager.isFocusOnSatelliteWhenSelected = (<HTMLInputElement>getEl('settings-focusOnSatelliteWhenSelected')).checked;
     settingsManager.drawCameraWidget = (<HTMLInputElement>getEl('settings-drawCameraWidget')).checked;
-    const ccWidgetCanvas = getEl('camera-control-widget');
-
-    if (ccWidgetCanvas) {
-      if (settingsManager.drawCameraWidget) {
-        ccWidgetCanvas.style.display = 'block';
-      } else {
-        ccWidgetCanvas.style.display = 'none';
-      }
-    }
 
     const isDrawOrbitsChanged = settingsManager.isDrawOrbits !== (<HTMLInputElement>getEl('settings-drawOrbits')).checked;
 

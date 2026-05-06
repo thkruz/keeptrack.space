@@ -22,7 +22,7 @@
       },
       "entries": {
         "defaultCatalog": "Каталог за замовчуванням",
-        "celestrakOnly": "Тільки CelesTrack",
+        "celestrakOnly": "Тільки CelesTrak",
         "vimpelOnly": "Тільки JSC Вімпел",
         "last30days": "Запуски за останні 30 днів",
         "stations": "Космічні станції",
@@ -87,7 +87,7 @@
       "toasts": {
         "loaded": "{catalog} завантажено",
         "defaultLoaded": "Каталог за замовчуванням відновлено",
-        "celestrakLoaded": "Каталог CelesTrack завантажено",
+        "celestrakLoaded": "Каталог CelesTrak завантажено",
         "vimpelLoaded": "Каталог JSC Вімпел завантажено"
       },
       "commands": {
@@ -95,7 +95,11 @@
       },
       "errorMsgs": {
         "FetchFailed": "Не вдалося завантажити каталог",
-        "DefaultFailed": "Не вдалося відновити каталог за замовчуванням"
+        "DefaultFailed": "Не вдалося відновити каталог за замовчуванням",
+        "Forbidden": "CelesTrak rejected the request (HTTP 403). This is usually a Cloudflare rate-limit — wait a minute and try again.",
+        "RateLimited": "Too many catalog requests. Please wait a minute before trying again.",
+        "ServerError": "CelesTrak is temporarily unavailable. Please try again in a few minutes.",
+        "NetworkError": "Could not reach CelesTrak. Check your network connection."
       }
     }
   }

@@ -22,7 +22,7 @@
       },
       "entries": {
         "defaultCatalog": "Výchozí katalog",
-        "celestrakOnly": "Pouze CelesTrack",
+        "celestrakOnly": "Pouze CelesTrak",
         "vimpelOnly": "Pouze JSC Vimpel",
         "last30days": "Starty za posledních 30 dní",
         "stations": "Kosmické stanice",
@@ -87,7 +87,7 @@
       "toasts": {
         "loaded": "Načten {catalog}",
         "defaultLoaded": "Výchozí katalog obnoven",
-        "celestrakLoaded": "Katalog CelesTrack načten",
+        "celestrakLoaded": "Katalog CelesTrak načten",
         "vimpelLoaded": "Katalog JSC Vimpel načten"
       },
       "commands": {
@@ -95,7 +95,11 @@
       },
       "errorMsgs": {
         "FetchFailed": "Nepodařilo se načíst katalog",
-        "DefaultFailed": "Nepodařilo se obnovit výchozí katalog"
+        "DefaultFailed": "Nepodařilo se obnovit výchozí katalog",
+        "Forbidden": "CelesTrak rejected the request (HTTP 403). This is usually a Cloudflare rate-limit — wait a minute and try again.",
+        "RateLimited": "Too many catalog requests. Please wait a minute before trying again.",
+        "ServerError": "CelesTrak is temporarily unavailable. Please try again in a few minutes.",
+        "NetworkError": "Could not reach CelesTrak. Check your network connection."
       }
     }
   }

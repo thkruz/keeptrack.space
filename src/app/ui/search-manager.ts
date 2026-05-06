@@ -290,13 +290,6 @@ export class SearchManager {
       groupManagerInstance.clearSelect();
       this.isResultsOpen = false;
 
-      // Clear the current text in the search box and reset search results
-      const searchDom = <HTMLInputElement>getEl('search');
-
-      if (searchDom) {
-        searchDom.value = '';
-      }
-
       settingsManager.lastSearch = '';
       settingsManager.lastSearchResults = [];
       dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.objectCache.length);
@@ -846,6 +839,12 @@ export class SearchManager {
     getEl('search-holder')?.classList.add('search-slide-up');
     ServiceLocator.getUiManager().hideSideMenus();
     this.hideResults();
+
+    const searchDom = <HTMLInputElement>getEl('search');
+
+    if (searchDom) {
+      searchDom.value = '';
+    }
   }
 
   openSearch(isForce = false) {

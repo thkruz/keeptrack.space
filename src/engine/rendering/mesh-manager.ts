@@ -136,6 +136,9 @@ export class MeshManager {
    * Update mesh for a non-catalog body (e.g., deep-space satellite) using position and model name.
    */
   updateForBody(position: EciArr3, modelName: string): void {
+    if (!this.isReady) {
+      return;
+    }
     this.currentMeshObject.id = 0;
     this.currentMeshObject.inSun = 1;
     this.currentMeshObject.isRotationStable = false;

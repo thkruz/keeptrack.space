@@ -28,7 +28,7 @@ export const getEl = (id: string, isExpectedMissing = false): HTMLElement | null
 
 export const setInnerHtml = (id: string, html: string) => {
   requestIdleCallback(() => {
-    const el = getEl(id);
+    const el = getEl(id, true);
 
     if (!el) {
       errorManagerInstance.debug(`Element with id ${id} not found!`);

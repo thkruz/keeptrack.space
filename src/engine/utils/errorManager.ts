@@ -54,22 +54,41 @@ export class ErrorManager {
     return `[${LOG_LABELS[level]}] ${msg}`;
   }
 
+  private toError_(e: unknown): Error {
+    if (e instanceof Error) {
+      return e;
+    }
+    if (e === null || e === undefined) {
+      return new Error('Unknown error');
+    }
+    if (typeof e === 'string') {
+      return new Error(e);
+    }
+    try {
+      return new Error(JSON.stringify(e));
+    } catch {
+      return new Error(String(e));
+    }
+  }
+
   error(e: Error, funcName: string, toastMsg?: string): void {
     if (!this.shouldLog_(LogLevel.ERROR)) {
       return;
     }
 
-    EventBus.getInstance().emit(EventBusEvent.error, e, funcName);
+    const err = this.toError_(e);
+
+    EventBus.getInstance().emit(EventBusEvent.error, err, funcName);
 
     // eslint-disable-next-line no-console
-    console.error(this.formatMsg_(LogLevel.ERROR, `${funcName}: ${e.message}`), e);
+    console.error(this.formatMsg_(LogLevel.ERROR, `${funcName}: ${err.message}`), err);
     if (!isThisNode()) {
       // eslint-disable-next-line no-console
       console.trace();
     }
 
-    toastMsg ??= e.message || 'Unknown error';
-    const url = this.getErrorUrl_(e, funcName);
+    toastMsg ??= err.message || 'Unknown error';
+    const url = this.getErrorUrl_(err, funcName);
 
     // Max 1 error per 5 minutes
     if (url !== '' && Date.now() - this.lastErrorTime_ > 1000 * 60 * 5) {
@@ -80,7 +99,7 @@ export class ErrorManager {
     ServiceLocator.getUiManager()?.toast(toastMsg, ToastMsgType.error, true);
 
     if (isThisNode()) {
-      throw e;
+      throw err;
     }
   }
 

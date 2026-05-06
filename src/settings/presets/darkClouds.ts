@@ -118,9 +118,9 @@ export const darkClouds = (settingsManager: SettingsManager) => {
     if (i18next.language === 'zh') {
       // Chinese language uses a different format
       inYearString = `${yearPrefix}${yearStr}${t7e('darkClouds.in')}`;
-      getEl('textOverlay')!.innerHTML = `${inYearString}${satellitesSpan}${t7e('darkClouds.and')}${debrisSpan}`;
+      setInnerHtml('textOverlay', `${inYearString}${satellitesSpan}${t7e('darkClouds.and')}${debrisSpan}`);
     } else {
-      getEl('textOverlay')!.innerHTML = `${satellitesSpan} ${t7e('darkClouds.and')} ${debrisSpan} ${inYearString}`;
+      setInnerHtml('textOverlay', `${satellitesSpan} ${t7e('darkClouds.and')} ${debrisSpan} ${inYearString}`);
     }
 
     return `${inYearString}`;

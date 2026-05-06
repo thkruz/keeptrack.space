@@ -24,6 +24,11 @@ declare global {
   declare module '*.mp3';
   declare module '*.wav';
   declare module '*.flac';
+  declare module '*.txt' {
+    const content: string;
+
+    export default content;
+  }
   interface Window {
     settingsManager: SettingsManager;
     settingsOverride: any;

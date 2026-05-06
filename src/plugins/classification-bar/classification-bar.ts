@@ -36,11 +36,15 @@ export class ClassificationBar extends KeepTrackPlugin {
       this.updateTopMenuHeight_(true);
     }
 
-    getEl(this.textStringDomId)!.innerHTML = classificationString;
-
+    const textStringDom = getEl(this.textStringDomId);
     const classificationContainerDom = getEl(this.containerDomId);
 
-    classificationContainerDom!.style.fontWeight = '500';
+    if (!textStringDom || !classificationContainerDom) {
+      return;
+    }
+
+    textStringDom.innerHTML = classificationString;
+    classificationContainerDom.style.fontWeight = '500';
 
     if (Classification.isValidClassification(classificationString)) {
       const colors = Classification.getColors(classificationString);
@@ -49,8 +53,8 @@ export class ClassificationBar extends KeepTrackPlugin {
       color = colors.color;
     }
 
-    classificationContainerDom!.style.backgroundColor = backgroundColor;
-    classificationContainerDom!.style.color = color;
+    classificationContainerDom.style.backgroundColor = backgroundColor;
+    classificationContainerDom.style.color = color;
 
     this.classificationString_ = classificationString;
   }

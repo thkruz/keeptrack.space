@@ -5,7 +5,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { Degrees, Kilometers, ZoomValue } from '@ootk/src/main';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
-import { getEl } from '../../engine/utils/get-el';
+import { getEl, setInnerHtml } from '../../engine/utils/get-el';
 import { lat2pitch, lon2yaw } from '../../engine/utils/transforms';
 import { SensorManager } from '../sensors/sensorManager';
 
@@ -121,9 +121,9 @@ export class UiGeolocation {
       (<HTMLInputElement>getEl('cs-minrange')).value = '100';
       (<HTMLInputElement>getEl('cs-maxrange')).value = '50000';
 
-      getEl('sensor-type')!.innerHTML = 'Telescope';
-      getEl('sensor-info-title')!.innerHTML = 'Custom Sensor';
-      getEl('sensor-country')!.innerHTML = 'Custom Sensor';
+      setInnerHtml('sensor-type', 'Telescope');
+      setInnerHtml('sensor-info-title', 'Custom Sensor');
+      setInnerHtml('sensor-country', 'Custom Sensor');
     } catch {
       // Optional UI elements - don't throw an error if they don't exist
       errorManagerInstance.debug('Error updating custom sensor UI. Is the plugin loaded?');

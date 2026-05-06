@@ -59,6 +59,7 @@ import { SpatialDensityColorScheme } from './color-schemes/spatial-density-color
 import { StarlinkColorScheme } from './color-schemes/starlink-color-scheme';
 import { SunlightColorScheme } from './color-schemes/sunlight-color-scheme';
 import { VelocityColorScheme } from './color-schemes/velocity-color-scheme';
+import { VisualMagnitudeColorScheme } from './color-schemes/visual-magnitude-color-scheme';
 import { buildColorDataArrays } from './color-worker/color-data-builder';
 import { FilterState, SettingsFlags } from './color-worker/color-worker-messages';
 import { WebGLRenderer } from './webgl-renderer';
@@ -81,6 +82,7 @@ export class ColorSchemeManager {
     VelocityColorScheme: new VelocityColorScheme(),
     StarlinkColorScheme: new StarlinkColorScheme(),
     SmallSatColorScheme: new SmallSatColorScheme(),
+    VisualMagnitudeColorScheme: new VisualMagnitudeColorScheme(),
   };
   private readonly DOTS_PER_CALC = 350;
   private gl_: WebGL2RenderingContext;

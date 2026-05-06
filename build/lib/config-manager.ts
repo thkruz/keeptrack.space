@@ -85,6 +85,17 @@ export class ConfigManager {
         }
         this.config.isWatch = this.cliWatch_;
 
+        // Populate process.env so dotenv-webpack's systemvars picks up secrets that live
+        // in the root .env (e.g., KEEPTRACK_API_KEY) but aren't duplicated in profile.env.
+        // Load profile.env first so its values take precedence over root .env on conflicts;
+        // OS env wins over both because dotenv.config does not overwrite existing keys.
+        if (this.config.envFilePath !== '.env' && existsSync(this.config.envFilePath)) {
+          dotenv.config({ path: this.config.envFilePath });
+        }
+        if (existsSync('./.env')) {
+          dotenv.config({ path: './.env' });
+        }
+
         // process.env still wins (allows CI/CD overrides)
         this.applyProcessEnvOverrides_();
       } else {

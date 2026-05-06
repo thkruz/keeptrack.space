@@ -83,7 +83,7 @@ export const starTalk = (settingsManager: SettingsManager) => {
     const satellitesSpan = '<span style="color: rgb(35, 255, 35);">Satellites </span>';
     const debrisSpan = '<span style="color: rgb(102, 102, 102);">Debris </span>';
 
-    getEl('textOverlay')!.innerHTML = `${satellitesSpan} and ${debrisSpan} ${english}`;
+    setInnerHtml('textOverlay', `${satellitesSpan} and ${debrisSpan} ${english}`);
 
     return `${english}`;
   };

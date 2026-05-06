@@ -1,0 +1,47 @@
+/* Top-center non-blocking async indicator.
+ * Shown via showAsyncIndicator() / withAsyncIndicator() while any
+ * async action is in flight. Sits above modals, below tooltips. */
+
+#async-indicator {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 200ms ease, visibility 0s linear 200ms;
+}
+
+#async-indicator.async-indicator--active {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 200ms ease, visibility 0s linear 0s;
+}
+
+#async-indicator::before {
+  content: '';
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(255, 255, 255, 0.18);
+  border-top-color: var(--color-primary, #ba160c);
+  border-radius: 50%;
+  animation: async-indicator-spin 0.85s linear infinite;
+}
+
+@keyframes async-indicator-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

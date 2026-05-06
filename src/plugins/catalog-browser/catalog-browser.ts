@@ -15,6 +15,7 @@ import {
   IHelpConfig,
   ISideMenuConfig,
 } from '@app/engine/plugins/core/plugin-capabilities';
+import { hideAsyncIndicator, showAsyncIndicator } from '@app/engine/utils/asyncIndicator';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -184,6 +185,7 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
     }
 
     this.isLoading_ = true;
+    showAsyncIndicator();
     const uiManager = ServiceLocator.getUiManager();
 
     try {
@@ -232,6 +234,7 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
       );
     } finally {
       this.isLoading_ = false;
+      hideAsyncIndicator();
     }
   }
 
@@ -241,6 +244,7 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
     }
 
     this.isLoading_ = true;
+    showAsyncIndicator();
     const uiManager = ServiceLocator.getUiManager();
 
     try {
@@ -248,13 +252,16 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
       const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error(`CelesTrack returned HTTP ${response.status}`);
+        const err = new Error(`CelesTrak returned HTTP ${response.status}`) as Error & { status?: number };
+
+        err.status = response.status;
+        throw err;
       }
 
       const tleContent = await response.text();
 
       if (!tleContent.trim()) {
-        throw new Error('Empty response from CelesTrack');
+        throw new Error('Empty response from CelesTrak');
       }
 
       if (this.orbitalDataOnly_) {
@@ -274,13 +281,50 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
       );
     } catch (error) {
       errorManagerInstance.error(error, 'CatalogBrowserPlugin');
+      const { messageKey, toastType } = this.classifyFetchError_(error);
+
       uiManager.toast(
-        t7e('plugins.CatalogBrowserPlugin.errorMsgs.FetchFailed' as T7eKey),
-        ToastMsgType.critical,
+        t7e(messageKey),
+        toastType,
       );
     } finally {
       this.isLoading_ = false;
+      hideAsyncIndicator();
     }
+  }
+
+  private classifyFetchError_(error: unknown): { messageKey: T7eKey; toastType: ToastMsgType } {
+    const status = (error as { status?: number } | null)?.status;
+
+    if (status === 403) {
+      return {
+        messageKey: 'plugins.CatalogBrowserPlugin.errorMsgs.Forbidden' as T7eKey,
+        toastType: ToastMsgType.caution,
+      };
+    }
+    if (status === 429) {
+      return {
+        messageKey: 'plugins.CatalogBrowserPlugin.errorMsgs.RateLimited' as T7eKey,
+        toastType: ToastMsgType.caution,
+      };
+    }
+    if (typeof status === 'number' && status >= 500) {
+      return {
+        messageKey: 'plugins.CatalogBrowserPlugin.errorMsgs.ServerError' as T7eKey,
+        toastType: ToastMsgType.caution,
+      };
+    }
+    if (error instanceof TypeError) {
+      return {
+        messageKey: 'plugins.CatalogBrowserPlugin.errorMsgs.NetworkError' as T7eKey,
+        toastType: ToastMsgType.critical,
+      };
+    }
+
+    return {
+      messageKey: 'plugins.CatalogBrowserPlugin.errorMsgs.FetchFailed' as T7eKey,
+      toastType: ToastMsgType.critical,
+    };
   }
 
   /**

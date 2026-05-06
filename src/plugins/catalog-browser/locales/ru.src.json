@@ -22,7 +22,7 @@
       },
       "entries": {
         "defaultCatalog": "Каталог по умолчанию",
-        "celestrakOnly": "Только CelesTrack",
+        "celestrakOnly": "Только CelesTrak",
         "vimpelOnly": "Только JSC Вимпел",
         "last30days": "Запуски за последние 30 дней",
         "stations": "Космические станции",
@@ -87,7 +87,7 @@
       "toasts": {
         "loaded": "{catalog} загружен",
         "defaultLoaded": "Каталог по умолчанию восстановлен",
-        "celestrakLoaded": "Каталог CelesTrack загружен",
+        "celestrakLoaded": "Каталог CelesTrak загружен",
         "vimpelLoaded": "Каталог JSC Вимпел загружен"
       },
       "commands": {
@@ -95,7 +95,11 @@
       },
       "errorMsgs": {
         "FetchFailed": "Не удалось загрузить каталог",
-        "DefaultFailed": "Не удалось восстановить каталог по умолчанию"
+        "DefaultFailed": "Не удалось восстановить каталог по умолчанию",
+        "Forbidden": "CelesTrak rejected the request (HTTP 403). This is usually a Cloudflare rate-limit — wait a minute and try again.",
+        "RateLimited": "Too many catalog requests. Please wait a minute before trying again.",
+        "ServerError": "CelesTrak is temporarily unavailable. Please try again in a few minutes.",
+        "NetworkError": "Could not reach CelesTrak. Check your network connection."
       }
     }
   }

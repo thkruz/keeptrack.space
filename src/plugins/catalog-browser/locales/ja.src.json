@@ -22,7 +22,7 @@
       },
       "entries": {
         "defaultCatalog": "デフォルトカタログ",
-        "celestrakOnly": "CelesTrack のみ",
+        "celestrakOnly": "CelesTrak のみ",
         "vimpelOnly": "JSC Vimpel のみ",
         "last30days": "過去30日間の打ち上げ",
         "stations": "宇宙ステーション",
@@ -87,7 +87,7 @@
       "toasts": {
         "loaded": "{catalog}を読み込みました",
         "defaultLoaded": "デフォルトカタログを復元しました",
-        "celestrakLoaded": "CelesTrack カタログを読み込みました",
+        "celestrakLoaded": "CelesTrak カタログを読み込みました",
         "vimpelLoaded": "JSC Vimpel カタログを読み込みました"
       },
       "commands": {
@@ -95,7 +95,11 @@
       },
       "errorMsgs": {
         "FetchFailed": "カタログの取得に失敗",
-        "DefaultFailed": "デフォルトカタログの復元に失敗"
+        "DefaultFailed": "デフォルトカタログの復元に失敗",
+        "Forbidden": "CelesTrak rejected the request (HTTP 403). This is usually a Cloudflare rate-limit — wait a minute and try again.",
+        "RateLimited": "Too many catalog requests. Please wait a minute before trying again.",
+        "ServerError": "CelesTrak is temporarily unavailable. Please try again in a few minutes.",
+        "NetworkError": "Could not reach CelesTrak. Check your network connection."
       }
     }
   }

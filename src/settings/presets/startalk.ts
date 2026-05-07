@@ -58,12 +58,10 @@ export const starTalk = (settingsManager: SettingsManager) => {
   settingsManager.orbitGroupAlpha = 0.25; // Transparency of satellite orbits (transparency has no impact on load times)
 
   /*
-   * NOTE: Ideally you want each draw cycle to complete within 16ms. 10,000 creates enough lines to make it seem like "everything" to
-   * the average person while still keeping performance acceptable.
+   * NOTE: Ideally you want each draw cycle to complete within 16ms. Larger values
+   * draw more orbits but may regress frame time.
    */
-  settingsManager.maxOribtsDisplayedDesktopAll = 10000; // This applies when showing "all" orbits and improves performance substantially
-  settingsManager.maxOribtsDisplayedDesktop = 200000; // settingsManager applies when searching (ie time machine)
-  settingsManager.maxOribtsDisplayed = 100000;
+  settingsManager.maxOrbitsDisplayed = 200000;
   settingsManager.searchLimit = 100000;
   settingsManager.minZoomDistance = <Kilometers>10000;
   settingsManager.maxZoomDistance = <Kilometers>100000;

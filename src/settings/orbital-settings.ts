@@ -55,19 +55,11 @@ export class OrbitalSettings {
 
   // Orbit Limits
   /**
-   * @deprecated
-   * Maximum number of orbits to display when selecting "all" satellites
+   * Maximum number of orbit lines rendered simultaneously. Larger values
+   * are slower; mobile devices override this at startup via
+   * MobileManager.MOBILE_ORBIT_LIMIT.
    */
-  maxOribtsDisplayedDesktopAll = 1000;
-  maxOribtsDisplayed = 100000;
-  /**
-   * The maximum number of orbits to display on mobile devices.
-   */
-  maxOrbitsDisplayedMobile = 1500;
-  /**
-   * The maximum number of orbits to be displayed on desktop.
-   */
-  maxOribtsDisplayedDesktop = 100000;
+  maxOrbitsDisplayed = 100000;
 
   // Orbit Styling
   /**

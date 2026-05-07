@@ -9,6 +9,8 @@ import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl, hideEl } from '../../engine/utils/get-el';
 
 export class MobileManager {
+  static readonly MOBILE_ORBIT_LIMIT = 1500;
+
   // eslint-disable-next-line require-await
   static async checkMobileMode() {
     try {
@@ -19,7 +21,7 @@ export class MobileManager {
           settingsManager.disableWindowTouchMove = false;
           settingsManager.isShowLoadingHints = false;
           settingsManager.isDisableBottomMenu = false;
-          settingsManager.maxOribtsDisplayed = settingsManager.maxOrbitsDisplayedMobile;
+          settingsManager.maxOrbitsDisplayed = MobileManager.MOBILE_ORBIT_LIMIT;
           settingsManager.enableHoverOverlay = false;
           settingsManager.cameraMovementSpeed = settingsManager.touchCameraMovementSpeed;
           settingsManager.cameraMovementSpeedMin = settingsManager.touchCameraMovementSpeed;
@@ -140,7 +142,6 @@ export class MobileManager {
           settingsManager.minDistanceFromSatellite = <Kilometers>25;
           settingsManager.isLoadLastSensor = false;
         } else {
-          settingsManager.maxOribtsDisplayed = settingsManager.maxOribtsDisplayedDesktop;
           if (typeof settingsManager.enableHoverOverlay === 'undefined') {
             settingsManager.enableHoverOverlay = true;
           }

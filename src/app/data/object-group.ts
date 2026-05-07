@@ -48,35 +48,35 @@ export class ObjectGroup<T extends GroupType> {
           }
           // Stop when we hit the max number of orbits to display
 
-          return this.ids.length <= Math.min(settingsManager.maxOribtsDisplayed, settingsManager.maxOribtsDisplayedDesktopAll);
+          return this.ids.length <= settingsManager.maxOrbitsDisplayed;
         });
         break;
       case GroupType.YEAR:
         this.ids = CatalogSearch.year(ServiceLocator.getCatalogManager().getSats(), data as GroupData[GroupType.YEAR])
-          // .slice(0, settingsManager.maxOribtsDisplayed)
+          // .slice(0, settingsManager.maxOrbitsDisplayed)
           .filter((sat: Satellite) => typeof sat.id !== 'undefined' && !sat.isStatic())
           .map((sat: Satellite) => sat.id);
         break;
       case GroupType.YEAR_OR_LESS:
         this.ids = CatalogSearch.yearOrLess(ServiceLocator.getCatalogManager().getSats(), data as GroupData[GroupType.YEAR_OR_LESS])
-          // .slice(0, settingsManager.maxOribtsDisplayed)
+          // .slice(0, settingsManager.maxOrbitsDisplayed)
           .filter((sat: Satellite) => typeof sat.id !== 'undefined' && !sat.isStatic())
           .map((sat: Satellite) => sat.id);
         break;
       case GroupType.INTLDES:
         this.ids = (data as GroupData[GroupType.INTLDES])
-          // .slice(0, settingsManager.maxOribtsDisplayed)
+          // .slice(0, settingsManager.maxOrbitsDisplayed)
           .map((intlDes: string) => ServiceLocator.getCatalogManager().intlDes2id(intlDes))
           .filter((id: number | null): id is number => id !== null);
         break;
       case GroupType.NAME_REGEX:
         this.ids = CatalogSearch.objectName(objData, data as GroupData[GroupType.NAME_REGEX])
-          // .slice(0, settingsManager.maxOribtsDisplayed)
+          // .slice(0, settingsManager.maxOrbitsDisplayed)
           .map((obj: BaseObject) => obj.id);
         break;
       case GroupType.PAYLOAD_NAME_REGEX:
         this.ids = CatalogSearch.objectName(objData, data as GroupData[GroupType.PAYLOAD_NAME_REGEX])
-          // .slice(0, settingsManager.maxOribtsDisplayed)
+          // .slice(0, settingsManager.maxOrbitsDisplayed)
           .filter((obj: BaseObject) => obj.isPayload())
           .map((obj: BaseObject) => obj.id);
         break;
@@ -85,27 +85,27 @@ export class ObjectGroup<T extends GroupType> {
         break;
       case GroupType.COUNTRY_REGEX:
         this.ids = CatalogSearch.country(ServiceLocator.getCatalogManager().getSats(), data as GroupData[GroupType.COUNTRY_REGEX])
-          // .slice(0, settingsManager.maxOribtsDisplayed)
+          // .slice(0, settingsManager.maxOrbitsDisplayed)
           .map((obj: BaseObject) => obj.id);
         break;
       case GroupType.SHAPE_STRING:
         this.ids = CatalogSearch.shape(ServiceLocator.getCatalogManager().getSats(), data as GroupData[GroupType.SHAPE_STRING])
-          // .slice(0, settingsManager.maxOribtsDisplayed)
+          // .slice(0, settingsManager.maxOrbitsDisplayed)
           .map((sat: Satellite) => sat.id);
         break;
       case GroupType.BUS_STRING:
         this.ids = CatalogSearch.bus(ServiceLocator.getCatalogManager().getSats(), data as GroupData[GroupType.BUS_STRING])
-          // .slice(0, settingsManager.maxOribtsDisplayed)
+          // .slice(0, settingsManager.maxOrbitsDisplayed)
           .map((sat: Satellite) => sat.id);
         break;
       case GroupType.SCC_NUM:
         this.ids = (data as GroupData[GroupType.SCC_NUM])
-          // .slice(0, settingsManager.maxOribtsDisplayed)
+          // .slice(0, settingsManager.maxOrbitsDisplayed)
           .map((sccNum: number) => ServiceLocator.getCatalogManager().sccNum2Id(sccNum))
           .filter((id: number | null): id is number => id !== null);
         break;
       case GroupType.ID_LIST:
-        this.ids = (data as GroupData[GroupType.ID_LIST]).slice(0, settingsManager.maxOribtsDisplayed).map((id: number) => id);
+        this.ids = (data as GroupData[GroupType.ID_LIST]).slice(0, settingsManager.maxOrbitsDisplayed).map((id: number) => id);
         break;
       default:
         throw new Error('Unknown group type');
@@ -139,7 +139,7 @@ export class ObjectGroup<T extends GroupType> {
     data = `${data}|${expandedData.join('|')}`;
     this.ids = satData
       .filter((sat: Satellite) => data.split('|').includes(sat.country) && !sat.sccNum5.startsWith('T'))
-      // .slice(0, settingsManager.maxOribtsDisplayed)
+      // .slice(0, settingsManager.maxOrbitsDisplayed)
       // eslint-disable-next-line arrow-body-style
       .map((sat: Satellite) => {
         return sat.id;

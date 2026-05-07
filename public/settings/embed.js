@@ -23,7 +23,7 @@ const settingsOverride = {
   /*
    * enableHoverOrbits: false,            // Show orbits when mouse hovers over
    * startWithOrbitsDisplayed: true, // Start with orbits displayed
-   * maxOribtsDisplayedDesktopAll: 50000, // Maximum number of orbits to display
+   * maxOrbitsDisplayed: 50000,           // Maximum number of orbits to display
    */
   isDisableSensors: true,
   isDisableLaunchSites: true,

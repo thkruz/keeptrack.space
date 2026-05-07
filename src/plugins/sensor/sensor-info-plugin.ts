@@ -252,6 +252,10 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
     const firstSensor = ServiceLocator.getSensorManager().currentSensors[0];
 
+    if (!firstSensor) {
+      return;
+    }
+
     const sensorLatitudeElement = getEl('sensor-latitude');
     const sensorLongitudeElement = getEl('sensor-longitude');
     const sensorMinAzimuthElement = getEl('sensor-minazimuth');

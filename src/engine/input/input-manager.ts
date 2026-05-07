@@ -251,6 +251,7 @@ export class InputManager {
   public getSatIdFromCoord(x: number, y: number): number {
     const renderer = ServiceLocator.getRenderer();
     const dotsManagerInstance = ServiceLocator.getDotsManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const { gl } = renderer;
 
     // NOTE: gl.readPixels is a huge bottleneck but readPixelsAsync doesn't work properly on mobile
@@ -261,9 +262,17 @@ export class InputManager {
     if (!this.isAsyncWorking) {
       gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManagerInstance.pickReadPixelBuffer);
     }
-    // NOTE: const id = ((dotsManagerInstance.pickReadPixelBuffer[2] << 16) | (dotsManagerInstance.pickReadPixelBuffer[1] << 8) | dotsManagerInstance.pickReadPixelBuffer[0]) - 1;
 
-    return ((dotsManagerInstance.pickReadPixelBuffer[2] << 16) | (dotsManagerInstance.pickReadPixelBuffer[1] << 8) | dotsManagerInstance.pickReadPixelBuffer[0]) - 1;
+    const buf = dotsManagerInstance.pickReadPixelBuffer;
+    const id = ((buf[2] << 16) | (buf[1] << 8) | buf[0]) - 1;
+
+    // Async readback can leave pickReadPixelBuffer with stale or partially-written values,
+    // producing decoded ids well outside the catalog. Treat any out-of-range id as a miss.
+    if (id < 0 || id >= catalogManagerInstance.numObjects) {
+      return -1;
+    }
+
+    return id;
   }
 
   /**

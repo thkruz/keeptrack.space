@@ -107,6 +107,12 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       return;
     }
 
+    // updateSelectBox can fire before SatInfoBox.uiManagerFinal_ injects the section.
+    // EL.APOGEE is created in createOrbitalDataRows(), so its presence implies the section exists.
+    if (!getEl(EL.APOGEE, true)) {
+      return;
+    }
+
     if (obj instanceof Satellite) {
       setInnerHtml(EL.APOGEE, `${obj.apogee.toFixed(0)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
       setInnerHtml(EL.PERIGEE, `${obj.perigee.toFixed(0)} ${t7e('SatInfoBoxOrbital.kilometer')}`);

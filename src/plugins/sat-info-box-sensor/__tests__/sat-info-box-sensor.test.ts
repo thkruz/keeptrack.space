@@ -5,6 +5,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
+import * as isThisNodeModule from '@app/engine/utils/isThisNode';
 import { KeepTrack } from '@app/keeptrack';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SatInfoBoxSensor } from '@app/plugins/sat-info-box-sensor/sat-info-box-sensor';
@@ -35,6 +36,22 @@ describe('SatInfoBoxSensor', () => {
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager, SatInfoBox]);
     window.M.AutoInit = vi.fn();
+  });
+
+  it('does not throw when updateSelectBox fires before the sensor DOM is created', () => {
+    const plugin = new SatInfoBoxSensor();
+
+    plugin.init();
+    KeepTrack.getInstance().isInitialized = true;
+    // Simulate browser behavior: getEl returns null instead of throwing in test mode
+    const isThisNodeSpy = vi.spyOn(isThisNodeModule, 'isThisNode').mockReturnValue(false);
+
+    // Sanity: section element should not be in DOM yet
+    expect(getEl('sat-range', true)).toBeNull();
+
+    expect(() => EventBus.getInstance().emit(EventBusEvent.updateSelectBox, defaultSat)).not.toThrow();
+
+    isThisNodeSpy.mockRestore();
   });
 
   describe('Sun status field', () => {

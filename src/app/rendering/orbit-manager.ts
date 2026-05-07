@@ -674,7 +674,10 @@ export class OrbitManager {
       return;
     } // no hover object
     if (typeof this.glBuffers_[id] === 'undefined') {
-      throw new Error(`orbit buffer ${id} not allocated`);
+      // colorData is sized to numObjects but glBuffers_ is sized to missileSats,
+      // so an id can pass an upstream colorData check yet have no orbit buffer
+      // (e.g. FOV markers, or stale picking values). Skip rather than crash the render loop.
+      return;
     }
 
     const obj = ServiceLocator.getCatalogManager().getObject(id, GetSatType.EXTRA_ONLY);

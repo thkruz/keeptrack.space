@@ -105,7 +105,22 @@ export class GpAgeColorScheme extends ColorScheme {
       };
     }
 
+    if (!obj.isSatellite()) {
+      return {
+        color: this.colorTheme.transparent,
+        pickable: Pickable.No,
+      };
+    }
+
     const sat = obj as Satellite;
+
+    if (!sat.tle1 || sat.tle1.length < 32) {
+      return {
+        color: this.colorTheme.transparent,
+        pickable: Pickable.No,
+      };
+    }
+
     const epochYearShort = parseInt(sat.tle1.substring(18, 20), 10);
     const epochDay = parseFloat(sat.tle1.substring(20, 32));
 

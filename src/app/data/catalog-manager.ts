@@ -93,7 +93,6 @@ export class CatalogManager {
     marker: boolean;
     id: number;
   }[];
-  hoveringSat = -1;
   isLaunchSiteManagerLoaded = false;
   isSensorManagerLoaded = false;
   isStarManagerLoaded = false;

@@ -17,6 +17,7 @@ import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { RADIUS_OF_EARTH } from '../utils/constants';
 import { glsl } from '../utils/development/formatter';
+import { ensureVelocityVec3 } from '../utils/space-object-invariants';
 import { BufferAttribute } from './buffer-attribute';
 import { DepthManager } from './depth-manager';
 import { IDotsShaderProvider } from './dots-shader-provider';
@@ -828,15 +829,13 @@ export class DotsManager {
       return;
     }
 
-    /*
-     * Fix for https://github.com/thkruz/keeptrack.space/issues/834
-     * TODO: Remove this once we figure out why this is happening
-     */
+    // Guard for issue #834 — telemeters when prior velocity was structurally invalid.
+    const spaceObject = object as unknown as {
+      id?: number; name?: string; type?: number;
+      velocity: TemeVec3<KilometersPerSecond>; position: TemeVec3;
+    };
 
-    // Type assertion: only SpaceObject and its subclasses have velocity and position
-    const spaceObject = object as unknown as { velocity: TemeVec3<KilometersPerSecond>; position: TemeVec3 };
-
-    spaceObject.velocity = { x: 0, y: 0, z: 0 } as TemeVec3<KilometersPerSecond>;
+    ensureVelocityVec3(spaceObject, 'DotsManager.updatePosVel');
 
     const isChanged = spaceObject.velocity.x !== this.velocityData[i * 3] ||
       spaceObject.velocity.y !== this.velocityData[i * 3 + 1] ||

@@ -94,4 +94,24 @@ describe('code_snippet', () => {
     expect(getEl('sat-hoverbox')).toBeDefined();
     expect(getEl('sat-hoverbox')?.style.display).toBe('flex');
   });
+
+  // Regression test for v10.2.2 crash:
+  //   TypeError: Cannot read properties of undefined (reading 'type')
+  //   at HoverManager.setHover <- updateHover_ <- setHoverId
+  // setHover read .type on objectCache[i] without optional chaining; a stale id
+  // from the input pipeline pointing to an empty cache slot crashed the gameLoop.
+  it('does not throw when hover id points to an undefined catalog entry', () => {
+    hoverManager.init();
+    const orbitMgr = ServiceLocator.getOrbitManager();
+
+    ServiceLocator.getCatalogManager().objectCache = [];
+    settingsManager.enableHoverOrbits = true;
+    orbitMgr.setHoverOrbit = vi.fn();
+    orbitMgr.clearHoverOrbit = vi.fn();
+
+    expect(() => hoverManager.setHoverId(42)).not.toThrow();
+    expect(hoverManager.getHoverId()).toBe(42);
+    expect(orbitMgr.setHoverOrbit).not.toHaveBeenCalled();
+    expect(orbitMgr.clearHoverOrbit).toHaveBeenCalled();
+  });
 });

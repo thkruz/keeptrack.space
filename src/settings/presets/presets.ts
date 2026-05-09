@@ -255,8 +255,7 @@ export class SettingsPresets {
     settings.colors.rocketBody = [0.5, 0.5, 0.5, 1];
     settings.colors.unknown = [0.5, 0.5, 0.5, 1];
     settings.colors.pink = [0.5, 0.5, 0.5, 1];
-    settings.maxOribtsDisplayedDesktopAll = 100000;
-    settings.maxOribtsDisplayed = 100000;
+    settings.maxOrbitsDisplayed = 100000;
     settings.searchLimit = 100000;
     settings.onLoadCb = () => {
       const groupManagerInstance = ServiceLocator.getGroupsManager();

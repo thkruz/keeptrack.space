@@ -104,8 +104,16 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   sideMenuSettingsWidth: number = 350;
   downloadIconSrc = fileExcelPng;
   downloadIconCb = () => {
+    const lastArray = ServiceLocator.getSensorManager().lastMultiSiteArray;
+
+    if (lastArray.length === 0) {
+      ServiceLocator.getSoundManager()?.play(SoundNames.ERROR);
+
+      return;
+    }
+
     ServiceLocator.getSoundManager()?.play(SoundNames.EXPORT);
-    const exportData = ServiceLocator.getSensorManager().lastMultiSiteArray.map((look) => ({
+    const exportData = lastArray.map((look) => ({
       time: look.time,
       sensor: look.objName,
       az: look.az?.toFixed(2) ?? 'N/A',

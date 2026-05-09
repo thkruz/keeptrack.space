@@ -407,7 +407,9 @@ export class HoverManager {
 
     this.currentHoverId = id;
 
-    if (id !== -1 && catalogManagerInstance.objectCache[id]?.type !== SpaceObjectType.STAR) {
+    const obj = catalogManagerInstance.objectCache[id];
+
+    if (id !== -1 && obj && obj.type !== SpaceObjectType.STAR) {
       orbitManagerInstance.setHoverOrbit(id);
     } else {
       orbitManagerInstance.clearHoverOrbit();

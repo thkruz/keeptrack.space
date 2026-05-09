@@ -239,6 +239,12 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       return;
     }
 
+    // updateSelectBox can fire before SatInfoBox.uiManagerFinal_ injects the section.
+    // EL.RANGE is created in createSensorSection_(), so its presence implies the section exists.
+    if (!getEl(EL.RANGE, true)) {
+      return;
+    }
+
     try {
       const timeManagerInstance = ServiceLocator.getTimeManager();
       const sensorManagerInstance = ServiceLocator.getSensorManager();

@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v12.2.2](https://github.com/thkruz/keeptrack.space/compare/v12.2.1...v12.2.2)
+
+>  
+
+- refactor(hover-manager): :recycle: simplify hover id check logic [`#1317`](https://github.com/thkruz/keeptrack.space/issues/1317)
+- fix(camera): :bug: handle singular matrixWorldInverse case [`#1318`](https://github.com/thkruz/keeptrack.space/issues/1318)
+- fix(dots-manager): :bug: ensure valid velocity structure [`#834`](https://github.com/thkruz/keeptrack.space/issues/834)
+- chore(ootk): :wrench: update subproject commit to dirty state [`#1185`](https://github.com/thkruz/keeptrack.space/issues/1185)
+- test(dateTimeManager): :white_check_mark: add tests for DateTimeManager [`#1200`](https://github.com/thkruz/keeptrack.space/issues/1200)
+- fix(sensorManager): :bug: initialize lastMultiSiteArray to empty [`#1186`](https://github.com/thkruz/keeptrack.space/issues/1186)
+- fix(sensorInfoPlugin): :bug: handle missing first sensor case [`#1183`](https://github.com/thkruz/keeptrack.space/issues/1183)
+- test(color-schemes): :white_check_mark: add regression tests for missing tle1 [`8ce8461`](https://github.com/thkruz/keeptrack.space/commit/8ce8461da7b6ccf477804b7b8c699d0ce43be475)
+- fix(settings): :bug: correct typo in maxOrbitsDisplayed [`ab71c54`](https://github.com/thkruz/keeptrack.space/commit/ab71c5472a6f7d08eae3859750993917bda7faad)
+- test(orbitalSettings): :white_check_mark: add tests for maxOrbitsDisplayed [`b031bdd`](https://github.com/thkruz/keeptrack.space/commit/b031bdd61e3de1d5d74c8b584a9d2e957fac7a88)
+- fix(satInfoBoxSensor): :bug: handle updateSelectBox before DOM creation [`2e61b5e`](https://github.com/thkruz/keeptrack.space/commit/2e61b5e84dac4fd1e43d9ae6002684a0dde79cd5)
+- fix(color-schemes): :bug: guard against missing tle1 in GpAge and Confidence schemes [`8294c26`](https://github.com/thkruz/keeptrack.space/commit/8294c2615d30647c890c52349f965622701b9fae)
+- chore(deps): :wrench: update Dependabot config for daily checks [`3be63c2`](https://github.com/thkruz/keeptrack.space/commit/3be63c2164f1a7a38efecee7f447c544f618ec60)
+- test(hoverManager): :white_check_mark: add regression test for hover id crash [`b82c03c`](https://github.com/thkruz/keeptrack.space/commit/b82c03c1b9659fd8d74eeb50bb21bec1eb486b88)
+- fix(inputManager): :bug: handle out-of-range IDs in getSatIdFromCoord [`1f5c8da`](https://github.com/thkruz/keeptrack.space/commit/1f5c8da12d74a497379b3f9c0f22b0b1dbf64374)
+- chore: :wrench: update changelog for v12.2.1 release [`61f7465`](https://github.com/thkruz/keeptrack.space/commit/61f7465e6c13c98b88518a081a733d7005eb2724)
+- fix(orbitManager): :bug: skip rendering on undefined orbit buffer [`ffecb1e`](https://github.com/thkruz/keeptrack.space/commit/ffecb1ebd791738545faee8e9892924e9058001b)
+- chore(deps): :wrench: add labels to Dependabot config [`5abcf71`](https://github.com/thkruz/keeptrack.space/commit/5abcf71daa0042a47b9042101309cc10257a019a)
+- chore(deps-dev): :wrench: bump css-loader from 6.11.0 to 7.1.4 [`0c0c8ad`](https://github.com/thkruz/keeptrack.space/commit/0c0c8adb7d13efa67b138ef447cde5e1c584e614)
+- chore(plugins-pro): :wrench: update subproject commit hash [`eab81d0`](https://github.com/thkruz/keeptrack.space/commit/eab81d0f164f355245d33ea7478825fefe18abc9)
+- fix(data-settings): :bug: correct telemetry server URL [`6db41b0`](https://github.com/thkruz/keeptrack.space/commit/6db41b0fd1742d2c6eb3149caf93e8288b34c409)
+- chore(plugins-pro): :wrench: update subproject commit hash [`3463f4d`](https://github.com/thkruz/keeptrack.space/commit/3463f4da83f467060d50c67b34490a72d561d18c)
+- chore(deps): :wrench: remove semver-major cooldown days [`ad14b1d`](https://github.com/thkruz/keeptrack.space/commit/ad14b1d56f7ab813b95f8f5c89f613aa2222ca38)
+- chore(deps-dev): :wrench: bump @babel/plugin-transform-modules-systemjs from 7.25.9 to 7.29.4 [`20ba893`](https://github.com/thkruz/keeptrack.space/commit/20ba893f35b4eec621910962d1c5f01b3732ff99)
+- chore(deps-dev): :wrench: bump follow-redirects from 1.15.9 to 1.16.0 [`6ae7816`](https://github.com/thkruz/keeptrack.space/commit/6ae7816551e9d89f8e005d29cbb4e524d3611b4b)
+- chore(deps): :wrench: bump postcss from 8.5.6 to 8.5.14 [`727e13a`](https://github.com/thkruz/keeptrack.space/commit/727e13a06a903e6535fcf5911829a9396a6cf021)
+- chore(deps-dev): :wrench: bump fast-uri from 3.0.6 to 3.1.2 [`638138f`](https://github.com/thkruz/keeptrack.space/commit/638138fa3b1f6e8f0dd9f8c957555fe374bff374)
+
 #### [v12.2.1](https://github.com/thkruz/keeptrack.space/compare/v12.2.0...v12.2.1)
 
 >  

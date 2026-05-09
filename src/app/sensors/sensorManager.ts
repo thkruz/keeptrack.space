@@ -50,7 +50,7 @@ import { SensorInfoPlugin } from '../../plugins/sensor/sensor-info-plugin';
 import { sensorGroups } from '../data/catalogs/sensor-groups';
 
 export class SensorManager {
-  lastMultiSiteArray: TearrData[];
+  lastMultiSiteArray: TearrData[] = [];
   private resetTimeoutId_: ReturnType<typeof setTimeout> | null = null;
 
   // TODO: There is a better way to handle this.

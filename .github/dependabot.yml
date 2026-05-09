@@ -9,8 +9,15 @@ updates:
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
-      interval: 'weekly'
+      interval: 'daily'
     target-branch: 'develop'
+    labels: ['Dependencies']
+    commit-message:
+      prefix: 'chore(deps): :wrench:'
+      prefix-development: 'chore(deps-dev): :wrench:'
+    cooldown:
+      default-days: 3
+      semver-major-days: 7
     groups:
       minor-and-patch:
         update-types:
@@ -20,8 +27,13 @@ updates:
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
-      interval: 'weekly'
+      interval: 'daily'
     target-branch: 'develop'
+    labels: ['Dependencies']
+    commit-message:
+      prefix: 'chore(deps): :wrench:'
+    cooldown:
+      default-days: 3
     groups:
       actions-minor-and-patch:
         update-types:

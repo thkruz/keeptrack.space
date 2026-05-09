@@ -46,6 +46,13 @@ export class ConfidenceColorScheme extends ColorScheme {
     }
     const sat = obj as Satellite;
 
+    if (!sat.tle1 || sat.tle1.length < 65) {
+      return {
+        color: this.colorTheme.transparent,
+        pickable: Pickable.No,
+      };
+    }
+
     const confidenceScore = parseInt(sat.tle1.substring(64, 65)) || 0;
     let pickable: Pickable;
     let color: [number, number, number, number];

@@ -122,6 +122,7 @@ export class Camera {
      * Main source of projection matrix for rest of the application
      */
   projectionMatrix: mat4 = mat4.create();
+  private singularMatrixWarned_ = false;
   get matrixWorld(): mat4 {
     const out = mat4.create();
     const inverted = mat4.invert(out, this.matrixWorldInverse);
@@ -129,7 +130,12 @@ export class Camera {
     if (!inverted) {
       // matrixWorldInverse is singular (zero determinant); return identity so callers
       // reading [12]/[13]/[14] get a valid mat4 instead of null. See issue #1318.
-      errorManagerInstance.debug('Camera.matrixWorld: matrixWorldInverse is non-invertible, returning identity');
+      // Logged once per instance — getCamPos() reads this 3x/frame, so unguarded
+      // logging would emit ~180 messages/sec while the singular state persists.
+      if (!this.singularMatrixWarned_) {
+        this.singularMatrixWarned_ = true;
+        errorManagerInstance.debug('Camera.matrixWorld: matrixWorldInverse is non-invertible, returning identity');
+      }
 
       return mat4.identity(out);
     }

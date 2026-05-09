@@ -11,6 +11,7 @@ updates:
     schedule:
       interval: 'daily'
     target-branch: 'develop'
+    labels: ['Dependencies']
     commit-message:
       prefix: 'chore(deps): :wrench:'
       prefix-development: 'chore(deps-dev): :wrench:'
@@ -28,6 +29,7 @@ updates:
     schedule:
       interval: 'daily'
     target-branch: 'develop'
+    labels: ['Dependencies']
     commit-message:
       prefix: 'chore(deps): :wrench:'
     cooldown:

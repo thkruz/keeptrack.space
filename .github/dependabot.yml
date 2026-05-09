@@ -32,7 +32,6 @@ updates:
       prefix: 'chore(deps): :wrench:'
     cooldown:
       default-days: 3
-      semver-major-days: 7
     groups:
       actions-minor-and-patch:
         update-types:

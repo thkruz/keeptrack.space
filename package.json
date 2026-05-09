@@ -122,7 +122,7 @@
     "papaparse": "^5.4.1",
     "prettier-plugin-organize-imports": "^4.3.0",
     "source-map-loader": "^4.0.2",
-    "style-loader": "^3.3.4",
+    "style-loader": "^4.0.0",
     "ts-loader": "^9.4.4",
     "tsup": "^8.5.1",
     "tsx": "^4.19.0",

@@ -13,7 +13,24 @@ import { errorManagerInstance } from './errorManager';
  * warning when it actually fires on bad input — turning a silent recovery into actionable signal.
  */
 
+const MAX_REPORTED_KEYS = 256;
 const reportedKeys = new Set<string>();
+
+const markReported = (key: string): boolean => {
+  if (reportedKeys.has(key)) {
+    return false;
+  }
+  if (reportedKeys.size >= MAX_REPORTED_KEYS) {
+    const oldest = reportedKeys.values().next().value;
+
+    if (oldest !== undefined) {
+      reportedKeys.delete(oldest);
+    }
+  }
+  reportedKeys.add(key);
+
+  return true;
+};
 
 export const freshZeroVec3 = (): TemeVec3<KilometersPerSecond> =>
   ({ x: 0, y: 0, z: 0 }) as TemeVec3<KilometersPerSecond>;
@@ -53,8 +70,7 @@ export const ensureVelocityVec3 = (
     const id = target.id ?? 'unknown';
     const dedupKey = `${callsite}:${id}`;
 
-    if (!reportedKeys.has(dedupKey)) {
-      reportedKeys.add(dedupKey);
+    if (markReported(dedupKey)) {
       errorManagerInstance.warn(
         `Non-object velocity detected (issue #834). callsite=${callsite} id=${id} name=${target.name ?? '?'} type=${target.type ?? '?'} priorType=${typeof prior} priorValue=${summarize(prior)} version=${__VERSION__} buildDate=${__VERSION_DATE__}`,
       );

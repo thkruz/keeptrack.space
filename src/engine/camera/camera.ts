@@ -123,7 +123,18 @@ export class Camera {
      */
   projectionMatrix: mat4 = mat4.create();
   get matrixWorld(): mat4 {
-    return mat4.invert(mat4.create(), this.matrixWorldInverse)!;
+    const out = mat4.create();
+    const inverted = mat4.invert(out, this.matrixWorldInverse);
+
+    if (!inverted) {
+      // matrixWorldInverse is singular (zero determinant); return identity so callers
+      // reading [12]/[13]/[14] get a valid mat4 instead of null. See issue #1318.
+      errorManagerInstance.debug('Camera.matrixWorld: matrixWorldInverse is non-invertible, returning identity');
+
+      return mat4.identity(out);
+    }
+
+    return inverted;
   }
   matrixWorldInverse = mat4.create();
   cameraType: CameraType = CameraType.FIXED_TO_EARTH;

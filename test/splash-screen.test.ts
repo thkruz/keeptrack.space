@@ -6,16 +6,20 @@ import { SplashScreen } from '@app/app/ui/splash-screen';
 import { KeepTrack } from '@app/keeptrack';
 
 describe('SplashScreen_class', () => {
+  let previousContainerRoot: HTMLDivElement;
+
   beforeEach(() => {
     // getEl() resolves via document.getElementById, which does not pierce
     // shadow roots, so the splash screen must be attached to the live document.
     document.body.innerHTML = '';
+    previousContainerRoot = KeepTrack.getInstance().containerRoot;
     KeepTrack.getInstance().containerRoot = document.body as unknown as HTMLDivElement;
     SplashScreen.initLoadingScreen(document.body);
   });
 
   afterEach(() => {
     document.body.innerHTML = '';
+    KeepTrack.getInstance().containerRoot = previousContainerRoot;
   });
 
   // Tests that the loading screen is hidden immediately when running on mobile

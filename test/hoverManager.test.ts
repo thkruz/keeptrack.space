@@ -102,10 +102,16 @@ describe('code_snippet', () => {
   // from the input pipeline pointing to an empty cache slot crashed the gameLoop.
   it('does not throw when hover id points to an undefined catalog entry', () => {
     hoverManager.init();
-    catalogManagerInstance.objectCache = [];
+    const orbitMgr = ServiceLocator.getOrbitManager();
+
+    ServiceLocator.getCatalogManager().objectCache = [];
     settingsManager.enableHoverOrbits = true;
+    orbitMgr.setHoverOrbit = vi.fn();
+    orbitMgr.clearHoverOrbit = vi.fn();
 
     expect(() => hoverManager.setHoverId(42)).not.toThrow();
     expect(hoverManager.getHoverId()).toBe(42);
+    expect(orbitMgr.setHoverOrbit).not.toHaveBeenCalled();
+    expect(orbitMgr.clearHoverOrbit).toHaveBeenCalled();
   });
 });

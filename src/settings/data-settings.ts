@@ -60,7 +60,7 @@ export class DataSettings {
 
   // Servers
   apiServer = 'https://api.keeptrack.space';
-  telemetryServer = 'https://telemetry.keeptrack.space';
+  telemetryServer = 'https://telemetry.keeptrack.space/api/telemetry';
   userServer = 'https://user.keeptrack.space';
 
   /**

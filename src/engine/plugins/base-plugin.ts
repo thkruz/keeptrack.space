@@ -1140,9 +1140,11 @@ export abstract class KeepTrackPlugin {
         if (isDisabled) {
           button.classList.add('bmenu-item-disabled');
         }
-        if (this.isLoginRequired && !settingsManager.isDisableLoginGate) {
-          button.classList.add('bmenu-item-pro');
+        if (this.isLoginRequired) {
           button.setAttribute('data-pro-gated', '');
+          if (!settingsManager.isDisableLoginGate) {
+            button.classList.add('bmenu-item-pro');
+          }
         }
 
         button.innerHTML = `
@@ -1186,9 +1188,11 @@ export abstract class KeepTrackPlugin {
         if (isDisabled) {
           item.classList.add('bmenu-item-disabled');
         }
-        if (this.isLoginRequired && !settingsManager.isDisableLoginGate) {
-          item.classList.add('bmenu-item-pro');
+        if (this.isLoginRequired) {
           item.setAttribute('data-pro-gated', '');
+          if (!settingsManager.isDisableLoginGate) {
+            item.classList.add('bmenu-item-pro');
+          }
         }
 
         item.innerHTML = `

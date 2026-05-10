@@ -829,6 +829,14 @@ export class DotsManager {
       return;
     }
 
+    // positionData/velocityData only cover satellites and missiles. Static objects (stars,
+    // ground objects, sensors, etc.) live past the end of the array — skip them so we don't
+    // write garbage zeros and don't trip the #834 invariant on a `velocity` that is legitimately
+    // undefined for non-orbiting objects.
+    if (i < 0 || i * 3 + 2 >= this.velocityData.length) {
+      return;
+    }
+
     // Guard for issue #834 — telemeters when prior velocity was structurally invalid.
     const spaceObject = object as unknown as {
       id?: number; name?: string; type?: number;

@@ -55,7 +55,7 @@ const summarize = (value: unknown): string => {
  * Guarantees `target.velocity` is a `{x, y, z}` object before any component is written to.
  *
  * If `target.velocity` was structurally invalid (anything other than a non-null object), it is
- * replaced with a fresh zero Vec3 and a single warning is reported per (callsite, id) — so
+ * replaced with a fresh zero Vec3 and a single debug message is reported per (callsite, id) — so
  * repeated calls on the same offending object don't spam telemetry.
  *
  * @returns the velocity Vec3, which is now guaranteed safe to mutate.
@@ -71,7 +71,7 @@ export const ensureVelocityVec3 = (
     const dedupKey = `${callsite}:${id}`;
 
     if (markReported(dedupKey)) {
-      errorManagerInstance.warn(
+      errorManagerInstance.debug(
         `Non-object velocity detected (issue #834). callsite=${callsite} id=${id} name=${target.name ?? '?'} type=${target.type ?? '?'} priorType=${typeof prior} priorValue=${summarize(prior)} version=${__VERSION__} buildDate=${__VERSION_DATE__}`,
       );
     }

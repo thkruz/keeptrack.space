@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v12.2.3](https://github.com/thkruz/keeptrack.space/compare/v12.2.2...v12.2.3)
+
+>  
+
+- chore: :wrench: update changelog for v12.2.2 release [`e58ca98`](https://github.com/thkruz/keeptrack.space/commit/e58ca98f9aaf44ccca1b18732fbc342cfeef06c7)
+- refactor(velocity): :recycle: improve reporting for non-object velocity [`33c7dd2`](https://github.com/thkruz/keeptrack.space/commit/33c7dd295be08bb8f27088908e64245baa7d2892)
+- fix(dots-manager): :bug: guard against invalid velocity data access [`12ec921`](https://github.com/thkruz/keeptrack.space/commit/12ec921d78fe01eb395406a72ac857028b081725)
+- fix(camera): :bug: log singular matrix warning once per instance [`474b40f`](https://github.com/thkruz/keeptrack.space/commit/474b40faa6fec40a3858703554df6e927a7c35e6)
+- test: :white_check_mark: refactor setup for splash screen tests [`e82f3d0`](https://github.com/thkruz/keeptrack.space/commit/e82f3d00d1c5d36dbfb0b0d99ba1b83bf4d137b7)
+- chore(plugins-pro): :wrench: update subproject commit reference [`ae2ea4d`](https://github.com/thkruz/keeptrack.space/commit/ae2ea4d1787728dff4beaa3c83c7b35ecb161b06)
+- chore(plugins-pro): :wrench: update subproject commit reference [`20989d1`](https://github.com/thkruz/keeptrack.space/commit/20989d1c96e76b9650e50cd464bcffc609d0386c)
+
 #### [v12.2.2](https://github.com/thkruz/keeptrack.space/compare/v12.2.1...v12.2.2)
 
 >  

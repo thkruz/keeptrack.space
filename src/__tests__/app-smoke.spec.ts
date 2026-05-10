@@ -1,14 +1,8 @@
 import { expect, test } from '@playwright/test';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { expectCleanBoot, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('App smoke tests', () => {
   test('app loads and becomes ready', async ({ page }) => {
-    const errors: string[] = [];
-
-    page.on('pageerror', (err) => {
-      errors.push(err.message);
-    });
-
     await waitForAppReady(page);
 
     // Loading screen should be gone
@@ -20,8 +14,14 @@ test.describe('App smoke tests', () => {
 
     expect(isReady).toBe(true);
 
-    // No uncaught JS errors during startup
-    expect(errors).toHaveLength(0);
+    // Catches console.warn / console.error / pageerror against the
+    // allowlist in test/e2e/console-listener.ts.
+    expectCleanBoot(page);
+  });
+
+  test('app boots without console warnings or errors', async ({ page }) => {
+    await waitForAppReady(page);
+    expectCleanBoot(page);
   });
 
   test('canvas exists with non-zero dimensions', async ({ page }) => {

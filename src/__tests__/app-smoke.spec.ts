@@ -77,7 +77,9 @@ test.describe('App smoke tests', () => {
       plugins: { FilterMenuPlugin: { enabled: true } },
     });
 
-    const drawerItem = page.locator('.drawer-item[data-plugin-id="filter-menu-icon"]');
+    // Use .first() — clicking the item adds a duplicate to the "Recents" group,
+    // so a bare locator becomes ambiguous on the second click.
+    const drawerItem = page.locator('.drawer-item[data-plugin-id="filter-menu-icon"]').first();
 
     await expect(drawerItem).toBeVisible({ timeout: 5_000 });
 
@@ -88,9 +90,11 @@ test.describe('App smoke tests', () => {
 
     await expect(sideMenu).toBeVisible({ timeout: 5_000 });
 
-    // Close — clicking the same drawer item again toggles the side menu off
+    // Close — clicking the same drawer item again slides the side menu off-screen.
+    // The close animation uses translateX(-120%); the element stays in the DOM with
+    // display: block, so check viewport intersection rather than visibility.
     await drawerItem.click();
-    await expect(sideMenu).toBeHidden({ timeout: 5_000 });
+    await expect(sideMenu).not.toBeInViewport({ timeout: 5_000 });
   });
 
   test('time display is visible', async ({ page }) => {

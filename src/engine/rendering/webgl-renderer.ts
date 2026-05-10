@@ -32,6 +32,9 @@ export class WebGLRenderer {
   private satLabelModeLastTime_ = 0;
   private settings_: SettingsManager;
   isContextLost = false;
+  private isResizePendingAfterContextRestore_ = false;
+  private contextLostRecoveryTimeoutId_: number | null = null;
+  private static readonly CONTEXT_LOST_RECOVERY_TIMEOUT_MS = 5000;
 
   /** A canvas where the renderer draws its output. */
   domElement: HTMLCanvasElement;
@@ -74,6 +77,12 @@ export class WebGLRenderer {
 
   updatePMatrix(): void {
     if (!this.gl) {
+      return;
+    }
+
+    // Skip projection matrix recalculation while the context is lost — drawingBufferWidth/Height read 0,
+    // producing a NaN aspect ratio that propagates into the matrix and floods logs every frame.
+    if (this.isContextLost || this.gl.isContextLost?.()) {
       return;
     }
 
@@ -122,12 +131,42 @@ export class WebGLRenderer {
     e.preventDefault(); // allows the context to be restored
     errorManagerInstance.info('WebGL Context Lost');
     this.isContextLost = true;
+
+    // The browser owns context restoration — there's no API to force it. If `webglcontextrestored`
+    // never fires, surface a one-shot prompt so the user knows a refresh is the only path forward.
+    if (this.contextLostRecoveryTimeoutId_ !== null) {
+      window.clearTimeout(this.contextLostRecoveryTimeoutId_);
+    }
+    this.contextLostRecoveryTimeoutId_ = window.setTimeout(() => {
+      this.contextLostRecoveryTimeoutId_ = null;
+      if (this.isContextLost) {
+        // Emit the error event directly so telemetry's sendErrorData_ fires (warn() only toasts).
+        // We avoid errorManagerInstance.error() because it auto-opens a GitHub issue URL, which is
+        // too invasive for a "please refresh" prompt triggered by a GPU/driver event.
+        EventBus.getInstance().emit(
+          EventBusEvent.error,
+          new Error('WebGL context lost — refresh the page to recover.'),
+          'WebGLRenderer.onContextLost_',
+        );
+        errorManagerInstance.warn('WebGL context lost — refresh the page to recover.');
+      }
+    }, WebGLRenderer.CONTEXT_LOST_RECOVERY_TIMEOUT_MS);
   }
 
   private onContextRestore_() {
     errorManagerInstance.info('WebGL Context Restored');
     this.resetGLState_();
     this.isContextLost = false;
+
+    if (this.contextLostRecoveryTimeoutId_ !== null) {
+      window.clearTimeout(this.contextLostRecoveryTimeoutId_);
+      this.contextLostRecoveryTimeoutId_ = null;
+    }
+
+    if (this.isResizePendingAfterContextRestore_) {
+      this.isResizePendingAfterContextRestore_ = false;
+      this.resizeCanvas();
+    }
   }
 
   // eslint-disable-next-line require-await
@@ -522,6 +561,13 @@ export class WebGLRenderer {
   resizeCanvas(isForcedResize = false) {
     const gl = this.gl;
 
+    // Skip GPU resource (re)creation while the WebGL context is lost; replay once it's restored.
+    if (this.isContextLost || gl?.isContextLost?.()) {
+      this.isResizePendingAfterContextRestore_ = true;
+
+      return;
+    }
+
     if (!gl.canvas) {
       // We lost the canvas - try to get it again
       this.glInit();
@@ -779,6 +825,12 @@ export class WebGLRenderer {
   }
 
   private validateProjectionMatrix_() {
+    // No valid projection matrix is possible while the context is lost; suppress checks/retries
+    // until the restore handler replays resizeCanvas and rebuilds the matrix.
+    if (this.isContextLost || this.gl?.isContextLost?.()) {
+      return;
+    }
+
     const mainCamera = ServiceLocator.getMainCamera();
     const projectionMatrix = mainCamera.projectionMatrix;
 

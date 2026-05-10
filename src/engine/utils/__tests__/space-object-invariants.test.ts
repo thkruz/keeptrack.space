@@ -15,18 +15,18 @@ type MutableTarget = {
 };
 
 describe('ensureVelocityVec3', () => {
-  let warnSpy: ReturnType<typeof vi.spyOn>;
+  let debugSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     _resetVelocityInvariantReportingForTests();
-    warnSpy = vi.spyOn(errorManagerInstance, 'warn').mockImplementation(() => { /* silence */ });
+    debugSpy = vi.spyOn(errorManagerInstance, 'debug').mockImplementation(() => { /* silence */ });
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('preserves a valid Vec3 and does not warn', () => {
+  it('preserves a valid Vec3 and does not report', () => {
     const target: MutableTarget = {
       id: 1,
       velocity: { x: 1, y: 2, z: 3 } as TemeVec3<KilometersPerSecond>,
@@ -36,18 +36,18 @@ describe('ensureVelocityVec3', () => {
 
     expect(out).toBe(target.velocity);
     expect(target.velocity).toEqual({ x: 1, y: 2, z: 3 });
-    expect(warnSpy).not.toHaveBeenCalled();
+    expect(debugSpy).not.toHaveBeenCalled();
   });
 
-  it('replaces a scalar 0 with a fresh zero Vec3 and warns once', () => {
+  it('replaces a scalar 0 with a fresh zero Vec3 and reports once', () => {
     const target = { id: 42, name: 'BadSat', type: 1, velocity: 0 as unknown as TemeVec3<KilometersPerSecond> };
 
     const out = ensureVelocityVec3(target as MutableTarget, 'test');
 
     expect(out).toEqual({ x: 0, y: 0, z: 0 });
     expect(target.velocity).toBe(out);
-    expect(warnSpy).toHaveBeenCalledTimes(1);
-    const msg = warnSpy.mock.calls[0][0] as string;
+    expect(debugSpy).toHaveBeenCalledTimes(1);
+    const msg = debugSpy.mock.calls[0][0] as string;
 
     expect(msg).toContain('callsite=test');
     expect(msg).toContain('id=42');
@@ -61,17 +61,17 @@ describe('ensureVelocityVec3', () => {
     ensureVelocityVec3(target as MutableTarget, 'test');
 
     expect(target.velocity).toEqual({ x: 0, y: 0, z: 0 });
-    expect(warnSpy).toHaveBeenCalledTimes(1);
-    expect(warnSpy.mock.calls[0][0]).toContain('priorValue=null');
+    expect(debugSpy).toHaveBeenCalledTimes(1);
+    expect(debugSpy.mock.calls[0][0]).toContain('priorValue=null');
   });
 
-  it('replaces undefined velocity and warns', () => {
+  it('replaces undefined velocity and reports', () => {
     const target = { id: 8, velocity: undefined as unknown as TemeVec3<KilometersPerSecond> };
 
     ensureVelocityVec3(target as MutableTarget, 'test');
 
     expect(target.velocity).toEqual({ x: 0, y: 0, z: 0 });
-    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(debugSpy).toHaveBeenCalledTimes(1);
   });
 
   it('dedups repeated bad calls for the same (callsite, id)', () => {
@@ -83,7 +83,7 @@ describe('ensureVelocityVec3', () => {
     target.velocity = 0 as unknown as TemeVec3<KilometersPerSecond>;
     ensureVelocityVec3(target as MutableTarget, 'test');
 
-    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(debugSpy).toHaveBeenCalledTimes(1);
   });
 
   it('reports separately for the same id from a different callsite', () => {
@@ -93,7 +93,7 @@ describe('ensureVelocityVec3', () => {
     ensureVelocityVec3(a as MutableTarget, 'callsite-a');
     ensureVelocityVec3(b as MutableTarget, 'callsite-b');
 
-    expect(warnSpy).toHaveBeenCalledTimes(2);
+    expect(debugSpy).toHaveBeenCalledTimes(2);
   });
 
   it('reports separately for different ids from the same callsite', () => {
@@ -103,7 +103,7 @@ describe('ensureVelocityVec3', () => {
     ensureVelocityVec3(a as MutableTarget, 'test');
     ensureVelocityVec3(b as MutableTarget, 'test');
 
-    expect(warnSpy).toHaveBeenCalledTimes(2);
+    expect(debugSpy).toHaveBeenCalledTimes(2);
   });
 
   it('uses "unknown" as the dedup id when target has no id', () => {
@@ -113,9 +113,9 @@ describe('ensureVelocityVec3', () => {
     ensureVelocityVec3(a as MutableTarget, 'test');
     ensureVelocityVec3(b as MutableTarget, 'test');
 
-    // Both dedup under callsite=test, id=unknown — only one warn.
-    expect(warnSpy).toHaveBeenCalledTimes(1);
-    expect(warnSpy.mock.calls[0][0]).toContain('id=unknown');
+    // Both dedup under callsite=test, id=unknown — only one report.
+    expect(debugSpy).toHaveBeenCalledTimes(1);
+    expect(debugSpy.mock.calls[0][0]).toContain('id=unknown');
   });
 });
 

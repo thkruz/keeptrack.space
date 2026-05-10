@@ -829,32 +829,37 @@ export class DotsManager {
       return;
     }
 
-    // Guard for issue #834 — telemeters when prior velocity was structurally invalid.
     const spaceObject = object as unknown as {
       id?: number; name?: string; type?: number;
       velocity: TemeVec3<KilometersPerSecond>; position: TemeVec3;
     };
 
-    ensureVelocityVec3(spaceObject, 'DotsManager.updatePosVel');
+    // Static objects (stars, ground objects, sensors) carry a cruncher-computed position but
+    // no velocity — their satVel slots stay zero and they have no `velocity` member to mutate.
+    // Skip the velocity work for them; still write position so hover/info paths can read it.
+    if (!object.isStatic()) {
+      // Guard for issue #834 — telemeters when prior velocity was structurally invalid.
+      ensureVelocityVec3(spaceObject, 'DotsManager.updatePosVel');
 
-    const isChanged = spaceObject.velocity.x !== this.velocityData[i * 3] ||
-      spaceObject.velocity.y !== this.velocityData[i * 3 + 1] ||
-      spaceObject.velocity.z !== this.velocityData[i * 3 + 2];
+      const isChanged = spaceObject.velocity.x !== this.velocityData[i * 3] ||
+        spaceObject.velocity.y !== this.velocityData[i * 3 + 1] ||
+        spaceObject.velocity.z !== this.velocityData[i * 3 + 2];
 
-    spaceObject.velocity.x = (this.velocityData[i * 3] as KilometersPerSecond) || (0 as KilometersPerSecond);
-    spaceObject.velocity.y = (this.velocityData[i * 3 + 1] as KilometersPerSecond) || (0 as KilometersPerSecond);
-    spaceObject.velocity.z = (this.velocityData[i * 3 + 2] as KilometersPerSecond) || (0 as KilometersPerSecond);
+      spaceObject.velocity.x = (this.velocityData[i * 3] as KilometersPerSecond) || (0 as KilometersPerSecond);
+      spaceObject.velocity.y = (this.velocityData[i * 3 + 1] as KilometersPerSecond) || (0 as KilometersPerSecond);
+      spaceObject.velocity.z = (this.velocityData[i * 3 + 2] as KilometersPerSecond) || (0 as KilometersPerSecond);
 
-    // Missiles have their own mutable totalVelocity that needs smoothing
-    // Other SpaceObjects use a computed getter that auto-calculates from velocity
-    if (object.type === SpaceObjectType.BALLISTIC_MISSILE) {
-      const missile = object as MissileObject;
-      const newVel = Math.sqrt(missile.velocity.x ** 2 + missile.velocity.y ** 2 + missile.velocity.z ** 2);
+      // Missiles have their own mutable totalVelocity that needs smoothing
+      // Other SpaceObjects use a computed getter that auto-calculates from velocity
+      if (object.type === SpaceObjectType.BALLISTIC_MISSILE) {
+        const missile = object as MissileObject;
+        const newVel = Math.sqrt(missile.velocity.x ** 2 + missile.velocity.y ** 2 + missile.velocity.z ** 2);
 
-      if (missile.totalVelocity === 0) {
-        missile.totalVelocity = newVel;
-      } else if (isChanged) {
-        missile.totalVelocity = missile.totalVelocity * 0.9 + newVel * 0.1;
+        if (missile.totalVelocity === 0) {
+          missile.totalVelocity = newVel;
+        } else if (isChanged) {
+          missile.totalVelocity = missile.totalVelocity * 0.9 + newVel * 0.1;
+        }
       }
     }
 

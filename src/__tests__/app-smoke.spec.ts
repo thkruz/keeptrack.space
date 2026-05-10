@@ -1,14 +1,8 @@
 import { expect, test } from '@playwright/test';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { expectCleanBoot, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('App smoke tests', () => {
   test('app loads and becomes ready', async ({ page }) => {
-    const errors: string[] = [];
-
-    page.on('pageerror', (err) => {
-      errors.push(err.message);
-    });
-
     await waitForAppReady(page);
 
     // Loading screen should be gone
@@ -20,8 +14,14 @@ test.describe('App smoke tests', () => {
 
     expect(isReady).toBe(true);
 
-    // No uncaught JS errors during startup
-    expect(errors).toHaveLength(0);
+    // Catches console.warn / console.error / pageerror against the
+    // allowlist in test/e2e/console-listener.ts.
+    expectCleanBoot(page);
+  });
+
+  test('app boots without console warnings or errors', async ({ page }) => {
+    await waitForAppReady(page);
+    expectCleanBoot(page);
   });
 
   test('canvas exists with non-zero dimensions', async ({ page }) => {
@@ -52,11 +52,13 @@ test.describe('App smoke tests', () => {
   });
 
   test('drawer opens and shows plugin groups', async ({ page }) => {
-    await waitForAppReady(page);
+    // Hamburger only renders in mobile mode; on desktop the rail drawer is
+    // always visible and the hamburger is hidden via !important CSS.
+    await waitForAppReady(page, { settings: { isMobileModeEnabled: true } });
 
     const hamburger = page.locator('#drawer-hamburger');
 
-    await expect(hamburger).toBeAttached();
+    await expect(hamburger).toBeVisible();
 
     await hamburger.click();
 
@@ -70,26 +72,29 @@ test.describe('App smoke tests', () => {
     expect(groupCount).toBeGreaterThanOrEqual(1);
   });
 
-  test('clicking a bottom icon toggles side menu', async ({ page }) => {
+  test('drawer item opens and closes side menu', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { FilterMenuPlugin: { enabled: true } },
     });
 
-    const icon = page.locator('#filter-menu-icon');
+    // Use .first() — clicking the item adds a duplicate to the "Recents" group,
+    // so a bare locator becomes ambiguous on the second click.
+    const drawerItem = page.locator('.drawer-item[data-plugin-id="filter-menu-icon"]').first();
 
-    await expect(icon).toBeAttached({ timeout: 5_000 });
+    await expect(drawerItem).toBeVisible({ timeout: 5_000 });
 
-    // Click to open
-    await icon.click();
-    await expect(icon).toHaveClass(/bmenu-item-selected/u, { timeout: 5_000 });
+    // Open
+    await drawerItem.click();
 
     const sideMenu = page.locator('#filter-menu');
 
     await expect(sideMenu).toBeVisible({ timeout: 5_000 });
 
-    // Click again to close
-    await icon.click();
-    await expect(icon).not.toHaveClass(/bmenu-item-selected/u, { timeout: 5_000 });
+    // Close — clicking the same drawer item again slides the side menu off-screen.
+    // The close animation uses translateX(-120%); the element stays in the DOM with
+    // display: block, so check viewport intersection rather than visibility.
+    await drawerItem.click();
+    await expect(sideMenu).not.toBeInViewport({ timeout: 5_000 });
   });
 
   test('time display is visible', async ({ page }) => {

@@ -167,6 +167,74 @@ jobs:
           MSG="### Build (${{ matrix.profile }}) Passed"
           echo "$MSG" >> $GITHUB_STEP_SUMMARY
 
+  boot-smoke:
+    needs: lint-and-test
+    name: Boot Smoke Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Cache node modules
+        uses: actions/cache@v4.2.3
+        with:
+          path: ~/.npm
+          key: >-
+            ${{ runner.os }}-build-node-modules-${{
+            hashFiles('**/package-lock.json') }}
+          restore-keys: >-
+            ${{ runner.os }}-build-node-modules-${{
+            runner.os }}-
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+      - name: Update submodules
+        run: git submodule update --init --recursive
+
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4.2.3
+        with:
+          path: ~/.cache/ms-playwright
+          key: >-
+            ${{ runner.os }}-playwright-${{
+            hashFiles('**/package-lock.json') }}
+          restore-keys: >-
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Build (oss)
+        run: |
+          npx tsx ./build/generate-translation.ts
+          npx tsx ./build/build-manager.ts production --profile=oss
+
+      - name: Run Boot Smoke Test
+        run: |
+          echo "Running app boot smoke tests..."
+          npm run test:e2e:smoke
+          echo '### Boot Smoke Test Passed' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-boot-smoke
+          path: playwright-report/
+          retention-days: 7
+
   trufflehog:
     needs: build
     name: TruffleHog Secrets Scan
@@ -206,13 +274,14 @@ jobs:
 
   pipeline-complete:
     if: always()
-    needs: [lint-and-test, build, trufflehog, codeql]
+    needs: [lint-and-test, boot-smoke, build, trufflehog, codeql]
     name: Build Pipeline Complete
     runs-on: ubuntu-latest
     steps:
       - name: Check job results
         run: |
           if [[ "${{ needs.lint-and-test.result }}" == "failure" || \
+                "${{ needs.boot-smoke.result }}" == "failure" || \
                 "${{ needs.build.result }}" == "failure" || \
                 "${{ needs.codeql.result }}" == "failure" ]]; then
             echo "One or more required jobs failed"

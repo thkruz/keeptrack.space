@@ -1,6 +1,6 @@
 {
   "name": "keeptrack.space",
-  "version": "12.2.2",
+  "version": "12.2.3",
   "type": "module",
   "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
   "author": "Theodore Kruczek",
@@ -59,6 +59,7 @@
     "test:e2e": "npx playwright test",
     "test:e2e:ui": "npx playwright test --ui",
     "test:e2e:headed": "npx playwright test --headed",
+    "test:e2e:smoke": "npx playwright test src/__tests__/app-smoke.spec.ts",
     "check:locales": "npx tsx scripts/check-locale-quality.ts",
     "check:locales:quick": "npx tsx scripts/check-locale-quality.ts --skip-llm",
     "test:watch": "vitest",

@@ -85,6 +85,11 @@ export enum EventBusEvent {
   satInfoBoxAddListeners = 'satInfoBoxAddListeners',
   satInfoBoxInit = 'satInfoBoxInit',
   satInfoBoxFinal = 'satInfoBoxFinal',
+  /**
+   * Emitted from SatInfoBox.show() after the panel has been switched to display: block.
+   * Listeners can rely on the container having a non-zero clientWidth on the next frame.
+   */
+  satInfoBoxShown = 'satInfoBoxShown',
   error = 'error',
   userAccountChange = 'userAccountChange',
   userLogin = 'userSignedIn',

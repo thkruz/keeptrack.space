@@ -877,11 +877,18 @@ export class CatalogLoader {
     }
 
     try {
-      const { StarsPlugin } = await import('../../plugins-pro/stars/stars-plugin');
+      // Use a dynamically-computed specifier so Vite's import analyzer does not try
+      // to resolve this Pro-only module during OSS builds/tests.
+      const proStarsPluginPath = ['..', '..', 'plugins-pro', 'stars', 'stars-plugin'].join('/');
+      const { StarsPlugin } = await import(/* @vite-ignore */ proStarsPluginPath);
 
       await StarsPlugin.injectStars();
-    } catch {
-      // StarsPlugin not available — skip silently
+    } catch (error) {
+      errorManagerInstance.warn(
+        'StarsPlugin is a Pro feature and could not be loaded. ' +
+        'If you are running the Pro build, verify your .env configuration, PRO_LICENSE_KEY, and plugins-pro files. ' +
+        `Original error: ${(error as Error).message}`,
+      );
     }
   }
 

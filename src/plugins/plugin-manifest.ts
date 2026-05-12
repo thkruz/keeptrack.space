@@ -578,7 +578,7 @@ export const pluginManifest: PluginDescriptor[] = [
   },
   {
     configKey: 'FovFadePlugin',
-    proImport: () => importPro('../plugins-pro/fov-fade/fov-fade'),
+    proImport: __IS_PRO__ ? () => importPro('../plugins-pro/fov-fade/fov-fade') : undefined,
     proClassName: 'FovFadePlugin',
     ossImport: () => import('./fov-fade/fov-fade'),
     ossClassName: 'FovFadePlugin',

@@ -71,7 +71,7 @@ export class ErrorManager {
     }
   }
 
-  error(e: Error, funcName: string, toastMsg?: string): void {
+  error(e: Error, funcName: string, toastMsg?: string, opts?: { skipAutoFile?: boolean; skipToast?: boolean }): void {
     if (!this.shouldLog_(LogLevel.ERROR)) {
       return;
     }
@@ -88,19 +88,37 @@ export class ErrorManager {
     }
 
     toastMsg ??= err.message || 'Unknown error';
-    const url = this.getErrorUrl_(err, funcName);
 
-    // Max 1 error per 5 minutes
-    if (url !== '' && Date.now() - this.lastErrorTime_ > 1000 * 60 * 5) {
-      window.open(url, '_blank');
-      this.lastErrorTime_ = Date.now();
+    const skipAutoFile = opts?.skipAutoFile === true || this.isExternalFetchError_(err);
+
+    if (!skipAutoFile) {
+      const url = this.getErrorUrl_(err, funcName);
+
+      // Max 1 error per 5 minutes
+      if (url !== '' && Date.now() - this.lastErrorTime_ > 1000 * 60 * 5) {
+        window.open(url, '_blank');
+        this.lastErrorTime_ = Date.now();
+      }
     }
 
-    ServiceLocator.getUiManager()?.toast(toastMsg, ToastMsgType.error, true);
+    if (opts?.skipToast !== true) {
+      ServiceLocator.getUiManager()?.toast(toastMsg, ToastMsgType.error, true);
+    }
 
     if (isThisNode()) {
       throw err;
     }
+  }
+
+  private isExternalFetchError_(err: Error): boolean {
+    if (typeof (err as { status?: unknown }).status === 'number') {
+      return true;
+    }
+    if (err instanceof TypeError && /failed to fetch|networkerror|load failed|fetch/iu.test(err.message)) {
+      return true;
+    }
+
+    return false;
   }
 
   warn(msg: string, ...optionalParams: unknown[]): void {

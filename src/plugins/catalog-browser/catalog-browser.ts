@@ -280,8 +280,11 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
         ToastMsgType.normal,
       );
     } catch (error) {
-      errorManagerInstance.error(error, 'CatalogBrowserPlugin');
-      const { messageKey, toastType } = this.classifyFetchError_(error);
+      const { messageKey, toastType, isTransient } = this.classifyFetchError_(error);
+
+      if (!isTransient) {
+        errorManagerInstance.error(error as Error, 'CatalogBrowserPlugin', undefined, { skipToast: true });
+      }
 
       uiManager.toast(
         t7e(messageKey),
@@ -293,37 +296,42 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
     }
   }
 
-  private classifyFetchError_(error: unknown): { messageKey: T7eKey; toastType: ToastMsgType } {
+  private classifyFetchError_(error: unknown): { messageKey: T7eKey; toastType: ToastMsgType; isTransient: boolean } {
     const status = (error as { status?: number } | null)?.status;
 
     if (status === 403) {
       return {
         messageKey: 'plugins.CatalogBrowserPlugin.errorMsgs.Forbidden' as T7eKey,
         toastType: ToastMsgType.caution,
+        isTransient: true,
       };
     }
     if (status === 429) {
       return {
         messageKey: 'plugins.CatalogBrowserPlugin.errorMsgs.RateLimited' as T7eKey,
         toastType: ToastMsgType.caution,
+        isTransient: true,
       };
     }
     if (typeof status === 'number' && status >= 500) {
       return {
         messageKey: 'plugins.CatalogBrowserPlugin.errorMsgs.ServerError' as T7eKey,
         toastType: ToastMsgType.caution,
+        isTransient: true,
       };
     }
     if (error instanceof TypeError) {
       return {
         messageKey: 'plugins.CatalogBrowserPlugin.errorMsgs.NetworkError' as T7eKey,
         toastType: ToastMsgType.critical,
+        isTransient: false,
       };
     }
 
     return {
       messageKey: 'plugins.CatalogBrowserPlugin.errorMsgs.FetchFailed' as T7eKey,
       toastType: ToastMsgType.critical,
+      isTransient: false,
     };
   }
 

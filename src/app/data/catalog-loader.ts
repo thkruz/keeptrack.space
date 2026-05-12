@@ -4,6 +4,7 @@ import { rgbaArray, SolarBody } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { importPro } from '@app/engine/utils/import-pro';
 import { StringPad } from '@app/engine/utils/stringPad';
 import { CruncherSat } from '@app/webworker/positionCruncher';
 import {
@@ -877,19 +878,37 @@ export class CatalogLoader {
     }
 
     try {
-      // Use a dynamically-computed specifier so Vite's import analyzer does not try
-      // to resolve this Pro-only module during OSS builds/tests.
-      const proStarsPluginPath = ['..', '..', 'plugins-pro', 'stars', 'stars-plugin'].join('/');
-      const { StarsPlugin } = await import(/* @vite-ignore */ proStarsPluginPath);
+      const { StarsPlugin } = await importPro('../../plugins-pro/stars/stars-plugin') as {
+        StarsPlugin: { injectStars: () => Promise<void> };
+      };
 
       await StarsPlugin.injectStars();
     } catch (error) {
-      errorManagerInstance.warn(
-        'StarsPlugin is a Pro feature and could not be loaded. ' +
-        'If you are running the Pro build, verify your .env configuration, PRO_LICENSE_KEY, and plugins-pro files. ' +
-        `Original error: ${(error as Error).message}`,
-      );
+      if (CatalogLoader.isModuleNotFoundError_(error)) {
+        errorManagerInstance.warn(
+          'StarsPlugin is a Pro feature and could not be loaded. ' +
+          'If you are running the Pro build, verify your .env configuration, PRO_LICENSE_KEY, and plugins-pro files.',
+        );
+      } else {
+        errorManagerInstance.error(
+          error instanceof Error ? error : new Error(String(error)),
+          'CatalogLoader.injectStarData_',
+          `StarsPlugin failed to initialize: ${(error as Error).message ?? String(error)}`,
+        );
+      }
     }
+  }
+
+  private static isModuleNotFoundError_(error: unknown): boolean {
+    if (!(error instanceof Error)) {
+      return false;
+    }
+    const code = (error as Error & { code?: string }).code;
+
+    return code === 'ERR_MODULE_NOT_FOUND' ||
+      code === 'MODULE_NOT_FOUND' ||
+      (/Cannot find module/u).test(error.message) ||
+      (/Failed to fetch dynamically imported module/u).test(error.message);
   }
 
   /**

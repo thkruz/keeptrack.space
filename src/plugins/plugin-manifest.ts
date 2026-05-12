@@ -12,16 +12,9 @@
  * In OSS builds, __IS_PRO__ is false → the ternary evaluates to undefined →
  * rspack never resolves the plugins-pro path → no stub files needed.
  */
+import { importPro } from '../engine/utils/import-pro';
 import type { PluginDescriptor } from './plugin-descriptor';
 import { satInfoBoxOrbitalConfigurationDefaults } from './sat-info-box-orbital/sat-info-box-orbital-settings';
-
-/**
- * Dynamically import a Pro-only module. The path is passed through a variable
- * (and tagged with @vite-ignore) so Vite's import analyzer does not try to
- * resolve the plugins-pro path during OSS builds/tests. At runtime the Pro
- * imports are only invoked when __IS_PRO__ is true (see ternaries below).
- */
-const importPro = (path: string) => import(/* @vite-ignore */ path);
 
 export const pluginManifest: PluginDescriptor[] = [
   // ── Always-enabled infrastructure ──────────────────────────────────────────

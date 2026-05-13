@@ -47,7 +47,7 @@ export class PluginManager {
     const PluginClass = resolved.mod[className] as new () => KeepTrackPlugin;
     const plugin = new PluginClass();
 
-    if (descriptor.isLoginRequired) {
+    if (descriptor.isLoginRequired && resolved.usedPro) {
       plugin.isLoginRequired = true;
     }
 

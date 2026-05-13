@@ -893,7 +893,7 @@ export class CatalogLoader {
         errorManagerInstance.error(
           error instanceof Error ? error : new Error(String(error)),
           'CatalogLoader.injectStarData_',
-          `StarsPlugin failed to initialize: ${(error as Error).message ?? String(error)}`,
+          `StarsPlugin failed to initialize: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
     }

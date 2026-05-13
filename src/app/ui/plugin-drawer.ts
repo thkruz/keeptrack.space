@@ -317,8 +317,6 @@ export class PluginDrawer {
           utilityKey = 'utility-layers';
         }
 
-        const isProGated = plugin.isLoginRequired && !settingsManager.isDisableLoginGate;
-
         utilityGroups[utilityKey].items.push({
           id: plugin.bottomIconElementName,
           pluginId: plugin.id,
@@ -326,14 +324,13 @@ export class PluginDrawer {
           imgSrc,
           isTopMenu: false,
           isDisabled: plugin.isIconDisabledOnLoad,
-          isLoginRequired: isProGated,
+          isLoginRequired: plugin.isLoginRequired,
           order,
         });
       }
 
       // Put in first matching MenuMode group (only if not in the utility footer)
       if (plugin.iconPlacement === IconPlacement.BOTTOM_ONLY) {
-        const isProGated = plugin.isLoginRequired && !settingsManager.isDisableLoginGate;
         const primaryMode = plugin.menuMode.find((m) => m !== MenuMode.ALL) ?? MenuMode.CATALOG;
 
         menuGroups[`mode-${primaryMode}`]?.items.push({
@@ -342,7 +339,7 @@ export class PluginDrawer {
           imgSrc,
           isTopMenu: false,
           isDisabled: plugin.isIconDisabledOnLoad,
-          isLoginRequired: isProGated,
+          isLoginRequired: plugin.isLoginRequired,
           order,
           shortcutHint: PluginDrawer.getShortcutHint_(plugin.id),
         });
@@ -743,8 +740,8 @@ export class PluginDrawer {
     for (const item of group.items) {
       const dataAttr = item.isTopMenu ? `data-top-menu-id="${item.id}"` : `data-plugin-id="${item.id}"`;
       const disabledClass = item.isDisabled ? ' disabled' : '';
-      const proClass = item.isLoginRequired ? ' bmenu-item-pro' : '';
       const proAttr = item.isLoginRequired ? ' data-pro-gated' : '';
+      const proClass = (item.isLoginRequired && !settingsManager.isDisableLoginGate) ? ' bmenu-item-pro' : '';
       const tabIdx = item.isDisabled ? '' : ' tabindex="0"';
       const shortcutBadge = item.shortcutHint ? `<span class="drawer-item-shortcut">${item.shortcutHint}</span>` : '';
 

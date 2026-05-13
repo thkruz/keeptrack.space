@@ -64,6 +64,7 @@ export interface EngineEventMap {
   [EventBusEvent.satInfoBoxAddListeners]: [];
   [EventBusEvent.satInfoBoxInit]: [];
   [EventBusEvent.satInfoBoxFinal]: [];
+  [EventBusEvent.satInfoBoxShown]: [];
   [EventBusEvent.error]: [Error, string]; // error, function name
   [EventBusEvent.userAccountChange]: [User | null]; // user
   [EventBusEvent.userLogin]: [User | null]; // user

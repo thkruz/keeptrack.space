@@ -57,8 +57,14 @@ export class UiManager {
 
   // materializecss/materialize goes to window.M, but we want a local reference
   M = window.M;
-  bottomIconPress: (el: HTMLElement) => void;
-  hideSideMenus: () => void;
+  bottomIconPress = (el: HTMLElement) => {
+    ServiceLocator.getSoundManager()?.play(SoundNames.BEEP);
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, el.id);
+  };
+  hideSideMenus = () => {
+    closeColorbox();
+    EventBus.getInstance().emit(EventBusEvent.hideSideMenus);
+  };
   isCurrentlyTyping = false;
   isUiVisible = true;
   lastBoxUpdateTime = 0;
@@ -458,10 +464,6 @@ export class UiManager {
     EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
-        this.bottomIconPress = (el: HTMLElement) => {
-          ServiceLocator.getSoundManager()?.play(SoundNames.BEEP);
-          EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, el.id);
-        };
         const BottomIcons = getEl('bottom-icons');
 
         BottomIcons?.addEventListener('click', (evt: Event) => {
@@ -487,10 +489,6 @@ export class UiManager {
             this.bottomIconPress(targetElement);
           }
         });
-        this.hideSideMenus = () => {
-          closeColorbox();
-          EventBus.getInstance().emit(EventBusEvent.hideSideMenus);
-        };
       },
     );
   }

@@ -2,6 +2,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { t7e } from '@app/locales/keys';
+import { settingsManager } from '@app/settings/settings';
 
 type DrawerKey_ = Parameters<typeof t7e>[0];
 
@@ -54,8 +55,8 @@ export function renderUtilityFooter(groups: Record<string, DrawerGroup>): void {
 
     for (const item of group.items) {
       const disabledClass = item.isDisabled ? ' bmenu-item-disabled' : '';
-      const proClass = item.isLoginRequired ? ' bmenu-item-pro' : '';
       const proAttr = item.isLoginRequired ? ' data-pro-gated' : '';
+      const proClass = (item.isLoginRequired && !settingsManager.isDisableLoginGate) ? ' bmenu-item-pro' : '';
       const dataAttr = item.isTopMenu ? `data-top-menu-id="${item.id}"` : `data-plugin-id="${item.id}"`;
       const idAttr = item.pluginId ? ` id="${item.pluginId}-utility-icon"` : '';
 

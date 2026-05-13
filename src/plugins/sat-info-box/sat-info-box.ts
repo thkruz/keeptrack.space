@@ -497,6 +497,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
     showEl(SatInfoBox.containerId_);
     this.isVisible_ = true;
+    EventBus.getInstance().emit(EventBusEvent.satInfoBoxShown);
   }
 
   toggle(): void {

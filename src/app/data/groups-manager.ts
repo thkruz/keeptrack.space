@@ -1,4 +1,6 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { GroupData, GroupType, ObjectGroup } from './object-group';
 
 /**
@@ -26,6 +28,14 @@ export class GroupsManager {
   groupList: Record<string, ObjectGroup<GroupType>> = {};
   selectedGroup: ObjectGroup<GroupType> | null = null;
   stopUpdatingInViewSoon: boolean;
+
+  constructor() {
+    EventBus.getInstance().on(EventBusEvent.catalogReloaded, this.onCatalogReloaded_);
+  }
+
+  private onCatalogReloaded_ = (): void => {
+    this.init();
+  };
 
   private changeGroup_(group: ObjectGroup<GroupType> | null): ObjectGroup<GroupType> | null {
     this.selectedGroup = group;

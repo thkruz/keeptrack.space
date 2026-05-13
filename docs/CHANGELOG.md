@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v12.2.4](https://github.com/thkruz/keeptrack.space/compare/v12.2.3...v12.2.4)
+
+>  
+
+- Fix/pro plugin errofix: improve missing Pro plugin handlingr messages [`#1333`](https://github.com/thkruz/keeptrack.space/pull/1333)
+- fix(stereo-map): :bug: clamp resize2DMap_ dimensions to prevent negative typed array length [`#1336`](https://github.com/thkruz/keeptrack.space/issues/1336)
+- fix(error-manager): :bug: stop auto-filing GitHub issues for transient fetch errors [`#1332`](https://github.com/thkruz/keeptrack.space/issues/1332)
+- feat(ui-manager): :sparkles: initialize bottomIconPress and hideSideMenus [`#1331`](https://github.com/thkruz/keeptrack.space/issues/1331)
+- feat(event-bus): :sparkles: add satInfoBoxShown event [`#1324`](https://github.com/thkruz/keeptrack.space/issues/1324)
+- feat(webgl): :sparkles: improve context loss handling and recovery [`#1323`](https://github.com/thkruz/keeptrack.space/issues/1323)
+- feat(console-listener): :sparkles: add console violation tracking [`b47c876`](https://github.com/thkruz/keeptrack.space/commit/b47c876924a7f1ea42e3985addf98b070a879488)
+- fix: improve missing pro plugin handling [`53a9465`](https://github.com/thkruz/keeptrack.space/commit/53a9465c11a49c39c71c61b63fde5df292a89b2d)
+- feat(boot-smoke): :sparkles: add boot smoke test job [`13080fd`](https://github.com/thkruz/keeptrack.space/commit/13080fda95ca0039111c054fbfcfbf91a59c4e48)
+- feat(catalog-loader): :sparkles: implement dynamic Pro module import [`4bc3a0d`](https://github.com/thkruz/keeptrack.space/commit/4bc3a0d23ae5981914be2260fba15bbace87f0b3)
+- chore(settings): :wrench: comment out GitHub Copilot commit message generation instructions [`11b390c`](https://github.com/thkruz/keeptrack.space/commit/11b390cb1fbf85212d976a0c5feb76de249f23c1)
+- fix(webgl-renderer): :bug: wrap godrays initialization in try/catch to prevent startup failure on shader compile errors [`eb94696`](https://github.com/thkruz/keeptrack.space/commit/eb94696d1604591a11d21493d81e495322f3e891)
+- fix(dots-manager): :bug: skip velocity update for static objects [`4142060`](https://github.com/thkruz/keeptrack.space/commit/4142060d2d2b1109a80ab15909e430b9c5173107)
+- test(app-smoke): :white_check_mark: improve console error checks [`250e0fb`](https://github.com/thkruz/keeptrack.space/commit/250e0fb7f2f26007dfc464fb5529e6937b78d6de)
+- feat(plugin-drawer): :sparkles: update login gate handling logic [`d9665fb`](https://github.com/thkruz/keeptrack.space/commit/d9665fbf62997d78f48becd77547d8e5609b8af3)
+- test(app-smoke): :white_check_mark: improve drawer item interactions [`ee260c5`](https://github.com/thkruz/keeptrack.space/commit/ee260c54af374d9c0d9ef30a6d9c163077bce3b8)
+- docs: :memo: update version badge to 12.2.3 [`662249d`](https://github.com/thkruz/keeptrack.space/commit/662249de1446083c7dc866fde6d007ffd1cd01a8)
+- feat(groups-manager): :sparkles: add event listener for catalog reload to initialize groups [`7139a68`](https://github.com/thkruz/keeptrack.space/commit/7139a68204b464fe3d304988349aca0e0e6d7b3c)
+- test(app-smoke): :white_check_mark: improve drawer item interaction [`773228a`](https://github.com/thkruz/keeptrack.space/commit/773228a4cd7ba71417f29da58f2a168b4002032f)
+- fix(velocity): :bug: change warning to debug message for velocity checks [`f5aa9f2`](https://github.com/thkruz/keeptrack.space/commit/f5aa9f27ac6d2a345f6abc15e5f64bbf4bae5307)
+- chore(plugins-pro): :wrench: update subproject commit reference [`4e79c93`](https://github.com/thkruz/keeptrack.space/commit/4e79c938c0dffe7fc38f55398bef609299ffa12c)
+- fix(plugin-manifest): :bug: handle pro import conditionally [`8c8d44e`](https://github.com/thkruz/keeptrack.space/commit/8c8d44e5d1b53f830515e9dbbf0c850c1bf1ff31)
+- feat(tests): :sparkles: add smoke test for app [`c923f01`](https://github.com/thkruz/keeptrack.space/commit/c923f01c8ddd99bc471f430fa439af07bf6b51b8)
+
 #### [v12.2.3](https://github.com/thkruz/keeptrack.space/compare/v12.2.2...v12.2.3)
 
 >  

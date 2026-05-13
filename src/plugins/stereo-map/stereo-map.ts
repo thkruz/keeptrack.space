@@ -595,6 +595,7 @@ export class StereoMap extends KeepTrackPlugin {
   }
 
   private static readonly SAT_INFOBOX_WIDTH_ = 360;
+  private static readonly MIN_MAP_DIMENSION_ = 2;
 
   private resize2DMap_(isForceWidescreen?: boolean): void {
     isForceWidescreen ??= false;
@@ -603,13 +604,19 @@ export class StereoMap extends KeepTrackPlugin {
     if (mapMenuDOM) {
       if (isForceWidescreen || window.innerWidth > window.innerHeight) {
         // If widescreen, leave room for the sat-info-box on the right
-        const availableWidth = window.innerWidth - StereoMap.SAT_INFOBOX_WIDTH_;
+        const availableWidth = Math.max(
+          StereoMap.MIN_MAP_DIMENSION_,
+          window.innerWidth - StereoMap.SAT_INFOBOX_WIDTH_,
+        );
 
         settingsManager.mapWidth = availableWidth;
         settingsManager.mapHeight = settingsManager.mapWidth / 2;
         mapMenuDOM.style.width = `${availableWidth}px`;
       } else {
-        settingsManager.mapHeight = window.innerHeight - 100; // Subtract 100 portrait (mobile)
+        settingsManager.mapHeight = Math.max(
+          StereoMap.MIN_MAP_DIMENSION_,
+          window.innerHeight - 100, // Subtract 100 portrait (mobile)
+        );
         settingsManager.mapWidth = settingsManager.mapHeight * 2;
         mapMenuDOM.style.width = `${settingsManager.mapWidth}px`;
       }

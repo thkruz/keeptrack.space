@@ -22,6 +22,7 @@ import { errorManagerInstance } from '../utils/errorManager';
 import { getEl } from '../utils/get-el';
 import { isThisNode } from '../utils/isThisNode';
 import { DepthManager } from './depth-manager';
+import { Godrays } from './draw-manager/godrays';
 import { PostProcessingManager } from './draw-manager/post-processing';
 import { Sun } from './draw-manager/sun';
 import { MeshManager } from './mesh-manager';
@@ -620,8 +621,17 @@ export class WebGLRenderer {
       dotsManagerInstance.initProgramPicking();
     }
 
-    // Fix flat geometry if it has already been created
-    ServiceLocator.getScene().godrays?.init(gl, ServiceLocator.getScene().sun);
+    // Fix flat geometry if it has already been created. Wrap in try/catch so a failing
+    // shader compile (observed on iOS Safari during the initial postStart resize) only
+    // disables godrays instead of aborting the whole startup chain.
+    const scene = ServiceLocator.getScene();
+
+    try {
+      scene.godrays?.init(gl, scene.sun);
+    } catch (error) {
+      errorManagerInstance.warn(`Godrays init failed during resizeCanvas; disabling godrays. ${error instanceof Error ? error.message : error}`);
+      scene.godrays = null as unknown as Godrays;
+    }
   }
 
   /**

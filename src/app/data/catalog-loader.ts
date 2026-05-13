@@ -4,7 +4,6 @@ import { rgbaArray, SolarBody } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { importPro } from '@app/engine/utils/import-pro';
 import { StringPad } from '@app/engine/utils/stringPad';
 import { CruncherSat } from '@app/webworker/positionCruncher';
 import {
@@ -878,7 +877,7 @@ export class CatalogLoader {
     }
 
     try {
-      const { StarsPlugin } = await importPro('../../plugins-pro/stars/stars-plugin') as {
+      const { StarsPlugin } = await import(/* @vite-ignore */ '../../plugins-pro/stars/stars-plugin') as {
         StarsPlugin: { injectStars: () => Promise<void> };
       };
 

@@ -114,7 +114,7 @@ export class ErrorManager {
     if (typeof (err as { status?: unknown }).status === 'number') {
       return true;
     }
-    if (err instanceof TypeError && /failed to fetch|networkerror|load failed|fetch/iu.test(err.message)) {
+    if (err instanceof TypeError && (/failed to fetch|networkerror|load failed|fetch/iu).test(err.message)) {
       return true;
     }
 

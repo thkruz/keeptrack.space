@@ -135,9 +135,18 @@ export enum EventBusEvent {
    */
   catalogReloaded = 'catalogReloaded',
   /**
-   * Emitted after time sync and before filterTLEDatabase in CatalogLoader.processFiles_.
-   * Pro plugins (StarsPlugin, etc.) use this hook to inject static catalog objects
-   * before the TLE filter pass runs. Listeners may be async; emitAsync awaits them all.
+   * Emitted from CatalogLoader.parse(...) after time sync and before
+   * filterTLEDatabase. Pro plugins (e.g. StarsPlugin) use this hook to inject
+   * static catalog objects before the TLE filter pass runs.
+   *
+   * Dispatched via emitAsync — listeners may be async and are awaited (fail-fast:
+   * the first rejection rejects emitAsync, but every listener is still scheduled).
+   *
+   * Idempotency contract: parse(...) can be invoked multiple times in a single
+   * session (e.g. drag-and-drop catalog swap), so listeners MUST be idempotent
+   * across reloads. If a listener appends to CatalogManager.staticSet, it must
+   * first strip its own prior entries — otherwise duplicates accumulate. See
+   * StarsPlugin for the canonical pattern.
    */
   beforeFilterTLEDatabase = 'beforeFilterTLEDatabase',
   /**

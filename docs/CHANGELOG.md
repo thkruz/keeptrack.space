@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v12.2.5](https://github.com/thkruz/keeptrack.space/compare/v12.2.4...v12.2.5)
+
+>  
+
+- chore(deps): :wrench: bump resizable from 1.2.1 to 2.0.0 [`#1328`](https://github.com/thkruz/keeptrack.space/pull/1328)
+- chore(deps-dev): :wrench: bump style-loader from 3.3.4 to 4.0.0 [`#1329`](https://github.com/thkruz/keeptrack.space/pull/1329)
+- refactor(imports): remove importPro utility and update dynamic imports to use native import [`54e85f3`](https://github.com/thkruz/keeptrack.space/commit/54e85f395b310c8b7ffdaf60e1c4db4e83038430)
+- feat(build-pipeline): add lint-and-test-oss job for OSS contributors without plugins-pro [`eed6ad1`](https://github.com/thkruz/keeptrack.space/commit/eed6ad17c0b2b368b5049bf5ae54ea494cb4d04a)
+- feat(catalog-loader): integrate EventBus for static catalog data injection [`940b9e4`](https://github.com/thkruz/keeptrack.space/commit/940b9e427c83326930c2ebcbb4e52f8385c02105)
+- docs(changelog): :memo: update changelog for version 12.2.4 with recent changes [`409b13c`](https://github.com/thkruz/keeptrack.space/commit/409b13ca79d93acd3eac805ccb75b015e420809e)
+- feat(vitest): add stub for plugins-pro in Vitest configuration [`a2c78fd`](https://github.com/thkruz/keeptrack.space/commit/a2c78fdf25891c1eace39650d39b03856ce91056)
+- feat(plugins-pro): add ambient fallback declaration for optional submodule [`b39d7bc`](https://github.com/thkruz/keeptrack.space/commit/b39d7bc7a67c0e3d4736a43c72209a4312288534)
+- feat(event-bus): add beforeFilterTLEDatabase event and async emit method [`822959b`](https://github.com/thkruz/keeptrack.space/commit/822959b1da68f29d4c9a7b74f8e46d1b8a94fb03)
+- feat(vitest): enhance stub-plugins-pro to support async resolution [`e30de30`](https://github.com/thkruz/keeptrack.space/commit/e30de30720f326efde7c8e48b7622421b1cf766d)
+- fix(errorManager): improve regex test for TypeError in isExternalFetchError_ method [`5c9f2a2`](https://github.com/thkruz/keeptrack.space/commit/5c9f2a2f6de35a859fc225abba7a3d74aefb1892)
+- fix(plugin-manager): update login requirement check to ensure only gating pro usage [`3790114`](https://github.com/thkruz/keeptrack.space/commit/379011479920732cdb4b2f50a152798a068006e1)
+- docs(README): update version badge to 12.2.4 [`3f1db55`](https://github.com/thkruz/keeptrack.space/commit/3f1db55f2bd5751d90400d5d902f1430df3f91f2)
+- fix(catalog-loader): :bug: improve error message handling in injectStarData_ method [`50b603a`](https://github.com/thkruz/keeptrack.space/commit/50b603aba1f9d557b3bb1f380b2c07be4196dbb9)
+
 #### [v12.2.4](https://github.com/thkruz/keeptrack.space/compare/v12.2.3...v12.2.4)
 
 >  

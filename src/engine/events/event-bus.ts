@@ -79,6 +79,7 @@ export interface EngineEventMap {
   [EventBusEvent.screenshotComposite]: [CanvasRenderingContext2D, number, number];
   [EventBusEvent.screenshotShouldCropSquare]: [];
   [EventBusEvent.catalogReloaded]: [];
+  [EventBusEvent.beforeFilterTLEDatabase]: [];
   [EventBusEvent.connectivityChange]: [boolean]; // isOnline
   [EventBusEvent.loginGateStateChange]: [boolean]; // isAuthenticated
   [EventBusEvent.colorSchemeChanged]: [unknown]; // scheme instance
@@ -124,6 +125,21 @@ export class EventBus {
     this.verifyEvent_(event);
 
     (<EventBusRegisterParams<T>[]>this.events[event]).forEach((cb: EventBusRegisterParams<T>) => cb.cb(...args));
+  }
+
+  async emitAsync<T extends EventBusEvent>(event: T, ...args: EngineEventMap[T]): Promise<void> {
+    this.verifyEvent_(event);
+
+    // Wrap each invocation in Promise.resolve().then(...) so a synchronous throw
+    // in one listener turns into a rejected promise rather than bailing out of
+    // the .map() before the remaining listeners are scheduled. Fail-fast still
+    // applies: the first rejection rejects emitAsync, but every listener gets
+    // a chance to run.
+    await Promise.all(
+      (<EventBusRegisterParams<T>[]>this.events[event]).map(
+        (cb: EventBusRegisterParams<T>) => Promise.resolve().then(() => cb.cb(...args)),
+      ),
+    );
   }
 
   /**

@@ -59,6 +59,9 @@
       "@ootk/*": [
         "src/engine/ootk/*"
       ],
+      "@plugins-pro/*": [
+        "src/plugins-pro/*"
+      ],
       "@public/*": [
         "public/*"
       ],

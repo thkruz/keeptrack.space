@@ -83,6 +83,7 @@ export default defineConfig({
       '@app': path.resolve(__dirname, './src'),
       '@engine': path.resolve(__dirname, './src/engine'),
       '@ootk': path.resolve(__dirname, './src/engine/ootk'),
+      '@plugins-pro': path.resolve(__dirname, './src/plugins-pro'),
       '@public': path.resolve(__dirname, './public'),
       '@css': path.resolve(__dirname, './public/css'),
       '@test': path.resolve(__dirname, './test'),

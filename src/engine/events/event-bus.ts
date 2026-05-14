@@ -130,9 +130,14 @@ export class EventBus {
   async emitAsync<T extends EventBusEvent>(event: T, ...args: EngineEventMap[T]): Promise<void> {
     this.verifyEvent_(event);
 
+    // Wrap each invocation in Promise.resolve().then(...) so a synchronous throw
+    // in one listener turns into a rejected promise rather than bailing out of
+    // the .map() before the remaining listeners are scheduled. Fail-fast still
+    // applies: the first rejection rejects emitAsync, but every listener gets
+    // a chance to run.
     await Promise.all(
       (<EventBusRegisterParams<T>[]>this.events[event]).map(
-        (cb: EventBusRegisterParams<T>) => Promise.resolve(cb.cb(...args)),
+        (cb: EventBusRegisterParams<T>) => Promise.resolve().then(() => cb.cb(...args)),
       ),
     );
   }

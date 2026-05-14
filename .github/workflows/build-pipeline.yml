@@ -20,7 +20,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: YAML Lint
         uses: ibiqlik/action-yamllint@v3.1.1
         with:
@@ -36,7 +36,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: NPM Audit Action
         uses: oke-py/npm-audit-action@main
         with:
@@ -56,15 +56,15 @@ jobs:
       matrix:
         task: [eslint, unit-test, typecheck]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '24'
 
       - name: Cache node modules
-        uses: actions/cache@v4.2.3
+        uses: actions/cache@v5
         with:
           path: ~/.npm
           key: >-
@@ -125,15 +125,15 @@ jobs:
       matrix:
         task: [eslint, unit-test, typecheck]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '24'
 
       - name: Cache node modules
-        uses: actions/cache@v4.2.3
+        uses: actions/cache@v5
         with:
           path: ~/.npm
           key: >-
@@ -202,15 +202,15 @@ jobs:
         profile: [oss, pro, celestrak, embed, epfl, offline]
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '24'
 
       - name: Cache node modules
-        uses: actions/cache@v4.2.3
+        uses: actions/cache@v5
         with:
           path: ~/.npm
           key: >-
@@ -267,15 +267,15 @@ jobs:
       contents: read
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '24'
 
       - name: Cache node modules
-        uses: actions/cache@v4.2.3
+        uses: actions/cache@v5
         with:
           path: ~/.npm
           key: >-
@@ -293,7 +293,7 @@ jobs:
         run: npm ci --ignore-scripts
 
       - name: Cache Playwright browsers
-        uses: actions/cache@v4.2.3
+        uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
           key: >-
@@ -332,7 +332,7 @@ jobs:
       contents: read
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -348,7 +348,7 @@ jobs:
       actions: read
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3

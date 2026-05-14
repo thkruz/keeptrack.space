@@ -79,6 +79,7 @@ export interface EngineEventMap {
   [EventBusEvent.screenshotComposite]: [CanvasRenderingContext2D, number, number];
   [EventBusEvent.screenshotShouldCropSquare]: [];
   [EventBusEvent.catalogReloaded]: [];
+  [EventBusEvent.beforeFilterTLEDatabase]: [];
   [EventBusEvent.connectivityChange]: [boolean]; // isOnline
   [EventBusEvent.loginGateStateChange]: [boolean]; // isAuthenticated
   [EventBusEvent.colorSchemeChanged]: [unknown]; // scheme instance
@@ -124,6 +125,16 @@ export class EventBus {
     this.verifyEvent_(event);
 
     (<EventBusRegisterParams<T>[]>this.events[event]).forEach((cb: EventBusRegisterParams<T>) => cb.cb(...args));
+  }
+
+  async emitAsync<T extends EventBusEvent>(event: T, ...args: EngineEventMap[T]): Promise<void> {
+    this.verifyEvent_(event);
+
+    await Promise.all(
+      (<EventBusRegisterParams<T>[]>this.events[event]).map(
+        (cb: EventBusRegisterParams<T>) => Promise.resolve(cb.cb(...args)),
+      ),
+    );
   }
 
   /**

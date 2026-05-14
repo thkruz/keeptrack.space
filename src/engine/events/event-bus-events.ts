@@ -135,6 +135,12 @@ export enum EventBusEvent {
    */
   catalogReloaded = 'catalogReloaded',
   /**
+   * Emitted after time sync and before filterTLEDatabase in CatalogLoader.processFiles_.
+   * Pro plugins (StarsPlugin, etc.) use this hook to inject static catalog objects
+   * before the TLE filter pass runs. Listeners may be async; emitAsync awaits them all.
+   */
+  beforeFilterTLEDatabase = 'beforeFilterTLEDatabase',
+  /**
    * Emitted when browser internet connectivity changes.
    * Parameters: (isOnline: boolean)
    */

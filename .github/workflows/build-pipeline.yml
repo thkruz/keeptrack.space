@@ -113,8 +113,84 @@ jobs:
           echo "Running Type Check..."
           npm run typecheck
           echo '### Type Check Passed' >> $GITHUB_STEP_SUMMARY
+  lint-and-test-oss:
+    needs: compliance
+    name: Lint and Unit Tests (OSS, no plugins-pro)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        task: [eslint, unit-test, typecheck]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Cache node modules
+        uses: actions/cache@v4.2.3
+        with:
+          path: ~/.npm
+          key: >-
+            ${{ runner.os }}-build-node-modules-${{
+            hashFiles('**/package-lock.json') }}
+          restore-keys: >-
+            ${{ runner.os }}-build-node-modules-${{
+            runner.os }}-
+
+      # No "Set up SSH" — OSS contributors do not have SSH access.
+      # Initialize ONLY the public ootk submodule (HTTPS, required for builds).
+      - name: Update public submodules only
+        run: git submodule update --init --recursive -- src/engine/ootk
+
+      - name: Verify plugins-pro is absent
+        run: |
+          if [ -n "$(ls -A src/plugins-pro 2>/dev/null)" ]; then
+            echo "ERROR: src/plugins-pro is populated; this job must simulate"
+            echo "an OSS contributor without access."
+            exit 1
+          fi
+          echo "Confirmed src/plugins-pro is empty"
+
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Set Timezone (only for tests)
+        if: matrix.task == 'unit-test'
+        uses: szenius/set-timezone@v1.2
+        with:
+          timezoneLinux: 'America/New_York'
+
+      - name: Run ESLint
+        if: matrix.task == 'eslint'
+        run: |
+          echo "Running ESLint (OSS)..."
+          npm run lint
+          echo '### ESLint (OSS) Passed' >> $GITHUB_STEP_SUMMARY
+
+      - name: Run Unit Tests
+        if: matrix.task == 'unit-test'
+        run: |
+          echo "Creating translation files..."
+          npm run generate-t7e
+          echo "Running Unit Tests (OSS)..."
+          npm test
+          echo '### Unit Tests (OSS) Passed' >> $GITHUB_STEP_SUMMARY
+
+      - name: Run Type Check
+        if: matrix.task == 'typecheck'
+        run: |
+          echo "Creating translation files..."
+          npm run generate-t7e
+          echo "Running Type Check (OSS)..."
+          npm run typecheck
+          echo '### Type Check (OSS) Passed' >> $GITHUB_STEP_SUMMARY
   build:
-    needs: [lint-and-test]
+    needs: [lint-and-test, lint-and-test-oss]
     name: Build (${{ matrix.profile }})
     runs-on: ubuntu-latest
     permissions:
@@ -143,11 +219,26 @@ jobs:
             ${{ runner.os }}-build-node-modules-${{
             runner.os }}-
 
+      # OSS profile: no SSH, only the public ootk submodule.
+      - name: Update public submodules only (OSS)
+        if: matrix.profile == 'oss'
+        run: git submodule update --init --recursive -- src/engine/ootk
+
+      - name: Verify plugins-pro absence (OSS only)
+        if: matrix.profile == 'oss'
+        run: |
+          if [ -n "$(ls -A src/plugins-pro 2>/dev/null)" ]; then
+            echo "ERROR: OSS build sees plugins-pro contents"; exit 1
+          fi
+
+      # Non-OSS profiles: SSH + full submodules (pro included).
       - name: Set up SSH
+        if: matrix.profile != 'oss'
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
       - name: Update submodules
+        if: matrix.profile != 'oss'
         run: git submodule update --init --recursive
 
       - name: Install Dependencies
@@ -193,12 +284,9 @@ jobs:
             ${{ runner.os }}-build-node-modules-${{
             runner.os }}-
 
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-      - name: Update submodules
-        run: git submodule update --init --recursive
+      # boot-smoke only ever builds the oss profile, so skip SSH entirely.
+      - name: Update public submodules only
+        run: git submodule update --init --recursive -- src/engine/ootk
 
       - name: Install Dependencies
         run: npm ci --ignore-scripts
@@ -274,13 +362,20 @@ jobs:
 
   pipeline-complete:
     if: always()
-    needs: [lint-and-test, boot-smoke, build, trufflehog, codeql]
+    needs:
+      - lint-and-test
+      - lint-and-test-oss
+      - boot-smoke
+      - build
+      - trufflehog
+      - codeql
     name: Build Pipeline Complete
     runs-on: ubuntu-latest
     steps:
       - name: Check job results
         run: |
           if [[ "${{ needs.lint-and-test.result }}" == "failure" || \
+                "${{ needs.lint-and-test-oss.result }}" == "failure" || \
                 "${{ needs.boot-smoke.result }}" == "failure" || \
                 "${{ needs.build.result }}" == "failure" || \
                 "${{ needs.codeql.result }}" == "failure" ]]; then

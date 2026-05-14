@@ -18,12 +18,18 @@ export default defineConfig({
     {
       name: 'stub-plugins-pro',
       enforce: 'pre',
-      resolveId(id) {
-        if (id.includes('plugins-pro/')) {
-          return PLUGINS_PRO_STUB_ID;
+      async resolveId(id, importer) {
+        if (!id.includes('plugins-pro/')) {
+          return null;
         }
 
-        return null;
+        const resolved = await this.resolve(id, importer, { skipSelf: true });
+
+        if (resolved) {
+          return resolved;
+        }
+
+        return PLUGINS_PRO_STUB_ID;
       },
       load(id) {
         if (id === PLUGINS_PRO_STUB_ID) {

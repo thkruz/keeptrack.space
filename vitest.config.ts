@@ -5,6 +5,8 @@ import { defineConfig } from 'vitest/config';
 
 const packageJson = JSON.parse(readFileSync('./package.json', 'utf-8'));
 
+const PLUGINS_PRO_STUB_ID = '\0virtual:plugins-pro-stub';
+
 export default defineConfig({
   define: {
     __VERSION__: JSON.stringify(packageJson.version),
@@ -12,6 +14,26 @@ export default defineConfig({
     __COMMIT_HASH__: JSON.stringify(execSync('git rev-parse --short HEAD').toString().trim()),
     __IS_PRO__: JSON.stringify(false),
   },
+  plugins: [
+    {
+      name: 'stub-plugins-pro',
+      enforce: 'pre',
+      resolveId(id) {
+        if (id.includes('plugins-pro/')) {
+          return PLUGINS_PRO_STUB_ID;
+        }
+
+        return null;
+      },
+      load(id) {
+        if (id === PLUGINS_PRO_STUB_ID) {
+          return 'export default {};';
+        }
+
+        return null;
+      },
+    },
+  ],
   test: {
     environment: 'jsdom',
     globals: true,

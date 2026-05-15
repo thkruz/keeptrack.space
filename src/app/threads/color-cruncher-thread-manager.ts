@@ -14,6 +14,7 @@ import {
 import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 
 export class ColorCruncherThreadManager extends WebWorkerThreadManager {
   readonly WEB_WORKER_CODE: string = 'js/colorCruncher.js';
@@ -96,13 +97,35 @@ export class ColorCruncherThreadManager extends WebWorkerThreadManager {
     vel: Float32Array | null,
     dotsOnScreenVal?: number,
   ): void {
-    this.postMessage({
-      typ: ColorWorkerMsgType.UPDATE_DYNAMIC,
-      inViewData: inView,
-      inSunData: inSun,
-      satVel: vel,
-      dotsOnScreen: dotsOnScreenVal,
-    });
+    const inViewSnap = inView ? new Int8Array(inView) : null;
+    const inSunSnap = inSun ? new Int8Array(inSun) : null;
+    const velSnap = vel ? new Float32Array(vel) : null;
+
+    const transfer: Transferable[] = [];
+
+    if (inViewSnap) {
+      transfer.push(inViewSnap.buffer);
+    }
+    if (inSunSnap) {
+      transfer.push(inSunSnap.buffer);
+    }
+    if (velSnap) {
+      transfer.push(velSnap.buffer);
+    }
+
+    try {
+      this.postMessage({
+        typ: ColorWorkerMsgType.UPDATE_DYNAMIC,
+        inViewData: inViewSnap,
+        inSunData: inSunSnap,
+        satVel: velSnap,
+        dotsOnScreen: dotsOnScreenVal,
+      }, transfer);
+    } catch (error) {
+      errorManagerInstance.warn(
+        `ColorCruncher dynamic update dropped: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
   }
 
   sendGroupUpdate(ids: number[] | null): void {

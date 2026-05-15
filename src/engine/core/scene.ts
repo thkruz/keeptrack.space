@@ -463,10 +463,14 @@ export class Scene {
     }
 
     if (Number(selectedSatelliteManager.selectedSat) > -1) {
-      this.searchBox.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
-      this.primaryCovBubble.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
+      if (this.searchBox.hasValidPose) {
+        this.searchBox.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
+      }
+      if (this.primaryCovBubble.hasValidPose) {
+        this.primaryCovBubble.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
+      }
     }
-    if (Number(selectedSatelliteManager.secondarySat) > -1) {
+    if (Number(selectedSatelliteManager.secondarySat) > -1 && this.secondaryCovBubble.hasValidPose) {
       this.secondaryCovBubble.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
     }
   }

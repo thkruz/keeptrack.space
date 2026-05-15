@@ -59,9 +59,14 @@ export class Box {
 
   private gl_: WebGL2RenderingContext;
   private isLoaded_ = false;
+  private hasValidPose_ = false;
   private mvMatrix_: mat4;
   private nMatrix_ = mat3.create();
   private program_: WebGLProgram;
+
+  get hasValidPose(): boolean {
+    return this.hasValidPose_;
+  }
 
   private textureMap_ = {
     src: <string><unknown>null,
@@ -93,7 +98,7 @@ export class Box {
   }
 
   draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer = null as WebGLFramebuffer | null) {
-    if (!this.isLoaded_) {
+    if (!this.isLoaded_ || !this.hasValidPose_) {
       return;
     }
 
@@ -154,6 +159,7 @@ export class Box {
       this.drawPosition[0] = 0;
       this.drawPosition[1] = 0;
       this.drawPosition[2] = 0;
+      this.hasValidPose_ = false;
 
       return;
     }
@@ -179,6 +185,8 @@ export class Box {
 
     // Calculate the normal matrix
     mat3.normalFromMat4(this.nMatrix_, this.mvMatrix_);
+
+    this.hasValidPose_ = true;
   }
 
   private initBuffers_() {

@@ -47,6 +47,7 @@ jobs:
         continue-on-error: true
   lint-and-test:
     needs: compliance
+    if: github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'workflow_dispatch'
     name: Lint and Unit Tests
     runs-on: ubuntu-latest
     permissions:
@@ -192,6 +193,7 @@ jobs:
           echo '### Type Check (OSS) Passed' >> $GITHUB_STEP_SUMMARY
   build:
     needs: [lint-and-test, lint-and-test-oss]
+    if: always() && needs.lint-and-test-oss.result == 'success' && (needs.lint-and-test.result == 'success' || needs.lint-and-test.result == 'skipped')
     name: Build (${{ matrix.profile }})
     runs-on: ubuntu-latest
     permissions:
@@ -234,12 +236,12 @@ jobs:
 
       # Non-OSS profiles: SSH + full submodules (pro included).
       - name: Set up SSH
-        if: matrix.profile != 'oss'
+        if: matrix.profile != 'oss' && github.event.pull_request.head.repo.full_name == github.repository
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
       - name: Update submodules
-        if: matrix.profile != 'oss'
+        if: matrix.profile != 'oss' && github.event.pull_request.head.repo.full_name == github.repository
         run: git submodule update --init --recursive
 
       - name: Install Dependencies
@@ -260,7 +262,8 @@ jobs:
           echo "$MSG" >> $GITHUB_STEP_SUMMARY
 
   boot-smoke:
-    needs: lint-and-test
+    needs: [lint-and-test, lint-and-test-oss]
+    if: always() && needs.lint-and-test-oss.result == 'success' && (needs.lint-and-test.result == 'success' || needs.lint-and-test.result == 'skipped')
     name: Boot Smoke Test
     runs-on: ubuntu-latest
     permissions:
@@ -375,7 +378,7 @@ jobs:
     steps:
       - name: Check job results
         run: |
-          if [[ "${{ needs.lint-and-test.result }}" == "failure" || \
+          if [[ ("${{ needs.lint-and-test.result }}" == "failure") || \
                 "${{ needs.lint-and-test-oss.result }}" == "failure" || \
                 "${{ needs.boot-smoke.result }}" == "failure" || \
                 "${{ needs.build.result }}" == "failure" || \

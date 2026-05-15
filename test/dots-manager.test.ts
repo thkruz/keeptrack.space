@@ -4,7 +4,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { DotsManager } from '@app/engine/rendering/dots-manager';
 import { WebGLRenderer } from '@app/engine/rendering/webgl-renderer';
 import { SettingsManager } from '@app/settings/settings';
-import { Milliseconds } from '@ootk/src/main';
+import { BaseObject, Milliseconds } from '@ootk/src/main';
 import { mat4 } from 'gl-matrix';
 import { vi } from 'vitest';
 import { setupStandardEnvironment } from './environment/standard-env';
@@ -46,6 +46,25 @@ describe('drawManager', () => {
     expect(() => dotsManagerInstance.update()).not.toThrow();
     drawManagerInstance.dtAdjusted = <Milliseconds>1000000000;
     expect(() => dotsManagerInstance.update()).not.toThrow();
+  });
+
+  // Regression for issue #1340 — null positionData/velocityData must not throw mid-render
+  describe('updatePosVel guards null typed arrays (issue #1340)', () => {
+    const stubStaticObject = { isStatic: () => true } as unknown as BaseObject;
+    const stubMovingObject = { isStatic: () => false, type: -1, velocity: { x: 0, y: 0, z: 0 } } as unknown as BaseObject;
+
+    it('returns silently when positionData is null but velocityData is set (worker delivered satVel without satPos)', () => {
+      dotsManagerInstance.velocityData = new Float32Array(3);
+      dotsManagerInstance.positionData = null as unknown as Float32Array;
+      expect(() => dotsManagerInstance.updatePosVel(stubStaticObject, 0)).not.toThrow();
+      expect(() => dotsManagerInstance.updatePosVel(stubMovingObject, 0)).not.toThrow();
+    });
+
+    it('returns silently when velocityData is null', () => {
+      dotsManagerInstance.positionData = new Float32Array(3);
+      dotsManagerInstance.velocityData = null as unknown as Float32Array;
+      expect(() => dotsManagerInstance.updatePosVel(stubStaticObject, 0)).not.toThrow();
+    });
   });
 });
 

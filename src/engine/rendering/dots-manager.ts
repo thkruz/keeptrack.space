@@ -851,7 +851,7 @@ export class DotsManager {
    * @param i The index of the satellite in the `positionData` and `velocityData` arrays.
    */
   updatePosVel(object: BaseObject, i: number): void {
-    if (!this.velocityData) {
+    if (!this.velocityData || !this.positionData) {
       return;
     }
 

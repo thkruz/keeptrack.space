@@ -614,11 +614,20 @@ export class WebGLRenderer {
     this.updatePMatrix();
     this.isPostProcessingResizeNeeded = true;
 
-    // Fix the gpu picker texture size if it has already been created
+    // Resize the GPU picker framebuffer to match the new canvas size. Wrap in try/catch
+    // so a transient GL failure (observed during driver hiccups) only defers the resize
+    // until context restore instead of aborting the rest of the resize path.
     const dotsManagerInstance = ServiceLocator.getDotsManager();
 
     if (dotsManagerInstance.isReady) {
-      dotsManagerInstance.initProgramPicking();
+      try {
+        dotsManagerInstance.resizePickingFramebuffer();
+      } catch (error) {
+        errorManagerInstance.warn(
+          `Picking framebuffer resize failed during resizeCanvas; deferring until context restore. ${error instanceof Error ? error.message : error}`,
+        );
+        this.isResizePendingAfterContextRestore_ = true;
+      }
     }
 
     // Fix flat geometry if it has already been created. Wrap in try/catch so a failing

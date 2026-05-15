@@ -2,9 +2,11 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { DotsManager } from '@app/engine/rendering/dots-manager';
+import { WebGLRenderer } from '@app/engine/rendering/webgl-renderer';
 import { SettingsManager } from '@app/settings/settings';
 import { Milliseconds } from '@ootk/src/main';
 import { mat4 } from 'gl-matrix';
+import { vi } from 'vitest';
 import { setupStandardEnvironment } from './environment/standard-env';
 
 describe('drawManager', () => {
@@ -44,5 +46,76 @@ describe('drawManager', () => {
     expect(() => dotsManagerInstance.update()).not.toThrow();
     drawManagerInstance.dtAdjusted = <Milliseconds>1000000000;
     expect(() => dotsManagerInstance.update()).not.toThrow();
+  });
+});
+
+describe('DotsManager picking program lifecycle', () => {
+  let dotsManagerInstance: DotsManager;
+  let renderer: WebGLRenderer;
+
+  beforeEach(() => {
+    PluginRegistry.unregisterAllPlugins();
+    setupStandardEnvironment();
+    dotsManagerInstance = ServiceLocator.getDotsManager();
+    renderer = ServiceLocator.getRenderer();
+
+    // Distinct sentinels per allocation so identity comparisons can verify the
+    // create -> delete -> create-new lifecycle across resizes.
+    let fbCounter = 0;
+    let texCounter = 0;
+    let rbCounter = 0;
+
+    renderer.gl.createFramebuffer = vi.fn(() => ({ id: `fb-${++fbCounter}` } as unknown as WebGLFramebuffer));
+    renderer.gl.createTexture = vi.fn(() => ({ id: `tex-${++texCounter}` } as unknown as WebGLTexture));
+    renderer.gl.createRenderbuffer = vi.fn(() => ({ id: `rb-${++rbCounter}` } as unknown as WebGLRenderbuffer));
+    renderer.gl.deleteFramebuffer = vi.fn();
+    renderer.gl.deleteTexture = vi.fn();
+    renderer.gl.deleteRenderbuffer = vi.fn();
+
+    // Stub the picking shader source so initProgramPicking can compile through the
+    // mock WebGL context without needing full DotsManager.init().
+    dotsManagerInstance['shaders_'].picking = {
+      vert: 'vert-source',
+      frag: 'frag-source',
+    };
+
+    dotsManagerInstance.initProgramPicking();
+  });
+
+  it('only compiles the picking program once across resize cycles', () => {
+    const programAfterInit = dotsManagerInstance.programs.picking.program;
+
+    expect(programAfterInit).toBeTruthy();
+
+    dotsManagerInstance.resizePickingFramebuffer();
+    dotsManagerInstance.resizePickingFramebuffer();
+    dotsManagerInstance.resizePickingFramebuffer();
+
+    expect(dotsManagerInstance.programs.picking.program).toBe(programAfterInit);
+  });
+
+  it('deletes previous framebuffer/texture/renderbuffer on resize', () => {
+    const initialFramebuffer = ServiceLocator.getScene().frameBuffers.gpuPicking;
+    const initialTexture = dotsManagerInstance.pickingTexture;
+    const initialRenderBuffer = dotsManagerInstance.pickingRenderBuffer;
+
+    dotsManagerInstance.resizePickingFramebuffer();
+
+    expect(renderer.gl.deleteFramebuffer).toHaveBeenCalledWith(initialFramebuffer);
+    expect(renderer.gl.deleteTexture).toHaveBeenCalledWith(initialTexture);
+    expect(renderer.gl.deleteRenderbuffer).toHaveBeenCalledWith(initialRenderBuffer);
+    expect(dotsManagerInstance.pickingTexture).not.toBe(initialTexture);
+    expect(dotsManagerInstance.pickingRenderBuffer).not.toBe(initialRenderBuffer);
+  });
+
+  it('does not reallocate pickReadPixelBuffer on resize', () => {
+    const initialBuffer = dotsManagerInstance.pickReadPixelBuffer;
+
+    expect(initialBuffer).toBeInstanceOf(Uint8Array);
+
+    dotsManagerInstance.resizePickingFramebuffer();
+    dotsManagerInstance.resizePickingFramebuffer();
+
+    expect(dotsManagerInstance.pickReadPixelBuffer).toBe(initialBuffer);
   });
 });

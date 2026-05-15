@@ -559,10 +559,13 @@ export class DotsManager {
   }
 
   /**
-   * Initializes the GPU Picking program.
+   * Initializes the GPU Picking program (one-time setup).
    *
-   * This function creates a program from the picking shaders, assigns attributes and uniforms,
-   * creates a framebuffer, texture, and renderbuffer for picking, and initializes a pixel buffer.
+   * Compiles the picking shader program, assigns attributes and uniforms, allocates
+   * the read-pixel staging buffer, and creates the initial picking framebuffer.
+   * Subsequent resizes must call {@link resizePickingFramebuffer} — they must NOT
+   * rebuild the shader program, which can intermittently fail to compile when the
+   * GPU process is in a transient bad state during a resize event.
    */
   initProgramPicking() {
     const gl = ServiceLocator.getRenderer().gl;
@@ -580,8 +583,33 @@ export class DotsManager {
       this.programs.picking.uniforms[name] = gl.getUniformLocation(this.programs.picking.program, name) as WebGLUniformLocation;
     }
 
-    ServiceLocator.getScene().frameBuffers.gpuPicking = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, ServiceLocator.getScene().frameBuffers.gpuPicking);
+    this.pickReadPixelBuffer = new Uint8Array(4 * this.PICKING_READ_PIXEL_BUFFER_SIZE * this.PICKING_READ_PIXEL_BUFFER_SIZE);
+
+    this.resizePickingFramebuffer();
+  }
+
+  /**
+   * Recreates the GPU picking framebuffer, color texture, and depth renderbuffer
+   * at the current drawing buffer size. Previous resources are released first so
+   * resizes don't leak GL handles. Safe to call repeatedly; does not rebuild the
+   * picking shader program.
+   */
+  resizePickingFramebuffer() {
+    const gl = ServiceLocator.getRenderer().gl;
+    const scene = ServiceLocator.getScene();
+
+    if (scene.frameBuffers.gpuPicking) {
+      gl.deleteFramebuffer(scene.frameBuffers.gpuPicking);
+    }
+    if (this.pickingTexture) {
+      gl.deleteTexture(this.pickingTexture);
+    }
+    if (this.pickingRenderBuffer) {
+      gl.deleteRenderbuffer(this.pickingRenderBuffer);
+    }
+
+    scene.frameBuffers.gpuPicking = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, scene.frameBuffers.gpuPicking);
 
     this.pickingTexture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, this.pickingTexture);
@@ -597,8 +625,6 @@ export class DotsManager {
 
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.pickingTexture, 0);
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.pickingRenderBuffer);
-
-    this.pickReadPixelBuffer = new Uint8Array(4 * this.PICKING_READ_PIXEL_BUFFER_SIZE * this.PICKING_READ_PIXEL_BUFFER_SIZE);
   }
 
   /**

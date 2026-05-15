@@ -454,7 +454,7 @@ export class OrbitManager {
         if (id === hoverManagerInstance.getHoverId() || id === this.currentSelectId_) {
           return;
         } // Skip hover and select objects
-        if (!ServiceLocator.getCatalogManager().getObject(id)?.active) {
+        if (!ServiceLocator.getCatalogManager().getObject(id, GetSatType.EXTRA_ONLY)?.active) {
           return;
         } // Skip inactive objects
 

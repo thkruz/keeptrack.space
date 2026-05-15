@@ -34,12 +34,17 @@ export class Ellipsoid {
 
   private gl_: WebGL2RenderingContext;
   private isLoaded_ = false;
+  private hasValidPose_ = false;
   private mvMatrix_: mat4;
   private readonly nMatrix_ = mat3.create();
   private program_: WebGLProgram;
   private vao: WebGLVertexArrayObject;
 
   drawPosition = [0, 0, 0] as vec3;
+
+  get hasValidPose(): boolean {
+    return this.hasValidPose_;
+  }
 
   private readonly uniforms_ = {
     u_nMatrix: <WebGLUniformLocation><unknown>null,
@@ -77,7 +82,7 @@ export class Ellipsoid {
   }
 
   draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer = null as WebGLFramebuffer | null) {
-    if (!this.isLoaded_ || !settingsManager.isDrawCovarianceEllipsoid) {
+    if (!this.isLoaded_ || !this.hasValidPose_ || !settingsManager.isDrawCovarianceEllipsoid) {
       return;
     }
     if (this.drawPosition[0] === 0 && this.drawPosition[1] === 0 && this.drawPosition[2] === 0) {
@@ -138,6 +143,7 @@ export class Ellipsoid {
       this.drawPosition[0] = 0;
       this.drawPosition[1] = 0;
       this.drawPosition[2] = 0;
+      this.hasValidPose_ = false;
 
       return;
     }
@@ -157,6 +163,8 @@ export class Ellipsoid {
 
     // Calculate normal matrix
     mat3.normalFromMat4(this.nMatrix_, this.mvMatrix_);
+
+    this.hasValidPose_ = true;
   }
 
   private initBuffers_() {

@@ -150,4 +150,53 @@ export class ColorSchemeTestUtils {
       }
     });
   }
+
+  /**
+   * Extracts every legend swatch slug (`layers-<slug>-box`) from the scheme's static
+   * `layersHtml`. Returns an empty array if the scheme has no legend.
+   */
+  static extractLegendSlugs(layersHtml: string): string[] {
+    const slugPattern = /layers-([A-Za-z0-9_]+)-box/gu;
+    const slugs = new Set<string>();
+    let match: RegExpExecArray | null;
+
+    while ((match = slugPattern.exec(layersHtml)) !== null) {
+      slugs.add(match[1]);
+    }
+
+    return [...slugs];
+  }
+
+  /**
+   * Validates the slug/colorTheme/objectTypeFlags contract that `LayersManager.layersHoverMenuClick`
+   * depends on. For every `layers-<slug>-box` in the legend HTML, both `colorTheme[slug]` and
+   * `objectTypeFlags[slug]` must be defined after construction — otherwise the legend swatch
+   * stays black and the toggle silently no-ops.
+   *
+   * Caught the `sunlightFov` regression where `colorTheme.sunlightInview` existed but the
+   * legend used `layers-sunlightFov-box`, producing "Color not found for sunlightFov" logs.
+   */
+  static assertLegendSlugContract(
+    scheme: ColorScheme,
+    schemeClass: { name: string; layersHtml?: string },
+  ): { missingColors: string[]; missingFlags: string[] } {
+    const layersHtml = schemeClass.layersHtml ?? '';
+    const slugs = this.extractLegendSlugs(layersHtml);
+    const missingColors: string[] = [];
+    const missingFlags: string[] = [];
+
+    for (const slug of slugs) {
+      if (scheme.colorTheme[slug] === undefined) {
+        missingColors.push(slug);
+      }
+      if (scheme.objectTypeFlags[slug] === undefined) {
+        missingFlags.push(slug);
+      }
+    }
+
+    expect(missingColors, `${schemeClass.name}: colorTheme missing entries for legend slugs`).toEqual([]);
+    expect(missingFlags, `${schemeClass.name}: objectTypeFlags missing entries for legend slugs`).toEqual([]);
+
+    return { missingColors, missingFlags };
+  }
 }

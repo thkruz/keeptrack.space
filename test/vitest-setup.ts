@@ -366,6 +366,8 @@ global.mocks.glMock = {
   deleteTexture: vi.fn(),
   deleteProgram: vi.fn(),
   deleteShader: vi.fn(),
+  deleteFramebuffer: vi.fn(),
+  deleteRenderbuffer: vi.fn(),
 };
 
 // mock_requestAnimationFrame.js

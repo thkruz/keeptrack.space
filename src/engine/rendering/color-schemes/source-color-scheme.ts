@@ -28,6 +28,7 @@ export class SourceColorScheme extends ColorScheme {
     sourceVimpel: true,
     sourceSatnogs: true,
     sourceOemImport: true,
+    countryOther: true,
   };
 
   static readonly uniqueColorTheme = {

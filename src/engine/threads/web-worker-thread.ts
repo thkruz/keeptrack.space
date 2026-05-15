@@ -88,9 +88,9 @@ export abstract class WebWorkerThreadManager {
     // Handle other messages as needed
   }
 
-  postMessage(message) {
+  postMessage(message, transfer: Transferable[] = []) {
     if (this.worker_) {
-      this.worker_.postMessage(message);
+      this.worker_.postMessage(message, transfer);
     }
   }
 

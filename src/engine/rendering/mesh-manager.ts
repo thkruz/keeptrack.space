@@ -91,10 +91,16 @@ export class MeshManager {
   isReady: boolean;
 
   draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer = null as WebGLFramebuffer | null) {
+    if (!this.isReady || !this.meshRenderer_) {
+      return;
+    }
     this.meshRenderer_.draw(pMatrix, camMatrix, tgtBuffer);
   }
 
   drawOcclusion(pMatrix: mat4, camMatrix: mat4, occlusionPrgm: OcclusionProgram, tgtBuffer: WebGLBuffer) {
+    if (!this.isReady || !this.meshRenderer_) {
+      return;
+    }
     this.meshRenderer_.drawOcclusion(pMatrix, camMatrix, occlusionPrgm, tgtBuffer);
   }
 

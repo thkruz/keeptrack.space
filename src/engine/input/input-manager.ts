@@ -10,6 +10,7 @@ import { lineManagerInstance } from '../rendering/line-manager';
 import { t7e } from '@app/locales/keys';
 import { html } from '../utils/development/formatter';
 import { getEl, hideEl } from '../utils/get-el';
+import { errorManagerInstance } from '../utils/errorManager';
 import { isThisNode } from '../utils/isThisNode';
 import { KeyboardInput } from './input-manager/keyboard-input';
 import { MouseInput } from './input-manager/mouse-input';
@@ -63,6 +64,8 @@ export class InputManager {
   public mouse: MouseInput;
   public touch: TouchInput;
   public isAsyncWorking = true;
+  public isPickingSupported = true;
+  private hasWarnedPickingDisabled_ = false;
   lastUpdateTime: number = 0;
 
   constructor() {
@@ -249,18 +252,28 @@ export class InputManager {
    * @returns The ID of the satellite at the given screen coordinates.
    */
   public getSatIdFromCoord(x: number, y: number): number {
+    if (!this.isPickingSupported) {
+      return -1;
+    }
     const renderer = ServiceLocator.getRenderer();
     const dotsManagerInstance = ServiceLocator.getDotsManager();
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const { gl } = renderer;
 
-    // NOTE: gl.readPixels is a huge bottleneck but readPixelsAsync doesn't work properly on mobile
+    // NOTE: gl.readPixels is a huge bottleneck but readPixelsAsync doesn't work properly on mobile.
+    // readPixelsAsync swallows its own errors and flips isAsyncWorking; safe to fire-and-forget.
     gl.bindFramebuffer(gl.FRAMEBUFFER, ServiceLocator.getScene().frameBuffers.gpuPicking);
     if (!isThisNode() && this.isAsyncWorking && !settingsManager.isDisableAsyncReadPixels) {
       this.readPixelsAsync(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManagerInstance.pickReadPixelBuffer);
     }
     if (!this.isAsyncWorking) {
-      gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManagerInstance.pickReadPixelBuffer);
+      try {
+        gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManagerInstance.pickReadPixelBuffer);
+      } catch (e) {
+        this.disablePicking_(e);
+
+        return -1;
+      }
     }
 
     const buf = dotsManagerInstance.pickReadPixelBuffer;
@@ -281,6 +294,9 @@ export class InputManager {
    * Enable via settingsManager.debugMobilePicking = true.
    */
   public getSatIdFromCoordNeighborhood(x: number, y: number, patchSize = 21): { id: number; offsetX: number; offsetY: number; hitCount: number; patchData: string } {
+    if (!this.isPickingSupported) {
+      return { id: -1, offsetX: 0, offsetY: 0, hitCount: 0, patchData: '(picking disabled)' };
+    }
     const renderer = ServiceLocator.getRenderer();
     const { gl } = renderer;
 
@@ -292,7 +308,13 @@ export class InputManager {
     const buf = new Uint8Array(4 * clampedW * clampedH);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, ServiceLocator.getScene().frameBuffers.gpuPicking);
-    gl.readPixels(startX, startY, clampedW, clampedH, gl.RGBA, gl.UNSIGNED_BYTE, buf);
+    try {
+      gl.readPixels(startX, startY, clampedW, clampedH, gl.RGBA, gl.UNSIGNED_BYTE, buf);
+    } catch (e) {
+      this.disablePicking_(e);
+
+      return { id: -1, offsetX: 0, offsetY: 0, hitCount: 0, patchData: '(picking disabled)' };
+    }
 
     let closestId = -1;
     let closestDist = Infinity;
@@ -331,6 +353,17 @@ export class InputManager {
       hitCount: hits.length,
       patchData: hits.length > 0 ? hits.join('\n') : '(no valid IDs in patch)',
     };
+  }
+
+  private disablePicking_(e: unknown): void {
+    this.isPickingSupported = false;
+    this.isAsyncWorking = false;
+    if (!this.hasWarnedPickingDisabled_) {
+      this.hasWarnedPickingDisabled_ = true;
+      const msg = e instanceof Error ? e.message : String(e);
+
+      errorManagerInstance.warn(`Satellite hover-pick disabled: WebGL readPixels not supported in this browser (${msg}). Click-to-select still works.`);
+    }
   }
 
   public init(): void {

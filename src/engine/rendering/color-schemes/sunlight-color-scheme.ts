@@ -2,15 +2,15 @@
 import { SunStatus } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { hideEl } from '@app/engine/utils/get-el';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
-import { BaseObject, Satellite, Star } from '@ootk/src/main';
 import { t7e } from '@app/locales/keys';
+import { BaseObject, Satellite, Star } from '@ootk/src/main';
 import { ColorScheme } from './color-scheme';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SunlightColorScheme extends ColorScheme {
   readonly label = t7e('colorSchemes.SunlightColorScheme.label' as Parameters<typeof t7e>[0]);
@@ -29,7 +29,7 @@ export class SunlightColorScheme extends ColorScheme {
     sunlight100: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
     sunlight80: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
     sunlight60: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
-    sunlightInview: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
+    sunlightFov: [1.0, 0.5, 0.0, 0.8] as rgbaArray,
     umbral: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
     penumbral: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
   };

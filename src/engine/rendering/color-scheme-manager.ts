@@ -132,7 +132,13 @@ export class ColorSchemeManager {
     'CountryColorScheme',
     'VelocityColorScheme',
     'SunlightColorScheme',
-    'RcsColorScheme',
+    // RcsColorScheme intentionally excluded: it relies on the estimator
+    // cascade (preset → catalog-mining → geometric → vmag-derived) which only
+    // runs on the main thread. The worker's `rcsScheme` only reads the raw
+    // catalog rcs and would show every object without a published value as
+    // Unknown, defeating the point of the estimator. The performance cost of
+    // main-thread coloring is acceptable here because recolors are
+    // infrequent (scheme change, settings change, sensor change).
     'ConfidenceColorScheme',
     'GpAgeColorScheme',
     'MissionColorScheme',

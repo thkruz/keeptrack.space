@@ -1,7 +1,7 @@
 import { rgbaArray } from '@app/engine/core/interfaces';
 
 export const defaultColorSettings = {
-  version: '1.4.6', // This should match the one in settings.ts and be updated to force users cache to clear
+  version: '1.4.7', // Bumped to invalidate cached colors after the RCS plasma palette + new vmag/rcs slug additions (rcsXXXSmall, rcsXLarge, vmagBright2…). Without this bump, existing users keep the old yellow rcsUnknown / red rcsXXSmall etc. from localStorage.
   length: 0,
   facility: [0.0, 0.64, 0.64, 1.0] as rgbaArray,
   sunlight100: [1.0, 1.0, 1.0, 0.7] as rgbaArray,
@@ -66,12 +66,16 @@ export const defaultColorSettings = {
   confidenceHi: [0.0, 1.0, 0.0, 0.65] as rgbaArray,
   confidenceMed: [1.0, 0.4, 0.0, 0.65] as rgbaArray,
   confidenceLow: [1.0, 0.0, 0.0, 0.65] as rgbaArray,
-  rcsXXSmall: [1.0, 0, 0, 0.6] as rgbaArray,
-  rcsXSmall: [1.0, 0.2, 0, 0.6] as rgbaArray,
-  rcsSmall: [1.0, 0.4, 0, 0.6] as rgbaArray,
-  rcsMed: [0.2, 0.4, 1.0, 1] as rgbaArray,
-  rcsLarge: [0, 1.0, 0, 0.6] as rgbaArray,
-  rcsUnknown: [1.0, 1.0, 0, 0.6] as rgbaArray,
+  // Plasma palette, sampled at 7 evenly-spaced points (smallest → largest RCS).
+  // Distinct hue family from vmag's viridis so the active scheme reads at a glance.
+  rcsXXXSmall: [0.051, 0.031, 0.530, 0.9] as rgbaArray,
+  rcsXXSmall: [0.380, 0.000, 0.659, 0.9] as rgbaArray,
+  rcsXSmall: [0.620, 0.060, 0.624, 0.9] as rgbaArray,
+  rcsSmall: [0.798, 0.280, 0.470, 0.9] as rgbaArray,
+  rcsMed: [0.929, 0.473, 0.327, 0.9] as rgbaArray,
+  rcsLarge: [0.987, 0.682, 0.219, 0.9] as rgbaArray,
+  rcsXLarge: [0.941, 0.976, 0.129, 0.9] as rgbaArray,
+  rcsUnknown: [0.5, 0.5, 0.5, 0.4] as rgbaArray,
   lostobjects: [1, 0, 0, 0.8] as rgbaArray,
   inGroup: [1.0, 0.0, 0.0, 1.0] as rgbaArray,
   countryPRC: [1.0, 0, 0, 0.6] as rgbaArray,
@@ -86,12 +90,12 @@ export const defaultColorSettings = {
   notional: [1, 0, 0, 0.8] as rgbaArray,
   starlink: [0.0, 0.8, 0.0, 0.8] as rgbaArray,
   starlinkNot: [0.8, 0.0, 0.0, 0.8] as rgbaArray,
-  vmagBright: [0, 1.0, 0, 0.9] as rgbaArray,
-  vmagBright2: [0.6, 0.996, 0, 0.9] as rgbaArray,
-  vmagMed1: [0.8, 1.0, 0, 0.9] as rgbaArray,
-  vmagMed2: [1.0, 1.0, 0, 0.9] as rgbaArray,
-  vmagDim1: [1.0, 0.8, 0, 0.9] as rgbaArray,
-  vmagDim2: [1.0, 0.6, 0, 0.9] as rgbaArray,
-  vmagFaint: [1.0, 0, 0, 0.9] as rgbaArray,
-  vmagUnknown: [0.5, 0.5, 0.5, 0.6] as rgbaArray,
+  vmagBright: [0.992, 0.906, 0.145, 0.9] as rgbaArray,
+  vmagBright2: [0.369, 0.788, 0.380, 0.9] as rgbaArray,
+  vmagMed1: [0.125, 0.569, 0.549, 0.9] as rgbaArray,
+  vmagMed2: [0.192, 0.408, 0.557, 0.9] as rgbaArray,
+  vmagDim1: [0.243, 0.286, 0.537, 0.9] as rgbaArray,
+  vmagDim2: [0.286, 0.137, 0.455, 0.9] as rgbaArray,
+  vmagFaint: [0.267, 0.004, 0.329, 0.9] as rgbaArray,
+  vmagUnknown: [0.5, 0.5, 0.5, 0.4] as rgbaArray,
 };

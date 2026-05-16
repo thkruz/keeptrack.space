@@ -4,6 +4,7 @@ import type { PluginConfiguration } from '../keeptrack-plugins-configuration';
 
 export interface SatInfoBoxObjectConfiguration extends PluginConfiguration {
   isShowStdMag: boolean;
+  isShowAppMag: boolean;
   isEstimateRcs: boolean;
   isShowConfiguration: boolean;
   isShowLaunchVehicle: boolean;
@@ -13,6 +14,7 @@ export interface SatInfoBoxObjectConfiguration extends PluginConfiguration {
 export const satInfoBoxObjectConfigurationDefaults: SatInfoBoxObjectConfiguration = {
   enabled: true,
   isShowStdMag: true,
+  isShowAppMag: true,
   isEstimateRcs: true,
   isShowConfiguration: true,
   isShowLaunchVehicle: true,

@@ -46,6 +46,11 @@
       "label": "标准星等",
       "tooltip": "标准星等 - 数值越小越亮"
     },
+    "AppMag": {
+      "label": "视星等",
+      "tooltip": "在当前仿真时间从所选传感器观测到的视星等"
+    },
+    "estimatedSuffix": "（估算）",
     "unknown": "未知"
   }
 }

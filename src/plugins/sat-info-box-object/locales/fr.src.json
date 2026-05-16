@@ -46,6 +46,11 @@
       "label": "Magnitude standard",
       "tooltip": "Magnitude standard - Les nombres plus petits sont plus brillants"
     },
+    "AppMag": {
+      "label": "Magnitude apparente",
+      "tooltip": "Magnitude visuelle apparente observée depuis le capteur sélectionné à l'heure de simulation actuelle"
+    },
+    "estimatedSuffix": "(est.)",
     "unknown": "Inconnu"
   }
 }

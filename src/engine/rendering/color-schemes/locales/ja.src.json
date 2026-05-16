@@ -15,6 +15,6 @@
     "StarlinkColorScheme": { "label": "Starlink" },
     "SunlightColorScheme": { "label": "日照状況" },
     "VelocityColorScheme": { "label": "速度" },
-    "VisualMagnitudeColorScheme": { "label": "視等級" }
+    "VisualMagnitudeColorScheme": { "label": "標準等級" }
   }
 }

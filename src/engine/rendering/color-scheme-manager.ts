@@ -132,7 +132,13 @@ export class ColorSchemeManager {
     'CountryColorScheme',
     'VelocityColorScheme',
     'SunlightColorScheme',
-    'RcsColorScheme',
+    // RcsColorScheme intentionally excluded: it relies on the estimator
+    // cascade (preset → catalog-mining → geometric → vmag-derived) which only
+    // runs on the main thread. The worker's `rcsScheme` only reads the raw
+    // catalog rcs and would show every object without a published value as
+    // Unknown, defeating the point of the estimator. The performance cost of
+    // main-thread coloring is acceptable here because recolors are
+    // infrequent (scheme change, settings change, sensor change).
     'ConfidenceColorScheme',
     'GpAgeColorScheme',
     'MissionColorScheme',
@@ -253,14 +259,6 @@ export class ColorSchemeManager {
       this.applyFovFadeOverlay_();
       this.setSelectedAndHoverBuffer_();
       this.sendColorBufferToGpu();
-
-      // Save the color scheme if needed
-      if (this.currentColorScheme?.id && this.lastColorScheme?.id !== this.currentColorScheme?.id) {
-        UrlManager.updateURL();
-        PersistenceManager.getInstance().saveItem(StorageKey.COLOR_SCHEME, this.currentColorScheme.id);
-        // Note the colorscheme for next time
-        this.lastColorScheme = this.currentColorScheme;
-      }
     } catch (e) {
       this.currentColorScheme ??= this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? Object.values(this.colorSchemeInstances)[0];
       this.lastColorScheme = this.currentColorScheme;
@@ -605,6 +603,13 @@ export class ColorSchemeManager {
         dotsManagerInstance.buffers.pickability = this.pickableBuffer;
       } else {
         throw new Error('Color or pickable buffer is not initialized');
+      }
+
+      // Save here, not in calculateColorBuffers — worker-mode schemes bail out of that method early.
+      if (this.currentColorScheme?.id && this.lastColorScheme?.id !== this.currentColorScheme?.id) {
+        UrlManager.updateURL();
+        PersistenceManager.getInstance().saveItem(StorageKey.COLOR_SCHEME, this.currentColorScheme.id);
+        this.lastColorScheme = this.currentColorScheme;
       }
 
       EventBus.getInstance().emit(EventBusEvent.colorSchemeChanged, scheme);

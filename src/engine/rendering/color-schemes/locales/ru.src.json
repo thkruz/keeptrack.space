@@ -15,6 +15,6 @@
     "StarlinkColorScheme": { "label": "Starlink" },
     "SunlightColorScheme": { "label": "Статус освещённости" },
     "VelocityColorScheme": { "label": "Скорость" },
-    "VisualMagnitudeColorScheme": { "label": "Видимая звёздная величина" }
+    "VisualMagnitudeColorScheme": { "label": "Стандартная звёздная величина" }
   }
 }

@@ -55,8 +55,10 @@ export interface ColorSchemeColorMap {
   penumbral: [number, number, number, number];
   umbral: [number, number, number, number];
   gradientAmt: number;
+  rcsXXXSmall: [number, number, number, number];
   rcsXXSmall: [number, number, number, number];
   rcsXSmall: [number, number, number, number];
+  rcsXLarge: [number, number, number, number];
   lostobjects: [number, number, number, number];
   inGroup: [number, number, number, number];
   starlink: [number, number, number, number];

@@ -1163,6 +1163,10 @@ export class CatalogLoader {
   }
 
   private static processAllSats_(resp: KeepTrackTLEFile[], i: number, catalogManagerInstance: CatalogManager, tempObjData: BaseObject[], notionalSatNum: number): void {
+    if (typeof resp[i]?.name !== 'string') {
+      errorManagerInstance.debug(`Catalog entry ${i} (SCC ${resp[i]?.sccNum ?? 'unknown'}) is missing 'name'; using placeholder`);
+      resp[i].name = `Unknown ${resp[i]?.sccNum ?? i}`;
+    }
     if (settingsManager.isStarlinkOnly && resp[i].name.indexOf('STARLINK') === -1) {
       return;
     }

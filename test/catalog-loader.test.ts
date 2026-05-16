@@ -28,12 +28,26 @@ describe('Catalog Loader', () => {
   afterEach(() => {
     vi.restoreAllMocks();
     EventBus.getInstance().unregisterAllEvents();
+    settingsManager.isStarlinkOnly = false;
   });
 
   it('should load the catalog', async () => {
     settingsManager.isDisableAsciiCatalog = true;
     await CatalogLoader.load();
     expect(globalThis.fetch).toHaveBeenCalled();
+  });
+
+  it('does not throw when a keepTrackTle entry is missing name (regression: #1349)', async () => {
+    settingsManager.isStarlinkOnly = true;
+
+    const nameless = [
+      {
+        tle1: '1 25544U 98067A   24001.00000000  .00000000  00000-0  00000-0 0  0000',
+        tle2: '2 25544  51.6400 000.0000 0000000   0.0000   0.0000 15.50000000000000',
+      },
+    ];
+
+    await expect(CatalogLoader.parse({ keepTrackTle: nameless as never })).resolves.not.toThrow();
   });
 
   it('awaits beforeFilterTLEDatabase listeners before filterTLEDatabase runs', async () => {

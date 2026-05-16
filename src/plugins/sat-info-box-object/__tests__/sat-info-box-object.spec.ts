@@ -17,6 +17,15 @@ test.describe('SatInfoBoxObject', () => {
     await expect(page.locator('#sat-country')).toBeAttached();
     await expect(page.locator('#sat-launchSite')).toBeAttached();
 
+    // Standard and apparent magnitude rows are part of the object section
+    await expect(page.locator('#sat-stdmag-row')).toBeAttached();
+    await expect(page.locator('#sat-stdmag')).toBeAttached();
+    await expect(page.locator('#sat-appmag-row')).toBeAttached();
+    await expect(page.locator('#sat-appmag')).toBeAttached();
+
+    // Apparent magnitude row starts hidden until a sensor is selected
+    await expect(page.locator('#sat-appmag-row')).toBeHidden();
+
     // Secondary satellite comparison section
     await expect(page.locator('#secondary-sat-info')).toBeAttached();
   });

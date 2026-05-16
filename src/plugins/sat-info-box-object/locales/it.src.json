@@ -46,6 +46,11 @@
       "label": "Mag standard",
       "tooltip": "Magnitudine standard - Numeri più piccoli indicano maggiore luminosità"
     },
+    "AppMag": {
+      "label": "Mag apparente",
+      "tooltip": "Magnitudine visuale apparente osservata dal sensore selezionato all'ora di simulazione corrente"
+    },
+    "estimatedSuffix": "(stim.)",
     "unknown": "Sconosciuto"
   }
 }

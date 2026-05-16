@@ -15,6 +15,6 @@
     "StarlinkColorScheme": { "label": "Starlink" },
     "SunlightColorScheme": { "label": "일조 상태" },
     "VelocityColorScheme": { "label": "속도" },
-    "VisualMagnitudeColorScheme": { "label": "겉보기 등급" }
+    "VisualMagnitudeColorScheme": { "label": "표준 등급" }
   }
 }

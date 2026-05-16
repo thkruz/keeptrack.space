@@ -23,9 +23,36 @@ const LOG_LABELS: Record<LogLevel, string> = {
   [LogLevel.NONE]: '',
 };
 
+const SIGNATURE_WINDOW_MS = 5 * 60 * 1000;
+const SIGNATURE_MAP_PRUNE_THRESHOLD = 100;
+
+export interface ErrorOptions {
+  skipAutoFile?: boolean;
+  skipToast?: boolean;
+}
+
+export interface ErrorContext {
+  /** Raw thrown value — may be null/undefined for cross-origin script errors. */
+  error: unknown;
+  funcName: string;
+  /** event.message — preserved even when `error` is null. */
+  message?: string;
+  /** event.filename */
+  source?: string;
+  /** event.lineno */
+  line?: number;
+  /** event.colno */
+  col?: number;
+  /** True when event.error is null AND message is 'Script error.' (cross-origin). */
+  isCrossOrigin?: boolean;
+  isUnhandledRejection?: boolean;
+  toastMsg?: string;
+  opts?: ErrorOptions;
+}
+
 export class ErrorManager {
   private minLevel_: LogLevel;
-  private lastErrorTime_ = 0;
+  private signatureWindow_ = new Map<string, number>();
   private newGithubIssueUrl_: (options: Options) => string;
 
   constructor() {
@@ -54,60 +81,139 @@ export class ErrorManager {
     return `[${LOG_LABELS[level]}] ${msg}`;
   }
 
-  private toError_(e: unknown): Error {
+  private toError_(e: unknown, message?: string, source?: string, line?: number, col?: number): Error {
     if (e instanceof Error) {
       return e;
     }
+
+    // Cross-origin / synthetic case: build an Error whose stack reflects the captured event fields.
+    if ((e === null || e === undefined) && (message || source)) {
+      const err = new Error(message ?? 'Unknown error');
+
+      err.stack = `${err.name}: ${err.message}\n    at ${source ?? '<anonymous>'}:${line ?? '?'}:${col ?? '?'}`;
+
+      return err;
+    }
+
+    let err: Error;
+
     if (e === null || e === undefined) {
-      return new Error('Unknown error');
+      err = new Error('Unknown error');
+    } else if (typeof e === 'string') {
+      err = new Error(e);
+    } else {
+      try {
+        err = new Error(JSON.stringify(e));
+      } catch {
+        err = new Error(String(e));
+      }
     }
-    if (typeof e === 'string') {
-      return new Error(e);
+
+    // Re-anchor the stack to the caller of toError_, so reports don't all look like
+    // "at ErrorManager.toError_". V8 only — other engines keep the constructor stack.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+    const captureStackTrace = (Error as unknown as { captureStackTrace?: (target: object, constructorOpt: Function) => void }).captureStackTrace;
+
+    if (typeof captureStackTrace === 'function') {
+      captureStackTrace(err, this.toError_);
     }
-    try {
-      return new Error(JSON.stringify(e));
-    } catch {
-      return new Error(String(e));
-    }
+
+    return err;
   }
 
-  error(e: Error, funcName: string, toastMsg?: string, opts?: { skipAutoFile?: boolean; skipToast?: boolean }): void {
+  /**
+   * Structured entry point — preserves ErrorEvent / PromiseRejectionEvent context
+   * so reports carry real source locations even when the raw thrown value is null.
+   */
+  reportEvent(ctx: ErrorContext): void {
     if (!this.shouldLog_(LogLevel.ERROR)) {
       return;
     }
 
-    const err = this.toError_(e);
+    // Cross-origin script errors are unfixable on our end — Rocket Loader and other
+    // third-party loaders trigger these. Surface them to telemetry and console once,
+    // but don't toast the user or auto-file a useless "Unknown error" GitHub issue.
+    if (ctx.isCrossOrigin) {
+      const err = this.toError_(ctx.error, ctx.message, ctx.source, ctx.line, ctx.col);
 
-    EventBus.getInstance().emit(EventBusEvent.error, err, funcName);
+      EventBus.getInstance().emit(EventBusEvent.error, err, ctx.funcName);
+      // eslint-disable-next-line no-console
+      console.warn(
+        this.formatMsg_(LogLevel.WARN, `${ctx.funcName}: suppressed cross-origin script error`),
+        { message: ctx.message, source: ctx.source, line: ctx.line, col: ctx.col },
+      );
+
+      return;
+    }
+
+    const err = this.toError_(ctx.error, ctx.message, ctx.source, ctx.line, ctx.col);
+
+    EventBus.getInstance().emit(EventBusEvent.error, err, ctx.funcName);
 
     // eslint-disable-next-line no-console
-    console.error(this.formatMsg_(LogLevel.ERROR, `${funcName}: ${err.message}`), err);
+    console.error(this.formatMsg_(LogLevel.ERROR, `${ctx.funcName}: ${err.message}`), err);
     if (!isThisNode()) {
       // eslint-disable-next-line no-console
       console.trace();
     }
 
-    toastMsg ??= err.message || 'Unknown error';
-
-    const skipAutoFile = opts?.skipAutoFile === true || this.isExternalFetchError_(err);
+    const toastMsg = ctx.toastMsg ?? err.message ?? 'Unknown error';
+    const isDup = this.isDuplicateSuppressed_(this.getSignature_(err));
+    const skipAutoFile = ctx.opts?.skipAutoFile === true || this.isExternalFetchError_(err) || isDup;
 
     if (!skipAutoFile) {
-      const url = this.getErrorUrl_(err, funcName);
+      const url = this.getErrorUrl_(err, ctx);
 
-      // Max 1 error per 5 minutes
-      if (url !== '' && Date.now() - this.lastErrorTime_ > 1000 * 60 * 5) {
+      if (url !== '') {
         window.open(url, '_blank');
-        this.lastErrorTime_ = Date.now();
       }
     }
 
-    if (opts?.skipToast !== true) {
+    if (ctx.opts?.skipToast !== true && !isDup) {
       ServiceLocator.getUiManager()?.toast(toastMsg, ToastMsgType.error, true);
     }
 
     if (isThisNode()) {
       throw err;
     }
+  }
+
+  /**
+   * Thin wrapper preserved for the ~28 existing call sites. New code should use
+   * {@link reportEvent} directly to pass through ErrorEvent / PromiseRejection fields.
+   */
+  error(e: Error, funcName: string, toastMsg?: string, opts?: ErrorOptions): void {
+    this.reportEvent({ error: e, funcName, toastMsg, opts });
+  }
+
+  private getSignature_(err: Error): string {
+    const firstFrame = (err.stack ?? '')
+      .split('\n')
+      .map((line) => line.trim())
+      .find((line) => line.startsWith('at ')) ?? '';
+
+    return `${err.name}::${err.message}::${firstFrame}`;
+  }
+
+  private isDuplicateSuppressed_(signature: string): boolean {
+    const now = Date.now();
+    const last = this.signatureWindow_.get(signature);
+
+    if (last !== undefined && now - last < SIGNATURE_WINDOW_MS) {
+      return true;
+    }
+
+    this.signatureWindow_.set(signature, now);
+
+    if (this.signatureWindow_.size > SIGNATURE_MAP_PRUNE_THRESHOLD) {
+      for (const [sig, t] of this.signatureWindow_) {
+        if (now - t > SIGNATURE_WINDOW_MS) {
+          this.signatureWindow_.delete(sig);
+        }
+      }
+    }
+
+    return false;
   }
 
   private isExternalFetchError_(err: Error): boolean {
@@ -177,16 +283,25 @@ export class ErrorManager {
     console.debug(this.formatMsg_(LogLevel.DEBUG, msg), ...optionalParams);
   }
 
-  private getErrorUrl_(e: Error, funcName: string): string {
+  private getErrorUrl_(e: Error, ctx: ErrorContext): string {
+    const sourceLocation = ctx.source
+      ? `\n#### Source\n${ctx.source}:${ctx.line ?? '?'}:${ctx.col ?? '?'}`
+      : '';
+    const rejectionFlag = ctx.isUnhandledRejection
+      ? '\n#### Type\nUnhandled Promise Rejection'
+      : '';
+
     return this.newGithubIssueUrl_({
       user: 'thkruz',
       repo: 'keeptrack.space',
-      title: `${e?.name || 'Unknown'} in ${funcName}`,
+      title: `${e?.name || 'Unknown'} in ${ctx.funcName}`,
       labels: ['Problems : Bug'],
       body: `#### User Description
 Type what you were trying to do here...\n\n\n
 #### Version
 ${__VERSION__} - ${new Date(__VERSION_DATE__).toLocaleString()}
+#### Function
+${ctx.funcName}${rejectionFlag}${sourceLocation}
 #### Error Title
 ${e.name}
 #### Error Message

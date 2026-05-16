@@ -1,15 +1,23 @@
-/* eslint-disable complexity */
-import { SatMath } from '@app/app/analysis/sat-math';
-import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import { Scene } from '@app/engine/core/scene';
+import { estimateStdMag } from '@app/app/analysis/std-mag-estimator';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
-import { Sun } from '@app/engine/rendering/draw-manager/sun';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite } from '@ootk/src/main';
 import { ColorScheme } from './color-scheme';
 
+/**
+ * Colors satellites by *intrinsic* standard magnitude — sensor-independent,
+ * unlike the older apparent-magnitude scheme. Uses the std-mag estimator
+ * (catalog `vmag` → curated bus/name presets → Lambert-sphere from physical
+ * properties) so we have a value for the majority of the catalog, not just
+ * the small subset with a published `vmag`.
+ *
+ * Bucket boundaries are derived as quantiles of the loaded catalog rather
+ * than fixed magnitudes — keeps the seven color bands visually populated
+ * regardless of how the underlying distribution shifts (sparse catalogs sit
+ * compressed in mid-buckets under fixed thresholds).
+ */
 export class VisualMagnitudeColorScheme extends ColorScheme {
   readonly label = t7e('colorSchemes.VisualMagnitudeColorScheme.label' as Parameters<typeof t7e>[0]);
   readonly id = 'VisualMagnitudeColorScheme';
@@ -23,24 +31,52 @@ export class VisualMagnitudeColorScheme extends ColorScheme {
     vmagDim1: true,
     vmagDim2: true,
     vmagFaint: true,
-    vmagUnknown: true,
+    // Default OFF: objects with no signal hide completely until the user
+    // opts them back in via the legend toggle.
+    vmagUnknown: false,
   };
 
+  /**
+   * Viridis (perceptually uniform) palette, sampled at 7 evenly-spaced points.
+   * Ordered brightest → faintest so the array index matches the bucket index.
+   *
+   * Yellow = brightest intrinsic magnitude (small numeric value), dark purple
+   * = faintest. Yellow at the bright end follows the convention used in star
+   * atlases; dark purple at the faint end reads as "fading into the noise."
+   */
   static readonly uniqueColorTheme = {
-    vmagBright: [0, 1.0, 0, 0.9] as rgbaArray,
-    vmagBright2: [0.6, 0.996, 0, 0.9] as rgbaArray,
-    vmagMed1: [0.8, 1.0, 0, 0.9] as rgbaArray,
-    vmagMed2: [1.0, 1.0, 0, 0.9] as rgbaArray,
-    vmagDim1: [1.0, 0.8, 0, 0.9] as rgbaArray,
-    vmagDim2: [1.0, 0.6, 0, 0.9] as rgbaArray,
-    vmagFaint: [1.0, 0, 0, 0.9] as rgbaArray,
-    vmagUnknown: [0.5, 0.5, 0.5, 0.6] as rgbaArray,
+    vmagBright: [0.992, 0.906, 0.145, 0.9] as rgbaArray,
+    vmagBright2: [0.369, 0.788, 0.380, 0.9] as rgbaArray,
+    vmagMed1: [0.125, 0.569, 0.549, 0.9] as rgbaArray,
+    vmagMed2: [0.192, 0.408, 0.557, 0.9] as rgbaArray,
+    vmagDim1: [0.243, 0.286, 0.537, 0.9] as rgbaArray,
+    vmagDim2: [0.286, 0.137, 0.455, 0.9] as rgbaArray,
+    vmagFaint: [0.267, 0.004, 0.329, 0.9] as rgbaArray,
+    // Reserved for the "show unknowns" toggle — gives a faint visible swatch
+    // when users explicitly opt in, distinguishable from the bright/faint
+    // colored populations.
+    vmagUnknown: [0.5, 0.5, 0.5, 0.4] as rgbaArray,
   };
 
-  // Cached per-recolor: set in calculateParams(), read in update()
-  private sensor_: DetailedSensor | null = null;
-  private sun_: Sun | null = null;
-  private propTime_: Date | null = null;
+  private static readonly BUCKET_SLUGS = [
+    'vmagBright',
+    'vmagBright2',
+    'vmagMed1',
+    'vmagMed2',
+    'vmagDim1',
+    'vmagDim2',
+    'vmagFaint',
+  ] as const;
+
+  /**
+   * Used until `calculateParams` has scanned the catalog at least once.
+   * Hand-tuned around the typical LEO operational range so the very first
+   * recolor (often run before the catalog is fully populated) is still
+   * informative rather than dumping everything into a single bucket.
+   */
+  private static readonly FALLBACK_THRESHOLDS: readonly number[] = [2, 4, 5.5, 6.5, 7.5, 9];
+
+  private thresholds_: readonly number[] = VisualMagnitudeColorScheme.FALLBACK_THRESHOLDS;
 
   constructor() {
     super(VisualMagnitudeColorScheme.uniqueColorTheme);
@@ -50,11 +86,63 @@ export class VisualMagnitudeColorScheme extends ColorScheme {
   }
 
   override calculateParams() {
-    const sensorManager = ServiceLocator.getSensorManager();
+    const catalog = ServiceLocator.getCatalogManager();
+    const sats = catalog?.getSats() ?? [];
+    const mags: number[] = [];
 
-    this.sensor_ = sensorManager?.isSensorSelected() ? sensorManager.getSensor() : null;
-    this.sun_ = Scene.getInstance().sun ?? null;
-    this.propTime_ = ServiceLocator.getTimeManager()?.simulationTimeObj ?? null;
+    for (const sat of sats) {
+      const v = VisualMagnitudeColorScheme.resolveMag_(sat);
+
+      if (v !== null && isFinite(v)) {
+        mags.push(v);
+      }
+    }
+
+    // Need at least one value per bucket boundary to compute quantiles. With
+    // fewer points the previous thresholds remain in effect — better than
+    // collapsing every object into one band.
+    if (mags.length < VisualMagnitudeColorScheme.BUCKET_SLUGS.length) {
+      return null;
+    }
+
+    mags.sort((a, b) => a - b);
+
+    const bucketCount = VisualMagnitudeColorScheme.BUCKET_SLUGS.length;
+    const thresholds: number[] = [];
+    let prevValue = Number.NEGATIVE_INFINITY;
+    let prevIdx = -1;
+
+    for (let i = 1; i < bucketCount; i++) {
+      let idx = Math.max(Math.floor((mags.length * i) / bucketCount), prevIdx + 1);
+
+      // For the FIRST threshold, also skip past the leading cluster of equal
+      // values so the smallest-value group lands in bucket 0 instead of
+      // bucket 1. Strict-less-than bucketing otherwise leaves bucket 0 empty
+      // whenever the catalog's smallest magnitude is tied across many
+      // objects (e.g. a preset value applied to thousands of family members).
+      // For later thresholds, dedup as before to keep thresholds strictly
+      // increasing.
+      const skipTarget = i === 1 ? mags[0] : prevValue;
+
+      while (idx < mags.length && mags[idx] <= skipTarget) {
+        idx++;
+      }
+      if (idx >= mags.length) {
+        // No more distinct values available — fill the remaining slots with
+        // +Infinity and stop. Every subsequent iteration would re-hit this
+        // case anyway, and continuing leaves prevValue stale which would
+        // cause later iterations to mis-anchor their dedup search.
+        while (thresholds.length < bucketCount - 1) {
+          thresholds.push(Number.POSITIVE_INFINITY);
+        }
+        break;
+      }
+      thresholds.push(mags[idx]);
+      prevValue = mags[idx];
+      prevIdx = idx;
+    }
+
+    this.thresholds_ = thresholds;
 
     return null;
   }
@@ -65,20 +153,7 @@ export class VisualMagnitudeColorScheme extends ColorScheme {
     }
 
     const sat = obj as Satellite;
-
-    let mag: number | null = null;
-
-    if (this.sensor_ && this.sun_ && this.propTime_) {
-      try {
-        mag = SatMath.calculateVisMag(sat, this.sensor_, this.propTime_, this.sun_);
-      } catch {
-        mag = null;
-      }
-    }
-
-    if (mag === null) {
-      mag = typeof sat.vmag === 'number' ? sat.vmag : null;
-    }
+    const mag = VisualMagnitudeColorScheme.resolveMag_(sat);
 
     if (mag === null) {
       if (this.objectTypeFlags.vmagUnknown) {
@@ -88,95 +163,93 @@ export class VisualMagnitudeColorScheme extends ColorScheme {
         };
       }
 
+      // `deselected` is zero-alpha — unknowns disappear and don't block
+      // clicks on objects behind them. (Distinct from `transparent`, which
+      // is a 10%-alpha white ghost used for dimmed states elsewhere.)
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
 
-    if (mag < 0 && this.objectTypeFlags.vmagBright) {
+    const bucketIdx = VisualMagnitudeColorScheme.bucketIndex_(mag, this.thresholds_);
+    const slug = VisualMagnitudeColorScheme.BUCKET_SLUGS[bucketIdx];
+
+    if (!this.objectTypeFlags[slug]) {
       return {
-        color: this.colorTheme.vmagBright,
-        pickable: Pickable.Yes,
-      };
-    }
-    if (mag >= 0 && mag < 3 && this.objectTypeFlags.vmagBright2) {
-      return {
-        color: this.colorTheme.vmagBright2,
-        pickable: Pickable.Yes,
-      };
-    }
-    if (mag >= 3 && mag < 4.5 && this.objectTypeFlags.vmagMed1) {
-      return {
-        color: this.colorTheme.vmagMed1,
-        pickable: Pickable.Yes,
-      };
-    }
-    if (mag >= 4.5 && mag < 6 && this.objectTypeFlags.vmagMed2) {
-      return {
-        color: this.colorTheme.vmagMed2,
-        pickable: Pickable.Yes,
-      };
-    }
-    if (mag >= 6 && mag < 7.5 && this.objectTypeFlags.vmagDim1) {
-      return {
-        color: this.colorTheme.vmagDim1,
-        pickable: Pickable.Yes,
-      };
-    }
-    if (mag >= 7.5 && mag < 9 && this.objectTypeFlags.vmagDim2) {
-      return {
-        color: this.colorTheme.vmagDim2,
-        pickable: Pickable.Yes,
-      };
-    }
-    if (mag >= 9 && this.objectTypeFlags.vmagFaint) {
-      return {
-        color: this.colorTheme.vmagFaint,
-        pickable: Pickable.Yes,
+        color: this.colorTheme.deselected,
+        pickable: Pickable.No,
       };
     }
 
-    // Flag must have been turned off
     return {
-      color: this.colorTheme.deselected,
-      pickable: Pickable.No,
+      color: this.colorTheme[slug],
+      pickable: Pickable.Yes,
     };
+  }
+
+  /**
+   * Catalog value wins when present; the estimator fills in the rest. We
+   * never write the result back onto `sat.vmag` here — `sat-info-box-object`
+   * uses the catalog/estimate distinction to render its `(est.)` provenance
+   * suffix, and caching estimates would silently erase that signal.
+   */
+  private static resolveMag_(sat: Satellite): number | null {
+    if (typeof sat.vmag === 'number' && !isNaN(sat.vmag)) {
+      return sat.vmag;
+    }
+
+    return estimateStdMag(sat);
+  }
+
+  /**
+   * Returns the bucket index in [0, BUCKET_SLUGS.length). Magnitude ascends
+   * with faintness, so the first threshold the value falls below selects the
+   * bucket. Exposed as a static for unit tests.
+   */
+  private static bucketIndex_(mag: number, thresholds: readonly number[]): number {
+    for (let i = 0; i < thresholds.length; i++) {
+      if (mag < thresholds[i]) {
+        return i;
+      }
+    }
+
+    return thresholds.length;
   }
 
   static readonly layersHtml = html`
   <ul id="layers-list-vmag">
     <li>
       <div class="Square-Box layers-vmagBright-box"></div>
-      Brighter Than 0
+      Brightest
     </li>
     <li>
       <div class="Square-Box layers-vmagBright2-box"></div>
-      Between 0 and 3
+      Very Bright
     </li>
     <li>
       <div class="Square-Box layers-vmagMed1-box"></div>
-      Between 3 and 4.5
+      Bright
     </li>
     <li>
       <div class="Square-Box layers-vmagMed2-box"></div>
-      Between 4.5 and 6
+      Medium
     </li>
     <li>
       <div class="Square-Box layers-vmagDim1-box"></div>
-      Between 6 and 7.5
+      Dim
     </li>
     <li>
       <div class="Square-Box layers-vmagDim2-box"></div>
-      Between 7.5 and 9
+      Very Dim
     </li>
     <li>
       <div class="Square-Box layers-vmagFaint-box"></div>
-      Dimmer Than 9
+      Faintest
     </li>
     <li>
       <div class="Square-Box layers-vmagUnknown-box"></div>
-      No Public Data
+      No Data
     </li>
   </ul>
   `.trim();

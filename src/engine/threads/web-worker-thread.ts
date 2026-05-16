@@ -36,7 +36,14 @@ export abstract class WebWorkerThreadManager {
 
       this.worker_.onmessage = this.onMessage.bind(this);
       this.worker_.onerror = (event: ErrorEvent) => {
-        errorManagerInstance.warn(`[${this.WEB_WORKER_CODE}] Worker error: ${event.message}`);
+        errorManagerInstance.reportEvent({
+          error: event.error,
+          funcName: `Worker[${this.WEB_WORKER_CODE}]`,
+          message: event.message,
+          source: event.filename,
+          line: event.lineno,
+          col: event.colno,
+        });
       };
     } catch (error) {
       // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files

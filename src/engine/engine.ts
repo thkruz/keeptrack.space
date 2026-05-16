@@ -88,7 +88,29 @@ export class Engine {
       if (isThisNode()) {
         throw e.error;
       }
-      errorManagerInstance.error(e.error, 'Global Error Trapper', e.message);
+      errorManagerInstance.reportEvent({
+        error: e.error,
+        funcName: 'Global Error Trapper',
+        message: e.message,
+        source: e.filename,
+        line: e.lineno,
+        col: e.colno,
+        isCrossOrigin: !e.error && e.message === 'Script error.',
+      });
+    });
+
+    window.addEventListener('unhandledrejection', (e: PromiseRejectionEvent) => {
+      if (!settingsManager.isGlobalErrorTrapOn) {
+        return;
+      }
+      if (isThisNode()) {
+        throw e.reason;
+      }
+      errorManagerInstance.reportEvent({
+        error: e.reason,
+        funcName: 'Unhandled Promise Rejection',
+        isUnhandledRejection: true,
+      });
     });
   }
 

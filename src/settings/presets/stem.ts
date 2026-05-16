@@ -17,6 +17,7 @@ export const stemEnvironment = (settingsManager: SettingsManager) => {
   settingsManager.plugins.SatInfoBoxObject = {
     enabled: true,
     isShowStdMag: false,
+    isShowAppMag: false,
     isEstimateRcs: false,
     isShowConfiguration: true,
     isShowLaunchVehicle: true,

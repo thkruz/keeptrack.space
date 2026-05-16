@@ -13,6 +13,9 @@ export const EL = {
   CONFIGURATION: 'sat-configuration',
   RCS: 'sat-rcs',
   STDMAG: 'sat-stdmag',
+  STDMAG_ROW: 'sat-stdmag-row',
+  APPMAG: 'sat-appmag',
+  APPMAG_ROW: 'sat-appmag-row',
 
   // Secondary satellite elements
   DIST: 'sat-sec-dist',

@@ -46,6 +46,11 @@
       "label": "Jasność std.",
       "tooltip": "Jasność standardowa - Mniejsze liczby oznaczają jaśniejszy obiekt"
     },
+    "AppMag": {
+      "label": "Jasność obs.",
+      "tooltip": "Obserwowana jasność wizualna z wybranego sensora w bieżącym czasie symulacji"
+    },
+    "estimatedSuffix": "(szac.)",
     "unknown": "Nieznany"
   }
 }

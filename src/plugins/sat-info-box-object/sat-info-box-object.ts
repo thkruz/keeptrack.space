@@ -1,5 +1,7 @@
 /* eslint-disable max-lines */
 import { SatMath } from '@app/app/analysis/sat-math';
+import { buildCatalogRcsStats, estimateRcsWithSource } from '@app/app/analysis/rcs-estimator';
+import { estimateStdMagWithSource, StdMagWithSource } from '@app/app/analysis/std-mag-estimator';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { StringExtractor } from '@app/app/ui/string-extractor';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -104,11 +106,18 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
           <div class="sat-info-value" id="${EL.RCS}">NO DATA</div>
         </div>
         ${settingsManager.plugins.SatInfoBoxObject?.isShowStdMag !== false ? html`
-        <div class="sat-info-row sat-only-info">
+        <div class="sat-info-row sat-only-info" id="${EL.STDMAG_ROW}">
           <div class="sat-info-key"
             kt-tooltip="${t7e('SatInfoBoxObject.StdMag.tooltip')}">${t7e('SatInfoBoxObject.StdMag.label')}
           </div>
           <div class="sat-info-value" id="${EL.STDMAG}">NO DATA</div>
+        </div>` : ''}
+        ${settingsManager.plugins.SatInfoBoxObject?.isShowAppMag !== false ? html`
+        <div class="sat-info-row sat-only-info" id="${EL.APPMAG_ROW}" style="display: none;">
+          <div class="sat-info-key"
+            kt-tooltip="${t7e('SatInfoBoxObject.AppMag.tooltip')}">${t7e('SatInfoBoxObject.AppMag.label')}
+          </div>
+          <div class="sat-info-value" id="${EL.APPMAG}">NO DATA</div>
         </div>` : ''}
       </div>
     `;
@@ -189,15 +198,11 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
     const sat = satMisl as Satellite;
 
     if (settingsManager.plugins.SatInfoBoxObject?.isShowStdMag !== false) {
-      const satStandardMagnitudeElement = getEl(EL.STDMAG);
+      this.updateStdMag_(sat);
+    }
 
-      if (satStandardMagnitudeElement) {
-        satStandardMagnitudeElement.innerHTML = sat?.vmag && sat?.vmag?.toFixed(2) !== '' ? sat?.vmag?.toFixed(2) : t7e('SatInfoBoxObject.unknown');
-
-        if (!sat?.vmag && sat?.vmag !== 0) {
-          sat.vmag = this.calculateStdMag_(sat);
-        }
-      }
+    if (settingsManager.plugins.SatInfoBoxObject?.isShowAppMag !== false) {
+      this.updateApparentMag_(sat);
     }
 
     if (settingsManager.plugins.SatInfoBoxObject?.isShowConfiguration !== false) {
@@ -209,6 +214,84 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
     }
 
     requestIdleCallback(this.updateRcsData_.bind(this, sat));
+  }
+
+  private updateStdMag_(sat: Satellite) {
+    const stdMagElement = getEl(EL.STDMAG);
+
+    if (!stdMagElement) {
+      return;
+    }
+
+    const result = this.calculateStdMag_(sat);
+
+    if (result === null) {
+      stdMagElement.innerHTML = t7e('SatInfoBoxObject.unknown');
+
+      return;
+    }
+
+    // Cache catalog/preset values onto the object so downstream consumers
+    // (apparent-mag, color schemes) get a populated vmag without recomputing.
+    if (result.source !== 'estimate' && sat.vmag === null) {
+      sat.vmag = result.vmag;
+    }
+
+    const formatted = result.vmag.toFixed(2);
+
+    stdMagElement.innerHTML = result.source === 'catalog'
+      ? formatted
+      : `${formatted} ${t7e('SatInfoBoxObject.estimatedSuffix')}`;
+  }
+
+  private updateApparentMag_(sat: Satellite) {
+    const appMagRow = getEl(EL.APPMAG_ROW);
+    const appMagElement = getEl(EL.APPMAG);
+
+    if (!appMagRow || !appMagElement) {
+      return;
+    }
+
+    const sensorManager = ServiceLocator.getSensorManager();
+
+    if (!sensorManager.isSensorSelected()) {
+      appMagRow.style.display = 'none';
+
+      return;
+    }
+
+    const sensor = sensorManager.currentSensors[0];
+
+    if (!sensor) {
+      appMagRow.style.display = 'none';
+
+      return;
+    }
+
+    // Catalog/preset values are cached onto sat.vmag in updateStdMag_; for the
+    // estimate path, pass the value via the override parameter so we don't
+    // erase its provenance (the `(est.)` suffix in the standard mag row).
+    let intrinsicOverride: number | undefined;
+
+    if (sat.vmag === null) {
+      const fallback = estimateStdMagWithSource(sat);
+
+      if (fallback) {
+        intrinsicOverride = fallback.vmag;
+      }
+    }
+
+    try {
+      const timeManager = ServiceLocator.getTimeManager();
+      const sun = ServiceLocator.getScene().sun;
+      const appMag = SatMath.calculateVisMag(sat, sensor, timeManager.simulationTimeObj, sun, intrinsicOverride);
+
+      appMagElement.innerHTML = appMag.toFixed(2);
+      appMagRow.style.display = '';
+    } catch (e) {
+      errorManagerInstance.debug(`Apparent magnitude calculation failed: ${e}`);
+      appMagRow.style.display = 'none';
+    }
   }
 
   private updateLaunchVehicleCorrelationTable_(obj: BaseObject) {
@@ -434,90 +517,48 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
       return;
     }
 
-    if ((sat.rcs === null || typeof sat.rcs === 'undefined')) {
-      if (settingsManager.plugins.SatInfoBoxObject?.isEstimateRcs === false) {
+    // Respect the "no estimation" opt-out: show only what's literally in the
+    // catalog, fall back to Unknown otherwise.
+    if (settingsManager.plugins.SatInfoBoxObject?.isEstimateRcs === false) {
+      if (typeof sat.rcs === 'number' && !isNaN(sat.rcs)) {
+        satRcsEl.innerHTML = `${sat.rcs} m<sup>2</sup>`;
+        satRcsEl.setAttribute('kt-tooltip', `${SatMath.mag2db(sat.rcs).toFixed(2)} dBsm`);
+      } else {
         satRcsEl.innerHTML = t7e('Common.unknown');
         satRcsEl.setAttribute('kt-tooltip', t7e('Common.unknown'));
-      } else {
-        const estRcs = SatMath.estimateRcsUsingHistoricalData(sat);
-
-        if (estRcs !== null) {
-          satRcsEl.innerHTML = `H-Est ${estRcs.toFixed(4)} m<sup>2</sup>`;
-          satRcsEl.setAttribute('kt-tooltip', `${SatMath.mag2db(estRcs).toFixed(2)} dBsm (Historical Estimate)`);
-        } else if (sat.length && sat.diameter && sat.span && sat.shape) {
-          const rcs = SatMath.estimateRcs(parseFloat(sat.length), parseFloat(sat.diameter), parseFloat(sat.span), sat.shape);
-
-          satRcsEl.innerHTML = `Est ${rcs.toFixed(4)} m<sup>2</sup>`;
-          satRcsEl.setAttribute('kt-tooltip', `Est ${SatMath.mag2db(rcs).toFixed(2)} dBsm`);
-        } else {
-          satRcsEl.innerHTML = t7e('Common.unknown');
-          satRcsEl.setAttribute('kt-tooltip', t7e('Common.unknown'));
-        }
       }
-    } else if (!isNaN(sat.rcs)) {
-      satRcsEl.innerHTML = `${sat.rcs} m<sup>2</sup>`;
-    } else {
+
+      return;
+    }
+
+    // Catalog-mining is the most expensive layer; build the stats snapshot
+    // once on demand here. Slower than the color scheme's path (which caches
+    // it per recolor) but the info box runs at most a few times per second.
+    const stats = buildCatalogRcsStats(ServiceLocator.getCatalogManager().getSats());
+    const result = estimateRcsWithSource(sat, stats);
+
+    if (result === null) {
       satRcsEl.innerHTML = t7e('Common.unknown');
       satRcsEl.setAttribute('kt-tooltip', t7e('Common.unknown'));
-      // satRcsEl.setAttribute('kt-tooltip', `${SatMath.mag2db(sat.rcs).toFixed(2)} dBsm`);
+
+      return;
+    }
+
+    const formatted = `${result.rcs.toFixed(4)} m<sup>2</sup>`;
+    const dbsm = `${SatMath.mag2db(result.rcs).toFixed(2)} dBsm`;
+
+    if (result.source === 'catalog') {
+      satRcsEl.innerHTML = formatted;
+      satRcsEl.setAttribute('kt-tooltip', dbsm);
+    } else {
+      const suffix = t7e('SatInfoBoxObject.estimatedSuffix');
+
+      satRcsEl.innerHTML = `${formatted} ${suffix}`;
+      satRcsEl.setAttribute('kt-tooltip', `${dbsm} (${result.source})`);
     }
   }
 
-  private calculateStdMag_(obj: Satellite): number | null {
-    if (obj.vmag) {
-      return obj.vmag;
-    }
-
-    const similarVmag: number[] = [];
-    const catalogManager = ServiceLocator.getCatalogManager();
-    const curSatType = obj.type;
-    const curSatId = obj.id;
-    const curSatCountry = obj.country;
-    const curSatName = obj.name.toLowerCase();
-
-    catalogManager.getSats().forEach((posSat) => {
-      if (!posSat.vmag) {
-        return;
-      }
-      if (curSatCountry !== posSat.country) {
-        // Only look at same country
-        return;
-      }
-      if (curSatType !== posSat.type) {
-        // Only look at same type of curSat
-        return;
-      }
-      if (curSatId === posSat.id) {
-        // Don't look at the same curSat
-        return;
-      }
-
-      similarVmag.push(posSat.vmag);
-
-      // Only use the first word of the name
-      const posName = posSat.name.toLowerCase();
-
-      if (curSatName.length < 4 || posName.length < 4) {
-        return;
-      }
-
-      // Determine how many characters match
-      const matchingChars = curSatName.split('').filter((char, index) => char === posName[index]);
-
-      if (matchingChars.length / curSatName.length > 0.85) {
-        similarVmag.push(posSat.vmag);
-        similarVmag.push(posSat.vmag);
-        similarVmag.push(posSat.vmag);
-      }
-    });
-
-    if (similarVmag.length > 0) {
-      const avgVmag = similarVmag.reduce((a, b) => a + b, 0) / similarVmag.length;
-
-
-      return avgVmag;
-    }
-
-    return null;
+  private calculateStdMag_(obj: Satellite): StdMagWithSource | null {
+    return estimateStdMagWithSource(obj);
   }
 }

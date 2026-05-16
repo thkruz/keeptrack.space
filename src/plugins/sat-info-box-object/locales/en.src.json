@@ -46,6 +46,11 @@
       "label": "Standard Mag",
       "tooltip": "Standard Magnitude - Smaller Numbers Are Brighter"
     },
+    "AppMag": {
+      "label": "Apparent Mag",
+      "tooltip": "Apparent visual magnitude observed from the selected sensor at the current simulation time"
+    },
+    "estimatedSuffix": "(est.)",
     "unknown": "Unknown"
   }
 }

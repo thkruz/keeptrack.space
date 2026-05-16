@@ -46,6 +46,11 @@
       "label": "Std. magnituda",
       "tooltip": "Standardní magnituda – nižší čísla znamenají vyšší jas"
     },
+    "AppMag": {
+      "label": "Zdánl. magnituda",
+      "tooltip": "Zdánlivá vizuální magnituda pozorovaná z vybraného senzoru v aktuálním simulačním čase"
+    },
+    "estimatedSuffix": "(odh.)",
     "unknown": "Neznámý"
   }
 }

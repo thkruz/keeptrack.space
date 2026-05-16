@@ -46,6 +46,11 @@
       "label": "Standard-Mag",
       "tooltip": "Standardhelligkeit - Kleinere Zahlen sind heller"
     },
+    "AppMag": {
+      "label": "Scheinbare Mag",
+      "tooltip": "Scheinbare visuelle Helligkeit, beobachtet vom ausgewählten Sensor zur aktuellen Simulationszeit"
+    },
+    "estimatedSuffix": "(gesch.)",
     "unknown": "Unbekannt"
   }
 }

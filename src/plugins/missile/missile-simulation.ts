@@ -29,7 +29,7 @@ export class MissileSimulation {
   private readonly earthMass_ = 5.9726 * 10 ** 24; // kg
   private readonly gravConstant_ = 6.67384 * 10 ** -11; // m^3 kg^-1 s^-2
   private readonly gasConstant_ = 287; // J K^-1 kg^-1
-  private readonly fuelDensity_ = 1750; // kg/m^2
+  private readonly fuelDensity_ = 1750; // kg/m^3
   private readonly stepSize_ = 1; // s
 
   // Per-launch derived state.
@@ -322,13 +322,13 @@ export class MissileSimulation {
     const Lambda2 = (TargetLongitude * Math.PI) / 180;
     let Lambda12: number | undefined;
 
-    if (Lambda2 - Lambda1 >= -180 && Lambda2 - Lambda1 <= 180) {
+    if (Lambda2 - Lambda1 >= -Math.PI && Lambda2 - Lambda1 <= Math.PI) {
       Lambda12 = Lambda2 - Lambda1;
     }
-    if (Lambda2 - Lambda1 > 180) {
+    if (Lambda2 - Lambda1 > Math.PI) {
       Lambda12 = Lambda2 - Lambda1 - 2 * Math.PI;
     }
-    if (Lambda2 - Lambda1 < -180) {
+    if (Lambda2 - Lambda1 < -Math.PI) {
       Lambda12 = Lambda2 - Lambda1 + 2 * Math.PI;
     }
 

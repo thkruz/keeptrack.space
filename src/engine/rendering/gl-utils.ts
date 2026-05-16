@@ -2,6 +2,12 @@
 import { vec3 } from 'gl-matrix';
 import { errorManagerInstance } from '../utils/errorManager';
 import { BufferAttribute } from './buffer-attribute';
+import { getInjectedFailure, updateTextureStatus } from './texture-load-registry';
+
+/** Retry policy for transient texture-fetch failures. */
+const TEXTURE_RETRY_MAX_ATTEMPTS = 3;
+const TEXTURE_RETRY_BACKOFFS_MS = [500, 1500];
+const TEXTURE_RETRY_AFTER_CAP_MS = 5000;
 
 export abstract class GlUtils {
   static isWebglLintEnabled = false;
@@ -88,16 +94,70 @@ export abstract class GlUtils {
 
   /**
    * Init a texture and load an image.
+   *
+   * Retries transient failures (5xx, network errors) up to TEXTURE_RETRY_MAX_ATTEMPTS - 1 times
+   * with exponential backoff. 4xx and AbortError fail immediately. Honors Retry-After when
+   * present and within TEXTURE_RETRY_AFTER_CAP_MS.
    */
-  // eslint-disable-next-line require-await
   static async initTexture(gl: WebGL2RenderingContext, url: string): Promise<WebGLTexture> {
     const texture = gl.createTexture();
 
-    try {
-      const resp = await fetch(url);
+    updateTextureStatus(url, { state: 'loading', attempts: 0, lastError: undefined });
 
-      if (!resp.ok) {
-        throw new Error(`Failed to fetch image: ${url} (${resp.status})`);
+    let attempts = 0;
+    let lastErr: Error | null = null;
+    let resp: Response | null = null;
+
+    try {
+      /* eslint-disable no-await-in-loop -- retry requires sequential awaits */
+      while (attempts < TEXTURE_RETRY_MAX_ATTEMPTS) {
+        attempts += 1;
+        resp = null;
+        try {
+          resp = await GlUtils.fetchTexture_(url);
+          if (resp.ok) {
+            break;
+          }
+
+          // 4xx: don't retry, the asset isn't going to magically appear
+          if (resp.status >= 400 && resp.status < 500) {
+            lastErr = new Error(`Failed to fetch image: ${url} (${resp.status})`);
+            break;
+          }
+
+          lastErr = new Error(`Failed to fetch image: ${url} (${resp.status})`);
+        } catch (err) {
+          if (err instanceof DOMException && err.name === 'AbortError') {
+            throw err;
+          }
+          if (err instanceof Error && err.name === 'AbortError') {
+            throw err;
+          }
+          // TypeError is the canonical network-failure shape from fetch
+          if (!(err instanceof TypeError)) {
+            throw err;
+          }
+          lastErr = err;
+          resp = null;
+        }
+
+        if (attempts < TEXTURE_RETRY_MAX_ATTEMPTS) {
+          const retryAfterMs = GlUtils.parseRetryAfterMs_(resp);
+          const delayMs = retryAfterMs !== null
+            ? Math.min(retryAfterMs, TEXTURE_RETRY_AFTER_CAP_MS)
+            : TEXTURE_RETRY_BACKOFFS_MS[attempts - 1] ?? TEXTURE_RETRY_BACKOFFS_MS[TEXTURE_RETRY_BACKOFFS_MS.length - 1];
+
+          errorManagerInstance.debug(`initTexture retry ${attempts}/${TEXTURE_RETRY_MAX_ATTEMPTS - 1} for ${url} in ${delayMs}ms (${lastErr?.message ?? 'unknown'})`);
+          updateTextureStatus(url, { state: 'retrying', attempts, lastError: lastErr?.message });
+          await new Promise<void>((resolve) => {
+            setTimeout(resolve, delayMs);
+          });
+        }
+      }
+      /* eslint-enable no-await-in-loop */
+
+      if (!resp || !resp.ok) {
+        throw lastErr ?? new Error(`Failed to fetch image: ${url}`);
       }
 
       const blob = await resp.blob();
@@ -136,10 +196,63 @@ export abstract class GlUtils {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       }
 
+      updateTextureStatus(url, { state: 'loaded', attempts, lastError: undefined });
+
       return texture;
     } catch (err) {
-      throw new Error(`Failed to load image: ${url} - ${err instanceof Error ? err.message : String(err)}`);
+      const wrapped = new Error(`Failed to load image: ${url} - ${err instanceof Error ? err.message : String(err)}`);
+
+      updateTextureStatus(url, { state: 'failed', attempts: Math.max(attempts, 1), lastError: wrapped.message });
+      throw wrapped;
     }
+  }
+
+  /**
+   * Internal fetch hook that respects the dev-only failure-injection rules from
+   * texture-load-registry. In production this just forwards to global fetch.
+   */
+  private static fetchTexture_(url: string): Promise<Response> {
+    const injected = getInjectedFailure(url);
+
+    if (injected) {
+      if (injected.status === 'network') {
+        return Promise.reject(new TypeError(`Synthetic network failure for ${url}`));
+      }
+
+
+      return Promise.resolve(new Response(`Synthetic failure for ${url}`, { status: injected.status, statusText: 'Synthetic Failure' }));
+    }
+
+
+    return fetch(url);
+  }
+
+  /** Parse Retry-After header (delta-seconds or HTTP-date) to milliseconds, or null if absent/invalid. */
+  private static parseRetryAfterMs_(resp: Response | null): number | null {
+    if (!resp) {
+      return null;
+    }
+    const raw = resp.headers.get('Retry-After');
+
+    if (!raw) {
+      return null;
+    }
+    const seconds = Number.parseFloat(raw);
+
+    if (!Number.isNaN(seconds) && Number.isFinite(seconds) && seconds >= 0) {
+      return seconds * 1000;
+    }
+    const date = Date.parse(raw);
+
+    if (!Number.isNaN(date)) {
+      const delta = date - Date.now();
+
+
+      return delta > 0 ? delta : 0;
+    }
+
+
+    return null;
   }
 
   static getBestTexture(textureMap: Record<string, WebGLTexture>): WebGLTexture {

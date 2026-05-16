@@ -264,7 +264,11 @@ export abstract class UrlManager {
           case 'external-only':
           case 'bottomMenu':
           case 'earth':
-            // Consumed by other parameter handlers (lat/lon uses date, zoom uses camDistBuffer)
+          case 'debugFailTexture':
+          case 'debugFailStatus':
+          case 'debugFailCount':
+            // Consumed by other parameter handlers (lat/lon uses date, zoom uses camDistBuffer);
+            // debugFail* are read in texture-load-registry for dev-only texture failure injection
             break;
           default:
             errorManagerInstance.info(`Unknown URL parameter: ${key}`);

@@ -189,4 +189,9 @@ export enum EventBusEvent {
    * FovFadePlugin consumes the data and updates the alpha overlay.
    */
   onFovPredictionReady = 'onFovPredictionReady',
+  /**
+   * Emitted by GlUtils.initTexture on each state transition (loading, retrying, loaded, failed).
+   * Parameters: (status: TextureStatus)
+   */
+  textureStatusChanged = 'textureStatusChanged',
 }

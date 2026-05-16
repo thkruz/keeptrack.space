@@ -228,9 +228,12 @@ export abstract class SatMath {
    * @param sensor The sensor object.
    * @param propTime The time at which to calculate the visual magnitude.
    * @param sun The Sun object.
+   * @param intrinsicMagOverride Optional standard magnitude to use instead of `sat.vmag`. Lets
+   *   callers supply an estimator-derived value when the catalog has no published vmag, without
+   *   mutating the satellite (which would erase provenance for the UI's `(est.)` marker).
    * @returns The visual magnitude of the satellite.
    */
-  static calculateVisMag(sat: Satellite, sensor: DetailedSensor, propTime: Date, sun: Sun): number {
+  static calculateVisMag(sat: Satellite, sensor: DetailedSensor, propTime: Date, sun: Sun, intrinsicMagOverride?: number): number {
     let rae: {
       az: Degrees | null;
       el: Degrees | null;
@@ -265,7 +268,9 @@ export abstract class SatMath {
      *  DEBUG:
      *  if (!sat.vmag) console.debug('No standard magnitude in the database defaulting to 8');
      */
-    const intrinsicMagnitude = sat.vmag || 8;
+    const intrinsicMagnitude = (typeof intrinsicMagOverride === 'number' && !isNaN(intrinsicMagOverride))
+      ? intrinsicMagOverride
+      : (sat.vmag || 8);
 
     const term2 = 5.0 * Math.log10(distanceToSatellite / 1000);
 

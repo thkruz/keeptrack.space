@@ -15,6 +15,6 @@
     "StarlinkColorScheme": { "label": "Starlink" },
     "SunlightColorScheme": { "label": "Stav slunečního svitu" },
     "VelocityColorScheme": { "label": "Rychlost" },
-    "VisualMagnitudeColorScheme": { "label": "Vizuální magnituda" }
+    "VisualMagnitudeColorScheme": { "label": "Standardní magnituda" }
   }
 }

@@ -15,6 +15,6 @@
     "StarlinkColorScheme": { "label": "Starlink" },
     "SunlightColorScheme": { "label": "Sunlight Status" },
     "VelocityColorScheme": { "label": "Velocity" },
-    "VisualMagnitudeColorScheme": { "label": "Visual Magnitude" }
+    "VisualMagnitudeColorScheme": { "label": "Standard Magnitude" }
   }
 }

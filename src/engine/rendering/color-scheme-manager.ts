@@ -259,14 +259,6 @@ export class ColorSchemeManager {
       this.applyFovFadeOverlay_();
       this.setSelectedAndHoverBuffer_();
       this.sendColorBufferToGpu();
-
-      // Save the color scheme if needed
-      if (this.currentColorScheme?.id && this.lastColorScheme?.id !== this.currentColorScheme?.id) {
-        UrlManager.updateURL();
-        PersistenceManager.getInstance().saveItem(StorageKey.COLOR_SCHEME, this.currentColorScheme.id);
-        // Note the colorscheme for next time
-        this.lastColorScheme = this.currentColorScheme;
-      }
     } catch (e) {
       this.currentColorScheme ??= this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? Object.values(this.colorSchemeInstances)[0];
       this.lastColorScheme = this.currentColorScheme;
@@ -611,6 +603,13 @@ export class ColorSchemeManager {
         dotsManagerInstance.buffers.pickability = this.pickableBuffer;
       } else {
         throw new Error('Color or pickable buffer is not initialized');
+      }
+
+      // Save here, not in calculateColorBuffers — worker-mode schemes bail out of that method early.
+      if (this.currentColorScheme?.id && this.lastColorScheme?.id !== this.currentColorScheme?.id) {
+        UrlManager.updateURL();
+        PersistenceManager.getInstance().saveItem(StorageKey.COLOR_SCHEME, this.currentColorScheme.id);
+        this.lastColorScheme = this.currentColorScheme;
       }
 
       EventBus.getInstance().emit(EventBusEvent.colorSchemeChanged, scheme);

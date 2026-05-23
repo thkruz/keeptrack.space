@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v12.2.10](https://github.com/thkruz/keeptrack.space/compare/v12.2.9...v12.2.10)
+
+>  
+
+- fix(draw-manager): :bug: guard mesh updates against null positionData during catalog swap [`539120e`](https://github.com/thkruz/keeptrack.space/commit/539120e57a5b54e314341c516acccda21045bd05)
+- fix(orbit-cruncher): :bug: validate id and seqNum in worker handlers to survive catalog swap [`c3f1803`](https://github.com/thkruz/keeptrack.space/commit/c3f1803440e28e0fed80bc77d77cb5cff94ade10)
+- fix(dots-manager): :bug: guard getPositionArray and getIdFromEci against null buffer [`b0eb51e`](https://github.com/thkruz/keeptrack.space/commit/b0eb51e502d0fdc52bf21a9d1df78d89d33ffb7e)
+- fix(sat-label-manager): :bug: guard label position updates against null buffer and stale satIds [`125e20d`](https://github.com/thkruz/keeptrack.space/commit/125e20dfa1d8ce79ce26b95e32622ff57a25e613)
+- docs(changelog): :memo: update changelog for version 12.2.9 with recent changes [`93160e6`](https://github.com/thkruz/keeptrack.space/commit/93160e6270a2171fd0c309d30b78742cdb380fd0)
+- fix(select-sat-manager): :bug: invalidate cached satellite references on catalog reload [`907579b`](https://github.com/thkruz/keeptrack.space/commit/907579bcb45c1f73d03edffe412a4b2cc5f0680b)
+- fix(sensor-manager): :bug: clear lastMultiSiteArray on catalog reload [`97e83fa`](https://github.com/thkruz/keeptrack.space/commit/97e83faa33c46ccec749bc628b29884ba34be406)
+- fix(position-cruncher): :bug: validate id against objCache in SAT_EDIT and NEW_MISSILE handlers [`b04ba19`](https://github.com/thkruz/keeptrack.space/commit/b04ba19994286347c033d8fe96eeecbbf3a03feb)
+- chore(plugins-pro): :wrench: update subproject commit reference [`a84869d`](https://github.com/thkruz/keeptrack.space/commit/a84869db9191a5d4f726c7f7fb03783f70e9d6c7)
+- chore(plugins-pro): :wrench: update subproject commit reference [`e006271`](https://github.com/thkruz/keeptrack.space/commit/e006271bd20a43466b8b6dbc8a537e3a0f690704)
+
 #### [v12.2.9](https://github.com/thkruz/keeptrack.space/compare/v12.2.8...v12.2.9)
 
 >  

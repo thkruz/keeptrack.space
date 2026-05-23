@@ -315,6 +315,14 @@ export class CoreSettings {
   isDisableLoginGate = false;
 
   /**
+   * When true, the override's `plugins` map is treated as an exhaustive allowlist:
+   * any plugin not listed (regardless of manifest default) is forced to enabled:false.
+   * Profiles like celestrak/embed should set this to true so new plugins added to the
+   * manifest later don't leak into the deployment.
+   */
+  isStrictPluginList = false;
+
+  /**
    * Callback function that is called when the settings are loaded.
    */
   // eslint-disable-next-line no-empty-function

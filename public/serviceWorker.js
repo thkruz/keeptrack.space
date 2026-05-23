@@ -1,4 +1,8 @@
 const currentCacheName = 'KeepTrack-vX.X.X';
+// Patched by build/lib/version-manager.ts on every build so the SW file bytes
+// change between deploys. Guarantees the browser detects an update and the
+// existing controllerchange listener in index.html auto-reloads clients.
+const BUILD_ID = '__BUILD_ID__';
 
 const OFFLINE_HTML =
   '<!DOCTYPE html><html><head><title>KeepTrack - Offline</title></head>' +
@@ -126,6 +130,27 @@ self.addEventListener('fetch', (e) => {
 
   // Skip other cross-origin requests
   if (url.origin !== self.location.origin) {
+    return;
+  }
+
+  // --- Settings files: network-first so profile overrides apply immediately,
+  //     with cache fallback for offline. settingsOverride.js controls runtime
+  //     flags (isAutoStart, plugin enables, data sources) and must never be stale.
+  if (url.pathname.startsWith('/settings/')) {
+    e.respondWith(
+      fetchWithTimeout(e.request, 4000)
+        .then((response) => {
+          if (response.ok && response.status !== 206) {
+            const clone = response.clone();
+
+            caches.open(currentCacheName).then((cache) => cache.put(e.request, clone));
+          }
+
+          return response;
+        })
+        .catch(() => caches.match(e.request).then((cached) => cached || new Response('', { status: 504, statusText: 'Gateway Timeout' }))),
+    );
+
     return;
   }
 

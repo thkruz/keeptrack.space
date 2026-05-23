@@ -5,6 +5,7 @@ import type { BaseObject, Satellite, Milliseconds } from '@ootk/src/main';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import type { PanTouchEvent, TapTouchEvent } from '../input/input-manager/touch-input';
 import type { LineManager } from '../rendering/line-manager';
+import type { TextureStatus } from '../rendering/texture-load-registry';
 import { errorManagerInstance } from '../utils/errorManager';
 import { EventBusEvent } from './event-bus-events';
 
@@ -88,6 +89,7 @@ export interface EngineEventMap {
   [EventBusEvent.cameraTypeChanged]: [string]; // camera type name
   [EventBusEvent.onColorBufferReady]: [];
   [EventBusEvent.onFovPredictionReady]: [];
+  [EventBusEvent.textureStatusChanged]: [TextureStatus];
 }
 
 interface EventBusRegisterParams<T extends EventBusEvent> {

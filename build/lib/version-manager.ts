@@ -77,13 +77,19 @@ export class VersionManager {
     const version = this.readVersionFromPackageJson_(packageJsonPath);
     const swPath = './dist/serviceWorker.js';
     const swContent = this.fileManager.readFile(swPath);
-    const updated = swContent.replace(
-      /currentCacheName = 'KeepTrack-v[^']*'/u,
-      `currentCacheName = 'KeepTrack-v${version}'`,
-    );
+    const buildId = `${version}-${Date.now()}`;
+    const updated = swContent
+      .replace(
+        /currentCacheName = 'KeepTrack-v[^']*'/u,
+        `currentCacheName = 'KeepTrack-v${version}'`,
+      )
+      .replace(
+        /BUILD_ID = '[^']*'/u,
+        `BUILD_ID = '${buildId}'`,
+      );
 
     this.fileManager.writeFile(swPath, updated);
-    logWithStyle(`Updated service worker cache name to KeepTrack-v${version}`, ConsoleStyles.SUCCESS);
+    logWithStyle(`Updated service worker (cache: KeepTrack-v${version}, build: ${buildId})`, ConsoleStyles.SUCCESS);
   }
 
   /**

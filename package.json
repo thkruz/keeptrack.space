@@ -1,6 +1,6 @@
 {
   "name": "keeptrack.space",
-  "version": "12.2.7",
+  "version": "12.2.8",
   "type": "module",
   "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
   "author": "Theodore Kruczek",
@@ -85,7 +85,7 @@
     "@babel/preset-env": "^7.25.3",
     "@babel/preset-typescript": "^7.23.0",
     "@playwright/test": "^1.58.2",
-    "@rspack/cli": "^1.4.11",
+    "@rspack/cli": "^1.7.11",
     "@rspack/core": "^1.4.11",
     "@testing-library/dom": "^9.3.3",
     "@testing-library/user-event": "^14.5.2",

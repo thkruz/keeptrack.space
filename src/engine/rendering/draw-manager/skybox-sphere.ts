@@ -5,6 +5,7 @@ import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { glsl } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { SettingsManager } from '@app/settings/settings';
 import { DEG2RAD } from '@ootk/src/main';
 import { mat3, mat4 } from 'gl-matrix';
@@ -184,16 +185,24 @@ export class SkyBoxSphere {
     sm.milkyWayTextureQuality ??= this.DEFAULT_RESOLUTION;
 
     if (sm.isDrawMilkyWay && !this.textureMilkyWay[sm.milkyWayTextureQuality] && sm.milkyWayTextureQuality !== MilkyWayTextureQuality.OFF) {
-      GlUtils.initTexture(this.gl_, `${this.getSrc_(this.MILKYWAY_SRC_BASE, sm.milkyWayTextureQuality, 'jpg')}`).then((texture) => {
+      const milkyWayUrl = `${this.getSrc_(this.MILKYWAY_SRC_BASE, sm.milkyWayTextureQuality, 'jpg')}`;
+
+      GlUtils.initTexture(this.gl_, milkyWayUrl).then((texture) => {
         this.textureMilkyWay[sm.milkyWayTextureQuality] = texture;
         this.isTexturesReady_ = true;
+      }).catch((err) => {
+        errorManagerInstance.warn(`Failed to load milkyway texture: ${milkyWayUrl}`, err);
       });
     }
     if (sm.isGraySkybox && !this.isReadyGraySkybox_) {
-      GlUtils.initTexture(this.gl_, SkyBoxSphere.getSrcGraySkybox(sm)).then((texture) => {
+      const graySkyboxUrl = SkyBoxSphere.getSrcGraySkybox(sm);
+
+      GlUtils.initTexture(this.gl_, graySkyboxUrl).then((texture) => {
         this.textureGraySkybox_ = texture;
         this.isReadyGraySkybox_ = true;
         this.isTexturesReady_ = true;
+      }).catch((err) => {
+        errorManagerInstance.warn(`Failed to load gray skybox texture: ${graySkyboxUrl}`, err);
       });
     }
   }

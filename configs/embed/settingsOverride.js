@@ -498,6 +498,9 @@ const settingsOverride = {
   isAllowRightClick: false,
   isShowLoadingHints: false,
   isBlockPersistence: true,
+  // Treat the plugins map above as an exhaustive allowlist — any plugin not
+  // listed (including new ones added to the manifest later) is forced disabled.
+  isStrictPluginList: true,
   isDisableBottomMenu: true,
   isDrawSun: false,
   isDrawMilkyWay: false,

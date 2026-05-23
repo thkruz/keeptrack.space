@@ -75,6 +75,13 @@ export class ConfigManager {
           );
         }
 
+        // Snapshot OS-level process.env BEFORE dotenv pollutes it. Only true OS
+        // env vars (set by CI/CD or the shell) should be allowed to override
+        // profile config; values loaded from the root .env must not silently
+        // override profile paths (the legacy .env still defines SETTINGS_PATH,
+        // STYLE_CSS_PATH, etc., which would otherwise clobber the profile).
+        const osEnv: NodeJS.ProcessEnv = { ...process.env };
+
         const profileOverrides = profileLoader.loadProfile(this.profileName_);
 
         Object.assign(this.config, profileOverrides);
@@ -96,8 +103,9 @@ export class ConfigManager {
           dotenv.config({ path: './.env' });
         }
 
-        // process.env still wins (allows CI/CD overrides)
-        this.applyProcessEnvOverrides_();
+        // Apply only OS-level env overrides (CI/CD), using the pre-dotenv snapshot
+        // so .env file values cannot silently override profile config.
+        this.applyProcessEnvOverrides_(osEnv);
       } else {
         // Legacy mode: load from .env file
         const envFilePath = './.env';
@@ -181,41 +189,44 @@ export class ConfigManager {
   }
 
   /**
-   * Applies process.env overrides on top of profile config (for CI/CD)
+   * Applies env overrides on top of profile config (for CI/CD).
+   * Must be passed a snapshot of process.env taken BEFORE dotenv.config calls,
+   * so .env file values don't silently override profile config — only true
+   * OS-level env vars do.
    */
-  private applyProcessEnvOverrides_(): void {
-    if (process.env.SETTINGS_PATH) {
-      this.config.settingsPath = process.env.SETTINGS_PATH;
+  private applyProcessEnvOverrides_(env: NodeJS.ProcessEnv): void {
+    if (env.SETTINGS_PATH) {
+      this.config.settingsPath = env.SETTINGS_PATH;
     }
-    if (process.env.FAVICON_PATH) {
-      this.config.favIconPath = process.env.FAVICON_PATH;
+    if (env.FAVICON_PATH) {
+      this.config.favIconPath = env.FAVICON_PATH;
     }
-    if (process.env.TEXT_LOGO_PATH) {
-      this.config.textLogoPath = process.env.TEXT_LOGO_PATH;
+    if (env.TEXT_LOGO_PATH) {
+      this.config.textLogoPath = env.TEXT_LOGO_PATH;
     }
-    if (process.env.STYLE_CSS_PATH) {
-      this.config.styleCssPath = process.env.STYLE_CSS_PATH;
+    if (env.STYLE_CSS_PATH) {
+      this.config.styleCssPath = env.STYLE_CSS_PATH;
     }
-    if (process.env.LOADING_SCREEN_CSS_PATH) {
-      this.config.loadingScreenCssPath = process.env.LOADING_SCREEN_CSS_PATH;
+    if (env.LOADING_SCREEN_CSS_PATH) {
+      this.config.loadingScreenCssPath = env.LOADING_SCREEN_CSS_PATH;
     }
-    if (process.env.PRIMARY_LOGO_PATH) {
-      this.config.primaryLogoPath = process.env.PRIMARY_LOGO_PATH;
+    if (env.PRIMARY_LOGO_PATH) {
+      this.config.primaryLogoPath = env.PRIMARY_LOGO_PATH;
     }
-    if (process.env.SECONDARY_LOGO_PATH) {
-      this.config.secondaryLogoPath = process.env.SECONDARY_LOGO_PATH;
+    if (env.SECONDARY_LOGO_PATH) {
+      this.config.secondaryLogoPath = env.SECONDARY_LOGO_PATH;
     }
-    if (process.env.MODE) {
-      this.config.mode = process.env.MODE as BuildConfig['mode'];
+    if (env.MODE) {
+      this.config.mode = env.MODE as BuildConfig['mode'];
     }
-    if (process.env.IS_PRO) {
-      this.config.isPro = process.env.IS_PRO === 'true';
+    if (env.IS_PRO) {
+      this.config.isPro = env.IS_PRO === 'true';
     }
-    if (process.env.PUBLIC_SUPABASE_URL) {
-      this.config.PUBLIC_SUPABASE_URL = process.env.PUBLIC_SUPABASE_URL;
+    if (env.PUBLIC_SUPABASE_URL) {
+      this.config.PUBLIC_SUPABASE_URL = env.PUBLIC_SUPABASE_URL;
     }
-    if (process.env.PUBLIC_SUPABASE_ANON_KEY) {
-      this.config.PUBLIC_SUPABASE_ANON_KEY = process.env.PUBLIC_SUPABASE_ANON_KEY;
+    if (env.PUBLIC_SUPABASE_ANON_KEY) {
+      this.config.PUBLIC_SUPABASE_ANON_KEY = env.PUBLIC_SUPABASE_ANON_KEY;
     }
   }
 

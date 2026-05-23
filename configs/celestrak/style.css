@@ -1,5 +1,28 @@
 @import url('../../public/css/style.common.css');
 
+:root {
+  /* Legacy aliases (match loading-screen.css) */
+  --color-primary: #046eb6 !important;
+  --color-primary-light: #add8e6 !important;
+  --color-primary-dark: #023456 !important;
+  --color-dark-background: #002d47 !important;
+  --color-dark-border: #004270 !important;
+  --color-dark-text-accent: #add8e6 !important;
+  --color-dark-text-muted: #6b6b6b !important;
+  --colorTertiary: #046eb6 !important;
+
+  /* New design-token primitives (override the red palette) */
+  --kt-red-400: #2a8ed1 !important;
+  --kt-red-500: #046eb6 !important;
+  --kt-red-600: #023456 !important;
+
+  /* New semantic tokens that resolve directly to the red palette */
+  --kt-accent: #046eb6 !important;
+  --kt-accent-light: #2a8ed1 !important;
+  --kt-accent-dark: #023456 !important;
+  --kt-text-accent: #add8e6 !important;
+}
+
 
 /* File-specific CSS rules */
 

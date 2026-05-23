@@ -27,6 +27,7 @@ import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, E
 import { isThisNode } from '../engine/utils/isThisNode';
 import { PersistenceManager, StorageKey } from '../engine/utils/persistence-manager';
 import { CameraSettings, defaultCameraSettings } from './camera-settings';
+import { pluginManifest } from '@app/plugins/plugin-manifest';
 import { ColorSettings, defaultColorSettings } from './color-settings';
 import { CoreSettings, defaultCoreSettings } from './core-settings';
 import { DataSettings, defaultDataSettings } from './data-settings';
@@ -790,6 +791,25 @@ export class SettingsManager {
         this[key] = this.deepMerge({ ...currentValue }, overrideValue);
       } else {
         this[key] = overrideValue;
+      }
+    }
+
+    // Strict plugin allowlist: when the profile opts in, any plugin not explicitly
+    // listed in overrides.plugins is forced to enabled:false. Prevents new plugins
+    // added to the manifest later from leaking into branded/embed deployments.
+    // alwaysEnabled plugins (infrastructure like SelectSatManager) are exempt —
+    // their base-plugin init() reads settingsManager.plugins[id].enabled and bails
+    // out if false, which would break every plugin that depends on them.
+    if (this.isStrictPluginList && overrides.plugins) {
+      const allowed = new Set(Object.keys(overrides.plugins));
+      const alwaysEnabled = new Set(
+        pluginManifest.filter((d) => d.alwaysEnabled).map((d) => d.configKey),
+      );
+
+      for (const key of Object.keys(this.plugins)) {
+        if (!allowed.has(key) && !alwaysEnabled.has(key)) {
+          this.plugins[key] = { ...this.plugins[key], enabled: false };
+        }
       }
     }
   }

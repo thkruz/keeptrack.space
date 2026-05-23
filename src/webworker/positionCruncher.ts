@@ -316,6 +316,10 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
         if (m.data.id === undefined) {
           break;
         }
+        // Discard edits for ids outside the current catalog (e.g. in-flight after a swap to a smaller catalog).
+        if (m.data.id >= objCache.length || !objCache[m.data.id]) {
+          break;
+        }
         // replace old TLEs
         const satrec = Sgp4.createSatrec(m.data.tle1, m.data.tle2);
 
@@ -358,7 +362,7 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
       }
       break;
     case PosCruncherMsgType.NEW_MISSILE:
-      if (m.data.id !== undefined) {
+      if (m.data.id !== undefined && m.data.id < objCache.length) {
         objCache[m.data.id] = <PosCruncherCachedObject>(<unknown>m.data);
       }
       break;

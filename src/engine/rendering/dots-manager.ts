@@ -439,7 +439,15 @@ export class DotsManager {
   }
 
   getPositionArray(i: number): EciArr3 {
-    return [this.positionData[i * 3], this.positionData[i * 3 + 1], this.positionData[i * 3 + 2]] as EciArr3;
+    const posData = this.positionData;
+    const idx = i * 3;
+
+    // positionData is nulled during catalog swap; callers (line manager, scene offset, etc.) treat origin as a safe default
+    if (!posData || idx + 2 >= posData.length) {
+      return [0, 0, 0] as EciArr3;
+    }
+
+    return [posData[idx], posData[idx + 1], posData[idx + 2]] as EciArr3;
   }
 
   /**
@@ -448,14 +456,24 @@ export class DotsManager {
    * @param maxDots - The maximum number of satellites to search through.
    * @returns The ID of the closest satellite, or null if no satellite is found within 100km.
    */
-  getIdFromEci(eci: { x: number; y: number; z: number }, maxDots = this.positionData.length): number | null {
+  getIdFromEci(eci: { x: number; y: number; z: number }, maxDots?: number): number | null {
+    const posData = this.positionData;
+
+    if (!posData) {
+      return null;
+    }
+
+    // positionData is xyz-packed (length = 3 * numSats). When the caller omits maxDots,
+    // the loop bound must be sat count, not buffer length, or we read past the end.
+    const satCount = Math.floor(posData.length / 3);
+    const effectiveMaxDots = typeof maxDots === 'number' ? Math.min(maxDots, satCount) : satCount;
     const possibleMatches: { id: number; distance: number }[] = [];
 
     // loop through all the satellites
-    for (let id = 0; id < maxDots; id++) {
-      const x = this.positionData[id * 3];
-      const y = this.positionData[id * 3 + 1];
-      const z = this.positionData[id * 3 + 2];
+    for (let id = 0; id < effectiveMaxDots; id++) {
+      const x = posData[id * 3];
+      const y = posData[id * 3 + 1];
+      const z = posData[id * 3 + 2];
 
       if (x > eci.x - 100 && x < eci.x + 100 && y > eci.y - 100 && y < eci.y + 100 && z > eci.z - 100 && z < eci.z + 100) {
         // if within 1km of the satellite, return it

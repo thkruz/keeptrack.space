@@ -95,6 +95,12 @@ export class SatLabelManager {
     const positionData = dotsManager.positionData;
 
     if (!positionData) {
+      // draw() and updatePositions() key off instanceCount_; without zeroing it,
+      // the stale satPositionData_ from before the swap would keep rendering.
+      this.labeledSatIds_ = [];
+      this.labelGlyphCounts_ = [];
+      this.instanceCount_ = 0;
+
       return;
     }
 
@@ -154,6 +160,9 @@ export class SatLabelManager {
     const positionData = dotsManager.positionData;
 
     if (!positionData) {
+      // Stop draw() from rendering stale satPositionData_ until updateLabels rebuilds.
+      this.instanceCount_ = 0;
+
       return;
     }
 

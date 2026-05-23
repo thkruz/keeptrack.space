@@ -264,10 +264,14 @@ jobs:
   boot-smoke:
     needs: [lint-and-test, lint-and-test-oss]
     if: always() && needs.lint-and-test-oss.result == 'success' && (needs.lint-and-test.result == 'success' || needs.lint-and-test.result == 'skipped')
-    name: Boot Smoke Test
+    name: Boot Smoke (${{ matrix.profile }})
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [oss, pro, celestrak, embed, epfl, offline]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6
@@ -288,9 +292,27 @@ jobs:
             ${{ runner.os }}-build-node-modules-${{
             runner.os }}-
 
-      # boot-smoke only ever builds the oss profile, so skip SSH entirely.
-      - name: Update public submodules only
+      # OSS profile: no SSH, only the public ootk submodule.
+      - name: Update public submodules only (OSS)
+        if: matrix.profile == 'oss'
         run: git submodule update --init --recursive -- src/engine/ootk
+
+      - name: Verify plugins-pro absence (OSS only)
+        if: matrix.profile == 'oss'
+        run: |
+          if [ -n "$(ls -A src/plugins-pro 2>/dev/null)" ]; then
+            echo "ERROR: OSS boot-smoke sees plugins-pro contents"; exit 1
+          fi
+
+      # Non-OSS profiles: SSH + full submodules (pro included).
+      - name: Set up SSH
+        if: matrix.profile != 'oss' && github.event.pull_request.head.repo.full_name == github.repository
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+      - name: Update submodules
+        if: matrix.profile != 'oss' && github.event.pull_request.head.repo.full_name == github.repository
+        run: git submodule update --init --recursive
 
       - name: Install Dependencies
         run: npm ci --ignore-scripts
@@ -308,22 +330,25 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Build (oss)
+      - name: Build (${{ matrix.profile }})
         run: |
           npx tsx ./build/generate-translation.ts
-          npx tsx ./build/build-manager.ts production --profile=oss
+          PROFILE=${{ matrix.profile }}
+          npx tsx ./build/build-manager.ts production \
+            --profile="$PROFILE"
 
       - name: Run Boot Smoke Test
         run: |
-          echo "Running app boot smoke tests..."
+          echo "Running app boot smoke tests (${{ matrix.profile }})..."
           npm run test:e2e:smoke
-          echo '### Boot Smoke Test Passed' >> $GITHUB_STEP_SUMMARY
+          MSG="### Boot Smoke (${{ matrix.profile }}) Passed"
+          echo "$MSG" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Playwright report on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-boot-smoke
+          name: playwright-report-boot-smoke-${{ matrix.profile }}
           path: playwright-report/
           retention-days: 7
 

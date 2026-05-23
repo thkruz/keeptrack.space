@@ -85,6 +85,17 @@ export class SelectSatManager extends KeepTrackPlugin {
         }
       }
     });
+
+    // Catalog swaps invalidate every cached satellite reference held here. The id-based
+    // selectedSat is reset by catalog-loader's selectSat(-1) call, but the JS object
+    // references aren't, so we clear them ourselves to avoid acting on a stale Satellite.
+    EventBus.getInstance().on(EventBusEvent.catalogReloaded, () => {
+      this.primarySatObj = this.noSatObj_;
+      this.primarySatCovMatrix = null;
+      this.secondarySatObj = null;
+      this.secondarySatCovMatrix = vec3.create();
+      this.lastSelectedSat_ = -1;
+    });
   }
 
   checkIfSelectSatVisible() {

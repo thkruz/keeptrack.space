@@ -32,7 +32,7 @@ function isDevHost_(): boolean {
   const host = location.hostname;
 
 
-  return host === 'localhost' || host === '127.0.0.1' || host === '[::1]' || host === '';
+  return host === 'localhost' || host === '127.0.0.1' || host === '::1' || host === '[::1]' || host === '';
 }
 
 /** Parse failure-injection rules from the URL query string. Returns empty array outside dev. */

@@ -18,8 +18,14 @@ export class SensorToRaeLine extends Line {
 
   update(): void {
     const posData = ServiceLocator.getDotsManager().positionData;
-    const id = this.sensor.id;
-    const sensorEciArr = [posData[Number(id) * 3], posData[Number(id) * 3 + 1], posData[Number(id) * 3 + 2]] as EciArr3;
+    const idx = Number(this.sensor.id) * 3;
+
+    // positionData is nulled during catalog swap; resume on next cruncher message
+    if (!posData || idx + 2 >= posData.length) {
+      return;
+    }
+
+    const sensorEciArr = [posData[idx], posData[idx + 1], posData[idx + 2]] as EciArr3;
 
     const gmst = ServiceLocator.getTimeManager().gmst;
 

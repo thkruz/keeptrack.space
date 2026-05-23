@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v12.2.9](https://github.com/thkruz/keeptrack.space/compare/v12.2.8...v12.2.9)
+
+>  
+
+- fix(line-manager): :bug: guard line updates against null positionData during catalog swap [`#1357`](https://github.com/thkruz/keeptrack.space/issues/1357)
+- fix(build): simplify boot-smoke job by removing matrix profiles and SSH setup [`d17fcd5`](https://github.com/thkruz/keeptrack.space/commit/d17fcd51c2062bd6e29996d1ba7b072cce25cc73)
+- feat(build): enhance boot-smoke job with matrix profiles and SSH setup [`9b7db2f`](https://github.com/thkruz/keeptrack.space/commit/9b7db2f41d7542d8ad5198b863cdc02a69aff1d9)
+- docs(changelog): :memo: update changelog for version 12.2.8 with recent changes [`bce648b`](https://github.com/thkruz/keeptrack.space/commit/bce648b599f931345c2308f08344ba91fa90a5e8)
+- test(gl-utils): :white_check_mark: stub createImageBitmap to actually hit the non-POT branch [`9c8f914`](https://github.com/thkruz/keeptrack.space/commit/9c8f9142225466043f2fdfb832b73f8d6f6eeb9e)
+- fix(dependencies): :bug: revert @rspack/cli to ^1.7.11 for compatibility with @rspack/core@1.x [`bb91326`](https://github.com/thkruz/keeptrack.space/commit/bb91326fdb8abb71acfd1b263a4f4047c9f43cdc)
+- fix(rendering): :bug: detect IPv6 localhost (::1) for dev-host check [`aae0caf`](https://github.com/thkruz/keeptrack.space/commit/aae0caf70b9bb3304954aacb7814762b0d1be801)
+- fix(dependencies): update @rspack/cli to version 2.0.4 [`1115289`](https://github.com/thkruz/keeptrack.space/commit/1115289a9c090e90ccc2227f3f86dec900d20851)
+- docs(readme): :memo: update version badge to 12.2.8 [`3d9f386`](https://github.com/thkruz/keeptrack.space/commit/3d9f386e4151d4e965dadcbbebd073ed817b2ab3)
+- docs(changelog): :memo: remove duplicate mesh-manager entry for #1338 [`91af1ed`](https://github.com/thkruz/keeptrack.space/commit/91af1ed193620856b84d7c855e43998c0ebdc8ec)
+
 #### [v12.2.8](https://github.com/thkruz/keeptrack.space/compare/v12.2.7...v12.2.8)
 
 >  
@@ -48,6 +63,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - fix(dots-manager): guard updatePosVel against null positionData and velocityData [`#1340`](https://github.com/thkruz/keeptrack.space/issues/1340)
 - fix(mesh-manager): guard draw and drawOcclusion against uninitialized renderer [`#1338`](https://github.com/thkruz/keeptrack.space/issues/1338)
 - fix(rendering): :bug: improve GPU picking framebuffer management and add tests for lifecycle [`#1347`](https://github.com/thkruz/keeptrack.space/issues/1347)
+- fix(mesh-manager): guard draw and drawOcclusion against uninitialized renderer [`#1338`](https://github.com/thkruz/keeptrack.space/issues/1338)
 - test(missile-manager): :white_check_mark: Add unit tests for missileManager functionality and input validation [`866b76a`](https://github.com/thkruz/keeptrack.space/commit/866b76a91efc7f0a934ebb52be6666d4af84f59c)
 - feat(rcs-estimator): :sparkles: add RCS estimator with catalog mining and vmag-derived fallback [`cb0e160`](https://github.com/thkruz/keeptrack.space/commit/cb0e160ab1858d9cff3b9a8b42b70dd755a8b6b8)
 - feat(visual-magnitude): :sparkles: switch to standard magnitude with viridis palette and quantile bucketing [`a8eb239`](https://github.com/thkruz/keeptrack.space/commit/a8eb23940b7b28b32dcce492cc0f6eaeabdbf29c)

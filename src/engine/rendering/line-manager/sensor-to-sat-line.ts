@@ -31,8 +31,14 @@ export class SensorToSatLine extends Line {
 
   update(): void {
     const posData = ServiceLocator.getDotsManager().positionData;
-    const id = this.sat.id;
-    const eciArr = [posData[Number(id) * 3], posData[Number(id) * 3 + 1], posData[Number(id) * 3 + 2]] as EciArr3;
+    const idx = Number(this.sat.id) * 3;
+
+    // positionData is nulled during catalog swap; resume on next cruncher message
+    if (!posData || idx + 2 >= posData.length) {
+      return;
+    }
+
+    const eciArr = [posData[idx], posData[idx + 1], posData[idx + 2]] as EciArr3;
 
     const sensorEci = this.sensor.eci(ServiceLocator.getTimeManager().simulationTimeObj);
     const sensorEciArr = [sensorEci.x, sensorEci.y, sensorEci.z] as EciArr3;

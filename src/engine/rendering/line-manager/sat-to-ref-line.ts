@@ -20,10 +20,17 @@ export class SatToRefLine extends Line {
 
   update(): void {
     const posData = ServiceLocator.getDotsManager().positionData;
+    const idx = Number(this.sat.id) * 3;
+
+    // positionData is nulled during catalog swap; resume on next cruncher message
+    if (!posData || idx + 2 >= posData.length) {
+      return;
+    }
+
     const position = {
-      x: posData[Number(this.sat.id) * 3],
-      y: posData[Number(this.sat.id) * 3 + 1],
-      z: posData[Number(this.sat.id) * 3 + 2],
+      x: posData[idx],
+      y: posData[idx + 1],
+      z: posData[idx + 2],
     };
     const satArr = [position.x, position.y, position.z] as EciArr3;
 

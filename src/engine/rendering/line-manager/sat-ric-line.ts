@@ -18,10 +18,17 @@ export class SatRicLine extends Line {
 
   update(): void {
     const posData = ServiceLocator.getDotsManager().positionData;
+    const idx = Number(this.sat.id) * 3;
+
+    // positionData is nulled during catalog swap; resume on next cruncher message
+    if (!posData || idx + 2 >= posData.length) {
+      return;
+    }
+
     const position = {
-      x: posData[Number(this.sat.id) * 3],
-      y: posData[Number(this.sat.id) * 3 + 1],
-      z: posData[Number(this.sat.id) * 3 + 2],
+      x: posData[idx],
+      y: posData[idx + 1],
+      z: posData[idx + 2],
     };
     const satArr = [position.x, position.y, position.z] as EciArr3;
 
@@ -29,6 +36,11 @@ export class SatRicLine extends Line {
     const inTrack = { ...this.sat.velocity }; // Duplicate the velocity vector to avoid modifying the original
     // Normalize the velocity vector
     const inTrackMag = Math.sqrt(inTrack.x * inTrack.x + inTrack.y * inTrack.y + inTrack.z * inTrack.z);
+
+    // Zero-velocity sat (stale-catalog edge case) would propagate NaN through the vertex buffer
+    if (inTrackMag === 0) {
+      return;
+    }
 
     inTrack.x = inTrack.x / inTrackMag as KilometersPerSecond;
     inTrack.y = inTrack.y / inTrackMag as KilometersPerSecond;

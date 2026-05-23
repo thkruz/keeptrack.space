@@ -13,6 +13,10 @@ let numberOfSegments: number;
 let orbitType = OrbitDrawTypes.ORBIT;
 let orbitFadeFactor = 1.0;
 let numberOfOrbitsToDraw = 1;
+/** Tracks the last catalog-swap seqNum; per-id update messages older than this are discarded as stale. */
+let currentSeqNum = 0;
+
+const isStaleUpdate_ = (seqNum?: number): boolean => typeof seqNum === 'number' && seqNum < currentSeqNum;
 
 export const onMessage = (m: {
   data: OrbitCruncherInMsgs;
@@ -24,10 +28,16 @@ export const onMessage = (m: {
       handleMsgInit_(msg);
       break;
     case OrbitCruncherMsgType.SATELLITE_UPDATE:
+      if (isStaleUpdate_(msg.seqNum)) {
+        break;
+      }
       handleMsgSatelliteUpdate_(msg);
       updateOrbitData_(msg);
       break;
     case OrbitCruncherMsgType.MISSILE_UPDATE:
+      if (isStaleUpdate_(msg.seqNum)) {
+        break;
+      }
       handleMsgMissileUpdate_(msg);
       updateOrbitData_(msg);
       break;
@@ -54,11 +64,41 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
   const isPolarViewEcf = data.isPolarViewEcf || false;
   const pointsOut = new Float32Array((numberOfSegments + 1) * 4);
 
+  // Defensive bounds check: a catalog swap can shrink objCache, but in-flight
+  // update messages for old ids may still arrive. Reply with the zero buffer
+  // so the consumer (orbit-cruncher-thread-manager) sees a normal response
+  // and any waiting state (inProgress_, orbitCache) gets cleared.
+  if (id >= objCache.length || !objCache[id]) {
+    postMessage({
+      typ: OrbitCruncherMsgType.RESPONSE_DATA,
+      pointsOut,
+      satId: id,
+      seqNum: currentSeqNum,
+    }, { transfer: [pointsOut.buffer as ArrayBuffer] });
+
+    return;
+  }
+
   const len = numberOfSegments + 1;
   let i = 0;
   // Calculate Missile Orbits
 
   if ((objCache[id] as OrbitCruncherMissileObject).missile) {
+    const missile = objCache[id] as OrbitCruncherMissileObject;
+    const hasTrajectory = missile.latList && missile.lonList && missile.altList && missile.altList.length > 0;
+
+    if (!hasTrajectory) {
+      // pointsOut is already zero-initialized; nothing to draw until the missile trajectory is populated
+      postMessage({
+        typ: OrbitCruncherMsgType.RESPONSE_DATA,
+        pointsOut,
+        satId: id,
+        seqNum: currentSeqNum,
+      }, { transfer: [pointsOut.buffer as ArrayBuffer] });
+
+      return;
+    }
+
     // Compute GMST once for all missile segments (same time for all points)
     const missileJ =
       jday(nowDate.getUTCFullYear(), nowDate.getUTCMonth() + 1, nowDate.getUTCDate(), nowDate.getUTCHours(), nowDate.getUTCMinutes(), nowDate.getUTCSeconds()) +
@@ -66,18 +106,8 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
     const missileGmst = Sgp4.gstime(missileJ);
 
     while (i < len) {
-      const missile = objCache[id] as OrbitCruncherMissileObject;
-
-      if (missile.latList?.length === 0) {
-        pointsOut[i * 4] = 0;
-        pointsOut[i * 4 + 1] = 0;
-        pointsOut[i * 4 + 2] = 0;
-        pointsOut[i * 4 + 3] = 0;
-        i++;
-      } else {
-        drawMissileSegment_(missile, i, pointsOut, len, missileGmst);
-        i++;
-      }
+      drawMissileSegment_(missile, i, pointsOut, len, missileGmst);
+      i++;
     }
   } else if ((objCache[id] as OrbitCruncherOtherObject).ignore || !(objCache[id] as OrbitCruncherSatelliteObject).satrec) {
     // Invalid objects or OemSatellite with no TLEs
@@ -85,6 +115,7 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
       typ: OrbitCruncherMsgType.RESPONSE_DATA,
       pointsOut,
       satId: id,
+      seqNum: currentSeqNum,
     }, { transfer: [pointsOut.buffer as ArrayBuffer] });
 
     return;
@@ -128,6 +159,7 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
     typ: OrbitCruncherMsgType.RESPONSE_DATA,
     pointsOut,
     satId: id,
+    seqNum: currentSeqNum,
   }, { transfer: [pointsOut.buffer as ArrayBuffer] });
 };
 
@@ -209,6 +241,9 @@ const handleMsgInit_ = (data: OrbitCruncherInMsgInit) => {
   orbitFadeFactor = data.orbitFadeFactor ?? 1.0;
   numberOfOrbitsToDraw = data.numberOfOrbitsToDraw ?? 1;
   numberOfSegments = data.numSegs;
+  if (typeof data.seqNum === 'number') {
+    currentSeqNum = data.seqNum;
+  }
 
   const objData = JSON.parse(data.objData) as OrbitCruncherCachedObject[];
   const sLen = objData.length - 1;
@@ -229,10 +264,17 @@ const handleMsgInit_ = (data: OrbitCruncherInMsgInit) => {
     }
   }
 
+  // Drop residual entries from the previous (larger) catalog so SATELLITE_UPDATE
+  // for an id beyond the new range can't mutate a stale object.
+  objCache.length = objData.length;
+
   postMessage('ready');
 };
 
 const handleMsgSatelliteUpdate_ = (data: OrbitCruncherInMsgSatelliteUpdate) => {
+  if (data.id >= objCache.length || !objCache[data.id]) {
+    return;
+  }
   // If new orbit
   if (data.tle1 && data.tle2) {
     const satelliteCacheEntry = objCache[data.id] as OrbitCruncherSatelliteObject;
@@ -242,6 +284,9 @@ const handleMsgSatelliteUpdate_ = (data: OrbitCruncherInMsgSatelliteUpdate) => {
 };
 
 const handleMsgMissileUpdate_ = (data: OrbitCruncherInMsgMissileUpdate) => {
+  if (data.id >= objCache.length || !objCache[data.id]) {
+    return;
+  }
   if (data.latList && data.lonList && data.altList) {
     const missileCacheEntry = objCache[data.id] as OrbitCruncherMissileObject;
 

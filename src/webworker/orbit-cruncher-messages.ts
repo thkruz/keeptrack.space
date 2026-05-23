@@ -33,6 +33,8 @@ export interface OrbitCruncherInMsgInit {
   objData: string;
   numSegs: number;
   numberOfOrbitsToDraw?: number;
+  /** Catalog-swap sequence number. Worker rejects update messages older than the last INIT. */
+  seqNum?: number;
 }
 
 export interface OrbitCruncherInMsgSatelliteUpdate {
@@ -44,6 +46,7 @@ export interface OrbitCruncherInMsgSatelliteUpdate {
   tle2?: string;
   isEcfOutput: boolean;
   isPolarViewEcf?: boolean;
+  seqNum?: number;
 }
 
 export interface OrbitCruncherInMsgMissileUpdate {
@@ -56,6 +59,7 @@ export interface OrbitCruncherInMsgMissileUpdate {
   altList?: Kilometers[];
   isEcfOutput: boolean;
   isPolarViewEcf?: boolean;
+  seqNum?: number;
 }
 
 export interface OrbitCruncherInMsgChangeOrbitType {
@@ -81,6 +85,8 @@ export interface OrbitCruncherOutMsgPoints {
   typ: OrbitCruncherMsgType.RESPONSE_DATA;
   pointsOut: Float32Array;
   satId: number;
+  /** Echoes the seqNum the worker was on when it produced these points. Main thread drops stale responses. */
+  seqNum?: number;
 }
 
 // ─── Object Cache Types (used inside the worker) ───────────────────────────

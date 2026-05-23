@@ -11,15 +11,19 @@ import { Degrees, Kilometers } from '@ootk/src/main';
 export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
   readonly WEB_WORKER_CODE: string = 'js/orbitCruncher.js';
 
+  private currentSeqNum_ = 0;
+
   // ─── Typed Send Methods ─────────────────────────────────────────────
 
   sendInit(objData: string, numSegs: number, orbitFadeFactor?: number, numberOfOrbitsToDraw?: number): void {
+    this.currentSeqNum_++;
     this.postMessage({
       typ: OrbitCruncherMsgType.INIT,
       objData,
       numSegs,
       orbitFadeFactor,
       numberOfOrbitsToDraw,
+      seqNum: this.currentSeqNum_,
     });
   }
 
@@ -35,6 +39,7 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
       isPolarViewEcf,
       tle1,
       tle2,
+      seqNum: this.currentSeqNum_,
     });
   }
 
@@ -52,6 +57,7 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
       latList,
       lonList,
       altList,
+      seqNum: this.currentSeqNum_,
     });
   }
 
@@ -82,6 +88,11 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
     const data = m.data as OrbitCruncherOutMsgPoints;
 
     if (!data || data.typ !== OrbitCruncherMsgType.RESPONSE_DATA) {
+      return;
+    }
+
+    // Discard stale responses from before the last catalog swap.
+    if (typeof data.seqNum === 'number' && data.seqNum < this.currentSeqNum_) {
       return;
     }
 

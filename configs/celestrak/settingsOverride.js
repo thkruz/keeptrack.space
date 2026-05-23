@@ -408,6 +408,9 @@ const settingsOverride = {
   },
   isDisableLoginGate: true,
   isBlockPersistence: true,
+  // Treat the plugins map above as an exhaustive allowlist — any plugin not
+  // listed (including new ones added to the manifest later) is forced disabled.
+  isStrictPluginList: true,
   isShowSecondaryLogo: true,
   isUseJdayOnTopMenu: false,
   isJdayToggleable: false,

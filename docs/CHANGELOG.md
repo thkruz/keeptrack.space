@@ -48,7 +48,6 @@ All notable changes to this project will be documented in this file. Dates are d
 - fix(dots-manager): guard updatePosVel against null positionData and velocityData [`#1340`](https://github.com/thkruz/keeptrack.space/issues/1340)
 - fix(mesh-manager): guard draw and drawOcclusion against uninitialized renderer [`#1338`](https://github.com/thkruz/keeptrack.space/issues/1338)
 - fix(rendering): :bug: improve GPU picking framebuffer management and add tests for lifecycle [`#1347`](https://github.com/thkruz/keeptrack.space/issues/1347)
-- fix(mesh-manager): guard draw and drawOcclusion against uninitialized renderer [`#1338`](https://github.com/thkruz/keeptrack.space/issues/1338)
 - test(missile-manager): :white_check_mark: Add unit tests for missileManager functionality and input validation [`866b76a`](https://github.com/thkruz/keeptrack.space/commit/866b76a91efc7f0a934ebb52be6666d4af84f59c)
 - feat(rcs-estimator): :sparkles: add RCS estimator with catalog mining and vmag-derived fallback [`cb0e160`](https://github.com/thkruz/keeptrack.space/commit/cb0e160ab1858d9cff3b9a8b42b70dd755a8b6b8)
 - feat(visual-magnitude): :sparkles: switch to standard magnitude with viridis palette and quantile bucketing [`a8eb239`](https://github.com/thkruz/keeptrack.space/commit/a8eb23940b7b28b32dcce492cc0f6eaeabdbf29c)

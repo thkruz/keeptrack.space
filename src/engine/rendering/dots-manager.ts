@@ -463,7 +463,10 @@ export class DotsManager {
       return null;
     }
 
-    const effectiveMaxDots = maxDots ?? posData.length;
+    // positionData is xyz-packed (length = 3 * numSats). When the caller omits maxDots,
+    // the loop bound must be sat count, not buffer length, or we read past the end.
+    const satCount = Math.floor(posData.length / 3);
+    const effectiveMaxDots = typeof maxDots === 'number' ? Math.min(maxDots, satCount) : satCount;
     const possibleMatches: { id: number; distance: number }[] = [];
 
     // loop through all the satellites

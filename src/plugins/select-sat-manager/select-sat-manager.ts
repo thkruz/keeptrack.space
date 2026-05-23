@@ -89,9 +89,12 @@ export class SelectSatManager extends KeepTrackPlugin {
     // Catalog swaps invalidate every cached satellite reference held here. The id-based
     // selectedSat is reset by catalog-loader's selectSat(-1) call, but the JS object
     // references aren't, so we clear them ourselves to avoid acting on a stale Satellite.
+    // secondarySat (the id) is also cleared here since catalog-loader doesn't touch it,
+    // and a stale id can collide with a new selection that happens to reuse the number.
     EventBus.getInstance().on(EventBusEvent.catalogReloaded, () => {
       this.primarySatObj = this.noSatObj_;
       this.primarySatCovMatrix = null;
+      this.secondarySat = -1;
       this.secondarySatObj = null;
       this.secondarySatCovMatrix = vec3.create();
       this.lastSelectedSat_ = -1;

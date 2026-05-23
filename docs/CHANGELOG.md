@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v12.2.8](https://github.com/thkruz/keeptrack.space/compare/v12.2.7...v12.2.8)
+
+>  
+
+- chore(configs): :wrench: opt celestrak and embed into strict plugin allowlist [`#1354`](https://github.com/thkruz/keeptrack.space/pull/1354)
+- fix(celestrak): :bug: override design tokens for blue main-app theme [`#1354`](https://github.com/thkruz/keeptrack.space/pull/1354)
+- feat(settings): :sparkles: add isStrictPluginList for profile plugin allowlists [`#1354`](https://github.com/thkruz/keeptrack.space/pull/1354)
+- fix(build): :bug: prevent root .env from overriding profile config [`#1354`](https://github.com/thkruz/keeptrack.space/pull/1354)
+- fix(pwa): :bug: prevent stale settingsOverride and force SW update per build [`#1354`](https://github.com/thkruz/keeptrack.space/pull/1354)
+- fix(rendering): :bug: gracefully handle texture load failures [`0bde771`](https://github.com/thkruz/keeptrack.space/commit/0bde771df7bee66a49781579bfc1be922d5e1881)
+- docs(changelog): update changelog for version 12.2.7 with recent changes [`41c2258`](https://github.com/thkruz/keeptrack.space/commit/41c225849d7c6de79e6c51189f5775ad0f71f4ec)
+- fix(missile): :bug: compare longitude wrap in radians, not degrees [`8c1efca`](https://github.com/thkruz/keeptrack.space/commit/8c1efcab85062cd88f1a1301bb70dedfa8dd51b1)
+- chore(plugins-pro): :wrench: update subproject commit reference [`8668beb`](https://github.com/thkruz/keeptrack.space/commit/8668beba976d9ca582565f8b0b77fbe266ebf29c)
+- docs(readme): update version badge to 12.2.7 [`c100e7a`](https://github.com/thkruz/keeptrack.space/commit/c100e7af480fc90fe375d0b57596252bb27ded2d)
+- docs(changelog): :memo: remove duplicate mesh-manager entry for #1338 [`d828d87`](https://github.com/thkruz/keeptrack.space/commit/d828d875da48113a519a51d9873bfd71c17d42d9)
+
 #### [v12.2.7](https://github.com/thkruz/keeptrack.space/compare/v12.2.6...v12.2.7)
 
 >  
@@ -32,6 +48,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - fix(dots-manager): guard updatePosVel against null positionData and velocityData [`#1340`](https://github.com/thkruz/keeptrack.space/issues/1340)
 - fix(mesh-manager): guard draw and drawOcclusion against uninitialized renderer [`#1338`](https://github.com/thkruz/keeptrack.space/issues/1338)
 - fix(rendering): :bug: improve GPU picking framebuffer management and add tests for lifecycle [`#1347`](https://github.com/thkruz/keeptrack.space/issues/1347)
+- fix(mesh-manager): guard draw and drawOcclusion against uninitialized renderer [`#1338`](https://github.com/thkruz/keeptrack.space/issues/1338)
 - test(missile-manager): :white_check_mark: Add unit tests for missileManager functionality and input validation [`866b76a`](https://github.com/thkruz/keeptrack.space/commit/866b76a91efc7f0a934ebb52be6666d4af84f59c)
 - feat(rcs-estimator): :sparkles: add RCS estimator with catalog mining and vmag-derived fallback [`cb0e160`](https://github.com/thkruz/keeptrack.space/commit/cb0e160ab1858d9cff3b9a8b42b70dd755a8b6b8)
 - feat(visual-magnitude): :sparkles: switch to standard magnitude with viridis palette and quantile bucketing [`a8eb239`](https://github.com/thkruz/keeptrack.space/commit/a8eb23940b7b28b32dcce492cc0f6eaeabdbf29c)

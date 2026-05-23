@@ -162,6 +162,13 @@ export class SensorManager {
 
   constructor() {
     this.currentSensors = [];
+
+    // Multi-site look-angles results are keyed to satellite ids from the previous catalog.
+    // After a swap, the cached TearrData entries reference ids that may no longer exist or
+    // now point to different satellites. Drop the cache so exports and re-display rebuild.
+    EventBus.getInstance().on(EventBusEvent.catalogReloaded, () => {
+      this.lastMultiSiteArray = [];
+    });
   }
 
   static drawFov(sensor: DetailedSensor) {

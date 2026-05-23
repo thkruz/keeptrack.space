@@ -34,6 +34,7 @@ function makeResponse(status: number, headers: Record<string, string> = {}): Res
 function makeOkResponse(): Response {
   const blob = new Blob([new Uint8Array(4)], { type: 'image/png' });
   // Bake a non-power-of-2 image so the simpler shader-param path runs
+  // (avoids the mipmap/anisotropy branch in initTexture, which isn't what these retry tests care about).
 
 
   return new Response(blob, { status: 200, headers: { 'Content-Type': 'image/png' } });
@@ -43,6 +44,12 @@ describe('GlUtils.initTexture retry policy', () => {
   beforeEach(() => {
     resetTextureLoadRegistry();
     vi.useFakeTimers();
+    // Override the global 1x1 createImageBitmap mock so initTexture takes the non-POT branch.
+    vi.stubGlobal('createImageBitmap', vi.fn(() => Promise.resolve({
+      width: 3,
+      height: 5,
+      close: () => { /* noop */ },
+    } as ImageBitmap)));
   });
 
   it('resolves on first attempt when fetch is OK', async () => {

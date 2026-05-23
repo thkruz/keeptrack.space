@@ -84,11 +84,18 @@ export class FrustumMesh extends CustomMesh {
     this.elevationOffset = settings.elevationOffset || 0;
   }
 
-  private updatePosition_() {
+  private updatePosition_(): boolean {
     const positionData = ServiceLocator.getDotsManager()?.positionData;
-    const id = this.obj.id;
+    const idx = Number(this.obj.id) * 3;
 
-    this.pos = vec3.fromValues(positionData[Number(id) * 3], positionData[Number(id) * 3 + 1], positionData[Number(id) * 3 + 2]);
+    // positionData is nulled during catalog swap; resume on next cruncher message
+    if (!positionData || idx + 2 >= positionData.length) {
+      return false;
+    }
+
+    this.pos = vec3.fromValues(positionData[idx], positionData[idx + 1], positionData[idx + 2]);
+
+    return true;
   }
 
   update() {
@@ -96,10 +103,14 @@ export class FrustumMesh extends CustomMesh {
       return;
     }
 
-    this.updatePosition_();
+    if (!this.updatePosition_()) {
+      return;
+    }
 
     if (this.targetObj) {
-      this.updateSatToSat_();
+      if (!this.updateSatToSat_()) {
+        return;
+      }
     } else if (this.azimuthOffset !== 0 || this.elevationOffset !== 0) {
       this.updateFreeDirection_();
     } else {
@@ -142,14 +153,18 @@ export class FrustumMesh extends CustomMesh {
     this.computeFrustumCorners_(dx, dy, dz, ox, oy, oz, effectiveNear, effectiveFar);
   }
 
-  private updateSatToSat_() {
+  private updateSatToSat_(): boolean {
     const worldShift = Scene.getInstance().worldShift;
     const positionData = ServiceLocator.getDotsManager()?.positionData;
-    const targetId = this.targetObj!.id;
+    const tIdx = Number(this.targetObj!.id) * 3;
 
-    const tx = positionData[Number(targetId) * 3];
-    const ty = positionData[Number(targetId) * 3 + 1];
-    const tz = positionData[Number(targetId) * 3 + 2];
+    if (!positionData || tIdx + 2 >= positionData.length) {
+      return false;
+    }
+
+    const tx = positionData[tIdx];
+    const ty = positionData[tIdx + 1];
+    const tz = positionData[tIdx + 2];
 
     const px = this.pos[0];
     const py = this.pos[1];
@@ -162,7 +177,7 @@ export class FrustumMesh extends CustomMesh {
     const dist = Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
 
     if (dist < 1) {
-      return;
+      return false;
     }
 
     const dx = dirX / dist;
@@ -174,6 +189,8 @@ export class FrustumMesh extends CustomMesh {
     const oz = pz + worldShift[2];
 
     this.computeFrustumCorners_(dx, dy, dz, ox, oy, oz, this.nearDistance, this.farDistance);
+
+    return true;
   }
 
   private updateFreeDirection_() {
@@ -255,12 +272,12 @@ export class FrustumMesh extends CustomMesh {
     let hasVelocityRef = false;
 
     const velocityData = ServiceLocator.getDotsManager()?.velocityData;
+    const vIdx = Number(this.obj.id) * 3;
 
-    if (velocityData) {
-      const id = Number(this.obj.id);
-      const vx = velocityData[id * 3];
-      const vy = velocityData[id * 3 + 1];
-      const vz = velocityData[id * 3 + 2];
+    if (velocityData && vIdx + 2 < velocityData.length) {
+      const vx = velocityData[vIdx];
+      const vy = velocityData[vIdx + 1];
+      const vz = velocityData[vIdx + 2];
 
       // Use -velocity as reference so cross-product math yields up = velocity projection.
       // Verify the cross product has sufficient magnitude (fails when velocity is

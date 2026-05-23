@@ -66,11 +66,18 @@ export class ConeMesh extends CustomMesh {
     this.targetObj = settings.targetObj ?? this.targetObj;
   }
 
-  private updatePosition_() {
+  private updatePosition_(): boolean {
     const positionData = ServiceLocator.getDotsManager()?.positionData;
-    const id = this.obj.id;
+    const idx = Number(this.obj.id) * 3;
 
-    this.pos = vec3.fromValues(positionData[Number(id) * 3], positionData[Number(id) * 3 + 1], positionData[Number(id) * 3 + 2]);
+    // positionData is nulled during catalog swap; resume on next cruncher message
+    if (!positionData || idx + 2 >= positionData.length) {
+      return false;
+    }
+
+    this.pos = vec3.fromValues(positionData[idx], positionData[idx + 1], positionData[idx + 2]);
+
+    return true;
   }
 
   /**
@@ -85,10 +92,14 @@ export class ConeMesh extends CustomMesh {
       return;
     }
 
-    this.updatePosition_();
+    if (!this.updatePosition_()) {
+      return;
+    }
 
     if (this.targetObj) {
-      this.updateSatToSat_();
+      if (!this.updateSatToSat_()) {
+        return;
+      }
     } else {
       this.updateEarthCenter_();
     }
@@ -149,15 +160,19 @@ export class ConeMesh extends CustomMesh {
     }
   }
 
-  private updateSatToSat_() {
+  private updateSatToSat_(): boolean {
     const worldShift = Scene.getInstance().worldShift;
     const positionData = ServiceLocator.getDotsManager()?.positionData;
-    const targetId = this.targetObj!.id;
+    const tIdx = Number(this.targetObj!.id) * 3;
+
+    if (!positionData || tIdx + 2 >= positionData.length) {
+      return false;
+    }
 
     // Target position from position buffer
-    const tx = positionData[Number(targetId) * 3];
-    const ty = positionData[Number(targetId) * 3 + 1];
-    const tz = positionData[Number(targetId) * 3 + 2];
+    const tx = positionData[tIdx];
+    const ty = positionData[tIdx + 1];
+    const tz = positionData[tIdx + 2];
 
     const px = this.pos[0];
     const py = this.pos[1];
@@ -170,7 +185,7 @@ export class ConeMesh extends CustomMesh {
     const dist = Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
 
     if (dist < 1) {
-      return;
+      return false;
     }
 
     const dx = dirX / dist;
@@ -191,6 +206,8 @@ export class ConeMesh extends CustomMesh {
     const baseRadius = dist * Math.tan((this.fieldOfView * Math.PI) / 180);
 
     this.computeBaseCircle_(dx, dy, dz, baseCX, baseCY, baseCZ, baseRadius);
+
+    return true;
   }
 
   private computeBaseCircle_(dx: number, dy: number, dz: number, baseCX: number, baseCY: number, baseCZ: number, baseRadius: number) {

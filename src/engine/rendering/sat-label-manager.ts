@@ -94,6 +94,10 @@ export class SatLabelManager {
     const dotsManager = ServiceLocator.getDotsManager();
     const positionData = dotsManager.positionData;
 
+    if (!positionData) {
+      return;
+    }
+
     this.labeledSatIds_ = [];
     this.labelGlyphCounts_ = [];
     let instanceIdx = 0;
@@ -102,6 +106,10 @@ export class SatLabelManager {
       const satId = visibleSatIds[s];
       const text = labelTexts[s];
       const posBase = satId * 3;
+
+      if (posBase + 2 >= positionData.length) {
+        continue;
+      }
 
       const px = positionData[posBase];
       const py = positionData[posBase + 1];
@@ -145,12 +153,22 @@ export class SatLabelManager {
     const dotsManager = ServiceLocator.getDotsManager();
     const positionData = dotsManager.positionData;
 
+    if (!positionData) {
+      return;
+    }
+
     let instanceIdx = 0;
 
     for (let s = 0; s < this.labeledSatIds_.length; s++) {
       const satId = this.labeledSatIds_[s];
       const glyphCount = this.labelGlyphCounts_[s];
       const posBase = satId * 3;
+
+      if (posBase + 2 >= positionData.length) {
+        // Stale labeledSatIds_ from before a catalog swap; skip until updateLabels() refreshes
+        instanceIdx += glyphCount;
+        continue;
+      }
       const px = positionData[posBase];
       const py = positionData[posBase + 1];
       const pz = positionData[posBase + 2];

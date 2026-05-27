@@ -43,7 +43,7 @@ export class CatalogExporter {
         return;
       }
 
-      satOnlyData.sort((a, b) => parseInt(a.sccNum) - parseInt(b.sccNum));
+      satOnlyData.sort((a, b) => a.sccNum.localeCompare(b.sccNum, 'en', { numeric: true }));
       for (const sat of satOnlyData) {
         if (typeof sat.tle1 === 'undefined' || typeof sat.tle2 === 'undefined') {
           continue;
@@ -116,7 +116,7 @@ export class CatalogExporter {
         return;
       }
 
-      satOnlyData.sort((a, b) => parseInt(a.sccNum) - parseInt(b.sccNum));
+      satOnlyData.sort((a, b) => a.sccNum.localeCompare(b.sccNum, 'en', { numeric: true }));
       for (const sat of satOnlyData) {
         if (typeof sat.tle1 === 'undefined' || typeof sat.tle2 === 'undefined') {
           continue;
@@ -163,7 +163,7 @@ export class CatalogExporter {
         return;
       }
 
-      satOnlyData.sort((a, b) => parseInt(a.sccNum) - parseInt(b.sccNum));
+      satOnlyData.sort((a, b) => a.sccNum.localeCompare(b.sccNum, 'en', { numeric: true }));
       for (const sat of satOnlyData) {
         if (typeof sat.tle1 === 'undefined' || typeof sat.tle2 === 'undefined') {
           continue;

@@ -87,7 +87,9 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
           const link = document.createElement('a');
 
           link.href = image;
-          link.download = `sat-${(this.selectSatManager_.getSelectedSat() as Satellite).sccNum6}-polar-plot.png`;
+          const polarSat = this.selectSatManager_.getSelectedSat() as Satellite;
+
+          link.download = `sat-${polarSat.sccNum6 ?? polarSat.sccNum}-polar-plot.png`;
           link.click();
         });
       },

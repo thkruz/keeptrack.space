@@ -620,7 +620,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
           return 0;
         }
 
-        return parseInt(satA.sccNum) - parseInt(satB.sccNum);
+        return satA.sccNum.localeCompare(satB.sccNum, 'en', { numeric: true });
       });
       this.updateWatchlist();
       EventBus.getInstance().emit(EventBusEvent.onWatchlistAdd, this.watchlistList);
@@ -709,7 +709,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
         return 0;
       }
 
-      return parseInt(satA.sccNum) - parseInt(satB.sccNum);
+      return satA.sccNum.localeCompare(satB.sccNum, 'en', { numeric: true });
     });
     this.updateWatchlist();
     (<HTMLInputElement>getEl('watchlist-new')).value = ''; // Clear the search box after enter pressed/selected

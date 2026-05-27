@@ -162,7 +162,7 @@ export class CreateSat extends KeepTrackPlugin {
     const basicTabContent = html`
       <form id="createSat-basic-form">
         <div class="input-field col s12">
-          <input value="90000" id="${p}-basic-scc" type="text" maxlength="5" />
+          <input value="90000" id="${p}-basic-scc" type="text" maxlength="9" />
           <label for="${p}-basic-scc" class="active">${l('noradId')}</label>
         </div>
         <div class="input-field col s12">
@@ -190,7 +190,7 @@ export class CreateSat extends KeepTrackPlugin {
     const advancedTabContent = html`
       <form id="createSat" style="scrollbar-gutter: stable;">
         <div class="input-field col s12">
-          <input value="90000" id="${p}-scc" type="text" maxlength="5" />
+          <input value="90000" id="${p}-scc" type="text" maxlength="9" />
           <label for="${p}-scc" class="active">${l('noradId')}</label>
         </div>
         <div class="input-field col s12">

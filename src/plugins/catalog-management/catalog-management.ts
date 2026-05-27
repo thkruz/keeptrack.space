@@ -545,7 +545,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
 
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
 
-    saveAs(blob, `${satellite.sccNum5}.e`);
+    saveAs(blob, `${satellite.sccNum5 ?? satellite.sccNum}.e`);
   }
 
   /**

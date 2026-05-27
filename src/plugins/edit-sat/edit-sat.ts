@@ -162,7 +162,7 @@ export class EditSat extends KeepTrackPlugin {
       <div class="row">
         <form id="editSat-menu-form">
           <div class="input-field col s12">
-            <input disabled value="AAAAA" id="${p}-scc" type="text" maxlength="5" />
+            <input disabled value="AAAAA" id="${p}-scc" type="text" maxlength="9" />
             <label for="disabled" class="active">${l('scc')}</label>
           </div>
           <div class="input-field col s12">
@@ -552,11 +552,16 @@ export class EditSat extends KeepTrackPlugin {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     const object = JSON.parse(<string>eventTarget.result);
-    const sccNum = parseInt(StringPad.pad0(object.tle1.substr(2, 5).trim(), 5));
-    const sat = catalogManagerInstance.sccNum2Sat(sccNum);
+    // Prefer the canonical sccNum from the file; fall back to the TLE column for
+    // legacy exports without it. The TLE column only carries 5 chars and loses
+    // identity for extended (7+ digit) catalog numbers.
+    const sccNumStr = typeof object.sccNum === 'string' || typeof object.sccNum === 'number'
+      ? String(object.sccNum)
+      : StringPad.pad0(object.tle1.substr(2, 5).trim(), 5);
+    const sat = catalogManagerInstance.sccNum2Sat(sccNumStr);
 
     if (!sat) {
-      errorManagerInstance.warn(t7e('plugins.EditSat.errorMsgs.satelliteNotFound' as T7eKey).replace('{sccNum}', sccNum.toString()));
+      errorManagerInstance.warn(t7e('plugins.EditSat.errorMsgs.satelliteNotFound' as T7eKey).replace('{sccNum}', sccNumStr));
 
       return;
     }

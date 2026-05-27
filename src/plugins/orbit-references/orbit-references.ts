@@ -69,7 +69,7 @@ export class OrbitReferences extends KeepTrackPlugin {
       return;
     }
 
-    let searchStr = sat.sccNum5.padStart(5, '0');
+    let searchStr = (sat.sccNum5 ?? sat.sccNum).padStart(5, '0');
 
     // Add the satellites
     const ecen = sat.eccentricity.toString();

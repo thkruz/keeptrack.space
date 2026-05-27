@@ -70,7 +70,7 @@ export class ProximityOps extends KeepTrackPlugin {
   sideMenuElementHtml = html`
     <form id="proximityOps-menu-form">
     <div class="input-field col s12">
-        <input value="0" id="proximity-ops-norad" type="text" maxlength="5" />
+        <input value="0" id="proximity-ops-norad" type="text" maxlength="9" />
         <label for="proximity-ops-norad" class="active">${t7e('plugins.ProximityOps.noradId')}</label>
     </div>
 

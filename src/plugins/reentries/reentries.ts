@@ -356,7 +356,7 @@ export class Reentries extends KeepTrackPlugin {
     ServiceLocator.getTimeManager().changeStaticOffset(decayEpoch.getTime() - now.getTime());
     ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
 
-    ServiceLocator.getUiManager().doSearch(`${sat.sccNum5}`);
+    ServiceLocator.getUiManager().doSearch(`${sat.sccNum5 ?? sat.sccNum}`);
 
     this.selectSatIdOnCruncher_ = sat.id;
   }
@@ -591,7 +591,7 @@ export class Reentries extends KeepTrackPlugin {
       return;
     }
 
-    ServiceLocator.getUiManager().doSearch(`${sat.sccNum5}`);
+    ServiceLocator.getUiManager().doSearch(`${sat.sccNum5 ?? sat.sccNum}`);
 
     this.selectSatIdOnCruncher_ = sat.id;
   }

@@ -13,6 +13,7 @@ import { WebGLRenderer } from '@app/engine/rendering/webgl-renderer';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import * as getEl from '@app/engine/utils/get-el';
 import { settingsManager } from '@app/settings/settings';
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { BaseObject, Degrees, Satellite, SpaceObjectType, TleLine1 } from '@ootk/src/main';
 import { defaultSat } from './environment/apiMocks';
 
@@ -740,5 +741,41 @@ describe('ColorSchemeManager Block 2', () => {
     // Assert
     expect(colorSchemeManager.isUseGroupColorScheme).toBe(false);
     expect(colorSchemeManager.currentColorScheme).toBe(Object.values(colorSchemeManager.colorSchemeInstances)[0]);
+  });
+
+  describe('orbit-altitude filters with OemSatellite', () => {
+    // OemSatellite passes isSatellite() but has no apogee/eccentricity. The
+    // pre-fix filters compared `(obj as Satellite).apogee < N`, which is
+    // `undefined < N` = false — the filter quietly failed to apply to OEM
+    // objects. After the fix, the methods short-circuit on `instanceof Satellite`.
+    const makeFakeOemSat = (overrides: Partial<OemSatellite> = {}): OemSatellite => {
+      const fake = Object.assign(Object.create(OemSatellite.prototype) as OemSatellite, {
+        id: 999,
+        type: SpaceObjectType.PAYLOAD,
+        sccNum: '',
+        ...overrides,
+      });
+
+      return fake;
+    };
+
+    const filterMethods: (keyof ColorSchemeManager)[] = [
+      'isvLeoSatOff', 'isLeoSatOff', 'isMeoSatOff', 'isHeoSatOff', 'isGeoSatOff', 'isXGeoSatOff',
+    ];
+
+    filterMethods.forEach((method) => {
+      it(`${method} returns false for an OemSatellite (instead of silently failing the filter)`, () => {
+        const oem = makeFakeOemSat();
+
+        settingsManager.filter = {
+          vLEOSatellites: false, lEOSatellites: false, mEOSatellites: false,
+          hEOSatellites: false, gEOSatellites: false, xGEOSatellites: false,
+        } as typeof settingsManager.filter;
+
+        const result = (colorSchemeManager[method] as (obj: BaseObject) => boolean)(oem as BaseObject);
+
+        expect(result).toBe(false);
+      });
+    });
   });
 });

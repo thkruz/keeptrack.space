@@ -4,7 +4,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
-import { BaseObject, FormatTle, Tle } from '@ootk/src/main';
+import { BaseObject, FormatTle, Satellite, Tle } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -30,8 +30,9 @@ export class OrbitReferences extends KeepTrackPlugin {
     EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (obj?: BaseObject) => {
-        // Skip this if there is no satellite object because the menu isn't open
-        if (!obj?.isSatellite()) {
+        // instanceof Satellite excludes OemSatellite, which lacks the TLE-derived
+        // orbital elements (eccentricity, meanMotion, …) we read inside the click handler.
+        if (!(obj instanceof Satellite)) {
           hideEl('orbit-references-link');
 
           return;
@@ -65,7 +66,8 @@ export class OrbitReferences extends KeepTrackPlugin {
     // Determine which satellite is selected
     const sat = catalogManagerInstance.getSat(this.selectSatManager_.selectedSat);
 
-    if (!sat) {
+    // Same Satellite-only guard as the link visibility above.
+    if (!(sat instanceof Satellite)) {
       return;
     }
 
@@ -82,7 +84,10 @@ export class OrbitReferences extends KeepTrackPlugin {
     // .intlDes is 2000-001A we need 00001A
     const yy = sat.intlDes.split('-')[0].slice(2);
     const intl = yy + sat.intlDes.split('-')[1];
-    const scc = sat.sccNum;
+    // FormatTle.createTle runs scc through Tle.convert6DigitToA5, which throws
+    // for extended (7+ digit) IDs. Mirror Satellite.toTle and pass the trailing
+    // 5 digits so the TLE stays well-formed; the canonical id stays on sat.sccNum.
+    const scc = Tle.classifySatNum(sat.sccNum) === 'extended' ? sat.sccNum.slice(-5) : sat.sccNum;
 
     const period = 1440.0 / parseFloat(meanmo);
 

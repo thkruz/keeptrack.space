@@ -316,8 +316,10 @@ export class CatalogManager {
   }
 
   getSats(): Satellite[] {
-    // sats are the first numSats objects in the objectCache
-    return this.objectCache.slice(0, this.numSatellites).filter((sat) => sat.isSatellite()) as Satellite[];
+    // sats are the first numSats objects in the objectCache.
+    // Use instanceof Satellite (not isSatellite()) so OemSatellite — which returns true
+    // from isSatellite() but lacks tle1/tle2/apogee/perigee — does not leak through.
+    return this.objectCache.slice(0, this.numSatellites).filter((sat): sat is Satellite => sat instanceof Satellite);
   }
 
   getMissile(missileId: string | number): MissileObject | null {

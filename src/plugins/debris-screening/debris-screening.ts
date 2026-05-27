@@ -292,14 +292,16 @@ export class DebrisScreening extends KeepTrackPlugin {
       const catalogManager = ServiceLocator.getCatalogManager();
       const timeManager = ServiceLocator.getTimeManager();
 
-      const satId = catalogManager.sccNum2Id(parseInt((<HTMLInputElement>getEl(`${this.formPrefix_}-scc`)).value));
+      const satId = catalogManager.sccNum2Id((<HTMLInputElement>getEl(`${this.formPrefix_}-scc`)).value.trim());
       const timeVal = <Hours>parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-time`)).value);
       const uVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-u`)).value) as Kilometers;
       const vVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-v`)).value) as Kilometers;
       const wVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-w`)).value) as Kilometers;
-      const sat = catalogManager.getObject(satId, GetSatType.SKIP_POS_VEL) as Satellite;
+      const sat = catalogManager.getObject(satId, GetSatType.SKIP_POS_VEL);
 
-      if (!sat) {
+      // OemSatellite passes isSatellite() but has no tle1/tle2/apogee/perigee
+      // — toTle() and the orbital-shell filter below would both throw.
+      if (!(sat instanceof Satellite)) {
         errorManagerInstance.warn('Invalid satellite selected');
 
         return;
@@ -319,10 +321,12 @@ export class DebrisScreening extends KeepTrackPlugin {
       const secondaries: CatalogObject[] = [];
 
       catalogManager.objectCache.forEach((obj) => {
-        if (!obj.isSatellite() || obj.id === satId) {
+        // instanceof excludes OemSatellite, which lacks tle1/tle2/apogee/perigee
+        // and would throw inside toTle() / the shell-filter math below.
+        if (!(obj instanceof Satellite) || obj.id === satId) {
           return;
         }
-        const sat2 = obj as Satellite;
+        const sat2 = obj;
 
         // Basic orbital shell filtering
         if (sat2.perigee > sat.apogee || sat.perigee > sat2.apogee) {
@@ -513,7 +517,8 @@ export class DebrisScreening extends KeepTrackPlugin {
 
   private selectSecondarySatelliteByScc_(sccNum: string): void {
     const catalogManager = ServiceLocator.getCatalogManager();
-    const id = catalogManager.sccNum2Id(parseInt(sccNum));
+    // Pass the string straight through — sccNum2Id handles numeric/alpha-5/extended.
+    const id = catalogManager.sccNum2Id(sccNum);
 
     if (id !== null && id !== -1) {
       PluginRegistry.getPlugin(SelectSatManager)?.setSecondarySat(id);

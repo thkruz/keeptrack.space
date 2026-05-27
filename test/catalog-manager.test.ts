@@ -4,6 +4,7 @@ import { CatalogManager } from '@app/app/data/catalog-manager';
 import { CatalogSearch } from '@app/app/data/catalog-search';
 import { GetSatType } from '@app/engine/core/interfaces';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { BaseObject, Degrees, Satellite, Kilometers, Minutes, SpaceObjectType } from '@ootk/src/main';
 import { defaultSat } from './environment/apiMocks';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -208,5 +209,23 @@ describe('calcSatrec', () => {
     expect(() => catalogManagerInstance.addAnalystSat(defaultSat.tle1.slice(0, 68), defaultSat.tle2, 0)).toThrow();
     expect(() => catalogManagerInstance.addAnalystSat(defaultSat.tle1, `${defaultSat.tle2}0`, 0)).toThrow();
     expect(() => catalogManagerInstance.addAnalystSat(defaultSat.tle1, defaultSat.tle2, 1)).not.toThrow();
+  });
+
+  // getSats must filter OemSatellite — its isSatellite() returns true but it
+  // lacks tle1/tle2/apogee/perigee, which downstream consumers (orbit-cruncher,
+  // RPO finder, etc.) assume exist on every returned object.
+  it('getSats excludes OemSatellite while keeping true Satellites', () => {
+    const fakeOem = Object.assign(Object.create(OemSatellite.prototype) as OemSatellite, {
+      id: 1,
+      sccNum: '',
+    });
+
+    catalogManagerInstance.objectCache = [defaultSat, fakeOem as unknown as BaseObject];
+    catalogManagerInstance.numSatellites = 2;
+
+    const result = catalogManagerInstance.getSats();
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).toBe(defaultSat);
   });
 });

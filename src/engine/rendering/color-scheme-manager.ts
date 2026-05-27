@@ -1054,6 +1054,23 @@ export class ColorSchemeManager {
     this.colorCruncher_.sendCatalogData(data, this.catalogSeqNum_);
   }
 
+  /**
+   * Re-send catalog metadata (type, status, country, source, …) to the color
+   * worker and force a recolor. Use after operations that mutate object
+   * properties the worker reads from its typed-array snapshot — for example
+   * breakup repurposing an analyst PAYLOAD slot as DEBRIS, which the worker
+   * otherwise has no way to learn about until the next catalog reload.
+   *
+   * No-op in non-worker mode (main-thread schemes re-read objectCache every
+   * frame and will pick up the change automatically).
+   */
+  notifyObjectsChanged(): void {
+    if (this.useWorkerMode_ && this.colorCruncher_ && this.workerReady_) {
+      this.sendCatalogToWorker_();
+      this.colorCruncher_.sendForceRecolor();
+    }
+  }
+
   /** Send all current state to the worker — used after catalog init */
   private sendAllStateToWorker_(): void {
     if (!this.colorCruncher_) {

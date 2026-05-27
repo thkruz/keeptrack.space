@@ -110,8 +110,8 @@ export class OemSatellite extends SpaceObject {
   orbitFullPathColor: vec4 = LineColors.BLUE;
   dotColor: rgbaArray = [0, 255, 0, 1];
   sccNum = '';
-  sccNum5: string | null = '';
-  sccNum6: string | null = '';
+  sccNum5: string | null = null;
+  sccNum6: string | null = null;
   intlDes = '';
 
   // Satellite-compatible properties populated from USER_DEFINED_ OEM metadata

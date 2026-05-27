@@ -1175,6 +1175,15 @@ export class CatalogLoader {
       dynamicTyping: false,
     });
 
+    if (result.errors.length > 0) {
+      const firstError = result.errors[0];
+      const rowInfo = typeof firstError.row === 'number' ? ` at row ${firstError.row}` : '';
+
+      errorManagerInstance.info(
+        `External CSV parse reported ${result.errors.length} error(s); first error${rowInfo}: ${firstError.code} - ${firstError.message}`,
+      );
+    }
+
     for (const row of result.data) {
       if (!row.NORAD_CAT_ID || !row.OBJECT_NAME) {
         continue;

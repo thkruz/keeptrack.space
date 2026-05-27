@@ -748,6 +748,12 @@ describe('ColorSchemeManager Block 2', () => {
     // pre-fix filters compared `(obj as Satellite).apogee < N`, which is
     // `undefined < N` = false — the filter quietly failed to apply to OEM
     // objects. After the fix, the methods short-circuit on `instanceof Satellite`.
+    let csm: ColorSchemeManager;
+
+    beforeEach(() => {
+      csm = new ColorSchemeManager();
+    });
+
     const makeFakeOemSat = (overrides: Partial<OemSatellite> = {}): OemSatellite => {
       const fake = Object.assign(Object.create(OemSatellite.prototype) as OemSatellite, {
         id: 999,
@@ -772,7 +778,7 @@ describe('ColorSchemeManager Block 2', () => {
           hEOSatellites: false, gEOSatellites: false, xGEOSatellites: false,
         } as typeof settingsManager.filter;
 
-        const result = (colorSchemeManager[method] as (obj: BaseObject) => boolean)(oem as BaseObject);
+        const result = (csm[method] as (obj: BaseObject) => boolean)(oem as BaseObject);
 
         expect(result).toBe(false);
       });

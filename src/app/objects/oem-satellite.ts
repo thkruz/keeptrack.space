@@ -110,8 +110,8 @@ export class OemSatellite extends SpaceObject {
   orbitFullPathColor: vec4 = LineColors.BLUE;
   dotColor: rgbaArray = [0, 255, 0, 1];
   sccNum = '';
-  sccNum5 = '';
-  sccNum6 = '';
+  sccNum5: string | null = '';
+  sccNum6: string | null = '';
   intlDes = '';
 
   // Satellite-compatible properties populated from USER_DEFINED_ OEM metadata
@@ -258,8 +258,15 @@ export class OemSatellite extends SpaceObject {
 
       if (match?.groups?.id) {
         this.sccNum = match.groups.id;
-        this.sccNum5 = Tle.convert6DigitToA5(this.sccNum);
-        this.sccNum6 = Tle.convertA5to6Digit(this.sccNum5);
+        const kind = Tle.classifySatNum(this.sccNum);
+
+        if (kind === 'numeric5' || kind === 'alpha5' || kind === 'numeric6') {
+          this.sccNum5 = Tle.convert6DigitToA5(this.sccNum);
+          this.sccNum6 = Tle.convertA5to6Digit(this.sccNum5);
+        } else {
+          this.sccNum5 = null;
+          this.sccNum6 = null;
+        }
         // With a real NORAD ID, this is a known payload not a notional object
         this.type = SpaceObjectType.PAYLOAD;
         break;

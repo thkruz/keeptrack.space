@@ -579,8 +579,11 @@ export class SearchManager {
           continue;
         }
 
-        // Check if matches 6Digit
-        if (sat.sccNum6 && sat.sccNum6.indexOf(searchStringIn) !== -1) {
+        // sccNum6 is null for extended (7+ digit) IDs — fall back to the
+        // canonical sccNum so CelesTrak supplemental IDs are searchable too.
+        const matchKey = sat.sccNum6 ?? sat.sccNum;
+
+        if (matchKey && matchKey.indexOf(searchStringIn) !== -1) {
           if (!seenIds.has(sat.id)) {
             seenIds.add(sat.id);
             totalFound++;
@@ -595,7 +598,7 @@ export class SearchManager {
           }
           lastFoundI = i;
 
-          if (searchStringIn.length === 6) {
+          if (searchStringIn.length === matchKey.length) {
             break;
           }
         }

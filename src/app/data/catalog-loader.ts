@@ -11,6 +11,7 @@ import {
   CatalogSource,
   LandObject,
   Marker,
+  OmmDataFormat,
   PayloadStatus,
   Satellite,
   SpaceObjectType,
@@ -19,6 +20,7 @@ import {
   TleLine1,
   TleLine2,
 } from '@ootk/src/main';
+import Papa from 'papaparse';
 import { EventBus } from '../../engine/events/event-bus';
 import { EventBusEvent } from '../../engine/events/event-bus-events';
 import { SettingsManager } from '../../settings/settings';
@@ -149,8 +151,15 @@ export class CatalogLoader {
     for (let i = 0; i < resp.length; i++) {
       CatalogLoader.addSccNum_(resp, i);
 
-      // Check if first digit is a letter
-      resp[i].sccNum = Tle.convertA5to6Digit(resp[i]?.sccNum ?? '');
+      // Check if first digit is a letter. Bad upstream data (e.g. Unicode
+      // lookalikes in the SCC column) can throw here — skip the row so one
+      // corrupt entry doesn't abort the whole catalog load.
+      try {
+        resp[i].sccNum = Tle.convertA5to6Digit(resp[i]?.sccNum ?? '');
+      } catch (err) {
+        errorManagerInstance.info(`Skipping catalog entry ${i} with malformed SCC: ${JSON.stringify(resp[i]?.sccNum)} — ${(err as Error).message}`);
+        continue;
+      }
 
       CatalogLoader.processAllSats_(resp, i, catalogManagerInstance, tempObjData, notionalSatNum);
     }
@@ -522,7 +531,14 @@ export class CatalogLoader {
       const incomingMap = new Map<string, AsciiTleSat>();
 
       for (const entry of asciiCatalog) {
-        const scc6 = Tle.convertA5to6Digit(entry.SCC);
+        let scc6: string;
+
+        try {
+          scc6 = Tle.convertA5to6Digit(entry.SCC);
+        } catch (err) {
+          errorManagerInstance.info(`Skipping incoming TLE entry with malformed SCC: ${JSON.stringify(entry.SCC)} — ${(err as Error).message}`);
+          continue;
+        }
 
         incomingMap.set(scc6, entry);
       }
@@ -953,7 +969,9 @@ export class CatalogLoader {
 
             CatalogLoader.cleanAsciiCatalogFile_(content);
 
-            if (content[0].startsWith('1 ')) {
+            if (CatalogLoader.isCsvGpHeader_(content[0])) {
+              CatalogLoader.parseAsciiCsv_(data, externalCatalog);
+            } else if (content[0].startsWith('1 ')) {
               CatalogLoader.parseAsciiTLE_(content, externalCatalog);
             } else if (content[1].startsWith('1 ')) {
               CatalogLoader.parseAscii3LE_(content, externalCatalog);
@@ -1141,6 +1159,43 @@ export class CatalogLoader {
     }
   }
 
+  private static isCsvGpHeader_(firstLine: string | undefined): boolean {
+    if (!firstLine || !firstLine.includes(',')) {
+      return false;
+    }
+    const upper = firstLine.toUpperCase();
+
+    return upper.includes('NORAD_CAT_ID') || upper.includes('OBJECT_NAME') || upper.includes('MEAN_MOTION');
+  }
+
+  private static parseAsciiCsv_(rawCsv: string, externalCatalog: AsciiTleSat[]) {
+    const result = Papa.parse<OmmDataFormat>(rawCsv, {
+      header: true,
+      skipEmptyLines: true,
+      dynamicTyping: false,
+    });
+
+    for (const row of result.data) {
+      if (!row.NORAD_CAT_ID || !row.OBJECT_NAME) {
+        continue;
+      }
+      try {
+        // ootk handles extended (7+ digit) IDs natively: the full ID stays on
+        // Satellite.sccNum, and the TLE string carries the last-5-digit tail.
+        const sat = Satellite.fromOmm(row);
+
+        externalCatalog.push({
+          SCC: sat.sccNum,
+          ON: row.OBJECT_NAME,
+          TLE1: sat.tle1,
+          TLE2: sat.tle2,
+        });
+      } catch (err) {
+        errorManagerInstance.info(`Skipping external CSV row for ${row.OBJECT_NAME ?? row.NORAD_CAT_ID}: ${(err as Error).message}`);
+      }
+    }
+  }
+
   private static parseIntlDes_(TLE1: string) {
     let year = TLE1.substring(9, 17).trim().substring(0, 2); // clean up intl des for display
 
@@ -1313,7 +1368,15 @@ export class CatalogLoader {
       element.OT = SpaceObjectType.UNKNOWN;
     }
     const intlDes = this.parseIntlDes_(element.TLE1);
-    const sccNum = Tle.convertA5to6Digit(element.SCC.toString());
+    let sccNum: string;
+
+    try {
+      sccNum = Tle.convertA5to6Digit(element.SCC.toString());
+    } catch (err) {
+      errorManagerInstance.info(`Skipping satellite with malformed SCC: ${element.ON} (${JSON.stringify(element.SCC)}) — ${(err as Error).message}`);
+
+      return;
+    }
     const asciiSatInfo = {
       static: false,
       missile: false,
@@ -1466,7 +1529,14 @@ export class CatalogLoader {
       if (!element.TLE1 || !element.TLE2) {
         continue;
       } // Don't Process Bad Satellite Information
-      const scc = Tle.convertA5to6Digit(element.TLE1.substring(2, 7).trim());
+      let scc: string;
+
+      try {
+        scc = Tle.convertA5to6Digit(element.TLE1.substring(2, 7).trim());
+      } catch (err) {
+        errorManagerInstance.info(`Skipping jsCatalog entry with malformed SCC in TLE1: ${JSON.stringify(element.TLE1.substring(2, 7))} — ${(err as Error).message}`);
+        continue;
+      }
 
       if (typeof catalogManagerInstance.sccIndex[`${scc}`] !== 'undefined') {
         /*
@@ -1504,15 +1574,19 @@ export class CatalogLoader {
             id: tempObjData.length,
           };
 
-          const satellite = new Satellite({
-            tle1: jsSatInfo.TLE1 as TleLine1,
-            tle2: jsSatInfo.TLE2 as TleLine2,
-            ...jsSatInfo,
-          });
+          try {
+            const satellite = new Satellite({
+              tle1: jsSatInfo.TLE1 as TleLine1,
+              tle2: jsSatInfo.TLE2 as TleLine2,
+              ...jsSatInfo,
+            });
 
-          satellite.id = tempObjData.length;
+            satellite.id = tempObjData.length;
 
-          tempObjData.push(satellite);
+            tempObjData.push(satellite);
+          } catch (err) {
+            errorManagerInstance.info(`Skipping jsCatalog Vimpel entry (altId ${altId}): ${(err as Error).message}`);
+          }
         } else {
           errorManagerInstance.debug('Skipping non-Vimpel satellite in JSC Vimpel catalog');
         }

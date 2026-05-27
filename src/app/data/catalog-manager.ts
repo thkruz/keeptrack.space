@@ -195,6 +195,10 @@ export class CatalogManager {
     // For backwards compatibility, this method accepts a number or string as the a5Num parameter.
     if (typeof a5Num === 'number') {
       a5Num = a5Num.toString().padStart(5, '0');
+    } else if ((/^\d{1,5}$/u).test(a5Num)) {
+      // Pure-numeric short input gets padded to legacy 5-digit canonical form.
+      // Alpha-5 ("T0001") and extended (7+ digit) IDs pass through unchanged.
+      a5Num = a5Num.padStart(5, '0');
     }
 
     const satBySccIndex = this.sccIndex[`${a5Num}`];
@@ -220,7 +224,7 @@ export class CatalogManager {
    * @param sccNum - The object number of the satellite.
    * @returns The satellite object if found, null otherwise.
    */
-  sccNum2Sat(sccNum: number): Satellite | null {
+  sccNum2Sat(sccNum: number | string): Satellite | null {
     const sat = this.getObject(this.sccNum2Id(sccNum.toString().padStart(5, '0')));
 
     if (!sat?.isSatellite()) {

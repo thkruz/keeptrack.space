@@ -4,7 +4,7 @@ import { vi } from 'vitest';
 /* eslint-disable dot-notation */
 import { SatMath } from '@app/app/analysis/sat-math';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { Kilometers } from '@app/engine/ootk/src/main';
+import { Kilometers, Satellite } from '@app/engine/ootk/src/main';
 import { Breakup } from '@app/plugins/breakup/breakup';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import * as OrbitFinderFile from '@ootk/src/orbit-design/OrbitFinder';
@@ -59,13 +59,15 @@ describe('Breakup_class', () => {
 
       websiteInit(breakupPlugin);
 
-      const mockSat = {
-        isSatellite: () => true,
+      // Object.create(Satellite.prototype, …) keeps instanceof Satellite working
+      // (the plugin gates on instanceof to reject OemSatellite) while letting us
+      // pin apogee/perigee to test values.
+      const mockSat = Object.assign(Object.create(Satellite.prototype), {
         apogee: 2000,
         perigee: 500,
-      };
+      });
 
-      vi.spyOn(breakupPlugin['selectSatManager_'], 'getSelectedSat').mockReturnValue(mockSat as any);
+      vi.spyOn(breakupPlugin['selectSatManager_'], 'getSelectedSat').mockReturnValue(mockSat);
       const closeSpy = vi.spyOn(breakupPlugin, 'closeSideMenu');
       const disableSpy = vi.spyOn(breakupPlugin, 'setBottomIconToDisabled');
 
@@ -80,14 +82,13 @@ describe('Breakup_class', () => {
 
       websiteInit(breakupPlugin);
 
-      const mockSat = {
-        isSatellite: () => true,
+      const mockSat = Object.assign(Object.create(Satellite.prototype), {
         apogee: 500,
         perigee: 400,
         sccNum: '12345',
-      };
+      });
 
-      vi.spyOn(breakupPlugin['selectSatManager_'], 'getSelectedSat').mockReturnValue(mockSat as any);
+      vi.spyOn(breakupPlugin['selectSatManager_'], 'getSelectedSat').mockReturnValue(mockSat);
       breakupPlugin['isMenuButtonActive'] = true;
 
       breakupPlugin.onBottomIconClick();

@@ -58,7 +58,8 @@ test.describe('EditSat', () => {
     await expect(page.locator('#editSat-open')).toBeAttached();
     await expect(page.locator('#editSat-file')).toBeAttached();
 
-    // 7. Verify SCC input is disabled (read-only)
+    // 7. Verify SCC input is disabled (read-only) and accepts 9-digit width
     await expect(page.locator('#es-scc')).toBeDisabled();
+    await expect(page.locator('#es-scc')).toHaveAttribute('maxlength', '9');
   });
 });

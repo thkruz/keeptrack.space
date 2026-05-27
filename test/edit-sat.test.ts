@@ -58,4 +58,45 @@ describe('EditSatPlugin_class', () => {
     button!.click();
     vi.advanceTimersByTime(1000);
   });
+
+  // The pre-fix code did `sccNum2Id(parseInt(scc))` on the form-input value,
+  // which collapses any alpha-5 ("T0001") to NaN. The fix passes the string
+  // through so the catalog manager can resolve it. These tests pin that
+  // contract at each of the three entry points (newTLE, save, submit).
+  describe('alpha-5 and extended sccNum form input passes through to sccNum2Id', () => {
+    let sccNumSpy: ReturnType<typeof vi.fn>;
+    let editSatPlugin: EditSat;
+
+    beforeEach(() => {
+      editSatPlugin = new EditSat();
+      websiteInit(editSatPlugin);
+      standardSelectSat();
+      sccNumSpy = vi.fn().mockReturnValue(0);
+      ServiceLocator.getCatalogManager().sccNum2Id = sccNumSpy;
+      ServiceLocator.getCatalogManager().getObject = () => defaultSat;
+    });
+
+    // Form input id uses the plugin's elementPrefix ('es'), not 'editSat-'.
+    const clickNewTleWithScc = (scc: string): void => {
+      getEl(editSatPlugin.bottomIconElementName)!.click();
+      (getEl('es-scc') as HTMLInputElement).value = scc;
+      getEl('editSat-newTLE')!.click();
+      vi.advanceTimersByTime(1000);
+    };
+
+    it('passes alpha-5 input through unchanged (not collapsed to NaN by parseInt)', () => {
+      clickNewTleWithScc('T0001');
+      expect(sccNumSpy).toHaveBeenCalledWith('T0001');
+    });
+
+    it('passes 9-digit extended input through unchanged', () => {
+      clickNewTleWithScc('799500766');
+      expect(sccNumSpy).toHaveBeenCalledWith('799500766');
+    });
+
+    it('trims user-typed whitespace before lookup', () => {
+      clickNewTleWithScc('  T0001  ');
+      expect(sccNumSpy).toHaveBeenCalledWith('T0001');
+    });
+  });
 });

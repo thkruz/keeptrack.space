@@ -273,4 +273,114 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
     // Numeric (legacy parseInt path) input still works for 9-digit.
     expect(catalogManager.sccNum2Id(799500766)).toBe(catalogManager.sccIndex['799500766']);
   });
+
+  // Alpha-5 ("T0001") is the trickiest case: catalog-loader indexes the
+  // satellite under its 6-digit numeric equivalent ("270001"), but
+  // Satellite.sccNum still preserves the alpha-5 string. Plugins that
+  // accept user input in alpha-5 form must therefore resolve via either
+  // (a) the direct 6-digit index hit, or (b) the extensive sccIndex-miss
+  // fallback that compares against sat.sccNum.
+  it('sccNum2Id resolves alpha-5 inputs in both index forms', async () => {
+    const rows = parseCsvFixture('./test/environment/extended-catalog.csv');
+    const externalCatalog: AsciiTleSat[] = rows.map((row) => {
+      const sat = Satellite.fromOmm(row);
+
+      return {
+        SCC: sat.sccNum,
+        ON: row.OBJECT_NAME,
+        TLE1: sat.tle1,
+        TLE2: sat.tle2,
+      };
+    });
+
+    await CatalogLoader.parse({
+      keepTrackTle: [],
+      externalCatalog: Promise.resolve(externalCatalog),
+    });
+
+    const catalogManager = ServiceLocator.getCatalogManager();
+    const expectedId = catalogManager.sccIndex['270001'];
+
+    expect(expectedId).toBeDefined();
+
+    // Direct 6-digit lookup — fast path, hits sccIndex.
+    expect(catalogManager.sccNum2Id('270001')).toBe(expectedId);
+
+    // Alpha-5 lookup — sccIndex misses, but the extensive-search fallback
+    // matches sat.sccNum === "T0001" and returns the same id.
+    expect(catalogManager.sccNum2Id('T0001')).toBe(expectedId);
+  });
+
+  it('sccNum2Id returns null for unknown inputs across all forms', async () => {
+    const rows = parseCsvFixture('./test/environment/extended-catalog.csv');
+    const externalCatalog: AsciiTleSat[] = rows.map((row) => {
+      const sat = Satellite.fromOmm(row);
+
+      return {
+        SCC: sat.sccNum,
+        ON: row.OBJECT_NAME,
+        TLE1: sat.tle1,
+        TLE2: sat.tle2,
+      };
+    });
+
+    await CatalogLoader.parse({
+      keepTrackTle: [],
+      externalCatalog: Promise.resolve(externalCatalog),
+    });
+
+    const catalogManager = ServiceLocator.getCatalogManager();
+
+    // Not in catalog: numeric5, alpha-5, numeric6, extended — all should null.
+    expect(catalogManager.sccNum2Id('00099')).toBeNull();
+    expect(catalogManager.sccNum2Id('Z9999')).toBeNull();
+    expect(catalogManager.sccNum2Id('300000')).toBeNull();
+    expect(catalogManager.sccNum2Id('999999999')).toBeNull();
+  });
+
+  it('sccNum2Sat returns the Satellite for numeric, alpha-5, and extended inputs', async () => {
+    const rows = parseCsvFixture('./test/environment/extended-catalog.csv');
+    const externalCatalog: AsciiTleSat[] = rows.map((row) => {
+      const sat = Satellite.fromOmm(row);
+
+      return {
+        SCC: sat.sccNum,
+        ON: row.OBJECT_NAME,
+        TLE1: sat.tle1,
+        TLE2: sat.tle2,
+      };
+    });
+
+    await CatalogLoader.parse({
+      keepTrackTle: [],
+      externalCatalog: Promise.resolve(externalCatalog),
+    });
+
+    const catalogManager = ServiceLocator.getCatalogManager();
+
+    // 5-digit and 9-digit round-trip cleanly — canonical sccNum is the input.
+    expect(catalogManager.sccNum2Sat('00005')?.sccNum).toBe('00005');
+    expect(catalogManager.sccNum2Sat('799500766')?.sccNum).toBe('799500766');
+
+    // Alpha-5 quirk: processAsciiCatalogUnknown_ converts the input through
+    // Tle.convertA5to6Digit BEFORE constructing the Satellite, so the canonical
+    // sccNum on the loaded sat is the 6-digit form ("270001"), with the
+    // alpha-5 form available on sccNum5. Both lookup inputs ("T0001" and
+    // "270001") must therefore resolve to the same satellite — and the user
+    // can recover their original alpha-5 via sccNum5.
+    const alpha5SatByInput = catalogManager.sccNum2Sat('T0001');
+
+    expect(alpha5SatByInput?.sccNum).toBe('270001');
+    expect(alpha5SatByInput?.sccNum5).toBe('T0001');
+    expect(catalogManager.sccNum2Sat('270001')?.sccNum).toBe('270001');
+
+    // Number-form input still works for 5-digit (legacy contract).
+    expect(catalogManager.sccNum2Sat(5)?.sccNum).toBe('00005');
+
+    // Number-form input works for 9-digit too — value fits in Number.MAX_SAFE_INTEGER.
+    expect(catalogManager.sccNum2Sat(799500766)?.sccNum).toBe('799500766');
+
+    // Unknown id resolves to null.
+    expect(catalogManager.sccNum2Sat('99999')).toBeNull();
+  });
 });

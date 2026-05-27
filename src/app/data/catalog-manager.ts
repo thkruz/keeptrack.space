@@ -201,15 +201,41 @@ export class CatalogManager {
       a5Num = a5Num.padStart(5, '0');
     }
 
-    const satBySccIndex = this.sccIndex[`${a5Num}`];
+    const key = a5Num.toString();
 
-    if (typeof satBySccIndex !== 'undefined') {
-      return this.sccIndex[`${a5Num}`];
-    } else if (isExtensiveSearch) {
+    // Fast path: direct sccIndex hit.
+    if (typeof this.sccIndex[key] !== 'undefined') {
+      return this.sccIndex[key];
+    }
+
+    // Equivalence path: the catalog loader indexes alpha-5 inputs under their
+    // 6-digit numeric form (Tle.convertA5to6Digit), so a user typing "T0001"
+    // would otherwise miss a satellite stored at sccIndex["270001"]. Try the
+    // 6↔A5 conversion before falling through to extensive search.
+    const kind = Tle.classifySatNum(key);
+
+    if (kind === 'alpha5' || kind === 'numeric6') {
+      try {
+        const altKey = kind === 'alpha5' ? Tle.convertA5to6Digit(key) : Tle.convert6DigitToA5(key);
+
+        if (typeof this.sccIndex[altKey] !== 'undefined') {
+          return this.sccIndex[altKey];
+        }
+      } catch {
+        // Conversion threw — fall through to extensive search.
+      }
+    }
+
+    if (isExtensiveSearch) {
       for (let i = 0; i < this.objectCache.length; i++) {
         const obj = this.objectCache[i];
 
-        if (obj?.isSatellite() && (obj as Satellite)?.sccNum === a5Num.toString()) {
+        if (!(obj instanceof Satellite)) {
+          continue;
+        }
+        // Match the canonical sccNum and both derived forms so user input in
+        // any of the three forms (numeric, alpha-5, 6-digit) resolves.
+        if (obj.sccNum === key || obj.sccNum5 === key || obj.sccNum6 === key) {
           return i;
         }
       }

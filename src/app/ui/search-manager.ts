@@ -555,7 +555,7 @@ export class SearchManager {
 
     // Initialize search results
     const satData = (SearchManager.getSearchableObjects_(false) as Satellite[])
-      .sort((a, b) => (a.sccNum6 ?? a.sccNum).localeCompare(b.sccNum6 ?? b.sccNum, 'en', { numeric: true }));
+      .sort((a, b) => (a.sccNum6 ?? a.sccNum ?? '').localeCompare(b.sccNum6 ?? b.sccNum ?? '', 'en', { numeric: true }));
 
     let i = 0;
     let lastFoundI = 0;
@@ -613,14 +613,13 @@ export class SearchManager {
     const dotsManagerInstance = ServiceLocator.getDotsManager();
     const searchableObjects = (
       catalogManagerInstance.objectCache.filter((obj) => {
-        if (obj.isSensor() || obj.isMarker() || obj.isGroundObject() || obj.isStar()) {
+        // Allow-list: only satellites (incl. OemSatellite) and missiles are searchable.
+        // Planets, markers, sensors, ground objects, stars, and unused OEM placeholder slots
+        // (which are Planet instances and would otherwise have undefined sccNum) are rejected.
+        if (!obj.isSatellite() && !(isIncludeMissiles && obj.isMissile())) {
           return false;
-        } // Skip static dots (Maybe these should be searchable?)
-        if (!isIncludeMissiles && obj.isMissile()) {
-          return false;
-        } // Skip missiles (if not searching for missiles
+        }
 
-        // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
         if (!(obj as MissileObject).active) {
           return false;
         } // Skip inactive missiles.

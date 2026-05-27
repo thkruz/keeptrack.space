@@ -1,6 +1,6 @@
 {
   "name": "keeptrack.space",
-  "version": "12.2.10",
+  "version": "12.3.0",
   "type": "module",
   "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
   "author": "Theodore Kruczek",

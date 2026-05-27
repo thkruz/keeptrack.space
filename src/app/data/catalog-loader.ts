@@ -884,7 +884,12 @@ export class CatalogLoader {
   }
 
   /**
-   * Fix missing zeros in the SCC number
+   * Fix missing zeros in the SCC number.
+   *
+   * Only safe for legacy 5-digit numeric sccNums: the source is TLE columns 3-7,
+   * which physically hold only 5 chars. Extended (7+ digit) IDs and the alpha-5
+   * forms should come from CSV/OMM/JSON ingestion paths that carry the canonical
+   * sccNum in a dedicated column — never through this helper.
    *
    * TODO: This should be done by the catalog-manager itself
    */
@@ -1390,6 +1395,10 @@ export class CatalogLoader {
       static: false,
       missile: false,
       active: true,
+      // Analyst-slot detection is by the legacy 90000-99999 numeric range.
+      // Alpha-5 / extended IDs parseInt to NaN or large numbers and fall through
+      // to the upstream element.ON — which is the correct behavior since those
+      // forms can't be analyst slots in the current allocation scheme.
       name: parseInt(sccNum) >= 90000 && parseInt(sccNum) <= 99999 ? `Analyst ${sccNum}` : element.ON,
       type: element.OT,
       country: 'Unknown',

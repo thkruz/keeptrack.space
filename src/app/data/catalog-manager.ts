@@ -488,6 +488,11 @@ export class CatalogManager {
     }
   }
 
+  /**
+   * @param sccNum The canonical sccNum for this satellite. Strongly recommended
+   *   for extended (7+ digit) IDs: the TLE column 3-7 substring fallback only
+   *   reads the trailing 5 chars and will silently lose precision otherwise.
+   */
   addAnalystSat(tle1: string, tle2: string, id: number, sccNum?: string): Satellite | null {
     if (tle1.length !== 69) {
       throw new Error(`Invalid TLE1: length is not 69 - ${tle1}`);
@@ -513,6 +518,8 @@ export class CatalogManager {
         country: 'ANALSAT',
         launchVehicle: 'Analyst Satellite',
         launchSite: 'ANALSAT',
+        // Fallback reads the TLE col 3-7 satnum (max 5 chars); extended IDs
+        // can only be preserved by passing the explicit sccNum parameter.
         sccNum: sccNum ?? tle1.substring(2, 7).trim().padStart(5, '0'),
         tle1: tle1 as TleLine1,
         tle2: tle2 as TleLine2,

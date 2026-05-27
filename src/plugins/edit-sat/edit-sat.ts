@@ -358,7 +358,7 @@ export class EditSat extends KeepTrackPlugin {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     try {
-      const id = catalogManagerInstance.sccNum2Id(parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value));
+      const id = catalogManagerInstance.sccNum2Id((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value.trim());
       const obj = catalogManagerInstance.getObject(id);
 
       if (!obj?.isSatellite()) {
@@ -435,8 +435,8 @@ export class EditSat extends KeepTrackPlugin {
     const p = EditSat.elementPrefix;
 
     getEl(`${p}-error`)!.style.display = 'none';
-    const scc = (<HTMLInputElement>getEl(`${p}-scc`)).value;
-    const satId = catalogManagerInstance.sccNum2Id(parseInt(scc));
+    const scc = (<HTMLInputElement>getEl(`${p}-scc`)).value.trim();
+    const satId = catalogManagerInstance.sccNum2Id(scc);
 
     if (satId === null) {
       errorManagerInstance.info(t7e('plugins.EditSat.errorMsgs.notRealSatellite' as T7eKey));
@@ -502,8 +502,8 @@ export class EditSat extends KeepTrackPlugin {
     ServiceLocator.getSoundManager()?.play(SoundNames.EXPORT);
 
     try {
-      const scc = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value;
-      const satId = catalogManagerInstance.sccNum2Id(parseInt(scc));
+      const scc = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value.trim();
+      const satId = catalogManagerInstance.sccNum2Id(scc);
       const sat = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY) as Satellite;
       const sat2 = {
         tle1: sat.tle1,

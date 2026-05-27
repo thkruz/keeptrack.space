@@ -583,7 +583,7 @@ export class Reentries extends KeepTrackPlugin {
   }
 
   protected reentryEventClicked_(sccNum: string) {
-    const sat = ServiceLocator.getCatalogManager().sccNum2Sat(parseInt(sccNum));
+    const sat = ServiceLocator.getCatalogManager().sccNum2Sat(sccNum);
 
     if (!sat) {
       ServiceLocator.getUiManager().toast(t7e('plugins.Reentries.errorMsgs.satelliteDecayed' as Parameters<typeof t7e>[0]), ToastMsgType.caution);

@@ -142,6 +142,10 @@ export class TransponderChannelData extends KeepTrackPlugin {
     EventBus.getInstance().on(
       EventBusEvent.uiManagerInit,
       () => {
+        // addConstellation takes number[] for SCC_NUM groups today. The TV
+        // satellite list is exclusively legacy 5-digit numeric IDs, so parseInt
+        // is safe here; if this list ever contains alpha-5 or extended IDs the
+        // addConstellation signature will need to grow to accept strings.
         PluginRegistry.getPlugin(SatConstellations)?.addConstellation('TV Satellites', GroupType.SCC_NUM, this.satsWithChannels_.map((sccNum) => parseInt(sccNum)));
       },
     );

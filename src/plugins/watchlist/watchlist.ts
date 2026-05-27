@@ -342,7 +342,8 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     if (savedSatList.length > 0) {
       // We need to convert it to an array of objects
-      newWatchlist = savedSatList.map((sccNum: string) => ({ id: catalogManagerInstance.sccNum2Id(parseInt(sccNum)) ?? -1, inView: false }));
+      // sccNum2Id accepts the string directly; parseInt would drop alpha-5 / extended IDs.
+      newWatchlist = savedSatList.map((sccNum: string) => ({ id: catalogManagerInstance.sccNum2Id(sccNum) ?? -1, inView: false }));
     } else {
       newWatchlist = [];
     }
@@ -780,7 +781,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
         // We need to convert it to an array of objects
         const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
-        newWatchlist = savedSatList.map((sccNum: string) => ({ id: String(catalogManagerInstance.sccNum2Id(parseInt(sccNum)) ?? '-1'), inView: false }));
+        newWatchlist = savedSatList.map((sccNum: string) => ({ id: String(catalogManagerInstance.sccNum2Id(sccNum) ?? '-1'), inView: false }));
       } else {
         newWatchlist = [];
       }

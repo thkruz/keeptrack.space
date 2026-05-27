@@ -554,7 +554,8 @@ export class SearchManager {
     settingsManager.lastSearch = searchList;
 
     // Initialize search results
-    const satData = (SearchManager.getSearchableObjects_(false) as Satellite[]).sort((a, b) => parseInt(a.sccNum6) - parseInt(b.sccNum6));
+    const satData = (SearchManager.getSearchableObjects_(false) as Satellite[])
+      .sort((a, b) => (a.sccNum6 ?? a.sccNum).localeCompare(b.sccNum6 ?? b.sccNum, 'en', { numeric: true }));
 
     let i = 0;
     let lastFoundI = 0;

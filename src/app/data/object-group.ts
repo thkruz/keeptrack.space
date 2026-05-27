@@ -138,7 +138,7 @@ export class ObjectGroup<T extends GroupType> {
 
     data = `${data}|${expandedData.join('|')}`;
     this.ids = satData
-      .filter((sat: Satellite) => data.split('|').includes(sat.country) && !sat.sccNum5.startsWith('T'))
+      .filter((sat: Satellite) => data.split('|').includes(sat.country) && !sat.sccNum5?.startsWith('T'))
       // .slice(0, settingsManager.maxOrbitsDisplayed)
       // eslint-disable-next-line arrow-body-style
       .map((sat: Satellite) => {

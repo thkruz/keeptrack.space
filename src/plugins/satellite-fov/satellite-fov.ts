@@ -370,7 +370,9 @@ export class SatelliteFov extends KeepTrackPlugin {
       return;
     }
 
-    (getEl('sat-fov-s2s-target-scc') as HTMLInputElement).value = secondarySat.sccNum5 ?? secondarySat.id.toString();
+    // Display the canonical sccNum. sccNum5 is null for extended (7+ digit) IDs;
+    // fall back to sccNum, NOT the internal numeric id which is meaningless to users.
+    (getEl('sat-fov-s2s-target-scc') as HTMLInputElement).value = secondarySat.sccNum5 ?? secondarySat.sccNum;
   }
 
   private handleCreateSatToSat_() {

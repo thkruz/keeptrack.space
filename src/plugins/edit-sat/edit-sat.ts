@@ -19,7 +19,7 @@ import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { StringPad } from '@app/engine/utils/stringPad';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, FormatTle, OrbitFinder, Satellite, SatelliteRecord, Sgp4, TleLine1, ZoomValue, eci2lla } from '@ootk/src/main';
+import { BaseObject, FormatTle, OrbitFinder, Satellite, SatelliteRecord, Sgp4, Tle, TleLine1, ZoomValue, eci2lla } from '@ootk/src/main';
 import editSatellitePng from '@public/img/icons/edit-satellite.png';
 import { saveAs } from 'file-saver';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -462,7 +462,11 @@ export class EditSat extends KeepTrackPlugin {
     const epochyr = (<HTMLInputElement>getEl(`${p}-year`)).value;
     const epochday = (<HTMLInputElement>getEl(`${p}-day`)).value;
 
-    const { tle1, tle2 } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc });
+    // FormatTle runs scc through Tle.convert6DigitToA5, which throws for
+    // extended (7+ digit) IDs. Pass the trailing 5 chars so the TLE line stays
+    // well-formed; the canonical id stays on the Satellite object.
+    const tleScc = Tle.classifySatNum(scc) === 'extended' ? scc.slice(-5) : scc;
+    const { tle1, tle2 } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc: tleScc });
 
     let satrec: SatelliteRecord;
 

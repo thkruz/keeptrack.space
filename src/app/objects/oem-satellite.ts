@@ -254,12 +254,21 @@ export class OemSatellite extends SpaceObject {
     ];
 
     for (const comment of allComments) {
-      const match = comment.match(/NORAD_ID\s*=\s*(?<id>\d+)/u);
+      // Match any non-whitespace token after NORAD_ID = so alpha-5 ("T0001")
+      // and 9-digit extended IDs are captured, not just legacy numerics.
+      // classifySatNum below filters the resulting string and only treats it
+      // as a known payload when it parses as a valid sccNum form.
+      const match = comment.match(/NORAD_ID\s*=\s*(?<id>\S+)/u);
 
       if (match?.groups?.id) {
-        this.sccNum = match.groups.id;
-        const kind = Tle.classifySatNum(this.sccNum);
+        const id = match.groups.id;
+        const kind = Tle.classifySatNum(id);
 
+        if (kind === 'invalid') {
+          continue;
+        }
+
+        this.sccNum = id;
         if (kind === 'numeric5' || kind === 'alpha5' || kind === 'numeric6') {
           this.sccNum5 = Tle.convert6DigitToA5(this.sccNum);
           this.sccNum6 = Tle.convertA5to6Digit(this.sccNum5);

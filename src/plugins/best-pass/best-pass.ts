@@ -333,7 +333,11 @@ export class BestPassPlugin extends KeepTrackPlugin {
 
             return {
               START_DTG: sTime.getTime(),
-              SATELLITE_ID: parseInt(satrecIn.satnum, 10).toString(),
+              // Use the canonical sccNum on the Satellite, not satrec.satnum.
+              // satrec.satnum is the parsed numeric form — for alpha-5 sats it
+              // would be the 6-digit equivalent ("270001"), not the alpha-5
+              // string ("T0001") the user expects to see.
+              SATELLITE_ID: sat.sccNum,
               PASS_SCORE: score.toFixed(1),
               START_DATE: sTime,
               START_TIME: sTime,

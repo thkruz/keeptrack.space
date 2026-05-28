@@ -1294,7 +1294,11 @@ export class CatalogLoader {
       }
 
       if (isAddedToCatalog) {
-        catalogManagerInstance.sccIndex[`${resp[i].sccNum}`] = tempObjData.length - 1;
+        // Canonicalize so the keepTrack-bundled TLE catalog and external
+        // CelesTrak updates share a single sccIndex entry per satellite.
+        const key = CatalogLoader.canonicalSccKey(resp[i].sccNum) ?? resp[i].sccNum;
+
+        catalogManagerInstance.sccIndex[key] = tempObjData.length - 1;
         catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = tempObjData.length - 1;
       }
     }
@@ -1344,7 +1348,20 @@ export class CatalogLoader {
   }
 
   private static processAsciiCatalogKnown_(catalogManagerInstance: CatalogManager, element: AsciiTleSat, tempSatData: Satellite[]) {
-    const i = catalogManagerInstance.sccIndex[`${element.SCC}`];
+    // sccIndex is keyed by the canonical 6-digit numeric form. element.SCC may
+    // be alpha-5 ("T0001") — canonicalize before the lookup so an external
+    // update for an alpha-5 satellite still finds the existing slot instead
+    // of silently inserting a duplicate via processAsciiCatalogUnknown_.
+    const canonicalKey = CatalogLoader.canonicalSccKey(element.SCC);
+
+    if (canonicalKey === null) {
+      // Malformed SCC — let the unknown-path handle the error reporting.
+      CatalogLoader.processAsciiCatalogUnknown_(element, tempSatData, catalogManagerInstance);
+
+      return;
+    }
+
+    const i = catalogManagerInstance.sccIndex[canonicalKey];
 
     if (typeof i === 'undefined' || !tempSatData[i]) {
       CatalogLoader.processAsciiCatalogUnknown_(element, tempSatData, catalogManagerInstance);
@@ -1382,12 +1399,23 @@ export class CatalogLoader {
       element.OT = SpaceObjectType.UNKNOWN;
     }
     const intlDes = this.parseIntlDes_(element.TLE1);
-    let sccNum: string;
+    // sccNum here is the display-canonical numeric form (6-digit for alpha-5
+    // inputs, passthrough otherwise). The Satellite class itself enforces
+    // this invariant inside assignAlpha5Forms_, but pre-computing the
+    // canonical key here lets us dedup before constructing a Satellite.
+    const sccNum = CatalogLoader.canonicalSccKey(element.SCC);
 
-    try {
-      sccNum = Tle.convertA5to6Digit(element.SCC.toString());
-    } catch (err) {
-      errorManagerInstance.info(`Skipping satellite with malformed SCC: ${element.ON} (${JSON.stringify(element.SCC)}) — ${(err as Error).message}`);
+    if (sccNum === null) {
+      errorManagerInstance.info(`Skipping satellite with malformed SCC: ${element.ON} (${JSON.stringify(element.SCC)})`);
+
+      return;
+    }
+    // If the canonical key is already claimed (e.g. by an earlier load path
+    // that wrote the same satellite under either its alpha-5 or numeric form),
+    // route through Known_ to update in place instead of orphaning the prior slot.
+    if (typeof catalogManagerInstance.sccIndex[sccNum] !== 'undefined' &&
+        tempSatData[catalogManagerInstance.sccIndex[sccNum]]) {
+      CatalogLoader.processAsciiCatalogKnown_(catalogManagerInstance, element, tempSatData as Satellite[]);
 
       return;
     }
@@ -1396,9 +1424,10 @@ export class CatalogLoader {
       missile: false,
       active: true,
       // Analyst-slot detection is by the legacy 90000-99999 numeric range.
-      // Alpha-5 / extended IDs parseInt to NaN or large numbers and fall through
-      // to the upstream element.ON — which is the correct behavior since those
-      // forms can't be analyst slots in the current allocation scheme.
+      // sccNum is already the canonical numeric form so parseInt works for
+      // alpha-5 inputs too (alpha-5 sats that land in the analyst range get
+      // labeled accordingly). Extended (7+ digit) IDs parse to large numbers
+      // and fall through to element.ON.
       name: parseInt(sccNum) >= 90000 && parseInt(sccNum) <= 99999 ? `Analyst ${sccNum}` : element.ON,
       type: element.OT,
       country: 'Unknown',
@@ -1417,7 +1446,7 @@ export class CatalogLoader {
       asciiSatInfo.source = CatalogSource.CELESTRAK;
     }
 
-    catalogManagerInstance.sccIndex[`${sccNum.toString()}`] = tempSatData.length;
+    catalogManagerInstance.sccIndex[sccNum] = tempSatData.length;
     catalogManagerInstance.cosparIndex[`${intlDes}`] = tempSatData.length;
 
     try {
@@ -1451,12 +1480,12 @@ export class CatalogLoader {
         continue;
       } // Don't Process Bad Satellite Information
 
-      // See if we know anything about it already
-      if (typeof catalogManagerInstance.sccIndex[`${element.SCC}`] !== 'undefined') {
-        CatalogLoader.processAsciiCatalogKnown_(catalogManagerInstance, element, tempSatData);
-      } else {
-        CatalogLoader.processAsciiCatalogUnknown_(element, tempSatData, catalogManagerInstance);
-      }
+      // processAsciiCatalogKnown_ canonicalizes element.SCC before the index
+      // lookup and falls through to Unknown_ if no match — so we can route
+      // everything through Known_. The previous "raw element.SCC" dispatch
+      // would mis-route alpha-5 updates whose canonical key was already
+      // present, silently inserting duplicates.
+      CatalogLoader.processAsciiCatalogKnown_(catalogManagerInstance, element, tempSatData);
     }
 
     if (settingsManager.dataSources.externalTLEs) {
@@ -1476,7 +1505,9 @@ export class CatalogLoader {
 
       for (let idx = 0; idx < tempSatData.length; idx++) {
         tempSatData[idx].id = idx;
-        catalogManagerInstance.sccIndex[`${tempSatData[idx].sccNum}`] = idx;
+        const key = CatalogLoader.canonicalSccKey(tempSatData[idx].sccNum) ?? tempSatData[idx].sccNum;
+
+        catalogManagerInstance.sccIndex[key] = idx;
         catalogManagerInstance.cosparIndex[`${tempSatData[idx].intlDes}`] = idx;
       }
     }
@@ -1490,8 +1521,10 @@ export class CatalogLoader {
       if (!element.SCC || !element.TLE1 || !element.TLE2) {
         continue;
       } // Don't Process Bad Satellite Information
-      if (typeof catalogManagerInstance.sccIndex[`${element.SCC}`] !== 'undefined') {
-        const i = catalogManagerInstance.sccIndex[`${element.SCC}`];
+      const canonicalKey = CatalogLoader.canonicalSccKey(element.SCC) ?? element.SCC.toString();
+
+      if (typeof catalogManagerInstance.sccIndex[canonicalKey] !== 'undefined') {
+        const i = catalogManagerInstance.sccIndex[canonicalKey];
 
         if (typeof tempSatData[i] === 'undefined') {
           continue;
@@ -1524,7 +1557,7 @@ export class CatalogLoader {
           vmag: element.vmag,
         };
 
-        catalogManagerInstance.sccIndex[`${element.SCC.toString()}`] = tempSatData.length;
+        catalogManagerInstance.sccIndex[canonicalKey] = tempSatData.length;
         catalogManagerInstance.cosparIndex[`${intlDes}`] = tempSatData.length;
 
         const satellite = new Satellite({
@@ -1679,5 +1712,25 @@ export class CatalogLoader {
 
       return 0;
     });
+  }
+
+  /**
+   * Returns the canonical sccIndex key for a satellite identifier, or null
+   * if the input is malformed. All sccIndex reads and writes inside the
+   * loader must go through this helper so alpha-5 ("T0001") and its 6-digit
+   * numeric equivalent ("270001") collapse to the same key — otherwise
+   * different ingestion paths would assign the same satellite to different
+   * keys and silently insert duplicates.
+   *
+   * Tle.convertA5to6Digit is the chosen canonical: passthrough for legacy
+   * 5-digit numerics, passthrough for extended (7+ digit) IDs, and
+   * conversion for alpha-5 inputs.
+   */
+  static canonicalSccKey(scc: string | number): string | null {
+    try {
+      return Tle.convertA5to6Digit(scc.toString());
+    } catch {
+      return null;
+    }
   }
 }

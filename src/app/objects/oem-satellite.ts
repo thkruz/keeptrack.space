@@ -268,10 +268,13 @@ export class OemSatellite extends SpaceObject {
           continue;
         }
 
-        this.sccNum = id;
+        // Normalize to the display-canonical numeric form so OemSatellite.sccNum
+        // matches the convention used by Satellite (alpha-5 input "T0001" is
+        // stored as "270001"; the alpha-5 string is preserved on sccNum5).
+        this.sccNum = Tle.convertA5to6Digit(id);
         if (kind === 'numeric5' || kind === 'alpha5' || kind === 'numeric6') {
           this.sccNum5 = Tle.convert6DigitToA5(this.sccNum);
-          this.sccNum6 = Tle.convertA5to6Digit(this.sccNum5);
+          this.sccNum6 = this.sccNum;
         } else {
           this.sccNum5 = null;
           this.sccNum6 = null;

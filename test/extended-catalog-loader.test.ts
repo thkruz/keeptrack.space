@@ -84,7 +84,7 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
     EventBus.getInstance().unregisterAllEvents();
   });
 
-  it('Satellite.fromOmm preserves all three ID kinds on sccNum', () => {
+  it('Satellite.fromOmm normalizes sccNum to the display-canonical numeric form', () => {
     const rows = parseCsvFixture('./test/environment/extended-catalog.csv');
 
     expect(rows).toHaveLength(3);
@@ -93,14 +93,16 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
     const alpha5 = Satellite.fromOmm(rows[1]);
     const extended = Satellite.fromOmm(rows[2]);
 
-    // sccNum is the canonical form, preserved exactly from input.
+    // sccNum is always numeric — alpha-5 input "T0001" is normalized to its
+    // 6-digit equivalent "270001"; numeric inputs pass through unchanged.
+    // The alpha-5 string is preserved on sccNum5 for cross-referencing.
     expect(vanguard.sccNum).toBe('00005');
-    expect(alpha5.sccNum).toBe('T0001');
+    expect(alpha5.sccNum).toBe('270001');
+    expect(alpha5.sccNum5).toBe('T0001');
     expect(extended.sccNum).toBe('799500766');
 
     // sccNum5/sccNum6 are null for extended (exceeds alpha-5 capacity).
     expect(vanguard.sccNum5).not.toBeNull();
-    expect(alpha5.sccNum5).not.toBeNull();
     expect(extended.sccNum5).toBeNull();
     expect(extended.sccNum6).toBeNull();
 
@@ -140,15 +142,17 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
     expect(extendedId).toBeDefined();
     expect((catalogManager.objectCache[extendedId] as Satellite).sccNum).toBe('799500766');
 
-    // Alpha-5: catalog-loader normalizes "T0001" to its 6-digit numeric form
-    // "270001" via Tle.convertA5to6Digit BEFORE indexing.
-    // This is a known long-standing behavior — alpha-5 lookups must use the
-    // 6-digit numeric form (or be routed through the smart sccNum2Id below).
-    const alpha5IdByA5 = catalogManager.sccIndex.T0001;
+    // Alpha-5: both sccIndex and Satellite.sccNum use the display-canonical
+    // 6-digit numeric form ("270001"); the alpha-5 string lives on sccNum5.
+    // User-facing lookups via sccNum2Id still accept either form on input.
     const alpha5IdBy6Digit = catalogManager.sccIndex['270001'];
 
-    expect(alpha5IdByA5).toBeUndefined();
     expect(alpha5IdBy6Digit).toBeDefined();
+
+    const alpha5Sat = catalogManager.objectCache[alpha5IdBy6Digit] as Satellite;
+
+    expect(alpha5Sat.sccNum).toBe('270001');
+    expect(alpha5Sat.sccNum5).toBe('T0001');
   });
 
   it('skips entries with malformed SCC without aborting the rest of the load (Satnogs regression)', async () => {
@@ -362,17 +366,17 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
     expect(catalogManager.sccNum2Sat('00005')?.sccNum).toBe('00005');
     expect(catalogManager.sccNum2Sat('799500766')?.sccNum).toBe('799500766');
 
-    // Alpha-5 quirk: processAsciiCatalogUnknown_ converts the input through
-    // Tle.convertA5to6Digit BEFORE constructing the Satellite, so the canonical
-    // sccNum on the loaded sat is the 6-digit form ("270001"), with the
-    // alpha-5 form available on sccNum5. Both lookup inputs ("T0001" and
-    // "270001") must therefore resolve to the same satellite — and the user
-    // can recover their original alpha-5 via sccNum5.
+    // Alpha-5: Satellite.sccNum is always normalized to the display-canonical
+    // numeric form. Both lookup inputs — alpha-5 "T0001" and its 6-digit
+    // equivalent "270001" — resolve to the same satellite, and the result
+    // always reports the numeric form on .sccNum (alpha-5 lives on .sccNum5).
     const alpha5SatByInput = catalogManager.sccNum2Sat('T0001');
+    const alpha5SatBy6Digit = catalogManager.sccNum2Sat('270001');
 
     expect(alpha5SatByInput?.sccNum).toBe('270001');
     expect(alpha5SatByInput?.sccNum5).toBe('T0001');
-    expect(catalogManager.sccNum2Sat('270001')?.sccNum).toBe('270001');
+    expect(alpha5SatBy6Digit?.sccNum).toBe('270001');
+    expect(alpha5SatByInput).toBe(alpha5SatBy6Digit);
 
     // Number-form input still works for 5-digit (legacy contract).
     expect(catalogManager.sccNum2Sat(5)?.sccNum).toBe('00005');
@@ -382,5 +386,76 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
 
     // Unknown id resolves to null.
     expect(catalogManager.sccNum2Sat('99999')).toBeNull();
+  });
+
+  // The loader has two paths: processAsciiCatalogKnown_ (update existing) and
+  // processAsciiCatalogUnknown_ (insert new). The "known" path checked
+  // sccIndex by raw element.SCC — so for a catalog that was originally
+  // loaded with alpha-5 input ("T0001"), an external update arriving with
+  // the same alpha-5 SCC would miss the canonical 6-digit index entry and
+  // be silently inserted as a duplicate. Both paths now canonicalize before
+  // sccIndex lookup; this test pins that contract.
+  it('updates (does not duplicate) an alpha-5 satellite when reloaded via the same alpha-5 SCC', async () => {
+    const buildExternalRow = (epoch: string, sat: Satellite): AsciiTleSat => ({
+      SCC: sat.sccNum,
+      ON: 'TEST-ALPHA5',
+      TLE1: sat.tle1,
+      TLE2: sat.tle2,
+    });
+
+    const sat1 = Satellite.fromOmm({
+      OBJECT_NAME: 'TEST-ALPHA5',
+      OBJECT_ID: '2024-001A',
+      EPOCH: '2024-01-01T00:00:00.000000',
+      MEAN_MOTION: 15.5, ECCENTRICITY: 0.0001137, INCLINATION: 51.6415,
+      RA_OF_ASC_NODE: 100, ARG_OF_PERICENTER: 0, MEAN_ANOMALY: 0,
+      EPHEMERIS_TYPE: 0, CLASSIFICATION_TYPE: 'U', NORAD_CAT_ID: 'T0001',
+      ELEMENT_SET_NO: 999, REV_AT_EPOCH: 1, BSTAR: 0,
+      MEAN_MOTION_DOT: 0, MEAN_MOTION_DDOT: 0,
+    });
+
+    // First load — fills the catalog with one alpha-5 satellite.
+    await CatalogLoader.parse({
+      keepTrackTle: [],
+      externalCatalog: Promise.resolve([buildExternalRow('2024-01-01', sat1)]),
+    });
+
+    const catalogManager = ServiceLocator.getCatalogManager();
+    const sccBefore = Object.keys(catalogManager.sccIndex).length;
+    const cacheLenBefore = catalogManager.objectCache.length;
+
+    expect(catalogManager.sccIndex['270001']).toBeDefined();
+    expect(sccBefore).toBeGreaterThan(0);
+
+    // Second load — same alpha-5 SCC, fresh epoch / TLE. Should UPDATE the
+    // existing slot, not insert a duplicate.
+    const sat2 = Satellite.fromOmm({
+      OBJECT_NAME: 'TEST-ALPHA5-UPDATED',
+      OBJECT_ID: '2024-001A',
+      EPOCH: '2024-06-01T00:00:00.000000',
+      MEAN_MOTION: 15.5, ECCENTRICITY: 0.0001137, INCLINATION: 51.6415,
+      RA_OF_ASC_NODE: 100, ARG_OF_PERICENTER: 0, MEAN_ANOMALY: 0,
+      EPHEMERIS_TYPE: 0, CLASSIFICATION_TYPE: 'U', NORAD_CAT_ID: 'T0001',
+      ELEMENT_SET_NO: 999, REV_AT_EPOCH: 1, BSTAR: 0,
+      MEAN_MOTION_DOT: 0, MEAN_MOTION_DDOT: 0,
+    });
+
+    await CatalogLoader.parse({
+      keepTrackTle: [],
+      externalCatalog: Promise.resolve([buildExternalRow('2024-06-01', sat2)]),
+    });
+
+    // sccIndex size should NOT have grown — same satellite, just updated.
+    expect(Object.keys(catalogManager.sccIndex).length).toBe(sccBefore);
+    expect(catalogManager.objectCache.length).toBe(cacheLenBefore);
+    // The slot now reflects the fresh epoch.
+    const updatedId = catalogManager.sccIndex['270001'];
+    const updated = catalogManager.objectCache[updatedId] as Satellite;
+
+    expect(updated.tle1).toContain('24153'); // 2024 day-of-year 153 ≈ Jun 1
+    // sccNum is the display-canonical numeric form (alpha-5 'T0001' → '270001');
+    // the original alpha-5 string is preserved on sccNum5.
+    expect(updated.sccNum).toBe('270001');
+    expect(updated.sccNum5).toBe('T0001');
   });
 });

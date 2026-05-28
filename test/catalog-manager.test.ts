@@ -250,11 +250,13 @@ describe('calcSatrec', () => {
       expect(sat!.sccNum).toBe('25544');
     });
 
-    it('preserves an explicit alpha-5 sccNum parameter', () => {
+    it('normalizes an explicit alpha-5 sccNum parameter to the numeric form', () => {
       const sat = catalogManagerInstance.addAnalystSat(defaultSat.tle1, defaultSat.tle2, 1, 'T0001');
 
       expect(sat).not.toBeNull();
-      expect(sat!.sccNum).toBe('T0001');
+      // Satellite normalizes alpha-5 input internally; sccNum is always the
+      // display-canonical numeric form.
+      expect(sat!.sccNum).toBe('270001');
       expect(sat!.sccNum5).toBe('T0001');
     });
 

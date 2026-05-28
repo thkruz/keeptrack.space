@@ -52,13 +52,14 @@ describe('OemSatellite NORAD_ID extraction from COMMENT lines', () => {
   // Pre-fix the regex was `(?<id>\d+)` which only matched digits. Real-world
   // OEM files (CelesTrak supplemental, SpaceTrack-derived) may carry alpha-5
   // NORAD_IDs in the COMMENT block and would have been silently dropped.
-  it('extracts an alpha-5 NORAD_ID (regression: pre-fix \\d+ regex missed it)', () => {
+  // The captured alpha-5 string is then normalized to its 6-digit numeric
+  // form on sccNum (the alpha-5 string is preserved on sccNum5).
+  it('extracts an alpha-5 NORAD_ID and normalizes it to the numeric form on sccNum', () => {
     const sat = new OemSatellite(makeOem(['NORAD_ID = T0001']));
 
-    expect(sat.sccNum).toBe('T0001');
+    expect(sat.sccNum).toBe('270001');
     expect(sat.sccNum5).toBe('T0001');
-    // 6-digit numeric form is derived from alpha-5.
-    expect(sat.sccNum6).not.toBeNull();
+    expect(sat.sccNum6).toBe('270001');
     expect(sat.type).toBe(SpaceObjectType.PAYLOAD);
   });
 
@@ -119,6 +120,7 @@ describe('OemSatellite NORAD_ID extraction from COMMENT lines', () => {
 
     const sat = new OemSatellite(oem);
 
-    expect(sat.sccNum).toBe('T0001');
+    expect(sat.sccNum).toBe('270001');
+    expect(sat.sccNum5).toBe('T0001');
   });
 });

@@ -228,4 +228,54 @@ describe('calcSatrec', () => {
     expect(result).toHaveLength(1);
     expect(result[0]).toBe(defaultSat);
   });
+
+  // addAnalystSat is the construction path used by breakup, orbit-references,
+  // and the analyst-slot system. Extended (9-digit) sccNums can only be
+  // preserved by passing the explicit `sccNum` parameter — the fallback only
+  // reads the trailing 5 chars from the TLE column.
+  describe('addAnalystSat sccNum handling', () => {
+    beforeEach(() => {
+      catalogManagerInstance.objectCache = [defaultSat];
+      catalogManagerInstance.satCruncherThread = {
+        postMessage: vi.fn(),
+        sendSatEdit: vi.fn(),
+      } as any;
+    });
+
+    it('falls back to the 5-char TLE satnum when no explicit sccNum is passed', () => {
+      const sat = catalogManagerInstance.addAnalystSat(defaultSat.tle1, defaultSat.tle2, 1);
+
+      expect(sat).not.toBeNull();
+      // defaultSat's TLE has '25544' in cols 3-7.
+      expect(sat!.sccNum).toBe('25544');
+    });
+
+    it('preserves an explicit alpha-5 sccNum parameter', () => {
+      const sat = catalogManagerInstance.addAnalystSat(defaultSat.tle1, defaultSat.tle2, 1, 'T0001');
+
+      expect(sat).not.toBeNull();
+      expect(sat!.sccNum).toBe('T0001');
+      expect(sat!.sccNum5).toBe('T0001');
+    });
+
+    it('preserves an explicit 9-digit extended sccNum parameter', () => {
+      const sat = catalogManagerInstance.addAnalystSat(defaultSat.tle1, defaultSat.tle2, 1, '799500766');
+
+      expect(sat).not.toBeNull();
+      expect(sat!.sccNum).toBe('799500766');
+      // sccNum5/6 are null for extended.
+      expect(sat!.sccNum5).toBeNull();
+      expect(sat!.sccNum6).toBeNull();
+    });
+
+    it('preserves an explicit 6-digit numeric sccNum (A5-capable range)', () => {
+      const sat = catalogManagerInstance.addAnalystSat(defaultSat.tle1, defaultSat.tle2, 1, '270001');
+
+      expect(sat).not.toBeNull();
+      expect(sat!.sccNum).toBe('270001');
+      // 6-digit numeric in alpha-5 range has both forms populated.
+      expect(sat!.sccNum5).toBe('T0001');
+      expect(sat!.sccNum6).toBe('270001');
+    });
+  });
 });

@@ -98,5 +98,25 @@ describe('EditSatPlugin_class', () => {
       clickNewTleWithScc('  T0001  ');
       expect(sccNumSpy).toHaveBeenCalledWith('T0001');
     });
+
+    // The save TLE button has its own static handler reading the same scc
+    // field; verify it also dropped parseInt and now passes strings through.
+    it('save TLE button also passes alpha-5 input through unchanged', () => {
+      getEl(editSatPlugin.bottomIconElementName)!.click();
+      (getEl('es-scc') as HTMLInputElement).value = 'T0001';
+      getEl('editSat-save')!.click();
+      vi.advanceTimersByTime(1000);
+
+      expect(sccNumSpy).toHaveBeenCalledWith('T0001');
+    });
+
+    it('save TLE button passes 9-digit extended input through unchanged', () => {
+      getEl(editSatPlugin.bottomIconElementName)!.click();
+      (getEl('es-scc') as HTMLInputElement).value = '799500766';
+      getEl('editSat-save')!.click();
+      vi.advanceTimersByTime(1000);
+
+      expect(sccNumSpy).toHaveBeenCalledWith('799500766');
+    });
   });
 });

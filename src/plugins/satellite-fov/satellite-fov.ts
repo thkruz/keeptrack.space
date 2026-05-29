@@ -394,7 +394,8 @@ export class SatelliteFov extends KeepTrackPlugin {
     }
 
     const catalogManager = ServiceLocator.getCatalogManager();
-    const targetId = catalogManager.sccNum2Id(parseInt(sccInput));
+    // sccNum2Id handles numeric / alpha-5 / extended; parseInt would drop alpha-5.
+    const targetId = catalogManager.sccNum2Id(sccInput);
 
     if (targetId === null) {
       toast('Target satellite not found in catalog.', ToastMsgType.critical);

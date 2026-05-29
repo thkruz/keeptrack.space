@@ -106,7 +106,9 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
   }
 
   private eventClicked_(row: number) {
-    const sat = ServiceLocator.getCatalogManager().sccNum2Sat(parseInt(this.orbitGuardEvents[row].satNo));
+    // sccNum2Sat handles numeric / alpha-5 / extended; parseInt would drop
+    // alpha-5 satNos.
+    const sat = ServiceLocator.getCatalogManager().sccNum2Sat(this.orbitGuardEvents[row].satNo);
 
     if (!sat) {
       ServiceLocator.getUiManager().toast('Satellite appears to have decayed!', ToastMsgType.caution);

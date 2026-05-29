@@ -333,7 +333,9 @@ export class Reentries extends KeepTrackPlugin {
   }
 
   protected tipEventClicked_(row: number) {
-    const sat = ServiceLocator.getCatalogManager().sccNum2Sat(parseInt(this.tipList_[row].NORAD_CAT_ID));
+    // sccNum2Sat accepts the NORAD_CAT_ID string directly; parseInt would drop
+    // alpha-5 IDs.
+    const sat = ServiceLocator.getCatalogManager().sccNum2Sat(this.tipList_[row].NORAD_CAT_ID);
 
     if (!sat) {
       ServiceLocator.getUiManager().toast(t7e('plugins.Reentries.errorMsgs.satelliteDecayed' as Parameters<typeof t7e>[0]), ToastMsgType.caution);
@@ -409,7 +411,7 @@ export class Reentries extends KeepTrackPlugin {
     tr.setAttribute('class', 'tip-object link');
     tr.setAttribute('data-row', i.toString());
 
-    const sat = ServiceLocator.getCatalogManager().sccNum2Sat(parseInt(this.tipList_[i].NORAD_CAT_ID));
+    const sat = ServiceLocator.getCatalogManager().sccNum2Sat(this.tipList_[i].NORAD_CAT_ID);
     let rcs = 'Reentered';
     let age = 'Reentered';
     let volume = 'Reentered';
@@ -479,7 +481,7 @@ export class Reentries extends KeepTrackPlugin {
         const sccNums = CatalogSearch.findReentry(<Satellite[]>objectCache, 200);
 
         this.reentryList_ = sccNums
-          .map((scc) => ServiceLocator.getCatalogManager().sccNum2Sat(parseInt(scc)))
+          .map((scc) => ServiceLocator.getCatalogManager().sccNum2Sat(scc))
           .filter((sat): sat is Satellite => sat !== null);
 
         this.createReentryTable_();

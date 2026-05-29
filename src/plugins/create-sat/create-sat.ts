@@ -826,8 +826,9 @@ export class CreateSat extends KeepTrackPlugin {
     }
 
     try {
-      // Convert SCC to internal ID
-      const satId = catalogManagerInstance.sccNum2Id(parseInt(inputParams.scc)) ?? -1;
+      // Convert SCC to internal ID. sccNum2Id accepts the string form directly
+      // (numeric / alpha-5 / extended); parseInt would drop alpha-5 IDs.
+      const satId = catalogManagerInstance.sccNum2Id(inputParams.scc) ?? -1;
       const obj = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY);
 
       if (!obj?.isSatellite()) {
@@ -959,7 +960,8 @@ export class CreateSat extends KeepTrackPlugin {
 
     try {
       const scc = (getEl(`${CreateSat.elementPrefix}-scc`) as HTMLInputElement).value;
-      const satId = catalogManagerInstance.sccNum2Id(parseInt(scc));
+      // sccNum2Id accepts the string directly; parseInt would drop alpha-5 IDs.
+      const satId = catalogManagerInstance.sccNum2Id(scc);
       const sat = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY) as Satellite;
 
       if (!sat || !sat.tle1 || !sat.tle2) {

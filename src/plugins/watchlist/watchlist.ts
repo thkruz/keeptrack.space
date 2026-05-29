@@ -692,7 +692,15 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     const sats = (<HTMLInputElement>getEl('watchlist-new')).value.split(/[\s,]+/u);
 
     sats.forEach((satNum: string) => {
-      const id = ServiceLocator.getCatalogManager().sccNum2Id(parseInt(satNum)) ?? -1;
+      if (!satNum.trim()) {
+        return;
+      }
+
+      // Pass the raw string to sccNum2Id, which handles every sccNum form
+      // (numeric, alpha-5 "T0001", 6-digit, extended) plus leading-zero
+      // normalization. parseInt would turn "T0001" into NaN and silently
+      // drop alpha-5 / extended watchlist entries.
+      const id = ServiceLocator.getCatalogManager().sccNum2Id(satNum.trim()) ?? -1;
 
       if (id === -1) {
         errorManagerInstance.warnToast(`Sat ${satNum} not found!`);

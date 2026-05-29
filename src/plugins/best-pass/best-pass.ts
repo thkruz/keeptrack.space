@@ -221,7 +221,9 @@ export class BestPassPlugin extends KeepTrackPlugin {
         if (typeof satId === 'undefined' || satId === null || satId === '' || satId === ' ') {
           continue;
         }
-        const sat = catalogManager.sccNum2Sat(parseInt(satId, 10));
+        // sccNum2Sat handles every sccNum form directly; parseInt would turn a
+        // typed alpha-5 ("T0001") into NaN and silently skip it.
+        const sat = catalogManager.sccNum2Sat(satId.trim());
 
         if (!sat) {
           continue;

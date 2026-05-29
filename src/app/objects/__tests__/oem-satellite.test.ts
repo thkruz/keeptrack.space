@@ -81,6 +81,20 @@ describe('OemSatellite NORAD_ID extraction from COMMENT lines', () => {
     expect(sat.type).toBe(SpaceObjectType.PAYLOAD);
   });
 
+  // A 6-digit value above the alpha-5 capacity (340000-999999) classifies as
+  // 'extended'. Tle.convertA5to6Digit THROWS for this range (it cannot be
+  // represented in TLE columns), so the NORAD parse must guard the call the
+  // same way Satellite.assignAlpha5Forms_ does. Pre-fix the unguarded call
+  // crashed the entire OemSatellite constructor for these IDs.
+  it('extracts a 6-digit extended NORAD_ID above the alpha-5 range without throwing', () => {
+    const sat = new OemSatellite(makeOem(['NORAD_ID = 400000']));
+
+    expect(sat.sccNum).toBe('400000');
+    expect(sat.sccNum5).toBeNull();
+    expect(sat.sccNum6).toBeNull();
+    expect(sat.type).toBe(SpaceObjectType.PAYLOAD);
+  });
+
   it('leaves the satellite NOTIONAL when no NORAD_ID is present', () => {
     const sat = new OemSatellite(makeOem(['some other comment']));
 

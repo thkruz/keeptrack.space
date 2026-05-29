@@ -138,3 +138,183 @@ describe('OemSatellite NORAD_ID extraction from COMMENT lines', () => {
     expect(sat.sccNum5).toBe('T0001');
   });
 });
+
+describe('OemSatellite.applyUserDefinedMetadata_', () => {
+  it('maps every USER_DEFINED_ field onto the satellite', () => {
+    const sat = new OemSatellite(makeOem());
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (sat as any).applyUserDefinedMetadata_({
+      COUNTRY: 'US',
+      LAUNCH_SITE: 'KSC',
+      LAUNCH_VEHICLE: 'Saturn V',
+      MISSION: 'Apollo',
+      USER: 'NASA',
+      CONTRACTOR: 'Boeing',
+      BUS: 'S-IVB',
+      SHAPE: 'Cylinder',
+      SOURCE: 'CustomSource',
+    });
+
+    expect(sat.country).toBe('US');
+    expect(sat.launchSite).toBe('KSC');
+    expect(sat.launchVehicle).toBe('Saturn V');
+    expect(sat.mission).toBe('Apollo');
+    expect(sat.owner).toBe('NASA');
+    expect(sat.manufacturer).toBe('Boeing');
+    expect(sat.bus).toBe('S-IVB');
+    expect(sat.shape).toBe('Cylinder');
+    expect(sat.source).toBe('CustomSource');
+  });
+
+  it('maps OBJECT_TYPE onto the SpaceObjectType enum', () => {
+    const sat = new OemSatellite(makeOem());
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (sat as any).applyUserDefinedMetadata_({ OBJECT_TYPE: 'rocket_body' });
+    expect(sat.type).toBe(SpaceObjectType.ROCKET_BODY);
+  });
+
+  it('leaves the type unchanged for an unrecognized OBJECT_TYPE', () => {
+    const sat = new OemSatellite(makeOem());
+    const before = sat.type;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (sat as any).applyUserDefinedMetadata_({ OBJECT_TYPE: 'NONSENSE' });
+    expect(sat.type).toBe(before);
+  });
+
+  it('is a no-op when no USER_DEFINED block is present', () => {
+    const sat = new OemSatellite(makeOem());
+
+    sat.country = 'PRESET';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (sat as any).applyUserDefinedMetadata_(undefined);
+    expect(sat.country).toBe('PRESET');
+  });
+
+  it('applies USER_DEFINED metadata through the constructor', () => {
+    const oem = makeOem();
+
+    oem.dataBlocks[0].metadata.USER_DEFINED = { COUNTRY: 'JP', OBJECT_TYPE: 'DEBRIS' };
+    const sat = new OemSatellite(oem);
+
+    expect(sat.country).toBe('JP');
+    expect(sat.type).toBe(SpaceObjectType.DEBRIS);
+  });
+});
+
+describe('OemSatellite.toJ2000', () => {
+  const startSec = Date.UTC(2026, 0, 1) / 1000;
+
+  it('returns the first state vector at/after the requested time (before range)', () => {
+    const sat = new OemSatellite(makeOem());
+    const result = sat.toJ2000(new Date((startSec - 100) * 1000));
+
+    expect(result).toBe(sat.OemDataBlocks[0].ephemeris[0]);
+  });
+
+  it('returns the next state vector when the time falls between samples', () => {
+    const sat = new OemSatellite(makeOem());
+    const result = sat.toJ2000(new Date((startSec + 30) * 1000));
+
+    expect(result).toBe(sat.OemDataBlocks[0].ephemeris[1]);
+  });
+
+  it('returns the last state vector when the time is beyond the ephemeris', () => {
+    const sat = new OemSatellite(makeOem());
+    const last = sat.OemDataBlocks[0].ephemeris[1];
+
+    expect(sat.toJ2000(new Date((startSec + 99999) * 1000))).toBe(last);
+  });
+});
+
+describe('OemSatellite.computeGlobalIndex_', () => {
+  const makeMultiBlockOem = (): ParsedOem => {
+    const startSec = Date.UTC(2026, 0, 1) / 1000 as Seconds;
+    const base = makeOem();
+    const block0 = base.dataBlocks[0]; // 2 ephemeris points
+
+    return {
+      header: base.header,
+      dataBlocks: [
+        block0,
+        {
+          metadata: { ...block0.metadata, OBJECT_NAME: 'BLOCK 2' },
+          ephemeris: [
+            makeStateVector(startSec + 120),
+            makeStateVector(startSec + 180),
+            makeStateVector(startSec + 240),
+          ],
+        },
+      ],
+    };
+  };
+
+  it('sums the ephemeris lengths of preceding blocks plus the current index', () => {
+    const sat = new OemSatellite(makeMultiBlockOem());
+
+    // Set the private indices directly to avoid the setters' orbit-path rebuild.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (sat as any).dataBlockIdx_ = 1;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (sat as any).stateVectorIdx_ = 2;
+
+    // block0 has 2 points, so global index = 2 + 2 = 4.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((sat as any).computeGlobalIndex_()).toBe(4);
+  });
+
+  it('returns the state-vector index for the first block', () => {
+    const sat = new OemSatellite(makeMultiBlockOem());
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (sat as any).dataBlockIdx_ = 0;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (sat as any).stateVectorIdx_ = 1;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((sat as any).computeGlobalIndex_()).toBe(1);
+  });
+});
+
+describe('OemSatellite type predicates', () => {
+  it('reports satellite-kind but not the other kinds', () => {
+    const sat = new OemSatellite(makeOem());
+
+    expect(sat.isSatellite()).toBe(true);
+    expect(sat.isStatic()).toBe(false);
+    expect(sat.isMissile()).toBe(false);
+    expect(sat.isSensor()).toBe(false);
+    expect(sat.isMarker()).toBe(false);
+    expect(sat.isStar()).toBe(false);
+  });
+});
+
+describe('OemSatellite.clone', () => {
+  it('produces an independent copy that preserves identity fields', () => {
+    const sat = new OemSatellite(makeOem(['NORAD_ID = 25544']));
+    const copy = sat.clone();
+
+    expect(copy).not.toBe(sat);
+    expect(copy.sccNum).toBe('25544');
+    expect(copy.header.ORIGINATOR).toBe(sat.header.ORIGINATOR);
+    expect(copy.OemDataBlocks).toHaveLength(sat.OemDataBlocks.length);
+
+    // Mutating the original header must not bleed into the clone.
+    sat.header.ORIGINATOR = 'MUTATED';
+    expect(copy.header.ORIGINATOR).not.toBe('MUTATED');
+  });
+});
+
+describe('OemSatellite.serializeSpecific', () => {
+  it('emits the OEM-specific snapshot fields', () => {
+    const sat = new OemSatellite(makeOem(['NORAD_ID = 25544']));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data = (sat as any).serializeSpecific() as Record<string, unknown>;
+
+    expect(data.sccNum).toBe('25544');
+    expect(data.source).toBe('OEM File');
+    expect(data).toHaveProperty('header');
+    expect(data).toHaveProperty('OemDataBlocks');
+  });
+});

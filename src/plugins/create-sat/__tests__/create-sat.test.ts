@@ -81,7 +81,9 @@ describe('CreateSat', () => {
     CreateSat['createSatSubmit_']();
 
     // Assertions
-    expect(mockCatalogManager.sccNum2Id).toHaveBeenCalledWith(12345);
+    // sccNum2Id now receives the raw form string (no parseInt) so alpha-5 and
+    // extended IDs survive; the mock still resolves it to internal id 12345.
+    expect(mockCatalogManager.sccNum2Id).toHaveBeenCalledWith('12345');
     expect(mockCatalogManager.getObject).toHaveBeenCalledWith(12345, GetSatType.EXTRA_ONLY);
     expect(FormatTle.createTle).toHaveBeenCalled();
     expect(Sgp4.createSatrec).toHaveBeenCalledWith(
@@ -167,7 +169,9 @@ describe('CreateSat', () => {
     CreateSat['createSatSubmit_']();
 
     // Assertions
-    expect(mockCatalogManager.sccNum2Id).toHaveBeenCalledWith(12345);
+    // sccNum2Id now receives the raw form string (no parseInt) so alpha-5 and
+    // extended IDs survive; the mock still resolves it to internal id 12345.
+    expect(mockCatalogManager.sccNum2Id).toHaveBeenCalledWith('12345');
     expect(mockCatalogManager.getObject).toHaveBeenCalledWith(12345, GetSatType.EXTRA_ONLY);
     expect(FormatTle.createTle).toHaveBeenCalled();
     expect(Sgp4.createSatrec).toHaveBeenCalledWith(

@@ -1,4 +1,6 @@
+import { vi } from 'vitest';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { disableConsoleErrors, enableConsoleErrors, setupDefaultHtml } from './environment/standard-env';
@@ -87,6 +89,48 @@ describe('WatchlistPlugin_form', () => {
       watchlistNewElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
       enableConsoleErrors();
     }
+  });
+});
+
+// The pre-fix add handler did `sccNum2Id(parseInt(satNum))`, which collapses
+// any typed alpha-5 ("T0001") to NaN and silently rejected alpha-5 / extended
+// watchlist entries. The fix passes the raw string through so the catalog
+// manager resolves it via its full equivalence logic.
+describe('WatchlistPlugin_addInputForm_sccNumForms', () => {
+  let watchlistPlugin: WatchlistPlugin;
+  let sccNumSpy: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    PluginRegistry.unregisterAllPlugins();
+    setupDefaultHtml();
+    watchlistPlugin = new WatchlistPlugin();
+    websiteInit(watchlistPlugin);
+    // Return -1 so the handler short-circuits to the "not found" toast without
+    // needing a real catalog entry; we only assert what the spy received.
+    sccNumSpy = vi.fn().mockReturnValue(-1);
+    ServiceLocator.getCatalogManager().sccNum2Id = sccNumSpy;
+  });
+
+  const addViaForm = (value: string): void => {
+    (getEl('watchlist-new') as HTMLInputElement).value = value;
+    getEl('watchlist-add')!.click();
+  };
+
+  it('passes alpha-5 input through unchanged (not collapsed to NaN by parseInt)', () => {
+    addViaForm('T0001');
+    expect(sccNumSpy).toHaveBeenCalledWith('T0001');
+  });
+
+  it('passes 9-digit extended input through unchanged', () => {
+    addViaForm('799500766');
+    expect(sccNumSpy).toHaveBeenCalledWith('799500766');
+  });
+
+  it('splits and trims a mixed-form comma list, passing each form verbatim', () => {
+    addViaForm('25544, T0001 , 799500766');
+    expect(sccNumSpy).toHaveBeenCalledWith('25544');
+    expect(sccNumSpy).toHaveBeenCalledWith('T0001');
+    expect(sccNumSpy).toHaveBeenCalledWith('799500766');
   });
 });
 

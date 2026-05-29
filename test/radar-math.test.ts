@@ -52,6 +52,30 @@ describe('minSignal_method', () => {
   });
 });
 
+describe('maxRng_method', () => {
+  it('returns a positive, finite maximum range', () => {
+    const rng = RadarMath.maxRng(1_000_000, 1000, 10, -100, 450);
+
+    expect(Number.isFinite(rng)).toBe(true);
+    expect(rng).toBeGreaterThan(0);
+  });
+
+  it('scales range with the fourth root of transmitted power', () => {
+    // numer ∝ pW and rng = (numer/denom)^(1/4), so 16x power -> 2x range.
+    const base = RadarMath.maxRng(1_000_000, 1000, 10, -100, 450);
+    const sixteenX = RadarMath.maxRng(16_000_000, 1000, 10, -100, 450);
+
+    expect(sixteenX / base).toBeCloseTo(2, 5);
+  });
+
+  it('increases range with a larger radar cross section', () => {
+    const small = RadarMath.maxRng(1_000_000, 1000, 1, -100, 450);
+    const large = RadarMath.maxRng(1_000_000, 1000, 100, -100, 450);
+
+    expect(large).toBeGreaterThan(small);
+  });
+});
+
 describe('beamWidthAtRange_method', () => {
   // Tests that the method returns the correct beam width at a given range.
   it('test_beam_width_at_range', () => {

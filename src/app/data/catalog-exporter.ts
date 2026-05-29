@@ -1,8 +1,29 @@
 import { saveXlsx } from '@app/engine/utils/saveVariable';
-import { BaseObject, Satellite } from '@ootk/src/main';
+import { BaseObject, Satellite, Tle } from '@ootk/src/main';
 import { saveAs } from 'file-saver';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+
+/**
+ * Warns when extended (7+ digit / >339999 6-digit) sccNums are in the export
+ * selection but the export format is pure-TLE-text. The TLE format physically
+ * caps cols 3-7 at 5 chars, so extended IDs only round-trip via formats that
+ * carry the canonical sccNum in a dedicated column (CSV / OMM / TCE+JSON).
+ *
+ * The export still proceeds — the warning is informational so users know
+ * why a re-imported pure-TLE file would lose precision.
+ */
+function warnIfExtendedInTleTextExport_(sats: Satellite[]): void {
+  const extendedCount = sats.filter((sat) => Tle.classifySatNum(sat.sccNum) === 'extended').length;
+
+  if (extendedCount > 0) {
+    errorManagerInstance.warn(
+      `${extendedCount} extended (7+ digit) sccNum satellite(s) in this export — ` +
+      'TLE-format cols 3-7 only fit 5 chars, so re-importing this file will ' +
+      'lose the canonical id. Use CSV/OMM export to preserve extended IDs.',
+    );
+  }
+}
 
 interface CatalogExportCsvFields {
   [key: string]: unknown; // Add string index signature
@@ -117,6 +138,7 @@ export class CatalogExporter {
       }
 
       satOnlyData.sort((a, b) => a.sccNum.localeCompare(b.sccNum, 'en', { numeric: true }));
+      warnIfExtendedInTleTextExport_(satOnlyData);
       for (const sat of satOnlyData) {
         if (typeof sat.tle1 === 'undefined' || typeof sat.tle2 === 'undefined') {
           continue;
@@ -164,6 +186,7 @@ export class CatalogExporter {
       }
 
       satOnlyData.sort((a, b) => a.sccNum.localeCompare(b.sccNum, 'en', { numeric: true }));
+      warnIfExtendedInTleTextExport_(satOnlyData);
       for (const sat of satOnlyData) {
         if (typeof sat.tle1 === 'undefined' || typeof sat.tle2 === 'undefined') {
           continue;

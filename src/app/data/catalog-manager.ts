@@ -165,8 +165,10 @@ export class CatalogManager {
    * If a satellite number does not have a corresponding ID, it is not included in the returned array.
    */
   satnums2ids(satnumArray: number[]): number[] {
+    // sccNum2Id normalizes numeric input itself (strips leading zeros) so the
+    // padStart that used to live here is no longer needed.
     return satnumArray
-      .map((satnum) => this.sccNum2Id(satnum.toString().padStart(5, '0'), false))
+      .map((satnum) => this.sccNum2Id(satnum, false))
       .filter((id): id is number => id !== null);
   }
 
@@ -192,16 +194,15 @@ export class CatalogManager {
    * If the object number is found in the `satData`, it returns the index as the ID. If not found, it returns null.
    */
   sccNum2Id(a5Num: string | number, isExtensiveSearch = true): number | null {
-    // For backwards compatibility, this method accepts a number or string as the a5Num parameter.
-    if (typeof a5Num === 'number') {
-      a5Num = a5Num.toString().padStart(5, '0');
-    } else if ((/^\d{1,5}$/u).test(a5Num)) {
-      // Pure-numeric short input gets padded to legacy 5-digit canonical form.
-      // Alpha-5 ("T0001") and extended (7+ digit) IDs pass through unchanged.
-      a5Num = a5Num.padStart(5, '0');
-    }
+    // Normalize input to the display-canonical natural-number form so user
+    // input of "5", "00005", or 5 (all referring to Vanguard) collapses to
+    // a single sccIndex key. Alpha-5 ("T0001") and extended (7+ digit) IDs
+    // have no leading zeros and pass through unchanged.
+    let key = typeof a5Num === 'number' ? a5Num.toString() : a5Num;
 
-    const key = a5Num.toString();
+    if ((/^0+\d/u).test(key)) {
+      key = key.replace(/^0+/u, '');
+    }
 
     // Fast path: direct sccIndex hit.
     if (typeof this.sccIndex[key] !== 'undefined') {
@@ -251,7 +252,9 @@ export class CatalogManager {
    * @returns The satellite object if found, null otherwise.
    */
   sccNum2Sat(sccNum: number | string): Satellite | null {
-    const sat = this.getObject(this.sccNum2Id(sccNum.toString().padStart(5, '0')));
+    // sccNum2Id handles all input forms (numeric, alpha-5, extended) plus
+    // leading-zero normalization, so no pre-processing needed here.
+    const sat = this.getObject(this.sccNum2Id(sccNum));
 
     if (!sat?.isSatellite()) {
       errorManagerInstance.debug(`Object ${sccNum} is not a satellite!`);
@@ -263,7 +266,7 @@ export class CatalogManager {
   }
 
   a52Sat(sccNum: string): Satellite | null {
-    const sat = this.getObject(this.sccNum2Id(sccNum.padStart(5, '0')));
+    const sat = this.getObject(this.sccNum2Id(sccNum));
 
     if (!sat?.isSatellite()) {
       errorManagerInstance.debug(`Object ${sccNum} is not a satellite!`);

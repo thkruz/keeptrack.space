@@ -93,10 +93,10 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
     const alpha5 = Satellite.fromOmm(rows[1]);
     const extended = Satellite.fromOmm(rows[2]);
 
-    // sccNum is always numeric — alpha-5 input "T0001" is normalized to its
-    // 6-digit equivalent "270001"; numeric inputs pass through unchanged.
+    // sccNum is the natural-number form (no leading zeros, no alpha-5).
+    // Vanguard "5" not "00005"; alpha-5 "T0001" → "270001"; extended preserved.
     // The alpha-5 string is preserved on sccNum5 for cross-referencing.
-    expect(vanguard.sccNum).toBe('00005');
+    expect(vanguard.sccNum).toBe('5');
     expect(alpha5.sccNum).toBe('270001');
     expect(alpha5.sccNum5).toBe('T0001');
     expect(extended.sccNum).toBe('799500766');
@@ -106,7 +106,8 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
     expect(extended.sccNum5).toBeNull();
     expect(extended.sccNum6).toBeNull();
 
-    // TLE cols 3-7 carry the last-5-digit tail for extended IDs.
+    // TLE cols 3-7 carry the zero-padded 5-char satnum for the TLE format
+    // contract (extended IDs are necessarily the trailing 5 digits).
     expect(extended.tle1.substring(2, 7)).toBe('00766');
   });
 
@@ -129,12 +130,12 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
     });
 
     const catalogManager = ServiceLocator.getCatalogManager();
-
-    // 5-digit numeric: indexed as-is (convertA5to6Digit is identity).
-    const vanguardId = catalogManager.sccIndex['00005'];
+    // 5-digit numeric: leading zeros are stripped, so Vanguard NORAD 5 is
+    // indexed under "5" and sat.sccNum is also "5" (natural-number form).
+    const vanguardId = catalogManager.sccIndex['5'];
 
     expect(vanguardId).toBeDefined();
-    expect((catalogManager.objectCache[vanguardId] as Satellite).sccNum).toBe('00005');
+    expect((catalogManager.objectCache[vanguardId] as Satellite).sccNum).toBe('5');
 
     // 9-digit extended: indexed by full ID (convertA5to6Digit identity for 7+ digits).
     const extendedId = catalogManager.sccIndex['799500766'];
@@ -190,7 +191,7 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
     const catalogManager = ServiceLocator.getCatalogManager();
 
     // The good entries must still be present.
-    expect(catalogManager.sccIndex['00005']).toBeDefined();
+    expect(catalogManager.sccIndex['5']).toBeDefined();
     expect(catalogManager.sccIndex['799500766']).toBeDefined();
   });
 
@@ -242,10 +243,10 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
     // Good entry still indexed.
     const catalogManager = ServiceLocator.getCatalogManager();
 
-    expect(catalogManager.sccIndex['00005']).toBeDefined();
+    expect(catalogManager.sccIndex['5']).toBeDefined();
   });
 
-  it('sccNum2Id smart-pads pure-numeric short input and passes 9-digit through', async () => {
+  it('sccNum2Id normalizes leading-zero numeric input and passes 9-digit through', async () => {
     const rows = parseCsvFixture('./test/environment/extended-catalog.csv');
     const externalCatalog: AsciiTleSat[] = rows.map((row) => {
       const sat = Satellite.fromOmm(row);
@@ -265,16 +266,16 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
 
     const catalogManager = ServiceLocator.getCatalogManager();
 
-    // Short numeric string input gets padded — "5" finds Vanguard "00005".
-    expect(catalogManager.sccNum2Id('5')).toBe(catalogManager.sccIndex['00005']);
+    // Short numeric string input matches the natural-number key.
+    expect(catalogManager.sccNum2Id('5')).toBe(catalogManager.sccIndex['5']);
 
-    // Already-padded short numeric — padStart(5) is no-op.
-    expect(catalogManager.sccNum2Id('00005')).toBe(catalogManager.sccIndex['00005']);
+    // Leading-zero padded input is stripped to the natural form.
+    expect(catalogManager.sccNum2Id('00005')).toBe(catalogManager.sccIndex['5']);
 
-    // 9-digit numeric input — passes through unchanged (does not match \d{1,5}).
+    // 9-digit numeric input — passes through unchanged.
     expect(catalogManager.sccNum2Id('799500766')).toBe(catalogManager.sccIndex['799500766']);
 
-    // Numeric (legacy parseInt path) input still works for 9-digit.
+    // Numeric (legacy number-input path) input still works for 9-digit.
     expect(catalogManager.sccNum2Id(799500766)).toBe(catalogManager.sccIndex['799500766']);
   });
 
@@ -362,8 +363,10 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
 
     const catalogManager = ServiceLocator.getCatalogManager();
 
-    // 5-digit and 9-digit round-trip cleanly — canonical sccNum is the input.
-    expect(catalogManager.sccNum2Sat('00005')?.sccNum).toBe('00005');
+    // 5-digit input round-trips to its leading-zero-stripped natural form.
+    // sccNum2Sat accepts either "00005" or "5" but always returns sat.sccNum="5".
+    expect(catalogManager.sccNum2Sat('00005')?.sccNum).toBe('5');
+    expect(catalogManager.sccNum2Sat('5')?.sccNum).toBe('5');
     expect(catalogManager.sccNum2Sat('799500766')?.sccNum).toBe('799500766');
 
     // Alpha-5: Satellite.sccNum is always normalized to the display-canonical
@@ -378,8 +381,9 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
     expect(alpha5SatBy6Digit?.sccNum).toBe('270001');
     expect(alpha5SatByInput).toBe(alpha5SatBy6Digit);
 
-    // Number-form input still works for 5-digit (legacy contract).
-    expect(catalogManager.sccNum2Sat(5)?.sccNum).toBe('00005');
+    // Number-form input still works for 5-digit (legacy contract); result
+    // is the natural-number string regardless of whether input was 5 or "00005".
+    expect(catalogManager.sccNum2Sat(5)?.sccNum).toBe('5');
 
     // Number-form input works for 9-digit too — value fits in Number.MAX_SAFE_INTEGER.
     expect(catalogManager.sccNum2Sat(799500766)?.sccNum).toBe('799500766');

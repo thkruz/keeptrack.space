@@ -1722,13 +1722,17 @@ export class CatalogLoader {
    * different ingestion paths would assign the same satellite to different
    * keys and silently insert duplicates.
    *
-   * Tle.convertA5to6Digit is the chosen canonical: passthrough for legacy
-   * 5-digit numerics, passthrough for extended (7+ digit) IDs, and
-   * conversion for alpha-5 inputs.
+   * Canonicalization rules:
+   * 1. Alpha-5 → its 6-digit numeric form via Tle.convertA5to6Digit.
+   * 2. Numerics → leading zeros stripped, so "00005" and "5" share a key.
+   *    Matches Satellite.sccNum's display-canonical form so plugins can
+   *    use either sat.sccNum or canonicalSccKey(...) interchangeably.
    */
   static canonicalSccKey(scc: string | number): string | null {
     try {
-      return Tle.convertA5to6Digit(scc.toString());
+      const sixDigit = Tle.convertA5to6Digit(scc.toString());
+
+      return sixDigit.replace(/^0+(?=\d)/u, '');
     } catch {
       return null;
     }

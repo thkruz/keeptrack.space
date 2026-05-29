@@ -54,7 +54,8 @@ describe('calcSatrec', () => {
     catalogManagerInstance.objectCache = [newSat];
     const satnumList = catalogManagerInstance.id2satnum(idList);
 
-    expect(satnumList).toStrictEqual(['00005']);
+    // sccNum invariant: natural-number form, leading zeros stripped.
+    expect(satnumList).toStrictEqual(['5']);
   });
 
   // should search for objects in similar orbits

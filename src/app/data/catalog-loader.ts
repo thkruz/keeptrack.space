@@ -1729,12 +1729,22 @@ export class CatalogLoader {
    *    use either sat.sccNum or canonicalSccKey(...) interchangeably.
    */
   static canonicalSccKey(scc: string | number): string | null {
-    try {
-      const sixDigit = Tle.convertA5to6Digit(scc.toString());
+    const raw = scc.toString();
 
-      return sixDigit.replace(/^0+(?=\d)/u, '');
+    try {
+      return Tle.convertA5to6Digit(raw).replace(/^0+(?=\d)/u, '');
     } catch {
-      return null;
+      // Tle.convertA5to6Digit throws for IDs beyond TLE alpha-5 capacity —
+      // specifically a 6-digit numeric value > 339999. These are still valid
+      // "extended" catalog numbers: Satellite.assignAlpha5Forms_ catches the
+      // same throw and keeps them verbatim on sat.sccNum. Return the stripped
+      // numeric form here too so this key stays interchangeable with
+      // sat.sccNum (as the doc promises). Only genuinely malformed
+      // (non-numeric) input — e.g. Satnogs-style Unicode corruption — yields
+      // null so callers can skip it.
+      const trimmed = raw.trim();
+
+      return (/^\d+$/u).test(trimmed) ? trimmed.replace(/^0+(?=\d)/u, '') : null;
     }
   }
 }

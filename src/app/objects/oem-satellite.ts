@@ -271,7 +271,17 @@ export class OemSatellite extends SpaceObject {
         // Normalize to the display-canonical numeric form so OemSatellite.sccNum
         // matches the convention used by Satellite (alpha-5 "T0001" → "270001",
         // leading zeros stripped). The alpha-5 string is preserved on sccNum5.
-        this.sccNum = Tle.convertA5to6Digit(id).replace(/^0+(?=\d)/u, '');
+        // Tle.convertA5to6Digit THROWS for extended IDs beyond TLE alpha-5
+        // capacity (a 6-digit value > 339999); guard it the same way
+        // Satellite.assignAlpha5Forms_ does and keep the original as canonical.
+        let normalizedScc = id;
+
+        try {
+          normalizedScc = Tle.convertA5to6Digit(id);
+        } catch {
+          // Extended (e.g. 6-digit > 339999) — leave the numeric form untouched.
+        }
+        this.sccNum = normalizedScc.replace(/^0+(?=\d)/u, '');
         if (kind === 'numeric5' || kind === 'alpha5' || kind === 'numeric6') {
           this.sccNum5 = Tle.convert6DigitToA5(this.sccNum);
           this.sccNum6 = this.sccNum;

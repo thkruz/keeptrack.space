@@ -463,3 +463,39 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
     expect(updated.sccNum5).toBe('T0001');
   });
 });
+
+describe('CatalogLoader.canonicalSccKey', () => {
+  it('strips leading zeros so padded numerics share a key with their canonical form', () => {
+    expect(CatalogLoader.canonicalSccKey('00005')).toBe('5');
+    expect(CatalogLoader.canonicalSccKey('025544')).toBe('25544');
+    expect(CatalogLoader.canonicalSccKey(5)).toBe('5');
+  });
+
+  it('normalizes alpha-5 to its 6-digit numeric form', () => {
+    expect(CatalogLoader.canonicalSccKey('T0001')).toBe('270001');
+  });
+
+  it('passes a 6-digit numeric in the alpha-5 range through unchanged', () => {
+    expect(CatalogLoader.canonicalSccKey('270001')).toBe('270001');
+  });
+
+  it('passes a 7+ digit extended numeric through unchanged', () => {
+    expect(CatalogLoader.canonicalSccKey('799500766')).toBe('799500766');
+  });
+
+  // Tle.convertA5to6Digit throws for a 6-digit value above the alpha-5 capacity
+  // (340000-999999). Such IDs are still valid extended catalog numbers, so the
+  // key must match Satellite.sccNum (the numeric form) rather than collapse to
+  // null — otherwise sat.sccNum and canonicalSccKey would disagree, contrary to
+  // the documented interchangeability.
+  it('keeps a 6-digit extended numeric (> 339999) as its canonical numeric key', () => {
+    expect(CatalogLoader.canonicalSccKey('400000')).toBe('400000');
+    expect(CatalogLoader.canonicalSccKey('0400000')).toBe('400000');
+  });
+
+  it('returns null only for genuinely malformed (non-numeric) SCCs', () => {
+    expect(CatalogLoader.canonicalSccKey('饃9500')).toBeNull(); // Satnogs-style corruption
+    expect(CatalogLoader.canonicalSccKey('T00A1')).toBeNull(); // bad alpha-5 trailing
+    expect(CatalogLoader.canonicalSccKey('99X99')).toBeNull(); // stray letter, not a leading-letter alpha-5
+  });
+});

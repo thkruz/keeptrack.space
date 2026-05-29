@@ -1,10 +1,10 @@
 /* eslint-disable class-methods-use-this */
+import { MissileParams } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import type { ClassicalElements } from '@app/engine/ootk/src/coordinate/ClassicalElements';
 import type { ITRF } from '@app/engine/ootk/src/coordinate/ITRF';
 import type { J2000 } from '@app/engine/ootk/src/coordinate/J2000';
-import { MissileParams } from '@app/engine/core/interfaces';
-import { ServiceLocator } from '@app/engine/core/service-locator';
-import { SpaceObject, SpaceObjectParams, DEG2RAD, Degrees, EcefVec3, Kilometers, LlaVec3, PosVel, Radians, SpaceObjectType, Vector3D, calcGmst, eci2lla, lla2eci, eci2ecef, TemeVec3 } from '@ootk/src/main';
+import { calcGmst, DEG2RAD, Degrees, EcefVec3, eci2ecef, eci2lla, Kilometers, lla2eci, LlaVec3, PosVel, Radians, SpaceObject, SpaceObjectParams, SpaceObjectType, TemeVec3, Vector3D } from '@ootk/src/main';
 
 export class MissileObject extends SpaceObject {
   type = SpaceObjectType.BALLISTIC_MISSILE;
@@ -49,6 +49,10 @@ export class MissileObject extends SpaceObject {
   }
 
   isStatic(): boolean {
+    return false;
+  }
+
+  isSatellite(): boolean {
     return false;
   }
 

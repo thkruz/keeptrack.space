@@ -356,6 +356,39 @@ describe('SideMenuComponent', () => {
     });
   });
 
+  describe('registerFormSubmit with no callback', () => {
+    it('returns early when neither a callback nor onFormSubmit is provided', () => {
+      const component = new SideMenuComponent('test-plugin', createConfig());
+
+      component.init();
+      // No callback argument and no onFormSubmit in callbacks -> early return (no handler registered)
+      expect(() => component.registerFormSubmit()).not.toThrow();
+      eventBus.emit(EventBusEvent.uiManagerInit);
+      eventBus.emit(EventBusEvent.uiManagerFinal);
+
+      const form = document.getElementById('test-menu-form');
+
+      // Submitting should be a no-op since no handler was registered
+      expect(() => form?.dispatchEvent(new Event('submit'))).not.toThrow();
+    });
+  });
+
+  describe('mobile mode', () => {
+    it('runs the mobile-mode search-close branch when opening', () => {
+      settingsManager.isMobileModeEnabled = true;
+      const component = new SideMenuComponent('test-plugin', createConfig());
+
+      component.init();
+      eventBus.emit(EventBusEvent.uiManagerInit);
+
+      // Exercises the isMobileModeEnabled branch in hideAllSideMenus (searchManager?.closeSearch()).
+      expect(() => component.open()).not.toThrow();
+      expect(component.opened).toBe(true);
+
+      settingsManager.isMobileModeEnabled = false;
+    });
+  });
+
   describe('drag options', () => {
     it('should register drag handler when dragOptions provided', () => {
       const component = new SideMenuComponent('test-plugin', createConfig({

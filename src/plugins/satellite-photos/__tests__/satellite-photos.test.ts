@@ -1,10 +1,13 @@
-import { MenuMode } from '@app/engine/core/interfaces';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { KeepTrack } from '@app/keeptrack';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { SatellitePhotos } from '@app/plugins/satellite-photos/satellite-photos';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { getEl } from '@app/engine/utils/get-el';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
-import { standardPluginMenuButtonTests, standardPluginSuite } from '@test/generic-tests';
+import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
 
 describe('SatellitePhotos', () => {
@@ -110,6 +113,40 @@ describe('SatellitePhotos', () => {
       plugin.addJs();
 
       expect(onSpy).toHaveBeenCalledWith(EventBusEvent.onKeepTrackReady, expect.any(Function));
+    });
+  });
+});
+
+describe('SatellitePhotos_class', () => {
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager]);
+  });
+
+  standardPluginSuite(SatellitePhotos, 'SatellitePhotos');
+  standardPluginMenuButtonTests(SatellitePhotos, 'SatellitePhotos');
+});
+
+describe('SatellitePhotos_test_links', () => {
+  setupStandardEnvironment([SelectSatManager]);
+  const tempSatellitePhotosPlugin = new SatellitePhotos();
+
+  websiteInit(tempSatellitePhotosPlugin);
+  const links = Array.from(getEl('sat-photo-menu-content')!.getElementsByTagName('li')).map((li) => li.id);
+
+  let satellitePhotosPlugin: SatellitePhotos;
+
+  beforeEach(() => {
+    PluginRegistry.unregisterAllPlugins();
+    setupStandardEnvironment([SelectSatManager]);
+    satellitePhotosPlugin = new SatellitePhotos();
+    websiteInit(satellitePhotosPlugin);
+    KeepTrack.getInstance().containerRoot.innerHTML += '<div id="colorbox-div"></div>';
+  });
+
+  links.forEach((link) => {
+    it(`should have a working link to ${link}`, () => {
+      expect(getEl(link)).toBeTruthy();
+      expect(() => getEl(link)!.click()).not.toThrow();
     });
   });
 });

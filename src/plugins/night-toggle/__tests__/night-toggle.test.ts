@@ -1,7 +1,7 @@
-import { vi } from 'vitest';
 import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
-import { standardPluginSuite } from '@test/generic-tests';
+import { standardPluginMenuButtonTests, standardPluginSuite } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('NightToggle', () => {
   beforeEach(() => {
@@ -13,4 +13,5 @@ describe('NightToggle', () => {
   });
 
   standardPluginSuite(NightToggle, 'NightToggle');
+  standardPluginMenuButtonTests(NightToggle, 'Night_Toggle');
 });

@@ -1,11 +1,14 @@
+import { CollisionEvent, Collisions } from '@app/plugins/collisions/collisions';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { Mock, vi } from 'vitest';
+import { getEl } from '@app/engine/utils/get-el';
+import { readFileSync } from 'fs';
+import { setupDefaultHtml, setupStandardEnvironment } from '@test/environment/standard-env';
+import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
+
 /* eslint-disable max-lines-per-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
-import { MenuMode } from '@app/engine/core/interfaces';
-import { CollisionEvent, Collisions } from '@app/plugins/collisions/collisions';
-import { setupStandardEnvironment } from '@test/environment/standard-env';
-import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 
 // Mock fetch for collision data
 const mockCollisionData: CollisionEvent[] = [
@@ -246,5 +249,49 @@ describe('Collisions_class', () => {
 
       expect(headerRow.cells.length).toBe(6);
     });
+  });
+});
+
+/* eslint-disable dot-notation */
+
+const socratesFileData = JSON.parse(readFileSync('./public/tle/SOCRATES.json', 'utf8'));
+
+describe('CollisionsPlugin_class', () => {
+  let satConstellationsPlugin: Collisions;
+
+  beforeEach(() => {
+    setupDefaultHtml();
+    satConstellationsPlugin = new Collisions();
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(socratesFileData),
+    } as Response);
+  });
+
+  standardPluginSuite(Collisions, 'CollisionsPlugin');
+  standardPluginMenuButtonTests(Collisions, 'CollisionsPlugin');
+
+  it('should have clickable objects', () => {
+    websiteInit(satConstellationsPlugin);
+    getEl(`${satConstellationsPlugin.id}-menu`)!.click();
+    satConstellationsPlugin['collisionList_'] = [
+      {
+        ID: 1,
+        SAT1: 25544,
+        SAT1_NAME: 'ISS (ZARYA)',
+        SAT1_STATUS: 'active',
+        SAT2: 5,
+        SAT2_NAME: 'VANGUARD 1',
+        SAT2_STATUS: 'inactive',
+        SAT1_AGE_OF_TLE: 1,
+        SAT2_AGE_OF_TLE: 2,
+        TOCA: '2021-01-01T00:00:00.000Z',
+        MIN_RNG: 3,
+        DILUTION_THRESHOLD: 4,
+        REL_SPEED: 5,
+        MAX_PROB: 6,
+      } as CollisionEvent,
+    ];
+    satConstellationsPlugin['eventClicked_'](0);
   });
 });

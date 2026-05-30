@@ -1,5 +1,6 @@
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { getEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
@@ -80,5 +81,93 @@ describe('ShortTermFences_class', () => {
       PluginRegistry.getPlugin(SelectSatManager)!.selectSat(0);
       expect(() => stf['stfOnObjectLinkClick_']()).not.toThrow();
     });
+  });
+});
+
+describe('ShortTermFences behavior', () => {
+  let stf: ShortTermFences;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const p = () => stf as any;
+
+  beforeEach(() => {
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
+    setupStandardEnvironment([SelectSatManager, SatInfoBox]);
+    stf = new ShortTermFences();
+    websiteInit(stf);
+    ServiceLocator.getSensorManager().currentSensors = [defaultSensor] as never;
+    vi.spyOn(p(), 'verifySensorSelected').mockReturnValue(true);
+    vi.spyOn(p(), 'verifySatelliteSelected').mockReturnValue(true);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('onSubmit_ adds an STF when it is within the sensor field of view', () => {
+    vi.spyOn(defaultSensor, 'isRaeInFov').mockReturnValue(true);
+    const addStf = vi.fn();
+
+    ServiceLocator.getSensorManager().addStf = addStf;
+
+    p().onSubmit_();
+
+    expect(addStf).toHaveBeenCalled();
+  });
+
+  it('onSubmit_ warns when the STF is outside the sensor field of view', () => {
+    vi.spyOn(defaultSensor, 'isRaeInFov').mockReturnValue(false);
+
+    expect(() => p().onSubmit_()).not.toThrow();
+  });
+
+  it('the azExt and elExt blur handlers compute the extent in kilometres', () => {
+    getEl('stf-azExt')!.dispatchEvent(new Event('blur'));
+    getEl('stf-elExt')!.dispatchEvent(new Event('blur'));
+
+    expect((getEl('stf-azExtKm') as HTMLInputElement).value).not.toBe('');
+    expect((getEl('stf-elExtKm') as HTMLInputElement).value).not.toBe('');
+  });
+
+  it('the azExt and elExt blur handlers clamp an over-wide extent to 80 degrees', () => {
+    (getEl('stf-azExt') as HTMLInputElement).value = '120';
+    getEl('stf-azExt')!.dispatchEvent(new Event('blur'));
+    expect((getEl('stf-azExt') as HTMLInputElement).value).toBe('80.0');
+
+    (getEl('stf-elExt') as HTMLInputElement).value = '120';
+    getEl('stf-elExt')!.dispatchEvent(new Event('blur'));
+    expect((getEl('stf-elExt') as HTMLInputElement).value).toBe('80.0');
+  });
+
+  it('selectSatData wires the on-object STF link for a satellite', () => {
+    const fresh = new ShortTermFences();
+    const onSpy = vi.spyOn(EventBus.getInstance(), 'on');
+
+    fresh.addHtml();
+    const handler = onSpy.mock.calls.find(([evt]) => evt === EventBusEvent.selectSatData)![1] as (obj: unknown) => void;
+
+    document.body.insertAdjacentHTML('beforeend', '<div id="actions-section"></div>');
+
+    expect(() => handler(defaultSat)).not.toThrow();
+    expect(getEl('stf-on-object-link', true)).not.toBeNull();
+  });
+
+  it('stfOnObjectLinkClick_ fills the form from the selected satellite RAE', () => {
+    p().selectSatManager_.primarySatObj = defaultSat;
+    vi.spyOn(stf, 'setBottomIconToSelected').mockImplementation(() => undefined);
+
+    expect(() => p().stfOnObjectLinkClick_()).not.toThrow();
+    expect((getEl('stf-az') as HTMLInputElement).value).not.toBe('');
+  });
+
+  it('stfOnObjectLinkClick_ returns when no satellite is selected', () => {
+    (p().verifySatelliteSelected as ReturnType<typeof vi.fn>).mockReturnValue(false);
+
+    expect(() => p().stfOnObjectLinkClick_()).not.toThrow();
+  });
+
+  it('stfOnObjectLinkClick_ warns when there is no select-sat manager', () => {
+    p().selectSatManager_ = null;
+
+    expect(() => p().stfOnObjectLinkClick_()).not.toThrow();
   });
 });

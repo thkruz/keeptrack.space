@@ -90,6 +90,14 @@ export class WebpackManager {
       };
     }
 
+    // Coverage build: keep production behavior (pro profile, all plugins) but emit
+    // readable, source-mapped output so Playwright V8 coverage maps back to TS source.
+    // Inline maps travel with the script in the coverage data, avoiding any .map fetch.
+    if (process.env.COVERAGE === '1') {
+      baseConfig.devtool = 'inline-source-map';
+      baseConfig.optimization = { ...baseConfig.optimization, minimize: false };
+    }
+
     // split entry points of main and webworkers
     const mainConfig = this.createMainConfig_(baseConfig, dirName, 'dist');
     const webWorkerConfig = this.createWorkerConfig_(baseConfig, dirName, 'dist', '');

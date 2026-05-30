@@ -8,6 +8,9 @@ const chromiumArgs = process.env.CI
 export default defineConfig({
   testDir: './src',
   testMatch: '**/__tests__/*.spec.ts',
+  // No-op unless E2E_COVERAGE=1; clears/generates the monocart V8 coverage report.
+  globalSetup: './test/e2e/coverage-setup.ts',
+  globalTeardown: './test/e2e/coverage-teardown.ts',
   fullyParallel: !process.env.CI,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,

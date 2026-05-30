@@ -68,13 +68,13 @@ export default defineConfig({
       ],
       reportOnFailure: true,
       // Re-baselined against the full src denominator (coverage.include now counts every
-      // src file, not just imported ones). Actuals: lines 41.4 / statements 41.3 /
-      // functions 46.7 / branches 31.3 — ratchet upward as coverage climbs.
+      // src file, not just imported ones). Actuals: lines 41.9 / statements 41.8 /
+      // functions 47.9 / branches 31.7 — ratchet upward as coverage climbs.
       thresholds: {
-        statements: 40,
-        branches: 30,
-        functions: 46,
-        lines: 40,
+        statements: 41,
+        branches: 31,
+        functions: 47,
+        lines: 41,
       },
     },
     include: ['**/?(*.)+(test).?(m)[jt]s?(x)'],

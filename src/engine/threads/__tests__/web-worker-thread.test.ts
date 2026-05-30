@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import * as isThisNodeMod from '@app/engine/utils/isThisNode';
 import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
@@ -12,7 +13,16 @@ class MockWorker {
   onerror: ((e: unknown) => void) | null = null;
   postMessage = vi.fn();
   terminate = vi.fn();
-  constructor(public url: string) {}
+  url: string;
+  constructor(url: string) {
+    this.url = url;
+  }
+}
+
+class ThrowingWorker {
+  constructor() {
+    throw new Error('construct fail');
+  }
 }
 
 const stubWorker = () => ({ postMessage: vi.fn(), terminate: vi.fn(), addEventListener: vi.fn(), removeEventListener: vi.fn() }) as unknown as Worker;
@@ -132,12 +142,6 @@ describe('WebWorkerThreadManager', () => {
     });
 
     it('rethrows when the Worker constructor fails (non-file protocol)', () => {
-      class ThrowingWorker {
-        constructor() {
-          throw new Error('construct fail');
-        }
-      }
-
       vi.stubGlobal('Worker', ThrowingWorker);
       const mgr = new TestThread([]);
 
@@ -145,12 +149,6 @@ describe('WebWorkerThreadManager', () => {
     });
 
     it('throws the file-access hint when the Worker fails under file:// protocol', () => {
-      class ThrowingWorker {
-        constructor() {
-          throw new Error('construct fail');
-        }
-      }
-
       vi.stubGlobal('Worker', ThrowingWorker);
       vi.stubGlobal('window', { location: { href: 'file:///C:/app/index.html' } });
       const mgr = new TestThread([]);

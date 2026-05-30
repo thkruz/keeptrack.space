@@ -410,4 +410,62 @@ describe('BottomIconComponent', () => {
       expect(component.disabled).toBe(false);
     });
   });
+
+  describe('menu mode visibility', () => {
+    it('shows the icon when the active menu mode is in its config', () => {
+      const component = new BottomIconComponent('test-plugin', createConfig({ menuMode: [MenuMode.CATALOG] }));
+
+      component.init();
+      eventBus.emit(EventBusEvent.uiManagerInit);
+      (global as any).settingsManager.activeMenuMode = MenuMode.CATALOG;
+
+      eventBus.emit(EventBusEvent.bottomMenuModeChange);
+
+      expect(component.getElement()?.style.display).not.toBe('none');
+    });
+
+    it('hides the icon when the active menu mode is not in its config', () => {
+      const component = new BottomIconComponent('test-plugin', createConfig({ menuMode: [MenuMode.SETTINGS] }));
+
+      component.init();
+      eventBus.emit(EventBusEvent.uiManagerInit);
+      (global as any).settingsManager.activeMenuMode = MenuMode.CATALOG;
+
+      eventBus.emit(EventBusEvent.bottomMenuModeChange);
+
+      expect(component.getElement()?.style.display).toBe('none');
+    });
+  });
+
+  describe('disable and shake', () => {
+    it('disable also deselects a selected icon', () => {
+      const component = new BottomIconComponent('test-plugin', createConfig());
+
+      component.init();
+      eventBus.emit(EventBusEvent.uiManagerInit);
+      component.select();
+
+      component.disable(true);
+
+      expect(component.selected).toBe(false);
+      expect(component.disabled).toBe(true);
+
+      // A second disable() short-circuits (already disabled), and enable() short-circuits
+      // once the icon is re-enabled.
+      component.disable();
+      component.enable();
+      expect(component.disabled).toBe(false);
+      component.enable();
+      expect(component.disabled).toBe(false);
+    });
+
+    it('shake does not throw', () => {
+      const component = new BottomIconComponent('test-plugin', createConfig());
+
+      component.init();
+      eventBus.emit(EventBusEvent.uiManagerInit);
+
+      expect(() => component.shake()).not.toThrow();
+    });
+  });
 });

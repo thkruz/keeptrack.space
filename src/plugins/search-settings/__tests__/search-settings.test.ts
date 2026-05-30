@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 import { SearchSettingsPlugin } from '@app/plugins/search-settings/search-settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
-import { standardPluginSuite } from '@test/generic-tests';
+import { standardPluginSuite, standardPluginMenuButtonTests } from '@test/generic-tests';
 
 describe('SearchSettingsPlugin', () => {
   beforeEach(() => {
@@ -13,4 +13,5 @@ describe('SearchSettingsPlugin', () => {
   });
 
   standardPluginSuite(SearchSettingsPlugin, 'SearchSettingsPlugin');
+  standardPluginMenuButtonTests(SearchSettingsPlugin, 'SearchSettingsPlugin');
 });

@@ -3,7 +3,7 @@ import { ShortTermFences } from '@app/plugins/short-term-fences/short-term-fence
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
  import { setupStandardEnvironment } from '@test/environment/standard-env';
-import { standardPluginSuite } from '@test/generic-tests';
+import { standardPluginSuite, standardPluginMenuButtonTests, standardClickTests, standardChangeTests } from '@test/generic-tests';
 
 describe('ShortTermFences', () => {
   beforeEach(() => {
@@ -15,4 +15,7 @@ describe('ShortTermFences', () => {
   });
 
   standardPluginSuite(ShortTermFences, 'ShortTermFences');
+  standardPluginMenuButtonTests(ShortTermFences, 'ShortTermFences');
+  standardClickTests(ShortTermFences);
+  standardChangeTests(ShortTermFences);
 });

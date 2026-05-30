@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 import { NextLaunchesPlugin } from '@app/plugins/next-launches/next-launches';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
-import { standardPluginSuite } from '@test/generic-tests';
+import { standardPluginSuite, standardPluginMenuButtonTests, standardClickTests, standardChangeTests } from '@test/generic-tests';
 
 describe('NextLaunchesPlugin', () => {
   beforeEach(() => {
@@ -13,4 +13,7 @@ describe('NextLaunchesPlugin', () => {
   });
 
   standardPluginSuite(NextLaunchesPlugin, 'NextLaunchesPlugin');
+  standardPluginMenuButtonTests(NextLaunchesPlugin, 'NextLaunchesPlugin');
+  standardClickTests(NextLaunchesPlugin);
+  standardChangeTests(NextLaunchesPlugin);
 });

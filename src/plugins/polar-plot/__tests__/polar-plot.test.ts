@@ -2,7 +2,7 @@ import { vi } from 'vitest';
 import { PolarPlotPlugin } from '@app/plugins/polar-plot/polar-plot';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
-import { standardPluginSuite } from '@test/generic-tests';
+import { standardPluginSuite, standardPluginMenuButtonTests, standardClickTests, standardChangeTests } from '@test/generic-tests';
 
 describe('PolarPlotPlugin', () => {
   beforeEach(() => {
@@ -14,4 +14,7 @@ describe('PolarPlotPlugin', () => {
   });
 
   standardPluginSuite(PolarPlotPlugin, 'PolarPlotPlugin');
+  standardPluginMenuButtonTests(PolarPlotPlugin, 'PolarPlotPlugin');
+  standardClickTests(PolarPlotPlugin);
+  standardChangeTests(PolarPlotPlugin);
 });

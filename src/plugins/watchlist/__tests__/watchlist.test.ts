@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
-import { standardPluginSuite } from '@test/generic-tests';
+import { standardPluginSuite, standardPluginMenuButtonTests } from '@test/generic-tests';
 
 describe('WatchlistPlugin', () => {
   beforeEach(() => {
@@ -13,4 +13,5 @@ describe('WatchlistPlugin', () => {
   });
 
   standardPluginSuite(WatchlistPlugin, 'WatchlistPlugin');
+  standardPluginMenuButtonTests(WatchlistPlugin, 'WatchlistPlugin');
 });

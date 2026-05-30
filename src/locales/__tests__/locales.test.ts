@@ -51,6 +51,13 @@ describe('Locales', () => {
     setup(localization);
     validateLocalizationKeys(localization, flatMapOfAllKeys);
   });
+
+  it('pre-caches all translations without throwing', () => {
+    i18next.changeLanguage('en');
+    const localization = Localization.getInstance() as unknown as { preCacheTranslations(): void };
+
+    expect(() => localization.preCacheTranslations()).not.toThrow();
+  });
 });
 
 // Check that every function in the localization object works

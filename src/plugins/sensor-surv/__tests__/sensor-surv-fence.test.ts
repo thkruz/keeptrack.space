@@ -47,3 +47,53 @@ describe('SensorSurvFence_class', () => {
     expect(() => EventBus.getInstance().emit(EventBusEvent.setSensor, defaultSensor, 2)).not.toThrow();
   });
 });
+
+describe('SensorSurvFence methods', () => {
+  let plugin: SensorSurvFence;
+
+  beforeEach(() => {
+    setupStandardEnvironment([TopMenu, DateTimeManager, SensorListPlugin]);
+    plugin = new SensorSurvFence();
+    plugin.init();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('exposes the bottom-icon config', () => {
+    expect(plugin.getBottomIconConfig().elementName).toBe('sensor-surv-fence-bottom-icon');
+  });
+
+  it('enableIfSensorSelected enables with a sensor and disables without', () => {
+    const enable = vi.spyOn(plugin, 'setBottomIconToEnabled').mockImplementation(() => undefined);
+    const disable = vi.spyOn(plugin, 'setBottomIconToDisabled').mockImplementation(() => undefined);
+
+    plugin.enableIfSensorSelected(defaultSensor);
+    expect(enable).toHaveBeenCalled();
+
+    plugin.enableIfSensorSelected(undefined);
+    expect(disable).toHaveBeenCalled();
+  });
+
+  it('onBottomIconClick disables when inactive and enables when active', () => {
+    const disable = vi.spyOn(plugin, 'disableSurvView');
+
+    plugin.isMenuButtonActive = false;
+    plugin.onBottomIconClick();
+    expect(disable).toHaveBeenCalled();
+
+    const select = vi.spyOn(plugin, 'setBottomIconToSelected').mockImplementation(() => undefined);
+
+    plugin.isMenuButtonActive = true;
+    plugin.onBottomIconClick();
+    expect(select).toHaveBeenCalled();
+  });
+
+  it('bridges bottomIconCallback to onBottomIconClick', () => {
+    const spy = vi.spyOn(plugin, 'onBottomIconClick');
+
+    plugin.bottomIconCallback();
+    expect(spy).toHaveBeenCalled();
+  });
+});

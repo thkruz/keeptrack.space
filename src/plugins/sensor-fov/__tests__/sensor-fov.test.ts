@@ -59,3 +59,69 @@ describe('SensorFov_class', () => {
     expect(() => EventBus.getInstance().emit(EventBusEvent.setSensor, defaultSensor, 2)).not.toThrow();
   });
 });
+
+describe('SensorFov methods', () => {
+  let plugin: SensorFov;
+  let fovHandler: (sensor?: unknown) => void;
+
+  beforeEach(() => {
+    setupStandardEnvironment([TopMenu, DateTimeManager, SensorListPlugin]);
+    const onSpy = vi.spyOn(EventBus.getInstance(), 'on');
+
+    plugin = new SensorFov();
+    plugin.init();
+    // sensor-fov registers its sensorDotSelected handler last (after dependency inits)
+    const handlers = onSpy.mock.calls
+      .filter((c) => c[0] === EventBusEvent.sensorDotSelected)
+      .map((c) => c[1] as (sensor?: unknown) => void);
+
+    fovHandler = handlers[handlers.length - 1];
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('exposes the bottom-icon config', () => {
+    expect(plugin.getBottomIconConfig().elementName).toBe('sensor-fov-bottom-icon');
+  });
+
+  it('sensorDotSelected handler enables with a sensor and disables without', () => {
+    const enable = vi.spyOn(plugin, 'setBottomIconToEnabled').mockImplementation(() => undefined);
+    const disable = vi.spyOn(plugin, 'setBottomIconToDisabled').mockImplementation(() => undefined);
+    const unselect = vi.spyOn(plugin, 'setBottomIconToUnselected').mockImplementation(() => undefined);
+
+    fovHandler(defaultSensor);
+    expect(enable).toHaveBeenCalled();
+
+    fovHandler(undefined);
+    expect(disable).toHaveBeenCalled();
+    expect(unselect).toHaveBeenCalled();
+  });
+
+  it('disableFovView emits changeSensorMarkers and unselects', () => {
+    const emitSpy = vi.spyOn(EventBus.getInstance(), 'emit').mockImplementation(() => undefined as never);
+    const unselect = vi.spyOn(plugin, 'setBottomIconToUnselected').mockImplementation(() => undefined);
+
+    plugin.isMenuButtonActive = false;
+    plugin.onBottomIconClick();
+
+    expect(emitSpy).toHaveBeenCalledWith(EventBusEvent.changeSensorMarkers, plugin.id);
+    expect(unselect).toHaveBeenCalled();
+  });
+
+  it('onBottomIconClick enables the FOV view when active', () => {
+    const select = vi.spyOn(plugin, 'setBottomIconToSelected').mockImplementation(() => undefined);
+
+    plugin.isMenuButtonActive = true;
+    plugin.onBottomIconClick();
+    expect(select).toHaveBeenCalled();
+  });
+
+  it('bridges bottomIconCallback to onBottomIconClick', () => {
+    const spy = vi.spyOn(plugin, 'onBottomIconClick');
+
+    plugin.bottomIconCallback();
+    expect(spy).toHaveBeenCalled();
+  });
+});

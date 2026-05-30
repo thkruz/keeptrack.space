@@ -1,5 +1,9 @@
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { OemSatellite, ParsedOem } from '@app/app/objects/oem-satellite';
 import { EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, SpaceObjectType, Vector3D } from '@ootk/src/main';
+import { defaultSensor } from '@test/environment/apiMocks';
+import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { vi } from 'vitest';
 
 const makeStateVector = (epochSec: number): J2000 => new J2000(
   EpochUTC.fromDateTime(new Date(epochSec * 1000)),
@@ -380,5 +384,76 @@ describe('OemSatellite.findStateVectorTime_ (binary search over ephemeris)', () 
 
     search(sat, startSec + 200); // jump forward to index 3
     expect(search(sat, startSec + 30)).toBe(0); // back to [0,60)
+  });
+});
+
+describe('OemSatellite ephemeris math', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let sat: any;
+  const inRange = new Date(Date.UTC(2026, 0, 1, 0, 0, 30));
+
+  beforeEach(() => {
+    setupStandardEnvironment();
+    settingsManager.isOrbitCruncherInEcf = false;
+    ServiceLocator.getUiManager().toast = vi.fn();
+    sat = new OemSatellite(makeOem());
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('eci interpolates a position and velocity within the ephemeris window', () => {
+    const pv = sat.eci(inRange);
+
+    expect(pv).not.toBeNull();
+    expect(Number.isFinite(pv.position.x)).toBe(true);
+    expect(Number.isFinite(pv.velocity.y)).toBe(true);
+  });
+
+  it('eci tolerates an out-of-range date', () => {
+    expect(() => sat.eci(new Date(Date.UTC(2030, 0, 1)))).not.toThrow();
+  });
+
+  it('updatePosAndVel returns null when there are no data blocks', () => {
+    sat.OemDataBlocks = [];
+    expect(sat.updatePosAndVel(inRange.getTime() / 1000)).toBeNull();
+  });
+
+  it('ecef, lla, toITRF and toClassicalElements derive from the state vector', () => {
+    expect(() => sat.ecef(inRange)).not.toThrow();
+    expect(() => sat.lla(inRange)).not.toThrow();
+    expect(() => sat.toITRF(inRange)).not.toThrow();
+    expect(() => sat.toClassicalElements(inRange)).not.toThrow();
+  });
+
+  it('getOrbitPath builds a TEME path cache', () => {
+    expect(sat.getOrbitPath()).toBeInstanceOf(Float32Array);
+  });
+
+  it('getRae and getTearData compute look angles for a sensor', () => {
+    expect(() => sat.getRae(inRange, defaultSensor)).not.toThrow();
+    expect(() => sat.getTearData(inRange, [defaultSensor])).not.toThrow();
+  });
+
+  it('type predicates report it as a satellite', () => {
+    expect(sat.isSatellite()).toBe(true);
+    expect(sat.isStatic()).toBe(false);
+    expect(sat.isMissile()).toBe(false);
+    expect(sat.isSensor()).toBe(false);
+    expect(sat.isMarker()).toBe(false);
+    expect(sat.isStar()).toBe(false);
+    expect(sat.isGroundObject()).toBe(false);
+    expect(sat.isPayload()).toBe(false);
+    expect(sat.isRocketBody()).toBe(false);
+    expect(sat.isDebris()).toBe(false);
+  });
+
+  it('stateVectorIdx and dataBlockIdx setters refresh the orbit cache', () => {
+    expect(() => { sat.stateVectorIdx = 1; }).not.toThrow();
+    expect(() => { sat.stateVectorIdx = 1; }).not.toThrow();
+    expect(() => { sat.dataBlockIdx = 0; }).not.toThrow();
+    expect(sat.stateVectorIdx).toBe(1);
+    expect(sat.dataBlockIdx).toBe(0);
   });
 });

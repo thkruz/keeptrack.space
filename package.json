@@ -60,6 +60,7 @@
     "test:e2e:ui": "npx playwright test --ui",
     "test:e2e:headed": "npx playwright test --headed",
     "test:e2e:smoke": "npx playwright test src/__tests__/app-smoke.spec.ts",
+    "test:e2e:gate": "npx tsx scripts/e2e-gate.ts",
     "check:locales": "npx tsx scripts/check-locale-quality.ts",
     "check:locales:quick": "npx tsx scripts/check-locale-quality.ts --skip-llm",
     "test:watch": "vitest",

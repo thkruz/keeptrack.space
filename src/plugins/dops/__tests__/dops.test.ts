@@ -1,5 +1,7 @@
 import { vi } from 'vitest';
 /* eslint-disable dot-notation */
+import { CameraType } from '@app/engine/camera/camera-type';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { DopsPlugin } from '@app/plugins/dops/dops';
 import { getEl } from '@app/engine/utils/get-el';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -81,5 +83,66 @@ describe('DopsPlugin_class', () => {
 
       expect(() => plugin.rmbCallback('unknown-id')).not.toThrow();
     });
+  });
+});
+
+describe('DopsPlugin behavior', () => {
+  let plugin: DopsPlugin;
+
+  beforeEach(() => {
+    setupStandardEnvironment();
+    plugin = new DopsPlugin();
+    websiteInit(plugin);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('D shortcut returns in FPS mode and opens the menu otherwise', () => {
+    const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
+
+    ServiceLocator.getMainCamera().cameraType = CameraType.FPS;
+    plugin.getKeyboardShortcuts()[0].callback();
+    expect(spy).not.toHaveBeenCalled();
+
+    ServiceLocator.getMainCamera().cameraType = CameraType.CURRENT;
+    plugin.getKeyboardShortcuts()[0].callback();
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('rmbCallback warns when the clicked location is invalid', () => {
+    ServiceLocator.getInputManager().mouse = { latLon: undefined } as never;
+
+    expect(() => plugin.rmbCallback('dops-24dops-rmb')).not.toThrow();
+  });
+
+  it('rmbCallback fills the form and opens the menu when inactive', () => {
+    ServiceLocator.getInputManager().mouse = { latLon: { lat: 10, lon: 20 } } as never;
+    plugin.isMenuButtonActive = false;
+    const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
+
+    plugin.rmbCallback('dops-24dops-rmb');
+
+    expect((getEl('dops-lat') as HTMLInputElement).value).toBe('10.000');
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('rmbCallback refreshes the side menu when already active', () => {
+    ServiceLocator.getInputManager().mouse = { latLon: { lat: 10, lon: 20 } } as never;
+    plugin.isMenuButtonActive = true;
+    vi.spyOn(plugin as unknown as { updateSideMenu(): void }, 'updateSideMenu').mockImplementation(() => undefined);
+    vi.spyOn(plugin, 'setBottomIconToEnabled').mockImplementation(() => undefined);
+
+    expect(() => plugin.rmbCallback('dops-24dops-rmb')).not.toThrow();
+  });
+
+  it('getGpsSats collects catalog satellites for the GPS group', () => {
+    const group = { groupList: { GPSGroup: { ids: [1, 2] } }, createGroup: vi.fn() };
+    const catalog = { getSat: (id: number) => (id === 1 ? { sccNum: '1' } : null) };
+
+    const sats = DopsPlugin.getGpsSats(catalog as never, group as never);
+
+    expect(sats).toHaveLength(1);
   });
 });

@@ -153,4 +153,18 @@ describe('PluginEventManager', () => {
       expect(eventManager.subscriptionCount).toBe(3);
     });
   });
+
+  describe('once', () => {
+    it('tracks a single subscription and removes it from tracking after the first emit', () => {
+      const callback = vi.fn();
+
+      eventManager.once(EventBusEvent.bottomMenuClick, callback);
+      expect(eventManager.subscriptionCount).toBe(1);
+
+      eventBus.emit(EventBusEvent.bottomMenuClick, 'icon');
+      expect(callback).toHaveBeenCalledTimes(1);
+      // The wrapped callback removes itself from tracking after firing
+      expect(eventManager.subscriptionCount).toBe(0);
+    });
+  });
 });

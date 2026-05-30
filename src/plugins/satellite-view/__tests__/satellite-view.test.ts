@@ -124,3 +124,65 @@ describe('SatelliteViewPlugin_class', () => {
     expect(uiManagerInstance.toast).not.toHaveBeenCalled();
   });
 });
+
+describe('SatelliteViewPlugin methods', () => {
+  let plugin: SatelliteViewPlugin;
+
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager]);
+    plugin = new SatelliteViewPlugin();
+    plugin.init();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('binds the "5" keyboard shortcut', () => {
+    expect(plugin.getKeyboardShortcuts()[0].key).toBe('5');
+    expect(() => plugin.getKeyboardShortcuts()[0].callback()).not.toThrow();
+  });
+
+  it('toasts and shakes when no satellite is selected', () => {
+    const ssm = PluginRegistry.getPlugin(SelectSatManager) as SelectSatManager;
+
+    ssm.selectedSat = -1;
+    const shake = vi.spyOn(plugin, 'shakeBottomIcon').mockImplementation(() => undefined);
+    const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast');
+
+    plugin.bottomIconCallback();
+
+    expect(toast).toHaveBeenCalled();
+    expect(shake).toHaveBeenCalled();
+  });
+
+  it('switches to SATELLITE_FIRST_PERSON when a satellite is selected', () => {
+    const ssm = PluginRegistry.getPlugin(SelectSatManager) as SelectSatManager;
+
+    ssm.selectedSat = 0;
+    vi.spyOn(plugin, 'setBottomIconToSelected').mockImplementation(() => undefined);
+
+    plugin.bottomIconCallback();
+
+    expect(ServiceLocator.getMainCamera().cameraType).toBe(CameraType.SATELLITE_FIRST_PERSON);
+  });
+
+  it('runs the shouldSkipSatelliteModels and updateLoop sync handlers', () => {
+    expect(() => EventBus.getInstance().emit(EventBusEvent.shouldSkipSatelliteModels)).not.toThrow();
+
+    const select = vi.spyOn(plugin, 'setBottomIconToSelected').mockImplementation(() => undefined);
+
+    ServiceLocator.getMainCamera().cameraType = CameraType.SATELLITE_FIRST_PERSON;
+    plugin.isMenuButtonActive = false;
+    plugin.isIconDisabled = false;
+    EventBus.getInstance().emit(EventBusEvent.updateLoop);
+    expect(select).toHaveBeenCalled();
+
+    const unselect = vi.spyOn(plugin, 'setBottomIconToUnselected').mockImplementation(() => undefined);
+
+    ServiceLocator.getMainCamera().cameraType = CameraType.FIXED_TO_EARTH;
+    plugin.isMenuButtonActive = true;
+    EventBus.getInstance().emit(EventBusEvent.updateLoop);
+    expect(unselect).toHaveBeenCalled();
+  });
+});

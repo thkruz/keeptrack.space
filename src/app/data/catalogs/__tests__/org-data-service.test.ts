@@ -52,4 +52,27 @@ describe('OrgDataService (after remote load)', () => {
 
     vi.restoreAllMocks();
   });
+
+  it('init kicks off a fetch that falls back to bundled data on an HTTP error', async () => {
+    // The singleton load-state is global; reset it so init() actually re-fetches here.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, dot-notation
+    (orgDataService as any).loadPromise_ = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, dot-notation
+    (orgDataService as any).loaded_ = false;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).settingsManager = settingsManager;
+    settingsManager.dataSources.orgs = 'https://test.local/orgs.json';
+
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue({ ok: false, status: 500 } as Response);
+
+    orgDataService.init();
+    // A second init() short-circuits because a load is already in flight.
+    orgDataService.init();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, dot-notation
+    await (orgDataService as any).loadPromise_;
+
+    expect(orgDataService.isLoaded).toBe(false);
+
+    vi.restoreAllMocks();
+  });
 });

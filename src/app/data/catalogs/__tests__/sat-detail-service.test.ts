@@ -93,5 +93,15 @@ describe('SatDetailDataService', () => {
       expect(sat.mission).toBe('');
       expect(sat.purpose).toBe('KeepThis');
     });
+
+    it('skips merging when the response is not an object', async () => {
+      // A primitive (non-array, non-object) body trips the unexpected-format guard.
+      vi.spyOn(globalThis, 'fetch').mockResolvedValue(respond(42));
+      const sat = satWith('50015');
+
+      await satDetailService.fetchSatDetail(sat);
+
+      expect(sat.mission).toBe('');
+    });
   });
 });

@@ -318,3 +318,67 @@ describe('OemSatellite.serializeSpecific', () => {
     expect(data).toHaveProperty('OemDataBlocks');
   });
 });
+
+describe('OemSatellite.findStateVectorTime_ (binary search over ephemeris)', () => {
+  const startSec = Date.UTC(2026, 0, 1) / 1000;
+
+  const makeMultiVectorOem = (): ParsedOem => {
+    const base = makeOem();
+
+    return {
+      header: base.header,
+      dataBlocks: [
+{
+        metadata: base.dataBlocks[0].metadata,
+        // Vectors at +0, +60, +120, +180, +240 seconds.
+        ephemeris: [0, 60, 120, 180, 240].map((dt) => makeStateVector(startSec + dt)),
+      },
+],
+    };
+  };
+
+  // The index setters rebuild the orbit path (heavy + GL); stub it so the search
+  // logic is isolated.
+  const buildSat = (): OemSatellite => {
+    const sat = new OemSatellite(makeMultiVectorOem());
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (sat as any).getOrbitPath = () => new Float32Array();
+
+    return sat;
+  };
+
+  const search = (sat: OemSatellite, simSec: number): number => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (sat as any).findStateVectorTime_(simSec);
+
+    return sat.stateVectorIdx;
+  };
+
+  it('lands in the interval containing the requested time', () => {
+    const sat = buildSat();
+
+    // +90s falls in [60,120) -> index 1.
+    expect(search(sat, startSec + 90)).toBe(1);
+  });
+
+  it('advances to a later interval on a forward jump', () => {
+    const sat = buildSat();
+
+    // +200s falls in [180,240) -> index 3.
+    expect(search(sat, startSec + 200)).toBe(3);
+  });
+
+  it('clamps to the last vector when the time is beyond the ephemeris', () => {
+    const sat = buildSat();
+
+    expect(search(sat, startSec + 100000)).toBe(4);
+  });
+
+  it('searches backward after a forward jump', () => {
+    const sat = buildSat();
+
+    search(sat, startSec + 200); // jump forward to index 3
+    expect(search(sat, startSec + 30)).toBe(0); // back to [0,60)
+  });
+});

@@ -50,8 +50,9 @@ test.describe('ColorMenu Plugin', () => {
 
     await expect(firstItem).toHaveAttribute('data-color');
 
-    // Close via the side menu close button
-    await page.locator('#color-scheme-menu-close-btn').click();
+    // ── Behavior: apply a color scheme (exercises the per-item click handler) ──
+    // Selecting a scheme applies it and closes the side menu, deselecting the icon.
+    await firstItem.click();
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u, { timeout: 5_000 });
   });
 });

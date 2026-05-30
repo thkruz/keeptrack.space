@@ -1,9 +1,11 @@
 import { vi } from 'vitest';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
+import { CameraType } from '@app/engine/camera/camera-type';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { settingsManager } from '@app/settings/settings';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrack } from '@app/keeptrack';
@@ -226,6 +228,68 @@ describe('ColorMenu_class', () => {
       // Restore real timers to avoid leaking fake timers to other test files
       vi.useRealTimers();
     }, 20000);
+  });
+
+  describe('keyboard shortcut and command palette', () => {
+    it('A shortcut returns early in FPS camera mode', () => {
+      const plugin = new ColorMenu();
+
+      ServiceLocator.getMainCamera().cameraType = CameraType.FPS;
+      const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
+
+      plugin.getKeyboardShortcuts()[0].callback();
+
+      expect(spy).not.toHaveBeenCalled();
+    });
+
+    it('A shortcut opens the menu when not in FPS mode', () => {
+      const plugin = new ColorMenu();
+
+      ServiceLocator.getMainCamera().cameraType = CameraType.CURRENT;
+      const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
+
+      plugin.getKeyboardShortcuts()[0].callback();
+
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it('buildColorSchemeList_ skips schemes not in the color menu', () => {
+      const plugin = new ColorMenu();
+      const mgr = ServiceLocator.getColorSchemeManager();
+
+      mgr.colorSchemeInstances = {
+        shown: { id: 'shown', label: 'Shown', isOptionInColorMenu: true },
+        hidden: { id: 'hidden', label: 'Hidden', isOptionInColorMenu: false },
+      } as any;
+      settingsManager.colorSchemeInstances = { shown: { enabled: true }, hidden: { enabled: true } } as any;
+
+      const list = plugin['buildColorSchemeList_']();
+
+      expect(list).toContain('shown');
+      expect(list).not.toContain('hidden');
+    });
+
+    it('builds command palette commands for enabled in-menu schemes and invokes one', () => {
+      const plugin = new ColorMenu();
+      const mgr = ServiceLocator.getColorSchemeManager();
+
+      mgr.colorSchemeInstances = {
+        foo: { id: 'foo', label: 'Foo', isOptionInColorMenu: true },
+        bar: { id: 'bar', label: 'Bar', isOptionInColorMenu: false },
+      } as any;
+      settingsManager.colorSchemeInstances = { foo: { enabled: true }, bar: { enabled: true } } as any;
+
+      const commands = plugin.getCommandPaletteCommands();
+
+      expect(commands).toHaveLength(1);
+      expect(commands[0].id).toBe('ColorMenu.setColorScheme.foo');
+
+      const clickSpy = vi.spyOn(ColorMenu, 'colorsMenuClick').mockImplementation(() => undefined);
+
+      commands[0].callback();
+
+      expect(clickSpy).toHaveBeenCalledWith('foo');
+    });
   });
 
   describe('Plugin identity', () => {

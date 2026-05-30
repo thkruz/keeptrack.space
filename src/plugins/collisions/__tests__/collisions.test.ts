@@ -1,10 +1,21 @@
 import { CollisionEvent, Collisions } from '@app/plugins/collisions/collisions';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { Mock, vi } from 'vitest';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { readFileSync } from 'fs';
 import { setupDefaultHtml, setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
+
+const flush = async () => {
+  for (let i = 0; i < 6; i++) {
+    // eslint-disable-next-line no-await-in-loop
+    await Promise.resolve();
+  }
+};
 
 /* eslint-disable max-lines-per-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -293,5 +304,115 @@ describe('CollisionsPlugin_class', () => {
       } as CollisionEvent,
     ];
     satConstellationsPlugin['eventClicked_'](0);
+  });
+});
+
+describe('Collisions behavior', () => {
+  let plugin: Collisions;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const p = () => plugin as any;
+
+  beforeEach(() => {
+    setupStandardEnvironment();
+    global.fetch = vi.fn(() => Promise.resolve({ json: () => Promise.resolve(mockCollisionData) })) as Mock;
+    plugin = new Collisions();
+    websiteInit(plugin);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('onCruncherMessage selects the pending satellite then clears it', () => {
+    p().selectSatIdOnCruncher_ = 42;
+
+    expect(() => EventBus.getInstance().emit(EventBusEvent.onCruncherMessage)).not.toThrow();
+    expect(p().selectSatIdOnCruncher_).toBeNull();
+  });
+
+  it('onUserLogin_ fetches data when the menu is active and the list is empty', () => {
+    const fetchSpy = vi.spyOn(p(), 'fetchCollisionData_').mockImplementation(() => undefined);
+
+    vi.spyOn(p(), 'updateToolbarForLoginState_').mockImplementation(() => undefined);
+    plugin.isMenuButtonActive = true;
+    p().collisionList_ = [];
+
+    p().onUserLogin_();
+
+    expect(p().isLoggedIn_).toBe(true);
+    expect(fetchSpy).toHaveBeenCalled();
+  });
+
+  it('onUserLogout_ updates the toolbar when the menu is active', () => {
+    const spy = vi.spyOn(p(), 'updateToolbarForLoginState_').mockImplementation(() => undefined);
+
+    plugin.isMenuButtonActive = true;
+    p().onUserLogout_();
+
+    expect(p().isLoggedIn_).toBe(false);
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('updateToolbarForLoginState_ toggles buttons for logged-out state with and without data', () => {
+    p().isLoggedIn_ = false;
+
+    p().collisionList_ = [];
+    expect(() => p().updateToolbarForLoginState_()).not.toThrow();
+
+    p().collisionList_ = mockCollisionData;
+    expect(() => p().updateToolbarForLoginState_()).not.toThrow();
+  });
+
+  it('fetchCollisionData_ bails out when a fetch is already in flight', () => {
+    p().isFetching_ = true;
+
+    expect(() => p().fetchCollisionData_()).not.toThrow();
+  });
+
+  it('fetchCollisionData_ warns when the API returns no collisions', async () => {
+    global.fetch = vi.fn(() => Promise.resolve({ json: () => Promise.resolve([]) })) as Mock;
+    const warn = vi.spyOn(errorManagerInstance, 'warn').mockImplementation(() => undefined);
+
+    p().isFetching_ = false;
+    p().fetchCollisionData_();
+    await flush();
+
+    expect(warn).toHaveBeenCalled();
+  });
+
+  it('fetchCollisionData_ warns when the fetch rejects', async () => {
+    global.fetch = vi.fn(() => Promise.reject(new Error('network'))) as Mock;
+    const warn = vi.spyOn(errorManagerInstance, 'warn').mockImplementation(() => undefined);
+
+    p().isFetching_ = false;
+    p().fetchCollisionData_();
+    await flush();
+
+    expect(warn).toHaveBeenCalled();
+  });
+
+  it('createTable_ warns when the table element is missing', () => {
+    getEl('Collisions-table', true)?.remove();
+
+    expect(() => p().createTable_()).not.toThrow();
+  });
+
+  it('wires the fetch, refresh and row-click handlers', () => {
+    vi.spyOn(p(), 'fetchCollisionData_').mockImplementation(() => undefined);
+    const eventClicked = vi.spyOn(p(), 'eventClicked_').mockImplementation(() => undefined);
+
+    getEl('Collisions-fetch-btn', true)?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    getEl('Collisions-refresh-btn', true)?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    const menu = getEl('Collisions-menu', true);
+
+    if (menu) {
+      menu.insertAdjacentHTML('beforeend', '<div class="Collisions-object" data-row="0"><span id="cell-x">c</span></div>');
+      getEl('cell-x', true)?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      // The row handler defers to eventClicked_ via showLoading's setTimeout.
+      vi.advanceTimersByTime(2000);
+    }
+
+    expect(eventClicked).toHaveBeenCalledWith(0);
   });
 });

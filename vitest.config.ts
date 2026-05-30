@@ -55,6 +55,7 @@ export default defineConfig({
         'test/**',
         'dist/**',
         'src/engine/ootk/**',
+        '**/*.d.ts',
         '**/*.test.ts',
         '**/*.test.js',
         '**/*.spec.ts',

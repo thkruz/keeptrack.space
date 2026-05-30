@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@test/e2e/coverage';
 import { expectCleanBoot, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('TopMenu', () => {

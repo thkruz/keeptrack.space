@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('MultiSiteLookAnglesPlugin', () => {

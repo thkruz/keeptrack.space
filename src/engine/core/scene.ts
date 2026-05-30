@@ -351,6 +351,9 @@ export class Scene {
   }
 
   private updateVisualsBasedOnPerformance_() {
+    if (settingsManager.isDisablePerformanceDowngrade) {
+      return;
+    }
     if ((!settingsManager.isDisablePlanets ||
       !settingsManager.isDisableGodrays ||
       settingsManager.isDrawSun ||

@@ -48,6 +48,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['lcov', 'html', 'text'],
       reportsDirectory: './coverage',
+      include: ['src/**/*.{ts,tsx}'],
       exclude: [
         'node_modules/**',
         'src/lib/external/**',
@@ -56,17 +57,23 @@ export default defineConfig({
         'src/engine/ootk/**',
         '**/*.test.ts',
         '**/*.test.js',
+        '**/*.spec.ts',
+        '**/*.spec.tsx',
+        '**/__tests__/**',
         '**/test.ts',
         '**/test.js',
         '**/*.stories.ts',
         '**/*.stories.js',
       ],
       reportOnFailure: true,
+      // Re-baselined against the full src denominator (coverage.include now counts every
+      // src file, not just imported ones). Actuals: lines 35.0 / statements 35.0 /
+      // functions 39.6 / branches 27.7 — ratchet upward as coverage climbs.
       thresholds: {
-        statements: 44,
-        branches: 33,
-        functions: 49,
-        lines: 44,
+        statements: 34,
+        branches: 27,
+        functions: 38,
+        lines: 34,
       },
     },
     include: ['**/?(*.)+(test).?(m)[jt]s?(x)'],

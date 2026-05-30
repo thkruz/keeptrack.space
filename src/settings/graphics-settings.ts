@@ -111,6 +111,15 @@ export class GraphicsSettings {
    */
   isSkipTleInterpolation = false;
 
+  /**
+   * Disable the runtime auto-quality-downgrade loop (Scene.updateVisualsBasedOnPerformance_),
+   * which disables visual features one-by-one and shows a "Your computer is struggling!" toast
+   * when sustained FPS is below the limit. Off by default so real low-end devices still scale
+   * down; E2E sets it true because the headless/SwiftShader GPU is always below the limit and
+   * the resulting toast stack overlaps and blocks side-menu close buttons.
+   */
+  isDisablePerformanceDowngrade = false;
+
   // Godrays (Sun illumination effects)
   /**
    * Disable drawing godrays (huge performance hit on mobile)

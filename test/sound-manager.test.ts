@@ -61,4 +61,34 @@ describe('Sound Manager', () => {
     } as unknown as SpeechSynthesis;
     expect(() => soundManagerPlugin.speak('hello')).not.toThrow();
   });
+
+  it('getVolumeForSound returns the right level per sound family', () => {
+    const vol = (soundManagerPlugin as unknown as { getVolumeForSound(k: string): number }).getVolumeForSound;
+    const sm = soundManagerPlugin as unknown as { getVolumeForSound(k: string): number };
+
+    expect(sm.getVolumeForSound('click1')).toBeCloseTo(0.15);
+    expect(sm.getVolumeForSound('chatter3')).toBeCloseTo(0.25);
+    expect(sm.getVolumeForSound(SoundNames.LOADING)).toBeCloseTo(0.25);
+    expect(sm.getVolumeForSound(SoundNames.EXPORT)).toBeCloseTo(0.3);
+    expect(sm.getVolumeForSound('error2')).toBeCloseTo(0.5);
+    expect(sm.getVolumeForSound('beep1')).toBeCloseTo(0.3);
+    expect(sm.getVolumeForSound(SoundNames.MENU_BUTTON)).toBeCloseTo(0.25);
+    // Anything unrecognized plays at full volume.
+    expect(sm.getVolumeForSound('somethingElse')).toBeCloseTo(1.0);
+    expect(vol).toBeTypeOf('function');
+  });
+
+  it('toggleMute flips mute state and emits the change once per transition', () => {
+    // Muting calls stopAll_, which cancels speech synthesis (undefined in jsdom).
+    window.speechSynthesis = { cancel: vi.fn() } as unknown as SpeechSynthesis;
+    const emit = vi.spyOn(EventBus.getInstance(), 'emit');
+
+    expect(soundManagerPlugin.isMute).toBe(false);
+    expect(soundManagerPlugin.toggleMute()).toBe(true);
+    expect(soundManagerPlugin.isMute).toBe(true);
+    expect(soundManagerPlugin.toggleMute()).toBe(false);
+    expect(soundManagerPlugin.isMute).toBe(false);
+    expect(emit).toHaveBeenCalledWith(EventBusEvent.soundMuteChanged, true);
+    expect(emit).toHaveBeenCalledWith(EventBusEvent.soundMuteChanged, false);
+  });
 });

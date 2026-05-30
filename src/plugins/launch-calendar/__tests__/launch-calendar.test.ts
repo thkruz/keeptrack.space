@@ -44,6 +44,13 @@ describe('LaunchCalendar', () => {
       expect(commands[0].id).toBe('LaunchCalendar.open');
       expect(commands[0].callback).toBeInstanceOf(Function);
     });
+
+    it('invokes the command callback without throwing', () => {
+      websiteInit(plugin);
+      vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
+
+      expect(() => plugin.getCommandPaletteCommands()[0].callback()).not.toThrow();
+    });
   });
 
   describe('onBottomIconClick', () => {

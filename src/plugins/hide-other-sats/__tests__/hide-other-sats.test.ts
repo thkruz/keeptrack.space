@@ -92,8 +92,10 @@ describe('HideOtherSatellitesPlugin', () => {
       vi.spyOn(csm, 'reloadColors').mockImplementation(() => undefined);
     });
 
-    it('exposes the bottom-icon config', () => {
+    it('exposes the bottom-icon config and an invocable command', () => {
       expect(plugin.getBottomIconConfig().elementName).toBe('hide-other-sats-bottom-icon');
+      vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
+      expect(() => plugin.getCommandPaletteCommands()[0].callback()).not.toThrow();
     });
 
     it('hides others when active', () => {

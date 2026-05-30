@@ -3,12 +3,21 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrack } from '@app/keeptrack';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import * as colorbox from '@app/engine/utils/colorbox';
 import { SatellitePhotos } from '@app/plugins/satellite-photos/satellite-photos';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { getEl } from '@app/engine/utils/get-el';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
+
+const flushAsync = async () => {
+  for (let i = 0; i < 6; i++) {
+    // eslint-disable-next-line no-await-in-loop
+    await Promise.resolve();
+  }
+};
 
 describe('SatellitePhotos', () => {
   beforeEach(() => {
@@ -148,5 +157,130 @@ describe('SatellitePhotos_test_links', () => {
       expect(getEl(link)).toBeTruthy();
       expect(() => getEl(link)!.click()).not.toThrow();
     });
+  });
+});
+
+describe('SatellitePhotos behavior', () => {
+  let plugin: SatellitePhotos;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const p = () => plugin as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const statics = SatellitePhotos as any;
+
+  beforeEach(() => {
+    PluginRegistry.unregisterAllPlugins();
+    setupStandardEnvironment([SelectSatManager]);
+    plugin = new SatellitePhotos();
+    websiteInit(plugin);
+    vi.spyOn(colorbox, 'openColorbox').mockImplementation(() => undefined);
+    ServiceLocator.getUiManager().searchManager.hideResults = vi.fn();
+    ServiceLocator.getCatalogManager().sccNum2Id = vi.fn(() => 1);
+    ServiceLocator.getMainCamera().changeZoom = vi.fn();
+    ServiceLocator.getMainCamera().camSnap = vi.fn();
+    PluginRegistry.getPlugin(SelectSatManager)!.selectSat = vi.fn();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('H shortcut opens the menu', () => {
+    const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
+
+    plugin.getKeyboardShortcuts()[0].callback();
+
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('clicking each weather-sat link loads an image', () => {
+    ['meteosat9-link', 'meteosat11-link', 'himawari8-link', 'goes16-link', 'goes18-link', 'elektro3-link'].forEach((id) => {
+      getEl(id)!.click();
+    });
+
+    expect(colorbox.openColorbox).toHaveBeenCalled();
+    // Runs the colorbox_ setTimeout that re-enables colorbox close.
+    vi.advanceTimersByTime(2500);
+  });
+
+  it('loadElektro_ handles future, distant-past and present sim times', () => {
+    const tm = ServiceLocator.getTimeManager();
+
+    tm.simulationTimeObj = new Date(Date.now() + 1000 * 60 * 60 * 48) as never;
+    expect(() => p().loadElektro_()).not.toThrow();
+
+    tm.simulationTimeObj = new Date(Date.now() - 1000 * 60 * 60 * 48) as never;
+    expect(() => p().loadElektro_()).not.toThrow();
+
+    tm.simulationTimeObj = new Date(Date.now() - 1000 * 60 * 60) as never;
+    expect(() => p().loadElektro_()).not.toThrow();
+  });
+
+  it('loadElektroPastOrPresent_ adjusts a sim time near the 24h boundary', () => {
+    // Frozen test time is midnight, which makes the >24h adjustment unreachable; use a non-midnight clock.
+    vi.setSystemTime(new Date('2022-06-15T14:23:00Z'));
+    const tm = ServiceLocator.getTimeManager();
+
+    // Gap just under 24h so flooring the minutes pushes closestTime past the 24h mark.
+    tm.simulationTimeObj = new Date(Date.now() - (24 * 60 - 1) * 60 * 1000) as never;
+    expect(() => p().loadElektro_()).not.toThrow();
+
+    vi.setSystemTime(new Date('2022-01-01T00:00:00Z'));
+  });
+
+  it('himawari8_ loads a past image and warns for future sim times', () => {
+    const tm = ServiceLocator.getTimeManager();
+
+    tm.simulationTimeObj = new Date(Date.now() - 1000 * 60 * 60) as never;
+    expect(() => statics.himawari8_()).not.toThrow();
+    vi.advanceTimersByTime(2500);
+
+    const toast = vi.fn();
+
+    ServiceLocator.getUiManager().toast = toast;
+    tm.simulationTimeObj = new Date(Date.now() + 1000 * 60 * 60 * 48) as never;
+    statics.himawari8_();
+    expect(toast).toHaveBeenCalled();
+  });
+
+  it('initDISCOVR_ runs on keepTrackReady and adds image links when the API responds', async () => {
+    global.fetch = vi.fn(() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve([{ image: 'img', identifier: '20220101', centroid_coordinates: { lat: 0, lon: 0 } }]),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    })) as any;
+
+    // The onKeepTrackReady handler (wired in addJs) is what kicks off initDISCOVR_.
+    EventBus.getInstance().emit(EventBusEvent.onKeepTrackReady);
+    await flushAsync();
+
+    expect(getEl('discovr-link1', true)).not.toBeNull();
+    // The added link snaps the camera to the photo coordinates.
+    getEl('discovr-link1', true)!.click();
+    expect(ServiceLocator.getMainCamera().camSnap).toHaveBeenCalled();
+  });
+
+  it('initDISCOVR_ falls into the catch on a non-ok HTTP response', async () => {
+    global.fetch = vi.fn(() => Promise.resolve({ ok: false, status: 503 })) as never;
+
+    p().initDISCOVR_();
+    await flushAsync();
+
+    expect(getEl('sat-photo-menu-list')!.innerHTML).toContain('Temporarily Unavailable');
+  });
+
+  it('initDISCOVR_ shows an unavailable entry when the API fails', async () => {
+    global.fetch = vi.fn(() => Promise.reject(new Error('network'))) as never;
+
+    p().initDISCOVR_();
+    await flushAsync();
+
+    expect(getEl('sat-photo-menu-list')!.innerHTML).toContain('Temporarily Unavailable');
+  });
+
+  it('addDiscvrLinks_ returns early when the list element is absent', () => {
+    getEl('sat-photo-menu-list', true)?.remove();
+    p().discvrPhotos_ = [{ imageUrl: 'u', lat: 0, lon: 0 }];
+
+    expect(() => p().addDiscvrLinks_()).not.toThrow();
   });
 });

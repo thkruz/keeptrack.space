@@ -5,6 +5,7 @@ test.describe('SearchSettingsPlugin', () => {
   test('open side menu, verify settings inputs, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { SearchSettingsPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#search-settings-bottom-icon');

@@ -5,6 +5,7 @@ test.describe('ColorMenu Plugin', () => {
   test('open side menu, verify color scheme list, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { ColorMenu: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#menu-color-scheme');

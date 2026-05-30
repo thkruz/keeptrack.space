@@ -5,6 +5,7 @@ test.describe('BestPassPlugin', () => {
   test('icon disabled without sensor, drawer item visible, form elements in DOM', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { BestPassPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#best-pass-icon');

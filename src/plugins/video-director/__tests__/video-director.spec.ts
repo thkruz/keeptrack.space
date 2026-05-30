@@ -5,6 +5,7 @@ test.describe('VideoDirectorPlugin', () => {
   test('open side menu, verify form elements, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { VideoDirectorPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#video-director-icon');

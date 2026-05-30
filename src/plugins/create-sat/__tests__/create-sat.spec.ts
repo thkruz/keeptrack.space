@@ -5,7 +5,7 @@ test.describe('CreateSat Plugin', () => {
   test('open side menu, verify tabs and form fields, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { CreateSat: { enabled: true } },
-      settings: { isDisableLoginGate: true },
+      settings: { isDisableLoginGate: true, isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#create-satellite-bottom-icon');

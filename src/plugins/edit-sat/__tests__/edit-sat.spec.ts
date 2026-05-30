@@ -5,6 +5,7 @@ test.describe('EditSat', () => {
   test('disabled when no satellite is selected', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { EditSat: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     // 1. Bottom icon should exist but be disabled (requires satellite selection)

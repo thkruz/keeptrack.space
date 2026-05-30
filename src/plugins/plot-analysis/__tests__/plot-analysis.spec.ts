@@ -13,7 +13,7 @@ test.describe('Plot Analysis Plugins', () => {
         Inc2AltPlots: { enabled: true },
         Inc2LonPlots: { enabled: true },
       },
-      settings: { isDisableLoginGate: true },
+      settings: { isDisableLoginGate: true, isMobileModeEnabled: true },
     });
 
     // ── Satellite-dependent plots: ECI, ECF, RIC ──

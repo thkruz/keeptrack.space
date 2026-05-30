@@ -5,6 +5,7 @@ test.describe('ProximityOps', () => {
   test('open side menu, verify form elements and secondary menu, close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { ProximityOps: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     // Legacy pattern: locale "Rendezvous and Proximity Operations"

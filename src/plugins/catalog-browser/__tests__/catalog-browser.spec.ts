@@ -5,6 +5,7 @@ test.describe('CatalogBrowserPlugin', () => {
   test('open side menu, verify catalog list and toggle, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { CatalogBrowserPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#menu-catalog-browser');

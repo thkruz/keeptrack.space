@@ -5,7 +5,7 @@ test.describe('DopsPlugin', () => {
   test('open side menu via drawer, verify form and content, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { DopsPlugin: { enabled: true } },
-      settings: { isDisableLoginGate: true },
+      settings: { isDisableLoginGate: true, isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#menu-dops');

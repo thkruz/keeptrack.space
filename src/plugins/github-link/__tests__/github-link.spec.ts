@@ -5,6 +5,7 @@ test.describe('GithubLinkPlugin', () => {
   test('renders in About drawer group and opens GitHub on click', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { GithubLinkPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     // The top menu button should exist in the DOM

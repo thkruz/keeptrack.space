@@ -5,6 +5,7 @@ test.describe('CustomSensorPlugin', () => {
   test('open side menu, verify form elements, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { CustomSensorPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#custom-sensor-bottom-icon');

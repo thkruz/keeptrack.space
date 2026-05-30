@@ -5,6 +5,7 @@ test.describe('Collisions Plugin', () => {
   test('open side menu, verify table and toolbar, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { Collisions: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#menu-satellite-collision');

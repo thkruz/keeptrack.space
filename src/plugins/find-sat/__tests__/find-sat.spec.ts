@@ -6,7 +6,7 @@ test.describe('FindSatPlugin', () => {
     // FindSat is login-gated in the manifest
     await waitForAppReady(page, {
       plugins: { FindSatPlugin: { enabled: true } },
-      settings: { isDisableLoginGate: true },
+      settings: { isDisableLoginGate: true, isMobileModeEnabled: true },
     });
 
     // 1. Bottom icon should exist and not be disabled

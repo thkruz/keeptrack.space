@@ -5,6 +5,7 @@ test.describe('PolarPlotPlugin', () => {
   test('disabled without sensor and satellite, DOM elements exist', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { PolarPlotPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     // Legacy pattern: locale "Polar Plot" → slug "polar-plot" → "polar-plot-bottom-icon"

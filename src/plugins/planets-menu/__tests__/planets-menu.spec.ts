@@ -5,6 +5,7 @@ test.describe('PlanetsMenuPlugin', () => {
   test('open side menu, verify planet lists and sections, close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { PlanetsMenuPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     // Bottom icon should exist in DOM

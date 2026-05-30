@@ -5,7 +5,7 @@ test.describe('CloseObjects Plugin', () => {
   test('open side menu, verify find button and pro results elements, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { CloseObjectsPlugin: { enabled: true } },
-      settings: { isDisableLoginGate: true },
+      settings: { isDisableLoginGate: true, isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#close-objects-icon');

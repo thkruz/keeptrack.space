@@ -5,6 +5,7 @@ test.describe('MissilePlugin', () => {
   test('open side menu via drawer, verify form elements, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { MissilePlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     // Composition-based: elementName is 'MissilePlugin-bottom-icon'

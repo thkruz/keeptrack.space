@@ -5,6 +5,7 @@ test.describe('DebrisScreening Plugin', () => {
   test('icon is disabled without satellite, drawer item visible in EVENTS group', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { DebrisScreening: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#debris-screening-bottom-icon');

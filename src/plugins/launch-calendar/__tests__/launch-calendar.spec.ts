@@ -5,6 +5,7 @@ test.describe('LaunchCalendar Plugin', () => {
   test('open and close colorbox via drawer', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { LaunchCalendar: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#launch-calendar-bottom-icon');

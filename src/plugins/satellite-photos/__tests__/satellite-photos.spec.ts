@@ -5,6 +5,7 @@ test.describe('SatellitePhotos', () => {
   test('open side menu, verify photo links, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { SatellitePhotos: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#menu-sat-photo');

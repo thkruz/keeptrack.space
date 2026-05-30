@@ -5,6 +5,7 @@ test.describe('SettingsMenuPlugin', () => {
   test('open side menu, verify settings form, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { SettingsMenuPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#settings-menu-icon');

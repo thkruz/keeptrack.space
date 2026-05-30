@@ -5,6 +5,7 @@ test.describe('FilterMenuPlugin', () => {
   test('full user flow: open, verify filters, toggle, reset, close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { FilterMenuPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     // 1. Bottom icon should exist and not be disabled

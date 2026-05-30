@@ -5,6 +5,7 @@ test.describe('SatConstellations Plugin', () => {
   test('open side menu via drawer, verify constellation list and secondary menu, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { SatConstellations: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#menu-constellations');

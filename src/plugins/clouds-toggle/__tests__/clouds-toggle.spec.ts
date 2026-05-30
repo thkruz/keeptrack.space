@@ -17,7 +17,7 @@ test.describe('CloudsToggle Plugin', () => {
     const initialState = await page.evaluate(() => (window as any).settingsManager?.isDrawCloudsMap);
 
     // Click to toggle clouds
-    await utilityIcon.click({ force: true });
+    await utilityIcon.dispatchEvent('click');
 
     // Verify the setting toggled from its initial state
     await expect(async () => {
@@ -27,7 +27,7 @@ test.describe('CloudsToggle Plugin', () => {
     }).toPass({ timeout: 5_000 });
 
     // Click again to toggle back
-    await utilityIcon.click({ force: true });
+    await utilityIcon.dispatchEvent('click');
 
     // Verify the setting returned to its initial state
     await expect(async () => {

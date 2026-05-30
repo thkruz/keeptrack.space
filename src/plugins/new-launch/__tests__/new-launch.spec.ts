@@ -5,7 +5,7 @@ test.describe('NewLaunch', () => {
   test('open pro side menu, verify form elements, and close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { NewLaunch: { enabled: true } },
-      settings: { isDisableLoginGate: true },
+      settings: { isDisableLoginGate: true, isMobileModeEnabled: true },
     });
 
     // 1. Verify bottom icon exists (legacy pattern: "New Launch" → "new-launch-bottom-icon")

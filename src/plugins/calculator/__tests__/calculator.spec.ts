@@ -5,6 +5,7 @@ test.describe('Calculator', () => {
   test('open side menu, verify form elements, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { Calculator: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#menu-calculator');

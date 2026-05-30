@@ -17,7 +17,7 @@ test.describe('PoliticalMapToggle', () => {
     const initialState = await page.evaluate(() => (window as any).settingsManager?.isDrawPoliticalMap);
 
     // Click to toggle on
-    await utilityIcon.click({ force: true });
+    await utilityIcon.dispatchEvent('click');
 
     // Verify the setting toggled from its initial state
     await expect(async () => {
@@ -27,7 +27,7 @@ test.describe('PoliticalMapToggle', () => {
     }).toPass({ timeout: 5_000 });
 
     // Click again to toggle off
-    await utilityIcon.click({ force: true });
+    await utilityIcon.dispatchEvent('click');
 
     // Verify the setting returned to its initial state
     await expect(async () => {

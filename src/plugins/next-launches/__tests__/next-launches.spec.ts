@@ -5,6 +5,7 @@ test.describe('NextLaunchesPlugin', () => {
   test('open side menu, verify elements, and close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { NextLaunchesPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     // 1. Verify bottom icon exists in DOM (hidden in #bottom-icons)

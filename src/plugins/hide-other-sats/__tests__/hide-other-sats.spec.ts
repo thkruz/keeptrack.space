@@ -19,7 +19,7 @@ test.describe('HideOtherSatellitesPlugin', () => {
     );
 
     // Click to toggle (hide other sats — sets alpha to 0)
-    await utilityIcon.click({ force: true });
+    await utilityIcon.dispatchEvent('click');
 
     // Verify transparent alpha changed
     await expect(async () => {
@@ -34,7 +34,7 @@ test.describe('HideOtherSatellitesPlugin', () => {
     await expect(utilityIcon).toHaveClass(/bmenu-item-selected/u);
 
     // Click again to toggle off (show other sats — restores alpha to 0.1)
-    await utilityIcon.click({ force: true });
+    await utilityIcon.dispatchEvent('click');
 
     // Verify transparent alpha returned to initial
     await expect(async () => {

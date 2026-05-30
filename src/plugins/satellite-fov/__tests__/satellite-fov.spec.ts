@@ -8,11 +8,12 @@ test.describe('SatelliteFov', () => {
       settings: { isDisableLoginGate: true },
     });
 
-    // SatelliteFov does not set isIconDisabledOnLoad, so icon is enabled on load
+    // SatelliteFov sets isRequireSatelliteSelected + isIconDisabledOnLoad, so the
+    // icon is disabled on load until a satellite is selected.
     const bottomIcon = page.locator('#satellite-fov-bottom-icon');
 
     await expect(bottomIcon).toBeAttached();
-    await expect(bottomIcon).not.toHaveClass(/bmenu-item-disabled/u);
+    await expect(bottomIcon).toHaveClass(/bmenu-item-disabled/u);
 
     // Side menu form elements should be in DOM
     await expect(page.locator('#satellite-fov-menu')).toBeAttached();

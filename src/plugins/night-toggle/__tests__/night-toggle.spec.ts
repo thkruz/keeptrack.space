@@ -22,7 +22,7 @@ test.describe('NightToggle', () => {
     expect(initialState).toBe(false);
 
     // Click to toggle on (draw night as day)
-    await utilityIcon.click({ force: true });
+    await utilityIcon.dispatchEvent('click');
 
     // Verify setting toggled
     await expect(async () => {
@@ -35,7 +35,7 @@ test.describe('NightToggle', () => {
     await expect(utilityIcon).toHaveClass(/bmenu-item-selected/u);
 
     // Click again to toggle off
-    await utilityIcon.click({ force: true });
+    await utilityIcon.dispatchEvent('click');
 
     // Verify setting returned to initial state
     await expect(async () => {

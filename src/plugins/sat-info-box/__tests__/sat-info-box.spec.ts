@@ -93,6 +93,7 @@ test.describe('SatInfoBox and Related Plugins', () => {
   test('sat-infobox has no drawer entry (infrastructure plugin)', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { SatInfoBoxCore: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     // Open drawer

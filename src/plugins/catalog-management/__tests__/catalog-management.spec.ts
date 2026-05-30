@@ -5,7 +5,7 @@ test.describe('CatalogManagement Plugin', () => {
   test('open side menu, verify tabs and form fields, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { CatalogManagementPlugin: { enabled: true } },
-      settings: { isDisableLoginGate: true },
+      settings: { isDisableLoginGate: true, isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#catalog-management-icon');

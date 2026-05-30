@@ -5,6 +5,7 @@ test.describe('SensorListPlugin', () => {
   test('open side menu with sensor list, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { SensorListPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#sensors-bottom-icon');

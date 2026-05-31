@@ -354,17 +354,20 @@ global.mocks.glMock = {
   clearColor: vi.fn(),
   compileShader: vi.fn(),
   createBuffer: () => ({ numItems: 0, layout: {}, data: {} }),
-  createFramebuffer: vi.fn(),
+  // Real WebGL create* calls return distinct opaque objects (never undefined/null
+  // on a healthy context). Return fresh objects so code that stores/null-checks the
+  // handle (texture_/vao_/framebuffer_) takes the production path.
+  createFramebuffer: () => ({}),
   createProgram: () => ({
     test: '',
   }),
   createImageBitmap: vi.fn(),
-  createRenderbuffer: vi.fn(),
+  createRenderbuffer: () => ({}),
   createShader: () => ({
     test: '',
   }),
-  createTexture: vi.fn(),
-  createVertexArray: vi.fn(),
+  createTexture: () => ({}),
+  createVertexArray: () => ({}),
   depthMask: vi.fn(),
   disable: vi.fn(),
   disableVertexAttribArray: vi.fn(),

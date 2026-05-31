@@ -330,7 +330,8 @@ const glConstants = {
   MAX_TEXTURE_SIZE: 0x0D33, VERSION: 0x1F02,
   NO_ERROR: 0, INVALID_ENUM: 0x0500, INVALID_VALUE: 0x0501, INVALID_OPERATION: 0x0502,
   INVALID_FRAMEBUFFER_OPERATION: 0x0506, OUT_OF_MEMORY: 0x0505, CONTEXT_LOST_WEBGL: 0x9242,
-  SYNC_GPU_COMMANDS_COMPLETE: 0x9117, TIMEOUT_EXPIRED: 0x911B, WAIT_FAILED: 0x911D,
+  SYNC_GPU_COMMANDS_COMPLETE: 0x9117, ALREADY_SIGNALED: 0x911A, TIMEOUT_EXPIRED: 0x911B,
+  CONDITION_SATISFIED: 0x911C, WAIT_FAILED: 0x911D,
 };
 
 global.mocks.glMock = {
@@ -424,6 +425,33 @@ global.mocks.glMock = {
   deleteShader: vi.fn(),
   deleteFramebuffer: vi.fn(),
   deleteRenderbuffer: vi.fn(),
+  // --- Methods the codebase calls that were previously absent (would throw). ---
+  // Commands (void):
+  uniform4f: vi.fn(),
+  blendFuncSeparate: vi.fn(),
+  polygonOffset: vi.fn(),
+  texParameterf: vi.fn(),
+  flush: vi.fn(),
+  getBufferSubData: vi.fn(),
+  deleteSync: vi.fn(),
+  // Queries — return realistic "healthy context / no error" values, matching real WebGL:
+  getError: () => 0, // NO_ERROR
+  getSupportedExtensions: () => [],
+  getBufferParameter: () => 0,
+  getTexParameter: () => 0,
+  checkFramebufferStatus: () => 0x8CD5, // FRAMEBUFFER_COMPLETE
+  fenceSync: () => ({}), // opaque WebGLSync
+  clientWaitSync: () => 0x911A, // ALREADY_SIGNALED (work is done)
+  getParameter: (pname) => {
+    if (pname === 0x0D33) {
+      return 16384; // MAX_TEXTURE_SIZE
+    }
+    if (pname === 0x1F02) {
+      return 'WebGL 2.0 (mock)'; // VERSION
+    }
+
+    return 0;
+  },
 };
 
 // mock_requestAnimationFrame.js

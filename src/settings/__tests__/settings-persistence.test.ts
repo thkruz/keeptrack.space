@@ -1,11 +1,12 @@
 import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
 import { StorageKey } from '@app/engine/persistence/storage-key';
-import { SettingsManager } from '@app/settings/settings';
+import { SettingsManager, settingsManager } from '@app/settings/settings';
 import { vi } from 'vitest';
 
 describe('SettingsManager persistence', () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sm = () => (globalThis as any).settingsManager;
+  // preserveSettings() reads the module-level settingsManager singleton, so mutate
+  // that object directly rather than globalThis (other suites swap the global).
+  const sm = () => settingsManager;
   let originalOffline: boolean;
 
   beforeEach(() => {
@@ -37,10 +38,11 @@ describe('SettingsManager persistence', () => {
     it('persists draw settings when offline mode is on', () => {
       sm().offlineMode = true;
       sm().isDrawOrbits = true;
+      const saveSpy = vi.spyOn(PersistenceManager.getInstance(), 'saveItem');
 
       SettingsManager.preserveSettings();
 
-      expect(PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ORBITS)).toBe('true');
+      expect(saveSpy).toHaveBeenCalledWith(StorageKey.SETTINGS_DRAW_ORBITS, 'true');
     });
 
     it('does not write items when offline mode is off but still emits saveSettings', () => {

@@ -1,13 +1,17 @@
 import { vi } from 'vitest';
 import { CatalogManager } from '@app/app/data/catalog-manager';
 import { GroupsManager } from '@app/app/data/groups-manager';
-import { SearchManager } from '@app/app/ui/search-manager';
+import { SearchManager, SearchResultType } from '@app/app/ui/search-manager';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { DotsManager } from '@app/engine/rendering/dots-manager';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { settingsManager } from '@app/settings/settings';
 import { Satellite } from '@ootk/src/main';
-import { defaultSat } from '@test/environment/apiMocks';
+import { defaultMisl, defaultSat } from '@test/environment/apiMocks';
+import { setupStandardEnvironment } from '@test/environment/standard-env';
 
 describe('SearchManager', () => {
   let searchManager: SearchManager;
@@ -220,5 +224,133 @@ describe('SearchManager', () => {
 
       expect(() => searchManager.doSearch('99999')).not.toThrow();
     });
+  });
+});
+
+describe('SearchManager interactions', () => {
+  let mgr: SearchManager;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const p = () => mgr as any;
+
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager, TopMenu]);
+    // Provide the search DOM the interactive paths read, as queryable body nodes.
+    for (const id of ['ui-wrapper', 'search-holder', 'search', 'search-results', 'search-icon']) {
+      document.getElementById(id)?.remove();
+    }
+    document.body.insertAdjacentHTML('beforeend',
+      '<div id="ui-wrapper"></div><div id="search-holder"></div><input id="search" />' +
+      '<div id="search-results"></div><div id="search-icon"></div>');
+    // jsdom does not implement scrollIntoView.
+    Element.prototype.scrollIntoView = vi.fn();
+    mgr = new SearchManager();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('init wires the top-menu button and keyboard shortcut without throwing', () => {
+    expect(() => mgr.init()).not.toThrow();
+
+    const topMenu = PluginRegistry.getPlugin(TopMenu);
+
+    expect(topMenu?.navItems.some((n) => n.id === 'search-btn')).toBe(true);
+  });
+
+  it('doArraySearch builds a comma-separated list of sccNums', () => {
+    const catalog = {
+      objectCache: [
+        new Satellite({ ...defaultSat, id: 0, sccNum: '00005' }),
+        new Satellite({ ...defaultSat, id: 1, sccNum: '25544' }),
+      ],
+    } as unknown as CatalogManager;
+
+    // The Satellite constructor normalizes leading zeros: '00005' -> '5'.
+    expect(SearchManager.doArraySearch(catalog, [0, 1])).toBe('5,25544');
+  });
+
+  it('getCurrentSearch reflects the input only when results are open', () => {
+    (document.getElementById('search') as HTMLInputElement).value = 'ISS';
+
+    mgr.isResultsOpen = false;
+    expect(mgr.getCurrentSearch()).toBe('');
+
+    mgr.isResultsOpen = true;
+    expect(mgr.getCurrentSearch()).toBe('ISS');
+  });
+
+  it('getLastResultGroup returns the cached group', () => {
+    const group = { foo: 'bar' };
+
+    p().lastResultGroup_ = group;
+    expect(mgr.getLastResultGroup()).toBe(group);
+  });
+
+  it('fillResultBox renders a highlighted row for each search-result type', () => {
+    const sat = new Satellite({ ...defaultSat, id: 0, sccNum: '25544', intlDes: '1998-067A', launchVehicle: 'Proton-K' });
+
+    Object.assign(sat, { altName: 'ZARYA', bus: 'BoeingBus' });
+    ServiceLocator.getCatalogManager().objectCache = [sat, defaultMisl] as never;
+    ServiceLocator.getDotsManager().positionData = null as never;
+
+    const results = [
+      { id: 0, searchType: SearchResultType.OBJECT_NAME, strIndex: 0, patlen: 3 },
+      { id: 0, searchType: SearchResultType.NORAD_ID, strIndex: 0, patlen: 5 },
+      { id: 0, searchType: SearchResultType.INTLDES, strIndex: 0, patlen: 4 },
+      { id: 0, searchType: SearchResultType.ALT_NAME, strIndex: 0, patlen: 2 },
+      { id: 0, searchType: SearchResultType.LAUNCH_VEHICLE, strIndex: 0, patlen: 6 },
+      { id: 0, searchType: SearchResultType.BUS, strIndex: 0, patlen: 6 },
+      { id: 1, searchType: SearchResultType.MISSILE, strIndex: 0, patlen: 5 },
+      { id: 0, searchType: SearchResultType.STAR, strIndex: 0, patlen: 4 },
+    ];
+
+    expect(() => mgr.fillResultBox(results, ServiceLocator.getCatalogManager(), 50)).not.toThrow();
+
+    const rows = document.getElementById('search-results')!.querySelectorAll('.search-result');
+
+    expect(rows.length).toBe(results.length);
+    // totalFound (50) > results.length renders the "showing N of M" banner.
+    expect(document.getElementById('search-results')!.querySelector('.search-result-limit')).not.toBeNull();
+  });
+
+  it('addListeners_ routes the input event to doSearch and the icon click to toggleSearch', () => {
+    p().addListeners_();
+    const searchSpy = vi.spyOn(mgr, 'doSearch').mockImplementation(() => undefined);
+    const toggleSpy = vi.spyOn(mgr, 'toggleSearch').mockImplementation(() => undefined);
+
+    (document.getElementById('search') as HTMLInputElement).value = 'abc';
+    document.getElementById('search')!.dispatchEvent(new Event('input'));
+    expect(searchSpy).toHaveBeenCalledWith('abc');
+
+    document.getElementById('search-icon')!.dispatchEvent(new Event('click'));
+    expect(toggleSpy).toHaveBeenCalled();
+  });
+
+  it('keyboard ArrowDown selects the first result row', () => {
+    document.getElementById('search-results')!.innerHTML =
+      '<div class="search-result" data-obj-id="0"></div><div class="search-result" data-obj-id="1"></div>';
+    p().addListeners_();
+
+    const evt = new KeyboardEvent('keydown', { key: 'ArrowDown' });
+
+    document.getElementById('search')!.dispatchEvent(evt);
+
+    expect(p().selectedIndex_).toBe(0);
+  });
+
+  it('updateSelectedResult_ marks the selected row and updates hover', () => {
+    document.getElementById('search-results')!.innerHTML =
+      '<div class="search-result" data-obj-id="7"></div><div class="search-result" data-obj-id="9"></div>';
+    const rows = document.querySelectorAll('.search-result');
+
+    rows.forEach((r) => {
+      (r as HTMLElement).scrollIntoView = vi.fn();
+    });
+    vi.spyOn(ServiceLocator, 'getHoverManager').mockReturnValue({ setHoverId: vi.fn() } as never);
+    p().selectedIndex_ = 1;
+    p().updateSelectedResult_(rows);
+
+    expect((rows[1] as HTMLElement).classList.contains('search-result--selected')).toBe(true);
   });
 });

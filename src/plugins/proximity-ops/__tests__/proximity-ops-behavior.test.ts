@@ -99,4 +99,63 @@ describe('ProximityOps behavior', () => {
       expect(table.querySelectorAll('tr').length).toBeGreaterThan(0);
     }
   });
+
+  describe('satellite filtering', () => {
+    const fakeSat = (over: Record<string, unknown> = {}) => ({
+      tle1: '1 ...',
+      period: 95,
+      inclination: 51.6,
+      rightAscension: 100,
+      source: 0,
+      isPayload: () => true,
+      lla: () => ({ lat: 0, lon: 10 }),
+      ...over,
+    });
+
+    const setChecks = (payloadOnly: boolean, noVimpel: boolean) => {
+      (getEl('proximity-ops-payload-only') as HTMLInputElement).checked = payloadOnly;
+      (getEl('proximity-ops-no-vimpel') as HTMLInputElement).checked = noVimpel;
+    };
+
+    it('getFilteredSatellites returns all sats when no filter is active', () => {
+      vi.spyOn(ServiceLocator.getCatalogManager(), 'getSats').mockReturnValue([fakeSat(), fakeSat()] as never);
+      setChecks(false, false);
+
+      expect(p().getFilteredSatellites()).toHaveLength(2);
+    });
+
+    it('getFilteredSatellites drops non-payloads when payload-only is checked', () => {
+      vi.spyOn(ServiceLocator.getCatalogManager(), 'getSats').mockReturnValue([
+        fakeSat({ isPayload: () => true }),
+        fakeSat({ isPayload: () => false }),
+      ] as never);
+      setChecks(true, false);
+
+      expect(p().getFilteredSatellites()).toHaveLength(1);
+    });
+
+    it('findSatsAvALeo_ matches LEO satellites near the target plane', () => {
+      vi.spyOn(ServiceLocator.getCatalogManager(), 'getSats').mockReturnValue([
+        fakeSat({ inclination: 51.6, rightAscension: 100, period: 95 }),
+        fakeSat({ inclination: 0, rightAscension: 300, period: 95 }),
+      ] as never);
+      setChecks(false, false);
+
+      const matches = p().findSatsAvALeo_(51.6, 100);
+
+      expect(matches.length).toBe(1);
+    });
+
+    it('findSatsAvAGeo_ matches GEO satellites near the target longitude', () => {
+      vi.spyOn(ServiceLocator.getCatalogManager(), 'getSats').mockReturnValue([
+        fakeSat({ period: 24 * 60, lla: () => ({ lat: 0, lon: 10 }) }),
+        fakeSat({ period: 24 * 60, lla: () => ({ lat: 0, lon: 120 }) }),
+      ] as never);
+      setChecks(false, false);
+
+      const matches = p().findSatsAvAGeo_(10);
+
+      expect(matches.length).toBe(1);
+    });
+  });
 });

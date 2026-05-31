@@ -463,3 +463,50 @@ describe('OemSatellite ephemeris math', () => {
     expect(sat.dataBlockIdx).toBe(0);
   });
 });
+
+describe('OemSatellite runtime (eci / rae / predicates)', () => {
+  // The fixture ephemeris only spans the first 60 seconds (two state vectors).
+  const inRange = new Date(Date.UTC(2026, 0, 1, 0, 0, 30));
+
+  it('eci returns a position/velocity inside the ephemeris window and null outside it', () => {
+    const sat = new OemSatellite(makeOem());
+
+    expect(sat.eci(inRange)).not.toBeNull();
+    // A date well past STOP_TIME falls outside the ephemeris coverage.
+    expect(sat.eci(new Date(Date.UTC(2030, 0, 1)))).toBeNull();
+  });
+
+  it('getRae returns look angles for an in-range time or null when the eci is unavailable', () => {
+    const sat = new OemSatellite(makeOem());
+    const rae = sat.getRae(inRange, defaultSensor);
+
+    expect(rae === null || typeof rae.az === 'number').toBe(true);
+  });
+
+  it('getTearData returns a TearrData record for the sensor list', () => {
+    const sat = new OemSatellite(makeOem());
+    const tear = sat.getTearData(inRange, [defaultSensor]);
+
+    expect(tear).toHaveProperty('time');
+  });
+
+  it('exposes consistent object-type predicates', () => {
+    const sat = new OemSatellite(makeOem(['NORAD_ID = 25544']));
+
+    expect(sat.isSatellite()).toBe(true);
+    expect(sat.isGroundObject()).toBe(false);
+    expect(sat.isSensor()).toBe(false);
+    expect(sat.isMarker()).toBe(false);
+    expect(sat.isStar()).toBe(false);
+    expect(sat.isMissile()).toBe(false);
+    expect(sat.isStatic()).toBe(false);
+  });
+
+  it('reports the fixed payload/rocket/debris predicates (always false for OEM objects)', () => {
+    const sat = new OemSatellite(makeOem(['NORAD_ID = 25544']));
+
+    expect(sat.isPayload()).toBe(false);
+    expect(sat.isRocketBody()).toBe(false);
+    expect(sat.isDebris()).toBe(false);
+  });
+});

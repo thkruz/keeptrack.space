@@ -1,103 +1,194 @@
+import { ColorWorkerMsgType } from '@app/engine/rendering/color-worker/color-worker-messages';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ColorCruncherThreadManager } from '../color-cruncher-thread-manager';
 
-/** Minimal Worker stub — jsdom has no Worker implementation. */
-class FakeWorker {
-  postMessage = vi.fn();
-  terminate = vi.fn();
-  onmessage: ((e: MessageEvent) => void) | null = null;
-}
+/** A Worker stub whose postMessage/terminate are spies, passed to init() as workerStub. */
+const makeWorkerStub = () => ({
+  postMessage: vi.fn(),
+  terminate: vi.fn(),
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+} as unknown as Worker & { postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> });
 
-/**
- * createWorker_ does `new Worker(new URL('...', import.meta.url))`, which cannot
- * run under jsdom (URL/Worker are unavailable). Spy it to return a fake worker so
- * the rest of the manager's wiring is exercised honestly.
- */
-const withFakeWorker = (mgr: ColorCruncherThreadManager): FakeWorker => {
-  const fake = new FakeWorker();
+/** Builds an initialized manager backed by a spy worker. */
+const makeMgr = () => {
+  const worker = makeWorkerStub();
+  const mgr = new ColorCruncherThreadManager([]);
 
-  vi.spyOn(mgr as unknown as { createWorker_: () => Worker }, 'createWorker_').mockReturnValue(fake as unknown as Worker);
+  mgr.init(worker);
 
-  return fake;
+  return { mgr, worker };
 };
 
+const lastMsg = (worker: { postMessage: ReturnType<typeof vi.fn> }): Record<string, unknown> =>
+  worker.postMessage.mock.calls.at(-1)![0] as Record<string, unknown>;
+
 describe('ColorCruncherThreadManager', () => {
-  let mgr: ColorCruncherThreadManager;
-
-  beforeEach(() => {
-    mgr = new ColorCruncherThreadManager();
-  });
-
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  describe('init', () => {
-    it('creates a worker when the Worker constructor succeeds', () => {
-      const fake = withFakeWorker(mgr);
+  describe('lifecycle', () => {
+    it('uses the provided worker stub', () => {
+      const { mgr, worker } = makeMgr();
+
+      expect(mgr.worker).toBe(worker);
+    });
+
+    it('auto-creates a mock worker and reports ready when no stub is given', () => {
+      const mgr = new ColorCruncherThreadManager([]);
 
       mgr.init();
 
-      expect(mgr.getWorker()).toBe(fake);
+      expect(mgr.worker).not.toBeNull();
+      expect(mgr.isReady).toBe(true);
     });
 
-    it('warns and leaves the worker null when construction throws', () => {
-      vi.spyOn(mgr as unknown as { createWorker_: () => Worker }, 'createWorker_').mockImplementation(() => {
-        throw new Error('no worker');
-      });
-
-      expect(() => mgr.init()).not.toThrow();
-      expect(mgr.getWorker()).toBeNull();
-    });
-  });
-
-  describe('postMessage', () => {
-    it('forwards the payload to the worker', () => {
-      const fake = withFakeWorker(mgr);
-
-      mgr.init();
-      const payload = { foo: 'bar' };
-
-      mgr.postMessage(payload);
-
-      expect(fake.postMessage).toHaveBeenCalledWith(payload);
-    });
-
-    it('is a no-op when there is no worker', () => {
-      expect(() => mgr.postMessage({ foo: 1 })).not.toThrow();
-    });
-  });
-
-  describe('onMessage', () => {
-    it('wires the callback to the worker onmessage handler', () => {
-      const fake = withFakeWorker(mgr);
-
-      mgr.init();
-      const cb = vi.fn();
-
-      mgr.onMessage(cb);
-
-      expect(fake.onmessage).toBe(cb);
-    });
-
-    it('is a no-op when there is no worker', () => {
-      expect(() => mgr.onMessage(vi.fn())).not.toThrow();
-    });
-  });
-
-  describe('terminate', () => {
     it('terminates and clears the worker', () => {
-      const fake = withFakeWorker(mgr);
+      const { mgr, worker } = makeMgr();
 
-      mgr.init();
       mgr.terminate();
 
-      expect(fake.terminate).toHaveBeenCalled();
-      expect(mgr.getWorker()).toBeNull();
+      expect(worker.terminate).toHaveBeenCalled();
+      expect(mgr.worker).toBeNull();
     });
 
-    it('is a no-op when there is no worker', () => {
-      expect(() => mgr.terminate()).not.toThrow();
+    it('send helpers are silent no-ops before a worker exists', () => {
+      const mgr = new ColorCruncherThreadManager([]);
+
+      expect(() => {
+        mgr.sendForceRecolor();
+        mgr.terminate();
+      }).not.toThrow();
+    });
+  });
+
+  describe('send helpers', () => {
+    it('sendCatalogData posts INIT_CATALOG and records the sequence number', () => {
+      const { mgr, worker } = makeMgr();
+
+      mgr.sendCatalogData({ foo: 1 } as never, 9);
+
+      expect(lastMsg(worker)).toMatchObject({ typ: ColorWorkerMsgType.INIT_CATALOG, seqNum: 9 });
+    });
+
+    it('sendSchemeChange posts UPDATE_SCHEME with the scheme id and group flag', () => {
+      const { mgr, worker } = makeMgr();
+
+      mgr.sendSchemeChange('RcsColorScheme', true);
+
+      expect(lastMsg(worker)).toEqual({
+        typ: ColorWorkerMsgType.UPDATE_SCHEME,
+        schemeId: 'RcsColorScheme',
+        isGroupScheme: true,
+      });
+    });
+
+    it('sendFilterUpdate posts UPDATE_FILTERS', () => {
+      const { mgr, worker } = makeMgr();
+
+      mgr.sendFilterUpdate({ a: 1 } as never);
+
+      expect(lastMsg(worker)).toMatchObject({ typ: ColorWorkerMsgType.UPDATE_FILTERS });
+    });
+
+    it('sendGroupUpdate posts UPDATE_GROUP with ids', () => {
+      const { mgr, worker } = makeMgr();
+
+      mgr.sendGroupUpdate([1, 2, 3]);
+
+      expect(lastMsg(worker)).toEqual({ typ: ColorWorkerMsgType.UPDATE_GROUP, groupIds: [1, 2, 3] });
+    });
+
+    it('sendForceRecolor posts FORCE_RECOLOR', () => {
+      const { mgr, worker } = makeMgr();
+
+      mgr.sendForceRecolor();
+
+      expect(lastMsg(worker)).toEqual({ typ: ColorWorkerMsgType.FORCE_RECOLOR });
+    });
+
+    it('sendObjectTypeFlags posts UPDATE_OBJ_TYPE_FLAGS', () => {
+      const { mgr, worker } = makeMgr();
+
+      mgr.sendObjectTypeFlags({ payload: true });
+
+      expect(lastMsg(worker)).toEqual({ typ: ColorWorkerMsgType.UPDATE_OBJ_TYPE_FLAGS, objectTypeFlags: { payload: true } });
+    });
+
+    it('sendColorTheme posts UPDATE_COLOR_THEME', () => {
+      const { mgr, worker } = makeMgr();
+
+      mgr.sendColorTheme({ payload: [1, 0, 0, 1] });
+
+      expect(lastMsg(worker)).toEqual({ typ: ColorWorkerMsgType.UPDATE_COLOR_THEME, colorTheme: { payload: [1, 0, 0, 1] } });
+    });
+
+    it('sendDynamicUpdate snapshots typed arrays and posts UPDATE_DYNAMIC', () => {
+      const { mgr, worker } = makeMgr();
+
+      mgr.sendDynamicUpdate(new Int8Array([1]), new Int8Array([0]), new Float32Array([2]), 42);
+
+      const msg = lastMsg(worker);
+
+      expect(msg.typ).toBe(ColorWorkerMsgType.UPDATE_DYNAMIC);
+      expect(msg.dotsOnScreen).toBe(42);
+    });
+
+    it('sendDynamicUpdate tolerates null buffers', () => {
+      const { mgr, worker } = makeMgr();
+
+      expect(() => mgr.sendDynamicUpdate(null, null, null)).not.toThrow();
+      expect(lastMsg(worker).typ).toBe(ColorWorkerMsgType.UPDATE_DYNAMIC);
+    });
+  });
+
+  describe('onMessage / consumeColorData', () => {
+    it('returns null from consumeColorData before any buffers arrive', () => {
+      const { mgr } = makeMgr();
+
+      expect(mgr.consumeColorData()).toBeNull();
+    });
+
+    it('marks ready on a "ready" message', () => {
+      const mgr = new ColorCruncherThreadManager([]);
+
+      (mgr as unknown as { onMessage: (e: MessageEvent) => void }).onMessage({ data: 'ready' } as MessageEvent);
+
+      expect(mgr.isReady).toBe(true);
+    });
+
+    it('stores incoming color buffers, emits a ready event, then consumes once', () => {
+      const { mgr } = makeMgr();
+      const emitSpy = vi.spyOn(EventBus.getInstance(), 'emit').mockImplementation(() => undefined);
+      const colorData = new Float32Array([1, 2, 3, 4]);
+      const pickableData = new Int8Array([1]);
+
+      (mgr as unknown as { onMessage: (e: MessageEvent) => void }).onMessage({
+        data: { colorData, pickableData, seqNum: 0 },
+      } as MessageEvent);
+
+      expect(emitSpy).toHaveBeenCalledWith(EventBusEvent.onColorBufferReady);
+
+      const consumed = mgr.consumeColorData();
+
+      expect(consumed).toEqual({ colorData, pickableData });
+      expect(mgr.consumeColorData()).toBeNull();
+    });
+
+    it('discards stale buffers from an older catalog sequence', () => {
+      const { mgr, worker } = makeMgr();
+
+      mgr.sendCatalogData({} as never, 5); // currentSeqNum_ = 5
+      void worker;
+
+      (mgr as unknown as { onMessage: (e: MessageEvent) => void }).onMessage({
+        data: { colorData: new Float32Array([1]), pickableData: new Int8Array([1]), seqNum: 1 },
+      } as MessageEvent);
+
+      expect(mgr.consumeColorData()).toBeNull();
     });
   });
 });

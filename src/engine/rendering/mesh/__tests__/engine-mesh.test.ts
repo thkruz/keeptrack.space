@@ -3,7 +3,15 @@ import { MeshRegistry } from '@app/engine/rendering/mesh/mesh-registry';
 import { MeshRenderer } from '@app/engine/rendering/mesh/mesh-renderer';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { mat3, mat4 } from 'gl-matrix';
+import { OBJ } from 'webgl-obj-loader';
 import { vi } from 'vitest';
+
+// A real OBJ vertex layout so MeshRenderer.applyAttributePointers_ runs the genuine
+// attribute-binding path (it reads layout.attributeMap[key].{size,type,...}).
+const realLayout = () => new OBJ.Layout(
+  OBJ.Layout.POSITION, OBJ.Layout.NORMAL, OBJ.Layout.UV,
+  OBJ.Layout.AMBIENT, OBJ.Layout.DIFFUSE, OBJ.Layout.SPECULAR, OBJ.Layout.SPECULAR_EXPONENT,
+);
 
 describe('MeshRegistry', () => {
   let registry: MeshRegistry;
@@ -74,7 +82,7 @@ describe('MeshRenderer', () => {
       inSun: 1,
       model: {
         mesh: {},
-        layout: { attributeMap: {} },
+        layout: realLayout(),
         buffers: { vertexBuffer: {}, indexBuffer: {}, indexCount: 3, useUint32Indices: false },
       },
     },
@@ -120,11 +128,25 @@ describe('MeshRenderer', () => {
     const renderer = new MeshRenderer(mm as never, gl());
     const drawSpy = vi.spyOn(gl(), 'drawElements');
 
+    const attribSpy = vi.spyOn(gl(), 'vertexAttribPointer');
+
     renderer.draw(mat4.create(), mat4.create());
 
-    // GL enum constants are undefined in the mock; assert the index count arg.
-    expect(drawSpy).toHaveBeenCalled();
-    expect(drawSpy.mock.calls[0][1]).toBe(3);
+    expect(drawSpy).toHaveBeenCalledWith(gl().TRIANGLES, 3, gl().UNSIGNED_SHORT, 0);
+    // The attribute-binding path actually runs now (real GLint locations + real layout).
+    expect(attribSpy).toHaveBeenCalled();
+    expect(attribSpy.mock.calls[0][2]).toBe(gl().FLOAT);
+  });
+
+  it('warns and skips binding when an attribute location is not found (-1)', () => {
+    const renderer = new MeshRenderer(fakeMeshManager() as never, gl());
+    const attribSpy = vi.spyOn(gl(), 'vertexAttribPointer');
+
+    vi.spyOn(gl(), 'getAttribLocation').mockReturnValue(-1);
+
+    renderer.draw(mat4.create(), mat4.create());
+
+    expect(attribSpy).not.toHaveBeenCalled();
   });
 
   it('uses the 32-bit index path when the model requests them', () => {
@@ -137,7 +159,7 @@ describe('MeshRenderer', () => {
 
     renderer.draw(mat4.create(), mat4.create());
 
-    expect(drawSpy.mock.calls[0][1]).toBe(70_000);
+    expect(drawSpy).toHaveBeenCalledWith(gl().TRIANGLES, 70_000, gl().UNSIGNED_INT, 0);
   });
 
   it('skips drawing when UI is disabled, the manager is not ready, or buffers are missing', () => {

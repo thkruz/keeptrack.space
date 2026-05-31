@@ -293,7 +293,48 @@ import('./environment/standard-env').then((module) => {
 });
 
 global.mocks = {};
+
+/*
+ * Real WebGL returns a GLint location (>= 0 when the attribute/uniform is live,
+ * -1 / null when it is not) — NOT undefined. Returning undefined would make code
+ * that branches on the location (e.g. `loc !== -1`, `typeof loc !== 'undefined'`)
+ * take a path that cannot occur in production. Hand back deterministic, distinct,
+ * non-negative locations per attribute name and opaque objects per uniform name so
+ * the production attribute/uniform-binding paths actually execute. Tests that need
+ * the "not found" branch override getAttribLocation per-test to return -1.
+ */
+const glAttribLocations_ = new Map();
+const glUniformLocations_ = new Map();
+
+// Accurate WebGL2 (OpenGL ES 3.0) enum constants for the values the codebase uses.
+// Hardcoded from the spec — jsdom has no WebGL2RenderingContext to read them from.
+const glConstants = {
+  POINTS: 0x0000, LINES: 0x0001, LINE_STRIP: 0x0003, TRIANGLES: 0x0004,
+  ZERO: 0, ONE: 1, SRC_ALPHA: 0x0302, ONE_MINUS_SRC_COLOR: 0x0301, ONE_MINUS_SRC_ALPHA: 0x0303,
+  DEPTH_BUFFER_BIT: 0x0100, COLOR_BUFFER_BIT: 0x4000,
+  LEQUAL: 0x0203, BLEND: 0x0BE2, DEPTH_TEST: 0x0B71, SCISSOR_TEST: 0x0C11, POLYGON_OFFSET_FILL: 0x8037,
+  BYTE: 0x1400, UNSIGNED_BYTE: 0x1401, SHORT: 0x1402, UNSIGNED_SHORT: 0x1403,
+  INT: 0x1404, UNSIGNED_INT: 0x1405, FLOAT: 0x1406,
+  RGBA: 0x1908, DEPTH_COMPONENT16: 0x81A5, DEPTH_COMPONENT32F: 0x8CAC,
+  ARRAY_BUFFER: 0x8892, ELEMENT_ARRAY_BUFFER: 0x8893, PIXEL_PACK_BUFFER: 0x88EB,
+  STREAM_READ: 0x88E1, STATIC_DRAW: 0x88E4, DYNAMIC_DRAW: 0x88E8, BUFFER_SIZE: 0x8764,
+  FRAGMENT_SHADER: 0x8B30, VERTEX_SHADER: 0x8B31, COMPILE_STATUS: 0x8B81, LINK_STATUS: 0x8B82,
+  TEXTURE_2D: 0x0DE1, TEXTURE_BINDING_2D: 0x8069,
+  TEXTURE0: 0x84C0, TEXTURE1: 0x84C1, TEXTURE2: 0x84C2, TEXTURE3: 0x84C3, TEXTURE4: 0x84C4, TEXTURE5: 0x84C5,
+  TEXTURE_MAG_FILTER: 0x2800, TEXTURE_MIN_FILTER: 0x2801, TEXTURE_WRAP_S: 0x2802, TEXTURE_WRAP_T: 0x2803,
+  TEXTURE_MAX_LEVEL: 0x813D, NEAREST: 0x2600, LINEAR: 0x2601, LINEAR_MIPMAP_LINEAR: 0x2703,
+  CLAMP_TO_EDGE: 0x812F, REPEAT: 0x2901,
+  FRAMEBUFFER: 0x8D40, RENDERBUFFER: 0x8D41, COLOR_ATTACHMENT0: 0x8CE0, DEPTH_ATTACHMENT: 0x8D00,
+  FRAMEBUFFER_COMPLETE: 0x8CD5,
+  UNPACK_ALIGNMENT: 0x0CF5, UNPACK_FLIP_Y_WEBGL: 0x9240, UNPACK_PREMULTIPLY_ALPHA_WEBGL: 0x9241,
+  MAX_TEXTURE_SIZE: 0x0D33, VERSION: 0x1F02,
+  NO_ERROR: 0, INVALID_ENUM: 0x0500, INVALID_VALUE: 0x0501, INVALID_OPERATION: 0x0502,
+  INVALID_FRAMEBUFFER_OPERATION: 0x0506, OUT_OF_MEMORY: 0x0505, CONTEXT_LOST_WEBGL: 0x9242,
+  SYNC_GPU_COMMANDS_COMPLETE: 0x9117, TIMEOUT_EXPIRED: 0x911B, WAIT_FAILED: 0x911D,
+};
+
 global.mocks.glMock = {
+  ...glConstants,
   activeTexture: vi.fn(),
   attachShader: vi.fn(),
   bindBuffer: vi.fn(),
@@ -330,12 +371,24 @@ global.mocks.glMock = {
   framebufferRenderbuffer: vi.fn(),
   framebufferTexture2D: vi.fn(),
   generateMipmap: vi.fn(),
-  getAttribLocation: vi.fn(),
+  getAttribLocation: (_program, name) => {
+    if (!glAttribLocations_.has(name)) {
+      glAttribLocations_.set(name, glAttribLocations_.size);
+    }
+
+    return glAttribLocations_.get(name);
+  },
   getExtension: vi.fn(),
   getProgramInfoLog: vi.fn(),
   getProgramParameter: () => true,
   getShaderParameter: () => true,
-  getUniformLocation: () => true,
+  getUniformLocation: (_program, name) => {
+    if (!glUniformLocations_.has(name)) {
+      glUniformLocations_.set(name, { name });
+    }
+
+    return glUniformLocations_.get(name);
+  },
   isContextLost: vi.fn(() => false),
   linkProgram: vi.fn(),
   readPixels: vi.fn(),

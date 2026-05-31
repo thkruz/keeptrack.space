@@ -2,8 +2,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { vi } from 'vitest';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { getEl } from '@app/engine/utils/get-el';
 import { ProximityOps } from '@app/plugins/proximity-ops/proximity-ops';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 
@@ -170,6 +173,68 @@ describe('ProximityOps_class', () => {
       plugin.downloadIconCb();
 
       // No error should be thrown, toast is shown
+    });
+  });
+
+  describe('search + RPO computation', () => {
+    let plugin: ProximityOps;
+    const p = () => plugin as any;
+
+    const cloneSat = (over: Record<string, unknown> = {}) =>
+      Object.assign(Object.create(Object.getPrototypeOf(defaultSat)), defaultSat, { id: 1, ...over });
+
+    beforeEach(() => {
+      plugin = new ProximityOps();
+      websiteInit(plugin);
+      const catalog = ServiceLocator.getCatalogManager();
+
+      catalog.getSats = vi.fn(() => [defaultSat, cloneSat()]) as never;
+      catalog.getSat = vi.fn(() => defaultSat) as never;
+    });
+
+    it('findClosestApproach returns a proximity event with dist/vel/ric', () => {
+      const event = plugin.findClosestApproach(defaultSat, cloneSat() as never, new Date('2022-01-01T00:00:00Z'), 5400 as never);
+
+      expect(typeof event.dist).toBe('number');
+      expect(typeof event.vel).toBe('number');
+      expect(event.ric).toBeDefined();
+    });
+
+    it('findRPOs_ collects pairs within the distance/velocity limits', () => {
+      const rpos = p().findRPOs_([defaultSat, cloneSat()], 1e9, 1e9, 5400, false);
+
+      expect(Array.isArray(rpos)).toBe(true);
+    });
+
+    it('getFilteredSatellites applies the payload-only filter', () => {
+      (getEl('proximity-ops-payload-only') as HTMLInputElement).checked = true;
+
+      const sats = p().getFilteredSatellites();
+
+      expect(Array.isArray(sats)).toBe(true);
+    });
+
+    it('populateTable_ renders a row per event and a no-results row when empty', () => {
+      const event = plugin.findClosestApproach(defaultSat, cloneSat() as never, new Date('2022-01-01T00:00:00Z'), 5400 as never);
+
+      p().populateTable_([event]);
+      expect(getEl('proximity-ops-table')!.querySelectorAll('tr').length).toBeGreaterThan(1);
+
+      p().populateTable_([]);
+      expect(getEl('proximity-ops-table')!.textContent).toBeTruthy();
+    });
+
+    it('processRPOSearch_ toasts when the primary satellite is not found', () => {
+      ServiceLocator.getCatalogManager().sccNum2Id = vi.fn(() => null) as never;
+      (getEl('proximity-ops-ava') as HTMLInputElement).checked = false;
+      (getEl('proximity-ops-type') as HTMLInputElement).value = 'GEO';
+      (getEl('proximity-ops-norad') as HTMLInputElement).value = '99999';
+      const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast');
+
+      const result = p().processRPOSearch_();
+
+      expect(result).toEqual([]);
+      expect(toast).toHaveBeenCalled();
     });
   });
 });

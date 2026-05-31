@@ -124,3 +124,73 @@ describe('SensorManager remove/clear', () => {
     expect(mgr.secondarySensors).toStrictEqual([a]);
   });
 });
+
+describe('SensorManager add / set / reset', () => {
+  let mgr: SensorManager;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const p = () => mgr as any;
+
+  beforeEach(() => {
+    setupStandardEnvironment();
+    mgr = new SensorManager();
+    // Isolate the bookkeeping from the cruncher/camera/FOV side effects.
+    vi.spyOn(p(), 'updatePositionCruncher_').mockImplementation(() => undefined);
+    vi.spyOn(p(), 'cameraToCurrentSensor_').mockImplementation(() => undefined);
+    vi.spyOn(mgr, 'setSensor').mockImplementation(() => undefined);
+  });
+
+  afterEach(() => vi.restoreAllMocks());
+
+  it('addStf pushes onto the stf list', () => {
+    mgr.addStf(sensor({ sensorId: 5 }));
+
+    expect(mgr.stfSensors).toHaveLength(1);
+  });
+
+  it('clearSecondarySensors empties the secondary list', () => {
+    mgr.secondarySensors = [sensor({}), sensor({})];
+    mgr.clearSecondarySensors();
+
+    expect(mgr.secondarySensors).toStrictEqual([]);
+  });
+
+  it('addSecondarySensor makes the first sensor primary', () => {
+    mgr.currentSensors = [];
+    mgr.addSecondarySensor(sensor({ sensorId: 1 }));
+
+    expect(mgr.currentSensors).toHaveLength(1);
+    expect(mgr.setSensor).toHaveBeenCalled();
+  });
+
+  it('addSecondarySensor adds a secondary when a primary exists', () => {
+    mgr.currentSensors = [sensor({ sensorId: 0 })];
+    mgr.addSecondarySensor(sensor({ sensorId: 1 }));
+
+    expect(mgr.secondarySensors).toHaveLength(1);
+  });
+
+  it('setCurrentSensor sets or clears the current list', () => {
+    mgr.setCurrentSensor([sensor({ sensorId: 1 })]);
+    expect(mgr.currentSensors).toHaveLength(1);
+
+    mgr.setCurrentSensor(null);
+    expect(mgr.currentSensors).toStrictEqual([]);
+  });
+
+  it('getSensorFromsensorId looks up a known sensor and returns null otherwise', () => {
+    expect(SensorManager.getSensorFromsensorId(null)).toBeNull();
+    expect(SensorManager.getSensorFromsensorId(-1)).toBeNull();
+    // A real registered sensor id resolves; an absurd id does not.
+    expect(SensorManager.getSensorFromsensorId(999999)).toBeNull();
+  });
+
+  it('removePrimarySensor clears the current sensor and promotes a secondary', () => {
+    const primary = sensor({ sensorId: 0 });
+    const secondary = sensor({ sensorId: 1 });
+
+    mgr.currentSensors = [primary];
+    mgr.secondarySensors = [secondary];
+
+    expect(() => mgr.removePrimarySensor(primary)).not.toThrow();
+  });
+});

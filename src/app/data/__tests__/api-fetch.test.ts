@@ -84,7 +84,7 @@ describe('apiFetch', () => {
 
   describe('401 warning toast', () => {
     beforeEach(() => {
-      vi.spyOn(errorManagerInstance, 'warnToast').mockImplementation(() => {});
+      vi.spyOn(errorManagerInstance, 'warnToast').mockImplementation(() => { /* noop */ });
     });
 
     it('should show warnToast on first 401 from api.keeptrack.space', async () => {

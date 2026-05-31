@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc, max-lines-per-function */
 /**
  * Color Worker Parity Tests
  *

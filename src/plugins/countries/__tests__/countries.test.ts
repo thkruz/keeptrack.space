@@ -292,9 +292,7 @@ describe('CountriesMenu behavior', () => {
   });
 
   it('builds command-palette commands grouped by country and invokes one', () => {
-    vi.spyOn(ServiceLocator.getCatalogManager(), 'getSats').mockReturnValue([
-      { country: 'US' }, { country: 'US' }, { country: 'CA' }, { country: 'ANALSAT' }, { country: '' },
-    ] as never);
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'getSats').mockReturnValue([{ country: 'US' }, { country: 'US' }, { country: 'CA' }, { country: 'ANALSAT' }, { country: '' }] as never);
     // Two distinct display names so the alphabetical sort comparator actually runs.
     vi.spyOn(StringExtractor, 'extractCountry').mockImplementation((code: string) => (code === 'CA' ? 'Canada' : 'United States'));
 

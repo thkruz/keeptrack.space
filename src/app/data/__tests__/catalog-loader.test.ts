@@ -1,8 +1,7 @@
 import { vi } from 'vitest';
-import { CatalogLoader } from '@app/app/data/catalog-loader';
+import { AsciiTleSat, CatalogLoader } from '@app/app/data/catalog-loader';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { AsciiTleSat } from '@app/app/data/catalog-loader';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { Satellite } from '@app/engine/ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -74,12 +73,14 @@ describe('Catalog Loader', () => {
       MEAN_MOTION_DOT: 0,
       MEAN_MOTION_DDOT: 0,
     });
-    const externalCatalog: AsciiTleSat[] = [{
+    const externalCatalog: AsciiTleSat[] = [
+{
       SCC: sat.sccNum,
       ON: 'STARLINK-37402',
       TLE1: sat.tle1,
       TLE2: sat.tle2,
-    }];
+    },
+];
 
     await CatalogLoader.parse({
       keepTrackTle: [],

@@ -38,6 +38,7 @@ describe('getClass', () => {
   beforeEach(() => {
     // Initialize containerRoot for each test
     const keepTrack = KeepTrack.getInstance();
+
     keepTrack.containerRoot = document.createElement('div');
     document.body.appendChild(keepTrack.containerRoot);
   });
@@ -45,6 +46,7 @@ describe('getClass', () => {
   afterEach(() => {
     // Clean up after each test
     const keepTrack = KeepTrack.getInstance();
+
     if (keepTrack.containerRoot && keepTrack.containerRoot.parentNode) {
       keepTrack.containerRoot.parentNode.removeChild(keepTrack.containerRoot);
     }

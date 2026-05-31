@@ -174,9 +174,7 @@ describe('Plugin Capabilities Type Guards', () => {
   describe('hasKeyboardShortcuts', () => {
     it('should return true for objects implementing IKeyboardShortcutCapable', () => {
       const plugin: IKeyboardShortcutCapable = {
-        getKeyboardShortcuts: (): IKeyboardShortcut[] => [
-          { key: 'N', callback: vi.fn() },
-        ],
+        getKeyboardShortcuts: (): IKeyboardShortcut[] => [{ key: 'N', callback: vi.fn() }],
       };
 
       expect(hasKeyboardShortcuts(plugin)).toBe(true);

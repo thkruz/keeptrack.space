@@ -765,9 +765,7 @@ describe('ColorSchemeManager Block 2', () => {
       return fake;
     };
 
-    const filterMethods: (keyof ColorSchemeManager)[] = [
-      'isvLeoSatOff', 'isLeoSatOff', 'isMeoSatOff', 'isHeoSatOff', 'isGeoSatOff', 'isXGeoSatOff',
-    ];
+    const filterMethods: (keyof ColorSchemeManager)[] = ['isvLeoSatOff', 'isLeoSatOff', 'isMeoSatOff', 'isHeoSatOff', 'isGeoSatOff', 'isXGeoSatOff'];
 
     filterMethods.forEach((method) => {
       it(`${method} returns false for an OemSatellite (instead of silently failing the filter)`, () => {

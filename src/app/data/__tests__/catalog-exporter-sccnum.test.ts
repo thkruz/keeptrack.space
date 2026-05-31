@@ -43,9 +43,9 @@ describe('CatalogExporter sccNum behavior across forms', () => {
   describe('exportTle2Csv preserves canonical sccNum across all forms', () => {
     it('writes Satellite.sccNum (always numeric) into the satId column', () => {
       const sats: BaseObject[] = [
-        buildSat(0, '25544'),                  // legacy 5-digit numeric
-        buildSat(1, 'T0001'),                  // alpha-5 — Satellite normalizes to 270001
-        buildSat(2, '99999', '799500766'),     // extended ID via explicit override
+        buildSat(0, '25544'), // legacy 5-digit numeric
+        buildSat(1, 'T0001'), // alpha-5 — Satellite normalizes to 270001
+        buildSat(2, '99999', '799500766'), // extended ID via explicit override
       ];
 
       CatalogExporter.exportTle2Csv(sats);
@@ -77,11 +77,11 @@ describe('CatalogExporter sccNum behavior across forms', () => {
   describe('exportTle2Csv sort order across mixed-width sccNums', () => {
     it('sorts numerically across 5-digit, alpha-5 numeric form, and 9-digit', () => {
       const sats: BaseObject[] = [
-        buildSat(0, '99999'),                  // 99999
-        buildSat(1, '25544'),                  // 25544
-        buildSat(2, '00005'),                  // "5" after leading-zero strip
-        buildSat(3, 'T0001'),                  // alpha-5 → 270001 numeric
-        buildSat(4, '99999', '799500766'),     // extended 9-digit
+        buildSat(0, '99999'), // 99999
+        buildSat(1, '25544'), // 25544
+        buildSat(2, '00005'), // "5" after leading-zero strip
+        buildSat(3, 'T0001'), // alpha-5 → 270001 numeric
+        buildSat(4, '99999', '799500766'), // extended 9-digit
       ];
 
       CatalogExporter.exportTle2Csv(sats);

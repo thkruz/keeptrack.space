@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { vi } from 'vitest';
 /**
  * @jest-environment jsdom

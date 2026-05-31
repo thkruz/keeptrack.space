@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { vi } from 'vitest';
 import { readFileSync } from 'fs';
 import { CatalogLoader, AsciiTleSat } from '@app/app/data/catalog-loader';

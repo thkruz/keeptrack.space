@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { GlUtils } from '@app/engine/rendering/gl-utils';
 import { resetTextureLoadRegistry, getTextureStatuses } from '@app/engine/rendering/texture-load-registry';

@@ -46,7 +46,7 @@ describe('code_snippet', () => {
   beforeAll(() => {
     orbitManagerInstance = ServiceLocator.getOrbitManager();
     catalogManagerInstance = ServiceLocator.getCatalogManager();
-    void catalogManagerInstance; // Variable is used indirectly by test utilities
+    expect(catalogManagerInstance).toBeDefined(); // Variable is used indirectly by test utilities
     orbitManagerInstance.setHoverOrbit = vi.fn();
 
     // orbitManagerInstance.setHoverOrbit = vi.fn();

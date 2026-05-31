@@ -245,6 +245,7 @@ describe('SatellitePhotos behavior', () => {
   it('initDISCOVR_ runs on keepTrackReady and adds image links when the API responds', async () => {
     global.fetch = vi.fn(() => Promise.resolve({
       ok: true,
+      // eslint-disable-next-line camelcase
       json: () => Promise.resolve([{ image: 'img', identifier: '20220101', centroid_coordinates: { lat: 0, lon: 0 } }]),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     })) as any;

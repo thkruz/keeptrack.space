@@ -450,9 +450,15 @@ describe('OemSatellite ephemeris math', () => {
   });
 
   it('stateVectorIdx and dataBlockIdx setters refresh the orbit cache', () => {
-    expect(() => { sat.stateVectorIdx = 1; }).not.toThrow();
-    expect(() => { sat.stateVectorIdx = 1; }).not.toThrow();
-    expect(() => { sat.dataBlockIdx = 0; }).not.toThrow();
+    expect(() => {
+ sat.stateVectorIdx = 1;
+}).not.toThrow();
+    expect(() => {
+ sat.stateVectorIdx = 1;
+}).not.toThrow();
+    expect(() => {
+ sat.dataBlockIdx = 0;
+}).not.toThrow();
     expect(sat.stateVectorIdx).toBe(1);
     expect(sat.dataBlockIdx).toBe(0);
   });

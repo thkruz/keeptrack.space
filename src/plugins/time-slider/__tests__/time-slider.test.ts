@@ -115,10 +115,10 @@ describe('TimeSlider behavior', () => {
     const onSpy = vi.spyOn(EventBus.getInstance(), 'on');
 
     plugin.addJs();
-    const handlers = onSpy.mock.calls.filter(([evt]) => evt === EventBusEvent.uiManagerFinal
-      || evt === EventBusEvent.selectedDateChange
-      || evt === EventBusEvent.staticOffsetChange
-      || evt === EventBusEvent.scenarioBoundsChanged).map((c) => c[1] as () => void);
+    const handlers = onSpy.mock.calls.filter(([evt]) => evt === EventBusEvent.uiManagerFinal ||
+      evt === EventBusEvent.selectedDateChange ||
+      evt === EventBusEvent.staticOffsetChange ||
+      evt === EventBusEvent.scenarioBoundsChanged).map((c) => c[1] as () => void);
 
     expect(() => handlers.forEach((h) => h())).not.toThrow();
 

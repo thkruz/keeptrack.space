@@ -25,7 +25,7 @@ describe('KeyboardShortcutRegistry', () => {
     });
 
     it('should reject a shortcut that conflicts with an existing registration', () => {
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
       const cb = vi.fn();
 
       KeyboardShortcutRegistry.register('PluginA', [{ key: 'F', callback: cb }]);
@@ -52,7 +52,7 @@ describe('KeyboardShortcutRegistry', () => {
     });
 
     it('should conflict when undefined modifier matches false (both mean not required)', () => {
-      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
       const cb = vi.fn();
 
       KeyboardShortcutRegistry.register('PluginA', [{ key: 'F', callback: cb }]);
@@ -73,7 +73,7 @@ describe('KeyboardShortcutRegistry', () => {
     });
 
     it('should accept a partial list when some shortcuts conflict', () => {
-      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
       const cb = vi.fn();
 
       KeyboardShortcutRegistry.register('PluginA', [{ key: 'F', callback: cb }]);
@@ -89,7 +89,7 @@ describe('KeyboardShortcutRegistry', () => {
     });
 
     it('should detect conflict via code field', () => {
-      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
       const cb = vi.fn();
 
       KeyboardShortcutRegistry.register('PluginA', [{ key: 'F', code: 'KeyF', callback: cb }]);
@@ -124,7 +124,7 @@ describe('KeyboardShortcutRegistry', () => {
 
   describe('clear', () => {
     it('should reset all state', () => {
-      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
       const cb = vi.fn();
 
       KeyboardShortcutRegistry.register('PluginA', [{ key: 'F', callback: cb }]);
@@ -148,7 +148,7 @@ describe('KeyboardShortcutRegistry', () => {
   describe('shortcutsConflict', () => {
     const make = (overrides: Partial<IKeyboardShortcut> = {}): IKeyboardShortcut => ({
       key: 'F',
-      callback: () => {},
+      callback: () => { /* noop */ },
       ...overrides,
     });
 
@@ -193,13 +193,13 @@ describe('KeyboardShortcutRegistry', () => {
 
   describe('formatShortcut', () => {
     it('should format a simple key without modifiers', () => {
-      const result = KeyboardShortcutRegistry.formatShortcut({ key: 'N', callback: () => {} });
+      const result = KeyboardShortcutRegistry.formatShortcut({ key: 'N', callback: () => { /* noop */ } });
 
       expect(result).toBe('N');
     });
 
     it('should include required modifiers', () => {
-      const result = KeyboardShortcutRegistry.formatShortcut({ key: 'F', ctrl: true, shift: true, callback: () => {} });
+      const result = KeyboardShortcutRegistry.formatShortcut({ key: 'F', ctrl: true, shift: true, callback: () => { /* noop */ } });
 
       expect(result).toBe('Ctrl+Shift+F');
     });
@@ -215,7 +215,7 @@ describe('KeyboardShortcutRegistry', () => {
 
   describe('getConflicts', () => {
     it('should record both sides of the conflict', () => {
-      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
       const cb = vi.fn();
 
       KeyboardShortcutRegistry.register('Winner', [{ key: 'X', callback: cb }]);
@@ -240,7 +240,7 @@ describe('KeyboardShortcutRegistry', () => {
    */
   describe('real-world shortcut audit', () => {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    const noop = () => {};
+    const noop = () => { /* noop */ };
 
     // Shortcuts extracted from each plugin's getKeyboardShortcuts(), in approximate load order.
     // Modifiers omitted = undefined (don't care) — matches the real definitions.
@@ -278,7 +278,7 @@ describe('KeyboardShortcutRegistry', () => {
     ];
 
     it('should have no conflicts across all plugin shortcuts', () => {
-      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
 
       for (const { pluginId, shortcuts } of pluginShortcuts) {
         KeyboardShortcutRegistry.register(

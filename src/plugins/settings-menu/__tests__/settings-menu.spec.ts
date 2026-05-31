@@ -48,10 +48,10 @@ test.describe('SettingsMenuPlugin', () => {
     // Reset to defaults deterministically clears demo mode and trailing orbits.
     await page.locator('#settings-reset').click();
     await expect
-      .poll(async () => page.evaluate(() => (window as unknown as { settingsManager?: { isDemoModeOn?: boolean } }).settingsManager?.isDemoModeOn), { timeout: 5_000 })
+      .poll(() => page.evaluate(() => (window as unknown as { settingsManager?: { isDemoModeOn?: boolean } }).settingsManager?.isDemoModeOn), { timeout: 5_000 })
       .toBe(false);
     await expect
-      .poll(async () => page.evaluate(() => (window as unknown as { settingsManager?: { isDrawTrailingOrbits?: boolean } }).settingsManager?.isDrawTrailingOrbits))
+      .poll(() => page.evaluate(() => (window as unknown as { settingsManager?: { isDrawTrailingOrbits?: boolean } }).settingsManager?.isDrawTrailingOrbits))
       .toBe(false);
 
     // Close

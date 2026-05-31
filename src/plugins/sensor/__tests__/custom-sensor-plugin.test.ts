@@ -13,7 +13,7 @@ describe('CustomSensorPlugin_class', () => {
   beforeEach(() => {
     setupStandardEnvironment([TopMenu, DateTimeManager, SensorInfoPlugin, SensorListPlugin]);
     customSensorPlugin = new CustomSensorPlugin();
-    void customSensorPlugin; // Variable is used indirectly by plugin suite tests
+    expect(customSensorPlugin).toBeDefined(); // Variable is used indirectly by plugin suite tests
   });
 
   afterEach(() => {

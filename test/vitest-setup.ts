@@ -346,6 +346,9 @@ global.mocks.glMock = {
   bufferData: vi.fn(),
   bufferSubData: vi.fn(),
   canvas: { height: 1080, width: 1920 },
+  // Real WebGL contexts expose the backing drawing-buffer size; mirror the canvas dims.
+  drawingBufferWidth: 1920,
+  drawingBufferHeight: 1080,
   clear: vi.fn(),
   clearColor: vi.fn(),
   compileShader: vi.fn(),

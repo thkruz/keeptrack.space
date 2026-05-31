@@ -1,138 +1,168 @@
-import { DetailedSatellite, DetailedSensor } from '@ootk/src/main';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { CruncherType } from '../cruncher-type';
+import { PosCruncherMsgType } from '@app/webworker/position-cruncher-messages';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SatCruncherThreadManager } from '../sat-cruncher-thread-manager';
 
-class FakeWorker {
-  postMessage = vi.fn();
-  terminate = vi.fn();
-  onmessage: ((e: MessageEvent) => void) | null = null;
-}
+/** A Worker stub whose postMessage/terminate are spies, passed to init() as workerStub. */
+const makeWorkerStub = () => ({
+  postMessage: vi.fn(),
+  terminate: vi.fn(),
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+} as unknown as Worker & { postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> });
 
-const withFakeWorker = (mgr: SatCruncherThreadManager): FakeWorker => {
-  const fake = new FakeWorker();
+const makeMgr = () => {
+  const worker = makeWorkerStub();
+  const mgr = new SatCruncherThreadManager([]);
 
-  vi.spyOn(mgr as unknown as { createWorker_: () => Worker }, 'createWorker_').mockReturnValue(fake as unknown as Worker);
-  mgr.init();
+  mgr.init(worker);
 
-  return fake;
+  return { mgr, worker };
 };
 
+const lastMsg = (worker: { postMessage: ReturnType<typeof vi.fn> }): Record<string, unknown> =>
+  worker.postMessage.mock.calls.at(-1)![0] as Record<string, unknown>;
+
 describe('SatCruncherThreadManager', () => {
-  let mgr: SatCruncherThreadManager;
-
-  beforeEach(() => {
-    mgr = new SatCruncherThreadManager();
-  });
-
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
   describe('lifecycle', () => {
-    it('creates a worker on init', () => {
-      const fake = withFakeWorker(mgr);
+    it('uses the provided worker stub', () => {
+      const { mgr, worker } = makeMgr();
 
-      expect(mgr.getWorker()).toBe(fake);
-    });
-
-    it('warns and leaves the worker null when construction throws', () => {
-      vi.spyOn(mgr as unknown as { createWorker_: () => Worker }, 'createWorker_').mockImplementation(() => {
-        throw new Error('boom');
-      });
-
-      expect(() => mgr.init()).not.toThrow();
-      expect(mgr.getWorker()).toBeNull();
+      expect(mgr.worker).toBe(worker);
     });
 
     it('terminates and clears the worker', () => {
-      const fake = withFakeWorker(mgr);
+      const { mgr, worker } = makeMgr();
 
       mgr.terminate();
 
-      expect(fake.terminate).toHaveBeenCalled();
-      expect(mgr.getWorker()).toBeNull();
+      expect(worker.terminate).toHaveBeenCalled();
+      expect(mgr.worker).toBeNull();
+    });
+
+    it('send helpers are silent no-ops before a worker exists', () => {
+      const mgr = new SatCruncherThreadManager([]);
+
+      expect(() => {
+        mgr.sendSunlightViewToggle(true);
+        mgr.sendSatelliteSelected([1]);
+      }).not.toThrow();
     });
   });
 
-  describe('postMessage / onMessage', () => {
-    it('forwards a payload to the worker', () => {
-      const fake = withFakeWorker(mgr);
+  describe('send helpers', () => {
+    it('sendCatalogData posts OBJ_DATA and increments the sequence number', () => {
+      const { mgr, worker } = makeMgr();
 
-      mgr.postMessage({ a: 1 });
+      mgr.sendCatalogData('catalog-text', 50, true);
 
-      expect(fake.postMessage).toHaveBeenCalledWith({ a: 1 });
+      expect(lastMsg(worker)).toEqual({
+        typ: PosCruncherMsgType.OBJ_DATA,
+        dat: 'catalog-text',
+        fieldOfViewSetLength: 50,
+        isLowPerf: true,
+        seqNum: 1,
+      });
+
+      mgr.sendCatalogData('again', 60);
+      expect(lastMsg(worker).seqNum).toBe(2);
     });
 
-    it('guards postMessage and onMessage when there is no worker', () => {
-      expect(() => mgr.postMessage({ a: 1 })).not.toThrow();
-      expect(() => mgr.onMessage(vi.fn())).not.toThrow();
-    });
+    it('sendTimeSync posts OFFSET with the time fields', () => {
+      const { mgr, worker } = makeMgr();
 
-    it('wires onMessage to the worker', () => {
-      const fake = withFakeWorker(mgr);
-      const cb = vi.fn();
+      mgr.sendTimeSync(1000, 42, 2);
 
-      mgr.onMessage(cb);
-
-      expect(fake.onmessage).toBe(cb);
-    });
-  });
-
-  describe('typed send helpers', () => {
-    it('sendSatEdit posts a SAT_EDIT message with the satellite fields', () => {
-      const fake = withFakeWorker(mgr);
-      const sat = { id: 7, active: true, tle1: 'TLE-1', tle2: 'TLE-2' } as unknown as DetailedSatellite;
-
-      mgr.sendSatEdit(sat);
-
-      expect(fake.postMessage).toHaveBeenCalledWith({
-        typ: CruncherType.SAT_EDIT,
-        id: 7,
-        active: true,
-        tle1: 'TLE-1',
-        tle2: 'TLE-2',
+      expect(lastMsg(worker)).toEqual({
+        typ: PosCruncherMsgType.OFFSET,
+        staticOffset: 1000,
+        dynamicOffsetEpoch: 42,
+        propRate: 2,
       });
     });
 
-    it('sendSensorUpdate posts a SENSOR message with the sensor', () => {
-      const fake = withFakeWorker(mgr);
-      const sensor = { objName: 'RADAR-1' } as unknown as DetailedSensor;
+    it('sendSatEdit posts SAT_EDIT with the satellite fields', () => {
+      const { mgr, worker } = makeMgr();
 
-      mgr.sendSensorUpdate(sensor);
+      mgr.sendSatEdit(7, 'TLE-1', 'TLE-2', true);
 
-      expect(fake.postMessage).toHaveBeenCalledWith({ typ: CruncherType.SENSOR, sensor });
+      expect(lastMsg(worker)).toEqual({
+        typ: PosCruncherMsgType.SAT_EDIT,
+        id: 7,
+        tle1: 'TLE-1',
+        tle2: 'TLE-2',
+        active: true,
+      });
     });
 
-    it('sendSensorUpdate accepts a null sensor', () => {
-      const fake = withFakeWorker(mgr);
+    it('sendNewMissile spreads the missile payload under NEW_MISSILE', () => {
+      const { mgr, worker } = makeMgr();
+      const data = {
+        id: 5,
+        active: true,
+        latList: [1, 2],
+        lonList: [3, 4],
+        altList: [5, 6],
+        startTime: 123,
+      } as never;
 
-      mgr.sendSensorUpdate(null);
+      mgr.sendNewMissile(data);
 
-      expect(fake.postMessage).toHaveBeenCalledWith({ typ: CruncherType.SENSOR, sensor: null });
+      expect(lastMsg(worker)).toMatchObject({ typ: PosCruncherMsgType.NEW_MISSILE, id: 5, startTime: 123 });
     });
 
-    it('sendTimeSync posts an OFFSET message spreading the date data', () => {
-      const fake = withFakeWorker(mgr);
+    it('sendSensorUpdate posts SENSOR with the sensor array', () => {
+      const { mgr, worker } = makeMgr();
+      const sensors = [{ objName: 'RADAR-1' }] as never;
 
-      mgr.sendTimeSync({ staticOffset: 1000, dynamicOffsetEpoch: 42, propRate: 1 } as never);
+      mgr.sendSensorUpdate(sensors);
 
-      expect(fake.postMessage).toHaveBeenCalledWith(expect.objectContaining({
-        typ: CruncherType.OFFSET,
-        staticOffset: 1000,
-        dynamicOffsetEpoch: 42,
-        propRate: 1,
-      }));
+      expect(lastMsg(worker)).toEqual({ typ: PosCruncherMsgType.SENSOR, sensor: sensors });
     });
 
-    it('send helpers are silent no-ops when there is no worker', () => {
-      const sat = { id: 1, active: true, tle1: 'a', tle2: 'b' } as unknown as DetailedSatellite;
+    it('sendSunlightViewToggle posts SUNLIGHT_VIEW with the flag', () => {
+      const { mgr, worker } = makeMgr();
 
-      expect(() => {
-        mgr.sendSatEdit(sat);
-        mgr.sendSensorUpdate(null);
-        mgr.sendTimeSync({ staticOffset: 0 } as never);
-      }).not.toThrow();
+      mgr.sendSunlightViewToggle(true);
+
+      expect(lastMsg(worker)).toEqual({ typ: PosCruncherMsgType.SUNLIGHT_VIEW, isSunlightView: true });
+    });
+
+    it('sendMarkerUpdate posts UPDATE_MARKERS', () => {
+      const { mgr, worker } = makeMgr();
+
+      mgr.sendMarkerUpdate(10);
+
+      expect(lastMsg(worker)).toMatchObject({ typ: PosCruncherMsgType.UPDATE_MARKERS, fieldOfViewSetLength: 10 });
+    });
+
+    it('sendSatelliteSelected posts SATELLITE_SELECTED with the ids', () => {
+      const { mgr, worker } = makeMgr();
+
+      mgr.sendSatelliteSelected([1, 2, 3]);
+
+      expect(lastMsg(worker)).toEqual({ typ: PosCruncherMsgType.SATELLITE_SELECTED, satelliteSelected: [1, 2, 3] });
+    });
+  });
+
+  describe('onMessage guards', () => {
+    it('returns early when there is no message data', () => {
+      const { mgr } = makeMgr();
+
+      expect(() => (mgr as unknown as { onMessage: (e: { data: unknown }) => void }).onMessage({ data: null })).not.toThrow();
+    });
+
+    it('discards stale messages from an older catalog sequence', () => {
+      const { mgr, worker } = makeMgr();
+
+      mgr.sendCatalogData('x', 1); // currentSeqNum_ = 1
+      void worker;
+
+      // A message with a lower seqNum must be ignored without touching DotsManager.
+      expect(() => (mgr as unknown as { onMessage: (e: { data: unknown }) => void }).onMessage({ data: { seqNum: 0 } })).not.toThrow();
     });
   });
 });

@@ -180,12 +180,16 @@ vi.mock('echarts', () => {
   const registerTheme = vi.fn();
   const registerLocale = vi.fn();
   const graphic = {};
+  // Top-level echarts.dispose(target) is a real module export, distinct from the
+  // chart instance's own .dispose(); production code calls echarts.dispose(this.chart).
+  const disposeInstance = vi.fn();
 
   return {
     __esModule: true,
-    default: { init, use, registerTheme, registerLocale, graphic },
+    default: { init, use, dispose: disposeInstance, registerTheme, registerLocale, graphic },
     init,
     use,
+    dispose: disposeInstance,
     registerTheme,
     registerLocale,
     graphic,

@@ -90,6 +90,20 @@ describe('RicPlot getPlotData / createPlot', () => {
     expect(tip).toContain('Radial: 1.00 km');
   });
 
+  it('disposes the previous chart before re-initializing', () => {
+    p().selectSatManager_.selectedSat = 0;
+    p().selectSatManager_.secondarySat = 1;
+    p().selectSatManager_.secondarySatObj = satS;
+    const chartDom = document.createElement('div');
+
+    plugin.createPlot(plugin.getPlotData(), chartDom);
+    const existing = plugin.chart;
+
+    plugin.createPlot(plugin.getPlotData(), chartDom);
+
+    expect(echarts.dispose).toHaveBeenCalledWith(existing);
+  });
+
   it('does nothing when the menu button is inactive', () => {
     p().isMenuButtonActive = false;
 

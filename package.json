@@ -114,7 +114,7 @@
     "cross-env": "^7.0.3",
     "css-loader": "^7.1.4",
     "dotenv-webpack": "^8.1.1",
-    "eslint": "^10.4.1",
+    "eslint": "^8.57.0",
     "happy-dom": "^20.5.0",
     "husky": "^8.0.1",
     "imports-loader": "^4.0.1",

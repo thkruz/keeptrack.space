@@ -925,7 +925,7 @@ export abstract class KeepTrackPlugin {
     return html`
       <div class="side-menu-title-bar">
         <div class="side-menu-title-left"></div>
-        <h5 class="side-menu-title-text">${this.sideMenuTitle}</h5>
+        <h5 class="side-menu-title-text">${this.sideMenuTitle ?? ''}</h5>
         <div class="side-menu-title-right">
           ${downloadIconHtml}
           ${settingsIconHtml}

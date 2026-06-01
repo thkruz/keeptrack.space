@@ -1,10 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('ColorMenu Plugin', () => {
   test('open side menu, verify color scheme list, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { ColorMenu: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#menu-color-scheme');
@@ -49,8 +50,9 @@ test.describe('ColorMenu Plugin', () => {
 
     await expect(firstItem).toHaveAttribute('data-color');
 
-    // Close via the side menu close button
-    await page.locator('#color-scheme-menu-close-btn').click();
+    // ── Behavior: apply a color scheme (exercises the per-item click handler) ──
+    // Selecting a scheme applies it and closes the side menu, deselecting the icon.
+    await firstItem.click();
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u, { timeout: 5_000 });
   });
 });

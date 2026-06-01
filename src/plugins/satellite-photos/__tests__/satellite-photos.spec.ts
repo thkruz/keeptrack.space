@@ -1,10 +1,11 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('SatellitePhotos', () => {
   test('open side menu, verify photo links, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { SatellitePhotos: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#menu-sat-photo');

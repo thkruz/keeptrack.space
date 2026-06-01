@@ -1,10 +1,11 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('CustomSensorPlugin', () => {
   test('open side menu, verify form elements, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { CustomSensorPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#custom-sensor-bottom-icon');

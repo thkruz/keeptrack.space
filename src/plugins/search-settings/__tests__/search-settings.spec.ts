@@ -1,10 +1,11 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('SearchSettingsPlugin', () => {
   test('open side menu, verify settings inputs, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { SearchSettingsPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#search-settings-bottom-icon');

@@ -24,6 +24,7 @@ import { UrlManager } from '@app/engine/input/url-manager';
 import { ColorSchemeColorMap } from '@app/engine/rendering/color-schemes/color-scheme';
 import { ObjectTypeColorSchemeColorMap } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
 import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
+import { LogLevel, errorManagerInstance } from '../engine/utils/errorManager';
 import { isThisNode } from '../engine/utils/isThisNode';
 import { PersistenceManager, StorageKey } from '../engine/utils/persistence-manager';
 import { CameraSettings, defaultCameraSettings } from './camera-settings';
@@ -72,6 +73,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   sizeOfSun: 'graphics',
   isUseSunTexture: 'graphics',
   isDrawNightAsDay: 'graphics',
+  isDisablePerformanceDowngrade: 'graphics',
   isDisableGodrays: 'graphics',
   godraysSamples: 'graphics',
   godraysDecay: 'graphics',
@@ -791,6 +793,17 @@ export class SettingsManager {
         this[key] = this.deepMerge({ ...currentValue }, overrideValue);
       } else {
         this[key] = overrideValue;
+      }
+    }
+
+    // Allow overrides to raise the error-manager minimum log level by name (e.g.
+    // 'WARN'). E2E runs set this so info/log boot toasts — which render in a
+    // full-width band over the side-menu close buttons on localhost — never appear.
+    if (typeof overrides.minLogLevel === 'string') {
+      const level = LogLevel[overrides.minLogLevel as keyof typeof LogLevel];
+
+      if (typeof level === 'number') {
+        errorManagerInstance.setLogLevel(level);
       }
     }
 

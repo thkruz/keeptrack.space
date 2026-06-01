@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('GraticuleToggle', () => {
@@ -20,7 +20,7 @@ test.describe('GraticuleToggle', () => {
     const initialState = await page.evaluate(() => (window as any).settingsManager?.isDrawGraticule);
 
     // Click to toggle on
-    await utilityIcon.click({ force: true });
+    await utilityIcon.dispatchEvent('click');
 
     // Verify setting toggled
     await expect(async () => {
@@ -33,7 +33,7 @@ test.describe('GraticuleToggle', () => {
     await expect(utilityIcon).toHaveClass(/bmenu-item-selected/u);
 
     // Click again to toggle off
-    await utilityIcon.click({ force: true });
+    await utilityIcon.dispatchEvent('click');
 
     // Verify setting returned to initial state
     await expect(async () => {

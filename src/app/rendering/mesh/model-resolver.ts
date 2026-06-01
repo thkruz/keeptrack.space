@@ -1,7 +1,7 @@
 import type { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import type { MeshModel } from '@app/engine/rendering/mesh-manager';
-import { BaseObject, Satellite, SpaceObjectType } from '@ootk/src/main';
+import { BaseObject, Satellite, SpaceObjectType, Tle } from '@ootk/src/main';
 
 export const SatelliteModels = {
   aehf: 'aehf',
@@ -130,17 +130,27 @@ export class ModelResolver {
         case SpaceObjectType.ROCKET_BODY:
           // TODO: Add more rocket body models
           return SatelliteModels.rocketbody;
-        case SpaceObjectType.DEBRIS:
-          // TODO: Add more debris models
-          if (parseInt(sat.sccNum) <= 20000) {
+        case SpaceObjectType.DEBRIS: {
+          // The numeric thresholds below only make sense for legacy 5-digit
+          // numeric sccNums. Alpha-5 / extended IDs would parseInt to NaN or
+          // huge values and always fall into the debris2 bucket — bypass that.
+          const kind = Tle.classifySatNum(sat.sccNum);
+
+          if (kind !== 'numeric5' && kind !== 'numeric6') {
             return SatelliteModels.debris0;
-          } else if (parseInt(sat.sccNum) <= 35000) {
-            return SatelliteModels.debris1;
-          } else if (parseInt(sat.sccNum) > 35000) {
-            return SatelliteModels.debris2;
           }
 
-          return SatelliteModels.debris0;
+          // TODO: Add more debris models
+          const nNum = parseInt(sat.sccNum);
+
+          if (nNum <= 20000) {
+            return SatelliteModels.debris0;
+          } else if (nNum <= 35000) {
+            return SatelliteModels.debris1;
+          }
+
+          return SatelliteModels.debris2;
+        }
         default:
         // Generic Model
       }

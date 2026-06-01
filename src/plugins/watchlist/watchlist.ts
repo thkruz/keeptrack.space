@@ -342,7 +342,8 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     if (savedSatList.length > 0) {
       // We need to convert it to an array of objects
-      newWatchlist = savedSatList.map((sccNum: string) => ({ id: catalogManagerInstance.sccNum2Id(parseInt(sccNum)) ?? -1, inView: false }));
+      // sccNum2Id accepts the string directly; parseInt would drop alpha-5 / extended IDs.
+      newWatchlist = savedSatList.map((sccNum: string) => ({ id: catalogManagerInstance.sccNum2Id(sccNum) ?? -1, inView: false }));
     } else {
       newWatchlist = [];
     }
@@ -620,7 +621,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
           return 0;
         }
 
-        return parseInt(satA.sccNum) - parseInt(satB.sccNum);
+        return satA.sccNum.localeCompare(satB.sccNum, 'en', { numeric: true });
       });
       this.updateWatchlist();
       EventBus.getInstance().emit(EventBusEvent.onWatchlistAdd, this.watchlistList);
@@ -691,7 +692,15 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     const sats = (<HTMLInputElement>getEl('watchlist-new')).value.split(/[\s,]+/u);
 
     sats.forEach((satNum: string) => {
-      const id = ServiceLocator.getCatalogManager().sccNum2Id(parseInt(satNum)) ?? -1;
+      if (!satNum.trim()) {
+        return;
+      }
+
+      // Pass the raw string to sccNum2Id, which handles every sccNum form
+      // (numeric, alpha-5 "T0001", 6-digit, extended) plus leading-zero
+      // normalization. parseInt would turn "T0001" into NaN and silently
+      // drop alpha-5 / extended watchlist entries.
+      const id = ServiceLocator.getCatalogManager().sccNum2Id(satNum.trim()) ?? -1;
 
       if (id === -1) {
         errorManagerInstance.warnToast(`Sat ${satNum} not found!`);
@@ -709,7 +718,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
         return 0;
       }
 
-      return parseInt(satA.sccNum) - parseInt(satB.sccNum);
+      return satA.sccNum.localeCompare(satB.sccNum, 'en', { numeric: true });
     });
     this.updateWatchlist();
     (<HTMLInputElement>getEl('watchlist-new')).value = ''; // Clear the search box after enter pressed/selected
@@ -780,7 +789,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
         // We need to convert it to an array of objects
         const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
-        newWatchlist = savedSatList.map((sccNum: string) => ({ id: String(catalogManagerInstance.sccNum2Id(parseInt(sccNum)) ?? '-1'), inView: false }));
+        newWatchlist = savedSatList.map((sccNum: string) => ({ id: String(catalogManagerInstance.sccNum2Id(sccNum) ?? '-1'), inView: false }));
       } else {
         newWatchlist = [];
       }

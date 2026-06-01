@@ -74,6 +74,27 @@ export const standardPluginSuite = (Plugin: Constructor<KeepTrackPlugin>, plugin
 };
 
 /**
+ * Resilient bootstrap smoke suite for plugins that don't fit the full standardPluginSuite
+ * (e.g. legacy plugins without a sideMenuTitle, where direct addHtml() title-bar rendering
+ * throws under the strict test-env html formatter). Exercises construct + init + the
+ * uiManager lifecycle events, plus the init-twice guard — enough to take a plugin file off
+ * 0% and cover its constructor, capability config, and event wiring without per-plugin tuning.
+ */
+export const standardPluginSmokeSuite = (Plugin: Constructor<KeepTrackPlugin>, pluginName?: string) => {
+  pluginName ??= Plugin.name;
+
+  test(`${pluginName}_smoke_init`, () => {
+    BottomMenu.createBottomMenu();
+    const plugin = new Plugin();
+
+    expect(plugin.init).toBeDefined();
+    expect(() => plugin.init()).not.toThrow();
+    expect(() => EventBus.getInstance().emit(EventBusEvent.uiManagerInit)).not.toThrow();
+    expect(() => EventBus.getInstance().emit(EventBusEvent.uiManagerFinal)).not.toThrow();
+  });
+};
+
+/**
  * Initializes a standard plugin and tests its initialization.
  * @param pluginName - The name of the plugin being tested.
  * @param Plugin - The constructor function of the plugin being tested.

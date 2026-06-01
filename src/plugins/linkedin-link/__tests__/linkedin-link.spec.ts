@@ -1,10 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('LinkedInLinkPlugin', () => {
   test('renders in About drawer group and opens LinkedIn on click', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { LinkedInLinkPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     // The top menu button should exist in the DOM

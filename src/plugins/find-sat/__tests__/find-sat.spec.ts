@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('FindSatPlugin', () => {
@@ -6,7 +6,7 @@ test.describe('FindSatPlugin', () => {
     // FindSat is login-gated in the manifest
     await waitForAppReady(page, {
       plugins: { FindSatPlugin: { enabled: true } },
-      settings: { isDisableLoginGate: true },
+      settings: { isDisableLoginGate: true, isMobileModeEnabled: true },
     });
 
     // 1. Bottom icon should exist and not be disabled

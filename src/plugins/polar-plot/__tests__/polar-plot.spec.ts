@@ -1,10 +1,11 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('PolarPlotPlugin', () => {
   test('disabled without sensor and satellite, DOM elements exist', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { PolarPlotPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     // Legacy pattern: locale "Polar Plot" → slug "polar-plot" → "polar-plot-bottom-icon"

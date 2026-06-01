@@ -110,8 +110,8 @@ export class OemSatellite extends SpaceObject {
   orbitFullPathColor: vec4 = LineColors.BLUE;
   dotColor: rgbaArray = [0, 255, 0, 1];
   sccNum = '';
-  sccNum5 = '';
-  sccNum6 = '';
+  sccNum5: string | null = null;
+  sccNum6: string | null = null;
   intlDes = '';
 
   // Satellite-compatible properties populated from USER_DEFINED_ OEM metadata
@@ -254,12 +254,41 @@ export class OemSatellite extends SpaceObject {
     ];
 
     for (const comment of allComments) {
-      const match = comment.match(/NORAD_ID\s*=\s*(?<id>\d+)/u);
+      // Match any non-whitespace token after NORAD_ID = so alpha-5 ("T0001")
+      // and 9-digit extended IDs are captured, not just legacy numerics.
+      // classifySatNum below filters the resulting string and only treats it
+      // as a known payload when it parses as a valid sccNum form.
+      const match = comment.match(/NORAD_ID\s*=\s*(?<id>\S+)/u);
 
       if (match?.groups?.id) {
-        this.sccNum = match.groups.id;
-        this.sccNum5 = Tle.convert6DigitToA5(this.sccNum);
-        this.sccNum6 = Tle.convertA5to6Digit(this.sccNum5);
+        const id = match.groups.id;
+        const kind = Tle.classifySatNum(id);
+
+        if (kind === 'invalid') {
+          continue;
+        }
+
+        // Normalize to the display-canonical numeric form so OemSatellite.sccNum
+        // matches the convention used by Satellite (alpha-5 "T0001" → "270001",
+        // leading zeros stripped). The alpha-5 string is preserved on sccNum5.
+        // Tle.convertA5to6Digit THROWS for extended IDs beyond TLE alpha-5
+        // capacity (a 6-digit value > 339999); guard it the same way
+        // Satellite.assignAlpha5Forms_ does and keep the original as canonical.
+        let normalizedScc = id;
+
+        try {
+          normalizedScc = Tle.convertA5to6Digit(id);
+        } catch {
+          // Extended (e.g. 6-digit > 339999) — leave the numeric form untouched.
+        }
+        this.sccNum = normalizedScc.replace(/^0+(?=\d)/u, '');
+        if (kind === 'numeric5' || kind === 'alpha5' || kind === 'numeric6') {
+          this.sccNum5 = Tle.convert6DigitToA5(this.sccNum);
+          this.sccNum6 = this.sccNum;
+        } else {
+          this.sccNum5 = null;
+          this.sccNum6 = null;
+        }
         // With a real NORAD ID, this is a known payload not a notional object
         this.type = SpaceObjectType.PAYLOAD;
         break;

@@ -1,11 +1,10 @@
-import { Configuration, DefinePlugin, DefinePluginOptions, HtmlRspackPlugin, LightningCssMinimizerRspackPlugin, SwcJsMinimizerRspackPlugin } from '@rspack/core';
+import { Configuration, DefinePlugin, DefinePluginOptions, HtmlRspackPlugin, LightningCssMinimizerRspackPlugin, ProgressPlugin, SwcJsMinimizerRspackPlugin } from '@rspack/core';
 import { execSync } from 'child_process';
 import CleanTerminalPlugin from 'clean-terminal-webpack-plugin';
 import DotEnv from 'dotenv-webpack';
 import { readFileSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
-import WebpackBar from 'webpackbar/rspack';
 import { BuildConfig } from './lib/config-manager';
 export class WebpackManager {
   static readonly DEFAULT_MODE = 'development';
@@ -88,6 +87,14 @@ export class WebpackManager {
           },
         },
       };
+    }
+
+    // Coverage build: keep production behavior (pro profile, all plugins) but emit
+    // readable, source-mapped output so Playwright V8 coverage maps back to TS source.
+    // Inline maps travel with the script in the coverage data, avoiding any .map fetch.
+    if (process.env.COVERAGE === '1') {
+      baseConfig.devtool = 'inline-source-map';
+      baseConfig.optimization = { ...baseConfig.optimization, minimize: false };
     }
 
     // split entry points of main and webworkers
@@ -275,12 +282,8 @@ export class WebpackManager {
             path: `./${this.config.envFilePath}`,
             allowEmptyValues: true,
           }),
-          new WebpackBar({
-            name: 'KeepTrack Main Code',
-            color: '#66b242',
-            basic: false,
-            fancy: true,
-            profile: false,
+          new ProgressPlugin({
+            prefix: 'KeepTrack Main Code',
           }),
         ],
       },
@@ -315,12 +318,8 @@ export class WebpackManager {
             path: `./${this.config.envFilePath}`,
             allowEmptyValues: true,
           }),
-          new WebpackBar({
-            name: 'KeepTrack Auth',
-            color: '#66b242',
-            basic: false,
-            fancy: true,
-            profile: false,
+          new ProgressPlugin({
+            prefix: 'KeepTrack Auth',
           }),
         ],
       },
@@ -348,12 +347,8 @@ export class WebpackManager {
           publicPath: `./${pubPath}js/`,
         },
         plugins: [
-          new WebpackBar({
-            name: 'KeepTrack Workers',
-            color: '#66b242',
-            basic: false,
-            fancy: true,
-            profile: false,
+          new ProgressPlugin({
+            prefix: 'KeepTrack Workers',
           }),
         ],
       },

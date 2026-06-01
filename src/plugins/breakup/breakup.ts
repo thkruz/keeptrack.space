@@ -17,8 +17,10 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
+import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, eci2lla, Kilometers, OrbitFinder, Satellite, Tle, TleLine1, TleLine2 } from '@ootk/src/main';
+import { BaseObject, eci2lla, Kilometers, OrbitFinder, Satellite, SpaceObjectType, Tle, TleLine1, TleLine2 } from '@ootk/src/main';
+import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import streamPng from '@public/img/icons/stream.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -68,13 +70,14 @@ export class Breakup extends KeepTrackPlugin {
   onBottomIconClick(): void {
     const obj = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
 
-    if (!obj?.isSatellite()) {
+    // Reject anything that isn't a true TLE-backed Satellite (e.g. OemSatellite returns
+    // true from isSatellite() but has no tle1/tle2/apogee/perigee, which would blow up
+    // downstream when OrbitFinder tries to synthesize TLEs from it).
+    if (!(obj instanceof Satellite)) {
       return;
     }
 
-    const sat = obj as Satellite;
-
-    if (sat?.apogee - sat?.perigee > this.maxDifApogeeVsPerigee_) {
+    if (obj.apogee - obj.perigee > this.maxDifApogeeVsPerigee_) {
       errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.CannotCreateBreakupForNonCircularOrbits'));
       this.closeSideMenu();
       this.setBottomIconToDisabled();
@@ -234,13 +237,15 @@ export class Breakup extends KeepTrackPlugin {
 
     // Custom satellite selection handling - KEEP: Custom plugin logic
     EventBus.getInstance().on(EventBusEvent.selectSatData, (sat: BaseObject) => {
-      if (!sat?.isSatellite()) {
+      // Restrict to true TLE-backed Satellite — OemSatellite passes isSatellite() but
+      // can't be propagated through the SGP4 breakup pipeline.
+      if (!(sat instanceof Satellite)) {
         if (this.isMenuButtonActive) {
           this.closeSideMenu();
         }
         this.setBottomIconToUnselected();
         this.setBottomIconToDisabled();
-      } else if ((sat as Satellite)?.apogee - (sat as Satellite)?.perigee > this.maxDifApogeeVsPerigee_) {
+      } else if (sat.apogee - sat.perigee > this.maxDifApogeeVsPerigee_) {
         if (this.isMenuButtonActive) {
           this.closeSideMenu();
           errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.CannotCreateBreakupForNonCircularOrbits'));
@@ -284,7 +289,9 @@ export class Breakup extends KeepTrackPlugin {
 
     const mainsat = catalogManagerInstance.getSat(satId ?? -1);
 
-    if (!mainsat || satId === null) {
+    // getSat's return type is Satellite, but at runtime it only checks isSatellite() —
+    // OemSatellite slips through that check and lacks tle1/tle2/apogee/perigee.
+    if (!mainsat || satId === null || !(mainsat instanceof Satellite)) {
       errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.SatelliteNotFound'));
 
       return;
@@ -440,6 +447,10 @@ export class Breakup extends KeepTrackPlugin {
               name: `Breakup Piece ${i + 1}`,
               tle1: iTle1,
               tle2: iTle2 as TleLine2,
+              // The analyst-slot template is a PAYLOAD; pieces are debris and
+              // need the type overridden so color schemes and search treat
+              // them correctly.
+              type: SpaceObjectType.DEBRIS,
               active: true,
             },
           });
@@ -462,7 +473,32 @@ export class Breakup extends KeepTrackPlugin {
     if (breakupCount > settingsManager.searchLimit) {
       settingsManager.searchLimit = breakupCount;
     }
-    ServiceLocator.getUiManager().doSearch(`${mainsat.sccNum},Breakup Piece`);
+
+    /*
+     * Pieces changed type (PAYLOAD analyst slot → DEBRIS) and active flag in
+     * objectCache, but in worker-mode the color worker only sees the typed-array
+     * snapshot taken at init. Without this nudge they'd keep rendering as
+     * orange "inactive payloads" in the Celestrak scheme.
+     */
+    ServiceLocator.getColorSchemeManager().notifyObjectsChanged();
+
+    /*
+     * Defer the search until the cruncher has actually propagated the new TLEs.
+     * The sendSatEdit posts above are async, so position data for the pieces is
+     * still all-zero on the next render — running doSearch immediately would
+     * paint every piece as "Decayed" in the dropdown. Wait for two cruncher
+     * frames before triggering the search.
+     */
+    const searchStr = `${mainsat.sccNum},Breakup Piece`;
+
+    waitForCruncher({
+      cruncher: catalogManagerInstance.satCruncher,
+      cb: () => ServiceLocator.getUiManager().doSearch(searchStr),
+      validationFunc: (data: PositionCruncherOutgoingMsg) => typeof data.satPos !== 'undefined',
+      skipNumber: 2,
+      maxRetries: 50,
+      isRunCbOnFailure: true,
+    });
   }
 
   private static getFormData_(catalogManagerInstance: CatalogManager) {

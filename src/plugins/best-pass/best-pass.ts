@@ -221,7 +221,9 @@ export class BestPassPlugin extends KeepTrackPlugin {
         if (typeof satId === 'undefined' || satId === null || satId === '' || satId === ' ') {
           continue;
         }
-        const sat = catalogManager.sccNum2Sat(parseInt(satId, 10));
+        // sccNum2Sat handles every sccNum form directly; parseInt would turn a
+        // typed alpha-5 ("T0001") into NaN and silently skip it.
+        const sat = catalogManager.sccNum2Sat(satId.trim());
 
         if (!sat) {
           continue;
@@ -333,7 +335,11 @@ export class BestPassPlugin extends KeepTrackPlugin {
 
             return {
               START_DTG: sTime.getTime(),
-              SATELLITE_ID: parseInt(satrecIn.satnum, 10).toString(),
+              // Use the canonical sccNum on the Satellite, not satrec.satnum.
+              // satrec.satnum is the parsed numeric form — for alpha-5 sats it
+              // would be the 6-digit equivalent ("270001"), not the alpha-5
+              // string ("T0001") the user expects to see.
+              SATELLITE_ID: sat.sccNum,
               PASS_SCORE: score.toFixed(1),
               START_DATE: sTime,
               START_TIME: sTime,

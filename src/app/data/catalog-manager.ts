@@ -165,8 +165,10 @@ export class CatalogManager {
    * If a satellite number does not have a corresponding ID, it is not included in the returned array.
    */
   satnums2ids(satnumArray: number[]): number[] {
+    // sccNum2Id normalizes numeric input itself (strips leading zeros) so the
+    // padStart that used to live here is no longer needed.
     return satnumArray
-      .map((satnum) => this.sccNum2Id(satnum.toString().padStart(5, '0'), false))
+      .map((satnum) => this.sccNum2Id(satnum, false))
       .filter((id): id is number => id !== null);
   }
 
@@ -192,20 +194,49 @@ export class CatalogManager {
    * If the object number is found in the `satData`, it returns the index as the ID. If not found, it returns null.
    */
   sccNum2Id(a5Num: string | number, isExtensiveSearch = true): number | null {
-    // For backwards compatibility, this method accepts a number or string as the a5Num parameter.
-    if (typeof a5Num === 'number') {
-      a5Num = a5Num.toString().padStart(5, '0');
+    // Normalize input to the display-canonical natural-number form so user
+    // input of "5", "00005", or 5 (all referring to Vanguard) collapses to
+    // a single sccIndex key. Alpha-5 ("T0001") and extended (7+ digit) IDs
+    // have no leading zeros and pass through unchanged.
+    let key = typeof a5Num === 'number' ? a5Num.toString() : a5Num;
+
+    if ((/^0+\d/u).test(key)) {
+      key = key.replace(/^0+/u, '');
     }
 
-    const satBySccIndex = this.sccIndex[`${a5Num}`];
+    // Fast path: direct sccIndex hit.
+    if (typeof this.sccIndex[key] !== 'undefined') {
+      return this.sccIndex[key];
+    }
 
-    if (typeof satBySccIndex !== 'undefined') {
-      return this.sccIndex[`${a5Num}`];
-    } else if (isExtensiveSearch) {
+    // Equivalence path: the catalog loader indexes alpha-5 inputs under their
+    // 6-digit numeric form (Tle.convertA5to6Digit), so a user typing "T0001"
+    // would otherwise miss a satellite stored at sccIndex["270001"]. Try the
+    // 6↔A5 conversion before falling through to extensive search.
+    const kind = Tle.classifySatNum(key);
+
+    if (kind === 'alpha5' || kind === 'numeric6') {
+      try {
+        const altKey = kind === 'alpha5' ? Tle.convertA5to6Digit(key) : Tle.convert6DigitToA5(key);
+
+        if (typeof this.sccIndex[altKey] !== 'undefined') {
+          return this.sccIndex[altKey];
+        }
+      } catch {
+        // Conversion threw — fall through to extensive search.
+      }
+    }
+
+    if (isExtensiveSearch) {
       for (let i = 0; i < this.objectCache.length; i++) {
         const obj = this.objectCache[i];
 
-        if (obj?.isSatellite() && (obj as Satellite)?.sccNum === a5Num.toString()) {
+        if (!(obj instanceof Satellite)) {
+          continue;
+        }
+        // Match the canonical sccNum and both derived forms so user input in
+        // any of the three forms (numeric, alpha-5, 6-digit) resolves.
+        if (obj.sccNum === key || obj.sccNum5 === key || obj.sccNum6 === key) {
           return i;
         }
       }
@@ -220,8 +251,10 @@ export class CatalogManager {
    * @param sccNum - The object number of the satellite.
    * @returns The satellite object if found, null otherwise.
    */
-  sccNum2Sat(sccNum: number): Satellite | null {
-    const sat = this.getObject(this.sccNum2Id(sccNum.toString().padStart(5, '0')));
+  sccNum2Sat(sccNum: number | string): Satellite | null {
+    // sccNum2Id handles all input forms (numeric, alpha-5, extended) plus
+    // leading-zero normalization, so no pre-processing needed here.
+    const sat = this.getObject(this.sccNum2Id(sccNum));
 
     if (!sat?.isSatellite()) {
       errorManagerInstance.debug(`Object ${sccNum} is not a satellite!`);
@@ -233,7 +266,7 @@ export class CatalogManager {
   }
 
   a52Sat(sccNum: string): Satellite | null {
-    const sat = this.getObject(this.sccNum2Id(sccNum.padStart(5, '0')));
+    const sat = this.getObject(this.sccNum2Id(sccNum));
 
     if (!sat?.isSatellite()) {
       errorManagerInstance.debug(`Object ${sccNum} is not a satellite!`);
@@ -312,8 +345,10 @@ export class CatalogManager {
   }
 
   getSats(): Satellite[] {
-    // sats are the first numSats objects in the objectCache
-    return this.objectCache.slice(0, this.numSatellites).filter((sat) => sat.isSatellite()) as Satellite[];
+    // sats are the first numSats objects in the objectCache.
+    // Use instanceof Satellite (not isSatellite()) so OemSatellite — which returns true
+    // from isSatellite() but lacks tle1/tle2/apogee/perigee — does not leak through.
+    return this.objectCache.slice(0, this.numSatellites).filter((sat): sat is Satellite => sat instanceof Satellite);
   }
 
   getMissile(missileId: string | number): MissileObject | null {
@@ -482,6 +517,11 @@ export class CatalogManager {
     }
   }
 
+  /**
+   * @param sccNum The canonical sccNum for this satellite. Strongly recommended
+   *   for extended (7+ digit) IDs: the TLE column 3-7 substring fallback only
+   *   reads the trailing 5 chars and will silently lose precision otherwise.
+   */
   addAnalystSat(tle1: string, tle2: string, id: number, sccNum?: string): Satellite | null {
     if (tle1.length !== 69) {
       throw new Error(`Invalid TLE1: length is not 69 - ${tle1}`);
@@ -507,6 +547,8 @@ export class CatalogManager {
         country: 'ANALSAT',
         launchVehicle: 'Analyst Satellite',
         launchSite: 'ANALSAT',
+        // Fallback reads the TLE col 3-7 satnum (max 5 chars); extended IDs
+        // can only be preserved by passing the explicit sccNum parameter.
         sccNum: sccNum ?? tle1.substring(2, 7).trim().padStart(5, '0'),
         tle1: tle1 as TleLine1,
         tle2: tle2 as TleLine2,

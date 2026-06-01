@@ -178,9 +178,10 @@ export class NewLaunch extends KeepTrackPlugin {
 
   protected isDoingCalculations_ = false;
   submitCallback: () => void = () => {
-    const sccNum = (<HTMLInputElement>getEl('nl-scc')).value;
+    const sccNum = (<HTMLInputElement>getEl('nl-scc')).value.trim();
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
-    const inputSat = catalogManagerInstance.sccNum2Sat(parseInt(sccNum))!;
+    // sccNum2Sat accepts the string form directly; parseInt would drop alpha-5/extended.
+    const inputSat = catalogManagerInstance.sccNum2Sat(sccNum)!;
 
     this.executeLaunch_(inputSat);
   };

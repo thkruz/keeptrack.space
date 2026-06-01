@@ -43,6 +43,13 @@ const sseClients = new Set<ServerResponse>();
 
 function startServer() {
   const server = createServer(async (req, res) => {
+    // Swallow socket-level errors (client aborts, RST). Without this listener a
+    // write to a closed/aborted socket emits an unhandled 'error' that crashes the
+    // whole process — under Playwright (which aborts requests on page close /
+    // navigation constantly) that takes down the server and every later test fails
+    // with ERR_CONNECTION_REFUSED.
+    res.on('error', () => { /* ignore broken pipe / reset */ });
+
     const pathname = new URL(req.url!, `http://localhost:${PORT}`).pathname;
 
     // SSE endpoint for livereload
@@ -79,9 +86,30 @@ function startServer() {
       res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' });
       res.end(data);
     } catch {
-      res.writeHead(404);
+      // Guard against "headers already sent" when the response was partially
+      // written before the failure — calling writeHead again would throw out of
+      // the catch and crash the process.
+      if (!res.headersSent) {
+        res.writeHead(404);
+      }
       res.end('Not found');
     }
+  });
+
+  // A malformed request line / header from an aborted client must not crash the server.
+  server.on('clientError', (_err, socket) => {
+    if (socket.writable) {
+      socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+    }
+  });
+
+  // Last-resort safety net: keep the dev/test server alive even if an unexpected
+  // error escapes a request handler. Logged, not fatal.
+  process.on('uncaughtException', (err) => {
+    logWithStyle(`Uncaught exception (server kept alive): ${err.message}`, ConsoleStyles.ERROR);
+  });
+  process.on('unhandledRejection', (reason) => {
+    logWithStyle(`Unhandled rejection (server kept alive): ${String(reason)}`, ConsoleStyles.ERROR);
   });
 
   server.listen(PORT, () => {

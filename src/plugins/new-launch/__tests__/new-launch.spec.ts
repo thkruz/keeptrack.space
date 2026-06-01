@@ -1,11 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('NewLaunch', () => {
   test('open pro side menu, verify form elements, and close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { NewLaunch: { enabled: true } },
-      settings: { isDisableLoginGate: true },
+      settings: { isDisableLoginGate: true, isMobileModeEnabled: true },
     });
 
     // 1. Verify bottom icon exists (legacy pattern: "New Launch" → "new-launch-bottom-icon")

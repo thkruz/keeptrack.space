@@ -39,6 +39,18 @@ export async function waitForAppReady(page: Page, options: AppReadyOptions = {})
   const overrideObj = {
     isAutoStart: true,
     noCatalogOnLoad: true,
+    // Suppress info/log boot toasts. On localhost the error-manager defaults to
+    // LogLevel.LOG, so status messages render as toasts in a full-width band that
+    // overlaps side-menu close buttons and intercepts clicks. WARN keeps real
+    // warnings/errors (still asserted by expectCleanBoot) while killing the band.
+    minLogLevel: 'WARN',
+    // The headless/SwiftShader GPU runs below the FPS limit, so
+    // Scene.updateVisualsBasedOnPerformance_ walks the auto-downgrade ladder and fires a
+    // "Your computer is struggling!" caution toast (direct uiManager.toast(), NOT gated by
+    // minLogLevel) for each disabled feature. Those toasts stack in the same top band and
+    // intercept side-menu close-button clicks. Disabling the downgrade loop entirely keeps
+    // every plugin/feature enabled (so icons stay clickable) while killing the toast band.
+    isDisablePerformanceDowngrade: true,
     plugins: options.plugins ?? {},
     ...(options.settings ?? {}),
   };

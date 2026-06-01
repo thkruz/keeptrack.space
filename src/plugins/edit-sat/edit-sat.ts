@@ -19,7 +19,7 @@ import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { StringPad } from '@app/engine/utils/stringPad';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, FormatTle, OrbitFinder, Satellite, SatelliteRecord, Sgp4, TleLine1, ZoomValue, eci2lla } from '@ootk/src/main';
+import { BaseObject, FormatTle, OrbitFinder, Satellite, SatelliteRecord, Sgp4, Tle, TleLine1, ZoomValue, eci2lla } from '@ootk/src/main';
 import editSatellitePng from '@public/img/icons/edit-satellite.png';
 import { saveAs } from 'file-saver';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -162,7 +162,7 @@ export class EditSat extends KeepTrackPlugin {
       <div class="row">
         <form id="editSat-menu-form">
           <div class="input-field col s12">
-            <input disabled value="AAAAA" id="${p}-scc" type="text" maxlength="5" />
+            <input disabled value="AAAAA" id="${p}-scc" type="text" maxlength="9" />
             <label for="disabled" class="active">${l('scc')}</label>
           </div>
           <div class="input-field col s12">
@@ -358,7 +358,7 @@ export class EditSat extends KeepTrackPlugin {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     try {
-      const id = catalogManagerInstance.sccNum2Id(parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value));
+      const id = catalogManagerInstance.sccNum2Id((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value.trim());
       const obj = catalogManagerInstance.getObject(id);
 
       if (!obj?.isSatellite()) {
@@ -435,8 +435,8 @@ export class EditSat extends KeepTrackPlugin {
     const p = EditSat.elementPrefix;
 
     getEl(`${p}-error`)!.style.display = 'none';
-    const scc = (<HTMLInputElement>getEl(`${p}-scc`)).value;
-    const satId = catalogManagerInstance.sccNum2Id(parseInt(scc));
+    const scc = (<HTMLInputElement>getEl(`${p}-scc`)).value.trim();
+    const satId = catalogManagerInstance.sccNum2Id(scc);
 
     if (satId === null) {
       errorManagerInstance.info(t7e('plugins.EditSat.errorMsgs.notRealSatellite' as T7eKey));
@@ -462,7 +462,11 @@ export class EditSat extends KeepTrackPlugin {
     const epochyr = (<HTMLInputElement>getEl(`${p}-year`)).value;
     const epochday = (<HTMLInputElement>getEl(`${p}-day`)).value;
 
-    const { tle1, tle2 } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc });
+    // FormatTle runs scc through Tle.convert6DigitToA5, which throws for
+    // extended (7+ digit) IDs. Pass the trailing 5 chars so the TLE line stays
+    // well-formed; the canonical id stays on the Satellite object.
+    const tleScc = Tle.classifySatNum(scc) === 'extended' ? scc.slice(-5) : scc;
+    const { tle1, tle2 } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc: tleScc });
 
     let satrec: SatelliteRecord;
 
@@ -502,8 +506,8 @@ export class EditSat extends KeepTrackPlugin {
     ServiceLocator.getSoundManager()?.play(SoundNames.EXPORT);
 
     try {
-      const scc = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value;
-      const satId = catalogManagerInstance.sccNum2Id(parseInt(scc));
+      const scc = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value.trim();
+      const satId = catalogManagerInstance.sccNum2Id(scc);
       const sat = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY) as Satellite;
       const sat2 = {
         tle1: sat.tle1,
@@ -552,11 +556,16 @@ export class EditSat extends KeepTrackPlugin {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     const object = JSON.parse(<string>eventTarget.result);
-    const sccNum = parseInt(StringPad.pad0(object.tle1.substr(2, 5).trim(), 5));
-    const sat = catalogManagerInstance.sccNum2Sat(sccNum);
+    // Prefer the canonical sccNum from the file; fall back to the TLE column for
+    // legacy exports without it. The TLE column only carries 5 chars and loses
+    // identity for extended (7+ digit) catalog numbers.
+    const sccNumStr = typeof object.sccNum === 'string' || typeof object.sccNum === 'number'
+      ? String(object.sccNum)
+      : StringPad.pad0(object.tle1.substr(2, 5).trim(), 5);
+    const sat = catalogManagerInstance.sccNum2Sat(sccNumStr);
 
     if (!sat) {
-      errorManagerInstance.warn(t7e('plugins.EditSat.errorMsgs.satelliteNotFound' as T7eKey).replace('{sccNum}', sccNum.toString()));
+      errorManagerInstance.warn(t7e('plugins.EditSat.errorMsgs.satelliteNotFound' as T7eKey).replace('{sccNum}', sccNumStr));
 
       return;
     }

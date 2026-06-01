@@ -84,8 +84,10 @@ public/img/*.xcf
 # TypeDoc Output
 docs/api
 
-# Jest Coverage
+# Coverage reports
 coverage/
+coverage-e2e/
+coverage-combined/
 
 # Build Folder
 dist

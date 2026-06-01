@@ -1,10 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('CountriesMenu Plugin', () => {
   test('open side menu, verify country list structure, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { CountriesMenu: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#menu-countries');

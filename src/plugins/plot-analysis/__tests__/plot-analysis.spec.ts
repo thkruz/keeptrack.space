@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('Plot Analysis Plugins', () => {
@@ -13,7 +13,7 @@ test.describe('Plot Analysis Plugins', () => {
         Inc2AltPlots: { enabled: true },
         Inc2LonPlots: { enabled: true },
       },
-      settings: { isDisableLoginGate: true },
+      settings: { isDisableLoginGate: true, isMobileModeEnabled: true },
     });
 
     // ── Satellite-dependent plots: ECI, ECF, RIC ──

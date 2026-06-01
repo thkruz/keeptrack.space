@@ -382,6 +382,8 @@ export const mockCameraManager = <Camera>(<unknown>{
   lookAtPosition: vi.fn(),
   setCameraType: vi.fn(),
   snapToSat: vi.fn(),
+  registerCameraModeDelegate: vi.fn(),
+  unregisterCameraModeDelegate: vi.fn(),
   update: vi.fn(),
   zoomLevel: vi.fn(),
   drawAstronomy: vi.fn(),

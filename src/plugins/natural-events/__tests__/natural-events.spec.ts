@@ -1,10 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('NaturalEventsPlugin', () => {
   test('open side menu via drawer, verify toolbar and table, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { NaturalEventsPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     // Legacy pattern with explicit bottomIconElementName: 'menu-natural-events'

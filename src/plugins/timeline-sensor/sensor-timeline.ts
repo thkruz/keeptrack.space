@@ -213,7 +213,9 @@ export class SensorTimeline extends KeepTrackPlugin {
     link.href = URL.createObjectURL(blob);
 
     // Set the download attribute with a dynamically generated filename
-    link.download = `sat-${(PluginRegistry.getPlugin(SelectSatManager)!.getSelectedSat() as Satellite).sccNum6}-timeline.csv`;
+    const timelineSat = PluginRegistry.getPlugin(SelectSatManager)!.getSelectedSat() as Satellite;
+
+    link.download = `sat-${timelineSat.sccNum6 ?? timelineSat.sccNum}-timeline.csv`;
 
     // Simulate a click on the link to trigger the download
     link.click();

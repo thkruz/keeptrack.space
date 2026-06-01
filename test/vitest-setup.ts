@@ -180,12 +180,16 @@ vi.mock('echarts', () => {
   const registerTheme = vi.fn();
   const registerLocale = vi.fn();
   const graphic = {};
+  // Top-level echarts.dispose(target) is a real module export, distinct from the
+  // chart instance's own .dispose(); production code calls echarts.dispose(this.chart).
+  const disposeInstance = vi.fn();
 
   return {
     __esModule: true,
-    default: { init, use, registerTheme, registerLocale, graphic },
+    default: { init, use, dispose: disposeInstance, registerTheme, registerLocale, graphic },
     init,
     use,
+    dispose: disposeInstance,
     registerTheme,
     registerLocale,
     graphic,
@@ -293,7 +297,49 @@ import('./environment/standard-env').then((module) => {
 });
 
 global.mocks = {};
+
+/*
+ * Real WebGL returns a GLint location (>= 0 when the attribute/uniform is live,
+ * -1 / null when it is not) — NOT undefined. Returning undefined would make code
+ * that branches on the location (e.g. `loc !== -1`, `typeof loc !== 'undefined'`)
+ * take a path that cannot occur in production. Hand back deterministic, distinct,
+ * non-negative locations per attribute name and opaque objects per uniform name so
+ * the production attribute/uniform-binding paths actually execute. Tests that need
+ * the "not found" branch override getAttribLocation per-test to return -1.
+ */
+const glAttribLocations_ = new Map();
+const glUniformLocations_ = new Map();
+
+// Accurate WebGL2 (OpenGL ES 3.0) enum constants for the values the codebase uses.
+// Hardcoded from the spec — jsdom has no WebGL2RenderingContext to read them from.
+const glConstants = {
+  POINTS: 0x0000, LINES: 0x0001, LINE_STRIP: 0x0003, TRIANGLES: 0x0004,
+  ZERO: 0, ONE: 1, SRC_ALPHA: 0x0302, ONE_MINUS_SRC_COLOR: 0x0301, ONE_MINUS_SRC_ALPHA: 0x0303,
+  DEPTH_BUFFER_BIT: 0x0100, COLOR_BUFFER_BIT: 0x4000,
+  LEQUAL: 0x0203, BLEND: 0x0BE2, DEPTH_TEST: 0x0B71, SCISSOR_TEST: 0x0C11, POLYGON_OFFSET_FILL: 0x8037,
+  BYTE: 0x1400, UNSIGNED_BYTE: 0x1401, SHORT: 0x1402, UNSIGNED_SHORT: 0x1403,
+  INT: 0x1404, UNSIGNED_INT: 0x1405, FLOAT: 0x1406,
+  RGBA: 0x1908, DEPTH_COMPONENT16: 0x81A5, DEPTH_COMPONENT32F: 0x8CAC,
+  ARRAY_BUFFER: 0x8892, ELEMENT_ARRAY_BUFFER: 0x8893, PIXEL_PACK_BUFFER: 0x88EB,
+  STREAM_READ: 0x88E1, STATIC_DRAW: 0x88E4, DYNAMIC_DRAW: 0x88E8, BUFFER_SIZE: 0x8764,
+  FRAGMENT_SHADER: 0x8B30, VERTEX_SHADER: 0x8B31, COMPILE_STATUS: 0x8B81, LINK_STATUS: 0x8B82,
+  TEXTURE_2D: 0x0DE1, TEXTURE_BINDING_2D: 0x8069,
+  TEXTURE0: 0x84C0, TEXTURE1: 0x84C1, TEXTURE2: 0x84C2, TEXTURE3: 0x84C3, TEXTURE4: 0x84C4, TEXTURE5: 0x84C5,
+  TEXTURE_MAG_FILTER: 0x2800, TEXTURE_MIN_FILTER: 0x2801, TEXTURE_WRAP_S: 0x2802, TEXTURE_WRAP_T: 0x2803,
+  TEXTURE_MAX_LEVEL: 0x813D, NEAREST: 0x2600, LINEAR: 0x2601, LINEAR_MIPMAP_LINEAR: 0x2703,
+  CLAMP_TO_EDGE: 0x812F, REPEAT: 0x2901,
+  FRAMEBUFFER: 0x8D40, RENDERBUFFER: 0x8D41, COLOR_ATTACHMENT0: 0x8CE0, DEPTH_ATTACHMENT: 0x8D00,
+  FRAMEBUFFER_COMPLETE: 0x8CD5,
+  UNPACK_ALIGNMENT: 0x0CF5, UNPACK_FLIP_Y_WEBGL: 0x9240, UNPACK_PREMULTIPLY_ALPHA_WEBGL: 0x9241,
+  MAX_TEXTURE_SIZE: 0x0D33, VERSION: 0x1F02,
+  NO_ERROR: 0, INVALID_ENUM: 0x0500, INVALID_VALUE: 0x0501, INVALID_OPERATION: 0x0502,
+  INVALID_FRAMEBUFFER_OPERATION: 0x0506, OUT_OF_MEMORY: 0x0505, CONTEXT_LOST_WEBGL: 0x9242,
+  SYNC_GPU_COMMANDS_COMPLETE: 0x9117, ALREADY_SIGNALED: 0x911A, TIMEOUT_EXPIRED: 0x911B,
+  CONDITION_SATISFIED: 0x911C, WAIT_FAILED: 0x911D,
+};
+
 global.mocks.glMock = {
+  ...glConstants,
   activeTexture: vi.fn(),
   attachShader: vi.fn(),
   bindBuffer: vi.fn(),
@@ -305,21 +351,27 @@ global.mocks.glMock = {
   bufferData: vi.fn(),
   bufferSubData: vi.fn(),
   canvas: { height: 1080, width: 1920 },
+  // Real WebGL contexts expose the backing drawing-buffer size; mirror the canvas dims.
+  drawingBufferWidth: 1920,
+  drawingBufferHeight: 1080,
   clear: vi.fn(),
   clearColor: vi.fn(),
   compileShader: vi.fn(),
   createBuffer: () => ({ numItems: 0, layout: {}, data: {} }),
-  createFramebuffer: vi.fn(),
+  // Real WebGL create* calls return distinct opaque objects (never undefined/null
+  // on a healthy context). Return fresh objects so code that stores/null-checks the
+  // handle (texture_/vao_/framebuffer_) takes the production path.
+  createFramebuffer: () => ({}),
   createProgram: () => ({
     test: '',
   }),
   createImageBitmap: vi.fn(),
-  createRenderbuffer: vi.fn(),
+  createRenderbuffer: () => ({}),
   createShader: () => ({
     test: '',
   }),
-  createTexture: vi.fn(),
-  createVertexArray: vi.fn(),
+  createTexture: () => ({}),
+  createVertexArray: () => ({}),
   depthMask: vi.fn(),
   disable: vi.fn(),
   disableVertexAttribArray: vi.fn(),
@@ -330,12 +382,24 @@ global.mocks.glMock = {
   framebufferRenderbuffer: vi.fn(),
   framebufferTexture2D: vi.fn(),
   generateMipmap: vi.fn(),
-  getAttribLocation: vi.fn(),
+  getAttribLocation: (_program, name) => {
+    if (!glAttribLocations_.has(name)) {
+      glAttribLocations_.set(name, glAttribLocations_.size);
+    }
+
+    return glAttribLocations_.get(name);
+  },
   getExtension: vi.fn(),
   getProgramInfoLog: vi.fn(),
   getProgramParameter: () => true,
   getShaderParameter: () => true,
-  getUniformLocation: () => true,
+  getUniformLocation: (_program, name) => {
+    if (!glUniformLocations_.has(name)) {
+      glUniformLocations_.set(name, { name });
+    }
+
+    return glUniformLocations_.get(name);
+  },
   isContextLost: vi.fn(() => false),
   linkProgram: vi.fn(),
   readPixels: vi.fn(),
@@ -368,6 +432,33 @@ global.mocks.glMock = {
   deleteShader: vi.fn(),
   deleteFramebuffer: vi.fn(),
   deleteRenderbuffer: vi.fn(),
+  // --- Methods the codebase calls that were previously absent (would throw). ---
+  // Commands (void):
+  uniform4f: vi.fn(),
+  blendFuncSeparate: vi.fn(),
+  polygonOffset: vi.fn(),
+  texParameterf: vi.fn(),
+  flush: vi.fn(),
+  getBufferSubData: vi.fn(),
+  deleteSync: vi.fn(),
+  // Queries — return realistic "healthy context / no error" values, matching real WebGL:
+  getError: () => 0, // NO_ERROR
+  getSupportedExtensions: () => [],
+  getBufferParameter: () => 0,
+  getTexParameter: () => 0,
+  checkFramebufferStatus: () => 0x8CD5, // FRAMEBUFFER_COMPLETE
+  fenceSync: () => ({}), // opaque WebGLSync
+  clientWaitSync: () => 0x911A, // ALREADY_SIGNALED (work is done)
+  getParameter: (pname) => {
+    if (pname === 0x0D33) {
+      return 16384; // MAX_TEXTURE_SIZE
+    }
+    if (pname === 0x1F02) {
+      return 'WebGL 2.0 (mock)'; // VERSION
+    }
+
+    return 0;
+  },
 };
 
 // mock_requestAnimationFrame.js

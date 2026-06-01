@@ -1,10 +1,11 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('ProximityOps', () => {
   test('open side menu, verify form elements and secondary menu, close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { ProximityOps: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     // Legacy pattern: locale "Rendezvous and Proximity Operations"
@@ -49,6 +50,11 @@ test.describe('ProximityOps', () => {
     expect(await page.locator('#proximity-ops-maxDis').inputValue()).toBe('100');
     expect(await page.locator('#proximity-ops-maxVel').inputValue()).toBe('0.1');
     expect(await page.locator('#proximity-ops-duration').inputValue()).toBe('24');
+
+    // 9-digit NORAD ID support: maxlength must allow CelesTrak supplemental IDs.
+    await expect(page.locator('#proximity-ops-norad')).toHaveAttribute('maxlength', '9');
+    await page.locator('#proximity-ops-norad').fill('799500766');
+    expect(await page.locator('#proximity-ops-norad').inputValue()).toBe('799500766');
 
     // Verify toggle switches exist
     await expect(page.locator('#proximity-ops-ava')).toBeAttached();

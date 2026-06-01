@@ -482,26 +482,28 @@ export class ColorSchemeManager {
     return settingsManager.filter?.notionalSatellites === false && obj.type === SpaceObjectType.NOTIONAL;
   }
   isvLeoSatOff(obj: BaseObject) {
-    return settingsManager.filter?.vLEOSatellites === false && (obj as Satellite).apogee < 400;
+    // OemSatellite passes isSatellite() but has no apogee — guard so the
+    // altitude filter doesn't silently fail open (undefined < N is false).
+    return settingsManager.filter?.vLEOSatellites === false && obj instanceof Satellite && obj.apogee < 400;
   }
   isLeoSatOff(obj: BaseObject) {
-    return settingsManager.filter?.lEOSatellites === false && (obj as Satellite).apogee < 6000 && (obj as Satellite).apogee >= 400;
+    return settingsManager.filter?.lEOSatellites === false && obj instanceof Satellite && obj.apogee < 6000 && obj.apogee >= 400;
   }
   isMeoSatOff(obj: BaseObject) {
-    return settingsManager.filter?.mEOSatellites === false && (obj as Satellite).eccentricity < 0.1 && ((obj as Satellite).apogee >= 6000 &&
-      (obj as Satellite).apogee < 34786);
+    return settingsManager.filter?.mEOSatellites === false && obj instanceof Satellite && obj.eccentricity < 0.1 &&
+      obj.apogee >= 6000 && obj.apogee < 34786;
   }
   isHeoSatOff(obj: BaseObject) {
-    return settingsManager.filter?.hEOSatellites === false &&
-      (obj as Satellite).eccentricity >= 0.1 && ((obj as Satellite).apogee <= 39786);
+    return settingsManager.filter?.hEOSatellites === false && obj instanceof Satellite &&
+      obj.eccentricity >= 0.1 && obj.apogee <= 39786;
   }
   isGeoSatOff(obj: BaseObject) {
-    return settingsManager.filter?.gEOSatellites === false && (obj as Satellite).eccentricity < 0.1 && ((obj as Satellite).apogee >= 34786 &&
-      (obj as Satellite).apogee < 36786);
+    return settingsManager.filter?.gEOSatellites === false && obj instanceof Satellite && obj.eccentricity < 0.1 &&
+      obj.apogee >= 34786 && obj.apogee < 36786;
   }
   isXGeoSatOff(obj: BaseObject) {
-    return settingsManager.filter?.xGEOSatellites === false &&
-      (((obj as Satellite).eccentricity < 0.1 && ((obj as Satellite).apogee > 36786)) || ((obj as Satellite).apogee > 39786));
+    return settingsManager.filter?.xGEOSatellites === false && obj instanceof Satellite &&
+      ((obj.eccentricity < 0.1 && obj.apogee > 36786) || obj.apogee > 39786);
   }
   isUnitedStatesOff(obj: BaseObject) {
     return settingsManager.filter?.unitedStates === false && (obj as Satellite)?.country === 'US';
@@ -1052,6 +1054,23 @@ export class ColorSchemeManager {
     const data = buildColorDataArrays(catalogManager.objectCache);
 
     this.colorCruncher_.sendCatalogData(data, this.catalogSeqNum_);
+  }
+
+  /**
+   * Re-send catalog metadata (type, status, country, source, …) to the color
+   * worker and force a recolor. Use after operations that mutate object
+   * properties the worker reads from its typed-array snapshot — for example
+   * breakup repurposing an analyst PAYLOAD slot as DEBRIS, which the worker
+   * otherwise has no way to learn about until the next catalog reload.
+   *
+   * No-op in non-worker mode (main-thread schemes re-read objectCache every
+   * frame and will pick up the change automatically).
+   */
+  notifyObjectsChanged(): void {
+    if (this.useWorkerMode_ && this.colorCruncher_ && this.workerReady_) {
+      this.sendCatalogToWorker_();
+      this.colorCruncher_.sendForceRecolor();
+    }
   }
 
   /** Send all current state to the worker — used after catalog init */

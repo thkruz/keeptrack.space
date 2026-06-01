@@ -1,10 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('CatalogBrowserPlugin', () => {
   test('open side menu, verify catalog list and toggle, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { CatalogBrowserPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#menu-catalog-browser');

@@ -1,10 +1,11 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('FilterMenuPlugin', () => {
   test('full user flow: open, verify filters, toggle, reset, close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { FilterMenuPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     // 1. Bottom icon should exist and not be disabled

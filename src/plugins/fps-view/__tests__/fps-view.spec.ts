@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('FpsView Plugin', () => {
@@ -17,7 +17,7 @@ test.describe('FpsView Plugin', () => {
     await expect(utilityIcon).not.toHaveClass(/bmenu-item-selected/u);
 
     // Click utility icon to activate FPS view
-    await utilityIcon.click({ force: true });
+    await utilityIcon.dispatchEvent('click');
 
     // Verify icon becomes selected (camera changed to FPS)
     await expect(utilityIcon).toHaveClass(/bmenu-item-selected/u, { timeout: 5_000 });

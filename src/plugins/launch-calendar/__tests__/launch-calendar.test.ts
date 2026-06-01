@@ -1,7 +1,11 @@
-import { vi } from 'vitest';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { LaunchCalendar } from '@app/plugins/launch-calendar/launch-calendar';
-import { setupDefaultHtml } from '@test/environment/standard-env';
-import { standardPluginSuite, websiteInit } from '@test/generic-tests';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { createColorbox } from '@app/engine/utils/colorbox';
+import { setupDefaultHtml, setupStandardEnvironment } from '@test/environment/standard-env';
+import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('LaunchCalendar', () => {
   let plugin: LaunchCalendar;
@@ -40,6 +44,13 @@ describe('LaunchCalendar', () => {
       expect(commands[0].id).toBe('LaunchCalendar.open');
       expect(commands[0].callback).toBeInstanceOf(Function);
     });
+
+    it('invokes the command callback without throwing', () => {
+      websiteInit(plugin);
+      vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
+
+      expect(() => plugin.getCommandPaletteCommands()[0].callback()).not.toThrow();
+    });
   });
 
   describe('onBottomIconClick', () => {
@@ -60,5 +71,28 @@ describe('LaunchCalendar', () => {
 
       expect(spy).toHaveBeenCalled();
     });
+  });
+});
+
+describe('launch_calendar_plugin', () => {
+  let launchCalendarPlugin: LaunchCalendar;
+
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager]);
+    createColorbox();
+    launchCalendarPlugin = new LaunchCalendar();
+  });
+
+  standardPluginSuite(LaunchCalendar, 'LaunchCalendar');
+  standardPluginMenuButtonTests(LaunchCalendar, 'LaunchCalendar');
+
+  test('close_colorbox', () => {
+    launchCalendarPlugin.init();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, launchCalendarPlugin.bottomIconElementName);
+    vi.advanceTimersByTime(4000);
+    // eslint-disable-next-line dot-notation
+    expect(() => launchCalendarPlugin['closeColorbox_']()).not.toThrow();
   });
 });

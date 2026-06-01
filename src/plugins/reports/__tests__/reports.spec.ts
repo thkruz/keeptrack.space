@@ -1,10 +1,11 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('ReportsPlugin', () => {
   test('icon is disabled without satellite, drawer item visible in ANALYSIS group', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { ReportsPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#reports-bottom-icon');

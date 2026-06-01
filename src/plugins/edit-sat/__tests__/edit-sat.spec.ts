@@ -1,10 +1,11 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('EditSat', () => {
   test('disabled when no satellite is selected', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { EditSat: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     // 1. Bottom icon should exist but be disabled (requires satellite selection)
@@ -58,7 +59,8 @@ test.describe('EditSat', () => {
     await expect(page.locator('#editSat-open')).toBeAttached();
     await expect(page.locator('#editSat-file')).toBeAttached();
 
-    // 7. Verify SCC input is disabled (read-only)
+    // 7. Verify SCC input is disabled (read-only) and accepts 9-digit width
     await expect(page.locator('#es-scc')).toBeDisabled();
+    await expect(page.locator('#es-scc')).toHaveAttribute('maxlength', '9');
   });
 });

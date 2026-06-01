@@ -1,10 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('Collisions Plugin', () => {
   test('open side menu, verify table and toolbar, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { Collisions: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#menu-satellite-collision');

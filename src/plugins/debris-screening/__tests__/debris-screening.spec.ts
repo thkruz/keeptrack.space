@@ -1,10 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('DebrisScreening Plugin', () => {
   test('icon is disabled without satellite, drawer item visible in EVENTS group', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { DebrisScreening: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#debris-screening-bottom-icon');

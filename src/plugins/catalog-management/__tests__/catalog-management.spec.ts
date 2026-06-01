@@ -1,11 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('CatalogManagement Plugin', () => {
   test('open side menu, verify tabs and form fields, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { CatalogManagementPlugin: { enabled: true } },
-      settings: { isDisableLoginGate: true },
+      settings: { isDisableLoginGate: true, isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#catalog-management-icon');

@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v12.3.0](https://github.com/thkruz/keeptrack.space/compare/v12.2.11...v12.3.0)
+
+#### [v12.2.11](https://github.com/thkruz/keeptrack.space/compare/v12.2.10...v12.2.11)
+
+>  
+
+- test(catalog): :white_check_mark: cover 9-digit sccNum end-to-end across unit and E2E layers [`1dfe727`](https://github.com/thkruz/keeptrack.space/commit/1dfe727f6f3c1f77130c289db216cd495de59270)
+- feat(catalog-loader): :sparkles: add CSV/OMM ingestion path and harden parsing against malformed SCC [`1d21a3d`](https://github.com/thkruz/keeptrack.space/commit/1d21a3ddb3b5503f02e9ba8564073fbbf1cde6ad)
+- feat(plugins): :sparkles: support extended (7+ digit) sccNum across plugins [`3aaa439`](https://github.com/thkruz/keeptrack.space/commit/3aaa4399099d18feaa41798c2581db10cdc90093)
+- feat(oem-satellite): :sparkles: nullable sccNum5/sccNum6 for extended IDs [`392bc03`](https://github.com/thkruz/keeptrack.space/commit/392bc030622f976f1f4421af5efb43ff3f074222)
+- docs(changelog): :memo: update changelog for version 12.2.10 with recent changes [`a1ca12b`](https://github.com/thkruz/keeptrack.space/commit/a1ca12b342c544560115ea9d0e7c7bfead5d404b)
+- fix(sat-label-manager): :bug: clear instanceCount_ when positionData is null [`7ca5f6e`](https://github.com/thkruz/keeptrack.space/commit/7ca5f6e33ca9a10eb4f6a2a69b183aef1f0fe16a)
+- feat(catalog-exporter): :sparkles: sort exports with locale-aware numeric compare [`c91ff72`](https://github.com/thkruz/keeptrack.space/commit/c91ff7255a803256617a3cd98f476a9907f8ea66)
+- feat(catalog-manager): :sparkles: smart-pad short numeric sccNum strings in sccNum2Id [`85158aa`](https://github.com/thkruz/keeptrack.space/commit/85158aa0b0d744611c61558843797b888c13f8e1)
+- fix(dots-manager): :bug: bound getIdFromEci by sat count, not xyz-packed buffer length [`e90258f`](https://github.com/thkruz/keeptrack.space/commit/e90258ff111f78a4583b1c4c1d48e0bbf09d0a99)
+- feat(search-manager): :sparkles: sort search candidates with locale-aware numeric compare [`3d1a1ac`](https://github.com/thkruz/keeptrack.space/commit/3d1a1ac5967fb8b54a3408ab44e70041f1e101cf)
+- fix(select-sat-manager): :bug: also reset secondarySat id on catalog reload [`9f3ef9f`](https://github.com/thkruz/keeptrack.space/commit/9f3ef9fcef149ed5bac49afbd49e93fe4d2b49ae)
+- docs(readme): :memo: bump version badge to 12.2.10 [`fbfaec2`](https://github.com/thkruz/keeptrack.space/commit/fbfaec22fa915a46b4fe0cc840539d59c45acd15)
+- chore(plugins-pro): :wrench: update subproject commit reference [`7c86c1e`](https://github.com/thkruz/keeptrack.space/commit/7c86c1e03aa3f2b0ae2f7820abc91c5efae219eb)
+- chore(ootk): :wrench: update subproject commit reference [`7fbf02b`](https://github.com/thkruz/keeptrack.space/commit/7fbf02b77a13d40e226f531a40096140e3528b74)
+- fix(object-group): :bug: null-guard sccNum5 startsWith for extended IDs [`ac64d31`](https://github.com/thkruz/keeptrack.space/commit/ac64d31fe0c2d4c2cdfb5e44da48c99084af1228)
+- chore(plugins-pro): :wrench: update subproject commit reference [`1b0447e`](https://github.com/thkruz/keeptrack.space/commit/1b0447ea37b190b2956b3d55162dcc92f7dfbba8)
+
 #### [v12.2.10](https://github.com/thkruz/keeptrack.space/compare/v12.2.9...v12.2.10)
 
 >  

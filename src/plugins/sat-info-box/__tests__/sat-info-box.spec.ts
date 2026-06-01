@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('SatInfoBox and Related Plugins', () => {
@@ -93,6 +93,7 @@ test.describe('SatInfoBox and Related Plugins', () => {
   test('sat-infobox has no drawer entry (infrastructure plugin)', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { SatInfoBoxCore: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     // Open drawer

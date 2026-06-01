@@ -33,7 +33,7 @@ interface ConstellationStats {
 interface ConstellationDef {
   groupName: string;
   groupType: GroupType;
-  groupValue: number[] | RegExp;
+  groupValue: (number | string)[] | RegExp;
   groupSlug: string;
 }
 
@@ -181,7 +181,7 @@ export class SatConstellations extends KeepTrackPlugin {
 
   // ── Public API ──────────────────────────────────────────────────────
 
-  addConstellation(groupName: string, groupType: GroupType, groupValue: number[] | RegExp): void {
+  addConstellation(groupName: string, groupType: GroupType, groupValue: (number | string)[] | RegExp): void {
     const groupSlug = groupName.replace(/\s+/gu, '-').toLowerCase();
 
     this.additionalConstellations_.push({ groupName, groupType, groupValue, groupSlug });

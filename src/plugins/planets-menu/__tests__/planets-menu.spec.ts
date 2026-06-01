@@ -1,10 +1,11 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('PlanetsMenuPlugin', () => {
   test('open side menu, verify planet lists and sections, close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { PlanetsMenuPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     // Bottom icon should exist in DOM

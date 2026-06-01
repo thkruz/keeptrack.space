@@ -1,10 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('NextLaunchesPlugin', () => {
   test('open side menu, verify elements, and close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { NextLaunchesPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     // 1. Verify bottom icon exists in DOM (hidden in #bottom-icons)

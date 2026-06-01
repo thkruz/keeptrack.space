@@ -1,10 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('SensorListPlugin', () => {
   test('open side menu with sensor list, then close', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { SensorListPlugin: { enabled: true } },
+      settings: { isMobileModeEnabled: true },
     });
 
     const bottomIcon = page.locator('#sensors-bottom-icon');
@@ -29,6 +30,15 @@ test.describe('SensorListPlugin', () => {
 
     await expect(bottomIcon).toHaveClass(/bmenu-item-selected/u, { timeout: 5_000 });
     await expect(page.locator('#sensor-list-menu')).toBeVisible({ timeout: 5_000 });
+
+    // ── Behavior: select a sensor (exercises the sensor-list click delegation + setSensor) ──
+    const firstSensor = page.locator('#sensor-list-content li.menu-selectable[data-sensor]').first();
+
+    await expect(firstSensor).toBeVisible();
+    await firstSensor.click();
+
+    // Selecting a sensor enables the otherwise-disabled Reset Sensor button.
+    await expect(page.locator('#reset-sensor-button')).toBeEnabled({ timeout: 5_000 });
 
     // Close
     await page.evaluate(() => {

@@ -418,16 +418,18 @@ export class OrbitManager {
     return JSON.stringify(
       // TODO: objData should always be guaranteed
       objData?.map((obj) => {
-        if (!obj.isSatellite() && !obj.isMissile()) {
-          return { ignore: true };
-        }
         if (obj.isMissile()) {
           return { missile: true };
         }
+        // OemSatellite passes isSatellite() but has no tle1/tle2 — the orbit
+        // cruncher would otherwise receive `undefined` TLEs and break SGP4.
+        if (!(obj instanceof Satellite)) {
+          return { ignore: true };
+        }
 
         return {
-          tle1: (obj as Satellite).tle1,
-          tle2: (obj as Satellite).tle2,
+          tle1: obj.tle1,
+          tle2: obj.tle2,
         };
       }),
     );

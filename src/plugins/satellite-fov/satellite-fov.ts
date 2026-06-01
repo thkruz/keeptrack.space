@@ -370,7 +370,9 @@ export class SatelliteFov extends KeepTrackPlugin {
       return;
     }
 
-    (getEl('sat-fov-s2s-target-scc') as HTMLInputElement).value = secondarySat.sccNum5 ?? secondarySat.id.toString();
+    // Display the canonical sccNum. sccNum5 is null for extended (7+ digit) IDs;
+    // fall back to sccNum, NOT the internal numeric id which is meaningless to users.
+    (getEl('sat-fov-s2s-target-scc') as HTMLInputElement).value = secondarySat.sccNum5 ?? secondarySat.sccNum;
   }
 
   private handleCreateSatToSat_() {
@@ -392,7 +394,8 @@ export class SatelliteFov extends KeepTrackPlugin {
     }
 
     const catalogManager = ServiceLocator.getCatalogManager();
-    const targetId = catalogManager.sccNum2Id(parseInt(sccInput));
+    // sccNum2Id handles numeric / alpha-5 / extended; parseInt would drop alpha-5.
+    const targetId = catalogManager.sccNum2Id(sccInput);
 
     if (targetId === null) {
       toast('Target satellite not found in catalog.', ToastMsgType.critical);

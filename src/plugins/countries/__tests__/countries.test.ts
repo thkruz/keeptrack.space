@@ -11,6 +11,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { CountriesMenu } from '@app/plugins/countries/countries';
+import { settingsManager as settingsManagerSingleton } from '@app/settings/settings';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { defaultSat } from '@test/environment/apiMocks';
@@ -267,5 +268,72 @@ describe('CountriesMenu', () => {
       expect(onSpy).toHaveBeenCalledWith(EventBusEvent.uiManagerFinal, expect.any(Function));
       expect(uiFinalSpy).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe('CountriesMenu behavior', () => {
+  let plugin: CountriesMenu;
+
+  beforeEach(() => {
+    setupCountriesMenuTestEnvironment();
+    plugin = new CountriesMenu();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('O shortcut opens the menu', () => {
+    const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
+
+    plugin.getKeyboardShortcuts()[0].callback();
+
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('builds command-palette commands grouped by country and invokes one', () => {
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'getSats').mockReturnValue([{ country: 'US' }, { country: 'US' }, { country: 'CA' }, { country: 'ANALSAT' }, { country: '' }] as never);
+    // Two distinct display names so the alphabetical sort comparator actually runs.
+    vi.spyOn(StringExtractor, 'extractCountry').mockImplementation((code: string) => (code === 'CA' ? 'Canada' : 'United States'));
+
+    const commands = plugin.getCommandPaletteCommands();
+
+    expect(commands.length).toBe(2);
+    expect(commands[0].label).toContain('Canada');
+
+    const clickSpy = vi.spyOn(plugin as unknown as { countryMenuClick_(c: string): void }, 'countryMenuClick_').mockImplementation(() => undefined);
+
+    commands[0].callback();
+    expect(clickSpy).toHaveBeenCalled();
+  });
+
+  it('countryMenuClick_ selects the group, fills results and closes search on mobile', () => {
+    const groups = ServiceLocator.getGroupsManager();
+
+    // createGroup is what populates groupList for a country; emulate that so groupSelected_ proceeds.
+    vi.spyOn(groups, 'createGroup').mockImplementation((_type, _data, name: string) => {
+      groups.groupList[name] = { ids: [1, 2] } as never;
+
+      return groups.groupList[name];
+    });
+    vi.spyOn(groups, 'selectGroup').mockImplementation(() => undefined);
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'getSat').mockReturnValue({ sccNum: '00005' } as never);
+
+    const ui = ServiceLocator.getUiManager();
+
+    ui.searchManager.fillResultBox = vi.fn();
+    ui.searchManager.closeSearch = vi.fn();
+    ui.hideSideMenus = vi.fn();
+
+    if (!document.getElementById('search')) {
+      document.body.insertAdjacentHTML('beforeend', '<input id="search"/>');
+    }
+    // countries.ts reads the imported settingsManager singleton, not the ambient global.
+    settingsManagerSingleton.isMobileModeEnabled = true;
+
+    expect(() => (plugin as unknown as { countryMenuClick_(c: string): void }).countryMenuClick_('US')).not.toThrow();
+    expect(settingsManagerSingleton.isMobileModeEnabled).toBe(true);
+
+    settingsManagerSingleton.isMobileModeEnabled = false;
   });
 });

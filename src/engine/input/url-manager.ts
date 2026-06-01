@@ -444,7 +444,9 @@ export abstract class UrlManager {
 
   private static handleSatParam_(val: string) {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
-    const urlSatId = catalogManagerInstance.sccNum2Id(parseInt(val));
+    // Pass the raw string — sccNum2Id handles numeric, alpha-5, and extended
+    // forms. parseInt would turn alpha-5 ("T0001") into NaN.
+    const urlSatId = catalogManagerInstance.sccNum2Id(val);
 
     if (urlSatId !== null) {
       PluginRegistry.getPlugin(SelectSatManager)?.selectSat(urlSatId);

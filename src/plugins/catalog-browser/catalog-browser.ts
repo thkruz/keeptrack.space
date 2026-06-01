@@ -20,7 +20,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
-import { Satellite, Tle } from '@ootk/src/main';
+import { Satellite } from '@ootk/src/main';
 import satelliteAltPng from '@public/img/icons/satellite-alt.png';
 import { CatalogBrowserData } from './catalog-browser-data';
 import type { CatalogBrowserConfiguration } from './catalog-browser-settings';
@@ -401,8 +401,16 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
     const incomingMap = new Map<string, { TLE1: string; TLE2: string; ON?: string }>();
 
     for (const entry of asciiCatalog) {
-      const scc6 = Tle.convertA5to6Digit(entry.SCC);
+      // canonicalSccKey strips leading zeros so a zero-padded incoming SCC
+      // ("025544") still matches the display-canonical cached.sccNum ("25544"),
+      // and returns null for malformed SCCs (Satnogs-style corruption) or IDs
+      // beyond TLE alpha-5 capacity instead of throwing — skip those rather
+      // than crashing the whole merge.
+      const scc6 = CatalogLoader.canonicalSccKey(entry.SCC);
 
+      if (scc6 === null) {
+        continue;
+      }
       incomingMap.set(scc6, entry);
     }
 

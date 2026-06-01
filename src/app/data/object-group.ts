@@ -29,7 +29,10 @@ export type GroupData = {
   [GroupType.COUNTRY_REGEX]: RegExp;
   [GroupType.SHAPE_STRING]: string;
   [GroupType.BUS_STRING]: string;
-  [GroupType.SCC_NUM]: number[];
+  // sccNum2Id accepts any of: numeric, alpha-5 ("T0001"), 6-digit numeric,
+  // or extended 7+ digit string. Accept both shapes so constellations can be
+  // built from mixed-form ID lists without a caller-side parseInt.
+  [GroupType.SCC_NUM]: (number | string)[];
   [GroupType.ID_LIST]: number[];
   [GroupType.PAYLOAD_NAME_REGEX]: RegExp;
 };
@@ -101,7 +104,7 @@ export class ObjectGroup<T extends GroupType> {
       case GroupType.SCC_NUM:
         this.ids = (data as GroupData[GroupType.SCC_NUM])
           // .slice(0, settingsManager.maxOrbitsDisplayed)
-          .map((sccNum: number) => ServiceLocator.getCatalogManager().sccNum2Id(sccNum))
+          .map((sccNum) => ServiceLocator.getCatalogManager().sccNum2Id(sccNum))
           .filter((id: number | null): id is number => id !== null);
         break;
       case GroupType.ID_LIST:
@@ -137,8 +140,12 @@ export class ObjectGroup<T extends GroupType> {
     // Concat data with expandedData using | as a delimiter
 
     data = `${data}|${expandedData.join('|')}`;
+    // Exclude analyst sats from country groups. The legacy check looked at
+    // sccNum5?.startsWith('T') as a heuristic for analyst slots, but that
+    // pattern doesn't reliably identify them — analyst sats are tagged
+    // explicitly via `country === 'ANALSAT'` in catalog-loader, so test that.
     this.ids = satData
-      .filter((sat: Satellite) => data.split('|').includes(sat.country) && !sat.sccNum5.startsWith('T'))
+      .filter((sat: Satellite) => data.split('|').includes(sat.country) && sat.country !== 'ANALSAT')
       // .slice(0, settingsManager.maxOrbitsDisplayed)
       // eslint-disable-next-line arrow-body-style
       .map((sat: Satellite) => {

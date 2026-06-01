@@ -134,7 +134,9 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       Sensor: sensorDisplayName,
     }));
 
-    saveXlsx(csvData, `${sensorDisplayName ?? 'unk'}-${(this.selectSatManager_.getSelectedSat() as Satellite).sccNum6}-look-angles`);
+    const lookAnglesSat = this.selectSatManager_.getSelectedSat() as Satellite;
+
+    saveXlsx(csvData, `${sensorDisplayName ?? 'unk'}-${lookAnglesSat.sccNum6 ?? lookAnglesSat.sccNum}-look-angles`);
   };
   sideMenuSecondaryOptions = {
     width: 300,

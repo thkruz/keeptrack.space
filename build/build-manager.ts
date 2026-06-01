@@ -146,10 +146,19 @@ class BuildManager {
     compilers.run((err: Error | null, stats?: MultiStats) => {
       BuildManager.handleCompilerResults(err, stats);
 
+      const failed = Boolean(err) || Boolean(stats?.hasErrors());
+
       // Close the compiler to let the process exit
       compilers.close((closeErr: Error | null) => {
         if (closeErr) {
           handleBuildError(closeErr, false);
+        }
+
+        if (failed || closeErr) {
+          // A failed compile must exit non-zero so CI catches it here rather than
+          // serving an app-less dist to the downstream smoke tests.
+          logWithStyle('Build failed.', ConsoleStyles.ERROR);
+          process.exit(1);
         }
 
         logWithStyle('Build completed successfully!', ConsoleStyles.SUCCESS);

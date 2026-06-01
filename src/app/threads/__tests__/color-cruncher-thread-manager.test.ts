@@ -179,10 +179,9 @@ describe('ColorCruncherThreadManager', () => {
     });
 
     it('discards stale buffers from an older catalog sequence', () => {
-      const { mgr, worker } = makeMgr();
+      const { mgr } = makeMgr();
 
       mgr.sendCatalogData({} as never, 5); // currentSeqNum_ = 5
-      void worker;
 
       (mgr as unknown as { onMessage: (e: MessageEvent) => void }).onMessage({
         data: { colorData: new Float32Array([1]), pickableData: new Int8Array([1]), seqNum: 1 },

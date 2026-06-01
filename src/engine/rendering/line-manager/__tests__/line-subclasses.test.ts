@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { Scene } from '@app/engine/core/scene';
 import { SolarBody } from '@app/engine/core/interfaces';

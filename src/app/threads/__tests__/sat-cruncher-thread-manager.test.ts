@@ -74,6 +74,7 @@ describe('SatCruncherThreadManager', () => {
     it('sendTimeSync posts OFFSET with the time fields', () => {
       const { mgr, worker } = makeMgr();
 
+      // eslint-disable-next-line no-sync -- domain method name, not a Node fs sync call
       mgr.sendTimeSync(1000, 42, 2);
 
       expect(lastMsg(worker)).toEqual({
@@ -156,10 +157,9 @@ describe('SatCruncherThreadManager', () => {
     });
 
     it('discards stale messages from an older catalog sequence', () => {
-      const { mgr, worker } = makeMgr();
+      const { mgr } = makeMgr();
 
       mgr.sendCatalogData('x', 1); // currentSeqNum_ = 1
-      void worker;
 
       // A message with a lower seqNum must be ignored without touching DotsManager.
       expect(() => (mgr as unknown as { onMessage: (e: { data: unknown }) => void }).onMessage({ data: { seqNum: 0 } })).not.toThrow();

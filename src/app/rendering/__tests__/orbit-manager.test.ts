@@ -1,4 +1,5 @@
 /* eslint-disable dot-notation */
+/* eslint-disable max-lines-per-function */
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { OrbitManager } from '@app/app/rendering/orbit-manager';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';

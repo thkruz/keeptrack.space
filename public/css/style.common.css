@@ -2544,12 +2544,14 @@ button.ui-button::-moz-focus-inner {
   filter: grayscale(1) !important;
 }
 
-/* Pro-locked icons — blue tint when user is NOT logged in */
-.bmenu-item-pro img {
+/* Pro-locked icons — blue tint only while the user is NOT logged in. The tint
+   is driven purely off the body-level .user-logged-in class so freshly-rendered
+   gated items inherit the right look with no per-element JS sync. */
+body:not(.user-logged-in) .bmenu-item-pro img {
   filter: hue-rotate(227deg) brightness(1.2) !important;
 }
 
-.bmenu-item-pro:hover img {
+body:not(.user-logged-in) .bmenu-item-pro:hover img {
   filter: hue-rotate(227deg) brightness(1.8) !important;
 }
 

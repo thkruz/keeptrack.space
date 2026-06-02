@@ -320,6 +320,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   isStarlinkOnly: 'core',
   isNotionalDebris: 'core',
   isDebrisOnly: 'core',
+  catalogReferenceTime: 'core',
   lastSearch: 'core',
   lastSearchResults: 'core',
   minimumSearchCharacters: 'core',

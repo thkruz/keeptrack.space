@@ -164,6 +164,15 @@ export class CoreSettings {
   isNotionalDebris = false;
   isDebrisOnly = false;
 
+  /**
+   * Reference epoch (ms since Unix epoch) that age-of-GP displays measure against,
+   * instead of the wall clock. `null` means "use the current time" (the normal,
+   * live-catalog case). The HistoricCatalogPlugin sets this to a loaded snapshot's
+   * time so the GP-age color scheme and sat-info-box report age relative to when
+   * the historic catalog was current. Cleared by CatalogLoader on any fresh load.
+   */
+  catalogReferenceTime: number | null = null;
+
   // Search
   lastSearch: string | string[] = '';
   /**

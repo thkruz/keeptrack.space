@@ -889,4 +889,11 @@ export const pluginManifest: PluginDescriptor[] = [
     proClassName: 'FavoritesMenuPlugin',
     defaultConfig: { enabled: true },
   },
+  {
+    configKey: 'CompanionLinkPlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/companion-link/companion-link') : undefined,
+    proClassName: 'CompanionLinkPlugin',
+    defaultConfig: { enabled: false, order: 520 },
+    isLoginRequired: true,
+  },
 ];

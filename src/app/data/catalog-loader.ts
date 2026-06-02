@@ -202,6 +202,9 @@ export class CatalogLoader {
   static async load(): Promise<void> {
     const settingsManager: SettingsManager = window.settingsManager;
 
+    // Loading the live catalog measures GP age against the wall clock again.
+    settingsManager.catalogReferenceTime = null;
+
     // Fire-and-forget: fetch org data from R2 in parallel with catalog loading
     orgDataService.init();
 
@@ -399,6 +402,9 @@ export class CatalogLoader {
 
     showLoadingSticky();
 
+    // Reloading from raw TLEs measures GP age against the wall clock again.
+    settingsManager.catalogReferenceTime = null;
+
     try {
       // Deselect current satellite
       const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);
@@ -499,6 +505,9 @@ export class CatalogLoader {
     const { PluginRegistry } = await import('../../engine/core/plugin-registry');
 
     showLoadingSticky();
+
+    // Reloading from raw TLEs measures GP age against the wall clock again.
+    settingsManager.catalogReferenceTime = null;
 
     try {
       // Deselect current satellite
@@ -659,6 +668,10 @@ export class CatalogLoader {
     const { PluginRegistry } = await import('../../engine/core/plugin-registry');
 
     showLoadingSticky();
+
+    // Default to wall-clock GP age; callers loading a historic snapshot (e.g. the
+    // HistoricCatalogPlugin) re-establish settingsManager.catalogReferenceTime afterward.
+    settingsManager.catalogReferenceTime = null;
 
     try {
       const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);

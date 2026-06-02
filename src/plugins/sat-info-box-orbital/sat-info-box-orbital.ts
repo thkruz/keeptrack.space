@@ -11,6 +11,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
+import { getCatalogReferenceDate } from '@app/engine/utils/catalog-reference-time';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
@@ -133,7 +134,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
         );
       }
 
-      const now: Date | number | string = new Date();
+      const now: Date | number | string = getCatalogReferenceDate();
       const daysold = obj.ageOfElset(now);
       const age = daysold >= 1 ? daysold : daysold * 24;
       const units = daysold >= 1 ? t7e('SatInfoBoxOrbital.AgeOfGP.days') : t7e('SatInfoBoxOrbital.AgeOfGP.hours');

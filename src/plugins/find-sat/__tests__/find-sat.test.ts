@@ -1,12 +1,17 @@
 import { vi } from 'vitest';
 /* eslint-disable dot-notation */
 import { MenuMode } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { FindSatPlugin } from '@app/plugins/find-sat/find-sat';
-import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { FindSatPlugin, SearchSatParams } from '@app/plugins/find-sat/find-sat';
+import { defaultSat } from '@test/environment/apiMocks';
+import { setupStandardEnvironment, mockUiManager } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { KeepTrack } from '@app/keeptrack';
+import { Satellite } from '@ootk/src/main';
 
 // eslint-disable-next-line max-lines-per-function
 describe('FindSatPlugin_class', () => {
@@ -138,6 +143,134 @@ describe('FindSatPlugin_class', () => {
   // =========================================================================
   // Search filter tests
   // =========================================================================
+
+  const createFindSat = (id: number, bus: string, payload: string): Satellite => {
+    const sat = defaultSat.clone();
+
+    sat.id = id;
+    sat.sccNum = `${id}`.padStart(5, '0');
+    sat.bus = bus;
+    sat.payload = payload;
+
+    return sat;
+  };
+
+  const initPluginWithCatalog = (sats: Satellite[]): FindSatPlugin => {
+    const plugin = new FindSatPlugin();
+    const catalogManager = ServiceLocator.getCatalogManager();
+
+    catalogManager.objectCache = sats;
+    catalogManager.numSatellites = sats.length;
+    catalogManager.sccIndex = Object.fromEntries(sats.map((sat) => [sat.sccNum, sat.id]));
+    plugin.init();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+
+    return plugin;
+  };
+
+  const getSelectValues = (selectId: string): string[] => Array.from((getEl(selectId) as HTMLSelectElement).options).map((option) => option.value);
+
+  const defaultSearchParams = (): SearchSatParams => ({
+    argPe: Number.NaN,
+    argPeMarg: Number.NaN,
+    az: Number.NaN,
+    azMarg: Number.NaN,
+    bus: 'All',
+    countryCode: 'All',
+    el: Number.NaN,
+    elMarg: Number.NaN,
+    inc: Number.NaN,
+    incMarg: Number.NaN,
+    objType: 0,
+    payload: 'All',
+    period: Number.NaN,
+    periodMarg: Number.NaN,
+    tleAge: Number.NaN,
+    tleAgeMarg: Number.NaN,
+    raan: Number.NaN,
+    raanMarg: Number.NaN,
+    rcs: Number.NaN,
+    rcsMarg: Number.NaN,
+    rng: Number.NaN,
+    rngMarg: Number.NaN,
+    shape: 'All',
+    source: 'All',
+  } as SearchSatParams);
+
+  it('should filter bus options case-insensitively with partial input', () => {
+    initPluginWithCatalog([
+      createFindSat(5, 'Starlink', 'Imaging-1'),
+      createFindSat(6, 'Dragon', 'Weather-1'),
+      createFindSat(7, 'Starshield', 'Relay-1'),
+    ]);
+
+    const busFilter = getEl('fbl-bus-filter') as HTMLInputElement;
+
+    busFilter.value = 'sta';
+    busFilter.dispatchEvent(new Event('input'));
+
+    expect(getSelectValues('fbl-bus')).toEqual(['All', 'Starlink', 'Starshield']);
+  });
+
+  it('should filter payload options case-insensitively with partial input', () => {
+    initPluginWithCatalog([
+      createFindSat(5, 'Starlink', 'Imaging-1'),
+      createFindSat(6, 'Dragon', 'Weather-1'),
+      createFindSat(7, 'Starshield', 'Wideband-1'),
+    ]);
+
+    const payloadFilter = getEl('fbl-payload-filter') as HTMLInputElement;
+
+    payloadFilter.value = 'WEA';
+    payloadFilter.dispatchEvent(new Event('input'));
+
+    expect(getSelectValues('fbl-payload')).toEqual(['All', 'Weather']);
+  });
+
+  it('should restore all bus and payload options when filters are cleared', () => {
+    initPluginWithCatalog([
+      createFindSat(5, 'Starlink', 'Imaging-1'),
+      createFindSat(6, 'Dragon', 'Weather-1'),
+      createFindSat(7, 'Starshield', 'Relay-1'),
+    ]);
+
+    const initialBusOptions = getSelectValues('fbl-bus');
+    const initialPayloadOptions = getSelectValues('fbl-payload');
+    const busFilter = getEl('fbl-bus-filter') as HTMLInputElement;
+    const payloadFilter = getEl('fbl-payload-filter') as HTMLInputElement;
+
+    busFilter.value = 'drag';
+    busFilter.dispatchEvent(new Event('input'));
+    payloadFilter.value = 'ima';
+    payloadFilter.dispatchEvent(new Event('input'));
+    busFilter.value = '';
+    busFilter.dispatchEvent(new Event('input'));
+    payloadFilter.value = '';
+    payloadFilter.dispatchEvent(new Event('input'));
+
+    expect(getSelectValues('fbl-bus')).toEqual(initialBusOptions);
+    expect(getSelectValues('fbl-payload')).toEqual(initialPayloadOptions);
+  });
+
+  it('should keep exact bus and payload search behavior', () => {
+    const plugin = initPluginWithCatalog([
+      createFindSat(5, 'Starlink', 'Imaging-1'),
+      createFindSat(6, 'Dragon', 'Weather-1'),
+      createFindSat(7, 'Starlink', 'Weather-2'),
+    ]);
+
+    const results = plugin['searchSats_']({
+      ...defaultSearchParams(),
+      bus: 'Starlink',
+      payload: 'Imaging',
+    });
+
+    expect(results).toHaveLength(1);
+    expect(results[0].bus).toBe('Starlink');
+    expect(results[0].payload).toBe('Imaging-1');
+    expect(mockUiManager.doSearch).toHaveBeenCalledWith('00005');
+  });
 
   it('should find satellites with all inputs set to 0', () => {
     const plugin = new FindSatPlugin();

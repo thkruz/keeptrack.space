@@ -144,10 +144,22 @@ export class FindSatPlugin extends KeepTrackPlugin {
         </div>
         <div class="row">
           <div class="input-field col s12">
+            <input placeholder="Type to filter bus options" id="fbl-bus-filter" type="text">
+            <label for="fbl-bus-filter" class="active">${l('satelliteBus')} Filter</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
             <select value=0 id="fbl-bus" type="text">
               <option value='All'>${l('all')}</option>
             </select>
             <label for="disabled">${l('satelliteBus')}</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <input placeholder="Type to filter payload options" id="fbl-payload-filter" type="text">
+            <label for="fbl-payload-filter" class="active">${l('payload')} Filter</label>
           </div>
         </div>
         <div class="row">
@@ -321,6 +333,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
       .forEach((bus) => {
         getEl('fbl-bus')!.insertAdjacentHTML('beforeend', `<option value="${bus}">${bus}</option>`);
       });
+    FindSatPlugin.addSelectFilter_('fbl-bus-filter', 'fbl-bus');
 
     countryNameList.forEach((countryName: string) => {
       getEl('fbl-country')!.insertAdjacentHTML('beforeend', `<option value="${countryCodeList[countryName]}">${countryName}</option>`);
@@ -359,11 +372,48 @@ export class FindSatPlugin extends KeepTrackPlugin {
           getEl('fbl-payload')!.insertAdjacentHTML('beforeend', `<option value="${payload}">${payload}</option>`);
         }
       });
+    FindSatPlugin.addSelectFilter_('fbl-payload-filter', 'fbl-payload');
 
     // Export data
     getEl('findByLooks-export')?.addEventListener('click', () => {
       this.onDownload();
     });
+  }
+
+  protected static addSelectFilter_(filterInputId: string, selectId: string): void {
+    const filterInput = getEl(filterInputId) as HTMLInputElement | null;
+    const select = getEl(selectId) as HTMLSelectElement | null;
+
+    if (!filterInput || !select) {
+      return;
+    }
+
+    const allOptions = Array.from(select.options).map((option) => ({
+      text: option.text,
+      value: option.value,
+    }));
+
+    filterInput.addEventListener('input', () => {
+      const selectedValue = select.value;
+      const filterText = filterInput.value.trim().toLowerCase();
+      const filteredOptions = allOptions.filter((option) => option.value === 'All' || option.text.toLowerCase().includes(filterText));
+
+      select.replaceChildren(...filteredOptions.map((option) => new Option(option.text, option.value)));
+      select.value = filteredOptions.some((option) => option.value === selectedValue) ? selectedValue : 'All';
+      FindSatPlugin.refreshMaterializeSelect_(select);
+    });
+  }
+
+  protected static refreshMaterializeSelect_(select: HTMLSelectElement): void {
+    const formSelect = (window.M as typeof window.M & {
+      FormSelect?: {
+        getInstance?: (el: Element) => { destroy?: () => void } | undefined;
+        init?: (el: Element) => void;
+      };
+    } | undefined)?.FormSelect;
+
+    formSelect?.getInstance?.(select)?.destroy?.();
+    formSelect?.init?.(select);
   }
 
   protected findByLooksSubmit_(): Promise<void> {

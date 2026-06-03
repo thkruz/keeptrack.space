@@ -1,6 +1,7 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { BaseObject, Days, Satellite, getDayOfYear, Star } from '@ootk/src/main';
+import { getCatalogReferenceDate } from '../../utils/catalog-reference-time';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
@@ -49,7 +50,7 @@ export class GpAgeColorScheme extends ColorScheme {
   }
 
   override calculateParams() {
-    const now = new Date();
+    const now = getCatalogReferenceDate();
 
     return {
       jday: getDayOfYear(now) + ((now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds()) / 86400),
@@ -71,7 +72,7 @@ export class GpAgeColorScheme extends ColorScheme {
 
     if (!params) {
       errorManagerInstance.debug('No params passed to ageOfElset');
-      const now = new Date();
+      const now = getCatalogReferenceDate();
 
       params = {
         jday: getDayOfYear(now) + ((now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds()) / 86400),

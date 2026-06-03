@@ -688,18 +688,18 @@ export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: Gree
   let cosLat: number, cosLon: number, sinLat: number, sinLon: number;
 
   const tLen = missile.altList.length;
-  let curMissivarTime = 0;
 
-  for (let t = 0; t < tLen; t++) {
-    if (missile.startTime * 1 + t * 1000 >= now.getTime()) {
-      curMissivarTime = t;
-      break;
-    }
-  }
+  // Map sim time to a trajectory index (each point is 1 second). Clamp to the trajectory: before
+  // launch hold at the pad (index 0); after the final point hold at the impact point (tLen-1).
+  // The previous "first t where startTime+t*1000 >= now" loop left the index at 0 when sim time
+  // ran past the trajectory end, snapping impacted missiles back to their launch site.
+  const curMissivarTime = Math.max(0, Math.min(Math.ceil((now.getTime() - missile.startTime) / 1000), tLen - 1));
 
   missile.lastTime = missile.lastTime !== undefined && missile.lastTime >= 0 ? missile.lastTime : 0;
 
-  const timeIndex = missile.lastTime + 1;
+  // Look one point ahead for the velocity estimate, but never past the last point (avoids reading
+  // undefined lat/lon/alt — which produced NaN velocity — once the missile reaches impact).
+  const timeIndex = Math.min(missile.lastTime + 1, tLen - 1);
   const lat = missile.latList[timeIndex];
   const lon = missile.lonList[timeIndex];
   const alt = missile.altList[timeIndex];

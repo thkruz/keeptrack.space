@@ -130,12 +130,15 @@ export class ErrorManager {
       return;
     }
 
-    // Cross-origin script errors are unfixable on our end — Rocket Loader and other
-    // third-party loaders trigger these. Surface them to telemetry and console once,
-    // but don't toast the user or auto-file a useless "Unknown error" GitHub issue.
-    if (ctx.isCrossOrigin) {
-      const err = this.toError_(ctx.error, ctx.message, ctx.source, ctx.line, ctx.col);
+    const err = this.toError_(ctx.error, ctx.message, ctx.source, ctx.line, ctx.col);
 
+    // Cross-origin / third-party-loader errors are unfixable on our end — Cloudflare Rocket
+    // Loader and other CDN-injected scripts trigger these, including via unhandled promise
+    // rejections whose reason is null (the window `error` handler flags 'Script error.' with
+    // isCrossOrigin, but the rejection handler can't, so we also sniff the stack/source for
+    // their frames). Surface to telemetry and console once, but don't toast the user or
+    // auto-file a useless "Unknown error" GitHub issue (see #1371).
+    if (this.isThirdPartyScriptError_(err, ctx)) {
       EventBus.getInstance().emit(EventBusEvent.error, err, ctx.funcName);
       // eslint-disable-next-line no-console
       console.warn(
@@ -145,8 +148,6 @@ export class ErrorManager {
 
       return;
     }
-
-    const err = this.toError_(ctx.error, ctx.message, ctx.source, ctx.line, ctx.col);
 
     EventBus.getInstance().emit(EventBusEvent.error, err, ctx.funcName);
 
@@ -216,15 +217,38 @@ export class ErrorManager {
     return false;
   }
 
-  private isExternalFetchError_(err: Error): boolean {
-    if (typeof (err as { status?: unknown }).status === 'number') {
-      return true;
-    }
-    if (err instanceof TypeError && (/failed to fetch|networkerror|load failed|fetch/iu).test(err.message)) {
+  /**
+   * Cloudflare Rocket Loader and other CDN-injected loaders throw/reject from code we don't
+   * ship and can't fix. They surface either as same-origin 'Script error.' (flagged upstream
+   * with `isCrossOrigin`) or as unhandled rejections with a null reason — the latter never get
+   * flagged, so we also match their telltale frames (`cdn-cgi`, `rocket-loader`) in the error
+   * stack or captured source. Matching the rebuilt synthetic stack works because `toError_`
+   * re-anchors a null-reason error to the synchronous caller, which is the loader itself (#1371).
+   */
+  private isThirdPartyScriptError_(err: Error, ctx: ErrorContext): boolean {
+    if (ctx.isCrossOrigin) {
       return true;
     }
 
-    return false;
+    return (/cdn-cgi|rocket-loader/iu).test(`${ctx.source ?? ''}\n${err.stack ?? ''}`);
+  }
+
+  private isExternalFetchError_(err: Error): boolean {
+    // HTTP-status-bearing errors (e.g. CelesTrak `err.status = 500`) are server-side, not our bug.
+    if (typeof (err as { status?: unknown }).status === 'number') {
+      return true;
+    }
+
+    /*
+     * Network-layer fetch failures (offline, DNS, CORS, dead host) surface with one of these
+     * browser-specific messages: 'Failed to fetch' (Chromium), 'NetworkError when attempting
+     * to fetch resource.' (Firefox), 'Load failed' (Safari). Match on the MESSAGE regardless of
+     * prototype — an error that crosses a Web Worker / structured-clone boundary, or is rebuilt by
+     * toError_, arrives as a plain Error and would slip past an `instanceof TypeError` check and
+     * get auto-filed as a spurious GitHub issue. The phrases are specific enough that a real app
+     * bug is unlikely to collide; a bare 'fetch' is deliberately NOT matched (too broad).
+     */
+    return (/failed to fetch|networkerror|load failed/iu).test(err.message);
   }
 
   warn(msg: string, ...optionalParams: unknown[]): void {

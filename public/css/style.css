@@ -34,8 +34,8 @@
 /* File-specific CSS rules */
 
 .top-menu-icons__blue-img,
-.bmenu-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help, .bmenu-item-pro) .bmenu-item-inner *,
-.bmenu-filter-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help, .bmenu-item-pro) .bmenu-filter-item-inner * {
+.bmenu-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help) .bmenu-item-inner *,
+.bmenu-filter-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help) .bmenu-filter-item-inner * {
   filter: var(--filter-icon-blue);
 }
 

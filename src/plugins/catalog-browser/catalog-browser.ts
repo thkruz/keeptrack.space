@@ -1,5 +1,5 @@
 import { apiFetch } from '@app/app/data/api-fetch';
-import { CatalogLoader, KeepTrackTLEFile } from '@app/app/data/catalog-loader';
+import { CatalogLoader, JsSat, KeepTrackTLEFile } from '@app/app/data/catalog-loader';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -204,10 +204,11 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
         if (!resp.ok) {
           throw new Error(`Vimpel fetch returned HTTP ${resp.status}`);
         }
-        const vimpelData = await resp.json() as { TLE1: string; TLE2: string }[];
-        const tleLines = vimpelData.map((s) => `${s.TLE1}\n${s.TLE2}`).join('\n');
+        const vimpelData = await resp.json() as JsSat[];
 
-        await CatalogLoader.reloadCatalog(tleLines);
+        // Route through the JSC Vimpel pipeline (not raw-TLE reload) so altIds,
+        // labels, and object types match the initial-boot processing.
+        await CatalogLoader.reloadVimpelCatalog(vimpelData);
       } else {
         await CatalogLoader.load();
       }

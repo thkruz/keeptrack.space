@@ -369,12 +369,14 @@ body.drawer-mode {
     flex-shrink: 0;
   }
 
-  /* Pro-locked items — match bottom menu yellow tint */
-  .drawer-item.bmenu-item-pro .drawer-item-icon {
+  /* Pro-locked items — match bottom menu yellow tint, only while logged out.
+     `&` is the enclosing body.drawer-mode, so this gates on the body-level
+     .user-logged-in class without a (never-matching) nested body descendant. */
+  &:not(.user-logged-in) .drawer-item.bmenu-item-pro .drawer-item-icon {
     filter: hue-rotate(227deg) brightness(1.2);
   }
 
-  .drawer-item.bmenu-item-pro:hover .drawer-item-icon {
+  &:not(.user-logged-in) .drawer-item.bmenu-item-pro:hover .drawer-item-icon {
     filter: hue-rotate(227deg) brightness(1.8);
   }
 

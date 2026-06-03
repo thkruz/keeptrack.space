@@ -116,6 +116,39 @@ describe('ErrorManager.reportEvent', () => {
     expect(console.warn).toHaveBeenCalled();
   });
 
+  it('suppresses a Rocket Loader rejection (null reason, loader frame in stack) — #1371', () => {
+    // Reproduces the unhandledrejection from Cloudflare Rocket Loader: reason is null and
+    // the only signal is the loader frame in the synthesized stack. Must not throw or auto-file.
+    const err = new Error('Unknown error');
+
+    err.stack = 'Error: Unknown error\n    at c (https://app.keeptrack.space/cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js:1:9405)';
+
+    expect(() => errorManager.reportEvent({
+      error: err,
+      funcName: 'Unhandled Promise Rejection',
+      isUnhandledRejection: true,
+    })).not.toThrow();
+
+    // Still surfaces to EventBus for telemetry, but quietly (warn, not error).
+    expect(captured).toHaveLength(1);
+    // eslint-disable-next-line no-console
+    expect(console.warn).toHaveBeenCalled();
+    // eslint-disable-next-line no-console
+    expect(console.error).not.toHaveBeenCalled();
+  });
+
+  it('does not suppress a normal app rejection whose stack has no loader frame', () => {
+    expect(() => errorManager.reportEvent({
+      error: new Error('real bug'),
+      funcName: 'Unhandled Promise Rejection',
+      isUnhandledRejection: true,
+    })).toThrow('real bug');
+
+    expect(captured).toHaveLength(1);
+    // eslint-disable-next-line no-console
+    expect(console.error).toHaveBeenCalled();
+  });
+
   it('synthesizes a stack from ErrorEvent fields when raw error is null', () => {
     expect(() => errorManager.reportEvent({
       error: null,
@@ -172,5 +205,62 @@ describe('ErrorManager.reportEvent', () => {
       line: 1,
       col: 1,
     })).toThrow('real-world message');
+  });
+});
+
+describe('ErrorManager.isExternalFetchError_ (auto-file suppression)', () => {
+  let errorManager: ErrorManager;
+  let openSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    errorManager = new ErrorManager();
+    vi.spyOn(console, 'error').mockImplementation(() => { /* silence */ });
+    openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    // Force the real auto-file gate to be reachable (isThisNode would otherwise stub the URL to '').
+    (errorManager as unknown as { newGithubIssueUrl_: () => string }).newGithubIssueUrl_ = () => 'https://github.com/issue';
+    (errorManager as unknown as { minLevel_: number }).minLevel_ = 0;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const reportInNode = (err: Error): void => {
+    // reportEvent rethrows under node; swallow it so we can assert on the auto-file spy.
+    try {
+      errorManager.reportEvent({ error: err, funcName: 'CatalogBrowserPlugin' });
+    } catch {
+      /* expected node rethrow */
+    }
+  };
+
+  it('suppresses a genuine TypeError "Failed to fetch"', () => {
+    reportInNode(new TypeError('Failed to fetch'));
+    expect(openSpy).not.toHaveBeenCalled();
+  });
+
+  it('suppresses a worker-boundary network error that lost its TypeError prototype', () => {
+    // Structured-clone across a Worker boundary downgrades TypeError -> plain Error.
+    reportInNode(new Error('Failed to fetch'));
+    expect(openSpy).not.toHaveBeenCalled();
+  });
+
+  it('suppresses Firefox/Safari network phrasings regardless of prototype', () => {
+    reportInNode(new Error('NetworkError when attempting to fetch resource.'));
+    reportInNode(new Error('Load failed'));
+    expect(openSpy).not.toHaveBeenCalled();
+  });
+
+  it('suppresses status-bearing HTTP errors (server-side, not our bug)', () => {
+    const err = new Error('CelesTrak returned HTTP 500') as Error & { status: number };
+
+    err.status = 500;
+    reportInNode(err);
+    expect(openSpy).not.toHaveBeenCalled();
+  });
+
+  it('still auto-files a real bug whose message merely contains "fetch"', () => {
+    reportInNode(new TypeError('Cannot read properties of undefined (reading \'fetchData\')'));
+    expect(openSpy).toHaveBeenCalledTimes(1);
   });
 });

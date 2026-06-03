@@ -7,6 +7,9 @@ import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { jday } from '@app/engine/utils/transforms';
 import { DEG2RAD, Degrees, TemeVec3, Kilometers, KilometersPerSecond, MILLISECONDS_TO_DAYS, RAD2DEG, Sgp4, SpaceObjectType, ecefRad2rae, eci2ecef, eci2lla } from '@ootk/src/main';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ScenarioManagementPlugin } from '@app/plugins/scenario-management/scenario-management';
+import { TimeSlider } from '@app/plugins/time-slider/time-slider';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
 import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, globalBMTargets, ukSLBM } from './missile-data';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -17,65 +20,112 @@ const missileArray: MissileObject[] = [];
 
 let isMassRaidLoaded = false;
 
+/**
+ * Bound the scenario timeline to the union of every active missile in the catalog: earliest launch
+ * → latest impact (each trajectory point is 1 second in the cruncher's index→time mapping).
+ *
+ * Recomputed whenever missiles are added, so the window expands to cover the whole mass raid, or
+ * every custom missile launched so far (start = earliest of any, stop = latest of any). No-op when
+ * the scenario plugin isn't loaded or no active missiles remain — clearMissiles() releases the
+ * bounds in that case.
+ */
+const boundScenarioToActiveMissiles_ = (): void => {
+  const scenarioPlugin = PluginRegistry.getPlugin(ScenarioManagementPlugin);
+
+  if (!scenarioPlugin) {
+    return;
+  }
+
+  const catalogManagerInstance = ServiceLocator.getCatalogManager();
+  const firstMissileId = catalogManagerInstance.missileSats - 500;
+  let minStartMs = Infinity;
+  let maxEndMs = -Infinity;
+
+  for (let id = firstMissileId; id < catalogManagerInstance.missileSats; id++) {
+    const missile = catalogManagerInstance.objectCache[id] as MissileObject | undefined;
+
+    if (!missile?.isMissile() || !missile.active || !missile.altList?.length) {
+      continue;
+    }
+
+    minStartMs = Math.min(minStartMs, missile.startTime);
+    maxEndMs = Math.max(maxEndMs, missile.startTime + (missile.altList.length - 1) * 1000);
+  }
+
+  if (minStartMs === Infinity) {
+    return; // No active missiles to bound
+  }
+
+  scenarioPlugin.updateScenario({ startTime: new Date(minStartMs), endTime: new Date(maxEndMs) });
+  PluginRegistry.getPlugin(TimeSlider)?.updateSliderPosition();
+};
+
 // This function stalls Jest for multiple minutes.
 /* istanbul ignore next */
 export const MassRaidPre = async (time: number, simFile: string) => {
   missileManager.clearMissiles();
+
   await fetch(simFile)
     .then((response) => response.json())
     .then((newMissileArray) => {
       const catalogManagerInstance = ServiceLocator.getCatalogManager();
+      const dotsManagerInstance = ServiceLocator.getDotsManager();
+      const orbitManagerInstance = ServiceLocator.getOrbitManager();
       const satSetLen = catalogManagerInstance.missileSats;
 
       missileManager.missilesInUse = newMissileArray.length;
       for (let i = 0; i < newMissileArray.length; i++) {
         const x = satSetLen - 500 + i;
 
-        newMissileArray[i].startTime = time;
-        newMissileArray[i].name = newMissileArray[i].ON;
-        newMissileArray[i].country = newMissileArray[i].C;
+        const raw = newMissileArray[i];
 
-        // Add the missile to the catalog
-        catalogManagerInstance.objectCache[x] = newMissileArray[i];
-        const cachedObj = catalogManagerInstance.objectCache[x] as unknown as { velocity?: TemeVec3<KilometersPerSecond>; totalVelocity?: number };
+        raw.startTime = time;
+        raw.name = raw.ON;
+        raw.country = raw.C;
 
-        if (!cachedObj.velocity?.x && !cachedObj.velocity?.y && !cachedObj.velocity?.z) {
-          cachedObj.velocity = { x: 0, y: 0, z: 0 } as TemeVec3<KilometersPerSecond>;
-        }
-        cachedObj.totalVelocity ??= 0;
-
-        // Convert legacy format to new MissileObject class
-        const missileObjData = catalogManagerInstance.getObject(x) as MissileObject;
+        // Build the real MissileObject directly from the raw sim data and store that in the
+        // catalog. Never stage raw JSON in the cache: a plain object has no class methods, so any
+        // catalog read that runs updatePosVel() would call isStatic() on it and throw. The
+        // MissileObject constructor already defaults velocity/totalVelocity to zero. (issue #1373)
         const missileObj = new MissileObject({
           id: x,
-          name: missileObjData.name,
-          country: missileObjData.country,
-          desc: missileObjData.desc,
-          active: missileObjData.active,
-          type: missileObjData.type,
-          latList: missileObjData.latList,
-          lonList: missileObjData.lonList,
-          altList: missileObjData.altList,
-          startTime: missileObjData.startTime,
+          name: raw.name,
+          country: raw.country,
+          desc: raw.desc,
+          active: raw.active,
+          type: raw.type,
+          latList: raw.latList,
+          lonList: raw.lonList,
+          altList: raw.altList,
+          startTime: raw.startTime,
         } as unknown as MissileParams);
 
         catalogManagerInstance.objectCache[x] = missileObj;
 
-        if (missileObj) {
-          missileObj.id = satSetLen - 500 + i;
-          catalogManagerInstance.satCruncherThread.sendNewMissile({
-            id: missileObj.id,
-            active: missileObj.active,
-            type: missileObj.type,
-            latList: missileObj.latList,
-            lonList: missileObj.lonList,
-            altList: missileObj.altList,
-            startTime: missileObj.startTime,
-          });
-          const orbitManagerInstance = ServiceLocator.getOrbitManager();
+        // Seed the missile's initial position on the main thread. The position-cruncher worker
+        // fills positionData asynchronously on its next cycle, but the doSearch('RV_') below runs
+        // synchronously — without this seed every missile reads position {0,0,0} and is flagged as
+        // "decayed" until the user searches a second time. The cruncher overwrites these with
+        // matching values once it runs, so this only bridges the startup gap.
+        const pv = missileObj.eci();
 
-          orbitManagerInstance.updateOrbitBuffer(missileObj.id, missileObj);
+        if (pv && dotsManagerInstance.positionData) {
+          dotsManagerInstance.positionData[x * 3] = pv.position.x;
+          dotsManagerInstance.positionData[x * 3 + 1] = pv.position.y;
+          dotsManagerInstance.positionData[x * 3 + 2] = pv.position.z;
         }
+
+        catalogManagerInstance.satCruncherThread.sendNewMissile({
+          id: missileObj.id,
+          active: missileObj.active,
+          type: missileObj.type,
+          latList: missileObj.latList,
+          lonList: missileObj.lonList,
+          altList: missileObj.altList,
+          startTime: missileObj.startTime,
+        });
+
+        orbitManagerInstance.updateOrbitBuffer(missileObj.id, missileObj);
       }
       missileManager.missileArray = newMissileArray;
     });
@@ -85,6 +135,18 @@ export const MassRaidPre = async (time: number, simFile: string) => {
   SettingsMenuPlugin.syncOnLoad();
 
   isMassRaidLoaded = true;
+
+  // Bound the scenario timeline to the raid window (launch → last impact). Outside this range the
+  // cruncher has no trajectory data, so missiles would otherwise sit at the launch site; the
+  // scenario plugin clamps sim time to these bounds and pauses at the edges.
+  boundScenarioToActiveMissiles_();
+
+  // The missiles were just activated in objectCache, but in worker-mode the color worker only has
+  // the typed-array snapshot taken at catalog init (active=0 for these slots). Without this nudge
+  // it keeps coloring them transparent, so the group orbit overlay skips them on alpha (they only
+  // appear on hover, which ignores the color buffer). Rebuilds the worker's catalog + recolors.
+  ServiceLocator.getColorSchemeManager().notifyObjectsChanged();
+
   ServiceLocator.getUiManager().doSearch('RV_');
 };
 
@@ -130,6 +192,11 @@ export const clearMissiles = () => {
     }
   }
   missileManager.missilesInUse = 0;
+
+  // Release the raid's scenario timeline bounds so the user can scrub freely again. MassRaidPre
+  // calls clearMissiles() before loading, then re-applies fresh bounds, so this is a no-op there.
+  PluginRegistry.getPlugin(ScenarioManagementPlugin)?.updateScenario({ startTime: null, endTime: null });
+  PluginRegistry.getPlugin(TimeSlider)?.updateSliderPosition();
 };
 
 /**
@@ -313,7 +380,22 @@ export const Missile = (
       altList: missileObj.altList,
     });
 
+    // Seed the initial position on the main thread so the missile reads as active immediately,
+    // rather than "decayed" (position {0,0,0}) until the async position-cruncher's first cycle.
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
+    const pv = missileObj.eci();
+
+    if (pv && dotsManagerInstance.positionData) {
+      dotsManagerInstance.positionData[MissileObjectNum * 3] = pv.position.x;
+      dotsManagerInstance.positionData[MissileObjectNum * 3 + 1] = pv.position.y;
+      dotsManagerInstance.positionData[MissileObjectNum * 3 + 2] = pv.position.z;
+    }
+
     missileManager.missileArray = missileArray;
+
+    // Expand the scenario timeline to cover this missile alongside every other active one
+    // (earliest launch → latest impact across all custom missiles).
+    boundScenarioToActiveMissiles_();
   }
   missileManager.missilesInUse++;
   missileManager.lastMissileErrorType = ToastMsgType.normal;

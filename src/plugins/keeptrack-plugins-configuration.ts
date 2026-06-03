@@ -117,6 +117,7 @@ export type KeepTrackPluginsConfiguration = {
   ScreenRecorder?: PluginConfiguration;
   CatalogManagementPlugin?: PluginConfiguration;
   CatalogBrowserPlugin?: CatalogBrowserConfiguration;
+  HistoricCatalogPlugin?: PluginConfiguration;
   CloseObjectsPlugin?: PluginConfiguration;
   BestPassPlugin?: PluginConfiguration;
   OverflightPlugin?: PluginConfiguration;

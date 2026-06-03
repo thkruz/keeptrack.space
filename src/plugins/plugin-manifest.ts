@@ -679,6 +679,12 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 10 },
   },
   {
+    configKey: 'HistoricCatalogPlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/historic-catalog/historic-catalog') : undefined,
+    proClassName: 'HistoricCatalogPlugin',
+    defaultConfig: { enabled: true, order: 11 },
+  },
+  {
     configKey: 'CloseObjectsPlugin',
     ossImport: () => import('./close-objects/close-objects'),
     ossClassName: 'CloseObjectsPlugin',
@@ -888,5 +894,12 @@ export const pluginManifest: PluginDescriptor[] = [
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/favorites-menu/favorites-menu') : undefined,
     proClassName: 'FavoritesMenuPlugin',
     defaultConfig: { enabled: true },
+  },
+  {
+    configKey: 'CompanionLinkPlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/companion-link/companion-link') : undefined,
+    proClassName: 'CompanionLinkPlugin',
+    defaultConfig: { enabled: false, order: 520 },
+    isLoginRequired: true,
   },
 ];

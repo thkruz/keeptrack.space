@@ -55,8 +55,12 @@ export async function compressToGzip(jsonString: string): Promise<Uint8Array> {
   return result;
 }
 
-/** Decompress a gzipped Uint8Array to string using native DecompressionStream. */
-export async function decompressFromGzip(data: Uint8Array): Promise<string> {
+/**
+ * Decompress a gzipped Uint8Array to raw bytes using native DecompressionStream.
+ * Use this for binary payloads (e.g. a tar archive); use {@link decompressFromGzip}
+ * when the decompressed content is text.
+ */
+export async function decompressGzipToBytes(data: Uint8Array): Promise<Uint8Array> {
   const stream = new ReadableStream({
     start(controller) {
       controller.enqueue(data);
@@ -66,8 +70,7 @@ export async function decompressFromGzip(data: Uint8Array): Promise<string> {
 
   const decompressedStream = stream.pipeThrough(new DecompressionStream('gzip'));
   const reader = decompressedStream.getReader();
-  const decoder = new TextDecoder();
-  let result = '';
+  const chunks: Uint8Array[] = [];
 
   for (;;) {
     // eslint-disable-next-line no-await-in-loop
@@ -76,10 +79,24 @@ export async function decompressFromGzip(data: Uint8Array): Promise<string> {
     if (done) {
       break;
     }
-    result += decoder.decode(value, { stream: true });
+    chunks.push(value);
   }
 
-  result += decoder.decode();
+  const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+  const result = new Uint8Array(totalLength);
+  let offset = 0;
+
+  for (const chunk of chunks) {
+    result.set(chunk, offset);
+    offset += chunk.length;
+  }
 
   return result;
+}
+
+/** Decompress a gzipped Uint8Array to string using native DecompressionStream. */
+export async function decompressFromGzip(data: Uint8Array): Promise<string> {
+  const bytes = await decompressGzipToBytes(data);
+
+  return new TextDecoder().decode(bytes);
 }

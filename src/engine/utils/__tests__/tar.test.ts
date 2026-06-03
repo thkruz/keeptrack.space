@@ -114,6 +114,16 @@ describe('extractTarEntry', () => {
     expect(extractTarEntry(tar, (name) => name.endsWith('catalog.json.gz'))).toBeNull();
   });
 
+  it('matches entries whose name contains spaces (NUL-padded name field)', () => {
+    const encoder = new TextEncoder();
+    const tar = buildTar([buildTarEntry('rso archive/orbit data.json', encoder.encode('payload'))]);
+
+    const found = extractTarEntry(tar, (name) => name === 'rso archive/orbit data.json');
+
+    expect(found).not.toBeNull();
+    expect(new TextDecoder().decode(found!)).toBe('payload');
+  });
+
   it('handles data that is not block-aligned', () => {
     const encoder = new TextEncoder();
     const odd = encoder.encode('x'.repeat(700)); // spans two blocks

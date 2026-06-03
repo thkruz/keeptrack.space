@@ -26,13 +26,15 @@ const SIZE_OFFSET = 124;
 const SIZE_LENGTH = 12;
 
 /**
- * Read a NUL/space-terminated ASCII field from a tar header block.
+ * Read a NUL-terminated ASCII field from a tar header block. The name field is
+ * NUL-padded and may legitimately contain spaces, so only NUL terminates here;
+ * numeric fields are space-padded and rely on the caller trimming the result.
  */
 function readString_(block: Uint8Array, offset: number, length: number): string {
   let end = offset;
   const limit = offset + length;
 
-  while (end < limit && block[end] !== 0 && block[end] !== 0x20) {
+  while (end < limit && block[end] !== 0) {
     end++;
   }
 

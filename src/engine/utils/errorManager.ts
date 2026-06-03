@@ -217,14 +217,21 @@ export class ErrorManager {
   }
 
   private isExternalFetchError_(err: Error): boolean {
+    // HTTP-status-bearing errors (e.g. CelesTrak `err.status = 500`) are server-side, not our bug.
     if (typeof (err as { status?: unknown }).status === 'number') {
       return true;
     }
-    if (err instanceof TypeError && (/failed to fetch|networkerror|load failed|fetch/iu).test(err.message)) {
-      return true;
-    }
 
-    return false;
+    /*
+     * Network-layer fetch failures (offline, DNS, CORS, dead host) surface with one of these
+     * browser-specific messages: 'Failed to fetch' (Chromium), 'NetworkError when attempting
+     * to fetch resource.' (Firefox), 'Load failed' (Safari). Match on the MESSAGE regardless of
+     * prototype — an error that crosses a Web Worker / structured-clone boundary, or is rebuilt by
+     * toError_, arrives as a plain Error and would slip past an `instanceof TypeError` check and
+     * get auto-filed as a spurious GitHub issue. The phrases are specific enough that a real app
+     * bug is unlikely to collide; a bare 'fetch' is deliberately NOT matched (too broad).
+     */
+    return (/failed to fetch|networkerror|load failed/iu).test(err.message);
   }
 
   warn(msg: string, ...optionalParams: unknown[]): void {

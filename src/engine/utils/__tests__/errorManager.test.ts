@@ -174,3 +174,60 @@ describe('ErrorManager.reportEvent', () => {
     })).toThrow('real-world message');
   });
 });
+
+describe('ErrorManager.isExternalFetchError_ (auto-file suppression)', () => {
+  let errorManager: ErrorManager;
+  let openSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    errorManager = new ErrorManager();
+    vi.spyOn(console, 'error').mockImplementation(() => { /* silence */ });
+    openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    // Force the real auto-file gate to be reachable (isThisNode would otherwise stub the URL to '').
+    (errorManager as unknown as { newGithubIssueUrl_: () => string }).newGithubIssueUrl_ = () => 'https://github.com/issue';
+    (errorManager as unknown as { minLevel_: number }).minLevel_ = 0;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const reportInNode = (err: Error): void => {
+    // reportEvent rethrows under node; swallow it so we can assert on the auto-file spy.
+    try {
+      errorManager.reportEvent({ error: err, funcName: 'CatalogBrowserPlugin' });
+    } catch {
+      /* expected node rethrow */
+    }
+  };
+
+  it('suppresses a genuine TypeError "Failed to fetch"', () => {
+    reportInNode(new TypeError('Failed to fetch'));
+    expect(openSpy).not.toHaveBeenCalled();
+  });
+
+  it('suppresses a worker-boundary network error that lost its TypeError prototype', () => {
+    // Structured-clone across a Worker boundary downgrades TypeError -> plain Error.
+    reportInNode(new Error('Failed to fetch'));
+    expect(openSpy).not.toHaveBeenCalled();
+  });
+
+  it('suppresses Firefox/Safari network phrasings regardless of prototype', () => {
+    reportInNode(new Error('NetworkError when attempting to fetch resource.'));
+    reportInNode(new Error('Load failed'));
+    expect(openSpy).not.toHaveBeenCalled();
+  });
+
+  it('suppresses status-bearing HTTP errors (server-side, not our bug)', () => {
+    const err = new Error('CelesTrak returned HTTP 500') as Error & { status: number };
+
+    err.status = 500;
+    reportInNode(err);
+    expect(openSpy).not.toHaveBeenCalled();
+  });
+
+  it('still auto-files a real bug whose message merely contains "fetch"', () => {
+    reportInNode(new TypeError('Cannot read properties of undefined (reading \'fetchData\')'));
+    expect(openSpy).toHaveBeenCalledTimes(1);
+  });
+});

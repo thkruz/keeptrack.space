@@ -217,6 +217,51 @@ body.drawer-mode {
     flex-shrink: 0;
   }
 
+  /* ---- Top Actions Row (search + app launcher) ---- */
+  .drawer-top-actions {
+    display: flex;
+    align-items: center;
+  }
+
+  .drawer-top-actions .drawer-search {
+    flex: 1;
+    min-width: 0;
+    margin-right: 0;
+  }
+
+  /* ---- App Launcher Button ---- */
+  .drawer-app-launcher {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    margin: 10px 12px 10px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--kt-radius-sm, 4px);
+    cursor: pointer;
+    transition: border-color var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
+      background-color var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+  }
+
+  .drawer-app-launcher:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .drawer-app-launcher-icon {
+    width: 20px;
+    height: 20px;
+    opacity: 0.7;
+    filter: var(--filter-icon-blue);
+    transition: opacity var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+  }
+
+  .drawer-app-launcher:hover .drawer-app-launcher-icon {
+    opacity: 1;
+  }
+
   /* ---- Drawer Content ---- */
   .drawer-content {
     padding-bottom: 20px;
@@ -773,6 +818,25 @@ body.drawer-mode:not(.is-mobile-mode) {
       padding var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
       margin var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
       opacity var(--kt-duration-normal, 200ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+  }
+
+  /* App launcher collapses with the search in rail mode */
+  .plugin-drawer.rail-mode .drawer-app-launcher {
+    max-width: 0;
+    margin: 0;
+    border: none;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-width var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
+      margin var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
+      opacity var(--kt-duration-normal, 200ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+  }
+
+  .plugin-drawer.rail-mode.rail-hover .drawer-app-launcher {
+    max-width: 40px;
+    margin: 10px 12px 10px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    opacity: 1;
   }
 
   .plugin-drawer.rail-mode .drawer-group-header {

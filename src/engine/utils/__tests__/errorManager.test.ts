@@ -116,6 +116,39 @@ describe('ErrorManager.reportEvent', () => {
     expect(console.warn).toHaveBeenCalled();
   });
 
+  it('suppresses a Rocket Loader rejection (null reason, loader frame in stack) — #1371', () => {
+    // Reproduces the unhandledrejection from Cloudflare Rocket Loader: reason is null and
+    // the only signal is the loader frame in the synthesized stack. Must not throw or auto-file.
+    const err = new Error('Unknown error');
+
+    err.stack = 'Error: Unknown error\n    at c (https://app.keeptrack.space/cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js:1:9405)';
+
+    expect(() => errorManager.reportEvent({
+      error: err,
+      funcName: 'Unhandled Promise Rejection',
+      isUnhandledRejection: true,
+    })).not.toThrow();
+
+    // Still surfaces to EventBus for telemetry, but quietly (warn, not error).
+    expect(captured).toHaveLength(1);
+    // eslint-disable-next-line no-console
+    expect(console.warn).toHaveBeenCalled();
+    // eslint-disable-next-line no-console
+    expect(console.error).not.toHaveBeenCalled();
+  });
+
+  it('does not suppress a normal app rejection whose stack has no loader frame', () => {
+    expect(() => errorManager.reportEvent({
+      error: new Error('real bug'),
+      funcName: 'Unhandled Promise Rejection',
+      isUnhandledRejection: true,
+    })).toThrow('real bug');
+
+    expect(captured).toHaveLength(1);
+    // eslint-disable-next-line no-console
+    expect(console.error).toHaveBeenCalled();
+  });
+
   it('synthesizes a stack from ErrorEvent fields when raw error is null', () => {
     expect(() => errorManager.reportEvent({
       error: null,

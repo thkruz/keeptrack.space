@@ -45,6 +45,12 @@ export interface ErrorContext {
   col?: number;
   /** True when event.error is null AND message is 'Script error.' (cross-origin). */
   isCrossOrigin?: boolean;
+  /**
+   * True when an event handler received an opaque payload — null error, no message, no source
+   * (e.g. a cross-origin/opaque Web Worker onerror). The source sets this because reportEvent
+   * can't distinguish it from a deliberate `error(null)` call after the fact.
+   */
+  isOpaqueEvent?: boolean;
   isUnhandledRejection?: boolean;
   toastMsg?: string;
   opts?: ErrorOptions;
@@ -132,13 +138,15 @@ export class ErrorManager {
 
     const err = this.toError_(ctx.error, ctx.message, ctx.source, ctx.line, ctx.col);
 
-    // Cross-origin / third-party-loader errors are unfixable on our end — Cloudflare Rocket
-    // Loader and other CDN-injected scripts trigger these, including via unhandled promise
-    // rejections whose reason is null (the window `error` handler flags 'Script error.' with
-    // isCrossOrigin, but the rejection handler can't, so we also sniff the stack/source for
-    // their frames). Surface to telemetry and console once, but don't toast the user or
-    // auto-file a useless "Unknown error" GitHub issue (see #1371).
-    if (this.isThirdPartyScriptError_(err, ctx)) {
+    // Cross-origin / opaque / third-party-loader errors are unfixable on our end — Cloudflare
+    // Rocket Loader and other CDN-injected scripts trigger these, including via unhandled promise
+    // rejections whose reason is null, and opaque Web Worker onerror events carry no payload at all
+    // (the window `error` handler flags 'Script error.' with isCrossOrigin, but worker/rejection
+    // handlers can't, so we also sniff the event fields and stack). Surface to telemetry and console
+    // once, but tag the error as unactionable so telemetry skips the bug-filing POST, and don't toast
+    // the user or auto-file a useless "Unknown error" GitHub issue (see #1371).
+    if (this.isUnactionableError_(err, ctx)) {
+      (err as { isUnactionable?: boolean }).isUnactionable = true;
       EventBus.getInstance().emit(EventBusEvent.error, err, ctx.funcName);
       // eslint-disable-next-line no-console
       console.warn(
@@ -218,15 +226,24 @@ export class ErrorManager {
   }
 
   /**
-   * Cloudflare Rocket Loader and other CDN-injected loaders throw/reject from code we don't
-   * ship and can't fix. They surface either as same-origin 'Script error.' (flagged upstream
-   * with `isCrossOrigin`) or as unhandled rejections with a null reason — the latter never get
-   * flagged, so we also match their telltale frames (`cdn-cgi`, `rocket-loader`) in the error
-   * stack or captured source. Matching the rebuilt synthetic stack works because `toError_`
-   * re-anchors a null-reason error to the synchronous caller, which is the loader itself (#1371).
+   * Errors we can't act on: cross-origin script errors, opaque event payloads, and third-party
+   * loader noise. These get logged + counted but are never toasted, auto-filed, or POSTed to the
+   * bug-filing telemetry endpoint (which would surface them as false-positive GitHub issues).
+   *
+   * Three sources:
+   * - Same-origin 'Script error.' from a cross-origin script, flagged upstream with `isCrossOrigin`.
+   * - Opaque events (flagged upstream with `isOpaqueEvent`): the raw thrown value is null/undefined
+   *   AND the event carried no message and no source. A Web Worker `onerror` for a cross-origin/opaque
+   *   worker (e.g. colorCruncher) arrives this way. `toError_` can only synthesize a bare 'Unknown
+   *   error' whose stack points back at `reportEvent` — there is nothing to debug. The source flags
+   *   this because reportEvent can't tell it apart from a deliberate `error(null)` call after the fact.
+   * - Cloudflare Rocket Loader / CDN-injected loaders: null-reason rejections that never get flagged,
+   *   so we match their telltale frames (`cdn-cgi`, `rocket-loader`) in the stack or captured source.
+   *   Matching the rebuilt synthetic stack works because `toError_` re-anchors a null-reason error to
+   *   the synchronous caller, which is the loader itself (#1371).
    */
-  private isThirdPartyScriptError_(err: Error, ctx: ErrorContext): boolean {
-    if (ctx.isCrossOrigin) {
+  private isUnactionableError_(err: Error, ctx: ErrorContext): boolean {
+    if (ctx.isCrossOrigin || ctx.isOpaqueEvent) {
       return true;
     }
 

@@ -36,6 +36,11 @@ export abstract class WebWorkerThreadManager {
 
       this.worker_.onmessage = this.onMessage.bind(this);
       this.worker_.onerror = (event: ErrorEvent) => {
+        // A cross-origin/opaque worker surfaces an onerror with no usable diagnostics: null error,
+        // empty message, empty filename. There's nothing to act on, so flag it as opaque — errorManager
+        // then suppresses the toast/auto-file and telemetry skips the bug-filing POST (false positives).
+        const isOpaqueEvent = !event.error && (!event.message || event.message.trim() === '') && !event.filename;
+
         errorManagerInstance.reportEvent({
           error: event.error,
           funcName: `Worker[${this.WEB_WORKER_CODE}]`,
@@ -43,6 +48,7 @@ export abstract class WebWorkerThreadManager {
           source: event.filename,
           line: event.lineno,
           col: event.colno,
+          isOpaqueEvent,
         });
       };
     } catch (error) {

@@ -135,9 +135,7 @@ describe('CatalogBrowserPlugin behavior', () => {
   });
 
   it('VIMPEL_ONLY routes parsed vimpel.json through reloadVimpelCatalog, not reloadCatalog', async () => {
-    const vimpelData = [
-      { TLE1: '1      V 12104    25007.20347222 +.00000000 +00000+0 +00000-0 0 29990', TLE2: '2       064.8350 009.7330 1627170 165.9900 359.1946 12.12185514 00010' },
-    ];
+    const vimpelData = [{ TLE1: '1      V 12104    25007.20347222 +.00000000 +00000+0 +00000-0 0 29990', TLE2: '2       064.8350 009.7330 1627170 165.9900 359.1946 12.12185514 00010' }];
 
     vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve(vimpelData) })));
     const vimpelSpy = vi.spyOn(CatalogLoader, 'reloadVimpelCatalog').mockResolvedValue(undefined as never);

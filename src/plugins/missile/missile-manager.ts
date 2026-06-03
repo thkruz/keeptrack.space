@@ -31,32 +31,27 @@ export const MassRaidPre = async (time: number, simFile: string) => {
       for (let i = 0; i < newMissileArray.length; i++) {
         const x = satSetLen - 500 + i;
 
-        newMissileArray[i].startTime = time;
-        newMissileArray[i].name = newMissileArray[i].ON;
-        newMissileArray[i].country = newMissileArray[i].C;
+        const raw = newMissileArray[i];
 
-        // Add the missile to the catalog
-        catalogManagerInstance.objectCache[x] = newMissileArray[i];
-        const cachedObj = catalogManagerInstance.objectCache[x] as unknown as { velocity?: TemeVec3<KilometersPerSecond>; totalVelocity?: number };
+        raw.startTime = time;
+        raw.name = raw.ON;
+        raw.country = raw.C;
 
-        if (!cachedObj.velocity?.x && !cachedObj.velocity?.y && !cachedObj.velocity?.z) {
-          cachedObj.velocity = { x: 0, y: 0, z: 0 } as TemeVec3<KilometersPerSecond>;
-        }
-        cachedObj.totalVelocity ??= 0;
-
-        // Convert legacy format to new MissileObject class
-        const missileObjData = catalogManagerInstance.getObject(x) as MissileObject;
+        // Build the real MissileObject directly from the raw sim data and store that in the
+        // catalog. Never stage raw JSON in the cache: a plain object has no class methods, so any
+        // catalog read that runs updatePosVel() would call isStatic() on it and throw. The
+        // MissileObject constructor already defaults velocity/totalVelocity to zero. (issue #1373)
         const missileObj = new MissileObject({
           id: x,
-          name: missileObjData.name,
-          country: missileObjData.country,
-          desc: missileObjData.desc,
-          active: missileObjData.active,
-          type: missileObjData.type,
-          latList: missileObjData.latList,
-          lonList: missileObjData.lonList,
-          altList: missileObjData.altList,
-          startTime: missileObjData.startTime,
+          name: raw.name,
+          country: raw.country,
+          desc: raw.desc,
+          active: raw.active,
+          type: raw.type,
+          latList: raw.latList,
+          lonList: raw.lonList,
+          altList: raw.altList,
+          startTime: raw.startTime,
         } as unknown as MissileParams);
 
         catalogManagerInstance.objectCache[x] = missileObj;

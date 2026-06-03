@@ -499,6 +499,11 @@ export class MissilePlugin extends KeepTrackPlugin {
           );
         }
         uiManagerInstance.toast(missileManager.lastMissileError, missileManager.lastMissileErrorType);
+        // The new missile was just activated in objectCache; nudge the (worker-mode) color worker
+        // so it recolors the slot from transparent before the group overlay renders. Without this
+        // the orbit overlay skips the missile on alpha and it only appears on hover. (Once after
+        // creation — createMissile is called once per launch here.)
+        ServiceLocator.getColorSchemeManager().notifyObjectsChanged();
         uiManagerInstance.doSearch('RV_');
       }
       hideLoading();

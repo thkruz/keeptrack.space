@@ -20,14 +20,50 @@ const missileArray: MissileObject[] = [];
 
 let isMassRaidLoaded = false;
 
+/**
+ * Bound the scenario timeline to the union of every active missile in the catalog: earliest launch
+ * → latest impact (each trajectory point is 1 second in the cruncher's index→time mapping).
+ *
+ * Recomputed whenever missiles are added, so the window expands to cover the whole mass raid, or
+ * every custom missile launched so far (start = earliest of any, stop = latest of any). No-op when
+ * the scenario plugin isn't loaded or no active missiles remain — clearMissiles() releases the
+ * bounds in that case.
+ */
+const boundScenarioToActiveMissiles_ = (): void => {
+  const scenarioPlugin = PluginRegistry.getPlugin(ScenarioManagementPlugin);
+
+  if (!scenarioPlugin) {
+    return;
+  }
+
+  const catalogManagerInstance = ServiceLocator.getCatalogManager();
+  const firstMissileId = catalogManagerInstance.missileSats - 500;
+  let minStartMs = Infinity;
+  let maxEndMs = -Infinity;
+
+  for (let id = firstMissileId; id < catalogManagerInstance.missileSats; id++) {
+    const missile = catalogManagerInstance.objectCache[id] as MissileObject | undefined;
+
+    if (!missile?.isMissile() || !missile.active || !missile.altList?.length) {
+      continue;
+    }
+
+    minStartMs = Math.min(minStartMs, missile.startTime);
+    maxEndMs = Math.max(maxEndMs, missile.startTime + (missile.altList.length - 1) * 1000);
+  }
+
+  if (minStartMs === Infinity) {
+    return; // No active missiles to bound
+  }
+
+  scenarioPlugin.updateScenario({ startTime: new Date(minStartMs), endTime: new Date(maxEndMs) });
+  PluginRegistry.getPlugin(TimeSlider)?.updateSliderPosition();
+};
+
 // This function stalls Jest for multiple minutes.
 /* istanbul ignore next */
 export const MassRaidPre = async (time: number, simFile: string) => {
   missileManager.clearMissiles();
-
-  // Longest missile flight in the raid (each trajectory point is 1 second in the cruncher's
-  // index→time mapping). Used to bound the scenario timeline after load.
-  let maxTrajectoryMs = 0;
 
   await fetch(simFile)
     .then((response) => response.json())
@@ -46,8 +82,6 @@ export const MassRaidPre = async (time: number, simFile: string) => {
         raw.startTime = time;
         raw.name = raw.ON;
         raw.country = raw.C;
-
-        maxTrajectoryMs = Math.max(maxTrajectoryMs, (raw.altList.length - 1) * 1000);
 
         // Build the real MissileObject directly from the raw sim data and store that in the
         // catalog. Never stage raw JSON in the cache: a plain object has no class methods, so any
@@ -105,15 +139,7 @@ export const MassRaidPre = async (time: number, simFile: string) => {
   // Bound the scenario timeline to the raid window (launch → last impact). Outside this range the
   // cruncher has no trajectory data, so missiles would otherwise sit at the launch site; the
   // scenario plugin clamps sim time to these bounds and pauses at the edges.
-  const scenarioPlugin = PluginRegistry.getPlugin(ScenarioManagementPlugin);
-
-  if (scenarioPlugin && maxTrajectoryMs > 0) {
-    scenarioPlugin.updateScenario({
-      startTime: new Date(time),
-      endTime: new Date(time + maxTrajectoryMs),
-    });
-    PluginRegistry.getPlugin(TimeSlider)?.updateSliderPosition();
-  }
+  boundScenarioToActiveMissiles_();
 
   // The missiles were just activated in objectCache, but in worker-mode the color worker only has
   // the typed-array snapshot taken at catalog init (active=0 for these slots). Without this nudge
@@ -354,7 +380,22 @@ export const Missile = (
       altList: missileObj.altList,
     });
 
+    // Seed the initial position on the main thread so the missile reads as active immediately,
+    // rather than "decayed" (position {0,0,0}) until the async position-cruncher's first cycle.
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
+    const pv = missileObj.eci();
+
+    if (pv && dotsManagerInstance.positionData) {
+      dotsManagerInstance.positionData[MissileObjectNum * 3] = pv.position.x;
+      dotsManagerInstance.positionData[MissileObjectNum * 3 + 1] = pv.position.y;
+      dotsManagerInstance.positionData[MissileObjectNum * 3 + 2] = pv.position.z;
+    }
+
     missileManager.missileArray = missileArray;
+
+    // Expand the scenario timeline to cover this missile alongside every other active one
+    // (earliest launch → latest impact across all custom missiles).
+    boundScenarioToActiveMissiles_();
   }
   missileManager.missilesInUse++;
   missileManager.lastMissileErrorType = ToastMsgType.normal;

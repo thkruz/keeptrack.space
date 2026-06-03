@@ -31,7 +31,7 @@ import { LaunchSite } from './catalog-manager/LaunchFacility';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { orgDataService } from './catalogs/org-data-service';
 
-interface JsSat {
+export interface JsSat {
   TLE1: string;
   TLE2: string;
   vmag?: number;
@@ -394,6 +394,46 @@ export class CatalogLoader {
    * Supports .tce (2-line), .tle (3-line), and .txt TLE files.
    */
   static async reloadCatalog(tceContent: string): Promise<void> {
+    const asciiCatalog = CatalogLoader.parseTceContent(tceContent);
+
+    if (asciiCatalog.length === 0) {
+      throw new Error('No valid TLE data found in file');
+    }
+
+    // Must pass as externalCatalog because parse() uses `externalCatalog || asciiCatalog`
+    // and externalCatalog defaults to Promise.resolve([]) which is truthy, discarding keepTrackAscii
+    await CatalogLoader.reloadFromParseArgs_({
+      keepTrackTle: [],
+      externalCatalog: Promise.resolve(asciiCatalog),
+    });
+  }
+
+  /**
+   * Reloads the catalog from raw JSC Vimpel (vimpel.json) data.
+   *
+   * Routes the data through the same {@link processJsCatalog_} pipeline used at
+   * initial boot, so altIds, "JSC Vimpel" labels, source, and object types match.
+   * Passing Vimpel data as raw TLE text to {@link reloadCatalog} instead routes it
+   * through the ASCII pipeline, which cannot recover the Vimpel altId (the catalog
+   * number column is blank) and ends up assigning incorrect labels and launch years.
+   */
+  static async reloadVimpelCatalog(jsCatalog: JsSat[]): Promise<void> {
+    if (jsCatalog.length === 0) {
+      throw new Error('No valid Vimpel data found');
+    }
+
+    await CatalogLoader.reloadFromParseArgs_({
+      keepTrackTle: [],
+      vimpelCatalog: Promise.resolve(jsCatalog),
+    });
+  }
+
+  /**
+   * Shared scaffolding for live catalog swaps: resets selection/orbit/hover state,
+   * tears down and rebuilds the rendering subsystems, re-parses via {@link parse},
+   * and keeps the loading screen up until the propagation worker reports ready.
+   */
+  private static async reloadFromParseArgs_(parseArgs: Parameters<typeof CatalogLoader.parse>[0]): Promise<void> {
     const { showLoadingSticky, hideLoading } = await import('../../engine/utils/showLoading');
     const { SelectSatManager } = await import('../../plugins/select-sat-manager/select-sat-manager');
     const { EventBus } = await import('../../engine/events/event-bus');
@@ -429,13 +469,6 @@ export class CatalogLoader {
       // Clear search results
       settingsManager.lastSearchResults = [];
 
-      // Parse the TLE content
-      const asciiCatalog = CatalogLoader.parseTceContent(tceContent);
-
-      if (asciiCatalog.length === 0) {
-        throw new Error('No valid TLE data found in file');
-      }
-
       // Reset rendering subsystems
       const dotsManager = ServiceLocator.getDotsManager();
       const colorSchemeManager = ServiceLocator.getColorSchemeManager();
@@ -444,12 +477,7 @@ export class CatalogLoader {
       colorSchemeManager.resetForCatalogSwap();
 
       // Re-parse the catalog via existing pipeline
-      // Must pass as externalCatalog because parse() uses `externalCatalog || asciiCatalog`
-      // and externalCatalog defaults to Promise.resolve([]) which is truthy, discarding keepTrackAscii
-      await CatalogLoader.parse({
-        keepTrackTle: [],
-        externalCatalog: Promise.resolve(asciiCatalog),
-      });
+      await CatalogLoader.parse(parseArgs);
 
       // Re-init GPU buffers with the new catalog size
       // This must run after parse (which sets objectCache/numObjects) but before

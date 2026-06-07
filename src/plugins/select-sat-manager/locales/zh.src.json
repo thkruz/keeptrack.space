@@ -2,5 +2,16 @@
   "SelectSatManager": {
     "objectInsideEarth": "对象位于地球内部，无法选择",
     "noSatellitesFound": "未找到该所有者/制造商的卫星"
+  },
+  "plugins": {
+    "SelectSatManager": {
+      "sectionLabel": "Satellite Selection",
+      "settings": {
+        "focusOnSatWhenSelected": {
+          "label": "Focus on Satellite When Selected",
+          "helpText": "Zoom in on the satellite when selected."
+        }
+      }
+    }
   }
 }

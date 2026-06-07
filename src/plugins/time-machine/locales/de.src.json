@@ -1,7 +1,13 @@
 {
   "plugins": {
     "TimeMachine": {
-      "bottomIconLabel": "Zeitmaschine"
+      "bottomIconLabel": "Zeitmaschine",
+      "settings": {
+        "disableToasts": {
+          "label": "Disable Time Machine Toasts",
+          "helpText": "Time Machine stop showing toast messages."
+        }
+      }
     }
   }
 }

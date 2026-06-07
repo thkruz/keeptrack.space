@@ -1,11 +1,17 @@
 import { GroupType } from '@app/app/data/object-group';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { ICommandPaletteCommand } from '@app/engine/plugins/core/plugin-capabilities';
+import {
+  ICommandPaletteCommand,
+  ISettingsContribution,
+  ISettingsContributor,
+} from '@app/engine/plugins/core/plugin-capabilities';
+import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
+import { t7e } from '@app/locales/keys';
 import historyPng from '@public/img/icons/history.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 
-export class TimeMachine extends KeepTrackPlugin {
+export class TimeMachine extends KeepTrackPlugin implements ISettingsContributor {
   readonly id = 'TimeMachine';
   static readonly TIME_BETWEEN_SATELLITES = 10000;
   dependencies_ = [];
@@ -41,6 +47,29 @@ export class TimeMachine extends KeepTrackPlugin {
         callback: () => this.bottomMenuClicked(),
       },
     ];
+  }
+
+  getSettingsContribution(): ISettingsContribution {
+    return {
+      sectionId: this.id,
+      sectionLabel: this.bottomIconLabel,
+      controls: [
+        {
+          type: 'toggle',
+          id: 'disableToasts',
+          label: t7e('plugins.TimeMachine.settings.disableToasts.label'),
+          helpText: t7e('plugins.TimeMachine.settings.disableToasts.helpText'),
+          get: () => settingsManager.isDisableTimeMachineToasts,
+          set: (next) => {
+            settingsManager.isDisableTimeMachineToasts = next;
+            PersistenceManager.getInstance().saveItem(
+              StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS,
+              next.toString(),
+            );
+          },
+        },
+      ],
+    };
   }
   historyOfSatellitesRunCount = 0;
   isTimeMachineRunning = false;

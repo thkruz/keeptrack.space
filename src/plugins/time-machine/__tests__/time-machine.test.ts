@@ -3,6 +3,11 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrack } from '@app/keeptrack';
 import { Milliseconds } from '@ootk/src/main';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import {
+  hasSettingsContribution,
+  ISettingToggleControl,
+} from '@app/engine/plugins/core/plugin-capabilities';
+import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { defaultSat } from '@test/environment/apiMocks';
 import { setupDefaultHtml, setupStandardEnvironment } from '@test/environment/standard-env';
@@ -130,5 +135,53 @@ describe('TimeMachine branches', () => {
     plugin.removeSatellite(0);
 
     expect(clearSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe('TimeMachine settings contribution', () => {
+  let plugin: TimeMachine;
+
+  beforeEach(() => {
+    setupStandardEnvironment();
+    plugin = new TimeMachine();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('advertises a settings contribution to the settings-menu collector', () => {
+    expect(hasSettingsContribution(plugin)).toBe(true);
+  });
+
+  it('contributes a single toggle bound to settingsManager.isDisableTimeMachineToasts', () => {
+    const contribution = plugin.getSettingsContribution();
+
+    expect(contribution.sectionId).toBe('TimeMachine');
+    expect(contribution.controls).toHaveLength(1);
+    expect(contribution.controls[0].type).toBe('toggle');
+    expect(contribution.controls[0].id).toBe('disableToasts');
+
+    settingsManager.isDisableTimeMachineToasts = false;
+    expect((contribution.controls[0] as ISettingToggleControl).get()).toBe(false);
+
+    settingsManager.isDisableTimeMachineToasts = true;
+    expect((contribution.controls[0] as ISettingToggleControl).get()).toBe(true);
+  });
+
+  it('writes the new value to settingsManager and persists to localStorage when set() is called', () => {
+    const contribution = plugin.getSettingsContribution();
+    const toggle = contribution.controls[0] as ISettingToggleControl;
+    const saveSpy = vi.spyOn(PersistenceManager.getInstance(), 'saveItem').mockImplementation(() => undefined);
+
+    toggle.set(true);
+
+    expect(settingsManager.isDisableTimeMachineToasts).toBe(true);
+    expect(saveSpy).toHaveBeenCalledWith(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS, 'true');
+
+    toggle.set(false);
+
+    expect(settingsManager.isDisableTimeMachineToasts).toBe(false);
+    expect(saveSpy).toHaveBeenCalledWith(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS, 'false');
   });
 });

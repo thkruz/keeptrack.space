@@ -140,7 +140,7 @@ describe('SettingsMenuPlugin.renderPluginContributions_', () => {
 
   it('renders each contributing plugin into the settings-plugin-sections container during uiManagerFinal', () => {
     const plugin = new SettingsMenuPlugin();
-    const contributor = new TestPlugin('Contrib', () => makeToggleContribution('Contrib', 'Contrib Label', 'flag'));
+    const contributor = new TestPlugin('Contrib', () => makeToggleContribution('Contrib', 'Contrib Label', undefined, 'flag'));
 
     PluginRegistry.addPlugin(contributor);
     websiteInit(plugin);

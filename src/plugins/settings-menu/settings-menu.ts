@@ -343,9 +343,16 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isDemoModeOn = false;
     settingsManager.isFreezePropRateOnDrag = false;
     settingsManager.isCompensateForEarthRotation = true;
+    // These settings now live in plugin-contributed sections (Watchlist, SelectSatManager,
+    // TimeMachine), but "Reset to defaults" must still restore them. Refresh the menu afterwards
+    // so any open plugin sections re-render with the reset values.
+    settingsManager.satLabelMode = SatLabelMode.FOV_ONLY;
+    settingsManager.isFocusOnSatelliteWhenSelected = true;
+    settingsManager.isDisableTimeMachineToasts = false;
     PersistenceManager.getInstance().removeItem(StorageKey.SETTINGS_DOT_COLORS);
     SettingsManager.preserveSettings();
     SettingsMenuPlugin.syncOnLoad();
+    EventBus.getInstance().emit(EventBusEvent.settingsMenuRefresh);
   }
 
   private static onSubmit_(e: SubmitEvent) {

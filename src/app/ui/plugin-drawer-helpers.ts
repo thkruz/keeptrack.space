@@ -114,6 +114,11 @@ export function collectDrawerItems(): CollectedDrawerItems {
   menuGroups.about = { label: t7e('pluginDrawer.groupAbout' as DrawerKey_), items: [] };
 
   for (const plugin of plugins) {
+    // CompanionLinkPlugin is surfaced as an inline icon next to the status footer, not a drawer entry.
+    if (plugin.id === 'CompanionLinkPlugin') {
+      continue;
+    }
+
     // Handle TopMenuPlugins — put in About group
     if (plugin instanceof TopMenuPlugin) {
       const btnEl = getEl(`${plugin.id}-btn`, true);
@@ -256,6 +261,32 @@ export function renderUtilityFooter(groups: Record<string, DrawerGroup>): void {
 
 // ---- Status Footer ----
 
+/** Whether the user is signed in (required before the phone link is usable). */
+function isCompanionSignedIn_(): boolean {
+  const userPlugin = PluginRegistry.getPluginByName('UserAccountPlugin') as
+    (KeepTrackPlugin & { cachedUser?: { id?: string } | null }) | null;
+
+  return Boolean(userPlugin?.cachedUser?.id);
+}
+
+/**
+ * Reflect the current sign-in state on the phone-link icon: yellow + disabled
+ * when signed out, red (active) when signed in. Safe to call repeatedly.
+ */
+export function updatePhoneLinkState(): void {
+  const phoneLinkEl = getEl('drawer-phone-link', true);
+
+  if (!phoneLinkEl) {
+    return;
+  }
+
+  const signedIn = isCompanionSignedIn_();
+
+  phoneLinkEl.classList.toggle('drawer-phone-link--disabled', !signedIn);
+  phoneLinkEl.setAttribute('aria-disabled', String(!signedIn));
+  phoneLinkEl.setAttribute('kt-tooltip', signedIn ? 'Phone Link' : 'Sign in to link your phone');
+}
+
 /** Render the status footer showing connectivity and version. */
 export function renderStatusFooter(): void {
   const footerEl = getEl('drawer-status-footer', true);
@@ -265,12 +296,26 @@ export function renderStatusFooter(): void {
   }
 
   const isOnline = navigator.onLine;
+  const hasCompanionLink = Boolean(PluginRegistry.getPluginByName('CompanionLinkPlugin'));
+  const signedIn = isCompanionSignedIn_();
+  const phoneLinkIcon = hasCompanionLink
+    ? [
+      `    <div class="drawer-phone-link${signedIn ? '' : ' drawer-phone-link--disabled'}" id="drawer-phone-link"`,
+      `      role="button" tabindex="0" aria-disabled="${String(!signedIn)}"`,
+      `      kt-tooltip="${signedIn ? 'Phone Link' : 'Sign in to link your phone'}">`,
+      '      <svg class="drawer-phone-link-icon" viewBox="0 0 24 24" aria-hidden="true">',
+      '        <path fill="currentColor" d="M7 18v-8H3v8zm-4.5 2q-.625 0-1.062-.437T1 18.5v-9q0-.625.438-1.062T2.5 8h5q.625 0 1.063.438T9 9.5v9q0 .625-.437 1.063T7.5 20zM5 12.5q.325 0 .538-.225t.212-.525q0-.325-.213-.537T5 11q-.3 0-.525.213t-.225.537q0 .3.225.525T5 12.5M15.75 22v-5q-.225-.2-.363-.462T15.25 16q0-.525.375-.888t.875-.362q.525 0 .888.363t.362.887q0 .275-.112.55t-.388.45v5zm-2.075-3.175q-.55-.575-.862-1.3T12.5 16q0-1.675 1.175-2.838T16.5 12q1.675 0 2.838 1.163T20.5 16q0 .775-.288 1.5t-.862 1.3l-1.075-1.05q.35-.35.538-.8T19 16q0-1.05-.725-1.775T16.5 13.5t-1.775.725T14 16q0 .5.2.95t.55.8zM11.9 20.6q-.875-.95-1.388-2.138T10 16q0-2.725 1.9-4.612T16.5 9.5q2.725 0 4.613 1.888T23 16q0 1.275-.475 2.463t-1.4 2.112L20.05 19.5q.725-.725 1.088-1.625T21.5 16q0-2.1-1.45-3.55T16.5 11q-2.075 0-3.537 1.45T11.5 16q0 .975.388 1.888t1.087 1.637zM2 6q0-.825.588-1.412T4 4h15q.825 0 1.413.588T21 6v2.8q-.475-.275-.975-.513T19 7.876V6zm3 8"></path>',
+      '      </svg>',
+      '    </div>',
+    ].join('')
+    : '';
 
   footerEl.innerHTML = [
     '<div class="drawer-status-footer">',
     '  <div class="drawer-status-connectivity">',
     `    <span class="drawer-status-dot${isOnline ? '' : ' drawer-status-dot--offline'}"></span>`,
     `    <span class="drawer-status-connectivity-label${isOnline ? '' : ' drawer-status-connectivity-label--offline'}">${isOnline ? 'Connected' : 'Offline'}</span>`,
+    phoneLinkIcon,
     '  </div>',
     `  <span class="drawer-status-version">KeepTrack v${__VERSION__}</span>`,
     '</div>',

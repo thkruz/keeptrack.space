@@ -16,7 +16,7 @@ import {
   buildRecentGroupFromCache, collectDrawerItems, loadRecentPlugins, renderBadge,
   renderStatusFooter, renderUtilityFooter, saveRecentPlugins,
   syncBadgesFromEvents, syncInitialUtilityState, syncUtilityFooterState,
-  trackRecentPlugin, updateConnectivityStatus,
+  trackRecentPlugin, updateConnectivityStatus, updatePhoneLinkState,
 } from './plugin-drawer-helpers';
 import './plugin-drawer.css';
 
@@ -93,6 +93,10 @@ export class PluginDrawer {
     EventBus.getInstance().on(EventBusEvent.connectivityChange, (isOnline: boolean) => {
       this.updateConnectivityStatus_(isOnline);
     });
+
+    // Phone-link icon: red (active) when signed in, yellow + disabled when signed out.
+    EventBus.getInstance().on(EventBusEvent.userLogin, () => updatePhoneLinkState());
+    EventBus.getInstance().on(EventBusEvent.userLogout, () => updatePhoneLinkState());
   }
 
   open(): void {
@@ -449,6 +453,32 @@ export class PluginDrawer {
         if (evt.key === 'Enter' || evt.key === ' ') {
           evt.preventDefault();
           PluginDrawer.openAppLauncher_();
+        }
+      });
+    }
+
+    // Phone Link trigger — opens the CompanionLinkPlugin side menu
+    const phoneLink = getEl('drawer-phone-link', true);
+
+    if (phoneLink) {
+      const openPhoneLink = () => {
+        // Disabled until the user signs in.
+        if (phoneLink.classList.contains('drawer-phone-link--disabled')) {
+          return;
+        }
+        ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+        this.close();
+        // Small delay to let the drawer close before the side menu toggles
+        setTimeout(() => {
+          EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, 'menu-companion-link');
+        }, 100);
+      };
+
+      phoneLink.addEventListener('click', openPhoneLink);
+      phoneLink.addEventListener('keydown', (evt: KeyboardEvent) => {
+        if (evt.key === 'Enter' || evt.key === ' ') {
+          evt.preventDefault();
+          openPhoneLink();
         }
       });
     }

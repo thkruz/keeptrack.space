@@ -540,6 +540,57 @@ body.drawer-mode {
     color: rgba(255, 255, 255, 0.35);
   }
 
+  .drawer-phone-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    margin-left: auto;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--kt-radius-sm, 4px);
+    cursor: pointer;
+    transition: border-color var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
+      background-color var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+  }
+
+  .drawer-phone-link:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .drawer-phone-link-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--kt-accent-light, #e01a0e);
+    opacity: 0.9;
+    transition: opacity var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+  }
+
+  .drawer-phone-link:hover .drawer-phone-link-icon {
+    opacity: 1;
+  }
+
+  /* Signed out: yellow + disabled (sign in to enable). */
+  .drawer-phone-link--disabled {
+    cursor: default;
+  }
+
+  .drawer-phone-link--disabled:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    background: transparent;
+  }
+
+  .drawer-phone-link--disabled .drawer-phone-link-icon {
+    color: #f6c343;
+    opacity: 0.6;
+  }
+
+  .drawer-phone-link--disabled:hover .drawer-phone-link-icon {
+    opacity: 0.6;
+  }
+
   /* ---- Utility Footer (fixed to bottom-right of viewport) ---- */
   .drawer-utility-footer:empty {
     display: none;

@@ -890,6 +890,12 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true },
   },
   {
+    configKey: 'LaunchpadPlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/launchpad/launchpad') : undefined,
+    proClassName: 'LaunchpadPlugin',
+    defaultConfig: { enabled: true },
+  },
+  {
     configKey: 'FavoritesMenuPlugin',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/favorites-menu/favorites-menu') : undefined,
     proClassName: 'FavoritesMenuPlugin',

@@ -14,8 +14,13 @@ import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
+import {
+  IKeyboardShortcut,
+  ISettingsContribution,
+  ISettingsContributor,
+} from '@app/engine/plugins/core/plugin-capabilities';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { t7e } from '@app/locales/keys';
 import { createSampleCovarianceFromTle, Kilometers, LandObject, RADIUS_OF_EARTH, Satellite, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
@@ -27,9 +32,33 @@ import { TopMenu } from '../top-menu/top-menu';
 /**
  * This is the class that manages the selection of objects.
  */
-export class SelectSatManager extends KeepTrackPlugin {
+export class SelectSatManager extends KeepTrackPlugin implements ISettingsContributor {
   readonly id = 'SelectSatManager';
   dependencies_ = [];
+
+  getSettingsContribution(): ISettingsContribution {
+    return {
+      sectionId: this.id,
+      sectionLabel: t7e('plugins.SelectSatManager.sectionLabel'),
+      controls: [
+        {
+          type: 'toggle',
+          id: 'focusOnSatWhenSelected',
+          label: t7e('plugins.SelectSatManager.settings.focusOnSatWhenSelected.label'),
+          helpText: t7e('plugins.SelectSatManager.settings.focusOnSatWhenSelected.helpText'),
+          get: () => settingsManager.isFocusOnSatelliteWhenSelected,
+          set: (next) => {
+            settingsManager.isFocusOnSatelliteWhenSelected = next;
+            PersistenceManager.getInstance().saveItem(
+              StorageKey.SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED,
+              next.toString(),
+            );
+          },
+        },
+      ],
+    };
+  }
+
   lastCssStyle = '';
   selectedSat = -1;
   private readonly noSatObj_ = <Satellite>(<unknown>{

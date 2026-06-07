@@ -147,5 +147,6 @@ export type KeepTrackPluginsConfiguration = {
   ViewInfoRmbPlugin?: PluginConfiguration;
   VcrPlugin?: PluginConfiguration;
   CommandPalettePlugin?: PluginConfiguration;
+  LaunchpadPlugin?: PluginConfiguration;
   FavoritesMenuPlugin?: PluginConfiguration;
 };

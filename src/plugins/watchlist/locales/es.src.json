@@ -4,6 +4,18 @@
       "bottomIconLabel": "Watchlist",
       "title": "Watchlist",
       "helpBody": "El menú de Watchlist te permite crear una lista de satélites prioritarios para rastrear. Esto te permite recuperar rápidamente los satélites que más te interesan. La lista se guarda en el almacenamiento local de tu navegador y estará disponible la próxima vez que visites el sitio. <br><br> Cuando los satélites en la watchlist entran en el campo de visión del sensor seleccionado, se mostrará una notificación, se dibujará una línea desde el sensor al satélite y el número del satélite se mostrará en el globo. <br><br> La función de superposición depende de que la watchlist esté poblada."
+,
+      "settings": {
+        "satLabelMode": {
+          "label": "Satellite Label Mode",
+          "helpText": "Controls satellite label rendering on watchlist satellites.",
+          "options": {
+            "off": "Off",
+            "fovOnly": "FOV Only",
+            "all": "All Watchlist"
+          }
+        }
+      }
     },
     "WatchlistOverlay": {
       "bottomIconLabel": "Superposición",

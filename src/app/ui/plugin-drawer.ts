@@ -1,47 +1,24 @@
 import { SoundNames } from '@app/engine/audio/sounds';
-import { MenuMode } from '@app/engine/core/interfaces';
-import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import { IconPlacement, UtilityGroup } from '@app/engine/plugins/core/plugin-capabilities';
-import { TopMenuPlugin } from '@app/engine/plugins/top-menu-plugin';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
-import { t7e } from '@app/locales/keys';
-import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { settingsManager } from '@app/settings/settings';
+import appsPng from '@public/img/icons/apps.png';
 import leftPanelClosePng from '@public/img/icons/left-panel-close.png';
 import leftPanelOpenPng from '@public/img/icons/left-panel-open.png';
 import searchPng from '@public/img/icons/search.png';
 import ktsOrangeLogoPng from '@public/img/kts-orange-logo.png';
 import {
   type DrawerBadge, type DrawerGroup, type DrawerItemData,
-  buildRecentGroupFromCache, loadRecentPlugins, renderBadge,
+  buildRecentGroupFromCache, collectDrawerItems, loadRecentPlugins, renderBadge,
   renderStatusFooter, renderUtilityFooter, saveRecentPlugins,
   syncBadgesFromEvents, syncInitialUtilityState, syncUtilityFooterState,
-  trackRecentPlugin, updateConnectivityStatus,
+  trackRecentPlugin, updateConnectivityStatus, updatePhoneLinkState,
 } from './plugin-drawer-helpers';
 import './plugin-drawer.css';
-
-type DrawerKey_ = Parameters<typeof t7e>[0];
-
-const MODE_LABEL_KEYS: Record<number, DrawerKey_> = {
-  [MenuMode.CATALOG]: 'pluginDrawer.modeCatalog' as DrawerKey_,
-  [MenuMode.SENSORS]: 'pluginDrawer.modeSensors' as DrawerKey_,
-  [MenuMode.EVENTS]: 'pluginDrawer.modeEvents' as DrawerKey_,
-  [MenuMode.CREATE]: 'pluginDrawer.modeCreate' as DrawerKey_,
-  [MenuMode.ANALYSIS]: 'pluginDrawer.modeAnalysis' as DrawerKey_,
-  [MenuMode.DISPLAY]: 'pluginDrawer.modeDisplay' as DrawerKey_,
-  [MenuMode.TOOLS]: 'pluginDrawer.modeTools' as DrawerKey_,
-  [MenuMode.SETTINGS]: 'pluginDrawer.modeSettings' as DrawerKey_,
-  [MenuMode.EXPERIMENTAL]: 'pluginDrawer.modeExperimental' as DrawerKey_,
-};
-
-/** Nav item IDs that should appear in the utility footer instead of Quick Actions */
-const UTILITY_NAV_ITEM_IDS = new Set(['sound-btn', 'layers-menu-btn']);
 
 
 export class PluginDrawer {
@@ -116,6 +93,10 @@ export class PluginDrawer {
     EventBus.getInstance().on(EventBusEvent.connectivityChange, (isOnline: boolean) => {
       this.updateConnectivityStatus_(isOnline);
     });
+
+    // Phone-link icon: red (active) when signed in, yellow + disabled when signed out.
+    EventBus.getInstance().on(EventBusEvent.userLogin, () => updatePhoneLinkState());
+    EventBus.getInstance().on(EventBusEvent.userLogout, () => updatePhoneLinkState());
   }
 
   open(): void {
@@ -221,14 +202,28 @@ export class PluginDrawer {
 
     const drawer = document.createElement('div');
 
+    // Only show the app-launcher button when the Launchpad plugin is loaded.
+    const hasLauncher = !!PluginRegistry.getPluginByName('LaunchpadPlugin');
+    const launcherHtml = hasLauncher
+      ? [
+        '    <div class="drawer-app-launcher" id="drawer-app-launcher" role="button" tabindex="0"',
+        '      aria-label="Open app launcher" kt-tooltip="App Launcher (Shift+Z)">',
+        `      <img class="drawer-app-launcher-icon" src="${appsPng}" alt="App Launcher" />`,
+        '    </div>',
+      ].join('')
+      : '';
+
     drawer.id = 'plugin-drawer';
     drawer.className = `plugin-drawer ${modeClass}`;
     drawer.innerHTML = [
       '<div class="drawer-inner">',
-      '  <div class="drawer-search" id="drawer-search-trigger" role="button" tabindex="0">',
-      `    <img class="drawer-search-icon" src=${searchPng} alt="Search" />`,
-      '    <span class="drawer-search-label">Search\u2026</span>',
-      '    <span class="drawer-search-shortcut">Ctrl+\u21E7+K</span>',
+      '  <div class="drawer-top-actions">',
+      '    <div class="drawer-search" id="drawer-search-trigger" role="button" tabindex="0">',
+      `      <img class="drawer-search-icon" src=${searchPng} alt="Search" />`,
+      '      <span class="drawer-search-label">Search\u2026</span>',
+      '      <span class="drawer-search-shortcut">Ctrl+\u21E7+K</span>',
+      '    </div>',
+      launcherHtml,
       '  </div>',
       '  <div id="drawer-content" class="drawer-content"></div>',
       '</div>',
@@ -259,118 +254,7 @@ export class PluginDrawer {
   }
 
   private populateDrawerItems_(): void {
-    const plugins = PluginRegistry.plugins;
-    const menuGroups: Record<string, DrawerGroup> = {};
-    const utilityGroups: Record<string, DrawerGroup> = {};
-
-    // Initialize MenuMode groups (scrollable content)
-    for (const [mode, key] of Object.entries(MODE_LABEL_KEYS)) {
-      menuGroups[`mode-${mode}`] = { label: t7e(key), items: [] };
-    }
-
-    // Initialize utility groups (pinned footer)
-    utilityGroups['utility-camera'] = { label: t7e('pluginDrawer.groupCameraModes' as DrawerKey_), items: [] };
-    utilityGroups['utility-layers'] = { label: t7e('pluginDrawer.groupLayerToggles' as DrawerKey_), items: [] };
-    utilityGroups['utility-settings'] = { label: t7e('pluginDrawer.groupSettingsToggles' as DrawerKey_), items: [] };
-
-    // About group for TopMenuPlugin instances (e.g., GithubLink)
-    menuGroups.about = { label: t7e('pluginDrawer.groupAbout' as DrawerKey_), items: [] };
-
-    for (const plugin of plugins) {
-      // Handle TopMenuPlugins — put in About group
-      if (plugin instanceof TopMenuPlugin) {
-        const btnEl = getEl(`${plugin.id}-btn`, true);
-        const imgEl = btnEl?.querySelector('img') as HTMLImageElement | null;
-        const tooltip = btnEl?.getAttribute('kt-tooltip') || plugin.id;
-
-        if (imgEl) {
-          menuGroups.about.items.push({
-            id: plugin.id,
-            label: tooltip,
-            imgSrc: imgEl.src || imgEl.getAttribute('delayedsrc') || '',
-            isTopMenu: true,
-            order: 0,
-          });
-        }
-        continue;
-      }
-
-      // Handle bottom icon plugins
-      if (!plugin.bottomIconElementName || !plugin.bottomIconImg || plugin.isBottomIconHidden) {
-        continue;
-      }
-
-      const order = plugin.bottomIconOrder ?? KeepTrackPlugin.MAX_BOTTOM_ICON_ORDER;
-
-      // Resolve the image source — it may be a webpack module or a string
-      const imgSrc = this.resolveImgSrc_(plugin);
-
-      // Put in utility group if applicable
-      if (plugin.iconPlacement === IconPlacement.UTILITY_ONLY || plugin.iconPlacement === IconPlacement.BOTH) {
-        let utilityKey: string;
-
-        if (plugin.utilityGroup === UtilityGroup.CAMERA_MODE) {
-          utilityKey = 'utility-camera';
-        } else if (plugin.utilityGroup === UtilityGroup.SETTINGS_TOGGLE) {
-          utilityKey = 'utility-settings';
-        } else {
-          utilityKey = 'utility-layers';
-        }
-
-        utilityGroups[utilityKey].items.push({
-          id: plugin.bottomIconElementName,
-          pluginId: plugin.id,
-          label: plugin.bottomIconLabel,
-          imgSrc,
-          isTopMenu: false,
-          isDisabled: plugin.isIconDisabledOnLoad,
-          isLoginRequired: plugin.isLoginRequired,
-          order,
-        });
-      }
-
-      // Put in first matching MenuMode group (only if not in the utility footer)
-      if (plugin.iconPlacement === IconPlacement.BOTTOM_ONLY) {
-        const primaryMode = plugin.menuMode.find((m) => m !== MenuMode.ALL) ?? MenuMode.CATALOG;
-
-        menuGroups[`mode-${primaryMode}`]?.items.push({
-          id: plugin.bottomIconElementName,
-          label: plugin.bottomIconLabel,
-          imgSrc,
-          isTopMenu: false,
-          isDisabled: plugin.isIconDisabledOnLoad,
-          isLoginRequired: plugin.isLoginRequired,
-          order,
-          shortcutHint: PluginDrawer.getShortcutHint_(plugin.id),
-        });
-      }
-    }
-
-    // Add TopMenu navItems (sound, layers, tutorial, etc.) to appropriate groups
-    const topMenu = PluginRegistry.getPlugin(TopMenu);
-
-    if (topMenu) {
-      for (const navItem of topMenu.navItems) {
-        const btnEl = getEl(navItem.id, true);
-        const imgEl = btnEl?.querySelector('img') as HTMLImageElement | null;
-        const imgSrc = imgEl?.src || imgEl?.getAttribute('delayedsrc') || String(navItem.icon);
-        const tooltip = btnEl?.getAttribute('kt-tooltip') || navItem.tooltip || navItem.id;
-        const isDisabled = btnEl?.classList.contains('bmenu-item-disabled') ?? false;
-
-        const item: DrawerItemData = {
-          id: navItem.id,
-          label: tooltip,
-          imgSrc,
-          isTopMenu: true,
-          isDisabled,
-          order: navItem.order,
-        };
-
-        if (UTILITY_NAV_ITEM_IDS.has(navItem.id)) {
-          utilityGroups['utility-settings'].items.push(item);
-        }
-      }
-    }
+    const { menuGroups, utilityGroups } = collectDrawerItems();
 
     // Build the "Recent" group from persisted recent plugin IDs
     const recentGroup = this.buildRecentGroup_(menuGroups);
@@ -442,18 +326,6 @@ export class PluginDrawer {
 
   private renderUtilityFooter_(groups: Record<string, DrawerGroup>): void {
     renderUtilityFooter(groups);
-  }
-
-  private resolveImgSrc_(plugin: KeepTrackPlugin): string {
-    // Try to get from the already-rendered bottom icon DOM element
-    const iconEl = getEl(plugin.bottomIconElementName, true);
-    const img = iconEl?.querySelector('img') as HTMLImageElement | null;
-
-    if (img) {
-      return img.src || img.getAttribute('delayedsrc') || String(plugin.bottomIconImg);
-    }
-
-    return String(plugin.bottomIconImg);
   }
 
   private wireEventListeners_(): void {
@@ -565,6 +437,48 @@ export class PluginDrawer {
         if (evt.key === 'Enter' || evt.key === ' ') {
           evt.preventDefault();
           PluginDrawer.openCommandPalette_();
+        }
+      });
+    }
+
+    // App launcher trigger — opens the Launchpad grid
+    const appLauncher = getEl('drawer-app-launcher', true);
+
+    if (appLauncher) {
+      appLauncher.addEventListener('click', () => {
+        ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+        PluginDrawer.openAppLauncher_();
+      });
+      appLauncher.addEventListener('keydown', (evt: KeyboardEvent) => {
+        if (evt.key === 'Enter' || evt.key === ' ') {
+          evt.preventDefault();
+          PluginDrawer.openAppLauncher_();
+        }
+      });
+    }
+
+    // Phone Link trigger — opens the CompanionLinkPlugin side menu
+    const phoneLink = getEl('drawer-phone-link', true);
+
+    if (phoneLink) {
+      const openPhoneLink = () => {
+        // Disabled until the user signs in.
+        if (phoneLink.classList.contains('drawer-phone-link--disabled')) {
+          return;
+        }
+        ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+        this.close();
+        // Small delay to let the drawer close before the side menu toggles
+        setTimeout(() => {
+          EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, 'menu-companion-link');
+        }, 100);
+      };
+
+      phoneLink.addEventListener('click', openPhoneLink);
+      phoneLink.addEventListener('keydown', (evt: KeyboardEvent) => {
+        if (evt.key === 'Enter' || evt.key === ' ') {
+          evt.preventDefault();
+          openPhoneLink();
         }
       });
     }
@@ -710,21 +624,6 @@ export class PluginDrawer {
   }
 
   /**
-   * Look up the first registered keyboard shortcut for a plugin and return a display string.
-   */
-  private static getShortcutHint_(pluginId: string): string | undefined {
-    const allShortcuts = KeyboardShortcutRegistry.getAll();
-
-    for (const entry of allShortcuts) {
-      if (entry.pluginId === pluginId) {
-        return KeyboardShortcutRegistry.formatShortcut(entry.shortcut);
-      }
-    }
-
-    return undefined;
-  }
-
-  /**
    * Render a single drawer group to HTML.
    */
   private static renderGroupHtml_(key: string, group: DrawerGroup, isExpanded: boolean): string {
@@ -767,6 +666,18 @@ export class PluginDrawer {
       code: 'KeyK',
       key: 'K',
       ctrlKey: true,
+      shiftKey: true,
+      bubbles: true,
+    }));
+  }
+
+  // ---- App Launcher ----
+
+  private static openAppLauncher_(): void {
+    // Dispatch the keyboard shortcut that the LaunchpadPlugin listens for
+    window.dispatchEvent(new KeyboardEvent('keydown', {
+      code: 'KeyZ',
+      key: 'Z',
       shiftKey: true,
       bubbles: true,
     }));

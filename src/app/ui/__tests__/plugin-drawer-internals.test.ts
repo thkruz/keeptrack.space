@@ -1,7 +1,9 @@
 import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { PluginDrawer } from '@app/app/ui/plugin-drawer';
+import { getShortcutHint } from '@app/app/ui/plugin-drawer-helpers';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
 
@@ -74,12 +76,12 @@ describe('PluginDrawer internals', () => {
     expect(collapsed).toContain('drawer-group collapsed');
   });
 
-  it('getShortcutHint_ resolves a registered plugin shortcut', () => {
+  it('getShortcutHint resolves a registered plugin shortcut', () => {
     vi.spyOn(KeyboardShortcutRegistry, 'getAll').mockReturnValue([{ pluginId: 'PluginA', shortcut: { key: 'A' } }] as never);
     vi.spyOn(KeyboardShortcutRegistry, 'formatShortcut').mockReturnValue('A');
 
-    expect(C.getShortcutHint_('PluginA')).toBe('A');
-    expect(C.getShortcutHint_('NoSuchPlugin')).toBeUndefined();
+    expect(getShortcutHint('PluginA')).toBe('A');
+    expect(getShortcutHint('NoSuchPlugin')).toBeUndefined();
   });
 
   it('openCommandPalette_ dispatches the Ctrl+Shift+K keydown', () => {
@@ -92,6 +94,34 @@ describe('PluginDrawer internals', () => {
     expect(evt.code).toBe('KeyK');
     expect(evt.ctrlKey).toBe(true);
     expect(evt.shiftKey).toBe(true);
+  });
+
+  it('openAppLauncher_ dispatches the Shift+Z keydown', () => {
+    const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+
+    C.openAppLauncher_();
+
+    const evt = dispatchSpy.mock.calls[0][0] as KeyboardEvent;
+
+    expect(evt.code).toBe('KeyZ');
+    expect(evt.shiftKey).toBe(true);
+    expect(evt.ctrlKey).toBe(false);
+  });
+
+  it('createDrawerDom_ renders the app launcher when LaunchpadPlugin is loaded', () => {
+    vi.spyOn(PluginRegistry, 'getPluginByName').mockReturnValue({} as never);
+
+    p().createDrawerDom_();
+
+    expect(p().drawerEl_.querySelector('#drawer-app-launcher')).not.toBeNull();
+  });
+
+  it('createDrawerDom_ omits the app launcher when LaunchpadPlugin is absent', () => {
+    vi.spyOn(PluginRegistry, 'getPluginByName').mockReturnValue(null as never);
+
+    p().createDrawerDom_();
+
+    expect(p().drawerEl_.querySelector('#drawer-app-launcher')).toBeNull();
   });
 
   it('buildRecentGroup_ indexes non-top-menu items into the drawer cache', () => {

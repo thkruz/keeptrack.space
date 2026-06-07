@@ -48,9 +48,7 @@ describe('SettingsMenuPlugin_class', () => {
     expect(() => getEl('settings-isDrawInCoverageLines')?.click()).not.toThrow();
     expect(() => getEl('settings-eciOnHover')?.click()).not.toThrow();
     expect(() => getEl('settings-demo-mode')?.click()).not.toThrow();
-    expect(() => getEl('settings-sat-label-mode')?.click()).not.toThrow();
     expect(() => getEl('settings-freeze-drag')?.click()).not.toThrow();
-    expect(() => getEl('settings-time-machine-toasts')?.click()).not.toThrow();
     expect(() => getEl('settings-snp')?.click()).not.toThrow();
   });
   // Test submitting changes
@@ -87,8 +85,7 @@ describe('SettingsMenuPlugin form handlers', () => {
     vi.restoreAllMocks();
   });
 
-  it('onFormChange_ plays a click for the label-mode select and ignores unknown targets', () => {
-    expect(() => statics.onFormChange_({ target: getEl('settings-sat-label-mode') }, false)).not.toThrow();
+  it('onFormChange_ ignores unknown targets', () => {
     expect(() => statics.onFormChange_({ target: { id: 'some-unknown-control' } }, false)).not.toThrow();
   });
 
@@ -96,11 +93,25 @@ describe('SettingsMenuPlugin form handlers', () => {
     expect(() => statics.onFormChange_(undefined)).toThrow();
   });
 
+  it('forces satLabelMode to OFF and emits settingsMenuRefresh when demo mode is enabled', async () => {
+    const { EventBus } = await import('@app/engine/events/event-bus');
+    const { EventBusEvent } = await import('@app/engine/events/event-bus-events');
+    const { SatLabelMode } = await import('@app/settings/ui-settings');
+
+    settingsManager.satLabelMode = SatLabelMode.ALL;
+    const emitSpy = vi.spyOn(EventBus.getInstance(), 'emit');
+
+    statics.onFormChange_({ target: { id: 'settings-demo-mode' } }, true);
+
+    expect(settingsManager.satLabelMode).toBe(SatLabelMode.OFF);
+    expect(emitSpy).toHaveBeenCalledWith(EventBusEvent.settingsMenuRefresh);
+  });
+
   it('onSubmit_ throws when the event is missing', () => {
     expect(() => statics.onSubmit_(undefined)).toThrow();
   });
 
-  it('onSubmit_ applies changed orbit settings, stops time machine and clamps an invalid FOV', () => {
+  it('onSubmit_ applies changed orbit settings and stops time machine', () => {
     const orbit = ServiceLocator.getOrbitManager();
 
     orbit.orbitThreadMgr = { sendSettingsUpdate: vi.fn() } as never;
@@ -111,9 +122,6 @@ describe('SettingsMenuPlugin form handlers', () => {
 
     csm.calculateColorBuffers = vi.fn().mockResolvedValue(undefined as never);
     csm.reloadColors = vi.fn();
-    const toast = vi.fn();
-
-    ServiceLocator.getUiManager().toast = toast;
 
     const timeMachine = new TimeMachine();
 
@@ -126,16 +134,12 @@ describe('SettingsMenuPlugin form handlers', () => {
     (getEl('settings-numberOfEcfOrbitsToDraw') as HTMLInputElement).value = '5';
     settingsManager.isDrawOrbits = false;
     (getEl('settings-drawOrbits') as HTMLInputElement).checked = true;
-    // Invalid field of view -> reset + toast.
-    (getEl('satFieldOfView') as HTMLInputElement).value = 'abc';
 
     statics.onSubmit_({ preventDefault: vi.fn() });
 
     expect(orbit.orbitThreadMgr.sendSettingsUpdate).toHaveBeenCalledWith(5);
     expect(orbit.drawOrbitsSettingChanged).toHaveBeenCalled();
     expect(timeMachine.isMenuButtonActive).toBe(false);
-    expect(toast).toHaveBeenCalled();
-    expect((getEl('satFieldOfView') as HTMLInputElement).value).toBe('30');
   });
 
   it('uiManagerFinal hides confidence and time-machine rows when those features are off', () => {

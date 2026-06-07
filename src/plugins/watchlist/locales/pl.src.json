@@ -4,6 +4,18 @@
       "bottomIconLabel": "Lista obserwacyjna",
       "title": "Lista obserwacyjna",
       "helpBody": "Menu listy obserwacyjnej pozwala utworzyć listę priorytetowych satelitów do śledzenia. Umożliwia szybkie odnalezienie satelitów, które najbardziej Cię interesują. Lista jest zapisywana w pamięci lokalnej przeglądarki i będzie dostępna przy następnej wizycie na stronie. <br><br> Gdy satelity z listy obserwacyjnej wejdą w pole widzenia wybranego czujnika, zostanie wyświetlone powiadomienie, narysowana linia od czujnika do satelity, a numer satelity zostanie wyświetlony na globie. <br><br> Funkcja nakładki wymaga wypełnienia listy obserwacyjnej."
+,
+      "settings": {
+        "satLabelMode": {
+          "label": "Satellite Label Mode",
+          "helpText": "Controls satellite label rendering on watchlist satellites.",
+          "options": {
+            "off": "Off",
+            "fovOnly": "FOV Only",
+            "all": "All Watchlist"
+          }
+        }
+      }
     },
     "WatchlistOverlay": {
       "bottomIconLabel": "Nakładka",

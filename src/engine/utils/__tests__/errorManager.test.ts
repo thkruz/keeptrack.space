@@ -116,6 +116,26 @@ describe('ErrorManager.reportEvent', () => {
     expect(console.warn).toHaveBeenCalled();
   });
 
+  it('suppresses an opaque Web Worker onerror (null error, no message, no source)', () => {
+    // colorCruncher worker onerror for an opaque/cross-origin worker: event.error is null and
+    // message/filename are empty, so toError_ can only build a bare "Unknown error". Must not
+    // throw or be loud, and must be tagged unactionable so telemetry skips the bug-filing POST.
+    expect(() => errorManager.reportEvent({
+      error: null,
+      funcName: 'Worker[js/colorCruncher.js]',
+      message: '',
+      source: '',
+      isOpaqueEvent: true,
+    })).not.toThrow();
+
+    expect(captured).toHaveLength(1);
+    expect((captured[0].err as { isUnactionable?: boolean }).isUnactionable).toBe(true);
+    // eslint-disable-next-line no-console
+    expect(console.warn).toHaveBeenCalled();
+    // eslint-disable-next-line no-console
+    expect(console.error).not.toHaveBeenCalled();
+  });
+
   it('suppresses a Rocket Loader rejection (null reason, loader frame in stack) — #1371', () => {
     // Reproduces the unhandledrejection from Cloudflare Rocket Loader: reason is null and
     // the only signal is the loader frame in the synthesized stack. Must not throw or auto-file.

@@ -25,6 +25,7 @@ export enum StorageKey {
   SETTINGS_SAT_LABEL_MODE_V2 = 'v2-keepTrack-settings-satLabelModeV2',
   SETTINGS_FREEZE_PROP_RATE_ON_DRAG = 'v2-keepTrack-settings-freezePropRateOnDrag',
   SETTINGS_DISABLE_TIME_MACHINE_TOASTS = 'v2-keepTrack-settings-disableTimeMachineToasts',
+  SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED = 'v2-keepTrack-settings-focusOnSatWhenSelected',
   SETTINGS_SEARCH_LIMIT = 'v2-keepTrack-settings-searchLimit',
   SETTINGS_SHOW_DECAYED_IN_SEARCH = 'v2-keepTrack-settings-showDecayedInSearch',
   SETTINGS_DRAW_TRAILING_ORBITS = 'v2-keepTrack-settings-drawTrailingOrbits',

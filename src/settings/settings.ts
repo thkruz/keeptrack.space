@@ -456,6 +456,7 @@ export class SettingsManager {
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SAT_LABEL_MODE_V2, settingsManager.satLabelMode.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG, settingsManager.isFreezePropRateOnDrag.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS, settingsManager.isDisableTimeMachineToasts.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED, settingsManager.isFocusOnSatelliteWhenSelected.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SEARCH_LIMIT, settingsManager.searchLimit.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SHOW_DECAYED_IN_SEARCH, settingsManager.isShowDecayedInSearch.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_SAMPLES, settingsManager.godraysSamples.toString());
@@ -509,6 +510,7 @@ export class SettingsManager {
     }
     this.isFreezePropRateOnDrag = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG, this.isFreezePropRateOnDrag) as boolean;
     this.isDisableTimeMachineToasts = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS, this.isDisableTimeMachineToasts) as boolean;
+    this.isFocusOnSatelliteWhenSelected = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED, this.isFocusOnSatelliteWhenSelected) as boolean;
 
     const earthDayTextureQaulityString = PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION);
 

@@ -4,6 +4,18 @@
       "bottomIconLabel": "Seznam sledovaných",
       "title": "Seznam sledovaných",
       "helpBody": "Menu seznamu sledovaných umožňuje vytvořit seznam prioritních satelitů ke sledování. To vám umožní rychle načíst satelity, které vás nejvíce zajímají. Seznam je uložen v místním úložišti vašeho prohlížeče a bude k dispozici při příští návštěvě stránky. <br><br> Když satelity na seznamu sledovaných vstoupí do zorného pole vybraného senzoru, zobrazí se oznámení, nakreslí se čára od senzoru k satelitu a číslo satelitu se zobrazí na glóbu. <br><br> Funkce překryvu závisí na vyplněném seznamu sledovaných."
+,
+      "settings": {
+        "satLabelMode": {
+          "label": "Satellite Label Mode",
+          "helpText": "Controls satellite label rendering on watchlist satellites.",
+          "options": {
+            "off": "Off",
+            "fovOnly": "FOV Only",
+            "all": "All Watchlist"
+          }
+        }
+      }
     },
     "WatchlistOverlay": {
       "bottomIconLabel": "Překryv",

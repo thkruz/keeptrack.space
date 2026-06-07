@@ -2,5 +2,16 @@
   "SelectSatManager": {
     "objectInsideEarth": "물체가 지구 내부에 있어 선택할 수 없습니다",
     "noSatellitesFound": "이 소유자/제조업체의 위성을 찾을 수 없습니다"
+  },
+  "plugins": {
+    "SelectSatManager": {
+      "sectionLabel": "Satellite Selection",
+      "settings": {
+        "focusOnSatWhenSelected": {
+          "label": "Focus on Satellite When Selected",
+          "helpText": "Zoom in on the satellite when selected."
+        }
+      }
+    }
   }
 }

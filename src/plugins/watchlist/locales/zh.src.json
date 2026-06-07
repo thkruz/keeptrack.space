@@ -4,6 +4,18 @@
       "bottomIconLabel": "监视列表",
       "title": "监视列表",
       "helpBody": "监视列表菜单允许您创建优先跟踪的卫星列表，便于快速检索感兴趣的卫星。该列表保存在浏览器本地存储，下次访问网站时仍可用。<br><br>当监视列表中的卫星进入所选传感器视场时，会显示通知，从传感器到卫星会绘制一条连线，并在地球上显示卫星编号。<br><br>叠加功能依赖于监视列表已被填充。"
+,
+      "settings": {
+        "satLabelMode": {
+          "label": "Satellite Label Mode",
+          "helpText": "Controls satellite label rendering on watchlist satellites.",
+          "options": {
+            "off": "Off",
+            "fovOnly": "FOV Only",
+            "all": "All Watchlist"
+          }
+        }
+      }
     },
     "WatchlistOverlay": {
       "bottomIconLabel": "叠加",

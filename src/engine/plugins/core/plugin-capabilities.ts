@@ -622,3 +622,155 @@ export function requiresSensor(plugin: unknown): plugin is IRequiresSensor {
 export function requiresSatellite(plugin: unknown): plugin is IRequiresSatellite {
   return typeof plugin === 'object' && plugin !== null && 'requiresSatelliteSelected' in plugin;
 }
+
+// ============================================================================
+// Settings Contribution Capability
+// ============================================================================
+
+/**
+ * Discriminator for the variants of {@link ISettingControl}.
+ */
+export type SettingControlType = 'toggle' | 'number' | 'select' | 'button';
+
+/**
+ * Fields shared by every settings control variant. Not intended to be used
+ * directly — consume {@link ISettingControl} instead.
+ */
+interface ISettingControlBase {
+  /**
+   * Identifier for this control, unique within its contribution.
+   * Convention: camelCase, descriptive of the underlying setting.
+   * @example 'disableToasts', 'maxSearchResults'
+   */
+  id: string;
+
+  /**
+   * Pre-translated label rendered next to the control.
+   * Plugins should call {@link t7e} before populating this field.
+   */
+  label: string;
+
+  /**
+   * Pre-translated tooltip / help text shown on hover.
+   */
+  helpText?: string;
+
+  /**
+   * Optional predicate returning false to hide this control. Defaults to
+   * always visible. Emit {@link EventBusEvent.settingsMenuRefresh} if the
+   * value would change after the menu has been rendered.
+   */
+  isAvailable?: () => boolean;
+
+  /**
+   * Optional predicate returning true to render this control in a disabled
+   * (read-only) state — e.g., feature gated behind a pro license.
+   */
+  isDisabled?: () => boolean;
+}
+
+/**
+ * Boolean checkbox / switch.
+ */
+export interface ISettingToggleControl extends ISettingControlBase {
+  type: 'toggle';
+  get: () => boolean;
+  set: (next: boolean) => void;
+}
+
+/**
+ * Numeric input. Optional min / max / step / unit drive rendering only —
+ * plugins must still validate inside {@link set} if invariants matter.
+ */
+export interface ISettingNumberControl extends ISettingControlBase {
+  type: 'number';
+  get: () => number;
+  set: (next: number) => void;
+  min?: number;
+  max?: number;
+  step?: number;
+  /**
+   * Unit suffix rendered after the input.
+   * @example 'km', '°', 'ms'
+   */
+  unit?: string;
+}
+
+/**
+ * Dropdown with a fixed set of string options.
+ */
+export interface ISettingSelectControl<T extends string = string> extends ISettingControlBase {
+  type: 'select';
+  options: ReadonlyArray<{ value: T; label: string }>;
+  get: () => T;
+  set: (next: T) => void;
+}
+
+/**
+ * Action button. Useful for one-shot operations like "Reset to defaults".
+ */
+export interface ISettingButtonControl extends ISettingControlBase {
+  type: 'button';
+  buttonLabel: string;
+  onClick: () => void;
+}
+
+/**
+ * Discriminated union of every supported settings control. Renderers switch
+ * on {@link SettingControlType} via the `type` field.
+ */
+export type ISettingControl =
+  | ISettingToggleControl
+  | ISettingNumberControl
+  | ISettingSelectControl
+  | ISettingButtonControl;
+
+/**
+ * One settings section, contributed by a single plugin. Rendered as a labeled
+ * group inside the settings menu. Plugins persist their own state inside the
+ * control's {@link ISettingControlBase.set} callback — settings-menu is
+ * unaware of where the value lives.
+ */
+export interface ISettingsContribution {
+  /**
+   * Identifier for this section, unique across plugins.
+   * Convention: the plugin's `id`.
+   */
+  sectionId: string;
+
+  /**
+   * Pre-translated section header.
+   */
+  sectionLabel: string;
+
+  /**
+   * Sort key (ascending). Sections without `order` are placed after sections
+   * that specify one, preserving plugin manifest order as a tiebreaker.
+   */
+  order?: number;
+
+  /**
+   * Controls rendered inside this section, in declaration order.
+   */
+  controls: ISettingControl[];
+}
+
+/**
+ * Interface for plugins that contribute one section to the settings menu.
+ * Implementing this is the supported path for plugin-specific settings —
+ * see issue #681. Do not add entries directly to the settings-menu plugin.
+ */
+export interface ISettingsContributor {
+  /**
+   * Returns this plugin's settings section. Called every time the settings
+   * menu is opened, and again on {@link EventBusEvent.settingsMenuRefresh}.
+   */
+  getSettingsContribution(): ISettingsContribution;
+}
+
+/**
+ * Type guard to check if a plugin contributes a settings section.
+ */
+export function hasSettingsContribution(plugin: unknown): plugin is ISettingsContributor {
+  return typeof plugin === 'object' && plugin !== null && 'getSettingsContribution' in plugin;
+}

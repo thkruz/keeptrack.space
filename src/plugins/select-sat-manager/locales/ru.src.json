@@ -2,5 +2,16 @@
   "SelectSatManager": {
     "objectInsideEarth": "Объект находится внутри Земли, выбор невозможен",
     "noSatellitesFound": "Спутники для этого владельца/производителя не найдены"
+  },
+  "plugins": {
+    "SelectSatManager": {
+      "sectionLabel": "Satellite Selection",
+      "settings": {
+        "focusOnSatWhenSelected": {
+          "label": "Focus on Satellite When Selected",
+          "helpText": "Zoom in on the satellite when selected."
+        }
+      }
+    }
   }
 }

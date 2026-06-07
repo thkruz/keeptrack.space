@@ -2,6 +2,11 @@ import { vi } from 'vitest';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import {
+  hasSettingsContribution,
+  ISettingToggleControl,
+} from '@app/engine/plugins/core/plugin-capabilities';
+import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
@@ -293,5 +298,53 @@ describe('SelectSatManager_class', () => {
     selectSatManager.selectSat(0);
 
     expect(selectSatManager.primarySatCovMatrix).toBeDefined();
+  });
+});
+
+describe('SelectSatManager settings contribution', () => {
+  let plugin: SelectSatManager;
+
+  beforeEach(() => {
+    setupStandardEnvironment();
+    plugin = new SelectSatManager();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('advertises a settings contribution', () => {
+    expect(hasSettingsContribution(plugin)).toBe(true);
+  });
+
+  it('contributes a single toggle bound to settingsManager.isFocusOnSatelliteWhenSelected', () => {
+    const contribution = plugin.getSettingsContribution();
+
+    expect(contribution.sectionId).toBe('SelectSatManager');
+    expect(contribution.controls).toHaveLength(1);
+    const control = contribution.controls[0];
+
+    expect(control.type).toBe('toggle');
+    expect(control.id).toBe('focusOnSatWhenSelected');
+
+    settingsManager.isFocusOnSatelliteWhenSelected = false;
+    expect((control as ISettingToggleControl).get()).toBe(false);
+    settingsManager.isFocusOnSatelliteWhenSelected = true;
+    expect((control as ISettingToggleControl).get()).toBe(true);
+  });
+
+  it('set() updates settingsManager and persists to localStorage', () => {
+    const control = plugin.getSettingsContribution().controls[0] as ISettingToggleControl;
+    const saveSpy = vi.spyOn(PersistenceManager.getInstance(), 'saveItem').mockImplementation(() => undefined);
+
+    control.set(false);
+
+    expect(settingsManager.isFocusOnSatelliteWhenSelected).toBe(false);
+    expect(saveSpy).toHaveBeenCalledWith(StorageKey.SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED, 'false');
+
+    control.set(true);
+
+    expect(settingsManager.isFocusOnSatelliteWhenSelected).toBe(true);
+    expect(saveSpy).toHaveBeenCalledWith(StorageKey.SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED, 'true');
   });
 });

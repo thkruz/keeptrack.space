@@ -4,6 +4,18 @@
       "bottomIconLabel": "Watchlist",
       "title": "Watchlist",
       "helpBody": "Das Watchlist-Menü ermöglicht es Ihnen, eine Liste von Prioritätssatelliten zu erstellen, die Sie verfolgen möchten. Dies ermöglicht es Ihnen, schnell auf die Satelliten zuzugreifen, die Sie am meisten interessieren. Die Liste wird im lokalen Speicher Ihres Browsers gespeichert und steht Ihnen beim nächsten Besuch der Website zur Verfügung. <br><br> Wenn Satelliten auf der Watchlist in das Sichtfeld des ausgewählten Sensors eintreten, wird eine Benachrichtigung angezeigt, eine Linie vom Sensor zum Satelliten gezogen und die Nummer des Satelliten auf dem Globus angezeigt. <br><br> Die Überlagerung-Funktion basiert darauf, dass die Watchlist gefüllt ist."
+,
+      "settings": {
+        "satLabelMode": {
+          "label": "Satellite Label Mode",
+          "helpText": "Controls satellite label rendering on watchlist satellites.",
+          "options": {
+            "off": "Off",
+            "fovOnly": "FOV Only",
+            "all": "All Watchlist"
+          }
+        }
+      }
     },
     "WatchlistOverlay": {
       "bottomIconLabel": "Überlagerung",

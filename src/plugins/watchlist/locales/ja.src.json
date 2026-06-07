@@ -4,6 +4,18 @@
       "bottomIconLabel": "ウォッチリスト",
       "title": "ウォッチリスト",
       "helpBody": "ウォッチリストメニューでは、追跡する優先衛星のリストを作成できます。これにより、最も関心のある衛星をすぐに取得できます。リストはブラウザのローカルストレージに保存され、次回サイトを訪問したときにも利用できます。<br><br>ウォッチリスト上の衛星が選択されたセンサーの視野に入ると、通知が表示され、センサーから衛星への線が描画され、衛星の番号が地球儀上に表示されます。<br><br>オーバーレイ機能はウォッチリストが入力されていることに依存しています。"
+,
+      "settings": {
+        "satLabelMode": {
+          "label": "Satellite Label Mode",
+          "helpText": "Controls satellite label rendering on watchlist satellites.",
+          "options": {
+            "off": "Off",
+            "fovOnly": "FOV Only",
+            "all": "All Watchlist"
+          }
+        }
+      }
     },
     "WatchlistOverlay": {
       "bottomIconLabel": "オーバーレイ",

@@ -1,9 +1,15 @@
 import { KeepTrack } from '@app/keeptrack';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import {
+  hasSettingsContribution,
+  ISettingSelectControl,
+} from '@app/engine/plugins/core/plugin-capabilities';
+import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
+import { SatLabelMode } from '@app/settings/ui-settings';
 import { defaultSat } from '@test/environment/apiMocks';
 import { disableConsoleErrors, enableConsoleErrors, setupDefaultHtml, setupStandardEnvironment } from '@test/environment/standard-env';
 import { getEl } from '@app/engine/utils/get-el';
@@ -294,5 +300,63 @@ describe('WatchlistPlugin list operations', () => {
     p().onReaderLoad_(evt);
 
     expect(plugin.getSatellites()).toContain(defaultSat.id);
+  });
+});
+
+describe('WatchlistPlugin settings contribution', () => {
+  let plugin: WatchlistPlugin;
+
+  beforeEach(() => {
+    setupStandardEnvironment();
+    plugin = new WatchlistPlugin();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('advertises a settings contribution', () => {
+    expect(hasSettingsContribution(plugin)).toBe(true);
+  });
+
+  it('contributes a single select with three options spanning every SatLabelMode value', () => {
+    const contribution = plugin.getSettingsContribution();
+
+    expect(contribution.sectionId).toBe('WatchlistPlugin');
+    expect(contribution.controls).toHaveLength(1);
+    const control = contribution.controls[0] as ISettingSelectControl;
+
+    expect(control.type).toBe('select');
+    expect(control.id).toBe('satLabelMode');
+    expect(control.options.map((o) => o.value)).toEqual([
+      String(SatLabelMode.OFF),
+      String(SatLabelMode.FOV_ONLY),
+      String(SatLabelMode.ALL),
+    ]);
+  });
+
+  it('get() returns the current satLabelMode serialized to the matching option value', () => {
+    const control = plugin.getSettingsContribution().controls[0] as ISettingSelectControl;
+
+    settingsManager.satLabelMode = SatLabelMode.OFF;
+    expect(control.get()).toBe(String(SatLabelMode.OFF));
+
+    settingsManager.satLabelMode = SatLabelMode.ALL;
+    expect(control.get()).toBe(String(SatLabelMode.ALL));
+  });
+
+  it('set() parses the string value back into the enum and persists it', () => {
+    const control = plugin.getSettingsContribution().controls[0] as ISettingSelectControl;
+    const saveSpy = vi.spyOn(PersistenceManager.getInstance(), 'saveItem').mockImplementation(() => undefined);
+
+    control.set(String(SatLabelMode.ALL));
+
+    expect(settingsManager.satLabelMode).toBe(SatLabelMode.ALL);
+    expect(saveSpy).toHaveBeenCalledWith(StorageKey.SETTINGS_SAT_LABEL_MODE, String(SatLabelMode.ALL));
+
+    control.set(String(SatLabelMode.OFF));
+
+    expect(settingsManager.satLabelMode).toBe(SatLabelMode.OFF);
+    expect(saveSpy).toHaveBeenCalledWith(StorageKey.SETTINGS_SAT_LABEL_MODE, String(SatLabelMode.OFF));
   });
 });

@@ -42,8 +42,13 @@ import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import bookmarksPng from '@public/img/icons/bookmarks.png';
 import saveAs from 'file-saver';
+import { t7e } from '@app/locales/keys';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { IKeyboardShortcut } from '../../engine/plugins/core/plugin-capabilities';
+import {
+  IKeyboardShortcut,
+  ISettingsContribution,
+  ISettingsContributor,
+} from '../../engine/plugins/core/plugin-capabilities';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { EL as SAT_INFO_EL } from '../sat-info-box/sat-info-box-html';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -54,9 +59,41 @@ export interface UpdateWatchlistParams {
   isSkipSearch?: boolean;
 }
 
-export class WatchlistPlugin extends KeepTrackPlugin {
+export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContributor {
   readonly id = 'WatchlistPlugin';
   dependencies_ = [];
+
+  getSettingsContribution(): ISettingsContribution {
+    const l = (key: string) => t7e(`plugins.WatchlistPlugin.settings.satLabelMode.${key}` as Parameters<typeof t7e>[0]);
+
+    return {
+      sectionId: this.id,
+      sectionLabel: this.bottomIconLabel,
+      controls: [
+        {
+          type: 'select',
+          id: 'satLabelMode',
+          label: l('label'),
+          helpText: l('helpText'),
+          options: [
+            { value: String(SatLabelMode.OFF), label: l('options.off') },
+            { value: String(SatLabelMode.FOV_ONLY), label: l('options.fovOnly') },
+            { value: String(SatLabelMode.ALL), label: l('options.all') },
+          ],
+          get: () => String(settingsManager.satLabelMode),
+          set: (next) => {
+            const parsed = parseInt(next, 10) as SatLabelMode;
+
+            settingsManager.satLabelMode = parsed;
+            PersistenceManager.getInstance().saveItem(
+              StorageKey.SETTINGS_SAT_LABEL_MODE,
+              parsed.toString(),
+            );
+          },
+        },
+      ],
+    };
+  }
 
   getKeyboardShortcuts(): IKeyboardShortcut[] {
     return [

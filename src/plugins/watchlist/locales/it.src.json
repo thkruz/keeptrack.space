@@ -4,6 +4,18 @@
       "bottomIconLabel": "Lista di osservazione",
       "title": "Lista di osservazione",
       "helpBody": "Il menu Lista di osservazione consente di creare un elenco di satelliti prioritari da tracciare. Questo permette di recuperare rapidamente i satelliti di maggiore interesse. L'elenco viene salvato nella memoria locale del browser e sarà disponibile alla prossima visita del sito. <br><br> Quando i satelliti nella lista di osservazione entrano nel campo visivo del sensore selezionato, verrà visualizzata una notifica, verrà tracciata una linea dal sensore al satellite e il numero del satellite verrà visualizzato sul globo. <br><br> La funzione di sovrapposizione si basa sulla lista di osservazione compilata."
+,
+      "settings": {
+        "satLabelMode": {
+          "label": "Satellite Label Mode",
+          "helpText": "Controls satellite label rendering on watchlist satellites.",
+          "options": {
+            "off": "Off",
+            "fovOnly": "FOV Only",
+            "all": "All Watchlist"
+          }
+        }
+      }
     },
     "WatchlistOverlay": {
       "bottomIconLabel": "Sovrapposizione",

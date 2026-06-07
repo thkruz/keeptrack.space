@@ -78,6 +78,12 @@ export abstract class UrlManager {
       queryStr = queryStr.split('?')[1]; // Remove any query string after the hash
     }
 
+    // Normalize "smart"/curly quotes (U+2018/U+2019/U+201C/U+201D) to a straight
+    // double quote. Browsers and rich-text editors often substitute these when a
+    // user pastes a quoted URL, and a mismatched pair (e.g. a curly opening quote
+    // with a straight closing quote) breaks the quote-aware encoding below.
+    queryStr = queryStr.replace(/%E2%80%9[89CD]/giu, '%22');
+
     // URI Encode all %22 to ensure url is not broken
     const params = queryStr
       .split('%22')
@@ -100,7 +106,17 @@ export abstract class UrlManager {
     const keyValuePairs: Record<string, string> = {};
 
     params.forEach((param) => {
-      const [key, val] = param.split('=');
+      // Split on the FIRST '=' only — values can legitimately contain '=' (e.g. an
+      // external URL with its own query string), so param.split('=')[1] would drop
+      // everything after the second '='.
+      const eqIndex = param.indexOf('=');
+
+      if (eqIndex === -1) {
+        return;
+      }
+
+      const key = param.slice(0, eqIndex);
+      const val = param.slice(eqIndex + 1);
 
       if (key && val) {
         keyValuePairs[key] = decodeURIComponent(val.replace(/\+/gu, ' '));

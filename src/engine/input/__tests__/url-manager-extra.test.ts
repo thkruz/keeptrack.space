@@ -81,6 +81,27 @@ describe('UrlManager.parseGetVariables', () => {
   });
 });
 
+describe('UrlManager.getKeyValuePairs', () => {
+  it('keeps a wrapped external URL intact, including its own query string', () => {
+    setLocation('/?tle=%22https://celestrak.org/NORAD/elements/supplemental/sup-gp.php?INTDES=2026-123&FORMAT=csv%22&external-only=true');
+
+    const kv = UrlManager.getKeyValuePairs();
+
+    expect(kv.tle).toBe('https://celestrak.org/NORAD/elements/supplemental/sup-gp.php?INTDES=2026-123&FORMAT=csv');
+    expect(kv['external-only']).toBe('true');
+  });
+
+  it('treats curly/smart quotes the same as straight quotes (mismatched pair)', () => {
+    // %E2%80%9C is a curly opening quote (U+201C); closing quote is straight (%22).
+    setLocation('/?tle=%E2%80%9Chttps://celestrak.org/NORAD/elements/supplemental/sup-gp.php?INTDES=2026-123&FORMAT=csv%22&external-only=true');
+
+    const kv = UrlManager.getKeyValuePairs();
+
+    expect(kv.tle).toBe('https://celestrak.org/NORAD/elements/supplemental/sup-gp.php?INTDES=2026-123&FORMAT=csv');
+    expect(kv['external-only']).toBe('true');
+  });
+});
+
 describe('UrlManager.updateURL', () => {
   beforeEach(() => {
     setupStandardEnvironment();

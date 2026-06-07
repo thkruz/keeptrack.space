@@ -11,6 +11,7 @@ import {
   hasHelp,
   hasKeyboardShortcuts,
   hasSecondaryMenu,
+  hasSettingsContribution,
   hasSideMenu,
   IBottomIconCapable,
   IBottomIconConfig,
@@ -24,6 +25,8 @@ import {
   IKeyboardShortcutCapable,
   ISecondaryMenuCapable,
   ISecondaryMenuConfig,
+  ISettingsContribution,
+  ISettingsContributor,
   ISideMenuCapable,
   ISideMenuConfig,
   IRequiresSatellite,
@@ -309,6 +312,33 @@ describe('Plugin Capability Interfaces', () => {
 
       expect(shortcut.key).toBe('Escape');
       expect(shortcut.ctrl).toBeUndefined();
+    });
+  });
+
+  describe('hasSettingsContribution', () => {
+    const sampleContribution: ISettingsContribution = {
+      sectionId: 'Sample',
+      sectionLabel: 'Sample',
+      controls: [{ type: 'toggle', id: 'flag', label: 'Flag', get: () => false, set: () => undefined }],
+    };
+
+    it('should return true for plugins implementing ISettingsContributor', () => {
+      const plugin: ISettingsContributor = {
+        getSettingsContribution: () => sampleContribution,
+      };
+
+      expect(hasSettingsContribution(plugin)).toBe(true);
+    });
+
+    it('should return false for plugins without getSettingsContribution', () => {
+      expect(hasSettingsContribution({ id: 'plain' })).toBe(false);
+    });
+
+    it('should return false for null, undefined, and primitives', () => {
+      expect(hasSettingsContribution(null)).toBe(false);
+      expect(hasSettingsContribution(undefined)).toBe(false);
+      expect(hasSettingsContribution(42)).toBe(false);
+      expect(hasSettingsContribution('plugin')).toBe(false);
     });
   });
 });

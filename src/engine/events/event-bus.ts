@@ -90,6 +90,7 @@ export interface EngineEventMap {
   [EventBusEvent.onColorBufferReady]: [];
   [EventBusEvent.onFovPredictionReady]: [];
   [EventBusEvent.textureStatusChanged]: [TextureStatus];
+  [EventBusEvent.settingsMenuRefresh]: [];
 }
 
 interface EventBusRegisterParams<T extends EventBusEvent> {

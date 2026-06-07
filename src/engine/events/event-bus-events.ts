@@ -194,4 +194,12 @@ export enum EventBusEvent {
    * Parameters: (status: TextureStatus)
    */
   textureStatusChanged = 'textureStatusChanged',
+  /**
+   * Emitted when a plugin's settings contributions change (e.g., a control's
+   * isAvailable predicate flips, or a contribution is added/removed at runtime).
+   * SettingsMenuPlugin re-collects ISettingsContributor.getSettingsContribution()
+   * from every plugin in response. Most plugins never need to emit this — controls
+   * are collected automatically the first time the settings menu opens.
+   */
+  settingsMenuRefresh = 'settingsMenuRefresh',
 }

@@ -352,11 +352,11 @@ describe('WatchlistPlugin settings contribution', () => {
     control.set(String(SatLabelMode.ALL));
 
     expect(settingsManager.satLabelMode).toBe(SatLabelMode.ALL);
-    expect(saveSpy).toHaveBeenCalledWith(StorageKey.SETTINGS_SAT_LABEL_MODE, String(SatLabelMode.ALL));
+    expect(saveSpy).toHaveBeenCalledWith(StorageKey.SETTINGS_SAT_LABEL_MODE_V2, String(SatLabelMode.ALL));
 
     control.set(String(SatLabelMode.OFF));
 
     expect(settingsManager.satLabelMode).toBe(SatLabelMode.OFF);
-    expect(saveSpy).toHaveBeenCalledWith(StorageKey.SETTINGS_SAT_LABEL_MODE, String(SatLabelMode.OFF));
+    expect(saveSpy).toHaveBeenCalledWith(StorageKey.SETTINGS_SAT_LABEL_MODE_V2, String(SatLabelMode.OFF));
   });
 });

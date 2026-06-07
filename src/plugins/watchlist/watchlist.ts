@@ -86,7 +86,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
 
             settingsManager.satLabelMode = parsed;
             PersistenceManager.getInstance().saveItem(
-              StorageKey.SETTINGS_SAT_LABEL_MODE,
+              StorageKey.SETTINGS_SAT_LABEL_MODE_V2,
               parsed.toString(),
             );
           },

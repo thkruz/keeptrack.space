@@ -1,9 +1,10 @@
 import { SoundNames } from '@app/engine/audio/sounds';
-import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { hasSettingsContribution, ISettingsContribution } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
@@ -12,6 +13,7 @@ import { SatLabelMode } from '@app/settings/ui-settings';
 import settingsPng from '@public/img/icons/settings.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { TimeMachine } from '../time-machine/time-machine';
+import { attachSettingControlListeners, renderSettingsSection } from './settings-control-renderer';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -70,13 +72,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
                 <input id="settings-enableHoverOverlay" type="checkbox" checked/>
                 <span class="lever"></span>
                 Show Info On Hover
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Zoom in on the satellite when selected.">
-                <input id="settings-focusOnSatelliteWhenSelected" type="checkbox" checked/>
-                <span class="lever"></span>
-                Focus on Satellite When Selected
               </label>
             </div>
             <div class="switch row">
@@ -146,14 +141,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
                 Enable Demo Mode
               </label>
             </div>
-            <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="Controls satellite label rendering on watchlist satellites.">
-              <select id="settings-sat-label-mode">
-                <option value="0">Off</option>
-                <option value="1" selected>FOV Only</option>
-                <option value="2">All Watchlist</option>
-              </select>
-              <label>Satellite Label Mode</label>
-            </div>
             <div class="switch row">
               <label data-position="top" data-delay="50" data-tooltip="Time will freeze as you rotate the camera.">
                 <input id="settings-freeze-drag" type="checkbox" />
@@ -162,30 +149,11 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Time Machine stop showing toast messages.">
-                <input id="settings-time-machine-toasts" type="checkbox" />
-                <span class="lever"></span>
-                Disable Time Machine Toasts
-              </label>
-            </div>
-            <div class="switch row">
               <label data-position="top" data-delay="50" data-tooltip="Compensate camera yaw for Earth rotation so the view stays fixed to geographic coordinates.">
                 <input id="settings-compensateEarthRotation" type="checkbox" checked/>
                 <span class="lever"></span>
                 Compensate for Earth Rotation
               </label>
-            </div>
-          </div>
-          <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
-          <div id="settings-opt" class="row">
-            <div class="row">
-              <h5 class="center-align">Settings Overrides</h5>
-            </div>
-            <div class="row">
-              <div class="input-field col s12">
-                <input value="30" id="satFieldOfView" type="text" data-position="top" data-delay="50" data-tooltip="What is the satellite's field of view in degrees" />
-                <label for="satFieldOfView" class="active">Satellite Field of View</label>
-              </div>
             </div>
           </div>
           <div id="fastCompSettings" class="row">
@@ -198,6 +166,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
               </label>
             </div>
           </div>
+          <div id="settings-plugin-sections"></div>
         </form>
       </div>
     </div>
@@ -217,11 +186,66 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
           hideEl(getEl('settings-confidence-levels')!.parentElement!.parentElement!);
         }
 
-        if (!settingsManager.plugins.TimeMachine) {
-          hideEl(getEl('settings-time-machine-toasts')!.parentElement!.parentElement!);
-        }
+        SettingsMenuPlugin.renderPluginContributions_();
       },
     );
+
+    EventBus.getInstance().on(EventBusEvent.settingsMenuRefresh, SettingsMenuPlugin.renderPluginContributions_);
+  }
+
+  private static collectPluginContributions_(): ISettingsContribution[] {
+    const contributions: { contribution: ISettingsContribution; manifestOrder: number }[] = [];
+
+    PluginRegistry.plugins.forEach((plugin, manifestOrder) => {
+      if (hasSettingsContribution(plugin)) {
+        try {
+          contributions.push({ contribution: plugin.getSettingsContribution(), manifestOrder });
+        } catch (err) {
+          // A misbehaving plugin must not break the settings menu.
+          // eslint-disable-next-line no-console
+          console.error(`SettingsMenuPlugin: ${plugin.id}.getSettingsContribution() threw`, err);
+        }
+      }
+    });
+
+    return contributions
+      .sort((a, b) => {
+        const orderA = a.contribution.order ?? Number.POSITIVE_INFINITY;
+        const orderB = b.contribution.order ?? Number.POSITIVE_INFINITY;
+
+        if (orderA !== orderB) {
+          return orderA - orderB;
+        }
+
+        return a.manifestOrder - b.manifestOrder;
+      })
+      .map(({ contribution }) => contribution);
+  }
+
+  private static renderPluginContributions_(): void {
+    // Refresh can legitimately fire before the settings menu has been mounted
+    // (e.g., a plugin emits settingsMenuRefresh during early init), so tolerate
+    // a missing container instead of throwing.
+    const container = getEl('settings-plugin-sections', true);
+
+    if (!container) {
+      return;
+    }
+
+    const contributions = SettingsMenuPlugin.collectPluginContributions_();
+
+    container.innerHTML = contributions.map((c) => renderSettingsSection(c)).join('');
+
+    contributions.forEach((contribution) => {
+      contribution.controls.forEach((control) => {
+        attachSettingControlListeners(control, contribution.sectionId);
+      });
+    });
+
+    if (window.M?.AutoInit) {
+      // eslint-disable-next-line new-cap
+      window.M.AutoInit();
+    }
   }
 
   addJs(): void {
@@ -243,13 +267,11 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       { id: 'settings-numberOfEcfOrbitsToDraw', setting: 'numberOfEcfOrbitsToDraw' },
       { id: 'settings-isDrawInCoverageLines', setting: 'isDrawInCoverageLines' },
       { id: 'settings-enableHoverOverlay', setting: 'enableHoverOverlay' },
-      { id: 'settings-focusOnSatelliteWhenSelected', setting: 'isFocusOnSatelliteWhenSelected' },
       { id: 'settings-eciOnHover', setting: 'isEciOnHover' },
       { id: 'settings-confidence-levels', setting: 'isShowConfidenceLevels' },
       { id: 'settings-demo-mode', setting: 'isDemoModeOn' },
       { id: 'settings-snp', setting: 'isShowNextPassOnHover' },
       { id: 'settings-freeze-drag', setting: 'isFreezePropRateOnDrag' },
-      { id: 'settings-time-machine-toasts', setting: 'isDisableTimeMachineToasts' },
       { id: 'settings-compensateEarthRotation', setting: 'isCompensateForEarthRotation' },
     ];
 
@@ -260,13 +282,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
         element.checked = settingsManager[setting];
       }
     });
-
-    const satLabelModeEl = <HTMLSelectElement>getEl('settings-sat-label-mode');
-
-    if (satLabelModeEl) {
-      satLabelModeEl.value = settingsManager.satLabelMode.toString();
-    }
-
   }
 
   // eslint-disable-next-line complexity
@@ -283,7 +298,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       case 'settings-numberOfEcfOrbitsToDraw':
       case 'settings-isDrawInCoverageLines':
       case 'settings-enableHoverOverlay':
-      case 'settings-focusOnSatelliteWhenSelected':
       case 'settings-drawSun':
       case 'settings-drawBlackEarth':
       case 'settings-drawAtmosphere':
@@ -294,7 +308,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       case 'settings-confidence-levels':
       case 'settings-demo-mode':
       case 'settings-freeze-drag':
-      case 'settings-time-machine-toasts':
       case 'settings-compensateEarthRotation':
       case 'settings-snp':
         if ((<HTMLInputElement>getEl((<HTMLInputElement>e.target)?.id ?? ''))?.checked) {
@@ -303,18 +316,18 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
           ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
         }
         break;
-      case 'settings-sat-label-mode':
-        ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
-        break;
       default:
         break;
     }
 
     isDMChecked ??= (<HTMLInputElement>getEl('settings-demo-mode')).checked;
 
-    // When demo mode is enabled, disable satellite labels
+    // When demo mode is enabled, disable satellite labels. The label dropdown
+    // now lives on WatchlistPlugin's settings contribution, so update the
+    // backing state directly and refresh that section to re-render.
     if (isDMChecked && (<HTMLElement>e.target).id === 'settings-demo-mode') {
-      (<HTMLSelectElement>getEl('settings-sat-label-mode')).value = '0';
+      settingsManager.satLabelMode = SatLabelMode.OFF;
+      EventBus.getInstance().emit(EventBusEvent.settingsMenuRefresh);
     }
   }
 
@@ -326,12 +339,9 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isOrbitCruncherInEcf = true;
     settingsManager.isDrawInCoverageLines = true;
     settingsManager.enableHoverOverlay = true;
-    settingsManager.isFocusOnSatelliteWhenSelected = true;
     settingsManager.isEciOnHover = false;
     settingsManager.isDemoModeOn = false;
-    settingsManager.satLabelMode = SatLabelMode.FOV_ONLY;
     settingsManager.isFreezePropRateOnDrag = false;
-    settingsManager.isDisableTimeMachineToasts = false;
     settingsManager.isCompensateForEarthRotation = true;
     PersistenceManager.getInstance().removeItem(StorageKey.SETTINGS_DOT_COLORS);
     SettingsManager.preserveSettings();
@@ -344,7 +354,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
     e.preventDefault();
 
-    const uiManagerInstance = ServiceLocator.getUiManager();
     const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
     ServiceLocator.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
@@ -358,7 +367,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.numberOfEcfOrbitsToDraw = numberOfEcfOrbitsToDraw;
     settingsManager.isDrawInCoverageLines = (<HTMLInputElement>getEl('settings-isDrawInCoverageLines')).checked;
     settingsManager.enableHoverOverlay = (<HTMLInputElement>getEl('settings-enableHoverOverlay')).checked;
-    settingsManager.isFocusOnSatelliteWhenSelected = (<HTMLInputElement>getEl('settings-focusOnSatelliteWhenSelected')).checked;
     settingsManager.drawCameraWidget = (<HTMLInputElement>getEl('settings-drawCameraWidget')).checked;
 
     const isDrawOrbitsChanged = settingsManager.isDrawOrbits !== (<HTMLInputElement>getEl('settings-drawOrbits')).checked;
@@ -375,11 +383,8 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isEciOnHover = (<HTMLInputElement>getEl('settings-eciOnHover')).checked;
     settingsManager.isShowConfidenceLevels = (<HTMLInputElement>getEl('settings-confidence-levels')).checked;
     settingsManager.isDemoModeOn = (<HTMLInputElement>getEl('settings-demo-mode')).checked;
-    settingsManager.satLabelMode = parseInt((<HTMLSelectElement>getEl('settings-sat-label-mode')).value) as SatLabelMode;
     settingsManager.isShowNextPass = (<HTMLInputElement>getEl('settings-snp')).checked;
     settingsManager.isFreezePropRateOnDrag = (<HTMLInputElement>getEl('settings-freeze-drag')).checked;
-
-    settingsManager.isDisableTimeMachineToasts = (<HTMLInputElement>getEl('settings-time-machine-toasts')).checked;
     settingsManager.isCompensateForEarthRotation = (<HTMLInputElement>getEl('settings-compensateEarthRotation')).checked;
     const timeMachinePlugin = PluginRegistry.getPlugin(TimeMachine);
 
@@ -402,13 +407,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     PluginRegistry.getPlugin(TimeMachine)?.setBottomIconToUnselected();
 
     colorSchemeManagerInstance.reloadColors();
-
-    const newFieldOfView = parseInt((<HTMLInputElement>getEl('satFieldOfView')).value);
-
-    if (isNaN(newFieldOfView)) {
-      (<HTMLInputElement>getEl('satFieldOfView')).value = '30';
-      uiManagerInstance.toast('Invalid field of view value!', ToastMsgType.critical);
-    }
 
     colorSchemeManagerInstance.calculateColorBuffers(true);
 

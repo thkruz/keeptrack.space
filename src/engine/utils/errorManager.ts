@@ -56,6 +56,25 @@ export interface ErrorContext {
   opts?: ErrorOptions;
 }
 
+/**
+ * True when a window `error` event carries no actionable payload — the browser handed us only the
+ * cross-origin/opaque husk of a script error, not the real Error. The spec sentinel is a null
+ * `error` with message `'Script error.'`, but some Chromium forks (e.g. the VivoBrowser fork in
+ * #1353) leak a non-standard message or drop the filename instead, so the exact-sentinel check
+ * alone misses them. Any null-error event without a usable message or source is treated as
+ * cross-origin so it's tagged unactionable downstream (no toast, no auto-filed "Unknown error").
+ *
+ * Guarded by `!e.error`: a genuine same-origin uncaught error always carries the real Error object,
+ * so this never swallows actionable bugs that merely happen to lack a message or filename.
+ */
+export function isOpaqueWindowError(e: Pick<ErrorEvent, 'error' | 'message' | 'filename'>): boolean {
+  if (e.error) {
+    return false;
+  }
+
+  return e.message === 'Script error.' || !e.message || !e.filename;
+}
+
 export class ErrorManager {
   private minLevel_: LogLevel;
   private signatureWindow_ = new Map<string, number>();

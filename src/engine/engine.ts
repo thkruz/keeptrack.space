@@ -13,7 +13,7 @@ import { EventBus } from './events/event-bus';
 import { EventBusEvent } from './events/event-bus-events';
 import { InputManager } from './input/input-manager';
 import { WebGLRenderer } from './rendering/webgl-renderer';
-import { errorManagerInstance } from './utils/errorManager';
+import { errorManagerInstance, isOpaqueWindowError } from './utils/errorManager';
 import { isThisNode } from './utils/isThisNode';
 
 
@@ -95,7 +95,7 @@ export class Engine {
         source: e.filename,
         line: e.lineno,
         col: e.colno,
-        isCrossOrigin: !e.error && e.message === 'Script error.',
+        isCrossOrigin: isOpaqueWindowError(e),
       });
     });
 

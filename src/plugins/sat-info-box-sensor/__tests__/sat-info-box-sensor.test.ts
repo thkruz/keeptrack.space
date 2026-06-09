@@ -35,7 +35,6 @@ const triggerFrameUpdate = () => {
 describe('SatInfoBoxSensor', () => {
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager, SatInfoBox]);
-    window.M.AutoInit = vi.fn();
   });
 
   it('does not throw when updateSelectBox fires before the sensor DOM is created', () => {

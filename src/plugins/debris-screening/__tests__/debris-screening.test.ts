@@ -9,11 +9,6 @@ import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from 
 describe('DebrisScreening_class', () => {
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
-    window.M = {
-      AutoInit: () => {
-        // Mock the M.AutoInit function
-      },
-    } as unknown as typeof window.M;
   });
 
   standardPluginSuite(DebrisScreening, 'DebrisScreening');
@@ -25,11 +20,6 @@ describe('DebrisScreening_capabilities', () => {
 
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
-    window.M = {
-      AutoInit: () => {
-        // Mock the M.AutoInit function
-      },
-    } as unknown as typeof window.M;
     plugin = new DebrisScreening();
   });
 
@@ -73,11 +63,6 @@ describe('DebrisScreening_form', () => {
 
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
-    window.M = {
-      AutoInit: () => {
-        // Mock the M.AutoInit function
-      },
-    } as unknown as typeof window.M;
     debrisScreeningPlugin = new DebrisScreening();
   });
 
@@ -121,11 +106,6 @@ describe('DebrisScreening_risk_classification', () => {
 
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
-    window.M = {
-      AutoInit: () => {
-        // Mock the M.AutoInit function
-      },
-    } as unknown as typeof window.M;
     plugin = new DebrisScreening();
   });
 
@@ -171,11 +151,6 @@ describe('DebrisScreening_formatting', () => {
 
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
-    window.M = {
-      AutoInit: () => {
-        // Mock the M.AutoInit function
-      },
-    } as unknown as typeof window.M;
     plugin = new DebrisScreening();
   });
 

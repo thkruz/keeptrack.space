@@ -47,16 +47,6 @@ describe('WatchlistPlugin_form', () => {
   beforeEach(() => {
     setupDefaultHtml();
     watchlistPlugin = new WatchlistPlugin();
-    window.M = {
-      keys: {
-        TAB: 9,
-        ENTER: 13,
-        ESC: 27,
-        ARROW_UP: 38,
-        ARROW_DOWN: 40,
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
     websiteInit(watchlistPlugin);
   });
 

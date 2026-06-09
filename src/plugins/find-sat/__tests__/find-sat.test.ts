@@ -18,7 +18,6 @@ describe('FindSatPlugin_class', () => {
   beforeEach(() => {
     KeepTrack.getInstance().containerRoot.innerHTML = '';
     setupStandardEnvironment();
-    window.M.AutoInit = vi.fn();
   });
 
   standardPluginSuite(FindSatPlugin);

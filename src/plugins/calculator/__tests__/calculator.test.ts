@@ -13,7 +13,6 @@ describe('Calculator_class', () => {
   beforeEach(() => {
     KeepTrack.getInstance().containerRoot.innerHTML = '';
     setupStandardEnvironment();
-    window.M.AutoInit = vi.fn();
   });
 
   standardPluginSuite(Calculator);
@@ -34,7 +33,6 @@ describe('Calculator pure helpers', () => {
   beforeEach(() => {
     KeepTrack.getInstance().containerRoot.innerHTML = '';
     setupStandardEnvironment();
-    window.M.AutoInit = vi.fn();
     calc = new Calculator() as unknown as CalcInternals;
   });
 
@@ -100,7 +98,6 @@ describe('Calculator conversion engine', () => {
   beforeEach(() => {
     KeepTrack.getInstance().containerRoot.innerHTML = '';
     setupStandardEnvironment([SelectSatManager]);
-    window.M.AutoInit = vi.fn();
     plugin = new Calculator();
     websiteInit(plugin);
     ServiceLocator.getSensorManager().currentSensors = [defaultSensor];

@@ -15,7 +15,6 @@ import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from 
 describe('Breakup_class', () => {
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
-    window.M.AutoInit = vi.fn();
   });
 
   standardPluginSuite(Breakup, 'Breakup');

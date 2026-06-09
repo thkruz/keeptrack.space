@@ -1,4 +1,3 @@
-import { AutoInit } from '@materializecss/materialize';
 import { ServiceLocator } from './engine/core/service-locator';
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -29,6 +28,8 @@ import 'material-icons/iconfont/material-icons.css';
 import 'requestidlecallback-polyfill';
 
 import { Localization } from './locales/locales'; // Ensure localization is imported first
+
+import { initMaterialSelects } from './engine/ui/material-select';
 
 import { CatalogLoader } from './app/data/catalog-loader';
 import { CatalogManager } from './app/data/catalog-manager';
@@ -426,10 +427,9 @@ theodore.kruczek at gmail dot com.
 
       ServiceLocator.getUiManager().initMenuController();
 
-      // Update MaterialUI with new menu options
+      // Style every plugin menu's <select> (Tabs/Dropdown are initialized per-plugin)
       try {
-        // eslint-disable-next-line new-cap
-        AutoInit();
+        initMaterialSelects();
       } catch {
         // intentionally left blank
       }

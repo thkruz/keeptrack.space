@@ -1,6 +1,6 @@
 /* eslint-disable prefer-const */
 /* eslint-disable complexity */
-import { FormSelect } from '@materializecss/materialize';
+import { refreshMaterialSelect } from '@app/engine/ui/material-select';
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
 import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
 import { CameraType } from '@app/engine/camera/camera-type';
@@ -406,8 +406,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
   }
 
   protected static refreshMaterializeSelect_(select: HTMLSelectElement): void {
-    FormSelect.getInstance(select)?.destroy();
-    FormSelect.init(select);
+    refreshMaterialSelect(select);
   }
 
   protected findByLooksSubmit_(): Promise<void> {

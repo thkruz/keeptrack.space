@@ -1,4 +1,4 @@
-import { AutoInit } from '@materializecss/materialize';
+import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -243,8 +243,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       });
     });
 
-    // eslint-disable-next-line new-cap
-    AutoInit();
+    initMaterialSelects(getEl('settings-menu') ?? document.body);
   }
 
   addJs(): void {

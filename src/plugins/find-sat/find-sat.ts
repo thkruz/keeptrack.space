@@ -1,5 +1,6 @@
 /* eslint-disable prefer-const */
 /* eslint-disable complexity */
+import { FormSelect } from '@materializecss/materialize';
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
 import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
 import { CameraType } from '@app/engine/camera/camera-type';
@@ -405,15 +406,8 @@ export class FindSatPlugin extends KeepTrackPlugin {
   }
 
   protected static refreshMaterializeSelect_(select: HTMLSelectElement): void {
-    const formSelect = (window.M as typeof window.M & {
-      FormSelect?: {
-        getInstance?: (el: Element) => { destroy?: () => void } | undefined;
-        init?: (el: Element) => void;
-      };
-    } | undefined)?.FormSelect;
-
-    formSelect?.getInstance?.(select)?.destroy?.();
-    formSelect?.init?.(select);
+    FormSelect.getInstance(select)?.destroy();
+    FormSelect.init(select);
   }
 
   protected findByLooksSubmit_(): Promise<void> {

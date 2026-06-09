@@ -1,3 +1,4 @@
+import { AutoInit } from '@materializecss/materialize';
 import { ServiceLocator } from './engine/core/service-locator';
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -229,7 +230,7 @@ export class KeepTrack {
       // Load the CSS
       if (!settingsManager.isDisableCss) {
         import('@css/fonts.css');
-        import(/* webpackMode: "eager" */ '@css/materialize.css').catch(() => {
+        import(/* webpackMode: "eager" */ '@materializecss/materialize/dist/css/materialize.css').catch(() => {
           // This is intentional
         });
         import(/* webpackMode: "eager" */ '@css/astroux/css/astro.css').catch(() => {
@@ -427,9 +428,8 @@ theodore.kruczek at gmail dot com.
 
       // Update MaterialUI with new menu options
       try {
-        // Jest workaround
         // eslint-disable-next-line new-cap
-        window.M.AutoInit();
+        AutoInit();
       } catch {
         // intentionally left blank
       }

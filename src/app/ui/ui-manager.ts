@@ -32,7 +32,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { KeyboardComponent } from '@app/engine/plugins/components/keyboard/keyboard-component';
 import { isThisNode } from '@app/engine/utils/isThisNode';
-import '@materializecss/materialize';
+import { Dropdown, Toast } from '@materializecss/materialize';
 import { BaseObject, Milliseconds, MILLISECONDS_PER_SECOND } from '@ootk/src/main';
 import cancelPng from '@public/img/icons/cancel.png';
 import checkCirclePng from '@public/img/icons/check-circle.png';
@@ -55,8 +55,6 @@ export class UiManager {
   private isFooterVisible_ = true;
   private isInitialized_ = false;
 
-  // materializecss/materialize goes to window.M, but we want a local reference
-  M = window.M;
   bottomIconPress = (el: HTMLElement) => {
     ServiceLocator.getSoundManager()?.play(SoundNames.BEEP);
     EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, el.id);
@@ -181,13 +179,21 @@ export class UiManager {
         break;
     }
 
-    const iconHtml = `<img class="kt-toast-icon" src="${iconSrc}" alt="" />`;
+    // v2 renders the `text` option via innerText (no HTML), so build the icon + message by DOM.
+    const toastMsg = new Toast({ text: '' });
+    const toastEl = toastMsg.el;
 
-    const toastMsg = window.M.toast({
-      unsafeHTML: `${iconHtml}<span>${toastText}</span>`,
-    });
+    const icon = document.createElement('img');
 
-    const toastEl = toastMsg.$el[0] as HTMLElement;
+    icon.className = 'kt-toast-icon';
+    icon.src = iconSrc;
+    icon.alt = '';
+
+    const message = document.createElement('span');
+
+    message.textContent = toastText;
+
+    toastEl.append(icon, message);
 
     // Add an on click event to dismiss the toast
     toastEl.addEventListener('click', () => {
@@ -349,7 +355,7 @@ export class UiManager {
       },
     ]).init();
 
-    window.M.Dropdown.init(elems);
+    Dropdown.init(elems);
     this.isInitialized_ = true;
   }
 
@@ -519,11 +525,7 @@ export class UiManager {
     }
   }
 
-  private activeToastList_ = [] as {
-    $el: NodeListOf<HTMLElement>;
-    timeRemaining: number;
-    dismiss: () => void;
-  }[];
+  private activeToastList_ = [] as Toast[];
 
   /**
    * Checks if enough time has elapsed and then calls all queued updateSelectBox callbacks

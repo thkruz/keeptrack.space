@@ -1,3 +1,4 @@
+import { AutoInit } from '@materializecss/materialize';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -242,10 +243,8 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       });
     });
 
-    if (window.M?.AutoInit) {
-      // eslint-disable-next-line new-cap
-      window.M.AutoInit();
-    }
+    // eslint-disable-next-line new-cap
+    AutoInit();
   }
 
   addJs(): void {

@@ -98,7 +98,6 @@
     "@types/draggabilly": "^2.1.6",
     "@types/file-saver": "^2.0.7",
     "@types/google-publisher-tag": "^1.20260216.0",
-    "@types/materialize-css": "^1.0.11",
     "@types/node": "^24.7.0",
     "@types/numeric": "^1.2.2",
     "@types/opener": "^1.4.3",
@@ -141,7 +140,7 @@
   },
   "dependencies": {
     "@e965/xlsx": "0.20.3",
-    "@materializecss/materialize": "^1.2.2",
+    "@materializecss/materialize": "^2.3.3",
     "@supabase/supabase-js": "^2.55.0",
     "astronomy-engine": "^2.1.19",
     "dotenv": "^16.5.0",

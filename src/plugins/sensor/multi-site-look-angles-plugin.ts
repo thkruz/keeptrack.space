@@ -1,3 +1,5 @@
+import { t7e } from '@app/locales/keys';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { SatMath } from '@app/app/analysis/sat-math';
 import { sensors } from '@app/app/data/catalogs/sensors';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
@@ -30,6 +32,9 @@ import { sensorGroups } from '../../app/data/catalogs/sensor-groups';
 import { SensorManager } from '../../app/sensors/sensorManager';
 import { ClickDragOptions, fileExcelPng, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.MultiSiteLookAnglesPlugin.${key}` as Parameters<typeof t7e>[0]);
+
 export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   readonly id = 'MultiSiteLookAnglesPlugin';
   dependencies_ = [SelectSatManager.name];
@@ -116,9 +121,9 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     const exportData = lastArray.map((look) => ({
       time: look.time,
       sensor: look.objName,
-      az: look.az?.toFixed(2) ?? 'N/A',
-      el: look.el?.toFixed(2) ?? 'N/A',
-      rng: look.rng?.toFixed(2) ?? 'N/A',
+      az: look.az?.toFixed(2) ?? l('msgs.na'),
+      el: look.el?.toFixed(2) ?? l('msgs.na'),
+      rng: look.rng?.toFixed(2) ?? l('msgs.na'),
       visible: look.visible,
     }));
 
@@ -129,6 +134,33 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     leftOffset: null,
     zIndex: 3,
   };
+
+
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/multi-site-look-angles/multi-site-look-angles-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: l('help.readingHeading'),
+          content: l('help.reading'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2')],
+    };
+  }
 
   addHtml(): void {
     super.addHtml();
@@ -400,27 +432,27 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     let tr = tbl.insertRow();
     let tdT = tr.insertCell();
 
-    tdT.appendChild(document.createTextNode('Time'));
+    tdT.appendChild(document.createTextNode(l('table.time')));
     tdT.setAttribute('style', 'text-decoration: underline');
     let tdE = tr.insertCell();
 
-    tdE.appendChild(document.createTextNode('El'));
+    tdE.appendChild(document.createTextNode(l('table.el')));
     tdE.setAttribute('style', 'text-decoration: underline');
     let tdA = tr.insertCell();
 
-    tdA.appendChild(document.createTextNode('Az'));
+    tdA.appendChild(document.createTextNode(l('table.az')));
     tdA.setAttribute('style', 'text-decoration: underline');
     let tdR = tr.insertCell();
 
-    tdR.appendChild(document.createTextNode('Rng'));
+    tdR.appendChild(document.createTextNode(l('table.rng')));
     tdR.setAttribute('style', 'text-decoration: underline');
     let tdS = tr.insertCell();
 
-    tdS.appendChild(document.createTextNode('Sensor'));
+    tdS.appendChild(document.createTextNode(l('table.sensor')));
     tdS.setAttribute('style', 'text-decoration: underline');
     let tdV = tr.insertCell();
 
-    tdV.appendChild(document.createTextNode('Visible'));
+    tdV.appendChild(document.createTextNode(l('table.visible')));
     tdV.setAttribute('style', 'text-decoration: underline');
 
     const timeManagerInstance = ServiceLocator.getTimeManager();
@@ -436,15 +468,15 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       tdT = tr.insertCell();
       tdT.appendChild(document.createTextNode(dateFormat(entry.time, 'isoDateTime', true)));
       tdE = tr.insertCell();
-      tdE.appendChild(document.createTextNode(entry.el?.toFixed(1) ?? 'N/A'));
+      tdE.appendChild(document.createTextNode(entry.el?.toFixed(1) ?? l('msgs.na')));
       tdA = tr.insertCell();
-      tdA.appendChild(document.createTextNode(entry.az?.toFixed(0) ?? 'N/A'));
+      tdA.appendChild(document.createTextNode(entry.az?.toFixed(0) ?? l('msgs.na')));
       tdR = tr.insertCell();
-      tdR.appendChild(document.createTextNode(entry.rng?.toFixed(0) ?? 'N/A'));
+      tdR.appendChild(document.createTextNode(entry.rng?.toFixed(0) ?? l('msgs.na')));
       tdS = tr.insertCell();
       tdS.appendChild(document.createTextNode(sensor.uiName ?? sensor.shortName ?? sensor.objName ?? ''));
       tdV = tr.insertCell();
-      tdV.appendChild(document.createTextNode(entry.visible ? 'Yes' : 'No'));
+      tdV.appendChild(document.createTextNode(entry.visible ? l('msgs.yes') : l('msgs.no')));
       if (entry.visible) {
         tdV.setAttribute('style', 'color: #2d7b31');
       } else {
@@ -462,7 +494,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       const searchLength = (this.lengthOfLookAngles_ * 24).toFixed(1);
 
       td.colSpan = 4;
-      td.appendChild(document.createTextNode(`Satellite is not visible for the next ${searchLength} hours.`));
+      td.appendChild(document.createTextNode(l('msgs.notVisible').replace('{hours}', searchLength)));
     }
   }
 }

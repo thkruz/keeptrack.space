@@ -51,7 +51,7 @@ describe('LookAnglesPlugin look-angle computation', () => {
   });
 
   it('getlookangles_ runs the propagation loop and populates the looks table', () => {
-    // Keep the loop bounded — a tiny window over a 1s rise/set interval.
+    // Keep the loop bounded - a tiny window over a 1s rise/set interval.
     p().lengthOfLookAngles_ = 0.002;
 
     const result = p().getlookangles_(defaultSat);

@@ -3,12 +3,58 @@
     "SensorInfoPlugin": {
       "bottomIconLabel": "Informacje o czujniku",
       "title": "Menu informacji o czujniku",
-      "helpBody": "Informacje o czujniku zawierają dane o aktualnie wybranym czujniku. Informacje oparte są na publicznie dostępnych danych i nie zawsze muszą być w 100% dokładne. Jeśli posiadasz publiczne dane o dodatkowych czujnikach lub poprawki do istniejących informacji o czujnikach, skontaktuj się ze mną pod adresem <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>. <br><br> Dostępne informacje obejmują: <ul style=\"margin-left: 40px;\"> <li> Nazwa czujnika </li> <li> Właściciel czujnika </li> <li> Typ czujnika </li> <li> Pole widzenia czujnika </li> </ul> <br> Dodatkowo z tego menu można szybko utworzyć linie od czujnika do Słońca lub Księżyca."
+      "labels": {
+        "sensorName": "Nazwa czujnika",
+        "country": "Kraj",
+        "sensorType": "Typ czujnika",
+        "latitude": "Szerokość geograficzna",
+        "longitude": "Długość geograficzna",
+        "minAzimuth": "Min. azymut",
+        "maxAzimuth": "Maks. azymut",
+        "minElevation": "Min. elewacja",
+        "maxElevation": "Maks. elewacja",
+        "minRange": "Min. zasięg",
+        "maxRange": "Maks. zasięg",
+        "band": "Pasmo",
+        "beamWidth": "Szerokość wiązki",
+        "unknown": "Nieznany"
+      },
+      "buttons": {
+        "drawLineToSun": "Narysuj linię do Słońca",
+        "drawLineToMoon": "Narysuj linię do Księżyca",
+        "addLineToSun": "Dodaj linię do Słońca",
+        "removeLineToSun": "Usuń linię do Słońca",
+        "addLineToMoon": "Dodaj linię do Księżyca",
+        "removeLineToMoon": "Usuń linię do Księżyca"
+      },
+      "errorMsgs": {
+        "selectOnlyOneSensor": "Wybierz tylko jeden czujnik"
+      },
+      "help": {
+        "overview": "Informacje o czujniku pokazują techniczne szczegóły aktualnie wybranego czujnika: kto jest jego właścicielem, jakiego jest typu, gdzie się znajduje i jakie są dokładne granice jego pola widzenia. Ikona pozostaje nieaktywna, dopóki nie wybierzesz czujnika w menu czujników.",
+        "imgAlt": "Menu informacji o czujniku pokazujące lokalizację czujnika i granice pola widzenia",
+        "imgCaption": "Informacje o czujniku dla wybranego radaru, w tym granice azymutu, elewacji i zasięgu.",
+        "fieldsHeading": "Co oznaczają pola",
+        "fields": "<ul><li><strong>Szerokość / długość geograficzna</strong>: naziemna lokalizacja czujnika.</li><li><strong>Min. / maks. azymut</strong>: łuk kompasu, który czujnik może pokryć.</li><li><strong>Min. / maks. elewacja</strong>: jak nisko i wysoko nad horyzontem może patrzeć.</li><li><strong>Min. / maks. zasięg</strong>: okno odległości, w którym może śledzić, w km.</li><li><strong>Pasmo / szerokość wiązki</strong>: pasmo częstotliwości radaru i szerokość wiązki; są ukryte dla czujników optycznych i obserwatorów.</li></ul>Granice azymutu, elewacji i zasięgu razem definiują bryłę pola widzenia rysowaną na globusie.",
+        "howToUse": "<ol><li>Wybierz czujnik w menu czujników.</li><li>Otwórz informacje o czujniku z dolnego paska.</li><li>Użyj <strong>Dodaj linię do Słońca</strong> lub <strong>Dodaj linię do Księżyca</strong>, aby narysować linię od czujnika. To przydatne do wykrywania okien wykluczenia słonecznego lub zakłóceń światłem księżyca dla czujników optycznych. Kliknij przycisk ponownie, aby usunąć linię.</li></ol>",
+        "tip1": "Przyciski linii do Słońca i Księżyca wymagają dokładnie jednego wybranego czujnika i odmówią rysowania, gdy aktywna jest cała sieć.",
+        "tip2": "Parametry czujników oparte są na publicznie dostępnych danych i mogą nie być idealnie dokładne. Poprawki są mile widziane pod adresem admin@keeptrack.space.",
+        "tip3": "Aby eksperymentować z innymi granicami pola widzenia, zbuduj kopię tego czujnika w menu własnego czujnika, ponieważ to menu jest tylko do odczytu."
+      }
     },
     "CustomSensorPlugin": {
       "bottomIconLabel": "Własny czujnik",
       "title": "Menu własnego czujnika",
-      "helpBody": "Umożliwia utworzenie własnego czujnika do wykorzystania w obliczeniach i funkcjach innych menu. Może to być zupełnie nowy czujnik lub modyfikacja istniejącego. <br><br> Po ustawieniu szerokości geograficznej, długości geograficznej i wysokości czujnika można ustawić jego pole widzenia. Wybranie teleskopu utworzy pole widzenia 360 stopni z maską elewacji 10 stopni i nieograniczonym zasięgiem. Odznaczenie opcji teleskopu pozwoli na ręczne ustawienie pola widzenia. <br><br> Jeśli próbujesz edytować istniejący czujnik, możesz najpierw wybrać go z listy czujników, a własny czujnik zostanie zaktualizowany informacjami wybranego czujnika.",
+      "help": {
+        "overview": "Własny czujnik pozwala zbudować czujnik naziemny w dowolnym miejscu na Ziemi: zupełnie nowe stanowisko albo zmodyfikowaną kopię istniejącego. Czujnik działa potem wszędzie tam, gdzie prawdziwy, w tym w kątach obserwacji, renderowaniu pola widzenia i obliczeniach przelotów.",
+        "imgAlt": "Menu własnego czujnika z polami lokalizacji i pola widzenia",
+        "imgCaption": "Ustaw lokalizację i pole widzenia, a następnie dodaj czujnik.",
+        "fieldsHeading": "Definiowanie czujnika",
+        "fields": "Ustaw pola <strong>Szerokość geograficzna</strong>, <strong>Długość geograficzna</strong> i <strong>Wysokość nad poziomem morza (km)</strong>, a następnie wybierz <strong>Typ czujnika</strong>: obserwator, optyczny, radar z anteną fazowaną lub mechaniczny. Zaznaczenie opcji <strong>Teleskop</strong> daje pełny 360-stopniowy widok w azymucie z maską elewacji 10 stopni i nieograniczonym zasięgiem; odznacz ją, aby samodzielnie ustawić granice azymutu, elewacji i zasięgu.",
+        "howToUse": "<ol><li>Otwórz menu <strong>Własny czujnik</strong> (tryb Utwórz) albo kliknij prawym przyciskiem w dowolne miejsce na Ziemi i wybierz <strong>Utwórz czujnik tutaj</strong> lub <strong>Utwórz obserwatora tutaj</strong>, aby wstępnie wypełnić lokalizację.</li><li>Dostosuj pola albo kliknij <strong>Użyj geolokalizacji</strong>, aby użyć własnej pozycji (tylko HTTPS).</li><li>Kliknij <strong>Dodaj własny czujnik</strong>. Nowy czujnik pojawi się na globusie i w panelu listy aktywnych czujników.</li><li>Włącz <strong>Zastąp czujnik</strong>, aby wymienić czujnik główny zamiast dodawać kolejny; <strong>Wyczyść własne czujniki</strong> usuwa je wszystkie.</li></ol>",
+        "tip1": "Aby edytować parametry prawdziwego czujnika, najpierw wybierz go w menu czujników; formularz wstępnie wypełni się jego wartościami, więc możesz je poprawić i dodać go ponownie.",
+        "tip2": "Wiele własnych czujników się sumuje: każde dodanie staje się kolejnym aktywnym czujnikiem, co jest łatwym sposobem na zasymulowanie małej sieci."
+      },
       "labels": {
         "sensorName": "Nazwa czujnika",
         "defaultSensorName": "Własny czujnik",
@@ -72,12 +118,66 @@
     "LookAnglesPlugin": {
       "bottomIconLabel": "Kąty obserwacji",
       "title": "Menu kątów obserwacji",
-      "helpBody": "Menu kątów obserwacji umożliwia obliczenie zasięgu, azymutu i kątów elewacji między czujnikiem a satelitą. Przed użyciem menu należy najpierw wybrać satelitę i czujnik. <br><br> Przełącznik pokazywania tylko czasów wschodu i zachodu obliczy jedynie czasy wschodu i zachodu satelity. Jest to przydatne do szybkiego określenia, kiedy satelita będzie widoczny dla czujnika. <br><br> Zakres wyszukiwania można modyfikować, zmieniając opcje długości i interwału."
+      "settings": {
+        "showRiseSetOnly": "Pokaż tylko czasy wschodu i zachodu",
+        "calculationLength": "Długość obliczeń (dni)",
+        "interval": "Interwał (sekundy)"
+      },
+      "table": {
+        "time": "Czas",
+        "type": "Typ",
+        "el": "El.",
+        "az": "Az.",
+        "rng": "Odl.",
+        "visible": "Widoczny"
+      },
+      "msgs": {
+        "notVisible": "Satelita nie będzie widoczny przez najbliższe {hours} godzin.",
+        "yes": "Tak",
+        "no": "Nie",
+        "rise": "Wschód",
+        "set": "Zachód",
+        "maxEl": "Maks. El.",
+        "unknown": "Nieznany"
+      },
+      "help": {
+        "overview": "Kąty obserwacji obliczają dane naprowadzania, których czujnik potrzebuje do śledzenia wybranego satelity: czas, azymut, elewację i odległość każdej nadchodzącej okazji obserwacyjnej. To pomost między oglądaniem przelotu w 3D a faktycznym skierowaniem anteny lub teleskopu na satelitę.",
+        "imgAlt": "Tabela kątów obserwacji z czasami, azymutami, elewacjami i odległościami",
+        "imgCaption": "Każdy wiersz to rozwiązanie naprowadzania; kliknij go, aby przeskoczyć zegarem do tej chwili.",
+        "readingHeading": "Czytanie tabeli",
+        "reading": "Każdy wiersz podaje <strong>Czas</strong>, elewację (<strong>El.</strong>), azymut (<strong>Az.</strong>) i odległość (<strong>Odl.</strong>) satelity widzianego z czujnika, a także czy jest optycznie <strong>Widoczny</strong>. Po włączeniu opcji <strong>Pokaż tylko czasy wschodu i zachodu</strong> tabela zawęża się do zdarzeń wschodu, maksymalnej elewacji i zachodu każdego przelotu, oznaczonych w kolumnie <strong>Typ</strong>.",
+        "howToUse": "<ol><li>Wybierz zarówno czujnik, jak i satelitę; dolna ikona pozostaje nieaktywna, dopóki oba nie są ustawione.</li><li>Otwórz <strong>Kąty obserwacji</strong> z dolnego paska. Tabela obliczy się automatycznie.</li><li>Otwórz panel ustawień, aby przełączyć tryb wschód/zachód albo zmienić <strong>Długość obliczeń (dni)</strong> i <strong>Interwał (sekundy)</strong>.</li><li>Kliknij wiersz, aby przeskoczyć zegarem symulacji do tej chwili, albo użyj przycisku pobierania, aby wyeksportować tabelę.</li></ol>",
+        "tip1": "Tryb wschód/zachód to najszybszy sposób, aby dowiedzieć się, kiedy następnym razem zobaczysz satelitę; przełącz się na pełną tabelę, gdy potrzebujesz kątów naprowadzania sekunda po sekundzie.",
+        "tip2": "Kliknięcie wiersza zachowuje stan odtwarzania, więc wstrzymany zegar pozostaje wstrzymany w nowym czasie."
+      }
     },
     "MultiSiteLookAnglesPlugin": {
       "bottomIconLabel": "Obserwacje wielostanowiskowe",
       "title": "Menu wielostanowiskowych kątów obserwacji",
-      "helpBody": "Menu wielostanowiskowych kątów obserwacji umożliwia obliczenie zasięgu, azymutu i kątów elewacji między satelitą a wieloma czujnikami. Przed użyciem menu należy najpierw wybrać satelitę. <br><br> Domyślnie menu oblicza kąty obserwacji dla wszystkich czujników w Sieci Obserwacji Przestrzeni Kosmicznej. Jeśli chcesz obliczyć kąty obserwacji dla dodatkowych czujników, możesz wyeksportować plik CSV na dole menu. Plik CSV będzie zawierał kąty obserwacji dla wszystkich czujników. <br><br> Kliknięcie wiersza w tabeli spowoduje wybranie czujnika i zmianę czasu symulacji na czas kąta obserwacji."
+      "table": {
+        "time": "Czas",
+        "el": "El.",
+        "az": "Az.",
+        "rng": "Odl.",
+        "sensor": "Czujnik",
+        "visible": "Widoczny"
+      },
+      "msgs": {
+        "notVisible": "Satelita nie będzie widoczny przez najbliższe {hours} godzin.",
+        "yes": "Tak",
+        "no": "Nie",
+        "na": "nd."
+      },
+      "help": {
+        "overview": "Wielostanowiskowe kąty obserwacji odpowiadają na pytanie sieciowe: który z moich czujników widzi wybranego satelitę i kiedy? Obliczają kąty obserwacji dla wielu stanowisk naraz i przeplatają je w jedną chronologiczną tabelę.",
+        "imgAlt": "Tabela wielostanowiskowych kątów obserwacji z czujnikami i danymi naprowadzania",
+        "imgCaption": "Każdy wiersz łączy moment przelotu z czujnikiem, który go widzi.",
+        "readingHeading": "Czytanie tabeli",
+        "reading": "Wiersze są posortowane chronologicznie dla wszystkich włączonych stanowisk, a każdy podaje <strong>Czas</strong>, elewację (<strong>El.</strong>), azymut (<strong>Az.</strong>), odległość (<strong>Odl.</strong>), zaangażowany <strong>Czujnik</strong> i widoczność optyczną. Panel przełączania czujników wybiera, które stanowiska są obliczane: zielone czujniki są uwzględniane, a czerwone wykluczane.",
+        "howToUse": "<ol><li>Wybierz satelitę; dolna ikona pozostaje nieaktywna, dopóki żaden nie jest wybrany. Wybór czujnika nie jest potrzebny.</li><li>Otwórz <strong>Obserwacje wielostanowiskowe</strong> z dolnego paska. Domyślna sieć ostrzegania przed rakietami obliczy się automatycznie.</li><li>Włączaj lub wyłączaj czujniki w panelu listy czujników, aby zmienić sieć.</li><li>Kliknij wiersz, aby wybrać ten czujnik i przeskoczyć zegarem do tej chwili, albo wyeksportuj tabelę przyciskiem pobierania.</li></ol>",
+        "tip1": "Używaj tego do planowania przekazań: tam, gdzie kończy się pokrycie jednego czujnika, następny wiersz pokazuje, które stanowisko przejmuje satelitę.",
+        "tip2": "Stanowiska optyczne pokazują widoczność tylko wtedy, gdy warunki oświetleniowe pozwalają na rzeczywistą obserwację; radary zawsze pokazują nd."
+      }
     }
   }
 }

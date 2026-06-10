@@ -3,12 +3,58 @@
     "SensorInfoPlugin": {
       "bottomIconLabel": "Info o senzoru",
       "title": "Menu informací o senzoru",
-      "helpBody": "Info o senzoru poskytuje informace o aktuálně vybraném senzoru. Informace jsou založeny na veřejně dostupných datech a nemusí být vždy 100% přesné. Pokud máte veřejná data o dalších senzorech nebo opravy k existujícím informacím o senzorech, kontaktujte mě na <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>. <br><br> Poskytované informace zahrnují: <ul style=\"margin-left: 40px;\"> <li> Název senzoru </li> <li> Vlastník senzoru </li> <li> Typ senzoru </li> <li> Zorné pole senzoru </li> </ul> <br> Navíc lze z tohoto menu rychle vytvořit čáry ze senzoru ke Slunci nebo Měsíci."
+      "labels": {
+        "sensorName": "Název senzoru",
+        "country": "Země",
+        "sensorType": "Typ senzoru",
+        "latitude": "Zeměpisná šířka",
+        "longitude": "Zeměpisná délka",
+        "minAzimuth": "Min. azimut",
+        "maxAzimuth": "Max. azimut",
+        "minElevation": "Min. elevace",
+        "maxElevation": "Max. elevace",
+        "minRange": "Min. dosah",
+        "maxRange": "Max. dosah",
+        "band": "Pásmo",
+        "beamWidth": "Šířka svazku",
+        "unknown": "Neznámé"
+      },
+      "buttons": {
+        "drawLineToSun": "Nakreslit čáru ke Slunci",
+        "drawLineToMoon": "Nakreslit čáru k Měsíci",
+        "addLineToSun": "Přidat čáru ke Slunci",
+        "removeLineToSun": "Odebrat čáru ke Slunci",
+        "addLineToMoon": "Přidat čáru k Měsíci",
+        "removeLineToMoon": "Odebrat čáru k Měsíci"
+      },
+      "errorMsgs": {
+        "selectOnlyOneSensor": "Vyberte prosím pouze jeden senzor"
+      },
+      "help": {
+        "overview": "Info o senzoru zobrazuje technické podrobnosti aktuálně vybraného senzoru: kdo jej vlastní, jakého je typu, kde se nachází a přesné limity jeho zorného pole. Ikona zůstává neaktivní, dokud nevyberete senzor v menu senzorů.",
+        "imgAlt": "Menu Info o senzoru zobrazující polohu senzoru a limity zorného pole",
+        "imgCaption": "Info o senzoru pro vybraný radar, včetně limitů azimutu, elevace a dosahu.",
+        "fieldsHeading": "Co jednotlivá pole znamenají",
+        "fields": "<ul><li><strong>Zeměpisná šířka / délka</strong>: poloha senzoru na zemi.</li><li><strong>Min / max azimut</strong>: kompasový oblouk, který senzor dokáže pokrýt.</li><li><strong>Min / max elevace</strong>: jak nízko a vysoko nad horizontem se může dívat.</li><li><strong>Min / max dosah</strong>: okno vzdálenosti, ve kterém může sledovat, v km.</li><li><strong>Pásmo / šířka svazku</strong>: frekvenční pásmo radaru a šířka svazku; u optických senzorů a pozorovatelů jsou skryté.</li></ul>Limity azimutu, elevace a dosahu společně definují objem zorného pole vykreslený na glóbu.",
+        "howToUse": "<ol><li>Vyberte senzor v menu senzorů.</li><li>Otevřete Info o senzoru ze spodní lišty.</li><li>Pomocí <strong>Přidat čáru ke Slunci</strong> nebo <strong>Přidat čáru k Měsíci</strong> nakreslíte čáru od senzoru; to je užitečné pro odhalení oken slunečního vyloučení nebo rušení měsíčním svitem u optických senzorů. Opětovným kliknutím na tlačítko čáru odstraníte.</li></ol>",
+        "tip1": "Tlačítka čar ke Slunci a Měsíci vyžadují právě jeden vybraný senzor; odmítnou kreslit, když je aktivní celá síť.",
+        "tip2": "Parametry senzorů jsou založeny na veřejně dostupných datech a nemusí být zcela přesné. Opravy jsou vítány na admin@keeptrack.space.",
+        "tip3": "Chcete-li experimentovat s jinými limity zorného pole, vytvořte si kopii tohoto senzoru v menu vlastního senzoru, protože toto menu je pouze pro čtení."
+      }
     },
     "CustomSensorPlugin": {
       "bottomIconLabel": "Vlastní senzor",
       "title": "Menu vlastního senzoru",
-      "helpBody": "Toto vám umožňuje vytvořit vlastní senzor pro použití ve výpočtech a funkcích ostatních menu. Může se jednat o zcela originální senzor nebo o úpravu existujícího senzoru. <br><br> Po nastavení zeměpisné šířky, zeměpisné délky a výšky senzoru můžete nastavit jeho zorné pole. Výběr teleskopu vytvoří 360stupňové zorné pole s elevační maskou 10 stupňů a neomezeným dosahem. Zrušení výběru možnosti teleskopu vám umožní nastavit zorné pole ručně. <br><br> Pokud se pokoušíte upravit existující senzor, můžete jej nejprve vybrat ze seznamu senzorů a vlastní senzor bude aktualizován informacemi vybraného senzoru.",
+      "help": {
+        "overview": "Vlastní senzor umožňuje postavit pozemní senzor kdekoli na Zemi: zcela nové stanoviště, nebo upravenou kopii existujícího. Senzor pak funguje všude tam, kde skutečný, včetně úhlů pohledu, vykreslování zorného pole a výpočtů přeletů.",
+        "imgAlt": "Menu vlastního senzoru s poli pro polohu a zorné pole",
+        "imgCaption": "Nastavte polohu a zorné pole a poté senzor přidejte.",
+        "fieldsHeading": "Definování senzoru",
+        "fields": "Nastavte pole <strong>Zeměpisná šířka</strong>, <strong>Zeměpisná délka</strong> a <strong>Nadmořská výška (km)</strong>, poté zvolte <strong>Typ senzoru</strong>: pozorovatel, optický, fázový anténní radar nebo mechanický. Zaškrtnutí volby <strong>Teleskop</strong> poskytne plný 360stupňový rozhled v azimutu s elevační maskou 10 stupňů a neomezeným dosahem; zrušením zaškrtnutí nastavíte limity azimutu, elevace a dosahu sami.",
+        "howToUse": "<ol><li>Otevřete menu <strong>Vlastní senzor</strong> (režim Vytvořit), nebo klikněte pravým tlačítkem kamkoli na Zemi a zvolte <strong>Vytvořit senzor zde</strong> či <strong>Vytvořit pozorovatele zde</strong> pro předvyplnění polohy.</li><li>Upravte pole, nebo klikněte na <strong>Použít geolokaci</strong> a použijte vlastní polohu (pouze HTTPS).</li><li>Klikněte na <strong>Přidat vlastní senzor</strong>. Nový senzor se objeví na glóbu a v panelu seznamu aktivních senzorů.</li><li>Zapněte <strong>Nahradit senzor</strong>, chcete-li vyměnit primární senzor místo přidání dalšího; <strong>Vymazat vlastní senzory</strong> je všechny odstraní.</li></ol>",
+        "tip1": "Chcete-li upravit parametry skutečného senzoru, nejprve jej vyberte v menu senzorů; formulář se předvyplní jeho hodnotami, takže je můžete doladit a znovu přidat.",
+        "tip2": "Více vlastních senzorů se sčítá: každé přidání se stane dalším aktivním senzorem, což je snadný způsob, jak si namodelovat malou síť."
+      },
       "labels": {
         "sensorName": "Název senzoru",
         "defaultSensorName": "Vlastní senzor",
@@ -72,12 +118,66 @@
     "LookAnglesPlugin": {
       "bottomIconLabel": "Úhly pohledu",
       "title": "Menu úhlů pohledu",
-      "helpBody": "Menu úhlů pohledu umožňuje vypočítat vzdálenost, azimut a elevační úhly mezi senzorem a satelitem. Před použitím menu musí být nejprve vybrán satelit a senzor. <br><br> Přepínač pouze časů východu a západu vypočítá pouze časy východu a západu satelitu. To je užitečné pro rychlé určení, kdy bude satelit viditelný pro senzor. <br><br> Rozsah vyhledávání lze upravit změnou možností délky a intervalu."
+      "settings": {
+        "showRiseSetOnly": "Zobrazit pouze časy východu a západu",
+        "calculationLength": "Délka výpočtu (dny)",
+        "interval": "Interval (sekundy)"
+      },
+      "table": {
+        "time": "Čas",
+        "type": "Typ",
+        "el": "El.",
+        "az": "Az.",
+        "rng": "Vzd.",
+        "visible": "Viditelný"
+      },
+      "msgs": {
+        "notVisible": "Satelit nebude viditelný v příštích {hours} hodinách.",
+        "yes": "Ano",
+        "no": "Ne",
+        "rise": "Východ",
+        "set": "Západ",
+        "maxEl": "Max. El.",
+        "unknown": "Neznámé"
+      },
+      "help": {
+        "overview": "Úhly pohledu počítají naváděcí data, která senzor potřebuje ke sledování vybraného satelitu: čas, azimut, elevaci a vzdálenost každé nadcházející příležitosti k pozorování. Je to most mezi sledováním přeletu ve 3D a skutečným namířením antény nebo teleskopu.",
+        "imgAlt": "Tabulka úhlů pohledu s časy, azimuty, elevacemi a vzdálenostmi",
+        "imgCaption": "Každý řádek je naváděcí řešení; kliknutím na něj přesunete hodiny na daný okamžik.",
+        "readingHeading": "Čtení tabulky",
+        "reading": "Každý řádek uvádí <strong>Čas</strong>, elevaci (<strong>El.</strong>), azimut (<strong>Az.</strong>) a vzdálenost (<strong>Vzd.</strong>) satelitu při pohledu ze senzoru, plus zda je opticky <strong>Viditelný</strong>. Se zapnutou volbou <strong>Zobrazit pouze časy východu a západu</strong> se tabulka zúží na události východu, maximální elevace a západu každého přeletu, označené ve sloupci <strong>Typ</strong>.",
+        "howToUse": "<ol><li>Vyberte senzor i satelit; spodní ikona zůstává neaktivní, dokud nejsou nastaveny oba.</li><li>Otevřete <strong>Úhly pohledu</strong> ze spodní lišty. Tabulka se vypočítá automaticky.</li><li>Otevřete panel nastavení a přepněte režim východ/západ nebo změňte hodnoty <strong>Délka výpočtu (dny)</strong> a <strong>Interval (sekundy)</strong>.</li><li>Kliknutím na řádek přesunete simulační hodiny na daný okamžik, nebo tabulku exportujete tlačítkem stahování.</li></ol>",
+        "tip1": "Režim východ/západ je nejrychlejší způsob, jak zjistit, kdy satelit uvidíte příště; na úplnou tabulku přepněte, když potřebujete naváděcí úhly sekundu po sekundě.",
+        "tip2": "Kliknutí na řádek zachová stav přehrávání, takže pozastavené hodiny zůstanou pozastavené i v novém čase."
+      }
     },
     "MultiSiteLookAnglesPlugin": {
       "bottomIconLabel": "Pohledy z více míst",
       "title": "Menu úhlů pohledu z více míst",
-      "helpBody": "Menu úhlů pohledu z více míst umožňuje vypočítat vzdálenost, azimut a elevační úhly mezi satelitem a více senzory. Před použitím menu musí být nejprve vybrán satelit. <br><br> Ve výchozím nastavení menu vypočítá úhly pohledu pro všechny senzory v síti sledování vesmíru. Pokud chcete vypočítat úhly pohledu pro další senzory, můžete exportovat soubor CSV ve spodní části menu. Soubor CSV bude obsahovat úhly pohledu pro všechny senzory. <br><br> Kliknutím na řádek v tabulce vyberete senzor a změníte čas simulace na čas úhlu pohledu."
+      "table": {
+        "time": "Čas",
+        "el": "El.",
+        "az": "Az.",
+        "rng": "Vzd.",
+        "sensor": "Senzor",
+        "visible": "Viditelný"
+      },
+      "msgs": {
+        "notVisible": "Satelit nebude viditelný v příštích {hours} hodinách.",
+        "yes": "Ano",
+        "no": "Ne",
+        "na": "N/A"
+      },
+      "help": {
+        "overview": "Úhly pohledu z více míst odpovídají na síťovou otázku: který ze všech mých senzorů vidí vybraný satelit a kdy? Počítají úhly pohledu pro mnoho stanovišť najednou a prokládají je do jediné chronologické tabulky.",
+        "imgAlt": "Tabulka úhlů pohledu z více míst se senzory a naváděcími daty",
+        "imgCaption": "Každý řádek spojuje okamžik přeletu se senzorem, který jej vidí.",
+        "readingHeading": "Čtení tabulky",
+        "reading": "Řádky jsou seřazeny chronologicky napříč všemi zapnutými stanovišti a každý uvádí <strong>Čas</strong>, elevaci (<strong>El.</strong>), azimut (<strong>Az.</strong>), vzdálenost (<strong>Vzd.</strong>), dotčený <strong>Senzor</strong> a optickou viditelnost. Panel přepínačů senzorů určuje, která stanoviště se počítají: zelené senzory jsou zahrnuty a červené vyloučeny.",
+        "howToUse": "<ol><li>Vyberte satelit; spodní ikona zůstává neaktivní, dokud není vybrán. Výběr senzoru není potřeba.</li><li>Otevřete <strong>Pohledy z více míst</strong> ze spodní lišty. Výchozí síť včasné výstrahy proti raketám se vypočítá automaticky.</li><li>Zapínáním a vypínáním senzorů v panelu seznamu senzorů změníte síť.</li><li>Kliknutím na řádek vyberete daný senzor a přesunete hodiny na daný okamžik, nebo tabulku exportujete tlačítkem stahování.</li></ol>",
+        "tip1": "Použijte je k plánování předávek: kde končí pokrytí jednoho senzoru, další řádek ukáže, které stanoviště satelit převezme.",
+        "tip2": "Optická stanoviště ukazují viditelnost jen tehdy, když světelné podmínky skutečné pozorování umožňují; radary vždy zobrazují N/A."
+      }
     }
   }
 }

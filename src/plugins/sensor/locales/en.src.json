@@ -3,12 +3,58 @@
     "SensorInfoPlugin": {
       "bottomIconLabel": "Sensor Info",
       "title": "Sensor Info Menu",
-      "helpBody": "Sensor Info provides information about the currently selected sensor. The information is based on publicly available data and may not always be 100% accurate. If you have public data on additional sensors or corrections to existing sensor information please contact me at <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>. <br><br> The information provided includes: <ul style=\"margin-left: 40px;\"> <li> Sensor Name </li> <li> Sensor Owner </li> <li> Sensor Type </li> <li> Sensor Field of View </li> </ul> <br> Additionally, lines can be quickly created from the sensor to the sun or moon from this menu."
+      "labels": {
+        "sensorName": "Sensor Name",
+        "country": "Country",
+        "sensorType": "Sensor Type",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "minAzimuth": "Min Azimuth",
+        "maxAzimuth": "Max Azimuth",
+        "minElevation": "Min Elevation",
+        "maxElevation": "Max Elevation",
+        "minRange": "Min Range",
+        "maxRange": "Max Range",
+        "band": "Band",
+        "beamWidth": "Beam Width",
+        "unknown": "Unknown"
+      },
+      "buttons": {
+        "drawLineToSun": "Draw Line to Sun",
+        "drawLineToMoon": "Draw Line to Moon",
+        "addLineToSun": "Add Line to Sun",
+        "removeLineToSun": "Remove Line to Sun",
+        "addLineToMoon": "Add Line to Moon",
+        "removeLineToMoon": "Remove Line to Moon"
+      },
+      "errorMsgs": {
+        "selectOnlyOneSensor": "Please Select Only One Sensor"
+      },
+      "help": {
+        "overview": "Sensor Info shows the technical details of the currently selected sensor: who owns it, what type it is, where it sits, and the exact limits of its field of view. The icon stays disabled until you select a sensor in the Sensors menu.",
+        "imgAlt": "The Sensor Info menu showing a sensor's location and field-of-view limits",
+        "imgCaption": "Sensor Info for a selected radar, including its azimuth, elevation, and range limits.",
+        "fieldsHeading": "What the Fields Mean",
+        "fields": "<ul><li><strong>Latitude / Longitude</strong>: the sensor's ground location.</li><li><strong>Min / Max Azimuth</strong>: the compass arc the sensor can cover.</li><li><strong>Min / Max Elevation</strong>: how low and high above the horizon it can look.</li><li><strong>Min / Max Range</strong>: the distance window it can track within, in km.</li><li><strong>Band / Beam Width</strong>: radar frequency band and beam width; these are hidden for optical sensors and observers.</li></ul>Together the azimuth, elevation, and range limits define the field-of-view volume drawn on the globe.",
+        "howToUse": "<ol><li>Select a sensor in the Sensors menu.</li><li>Open Sensor Info from the bottom bar.</li><li>Use <strong>Add Line to Sun</strong> or <strong>Add Line to Moon</strong> to draw a line from the sensor. This is handy for spotting solar exclusion windows or moonlight interference for optical sensors. Click the button again to remove the line.</li></ol>",
+        "tip1": "The sun and moon line buttons need exactly one sensor selected; they will refuse to draw when a whole network is active.",
+        "tip2": "Sensor parameters are based on publicly available data and may not be perfectly accurate. Corrections are welcome at admin@keeptrack.space.",
+        "tip3": "To experiment with different field-of-view limits, build a copy of this sensor in the Custom Sensor menu instead, since this menu is read-only."
+      }
     },
     "CustomSensorPlugin": {
       "bottomIconLabel": "Custom Sensor",
       "title": "Custom Sensor Menu",
-      "helpBody": "This allows you to create a custom sensor for use in calculations and other menu's functions. This can be a completely original sensor or a modification of an existing sensor. <br><br> After setting the latitude, longitude, and altitude of the sensor, you can set the sensor's field of view. Selecting telescope will create a 360 degree field of view with an elevation mask of 10 degrees and unlimited range. Deselecting the telescope option will allow you to set the field of view manually. <br><br> If you are trying to edit an existing sensor, you can select it from the sensor list first and the custom sensor will be updated with the selected sensor's information.",
+      "help": {
+        "overview": "Custom Sensor builds a ground sensor anywhere on Earth: a completely new site, or a modified copy of an existing one. The sensor then works everywhere a real one does, including look angles, field of view rendering, and pass calculations.",
+        "imgAlt": "The Custom Sensor menu with location and field of view fields",
+        "imgCaption": "Set the location and field of view, then add the sensor.",
+        "fieldsHeading": "Defining the Sensor",
+        "fields": "Set the <strong>Latitude</strong>, <strong>Longitude</strong>, and <strong>Elevation Above Sea Level (Km)</strong>, then pick the <strong>Type of Sensor</strong>: Observer, Optical, Phased Array Radar, or Mechanical. Checking <strong>Telescope</strong> gives a full 360 degree azimuth view with a 10 degree elevation mask and unlimited range; uncheck it to set the azimuth, elevation, and range limits yourself.",
+        "howToUse": "<ol><li>Open the <strong>Custom Sensor</strong> menu (Create mode), or right-click anywhere on Earth and choose <strong>Create Sensor Here</strong> or <strong>Create Observer Here</strong> to pre-fill the location.</li><li>Adjust the fields, or click <strong>Use Geolocation</strong> to use your own position (HTTPS only).</li><li>Click <strong>Add Custom Sensor</strong>. The new sensor appears on the globe and in the active sensor list panel.</li><li>Enable <strong>Replace Sensor</strong> to swap the primary sensor instead of adding another; <strong>Clear Custom Sensors</strong> removes them all.</li></ol>",
+        "tip1": "To edit a real sensor's parameters, select it in the Sensors menu first; the form pre-fills with its values so you can tweak and re-add it.",
+        "tip2": "Multiple custom sensors stack: each addition becomes another active sensor, which is an easy way to mock up a small network."
+      },
       "labels": {
         "sensorName": "Sensor Name",
         "defaultSensorName": "Custom Sensor",
@@ -72,12 +118,66 @@
     "LookAnglesPlugin": {
       "bottomIconLabel": "Look Angles",
       "title": "Look Angles Menu",
-      "helpBody": "The Look Angles menu allows you to calculate the range, azimuth, and elevation angles between a sensor and a satellite. A satellite and sensor must first be selected before the menu can be used. <br><br> The toggle only rise and set times will only calculate the rise and set times of the satellite. This is useful for quickly determining when a satellite will be visible to a sensor. <br><br> The search range can be modified by changing the length and interval options."
+      "settings": {
+        "showRiseSetOnly": "Show Only Rise and Set Times",
+        "calculationLength": "Calculation Length (Days)",
+        "interval": "Interval (Seconds)"
+      },
+      "table": {
+        "time": "Time",
+        "type": "Type",
+        "el": "El",
+        "az": "Az",
+        "rng": "Rng",
+        "visible": "Visible"
+      },
+      "msgs": {
+        "notVisible": "Satellite is not visible for the next {hours} hours.",
+        "yes": "Yes",
+        "no": "No",
+        "rise": "Rise",
+        "set": "Set",
+        "maxEl": "Max El",
+        "unknown": "Unknown"
+      },
+      "help": {
+        "overview": "Look Angles computes the pointing data a sensor needs to track the selected satellite: the time, azimuth, elevation, and range of every upcoming observation opportunity. It is the bridge between seeing a pass in 3D and actually pointing an antenna or telescope at it.",
+        "imgAlt": "The Look Angles table of times, azimuths, elevations, and ranges",
+        "imgCaption": "Each row is a pointing solution; click one to jump the clock to that moment.",
+        "readingHeading": "Reading the Table",
+        "reading": "Each row lists the <strong>Time</strong>, elevation (<strong>El</strong>), azimuth (<strong>Az</strong>), and range (<strong>Rng</strong>) of the satellite as seen from the sensor, plus whether it is optically <strong>Visible</strong>. With <strong>Show Only Rise and Set Times</strong> enabled, the table collapses to each pass's rise, maximum elevation, and set events, labeled in the <strong>Type</strong> column.",
+        "howToUse": "<ol><li>Select both a sensor and a satellite; the bottom icon stays disabled until both are set.</li><li>Open <strong>Look Angles</strong> from the bottom bar. The table computes automatically.</li><li>Open the settings panel to toggle rise/set mode or change the <strong>Calculation Length (Days)</strong> and <strong>Interval (Seconds)</strong>.</li><li>Click a row to jump the simulation clock to that moment, or use the download button to export the table.</li></ol>",
+        "tip1": "Rise/set mode is the fastest way to answer when you can see the satellite next; switch to the full table when you need second by second pointing angles.",
+        "tip2": "Clicking a row preserves your playback state, so a paused clock stays paused at the new time."
+      }
     },
     "MultiSiteLookAnglesPlugin": {
       "bottomIconLabel": "Multi-Site Looks",
       "title": "Multi-Site Look Angles Menu",
-      "helpBody": "The Multi-Site Look Angles menu allows you to calculate the range, azimuth, and elevation angles between a satellite and multiple sensors. A satellite must first be selected before the menu can be used. <br><br> By default the menu will calculate the look angles for all sensors in the Space Surveillance Netowrk. If you would like to calculate the look angles for additional sensors, you can export a csv file at the bottom of the menu. The csv file will contain look angles for all sensors. <br><br> Clicking on a row in the table will select the sensor and change the simulation time to the time of the look angle."
+      "table": {
+        "time": "Time",
+        "el": "El",
+        "az": "Az",
+        "rng": "Rng",
+        "sensor": "Sensor",
+        "visible": "Visible"
+      },
+      "msgs": {
+        "notVisible": "Satellite is not visible for the next {hours} hours.",
+        "yes": "Yes",
+        "no": "No",
+        "na": "N/A"
+      },
+      "help": {
+        "overview": "Multi-Site Look Angles answers a network question: of all my sensors, which one sees the selected satellite, and when? It computes look angles across many sites at once and interleaves them into a single chronological table.",
+        "imgAlt": "The Multi-Site Look Angles table with sensors and pointing data",
+        "imgCaption": "Each row pairs a pass moment with the sensor that sees it.",
+        "readingHeading": "Reading the Table",
+        "reading": "Rows are sorted chronologically across every enabled site, each listing the <strong>Time</strong>, elevation (<strong>El</strong>), azimuth (<strong>Az</strong>), range (<strong>Rng</strong>), the <strong>Sensor</strong> involved, and optical visibility. The sensor toggle panel chooses which sites are computed: green sensors are included and red sensors are excluded.",
+        "howToUse": "<ol><li>Select a satellite; the bottom icon stays disabled until one is selected. No sensor selection is needed.</li><li>Open <strong>Multi-Site Looks</strong> from the bottom bar. The default missile warning network is computed automatically.</li><li>Toggle sensors on or off in the sensor list panel to change the network.</li><li>Click a row to select that sensor and jump the clock to that moment, or export the table with the download button.</li></ol>",
+        "tip1": "Use it to plan handoffs: where one sensor's coverage ends, the next row shows which site picks the satellite up.",
+        "tip2": "Optical sites show visibility only when lighting conditions allow an actual observation; radars always show N/A."
+      }
     }
   }
 }

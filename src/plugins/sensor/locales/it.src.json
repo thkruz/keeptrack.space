@@ -3,12 +3,58 @@
     "SensorInfoPlugin": {
       "bottomIconLabel": "Info sensore",
       "title": "Menu info sensore",
-      "helpBody": "Info sensore fornisce informazioni sul sensore attualmente selezionato. Le informazioni si basano su dati pubblicamente disponibili e potrebbero non essere sempre accurate al 100%. Se disponi di dati pubblici su sensori aggiuntivi o correzioni alle informazioni sui sensori esistenti, contattami all'indirizzo <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>. <br><br> Le informazioni fornite includono: <ul style=\"margin-left: 40px;\"> <li> Nome del sensore </li> <li> Proprietario del sensore </li> <li> Tipo di sensore </li> <li> Campo visivo del sensore </li> </ul> <br> Inoltre, da questo menu è possibile creare rapidamente linee dal sensore al sole o alla luna."
+      "labels": {
+        "sensorName": "Nome del sensore",
+        "country": "Paese",
+        "sensorType": "Tipo di sensore",
+        "latitude": "Latitudine",
+        "longitude": "Longitudine",
+        "minAzimuth": "Azimut min",
+        "maxAzimuth": "Azimut max",
+        "minElevation": "Elevazione min",
+        "maxElevation": "Elevazione max",
+        "minRange": "Portata min",
+        "maxRange": "Portata max",
+        "band": "Banda",
+        "beamWidth": "Larghezza del fascio",
+        "unknown": "Sconosciuto"
+      },
+      "buttons": {
+        "drawLineToSun": "Traccia una linea verso il Sole",
+        "drawLineToMoon": "Traccia una linea verso la Luna",
+        "addLineToSun": "Aggiungi linea verso il Sole",
+        "removeLineToSun": "Rimuovi linea verso il Sole",
+        "addLineToMoon": "Aggiungi linea verso la Luna",
+        "removeLineToMoon": "Rimuovi linea verso la Luna"
+      },
+      "errorMsgs": {
+        "selectOnlyOneSensor": "Seleziona un solo sensore"
+      },
+      "help": {
+        "overview": "Info sensore mostra i dettagli tecnici del sensore attualmente selezionato: chi lo possiede, di che tipo è, dove si trova e i limiti esatti del suo campo visivo. L'icona rimane disabilitata finché non selezioni un sensore nel menu Sensori.",
+        "imgAlt": "Il menu Info sensore che mostra la posizione di un sensore e i limiti del campo visivo",
+        "imgCaption": "Info sensore per un radar selezionato, inclusi i limiti di azimut, elevazione e portata.",
+        "fieldsHeading": "Cosa significano i campi",
+        "fields": "<ul><li><strong>Latitudine / Longitudine</strong>: la posizione a terra del sensore.</li><li><strong>Azimut min / max</strong>: l'arco di bussola che il sensore può coprire.</li><li><strong>Elevazione min / max</strong>: quanto in basso e in alto sopra l'orizzonte può guardare.</li><li><strong>Portata min / max</strong>: la finestra di distanza entro cui può tracciare, in km.</li><li><strong>Banda / Larghezza del fascio</strong>: banda di frequenza del radar e larghezza del fascio; sono nascoste per i sensori ottici e gli osservatori.</li></ul>Insieme, i limiti di azimut, elevazione e portata definiscono il volume del campo visivo disegnato sul globo.",
+        "howToUse": "<ol><li>Seleziona un sensore nel menu Sensori.</li><li>Apri Info sensore dalla barra inferiore.</li><li>Usa <strong>Aggiungi linea verso il Sole</strong> o <strong>Aggiungi linea verso la Luna</strong> per tracciare una linea dal sensore. È utile per individuare le finestre di esclusione solare o le interferenze della luce lunare per i sensori ottici. Fai di nuovo clic sul pulsante per rimuovere la linea.</li></ol>",
+        "tip1": "I pulsanti delle linee verso il sole e la luna richiedono esattamente un sensore selezionato; si rifiuteranno di disegnare quando è attiva un'intera rete.",
+        "tip2": "I parametri dei sensori si basano su dati pubblicamente disponibili e potrebbero non essere perfettamente accurati. Le correzioni sono benvenute all'indirizzo admin@keeptrack.space.",
+        "tip3": "Per sperimentare con limiti del campo visivo diversi, crea invece una copia di questo sensore nel menu Sensore personalizzato, poiché questo menu è di sola lettura."
+      }
     },
     "CustomSensorPlugin": {
       "bottomIconLabel": "Sensore personalizzato",
       "title": "Menu sensore personalizzato",
-      "helpBody": "Questa funzione consente di creare un sensore personalizzato da utilizzare nei calcoli e nelle funzioni di altri menu. Può essere un sensore completamente originale o una modifica di un sensore esistente. <br><br> Dopo aver impostato la latitudine, la longitudine e l'altitudine del sensore, è possibile impostare il campo visivo. Selezionando il telescopio si creerà un campo visivo di 360 gradi con una maschera di elevazione di 10 gradi e portata illimitata. Deselezionando l'opzione telescopio sarà possibile impostare il campo visivo manualmente. <br><br> Se si desidera modificare un sensore esistente, è possibile selezionarlo prima dall'elenco dei sensori e il sensore personalizzato verrà aggiornato con le informazioni del sensore selezionato.",
+      "help": {
+        "overview": "Il sensore personalizzato costruisce un sensore a terra in qualsiasi punto della Terra: un sito completamente nuovo oppure una copia modificata di uno esistente. Il sensore funziona poi ovunque funzioni uno reale, inclusi gli angoli di osservazione, il rendering del campo visivo e i calcoli dei passaggi.",
+        "imgAlt": "Il menu del sensore personalizzato con i campi di posizione e campo visivo",
+        "imgCaption": "Imposta la posizione e il campo visivo, quindi aggiungi il sensore.",
+        "fieldsHeading": "Definire il sensore",
+        "fields": "Imposta <strong>Latitudine</strong>, <strong>Longitudine</strong> e <strong>Altitudine sul livello del mare (km)</strong>, quindi scegli il <strong>Tipo di sensore</strong>: osservatore, ottico, radar ad array a scansione di fase o meccanico. Selezionando <strong>Telescopio</strong> si ottiene una vista completa a 360 gradi in azimut con una maschera di elevazione di 10 gradi e portata illimitata; deselezionalo per impostare tu stesso i limiti di azimut, elevazione e portata.",
+        "howToUse": "<ol><li>Apri il menu <strong>Sensore personalizzato</strong> (modalità Crea), oppure fai clic con il tasto destro in un punto qualsiasi della Terra e scegli <strong>Crea sensore qui</strong> o <strong>Crea osservatore qui</strong> per precompilare la posizione.</li><li>Regola i campi, oppure fai clic su <strong>Usa geolocalizzazione</strong> per usare la tua posizione (solo HTTPS).</li><li>Fai clic su <strong>Aggiungi sensore personalizzato</strong>. Il nuovo sensore appare sul globo e nel pannello dell'elenco dei sensori attivi.</li><li>Attiva <strong>Sostituisci sensore</strong> per sostituire il sensore primario invece di aggiungerne un altro; <strong>Cancella sensori personalizzati</strong> li rimuove tutti.</li></ol>",
+        "tip1": "Per modificare i parametri di un sensore reale, selezionalo prima nel menu Sensori; il modulo si precompila con i suoi valori così puoi ritoccarli e aggiungerlo di nuovo.",
+        "tip2": "Più sensori personalizzati si accumulano: ogni aggiunta diventa un altro sensore attivo, il che è un modo facile per simulare una piccola rete."
+      },
       "labels": {
         "sensorName": "Nome del sensore",
         "defaultSensorName": "Sensore personalizzato",
@@ -72,12 +118,66 @@
     "LookAnglesPlugin": {
       "bottomIconLabel": "Angoli di osservazione",
       "title": "Menu angoli di osservazione",
-      "helpBody": "Il menu Angoli di osservazione consente di calcolare la distanza, l'azimut e gli angoli di elevazione tra un sensore e un satellite. Prima di poter utilizzare il menu è necessario selezionare un satellite e un sensore. <br><br> L'opzione per mostrare solo gli orari di sorgere e tramontare calcolerà esclusivamente gli orari di sorgere e tramontare del satellite. Questo è utile per determinare rapidamente quando un satellite sarà visibile a un sensore. <br><br> L'intervallo di ricerca può essere modificato cambiando le opzioni di durata e intervallo."
+      "settings": {
+        "showRiseSetOnly": "Mostra solo gli orari di sorgere e tramonto",
+        "calculationLength": "Durata del calcolo (giorni)",
+        "interval": "Intervallo (secondi)"
+      },
+      "table": {
+        "time": "Ora",
+        "type": "Tipo",
+        "el": "El.",
+        "az": "Az.",
+        "rng": "Dist.",
+        "visible": "Visibile"
+      },
+      "msgs": {
+        "notVisible": "Il satellite non sarà visibile per le prossime {hours} ore.",
+        "yes": "Sì",
+        "no": "No",
+        "rise": "Sorgere",
+        "set": "Tramonto",
+        "maxEl": "El. max",
+        "unknown": "Sconosciuto"
+      },
+      "help": {
+        "overview": "Angoli di osservazione calcola i dati di puntamento di cui un sensore ha bisogno per inseguire il satellite selezionato: l'ora, l'azimut, l'elevazione e la distanza di ogni prossima opportunità di osservazione. È il ponte tra vedere un passaggio in 3D e puntare davvero un'antenna o un telescopio verso di esso.",
+        "imgAlt": "La tabella degli angoli di osservazione con orari, azimut, elevazioni e distanze",
+        "imgCaption": "Ogni riga è una soluzione di puntamento; fai clic su una per portare l'orologio a quel momento.",
+        "readingHeading": "Leggere la tabella",
+        "reading": "Ogni riga elenca l'<strong>Ora</strong>, l'elevazione (<strong>El.</strong>), l'azimut (<strong>Az.</strong>) e la distanza (<strong>Dist.</strong>) del satellite visto dal sensore, oltre a indicare se è otticamente <strong>Visibile</strong>. Con <strong>Mostra solo gli orari di sorgere e tramonto</strong> attivato, la tabella si riduce agli eventi di sorgere, elevazione massima e tramonto di ogni passaggio, etichettati nella colonna <strong>Tipo</strong>.",
+        "howToUse": "<ol><li>Seleziona sia un sensore sia un satellite; l'icona inferiore rimane disabilitata finché non sono impostati entrambi.</li><li>Apri <strong>Angoli di osservazione</strong> dalla barra inferiore. La tabella si calcola automaticamente.</li><li>Apri il pannello delle impostazioni per attivare la modalità sorgere/tramonto o modificare <strong>Durata del calcolo (giorni)</strong> e <strong>Intervallo (secondi)</strong>.</li><li>Fai clic su una riga per portare l'orologio della simulazione a quel momento, oppure usa il pulsante di download per esportare la tabella.</li></ol>",
+        "tip1": "La modalità sorgere/tramonto è il modo più rapido per sapere quando potrai vedere di nuovo il satellite; passa alla tabella completa quando ti servono angoli di puntamento secondo per secondo.",
+        "tip2": "Fare clic su una riga preserva lo stato di riproduzione, quindi un orologio in pausa rimane in pausa al nuovo orario."
+      }
     },
     "MultiSiteLookAnglesPlugin": {
       "bottomIconLabel": "Osservazione multi-sito",
       "title": "Menu angoli di osservazione multi-sito",
-      "helpBody": "Il menu Angoli di osservazione multi-sito consente di calcolare la distanza, l'azimut e gli angoli di elevazione tra un satellite e più sensori. Prima di poter utilizzare il menu è necessario selezionare un satellite. <br><br> Per impostazione predefinita, il menu calcolerà gli angoli di osservazione per tutti i sensori nella rete di sorveglianza spaziale. Se si desidera calcolare gli angoli di osservazione per sensori aggiuntivi, è possibile esportare un file CSV in fondo al menu. Il file CSV conterrà gli angoli di osservazione per tutti i sensori. <br><br> Facendo clic su una riga nella tabella si selezionerà il sensore e si cambierà il tempo di simulazione all'orario dell'angolo di osservazione."
+      "table": {
+        "time": "Ora",
+        "el": "El.",
+        "az": "Az.",
+        "rng": "Dist.",
+        "sensor": "Sensore",
+        "visible": "Visibile"
+      },
+      "msgs": {
+        "notVisible": "Il satellite non sarà visibile per le prossime {hours} ore.",
+        "yes": "Sì",
+        "no": "No",
+        "na": "N/D"
+      },
+      "help": {
+        "overview": "Gli angoli di osservazione multi-sito rispondono a una domanda di rete: tra tutti i miei sensori, quale vede il satellite selezionato, e quando? Calcolano gli angoli di osservazione su molti siti contemporaneamente e li intrecciano in un'unica tabella cronologica.",
+        "imgAlt": "La tabella degli angoli di osservazione multi-sito con sensori e dati di puntamento",
+        "imgCaption": "Ogni riga abbina un momento del passaggio al sensore che lo vede.",
+        "readingHeading": "Leggere la tabella",
+        "reading": "Le righe sono ordinate cronologicamente tra tutti i siti abilitati, e ognuna elenca l'<strong>Ora</strong>, l'elevazione (<strong>El.</strong>), l'azimut (<strong>Az.</strong>), la distanza (<strong>Dist.</strong>), il <strong>Sensore</strong> coinvolto e la visibilità ottica. Il pannello di selezione dei sensori sceglie quali siti vengono calcolati: i sensori verdi sono inclusi e quelli rossi esclusi.",
+        "howToUse": "<ol><li>Seleziona un satellite; l'icona inferiore rimane disabilitata finché non ne è selezionato uno. Non serve selezionare alcun sensore.</li><li>Apri <strong>Osservazione multi-sito</strong> dalla barra inferiore. La rete predefinita di allerta missilistica viene calcolata automaticamente.</li><li>Attiva o disattiva i sensori nel pannello dell'elenco dei sensori per cambiare la rete.</li><li>Fai clic su una riga per selezionare quel sensore e portare l'orologio a quel momento, oppure esporta la tabella con il pulsante di download.</li></ol>",
+        "tip1": "Usalo per pianificare i passaggi di consegne: dove finisce la copertura di un sensore, la riga successiva mostra quale sito riprende il satellite.",
+        "tip2": "I siti ottici mostrano la visibilità solo quando le condizioni di illuminazione consentono un'osservazione reale; i radar mostrano sempre N/D."
+      }
     }
   }
 }

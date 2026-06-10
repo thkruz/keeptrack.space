@@ -1,3 +1,5 @@
+import { t7e } from '@app/locales/keys';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { SensorMath, TearrData, TearrType } from '@app/app/sensors/sensor-math';
@@ -19,6 +21,9 @@ import { ClickDragOptions, fileExcelPng, KeepTrackPlugin } from '../../engine/pl
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 type LookAngleData = TearrData & { canStationObserve: boolean };
+
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.LookAnglesPlugin.${key}` as Parameters<typeof t7e>[0]);
 
 export class LookAnglesPlugin extends KeepTrackPlugin {
   readonly id = 'LookAnglesPlugin';
@@ -79,7 +84,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
         <label>
             <input id="settings-riseset" type="checkbox" checked="true" />
             <span class="lever"></span>
-            Show Only Rise and Set Times
+            ${l('settings.showRiseSetOnly')}
         </label>
     </div>
     <div class="row">
@@ -87,7 +92,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
           <input id="look-angles-length" value="2" type="text" data-position="bottom" data-delay="50" data-tooltip="How Many Days of Look Angles Should be Calculated"
             style="text-align: center;"
           />
-          <label for="look-anglesLength" class="active">Calculation Length (Days)</label>
+          <label for="look-anglesLength" class="active">${l('settings.calculationLength')}</label>
       </div>
     </div>
     <div class="row">
@@ -95,7 +100,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
           <input id="look-angles-interval" value="30" type="text" data-position="bottom" data-delay="50" data-tooltip="Seconds Between Each Line of Look Angles"
             style="text-align: center;"
           />
-          <label for="look-anglesInterval" class="active">Interval (Seconds)</label>
+          <label for="look-anglesInterval" class="active">${l('settings.interval')}</label>
       </div>
     </div>`;
   downloadIconSrc = fileExcelPng;
@@ -142,6 +147,33 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     width: 300,
     zIndex: 3,
   };
+
+
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/look-angles/look-angles-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: l('help.readingHeading'),
+          content: l('help.reading'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2')],
+    };
+  }
 
   addHtml(): void {
     super.addHtml();
@@ -301,7 +333,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     const tr = tbl.insertRow();
     const tdT = tr.insertCell();
 
-    tdT.appendChild(document.createTextNode('Time'));
+    tdT.appendChild(document.createTextNode(l('table.time')));
     tdT.setAttribute('style', 'text-decoration: underline');
 
     // If isRiseSetOnly is true, add a column for type
@@ -309,25 +341,25 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
     if (lookAngleData.length > 0 && typeof lookAngleData[0].type !== 'undefined') {
 
-      tdType.appendChild(document.createTextNode('Type'));
+      tdType.appendChild(document.createTextNode(l('table.type')));
       tdType.setAttribute('style', 'text-decoration: underline');
     }
 
     const tdE = tr.insertCell();
 
-    tdE.appendChild(document.createTextNode('El'));
+    tdE.appendChild(document.createTextNode(l('table.el')));
     tdE.setAttribute('style', 'text-decoration: underline');
     const tdA = tr.insertCell();
 
-    tdA.appendChild(document.createTextNode('Az'));
+    tdA.appendChild(document.createTextNode(l('table.az')));
     tdA.setAttribute('style', 'text-decoration: underline');
     const tdR = tr.insertCell();
 
-    tdR.appendChild(document.createTextNode('Rng'));
+    tdR.appendChild(document.createTextNode(l('table.rng')));
     tdR.setAttribute('style', 'text-decoration: underline');
     const tdV = tr.insertCell();
 
-    tdV.appendChild(document.createTextNode('Visible'));
+    tdV.appendChild(document.createTextNode(l('table.visible')));
     tdV.setAttribute('style', 'text-decoration: underline');
 
     for (const entry of lookAngleData) {
@@ -340,7 +372,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       const searchLength = (this.lengthOfLookAngles_ * 24).toFixed(1);
 
       td.colSpan = 4;
-      td.appendChild(document.createTextNode(`Satellite is not visible for the next ${searchLength} hours.`));
+      td.appendChild(document.createTextNode(l('msgs.notVisible').replace('{hours}', searchLength)));
     }
   }
 
@@ -383,7 +415,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       tdR = tr.insertCell();
       tdR.appendChild(document.createTextNode(entry.rng?.toFixed(0) ?? 'Unknown'));
       tdV = tr.insertCell();
-      tdV.appendChild(document.createTextNode(entry.canStationObserve ? 'Yes' : 'No'));
+      tdV.appendChild(document.createTextNode(entry.canStationObserve ? l('msgs.yes') : l('msgs.no')));
       if (entry.canStationObserve) {
         tdV.setAttribute('style', 'color: #2d7b31');
       } else {
@@ -395,14 +427,14 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   private static tearrTypeToString_(type: TearrType): string {
     switch (type) {
       case TearrType.RISE:
-        return 'Rise';
+        return l('msgs.rise');
       case TearrType.SET:
-        return 'Set';
+        return l('msgs.set');
       case TearrType.MAX_EL:
-        return 'Max El';
+        return l('msgs.maxEl');
       case TearrType.UNKNOWN:
       default:
-        return 'Unknown';
+        return l('msgs.unknown');
     }
   }
 

@@ -3,12 +3,58 @@
     "SensorInfoPlugin": {
       "bottomIconLabel": "Sensorinfo",
       "title": "Sensorinfo-Menü",
-      "helpBody": "Sensorinfo bietet Informationen über den aktuell ausgewählten Sensor. Die Informationen basieren auf öffentlich zugänglichen Daten und sind möglicherweise nicht immer 100% genau. Wenn Sie öffentliche Daten zu zusätzlichen Sensoren oder Korrekturen zu bestehenden Sensorinformationen haben, kontaktieren Sie mich bitte unter <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>. <br><br> Die bereitgestellten Informationen umfassen: <ul style=\"margin-left: 40px;\"> <li> Sensorname </li> <li> Sensoreigentümer </li> <li> Sensortyp </li> <li> Sichtfeld des Sensors </li> </ul> <br> Zusätzlich können von diesem Menü aus schnell Linien vom Sensor zur Sonne oder zum Mond erstellt werden."
+      "labels": {
+        "sensorName": "Sensorname",
+        "country": "Land",
+        "sensorType": "Sensortyp",
+        "latitude": "Breitengrad",
+        "longitude": "Längengrad",
+        "minAzimuth": "Min. Azimut",
+        "maxAzimuth": "Max. Azimut",
+        "minElevation": "Min. Elevation",
+        "maxElevation": "Max. Elevation",
+        "minRange": "Min. Reichweite",
+        "maxRange": "Max. Reichweite",
+        "band": "Band",
+        "beamWidth": "Strahlbreite",
+        "unknown": "Unbekannt"
+      },
+      "buttons": {
+        "drawLineToSun": "Linie zur Sonne zeichnen",
+        "drawLineToMoon": "Linie zum Mond zeichnen",
+        "addLineToSun": "Linie zur Sonne hinzufügen",
+        "removeLineToSun": "Linie zur Sonne entfernen",
+        "addLineToMoon": "Linie zum Mond hinzufügen",
+        "removeLineToMoon": "Linie zum Mond entfernen"
+      },
+      "errorMsgs": {
+        "selectOnlyOneSensor": "Bitte wählen Sie nur einen Sensor aus"
+      },
+      "help": {
+        "overview": "Sensorinfo zeigt die technischen Details des aktuell ausgewählten Sensors: wem er gehört, welcher Typ er ist, wo er sich befindet und die genauen Grenzen seines Sichtfelds. Das Symbol bleibt deaktiviert, bis Sie im Sensorenmenü einen Sensor auswählen.",
+        "imgAlt": "Das Sensorinfo-Menü mit Standort und Sichtfeldgrenzen eines Sensors",
+        "imgCaption": "Sensorinfo für ein ausgewähltes Radar, einschließlich seiner Azimut-, Elevations- und Reichweitengrenzen.",
+        "fieldsHeading": "Was die Felder bedeuten",
+        "fields": "<ul><li><strong>Breitengrad / Längengrad</strong>: der Bodenstandort des Sensors.</li><li><strong>Min. / max. Azimut</strong>: der Kompassbogen, den der Sensor abdecken kann.</li><li><strong>Min. / max. Elevation</strong>: wie tief und hoch über dem Horizont er blicken kann.</li><li><strong>Min. / max. Reichweite</strong>: das Entfernungsfenster, in dem er verfolgen kann, in km.</li><li><strong>Band / Strahlbreite</strong>: Radarfrequenzband und Strahlbreite; bei optischen Sensoren und Beobachtern werden diese ausgeblendet.</li></ul>Zusammen definieren die Azimut-, Elevations- und Reichweitengrenzen das Sichtfeldvolumen, das auf dem Globus gezeichnet wird.",
+        "howToUse": "<ol><li>Wählen Sie im Sensorenmenü einen Sensor aus.</li><li>Öffnen Sie Sensorinfo über die untere Leiste.</li><li>Verwenden Sie <strong>Linie zur Sonne hinzufügen</strong> oder <strong>Linie zum Mond hinzufügen</strong>, um eine Linie vom Sensor zu zeichnen; das ist praktisch, um Sonnenausschlussfenster oder Mondlichtstörungen bei optischen Sensoren zu erkennen. Klicken Sie erneut auf die Schaltfläche, um die Linie zu entfernen.</li></ol>",
+        "tip1": "Die Sonnen- und Mondlinien-Schaltflächen benötigen genau einen ausgewählten Sensor; sie zeichnen nicht, wenn ein ganzes Netzwerk aktiv ist.",
+        "tip2": "Die Sensorparameter basieren auf öffentlich zugänglichen Daten und sind möglicherweise nicht vollkommen genau. Korrekturen sind unter admin@keeptrack.space willkommen.",
+        "tip3": "Um mit anderen Sichtfeldgrenzen zu experimentieren, erstellen Sie stattdessen eine Kopie dieses Sensors im Menü für benutzerdefinierte Sensoren, denn dieses Menü ist schreibgeschützt."
+      }
     },
     "CustomSensorPlugin": {
       "bottomIconLabel": "Benutzerdefinierter Sensor",
       "title": "Menü für benutzerdefinierte Sensoren",
-      "helpBody": "Dies ermöglicht es Ihnen, einen benutzerdefinierten Sensor für Berechnungen und andere Menüfunktionen zu erstellen. Dies kann ein völlig origineller Sensor oder eine Modifikation eines bestehenden Sensors sein. <br><br> Nachdem Sie den Breitengrad, den Längengrad und die Höhe des Sensors festgelegt haben, können Sie das Sichtfeld des Sensors einstellen. Die Auswahl von 'Teleskop' erstellt ein 360-Grad-Sichtfeld mit einer Elevationsmaske von 10 Grad und unbegrenzter Reichweite. Wenn Sie die Teleskop-Option deaktivieren, können Sie das Sichtfeld manuell einstellen. <br><br> Wenn Sie versuchen, einen bestehenden Sensor zu bearbeiten, können Sie ihn zuerst aus der Sensorliste auswählen, und der benutzerdefinierte Sensor wird mit den Informationen des ausgewählten Sensors aktualisiert.",
+      "help": {
+        "overview": "Mit dem benutzerdefinierten Sensor erstellen Sie einen Bodensensor an einem beliebigen Ort der Erde: einen völlig neuen Standort oder eine veränderte Kopie eines bestehenden. Der Sensor funktioniert dann überall dort, wo ein echter funktioniert, einschließlich Blickwinkeln, Sichtfelddarstellung und Überflugberechnungen.",
+        "imgAlt": "Das Menü für benutzerdefinierte Sensoren mit Feldern für Standort und Sichtfeld",
+        "imgCaption": "Legen Sie Standort und Sichtfeld fest und fügen Sie dann den Sensor hinzu.",
+        "fieldsHeading": "Den Sensor definieren",
+        "fields": "Legen Sie <strong>Breitengrad</strong>, <strong>Längengrad</strong> und <strong>Höhe über dem Meeresspiegel (km)</strong> fest und wählen Sie dann den <strong>Sensortyp</strong>: Beobachter, optisch, Phased-Array-Radar oder mechanisch. Wenn Sie <strong>Teleskop</strong> aktivieren, erhalten Sie ein volles 360-Grad-Azimutsichtfeld mit einer Elevationsmaske von 10 Grad und unbegrenzter Reichweite; deaktivieren Sie die Option, um Azimut-, Elevations- und Reichweitengrenzen selbst festzulegen.",
+        "howToUse": "<ol><li>Öffnen Sie das Menü <strong>Benutzerdefinierter Sensor</strong> (Modus Erstellen), oder klicken Sie mit der rechten Maustaste auf eine beliebige Stelle der Erde und wählen Sie <strong>Sensor hier erstellen</strong> oder <strong>Beobachter hier erstellen</strong>, um den Standort vorab auszufüllen.</li><li>Passen Sie die Felder an, oder klicken Sie auf <strong>Geolokalisierung verwenden</strong>, um Ihre eigene Position zu nutzen (nur HTTPS).</li><li>Klicken Sie auf <strong>Benutzerdefinierten Sensor hinzufügen</strong>. Der neue Sensor erscheint auf dem Globus und im Panel der aktiven Sensorliste.</li><li>Aktivieren Sie <strong>Sensor ersetzen</strong>, um den primären Sensor auszutauschen, statt einen weiteren hinzuzufügen; <strong>Benutzerdefinierte Sensoren löschen</strong> entfernt sie alle.</li></ol>",
+        "tip1": "Um die Parameter eines echten Sensors zu bearbeiten, wählen Sie ihn zuerst im Sensorenmenü aus; das Formular wird mit seinen Werten vorausgefüllt, sodass Sie sie anpassen und erneut hinzufügen können.",
+        "tip2": "Mehrere benutzerdefinierte Sensoren summieren sich: Jede Hinzufügung wird ein weiterer aktiver Sensor, womit sich leicht ein kleines Netzwerk nachbilden lässt."
+      },
       "labels": {
         "sensorName": "Sensorname",
         "defaultSensorName": "Benutzerdefinierter Sensor",
@@ -72,12 +118,66 @@
     "LookAnglesPlugin": {
       "bottomIconLabel": "Blickwinkel",
       "title": "Blickwinkel-Menü",
-      "helpBody": "Das Blickwinkel-Menü ermöglicht es Ihnen, die Entfernung, den Azimut und die Elevationswinkel zwischen einem Sensor und einem Satelliten zu berechnen. Ein Satellit und ein Sensor müssen zuerst ausgewählt werden, bevor das Menü verwendet werden kann. <br><br> Die Option 'Nur Auf- und Untergangszeiten umschalten' berechnet nur die Auf- und Untergangszeiten des Satelliten. Dies ist nützlich, um schnell zu bestimmen, wann ein Satellit für einen Sensor sichtbar sein wird. <br><br> Der Suchbereich kann durch Ändern der Längen- und Intervalloptionen modifiziert werden."
+      "settings": {
+        "showRiseSetOnly": "Nur Auf- und Untergangszeiten anzeigen",
+        "calculationLength": "Berechnungsdauer (Tage)",
+        "interval": "Intervall (Sekunden)"
+      },
+      "table": {
+        "time": "Zeit",
+        "type": "Typ",
+        "el": "El.",
+        "az": "Az.",
+        "rng": "Entf.",
+        "visible": "Sichtbar"
+      },
+      "msgs": {
+        "notVisible": "Der Satellit ist in den nächsten {hours} Stunden nicht sichtbar.",
+        "yes": "Ja",
+        "no": "Nein",
+        "rise": "Aufgang",
+        "set": "Untergang",
+        "maxEl": "Max. El.",
+        "unknown": "Unbekannt"
+      },
+      "help": {
+        "overview": "Blickwinkel berechnet die Zielführungsdaten, die ein Sensor zum Verfolgen des ausgewählten Satelliten benötigt: Zeit, Azimut, Elevation und Entfernung jeder bevorstehenden Beobachtungsgelegenheit. Es ist die Brücke zwischen dem Betrachten eines Überflugs in 3D und dem tatsächlichen Ausrichten einer Antenne oder eines Teleskops.",
+        "imgAlt": "Die Blickwinkel-Tabelle mit Zeiten, Azimuten, Elevationen und Entfernungen",
+        "imgCaption": "Jede Zeile ist eine Zielführungslösung; klicken Sie auf eine, um die Uhr auf diesen Moment zu springen.",
+        "readingHeading": "Die Tabelle lesen",
+        "reading": "Jede Zeile zeigt <strong>Zeit</strong>, Elevation (<strong>El.</strong>), Azimut (<strong>Az.</strong>) und Entfernung (<strong>Entf.</strong>) des Satelliten aus Sicht des Sensors sowie ob er optisch <strong>Sichtbar</strong> ist. Mit aktivierter Option <strong>Nur Auf- und Untergangszeiten anzeigen</strong> reduziert sich die Tabelle auf die Auf-, Maximalelevations- und Untergangsereignisse jedes Überflugs, gekennzeichnet in der Spalte <strong>Typ</strong>.",
+        "howToUse": "<ol><li>Wählen Sie sowohl einen Sensor als auch einen Satelliten aus; das untere Symbol bleibt deaktiviert, bis beide gesetzt sind.</li><li>Öffnen Sie <strong>Blickwinkel</strong> über die untere Leiste. Die Tabelle wird automatisch berechnet.</li><li>Öffnen Sie das Einstellungsfeld, um den Auf-/Untergangsmodus umzuschalten oder <strong>Berechnungsdauer (Tage)</strong> und <strong>Intervall (Sekunden)</strong> zu ändern.</li><li>Klicken Sie auf eine Zeile, um die Simulationsuhr auf diesen Moment zu springen, oder exportieren Sie die Tabelle über die Download-Schaltfläche.</li></ol>",
+        "tip1": "Der Auf-/Untergangsmodus ist der schnellste Weg zu erfahren, wann Sie den Satelliten als Nächstes sehen können; wechseln Sie zur vollständigen Tabelle, wenn Sie sekundengenaue Zielwinkel benötigen.",
+        "tip2": "Das Klicken auf eine Zeile bewahrt Ihren Wiedergabestatus: Eine pausierte Uhr bleibt auch zur neuen Zeit pausiert."
+      }
     },
     "MultiSiteLookAnglesPlugin": {
       "bottomIconLabel": "Multi-Standort-Blickwinkel",
       "title": "Multi-Standort-Blickwinkel-Menü",
-      "helpBody": "Das Multi-Standort-Blickwinkel-Menü ermöglicht es Ihnen, die Entfernung, den Azimut und die Elevationswinkel zwischen einem Satelliten und mehreren Sensoren zu berechnen. Ein Satellit muss zuerst ausgewählt werden, bevor das Menü verwendet werden kann. <br><br> Standardmäßig berechnet das Menü die Blickwinkel für alle Sensoren im Space Surveillance Network. Wenn Sie die Blickwinkel für zusätzliche Sensoren berechnen möchten, können Sie am unteren Rand des Menüs eine CSV-Datei exportieren. Die CSV-Datei enthält Blickwinkel für alle Sensoren. <br><br> Durch Klicken auf eine Zeile in der Tabelle wird der Sensor ausgewählt und die Simulationszeit auf die Zeit des Blickwinkels geändert."
+      "table": {
+        "time": "Zeit",
+        "el": "El.",
+        "az": "Az.",
+        "rng": "Entf.",
+        "sensor": "Sensor",
+        "visible": "Sichtbar"
+      },
+      "msgs": {
+        "notVisible": "Der Satellit ist in den nächsten {hours} Stunden nicht sichtbar.",
+        "yes": "Ja",
+        "no": "Nein",
+        "na": "k. A."
+      },
+      "help": {
+        "overview": "Multi-Standort-Blickwinkel beantwortet eine Netzwerkfrage: Welcher meiner Sensoren sieht den ausgewählten Satelliten, und wann? Es berechnet Blickwinkel über viele Standorte gleichzeitig und verschachtelt sie zu einer einzigen chronologischen Tabelle.",
+        "imgAlt": "Die Multi-Standort-Blickwinkel-Tabelle mit Sensoren und Zielführungsdaten",
+        "imgCaption": "Jede Zeile verknüpft einen Überflugmoment mit dem Sensor, der ihn sieht.",
+        "readingHeading": "Die Tabelle lesen",
+        "reading": "Die Zeilen sind über alle aktivierten Standorte chronologisch sortiert; jede zeigt <strong>Zeit</strong>, Elevation (<strong>El.</strong>), Azimut (<strong>Az.</strong>), Entfernung (<strong>Entf.</strong>), den beteiligten <strong>Sensor</strong> und die optische Sichtbarkeit. Das Sensor-Umschaltfeld bestimmt, welche Standorte berechnet werden: Grüne Sensoren sind einbezogen, rote ausgeschlossen.",
+        "howToUse": "<ol><li>Wählen Sie einen Satelliten aus; das untere Symbol bleibt deaktiviert, bis einer ausgewählt ist. Eine Sensorauswahl ist nicht nötig.</li><li>Öffnen Sie <strong>Multi-Standort-Blickwinkel</strong> über die untere Leiste. Das Standard-Raketenwarnnetzwerk wird automatisch berechnet.</li><li>Schalten Sie Sensoren im Sensorlisten-Panel ein oder aus, um das Netzwerk zu ändern.</li><li>Klicken Sie auf eine Zeile, um diesen Sensor auszuwählen und die Uhr auf diesen Moment zu springen, oder exportieren Sie die Tabelle über die Download-Schaltfläche.</li></ol>",
+        "tip1": "Nutzen Sie es zur Planung von Übergaben: Wo die Abdeckung eines Sensors endet, zeigt die nächste Zeile, welcher Standort den Satelliten übernimmt.",
+        "tip2": "Optische Standorte zeigen die Sichtbarkeit nur, wenn die Lichtverhältnisse eine tatsächliche Beobachtung zulassen; Radare zeigen immer k. A."
+      }
     }
   }
 }

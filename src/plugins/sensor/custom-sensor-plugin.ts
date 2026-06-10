@@ -1,4 +1,5 @@
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { UiGeolocation } from '@app/app/ui/ui-manager-geolocation';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { MenuMode } from '@app/engine/core/interfaces';
@@ -238,6 +239,35 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     minWidth: 350,
     isDraggable: true,
   };
+
+
+  getHelpConfig(): IHelpConfig {
+    const t = (key: string): string => CustomSensorPlugin.t_(key);
+
+    return {
+      title: CustomSensorPlugin.t_('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t('help.overview'),
+          image: {
+            src: 'img/help/custom-sensor/custom-sensor-menu.png',
+            alt: t('help.imgAlt'),
+            caption: t('help.imgCaption'),
+          },
+        },
+        {
+          heading: t('help.fieldsHeading'),
+          content: t('help.fields'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t('help.howToUse'),
+        },
+      ],
+      tips: [t('help.tip1'), t('help.tip2')],
+    };
+  }
 
   addHtml(): void {
     super.addHtml();

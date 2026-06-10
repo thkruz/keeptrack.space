@@ -175,8 +175,32 @@ export class StereoMap extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.StereoMap.title' as Parameters<typeof t7e>[0]) ?? 'Stereographic Map Menu',
-      body: t7e('plugins.StereoMap.helpBody' as Parameters<typeof t7e>[0]) ?? '',
+      title: t7e('plugins.StereoMap.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.StereoMap.help.overview'),
+          image: {
+            src: 'img/help/stereo-map/stereo-map-menu.png',
+            alt: t7e('plugins.StereoMap.help.imgAlt'),
+            caption: t7e('plugins.StereoMap.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.StereoMap.help.readingTheMapHeading'),
+          content: t7e('plugins.StereoMap.help.readingTheMap'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.StereoMap.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.StereoMap.help.tip1'),
+        t7e('plugins.StereoMap.help.tip2'),
+        t7e('plugins.StereoMap.help.tip3'),
+      ],
+      shortcuts: [{ keys: ['M'], description: t7e('plugins.StereoMap.help.shortcutToggle') }],
     };
   }
 
@@ -193,14 +217,14 @@ export class StereoMap extends KeepTrackPlugin {
     return [
       {
         id: 'StereoMap.toggle',
-        label: 'Toggle Stereo Map',
+        label: t7e('plugins.StereoMap.commands.toggle' as Parameters<typeof t7e>[0]),
         category: 'Display',
         shortcutHint: 'M',
         callback: () => this.bottomMenuClicked(),
       },
       {
         id: 'StereoMap.export',
-        label: 'Export Stereo Map',
+        label: t7e('plugins.StereoMap.commands.export' as Parameters<typeof t7e>[0]),
         category: 'Export',
         callback: () => this.onDownload(),
         isAvailable: () => this.isMenuButtonActive,

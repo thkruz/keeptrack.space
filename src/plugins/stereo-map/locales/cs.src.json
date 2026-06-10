@@ -3,7 +3,22 @@
     "StereoMap": {
       "bottomIconLabel": "Stereografická mapa",
       "title": "Menu stereografické mapy",
-      "helpBody": "Menu stereografické mapy slouží k vizualizaci pozemních stop satelitů ve stereografické projekci. <br/><br/> Kliknutím na místo podél pozemní stopy změníte čas simulace na okamžik, kdy satelit dosáhne daného místa. <br/><br/> Žluté body označují, kdy je satelit v zorném poli senzoru. Červené body označují, kdy satelit není v zorném poli senzoru. Bod nejblíže satelitu odpovídá aktuálnímu času.",
+      "help": {
+        "overview": "Stereografická mapa promítá pozemní stopu vybraného satelitu na plochou mapu Země. Zobrazuje, kde se satelit právě nachází, dráhu, kterou bude sledovat během nadcházející orbity, a pokud je vybrán senzor, také přesně kdy bude pro tento senzor viditelný. Mapa se automaticky aktualizuje s postupem času simulace.",
+        "imgAlt": "Stereografická mapa zobrazující pozemní stopu satelitu se zvýrazněnými viditelnými úseky",
+        "imgCaption": "Pozemní stopa satelitu. Ikona satelitu označuje aktuální pozici; ikony radarů označují vybrané senzory.",
+        "readingTheMapHeading": "Čtení mapy",
+        "readingTheMap": "<ul><li><strong>Ikona satelitu</strong>: aktuální pozice satelitu. Pohybuje se s postupem času.</li><li><strong>Žlutá stopa a body</strong>: části orbity, kde se satelit nachází v zorném poli vybraného senzoru.</li><li><strong>Červená stopa a body</strong>: části orbity, kde satelit nevidí žádný vybraný senzor. Bez vybraného senzoru je celá stopa červená.</li><li><strong>Ikony radarů</strong>: pozemní umístění aktuálně vybraných senzorů.</li></ul>",
+        "howToUse": "<ol><li>Vyberte satelit, například vyhledejte \"ISS\" a klikněte na výsledek.</li><li>Volitelně vyberte senzor z menu Senzory, aby se okna viditelnosti zobrazila žlutě.</li><li>Otevřete stereografickou mapu ze spodního menu (ikona je neaktivní, dokud není vybrán satelit).</li><li>Kliknutím na libovolný bod podél pozemní stopy přesunete čas simulace na okamžik, kdy satelit tohoto bodu dosáhne.</li><li>Pomocí tlačítka stažení uložíte aktuální mapu jako obrázek PNG.</li></ol>",
+        "tip1": "Kliknutím na žlutý bod přeskočíte přímo na nadcházející přelet nad senzorem a poté můžete přelet sledovat na 3D glóbu.",
+        "tip2": "Mapa se překresluje přibližně každých 30 sekund; výběr nového satelitu nebo kliknutí na bod ji obnoví okamžitě.",
+        "tip3": "Mapa je dostupná také z palety příkazů: \"Přepnout stereografickou mapu\" a \"Exportovat stereografickou mapu\".",
+        "shortcutToggle": "Přepnout stereografickou mapu"
+      },
+      "commands": {
+        "toggle": "Přepnout stereografickou mapu",
+        "export": "Exportovat stereografickou mapu"
+      },
       "labels": {
         "orbitsToDisplay": "Počet orbit k zobrazení",
         "showGraticule": "Zobrazit síť souřadnic",

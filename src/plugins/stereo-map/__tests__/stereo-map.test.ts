@@ -83,7 +83,10 @@ describe('StereoMapPlugin_class', () => {
       const helpConfig = plugin.getHelpConfig();
 
       expect(helpConfig.title).toBeDefined();
-      expect(helpConfig.body).toBeDefined();
+      expect(helpConfig.sections!.length).toBeGreaterThanOrEqual(3);
+      expect(helpConfig.sections![0].image?.src).toContain('img/help/stereo-map/');
+      expect(helpConfig.tips!.length).toBeGreaterThan(0);
+      expect(helpConfig.shortcuts).toEqual([expect.objectContaining({ keys: ['M'] })]);
     });
 
     it('should return correct keyboard shortcuts', () => {

@@ -7,7 +7,7 @@ import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
 
-// jsdom has no canvas 2D context — stub the calls the plugin makes on init.
+// jsdom has no canvas 2D context - stub the calls the plugin makes on init.
 HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   drawImage: vi.fn(), clearRect: vi.fn(), fillRect: vi.fn(), fillText: vi.fn(),
   measureText: vi.fn(() => ({ width: 0 })), beginPath: vi.fn(), moveTo: vi.fn(),

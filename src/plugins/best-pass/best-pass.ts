@@ -83,8 +83,28 @@ export class BestPassPlugin extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.BestPassPlugin.title' as Parameters<typeof t7e>[0]),
-      body: t7e('plugins.BestPassPlugin.helpBody' as Parameters<typeof t7e>[0]),
+      title: t7e('plugins.BestPassPlugin.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.BestPassPlugin.help.overview'),
+          image: {
+            src: 'img/help/best-pass/best-pass-menu.png',
+            alt: t7e('plugins.BestPassPlugin.help.imgAlt'),
+            caption: t7e('plugins.BestPassPlugin.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.BestPassPlugin.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.BestPassPlugin.help.tip1'),
+        t7e('plugins.BestPassPlugin.help.tip2'),
+        t7e('plugins.BestPassPlugin.help.tip3'),
+      ],
+      shortcuts: [{ keys: ['B'], description: t7e('plugins.BestPassPlugin.help.shortcutToggle') }],
     };
   }
 

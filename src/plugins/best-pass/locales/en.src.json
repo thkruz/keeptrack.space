@@ -3,13 +3,22 @@
     "BestPassPlugin": {
       "bottomIconLabel": "Best Passes",
       "title": "Best Pass Times",
-      "helpBody": "The Best Pass Times plugin calculates optimal pass times for satellites based on the currently selected sensor. Passes are scored based on duration, maximum elevation, minimum range, and sun position. Results are exported as CSV.",
       "satelliteNumbersLabel": "Satellite Numbers",
       "generateButton": "Generate Best Pass Times",
       "selectSensorFirst": "Select Sensor First!",
       "errorMsgs": {
         "SensorRequired": "You must select a sensor first!",
         "SensorFormatError": "Sensor's format incorrect. Did you select a sensor first?"
+      },
+      "help": {
+        "overview": "Best Pass Times scores every upcoming pass of the satellites you list over the currently selected sensor and saves the results as a spreadsheet. The score rewards long duration, high maximum elevation, short range, and favorable sun position, so the best observation opportunities rise to the top.",
+        "imgAlt": "The Best Pass Times menu with a satellite number list",
+        "imgCaption": "List satellite numbers, then generate a ranked spreadsheet of passes.",
+        "howToUse": "<ol><li>Select a sensor first; the bottom icon is disabled and the button reads <strong>Select Sensor First!</strong> until you do.</li><li>Open <strong>Best Passes</strong> from the bottom menu or press <strong>B</strong>.</li><li>Enter the satellites to evaluate in <strong>Satellite Numbers</strong>, separated by commas or spaces (for example 25544, 20580).</li><li>Click <strong>Generate Best Pass Times</strong>. A spreadsheet file downloads with one row per pass, including start and stop dates, times, and the pass geometry.</li></ol>",
+        "tip1": "Alpha-5 designators such as T0001 work as well as plain catalog numbers.",
+        "tip2": "Numbers that do not match a catalog object are skipped silently, so double check the list if the spreadsheet has fewer satellites than expected.",
+        "tip3": "Results are sorted chronologically, so scan the elevation and duration columns to find the strongest passes.",
+        "shortcutToggle": "Toggle the Best Pass Times menu"
       }
     }
   }

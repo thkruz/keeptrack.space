@@ -3,13 +3,22 @@
     "BestPassPlugin": {
       "bottomIconLabel": "Najlepsze przeloty",
       "title": "Czasy najlepszych przelotów",
-      "helpBody": "Wtyczka czasów najlepszych przelotów oblicza optymalne czasy przelotów satelitów na podstawie aktualnie wybranego czujnika. Przeloty są oceniane na podstawie czasu trwania, maksymalnej elewacji, minimalnego zasięgu i pozycji Słońca. Wyniki są eksportowane jako CSV.",
       "satelliteNumbersLabel": "Numery satelitów",
       "generateButton": "Generuj czasy najlepszych przelotów",
       "selectSensorFirst": "Najpierw wybierz czujnik!",
       "errorMsgs": {
         "SensorRequired": "Najpierw musisz wybrać czujnik!",
         "SensorFormatError": "Nieprawidłowy format czujnika. Czy najpierw wybrałeś czujnik?"
+      },
+      "help": {
+        "overview": "Czasy najlepszych przelotów oceniają każdy nadchodzący przelot wymienionych satelitów nad aktualnie wybranym czujnikiem i zapisują wyniki jako arkusz kalkulacyjny. Ocena premiuje długi czas trwania, wysoką maksymalną elewację, krótki zasięg i korzystną pozycję Słońca, dzięki czemu najlepsze okazje obserwacyjne trafiają na górę.",
+        "imgAlt": "Menu czasów najlepszych przelotów z listą numerów satelitów",
+        "imgCaption": "Wypisz numery satelitów, a następnie wygeneruj arkusz z uszeregowanymi przelotami.",
+        "howToUse": "<ol><li>Najpierw wybierz czujnik; do tego czasu dolna ikona jest nieaktywna, a przycisk pokazuje <strong>Najpierw wybierz czujnik!</strong>.</li><li>Otwórz <strong>Najlepsze przeloty</strong> z dolnego menu lub naciśnij <strong>B</strong>.</li><li>Wpisz satelity do oceny w polu <strong>Numery satelitów</strong>, rozdzielając je przecinkami lub spacjami (na przykład 25544, 20580).</li><li>Kliknij <strong>Generuj czasy najlepszych przelotów</strong>. Pobrany zostanie plik arkusza z jednym wierszem na przelot, zawierającym daty i godziny rozpoczęcia i zakończenia oraz geometrię przelotu.</li></ol>",
+        "tip1": "Oznaczenia Alpha-5, takie jak T0001, działają tak samo jak zwykłe numery katalogowe.",
+        "tip2": "Numery, które nie pasują do żadnego obiektu w katalogu, są pomijane bez ostrzeżenia, więc sprawdź listę, jeśli arkusz zawiera mniej satelitów niż oczekiwano.",
+        "tip3": "Wyniki są posortowane chronologicznie, więc przejrzyj kolumny elewacji i czasu trwania, aby znaleźć najlepsze przeloty.",
+        "shortcutToggle": "Przełącz menu czasów najlepszych przelotów"
       }
     }
   }

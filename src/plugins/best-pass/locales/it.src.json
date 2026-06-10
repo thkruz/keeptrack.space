@@ -3,13 +3,22 @@
     "BestPassPlugin": {
       "bottomIconLabel": "Migliori passaggi",
       "title": "Orari migliori passaggi",
-      "helpBody": "Il plugin Migliori passaggi calcola gli orari di passaggio ottimali per i satelliti in base al sensore attualmente selezionato. I passaggi vengono valutati in base alla durata, all'elevazione massima, alla distanza minima e alla posizione del sole. I risultati vengono esportati come CSV.",
       "satelliteNumbersLabel": "Numeri satellite",
       "generateButton": "Genera orari migliori passaggi",
       "selectSensorFirst": "Seleziona prima un sensore!",
       "errorMsgs": {
         "SensorRequired": "Devi prima selezionare un sensore!",
         "SensorFormatError": "Formato del sensore non corretto. Hai selezionato un sensore?"
+      },
+      "help": {
+        "overview": "Orari migliori passaggi assegna un punteggio a ogni passaggio imminente dei satelliti elencati sopra il sensore attualmente selezionato e salva i risultati in un foglio di calcolo. Il punteggio premia la lunga durata, l'elevazione massima alta, la distanza ridotta e una posizione del sole favorevole, così le migliori opportunità di osservazione emergono in cima.",
+        "imgAlt": "Il menu Orari migliori passaggi con un elenco di numeri di satellite",
+        "imgCaption": "Elenca i numeri dei satelliti, poi genera un foglio di calcolo dei passaggi classificati.",
+        "howToUse": "<ol><li>Seleziona prima un sensore; finché non lo fai, l'icona in basso è disabilitata e il pulsante mostra <strong>Seleziona prima un sensore!</strong>.</li><li>Apri <strong>Migliori passaggi</strong> dal menu inferiore o premi <strong>B</strong>.</li><li>Inserisci i satelliti da valutare in <strong>Numeri satellite</strong>, separati da virgole o spazi (ad esempio 25544, 20580).</li><li>Fai clic su <strong>Genera orari migliori passaggi</strong>. Viene scaricato un foglio di calcolo con una riga per passaggio, comprese le date e gli orari di inizio e fine e la geometria del passaggio.</li></ol>",
+        "tip1": "I designatori Alpha-5 come T0001 funzionano come i normali numeri di catalogo.",
+        "tip2": "I numeri che non corrispondono a un oggetto del catalogo vengono ignorati silenziosamente, quindi ricontrolla l'elenco se il foglio di calcolo contiene meno satelliti del previsto.",
+        "tip3": "I risultati sono ordinati cronologicamente, quindi scorri le colonne di elevazione e durata per individuare i passaggi più favorevoli.",
+        "shortcutToggle": "Mostra o nascondi il menu Orari migliori passaggi"
       }
     }
   }

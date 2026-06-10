@@ -3,13 +3,22 @@
     "BestPassPlugin": {
       "bottomIconLabel": "Beste Überflüge",
       "title": "Beste Überflugzeiten",
-      "helpBody": "Das Plugin Beste Überflugzeiten berechnet optimale Überflugzeiten für Satelliten basierend auf dem aktuell ausgewählten Sensor. Überflüge werden nach Dauer, maximaler Elevation, minimaler Entfernung und Sonnenposition bewertet. Ergebnisse werden als CSV exportiert.",
       "satelliteNumbersLabel": "Satellitennummern",
       "generateButton": "Beste Überflugzeiten berechnen",
       "selectSensorFirst": "Sensor zuerst auswählen!",
       "errorMsgs": {
         "SensorRequired": "Sie müssen zuerst einen Sensor auswählen!",
         "SensorFormatError": "Sensorformat falsch. Haben Sie einen Sensor ausgewählt?"
+      },
+      "help": {
+        "overview": "Beste Überflugzeiten bewertet jeden bevorstehenden Überflug der von Ihnen aufgelisteten Satelliten über den aktuell ausgewählten Sensor und speichert die Ergebnisse als Tabelle. Die Bewertung belohnt lange Dauer, hohe maximale Elevation, kurze Entfernung und eine günstige Sonnenposition, sodass die besten Beobachtungsgelegenheiten ganz oben landen.",
+        "imgAlt": "Das Menü Beste Überflugzeiten mit einer Liste von Satellitennummern",
+        "imgCaption": "Listen Sie Satellitennummern auf und erzeugen Sie dann eine bewertete Tabelle der Überflüge.",
+        "howToUse": "<ol><li>Wählen Sie zuerst einen Sensor aus; bis dahin ist das untere Symbol deaktiviert und die Schaltfläche zeigt <strong>Sensor zuerst auswählen!</strong>.</li><li>Öffnen Sie <strong>Beste Überflüge</strong> über das untere Menü oder drücken Sie <strong>B</strong>.</li><li>Geben Sie die auszuwertenden Satelliten unter <strong>Satellitennummern</strong> ein, getrennt durch Kommas oder Leerzeichen (zum Beispiel 25544, 20580).</li><li>Klicken Sie auf <strong>Beste Überflugzeiten berechnen</strong>. Eine Tabellendatei wird heruntergeladen, mit einer Zeile pro Überflug einschließlich Start- und Enddatum, Uhrzeiten und der Überfluggeometrie.</li></ol>",
+        "tip1": "Alpha-5-Bezeichnungen wie T0001 funktionieren genauso wie einfache Katalognummern.",
+        "tip2": "Nummern, die keinem Katalogobjekt entsprechen, werden stillschweigend übersprungen; prüfen Sie also die Liste, wenn die Tabelle weniger Satelliten enthält als erwartet.",
+        "tip3": "Die Ergebnisse sind chronologisch sortiert; durchsuchen Sie daher die Spalten für Elevation und Dauer, um die stärksten Überflüge zu finden.",
+        "shortcutToggle": "Das Menü Beste Überflugzeiten ein- oder ausblenden"
       }
     }
   }

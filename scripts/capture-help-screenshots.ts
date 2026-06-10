@@ -172,7 +172,7 @@ const RECIPES: CaptureRecipe[] = [
     steps: async (page) => {
       await openPluginMenu(page, 'menu-watchlist');
       await page.locator('#watchlist-menu').waitFor({ state: 'visible', timeout: 10_000 });
-      await page.locator('#watchlist-new').fill('25544, 20580, 25338, 28654');
+      await page.locator('#watchlist-new-sat, #watchlist-new').first().fill('25544, 20580, 25338, 28654');
       await page.evaluate('document.getElementById(\'watchlist-add\')?.click()');
       await page.waitForTimeout(2_000);
     },
@@ -276,7 +276,7 @@ const RECIPES: CaptureRecipe[] = [
       await selectSensor(page, 'EGLAFB');
       await openPluginMenu(page, 'menu-watchlist');
       await page.locator('#watchlist-menu').waitFor({ state: 'visible', timeout: 10_000 });
-      await page.locator('#watchlist-new').fill('25544, 20580, 25338, 28654');
+      await page.locator('#watchlist-new-sat, #watchlist-new').first().fill('25544, 20580, 25338, 28654');
       await page.evaluate('document.getElementById(\'watchlist-add\')?.click()');
       await page.waitForTimeout(2_000);
       await openPluginMenu(page, 'satellite-timeline-bottom-icon');
@@ -702,6 +702,237 @@ const RECIPES: CaptureRecipe[] = [
       await page.waitForTimeout(8_000);
     },
     shots: [{ name: 'multi-site-look-angles-menu', selector: '#multi-site-look-angles-menu' }],
+  },
+  {
+    id: 'eclipse-solar-analysis',
+    plugins: { EclipseSolarAnalysis: { enabled: true } },
+    steps: async (page) => {
+      await selectSatellite(page, 'ISS (ZARYA)');
+      await openPluginMenu(page, 'eclipse-analysis-bottom-icon');
+      await page.locator('#eclipse-solar-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.evaluate('document.getElementById(\'sat-infobox\')?.style.setProperty(\'display\', \'none\')');
+      await page.waitForTimeout(3_000);
+    },
+    shots: [{ name: 'eclipse-solar-analysis-menu', selector: '#eclipse-solar-menu' }],
+  },
+  {
+    id: 'initial-orbit',
+    plugins: { InitialOrbitDeterminationPlugin: { enabled: true } },
+    steps: async (page) => {
+      await openPluginMenu(page, 'initial-od-bottom-icon');
+      await page.locator('#initial-od-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.waitForTimeout(500);
+    },
+    shots: [{ name: 'initial-orbit-menu', selector: '#initial-od-menu' }],
+  },
+  {
+    id: 'maneuver',
+    plugins: { ManeuverPlugin: { enabled: true } },
+    steps: async (page) => {
+      await openPluginMenu(page, 'maneuver-bottom-icon');
+      await page.locator('#maneuver-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.waitForTimeout(500);
+    },
+    shots: [{ name: 'maneuver-menu', selector: '#maneuver-menu' }],
+  },
+  {
+    id: 'link-budget',
+    plugins: { LinkBudgetPlugin: { enabled: true }, SensorListPlugin: { enabled: true } },
+    steps: async (page) => {
+      await selectSensor(page, 'EGLAFB');
+      await selectSatellite(page, 'ISS (ZARYA)');
+      await openPluginMenu(page, 'link-budget-bottom-icon');
+      await page.locator('#link-budget-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.evaluate('document.getElementById(\'link-calc-btn\')?.click()');
+      await page.evaluate('document.getElementById(\'sat-infobox\')?.style.setProperty(\'display\', \'none\')');
+      await page.waitForTimeout(2_000);
+    },
+    shots: [{ name: 'link-budget-menu', selector: '#link-budget-menu' }],
+  },
+  {
+    id: 'neighborhood-watch',
+    plugins: { NeighborhoodWatch: { enabled: true } },
+    steps: async (page) => {
+      await openPluginMenu(page, 'neighborhood-watch-icon');
+      await page.locator('#neighborhood-watch-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.waitForTimeout(500);
+    },
+    shots: [{ name: 'neighborhood-watch-menu', selector: '#neighborhood-watch-menu' }],
+  },
+  {
+    id: 'neighborhood-history',
+    plugins: { NeighborhoodHistoryPlugin: { enabled: true } },
+    steps: async (page) => {
+      await openPluginMenu(page, 'neighborhood-history-icon');
+      await page.locator('#neighborhood-history-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.waitForTimeout(500);
+    },
+    shots: [{ name: 'neighborhood-history-menu', selector: '#neighborhood-history-menu' }],
+  },
+  {
+    id: 'overflight',
+    plugins: { OverflightPlugin: { enabled: true }, WatchlistPlugin: { enabled: true } },
+    steps: async (page) => {
+      await openPluginMenu(page, 'menu-watchlist');
+      await page.locator('#watchlist-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.locator('#watchlist-new-sat, #watchlist-new').first().fill('25544, 20580');
+      await page.evaluate('document.getElementById(\'watchlist-add\')?.click()');
+      await page.waitForTimeout(2_000);
+      await openPluginMenu(page, 'overflight-icon');
+      await page.locator('#overflight-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.waitForTimeout(500);
+    },
+    shots: [{ name: 'overflight-menu', selector: '#overflight-menu' }],
+  },
+  {
+    id: 'toca-poca',
+    plugins: { TocaPocaPlugin: { enabled: true } },
+    steps: async (page) => {
+      await openPluginMenu(page, 'menu-satellite-selection');
+      await page.locator('#TocaPocaPlugin-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.waitForTimeout(500);
+    },
+    shots: [{ name: 'toca-poca-menu', selector: '#TocaPocaPlugin-menu' }],
+  },
+  {
+    id: 'oem-reader',
+    plugins: { OemReaderPlugin: { enabled: true } },
+    steps: async (page) => {
+      await openPluginMenu(page, 'oem-reader-bottom-icon');
+      await page.locator('#oem-reader-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.waitForTimeout(500);
+    },
+    shots: [{ name: 'oem-reader-menu', selector: '#oem-reader-menu' }],
+  },
+  {
+    id: 'observation-reader',
+    plugins: { ObservationReaderPlugin: { enabled: true } },
+    steps: async (page) => {
+      await openPluginMenu(page, 'observation-reader-bottom-icon');
+      await page.locator('#observation-reader-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.waitForTimeout(500);
+    },
+    shots: [{ name: 'observation-reader-menu', selector: '#observation-reader-menu' }],
+  },
+  {
+    id: 'historic-catalog',
+    plugins: { HistoricCatalogPlugin: { enabled: true } },
+    steps: async (page) => {
+      await openPluginMenu(page, 'menu-historic-catalog');
+      await page.locator('#historic-catalog-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.waitForTimeout(500);
+    },
+    shots: [{ name: 'historic-catalog-menu', selector: '#historic-catalog-menu' }],
+  },
+  {
+    id: 'optical-simulation',
+    plugins: { OpticalSimulation: { enabled: true }, SensorListPlugin: { enabled: true } },
+    steps: async (page) => {
+      await selectSensor(page, 'GEODDSSOC');
+      await selectSatellite(page, 'NAVSTAR');
+      await openPluginMenu(page, 'menu-optical-sim');
+      await page.locator('#optical-sim-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.evaluate('document.getElementById(\'sat-infobox\')?.style.setProperty(\'display\', \'none\')');
+      await page.waitForTimeout(1_000);
+    },
+    shots: [{ name: 'optical-simulation-menu', selector: '#optical-sim-menu' }],
+  },
+  {
+    id: 'seismic-activity',
+    plugins: { SeismicActivityPlugin: { enabled: true } },
+    steps: async (page) => {
+      await openPluginMenu(page, 'menu-seismic-activity');
+      await page.locator('#SeismicActivityPlugin-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      // USGS feed fetch
+      await page.waitForTimeout(8_000);
+    },
+    shots: [{ name: 'seismic-activity-menu', selector: '#SeismicActivityPlugin-menu' }],
+  },
+  {
+    id: 'deep-space-missions-menu',
+    plugins: { DeepSpaceMissionsPlugin: { enabled: true } },
+    steps: async (page) => {
+      await openPluginMenu(page, 'menu-deep-space-missions');
+      await page.locator('#deep-space-missions-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.waitForTimeout(500);
+    },
+    shots: [{ name: 'deep-space-missions-menu', selector: '#deep-space-missions-menu' }],
+  },
+  {
+    id: 'aurora',
+    plugins: { AuroraPlugin: { enabled: true } },
+    steps: async (page) => {
+      await openPluginMenu(page, 'menu-aurora');
+      await page.locator('#AuroraPlugin-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      // NOAA OVATION fetch
+      await page.evaluate('document.getElementById(\'aurora-fetch-btn\')?.click()');
+      await page.waitForTimeout(8_000);
+    },
+    shots: [{ name: 'aurora-menu', selector: '#AuroraPlugin-menu' }],
+  },
+  {
+    id: 'natural-events',
+    plugins: { NaturalEventsPlugin: { enabled: true } },
+    steps: async (page) => {
+      await openPluginMenu(page, 'menu-natural-events');
+      await page.locator('#NaturalEventsPlugin-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      // EONET feed fetch
+      await page.waitForTimeout(8_000);
+    },
+    shots: [{ name: 'natural-events-menu', selector: '#NaturalEventsPlugin-menu' }],
+  },
+  {
+    id: 'scenario-management-pro',
+    plugins: {
+      ScenarioManagementPlugin: { enabled: true },
+      ScenarioManagementMenu: { enabled: true },
+    },
+    steps: async (page) => {
+      await openPluginMenu(page, 'scenario-management-icon');
+      await page.locator('#scenario-management-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.waitForTimeout(500);
+    },
+    shots: [{ name: 'scenario-management-pro-menu', selector: '#scenario-management-menu' }],
+  },
+  {
+    id: 'symbology',
+    plugins: { SymbologyPlugin: { enabled: true } },
+    steps: async (page) => {
+      await openPluginMenu(page, 'symbology-icon');
+      await page.locator('#symbology-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.waitForTimeout(500);
+    },
+    shots: [{ name: 'symbology-menu', selector: '#symbology-menu' }],
+  },
+  {
+    id: 'color-scheme-editor',
+    plugins: { ColorSchemeEditorPlugin: { enabled: true } },
+    steps: async (page) => {
+      await openPluginMenu(page, 'color-scheme-editor-icon');
+      await page.locator('#color-scheme-editor-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.waitForTimeout(1_000);
+    },
+    shots: [{ name: 'color-scheme-editor-menu', selector: '#color-scheme-editor-menu' }],
+  },
+  {
+    id: 'companion-link',
+    plugins: { CompanionLinkPlugin: { enabled: true } },
+    steps: async (page) => {
+      await openPluginMenu(page, 'menu-companion-link');
+      await page.locator('#companion-link-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.waitForTimeout(1_000);
+    },
+    shots: [{ name: 'companion-link-menu', selector: '#companion-link-menu' }],
+  },
+  {
+    id: 'graphics-menu',
+    plugins: { GraphicsMenuPlugin: { enabled: true } },
+    steps: async (page) => {
+      await openPluginMenu(page, 'graphics-menu-bottom-icon');
+      await page.locator('#graphics-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.waitForTimeout(500);
+    },
+    shots: [{ name: 'graphics-menu', selector: '#graphics-menu' }],
   },
   {
     id: 'edit-sat',

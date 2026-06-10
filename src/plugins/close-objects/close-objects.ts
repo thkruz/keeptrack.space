@@ -79,8 +79,30 @@ export class CloseObjectsPlugin extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.CloseObjectsPlugin.title' as Parameters<typeof t7e>[0]),
-      body: t7e('plugins.CloseObjectsPlugin.helpBody' as Parameters<typeof t7e>[0]),
+      title: t7e('plugins.CloseObjectsPlugin.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.CloseObjectsPlugin.help.overview'),
+          image: {
+            src: 'img/help/close-objects/close-objects-menu.png',
+            alt: t7e('plugins.CloseObjectsPlugin.help.imgAlt'),
+            caption: t7e('plugins.CloseObjectsPlugin.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.CloseObjectsPlugin.help.methodHeading'),
+          content: t7e('plugins.CloseObjectsPlugin.help.method'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.CloseObjectsPlugin.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.CloseObjectsPlugin.help.tip1'),
+        t7e('plugins.CloseObjectsPlugin.help.tip2'),
+      ],
     };
   }
 

@@ -3,8 +3,17 @@
     "CloseObjectsPlugin": {
       "bottomIconLabel": "Close Objects",
       "title": "Close Objects Search",
-      "helpBody": "The Close Objects Search finds satellites and debris within close proximity to each other. It uses a two-phase spatial search algorithm to identify objects within 50km of each other, first checking current positions, then verifying with projected positions 30 minutes later.",
-      "findBtn": "Find Close Objects"
+      "findBtn": "Find Close Objects",
+      "help": {
+        "overview": "Close Objects Search sweeps the entire catalog for pairs of objects flying within 50 km of each other right now. It is a quick way to spot co-orbiting payloads, recent breakups, and crowded neighborhoods without running a full conjunction screening.",
+        "imgAlt": "The Close Objects Search menu with its find button",
+        "imgCaption": "One click sweeps the whole catalog for objects within 50 km of each other.",
+        "methodHeading": "How It Works",
+        "method": "The search runs in two phases. First, a fast bounding box pass compares every object's current position to find candidate pairs within the search radius. Then each candidate pair is re-propagated 30 minutes into the future: pairs that are still close are confirmed, which filters out objects that merely crossed paths for a moment.",
+        "howToUse": "<ol><li>Open <strong>Close Objects</strong> from the bottom menu.</li><li>Click <strong>Find Close Objects</strong>. The sweep takes a few seconds on the full catalog.</li><li>The confirmed pairs are loaded into the search bar, so every close object is highlighted and listed in the search results.</li><li>Click any result to inspect an object, or use other menus (like Debris Screening) to analyze a specific pair in depth.</li></ol>",
+        "tip1": "Pairs are confirmed only if they remain within range 30 minutes later, so formation flyers and rendezvous pairs show up while brief crossings are filtered out.",
+        "tip2": "The results replace the current search; copy the search text first if you need to keep an existing list."
+      }
     }
   }
 }

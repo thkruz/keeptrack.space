@@ -2,9 +2,18 @@
   "plugins": {
     "CloseObjectsPlugin": {
       "bottomIconLabel": "Objetos cercanos",
-      "title": "B\u00fasqueda de objetos cercanos",
-      "helpBody": "La búsqueda de objetos cercanos encuentra satélites y escombros en proximidad cercana entre sí. Utiliza un algoritmo de búsqueda espacial de dos fases para identificar objetos dentro de 50 km entre sí, verificando primero las posiciones actuales y luego confirmando con posiciones proyectadas 30 minutos después.",
-      "findBtn": "Buscar objetos cercanos"
+      "title": "Búsqueda de objetos cercanos",
+      "findBtn": "Buscar objetos cercanos",
+      "help": {
+        "overview": "La búsqueda de objetos cercanos recorre todo el catálogo en busca de pares de objetos que vuelan a menos de 50 km entre sí en este momento. Es una forma rápida de detectar cargas útiles coorbitantes, fragmentaciones recientes y zonas congestionadas sin ejecutar un análisis de conjunciones completo.",
+        "imgAlt": "El menú de búsqueda de objetos cercanos con su botón de búsqueda",
+        "imgCaption": "Un solo clic recorre todo el catálogo en busca de objetos a menos de 50 km entre sí.",
+        "methodHeading": "Cómo funciona",
+        "method": "La búsqueda se ejecuta en dos fases. Primero, una pasada rápida con cajas delimitadoras compara la posición actual de cada objeto para encontrar pares candidatos dentro del radio de búsqueda. Luego, cada par candidato se vuelve a propagar 30 minutos hacia el futuro: los pares que siguen estando cerca se confirman, lo que filtra los objetos que solo se cruzaron por un instante.",
+        "howToUse": "<ol><li>Abra <strong>Objetos cercanos</strong> desde el menú inferior.</li><li>Haga clic en <strong>Buscar objetos cercanos</strong>. El barrido del catálogo completo tarda unos segundos.</li><li>Los pares confirmados se cargan en la barra de búsqueda, de modo que cada objeto cercano queda resaltado y listado en los resultados de búsqueda.</li><li>Haga clic en cualquier resultado para inspeccionar un objeto, o use otros menús (como Detección de Escombros) para analizar un par concreto en profundidad.</li></ol>",
+        "tip1": "Los pares solo se confirman si permanecen dentro del alcance 30 minutos después, de modo que aparecen los vuelos en formación y los pares en encuentro, mientras que los cruces breves quedan filtrados.",
+        "tip2": "Los resultados reemplazan la búsqueda actual; copie primero el texto de búsqueda si necesita conservar una lista existente."
+      }
     }
   }
 }

@@ -3,8 +3,17 @@
     "CloseObjectsPlugin": {
       "bottomIconLabel": "Objets proches",
       "title": "Recherche d'objets proches",
-      "helpBody": "La recherche d'objets proches trouve les satellites et débris à proximité les uns des autres. Elle utilise un algorithme de recherche spatiale en deux phases pour identifier les objets à moins de 50 km les uns des autres, en vérifiant d'abord les positions actuelles, puis en confirmant avec les positions projetées 30 minutes plus tard.",
-      "findBtn": "Rechercher des objets proches"
+      "findBtn": "Rechercher des objets proches",
+      "help": {
+        "overview": "La recherche d'objets proches balaie l'ensemble du catalogue à la recherche de paires d'objets volant à moins de 50 km l'un de l'autre en ce moment même. C'est un moyen rapide de repérer les charges utiles co-orbitales, les fragmentations récentes et les zones encombrées sans lancer un filtrage complet des conjonctions.",
+        "imgAlt": "Le menu de recherche d'objets proches avec son bouton de recherche",
+        "imgCaption": "Un seul clic balaie tout le catalogue à la recherche d'objets à moins de 50 km les uns des autres.",
+        "methodHeading": "Fonctionnement",
+        "method": "La recherche s'exécute en deux phases. D'abord, une passe rapide par boîtes englobantes compare la position actuelle de chaque objet pour trouver les paires candidates dans le rayon de recherche. Ensuite, chaque paire candidate est repropagée 30 minutes dans le futur : les paires encore proches sont confirmées, ce qui élimine les objets qui n'ont fait que se croiser un instant.",
+        "howToUse": "<ol><li>Ouvrez <strong>Objets proches</strong> depuis le menu inférieur.</li><li>Cliquez sur <strong>Rechercher des objets proches</strong>. Le balayage du catalogue complet prend quelques secondes.</li><li>Les paires confirmées sont chargées dans la barre de recherche, de sorte que chaque objet proche est mis en surbrillance et listé dans les résultats de recherche.</li><li>Cliquez sur un résultat pour inspecter un objet, ou utilisez d'autres menus (comme la Détection de Débris) pour analyser une paire précise en détail.</li></ol>",
+        "tip1": "Les paires ne sont confirmées que si elles restent à portée 30 minutes plus tard ; les vols en formation et les paires en rendez-vous apparaissent donc, tandis que les croisements brefs sont filtrés.",
+        "tip2": "Les résultats remplacent la recherche en cours ; copiez d'abord le texte de recherche si vous devez conserver une liste existante."
+      }
     }
   }
 }

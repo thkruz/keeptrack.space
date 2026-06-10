@@ -26,10 +26,15 @@ import {
   eci2rae,
   rae2eci,
 } from '@ootk/src/main';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { t7e } from '@app/locales/keys';
 import calculatorPng from '@public/img/icons/calculator.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './calculator.css';
+
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.Calculator.${key}` as Parameters<typeof t7e>[0]);
 
 enum CoordFrame {
   J2000 = 'J2000',
@@ -58,14 +63,29 @@ interface FieldDef {
   isAngle?: boolean;
 }
 
-const COORD_FRAME_LABELS: Record<CoordFrame, string> = {
-  [CoordFrame.J2000]: 'J2000 (ECI)',
-  [CoordFrame.ITRF]: 'ITRF (ECEF)',
-  [CoordFrame.TEME]: 'TEME',
-  [CoordFrame.LLA]: 'Geodetic (LLA)',
-  [CoordFrame.RAE]: 'RAE (Topocentric)',
-  [CoordFrame.RADEC]: 'RA/Dec (Geocentric)',
-  [CoordFrame.CLASSICAL]: 'Classical Elements',
+/*
+ * Frame labels resolve lazily so t7e is not evaluated at module parse time,
+ * before localization has loaded.
+ */
+const coordFrameLabel = (frame: CoordFrame): string => {
+  switch (frame) {
+    case CoordFrame.J2000:
+      return 'J2000 (ECI)';
+    case CoordFrame.ITRF:
+      return 'ITRF (ECEF)';
+    case CoordFrame.TEME:
+      return 'TEME';
+    case CoordFrame.LLA:
+      return l('frames.geodeticLla');
+    case CoordFrame.RAE:
+      return l('frames.raeTopocentric');
+    case CoordFrame.RADEC:
+      return l('frames.raDecGeocentric');
+    case CoordFrame.CLASSICAL:
+      return l('frames.classicalElements');
+    default:
+      return frame;
+  }
 };
 
 const CARTESIAN_FRAMES: CoordFrame[] = [CoordFrame.J2000, CoordFrame.ITRF, CoordFrame.TEME];
@@ -85,6 +105,32 @@ export class Calculator extends KeepTrackPlugin {
     minWidth: 350,
   };
 
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/calculator/calculator-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: l('help.framesHeading'),
+          content: l('help.frames'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2'), l('help.tip3')],
+    };
+  }
+
   private currentInputFrame_: CoordFrame = CoordFrame.J2000;
   private outputFormat_: OutputFormat = OutputFormat.FIXED_4;
   private lastJ2000_: J2000 | null = null;
@@ -98,17 +144,17 @@ export class Calculator extends KeepTrackPlugin {
       <form id="calculator-form">
         <div class="row calc-control-row">
           <div class="input-field col s12">
-            <label for="calc-input-frame">Input Frame</label>
+            <label for="calc-input-frame">${l('labels.inputFrame')}</label>
             <select id="calc-input-frame" class="browser-default">
               ${Object.values(CoordFrame).map((f) =>
-    `<option value="${f}" ${f === CoordFrame.J2000 ? 'selected' : ''}>${COORD_FRAME_LABELS[f]}</option>`,
+    `<option value="${f}" ${f === CoordFrame.J2000 ? 'selected' : ''}>${coordFrameLabel(f)}</option>`,
   ).join('')}
             </select>
           </div>
         </div>
 
         <div class="center-align row" id="calc-load-sat-row">
-          <button id="calc-load-sat-btn" class="btn btn-ui waves-effect waves-light" type="button">Load Selected Satellite</button>
+          <button id="calc-load-sat-btn" class="btn btn-ui waves-effect waves-light" type="button">${l('labels.loadSelectedSatellite')}</button>
         </div>
 
         <div id="calc-input-fields"></div>
@@ -117,7 +163,7 @@ export class Calculator extends KeepTrackPlugin {
           <div class="col s12">
             <label>
               <input type="checkbox" id="calc-show-velocity" />
-              <span>Include Velocity</span>
+              <span>${l('labels.includeVelocity')}</span>
             </label>
           </div>
         </div>
@@ -125,19 +171,19 @@ export class Calculator extends KeepTrackPlugin {
         <div id="calc-velocity-fields" style="display:none;"></div>
 
         <div class="center-align row" style="margin: 1rem 0rem 0rem 0rem;">
-          <button id="calc-convert-btn" class="btn btn-ui waves-effect waves-light" type="submit">Convert &#9658;</button>
+          <button id="calc-convert-btn" class="btn btn-ui waves-effect waves-light" type="submit">${l('labels.convert')} &#9658;</button>
         </div>
       </form>
 
       <div class="row calc-control-row">
         <div class="input-field col s12">
-          <label for="calc-output-format">Output Format</label>
+          <label for="calc-output-format">${l('labels.outputFormat')}</label>
           <select id="calc-output-format" class="browser-default">
-            <option value="4" selected>Fixed (4 decimals)</option>
-            <option value="6">Fixed (6 decimals)</option>
-            <option value="8">Fixed (8 decimals)</option>
-            <option value="sci">Scientific Notation</option>
-            <option value="dms">DMS (angles)</option>
+            <option value="4" selected>${l('formats.fixed4')}</option>
+            <option value="6">${l('formats.fixed6')}</option>
+            <option value="8">${l('formats.fixed8')}</option>
+            <option value="sci">${l('formats.scientific')}</option>
+            <option value="dms">${l('formats.dms')}</option>
           </select>
         </div>
       </div>
@@ -145,7 +191,7 @@ export class Calculator extends KeepTrackPlugin {
       <div id="calc-output-sections"></div>
 
       <div id="calc-draw-line-row" class="center-align row" style="display:none;">
-        <button id="calc-draw-line-btn" class="btn btn-ui waves-effect waves-light" type="button">Draw Line</button>
+        <button id="calc-draw-line-btn" class="btn btn-ui waves-effect waves-light" type="button">${l('labels.drawLine')}</button>
       </div>
     </div>
   `;
@@ -214,31 +260,31 @@ export class Calculator extends KeepTrackPlugin {
         ];
       case CoordFrame.LLA:
         return [
-          { id: 'lat', label: 'Latitude', unit: 'deg', default: '0', isAngle: true },
-          { id: 'lon', label: 'Longitude', unit: 'deg', default: '0', isAngle: true },
-          { id: 'alt', label: 'Altitude', unit: 'km', default: '400' },
+          { id: 'lat', label: l('labels.latitude'), unit: 'deg', default: '0', isAngle: true },
+          { id: 'lon', label: l('labels.longitude'), unit: 'deg', default: '0', isAngle: true },
+          { id: 'alt', label: l('labels.altitude'), unit: 'km', default: '400' },
         ];
       case CoordFrame.RAE:
         return [
-          { id: 'sensor', label: 'Sensor', unit: '', default: '', readonly: true },
-          { id: 'r', label: 'Range', unit: 'km', default: '3000' },
-          { id: 'a', label: 'Azimuth', unit: 'deg', default: '45', isAngle: true },
-          { id: 'e', label: 'Elevation', unit: 'deg', default: '30', isAngle: true },
+          { id: 'sensor', label: l('labels.sensor'), unit: '', default: '', readonly: true },
+          { id: 'r', label: l('labels.range'), unit: 'km', default: '3000' },
+          { id: 'a', label: l('labels.azimuth'), unit: 'deg', default: '45', isAngle: true },
+          { id: 'e', label: l('labels.elevation'), unit: 'deg', default: '30', isAngle: true },
         ];
       case CoordFrame.RADEC:
         return [
-          { id: 'ra', label: 'Right Ascension', unit: 'deg', default: '0', isAngle: true },
-          { id: 'dec', label: 'Declination', unit: 'deg', default: '0', isAngle: true },
-          { id: 'range', label: 'Range', unit: 'km', default: '6778' },
+          { id: 'ra', label: l('labels.rightAscension'), unit: 'deg', default: '0', isAngle: true },
+          { id: 'dec', label: l('labels.declination'), unit: 'deg', default: '0', isAngle: true },
+          { id: 'range', label: l('labels.range'), unit: 'km', default: '6778' },
         ];
       case CoordFrame.CLASSICAL:
         return [
-          { id: 'sma', label: 'Semi-major Axis', unit: 'km', default: '6778' },
-          { id: 'ecc', label: 'Eccentricity', unit: '', default: '0.001' },
-          { id: 'inc', label: 'Inclination', unit: 'deg', default: '51.6', isAngle: true },
-          { id: 'raan', label: 'RAAN', unit: 'deg', default: '0', isAngle: true },
-          { id: 'argpe', label: 'Arg. Perigee', unit: 'deg', default: '0', isAngle: true },
-          { id: 'nu', label: 'True Anomaly', unit: 'deg', default: '0', isAngle: true },
+          { id: 'sma', label: l('labels.semiMajorAxis'), unit: 'km', default: '6778' },
+          { id: 'ecc', label: l('labels.eccentricity'), unit: '', default: '0.001' },
+          { id: 'inc', label: l('labels.inclination'), unit: 'deg', default: '51.6', isAngle: true },
+          { id: 'raan', label: l('labels.raan'), unit: 'deg', default: '0', isAngle: true },
+          { id: 'argpe', label: l('labels.argPerigee'), unit: 'deg', default: '0', isAngle: true },
+          { id: 'nu', label: l('labels.trueAnomaly'), unit: 'deg', default: '0', isAngle: true },
         ];
       default:
         return [];
@@ -268,34 +314,34 @@ export class Calculator extends KeepTrackPlugin {
         ];
       case CoordFrame.LLA:
         return [
-          { id: 'lla-lat', label: 'Latitude', unit: 'deg', default: '', isAngle: true },
-          { id: 'lla-lon', label: 'Longitude', unit: 'deg', default: '', isAngle: true },
-          { id: 'lla-alt', label: 'Altitude', unit: 'km', default: '' },
+          { id: 'lla-lat', label: l('labels.latitude'), unit: 'deg', default: '', isAngle: true },
+          { id: 'lla-lon', label: l('labels.longitude'), unit: 'deg', default: '', isAngle: true },
+          { id: 'lla-alt', label: l('labels.altitude'), unit: 'km', default: '' },
         ];
       case CoordFrame.RAE:
         return [
-          { id: 'rae-sensor', label: 'Sensor', unit: '', default: '' },
-          { id: 'rae-r', label: 'Range', unit: 'km', default: '' },
-          { id: 'rae-a', label: 'Azimuth', unit: 'deg', default: '', isAngle: true },
-          { id: 'rae-e', label: 'Elevation', unit: 'deg', default: '', isAngle: true },
+          { id: 'rae-sensor', label: l('labels.sensor'), unit: '', default: '' },
+          { id: 'rae-r', label: l('labels.range'), unit: 'km', default: '' },
+          { id: 'rae-a', label: l('labels.azimuth'), unit: 'deg', default: '', isAngle: true },
+          { id: 'rae-e', label: l('labels.elevation'), unit: 'deg', default: '', isAngle: true },
         ];
       case CoordFrame.RADEC:
         return [
-          { id: 'radec-ra', label: 'Right Ascension', unit: 'deg', default: '', isAngle: true },
-          { id: 'radec-dec', label: 'Declination', unit: 'deg', default: '', isAngle: true },
-          { id: 'radec-range', label: 'Range', unit: 'km', default: '' },
+          { id: 'radec-ra', label: l('labels.rightAscension'), unit: 'deg', default: '', isAngle: true },
+          { id: 'radec-dec', label: l('labels.declination'), unit: 'deg', default: '', isAngle: true },
+          { id: 'radec-range', label: l('labels.range'), unit: 'km', default: '' },
         ];
       case CoordFrame.CLASSICAL:
         return [
-          { id: 'ce-sma', label: 'Semi-major Axis', unit: 'km', default: '' },
-          { id: 'ce-ecc', label: 'Eccentricity', unit: '', default: '' },
-          { id: 'ce-inc', label: 'Inclination', unit: 'deg', default: '', isAngle: true },
-          { id: 'ce-raan', label: 'RAAN', unit: 'deg', default: '', isAngle: true },
-          { id: 'ce-argpe', label: 'Arg. Perigee', unit: 'deg', default: '', isAngle: true },
-          { id: 'ce-nu', label: 'True Anomaly', unit: 'deg', default: '', isAngle: true },
-          { id: 'ce-period', label: 'Period', unit: 'min', default: '' },
-          { id: 'ce-apogee', label: 'Apogee Alt', unit: 'km', default: '' },
-          { id: 'ce-perigee', label: 'Perigee Alt', unit: 'km', default: '' },
+          { id: 'ce-sma', label: l('labels.semiMajorAxis'), unit: 'km', default: '' },
+          { id: 'ce-ecc', label: l('labels.eccentricity'), unit: '', default: '' },
+          { id: 'ce-inc', label: l('labels.inclination'), unit: 'deg', default: '', isAngle: true },
+          { id: 'ce-raan', label: l('labels.raan'), unit: 'deg', default: '', isAngle: true },
+          { id: 'ce-argpe', label: l('labels.argPerigee'), unit: 'deg', default: '', isAngle: true },
+          { id: 'ce-nu', label: l('labels.trueAnomaly'), unit: 'deg', default: '', isAngle: true },
+          { id: 'ce-period', label: l('labels.period'), unit: 'min', default: '' },
+          { id: 'ce-apogee', label: l('labels.apogeeAlt'), unit: 'km', default: '' },
+          { id: 'ce-perigee', label: l('labels.perigeeAlt'), unit: 'km', default: '' },
         ];
       default:
         return [];
@@ -347,7 +393,7 @@ export class Calculator extends KeepTrackPlugin {
       const sensorInput = getEl('calc-in-sensor') as HTMLInputElement | null;
 
       if (sensorInput) {
-        sensorInput.value = sensor?.name ?? 'No sensor selected';
+        sensorInput.value = sensor?.name ?? l('msgs.noSensorSelected');
       }
     }
   }
@@ -382,7 +428,7 @@ export class Calculator extends KeepTrackPlugin {
       const fields = this.getOutputFieldDefs_(frame);
 
       return `<div class="calc-output-section" id="calc-out-${frame.toLowerCase()}-section">
-        <div class="center-align calc-section-header">${COORD_FRAME_LABELS[frame]}</div>
+        <div class="center-align calc-section-header">${coordFrameLabel(frame)}</div>
         ${fields.map((f) => {
         const unitSuffix = f.unit ? ` (${f.unit})` : '';
 
@@ -685,7 +731,7 @@ export class Calculator extends KeepTrackPlugin {
       }
     } else {
       this.lastRae_ = null;
-      set('rae-sensor', 'No sensor selected');
+      set('rae-sensor', l('msgs.noSensorSelected'));
       set('rae-r', '-');
       set('rae-a', '-');
       set('rae-e', '-');
@@ -700,7 +746,7 @@ export class Calculator extends KeepTrackPlugin {
     const velMag = j2000.velocity.magnitude();
 
     if (velMag < 0.001) {
-      const noVel = 'Needs velocity';
+      const noVel = l('msgs.needsVelocity');
 
       set('ce-sma', noVel);
       set('ce-ecc', noVel);
@@ -831,7 +877,7 @@ export class Calculator extends KeepTrackPlugin {
         const sensor = ServiceLocator.getSensorManager().currentSensors[0];
 
         if (!sensor) {
-          errorManagerInstance.warn('No sensor selected for RAE output.');
+          errorManagerInstance.warn(l('msgs.noSensorForRae'));
 
           return;
         }

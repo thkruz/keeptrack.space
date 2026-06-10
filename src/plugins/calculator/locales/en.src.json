@@ -3,7 +3,61 @@
     "Calculator": {
       "bottomIconLabel": "Reference Frame Transforms",
       "title": "Reference Frame Transforms Menu",
-      "helpBody": "The Reference Frame Transforms Menu is used to convert between different reference frames. <br><br> The menu allows you to convert between the following reference frames: <ul style=\"margin-left: 40px;\"> <li> ECI - Earth Centered Inertial </li> <li> ECEF - Earth Centered Earth Fixed </li> <li> Geodetic </li> <li> Topocentric </li> </ul>"
+      "frames": {
+        "geodeticLla": "Geodetic (LLA)",
+        "raeTopocentric": "RAE (Topocentric)",
+        "raDecGeocentric": "RA/Dec (Geocentric)",
+        "classicalElements": "Classical Elements"
+      },
+      "labels": {
+        "inputFrame": "Input Frame",
+        "loadSelectedSatellite": "Load Selected Satellite",
+        "includeVelocity": "Include Velocity",
+        "convert": "Convert",
+        "outputFormat": "Output Format",
+        "drawLine": "Draw Line",
+        "sensor": "Sensor",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "altitude": "Altitude",
+        "range": "Range",
+        "azimuth": "Azimuth",
+        "elevation": "Elevation",
+        "rightAscension": "Right Ascension",
+        "declination": "Declination",
+        "semiMajorAxis": "Semi-major Axis",
+        "eccentricity": "Eccentricity",
+        "inclination": "Inclination",
+        "raan": "RAAN",
+        "argPerigee": "Arg. Perigee",
+        "trueAnomaly": "True Anomaly",
+        "period": "Period",
+        "apogeeAlt": "Apogee Alt",
+        "perigeeAlt": "Perigee Alt"
+      },
+      "formats": {
+        "fixed4": "Fixed (4 decimals)",
+        "fixed6": "Fixed (6 decimals)",
+        "fixed8": "Fixed (8 decimals)",
+        "scientific": "Scientific Notation",
+        "dms": "DMS (angles)"
+      },
+      "msgs": {
+        "noSensorSelected": "No sensor selected",
+        "needsVelocity": "Needs velocity",
+        "noSensorForRae": "No sensor selected for RAE output."
+      },
+      "help": {
+        "overview": "The Reference Frame Transforms calculator converts a position (and optionally velocity) between every coordinate frame KeepTrack understands: J2000 (ECI), ITRF (ECEF), TEME, Geodetic (LLA), RAE (Topocentric), RA/Dec (Geocentric), and Classical Elements. Type a state in any one frame and read it out in all the others at once.",
+        "imgAlt": "The Reference Frame Transforms menu with input fields and converted outputs",
+        "imgCaption": "Enter a state in one frame; every other frame is computed in one click.",
+        "framesHeading": "Supported Frames",
+        "frames": "<ul><li><strong>J2000 (ECI)</strong>, <strong>TEME</strong>: Earth centered inertial frames; TEME is the frame TLEs are published in.</li><li><strong>ITRF (ECEF)</strong>: Earth centered, Earth fixed; rotates with the planet.</li><li><strong>Geodetic (LLA)</strong>: latitude, longitude, and altitude.</li><li><strong>RAE (Topocentric)</strong>: range, azimuth, and elevation as seen from the selected sensor.</li><li><strong>RA/Dec (Geocentric)</strong>: right ascension and declination.</li><li><strong>Classical Elements</strong>: Keplerian orbital elements, with period, apogee, and perigee in the output.</li></ul>",
+        "howToUse": "<ol><li>Open the menu from the bottom bar (Tools mode).</li><li>Pick an <strong>Input Frame</strong>; the input fields change to match.</li><li>Type the values, or click <strong>Load Selected Satellite</strong> to fill them from the currently selected satellite.</li><li>For Cartesian frames, check <strong>Include Velocity</strong> to convert the velocity vector too; Classical Elements output needs it.</li><li>Click <strong>Convert</strong>. Every other frame's values appear below, formatted per the <strong>Output Format</strong> selector.</li><li>With a sensor selected and an RAE result computed, <strong>Draw Line</strong> renders the line from the sensor to that point in the 3D view.</li></ol>",
+        "tip1": "RAE input and output need a sensor selected first; the field shows the sensor in use so you always know the reference site.",
+        "tip2": "The DMS output format presents angles as degrees, minutes, and seconds, which is convenient for telescope pointing.",
+        "tip3": "Classical Elements conversion requires velocity: without it the output reads that it needs velocity rather than guessing an orbit."
+      }
     }
   }
 }

@@ -3,7 +3,61 @@
     "Calculator": {
       "bottomIconLabel": "Referenzrahmen-Transformationen",
       "title": "Referenzrahmen-Transformationen-Menü",
-      "helpBody": "Das Referenzrahmen-Transformationen-Menü wird verwendet, um zwischen verschiedenen Referenzrahmen zu konvertieren. <br><br> Das Menü ermöglicht es Ihnen, zwischen den folgenden Referenzrahmen zu konvertieren: <ul style=\"margin-left: 40px;\"> <li> ECI - Erdzentriert Inertial </li> <li> ECEF - Erdzentriert Erd-Fest </li> <li> Geodätisch </li> <li> Topozentrisch </li> </ul>"
+      "frames": {
+        "geodeticLla": "Geodätisch (LLA)",
+        "raeTopocentric": "RAE (topozentrisch)",
+        "raDecGeocentric": "RA/Dec (geozentrisch)",
+        "classicalElements": "Klassische Bahnelemente"
+      },
+      "labels": {
+        "inputFrame": "Eingaberahmen",
+        "loadSelectedSatellite": "Ausgewählten Satelliten laden",
+        "includeVelocity": "Geschwindigkeit einbeziehen",
+        "convert": "Konvertieren",
+        "outputFormat": "Ausgabeformat",
+        "drawLine": "Linie zeichnen",
+        "sensor": "Sensor",
+        "latitude": "Breitengrad",
+        "longitude": "Längengrad",
+        "altitude": "Höhe",
+        "range": "Entfernung",
+        "azimuth": "Azimut",
+        "elevation": "Elevation",
+        "rightAscension": "Rektaszension",
+        "declination": "Deklination",
+        "semiMajorAxis": "Große Halbachse",
+        "eccentricity": "Exzentrizität",
+        "inclination": "Inklination",
+        "raan": "RAAN",
+        "argPerigee": "Arg. des Perigäums",
+        "trueAnomaly": "Wahre Anomalie",
+        "period": "Periode",
+        "apogeeAlt": "Apogäumshöhe",
+        "perigeeAlt": "Perigäumshöhe"
+      },
+      "formats": {
+        "fixed4": "Fest (4 Nachkommastellen)",
+        "fixed6": "Fest (6 Nachkommastellen)",
+        "fixed8": "Fest (8 Nachkommastellen)",
+        "scientific": "Wissenschaftliche Notation",
+        "dms": "DMS (Winkel)"
+      },
+      "msgs": {
+        "noSensorSelected": "Kein Sensor ausgewählt",
+        "needsVelocity": "Benötigt Geschwindigkeit",
+        "noSensorForRae": "Kein Sensor für die RAE-Ausgabe ausgewählt."
+      },
+      "help": {
+        "overview": "Der Rechner für Referenzrahmen-Transformationen konvertiert eine Position (und optional die Geschwindigkeit) zwischen allen Koordinatenrahmen, die KeepTrack kennt: J2000 (ECI), ITRF (ECEF), TEME, Geodätisch (LLA), RAE (topozentrisch), RA/Dec (geozentrisch) und Klassische Bahnelemente. Geben Sie einen Zustand in einem beliebigen Rahmen ein und lesen Sie ihn in allen anderen gleichzeitig ab.",
+        "imgAlt": "Das Referenzrahmen-Transformationen-Menü mit Eingabefeldern und konvertierten Ausgaben",
+        "imgCaption": "Geben Sie einen Zustand in einem Rahmen ein; jeder andere Rahmen wird mit einem Klick berechnet.",
+        "framesHeading": "Unterstützte Rahmen",
+        "frames": "<ul><li><strong>J2000 (ECI)</strong>, <strong>TEME</strong>: erdzentrierte Inertialrahmen; TEME ist der Rahmen, in dem TLEs veröffentlicht werden.</li><li><strong>ITRF (ECEF)</strong>: erdzentriert, erdfest; rotiert mit dem Planeten.</li><li><strong>Geodätisch (LLA)</strong>: Breitengrad, Längengrad und Höhe.</li><li><strong>RAE (topozentrisch)</strong>: Entfernung, Azimut und Elevation aus Sicht des ausgewählten Sensors.</li><li><strong>RA/Dec (geozentrisch)</strong>: Rektaszension und Deklination.</li><li><strong>Klassische Bahnelemente</strong>: Keplersche Bahnelemente, mit Periode, Apogäum und Perigäum in der Ausgabe.</li></ul>",
+        "howToUse": "<ol><li>Öffnen Sie das Menü über die untere Leiste (Modus Werkzeuge).</li><li>Wählen Sie einen <strong>Eingaberahmen</strong>; die Eingabefelder passen sich entsprechend an.</li><li>Geben Sie die Werte ein oder klicken Sie auf <strong>Ausgewählten Satelliten laden</strong>, um sie vom aktuell ausgewählten Satelliten zu übernehmen.</li><li>Aktivieren Sie bei kartesischen Rahmen <strong>Geschwindigkeit einbeziehen</strong>, um auch den Geschwindigkeitsvektor zu konvertieren; die Ausgabe der Klassischen Bahnelemente benötigt ihn.</li><li>Klicken Sie auf <strong>Konvertieren</strong>. Die Werte aller anderen Rahmen erscheinen darunter, formatiert gemäß der Auswahl unter <strong>Ausgabeformat</strong>.</li><li>Mit einem ausgewählten Sensor und einem berechneten RAE-Ergebnis zeichnet <strong>Linie zeichnen</strong> die Linie vom Sensor zu diesem Punkt in der 3D-Ansicht.</li></ol>",
+        "tip1": "RAE-Eingabe und -Ausgabe benötigen zuerst einen ausgewählten Sensor; das Feld zeigt den verwendeten Sensor an, sodass Sie immer den Referenzstandort kennen.",
+        "tip2": "Das DMS-Ausgabeformat stellt Winkel als Grad, Minuten und Sekunden dar, was für die Teleskopausrichtung praktisch ist.",
+        "tip3": "Die Konvertierung in Klassische Bahnelemente erfordert die Geschwindigkeit: Ohne sie meldet die Ausgabe, dass die Geschwindigkeit benötigt wird, statt eine Bahn zu raten."
+      }
     }
   }
 }

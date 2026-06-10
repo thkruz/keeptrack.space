@@ -3,7 +3,61 @@
     "Calculator": {
       "bottomIconLabel": "기준계 변환",
       "title": "기준계 변환 메뉴",
-      "helpBody": "기준계 변환 메뉴는 서로 다른 기준계 간에 변환하는 데 사용됩니다. <br><br> 이 메뉴를 사용하면 다음 기준계 간에 변환할 수 있습니다: <ul style=\"margin-left: 40px;\"> <li> ECI - 지구 중심 관성 </li> <li> ECEF - 지구 중심 지구 고정 </li> <li> 측지학적 </li> <li> 지역 중심 </li> </ul>"
+      "frames": {
+        "geodeticLla": "측지 좌표 (LLA)",
+        "raeTopocentric": "RAE (관측점 중심)",
+        "raDecGeocentric": "RA/Dec (지구 중심)",
+        "classicalElements": "고전 궤도 요소"
+      },
+      "labels": {
+        "inputFrame": "입력 기준계",
+        "loadSelectedSatellite": "선택한 위성 불러오기",
+        "includeVelocity": "속도 포함",
+        "convert": "변환",
+        "outputFormat": "출력 형식",
+        "drawLine": "선 그리기",
+        "sensor": "센서",
+        "latitude": "위도",
+        "longitude": "경도",
+        "altitude": "고도",
+        "range": "거리",
+        "azimuth": "방위각",
+        "elevation": "고도각",
+        "rightAscension": "적경",
+        "declination": "적위",
+        "semiMajorAxis": "장반경",
+        "eccentricity": "이심률",
+        "inclination": "경사각",
+        "raan": "RAAN",
+        "argPerigee": "근지점 편각",
+        "trueAnomaly": "진근점 이각",
+        "period": "주기",
+        "apogeeAlt": "원지점 고도",
+        "perigeeAlt": "근지점 고도"
+      },
+      "formats": {
+        "fixed4": "고정 (소수점 4자리)",
+        "fixed6": "고정 (소수점 6자리)",
+        "fixed8": "고정 (소수점 8자리)",
+        "scientific": "지수 표기법",
+        "dms": "DMS (각도)"
+      },
+      "msgs": {
+        "noSensorSelected": "선택된 센서가 없습니다",
+        "needsVelocity": "속도가 필요합니다",
+        "noSensorForRae": "RAE 출력을 위한 센서가 선택되지 않았습니다."
+      },
+      "help": {
+        "overview": "기준계 변환 계산기는 KeepTrack이 지원하는 모든 좌표계 간에 위치(및 선택적으로 속도)를 변환합니다: J2000 (ECI), ITRF (ECEF), TEME, 측지 좌표 (LLA), RAE (관측점 중심), RA/Dec (지구 중심), 고전 궤도 요소. 한 좌표계에 상태를 입력하면 다른 모든 좌표계의 값을 한 번에 확인할 수 있습니다.",
+        "imgAlt": "입력 필드와 변환된 출력이 표시된 기준계 변환 메뉴",
+        "imgCaption": "한 좌표계에 상태를 입력하면 다른 모든 좌표계가 클릭 한 번으로 계산됩니다.",
+        "framesHeading": "지원 좌표계",
+        "frames": "<ul><li><strong>J2000 (ECI)</strong>, <strong>TEME</strong>: 지구 중심 관성 좌표계입니다. TEME는 TLE가 발행되는 좌표계입니다.</li><li><strong>ITRF (ECEF)</strong>: 지구 중심, 지구 고정 좌표계로 지구와 함께 회전합니다.</li><li><strong>측지 좌표 (LLA)</strong>: 위도, 경도, 고도.</li><li><strong>RAE (관측점 중심)</strong>: 선택한 센서에서 본 거리, 방위각, 고도각.</li><li><strong>RA/Dec (지구 중심)</strong>: 적경과 적위.</li><li><strong>고전 궤도 요소</strong>: 케플러 궤도 요소이며 출력에 주기, 원지점, 근지점이 포함됩니다.</li></ul>",
+        "howToUse": "<ol><li>하단 바(도구 모드)에서 메뉴를 엽니다.</li><li><strong>입력 기준계</strong>를 선택하면 입력 필드가 그에 맞게 바뀝니다.</li><li>값을 직접 입력하거나 <strong>선택한 위성 불러오기</strong>를 클릭해 현재 선택된 위성의 값으로 채웁니다.</li><li>직교 좌표계의 경우 <strong>속도 포함</strong>을 체크하면 속도 벡터도 변환됩니다. 고전 궤도 요소 출력에는 속도가 필요합니다.</li><li><strong>변환</strong>을 클릭합니다. 다른 모든 좌표계의 값이 아래에 표시되며 <strong>출력 형식</strong> 선택기에 따라 형식이 지정됩니다.</li><li>센서가 선택되어 있고 RAE 결과가 계산된 상태에서 <strong>선 그리기</strong>를 클릭하면 3D 뷰에 센서에서 해당 지점까지의 선이 그려집니다.</li></ol>",
+        "tip1": "RAE 입력과 출력에는 먼저 센서를 선택해야 합니다. 필드에 사용 중인 센서가 표시되므로 기준 위치를 항상 알 수 있습니다.",
+        "tip2": "DMS 출력 형식은 각도를 도, 분, 초로 표시하므로 망원경 조준에 편리합니다.",
+        "tip3": "고전 궤도 요소 변환에는 속도가 필요합니다. 속도가 없으면 출력은 궤도를 추측하는 대신 속도가 필요하다고 표시합니다."
+      }
     }
   }
 }

@@ -3,7 +3,53 @@
     "NewLaunch": {
       "bottomIconLabel": "Nouveau lancement",
       "title": "Menu Nouveau lancement",
-      "helpBody": "Le menu Nouveau lancement permet de générer des lancements orbitaux notionnels en modifiant des satellites existants avec des paramètres similaires. <br><br> Après avoir sélectionné un satellite, vous pouvez choisir un site de lancement et un azimut nord/sud. Le satellite sélectionné sera modifié pour l’aligner avec le site de lancement. L’horloge est alors remise à 00:00:00 pour représenter le temps relatif après le lancement. Cela peut aider à calculer la couverture capteur par rapport à l’heure de lancement. La relation de l’objet avec les autres objets orbitaux sera incorrecte."
+      "sideMenuTitle": "Nouveau lancement",
+      "leoOptimizedNote": "Remarque : cet outil est optimisé pour les satellites LEO et peut ne pas fonctionner correctement pour les orbites HEO ou GEO.",
+      "labels": {
+        "satelliteScc": "SCC# du satellite",
+        "inclination": "Inclinaison",
+        "launchingNorthOrSouth": "Lancement vers le nord ou le sud",
+        "launchFacility": "Site de lancement",
+        "north": "Nord",
+        "south": "Sud"
+      },
+      "buttons": {
+        "createLaunchNominal": "Créer un lancement nominal",
+        "inclinationTooLow": "Inclinaison trop faible !"
+      },
+      "msgs": {
+        "launchNominalCreated": "Lancement nominal créé !",
+        "timeRelativeToLaunch": "Le temps est désormais relatif à l'heure de lancement."
+      },
+      "errorMsgs": {
+        "noMoreNominalSatellites": "Plus de satellites nominaux disponibles !",
+        "launchSiteNotFound": "Site de lancement {launchSite} introuvable !",
+        "failedToCreateTle": "Échec de la création du TLE : {error}",
+        "invalidTle1Length": "TLE1 créé invalide : la longueur n'est pas de 69 - {tle}",
+        "invalidTle2Length": "TLE2 créé invalide : la longueur n'est pas de 69 - {tle}",
+        "failedAltitudeTest": "Échec du test d'altitude - essayez un autre satellite !",
+        "cruncherFailed": "Le calculateur n'a pas satisfait l'exigence après plusieurs tentatives ! Ce lancement est-il seulement possible ?",
+        "errorCreatingSatRecord": "Erreur lors de la création de l'enregistrement du satellite !",
+        "launchSiteNotInCatalog": "Site de lancement {name} introuvable dans le catalogue launchSites.",
+        "invalidEccentricityFormat": "Format d'excentricité invalide !",
+        "eccentricityFormatIssue": "Un problème est survenu avec le format d'excentricité de ce satellite. Essayez un autre satellite.",
+        "invalidEpochYearFormat": "Format d'année d'époque invalide !",
+        "epochYearFormatIssue": "Un problème est survenu avec le format d'année d'époque de ce satellite. Essayez un autre satellite.",
+        "invalidEpochDayFormat": "Format de jour d'époque invalide ! Il doit comporter 3 chiffres, une décimale et 8 chiffres après la décimale.",
+        "epochDayFormatIssue": "Un problème est survenu avec le format de jour d'époque de ce satellite. Essayez un autre satellite.",
+        "failedToPropagate": "Échec de la propagation du satellite. Essayez d'autres paramètres ou signalez ce problème si les paramètres sont corrects.",
+        "changingOrbitBufferFailed": "Échec de la modification des données du tampon d'orbite"
+      },
+      "help": {
+        "overview": "Le menu Nouveau lancement crée un lancement notionnel : il copie l’orbite d’un satellite réel, la fait pivoter pour qu’elle décolle depuis un site de lancement de votre choix et remet l’horloge à T+0. Utilisez-le pour répondre à la question \"si quelque chose est lancé depuis ce site vers ce type d’orbite, quand mes capteurs le verront-ils ?\"",
+        "imgAlt": "Le menu Nouveau lancement avec les options de site de lancement et de direction",
+        "imgCaption": "Choisissez un satellite modèle, un site de lancement et un lancement vers le nord ou vers le sud.",
+        "howToUse": "<ol><li>Sélectionnez un satellite dont l’orbite ressemble à celle de la charge utile attendue. Son inclinaison et son altitude deviennent le modèle. L’icône est désactivée tant qu’aucun satellite n’est sélectionné.</li><li>Ouvrez le menu et choisissez un <strong>site de lancement</strong> (regroupés par pays) et si le lancement se dirige vers le <strong>nord ou le sud</strong>.</li><li>Cliquez sur <strong>Créer un lancement nominal</strong>. Un nouvel objet simulé est créé sur l’orbite pivotée et l’horloge est remise à 00:00:00 ; le temps est désormais relatif au décollage.</li><li>Ouvrez les menus de couverture capteur (angles de visée, visées multi-sites) pour voir quand le nominal devient visible pour la première fois après le lancement.</li></ol>",
+        "limitsHeading": "Limitations",
+        "limits": "<ul><li>L’inclinaison du modèle doit être au moins égale à la latitude du site de lancement : on ne peut pas lancer vers une orbite moins inclinée que le lieu de lancement, le bouton se désactive donc dans ce cas.</li><li>L’outil est optimisé pour le LEO ; les modèles fortement elliptiques ou GEO peuvent échouer.</li><li>Le nominal est simulé : sa position par rapport aux autres objets du catalogue n’a pas de signification.</li><li>Le satellite modèle sélectionné reste inchangé ; le nominal est un objet distinct dans un emplacement du catalogue analyste.</li></ul>",
+        "tip1": "Après la création, l’horloge indique le temps écoulé depuis le décollage : \"00:45:00\" signifie 45 minutes après le lancement, idéal pour les chronologies de couverture capteur.",
+        "tip2": "Si la création échoue à son contrôle d’altitude, essayez un autre satellite modèle avec une orbite plus conventionnelle."
+      }
     }
   }
 }

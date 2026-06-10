@@ -3,7 +3,53 @@
     "NewLaunch": {
       "bottomIconLabel": "Nuovo lancio",
       "title": "Menu nuovo lancio",
-      "helpBody": "Il menu Nuovo lancio viene utilizzato per generare lanci orbitali ipotetici modificando satelliti esistenti con parametri simili. <br><br> Dopo aver selezionato un satellite, è possibile selezionare un sito di lancio e un azimut nord/sud. Il satellite selezionato verrà modificato per allinearlo al sito di lancio. L'orologio viene quindi impostato su 00:00:00 per rappresentare il tempo relativo dopo il lancio. Questo può essere utile per calcolare la copertura dei sensori rispetto al tempo di lancio. La relazione dell'oggetto con altri oggetti orbitali non sarà corretta."
+      "sideMenuTitle": "Nuovo lancio",
+      "leoOptimizedNote": "Nota: questo strumento è ottimizzato per i satelliti LEO e potrebbe non funzionare correttamente per orbite HEO o GEO.",
+      "labels": {
+        "satelliteScc": "SCC# satellite",
+        "inclination": "Inclinazione",
+        "launchingNorthOrSouth": "Lancio verso nord o sud",
+        "launchFacility": "Sito di lancio",
+        "north": "Nord",
+        "south": "Sud"
+      },
+      "buttons": {
+        "createLaunchNominal": "Crea lancio nominale",
+        "inclinationTooLow": "Inclinazione troppo bassa!"
+      },
+      "msgs": {
+        "launchNominalCreated": "Lancio nominale creato!",
+        "timeRelativeToLaunch": "Il tempo è ora relativo all'orario di lancio."
+      },
+      "errorMsgs": {
+        "noMoreNominalSatellites": "Nessun altro satellite nominale disponibile!",
+        "launchSiteNotFound": "Sito di lancio {launchSite} non trovato!",
+        "failedToCreateTle": "Creazione del TLE non riuscita: {error}",
+        "invalidTle1Length": "TLE1 creato non valido: la lunghezza non è 69 - {tle}",
+        "invalidTle2Length": "TLE2 creato non valido: la lunghezza non è 69 - {tle}",
+        "failedAltitudeTest": "Test di quota non superato - prova un satellite diverso!",
+        "cruncherFailed": "Il calcolatore non ha soddisfatto il requisito dopo diversi tentativi! Questo lancio è davvero possibile?",
+        "errorCreatingSatRecord": "Errore nella creazione del record del satellite!",
+        "launchSiteNotInCatalog": "Sito di lancio {name} non trovato nel catalogo launchSites.",
+        "invalidEccentricityFormat": "Formato dell'eccentricità non valido!",
+        "eccentricityFormatIssue": "Si è verificato un problema con il formato dell'eccentricità di questo satellite. Prova un satellite diverso.",
+        "invalidEpochYearFormat": "Formato dell'anno di epoca non valido!",
+        "epochYearFormatIssue": "Si è verificato un problema con il formato dell'anno di epoca di questo satellite. Prova un satellite diverso.",
+        "invalidEpochDayFormat": "Formato del giorno di epoca non valido! Deve essere composto da 3 cifre, un separatore decimale e 8 cifre dopo il decimale.",
+        "epochDayFormatIssue": "Si è verificato un problema con il formato del giorno di epoca di questo satellite. Prova un satellite diverso.",
+        "failedToPropagate": "Impossibile propagare il satellite. Prova parametri diversi o segnala il problema se i parametri sono corretti.",
+        "changingOrbitBufferFailed": "Modifica dei dati del buffer dell'orbita non riuscita"
+      },
+      "help": {
+        "overview": "Il menu Nuovo lancio crea un lancio ipotetico: copia l'orbita di un satellite reale, la ruota in modo che decolli da un sito di lancio a tua scelta e azzera l'orologio a T+0. Usalo per rispondere alla domanda \"se qualcosa viene lanciato da questo sito verso questo tipo di orbita, quando lo vedranno i miei sensori?\"",
+        "imgAlt": "Il menu Nuovo lancio con le opzioni di sito di lancio e direzione",
+        "imgCaption": "Scegli un satellite modello, un sito di lancio e un lancio verso nord o verso sud.",
+        "howToUse": "<ol><li>Seleziona un satellite la cui orbita assomigli a quella del carico utile previsto. La sua inclinazione e quota diventano il modello. L'icona è disabilitata finché non viene selezionato un satellite.</li><li>Apri il menu e scegli un <strong>sito di lancio</strong> (raggruppati per paese) e se il lancio è diretto verso <strong>nord o sud</strong>.</li><li>Fai clic su <strong>Crea lancio nominale</strong>. Un nuovo oggetto simulato viene creato sull'orbita ruotata e l'orologio si azzera a 00:00:00; il tempo è ora relativo al decollo.</li><li>Apri i menu di copertura dei sensori (angoli di osservazione, osservazioni multi-sito) per vedere quando il nominale diventa visibile per la prima volta dopo il lancio.</li></ol>",
+        "limitsHeading": "Limitazioni",
+        "limits": "<ul><li>L'inclinazione del modello deve essere almeno pari alla latitudine del sito di lancio: non è possibile lanciare verso un'orbita meno inclinata del luogo di lancio, quindi in tal caso il pulsante si disabilita automaticamente.</li><li>Lo strumento è ottimizzato per LEO; modelli altamente ellittici o GEO possono fallire.</li><li>Il nominale è simulato: la sua posizione rispetto agli altri oggetti del catalogo non è significativa.</li><li>Il satellite modello selezionato resta invariato; il nominale è un oggetto separato in uno slot del catalogo analista.</li></ul>",
+        "tip1": "Dopo la creazione l'orologio indica il tempo trascorso dal decollo: \"00:45:00\" significa 45 minuti dopo il lancio, perfetto per le cronologie di copertura dei sensori.",
+        "tip2": "Se la creazione fallisce il controllo di quota, prova un altro satellite modello con un'orbita più convenzionale."
+      }
     }
   }
 }

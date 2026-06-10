@@ -28,7 +28,7 @@ test.describe('NewLaunch', () => {
 
     await expect(drawerItem).toBeVisible();
 
-    // 3. Click to activate — Pro version doesn't require satellite selected
+    // 3. Click to activate - Pro version doesn't require satellite selected
     await drawerItem.click();
 
     // 4. Verify side menu opens

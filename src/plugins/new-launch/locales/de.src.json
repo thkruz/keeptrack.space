@@ -3,7 +3,53 @@
     "NewLaunch": {
       "bottomIconLabel": "Neuer Start",
       "title": "Neuer Start Menü",
-      "helpBody": "Das Menü 'Neuer Start' wird verwendet, um fiktive Orbitalmissionen zu generieren, indem bestehende Satelliten mit ähnlichen Parametern modifiziert werden. <br><br> Nach Auswahl eines Satelliten können Sie einen Startort und einen Nord/Süd-Azimut auswählen. Der ausgewählte Satellit wird modifiziert, um ihn mit dem Startort in Einklang zu bringen. Die Uhr wird dann auf 00:00:00 geändert, um die relative Zeit nach dem Start darzustellen. Dies kann hilfreich sein, um die Sensorabdeckung relativ zur Startzeit zu berechnen. Die Beziehung des Objekts zu anderen Orbitalobjekten wird nicht korrekt sein."
+      "sideMenuTitle": "Neuer Start",
+      "leoOptimizedNote": "Hinweis: Dieses Werkzeug ist für LEO-Satelliten optimiert und funktioniert für HEO- oder GEO-Umlaufbahnen möglicherweise nicht korrekt.",
+      "labels": {
+        "satelliteScc": "Satelliten-SCC#",
+        "inclination": "Inklination",
+        "launchingNorthOrSouth": "Start nach Norden oder Süden",
+        "launchFacility": "Startanlage",
+        "north": "Norden",
+        "south": "Süden"
+      },
+      "buttons": {
+        "createLaunchNominal": "Startnominal erstellen",
+        "inclinationTooLow": "Inklination zu niedrig!"
+      },
+      "msgs": {
+        "launchNominalCreated": "Startnominal erstellt!",
+        "timeRelativeToLaunch": "Die Zeit ist jetzt relativ zur Startzeit."
+      },
+      "errorMsgs": {
+        "noMoreNominalSatellites": "Keine weiteren nominalen Satelliten verfügbar!",
+        "launchSiteNotFound": "Startort {launchSite} nicht gefunden!",
+        "failedToCreateTle": "TLE konnte nicht erstellt werden: {error}",
+        "invalidTle1Length": "Ungültige TLE1 erstellt: Länge ist nicht 69 - {tle}",
+        "invalidTle2Length": "Ungültige TLE2 erstellt: Länge ist nicht 69 - {tle}",
+        "failedAltitudeTest": "Höhentest fehlgeschlagen - versuchen Sie einen anderen Satelliten!",
+        "cruncherFailed": "Der Cruncher konnte die Anforderung nach mehreren Versuchen nicht erfüllen! Ist dieser Start überhaupt möglich?",
+        "errorCreatingSatRecord": "Fehler beim Erstellen des Satellitendatensatzes!",
+        "launchSiteNotInCatalog": "Startort {name} nicht im launchSites-Katalog gefunden.",
+        "invalidEccentricityFormat": "Ungültiges Exzentrizitätsformat!",
+        "eccentricityFormatIssue": "Es gab ein Problem mit dem Exzentrizitätsformat dieses Satelliten. Versuchen Sie einen anderen Satelliten.",
+        "invalidEpochYearFormat": "Ungültiges Epochenjahr-Format!",
+        "epochYearFormatIssue": "Es gab ein Problem mit dem Epochenjahr-Format dieses Satelliten. Versuchen Sie einen anderen Satelliten.",
+        "invalidEpochDayFormat": "Ungültiges Epochentag-Format! Es müssen 3 Ziffern, ein Dezimalpunkt und 8 Nachkommastellen sein.",
+        "epochDayFormatIssue": "Es gab ein Problem mit dem Epochentag-Format dieses Satelliten. Versuchen Sie einen anderen Satelliten.",
+        "failedToPropagate": "Satellit konnte nicht propagiert werden. Versuchen Sie andere Parameter oder melden Sie dieses Problem, wenn die Parameter korrekt sind.",
+        "changingOrbitBufferFailed": "Ändern der Orbit-Puffer-Daten fehlgeschlagen"
+      },
+      "help": {
+        "overview": "Das Menü 'Neuer Start' erstellt einen fiktiven Start: Es kopiert die Umlaufbahn eines realen Satelliten, dreht sie so, dass der Start von einem von Ihnen gewählten Startort erfolgt, und setzt die Uhr auf T+0 zurück. Verwenden Sie es, um die Frage zu beantworten: \"Wenn etwas von diesem Standort in diese Art von Umlaufbahn startet, wann werden meine Sensoren es sehen?\"",
+        "imgAlt": "Das Menü 'Neuer Start' mit Optionen für Startanlage und Richtung",
+        "imgCaption": "Wählen Sie einen Vorlagensatelliten, eine Startanlage und einen Start in Richtung Norden oder Süden.",
+        "howToUse": "<ol><li>Wählen Sie einen Satelliten, dessen Umlaufbahn der erwarteten Nutzlast ähnelt; seine Inklination und Höhe werden zur Vorlage. Das Symbol ist deaktiviert, bis ein Satellit ausgewählt ist.</li><li>Öffnen Sie das Menü und wählen Sie eine <strong>Startanlage</strong> (nach Land gruppiert) sowie, ob der Start <strong>nach Norden oder Süden</strong> führt.</li><li>Klicken Sie auf <strong>Startnominal erstellen</strong>. Ein neues simuliertes Objekt wird auf der gedrehten Umlaufbahn erstellt, und die Uhr wird auf 00:00:00 zurückgesetzt; die Zeit ist nun relativ zum Abheben.</li><li>Öffnen Sie die Menüs zur Sensorabdeckung (Blickwinkel, Multi-Site-Blicke), um zu sehen, wann das Nominal nach dem Start erstmals sichtbar wird.</li></ol>",
+        "limitsHeading": "Einschränkungen",
+        "limits": "<ul><li>Die Inklination der Vorlage muss mindestens der geographischen Breite des Startorts entsprechen: Man kann nicht in eine Umlaufbahn starten, die weniger geneigt ist als der Startort, daher deaktiviert sich die Schaltfläche in diesem Fall selbst.</li><li>Das Werkzeug ist für LEO optimiert; hochelliptische oder GEO-Vorlagen können fehlschlagen.</li><li>Das Nominal ist simuliert: Seine Position relativ zu anderen Katalogobjekten ist nicht aussagekräftig.</li><li>Ihr ausgewählter Vorlagensatellit bleibt unverändert; das Nominal ist ein separates Objekt in einem Analysten-Katalogplatz.</li></ul>",
+        "tip1": "Nach der Erstellung zeigt die Uhr die Zeit seit dem Abheben: \"00:45:00\" bedeutet 45 Minuten nach dem Start, ideal für Zeitachsen der Sensorabdeckung.",
+        "tip2": "Wenn die Erstellung an der Höhenprüfung scheitert, versuchen Sie einen anderen Vorlagensatelliten mit einer konventionelleren Umlaufbahn."
+      }
     }
   }
 }

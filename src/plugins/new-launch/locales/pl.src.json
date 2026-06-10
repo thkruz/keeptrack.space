@@ -3,7 +3,53 @@
     "NewLaunch": {
       "bottomIconLabel": "Nowy start",
       "title": "Menu nowego startu",
-      "helpBody": "Menu nowego startu służy do generowania hipotetycznych startów orbitalnych poprzez modyfikację istniejących satelitów o podobnych parametrach. <br><br> Po wybraniu satelity możesz wybrać miejsce startu oraz azymut północny/południowy. Wybrany satelita zostanie zmodyfikowany, aby dopasować go do miejsca startu. Zegar zostanie zmieniony na 00:00:00, aby reprezentować czas względny po starcie. Może to być pomocne przy obliczaniu zasięgu czujników względem czasu startu. Relacja obiektu z innymi obiektami orbitalnymi będzie nieprawidłowa."
+      "sideMenuTitle": "Nowy start",
+      "leoOptimizedNote": "Uwaga: to narzędzie jest zoptymalizowane pod satelity LEO i może nie działać poprawnie dla orbit HEO lub GEO.",
+      "labels": {
+        "satelliteScc": "SCC# satelity",
+        "inclination": "Inklinacja",
+        "launchingNorthOrSouth": "Start na północ czy południe",
+        "launchFacility": "Miejsce startu",
+        "north": "Północ",
+        "south": "Południe"
+      },
+      "buttons": {
+        "createLaunchNominal": "Utwórz start nominalny",
+        "inclinationTooLow": "Zbyt mała inklinacja!"
+      },
+      "msgs": {
+        "launchNominalCreated": "Utworzono start nominalny!",
+        "timeRelativeToLaunch": "Czas jest teraz liczony względem startu."
+      },
+      "errorMsgs": {
+        "noMoreNominalSatellites": "Brak dostępnych satelitów nominalnych!",
+        "launchSiteNotFound": "Nie znaleziono miejsca startu {launchSite}!",
+        "failedToCreateTle": "Nie udało się utworzyć TLE: {error}",
+        "invalidTle1Length": "Utworzono nieprawidłowy TLE1: długość nie wynosi 69 - {tle}",
+        "invalidTle2Length": "Utworzono nieprawidłowy TLE2: długość nie wynosi 69 - {tle}",
+        "failedAltitudeTest": "Test wysokości nie powiódł się - wypróbuj innego satelitę!",
+        "cruncherFailed": "Moduł obliczeniowy nie spełnił wymagań po wielu próbach! Czy ten start jest w ogóle możliwy?",
+        "errorCreatingSatRecord": "Błąd podczas tworzenia rekordu satelity!",
+        "launchSiteNotInCatalog": "Miejsca startu {name} nie znaleziono w katalogu launchSites.",
+        "invalidEccentricityFormat": "Nieprawidłowy format mimośrodu!",
+        "eccentricityFormatIssue": "Wystąpił problem z formatem mimośrodu tego satelity. Wypróbuj innego satelitę.",
+        "invalidEpochYearFormat": "Nieprawidłowy format roku epoki!",
+        "epochYearFormatIssue": "Wystąpił problem z formatem roku epoki tego satelity. Wypróbuj innego satelitę.",
+        "invalidEpochDayFormat": "Nieprawidłowy format dnia epoki! Wymagane 3 cyfry, separator dziesiętny i 8 cyfr po przecinku.",
+        "epochDayFormatIssue": "Wystąpił problem z formatem dnia epoki tego satelity. Wypróbuj innego satelitę.",
+        "failedToPropagate": "Nie udało się propagować satelity. Wypróbuj inne parametry lub zgłoś problem, jeśli parametry są poprawne.",
+        "changingOrbitBufferFailed": "Zmiana danych bufora orbity nie powiodła się"
+      },
+      "help": {
+        "overview": "Menu nowego startu tworzy hipotetyczny start: kopiuje orbitę rzeczywistego satelity, obraca ją tak, aby start odbywał się z wybranego miejsca startu, i resetuje zegar do T+0. Użyj go, aby odpowiedzieć na pytanie \"jeśli coś wystartuje z tego miejsca na tego rodzaju orbitę, kiedy moje czujniki to zobaczą?\"",
+        "imgAlt": "Menu nowego startu z opcjami miejsca startu i kierunku",
+        "imgCaption": "Wybierz satelitę wzorcowego, miejsce startu oraz start w kierunku północnym lub południowym.",
+        "howToUse": "<ol><li>Wybierz satelitę, którego orbita przypomina orbitę oczekiwanego ładunku; jego inklinacja i wysokość stają się wzorcem. Ikona jest nieaktywna, dopóki nie zostanie wybrany satelita.</li><li>Otwórz menu i wybierz <strong>miejsce startu</strong> (pogrupowane według krajów) oraz czy start kieruje się na <strong>północ czy południe</strong>.</li><li>Kliknij <strong>Utwórz start nominalny</strong>. Na obróconej orbicie zostanie utworzony nowy symulowany obiekt, a zegar zresetuje się do 00:00:00, więc czas jest teraz liczony względem startu.</li><li>Otwórz menu zasięgu czujników (kąty obserwacji, obserwacje wielostanowiskowe), aby zobaczyć, kiedy obiekt nominalny po raz pierwszy stanie się widoczny po starcie.</li></ol>",
+        "limitsHeading": "Ograniczenia",
+        "limits": "<ul><li>Inklinacja wzorca musi być co najmniej równa szerokości geograficznej miejsca startu: nie można wystartować na orbitę nachyloną mniej niż miejsce startu, więc w takim przypadku przycisk sam się dezaktywuje.</li><li>Narzędzie jest zoptymalizowane pod LEO; wzorce silnie eliptyczne lub GEO mogą zawieść.</li><li>Obiekt nominalny jest symulowany: jego pozycja względem innych obiektów katalogu nie ma znaczenia.</li><li>Wybrany satelita wzorcowy pozostaje niezmieniony; obiekt nominalny to osobny obiekt w analitycznym slocie katalogu.</li></ul>",
+        "tip1": "Po utworzeniu zegar pokazuje czas od startu: \"00:45:00\" oznacza 45 minut po starcie, co jest idealne do osi czasu zasięgu czujników.",
+        "tip2": "Jeśli tworzenie nie przejdzie kontroli wysokości, wypróbuj innego satelitę wzorcowego o bardziej konwencjonalnej orbicie."
+      }
     }
   }
 }

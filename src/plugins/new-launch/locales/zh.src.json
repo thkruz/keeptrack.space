@@ -3,7 +3,53 @@
     "NewLaunch": {
       "bottomIconLabel": "新发射",
       "title": "新发射菜单",
-      "helpBody": "新发射菜单用于通过修改具有相似参数的现有卫星，生成假想轨道发射。<br><br>选择卫星后，可选择发射地点和南/北方位角。所选卫星将被调整以与发射场对齐，时间将重置为00:00:00，表示发射后的相对时间。这有助于计算发射时刻的传感器覆盖。与其他轨道物体的关系可能不准确。"
+      "sideMenuTitle": "新发射",
+      "leoOptimizedNote": "注意：此工具针对LEO卫星优化，对于HEO或GEO轨道可能无法正常工作。",
+      "labels": {
+        "satelliteScc": "卫星 SCC#",
+        "inclination": "倾角",
+        "launchingNorthOrSouth": "向北或向南发射",
+        "launchFacility": "发射设施",
+        "north": "北",
+        "south": "南"
+      },
+      "buttons": {
+        "createLaunchNominal": "创建发射标称轨道",
+        "inclinationTooLow": "倾角过低！"
+      },
+      "msgs": {
+        "launchNominalCreated": "发射标称轨道已创建！",
+        "timeRelativeToLaunch": "时间现在以发射时间为基准。"
+      },
+      "errorMsgs": {
+        "noMoreNominalSatellites": "没有更多可用的标称卫星！",
+        "launchSiteNotFound": "未找到发射场 {launchSite}！",
+        "failedToCreateTle": "创建TLE失败：{error}",
+        "invalidTle1Length": "创建的TLE1无效：长度不是69 - {tle}",
+        "invalidTle2Length": "创建的TLE2无效：长度不是69 - {tle}",
+        "failedAltitudeTest": "高度检查未通过 - 请尝试另一颗卫星！",
+        "cruncherFailed": "计算器多次尝试后仍未能满足要求！这次发射真的可行吗？",
+        "errorCreatingSatRecord": "创建卫星记录时出错！",
+        "launchSiteNotInCatalog": "在launchSites目录中未找到发射场 {name}。",
+        "invalidEccentricityFormat": "偏心率格式无效！",
+        "eccentricityFormatIssue": "该卫星的偏心率格式存在问题。请尝试另一颗卫星。",
+        "invalidEpochYearFormat": "历元年份格式无效！",
+        "epochYearFormatIssue": "该卫星的历元年份格式存在问题。请尝试另一颗卫星。",
+        "invalidEpochDayFormat": "历元日格式无效！必须为3位数字、一个小数点和小数点后8位数字。",
+        "epochDayFormatIssue": "该卫星的历元日格式存在问题。请尝试另一颗卫星。",
+        "failedToPropagate": "卫星传播失败。请尝试不同的参数，如果参数确实正确，请报告此问题。",
+        "changingOrbitBufferFailed": "更改轨道缓冲区数据失败"
+      },
+      "help": {
+        "overview": "新发射菜单用于创建假想发射：它会复制一颗真实卫星的轨道，将其旋转为从您选择的发射场起飞，并把时钟重置为T+0。用它来回答“如果有物体从该发射场进入这类轨道，我的传感器何时能看到它？”",
+        "imgAlt": "带有发射设施和方向选项的新发射菜单",
+        "imgCaption": "选择模板卫星、发射设施以及向北或向南的发射方向。",
+        "howToUse": "<ol><li>选择一颗轨道与预期载荷相似的卫星：其倾角和高度将作为模板。在选择卫星之前图标处于禁用状态。</li><li>打开菜单，选择<strong>发射设施</strong>（按国家分组），并选择发射朝向<strong>北或南</strong>。</li><li>点击<strong>创建发射标称轨道</strong>。将在旋转后的轨道上创建一个新的模拟物体，时钟重置为00:00:00，时间此后以起飞为基准。</li><li>打开传感器覆盖菜单（观测角、多站观测），查看发射后标称物体何时首次可见。</li></ol>",
+        "limitsHeading": "限制",
+        "limits": "<ul><li>模板的倾角必须不小于发射场的纬度：无法发射到倾角小于发射地纬度的轨道，因此这种情况下按钮会自动禁用。</li><li>该工具针对LEO优化；高椭圆或GEO模板可能失败。</li><li>标称物体是模拟的：它相对于其他目录物体的位置没有意义。</li><li>所选模板卫星保持不变：标称物体是分析师目录槽位中的一个独立物体。</li></ul>",
+        "tip1": "创建后时钟显示自起飞以来的时间：“00:45:00”表示发射后45分钟，非常适合传感器覆盖时间线。",
+        "tip2": "如果创建未通过高度检查，请尝试轨道更常规的另一颗模板卫星。"
+      }
     }
   }
 }

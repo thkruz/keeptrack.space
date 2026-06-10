@@ -3,7 +3,53 @@
     "NewLaunch": {
       "bottomIconLabel": "Nový start",
       "title": "Menu nového startu",
-      "helpBody": "Menu nového startu slouží ke generování hypotetických orbitálních startů úpravou existujících satelitů s podobnými parametry. <br><br> Po výběru satelitu můžete zvolit místo startu a severní/jižní azimut. Vybraný satelit bude upraven tak, aby odpovídal místu startu. Hodiny se poté změní na 00:00:00, což představuje relativní čas po startu. To může být užitečné při výpočtu pokrytí senzory vzhledem k času startu. Vztah objektu k ostatním orbitálním objektům bude nesprávný."
+      "sideMenuTitle": "Nový start",
+      "leoOptimizedNote": "Poznámka: Tento nástroj je optimalizován pro satelity na LEO a nemusí správně fungovat pro dráhy HEO nebo GEO.",
+      "labels": {
+        "satelliteScc": "SCC# satelitu",
+        "inclination": "Inklinace",
+        "launchingNorthOrSouth": "Start na sever nebo na jih",
+        "launchFacility": "Místo startu",
+        "north": "Sever",
+        "south": "Jih"
+      },
+      "buttons": {
+        "createLaunchNominal": "Vytvořit nominální start",
+        "inclinationTooLow": "Příliš nízká inklinace!"
+      },
+      "msgs": {
+        "launchNominalCreated": "Nominální start vytvořen!",
+        "timeRelativeToLaunch": "Čas je nyní relativní vůči času startu."
+      },
+      "errorMsgs": {
+        "noMoreNominalSatellites": "Nejsou k dispozici žádné další nominální satelity!",
+        "launchSiteNotFound": "Místo startu {launchSite} nebylo nalezeno!",
+        "failedToCreateTle": "Nepodařilo se vytvořit TLE: {error}",
+        "invalidTle1Length": "Vytvořen neplatný TLE1: délka není 69 - {tle}",
+        "invalidTle2Length": "Vytvořen neplatný TLE2: délka není 69 - {tle}",
+        "failedAltitudeTest": "Test výšky selhal - zkuste jiný satelit!",
+        "cruncherFailed": "Cruncher nesplnil požadavek ani po několika pokusech! Je tento start vůbec možný?",
+        "errorCreatingSatRecord": "Chyba při vytváření záznamu satelitu!",
+        "launchSiteNotInCatalog": "Místo startu {name} nebylo nalezeno v katalogu launchSites.",
+        "invalidEccentricityFormat": "Neplatný formát excentricity!",
+        "eccentricityFormatIssue": "U formátu excentricity tohoto satelitu nastal problém. Zkuste jiný satelit.",
+        "invalidEpochYearFormat": "Neplatný formát roku epochy!",
+        "epochYearFormatIssue": "U formátu roku epochy tohoto satelitu nastal problém. Zkuste jiný satelit.",
+        "invalidEpochDayFormat": "Neplatný formát dne epochy! Musí mít 3 číslice, desetinnou tečku a 8 číslic za ní.",
+        "epochDayFormatIssue": "U formátu dne epochy tohoto satelitu nastal problém. Zkuste jiný satelit.",
+        "failedToPropagate": "Propagace satelitu se nezdařila. Zkuste jiné parametry, nebo pokud jsou parametry správné, nahlaste tento problém.",
+        "changingOrbitBufferFailed": "Změna dat orbitálního bufferu se nezdařila"
+      },
+      "help": {
+        "overview": "Menu nového startu vytváří hypotetický start: zkopíruje dráhu skutečného satelitu, natočí ji tak, aby start probíhal ze zvoleného místa startu, a vynuluje hodiny na T+0. Použijte jej k zodpovězení otázky \"pokud něco odstartuje z tohoto místa na tento typ dráhy, kdy to mé senzory uvidí?\"",
+        "imgAlt": "Menu nového startu s možnostmi místa startu a směru",
+        "imgCaption": "Vyberte vzorový satelit, místo startu a start severním nebo jižním směrem.",
+        "howToUse": "<ol><li>Vyberte satelit, jehož dráha se podobá očekávanému nákladu; jeho inklinace a výška se stanou vzorem. Ikona je neaktivní, dokud není vybrán satelit.</li><li>Otevřete menu a zvolte <strong>místo startu</strong> (seskupené podle zemí) a zda start míří <strong>na sever nebo na jih</strong>.</li><li>Klikněte na <strong>Vytvořit nominální start</strong>. Na natočené dráze se vytvoří nový simulovaný objekt a hodiny se vynulují na 00:00:00; čas je nyní relativní vůči startu.</li><li>Otevřete menu pokrytí senzory (pozorovací úhly, pohledy z více stanovišť), abyste viděli, kdy se nominál po startu poprvé stane viditelným.</li></ol>",
+        "limitsHeading": "Omezení",
+        "limits": "<ul><li>Inklinace vzoru musí být alespoň rovna zeměpisné šířce místa startu: nelze startovat na dráhu skloněnou méně, než odkud startujete, takže v takovém případě se tlačítko samo deaktivuje.</li><li>Nástroj je optimalizován pro LEO; vysoce eliptické nebo GEO vzory mohou selhat.</li><li>Nominál je simulovaný: jeho poloha vůči ostatním objektům katalogu nemá vypovídací hodnotu.</li><li>Vybraný vzorový satelit zůstává nezměněn; nominál je samostatný objekt v analytickém slotu katalogu.</li></ul>",
+        "tip1": "Po vytvoření hodiny ukazují čas od startu: \"00:45:00\" znamená 45 minut po startu, což je ideální pro časové osy pokrytí senzory.",
+        "tip2": "Pokud vytvoření selže při kontrole výšky, zkuste jiný vzorový satelit s konvenčnější dráhou."
+      }
     }
   }
 }

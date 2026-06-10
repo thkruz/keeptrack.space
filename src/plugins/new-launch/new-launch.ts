@@ -29,7 +29,10 @@ import {
   TleLine1, TleLine2,
 } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { IHelpConfig } from '../../engine/plugins/core/plugin-capabilities';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+
+type T7eKey = Parameters<typeof t7e>[0];
 
 export interface LaunchParams {
   templateSccNum: string;
@@ -85,6 +88,35 @@ export class NewLaunch extends KeepTrackPlugin {
   isIconDisabled = true;
   sideMenuElementName: string = 'newLaunch-menu';
 
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: t7e('plugins.NewLaunch.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.NewLaunch.help.overview'),
+          image: {
+            src: 'img/help/new-launch/new-launch-menu.png',
+            alt: t7e('plugins.NewLaunch.help.imgAlt'),
+            caption: t7e('plugins.NewLaunch.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.NewLaunch.help.howToUse'),
+        },
+        {
+          heading: t7e('plugins.NewLaunch.help.limitsHeading'),
+          content: t7e('plugins.NewLaunch.help.limits'),
+        },
+      ],
+      tips: [
+        t7e('plugins.NewLaunch.help.tip1'),
+        t7e('plugins.NewLaunch.help.tip2'),
+      ],
+    };
+  }
+
   /**
    * Build the grouped launch facility `<select>` options HTML.
    * Extracted as a static method so pro subclasses can reuse it.
@@ -126,41 +158,42 @@ export class NewLaunch extends KeepTrackPlugin {
 
   sideMenuElementHtml: string = (() => {
     const optionsHtml = NewLaunch.buildFacilityOptionsHtml();
+    const l = (key: string) => t7e(`plugins.NewLaunch.labels.${key}` as T7eKey);
 
     return html`
       <div id="newLaunch-menu" class="side-menu-parent start-hidden">
         <div id="newLaunch-content" class="side-menu">
           <div class="row">
-            <h5 class="center-align">New Launch</h5>
+            <h5 class="center-align">${t7e('plugins.NewLaunch.sideMenuTitle' as T7eKey)}</h5>
             <div class="center-align" style="margin: 0em 0.75em 1.5em 0.75em; color: #888; font-size: 0.95em;">
-              Note: This tool is optimized for LEO satellites and may not work correctly for HEO or GEO orbits.
+              ${t7e('plugins.NewLaunch.leoOptimizedNote' as T7eKey)}
             </div>
             <form id="${this.sideMenuElementName}-form" class="col s12">
               <div class="input-field col s12">
                 <input disabled value="00005" id="nl-scc" type="text">
-                <label for="disabled" class="active">Satellite SCC#</label>
+                <label for="disabled" class="active">${l('satelliteScc')}</label>
               </div>
               <div class="input-field col s12">
                 <input disabled value="50.00" id="nl-inc" type="text">
-                <label for="disabled" class="active">Inclination</label>
+                <label for="disabled" class="active">${l('inclination')}</label>
               </div>
               <div class="input-field col s12">
                 <select value="50.00" id="nl-updown" type="text">
-                  <option value="N">North</option>
-                  <option value="S">South</option>
+                  <option value="N">${l('north')}</option>
+                  <option value="S">${l('south')}</option>
                 </select>
-                <label for="disabled">Launching North or South</label>
+                <label for="disabled">${l('launchingNorthOrSouth')}</label>
               </div>
               <div class="input-field col s12" id="nl-launch-menu">
                 <select id="nl-facility">
                   ${optionsHtml}
                 </select>
-                <label>Launch Facility</label>
+                <label>${l('launchFacility')}</label>
               </div>
               <div class="center-align">
                 <button
-                  id="${this.sideMenuElementName}-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create Launch
-                  Nominal &#9658;
+                  id="${this.sideMenuElementName}-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">
+                  ${t7e('plugins.NewLaunch.buttons.createLaunchNominal' as T7eKey)} &#9658;
                 </button>
               </div>
             </form>
@@ -219,7 +252,7 @@ export class NewLaunch extends KeepTrackPlugin {
     }
 
     if (id === -1 || !nominalSat) {
-      uiManagerInstance.toast('No more nominal satellites available!', ToastMsgType.critical);
+      uiManagerInstance.toast(t7e('plugins.NewLaunch.errorMsgs.noMoreNominalSatellites' as T7eKey), ToastMsgType.critical);
       this.isDoingCalculations_ = false;
       hideLoading();
 
@@ -242,10 +275,11 @@ export class NewLaunch extends KeepTrackPlugin {
    * Rotate the satellite's orbit over the selected launch site using OrbitFinder,
    * then update the cruncher and wait for propagation results.
    *
-   * This is the second half of the launch flow — call it directly when the
+   * This is the second half of the launch flow - call it directly when the
    * nominal satellite is already created (e.g. custom orbit mode).
    */
   protected launchFromSite_(sat: Satellite, id: number): void {
+    const eMsg = (key: string) => t7e(`plugins.NewLaunch.errorMsgs.${key}` as T7eKey);
     const timeManagerInstance = ServiceLocator.getTimeManager();
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const uiManagerInstance = ServiceLocator.getUiManager();
@@ -262,7 +296,7 @@ export class NewLaunch extends KeepTrackPlugin {
     launchLon = launchSite.lon;
 
     if (launchLat === null || launchLon === null) {
-      uiManagerInstance.toast(`Launch Site ${launchFac} not found!`, ToastMsgType.critical);
+      uiManagerInstance.toast(eMsg('launchSiteNotFound').replace('{launchSite}', launchFac), ToastMsgType.critical);
 
       return;
     }
@@ -302,11 +336,11 @@ export class NewLaunch extends KeepTrackPlugin {
 
     if (tle1 === 'Error' || tle1.length !== 69 || tle2.length !== 69) {
       if (tle1 === 'Error') {
-        uiManagerInstance.toast(`Failed to Create TLE: ${tle2}`, ToastMsgType.critical);
+        uiManagerInstance.toast(eMsg('failedToCreateTle').replace('{error}', tle2), ToastMsgType.critical);
       } else if (tle1.length !== 69) {
-        uiManagerInstance.toast(`Invalid TLE1 Created: length is not 69 - ${tle1}`, ToastMsgType.critical);
+        uiManagerInstance.toast(eMsg('invalidTle1Length').replace('{tle}', tle1), ToastMsgType.critical);
       } else if (tle2.length !== 69) {
-        uiManagerInstance.toast(`Invalid TLE2 Created: length is not 69 - ${tle2}`, ToastMsgType.critical);
+        uiManagerInstance.toast(eMsg('invalidTle2Length').replace('{tle}', tle2), ToastMsgType.critical);
       }
 
       // We have to change the time for the TLE creation, but it failed, so revert it.
@@ -323,7 +357,7 @@ export class NewLaunch extends KeepTrackPlugin {
     try {
       sat.editTle(tle1, tle2 as TleLine2);
     } catch (e) {
-      errorManagerInstance.error(e, 'new-launch.ts', 'Error creating satellite record!');
+      errorManagerInstance.error(e, 'new-launch.ts', t7e('plugins.NewLaunch.errorMsgs.errorCreatingSatRecord' as T7eKey));
 
       return;
     }
@@ -345,7 +379,7 @@ export class NewLaunch extends KeepTrackPlugin {
         orbitManagerInstance.changeOrbitBufferData(id, tle1, tle2);
       }
     } else {
-      uiManagerInstance.toast('Failed Altitude Test - Try a Different Satellite!', ToastMsgType.critical);
+      uiManagerInstance.toast(eMsg('failedAltitudeTest'), ToastMsgType.critical);
     }
 
     waitForCruncher({
@@ -357,10 +391,10 @@ export class NewLaunch extends KeepTrackPlugin {
         // Deseletect the satellite
         PluginRegistry.getPlugin(SelectSatManager)?.selectSat(sat.id);
 
-        uiManagerInstance.toast('Launch Nominal Created!', ToastMsgType.standby);
+        uiManagerInstance.toast(t7e('plugins.NewLaunch.msgs.launchNominalCreated' as T7eKey), ToastMsgType.standby);
         uiManagerInstance.searchManager.doSearch(sat.sccNum);
 
-        uiManagerInstance.toast('Time is now relative to launch time.', ToastMsgType.standby);
+        uiManagerInstance.toast(t7e('plugins.NewLaunch.msgs.timeRelativeToLaunch' as T7eKey), ToastMsgType.standby);
         ServiceLocator.getSoundManager()?.play(SoundNames.LIFT_OFF);
       },
       validationFunc: (data: PositionCruncherOutgoingMsg) => typeof data.satPos !== 'undefined',
@@ -372,7 +406,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
         this.isDoingCalculations_ = false;
         hideLoading();
-        uiManagerInstance.toast('Cruncher failed to meet requirement after multiple tries! Is this launch even possible?', ToastMsgType.critical);
+        uiManagerInstance.toast(eMsg('cruncherFailed'), ToastMsgType.critical);
       },
       skipNumber: 2,
       maxRetries: 50,
@@ -426,7 +460,7 @@ export class NewLaunch extends KeepTrackPlugin {
         launchSiteDropdown.dispatchEvent(new Event('change'));
       }
     } else {
-      errorManagerInstance.warn(`Launch site ${launchSite.name} not found in launchSites catalog.`);
+      errorManagerInstance.warn(t7e('plugins.NewLaunch.errorMsgs.launchSiteNotInCatalog' as T7eKey).replace('{name}', launchSite.name));
     }
   }
 
@@ -442,14 +476,15 @@ export class NewLaunch extends KeepTrackPlugin {
 
     if (inc < lat) {
       submitButtonDom.disabled = true;
-      submitButtonDom.textContent = 'Inclination Too Low!';
+      submitButtonDom.textContent = t7e('plugins.NewLaunch.buttons.inclinationTooLow' as T7eKey);
     } else {
       submitButtonDom.disabled = false;
-      submitButtonDom.textContent = 'Create Launch Nominal \u25B6';
+      submitButtonDom.textContent = `${t7e('plugins.NewLaunch.buttons.createLaunchNominal' as T7eKey)} \u25B6`;
     }
   }
 
   protected createNominalSat_(inputParams: Satellite, scc: string, id: number): Satellite | null {
+    const eMsg = (key: string) => t7e(`plugins.NewLaunch.errorMsgs.${key}` as T7eKey);
     const country = inputParams.country;
     const type = inputParams.type;
     const intl = `${inputParams.epochYear}69B`; // International designator
@@ -458,18 +493,18 @@ export class NewLaunch extends KeepTrackPlugin {
     const eccFrac = inputParams.eccentricity.toString().split('.')[1] ?? '0';
 
     if (!(/^\d{7}$/u).test(eccFrac.padStart(7, '0'))) {
-      ServiceLocator.getUiManager().toast('Invalid eccentricity format!', ToastMsgType.critical, true);
-      errorManagerInstance.warn('There was an issue with this satellite\'s eccentricity format. Try a different satellite.');
+      ServiceLocator.getUiManager().toast(eMsg('invalidEccentricityFormat'), ToastMsgType.critical, true);
+      errorManagerInstance.warn(eMsg('eccentricityFormatIssue'));
     }
 
     if (!(/^\d{2}$/u).test(inputParams.epochYear.toString()?.padStart(2, '0'))) {
-      ServiceLocator.getUiManager().toast('Invalid epoch year format!', ToastMsgType.critical, true);
-      errorManagerInstance.warn('There was an issue with this satellite\'s epoch year format. Try a different satellite.');
+      ServiceLocator.getUiManager().toast(eMsg('invalidEpochYearFormat'), ToastMsgType.critical, true);
+      errorManagerInstance.warn(eMsg('epochYearFormatIssue'));
     }
 
     if (!(/^(?:\d{3}\.\d{8})$/u).test(inputParams.epochDay.toFixed(8).padStart(12, '0'))) {
-      ServiceLocator.getUiManager().toast('Invalid epoch day format! Must be 3 digits, a decimal, and 8 digits after the decimal.', ToastMsgType.critical, true);
-      errorManagerInstance.warn('There was an issue with this satellite\'s epoch day format. Try a different satellite.');
+      ServiceLocator.getUiManager().toast(eMsg('invalidEpochDayFormat'), ToastMsgType.critical, true);
+      errorManagerInstance.warn(eMsg('epochDayFormatIssue'));
     }
 
     // Create TLE from parameters
@@ -508,7 +543,7 @@ export class NewLaunch extends KeepTrackPlugin {
     try {
       satrec = Sgp4.createSatrec(tle1, tle2);
     } catch (e) {
-      errorManagerInstance.error(e as Error, 'create-sat.ts', 'Error creating satellite record!');
+      errorManagerInstance.error(e as Error, 'create-sat.ts', eMsg('errorCreatingSatRecord'));
 
       return null;
     }
@@ -516,7 +551,7 @@ export class NewLaunch extends KeepTrackPlugin {
     // Validate altitude is reasonable
     if (SatMath.altitudeCheck(satrec, ServiceLocator.getTimeManager().simulationTimeObj) <= 1) {
       ServiceLocator.getUiManager().toast(
-        'Failed to propagate satellite. Try different parameters or report this issue if parameters are correct.',
+        eMsg('failedToPropagate'),
         ToastMsgType.caution,
         true,
       );
@@ -559,7 +594,7 @@ export class NewLaunch extends KeepTrackPlugin {
     try {
       ServiceLocator.getOrbitManager().changeOrbitBufferData(id, tle1, tle2);
     } catch (e) {
-      errorManagerInstance.error(e as Error, 'create-sat.ts', 'Changing orbit buffer data failed');
+      errorManagerInstance.error(e as Error, 'create-sat.ts', eMsg('changingOrbitBufferFailed'));
 
       return null;
     }

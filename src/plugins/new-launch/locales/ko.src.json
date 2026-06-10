@@ -3,7 +3,53 @@
     "NewLaunch": {
       "bottomIconLabel": "새 발사",
       "title": "새 발사 메뉴",
-      "helpBody": "새 발사 메뉴는 유사한 매개변수를 가진 기존 위성을 수정하여 개념적 궤도 발사를 생성하는 데 사용됩니다. <br><br> 위성을 선택한 후, 발사 위치와 북/남 방위각을 선택할 수 있습니다. 선택한 위성은 발사 지점에 맞게 수정됩니다. 시계는 발사 후 상대 시간을 나타내기 위해 00:00:00으로 변경됩니다. 이는 발사 시간에 대한 센서 커버리지를 계산하는 데 도움이 될 수 있습니다. 다른 궤도 물체와의 관계는 정확하지 않을 것입니다."
+      "sideMenuTitle": "새 발사",
+      "leoOptimizedNote": "참고: 이 도구는 LEO 위성에 최적화되어 있으며 HEO 또는 GEO 궤도에서는 올바르게 작동하지 않을 수 있습니다.",
+      "labels": {
+        "satelliteScc": "위성 SCC#",
+        "inclination": "경사각",
+        "launchingNorthOrSouth": "북쪽 또는 남쪽 발사",
+        "launchFacility": "발사 시설",
+        "north": "북쪽",
+        "south": "남쪽"
+      },
+      "buttons": {
+        "createLaunchNominal": "발사 노미널 생성",
+        "inclinationTooLow": "경사각이 너무 낮습니다!"
+      },
+      "msgs": {
+        "launchNominalCreated": "발사 노미널이 생성되었습니다!",
+        "timeRelativeToLaunch": "이제 시간은 발사 시간 기준 상대 시간입니다."
+      },
+      "errorMsgs": {
+        "noMoreNominalSatellites": "사용 가능한 노미널 위성이 더 이상 없습니다!",
+        "launchSiteNotFound": "발사 장소 {launchSite}을(를) 찾을 수 없습니다!",
+        "failedToCreateTle": "TLE 생성 실패: {error}",
+        "invalidTle1Length": "잘못된 TLE1이 생성되었습니다: 길이가 69가 아닙니다 - {tle}",
+        "invalidTle2Length": "잘못된 TLE2가 생성되었습니다: 길이가 69가 아닙니다 - {tle}",
+        "failedAltitudeTest": "고도 검사 실패 - 다른 위성을 시도해 보세요!",
+        "cruncherFailed": "여러 번 시도했지만 크런처가 요구 조건을 충족하지 못했습니다! 이 발사가 가능하기는 한가요?",
+        "errorCreatingSatRecord": "위성 레코드 생성 오류!",
+        "launchSiteNotInCatalog": "발사 장소 {name}이(가) launchSites 카탈로그에 없습니다.",
+        "invalidEccentricityFormat": "잘못된 이심률 형식입니다!",
+        "eccentricityFormatIssue": "이 위성의 이심률 형식에 문제가 있습니다. 다른 위성을 시도해 보세요.",
+        "invalidEpochYearFormat": "잘못된 에포크 연도 형식입니다!",
+        "epochYearFormatIssue": "이 위성의 에포크 연도 형식에 문제가 있습니다. 다른 위성을 시도해 보세요.",
+        "invalidEpochDayFormat": "잘못된 에포크 일 형식입니다! 3자리 숫자, 소수점, 소수점 뒤 8자리 숫자여야 합니다.",
+        "epochDayFormatIssue": "이 위성의 에포크 일 형식에 문제가 있습니다. 다른 위성을 시도해 보세요.",
+        "failedToPropagate": "위성 전파에 실패했습니다. 다른 매개변수를 시도하거나 매개변수가 올바르다면 이 문제를 보고해 주세요.",
+        "changingOrbitBufferFailed": "궤도 버퍼 데이터 변경 실패"
+      },
+      "help": {
+        "overview": "새 발사 메뉴는 개념적 발사를 생성합니다. 실제 위성의 궤도를 복사하고, 선택한 발사 장소에서 이륙하도록 회전시킨 다음, 시계를 T+0으로 재설정합니다. \"이 장소에서 이런 궤도로 무언가 발사되면 내 센서가 언제 그것을 볼 수 있을까?\"라는 질문에 답하는 데 사용하세요.",
+        "imgAlt": "발사 시설 및 방향 옵션이 있는 새 발사 메뉴",
+        "imgCaption": "템플릿 위성, 발사 시설, 북향 또는 남향 발사를 선택하세요.",
+        "howToUse": "<ol><li>예상 탑재체와 궤도가 유사한 위성을 선택하세요. 해당 위성의 경사각과 고도가 템플릿이 됩니다. 위성이 선택될 때까지 아이콘은 비활성화됩니다.</li><li>메뉴를 열고 <strong>발사 시설</strong>(국가별로 그룹화)과 발사가 <strong>북쪽 또는 남쪽</strong>으로 향할지 선택하세요.</li><li><strong>발사 노미널 생성</strong>을 클릭하세요. 회전된 궤도에 새로운 시뮬레이션 객체가 생성되고 시계가 00:00:00으로 재설정됩니다. 이제 시간은 이륙 기준 상대 시간입니다.</li><li>센서 커버리지 메뉴(관측 각도, 다중 사이트 관측)를 열어 발사 후 노미널이 처음으로 보이는 시점을 확인하세요.</li></ol>",
+        "limitsHeading": "제한 사항",
+        "limits": "<ul><li>템플릿의 경사각은 발사 장소의 위도 이상이어야 합니다. 발사 지점보다 기울기가 작은 궤도로는 발사할 수 없으므로 이 경우 버튼이 자동으로 비활성화됩니다.</li><li>이 도구는 LEO에 최적화되어 있습니다. 고타원 궤도나 GEO 템플릿은 실패할 수 있습니다.</li><li>노미널은 시뮬레이션입니다. 다른 카탈로그 객체와의 상대 위치는 의미가 없습니다.</li><li>선택한 템플릿 위성은 변경되지 않습니다. 노미널은 분석가 카탈로그 슬롯에 있는 별도의 객체입니다.</li></ul>",
+        "tip1": "생성 후 시계는 이륙 이후 경과 시간을 표시합니다. \"00:45:00\"은 발사 후 45분을 의미하며 센서 커버리지 타임라인에 적합합니다.",
+        "tip2": "생성이 고도 검사에서 실패하면 더 일반적인 궤도를 가진 다른 템플릿 위성을 시도해 보세요."
+      }
     }
   }
 }

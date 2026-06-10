@@ -3,10 +3,22 @@
     "SatellitePhotos": {
       "bottomIconLabel": "Satellite Imagery",
       "title": "Satellite Imagery",
-      "helpBody": "The Satellite Imagery plugin displays the latest images from geostationary weather satellites and DSCOVR. Click a satellite name to view its most recent image.",
       "defaultImageTitle": "Latest Satellite Image",
+      "labels": {
+        "dscovrUnavailable": "DSCOVR Temporarily Unavailable",
+        "dscovrImage": "DSCOVR Image {index}"
+      },
       "errorMsgs": {
         "FuturePictures": "Can't load images from the future. Loading most recent imagery."
+      },
+      "help": {
+        "overview": "Satellite Imagery shows the most recent pictures taken by real weather satellites: full disk views from MeteoSat, Himawari, GOES, and Elektro-L in geostationary orbit, plus whole Earth images from DSCOVR out at the L1 point. It connects what you see in the simulation to what those satellites are actually photographing right now.",
+        "imgAlt": "The Satellite Imagery menu listing weather satellites",
+        "imgCaption": "Click a satellite to view its latest image and fly to it in the scene.",
+        "howToUse": "<ol><li>Open <strong>Satellite Imagery</strong> from the bottom bar or press <strong>H</strong>; it needs an internet connection.</li><li>Click a satellite. The camera flies to it in the 3D scene and its newest image opens in an overlay.</li><li>DSCOVR entries appear at the bottom of the list with one entry per recent image.</li></ol>",
+        "tip1": "Images come live from each agency's public service, so a missing entry usually means that feed is temporarily down, not a bug.",
+        "tip2": "If the simulation clock is set in the future, the most recent real imagery is shown instead.",
+        "shortcutToggle": "Toggle the Satellite Imagery menu"
       }
     }
   }

@@ -3,10 +3,22 @@
     "SatellitePhotos": {
       "bottomIconLabel": "Satellitenbilder",
       "title": "Satellitenbilder",
-      "helpBody": "Das Satellitenbilder-Plugin zeigt die neuesten Aufnahmen von geostationären Wettersatelliten und DSCOVR an. Klicken Sie auf einen Satellitennamen, um das neueste Bild anzuzeigen.",
       "defaultImageTitle": "Neuestes Satellitenbild",
+      "labels": {
+        "dscovrUnavailable": "DSCOVR vorübergehend nicht verfügbar",
+        "dscovrImage": "DSCOVR-Bild {index}"
+      },
       "errorMsgs": {
         "FuturePictures": "Bilder aus der Zukunft können nicht geladen werden. Die neuesten Aufnahmen werden geladen."
+      },
+      "help": {
+        "overview": "Satellitenbilder zeigt die neuesten Aufnahmen echter Wettersatelliten: Vollscheibenansichten von MeteoSat, Himawari, GOES und Elektro-L im geostationären Orbit sowie Aufnahmen der gesamten Erde von DSCOVR am L1-Punkt. So verbinden Sie das, was Sie in der Simulation sehen, mit dem, was diese Satelliten gerade tatsächlich fotografieren.",
+        "imgAlt": "Das Satellitenbilder-Menü mit einer Liste von Wettersatelliten",
+        "imgCaption": "Klicken Sie auf einen Satelliten, um sein neuestes Bild anzuzeigen und in der Szene zu ihm zu fliegen.",
+        "howToUse": "<ol><li>Öffnen Sie <strong>Satellitenbilder</strong> über die untere Leiste oder drücken Sie <strong>H</strong>; eine Internetverbindung ist erforderlich.</li><li>Klicken Sie auf einen Satelliten. Die Kamera fliegt in der 3D-Szene zu ihm und sein neuestes Bild öffnet sich in einer Überlagerung.</li><li>DSCOVR-Einträge erscheinen am Ende der Liste, mit einem Eintrag pro aktuellem Bild.</li></ol>",
+        "tip1": "Die Bilder kommen live aus den öffentlichen Diensten der jeweiligen Agenturen; ein fehlender Eintrag bedeutet daher meist, dass dieser Feed vorübergehend ausgefallen ist, und ist kein Fehler.",
+        "tip2": "Wenn die Simulationsuhr in der Zukunft steht, werden stattdessen die neuesten echten Aufnahmen angezeigt.",
+        "shortcutToggle": "Satellitenbilder-Menü umschalten"
       }
     }
   }

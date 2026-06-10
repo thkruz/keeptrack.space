@@ -88,8 +88,27 @@ export class SatellitePhotos extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.SatellitePhotos.title' as Parameters<typeof t7e>[0]),
-      body: t7e('plugins.SatellitePhotos.helpBody' as Parameters<typeof t7e>[0]),
+      title: t7e('plugins.SatellitePhotos.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.SatellitePhotos.help.overview'),
+          image: {
+            src: 'img/help/satellite-photos/satellite-photos-menu.png',
+            alt: t7e('plugins.SatellitePhotos.help.imgAlt'),
+            caption: t7e('plugins.SatellitePhotos.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.SatellitePhotos.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.SatellitePhotos.help.tip1'),
+        t7e('plugins.SatellitePhotos.help.tip2'),
+      ],
+      shortcuts: [{ keys: ['H'], description: t7e('plugins.SatellitePhotos.help.shortcutToggle') }],
     };
   }
 
@@ -257,7 +276,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
       })
       .catch(() => {
         errorManagerInstance.log('https://epic.gsfc.nasa.gov/ request failed!');
-        const unavailableHtml = '<li class="menu-selectable disabled">DSCOVR Temporarily Unavailable</li>';
+        const unavailableHtml = `<li class="menu-selectable disabled">${t7e('plugins.SatellitePhotos.labels.dscovrUnavailable')}</li>`;
 
         getEl('sat-photo-menu-list', true)?.insertAdjacentHTML('beforeend', unavailableHtml);
       });
@@ -271,7 +290,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
     }
 
     for (let i = 1; i < this.discvrPhotos_.length + 1; i++) {
-      const linkHtml = `<li id="discovr-link${i}" class="menu-selectable">DSCOVR Image ${i}</li>`;
+      const linkHtml = `<li id="discovr-link${i}" class="menu-selectable">${t7e('plugins.SatellitePhotos.labels.dscovrImage').replace('{index}', i.toString())}</li>`;
 
       listEl.insertAdjacentHTML('beforeend', linkHtml);
       getEl(`discovr-link${i}`, true)?.addEventListener('click', () => {

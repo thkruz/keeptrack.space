@@ -3,7 +3,30 @@
     "OrbitGuardMenuPlugin": {
       "bottomIconLabel": "OrbitGuard",
       "title": "OrbitGuard",
-      "helpBody": "Il menu di rilevamento anomalie OrbitGuard visualizza gli ultimi eventi di manovra, orbita fuori famiglia e cambio di stabilità per i satelliti."
+      "labels": {
+        "dataCredit": "*Dati OrbitGuard forniti da MSBAI.",
+        "previous": "Precedente",
+        "next": "Successivo",
+        "pageOf": "Pagina {current} di {total}"
+      },
+      "table": {
+        "norad": "NORAD",
+        "eventStartTime": "Ora di inizio evento",
+        "eventEndTime": "Ora di fine evento",
+        "maneuverClass": "Classe di manovra",
+        "maneuverProbability": "Probabilità di manovra (%)",
+        "orbitOutOfFamily": "Orbita fuori famiglia",
+        "stabilityChange": "Cambio di stabilità",
+        "stabilityChangeProbability": "Probabilità di cambio di stabilità (%)"
+      },
+      "help": {
+        "overview": "OrbitGuard elenca le recenti rilevazioni di anomalie nell'intero catalogo: manovre sospette, orbite uscite dalla propria famiglia e cambi di stabilità, ognuna con una probabilità di confidenza. I dati provengono dal servizio OrbitGuard di MSBAI e offrono un elenco ordinato di satelliti che meritano un'analisi più attenta.",
+        "imgAlt": "La tabella delle anomalie OrbitGuard con gli eventi rilevati",
+        "imgCaption": "Ogni riga è un evento rilevato; le celle rosse segnalano le rilevazioni che hanno superato la soglia.",
+        "howToUse": "<ol><li>Apri <strong>OrbitGuard</strong> dalla barra inferiore (modalità Eventi). Gli ultimi eventi si caricano automaticamente.</li><li>Scorri la tabella: le celle evidenziate in rosso sono rilevazioni positive (una manovra classificata, un'orbita fuori famiglia o un cambio di stabilità).</li><li>Fai clic su una riga per volare verso quel satellite e portare l'orologio alla fine dell'evento.</li><li>Usa <strong>Precedente</strong> e <strong>Successivo</strong> per sfogliare l'elenco, 20 eventi per pagina.</li></ol>",
+        "tip1": "Gli eventi sono deduplicati per satellite e ordinati dal più recente, quindi le righe in alto mostrano l'attività più recente.",
+        "tip2": "Le probabilità indicano la confidenza del modello, non una certezza; considera i valori intermedi come uno spunto per una verifica manuale, non come una conclusione."
+      }
     }
   }
 }

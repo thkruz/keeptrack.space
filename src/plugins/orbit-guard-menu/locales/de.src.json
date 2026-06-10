@@ -3,7 +3,30 @@
     "OrbitGuardMenuPlugin": {
       "bottomIconLabel": "OrbitGuard",
       "title": "OrbitGuard",
-      "helpBody": "Das OrbitGuard-Anomalieerkennungsmenü zeigt die neuesten Manöver-, Orbit-außerhalb-der-Norm- und Stabilitätsänderungsereignisse für Satelliten an."
+      "labels": {
+        "dataCredit": "*OrbitGuard-Daten bereitgestellt von MSBAI.",
+        "previous": "Zurück",
+        "next": "Weiter",
+        "pageOf": "Seite {current} von {total}"
+      },
+      "table": {
+        "norad": "NORAD",
+        "eventStartTime": "Startzeit des Ereignisses",
+        "eventEndTime": "Endzeit des Ereignisses",
+        "maneuverClass": "Manöverklasse",
+        "maneuverProbability": "Manöverwahrscheinlichkeit (%)",
+        "orbitOutOfFamily": "Orbit außerhalb der Familie",
+        "stabilityChange": "Stabilitätsänderung",
+        "stabilityChangeProbability": "Wahrscheinlichkeit der Stabilitätsänderung (%)"
+      },
+      "help": {
+        "overview": "OrbitGuard listet aktuelle Anomalieerkennungen im gesamten Katalog auf: vermutete Manöver, Orbits, die aus ihrer Familie gedriftet sind, und Stabilitätsänderungen, jeweils mit einer Konfidenzwahrscheinlichkeit. Die Daten stammen aus dem OrbitGuard-Dienst von MSBAI und liefern eine sortierte Liste von Satelliten, die einen genaueren Blick wert sind.",
+        "imgAlt": "Die OrbitGuard-Anomalietabelle mit erkannten Ereignissen",
+        "imgCaption": "Jede Zeile ist ein erkanntes Ereignis; rote Zellen markieren Erkennungen, die ihren Schwellenwert überschritten haben.",
+        "howToUse": "<ol><li>Öffnen Sie <strong>OrbitGuard</strong> über die untere Leiste (Modus Ereignisse). Die neuesten Ereignisse werden automatisch geladen.</li><li>Überfliegen Sie die Tabelle: rot hervorgehobene Zellen sind positive Erkennungen (ein klassifiziertes Manöver, ein Orbit außerhalb der Familie oder eine Stabilitätsänderung).</li><li>Klicken Sie auf eine Zeile, um zu diesem Satelliten zu fliegen und die Uhr auf das Ende des Ereignisses zu stellen.</li><li>Mit <strong>Zurück</strong> und <strong>Weiter</strong> blättern Sie durch die Liste, 20 Ereignisse pro Seite.</li></ol>",
+        "tip1": "Ereignisse werden pro Satellit dedupliziert und nach Aktualität sortiert, sodass die obersten Zeilen die jüngste Aktivität zeigen.",
+        "tip2": "Wahrscheinlichkeiten sind Modellkonfidenz, keine Gewissheit; betrachten Sie mittlere Werte als Anlass für eine manuelle Prüfung und nicht als Schlussfolgerung."
+      }
     }
   }
 }

@@ -3,7 +3,30 @@
     "OrbitGuardMenuPlugin": {
       "bottomIconLabel": "OrbitGuard",
       "title": "OrbitGuard",
-      "helpBody": "The OrbitGuard Anomaly Detection menu displays the latest maneuvern Orbit Out of Family, and Stability Change events for satellites."
+      "labels": {
+        "dataCredit": "*OrbitGuard Data provided by MSBAI.",
+        "previous": "Previous",
+        "next": "Next",
+        "pageOf": "Page {current} of {total}"
+      },
+      "table": {
+        "norad": "NORAD",
+        "eventStartTime": "Event Start Time",
+        "eventEndTime": "Event End Time",
+        "maneuverClass": "Maneuver Class",
+        "maneuverProbability": "Maneuver Probability (%)",
+        "orbitOutOfFamily": "Orbit Out of Family",
+        "stabilityChange": "Stability Change",
+        "stabilityChangeProbability": "Stability Change Probability (%)"
+      },
+      "help": {
+        "overview": "OrbitGuard lists recent anomaly detections across the catalog: suspected maneuvers, orbits that have drifted out of family, and stability changes, each with a confidence probability. The data comes from MSBAI's OrbitGuard service and gives you a ranked feed of satellites worth a closer look.",
+        "imgAlt": "The OrbitGuard anomaly table with detection events",
+        "imgCaption": "Each row is a detected event; red cells flag detections that crossed their threshold.",
+        "howToUse": "<ol><li>Open <strong>OrbitGuard</strong> from the bottom bar (Events mode). The latest events load automatically.</li><li>Scan the table: cells highlighted red are positive detections (a classified maneuver, an out of family orbit, or a stability change).</li><li>Click a row to fly to that satellite and jump the clock to the end of the event.</li><li>Use <strong>Previous</strong> and <strong>Next</strong> to page through the feed, 20 events per page.</li></ol>",
+        "tip1": "Events are deduplicated per satellite and sorted newest first, so the top rows are the most recent activity.",
+        "tip2": "Probabilities are model confidence, not certainty; treat mid range values as a cue for manual review rather than a conclusion."
+      }
     }
   }
 }

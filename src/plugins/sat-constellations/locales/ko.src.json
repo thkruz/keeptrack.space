@@ -1,53 +1,65 @@
 {
   "plugins": {
     "SatConstellations": {
-      "bottomIconLabel": "\ucf58\uc2a4\ud154\ub808\uc774\uc158",
-      "title": "\ucf58\uc2a4\ud154\ub808\uc774\uc158 \uba54\ub274",
-      "helpBody": "\ucf58\uc2a4\ud154\ub808\uc774\uc158 \uba54\ub274\ub97c \uc0ac\uc6a9\ud558\uba74 \uc704\uc131 \uadf8\ub8f9\uc744 \ubcfc \uc218 \uc788\uc2b5\ub2c8\ub2e4. <br><br> \uc77c\ubd80 \ucf58\uc2a4\ud154\ub808\uc774\uc158\uc758 \uacbd\uc6b0, \ucf58\uc2a4\ud154\ub808\uc774\uc158 \ub0b4 \uc704\uc131 \uac04\uc5d0 \uac1c\ub150\uc801 \uc5c5\ub9c1\ud06c/\ub2e4\uc6b4\ub9c1\ud06c \ubc0f/\ub610\ub294 \ud06c\ub85c\uc2a4\ub9c1\ud06c\uac00 \uadf8\ub824\uc9d1\ub2c8\ub2e4.",
+      "bottomIconLabel": "콘스텔레이션",
+      "title": "콘스텔레이션 메뉴",
+      "help": {
+        "overview": "콘스텔레이션 메뉴는 관련 위성을 그룹화하여 하나의 시스템으로 살펴볼 수 있게 합니다. GPS와 Galileo 같은 항법 콘스텔레이션, 통신 위성군, 우주 정거장 등이 있습니다. 콘스텔레이션을 선택하면 구성원이 강조 표시되고 요약 통계가 표시되며 모든 위성이 정렬 가능한 표에 나열됩니다.",
+        "imgAlt": "콘스텔레이션이 선택되고 통계와 표가 표시된 콘스텔레이션 메뉴",
+        "imgCaption": "콘스텔레이션을 선택하면 통계와 RAAN별로 그룹화된 구성원 표가 표시됩니다.",
+        "readingHeading": "통계 및 표",
+        "reading": "콘스텔레이션을 선택하면 머리글에 <strong>위성</strong> 수, <strong>평균 고도</strong>, <strong>경사</strong> 범위가 표시됩니다. 표에는 각 구성원의 NORAD 번호, 이름, 경사, RAAN, 근지점, 원지점이 RAAN별로 그룹화되어 표시되므로 궤도면이 잘 드러납니다. 행을 클릭하면 해당 위성이 선택됩니다.",
+        "filtersHeading": "필터",
+        "filters": "필터 패널로 표를 좁힐 수 있습니다. 최소 및 최대 <strong>경사</strong>, <strong>고도</strong>, <strong>RAAN</strong>을 설정하거나 <strong>이름 필터</strong>를 입력합니다(정규식을 사용할 수 있습니다). <strong>적용</strong>은 표를 갱신하고 <strong>초기화</strong>는 모든 필터를 지웁니다.",
+        "howToUse": "<ol><li>하단 막대에서 <strong>콘스텔레이션</strong> 메뉴를 엽니다(카탈로그 모드).</li><li>콘스텔레이션, 예를 들어 <strong>GPS 위성</strong>을 클릭합니다. 구성원이 3D 보기에서 강조 표시되고 통계와 표가 채워집니다.</li><li>일부 콘스텔레이션에서는 구성원 사이에 개념적 업링크, 다운링크 또는 크로스링크 선이 그려집니다.</li><li>필터 패널로 궤도면이나 고도 대역을 분리하고, 표의 행을 클릭하여 개별 위성을 살펴봅니다.</li></ol>",
+        "tip1": "마지막으로 선택한 콘스텔레이션이 기억되므로 KeepTrack을 다시 열면 작업 중이던 그룹이 복원됩니다.",
+        "tip2": "콘스텔레이션은 명령 팔레트 명령으로도 제공되므로 메뉴를 열지 않고도 이동할 수 있습니다.",
+        "tip3": "RAAN별 그룹화는 궤도면을 분명하게 보여 줍니다. 같은 평면의 위성은 거의 같은 RAAN 값을 공유합니다."
+      },
       "constellations": {
-        "SpaceStations": "\uc6b0\uc8fc \uc815\uac70\uc7a5",
-        "AmateurRadio": "\uc544\ub9c8\ucd94\uc5b4 \ub77c\ub514\uc624",
-        "GPSGroup": "GPS \uc704\uc131",
-        "GalileoGroup": "Galileo \uc704\uc131",
-        "GlonassGroup": "Glonass \uc704\uc131",
+        "SpaceStations": "우주 정거장",
+        "AmateurRadio": "아마추어 라디오",
+        "GPSGroup": "GPS 위성",
+        "GalileoGroup": "Galileo 위성",
+        "GlonassGroup": "Glonass 위성",
         "iridium": "Iridium",
         "orbcomm": "Orbcomm",
         "globalstar": "Globalstar",
         "ses": "SES",
-        "aehf": "Milstar \ubc0f AEHF",
-        "wgs": "DSCS \ubc0f WGS",
+        "aehf": "Milstar 및 AEHF",
+        "wgs": "DSCS 및 WGS",
         "starlink": "Starlink",
         "sbirs": "SBIRS"
       },
       "stats": {
-        "satellites": "\uc704\uc131",
-        "avgAltitude": "\ud3c9\uade0 \uace0\ub3c4",
-        "incRange": "\uacbd\uc0ac"
+        "satellites": "위성",
+        "avgAltitude": "평균 고도",
+        "incRange": "경사"
       },
       "table": {
         "norad": "NORAD",
-        "name": "\uc774\ub984",
-        "inclination": "\uacbd\uc0ac",
+        "name": "이름",
+        "inclination": "경사",
         "raan": "RAAN",
-        "perigee": "\uadfc\uc9c0\uc810",
-        "apogee": "\uc6d0\uc9c0\uc810"
+        "perigee": "근지점",
+        "apogee": "원지점"
       },
       "filters": {
-        "incMin": "\ucd5c\uc18c \uacbd\uc0ac (\u00B0)",
-        "incMax": "\ucd5c\ub300 \uacbd\uc0ac (\u00B0)",
-        "altMin": "\ucd5c\uc18c \uace0\ub3c4 (km)",
-        "altMax": "\ucd5c\ub300 \uace0\ub3c4 (km)",
-        "raanMin": "\ucd5c\uc18c RAAN (\u00B0)",
-        "raanMax": "\ucd5c\ub300 RAAN (\u00B0)",
-        "nameFilter": "\uc774\ub984 \ud544\ud130",
-        "apply": "\uc801\uc6a9",
-        "reset": "\ucd08\uae30\ud654"
+        "incMin": "최소 경사 (°)",
+        "incMax": "최대 경사 (°)",
+        "altMin": "최소 고도 (km)",
+        "altMax": "최대 고도 (km)",
+        "raanMin": "최소 RAAN (°)",
+        "raanMax": "최대 RAAN (°)",
+        "nameFilter": "이름 필터",
+        "apply": "적용",
+        "reset": "초기화"
       },
       "commands": {
-        "category": "\ucf58\uc2a4\ud154\ub808\uc774\uc158"
+        "category": "콘스텔레이션"
       },
       "errorMsgs": {
-        "NoConstellationSelected": "\ucf58\uc2a4\ud154\ub808\uc774\uc158\uc774 \uc120\ud0dd\ub418\uc9c0 \uc54a\uc558\uc2b5\ub2c8\ub2e4"
+        "NoConstellationSelected": "콘스텔레이션이 선택되지 않았습니다"
       }
     }
   }

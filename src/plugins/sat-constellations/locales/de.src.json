@@ -2,8 +2,20 @@
   "plugins": {
     "SatConstellations": {
       "bottomIconLabel": "Konstellationen",
-      "title": "Konstellationen-Men\u00fc",
-      "helpBody": "Das Konstellationen-Men\u00fc erm\u00f6glicht es Ihnen, Gruppen von Satelliten anzuzeigen. <br><br> F\u00fcr einige Konstellationen werden fiktive Uplinks/Downlinks und/oder Crosslinks zwischen Satelliten in der Konstellation gezeichnet.",
+      "title": "Konstellationen-Menü",
+      "help": {
+        "overview": "Das Konstellationen-Menü gruppiert zusammengehörige Satelliten, damit Sie sie als System untersuchen können: Navigationskonstellationen wie GPS und Galileo, Kommunikationsflotten, Raumstationen und mehr. Die Auswahl einer Konstellation hebt ihre Mitglieder hervor, zeigt zusammenfassende Statistiken und listet jeden Satelliten in einer sortierbaren Tabelle auf.",
+        "imgAlt": "Das Konstellationen-Menü mit einer ausgewählten Konstellation sowie ihren Statistiken und ihrer Tabelle",
+        "imgCaption": "Die Auswahl einer Konstellation zeigt ihre Statistiken und eine nach RAAN gruppierte Tabelle der Mitglieder.",
+        "readingHeading": "Statistiken und Tabelle",
+        "reading": "Nach der Auswahl einer Konstellation zeigt die Kopfzeile die Anzahl <strong>Satelliten</strong>, die <strong>Ø Höhe</strong> (durchschnittliche Höhe) und den Bereich <strong>Ink</strong> (Inklination). Die Tabelle listet jedes Mitglied mit NORAD-Nummer, Name, Inklination, RAAN, Perigäum und Apogäum, gruppiert nach RAAN, sodass Bahnebenen hervortreten. Klicken Sie auf eine Zeile, um diesen Satelliten auszuwählen.",
+        "filtersHeading": "Filter",
+        "filters": "Das Filterfeld grenzt die Tabelle ein: Legen Sie minimale und maximale <strong>Inklination</strong>, <strong>Höhe</strong> oder <strong>RAAN</strong> fest oder geben Sie einen <strong>Namensfilter</strong> ein (reguläre Ausdrücke funktionieren). <strong>Anwenden</strong> aktualisiert die Tabelle und <strong>Zurücksetzen</strong> löscht alle Filter.",
+        "howToUse": "<ol><li>Öffnen Sie das Menü <strong>Konstellationen</strong> über die untere Leiste (Katalogmodus).</li><li>Klicken Sie auf eine Konstellation, zum Beispiel <strong>GPS-Satelliten</strong>. Ihre Mitglieder werden in der 3D-Ansicht hervorgehoben, und Statistiken sowie Tabelle füllen sich.</li><li>Für einige Konstellationen werden fiktive Uplink-, Downlink- oder Crosslink-Verbindungen zwischen den Mitgliedern gezeichnet.</li><li>Nutzen Sie das Filterfeld, um Bahnebenen oder Höhenschalen zu isolieren, und klicken Sie auf Tabellenzeilen, um einzelne Satelliten zu untersuchen.</li></ol>",
+        "tip1": "Die zuletzt ausgewählte Konstellation wird gespeichert, sodass beim erneuten Öffnen von KeepTrack Ihre Arbeitsgruppe wiederhergestellt wird.",
+        "tip2": "Konstellationen sind auch als Befehle in der Befehlspalette verfügbar, sodass Sie ohne Öffnen des Menüs zu einer springen können.",
+        "tip3": "Die Gruppierung nach RAAN macht Bahnebenen offensichtlich: Satelliten in derselben Ebene haben nahezu denselben RAAN-Wert."
+      },
       "constellations": {
         "SpaceStations": "Raumstationen",
         "AmateurRadio": "Amateurfunk",
@@ -21,7 +33,7 @@
       },
       "stats": {
         "satellites": "Satelliten",
-        "avgAltitude": "\u00d8 H\u00f6he",
+        "avgAltitude": "Ø Höhe",
         "incRange": "Ink"
       },
       "table": {
@@ -29,25 +41,25 @@
         "name": "Name",
         "inclination": "Ink",
         "raan": "RAAN",
-        "perigee": "Perig\u00e4um",
-        "apogee": "Apog\u00e4um"
+        "perigee": "Perigäum",
+        "apogee": "Apogäum"
       },
       "filters": {
-        "incMin": "Min Ink (\u00B0)",
-        "incMax": "Max Ink (\u00B0)",
-        "altMin": "Min H\u00f6he (km)",
-        "altMax": "Max H\u00f6he (km)",
-        "raanMin": "Min. RAAN (\u00B0)",
-        "raanMax": "Max. RAAN (\u00B0)",
+        "incMin": "Min Ink (°)",
+        "incMax": "Max Ink (°)",
+        "altMin": "Min Höhe (km)",
+        "altMax": "Max Höhe (km)",
+        "raanMin": "Min. RAAN (°)",
+        "raanMax": "Max. RAAN (°)",
         "nameFilter": "Namensfilter",
         "apply": "Anwenden",
-        "reset": "Zur\u00fccksetzen"
+        "reset": "Zurücksetzen"
       },
       "commands": {
         "category": "Konstellationen"
       },
       "errorMsgs": {
-        "NoConstellationSelected": "Keine Konstellation ausgew\u00e4hlt"
+        "NoConstellationSelected": "Keine Konstellation ausgewählt"
       }
     }
   }

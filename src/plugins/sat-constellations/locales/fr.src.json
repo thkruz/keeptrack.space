@@ -3,7 +3,19 @@
     "SatConstellations": {
       "bottomIconLabel": "Constellations sat.",
       "title": "Menu Constellations",
-      "helpBody": "Le menu Constellations permet de visualiser des groupes de satellites. <br><br> Pour certaines constellations, des liaisons montantes/descendantes ou inter-satellites notionnelles seront affich\u00e9es.",
+      "help": {
+        "overview": "Le menu Constellations regroupe des satellites apparentés afin de les étudier comme un système : constellations de navigation comme GPS et Galileo, flottes de communications, stations spatiales et plus encore. La sélection d'une constellation met ses membres en évidence, affiche des statistiques de synthèse et liste chaque satellite dans un tableau triable.",
+        "imgAlt": "Le menu Constellations avec une constellation sélectionnée, ses statistiques et son tableau",
+        "imgCaption": "La sélection d'une constellation affiche ses statistiques et un tableau des membres regroupés par RAAN.",
+        "readingHeading": "Statistiques et tableau",
+        "reading": "Après la sélection d'une constellation, l'en-tête affiche le nombre de <strong>Satellites</strong>, l'<strong>Alt Moy</strong> (altitude moyenne) et la plage d'<strong>Inc</strong> (inclinaison). Le tableau liste chaque membre avec son numéro NORAD, son nom, son inclinaison, son RAAN, son périgée et son apogée, regroupés par RAAN pour faire ressortir les plans orbitaux. Cliquez sur une ligne pour sélectionner ce satellite.",
+        "filtersHeading": "Filtres",
+        "filters": "Le panneau de filtres affine le tableau : définissez l'<strong>inclinaison</strong>, l'<strong>altitude</strong> ou le <strong>RAAN</strong> minimum et maximum, ou saisissez un <strong>Filtre de Nom</strong> (les expressions régulières fonctionnent). <strong>Appliquer</strong> met à jour le tableau et <strong>Réinitialiser</strong> efface tous les filtres.",
+        "howToUse": "<ol><li>Ouvrez le menu <strong>Constellations sat.</strong> depuis la barre inférieure (mode Catalogue).</li><li>Cliquez sur une constellation, par exemple <strong>Satellites GPS</strong>. Ses membres sont mis en évidence dans la vue 3D et les statistiques et le tableau se remplissent.</li><li>Pour certaines constellations, des liaisons montantes, descendantes ou inter-satellites notionnelles sont tracées entre les membres.</li><li>Utilisez le panneau de filtres pour isoler des plans ou des couches d'altitude, et cliquez sur les lignes du tableau pour inspecter des satellites individuels.</li></ol>",
+        "tip1": "La dernière constellation sélectionnée est mémorisée : à la réouverture de KeepTrack, votre groupe de travail est restauré.",
+        "tip2": "Les constellations sont aussi disponibles comme commandes de la palette de commandes, vous pouvez donc y accéder sans ouvrir le menu.",
+        "tip3": "Le regroupement par RAAN rend les plans orbitaux évidents : les satellites d'un même plan partagent une valeur de RAAN presque identique."
+      },
       "constellations": {
         "SpaceStations": "Stations Spatiales",
         "AmateurRadio": "Radio Amateur",
@@ -29,25 +41,25 @@
         "name": "Nom",
         "inclination": "Inc",
         "raan": "RAAN",
-        "perigee": "P\u00e9rig\u00e9e",
-        "apogee": "Apog\u00e9e"
+        "perigee": "Périgée",
+        "apogee": "Apogée"
       },
       "filters": {
-        "incMin": "Inc Min (\u00B0)",
-        "incMax": "Inc Max (\u00B0)",
+        "incMin": "Inc Min (°)",
+        "incMax": "Inc Max (°)",
         "altMin": "Alt Min (km)",
         "altMax": "Alt Max (km)",
-        "raanMin": "RAAN Min (\u00B0)",
-        "raanMax": "RAAN Max (\u00B0)",
+        "raanMin": "RAAN Min (°)",
+        "raanMax": "RAAN Max (°)",
         "nameFilter": "Filtre de Nom",
         "apply": "Appliquer",
-        "reset": "R\u00e9initialiser"
+        "reset": "Réinitialiser"
       },
       "commands": {
         "category": "Constellations de satellites"
       },
       "errorMsgs": {
-        "NoConstellationSelected": "Aucune constellation s\u00e9lectionn\u00e9e"
+        "NoConstellationSelected": "Aucune constellation sélectionnée"
       }
     }
   }

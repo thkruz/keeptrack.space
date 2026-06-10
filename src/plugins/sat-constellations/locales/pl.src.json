@@ -3,7 +3,19 @@
     "SatConstellations": {
       "bottomIconLabel": "Konstelacje",
       "title": "Menu konstelacji",
-      "helpBody": "Menu konstelacji umożliwia przeglądanie grup satelitów. <br><br> Dla niektórych konstelacji rysowane są schematyczne łącza uplink/downlink i/lub łącza krzyżowe między satelitami w konstelacji.",
+      "help": {
+        "overview": "Menu konstelacji grupuje powiązane satelity, aby można było badać je jako system: konstelacje nawigacyjne takie jak GPS i Galileo, floty komunikacyjne, stacje kosmiczne i inne. Wybranie konstelacji wyróżnia jej członków, pokazuje statystyki podsumowujące i wyświetla każdego satelitę w sortowalnej tabeli.",
+        "imgAlt": "Menu konstelacji z wybraną konstelacją oraz jej statystykami i tabelą",
+        "imgCaption": "Wybranie konstelacji pokazuje jej statystyki i tabelę członków pogrupowanych według RAAN.",
+        "readingHeading": "Statystyki i tabela",
+        "reading": "Po wybraniu konstelacji nagłówek pokazuje liczbę <strong>Satelity</strong>, wartość <strong>Śr. wys.</strong> (średnia wysokość) oraz zakres <strong>Inkl.</strong> (inklinacja). Tabela wyświetla każdego członka z numerem NORAD, nazwą, inklinacją, RAAN, perygeum i apogeum, pogrupowanych według RAAN, dzięki czemu płaszczyzny orbitalne są dobrze widoczne. Kliknij wiersz, aby wybrać danego satelitę.",
+        "filtersHeading": "Filtry",
+        "filters": "Panel filtrów zawęża tabelę: ustaw minimalną i maksymalną <strong>inklinację</strong>, <strong>wysokość</strong> lub <strong>RAAN</strong>, albo wpisz <strong>Filtr nazwy</strong> (wyrażenia regularne działają). <strong>Zastosuj</strong> aktualizuje tabelę, a <strong>Resetuj</strong> czyści wszystkie filtry.",
+        "howToUse": "<ol><li>Otwórz menu <strong>Konstelacje</strong> z dolnego paska (tryb katalogu).</li><li>Kliknij konstelację, na przykład <strong>Satelity GPS</strong>. Jej członkowie zostaną wyróżnieni w widoku 3D, a statystyki i tabela się wypełnią.</li><li>Dla niektórych konstelacji między członkami rysowane są schematyczne łącza w górę, w dół lub łącza krzyżowe.</li><li>Użyj panelu filtrów, aby wyodrębnić płaszczyzny lub powłoki wysokości, i klikaj wiersze tabeli, aby badać poszczególne satelity.</li></ol>",
+        "tip1": "Ostatnio wybrana konstelacja jest zapamiętywana, więc po ponownym otwarciu KeepTrack twoja grupa robocza zostaje przywrócona.",
+        "tip2": "Konstelacje są też dostępne jako polecenia palety poleceń, więc można przejść do jednej z nich bez otwierania menu.",
+        "tip3": "Grupowanie według RAAN uwidacznia płaszczyzny orbitalne: satelity w tej samej płaszczyźnie mają niemal tę samą wartość RAAN."
+      },
       "constellations": {
         "SpaceStations": "Stacje kosmiczne",
         "AmateurRadio": "Radio amatorskie",

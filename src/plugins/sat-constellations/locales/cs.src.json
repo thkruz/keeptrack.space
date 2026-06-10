@@ -3,7 +3,19 @@
     "SatConstellations": {
       "bottomIconLabel": "Konstelace",
       "title": "Nabídka konstelací",
-      "helpBody": "Nabídka Konstelace umožňuje zobrazit skupiny satelitů. <br><br> U některých konstelací budou vykresleny hypotetické uplinky/downlinky a/nebo crosslinky mezi satelity v konstelaci.",
+      "help": {
+        "overview": "Nabídka konstelací seskupuje související satelity, abyste je mohli studovat jako systém: navigační konstelace jako GPS a Galileo, komunikační flotily, kosmické stanice a další. Výběr konstelace zvýrazní její členy, zobrazí souhrnné statistiky a vypíše každý satelit v řaditelné tabulce.",
+        "imgAlt": "Nabídka konstelací s vybranou konstelací a jejími statistikami a tabulkou",
+        "imgCaption": "Výběr konstelace zobrazí její statistiky a tabulku členů seskupených podle RAAN.",
+        "readingHeading": "Statistiky a tabulka",
+        "reading": "Po výběru konstelace záhlaví zobrazuje počet <strong>Satelity</strong>, hodnotu <strong>Prům. výška</strong> (průměrná výška) a rozsah <strong>Sklon</strong> (sklon dráhy). Tabulka uvádí každého člena s jeho číslem NORAD, názvem, sklonem, RAAN, perigeem a apogeem, seskupené podle RAAN, takže orbitální roviny vyniknou. Kliknutím na řádek vyberete daný satelit.",
+        "filtersHeading": "Filtry",
+        "filters": "Panel filtrů zužuje tabulku: nastavte minimální a maximální <strong>sklon</strong>, <strong>výšku</strong> nebo <strong>RAAN</strong>, nebo zadejte <strong>Filtr názvu</strong> (regulární výrazy fungují). <strong>Použít</strong> aktualizuje tabulku a <strong>Obnovit výchozí</strong> vymaže všechny filtry.",
+        "howToUse": "<ol><li>Otevřete nabídku <strong>Konstelace</strong> ze spodní lišty (režim katalogu).</li><li>Klikněte na konstelaci, například <strong>Satelity GPS</strong>. Její členové se zvýrazní ve 3D zobrazení a vyplní se statistiky a tabulka.</li><li>U některých konstelací se mezi členy vykreslují hypotetické spoje pro vzestupnou, sestupnou nebo mezidružicovou komunikaci.</li><li>Pomocí panelu filtrů izolujte roviny nebo výškové vrstvy a kliknutím na řádky tabulky prozkoumejte jednotlivé satelity.</li></ol>",
+        "tip1": "Poslední vybraná konstelace se ukládá, takže po opětovném otevření KeepTrack se obnoví vaše pracovní skupina.",
+        "tip2": "Konstelace jsou také dostupné jako příkazy v paletě příkazů, takže na ně můžete přejít bez otevírání nabídky.",
+        "tip3": "Seskupení podle RAAN zviditelňuje orbitální roviny: satelity ve stejné rovině sdílejí téměř stejnou hodnotu RAAN."
+      },
       "constellations": {
         "SpaceStations": "Kosmické stanice",
         "AmateurRadio": "Radioamatérské",

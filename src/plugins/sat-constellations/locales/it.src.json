@@ -3,7 +3,19 @@
     "SatConstellations": {
       "bottomIconLabel": "Costellazioni",
       "title": "Menu costellazioni",
-      "helpBody": "Il menu Costellazioni consente di visualizzare gruppi di satelliti. <br><br> Per alcune costellazioni, verranno disegnati uplink/downlink e/o crosslink indicativi tra i satelliti della costellazione.",
+      "help": {
+        "overview": "Il menu Costellazioni raggruppa satelliti correlati per studiarli come un sistema: costellazioni di navigazione come GPS e Galileo, flotte di comunicazione, stazioni spaziali e altro. Selezionando una costellazione i suoi membri vengono evidenziati, vengono mostrate statistiche riassuntive e ogni satellite è elencato in una tabella ordinabile.",
+        "imgAlt": "Il menu Costellazioni con una costellazione selezionata, le sue statistiche e la tabella",
+        "imgCaption": "Selezionando una costellazione vengono mostrate le sue statistiche e una tabella dei membri raggruppati per RAAN.",
+        "readingHeading": "Statistiche e tabella",
+        "reading": "Dopo aver selezionato una costellazione, l'intestazione mostra il conteggio <strong>Satelliti</strong>, l'<strong>Alt media</strong> (altitudine media) e l'intervallo <strong>Inc</strong> (inclinazione). La tabella elenca ogni membro con numero NORAD, nome, inclinazione, RAAN, perigeo e apogeo, raggruppati per RAAN così da far risaltare i piani orbitali. Fai clic su una riga per selezionare quel satellite.",
+        "filtersHeading": "Filtri",
+        "filters": "Il pannello dei filtri restringe la tabella: imposta <strong>inclinazione</strong>, <strong>altitudine</strong> o <strong>RAAN</strong> minimi e massimi, oppure digita un <strong>Filtro nome</strong> (le espressioni regolari funzionano). <strong>Applica</strong> aggiorna la tabella e <strong>Reimposta</strong> cancella tutti i filtri.",
+        "howToUse": "<ol><li>Apri il menu <strong>Costellazioni</strong> dalla barra inferiore (modalità Catalogo).</li><li>Fai clic su una costellazione, ad esempio <strong>Satelliti GPS</strong>. I suoi membri vengono evidenziati nella vista 3D e statistiche e tabella si popolano.</li><li>Per alcune costellazioni vengono disegnati collegamenti indicativi di uplink, downlink o crosslink tra i membri.</li><li>Usa il pannello dei filtri per isolare piani o fasce di altitudine e fai clic sulle righe della tabella per esaminare i singoli satelliti.</li></ol>",
+        "tip1": "L'ultima costellazione selezionata viene ricordata, quindi riaprendo KeepTrack il tuo gruppo di lavoro viene ripristinato.",
+        "tip2": "Le costellazioni sono disponibili anche come comandi della palette dei comandi, così puoi passare a una senza aprire il menu.",
+        "tip3": "Il raggruppamento per RAAN rende evidenti i piani orbitali: i satelliti dello stesso piano condividono un valore di RAAN quasi identico."
+      },
       "constellations": {
         "SpaceStations": "Stazioni spaziali",
         "AmateurRadio": "Radio amatoriale",
@@ -33,12 +45,12 @@
         "apogee": "Apogeo"
       },
       "filters": {
-        "incMin": "Inc min (\u00B0)",
-        "incMax": "Inc max (\u00B0)",
+        "incMin": "Inc min (°)",
+        "incMax": "Inc max (°)",
         "altMin": "Alt min (km)",
         "altMax": "Alt max (km)",
-        "raanMin": "RAAN min (\u00B0)",
-        "raanMax": "RAAN max (\u00B0)",
+        "raanMin": "RAAN min (°)",
+        "raanMax": "RAAN max (°)",
         "nameFilter": "Filtro nome",
         "apply": "Applica",
         "reset": "Reimposta"

@@ -90,8 +90,35 @@ export class SatConstellations extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.SatConstellations.title' as Parameters<typeof t7e>[0]),
-      body: t7e('plugins.SatConstellations.helpBody' as Parameters<typeof t7e>[0]),
+      title: t7e('plugins.SatConstellations.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.SatConstellations.help.overview'),
+          image: {
+            src: 'img/help/sat-constellations/sat-constellations-menu.png',
+            alt: t7e('plugins.SatConstellations.help.imgAlt'),
+            caption: t7e('plugins.SatConstellations.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.SatConstellations.help.readingHeading'),
+          content: t7e('plugins.SatConstellations.help.reading'),
+        },
+        {
+          heading: t7e('plugins.SatConstellations.help.filtersHeading'),
+          content: t7e('plugins.SatConstellations.help.filters'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.SatConstellations.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.SatConstellations.help.tip1'),
+        t7e('plugins.SatConstellations.help.tip2'),
+        t7e('plugins.SatConstellations.help.tip3'),
+      ],
     };
   }
 

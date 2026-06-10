@@ -3,7 +3,30 @@
     "Collisions": {
       "bottomIconLabel": "Kolize",
       "title": "Nabídka kolizí",
-      "helpBody": "Nabídka Kolize zobrazuje satelity s vysokou pravděpodobností kolize. <br><br> Kliknutím na řádek vyberete dva satelity zapojené do kolize a čas se změní na čas kolize.",
+      "toolbar": {
+        "fetchData": "Načíst data",
+        "refresh": "Obnovit"
+      },
+      "table": {
+        "toca": "TOCA",
+        "sat1": "#1",
+        "sat2": "#2",
+        "maxProb": "Max. pravděpodobnost",
+        "minRange": "Min. vzdálenost (km)",
+        "relSpeed": "Rel. rychlost (km/s)"
+      },
+      "dataSource": "Data o kolizích poskytuje CelesTrak prostřednictvím {link}.",
+      "help": {
+        "overview": "Nabídka Kolize zobrazuje seznam nadcházejících blízkých přiblížení (konjunkcí) mezi katalogizovanými objekty na základě dat hodnocení konjunkcí SOCRATES od CelesTrak. Každý řádek představuje předpovězenou událost s její pravděpodobností a geometrií a kliknutím na řádek se na ni v simulaci přesunete.",
+        "imgAlt": "Nabídka Kolize zobrazující tabulku nadcházejících konjunkcí",
+        "imgCaption": "Nadcházející konjunkce ze SOCRATES, seřazené tak, aby byly nejrizikovější události vidět na první pohled.",
+        "columnsHeading": "Čtení tabulky",
+        "columns": "<ul><li><strong>TOCA</strong>: čas největšího přiblížení (UTC).</li><li><strong>#1 / #2</strong>: identifikátory NORAD dvou zúčastněných objektů.</li><li><strong>Max. pravděpodobnost</strong>: maximální odhadovaná pravděpodobnost srážky.</li><li><strong>Min. vzdálenost (km)</strong>: předpovězená vzdálenost minutí při největším přiblížení.</li><li><strong>Rel. rychlost (km/s)</strong>: jak rychle se objekty míjejí.</li></ul>",
+        "howToUse": "<ol><li>Otevřete nabídku a kliknutím na ikonu stažení načtěte nejnovější data SOCRATES (vyžaduje připojení k internetu).</li><li>Klikněte na libovolný řádek: čas simulace skočí na 30 sekund před největším přiblížením, vybere se první objekt a oba identifikátory se načtou do vyhledávací lišty.</li><li>Sledujte průběh konjunkce na glóbu, nebo simulaci pozastavte a procházejte ji pomocí ovládání času.</li><li>Pomocí ikony obnovení později stáhněte aktualizovaná data.</li></ol>",
+        "tip1": "Data SOCRATES jsou společností CelesTrak aktualizována pravidelně; jde o screeningový produkt, nikoli o systém varování v reálném čase.",
+        "tip2": "Po kliknutí na řádek jsou oba objekty ve vyhledávací liště; kliknutím na druhý z výsledků jej můžete prozkoumat nebo nastavit jako sekundární objekt.",
+        "tip3": "Simulace skočí na 30 sekund před událostí, takže můžete sledovat samotné přiblížení, a ne až jeho následky."
+      },
       "errorMsgs": {
         "noCollisionsData": "Nebyla nalezena žádná data o kolizích!",
         "errorProcessingCollisions": "Chyba při zpracování dat SOCRATES!"

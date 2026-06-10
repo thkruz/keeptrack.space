@@ -3,7 +3,30 @@
     "Collisions": {
       "bottomIconLabel": "충돌",
       "title": "충돌 메뉴",
-      "helpBody": "충돌 메뉴는 충돌 가능성이 높은 위성을 보여줍니다. <br><br> 행을 클릭하면 충돌과 관련된 두 위성이 선택되고 시간이 충돌 시간으로 변경됩니다.",
+      "toolbar": {
+        "fetchData": "데이터 가져오기",
+        "refresh": "새로 고침"
+      },
+      "table": {
+        "toca": "TOCA",
+        "sat1": "#1",
+        "sat2": "#2",
+        "maxProb": "최대 확률",
+        "minRange": "최소 거리 (km)",
+        "relSpeed": "상대 속도 (km/s)"
+      },
+      "dataSource": "충돌 데이터는 CelesTrak에서 {link}를 통해 제공합니다.",
+      "help": {
+        "overview": "충돌 메뉴는 CelesTrak의 SOCRATES 접근 평가 데이터를 사용하여 카탈로그에 등록된 객체 간의 향후 근접 접근(컨정션)을 나열합니다. 각 행은 확률과 기하 정보를 가진 예측 이벤트이며, 행을 클릭하면 시뮬레이션에서 해당 이벤트로 바로 이동합니다.",
+        "imgAlt": "향후 컨정션 표를 보여주는 충돌 메뉴",
+        "imgCaption": "SOCRATES의 향후 컨정션으로, 가장 위험한 이벤트를 한눈에 볼 수 있도록 정렬되어 있습니다.",
+        "columnsHeading": "표 읽는 법",
+        "columns": "<ul><li><strong>TOCA</strong>: 최근접 시각(UTC).</li><li><strong>#1 / #2</strong>: 관련된 두 객체의 NORAD ID.</li><li><strong>최대 확률</strong>: 추정된 최대 충돌 확률.</li><li><strong>최소 거리 (km)</strong>: 최근접 시 예측되는 빗나감 거리.</li><li><strong>상대 속도 (km/s)</strong>: 두 객체가 서로 지나치는 속도.</li></ul>",
+        "howToUse": "<ol><li>메뉴를 열고 다운로드 아이콘을 클릭하여 최신 SOCRATES 데이터를 가져옵니다(인터넷 연결 필요).</li><li>아무 행이나 클릭하면 시뮬레이션 시간이 최근접 30초 전으로 이동하고 첫 번째 객체가 선택되며 두 ID가 모두 검색창에 로드됩니다.</li><li>지구본에서 컨정션이 전개되는 모습을 지켜보거나, 일시 정지한 후 시간 컨트롤로 단계별로 살펴봅니다.</li><li>나중에 새로 고침 아이콘을 사용하여 업데이트된 데이터를 가져옵니다.</li></ol>",
+        "tip1": "SOCRATES 데이터는 CelesTrak에서 주기적으로 업데이트합니다. 이는 선별용 제품이며 실시간 경보 시스템이 아닙니다.",
+        "tip2": "행을 클릭하면 두 객체가 모두 검색창에 있습니다. 결과에서 두 번째 객체를 클릭하면 자세히 살펴보거나 보조 객체로 설정할 수 있습니다.",
+        "tip3": "시뮬레이션은 이벤트 30초 전으로 이동하므로 접근 이후가 아니라 접근 과정을 지켜볼 수 있습니다."
+      },
       "errorMsgs": {
         "noCollisionsData": "충돌 데이터를 찾을 수 없습니다!",
         "errorProcessingCollisions": "SOCRATES 데이터 처리 중 오류 발생!"

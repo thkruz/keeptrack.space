@@ -3,7 +3,30 @@
     "Collisions": {
       "bottomIconLabel": "Kolizje",
       "title": "Menu kolizji",
-      "helpBody": "Menu kolizji pokazuje satelity z wysokim prawdopodobieństwem kolizji. <br><br> Kliknięcie wiersza spowoduje wybranie dwóch satelitów uczestniczących w kolizji i zmianę czasu na moment kolizji.",
+      "toolbar": {
+        "fetchData": "Pobierz dane",
+        "refresh": "Odśwież"
+      },
+      "table": {
+        "toca": "TOCA",
+        "sat1": "#1",
+        "sat2": "#2",
+        "maxProb": "Maks. prawd.",
+        "minRange": "Min. odległość (km)",
+        "relSpeed": "Prędkość wzgl. (km/s)"
+      },
+      "dataSource": "Dane o kolizjach dostarczane przez CelesTrak za pośrednictwem {link}.",
+      "help": {
+        "overview": "Menu kolizji wyświetla nadchodzące bliskie zbliżenia (koniunkcje) między skatalogowanymi obiektami, korzystając z danych oceny koniunkcji SOCRATES od CelesTrak. Każdy wiersz to przewidywane zdarzenie z jego prawdopodobieństwem i geometrią, a kliknięcie wiersza przenosi Cię prosto do niego w symulacji.",
+        "imgAlt": "Menu kolizji pokazujące tabelę nadchodzących koniunkcji",
+        "imgCaption": "Nadchodzące koniunkcje z SOCRATES, posortowane tak, aby najbardziej ryzykowne zdarzenia były widoczne na pierwszy rzut oka.",
+        "columnsHeading": "Czytanie tabeli",
+        "columns": "<ul><li><strong>TOCA</strong>: czas największego zbliżenia (UTC).</li><li><strong>#1 / #2</strong>: identyfikatory NORAD dwóch zaangażowanych obiektów.</li><li><strong>Maks. prawd.</strong>: maksymalne szacowane prawdopodobieństwo kolizji.</li><li><strong>Min. odległość (km)</strong>: przewidywana odległość minięcia w momencie największego zbliżenia.</li><li><strong>Prędkość wzgl. (km/s)</strong>: jak szybko obiekty mijają się nawzajem.</li></ul>",
+        "howToUse": "<ol><li>Otwórz menu i kliknij ikonę pobierania, aby pobrać najnowsze dane SOCRATES (wymaga połączenia z internetem).</li><li>Kliknij dowolny wiersz: czas symulacji przeskoczy do 30 sekund przed największym zbliżeniem, pierwszy obiekt zostanie wybrany, a oba identyfikatory zostaną załadowane do paska wyszukiwania.</li><li>Obserwuj przebieg koniunkcji na globie albo zatrzymaj symulację i przechodź przez nią krok po kroku za pomocą kontrolek czasu.</li><li>Użyj ikony odświeżania, aby później pobrać zaktualizowane dane.</li></ol>",
+        "tip1": "Dane SOCRATES są okresowo aktualizowane przez CelesTrak. To produkt przesiewowy, a nie system ostrzegania w czasie rzeczywistym.",
+        "tip2": "Po kliknięciu wiersza oba obiekty znajdują się w pasku wyszukiwania; kliknij drugi z wyników, aby go obejrzeć lub ustawić jako obiekt dodatkowy.",
+        "tip3": "Symulacja przeskakuje do 30 sekund przed zdarzeniem, dzięki czemu możesz obserwować zbliżenie, a nie jego następstwa."
+      },
       "errorMsgs": {
         "noCollisionsData": "Nie znaleziono danych o kolizjach!",
         "errorProcessingCollisions": "Błąd przetwarzania danych SOCRATES!"

@@ -3,7 +3,30 @@
     "Collisions": {
       "bottomIconLabel": "Collisions",
       "title": "Collisions Menu",
-      "helpBody": "The Collisions Menu shows satellites with a high probability of collision. <br><br> Clicking on a row will select the two satellites involved in the collision and change the time to the time of the collision.",
+      "toolbar": {
+        "fetchData": "Fetch Data",
+        "refresh": "Refresh"
+      },
+      "table": {
+        "toca": "TOCA",
+        "sat1": "#1",
+        "sat2": "#2",
+        "maxProb": "Max Prob",
+        "minRange": "Min Range (km)",
+        "relSpeed": "Rel Speed (km/s)"
+      },
+      "dataSource": "Collision data provided by CelesTrak via {link}.",
+      "help": {
+        "overview": "The Collisions menu lists upcoming close approaches (conjunctions) between cataloged objects, using CelesTrak's SOCRATES conjunction assessment data. Each row is a predicted event with its probability and geometry, and clicking a row takes you straight to it in the simulation.",
+        "imgAlt": "The Collisions menu showing a table of upcoming conjunctions",
+        "imgCaption": "Upcoming conjunctions from SOCRATES, sorted with the riskiest events visible at a glance.",
+        "columnsHeading": "Reading the Table",
+        "columns": "<ul><li><strong>TOCA</strong>: Time of Closest Approach (UTC).</li><li><strong>#1 / #2</strong>: the NORAD IDs of the two objects involved.</li><li><strong>Max Prob</strong>: the maximum estimated collision probability.</li><li><strong>Min Range (km)</strong>: predicted miss distance at closest approach.</li><li><strong>Rel Speed (km/s)</strong>: how fast the objects pass each other.</li></ul>",
+        "howToUse": "<ol><li>Open the menu and click the download icon to fetch the latest SOCRATES data (requires an internet connection).</li><li>Click any row: the simulation time jumps to 30 seconds before closest approach and the first object is selected, with both IDs loaded into the search bar.</li><li>Watch the conjunction unfold on the globe, or pause and step through it with the time controls.</li><li>Use the refresh icon to pull updated data later.</li></ol>",
+        "tip1": "SOCRATES data is updated periodically by CelesTrak. It is a screening product, not a real-time warning system.",
+        "tip2": "After clicking a row, both objects are in the search bar; click the second one in the results to inspect it or set it as a secondary object.",
+        "tip3": "The simulation jumps to 30 seconds before the event so you can watch the approach rather than the aftermath."
+      },
       "errorMsgs": {
         "noCollisionsData": "No collision data found!",
         "errorProcessingCollisions": "Error processing SOCRATES data!"

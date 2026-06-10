@@ -29,7 +29,7 @@ test.describe('Collisions Plugin', () => {
 
     await expect(drawerItem).toBeVisible();
 
-    // Click the drawer item — should open side menu and select the icon
+    // Click the drawer item - should open side menu and select the icon
     await drawerItem.click();
     await expect(sideMenu).toBeVisible({ timeout: 5_000 });
     await expect(bottomIcon).toHaveClass(/bmenu-item-selected/u);

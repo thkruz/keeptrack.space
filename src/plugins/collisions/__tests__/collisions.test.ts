@@ -3,7 +3,6 @@ import { MenuMode } from '@app/engine/core/interfaces';
 import { Mock, vi } from 'vitest';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { readFileSync } from 'fs';
@@ -101,7 +100,8 @@ describe('Collisions_class', () => {
       const helpConfig = plugin.getHelpConfig();
 
       expect(helpConfig.title).toBeDefined();
-      expect(helpConfig.body).toBeDefined();
+      expect(helpConfig.sections!.length).toBeGreaterThanOrEqual(3);
+      expect(helpConfig.sections![0].image?.src).toContain('img/help/collisions/');
     });
 
     it('should return correct drag options', () => {

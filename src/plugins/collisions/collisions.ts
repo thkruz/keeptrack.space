@@ -101,22 +101,26 @@ export class Collisions extends KeepTrackPlugin {
   }
 
   protected buildSideMenuHtml_(): string {
+    const tb = (key: string) => t7e(`plugins.Collisions.toolbar.${key}` as Parameters<typeof t7e>[0]);
+    const attribution = t7e('plugins.Collisions.dataSource' as Parameters<typeof t7e>[0])
+      .replace('{link}', '<a href="https://celestrak.org/SOCRATES/" target="_blank" rel="noreferrer">SOCRATES</a>');
+
     return html`
       <div id="Collisions-menu" class="side-menu-parent start-hidden">
         <div id="Collisions-content" class="side-menu">
           <div class="row">
             <div class="col-toolbar">
               <button id="Collisions-fetch-btn" class="btn btn-ui waves-effect waves-light icon-btn"
-                type="button" kt-tooltip="Fetch Data">
+                type="button" kt-tooltip="${tb('fetchData')}">
                 <img src="${fetchPng}" class="icon-btn-img" alt="" />
               </button>
               <button id="Collisions-refresh-btn" class="btn btn-ui waves-effect waves-light icon-btn"
-                type="button" kt-tooltip="Refresh" style="display:none;">
+                type="button" kt-tooltip="${tb('refresh')}" style="display:none;">
                 <img src="${refreshPng}" class="icon-btn-img" alt="" />
               </button>
             </div>
             <table id="Collisions-table" class="center-align"></table>
-            <sub class="center-align">*Collision data provided by CelesTrak via <a href="https://celestrak.org/SOCRATES/" target="_blank" rel="noreferrer">SOCRATES</a>.</sub>
+            <sub class="center-align">*${attribution}</sub>
           </div>
         </div>
       </div>
@@ -126,7 +130,30 @@ export class Collisions extends KeepTrackPlugin {
   getHelpConfig(): IHelpConfig {
     return {
       title: t7e('plugins.Collisions.title'),
-      body: t7e('plugins.Collisions.helpBody'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.Collisions.help.overview'),
+          image: {
+            src: 'img/help/collisions/collisions-menu.png',
+            alt: t7e('plugins.Collisions.help.imgAlt'),
+            caption: t7e('plugins.Collisions.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.Collisions.help.columnsHeading'),
+          content: t7e('plugins.Collisions.help.columns'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.Collisions.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.Collisions.help.tip1'),
+        t7e('plugins.Collisions.help.tip2'),
+        t7e('plugins.Collisions.help.tip3'),
+      ],
     };
   }
 
@@ -291,8 +318,9 @@ export class Collisions extends KeepTrackPlugin {
   }
 
   protected static createHeaders_(tbl: HTMLTableElement) {
+    const th = (key: string) => t7e(`plugins.Collisions.table.${key}` as Parameters<typeof t7e>[0]);
     const tr = tbl.insertRow();
-    const names = ['TOCA', '#1', '#2', 'Max Prob', 'Min Range (km)', 'Rel Speed (km/s)'];
+    const names = [th('toca'), th('sat1'), th('sat2'), th('maxProb'), th('minRange'), th('relSpeed')];
 
     for (const name of names) {
       const column = tr.insertCell();

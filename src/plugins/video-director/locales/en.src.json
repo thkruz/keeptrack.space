@@ -3,7 +3,33 @@
     "VideoDirectorPlugin": {
       "title": "Video Director",
       "bottomIconLabel": "Video Director",
-      "helpBody": "This menu allows you to add camera effects and control camera movements for creating cinematic videos within the simulation."
+      "labels": {
+        "updateSettings": "Update Settings",
+        "cameraMovements": "Camera Movements",
+        "rotateSpeed": "Rotate Speed",
+        "rotateLeft": "Rotate Camera Left",
+        "rotateRight": "Rotate Camera Right",
+        "rotateUp": "Rotate Camera Up",
+        "rotateDown": "Rotate Camera Down",
+        "panSpeed": "Pan Speed",
+        "panLeft": "Pan Camera Left",
+        "panRight": "Pan Camera Right",
+        "panUp": "Pan Camera Up",
+        "panDown": "Pan Camera Down",
+        "zoomSpeed": "Zoom Speed",
+        "zoomIn": "Zoom Camera In",
+        "zoomOut": "Zoom Camera Out",
+        "disableSelectedDot": "Disable Selected Satellite Dot",
+        "startAutoRotate": "Start Auto Rotate"
+      },
+      "help": {
+        "overview": "Video Director sets up smooth, repeatable camera motion for recording cinematic clips of the simulation: slow rotations, pans, and zooms at precise speeds, with the selected satellite's highlight dot optionally hidden so it does not appear in the footage.",
+        "imgAlt": "The Video Director menu with rotate, pan, and zoom controls",
+        "imgCaption": "Pick a motion direction and speed, then start the move.",
+        "howToUse": "<ol><li>Open <strong>Video Director</strong> from the bottom bar (Tools mode).</li><li>Set the <strong>Rotate Speed</strong>, <strong>Pan Speed</strong>, or <strong>Zoom Speed</strong>, and toggle the direction you want; opposite directions are mutually exclusive.</li><li>Click <strong>Update Settings</strong> to apply, then <strong>Start Auto Rotate</strong> to begin the motion.</li><li>Enable <strong>Disable Selected Satellite Dot</strong> to keep the selection marker out of your recording.</li></ol>",
+        "tip1": "Very small speed values give broadcast smooth motion; the defaults are tuned for slow, cinematic moves.",
+        "tip2": "Combine a slow rotation with the time controls running at high speed for a classic orbit timelapse shot."
+      }
     }
   }
 }

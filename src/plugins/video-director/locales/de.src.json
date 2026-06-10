@@ -1,9 +1,35 @@
 {
   "plugins": {
     "VideoDirectorPlugin": {
-      "bottomIconLabel": "Video-Direktor",
       "title": "Video-Direktor-Menü",
-      "helpBody": "Das Video-Direktor-Menü wird verwendet, um die Kamera und Objekte in der Szene zu manipulieren, um ein Video zu erstellen."
+      "bottomIconLabel": "Video-Direktor",
+      "labels": {
+        "updateSettings": "Einstellungen aktualisieren",
+        "cameraMovements": "Kamerabewegungen",
+        "rotateSpeed": "Rotationsgeschwindigkeit",
+        "rotateLeft": "Kamera nach links drehen",
+        "rotateRight": "Kamera nach rechts drehen",
+        "rotateUp": "Kamera nach oben drehen",
+        "rotateDown": "Kamera nach unten drehen",
+        "panSpeed": "Schwenkgeschwindigkeit",
+        "panLeft": "Kamera nach links schwenken",
+        "panRight": "Kamera nach rechts schwenken",
+        "panUp": "Kamera nach oben schwenken",
+        "panDown": "Kamera nach unten schwenken",
+        "zoomSpeed": "Zoomgeschwindigkeit",
+        "zoomIn": "Kamera hineinzoomen",
+        "zoomOut": "Kamera herauszoomen",
+        "disableSelectedDot": "Punkt des ausgewählten Satelliten deaktivieren",
+        "startAutoRotate": "Automatische Rotation starten"
+      },
+      "help": {
+        "overview": "Der Video-Direktor richtet flüssige, wiederholbare Kamerabewegungen zum Aufnehmen filmischer Clips der Simulation ein: langsame Rotationen, Schwenks und Zooms mit präzisen Geschwindigkeiten, wobei der Markierungspunkt des ausgewählten Satelliten optional ausgeblendet werden kann, damit er nicht im Filmmaterial erscheint.",
+        "imgAlt": "Das Video-Direktor-Menü mit Steuerungen für Rotation, Schwenken und Zoom",
+        "imgCaption": "Wählen Sie eine Bewegungsrichtung und Geschwindigkeit und starten Sie dann die Bewegung.",
+        "howToUse": "<ol><li>Öffnen Sie den <strong>Video-Direktor</strong> über die untere Leiste (Modus Werkzeuge).</li><li>Stellen Sie <strong>Rotationsgeschwindigkeit</strong>, <strong>Schwenkgeschwindigkeit</strong> oder <strong>Zoomgeschwindigkeit</strong> ein und aktivieren Sie die gewünschte Richtung; entgegengesetzte Richtungen schließen sich gegenseitig aus.</li><li>Klicken Sie auf <strong>Einstellungen aktualisieren</strong>, um sie anzuwenden, und dann auf <strong>Automatische Rotation starten</strong>, um die Bewegung zu beginnen.</li><li>Aktivieren Sie <strong>Punkt des ausgewählten Satelliten deaktivieren</strong>, um die Auswahlmarkierung aus Ihrer Aufnahme fernzuhalten.</li></ol>",
+        "tip1": "Sehr kleine Geschwindigkeitswerte ergeben sendetaugliche, weiche Bewegungen; die Standardwerte sind auf langsame, filmische Fahrten abgestimmt.",
+        "tip2": "Kombinieren Sie eine langsame Rotation mit schnell laufender Simulationszeit für eine klassische Orbit-Zeitraffer-Aufnahme."
+      }
     }
   }
 }

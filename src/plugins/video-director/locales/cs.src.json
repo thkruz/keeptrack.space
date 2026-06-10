@@ -3,7 +3,33 @@
     "VideoDirectorPlugin": {
       "title": "Video režisér",
       "bottomIconLabel": "Video režisér",
-      "helpBody": "Toto menu umožňuje přidávat efekty kamery a ovládat pohyby kamery pro vytváření filmových videí v simulaci."
+      "labels": {
+        "updateSettings": "Aktualizovat nastavení",
+        "cameraMovements": "Pohyby kamery",
+        "rotateSpeed": "Rychlost rotace",
+        "rotateLeft": "Otočit kameru doleva",
+        "rotateRight": "Otočit kameru doprava",
+        "rotateUp": "Otočit kameru nahoru",
+        "rotateDown": "Otočit kameru dolů",
+        "panSpeed": "Rychlost posunu",
+        "panLeft": "Posunout kameru doleva",
+        "panRight": "Posunout kameru doprava",
+        "panUp": "Posunout kameru nahoru",
+        "panDown": "Posunout kameru dolů",
+        "zoomSpeed": "Rychlost přiblížení",
+        "zoomIn": "Přiblížit kameru",
+        "zoomOut": "Oddálit kameru",
+        "disableSelectedDot": "Vypnout bod vybraného satelitu",
+        "startAutoRotate": "Spustit automatickou rotaci"
+      },
+      "help": {
+        "overview": "Video režisér nastavuje plynulé, opakovatelné pohyby kamery pro natáčení filmových klipů ze simulace: pomalé rotace, posuny a přiblížení s přesnými rychlostmi, přičemž zvýrazňovací bod vybraného satelitu lze volitelně skrýt, aby se neobjevil v záběrech.",
+        "imgAlt": "Menu Video režiséra s ovládacími prvky rotace, posunu a přiblížení",
+        "imgCaption": "Vyberte směr a rychlost pohybu a poté pohyb spusťte.",
+        "howToUse": "<ol><li>Otevřete <strong>Video režisér</strong> ze spodní lišty (režim Nástroje).</li><li>Nastavte <strong>Rychlost rotace</strong>, <strong>Rychlost posunu</strong> nebo <strong>Rychlost přiblížení</strong> a zapněte požadovaný směr; opačné směry se vzájemně vylučují.</li><li>Klikněte na <strong>Aktualizovat nastavení</strong> pro použití a poté na <strong>Spustit automatickou rotaci</strong> pro zahájení pohybu.</li><li>Zapněte <strong>Vypnout bod vybraného satelitu</strong>, aby značka výběru nebyla v nahrávce.</li></ol>",
+        "tip1": "Velmi malé hodnoty rychlosti dávají hladký pohyb vysílací kvality; výchozí hodnoty jsou vyladěny pro pomalé, filmové pohyby.",
+        "tip2": "Zkombinujte pomalou rotaci s rychle běžícím časem simulace pro klasický časosběrný záběr orbity."
+      }
     }
   }
 }

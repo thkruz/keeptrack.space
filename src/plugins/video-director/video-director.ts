@@ -7,6 +7,8 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { t7e } from '@app/locales/keys';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 
 /**
@@ -37,6 +39,9 @@ declare module '@app/engine/core/interfaces' {
   }
 }
 
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.VideoDirectorPlugin.${key}` as Parameters<typeof t7e>[0]);
+
 export class VideoDirectorPlugin extends KeepTrackPlugin {
   readonly id = 'VideoDirectorPlugin';
   dependencies_ = [];
@@ -59,100 +64,100 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
             <div class="row center"></div>
             </br>
             <div class="row center">
-              <button id="video-director-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Update video-director &#9658;</button>
+              <button id="video-director-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">${l('labels.updateSettings')} &#9658;</button>
             </div>
-            <h5 class="center-align">General video-director</h5>
+            <h5 class="center-align">${l('labels.cameraMovements')}</h5>
             <div class="input-field col s12">
               <input value="0.000075" id="video-director-rotateSpeed" type="text" maxlength="9" />
-              <label for="video-director-rotateSpeed" class="active">Rotate Speed</label>
+              <label for="video-director-rotateSpeed" class="active">${l('labels.rotateSpeed')}</label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Rotate Camera to the Left">
+              <label data-position="top" data-delay="50" data-tooltip="${l('labels.rotateLeft')}">
                 <input id="video-director-rotateL" type="checkbox" checked/>
                 <span class="lever"></span>
-                Rotate Camera Left
+                ${l('labels.rotateLeft')}
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Rotate Camera to the Right">
+              <label data-position="top" data-delay="50" data-tooltip="${l('labels.rotateRight')}">
                 <input id="video-director-rotateR" type="checkbox"/>
                 <span class="lever"></span>
-                Rotate Camera Right
+                ${l('labels.rotateRight')}
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Rotate Camera Up">
+              <label data-position="top" data-delay="50" data-tooltip="${l('labels.rotateUp')}">
                 <input id="video-director-rotateU" type="checkbox"/>
                 <span class="lever"></span>
-                Rotate Camera Up
+                ${l('labels.rotateUp')}
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Rotate Camera Down">
+              <label data-position="top" data-delay="50" data-tooltip="${l('labels.rotateDown')}">
                 <input id="video-director-rotateD" type="checkbox"/>
                 <span class="lever"></span>
-                Rotate Camera Down
+                ${l('labels.rotateDown')}
               </label>
             </div>
             <div class="input-field col s12">
               <input value="0.05" id="video-director-panSpeed" type="text" maxlength="9" />
-              <label for="video-director-panSpeed" class="active">Pan Speed</label>
+              <label for="video-director-panSpeed" class="active">${l('labels.panSpeed')}</label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Pan Camera Left">
+              <label data-position="top" data-delay="50" data-tooltip="${l('labels.panLeft')}">
                 <input id="video-director-panL" type="checkbox"/>
                 <span class="lever"></span>
-                Pan Camera Left
+                ${l('labels.panLeft')}
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Pan Camera Right">
+              <label data-position="top" data-delay="50" data-tooltip="${l('labels.panRight')}">
                 <input id="video-director-panR" type="checkbox"/>
                 <span class="lever"></span>
-                Pan Camera Right
+                ${l('labels.panRight')}
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Pan Camera Up">
+              <label data-position="top" data-delay="50" data-tooltip="${l('labels.panUp')}">
                 <input id="video-director-panU" type="checkbox"/>
                 <span class="lever"></span>
-                Pan Camera Up
+                ${l('labels.panUp')}
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Pan Camera Down">
+              <label data-position="top" data-delay="50" data-tooltip="${l('labels.panDown')}">
                 <input id="video-director-panD" type="checkbox"/>
                 <span class="lever"></span>
-                Pan Camera Down
+                ${l('labels.panDown')}
               </label>
             </div>
             <div class="input-field col s12">
               <input value="0.0005" id="video-director-zoomSpeed" type="text" maxlength="9" />
-              <label for="video-director-zoomSpeed" class="active">Zoom Speed</label>
+              <label for="video-director-zoomSpeed" class="active">${l('labels.zoomSpeed')}</label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Zoom Camera In">
+              <label data-position="top" data-delay="50" data-tooltip="${l('labels.zoomIn')}">
                 <input id="video-director-zoomIn" type="checkbox"/>
                 <span class="lever"></span>
-                Zoom Camera In
+                ${l('labels.zoomIn')}
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Zoom Camera Out">
+              <label data-position="top" data-delay="50" data-tooltip="${l('labels.zoomOut')}">
                 <input id="video-director-zoomOut" type="checkbox"/>
                 <span class="lever"></span>
-                Zoom Camera Out
+                ${l('labels.zoomOut')}
               </label>
           </div>
           <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable Selected Satellite Dot">
+              <label data-position="top" data-delay="50" data-tooltip="${l('labels.disableSelectedDot')}">
                 <input id="video-director-selectedColor" type="checkbox"/>
                 <span class="lever"></span>
-                Disable Selected Satellite Dot
+                ${l('labels.disableSelectedDot')}
               </label>
           </div>
           <div class="center-align row">
-            <button id="video-director-rotate" class="btn btn-ui waves-effect waves-light" type="button" name="action">Start Auto Rotate &#9658;</button>
+            <button id="video-director-rotate" class="btn btn-ui waves-effect waves-light" type="button" name="action">${l('labels.startAutoRotate')} &#9658;</button>
           </div>
         </form>
       </div>
@@ -160,6 +165,28 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
   </div>`;
 
   isNotColorPickerInitialSetup = false;
+
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/video-director/video-director-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2')],
+    };
+  }
 
   addHtml(): void {
     super.addHtml();

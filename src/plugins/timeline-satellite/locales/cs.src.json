@@ -3,7 +3,30 @@
     "SatelliteTimeline": {
       "bottomIconLabel": "Časová osa satelitu",
       "title": "Menu časové osy satelitu",
-      "helpBody": "Menu časové osy satelitu zobrazuje, kdy má jeden senzor viditelnost seznamu satelitů. Časová osa je barevně kódována pro zobrazení kvality přeletu. Červená je špatný přelet, žlutá je průměrný přelet a zelená je dobrý přelet. Kliknutím na přelet změníte satelit a čas na daný přelet. <br><br> Časovou osu lze upravit změnou počátečního a koncového času simulace. Dále lze časovou osu upravit změnou možností délky a intervalu."
+      "labels": {
+        "calculationLength": "Délka výpočtu (hodiny)",
+        "calculationInterval": "Interval výpočtu (sekundy)",
+        "badPassLength": "Délka špatného přeletu (sekundy)",
+        "avgPassLength": "Délka průměrného přeletu (sekundy)"
+      },
+      "msgs": {
+        "noPasses": "Žádné přelety"
+      },
+      "errorMsgs": {
+        "addSatellitesOrSelect": "Přidejte satelity do seznamu nebo vyberte satelit"
+      },
+      "help": {
+        "overview": "Časová osa satelitu je zrcadlovým obrazem časové osy senzoru: ukazuje, kdy jeden vybraný senzor uvidí seznam satelitů. Každý řádek je satelit ze seznamu sledovaných (nebo aktuálně vybraný satelit) a každý barevný pruh je jeden přelet, takže můžete naplánovat pozorování jednoho stanoviště pro mnoho cílů.",
+        "imgAlt": "Časová osa satelitu zobrazující barevně kódované přelety pro několik satelitů",
+        "imgCaption": "Každý řádek je jeden satelit; barva pruhu ukazuje kvalitu každého přeletu nad vybraným senzorem.",
+        "readingHeading": "Jak číst časovou osu",
+        "reading": "<ul><li><strong>Zelená</strong>: dlouhý přelet, nad prahem průměrného přeletu.</li><li><strong>Žlutá</strong>: průměrný přelet.</li><li><strong>Červená</strong>: krátký přelet, pod prahem špatného přeletu.</li><li><strong>Světle šedý řádek</strong>: tento satelit v daném okně nikdy nevstoupí do zorného pole senzoru.</li></ul>Najetím myší na pruh zobrazíte přesný čas začátku a konce. Řádky jsou označeny katalogovým číslem NORAD každého satelitu.",
+        "settingsHeading": "Nastavení",
+        "settings": "Panel nastavení řídí výpočet: <strong>Délka výpočtu (hodiny)</strong> určuje okno, <strong>Interval výpočtu (sekundy)</strong> vyvažuje rychlost a přesnost a prahy <strong>Délka špatného přeletu</strong> a <strong>Délka průměrného přeletu</strong> definují červené, žluté a zelené zbarvení.",
+        "howToUse": "<ol><li>Vyberte senzor; spodní ikona zůstává neaktivní, dokud žádný není vybrán.</li><li>Přidejte satelity do seznamu sledovaných, nebo vyberte jeden satelit, a poté otevřete položku <strong>Časová osa satelitu</strong> ve spodním menu.</li><li>Časová osa se automaticky vypočítá a vykreslí; v panelu nastavení můžete změnit okno nebo prahy.</li><li>Kliknutím na přelet vyberete daný satelit a posunete hodiny na začátek přeletu.</li><li>Pomocí tlačítka stažení uložíte časovou osu jako obrázek PNG.</li></ol>",
+        "tip1": "Nejprve naplňte seznam sledovaných: s několika satelity v seznamu můžete naplánovat celou pozorovací noc pro dané stanoviště v jediném pohledu.",
+        "tip2": "Časová osa má výchozí okno 6 hodin, což vyhovuje jedné noční směně; pro delší plánovací horizonty zvyšte délku výpočtu."
+      }
     }
   }
 }

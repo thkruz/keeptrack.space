@@ -3,7 +3,30 @@
     "SatelliteTimeline": {
       "bottomIconLabel": "Oś czasu satelity",
       "title": "Menu osi czasu satelity",
-      "helpBody": "Menu osi czasu satelity pokazuje, kiedy pojedynczy czujnik ma widoczność listy satelitów. Oś czasu jest oznaczona kolorami, aby pokazać jakość przelotu. Czerwony oznacza słaby przelot, żółty przeciętny, a zielony dobry. Kliknij przelot, aby zmienić satelitę i czas na ten przelot. <br><br> Oś czasu można modyfikować, zmieniając czas rozpoczęcia i zakończenia symulacji. Dodatkowo oś czasu można modyfikować, zmieniając opcje długości i interwału."
+      "labels": {
+        "calculationLength": "Długość obliczeń (godziny)",
+        "calculationInterval": "Interwał obliczeń (sekundy)",
+        "badPassLength": "Długość słabego przelotu (sekundy)",
+        "avgPassLength": "Długość przeciętnego przelotu (sekundy)"
+      },
+      "msgs": {
+        "noPasses": "Brak przelotów"
+      },
+      "errorMsgs": {
+        "addSatellitesOrSelect": "Dodaj satelity do listy lub wybierz satelitę"
+      },
+      "help": {
+        "overview": "Oś czasu satelity to lustrzane odbicie osi czasu czujnika: pokazuje, kiedy jeden wybrany czujnik może widzieć listę satelitów. Każdy wiersz to satelita z Twojej listy obserwacyjnej (lub aktualnie wybrany satelita), a każdy kolorowy pasek to przelot, dzięki czemu możesz zaplanować obserwacje jednego stanowiska dla wielu celów.",
+        "imgAlt": "Oś czasu satelity pokazująca oznaczone kolorami przeloty dla kilku satelitów",
+        "imgCaption": "Każdy wiersz to satelita; kolor paska pokazuje jakość każdego przelotu nad wybranym czujnikiem.",
+        "readingHeading": "Jak czytać oś czasu",
+        "reading": "<ul><li><strong>Zielony</strong>: długi przelot, powyżej progu przeciętnego przelotu.</li><li><strong>Żółty</strong>: przeciętny przelot.</li><li><strong>Czerwony</strong>: krótki przelot, poniżej progu słabego przelotu.</li><li><strong>Jasnoszary wiersz</strong>: ten satelita nigdy nie wchodzi w pole widzenia czujnika w tym oknie.</li></ul>Najedź kursorem na pasek, aby zobaczyć dokładne czasy rozpoczęcia i zakończenia. Wiersze są opisane numerem katalogowym NORAD każdego satelity.",
+        "settingsHeading": "Ustawienia",
+        "settings": "Panel ustawień steruje obliczeniami: <strong>Długość obliczeń (godziny)</strong> ustala okno, <strong>Interwał obliczeń (sekundy)</strong> równoważy szybkość i precyzję, a progi <strong>Długość słabego przelotu</strong> i <strong>Długość przeciętnego przelotu</strong> definiują czerwone, żółte i zielone kolorowanie.",
+        "howToUse": "<ol><li>Wybierz czujnik; dolna ikona pozostaje nieaktywna, dopóki żaden nie zostanie wybrany.</li><li>Dodaj satelity do listy obserwacyjnej lub wybierz pojedynczego satelitę, a następnie otwórz <strong>Oś czasu satelity</strong> z dolnego menu.</li><li>Oś czasu jest obliczana i rysowana automatycznie; dostosuj panel ustawień, aby zmienić okno lub progi.</li><li>Kliknij przelot, aby wybrać tego satelitę i przeskoczyć zegarem na początek przelotu.</li><li>Użyj przycisku pobierania, aby zapisać oś czasu jako obraz PNG.</li></ol>",
+        "tip1": "Najpierw wypełnij listę obserwacyjną: mając kilka satelitów na liście, możesz zaplanować całą sesję obserwacyjną dla stanowiska w jednym widoku.",
+        "tip2": "Oś czasu domyślnie używa okna 6-godzinnego, odpowiedniego dla jednej nocnej zmiany; zwiększ długość obliczeń dla dłuższych horyzontów planowania."
+      }
     }
   }
 }

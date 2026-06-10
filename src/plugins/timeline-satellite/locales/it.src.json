@@ -3,7 +3,30 @@
     "SatelliteTimeline": {
       "bottomIconLabel": "Cronologia satellite",
       "title": "Menu cronologia satellite",
-      "helpBody": "Il menu Cronologia satellite mostra quando un singolo sensore ha visibilità di un elenco di satelliti. La cronologia è codificata a colori per mostrare la qualità del passaggio. Il rosso indica un passaggio scadente, il giallo un passaggio medio e il verde un buon passaggio. Fare clic su un passaggio per cambiare il satellite e l'orario a quel passaggio. <br><br> La cronologia può essere modificata cambiando l'orario di inizio e fine della simulazione. Inoltre, la cronologia può essere modificata cambiando le opzioni di durata e intervallo."
+      "labels": {
+        "calculationLength": "Durata del calcolo (ore)",
+        "calculationInterval": "Intervallo di calcolo (secondi)",
+        "badPassLength": "Durata passaggio scadente (secondi)",
+        "avgPassLength": "Durata passaggio medio (secondi)"
+      },
+      "msgs": {
+        "noPasses": "Nessun passaggio"
+      },
+      "errorMsgs": {
+        "addSatellitesOrSelect": "Aggiungi satelliti all'elenco o seleziona un satellite"
+      },
+      "help": {
+        "overview": "La Cronologia satellite è l'immagine speculare della Cronologia sensore: mostra quando un sensore selezionato può vedere un elenco di satelliti. Ogni riga è un satellite della tua Lista di osservazione (o il satellite attualmente selezionato) e ogni barra colorata è un passaggio, così puoi pianificare le osservazioni di un singolo sito su molti obiettivi.",
+        "imgAlt": "La Cronologia satellite che mostra passaggi codificati a colori per diversi satelliti",
+        "imgCaption": "Ogni riga è un satellite; il colore della barra indica la qualità di ogni passaggio sopra il sensore selezionato.",
+        "readingHeading": "Come leggere la cronologia",
+        "reading": "<ul><li><strong>Verde</strong>: un passaggio lungo, sopra la soglia del passaggio medio.</li><li><strong>Giallo</strong>: un passaggio medio.</li><li><strong>Rosso</strong>: un passaggio breve, sotto la soglia del passaggio scadente.</li><li><strong>Riga grigio chiaro</strong>: quel satellite non entra mai nel campo visivo del sensore nella finestra.</li></ul>Passa il cursore su una barra per vedere gli orari esatti di inizio e fine. Le righe sono etichettate con il numero di catalogo NORAD di ciascun satellite.",
+        "settingsHeading": "Impostazioni",
+        "settings": "Il pannello delle impostazioni controlla il calcolo: <strong>Durata del calcolo (ore)</strong> imposta la finestra, <strong>Intervallo di calcolo (secondi)</strong> bilancia velocità e precisione, e le soglie <strong>Durata passaggio scadente</strong> e <strong>Durata passaggio medio</strong> definiscono la colorazione rossa, gialla e verde.",
+        "howToUse": "<ol><li>Seleziona un sensore; l'icona in basso resta disabilitata finché non ne viene selezionato uno.</li><li>Aggiungi satelliti alla Lista di osservazione, oppure seleziona un singolo satellite, quindi apri la <strong>Cronologia satellite</strong> dal menu in basso.</li><li>La cronologia viene calcolata e disegnata automaticamente; regola il pannello delle impostazioni per cambiare finestra o soglie.</li><li>Fai clic su un passaggio per selezionare quel satellite e portare l'orologio all'inizio del passaggio.</li><li>Usa il pulsante di download per salvare la cronologia come immagine PNG.</li></ol>",
+        "tip1": "Popola prima la Lista di osservazione: con diversi satelliti elencati puoi pianificare un'intera sessione di osservazione per il sito in un'unica vista.",
+        "tip2": "La cronologia usa per impostazione predefinita una finestra di 6 ore, adatta a un singolo turno notturno; aumenta la durata del calcolo per orizzonti di pianificazione più lunghi."
+      }
     }
   }
 }

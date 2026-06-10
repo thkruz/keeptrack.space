@@ -32,8 +32,13 @@ import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { BaseObject, Degrees } from '@ootk/src/main';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import satelliteFovPng from '@public/img/icons/satellite-fov.png';
-import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
+import { IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
+import { t7e } from '@app/locales/keys';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.SatelliteFov.${key}` as Parameters<typeof t7e>[0]);
+
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './satellite-fov.css';
 
@@ -56,6 +61,36 @@ export class SatelliteFov extends KeepTrackPlugin {
   sideMenuElementName: string = 'satellite-fov-menu';
   sideMenuElementHtml: string = SatelliteFov.buildSideMenuHtml_();
 
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/satellite-fov/satellite-fov-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: l('help.tabsHeading'),
+          content: l('help.tabs'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2')],
+      shortcuts: [
+        { keys: ['C'], description: l('help.shortcutToggleCone') },
+        { keys: ['V'], description: l('help.shortcutToggleS2s') },
+      ],
+    };
+  }
+
   getKeyboardShortcuts(): IKeyboardShortcut[] {
     return [
       {
@@ -73,43 +108,43 @@ export class SatelliteFov extends KeepTrackPlugin {
   <form id="sat-fov-settings-form">
     <div class="row">
       <div class="col s12">
-        <h3>Sensor Design</h3>
+        <h3>${l('labels.sensorDesign')}</h3>
       </div>
       <div class="input-field col s12">
-          <input id="sat-fov-fov-angle" value="3" type="text" data-position="bottom" data-delay="50" data-tooltip="Field of View of the Sensor"
+          <input id="sat-fov-fov-angle" value="3" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.fovOfSensor')}"
             style="text-align: center;"
           />
-          <label for="sat-fov-fov-angle" class="active">Field of View (Degrees)</label>
+          <label for="sat-fov-fov-angle" class="active">${l('labels.fovDegrees')}</label>
       </div>
     </div>
     <div class="divider"></div>
     <div class="row">
       <div class="col s12">
-        <h3>Color Settings</h3>
+        <h3>${l('labels.colorSettings')}</h3>
       </div>
       <div class="input-field col s4">
-        <input id="sat-fov-red" value="0.2" type="text" data-position="bottom" data-delay="50" data-tooltip="Red Color Value"
+        <input id="sat-fov-red" value="0.2" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.red')}"
           style="text-align: center;"
         />
         <label for="sat-fov-red" class="active">R</label>
       </div>
       <div class="input-field col s4">
-        <input id="sat-fov-green" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="Green Color Value"
+        <input id="sat-fov-green" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.green')}"
           style="text-align: center;"
         />
         <label for="sat-fov-green" class="active">G</label>
       </div>
       <div class="input-field col s4">
-        <input id="sat-fov-blue" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="Blue Color Value"
+        <input id="sat-fov-blue" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.blue')}"
           style="text-align: center;"
         />
         <label for="sat-fov-blue" class="active">B</label>
       </div>
       <div class="input-field col s12">
-        <input id="sat-fov-opacity" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="Opacity Value"
+        <input id="sat-fov-opacity" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.opacity')}"
           style="text-align: center;"
         />
-        <label for="sat-fov-opacity" class="active">Opacity</label>
+        <label for="sat-fov-opacity" class="active">${l('labels.opacity')}</label>
       </div>
     </div>
   </form>
@@ -121,50 +156,50 @@ export class SatelliteFov extends KeepTrackPlugin {
       <div class="center">
         <button id="reset-sat-fov-cones-button" class="center-align btn btn-ui waves-effect waves-light menu-selectable" type="button"
         style="margin: -10px 0px 10px 0px;">
-          Reset All FOV Cones &#9658;
+          ${l('buttons.resetAllFovCones')} &#9658;
         </button>
       </div>
     <form id="sat-fov-settings-default-form">
       <div class="row">
-        ${SatelliteFov.genH5Title_('Default Sensor Design')}
+        ${SatelliteFov.genH5Title_(l('labels.defaultSensorDesign'))}
         <div class="input-field col s12">
-            <input id="sat-fov-default-fov-angle" value="3" type="text" data-position="bottom" data-delay="50" data-tooltip="Field of View of the Sensor"
+            <input id="sat-fov-default-fov-angle" value="3" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.fovOfSensor')}"
               style="text-align: center;"
             />
-            <label for="sat-fov-default-fov-angle" class="active">Field of View (Degrees)</label>
+            <label for="sat-fov-default-fov-angle" class="active">${l('labels.fovDegrees')}</label>
         </div>
       </div>
       <div class="row">
-        ${SatelliteFov.genH5Title_('Default Color Settings')}
+        ${SatelliteFov.genH5Title_(l('labels.defaultColorSettings'))}
         <div class="input-field col s4">
-          <input id="sat-fov-default-red" value="0.2" type="text" data-position="bottom" data-delay="50" data-tooltip="Red Color Value"
+          <input id="sat-fov-default-red" value="0.2" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.red')}"
             style="text-align: center;"
           />
           <label for="sat-fov-default-red" class="active">R</label>
         </div>
         <div class="input-field col s4">
-          <input id="sat-fov-default-green" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="Green Color Value"
+          <input id="sat-fov-default-green" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.green')}"
             style="text-align: center;"
           />
           <label for="sat-fov-default-green" class="active">G</label>
         </div>
         <div class="input-field col s4">
-          <input id="sat-fov-default-blue" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="Blue Color Value"
+          <input id="sat-fov-default-blue" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.blue')}"
             style="text-align: center;"
           />
           <label for="sat-fov-default-blue" class="active">B</label>
         </div>
         <div class="input-field col s12">
-          <input id="sat-fov-default-opacity" value="0.15" type="text" data-position="bottom" data-delay="50" data-tooltip="Opacity Value"
+          <input id="sat-fov-default-opacity" value="0.15" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.opacity')}"
             style="text-align: center;"
           />
-          <label for="sat-fov-default-opacity" class="active">Opacity</label>
+          <label for="sat-fov-default-opacity" class="active">${l('labels.opacity')}</label>
         </div>
       </div>
     </form>
     </div>
     <div class="row">
-      ${SatelliteFov.genH5Title_('Active Sensors')}
+      ${SatelliteFov.genH5Title_(l('labels.activeSensors'))}
       <div id="sat-fov-active-cones" class="col s12">
       </div>
     </div>`;
@@ -172,78 +207,78 @@ export class SatelliteFov extends KeepTrackPlugin {
     const satToSatContent = html`
     <div>
       <div class="row">
-        ${SatelliteFov.genH5Title_('Target Satellite')}
+        ${SatelliteFov.genH5Title_(l('labels.targetSatellite'))}
         <div class="input-field col s12">
           <input id="sat-fov-s2s-target-scc" type="text" placeholder="e.g. 25544"
             style="text-align: center;"
           />
-          <label for="sat-fov-s2s-target-scc" class="active">Target Catalog Number</label>
+          <label for="sat-fov-s2s-target-scc" class="active">${l('labels.targetCatalogNumber')}</label>
         </div>
         <div class="center" style="margin-bottom: 10px;">
           <button id="sat-fov-s2s-use-secondary-btn" class="btn btn-ui waves-effect waves-light btn-small menu-selectable" type="button">
-            Use Secondary Sat &#9658;
+            ${l('buttons.useSecondarySat')} &#9658;
           </button>
         </div>
       </div>
       <form id="sat-fov-s2s-settings-form">
         <div class="row">
-          ${SatelliteFov.genH5Title_('FOV Settings')}
+          ${SatelliteFov.genH5Title_(l('labels.fovSettings'))}
           <div class="input-field col s12">
-            <input id="sat-fov-s2s-fov-angle" value="3" type="text" data-position="bottom" data-delay="50" data-tooltip="Field of View of the Sensor"
+            <input id="sat-fov-s2s-fov-angle" value="3" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.fovOfSensor')}"
               style="text-align: center;"
             />
-            <label for="sat-fov-s2s-fov-angle" class="active">Field of View (Degrees)</label>
+            <label for="sat-fov-s2s-fov-angle" class="active">${l('labels.fovDegrees')}</label>
           </div>
         </div>
         <div class="row">
-          ${SatelliteFov.genH5Title_('Color Settings')}
+          ${SatelliteFov.genH5Title_(l('labels.colorSettings'))}
           <div class="input-field col s4">
-            <input id="sat-fov-s2s-red" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="Red Color Value"
+            <input id="sat-fov-s2s-red" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.red')}"
               style="text-align: center;"
             />
             <label for="sat-fov-s2s-red" class="active">R</label>
           </div>
           <div class="input-field col s4">
-            <input id="sat-fov-s2s-green" value="0.5" type="text" data-position="bottom" data-delay="50" data-tooltip="Green Color Value"
+            <input id="sat-fov-s2s-green" value="0.5" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.green')}"
               style="text-align: center;"
             />
             <label for="sat-fov-s2s-green" class="active">G</label>
           </div>
           <div class="input-field col s4">
-            <input id="sat-fov-s2s-blue" value="0.0" type="text" data-position="bottom" data-delay="50" data-tooltip="Blue Color Value"
+            <input id="sat-fov-s2s-blue" value="0.0" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.blue')}"
               style="text-align: center;"
             />
             <label for="sat-fov-s2s-blue" class="active">B</label>
           </div>
           <div class="input-field col s12">
-            <input id="sat-fov-s2s-opacity" value="0.3" type="text" data-position="bottom" data-delay="50" data-tooltip="Opacity Value"
+            <input id="sat-fov-s2s-opacity" value="0.3" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.opacity')}"
               style="text-align: center;"
             />
-            <label for="sat-fov-s2s-opacity" class="active">Opacity</label>
+            <label for="sat-fov-s2s-opacity" class="active">${l('labels.opacity')}</label>
           </div>
         </div>
       </form>
       <div class="center" style="margin-bottom: 10px;">
         <button id="sat-fov-s2s-create-btn" class="btn btn-ui waves-effect waves-light menu-selectable" type="button">
-          Create Sat-to-Sat Cone &#9658;
+          ${l('buttons.createS2sCone')} &#9658;
         </button>
       </div>
       <div class="center">
         <button id="reset-sat-fov-s2s-cones-button" class="center-align btn btn-ui waves-effect waves-light menu-selectable" type="button"
         style="margin: -10px 0px 10px 0px;">
-          Reset Sat-to-Sat Cones &#9658;
+          ${l('buttons.resetS2sCones')} &#9658;
         </button>
       </div>
       <div class="row">
-        ${SatelliteFov.genH5Title_('Active Sat-to-Sat Cones')}
+        ${SatelliteFov.genH5Title_(l('labels.activeS2sCones'))}
         <div id="sat-fov-s2s-active-cones" class="col s12">
         </div>
       </div>
     </div>`;
 
     return buildSideMenuTabsHtml(SAT_FOV_TABS_ID, [
-      { id: 'sat-fov-earth-center-tab', label: 'Earth Center', content: earthCenterContent },
-      { id: 'sat-fov-s2s-tab', label: 'Sat-to-Sat', content: satToSatContent },
+      { id: 'sat-fov-earth-center-tab', label: l('tabs.earthCenter'), content: earthCenterContent },
+      { id: 'sat-fov-s2s-tab', label: l('tabs.satToSat'), content: satToSatContent },
     ]);
   }
 
@@ -365,7 +400,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     const toast = ServiceLocator.getUiManager().toast.bind(ServiceLocator.getUiManager());
 
     if (!secondarySat) {
-      toast('No secondary satellite selected. Right-click a satellite or use [ ] keys.', ToastMsgType.caution);
+      toast(l('errorMsgs.noSecondary'), ToastMsgType.caution);
 
       return;
     }
@@ -380,7 +415,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     const currentSat = PluginRegistry.getPlugin(SelectSatManager)?.getSelectedSat();
 
     if (!currentSat) {
-      toast('Select a source satellite first.', ToastMsgType.caution);
+      toast(l('errorMsgs.selectSourceFirst'), ToastMsgType.caution);
 
       return;
     }
@@ -388,7 +423,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     const sccInput = (getEl('sat-fov-s2s-target-scc') as HTMLInputElement).value.trim();
 
     if (!sccInput) {
-      toast('Enter a target catalog number.', ToastMsgType.caution);
+      toast(l('errorMsgs.enterTargetNumber'), ToastMsgType.caution);
 
       return;
     }
@@ -398,7 +433,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     const targetId = catalogManager.sccNum2Id(sccInput);
 
     if (targetId === null) {
-      toast('Target satellite not found in catalog.', ToastMsgType.critical);
+      toast(l('errorMsgs.targetNotFound'), ToastMsgType.critical);
 
       return;
     }
@@ -406,13 +441,13 @@ export class SatelliteFov extends KeepTrackPlugin {
     const targetObj = catalogManager.getObject(targetId);
 
     if (!targetObj) {
-      toast('Target satellite not found in catalog.', ToastMsgType.critical);
+      toast(l('errorMsgs.targetNotFound'), ToastMsgType.critical);
 
       return;
     }
 
     if (targetObj.id === currentSat.id) {
-      toast('Target satellite cannot be the same as source.', ToastMsgType.caution);
+      toast(l('errorMsgs.targetSameAsSource'), ToastMsgType.caution);
 
       return;
     }
@@ -420,7 +455,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     const fovAngle = parseFloat((getEl('sat-fov-s2s-fov-angle') as HTMLInputElement).value);
 
     if (isNaN(fovAngle) || fovAngle <= 0 || fovAngle > 180) {
-      toast('Field of View must be a number between 0 and 180 degrees.', ToastMsgType.critical);
+      toast(l('errorMsgs.fovRange'), ToastMsgType.critical);
 
       return;
     }
@@ -477,35 +512,35 @@ export class SatelliteFov extends KeepTrackPlugin {
     const toast = ServiceLocator.getUiManager().toast.bind(ServiceLocator.getUiManager());
 
     if (isNaN(fovAngle) || fovAngle <= 0 || fovAngle > 180) {
-      toast('Field of View must be a number between 0 and 180 degrees.', ToastMsgType.critical);
+      toast(l('errorMsgs.fovRange'), ToastMsgType.critical);
       (getEl('sat-fov-default-fov-angle') as HTMLInputElement).value = '3';
 
       return;
     }
 
     if (isNaN(red) || red < 0 || red > 1) {
-      toast('Red color value must be a number between 0 and 1.', ToastMsgType.critical);
+      toast(l('errorMsgs.redRange'), ToastMsgType.critical);
       (getEl('sat-fov-default-red') as HTMLInputElement).value = '0.5';
 
       return;
     }
 
     if (isNaN(green) || green < 0 || green > 1) {
-      toast('Green color value must be a number between 0 and 1.', ToastMsgType.critical);
+      toast(l('errorMsgs.greenRange'), ToastMsgType.critical);
       (getEl('sat-fov-default-green') as HTMLInputElement).value = '0.5';
 
       return;
     }
 
     if (isNaN(blue) || blue < 0 || blue > 1) {
-      toast('Blue color value must be a number between 0 and 1.', ToastMsgType.critical);
+      toast(l('errorMsgs.blueRange'), ToastMsgType.critical);
       (getEl('sat-fov-default-blue') as HTMLInputElement).value = '0.5';
 
       return;
     }
 
     if (isNaN(opacity) || opacity < 0 || opacity > 1) {
-      toast('Opacity value must be a number between 0 and 1.', ToastMsgType.critical);
+      toast(l('errorMsgs.opacityRange'), ToastMsgType.critical);
       (getEl('sat-fov-default-opacity') as HTMLInputElement).value = '0.15';
 
       return;

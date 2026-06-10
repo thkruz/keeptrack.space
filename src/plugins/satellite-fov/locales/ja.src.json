@@ -3,7 +3,60 @@
     "SatelliteFov": {
       "bottomIconLabel": "衛星視野",
       "title": "衛星視野",
-      "helpBody": "衛星視野プラグインでは、衛星の視野を制御できます。"
+      "tabs": {
+        "earthCenter": "地球中心",
+        "satToSat": "衛星間"
+      },
+      "labels": {
+        "sensorDesign": "センサー設計",
+        "colorSettings": "色設定",
+        "defaultSensorDesign": "デフォルトのセンサー設計",
+        "defaultColorSettings": "デフォルトの色設定",
+        "activeSensors": "アクティブなセンサー",
+        "targetSatellite": "ターゲット衛星",
+        "fovSettings": "視野設定",
+        "activeS2sCones": "アクティブな衛星間コーン",
+        "fovDegrees": "視野（度）",
+        "opacity": "不透明度",
+        "targetCatalogNumber": "ターゲットのカタログ番号"
+      },
+      "tooltips": {
+        "fovOfSensor": "センサーの視野",
+        "red": "赤の色値",
+        "green": "緑の色値",
+        "blue": "青の色値",
+        "opacity": "不透明度の値"
+      },
+      "buttons": {
+        "resetAllFovCones": "すべてのFOVコーンをリセット",
+        "useSecondarySat": "セカンダリ衛星を使用",
+        "createS2sCone": "衛星間コーンを作成",
+        "resetS2sCones": "衛星間コーンをリセット"
+      },
+      "errorMsgs": {
+        "noSecondary": "セカンダリ衛星が選択されていません。衛星を右クリックするか、[ ] キーを使用してください。",
+        "selectSourceFirst": "まずソース衛星を選択してください。",
+        "enterTargetNumber": "ターゲットのカタログ番号を入力してください。",
+        "targetNotFound": "ターゲット衛星がカタログに見つかりません。",
+        "targetSameAsSource": "ターゲット衛星はソース衛星と同じにはできません。",
+        "fovRange": "視野は0から180度の間の数値でなければなりません。",
+        "redRange": "赤の色値は0から1の間の数値でなければなりません。",
+        "greenRange": "緑の色値は0から1の間の数値でなければなりません。",
+        "blueRange": "青の色値は0から1の間の数値でなければなりません。",
+        "opacityRange": "不透明度の値は0から1の間の数値でなければなりません。"
+      },
+      "help": {
+        "overview": "衛星視野は、衛星からセンサーコーンを描画して、その衛星が何を見られるかを可視化します。地球に向かう直下方向のコーン（地球中心）か、別の衛星に向けたリンクコーン（衛星間）のいずれかです。コーンの角度と色を設定すると、その体積が3Dビューにリアルタイムで描画されます。",
+        "imgAlt": "地球中心タブと衛星間タブを備えた衛星視野メニュー",
+        "imgCaption": "コーンの角度と色を設定し、衛星ごとにコーンを切り替えます。",
+        "tabsHeading": "地球中心と衛星間",
+        "tabs": "<strong>地球中心</strong>タブは直下方向のコーンを管理します。デフォルトの<strong>視野（度）</strong>と色を設定し、<strong>C</strong>を押して選択中の衛星のコーンを切り替え、<strong>アクティブなセンサー</strong>リストですべてのアクティブなコーンを管理します。<strong>衛星間</strong>タブはソース衛星からターゲットに向かうコーンを作成します。<strong>ターゲットのカタログ番号</strong>を入力するか<strong>セカンダリ衛星を使用</strong>をクリックし、続いて<strong>衛星間コーンを作成</strong>をクリックします。<strong>V</strong>は現在のセカンダリ衛星に向かうコーンを切り替えます。",
+        "howToUse": "<ol><li>衛星を選択します。衛星が選択されるまで下部のアイコンは無効です。</li><li>メニューを開き、コーンの角度、色、不透明度を調整します。値は新しいコーンに適用されます。</li><li><strong>C</strong>を押す（またはメニューを使用する）と、選択中の衛星で地球方向のコーンを切り替えられます。</li><li>衛星間リンクの場合は、<strong>衛星間</strong>タブを開き、ターゲットを選び、<strong>衛星間コーンを作成</strong>をクリックします。</li><li>リセットボタンを使うと、各タイプのコーンをすべて消去できます。</li></ol>",
+        "tip1": "コーンは他の衛星を選択しても保持されるため、1機ずつ追加してコンステレーション全体のカバレッジ図を構築できます。",
+        "tip2": "衛星を右クリックするか [ と ] キーでセカンダリ衛星を設定できます。その後「セカンダリ衛星を使用」がターゲットを自動的に入力します。",
+        "shortcutToggleCone": "選択中の衛星で地球方向のFOVコーンを切り替え",
+        "shortcutToggleS2s": "セカンダリ衛星に向かうコーンを切り替え"
+      }
     }
   }
 }

@@ -3,7 +3,60 @@
     "SatelliteFov": {
       "bottomIconLabel": "FOV satelitu",
       "title": "Zorné pole satelitu",
-      "helpBody": "Plugin zorného pole satelitu umožňuje ovládat zorné pole satelitu."
+      "tabs": {
+        "earthCenter": "Střed Země",
+        "satToSat": "Satelit-satelit"
+      },
+      "labels": {
+        "sensorDesign": "Návrh senzoru",
+        "colorSettings": "Nastavení barev",
+        "defaultSensorDesign": "Výchozí návrh senzoru",
+        "defaultColorSettings": "Výchozí nastavení barev",
+        "activeSensors": "Aktivní senzory",
+        "targetSatellite": "Cílový satelit",
+        "fovSettings": "Nastavení FOV",
+        "activeS2sCones": "Aktivní kužely satelit-satelit",
+        "fovDegrees": "Zorné pole (stupně)",
+        "opacity": "Neprůhlednost",
+        "targetCatalogNumber": "Katalogové číslo cíle"
+      },
+      "tooltips": {
+        "fovOfSensor": "Zorné pole senzoru",
+        "red": "Hodnota červené barvy",
+        "green": "Hodnota zelené barvy",
+        "blue": "Hodnota modré barvy",
+        "opacity": "Hodnota neprůhlednosti"
+      },
+      "buttons": {
+        "resetAllFovCones": "Resetovat všechny kužely FOV",
+        "useSecondarySat": "Použít sekundární satelit",
+        "createS2sCone": "Vytvořit kužel satelit-satelit",
+        "resetS2sCones": "Resetovat kužely satelit-satelit"
+      },
+      "errorMsgs": {
+        "noSecondary": "Není vybrán žádný sekundární satelit. Klikněte pravým tlačítkem na satelit nebo použijte klávesy [ ].",
+        "selectSourceFirst": "Nejprve vyberte zdrojový satelit.",
+        "enterTargetNumber": "Zadejte katalogové číslo cíle.",
+        "targetNotFound": "Cílový satelit nebyl v katalogu nalezen.",
+        "targetSameAsSource": "Cílový satelit nesmí být stejný jako zdrojový.",
+        "fovRange": "Zorné pole musí být číslo mezi 0 a 180 stupni.",
+        "redRange": "Hodnota červené barvy musí být číslo mezi 0 a 1.",
+        "greenRange": "Hodnota zelené barvy musí být číslo mezi 0 a 1.",
+        "blueRange": "Hodnota modré barvy musí být číslo mezi 0 a 1.",
+        "opacityRange": "Hodnota neprůhlednosti musí být číslo mezi 0 a 1."
+      },
+      "help": {
+        "overview": "Zorné pole satelitu vykresluje kužely senzorů ze satelitu, takže vidíte, co satelit může vidět: buď nadirový kužel směrem k Zemi (Střed Země), nebo spojovací kužel namířený na jiný satelit (Satelit-satelit). Nastavte úhel a barvu kužele a objem se živě vykreslí ve 3D zobrazení.",
+        "imgAlt": "Menu Zorné pole satelitu se záložkami Střed Země a Satelit-satelit",
+        "imgCaption": "Nakonfigurujte úhel a barvu kužele a poté přepínejte kužely u jednotlivých satelitů.",
+        "tabsHeading": "Střed Země a Satelit-satelit",
+        "tabs": "Záložka <strong>Střed Země</strong> spravuje kužely mířící k nadiru: nastavte výchozí <strong>Zorné pole (stupně)</strong> a barvu, stisknutím <strong>C</strong> přepnete kužel na vybraném satelitu a každý aktivní kužel spravujete v seznamu <strong>Aktivní senzory</strong>. Záložka <strong>Satelit-satelit</strong> vytváří kužel ze zdrojového satelitu směrem k cíli: zadejte <strong>Katalogové číslo cíle</strong> nebo klikněte na <strong>Použít sekundární satelit</strong> a poté na <strong>Vytvořit kužel satelit-satelit</strong>; klávesa <strong>V</strong> přepíná kužel směrem k aktuálnímu sekundárnímu satelitu.",
+        "howToUse": "<ol><li>Vyberte satelit; spodní ikona je neaktivní, dokud žádný není vybrán.</li><li>Otevřete menu a upravte úhel, barvu a neprůhlednost kužele. Hodnoty se použijí na nové kužely.</li><li>Stisknutím <strong>C</strong> (nebo pomocí menu) přepnete kužel mířící k Zemi na vybraném satelitu.</li><li>Pro spojení mezi satelity otevřete záložku <strong>Satelit-satelit</strong>, zvolte cíl a klikněte na <strong>Vytvořit kužel satelit-satelit</strong>.</li><li>Pomocí resetovacích tlačítek vymažete všechny kužely daného typu.</li></ol>",
+        "tip1": "Kužely zůstávají zachovány i při výběru dalších satelitů, takže můžete postupně, satelit po satelitu, sestavit obraz pokrytí celé konstelace.",
+        "tip2": "Sekundární satelit nastavíte kliknutím pravým tlačítkem na satelit nebo klávesami [ a ]; tlačítko Použít sekundární satelit pak cíl vyplní automaticky.",
+        "shortcutToggleCone": "Přepnout kužel FOV mířící k Zemi na vybraném satelitu",
+        "shortcutToggleS2s": "Přepnout kužel směrem k sekundárnímu satelitu"
+      }
     }
   }
 }

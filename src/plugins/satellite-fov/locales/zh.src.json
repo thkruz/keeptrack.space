@@ -3,7 +3,60 @@
     "SatelliteFov": {
       "bottomIconLabel": "卫星视场",
       "title": "卫星视场",
-      "helpBody": "卫星视场插件允许您控制卫星的视场。"
+      "tabs": {
+        "earthCenter": "地心",
+        "satToSat": "星间"
+      },
+      "labels": {
+        "sensorDesign": "传感器设计",
+        "colorSettings": "颜色设置",
+        "defaultSensorDesign": "默认传感器设计",
+        "defaultColorSettings": "默认颜色设置",
+        "activeSensors": "活动传感器",
+        "targetSatellite": "目标卫星",
+        "fovSettings": "视场设置",
+        "activeS2sCones": "活动星间锥体",
+        "fovDegrees": "视场（度）",
+        "opacity": "不透明度",
+        "targetCatalogNumber": "目标编目号"
+      },
+      "tooltips": {
+        "fovOfSensor": "传感器的视场",
+        "red": "红色分量值",
+        "green": "绿色分量值",
+        "blue": "蓝色分量值",
+        "opacity": "不透明度值"
+      },
+      "buttons": {
+        "resetAllFovCones": "重置所有视场锥体",
+        "useSecondarySat": "使用副卫星",
+        "createS2sCone": "创建星间锥体",
+        "resetS2sCones": "重置星间锥体"
+      },
+      "errorMsgs": {
+        "noSecondary": "未选择副卫星。请右键点击一颗卫星，或使用 [ ] 键。",
+        "selectSourceFirst": "请先选择源卫星。",
+        "enterTargetNumber": "请输入目标编目号。",
+        "targetNotFound": "在目录中未找到目标卫星。",
+        "targetSameAsSource": "目标卫星不能与源卫星相同。",
+        "fovRange": "视场必须是0到180度之间的数字。",
+        "redRange": "红色分量值必须是0到1之间的数字。",
+        "greenRange": "绿色分量值必须是0到1之间的数字。",
+        "blueRange": "蓝色分量值必须是0到1之间的数字。",
+        "opacityRange": "不透明度值必须是0到1之间的数字。"
+      },
+      "help": {
+        "overview": "卫星视场从卫星出发绘制传感器锥体，让您看到卫星能看到什么：既可以是指向地球的天底锥体（地心），也可以是指向另一颗卫星的链路锥体（星间）。设置锥角和颜色后，该体积会在3D视图中实时渲染。",
+        "imgAlt": "带有地心和星间选项卡的卫星视场菜单",
+        "imgCaption": "配置锥角和颜色，然后按卫星逐个切换锥体。",
+        "tabsHeading": "地心与星间",
+        "tabs": "<strong>地心</strong>选项卡管理指向天底的锥体：设置默认的<strong>视场（度）</strong>和颜色，按 <strong>C</strong> 键切换所选卫星上的锥体，并在<strong>活动传感器</strong>列表中管理每个活动锥体。<strong>星间</strong>选项卡从源卫星向目标构建锥体：输入<strong>目标编目号</strong>或点击<strong>使用副卫星</strong>，然后点击<strong>创建星间锥体</strong>；<strong>V</strong> 键切换指向当前副卫星的锥体。",
+        "howToUse": "<ol><li>选择一颗卫星；在选择卫星之前，底部图标处于禁用状态。</li><li>打开菜单并调整锥角、颜色和不透明度。这些值将应用于新锥体。</li><li>按 <strong>C</strong> 键（或使用菜单）切换所选卫星上指向地球的锥体。</li><li>要创建星间链路，请打开<strong>星间</strong>选项卡，选择目标，然后点击<strong>创建星间锥体</strong>。</li><li>使用重置按钮可清除任一类型的所有锥体。</li></ol>",
+        "tip1": "选择其他卫星时锥体会保留，因此您可以逐颗卫星地构建整个星座的覆盖图。",
+        "tip2": "右键点击卫星或使用 [ 和 ] 键设置副卫星；之后点击使用副卫星会自动填入目标。",
+        "shortcutToggleCone": "切换所选卫星上指向地球的视场锥体",
+        "shortcutToggleS2s": "切换指向副卫星的锥体"
+      }
     }
   }
 }

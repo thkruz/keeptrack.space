@@ -3,7 +3,60 @@
     "SatelliteFov": {
       "bottomIconLabel": "Pole widzenia satelity",
       "title": "Pole widzenia satelity",
-      "helpBody": "Wtyczka Pole widzenia satelity umożliwia kontrolowanie pola widzenia satelity."
+      "tabs": {
+        "earthCenter": "Środek Ziemi",
+        "satToSat": "Satelita-satelita"
+      },
+      "labels": {
+        "sensorDesign": "Projekt czujnika",
+        "colorSettings": "Ustawienia kolorów",
+        "defaultSensorDesign": "Domyślny projekt czujnika",
+        "defaultColorSettings": "Domyślne ustawienia kolorów",
+        "activeSensors": "Aktywne czujniki",
+        "targetSatellite": "Satelita docelowy",
+        "fovSettings": "Ustawienia FOV",
+        "activeS2sCones": "Aktywne stożki satelita-satelita",
+        "fovDegrees": "Pole widzenia (stopnie)",
+        "opacity": "Nieprzezroczystość",
+        "targetCatalogNumber": "Numer katalogowy celu"
+      },
+      "tooltips": {
+        "fovOfSensor": "Pole widzenia czujnika",
+        "red": "Wartość koloru czerwonego",
+        "green": "Wartość koloru zielonego",
+        "blue": "Wartość koloru niebieskiego",
+        "opacity": "Wartość nieprzezroczystości"
+      },
+      "buttons": {
+        "resetAllFovCones": "Zresetuj wszystkie stożki FOV",
+        "useSecondarySat": "Użyj drugorzędnego satelity",
+        "createS2sCone": "Utwórz stożek satelita-satelita",
+        "resetS2sCones": "Zresetuj stożki satelita-satelita"
+      },
+      "errorMsgs": {
+        "noSecondary": "Nie wybrano drugorzędnego satelity. Kliknij satelitę prawym przyciskiem myszy lub użyj klawiszy [ ].",
+        "selectSourceFirst": "Najpierw wybierz satelitę źródłowego.",
+        "enterTargetNumber": "Wprowadź numer katalogowy celu.",
+        "targetNotFound": "Nie znaleziono satelity docelowego w katalogu.",
+        "targetSameAsSource": "Satelita docelowy nie może być taki sam jak źródłowy.",
+        "fovRange": "Pole widzenia musi być liczbą z zakresu od 0 do 180 stopni.",
+        "redRange": "Wartość koloru czerwonego musi być liczbą z zakresu od 0 do 1.",
+        "greenRange": "Wartość koloru zielonego musi być liczbą z zakresu od 0 do 1.",
+        "blueRange": "Wartość koloru niebieskiego musi być liczbą z zakresu od 0 do 1.",
+        "opacityRange": "Wartość nieprzezroczystości musi być liczbą z zakresu od 0 do 1."
+      },
+      "help": {
+        "overview": "Pole widzenia satelity rysuje stożki czujników wychodzące z satelity, dzięki czemu widać, co satelita może obserwować: stożek nadirowy skierowany ku Ziemi (Środek Ziemi) albo stożek łącza skierowany na innego satelitę (Satelita-satelita). Ustaw kąt i kolor stożka, a bryła będzie renderowana na żywo w widoku 3D.",
+        "imgAlt": "Menu Pole widzenia satelity z zakładkami Środek Ziemi i Satelita-satelita",
+        "imgCaption": "Skonfiguruj kąt i kolor stożka, a następnie przełączaj stożki dla poszczególnych satelitów.",
+        "tabsHeading": "Środek Ziemi i Satelita-satelita",
+        "tabs": "Zakładka <strong>Środek Ziemi</strong> zarządza stożkami skierowanymi w nadir: ustaw domyślne <strong>Pole widzenia (stopnie)</strong> i kolor, naciśnij <strong>C</strong>, aby przełączyć stożek na wybranym satelicie, i zarządzaj każdym aktywnym stożkiem na liście <strong>Aktywne czujniki</strong>. Zakładka <strong>Satelita-satelita</strong> buduje stożek od satelity źródłowego w stronę celu: wprowadź <strong>Numer katalogowy celu</strong> lub kliknij <strong>Użyj drugorzędnego satelity</strong>, a następnie <strong>Utwórz stożek satelita-satelita</strong>; klawisz <strong>V</strong> przełącza stożek w stronę bieżącego drugorzędnego satelity.",
+        "howToUse": "<ol><li>Wybierz satelitę; dolna ikona jest nieaktywna, dopóki żaden nie zostanie wybrany.</li><li>Otwórz menu i dostosuj kąt, kolor i nieprzezroczystość stożka. Wartości dotyczą nowych stożków.</li><li>Naciśnij <strong>C</strong> (lub użyj menu), aby przełączyć stożek skierowany ku Ziemi na wybranym satelicie.</li><li>Aby utworzyć łącze między satelitami, otwórz zakładkę <strong>Satelita-satelita</strong>, wybierz cel i kliknij <strong>Utwórz stożek satelita-satelita</strong>.</li><li>Użyj przycisków resetowania, aby usunąć wszystkie stożki danego typu.</li></ol>",
+        "tip1": "Stożki pozostają widoczne podczas wybierania kolejnych satelitów, więc możesz satelita po satelicie zbudować obraz pokrycia całej konstelacji.",
+        "tip2": "Drugorzędnego satelitę ustawisz, klikając satelitę prawym przyciskiem myszy lub klawiszami [ i ]; przycisk Użyj drugorzędnego satelity automatycznie uzupełni wtedy cel.",
+        "shortcutToggleCone": "Przełącz stożek FOV skierowany ku Ziemi na wybranym satelicie",
+        "shortcutToggleS2s": "Przełącz stożek w stronę drugorzędnego satelity"
+      }
     }
   }
 }

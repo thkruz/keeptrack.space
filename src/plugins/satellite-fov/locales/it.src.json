@@ -3,7 +3,60 @@
     "SatelliteFov": {
       "bottomIconLabel": "FOV Satellite",
       "title": "Campo Visivo del Satellite",
-      "helpBody": "Il plugin Campo Visivo del Satellite consente di controllare il campo visivo di un satellite."
+      "tabs": {
+        "earthCenter": "Centro della Terra",
+        "satToSat": "Sat a Sat"
+      },
+      "labels": {
+        "sensorDesign": "Progettazione del sensore",
+        "colorSettings": "Impostazioni colore",
+        "defaultSensorDesign": "Progettazione del sensore predefinita",
+        "defaultColorSettings": "Impostazioni colore predefinite",
+        "activeSensors": "Sensori attivi",
+        "targetSatellite": "Satellite bersaglio",
+        "fovSettings": "Impostazioni FOV",
+        "activeS2sCones": "Coni Sat a Sat attivi",
+        "fovDegrees": "Campo visivo (gradi)",
+        "opacity": "Opacità",
+        "targetCatalogNumber": "Numero di catalogo del bersaglio"
+      },
+      "tooltips": {
+        "fovOfSensor": "Campo visivo del sensore",
+        "red": "Valore del colore rosso",
+        "green": "Valore del colore verde",
+        "blue": "Valore del colore blu",
+        "opacity": "Valore di opacità"
+      },
+      "buttons": {
+        "resetAllFovCones": "Reimposta tutti i coni FOV",
+        "useSecondarySat": "Usa sat secondario",
+        "createS2sCone": "Crea cono Sat a Sat",
+        "resetS2sCones": "Reimposta i coni Sat a Sat"
+      },
+      "errorMsgs": {
+        "noSecondary": "Nessun satellite secondario selezionato. Fai clic con il pulsante destro su un satellite o usa i tasti [ ].",
+        "selectSourceFirst": "Seleziona prima un satellite di origine.",
+        "enterTargetNumber": "Inserisci un numero di catalogo del bersaglio.",
+        "targetNotFound": "Satellite bersaglio non trovato nel catalogo.",
+        "targetSameAsSource": "Il satellite bersaglio non può coincidere con quello di origine.",
+        "fovRange": "Il campo visivo deve essere un numero compreso tra 0 e 180 gradi.",
+        "redRange": "Il valore del colore rosso deve essere un numero compreso tra 0 e 1.",
+        "greenRange": "Il valore del colore verde deve essere un numero compreso tra 0 e 1.",
+        "blueRange": "Il valore del colore blu deve essere un numero compreso tra 0 e 1.",
+        "opacityRange": "Il valore di opacità deve essere un numero compreso tra 0 e 1."
+      },
+      "help": {
+        "overview": "Il Campo Visivo del Satellite disegna coni di sensore a partire da un satellite per mostrare ciò che può vedere: un cono al nadir verso la Terra (Centro della Terra) oppure un cono di collegamento puntato verso un altro satellite (Sat a Sat). Imposta l'angolo e il colore del cono e il volume viene visualizzato in tempo reale nella vista 3D.",
+        "imgAlt": "Il menu Campo Visivo del Satellite con le schede Centro della Terra e Sat a Sat",
+        "imgCaption": "Configura l'angolo e il colore del cono, poi attiva o disattiva i coni per ogni satellite.",
+        "tabsHeading": "Centro della Terra e Sat a Sat",
+        "tabs": "La scheda <strong>Centro della Terra</strong> gestisce i coni puntati al nadir: imposta il <strong>Campo visivo (gradi)</strong> e il colore predefiniti, premi <strong>C</strong> per attivare o disattivare un cono sul satellite selezionato e gestisci ogni cono attivo nell'elenco <strong>Sensori attivi</strong>. La scheda <strong>Sat a Sat</strong> costruisce un cono da un satellite di origine verso un bersaglio: inserisci un <strong>Numero di catalogo del bersaglio</strong> oppure fai clic su <strong>Usa sat secondario</strong>, poi su <strong>Crea cono Sat a Sat</strong>; <strong>V</strong> attiva o disattiva un cono verso il satellite secondario corrente.",
+        "howToUse": "<ol><li>Seleziona un satellite; l'icona in basso è disabilitata finché non ne viene selezionato uno.</li><li>Apri il menu e regola angolo, colore e opacità del cono. I valori si applicano ai nuovi coni.</li><li>Premi <strong>C</strong> (o usa il menu) per attivare o disattivare un cono puntato verso la Terra sul satellite selezionato.</li><li>Per un collegamento tra satelliti, apri la scheda <strong>Sat a Sat</strong>, scegli un bersaglio e fai clic su <strong>Crea cono Sat a Sat</strong>.</li><li>Usa i pulsanti di reimpostazione per cancellare tutti i coni di ciascun tipo.</li></ol>",
+        "tip1": "I coni rimangono mentre selezioni altri satelliti, così puoi costruire un quadro di copertura dell'intera costellazione un satellite alla volta.",
+        "tip2": "Imposta il satellite secondario facendo clic con il pulsante destro su un satellite o con i tasti [ e ]; Usa sat secondario compila quindi automaticamente il bersaglio.",
+        "shortcutToggleCone": "Attiva o disattiva un cono FOV puntato verso la Terra sul satellite selezionato",
+        "shortcutToggleS2s": "Attiva o disattiva un cono verso il satellite secondario"
+      }
     }
   }
 }

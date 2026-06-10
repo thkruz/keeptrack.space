@@ -3,7 +3,60 @@
     "SatelliteFov": {
       "bottomIconLabel": "Campo de Visión del Satélite",
       "title": "Campo de Visión del Satélite",
-      "helpBody": "El plugin de Campo de Visión del Satélite te permite controlar el campo de visión de un satélite."
+      "tabs": {
+        "earthCenter": "Centro de la Tierra",
+        "satToSat": "Sat a Sat"
+      },
+      "labels": {
+        "sensorDesign": "Diseño del Sensor",
+        "colorSettings": "Configuración de Color",
+        "defaultSensorDesign": "Diseño del Sensor por Defecto",
+        "defaultColorSettings": "Configuración de Color por Defecto",
+        "activeSensors": "Sensores Activos",
+        "targetSatellite": "Satélite Objetivo",
+        "fovSettings": "Ajustes de FOV",
+        "activeS2sCones": "Conos Sat a Sat Activos",
+        "fovDegrees": "Campo de Visión (Grados)",
+        "opacity": "Opacidad",
+        "targetCatalogNumber": "Número de Catálogo del Objetivo"
+      },
+      "tooltips": {
+        "fovOfSensor": "Campo de visión del sensor",
+        "red": "Valor del color rojo",
+        "green": "Valor del color verde",
+        "blue": "Valor del color azul",
+        "opacity": "Valor de opacidad"
+      },
+      "buttons": {
+        "resetAllFovCones": "Restablecer Todos los Conos FOV",
+        "useSecondarySat": "Usar Sat Secundario",
+        "createS2sCone": "Crear Cono Sat a Sat",
+        "resetS2sCones": "Restablecer Conos Sat a Sat"
+      },
+      "errorMsgs": {
+        "noSecondary": "No hay satélite secundario seleccionado. Haz clic derecho en un satélite o usa las teclas [ ].",
+        "selectSourceFirst": "Selecciona primero un satélite de origen.",
+        "enterTargetNumber": "Introduce un número de catálogo del objetivo.",
+        "targetNotFound": "Satélite objetivo no encontrado en el catálogo.",
+        "targetSameAsSource": "El satélite objetivo no puede ser el mismo que el de origen.",
+        "fovRange": "El campo de visión debe ser un número entre 0 y 180 grados.",
+        "redRange": "El valor del color rojo debe ser un número entre 0 y 1.",
+        "greenRange": "El valor del color verde debe ser un número entre 0 y 1.",
+        "blueRange": "El valor del color azul debe ser un número entre 0 y 1.",
+        "opacityRange": "El valor de opacidad debe ser un número entre 0 y 1."
+      },
+      "help": {
+        "overview": "El Campo de Visión del Satélite dibuja conos de sensor desde un satélite para que veas lo que este puede ver: un cono nadir hacia la Tierra (Centro de la Tierra) o un cono de enlace apuntado a otro satélite (Sat a Sat). Define el ángulo y el color del cono, y el volumen se muestra en vivo en la vista 3D.",
+        "imgAlt": "El menú de Campo de Visión del Satélite con sus pestañas Centro de la Tierra y Sat a Sat",
+        "imgCaption": "Configura el ángulo y el color del cono y luego activa o desactiva conos por satélite.",
+        "tabsHeading": "Centro de la Tierra y Sat a Sat",
+        "tabs": "La pestaña <strong>Centro de la Tierra</strong> gestiona los conos apuntados al nadir: define el <strong>Campo de Visión (Grados)</strong> y el color por defecto, pulsa <strong>C</strong> para alternar un cono en el satélite seleccionado y gestiona cada cono activo en la lista <strong>Sensores Activos</strong>. La pestaña <strong>Sat a Sat</strong> construye un cono desde un satélite de origen hacia un objetivo: introduce un <strong>Número de Catálogo del Objetivo</strong> o haz clic en <strong>Usar Sat Secundario</strong> y luego en <strong>Crear Cono Sat a Sat</strong>; <strong>V</strong> alterna un cono hacia el satélite secundario actual.",
+        "howToUse": "<ol><li>Selecciona un satélite; el icono inferior está deshabilitado hasta que se seleccione uno.</li><li>Abre el menú y ajusta el ángulo, el color y la opacidad del cono. Los valores se aplican a los conos nuevos.</li><li>Pulsa <strong>C</strong> (o usa el menú) para alternar un cono apuntado a la Tierra en el satélite seleccionado.</li><li>Para un enlace entre satélites, abre la pestaña <strong>Sat a Sat</strong>, elige un objetivo y haz clic en <strong>Crear Cono Sat a Sat</strong>.</li><li>Usa los botones de restablecer para borrar todos los conos de cada tipo.</li></ol>",
+        "tip1": "Los conos persisten mientras seleccionas otros satélites, así que puedes construir una imagen de cobertura de toda una constelación satélite a satélite.",
+        "tip2": "Define el satélite secundario haciendo clic derecho en un satélite o con las teclas [ y ]; Usar Sat Secundario rellena entonces el objetivo automáticamente.",
+        "shortcutToggleCone": "Alternar un cono FOV apuntado a la Tierra en el satélite seleccionado",
+        "shortcutToggleS2s": "Alternar un cono hacia el satélite secundario"
+      }
     }
   }
 }

@@ -121,7 +121,22 @@ export class Inc2AltPlots extends KeepTrackPlugin {
   getHelpConfig(): IHelpConfig {
     return {
       title: t7e('plugins.Inc2AltPlots.title'),
-      body: t7e('plugins.Inc2AltPlots.helpBody'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.Inc2AltPlots.help.overview'),
+          image: {
+            src: 'img/help/plot-analysis/inc2alt-menu.png',
+            alt: t7e('plugins.Inc2AltPlots.help.imgAlt'),
+            caption: t7e('plugins.Inc2AltPlots.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.Inc2AltPlots.help.howToUse'),
+        },
+      ],
+      tips: [t7e('plugins.Inc2AltPlots.help.tip1'), t7e('plugins.Inc2AltPlots.help.tip2')],
     };
   }
 

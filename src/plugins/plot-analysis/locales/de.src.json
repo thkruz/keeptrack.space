@@ -3,25 +3,83 @@
     "Inc2AltPlots": {
       "bottomIconLabel": "Ink vs Höhe-Diagramm",
       "title": "Inklination-zu-Höhe-Diagramm-Menü",
-      "helpBody": "Das Inklination-zu-Höhe-Diagramm-Menü wird verwendet, um die Inklination des Satelliten gegen seine Höhe darzustellen.",
       "labels": {
         "totalLeoPayloads": "Gesamtzahl LEO-Nutzlasten"
+      },
+      "help": {
+        "overview": "Das Inklination-vs-Höhe-Diagramm kartiert die LEO-Population: Jede Nutzlast wird nach Inklination gegen die Höhe aufgetragen. Konstellationen erscheinen als dichte Cluster (Starlink-Schalen, OneWeb-Bahnebenen), und überfüllte Höhenbänder stechen sofort hervor.",
+        "imgAlt": "Streudiagramm der LEO-Nutzlasten nach Inklination und Höhe",
+        "imgCaption": "Konstellationen gruppieren sich nach Inklination und Höhe zu sichtbaren Clustern.",
+        "howToUse": "<ol><li>Öffnen Sie das <strong>Ink vs Höhe-Diagramm</strong> über die untere Leiste (Modus Analyse).</li><li>Das Diagramm wird automatisch berechnet; zeigen Sie auf Punkte, um Satellitennamen zu sehen, und klicken Sie auf einen Punkt, um diesen Satelliten auszuwählen.</li><li>Verwenden Sie die Legende, um Konstellationen und Länder aus- oder einzublenden.</li></ol>",
+        "tip1": "Klicken Sie auf einen Legendeneintrag, um eine ganze Gruppe umzuschalten; das Isolieren einer einzelnen Konstellation macht ihre Schalenstruktur deutlich sichtbar.",
+        "tip2": "Das Diagramm tastet den Katalog zum aktuellen Zeitpunkt ab; öffnen Sie das Menü nach Katalogänderungen erneut, um es zu aktualisieren."
       }
     },
     "Inc2LonPlots": {
       "bottomIconLabel": "Ink vs Län-Diagramm",
       "title": "Inklination-zu-Längengrad-Diagramm-Menü",
-      "helpBody": "Das Ink-vs-Län-Diagramm-Menü wird verwendet, um die Inklination gegen den Längengrad im GEO-Gürtel darzustellen.",
       "labels": {
         "totalGeoPayloads": "Gesamtzahl GEO-Nutzlasten"
+      },
+      "help": {
+        "overview": "Das Inklination-vs-Längengrad-Diagramm vermisst den GEO-Gürtel: Jede geostationäre Nutzlast wird mit ihrer Längengrad-Position gegen ihre Inklination aufgetragen. Satelliten mit niedriger Inklination werden aktiv auf Position gehalten; solche mit höherer Inklination driften oder wurden auf geneigte Bahnen ausgemustert.",
+        "imgAlt": "Streudiagramm der GEO-Nutzlasten nach Längengrad und Inklination",
+        "imgCaption": "Jeder Punkt ist eine GEO-Nutzlast auf ihrer Längengrad-Position; die Höhe zeigt die Inklination.",
+        "howToUse": "<ol><li>Öffnen Sie das <strong>Ink vs Län-Diagramm</strong> über die untere Leiste oder drücken Sie <strong>G</strong>.</li><li>Der Gürtel wird automatisch dargestellt; zeigen Sie auf Punkte, um Namen zu sehen, und klicken Sie, um einen Satelliten auszuwählen.</li><li>Verwenden Sie die Legende, um nach Betreiberland zu filtern.</li></ol>",
+        "tip1": "Ein vertikaler Stapel von Punkten auf einem Längengrad ist ein Cluster ko-positionierter Satelliten, die sich eine Position teilen.",
+        "tip2": "Satelliten oberhalb von etwa 7 Grad Inklination befinden sich meist im Friedhofsorbit oder auf geneigten Abstellbahnen; der aktive Gürtel bleibt nahe null.",
+        "shortcutToggle": "Ink-vs-Län-Diagramm umschalten"
       }
     },
     "Time2LonPlots": {
       "bottomIconLabel": "Wasserfall-Diagramm",
       "title": "Wasserfall-Diagramm-Menü",
-      "helpBody": "Das Zeit-zu-Längengrad (Wasserfall) Diagramm zeigt die GEO-Satelliten-Längengradverschiebung über die Zeit.",
       "labels": {
         "totalGeoPayloads": "Gesamtzahl GEO-Nutzlasten"
+      },
+      "help": {
+        "overview": "Das Wasserfall-Diagramm verfolgt den GEO-Längengrad über die Zeit: Jede Linie zeigt, wie der Längengrad eines Satelliten im dargestellten Fenster driftet (oder gehalten wird). Satelliten mit Positionshaltung zeichnen vertikale Linien; driftende Satelliten verlaufen schräg; Umpositionierungen erscheinen als ausladende Kurven.",
+        "imgAlt": "Wasserfall-Diagramm des Längengrads von GEO-Satelliten über die Zeit",
+        "imgCaption": "Vertikale Linien sind Satelliten mit Positionshaltung; schräge Linien driften.",
+        "howToUse": "<ol><li>Öffnen Sie das <strong>Wasserfall-Diagramm</strong> über die untere Leiste (Modus Analyse).</li><li>Das Diagramm berechnet automatisch einen Tag Längengrad-Verlauf; zeigen Sie auf Linien, um Namen zu sehen, und klicken Sie zum Auswählen.</li><li>Verwenden Sie die Legende, um nach Land oder Betreiber zu filtern.</li></ol>",
+        "tip1": "Eine Linie, die von schräg zu vertikal abknickt, ist ein Satellit, der gerade eine Umpositionierung abgeschlossen und die Positionshaltung wieder aufgenommen hat.",
+        "tip2": "Die Berechnung umfasst den gesamten GEO-Gürtel und läuft in Abschnitten; geben Sie ihr auf langsameren Rechnern ein paar Sekunden Zeit."
+      }
+    },
+    "Lat2LonPlots": {
+      "bottomIconLabel": "Lat vs Lon-Diagramm",
+      "title": "Breitengrad-zu-Längengrad-Diagramm-Menü",
+      "help": {
+        "overview": "Das Breitengrad-vs-Längengrad-Diagramm ist eine flache Momentaufnahme, wo Satelliten gerade über der Erde stehen, dargestellt als Bodenpositionen. Es liest sich wie eine Karte ohne Karte: nützlich, um Abdeckungslücken zu erkennen und die Geometrie der Achterfiguren geneigter Satelliten im GEO-Gürtel zu studieren.",
+        "howToUse": "<ol><li>Öffnen Sie das <strong>Lat vs Lon-Diagramm</strong> über die untere Leiste (Modus Analyse).</li><li>Das Diagramm wird automatisch dargestellt; zeigen Sie auf Punkte, um Namen zu sehen, und klicken Sie, um einen Satelliten auszuwählen.</li></ol>",
+        "tip1": "Geneigte GEO-Satelliten beschreiben Nord-Süd-Ausschläge auf einem festen Längengrad, die in dieser Ansicht als vertikale Streuungen erscheinen."
+      }
+    },
+    "EciPlot": {
+      "bottomIconLabel": "ECI-Diagramm",
+      "title": "ECI-Diagramm-Menü",
+      "help": {
+        "overview": "Das ECI-Diagramm zeichnet die Bahn des ausgewählten Satelliten als 3D-Kurve im erdzentrierten Inertialsystem (ECI): dem an den Sternen fixierten Bezugssystem, in dem Bahnen saubere Ellipsen sind. Ist ein Sekundärsatellit ausgewählt, werden beide Bahnen zum Vergleich gemeinsam dargestellt.",
+        "howToUse": "<ol><li>Wählen Sie einen Satelliten aus; das untere Symbol ist deaktiviert, bis einer ausgewählt ist.</li><li>Öffnen Sie das <strong>ECI-Diagramm</strong> über die untere Leiste (Modus Analyse).</li><li>Ziehen Sie, um das 3D-Diagramm zu drehen, und scrollen Sie zum Zoomen; zeigen Sie auf die Kurve, um Positionswerte zu sehen.</li></ol>",
+        "tip1": "Wählen Sie zuerst einen Sekundärsatelliten aus (Rechtsklick oder die Tasten [ und ]), um zwei Bahnen zu überlagern und ihre Geometrie zu vergleichen."
+      }
+    },
+    "EcfPlot": {
+      "bottomIconLabel": "ECF-Diagramm",
+      "title": "ECF-Diagramm-Menü",
+      "help": {
+        "overview": "Das ECF-Diagramm zeichnet die Trajektorie des ausgewählten Satelliten im erdfesten, erdzentrierten Bezugssystem (ECF), das mit dem Planeten rotiert. Geosynchrone Satelliten schrumpfen zu kleinen Schleifen, und Bahnen mit sich wiederholender Bodenspur schließen sich in sich selbst; damit ist dies das Bezugssystem für die Untersuchung erdbezogenen Verhaltens.",
+        "howToUse": "<ol><li>Wählen Sie einen Satelliten aus; das untere Symbol ist deaktiviert, bis einer ausgewählt ist.</li><li>Öffnen Sie das <strong>ECF-Diagramm</strong> über die untere Leiste (Modus Analyse).</li><li>Ziehen Sie, um das 3D-Diagramm zu drehen, und scrollen Sie zum Zoomen; zeigen Sie auf die Kurve, um Positionswerte zu sehen.</li></ol>",
+        "tip1": "Die enge Achterfigur eines GEO-Satelliten in ECF ist sein täglicher Inklinations- und Exzentrizitätszyklus; je enger die Schleife, desto besser die Positionshaltung."
+      }
+    },
+    "RicPlot": {
+      "bottomIconLabel": "RIC-Diagramm",
+      "title": "RIC-Diagramm-Menü",
+      "help": {
+        "overview": "Das RIC-Diagramm zeigt die Relativbewegung zwischen zwei Satelliten im radial, entlang der Bahn und quer zur Bahn ausgerichteten Bezugssystem (RIC), zentriert auf den Primärsatelliten. Es ist die Standardansicht für Rendezvous, Formationsflug und Annäherungsanalysen: Die Bahn des Sekundärsatelliten wird so dargestellt, wie sie vom Primärsatelliten aus erscheint.",
+        "howToUse": "<ol><li>Wählen Sie einen Primärsatelliten und dann einen Sekundärsatelliten aus (Rechtsklick auf einen Satelliten oder die Tasten [ und ]).</li><li>Öffnen Sie das <strong>RIC-Diagramm</strong> über die untere Leiste (Modus Analyse).</li><li>Ziehen Sie, um das 3D-Diagramm zu drehen; der Ursprung ist der Primärsatellit, und die Kurve ist die relative Trajektorie des Sekundärsatelliten.</li></ol>",
+        "tip1": "Es müssen sowohl ein Primär- als auch ein Sekundärsatellit ausgewählt sein, sonst hat das Diagramm nichts zu vergleichen; wählen Sie Objekte auf ähnlichen Bahnen für einen gut lesbaren Maßstab."
       }
     }
   }

@@ -3,25 +3,83 @@
     "Inc2AltPlots": {
       "bottomIconLabel": "Wykres inkl. vs wys.",
       "title": "Menu wykresu inklinacji do wysokości",
-      "helpBody": "Menu wykresu inklinacji do wysokości służy do prezentacji inklinacji satelity w funkcji jego wysokości.",
       "labels": {
         "totalLeoPayloads": "Łączna liczba ładunków LEO"
+      },
+      "help": {
+        "overview": "Wykres inklinacji do wysokości mapuje populację LEO: każdy ładunek jest naniesiony według inklinacji względem wysokości. Konstelacje pojawiają się jako zwarte skupiska (powłoki Starlink, płaszczyzny OneWeb), a zatłoczone pasma wysokości od razu rzucają się w oczy.",
+        "imgAlt": "Wykres punktowy ładunków LEO według inklinacji i wysokości",
+        "imgCaption": "Konstelacje grupują się w widoczne skupiska według inklinacji i wysokości.",
+        "howToUse": "<ol><li>Otwórz <strong>Wykres inkl. vs wys.</strong> z dolnego paska (tryb Analiza).</li><li>Wykres oblicza się automatycznie; najedź na punkty, aby zobaczyć nazwy satelitów, i kliknij punkt, aby wybrać danego satelitę.</li><li>Użyj legendy, aby ukrywać lub pokazywać konstelacje i kraje.</li></ol>",
+        "tip1": "Kliknij pozycję legendy, aby przełączyć całą grupę; wyizolowanie jednej konstelacji uwidacznia strukturę jej powłok.",
+        "tip2": "Wykres próbkuje katalog w bieżącym czasie; po zmianach w katalogu otwórz menu ponownie, aby je odświeżyć."
       }
     },
     "Inc2LonPlots": {
       "bottomIconLabel": "Wykres inkl. vs dł.",
       "title": "Menu wykresu inklinacji do długości geograficznej",
-      "helpBody": "Menu wykresu inkl. vs dł. służy do prezentacji inklinacji w funkcji długości geograficznej w pasie GEO.",
       "labels": {
         "totalGeoPayloads": "Łączna liczba ładunków GEO"
+      },
+      "help": {
+        "overview": "Wykres inklinacji do długości geograficznej przedstawia pas GEO: każdy ładunek geostacjonarny jest naniesiony według swojej pozycji długości geograficznej względem inklinacji. Satelity o niskiej inklinacji aktywnie utrzymują pozycję; te o wyższej inklinacji dryfują lub zostały wycofane na orbity nachylone.",
+        "imgAlt": "Wykres punktowy ładunków GEO według długości geograficznej i inklinacji",
+        "imgCaption": "Każdy punkt to ładunek GEO na swojej pozycji długości geograficznej; wysokość pokazuje inklinację.",
+        "howToUse": "<ol><li>Otwórz <strong>Wykres inkl. vs dł.</strong> z dolnego paska lub naciśnij <strong>G</strong>.</li><li>Pas renderuje się automatycznie; najedź na punkty, aby zobaczyć nazwy, i kliknij, aby wybrać satelitę.</li><li>Użyj legendy, aby filtrować według kraju operatora.</li></ol>",
+        "tip1": "Pionowy słupek punktów na jednej długości geograficznej to skupisko satelitów współpozycjonowanych, dzielących tę samą pozycję.",
+        "tip2": "Satelity o inklinacji powyżej około 7 stopni znajdują się zwykle na orbicie cmentarnej lub nachylonej orbicie przechowawczej; aktywny pas trzyma się zera.",
+        "shortcutToggle": "Przełącz wykres inkl. vs dł."
       }
     },
     "Time2LonPlots": {
       "bottomIconLabel": "Wykres kaskadowy",
       "title": "Menu wykresu kaskadowego",
-      "helpBody": "Wykres czasu do długości geograficznej (kaskadowy) przedstawia dryf długości geograficznej satelitów GEO w czasie.",
       "labels": {
         "totalGeoPayloads": "Łączna liczba ładunków GEO"
+      },
+      "help": {
+        "overview": "Wykres kaskadowy śledzi długość geograficzną GEO w czasie: każda linia to długość geograficzna satelity dryfująca (lub utrzymywana) w wykreślonym oknie. Satelity utrzymujące pozycję rysują pionowe linie; dryfujące pochylają się; relokacje pojawiają się jako szerokie łuki.",
+        "imgAlt": "Wykres kaskadowy długości geograficznej satelitów GEO w czasie",
+        "imgCaption": "Pionowe linie to satelity utrzymujące pozycję; pochylone linie dryfują.",
+        "howToUse": "<ol><li>Otwórz <strong>Wykres kaskadowy</strong> z dolnego paska (tryb Analiza).</li><li>Wykres automatycznie oblicza dobę historii długości geograficznej; najedź na linie, aby zobaczyć nazwy, i kliknij, aby wybrać.</li><li>Użyj legendy, aby filtrować według kraju lub operatora.</li></ol>",
+        "tip1": "Linia, która przechodzi z pochylonej w pionową, to satelita, który właśnie zakończył relokację i wznowił utrzymywanie pozycji.",
+        "tip2": "Obliczenia obejmują cały pas GEO i wykonują się partiami; na wolniejszych komputerach daj im kilka sekund."
+      }
+    },
+    "Lat2LonPlots": {
+      "bottomIconLabel": "Wykres szer. vs dł.",
+      "title": "Menu wykresu szerokości do długości geograficznej",
+      "help": {
+        "overview": "Wykres szerokości do długości geograficznej to płaska migawka tego, gdzie satelity znajdują się teraz nad Ziemią, naniesiona jako pozycje naziemne. Czyta się go jak mapę bez mapy: przydaje się do wykrywania luk w pokryciu i geometrii śladów w kształcie ósemki nachylonych satelitów pasa GEO.",
+        "howToUse": "<ol><li>Otwórz <strong>Wykres szer. vs dł.</strong> z dolnego paska (tryb Analiza).</li><li>Wykres renderuje się automatycznie; najedź na punkty, aby zobaczyć nazwy, i kliknij, aby wybrać satelitę.</li></ol>",
+        "tip1": "Nachylone satelity GEO wykonują wahania północ-południe na stałej długości geograficznej, które w tym widoku wyglądają jak pionowe rozrzuty."
+      }
+    },
+    "EciPlot": {
+      "bottomIconLabel": "Wykres ECI",
+      "title": "Menu wykresu ECI",
+      "help": {
+        "overview": "Wykres ECI rysuje orbitę wybranego satelity jako krzywą 3D w inercjalnym układzie odniesienia o środku w Ziemi (ECI): układzie związanym z gwiazdami, w którym orbity są czystymi elipsami. Jeśli wybrano satelitę dodatkowego, obie orbity są wykreślane razem w celu porównania.",
+        "howToUse": "<ol><li>Wybierz satelitę; dolna ikona jest nieaktywna, dopóki żaden nie jest wybrany.</li><li>Otwórz <strong>Wykres ECI</strong> z dolnego paska (tryb Analiza).</li><li>Przeciągaj, aby obracać wykres 3D, i przewijaj, aby przybliżać; najedź na krzywą, aby zobaczyć wartości pozycji.</li></ol>",
+        "tip1": "Najpierw wybierz satelitę dodatkowego (prawy przycisk myszy lub klawisze [ i ]), aby nałożyć dwie orbity i porównać ich geometrię."
+      }
+    },
+    "EcfPlot": {
+      "bottomIconLabel": "Wykres ECF",
+      "title": "Menu wykresu ECF",
+      "help": {
+        "overview": "Wykres ECF rysuje trajektorię wybranego satelity w układzie odniesienia związanym z Ziemią o środku w Ziemi (ECF), który obraca się wraz z planetą. Satelity geosynchroniczne kurczą się do małych pętli, a orbity o powtarzalnym śladzie naziemnym zamykają się same w sobie, co czyni ten układ najlepszym do badania zachowania względem Ziemi.",
+        "howToUse": "<ol><li>Wybierz satelitę; dolna ikona jest nieaktywna, dopóki żaden nie jest wybrany.</li><li>Otwórz <strong>Wykres ECF</strong> z dolnego paska (tryb Analiza).</li><li>Przeciągaj, aby obracać wykres 3D, i przewijaj, aby przybliżać; najedź na krzywą, aby zobaczyć wartości pozycji.</li></ol>",
+        "tip1": "Ciasna ósemka satelity GEO w ECF to jego dobowy cykl inklinacji i mimośrodu; im ciaśniejsza pętla, tym lepsze utrzymywanie pozycji."
+      }
+    },
+    "RicPlot": {
+      "bottomIconLabel": "Wykres RIC",
+      "title": "Menu wykresu RIC",
+      "help": {
+        "overview": "Wykres RIC pokazuje ruch względny dwóch satelitów w układzie składowych promieniowej, wzdłuż toru i w poprzek toru (RIC), o środku w satelicie głównym. To standardowy widok dla spotkań orbitalnych, lotu w formacji i analizy bliskich zbliżeń: trasa satelity dodatkowego jest rysowana tak, jak widzi ją satelita główny.",
+        "howToUse": "<ol><li>Wybierz satelitę głównego, a następnie satelitę dodatkowego (kliknij satelitę prawym przyciskiem lub użyj klawiszy [ i ]).</li><li>Otwórz <strong>Wykres RIC</strong> z dolnego paska (tryb Analiza).</li><li>Przeciągaj, aby obracać wykres 3D; początek układu to satelita główny, a krzywa to względna trajektoria satelity dodatkowego.</li></ol>",
+        "tip1": "Muszą być wybrane zarówno satelita główny, jak i dodatkowy, inaczej wykres nie ma czego porównywać; dla czytelnej skali wybieraj obiekty na podobnych orbitach."
       }
     }
   }

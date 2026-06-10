@@ -112,8 +112,23 @@ export class Time2LonPlots extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.Time2LonPlots.title' as T7eKey),
-      body: t7e('plugins.Time2LonPlots.helpBody' as T7eKey),
+      title: t7e('plugins.Time2LonPlots.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.Time2LonPlots.help.overview'),
+          image: {
+            src: 'img/help/plot-analysis/time2lon-menu.png',
+            alt: t7e('plugins.Time2LonPlots.help.imgAlt'),
+            caption: t7e('plugins.Time2LonPlots.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.Time2LonPlots.help.howToUse'),
+        },
+      ],
+      tips: [t7e('plugins.Time2LonPlots.help.tip1'), t7e('plugins.Time2LonPlots.help.tip2')],
     };
   }
 

@@ -3,9 +3,14 @@
     "LaunchCalendar": {
       "bottomIconLabel": "Kalendář startů",
       "title": "Kalendář startů",
-      "helpBody": "Otevře kalendář startů z Gunter's Space Page pro aktuální rok. Poskytuje kompletní seznam orbitálních startů včetně dat, nosičů, nákladů a startovacích míst.",
       "commands": {
         "open": "Otevřít kalendář startů"
+      },
+      "help": {
+        "overview": "Kalendář startů otevře v překryvném okně seznam startů z Gunter's Space Page pro aktuální rok: ucelený, pravidelně aktualizovaný seznam orbitálních startů s daty, nosiči, náklady a místy startu. Použijte jej ke zjištění, co se chystá ke startu, a poté nadcházející starty znovu vytvořte nástrojem Nový start.",
+        "howToUse": "<ol><li>Klikněte na ikonu <strong>Kalendář startů</strong> ve spodním menu (režim Události). Kalendář se otevře v překryvném okně; postranní menu se automaticky zavřou.</li><li>Prohlédněte si seznam a poté překryvné okno zavřete pro návrat do 3D zobrazení.</li></ol>",
+        "tip1": "Kalendář je externí stránka z Gunter's Space Page, takže vyžaduje připojení k internetu.",
+        "tip2": "Je dostupný také z palety příkazů jako Otevřít kalendář startů."
       }
     }
   }

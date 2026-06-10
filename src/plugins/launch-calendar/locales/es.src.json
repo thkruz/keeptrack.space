@@ -3,9 +3,14 @@
     "LaunchCalendar": {
       "bottomIconLabel": "Calendario de Lanzamientos",
       "title": "Calendario de Lanzamientos",
-      "helpBody": "Abre el calendario de lanzamientos de Gunter's Space Page para el año actual. Esto proporciona una lista completa de lanzamientos orbitales incluyendo fechas, vehículos, cargas útiles y sitios de lanzamiento.",
       "commands": {
         "open": "Abrir Calendario de Lanzamientos"
+      },
+      "help": {
+        "overview": "El Calendario de Lanzamientos abre la lista de lanzamientos de Gunter's Space Page para el año actual en una superposición: una lista completa y actualizada periódicamente de lanzamientos orbitales con fechas, vehículos, cargas útiles y sitios de lanzamiento. Úselo para ver qué se lanzará próximamente y luego recree los próximos lanzamientos con la herramienta Nuevo Lanzamiento.",
+        "howToUse": "<ol><li>Haga clic en el icono <strong>Calendario de Lanzamientos</strong> en el menú inferior (modo Eventos). El calendario se abre en una superposición; los menús laterales se cierran automáticamente.</li><li>Explore la lista y luego cierre la superposición para volver a la vista 3D.</li></ol>",
+        "tip1": "El calendario es una página externa de Gunter's Space Page, por lo que requiere conexión a internet.",
+        "tip2": "También está disponible desde la paleta de comandos como Abrir Calendario de Lanzamientos."
       }
     }
   }

@@ -32,7 +32,7 @@ describe('LaunchCalendar', () => {
       const config = plugin.getHelpConfig();
 
       expect(config.title).toBeDefined();
-      expect(config.body).toBeDefined();
+      expect(config.sections!.length).toBeGreaterThan(0);
     });
   });
 

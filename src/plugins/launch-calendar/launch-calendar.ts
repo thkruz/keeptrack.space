@@ -46,8 +46,21 @@ export class LaunchCalendar extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.LaunchCalendar.title' as Parameters<typeof t7e>[0]),
-      body: t7e('plugins.LaunchCalendar.helpBody' as Parameters<typeof t7e>[0]),
+      title: t7e('plugins.LaunchCalendar.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.LaunchCalendar.help.overview'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.LaunchCalendar.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.LaunchCalendar.help.tip1'),
+        t7e('plugins.LaunchCalendar.help.tip2'),
+      ],
     };
   }
 

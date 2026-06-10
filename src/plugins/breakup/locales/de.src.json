@@ -3,7 +3,32 @@
     "Breakup": {
       "bottomIconLabel": "Zerfall erstellen",
       "title": "Zerfall-Menü",
-      "helpBody": "Das Zerfall-Menü ist ein Werkzeug zur Simulation des Zerfalls eines Satelliten. <br><br> Durch Duplizieren und Modifizieren der Umlaufbahn eines Satelliten können wir den Zerfall eines Satelliten modellieren. Nach Auswahl eines Satelliten und Öffnen des Menüs kann der Benutzer Folgendes auswählen: <ul style=\"margin-left: 40px;\"> <li>Inklinationsvariation</li> <li>RAAN-Variation</li> <li>Periodenvariation</li> <li>Anzahl der Zerfallsteile</li> </ul> Je größer die Variation, desto größer ist die Streuung im simulierten Zerfall. Die Standardvariationen reichen aus, um einen Zerfall mit angemessener Streuung zu simulieren.",
+      "sideMenuTitle": "Zerfallssimulator",
+      "labels": {
+        "satelliteScc": "Satelliten-SCC#",
+        "initialSatelliteNumber": "Anfangs-Satellitennummer",
+        "inclinationVariation": "Inklinationsvariation",
+        "periodVariation": "Periodenvariation",
+        "rightAscensionVariation": "Rektaszensionsvariation",
+        "pieces": "Teile",
+        "degrees": "Grad",
+        "minute": "Minute",
+        "minutes": "Minuten"
+      },
+      "buttons": {
+        "createBreakup": "Zerfall erstellen"
+      },
+      "help": {
+        "overview": "Das Zerfall-Menü simuliert das Auseinanderbrechen eines Satelliten an seiner aktuellen Position. Es klont den ausgewählten Satelliten in Trümmerteile, jedes mit einer kleinen zufälligen Variation seiner Umlaufbahn, sodass Sie beobachten können, wie sich die Trümmerwolke bildet und mit der Zeit ausbreitet.",
+        "imgAlt": "Das Zerfall-Menü mit Reglern für Variationen und Teileanzahl",
+        "imgCaption": "Zerfallsparameter. Größere Variationen verteilen die simulierte Trümmerwolke weiter.",
+        "parametersHeading": "Parameter",
+        "parameters": "<ul><li><strong>Inklinationsvariation</strong>: Streuung der Bahnneigung in Grad.</li><li><strong>Rektaszensionsvariation</strong>: Streuung der Ausrichtung der Bahnebene in Grad.</li><li><strong>Periodenvariation</strong>: Streuung der Umlaufperiode in Minuten, wodurch sich die Wolke entlang der Umlaufbahn streckt.</li><li><strong>Teile</strong>: wie viele Trümmerfragmente erstellt werden (5 bis 1000).</li><li><strong>Anfangs-Satellitennummer</strong>: die erste Analysten-Katalognummer, die den Teilen zugewiesen wird (standardmäßig 90000).</li></ul>Die Standardwerte erzeugen eine realistisch aussehende Streuung; erhöhen Sie sie für ein energiereicheres Ereignis.",
+        "howToUse": "<ol><li>Wählen Sie einen Satelliten auf einer nahezu kreisförmigen Umlaufbahn aus; das Symbol bleibt deaktiviert, bis ein Satellit ausgewählt ist.</li><li>Öffnen Sie das Zerfall-Menü und passen Sie die Variationen und die Teileanzahl an.</li><li>Klicken Sie auf <strong>Zerfall erstellen</strong>. Die Teile werden an der aktuellen Position des Satelliten erzeugt und die Suchleiste füllt sich mit den neuen Trümmern, sodass Sie die gesamte Wolke sehen können.</li><li>Beschleunigen Sie die Zeit, um zu beobachten, wie sich die Wolke entlang der Umlaufbahn verteilt.</li></ol>",
+        "tip1": "Es werden nur nahezu kreisförmige Umlaufbahnen unterstützt (Apogäum minus Perigäum höchstens 1000 km); das Menü lehnt stark elliptische Umlaufbahnen ab.",
+        "tip2": "Der Zerfall ist nur simuliert und existiert nur im Speicher. Laden Sie die Seite neu, um den ursprünglichen Katalog wiederherzustellen. Beachten Sie, dass die Umlaufbahn des Muttersatelliten so angepasst wird, dass sie über den Zerfallspunkt verläuft.",
+        "tip3": "Alle Teile werden als Objekte vom Typ Trümmer erstellt, sodass trümmerbasierte Farbschemata und Filter sofort auf sie angewendet werden."
+      },
       "errorMsgs": {
         "SatelliteNotFound": "Satellit nicht gefunden!",
         "CannotCreateBreakupForNonCircularOrbits": "Für nicht-kreisförmige Umlaufbahnen kann kein Zerfall erstellt werden. Wir arbeiten an einer Lösung.",

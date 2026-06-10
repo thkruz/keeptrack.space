@@ -3,7 +3,32 @@
     "Breakup": {
       "bottomIconLabel": "Créer une fragmentation",
       "title": "Menu Fragmentation",
-      "helpBody": "Le menu Fragmentation est un outil pour simuler la fragmentation d'un satellite. <br><br> En dupliquant et modifiant l'orbite d'un satellite, on peut modéliser sa fragmentation. Après avoir sélectionné un satellite et ouvert le menu, l'utilisateur peut choisir : <ul style=\"margin-left: 40px;\"> <li>Variation d'inclinaison</li> <li>Variation du RAAN</li> <li>Variation de période</li> <li>Nombre de fragments</li> </ul> Plus la variation est grande, plus la dispersion de la fragmentation simulée est importante. Les variations par défaut suffisent à simuler une fragmentation raisonnable.",
+      "sideMenuTitle": "Simulateur de fragmentation",
+      "labels": {
+        "satelliteScc": "SCC# du satellite",
+        "initialSatelliteNumber": "Numéro de satellite initial",
+        "inclinationVariation": "Variation d'inclinaison",
+        "periodVariation": "Variation de période",
+        "rightAscensionVariation": "Variation d'ascension droite",
+        "pieces": "Fragments",
+        "degrees": "Degrés",
+        "minute": "Minute",
+        "minutes": "Minutes"
+      },
+      "buttons": {
+        "createBreakup": "Créer une fragmentation"
+      },
+      "help": {
+        "overview": "Le menu Fragmentation simule la fragmentation d'un satellite à sa position actuelle. Il clone le satellite sélectionné en fragments de débris, chacun avec une petite variation aléatoire de son orbite, afin que vous puissiez observer le nuage de débris se former et s'étendre au fil du temps.",
+        "imgAlt": "Le menu Fragmentation avec les commandes de variation et de nombre de fragments",
+        "imgCaption": "Paramètres de fragmentation. Des variations plus grandes étalent davantage le nuage de débris simulé.",
+        "parametersHeading": "Paramètres",
+        "parameters": "<ul><li><strong>Variation d'inclinaison</strong> : degrés de dispersion de l'inclinaison orbitale.</li><li><strong>Variation d'ascension droite</strong> : degrés de dispersion de l'orientation du plan orbital.</li><li><strong>Variation de période</strong> : minutes de dispersion de la période orbitale, ce qui étire le nuage le long de l'orbite.</li><li><strong>Fragments</strong> : nombre de fragments de débris à créer (5 à 1000).</li><li><strong>Numéro de satellite initial</strong> : le premier numéro de catalogue analyste à attribuer aux fragments (90000 par défaut).</li></ul>Les valeurs par défaut produisent une dispersion d'aspect réaliste ; augmentez-les pour un événement plus énergétique.",
+        "howToUse": "<ol><li>Sélectionnez un satellite sur une orbite quasi circulaire. L'icône reste désactivée tant qu'aucun satellite n'est sélectionné.</li><li>Ouvrez le menu Fragmentation et ajustez les variations et le nombre de fragments.</li><li>Cliquez sur <strong>Créer une fragmentation</strong>. Les fragments sont générés à la position actuelle du satellite et la barre de recherche se remplit avec les nouveaux débris pour que vous puissiez voir tout le nuage.</li><li>Accélérez le temps pour observer le nuage se disperser le long de l'orbite.</li></ol>",
+        "tip1": "Seules les orbites quasi circulaires sont prises en charge (apogée moins périgée d'au plus 1000 km), donc le menu refuse les orbites très elliptiques.",
+        "tip2": "La fragmentation est simulée et n'existe qu'en mémoire. Rechargez la page pour restaurer le catalogue d'origine. Notez que l'orbite du satellite parent est ajustée pour passer au-dessus du point de fragmentation.",
+        "tip3": "Tous les fragments sont créés comme des objets de type débris, donc les schémas de couleurs et les filtres basés sur les débris s'y appliquent immédiatement."
+      },
       "errorMsgs": {
         "SatelliteNotFound": "Satellite introuvable !",
         "CannotCreateBreakupForNonCircularOrbits": "Impossible de créer une fragmentation pour des orbites non circulaires. Correction en cours.",

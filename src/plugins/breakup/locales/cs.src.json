@@ -3,7 +3,32 @@
     "Breakup": {
       "bottomIconLabel": "Vytvořit rozpad",
       "title": "Menu rozpadu",
-      "helpBody": "Menu rozpadu je nástroj pro simulaci rozpadu satelitu. <br><br> Duplikováním a úpravou dráhy satelitu můžeme modelovat rozpad satelitu. Po výběru satelitu a otevření menu může uživatel nastavit: <ul style=\"margin-left: 40px;\"> <li>Variaci inklinace</li> <li>Variaci RAAN</li> <li>Variaci periody</li> <li>Počet úlomků rozpadu</li> </ul> Čím větší variace, tím větší rozptyl v simulovaném rozpadu. Výchozí variace jsou dostatečné pro simulaci rozpadu s přiměřeným rozptylem.",
+      "sideMenuTitle": "Simulátor rozpadu",
+      "labels": {
+        "satelliteScc": "SCC# satelitu",
+        "initialSatelliteNumber": "Počáteční číslo satelitu",
+        "inclinationVariation": "Variace inklinace",
+        "periodVariation": "Variace periody",
+        "rightAscensionVariation": "Variace rektascenze",
+        "pieces": "Počet úlomků",
+        "degrees": "Stupně",
+        "minute": "Minuta",
+        "minutes": "Minuty"
+      },
+      "buttons": {
+        "createBreakup": "Vytvořit rozpad"
+      },
+      "help": {
+        "overview": "Menu rozpadu simuluje rozpad satelitu v jeho aktuální poloze. Naklonuje vybraný satelit na úlomky, z nichž každý má malou náhodnou variaci dráhy, takže můžete sledovat, jak se oblak úlomků v čase tvoří a rozptyluje.",
+        "imgAlt": "Menu rozpadu s ovládacími prvky variací a počtu úlomků",
+        "imgCaption": "Parametry rozpadu. Větší variace rozptýlí simulovaný oblak úlomků šířeji.",
+        "parametersHeading": "Parametry",
+        "parameters": "<ul><li><strong>Variace inklinace</strong>: rozptyl sklonu dráhy ve stupních.</li><li><strong>Variace rektascenze</strong>: rozptyl orientace roviny dráhy ve stupních.</li><li><strong>Variace periody</strong>: rozptyl oběžné periody v minutách, který protahuje oblak podél dráhy.</li><li><strong>Počet úlomků</strong>: kolik úlomků vytvořit (5 až 1000).</li><li><strong>Počáteční číslo satelitu</strong>: první analytické katalogové číslo přiřazené úlomkům (výchozí hodnota 90000).</li></ul>Výchozí hodnoty vytvoří realisticky vypadající rozptyl; pro energičtější událost je zvyšte.",
+        "howToUse": "<ol><li>Vyberte satelit na téměř kruhové dráze; ikona zůstává neaktivní, dokud není vybrán satelit.</li><li>Otevřete menu rozpadu a upravte variace a počet úlomků.</li><li>Klikněte na <strong>Vytvořit rozpad</strong>. Úlomky se vygenerují v aktuální poloze satelitu a vyhledávací pole se naplní novými úlomky, takže uvidíte celý oblak.</li><li>Zrychlete čas a sledujte, jak se oblak rozptyluje podél dráhy.</li></ol>",
+        "tip1": "Podporovány jsou pouze téměř kruhové dráhy (apogeum mínus perigeum nejvýše 1000 km), takže menu odmítá výrazně eliptické dráhy.",
+        "tip2": "Rozpad je pouze simulovaný a existuje jen v paměti; obnovením stránky se obnoví původní katalog. Pozor, dráha mateřského satelitu se upraví tak, aby procházela místem rozpadu.",
+        "tip3": "Všechny úlomky se vytvoří jako objekty typu úlomek, takže barevná schémata a filtry založené na úlomcích se na ně vztahují okamžitě."
+      },
       "errorMsgs": {
         "SatelliteNotFound": "Satelit nebyl nalezen!",
         "CannotCreateBreakupForNonCircularOrbits": "Nelze vytvořit rozpad pro nekruhové dráhy. Pracujeme na opravě.",

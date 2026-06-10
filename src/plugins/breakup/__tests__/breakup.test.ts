@@ -28,7 +28,7 @@ describe('Breakup_class', () => {
       standardSelectSat();
       // Mock OrbitFinder class
       vi.spyOn(OrbitFinderFile, 'OrbitFinder').mockImplementation(
-        function () {
+        function mockOrbitFinder() {
           return {
             rotateOrbitToLatLon: () => [defaultSat.tle1, defaultSat.tle2],
           };
@@ -318,8 +318,9 @@ describe('Breakup_class', () => {
       const helpConfig = breakupPlugin.getHelpConfig();
 
       expect(helpConfig.title).toBe('Breakup Menu');
-      expect(helpConfig.body).toContain('Breakup Menu');
-      expect(helpConfig.body).toContain('Inclination Variation');
+      expect(helpConfig.sections!.length).toBeGreaterThanOrEqual(3);
+      expect(helpConfig.sections![0].image?.src).toContain('img/help/breakup/');
+      expect(helpConfig.tips!.length).toBeGreaterThan(0);
     });
   });
 });

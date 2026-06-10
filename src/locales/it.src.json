@@ -1,0 +1,121 @@
+{
+  "Common": {
+    "unknown": "Sconosciuto"
+  },
+  "help": {
+    "overview": "Panoramica",
+    "howToUse": "Come usare",
+    "tips": "Suggerimenti",
+    "keyboardShortcuts": "Scorciatoie da tastiera",
+    "troubleshooting": "Risoluzione dei problemi"
+  },
+  "loadingScreen": {
+    "startButton": "Clicca per iniziare",
+    "hint": "Suggerimento:",
+    "downloadingScience": "Download dei dati scientifici..."
+  },
+  "errorMsgs": {
+    "LoginRequired": "Questa funzione richiede l'accesso. Effettua il login per continuare.",
+    "catalogNotFullyInitialized": "Il catalogo non è ancora completamente inizializzato. Attendere qualche secondo e riprovare.",
+    "sensorGroupsApiEmpty": "Nessun gruppo di sensori trovato nell'API, ritorno al database dei gruppi di sensori incluso.",
+    "SelectSensorFirst": "Seleziona prima un sensore!",
+    "SelectSatelliteFirst": "Seleziona prima un satellite!",
+    "SelectSecondarySatellite": "Seleziona prima un satellite secondario!",
+    "SatelliteNotDetailedSatellite": "Il satellite non è un DetailedSatellite!",
+    "SensorNotFound": "Sensore non trovato!",
+    "Scene": {
+      "disablingGodrays": "Il tuo computer è in difficoltà! Disattivazione raggi divini.",
+      "disablingAurora": "Il tuo computer è in difficoltà! Disattivazione aurora.",
+      "disablingAtmosphere": "Il tuo computer è in difficoltà! Disattivazione atmosfera.",
+      "disablingMoon": "Il tuo computer è in difficoltà! Disattivazione Luna.",
+      "disablingMilkyWay": "Il tuo computer è in difficoltà! Disattivazione Via Lattea.",
+      "disablingSun": "Il tuo computer è in difficoltà! Disattivazione Sole."
+    },
+    "Reports": {
+      "popupBlocker": "Consenti i popup per questo sito per visualizzare i rapporti."
+    },
+    "SensorManager": {
+      "errorUpdatingUi": "Errore nell'aggiornamento dello stile dell'interfaccia del sensore."
+    }
+  },
+  "hoverManager": {
+    "launched": "Lanciato",
+    "launchedPlanned": "Lancio: Pianificato",
+    "launchedUnknown": "Lancio: Sconosciuto"
+  },
+  "darkClouds": {
+    "in": "In",
+    "satellites": "Satelliti",
+    "and": "e",
+    "debris": "Detriti",
+    "buildingBuffers": "Costruzione buffer...",
+    "presentDay": "Giorno presente"
+  },
+  "plugins": {
+    "proOnlyMsg": "Questo plugin è un plugin pro. Il tuo file .env è configurato in modo errato o mancano dei file! Puoi saperne di più su https://keeptrack.space/pro.",
+    "WatchlistOverlay": {
+      "bottomIconLabel": "Overlay",
+      "title": "Menu overlay",
+      "helpBody": "<p> L'overlay dell'elenco satelliti mostra il tempo del prossimo passaggio per ogni satellite nel tuo elenco. L'overlay viene aggiornato ogni 10 secondi. </p> <p> L'overlay è codificato a colori per mostrare il tempo al prossimo passaggio. I colori sono i seguenti: </p> <ul> <li>Giallo - In vista</li> <li>Blu - Il tempo al prossimo passaggio è fino a 30 minuti dopo l'ora corrente o 10 minuti prima dell'ora corrente</li> <li>Bianco - Qualsiasi passaggio futuro che non soddisfa i requisiti sopra</li> </ul> <p> Facendo clic su un satellite nell'overlay si centrerà la mappa su quel satellite. </p>"
+    },
+    "SensorFov": {
+      "bottomIconLabel": "FOV sensore"
+    },
+    "SensorSurvFence": {
+      "bottomIconLabel": "Recinzione sensore"
+    },
+    "SatelliteViewPlugin": {
+      "bottomIconLabel": "Vista satellite"
+    },
+    "Planetarium": {
+      "bottomIconLabel": "Vista planetario"
+    },
+    "NightToggle": {
+      "bottomIconLabel": "Interruttore notte"
+    },
+    "Screenshot": {
+      "bottomIconLabel": "Cattura schermo"
+    },
+    "TimeMachine": {
+      "bottomIconLabel": "Macchina del tempo"
+    },
+    "ScreenRecorder": {
+      "bottomIconLabel": "Registra video"
+    },
+    "Astronomy": {
+      "bottomIconLabel": "Astronomia"
+    },
+    "ManeuverPlugin": {
+      "bottomIconLabel": "Manovra",
+      "title": "Menu manovre",
+      "helpBody": "Il menu manovre viene utilizzato per creare una manovra per un satellite. <br><br> Il menu consente di selezionare il tipo di manovra, il tempo della manovra e la grandezza della manovra. La manovra può essere applicata a un satellite selezionandolo dall'elenco dei satelliti."
+    },
+    "GraphicsMenuPlugin": {
+      "bottomIconLabel": "Menu grafica",
+      "title": "Menu grafica",
+      "helpBody": "Il menu grafica viene utilizzato per modificare le impostazioni grafiche dell'applicazione."
+    }
+  },
+  "pluginDrawer": {
+    "modeCatalog": "Catalogo",
+    "modeSensors": "Sensori",
+    "modeEvents": "Eventi",
+    "modeCreate": "Crea",
+    "modeAnalysis": "Analisi",
+    "modeDisplay": "Visualizzazione",
+    "modeTools": "Strumenti",
+    "modeSettings": "Impostazioni",
+    "modeExperimental": "Sperimentale",
+    "modeRecent": "Recenti",
+    "groupCameraModes": "Modalità fotocamera",
+    "groupLayerToggles": "Interruttori livelli",
+    "groupSettingsToggles": "Interruttori impostazioni",
+    "groupAbout": "Informazioni"
+  },
+  "rightClickMenu": {
+    "pauseClock": "Metti in pausa l'orologio",
+    "resetCamera": "Reimposta la fotocamera",
+    "clearLines": "Cancella le linee",
+    "clearScreen": "Cancella lo schermo"
+  }
+}

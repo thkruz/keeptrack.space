@@ -1,0 +1,121 @@
+{
+  "Common": {
+    "unknown": "Nieznany"
+  },
+  "help": {
+    "overview": "Przegląd",
+    "howToUse": "Jak używać",
+    "tips": "Wskazówki",
+    "keyboardShortcuts": "Skróty klawiszowe",
+    "troubleshooting": "Rozwiązywanie problemów"
+  },
+  "loadingScreen": {
+    "startButton": "Kliknij, aby rozpocząć",
+    "hint": "Wskazówka:",
+    "downloadingScience": "Pobieranie danych naukowych..."
+  },
+  "errorMsgs": {
+    "LoginRequired": "Ta funkcja wymaga logowania. Zaloguj się, aby kontynuować.",
+    "catalogNotFullyInitialized": "Katalog nie został jeszcze w pełni zainicjalizowany. Poczekaj kilka sekund i spróbuj ponownie.",
+    "sensorGroupsApiEmpty": "Nie znaleziono grup sensorów w API, przywracanie do dołączonej bazy danych grup sensorów.",
+    "SelectSensorFirst": "Najpierw wybierz sensor!",
+    "SelectSatelliteFirst": "Najpierw wybierz satelitę!",
+    "SelectSecondarySatellite": "Najpierw wybierz drugiego satelitę!",
+    "SatelliteNotDetailedSatellite": "Satelita nie jest szczegółowym satelitą (DetailedSatellite)!",
+    "SensorNotFound": "Nie znaleziono sensora!",
+    "Scene": {
+      "disablingGodrays": "Twój komputer ma trudności! Wyłączanie promieni boskich.",
+      "disablingAurora": "Twój komputer ma trudności! Wyłączanie zorzy polarnej.",
+      "disablingAtmosphere": "Twój komputer ma trudności! Wyłączanie atmosfery.",
+      "disablingMoon": "Twój komputer ma trudności! Wyłączanie Księżyca.",
+      "disablingMilkyWay": "Twój komputer ma trudności! Wyłączanie Drogi Mlecznej.",
+      "disablingSun": "Twój komputer ma trudności! Wyłączanie Słońca."
+    },
+    "Reports": {
+      "popupBlocker": "Proszę zezwolić na wyskakujące okna dla tej strony, aby wyświetlać raporty."
+    },
+    "SensorManager": {
+      "errorUpdatingUi": "Błąd podczas aktualizacji stylizacji interfejsu sensora."
+    }
+  },
+  "hoverManager": {
+    "launched": "Wystrzelony",
+    "launchedPlanned": "Wystrzelenie: Planowane",
+    "launchedUnknown": "Wystrzelenie: Nieznane"
+  },
+  "darkClouds": {
+    "in": "W",
+    "satellites": "Satelity",
+    "and": "i",
+    "debris": "Śmieci kosmiczne",
+    "buildingBuffers": "Budowanie buforów...",
+    "presentDay": "Dzień dzisiejszy"
+  },
+  "plugins": {
+    "proOnlyMsg": "Ta wtyczka jest wtyczką pro. Twój plik .env jest nieprawidłowo skonfigurowany lub brakuje plików! Więcej informacji na https://keeptrack.space/pro.",
+    "WatchlistOverlay": {
+      "bottomIconLabel": "Nakładka",
+      "title": "Menu nakładki",
+      "helpBody": "<p> Nakładka listy satelitów pokazuje czas następnego przelotu dla każdego satelity na liście. Nakładka jest aktualizowana co 10 sekund. </p> <p> Nakładka jest kodowana kolorami, aby pokazać czas do następnego przelotu. Kolory są następujące: </p> <ul> <li>Żółty - W zasięgu</li> <li>Niebieski - Czas do następnego przelotu wynosi do 30 minut po bieżącym czasie lub 10 minut przed bieżącym czasem</li> <li>Biały - Każdy przyszły przelot niespełniający powyższych wymagań</li> </ul> <p> Kliknięcie satelity na nakładce wycentruje mapę na tym satelicie. </p>"
+    },
+    "SensorFov": {
+      "bottomIconLabel": "FOV sensora"
+    },
+    "SensorSurvFence": {
+      "bottomIconLabel": "Ogrodzenie sensora"
+    },
+    "SatelliteViewPlugin": {
+      "bottomIconLabel": "Widok satelity"
+    },
+    "Planetarium": {
+      "bottomIconLabel": "Widok planetarium"
+    },
+    "NightToggle": {
+      "bottomIconLabel": "Przełącznik nocy"
+    },
+    "Screenshot": {
+      "bottomIconLabel": "Zrób zdjęcie"
+    },
+    "TimeMachine": {
+      "bottomIconLabel": "Wehikuł czasu"
+    },
+    "ScreenRecorder": {
+      "bottomIconLabel": "Nagraj wideo"
+    },
+    "Astronomy": {
+      "bottomIconLabel": "Astronomia"
+    },
+    "ManeuverPlugin": {
+      "bottomIconLabel": "Manewr",
+      "title": "Menu manewrów",
+      "helpBody": "Menu manewrów służy do tworzenia manewru dla satelity. <br><br> Menu pozwala wybrać typ manewru, czas manewru i wielkość manewru. Manewr może być zastosowany do satelity przez wybranie go z listy satelitów."
+    },
+    "GraphicsMenuPlugin": {
+      "bottomIconLabel": "Menu grafiki",
+      "title": "Menu grafiki",
+      "helpBody": "Menu grafiki służy do zmiany ustawień graficznych aplikacji."
+    }
+  },
+  "pluginDrawer": {
+    "modeCatalog": "Katalog",
+    "modeSensors": "Czujniki",
+    "modeEvents": "Zdarzenia",
+    "modeCreate": "Utwórz",
+    "modeAnalysis": "Analiza",
+    "modeDisplay": "Wyświetlanie",
+    "modeTools": "Narzędzia",
+    "modeSettings": "Ustawienia",
+    "modeExperimental": "Eksperymentalne",
+    "modeRecent": "Ostatnio używane",
+    "groupCameraModes": "Tryby kamery",
+    "groupLayerToggles": "Przełączniki warstw",
+    "groupSettingsToggles": "Przełączniki ustawień",
+    "groupAbout": "O programie"
+  },
+  "rightClickMenu": {
+    "pauseClock": "Wstrzymaj zegar",
+    "resetCamera": "Zresetuj kamerę",
+    "clearLines": "Wyczyść linie",
+    "clearScreen": "Wyczyść ekran"
+  }
+}

@@ -2,6 +2,13 @@
   "Common": {
     "unknown": "未知"
   },
+  "help": {
+    "overview": "概述",
+    "howToUse": "使用方法",
+    "tips": "提示",
+    "keyboardShortcuts": "键盘快捷键",
+    "troubleshooting": "故障排除"
+  },
   "loadingScreen": {
     "startButton": "点击开始",
     "hint": "提示：",
@@ -77,100 +84,10 @@
   },
   "plugins": {
     "proOnlyMsg": "此插件为专业版插件。您的 .env 文件配置不正确或缺少相关文件！详情请访问 https://keeptrack.space/pro。",
-    "SensorListPlugin": {
-      "bottomIconLabel": "传感器",
-      "title": "传感器列表菜单",
-      "helpBody": "传感器菜单允许您选择用于计算和其他菜单功能的传感器。传感器根据其主要支持的网络分组。菜单左侧显示传感器名称，右侧显示所属国家/组织。<br><br>选择“全部...传感器”选项将选择该组中的所有传感器。这对于可视化网络覆盖范围很有用，但目前并非所有计算都支持。如果您想为网络计算观测角度，建议使用多站点观测角工具，或分别为网络中的每个传感器计算观测角。<br><br>此列表中的传感器包括机械和相控阵雷达，以及光学传感器：<ul style=\"margin-left: 40px;\"> <li>相控阵雷达通常仅限于近地轨道（LEO）。</li> <li>机械雷达可用于LEO和地球同步轨道（GEO）。</li> <li>光学传感器通常用于GEO，但也可用于LEO。</li> <li>光学传感器仅限于晴朗夜晚观测，而雷达可用于昼夜。</li> </ul><br>传感器信息基于公开数据，可在传感器信息菜单中验证。如果您有更多公开传感器数据或修正建议，请联系<a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>。"
-    },
-    "SensorInfoPlugin": {
-      "bottomIconLabel": "传感器信息",
-      "title": "传感器信息菜单",
-      "helpBody": "传感器信息提供当前选中传感器的相关信息。信息基于公开数据，可能并非100%准确。如果您有更多公开传感器数据或修正建议，请联系<a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>。<br><br>提供的信息包括：<ul style=\"margin-left: 40px;\"> <li>传感器名称</li> <li>传感器所属</li> <li>传感器类型</li> <li>传感器视场</li> </ul><br>此外，可从此菜单快速创建传感器到太阳或月亮的连线。"
-    },
-    "CustomSensorPlugin": {
-      "bottomIconLabel": "自定义传感器",
-      "title": "自定义传感器菜单",
-      "helpBody": "此功能允许您创建用于计算和其他菜单功能的自定义传感器。可以是全新传感器，也可以基于现有传感器修改。<br><br>设置传感器的纬度、经度和高度后，可设置视场。选择望远镜选项将创建360度视场，仰角遮罩为10度，范围无限。取消选择望远镜选项可手动设置视场。<br><br>如需编辑现有传感器，可先在传感器列表中选择，之后自定义传感器将更新为所选传感器信息。"
-    },
-    "LookAnglesPlugin": {
-      "bottomIconLabel": "观测角",
-      "title": "观测角菜单",
-      "helpBody": "观测角菜单允许您计算传感器与卫星之间的距离、方位角和仰角。使用前需先选择卫星和传感器。<br><br>仅计算升起和落下时间的切换功能可快速判断卫星何时可被传感器观测。搜索范围可通过更改时长和间隔选项调整。"
-    },
-    "MultiSiteLookAnglesPlugin": {
-      "bottomIconLabel": "多站观测",
-      "title": "多站观测角菜单",
-      "helpBody": "多站观测角菜单允许您计算一颗卫星与多个传感器之间的距离、方位角和仰角。使用前需先选择卫星。<br><br>默认情况下，菜单会计算空间监视网络中所有传感器的观测角。如需计算其他传感器的观测角，可在菜单底部导出csv文件，文件将包含所有传感器的观测角。<br><br>点击表格中的一行将选中该传感器并将仿真时间切换到该观测角时间点。"
-    },
-    "SensorTimeline": {
-      "bottomIconLabel": "传感器时间线",
-      "title": "传感器时间线菜单",
-      "helpBody": "传感器时间线菜单显示多个传感器对一颗卫星的可见性。时间线按颜色区分观测质量：红色为差，黄色为一般，绿色为好。点击某次观测可切换到对应传感器和时间。<br><br>可通过更改仿真的起止时间，以及长度和间隔选项来调整时间线。"
-    },
-    "SatelliteTimeline": {
-      "bottomIconLabel": "卫星时间线",
-      "title": "卫星时间线菜单",
-      "helpBody": "卫星时间线菜单显示单个传感器对一组卫星的可见性。时间线按颜色区分通过质量：红色为差，黄色为一般，绿色为好。点击某次通过可切换到对应卫星和时间。<br><br>可通过更改仿真的起止时间，以及长度和间隔选项来调整时间线。"
-    },
-    "WatchlistPlugin": {
-      "bottomIconLabel": "卫星列表",
-      "title": "卫星列表",
-      "helpBody": "卫星列表菜单允许您创建优先跟踪的卫星列表，便于快速检索感兴趣的卫星。该列表保存在浏览器本地存储，下次访问网站时仍可用。<br><br>当卫星列表中的卫星进入所选传感器视场时，会显示通知，从传感器到卫星会绘制一条连线，并在地球上显示卫星编号。<br><br>叠加功能依赖于卫星列表已被填充。"
-    },
     "WatchlistOverlay": {
       "bottomIconLabel": "叠加",
       "title": "叠加菜单",
       "helpBody": "<p>卫星列表叠加显示卫星列表中卫星的下次通过时间，每10秒更新一次。</p><p>叠加颜色表示距离下次通过的时间：</p><ul><li>黄色 - 可见中</li><li>蓝色 - 距当前时间30分钟内或提前10分钟的通过</li><li>白色 - 其他未来通过</li></ul><p>点击叠加中的卫星会将地图中心定位到该卫星。</p>"
-    },
-    "ReportsPlugin": {
-      "bottomIconLabel": "报告",
-      "title": "报告菜单",
-      "helpBody": "报告菜单包含多种工具，帮助您分析和理解当前查看的数据。"
-    },
-    "PolarPlotPlugin": {
-      "bottomIconLabel": "极坐标图",
-      "title": "极坐标图菜单",
-      "helpBody": "极坐标图菜单用于生成卫星方位角和仰角随时间变化的二维极坐标图。"
-    },
-    "NextLaunchesPlugin": {
-      "bottomIconLabel": "下次发射",
-      "title": "下次发射菜单",
-      "helpBody": "下次发射菜单从<a href=\"https://thespacedevs.com/\" target=\"_blank\">The Space Devs</a>获取即将进行的发射信息。"
-    },
-    "FindSatPlugin": {
-      "bottomIconLabel": "查找卫星",
-      "title": "查找卫星菜单",
-      "helpBody": "查找卫星菜单用于按轨道参数或卫星特性查找卫星。<br><br>大多数参数输入左侧为目标值，右侧为误差范围。例如，查找51-52度倾角的卫星，可在左侧输入51.5，右侧输入0.5，搜索结果会显示所有在该范围内的卫星。"
-    },
-    "ShortTermFences": {
-      "bottomIconLabel": "短期搜索框",
-      "title": "短期搜索框（STF）菜单",
-      "helpBody": "短期搜索框（STF）菜单用于可视化传感器搜索区域。<br><br>除非您拥有/操作带有搜索框功能的传感器，否则该功能可能用处不大。"
-    },
-    "Reentries": {
-      "bottomIconLabel": "再入预测",
-      "title": "跟踪与再入预测菜单",
-      "helpBody": "跟踪与再入预测（TIP）菜单显示卫星的最新跟踪与再入预测信息。表格包含以下列：<br><br><b>NORAD</b>：卫星的NORAD目录编号。<br><br><b>衰减日期</b>：预测的卫星衰减日期。<br><br><b>纬度</b>：卫星衰减时的纬度。<br><br><b>经度</b>：卫星衰减时的经度。<br><br><b>窗口（分钟）</b>：预测时间窗口（分钟）。<br><br><b>下次报告（小时）</b>：距离下次报告的时间（小时）。<br><br><b>再入角（度）</b>：卫星再入角度（度）。<br><br><b>雷达截面积（平方米）</b>：卫星的雷达截面积。<br><br><b>GP数据龄（小时）</b>：最新轨道参数集的时效（小时）。<br><br><b>干质量（千克）</b>：卫星干质量。<br><br><b>体积（立方米）</b>：卫星估算体积。"
-    },
-    "DebrisScreening": {
-      "bottomIconLabel": "碎片筛查",
-      "title": "碎片筛查菜单",
-      "helpBody": "碎片筛查菜单用于生成可能被卫星观测到的碎片对象列表。通过计算碎片的轨道参数并与卫星轨道参数比较生成列表。用户可选择使用TLE或SGP4预报器生成列表，也可按碎片大小和星等进行筛选。"
-    },
-    "TransponderChannelData": {
-      "bottomIconLabel": "转发器与频道信息",
-      "title": "卫星转发器与频道信息",
-      "helpBody": "<p>本表包含卫星频道的技术细节，包括电视、广播及其他通信服务：</p><ul><li><strong>卫星：</strong> 播出频道的卫星名称</li><li><strong>频道：</strong> 电视/广播频道或通信服务名称</li><li><strong>波束：</strong> 卫星波束方向（如西半球）</li><li><strong>频率：</strong> 转发器频率及极化（如3840 V）</li><li><strong>系统：</strong> 播出系统（如DVB-S2 8PSK）</li><li><strong>符号率/FEC：</strong> 符号率及FEC比（如30000 3/4）</li><li><strong>视频：</strong> 视频/数据压缩格式（如MPEG-4/HD）</li><li><strong>语言：</strong> 可用音频/通信语言（如英语、中文）</li><li><strong>加密：</strong> 使用的加密系统（如PowerVu）</li></ul><p>这些信息适用于卫星通信专业人士、技术人员、爱好者及任何需要设置或排查卫星接收设备的人。</p>"
-    },
-    "NewLaunch": {
-      "bottomIconLabel": "新发射",
-      "title": "新发射菜单",
-      "helpBody": "新发射菜单用于通过修改具有相似参数的现有卫星，生成假想轨道发射。<br><br>选择卫星后，可选择发射地点和南/北方位角。所选卫星将被调整以与发射场对齐，时间将重置为00:00:00，表示发射后的相对时间。这有助于计算发射时刻的传感器覆盖。与其他轨道物体的关系可能不准确。"
-    },
-    "MissilePlugin": {
-      "bottomIconLabel": "导弹",
-      "title": "导弹菜单",
-      "helpBody": "导弹菜单用于生成国家间的假想导弹发射。<br><br>使用潜射导弹时，发射点为自定义经纬度；使用陆基导弹时，发射点为公开报道的固定经纬度。<br><br>除自定义导弹外，还提供若干涉及数百枚导弹的预设场景。<br><br>所有导弹发射均为假想，不代表真实世界事件。发射轨迹均基于同一弹道模型，但最小和最大射程不同。"
     },
     "SensorFov": {
       "bottomIconLabel": "传感器视场"
@@ -181,21 +98,11 @@
     "SatelliteViewPlugin": {
       "bottomIconLabel": "卫星视图"
     },
-    "SatelliteFov": {
-      "bottomIconLabel": "卫星视场",
-      "title": "卫星视场",
-      "helpBody": "卫星视场插件允许您控制卫星的视场。"
-    },
     "Planetarium": {
       "bottomIconLabel": "天文馆视图"
     },
     "NightToggle": {
       "bottomIconLabel": "夜间切换"
-    },
-    "ColorMenu": {
-      "bottomIconLabel": "配色方案",
-      "title": "配色方案菜单",
-      "helpBody": "配色菜单用于更改渲染对象时使用的配色主题。<br><br>不同主题可根据对象轨道、特性或与太阳/地球的关系改变颜色。"
     },
     "Screenshot": {
       "bottomIconLabel": "拍照"
@@ -203,66 +110,16 @@
     "TimeMachine": {
       "bottomIconLabel": "时间机器"
     },
-    "SatellitePhotos": {
-      "bottomIconLabel": "卫星照片",
-      "title": "卫星照片菜单",
-      "helpBody": "卫星照片菜单用于显示部分卫星的实时照片。<br><br>注意：图像API的更改可能导致KeepTrack中选择了错误的卫星。"
-    },
     "ScreenRecorder": {
       "bottomIconLabel": "录制视频"
     },
     "Astronomy": {
       "bottomIconLabel": "天文"
     },
-    "Calculator": {
-      "bottomIconLabel": "参考系转换",
-      "title": "参考系转换菜单",
-      "helpBody": "参考系转换菜单用于在不同参考系之间转换。<br><br>菜单允许您在以下参考系之间转换：<ul style=\"margin-left: 40px;\"><li>ECI - 地心惯性系</li><li>ECEF - 地心地固系</li><li>大地坐标系</li><li>地方坐标系</li></ul>"
-    },
     "ManeuverPlugin": {
       "bottomIconLabel": "机动",
       "title": "机动菜单",
       "helpBody": "机动菜单用于为卫星创建机动。<br><br>菜单允许您选择机动类型、机动时间和机动幅度。可通过从卫星列表中选择卫星来应用机动。"
-    },
-    "SettingsMenuPlugin": {
-      "bottomIconLabel": "设置",
-      "title": "设置菜单",
-      "helpBody": "设置菜单允许您配置应用程序。"
-    },
-    "VideoDirectorPlugin": {
-      "bottomIconLabel": "视频导演",
-      "title": "视频导演菜单",
-      "helpBody": "视频导演菜单用于操作场景中的摄像机和对象以创建视频。"
-    },
-    "EciPlot": {
-      "bottomIconLabel": "ECI绘图",
-      "title": "ECI绘图菜单",
-      "helpBody": "ECI绘图菜单用于绘制卫星在地心惯性系（ECI）中的位置。"
-    },
-    "EcfPlot": {
-      "bottomIconLabel": "ECF绘图",
-      "title": "ECF绘图菜单",
-      "helpBody": "ECF绘图菜单用于绘制卫星在地心地固系（ECF）中的位置。"
-    },
-    "RicPlot": {
-      "bottomIconLabel": "RIC绘图",
-      "title": "RIC绘图菜单",
-      "helpBody": "RIC绘图菜单用于绘制卫星在径向、轨道内和轨道横向（RIC）参考系中的位置。"
-    },
-    "Time2LonPlots": {
-      "bottomIconLabel": "瀑布图",
-      "title": "瀑布菜单",
-      "helpBody": "经度随时间（瀑布）绘图菜单用于绘制卫星经度随时间的变化。"
-    },
-    "Lat2LonPlots": {
-      "bottomIconLabel": "纬度-经度图",
-      "title": "纬度-经度绘图菜单",
-      "helpBody": "纬度-经度绘图菜单用于绘制GEO带内的纬度与经度关系。"
-    },
-    "Inc2LonPlots": {
-      "bottomIconLabel": "倾角-经度图",
-      "title": "倾角-经度绘图菜单",
-      "helpBody": "倾角-经度绘图菜单用于绘制GEO带内的倾角与经度关系。"
     },
     "GraphicsMenuPlugin": {
       "bottomIconLabel": "图形菜单",

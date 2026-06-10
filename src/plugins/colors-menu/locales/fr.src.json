@@ -4,7 +4,15 @@
       "bottomIconLabel": "Couleurs",
       "title": "Schémas de Couleurs",
       "rmbLabel": "Schéma de Couleurs",
-      "helpBody": "Le Menu Couleurs vous permet de modifier l'affichage des satellites à l'écran. Différents schémas de couleurs mettent en évidence différentes caractéristiques des satellites, telles que le pays d'origine, le type d'orbite ou le type d'objet."
+      "help": {
+        "overview": "Le menu Schémas de Couleurs change la façon dont chaque objet de la scène est coloré. Chaque schéma encode une propriété différente : pays d'origine, type d'objet, régime orbital, éclairage solaire, vitesse et plus encore. Choisir le bon schéma transforme le nuage de points en réponse à une question précise.",
+        "imgAlt": "Le menu Schémas de Couleurs avec la liste des schémas disponibles",
+        "imgCaption": "Cliquez sur un schéma pour recolorer instantanément tout le catalogue.",
+        "howToUse": "<ol><li>Ouvrez le menu <strong>Couleurs</strong> depuis la barre inférieure ou appuyez sur <strong>A</strong>.</li><li>Cliquez sur un schéma dans la liste. La scène est recolorée immédiatement et le menu se ferme.</li><li>Consultez la légende dans le coin de l'écran pour savoir ce que signifie chaque couleur dans le schéma actif.</li><li>Vous pouvez aussi faire un clic droit dans l'espace vide et choisir <strong>Schéma de Couleurs</strong> dans le menu contextuel.</li></ol>",
+        "tip1": "La légende se met à jour avec le schéma ; en cas de doute sur la signification d'une couleur, la légende fait foi.",
+        "tip2": "Certains schémas sont gourmands en données (comme la densité spatiale) et demandent un instant de calcul à la première sélection.",
+        "shortcutToggle": "Basculer le menu Schémas de Couleurs"
+      }
     }
   }
 }

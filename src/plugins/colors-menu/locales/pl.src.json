@@ -4,7 +4,15 @@
       "bottomIconLabel": "Kolory",
       "title": "Schematy kolorów",
       "rmbLabel": "Schemat kolorów",
-      "helpBody": "Menu kolorów pozwala zmienić sposób kolorowania satelitów na wyświetlaczu. Różne schematy kolorów podkreślają różne cechy satelitów, takie jak kraj pochodzenia, typ orbity lub typ obiektu."
+      "help": {
+        "overview": "Menu Schematy kolorów zmienia sposób kolorowania każdego obiektu w scenie. Każdy schemat koduje inną właściwość: kraj pochodzenia, typ obiektu, reżim orbitalny, oświetlenie słoneczne, prędkość i inne, więc wybór właściwego schematu zamienia chmurę punktów w odpowiedź na konkretne pytanie.",
+        "imgAlt": "Menu Schematy kolorów z listą dostępnych schematów",
+        "imgCaption": "Kliknij dowolny schemat, aby natychmiast przekolorować cały katalog.",
+        "howToUse": "<ol><li>Otwórz menu <strong>Kolory</strong> z dolnego paska lub naciśnij <strong>A</strong>.</li><li>Kliknij schemat na liście. Scena natychmiast zmienia kolory, a menu się zamyka.</li><li>Sprawdź legendę w rogu ekranu, aby odczytać, co oznacza każdy kolor w aktywnym schemacie.</li><li>Możesz też kliknąć prawym przyciskiem w pustą przestrzeń i wybrać <strong>Schemat kolorów</strong> z menu kontekstowego.</li></ol>",
+        "tip1": "Legenda aktualizuje się wraz ze schematem; jeśli nie wiesz, co oznacza dany kolor, legenda jest rozstrzygająca.",
+        "tip2": "Niektóre schematy są wymagające obliczeniowo (np. gęstość przestrzenna) i przy pierwszym wyborze ich obliczenie chwilę trwa.",
+        "shortcutToggle": "Przełącz menu Schematy kolorów"
+      }
     }
   }
 }

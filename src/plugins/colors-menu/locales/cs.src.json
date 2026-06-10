@@ -4,7 +4,15 @@
       "bottomIconLabel": "Barvy",
       "title": "Barevná schémata",
       "rmbLabel": "Barevné schéma",
-      "helpBody": "Nabídka Barvy umožňuje změnit způsob zbarvení satelitů na displeji. Různá barevná schémata zvýrazňují různé vlastnosti satelitů, jako je země původu, typ oběžné dráhy nebo typ objektu."
+      "help": {
+        "overview": "Nabídka Barevná schémata mění způsob, jakým je obarven každý objekt ve scéně. Každé schéma kóduje jinou vlastnost: zemi původu, typ objektu, orbitální režim, osvětlení Sluncem, rychlost a další, takže výběr správného schématu promění mračno bodů v odpověď na konkrétní otázku.",
+        "imgAlt": "Nabídka Barevná schémata se seznamem dostupných schémat",
+        "imgCaption": "Kliknutím na libovolné schéma okamžitě přebarvíte celý katalog.",
+        "howToUse": "<ol><li>Otevřete nabídku <strong>Barvy</strong> ze spodní lišty nebo stiskněte <strong>A</strong>.</li><li>Klikněte na schéma v seznamu. Scéna se okamžitě přebarví a nabídka se zavře.</li><li>Podívejte se na legendu v rohu obrazovky, abyste zjistili, co jednotlivé barvy v aktivním schématu znamenají.</li><li>Můžete také kliknout pravým tlačítkem do prázdného prostoru a z kontextové nabídky vybrat <strong>Barevné schéma</strong>.</li></ol>",
+        "tip1": "Legenda se aktualizuje spolu se schématem; pokud si nejste jisti, co barva znamená, legenda je rozhodující.",
+        "tip2": "Některá schémata jsou datově náročná (například prostorová hustota) a jejich první výpočet chvíli trvá.",
+        "shortcutToggle": "Přepnout nabídku Barevná schémata"
+      }
     }
   }
 }

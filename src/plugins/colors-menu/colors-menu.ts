@@ -166,7 +166,26 @@ export class ColorMenu extends KeepTrackPlugin implements ICommandPaletteCapable
   getHelpConfig(): IHelpConfig {
     return {
       title: t7e('plugins.ColorMenu.title'),
-      body: t7e('plugins.ColorMenu.helpBody'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.ColorMenu.help.overview'),
+          image: {
+            src: 'img/help/colors-menu/colors-menu.png',
+            alt: t7e('plugins.ColorMenu.help.imgAlt'),
+            caption: t7e('plugins.ColorMenu.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.ColorMenu.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.ColorMenu.help.tip1'),
+        t7e('plugins.ColorMenu.help.tip2'),
+      ],
+      shortcuts: [{ keys: ['A'], description: t7e('plugins.ColorMenu.help.shortcutToggle') }],
     };
   }
 

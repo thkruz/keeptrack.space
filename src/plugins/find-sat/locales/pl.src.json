@@ -3,8 +3,27 @@
     "FindSatPlugin": {
       "bottomIconLabel": "Znajdź satelitę",
       "title": "Znajdź satelitę",
-      "helpBody": "Menu Znajdź satelitę pozwala wyszukiwać satelity na podstawie różnych kryteriów:<br><br><ul style=\"margin-left: 40px;\"><li><strong>Typ obiektu</strong> - Filtruj według ładunku, członu rakietowego lub odłamków</li><li><strong>Kraj</strong> - Filtruj według kraju wynoszącego</li><li><strong>Platforma satelitarna/Ładunek/Kształt/Źródło</strong> - Filtruj według cech satelity</li><li><strong>Azymut/Elewacja/Zasięg</strong> - Szukaj według kątów obserwacji (wymaga czujnika)</li><li><strong>Parametry orbitalne</strong> - Inklinacja, Okres, RAAN, Argument perycentrum</li><li><strong>Wiek TLE</strong> - Filtruj według daty ostatniej aktualizacji TLE</li><li><strong>RCS</strong> - Filtruj według przekroju radarowego</li></ul><br>Wyniki są wyświetlane w pasku wyszukiwania. Użyj przycisku Eksportuj, aby zapisać wyniki jako CSV.",
+      "help": {
+        "overview": "Znajdź satelitę przeszukuje cały katalog w poszukiwaniu obiektów spełniających kombinację kryteriów fizycznych, orbitalnych i obserwacyjnych. To najszybszy sposób, aby odpowiedzieć na pytania takie jak \"które człony rakietowe z Chin znajdują się na orbicie o okresie około 100 minut?\" lub \"które ładunki są w tej chwili w zasięgu mojego czujnika?\"",
+        "imgAlt": "Menu Znajdź satelitę z filtrami typu obiektu, kraju, parametrów orbitalnych i czujnika",
+        "imgCaption": "Menu Znajdź satelitę. Każde wypełnione pole dodatkowo zawęża wyszukiwanie.",
+        "filtersHeading": "Dostępne filtry",
+        "filters": "<ul><li><strong>Typ obiektu</strong>: ładunki, człony rakietowe, odłamki. Możesz wybrać kilka typów naraz; wybranie konkretnego typu odznacza \"Wszystkie\".</li><li><strong>Kraj</strong>: jeden lub więcej krajów wynoszących.</li><li><strong>Platforma satelitarna / Ładunek / Kształt / Źródło</strong>: cechy fizyczne oraz dotyczące źródła danych.</li><li><strong>Azymut / Elewacja / Zasięg</strong>: bieżące kąty obserwacji z wybranego czujnika. Wymagają wcześniejszego wybrania czujnika.</li><li><strong>Parametry orbitalne</strong>: Inklinacja, Okres, Rektascensja i Argument perycentrum.</li><li><strong>Wiek TLE</strong>: jak dawno zaktualizowano dane orbitalne, w godzinach.</li><li><strong>RCS</strong>: przekrój radarowy w m².</li></ul>Każdy filtr liczbowy ma pole <strong>Margines</strong> określające akceptowany zakres wokół podanej wartości. Pozostaw je puste, aby użyć rozsądnej wartości domyślnej (na przykład ±5° dla kątów).",
+        "howToUse": "<ol><li>Otwórz menu z dolnego paska lub naciśnij Ctrl+F.</li><li>Wybierz z list rozwijanych jeden lub więcej typów obiektów i krajów.</li><li>Wprowadź kryteria liczbowe i opcjonalnie zawęź lub poszerz ich marginesy.</li><li>Kliknij <strong>Znajdź satelity</strong>. Pasujące obiekty zostaną załadowane do paska wyszukiwania u góry i wyróżnione na globusie.</li><li>Kliknij <strong>Eksportuj dane</strong>, aby zapisać bieżące wyniki jako plik CSV.</li></ol>",
+        "tip1": "Filtry łączą się logiką AND: każde kryterium musi pasować. Jeśli nie otrzymujesz wyników, najpierw usuń najbardziej restrykcyjny filtr.",
+        "tip2": "Azymut, elewacja i zasięg są mierzone od aktualnie wybranego czujnika, więc przed ich użyciem wybierz czujnik.",
+        "tip3": "Liczba wyników jest ograniczona. Jeśli ostrzeżenie informuje o osiągnięciu limitu, zawęź kryteria, aby mieć pewność, że widzisz wszystko.",
+        "tip4": "Ponieważ wyniki trafiają do paska wyszukiwania, możesz przekazać je do dowolnego innego menu działającego na bieżącym wyszukiwaniu lub doprecyzować je, wpisując tekst.",
+        "shortcutToggle": "Przełącz menu Znajdź satelitę"
+      },
       "labels": {
+        "typePayload": "Ładunek",
+        "typeRocketBody": "Człon rakietowy",
+        "typeDebris": "Odłamki",
+        "busFilterPlaceholder": "Wpisz, aby filtrować opcje platform",
+        "satelliteBusFilter": "Filtr platformy satelitarnej",
+        "payloadFilterPlaceholder": "Wpisz, aby filtrować opcje ładunków",
+        "payloadFilter": "Filtr ładunku",
         "objectType": "Typ obiektu",
         "country": "Kraj",
         "satelliteBus": "Platforma satelitarna",

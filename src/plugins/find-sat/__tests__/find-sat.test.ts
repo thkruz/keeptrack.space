@@ -56,12 +56,15 @@ describe('FindSatPlugin_class', () => {
   });
 
   describe('getHelpConfig', () => {
-    it('should return help configuration with title and body', () => {
+    it('should return help configuration with structured sections', () => {
       const plugin = new FindSatPlugin();
       const config = plugin.getHelpConfig();
 
       expect(config.title).toBeDefined();
-      expect(config.body).toBeDefined();
+      expect(config.sections!.length).toBeGreaterThanOrEqual(3);
+      expect(config.sections![0].image?.src).toContain('img/help/find-sat/');
+      expect(config.tips!.length).toBeGreaterThan(0);
+      expect(config.shortcuts).toEqual([expect.objectContaining({ keys: ['Ctrl', 'F'] })]);
     });
   });
 

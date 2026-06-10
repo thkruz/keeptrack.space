@@ -65,7 +65,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
   getBottomIconConfig(): IBottomIconConfig {
     return {
       elementName: 'find-satellite-bottom-icon',
-      label: 'Find Satellite',
+      label: t7e('plugins.FindSatPlugin.bottomIconLabel'),
       image: findSatPng,
       menuMode: [MenuMode.CATALOG, MenuMode.ALL],
     };
@@ -75,7 +75,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
   getSideMenuConfig(): ISideMenuConfig {
     return {
       elementName: 'findByLooks-menu',
-      title: 'Find Satellite',
+      title: t7e('plugins.FindSatPlugin.title'),
       html: this.buildSideMenuHtml_(),
       dragOptions: this.getDragOptions_(),
     };
@@ -92,7 +92,32 @@ export class FindSatPlugin extends KeepTrackPlugin {
   getHelpConfig(): IHelpConfig {
     return {
       title: t7e('plugins.FindSatPlugin.title'),
-      body: t7e('plugins.FindSatPlugin.helpBody'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.FindSatPlugin.help.overview'),
+          image: {
+            src: 'img/help/find-sat/find-sat-menu.png',
+            alt: t7e('plugins.FindSatPlugin.help.imgAlt'),
+            caption: t7e('plugins.FindSatPlugin.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.FindSatPlugin.help.filtersHeading'),
+          content: t7e('plugins.FindSatPlugin.help.filters'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.FindSatPlugin.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.FindSatPlugin.help.tip1'),
+        t7e('plugins.FindSatPlugin.help.tip2'),
+        t7e('plugins.FindSatPlugin.help.tip3'),
+        t7e('plugins.FindSatPlugin.help.tip4'),
+      ],
+      shortcuts: [{ keys: ['Ctrl', 'F'], description: t7e('plugins.FindSatPlugin.help.shortcutToggle') }],
     };
   }
 
@@ -129,9 +154,9 @@ export class FindSatPlugin extends KeepTrackPlugin {
           <div class="input-field col s12">
             <select id="fbl-type" multiple>
               <option value=0 selected>${l('all')}</option>
-              <option value=1>Payload</option>
-              <option value=2>Rocket Body</option>
-              <option value=3>Debris</option>
+              <option value=1>${l('typePayload')}</option>
+              <option value=2>${l('typeRocketBody')}</option>
+              <option value=3>${l('typeDebris')}</option>
             </select>
             <label for="disabled">${l('objectType')}</label>
           </div>
@@ -146,8 +171,8 @@ export class FindSatPlugin extends KeepTrackPlugin {
         </div>
         <div class="row">
           <div class="input-field col s12">
-            <input placeholder="Type to filter bus options" id="fbl-bus-filter" type="text">
-            <label for="fbl-bus-filter" class="active">${l('satelliteBus')} Filter</label>
+            <input placeholder="${l('busFilterPlaceholder')}" id="fbl-bus-filter" type="text">
+            <label for="fbl-bus-filter" class="active">${l('satelliteBusFilter')}</label>
           </div>
         </div>
         <div class="row">
@@ -160,8 +185,8 @@ export class FindSatPlugin extends KeepTrackPlugin {
         </div>
         <div class="row">
           <div class="input-field col s12">
-            <input placeholder="Type to filter payload options" id="fbl-payload-filter" type="text">
-            <label for="fbl-payload-filter" class="active">${l('payload')} Filter</label>
+            <input placeholder="${l('payloadFilterPlaceholder')}" id="fbl-payload-filter" type="text">
+            <label for="fbl-payload-filter" class="active">${l('payloadFilter')}</label>
           </div>
         </div>
         <div class="row">
@@ -434,14 +459,14 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
       if (hasAll && hasOthers) {
         if (prevHadAll) {
-          // A specific value was just picked — drop "All"
+          // A specific value was just picked - drop "All"
           Array.from(select.options).forEach((option) => {
             if (option.value === allValue) {
               option.selected = false;
             }
           });
         } else {
-          // "All" was just picked — clear the specific values
+          // "All" was just picked - clear the specific values
           Array.from(select.options).forEach((option) => {
             option.selected = option.value === allValue;
           });

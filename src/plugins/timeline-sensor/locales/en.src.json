@@ -3,7 +3,42 @@
     "SensorTimeline": {
       "bottomIconLabel": "Sensor Timeline",
       "title": "Sensor Timeline Menu",
-      "helpBody": "The Sensor Timeline menu shows when a list of sensors have visibility of one satellite. The timeline is color-coded to show the quality of the pass. Red is a bad pass, yellow is an average pass, and green is a good pass. Click on a pass to change the sensor and time to that pass. <br><br> The timeline can be modified by changing the start and end time of the simulation. Additionally, the timeline can be modified by changing the length and interval options."
+      "labels": {
+        "calculationLength": "Calculation Length (Hours)",
+        "calculationInterval": "Calculation Interval (Seconds)",
+        "badPassLength": "Bad Pass Length (Seconds)",
+        "avgPassLength": "Average Pass Length (Seconds)",
+        "detailedPlot": "Detailed Plot",
+        "useWeather": "Use Weather",
+        "useWeatherTooltip": "Account for weather when calculating passes using weather forecasts"
+      },
+      "passTypes": {
+        "canObserve": "Can Observe",
+        "inFov": "In Field of View",
+        "satInSun": "Satellite in Sunlight",
+        "stationInNight": "Station in Eclipse",
+        "clearSkies": "Clear Skies"
+      },
+      "msgs": {
+        "observable": "Observable",
+        "inFov": "In FOV",
+        "atNight": "At Night",
+        "clearSkies": "Clear Skies",
+        "noPasses": "No Passes"
+      },
+      "help": {
+        "overview": "The Sensor Timeline shows when a network of sensors can see the selected satellite over the coming hours. Each row is a sensor and each colored bar is a pass, so you can compare every site's opportunities at a glance and pick the best sensor for the next observation.",
+        "imgAlt": "The Sensor Timeline showing color coded passes for several sensors",
+        "imgCaption": "Each row is a sensor; bar color shows the quality of each pass of the selected satellite.",
+        "readingHeading": "Reading the Timeline",
+        "reading": "<ul><li><strong>Green</strong>: a long pass, above the average pass threshold.</li><li><strong>Yellow</strong>: an average pass.</li><li><strong>Red</strong>: a short pass, below the bad pass threshold.</li><li><strong>Light gray row</strong>: that sensor never sees the satellite in the window.</li></ul>Hover a bar for the exact start and end times. With <strong>Detailed Plot</strong> enabled, optical sensors gain extra rows showing the raw conditions: <strong>In Field of View</strong>, <strong>Satellite in Sunlight</strong>, <strong>Station in Eclipse</strong>, and <strong>Clear Skies</strong>; a pass is observable only where all of them line up.",
+        "settingsHeading": "Settings",
+        "settings": "The settings panel controls the calculation: <strong>Calculation Length (Hours)</strong> sets the window, <strong>Calculation Interval (Seconds)</strong> trades speed for precision, and the <strong>Bad Pass Length</strong> and <strong>Average Pass Length</strong> thresholds define the red, yellow, and green coloring. <strong>Use Weather</strong> folds hourly cloud cover forecasts into optical sensor passes. The buttons at the bottom toggle individual sensors: red means excluded from the calculation.",
+        "howToUse": "<ol><li>Select a satellite; the bottom icon stays disabled until one is selected.</li><li>Open the <strong>Sensor Timeline</strong> from the bottom menu. The timeline computes and draws automatically.</li><li>Open the settings panel to change the window, thresholds, plot detail, weather use, or which sensors are included; the plot recalculates when you change a value.</li><li>Click a pass to switch to that sensor and jump the clock to the pass start, ready for look angles or observation planning.</li><li>Use the download button to export the pass list as a CSV file.</li></ol>",
+        "tip1": "Weather comes from the Open-Meteo cloud cover forecast for each optical site; radars ignore weather, sunlight, and darkness conditions entirely.",
+        "tip2": "Clicking a pass re-selects the satellite after changing sensor and time, so other open menus refresh with the new geometry.",
+        "tip3": "Shorter calculation intervals catch brief passes but take longer to compute; 30 seconds is a good balance for a 24 hour window."
+      }
     }
   }
 }

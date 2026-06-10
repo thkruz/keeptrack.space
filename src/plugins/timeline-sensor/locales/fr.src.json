@@ -3,7 +3,42 @@
     "SensorTimeline": {
       "bottomIconLabel": "Chronologie Capteur",
       "title": "Menu Chronologie Capteur",
-      "helpBody": "Le menu Chronologie Capteur montre quand une liste de capteurs a une visibilité sur un satellite. La chronologie est colorée pour indiquer la qualité du passage. Rouge = mauvais passage, jaune = passage moyen, vert = bon passage. Cliquez sur un passage pour changer le capteur et l'heure. <br><br> La chronologie peut être modifiée en changeant l'heure de début et de fin de la simulation, ainsi que la longueur et l'intervalle."
+      "labels": {
+        "calculationLength": "Durée de calcul (heures)",
+        "calculationInterval": "Intervalle de calcul (secondes)",
+        "badPassLength": "Durée d'un mauvais passage (secondes)",
+        "avgPassLength": "Durée d'un passage moyen (secondes)",
+        "detailedPlot": "Tracé détaillé",
+        "useWeather": "Utiliser la météo",
+        "useWeatherTooltip": "Tenir compte de la météo lors du calcul des passages à l'aide des prévisions météorologiques"
+      },
+      "passTypes": {
+        "canObserve": "Observation possible",
+        "inFov": "Dans le champ de vision",
+        "satInSun": "Satellite au soleil",
+        "stationInNight": "Station dans l'obscurité",
+        "clearSkies": "Ciel dégagé"
+      },
+      "msgs": {
+        "observable": "Observable",
+        "inFov": "Dans le FOV",
+        "atNight": "De nuit",
+        "clearSkies": "Ciel dégagé",
+        "noPasses": "Aucun passage"
+      },
+      "help": {
+        "overview": "La Chronologie Capteur montre quand un réseau de capteurs peut voir le satellite sélectionné au cours des prochaines heures. Chaque ligne est un capteur et chaque barre colorée est un passage, ce qui permet de comparer d'un coup d'œil les opportunités de chaque site et de choisir le meilleur capteur pour la prochaine observation.",
+        "imgAlt": "La Chronologie Capteur affichant des passages codés par couleur pour plusieurs capteurs",
+        "imgCaption": "Chaque ligne est un capteur ; la couleur de la barre indique la qualité de chaque passage du satellite sélectionné.",
+        "readingHeading": "Lire la chronologie",
+        "reading": "<ul><li><strong>Vert</strong> : un passage long, au-dessus du seuil de passage moyen.</li><li><strong>Jaune</strong> : un passage moyen.</li><li><strong>Rouge</strong> : un passage court, en dessous du seuil de mauvais passage.</li><li><strong>Ligne gris clair</strong> : ce capteur ne voit jamais le satellite dans la fenêtre.</li></ul>Survolez une barre pour connaître les heures exactes de début et de fin. Avec <strong>Tracé détaillé</strong> activé, les capteurs optiques gagnent des lignes supplémentaires montrant les conditions brutes : <strong>Dans le champ de vision</strong>, <strong>Satellite au soleil</strong>, <strong>Station dans l'obscurité</strong> et <strong>Ciel dégagé</strong> ; un passage n'est observable que là où toutes sont réunies.",
+        "settingsHeading": "Paramètres",
+        "settings": "Le panneau de paramètres contrôle le calcul : <strong>Durée de calcul (heures)</strong> définit la fenêtre, <strong>Intervalle de calcul (secondes)</strong> arbitre entre vitesse et précision, et les seuils <strong>Durée d'un mauvais passage</strong> et <strong>Durée d'un passage moyen</strong> définissent la coloration rouge, jaune et verte. <strong>Utiliser la météo</strong> intègre les prévisions horaires de couverture nuageuse dans les passages des capteurs optiques. Les boutons en bas activent ou désactivent chaque capteur : rouge signifie exclu du calcul.",
+        "howToUse": "<ol><li>Sélectionnez un satellite ; l'icône du bas reste désactivée tant qu'aucun n'est sélectionné.</li><li>Ouvrez la <strong>Chronologie Capteur</strong> depuis le menu du bas. La chronologie est calculée et tracée automatiquement.</li><li>Ouvrez le panneau de paramètres pour modifier la fenêtre, les seuils, le niveau de détail, l'utilisation de la météo ou les capteurs inclus ; le tracé est recalculé à chaque changement de valeur.</li><li>Cliquez sur un passage pour basculer vers ce capteur et placer l'horloge au début du passage, prêt pour les angles de visée ou la planification d'observation.</li><li>Utilisez le bouton de téléchargement pour exporter la liste des passages au format CSV.</li></ol>",
+        "tip1": "La météo provient des prévisions de couverture nuageuse Open-Meteo pour chaque site optique ; les radars ignorent totalement les conditions de météo, d'ensoleillement et d'obscurité.",
+        "tip2": "Cliquer sur un passage resélectionne le satellite après le changement de capteur et d'heure, afin que les autres menus ouverts se rafraîchissent avec la nouvelle géométrie.",
+        "tip3": "Des intervalles de calcul plus courts détectent les passages brefs mais prennent plus de temps à calculer ; 30 secondes est un bon compromis pour une fenêtre de 24 heures."
+      }
     }
   }
 }

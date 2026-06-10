@@ -25,8 +25,10 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
+import { t7e } from '@app/locales/keys';
 import { fetchWeatherApi } from 'openmeteo';
 
 interface Pass {
@@ -70,6 +72,25 @@ type WeatherDataInput = {
 export class SensorTimeline extends KeepTrackPlugin {
   readonly id = 'SensorTimeline';
   dependencies_ = [SelectSatManager.name];
+
+  /** Translated display label for a pass type drawn on the canvas. */
+  private static passTypeLabel_(type: PassTypes): string {
+    switch (type) {
+      case PassTypes.CAN_OBSERVE:
+        return t7e('plugins.SensorTimeline.passTypes.canObserve');
+      case PassTypes.IN_FOV:
+        return t7e('plugins.SensorTimeline.passTypes.inFov');
+      case PassTypes.SAT_IN_SUN:
+        return t7e('plugins.SensorTimeline.passTypes.satInSun');
+      case PassTypes.STATION_IN_NIGHT:
+        return t7e('plugins.SensorTimeline.passTypes.stationInNight');
+      case PassTypes.CLEAR_SKIES:
+        return t7e('plugins.SensorTimeline.passTypes.clearSkies');
+      default:
+        return type;
+    }
+  }
+
   private canvas_: HTMLCanvasElement;
   private ctx_: CanvasRenderingContext2D;
   private canvasStatic_: HTMLCanvasElement;
@@ -117,6 +138,40 @@ export class SensorTimeline extends KeepTrackPlugin {
 
   menuMode: MenuMode[] = [MenuMode.DISPLAY, MenuMode.ALL];
 
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: t7e('plugins.SensorTimeline.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.SensorTimeline.help.overview'),
+          image: {
+            src: 'img/help/timeline-sensor/timeline-sensor-menu.png',
+            alt: t7e('plugins.SensorTimeline.help.imgAlt'),
+            caption: t7e('plugins.SensorTimeline.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.SensorTimeline.help.readingHeading'),
+          content: t7e('plugins.SensorTimeline.help.reading'),
+        },
+        {
+          heading: t7e('plugins.SensorTimeline.help.settingsHeading'),
+          content: t7e('plugins.SensorTimeline.help.settings'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.SensorTimeline.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.SensorTimeline.help.tip1'),
+        t7e('plugins.SensorTimeline.help.tip2'),
+        t7e('plugins.SensorTimeline.help.tip3'),
+      ],
+    };
+  }
+
   isRequireSatelliteSelected = true;
   isIconDisabled = true;
   isIconDisabledOnLoad = true;
@@ -144,7 +199,7 @@ export class SensorTimeline extends KeepTrackPlugin {
         <input id="sensor-timeline-setting-total-length" value="${this.lengthOfLookAngles_.toString()}" type="text"
           style="text-align: center;"
         />
-        <label for="sensor-timeline-setting-total-length" class="active">Calculation Length (Hours)</label>
+        <label for="sensor-timeline-setting-total-length" class="active">${t7e('plugins.SensorTimeline.labels.calculationLength')}</label>
       </div>
     </div>
     <div class="row">
@@ -152,7 +207,7 @@ export class SensorTimeline extends KeepTrackPlugin {
         <input id="sensor-timeline-setting-interval" value="${this.angleCalculationInterval_.toString()}" type="text"
           style="text-align: center;"
         />
-        <label for="sensor-timeline-setting-interval" class="active">Calculation Interval (Seconds)</label>
+        <label for="sensor-timeline-setting-interval" class="active">${t7e('plugins.SensorTimeline.labels.calculationInterval')}</label>
       </div>
     </div>
     <div class="row">
@@ -160,7 +215,7 @@ export class SensorTimeline extends KeepTrackPlugin {
         <input id="sensor-timeline-setting-bad-length" value="${this.lengthOfBadPass_.toString()}" type="text"
           style="text-align: center;"
         />
-        <label for="sensor-timeline-setting-bad-length" class="active">Bad Pass Length (Seconds)</label>
+        <label for="sensor-timeline-setting-bad-length" class="active">${t7e('plugins.SensorTimeline.labels.badPassLength')}</label>
       </div>
     </div>
     <div class="row">
@@ -168,21 +223,21 @@ export class SensorTimeline extends KeepTrackPlugin {
         <input id="sensor-timeline-setting-avg-length" value="${this.lengthOfAvgPass_.toString()}" type="text"
           style="text-align: center;"
         />
-        <label for="sensor-timeline-setting-avg-length" class="active">Average Pass Length (Seconds)</label>
+        <label for="sensor-timeline-setting-avg-length" class="active">${t7e('plugins.SensorTimeline.labels.avgPassLength')}</label>
       </div>
     </div>
     <div class="switch row">
-            <label for="sensor-timeline-toggle" data-position="top" data-delay="50" data-tooltip="Detailed Plot">
+            <label for="sensor-timeline-toggle" data-position="top" data-delay="50" data-tooltip="${t7e('plugins.SensorTimeline.labels.detailedPlot')}">
               <input id="sensor-timeline-toggle" type="checkbox"/>
               <span class="lever"></span>
-              Detailed Plot
+              ${t7e('plugins.SensorTimeline.labels.detailedPlot')}
             </label>
     </div>
     <div class="switch row">
-            <label for="weather-toggle" data-position="top" data-delay="50" data-tooltip="Account for weather when calculating passes using weather forecasts">
+            <label for="weather-toggle" data-position="top" data-delay="50" data-tooltip="${t7e('plugins.SensorTimeline.labels.useWeatherTooltip')}">
               <input id="weather-toggle" type="checkbox" checked/>
               <span class="lever"></span>
-              Use Weather
+              ${t7e('plugins.SensorTimeline.labels.useWeather')}
             </label>
     </div>
     <div class="row" style="margin: 0 10px;">
@@ -1043,11 +1098,11 @@ export class SensorTimeline extends KeepTrackPlugin {
     this.ctx_.textAlign = 'right';
     if (this.detailedPlot) {
       if (sensorPass.type === PassTypes.SAT_IN_SUN) {
-        this.ctx_.fillText(PassTypes.SAT_IN_SUN, this.leftOffset - nameOffset, yPos + 5);
+        this.ctx_.fillText(SensorTimeline.passTypeLabel_(PassTypes.SAT_IN_SUN), this.leftOffset - nameOffset, yPos + 5);
       } else if (sensorPass.type === PassTypes.CAN_OBSERVE) {
         this.ctx_.fillText((sensorPass.sensor.uiName ?? 'Missing uiName'), this.leftOffset - nameOffset, yPos + 5);
       } else {
-        this.ctx_.fillText(sensorPass.type, this.leftOffset - nameOffset, yPos + 5);
+        this.ctx_.fillText(SensorTimeline.passTypeLabel_(sensorPass.type as PassTypes), this.leftOffset - nameOffset, yPos + 5);
       }
     } else {
       this.ctx_.fillText((sensorPass.sensor.uiName ?? 'Missing uiName'), this.leftOffset - nameOffset, yPos + 5);
@@ -1092,16 +1147,16 @@ export class SensorTimeline extends KeepTrackPlugin {
 
           switch (sensorPass.type) {
             case PassTypes.CAN_OBSERVE:
-              text = `${sensorPass.sensor.uiName}: ${startTime} - ${endTime} (Observable)`;
+              text = `${sensorPass.sensor.uiName}: ${startTime} - ${endTime} (${t7e('plugins.SensorTimeline.msgs.observable')})`;
               break;
             case PassTypes.IN_FOV:
-              text = `${sensorPass.sensor.uiName}: ${startTime} - ${endTime} (In FOV)`;
+              text = `${sensorPass.sensor.uiName}: ${startTime} - ${endTime} (${t7e('plugins.SensorTimeline.msgs.inFov')})`;
               break;
             case PassTypes.STATION_IN_NIGHT:
-              text = `${sensorPass.sensor.uiName}: ${startTime} - ${endTime} (At Night)`;
+              text = `${sensorPass.sensor.uiName}: ${startTime} - ${endTime} (${t7e('plugins.SensorTimeline.msgs.atNight')})`;
               break;
             case PassTypes.CLEAR_SKIES:
-              text = `${sensorPass.sensor.uiName}: ${startTime} - ${endTime} (Clear Skies)`;
+              text = `${sensorPass.sensor.uiName}: ${startTime} - ${endTime} (${t7e('plugins.SensorTimeline.msgs.clearSkies')})`;
               break;
             default:
               text = `${sensorPass.sensor.uiName}: ${startTime} - ${endTime}`;
@@ -1150,7 +1205,7 @@ export class SensorTimeline extends KeepTrackPlugin {
 
       const drawEvent = (mouseX: number, mouseY: number): boolean => {
         if (mouseX >= this.leftOffset && mouseX <= this.leftOffset + this.width && mouseY >= yPos - 10 && mouseY <= yPos + 10) {
-          const text = `${sensorPass.sensor.uiName}: No Passes`;
+          const text = `${sensorPass.sensor.uiName}: ${t7e('plugins.SensorTimeline.msgs.noPasses')}`;
 
           this.drawTooltip_(text, mouseX, mouseY);
 

@@ -3,7 +3,42 @@
     "SensorTimeline": {
       "bottomIconLabel": "Cronologia sensore",
       "title": "Menu cronologia sensore",
-      "helpBody": "Il menu Cronologia sensore mostra quando un elenco di sensori ha visibilità di un satellite. La cronologia è codificata a colori per mostrare la qualità del passaggio. Il rosso indica un passaggio scadente, il giallo un passaggio medio e il verde un buon passaggio. Fare clic su un passaggio per cambiare il sensore e l'orario a quel passaggio. <br><br> La cronologia può essere modificata cambiando l'orario di inizio e fine della simulazione. Inoltre, la cronologia può essere modificata cambiando le opzioni di durata e intervallo."
+      "labels": {
+        "calculationLength": "Durata del calcolo (ore)",
+        "calculationInterval": "Intervallo di calcolo (secondi)",
+        "badPassLength": "Durata passaggio scadente (secondi)",
+        "avgPassLength": "Durata passaggio medio (secondi)",
+        "detailedPlot": "Grafico dettagliato",
+        "useWeather": "Usa meteo",
+        "useWeatherTooltip": "Tiene conto del meteo nel calcolo dei passaggi usando le previsioni meteorologiche"
+      },
+      "passTypes": {
+        "canObserve": "Osservazione possibile",
+        "inFov": "Nel campo visivo",
+        "satInSun": "Satellite illuminato dal Sole",
+        "stationInNight": "Stazione in eclissi",
+        "clearSkies": "Cielo sereno"
+      },
+      "msgs": {
+        "observable": "Osservabile",
+        "inFov": "Nel FOV",
+        "atNight": "Di notte",
+        "clearSkies": "Cielo sereno",
+        "noPasses": "Nessun passaggio"
+      },
+      "help": {
+        "overview": "La Cronologia sensore mostra quando una rete di sensori può vedere il satellite selezionato nelle ore a venire. Ogni riga è un sensore e ogni barra colorata è un passaggio, così puoi confrontare a colpo d'occhio le opportunità di ogni sito e scegliere il sensore migliore per la prossima osservazione.",
+        "imgAlt": "La Cronologia sensore che mostra passaggi codificati a colori per diversi sensori",
+        "imgCaption": "Ogni riga è un sensore; il colore della barra indica la qualità di ogni passaggio del satellite selezionato.",
+        "readingHeading": "Come leggere la cronologia",
+        "reading": "<ul><li><strong>Verde</strong>: un passaggio lungo, sopra la soglia del passaggio medio.</li><li><strong>Giallo</strong>: un passaggio medio.</li><li><strong>Rosso</strong>: un passaggio breve, sotto la soglia del passaggio scadente.</li><li><strong>Riga grigio chiaro</strong>: quel sensore non vede mai il satellite nella finestra.</li></ul>Passa il cursore su una barra per vedere gli orari esatti di inizio e fine. Con <strong>Grafico dettagliato</strong> attivo, i sensori ottici guadagnano righe aggiuntive che mostrano le condizioni di base: <strong>Nel campo visivo</strong>, <strong>Satellite illuminato dal Sole</strong>, <strong>Stazione in eclissi</strong> e <strong>Cielo sereno</strong>; un passaggio è osservabile solo dove tutte coincidono.",
+        "settingsHeading": "Impostazioni",
+        "settings": "Il pannello delle impostazioni controlla il calcolo: <strong>Durata del calcolo (ore)</strong> imposta la finestra, <strong>Intervallo di calcolo (secondi)</strong> bilancia velocità e precisione, e le soglie <strong>Durata passaggio scadente</strong> e <strong>Durata passaggio medio</strong> definiscono la colorazione rossa, gialla e verde. <strong>Usa meteo</strong> integra le previsioni orarie di copertura nuvolosa nei passaggi dei sensori ottici. I pulsanti in basso attivano o disattivano i singoli sensori: il rosso significa escluso dal calcolo.",
+        "howToUse": "<ol><li>Seleziona un satellite; l'icona in basso resta disabilitata finché non ne viene selezionato uno.</li><li>Apri la <strong>Cronologia sensore</strong> dal menu in basso. La cronologia viene calcolata e disegnata automaticamente.</li><li>Apri il pannello delle impostazioni per cambiare finestra, soglie, dettaglio del grafico, uso del meteo o quali sensori includere; il grafico viene ricalcolato quando modifichi un valore.</li><li>Fai clic su un passaggio per passare a quel sensore e portare l'orologio all'inizio del passaggio, pronto per gli angoli di puntamento o la pianificazione delle osservazioni.</li><li>Usa il pulsante di download per esportare l'elenco dei passaggi come file CSV.</li></ol>",
+        "tip1": "Il meteo proviene dalle previsioni di copertura nuvolosa Open-Meteo per ogni sito ottico; i radar ignorano completamente le condizioni di meteo, luce solare e oscurità.",
+        "tip2": "Fare clic su un passaggio riseleziona il satellite dopo il cambio di sensore e orario, così gli altri menu aperti si aggiornano con la nuova geometria.",
+        "tip3": "Intervalli di calcolo più brevi catturano i passaggi rapidi ma richiedono più tempo di calcolo; 30 secondi sono un buon equilibrio per una finestra di 24 ore."
+      }
     }
   }
 }

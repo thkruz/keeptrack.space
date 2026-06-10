@@ -3,7 +3,42 @@
     "SensorTimeline": {
       "bottomIconLabel": "Oś czasu czujnika",
       "title": "Menu osi czasu czujnika",
-      "helpBody": "Menu osi czasu czujnika pokazuje, kiedy lista czujników ma widoczność jednego satelity. Oś czasu jest oznaczona kolorami, aby pokazać jakość przelotu. Czerwony oznacza słaby przelot, żółty przeciętny, a zielony dobry. Kliknij przelot, aby zmienić czujnik i czas na ten przelot. <br><br> Oś czasu można modyfikować, zmieniając czas rozpoczęcia i zakończenia symulacji. Dodatkowo oś czasu można modyfikować, zmieniając opcje długości i interwału."
+      "labels": {
+        "calculationLength": "Długość obliczeń (godziny)",
+        "calculationInterval": "Interwał obliczeń (sekundy)",
+        "badPassLength": "Długość słabego przelotu (sekundy)",
+        "avgPassLength": "Długość przeciętnego przelotu (sekundy)",
+        "detailedPlot": "Szczegółowy wykres",
+        "useWeather": "Uwzględniaj pogodę",
+        "useWeatherTooltip": "Uwzględnia pogodę przy obliczaniu przelotów na podstawie prognoz pogody"
+      },
+      "passTypes": {
+        "canObserve": "Możliwość obserwacji",
+        "inFov": "W polu widzenia",
+        "satInSun": "Satelita w świetle słonecznym",
+        "stationInNight": "Stacja w cieniu Ziemi",
+        "clearSkies": "Czyste niebo"
+      },
+      "msgs": {
+        "observable": "Obserwowalny",
+        "inFov": "W FOV",
+        "atNight": "W nocy",
+        "clearSkies": "Czyste niebo",
+        "noPasses": "Brak przelotów"
+      },
+      "help": {
+        "overview": "Oś czasu czujnika pokazuje, kiedy sieć czujników może widzieć wybranego satelitę w nadchodzących godzinach. Każdy wiersz to czujnik, a każdy kolorowy pasek to przelot, dzięki czemu możesz jednym spojrzeniem porównać możliwości wszystkich stanowisk i wybrać najlepszy czujnik do następnej obserwacji.",
+        "imgAlt": "Oś czasu czujnika pokazująca oznaczone kolorami przeloty dla kilku czujników",
+        "imgCaption": "Każdy wiersz to czujnik; kolor paska pokazuje jakość każdego przelotu wybranego satelity.",
+        "readingHeading": "Jak czytać oś czasu",
+        "reading": "<ul><li><strong>Zielony</strong>: długi przelot, powyżej progu przeciętnego przelotu.</li><li><strong>Żółty</strong>: przeciętny przelot.</li><li><strong>Czerwony</strong>: krótki przelot, poniżej progu słabego przelotu.</li><li><strong>Jasnoszary wiersz</strong>: ten czujnik nigdy nie widzi satelity w tym oknie.</li></ul>Najedź kursorem na pasek, aby zobaczyć dokładne czasy rozpoczęcia i zakończenia. Przy włączonej opcji <strong>Szczegółowy wykres</strong> czujniki optyczne zyskują dodatkowe wiersze pokazujące warunki składowe: <strong>W polu widzenia</strong>, <strong>Satelita w świetle słonecznym</strong>, <strong>Stacja w cieniu Ziemi</strong> i <strong>Czyste niebo</strong>; przelot jest obserwowalny tylko tam, gdzie wszystkie się pokrywają.",
+        "settingsHeading": "Ustawienia",
+        "settings": "Panel ustawień steruje obliczeniami: <strong>Długość obliczeń (godziny)</strong> ustala okno, <strong>Interwał obliczeń (sekundy)</strong> równoważy szybkość i precyzję, a progi <strong>Długość słabego przelotu</strong> i <strong>Długość przeciętnego przelotu</strong> definiują czerwone, żółte i zielone kolorowanie. <strong>Uwzględniaj pogodę</strong> włącza godzinowe prognozy zachmurzenia do przelotów czujników optycznych. Przyciski na dole przełączają poszczególne czujniki: czerwony oznacza wykluczenie z obliczeń.",
+        "howToUse": "<ol><li>Wybierz satelitę; dolna ikona pozostaje nieaktywna, dopóki żaden nie zostanie wybrany.</li><li>Otwórz <strong>Oś czasu czujnika</strong> z dolnego menu. Oś czasu jest obliczana i rysowana automatycznie.</li><li>Otwórz panel ustawień, aby zmienić okno, progi, szczegółowość wykresu, użycie pogody lub uwzględniane czujniki; wykres jest przeliczany po każdej zmianie wartości.</li><li>Kliknij przelot, aby przełączyć się na ten czujnik i przeskoczyć zegarem na początek przelotu, gotowy do wyznaczania kątów obserwacji lub planowania.</li><li>Użyj przycisku pobierania, aby wyeksportować listę przelotów jako plik CSV.</li></ol>",
+        "tip1": "Pogoda pochodzi z prognozy zachmurzenia Open-Meteo dla każdego stanowiska optycznego; radary całkowicie ignorują warunki pogodowe, światło słoneczne i ciemność.",
+        "tip2": "Kliknięcie przelotu ponownie wybiera satelitę po zmianie czujnika i czasu, dzięki czemu inne otwarte menu odświeżają się z nową geometrią.",
+        "tip3": "Krótsze interwały obliczeń wychwytują krótkie przeloty, ale obliczenia trwają dłużej; 30 sekund to dobry kompromis dla okna 24-godzinnego."
+      }
     }
   }
 }

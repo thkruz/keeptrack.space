@@ -3,7 +3,42 @@
     "SensorTimeline": {
       "bottomIconLabel": "Línea de Tiempo del Sensor",
       "title": "Menú de Línea de Tiempo del Sensor",
-      "helpBody": "El menú de Línea de Tiempo del Sensor muestra cuándo una lista de sensores tiene visibilidad de un satélite. La línea de tiempo está codificada por colores para mostrar la calidad del pase. Rojo es un mal pase, amarillo es un pase promedio y verde es un buen pase. Haz clic en un pase para cambiar el sensor y el tiempo a ese pase. <br><br> La línea de tiempo puede ser modificada cambiando el tiempo de inicio y fin de la simulación. Además, la línea de tiempo puede ser modificada cambiando las opciones de longitud e intervalo."
+      "labels": {
+        "calculationLength": "Duración del Cálculo (Horas)",
+        "calculationInterval": "Intervalo de Cálculo (Segundos)",
+        "badPassLength": "Duración de Pase Malo (Segundos)",
+        "avgPassLength": "Duración de Pase Promedio (Segundos)",
+        "detailedPlot": "Gráfico Detallado",
+        "useWeather": "Usar Meteorología",
+        "useWeatherTooltip": "Tener en cuenta la meteorología al calcular los pases usando pronósticos del tiempo"
+      },
+      "passTypes": {
+        "canObserve": "Puede Observar",
+        "inFov": "En el Campo de Visión",
+        "satInSun": "Satélite Iluminado por el Sol",
+        "stationInNight": "Estación en Eclipse",
+        "clearSkies": "Cielo Despejado"
+      },
+      "msgs": {
+        "observable": "Observable",
+        "inFov": "En FOV",
+        "atNight": "De Noche",
+        "clearSkies": "Cielo Despejado",
+        "noPasses": "Sin Pases"
+      },
+      "help": {
+        "overview": "La Línea de Tiempo del Sensor muestra cuándo una red de sensores puede ver el satélite seleccionado durante las próximas horas. Cada fila es un sensor y cada barra de color es un pase, de modo que puedes comparar las oportunidades de cada sitio de un vistazo y elegir el mejor sensor para la próxima observación.",
+        "imgAlt": "La Línea de Tiempo del Sensor mostrando pases codificados por colores para varios sensores",
+        "imgCaption": "Cada fila es un sensor; el color de la barra muestra la calidad de cada pase del satélite seleccionado.",
+        "readingHeading": "Cómo Leer la Línea de Tiempo",
+        "reading": "<ul><li><strong>Verde</strong>: un pase largo, por encima del umbral de pase promedio.</li><li><strong>Amarillo</strong>: un pase promedio.</li><li><strong>Rojo</strong>: un pase corto, por debajo del umbral de pase malo.</li><li><strong>Fila gris claro</strong>: ese sensor nunca ve el satélite en la ventana.</li></ul>Pasa el cursor sobre una barra para ver las horas exactas de inicio y fin. Con <strong>Gráfico Detallado</strong> activado, los sensores ópticos ganan filas adicionales que muestran las condiciones en bruto: <strong>En el Campo de Visión</strong>, <strong>Satélite Iluminado por el Sol</strong>, <strong>Estación en Eclipse</strong> y <strong>Cielo Despejado</strong>; un pase solo es observable donde todas coinciden.",
+        "settingsHeading": "Configuración",
+        "settings": "El panel de configuración controla el cálculo: <strong>Duración del Cálculo (Horas)</strong> establece la ventana, <strong>Intervalo de Cálculo (Segundos)</strong> equilibra velocidad y precisión, y los umbrales de <strong>Duración de Pase Malo</strong> y <strong>Duración de Pase Promedio</strong> definen los colores rojo, amarillo y verde. <strong>Usar Meteorología</strong> incorpora los pronósticos horarios de nubosidad en los pases de los sensores ópticos. Los botones de la parte inferior activan o desactivan sensores individuales: rojo significa excluido del cálculo.",
+        "howToUse": "<ol><li>Selecciona un satélite; el icono inferior permanece deshabilitado hasta que se seleccione uno.</li><li>Abre la <strong>Línea de Tiempo del Sensor</strong> desde el menú inferior. La línea de tiempo se calcula y dibuja automáticamente.</li><li>Abre el panel de configuración para cambiar la ventana, los umbrales, el detalle del gráfico, el uso de la meteorología o qué sensores se incluyen; el gráfico se recalcula cuando cambias un valor.</li><li>Haz clic en un pase para cambiar a ese sensor y mover el reloj al inicio del pase, listo para ángulos de observación o planificación.</li><li>Usa el botón de descarga para exportar la lista de pases como un archivo CSV.</li></ol>",
+        "tip1": "La meteorología proviene del pronóstico de nubosidad de Open-Meteo para cada sitio óptico; los radares ignoran por completo las condiciones de meteorología, luz solar y oscuridad.",
+        "tip2": "Hacer clic en un pase vuelve a seleccionar el satélite después de cambiar el sensor y la hora, de modo que otros menús abiertos se actualizan con la nueva geometría.",
+        "tip3": "Los intervalos de cálculo más cortos capturan pases breves pero tardan más en calcularse; 30 segundos es un buen equilibrio para una ventana de 24 horas."
+      }
     }
   }
 }

@@ -255,6 +255,55 @@ body.keyboard-focused .dropdown-content li:focus {
     background-color: rgba(0, 0, 0, 0.08);
 }
 
+/*
+ * Multi-select dropdown options. v2 renders them as checkbox labels inside the
+ * select wrapper, which carries the input-field class — so generic field-input
+ * rules bleed onto the checkbox: width 100% stretches it across the row (turning
+ * its round MD3 focus outline into a giant ellipse) and pushes the option text to
+ * the far edge, while the app's dark-theme label color renders white-on-white.
+ * Restore native checkbox geometry and match the single-select option styling.
+ */
+.dropdown-content input[type='checkbox'] {
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    border: none;
+    position: relative;
+}
+
+.dropdown-content input[type='checkbox']:focus {
+    outline: none;
+}
+
+.dropdown-content li > span > label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: auto;
+    cursor: pointer;
+}
+
+.dropdown-content li > span > label,
+.dropdown-content [type='checkbox'] + span {
+    color: var(--color-primary);
+}
+
+/* Unchecked box border is on-surface-variant (near-white) — invisible on the white panel */
+.dropdown-content input[type='checkbox']:not(:checked)::before {
+    border-color: rgba(0, 0, 0, 0.45);
+}
+
+/*
+ * v2 makes dropdown options focusable; the app-wide :focus-visible outline
+ * (2px offset red) renders as clipped horizontal lines around the focused row
+ * inside the panel. Indicate focus with the hover background instead.
+ */
+.dropdown-content li:focus-visible {
+    outline: none;
+    background-color: #eee;
+}
+
 .row {
     margin-bottom: 1rem;
 }

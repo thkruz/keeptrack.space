@@ -3,16 +3,44 @@
     "WatchlistPlugin": {
       "bottomIconLabel": "Seznam sledovaných",
       "title": "Seznam sledovaných",
-      "helpBody": "Menu seznamu sledovaných umožňuje vytvořit seznam prioritních satelitů ke sledování. To vám umožní rychle načíst satelity, které vás nejvíce zajímají. Seznam je uložen v místním úložišti vašeho prohlížeče a bude k dispozici při příští návštěvě stránky. <br><br> Když satelity na seznamu sledovaných vstoupí do zorného pole vybraného senzoru, zobrazí se oznámení, nakreslí se čára od senzoru k satelitu a číslo satelitu se zobrazí na glóbu. <br><br> Funkce překryvu závisí na vyplněném seznamu sledovaných."
-,
+      "help": {
+        "overview": "Seznam sledovaných je váš seznam prioritních satelitů. Je uložen ve vašem prohlížeči, takže přečká i obnovení stránky. Když je vybrán senzor a satelit ze seznamu sledovaných vstoupí do jeho zorného pole, obdržíte oznámení, od senzoru k satelitu se nakreslí čára a číslo satelitu se zobrazí na glóbu.",
+        "imgAlt": "Menu seznamu sledovaných s několika přidanými satelity",
+        "imgCaption": "Seznam sledovaných s několika satelity. Kliknutím na název satelit vyberete; ikona záložky jej odebere.",
+        "managingHeading": "Správa seznamu",
+        "managing": "<ul><li><strong>Přidat</strong>: zadejte jedno nebo více čísel NORAD oddělených čárkami nebo mezerami (fungují i alpha-5 identifikátory jako T0001) a klikněte na ikonu přidání nebo stiskněte Enter.</li><li><strong>Rychlé přidání/odebrání</strong>: když je na glóbu vybrán libovolný satelit, klikněte na ikonu záložky vedle jeho názvu v informačním poli.</li><li><strong>Vybrat</strong>: kliknutím na číslo nebo název satelitu v seznamu k němu přeletíte.</li><li><strong>Uložit / Načíst</strong>: exportujte seznam jako soubor JSON a později jej načtěte nebo sdílejte.</li><li><strong>Vymazat</strong>: vyprázdní celý seznam.</li></ul>",
+        "howToUse": "<ol><li>Otevřete menu ze spodní lišty nebo stiskněte W.</li><li>Přidejte satelity podle čísla NORAD, například 25544 pro ISS.</li><li>Vyberte senzor v menu Senzory, abyste začali dostávat oznámení o viditelnosti a čáry od senzoru k satelitu.</li><li>Otevřete sekundární menu (ikona ozubeného kola), kde můžete skrýt všechny objekty mimo seznam sledovaných nebo změnit, kdy se vykreslují popisky (Vždy / Pouze FOV / Vypnuto).</li></ol>",
+        "tip1": "\"Skrýt ostatní objekty\" promění glóbus v zobrazení pouze seznamu sledovaných; ideální pro sledování několika objektů bez rušení celým katalogem.",
+        "tip2": "Menu překryvu (časy dalších průletů pro každý satelit ze seznamu sledovaných) funguje až poté, co seznam sledovaných obsahuje položky.",
+        "tip3": "Duplicity jsou automaticky ignorovány a neplatná čísla vyvolají oznámení s názvem satelitu, který nebyl nalezen.",
+        "shortcutToggle": "Přepnout menu seznamu sledovaných"
+      },
+      "labels": {
+        "newSatellites": "Nové satelity",
+        "saveList": "Uložit seznam",
+        "loadList": "Načíst seznam",
+        "clearList": "Vymazat seznam",
+        "hideOtherObjects": "Skrýt ostatní objekty",
+        "labelAlways": "Vždy",
+        "labelFovOnly": "Pouze FOV",
+        "labelOff": "Vypnuto"
+      },
+      "msgs": {
+        "watchlistLoaded": "Seznam sledovaných načten s {count} satelity"
+      },
+      "errorMsgs": {
+        "NoradAlreadyInList": "NORAD: {sccNum} už je v seznamu!",
+        "ObjectAlreadyInList": "Objekt {id} už je v seznamu!",
+        "SatNotFound": "Satelit {id} nebyl nalezen!"
+      },
       "settings": {
         "satLabelMode": {
-          "label": "Satellite Label Mode",
-          "helpText": "Controls satellite label rendering on watchlist satellites.",
+          "label": "Režim popisků satelitů",
+          "helpText": "Určuje vykreslování popisků u satelitů ze seznamu sledovaných.",
           "options": {
-            "off": "Off",
-            "fovOnly": "FOV Only",
-            "all": "All Watchlist"
+            "off": "Vypnuto",
+            "fovOnly": "Pouze FOV",
+            "all": "Celý seznam sledovaných"
           }
         }
       }

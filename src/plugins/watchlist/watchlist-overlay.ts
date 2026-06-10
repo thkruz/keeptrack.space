@@ -60,7 +60,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
   menuMode: MenuMode[] = [MenuMode.CATALOG, MenuMode.ALL];
 
-  /** ~72 minutes — just enough buffer beyond the 60-min display cap */
+  /** ~72 minutes - just enough buffer beyond the 60-min display cap */
   private readonly OVERLAY_CALC_LENGTH_IN_DAYS_ = 0.05;
 
   // Tier thresholds in milliseconds
@@ -84,7 +84,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   /** Cached FOV exit times keyed by satellite ID. Cleared on each recalc. */
   private readonly exitTimeCache_ = new Map<number, Date | null>();
 
-  /** Departed rotation state — avoids index jumps when departed count changes */
+  /** Departed rotation state - avoids index jumps when departed count changes */
   private departedRotationOffset_ = 0;
   private lastDepartedRotationTime_ = 0;
 
@@ -420,7 +420,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       return `${timeStr} +${agoMins}m ago`;
     }
 
-    // Upcoming, Aware, Background — HH:MM only
+    // Upcoming, Aware, Background - HH:MM only
     return dateFormat(passTime, 'HH:MM', true);
   }
 
@@ -465,7 +465,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
           try {
             exitTime = this.computeExitTime_(pass.sat, propTime);
           } catch {
-            // Bad satrec or sensor — fall back to pass-start countdown
+            // Bad satrec or sensor - fall back to pass-start countdown
           }
         }
         const timeStr = this.formatPassTime_(pass.time, propTime, tier, exitTime);
@@ -537,7 +537,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
       htmlParts.push('</div>');
 
-      // Set innerHTML directly — requestIdleCallback (setInnerHtml) defers too
+      // Set innerHTML directly - requestIdleCallback (setInnerHtml) defers too
       // long in a busy render loop and can cause stale/empty overlay content
       const contentEl = getEl('info-overlay-content');
 

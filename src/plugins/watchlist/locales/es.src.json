@@ -3,16 +3,44 @@
     "WatchlistPlugin": {
       "bottomIconLabel": "Watchlist",
       "title": "Watchlist",
-      "helpBody": "El menú de Watchlist te permite crear una lista de satélites prioritarios para rastrear. Esto te permite recuperar rápidamente los satélites que más te interesan. La lista se guarda en el almacenamiento local de tu navegador y estará disponible la próxima vez que visites el sitio. <br><br> Cuando los satélites en la watchlist entran en el campo de visión del sensor seleccionado, se mostrará una notificación, se dibujará una línea desde el sensor al satélite y el número del satélite se mostrará en el globo. <br><br> La función de superposición depende de que la watchlist esté poblada."
-,
+      "help": {
+        "overview": "La watchlist es tu lista de satélites prioritarios. Se guarda en tu navegador, por lo que sobrevive a las recargas. Cuando hay un sensor seleccionado y un satélite de la watchlist entra en su campo de visión, recibes una notificación, se dibuja una línea desde el sensor hasta el satélite y el número del satélite aparece en el globo.",
+        "imgAlt": "El menú de Watchlist con varios satélites añadidos",
+        "imgCaption": "Una watchlist con varios satélites. Haz clic en un nombre para seleccionarlo; el icono de marcador lo elimina.",
+        "managingHeading": "Gestión de la lista",
+        "managing": "<ul><li><strong>Añadir</strong>: escribe uno o más números NORAD separados por comas o espacios (los IDs alpha-5 como T0001 también funcionan) y haz clic en el icono de añadir o pulsa Enter.</li><li><strong>Añadir/eliminar rápido</strong>: cuando haya un satélite seleccionado en el globo, haz clic en el icono de marcador junto a su nombre en el cuadro de información.</li><li><strong>Seleccionar</strong>: haz clic en el número o nombre de un satélite en la lista para volar hasta él.</li><li><strong>Guardar / Cargar</strong>: exporta la lista como un archivo JSON y cárgala más tarde o compártela.</li><li><strong>Limpiar</strong>: vacía toda la lista.</li></ul>",
+        "howToUse": "<ol><li>Abre el menú desde la barra inferior o pulsa W.</li><li>Añade satélites por número NORAD, por ejemplo, 25544 para la ISS.</li><li>Selecciona un sensor en el menú de Sensores para empezar a recibir notificaciones de visibilidad y líneas del sensor al satélite.</li><li>Abre el menú secundario (icono de engranaje) para ocultar todos los objetos que no estén en la watchlist o cambiar cuándo se dibujan las etiquetas (Siempre / Solo FOV / Desactivado).</li></ol>",
+        "tip1": "\"Ocultar otros objetos\" convierte el globo en una vista solo de la watchlist; perfecto para seguir unos pocos objetos sin el desorden del catálogo completo.",
+        "tip2": "El menú de Superposición (tiempos del próximo pase para cada satélite de la watchlist) solo funciona cuando la watchlist tiene entradas.",
+        "tip3": "Los duplicados se ignoran automáticamente y los números no válidos generan una notificación con el nombre del satélite que no se encontró.",
+        "shortcutToggle": "Alternar el menú de Watchlist"
+      },
+      "labels": {
+        "newSatellites": "Nuevo(s) satélite(s)",
+        "saveList": "Guardar lista",
+        "loadList": "Cargar lista",
+        "clearList": "Limpiar lista",
+        "hideOtherObjects": "Ocultar otros objetos",
+        "labelAlways": "Siempre",
+        "labelFovOnly": "Solo FOV",
+        "labelOff": "Desactivado"
+      },
+      "msgs": {
+        "watchlistLoaded": "Watchlist cargada con {count} satélites"
+      },
+      "errorMsgs": {
+        "NoradAlreadyInList": "NORAD: ¡{sccNum} ya está en la lista!",
+        "ObjectAlreadyInList": "¡El objeto {id} ya está en la lista!",
+        "SatNotFound": "¡Satélite {id} no encontrado!"
+      },
       "settings": {
         "satLabelMode": {
-          "label": "Satellite Label Mode",
-          "helpText": "Controls satellite label rendering on watchlist satellites.",
+          "label": "Modo de etiquetas de satélite",
+          "helpText": "Controla la representación de las etiquetas en los satélites de la watchlist.",
           "options": {
-            "off": "Off",
-            "fovOnly": "FOV Only",
-            "all": "All Watchlist"
+            "off": "Desactivado",
+            "fovOnly": "Solo FOV",
+            "all": "Toda la watchlist"
           }
         }
       }

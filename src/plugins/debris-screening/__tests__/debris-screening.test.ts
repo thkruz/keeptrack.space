@@ -53,8 +53,10 @@ describe('DebrisScreening_capabilities', () => {
     const config = plugin.getHelpConfig();
 
     expect(config.title).toBe('Debris Screening');
-    expect(config.body).toContain('TCA');
-    expect(config.body).toContain('Probability of Collision');
+    const allContent = config.sections!.map((s) => s.content).join(' ');
+
+    expect(allContent).toContain('TCA');
+    expect(allContent).toContain('probability of collision');
   });
 });
 

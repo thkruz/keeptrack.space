@@ -3,7 +3,6 @@
     "DebrisScreening": {
       "bottomIconLabel": "Debris Screening",
       "title": "Debris Screening",
-      "helpBody": "The Debris Screening tool screens a selected satellite against the catalog to identify potential conjunctions. <br><br> Configure the assessment time window and click 'Screen for Debris' to run the analysis. Results will be displayed in a table showing: <ul style=\"margin-left: 40px;\"> <li><b>TCA</b> - Time of Closest Approach</li> <li><b>Miss Distance</b> - Total and RIC components (Radial, In-track, Cross-track)</li> <li><b>Pc</b> - Probability of Collision</li> <li><b>Risk Level</b> - Critical/High/Medium/Low based on Pc</li> </ul> Click on any satellite ID to select it. Export results to CSV using the download button.",
       "resultsTitle": "Screening Results",
       "resultsCount": "{count} conjunctions found",
       "exportCsv": "Export CSV",
@@ -14,15 +13,49 @@
         "low": "Low",
         "unknown": "N/A"
       },
+      "sccLabel": "Satellite SCC#",
+      "timeWindowLabel": "Time Window",
+      "timeOptions": {
+        "h1": "1 Hour",
+        "h4": "4 Hours",
+        "h8": "8 Hours",
+        "h24": "24 Hours",
+        "h48": "48 Hours",
+        "h72": "72 Hours"
+      },
       "uLabel": "U (Radial)",
       "vLabel": "V (In-track)",
       "wLabel": "W (Cross-track)",
+      "screenForDebris": "Screen for Debris",
       "drawBox": "Draw Box",
       "clearBox": "Clear Box",
+      "table": {
+        "secondary": "Secondary",
+        "tca": "TCA",
+        "missKm": "Miss (km)",
+        "rKm": "R (km)",
+        "iKm": "I (km)",
+        "cKm": "C (km)",
+        "pc": "Pc",
+        "risk": "Risk"
+      },
       "errorMsgs": {
         "InvalidSatellite": "Invalid satellite selected",
         "ScreeningFailed": "Screening failed",
         "NoResultsToExport": "No results to export"
+      },
+      "help": {
+        "overview": "Debris Screening runs a conjunction assessment for the selected satellite against the rest of the catalog. It finds every object that comes within a screening box you define around the satellite during the chosen time window, then ranks the encounters by probability of collision.",
+        "imgAlt": "The Debris Screening menu with time window and screening box options",
+        "imgCaption": "Set the time window and RIC screening box, then screen the selected satellite against the catalog.",
+        "boxHeading": "The Screening Box",
+        "box": "The screening volume is defined in RIC coordinates relative to the satellite: <strong>U (Radial)</strong> is up and down in orbit altitude, <strong>V (In-track)</strong> is along the direction of flight, and <strong>W (Cross-track)</strong> is side to side. The radial size matters most: most encounters separate cleanly in altitude, so a tight U with a wider V and W is the usual choice. <strong>Draw Box</strong> renders the volume around the satellite in the 3D view; <strong>Clear Box</strong> removes it.",
+        "resultsHeading": "Reading the Results",
+        "results": "Each row of the results table is one predicted conjunction: <strong>Secondary</strong> is the other object, <strong>TCA</strong> is the time of closest approach, <strong>Miss (km)</strong> is the total miss distance with its <strong>R</strong>, <strong>I</strong>, and <strong>C</strong> components, <strong>Pc</strong> is the probability of collision, and <strong>Risk</strong> classifies it as Critical, High, Medium, or Low. Click a row to select the secondary object and jump the clock to the TCA; the menu stays open so you can step through events. <strong>Export CSV</strong> saves the table.",
+        "howToUse": "<ol><li>Select a satellite; the bottom icon is disabled until one is selected.</li><li>Open <strong>Debris Screening</strong> from the bottom menu. The satellite's SCC number fills in automatically.</li><li>Pick a <strong>Time Window</strong> (1 to 72 hours) and adjust the <strong>U</strong>, <strong>V</strong>, and <strong>W</strong> box sizes if needed.</li><li>Click <strong>Screen for Debris</strong>. The results panel opens with the conjunctions found, ranked for review.</li><li>Click any row to inspect that encounter at its time of closest approach.</li></ol>",
+        "tip1": "Longer windows and bigger boxes find more encounters but take longer to compute; start with the defaults and widen only if you need more coverage.",
+        "tip2": "Clicking a row preserves your playback state: if the clock was paused it stays paused at the TCA.",
+        "tip3": "Risk levels are thresholds on Pc: above 1e-4 is Critical, above 1e-6 is High, and above 1e-8 is Medium."
       }
     }
   }

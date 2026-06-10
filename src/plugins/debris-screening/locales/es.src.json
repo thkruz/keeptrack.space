@@ -1,28 +1,61 @@
 {
   "plugins": {
     "DebrisScreening": {
-      "bottomIconLabel": "Deteccion de Escombros",
-      "title": "Deteccion de Escombros",
-      "helpBody": "La herramienta de Deteccion de Escombros analiza un satelite seleccionado contra el catalogo para identificar posibles conjunciones. <br><br> Configure la ventana de tiempo de evaluacion y haga clic en 'Buscar Escombros' para ejecutar el analisis. Los resultados se mostraran en una tabla: <ul style=\"margin-left: 40px;\"> <li><b>TCA</b> - Tiempo de Aproximacion Mas Cercana</li> <li><b>Distancia de Fallo</b> - Componentes totales y RIC</li> <li><b>Pc</b> - Probabilidad de Colision</li> <li><b>Nivel de Riesgo</b> - Critico/Alto/Medio/Bajo basado en Pc</li> </ul>",
-      "resultsTitle": "Resultados del Analisis",
+      "bottomIconLabel": "Detección de Escombros",
+      "title": "Detección de Escombros",
+      "resultsTitle": "Resultados del Análisis",
       "resultsCount": "{count} conjunciones encontradas",
       "exportCsv": "Exportar CSV",
       "riskLevels": {
-        "critical": "Critico",
+        "critical": "Crítico",
         "high": "Alto",
         "medium": "Medio",
         "low": "Bajo",
         "unknown": "N/D"
       },
+      "sccLabel": "SCC# del Satélite",
+      "timeWindowLabel": "Ventana de Tiempo",
+      "timeOptions": {
+        "h1": "1 hora",
+        "h4": "4 horas",
+        "h8": "8 horas",
+        "h24": "24 horas",
+        "h48": "48 horas",
+        "h72": "72 horas"
+      },
       "uLabel": "U (Radial)",
-      "vLabel": "V (In-Track)",
-      "wLabel": "W (Cross-Track)",
+      "vLabel": "V (En la trayectoria)",
+      "wLabel": "W (Transversal)",
+      "screenForDebris": "Buscar Escombros",
       "drawBox": "Dibujar Caja",
       "clearBox": "Borrar Caja",
+      "table": {
+        "secondary": "Secundario",
+        "tca": "TCA",
+        "missKm": "Distancia (km)",
+        "rKm": "R (km)",
+        "iKm": "I (km)",
+        "cKm": "C (km)",
+        "pc": "Pc",
+        "risk": "Riesgo"
+      },
       "errorMsgs": {
-        "InvalidSatellite": "Satelite seleccionado invalido",
-        "ScreeningFailed": "Analisis fallido",
+        "InvalidSatellite": "Satélite seleccionado no válido",
+        "ScreeningFailed": "El análisis falló",
         "NoResultsToExport": "Sin resultados para exportar"
+      },
+      "help": {
+        "overview": "La Detección de Escombros ejecuta una evaluación de conjunciones del satélite seleccionado contra el resto del catálogo. Encuentra cada objeto que entra en una caja de cribado definida alrededor del satélite durante la ventana de tiempo elegida y luego clasifica los encuentros por probabilidad de colisión.",
+        "imgAlt": "El menú de Detección de Escombros con opciones de ventana de tiempo y caja de cribado",
+        "imgCaption": "Configure la ventana de tiempo y la caja de cribado RIC, y luego analice el satélite seleccionado contra el catálogo.",
+        "boxHeading": "La Caja de Cribado",
+        "box": "El volumen de cribado se define en coordenadas RIC relativas al satélite: <strong>U (Radial)</strong> es arriba y abajo en altitud orbital, <strong>V (En la trayectoria)</strong> sigue la dirección de vuelo y <strong>W (Transversal)</strong> es de lado a lado. El tamaño radial es el que más importa: la mayoría de los encuentros se separan limpiamente en altitud, así que un U ajustado con V y W más anchos es la elección habitual. <strong>Dibujar Caja</strong> dibuja el volumen alrededor del satélite en la vista 3D; <strong>Borrar Caja</strong> lo elimina.",
+        "resultsHeading": "Cómo Leer los Resultados",
+        "results": "Cada fila de la tabla de resultados es una conjunción prevista: <strong>Secundario</strong> es el otro objeto, <strong>TCA</strong> es el tiempo de máxima aproximación, <strong>Distancia (km)</strong> es la distancia de paso total con sus componentes <strong>R</strong>, <strong>I</strong> y <strong>C</strong>, <strong>Pc</strong> es la probabilidad de colisión y <strong>Riesgo</strong> la clasifica como Crítico, Alto, Medio o Bajo. Haga clic en una fila para seleccionar el objeto secundario y saltar el reloj al TCA; el menú permanece abierto para que pueda recorrer los eventos. <strong>Exportar CSV</strong> guarda la tabla.",
+        "howToUse": "<ol><li>Seleccione un satélite; el icono inferior está deshabilitado hasta que haya uno seleccionado.</li><li>Abra <strong>Detección de Escombros</strong> desde el menú inferior. El número SCC del satélite se rellena automáticamente.</li><li>Elija una <strong>Ventana de Tiempo</strong> (1 a 72 horas) y ajuste los tamaños de caja <strong>U</strong>, <strong>V</strong> y <strong>W</strong> si es necesario.</li><li>Haga clic en <strong>Buscar Escombros</strong>. El panel de resultados se abre con las conjunciones encontradas, ordenadas para su revisión.</li><li>Haga clic en cualquier fila para inspeccionar ese encuentro en su tiempo de máxima aproximación.</li></ol>",
+        "tip1": "Ventanas más largas y cajas más grandes encuentran más encuentros, pero tardan más en calcularse; empiece con los valores predeterminados y amplíe solo si necesita más cobertura.",
+        "tip2": "Hacer clic en una fila conserva el estado de reproducción: si el reloj estaba en pausa, permanece en pausa en el TCA.",
+        "tip3": "Los niveles de riesgo son umbrales de Pc: por encima de 1e-4 es Crítico, por encima de 1e-6 es Alto y por encima de 1e-8 es Medio."
       }
     }
   }

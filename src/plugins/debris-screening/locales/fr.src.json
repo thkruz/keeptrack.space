@@ -1,28 +1,61 @@
 {
   "plugins": {
     "DebrisScreening": {
-      "bottomIconLabel": "Detection de Debris",
-      "title": "Detection de Debris",
-      "helpBody": "L'outil de Detection de Debris analyse un satellite selectionne par rapport au catalogue pour identifier les conjonctions potentielles. <br><br> Configurez la fenetre de temps d'evaluation et cliquez sur 'Rechercher des Debris' pour executer l'analyse. Les resultats seront affiches dans un tableau: <ul style=\"margin-left: 40px;\"> <li><b>TCA</b> - Temps d'Approche la Plus Proche</li> <li><b>Distance de Passage</b> - Composantes totales et RIC</li> <li><b>Pc</b> - Probabilite de Collision</li> <li><b>Niveau de Risque</b> - Critique/Eleve/Moyen/Faible base sur Pc</li> </ul>",
-      "resultsTitle": "Resultats de l'Analyse",
-      "resultsCount": "{count} conjonctions trouvees",
+      "bottomIconLabel": "Détection de Débris",
+      "title": "Détection de Débris",
+      "resultsTitle": "Résultats de l'Analyse",
+      "resultsCount": "{count} conjonctions trouvées",
       "exportCsv": "Exporter CSV",
       "riskLevels": {
         "critical": "Critique",
-        "high": "Eleve",
+        "high": "Élevé",
         "medium": "Moyen",
         "low": "Faible",
         "unknown": "N/D"
       },
+      "sccLabel": "SCC# du satellite",
+      "timeWindowLabel": "Fenêtre temporelle",
+      "timeOptions": {
+        "h1": "1 heure",
+        "h4": "4 heures",
+        "h8": "8 heures",
+        "h24": "24 heures",
+        "h48": "48 heures",
+        "h72": "72 heures"
+      },
       "uLabel": "U (Radial)",
-      "vLabel": "V (In-Track)",
-      "wLabel": "W (Cross-Track)",
-      "drawBox": "Dessiner Boîte",
-      "clearBox": "Effacer Boîte",
+      "vLabel": "V (Le long de la trajectoire)",
+      "wLabel": "W (Transverse)",
+      "screenForDebris": "Rechercher des débris",
+      "drawBox": "Dessiner la boîte",
+      "clearBox": "Effacer la boîte",
+      "table": {
+        "secondary": "Secondaire",
+        "tca": "TCA",
+        "missKm": "Distance (km)",
+        "rKm": "R (km)",
+        "iKm": "I (km)",
+        "cKm": "C (km)",
+        "pc": "Pc",
+        "risk": "Risque"
+      },
       "errorMsgs": {
-        "InvalidSatellite": "Satellite selectionne invalide",
-        "ScreeningFailed": "Analyse echouee",
-        "NoResultsToExport": "Aucun resultat a exporter"
+        "InvalidSatellite": "Satellite sélectionné invalide",
+        "ScreeningFailed": "Échec de l'analyse",
+        "NoResultsToExport": "Aucun résultat à exporter"
+      },
+      "help": {
+        "overview": "La Détection de Débris exécute une évaluation de conjonctions du satellite sélectionné par rapport au reste du catalogue. Elle trouve chaque objet qui entre dans une boîte de criblage définie autour du satellite pendant la fenêtre temporelle choisie, puis classe les rencontres par probabilité de collision.",
+        "imgAlt": "Le menu Détection de Débris avec les options de fenêtre temporelle et de boîte de criblage",
+        "imgCaption": "Définissez la fenêtre temporelle et la boîte de criblage RIC, puis analysez le satellite sélectionné par rapport au catalogue.",
+        "boxHeading": "La boîte de criblage",
+        "box": "Le volume de criblage est défini en coordonnées RIC relatives au satellite : <strong>U (Radial)</strong> correspond aux variations d'altitude orbitale, <strong>V (Le long de la trajectoire)</strong> suit la direction de vol et <strong>W (Transverse)</strong> va de côté à côté. La taille radiale compte le plus : la plupart des rencontres se séparent nettement en altitude, donc un U serré avec des V et W plus larges est le choix habituel. <strong>Dessiner la boîte</strong> affiche le volume autour du satellite dans la vue 3D ; <strong>Effacer la boîte</strong> le supprime.",
+        "resultsHeading": "Lire les résultats",
+        "results": "Chaque ligne du tableau de résultats est une conjonction prévue : <strong>Secondaire</strong> est l'autre objet, <strong>TCA</strong> est l'heure de l'approche au plus près, <strong>Distance (km)</strong> est la distance de passage totale avec ses composantes <strong>R</strong>, <strong>I</strong> et <strong>C</strong>, <strong>Pc</strong> est la probabilité de collision et <strong>Risque</strong> la classe comme Critique, Élevé, Moyen ou Faible. Cliquez sur une ligne pour sélectionner l'objet secondaire et amener l'horloge au TCA ; le menu reste ouvert pour que vous puissiez parcourir les événements. <strong>Exporter CSV</strong> enregistre le tableau.",
+        "howToUse": "<ol><li>Sélectionnez un satellite ; l'icône du bas est désactivée tant qu'aucun n'est sélectionné.</li><li>Ouvrez <strong>Détection de Débris</strong> depuis le menu inférieur. Le numéro SCC du satellite se remplit automatiquement.</li><li>Choisissez une <strong>Fenêtre temporelle</strong> (1 à 72 heures) et ajustez si besoin les tailles de boîte <strong>U</strong>, <strong>V</strong> et <strong>W</strong>.</li><li>Cliquez sur <strong>Rechercher des débris</strong>. Le panneau de résultats s'ouvre avec les conjonctions trouvées, classées pour examen.</li><li>Cliquez sur n'importe quelle ligne pour inspecter cette rencontre à son heure d'approche au plus près.</li></ol>",
+        "tip1": "Des fenêtres plus longues et des boîtes plus grandes trouvent plus de rencontres mais prennent plus de temps à calculer ; commencez avec les valeurs par défaut et n'élargissez que si vous avez besoin de plus de couverture.",
+        "tip2": "Cliquer sur une ligne préserve l'état de lecture : si l'horloge était en pause, elle reste en pause au TCA.",
+        "tip3": "Les niveaux de risque sont des seuils de Pc : au-dessus de 1e-4 c'est Critique, au-dessus de 1e-6 Élevé et au-dessus de 1e-8 Moyen."
       }
     }
   }

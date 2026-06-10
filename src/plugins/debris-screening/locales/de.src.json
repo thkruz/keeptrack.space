@@ -1,9 +1,8 @@
 {
   "plugins": {
     "DebrisScreening": {
-      "bottomIconLabel": "Trummer-Screening",
-      "title": "Trummer-Screening",
-      "helpBody": "Das Trummer-Screening-Tool pruft einen ausgewahlten Satelliten gegen den Katalog, um potenzielle Konjunktionen zu identifizieren. <br><br> Konfigurieren Sie das Bewertungszeitfenster und klicken Sie auf 'Screening fur Trummer', um die Analyse durchzufuhren. Die Ergebnisse werden in einer Tabelle angezeigt: <ul style=\"margin-left: 40px;\"> <li><b>TCA</b> - Zeitpunkt der engsten Annaherung</li> <li><b>Fehlabstand</b> - Gesamt- und RIC-Komponenten</li> <li><b>Pc</b> - Kollisionswahrscheinlichkeit</li> <li><b>Risikostufe</b> - Kritisch/Hoch/Mittel/Niedrig basierend auf Pc</li> </ul>",
+      "bottomIconLabel": "Trümmer-Screening",
+      "title": "Trümmer-Screening",
       "resultsTitle": "Screening-Ergebnisse",
       "resultsCount": "{count} Konjunktionen gefunden",
       "exportCsv": "CSV exportieren",
@@ -14,15 +13,49 @@
         "low": "Niedrig",
         "unknown": "N/V"
       },
+      "sccLabel": "Satelliten-SCC#",
+      "timeWindowLabel": "Zeitfenster",
+      "timeOptions": {
+        "h1": "1 Stunde",
+        "h4": "4 Stunden",
+        "h8": "8 Stunden",
+        "h24": "24 Stunden",
+        "h48": "48 Stunden",
+        "h72": "72 Stunden"
+      },
       "uLabel": "U (Radial)",
-      "vLabel": "V (In-Track)",
-      "wLabel": "W (Cross-Track)",
-      "drawBox": "Box Zeichnen",
-      "clearBox": "Box Löschen",
+      "vLabel": "V (Entlang der Bahn)",
+      "wLabel": "W (Quer zur Bahn)",
+      "screenForDebris": "Auf Trümmer prüfen",
+      "drawBox": "Box zeichnen",
+      "clearBox": "Box löschen",
+      "table": {
+        "secondary": "Sekundärobjekt",
+        "tca": "TCA",
+        "missKm": "Fehlabstand (km)",
+        "rKm": "R (km)",
+        "iKm": "I (km)",
+        "cKm": "C (km)",
+        "pc": "Pc",
+        "risk": "Risiko"
+      },
       "errorMsgs": {
-        "InvalidSatellite": "Ungultiger Satellit ausgewahlt",
+        "InvalidSatellite": "Ungültiger Satellit ausgewählt",
         "ScreeningFailed": "Screening fehlgeschlagen",
         "NoResultsToExport": "Keine Ergebnisse zum Exportieren"
+      },
+      "help": {
+        "overview": "Das Trümmer-Screening führt eine Konjunktionsbewertung des ausgewählten Satelliten gegen den Rest des Katalogs durch. Es findet jedes Objekt, das während des gewählten Zeitfensters in eine um den Satelliten definierte Screening-Box eintritt, und ordnet die Begegnungen nach Kollisionswahrscheinlichkeit.",
+        "imgAlt": "Das Trümmer-Screening-Menü mit Optionen für Zeitfenster und Screening-Box",
+        "imgCaption": "Stellen Sie das Zeitfenster und die RIC-Screening-Box ein und prüfen Sie dann den ausgewählten Satelliten gegen den Katalog.",
+        "boxHeading": "Die Screening-Box",
+        "box": "Das Screening-Volumen wird in RIC-Koordinaten relativ zum Satelliten definiert: <strong>U (Radial)</strong> ist auf und ab in der Bahnhöhe, <strong>V (Entlang der Bahn)</strong> verläuft in Flugrichtung und <strong>W (Quer zur Bahn)</strong> seitlich. Die radiale Größe ist am wichtigsten: Die meisten Begegnungen trennen sich sauber in der Höhe, daher ist ein enges U mit breiterem V und W die übliche Wahl. <strong>Box zeichnen</strong> stellt das Volumen um den Satelliten in der 3D-Ansicht dar; <strong>Box löschen</strong> entfernt es.",
+        "resultsHeading": "Die Ergebnisse lesen",
+        "results": "Jede Zeile der Ergebnistabelle ist eine vorhergesagte Konjunktion: <strong>Sekundärobjekt</strong> ist das andere Objekt, <strong>TCA</strong> der Zeitpunkt der größten Annäherung, <strong>Fehlabstand (km)</strong> der gesamte Fehlabstand mit seinen Komponenten <strong>R</strong>, <strong>I</strong> und <strong>C</strong>, <strong>Pc</strong> die Kollisionswahrscheinlichkeit, und <strong>Risiko</strong> stuft sie als Kritisch, Hoch, Mittel oder Niedrig ein. Klicken Sie auf eine Zeile, um das Sekundärobjekt auszuwählen und die Uhr zum TCA springen zu lassen; das Menü bleibt geöffnet, sodass Sie die Ereignisse durchgehen können. <strong>CSV exportieren</strong> speichert die Tabelle.",
+        "howToUse": "<ol><li>Wählen Sie einen Satelliten aus; das untere Symbol ist deaktiviert, bis einer ausgewählt ist.</li><li>Öffnen Sie <strong>Trümmer-Screening</strong> über das untere Menü. Die SCC-Nummer des Satelliten wird automatisch eingetragen.</li><li>Wählen Sie ein <strong>Zeitfenster</strong> (1 bis 72 Stunden) und passen Sie bei Bedarf die Boxgrößen <strong>U</strong>, <strong>V</strong> und <strong>W</strong> an.</li><li>Klicken Sie auf <strong>Auf Trümmer prüfen</strong>. Das Ergebnisfenster öffnet sich mit den gefundenen Konjunktionen, sortiert zur Durchsicht.</li><li>Klicken Sie auf eine beliebige Zeile, um die Begegnung zum Zeitpunkt der größten Annäherung zu untersuchen.</li></ol>",
+        "tip1": "Längere Fenster und größere Boxen finden mehr Begegnungen, brauchen aber mehr Rechenzeit; beginnen Sie mit den Standardwerten und erweitern Sie nur bei Bedarf.",
+        "tip2": "Ein Klick auf eine Zeile erhält den Wiedergabezustand: War die Uhr pausiert, bleibt sie am TCA pausiert.",
+        "tip3": "Risikostufen sind Schwellenwerte für Pc: über 1e-4 ist Kritisch, über 1e-6 Hoch und über 1e-8 Mittel."
       }
     }
   }

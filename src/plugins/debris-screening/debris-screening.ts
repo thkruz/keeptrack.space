@@ -15,6 +15,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
+import { t7e } from '@app/locales/keys';
 import {
   CatalogObject,
   CatalogScreener,
@@ -39,6 +40,9 @@ interface RiskLevel {
   label: string;
   className: string;
 }
+
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.DebrisScreening.${key}` as Parameters<typeof t7e>[0]);
 
 export class DebrisScreening extends KeepTrackPlugin {
   readonly id = 'DebrisScreening';
@@ -67,7 +71,7 @@ export class DebrisScreening extends KeepTrackPlugin {
   getBottomIconConfig(): IBottomIconConfig {
     return {
       elementName: 'debris-screening-bottom-icon',
-      label: 'Debris Screening',
+      label: l('bottomIconLabel'),
       image: frameInspectPng,
       menuMode: [MenuMode.EVENTS, MenuMode.ALL],
       isDisabledOnLoad: true,
@@ -95,7 +99,7 @@ export class DebrisScreening extends KeepTrackPlugin {
   getSideMenuConfig(): ISideMenuConfig {
     return {
       elementName: this.sideMenuName_,
-      title: 'Debris Screening',
+      title: l('title'),
       html: this.buildSideMenuHtml_(),
       dragOptions: {
         isDraggable: true,
@@ -112,18 +116,18 @@ export class DebrisScreening extends KeepTrackPlugin {
       <form id="${this.sideMenuName_}-form">
         <div class="input-field col s12">
           <input disabled value="00005" id="${this.formPrefix_}-scc" type="text" />
-          <label for="disabled" class="active">Satellite SCC#</label>
+          <label for="disabled" class="active">${l('sccLabel')}</label>
         </div>
         <div class="input-field col s12">
           <select id="${this.formPrefix_}-time">
-            <option value="1" selected>1 Hour</option>
-            <option value="4">4 Hours</option>
-            <option value="8">8 Hours</option>
-            <option value="24">24 Hours</option>
-            <option value="48">48 Hours</option>
-            <option value="72">72 Hours</option>
+            <option value="1" selected>${l('timeOptions.h1')}</option>
+            <option value="4">${l('timeOptions.h4')}</option>
+            <option value="8">${l('timeOptions.h8')}</option>
+            <option value="24">${l('timeOptions.h24')}</option>
+            <option value="48">${l('timeOptions.h48')}</option>
+            <option value="72">${l('timeOptions.h72')}</option>
           </select>
-          <label>Time Window</label>
+          <label>${l('timeWindowLabel')}</label>
         </div>
         <div class="input-field col s12">
           <select id="${this.formPrefix_}-u">
@@ -133,7 +137,7 @@ export class DebrisScreening extends KeepTrackPlugin {
             <option value="5">5 km</option>
             <option value="10">10 km</option>
           </select>
-          <label>U (Radial)</label>
+          <label>${l('uLabel')}</label>
         </div>
         <div class="input-field col s12">
           <select id="${this.formPrefix_}-v">
@@ -142,7 +146,7 @@ export class DebrisScreening extends KeepTrackPlugin {
             <option value="50">50 km</option>
             <option value="100">100 km</option>
           </select>
-          <label>V (In-track)</label>
+          <label>${l('vLabel')}</label>
         </div>
         <div class="input-field col s12">
           <select id="${this.formPrefix_}-w">
@@ -151,15 +155,15 @@ export class DebrisScreening extends KeepTrackPlugin {
             <option value="50">50 km</option>
             <option value="100">100 km</option>
           </select>
-          <label>W (Cross-track)</label>
+          <label>${l('wLabel')}</label>
         </div>
         <div id="${this.formPrefix_}-buttons" class="row center-align">
-          <button class="btn btn-ui waves-effect waves-light" type="submit" name="action">Screen for Debris &#9658;</button>
+          <button class="btn btn-ui waves-effect waves-light" type="submit" name="action">${l('screenForDebris')} &#9658;</button>
           <button id="${this.formPrefix_}-draw-box" class="btn btn-ui waves-effect waves-light" type="button">
-            Draw Box
+            ${l('drawBox')}
           </button>
           <button id="${this.formPrefix_}-clear-box" class="btn btn-ui waves-effect waves-light" type="button">
-            Clear Box
+            ${l('clearBox')}
           </button>
         </div>
       </form>
@@ -188,11 +192,11 @@ export class DebrisScreening extends KeepTrackPlugin {
       <div class="debris-screening-results">
         <div class="row ds-header-row">
           <div class="col s6">
-            <span id="${this.formPrefix_}-results-count" class="ds-results-count">0 conjunctions found</span>
+            <span id="${this.formPrefix_}-results-count" class="ds-results-count">${l('resultsCount').replace('{count}', '0')}</span>
           </div>
           <div class="col s6 right-align">
             <button id="${this.secondaryMenuName_}-export" class="btn btn-ui waves-effect waves-light btn-small">
-              <i class="material-icons left">file_download</i>Export CSV
+              <i class="material-icons left">file_download</i>${l('exportCsv')}
             </button>
           </div>
         </div>
@@ -200,14 +204,14 @@ export class DebrisScreening extends KeepTrackPlugin {
           <table id="${this.formPrefix_}-results-table" class="striped highlight">
             <thead>
               <tr>
-                <th>Secondary</th>
-                <th>TCA</th>
-                <th>Miss (km)</th>
-                <th>R (km)</th>
-                <th>I (km)</th>
-                <th>C (km)</th>
-                <th>Pc</th>
-                <th>Risk</th>
+                <th>${l('table.secondary')}</th>
+                <th>${l('table.tca')}</th>
+                <th>${l('table.missKm')}</th>
+                <th>${l('table.rKm')}</th>
+                <th>${l('table.iKm')}</th>
+                <th>${l('table.cKm')}</th>
+                <th>${l('table.pc')}</th>
+                <th>${l('table.risk')}</th>
               </tr>
             </thead>
             <tbody id="${this.formPrefix_}-results-body">
@@ -220,19 +224,31 @@ export class DebrisScreening extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: 'Debris Screening',
-      body: html`
-        The Debris Screening tool screens a selected satellite against the catalog to identify potential conjunctions.
-        <br /><br />
-        Configure the assessment time window and click 'Screen for Debris' to run the analysis. Results will be displayed in a table showing:
-        <ul style="margin-left: 40px;">
-          <li><b>TCA</b> - Time of Closest Approach</li>
-          <li><b>Miss Distance</b> - Total and RIC components (Radial, In-track, Cross-track)</li>
-          <li><b>Pc</b> - Probability of Collision</li>
-          <li><b>Risk Level</b> - Critical/High/Medium/Low based on Pc</li>
-        </ul>
-        Click on any row to select the secondary satellite and jump to the TCA time. Export results to CSV using the download button.
-      `,
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/debris-screening/debris-screening-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: l('help.boxHeading'),
+          content: l('help.box'),
+        },
+        {
+          heading: l('help.resultsHeading'),
+          content: l('help.results'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2'), l('help.tip3')],
     };
   }
 
@@ -302,7 +318,7 @@ export class DebrisScreening extends KeepTrackPlugin {
       // OemSatellite passes isSatellite() but has no tle1/tle2/apogee/perigee
       // — toTle() and the orbital-shell filter below would both throw.
       if (!(sat instanceof Satellite)) {
-        errorManagerInstance.warn('Invalid satellite selected');
+        errorManagerInstance.warn(l('errorMsgs.InvalidSatellite'));
 
         return;
       }
@@ -374,7 +390,7 @@ export class DebrisScreening extends KeepTrackPlugin {
         this.displayResults_();
         this.openSecondaryMenu();
       } catch (error) {
-        errorManagerInstance.warn(`Screening failed: ${error}`);
+        errorManagerInstance.warn(`${l('errorMsgs.ScreeningFailed')}: ${error}`);
       }
     }, 500);
   }
@@ -400,7 +416,7 @@ export class DebrisScreening extends KeepTrackPlugin {
 
   onDownload(): void {
     if (this.screeningResults_.length === 0) {
-      errorManagerInstance.info('No results to export');
+      errorManagerInstance.info(l('errorMsgs.NoResultsToExport'));
 
       return;
     }
@@ -456,7 +472,7 @@ export class DebrisScreening extends KeepTrackPlugin {
     }
 
     tbody.innerHTML = '';
-    countEl.textContent = `${this.screeningResults_.length} conjunctions found`;
+    countEl.textContent = l('resultsCount').replace('{count}', this.screeningResults_.length.toString());
 
     this.screeningResults_.forEach((result) => {
       const event = result.event;
@@ -484,20 +500,20 @@ export class DebrisScreening extends KeepTrackPlugin {
 
   protected getRiskLevel_(pc?: number): RiskLevel {
     if (typeof pc !== 'number') {
-      return { label: 'N/A', className: 'risk-unknown' };
+      return { label: l('riskLevels.unknown'), className: 'risk-unknown' };
     }
 
     if (pc > 1e-4) {
-      return { label: 'Critical', className: 'risk-critical' };
+      return { label: l('riskLevels.critical'), className: 'risk-critical' };
     }
     if (pc > 1e-6) {
-      return { label: 'High', className: 'risk-high' };
+      return { label: l('riskLevels.high'), className: 'risk-high' };
     }
     if (pc > 1e-8) {
-      return { label: 'Medium', className: 'risk-medium' };
+      return { label: l('riskLevels.medium'), className: 'risk-medium' };
     }
 
-    return { label: 'Low', className: 'risk-low' };
+    return { label: l('riskLevels.low'), className: 'risk-low' };
   }
 
   protected formatTca_(tca: EpochUTC): string {

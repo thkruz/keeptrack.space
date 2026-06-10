@@ -3,7 +3,46 @@
     "ReportsPlugin": {
       "bottomIconLabel": "Berichte",
       "title": "Berichte-Menü",
-      "helpBody": "Das Berichte-Menü ist eine Sammlung von Werkzeugen, die Ihnen helfen, die angezeigten Daten zu analysieren und zu verstehen."
+      "reports": {
+        "aer": {
+          "name": "Azimut, Elevation, Entfernung",
+          "description": "Erzeugt Azimut-, Elevations- und Entfernungsdaten für Satellitenüberflüge"
+        },
+        "lla": {
+          "name": "Breite, Länge, Höhe",
+          "description": "Erzeugt Daten zu Breite, Länge und Höhe über die Zeit"
+        },
+        "eci": {
+          "name": "Erdzentriert-inertial (ECI)",
+          "description": "Erzeugt ECI-Positions- und Geschwindigkeitsvektoren über die Zeit"
+        },
+        "coes": {
+          "name": "Klassische Bahnelemente",
+          "description": "Erzeugt klassische Bahnelemente zur aktuellen Epoche"
+        },
+        "visibilityWindows": {
+          "name": "Sichtbarkeitsfenster",
+          "description": "Erzeugt Sichtbarkeitsfenster mit Auf-/Untergangszeiten und Überflugdauer"
+        },
+        "sunEclipse": {
+          "name": "Sonnen-/Eklipsen-Analyse",
+          "description": "Erzeugt Sonnensichtbarkeit sowie Ein-/Austrittszeiten der Eklipse für Energie- und Thermalanalysen"
+        }
+      },
+      "commands": {
+        "generateReport": "Bericht {name} erstellen",
+        "open": "Berichte öffnen"
+      },
+      "help": {
+        "overview": "Das Berichte-Menü erzeugt Textberichte über den ausgewählten Satelliten: Überfluggeometrie, Position über die Zeit, Bahnelemente, Sichtbarkeitsfenster und Eklipsen-Analyse. Jeder Bericht öffnet sich in einem eigenen Fenster, sauber formatiert mit einer Download-Schaltfläche, bereit zum Einfügen in andere Werkzeuge oder zum Teilen.",
+        "imgAlt": "Das Berichte-Menü mit den verfügbaren Berichtstypen",
+        "imgCaption": "Jede Schaltfläche erzeugt einen formatierten Textbericht für den ausgewählten Satelliten.",
+        "typesHeading": "Verfügbare Berichte",
+        "types": "<ul><li><strong>Azimut, Elevation, Entfernung</strong>: Blickwinkel vom ausgewählten Sensor über die kommenden Überflüge (benötigt einen Sensor).</li><li><strong>Breite, Länge, Höhe</strong>: die Bodenspur über die Zeit.</li><li><strong>Erdzentriert-inertial (ECI)</strong>: ECI-Positions- und Geschwindigkeitsvektoren über die Zeit.</li><li><strong>Klassische Bahnelemente</strong>: die keplerschen Elemente zur aktuellen Epoche.</li><li><strong>Sichtbarkeitsfenster</strong>: Auf- und Untergangszeiten mit Überflugdauern (benötigt einen Sensor).</li><li><strong>Sonnen-/Eklipsen-Analyse</strong>: Sonnenschein- sowie Ein- und Austrittszeiten der Eklipse, nützlich für Energie- und Thermalarbeiten.</li></ul>",
+        "howToUse": "<ol><li>Wählen Sie einen Satelliten aus; das untere Symbol ist deaktiviert, bis einer ausgewählt ist.</li><li>Für sensorbasierte Berichte wählen Sie zusätzlich einen Sensor aus.</li><li>Öffnen Sie <strong>Berichte</strong> über die untere Leiste und klicken Sie auf eine Berichtsschaltfläche. Der Bericht öffnet sich in einem Popup-Fenster.</li><li>Verwenden Sie die Download-Schaltfläche im Berichtsfenster, um ihn als Textdatei zu speichern.</li></ol>",
+        "tip1": "Berichte decken mehrere Tage an Daten ab; bei den überflugbasierten Berichten kann die Erstellung einige Sekunden dauern.",
+        "tip2": "Wenn das Berichtsfenster nicht erscheint, ist meist der Popup-Blocker Ihres Browsers schuld; erlauben Sie Popups für diese Seite."
+      }
     }
   }
 }

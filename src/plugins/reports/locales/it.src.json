@@ -3,7 +3,46 @@
     "ReportsPlugin": {
       "bottomIconLabel": "Rapporti",
       "title": "Menu rapporti",
-      "helpBody": "Il menu Rapporti è una raccolta di strumenti per aiutarti ad analizzare e comprendere i dati che stai visualizzando."
+      "reports": {
+        "aer": {
+          "name": "Azimut, elevazione, distanza",
+          "description": "Genera dati di azimut, elevazione e distanza per i passaggi del satellite"
+        },
+        "lla": {
+          "name": "Latitudine, longitudine, altitudine",
+          "description": "Genera dati di latitudine, longitudine e altitudine nel tempo"
+        },
+        "eci": {
+          "name": "Inerziale geocentrico (ECI)",
+          "description": "Genera vettori di posizione e velocità ECI nel tempo"
+        },
+        "coes": {
+          "name": "Elementi orbitali classici",
+          "description": "Genera gli elementi orbitali classici all'epoca corrente"
+        },
+        "visibilityWindows": {
+          "name": "Finestre di visibilità",
+          "description": "Genera finestre di visibilità con orari di sorgere/tramonto e durata dei passaggi"
+        },
+        "sunEclipse": {
+          "name": "Analisi Sole/eclissi",
+          "description": "Genera la visibilità del sole e gli orari di ingresso/uscita dall'eclissi per analisi di potenza e termiche"
+        }
+      },
+      "commands": {
+        "generateReport": "Genera rapporto {name}",
+        "open": "Apri rapporti"
+      },
+      "help": {
+        "overview": "Il menu Rapporti genera rapporti testuali sul satellite selezionato: geometria dei passaggi, posizione nel tempo, elementi orbitali, finestre di visibilità e analisi delle eclissi. Ogni rapporto si apre in una finestra dedicata, formattato in modo ordinato con un pulsante di download, pronto da incollare in altri strumenti o da condividere.",
+        "imgAlt": "Il menu Rapporti con l'elenco dei tipi di rapporto disponibili",
+        "imgCaption": "Ogni pulsante genera un rapporto testuale formattato per il satellite selezionato.",
+        "typesHeading": "Rapporti disponibili",
+        "types": "<ul><li><strong>Azimut, elevazione, distanza</strong>: angoli di osservazione dal sensore selezionato durante i prossimi passaggi (richiede un sensore).</li><li><strong>Latitudine, longitudine, altitudine</strong>: la traccia al suolo nel tempo.</li><li><strong>Inerziale geocentrico (ECI)</strong>: vettori di posizione e velocità ECI nel tempo.</li><li><strong>Elementi orbitali classici</strong>: gli elementi kepleriani all'epoca corrente.</li><li><strong>Finestre di visibilità</strong>: orari di sorgere e tramonto con la durata dei passaggi (richiede un sensore).</li><li><strong>Analisi Sole/eclissi</strong>: orari di illuminazione solare e di ingresso e uscita dall'eclissi, utili per i lavori di potenza e termici.</li></ul>",
+        "howToUse": "<ol><li>Seleziona un satellite; l'icona in basso è disabilitata finché non ne viene selezionato uno.</li><li>Per i rapporti basati sul sensore, seleziona anche un sensore.</li><li>Apri <strong>Rapporti</strong> dalla barra inferiore e fai clic sul pulsante di un rapporto. Il rapporto si apre in una finestra popup.</li><li>Usa il pulsante di download nella finestra del rapporto per salvarlo come file di testo.</li></ol>",
+        "tip1": "I rapporti coprono diversi giorni di dati; la generazione può richiedere alcuni secondi per i rapporti basati sui passaggi.",
+        "tip2": "Se la finestra del rapporto non appare, il solito colpevole è il blocco popup del browser; consenti i popup per questo sito."
+      }
     }
   }
 }

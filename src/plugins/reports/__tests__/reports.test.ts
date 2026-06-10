@@ -46,7 +46,7 @@ describe('ReportsPlugin_class', () => {
       const helpConfig = plugin.getHelpConfig();
 
       expect(helpConfig.title).toBeDefined();
-      expect(helpConfig.body).toBeDefined();
+      expect(helpConfig.sections!.length).toBeGreaterThan(0);
     });
 
     it('should return command palette commands for all reports', () => {

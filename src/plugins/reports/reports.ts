@@ -44,6 +44,10 @@ import {
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { Kilometers, MILLISECONDS_PER_SECOND, Satellite, TemeVec3 } from '@ootk/src/main';
+
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.ReportsPlugin.${key}` as Parameters<typeof t7e>[0]);
+
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -178,7 +182,26 @@ export class ReportsPlugin extends KeepTrackPlugin {
   getHelpConfig(): IHelpConfig {
     return {
       title: t7e('plugins.ReportsPlugin.title'),
-      body: t7e('plugins.ReportsPlugin.helpBody'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/reports/reports-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: l('help.typesHeading'),
+          content: l('help.types'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2')],
     };
   }
 
@@ -187,7 +210,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
     const reportCommands: ICommandPaletteCommand[] = ReportsPlugin.getRegisteredReports().map((report) => ({
       id: `ReportsPlugin.${report.id}`,
-      label: `Generate ${report.name} Report`,
+      label: l('commands.generateReport').replace('{name}', report.name),
       category,
       callback: () => this.generateReport_(report),
       isAvailable: () => {
@@ -209,7 +232,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     return [
       {
         id: 'ReportsPlugin.open',
-        label: 'Open Reports',
+        label: l('commands.open'),
         category,
         callback: () => this.bottomMenuClicked(),
         isAvailable: () => !!this.selectSatManager_?.primarySatObj?.isSatellite?.(),
@@ -297,8 +320,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
     // Azimuth Elevation Range Report
     ReportsPlugin.registerReport({
       id: 'aer-report',
-      name: 'Azimuth Elevation Range',
-      description: 'Generate azimuth, elevation, and range data for satellite passes',
+      name: l('reports.aer.name'),
+      description: l('reports.aer.description'),
       requiresSensor: true,
       generate: (sat: Satellite, sensor: DetailedSensor | null, startTime: Date): ReportData => {
         if (!sensor) {
@@ -343,8 +366,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
     // Latitude Longitude Altitude Report
     ReportsPlugin.registerReport({
       id: 'lla-report',
-      name: 'Latitude Longitude Altitude',
-      description: 'Generate latitude, longitude, and altitude data over time',
+      name: l('reports.lla.name'),
+      description: l('reports.lla.description'),
       requiresSensor: false,
       generate: (sat: Satellite, _sensor: DetailedSensor | null, startTime: Date): ReportData => {
         const header = `Latitude Longitude Altitude Report\n-------------------------------\n${this.createHeader_(sat)}`;
@@ -374,8 +397,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
     // Earth Centered Inertial Report
     ReportsPlugin.registerReport({
       id: 'eci-report',
-      name: 'Earth Centered Inertial',
-      description: 'Generate ECI position and velocity vectors over time',
+      name: l('reports.eci.name'),
+      description: l('reports.eci.description'),
       requiresSensor: false,
       generate: (sat: Satellite, _sensor: DetailedSensor | null, startTime: Date): ReportData => {
         const header = `Earth Centered Inertial Report\n-------------------------------\n${this.createHeader_(sat)}`;
@@ -408,8 +431,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
     // Classical Orbital Elements Report
     ReportsPlugin.registerReport({
       id: 'coes-report',
-      name: 'Classical Orbital Elements',
-      description: 'Generate classical orbital elements at current epoch',
+      name: l('reports.coes.name'),
+      description: l('reports.coes.description'),
       requiresSensor: false,
       generate: (sat: Satellite): ReportData => {
         const header = `Classic Orbit Elements Report\n-------------------------------\n${this.createHeader_(sat)}`;
@@ -440,8 +463,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
     // Visibility Windows Report
     ReportsPlugin.registerReport({
       id: 'visibility-windows-report',
-      name: 'Visibility Windows',
-      description: 'Generate visibility windows with rise/set times and pass duration',
+      name: l('reports.visibilityWindows.name'),
+      description: l('reports.visibilityWindows.description'),
       requiresSensor: true,
       generate: (sat: Satellite, sensor: DetailedSensor | null, startTime: Date): ReportData => {
         if (!sensor) {
@@ -511,8 +534,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
     // Sun/Eclipse Report
     ReportsPlugin.registerReport({
       id: 'sun-eclipse-report',
-      name: 'Sun/Eclipse Analysis',
-      description: 'Generate sun visibility and eclipse entry/exit times for power and thermal analysis',
+      name: l('reports.sunEclipse.name'),
+      description: l('reports.sunEclipse.description'),
       requiresSensor: false,
       generate: (sat: Satellite, _sensor: DetailedSensor | null, startTime: Date): ReportData => {
         const header = `Sun/Eclipse Analysis Report\n-------------------------------\n${this.createHeader_(sat)}`;

@@ -3,15 +3,57 @@
     "PlanetsMenuPlugin": {
       "bottomIconLabel": "Planety",
       "title": "Menu seznamu planet",
-      "helpBody": "Toto menu umožňuje vybrat a zobrazit různé planety v simulaci.",
       "sections": {
         "planets": "Planety",
         "dwarfPlanets": "Trpasličí planety",
         "otherCelestialBodies": "Ostatní nebeská tělesa"
       },
+      "bodies": {
+        "Mercury": "Merkur",
+        "Venus": "Venuše",
+        "Earth": "Země",
+        "Mars": "Mars",
+        "Jupiter": "Jupiter",
+        "Saturn": "Saturn",
+        "Uranus": "Uran",
+        "Neptune": "Neptun",
+        "Pluto": "Pluto",
+        "Makemake": "Makemake",
+        "Eris": "Eris",
+        "Haumea": "Haumea",
+        "Ceres": "Ceres",
+        "Sedna": "Sedna",
+        "Quaoar": "Quaoar",
+        "Orcus": "Orcus",
+        "Gonggong": "Gonggong",
+        "Charon": "Charon",
+        "Moon": "Měsíc",
+        "Sun": "Slunce",
+        "Io": "Io",
+        "Europa": "Europa",
+        "Ganymede": "Ganymed",
+        "Callisto": "Callisto",
+        "Titan": "Titan",
+        "Rhea": "Rhea",
+        "Iapetus": "Iapetus",
+        "Dione": "Dione",
+        "Tethys": "Tethys",
+        "Enceladus": "Enceladus"
+      },
       "tooltips": {
         "centerCamera": "Zaměřit kameru na {body}.",
         "plannedFuture": "Plánováno pro budoucí aktualizaci."
+      },
+      "help": {
+        "overview": "Nabídka Planety promění KeepTrack v prohlížeč sluneční soustavy: vyberte libovolnou planetu, trpasličí planetu, Měsíc nebo Slunce a kamera se na ně vystředí. Je to nejrychlejší způsob, jak studovat cislunární geometrii a geometrii hlubokého vesmíru vedle katalogu objektů na oběžné dráze Země.",
+        "imgAlt": "Nabídka seznamu planet s planetami, trpasličími planetami a dalšími tělesy",
+        "imgCaption": "Kliknutím na libovolné těleso na ně vystředíte kameru.",
+        "howToUse": "<ol><li>Otevřete nabídku <strong>Planety</strong> ze spodní lišty nebo stiskněte <strong>P</strong>.</li><li>Klikněte na těleso, například <strong>Mars</strong> nebo <strong>Měsíc</strong>. Kamera se na ně vystředí a limity přiblížení se přizpůsobí novému měřítku.</li><li>Stisknutím <strong>Home</strong> se vrátíte k Zemi, nebo <strong>Shift</strong>+<strong>Home</strong> vystředíte Zemi v záběru.</li></ol>",
+        "tip1": "Několik měsíců (Io, Europa, Titan a další) je v seznamu, ale jsou zašedlé; jsou plánovány pro budoucí aktualizaci.",
+        "tip2": "Můžete také kliknout pravým tlačítkem do prázdného prostoru a vybrat těleso z kontextové nabídky.",
+        "shortcutToggle": "Přepnout nabídku Planety",
+        "shortcutHome": "Nastavit Zemi jako centrální těleso",
+        "shortcutCenterEarth": "Vystředit kameru na Zemi"
       }
     }
   }

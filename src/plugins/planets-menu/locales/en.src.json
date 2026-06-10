@@ -3,15 +3,57 @@
     "PlanetsMenuPlugin": {
       "bottomIconLabel": "Planets",
       "title": "Planets List Menu",
-      "helpBody": "This menu allows you to select and view different planets in the simulation.",
       "sections": {
         "planets": "Planets",
         "dwarfPlanets": "Dwarf Planets",
         "otherCelestialBodies": "Other Celestial Bodies"
       },
+      "bodies": {
+        "Mercury": "Mercury",
+        "Venus": "Venus",
+        "Earth": "Earth",
+        "Mars": "Mars",
+        "Jupiter": "Jupiter",
+        "Saturn": "Saturn",
+        "Uranus": "Uranus",
+        "Neptune": "Neptune",
+        "Pluto": "Pluto",
+        "Makemake": "Makemake",
+        "Eris": "Eris",
+        "Haumea": "Haumea",
+        "Ceres": "Ceres",
+        "Sedna": "Sedna",
+        "Quaoar": "Quaoar",
+        "Orcus": "Orcus",
+        "Gonggong": "Gonggong",
+        "Charon": "Charon",
+        "Moon": "Moon",
+        "Sun": "Sun",
+        "Io": "Io",
+        "Europa": "Europa",
+        "Ganymede": "Ganymede",
+        "Callisto": "Callisto",
+        "Titan": "Titan",
+        "Rhea": "Rhea",
+        "Iapetus": "Iapetus",
+        "Dione": "Dione",
+        "Tethys": "Tethys",
+        "Enceladus": "Enceladus"
+      },
       "tooltips": {
         "centerCamera": "Center the camera on {body}.",
         "plannedFuture": "Planned for future update."
+      },
+      "help": {
+        "overview": "The Planets menu turns KeepTrack into a solar system viewer: select any planet, dwarf planet, the Moon, or the Sun to center the camera on it. It is the quickest way to study cislunar and deep space geometry alongside the Earth orbiting catalog.",
+        "imgAlt": "The Planets List menu with planets, dwarf planets, and other bodies",
+        "imgCaption": "Click any body to center the camera on it.",
+        "howToUse": "<ol><li>Open the <strong>Planets</strong> menu from the bottom bar or press <strong>P</strong>.</li><li>Click a body, for example <strong>Mars</strong> or <strong>Moon</strong>. The camera recenters on it and zoom limits adjust to the new scale.</li><li>Press <strong>Home</strong> to return to Earth, or <strong>Shift</strong>+<strong>Home</strong> to recenter Earth in view.</li></ol>",
+        "tip1": "Several moons (Io, Europa, Titan, and others) are listed but grayed out; they are planned for a future update.",
+        "tip2": "You can also right-click empty space and choose a body from the context menu.",
+        "shortcutToggle": "Toggle the Planets menu",
+        "shortcutHome": "Set Earth as the center body",
+        "shortcutCenterEarth": "Center the camera on Earth"
       }
     }
   }

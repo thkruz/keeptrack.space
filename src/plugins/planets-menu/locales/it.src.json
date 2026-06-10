@@ -3,15 +3,57 @@
     "PlanetsMenuPlugin": {
       "bottomIconLabel": "Pianeti",
       "title": "Menu elenco pianeti",
-      "helpBody": "Questo menu consente di selezionare e visualizzare diversi pianeti nella simulazione.",
       "sections": {
         "planets": "Pianeti",
         "dwarfPlanets": "Pianeti nani",
         "otherCelestialBodies": "Altri corpi celesti"
       },
+      "bodies": {
+        "Mercury": "Mercurio",
+        "Venus": "Venere",
+        "Earth": "Terra",
+        "Mars": "Marte",
+        "Jupiter": "Giove",
+        "Saturn": "Saturno",
+        "Uranus": "Urano",
+        "Neptune": "Nettuno",
+        "Pluto": "Plutone",
+        "Makemake": "Makemake",
+        "Eris": "Eris",
+        "Haumea": "Haumea",
+        "Ceres": "Cerere",
+        "Sedna": "Sedna",
+        "Quaoar": "Quaoar",
+        "Orcus": "Orcus",
+        "Gonggong": "Gonggong",
+        "Charon": "Caronte",
+        "Moon": "Luna",
+        "Sun": "Sole",
+        "Io": "Io",
+        "Europa": "Europa",
+        "Ganymede": "Ganimede",
+        "Callisto": "Callisto",
+        "Titan": "Titano",
+        "Rhea": "Rea",
+        "Iapetus": "Giapeto",
+        "Dione": "Dione",
+        "Tethys": "Teti",
+        "Enceladus": "Encelado"
+      },
       "tooltips": {
         "centerCamera": "Centra la fotocamera su {body}.",
         "plannedFuture": "Previsto per un aggiornamento futuro."
+      },
+      "help": {
+        "overview": "Il menu Pianeti trasforma KeepTrack in un visualizzatore del sistema solare: seleziona un pianeta, un pianeta nano, la Luna o il Sole per centrare la fotocamera su di esso. È il modo più rapido per studiare la geometria cislunare e dello spazio profondo accanto al catalogo degli oggetti in orbita terrestre.",
+        "imgAlt": "Il menu elenco pianeti con pianeti, pianeti nani e altri corpi",
+        "imgCaption": "Fai clic su un corpo qualsiasi per centrare la fotocamera su di esso.",
+        "howToUse": "<ol><li>Apri il menu <strong>Pianeti</strong> dalla barra inferiore oppure premi <strong>P</strong>.</li><li>Fai clic su un corpo, ad esempio <strong>Marte</strong> o <strong>Luna</strong>. La fotocamera si ricentra su di esso e i limiti dello zoom si adattano alla nuova scala.</li><li>Premi <strong>Home</strong> per tornare alla Terra, oppure <strong>Shift</strong>+<strong>Home</strong> per ricentrare la Terra nella vista.</li></ol>",
+        "tip1": "Diverse lune (Io, Europa, Titano e altre) sono elencate ma disattivate; sono previste per un aggiornamento futuro.",
+        "tip2": "Puoi anche fare clic destro nello spazio vuoto e scegliere un corpo dal menu contestuale.",
+        "shortcutToggle": "Attiva/disattiva il menu Pianeti",
+        "shortcutHome": "Imposta la Terra come corpo centrale",
+        "shortcutCenterEarth": "Centra la fotocamera sulla Terra"
       }
     }
   }

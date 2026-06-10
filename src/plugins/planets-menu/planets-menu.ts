@@ -61,8 +61,33 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
   getHelpConfig(): IHelpConfig {
     return {
       title: t7e('plugins.PlanetsMenuPlugin.title'),
-      body: t7e('plugins.PlanetsMenuPlugin.helpBody'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: this.t_('help.overview'),
+          image: {
+            src: 'img/help/planets-menu/planets-menu.png',
+            alt: this.t_('help.imgAlt'),
+            caption: this.t_('help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: this.t_('help.howToUse'),
+        },
+      ],
+      tips: [this.t_('help.tip1'), this.t_('help.tip2')],
+      shortcuts: [
+        { keys: ['P'], description: this.t_('help.shortcutToggle') },
+        { keys: ['Home'], description: this.t_('help.shortcutHome') },
+        { keys: ['Shift', 'Home'], description: this.t_('help.shortcutCenterEarth') },
+      ],
     };
+  }
+
+  /** Translated display name for a solar body. */
+  private bodyName_(body: string): string {
+    return this.t_(`bodies.${body}`);
   }
 
   getContextMenuConfig(): IContextMenuConfig {
@@ -152,7 +177,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
     `;
 
     for (const object of this.PLANETS) {
-      html_ += `<li class="menu-selectable" kt-tooltip="${centerTooltip(object)}" data-planet="${object}">${object}</li>`;
+      html_ += `<li class="menu-selectable" kt-tooltip="${centerTooltip(this.bodyName_(object))}" data-planet="${object}">${this.bodyName_(object)}</li>`;
     }
 
     html_ += html`
@@ -161,7 +186,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
     `;
 
     for (const object of this.DWARF_PLANETS) {
-      html_ += `<li class="menu-selectable" kt-tooltip="${centerTooltip(object)}" data-planet="${object}">${object}</li>`;
+      html_ += `<li class="menu-selectable" kt-tooltip="${centerTooltip(this.bodyName_(object))}" data-planet="${object}">${this.bodyName_(object)}</li>`;
     }
 
     html_ += html`
@@ -173,9 +198,9 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
       const isDisabled = ['Io', 'Europa', 'Ganymede', 'Callisto', 'Titan', 'Rhea', 'Iapetus', 'Dione', 'Tethys', 'Enceladus'].includes(object);
 
       if (isDisabled) {
-        html_ += `<li class="planets-menu-disabled" kt-tooltip="${this.t_('tooltips.plannedFuture')}" aria-disabled="true" disabled>${object}</li>`;
+        html_ += `<li class="planets-menu-disabled" kt-tooltip="${this.t_('tooltips.plannedFuture')}" aria-disabled="true" disabled>${this.bodyName_(object)}</li>`;
       } else {
-        html_ += `<li class="menu-selectable" kt-tooltip="${centerTooltip(object)}" data-planet="${object}">${object}</li>`;
+        html_ += `<li class="menu-selectable" kt-tooltip="${centerTooltip(this.bodyName_(object))}" data-planet="${object}">${this.bodyName_(object)}</li>`;
       }
     }
 
@@ -189,9 +214,9 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
     let html_ = '';
 
     for (const planet of this.PLANETS) {
-      html_ += `<li id="planets-${planet}-rmb"><a href="#">${planet}</a></li>`;
+      html_ += `<li id="planets-${planet}-rmb"><a href="#">${this.bodyName_(planet)}</a></li>`;
       if (planet === SolarBody.Earth) {
-        html_ += `<li id="planets-${SolarBody.Moon}-rmb"><a href="#">Moon</a></li>`;
+        html_ += `<li id="planets-${SolarBody.Moon}-rmb"><a href="#">${this.bodyName_(SolarBody.Moon)}</a></li>`;
       }
     }
 

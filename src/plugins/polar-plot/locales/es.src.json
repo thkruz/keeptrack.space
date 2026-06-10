@@ -3,7 +3,25 @@
     "PolarPlotPlugin": {
       "bottomIconLabel": "Gráfico Polar",
       "title": "Menú de Gráfico Polar",
-      "helpBody": "El Menú de Gráfico Polar se usa para generar un gráfico polar 2D del azimut y elevación del satélite a lo largo del tiempo."
+      "labels": {
+        "notInView": "El satélite no estará visible durante las próximas {hours} horas",
+        "saveImage": "Guardar Imagen",
+        "satellite": "Satélite {sccNum}",
+        "unknownSensor": "Sensor desconocido",
+        "unknownStartTime": "Hora de inicio desconocida",
+        "unknownStopTime": "Hora de fin desconocida"
+      },
+      "help": {
+        "overview": "El Gráfico Polar dibuja el próximo pase del satélite seleccionado sobre el sensor seleccionado como una carta celeste clásica de azimut y elevación: el norte arriba, el horizonte en el anillo exterior y el cenit en el centro. Es la carta que un observador u operador usa para saber hacia dónde mirar en el cielo.",
+        "imgAlt": "Una carta celeste polar que muestra la trayectoria del pase de un satélite",
+        "imgCaption": "El pase comienza en el punto verde y termina en el punto rojo; los anillos marcan la elevación.",
+        "readingHeading": "Cómo leer el gráfico",
+        "reading": "La trayectoria comienza en un punto verde (salida) y termina en un punto rojo (puesta). Los anillos concéntricos marcan la elevación cada 15 grados desde el horizonte (borde exterior) hasta el cenit (centro), y las direcciones de la brújula recorren el borde. El encabezado muestra el sensor, el número del satélite y las horas de inicio y fin del pase en UTC.",
+        "howToUse": "<ol><li>Seleccione un sensor y un satélite; el icono inferior permanece desactivado hasta que ambos estén seleccionados.</li><li>Abra el <strong>Gráfico Polar</strong> desde la barra inferior. El próximo pase dentro de tres días se calcula y dibuja automáticamente.</li><li>Haga clic en <strong>Guardar Imagen</strong> para descargar el gráfico como archivo PNG.</li></ol>",
+        "tip1": "Si el satélite nunca sube sobre el horizonte en los próximos tres días, el gráfico se reemplaza por un aviso en lugar de una carta vacía.",
+        "tip2": "Una trayectoria que pasa cerca del centro es un pase de alta elevación: la mejor geometría para observación o comunicación.",
+        "shortcutToggle": "Alternar el menú de Gráfico Polar"
+      }
     }
   }
 }

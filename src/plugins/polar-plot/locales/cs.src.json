@@ -3,7 +3,25 @@
     "PolarPlotPlugin": {
       "bottomIconLabel": "Polární graf",
       "title": "Menu polárního grafu",
-      "helpBody": "Menu polárního grafu slouží ke generování 2D polárního grafu azimutu a elevace satelitu v čase."
+      "labels": {
+        "notInView": "Satelit nebude v příštích {hours} hodinách viditelný",
+        "saveImage": "Uložit obrázek",
+        "satellite": "Satelit {sccNum}",
+        "unknownSensor": "Neznámý senzor",
+        "unknownStartTime": "Neznámý čas začátku",
+        "unknownStopTime": "Neznámý čas konce"
+      },
+      "help": {
+        "overview": "Polární graf vykresluje další přelet vybraného satelitu nad vybraným senzorem jako klasickou mapu oblohy v azimutu a elevaci: sever nahoře, horizont na vnějším prstenci a zenit uprostřed. Je to mapa, kterou pozorovatel nebo operátor používá, aby věděl, kam se na obloze dívat.",
+        "imgAlt": "Polární mapa oblohy zobrazující dráhu přeletu satelitu",
+        "imgCaption": "Přelet začíná u zeleného bodu a končí u červeného bodu; prstence označují elevaci.",
+        "readingHeading": "Jak číst graf",
+        "reading": "Dráha začíná zeleným bodem (východ) a končí červeným bodem (západ). Soustředné prstence označují elevaci po 15 stupních od horizontu (vnější okraj) po zenit (střed) a po obvodu jsou uvedeny světové strany. Záhlaví zobrazuje senzor, číslo satelitu a časy začátku a konce přeletu v UTC.",
+        "howToUse": "<ol><li>Vyberte senzor a satelit; spodní ikona zůstává neaktivní, dokud nejsou vybrány oba.</li><li>Otevřete <strong>Polární graf</strong> ze spodní lišty. Další přelet do tří dnů se vypočítá a vykreslí automaticky.</li><li>Klikněte na <strong>Uložit obrázek</strong> pro stažení grafu jako souboru PNG.</li></ol>",
+        "tip1": "Pokud satelit v příštích třech dnech nikdy nevystoupá nad horizont, graf je nahrazen upozorněním místo prázdné mapy.",
+        "tip2": "Dráha procházející blízko středu znamená přelet s vysokou elevací: nejlepší geometrie pro pozorování nebo komunikaci.",
+        "shortcutToggle": "Přepnout menu polárního grafu"
+      }
     }
   }
 }

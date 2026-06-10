@@ -8,13 +8,17 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
+import { IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { BaseObject, Degrees, MILLISECONDS_PER_SECOND, Satellite, secondsPerDay } from '@ootk/src/main';
+import { t7e } from '@app/locales/keys';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 type PolarPlotData = Array<[Degrees, Degrees]>
+
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.PolarPlotPlugin.${key}` as Parameters<typeof t7e>[0]);
 
 export class PolarPlotPlugin extends KeepTrackPlugin {
   readonly id = 'PolarPlotPlugin';
@@ -50,6 +54,33 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
 
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/polar-plot/polar-plot-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: l('help.readingHeading'),
+          content: l('help.reading'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2')],
+      shortcuts: [{ keys: ['P'], description: l('help.shortcutToggle') }],
+    };
+  }
+
   getKeyboardShortcuts(): IKeyboardShortcut[] {
     return [
       {
@@ -62,9 +93,9 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   sideMenuElementHtml: string = html`
   <div id="polar-plot-menu" class="side-menu-parent start-hidden">
     <div id="polar-plot-content" class="side-menu" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-      <span id="polar-plot-warning" class="text-center">Satellite is not in view for the next ${(this.plotDuration_ * 24).toFixed(0)} hours</span>
+      <span id="polar-plot-warning" class="text-center">${l('labels.notInView').replace('{hours}', (this.plotDuration_ * 24).toFixed(0))}</span>
       <canvas id="polar-plot" class="w-96" width="1000" height="1000"></canvas>
-      <button id="polar-plot-save" class="btn btn-primary">Save Image</button>
+      <button id="polar-plot-save" class="btn btn-primary">${l('labels.saveImage')}</button>
     </div>
   </div>
   `;
@@ -159,7 +190,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
       showEl('polar-plot-warning');
       hideEl('polar-plot');
       hideEl('polar-plot-save');
-      setInnerHtml('polar-plot-warning', `Satellite is not in view for the next ${(this.plotDuration_ * 24).toFixed(0)} hours`);
+      setInnerHtml('polar-plot-warning', `${l('labels.notInView').replace('{hours}', (this.plotDuration_ * 24).toFixed(0))}`);
     }
   }
 
@@ -224,12 +255,12 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     this.ctx_.fillStyle = 'rgb(255, 255, 255)';
     this.ctx_.textAlign = 'left';
     this.ctx_.textBaseline = 'top';
-    const sensorName = ServiceLocator.getSensorManager().getSensor()?.name ?? 'Unknown Sensor';
+    const sensorName = ServiceLocator.getSensorManager().getSensor()?.name ?? l('labels.unknownSensor');
     const satNum = (this.selectSatManager_.getSelectedSat() as Satellite).sccNum;
-    const timeRange = `${this.passStartTime_?.toISOString().slice(11, 19) ?? 'Unknown Start Time'} - ${this.passStopTime_?.toISOString().slice(11, 19) ?? 'Unknown Stop Time'}`;
+    const timeRange = `${this.passStartTime_?.toISOString().slice(11, 19) ?? l('labels.unknownStartTime')} - ${this.passStopTime_?.toISOString().slice(11, 19) ?? l('labels.unknownStopTime')}`;
 
     this.ctx_.fillText(sensorName, 10, 10);
-    this.ctx_.fillText(`Satellite ${satNum}`, 10, this.canvasSize_ * 0.035 + 15);
+    this.ctx_.fillText(l('labels.satellite').replace('{sccNum}', satNum), 10, this.canvasSize_ * 0.035 + 15);
 
     this.ctx_.textAlign = 'center';
     this.ctx_.fillText(timeRange, this.canvasSize_ / 2, this.canvasSize_ - 10 - (this.canvasSize_ * 0.035));

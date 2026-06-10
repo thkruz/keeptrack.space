@@ -3,12 +3,34 @@
     "TransponderChannelData": {
       "bottomIconLabel": "转发器和频道信息",
       "title": "卫星频率",
-      "helpBody": "<p>此插件显示地球静止轨道电视卫星的转发器和频道频率信息。选择具有已知频道数据的卫星并打开此面板，以查看其广播频率、频道、波束覆盖和加密详情。</p><p>使用标题栏中的下载按钮将频道数据导出为CSV文件。</p>",
+      "constellationName": "电视卫星",
+      "table": {
+        "satellite": "卫星",
+        "tvchannel": "电视频道",
+        "beam": "波束",
+        "freq": "频率",
+        "system": "系统",
+        "SRFEC": "SR/FEC",
+        "video": "视频",
+        "lang": "语言",
+        "encryption": "加密"
+      },
       "errorMsgs": {
         "NoChannelInfo": "该卫星没有频道信息",
         "NotSatellite": "所选对象不是卫星",
         "FetchFailed": "无法获取 {name} 和 {altName} 的频道信息",
         "NoData": "没有可用的频道数据"
+      },
+      "help": {
+        "overview": "转发器和频道信息显示地球静止轨道电视或通信卫星实际正在播出的内容：每个已知频道及其频率、波束、传输系统和加密方式。数据涵盖数百颗知名广播卫星，并在打开菜单时实时获取。",
+        "imgAlt": "某广播卫星的卫星频率表",
+        "imgCaption": "每一行是一个频道，包含其波束、频率、系统和加密详情。",
+        "columnsHeading": "如何阅读此表",
+        "columns": "<ul><li><strong>电视频道</strong>：广播服务名称。</li><li><strong>波束</strong>：承载该频道的卫星天线波束，决定覆盖范围。</li><li><strong>频率</strong>：下行频率和极化方式。</li><li><strong>系统</strong>和<strong>SR/FEC</strong>：传输标准（例如 DVB-S2）及其符号率和前向纠错。</li><li><strong>视频</strong>和<strong>语言</strong>：编解码器和音频语言。</li><li><strong>加密</strong>：频道是免费播出还是加密播出，以及使用的加密系统。</li></ul>",
+        "howToUse": "<ol><li>选择一颗广播卫星；底部图标仅对具有已知频道数据的卫星启用。</li><li>从底部栏打开菜单或按 <strong>T</strong> 键。频道列表将下载并填充表格。</li><li>使用标题栏中的下载按钮将表格导出为电子表格。</li></ol>",
+        "tip1": "受支持的卫星已在星座菜单中注册为电视卫星星座，这是查找可查看卫星的最快方式。",
+        "tip2": "频道数据来自 KeepTrack API，反映公开列表；需要互联网连接。",
+        "shortcutToggle": "切换卫星频率菜单"
       }
     }
   }

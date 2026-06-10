@@ -3,12 +3,34 @@
     "TransponderChannelData": {
       "bottomIconLabel": "Información de transpondedor y canal",
       "title": "Frecuencias de satélite",
-      "helpBody": "<p>Este plugin muestra información de frecuencias de transpondedor y canal para satélites de TV geoestacionarios. Seleccione un satélite con datos de canal conocidos y abra este panel para ver sus frecuencias de transmisión, canales, cobertura de haz y detalles de cifrado.</p><p>Use el botón de descarga en la barra de título para exportar los datos del canal como archivo CSV.</p>",
+      "constellationName": "Satélites de TV",
+      "table": {
+        "satellite": "Satélite",
+        "tvchannel": "Canal de TV",
+        "beam": "Haz",
+        "freq": "Frecuencia",
+        "system": "Sistema",
+        "SRFEC": "SR/FEC",
+        "video": "Vídeo",
+        "lang": "Idioma",
+        "encryption": "Cifrado"
+      },
       "errorMsgs": {
         "NoChannelInfo": "El satélite no tiene información de canal",
         "NotSatellite": "El objeto seleccionado no es un satélite",
         "FetchFailed": "No se pudo obtener la información del canal para {name} y {altName}",
         "NoData": "No hay datos de canal disponibles"
+      },
+      "help": {
+        "overview": "La información de transpondedor y canal muestra lo que un satélite geoestacionario de TV o comunicaciones está transmitiendo realmente: cada canal conocido con su frecuencia, haz, sistema de transmisión y cifrado. Los datos cubren unos cientos de satélites de difusión muy conocidos y se obtienen en vivo al abrir el menú.",
+        "imgAlt": "La tabla de Frecuencias de satélite para un satélite de difusión",
+        "imgCaption": "Cada fila es un canal con sus detalles de haz, frecuencia, sistema y cifrado.",
+        "columnsHeading": "Cómo leer la tabla",
+        "columns": "<ul><li><strong>Canal de TV</strong>: el nombre del servicio de difusión.</li><li><strong>Haz</strong>: el haz de la antena del satélite que transporta el canal y determina la huella de cobertura.</li><li><strong>Frecuencia</strong>: la frecuencia de enlace descendente y la polarización.</li><li><strong>Sistema</strong> y <strong>SR/FEC</strong>: el estándar de transmisión (por ejemplo DVB-S2) con su tasa de símbolos y corrección de errores.</li><li><strong>Vídeo</strong> e <strong>Idioma</strong>: el códec y los idiomas de audio.</li><li><strong>Cifrado</strong>: si el canal es de emisión libre o está codificado, y con qué sistema.</li></ul>",
+        "howToUse": "<ol><li>Seleccione un satélite de difusión; el icono inferior solo se activa para satélites con datos de canal conocidos.</li><li>Abra el menú desde la barra inferior o pulse <strong>T</strong>. La lista de canales se descarga y rellena la tabla.</li><li>Use el botón de descarga en la barra de título para exportar la tabla como hoja de cálculo.</li></ol>",
+        "tip1": "Los satélites compatibles están registrados como una constelación Satélites de TV en el menú Constelaciones, que es la forma más rápida de encontrar uno para inspeccionar.",
+        "tip2": "Los datos de canal provienen de la API de KeepTrack y reflejan listados públicos; se requiere conexión a internet.",
+        "shortcutToggle": "Alternar el menú de Frecuencias de satélite"
       }
     }
   }

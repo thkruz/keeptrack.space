@@ -3,12 +3,34 @@
     "TransponderChannelData": {
       "bottomIconLabel": "Dane transpondera i kanałów",
       "title": "Częstotliwości satelitarne",
-      "helpBody": "<p>Ta wtyczka wyświetla informacje o częstotliwościach transpondera i kanałów dla geostacjonarnych satelitów telewizyjnych. Wybierz satelitę z dostępnymi danymi kanałów i otwórz ten panel, aby wyświetlić częstotliwości nadawania, kanały, zasięg wiązki i szczegóły szyfrowania.</p><p>Użyj przycisku pobierania na pasku tytułu, aby wyeksportować dane kanałów jako plik CSV.</p>",
+      "constellationName": "Satelity TV",
+      "table": {
+        "satellite": "Satelita",
+        "tvchannel": "Kanał TV",
+        "beam": "Wiązka",
+        "freq": "Częstotliwość",
+        "system": "System",
+        "SRFEC": "SR/FEC",
+        "video": "Wideo",
+        "lang": "Język",
+        "encryption": "Szyfrowanie"
+      },
       "errorMsgs": {
         "NoChannelInfo": "Satelita nie posiada informacji o kanałach",
         "NotSatellite": "Wybrany obiekt nie jest satelitą",
         "FetchFailed": "Nie udało się pobrać informacji o kanałach dla {name} i {altName}",
         "NoData": "Brak dostępnych danych kanałów"
+      },
+      "help": {
+        "overview": "Dane transpondera i kanałów pokazują, co geostacjonarny satelita telewizyjny lub komunikacyjny faktycznie nadaje: każdy znany kanał wraz z częstotliwością, wiązką, systemem transmisji i szyfrowaniem. Dane obejmują kilkaset dobrze znanych satelitów nadawczych i są pobierane na żywo po otwarciu menu.",
+        "imgAlt": "Tabela Częstotliwości satelitarne dla satelity nadawczego",
+        "imgCaption": "Każdy wiersz to jeden kanał ze szczegółami wiązki, częstotliwości, systemu i szyfrowania.",
+        "columnsHeading": "Jak czytać tabelę",
+        "columns": "<ul><li><strong>Kanał TV</strong>: nazwa usługi nadawczej.</li><li><strong>Wiązka</strong>: wiązka anteny satelity przenosząca kanał, która określa obszar pokrycia.</li><li><strong>Częstotliwość</strong>: częstotliwość łącza w dół i polaryzacja.</li><li><strong>System</strong> i <strong>SR/FEC</strong>: standard transmisji (na przykład DVB-S2) z szybkością symbolową i korekcją błędów.</li><li><strong>Wideo</strong> i <strong>Język</strong>: kodek i języki ścieżek audio.</li><li><strong>Szyfrowanie</strong>: czy kanał jest niekodowany, czy zaszyfrowany, i jakim systemem.</li></ul>",
+        "howToUse": "<ol><li>Wybierz satelitę nadawczego; dolna ikona aktywuje się tylko dla satelitów ze znanymi danymi kanałów.</li><li>Otwórz menu z dolnego paska lub naciśnij <strong>T</strong>. Lista kanałów zostanie pobrana i wypełni tabelę.</li><li>Użyj przycisku pobierania na pasku tytułu, aby wyeksportować tabelę jako arkusz kalkulacyjny.</li></ol>",
+        "tip1": "Obsługiwane satelity są zarejestrowane jako konstelacja Satelity TV w menu Konstelacje, co jest najszybszym sposobem na znalezienie satelity do sprawdzenia.",
+        "tip2": "Dane kanałów pochodzą z API KeepTrack i odzwierciedlają publiczne listy; wymagają połączenia z internetem.",
+        "shortcutToggle": "Przełącz menu Częstotliwości satelitarne"
       }
     }
   }

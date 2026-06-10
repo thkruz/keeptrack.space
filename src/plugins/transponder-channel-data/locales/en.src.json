@@ -3,12 +3,34 @@
     "TransponderChannelData": {
       "bottomIconLabel": "Transponder and Channel Info",
       "title": "Satellite Frequencies",
-      "helpBody": "<p>This plugin displays transponder and channel frequency information for geostationary TV satellites. Select a satellite with known channel data and open this panel to view its broadcast frequencies, channels, beam coverage, and encryption details.</p><p>Use the download button in the title bar to export the channel data as a CSV file.</p>",
+      "constellationName": "TV Satellites",
+      "table": {
+        "satellite": "Satellite",
+        "tvchannel": "TV Channel",
+        "beam": "Beam",
+        "freq": "Frequency",
+        "system": "System",
+        "SRFEC": "SR/FEC",
+        "video": "Video",
+        "lang": "Language",
+        "encryption": "Encryption"
+      },
       "errorMsgs": {
         "NoChannelInfo": "Satellite does not have channel information",
         "NotSatellite": "Selected object is not a satellite",
         "FetchFailed": "Failed to fetch channel info for {name} and {altName}",
         "NoData": "No channel data available"
+      },
+      "help": {
+        "overview": "Transponder and Channel Info shows what a geostationary TV or communications satellite is actually broadcasting: every known channel with its frequency, beam, transmission system, and encryption. The data covers a few hundred well known broadcast satellites and is fetched live when you open the menu.",
+        "imgAlt": "The Satellite Frequencies table for a broadcast satellite",
+        "imgCaption": "Each row is one channel with its beam, frequency, system, and encryption details.",
+        "columnsHeading": "Reading the Table",
+        "columns": "<ul><li><strong>TV Channel</strong>: the broadcast service name.</li><li><strong>Beam</strong>: the satellite antenna beam carrying the channel, which determines the coverage footprint.</li><li><strong>Frequency</strong>: the downlink frequency and polarization.</li><li><strong>System</strong> and <strong>SR/FEC</strong>: the transmission standard (for example DVB-S2) with its symbol rate and forward error correction.</li><li><strong>Video</strong> and <strong>Language</strong>: codec and audio languages.</li><li><strong>Encryption</strong>: whether the channel is free to air or scrambled, and with what system.</li></ul>",
+        "howToUse": "<ol><li>Select a broadcast satellite; the bottom icon enables only for satellites with known channel data.</li><li>Open the menu from the bottom bar or press <strong>T</strong>. The channel list downloads and fills the table.</li><li>Use the download button in the title bar to export the table as a spreadsheet.</li></ol>",
+        "tip1": "The supported satellites are registered as a TV Satellites constellation in the Constellations menu, which is the quickest way to find one to inspect.",
+        "tip2": "Channel data comes from the KeepTrack API and reflects public listings; it requires an internet connection.",
+        "shortcutToggle": "Toggle the Satellite Frequencies menu"
       }
     }
   }

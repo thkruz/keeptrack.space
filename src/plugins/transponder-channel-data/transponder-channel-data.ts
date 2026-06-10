@@ -114,8 +114,31 @@ export class TransponderChannelData extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.TransponderChannelData.title' as Parameters<typeof t7e>[0]),
-      body: t7e('plugins.TransponderChannelData.helpBody' as Parameters<typeof t7e>[0]),
+      title: t7e('plugins.TransponderChannelData.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.TransponderChannelData.help.overview'),
+          image: {
+            src: 'img/help/transponder-channel-data/transponder-channel-data-menu.png',
+            alt: t7e('plugins.TransponderChannelData.help.imgAlt'),
+            caption: t7e('plugins.TransponderChannelData.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.TransponderChannelData.help.columnsHeading'),
+          content: t7e('plugins.TransponderChannelData.help.columns'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.TransponderChannelData.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.TransponderChannelData.help.tip1'),
+        t7e('plugins.TransponderChannelData.help.tip2'),
+      ],
+      shortcuts: [{ keys: ['T'], description: t7e('plugins.TransponderChannelData.help.shortcutToggle') }],
     };
   }
 
@@ -145,7 +168,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
         // addConstellation now accepts (number | string)[] for SCC_NUM groups,
         // so we can pass the raw sccNum strings — alpha-5 / extended IDs in
         // the list would resolve correctly via sccNum2Id.
-        PluginRegistry.getPlugin(SatConstellations)?.addConstellation('TV Satellites', GroupType.SCC_NUM, this.satsWithChannels_);
+        PluginRegistry.getPlugin(SatConstellations)?.addConstellation(t7e('plugins.TransponderChannelData.constellationName'), GroupType.SCC_NUM, this.satsWithChannels_);
       },
     );
   }
@@ -261,8 +284,21 @@ export class TransponderChannelData extends KeepTrackPlugin {
 
     Object.keys(data[0]).forEach((key) => {
       const th = document.createElement('th');
+      const headerKeys: Record<string, string> = {
+        satellite: 'satellite',
+        tvchannel: 'tvchannel',
+        beam: 'beam',
+        freq: 'freq',
+        system: 'system',
+        SRFEC: 'SRFEC',
+        video: 'video',
+        lang: 'lang',
+        encryption: 'encryption',
+      };
 
-      th.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+      th.textContent = headerKeys[key]
+        ? t7e(`plugins.TransponderChannelData.table.${headerKeys[key]}` as Parameters<typeof t7e>[0])
+        : key.charAt(0).toUpperCase() + key.slice(1);
       th.style.textAlign = 'left';
       headerRow.appendChild(th);
     });

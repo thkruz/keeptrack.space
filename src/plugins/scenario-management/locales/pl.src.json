@@ -3,7 +3,58 @@
     "ScenarioManagementMenu": {
       "title": "Zarządzanie scenariuszami",
       "bottomIconLabel": "Zarządzanie scenariuszami",
-      "helpBody": "Wtyczka zarządzania scenariuszami pozwala organizować pracę dla różnych projektów lub kontekstów.<br/>Obecne funkcje to:<br/><br/>  - Nazwa i opis dla każdego scenariusza<br/>  - Data i godzina początku i końca okresu analizy<br/>  - Zapis/Wczytywanie scenariuszy<br/><br/>Celem jest ostatecznie dostarczenie pojedynczego pliku zawierającego wszystkie informacje niezbędne do zarządzania scenariuszami. Więcej funkcji wkrótce!"
+      "sideMenuTitle": "Ustawienia scenariusza",
+      "labels": {
+        "scenarioName": "Nazwa scenariusza",
+        "description": "Opis",
+        "scenarioStart": "Początek scenariusza",
+        "scenarioEnd": "Koniec scenariusza"
+      },
+      "tooltips": {
+        "name": "Nazwa scenariusza.",
+        "description": "Opis scenariusza.",
+        "startDate": "Początkowy DTG scenariusza w UTC (YYYY-MM-DD HH:MM:SS.sss).",
+        "endDate": "Końcowy DTG scenariusza w UTC (YYYY-MM-DD HH:MM:SS.sss)."
+      },
+      "placeholders": {
+        "description": "Wprowadź tutaj opis scenariusza..."
+      },
+      "buttons": {
+        "updateScenario": "Aktualizuj scenariusz",
+        "saveScenario": "Zapisz scenariusz",
+        "loadScenario": "Wczytaj scenariusz"
+      },
+      "msgs": {
+        "settingsUpdated": "Ustawienia scenariusza zostały pomyślnie zaktualizowane!",
+        "scenarioLoaded": "Scenariusz został pomyślnie wczytany!"
+      },
+      "errorMsgs": {
+        "nameRequired": "Nazwa scenariusza jest wymagana.",
+        "startDateInvalid": "Data początkowa jest nieprawidłowa.",
+        "endDateInvalid": "Data końcowa jest nieprawidłowa.",
+        "savingScenario": "Błąd podczas zapisywania scenariusza!",
+        "loadingScenarioFile": "Błąd podczas wczytywania pliku scenariusza!",
+        "decompressingScenarioFile": "Błąd podczas dekompresji pliku scenariusza!"
+      },
+      "defaults": {
+        "scenarioName": "Mój scenariusz",
+        "scenarioDescription": "Opis mojego scenariusza"
+      },
+      "core": {
+        "beforeStartTime": "Czas symulacji jest przed początkiem scenariusza. Wstrzymywanie na czasie początkowym.",
+        "afterStopTime": "Czas symulacji jest po końcu scenariusza. Wstrzymywanie na czasie końcowym."
+      },
+      "help": {
+        "overview": "Zarządzanie scenariuszami nadaje Twojej sesji nazwany kontekst: scenariusz z nazwą, opisem i opcjonalnym oknem analizy z czasem początku i końca. Zegar symulacji jest wtedy utrzymywany wewnątrz tego okna, a całą definicję można zapisać do pliku i później wczytać ponownie lub udostępnić współpracownikowi.",
+        "imgAlt": "Menu Ustawienia scenariusza z polami nazwy, opisu i okna czasowego",
+        "imgCaption": "Zdefiniuj nazwę scenariusza, opis oraz opcjonalny czas początku i końca.",
+        "windowHeading": "Okno scenariusza",
+        "window": "Gdy ustawisz <strong>Początek scenariusza</strong> lub <strong>Koniec scenariusza</strong> (UTC, w formacie YYYY-MM-DD HH:MM:SS.sss), zegar symulacji jest ograniczony do tego okna: jeśli czas przesunie się przed początek lub poza koniec, zegar zatrzymuje się na granicy, a powiadomienie wyjaśnia dlaczego. Pozostaw pola puste dla scenariusza bez ograniczeń.",
+        "howToUse": "<ol><li>Otwórz <strong>Zarządzanie scenariuszami</strong> z dolnego menu (tryb Narzędzia).</li><li>Wprowadź <strong>Nazwa scenariusza</strong> (wymagane) oraz opcjonalny <strong>Opis</strong>.</li><li>Opcjonalnie ustaw czasy <strong>Początek scenariusza</strong> i <strong>Koniec scenariusza</strong> w UTC.</li><li>Kliknij <strong>Aktualizuj scenariusz</strong>, aby zastosować. Okno czasowe jest egzekwowane natychmiast.</li><li>Użyj <strong>Zapisz scenariusz</strong>, aby pobrać definicję jako skompresowany plik .kts, oraz <strong>Wczytaj scenariusz</strong>, aby przywrócić ją z dysku.</li></ol>",
+        "tip1": "Jeśli odtwarzanie wydaje się zablokowane, sprawdź, czy zegar nie jest przytrzymany na granicy scenariusza; wyczyść pola początku i końca, aby go zwolnić.",
+        "tip2": "Pliki scenariuszy to małe skompresowane pliki .kts, przydatne do udostępniania wspólnego okna analizy zespołowi.",
+        "tip3": "Pola dat są weryfikowane podczas wpisywania; nieprawidłowa data jest podświetlana i odrzucana przy aktualizacji."
+      }
     }
   }
 }

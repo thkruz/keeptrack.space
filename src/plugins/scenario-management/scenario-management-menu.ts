@@ -31,10 +31,15 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { t7e } from '@app/locales/keys';
 import landscape3Png from '@public/img/icons/landscape3.png';
 import { saveAs } from 'file-saver';
 import { syncFormFields, validateDateInput } from './scenario-form-utils';
 import { ScenarioData, ScenarioManagementPlugin } from './scenario-management';
+
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.ScenarioManagementMenu.${key}` as Parameters<typeof t7e>[0]);
 
 export class ScenarioManagementMenu extends KeepTrackPlugin {
   readonly id = 'ScenarioManagementMenu';
@@ -49,6 +54,32 @@ export class ScenarioManagementMenu extends KeepTrackPlugin {
 
   private corePlugin_!: ScenarioManagementPlugin;
 
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/scenario-management/scenario-management-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: l('help.windowHeading'),
+          content: l('help.window'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2'), l('help.tip3')],
+    };
+  }
+
   sideMenuElementHtml: string = html`
   <div id="scenario-management-menu" class="side-menu-parent start-hidden">
     <div id="scenario-management-content" class="side-menu">
@@ -58,41 +89,41 @@ export class ScenarioManagementMenu extends KeepTrackPlugin {
             <div class="row center"></div>
             </br>
             <div class="row center">
-              <button id="${this.formPrefix_}-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Update Scenario &#9658;</button>
+              <button id="${this.formPrefix_}-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">${l('buttons.updateScenario')} &#9658;</button>
             </div>
-            <h5 class="center-align">Scenario Settings</h5>
+            <h5 class="center-align">${l('sideMenuTitle')}</h5>
             <!-- Scenario Name -->
             <div class="input-field col s12">
-              <input required id="${this.formPrefix_}-name" type="text" kt-tooltip="The name of the scenario.">
-              <label class="active" for="${this.formPrefix_}-name">Scenario Name</label>
+              <input required id="${this.formPrefix_}-name" type="text" kt-tooltip="${l('tooltips.name')}">
+              <label class="active" for="${this.formPrefix_}-name">${l('labels.scenarioName')}</label>
             </div>
             <!-- Scenario Description -->
             <div class="input-field col s12">
               <input id="${this.formPrefix_}-description" type="text"
-              kt-tooltip="The description of the scenario." placeholder="Enter scenario description here...">
-              <label class="active" for="${this.formPrefix_}-description">Description</label>
+              kt-tooltip="${l('tooltips.description')}" placeholder="${l('placeholders.description')}">
+              <label class="active" for="${this.formPrefix_}-description">${l('labels.description')}</label>
             </div>
             <!-- Scenario Start DateTime -->
             <div class="input-field col s12">
               <input id="${this.formPrefix_}-start-date" type="text"
-                kt-tooltip="The start DTG of the scenario in UTC (YYYY-MM-DD HH:MM:SS.sss)." placeholder="YYYY-MM-DD HH:MM:SS.sss"
+                kt-tooltip="${l('tooltips.startDate')}" placeholder="YYYY-MM-DD HH:MM:SS.sss"
               >
-              <label class="active" for="${this.formPrefix_}-start-date">Scenario Start</label>
+              <label class="active" for="${this.formPrefix_}-start-date">${l('labels.scenarioStart')}</label>
             </div>
             <!-- Scenario End DateTime -->
             <div class="input-field col s12">
               <input id="${this.formPrefix_}-end-date" type="text"
-                kt-tooltip="The end DTG of the scenario in UTC (YYYY-MM-DD HH:MM:SS.sss)." placeholder="YYYY-MM-DD HH:MM:SS.sss"
+                kt-tooltip="${l('tooltips.endDate')}" placeholder="YYYY-MM-DD HH:MM:SS.sss"
               >
-              <label class="active" for="${this.formPrefix_}-end-date">Scenario End</label>
+              <label class="active" for="${this.formPrefix_}-end-date">${l('labels.scenarioEnd')}</label>
             </div>
           </div>
         </form>
         <div class="row center">
-          <button id="${this.formPrefix_}-save" class="btn btn-ui waves-effect waves-light">Save Scenario &#9658;</button>
+          <button id="${this.formPrefix_}-save" class="btn btn-ui waves-effect waves-light">${l('buttons.saveScenario')} &#9658;</button>
         </div>
         <div class="row center">
-          <button id="${this.formPrefix_}-load" class="btn btn-ui waves-effect waves-light">Load Scenario &#9658;</button>
+          <button id="${this.formPrefix_}-load" class="btn btn-ui waves-effect waves-light">${l('buttons.loadScenario')} &#9658;</button>
         </div>
       </div>
     </div>
@@ -147,19 +178,19 @@ export class ScenarioManagementMenu extends KeepTrackPlugin {
     const endDateStr = endDateInput.value;
 
     if (!name) {
-      errorManagerInstance.warn('Scenario Name is required.');
+      errorManagerInstance.warn(l('errorMsgs.nameRequired'));
 
       return;
     }
 
     if (startDateStr && !validateDateInput(startDateInput)) {
-      errorManagerInstance.warn('Start Date is invalid.');
+      errorManagerInstance.warn(l('errorMsgs.startDateInvalid'));
 
       return;
     }
 
     if (endDateStr && !validateDateInput(endDateInput)) {
-      errorManagerInstance.warn('End Date is invalid.');
+      errorManagerInstance.warn(l('errorMsgs.endDateInvalid'));
 
       return;
     }
@@ -176,7 +207,7 @@ export class ScenarioManagementMenu extends KeepTrackPlugin {
 
     // Only show toast if button was clicked
     if (e && isUpdateSuccess) {
-      ServiceLocator.getUiManager().toast('Scenario settings updated successfully!', ToastMsgType.normal);
+      ServiceLocator.getUiManager().toast(l('msgs.settingsUpdated'), ToastMsgType.normal);
     }
   }
 
@@ -209,7 +240,7 @@ export class ScenarioManagementMenu extends KeepTrackPlugin {
       saveAs(blob, `keeptrack-scenario-${scenario.name}.kts`);
     } catch (e) {
       if (!isThisNode()) {
-        errorManagerInstance.error(e, 'scenario-management-menu.ts', 'Error saving scenario!');
+        errorManagerInstance.error(e, 'scenario-management-menu.ts', l('errorMsgs.savingScenario'));
       }
     }
   }
@@ -241,13 +272,13 @@ export class ScenarioManagementMenu extends KeepTrackPlugin {
                 };
 
                 if (this.corePlugin_.updateScenario(scenarioData)) {
-                  ServiceLocator.getUiManager().toast('Scenario loaded successfully!', ToastMsgType.normal);
+                  ServiceLocator.getUiManager().toast(l('msgs.scenarioLoaded'), ToastMsgType.normal);
                 }
               } catch (error) {
-                errorManagerInstance.error(error, 'scenario-management-menu.ts', 'Error loading scenario file!');
+                errorManagerInstance.error(error, 'scenario-management-menu.ts', l('errorMsgs.loadingScenarioFile'));
               }
             }).catch((error: Error) => {
-              errorManagerInstance.error(error, 'scenario-management-menu.ts', 'Error decompressing scenario file!');
+              errorManagerInstance.error(error, 'scenario-management-menu.ts', l('errorMsgs.decompressingScenarioFile'));
             });
           }
         };

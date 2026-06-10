@@ -3,7 +3,58 @@
     "ScenarioManagementMenu": {
       "title": "情景管理",
       "bottomIconLabel": "情景管理",
-      "helpBody": "情景管理插件允许您为不同的项目或上下文组织您的工作。<br/>当前功能包括：<br/><br/>  - 每个情景的名称和描述<br/>  - 分析周期的开始和结束日期/时间<br/>  - 保存/加载情景<br/><br/>目标是最终提供一个包含情景管理所需所有信息的单一文件。更多功能敬请期待！"
+      "sideMenuTitle": "情景设置",
+      "labels": {
+        "scenarioName": "情景名称",
+        "description": "描述",
+        "scenarioStart": "情景开始",
+        "scenarioEnd": "情景结束"
+      },
+      "tooltips": {
+        "name": "情景的名称。",
+        "description": "情景的描述。",
+        "startDate": "情景的开始DTG，UTC时间（YYYY-MM-DD HH:MM:SS.sss）。",
+        "endDate": "情景的结束DTG，UTC时间（YYYY-MM-DD HH:MM:SS.sss）。"
+      },
+      "placeholders": {
+        "description": "在此输入情景描述..."
+      },
+      "buttons": {
+        "updateScenario": "更新情景",
+        "saveScenario": "保存情景",
+        "loadScenario": "加载情景"
+      },
+      "msgs": {
+        "settingsUpdated": "情景设置更新成功！",
+        "scenarioLoaded": "情景加载成功！"
+      },
+      "errorMsgs": {
+        "nameRequired": "情景名称为必填项。",
+        "startDateInvalid": "开始日期无效。",
+        "endDateInvalid": "结束日期无效。",
+        "savingScenario": "保存情景时出错！",
+        "loadingScenarioFile": "加载情景文件时出错！",
+        "decompressingScenarioFile": "解压情景文件时出错！"
+      },
+      "defaults": {
+        "scenarioName": "我的情景",
+        "scenarioDescription": "我的情景的描述"
+      },
+      "core": {
+        "beforeStartTime": "仿真时间早于情景开始时间。在开始时间暂停。",
+        "afterStopTime": "仿真时间晚于情景结束时间。在结束时间暂停。"
+      },
+      "help": {
+        "overview": "情景管理为您的会话提供一个命名的上下文：一个具有名称、描述以及可选分析时间窗（含开始和结束时间）的情景。仿真时钟将保持在该时间窗内，整个定义可以保存为文件，稍后重新加载或与同事共享。",
+        "imgAlt": "包含名称、描述和时间窗字段的情景设置菜单",
+        "imgCaption": "定义情景名称、描述以及可选的开始和结束时间。",
+        "windowHeading": "情景时间窗",
+        "window": "当您设置<strong>情景开始</strong>或<strong>情景结束</strong>（UTC，格式为YYYY-MM-DD HH:MM:SS.sss）时，仿真时钟将被限制在该时间窗内：如果时间漂移到开始之前或结束之后，时钟会在边界处暂停，并有通知说明原因。将字段留空表示不受限制的情景。",
+        "howToUse": "<ol><li>从底部菜单（工具模式）打开<strong>情景管理</strong>。</li><li>输入<strong>情景名称</strong>（必填）和可选的<strong>描述</strong>。</li><li>可选择以UTC设置<strong>情景开始</strong>和<strong>情景结束</strong>时间。</li><li>点击<strong>更新情景</strong>以应用。时间窗会立即生效。</li><li>使用<strong>保存情景</strong>将定义下载为压缩的.kts文件，使用<strong>加载情景</strong>从磁盘恢复。</li></ol>",
+        "tip1": "如果播放似乎卡住了，请检查时钟是否被固定在情景边界处；清空开始和结束字段即可解除限制。",
+        "tip2": "情景文件是小巧的压缩.kts文件，便于与团队共享统一的分析时间窗。",
+        "tip3": "日期字段在输入时即进行验证；无效日期会被高亮显示，并在更新时被拒绝。"
+      }
     }
   }
 }

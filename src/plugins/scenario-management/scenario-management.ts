@@ -24,6 +24,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { t7e } from '@app/locales/keys';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 
 declare module '@app/engine/core/interfaces' {
@@ -44,8 +45,8 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
   readonly id = 'ScenarioManagementPlugin';
   dependencies_ = [];
 
-  defaultScenarioName = 'My Scenario';
-  defaultScenarioDescription = 'Description of My Scenario';
+  defaultScenarioName = t7e('plugins.ScenarioManagementMenu.defaults.scenarioName');
+  defaultScenarioDescription = t7e('plugins.ScenarioManagementMenu.defaults.scenarioDescription');
 
   scenario: ScenarioData = {
     name: this.defaultScenarioName,
@@ -62,13 +63,13 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
 
       if (this.scenario.startTime && simulationTimeObj.getTime() < this.scenario.startTime.getTime()) {
         simulationTimeObj.setTime(this.scenario.startTime.getTime());
-        ServiceLocator.getUiManager().toast('Simulation time is before the scenario start time. Pausing at start time.', ToastMsgType.caution, true);
+        ServiceLocator.getUiManager().toast(t7e('plugins.ScenarioManagementMenu.core.beforeStartTime'), ToastMsgType.caution, true);
         isOutsideBoundaries = true;
       }
 
       if (this.scenario.endTime && simulationTimeObj.getTime() > this.scenario.endTime.getTime()) {
         simulationTimeObj.setTime(this.scenario.endTime.getTime());
-        ServiceLocator.getUiManager().toast('Simulation time is after the scenario stop time. Pausing at stop time.', ToastMsgType.caution, true);
+        ServiceLocator.getUiManager().toast(t7e('plugins.ScenarioManagementMenu.core.afterStopTime'), ToastMsgType.caution, true);
         isOutsideBoundaries = true;
       }
 

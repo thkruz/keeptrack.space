@@ -3,7 +3,58 @@
     "ScenarioManagementMenu": {
       "title": "Správa scénářů",
       "bottomIconLabel": "Správa scénářů",
-      "helpBody": "Plugin správy scénářů umožňuje organizovat práci pro různé projekty nebo kontexty.<br/>Aktuální funkce jsou:<br/><br/>  - Název a popis pro každý scénář<br/>  - Počáteční a koncové datum/čas analytického období<br/>  - Uložení/načtení scénářů<br/><br/>Cílem je nakonec poskytnout jeden soubor obsahující veškeré informace potřebné pro správu scénářů. Další funkce již brzy!"
+      "sideMenuTitle": "Nastavení scénáře",
+      "labels": {
+        "scenarioName": "Název scénáře",
+        "description": "Popis",
+        "scenarioStart": "Začátek scénáře",
+        "scenarioEnd": "Konec scénáře"
+      },
+      "tooltips": {
+        "name": "Název scénáře.",
+        "description": "Popis scénáře.",
+        "startDate": "Počáteční DTG scénáře v UTC (YYYY-MM-DD HH:MM:SS.sss).",
+        "endDate": "Koncové DTG scénáře v UTC (YYYY-MM-DD HH:MM:SS.sss)."
+      },
+      "placeholders": {
+        "description": "Sem zadejte popis scénáře..."
+      },
+      "buttons": {
+        "updateScenario": "Aktualizovat scénář",
+        "saveScenario": "Uložit scénář",
+        "loadScenario": "Načíst scénář"
+      },
+      "msgs": {
+        "settingsUpdated": "Nastavení scénáře bylo úspěšně aktualizováno!",
+        "scenarioLoaded": "Scénář byl úspěšně načten!"
+      },
+      "errorMsgs": {
+        "nameRequired": "Název scénáře je povinný.",
+        "startDateInvalid": "Datum začátku je neplatné.",
+        "endDateInvalid": "Datum konce je neplatné.",
+        "savingScenario": "Chyba při ukládání scénáře!",
+        "loadingScenarioFile": "Chyba při načítání souboru scénáře!",
+        "decompressingScenarioFile": "Chyba při dekompresi souboru scénáře!"
+      },
+      "defaults": {
+        "scenarioName": "Můj scénář",
+        "scenarioDescription": "Popis mého scénáře"
+      },
+      "core": {
+        "beforeStartTime": "Čas simulace je před začátkem scénáře. Pozastavuji na čase začátku.",
+        "afterStopTime": "Čas simulace je po konci scénáře. Pozastavuji na čase konce."
+      },
+      "help": {
+        "overview": "Správa scénářů dává vaší relaci pojmenovaný kontext: scénář s názvem, popisem a volitelným analytickým oknem s časem začátku a konce. Hodiny simulace jsou pak drženy uvnitř tohoto okna a celou definici lze uložit do souboru, později znovu načíst nebo sdílet s kolegou.",
+        "imgAlt": "Menu Nastavení scénáře s poli pro název, popis a časové okno",
+        "imgCaption": "Definujte název scénáře, popis a volitelný čas začátku a konce.",
+        "windowHeading": "Okno scénáře",
+        "window": "Když nastavíte <strong>Začátek scénáře</strong> nebo <strong>Konec scénáře</strong> (UTC, ve formátu YYYY-MM-DD HH:MM:SS.sss), hodiny simulace jsou omezeny na toto okno: pokud se čas posune před začátek nebo za konec, hodiny se na hranici pozastaví a oznámení vysvětlí proč. Pro neomezený scénář ponechte pole prázdná.",
+        "howToUse": "<ol><li>Otevřete <strong>Správa scénářů</strong> ze spodního menu (režim Nástroje).</li><li>Zadejte <strong>Název scénáře</strong> (povinné) a volitelný <strong>Popis</strong>.</li><li>Volitelně nastavte časy <strong>Začátek scénáře</strong> a <strong>Konec scénáře</strong> v UTC.</li><li>Klikněte na <strong>Aktualizovat scénář</strong> pro použití. Časové okno je vynuceno okamžitě.</li><li>Použijte <strong>Uložit scénář</strong> ke stažení definice jako komprimovaného souboru .kts a <strong>Načíst scénář</strong> k obnovení z disku.</li></ol>",
+        "tip1": "Pokud se přehrávání zdá zaseknuté, zkontrolujte, zda nejsou hodiny přidržené na hranici scénáře; vymažte pole začátku a konce, abyste je uvolnili.",
+        "tip2": "Soubory scénářů jsou malé komprimované soubory .kts, vhodné pro sdílení společného analytického okna s týmem.",
+        "tip3": "Datumová pole se ověřují během psaní; neplatné datum je zvýrazněno a při aktualizaci odmítnuto."
+      }
     }
   }
 }

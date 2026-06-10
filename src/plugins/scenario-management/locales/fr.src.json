@@ -3,7 +3,58 @@
     "ScenarioManagementMenu": {
       "title": "Gestion des scénarios",
       "bottomIconLabel": "Gestion des scénarios",
-      "helpBody": "Le plugin de gestion des scénarios vous permet d'organiser votre travail pour différents projets ou contextes.<br/>Fonctionnalités actuelles :<br/><br/>  - Nom et description pour chaque scénario<br/>  - Date/heure de début et de fin de la période d'analyse<br/>  - Enregistrer/Charger des scénarios<br/><br/>L'objectif est de fournir éventuellement un fichier unique contenant toutes les informations nécessaires à la gestion des scénarios. Plus de fonctionnalités à venir !"
+      "sideMenuTitle": "Paramètres du scénario",
+      "labels": {
+        "scenarioName": "Nom du scénario",
+        "description": "Descriptif",
+        "scenarioStart": "Début du scénario",
+        "scenarioEnd": "Fin du scénario"
+      },
+      "tooltips": {
+        "name": "Le nom du scénario.",
+        "description": "La description du scénario.",
+        "startDate": "Le DTG de début du scénario en UTC (YYYY-MM-DD HH:MM:SS.sss).",
+        "endDate": "Le DTG de fin du scénario en UTC (YYYY-MM-DD HH:MM:SS.sss)."
+      },
+      "placeholders": {
+        "description": "Saisissez ici la description du scénario..."
+      },
+      "buttons": {
+        "updateScenario": "Mettre à jour le scénario",
+        "saveScenario": "Enregistrer le scénario",
+        "loadScenario": "Charger le scénario"
+      },
+      "msgs": {
+        "settingsUpdated": "Paramètres du scénario mis à jour avec succès !",
+        "scenarioLoaded": "Scénario chargé avec succès !"
+      },
+      "errorMsgs": {
+        "nameRequired": "Le nom du scénario est obligatoire.",
+        "startDateInvalid": "La date de début est invalide.",
+        "endDateInvalid": "La date de fin est invalide.",
+        "savingScenario": "Erreur lors de l'enregistrement du scénario !",
+        "loadingScenarioFile": "Erreur lors du chargement du fichier de scénario !",
+        "decompressingScenarioFile": "Erreur lors de la décompression du fichier de scénario !"
+      },
+      "defaults": {
+        "scenarioName": "Mon scénario",
+        "scenarioDescription": "Description de mon scénario"
+      },
+      "core": {
+        "beforeStartTime": "Le temps de simulation est antérieur au début du scénario. Pause au temps de début.",
+        "afterStopTime": "Le temps de simulation est postérieur à la fin du scénario. Pause au temps de fin."
+      },
+      "help": {
+        "overview": "La gestion des scénarios donne à votre session un contexte nommé : un scénario avec un nom, une description et une fenêtre d'analyse optionnelle avec une heure de début et de fin. L'horloge de simulation est alors maintenue dans cette fenêtre, et la définition complète peut être enregistrée dans un fichier puis rechargée plus tard ou partagée avec un collègue.",
+        "imgAlt": "Le menu Paramètres du scénario avec les champs de nom, de description et de fenêtre temporelle",
+        "imgCaption": "Définissez un nom de scénario, une description et, en option, une heure de début et de fin.",
+        "windowHeading": "La fenêtre du scénario",
+        "window": "Lorsque vous définissez un <strong>Début du scénario</strong> ou une <strong>Fin du scénario</strong> (UTC, au format YYYY-MM-DD HH:MM:SS.sss), l'horloge de simulation est contrainte à cette fenêtre : si le temps dérive avant le début ou après la fin, l'horloge se met en pause à la limite et une notification en explique la raison. Laissez les champs vides pour un scénario sans contrainte.",
+        "howToUse": "<ol><li>Ouvrez <strong>Gestion des scénarios</strong> depuis le menu inférieur (mode Outils).</li><li>Saisissez un <strong>Nom du scénario</strong> (obligatoire) et un <strong>Descriptif</strong> facultatif.</li><li>Définissez éventuellement les heures de <strong>Début du scénario</strong> et de <strong>Fin du scénario</strong> en UTC.</li><li>Cliquez sur <strong>Mettre à jour le scénario</strong> pour appliquer. La fenêtre temporelle est appliquée immédiatement.</li><li>Utilisez <strong>Enregistrer le scénario</strong> pour télécharger la définition sous forme de fichier .kts compressé, et <strong>Charger le scénario</strong> pour en restaurer un depuis le disque.</li></ol>",
+        "tip1": "Si la lecture semble bloquée, vérifiez si l'horloge est immobilisée à une limite du scénario ; effacez les champs de début et de fin pour la libérer.",
+        "tip2": "Les fichiers de scénario sont de petits fichiers .kts compressés, pratiques pour partager une fenêtre d'analyse commune avec une équipe.",
+        "tip3": "Les champs de date sont validés au fur et à mesure de la saisie ; une date invalide est mise en évidence et rejetée lors de la mise à jour."
+      }
     }
   }
 }

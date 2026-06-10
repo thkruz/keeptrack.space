@@ -3,7 +3,58 @@
     "ScenarioManagementMenu": {
       "title": "シナリオ管理",
       "bottomIconLabel": "シナリオ管理",
-      "helpBody": "シナリオ管理プラグインは、さまざまなプロジェクトやコンテキストに対して作業を整理することを可能にします。<br/>現在の機能は次のとおりです:<br/><br/>  - 各シナリオの名前と説明<br/>  - 解析期間の開始日時と終了日時<br/>  - シナリオの保存/読み込み<br/><br/>最終的な目標は、シナリオ管理に必要なすべての情報を含む単一のファイルを提供することです。今後さらに機能を追加予定です！"
+      "sideMenuTitle": "シナリオ設定",
+      "labels": {
+        "scenarioName": "シナリオ名",
+        "description": "説明",
+        "scenarioStart": "シナリオ開始",
+        "scenarioEnd": "シナリオ終了"
+      },
+      "tooltips": {
+        "name": "シナリオの名前です。",
+        "description": "シナリオの説明です。",
+        "startDate": "シナリオの開始DTG（UTC、YYYY-MM-DD HH:MM:SS.sss形式）です。",
+        "endDate": "シナリオの終了DTG（UTC、YYYY-MM-DD HH:MM:SS.sss形式）です。"
+      },
+      "placeholders": {
+        "description": "ここにシナリオの説明を入力してください..."
+      },
+      "buttons": {
+        "updateScenario": "シナリオを更新",
+        "saveScenario": "シナリオを保存",
+        "loadScenario": "シナリオを読み込む"
+      },
+      "msgs": {
+        "settingsUpdated": "シナリオ設定が正常に更新されました！",
+        "scenarioLoaded": "シナリオが正常に読み込まれました！"
+      },
+      "errorMsgs": {
+        "nameRequired": "シナリオ名は必須です。",
+        "startDateInvalid": "開始日時が無効です。",
+        "endDateInvalid": "終了日時が無効です。",
+        "savingScenario": "シナリオの保存中にエラーが発生しました！",
+        "loadingScenarioFile": "シナリオファイルの読み込み中にエラーが発生しました！",
+        "decompressingScenarioFile": "シナリオファイルの解凍中にエラーが発生しました！"
+      },
+      "defaults": {
+        "scenarioName": "マイシナリオ",
+        "scenarioDescription": "マイシナリオの説明"
+      },
+      "core": {
+        "beforeStartTime": "シミュレーション時刻がシナリオ開始時刻より前です。開始時刻で一時停止します。",
+        "afterStopTime": "シミュレーション時刻がシナリオ終了時刻より後です。終了時刻で一時停止します。"
+      },
+      "help": {
+        "overview": "シナリオ管理は、セッションに名前付きのコンテキストを与えます。すなわち、名前、説明、および開始時刻と終了時刻を持つ任意の解析ウィンドウを備えたシナリオです。シミュレーション時計はそのウィンドウ内に保たれ、定義全体をファイルに保存して後で再読み込みしたり、チームメイトと共有したりできます。",
+        "imgAlt": "名前、説明、時間ウィンドウのフィールドを備えたシナリオ設定メニュー",
+        "imgCaption": "シナリオ名、説明、および任意の開始・終了時刻を定義します。",
+        "windowHeading": "シナリオウィンドウ",
+        "window": "<strong>シナリオ開始</strong>または<strong>シナリオ終了</strong>（UTC、YYYY-MM-DD HH:MM:SS.sss形式）を設定すると、シミュレーション時計はそのウィンドウに制限されます。時刻が開始より前または終了より後にずれると、時計は境界で一時停止し、通知が理由を説明します。制約のないシナリオにする場合は、フィールドを空のままにしてください。",
+        "howToUse": "<ol><li>下部メニュー（ツールモード）から<strong>シナリオ管理</strong>を開きます。</li><li><strong>シナリオ名</strong>（必須）と任意の<strong>説明</strong>を入力します。</li><li>必要に応じて<strong>シナリオ開始</strong>と<strong>シナリオ終了</strong>の時刻をUTCで設定します。</li><li><strong>シナリオを更新</strong>をクリックして適用します。時間ウィンドウは即座に適用されます。</li><li><strong>シナリオを保存</strong>で定義を圧縮された.ktsファイルとしてダウンロードし、<strong>シナリオを読み込む</strong>でディスクから復元します。</li></ol>",
+        "tip1": "再生が止まっているように見える場合は、時計がシナリオの境界で固定されていないか確認してください。開始と終了のフィールドをクリアすると解除されます。",
+        "tip2": "シナリオファイルは小さな圧縮された.ktsファイルで、共通の解析ウィンドウをチームで共有するのに便利です。",
+        "tip3": "日付フィールドは入力中に検証されます。無効な日付は強調表示され、更新時に拒否されます。"
+      }
     }
   }
 }

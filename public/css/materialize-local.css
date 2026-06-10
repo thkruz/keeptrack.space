@@ -264,12 +264,27 @@ body.keyboard-focused .dropdown-content li:focus {
  * Restore native checkbox geometry and match the single-select option styling.
  */
 .dropdown-content input[type='checkbox'] {
-    width: auto;
-    height: auto;
+    width: 18px;
+    height: 18px;
     padding: 0;
     margin: 0;
     border: none;
     position: relative;
+    flex-shrink: 0;
+}
+
+/*
+ * v2 draws the box on ::before (absolute) but the checkmark on ::after in
+ * normal flow (position: relative, display: block), which can drift below the
+ * box. Anchor both to the 18px input so they always overlap.
+ */
+.dropdown-content input[type='checkbox']::before,
+.dropdown-content input[type='checkbox']::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 18px;
+    height: 18px;
 }
 
 .dropdown-content input[type='checkbox']:focus {

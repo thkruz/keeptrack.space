@@ -12,6 +12,33 @@ import { FormSelect } from '@materializecss/materialize';
 export function refreshMaterialSelect(select: HTMLSelectElement): void {
   FormSelect.getInstance(select)?.destroy();
   FormSelect.init(select);
+
+  /*
+   * v2 bug: for multi-selects, _toggleEntryFromArray updates the option, the li
+   * class, and the trigger text on each click, but checkbox visuals are only
+   * synced in _setSelectedStates(), which runs on open — so boxes don't reflect
+   * toggles made while the dropdown is open. Re-sync after every change.
+   */
+  if (select.multiple && !select.dataset.ktMultiWired) {
+    select.dataset.ktMultiWired = '1';
+    select.addEventListener('change', () => syncMaterialSelect(select));
+  }
+}
+
+/**
+ * Sync a FormSelect's rendered UI (option checkboxes, selected classes, trigger
+ * text) to the native select's state without rebuilding — unlike
+ * {@link refreshMaterialSelect}, this keeps an open dropdown open. Uses the
+ * instance's internal sync methods; falls back to a no-op if they disappear.
+ */
+export function syncMaterialSelect(select: HTMLSelectElement): void {
+  const instance = FormSelect.getInstance(select) as unknown as {
+    _setSelectedStates?: () => void;
+    _setValueToInput?: () => void;
+  } | undefined;
+
+  instance?._setSelectedStates?.();
+  instance?._setValueToInput?.();
 }
 
 /**

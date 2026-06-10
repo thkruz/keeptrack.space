@@ -1,6 +1,6 @@
 /* eslint-disable prefer-const */
 /* eslint-disable complexity */
-import { refreshMaterialSelect } from '@app/engine/ui/material-select';
+import { refreshMaterialSelect, syncMaterialSelect } from '@app/engine/ui/material-select';
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
 import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
 import { CameraType } from '@app/engine/camera/camera-type';
@@ -446,7 +446,8 @@ export class FindSatPlugin extends KeepTrackPlugin {
             option.selected = option.value === allValue;
           });
         }
-        FindSatPlugin.refreshMaterializeSelect_(select);
+        // Sync in place (a rebuild would close the open dropdown mid-selection)
+        syncMaterialSelect(select);
       }
       prevHadAll = Array.from(select.selectedOptions).some((option) => option.value === allValue);
     });

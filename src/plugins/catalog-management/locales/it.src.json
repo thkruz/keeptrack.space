@@ -7,7 +7,39 @@
         "import": "Importa",
         "export": "Esporta"
       },
-      "helpBody": "Il menu Gestione catalogo fornisce strumenti per importare ed esportare i dati del catalogo satellitare. <b>Scheda Importa:</b> Carica un file catalogo .tce, .tle o .txt tramite selettore file o trascinamento. <b>Scheda Esporta:</b> <ul style=\"margin-left: 40px;\"> <li>Esporta TLE ufficiali - Esporta i set di elementi a due linee reali.</li> <li>Esporta 3LE - Esporta i set di elementi a tre linee.</li> <li>Esporta TLE KeepTrack - Esporta tutti i set di elementi a due linee di KeepTrack inclusi gli analisti.</li> <li>Esporta 3LE KeepTrack - Esporta tutti i set di elementi a tre linee di KeepTrack inclusi gli analisti.</li> <li>Esporta catalogo CSV - Esporta i dati del catalogo in formato CSV.</li> <li>Esporta STK .tce - Esporta i dati TLE nel formato database satellitare STK.</li> <li>Esporta satelliti nel FOV - Esporta i satelliti attualmente nel campo visivo.</li> <li>Esporta effemeridi .e - Esporta le effemeridi propagate per il satellite selezionato in formato STK.</li> </ul>"
+      "labels": {
+        "dropzone": "Trascina qui un file .tce, .tle o .txt per caricare il catalogo",
+        "keepSatInfo": "Mantieni informazioni satelliti",
+        "keepSatInfoTooltip": "Aggiorna i TLE dei satelliti esistenti preservandone nome, paese e dati di missione. I satelliti non presenti nel file importato vengono rimossi.",
+        "catalogExports": "Esportazioni del catalogo",
+        "satelliteEphemeris": "Effemeridi del satellite",
+        "timeSpanHrs": "Intervallo di tempo (ore)",
+        "stepSizeSec": "Passo (sec)"
+      },
+      "buttons": {
+        "importCatalog": "Importa catalogo",
+        "exportOfficialTles": "Esporta TLE ufficiali",
+        "exportOfficial3les": "Esporta 3LE ufficiali",
+        "exportKeepTrackTles": "Esporta TLE KeepTrack",
+        "exportKeepTrack3les": "Esporta 3LE KeepTrack",
+        "exportCatalogXlsx": "Esporta catalogo XLSX",
+        "exportStkTce": "Esporta STK .tce",
+        "exportSatsInFov": "Esporta satelliti nel FOV",
+        "exportEphemeris": "Esporta effemeridi .e",
+        "selectSatelliteFirst": "Seleziona prima un satellite"
+      },
+      "help": {
+        "overview": "Gestione catalogo sposta i dati dei satelliti dentro e fuori KeepTrack. La scheda Importa carica un file catalogo dal disco, sostituendo o aggiornando il catalogo corrente; la scheda Esporta scrive il catalogo attivo in diversi formati, dai semplici file TLE ai fogli di calcolo e ai prodotti STK.",
+        "imgAlt": "Il menu Gestione catalogo con le schede Importa ed Esporta",
+        "imgCaption": "Importa un file catalogo o esporta il catalogo attivo in diversi formati.",
+        "importHeading": "Importazione",
+        "import": "Carica un file <strong>.tce</strong>, <strong>.tle</strong> o <strong>.txt</strong> con il pulsante <strong>Importa catalogo</strong> o trascinando il file sulla zona di rilascio. Con <strong>Mantieni informazioni satelliti</strong> attivo, i satelliti esistenti mantengono nomi, paesi e dati di missione e vengono aggiornate solo le loro orbite; i satelliti assenti dal file vengono rimossi. Disattivato, il file sostituisce completamente il catalogo.",
+        "exportHeading": "Esportazione",
+        "export": "<ul><li><strong>Esporta TLE / 3LE ufficiali</strong>: solo gli oggetti realmente catalogati, come set di elementi a due o tre righe.</li><li><strong>Esporta TLE / 3LE KeepTrack</strong>: tutto il contenuto della sessione, inclusi i satelliti analista che hai creato.</li><li><strong>Esporta catalogo XLSX</strong>: il catalogo completo come foglio di calcolo.</li><li><strong>Esporta STK .tce</strong>: il catalogo nel formato del database satellitare di STK.</li><li><strong>Esporta satelliti nel FOV</strong>: solo gli oggetti attualmente nel campo visivo del sensore selezionato.</li><li><strong>Esporta effemeridi .e</strong>: effemeridi STK propagate per il satellite selezionato, usando l'<strong>Intervallo di tempo (ore)</strong> e il <strong>Passo (sec)</strong> impostati.</li></ul>",
+        "howToUse": "<ol><li>Apri <strong>Gestione catalogo</strong> dalla barra inferiore (modalità Strumenti).</li><li>Per importare: scegli la scheda <strong>Importa</strong>, decidi se mantenere le informazioni dei satelliti, quindi seleziona o trascina un file.</li><li>Per esportare: scegli la scheda <strong>Esporta</strong> e fai clic sul formato desiderato; i file vengono scaricati immediatamente.</li><li>Per le effemeridi, seleziona prima un satellite; il pulsante resta disattivato finché non ne è selezionato uno.</li></ol>",
+        "tip1": "Mantieni informazioni satelliti è l'impostazione predefinita sicura quando si aggiornano le orbite da un file TLE più recente; disattivala solo quando sostituisci deliberatamente l'intero catalogo.",
+        "tip2": "Importazioni e modifiche esistono solo nella tua sessione; esporta prima di ricaricare la pagina se vuoi conservarle."
+      }
     }
   }
 }

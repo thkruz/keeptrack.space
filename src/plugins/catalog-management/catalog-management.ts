@@ -51,6 +51,9 @@ import './catalog-management.css';
 
 type T7eKey = Parameters<typeof t7e>[0];
 
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.CatalogManagementPlugin.${key}` as T7eKey);
+
 export class CatalogManagementPlugin extends KeepTrackPlugin {
   readonly id = 'CatalogManagementPlugin';
   dependencies_ = [];
@@ -99,8 +102,31 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.CatalogManagementPlugin.title' as T7eKey),
-      body: t7e('plugins.CatalogManagementPlugin.helpBody' as T7eKey),
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/catalog-management/catalog-management-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: l('help.importHeading'),
+          content: l('help.import'),
+        },
+        {
+          heading: l('help.exportHeading'),
+          content: l('help.export'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2')],
     };
   }
 
@@ -121,7 +147,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
       <div id="catalog-management-menu" class="side-menu-parent start-hidden">
         <div class="side-menu" style="scrollbar-gutter: stable;">
           <div id="cm-dropzone" class="cm-dropzone">
-            Drop .tce, .tle, or .txt file to load catalog
+            ${l('labels.dropzone')}
           </div>
           <div class="row">
             ${tabsHtml}
@@ -135,17 +161,17 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
     return html`
       <div class="switch row cm-toggle-row">
         <label for="cm-keep-sat-info" data-position="top" data-delay="50"
-          data-tooltip="Update TLEs for existing satellites while preserving name, country, and mission data. Satellites not in the imported file are removed.">
+          data-tooltip="${l('labels.keepSatInfoTooltip')}">
           <input id="cm-keep-sat-info" type="checkbox" />
           <span class="lever"></span>
-          Keep Satellite Information
+          ${l('labels.keepSatInfo')}
         </label>
       </div>
       <div class="row">
         <center>
           <input type="file" id="cm-import-file" accept=".tce,.tle,.txt" style="display:none" />
           <button id="cm-import-btn" class="btn btn-ui waves-effect waves-light">
-            Import Catalog &#9658;
+            ${l('buttons.importCatalog')} &#9658;
           </button>
         </center>
       </div>
@@ -154,76 +180,76 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
 
   protected buildExportTabHtml_(): string {
     return html`
-      <h5 class="center-align">Catalog Exports</h5>
+      <h5 class="center-align">${l('labels.catalogExports')}</h5>
       <div class="divider"></div>
       <div class="row"></div>
       <div class="row">
         <center>
           <button id="de-export-tle-2a" class="btn btn-ui waves-effect waves-light">
-            Export Official TLEs &#9658;
+            ${l('buttons.exportOfficialTles')} &#9658;
           </button>
         </center>
       </div>
       <div class="row">
         <center>
           <button id="de-export-tle-3a" class="btn btn-ui waves-effect waves-light">
-            Export Official 3LEs &#9658;
+            ${l('buttons.exportOfficial3les')} &#9658;
           </button>
         </center>
       </div>
       <div class="row">
         <center>
           <button id="de-export-tle-2b" class="btn btn-ui waves-effect waves-light">
-            Export KeepTrack TLEs &#9658;
+            ${l('buttons.exportKeepTrackTles')} &#9658;
           </button>
         </center>
       </div>
       <div class="row">
         <center>
           <button id="de-export-tle-3b" class="btn btn-ui waves-effect waves-light">
-            Export KeepTrack 3LEs &#9658;
+            ${l('buttons.exportKeepTrack3les')} &#9658;
           </button>
         </center>
       </div>
       <div class="row">
         <center>
           <button id="de-export-csv" class="btn btn-ui waves-effect waves-light">
-            Export Catalog XLSX &#9658;
+            ${l('buttons.exportCatalogXlsx')} &#9658;
           </button>
         </center>
       </div>
       <div class="row">
         <center>
           <button id="de-export-tce" class="btn btn-ui waves-effect waves-light">
-            Export STK .tce &#9658;
+            ${l('buttons.exportStkTce')} &#9658;
           </button>
         </center>
       </div>
       <div class="row">
         <center>
           <button id="de-export-fov" class="btn btn-ui waves-effect waves-light">
-            Export Satellites in FOV &#9658;
+            ${l('buttons.exportSatsInFov')} &#9658;
           </button>
         </center>
       </div>
-      <h5 class="center-align">Satellite Ephemeris</h5>
+      <h5 class="center-align">${l('labels.satelliteEphemeris')}</h5>
       <div class="divider"></div>
       <div class="row"></div>
       <form id="de-ephemeris-form">
         <div class="row">
           <div class="input-field col s6">
             <input value="24" id="de-ephem-span" type="text" />
-            <label for="de-ephem-span" class="active">Time Span (hrs)</label>
+            <label for="de-ephem-span" class="active">${l('labels.timeSpanHrs')}</label>
           </div>
           <div class="input-field col s6">
             <input value="60" id="de-ephem-step" type="text" />
-            <label for="de-ephem-step" class="active">Step Size (sec)</label>
+            <label for="de-ephem-step" class="active">${l('labels.stepSizeSec')}</label>
           </div>
         </div>
         <div class="row">
           <center>
             <button id="de-export-ephem" class="btn btn-ui waves-effect waves-light" type="submit"
-              name="action" disabled>Select Satellite First</button>
+              name="action" disabled>${l('buttons.selectSatelliteFirst')}</button>
           </center>
         </div>
       </form>
@@ -472,10 +498,10 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
 
     if (obj?.isSatellite()) {
       btn.disabled = false;
-      btn.textContent = 'Export .e Ephemeris \u25B6';
+      btn.textContent = `${l('buttons.exportEphemeris')} \u25B6`;
     } else {
       btn.disabled = true;
-      btn.textContent = 'Select Satellite First';
+      btn.textContent = l('buttons.selectSatelliteFirst');
     }
   }
 

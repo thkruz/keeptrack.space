@@ -7,7 +7,39 @@
         "import": "가져오기",
         "export": "내보내기"
       },
-      "helpBody": "카탈로그 관리 메뉴는 위성 카탈로그 데이터를 가져오고 내보내는 도구를 제공합니다. <b>가져오기 탭:</b> 파일 선택기 또는 드래그 앤 드롭으로 .tce, .tle 또는 .txt 카탈로그 파일을 로드합니다. <b>내보내기 탭:</b> <ul style=\"margin-left: 40px;\"> <li>공식 TLE 내보내기 – 실제 2행 궤도 요소를 내보냅니다.</li> <li>3LE 내보내기 – 3행 궤도 요소를 내보냅니다.</li> <li>KeepTrack TLE 내보내기 – 분석가를 포함한 모든 KeepTrack 2행 궤도 요소를 내보냅니다.</li> <li>KeepTrack 3LE 내보내기 – 분석가를 포함한 모든 KeepTrack 3행 궤도 요소를 내보냅니다.</li> <li>카탈로그 CSV 내보내기 – 카탈로그 데이터를 CSV로 내보냅니다.</li> <li>STK .tce 내보내기 – TLE 데이터를 STK 위성 데이터베이스 형식으로 내보냅니다.</li> <li>시야 내 위성 내보내기 – 현재 시야에 있는 위성을 내보냅니다.</li> <li>.e 천체력 내보내기 – 선택한 위성의 전파된 천체력을 STK 형식으로 내보냅니다.</li> </ul>"
+      "labels": {
+        "dropzone": ".tce, .tle 또는 .txt 파일을 끌어다 놓아 카탈로그를 불러옵니다",
+        "keepSatInfo": "위성 정보 유지",
+        "keepSatInfoTooltip": "기존 위성의 이름, 국가, 임무 데이터를 유지하면서 TLE를 업데이트합니다. 가져온 파일에 없는 위성은 제거됩니다.",
+        "catalogExports": "카탈로그 내보내기",
+        "satelliteEphemeris": "위성 천체력",
+        "timeSpanHrs": "기간 (시간)",
+        "stepSizeSec": "스텝 크기 (초)"
+      },
+      "buttons": {
+        "importCatalog": "카탈로그 가져오기",
+        "exportOfficialTles": "공식 TLE 내보내기",
+        "exportOfficial3les": "공식 3LE 내보내기",
+        "exportKeepTrackTles": "KeepTrack TLE 내보내기",
+        "exportKeepTrack3les": "KeepTrack 3LE 내보내기",
+        "exportCatalogXlsx": "카탈로그 XLSX 내보내기",
+        "exportStkTce": "STK .tce 내보내기",
+        "exportSatsInFov": "FOV 내 위성 내보내기",
+        "exportEphemeris": ".e 천체력 내보내기",
+        "selectSatelliteFirst": "먼저 위성을 선택하세요"
+      },
+      "help": {
+        "overview": "카탈로그 관리는 위성 데이터를 KeepTrack 안팎으로 옮깁니다. 가져오기 탭은 디스크에서 카탈로그 파일을 불러와 현재 카탈로그를 교체하거나 업데이트하고, 내보내기 탭은 일반 TLE 파일부터 스프레드시트와 STK 산출물까지 여러 형식으로 현재 카탈로그를 내보냅니다.",
+        "imgAlt": "가져오기 및 내보내기 탭이 있는 카탈로그 관리 메뉴",
+        "imgCaption": "카탈로그 파일을 가져오거나, 현재 카탈로그를 여러 형식으로 내보냅니다.",
+        "importHeading": "가져오기",
+        "import": "<strong>카탈로그 가져오기</strong> 버튼을 사용하거나 드롭 영역에 파일을 끌어다 놓아 <strong>.tce</strong>, <strong>.tle</strong> 또는 <strong>.txt</strong> 파일을 불러옵니다. <strong>위성 정보 유지</strong>를 켜면 기존 위성은 이름, 국가, 임무 데이터를 유지한 채 궤도만 업데이트되며, 파일에 없는 위성은 제거됩니다. 끄면 파일이 카탈로그 전체를 교체합니다.",
+        "exportHeading": "내보내기",
+        "export": "<ul><li><strong>공식 TLE / 3LE 내보내기</strong>: 실제로 등재된 물체만 2행 또는 3행 궤도 요소로 내보냅니다.</li><li><strong>KeepTrack TLE / 3LE 내보내기</strong>: 직접 만든 분석가 위성을 포함한 세션의 모든 항목을 내보냅니다.</li><li><strong>카탈로그 XLSX 내보내기</strong>: 전체 카탈로그를 스프레드시트로 내보냅니다.</li><li><strong>STK .tce 내보내기</strong>: 카탈로그를 STK 위성 데이터베이스 형식으로 내보냅니다.</li><li><strong>FOV 내 위성 내보내기</strong>: 현재 선택한 센서의 시야 안에 있는 물체만 내보냅니다.</li><li><strong>.e 천체력 내보내기</strong>: 설정한 <strong>기간 (시간)</strong>과 <strong>스텝 크기 (초)</strong>를 사용해 선택한 위성의 전파된 STK 천체력을 내보냅니다.</li></ul>",
+        "howToUse": "<ol><li>하단 바(도구 모드)에서 <strong>카탈로그 관리</strong>를 엽니다.</li><li>가져오려면 <strong>가져오기</strong> 탭을 선택하고 위성 정보를 유지할지 정한 다음 파일을 선택하거나 끌어다 놓습니다.</li><li>내보내려면 <strong>내보내기</strong> 탭을 선택하고 필요한 형식을 클릭합니다. 파일이 즉시 다운로드됩니다.</li><li>천체력을 만들려면 먼저 위성을 선택하세요. 위성이 선택될 때까지 버튼은 비활성화 상태로 유지됩니다.</li></ol>",
+        "tip1": "최신 TLE 파일로 궤도를 갱신할 때는 위성 정보 유지가 안전한 기본값입니다. 카탈로그 전체를 의도적으로 교체할 때만 끄세요.",
+        "tip2": "가져오기와 편집 내용은 세션에만 존재합니다. 유지하려면 페이지를 새로 고치기 전에 내보내세요."
+      }
     }
   }
 }

@@ -3,7 +3,15 @@
     "FilterMenuPlugin": {
       "title": "Nabídka filtrů",
       "bottomIconLabel": "Nabídka filtrů",
-      "helpBody": "Tato nabídka umožňuje filtrovat objekty zobrazené na glóbu podle jejich typu, orbitálního režimu a zdroje dat.",
+      "help": {
+        "overview": "Nabídka filtrů určuje, které objekty se vůbec vykreslují. Přepínače jsou seskupeny podle typu objektu (užitečná zatížení, trosky, těla raket), orbitálního režimu (od LEO po GEO a dále), zdroje dat a země, takže můžete katalog omezit přesně na populaci, kterou zkoumáte.",
+        "imgAlt": "Nabídka filtrů se seskupenými přepínači viditelnosti",
+        "imgCaption": "Každý přepínač okamžitě skryje nebo zobrazí část katalogu.",
+        "howToUse": "<ol><li>Otevřete <strong>Nabídka filtrů</strong> ze spodní lišty nebo stiskněte <strong>F</strong>.</li><li>Přepínejte přepínače; scéna se aktualizuje okamžitě při použití každého filtru.</li><li>Klikněte na <strong>Obnovit výchozí</strong> pro obnovení standardního zobrazení.</li></ol>",
+        "tip1": "Filtry se kombinují: objekt musí projít každou aktivní skupinou, aby zůstal viditelný, takže prázdně vypadající scéna obvykle znamená, že se dva filtry vzájemně vylučují.",
+        "tip2": "Paleta příkazů nabízí předvolby na jedno kliknutí, například zobrazit pouze LEO nebo skrýt trosky a těla raket.",
+        "shortcutToggle": "Přepnout nabídku filtrů"
+      },
       "resetToDefaults": "Obnovit výchozí",
       "defaultTooltip": "Vypněte pro skrytí {name}",
       "commands": {

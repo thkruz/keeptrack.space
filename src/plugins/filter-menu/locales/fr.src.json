@@ -3,7 +3,15 @@
     "FilterMenuPlugin": {
       "title": "Menu des filtres",
       "bottomIconLabel": "Menu des filtres",
-      "helpBody": "Ce menu vous permet de filtrer les objets affichés sur le globe en fonction de leur type, de leur régime orbital et de leur source de données.",
+      "help": {
+        "overview": "Le menu des filtres contrôle quels objets sont dessinés. Les commutateurs sont regroupés par type d'objet (charges utiles, débris, étages de fusée), régime orbital (de LEO à GEO et au-delà), source de données et pays, afin de réduire le catalogue exactement à la population que vous étudiez.",
+        "imgAlt": "Le menu des filtres avec ses commutateurs de visibilité regroupés",
+        "imgCaption": "Chaque commutateur masque ou affiche instantanément une partie du catalogue.",
+        "howToUse": "<ol><li>Ouvrez le <strong>Menu des filtres</strong> depuis la barre inférieure ou appuyez sur <strong>F</strong>.</li><li>Actionnez les commutateurs ; la scène se met à jour immédiatement à chaque filtre appliqué.</li><li>Cliquez sur <strong>Réinitialiser par défaut</strong> pour restaurer la vue standard.</li></ol>",
+        "tip1": "Les filtres se combinent : un objet doit passer chaque groupe actif pour rester visible ; une scène qui semble vide signifie donc souvent que deux filtres s'excluent mutuellement.",
+        "tip2": "La palette de commandes propose des préréglages en un clic, comme n'afficher que LEO ou masquer les débris et les étages de fusée.",
+        "shortcutToggle": "Basculer le menu des filtres"
+      },
       "resetToDefaults": "Réinitialiser par défaut",
       "defaultTooltip": "Désactiver pour masquer {name}",
       "commands": {

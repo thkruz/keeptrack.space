@@ -53,7 +53,7 @@ describe('FilterMenuPlugin_class', () => {
       const helpConfig = plugin.getHelpConfig();
 
       expect(helpConfig.title).toBeDefined();
-      expect(helpConfig.body).toBeDefined();
+      expect(helpConfig.sections!.length).toBeGreaterThan(0);
     });
 
     it('should return correct keyboard shortcuts', () => {

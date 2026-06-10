@@ -3,7 +3,15 @@
     "FilterMenuPlugin": {
       "title": "Filtermenü",
       "bottomIconLabel": "Filtermenü",
-      "helpBody": "Dieses Menü ermöglicht es Ihnen, die auf dem Globus angezeigten Objekte nach Typ, orbitalen Bereichen und Datenquellen zu filtern.",
+      "help": {
+        "overview": "Das Filtermenü steuert, welche Objekte überhaupt gezeichnet werden. Die Schalter sind nach Objekttyp (Nutzlasten, Trümmer, Raketenstufen), orbitalem Bereich (LEO bis GEO und darüber hinaus), Datenquelle und Land gruppiert, sodass Sie den Katalog auf genau die Population reduzieren können, die Sie untersuchen.",
+        "imgAlt": "Das Filtermenü mit seinen gruppierten Sichtbarkeitsschaltern",
+        "imgCaption": "Jeder Schalter blendet sofort einen Teil des Katalogs ein oder aus.",
+        "howToUse": "<ol><li>Öffnen Sie das <strong>Filtermenü</strong> über die untere Leiste oder drücken Sie <strong>F</strong>.</li><li>Betätigen Sie die Schalter; die Szene wird sofort aktualisiert, sobald jeder Filter angewendet wird.</li><li>Klicken Sie auf <strong>Auf Standard zurücksetzen</strong>, um die Standardansicht wiederherzustellen.</li></ol>",
+        "tip1": "Filter wirken kombiniert: Ein Objekt muss jede aktive Gruppe passieren, um sichtbar zu bleiben. Eine leer wirkende Szene bedeutet daher meist, dass sich zwei Filter gegenseitig ausschließen.",
+        "tip2": "Die Befehlspalette bietet Ein-Klick-Voreinstellungen, etwa nur LEO anzuzeigen oder Trümmer und Raketenstufen auszublenden.",
+        "shortcutToggle": "Filtermenü umschalten"
+      },
       "resetToDefaults": "Auf Standard zurücksetzen",
       "defaultTooltip": "Deaktivieren, um {name} auszublenden",
       "commands": {

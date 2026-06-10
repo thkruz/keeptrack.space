@@ -356,7 +356,26 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
   getHelpConfig(): IHelpConfig {
     return {
       title: t7e('plugins.FilterMenuPlugin.title'),
-      body: t7e('plugins.FilterMenuPlugin.helpBody'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.FilterMenuPlugin.help.overview'),
+          image: {
+            src: 'img/help/filter-menu/filter-menu.png',
+            alt: t7e('plugins.FilterMenuPlugin.help.imgAlt'),
+            caption: t7e('plugins.FilterMenuPlugin.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.FilterMenuPlugin.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.FilterMenuPlugin.help.tip1'),
+        t7e('plugins.FilterMenuPlugin.help.tip2'),
+      ],
+      shortcuts: [{ keys: ['F'], description: t7e('plugins.FilterMenuPlugin.help.shortcutToggle') }],
     };
   }
 

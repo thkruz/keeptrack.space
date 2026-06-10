@@ -3,7 +3,15 @@
     "FilterMenuPlugin": {
       "title": "Menú de filtros",
       "bottomIconLabel": "Menú de filtros",
-      "helpBody": "Este menú permite filtrar los objetos mostrados en el globo según su tipo, régimen orbital y fuente de datos.",
+      "help": {
+        "overview": "El menú de filtros controla qué objetos se dibujan. Los interruptores están agrupados por tipo de objeto (cargas útiles, desechos, cuerpos de cohetes), régimen orbital (de LEO a GEO y más allá), fuente de datos y país, de modo que pueda reducir el catálogo exactamente a la población que está estudiando.",
+        "imgAlt": "El menú de filtros con sus interruptores de visibilidad agrupados",
+        "imgCaption": "Cada interruptor oculta o muestra al instante una parte del catálogo.",
+        "howToUse": "<ol><li>Abra el <strong>Menú de filtros</strong> desde la barra inferior o pulse <strong>F</strong>.</li><li>Accione los interruptores; la escena se actualiza inmediatamente al aplicarse cada filtro.</li><li>Haga clic en <strong>Restablecer valores predeterminados</strong> para restaurar la vista estándar.</li></ol>",
+        "tip1": "Los filtros se combinan: un objeto debe pasar todos los grupos activos para seguir siendo visible, así que una escena que parece vacía suele significar que dos filtros se excluyen mutuamente.",
+        "tip2": "La paleta de comandos tiene preajustes de un clic, como mostrar solo LEO u ocultar desechos y cuerpos de cohetes.",
+        "shortcutToggle": "Alternar el menú de filtros"
+      },
       "resetToDefaults": "Restablecer valores predeterminados",
       "defaultTooltip": "Desactivar para ocultar {name}",
       "commands": {

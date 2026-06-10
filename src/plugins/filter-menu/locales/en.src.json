@@ -3,7 +3,15 @@
     "FilterMenuPlugin": {
       "title": "Filter Menu",
       "bottomIconLabel": "Filter Menu",
-      "helpBody": "This menu allows you to filter the objects displayed on the globe based on their type, orbital regime, and data source.",
+      "help": {
+        "overview": "The Filter menu controls which objects are drawn at all. Toggles are grouped by object type (payloads, debris, rocket bodies), orbital regime (LEO through GEO and beyond), data source, and country, so you can cut the catalog down to exactly the population you are studying.",
+        "imgAlt": "The Filter menu with its grouped visibility toggles",
+        "imgCaption": "Each switch hides or shows a slice of the catalog instantly.",
+        "howToUse": "<ol><li>Open the <strong>Filter Menu</strong> from the bottom bar or press <strong>F</strong>.</li><li>Toggle the switches; the scene updates immediately as each filter applies.</li><li>Click <strong>Reset to Defaults</strong> to restore the standard view.</li></ol>",
+        "tip1": "Filters combine: an object must pass every active group to stay visible, so an empty looking scene usually means two filters are excluding each other.",
+        "tip2": "The command palette has one click presets such as showing only LEO or hiding debris and rocket bodies.",
+        "shortcutToggle": "Toggle the Filter menu"
+      },
       "resetToDefaults": "Reset to Defaults",
       "defaultTooltip": "Disable to hide {name}",
       "commands": {

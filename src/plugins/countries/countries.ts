@@ -127,7 +127,7 @@ export class CountriesMenu extends KeepTrackPlugin implements ICommandPaletteCap
 
         return {
           id: `CountriesMenu.selectCountry.${dataGroup}`,
-          label: `Select Country: ${country}`,
+          label: t7e('plugins.CountriesMenu.commands.selectCountry').replace('{country}', country),
           category,
           callback: () => this.countryMenuClick_(dataGroup),
         };
@@ -137,7 +137,26 @@ export class CountriesMenu extends KeepTrackPlugin implements ICommandPaletteCap
   getHelpConfig(): IHelpConfig {
     return {
       title: t7e('plugins.CountriesMenu.title'),
-      body: t7e('plugins.CountriesMenu.helpBody'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.CountriesMenu.help.overview'),
+          image: {
+            src: 'img/help/countries/countries-menu.png',
+            alt: t7e('plugins.CountriesMenu.help.imgAlt'),
+            caption: t7e('plugins.CountriesMenu.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.CountriesMenu.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.CountriesMenu.help.tip1'),
+        t7e('plugins.CountriesMenu.help.tip2'),
+      ],
+      shortcuts: [{ keys: ['O'], description: t7e('plugins.CountriesMenu.help.shortcutToggle') }],
     };
   }
 

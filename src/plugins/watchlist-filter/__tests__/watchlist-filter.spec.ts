@@ -11,7 +11,7 @@ test.describe('WatchlistFilterPlugin', () => {
       settings: { isDisableLoginGate: true },
     });
 
-    // WatchlistFilter is UTILITY_ONLY — in drawer mode, the utility icon
+    // WatchlistFilter is UTILITY_ONLY - in drawer mode, the utility icon
     // gets id="${pluginId}-utility-icon" from the PluginDrawer.
     const utilityIcon = page.locator('#WatchlistFilterPlugin-utility-icon');
 

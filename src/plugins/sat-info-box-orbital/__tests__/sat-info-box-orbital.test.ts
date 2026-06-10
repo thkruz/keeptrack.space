@@ -19,7 +19,7 @@ import { vi } from 'vitest';
  * `SatInfoBoxOrbital.updateOrbitData_` when a satellite is preselected
  * (e.g. via `?sat=` URL param) before the SatInfoBox DOM has been built.
  */
-describe('SatInfoBoxOrbital — update before DOM ready', () => {
+describe('SatInfoBoxOrbital - update before DOM ready', () => {
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager, SatInfoBox]);
     // Ensure time manager has a real simulationTimeObj for gmst lookup

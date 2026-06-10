@@ -45,7 +45,7 @@ test.describe('CatalogManagement Plugin', () => {
     await expect(page.locator('#cm-import-btn')).toBeAttached();
     await expect(page.locator('#cm-dropzone')).toBeAttached();
 
-    // Verify Export tab elements — base buttons
+    // Verify Export tab elements - base buttons
     await expect(page.locator('#de-export-tle-2a')).toBeAttached();
     await expect(page.locator('#de-export-tle-3a')).toBeAttached();
     await expect(page.locator('#de-export-tle-2b')).toBeAttached();

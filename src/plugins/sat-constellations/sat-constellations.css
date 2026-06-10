@@ -1,4 +1,4 @@
-/* Side menu width override — ISideMenuConfig.width is not applied to DOM by base plugin */
+/* Side menu width override - ISideMenuConfig.width is not applied to DOM by base plugin */
 #constellations-menu {
   width: 650px !important;
 }

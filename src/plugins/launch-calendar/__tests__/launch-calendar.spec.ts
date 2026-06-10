@@ -21,7 +21,7 @@ test.describe('LaunchCalendar Plugin', () => {
 
     await expect(drawerItem).toBeVisible();
 
-    // Click the drawer item — should open colorbox and select the icon
+    // Click the drawer item - should open colorbox and select the icon
     await drawerItem.click();
     await expect(colorboxDiv).toBeVisible({ timeout: 10_000 });
     await expect(bottomIcon).toHaveClass(/bmenu-item-selected/u);

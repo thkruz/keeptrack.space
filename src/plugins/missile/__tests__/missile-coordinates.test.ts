@@ -1,6 +1,6 @@
 import { Missile } from '@app/plugins/missile/missile-math';
 
-// calcCoordinates_ / calcThrustForce_ are private statics — reach them through a cast.
+// calcCoordinates_ / calcThrustForce_ are private statics - reach them through a cast.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const M = Missile as any;
 

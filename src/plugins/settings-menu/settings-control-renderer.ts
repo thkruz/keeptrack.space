@@ -106,7 +106,7 @@ const renderButton_ = (c: ISettingButtonControl, domId: string): string => `
 
 /**
  * Renders a single control to its HTML representation. Listeners are NOT
- * attached here — call {@link attachSettingControlListeners} after the HTML
+ * attached here - call {@link attachSettingControlListeners} after the HTML
  * is inserted into the DOM.
  */
 export const renderSettingControl = (control: ISettingControl, sectionId: string): string => {

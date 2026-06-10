@@ -90,7 +90,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       { key: 'Dec', id: EL.DEC, tooltip: 'Declination', value: 'XX deg' },
       { key: 'Beam Width', id: EL.BEAMWIDTH, tooltip: 'Linear Width at Target\'s Range', value: 'xxxx km' },
       { key: 'Max Tmx Time', id: EL.MAX_TMX, tooltip: 'Time for RF/Light to Reach Target and Back', value: 'xxxx ms' },
-      { key: 'Sun', id: EL.SUN, tooltip: 'Does the Sun Impact the Sensor', value: '—' },
+      { key: 'Sun', id: EL.SUN, tooltip: 'Does the Sun Impact the Sensor', value: '-' },
       { key: 'Vis Mag', id: EL.VMAG, tooltip: 'Visual Magnitude (Lower numbers are brighter)', value: 'xx.x' },
       { key: 'Next Pass', id: EL.NEXT_PASS, tooltip: 'Next Time in Coverage', value: '00:00:00z' },
     ];
@@ -352,7 +352,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
 
       this.updateSatelliteTearrData_(obj, sensorManagerInstance, timeManagerInstance);
 
-      // Always update Sun status — hides the row when no sensor, computes when sensor active
+      // Always update Sun status - hides the row when no sensor, computes when sensor active
       this.calculateSunStatus_(obj);
 
       const nextPassElement = getEl('sat-nextpass');

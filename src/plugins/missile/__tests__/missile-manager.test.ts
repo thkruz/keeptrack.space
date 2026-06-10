@@ -34,7 +34,7 @@ type TestResult = {
  * Adapter over the current 14-positional `missileManager.createMissile` API.
  *
  * When PR 4 lands and the API becomes `createMissile(spec)`, only this helper
- * changes — every test body and snapshot stays identical.
+ * changes - every test body and snapshot stays identical.
  */
 const launch = (spec: TestMissileSpec): TestResult => {
   const slot = spec.missileObjectNum;
@@ -98,7 +98,7 @@ const resetMissileManagerState = () => {
   missileManager.missileArray = [];
 };
 
-describe('MissileManager (baseline — pre-refactor)', () => {
+describe('MissileManager (baseline - pre-refactor)', () => {
   beforeEach(() => {
     setupStandardEnvironment();
     seedMissileSlots();
@@ -309,12 +309,12 @@ describe('MissileManager (baseline — pre-refactor)', () => {
      * bugs below: silent validation failures and the retry-returns-0 path
      * that lies to callers about whether a missile was actually created.
      * The MissileSimulation extraction is still worth doing for clarity and
-     * testability — but "concurrency" is not the right framing.
+     * testability - but "concurrency" is not the right framing.
      */
 
     /**
      * Bug 1: invalid launch lat/lon ([missile-manager.ts:225-230]) returns
-     * 0 silently — no error message, no error type, no toast. Target lat/lon
+     * 0 silently - no error message, no error type, no toast. Target lat/lon
      * sets a message correctly; only launch coords are silent.
      *
      * Flips to passing in PR 4 when validation is unified through MissileLaunchResult.
@@ -339,12 +339,12 @@ describe('MissileManager (baseline — pre-refactor)', () => {
     /**
      * Bug 2: when computed apogee falls below minAltitudeTrue, Missile()
      * recursively calls itself with a higher burn rate at [missile-manager.ts:512]
-     * — then unconditionally returns 0, falsely signalling failure even when
+     * - then unconditionally returns 0, falsely signalling failure even when
      * the recursive call succeeded.
      *
      * Test setup: choose a launch where the default burn rate (0.042) is
      * insufficient and the retry-with-bumped-rate path kicks in. The retry
-     * should succeed, so the *caller* should observe success — but today
+     * should succeed, so the *caller* should observe success - but today
      * sees a return of 0.
      *
      * Flips to passing in PR 4 when the retry becomes an internal loop

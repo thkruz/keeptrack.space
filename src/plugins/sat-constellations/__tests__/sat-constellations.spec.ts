@@ -33,7 +33,7 @@ test.describe('SatConstellations Plugin', () => {
 
     await expect(drawerItem).toBeVisible();
 
-    // Click the drawer item — should open side menu
+    // Click the drawer item - should open side menu
     await drawerItem.click();
     await expect(sideMenu).toBeVisible({ timeout: 5_000 });
     await expect(bottomIcon).toHaveClass(/bmenu-item-selected/u);

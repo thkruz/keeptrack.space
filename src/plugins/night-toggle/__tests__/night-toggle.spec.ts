@@ -7,7 +7,7 @@ test.describe('NightToggle', () => {
       plugins: { NightToggle: { enabled: true } },
     });
 
-    // UTILITY_ONLY plugins create NO bottom icon — only a utility icon
+    // UTILITY_ONLY plugins create NO bottom icon - only a utility icon
     const utilityIcon = page.locator('#NightToggle-utility-icon');
 
     await expect(utilityIcon).toBeVisible();

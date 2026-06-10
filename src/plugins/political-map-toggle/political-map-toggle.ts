@@ -27,7 +27,7 @@ export class PoliticalMapToggle extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    // Sync button state with the setting at launch — political map may already be on
+    // Sync button state with the setting at launch - political map may already be on
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
       if (settingsManager.isDrawPoliticalMap) {
         this.setBottomIconToSelected();

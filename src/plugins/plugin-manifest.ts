@@ -1,6 +1,6 @@
 /* eslint-disable no-undefined */
 /**
- * Plugin Manifest — Single source of truth for all plugin registrations.
+ * Plugin Manifest - Single source of truth for all plugin registrations.
  *
  * Array order determines initialization order.
  *

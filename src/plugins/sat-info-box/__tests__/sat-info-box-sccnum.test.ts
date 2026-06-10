@@ -16,8 +16,8 @@ import { setupStandardEnvironment } from '@test/environment/standard-env';
 /*
  * The sat-info-box header displays Satellite.sccNum (the display-canonical
  * numeric form) in the OBJNUM field. This pins that every sccNum form renders
- * its expected canonical value — never "undefined", "NaN", or a wrong-width
- * string — for both Satellite and OemSatellite objects.
+ * its expected canonical value - never "undefined", "NaN", or a wrong-width
+ * string - for both Satellite and OemSatellite objects.
  *
  * Expected OBJNUM per input form (after assignAlpha5Forms_ normalization):
  *   numeric5  "25544"     -> "25544"
@@ -86,7 +86,7 @@ describe('SatInfoBox_header_OBJNUM_sccNumForms', () => {
     plugin = PluginRegistry.getPlugin(SatInfoBox)!;
     // Build the header DOM. createContainer inserts the markup then calls
     // initDraggabilly(), which throws under jsdom (no real layout) before the
-    // isHtmlReady_ flag is set — the EventBus swallows the error but leaves the
+    // isHtmlReady_ flag is set - the EventBus swallows the error but leaves the
     // flag false, so set it explicitly so updateHeaderData_ renders
     // synchronously instead of deferring via setTimeout.
     EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
@@ -98,7 +98,7 @@ describe('SatInfoBox_header_OBJNUM_sccNumForms', () => {
     // eslint-disable-next-line dot-notation
     plugin['updateHeaderData_'](obj);
     // setInnerHtml defers the actual DOM write via requestIdleCallback, which
-    // the test env polyfills onto setTimeout — flush it before reading.
+    // the test env polyfills onto setTimeout - flush it before reading.
     vi.runAllTimers();
 
     return getEl(EL.OBJNUM)!.innerHTML;

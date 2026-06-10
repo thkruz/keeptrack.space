@@ -26,7 +26,7 @@ let isMassRaidLoaded = false;
  *
  * Recomputed whenever missiles are added, so the window expands to cover the whole mass raid, or
  * every custom missile launched so far (start = earliest of any, stop = latest of any). No-op when
- * the scenario plugin isn't loaded or no active missiles remain — clearMissiles() releases the
+ * the scenario plugin isn't loaded or no active missiles remain - clearMissiles() releases the
  * bounds in that case.
  */
 const boundScenarioToActiveMissiles_ = (): void => {
@@ -104,7 +104,7 @@ export const MassRaidPre = async (time: number, simFile: string) => {
 
         // Seed the missile's initial position on the main thread. The position-cruncher worker
         // fills positionData asynchronously on its next cycle, but the doSearch('RV_') below runs
-        // synchronously — without this seed every missile reads position {0,0,0} and is flagged as
+        // synchronously - without this seed every missile reads position {0,0,0} and is flagged as
         // "decayed" until the user searches a second time. The cruncher overwrites these with
         // matching values once it runs, so this only bridges the startup gap.
         const pv = missileObj.eci();
@@ -211,7 +211,7 @@ export const clearMissiles = () => {
  *   - Catalog interaction (`getObject`, `satCruncherThread.sendNewMissile`,
  *     `orbitManager.updateOrbitBuffer`).
  *   - Trajectory post-processing (`smoothList_`) and writing to the missile object.
- *   - The low-apogee retry recursion (preserved verbatim — the bug where this
+ *   - The low-apogee retry recursion (preserved verbatim - the bug where this
  *     path returns 0 even when the recursive call succeeded is fixed in PR 4).
  *
  * The 14-positional signature and `1` / `0` return value are preserved for

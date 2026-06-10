@@ -166,7 +166,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
       EventBusEvent.uiManagerInit,
       () => {
         // addConstellation now accepts (number | string)[] for SCC_NUM groups,
-        // so we can pass the raw sccNum strings — alpha-5 / extended IDs in
+        // so we can pass the raw sccNum strings - alpha-5 / extended IDs in
         // the list would resolve correctly via sccNum2Id.
         PluginRegistry.getPlugin(SatConstellations)?.addConstellation(t7e('plugins.TransponderChannelData.constellationName'), GroupType.SCC_NUM, this.satsWithChannels_);
       },

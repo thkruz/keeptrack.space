@@ -32,7 +32,7 @@ describe('SatelliteTimeline drawing and canvas interactions', () => {
     websiteInit(plugin);
 
     // jsdom has no 2D context. drawTimeline_ clones the canvas and pulls a context from the
-    // clone — a prototype spy does NOT reach cloneNode-created elements, so override cloneNode
+    // clone - a prototype spy does NOT reach cloneNode-created elements, so override cloneNode
     // on the instance to return a canvas whose getContext returns a working mock.
     const clone = document.createElement('canvas');
 

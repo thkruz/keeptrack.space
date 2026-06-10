@@ -17,7 +17,7 @@ import { MissileSimulationResult, MissileSpec } from './missile-types';
  *
  * The physics formulas are copied verbatim from the pre-refactor `Missile()`
  * function. The golden-trajectory snapshot tests in `missile-manager.test.ts`
- * lock the output across this move — if a snapshot diff appears, the math
+ * lock the output across this move - if a snapshot diff appears, the math
  * drifted and the cause needs to be hunted down before merging.
  */
 export class MissileSimulation {

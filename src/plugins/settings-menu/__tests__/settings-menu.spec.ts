@@ -38,10 +38,10 @@ test.describe('SettingsMenuPlugin', () => {
     // ── Behavior: change settings, apply, then reset (exercises onFormChange_, onSubmit_, resetToDefaults) ──
 
     // Toggle a checkbox. The Materialize input is positioned off-viewport, so dispatch the
-    // click directly — it still toggles the box and fires the change the form listens for.
+    // click directly - it still toggles the box and fires the change the form listens for.
     await page.locator('#settings-demo-mode').dispatchEvent('click');
 
-    // Apply — onSubmit_ reads the entire form into settingsManager.
+    // Apply - onSubmit_ reads the entire form into settingsManager.
     await page.locator('#settings-submit').click();
     await expect(page.locator('#settings-menu')).toBeVisible();
 

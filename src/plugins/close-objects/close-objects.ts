@@ -45,7 +45,7 @@ export class CloseObjectsPlugin extends KeepTrackPlugin {
   readonly id = 'CloseObjectsPlugin';
   dependencies_ = [];
 
-  protected searchRadius_ = 50; // km — overridable by Pro
+  protected searchRadius_ = 50; // km - overridable by Pro
   protected closeObjectSearchStrCache_: string | null = null;
 
   // =========================================================================
@@ -121,7 +121,7 @@ export class CloseObjectsPlugin extends KeepTrackPlugin {
       </div>
     `;
 
-    // Pro adds getSecondaryMenuConfig() — generateSideMenuHtml_() auto-wraps with title bar
+    // Pro adds getSecondaryMenuConfig() - generateSideMenuHtml_() auto-wraps with title bar
     if ('getSecondaryMenuConfig' in this) {
       return innerHtml;
     }

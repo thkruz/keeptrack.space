@@ -49,12 +49,12 @@ describe('MissilePlugin behavior', () => {
   });
 
   it('msAttackerChange_ flags submarine launch sites and reveals launch fields', () => {
-    setVal('ms-attacker', '100'); // Ohio Sub — in the sub list
+    setVal('ms-attacker', '100'); // Ohio Sub - in the sub list
     p().msAttackerChange_();
     expect(p().isSub_).toBe(true);
     expect(getEl('ms-lau-holder-lat')!.style.display).toBe('block');
 
-    setVal('ms-attacker', '201'); // Dombarovskiy — silo, not a sub
+    setVal('ms-attacker', '201'); // Dombarovskiy - silo, not a sub
     p().msAttackerChange_();
     expect(p().isSub_).toBe(false);
     expect(getEl('ms-lau-holder-lat')!.style.display).toBe('none');

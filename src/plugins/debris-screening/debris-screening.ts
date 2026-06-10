@@ -316,7 +316,7 @@ export class DebrisScreening extends KeepTrackPlugin {
       const sat = catalogManager.getObject(satId, GetSatType.SKIP_POS_VEL);
 
       // OemSatellite passes isSatellite() but has no tle1/tle2/apogee/perigee
-      // — toTle() and the orbital-shell filter below would both throw.
+      // - toTle() and the orbital-shell filter below would both throw.
       if (!(sat instanceof Satellite)) {
         errorManagerInstance.warn(l('errorMsgs.InvalidSatellite'));
 
@@ -533,7 +533,7 @@ export class DebrisScreening extends KeepTrackPlugin {
 
   private selectSecondarySatelliteByScc_(sccNum: string): void {
     const catalogManager = ServiceLocator.getCatalogManager();
-    // Pass the string straight through — sccNum2Id handles numeric/alpha-5/extended.
+    // Pass the string straight through - sccNum2Id handles numeric/alpha-5/extended.
     const id = catalogManager.sccNum2Id(sccNum);
 
     if (id !== null && id !== -1) {

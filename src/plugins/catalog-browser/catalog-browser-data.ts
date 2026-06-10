@@ -1,5 +1,5 @@
 export interface CatalogEntry {
-  /** Unique ID for the catalog entry — never derived from translated name */
+  /** Unique ID for the catalog entry - never derived from translated name */
   id: string;
   /** CelesTrack GP API query parameter (e.g., 'GROUP=starlink' or 'FILE=starlink') */
   queryParam: string;

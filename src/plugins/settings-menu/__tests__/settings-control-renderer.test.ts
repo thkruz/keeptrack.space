@@ -315,7 +315,7 @@ describe('attachSettingControlListeners - toggle', () => {
       type: 'toggle', id: 't', label: 'T', isAvailable: () => false, get: () => false, set,
     };
 
-    // The renderer returns '', so simulate that no DOM exists, then call attach — should be a no-op.
+    // The renderer returns '', so simulate that no DOM exists, then call attach - should be a no-op.
     attachSettingControlListeners(ctrl, 's');
     expect(set).not.toHaveBeenCalled();
   });

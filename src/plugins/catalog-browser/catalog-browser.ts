@@ -428,7 +428,7 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
       // canonicalSccKey strips leading zeros so a zero-padded incoming SCC
       // ("025544") still matches the display-canonical cached.sccNum ("25544"),
       // and returns null for malformed SCCs (Satnogs-style corruption) or IDs
-      // beyond TLE alpha-5 capacity instead of throwing — skip those rather
+      // beyond TLE alpha-5 capacity instead of throwing - skip those rather
       // than crashing the whole merge.
       const scc6 = CatalogLoader.canonicalSccKey(entry.SCC);
 

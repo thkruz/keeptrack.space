@@ -6,13 +6,18 @@ import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import {
   IBottomIconConfig,
   ICommandPaletteCommand,
+  IHelpConfig,
   ISideMenuConfig,
 } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
+import { t7e } from '@app/locales/keys';
 import rocketPng from '@public/img/icons/rocket.png';
 import { missileManager } from './missile-manager';
+
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.MissilePlugin.${key}` as Parameters<typeof t7e>[0]);
 
 export class MissilePlugin extends KeepTrackPlugin {
   readonly id = 'MissilePlugin';
@@ -29,7 +34,7 @@ export class MissilePlugin extends KeepTrackPlugin {
   getBottomIconConfig(): IBottomIconConfig {
     return {
       elementName: `${this.id}-bottom-icon`,
-      label: 'Missile',
+      label: l('bottomIconLabel'),
       image: rocketPng,
       menuMode: [MenuMode.CREATE, MenuMode.ALL],
     };
@@ -38,11 +43,37 @@ export class MissilePlugin extends KeepTrackPlugin {
   getSideMenuConfig(): ISideMenuConfig {
     return {
       elementName: `${this.id}-menu`,
-      title: 'Create Missile Attack',
+      title: l('title'),
       html: this.buildSideMenuHtml_(),
       dragOptions: {
         isDraggable: true,
       },
+    };
+  }
+
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/missile/missile-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: l('help.typesHeading'),
+          content: l('help.types'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2'), l('help.tip3')],
     };
   }
 
@@ -54,149 +85,149 @@ export class MissilePlugin extends KeepTrackPlugin {
           <form id="${this.id}-menu-form" class="col s12">
             <div class="input-field col s12">
               <select id="ms-type">
-                <option value="0">Custom Missile</option>
-                <option value="1">Russia to USA</option>
-                <option value="2">Russia to USA w/ Subs</option>
-                <option value="3">China to USA</option>
-                <option value="4">North Korea to USA</option>
-                <option value="5">USA to Russia</option>
-                <option value="6">USA to China</option>
-                <option value="7">USA to North Korea</option>
+                <option value="0">${l('types.customMissile')}</option>
+                <option value="1">${l('types.russiaToUsa')}</option>
+                <option value="2">${l('types.russiaToUsaSubs')}</option>
+                <option value="3">${l('types.chinaToUsa')}</option>
+                <option value="4">${l('types.northKoreaToUsa')}</option>
+                <option value="5">${l('types.usaToRussia')}</option>
+                <option value="6">${l('types.usaToChina')}</option>
+                <option value="7">${l('types.usaToNorthKorea')}</option>
               </select>
-              <label>Type of Attack</label>
+              <label>${l('labels.typeOfAttack')}</label>
             </div>
             <div id="ms-custom-opt">
               <div class="input-field col s12">
                 <select id="ms-attacker">
-                  <optgroup label="Russia">
-                    <option value="200">Aleysk</option>
-                    <option value="201">Dombarovskiy</option>
-                    <option value="202">Uzhur</option>
-                    <option value="203">Kartaly</option>
-                    <option value="204">Irkutsk</option>
-                    <option value="205">Kansk</option>
-                    <option value="206">Krasnoyarsk</option>
-                    <option value="207">Nizhniy Tagil</option>
-                    <option value="208">Novosibirsk</option>
-                    <option value="209">Tatischevo (SS-19)</option>
-                    <option value="210">Tatischevo (SS-27)</option>
-                    <option value="211">Teykovo</option>
-                    <option value="212">Yoshkar Ola</option>
-                    <option value="213">Borei Sub (Bulava)</option>
-                    <option value="214">Delta IV Sub (Sineva)</option>
-                    <option value="215">Delta IV Sub (Layner)</option>
+                  <optgroup label="${l('groups.russia')}">
+                    <option value="200">${l('attackers.aleysk')}</option>
+                    <option value="201">${l('attackers.dombarovskiy')}</option>
+                    <option value="202">${l('attackers.uzhur')}</option>
+                    <option value="203">${l('attackers.kartaly')}</option>
+                    <option value="204">${l('attackers.irkutsk')}</option>
+                    <option value="205">${l('attackers.kansk')}</option>
+                    <option value="206">${l('attackers.krasnoyarsk')}</option>
+                    <option value="207">${l('attackers.nizhniyTagil')}</option>
+                    <option value="208">${l('attackers.novosibirsk')}</option>
+                    <option value="209">${l('attackers.tatischevoSs19')}</option>
+                    <option value="210">${l('attackers.tatischevoSs27')}</option>
+                    <option value="211">${l('attackers.teykovo')}</option>
+                    <option value="212">${l('attackers.yoshkarOla')}</option>
+                    <option value="213">${l('attackers.boreiSub')}</option>
+                    <option value="214">${l('attackers.deltaIvSubSineva')}</option>
+                    <option value="215">${l('attackers.deltaIvSubLayner')}</option>
                   </optgroup>
-                  <optgroup label="China">
-                    <option value="321">Type 092 Sub (JL-2)</option>
-                    <option value="300">Nanyang</option>
-                    <option value="301">Xining</option>
-                    <option value="302">Delingha</option>
-                    <option value="303">Haiyan</option>
-                    <option value="304">Datong</option>
-                    <option value="305">Tainshui</option>
-                    <option value="306">Xixia</option>
-                    <option value="307">Shaoyang</option>
-                    <option value="308">Yuxi</option>
-                    <option value="309">Luoyang</option>
-                    <option value="310">Wuzhai</option>
-                    <option value="311">Xuanhua</option>
-                    <option value="312">Tongdao</option>
-                    <option value="313">Lushi</option>
-                    <option value="314">Jingxian A</option>
-                    <option value="315">Jingxian B</option>
-                    <option value="316">Hunan</option>
-                    <option value="317">Daqing City</option>
-                    <option value="318">Xinyang City</option>
-                    <option value="319">Xinjiang Province</option>
-                    <option value="320">Tibet Province</option>
+                  <optgroup label="${l('groups.china')}">
+                    <option value="321">${l('attackers.type092Sub')}</option>
+                    <option value="300">${l('attackers.nanyang')}</option>
+                    <option value="301">${l('attackers.xining')}</option>
+                    <option value="302">${l('attackers.delingha')}</option>
+                    <option value="303">${l('attackers.haiyan')}</option>
+                    <option value="304">${l('attackers.datong')}</option>
+                    <option value="305">${l('attackers.tainshui')}</option>
+                    <option value="306">${l('attackers.xixia')}</option>
+                    <option value="307">${l('attackers.shaoyang')}</option>
+                    <option value="308">${l('attackers.yuxi')}</option>
+                    <option value="309">${l('attackers.luoyang')}</option>
+                    <option value="310">${l('attackers.wuzhai')}</option>
+                    <option value="311">${l('attackers.xuanhua')}</option>
+                    <option value="312">${l('attackers.tongdao')}</option>
+                    <option value="313">${l('attackers.lushi')}</option>
+                    <option value="314">${l('attackers.jingxianA')}</option>
+                    <option value="315">${l('attackers.jingxianB')}</option>
+                    <option value="316">${l('attackers.hunan')}</option>
+                    <option value="317">${l('attackers.daqingCity')}</option>
+                    <option value="318">${l('attackers.xinyangCity')}</option>
+                    <option value="319">${l('attackers.xinjiangProvince')}</option>
+                    <option value="320">${l('attackers.tibetProvince')}</option>
                   </optgroup>
-                  <optgroup label="United States">
-                    <option value="101">Minot</option>
-                    <option value="102">Malmstrom</option>
-                    <option value="103">F.E. Warren</option>
-                    <option value="100">Ohio Sub (Trident II)</option>
+                  <optgroup label="${l('groups.unitedStates')}">
+                    <option value="101">${l('attackers.minot')}</option>
+                    <option value="102">${l('attackers.malmstrom')}</option>
+                    <option value="103">${l('attackers.feWarren')}</option>
+                    <option value="100">${l('attackers.ohioSub')}</option>
                   </optgroup>
-                  <optgroup label="United Kingdom">
-                    <option value="600">Vanguard Sub (Trident II)</option>
-                    <option value="601">HMNB Clyde (Trident II)</option>
+                  <optgroup label="${l('groups.unitedKingdom')}">
+                    <option value="600">${l('attackers.vanguardSub')}</option>
+                    <option value="601">${l('attackers.hmnbClyde')}</option>
                   </optgroup>
-                  <optgroup label="France">
-                    <option value="500">Triomphant Sub (M51)</option>
-                    <option value="501">Bay of Biscay</option>
+                  <optgroup label="${l('groups.france')}">
+                    <option value="500">${l('attackers.triomphantSub')}</option>
+                    <option value="501">${l('attackers.bayOfBiscay')}</option>
                   </optgroup>
-                  <optgroup label="North Korea">
-                    <option value="400">Sinpo Sub (Pukkŭksŏng-1)</option>
-                    <option value="401">Sinpo</option>
-                    <option value="402">P'yong'an</option>
-                    <option value="403">Pyongyang</option>
+                  <optgroup label="${l('groups.northKorea')}">
+                    <option value="400">${l('attackers.sinpoSub')}</option>
+                    <option value="401">${l('attackers.sinpo')}</option>
+                    <option value="402">${l('attackers.pyongan')}</option>
+                    <option value="403">${l('attackers.pyongyang')}</option>
                   </optgroup>
                 </select>
-                <label>Launch Location</label>
+                <label>${l('labels.launchLocation')}</label>
               </div>
               <div id="ms-lau-holder-lat" class="input-field col s12">
                 <input placeholder="00.000" id="ms-lat-lau" type="text" maxlength="8" />
-                <label for="ms-lat-lau" class="active">Custom Launch Latitude</label>
+                <label for="ms-lat-lau" class="active">${l('labels.customLaunchLatitude')}</label>
               </div>
               <div id="ms-lau-holder-lon" class="input-field col s12">
                 <input placeholder="00.000" id="ms-lon-lau" type="text" maxlength="8" />
-                <label for="ms-lon-lau" class="active">Custom Launch Longitude</label>
+                <label for="ms-lon-lau" class="active">${l('labels.customLaunchLongitude')}</label>
               </div>
               <div class="input-field col s12">
                 <select id="ms-target">
-                  <optgroup label="United States">
-                    <option value="0">Washington DC</option>
-                    <option value="1">New York City</option>
-                    <option value="2">Los Angeles</option>
-                    <option value="3">Chicago</option>
-                    <option value="4">Boston</option>
-                    <option value="5">Seattle</option>
-                    <option value="6">Miami</option>
-                    <option value="7">Dallas</option>
-                    <option value="8">Colorado Springs</option>
-                    <option value="9">Omaha</option>
-                    <option value="10">Hawaii</option>
-                    <option value="11">Guam</option>
+                  <optgroup label="${l('groups.unitedStates')}">
+                    <option value="0">${l('targets.washingtonDc')}</option>
+                    <option value="1">${l('targets.newYorkCity')}</option>
+                    <option value="2">${l('targets.losAngeles')}</option>
+                    <option value="3">${l('targets.chicago')}</option>
+                    <option value="4">${l('targets.boston')}</option>
+                    <option value="5">${l('targets.seattle')}</option>
+                    <option value="6">${l('targets.miami')}</option>
+                    <option value="7">${l('targets.dallas')}</option>
+                    <option value="8">${l('targets.coloradoSprings')}</option>
+                    <option value="9">${l('targets.omaha')}</option>
+                    <option value="10">${l('targets.hawaii')}</option>
+                    <option value="11">${l('targets.guam')}</option>
                   </optgroup>
-                  <option value="-1">Custom Impact</option>
-                  <optgroup label="NATO Countries">
-                    <option value="12">London</option>
-                    <option value="13">Paris</option>
-                    <option value="14">French Caribean</option>
-                    <option value="15">Madrid</option>
-                    <option value="16">Rome</option>
-                    <option value="17">Berlin</option>
-                    <option value="18">Toronto</option>
+                  <option value="-1">${l('targets.customImpact')}</option>
+                  <optgroup label="${l('groups.natoCountries')}">
+                    <option value="12">${l('targets.london')}</option>
+                    <option value="13">${l('targets.paris')}</option>
+                    <option value="14">${l('targets.frenchCaribbean')}</option>
+                    <option value="15">${l('targets.madrid')}</option>
+                    <option value="16">${l('targets.rome')}</option>
+                    <option value="17">${l('targets.berlin')}</option>
+                    <option value="18">${l('targets.toronto')}</option>
                   </optgroup>
-                  <optgroup label="Non-NATO Countries">
-                    <option value="19">Moscow</option>
-                    <option value="20">St. Petersburg</option>
-                    <option value="21">Novosibirsk</option>
-                    <option value="22">Beijing</option>
-                    <option value="23">Pyongyang</option>
+                  <optgroup label="${l('groups.nonNatoCountries')}">
+                    <option value="19">${l('targets.moscow')}</option>
+                    <option value="20">${l('targets.stPetersburg')}</option>
+                    <option value="21">${l('targets.novosibirsk')}</option>
+                    <option value="22">${l('targets.beijing')}</option>
+                    <option value="23">${l('targets.pyongyang')}</option>
                   </optgroup>
                 </select>
-                <label>Target Location</label>
+                <label>${l('labels.targetLocation')}</label>
               </div>
               <div id="ms-tgt-holder-lat" class="input-field col s12">
                 <input placeholder="00.000" id="ms-lat" type="text" maxlength="8" />
-                <label for="ms-lat" class="active">Custom Target Latitude</label>
+                <label for="ms-lat" class="active">${l('labels.customTargetLatitude')}</label>
               </div>
               <div id="ms-tgt-holder-lon" class="input-field col s12">
                 <input placeholder="00.000" id="ms-lon" type="text" maxlength="8" />
-                <label for="ms-lon" class="active">Custom Target Longitude</label>
+                <label for="ms-lon" class="active">${l('labels.customTargetLongitude')}</label>
               </div>
             </div>
             <div class="center-align">
-              <button class="btn btn-ui waves-effect waves-light" type="submit" name="action">Launch Missile Attack &#9658;</button>
+              <button class="btn btn-ui waves-effect waves-light" type="submit" name="action">${l('buttons.launchMissileAttack')} &#9658;</button>
             </div>
           </form>
           <div class="row"></div>
           <div class="center-align">
-            <button id="searchRvBtn" class="btn btn-ui waves-effect waves-light" name="search">Show All Missiles &#9658;</button>
+            <button id="searchRvBtn" class="btn btn-ui waves-effect waves-light" name="search">${l('buttons.showAllMissiles')} &#9658;</button>
           </div>
         </div>
         <div id="ms-error" class="center-align menu-selectable start-hidden">
-          <h6 class="center-align">Error</h6>
+          <h6 class="center-align">${l('labels.error')}</h6>
         </div>
       </div>
     </div>
@@ -211,13 +242,13 @@ export class MissilePlugin extends KeepTrackPlugin {
     return [
       {
         id: 'MissilePlugin.open',
-        label: 'Open Missile Plugin',
+        label: l('commands.open'),
         category: 'Simulation',
         callback: () => this.bottomMenuClicked(),
       },
       {
         id: 'MissilePlugin.showAllMissiles',
-        label: 'Show All Missiles',
+        label: l('commands.showAllMissiles'),
         category: 'Simulation',
         callback: () => this.searchForRvs_(),
         isAvailable: () => missileManager.missilesInUse > 0,
@@ -291,19 +322,19 @@ export class MissilePlugin extends KeepTrackPlugin {
         missileManager.massRaidPre(launchTime, sim);
       }
       if (type !== 0) {
-        uiManagerInstance.toast(`${sim} Loaded`, ToastMsgType.standby, true);
+        uiManagerInstance.toast(l('msgs.simLoaded').replace('{sim}', sim), ToastMsgType.standby, true);
       }
       if (type === 0) {
         if (target === -1) {
           // Custom Target
           if (isNaN(tgtLat)) {
-            uiManagerInstance.toast('Invalid Target Latitude!', ToastMsgType.critical);
+            uiManagerInstance.toast(l('errorMsgs.invalidTargetLatitude'), ToastMsgType.critical);
             hideLoading();
 
             return;
           }
           if (isNaN(tgtLon)) {
-            uiManagerInstance.toast('Invalid Target Longitude!', ToastMsgType.critical);
+            uiManagerInstance.toast(l('errorMsgs.invalidTargetLongitude'), ToastMsgType.critical);
             hideLoading();
 
             return;
@@ -316,13 +347,13 @@ export class MissilePlugin extends KeepTrackPlugin {
 
         if (this.isSub_) {
           if (isNaN(lauLat)) {
-            uiManagerInstance.toast('Invalid Launch Latitude!', ToastMsgType.critical);
+            uiManagerInstance.toast(l('errorMsgs.invalidLaunchLatitude'), ToastMsgType.critical);
             hideLoading();
 
             return;
           }
           if (isNaN(lauLon)) {
-            uiManagerInstance.toast('Invalid Launch Longitude!', ToastMsgType.critical);
+            uiManagerInstance.toast(l('errorMsgs.invalidLaunchLongitude'), ToastMsgType.critical);
             hideLoading();
 
             return;

@@ -3,7 +3,6 @@
     "CatalogBrowserPlugin": {
       "bottomIconLabel": "Explorador de Catálogos",
       "title": "Explorador de Catálogos",
-      "helpBody": "Explore y cargue catálogos de satélites. <br><br>Use el interruptor para elegir entre reemplazar todo el catálogo (Todos los Datos) o actualizar solo los elementos orbitales de los satélites existentes (Solo Datos Orbitales).",
       "labels": {
         "allData": "Todos los Datos",
         "orbitalOnly": "Solo Orbital",
@@ -91,15 +90,27 @@
         "vimpelLoaded": "Catálogo JSC Vimpel cargado"
       },
       "commands": {
-        "category": "Explorador de Catálogos"
+        "category": "Explorador de Catálogos",
+        "loadCatalog": "Cargar catálogo: {name}"
       },
       "errorMsgs": {
         "FetchFailed": "Error al obtener el catálogo",
         "DefaultFailed": "Error al restaurar el catálogo predeterminado",
-        "Forbidden": "CelesTrak rejected the request (HTTP 403). This is usually a Cloudflare rate-limit — wait a minute and try again.",
-        "RateLimited": "Too many catalog requests. Please wait a minute before trying again.",
-        "ServerError": "CelesTrak is temporarily unavailable. Please try again in a few minutes.",
-        "NetworkError": "Could not reach CelesTrak. Check your network connection."
+        "Forbidden": "CelesTrak rechazó la solicitud (HTTP 403). Suele tratarse de un límite de peticiones de Cloudflare; espere un minuto e inténtelo de nuevo.",
+        "RateLimited": "Demasiadas solicitudes de catálogo. Espere un minuto antes de volver a intentarlo.",
+        "ServerError": "CelesTrak no está disponible temporalmente. Inténtelo de nuevo en unos minutos.",
+        "NetworkError": "No se pudo conectar con CelesTrak. Compruebe su conexión de red."
+      },
+      "help": {
+        "overview": "El Explorador de Catálogos cambia el catálogo de satélites que está viendo. Elija entre listas seleccionadas (una constelación, una nube de desechos, una categoría de misión) o catálogos completos de CelesTrak y JSC Vimpel, y la escena se recarga exactamente con esos objetos.",
+        "imgAlt": "El menú del Explorador de Catálogos con su interruptor de modo de carga y la lista de catálogos",
+        "imgCaption": "Elija un modo de carga y luego haga clic en cualquier catálogo para cargarlo.",
+        "modesHeading": "Modos de Carga",
+        "modes": "<strong>Todos los Datos</strong> reemplaza todo el catálogo con el conjunto de datos seleccionado, incluidos nombres, tipos y metadatos. <strong>Solo Orbital</strong> conserva todos los satélites que ya tiene y solo actualiza sus elementos orbitales, lo que es la opción más segura si ha editado objetos o depende de los metadatos existentes.",
+        "howToUse": "<ol><li>Abra el <strong>Explorador de Catálogos</strong> desde el menú inferior (modo Catálogo).</li><li>Elija <strong>Todos los Datos</strong> o <strong>Solo Orbital</strong> con el interruptor; la descripción debajo explica el modo actual.</li><li>Haga clic en un catálogo de la lista por categorías, como <strong>Estaciones Espaciales</strong>, <strong>Starlink</strong> o <strong>Desechos de COSMOS 1408</strong>. Una notificación confirma cuando se carga.</li><li>Cargue el <strong>Catálogo Predeterminado</strong> para volver al catálogo completo estándar.</li></ol>",
+        "tip1": "Cada catálogo también está disponible desde la paleta de comandos como un comando de carga de catálogo, por lo que puede cambiar sin abrir el menú.",
+        "tip2": "Cargar un catálogo pequeño mejora drásticamente el rendimiento en equipos lentos; la lista de los 100 Más Brillantes es un buen conjunto mínimo.",
+        "tip3": "Las descargas de catálogos provienen de CelesTrak y pueden estar limitadas por tasa de peticiones; si una carga falla con un mensaje HTTP 403, espere un minuto e inténtelo de nuevo."
       }
     }
   }

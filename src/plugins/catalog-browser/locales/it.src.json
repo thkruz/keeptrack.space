@@ -3,7 +3,6 @@
     "CatalogBrowserPlugin": {
       "bottomIconLabel": "Browser catalogo",
       "title": "Browser catalogo",
-      "helpBody": "Sfoglia e carica i cataloghi satellitari. <br><br>Usa il selettore per scegliere tra la sostituzione dell'intero catalogo (Tutti i dati) o l'aggiornamento solo degli elementi orbitali per i satelliti esistenti (Solo dati orbitali).",
       "labels": {
         "allData": "Tutti i dati",
         "orbitalOnly": "Solo orbitali",
@@ -28,7 +27,7 @@
         "stations": "Stazioni spaziali",
         "iss": "ISS",
         "css": "CSS (Tiangong)",
-        "visual": "100 pi\u00f9 luminosi",
+        "visual": "100 più luminosi",
         "active": "Satelliti attivi",
         "analyst": "Satelliti analista",
         "cosmos1408Debris": "Detriti COSMOS 1408",
@@ -91,15 +90,27 @@
         "vimpelLoaded": "Catalogo JSC Vimpel caricato"
       },
       "commands": {
-        "category": "Browser catalogo"
+        "category": "Browser catalogo",
+        "loadCatalog": "Carica catalogo: {name}"
       },
       "errorMsgs": {
         "FetchFailed": "Impossibile recuperare il catalogo",
         "DefaultFailed": "Impossibile ripristinare il catalogo predefinito",
-        "Forbidden": "CelesTrak rejected the request (HTTP 403). This is usually a Cloudflare rate-limit — wait a minute and try again.",
-        "RateLimited": "Too many catalog requests. Please wait a minute before trying again.",
-        "ServerError": "CelesTrak is temporarily unavailable. Please try again in a few minutes.",
-        "NetworkError": "Could not reach CelesTrak. Check your network connection."
+        "Forbidden": "CelesTrak ha rifiutato la richiesta (HTTP 403). Di solito si tratta di un limite di richieste di Cloudflare; attendi un minuto e riprova.",
+        "RateLimited": "Troppe richieste di catalogo. Attendi un minuto prima di riprovare.",
+        "ServerError": "CelesTrak è temporaneamente non disponibile. Riprova tra qualche minuto.",
+        "NetworkError": "Impossibile raggiungere CelesTrak. Controlla la connessione di rete."
+      },
+      "help": {
+        "overview": "Il Browser catalogo sostituisce il catalogo satellitare che stai visualizzando. Scegli tra elenchi curati (una costellazione, una nube di detriti, una categoria di missione) o cataloghi completi di CelesTrak e JSC Vimpel, e la scena si ricarica esattamente con quegli oggetti.",
+        "imgAlt": "Il menu del Browser catalogo con il selettore della modalità di caricamento e l'elenco dei cataloghi",
+        "imgCaption": "Scegli una modalità di caricamento, poi fai clic su un catalogo qualsiasi per caricarlo.",
+        "modesHeading": "Modalità di caricamento",
+        "modes": "<strong>Tutti i dati</strong> sostituisce l'intero catalogo con il set di dati selezionato, inclusi nomi, tipi e metadati. <strong>Solo orbitali</strong> mantiene tutti i satelliti che hai già e aggiorna solo i loro elementi orbitali; è la scelta più sicura se hai modificato oggetti o ti affidi ai metadati esistenti.",
+        "howToUse": "<ol><li>Apri il <strong>Browser catalogo</strong> dal menu inferiore (modalità Catalogo).</li><li>Scegli <strong>Tutti i dati</strong> o <strong>Solo orbitali</strong> con il selettore; la descrizione sottostante spiega la modalità corrente.</li><li>Fai clic su un catalogo nell'elenco per categorie, ad esempio <strong>Stazioni spaziali</strong>, <strong>Starlink</strong> o <strong>Detriti COSMOS 1408</strong>. Una notifica conferma il caricamento.</li><li>Carica il <strong>Catalogo predefinito</strong> per tornare al catalogo completo standard.</li></ol>",
+        "tip1": "Ogni catalogo è disponibile anche dalla palette dei comandi come comando di caricamento del catalogo, quindi puoi cambiare senza aprire il menu.",
+        "tip2": "Caricare un catalogo piccolo migliora notevolmente le prestazioni sui computer più lenti; l'elenco dei 100 più luminosi è un buon set minimo.",
+        "tip3": "I download dei cataloghi provengono da CelesTrak e possono essere soggetti a limiti di richieste; se un caricamento fallisce con un messaggio HTTP 403, attendi un minuto e riprova."
       }
     }
   }

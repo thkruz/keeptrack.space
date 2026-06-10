@@ -3,7 +3,6 @@
     "CatalogBrowserPlugin": {
       "bottomIconLabel": "Navigateur de Catalogues",
       "title": "Navigateur de Catalogues",
-      "helpBody": "Parcourez et chargez des catalogues de satellites. <br><br>Utilisez le commutateur pour choisir entre le remplacement de l'ensemble du catalogue (Toutes les Données) ou la mise à jour uniquement des éléments orbitaux pour les satellites existants (Données Orbitales Uniquement).",
       "labels": {
         "allData": "Toutes les Données",
         "orbitalOnly": "Orbital Uniquement",
@@ -91,15 +90,27 @@
         "vimpelLoaded": "Catalogue JSC Vimpel chargé"
       },
       "commands": {
-        "category": "Navigateur de Catalogues"
+        "category": "Navigateur de Catalogues",
+        "loadCatalog": "Charger le catalogue : {name}"
       },
       "errorMsgs": {
         "FetchFailed": "Échec du chargement du catalogue",
         "DefaultFailed": "Échec de la restauration du catalogue par défaut",
-        "Forbidden": "CelesTrak rejected the request (HTTP 403). This is usually a Cloudflare rate-limit — wait a minute and try again.",
-        "RateLimited": "Too many catalog requests. Please wait a minute before trying again.",
-        "ServerError": "CelesTrak is temporarily unavailable. Please try again in a few minutes.",
-        "NetworkError": "Could not reach CelesTrak. Check your network connection."
+        "Forbidden": "CelesTrak a rejeté la requête (HTTP 403). Il s'agit généralement d'une limitation de débit Cloudflare ; attendez une minute et réessayez.",
+        "RateLimited": "Trop de requêtes de catalogue. Veuillez attendre une minute avant de réessayer.",
+        "ServerError": "CelesTrak est temporairement indisponible. Veuillez réessayer dans quelques minutes.",
+        "NetworkError": "Impossible de joindre CelesTrak. Vérifiez votre connexion réseau."
+      },
+      "help": {
+        "overview": "Le Navigateur de Catalogues remplace le catalogue de satellites que vous consultez. Choisissez parmi des listes sélectionnées (une constellation, un nuage de débris, une catégorie de mission) ou des catalogues complets de CelesTrak et JSC Vimpel, et la scène se recharge avec exactement ces objets.",
+        "imgAlt": "Le menu du Navigateur de Catalogues avec son commutateur de mode de chargement et la liste des catalogues",
+        "imgCaption": "Choisissez un mode de chargement, puis cliquez sur un catalogue pour le charger.",
+        "modesHeading": "Modes de Chargement",
+        "modes": "<strong>Toutes les Données</strong> remplace l'ensemble du catalogue par le jeu de données sélectionné, y compris les noms, les types et les métadonnées. <strong>Orbital Uniquement</strong> conserve tous les satellites que vous avez déjà et ne rafraîchit que leurs éléments orbitaux ; c'est le choix le plus sûr si vous avez modifié des objets ou si vous dépendez des métadonnées existantes.",
+        "howToUse": "<ol><li>Ouvrez le <strong>Navigateur de Catalogues</strong> depuis le menu inférieur (mode Catalogue).</li><li>Choisissez <strong>Toutes les Données</strong> ou <strong>Orbital Uniquement</strong> avec le commutateur ; la description en dessous explique le mode actuel.</li><li>Cliquez sur un catalogue dans la liste par catégories, comme <strong>Stations Spatiales</strong>, <strong>Starlink</strong> ou <strong>Débris de COSMOS 1408</strong>. Une notification confirme le chargement.</li><li>Chargez le <strong>Catalogue Par Défaut</strong> pour revenir au catalogue complet standard.</li></ol>",
+        "tip1": "Chaque catalogue est aussi disponible depuis la palette de commandes sous forme de commande de chargement de catalogue, ce qui permet de changer sans ouvrir le menu.",
+        "tip2": "Charger un petit catalogue améliore considérablement les performances sur les machines lentes ; la liste des 100 Plus Brillants est un bon ensemble minimal.",
+        "tip3": "Les téléchargements de catalogues proviennent de CelesTrak et peuvent être limités en débit ; si un chargement échoue avec un message HTTP 403, attendez une minute et réessayez."
       }
     }
   }

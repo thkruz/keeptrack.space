@@ -3,7 +3,6 @@
     "CatalogBrowserPlugin": {
       "bottomIconLabel": "Katalog-Browser",
       "title": "Katalog-Browser",
-      "helpBody": "Durchsuchen und laden Sie Satellitenkataloge. <br><br>Verwenden Sie den Schalter, um zwischen dem Ersetzen des gesamten Katalogs (Alle Daten) oder der Aktualisierung nur der Orbitalelemente für vorhandene Satelliten (Nur Orbitaldaten) zu wählen.",
       "labels": {
         "allData": "Alle Daten",
         "orbitalOnly": "Nur Orbital",
@@ -91,15 +90,27 @@
         "vimpelLoaded": "JSC Vimpel-Katalog geladen"
       },
       "commands": {
-        "category": "Katalog-Browser"
+        "category": "Katalog-Browser",
+        "loadCatalog": "Katalog laden: {name}"
       },
       "errorMsgs": {
         "FetchFailed": "Katalog konnte nicht abgerufen werden",
         "DefaultFailed": "Standardkatalog konnte nicht wiederhergestellt werden",
-        "Forbidden": "CelesTrak rejected the request (HTTP 403). This is usually a Cloudflare rate-limit — wait a minute and try again.",
-        "RateLimited": "Too many catalog requests. Please wait a minute before trying again.",
-        "ServerError": "CelesTrak is temporarily unavailable. Please try again in a few minutes.",
-        "NetworkError": "Could not reach CelesTrak. Check your network connection."
+        "Forbidden": "CelesTrak hat die Anfrage abgelehnt (HTTP 403). Dies ist in der Regel eine Cloudflare-Ratenbegrenzung; warten Sie eine Minute und versuchen Sie es erneut.",
+        "RateLimited": "Zu viele Kataloganfragen. Bitte warten Sie eine Minute, bevor Sie es erneut versuchen.",
+        "ServerError": "CelesTrak ist vorübergehend nicht verfügbar. Bitte versuchen Sie es in einigen Minuten erneut.",
+        "NetworkError": "CelesTrak konnte nicht erreicht werden. Überprüfen Sie Ihre Netzwerkverbindung."
+      },
+      "help": {
+        "overview": "Der Katalog-Browser tauscht den Satellitenkatalog aus, den Sie gerade betrachten. Wählen Sie aus kuratierten Listen (eine Konstellation, eine Trümmerwolke, eine Missionskategorie) oder vollständigen Katalogen von CelesTrak und JSC Vimpel, und die Szene wird genau mit diesen Objekten neu geladen.",
+        "imgAlt": "Das Katalog-Browser-Menü mit dem Lademodus-Schalter und der Katalogliste",
+        "imgCaption": "Wählen Sie einen Lademodus und klicken Sie dann auf einen beliebigen Katalog, um ihn zu laden.",
+        "modesHeading": "Lademodi",
+        "modes": "<strong>Alle Daten</strong> ersetzt den gesamten Katalog durch den ausgewählten Datensatz, einschließlich Namen, Typen und Metadaten. <strong>Nur Orbital</strong> behält alle bereits vorhandenen Satelliten und aktualisiert nur deren Bahnelemente; dies ist die sicherere Wahl, wenn Sie Objekte bearbeitet haben oder auf vorhandene Metadaten angewiesen sind.",
+        "howToUse": "<ol><li>Öffnen Sie den <strong>Katalog-Browser</strong> über das untere Menü (Katalog-Modus).</li><li>Wählen Sie mit dem Schalter <strong>Alle Daten</strong> oder <strong>Nur Orbital</strong>; die Beschreibung darunter erklärt den aktuellen Modus.</li><li>Klicken Sie auf einen Katalog in der kategorisierten Liste, zum Beispiel <strong>Raumstationen</strong>, <strong>Starlink</strong> oder <strong>COSMOS 1408 Trümmer</strong>. Eine Benachrichtigung bestätigt das Laden.</li><li>Laden Sie den <strong>Standardkatalog</strong>, um zum normalen vollständigen Katalog zurückzukehren.</li></ol>",
+        "tip1": "Jeder Katalog ist auch über die Befehlspalette als Katalog-laden-Befehl verfügbar, sodass Sie wechseln können, ohne das Menü zu öffnen.",
+        "tip2": "Das Laden eines kleinen Katalogs verbessert die Leistung auf langsameren Rechnern erheblich; die Liste der 100 Hellsten ist ein guter minimaler Datensatz.",
+        "tip3": "Katalog-Downloads stammen von CelesTrak und können einer Ratenbegrenzung unterliegen; wenn ein Ladevorgang mit einer HTTP-403-Meldung fehlschlägt, warten Sie eine Minute und versuchen Sie es erneut."
       }
     }
   }

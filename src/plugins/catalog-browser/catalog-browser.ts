@@ -77,7 +77,30 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
   getHelpConfig(): IHelpConfig {
     return {
       title: t7e('plugins.CatalogBrowserPlugin.title' as T7eKey),
-      body: t7e('plugins.CatalogBrowserPlugin.helpBody' as T7eKey),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.CatalogBrowserPlugin.help.overview' as T7eKey),
+          image: {
+            src: 'img/help/catalog-browser/catalog-browser-menu.png',
+            alt: t7e('plugins.CatalogBrowserPlugin.help.imgAlt' as T7eKey),
+            caption: t7e('plugins.CatalogBrowserPlugin.help.imgCaption' as T7eKey),
+          },
+        },
+        {
+          heading: t7e('plugins.CatalogBrowserPlugin.help.modesHeading' as T7eKey),
+          content: t7e('plugins.CatalogBrowserPlugin.help.modes' as T7eKey),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.CatalogBrowserPlugin.help.howToUse' as T7eKey),
+        },
+      ],
+      tips: [
+        t7e('plugins.CatalogBrowserPlugin.help.tip1' as T7eKey),
+        t7e('plugins.CatalogBrowserPlugin.help.tip2' as T7eKey),
+        t7e('plugins.CatalogBrowserPlugin.help.tip3' as T7eKey),
+      ],
     };
   }
 

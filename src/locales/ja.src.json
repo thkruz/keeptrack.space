@@ -116,11 +116,6 @@
     "Astronomy": {
       "bottomIconLabel": "天文学"
     },
-    "ManeuverPlugin": {
-      "bottomIconLabel": "マヌーバ",
-      "title": "マヌーバメニュー",
-      "helpBody": "マヌーバメニューは、衛星のマヌーバ（軌道変更）を作成するために使用されます。<br><br>このメニューでは、マヌーバの種類、実施時刻、マヌーバの大きさを選択できます。衛星リストから衛星を選択してマヌーバを適用できます。"
-    },
     "GraphicsMenuPlugin": {
       "bottomIconLabel": "グラフィックメニュー",
       "title": "グラフィックメニュー",

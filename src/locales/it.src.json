@@ -85,11 +85,6 @@
     "Astronomy": {
       "bottomIconLabel": "Astronomia"
     },
-    "ManeuverPlugin": {
-      "bottomIconLabel": "Manovra",
-      "title": "Menu manovre",
-      "helpBody": "Il menu manovre viene utilizzato per creare una manovra per un satellite. <br><br> Il menu consente di selezionare il tipo di manovra, il tempo della manovra e la grandezza della manovra. La manovra può essere applicata a un satellite selezionandolo dall'elenco dei satelliti."
-    },
     "GraphicsMenuPlugin": {
       "bottomIconLabel": "Menu grafica",
       "title": "Menu grafica",

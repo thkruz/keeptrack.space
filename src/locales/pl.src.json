@@ -85,11 +85,6 @@
     "Astronomy": {
       "bottomIconLabel": "Astronomia"
     },
-    "ManeuverPlugin": {
-      "bottomIconLabel": "Manewr",
-      "title": "Menu manewrów",
-      "helpBody": "Menu manewrów służy do tworzenia manewru dla satelity. <br><br> Menu pozwala wybrać typ manewru, czas manewru i wielkość manewru. Manewr może być zastosowany do satelity przez wybranie go z listy satelitów."
-    },
     "GraphicsMenuPlugin": {
       "bottomIconLabel": "Menu grafiki",
       "title": "Menu grafiki",

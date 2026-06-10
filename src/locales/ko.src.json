@@ -85,11 +85,6 @@
     "Astronomy": {
       "bottomIconLabel": "천문학"
     },
-    "ManeuverPlugin": {
-      "bottomIconLabel": "기동",
-      "title": "기동 메뉴",
-      "helpBody": "기동 메뉴는 위성에 기동을 생성하는 데 사용됩니다. <br><br> 이 메뉴에서는 기동 유형, 기동 시간, 기동 크기를 선택할 수 있습니다. 위성 목록에서 위성을 선택하여 기동을 적용할 수 있습니다."
-    },
     "GraphicsMenuPlugin": {
       "bottomIconLabel": "그래픽 메뉴",
       "title": "그래픽 메뉴",

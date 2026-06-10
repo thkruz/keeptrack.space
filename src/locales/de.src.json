@@ -88,11 +88,6 @@
     "Astronomy": {
       "bottomIconLabel": "Sternenhimmel"
     },
-    "ManeuverPlugin": {
-      "bottomIconLabel": "Manöver",
-      "title": "Manöver-Menü",
-      "helpBody": "Das Manöver-Menü wird verwendet, um ein Manöver für einen Satelliten zu erstellen.<br><br> Das Menü ermöglicht es Ihnen, den Typ des Manövers, die Zeit des Manövers und die Größe des Manövers auszuwählen. Das Manöver kann auf einen Satelliten angewendet werden, indem Sie ihn aus der Liste der Satelliten auswählen."
-    },
     "GraphicsMenuPlugin": {
       "bottomIconLabel": "Grafikmenü",
       "title": "Grafikmenü",

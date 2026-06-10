@@ -85,11 +85,6 @@
     "Astronomy": {
       "bottomIconLabel": "Astronomie"
     },
-    "ManeuverPlugin": {
-      "bottomIconLabel": "Manévr",
-      "title": "Menu manévrů",
-      "helpBody": "Menu manévrů slouží k vytvoření manévru pro satelit. <br><br> Menu umožňuje vybrat typ manévru, čas manévru a velikost manévru. Manévr lze aplikovat na satelit jeho výběrem ze seznamu satelitů."
-    },
     "GraphicsMenuPlugin": {
       "bottomIconLabel": "Menu grafiky",
       "title": "Menu grafiky",

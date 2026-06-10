@@ -3,7 +3,52 @@
     "Reentries": {
       "bottomIconLabel": "Rientri",
       "title": "Rientri",
-      "helpBody": "Il menu Rientri ha due schede: <br><br> <b>Messaggi TIP</b> mostra le previsioni recenti e imminenti di rientro dei satelliti dallo US Space Command. Facendo clic su una riga si selezionerà quel satellite e si cambierà l'orario al tempo di decadimento previsto. <br><br> <b>Analisi dei rientri</b> mostra gli oggetti ordinati per perigeo più basso che hanno maggiori probabilità di rientrare nell'atmosfera. Fare clic su qualsiasi riga per selezionare il satellite.",
+      "tabLabels": {
+        "tipMessages": "Messaggi TIP",
+        "reentryAnalysis": "Analisi dei rientri"
+      },
+      "toolbar": {
+        "fetchData": "Scarica dati",
+        "refresh": "Aggiorna"
+      },
+      "table": {
+        "norad": "NORAD",
+        "decayDate": "Data di decadimento",
+        "latitude": "Latitudine",
+        "longitude": "Longitudine",
+        "window": "Finestra (min)",
+        "nextReport": "Prossimo rapporto (ore)",
+        "reentryAngle": "Angolo di rientro (gradi)",
+        "rcs": "RCS (m^2)",
+        "gpAge": "Età GP (ore)",
+        "dryMass": "Massa a secco (kg)",
+        "volume": "Volume (m^3)",
+        "name": "Nome",
+        "type": "Tipo",
+        "perigee": "Perigeo (km)",
+        "apogee": "Apogeo (km)",
+        "meanAlt": "Alt media (km)",
+        "incl": "Incl (°)",
+        "rcsSup": "RCS (m²)"
+      },
+      "labels": {
+        "reentered": "Rientrato",
+        "payload": "Carico utile",
+        "rocketBody": "Corpo di razzo",
+        "debris": "Detriti"
+      },
+      "help": {
+        "overview": "Il menu Rientri tiene traccia degli oggetti che stanno cadendo dall'orbita. Ha due schede: le previsioni ufficiali di rientro dello US Space Command e un'analisi in tempo reale degli oggetti più bassi del catalogo.",
+        "imgAlt": "Il menu Rientri con la tabella dei Messaggi TIP",
+        "imgCaption": "Previsioni di rientro TIP. Facendo clic su una riga la simulazione salta al tempo di decadimento previsto.",
+        "tabsHeading": "Le due schede",
+        "tabs": "<ul><li><strong>Messaggi TIP</strong>: messaggi di tracciamento e previsione d'impatto pubblicati dallo US Space Command, con il tempo di decadimento previsto, la posizione, la finestra di incertezza (minuti), l'angolo di rientro, l'RCS e la massa. Facendo clic su una riga si seleziona l'oggetto e il tempo della simulazione salta all'epoca di decadimento prevista.</li><li><strong>Analisi dei rientri</strong>: circa 200 oggetti catalogati ordinati per perigeo più basso. Le righe sono codificate a colori: rosso indica un perigeo sotto i 120 km (rientro imminente), giallo indica 120–160 km (rischio elevato). Facendo clic su una riga si seleziona l'oggetto.</li></ul>",
+        "howToUse": "<ol><li>Aprire il menu dalla barra inferiore o premere R.</li><li>Fare clic sull'icona di download per scaricare i dati TIP più recenti (richiede una connessione a internet).</li><li>Fare clic su una previsione per volare verso quell'oggetto al tempo di decadimento previsto.</li><li>Passare alla scheda Analisi dei rientri per vedere cosa decadrà per primo. Si carica alla prima apertura.</li></ol>",
+        "tip1": "Una voce \"Rientrato\" nella colonna Alt media significa che l'oggetto non può più essere propagato. Molto probabilmente è già rientrato.",
+        "tip2": "Le previsioni TIP comportano un'incertezza reale: la colonna Finestra indica l'incertezza in minuti, che può coprire interi continenti di traccia al suolo.",
+        "tip3": "Facendo clic su una riga TIP l'orologio della simulazione passa silenziosamente all'epoca di decadimento. Usare i controlli del tempo per tornare al presente.",
+        "shortcutToggle": "Attiva/disattiva il menu Rientri"
+      },
       "dataSource": "Messaggi di tracciamento e previsione d'impatto (TIP) forniti dallo US Space Command (USSPACECOM).",
       "errorMsgs": {
         "noTipData": "Nessun dato TIP trovato!",

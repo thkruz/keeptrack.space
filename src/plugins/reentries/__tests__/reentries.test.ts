@@ -88,7 +88,8 @@ describe('Reentries_class', () => {
       const helpConfig = plugin.getHelpConfig();
 
       expect(helpConfig.title).toBeDefined();
-      expect(helpConfig.body).toBeDefined();
+      expect(helpConfig.sections!.length).toBeGreaterThanOrEqual(3);
+      expect(helpConfig.sections![0].image?.src).toContain('img/help/reentries/');
     });
 
     it('should return correct drag options', () => {

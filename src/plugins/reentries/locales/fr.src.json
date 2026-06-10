@@ -3,7 +3,52 @@
     "Reentries": {
       "bottomIconLabel": "Rentrées",
       "title": "Rentrées",
-      "helpBody": "Le menu des Rentrées comporte deux onglets : <br><br> <b>Messages TIP</b> affiche les prédictions récentes et à venir de rentrée de satellites du Commandement spatial américain. Cliquer sur une ligne sélectionnera le satellite et changera l'heure au moment de désintégration prévu. <br><br> <b>Analyse de Rentrée</b> affiche les objets triés par périgée le plus bas qui sont les plus susceptibles de rentrer dans l'atmosphère. Cliquez sur une ligne pour sélectionner le satellite.",
+      "tabLabels": {
+        "tipMessages": "Messages TIP",
+        "reentryAnalysis": "Analyse de Rentrée"
+      },
+      "toolbar": {
+        "fetchData": "Récupérer les données",
+        "refresh": "Actualiser"
+      },
+      "table": {
+        "norad": "NORAD",
+        "decayDate": "Date de désintégration",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "window": "Fenêtre (min)",
+        "nextReport": "Prochain rapport (h)",
+        "reentryAngle": "Angle de rentrée (deg)",
+        "rcs": "RCS (m^2)",
+        "gpAge": "Âge GP (h)",
+        "dryMass": "Masse à sec (kg)",
+        "volume": "Volume (m^3)",
+        "name": "Nom",
+        "type": "Type",
+        "perigee": "Périgée (km)",
+        "apogee": "Apogée (km)",
+        "meanAlt": "Alt moyenne (km)",
+        "incl": "Incl (°)",
+        "rcsSup": "RCS (m²)"
+      },
+      "labels": {
+        "reentered": "Rentré",
+        "payload": "Charge utile",
+        "rocketBody": "Corps de fusée",
+        "debris": "Débris"
+      },
+      "help": {
+        "overview": "Le menu des Rentrées suit les objets en train de retomber de leur orbite. Il comporte deux onglets : les prédictions officielles de rentrée du Commandement spatial américain et une analyse en direct des objets les plus bas du catalogue.",
+        "imgAlt": "Le menu des Rentrées affichant le tableau des Messages TIP",
+        "imgCaption": "Prédictions de rentrée TIP. Cliquer sur une ligne fait sauter la simulation au moment de désintégration prévu.",
+        "tabsHeading": "Les deux onglets",
+        "tabs": "<ul><li><strong>Messages TIP</strong> : messages de Suivi et Prédiction d'Impact publiés par le Commandement spatial américain, avec l'heure de désintégration prévue, le lieu, la fenêtre d'incertitude (minutes), l'angle de rentrée, le RCS et la masse. Cliquer sur une ligne sélectionne l'objet et fait sauter l'heure de la simulation à l'époque de désintégration prévue.</li><li><strong>Analyse de Rentrée</strong> : environ 200 objets catalogués triés par périgée le plus bas. Les lignes sont codées par couleur : rouge signifie un périgée inférieur à 120 km (rentrée imminente), jaune signifie 120–160 km (risque élevé). Cliquer sur une ligne sélectionne l'objet.</li></ul>",
+        "howToUse": "<ol><li>Ouvrez le menu depuis la barre inférieure ou appuyez sur R.</li><li>Cliquez sur l'icône de téléchargement pour récupérer les dernières données TIP (nécessite une connexion internet).</li><li>Cliquez sur une prédiction pour voler vers cet objet à son moment de désintégration prévu.</li><li>Passez à l'onglet Analyse de Rentrée pour voir ce qui va se désintégrer ensuite. Il se charge à sa première ouverture.</li></ol>",
+        "tip1": "Une entrée \"Rentré\" dans la colonne Alt moyenne signifie que l'objet ne peut plus être propagé. Il est très probablement déjà retombé.",
+        "tip2": "Les prédictions TIP comportent une réelle incertitude : la colonne Fenêtre indique l'incertitude en minutes, ce qui peut couvrir des continents entiers de trace au sol.",
+        "tip3": "Cliquer sur une ligne TIP change silencieusement l'horloge de la simulation à l'époque de désintégration. Utilisez les commandes de temps pour revenir au présent.",
+        "shortcutToggle": "Basculer le menu des Rentrées"
+      },
       "dataSource": "Messages de Suivi et Prediction d'Impact (TIP) fournis par le Commandement spatial americain (USSPACECOM).",
       "errorMsgs": {
         "noTipData": "Aucune donnee TIP trouvee!",

@@ -3,7 +3,52 @@
     "Reentries": {
       "bottomIconLabel": "Vstupy do atmosféry",
       "title": "Vstupy do atmosféry",
-      "helpBody": "Menu vstupů do atmosféry má dvě záložky: <br><br> <b>TIP zprávy</b> zobrazují nedávné a nadcházející předpovědi vstupů satelitů do atmosféry od US Space Command. Kliknutím na řádek vyberete daný satelit a změníte čas na předpokládaný čas rozpadu. <br><br> <b>Analýza vstupů</b> zobrazuje objekty seřazené podle nejnižšího perigea, které s největší pravděpodobností vstoupí do atmosféry. Kliknutím na řádek vyberete satelit.",
+      "tabLabels": {
+        "tipMessages": "TIP zprávy",
+        "reentryAnalysis": "Analýza vstupů"
+      },
+      "toolbar": {
+        "fetchData": "Načíst data",
+        "refresh": "Obnovit"
+      },
+      "table": {
+        "norad": "NORAD",
+        "decayDate": "Datum zániku",
+        "latitude": "Zeměpisná šířka",
+        "longitude": "Zeměpisná délka",
+        "window": "Okno (min)",
+        "nextReport": "Další hlášení (hod)",
+        "reentryAngle": "Úhel vstupu (°)",
+        "rcs": "RCS (m^2)",
+        "gpAge": "Stáří GP (hod)",
+        "dryMass": "Suchá hmotnost (kg)",
+        "volume": "Objem (m^3)",
+        "name": "Název",
+        "type": "Typ",
+        "perigee": "Perigeum (km)",
+        "apogee": "Apogeum (km)",
+        "meanAlt": "Střední výška (km)",
+        "incl": "Inkl. (°)",
+        "rcsSup": "RCS (m²)"
+      },
+      "labels": {
+        "reentered": "Zaniklý",
+        "payload": "Užitečné zatížení",
+        "rocketBody": "R/B",
+        "debris": "Trosky"
+      },
+      "help": {
+        "overview": "Menu vstupů do atmosféry sleduje objekty padající z oběžné dráhy. Má dvě záložky: oficiální předpovědi vstupů do atmosféry od US Space Command a živou analýzu nejníže letících objektů v katalogu.",
+        "imgAlt": "Menu vstupů do atmosféry se zobrazenou tabulkou TIP zpráv",
+        "imgCaption": "TIP předpovědi vstupů do atmosféry. Kliknutím na řádek se simulace přesune na předpokládaný čas zániku.",
+        "tabsHeading": "Dvě záložky",
+        "tabs": "<ul><li><strong>TIP zprávy</strong>: zprávy Tracking and Impact Prediction publikované US Space Command, s předpokládaným časem zániku, polohou, oknem nejistoty (v minutách), úhlem vstupu, RCS a hmotností. Kliknutím na řádek vyberete objekt a simulační čas se přesune na předpokládanou epochu zániku.</li><li><strong>Analýza vstupů</strong>: přibližně 200 katalogizovaných objektů seřazených podle nejnižšího perigea. Řádky jsou barevně odlišeny: červená znamená perigeum pod 120 km (vstup do atmosféry bezprostředně hrozí), žlutá znamená 120–160 km (vysoké riziko). Kliknutím na řádek vyberete objekt.</li></ul>",
+        "howToUse": "<ol><li>Otevřete menu ze spodní lišty nebo stiskněte R.</li><li>Kliknutím na ikonu stahování načtete nejnovější TIP data (vyžaduje připojení k internetu).</li><li>Kliknutím na libovolnou předpověď přeletíte k danému objektu v předpokládaném čase zániku.</li><li>Přepněte na záložku Analýza vstupů a podívejte se, co zanikne jako další; načte se při prvním otevření.</li></ol>",
+        "tip1": "Záznam \"Zaniklý\" ve sloupci Střední výška znamená, že objekt již nelze propagovat; s největší pravděpodobností již zanikl.",
+        "tip2": "TIP předpovědi nesou skutečnou nejistotu: sloupec Okno udává nejistotu v minutách, která může na pozemní stopě pokrýt celé kontinenty.",
+        "tip3": "Kliknutí na řádek TIP tiše změní simulační čas na epochu zániku; pomocí ovládání času se vrátíte do současnosti.",
+        "shortcutToggle": "Přepnout menu vstupů do atmosféry"
+      },
       "dataSource": "Zprávy Tracking and Impact Prediction (TIP) poskytované US Space Command (USSPACECOM).",
       "errorMsgs": {
         "noTipData": "Nebyla nalezena žádná TIP data!",

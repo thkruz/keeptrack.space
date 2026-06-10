@@ -3,7 +3,52 @@
     "Reentries": {
       "bottomIconLabel": "Reentradas",
       "title": "Reentradas",
-      "helpBody": "El menú de Reentradas tiene dos pestañas: <br><br> <b>Mensajes TIP</b> muestra predicciones recientes y próximas de reentrada de satélites del Comando Espacial de EE.UU. Al hacer clic en una fila se seleccionará el satélite y cambiará la hora al momento de decaimiento previsto. <br><br> <b>Análisis de Reentrada</b> muestra objetos ordenados por perigeo más bajo que tienen más probabilidad de reingresar a la atmósfera. Haga clic en cualquier fila para seleccionar el satélite.",
+      "tabLabels": {
+        "tipMessages": "Mensajes TIP",
+        "reentryAnalysis": "Análisis de Reentrada"
+      },
+      "toolbar": {
+        "fetchData": "Obtener datos",
+        "refresh": "Actualizar"
+      },
+      "table": {
+        "norad": "NORAD",
+        "decayDate": "Fecha de decaimiento",
+        "latitude": "Latitud",
+        "longitude": "Longitud",
+        "window": "Ventana (min)",
+        "nextReport": "Próximo informe (hrs)",
+        "reentryAngle": "Ángulo de reentrada (grados)",
+        "rcs": "RCS (m^2)",
+        "gpAge": "Edad GP (hrs)",
+        "dryMass": "Masa seca (kg)",
+        "volume": "Volumen (m^3)",
+        "name": "Nombre",
+        "type": "Tipo",
+        "perigee": "Perigeo (km)",
+        "apogee": "Apogeo (km)",
+        "meanAlt": "Alt. media (km)",
+        "incl": "Incl. (°)",
+        "rcsSup": "RCS (m²)"
+      },
+      "labels": {
+        "reentered": "Reentrado",
+        "payload": "Carga útil",
+        "rocketBody": "R/B",
+        "debris": "Escombros"
+      },
+      "help": {
+        "overview": "El menú de Reentradas rastrea objetos que están cayendo de su órbita. Tiene dos pestañas: predicciones oficiales de reentrada del Comando Espacial de EE.UU. y un análisis en vivo de los objetos más bajos del catálogo.",
+        "imgAlt": "El menú de Reentradas mostrando la tabla de Mensajes TIP",
+        "imgCaption": "Predicciones de reentrada TIP. Al hacer clic en una fila, la simulación salta al momento de decaimiento previsto.",
+        "tabsHeading": "Las dos pestañas",
+        "tabs": "<ul><li><strong>Mensajes TIP</strong>: mensajes de Seguimiento y Predicción de Impacto publicados por el Comando Espacial de EE.UU., con la hora de decaimiento prevista, la ubicación, la ventana de incertidumbre (minutos), el ángulo de reentrada, el RCS y la masa. Al hacer clic en una fila se selecciona el objeto y la hora de la simulación salta a la época de decaimiento prevista.</li><li><strong>Análisis de Reentrada</strong>: aproximadamente 200 objetos catalogados ordenados por perigeo más bajo. Las filas están codificadas por colores: rojo significa perigeo por debajo de 120 km (reentrada inminente), amarillo significa 120–160 km (riesgo alto). Al hacer clic en una fila se selecciona el objeto.</li></ul>",
+        "howToUse": "<ol><li>Abra el menú desde la barra inferior o pulse R.</li><li>Haga clic en el icono de descarga para obtener los datos TIP más recientes (requiere conexión a internet).</li><li>Haga clic en cualquier predicción para volar a ese objeto en su momento de decaimiento previsto.</li><li>Cambie a la pestaña Análisis de Reentrada para ver qué decaerá a continuación; se carga la primera vez que la abre.</li></ol>",
+        "tip1": "Una entrada \"Reentrado\" en la columna Alt. media significa que el objeto ya no se puede propagar; lo más probable es que ya haya caído.",
+        "tip2": "Las predicciones TIP conllevan una incertidumbre real: la columna Ventana es la incertidumbre en minutos, que puede abarcar continentes enteros de traza terrestre.",
+        "tip3": "Al hacer clic en una fila TIP, el reloj de la simulación cambia silenciosamente a la época de decaimiento; use los controles de tiempo para volver al presente.",
+        "shortcutToggle": "Alternar el menú de Reentradas"
+      },
       "dataSource": "Mensajes de Seguimiento y Prediccion de Impacto (TIP) proporcionados por el Comando Espacial de EE.UU. (USSPACECOM).",
       "errorMsgs": {
         "noTipData": "No se encontraron datos TIP!",

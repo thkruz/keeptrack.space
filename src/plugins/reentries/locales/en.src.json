@@ -3,7 +3,52 @@
     "Reentries": {
       "bottomIconLabel": "Reentries",
       "title": "Reentries",
-      "helpBody": "The Reentries menu has two tabs: <br><br> <b>TIP Messages</b> shows recent and upcoming satellite reentry predictions from the US Space Command. Clicking on a row will select that satellite and change the time to the predicted decay time. <br><br> <b>Reentry Analysis</b> shows objects sorted by lowest perigee that are most likely to reenter the atmosphere. Click any row to select the satellite.",
+      "tabLabels": {
+        "tipMessages": "TIP Messages",
+        "reentryAnalysis": "Reentry Analysis"
+      },
+      "toolbar": {
+        "fetchData": "Fetch Data",
+        "refresh": "Refresh"
+      },
+      "table": {
+        "norad": "NORAD",
+        "decayDate": "Decay Date",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "window": "Window (min)",
+        "nextReport": "Next Report (hrs)",
+        "reentryAngle": "Reentry Angle (deg)",
+        "rcs": "RCS (m^2)",
+        "gpAge": "GP Age (hrs)",
+        "dryMass": "Dry Mass (kg)",
+        "volume": "Volume (m^3)",
+        "name": "Name",
+        "type": "Type",
+        "perigee": "Perigee (km)",
+        "apogee": "Apogee (km)",
+        "meanAlt": "Mean Alt (km)",
+        "incl": "Incl (°)",
+        "rcsSup": "RCS (m²)"
+      },
+      "labels": {
+        "reentered": "Reentered",
+        "payload": "Payload",
+        "rocketBody": "R/B",
+        "debris": "Debris"
+      },
+      "help": {
+        "overview": "The Reentries menu tracks objects falling out of orbit. It has two tabs: official reentry predictions from US Space Command, and a live analysis of the lowest objects in the catalog.",
+        "imgAlt": "The Reentries menu showing the TIP Messages table",
+        "imgCaption": "TIP reentry predictions. Clicking a row jumps the simulation to the predicted decay time.",
+        "tabsHeading": "The Two Tabs",
+        "tabs": "<ul><li><strong>TIP Messages</strong>: Tracking and Impact Prediction messages published by US Space Command, with the predicted decay time, location, uncertainty window (minutes), reentry angle, RCS, and mass. Clicking a row selects the object and jumps the simulation time to the predicted decay epoch.</li><li><strong>Reentry Analysis</strong>: roughly 200 cataloged objects sorted by lowest perigee. Rows are color coded: red means perigee below 120 km (reentry imminent), yellow means 120–160 km (high risk). Clicking a row selects the object.</li></ul>",
+        "howToUse": "<ol><li>Open the menu from the bottom bar or press R.</li><li>Click the download icon to fetch the latest TIP data (requires an internet connection).</li><li>Click any prediction to fly to that object at its predicted decay time.</li><li>Switch to the Reentry Analysis tab to browse what is decaying next. It loads the first time you open it.</li></ol>",
+        "tip1": "A \"Reentered\" entry in the Mean Alt column means the object can no longer be propagated. It has most likely already come down.",
+        "tip2": "TIP predictions carry real uncertainty: the Window column is the uncertainty in minutes, which can span continents of ground track.",
+        "tip3": "Clicking a TIP row silently changes the simulation clock to the decay epoch. Use the time controls to come back to the present.",
+        "shortcutToggle": "Toggle the Reentries menu"
+      },
       "dataSource": "Tracking and Impact Prediction (TIP) messages provided by the US Space Command (USSPACECOM).",
       "errorMsgs": {
         "noTipData": "No TIP data found!",

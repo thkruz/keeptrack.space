@@ -107,15 +107,16 @@ export class Reentries extends KeepTrackPlugin {
   }
 
   private buildSideMenuHtml_(): string {
+    const tb = (key: string) => t7e(`plugins.Reentries.toolbar.${key}` as Parameters<typeof t7e>[0]);
     const tipMessagesContent = html`
       <div class="row">
         <div class="re-toolbar">
           <button id="reentries-fetch-btn" class="btn btn-ui waves-effect waves-light icon-btn"
-            type="button" kt-tooltip="Fetch Data">
+            type="button" kt-tooltip="${tb('fetchData')}">
             <img src="${fetchPng}" class="icon-btn-img" alt="" />
           </button>
           <button id="reentries-refresh-btn" class="btn btn-ui waves-effect waves-light icon-btn"
-            type="button" kt-tooltip="Refresh" style="display:none;">
+            type="button" kt-tooltip="${tb('refresh')}" style="display:none;">
             <img src="${refreshPng}" class="icon-btn-img" alt="" />
           </button>
         </div>
@@ -131,8 +132,8 @@ export class Reentries extends KeepTrackPlugin {
     `;
 
     const tabsHtml = buildSideMenuTabsHtml(TABS_ID, [
-      { id: 'reentries-tip-tab', label: 'TIP Messages', content: tipMessagesContent },
-      { id: 'reentries-analysis-tab', label: 'Reentry Analysis', content: reentryAnalysisContent },
+      { id: 'reentries-tip-tab', label: t7e('plugins.Reentries.tabLabels.tipMessages' as Parameters<typeof t7e>[0]), content: tipMessagesContent },
+      { id: 'reentries-analysis-tab', label: t7e('plugins.Reentries.tabLabels.reentryAnalysis' as Parameters<typeof t7e>[0]), content: reentryAnalysisContent },
     ]);
 
     return html`
@@ -146,8 +147,32 @@ export class Reentries extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.Reentries.title' as Parameters<typeof t7e>[0]),
-      body: t7e('plugins.Reentries.helpBody' as Parameters<typeof t7e>[0]),
+      title: t7e('plugins.Reentries.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.Reentries.help.overview'),
+          image: {
+            src: 'img/help/reentries/reentries-menu.png',
+            alt: t7e('plugins.Reentries.help.imgAlt'),
+            caption: t7e('plugins.Reentries.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.Reentries.help.tabsHeading'),
+          content: t7e('plugins.Reentries.help.tabs'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.Reentries.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.Reentries.help.tip1'),
+        t7e('plugins.Reentries.help.tip2'),
+        t7e('plugins.Reentries.help.tip3'),
+      ],
+      shortcuts: [{ keys: ['R'], description: t7e('plugins.Reentries.help.shortcutToggle') }],
     };
   }
 
@@ -247,7 +272,7 @@ export class Reentries extends KeepTrackPlugin {
   }
 
   // =========================================================================
-  // TIP Messages (Tab 1) — existing functionality
+  // TIP Messages (Tab 1) - existing functionality
   // =========================================================================
 
   private fetchTipData_(): void {
@@ -381,19 +406,20 @@ export class Reentries extends KeepTrackPlugin {
   }
 
   private static createTipHeaders_(tbl: HTMLTableElement) {
+    const th = (key: string) => t7e(`plugins.Reentries.table.${key}` as Parameters<typeof t7e>[0]);
     const tr = tbl.insertRow();
     const names = [
-      'NORAD',
-      'Decay Date',
-      'Latitude',
-      'Longitude',
-      'Window (min)',
-      'Next Report (hrs)',
-      'Reentry Angle (deg)',
-      'RCS (m^2)',
-      'GP Age (hrs)',
-      'Dry Mass (kg)',
-      'Volume (m^3)',
+      th('norad'),
+      th('decayDate'),
+      th('latitude'),
+      th('longitude'),
+      th('window'),
+      th('nextReport'),
+      th('reentryAngle'),
+      th('rcs'),
+      th('gpAge'),
+      th('dryMass'),
+      th('volume'),
     ];
 
     for (const name of names) {
@@ -412,10 +438,12 @@ export class Reentries extends KeepTrackPlugin {
     tr.setAttribute('data-row', i.toString());
 
     const sat = ServiceLocator.getCatalogManager().sccNum2Sat(this.tipList_[i].NORAD_CAT_ID);
-    let rcs = 'Reentered';
-    let age = 'Reentered';
-    let volume = 'Reentered';
-    let gammaDegrees = 'Reentered';
+    const reentered = t7e('plugins.Reentries.labels.reentered' as Parameters<typeof t7e>[0]);
+    const unknown = t7e('Common.unknown');
+    let rcs = reentered;
+    let age = reentered;
+    let volume = reentered;
+    let gammaDegrees = reentered;
 
     if (sat) {
       const decayEpochDate = new Date(this.tipList_[i].DECAY_EPOCH);
@@ -433,7 +461,7 @@ export class Reentries extends KeepTrackPlugin {
 
         gammaDegrees = `${Math.abs(gamma * RAD2DEG).toFixed(2)}\u00B0`;
       } else {
-        gammaDegrees = 'Unknown';
+        gammaDegrees = unknown;
       }
 
       if (sat?.rcs) {
@@ -441,16 +469,16 @@ export class Reentries extends KeepTrackPlugin {
       } else {
         const rcsEst = SatMath.estimateRcsUsingHistoricalData(sat);
 
-        rcs = rcsEst ? `${rcsEst.toFixed(2)}` : 'Unknown';
+        rcs = rcsEst ? `${rcsEst.toFixed(2)}` : unknown;
       }
 
-      age = sat ? `${sat.ageOfElset(new Date(), 'hours').toFixed(2)}` : 'Unknown';
+      age = sat ? `${sat.ageOfElset(new Date(), 'hours').toFixed(2)}` : unknown;
 
       const span = sat?.span ? parseFloat(sat.span.replace(/[^0-9.]/gu, '')) : -1;
       const length = sat?.length ? parseFloat(sat.length.replace(/[^0-9.]/gu, '')) : -1;
       const diameter = sat?.diameter ? parseFloat(sat.diameter.replace(/[^0-9.]/gu, '')) : -1;
 
-      volume = span !== -1 && length !== -1 && diameter !== -1 ? `${((Math.PI / 6) * span * length * diameter).toFixed(2)}` : 'Unknown';
+      volume = span !== -1 && length !== -1 && diameter !== -1 ? `${((Math.PI / 6) * span * length * diameter).toFixed(2)}` : unknown;
     }
 
     Reentries.createCell_(tr, this.tipList_[i].NORAD_CAT_ID);
@@ -462,7 +490,7 @@ export class Reentries extends KeepTrackPlugin {
     Reentries.createCell_(tr, gammaDegrees);
     Reentries.createCell_(tr, rcs);
     Reentries.createCell_(tr, age);
-    Reentries.createCell_(tr, sat?.dryMass ?? 'Reentered');
+    Reentries.createCell_(tr, sat?.dryMass ?? reentered);
     Reentries.createCell_(tr, volume);
 
     return tr;
@@ -507,16 +535,17 @@ export class Reentries extends KeepTrackPlugin {
   }
 
   private static createReentryHeaders_(tbl: HTMLTableElement) {
+    const th = (key: string) => t7e(`plugins.Reentries.table.${key}` as Parameters<typeof t7e>[0]);
     const tr = tbl.insertRow();
     const names = [
-      'NORAD',
-      'Name',
-      'Type',
-      'Perigee (km)',
-      'Apogee (km)',
-      'Mean Alt (km)',
-      'Incl (\u00B0)',
-      'RCS (m\u00B2)',
+      th('norad'),
+      th('name'),
+      th('type'),
+      th('perigee'),
+      th('apogee'),
+      th('meanAlt'),
+      th('incl'),
+      th('rcsSup'),
     ];
 
     for (const name of names) {
@@ -529,6 +558,8 @@ export class Reentries extends KeepTrackPlugin {
   }
 
   private static createReentryRow_(tbl: HTMLTableElement, sat: Satellite) {
+    const l = (key: string) => t7e(`plugins.Reentries.labels.${key}` as Parameters<typeof t7e>[0]);
+    const unknown = t7e('Common.unknown');
     const tr = tbl.insertRow();
 
     tr.setAttribute('class', 'reentry-object link');
@@ -550,32 +581,32 @@ export class Reentries extends KeepTrackPlugin {
       tr.classList.add('reentry-warning');
     }
 
-    let typeStr = 'Unknown';
+    let typeStr = unknown;
 
     if (sat.type === SpaceObjectType.PAYLOAD) {
-      typeStr = 'Payload';
+      typeStr = l('payload');
     } else if (sat.type === SpaceObjectType.ROCKET_BODY) {
-      typeStr = 'R/B';
+      typeStr = l('rocketBody');
     } else if (sat.type === SpaceObjectType.DEBRIS) {
-      typeStr = 'Debris';
+      typeStr = l('debris');
     }
 
-    let rcsStr = 'Unknown';
+    let rcsStr = unknown;
 
     if (sat.rcs) {
       rcsStr = `${sat.rcs}`;
     } else {
       const rcsEst = SatMath.estimateRcsUsingHistoricalData(sat);
 
-      rcsStr = rcsEst ? `${rcsEst.toFixed(2)}` : 'Unknown';
+      rcsStr = rcsEst ? `${rcsEst.toFixed(2)}` : unknown;
     }
 
     const meanAltStr = hasReentered
-      ? 'Reentered'
+      ? l('reentered')
       : ((sat.apogee + sat.perigee) / 2).toFixed(1);
 
     Reentries.createCell_(tr, sat.sccNum);
-    Reentries.createCell_(tr, sat.name || 'Unknown');
+    Reentries.createCell_(tr, sat.name || unknown);
     Reentries.createCell_(tr, typeStr);
     Reentries.createCell_(tr, sat.perigee.toFixed(1));
     Reentries.createCell_(tr, sat.apogee.toFixed(1));

@@ -4,7 +4,6 @@
       "bottomIconLabel": "Rendezvous- und Annäherungsoperationen",
       "title": "Rendezvous- und Annäherungsoperationen (RPO)",
       "titleSecondary": "Rendezvous- und Annäherungsoperationen-Liste",
-      "helpBody": "Finde bevorstehende Annäherungen zwischen Satelliten. Konfiguriere Suchparameter wie Abstandsschwelle, Relativgeschwindigkeit und Orbittyp (GEO/LEO). Unterstützt Einzelsatelliten- und Alle-gegen-Alle-Suchmodi.",
       "noradId": "NORAD-ID",
       "maxDistThreshold": "Maximaler Abstandsschwellenwert (km)",
       "maxRelativeVelocity": "Maximale Relativgeschwindigkeit (km/s)",
@@ -18,7 +17,7 @@
       "comparePayloadsOnlyTooltip": "Nur nach RPOs zwischen Nutzlasten suchen",
       "ignoreVimpelRso": "Vimpel-RSO ignorieren",
       "ignoreVimpelRsoTooltip": "RSOs aus dem Vimpel-Katalog ignorieren",
-      "submitButton": "RPOs finden \u25b6",
+      "submitButton": "RPOs finden ▶",
       "noRposToDownload": "Keine RPOs zum Herunterladen!",
       "noRposFound": "Keine RPOs gefunden!",
       "satNotFound": "Satellit mit NORAD-ID {sccNum} nicht gefunden",
@@ -33,6 +32,20 @@
         "relDistance": "Rel. Entfernung [km]",
         "relVelocity": "Rel. Geschwindigkeit [km/s]",
         "date": "Datum"
+      },
+      "help": {
+        "overview": "Rendezvous- und Annäherungsoperationen (RPO) findet bevorstehende Annäherungen zwischen Satelliten: ein Raumfahrzeug, das nahe einem anderen manövriert, eine ko-orbitale Inspektion oder einfach zwei Objekte, die nahe beieinander driften. Geben Sie einen Satelliten an (oder durchsuchen Sie ein ganzes Orbitregime), und es liefert jede vorhergesagte Begegnung innerhalb Ihrer Abstands- und Geschwindigkeitsschwellen.",
+        "imgAlt": "Das RPO-Menü mit Suchparametern",
+        "imgCaption": "Legen Sie Schwellenwerte und Orbittyp fest und durchsuchen Sie dann einen Satelliten oder alle gegen alle.",
+        "modesHeading": "Suchmodi",
+        "modes": "Standardmäßig nimmt die Suche die eingegebene <strong>NORAD-ID</strong> und prüft diesen Satelliten gegen den Rest seines Orbitregimes. Wird <strong>Geostationär Alle gegen Alle</strong> aktiviert, wird stattdessen jeder GEO-Satellit gegen jeden anderen geprüft, womit sich der gesamte Gürtel auf Aktivität untersuchen lässt. <strong>Nur Nutzlasten vergleichen</strong> überspringt Trümmer und Raketenkörper, und <strong>Vimpel-RSO ignorieren</strong> schließt Objekte aus dem JSC-Vimpel-Katalog aus.",
+        "resultsHeading": "Ergebnisse lesen",
+        "results": "Jede Zeile verbindet ein <strong>Ziel</strong> und einen <strong>Jäger</strong> mit ihrer geringsten <strong>Rel. Entfernung</strong>, <strong>Rel. Geschwindigkeit</strong> und dem <strong>Datum</strong> der Begegnung. Klicken Sie auf eine Zeile, um beide Satelliten auszuwählen und Kamera und Uhr zur Annäherung springen zu lassen; GEO-Ergebnisse schalten zudem die Orbitanzeige auf ECF um, damit die Relativbewegung leicht ablesbar ist. Die Schaltfläche zum Herunterladen exportiert die Liste als CSV-Datei.",
+        "howToUse": "<ol><li>Öffnen Sie das Menü über die untere Leiste oder drücken Sie <strong>X</strong>.</li><li>Wählen Sie den <strong>Orbittyp</strong> (geostationär oder niedrige Erdumlaufbahn) und legen Sie <strong>Maximaler Abstandsschwellenwert</strong>, <strong>Maximale Relativgeschwindigkeit</strong> und <strong>Suchdauer</strong> fest.</li><li>Geben Sie eine <strong>NORAD-ID</strong> ein oder aktivieren Sie <strong>Geostationär Alle gegen Alle</strong> für eine gürtelweite Untersuchung.</li><li>Klicken Sie auf <strong>RPOs finden</strong>. Lange Suchen zeigen den Fortschritt; Ergebnisse öffnen sich im Listenpanel.</li><li>Klicken Sie auf eine beliebige Zeile, um zu dieser Begegnung zu fliegen.</li></ol>",
+        "tip1": "Eine niedrige Relativgeschwindigkeit bei geringer Entfernung unterscheidet absichtliche Annäherungsoperationen von einem schnellen Konjunktionsvorbeiflug; verschärfen Sie die Geschwindigkeitsschwelle, um nach Manövern zu filtern.",
+        "tip2": "Alle-gegen-Alle-Suchen in GEO sind aufwendig; grenzen Sie zuerst die Dauer ein und erweitern Sie sie, sobald die Schwellenwerte passen.",
+        "tip3": "Das Klicken auf ein GEO-Ergebnis schaltet die Orbits auf erdfeste (ECF) Darstellung um; der Hinweis zeigt, welcher Modus aktiv ist.",
+        "shortcutToggle": "RPO-Menü umschalten"
       }
     }
   }

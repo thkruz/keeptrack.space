@@ -59,9 +59,11 @@ describe('ProximityOps_class', () => {
 
     it('should have help content', () => {
       const plugin = new ProximityOps();
+      const config = plugin.getHelpConfig();
 
-      expect(plugin.helpTitle).toBeDefined();
-      expect(plugin.helpBody).toBeDefined();
+      expect(config.title).toBeDefined();
+      expect(config.sections!.length).toBeGreaterThan(0);
+      expect(config.shortcuts!.length).toBeGreaterThan(0);
     });
 
     it('should have bottom icon label', () => {

@@ -4,7 +4,6 @@
       "bottomIconLabel": "란데부 및 근접 조작",
       "title": "란데부 및 근접 조작(RPO)",
       "titleSecondary": "란데부 및 근접 조작 목록",
-      "helpBody": "위성 간의 다가오는 접근을 찾습니다. 거리 임계값, 상대 속도, 궤도 유형(GEO/LEO) 등 검색 매개변수를 구성합니다. 단일 위성 및 전체 대 전체 검색 모드를 지원합니다.",
       "noradId": "NORAD ID",
       "maxDistThreshold": "최대 거리 임계값 (km)",
       "maxRelativeVelocity": "최대 상대 속도 (km/s)",
@@ -18,7 +17,7 @@
       "comparePayloadsOnlyTooltip": "페이로드 간의 RPO만 검색합니다.",
       "ignoreVimpelRso": "Vimpel RSO 무시",
       "ignoreVimpelRsoTooltip": "Vimpel 카탈로그에서 가져온 RSO를 무시합니다.",
-      "submitButton": "RPO 검색 \u25b6",
+      "submitButton": "RPO 검색 ▶",
       "noRposToDownload": "다운로드할 RPO가 없습니다!",
       "noRposFound": "RPO를 찾을 수 없습니다!",
       "satNotFound": "NORAD ID {sccNum}인 위성을 찾을 수 없습니다",
@@ -33,6 +32,20 @@
         "relDistance": "상대 거리 [km]",
         "relVelocity": "상대 속도 [km/s]",
         "date": "날짜"
+      },
+      "help": {
+        "overview": "란데부 및 근접 조작(RPO)은 위성 간의 다가오는 접근을 찾습니다. 다른 위성 근처에서 기동하는 우주선, 동일 궤도 점검, 또는 단순히 서로 가까이 표류하는 두 물체 등이 해당됩니다. 위성을 지정하면(또는 궤도 영역 전체를 검색하면) 거리와 속도 임계값 내에서 예측되는 모든 조우를 반환합니다.",
+        "imgAlt": "검색 매개변수가 표시된 RPO 메뉴",
+        "imgCaption": "임계값과 궤도 유형을 설정한 다음 위성 하나를 검색하거나 전체 대 전체로 검색합니다.",
+        "modesHeading": "검색 모드",
+        "modes": "기본적으로 검색은 입력한 <strong>NORAD ID</strong>의 위성을 해당 궤도 영역의 나머지 위성과 대조합니다. <strong>정지궤도 전체 대 전체</strong>를 선택하면 대신 모든 GEO 위성을 서로 대조하며, 이는 벨트 전체의 활동을 조사하는 방법입니다. <strong>페이로드만 비교</strong>는 잔해물과 로켓 동체를 건너뛰고, <strong>Vimpel RSO 무시</strong>는 JSC Vimpel 카탈로그에서 가져온 물체를 제외합니다.",
+        "resultsHeading": "결과 해석",
+        "results": "각 행은 <strong>대상</strong>과 <strong>추적기</strong>를 최접근 시의 <strong>상대 거리</strong>, <strong>상대 속도</strong>, 조우 <strong>날짜</strong>와 함께 짝지어 보여 줍니다. 행을 클릭하면 두 위성이 모두 선택되고 카메라와 시계가 접근 시점으로 이동합니다. GEO 결과는 궤도 표시를 ECF로 전환하여 상대 운동을 읽기 쉽게 합니다. 다운로드 버튼은 목록을 CSV 파일로 내보냅니다.",
+        "howToUse": "<ol><li>하단 막대에서 메뉴를 열거나 <strong>X</strong> 키를 누릅니다.</li><li><strong>궤도 유형</strong>(정지궤도 또는 저지구궤도)을 선택하고 <strong>최대 거리 임계값</strong>, <strong>최대 상대 속도</strong>, <strong>검색 기간</strong>을 설정합니다.</li><li><strong>NORAD ID</strong>를 입력하거나 벨트 전체 조사를 위해 <strong>정지궤도 전체 대 전체</strong>를 선택합니다.</li><li><strong>RPO 검색</strong>을 클릭합니다. 긴 검색은 진행 상황을 표시하며, 결과는 목록 패널에 열립니다.</li><li>아무 행이나 클릭하면 해당 조우로 이동합니다.</li></ol>",
+        "tip1": "근거리에서의 낮은 상대 속도가 의도적인 근접 조작과 빠른 합 통과를 구분하는 기준입니다. 기동을 걸러내려면 속도 임계값을 좁히세요.",
+        "tip2": "GEO 전체 대 전체 검색은 부하가 큽니다. 먼저 기간을 줄이고 임계값이 적절해 보이면 확장하세요.",
+        "tip3": "GEO 결과를 클릭하면 궤도가 지구 고정(ECF) 표시로 전환됩니다. 알림이 어떤 모드가 활성화되었는지 알려 줍니다.",
+        "shortcutToggle": "RPO 메뉴 전환"
       }
     }
   }

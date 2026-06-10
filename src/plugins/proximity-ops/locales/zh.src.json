@@ -4,7 +4,6 @@
       "bottomIconLabel": "交会与近距离操作",
       "title": "交会与近距离操作（RPO）",
       "titleSecondary": "交会与近距离操作列表",
-      "helpBody": "查找卫星之间即将发生的接近事件。配置搜索参数包括距离阈值、相对速度和轨道类型（GEO/LEO）。支持单卫星和全部对全部搜索模式。",
       "noradId": "NORAD编号",
       "maxDistThreshold": "最大距离阈值（公里）",
       "maxRelativeVelocity": "最大相对速度（公里/秒）",
@@ -18,7 +17,7 @@
       "comparePayloadsOnlyTooltip": "仅搜索有效载荷之间的RPO",
       "ignoreVimpelRso": "忽略Vimpel RSO",
       "ignoreVimpelRsoTooltip": "忽略来自Vimpel目录的RSO",
-      "submitButton": "查找RPO \u25b6",
+      "submitButton": "查找RPO ▶",
       "noRposToDownload": "没有可下载的RPO！",
       "noRposFound": "未找到RPO！",
       "satNotFound": "未找到NORAD编号为{sccNum}的卫星",
@@ -33,6 +32,20 @@
         "relDistance": "相对距离 [公里]",
         "relVelocity": "相对速度 [公里/秒]",
         "date": "日期"
+      },
+      "help": {
+        "overview": "交会与近距离操作（RPO）功能可查找卫星之间即将发生的接近事件：一艘航天器在另一艘附近机动、共轨检查，或仅仅是两个物体相互靠近漂移。指定一颗卫星（或搜索整个轨道区域），它会返回在你的距离和速度阈值内的每一次预测交会。",
+        "imgAlt": "带有搜索参数的RPO菜单",
+        "imgCaption": "设置阈值和轨道类型，然后搜索单颗卫星或全部对全部。",
+        "modesHeading": "搜索模式",
+        "modes": "默认情况下，搜索会使用你输入的<strong>NORAD编号</strong>，并将该卫星与其轨道区域内的其他卫星进行筛查。勾选<strong>地球同步轨道全部对全部</strong>则会将每颗GEO卫星与其他所有卫星进行筛查，这是排查整个地球同步带活动的方法。<strong>仅比较有效载荷</strong>会跳过碎片和火箭残骸，<strong>忽略Vimpel RSO</strong>会排除来自JSC Vimpel目录的物体。",
+        "resultsHeading": "解读结果",
+        "results": "每一行将一个<strong>目标</strong>与一个<strong>追踪器</strong>配对，并给出最接近时的<strong>相对距离</strong>、<strong>相对速度</strong>以及交会的<strong>日期</strong>。点击某一行可同时选中两颗卫星，并将相机和时钟跳转到接近时刻；GEO结果还会将轨道显示切换为ECF，使相对运动易于解读。下载按钮可将列表导出为CSV文件。",
+        "howToUse": "<ol><li>从底部栏打开菜单，或按<strong>X</strong>键。</li><li>选择<strong>轨道类型</strong>（地球同步轨道或近地轨道），并设置<strong>最大距离阈值</strong>、<strong>最大相对速度</strong>和<strong>搜索时长</strong>。</li><li>输入<strong>NORAD编号</strong>，或勾选<strong>地球同步轨道全部对全部</strong>进行全带排查。</li><li>点击<strong>查找RPO</strong>。耗时较长的搜索会显示进度；结果将在列表面板中打开。</li><li>点击任意一行即可飞往该交会。</li></ol>",
+        "tip1": "近距离下的低相对速度正是有意的近距离操作与快速交会飞掠的区别所在；收紧速度阈值即可筛选出机动行为。",
+        "tip2": "GEO全部对全部的搜索负载很重；先缩短时长，待阈值合适后再扩大范围。",
+        "tip3": "点击GEO结果会将轨道切换为地固（ECF）显示；提示消息会告诉你当前处于哪种模式。",
+        "shortcutToggle": "切换RPO菜单"
       }
     }
   }

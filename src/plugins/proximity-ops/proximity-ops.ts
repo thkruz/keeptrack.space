@@ -6,7 +6,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
+import { IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
@@ -63,8 +63,41 @@ export class ProximityOps extends KeepTrackPlugin {
   RPOs: ProximityOpsEvent[] = [];
   bottomIconImg = rpo;
   bottomIconLabel = t7e('plugins.ProximityOps.bottomIconLabel');
-  helpTitle = t7e('plugins.ProximityOps.title');
-  helpBody = t7e('plugins.ProximityOps.helpBody');
+
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: t7e('plugins.ProximityOps.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.ProximityOps.help.overview'),
+          image: {
+            src: 'img/help/proximity-ops/proximity-ops-menu.png',
+            alt: t7e('plugins.ProximityOps.help.imgAlt'),
+            caption: t7e('plugins.ProximityOps.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.ProximityOps.help.modesHeading'),
+          content: t7e('plugins.ProximityOps.help.modes'),
+        },
+        {
+          heading: t7e('plugins.ProximityOps.help.resultsHeading'),
+          content: t7e('plugins.ProximityOps.help.results'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.ProximityOps.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.ProximityOps.help.tip1'),
+        t7e('plugins.ProximityOps.help.tip2'),
+        t7e('plugins.ProximityOps.help.tip3'),
+      ],
+      shortcuts: [{ keys: ['X'], description: t7e('plugins.ProximityOps.help.shortcutToggle') }],
+    };
+  }
 
   sideMenuElementName = 'proximityOps-menu';
   sideMenuElementHtml = html`

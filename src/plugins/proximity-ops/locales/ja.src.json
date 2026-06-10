@@ -4,7 +4,6 @@
       "bottomIconLabel": "ランデブー・近接運用",
       "title": "ランデブー・近接運用（RPO）",
       "titleSecondary": "ランデブー・近接運用リスト",
-      "helpBody": "衛星間の今後の接近を検索します。距離閾値、相対速度、軌道タイプ（GEO/LEO）などの検索パラメータを設定できます。単一衛星検索と全対全検索モードをサポートしています。",
       "noradId": "NORAD ID",
       "maxDistThreshold": "最大距離閾値（km）",
       "maxRelativeVelocity": "最大相対速度（km/s）",
@@ -18,7 +17,7 @@
       "comparePayloadsOnlyTooltip": "ペイロード間のみRPOを検索",
       "ignoreVimpelRso": "Vimpel RSOを無視",
       "ignoreVimpelRsoTooltip": "Vimpelカタログ由来のRSOを無視",
-      "submitButton": "RPOを検索 \u25b6",
+      "submitButton": "RPOを検索 ▶",
       "noRposToDownload": "ダウンロードするRPOがありません！",
       "noRposFound": "RPOが見つかりませんでした！",
       "satNotFound": "NORAD ID {sccNum} の衛星が見つかりません",
@@ -33,6 +32,20 @@
         "relDistance": "相対距離 [km]",
         "relVelocity": "相対速度 [km/s]",
         "date": "日付"
+      },
+      "help": {
+        "overview": "ランデブー・近接運用（RPO）は、衛星間の今後の接近を検出します。別の衛星の近くで機動する宇宙機、共軌道での点検、あるいは単に近くを漂流する2つの物体などです。衛星を指定する（または軌道域全体を検索する）と、距離と速度の閾値内で予測されるすべての遭遇が返されます。",
+        "imgAlt": "検索パラメータを表示したRPOメニュー",
+        "imgCaption": "閾値と軌道タイプを設定し、1つの衛星または全対全で検索します。",
+        "modesHeading": "検索モード",
+        "modes": "デフォルトでは、入力した<strong>NORAD ID</strong>の衛星を、その軌道域の他の衛星と照合します。<strong>静止軌道 全て対全て</strong>をチェックすると、代わりにすべてのGEO衛星を相互に照合し、ベルト全体の活動を調査できます。<strong>ペイロードのみ比較</strong>はデブリやロケット機体をスキップし、<strong>Vimpel RSOを無視</strong>はJSC Vimpelカタログ由来の物体を除外します。",
+        "resultsHeading": "結果の読み方",
+        "results": "各行は<strong>ターゲット</strong>と<strong>チェイサー</strong>のペアを、最接近時の<strong>相対距離</strong>、<strong>相対速度</strong>、遭遇の<strong>日付</strong>とともに示します。行をクリックすると両方の衛星が選択され、カメラと時計が接近時点にジャンプします。GEOの結果では軌道表示がECFに切り替わり、相対運動が読み取りやすくなります。ダウンロードボタンはリストをCSVファイルとして書き出します。",
+        "howToUse": "<ol><li>下部バーからメニューを開くか、<strong>X</strong>キーを押します。</li><li><strong>軌道タイプ</strong>（静止軌道または低軌道）を選び、<strong>最大距離閾値</strong>、<strong>最大相対速度</strong>、<strong>検索期間</strong>を設定します。</li><li><strong>NORAD ID</strong>を入力するか、ベルト全体の調査には<strong>静止軌道 全て対全て</strong>をチェックします。</li><li><strong>RPOを検索</strong>をクリックします。長い検索では進行状況が表示され、結果はリストパネルに開きます。</li><li>任意の行をクリックすると、その遭遇に移動します。</li></ol>",
+        "tip1": "近距離での低い相対速度こそが、意図的な近接運用と高速の接近通過を区別するものです。機動を絞り込むには速度閾値を厳しくします。",
+        "tip2": "GEOの全対全検索は負荷が高いため、まず期間を狭め、閾値が適切に見えたら範囲を広げてください。",
+        "tip3": "GEOの結果をクリックすると軌道が地球固定（ECF）表示に切り替わります。通知でどのモードが有効かが分かります。",
+        "shortcutToggle": "RPOメニューの切り替え"
       }
     }
   }

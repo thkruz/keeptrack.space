@@ -11,10 +11,15 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { t7e } from '@app/locales/keys';
 import { BaseObject, DEG2RAD, Degrees, EpochUTC, Kilometers, RAE, Radians, SpaceObjectType, ZoomValue, eci2rae } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.ShortTermFences.${key}` as Parameters<typeof t7e>[0]);
 
 export class ShortTermFences extends KeepTrackPlugin {
   readonly id = 'ShortTermFences';
@@ -39,57 +44,83 @@ export class ShortTermFences extends KeepTrackPlugin {
 
   menuMode: MenuMode[] = [MenuMode.CREATE, MenuMode.ALL];
 
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/short-term-fences/short-term-fences-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: l('help.fieldsHeading'),
+          content: l('help.fields'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2')],
+    };
+  }
+
   sideMenuElementName = 'stf-menu';
   sideMenuElementHtml: string = html`
   <div id="stf-menu" class="side-menu-parent start-hidden">
     <div id="stf-content" class="side-menu">
       <div class="row">
-        <h5 class="center-align">Short Term Fence</h5>
+        <h5 class="center-align">${l('sideMenuTitle')}</h5>
         <form id="stfForm">
           <div class="row">
-            <div id="stf-az-div" class=" input-field col s4" data-position="top" data-delay="50" data-tooltip="Search Center Azimuth Point in degrees (ex: 50)">
+            <div id="stf-az-div" class=" input-field col s4" data-position="top" data-delay="50" data-tooltip="${l('tooltips.centerAzimuth')}">
               <input id="stf-az" type="text" value="50" />
-              <label for="stf-az" class="active">Center Azimuth</label>
+              <label for="stf-az" class="active">${l('labels.centerAzimuth')}</label>
             </div>
-            <div id="stf-azExt-div" class=" input-field col s4" data-position="top" data-delay="50" data-tooltip="Total Extent Outside of Center Azimuth in degrees (ex: 4)">
+            <div id="stf-azExt-div" class=" input-field col s4" data-position="top" data-delay="50" data-tooltip="${l('tooltips.azimuthExtentDeg')}">
               <input id="stf-azExt" type="text" value="4" />
-              <label for="stf-azExt" class="active">Azimuth Extent (deg)</label>
+              <label for="stf-azExt" class="active">${l('labels.azimuthExtentDeg')}</label>
             </div>
             <div id="stf-azExtKm-div" class=" input-field col s4" data-position="top" data-delay="50"
-            data-tooltip="Total Extent Outside of Center Azimuth in kilometers (ex: 120)">
+            data-tooltip="${l('tooltips.azimuthExtentKm')}">
               <input id="stf-azExtKm" type="text" value="4" disabled/>
-              <label for="stf-azExtKm" class="active">Azimuth Extent (km)</label>
+              <label for="stf-azExtKm" class="active">${l('labels.azimuthExtentKm')}</label>
             </div>
           </div>
           <div class="row">
-            <div id="stf-el-div" class=" input-field col s4" data-position="top" data-delay="50" data-tooltip="Search Center Elevation Point in degrees (ex: 20)">
+            <div id="stf-el-div" class=" input-field col s4" data-position="top" data-delay="50" data-tooltip="${l('tooltips.centerElevation')}">
               <input id="stf-el" type="text" value="20" />
-              <label for="stf-el" class="active">Center Elevation</label>
+              <label for="stf-el" class="active">${l('labels.centerElevation')}</label>
             </div>
-            <div id="stf-elExt-div" class=" input-field col s4" data-position="top" data-delay="50" data-tooltip="Total Extent Outside of Center Elevation in degrees (ex: 4)">
+            <div id="stf-elExt-div" class=" input-field col s4" data-position="top" data-delay="50" data-tooltip="${l('tooltips.elevationExtentDeg')}">
               <input id="stf-elExt" type="text" value="4" />
-              <label for="stf-elExt" class="active">Elevation Extent (deg)</label>
+              <label for="stf-elExt" class="active">${l('labels.elevationExtentDeg')}</label>
             </div>
             <div id="stf-elExtKm-div" class=" input-field col s4" data-position="top" data-delay="50"
-              data-tooltip="Total Extent Outside of Center Elevation in kilometers (ex: 120)">
+              data-tooltip="${l('tooltips.elevationExtentKm')}">
               <input id="stf-elExtKm" type="text" value="4" disabled/>
-              <label for="stf-elExtKm" class="active">Elevation Extent (km)</label>
+              <label for="stf-elExtKm" class="active">${l('labels.elevationExtentKm')}</label>
             </div>
           </div>
           <div class="row">
-            <div id="stf-rng-div" class=" input-field col s4" data-position="top" data-delay="50" data-tooltip="Search Center Range Point in kilometers (ex: 1000)">
+            <div id="stf-rng-div" class=" input-field col s4" data-position="top" data-delay="50" data-tooltip="${l('tooltips.centerRange')}">
               <input id="stf-rng" type="text" value="1000" />
-              <label for="stf-rng" class="active">Center Range</label>
+              <label for="stf-rng" class="active">${l('labels.centerRange')}</label>
             </div>
-            <div id="stf-rngExt-div" class=" input-field col s4" data-position="top" data-delay="50" data-tooltip="Total Extent Outside of Center Range in kilometers (ex: 100)">
+            <div id="stf-rngExt-div" class=" input-field col s4" data-position="top" data-delay="50" data-tooltip="${l('tooltips.rangeExtent')}">
               <input id="stf-rngExt" type="text" value="100" />
-              <label for="stf-rngExt" class="active">Range Extent</label>
+              <label for="stf-rngExt" class="active">${l('labels.rangeExtent')}</label>
             </div>
           </div>
           <div class="row" style="display: flex; justify-content: space-evenly;">
-            <button id="stf-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create New STF &#9658;</button>
-            <button id="stf-remove-last" class="btn btn-ui waves-effect waves-light" type="button" name="action">Remove Last &#9658;</button>
-            <button id="stf-clear-all" class="btn btn-ui waves-effect waves-light" type="button" name="action">Clear All STFs &#9658;</button>
+            <button id="stf-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">${l('buttons.createNewStf')} &#9658;</button>
+            <button id="stf-remove-last" class="btn btn-ui waves-effect waves-light" type="button" name="action">${l('buttons.removeLast')} &#9658;</button>
+            <button id="stf-clear-all" class="btn btn-ui waves-effect waves-light" type="button" name="action">${l('buttons.clearAllStfs')} &#9658;</button>
           </div>
         </form>
       </div>
@@ -115,7 +146,7 @@ export class ShortTermFences extends KeepTrackPlugin {
             'beforeend',
             html`
             <div id="stf-on-object-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
-                  data-tooltip="Visualize Sensor Search Capability">Build Short Term Fence on this object...</div>
+                  data-tooltip="${l('tooltips.buildOnObject')}">${l('links.buildOnObject')}</div>
             `,
           );
           getEl('stf-on-object-link')?.addEventListener('click', this.stfOnObjectLinkClick_.bind(this));
@@ -269,7 +300,7 @@ export class ShortTermFences extends KeepTrackPlugin {
       !curSensor.isRaeInFov(minaz, minel, minrange) ||
       !curSensor.isRaeInFov(maxaz, maxel, maxrange)
     ) {
-      errorManagerInstance.warn('STF is not in view of the sensor!');
+      errorManagerInstance.warn(l('errorMsgs.stfNotInView'));
 
       return;
     }
@@ -290,7 +321,7 @@ export class ShortTermFences extends KeepTrackPlugin {
     const now = ServiceLocator.getTimeManager().simulationTimeObj;
 
     if (!this.selectSatManager_) {
-      errorManagerInstance.warn('No selectSatManager instance found');
+      errorManagerInstance.warn(l('errorMsgs.noSelectSatManager'));
 
       return;
     }

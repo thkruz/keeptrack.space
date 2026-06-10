@@ -3,7 +3,50 @@
     "ShortTermFences": {
       "bottomIconLabel": "Kurzzeit-Zaun",
       "title": "Kurzzeit-Zäune (STF) Menü",
-      "helpBody": "Das Kurzzeit-Zäune (STF) Menü wird verwendet, um Sensor-Suchboxen zu visualisieren. <br><br> Dies ist wahrscheinlich nicht sehr hilfreich, es sei denn, Sie besitzen/betreiben einen Sensor mit einer Suchbox-Funktionalität."
+      "sideMenuTitle": "Kurzzeit-Zaun",
+      "labels": {
+        "centerAzimuth": "Zentrum-Azimut",
+        "azimuthExtentDeg": "Azimut-Ausdehnung (deg)",
+        "azimuthExtentKm": "Azimut-Ausdehnung (km)",
+        "centerElevation": "Zentrum-Elevation",
+        "elevationExtentDeg": "Elevations-Ausdehnung (deg)",
+        "elevationExtentKm": "Elevations-Ausdehnung (km)",
+        "centerRange": "Zentrum-Entfernung",
+        "rangeExtent": "Entfernungs-Ausdehnung"
+      },
+      "tooltips": {
+        "centerAzimuth": "Azimut des Suchzentrums in Grad (z. B. 50)",
+        "azimuthExtentDeg": "Gesamtausdehnung um das Zentrum-Azimut in Grad (z. B. 4)",
+        "azimuthExtentKm": "Gesamtausdehnung um das Zentrum-Azimut in Kilometern (z. B. 120)",
+        "centerElevation": "Elevation des Suchzentrums in Grad (z. B. 20)",
+        "elevationExtentDeg": "Gesamtausdehnung um die Zentrum-Elevation in Grad (z. B. 4)",
+        "elevationExtentKm": "Gesamtausdehnung um die Zentrum-Elevation in Kilometern (z. B. 120)",
+        "centerRange": "Entfernung des Suchzentrums in Kilometern (z. B. 1000)",
+        "rangeExtent": "Gesamtausdehnung um die Zentrum-Entfernung in Kilometern (z. B. 100)",
+        "buildOnObject": "Sensor-Suchfähigkeit visualisieren"
+      },
+      "buttons": {
+        "createNewStf": "Neue STF erstellen",
+        "removeLast": "Letzte entfernen",
+        "clearAllStfs": "Alle STFs löschen"
+      },
+      "links": {
+        "buildOnObject": "Kurzzeit-Zaun auf diesem Objekt erstellen..."
+      },
+      "errorMsgs": {
+        "stfNotInView": "STF liegt nicht im Sichtbereich des Sensors!",
+        "noSelectSatManager": "Keine selectSatManager-Instanz gefunden"
+      },
+      "help": {
+        "overview": "Kurzzeit-Zäune visualisieren die Suchbox eines Sensors: einen Himmelsausschnitt, der durch ein Fenster aus Azimut, Elevation und Entfernung definiert ist. Operateure sehen damit genau, welches Volumen eine beauftragte Suche abdeckt und ob ein interessierendes Objekt hindurchfliegen würde.",
+        "imgAlt": "Das Kurzzeit-Zaun-Menü mit Feldern für Azimut, Elevation und Entfernung",
+        "imgCaption": "Definieren Sie den Zaun über seinen Mittelpunkt und die Ausdehnungen in Azimut, Elevation und Entfernung.",
+        "fieldsHeading": "Den Zaun definieren",
+        "fields": "Der Zaun ist auf einen Punkt zentriert, der durch <strong>Zentrum-Azimut</strong>, <strong>Zentrum-Elevation</strong> (Grad) und <strong>Zentrum-Entfernung</strong> (Kilometer) gegeben ist, alle vom ausgewählten Sensor aus gemessen. <strong>Azimut-Ausdehnung</strong> und <strong>Elevations-Ausdehnung</strong> legen die Gesamtbreite und Gesamthöhe in Grad fest; die entsprechende Größe in Kilometern bei der Zentrumsentfernung wird automatisch in den schreibgeschützten km-Feldern berechnet. <strong>Entfernungs-Ausdehnung</strong> legt die Tiefe der Box in Kilometern fest.",
+        "howToUse": "<ol><li>Wählen Sie einen Sensor aus; das untere Symbol ist deaktiviert, bis einer ausgewählt ist.</li><li>Öffnen Sie das Menü <strong>Kurzzeit-Zaun</strong> (Modus Erstellen) und geben Sie Mittelpunkt und Ausdehnungen ein.</li><li>Klicken Sie auf <strong>Neue STF erstellen</strong>. Das Zaunvolumen wird vom Sensor aus in der 3D-Ansicht gezeichnet.</li><li>Fügen Sie durch erneutes Absenden weitere Zäune hinzu; <strong>Letzte entfernen</strong> löscht den neuesten und <strong>Alle STFs löschen</strong> entfernt alle Zäune.</li><li>Bei einem ausgewählten Satelliten erhält die Satelliten-Infobox einen Link <strong>Kurzzeit-Zaun auf diesem Objekt erstellen...</strong>, der das Formular mit dem aktuellen Azimut, der Elevation und der Entfernung des Satelliten vorausfüllt.</li></ol>",
+        "tip1": "Liegt der angeforderte Zaun außerhalb dessen, was der Sensor sehen kann, wird die Erstellung mit einer Benachrichtigung abgelehnt, statt eine unmögliche Box zu zeichnen.",
+        "tip2": "Die Kilometer-Ausdehnungsfelder aktualisieren sich während der Eingabe, sodass sich leicht prüfen lässt, wie breit die Suche bei der gegebenen Entfernung wirklich ist."
+      }
     }
   }
 }

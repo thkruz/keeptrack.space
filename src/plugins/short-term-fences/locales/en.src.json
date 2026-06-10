@@ -3,7 +3,50 @@
     "ShortTermFences": {
       "bottomIconLabel": "Short Term Fence",
       "title": "Short Term Fences (STF) Menu",
-      "helpBody": "The Short Term Fences (STF) Menu is used for visualizing sensor search boxes. <br><br> This is unlikely to be very helpful unless you own/operate a sensor with a search box functionality."
+      "sideMenuTitle": "Short Term Fence",
+      "labels": {
+        "centerAzimuth": "Center Azimuth",
+        "azimuthExtentDeg": "Azimuth Extent (deg)",
+        "azimuthExtentKm": "Azimuth Extent (km)",
+        "centerElevation": "Center Elevation",
+        "elevationExtentDeg": "Elevation Extent (deg)",
+        "elevationExtentKm": "Elevation Extent (km)",
+        "centerRange": "Center Range",
+        "rangeExtent": "Range Extent"
+      },
+      "tooltips": {
+        "centerAzimuth": "Search Center Azimuth Point in degrees (ex: 50)",
+        "azimuthExtentDeg": "Total Extent Outside of Center Azimuth in degrees (ex: 4)",
+        "azimuthExtentKm": "Total Extent Outside of Center Azimuth in kilometers (ex: 120)",
+        "centerElevation": "Search Center Elevation Point in degrees (ex: 20)",
+        "elevationExtentDeg": "Total Extent Outside of Center Elevation in degrees (ex: 4)",
+        "elevationExtentKm": "Total Extent Outside of Center Elevation in kilometers (ex: 120)",
+        "centerRange": "Search Center Range Point in kilometers (ex: 1000)",
+        "rangeExtent": "Total Extent Outside of Center Range in kilometers (ex: 100)",
+        "buildOnObject": "Visualize Sensor Search Capability"
+      },
+      "buttons": {
+        "createNewStf": "Create New STF",
+        "removeLast": "Remove Last",
+        "clearAllStfs": "Clear All STFs"
+      },
+      "links": {
+        "buildOnObject": "Build Short Term Fence on this object..."
+      },
+      "errorMsgs": {
+        "stfNotInView": "STF is not in view of the sensor!",
+        "noSelectSatManager": "No selectSatManager instance found"
+      },
+      "help": {
+        "overview": "Short Term Fences visualize a sensor's search box: a wedge of sky defined by an azimuth, elevation, and range window. Operators use them to see exactly what volume a tasked search covers and whether an object of interest would pass through it.",
+        "imgAlt": "The Short Term Fence menu with azimuth, elevation, and range fields",
+        "imgCaption": "Define the fence by its center point and extents in azimuth, elevation, and range.",
+        "fieldsHeading": "Defining the Fence",
+        "fields": "The fence is centered on a point given by <strong>Center Azimuth</strong>, <strong>Center Elevation</strong> (degrees), and <strong>Center Range</strong> (kilometers), all measured from the selected sensor. The <strong>Azimuth Extent</strong> and <strong>Elevation Extent</strong> set the total width and height in degrees; the equivalent size in kilometers at the center range is computed automatically in the read only km fields. <strong>Range Extent</strong> sets the depth of the box in kilometers.",
+        "howToUse": "<ol><li>Select a sensor; the bottom icon is disabled until one is selected.</li><li>Open the <strong>Short Term Fence</strong> menu (Create mode) and enter the center point and extents.</li><li>Click <strong>Create New STF</strong>. The fence volume is drawn from the sensor in the 3D view.</li><li>Stack additional fences by submitting again; <strong>Remove Last</strong> deletes the newest one and <strong>Clear All STFs</strong> removes every fence.</li><li>With a satellite selected, the satellite info box gains a <strong>Build Short Term Fence on this object...</strong> link that pre-fills the form with the satellite's current azimuth, elevation, and range.</li></ol>",
+        "tip1": "If the fence you request is outside what the sensor can see, creation is rejected with a notification instead of drawing an impossible box.",
+        "tip2": "The kilometer extent fields update as you type, which makes it easy to sanity check how wide the search really is at range."
+      }
     }
   }
 }

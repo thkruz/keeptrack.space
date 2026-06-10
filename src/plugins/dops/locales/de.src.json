@@ -3,8 +3,6 @@
     "DopsPlugin": {
       "bottomIconLabel": "DOPs anzeigen",
       "title": "Präzisionsverdünnungs-Menü",
-      "helpTitle": "Präzisionsverdünnungs-Menü (DOP)",
-      "helpBody": "Das Präzisionsverdünnungs-Menü (DOP) wird verwendet, um die Präzisionsverdünnung (DOP) für einen bestimmten Standort und eine Elevationsmaske zu berechnen.<br><br>HDOP ist die Horizontale Präzisionsverdünnung. Sie ist ein Maß für die Genauigkeit der horizontalen Position.<br><br>PDOP ist die Positions-Präzisionsverdünnung. Sie ist ein Maß für die Genauigkeit der Position.<br><br>GDOP ist die Geometrische Präzisionsverdünnung. Sie ist ein Maß für die Genauigkeit der Position.",
       "labels": {
         "dopTable": "DOP-Tabelle",
         "latitude": "Breitengrad",
@@ -19,6 +17,12 @@
         "altitude": "Höhe in km",
         "mask": "Minimale Elevation für GPS-Empfang"
       },
+      "table": {
+        "time": "Zeit",
+        "hdop": "HDOP",
+        "pdop": "PDOP",
+        "gdop": "GDOP"
+      },
       "rmb": {
         "dops": "DOPs",
         "currentGpsDops": "Aktuelle GPS-DOPs",
@@ -29,6 +33,18 @@
       },
       "errorMsgs": {
         "invalidLocation": "Bitte wählen Sie einen gültigen Standort auf der Erde für 24-Stunden-DOPs!"
+      },
+      "help": {
+        "overview": "Das Präzisionsverdünnungs-Menü (DOP) schätzt, wie genau eine GPS-Positionsbestimmung an einem beliebigen Ort auf der Erde sein wird. DOP beschreibt die Geometrie der sichtbaren GPS-Konstellation: Sind die Satelliten weit über den Himmel verteilt, ist die Positionsbestimmung präzise (niedriger DOP); stehen sie dicht beieinander, verschlechtert sich die Genauigkeit (hoher DOP). Mit diesem Menü finden Sie die besten und schlechtesten GPS-Zeitfenster an einem Standort über die nächsten 24 Stunden.",
+        "imgAlt": "Das Präzisionsverdünnungs-Menü mit einer 24-Stunden-DOP-Tabelle",
+        "imgCaption": "Geben Sie einen Standort und eine Elevationsmaske ein und aktualisieren Sie dann, um die DOP-Werte für die nächsten 24 Stunden zu sehen.",
+        "valuesHeading": "Die DOP-Werte richtig lesen",
+        "values": "<ul><li><strong>HDOP</strong>: horizontale Genauigkeit (Breiten- und Längengrad).</li><li><strong>VDOP</strong>: vertikale Genauigkeit (Höhe).</li><li><strong>PDOP</strong>: gesamte 3D-Positionsgenauigkeit.</li><li><strong>GDOP</strong>: PDOP plus Beitrag der Empfängeruhr; die umfassendste einzelne Qualitätskennzahl.</li><li><strong>TDOP</strong>: Genauigkeit der Empfängeruhr.</li></ul>Niedriger ist besser: Werte unter 2 sind ausgezeichnet, 2 bis 5 ist für die meisten Anwendungen akzeptabel, größere Werte bedeuten eine verschlechterte Positionsbestimmung. Die Tabelle listet Zeit, HDOP, PDOP und GDOP in Schritten von einer Minute auf.",
+        "howToUse": "<ol><li>Öffnen Sie das Menü über die untere Leiste oder drücken Sie <strong>D</strong>.</li><li>Geben Sie <strong>Breitengrad</strong> und <strong>Längengrad</strong> in Grad, die <strong>Höhe</strong> in Kilometern und die <strong>Maske</strong> ein: die minimale Elevation in Grad, die ein GPS-Satellit über dem Horizont erreichen muss, um gezählt zu werden.</li><li>Klicken Sie auf <strong>DOP-Daten aktualisieren</strong>. Die Tabelle füllt sich mit einer Zeile pro Minute für die nächsten 24 Stunden.</li><li>Sie können auch mit der rechten Maustaste auf eine beliebige Stelle der Erde klicken und <strong>DOPs</strong> wählen: <strong>Aktuelle GPS-DOPs</strong> zeigt sofortige Werte für den angeklickten Punkt, und <strong>24-Stunden GPS-DOPs</strong> füllt das Formular mit diesem Standort und öffnet dieses Menü.</li></ol>",
+        "tip1": "Eine höhere Elevationsmaske schließt tief stehende Satelliten aus, was den DOP in der Regel erhöht. Verwenden Sie die Maske, die Ihr Empfänger tatsächlich anwendet; 15 Grad ist ein üblicher Standardwert.",
+        "tip2": "Der eingegebene Maskenwert wird als GPS-Elevationsmaske der Sitzung gespeichert, sodass andere GPS-bezogene Berechnungen ihn wiederverwenden.",
+        "tip3": "Das Tastenkürzel D wird ignoriert, während Sie die Kamera in der Ego-Perspektive steuern.",
+        "shortcutToggle": "Das Präzisionsverdünnungs-Menü ein- oder ausblenden"
       }
     }
   }

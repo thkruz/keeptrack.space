@@ -3,8 +3,6 @@
     "DopsPlugin": {
       "bottomIconLabel": "DOPを表示",
       "title": "精度低下率メニュー",
-      "helpTitle": "精度低下率 (DOP) メニュー",
-      "helpBody": "精度低下率（DOP）メニューは、指定された場所と仰角マスクのDOP値を計算するために使用されます。<br><br>HDOPは水平精度低下率です。水平方向の位置精度の指標です。<br><br>PDOPは位置精度低下率です。位置精度の指標です。<br><br>GDOPは幾何学的精度低下率です。位置精度の指標です。",
       "labels": {
         "dopTable": "DOPテーブル",
         "latitude": "緯度",
@@ -19,6 +17,12 @@
         "altitude": "高度（km）",
         "mask": "GPSロックの最小仰角"
       },
+      "table": {
+        "time": "時刻",
+        "hdop": "HDOP",
+        "pdop": "PDOP",
+        "gdop": "GDOP"
+      },
       "rmb": {
         "dops": "DOP",
         "currentGpsDops": "現在のGPS DOP",
@@ -29,6 +33,18 @@
       },
       "errorMsgs": {
         "invalidLocation": "24時間DOPの計算には地球上の有効な場所を選択してください。"
+      },
+      "help": {
+        "overview": "精度低下率（DOP）メニューは、地球上の任意の地点でGPS測位がどの程度正確になるかを推定します。DOPは可視GPS衛星群の幾何学的配置を表します。衛星が空全体に広く分布していれば測位は正確（DOPが低い）になり、密集していると精度が劣化（DOPが高い）します。このメニューを使うと、今後24時間における地点ごとの最良・最悪のGPS時間帯を見つけられます。",
+        "imgAlt": "24時間DOPテーブルを表示した精度低下率メニュー",
+        "imgCaption": "場所と仰角マスクを入力して更新すると、今後24時間のDOP値が表示されます。",
+        "valuesHeading": "DOP値の読み方",
+        "values": "<ul><li><strong>HDOP</strong>: 水平方向の精度（緯度と経度）。</li><li><strong>VDOP</strong>: 垂直方向の精度（高度）。</li><li><strong>PDOP</strong>: 3次元位置の総合精度。</li><li><strong>GDOP</strong>: PDOPに受信機時計の寄与を加えたもので、最も包括的な単一の品質指標です。</li><li><strong>TDOP</strong>: 受信機時計の精度。</li></ul>値は低いほど良好です。2未満は優秀、2から5はほとんどの用途で許容範囲、それより大きい値は測位が劣化していることを意味します。テーブルには時刻、HDOP、PDOP、GDOPが1分刻みで表示されます。",
+        "howToUse": "<ol><li>下部バーからメニューを開くか、<strong>D</strong>キーを押します。</li><li><strong>緯度</strong>と<strong>経度</strong>を度単位で、<strong>高度</strong>をキロメートル単位で入力し、<strong>マスク</strong>には、GPS衛星が計算に含まれるために地平線上で達する必要のある最小仰角を度単位で入力します。</li><li><strong>DOPデータを更新</strong>をクリックします。テーブルには今後24時間分、1分ごとに1行が表示されます。</li><li>地球上の任意の場所を右クリックして<strong>DOP</strong>を選ぶこともできます。<strong>現在のGPS DOP</strong>はクリックした地点の即時の値を表示し、<strong>24時間GPS DOP</strong>はその位置をフォームに入力してこのメニューを開きます。</li></ol>",
+        "tip1": "仰角マスクを上げると低い衛星が除外され、通常はDOPが増加します。実際に受信機が適用しているマスクを使用してください。一般的な既定値は15度です。",
+        "tip2": "入力したマスク値はセッションのGPS仰角マスクとして保存され、ほかのGPS関連の計算でも再利用されます。",
+        "tip3": "一人称視点カメラの操作中は、Dショートカットは無視されます。",
+        "shortcutToggle": "精度低下率メニューの表示を切り替え"
       }
     }
   }

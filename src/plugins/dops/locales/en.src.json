@@ -3,8 +3,6 @@
     "DopsPlugin": {
       "bottomIconLabel": "View DOPs",
       "title": "Dilution of Precision Menu",
-      "helpTitle": "Dilution of Precision (DOP) Menu",
-      "helpBody": "The Dilution of Precision (DOP) Menu is used to calculate the Dilution of Precision (DOP) for a given location and elevation mask.<br><br>HDOP is the Horizontal Dilution of Precision. It is a measure of the accuracy of the horizontal position.<br><br>PDOP is the Position Dilution of Precision. It is a measure of the accuracy of the position.<br><br>GDOP is the Geometric Dilution of Precision. It is a measure of the accuracy of the position.",
       "labels": {
         "dopTable": "DOP Table",
         "latitude": "Latitude",
@@ -19,6 +17,12 @@
         "altitude": "Altitude in KM",
         "mask": "Minimum Elevation for GPS Lock"
       },
+      "table": {
+        "time": "Time",
+        "hdop": "HDOP",
+        "pdop": "PDOP",
+        "gdop": "GDOP"
+      },
       "rmb": {
         "dops": "DOPs",
         "currentGpsDops": "Current GPS DOPs",
@@ -29,6 +33,18 @@
       },
       "errorMsgs": {
         "invalidLocation": "Please select a valid location on Earth for 24 Hour DOPs!"
+      },
+      "help": {
+        "overview": "The Dilution of Precision (DOP) menu estimates how accurate a GPS position fix will be at any location on Earth. DOP describes the geometry of the visible GPS constellation: when satellites are spread widely across the sky the fix is precise (low DOP), and when they are clustered together accuracy degrades (high DOP). Use this menu to find the best and worst GPS windows at a site over the next 24 hours.",
+        "imgAlt": "The Dilution of Precision menu with a 24 hour DOP table",
+        "imgCaption": "Enter a location and elevation mask, then update to see DOP values for the next 24 hours.",
+        "valuesHeading": "Reading the DOP Values",
+        "values": "<ul><li><strong>HDOP</strong>: horizontal accuracy (latitude and longitude).</li><li><strong>VDOP</strong>: vertical accuracy (altitude).</li><li><strong>PDOP</strong>: overall 3D position accuracy.</li><li><strong>GDOP</strong>: PDOP plus the receiver clock contribution; the most complete single quality figure.</li><li><strong>TDOP</strong>: receiver clock accuracy.</li></ul>Lower is better: values under 2 are excellent, 2 to 5 is acceptable for most uses, and larger values mean the fix is degraded. The table lists Time, HDOP, PDOP, and GDOP at one minute steps.",
+        "howToUse": "<ol><li>Open the menu from the bottom bar or press <strong>D</strong>.</li><li>Enter the <strong>Latitude</strong> and <strong>Longitude</strong> in degrees, the <strong>Altitude</strong> in kilometers, and the <strong>Mask</strong>: the minimum elevation in degrees a GPS satellite must reach above the horizon to be counted.</li><li>Click <strong>Update DOP Data</strong>. The table fills with one row per minute for the next 24 hours.</li><li>You can also right-click anywhere on Earth and choose <strong>DOPs</strong>: <strong>Current GPS DOPs</strong> shows an instant readout for the clicked point, and <strong>24 Hour GPS DOPs</strong> fills the form with that location and opens this menu.</li></ol>",
+        "tip1": "Raising the elevation mask excludes low satellites, which usually increases DOP. Use the mask your receiver actually applies; 15 degrees is a common default.",
+        "tip2": "The mask value you enter is stored as the session's GPS elevation mask, so other GPS related calculations reuse it.",
+        "tip3": "The D shortcut is ignored while flying the first person camera.",
+        "shortcutToggle": "Toggle the Dilution of Precision menu"
       }
     }
   }

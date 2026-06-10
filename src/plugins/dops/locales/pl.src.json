@@ -3,8 +3,6 @@
     "DopsPlugin": {
       "bottomIconLabel": "Pokaż DOP",
       "title": "Menu rozmycia precyzji",
-      "helpTitle": "Menu rozmycia precyzji (DOP)",
-      "helpBody": "Menu rozmycia precyzji (DOP) służy do obliczania rozmycia precyzji (DOP) dla danej lokalizacji i maski elewacji.<br><br>HDOP to poziome rozmycie precyzji. Jest miarą dokładności pozycji poziomej.<br><br>PDOP to pozycyjne rozmycie precyzji. Jest miarą dokładności pozycji.<br><br>GDOP to geometryczne rozmycie precyzji. Jest miarą dokładności pozycji.",
       "labels": {
         "dopTable": "Tabela DOP",
         "latitude": "Szerokość geogr.",
@@ -19,6 +17,12 @@
         "altitude": "Wysokość w km",
         "mask": "Minimalna elewacja dla blokady GPS"
       },
+      "table": {
+        "time": "Czas",
+        "hdop": "HDOP",
+        "pdop": "PDOP",
+        "gdop": "GDOP"
+      },
       "rmb": {
         "dops": "DOP",
         "currentGpsDops": "Bieżące DOP GPS",
@@ -29,6 +33,18 @@
       },
       "errorMsgs": {
         "invalidLocation": "Wybierz prawidłową lokalizację na Ziemi dla 24-godzinnych DOP!"
+      },
+      "help": {
+        "overview": "Menu rozmycia precyzji (DOP) szacuje, jak dokładne będzie wyznaczenie pozycji GPS w dowolnym miejscu na Ziemi. DOP opisuje geometrię widocznej konstelacji GPS: gdy satelity są szeroko rozproszone po niebie, pozycja jest precyzyjna (niski DOP), a gdy są skupione blisko siebie, dokładność spada (wysoki DOP). Użyj tego menu, aby znaleźć najlepsze i najgorsze okna GPS w danej lokalizacji w ciągu najbliższych 24 godzin.",
+        "imgAlt": "Menu rozmycia precyzji z 24-godzinną tabelą DOP",
+        "imgCaption": "Wprowadź lokalizację i maskę elewacji, a następnie zaktualizuj, aby zobaczyć wartości DOP na najbliższe 24 godziny.",
+        "valuesHeading": "Jak czytać wartości DOP",
+        "values": "<ul><li><strong>HDOP</strong>: dokładność pozioma (szerokość i długość geograficzna).</li><li><strong>VDOP</strong>: dokładność pionowa (wysokość).</li><li><strong>PDOP</strong>: ogólna dokładność pozycji 3D.</li><li><strong>GDOP</strong>: PDOP plus wkład zegara odbiornika; najbardziej kompletny pojedynczy wskaźnik jakości.</li><li><strong>TDOP</strong>: dokładność zegara odbiornika.</li></ul>Im niżej, tym lepiej: wartości poniżej 2 są doskonałe, 2 do 5 jest akceptowalne dla większości zastosowań, a większe wartości oznaczają pogorszoną pozycję. Tabela zawiera czas, HDOP, PDOP i GDOP w krokach co minutę.",
+        "howToUse": "<ol><li>Otwórz menu z dolnego paska lub naciśnij <strong>D</strong>.</li><li>Wprowadź <strong>Szerokość geogr.</strong> i <strong>Długość geogr.</strong> w stopniach oraz <strong>Wysokość</strong> w kilometrach. W polu <strong>Maska</strong> podaj minimalną elewację w stopniach, jaką satelita GPS musi osiągnąć nad horyzontem, aby został uwzględniony.</li><li>Kliknij <strong>Aktualizuj dane DOP</strong>. Tabela wypełni się jednym wierszem na minutę na najbliższe 24 godziny.</li><li>Możesz też kliknąć prawym przyciskiem w dowolnym miejscu na Ziemi i wybrać <strong>DOP</strong>: <strong>Bieżące DOP GPS</strong> pokazuje natychmiastowy odczyt dla klikniętego punktu, a <strong>24-godzinne DOP GPS</strong> wypełnia formularz tą lokalizacją i otwiera to menu.</li></ol>",
+        "tip1": "Podniesienie maski elewacji wyklucza nisko położone satelity, co zwykle zwiększa DOP. Użyj maski, którą faktycznie stosuje Twój odbiornik; 15 stopni to częsta wartość domyślna.",
+        "tip2": "Wprowadzona wartość maski jest zapisywana jako maska elewacji GPS dla sesji, więc inne obliczenia związane z GPS używają jej ponownie.",
+        "tip3": "Skrót D jest ignorowany podczas sterowania kamerą w widoku pierwszoosobowym.",
+        "shortcutToggle": "Przełącz menu rozmycia precyzji"
       }
     }
   }

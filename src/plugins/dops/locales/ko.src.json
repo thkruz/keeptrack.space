@@ -3,8 +3,6 @@
     "DopsPlugin": {
       "bottomIconLabel": "DOP 보기",
       "title": "정밀도 희석 메뉴",
-      "helpTitle": "정밀도 희석(DOP) 메뉴",
-      "helpBody": "정밀도 희석(DOP) 메뉴는 지정된 위치와 고도 마스크에 대한 정밀도 희석(DOP)을 계산하는 데 사용됩니다.<br><br>HDOP는 수평 정밀도 희석입니다. 수평 위치의 정확도를 측정합니다.<br><br>PDOP는 위치 정밀도 희석입니다. 위치의 정확도를 측정합니다.<br><br>GDOP는 기하학적 정밀도 희석입니다. 위치의 정확도를 측정합니다.",
       "labels": {
         "dopTable": "DOP 테이블",
         "latitude": "위도",
@@ -19,6 +17,12 @@
         "altitude": "고도 (km 단위)",
         "mask": "GPS 수신 최소 고도각"
       },
+      "table": {
+        "time": "시간",
+        "hdop": "HDOP",
+        "pdop": "PDOP",
+        "gdop": "GDOP"
+      },
       "rmb": {
         "dops": "DOPs",
         "currentGpsDops": "현재 GPS DOP",
@@ -29,6 +33,18 @@
       },
       "errorMsgs": {
         "invalidLocation": "24시간 DOP를 위해 지구의 유효한 위치를 선택하세요!"
+      },
+      "help": {
+        "overview": "정밀도 희석(DOP) 메뉴는 지구상의 임의 위치에서 GPS 위치 측정이 얼마나 정확할지를 추정합니다. DOP는 가시 GPS 위성군의 기하학적 배치를 나타냅니다. 위성이 하늘에 넓게 퍼져 있으면 측위가 정확하고(DOP 낮음), 한곳에 몰려 있으면 정확도가 떨어집니다(DOP 높음). 이 메뉴를 사용하면 향후 24시간 동안 특정 지점에서 GPS 상태가 가장 좋은 시간대와 가장 나쁜 시간대를 찾을 수 있습니다.",
+        "imgAlt": "24시간 DOP 테이블이 표시된 정밀도 희석 메뉴",
+        "imgCaption": "위치와 고도각 마스크를 입력한 후 업데이트하면 향후 24시간의 DOP 값을 볼 수 있습니다.",
+        "valuesHeading": "DOP 값 읽는 법",
+        "values": "<ul><li><strong>HDOP</strong>: 수평 정확도(위도와 경도).</li><li><strong>VDOP</strong>: 수직 정확도(고도).</li><li><strong>PDOP</strong>: 전체 3차원 위치 정확도.</li><li><strong>GDOP</strong>: PDOP에 수신기 시계의 기여분을 더한 값으로, 가장 종합적인 단일 품질 지표입니다.</li><li><strong>TDOP</strong>: 수신기 시계 정확도.</li></ul>값이 낮을수록 좋습니다. 2 미만은 매우 우수하고, 2에서 5 사이는 대부분의 용도에 적합하며, 그보다 큰 값은 측위가 저하되었음을 의미합니다. 테이블에는 시간, HDOP, PDOP, GDOP가 1분 간격으로 표시됩니다.",
+        "howToUse": "<ol><li>하단 바에서 메뉴를 열거나 <strong>D</strong> 키를 누릅니다.</li><li><strong>위도</strong>와 <strong>경도</strong>를 도 단위로, <strong>고도</strong>를 킬로미터 단위로 입력하고, <strong>마스크</strong>에는 GPS 위성이 계산에 포함되기 위해 지평선 위에서 도달해야 하는 최소 고도각을 도 단위로 입력합니다.</li><li><strong>DOP 데이터 업데이트</strong>를 클릭합니다. 테이블이 향후 24시간 동안 1분당 한 행씩 채워집니다.</li><li>지구상의 아무 곳이나 마우스 오른쪽 버튼으로 클릭하고 <strong>DOPs</strong>를 선택할 수도 있습니다. <strong>현재 GPS DOP</strong>는 클릭한 지점의 즉시 값을 보여 주고, <strong>24시간 GPS DOP</strong>는 해당 위치를 양식에 채운 뒤 이 메뉴를 엽니다.</li></ol>",
+        "tip1": "고도각 마스크를 높이면 낮은 위성이 제외되어 보통 DOP가 증가합니다. 실제 수신기가 적용하는 마스크 값을 사용하세요. 15도가 일반적인 기본값입니다.",
+        "tip2": "입력한 마스크 값은 세션의 GPS 고도각 마스크로 저장되어 다른 GPS 관련 계산에서도 재사용됩니다.",
+        "tip3": "1인칭 카메라를 조종하는 동안에는 D 단축키가 무시됩니다.",
+        "shortcutToggle": "정밀도 희석 메뉴 전환"
       }
     }
   }

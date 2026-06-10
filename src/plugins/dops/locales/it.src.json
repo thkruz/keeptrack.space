@@ -3,8 +3,6 @@
     "DopsPlugin": {
       "bottomIconLabel": "Visualizza DOP",
       "title": "Menu diluizione della precisione",
-      "helpTitle": "Menu diluizione della precisione (DOP)",
-      "helpBody": "Il menu Diluizione della precisione (DOP) viene utilizzato per calcolare la diluizione della precisione (DOP) per una determinata posizione e maschera di elevazione.<br><br>HDOP è la diluizione orizzontale della precisione. È una misura dell'accuratezza della posizione orizzontale.<br><br>PDOP è la diluizione posizionale della precisione. È una misura dell'accuratezza della posizione.<br><br>GDOP è la diluizione geometrica della precisione. È una misura dell'accuratezza della posizione.",
       "labels": {
         "dopTable": "Tabella DOP",
         "latitude": "Latitudine",
@@ -19,6 +17,12 @@
         "altitude": "Altitudine in km",
         "mask": "Elevazione minima per aggancio GPS"
       },
+      "table": {
+        "time": "Ora",
+        "hdop": "HDOP",
+        "pdop": "PDOP",
+        "gdop": "GDOP"
+      },
       "rmb": {
         "dops": "DOP",
         "currentGpsDops": "DOP GPS attuali",
@@ -29,6 +33,18 @@
       },
       "errorMsgs": {
         "invalidLocation": "Selezionare una posizione valida sulla Terra per i DOP a 24 ore!"
+      },
+      "help": {
+        "overview": "Il menu diluizione della precisione (DOP) stima quanto sarà accurata una posizione GPS in qualsiasi punto della Terra. Il DOP descrive la geometria della costellazione GPS visibile: quando i satelliti sono ben distribuiti nel cielo la posizione è precisa (DOP basso), mentre quando sono raggruppati l'accuratezza peggiora (DOP alto). Usa questo menu per trovare le finestre GPS migliori e peggiori in un sito nelle prossime 24 ore.",
+        "imgAlt": "Il menu diluizione della precisione con una tabella DOP di 24 ore",
+        "imgCaption": "Inserisci una posizione e una maschera di elevazione, poi aggiorna per vedere i valori DOP delle prossime 24 ore.",
+        "valuesHeading": "Come leggere i valori DOP",
+        "values": "<ul><li><strong>HDOP</strong>: accuratezza orizzontale (latitudine e longitudine).</li><li><strong>VDOP</strong>: accuratezza verticale (altitudine).</li><li><strong>PDOP</strong>: accuratezza complessiva della posizione 3D.</li><li><strong>GDOP</strong>: PDOP più il contributo dell'orologio del ricevitore; l'indicatore di qualità singolo più completo.</li><li><strong>TDOP</strong>: accuratezza dell'orologio del ricevitore.</li></ul>Più basso è, meglio è: valori sotto 2 sono eccellenti, da 2 a 5 è accettabile per la maggior parte degli usi, valori maggiori indicano una posizione degradata. La tabella elenca ora, HDOP, PDOP e GDOP a passi di un minuto.",
+        "howToUse": "<ol><li>Apri il menu dalla barra inferiore o premi <strong>D</strong>.</li><li>Inserisci la <strong>Latitudine</strong> e la <strong>Longitudine</strong> in gradi, l'<strong>Altitudine</strong> in chilometri e la <strong>Maschera</strong>: l'elevazione minima in gradi che un satellite GPS deve raggiungere sopra l'orizzonte per essere conteggiato.</li><li>Fai clic su <strong>Aggiorna dati DOP</strong>. La tabella si riempie con una riga al minuto per le prossime 24 ore.</li><li>Puoi anche fare clic destro in un punto qualsiasi della Terra e scegliere <strong>DOP</strong>: <strong>DOP GPS attuali</strong> mostra una lettura istantanea per il punto selezionato, mentre <strong>DOP GPS 24 ore</strong> compila il modulo con quella posizione e apre questo menu.</li></ol>",
+        "tip1": "Aumentare la maschera di elevazione esclude i satelliti bassi, il che di solito aumenta il DOP. Usa la maschera realmente applicata dal tuo ricevitore; 15 gradi è un valore predefinito comune.",
+        "tip2": "Il valore di maschera inserito viene salvato come maschera di elevazione GPS della sessione, quindi gli altri calcoli legati al GPS lo riutilizzano.",
+        "tip3": "La scorciatoia D viene ignorata mentre si pilota la telecamera in prima persona.",
+        "shortcutToggle": "Mostra o nascondi il menu diluizione della precisione"
       }
     }
   }

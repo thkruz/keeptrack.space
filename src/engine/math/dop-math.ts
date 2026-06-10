@@ -1,5 +1,6 @@
 import numeric from 'numeric';
 import { AzEl, DEG2RAD, Degrees, Satellite, Kilometers, MILLISECONDS_PER_SECOND, ecef2rae, eci2ecef } from '@ootk/src/main';
+import { t7e } from '@app/locales/keys';
 import { SatMath } from '../../app/analysis/sat-math';
 import { dateFormat } from '../utils/dateFormat';
 import { getEl } from '../utils/get-el';
@@ -149,16 +150,16 @@ export abstract class DopMath {
     let tr = tbl.insertRow();
     let tdT = tr.insertCell();
 
-    tdT.appendChild(document.createTextNode('Time'));
+    tdT.appendChild(document.createTextNode(t7e('plugins.DopsPlugin.table.time')));
     let tdH = tr.insertCell();
 
-    tdH.appendChild(document.createTextNode('HDOP'));
+    tdH.appendChild(document.createTextNode(t7e('plugins.DopsPlugin.table.hdop')));
     let tdP = tr.insertCell();
 
-    tdP.appendChild(document.createTextNode('PDOP'));
+    tdP.appendChild(document.createTextNode(t7e('plugins.DopsPlugin.table.pdop')));
     let tdG = tr.insertCell();
 
-    tdG.appendChild(document.createTextNode('GDOP'));
+    tdG.appendChild(document.createTextNode(t7e('plugins.DopsPlugin.table.gdop')));
 
     for (const result of dopsResults) {
       tr = tbl.insertRow();

@@ -63,8 +63,32 @@ export class DopsPlugin extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.DopsPlugin.helpTitle'),
-      body: t7e('plugins.DopsPlugin.helpBody'),
+      title: t7e('plugins.DopsPlugin.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.DopsPlugin.help.overview'),
+          image: {
+            src: 'img/help/dops/dops-menu.png',
+            alt: t7e('plugins.DopsPlugin.help.imgAlt'),
+            caption: t7e('plugins.DopsPlugin.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.DopsPlugin.help.valuesHeading'),
+          content: t7e('plugins.DopsPlugin.help.values'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.DopsPlugin.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.DopsPlugin.help.tip1'),
+        t7e('plugins.DopsPlugin.help.tip2'),
+        t7e('plugins.DopsPlugin.help.tip3'),
+      ],
+      shortcuts: [{ keys: ['D'], description: t7e('plugins.DopsPlugin.help.shortcutToggle') }],
     };
   }
 

@@ -3,8 +3,6 @@
     "DopsPlugin": {
       "bottomIconLabel": "Voir les DOPs",
       "title": "Menu Dilution de Précision",
-      "helpTitle": "Menu Dilution de Précision (DOP)",
-      "helpBody": "Le menu Dilution de Précision (DOP) permet de calculer la dilution de précision pour un emplacement et un masque d'élévation donnés.<br><br>Le HDOP est la dilution de précision horizontale. C'est une mesure de la précision de la position horizontale.<br><br>Le PDOP est la dilution de précision de position. C'est une mesure de la précision de la position.<br><br>Le GDOP est la dilution de précision géométrique. C'est une mesure de la précision de la position.",
       "labels": {
         "dopTable": "Tableau DOP",
         "latitude": "Latitude",
@@ -19,6 +17,12 @@
         "altitude": "Altitude en km",
         "mask": "Élévation minimale pour le verrouillage GPS"
       },
+      "table": {
+        "time": "Heure",
+        "hdop": "HDOP",
+        "pdop": "PDOP",
+        "gdop": "GDOP"
+      },
       "rmb": {
         "dops": "DOPs",
         "currentGpsDops": "DOP GPS actuels",
@@ -29,6 +33,18 @@
       },
       "errorMsgs": {
         "invalidLocation": "Veuillez sélectionner un emplacement valide sur Terre pour les DOP sur 24 heures !"
+      },
+      "help": {
+        "overview": "Le menu Dilution de Précision (DOP) estime la précision qu'aura un point GPS en n'importe quel endroit de la Terre. La DOP décrit la géométrie de la constellation GPS visible : lorsque les satellites sont largement répartis dans le ciel, le point est précis (DOP faible) ; lorsqu'ils sont regroupés, la précision se dégrade (DOP élevée). Utilisez ce menu pour trouver les meilleures et les pires fenêtres GPS sur un site au cours des prochaines 24 heures.",
+        "imgAlt": "Le menu Dilution de Précision avec un tableau DOP sur 24 heures",
+        "imgCaption": "Saisissez un emplacement et un masque d'élévation, puis mettez à jour pour voir les valeurs DOP des prochaines 24 heures.",
+        "valuesHeading": "Lire les valeurs DOP",
+        "values": "<ul><li><strong>HDOP</strong> : précision horizontale (latitude et longitude).</li><li><strong>VDOP</strong> : précision verticale (altitude).</li><li><strong>PDOP</strong> : précision globale de la position 3D.</li><li><strong>GDOP</strong> : le PDOP plus la contribution de l'horloge du récepteur ; l'indicateur de qualité unique le plus complet.</li><li><strong>TDOP</strong> : précision de l'horloge du récepteur.</li></ul>Plus la valeur est faible, mieux c'est : les valeurs inférieures à 2 sont excellentes, de 2 à 5 c'est acceptable pour la plupart des usages, et des valeurs plus élevées signifient un point dégradé. Le tableau liste l'heure, le HDOP, le PDOP et le GDOP par pas d'une minute.",
+        "howToUse": "<ol><li>Ouvrez le menu depuis la barre inférieure ou appuyez sur <strong>D</strong>.</li><li>Saisissez la <strong>Latitude</strong> et la <strong>Longitude</strong> en degrés, l'<strong>Altitude</strong> en kilomètres et le <strong>Masque</strong> : l'élévation minimale en degrés qu'un satellite GPS doit atteindre au-dessus de l'horizon pour être pris en compte.</li><li>Cliquez sur <strong>Mettre à jour les données DOP</strong>. Le tableau se remplit d'une ligne par minute pour les prochaines 24 heures.</li><li>Vous pouvez aussi faire un clic droit n'importe où sur la Terre et choisir <strong>DOPs</strong> : <strong>DOP GPS actuels</strong> affiche une lecture instantanée pour le point cliqué, et <strong>DOP GPS sur 24 heures</strong> remplit le formulaire avec cet emplacement et ouvre ce menu.</li></ol>",
+        "tip1": "Augmenter le masque d'élévation exclut les satellites bas, ce qui augmente généralement la DOP. Utilisez le masque réellement appliqué par votre récepteur ; 15 degrés est une valeur par défaut courante.",
+        "tip2": "La valeur de masque saisie est enregistrée comme masque d'élévation GPS de la session ; les autres calculs liés au GPS la réutilisent donc.",
+        "tip3": "Le raccourci D est ignoré pendant le pilotage de la caméra à la première personne.",
+        "shortcutToggle": "Afficher ou masquer le menu Dilution de Précision"
       }
     }
   }

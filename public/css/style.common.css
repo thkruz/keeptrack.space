@@ -21,7 +21,7 @@
 
   --time-slider-height: 0px;
 
-  /* Breakpoints (for JS access — CSS @media can't use custom properties) */
+  /* Breakpoints (for JS access - CSS @media can't use custom properties) */
   --bp-mobile: 694px;
   /* mobile: max-width 694px */
   --bp-tablet: 1300px;
@@ -2544,7 +2544,7 @@ button.ui-button::-moz-focus-inner {
   filter: grayscale(1) !important;
 }
 
-/* Pro-locked icons — blue tint only while the user is NOT logged in. The tint
+/* Pro-locked icons - blue tint only while the user is NOT logged in. The tint
    is driven purely off the body-level .user-logged-in class so freshly-rendered
    gated items inherit the right look with no per-element JS sync. */
 body:not(.user-logged-in) .bmenu-item-pro img {
@@ -3718,7 +3718,7 @@ nav a.sidenav-trigger i {
   /* fill parent so scrollbar spans full height */
   height: 100%;
   min-height: calc(1.5 * var(--bottom-icon-width));
-  /* pack items at top — prevents stretching */
+  /* pack items at top - prevents stretching */
   align-content: start;
   justify-content: center;
   row-gap: 5px;
@@ -4041,6 +4041,120 @@ input:focus {
   display: block;
   line-height: 20px;
   text-align: left;
+}
+
+/* Rich (structured) help dialog content */
+#help-text .help-rich {
+  max-width: 840px;
+  margin: 0 auto;
+  line-height: 1.55;
+}
+
+#help-text .help-section {
+  margin: 0 0 20px;
+  text-align: left;
+}
+
+#help-text .help-section:last-child {
+  margin-bottom: 0;
+}
+
+#help-text .help-section-heading {
+  margin: 0 0 8px;
+  padding-bottom: 4px;
+  font-size: 1.15em;
+  font-weight: 500;
+  color: var(--color-dark-text-accent);
+  border-bottom: 1px solid var(--color-dark-border);
+}
+
+#help-text .help-section-content ol,
+#help-text .help-section-content ul {
+  margin: 8px 0 0;
+  padding-left: 28px;
+}
+
+#help-text .help-section-content ol li,
+#help-text .help-section-content ul li {
+  margin-bottom: 4px;
+  list-style-position: outside;
+}
+
+#help-text .help-section-content ol li {
+  list-style-type: decimal;
+}
+
+#help-text .help-section-content ul li {
+  list-style-type: disc;
+}
+
+#help-text .help-figure {
+  margin: 12px auto 0;
+  text-align: center;
+}
+
+#help-text .help-figure img {
+  max-width: 100%;
+  max-height: 45vh;
+  border: 1px solid var(--color-dark-border);
+  border-radius: 4px;
+}
+
+#help-text .help-figure figcaption {
+  margin-top: 4px;
+  font-size: 0.85em;
+  font-style: italic;
+  opacity: 0.75;
+}
+
+#help-text .help-tips {
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 3px solid var(--color-primary);
+  border-radius: 0 4px 4px 0;
+}
+
+#help-text .help-tips .help-section-heading {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+#help-text .help-tips-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+#help-text .help-tips-list li {
+  margin-bottom: 4px;
+  list-style-type: disc;
+  list-style-position: outside;
+}
+
+#help-text .help-shortcut-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+#help-text .help-shortcut-keys {
+  flex-shrink: 0;
+  min-width: 130px;
+}
+
+#help-text kbd {
+  padding: 1px 7px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.85em;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--color-dark-border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+}
+
+#help-text .help-kbd-plus {
+  margin: 0 4px;
+  opacity: 0.7;
 }
 
 #jday {

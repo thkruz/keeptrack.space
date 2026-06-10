@@ -23,6 +23,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
 import { IHelpConfig } from '../../core/plugin-capabilities';
+import { buildHelpHtml } from './help-html';
 
 /**
  * Callback to check if the plugin's menu is currently active.
@@ -67,10 +68,10 @@ export class HelpComponent {
   }
 
   /**
-   * Gets the help body.
+   * Gets the help body rendered as HTML.
    */
   get body(): string {
-    return this.config.body;
+    return buildHelpHtml(this.config);
   }
 
   /**
@@ -114,6 +115,6 @@ export class HelpComponent {
    * Show the help content using the advice manager.
    */
   showHelp(): void {
-    adviceManagerInstance.showAdvice(this.config.title, this.config.body);
+    adviceManagerInstance.showAdvice(this.config.title, buildHelpHtml(this.config));
   }
 }

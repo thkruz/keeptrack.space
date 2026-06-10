@@ -3,7 +3,6 @@
     "CreateSat": {
       "bottomIconLabel": "Satellit erstellen",
       "title": "Satellit erstellen",
-      "helpBody": "Das Menü 'Satellit erstellen' ermöglicht es Ihnen, einen Satelliten durch manuelle Eingabe von Bahnelementen oder durch Import einer STK-Ephemeridendatei (.e) zu erstellen.<br><br><b>Basis-Tab</b>: Geben Sie Apogäum, Perigäum und Inklination ein, um schnell einen Satelliten zu erstellen.<br><br><b>Erweitert-Tab</b>: Geben Sie vollständige Kepler-Elemente ein (Inklination, RAAN, Exzentrizität, Argument des Perigäums, mittlere Anomalie, mittlere Bewegung).<br><br><b>STK .e Import</b>: Ziehen Sie eine STK-Ephemeridendatei per Drag & Drop auf das Menü. Unterstützte Formate: EphemerisTimePosVel, EphemerisTimePos und EphemerisTimePosVelAcc in inertialen Koordinatensystemen (J2000, ICRF, TEME usw.). Zeitformate EpSec und UTCG werden unterstützt. Schlüsselwörter sind nicht case-sensitiv.<br><br><b>Nicht unterstützt</b>: Geodätische Formate (LLA, LLR, MSL, Terrain), nicht-inertiale Bezugssysteme (Fixed, TrueOfDate) und Kovarianzdaten werden nicht unterstützt.",
       "tabs": {
         "basic": "Basis",
         "advanced": "Erweitert"
@@ -72,6 +71,17 @@
       "successMsgs": {
         "satCreated": "Satellit {name} ({scc}) erfolgreich erstellt",
         "tleExported": "TLE erfolgreich exportiert"
+      },
+      "help": {
+        "overview": "Das Menü Satellit erstellen fügt dem Katalog einen komplett neuen Satelliten aus den von Ihnen eingegebenen Bahnelementen hinzu. Nutzen Sie es, um einen geplanten Start zu modellieren, ein Objekt aus veröffentlichten Elementen nachzubilden oder Testfälle zu erstellen. Erstellte Satelliten belegen Analysten-Slots (NORAD-IDs 90000 bis 99999) und existieren nur in Ihrer Sitzung.",
+        "imgAlt": "Das Menü Satellit erstellen mit geöffnetem Basis-Tab",
+        "imgCaption": "Der Basis-Tab erstellt eine Umlaufbahn allein aus Apogäum, Perigäum und Inklination.",
+        "tabsHeading": "Basis- und Erweitert-Tab",
+        "tabs": "Der Tab <strong>Basis</strong> benötigt nur eine NORAD-ID, einen Namen sowie <strong>Inklination</strong>, <strong>Apogäumshöhe</strong> und <strong>Perigäumshöhe</strong>; der Rest der Umlaufbahn wird automatisch abgeleitet. Der Tab <strong>Erweitert</strong> bietet den vollständigen Elementsatz: <strong>Objekttyp</strong>, <strong>Land</strong>, Epoche, <strong>Rektaszension</strong>, <strong>Exzentrizität</strong>, <strong>Argument des Perigäums</strong>, <strong>Mittlere Anomalie</strong> und <strong>Mittlere Bewegung</strong> oder <strong>Periode</strong> (die Bearbeitung des einen berechnet das andere neu). Eine Anzeige <strong>Berechnete Parameter</strong> zeigt während der Eingabe das resultierende Apogäum, das Perigäum, die große Halbachse und die Orbitalgeschwindigkeit.",
+        "howToUse": "<ol><li>Öffnen Sie das Menü <strong>Satellit erstellen</strong> über die untere Leiste.</li><li>Wählen Sie eine freie NORAD-ID zwischen 90000 und 99999 und geben Sie dem Satelliten einen Namen.</li><li>Geben Sie im Tab <strong>Basis</strong> Inklination, Apogäum und Perigäum ein; oder wechseln Sie für den vollständigen Elementsatz zum Tab <strong>Erweitert</strong>.</li><li>Klicken Sie auf <strong>Satellit erstellen</strong>. Das neue Objekt erscheint sofort, und eine Bestätigungsmeldung zeigt Namen und Nummer an.</li><li>Mit <strong>TLE speichern</strong> exportieren Sie die Elemente des erstellten Satelliten als Datei, die Sie später wieder laden können.</li></ol>",
+        "tip1": "Jedes Feld wird mit einer spezifischen Fehlermeldung validiert; schlägt die Erstellung fehl, sagt Ihnen die Meldung genau, welcher Wert zu korrigieren ist.",
+        "tip2": "Ein Perigäum unter etwa 100 km wird abgelehnt, weil der Satellit sofort verglühen würde.",
+        "tip3": "Erstellte Satelliten gelten nur für die Sitzung; exportieren Sie ein TLE, wenn Sie das Objekt für einen anderen Tag behalten möchten."
       }
     }
   }

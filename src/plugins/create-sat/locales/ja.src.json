@@ -3,7 +3,6 @@
     "CreateSat": {
       "bottomIconLabel": "衛星を作成",
       "title": "衛星を作成",
-      "helpBody": "衛星作成メニューでは、軌道要素を手動で入力するか、STKエフェメリスファイル (.e) をインポートして衛星を作成できます。<br><br><b>基本タブ</b>：遠地点、近地点、軌道傾斜角を入力して素早く衛星を作成します。<br><br><b>詳細タブ</b>：完全なケプラー要素（軌道傾斜角、昇交点赤経、離心率、近地点引数、平均近点角、平均運動）を入力します。<br><br><b>STK .eインポート</b>：STKエフェメリスファイルをメニューにドラッグ＆ドロップします。対応形式：EphemerisTimePosVel、EphemerisTimePos、EphemerisTimePosVelAcc（慣性座標系：J2000、ICRF、TEMEなど）。時刻形式はEpSecとUTCGに対応。キーワードは大文字小文字を区別しません。<br><br><b>非対応</b>：測地形式（LLA、LLR、MSL、Terrain）、非慣性座標系（Fixed、TrueOfDate）、共分散データには対応していません。",
       "tabs": {
         "basic": "基本",
         "advanced": "詳細"
@@ -46,7 +45,7 @@
       "errorMsgs": {
         "errorCreatingSat": "衛星の作成中にエラーが発生しました！",
         "invalidNumericValues": "有効な数値を入力してください",
-        "perigeeTooLow": "近地点が低すぎます — 衛星は急速に減衰します",
+        "perigeeTooLow": "近地点が低すぎます。衛星は急速に減衰します",
         "apogeeMustBeGtePerigee": "遠地点は近地点以上である必要があります",
         "inclinationRange": "軌道傾斜角は0〜180度の範囲で入力してください",
         "invalidInputParams": "入力パラメータが無効です",
@@ -72,6 +71,17 @@
       "successMsgs": {
         "satCreated": "衛星 {name} ({scc}) が正常に作成されました",
         "tleExported": "TLEが正常にエクスポートされました"
+      },
+      "help": {
+        "overview": "衛星作成メニューでは、入力した軌道要素からまったく新しい衛星をカタログに追加できます。計画中の打ち上げのモデル化、公開された軌道要素からの物体の再現、テストケースの作成などに使用してください。作成された衛星はアナリスト用スロット（NORAD ID 90000〜99999）に登録され、現在のセッション内にのみ存在します。",
+        "imgAlt": "基本タブを表示した衛星作成メニュー",
+        "imgCaption": "基本タブでは、遠地点、近地点、軌道傾斜角だけから軌道を構築します。",
+        "tabsHeading": "基本タブと詳細タブ",
+        "tabs": "<strong>基本</strong>タブに必要なのはNORAD ID、名前、<strong>軌道傾斜角</strong>、<strong>遠地点高度</strong>、<strong>近地点高度</strong>だけで、残りの軌道は自動的に導出されます。<strong>詳細</strong>タブでは完全な軌道要素セットを設定できます：<strong>物体タイプ</strong>、<strong>国</strong>、元期、<strong>昇交点赤経</strong>、<strong>離心率</strong>、<strong>近地点引数</strong>、<strong>平均近点角</strong>、そして<strong>平均運動</strong>または<strong>周期</strong>（一方を編集するともう一方が再計算されます）。<strong>計算パラメータ</strong>欄には、入力に応じて結果の遠地点、近地点、軌道長半径、軌道速度が表示されます。",
+        "howToUse": "<ol><li>下部バーから<strong>衛星を作成</strong>メニューを開きます。</li><li>90000〜99999の範囲で空いているNORAD IDを選び、衛星に名前を付けます。</li><li><strong>基本</strong>タブで軌道傾斜角、遠地点、近地点を入力するか、<strong>詳細</strong>タブに切り替えて完全な軌道要素セットを入力します。</li><li><strong>衛星を作成</strong>をクリックします。新しい物体が即座に表示され、確認通知に名前と番号が表示されます。</li><li><strong>TLEを保存</strong>を使うと、作成した衛星の軌道要素をファイルとして書き出し、後で再読み込みできます。</li></ol>",
+        "tip1": "すべての入力欄は個別のエラーメッセージで検証されるため、作成に失敗した場合は、どの値を修正すべきかが通知で正確にわかります。",
+        "tip2": "およそ100 km未満の近地点は、衛星がすぐに落下してしまうため拒否されます。",
+        "tip3": "作成した衛星はセッション限りです。別の日にも使いたい場合はTLEをエクスポートしてください。"
       }
     }
   }

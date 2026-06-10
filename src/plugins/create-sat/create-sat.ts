@@ -29,6 +29,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { saveAs } from 'file-saver';
+import { buildCreateSatHelp } from './create-sat-help';
 
 type T7eKey = Parameters<typeof t7e>[0];
 
@@ -144,10 +145,7 @@ export class CreateSat extends KeepTrackPlugin {
   }
 
   getHelpConfig(): IHelpConfig {
-    return {
-      title: t7e('plugins.CreateSat.title'),
-      body: t7e('plugins.CreateSat.helpBody'),
-    };
+    return buildCreateSatHelp();
   }
 
   /**

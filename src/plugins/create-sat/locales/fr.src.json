@@ -3,7 +3,6 @@
     "CreateSat": {
       "bottomIconLabel": "Créer un satellite",
       "title": "Créer un satellite",
-      "helpBody": "Le menu Créer un satellite vous permet de créer un satellite en saisissant manuellement les éléments orbitaux ou en important un fichier d'éphémérides STK (.e).<br><br><b>Onglet Basique</b> : Entrez l'apogée, le périgée et l'inclinaison pour créer rapidement un satellite.<br><br><b>Onglet Avancé</b> : Entrez les éléments képlériens complets (inclinaison, RAAN, excentricité, argument du périgée, anomalie moyenne, mouvement moyen).<br><br><b>Import STK .e</b> : Glissez-déposez un fichier d'éphémérides STK sur le menu. Formats pris en charge : EphemerisTimePosVel, EphemerisTimePos et EphemerisTimePosVelAcc dans les systèmes de coordonnées inertiels (J2000, ICRF, TEME, etc.). Les formats de temps EpSec et UTCG sont pris en charge. Les mots-clés ne sont pas sensibles à la casse.<br><br><b>Non pris en charge</b> : Les formats géodésiques (LLA, LLR, MSL, Terrain), les référentiels non inertiels (Fixed, TrueOfDate) et les données de covariance ne sont pas pris en charge.",
       "tabs": {
         "basic": "Basique",
         "advanced": "Avancé"
@@ -46,7 +45,7 @@
       "errorMsgs": {
         "errorCreatingSat": "Erreur lors de la création du satellite !",
         "invalidNumericValues": "Veuillez saisir des valeurs numériques valides",
-        "perigeeTooLow": "Périgée trop bas — le satellite se désintégrerait rapidement",
+        "perigeeTooLow": "Périgée trop bas : le satellite se désintégrerait rapidement",
         "apogeeMustBeGtePerigee": "L'apogée doit être supérieure ou égale au périgée",
         "inclinationRange": "L'inclinaison doit être entre 0 et 180 degrés",
         "invalidInputParams": "Paramètres d'entrée invalides",
@@ -72,6 +71,17 @@
       "successMsgs": {
         "satCreated": "Satellite {name} ({scc}) créé avec succès",
         "tleExported": "TLE exporté avec succès"
+      },
+      "help": {
+        "overview": "Le menu Créer un satellite ajoute au catalogue un tout nouveau satellite à partir des éléments orbitaux que vous saisissez. Utilisez-le pour modéliser un lancement prévu, recréer un objet à partir d'éléments publiés ou construire des cas de test. Les satellites créés occupent des emplacements d'analyste (ID NORAD 90000 à 99999) et n'existent que dans votre session.",
+        "imgAlt": "Le menu Créer un satellite affichant l'onglet Basique",
+        "imgCaption": "L'onglet Basique construit une orbite uniquement à partir de l'apogée, du périgée et de l'inclinaison.",
+        "tabsHeading": "Onglets Basique et Avancé",
+        "tabs": "L'onglet <strong>Basique</strong> ne demande qu'un ID NORAD, un nom, l'<strong>Inclinaison</strong>, l'<strong>Altitude de l'apogée</strong> et l'<strong>Altitude du périgée</strong> ; le reste de l'orbite est dérivé automatiquement. L'onglet <strong>Avancé</strong> expose le jeu complet d'éléments : <strong>Type d'objet</strong>, <strong>Pays</strong>, époque, <strong>Ascension droite</strong>, <strong>Excentricité</strong>, <strong>Argument du périgée</strong>, <strong>Anomalie moyenne</strong> et <strong>Mouvement moyen</strong> ou <strong>Période</strong> (modifier l'un recalcule l'autre). Un panneau <strong>Paramètres calculés</strong> affiche au fil de la saisie l'apogée, le périgée, le demi-grand axe et la vitesse orbitale résultants.",
+        "howToUse": "<ol><li>Ouvrez le menu <strong>Créer un satellite</strong> depuis la barre inférieure.</li><li>Choisissez un ID NORAD libre entre 90000 et 99999 et donnez un nom au satellite.</li><li>Dans l'onglet <strong>Basique</strong>, saisissez l'inclinaison, l'apogée et le périgée ; ou passez à l'onglet <strong>Avancé</strong> pour le jeu complet d'éléments.</li><li>Cliquez sur <strong>Créer le satellite</strong>. Le nouvel objet apparaît immédiatement et une notification de confirmation affiche son nom et son numéro.</li><li>Utilisez <strong>Enregistrer le TLE</strong> pour exporter les éléments du satellite créé dans un fichier que vous pourrez recharger plus tard.</li></ol>",
+        "tip1": "Chaque champ est validé avec un message d'erreur spécifique ; si la création échoue, la notification vous indique exactement quelle valeur corriger.",
+        "tip2": "Un périgée inférieur à environ 100 km est refusé, car le satellite se désintégrerait immédiatement.",
+        "tip3": "Les satellites créés ne durent que la session ; exportez un TLE si vous voulez conserver l'objet pour un autre jour."
       }
     }
   }

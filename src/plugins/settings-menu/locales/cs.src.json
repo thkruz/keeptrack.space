@@ -3,7 +3,50 @@
     "SettingsMenuPlugin": {
       "bottomIconLabel": "Nastavení",
       "title": "Nabídka nastavení",
-      "helpBody": "Nabídka nastavení umožňuje konfigurovat aplikaci."
+      "buttons": {
+        "updateSettings": "Aktualizovat nastavení",
+        "resetToDefaults": "Obnovit výchozí"
+      },
+      "sections": {
+        "general": "Obecná nastavení",
+        "fastCpu": "Vyžadován rychlý procesor"
+      },
+      "labels": {
+        "showInfoOnHover": "Zobrazit informace při najetí myší",
+        "drawOrbits": "Vykreslovat orbity",
+        "drawTrailingOrbits": "Vykreslovat orbity za satelitem",
+        "drawOrbitsInEcf": "Vykreslovat orbity v ECF",
+        "numberOfEcfOrbits": "Počet vykreslovaných orbit v ECF",
+        "drawFovLines": "Vykreslovat čáry FOV",
+        "displayEciOnHover": "Zobrazit ECI při najetí myší",
+        "showCameraWidget": "Zobrazit widget kamery",
+        "showConfidenceLevels": "Zobrazit úrovně spolehlivosti",
+        "enableDemoMode": "Povolit demo režim",
+        "enableFreezeTime": "Zastavit čas při kliknutí",
+        "compensateEarthRotation": "Kompenzovat rotaci Země",
+        "showNextPassOnHover": "Zobrazit další přelet při najetí myší"
+      },
+      "tooltips": {
+        "showInfoOnHover": "Při najetí myší na satelit se zobrazí více informací.",
+        "drawOrbits": "Vypnutím skryjete čáry orbit",
+        "drawTrailingOrbits": "Zapnutím zobrazíte, kde satelit byl, místo toho, kam směřuje",
+        "drawOrbitsInEcf": "Orbity se vykreslí v ECF místo ECI (hlavně pro orbity GEO)",
+        "drawFovLines": "Vykreslovat čáry od senzoru k satelitům, které jsou v jeho FOV",
+        "displayEciOnHover": "Zobrazit souřadnice ECI při najetí myší",
+        "showCameraWidget": "Vypnutím skryjete widget kamery",
+        "showConfidenceLevels": "Zobrazit úrovně spolehlivosti sad elementů dráhy satelitu.",
+        "enableDemoMode": "Každé 3 sekundy bude vybrán nový satelit z FOV",
+        "enableFreezeTime": "Čas se zastaví, když otáčíte kamerou.",
+        "compensateEarthRotation": "Kompenzuje natočení kamery podle rotace Země, takže pohled zůstává pevně vůči zeměpisným souřadnicím."
+      },
+      "help": {
+        "overview": "Nabídka nastavení obsahuje volby zobrazení a interakce platné pro celou aplikaci: vykreslování orbit, chování při najetí myší, pomůcky kamery a výkonnostně náročné doplňky. Vlastní sekce sem přidávají i další pluginy, takže jde o jediné místo, kde ladíte chování KeepTracku.",
+        "imgAlt": "Nabídka nastavení s přepínači obecných voleb",
+        "imgCaption": "Přepněte volby a poté je použijte tlačítkem Aktualizovat nastavení.",
+        "howToUse": "<ol><li>Otevřete <strong>Nastavení</strong> ze spodní lišty.</li><li>Přepněte požadované přepínače; najetím myší na řádek zobrazíte vysvětlující nápovědu.</li><li>Kliknutím na <strong>Aktualizovat nastavení</strong> změny použijete. Některé volby překreslí scénu okamžitě.</li><li><strong>Obnovit výchozí</strong> vrátí všechny volby, včetně sekcí přidaných pluginy, na tovární hodnoty.</li></ol>",
+        "tip1": "Volby v sekci Vyžadován rychlý procesor, například zobrazení dalšího přeletu při najetí myší, provádějí výpočty navíc v každém snímku; na pomalejších počítačích je nechte vypnuté.",
+        "tip2": "Sekce pluginů dole pocházejí z jiných pluginů (Seznam sledovaných, Stroj času a další), takže nabídka roste s tím, jak se pluginy zapínají."
+      }
     }
   }
 }

@@ -5,13 +5,14 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { hasSettingsContribution, ISettingsContribution } from '@app/engine/plugins/core/plugin-capabilities';
+import { hasSettingsContribution, IHelpConfig, ISettingsContribution } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { SettingsManager } from '@app/settings/settings';
 import { SatLabelMode } from '@app/settings/ui-settings';
 import settingsPng from '@public/img/icons/settings.png';
+import { t7e } from '@app/locales/keys';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { TimeMachine } from '../time-machine/time-machine';
 import { attachSettingControlListeners, renderSettingsSection } from './settings-control-renderer';
@@ -44,6 +45,9 @@ declare module '@app/engine/core/interfaces' {
   }
 }
 
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.SettingsMenuPlugin.${key}` as Parameters<typeof t7e>[0]);
+
 export class SettingsMenuPlugin extends KeepTrackPlugin {
   readonly id = 'SettingsMenuPlugin';
   dependencies_ = [];
@@ -62,38 +66,38 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
             <div class="row center"></div>
             </br>
             <div class="row center">
-              <button id="settings-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Update Settings &#9658;</button>
+              <button id="settings-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">${l('buttons.updateSettings')} &#9658;</button>
             </div>
             <div class="row center">
-              <button id="settings-reset" class="btn btn-ui waves-effect waves-light" type="button" name="action">Reset to Defaults &#9658;</button>
+              <button id="settings-reset" class="btn btn-ui waves-effect waves-light" type="button" name="action">${l('buttons.resetToDefaults')} &#9658;</button>
             </div>
-            <h5 class="center-align">General Settings</h5>
+            <h5 class="center-align">${l('sections.general')}</h5>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Show more information when hovering over a satellite.">
+              <label data-position="top" data-delay="50" data-tooltip="${l('tooltips.showInfoOnHover')}">
                 <input id="settings-enableHoverOverlay" type="checkbox" checked/>
                 <span class="lever"></span>
-                Show Info On Hover
+                ${l('labels.showInfoOnHover')}
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable this to hide orbit lines">
+              <label data-position="top" data-delay="50" data-tooltip="${l('tooltips.drawOrbits')}">
                 <input id="settings-drawOrbits" type="checkbox" checked/>
                 <span class="lever"></span>
-                Draw Orbits
+                ${l('labels.drawOrbits')}
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Enable this to show where a satellite was instead of where it is going">
+              <label data-position="top" data-delay="50" data-tooltip="${l('tooltips.drawTrailingOrbits')}">
                 <input id="settings-drawTrailingOrbits" type="checkbox"/>
                 <span class="lever"></span>
-                Draw Trailing Orbits
+                ${l('labels.drawTrailingOrbits')}
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Orbits will be drawn using ECF vs ECI (Mainly for GEO Orbits)">
+              <label data-position="top" data-delay="50" data-tooltip="${l('tooltips.drawOrbitsInEcf')}">
                 <input id="settings-drawEcf" type="checkbox" checked/>
                 <span class="lever"></span>
-                Draw Orbits in ECF
+                ${l('labels.drawOrbitsInEcf')}
               </label>
             </div>
             <div class="input-field col s12">
@@ -105,65 +109,65 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
                 <option value="5">5</option>
                 <option value="10">10</option>
               </select>
-              <label>Number of ECF Orbits to Draw</label>
+              <label>${l('labels.numberOfEcfOrbits')}</label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Draw lines from sensor to satellites when in FOV">
+              <label data-position="top" data-delay="50" data-tooltip="${l('tooltips.drawFovLines')}">
                 <input id="settings-isDrawInCoverageLines" type="checkbox" checked/>
                 <span class="lever"></span>
-                Draw FOV Lines
+                ${l('labels.drawFovLines')}
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Display ECI Coordinates on Hover">
+              <label data-position="top" data-delay="50" data-tooltip="${l('tooltips.displayEciOnHover')}">
                 <input id="settings-eciOnHover" type="checkbox"/>
                 <span class="lever"></span>
-                Display ECI on Hover
+                ${l('labels.displayEciOnHover')}
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable this to hide the camera widget">
+              <label data-position="top" data-delay="50" data-tooltip="${l('tooltips.showCameraWidget')}">
                 <input id="settings-drawCameraWidget" type="checkbox"/>
                 <span class="lever"></span>
-                Show Camera Widget
+                ${l('labels.showCameraWidget')}
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Show confidence levels for satellite's element sets.">
+              <label data-position="top" data-delay="50" data-tooltip="${l('tooltips.showConfidenceLevels')}">
                 <input id="settings-confidence-levels" type="checkbox" />
                 <span class="lever"></span>
-                Show Confidence Levels
+                ${l('labels.showConfidenceLevels')}
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Every 3 seconds a new satellite will be selected from FOV">
+              <label data-position="top" data-delay="50" data-tooltip="${l('tooltips.enableDemoMode')}">
                 <input id="settings-demo-mode" type="checkbox" />
                 <span class="lever"></span>
-                Enable Demo Mode
+                ${l('labels.enableDemoMode')}
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Time will freeze as you rotate the camera.">
+              <label data-position="top" data-delay="50" data-tooltip="${l('tooltips.enableFreezeTime')}">
                 <input id="settings-freeze-drag" type="checkbox" />
                 <span class="lever"></span>
-                Enable Freeze Time on Click
+                ${l('labels.enableFreezeTime')}
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Compensate camera yaw for Earth rotation so the view stays fixed to geographic coordinates.">
+              <label data-position="top" data-delay="50" data-tooltip="${l('tooltips.compensateEarthRotation')}">
                 <input id="settings-compensateEarthRotation" type="checkbox" checked/>
                 <span class="lever"></span>
-                Compensate for Earth Rotation
+                ${l('labels.compensateEarthRotation')}
               </label>
             </div>
           </div>
           <div id="fastCompSettings" class="row">
-            <h5 class="center-align">Fast CPU Required</h5>
+            <h5 class="center-align">${l('sections.fastCpu')}</h5>
             <div class="switch row">
               <label>
                 <input id="settings-snp" type="checkbox" />
                 <span class="lever"></span>
-                Show Next Pass on Hover
+                ${l('labels.showNextPassOnHover')}
               </label>
             </div>
           </div>
@@ -172,6 +176,29 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       </div>
     </div>
   </div>`;
+
+
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/settings-menu/settings-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2')],
+    };
+  }
 
   addHtml(): void {
     super.addHtml();

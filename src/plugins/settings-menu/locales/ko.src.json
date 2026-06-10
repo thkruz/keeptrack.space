@@ -3,7 +3,50 @@
     "SettingsMenuPlugin": {
       "bottomIconLabel": "설정",
       "title": "설정 메뉴",
-      "helpBody": "설정 메뉴를 사용하면 애플리케이션을 구성할 수 있습니다."
+      "buttons": {
+        "updateSettings": "설정 업데이트",
+        "resetToDefaults": "기본값으로 재설정"
+      },
+      "sections": {
+        "general": "일반 설정",
+        "fastCpu": "빠른 CPU 필요"
+      },
+      "labels": {
+        "showInfoOnHover": "마우스 오버 시 정보 표시",
+        "drawOrbits": "궤도 그리기",
+        "drawTrailingOrbits": "후방 궤적 그리기",
+        "drawOrbitsInEcf": "ECF로 궤도 그리기",
+        "numberOfEcfOrbits": "그릴 ECF 궤도 수",
+        "drawFovLines": "FOV 선 그리기",
+        "displayEciOnHover": "마우스 오버 시 ECI 표시",
+        "showCameraWidget": "카메라 위젯 표시",
+        "showConfidenceLevels": "신뢰 수준 표시",
+        "enableDemoMode": "데모 모드 활성화",
+        "enableFreezeTime": "클릭 시 시간 정지",
+        "compensateEarthRotation": "지구 자전 보정",
+        "showNextPassOnHover": "마우스 오버 시 다음 통과 표시"
+      },
+      "tooltips": {
+        "showInfoOnHover": "위성 위에 마우스를 올리면 더 많은 정보를 표시합니다.",
+        "drawOrbits": "비활성화하면 궤도 선이 숨겨집니다",
+        "drawTrailingOrbits": "활성화하면 위성이 가는 방향 대신 지나온 위치를 표시합니다",
+        "drawOrbitsInEcf": "궤도가 ECI 대신 ECF로 그려집니다(주로 GEO 궤도용)",
+        "drawFovLines": "위성이 FOV 안에 있을 때 센서에서 위성까지 선을 그립니다",
+        "displayEciOnHover": "마우스 오버 시 ECI 좌표를 표시합니다",
+        "showCameraWidget": "비활성화하면 카메라 위젯이 숨겨집니다",
+        "showConfidenceLevels": "위성 궤도 요소 세트의 신뢰 수준을 표시합니다.",
+        "enableDemoMode": "3초마다 FOV에서 새 위성이 선택됩니다",
+        "enableFreezeTime": "카메라를 회전하는 동안 시간이 정지됩니다.",
+        "compensateEarthRotation": "지구 자전에 맞춰 카메라 요(yaw)를 보정하여 시점이 지리 좌표에 고정되도록 합니다."
+      },
+      "help": {
+        "overview": "설정 메뉴에는 애플리케이션 전체의 표시 및 상호작용 옵션이 모여 있습니다. 궤도 그리기, 마우스 오버 동작, 카메라 보조 기능, 성능에 민감한 부가 기능 등입니다. 다른 플러그인도 자체 섹션을 여기에 추가하므로, KeepTrack의 동작을 조정하는 단일 장소입니다.",
+        "imgAlt": "일반 옵션 스위치가 있는 설정 메뉴",
+        "imgCaption": "옵션을 전환한 뒤 설정 업데이트로 적용하세요.",
+        "howToUse": "<ol><li>하단 바에서 <strong>설정</strong>을 엽니다.</li><li>원하는 스위치를 전환하세요. 행 위에 마우스를 올리면 설명 툴팁이 표시됩니다.</li><li><strong>설정 업데이트</strong>를 클릭하여 적용합니다. 일부 옵션은 장면을 즉시 다시 그립니다.</li><li><strong>기본값으로 재설정</strong>은 플러그인이 추가한 섹션을 포함한 모든 옵션을 초기값으로 되돌립니다.</li></ol>",
+        "tip1": "빠른 CPU 필요 아래의 옵션(마우스 오버 시 다음 통과 표시 등)은 매 프레임 추가 계산을 수행합니다. 느린 컴퓨터에서는 꺼 두세요.",
+        "tip2": "하단의 플러그인 섹션은 다른 플러그인(워치리스트, 타임머신 등)에서 제공되므로, 플러그인이 활성화될수록 메뉴가 늘어납니다."
+      }
     }
   }
 }

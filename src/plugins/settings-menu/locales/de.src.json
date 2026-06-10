@@ -3,7 +3,50 @@
     "SettingsMenuPlugin": {
       "bottomIconLabel": "Einstellungen",
       "title": "Einstellungen-Menü",
-      "helpBody": "Das Einstellungen-Menü ermöglicht es Ihnen, die Anwendung zu konfigurieren."
+      "buttons": {
+        "updateSettings": "Einstellungen aktualisieren",
+        "resetToDefaults": "Auf Standard zurücksetzen"
+      },
+      "sections": {
+        "general": "Allgemeine Einstellungen",
+        "fastCpu": "Schneller Prozessor erforderlich"
+      },
+      "labels": {
+        "showInfoOnHover": "Infos beim Überfahren anzeigen",
+        "drawOrbits": "Orbits zeichnen",
+        "drawTrailingOrbits": "Nachlaufende Orbits zeichnen",
+        "drawOrbitsInEcf": "Orbits in ECF zeichnen",
+        "numberOfEcfOrbits": "Anzahl der zu zeichnenden ECF-Orbits",
+        "drawFovLines": "FOV-Linien zeichnen",
+        "displayEciOnHover": "ECI beim Überfahren anzeigen",
+        "showCameraWidget": "Kamera-Widget anzeigen",
+        "showConfidenceLevels": "Konfidenzniveaus anzeigen",
+        "enableDemoMode": "Demomodus aktivieren",
+        "enableFreezeTime": "Zeit beim Klicken einfrieren",
+        "compensateEarthRotation": "Erdrotation kompensieren",
+        "showNextPassOnHover": "Nächsten Überflug beim Überfahren anzeigen"
+      },
+      "tooltips": {
+        "showInfoOnHover": "Zeigt mehr Informationen, wenn Sie mit der Maus über einen Satelliten fahren.",
+        "drawOrbits": "Deaktivieren Sie dies, um Orbitlinien auszublenden",
+        "drawTrailingOrbits": "Aktivieren Sie dies, um anzuzeigen, wo ein Satellit war, statt wohin er fliegt",
+        "drawOrbitsInEcf": "Orbits werden in ECF statt ECI gezeichnet (hauptsächlich für GEO-Orbits)",
+        "drawFovLines": "Linien vom Sensor zu Satelliten zeichnen, wenn sie im FOV sind",
+        "displayEciOnHover": "ECI-Koordinaten beim Überfahren anzeigen",
+        "showCameraWidget": "Deaktivieren Sie dies, um das Kamera-Widget auszublenden",
+        "showConfidenceLevels": "Konfidenzniveaus für die Bahnelementsätze eines Satelliten anzeigen.",
+        "enableDemoMode": "Alle 3 Sekunden wird ein neuer Satellit aus dem FOV ausgewählt",
+        "enableFreezeTime": "Die Zeit friert ein, während Sie die Kamera drehen.",
+        "compensateEarthRotation": "Kompensiert den Kamera-Gierwinkel für die Erdrotation, sodass die Ansicht auf geografische Koordinaten fixiert bleibt."
+      },
+      "help": {
+        "overview": "Das Einstellungen-Menü enthält die anwendungsweiten Anzeige- und Interaktionsoptionen: Orbitzeichnung, Hover-Verhalten, Kamerahilfen und leistungsintensive Extras. Auch andere Plugins steuern hier eigene Abschnitte bei, sodass dies der zentrale Ort ist, um das Verhalten von KeepTrack anzupassen.",
+        "imgAlt": "Das Einstellungen-Menü mit seinen allgemeinen Optionsschaltern",
+        "imgCaption": "Schalten Sie Optionen um und übernehmen Sie sie mit Einstellungen aktualisieren.",
+        "howToUse": "<ol><li>Öffnen Sie <strong>Einstellungen</strong> über die untere Leiste.</li><li>Schalten Sie die gewünschten Schalter um; fahren Sie über eine Zeile, um einen erklärenden Tooltip zu sehen.</li><li>Klicken Sie auf <strong>Einstellungen aktualisieren</strong>, um sie zu übernehmen. Einige Optionen zeichnen die Szene sofort neu.</li><li><strong>Auf Standard zurücksetzen</strong> stellt alle Optionen, einschließlich der von Plugins beigesteuerten Abschnitte, auf Werkswerte zurück.</li></ol>",
+        "tip1": "Optionen unter Schneller Prozessor erforderlich, wie das Anzeigen des nächsten Überflugs beim Überfahren, führen in jedem Frame zusätzliche Berechnungen aus; lassen Sie sie auf langsameren Rechnern deaktiviert.",
+        "tip2": "Die Plugin-Abschnitte unten stammen von anderen Plugins (Watchlist, Zeitmaschine und mehr), das Menü wächst also mit den aktivierten Plugins."
+      }
     }
   }
 }

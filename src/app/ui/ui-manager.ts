@@ -51,6 +51,7 @@ import { UiValidation } from './ui-validation';
 
 export class UiManager {
   private static readonly LONG_TIMER_DELAY = MILLISECONDS_PER_SECOND * 100;
+  private static readonly TOAST_TEMPLATE_ID = 'kt-toast';
 
   private isFooterVisible_ = true;
   private isInitialized_ = false;
@@ -147,6 +148,23 @@ export class UiManager {
     this.activeToastList_ = [];
   }
 
+  /**
+   * Ensure the toast template exists. Injected from code (not index.html) so every
+   * entry point (main, embed, celestrak) gets it. Toast clones this per toast via
+   * the v2 toastId option.
+   */
+  private static ensureToastTemplate_(): void {
+    if (document.getElementById(UiManager.TOAST_TEMPLATE_ID)) {
+      return;
+    }
+
+    const template = document.createElement('template');
+
+    template.id = UiManager.TOAST_TEMPLATE_ID;
+    template.innerHTML = '<div><img class="kt-toast-icon" alt="" /><span class="kt-toast-msg"></span><div class="kt-toast-progress"></div></div>';
+    document.body.appendChild(template);
+  }
+
   private makeToast_(toastText: string, type: ToastMsgType, isLong = false) {
     if (settingsManager.isDisableToasts) {
       return null;
@@ -179,21 +197,25 @@ export class UiManager {
         break;
     }
 
-    // v2 renders the `text` option via innerText (no HTML), so build the icon + message by DOM.
-    const toastMsg = new Toast({ text: '' });
+    /*
+     * Clone the toast structure from the template (v2 toastId option). `text` must
+     * stay empty — Toast renders it via innerText, which would wipe the children.
+     */
+    UiManager.ensureToastTemplate_();
+    const toastMsg = new Toast({ text: '', toastId: UiManager.TOAST_TEMPLATE_ID });
     const toastEl = toastMsg.el;
 
-    const icon = document.createElement('img');
+    const icon = toastEl.querySelector<HTMLImageElement>('.kt-toast-icon');
 
-    icon.className = 'kt-toast-icon';
-    icon.src = iconSrc;
-    icon.alt = '';
+    if (icon) {
+      icon.src = iconSrc;
+    }
 
-    const message = document.createElement('span');
+    const message = toastEl.querySelector<HTMLElement>('.kt-toast-msg');
 
-    message.textContent = toastText;
-
-    toastEl.append(icon, message);
+    if (message) {
+      message.textContent = toastText;
+    }
 
     // Add an on click event to dismiss the toast
     toastEl.addEventListener('click', () => {
@@ -214,12 +236,12 @@ export class UiManager {
       toastMsg.timeRemaining = Math.min(Math.max(calculatedTime, 4000), 12000);
     }
 
-    // Add auto-dismiss progress bar
-    const progressBar = document.createElement('div');
+    // Auto-dismiss progress bar (part of the template)
+    const progressBar = toastEl.querySelector<HTMLElement>('.kt-toast-progress');
 
-    progressBar.className = 'kt-toast-progress';
-    progressBar.style.animationDuration = `${toastMsg.timeRemaining}ms`;
-    toastEl.appendChild(progressBar);
+    if (progressBar) {
+      progressBar.style.animationDuration = `${toastMsg.timeRemaining}ms`;
+    }
 
     setTimeout(() => {
       this.activeToastList_ = this.activeToastList_.filter((t) => t !== toastMsg);

@@ -3,7 +3,32 @@
     "SensorListPlugin": {
       "bottomIconLabel": "Sensors",
       "title": "Sensor List Menu",
-      "helpBody": "The Sensors menu allows you to select a sensor for use in calculations and other menu's functions. Sensors are in groups based on the networks they primarily support. On the left side of the menu is the name of the sensor and on the right side is the country/organization that owns it. <br><br> Selecting an \"All...Sensors\" option will select all sensors in that group. This is useful for visualizing the networks coverage, but currently does not work for all calculations. If you are trying to calculate look angles for a network it is best to use the multi-site look angles tool or to use look angles for each of the individual sensors in the network. <br><br> Sensors on this list include Mechanical and Phased Array Radars, in addition to Optical sensors: <ul style=\"margin-left: 40px;\"> <li> Phased Array Radars typically are limited to Low Earth Orbit (LEO). </li> <li> Mechanical Radars can be used for both LEO and Geostationary Orbit (GEO). </li> <li> Optical sensors are typically used for GEO, but can also be used for LEO. </li> <li> Optical sensors are limited to night time observations in clear skies, whereas radars can be used for both day and night. </li> </ul> <br> Sensor information is based on publicly available data and can be verified in the Sensor Info menu. If you have public data on additional sensors or corrections to existing sensor information please contact me at <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>."
+      "labels": {
+        "missingData": "Missing Data",
+        "tooltipSensorsInFov": "Visualize Sensor Coverage"
+      },
+      "buttons": {
+        "resetSensor": "Reset Sensor",
+        "showSensorsWithFov": "Show All Sensors with FOV..."
+      },
+      "commands": {
+        "category": "Sensors",
+        "setSensor": "Set Current Sensor to {name}",
+        "setSensorGroup": "Set Sensor Group: {name}"
+      },
+      "help": {
+        "overview": "The Sensors menu is where you pick the ground station the rest of the app calculates from. Sensors are grouped by the network they primarily support, with each entry showing the sensor's name on the left and its owning country or organization on the right. The selected sensor drives look angles, field-of-view cones, watchlist pass alerts, and every other sensor-aware menu.",
+        "imgAlt": "The Sensors menu showing grouped sensor networks",
+        "imgCaption": "Sensors are grouped by network. Click a group header to select the whole network at once.",
+        "sensorTypesHeading": "Sensor Types",
+        "sensorTypes": "<ul><li><strong>Phased-array radars</strong>: wide, fast scanning; typically limited to Low Earth Orbit (LEO).</li><li><strong>Mechanical radars</strong>: steerable dishes usable against both LEO and Geostationary Orbit (GEO).</li><li><strong>Optical telescopes</strong>: primarily used for GEO and deep space; they only work at night in clear skies, while radars work day and night.</li></ul>",
+        "howToUse": "<ol><li>Open the menu from the bottom bar or press S.</li><li>Click an individual sensor to select it. The camera flies to its location.</li><li>Or click a group header (e.g. \"All Space Surveillance Network Sensors\") to select the entire network, which is great for visualizing coverage.</li><li>Use <strong>Reset Sensor</strong> to clear the selection.</li></ol>",
+        "tip1": "Many calculations (like Look Angles) need a single sensor. If you selected a whole network, use the Multi-Site Looks menu instead or pick one sensor at a time.",
+        "tip2": "Every sensor is also available from the command palette: type the sensor's name to switch without opening this menu.",
+        "tip3": "Sensor parameters come from publicly available data; you can review them in the Sensor Info menu. Corrections are welcome at admin@keeptrack.space.",
+        "shortcutToggle": "Toggle the Sensors menu",
+        "shortcutCamera": "Snap the camera to the current sensor"
+      }
     }
   }
 }

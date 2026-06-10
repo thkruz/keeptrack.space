@@ -3,7 +3,32 @@
     "SensorListPlugin": {
       "bottomIconLabel": "Sensoren",
       "title": "Sensorlistenmenü",
-      "helpBody": "Das Sensorenmenü ermöglicht es Ihnen, einen Sensor für Berechnungen und andere Menüfunktionen auszuwählen. Die Sensoren sind in Gruppen basierend auf den Netzwerken, die sie hauptsächlich unterstützen, eingeteilt. Auf der linken Seite des Menüs befindet sich der Name des Sensors und auf der rechten Seite das Land/die Organisation, dem/der er gehört. <br><br> Die Auswahl einer \"Alle...Sensoren\"-Option wählt alle Sensoren in dieser Gruppe aus. Dies ist nützlich, um die Netzwerkabdeckung zu visualisieren, funktioniert aber derzeit nicht für alle Berechnungen. Wenn Sie versuchen, Blickwinkel für ein Netzwerk zu berechnen, ist es am besten, das Multi-Site-Blickwinkel-Tool zu verwenden oder Blickwinkel für jeden einzelnen Sensor im Netzwerk zu berechnen. <br><br> Zu den Sensoren auf dieser Liste gehören mechanische und Phased-Array-Radare sowie optische Sensoren: <ul style=\"margin-left: 40px;\"> <li> Phased-Array-Radare sind typischerweise auf den niedrigen Erdorbit (LEO) beschränkt. </li> <li> Mechanische Radare können sowohl für LEO als auch für den geostationären Orbit (GEO) verwendet werden. </li> <li> Optische Sensoren werden typischerweise für GEO verwendet, können aber auch für LEO eingesetzt werden. </li> <li> Optische Sensoren sind auf nächtliche Beobachtungen bei klarem Himmel beschränkt, während Radare sowohl tagsüber als auch nachts eingesetzt werden können. </li> </ul> <br> Die Sensorinformationen basieren auf öffentlich zugänglichen Daten und können im Sensorinfo-Menü überprüft werden. Wenn Sie öffentliche Daten zu zusätzlichen Sensoren oder Korrekturen zu bestehenden Sensorinformationen haben, kontaktieren Sie mich bitte unter <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>."
+      "labels": {
+        "missingData": "Fehlende Daten",
+        "tooltipSensorsInFov": "Sensorabdeckung visualisieren"
+      },
+      "buttons": {
+        "resetSensor": "Sensor zurücksetzen",
+        "showSensorsWithFov": "Alle Sensoren mit Sichtfeld anzeigen..."
+      },
+      "commands": {
+        "category": "Sensoren",
+        "setSensor": "Aktuellen Sensor auf {name} setzen",
+        "setSensorGroup": "Sensorgruppe festlegen: {name}"
+      },
+      "help": {
+        "overview": "Im Sensorenmenü wählen Sie die Bodenstation aus, von der aus der Rest der App rechnet. Die Sensoren sind nach dem Netzwerk gruppiert, das sie hauptsächlich unterstützen; jeder Eintrag zeigt links den Namen des Sensors und rechts das Land oder die Organisation, dem bzw. der er gehört. Der ausgewählte Sensor steuert Blickwinkel, Sichtfeldkegel, Überflugswarnungen der Beobachtungsliste und jedes andere sensorbezogene Menü.",
+        "imgAlt": "Das Sensorenmenü mit nach Netzwerken gruppierten Sensoren",
+        "imgCaption": "Sensoren sind nach Netzwerk gruppiert. Klicken Sie auf eine Gruppenüberschrift, um das gesamte Netzwerk auf einmal auszuwählen.",
+        "sensorTypesHeading": "Sensortypen",
+        "sensorTypes": "<ul><li><strong>Phased-Array-Radare</strong>: breite, schnelle Abtastung; typischerweise auf den niedrigen Erdorbit (LEO) beschränkt.</li><li><strong>Mechanische Radare</strong>: schwenkbare Antennen, die sowohl gegen LEO als auch gegen den geostationären Orbit (GEO) eingesetzt werden können.</li><li><strong>Optische Teleskope</strong>: hauptsächlich für GEO und den tiefen Weltraum verwendet; sie funktionieren nur nachts bei klarem Himmel, während Radare Tag und Nacht arbeiten.</li></ul>",
+        "howToUse": "<ol><li>Öffnen Sie das Menü über die untere Leiste oder drücken Sie S.</li><li>Klicken Sie auf einen einzelnen Sensor, um ihn auszuwählen; die Kamera fliegt zu seinem Standort.</li><li>Oder klicken Sie auf eine Gruppenüberschrift (z. B. \"All Space Surveillance Network Sensors\"), um das gesamte Netzwerk auszuwählen, ideal zur Visualisierung der Abdeckung.</li><li>Verwenden Sie <strong>Sensor zurücksetzen</strong>, um die Auswahl aufzuheben.</li></ol>",
+        "tip1": "Viele Berechnungen (wie Blickwinkel) benötigen einen einzelnen Sensor. Wenn Sie ein ganzes Netzwerk ausgewählt haben, verwenden Sie stattdessen das Multi-Standort-Blickwinkel-Menü oder wählen Sie die Sensoren einzeln aus.",
+        "tip2": "Jeder Sensor ist auch über die Befehlspalette verfügbar: Geben Sie den Namen des Sensors ein, um zu wechseln, ohne dieses Menü zu öffnen.",
+        "tip3": "Die Sensorparameter stammen aus öffentlich zugänglichen Daten; Sie können sie im Sensorinfo-Menü überprüfen. Korrekturen sind unter admin@keeptrack.space willkommen.",
+        "shortcutToggle": "Sensorenmenü umschalten",
+        "shortcutCamera": "Kamera auf den aktuellen Sensor ausrichten"
+      }
     }
   }
 }

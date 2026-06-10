@@ -7,11 +7,12 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { ICommandPaletteCapable, ICommandPaletteCommand, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
+import { ICommandPaletteCapable, ICommandPaletteCommand, IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getClass } from '@app/engine/utils/get-class';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite, ZoomValue } from '@ootk/src/main';
 import sensorPng from '@public/img/icons/sensor.png';
 import { SensorGroup, sensorGroups } from '../../app/data/catalogs/sensor-groups';
@@ -61,7 +62,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
         <div id="sensor-list-content" class="side-menu">
         <div class="row">
           <ul id="reset-sensor-text" class="sensor-reset-menu">
-            <button id="reset-sensor-button" class="center-align btn btn-ui waves-effect waves-light menu-selectable" type="button" disabled>Reset Sensor &#9658;</button>
+            <button id="reset-sensor-button" class="center-align btn btn-ui waves-effect waves-light menu-selectable" type="button" disabled>${t7e('plugins.SensorListPlugin.buttons.resetSensor' as Parameters<typeof t7e>[0])} &#9658;</button>
           </ul>
           <ul id="list-of-sensors">` +
     this.sensorGroups_.map((sensorGroup) => this.genericSensors_(sensorGroup.name)).join('') +
@@ -72,6 +73,40 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
     </div>`;
 
   isSensorLinksAdded = false;
+
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: t7e('plugins.SensorListPlugin.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.SensorListPlugin.help.overview'),
+          image: {
+            src: 'img/help/sensor-list/sensor-list-menu.png',
+            alt: t7e('plugins.SensorListPlugin.help.imgAlt'),
+            caption: t7e('plugins.SensorListPlugin.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.SensorListPlugin.help.sensorTypesHeading'),
+          content: t7e('plugins.SensorListPlugin.help.sensorTypes'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.SensorListPlugin.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.SensorListPlugin.help.tip1'),
+        t7e('plugins.SensorListPlugin.help.tip2'),
+        t7e('plugins.SensorListPlugin.help.tip3'),
+      ],
+      shortcuts: [
+        { keys: ['S'], description: t7e('plugins.SensorListPlugin.help.shortcutToggle') },
+        { keys: ['Ctrl', 'Home'], description: t7e('plugins.SensorListPlugin.help.shortcutCamera') },
+      ],
+    };
+  }
 
   getKeyboardShortcuts(): IKeyboardShortcut[] {
     return [
@@ -101,11 +136,11 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
   }
 
   getCommandPaletteCommands(): ICommandPaletteCommand[] {
-    const category = 'Sensors';
+    const category = t7e('plugins.SensorListPlugin.commands.category' as Parameters<typeof t7e>[0]);
 
     const sensorCommands: ICommandPaletteCommand[] = Object.entries(sensors).map(([key, sensor]) => ({
       id: `SensorListPlugin.setSensor.${key}`,
-      label: `Set Current Sensor to ${sensor.uiName}`,
+      label: t7e('plugins.SensorListPlugin.commands.setSensor' as Parameters<typeof t7e>[0]).replace('{name}', `${sensor.uiName}`),
       category,
       callback: () => {
         const sm = ServiceLocator.getSensorManager();
@@ -132,7 +167,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
 
     const groupCommands: ICommandPaletteCommand[] = this.sensorGroups_.map((group) => ({
       id: `SensorListPlugin.setSensorGroup.${group.name}`,
-      label: `Set Sensor Group: ${group.header}`,
+      label: t7e('plugins.SensorListPlugin.commands.setSensorGroup' as Parameters<typeof t7e>[0]).replace('{name}', group.header),
       category,
       callback: () => {
         const sm = ServiceLocator.getSensorManager();
@@ -227,7 +262,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
             'beforeend',
             html`
                   <div id="sensors-in-fov-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
-                        data-tooltip="Visualize Sensor Coverage">Show All Sensors with FOV...</div>
+                        data-tooltip="${t7e('plugins.SensorListPlugin.labels.tooltipSensorsInFov' as Parameters<typeof t7e>[0])}">${t7e('plugins.SensorListPlugin.buttons.showSensorsWithFov' as Parameters<typeof t7e>[0])}</div>
                 `,
           );
           getEl('sensors-in-fov-link')?.addEventListener('click', () => {
@@ -342,11 +377,13 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
   }
 
   private static createLiForSensor_(sensor: DetailedSensor) {
+    const missingData = t7e('plugins.SensorListPlugin.labels.missingData' as Parameters<typeof t7e>[0]);
+
     return html`
       <li class="menu-selectable" data-sensor="${sensor.objName ?? 'Missing Data'}">
-        <span>${sensor.uiName ?? 'Missing Data'}</span>
-        <span>${sensor.system ?? 'Missing Data'}</span>
-        <span class="badge dark-blue-badge" data-badge-caption="${sensor.operator ?? 'Missing Data'}"></span>
+        <span>${sensor.uiName ?? missingData}</span>
+        <span>${sensor.system ?? missingData}</span>
+        <span class="badge dark-blue-badge" data-badge-caption="${sensor.operator ?? missingData}"></span>
       </li>
     `;
   }

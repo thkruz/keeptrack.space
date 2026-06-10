@@ -36,7 +36,8 @@ export interface SearchSatParams {
   elMarg: Degrees;
   inc: Degrees;
   incMarg: Degrees;
-  objType: number;
+  /** 0 = all types; a single type or a list of types to match */
+  objType: number | number[];
   payload: string;
   period: Minutes;
   periodMarg: Minutes;
@@ -126,8 +127,8 @@ export class FindSatPlugin extends KeepTrackPlugin {
       <form id="findByLooks-menu-form">
         <div class="row">
           <div class="input-field col s12">
-            <select value=0 id="fbl-type" type="text">
-              <option value=0>${l('all')}</option>
+            <select id="fbl-type" multiple>
+              <option value=0 selected>${l('all')}</option>
               <option value=1>Payload</option>
               <option value=2>Rocket Body</option>
               <option value=3>Debris</option>
@@ -137,8 +138,8 @@ export class FindSatPlugin extends KeepTrackPlugin {
         </div>
         <div class="row">
           <div class="input-field col s12">
-            <select value=0 id="fbl-country" type="text">
-              <option value='All'>${l('all')}</option>
+            <select id="fbl-country" multiple>
+              <option value='All' selected>${l('all')}</option>
             </select>
             <label for="disabled">${l('country')}</label>
           </div>
@@ -340,6 +341,9 @@ export class FindSatPlugin extends KeepTrackPlugin {
       getEl('fbl-country')!.insertAdjacentHTML('beforeend', `<option value="${countryCodeList[countryName]}">${countryName}</option>`);
     });
 
+    FindSatPlugin.wireAllOptionExclusivity_('fbl-type', '0');
+    FindSatPlugin.wireAllOptionExclusivity_('fbl-country', 'All');
+
     getUnique(satData.filter((obj: BaseObject) => (obj as Satellite)?.shape).map((obj) => (obj as Satellite).shape))
       // Sort using lower case
       .sort((a, b) => (a).toLowerCase().localeCompare((b).toLowerCase()))
@@ -409,6 +413,56 @@ export class FindSatPlugin extends KeepTrackPlugin {
     refreshMaterialSelect(select);
   }
 
+  /**
+   * Keep the "All" option mutually exclusive with specific values in a
+   * multi-select: picking a specific value drops "All", and picking "All"
+   * clears the specific values.
+   */
+  private static wireAllOptionExclusivity_(selectId: string, allValue: string): void {
+    const select = getEl(selectId, true) as HTMLSelectElement | null;
+
+    if (!select) {
+      return;
+    }
+
+    let prevHadAll = Array.from(select.selectedOptions).some((option) => option.value === allValue);
+
+    select.addEventListener('change', () => {
+      const selected = Array.from(select.selectedOptions);
+      const hasAll = selected.some((option) => option.value === allValue);
+      const hasOthers = selected.some((option) => option.value !== allValue);
+
+      if (hasAll && hasOthers) {
+        if (prevHadAll) {
+          // A specific value was just picked — drop "All"
+          Array.from(select.options).forEach((option) => {
+            if (option.value === allValue) {
+              option.selected = false;
+            }
+          });
+        } else {
+          // "All" was just picked — clear the specific values
+          Array.from(select.options).forEach((option) => {
+            option.selected = option.value === allValue;
+          });
+        }
+        FindSatPlugin.refreshMaterializeSelect_(select);
+      }
+      prevHadAll = Array.from(select.selectedOptions).some((option) => option.value === allValue);
+    });
+  }
+
+  /** Read the selected option values of a (multi-)select. */
+  private static readMultiSelect_(id: string): string[] {
+    const select = getEl(id, true) as HTMLSelectElement | null;
+
+    if (!select?.selectedOptions) {
+      return [];
+    }
+
+    return Array.from(select.selectedOptions).map((option) => option.value);
+  }
+
   protected findByLooksSubmit_(): Promise<void> {
     this.hasSearchBeenRun_ = true;
 
@@ -429,12 +483,15 @@ export class FindSatPlugin extends KeepTrackPlugin {
       const periodMarg = parseFloat((<HTMLInputElement>getEl('fbl-period-margin')).value);
       const tleAgeMarg = parseFloat((<HTMLInputElement>getEl('fbl-tleAge-margin')).value);
       const rcsMarg = parseFloat((<HTMLInputElement>getEl('fbl-rcs-margin')).value);
-      const objType = parseInt((<HTMLInputElement>getEl('fbl-type')).value);
+      const typeValues = FindSatPlugin.readMultiSelect_('fbl-type').map(Number).filter((n) => !isNaN(n));
+      const objType = typeValues.length === 0 || typeValues.includes(0) ? 0 : typeValues;
       const raan = parseFloat((<HTMLInputElement>getEl('fbl-raan')).value);
       const raanMarg = parseFloat((<HTMLInputElement>getEl('fbl-raan-margin')).value);
       const argPe = parseFloat((<HTMLInputElement>getEl('fbl-argPe')).value);
       const argPeMarg = parseFloat((<HTMLInputElement>getEl('fbl-argPe-margin')).value);
-      const countryCode = (<HTMLInputElement>getEl('fbl-country')).value;
+      const countryValues = FindSatPlugin.readMultiSelect_('fbl-country');
+      // Country option values are already pipe-joined code groups, so joining selections keeps the searchSats_ format
+      const countryCode = countryValues.length === 0 || countryValues.includes('All') ? 'All' : countryValues.join('|');
       const bus = (<HTMLInputElement>getEl('fbl-bus')).value;
       const payload = (<HTMLInputElement>getEl('fbl-payload')).value;
       const shape = (<HTMLInputElement>getEl('fbl-shape')).value;
@@ -534,8 +591,8 @@ export class FindSatPlugin extends KeepTrackPlugin {
     return posAll.filter((pos) => dotsManagerInstance.inViewData[pos.id] === 1);
   }
 
-  protected static checkObjtype_(posAll: Satellite[], objtype: number) {
-    return posAll.filter((pos) => pos.type === objtype);
+  protected static checkObjtype_(posAll: Satellite[], objtypes: number[]) {
+    return posAll.filter((pos) => objtypes.includes(pos.type));
   }
 
   protected static checkRange_(posAll: Satellite[], min: number, max: number) {
@@ -650,7 +707,9 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
     res = !isValidInc && !isValidPeriod && !isValidTleAge && (isValidAz || isValidEl || isValidRange) ? FindSatPlugin.checkInview_(res) : res;
 
-    res = objType !== 0 ? FindSatPlugin.checkObjtype_(res, objType) : res;
+    const objTypes = (Array.isArray(objType) ? objType : [objType]).filter((type) => type !== 0);
+
+    res = objTypes.length > 0 ? FindSatPlugin.checkObjtype_(res, objTypes) : res;
 
     if (isValidAz) {
       res = FindSatPlugin.checkAz_(res, az - azMarg, az + azMarg);

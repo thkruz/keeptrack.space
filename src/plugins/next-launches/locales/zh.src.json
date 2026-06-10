@@ -3,7 +3,31 @@
     "NextLaunchesPlugin": {
       "bottomIconLabel": "下次发射",
       "title": "下次发射菜单",
-      "helpBody": "下次发射菜单从<a href=\"https://thespacedevs.com/\" target=\"_blank\">The Space Devs</a>获取即将进行的发射信息。"
+      "sideMenuTitle": "下次发射",
+      "tooltips": {
+        "fetchData": "获取数据",
+        "refresh": "刷新",
+        "exportLaunchInfo": "导出发射信息"
+      },
+      "table": {
+        "launchWindow": "发射窗口",
+        "mission": "任务",
+        "location": "地点",
+        "agency": "机构",
+        "country": "国家"
+      },
+      "msgs": {
+        "unknown": "未知",
+        "tbd": "待定"
+      },
+      "help": {
+        "overview": "下次发射列出全球即将进行的轨道发射，数据实时来自 The Space Devs 发射库：每次发射的发射窗口、任务、发射场、机构和国家。任务和发射场名称在可用时链接到更多资料。",
+        "imgAlt": "显示即将进行任务的下次发射表格",
+        "imgCaption": "每一行都是一次即将进行的发射，包含其窗口、任务、发射场和机构。",
+        "howToUse": "<ol><li>从底部栏（事件模式）打开<strong>下次发射</strong>。</li><li>点击获取按钮下载当前发射列表；需要互联网连接。</li><li>浏览表格；带链接的任务和发射台名称会打开背景资料页面。</li><li>使用导出按钮将列表保存为电子表格。</li></ol>",
+        "tip1": "发射窗口以 UTC 显示；超过一天的条目会显示“待定”，直到获取到最新数据。",
+        "tip2": "将此列表与新发射工具结合使用，可在发射发生前模拟其轨迹。"
+      }
     }
   }
 }

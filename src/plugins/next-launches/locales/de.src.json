@@ -3,7 +3,31 @@
     "NextLaunchesPlugin": {
       "bottomIconLabel": "Nächste Starts",
       "title": "Menü für nächste Starts",
-      "helpBody": "Das Menü für nächste Starts ruft Daten von <a href=\"https://thespacedevs.com/\" target=\"_blank\">The Space Devs</a> ab, um bevorstehende Starts anzuzeigen."
+      "sideMenuTitle": "Nächste Starts",
+      "tooltips": {
+        "fetchData": "Daten abrufen",
+        "refresh": "Aktualisieren",
+        "exportLaunchInfo": "Startinformationen exportieren"
+      },
+      "table": {
+        "launchWindow": "Startfenster",
+        "mission": "Mission",
+        "location": "Standort",
+        "agency": "Agentur",
+        "country": "Land"
+      },
+      "msgs": {
+        "unknown": "Unbekannt",
+        "tbd": "Noch offen"
+      },
+      "help": {
+        "overview": "Nächste Starts listet bevorstehende orbitale Starts weltweit auf, live aus der Startbibliothek von The Space Devs abgerufen: Startfenster, Mission, Startplatz, Agentur und Land für jeden Start. Missions- und Standortnamen verlinken, sofern verfügbar, auf weiterführende Informationen.",
+        "imgAlt": "Die Tabelle Nächste Starts mit bevorstehenden Missionen",
+        "imgCaption": "Jede Zeile ist ein bevorstehender Start mit Fenster, Mission, Startplatz und Agentur.",
+        "howToUse": "<ol><li>Öffnen Sie <strong>Nächste Starts</strong> über die untere Leiste (Modus Ereignisse).</li><li>Klicken Sie auf die Abruf-Schaltfläche, um die aktuelle Startliste herunterzuladen; dafür ist eine Internetverbindung erforderlich.</li><li>Durchsuchen Sie die Tabelle; verlinkte Missions- und Rampennamen öffnen Seiten mit Hintergrundinformationen.</li><li>Verwenden Sie die Export-Schaltfläche, um die Liste als Tabellenkalkulation zu speichern.</li></ol>",
+        "tip1": "Startfenster werden in UTC angezeigt; Einträge, die älter als ein Tag sind, zeigen „Noch offen“, bis frische Daten abgerufen werden.",
+        "tip2": "Kombinieren Sie diese Liste mit dem Werkzeug Neuer Start, um die Flugbahn eines bevorstehenden Starts im Voraus zu modellieren."
+      }
     }
   }
 }

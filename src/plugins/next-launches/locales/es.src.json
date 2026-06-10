@@ -3,7 +3,31 @@
     "NextLaunchesPlugin": {
       "bottomIconLabel": "Próximos Lanzamientos",
       "title": "Menú de Próximos Lanzamientos",
-      "helpBody": "El Menú de Próximos Lanzamientos obtiene datos de <a href=\"https://thespacedevs.com/\" target=\"_blank\">The Space Devs</a> para mostrar los próximos lanzamientos."
+      "sideMenuTitle": "Próximos Lanzamientos",
+      "tooltips": {
+        "fetchData": "Obtener datos",
+        "refresh": "Actualizar",
+        "exportLaunchInfo": "Exportar información de lanzamientos"
+      },
+      "table": {
+        "launchWindow": "Ventana de lanzamiento",
+        "mission": "Misión",
+        "location": "Ubicación",
+        "agency": "Agencia",
+        "country": "País"
+      },
+      "msgs": {
+        "unknown": "Desconocido",
+        "tbd": "Por determinar"
+      },
+      "help": {
+        "overview": "Próximos Lanzamientos muestra los próximos lanzamientos orbitales de todo el mundo, obtenidos en vivo de la biblioteca de lanzamientos de The Space Devs: la ventana de lanzamiento, la misión, el sitio de lanzamiento, la agencia y el país de cada uno. Los nombres de misiones y sitios enlazan a más información cuando está disponible.",
+        "imgAlt": "La tabla de Próximos Lanzamientos con las misiones próximas",
+        "imgCaption": "Cada fila es un lanzamiento próximo con su ventana, misión, sitio y agencia.",
+        "howToUse": "<ol><li>Abra <strong>Próximos Lanzamientos</strong> desde la barra inferior (modo Eventos).</li><li>Haga clic en el botón de obtención para descargar la lista actual de lanzamientos; requiere conexión a internet.</li><li>Explore la tabla; los nombres enlazados de misiones y plataformas abren páginas con más contexto.</li><li>Use el botón de exportación para guardar la lista como hoja de cálculo.</li></ol>",
+        "tip1": "Las ventanas de lanzamiento se muestran en UTC; las entradas con más de un día de antigüedad muestran «Por determinar» hasta que se obtengan datos nuevos.",
+        "tip2": "Combine esta lista con la herramienta Nuevo Lanzamiento para modelar la trayectoria de un lanzamiento próximo antes de que ocurra."
+      }
     }
   }
 }

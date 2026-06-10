@@ -14,8 +14,13 @@ import calendar2Png from '@public/img/icons/calendar2.png';
 import fetchPng from '@public/img/icons/download.png';
 import exportPng from '@public/img/icons/export.png';
 import refreshPng from '@public/img/icons/refresh.png';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { t7e } from '@app/locales/keys';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import './next-launches.css';
+
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.NextLaunchesPlugin.${key}` as Parameters<typeof t7e>[0]);
 
 interface LaunchInfoData {
   window_start: string | number | Date;
@@ -88,23 +93,45 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
 
   menuMode: MenuMode[] = [MenuMode.EVENTS, MenuMode.ALL];
 
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/next-launches/next-launches-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2')],
+    };
+  }
+
   sideMenuElementName: string = 'nextLaunch-menu';
   sideMenuElementHtml: string = html`
   <div id="nextLaunch-menu" class="side-menu-parent start-hidden">
     <div id="nextLaunch-content" class="side-menu">
       <div class="row">
-        <h5 class="center-align">Next Launches</h5>
+        <h5 class="center-align">${l('sideMenuTitle')}</h5>
         <div class="nl-toolbar">
           <button id="nextLaunch-fetch-btn" class="btn btn-ui waves-effect waves-light icon-btn"
-            type="button" kt-tooltip="Fetch Data">
+            type="button" kt-tooltip="${l('tooltips.fetchData')}">
             <img src="${fetchPng}" class="icon-btn-img" alt="" />
           </button>
           <button id="nextLaunch-refresh-btn" class="btn btn-ui waves-effect waves-light icon-btn"
-            type="button" kt-tooltip="Refresh" style="display:none;">
+            type="button" kt-tooltip="${l('tooltips.refresh')}" style="display:none;">
             <img src="${refreshPng}" class="icon-btn-img" alt="" />
           </button>
           <button id="export-launch-info" class="btn btn-ui waves-effect waves-light icon-btn"
-            type="button" kt-tooltip="Export Launch Info">
+            type="button" kt-tooltip="${l('tooltips.exportLaunchInfo')}">
             <img src="" delayedsrc="${exportPng}" class="icon-btn-img" alt="" />
           </button>
         </div>
@@ -280,17 +307,17 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
       if (typeof launchLibResult.last_updated !== 'undefined') {
         launchInfo.updated = new Date(launchLibResult.last_updated);
       }
-      launchInfo.name = typeof launchLibResult.name !== 'undefined' ? launchLibResult.name : 'Unknown';
-      launchInfo.location = launchLibResult.pad?.location?.name.split(',', 1)[0] ?? 'Unknown';
+      launchInfo.name = typeof launchLibResult.name !== 'undefined' ? launchLibResult.name : l('msgs.unknown');
+      launchInfo.location = launchLibResult.pad?.location?.name.split(',', 1)[0] ?? l('msgs.unknown');
       launchInfo.locationURL = launchLibResult.pad?.wiki_url ?? '';
       if (typeof launchLibResult.launch_service_provider !== 'undefined') {
-        launchInfo.agency = typeof launchLibResult.launch_service_provider.name !== 'undefined' ? launchLibResult.launch_service_provider.name : 'Unknown';
-        launchInfo.country = typeof launchLibResult.launch_service_provider.country_code !== 'undefined' ? launchLibResult.launch_service_provider.country_code : 'Unknown';
+        launchInfo.agency = typeof launchLibResult.launch_service_provider.name !== 'undefined' ? launchLibResult.launch_service_provider.name : l('msgs.unknown');
+        launchInfo.country = typeof launchLibResult.launch_service_provider.country_code !== 'undefined' ? launchLibResult.launch_service_provider.country_code : l('msgs.unknown');
         if (typeof launchLibResult.launch_service_provider.wiki_url !== 'undefined') {
           launchInfo.agencyURL = launchLibResult.launch_service_provider.wiki_url;
         }
       } else {
-        launchInfo.agency = 'Unknown';
+        launchInfo.agency = l('msgs.unknown');
         launchInfo.country = 'UNK';
         launchInfo.agencyURL = '';
       }
@@ -318,23 +345,23 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
     const tr = tbl.insertRow();
     const tdT = tr.insertCell();
 
-    tdT.appendChild(document.createTextNode('Launch Window'));
+    tdT.appendChild(document.createTextNode(l('table.launchWindow')));
     tdT.setAttribute('style', 'text-decoration: underline; width: 120px;');
     const tdN = tr.insertCell();
 
-    tdN.appendChild(document.createTextNode('Mission'));
+    tdN.appendChild(document.createTextNode(l('table.mission')));
     tdN.setAttribute('style', 'text-decoration: underline; width: 140px;');
     const tdL = tr.insertCell();
 
-    tdL.appendChild(document.createTextNode('Location'));
+    tdL.appendChild(document.createTextNode(l('table.location')));
     tdL.setAttribute('style', 'text-decoration: underline');
     const tdA = tr.insertCell();
 
-    tdA.appendChild(document.createTextNode('Agency'));
+    tdA.appendChild(document.createTextNode(l('table.agency')));
     tdA.setAttribute('style', 'text-decoration: underline');
     const tdC = tr.insertCell();
 
-    tdC.appendChild(document.createTextNode('Country'));
+    tdC.appendChild(document.createTextNode(l('table.country')));
     tdC.setAttribute('style', 'text-decoration: underline');
   }
 
@@ -346,7 +373,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
 
       // Time Cells
       const tdT = tr.insertCell();
-      const timeText = launchEvent.windowStart.valueOf() <= Date.now() - 1000 * 60 * 60 * 24 ? 'TBD' : `${dateFormat(launchEvent.windowStart, 'isoDateTime', true)} UTC`;
+      const timeText = launchEvent.windowStart.valueOf() <= Date.now() - 1000 * 60 * 60 * 24 ? l('msgs.tbd') : `${dateFormat(launchEvent.windowStart, 'isoDateTime', true)} UTC`;
 
       tdT.appendChild(document.createTextNode(timeText));
 
@@ -354,7 +381,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
       const tdN = tr.insertCell();
 
       // Mission Name Text
-      const nameText = launchEvent?.missionName || 'Unknown';
+      const nameText = launchEvent?.missionName || l('msgs.unknown');
       // Mission Name HTML Setup
       const nameHTML =
         !launchEvent?.missionURL || launchEvent.missionURL === ''

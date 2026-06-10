@@ -3,7 +3,31 @@
     "NextLaunchesPlugin": {
       "bottomIconLabel": "Następne starty",
       "title": "Menu następnych startów",
-      "helpBody": "Menu następnych startów pobiera dane z <a href=\"https://thespacedevs.com/\" target=\"_blank\">The Space Devs</a>, aby wyświetlić nadchodzące starty."
+      "sideMenuTitle": "Następne starty",
+      "tooltips": {
+        "fetchData": "Pobierz dane",
+        "refresh": "Odśwież",
+        "exportLaunchInfo": "Eksportuj informacje o startach"
+      },
+      "table": {
+        "launchWindow": "Okno startowe",
+        "mission": "Misja",
+        "location": "Lokalizacja",
+        "agency": "Agencja",
+        "country": "Kraj"
+      },
+      "msgs": {
+        "unknown": "Nieznane",
+        "tbd": "Do ustalenia"
+      },
+      "help": {
+        "overview": "Następne starty wyświetlają nadchodzące starty orbitalne z całego świata, pobierane na żywo z biblioteki startów The Space Devs: okno startowe, misję, miejsce startu, agencję i kraj każdego z nich. Nazwy misji i miejsc startu zawierają odnośniki do dodatkowych informacji, jeśli są dostępne.",
+        "imgAlt": "Tabela Następne starty z nadchodzącymi misjami",
+        "imgCaption": "Każdy wiersz to nadchodzący start z oknem, misją, miejscem i agencją.",
+        "howToUse": "<ol><li>Otwórz <strong>Następne starty</strong> z dolnego paska (tryb Zdarzenia).</li><li>Kliknij przycisk pobierania, aby pobrać aktualną listę startów; wymagane jest połączenie z internetem.</li><li>Przeglądaj tabelę; nazwy misji i wyrzutni z odnośnikami otwierają strony z dodatkowymi informacjami.</li><li>Użyj przycisku eksportu, aby zapisać listę jako arkusz kalkulacyjny.</li></ol>",
+        "tip1": "Okna startowe są wyświetlane w UTC; wpisy starsze niż jeden dzień pokazują „Do ustalenia”, dopóki nie zostaną pobrane świeże dane.",
+        "tip2": "Połącz tę listę z narzędziem Nowy start, aby zamodelować trajektorię nadchodzącego startu, zanim się odbędzie."
+      }
     }
   }
 }

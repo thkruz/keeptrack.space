@@ -99,8 +99,32 @@ export class EditSat extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.EditSat.title' as T7eKey),
-      body: t7e('plugins.EditSat.helpBody' as T7eKey),
+      title: t7e('plugins.EditSat.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.EditSat.help.overview'),
+          image: {
+            src: 'img/help/edit-sat/edit-sat-menu.png',
+            alt: t7e('plugins.EditSat.help.imgAlt'),
+            caption: t7e('plugins.EditSat.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.EditSat.help.fieldsHeading'),
+          content: t7e('plugins.EditSat.help.fields'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.EditSat.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.EditSat.help.tip1'),
+        t7e('plugins.EditSat.help.tip2'),
+        t7e('plugins.EditSat.help.tip3'),
+      ],
+      shortcuts: [{ keys: ['E'], description: t7e('plugins.EditSat.help.shortcutToggle') }],
     };
   }
 
@@ -166,7 +190,7 @@ export class EditSat extends KeepTrackPlugin {
             <label for="disabled" class="active">${l('scc')}</label>
           </div>
           <div class="input-field col s12">
-            <input placeholder="Unknown" id="${p}-country" type="text" />
+            <input placeholder="${t7e('Common.unknown')}" id="${p}-country" type="text" />
             <label for="${p}-country" class="active">${l('country')}</label>
           </div>
           <div class="input-field col s12">

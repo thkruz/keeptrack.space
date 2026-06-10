@@ -3,7 +3,18 @@
     "EditSat": {
       "bottomIconLabel": "Edytuj satelitę",
       "title": "Menu edycji satelity",
-      "helpBody": "Menu edycji satelity służy do edycji danych satelity. <br><br> <ul> <li> Numer SCC satelity — unikalny numer przypisany każdemu satelicie przez US Space Force. </li> <li> Rok epoki — rok ostatniej aktualizacji orbitalnej satelity. </li> <li> Dzień epoki — dzień roku ostatniej aktualizacji orbitalnej satelity. </li> <li> Inklinacja — kąt między płaszczyzną orbity satelity a płaszczyzną równikową. </li> <li> Rektascensja — kąt między węzłem wstępującym a pozycją satelity w momencie ostatniej aktualizacji orbitalnej. </li> <li> Mimośród — stopień odchylenia orbity satelity od okręgu. </li> <li> Argument perycentrum — kąt między węzłem wstępującym a najbliższym Ziemi punktem orbity satelity. </li> <li> Anomalia średnia — kąt między pozycją satelity w momencie ostatniej aktualizacji orbitalnej a najbliższym Ziemi punktem orbity. </li> <li> Ruch średni — szybkość zmian anomalii średniej satelity. </li> </ul>",
+      "help": {
+        "overview": "Menu edycji satelity pozwala zmieniać elementy orbitalne wybranego satelity (w praktyce przepisując jego TLE) oraz zapisywać i wczytywać TLE jako pliki. To podstawowe narzędzie do eksperymentów typu \"co by było, gdyby\" na orbicie rzeczywistego obiektu.",
+        "imgAlt": "Menu edycji satelity z polami elementów orbitalnych",
+        "imgCaption": "Każde pole odpowiada wartości TLE. Okres i ruch średni są automatycznie synchronizowane.",
+        "fieldsHeading": "Elementy orbitalne",
+        "fields": "<ul><li><strong>Rok / dzień epoki</strong>: kiedy zmierzono elementy: dwucyfrowy rok i ułamkowy dzień roku (np. 173.25 = południe 173. dnia).</li><li><strong>Inklinacja</strong>: nachylenie orbity względem równika, w stopniach.</li><li><strong>Rektascensja</strong>: gdzie orbita przecina równik w kierunku północnym, w stopniach.</li><li><strong>Mimośród</strong>: wpisz tylko cyfry po \"0.\" (np. 0001234 oznacza 0.0001234).</li><li><strong>Argument perycentrum</strong>: orientacja najniższego punktu orbity, w stopniach.</li><li><strong>Anomalia średnia</strong>: w którym miejscu orbity znajdował się satelita w epoce, w stopniach.</li><li><strong>Ruch średni / okres</strong>: obiegi na dobę i minuty na obieg; edycja jednego przelicza drugie.</li></ul>",
+        "howToUse": "<ol><li>Wybierz satelitę, a następnie otwórz menu z dolnego paska, naciśnij E lub kliknij satelitę prawym przyciskiem myszy i wybierz Edytuj sat.</li><li>Edytuj pola i kliknij <strong>Aktualizuj satelitę</strong>, aby zastosować zmiany. Satelita natychmiast przejdzie na nową orbitę.</li><li><strong>Aktualizuj epokę do teraz</strong> przestawia czas istniejącej orbity na bieżący moment, utrzymując satelitę nad jego obecną pozycją.</li><li><strong>Zapisz TLE</strong> eksportuje bieżące elementy jako plik JSON; <strong>Wczytaj TLE</strong> stosuje wcześniej zapisany plik.</li></ol>",
+        "tip1": "Aktualizacje są odrzucane, jeśli nowa orbita zeszłaby poniżej atmosfery; powiadomienie poprosi o wypróbowanie innych parametrów.",
+        "tip2": "Mimośród to najczęstsza literówka: to wyłącznie cyfry części ułamkowej, bez początkowego \"0.\".",
+        "tip3": "Edycje obowiązują tylko w bieżącej sesji i nigdy nie zmieniają prawdziwego katalogu. Przeładuj stronę, aby przywrócić pierwotną orbitę.",
+        "shortcutToggle": "Przełącz menu edycji satelity"
+      },
       "labels": {
         "scc": "Numer SCC satelity",
         "country": "Kraj",

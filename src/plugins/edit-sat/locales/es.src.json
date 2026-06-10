@@ -3,7 +3,18 @@
     "EditSat": {
       "bottomIconLabel": "Editar Satélite",
       "title": "Menú de Edición de Satélite",
-      "helpBody": "El Menú de Edición de Satélite se usa para editar los datos del satélite. <br><br> <ul> <li> Número SCC del Satélite - Un número único asignado a cada satélite por la Fuerza Espacial de EE. UU. </li> <li> Año de Época - El año de la última actualización orbital del satélite. </li> <li> Día de Época - El día del año de la última actualización orbital del satélite. </li> <li> Inclinación - El ángulo entre el plano orbital del satélite y el plano ecuatorial. </li> <li> Ascensión Recta - El ángulo entre el nodo ascendente y la posición del satélite en el momento de la última actualización orbital. </li> <li> Excentricidad - La cantidad en que la órbita del satélite se desvía de un círculo perfecto. </li> <li> Argumento del Perigeo - El ángulo entre el nodo ascendente y el punto más cercano del satélite a la tierra. </li> <li> Anomalía Media - El ángulo entre la posición del satélite en el momento de la última actualización orbital y el punto más cercano del satélite a la tierra. </li> <li> Movimiento Medio - La tasa a la que cambia la anomalía media del satélite. </li> </ul>",
+      "help": {
+        "overview": "El Menú de Edición de Satélite te permite cambiar los elementos orbitales del satélite seleccionado (reescribiendo en la práctica su TLE) y guardar o cargar TLE como archivos. Es la herramienta de referencia para experimentos hipotéticos con la órbita de un objeto real.",
+        "imgAlt": "El Menú de Edición de Satélite con campos de elementos orbitales",
+        "imgCaption": "Cada campo corresponde a un valor del TLE. El Período y el Movimiento Medio se mantienen sincronizados automáticamente.",
+        "fieldsHeading": "Elementos Orbitales",
+        "fields": "<ul><li><strong>Año / Día de Época</strong>: cuándo se midieron los elementos: año de dos dígitos y día fraccionario del año (p. ej., 173.25 = mediodía del día 173).</li><li><strong>Inclinación</strong>: inclinación de la órbita respecto al ecuador, en grados.</li><li><strong>Ascensión Recta</strong>: dónde la órbita cruza el ecuador hacia el norte, en grados.</li><li><strong>Excentricidad</strong>: introduce solo los dígitos después de \"0.\" (p. ej., 0001234 significa 0.0001234).</li><li><strong>Argumento del Perigeo</strong>: orientación del punto más bajo de la órbita, en grados.</li><li><strong>Anomalía Media</strong>: en qué punto de la órbita estaba el satélite en la época, en grados.</li><li><strong>Movimiento Medio / Período</strong>: revoluciones por día y minutos por órbita; editar uno recalcula el otro.</li></ul>",
+        "howToUse": "<ol><li>Selecciona un satélite, luego abre el menú desde la barra inferior, pulsa E, o haz clic derecho en el satélite y elige Editar Sat.</li><li>Edita los campos y haz clic en <strong>Actualizar Satélite</strong> para aplicar; el satélite se mueve inmediatamente a la nueva órbita.</li><li><strong>Actualizar Época a Ahora</strong> ajusta el tiempo de la órbita existente al momento actual, manteniendo el satélite sobre su ubicación presente.</li><li><strong>Guardar TLE</strong> exporta los elementos actuales como un archivo JSON; <strong>Cargar TLE</strong> aplica un archivo guardado previamente.</li></ol>",
+        "tip1": "Las actualizaciones se rechazan si la nueva órbita descendiera por debajo de la atmósfera; un aviso te pide probar con parámetros diferentes.",
+        "tip2": "La Excentricidad es el error tipográfico más común: son solo los dígitos fraccionarios, sin el \"0.\" inicial.",
+        "tip3": "Las ediciones son solo de la sesión y nunca tocan el catálogo real. Recarga la página para restaurar la órbita original.",
+        "shortcutToggle": "Alternar el Menú de Edición de Satélite"
+      },
       "labels": {
         "scc": "SCC# del Satélite",
         "country": "País",

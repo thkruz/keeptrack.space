@@ -3,7 +3,18 @@
     "EditSat": {
       "bottomIconLabel": "Edit Satellite",
       "title": "Edit Satellite Menu",
-      "helpBody": "The Edit Satellite Menu is used to edit the satellite data. <br><br> <ul> <li> Satellite SCC# - A unique number assigned to each satellite by the US Space Force. </li> <li> Epoch Year - The year of the satellite's last orbital update. </li> <li> Epoch Day - The day of the year of the satellite's last orbital update. </li> <li> Inclination - The angle between the satellite's orbital plane and the equatorial plane. </li> <li> Right Ascension - The angle between the ascending node and the satellite's position at the time of the last orbital update. </li> <li> Eccentricity - The amount by which the satellite's orbit deviates from a perfect circle. </li> <li> Argument of Perigee - The angle between the ascending node and the satellite's closest point to the earth. </li> <li> Mean Anomaly - The angle between the satellite's position at the time of the last orbital update and the satellite's closest point to the earth. </li> <li> Mean Motion - The rate at which the satellite's mean anomaly changes. </li> </ul>",
+      "help": {
+        "overview": "The Edit Satellite menu lets you change the orbital elements of the selected satellite (effectively rewriting its TLE) and save or load TLEs as files. It is the go-to tool for what-if experiments on a real object's orbit.",
+        "imgAlt": "The Edit Satellite menu with orbital element fields",
+        "imgCaption": "Each field maps to a TLE value. Period and Mean Motion stay in sync automatically.",
+        "fieldsHeading": "Orbital Elements",
+        "fields": "<ul><li><strong>Epoch Year / Day</strong>: when the elements were measured: two-digit year and fractional day of year (e.g. 173.25 = noon on day 173).</li><li><strong>Inclination</strong>: tilt of the orbit relative to the equator, in degrees.</li><li><strong>Right Ascension</strong>: where the orbit crosses the equator northbound, in degrees.</li><li><strong>Eccentricity</strong>: enter only the digits after \"0.\" (e.g. 0001234 means 0.0001234).</li><li><strong>Argument of Perigee</strong>: orientation of the orbit's low point, in degrees.</li><li><strong>Mean Anomaly</strong>: where along the orbit the satellite was at epoch, in degrees.</li><li><strong>Mean Motion / Period</strong>: revolutions per day and minutes per orbit; editing one recalculates the other.</li></ul>",
+        "howToUse": "<ol><li>Select a satellite, then open the menu from the bottom bar, press E, or right-click the satellite and choose Edit Sat.</li><li>Edit the fields and click <strong>Update Satellite</strong> to apply. The satellite immediately moves to the new orbit.</li><li><strong>Update Epoch to Now</strong> re-times the existing orbit to the current moment, keeping the satellite over its present location.</li><li><strong>Save TLE</strong> exports the current elements as a JSON file; <strong>Load TLE</strong> applies a previously saved file.</li></ol>",
+        "tip1": "Updates are rejected if the new orbit would dip below the atmosphere; a toast asks you to try different parameters.",
+        "tip2": "Eccentricity is the most common typo: it is the fractional digits only, with no leading \"0.\".",
+        "tip3": "Edits are session-only and never touch the real catalog. Reload the page to restore the original orbit.",
+        "shortcutToggle": "Toggle the Edit Satellite menu"
+      },
       "labels": {
         "scc": "Satellite SCC#",
         "country": "Country",

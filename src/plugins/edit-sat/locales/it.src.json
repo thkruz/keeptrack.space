@@ -3,7 +3,18 @@
     "EditSat": {
       "bottomIconLabel": "Modifica satellite",
       "title": "Menu modifica satellite",
-      "helpBody": "Il menu Modifica satellite viene utilizzato per modificare i dati del satellite. <br><br> <ul> <li> SCC# satellite - Un numero univoco assegnato a ogni satellite dalla US Space Force. </li> <li> Anno epoca - L'anno dell'ultimo aggiornamento orbitale del satellite. </li> <li> Giorno epoca - Il giorno dell'anno dell'ultimo aggiornamento orbitale del satellite. </li> <li> Inclinazione - L'angolo tra il piano orbitale del satellite e il piano equatoriale. </li> <li> Ascensione retta - L'angolo tra il nodo ascendente e la posizione del satellite al momento dell'ultimo aggiornamento orbitale. </li> <li> Eccentricità - La misura in cui l'orbita del satellite devia da un cerchio perfetto. </li> <li> Argomento del perigeo - L'angolo tra il nodo ascendente e il punto più vicino del satellite alla Terra. </li> <li> Anomalia media - L'angolo tra la posizione del satellite al momento dell'ultimo aggiornamento orbitale e il punto più vicino del satellite alla Terra. </li> <li> Moto medio - La velocità con cui cambia l'anomalia media del satellite. </li> </ul>",
+      "help": {
+        "overview": "Il menu Modifica satellite consente di cambiare gli elementi orbitali del satellite selezionato (riscrivendone di fatto il TLE) e di salvare o caricare TLE come file. È lo strumento di riferimento per esperimenti ipotetici sull'orbita di un oggetto reale.",
+        "imgAlt": "Il menu Modifica satellite con i campi degli elementi orbitali",
+        "imgCaption": "Ogni campo corrisponde a un valore del TLE. Periodo e Moto medio restano sincronizzati automaticamente.",
+        "fieldsHeading": "Elementi orbitali",
+        "fields": "<ul><li><strong>Anno / Giorno epoca</strong>: quando gli elementi sono stati misurati, ovvero anno a due cifre e giorno frazionario dell'anno (es. 173.25 = mezzogiorno del giorno 173).</li><li><strong>Inclinazione</strong>: inclinazione dell'orbita rispetto all'equatore, in gradi.</li><li><strong>Ascensione retta</strong>: dove l'orbita attraversa l'equatore verso nord, in gradi.</li><li><strong>Eccentricità</strong>: inserire solo le cifre dopo \"0.\" (es. 0001234 significa 0.0001234).</li><li><strong>Argomento del perigeo</strong>: orientamento del punto più basso dell'orbita, in gradi.</li><li><strong>Anomalia media</strong>: posizione del satellite lungo l'orbita all'epoca, in gradi.</li><li><strong>Moto medio / Periodo</strong>: rivoluzioni al giorno e minuti per orbita; modificando uno si ricalcola l'altro.</li></ul>",
+        "howToUse": "<ol><li>Seleziona un satellite, poi apri il menu dalla barra inferiore, premi E, oppure fai clic destro sul satellite e scegli Modifica sat.</li><li>Modifica i campi e fai clic su <strong>Aggiorna satellite</strong> per applicare. Il satellite si sposta immediatamente sulla nuova orbita.</li><li><strong>Aggiorna epoca a ora</strong> ricalibra il tempo dell'orbita esistente sull'istante attuale, mantenendo il satellite sopra la sua posizione presente.</li><li><strong>Salva TLE</strong> esporta gli elementi attuali come file JSON; <strong>Carica TLE</strong> applica un file salvato in precedenza.</li></ol>",
+        "tip1": "Gli aggiornamenti vengono rifiutati se la nuova orbita scendesse sotto l'atmosfera; un avviso chiede di provare parametri diversi.",
+        "tip2": "L'Eccentricità è l'errore di battitura più comune: sono solo le cifre frazionarie, senza lo \"0.\" iniziale.",
+        "tip3": "Le modifiche valgono solo per la sessione e non toccano mai il catalogo reale. Ricarica la pagina per ripristinare l'orbita originale.",
+        "shortcutToggle": "Attiva/disattiva il menu Modifica satellite"
+      },
       "labels": {
         "scc": "SCC# satellite",
         "country": "Paese",

@@ -3,6 +3,8 @@
  */
 export enum EventBusEvent {
   onHelpMenuClick = 'onHelpMenuClick',
+  /** Emitted with the owning plugin id when a plugin's help content is shown */
+  helpMenuShown = 'helpMenuShown',
   /**
    * Run at the end of SelectSatManager.selectSat with parameters (sat: SatObject, satId: number)
    */

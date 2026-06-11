@@ -1660,6 +1660,7 @@ export abstract class KeepTrackPlugin {
       (): boolean => {
         if (this.isMenuButtonActive) {
           adviceManagerInstance.showAdvice(helpTitle, helpText);
+          EventBus.getInstance().emit(EventBusEvent.helpMenuShown, this.id);
 
           return true;
         }

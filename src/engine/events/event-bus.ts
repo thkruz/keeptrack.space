@@ -44,6 +44,7 @@ export interface EngineEventMap {
   [EventBusEvent.onCruncherMessage]: [];
   [EventBusEvent.onCruncherReady]: [];
   [EventBusEvent.onHelpMenuClick]: [];
+  [EventBusEvent.helpMenuShown]: [string];
   [EventBusEvent.onKeepTrackReady]: [];
   [EventBusEvent.selectSatData]: [Satellite | MissileObject | BaseObject, number];
   [EventBusEvent.setSecondarySat]: [Satellite | null, number];

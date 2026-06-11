@@ -116,5 +116,6 @@ export class HelpComponent {
    */
   showHelp(): void {
     adviceManagerInstance.showAdvice(this.config.title, buildHelpHtml(this.config));
+    EventBus.getInstance().emit(EventBusEvent.helpMenuShown, this.pluginId);
   }
 }

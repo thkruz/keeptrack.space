@@ -113,4 +113,7 @@ export enum StorageKey {
 
   // Color Scheme Editor
   COLOR_SCHEME_OVERRIDES = 'v2-keepTrack-colorSchemeOverrides',
+
+  // Achievement progress counters (mirrors the server-synced app_preferences copy)
+  ACHIEVEMENT_COUNTERS = 'v2-keepTrack-achievementCounters',
 }

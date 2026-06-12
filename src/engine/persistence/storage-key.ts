@@ -141,4 +141,7 @@ export enum StorageKey {
 
   // Launchpad (recently activated tiles: [{ id, t }], newest first, capped)
   LAUNCHPAD_RECENTS = 'v2-keepTrack-launchpadRecents',
+
+  // User Account (epoch ms of the last successful cloud sync)
+  USER_LAST_SYNCED = 'v2-keepTrack-userLastSynced',
 }

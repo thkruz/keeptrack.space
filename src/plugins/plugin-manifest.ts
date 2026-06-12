@@ -545,6 +545,12 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 311 },
   },
   {
+    configKey: 'TerminatorToggle',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/terminator-toggle/terminator-toggle') : undefined,
+    proClassName: 'TerminatorToggle',
+    defaultConfig: { enabled: true, order: 312 },
+  },
+  {
     configKey: 'PoliticalMapToggle',
     ossImport: () => import('./political-map-toggle/political-map-toggle'),
     ossClassName: 'PoliticalMapToggle',

@@ -96,6 +96,7 @@ export type KeepTrackPluginsConfiguration = {
   NightToggle?: PluginConfiguration;
   OpticalSimulation?: PluginConfiguration;
   GraticuleToggle?: PluginConfiguration;
+  TerminatorToggle?: PluginConfiguration;
   CloudsToggle?: PluginConfiguration;
   PoliticalMapToggle?: PluginConfiguration;
   HideOtherSatellitesPlugin?: PluginConfiguration;

@@ -377,6 +377,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
       if (id) {
         orbitManagerInstance.changeOrbitBufferData(id, tle1, tle2);
+        catalogManagerInstance.seedDotPosition(id);
       }
     } else {
       uiManagerInstance.toast(eMsg('failedAltitudeTest'), ToastMsgType.critical);

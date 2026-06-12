@@ -282,3 +282,46 @@ describe('calcSatrec', () => {
     });
   });
 });
+
+/*
+ * The position cruncher applies sendSatEdit asynchronously, so a new analyst
+ * satellite would otherwise sit at the placeholder 0,0,0 ("Decayed" in the
+ * search results) until the cruncher's next cycle. addAnalystSat must seed
+ * the render buffers synchronously because consumers (maneuver, breakup,
+ * IOD) search for the new satellite immediately.
+ */
+describe('addAnalystSat render-buffer seeding', () => {
+  let catalogManagerInstance: CatalogManager;
+
+  beforeEach(() => {
+    catalogManagerInstance = new CatalogManager();
+    catalogManagerInstance.objectCache = [defaultSat];
+    catalogManagerInstance.satCruncherThread = {
+      postMessage: vi.fn(),
+      sendSatEdit: vi.fn(),
+    } as never;
+  });
+
+  it('seeds the dot position and nudges the color worker', async () => {
+    const { SatMath } = await import('@app/app/analysis/sat-math');
+
+    vi.spyOn(SatMath, 'getEci').mockReturnValue({
+      position: { x: 7000, y: 8000, z: 9000 },
+      velocity: { x: 1, y: 2, z: 3 },
+    } as never);
+
+    const positionData = new Float32Array(6);
+    const velocityData = new Float32Array(6);
+    const notifyObjectsChanged = vi.fn();
+
+    vi.spyOn(ServiceLocator, 'getDotsManager').mockReturnValue({ positionData, velocityData } as never);
+    vi.spyOn(ServiceLocator, 'getColorSchemeManager').mockReturnValue({ notifyObjectsChanged } as never);
+
+    const sat = catalogManagerInstance.addAnalystSat(defaultSat.tle1, defaultSat.tle2, 1);
+
+    expect(sat).not.toBeNull();
+    expect(Array.from(positionData.slice(3, 6))).toEqual([7000, 8000, 9000]);
+    expect(Array.from(velocityData.slice(3, 6))).toEqual([1, 2, 3]);
+    expect(notifyObjectsChanged).toHaveBeenCalled();
+  });
+});

@@ -25,6 +25,7 @@ describe('CreateSat', () => {
       satCruncherThread: {
         sendSatEdit: vi.fn(),
       },
+      seedDotPosition: vi.fn(),
     };
 
     const mockOrbitManager = {
@@ -119,6 +120,7 @@ describe('CreateSat', () => {
       satCruncherThread: {
         sendSatEdit: vi.fn(),
       },
+      seedDotPosition: vi.fn(),
     };
 
     const mockOrbitManager = {

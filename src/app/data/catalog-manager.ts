@@ -565,6 +565,8 @@ export class CatalogManager {
         throw new Error(`Object ${id} is not a satellite!`);
       }
 
+      this.seedDotPosition(id);
+
       return sat;
     }
     errorManagerInstance.debug(tle1);
@@ -573,6 +575,47 @@ export class CatalogManager {
 
 
     return null;
+  }
+
+  /**
+   * Seeds the render buffers for a satellite that was just created or edited
+   * on the main thread (analyst sats, breakups, created/edited satellites).
+   *
+   * The position cruncher processes sendSatEdit asynchronously, so until its
+   * next cycle the slot still holds the placeholder 0,0,0 position, which the
+   * search results and renderer read as "Decayed". The color worker likewise
+   * holds a catalog snapshot with the slot inactive, leaving the dot
+   * transparent. Consumers search for and select the new satellite immediately
+   * after creation, so both buffers are nudged synchronously here.
+   */
+  seedDotPosition(id: number): void {
+    // Best effort: render managers may not be registered yet (startup, tests)
+    try {
+      const sat = this.objectCache[id] as Satellite | undefined;
+
+      if (!sat?.isSatellite?.()) {
+        return;
+      }
+
+      const { position, velocity } = SatMath.getEci(sat, ServiceLocator.getTimeManager().simulationTimeObj);
+      const dotsManagerInstance = ServiceLocator.getDotsManager();
+
+      if (dotsManagerInstance?.positionData && (position.x !== 0 || position.y !== 0 || position.z !== 0)) {
+        dotsManagerInstance.positionData[id * 3] = position.x;
+        dotsManagerInstance.positionData[id * 3 + 1] = position.y;
+        dotsManagerInstance.positionData[id * 3 + 2] = position.z;
+
+        if (dotsManagerInstance.velocityData) {
+          dotsManagerInstance.velocityData[id * 3] = velocity.x;
+          dotsManagerInstance.velocityData[id * 3 + 1] = velocity.y;
+          dotsManagerInstance.velocityData[id * 3 + 2] = velocity.z;
+        }
+      }
+
+      ServiceLocator.getColorSchemeManager()?.notifyObjectsChanged?.();
+    } catch (e) {
+      errorManagerInstance.debug(`seedDotPosition skipped: ${(e as Error).message}`);
+    }
   }
 
   buildOrbitDensityMatrix_() {

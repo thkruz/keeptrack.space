@@ -931,6 +931,10 @@ export class CreateSat extends KeepTrackPlugin {
         errorManagerInstance.error(e as Error, 'create-sat.ts', 'Changing orbit buffer data failed');
       }
 
+      // Seed the render buffers so the immediate search below does not read
+      // the placeholder 0,0,0 position as "Decayed"
+      catalogManagerInstance.seedDotPosition(satId);
+
       // Search for the new satellite
       ServiceLocator.getUiManager().doSearch(inputParams.scc);
 

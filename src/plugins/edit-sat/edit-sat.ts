@@ -434,6 +434,7 @@ export class EditSat extends KeepTrackPlugin {
       const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
       orbitManagerInstance.changeOrbitBufferData(id, tle1, tle2);
+      catalogManagerInstance.seedDotPosition(id);
 
       // Reload menu with new TLE
       const obj2 = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
@@ -510,6 +511,7 @@ export class EditSat extends KeepTrackPlugin {
       sat.active = true;
       sat.editTle(tle1, tle2);
       sat.country = country;
+      catalogManagerInstance.seedDotPosition(satId);
       ServiceLocator.getMainCamera().state.zoomTarget = ZoomValue.GEO;
     } else {
       ServiceLocator.getUiManager().toast(
@@ -607,6 +609,7 @@ export class EditSat extends KeepTrackPlugin {
       catalogManagerInstance.satCruncherThread.sendSatEdit(sat.id, object.tle1, object.tle2, true);
       orbitManagerInstance.changeOrbitBufferData(sat.id, object.tle1, object.tle2);
       sat.active = true;
+      catalogManagerInstance.seedDotPosition(sat.id);
     } else {
       uiManagerInstance.toast(
         t7e('plugins.EditSat.errorMsgs.failedToPropagate' as T7eKey),

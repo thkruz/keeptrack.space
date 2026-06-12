@@ -19,7 +19,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { hideLoading, showLoading, showLoadingSticky } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
-import { RAD2DEG, Satellite, SpaceObjectType } from '@ootk/src/main';
+import { Degrees, RAD2DEG, Satellite, SpaceObjectType } from '@ootk/src/main';
 import fetchPng from '@public/img/icons/download.png';
 import refreshPng from '@public/img/icons/refresh.png';
 import sputnickPng from '@public/img/icons/sputnick.png';
@@ -54,6 +54,7 @@ export class Reentries extends KeepTrackPlugin {
   protected reentryList_: Satellite[] = [];
   private isLoggedIn_ = false;
   private isFetching_ = false;
+  private isFlyToCorridor_ = false;
 
   // =========================================================================
   // Composition-based configuration methods
@@ -119,6 +120,13 @@ export class Reentries extends KeepTrackPlugin {
             type="button" kt-tooltip="${tb('refresh')}" style="display:none;">
             <img src="${refreshPng}" class="icon-btn-img" alt="" />
           </button>
+          <div class="switch re-flyto-switch" kt-tooltip="${tb('flyToCorridorTooltip')}">
+            <label for="reentries-flyto-corridor">
+              <input id="reentries-flyto-corridor" type="checkbox" />
+              <span class="lever"></span>
+              <span class="re-flyto-label">${tb('flyToCorridor')}</span>
+            </label>
+          </div>
         </div>
         <table id="reentries-tip-table" class="center-align"></table>
         <sub class="center-align">*${t7e('plugins.Reentries.dataSource' as Parameters<typeof t7e>[0])}</sub>
@@ -222,6 +230,10 @@ export class Reentries extends KeepTrackPlugin {
       this.fetchTipData_();
     });
 
+    getEl('reentries-flyto-corridor', true)?.addEventListener('change', (evt: Event) => {
+      this.isFlyToCorridor_ = (<HTMLInputElement>evt.target).checked;
+    });
+
     // TIP Messages row click handler
     getEl(this.sideMenuElementName)!.addEventListener('click', (evt: Event) => {
       const el = (<HTMLElement>evt.target)?.parentElement;
@@ -282,7 +294,13 @@ export class Reentries extends KeepTrackPlugin {
     this.isFetching_ = true;
 
     fetch(this.tipDataSrc_)
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to fetch TIP data: ${response.status}`);
+        }
+
+        return response.json();
+      })
       .then((tipList: TipMsg[]) => {
         this.setTipList_(tipList);
         this.createTipTable_();
@@ -383,9 +401,37 @@ export class Reentries extends KeepTrackPlugin {
     ServiceLocator.getTimeManager().changeStaticOffset(decayEpoch.getTime() - now.getTime());
     ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
 
+    if (this.isFlyToCorridor_) {
+      this.flyToCorridor_(this.tipList_[row], decayEpoch);
+
+      return;
+    }
+
     ServiceLocator.getUiManager().doSearch(`${sat.sccNum5 ?? sat.sccNum}`);
 
     this.selectSatIdOnCruncher_ = sat.id;
+  }
+
+  /**
+   * Flies the camera to the predicted reentry corridor location for a TIP
+   * message. The object is deselected first so the camera looks at the ground
+   * point on the globe rather than chasing the decaying satellite.
+   */
+  private flyToCorridor_(tip: TipMsg, decayEpoch: Date): void {
+    const lat = <Degrees>Reentries.parseLat_(tip.LAT);
+    const lon = <Degrees>Reentries.parseLon_(tip.LON);
+    const camera = ServiceLocator.getMainCamera();
+
+    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
+
+    /*
+     * Defer one frame so the time jump propagates before lon2yaw resolves the
+     * longitude. Flying on the same frame as changeStaticOffset would aim the
+     * camera at a stale corridor position.
+     */
+    requestAnimationFrame(() => {
+      camera.lookAtLatLon(lat, lon, 0, decayEpoch);
+    });
   }
 
   protected createTipTable_(): void {
@@ -633,13 +679,25 @@ export class Reentries extends KeepTrackPlugin {
   // Utilities
   // =========================================================================
 
-  private lon2degrees_(lon: string): string {
+  /** Parses a TIP latitude string into signed degrees (north positive). */
+  private static parseLat_(lat: string): number {
+    return parseFloat(lat);
+  }
+
+  /** Parses a TIP longitude string into signed degrees normalized to [-180, 180]. */
+  private static parseLon_(lon: string): number {
     let lonDeg = parseFloat(lon);
-    let direction = 'E';
 
     if (lonDeg > 180) {
       lonDeg -= 360;
     }
+
+    return lonDeg;
+  }
+
+  private lon2degrees_(lon: string): string {
+    let lonDeg = Reentries.parseLon_(lon);
+    let direction = 'E';
 
     if (lonDeg < 0) {
       direction = 'W';
@@ -650,7 +708,7 @@ export class Reentries extends KeepTrackPlugin {
   }
 
   private lat2degrees_(lat: string): string {
-    let latDeg = parseFloat(lat);
+    let latDeg = Reentries.parseLat_(lat);
     let direction = 'N';
 
     if (latDeg < 0) {

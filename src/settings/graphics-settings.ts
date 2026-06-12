@@ -84,6 +84,11 @@ export class GraphicsSettings {
    * Determines whether or not to draw graticule (lat/lon grid) lines on the Earth.
    */
   isDrawGraticule = false;
+  /**
+   * Determines whether or not to draw the day/night terminator line and subsolar
+   * point marker on the flat (equirectangular) map view.
+   */
+  isDrawFlatMapTerminator = true;
 
   // Sun Settings
   sunTextureQuality: SunTextureQuality;

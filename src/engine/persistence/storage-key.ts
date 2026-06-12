@@ -31,6 +31,7 @@ export enum StorageKey {
   SETTINGS_DRAW_TRAILING_ORBITS = 'v2-keepTrack-settings-drawTrailingOrbits',
   SETTINGS_DRAW_AURORA = 'v2-keepTrack-settings-drawAurora',
   SETTINGS_DRAW_GRATICULE = 'v2-keepTrack-settings-drawGraticule',
+  SETTINGS_DRAW_FLAT_MAP_TERMINATOR = 'v2-keepTrack-settings-drawFlatMapTerminator',
   SETTINGS_DRAW_SUN = 'v2-keepTrack-settings-drawSun',
   SETTINGS_CONFIDENCE_LEVELS = 'v2-keepTrack-settings-confidenceLevels',
   SETTINGS_DRAW_COVARIANCE_ELLIPSOID = 'v2-keepTrack-settings-drawCovarianceEllipsoid',
@@ -116,4 +117,28 @@ export enum StorageKey {
 
   // Achievement progress counters (mirrors the server-synced app_preferences copy)
   ACHIEVEMENT_COUNTERS = 'v2-keepTrack-achievementCounters',
+
+  // Best Pass Pro (column visibility + propagation settings)
+  BEST_PASS_SETTINGS = 'v2-keepTrack-bestPassSettings',
+
+  // Sponsor ad dismissal (timestamp in ms until which the ad stays hidden)
+  SPONSOR_AD_DISMISSED_UNTIL = 'v2-keepTrack-sponsorAdDismissedUntil',
+
+  // Stereo Map (map style, graticule, political overlay, orbit multiplier)
+  STEREO_MAP_SETTINGS = 'v2-keepTrack-stereoMapSettings',
+
+  // Aurora Pro (opt-in NOAA OVATION auto-refresh toggle)
+  AURORA_AUTO_REFRESH = 'v2-keepTrack-auroraAutoRefresh',
+
+  // Scenario Management Pro (saved scenario library: name -> { savedAt, data })
+  SCENARIO_LIBRARY = 'v2-keepTrack-scenarioLibrary',
+
+  // Stars Pro (vmag limit, constellation label toggle)
+  STARS_SETTINGS = 'v2-keepTrack-starsSettings',
+
+  // Seismic Activity Pro (feed selection, min magnitude, auto-refresh)
+  SEISMIC_ACTIVITY_SETTINGS = 'v2-keepTrack-seismicActivitySettings',
+
+  // Launchpad (recently activated tiles: [{ id, t }], newest first, capped)
+  LAUNCHPAD_RECENTS = 'v2-keepTrack-launchpadRecents',
 }

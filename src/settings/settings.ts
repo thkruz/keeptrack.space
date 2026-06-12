@@ -69,6 +69,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   isDrawAtmosphere: 'graphics',
   isDrawAurora: 'graphics',
   isDrawGraticule: 'graphics',
+  isDrawFlatMapTerminator: 'graphics',
   isDrawSun: 'graphics',
   sizeOfSun: 'graphics',
   isUseSunTexture: 'graphics',
@@ -444,6 +445,7 @@ export class SettingsManager {
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE, settingsManager.isDrawAtmosphere.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_AURORA, settingsManager.isDrawAurora.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_GRATICULE, settingsManager.isDrawGraticule.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_FLAT_MAP_TERMINATOR, settingsManager.isDrawFlatMapTerminator.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_MILKY_WAY, settingsManager.isDrawMilkyWay.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_GRAY_SKYBOX, settingsManager.isGraySkybox.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_ECI_ON_HOVER, settingsManager.isEciOnHover.toString());
@@ -490,6 +492,8 @@ export class SettingsManager {
     this.isDrawAtmosphere = parseInt(PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE) ?? '1') as AtmosphereSettings;
     this.isDrawAurora = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_AURORA, this.isDrawAurora) as boolean;
     this.isDrawGraticule = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_GRATICULE, this.isDrawGraticule) as boolean;
+    this.isDrawFlatMapTerminator =
+      PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_FLAT_MAP_TERMINATOR, this.isDrawFlatMapTerminator) as boolean;
     this.isDrawMilkyWay = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_MILKY_WAY, this.isDrawMilkyWay) as boolean;
     this.isGraySkybox = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_GRAY_SKYBOX, this.isGraySkybox) as boolean;
     this.isEciOnHover = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_ECI_ON_HOVER, this.isEciOnHover) as boolean;

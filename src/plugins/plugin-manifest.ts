@@ -673,6 +673,12 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
   {
+    configKey: 'StarManagementPlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/stars/star-management') : undefined,
+    proClassName: 'StarManagementPlugin',
+    defaultConfig: { enabled: true, order: 420.5 },
+  },
+  {
     configKey: 'CatalogBrowserPlugin',
     ossImport: () => import('./catalog-browser/catalog-browser'),
     ossClassName: 'CatalogBrowserPlugin',

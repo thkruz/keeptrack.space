@@ -116,6 +116,7 @@ export type KeepTrackPluginsConfiguration = {
   SatellitePhotos?: PluginConfiguration;
   ScreenRecorder?: PluginConfiguration;
   CatalogManagementPlugin?: PluginConfiguration;
+  StarManagementPlugin?: PluginConfiguration;
   CatalogBrowserPlugin?: CatalogBrowserConfiguration;
   HistoricCatalogPlugin?: PluginConfiguration;
   CloseObjectsPlugin?: PluginConfiguration;

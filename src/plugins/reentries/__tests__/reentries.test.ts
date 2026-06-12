@@ -3,6 +3,7 @@ import { vi } from 'vitest';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { MenuMode } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { TipMsg, Reentries } from '@app/plugins/reentries/reentries';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
@@ -50,6 +51,8 @@ describe('Reentries_class', () => {
     // Mock fetch for TIP data
     global.fetch = vi.fn(() =>
       Promise.resolve({
+        ok: true,
+        status: 200,
         json: () => Promise.resolve(mockTipData),
       }),
     ) as vi.Mock;
@@ -392,6 +395,60 @@ describe('Reentries_class', () => {
 
       expect(row.classList.contains('reentry-critical')).toBe(true);
       expect(row.cells[5].textContent).toBe('Reentered');
+    });
+  });
+
+  describe('tipEventClicked_', () => {
+    it('parses longitude to [-180, 180] degrees', () => {
+      const plugin = new Reentries();
+
+      expect(Reentries['parseLon_']('120.5')).toBe(120.5);
+      expect(Reentries['parseLon_']('200.5')).toBeCloseTo(-159.5);
+      expect(Reentries['parseLat_']('-30.0')).toBe(-30);
+      expect(plugin).toBeDefined();
+    });
+
+    it('flies to the corridor lat/lon when the toggle is enabled', () => {
+      const plugin = new Reentries();
+
+      websiteInit(plugin);
+      plugin['tipList_'] = [{ ...mockTipData[0], NORAD_CAT_ID: '25544', LAT: '45.5', LON: '120.5' }];
+      plugin['isFlyToCorridor_'] = true;
+
+      const catalog = ServiceLocator.getCatalogManager();
+
+      vi.spyOn(catalog, 'sccNum2Sat').mockReturnValue({ id: 5, sccNum: '25544', sccNum5: '25544' } as any);
+      const lookAtSpy = vi.spyOn(ServiceLocator.getMainCamera(), 'lookAtLatLon').mockImplementation(() => undefined);
+      const rafSpy = vi.spyOn(global, 'requestAnimationFrame').mockImplementation((cb: FrameRequestCallback) => {
+        cb(0);
+
+        return 0;
+      });
+
+      plugin['tipEventClicked_'](0);
+
+      expect(rafSpy).toHaveBeenCalled();
+      // TIP[0] is LON 120.5 -> +120.5, LAT 45.5
+      expect(lookAtSpy).toHaveBeenCalledWith(45.5, 120.5, 0, expect.any(Date));
+      expect(plugin['selectSatIdOnCruncher_']).toBeNull();
+    });
+
+    it('follows the object when the toggle is disabled', () => {
+      const plugin = new Reentries();
+
+      websiteInit(plugin);
+      plugin['tipList_'] = [{ ...mockTipData[0], NORAD_CAT_ID: '25544', LAT: '45.5', LON: '120.5' }];
+      plugin['isFlyToCorridor_'] = false;
+
+      const catalog = ServiceLocator.getCatalogManager();
+
+      vi.spyOn(catalog, 'sccNum2Sat').mockReturnValue({ id: 5, sccNum: '25544', sccNum5: '25544' } as any);
+      const rafSpy = vi.spyOn(global, 'requestAnimationFrame');
+
+      plugin['tipEventClicked_'](0);
+
+      expect(rafSpy).not.toHaveBeenCalled();
+      expect(plugin['selectSatIdOnCruncher_']).toBe(5);
     });
   });
 

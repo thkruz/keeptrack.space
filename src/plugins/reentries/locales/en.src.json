@@ -9,7 +9,9 @@
       },
       "toolbar": {
         "fetchData": "Fetch Data",
-        "refresh": "Refresh"
+        "refresh": "Refresh",
+        "flyToCorridor": "Fly to corridor",
+        "flyToCorridorTooltip": "When enabled, clicking a TIP row flies the camera to the predicted reentry corridor on the globe instead of following the object."
       },
       "table": {
         "norad": "NORAD",

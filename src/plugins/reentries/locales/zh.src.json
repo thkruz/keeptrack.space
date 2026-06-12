@@ -9,7 +9,9 @@
       },
       "toolbar": {
         "fetchData": "获取数据",
-        "refresh": "刷新"
+        "refresh": "刷新",
+        "flyToCorridor": "飞向走廊",
+        "flyToCorridorTooltip": "启用后，点击 TIP 行会将相机飞向地球上预测的再入走廊，而不是跟随目标。"
       },
       "table": {
         "norad": "NORAD",

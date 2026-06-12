@@ -9,7 +9,9 @@
       },
       "toolbar": {
         "fetchData": "Scarica dati",
-        "refresh": "Aggiorna"
+        "refresh": "Aggiorna",
+        "flyToCorridor": "Vola al corridoio",
+        "flyToCorridorTooltip": "Quando attivato, facendo clic su una riga TIP la telecamera vola verso il corridoio di rientro previsto sul globo invece di seguire l'oggetto."
       },
       "table": {
         "norad": "NORAD",

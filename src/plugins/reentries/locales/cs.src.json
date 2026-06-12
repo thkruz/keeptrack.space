@@ -9,7 +9,9 @@
       },
       "toolbar": {
         "fetchData": "Načíst data",
-        "refresh": "Obnovit"
+        "refresh": "Obnovit",
+        "flyToCorridor": "Letět ke koridoru",
+        "flyToCorridorTooltip": "Když je zapnuto, kliknutí na řádek TIP přeletí kamerou k předpovídanému koridoru návratu na zeměkouli místo sledování objektu."
       },
       "table": {
         "norad": "NORAD",

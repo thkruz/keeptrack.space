@@ -9,7 +9,9 @@
       },
       "toolbar": {
         "fetchData": "データを取得",
-        "refresh": "更新"
+        "refresh": "更新",
+        "flyToCorridor": "回廊へ移動",
+        "flyToCorridorTooltip": "有効にすると、TIP行をクリックするとカメラがオブジェクトを追従する代わりに、地球上の予測再突入回廊へ移動します。"
       },
       "table": {
         "norad": "NORAD",

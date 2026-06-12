@@ -9,7 +9,9 @@
       },
       "toolbar": {
         "fetchData": "Pobierz dane",
-        "refresh": "Odśwież"
+        "refresh": "Odśwież",
+        "flyToCorridor": "Leć do korytarza",
+        "flyToCorridorTooltip": "Po włączeniu kliknięcie wiersza TIP przenosi kamerę do przewidywanego korytarza wejścia w atmosferę na globie zamiast śledzić obiekt."
       },
       "table": {
         "norad": "NORAD",

@@ -9,7 +9,9 @@
       },
       "toolbar": {
         "fetchData": "Daten abrufen",
-        "refresh": "Aktualisieren"
+        "refresh": "Aktualisieren",
+        "flyToCorridor": "Zum Korridor fliegen",
+        "flyToCorridorTooltip": "Wenn aktiviert, fliegt ein Klick auf eine TIP-Zeile die Kamera zum vorhergesagten Wiedereintrittskorridor auf dem Globus, anstatt dem Objekt zu folgen."
       },
       "table": {
         "norad": "NORAD",

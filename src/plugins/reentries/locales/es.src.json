@@ -9,7 +9,9 @@
       },
       "toolbar": {
         "fetchData": "Obtener datos",
-        "refresh": "Actualizar"
+        "refresh": "Actualizar",
+        "flyToCorridor": "Volar al corredor",
+        "flyToCorridorTooltip": "Cuando está activado, al hacer clic en una fila TIP la cámara vuela al corredor de reentrada previsto en el globo en lugar de seguir al objeto."
       },
       "table": {
         "norad": "NORAD",

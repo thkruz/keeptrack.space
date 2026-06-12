@@ -9,7 +9,9 @@
       },
       "toolbar": {
         "fetchData": "Récupérer les données",
-        "refresh": "Actualiser"
+        "refresh": "Actualiser",
+        "flyToCorridor": "Voler vers le couloir",
+        "flyToCorridorTooltip": "Lorsque cette option est activée, cliquer sur une ligne TIP fait voler la caméra vers le couloir de rentrée prévu sur le globe au lieu de suivre l'objet."
       },
       "table": {
         "norad": "NORAD",

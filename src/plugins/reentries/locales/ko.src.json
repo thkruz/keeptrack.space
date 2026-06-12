@@ -9,7 +9,9 @@
       },
       "toolbar": {
         "fetchData": "데이터 가져오기",
-        "refresh": "새로 고침"
+        "refresh": "새로 고침",
+        "flyToCorridor": "회랑으로 이동",
+        "flyToCorridorTooltip": "활성화하면 TIP 행을 클릭할 때 카메라가 물체를 따라가는 대신 지구본의 예측 재진입 회랑으로 이동합니다."
       },
       "table": {
         "norad": "NORAD",

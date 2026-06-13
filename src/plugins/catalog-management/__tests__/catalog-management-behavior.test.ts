@@ -100,7 +100,7 @@ describe('CatalogManagementPlugin behavior', () => {
     const csvSpy = vi.spyOn(CatalogExporter, 'exportTle2Csv').mockImplementation(() => undefined);
 
     p().initExportHandlers_();
-    getEl('de-export-tle-2a')!.dispatchEvent(new Event('click'));
+    getEl('de-export-tle')!.dispatchEvent(new Event('click'));
     getEl('de-export-csv')!.dispatchEvent(new Event('click'));
 
     expect(txtSpy).toHaveBeenCalled();

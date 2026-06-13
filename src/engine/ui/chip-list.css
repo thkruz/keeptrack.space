@@ -1,0 +1,63 @@
+/**
+ * Styling for the generic ChipList primitive (engine/ui/chip-list.ts).
+ * Themed with the shared dark-mode CSS variables so it blends into any menu.
+ */
+
+.kt-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  min-height: 28px;
+}
+
+.kt-chip-empty {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--color-dark-text-muted, rgba(255, 255, 255, 0.5));
+}
+
+.kt-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  padding: 2px 4px 2px 10px;
+  border: 1px solid var(--color-dark-border, rgba(255, 255, 255, 0.25));
+  border-radius: 14px;
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--color-dark-text-accent, #fff);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.kt-chip-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kt-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-dark-text-accent, #fff);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.kt-chip-remove:hover,
+.kt-chip-remove:focus {
+  opacity: 1;
+  background-color: var(--color-primary, #1e88e5);
+  outline: none;
+}

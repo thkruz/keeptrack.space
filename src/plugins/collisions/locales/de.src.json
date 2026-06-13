@@ -30,6 +30,10 @@
       "errorMsgs": {
         "noCollisionsData": "Keine Kollisionsdaten gefunden!",
         "errorProcessingCollisions": "Fehler bei der Verarbeitung der SOCRATES-Daten!"
+      },
+      "labels": {
+        "dataActions": "Konjunktionsdaten",
+        "results": "Bevorstehende Konjunktionen"
       }
     }
   }

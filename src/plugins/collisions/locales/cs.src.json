@@ -30,6 +30,10 @@
       "errorMsgs": {
         "noCollisionsData": "Nebyla nalezena žádná data o kolizích!",
         "errorProcessingCollisions": "Chyba při zpracování dat SOCRATES!"
+      },
+      "labels": {
+        "dataActions": "Data o konjunkcích",
+        "results": "Nadcházející konjunkce"
       }
     }
   }

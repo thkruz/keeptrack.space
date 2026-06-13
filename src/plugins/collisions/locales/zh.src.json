@@ -30,6 +30,10 @@
       "errorMsgs": {
         "noCollisionsData": "未找到碰撞数据！",
         "errorProcessingCollisions": "处理SOCRATES数据时出错！"
+      },
+      "labels": {
+        "dataActions": "交会数据",
+        "results": "即将发生的交会"
       }
     }
   }

@@ -30,6 +30,10 @@
       "errorMsgs": {
         "noCollisionsData": "衝突データが見つかりません！",
         "errorProcessingCollisions": "SOCRATESデータの処理中にエラーが発生しました！"
+      },
+      "labels": {
+        "dataActions": "接近データ",
+        "results": "今後の接近"
       }
     }
   }

@@ -30,6 +30,10 @@
       "errorMsgs": {
         "noCollisionsData": "Nie znaleziono danych o kolizjach!",
         "errorProcessingCollisions": "Błąd przetwarzania danych SOCRATES!"
+      },
+      "labels": {
+        "dataActions": "Dane o koniunkcjach",
+        "results": "Nadchodzące koniunkcje"
       }
     }
   }

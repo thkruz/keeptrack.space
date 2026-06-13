@@ -30,6 +30,10 @@
       "errorMsgs": {
         "noCollisionsData": "¡No se encontraron datos de colisión!",
         "errorProcessingCollisions": "¡Error al procesar los datos de SOCRATES!"
+      },
+      "labels": {
+        "dataActions": "Datos de conjunción",
+        "results": "Conjunciones próximas"
       }
     }
   }

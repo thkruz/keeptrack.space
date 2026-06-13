@@ -30,6 +30,10 @@
       "errorMsgs": {
         "noCollisionsData": "Nessun dato sulle collisioni trovato!",
         "errorProcessingCollisions": "Errore nell'elaborazione dei dati SOCRATES!"
+      },
+      "labels": {
+        "dataActions": "Dati di congiunzione",
+        "results": "Congiunzioni imminenti"
       }
     }
   }

@@ -30,6 +30,10 @@
       "errorMsgs": {
         "noCollisionsData": "Данные о столкновениях не найдены!",
         "errorProcessingCollisions": "Ошибка обработки данных SOCRATES!"
+      },
+      "labels": {
+        "dataActions": "Данные о сближениях",
+        "results": "Предстоящие сближения"
       }
     }
   }

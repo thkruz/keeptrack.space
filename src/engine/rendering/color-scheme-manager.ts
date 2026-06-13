@@ -189,6 +189,13 @@ export class ColorSchemeManager {
         return;
       }
 
+      // Periodic recolors are suppressed during a multi-frame offscreen capture
+      // so they cannot overwrite the capture's photometric colors. Forced
+      // recolors still run - state restoration after a capture relies on them.
+      if (!isForceRecolor && ServiceLocator.getRenderer()?.isCapturing) {
+        return;
+      }
+
       // In worker mode, delegate to the color worker instead of running main-thread loop
       if (this.useWorkerMode_ && this.colorCruncher_) {
         if (isForceRecolor) {
@@ -351,6 +358,13 @@ export class ColorSchemeManager {
     // Handle color buffer results from worker
     EventBus.getInstance().on(EventBusEvent.onColorBufferReady, () => {
       if (!this.colorCruncher_) {
+        return;
+      }
+
+      // During a multi-frame offscreen capture the capture owns colorData
+      // (photometric colors); applying a worker result would overwrite them
+      // mid-exposure. Drop it - the next result after captureEnd lands normally.
+      if (ServiceLocator.getRenderer()?.isCapturing) {
         return;
       }
       const data = this.colorCruncher_.consumeColorData();
@@ -969,6 +983,14 @@ export class ColorSchemeManager {
     for (let i = 0; i < n; i++) {
       this.colorData[i * 4 + 3] *= this.fovFadeAlpha_[i];
     }
+  }
+
+  /**
+   * Re-upload colorData to the GPU after an external system wrote per-object
+   * colors directly (e.g. the optical-simulation capture's photometric pass).
+   */
+  uploadColorDataToGpu(): void {
+    this.sendColorBufferToGpu();
   }
 
   /**

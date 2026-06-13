@@ -135,7 +135,9 @@ export class Engine {
 
     this.lastFrameTime_ = timestamp;
 
-    if (!this.isPaused && this.application_.isReady) {
+    // Stand down while a plugin runs a multi-frame offscreen capture — the capture
+    // drives renderer.update()/render() itself and owns camera, FOV, and time state.
+    if (!this.isPaused && !this.renderer.isCapturing && this.application_.isReady) {
       this.update_(dt); // Do any per frame calculations
       this.draw_(dt);
     }

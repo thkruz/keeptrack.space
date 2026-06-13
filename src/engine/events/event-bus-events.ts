@@ -50,6 +50,16 @@ export enum EventBusEvent {
   altCanvasResize = 'altCanvasResize',
   endOfDraw = 'endOfDraw',
   /**
+   * Emitted when a multi-frame offscreen capture begins (renderer.isCapturing is true).
+   * Systems that mutate camera, time, or position buffers should stand down until captureEnd.
+   */
+  captureStart = 'captureStart',
+  /**
+   * Emitted after a multi-frame offscreen capture finishes and renderer state is restored
+   * (renderer.isCapturing is false again).
+   */
+  captureEnd = 'captureEnd',
+  /**
    * Run in the updateWatchlist method of CatalogManager instance with parameters (watchlist: number[])
    */
   onWatchlistUpdated = 'onWatchlistUpdated',

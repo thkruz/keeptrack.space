@@ -823,6 +823,14 @@ export class DotsManager {
    * @param mData The data received from the SatCruncher worker.
    */
   updateCruncherBuffers(mData: SatCruncherMessageData) {
+    // During a multi-frame offscreen capture the capture loop hand-propagates
+    // positionData per frame; applying a cruncher message here would overwrite
+    // those positions (and FOV/sun state) mid-exposure. Drop the message — the
+    // cruncher keeps sending and the next message after captureEnd lands normally.
+    if (ServiceLocator.getRenderer()?.isCapturing) {
+      return;
+    }
+
     if (typeof mData.gmst === 'number') {
       this.cruncherGmst = mData.gmst;
     }

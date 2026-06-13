@@ -2,13 +2,14 @@
   "plugins": {
     "BestPassPlugin": {
       "bottomIconLabel": "Nejlepší průlety",
-      "title": "Časy nejlepších průletů",
+      "title": "Nejlepší průlety",
       "satelliteNumbersLabel": "Čísla satelitů",
       "generateButton": "Generovat časy nejlepších průletů",
       "selectSensorFirst": "Nejprve vyberte senzor!",
       "errorMsgs": {
         "SensorRequired": "Nejprve musíte vybrat senzor!",
-        "SensorFormatError": "Formát senzoru je nesprávný. Vybrali jste senzor?"
+        "SensorFormatError": "Formát senzoru je nesprávný. Vybrali jste senzor?",
+        "ResultsTruncated": "Dosažen limit výsledků: zobrazí se pouze prvních {limit} přeletů na satelit."
       },
       "help": {
         "overview": "Časy nejlepších průletů ohodnotí každý nadcházející průlet satelitů ze zadaného seznamu nad aktuálně vybraným senzorem a uloží výsledky jako tabulku. Hodnocení zvýhodňuje dlouhou dobu trvání, vysokou maximální elevaci, krátkou vzdálenost a příznivou polohu Slunce, takže nejlepší pozorovací příležitosti vystoupají na vrchol.",

@@ -2,13 +2,14 @@
   "plugins": {
     "BestPassPlugin": {
       "bottomIconLabel": "Najlepsze przeloty",
-      "title": "Czasy najlepszych przelotów",
+      "title": "Najlepsze przeloty",
       "satelliteNumbersLabel": "Numery satelitów",
       "generateButton": "Generuj czasy najlepszych przelotów",
       "selectSensorFirst": "Najpierw wybierz czujnik!",
       "errorMsgs": {
         "SensorRequired": "Najpierw musisz wybrać czujnik!",
-        "SensorFormatError": "Nieprawidłowy format czujnika. Czy najpierw wybrałeś czujnik?"
+        "SensorFormatError": "Nieprawidłowy format czujnika. Czy najpierw wybrałeś czujnik?",
+        "ResultsTruncated": "Osiągnięto limit wyników: wyświetlono tylko pierwsze {limit} przelotów na satelitę."
       },
       "help": {
         "overview": "Czasy najlepszych przelotów oceniają każdy nadchodzący przelot wymienionych satelitów nad aktualnie wybranym czujnikiem i zapisują wyniki jako arkusz kalkulacyjny. Ocena premiuje długi czas trwania, wysoką maksymalną elewację, krótki zasięg i korzystną pozycję Słońca, dzięki czemu najlepsze okazje obserwacyjne trafiają na górę.",

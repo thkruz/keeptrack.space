@@ -2,13 +2,14 @@
   "plugins": {
     "BestPassPlugin": {
       "bottomIconLabel": "最適パス",
-      "title": "最適パス時刻",
+      "title": "最適パス",
       "satelliteNumbersLabel": "衛星番号",
       "generateButton": "最適パス時刻を生成",
       "selectSensorFirst": "先にセンサーを選択してください！",
       "errorMsgs": {
         "SensorRequired": "最初にセンサーを選択する必要があります！",
-        "SensorFormatError": "センサーの形式が正しくありません。センサーを選択しましたか？"
+        "SensorFormatError": "センサーの形式が正しくありません。センサーを選択しましたか？",
+        "ResultsTruncated": "結果の上限に達しました: 衛星ごとに最初の{limit}件のパスのみ表示されます。"
       },
       "help": {
         "overview": "最適パス時刻は、リストした衛星が現在選択中のセンサー上空を通過する今後のすべてのパスを採点し、結果をスプレッドシートとして保存します。スコアは長い持続時間、高い最大仰角、短い距離、好ましい太陽位置を高く評価するため、最良の観測機会が上位に並びます。",

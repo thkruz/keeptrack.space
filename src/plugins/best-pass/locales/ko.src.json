@@ -2,13 +2,14 @@
   "plugins": {
     "BestPassPlugin": {
       "bottomIconLabel": "최적 통과",
-      "title": "최적 통과 시간",
+      "title": "최적 통과",
       "satelliteNumbersLabel": "위성 번호",
       "generateButton": "최적 통과 시간 생성",
       "selectSensorFirst": "먼저 센서를 선택하세요!",
       "errorMsgs": {
         "SensorRequired": "먼저 센서를 선택해야 합니다!",
-        "SensorFormatError": "센서 형식이 올바르지 않습니다. 센서를 선택하셨나요?"
+        "SensorFormatError": "센서 형식이 올바르지 않습니다. 센서를 선택하셨나요?",
+        "ResultsTruncated": "결과 한도에 도달했습니다: 위성당 처음 {limit}개의 패스만 표시됩니다."
       },
       "help": {
         "overview": "최적 통과 시간은 입력한 위성들이 현재 선택된 센서 위를 지나는 모든 향후 통과에 점수를 매기고 결과를 스프레드시트로 저장합니다. 점수는 긴 지속 시간, 높은 최대 앙각, 짧은 거리, 유리한 태양 위치에 가중치를 두므로 가장 좋은 관측 기회가 상위에 오릅니다.",

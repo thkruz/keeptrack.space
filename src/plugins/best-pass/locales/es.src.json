@@ -2,13 +2,14 @@
   "plugins": {
     "BestPassPlugin": {
       "bottomIconLabel": "Mejores pases",
-      "title": "Mejores tiempos de pase",
+      "title": "Mejores pases",
       "satelliteNumbersLabel": "Números de satélite",
       "generateButton": "Generar mejores tiempos de pase",
       "selectSensorFirst": "¡Seleccione sensor primero!",
       "errorMsgs": {
         "SensorRequired": "¡Debe seleccionar un sensor primero!",
-        "SensorFormatError": "Formato del sensor incorrecto. ¿Seleccionó un sensor primero?"
+        "SensorFormatError": "Formato del sensor incorrecto. ¿Seleccionó un sensor primero?",
+        "ResultsTruncated": "Límite de resultados alcanzado: solo se muestran los primeros {limit} pases por satélite."
       },
       "help": {
         "overview": "Mejores tiempos de pase puntúa cada pase próximo de los satélites que indique sobre el sensor actualmente seleccionado y guarda los resultados en una hoja de cálculo. La puntuación premia la larga duración, la elevación máxima alta, el alcance corto y una posición del sol favorable, de modo que las mejores oportunidades de observación quedan arriba.",

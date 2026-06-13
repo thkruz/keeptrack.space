@@ -2,13 +2,14 @@
   "plugins": {
     "BestPassPlugin": {
       "bottomIconLabel": "最佳过境",
-      "title": "最佳过境时间",
+      "title": "最佳过境",
       "satelliteNumbersLabel": "卫星编号",
       "generateButton": "生成最佳过境时间",
       "selectSensorFirst": "请先选择传感器！",
       "errorMsgs": {
         "SensorRequired": "您必须先选择一个传感器！",
-        "SensorFormatError": "传感器格式不正确。您是否先选择了传感器？"
+        "SensorFormatError": "传感器格式不正确。您是否先选择了传感器？",
+        "ResultsTruncated": "已达到结果上限：每颗卫星仅显示前 {limit} 次过境。"
       },
       "help": {
         "overview": "最佳过境时间会对您列出的卫星在当前选定传感器上空的每次即将到来的过境进行评分，并将结果保存为电子表格。评分偏好长持续时间、高最大仰角、短距离和有利的太阳位置，因此最佳观测机会会排在前面。",

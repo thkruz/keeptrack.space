@@ -2,13 +2,14 @@
   "plugins": {
     "BestPassPlugin": {
       "bottomIconLabel": "Beste Überflüge",
-      "title": "Beste Überflugzeiten",
+      "title": "Beste Überflüge",
       "satelliteNumbersLabel": "Satellitennummern",
       "generateButton": "Beste Überflugzeiten berechnen",
       "selectSensorFirst": "Sensor zuerst auswählen!",
       "errorMsgs": {
         "SensorRequired": "Sie müssen zuerst einen Sensor auswählen!",
-        "SensorFormatError": "Sensorformat falsch. Haben Sie einen Sensor ausgewählt?"
+        "SensorFormatError": "Sensorformat falsch. Haben Sie einen Sensor ausgewählt?",
+        "ResultsTruncated": "Ergebnislimit erreicht: Es werden nur die ersten {limit} Überflüge pro Satellit angezeigt."
       },
       "help": {
         "overview": "Beste Überflugzeiten bewertet jeden bevorstehenden Überflug der von Ihnen aufgelisteten Satelliten über den aktuell ausgewählten Sensor und speichert die Ergebnisse als Tabelle. Die Bewertung belohnt lange Dauer, hohe maximale Elevation, kurze Entfernung und eine günstige Sonnenposition, sodass die besten Beobachtungsgelegenheiten ganz oben landen.",

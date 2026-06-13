@@ -2,13 +2,14 @@
   "plugins": {
     "BestPassPlugin": {
       "bottomIconLabel": "Migliori passaggi",
-      "title": "Orari migliori passaggi",
+      "title": "Migliori passaggi",
       "satelliteNumbersLabel": "Numeri satellite",
       "generateButton": "Genera orari migliori passaggi",
       "selectSensorFirst": "Seleziona prima un sensore!",
       "errorMsgs": {
         "SensorRequired": "Devi prima selezionare un sensore!",
-        "SensorFormatError": "Formato del sensore non corretto. Hai selezionato un sensore?"
+        "SensorFormatError": "Formato del sensore non corretto. Hai selezionato un sensore?",
+        "ResultsTruncated": "Limite dei risultati raggiunto: vengono mostrati solo i primi {limit} passaggi per satellite."
       },
       "help": {
         "overview": "Orari migliori passaggi assegna un punteggio a ogni passaggio imminente dei satelliti elencati sopra il sensore attualmente selezionato e salva i risultati in un foglio di calcolo. Il punteggio premia la lunga durata, l'elevazione massima alta, la distanza ridotta e una posizione del sole favorevole, così le migliori opportunità di osservazione emergono in cima.",

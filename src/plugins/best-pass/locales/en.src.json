@@ -2,13 +2,14 @@
   "plugins": {
     "BestPassPlugin": {
       "bottomIconLabel": "Best Passes",
-      "title": "Best Pass Times",
+      "title": "Best Passes",
       "satelliteNumbersLabel": "Satellite Numbers",
       "generateButton": "Generate Best Pass Times",
       "selectSensorFirst": "Select Sensor First!",
       "errorMsgs": {
         "SensorRequired": "You must select a sensor first!",
-        "SensorFormatError": "Sensor's format incorrect. Did you select a sensor first?"
+        "SensorFormatError": "Sensor's format incorrect. Did you select a sensor first?",
+        "ResultsTruncated": "Result limit reached: only the first {limit} passes per satellite are shown."
       },
       "help": {
         "overview": "Best Pass Times scores every upcoming pass of the satellites you list over the currently selected sensor and saves the results as a spreadsheet. The score rewards long duration, high maximum elevation, short range, and favorable sun position, so the best observation opportunities rise to the top.",

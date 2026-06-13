@@ -2,13 +2,14 @@
   "plugins": {
     "BestPassPlugin": {
       "bottomIconLabel": "Meilleurs passages",
-      "title": "Meilleurs temps de passage",
+      "title": "Meilleurs passages",
       "satelliteNumbersLabel": "Numéros de satellite",
       "generateButton": "Générer les meilleurs temps de passage",
       "selectSensorFirst": "Sélectionnez d'abord un capteur !",
       "errorMsgs": {
         "SensorRequired": "Vous devez d'abord sélectionner un capteur !",
-        "SensorFormatError": "Format du capteur incorrect. Avez-vous sélectionné un capteur ?"
+        "SensorFormatError": "Format du capteur incorrect. Avez-vous sélectionné un capteur ?",
+        "ResultsTruncated": "Limite de résultats atteinte : seuls les {limit} premiers passages par satellite sont affichés."
       },
       "help": {
         "overview": "Meilleurs temps de passage note chaque passage à venir des satellites que vous indiquez au-dessus du capteur actuellement sélectionné et enregistre les résultats dans une feuille de calcul. Le score favorise une longue durée, une élévation maximale élevée, une distance courte et une position du soleil favorable, de sorte que les meilleures opportunités d'observation remontent en tête.",

@@ -98,9 +98,6 @@
     "SatelliteViewPlugin": {
       "bottomIconLabel": "卫星视图"
     },
-    "Planetarium": {
-      "bottomIconLabel": "天文馆视图"
-    },
     "NightToggle": {
       "bottomIconLabel": "夜间切换"
     },
@@ -112,9 +109,6 @@
     },
     "ScreenRecorder": {
       "bottomIconLabel": "录制视频"
-    },
-    "Astronomy": {
-      "bottomIconLabel": "天文"
     },
     "GraphicsMenuPlugin": {
       "bottomIconLabel": "图形菜单",

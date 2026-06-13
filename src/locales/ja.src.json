@@ -98,9 +98,6 @@
     "SatelliteViewPlugin": {
       "bottomIconLabel": "衛星ビュー"
     },
-    "Planetarium": {
-      "bottomIconLabel": "プラネタリウムビュー"
-    },
     "NightToggle": {
       "bottomIconLabel": "夜間表示切替"
     },
@@ -112,9 +109,6 @@
     },
     "ScreenRecorder": {
       "bottomIconLabel": "動画を録画"
-    },
-    "Astronomy": {
-      "bottomIconLabel": "天文学"
     },
     "GraphicsMenuPlugin": {
       "bottomIconLabel": "グラフィックメニュー",

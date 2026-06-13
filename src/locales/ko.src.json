@@ -67,9 +67,6 @@
     "SatelliteViewPlugin": {
       "bottomIconLabel": "위성 뷰"
     },
-    "Planetarium": {
-      "bottomIconLabel": "플라네타리움 뷰"
-    },
     "NightToggle": {
       "bottomIconLabel": "야간 토글"
     },
@@ -81,9 +78,6 @@
     },
     "ScreenRecorder": {
       "bottomIconLabel": "비디오 녹화"
-    },
-    "Astronomy": {
-      "bottomIconLabel": "천문학"
     },
     "GraphicsMenuPlugin": {
       "bottomIconLabel": "그래픽 메뉴",

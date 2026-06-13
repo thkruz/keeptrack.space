@@ -67,9 +67,6 @@
     "SatelliteViewPlugin": {
       "bottomIconLabel": "Вид спутника"
     },
-    "Planetarium": {
-      "bottomIconLabel": "Вид планетария"
-    },
     "NightToggle": {
       "bottomIconLabel": "Переключение ночи"
     },
@@ -81,9 +78,6 @@
     },
     "ScreenRecorder": {
       "bottomIconLabel": "Записать видео"
-    },
-    "Astronomy": {
-      "bottomIconLabel": "Астрономия"
     },
     "GraphicsMenuPlugin": {
       "bottomIconLabel": "Меню графики",

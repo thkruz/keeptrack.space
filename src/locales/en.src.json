@@ -67,9 +67,6 @@
     "SatelliteViewPlugin": {
       "bottomIconLabel": "Satellite View"
     },
-    "Planetarium": {
-      "bottomIconLabel": "Planetarium View"
-    },
     "NightToggle": {
       "bottomIconLabel": "Night Toggle"
     },
@@ -81,9 +78,6 @@
     },
     "ScreenRecorder": {
       "bottomIconLabel": "Record Video"
-    },
-    "Astronomy": {
-      "bottomIconLabel": "Astronomy"
     }
   },
   "pluginDrawer": {

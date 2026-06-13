@@ -117,7 +117,7 @@
     },
     "LookAnglesPlugin": {
       "bottomIconLabel": "Úhly pohledu",
-      "title": "Menu úhlů pohledu",
+      "title": "Úhly pohledu",
       "settings": {
         "showRiseSetOnly": "Zobrazit pouze časy východu a západu",
         "calculationLength": "Délka výpočtu (dny)",
@@ -151,9 +151,9 @@
         "tip2": "Kliknutí na řádek zachová stav přehrávání, takže pozastavené hodiny zůstanou pozastavené i v novém čase."
       }
     },
-    "MultiSiteLookAnglesPlugin": {
-      "bottomIconLabel": "Pohledy z více míst",
-      "title": "Menu úhlů pohledu z více míst",
+    "MultiSensorLookAnglesPlugin": {
+      "bottomIconLabel": "Pohledy z více senzorů",
+      "title": "Úhly pohledu z více senzorů",
       "table": {
         "time": "Čas",
         "el": "El.",

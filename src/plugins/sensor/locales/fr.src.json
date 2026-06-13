@@ -117,7 +117,7 @@
     },
     "LookAnglesPlugin": {
       "bottomIconLabel": "Angles de visée",
-      "title": "Menu Angles de visée",
+      "title": "Angles de visée",
       "settings": {
         "showRiseSetOnly": "Afficher uniquement les heures de lever et de coucher",
         "calculationLength": "Durée du calcul (jours)",
@@ -151,9 +151,9 @@
         "tip2": "Cliquer sur une ligne préserve votre état de lecture, de sorte qu'une horloge en pause reste en pause à la nouvelle heure."
       }
     },
-    "MultiSiteLookAnglesPlugin": {
-      "bottomIconLabel": "Angles multi-sites",
-      "title": "Menu Angles multi-sites",
+    "MultiSensorLookAnglesPlugin": {
+      "bottomIconLabel": "Multi-capteurs",
+      "title": "Angles de visée multi-capteurs",
       "table": {
         "time": "Heure",
         "el": "Élév.",

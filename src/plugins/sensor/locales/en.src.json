@@ -117,7 +117,7 @@
     },
     "LookAnglesPlugin": {
       "bottomIconLabel": "Look Angles",
-      "title": "Look Angles Menu",
+      "title": "Look Angles",
       "settings": {
         "showRiseSetOnly": "Show Only Rise and Set Times",
         "calculationLength": "Calculation Length (Days)",
@@ -151,9 +151,9 @@
         "tip2": "Clicking a row preserves your playback state, so a paused clock stays paused at the new time."
       }
     },
-    "MultiSiteLookAnglesPlugin": {
-      "bottomIconLabel": "Multi-Site Looks",
-      "title": "Multi-Site Look Angles Menu",
+    "MultiSensorLookAnglesPlugin": {
+      "bottomIconLabel": "Multi-Sensor Looks",
+      "title": "Multi-Sensor Look Angles",
       "table": {
         "time": "Time",
         "el": "El",

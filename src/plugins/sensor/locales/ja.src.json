@@ -117,7 +117,7 @@
     },
     "LookAnglesPlugin": {
       "bottomIconLabel": "視線角度",
-      "title": "視線角度メニュー",
+      "title": "視線角度",
       "settings": {
         "showRiseSetOnly": "上昇・下降時刻のみ表示",
         "calculationLength": "計算期間（日）",
@@ -151,9 +151,9 @@
         "tip2": "行をクリックしても再生状態は保持されるため、一時停止中の時計は新しい時刻でも一時停止のままです。"
       }
     },
-    "MultiSiteLookAnglesPlugin": {
-      "bottomIconLabel": "マルチサイト視線",
-      "title": "マルチサイト視線角度メニュー",
+    "MultiSensorLookAnglesPlugin": {
+      "bottomIconLabel": "マルチセンサー視線",
+      "title": "マルチセンサー視線角度",
       "table": {
         "time": "時刻",
         "el": "仰角",

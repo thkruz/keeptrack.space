@@ -117,7 +117,7 @@
     },
     "LookAnglesPlugin": {
       "bottomIconLabel": "Blickwinkel",
-      "title": "Blickwinkel-Menü",
+      "title": "Blickwinkel",
       "settings": {
         "showRiseSetOnly": "Nur Auf- und Untergangszeiten anzeigen",
         "calculationLength": "Berechnungsdauer (Tage)",
@@ -151,9 +151,9 @@
         "tip2": "Das Klicken auf eine Zeile bewahrt Ihren Wiedergabestatus: Eine pausierte Uhr bleibt auch zur neuen Zeit pausiert."
       }
     },
-    "MultiSiteLookAnglesPlugin": {
-      "bottomIconLabel": "Multi-Standort-Blickwinkel",
-      "title": "Multi-Standort-Blickwinkel-Menü",
+    "MultiSensorLookAnglesPlugin": {
+      "bottomIconLabel": "Multi-Sensor-Blickwinkel",
+      "title": "Multi-Sensor-Blickwinkel",
       "table": {
         "time": "Zeit",
         "el": "El.",

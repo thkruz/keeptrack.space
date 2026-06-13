@@ -117,7 +117,7 @@
     },
     "LookAnglesPlugin": {
       "bottomIconLabel": "Ángulos de Visión",
-      "title": "Menú de Ángulos de Visión",
+      "title": "Ángulos de Visión",
       "settings": {
         "showRiseSetOnly": "Mostrar Solo Tiempos de Salida y Puesta",
         "calculationLength": "Duración del Cálculo (Días)",
@@ -151,9 +151,9 @@
         "tip2": "Hacer clic en una fila conserva tu estado de reproducción, de modo que un reloj en pausa permanece en pausa en la nueva hora."
       }
     },
-    "MultiSiteLookAnglesPlugin": {
-      "bottomIconLabel": "Vistas Multi-Sitio",
-      "title": "Menú de Ángulos de Visión Multi-Sitio",
+    "MultiSensorLookAnglesPlugin": {
+      "bottomIconLabel": "Vistas Multisensor",
+      "title": "Ángulos de Visión Multisensor",
       "table": {
         "time": "Hora",
         "el": "El.",

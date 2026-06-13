@@ -117,7 +117,7 @@
     },
     "LookAnglesPlugin": {
       "bottomIconLabel": "Angoli di osservazione",
-      "title": "Menu angoli di osservazione",
+      "title": "Angoli di osservazione",
       "settings": {
         "showRiseSetOnly": "Mostra solo gli orari di sorgere e tramonto",
         "calculationLength": "Durata del calcolo (giorni)",
@@ -151,9 +151,9 @@
         "tip2": "Fare clic su una riga preserva lo stato di riproduzione, quindi un orologio in pausa rimane in pausa al nuovo orario."
       }
     },
-    "MultiSiteLookAnglesPlugin": {
-      "bottomIconLabel": "Osservazione multi-sito",
-      "title": "Menu angoli di osservazione multi-sito",
+    "MultiSensorLookAnglesPlugin": {
+      "bottomIconLabel": "Osservazione multi-sensore",
+      "title": "Angoli di osservazione multi-sensore",
       "table": {
         "time": "Ora",
         "el": "El.",

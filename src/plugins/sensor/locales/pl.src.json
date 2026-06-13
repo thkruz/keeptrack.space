@@ -117,7 +117,7 @@
     },
     "LookAnglesPlugin": {
       "bottomIconLabel": "Kąty obserwacji",
-      "title": "Menu kątów obserwacji",
+      "title": "Kąty obserwacji",
       "settings": {
         "showRiseSetOnly": "Pokaż tylko czasy wschodu i zachodu",
         "calculationLength": "Długość obliczeń (dni)",
@@ -151,9 +151,9 @@
         "tip2": "Kliknięcie wiersza zachowuje stan odtwarzania, więc wstrzymany zegar pozostaje wstrzymany w nowym czasie."
       }
     },
-    "MultiSiteLookAnglesPlugin": {
-      "bottomIconLabel": "Obserwacje wielostanowiskowe",
-      "title": "Menu wielostanowiskowych kątów obserwacji",
+    "MultiSensorLookAnglesPlugin": {
+      "bottomIconLabel": "Obserwacje wieloczujnikowe",
+      "title": "Wieloczujnikowe kąty obserwacji",
       "table": {
         "time": "Czas",
         "el": "El.",

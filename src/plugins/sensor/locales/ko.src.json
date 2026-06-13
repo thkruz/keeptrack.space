@@ -117,7 +117,7 @@
     },
     "LookAnglesPlugin": {
       "bottomIconLabel": "관측각",
-      "title": "관측각 메뉴",
+      "title": "관측각",
       "settings": {
         "showRiseSetOnly": "상승 및 하강 시간만 표시",
         "calculationLength": "계산 기간 (일)",
@@ -151,9 +151,9 @@
         "tip2": "행을 클릭해도 재생 상태가 유지되므로, 일시 정지된 시계는 새 시간에서도 일시 정지 상태로 남습니다."
       }
     },
-    "MultiSiteLookAnglesPlugin": {
-      "bottomIconLabel": "다중 사이트 관측각",
-      "title": "다중 사이트 관측각 메뉴",
+    "MultiSensorLookAnglesPlugin": {
+      "bottomIconLabel": "다중 센서 관측각",
+      "title": "다중 센서 관측각",
       "table": {
         "time": "시간",
         "el": "고도각",

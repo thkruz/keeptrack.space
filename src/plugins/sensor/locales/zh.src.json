@@ -117,7 +117,7 @@
     },
     "LookAnglesPlugin": {
       "bottomIconLabel": "观测角",
-      "title": "观测角菜单",
+      "title": "观测角",
       "settings": {
         "showRiseSetOnly": "仅显示升起和落下时间",
         "calculationLength": "计算时长（天）",
@@ -151,9 +151,9 @@
         "tip2": "点击行会保留您的播放状态，因此暂停的时钟在新时间点仍保持暂停。"
       }
     },
-    "MultiSiteLookAnglesPlugin": {
-      "bottomIconLabel": "多站观测",
-      "title": "多站观测角菜单",
+    "MultiSensorLookAnglesPlugin": {
+      "bottomIconLabel": "多传感器观测",
+      "title": "多传感器观测角",
       "table": {
         "time": "时间",
         "el": "仰角",

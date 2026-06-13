@@ -117,7 +117,7 @@
     },
     "LookAnglesPlugin": {
       "bottomIconLabel": "Кути огляду",
-      "title": "Меню кутів огляду",
+      "title": "Кути огляду",
       "settings": {
         "showRiseSetOnly": "Показувати лише часи сходу та заходу",
         "calculationLength": "Тривалість розрахунку (дні)",
@@ -151,9 +151,9 @@
         "tip2": "Клацання по рядку зберігає стан відтворення, тож призупинений годинник залишається призупиненим у новому часі."
       }
     },
-    "MultiSiteLookAnglesPlugin": {
-      "bottomIconLabel": "Багатосайтові кути",
-      "title": "Меню багатосайтових кутів огляду",
+    "MultiSensorLookAnglesPlugin": {
+      "bottomIconLabel": "Багатосенсорні кути",
+      "title": "Багатосенсорні кути огляду",
       "table": {
         "time": "Час",
         "el": "Підн.",

@@ -11,17 +11,23 @@
         "dropzone": "Suelte un archivo .tce, .tle o .txt para cargar el catálogo",
         "keepSatInfo": "Conservar información de satélites",
         "keepSatInfoTooltip": "Actualiza los TLE de los satélites existentes conservando su nombre, país y datos de misión. Los satélites que no estén en el archivo importado se eliminan.",
-        "catalogExports": "Exportaciones de catálogo",
-        "satelliteEphemeris": "Efemérides del satélite",
+        "orbitalElements": "Elementos orbitales",
+        "tabularStk": "Tabular y STK",
+        "selectedSatellite": "Satélite seleccionado",
+        "tleSource": "Fuente",
+        "tleFormat": "Formato",
         "timeSpanHrs": "Intervalo de tiempo (h)",
         "stepSizeSec": "Tamaño de paso (s)"
       },
+      "options": {
+        "sourceOfficial": "Oficial",
+        "sourceKeepTrack": "KeepTrack",
+        "format2": "2 líneas (TLE)",
+        "format3": "3 líneas (con nombre)"
+      },
       "buttons": {
         "importCatalog": "Importar catálogo",
-        "exportOfficialTles": "Exportar TLE oficiales",
-        "exportOfficial3les": "Exportar 3LE oficiales",
-        "exportKeepTrackTles": "Exportar TLE de KeepTrack",
-        "exportKeepTrack3les": "Exportar 3LE de KeepTrack",
+        "downloadTle": "Exportar formato TLE",
         "exportCatalogXlsx": "Exportar catálogo XLSX",
         "exportStkTce": "Exportar STK .tce",
         "exportSatsInFov": "Exportar satélites en FOV",
@@ -35,8 +41,8 @@
         "importHeading": "Importación",
         "import": "Cargue un archivo <strong>.tce</strong>, <strong>.tle</strong> o <strong>.txt</strong> con el botón <strong>Importar catálogo</strong> o arrastrando el archivo a la zona de soltado. Con <strong>Conservar información de satélites</strong> activado, los satélites existentes conservan sus nombres, países y datos de misión y solo se actualizan sus órbitas; los satélites ausentes del archivo se eliminan. Desactivado, el archivo reemplaza el catálogo por completo.",
         "exportHeading": "Exportación",
-        "export": "<ul><li><strong>Exportar TLE / 3LE oficiales</strong>: solo objetos catalogados reales, como conjuntos de elementos de dos o tres líneas.</li><li><strong>Exportar TLE / 3LE de KeepTrack</strong>: todo lo de la sesión, incluidos los satélites de analista que haya creado.</li><li><strong>Exportar catálogo XLSX</strong>: el catálogo completo como hoja de cálculo.</li><li><strong>Exportar STK .tce</strong>: el catálogo en el formato de base de datos de satélites de STK.</li><li><strong>Exportar satélites en FOV</strong>: solo los objetos que están actualmente dentro del campo de visión del sensor seleccionado.</li><li><strong>Exportar efemérides .e</strong>: efemérides STK propagadas para el satélite seleccionado, usando el <strong>Intervalo de tiempo (h)</strong> y el <strong>Tamaño de paso (s)</strong> configurados.</li></ul>",
-        "howToUse": "<ol><li>Abra <strong>Gestión de catálogo</strong> desde la barra inferior (modo Herramientas).</li><li>Para importar: elija la pestaña <strong>Importar</strong>, decida si conservar la información de los satélites y luego seleccione o suelte un archivo.</li><li>Para exportar: elija la pestaña <strong>Exportar</strong> y haga clic en el formato que necesite; los archivos se descargan de inmediato.</li><li>Para unas efemérides, seleccione primero un satélite; el botón permanece desactivado hasta que haya uno seleccionado.</li></ol>",
+        "export": "<ul><li><strong>Elementos orbitales</strong>: descargue conjuntos de elementos TLE/3LE. Elija una <strong>Fuente</strong> (Oficial conserva solo objetos catalogados reales; KeepTrack incluye los satélites de analista que haya creado) y un <strong>Formato</strong> (2 líneas, o 3 líneas con el nombre del satélite), y luego <strong>Descargar TLE</strong>.</li><li><strong>Tabular y STK</strong>: exporte el catálogo completo como hoja de cálculo XLSX, una base de datos STK .tce, o solo los satélites que están actualmente dentro del campo de visión del sensor seleccionado.</li><li><strong>Satélite seleccionado</strong>: con un satélite seleccionado, escriba unas efemérides STK .e propagadas usando el <strong>Intervalo de tiempo (h)</strong> y el <strong>Tamaño de paso (s)</strong> configurados.</li></ul>",
+        "howToUse": "<ol><li>Abra <strong>Gestión de catálogo</strong> desde la barra inferior (modo Herramientas).</li><li>Para importar: elija la pestaña <strong>Importar</strong>, decida si conservar la información de los satélites y luego seleccione o suelte un archivo.</li><li>Para exportar: elija la pestaña <strong>Exportar</strong>, configure las opciones y haga clic en la exportación que necesite; los archivos se descargan de inmediato.</li><li>Para exportaciones por satélite, seleccione primero un satélite; esos botones permanecen desactivados hasta que haya uno seleccionado.</li></ol>",
         "tip1": "Conservar información de satélites es la opción predeterminada segura al actualizar órbitas desde un archivo TLE más reciente; desactívela solo cuando reemplace deliberadamente todo el catálogo.",
         "tip2": "Las importaciones y ediciones solo existen en su sesión; exporte antes de recargar la página si desea conservarlas."
       }

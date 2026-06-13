@@ -11,17 +11,23 @@
         "dropzone": "Drop .tce, .tle, or .txt file to load catalog",
         "keepSatInfo": "Keep Satellite Information",
         "keepSatInfoTooltip": "Update TLEs for existing satellites while preserving name, country, and mission data. Satellites not in the imported file are removed.",
-        "catalogExports": "Catalog Exports",
-        "satelliteEphemeris": "Satellite Ephemeris",
+        "orbitalElements": "Orbital Elements",
+        "tabularStk": "Tabular & STK",
+        "selectedSatellite": "Selected Satellite",
+        "tleSource": "Source",
+        "tleFormat": "Format",
         "timeSpanHrs": "Time Span (hrs)",
         "stepSizeSec": "Step Size (sec)"
       },
+      "options": {
+        "sourceOfficial": "Official",
+        "sourceKeepTrack": "KeepTrack",
+        "format2": "2-Line (TLE)",
+        "format3": "3-Line (with name)"
+      },
       "buttons": {
         "importCatalog": "Import Catalog",
-        "exportOfficialTles": "Export Official TLEs",
-        "exportOfficial3les": "Export Official 3LEs",
-        "exportKeepTrackTles": "Export KeepTrack TLEs",
-        "exportKeepTrack3les": "Export KeepTrack 3LEs",
+        "downloadTle": "Export TLE Format",
         "exportCatalogXlsx": "Export Catalog XLSX",
         "exportStkTce": "Export STK .tce",
         "exportSatsInFov": "Export Satellites in FOV",
@@ -35,8 +41,8 @@
         "importHeading": "Importing",
         "import": "Load a <strong>.tce</strong>, <strong>.tle</strong>, or <strong>.txt</strong> file with the <strong>Import Catalog</strong> button or by dragging the file onto the drop zone. With <strong>Keep Satellite Information</strong> enabled, existing satellites keep their names, countries, and mission data and only their orbits update; satellites missing from the file are removed. Disabled, the file replaces the catalog wholesale.",
         "exportHeading": "Exporting",
-        "export": "<ul><li><strong>Export Official TLEs / 3LEs</strong>: only real cataloged objects, as two or three line element sets.</li><li><strong>Export KeepTrack TLEs / 3LEs</strong>: everything in the session including analyst satellites you created.</li><li><strong>Export Catalog XLSX</strong>: the full catalog as a spreadsheet.</li><li><strong>Export STK .tce</strong>: the catalog in STK's satellite database format.</li><li><strong>Export Satellites in FOV</strong>: just the objects currently inside the selected sensor's field of view.</li><li><strong>Export .e Ephemeris</strong>: a propagated STK ephemeris for the selected satellite, using the <strong>Time Span (hrs)</strong> and <strong>Step Size (sec)</strong> you set.</li></ul>",
-        "howToUse": "<ol><li>Open <strong>Catalog Management</strong> from the bottom bar (Tools mode).</li><li>To import: pick the <strong>Import</strong> tab, choose whether to keep satellite information, then select or drop a file.</li><li>To export: pick the <strong>Export</strong> tab and click the format you need; files download immediately.</li><li>For an ephemeris, select a satellite first; the button stays disabled until one is selected.</li></ol>",
+        "export": "<ul><li><strong>Orbital Elements</strong>: download TLE/3LE element sets. Choose a <strong>Source</strong> (Official keeps only real cataloged objects; KeepTrack includes analyst satellites you created) and a <strong>Format</strong> (2-line, or 3-line with the satellite name), then <strong>Download TLE</strong>.</li><li><strong>Tabular &amp; STK</strong>: export the full catalog as an XLSX spreadsheet, an STK .tce database, or only the satellites currently inside the selected sensor's field of view.</li><li><strong>Selected Satellite</strong>: with a satellite selected, write a propagated STK .e ephemeris using the <strong>Time Span (hrs)</strong> and <strong>Step Size (sec)</strong> you set.</li></ul>",
+        "howToUse": "<ol><li>Open <strong>Catalog Management</strong> from the bottom bar (Tools mode).</li><li>To import: pick the <strong>Import</strong> tab, choose whether to keep satellite information, then select or drop a file.</li><li>To export: pick the <strong>Export</strong> tab, set any options, and click the export you need; files download immediately.</li><li>For per-satellite exports, select a satellite first; those buttons stay disabled until one is selected.</li></ol>",
         "tip1": "Keep Satellite Information is the safe default when refreshing orbits from a newer TLE file; turn it off only when deliberately swapping the whole catalog.",
         "tip2": "Imports and edits live only in your session; export before reloading the page if you want to keep them."
       }

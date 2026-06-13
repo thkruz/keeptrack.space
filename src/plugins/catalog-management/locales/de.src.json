@@ -11,17 +11,23 @@
         "dropzone": "Ziehen Sie eine .tce-, .tle- oder .txt-Datei hierher, um den Katalog zu laden",
         "keepSatInfo": "Satelliteninformationen beibehalten",
         "keepSatInfoTooltip": "Aktualisiert die TLEs vorhandener Satelliten und behält dabei Name, Land und Missionsdaten bei. Satelliten, die nicht in der importierten Datei enthalten sind, werden entfernt.",
-        "catalogExports": "Katalog-Exporte",
-        "satelliteEphemeris": "Satelliten-Ephemeride",
+        "orbitalElements": "Bahnelemente",
+        "tabularStk": "Tabellen & STK",
+        "selectedSatellite": "Ausgewählter Satellit",
+        "tleSource": "Quelle",
+        "tleFormat": "Format",
         "timeSpanHrs": "Zeitspanne (Std.)",
         "stepSizeSec": "Schrittweite (Sek.)"
       },
+      "options": {
+        "sourceOfficial": "Offiziell",
+        "sourceKeepTrack": "KeepTrack",
+        "format2": "2 Zeilen (TLE)",
+        "format3": "3 Zeilen (mit Name)"
+      },
       "buttons": {
         "importCatalog": "Katalog importieren",
-        "exportOfficialTles": "Offizielle TLEs exportieren",
-        "exportOfficial3les": "Offizielle 3LEs exportieren",
-        "exportKeepTrackTles": "KeepTrack-TLEs exportieren",
-        "exportKeepTrack3les": "KeepTrack-3LEs exportieren",
+        "downloadTle": "TLE-Format exportieren",
         "exportCatalogXlsx": "Katalog als XLSX exportieren",
         "exportStkTce": "STK .tce exportieren",
         "exportSatsInFov": "Satelliten im FOV exportieren",
@@ -35,8 +41,8 @@
         "importHeading": "Import",
         "import": "Laden Sie eine <strong>.tce</strong>-, <strong>.tle</strong>- oder <strong>.txt</strong>-Datei über die Schaltfläche <strong>Katalog importieren</strong> oder indem Sie die Datei auf die Ablagezone ziehen. Ist <strong>Satelliteninformationen beibehalten</strong> aktiviert, behalten vorhandene Satelliten ihre Namen, Länder und Missionsdaten und nur ihre Bahnen werden aktualisiert; Satelliten, die in der Datei fehlen, werden entfernt. Ist die Option deaktiviert, ersetzt die Datei den Katalog vollständig.",
         "exportHeading": "Export",
-        "export": "<ul><li><strong>Offizielle TLEs / 3LEs exportieren</strong>: nur echte katalogisierte Objekte als zwei- oder dreizeilige Elementsätze.</li><li><strong>KeepTrack-TLEs / 3LEs exportieren</strong>: alles in der Sitzung, einschließlich der von Ihnen erstellten Analystensatelliten.</li><li><strong>Katalog als XLSX exportieren</strong>: der vollständige Katalog als Tabellenkalkulation.</li><li><strong>STK .tce exportieren</strong>: der Katalog im Satellitendatenbankformat von STK.</li><li><strong>Satelliten im FOV exportieren</strong>: nur die Objekte, die sich aktuell im Sichtfeld des ausgewählten Sensors befinden.</li><li><strong>.e-Ephemeride exportieren</strong>: eine propagierte STK-Ephemeride für den ausgewählten Satelliten unter Verwendung der eingestellten <strong>Zeitspanne (Std.)</strong> und <strong>Schrittweite (Sek.)</strong>.</li></ul>",
-        "howToUse": "<ol><li>Öffnen Sie <strong>Katalogverwaltung</strong> über die untere Leiste (Modus Werkzeuge).</li><li>Zum Importieren: Wählen Sie den Tab <strong>Importieren</strong>, entscheiden Sie, ob Satelliteninformationen beibehalten werden sollen, und wählen Sie dann eine Datei aus oder ziehen Sie sie hinein.</li><li>Zum Exportieren: Wählen Sie den Tab <strong>Exportieren</strong> und klicken Sie auf das benötigte Format; die Dateien werden sofort heruntergeladen.</li><li>Für eine Ephemeride wählen Sie zuerst einen Satelliten aus; die Schaltfläche bleibt deaktiviert, bis einer ausgewählt ist.</li></ol>",
+        "export": "<ul><li><strong>Bahnelemente</strong>: TLE/3LE-Elementsätze herunterladen. Wählen Sie eine <strong>Quelle</strong> (Offiziell behält nur echte katalogisierte Objekte; KeepTrack schließt die von Ihnen erstellten Analystensatelliten ein) und ein <strong>Format</strong> (2 Zeilen oder 3 Zeilen mit Satellitennamen), und klicken Sie dann auf <strong>TLE herunterladen</strong>.</li><li><strong>Tabellen &amp; STK</strong>: den vollständigen Katalog als XLSX-Tabelle, als STK-.tce-Datenbank oder nur die Satelliten exportieren, die sich aktuell im Sichtfeld des ausgewählten Sensors befinden.</li><li><strong>Ausgewählter Satellit</strong>: Mit einem ausgewählten Satelliten eine propagierte STK-.e-Ephemeride unter Verwendung der eingestellten <strong>Zeitspanne (Std.)</strong> und <strong>Schrittweite (Sek.)</strong> schreiben.</li></ul>",
+        "howToUse": "<ol><li>Öffnen Sie <strong>Katalogverwaltung</strong> über die untere Leiste (Modus Werkzeuge).</li><li>Zum Importieren: Wählen Sie den Tab <strong>Importieren</strong>, entscheiden Sie, ob Satelliteninformationen beibehalten werden sollen, und wählen Sie dann eine Datei aus oder ziehen Sie sie hinein.</li><li>Zum Exportieren: Wählen Sie den Tab <strong>Exportieren</strong>, legen Sie die Optionen fest und klicken Sie auf den gewünschten Export; die Dateien werden sofort heruntergeladen.</li><li>Für Exporte einzelner Satelliten wählen Sie zuerst einen Satelliten aus; diese Schaltflächen bleiben deaktiviert, bis einer ausgewählt ist.</li></ol>",
         "tip1": "Satelliteninformationen beibehalten ist die sichere Standardeinstellung, wenn Bahnen aus einer neueren TLE-Datei aktualisiert werden; deaktivieren Sie die Option nur, wenn Sie bewusst den gesamten Katalog austauschen.",
         "tip2": "Importe und Änderungen bestehen nur in Ihrer Sitzung; exportieren Sie sie vor dem Neuladen der Seite, wenn Sie sie behalten möchten."
       }

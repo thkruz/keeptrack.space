@@ -341,6 +341,7 @@ export class WebpackManager {
           debrisScreeningWorker: ['./src/webworker/debrisScreeningWorker.ts'],
           fovPredictionWorker: ['./src/webworker/fovPredictionWorker.ts'],
           bestPassWorker: ['./src/webworker/bestPassWorker.ts'],
+          closeObjectsWorker: ['./src/webworker/closeObjectsWorker.ts'],
         },
         output: {
           filename: '[name].js',

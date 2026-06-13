@@ -36,9 +36,11 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
+import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
-import { eci2rae, Kilometers, MINUTES_PER_DAY, RaeVec3, Satellite, SatelliteRecord, TAU } from '@ootk/src/main';
+import { Kilometers } from '@ootk/src/main';
 import eventNotePng from '@public/img/icons/event-note.png';
+import { BestPassDeps, BestPassOptions, DEFAULT_MAX_RESULTS, findPassesForSat, normalizePassRows } from './best-pass-calculator';
 import './best-pass.css';
 
 export class BestPassPlugin extends KeepTrackPlugin {
@@ -60,7 +62,9 @@ export class BestPassPlugin extends KeepTrackPlugin {
       elementName: 'best-pass-icon',
       label: t7e('plugins.BestPassPlugin.bottomIconLabel' as Parameters<typeof t7e>[0]),
       image: eventNotePng,
-      menuMode: [MenuMode.EVENTS, MenuMode.ALL],
+      // Sit in the Sensors section alongside the Look Angles tools (the related
+      // sensor/pass-analysis family), while staying discoverable under Events too.
+      menuMode: [MenuMode.SENSORS, MenuMode.EVENTS, MenuMode.ALL],
       isDisabledOnLoad: true,
     };
   }
@@ -164,20 +168,25 @@ export class BestPassPlugin extends KeepTrackPlugin {
       this.uiManagerFinal_.bind(this),
     );
 
-    EventBus.getInstance().on(EventBusEvent.setSensor, (sensor) => {
-      if (!sensor) {
-        return;
-      }
-      this.setBottomIconToEnabled();
-      BestPassPlugin.updateSensorButton_(sensor);
-    });
+    // Sensor-gated enable/disable only applies when a sensor is actually required.
+    // Subclasses that pick sensors in-menu (e.g. via chips) set isRequireSensorSelected
+    // = false so the icon stays usable without a globally selected sensor.
+    if (this.isRequireSensorSelected) {
+      EventBus.getInstance().on(EventBusEvent.setSensor, (sensor) => {
+        if (!sensor) {
+          return;
+        }
+        this.setBottomIconToEnabled();
+        BestPassPlugin.updateSensorButton_(sensor);
+      });
 
-    EventBus.getInstance().on(EventBusEvent.resetSensor, () => {
-      if (this.isMenuButtonActive) {
-        this.closeSideMenu();
-      }
-      this.setBottomIconToDisabled();
-    });
+      EventBus.getInstance().on(EventBusEvent.resetSensor, () => {
+        if (this.isMenuButtonActive) {
+          this.closeSideMenu();
+        }
+        this.setBottomIconToDisabled();
+      });
+    }
   }
 
   protected uiManagerFinal_() {
@@ -203,11 +212,35 @@ export class BestPassPlugin extends KeepTrackPlugin {
 
     if (!sensorManagerInstance.isSensorSelected()) {
       ServiceLocator.getUiManager().toast(t7e('plugins.BestPassPlugin.errorMsgs.SensorRequired' as Parameters<typeof t7e>[0]), ToastMsgType.critical);
-    } else {
+
+      return;
+    }
+
+    // Defer the heavy synchronous search behind the loading overlay so the UI can paint.
+    showLoading(() => {
       const passes = this.findBestPasses_(sats, sensorManagerInstance.getSensor()!);
 
-      saveXlsx(passes, 'bestSatTimes');
+      // Export is the primary action; run it first, then surface the advisory cap warning.
+      this.exportPasses_(passes);
+      this.toastIfTruncated_();
+    });
+  }
+
+  /** Exports the passes. Base saves an XLSX; the Pro plugin renders a table instead. */
+  protected exportPasses_(passes: lookanglesRow[]): void {
+    saveXlsx(passes, 'bestSatTimes').catch((e) => errorManagerInstance.debug(`Best pass export failed: ${e}`));
+  }
+
+  /** Warns the user when a search hit the per-satellite result cap. */
+  protected toastIfTruncated_(): void {
+    if (!this.lastResultTruncated_) {
+      return;
     }
+
+    ServiceLocator.getUiManager().toast(
+      t7e('plugins.BestPassPlugin.errorMsgs.ResultsTruncated' as Parameters<typeof t7e>[0]).replace('{limit}', DEFAULT_MAX_RESULTS.toString()),
+      ToastMsgType.caution,
+    );
   }
 
   protected static updateSensorButton_(sensor: DetailedSensor | string): void {
@@ -230,213 +263,91 @@ export class BestPassPlugin extends KeepTrackPlugin {
   // Best pass calculation
   // =========================================================================
 
-  protected findBestPasses_(sats: string, sensor: DetailedSensor): lookanglesRow[] {
-    sats = sats.replace(/ /gu, ',');
-    const satArray = sats.split(',');
-    const passes: lookanglesRow[] = [];
-    const catalogManager = ServiceLocator.getCatalogManager();
+  /** True when the most recent search hit the per-satellite result cap for any satellite. */
+  protected lastResultTruncated_ = false;
 
-    for (const satId of satArray) {
-      try {
-        if (typeof satId === 'undefined' || satId === null || satId === '' || satId === ' ') {
-          continue;
-        }
-        // sccNum2Sat handles every sccNum form directly; parseInt would turn a
-        // typed alpha-5 ("T0001") into NaN and silently skip it.
-        const sat = catalogManager.sccNum2Sat(satId.trim());
+  protected findBestPasses_(sats: string, sensor: DetailedSensor | null): lookanglesRow[] {
+    const sensors = this.getSearchSensors_(sensor).filter((s) => s && typeof s.minAz !== 'undefined');
 
-        if (!sat) {
-          continue;
-        }
-        const satPasses = this.findBestPass_(sat, [sensor]);
-
-        for (const pass of satPasses) {
-          passes.push(pass);
-        }
-      } catch (e) {
-        errorManagerInstance.debug(`Error finding best passes for ${satId}: ${e}`);
-      }
-    }
-    passes.sort((a, b) => (b.START_DTG as number) - (a.START_DTG as number));
-    passes.reverse();
-
-    for (const pass of passes) {
-      pass.START_DTG = (<Date>pass.START_DATE).toISOString();
-      pass.START_DATE = (<Date>pass.START_DATE).toISOString().split('T')[0];
-      pass.START_TIME = (<Date>pass.START_TIME).toISOString().split('T')[1].split('.')[0];
-      pass.STOP_DATE = (<Date>pass.STOP_DATE).toISOString().split('T')[0];
-      pass.STOP_TIME = (<Date>pass.STOP_TIME).toISOString().split('T')[1].split('.')[0];
-    }
-
-    return passes;
-  }
-
-  protected findBestPass_(sat: Satellite, sensors: DetailedSensor[]): lookanglesRow[] {
-    const timeManagerInstance = ServiceLocator.getTimeManager();
-
-    if (sensors.length <= 0 || typeof sensors[0]?.minAz === 'undefined') {
+    if (sensors.length === 0) {
       ServiceLocator.getUiManager().toast(t7e('plugins.BestPassPlugin.errorMsgs.SensorFormatError' as Parameters<typeof t7e>[0]), ToastMsgType.critical);
 
       return [];
     }
 
-    const sensor = sensors[0];
-
-    let offset = 0;
-
+    const satArray = sats.replace(/ /gu, ',').split(',');
     const catalogManager = ServiceLocator.getCatalogManager();
-    const scene = ServiceLocator.getScene();
-    const satrec = catalogManager.calcSatrec(sat);
-    const lookanglesTable = [] as lookanglesRow[];
+    const deps = this.buildBestPassDeps_();
+    const options: BestPassOptions = { lengthDays: this.looksLength_, intervalSec: this.looksInterval_ };
+    const passes: lookanglesRow[] = [];
+    let truncated = false;
 
-    const looksInterval = this.looksInterval_;
-    const looksLength = this.looksLength_;
+    for (const satId of satArray) {
+      try {
+        const trimmed = satId?.trim();
 
-    const orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU);
-
-    let score = 0;
-    let sAz = <string | null>null;
-    let sEl = <string | null>null;
-    let srng = <string | null>null;
-    let sTime = <Date | null>null;
-    let passMinrng = sensor.maxRng;
-    let passMaxEl = 0;
-    let start3 = false;
-    let stop3 = false;
-
-    const propagateBestPass_ = (now: Date, satrecIn: SatelliteRecord): lookanglesRow => {
-      const aer = SatMath.getRae(now, satrecIn, sensor) as unknown as RaeVec3;
-      const isInFOV = SatMath.checkIsInView(sensor, aer);
-
-      if (isInFOV) {
-        const now1 = timeManagerInstance.getOffsetTimeObj(offset - looksInterval * 1000);
-        let aer1 = SatMath.getRae(now1, satrecIn, sensor) as unknown as RaeVec3;
-
-        let isInFOV1 = SatMath.checkIsInView(sensor, aer1);
-
-        if (!isInFOV1) {
-          if (aer.el <= 3.5) {
-            start3 = true;
-          }
-
-          sTime = now;
-          sAz = aer.az.toFixed(0);
-          sEl = aer.el.toFixed(1);
-          srng = aer.rng.toFixed(0);
-        } else {
-          const _now1 = timeManagerInstance.getOffsetTimeObj(offset + looksInterval * 1000);
-
-          aer1 = SatMath.getRae(_now1, satrecIn, sensor) as unknown as RaeVec3;
-
-          isInFOV1 = SatMath.checkIsInView(sensor, aer1);
-          if (!isInFOV1) {
-            stop3 = aer.el <= 3.5;
-
-            if (sTime === null) {
-              return BestPassPlugin.emptyRow_();
-            }
-
-            score = Math.min((((now.getTime() - sTime.getTime()) / 1000 / 60) * 10) / 8, 10);
-            let elScore = Math.min((passMaxEl / 50) * 10, 10);
-
-            elScore *= start3 && stop3 ? 2 : 1;
-            score += elScore;
-            score += Math.min((10 * 750) / passMinrng, 10);
-
-            let tic = 0;
-
-            tic = (now.getTime() - sTime.getTime()) / 1000 || 0;
-
-            const sunRae = eci2rae(now, {
-              x: scene.sun.position[0] as Kilometers,
-              y: scene.sun.position[1] as Kilometers,
-              z: scene.sun.position[2] as Kilometers,
-            }, sensor);
-
-            return {
-              START_DTG: sTime.getTime(),
-              // Use the canonical sccNum on the Satellite, not satrec.satnum.
-              // satrec.satnum is the parsed numeric form - for alpha-5 sats it
-              // would be the 6-digit equivalent ("270001"), not the alpha-5
-              // string ("T0001") the user expects to see.
-              SATELLITE_ID: sat.sccNum,
-              PASS_SCORE: score.toFixed(1),
-              START_DATE: sTime,
-              START_TIME: sTime,
-              START_AZIMUTH: sAz!,
-              START_ELEVATION: sEl!,
-              START_RANGE: srng!,
-              STOP_DATE: now,
-              STOP_TIME: now,
-              STOP_AZIMTUH: aer.az.toFixed(0),
-              STOP_ELEVATION: aer.el.toFixed(1),
-              STOP_RANGE: aer.rng.toFixed(0),
-              TIME_IN_COVERAGE_SECONDS: tic,
-              MINIMUM_RANGE: passMinrng.toFixed(0),
-              MAXIMUM_ELEVATION: passMaxEl.toFixed(1),
-              SENSOR_TO_SUN_AZIMUTH: sunRae.az.toFixed(1),
-              SENSOR_TO_SUN_ELEVATION: sunRae.el.toFixed(1),
-            };
-          }
+        if (!trimmed) {
+          continue;
         }
-        if (passMaxEl < aer.el) {
-          passMaxEl = aer.el;
+        // sccNum2Sat handles every sccNum form directly; parseInt would turn a
+        // typed alpha-5 ("T0001") into NaN and silently skip it.
+        const sat = catalogManager.sccNum2Sat(trimmed);
+
+        if (!sat) {
+          continue;
         }
-        if (passMinrng > aer.rng) {
-          passMinrng = aer.rng;
+        const satrec = catalogManager.calcSatrec(sat);
+
+        for (const searchSensor of sensors) {
+          // Use the canonical sccNum on the Satellite, not satrec.satnum: for alpha-5
+          // sats satnum is the 6-digit numeric equivalent, not the "T0001" the user typed.
+          const result = findPassesForSat(sat.sccNum, satrec, searchSensor, options, deps, BestPassPlugin.sensorDisplayName_(searchSensor));
+
+          passes.push(...result.passes);
+          truncated = truncated || result.truncated;
         }
-      }
-
-      return BestPassPlugin.emptyRow_();
-    };
-
-    for (let i = 0; i < looksLength * 24 * 60 * 60; i += looksInterval) {
-      offset = i * 1000;
-      const now = timeManagerInstance.getOffsetTimeObj(offset);
-
-      if (lookanglesTable.length <= 5000) {
-        const _lookanglesRow = propagateBestPass_(now, satrec);
-
-        if (_lookanglesRow.PASS_SCORE !== null) {
-          lookanglesTable.push(_lookanglesRow);
-
-          score = 0;
-          sAz = null;
-          sEl = null;
-          srng = null;
-          sTime = null;
-          passMinrng = sensor.maxRng;
-          passMaxEl = 0;
-          start3 = false;
-          stop3 = false;
-          i += orbitalPeriod * 60 * 0.75; // NOSONAR
-        }
+      } catch (e) {
+        errorManagerInstance.debug(`Error finding best passes for ${satId}: ${e}`);
       }
     }
 
-    return lookanglesTable;
+    this.lastResultTruncated_ = truncated;
+    passes.sort((a, b) => (a.START_DTG as number) - (b.START_DTG as number));
+    normalizePassRows(passes);
+
+    return passes;
   }
 
-  protected static emptyRow_(): lookanglesRow {
+  /**
+   * Sensors to evaluate each satellite against. The base plugin searches only the
+   * passed (primary) sensor; the Pro plugin overrides this to source sensors from
+   * an in-menu chip selector.
+   */
+  protected getSearchSensors_(sensor: DetailedSensor | null): DetailedSensor[] {
+    return sensor ? [sensor] : [];
+  }
+
+  /** Assembles the application-state dependencies the pure calculator needs. */
+  protected buildBestPassDeps_(): BestPassDeps {
+    const timeManager = ServiceLocator.getTimeManager();
+    const scene = ServiceLocator.getScene();
+
     return {
-      START_DTG: null,
-      SATELLITE_ID: null,
-      PASS_SCORE: null,
-      START_DATE: null,
-      START_TIME: null,
-      START_AZIMUTH: null,
-      START_ELEVATION: null,
-      START_RANGE: null,
-      STOP_DATE: null,
-      STOP_TIME: null,
-      STOP_AZIMTUH: null,
-      STOP_ELEVATION: null,
-      STOP_RANGE: null,
-      TIME_IN_COVERAGE_SECONDS: null,
-      MINIMUM_RANGE: null,
-      MAXIMUM_ELEVATION: null,
-      SENSOR_TO_SUN_AZIMUTH: null,
-      SENSOR_TO_SUN_ELEVATION: null,
+      baseTimeMs: timeManager.simulationTimeObj.getTime(),
+      getRae: (date, satrec, sensor) => SatMath.getRae(date, satrec, sensor),
+      checkIsInView: (sensor, rae) => SatMath.checkIsInView(sensor, rae as Parameters<typeof SatMath.checkIsInView>[1]),
+      // The sun moves negligibly over a pass; a single snapshot of the current
+      // scene sun position is reused for the whole search, matching legacy behavior.
+      sunEciKm: () => ({
+        x: scene.sun.position[0] as Kilometers,
+        y: scene.sun.position[1] as Kilometers,
+        z: scene.sun.position[2] as Kilometers,
+      }),
     };
+  }
+
+  /** Human-readable sensor name for the SENSOR column / CSV. */
+  protected static sensorDisplayName_(sensor: DetailedSensor): string | null {
+    return sensor.uiName ?? sensor.shortName ?? sensor.name ?? null;
   }
 }

@@ -112,6 +112,26 @@ export const saveXlsx = async <T extends Record<string, unknown>>(items: Array<T
   }
 };
 
+/** Tabular export formats offered to the user. */
+export type ExportFormat = 'csv' | 'xlsx';
+
+/**
+ * Saves an array of objects in the requested tabular format, dispatching to
+ * {@link saveCsv} or {@link saveXlsx}. Lets a single download action offer both
+ * formats without callers branching on the format themselves.
+ * @param items The array of objects to save.
+ * @param name The base file name (extension is added by the format helper).
+ * @param format Either 'csv' or 'xlsx'. Defaults to 'csv'.
+ */
+export const saveTable = <T extends Record<string, unknown>>(items: Array<T>, name: string, format: ExportFormat = 'csv'): void => {
+  if (format === 'xlsx') {
+    saveXlsx(items, name).catch((e) => errorManagerInstance.error(e, 'saveTable', 'Error saving xlsx!'));
+
+    return;
+  }
+  saveCsv(items, name);
+};
+
 /**
  * Copies an array of objects as TSV (tab-separated values) to the clipboard.
  * @param items The array of objects to copy as TSV.

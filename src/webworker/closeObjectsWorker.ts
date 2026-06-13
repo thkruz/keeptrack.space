@@ -117,6 +117,12 @@ function handleStartSearch_(msg: CoMsgStartSearch): void {
         return;
       }
 
+      // Same NORAD id => two data sources for the same satellite, not two
+      // distinct objects. Skip before doing any propagation work.
+      if (sats[i1].sccNum === sats[i2].sccNum) {
+        continue;
+      }
+
       const sat1 = getSat(i1);
       const sat2 = getSat(i2);
 

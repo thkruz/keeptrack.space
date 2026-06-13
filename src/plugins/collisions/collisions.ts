@@ -17,8 +17,6 @@ import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
 import CollisionsPng from '@public/img/icons/collisions.png';
-import fetchPng from '@public/img/icons/download.png';
-import refreshPng from '@public/img/icons/refresh.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './collisions.css';
 
@@ -102,28 +100,41 @@ export class Collisions extends KeepTrackPlugin {
 
   protected buildSideMenuHtml_(): string {
     const tb = (key: string) => t7e(`plugins.Collisions.toolbar.${key}` as Parameters<typeof t7e>[0]);
+    const lbl = (key: string) => t7e(`plugins.Collisions.labels.${key}` as Parameters<typeof t7e>[0]);
     const attribution = t7e('plugins.Collisions.dataSource' as Parameters<typeof t7e>[0])
       .replace('{link}', '<a href="https://celestrak.org/SOCRATES/" target="_blank" rel="noreferrer">SOCRATES</a>');
 
     return html`
-      <div id="Collisions-menu" class="side-menu-parent start-hidden">
+      <div id="Collisions-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div id="Collisions-content" class="side-menu">
-          <div class="row">
-            <div class="col-toolbar">
-              <button id="Collisions-fetch-btn" class="btn btn-ui waves-effect waves-light icon-btn"
-                type="button" kt-tooltip="${tb('fetchData')}">
-                <img src="${fetchPng}" class="icon-btn-img" alt="" />
-              </button>
-              <button id="Collisions-refresh-btn" class="btn btn-ui waves-effect waves-light icon-btn"
-                type="button" kt-tooltip="${tb('refresh')}" style="display:none;">
-                <img src="${refreshPng}" class="icon-btn-img" alt="" />
-              </button>
-            </div>
-            <table id="Collisions-table" class="center-align"></table>
-            <sub class="center-align">*${attribution}</sub>
-          </div>
+          ${this.buildToolbarSection_(tb, lbl)}
+          <section class="kt-section">
+            <div class="kt-section-label">${lbl('results')}</div>
+            <table id="Collisions-table" class="collision-table"></table>
+            <sub class="collision-attribution">*${attribution}</sub>
+          </section>
         </div>
       </div>
+    `;
+  }
+
+  /**
+   * The Fetch / Refresh toolbar as v13 action rows. Only one is visible at a
+   * time (fetch before data is loaded, refresh afterwards); the visibility
+   * toggling lives in {@link updateToolbarForLoginState_}. Pro reuses these same
+   * button IDs, so the wiring in {@link uiManagerFinal_} is shared.
+   */
+  protected buildToolbarSection_(tb: (key: string) => string, lbl: (key: string) => string): string {
+    return html`
+      <section class="kt-section">
+        <div class="kt-section-label">${lbl('dataActions')}</div>
+        <button id="Collisions-fetch-btn" class="kt-action waves-effect" type="button">
+          <span class="kt-action-label">${tb('fetchData')}</span>
+        </button>
+        <button id="Collisions-refresh-btn" class="kt-action waves-effect" type="button" style="display:none;">
+          <span class="kt-action-label">${tb('refresh')}</span>
+        </button>
+      </section>
     `;
   }
 
@@ -178,10 +189,10 @@ export class Collisions extends KeepTrackPlugin {
     });
   }
 
-  private uiManagerFinal_() {
+  protected uiManagerFinal_() {
     getEl('Collisions-fetch-btn', true)?.addEventListener('click', () => {
       hideEl('Collisions-fetch-btn');
-      showEl('Collisions-refresh-btn', 'inline-flex');
+      showEl('Collisions-refresh-btn', 'flex');
       this.fetchCollisionData_();
     });
 
@@ -191,17 +202,19 @@ export class Collisions extends KeepTrackPlugin {
     });
 
     getEl('Collisions-menu', true)?.addEventListener('click', (evt: MouseEvent) => {
-      const el = (<HTMLElement>evt.target).parentElement;
+      // Walk up from the click target so nested markup (table cells or card
+      // internals) still resolves to its `.Collisions-object` row/card.
+      const el = (<HTMLElement>evt.target).closest('.Collisions-object') as HTMLElement | null;
 
-      if (!el!.classList.contains('Collisions-object')) {
+      if (!el) {
         return;
       }
-      // Might be better code for this.
-      const hiddenRow = el!.dataset?.row;
+
+      const hiddenRow = el.dataset?.row;
 
       if (hiddenRow !== undefined) {
         showLoading(() => {
-          this.eventClicked_(parseInt(hiddenRow!));
+          this.eventClicked_(parseInt(hiddenRow));
         });
       }
     });
@@ -224,7 +237,7 @@ export class Collisions extends KeepTrackPlugin {
         }
 
         hideEl('Collisions-fetch-btn');
-        showEl('Collisions-refresh-btn', 'inline-flex');
+        showEl('Collisions-refresh-btn', 'flex');
       })
       .catch(() => {
         errorManagerInstance.warn(t7e('plugins.Collisions.errorMsgs.noCollisionsData'));
@@ -262,19 +275,19 @@ export class Collisions extends KeepTrackPlugin {
         hideEl(fetchBtn);
       }
       if (refreshBtn) {
-        showEl(refreshBtn, 'inline-flex');
+        showEl(refreshBtn, 'flex');
       }
     } else {
       if (fetchBtn) {
         if (this.collisionList_.length === 0) {
-          showEl(fetchBtn, 'inline-flex');
+          showEl(fetchBtn, 'flex');
         } else {
           hideEl(fetchBtn);
         }
       }
       if (refreshBtn) {
         if (this.collisionList_.length > 0) {
-          showEl(refreshBtn, 'inline-flex');
+          showEl(refreshBtn, 'flex');
         } else {
           hideEl(refreshBtn);
         }
@@ -326,7 +339,6 @@ export class Collisions extends KeepTrackPlugin {
       const column = tr.insertCell();
 
       column.appendChild(document.createTextNode(name));
-      column.setAttribute('style', 'text-decoration: underline');
     }
   }
 

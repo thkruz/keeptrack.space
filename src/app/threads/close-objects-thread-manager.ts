@@ -11,26 +11,29 @@ import {
   type CoMsgStartSearch,
   type CoOutComplete,
   type CoOutError,
-  type CoOutProgress,
+  type CoOutTcaChunk,
   type CoOutVerified,
   type CoResultRow,
   type CoSatelliteData,
+  type CoTcaUpdate,
   type CoWorkerOutMsg,
 } from '@app/webworker/close-objects-messages';
 
 export interface CoSearchCallbacks {
   /** Verified pairs (no TCA yet) for a fast first paint of the table. */
   onVerified: (results: CoResultRow[]) => void;
-  /** Final results with TCA filled in for the closest pairs. */
-  onComplete: (results: CoResultRow[]) => void;
+  /** A batch of TCA results to patch onto the painted rows, plus progress. */
+  onTcaChunk: (updates: CoTcaUpdate[], processed: number, total: number) => void;
+  /** Signals the search finished; tcaCount pairs received a TCA search. */
+  onComplete: (tcaCount: number) => void;
   onError: (message: string) => void;
-  onProgress?: (processed: number, total: number) => void;
 }
 
 export interface CoSearchParams {
   sats: CoSatelliteData[];
   pairs: [number, number][];
   searchRadiusKm: number;
+  minMissDistanceKm: number;
   simEpochMs: number;
   verifyOffsetMs: number;
   tcaWindowMs: number;
@@ -68,16 +71,20 @@ export class CloseObjectsThreadManager extends WebWorkerThreadManager {
       case CoWorkerOutMsgType.VERIFIED:
         this.callbacks_.onVerified((data as CoOutVerified).results);
         break;
+      case CoWorkerOutMsgType.TCA_CHUNK:
+        this.callbacks_.onTcaChunk(
+          (data as CoOutTcaChunk).updates,
+          (data as CoOutTcaChunk).processed,
+          (data as CoOutTcaChunk).total,
+        );
+        break;
       case CoWorkerOutMsgType.COMPLETE:
-        this.callbacks_.onComplete((data as CoOutComplete).results);
+        this.callbacks_.onComplete((data as CoOutComplete).tcaCount);
         this.callbacks_ = null;
         break;
       case CoWorkerOutMsgType.ERROR:
         this.callbacks_.onError((data as CoOutError).message);
         this.callbacks_ = null;
-        break;
-      case CoWorkerOutMsgType.PROGRESS:
-        this.callbacks_.onProgress?.((data as CoOutProgress).processed, (data as CoOutProgress).total);
         break;
       default:
         break;
@@ -98,6 +105,7 @@ export class CloseObjectsThreadManager extends WebWorkerThreadManager {
       sats: params.sats,
       pairs: params.pairs,
       searchRadiusKm: params.searchRadiusKm,
+      minMissDistanceKm: params.minMissDistanceKm,
       simEpochMs: params.simEpochMs,
       verifyOffsetMs: params.verifyOffsetMs,
       tcaWindowMs: params.tcaWindowMs,

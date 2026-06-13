@@ -93,7 +93,7 @@ interface VerifiedPair {
  */
 function handleStartSearch_(msg: CoMsgStartSearch): void {
   const {
-    runId, sats, pairs, searchRadiusKm, simEpochMs, verifyOffsetMs,
+    runId, sats, pairs, searchRadiusKm, minMissDistanceKm, simEpochMs, verifyOffsetMs,
     tcaWindowMs, coarseStepMs, tolMs, maxTcaPairs,
   } = msg;
 
@@ -133,7 +133,9 @@ function handleStartSearch_(msg: CoMsgStartSearch): void {
 
       const dist = distance_(pos1, pos2);
 
-      if (dist > searchRadiusKm) {
+      // A near-zero miss means the two TLEs describe the same object (duplicate
+      // catalog entries), not a genuine conjunction - drop it.
+      if (dist > searchRadiusKm || dist < minMissDistanceKm) {
         continue;
       }
 
@@ -173,15 +175,24 @@ function handleStartSearch_(msg: CoMsgStartSearch): void {
       return;
     }
 
-    // TCA phase - only the closest pairs, since each costs hundreds of SGP4 props.
+    // TCA phase. Each pair costs hundreds of SGP4 props, but this runs off the
+    // main thread and the results stream back in batches, so we cover every
+    // verified pair up to a generous backstop rather than an arbitrary handful.
     const count = Math.min(verified.length, maxTcaPairs);
+    const BATCH = 25;
+    let batch: { i: number; tcaEpochMs: number; missAtTcaKm: number }[] = [];
+
+    const flush = (processed: number): void => {
+      postMessage({ typ: CoWorkerOutMsgType.TCA_CHUNK, runId, updates: batch, processed, total: count });
+      batch = [];
+    };
 
     for (let k = 0; k < count; k++) {
       if (cancelledRunId >= runId) {
         return;
       }
 
-      const { row, sat1, sat2 } = verified[k];
+      const { sat1, sat2 } = verified[k];
       const distFn = (tMs: number): number => {
         const time = new Date(simEpochMs + tMs);
         const p1 = propagateToTime_(sat1, time);
@@ -197,20 +208,19 @@ function handleStartSearch_(msg: CoMsgStartSearch): void {
       const tca = findTca(distFn, 0, tcaWindowMs, coarseStepMs, tolMs);
 
       if (tca) {
-        row.tcaEpochMs = simEpochMs + tca.tcaMs;
-        row.missAtTcaKm = tca.missKm;
+        batch.push({ i: k, tcaEpochMs: simEpochMs + tca.tcaMs, missAtTcaKm: tca.missKm });
       }
 
-      if (k % 20 === 0) {
-        postMessage({ typ: CoWorkerOutMsgType.PROGRESS, runId, processed: k, total: count });
+      if (batch.length >= BATCH) {
+        flush(k + 1);
       }
     }
 
-    postMessage({
-      typ: CoWorkerOutMsgType.COMPLETE,
-      runId,
-      results: verified.map((v) => v.row),
-    });
+    if (batch.length > 0) {
+      flush(count);
+    }
+
+    postMessage({ typ: CoWorkerOutMsgType.COMPLETE, runId, tcaCount: count });
   } catch (error) {
     postMessage({
       typ: CoWorkerOutMsgType.ERROR,

@@ -20,10 +20,11 @@ export const enum CoWorkerMsgType {
 export const enum CoWorkerOutMsgType {
   /** Verified pairs (no TCA yet) for an immediate first paint of the table. */
   VERIFIED = 1,
-  /** Final results with TCA / miss-at-TCA filled in for the closest pairs. */
+  /** Signals the TCA phase finished (all chunks already sent). */
   COMPLETE = 2,
   ERROR = 3,
-  PROGRESS = 4,
+  /** A batch of TCA results, patched onto the already-painted rows by index. */
+  TCA_CHUNK = 4,
 }
 
 // ─── Serializable data structures ───────────────────────────────────────────
@@ -69,6 +70,11 @@ export interface CoMsgStartSearch {
   /** Candidate pairs as [index1, index2] tuples into `sats`. */
   pairs: [number, number][];
   searchRadiusKm: number;
+  /**
+   * Pairs whose verified miss distance is below this (km) are dropped as
+   * duplicate TLEs of the same object rather than a genuine conjunction.
+   */
+  minMissDistanceKm: number;
   /** Simulation epoch (ms) the search window is anchored to. */
   simEpochMs: number;
   /** Offset (ms) past the sim epoch used to verify the broad-phase hit. */
@@ -98,10 +104,29 @@ export interface CoOutVerified {
   results: CoResultRow[];
 }
 
+/** A single pair's TCA result, keyed by its index in the VERIFIED result list. */
+export interface CoTcaUpdate {
+  /** Index into the VERIFIED results array (same sorted order on both threads). */
+  i: number;
+  tcaEpochMs: number;
+  missAtTcaKm: number;
+}
+
+export interface CoOutTcaChunk {
+  typ: CoWorkerOutMsgType.TCA_CHUNK;
+  runId: number;
+  updates: CoTcaUpdate[];
+  /** Pairs processed so far in the TCA phase. */
+  processed: number;
+  /** Total pairs that will get a TCA search. */
+  total: number;
+}
+
 export interface CoOutComplete {
   typ: CoWorkerOutMsgType.COMPLETE;
   runId: number;
-  results: CoResultRow[];
+  /** Pairs that received a TCA search (may be capped below the result count). */
+  tcaCount: number;
 }
 
 export interface CoOutError {
@@ -110,13 +135,4 @@ export interface CoOutError {
   message: string;
 }
 
-export interface CoOutProgress {
-  typ: CoWorkerOutMsgType.PROGRESS;
-  runId: number;
-  /** Pairs processed so far in the TCA phase. */
-  processed: number;
-  /** Total pairs that will get a TCA search. */
-  total: number;
-}
-
-export type CoWorkerOutMsg = CoOutVerified | CoOutComplete | CoOutError | CoOutProgress;
+export type CoWorkerOutMsg = CoOutVerified | CoOutTcaChunk | CoOutComplete | CoOutError;

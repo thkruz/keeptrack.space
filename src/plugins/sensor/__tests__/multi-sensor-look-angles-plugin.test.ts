@@ -2,7 +2,7 @@ import { vi } from 'vitest';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { MultiSiteLookAnglesPlugin } from '@app/plugins/sensor/multi-site-look-angles-plugin';
+import { MultiSensorLookAnglesPlugin } from '@app/plugins/sensor/multi-sensor-look-angles-plugin';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
 import { getEl } from '@app/engine/utils/get-el';
 import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
@@ -19,7 +19,7 @@ vi.mock('@app/engine/utils/saveVariable', () => ({
   getCircularReplacer: vi.fn(),
 }));
 
-describe('MultiSiteLookAnglesPlugin_class', () => {
+describe('MultiSensorLookAnglesPlugin_class', () => {
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
   });
@@ -28,10 +28,10 @@ describe('MultiSiteLookAnglesPlugin_class', () => {
     vi.advanceTimersByTime(1000);
   });
 
-  standardPluginSuite(MultiSiteLookAnglesPlugin);
-  standardPluginMenuButtonTests(MultiSiteLookAnglesPlugin);
-  standardClickTests(MultiSiteLookAnglesPlugin);
-  standardChangeTests(MultiSiteLookAnglesPlugin);
+  standardPluginSuite(MultiSensorLookAnglesPlugin);
+  standardPluginMenuButtonTests(MultiSensorLookAnglesPlugin);
+  standardClickTests(MultiSensorLookAnglesPlugin);
+  standardChangeTests(MultiSensorLookAnglesPlugin);
 
   describe('downloadIconCb', () => {
     beforeEach(() => {
@@ -43,7 +43,7 @@ describe('MultiSiteLookAnglesPlugin_class', () => {
     });
 
     it('does not export when lastMultiSiteArray is empty and plays the error sound', () => {
-      const plugin = new MultiSiteLookAnglesPlugin();
+      const plugin = new MultiSensorLookAnglesPlugin();
       const playSpy = vi.spyOn(ServiceLocator.getSoundManager()!, 'play').mockImplementation(() => undefined);
 
       ServiceLocator.getSensorManager().lastMultiSiteArray = [];
@@ -55,7 +55,7 @@ describe('MultiSiteLookAnglesPlugin_class', () => {
     });
 
     it('exports mapped data when lastMultiSiteArray has entries', () => {
-      const plugin = new MultiSiteLookAnglesPlugin();
+      const plugin = new MultiSensorLookAnglesPlugin();
       const playSpy = vi.spyOn(ServiceLocator.getSoundManager()!, 'play').mockImplementation(() => undefined);
 
       const sample: TearrData = {
@@ -89,14 +89,14 @@ describe('MultiSiteLookAnglesPlugin_class', () => {
   });
 });
 
-describe('MultiSiteLookAnglesPlugin look-angle computation', () => {
-  let plugin: MultiSiteLookAnglesPlugin;
+describe('MultiSensorLookAnglesPlugin look-angle computation', () => {
+  let plugin: MultiSensorLookAnglesPlugin;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const p = () => plugin as any;
 
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
-    plugin = new MultiSiteLookAnglesPlugin();
+    plugin = new MultiSensorLookAnglesPlugin();
     websiteInit(plugin);
     p().isMenuButtonActive = true;
   });
@@ -107,7 +107,7 @@ describe('MultiSiteLookAnglesPlugin look-angle computation', () => {
 
   it('propagateMultiSite_ returns a TearrData for an in-view pass', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = (MultiSiteLookAnglesPlugin as any).propagateMultiSite_(new Date('2022-01-01T00:00:00Z'), defaultSat.satrec, defaultSensor);
+    const result = (MultiSensorLookAnglesPlugin as any).propagateMultiSite_(new Date('2022-01-01T00:00:00Z'), defaultSat.satrec, defaultSensor);
 
     expect(result).toHaveProperty('time');
     expect(result).toHaveProperty('az');
@@ -118,13 +118,13 @@ describe('MultiSiteLookAnglesPlugin look-angle computation', () => {
     p().lengthOfLookAngles_ = 1;
 
     expect(() => p().getlookanglesMultiSite_(defaultSat, [defaultSensor])).not.toThrow();
-    expect(getEl('multi-site-look-angles-table')!.innerHTML.length).toBeGreaterThan(0);
+    expect(getEl('multi-sensor-look-angles-table')!.innerHTML.length).toBeGreaterThan(0);
     expect(ServiceLocator.getSensorManager().lastMultiSiteArray).toBeDefined();
   });
 
   it('refreshSideMenuData builds a sensor toggle button per named sensor', () => {
-    if (!getEl('multi-site-look-angles-sensor-list', true)) {
-      document.body.insertAdjacentHTML('beforeend', '<div id="multi-site-look-angles-sensor-list"></div>');
+    if (!getEl('multi-sensor-look-angles-sensor-list', true)) {
+      document.body.insertAdjacentHTML('beforeend', '<div id="multi-sensor-look-angles-sensor-list"></div>');
     }
     const named = defaultSensor.clone();
 
@@ -134,7 +134,7 @@ describe('MultiSiteLookAnglesPlugin look-angle computation', () => {
     p().refreshSideMenuData(defaultSat);
     vi.advanceTimersByTime(2000); // showLoading defers the build via setTimeout
 
-    expect(getEl('multi-site-look-angles-sensor-list')!.querySelectorAll('button').length).toBeGreaterThan(0);
+    expect(getEl('multi-sensor-look-angles-sensor-list')!.querySelectorAll('button').length).toBeGreaterThan(0);
   });
 
   it('populateMultiSiteTable_ renders rows for the look-angle entries', () => {
@@ -142,6 +142,6 @@ describe('MultiSiteLookAnglesPlugin look-angle computation', () => {
 
     p().populateMultiSiteTable_([entry], [defaultSensor]);
 
-    expect(getEl('multi-site-look-angles-table')!.querySelectorAll('tr').length).toBeGreaterThan(0);
+    expect(getEl('multi-sensor-look-angles-table')!.querySelectorAll('tr').length).toBeGreaterThan(0);
   });
 });

@@ -245,9 +245,9 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
   {
-    configKey: 'MultiSiteLookAnglesPlugin',
-    ossImport: () => import('./sensor/multi-site-look-angles-plugin'),
-    ossClassName: 'MultiSiteLookAnglesPlugin',
+    configKey: 'MultiSensorLookAnglesPlugin',
+    ossImport: () => import('./sensor/multi-sensor-look-angles-plugin'),
+    ossClassName: 'MultiSensorLookAnglesPlugin',
     defaultConfig: { enabled: true, order: 21 },
   },
   {

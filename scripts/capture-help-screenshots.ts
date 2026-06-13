@@ -689,19 +689,19 @@ const RECIPES: CaptureRecipe[] = [
     shots: [{ name: 'look-angles-menu', selector: '#look-angles-menu' }],
   },
   {
-    id: 'multi-site-look-angles',
+    id: 'multi-sensor-look-angles',
     plugins: {
-      MultiSiteLookAnglesPlugin: { enabled: true },
+      MultiSensorLookAnglesPlugin: { enabled: true },
       SensorListPlugin: { enabled: true },
     },
     steps: async (page) => {
       await selectSatellite(page, 'ISS (ZARYA)');
-      await openPluginMenu(page, 'multi-site-looks-bottom-icon');
-      await page.locator('#multi-site-look-angles-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await openPluginMenu(page, 'multi-sensor-looks-bottom-icon');
+      await page.locator('#multi-sensor-look-angles-menu').waitFor({ state: 'visible', timeout: 10_000 });
       await page.evaluate('document.getElementById(\'sat-infobox\')?.style.setProperty(\'display\', \'none\')');
       await page.waitForTimeout(8_000);
     },
-    shots: [{ name: 'multi-site-look-angles-menu', selector: '#multi-site-look-angles-menu' }],
+    shots: [{ name: 'multi-sensor-look-angles-menu', selector: '#multi-sensor-look-angles-menu' }],
   },
   {
     id: 'eclipse-solar-analysis',

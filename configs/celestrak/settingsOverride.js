@@ -52,7 +52,7 @@ const settingsOverride = {
     LookAnglesPlugin: {
       enabled: false,
     },
-    MultiSiteLookAnglesPlugin: {
+    MultiSensorLookAnglesPlugin: {
       enabled: false,
     },
     SensorTimeline: {

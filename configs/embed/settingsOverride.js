@@ -63,7 +63,7 @@ const settingsOverride = {
       enabled: false,
       order: 20,
     },
-    MultiSiteLookAnglesPlugin: {
+    MultiSensorLookAnglesPlugin: {
       enabled: false,
       order: 21,
     },

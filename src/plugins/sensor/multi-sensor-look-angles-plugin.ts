@@ -33,10 +33,10 @@ import { SensorManager } from '../../app/sensors/sensorManager';
 import { ClickDragOptions, fileExcelPng, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 /** Shorthand for this plugin's locale keys. */
-const l = (key: string): string => t7e(`plugins.MultiSiteLookAnglesPlugin.${key}` as Parameters<typeof t7e>[0]);
+const l = (key: string): string => t7e(`plugins.MultiSensorLookAnglesPlugin.${key}` as Parameters<typeof t7e>[0]);
 
-export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
-  readonly id = 'MultiSiteLookAnglesPlugin';
+export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
+  readonly id = 'MultiSensorLookAnglesPlugin';
   dependencies_ = [SelectSatManager.name];
   private readonly selectSatManager_: SelectSatManager;
   // combine sensorListSsn, sesnorListLeoLabs, and SensorListRus
@@ -95,15 +95,15 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     maxWidth: 750,
   };
 
-  sideMenuElementName: string = 'multi-site-look-angles-menu';
+  sideMenuElementName: string = 'multi-sensor-look-angles-menu';
   sideMenuElementHtml: string = html`
     <div class="row"></div>
     <div class="row">
-      <table id="multi-site-look-angles-table" class="center-align striped-light centered"></table>
+      <table id="multi-sensor-look-angles-table" class="center-align striped-light centered"></table>
     </div>`;
   sideMenuSecondaryHtml: string = html`
     <div class="row" style="margin: 0 10px;">
-      <div id="multi-site-look-angles-sensor-list">
+      <div id="multi-sensor-look-angles-sensor-list">
       </div>
     </div>`;
   sideMenuSettingsWidth: number = 350;
@@ -144,7 +144,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
           heading: t7e('help.overview'),
           content: l('help.overview'),
           image: {
-            src: 'img/help/multi-site-look-angles/multi-site-look-angles-menu.png',
+            src: 'img/help/multi-sensor-look-angles/multi-sensor-look-angles-menu.png',
             alt: l('help.imgAlt'),
             caption: l('help.imgCaption'),
           },
@@ -207,7 +207,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       if (sat) {
         showLoading(() => {
           // TODO: This should be a class property that persists between refreshes
-          const sensorListDom = getEl('multi-site-look-angles-sensor-list');
+          const sensorListDom = getEl('multi-sensor-look-angles-sensor-list');
 
           if (!sensorListDom) {
             errorManagerInstance.warn('Could not find sensor list dom');
@@ -352,7 +352,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
             };
           }
         } else {
-          multiSitePass = MultiSiteLookAnglesPlugin.propagateMultiSite_(now, satrec!, sensor);
+          multiSitePass = MultiSensorLookAnglesPlugin.propagateMultiSite_(now, satrec!, sensor);
         }
 
         let canStationObserve = true;
@@ -426,7 +426,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     const sensorManagerInstance = ServiceLocator.getSensorManager();
     const sensorMap = new Map(sensors.map((s) => [s.objName, s]));
 
-    const tbl = <HTMLTableElement>getEl('multi-site-look-angles-table'); // Identify the table to update
+    const tbl = <HTMLTableElement>getEl('multi-sensor-look-angles-table'); // Identify the table to update
 
     tbl.innerHTML = ''; // Clear the table from old object data
     let tr = tbl.insertRow();

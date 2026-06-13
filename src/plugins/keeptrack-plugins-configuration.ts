@@ -50,7 +50,7 @@ export type KeepTrackPluginsConfiguration = {
   ShortTermFences?: PluginConfiguration;
   LookAnglesPlugin?: PluginConfiguration;
   LinkBudgetPlugin?: PluginConfiguration;
-  MultiSiteLookAnglesPlugin?: PluginConfiguration;
+  MultiSensorLookAnglesPlugin?: PluginConfiguration;
   SensorTimeline?: PluginConfiguration;
   SatelliteTimeline?: PluginConfiguration;
   WatchlistPlugin?: PluginConfiguration;

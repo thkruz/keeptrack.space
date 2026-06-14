@@ -278,6 +278,27 @@ export class CatalogManager {
   }
 
   /**
+   * Finds the next unused analyst satellite slot - an inactive PAYLOAD reserved in
+   * the {@link CatalogManager.ANALYST_START_ID} block. Tools that host a generated
+   * nominal satellite (e.g. New Launch) claim one of these slots. Returns null when
+   * every analyst slot in the search window is already active.
+   *
+   * @param startOffset - First offset past ANALYST_START_ID to consider.
+   * @param endOffset - Exclusive upper offset bound for the search.
+   */
+  getNextAvailableAnalystSat(startOffset = 500, endOffset = 2500): Satellite | null {
+    for (let offset = startOffset; offset < endOffset; offset++) {
+      const sat = this.sccNum2Sat(CatalogManager.ANALYST_START_ID + offset);
+
+      if (sat && !sat.active) {
+        return sat;
+      }
+    }
+
+    return null;
+  }
+
+  /**
    * @deprecated - Stars are not currently working
    *
    * Converts a star name to its corresponding ID within a given range.

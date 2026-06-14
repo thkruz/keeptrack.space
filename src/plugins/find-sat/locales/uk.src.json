@@ -50,13 +50,20 @@
         "argOfPerigeeMargin": "Допуск (градуси)",
         "all": "Усі",
         "findSatellites": "Знайти супутник(и)",
-        "exportData": "Експорт даних"
+        "exportData": "Експорт даних",
+        "sectionClassification": "Класифікація",
+        "sectionLookAngles": "Кути спостереження",
+        "sectionOrbital": "Елементи орбіти",
+        "sectionPhysical": "Фізичні та дані",
+        "sensorNote": "Для кутів спостереження потрібно вибрати датчик.",
+        "resultCount": "Результатів: {count}"
       },
       "errorMsgs": {
         "NoSatellitesFound": "Супутники не знайдено",
         "NoSearchCriteriaEntered": "Критерії пошуку не введено",
         "TooManyResults": "Забагато результатів, обмежено до {limit}",
-        "TryFindingFirst": "Спочатку спробуйте знайти супутники!"
+        "TryFindingFirst": "Спочатку спробуйте знайти супутники!",
+        "SearchFailed": "Помилка пошуку: {error}"
       }
     }
   }

@@ -50,13 +50,20 @@
         "argOfPerigeeMargin": "マージン（度）",
         "all": "すべて",
         "findSatellites": "衛星を検索",
-        "exportData": "データをエクスポート"
+        "exportData": "データをエクスポート",
+        "sectionClassification": "分類",
+        "sectionLookAngles": "観測角",
+        "sectionOrbital": "軌道要素",
+        "sectionPhysical": "物理・データ",
+        "sensorNote": "観測角の利用にはセンサーの選択が必要です。",
+        "resultCount": "{count}件の結果"
       },
       "errorMsgs": {
         "NoSatellitesFound": "衛星が見つかりません",
         "NoSearchCriteriaEntered": "検索条件が入力されていません",
         "TooManyResults": "結果が多すぎます。{limit}件に制限されました",
-        "TryFindingFirst": "まず衛星を検索してください！"
+        "TryFindingFirst": "まず衛星を検索してください！",
+        "SearchFailed": "検索に失敗しました: {error}"
       }
     }
   }

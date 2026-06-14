@@ -106,6 +106,14 @@
   background: var(--color-dark-border);
 }
 
+/* Muted explanatory note inside a section card. */
+.kt-ui-v13 .kt-note {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-dark-text-muted);
+  margin: 0 0 8px;
+}
+
 /* ===== Field rows ===== */
 .kt-ui-v13 .kt-field-row {
   display: flex;

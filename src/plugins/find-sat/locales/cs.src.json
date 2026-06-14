@@ -50,13 +50,20 @@
         "argOfPerigeeMargin": "Tolerance (°)",
         "all": "Vše",
         "findSatellites": "Najít satelity",
-        "exportData": "Exportovat data"
+        "exportData": "Exportovat data",
+        "sectionClassification": "Klasifikace",
+        "sectionLookAngles": "Pozorovací úhly",
+        "sectionOrbital": "Dráhové elementy",
+        "sectionPhysical": "Fyzikální a data",
+        "sensorNote": "Pozorovací úhly vyžadují vybraný senzor.",
+        "resultCount": "{count} výsledků"
       },
       "errorMsgs": {
         "NoSatellitesFound": "Žádné satelity nenalezeny",
         "NoSearchCriteriaEntered": "Nebyla zadána žádná kritéria vyhledávání",
         "TooManyResults": "Příliš mnoho výsledků, omezeno na {limit}",
-        "TryFindingFirst": "Nejprve zkuste vyhledat satelity!"
+        "TryFindingFirst": "Nejprve zkuste vyhledat satelity!",
+        "SearchFailed": "Hledání selhalo: {error}"
       }
     }
   }

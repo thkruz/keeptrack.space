@@ -50,13 +50,20 @@
         "argOfPerigeeMargin": "Margine (gradi)",
         "all": "Tutti",
         "findSatellites": "Trova satellite/i",
-        "exportData": "Esporta dati"
+        "exportData": "Esporta dati",
+        "sectionClassification": "Classificazione",
+        "sectionLookAngles": "Angoli di osservazione",
+        "sectionOrbital": "Elementi orbitali",
+        "sectionPhysical": "Fisici e dati",
+        "sensorNote": "Gli angoli di osservazione richiedono un sensore selezionato.",
+        "resultCount": "{count} risultato/i"
       },
       "errorMsgs": {
         "NoSatellitesFound": "Nessun satellite trovato",
         "NoSearchCriteriaEntered": "Nessun criterio di ricerca inserito",
         "TooManyResults": "Troppi risultati, limitato a {limit}",
-        "TryFindingFirst": "Prova prima a cercare i satelliti!"
+        "TryFindingFirst": "Prova prima a cercare i satelliti!",
+        "SearchFailed": "Ricerca non riuscita: {error}"
       }
     }
   }

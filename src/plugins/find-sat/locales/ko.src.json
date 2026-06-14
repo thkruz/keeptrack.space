@@ -50,13 +50,20 @@
         "argOfPerigeeMargin": "여유(도)",
         "all": "전체",
         "findSatellites": "위성 찾기",
-        "exportData": "데이터 내보내기"
+        "exportData": "데이터 내보내기",
+        "sectionClassification": "분류",
+        "sectionLookAngles": "관측각",
+        "sectionOrbital": "궤도 요소",
+        "sectionPhysical": "물리 및 데이터",
+        "sensorNote": "관측각을 사용하려면 센서를 선택해야 합니다.",
+        "resultCount": "결과 {count}개"
       },
       "errorMsgs": {
         "NoSatellitesFound": "위성을 찾을 수 없습니다",
         "NoSearchCriteriaEntered": "검색 조건이 입력되지 않았습니다",
         "TooManyResults": "결과가 너무 많습니다. {limit}개로 제한됨",
-        "TryFindingFirst": "먼저 위성을 찾아보세요!"
+        "TryFindingFirst": "먼저 위성을 찾아보세요!",
+        "SearchFailed": "검색 실패: {error}"
       }
     }
   }

@@ -1,0 +1,13 @@
+/* Find Satellite (OSS) v13 menu extras */
+
+.fbl-result-count {
+  margin: 4px 6px 0;
+  padding: 0 8px;
+  font-size: 12px;
+  color: var(--color-dark-text-muted);
+  min-height: 16px;
+}
+
+.fbl-result-count:empty {
+  display: none;
+}

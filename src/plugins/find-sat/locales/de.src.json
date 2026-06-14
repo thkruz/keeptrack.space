@@ -50,13 +50,20 @@
         "argOfPerigeeMargin": "Toleranz (Grad)",
         "all": "Alle",
         "findSatellites": "Satellit(en) suchen",
-        "exportData": "Daten exportieren"
+        "exportData": "Daten exportieren",
+        "sectionClassification": "Klassifizierung",
+        "sectionLookAngles": "Blickwinkel",
+        "sectionOrbital": "Bahnelemente",
+        "sectionPhysical": "Physikalisch & Daten",
+        "sensorNote": "Blickwinkel erfordern einen ausgewählten Sensor.",
+        "resultCount": "{count} Ergebnis(se)"
       },
       "errorMsgs": {
         "NoSatellitesFound": "Keine Satelliten gefunden",
         "NoSearchCriteriaEntered": "Keine Suchkriterien eingegeben",
         "TooManyResults": "Zu viele Ergebnisse, begrenzt auf {limit}",
-        "TryFindingFirst": "Versuchen Sie zuerst, Satelliten zu finden!"
+        "TryFindingFirst": "Versuchen Sie zuerst, Satelliten zu finden!",
+        "SearchFailed": "Suche fehlgeschlagen: {error}"
       }
     }
   }

@@ -50,13 +50,20 @@
         "argOfPerigeeMargin": "容差（度）",
         "all": "全部",
         "findSatellites": "查找卫星",
-        "exportData": "导出数据"
+        "exportData": "导出数据",
+        "sectionClassification": "分类",
+        "sectionLookAngles": "观测角",
+        "sectionOrbital": "轨道要素",
+        "sectionPhysical": "物理与数据",
+        "sensorNote": "观测角需要先选择一个传感器。",
+        "resultCount": "{count} 个结果"
       },
       "errorMsgs": {
         "NoSatellitesFound": "未找到卫星",
         "NoSearchCriteriaEntered": "未输入搜索条件",
         "TooManyResults": "结果太多，限制为{limit}",
-        "TryFindingFirst": "请先尝试查找卫星！"
+        "TryFindingFirst": "请先尝试查找卫星！",
+        "SearchFailed": "搜索失败：{error}"
       }
     }
   }

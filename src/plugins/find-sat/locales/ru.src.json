@@ -50,13 +50,20 @@
         "argOfPerigeeMargin": "Допуск (градусы)",
         "all": "Все",
         "findSatellites": "Найти спутник(и)",
-        "exportData": "Экспорт данных"
+        "exportData": "Экспорт данных",
+        "sectionClassification": "Классификация",
+        "sectionLookAngles": "Углы наблюдения",
+        "sectionOrbital": "Элементы орбиты",
+        "sectionPhysical": "Физические и данные",
+        "sensorNote": "Для углов наблюдения необходимо выбрать датчик.",
+        "resultCount": "Результатов: {count}"
       },
       "errorMsgs": {
         "NoSatellitesFound": "Спутники не найдены",
         "NoSearchCriteriaEntered": "Критерии поиска не введены",
         "TooManyResults": "Слишком много результатов, ограничено до {limit}",
-        "TryFindingFirst": "Сначала попробуйте найти спутники!"
+        "TryFindingFirst": "Сначала попробуйте найти спутники!",
+        "SearchFailed": "Ошибка поиска: {error}"
       }
     }
   }

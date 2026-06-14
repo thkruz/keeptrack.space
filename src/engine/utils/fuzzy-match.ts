@@ -87,3 +87,37 @@ export const fuzzyScore = (label: string, query: string): number => {
 
   return fuzzySubsequenceScore(lowerLabel, lowerQuery);
 };
+
+/**
+ * Returns the indices of the characters in `label` that `query` matched,
+ * preferring a contiguous substring match and falling back to a left-to-right
+ * subsequence match (which also covers acronym hits, since first letters are a
+ * subsequence). Returns an empty array when `query` is empty or is not a
+ * subsequence of `label`. Intended for highlighting matched characters in the
+ * UI, so it mirrors how {@link fuzzyScore} decides a match exists.
+ */
+export const fuzzyMatchIndices = (label: string, query: string): number[] => {
+  if (query === '') {
+    return [];
+  }
+  const lowerLabel = label.toLowerCase();
+  const lowerQuery = query.toLowerCase();
+
+  const substringIdx = lowerLabel.indexOf(lowerQuery);
+
+  if (substringIdx >= 0) {
+    return Array.from({ length: lowerQuery.length }, (_, i) => substringIdx + i);
+  }
+
+  const indices: number[] = [];
+  let queryIdx = 0;
+
+  for (let i = 0; i < lowerLabel.length && queryIdx < lowerQuery.length; i++) {
+    if (lowerLabel[i] === lowerQuery[queryIdx]) {
+      indices.push(i);
+      queryIdx++;
+    }
+  }
+
+  return queryIdx === lowerQuery.length ? indices : [];
+};

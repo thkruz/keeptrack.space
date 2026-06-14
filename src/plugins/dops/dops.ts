@@ -13,7 +13,7 @@ import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { DopMath, ElevationMaskFn } from '@app/engine/math/dop-math';
+import { DopMath, ElevationMaskFn, GNSS_CONSTELLATION_PATTERNS, GnssConstellation } from '@app/engine/math/dop-math';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import {
   IBottomIconConfig,
@@ -25,7 +25,13 @@ import {
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { Degrees, Kilometers, Satellite, TemeVec3, eci2lla } from '@ootk/src/main';
+import { isValidLocation } from './dops-analysis';
 import './dops.css';
+
+type T7eKey = Parameters<typeof t7e>[0];
+
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.DopsPlugin.${key}` as T7eKey);
 
 export class DopsPlugin extends KeepTrackPlugin {
   readonly id = 'DopsPlugin';
@@ -112,40 +118,76 @@ export class DopsPlugin extends KeepTrackPlugin {
 
   protected buildSideMenuHtml_(): string {
     return html`
-    <div id="dops-menu" class="side-menu-parent start-hidden">
+    <div id="dops-menu" class="side-menu-parent start-hidden kt-ui-v13">
       <div id="dops-content" class="side-menu">
-        <div class="row">
-          <h5 class="center-align">${t7e('plugins.DopsPlugin.title')}</h5>
-        </div>
         <form id="dops-form">
-          <div class="switch row">
-            <div class="input-field col s3" data-position="bottom" data-offset="60" data-tooltip="${t7e('plugins.DopsPlugin.tooltips.latitude')}">
-              <input value="41" id="dops-lat" type="text">
-              <label for="dops-lat" class="active">${t7e('plugins.DopsPlugin.labels.latitude')}</label>
-            </div>
-            <div class="input-field col s3" data-position="bottom" data-offset="60" data-tooltip="${t7e('plugins.DopsPlugin.tooltips.longitude')}">
-              <input value="-71" id="dops-lon" type="text">
-              <label for="dops-lon" class="active">${t7e('plugins.DopsPlugin.labels.longitude')}</label>
-            </div>
-            <div class="input-field col s3" data-position="bottom" data-offset="60" data-tooltip="${t7e('plugins.DopsPlugin.tooltips.altitude')}">
-              <input value="0" id="dops-alt" type="text">
-              <label for="dops-alt" class="active">${t7e('plugins.DopsPlugin.labels.altitude')}</label>
-            </div>
-            <div class="input-field col s3" data-position="bottom" data-offset="60" data-tooltip="${t7e('plugins.DopsPlugin.tooltips.mask')}">
-              <input value="15" id="dops-el" type="text">
-              <label for="dops-el" class="active">${t7e('plugins.DopsPlugin.labels.mask')}</label>
-            </div>
-          </div>
-          <div class="row center">
-            <button id="dops-submit" class="btn btn-ui waves-effect waves-light" type="submit"
-              name="action">${t7e('plugins.DopsPlugin.labels.updateDopData')} &#9658;
-            </button>
-          </div>
+          ${this.wrapSection_(l('labels.location'), html`
+            ${this.locationBody_()}
+            ${DopsPlugin.actionButton_('dops-submit', l('labels.updateDopData'), { submit: true })}
+          `)}
         </form>
-      <div class="row">
-        <table id="dops" class="center-align striped-light centered"></table>
+        ${this.buildResultsHtml_()}
       </div>
     </div>`;
+  }
+
+  /** Wrap a section's controls in a titled v13 card. */
+  protected wrapSection_(title: string, body: string): string {
+    return html`
+      <section class="kt-section">
+        <div class="kt-section-label">${title}</div>
+        ${body}
+      </section>
+    `;
+  }
+
+  /** A full-width v13 action row (label + trailing chevron via CSS). */
+  protected static actionButton_(id: string, label: string, opts: { submit?: boolean; disabled?: boolean } = {}): string {
+    const type = opts.submit ? 'submit' : 'button';
+    const disabled = opts.disabled ? ' disabled' : '';
+
+    return html`
+      <button id="${id}" type="${type}" class="kt-action waves-effect"${disabled}>
+        <span class="kt-action-label">${label}</span>
+      </button>
+    `;
+  }
+
+  /**
+   * The observer location fields (lat/lon/alt/elevation mask). Pro extends this
+   * body with the constellation selector and terrain-mask editor action.
+   */
+  protected locationBody_(): string {
+    return html`
+      <div class="kt-field-row">
+        <div class="input-field col s3" data-position="bottom" data-offset="60" data-tooltip="${t7e('plugins.DopsPlugin.tooltips.latitude')}">
+          <input value="41" id="dops-lat" type="text">
+          <label for="dops-lat" class="active">${t7e('plugins.DopsPlugin.labels.latitude')}</label>
+        </div>
+        <div class="input-field col s3" data-position="bottom" data-offset="60" data-tooltip="${t7e('plugins.DopsPlugin.tooltips.longitude')}">
+          <input value="-71" id="dops-lon" type="text">
+          <label for="dops-lon" class="active">${t7e('plugins.DopsPlugin.labels.longitude')}</label>
+        </div>
+        <div class="input-field col s3" data-position="bottom" data-offset="60" data-tooltip="${t7e('plugins.DopsPlugin.tooltips.altitude')}">
+          <input value="0" id="dops-alt" type="text">
+          <label for="dops-alt" class="active">${t7e('plugins.DopsPlugin.labels.altitude')}</label>
+        </div>
+        <div class="input-field col s3" data-position="bottom" data-offset="60" data-tooltip="${t7e('plugins.DopsPlugin.tooltips.mask')}">
+          <input value="15" id="dops-el" type="text">
+          <label for="dops-el" class="active">${t7e('plugins.DopsPlugin.labels.mask')}</label>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * The results region below the form. OSS renders a single DOP table; Pro
+   * overrides this with the Sky View / 24hr Analysis tabbed layout.
+   */
+  protected buildResultsHtml_(): string {
+    return this.wrapSection_(l('labels.results'), html`
+      <table id="dops" class="center-align striped-light centered"></table>
+    `);
   }
 
   // =========================================================================
@@ -279,6 +321,13 @@ export class DopsPlugin extends KeepTrackPlugin {
     const lat = <Degrees>parseFloat((<HTMLInputElement>getEl('dops-lat')).value);
     const lon = <Degrees>parseFloat((<HTMLInputElement>getEl('dops-lon')).value);
     const alt = <Kilometers>parseFloat((<HTMLInputElement>getEl('dops-alt')).value);
+
+    if (!isValidLocation(lat, lon, alt)) {
+      ServiceLocator.getUiManager().toast(t7e('plugins.DopsPlugin.errorMsgs.invalidLocation'), ToastMsgType.caution);
+
+      return;
+    }
+
     const el = this.getElevationMask_();
 
     if (typeof el === 'number') {
@@ -292,20 +341,39 @@ export class DopsPlugin extends KeepTrackPlugin {
   }
 
   static getGpsSats(catalogManagerInstance: CatalogManager, groupManagerInstance: GroupsManager): Satellite[] {
-    if (!groupManagerInstance.groupList.GPSGroup) {
-      groupManagerInstance.groupList.GPSGroup = groupManagerInstance.createGroup(GroupType.NAME_REGEX, /NAVSTAR/iu, 'GPSGroup');
-    }
-    const gpsSats = groupManagerInstance.groupList.GPSGroup;
-    const gpsSatObjects = [] as Satellite[];
+    return DopsPlugin.getGnssSats(catalogManagerInstance, groupManagerInstance, 'gps');
+  }
 
-    gpsSats.ids.forEach((id: number) => {
+  /**
+   * Returns the satellites of the requested GNSS constellation (GPS, Galileo,
+   * GLONASS, BeiDou, or all of them) by matching catalog names.
+   */
+  static getGnssSats(
+    catalogManagerInstance: CatalogManager,
+    groupManagerInstance: GroupsManager,
+    constellation: GnssConstellation = 'gps',
+  ): Satellite[] {
+    // Keep the historical group name for GPS so existing groups are reused
+    const groupName = constellation === 'gps' ? 'GPSGroup' : `GnssGroup_${constellation}`;
+
+    if (!groupManagerInstance.groupList[groupName]) {
+      groupManagerInstance.groupList[groupName] = groupManagerInstance.createGroup(
+        GroupType.NAME_REGEX,
+        GNSS_CONSTELLATION_PATTERNS[constellation],
+        groupName,
+      );
+    }
+    const gnssSats = groupManagerInstance.groupList[groupName];
+    const gnssSatObjects = [] as Satellite[];
+
+    gnssSats.ids.forEach((id: number) => {
       const sat = catalogManagerInstance.getSat(id);
 
       if (sat) {
-        gpsSatObjects.push(sat);
+        gnssSatObjects.push(sat);
       }
     });
 
-    return gpsSatObjects;
+    return gnssSatObjects;
   }
 }

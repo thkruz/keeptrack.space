@@ -22,6 +22,24 @@ export type SatAzEl = {
   az: Degrees;
   el: Degrees;
   isVisible: boolean;
+  /** Catalog name of the satellite, used for sky plot identity labels */
+  name?: string;
+};
+
+/** Supported GNSS constellations for DOP analysis. */
+export type GnssConstellation = 'gps' | 'galileo' | 'glonass' | 'beidou' | 'all';
+
+/**
+ * Catalog-name matchers for each GNSS constellation.
+ * GLONASS satellites are cataloged as COSMOS objects; CelesTrak-style names carry
+ * a GLONASS tag or a 7xx Uragan series number in parentheses/brackets.
+ */
+export const GNSS_CONSTELLATION_PATTERNS: Record<GnssConstellation, RegExp> = {
+  gps: /NAVSTAR|\bGPS[\s-]/iu,
+  galileo: /GALILEO|\bGSAT-?\d{3,4}\b/iu,
+  glonass: /GLONASS|URAGAN|COSMOS\s*\d+\s*[([](?:GLONASS|7\d{2})/iu,
+  beidou: /BEIDOU|\bBDS[\s-]\d/iu,
+  all: /NAVSTAR|\bGPS[\s-]|GALILEO|\bGSAT-?\d{3,4}\b|GLONASS|URAGAN|COSMOS\s*\d+\s*[([](?:GLONASS|7\d{2})|BEIDOU|\bBDS[\s-]\d/iu,
 };
 
 /** Function that returns the minimum elevation at a given azimuth */
@@ -30,6 +48,8 @@ export type ElevationMaskFn = (az: Degrees) => Degrees;
 export type DopList = {
   time: Date;
   dops: DopValues;
+  /** Number of satellites visible above the elevation mask at this time */
+  visibleSats: number;
 }[];
 
 /**
@@ -119,7 +139,7 @@ export abstract class DopMath {
       }
 
       if (allSatAzEl) {
-        allSatAzEl.push({ az, el, isVisible });
+        allSatAzEl.push({ az, el, isVisible, name: sat.name });
       }
     });
 
@@ -174,6 +194,29 @@ export abstract class DopMath {
     }
   }
 
+  /**
+   * Builds a short identity label for a sky plot dot from a satellite catalog name.
+   * Prefers a PRN designator when one is parseable, otherwise shortens the name by
+   * stripping parenthetical/bracketed suffixes and truncating.
+   */
+  public static getSatelliteShortLabel(name?: string): string {
+    if (!name) {
+      return '';
+    }
+
+    const prnMatch = (/PRN\s*(\d+)/iu).exec(name);
+
+    if (prnMatch) {
+      return `PRN ${prnMatch[1]}`;
+    }
+
+    const shortened = name
+      .replace(/\s*[([].*$/u, '')
+      .trim();
+
+    return shortened.length > 12 ? `${shortened.slice(0, 11)}…` : shortened;
+  }
+
   public static getDopsList(
     getOffsetTimeObj: (offset: number) => Date,
     gpsSats: Satellite[],
@@ -190,7 +233,7 @@ export abstract class DopMath {
 
       const dops = DopMath.getDops(now, gpsSats, lat, lon, alt, el);
 
-      dopsResults.push({ time: now, dops });
+      dopsResults.push({ time: now, dops, visibleSats: dops.visibleSats });
     }
 
     return dopsResults;

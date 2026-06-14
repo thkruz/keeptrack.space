@@ -9,7 +9,9 @@
         "longitude": "Długość geogr.",
         "altitude": "Wysokość",
         "mask": "Maska",
-        "updateDopData": "Aktualizuj dane DOP"
+        "updateDopData": "Aktualizuj dane DOP",
+        "location": "Lokalizacja",
+        "results": "Wyniki"
       },
       "tooltips": {
         "latitude": "Szerokość geograficzna w stopniach",

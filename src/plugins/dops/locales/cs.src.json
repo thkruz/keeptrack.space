@@ -9,7 +9,9 @@
         "longitude": "Zeměpisná délka",
         "altitude": "Nadmořská výška",
         "mask": "Maska",
-        "updateDopData": "Aktualizovat data DOP"
+        "updateDopData": "Aktualizovat data DOP",
+        "location": "Poloha",
+        "results": "Výsledky"
       },
       "tooltips": {
         "latitude": "Zeměpisná šířka ve stupních",

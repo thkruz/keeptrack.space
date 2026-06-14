@@ -9,7 +9,9 @@
         "longitude": "경도",
         "altitude": "고도",
         "mask": "마스크",
-        "updateDopData": "DOP 데이터 업데이트"
+        "updateDopData": "DOP 데이터 업데이트",
+        "location": "위치",
+        "results": "결과"
       },
       "tooltips": {
         "latitude": "위도 (도 단위)",

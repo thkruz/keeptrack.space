@@ -9,7 +9,9 @@
         "longitude": "经度",
         "altitude": "高度",
         "mask": "遮罩",
-        "updateDopData": "更新 DOP 数据"
+        "updateDopData": "更新 DOP 数据",
+        "location": "位置",
+        "results": "结果"
       },
       "tooltips": {
         "latitude": "纬度（度）",

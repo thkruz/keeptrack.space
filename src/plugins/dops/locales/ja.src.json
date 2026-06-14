@@ -9,7 +9,9 @@
         "longitude": "経度",
         "altitude": "高度",
         "mask": "マスク",
-        "updateDopData": "DOPデータを更新"
+        "updateDopData": "DOPデータを更新",
+        "location": "場所",
+        "results": "結果"
       },
       "tooltips": {
         "latitude": "緯度（度）",

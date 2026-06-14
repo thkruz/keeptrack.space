@@ -9,7 +9,9 @@
         "longitude": "Довгота",
         "altitude": "Висота",
         "mask": "Маска",
-        "updateDopData": "Оновити дані DOP"
+        "updateDopData": "Оновити дані DOP",
+        "location": "Розташування",
+        "results": "Результати"
       },
       "tooltips": {
         "latitude": "Широта в градусах",

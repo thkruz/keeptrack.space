@@ -9,7 +9,9 @@
         "longitude": "Longitude",
         "altitude": "Altitude",
         "mask": "Mask",
-        "updateDopData": "Update DOP Data"
+        "updateDopData": "Update DOP Data",
+        "location": "Location",
+        "results": "Results"
       },
       "tooltips": {
         "latitude": "Latitude in Degrees",

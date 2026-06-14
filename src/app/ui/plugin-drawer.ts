@@ -12,11 +12,11 @@ import leftPanelOpenPng from '@public/img/icons/left-panel-open.png';
 import searchPng from '@public/img/icons/search.png';
 import ktsOrangeLogoPng from '@public/img/kts-orange-logo.png';
 import {
-  type DrawerBadge, type DrawerGroup, type DrawerItemData,
-  buildRecentGroupFromCache, collectDrawerItems, loadRecentPlugins, renderBadge,
-  renderStatusFooter, renderUtilityFooter, saveRecentPlugins,
+  type DrawerBadge, type DrawerGroup, type DrawerItemData, type RecentEntry,
+  buildRecentGroupFromCache, collectDrawerItems, loadRecents, recordRecent, renderBadge,
+  renderStatusFooter, renderUtilityFooter,
   syncBadgesFromEvents, syncInitialUtilityState, syncUtilityFooterState,
-  trackRecentPlugin, updateConnectivityStatus, updatePhoneLinkState,
+  updateConnectivityStatus, updatePhoneLinkState,
 } from './plugin-drawer-helpers';
 import './plugin-drawer.css';
 
@@ -28,7 +28,6 @@ export class PluginDrawer {
   private overlayEl_: HTMLElement | null = null;
   private hamburgerEl_: HTMLElement | null = null;
   private groupStates_: Record<string, boolean> = {};
-  private recentPluginIds_: string[] = [];
   private readonly allDrawerItems_: Map<string, DrawerItemData> = new Map();
   private isRailMode_ = false;
   private readonly badges_: Map<string, DrawerBadge> = new Map();
@@ -43,7 +42,6 @@ export class PluginDrawer {
     }
 
     this.loadGroupStates_();
-    this.recentPluginIds_ = loadRecentPlugins();
 
     // Rail mode is automatic on tablet+ (non-mobile)
     this.isRailMode_ = !this.isMobileMode_;
@@ -106,6 +104,8 @@ export class PluginDrawer {
     this.isOpen_ = true;
     this.exitRailMode_();
     this.syncActiveState_();
+    // Re-read recents so activations made from the Launchpad show up here too.
+    this.refreshRecentGroup_();
     this.drawerEl_?.classList.add('open');
     this.overlayEl_?.classList.add('open');
     this.hamburgerEl_?.classList.add('open');
@@ -686,9 +686,8 @@ export class PluginDrawer {
   // ---- Recent Plugins ----
 
   private trackRecentPlugin_(pluginId: string): void {
-    this.recentPluginIds_ = trackRecentPlugin(this.recentPluginIds_, pluginId);
-    saveRecentPlugins(this.recentPluginIds_);
-    this.refreshRecentGroup_();
+    // recordRecent returns the updated list, so reuse it instead of re-reading storage.
+    this.refreshRecentGroup_(recordRecent(pluginId));
   }
 
   private buildRecentGroup_(menuGroups: Record<string, DrawerGroup>): DrawerGroup {
@@ -701,10 +700,10 @@ export class PluginDrawer {
       }
     }
 
-    return buildRecentGroupFromCache(this.recentPluginIds_, this.allDrawerItems_);
+    return buildRecentGroupFromCache(loadRecents().map((entry) => entry.id), this.allDrawerItems_);
   }
 
-  private refreshRecentGroup_(): void {
+  private refreshRecentGroup_(entries: RecentEntry[] = loadRecents()): void {
     const contentEl = getEl('drawer-content', true);
 
     if (!contentEl) {
@@ -716,7 +715,7 @@ export class PluginDrawer {
 
     oldRecent?.remove();
 
-    const recentGroup = buildRecentGroupFromCache(this.recentPluginIds_, this.allDrawerItems_);
+    const recentGroup = buildRecentGroupFromCache(entries.map((entry) => entry.id), this.allDrawerItems_);
 
     if (recentGroup.items.length === 0) {
       return;

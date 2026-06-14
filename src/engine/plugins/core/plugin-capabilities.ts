@@ -645,10 +645,20 @@ export interface ICommandPaletteCommand {
   label: string;
 
   /**
-   * Optional category for organizing commands.
+   * Optional category for organizing commands. The palette groups results under
+   * a section header per category, so this should be a stable group name shared
+   * by related commands (not per-command metadata - use {@link description} for that).
    * @example 'Display', 'Sensors', 'Analysis'
    */
   category?: string;
+
+  /**
+   * Optional dim subtitle rendered under the label. Useful for clarifying what a
+   * non-obvious command does, or for per-row metadata (e.g. a satellite's NORAD
+   * number and country).
+   * @example 'Resets all filters to their defaults'
+   */
+  description?: string;
 
   /**
    * Optional keyboard shortcut hint displayed alongside the command.
@@ -656,6 +666,13 @@ export interface ICommandPaletteCommand {
    * @example 'N', 'Ctrl+Shift+F'
    */
   shortcutHint?: string;
+
+  /**
+   * Optional synonyms/aliases scored by the command palette in addition to
+   * the label and category, so commands are findable under alternate names.
+   * @example ['dark mode', 'eclipse'] for a night-toggle command
+   */
+  keywords?: string[];
 
   /**
    * Callback invoked when the command is selected.

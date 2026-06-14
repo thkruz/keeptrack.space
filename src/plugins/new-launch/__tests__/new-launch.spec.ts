@@ -36,9 +36,9 @@ test.describe('NewLaunch', () => {
 
     await expect(sideMenu).toBeVisible({ timeout: 5_000 });
 
-    // Verify Pro-specific elements (mode selector, custom orbit fields)
+    // Verify Pro-specific elements (mode tab selector, custom orbit fields)
     // Use toBeAttached for inner form elements of draggable side menu
-    await expect(page.locator('#nlp-mode')).toBeAttached();
+    await expect(page.locator('#nlp-mode-tabs')).toBeAttached();
     await expect(page.locator('#nlp-selected-section')).toBeAttached();
     await expect(page.locator('#nlp-scc-section')).toBeAttached();
     await expect(page.locator('#nlp-custom-section')).toBeAttached();

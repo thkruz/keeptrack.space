@@ -6,6 +6,11 @@
       "resultsTitle": "Screening Results",
       "resultsCount": "{count} conjunctions found",
       "exportCsv": "Export CSV",
+      "sections": {
+        "parameters": "Parameters",
+        "searchBox": "RIC Search Box",
+        "results": "Results"
+      },
       "riskLevels": {
         "critical": "Critical",
         "high": "High",

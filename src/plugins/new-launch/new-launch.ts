@@ -6,7 +6,6 @@ import rocketLaunchPng from '@public/img/icons/rocket-launch.png';
 
 import { SatMath } from '@app/app/analysis/sat-math';
 
-import { CatalogManager } from '@app/app/data/catalog-manager';
 import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
 import { launchSites } from '@app/app/data/catalogs/launch-sites';
 import { SoundNames } from '@app/engine/audio/sounds';
@@ -15,6 +14,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { TimeManager } from '@app/engine/core/time-manager';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { t7e } from '@app/locales/keys';
@@ -29,8 +29,9 @@ import {
   TleLine1, TleLine2,
 } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { IHelpConfig } from '../../engine/plugins/core/plugin-capabilities';
+import { IHelpConfig, IKeyboardShortcut } from '../../engine/plugins/core/plugin-capabilities';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import './new-launch.css';
 
 type T7eKey = Parameters<typeof t7e>[0];
 
@@ -114,7 +115,24 @@ export class NewLaunch extends KeepTrackPlugin {
         t7e('plugins.NewLaunch.help.tip1'),
         t7e('plugins.NewLaunch.help.tip2'),
       ],
+      shortcuts: [{ keys: ['Shift', 'L'], description: t7e('plugins.NewLaunch.help.shortcutOpen' as T7eKey) }],
     };
+  }
+
+  /**
+   * Shift+L for Launch - toggles the New Launch side menu open/closed. Plain 'L'
+   * is already taken by the orbit-line toggle, so this uses the Shift modifier.
+   */
+  getKeyboardShortcuts(): IKeyboardShortcut[] {
+    return [
+      {
+        key: 'L',
+        shift: true,
+        callback: () => {
+          this.bottomMenuClicked();
+        },
+      },
+    ];
   }
 
   /**
@@ -156,52 +174,96 @@ export class NewLaunch extends KeepTrackPlugin {
     ).join('\n');
   }
 
-  sideMenuElementHtml: string = (() => {
-    const optionsHtml = NewLaunch.buildFacilityOptionsHtml();
-    const l = (key: string) => t7e(`plugins.NewLaunch.labels.${key}` as T7eKey);
+  /**
+   * A full-width v13 action row (label left, chevron added via CSS). Public
+   * static so pro subclasses and the Pro HTML module can build matching rows.
+   * The label lives in a `.kt-action-label` span so JS can swap it without
+   * clobbering the chevron.
+   */
+  static actionButton_(id: string, label: string, opts: { submit?: boolean; disabled?: boolean } = {}): string {
+    const type = opts.submit ? 'submit' : 'button';
+    const disabled = opts.disabled ? ' disabled' : '';
 
     return html`
-      <div id="newLaunch-menu" class="side-menu-parent start-hidden">
+      <button id="${id}" type="${type}" name="action" class="kt-action waves-effect"${disabled}>
+        <span class="kt-action-label">${label}</span>
+      </button>
+    `;
+  }
+
+  /**
+   * Set the visible label on a `.kt-action` row without deleting the CSS chevron.
+   * Writes to the `.kt-action-label` span when present, falling back to the button
+   * text for any non-v13 caller.
+   */
+  protected setActionLabel_(buttonId: string, label: string): void {
+    const btn = getEl(buttonId);
+    const span = btn?.querySelector('.kt-action-label');
+
+    if (span) {
+      span.textContent = label;
+    } else if (btn) {
+      btn.textContent = label;
+    }
+  }
+
+  sideMenuElementHtml: string = this.buildSideMenuHtml_();
+
+  /** v13+ side-menu markup. Split into a method so the structure is overridable. */
+  protected buildSideMenuHtml_(): string {
+    const optionsHtml = NewLaunch.buildFacilityOptionsHtml();
+    const l = (key: string) => t7e(`plugins.NewLaunch.labels.${key}` as T7eKey);
+    const s = (key: string) => t7e(`plugins.NewLaunch.sections.${key}` as T7eKey);
+
+    return html`
+      <div id="newLaunch-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div id="newLaunch-content" class="side-menu">
           <div class="row">
-            <h5 class="center-align">${t7e('plugins.NewLaunch.sideMenuTitle' as T7eKey)}</h5>
-            <div class="center-align" style="margin: 0em 0.75em 1.5em 0.75em; color: #888; font-size: 0.95em;">
-              ${t7e('plugins.NewLaunch.leoOptimizedNote' as T7eKey)}
-            </div>
             <form id="${this.sideMenuElementName}-form" class="col s12">
-              <div class="input-field col s12">
-                <input disabled value="00005" id="nl-scc" type="text">
-                <label for="disabled" class="active">${l('satelliteScc')}</label>
-              </div>
-              <div class="input-field col s12">
-                <input disabled value="50.00" id="nl-inc" type="text">
-                <label for="disabled" class="active">${l('inclination')}</label>
-              </div>
-              <div class="input-field col s12">
-                <select value="50.00" id="nl-updown" type="text">
-                  <option value="N">${l('north')}</option>
-                  <option value="S">${l('south')}</option>
-                </select>
-                <label for="disabled">${l('launchingNorthOrSouth')}</label>
-              </div>
-              <div class="input-field col s12" id="nl-launch-menu">
-                <select id="nl-facility">
-                  ${optionsHtml}
-                </select>
-                <label>${l('launchFacility')}</label>
-              </div>
-              <div class="center-align">
-                <button
-                  id="${this.sideMenuElementName}-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">
-                  ${t7e('plugins.NewLaunch.buttons.createLaunchNominal' as T7eKey)} &#9658;
-                </button>
-              </div>
+              <div class="kt-note">${t7e('plugins.NewLaunch.leoOptimizedNote' as T7eKey)}</div>
+
+              <section class="kt-section">
+                <div class="kt-section-label">${s('template')}</div>
+                <div class="kt-field-row">
+                  <div class="input-field col s6">
+                    <input disabled value="00005" id="nl-scc" type="text">
+                    <label for="nl-scc" class="active">${l('satelliteScc')}</label>
+                  </div>
+                  <div class="input-field col s6">
+                    <input disabled value="50.00" id="nl-inc" type="text">
+                    <label for="nl-inc" class="active">${l('inclination')}</label>
+                  </div>
+                </div>
+              </section>
+
+              <section class="kt-section">
+                <div class="kt-section-label">${s('launchSite')}</div>
+                <div class="kt-field-row">
+                  <div class="input-field col s12">
+                    <select id="nl-updown">
+                      <option value="N">${l('north')}</option>
+                      <option value="S">${l('south')}</option>
+                    </select>
+                    <label for="nl-updown">${l('launchingNorthOrSouth')}</label>
+                  </div>
+                </div>
+                <div class="kt-field-row">
+                  <div class="input-field col s12" id="nl-launch-menu">
+                    <select id="nl-facility">
+                      ${optionsHtml}
+                    </select>
+                    <label>${l('launchFacility')}</label>
+                  </div>
+                </div>
+              </section>
+
+              ${NewLaunch.actionButton_(`${this.sideMenuElementName}-submit`, t7e('plugins.NewLaunch.buttons.createLaunchNominal' as T7eKey), { submit: true })}
             </form>
           </div>
         </div>
       </div>
     `;
-  })();
+  }
 
   dragOptions: ClickDragOptions = {
     minWidth: 400,
@@ -238,20 +300,9 @@ export class NewLaunch extends KeepTrackPlugin {
 
     showLoadingSticky();
 
-    let nominalSat: Satellite | null = null;
-    let id = -1;
+    const nominalSat = catalogManagerInstance.getNextAvailableAnalystSat();
 
-    // TODO: Next available analyst satellite should be a function in the catalog manager
-    for (let nomninalNumber = 500; nomninalNumber < 2500; nomninalNumber++) {
-      nominalSat = catalogManagerInstance.sccNum2Sat(CatalogManager.ANALYST_START_ID + nomninalNumber);
-
-      if (nominalSat && !nominalSat?.active) {
-        id = nominalSat.id;
-        break;
-      }
-    }
-
-    if (id === -1 || !nominalSat) {
+    if (!nominalSat) {
       uiManagerInstance.toast(t7e('plugins.NewLaunch.errorMsgs.noMoreNominalSatellites' as T7eKey), ToastMsgType.critical);
       this.isDoingCalculations_ = false;
       hideLoading();
@@ -259,6 +310,7 @@ export class NewLaunch extends KeepTrackPlugin {
       return;
     }
 
+    const id = nominalSat.id;
     const sat = this.createNominalSat_(inputSat, nominalSat.sccNum, id);
 
     if (!sat) {
@@ -416,7 +468,24 @@ export class NewLaunch extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
+    this.registerSelectSatListener_();
 
+    // Style the v13 menu's Materialize <select>s once the DOM is built.
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      const menuRoot = getEl(this.sideMenuElementName);
+
+      if (menuRoot) {
+        initMaterialSelects(menuRoot);
+      }
+    });
+  }
+
+  /**
+   * Wires the selectSatData event to the OSS form (fills `nl-scc` and toggles the
+   * bottom icon). Extracted as a protected hook so pro subclasses with different
+   * form HTML can override it (e.g. as a no-op) while still calling `super.addJs()`.
+   */
+  protected registerSelectSatListener_(): void {
     EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (obj: BaseObject) => {
@@ -468,19 +537,32 @@ export class NewLaunch extends KeepTrackPlugin {
   protected preValidate_(sat: Satellite): void {
     // Get Current LaunchSiteOptionValue
     const launchSiteOptionValue = (<HTMLInputElement>getEl('nl-facility')).value;
-    const lat = launchSites[launchSiteOptionValue].lat;
+    const launchSite = launchSites[launchSiteOptionValue];
+
+    // Guard against an empty/unknown facility value (no selection yet) - reading
+    // .lat off undefined would throw and abort the bottom-icon callback.
+    if (!launchSite) {
+      return;
+    }
+
+    const lat = launchSite.lat;
     let inc = sat.inclination;
 
     inc = inc > 90 ? ((180 - inc) as Degrees) : inc;
 
-    const submitButtonDom = <HTMLButtonElement>getEl(`${this.sideMenuElementName}-submit`);
+    const submitButtonId = `${this.sideMenuElementName}-submit`;
+    const submitButtonDom = getEl(submitButtonId) as HTMLButtonElement | null;
+
+    if (!submitButtonDom) {
+      return;
+    }
 
     if (inc < lat) {
       submitButtonDom.disabled = true;
-      submitButtonDom.textContent = t7e('plugins.NewLaunch.buttons.inclinationTooLow' as T7eKey);
+      this.setActionLabel_(submitButtonId, t7e('plugins.NewLaunch.buttons.inclinationTooLow' as T7eKey));
     } else {
       submitButtonDom.disabled = false;
-      submitButtonDom.textContent = `${t7e('plugins.NewLaunch.buttons.createLaunchNominal' as T7eKey)} \u25B6`;
+      this.setActionLabel_(submitButtonId, t7e('plugins.NewLaunch.buttons.createLaunchNominal' as T7eKey));
     }
   }
 

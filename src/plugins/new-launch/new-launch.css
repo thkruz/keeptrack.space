@@ -1,0 +1,66 @@
+/*
+ * New Launch (OSS) v13 menu styling.
+ *
+ * Scoped to `#newLaunch-menu`, which is the shared root id for BOTH the OSS
+ * NewLaunch menu and the Pro NewLaunchPro menu. This file is imported by the OSS
+ * plugin module, so it loads in the OSS build AND the Pro build (the Pro plugin
+ * extends NewLaunch). Keep cross-tier layout fixes here; Pro-only bits live in
+ * the Pro plugin's own new-launch.css.
+ *
+ * The shared card / action / field building blocks live in
+ * src/engine/ui/menu-v13.css (scoped under .kt-ui-v13).
+ */
+
+/*
+ * 1. Stacked-field headroom (same fix as Create Satellite and Debris Screening).
+ *    The shared v13 default (`.kt-field-row .input-field.col { margin-top: 6px }`)
+ *    is tuned for cards that never stack more than one labelled row; here several
+ *    rows stack per card and the floating "active" label collides with the row
+ *    above (and with the tab row in the Pro menu). Give every stacked row enough
+ *    room for the label to clear; the first row in a card only needs the
+ *    section-label gap (targeted by adjacency since the label is the first child).
+ */
+#newLaunch-menu .kt-field-row .input-field.col {
+  margin-top: 20px;
+}
+
+#newLaunch-menu .kt-section-label + .kt-field-row .input-field.col {
+  margin-top: 8px;
+}
+
+/*
+ * 2. Align the standalone primary action (Create Launch Nominal / Generate
+ *    Trajectory) with the inset section cards. `.kt-action` is width:100%, so
+ *    margins alone would push it 12px past the cards; subtract the margins from
+ *    the width (border-box) so its edges line up with the cards above it.
+ */
+#newLaunch-menu-form > .kt-action {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
+}
+
+/*
+ * 3. Focus indication. KeepTrack marks field focus with the underline, not a box.
+ *    The app-wide `:focus-visible` outline (offset 2px) would otherwise overlap
+ *    the floating label above each field, so swap it for a primary underline.
+ */
+#newLaunch-menu .input-field input:focus,
+#newLaunch-menu .input-field textarea:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#newLaunch-menu .input-field input:focus-visible,
+#newLaunch-menu .input-field textarea:focus-visible {
+  outline: none;
+}
+
+/*
+ * The template SCC/inclination fields are read-only mirrors of the selected
+ * satellite, so dim them slightly to read as output rather than editable inputs.
+ */
+#newLaunch-menu.kt-ui-v13 #nl-scc:disabled,
+#newLaunch-menu.kt-ui-v13 #nl-inc:disabled {
+  color: var(--color-dark-text-muted);
+}

@@ -29,11 +29,18 @@
         "apogeeKm": "Apogeo (km)",
         "perigeeKm": "Perigeo (km)",
         "smaKm": "Semieje Mayor (km)",
-        "velocityKms": "Velocidad Orbital (km/s)"
+        "velocityKms": "Velocidad Orbital (km/s)",
+        "sectionIdentity": "Identidad",
+        "sectionOrbit": "Órbita",
+        "sectionEpoch": "Época",
+        "sectionElements": "Elementos orbitales",
+        "sectionPresets": "Preajustes"
       },
       "buttons": {
         "createSatellite": "Crear Satélite",
-        "saveTle": "Guardar TLE"
+        "saveTle": "Guardar TLE",
+        "makeSunSync": "Inclinación heliosíncrona",
+        "cloneSelected": "Clonar satélite seleccionado"
       },
       "options": {
         "payload": "Carga Útil",
@@ -66,7 +73,10 @@
         "invalidMeanMotion": "Movimiento medio no válido. Debe tener el formato NN.NNNNN (ej., 16.00000).",
         "invalidPeriod": "Período no válido. Debe tener el formato NN.NNNN a NNNN.NNNN (ej., 90.0000, 9999.9999) con 8 dígitos en total.",
         "invalidSource": "Fuente no válida. No debe estar vacía.",
-        "invalidName": "Nombre no válido. No debe estar vacío."
+        "invalidName": "Nombre no válido. No debe estar vacío.",
+        "slotOccupied": "Sobrescribiendo el satélite existente {name} en la ranura {scc}.",
+        "noFreeSlots": "No quedan ranuras de analista libres (90000-99999 están todas en uso).",
+        "noSatSelected": "Seleccione primero un satélite para clonar."
       },
       "successMsgs": {
         "satCreated": "Satélite {name} ({scc}) creado exitosamente",
@@ -82,6 +92,16 @@
         "tip1": "Cada campo se valida con un mensaje de error específico, de modo que si la creación falla, el aviso le indica exactamente qué valor corregir.",
         "tip2": "Un perigeo por debajo de unos 100 km se rechaza porque el satélite decaería de inmediato.",
         "tip3": "Los satélites creados solo duran la sesión; exporte un TLE si quiere conservar el objeto para otro día."
+      },
+      "presets": {
+        "placeholder": "Cargar un preajuste…",
+        "selectLabel": "Preajuste de órbita",
+        "leoIss": "LEO (tipo ISS)",
+        "sso": "Heliosíncrona (800 km)",
+        "geo": "Geoestacionaria (GEO)",
+        "gto": "Transferencia a GEO (GTO)",
+        "molniya": "Molniya",
+        "polar": "Polar (600 km)"
       }
     }
   }

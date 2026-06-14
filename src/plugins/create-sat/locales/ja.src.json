@@ -29,11 +29,18 @@
         "apogeeKm": "遠地点 (km)",
         "perigeeKm": "近地点 (km)",
         "smaKm": "軌道長半径 (km)",
-        "velocityKms": "軌道速度 (km/s)"
+        "velocityKms": "軌道速度 (km/s)",
+        "sectionIdentity": "識別情報",
+        "sectionOrbit": "軌道",
+        "sectionEpoch": "元期",
+        "sectionElements": "軌道要素",
+        "sectionPresets": "プリセット"
       },
       "buttons": {
         "createSatellite": "衛星を作成",
-        "saveTle": "TLEを保存"
+        "saveTle": "TLEを保存",
+        "makeSunSync": "太陽同期傾斜角",
+        "cloneSelected": "選択した衛星を複製"
       },
       "options": {
         "payload": "ペイロード",
@@ -66,7 +73,10 @@
         "invalidMeanMotion": "無効な平均運動です。NN.NNNNN形式で入力してください（例：16.00000）。",
         "invalidPeriod": "無効な周期です。NN.NNNN〜NNNN.NNNN形式（例：90.0000、9999.9999）で合計8桁の数字を入力してください。",
         "invalidSource": "無効なソースです。空にすることはできません。",
-        "invalidName": "無効な名前です。空にすることはできません。"
+        "invalidName": "無効な名前です。空にすることはできません。",
+        "slotOccupied": "スロット {scc} の既存衛星 {name} を上書きします。",
+        "noFreeSlots": "空きのアナリストスロットがありません（90000～99999 はすべて使用中です）。",
+        "noSatSelected": "先に複製する衛星を選択してください。"
       },
       "successMsgs": {
         "satCreated": "衛星 {name} ({scc}) が正常に作成されました",
@@ -82,6 +92,16 @@
         "tip1": "すべての入力欄は個別のエラーメッセージで検証されるため、作成に失敗した場合は、どの値を修正すべきかが通知で正確にわかります。",
         "tip2": "およそ100 km未満の近地点は、衛星がすぐに落下してしまうため拒否されます。",
         "tip3": "作成した衛星はセッション限りです。別の日にも使いたい場合はTLEをエクスポートしてください。"
+      },
+      "presets": {
+        "placeholder": "プリセットを読み込む…",
+        "selectLabel": "軌道プリセット",
+        "leoIss": "LEO（ISS相当）",
+        "sso": "太陽同期（800 km）",
+        "geo": "静止軌道（GEO）",
+        "gto": "静止トランスファ（GTO）",
+        "molniya": "モルニヤ",
+        "polar": "極軌道（600 km）"
       }
     }
   }

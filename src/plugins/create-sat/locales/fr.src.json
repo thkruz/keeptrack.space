@@ -29,11 +29,18 @@
         "apogeeKm": "Apogée (km)",
         "perigeeKm": "Périgée (km)",
         "smaKm": "Demi-grand axe (km)",
-        "velocityKms": "Vitesse orbitale (km/s)"
+        "velocityKms": "Vitesse orbitale (km/s)",
+        "sectionIdentity": "Identité",
+        "sectionOrbit": "Orbite",
+        "sectionEpoch": "Époque",
+        "sectionElements": "Éléments orbitaux",
+        "sectionPresets": "Préréglages"
       },
       "buttons": {
         "createSatellite": "Créer le satellite",
-        "saveTle": "Enregistrer le TLE"
+        "saveTle": "Enregistrer le TLE",
+        "makeSunSync": "Inclinaison héliosynchrone",
+        "cloneSelected": "Cloner le satellite sélectionné"
       },
       "options": {
         "payload": "Charge utile",
@@ -66,7 +73,10 @@
         "invalidMeanMotion": "Mouvement moyen invalide. Doit être au format NN.NNNNN (ex. : 16.00000).",
         "invalidPeriod": "Période invalide. Doit être au format NN.NNNN à NNNN.NNNN (ex. : 90.0000, 9999.9999) avec 8 chiffres au total.",
         "invalidSource": "Source invalide. Ne doit pas être vide.",
-        "invalidName": "Nom invalide. Ne doit pas être vide."
+        "invalidName": "Nom invalide. Ne doit pas être vide.",
+        "slotOccupied": "Remplacement du satellite existant {name} dans l'emplacement {scc}.",
+        "noFreeSlots": "Plus d'emplacements analystes libres (90000-99999 sont tous utilisés).",
+        "noSatSelected": "Sélectionnez d'abord un satellite à cloner."
       },
       "successMsgs": {
         "satCreated": "Satellite {name} ({scc}) créé avec succès",
@@ -82,6 +92,16 @@
         "tip1": "Chaque champ est validé avec un message d'erreur spécifique ; si la création échoue, la notification vous indique exactement quelle valeur corriger.",
         "tip2": "Un périgée inférieur à environ 100 km est refusé, car le satellite se désintégrerait immédiatement.",
         "tip3": "Les satellites créés ne durent que la session ; exportez un TLE si vous voulez conserver l'objet pour un autre jour."
+      },
+      "presets": {
+        "placeholder": "Charger un préréglage…",
+        "selectLabel": "Préréglage d'orbite",
+        "leoIss": "LEO (type ISS)",
+        "sso": "Héliosynchrone (800 km)",
+        "geo": "Géostationnaire (GEO)",
+        "gto": "Transfert géostationnaire (GTO)",
+        "molniya": "Molniya",
+        "polar": "Polaire (600 km)"
       }
     }
   }

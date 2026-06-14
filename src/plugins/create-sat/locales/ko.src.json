@@ -29,11 +29,18 @@
         "apogeeKm": "원지점 (km)",
         "perigeeKm": "근지점 (km)",
         "smaKm": "장반경 (km)",
-        "velocityKms": "궤도 속도 (km/s)"
+        "velocityKms": "궤도 속도 (km/s)",
+        "sectionIdentity": "식별 정보",
+        "sectionOrbit": "궤도",
+        "sectionEpoch": "기준 시각",
+        "sectionElements": "궤도 요소",
+        "sectionPresets": "프리셋"
       },
       "buttons": {
         "createSatellite": "위성 생성",
-        "saveTle": "TLE 저장"
+        "saveTle": "TLE 저장",
+        "makeSunSync": "태양 동기 경사각",
+        "cloneSelected": "선택한 위성 복제"
       },
       "options": {
         "payload": "탑재체",
@@ -66,7 +73,10 @@
         "invalidMeanMotion": "잘못된 평균 운동입니다. NN.NNNNN 형식이어야 합니다 (예: 16.00000).",
         "invalidPeriod": "잘못된 주기입니다. NN.NNNN에서 NNNN.NNNN 형식이어야 합니다 (예: 90.0000, 9999.9999), 총 8자리.",
         "invalidSource": "잘못된 소스입니다. 비워둘 수 없습니다.",
-        "invalidName": "잘못된 이름입니다. 비워둘 수 없습니다."
+        "invalidName": "잘못된 이름입니다. 비워둘 수 없습니다.",
+        "slotOccupied": "슬롯 {scc}의 기존 위성 {name}을(를) 덮어씁니다.",
+        "noFreeSlots": "사용 가능한 분석 슬롯이 없습니다(90000-99999가 모두 사용 중입니다).",
+        "noSatSelected": "먼저 복제할 위성을 선택하세요."
       },
       "successMsgs": {
         "satCreated": "위성 {name} ({scc})이(가) 성공적으로 생성되었습니다",
@@ -82,6 +92,16 @@
         "tip1": "모든 입력란은 구체적인 오류 메시지로 검증되므로, 생성에 실패하면 어떤 값을 고쳐야 하는지 알림에서 정확히 알려줍니다.",
         "tip2": "약 100 km 미만의 근지점은 위성이 즉시 소멸하기 때문에 거부됩니다.",
         "tip3": "생성된 위성은 세션 동안만 유지됩니다. 나중에도 사용하려면 TLE를 내보내세요."
+      },
+      "presets": {
+        "placeholder": "프리셋 불러오기…",
+        "selectLabel": "궤도 프리셋",
+        "leoIss": "LEO (ISS 유형)",
+        "sso": "태양 동기 (800 km)",
+        "geo": "정지궤도 (GEO)",
+        "gto": "정지천이궤도 (GTO)",
+        "molniya": "몰니야",
+        "polar": "극궤도 (600 km)"
       }
     }
   }

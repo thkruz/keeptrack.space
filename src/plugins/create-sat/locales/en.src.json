@@ -29,11 +29,18 @@
         "apogeeKm": "Apogee (km)",
         "perigeeKm": "Perigee (km)",
         "smaKm": "Semi-Major Axis (km)",
-        "velocityKms": "Orbital Velocity (km/s)"
+        "velocityKms": "Orbital Velocity (km/s)",
+        "sectionIdentity": "Identity",
+        "sectionOrbit": "Orbit",
+        "sectionEpoch": "Epoch",
+        "sectionElements": "Orbital Elements",
+        "sectionPresets": "Presets"
       },
       "buttons": {
         "createSatellite": "Create Satellite",
-        "saveTle": "Save TLE"
+        "saveTle": "Save TLE",
+        "makeSunSync": "Sun-Sync Inclination",
+        "cloneSelected": "Clone Selected Satellite"
       },
       "options": {
         "payload": "Payload",
@@ -66,7 +73,10 @@
         "invalidMeanMotion": "Invalid mean motion. Must be in the format NN.NNNNN (e.g., 16.00000).",
         "invalidPeriod": "Invalid period. Must be in the format NN.NNNN to NNNN.NNNN (e.g., 90.0000, 9999.9999) with 8 digits total.",
         "invalidSource": "Invalid source. Must not be empty.",
-        "invalidName": "Invalid name. Must not be empty."
+        "invalidName": "Invalid name. Must not be empty.",
+        "slotOccupied": "Overwriting existing satellite {name} in slot {scc}.",
+        "noFreeSlots": "No free analyst slots remain (90000-99999 are all in use).",
+        "noSatSelected": "Select a satellite to clone first."
       },
       "successMsgs": {
         "satCreated": "Satellite {name} ({scc}) created successfully",
@@ -82,6 +92,16 @@
         "tip1": "Every field is validated with a specific error message, so if creation fails the toast tells you exactly which value to fix.",
         "tip2": "A perigee below roughly 100 km is rejected because the satellite would decay immediately.",
         "tip3": "Created satellites are session only; export a TLE if you want to keep the object for another day."
+      },
+      "presets": {
+        "placeholder": "Load a preset…",
+        "selectLabel": "Orbit Preset",
+        "leoIss": "LEO (ISS-like)",
+        "sso": "Sun-Synchronous (800 km)",
+        "geo": "Geostationary (GEO)",
+        "gto": "GEO Transfer (GTO)",
+        "molniya": "Molniya",
+        "polar": "Polar (600 km)"
       }
     }
   }

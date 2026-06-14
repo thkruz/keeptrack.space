@@ -29,11 +29,18 @@
         "apogeeKm": "Apogeum (km)",
         "perigeeKm": "Perigeum (km)",
         "smaKm": "Hlavní poloosa (km)",
-        "velocityKms": "Orbitální rychlost (km/s)"
+        "velocityKms": "Orbitální rychlost (km/s)",
+        "sectionIdentity": "Identita",
+        "sectionOrbit": "Oběžná dráha",
+        "sectionEpoch": "Epocha",
+        "sectionElements": "Elementy dráhy",
+        "sectionPresets": "Předvolby"
       },
       "buttons": {
         "createSatellite": "Vytvořit satelit",
-        "saveTle": "Uložit TLE"
+        "saveTle": "Uložit TLE",
+        "makeSunSync": "Slunečně synchronní sklon",
+        "cloneSelected": "Klonovat vybraný satelit"
       },
       "options": {
         "payload": "Užitečné zatížení",
@@ -66,7 +73,10 @@
         "invalidMeanMotion": "Neplatný střední pohyb. Musí být ve formátu NN.NNNNN (např. 16.00000).",
         "invalidPeriod": "Neplatná perioda. Musí být ve formátu NN.NNNN až NNNN.NNNN (např. 90.0000, 9999.9999) s celkem 8 číslicemi.",
         "invalidSource": "Neplatný zdroj. Nesmí být prázdný.",
-        "invalidName": "Neplatný název. Nesmí být prázdný."
+        "invalidName": "Neplatný název. Nesmí být prázdný.",
+        "slotOccupied": "Přepisuje se stávající satelit {name} ve slotu {scc}.",
+        "noFreeSlots": "Nezbývají žádné volné analytické sloty (90000-99999 jsou všechny obsazené).",
+        "noSatSelected": "Nejprve vyberte satelit ke klonování."
       },
       "successMsgs": {
         "satCreated": "Satelit {name} ({scc}) byl úspěšně vytvořen",
@@ -82,6 +92,16 @@
         "tip1": "Každé pole je validováno s konkrétní chybovou zprávou; pokud vytvoření selže, oznámení vám přesně řekne, kterou hodnotu opravit.",
         "tip2": "Perigeum pod zhruba 100 km je odmítnuto, protože satelit by okamžitě zanikl.",
         "tip3": "Vytvořené satelity platí jen pro aktuální relaci; pokud si chcete objekt ponechat na jindy, exportujte TLE."
+      },
+      "presets": {
+        "placeholder": "Načíst předvolbu…",
+        "selectLabel": "Předvolba dráhy",
+        "leoIss": "LEO (jako ISS)",
+        "sso": "Slunečně synchronní (800 km)",
+        "geo": "Geostacionární (GEO)",
+        "gto": "Přechodová ke GEO (GTO)",
+        "molniya": "Molnija",
+        "polar": "Polární (600 km)"
       }
     }
   }

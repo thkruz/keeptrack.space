@@ -29,11 +29,18 @@
         "apogeeKm": "Apogäum (km)",
         "perigeeKm": "Perigäum (km)",
         "smaKm": "Große Halbachse (km)",
-        "velocityKms": "Orbitalgeschwindigkeit (km/s)"
+        "velocityKms": "Orbitalgeschwindigkeit (km/s)",
+        "sectionIdentity": "Identität",
+        "sectionOrbit": "Orbit",
+        "sectionEpoch": "Epoche",
+        "sectionElements": "Bahnelemente",
+        "sectionPresets": "Voreinstellungen"
       },
       "buttons": {
         "createSatellite": "Satellit erstellen",
-        "saveTle": "TLE speichern"
+        "saveTle": "TLE speichern",
+        "makeSunSync": "Sonnensynchrone Inklination",
+        "cloneSelected": "Ausgewählten Satelliten klonen"
       },
       "options": {
         "payload": "Nutzlast",
@@ -66,7 +73,10 @@
         "invalidMeanMotion": "Ungültige mittlere Bewegung. Muss im Format NN.NNNNN sein (z.B. 16.00000).",
         "invalidPeriod": "Ungültige Periode. Muss im Format NN.NNNN bis NNNN.NNNN sein (z.B. 90.0000, 9999.9999) mit insgesamt 8 Ziffern.",
         "invalidSource": "Ungültige Quelle. Darf nicht leer sein.",
-        "invalidName": "Ungültiger Name. Darf nicht leer sein."
+        "invalidName": "Ungültiger Name. Darf nicht leer sein.",
+        "slotOccupied": "Vorhandener Satellit {name} in Slot {scc} wird überschrieben.",
+        "noFreeSlots": "Keine freien Analyst-Slots mehr (90000-99999 sind alle belegt).",
+        "noSatSelected": "Wählen Sie zuerst einen Satelliten zum Klonen aus."
       },
       "successMsgs": {
         "satCreated": "Satellit {name} ({scc}) erfolgreich erstellt",
@@ -82,6 +92,16 @@
         "tip1": "Jedes Feld wird mit einer spezifischen Fehlermeldung validiert; schlägt die Erstellung fehl, sagt Ihnen die Meldung genau, welcher Wert zu korrigieren ist.",
         "tip2": "Ein Perigäum unter etwa 100 km wird abgelehnt, weil der Satellit sofort verglühen würde.",
         "tip3": "Erstellte Satelliten gelten nur für die Sitzung; exportieren Sie ein TLE, wenn Sie das Objekt für einen anderen Tag behalten möchten."
+      },
+      "presets": {
+        "placeholder": "Voreinstellung laden…",
+        "selectLabel": "Bahn-Voreinstellung",
+        "leoIss": "LEO (ISS-ähnlich)",
+        "sso": "Sonnensynchron (800 km)",
+        "geo": "Geostationär (GEO)",
+        "gto": "GEO-Transfer (GTO)",
+        "molniya": "Molniya",
+        "polar": "Polar (600 km)"
       }
     }
   }

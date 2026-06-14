@@ -29,11 +29,18 @@
         "apogeeKm": "远地点（km）",
         "perigeeKm": "近地点（km）",
         "smaKm": "半长轴（km）",
-        "velocityKms": "轨道速度（km/s）"
+        "velocityKms": "轨道速度（km/s）",
+        "sectionIdentity": "标识",
+        "sectionOrbit": "轨道",
+        "sectionEpoch": "历元",
+        "sectionElements": "轨道要素",
+        "sectionPresets": "预设"
       },
       "buttons": {
         "createSatellite": "创建卫星",
-        "saveTle": "保存 TLE"
+        "saveTle": "保存 TLE",
+        "makeSunSync": "太阳同步倾角",
+        "cloneSelected": "克隆所选卫星"
       },
       "options": {
         "payload": "有效载荷",
@@ -66,7 +73,10 @@
         "invalidMeanMotion": "平均运动无效。格式必须为 NN.NNNNN（例如 16.00000）。",
         "invalidPeriod": "周期无效。格式必须为 NN.NNNN 到 NNNN.NNNN（例如 90.0000、9999.9999），共 8 位数字。",
         "invalidSource": "来源无效。不能为空。",
-        "invalidName": "名称无效。不能为空。"
+        "invalidName": "名称无效。不能为空。",
+        "slotOccupied": "正在覆盖槽位 {scc} 中的现有卫星 {name}。",
+        "noFreeSlots": "没有可用的分析槽位（90000-99999 已全部占用）。",
+        "noSatSelected": "请先选择要克隆的卫星。"
       },
       "successMsgs": {
         "satCreated": "卫星 {name}（{scc}）创建成功",
@@ -82,6 +92,16 @@
         "tip1": "每个字段都会以具体的错误信息进行校验，因此如果创建失败，提示会准确告诉您需要修正哪个值。",
         "tip2": "近地点低于约 100 km 会被拒绝，因为卫星会立即衰减坠落。",
         "tip3": "创建的卫星仅在当前会话中有效；如需保留该物体以备日后使用，请导出 TLE。"
+      },
+      "presets": {
+        "placeholder": "加载预设…",
+        "selectLabel": "轨道预设",
+        "leoIss": "近地轨道（类ISS）",
+        "sso": "太阳同步（800 公里）",
+        "geo": "地球静止（GEO）",
+        "gto": "地球同步转移（GTO）",
+        "molniya": "闪电轨道",
+        "polar": "极地（600 公里）"
       }
     }
   }

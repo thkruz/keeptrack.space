@@ -13,6 +13,10 @@
         "north": "Sever",
         "south": "Jih"
       },
+      "sections": {
+        "template": "Šablona",
+        "launchSite": "Startoviště"
+      },
       "buttons": {
         "createLaunchNominal": "Vytvořit nominální start",
         "inclinationTooLow": "Příliš nízká inklinace!"
@@ -48,7 +52,8 @@
         "limitsHeading": "Omezení",
         "limits": "<ul><li>Inklinace vzoru musí být alespoň rovna zeměpisné šířce místa startu: nelze startovat na dráhu skloněnou méně, než odkud startujete, takže v takovém případě se tlačítko samo deaktivuje.</li><li>Nástroj je optimalizován pro LEO; vysoce eliptické nebo GEO vzory mohou selhat.</li><li>Nominál je simulovaný: jeho poloha vůči ostatním objektům katalogu nemá vypovídací hodnotu.</li><li>Vybraný vzorový satelit zůstává nezměněn; nominál je samostatný objekt v analytickém slotu katalogu.</li></ul>",
         "tip1": "Po vytvoření hodiny ukazují čas od startu: \"00:45:00\" znamená 45 minut po startu, což je ideální pro časové osy pokrytí senzory.",
-        "tip2": "Pokud vytvoření selže při kontrole výšky, zkuste jiný vzorový satelit s konvenčnější dráhou."
+        "tip2": "Pokud vytvoření selže při kontrole výšky, zkuste jiný vzorový satelit s konvenčnější dráhou.",
+        "shortcutOpen": "Otevřít nabídku Nový start"
       }
     }
   }

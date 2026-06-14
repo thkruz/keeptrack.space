@@ -13,6 +13,10 @@
         "north": "Nord",
         "south": "Sud"
       },
+      "sections": {
+        "template": "Modello",
+        "launchSite": "Sito di lancio"
+      },
       "buttons": {
         "createLaunchNominal": "Crea lancio nominale",
         "inclinationTooLow": "Inclinazione troppo bassa!"
@@ -48,7 +52,8 @@
         "limitsHeading": "Limitazioni",
         "limits": "<ul><li>L'inclinazione del modello deve essere almeno pari alla latitudine del sito di lancio: non è possibile lanciare verso un'orbita meno inclinata del luogo di lancio, quindi in tal caso il pulsante si disabilita automaticamente.</li><li>Lo strumento è ottimizzato per LEO; modelli altamente ellittici o GEO possono fallire.</li><li>Il nominale è simulato: la sua posizione rispetto agli altri oggetti del catalogo non è significativa.</li><li>Il satellite modello selezionato resta invariato; il nominale è un oggetto separato in uno slot del catalogo analista.</li></ul>",
         "tip1": "Dopo la creazione l'orologio indica il tempo trascorso dal decollo: \"00:45:00\" significa 45 minuti dopo il lancio, perfetto per le cronologie di copertura dei sensori.",
-        "tip2": "Se la creazione fallisce il controllo di quota, prova un altro satellite modello con un'orbita più convenzionale."
+        "tip2": "Se la creazione fallisce il controllo di quota, prova un altro satellite modello con un'orbita più convenzionale.",
+        "shortcutOpen": "Apri il menu Nuovo lancio"
       }
     }
   }

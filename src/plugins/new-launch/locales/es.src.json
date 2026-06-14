@@ -13,6 +13,10 @@
         "north": "Norte",
         "south": "Sur"
       },
+      "sections": {
+        "template": "Plantilla",
+        "launchSite": "Sitio de lanzamiento"
+      },
       "buttons": {
         "createLaunchNominal": "Crear Lanzamiento Nominal",
         "inclinationTooLow": "¡Inclinación demasiado baja!"
@@ -48,7 +52,8 @@
         "limitsHeading": "Limitaciones",
         "limits": "<ul><li>La inclinación de la plantilla debe ser al menos la latitud del sitio de lanzamiento: no puedes lanzar a una órbita con menos inclinación que el lugar desde donde lanzas, así que el botón se deshabilita en ese caso.</li><li>La herramienta está optimizada para LEO; las plantillas altamente elípticas o GEO pueden fallar.</li><li>El nominal es simulado: su posición relativa a otros objetos del catálogo no es significativa.</li><li>El satélite plantilla seleccionado queda sin cambios; el nominal es un objeto separado en una ranura del catálogo de analista.</li></ul>",
         "tip1": "Tras la creación, el reloj muestra el tiempo desde el despegue: \"00:45:00\" significa 45 minutos después del lanzamiento, perfecto para cronologías de cobertura de sensores.",
-        "tip2": "Si la creación falla en su comprobación de altitud, prueba con otro satélite plantilla con una órbita más convencional."
+        "tip2": "Si la creación falla en su comprobación de altitud, prueba con otro satélite plantilla con una órbita más convencional.",
+        "shortcutOpen": "Abrir el menú de Nuevo lanzamiento"
       }
     }
   }

@@ -13,6 +13,10 @@
         "north": "Północ",
         "south": "Południe"
       },
+      "sections": {
+        "template": "Szablon",
+        "launchSite": "Miejsce startu"
+      },
       "buttons": {
         "createLaunchNominal": "Utwórz start nominalny",
         "inclinationTooLow": "Zbyt mała inklinacja!"
@@ -48,7 +52,8 @@
         "limitsHeading": "Ograniczenia",
         "limits": "<ul><li>Inklinacja wzorca musi być co najmniej równa szerokości geograficznej miejsca startu: nie można wystartować na orbitę nachyloną mniej niż miejsce startu, więc w takim przypadku przycisk sam się dezaktywuje.</li><li>Narzędzie jest zoptymalizowane pod LEO; wzorce silnie eliptyczne lub GEO mogą zawieść.</li><li>Obiekt nominalny jest symulowany: jego pozycja względem innych obiektów katalogu nie ma znaczenia.</li><li>Wybrany satelita wzorcowy pozostaje niezmieniony; obiekt nominalny to osobny obiekt w analitycznym slocie katalogu.</li></ul>",
         "tip1": "Po utworzeniu zegar pokazuje czas od startu: \"00:45:00\" oznacza 45 minut po starcie, co jest idealne do osi czasu zasięgu czujników.",
-        "tip2": "Jeśli tworzenie nie przejdzie kontroli wysokości, wypróbuj innego satelitę wzorcowego o bardziej konwencjonalnej orbicie."
+        "tip2": "Jeśli tworzenie nie przejdzie kontroli wysokości, wypróbuj innego satelitę wzorcowego o bardziej konwencjonalnej orbicie.",
+        "shortcutOpen": "Otwórz menu Nowy start"
       }
     }
   }

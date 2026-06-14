@@ -13,6 +13,10 @@
         "north": "Nord",
         "south": "Sud"
       },
+      "sections": {
+        "template": "Modèle",
+        "launchSite": "Site de lancement"
+      },
       "buttons": {
         "createLaunchNominal": "Créer un lancement nominal",
         "inclinationTooLow": "Inclinaison trop faible !"
@@ -48,7 +52,8 @@
         "limitsHeading": "Limitations",
         "limits": "<ul><li>L’inclinaison du modèle doit être au moins égale à la latitude du site de lancement : on ne peut pas lancer vers une orbite moins inclinée que le lieu de lancement, le bouton se désactive donc dans ce cas.</li><li>L’outil est optimisé pour le LEO ; les modèles fortement elliptiques ou GEO peuvent échouer.</li><li>Le nominal est simulé : sa position par rapport aux autres objets du catalogue n’a pas de signification.</li><li>Le satellite modèle sélectionné reste inchangé ; le nominal est un objet distinct dans un emplacement du catalogue analyste.</li></ul>",
         "tip1": "Après la création, l’horloge indique le temps écoulé depuis le décollage : \"00:45:00\" signifie 45 minutes après le lancement, idéal pour les chronologies de couverture capteur.",
-        "tip2": "Si la création échoue à son contrôle d’altitude, essayez un autre satellite modèle avec une orbite plus conventionnelle."
+        "tip2": "Si la création échoue à son contrôle d’altitude, essayez un autre satellite modèle avec une orbite plus conventionnelle.",
+        "shortcutOpen": "Ouvrir le menu Nouveau lancement"
       }
     }
   }

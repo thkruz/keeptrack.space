@@ -13,6 +13,10 @@
         "north": "Norden",
         "south": "Süden"
       },
+      "sections": {
+        "template": "Vorlage",
+        "launchSite": "Startplatz"
+      },
       "buttons": {
         "createLaunchNominal": "Startnominal erstellen",
         "inclinationTooLow": "Inklination zu niedrig!"
@@ -48,7 +52,8 @@
         "limitsHeading": "Einschränkungen",
         "limits": "<ul><li>Die Inklination der Vorlage muss mindestens der geographischen Breite des Startorts entsprechen: Man kann nicht in eine Umlaufbahn starten, die weniger geneigt ist als der Startort, daher deaktiviert sich die Schaltfläche in diesem Fall selbst.</li><li>Das Werkzeug ist für LEO optimiert; hochelliptische oder GEO-Vorlagen können fehlschlagen.</li><li>Das Nominal ist simuliert: Seine Position relativ zu anderen Katalogobjekten ist nicht aussagekräftig.</li><li>Ihr ausgewählter Vorlagensatellit bleibt unverändert; das Nominal ist ein separates Objekt in einem Analysten-Katalogplatz.</li></ul>",
         "tip1": "Nach der Erstellung zeigt die Uhr die Zeit seit dem Abheben: \"00:45:00\" bedeutet 45 Minuten nach dem Start, ideal für Zeitachsen der Sensorabdeckung.",
-        "tip2": "Wenn die Erstellung an der Höhenprüfung scheitert, versuchen Sie einen anderen Vorlagensatelliten mit einer konventionelleren Umlaufbahn."
+        "tip2": "Wenn die Erstellung an der Höhenprüfung scheitert, versuchen Sie einen anderen Vorlagensatelliten mit einer konventionelleren Umlaufbahn.",
+        "shortcutOpen": "Menü Neuer Start öffnen"
       }
     }
   }

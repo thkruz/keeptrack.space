@@ -13,6 +13,10 @@
         "north": "North",
         "south": "South"
       },
+      "sections": {
+        "template": "Template",
+        "launchSite": "Launch Site"
+      },
       "buttons": {
         "createLaunchNominal": "Create Launch Nominal",
         "inclinationTooLow": "Inclination Too Low!"
@@ -48,7 +52,8 @@
         "limitsHeading": "Limitations",
         "limits": "<ul><li>The template's inclination must be at least the launch site's latitude: you cannot launch into an orbit tilted less than where you launch from, so the button disables itself in that case.</li><li>The tool is optimized for LEO; highly elliptical or GEO templates may fail.</li><li>The nominal is simulated: its position relative to other catalog objects is not meaningful.</li><li>Your selected template satellite is left unchanged; the nominal is a separate object in an analyst catalog slot.</li></ul>",
         "tip1": "After creation the clock reads time since liftoff: \"00:45:00\" means 45 minutes after launch, perfect for sensor-coverage timelines.",
-        "tip2": "If the creation fails its altitude check, try a different template satellite with a more conventional orbit."
+        "tip2": "If the creation fails its altitude check, try a different template satellite with a more conventional orbit.",
+        "shortcutOpen": "Open the New Launch menu"
       }
     }
   }

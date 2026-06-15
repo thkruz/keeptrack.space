@@ -23,7 +23,11 @@
         "hideOtherObjects": "Skrýt ostatní objekty",
         "labelAlways": "Vždy",
         "labelFovOnly": "Pouze FOV",
-        "labelOff": "Vypnuto"
+        "labelOff": "Vypnuto",
+        "satellitesHeader": "Satelity",
+        "actionsHeader": "Akce",
+        "displayHeader": "Zobrazení",
+        "labelsHeader": "Popisky"
       },
       "msgs": {
         "watchlistLoaded": "Seznam sledovaných načten s {count} satelity"
@@ -48,7 +52,20 @@
     "WatchlistOverlay": {
       "bottomIconLabel": "Překryv",
       "title": "Menu překryvu",
-      "helpBody": "<p> Překryv seznamu sledovaných zobrazuje čas dalšího průletu pro každý satelit ve vašem seznamu sledovaných. Překryv se aktualizuje každých 10 sekund. </p> <p> Překryv je barevně rozlišen podle času do dalšího průletu. Barvy jsou následující: </p> <ul> <li>Žlutá – v zorném poli</li> <li>Modrá – čas do dalšího průletu je do 30 minut po aktuálním čase nebo 10 minut před aktuálním časem</li> <li>Bílá – jakýkoli budoucí průlet nesplňující výše uvedené požadavky</li> </ul> <p> Kliknutím na satelit v překryvu se mapa vycentruje na daný satelit. </p>"
+      "helpBody": "<p> Překryv seznamu sledovaných zobrazuje čas dalšího průletu pro každý satelit ve vašem seznamu sledovaných. Překryv se aktualizuje každých 10 sekund. </p> <p> Překryv je barevně rozlišen podle času do dalšího průletu. Barvy jsou následující: </p> <ul> <li>Žlutá – v zorném poli</li> <li>Modrá – čas do dalšího průletu je do 30 minut po aktuálním čase nebo 10 minut před aktuálním časem</li> <li>Bílá – jakýkoli budoucí průlet nesplňující výše uvedené požadavky</li> </ul> <p> Kliknutím na satelit v překryvu se mapa vycentruje na daný satelit. </p>",
+      "openOverlayCmd": "Otevřít překryv Watchlist",
+      "addSatellitesToast": "Nejprve přidejte satelity do seznamu!",
+      "noPassesMsg": "Žádné průlety během 60 minut",
+      "inFovToast": "Satelit {sccNum} je v zorném poli!",
+      "leftFovToast": "Satelit {sccNum} opustil zorné pole!",
+      "tiers": {
+        "inView": "V DOHLEDU",
+        "nextUp": "DALŠÍ",
+        "upcoming": "NADCHÁZEJÍCÍ",
+        "later": "POZDĚJI",
+        "background": "POZADÍ",
+        "departed": "VZDÁLENÉ"
+      }
     }
   }
 }

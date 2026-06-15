@@ -23,7 +23,11 @@
         "hideOtherObjects": "Andere Objekte ausblenden",
         "labelAlways": "Immer",
         "labelFovOnly": "Nur FOV",
-        "labelOff": "Aus"
+        "labelOff": "Aus",
+        "satellitesHeader": "Satelliten",
+        "actionsHeader": "Aktionen",
+        "displayHeader": "Anzeige",
+        "labelsHeader": "Beschriftungen"
       },
       "msgs": {
         "watchlistLoaded": "Watchlist mit {count} Satelliten geladen"
@@ -48,7 +52,20 @@
     "WatchlistOverlay": {
       "bottomIconLabel": "Überlagerung",
       "title": "Überlagerung-Menü",
-      "helpBody": "<p> Die Watchlist-Überlagerung zeigt die nächste Durchgangszeit für jeden Satelliten in Ihrer Watchlist an. Die Überlagerung wird alle 10 Sekunden aktualisiert. </p> <p> Die Überlagerung ist farbcodiert, um die Zeit bis zum nächsten Durchgang anzuzeigen. Die Farben sind wie folgt: </p> <ul> <li>Gelb - In Sicht</li> <li>Blau - Zeit bis zum nächsten Durchgang beträgt bis zu 30 Minuten nach der aktuellen Zeit oder 10 Minuten vor der aktuellen Zeit</li> <li>Weiß - Jeder zukünftige Durchgang, der nicht die obigen Anforderungen erfüllt</li> </ul> <p> Durch Klicken auf einen Satelliten in der Überlagerung wird die Karte auf diesen Satelliten zentriert. </p>"
+      "helpBody": "<p> Die Watchlist-Überlagerung zeigt die nächste Durchgangszeit für jeden Satelliten in Ihrer Watchlist an. Die Überlagerung wird alle 10 Sekunden aktualisiert. </p> <p> Die Überlagerung ist farbcodiert, um die Zeit bis zum nächsten Durchgang anzuzeigen. Die Farben sind wie folgt: </p> <ul> <li>Gelb - In Sicht</li> <li>Blau - Zeit bis zum nächsten Durchgang beträgt bis zu 30 Minuten nach der aktuellen Zeit oder 10 Minuten vor der aktuellen Zeit</li> <li>Weiß - Jeder zukünftige Durchgang, der nicht die obigen Anforderungen erfüllt</li> </ul> <p> Durch Klicken auf einen Satelliten in der Überlagerung wird die Karte auf diesen Satelliten zentriert. </p>",
+      "openOverlayCmd": "Watchlist-Überlagerung öffnen",
+      "addSatellitesToast": "Fügen Sie zuerst Satelliten zu Ihrer Liste hinzu!",
+      "noPassesMsg": "Keine Durchgänge innerhalb von 60 Minuten",
+      "inFovToast": "Satellit {sccNum} ist im Sichtfeld!",
+      "leftFovToast": "Satellit {sccNum} hat das Sichtfeld verlassen!",
+      "tiers": {
+        "inView": "IN SICHT",
+        "nextUp": "ALS NÄCHSTES",
+        "upcoming": "BEVORSTEHEND",
+        "later": "SPÄTER",
+        "background": "HINTERGRUND",
+        "departed": "VERLASSEN"
+      }
     }
   }
 }

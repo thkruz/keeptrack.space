@@ -23,7 +23,11 @@
         "hideOtherObjects": "Ocultar otros objetos",
         "labelAlways": "Siempre",
         "labelFovOnly": "Solo FOV",
-        "labelOff": "Desactivado"
+        "labelOff": "Desactivado",
+        "satellitesHeader": "Satélites",
+        "actionsHeader": "Acciones",
+        "displayHeader": "Visualización",
+        "labelsHeader": "Etiquetas"
       },
       "msgs": {
         "watchlistLoaded": "Watchlist cargada con {count} satélites"
@@ -48,7 +52,20 @@
     "WatchlistOverlay": {
       "bottomIconLabel": "Superposición",
       "title": "Menú de Superposición",
-      "helpBody": "<p> La superposición de la watchlist muestra el próximo tiempo de pase para cada satélite en tu watchlist. La superposición se actualiza cada 10 segundos. </p> <p> La superposición está codificada por colores para mostrar el tiempo hasta el próximo pase. Los colores son los siguientes: </p> <ul> <li>Amarillo - En Vista</li> <li>Azul - El tiempo hasta el próximo pase es de hasta 30 minutos después del tiempo actual o 10 minutos antes del tiempo actual</li> <li>Blanco - Cualquier pase futuro que no cumpla con los requisitos anteriores</li> </ul> <p> Hacer clic en un satélite en la superposición centrará el mapa en ese satélite. </p>"
+      "helpBody": "<p> La superposición de la watchlist muestra el próximo tiempo de pase para cada satélite en tu watchlist. La superposición se actualiza cada 10 segundos. </p> <p> La superposición está codificada por colores para mostrar el tiempo hasta el próximo pase. Los colores son los siguientes: </p> <ul> <li>Amarillo - En Vista</li> <li>Azul - El tiempo hasta el próximo pase es de hasta 30 minutos después del tiempo actual o 10 minutos antes del tiempo actual</li> <li>Blanco - Cualquier pase futuro que no cumpla con los requisitos anteriores</li> </ul> <p> Hacer clic en un satélite en la superposición centrará el mapa en ese satélite. </p>",
+      "openOverlayCmd": "Abrir superposición de Watchlist",
+      "addSatellitesToast": "¡Primero agregue satélites a su lista!",
+      "noPassesMsg": "Sin pasos en los próximos 60 minutos",
+      "inFovToast": "¡El satélite {sccNum} está en el campo de visión!",
+      "leftFovToast": "¡El satélite {sccNum} salió del campo de visión!",
+      "tiers": {
+        "inView": "A LA VISTA",
+        "nextUp": "SIGUIENTE",
+        "upcoming": "PRÓXIMOS",
+        "later": "MÁS TARDE",
+        "background": "FONDO",
+        "departed": "ALEJADOS"
+      }
     }
   }
 }

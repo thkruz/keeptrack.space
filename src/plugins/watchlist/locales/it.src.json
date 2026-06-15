@@ -23,7 +23,11 @@
         "hideOtherObjects": "Nascondi altri oggetti",
         "labelAlways": "Sempre",
         "labelFovOnly": "Solo FOV",
-        "labelOff": "Disattivato"
+        "labelOff": "Disattivato",
+        "satellitesHeader": "Satelliti",
+        "actionsHeader": "Azioni",
+        "displayHeader": "Visualizzazione",
+        "labelsHeader": "Etichette"
       },
       "msgs": {
         "watchlistLoaded": "Lista di osservazione caricata con {count} satelliti"
@@ -48,7 +52,20 @@
     "WatchlistOverlay": {
       "bottomIconLabel": "Sovrapposizione",
       "title": "Menu sovrapposizione",
-      "helpBody": "<p> La sovrapposizione della lista di osservazione mostra l'orario del prossimo passaggio per ogni satellite nella lista di osservazione. La sovrapposizione viene aggiornata ogni 10 secondi. </p> <p> La sovrapposizione è codificata a colori per mostrare il tempo al prossimo passaggio. I colori sono i seguenti: </p> <ul> <li>Giallo - In vista</li> <li>Blu - Il tempo al prossimo passaggio è fino a 30 minuti dopo l'orario corrente o 10 minuti prima dell'orario corrente</li> <li>Bianco - Qualsiasi passaggio futuro che non soddisfa i requisiti precedenti</li> </ul> <p> Facendo clic su un satellite nella sovrapposizione la mappa verrà centrata su quel satellite. </p>"
+      "helpBody": "<p> La sovrapposizione della lista di osservazione mostra l'orario del prossimo passaggio per ogni satellite nella lista di osservazione. La sovrapposizione viene aggiornata ogni 10 secondi. </p> <p> La sovrapposizione è codificata a colori per mostrare il tempo al prossimo passaggio. I colori sono i seguenti: </p> <ul> <li>Giallo - In vista</li> <li>Blu - Il tempo al prossimo passaggio è fino a 30 minuti dopo l'orario corrente o 10 minuti prima dell'orario corrente</li> <li>Bianco - Qualsiasi passaggio futuro che non soddisfa i requisiti precedenti</li> </ul> <p> Facendo clic su un satellite nella sovrapposizione la mappa verrà centrata su quel satellite. </p>",
+      "openOverlayCmd": "Apri overlay Watchlist",
+      "addSatellitesToast": "Aggiungi prima dei satelliti al tuo elenco!",
+      "noPassesMsg": "Nessun passaggio entro 60 minuti",
+      "inFovToast": "Il satellite {sccNum} è nel campo visivo!",
+      "leftFovToast": "Il satellite {sccNum} ha lasciato il campo visivo!",
+      "tiers": {
+        "inView": "IN VISTA",
+        "nextUp": "PROSSIMO",
+        "upcoming": "IN ARRIVO",
+        "later": "PIÙ TARDI",
+        "background": "SFONDO",
+        "departed": "USCITI"
+      }
     }
   }
 }

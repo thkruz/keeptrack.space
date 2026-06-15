@@ -23,7 +23,11 @@
         "hideOtherObjects": "Masquer les autres objets",
         "labelAlways": "Toujours",
         "labelFovOnly": "FOV uniquement",
-        "labelOff": "Désactivé"
+        "labelOff": "Désactivé",
+        "satellitesHeader": "Satellites",
+        "actionsHeader": "Actions",
+        "displayHeader": "Affichage",
+        "labelsHeader": "Étiquettes"
       },
       "msgs": {
         "watchlistLoaded": "Watchlist chargée avec {count} satellites"
@@ -48,7 +52,20 @@
     "WatchlistOverlay": {
       "bottomIconLabel": "Superposition",
       "title": "Menu Superposition",
-      "helpBody": "<p> La superposition de la watchlist affiche l'heure du prochain passage pour chaque satellite de votre watchlist. La superposition est mise à jour toutes les 10 secondes. </p> <p> Le code couleur indique le temps jusqu'au prochain passage : </p> <ul> <li>Jaune - En vue</li> <li>Bleu - Prochain passage dans les 30 minutes après l'heure actuelle ou 10 minutes avant</li> <li>Blanc - Tout autre passage futur</li> </ul> <p> Cliquer sur un satellite dans la superposition centre la carte sur ce satellite. </p>"
+      "helpBody": "<p> La superposition de la watchlist affiche l'heure du prochain passage pour chaque satellite de votre watchlist. La superposition est mise à jour toutes les 10 secondes. </p> <p> Le code couleur indique le temps jusqu'au prochain passage : </p> <ul> <li>Jaune - En vue</li> <li>Bleu - Prochain passage dans les 30 minutes après l'heure actuelle ou 10 minutes avant</li> <li>Blanc - Tout autre passage futur</li> </ul> <p> Cliquer sur un satellite dans la superposition centre la carte sur ce satellite. </p>",
+      "openOverlayCmd": "Ouvrir la superposition Watchlist",
+      "addSatellitesToast": "Ajoutez d'abord des satellites à votre liste !",
+      "noPassesMsg": "Aucun passage dans les 60 minutes",
+      "inFovToast": "Le satellite {sccNum} est dans le champ de vision !",
+      "leftFovToast": "Le satellite {sccNum} a quitté le champ de vision !",
+      "tiers": {
+        "inView": "EN VUE",
+        "nextUp": "À SUIVRE",
+        "upcoming": "À VENIR",
+        "later": "PLUS TARD",
+        "background": "ARRIÈRE-PLAN",
+        "departed": "PARTIS"
+      }
     }
   }
 }

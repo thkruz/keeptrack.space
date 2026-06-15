@@ -23,7 +23,11 @@
         "hideOtherObjects": "隐藏其他对象",
         "labelAlways": "始终",
         "labelFovOnly": "仅FOV",
-        "labelOff": "关闭"
+        "labelOff": "关闭",
+        "satellitesHeader": "卫星",
+        "actionsHeader": "操作",
+        "displayHeader": "显示",
+        "labelsHeader": "标签"
       },
       "msgs": {
         "watchlistLoaded": "监视列表已加载 {count} 颗卫星"
@@ -48,7 +52,20 @@
     "WatchlistOverlay": {
       "bottomIconLabel": "叠加",
       "title": "叠加菜单",
-      "helpBody": "<p>监视列表叠加显示监视列表中卫星的下次通过时间，每10秒更新一次。</p><p>叠加颜色表示距离下次通过的时间：</p><ul><li>黄色 - 可见中</li><li>蓝色 - 距当前时间30分钟内或提前10分钟的通过</li><li>白色 - 其他未来通过</li></ul><p>点击叠加中的卫星会将地图中心定位到该卫星。</p>"
+      "helpBody": "<p>监视列表叠加显示监视列表中卫星的下次通过时间，每10秒更新一次。</p><p>叠加颜色表示距离下次通过的时间：</p><ul><li>黄色 - 可见中</li><li>蓝色 - 距当前时间30分钟内或提前10分钟的通过</li><li>白色 - 其他未来通过</li></ul><p>点击叠加中的卫星会将地图中心定位到该卫星。</p>",
+      "openOverlayCmd": "打开 Watchlist 叠加层",
+      "addSatellitesToast": "请先将卫星添加到列表中！",
+      "noPassesMsg": "60 分钟内无过境",
+      "inFovToast": "卫星 {sccNum} 已进入视野！",
+      "leftFovToast": "卫星 {sccNum} 已离开视野！",
+      "tiers": {
+        "inView": "可见",
+        "nextUp": "即将",
+        "upcoming": "未来",
+        "later": "稍后",
+        "background": "后台",
+        "departed": "已离开"
+      }
     }
   }
 }

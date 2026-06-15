@@ -23,7 +23,11 @@
         "hideOtherObjects": "他のオブジェクトを非表示",
         "labelAlways": "常時",
         "labelFovOnly": "FOV内のみ",
-        "labelOff": "オフ"
+        "labelOff": "オフ",
+        "satellitesHeader": "衛星",
+        "actionsHeader": "操作",
+        "displayHeader": "表示",
+        "labelsHeader": "ラベル"
       },
       "msgs": {
         "watchlistLoaded": "ウォッチリストに{count}個の衛星を読み込みました"
@@ -48,7 +52,20 @@
     "WatchlistOverlay": {
       "bottomIconLabel": "オーバーレイ",
       "title": "オーバーレイメニュー",
-      "helpBody": "<p>ウォッチリストオーバーレイは、ウォッチリスト内の各衛星の次の通過時間を表示します。オーバーレイは10秒ごとに更新されます。</p><p>オーバーレイは次の通過までの時間を示すためにカラーコードされています。色は以下の通りです：</p><ul><li>黄色 - 視界内</li><li>青色 - 次の通過までの時間が現在時刻から30分以内または現在時刻の10分前</li><li>白色 - 上記の要件に適合しない将来の通過</li></ul><p>オーバーレイ内の衛星をクリックすると、地図がその衛星に中心を合わせます。</p>"
+      "helpBody": "<p>ウォッチリストオーバーレイは、ウォッチリスト内の各衛星の次の通過時間を表示します。オーバーレイは10秒ごとに更新されます。</p><p>オーバーレイは次の通過までの時間を示すためにカラーコードされています。色は以下の通りです：</p><ul><li>黄色 - 視界内</li><li>青色 - 次の通過までの時間が現在時刻から30分以内または現在時刻の10分前</li><li>白色 - 上記の要件に適合しない将来の通過</li></ul><p>オーバーレイ内の衛星をクリックすると、地図がその衛星に中心を合わせます。</p>",
+      "openOverlayCmd": "Watchlist オーバーレイを開く",
+      "addSatellitesToast": "まずリストに衛星を追加してください！",
+      "noPassesMsg": "60分以内のパスはありません",
+      "inFovToast": "衛星 {sccNum} が視界内に入りました！",
+      "leftFovToast": "衛星 {sccNum} が視界から外れました！",
+      "tiers": {
+        "inView": "視界内",
+        "nextUp": "次",
+        "upcoming": "予定",
+        "later": "後で",
+        "background": "バックグラウンド",
+        "departed": "通過済み"
+      }
     }
   }
 }

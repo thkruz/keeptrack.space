@@ -23,7 +23,11 @@
         "hideOtherObjects": "Hide Other Objects",
         "labelAlways": "Always",
         "labelFovOnly": "FOV Only",
-        "labelOff": "Off"
+        "labelOff": "Off",
+        "satellitesHeader": "Satellites",
+        "actionsHeader": "Actions",
+        "displayHeader": "Display",
+        "labelsHeader": "Labels"
       },
       "msgs": {
         "watchlistLoaded": "Watchlist Loaded with {count} Satellites"
@@ -48,7 +52,20 @@
     "WatchlistOverlay": {
       "bottomIconLabel": "Overlay",
       "title": "Overlay Menu",
-      "helpBody": "<p> The Watchlist Overlay shows the next pass time for each satellite in your watchlist. The overlay is updated every 10 seconds. </p> <p> The overlay is color coded to show the time to the next pass. The colors are as follows: </p> <ul> <li>Yellow - In View</li> <li>Blue - Time to Next Pass is up to 30 minutes after the current time or 10 minutes before the current time</li> <li>White - Any future pass not fitting the above requirements</li> </ul> <p> Clicking on a satellite in the overlay will center the map on that satellite. </p>"
+      "helpBody": "<p> The Watchlist Overlay shows the next pass time for each satellite in your watchlist. The overlay is updated every 10 seconds. </p> <p> The overlay is color coded to show the time to the next pass. The colors are as follows: </p> <ul> <li>Yellow - In View</li> <li>Blue - Time to Next Pass is up to 30 minutes after the current time or 10 minutes before the current time</li> <li>White - Any future pass not fitting the above requirements</li> </ul> <p> Clicking on a satellite in the overlay will center the map on that satellite. </p>",
+      "openOverlayCmd": "Open Watchlist Overlay",
+      "addSatellitesToast": "Add satellites to your list first!",
+      "noPassesMsg": "No passes within 60 minutes",
+      "inFovToast": "Satellite {sccNum} is in field of view!",
+      "leftFovToast": "Satellite {sccNum} left field of view!",
+      "tiers": {
+        "inView": "IN VIEW",
+        "nextUp": "NEXT UP",
+        "upcoming": "UPCOMING",
+        "later": "LATER",
+        "background": "BACKGROUND",
+        "departed": "DEPARTED"
+      }
     }
   }
 }

@@ -23,7 +23,11 @@
         "hideOtherObjects": "다른 객체 숨기기",
         "labelAlways": "항상",
         "labelFovOnly": "FOV만",
-        "labelOff": "끄기"
+        "labelOff": "끄기",
+        "satellitesHeader": "위성",
+        "actionsHeader": "작업",
+        "displayHeader": "표시",
+        "labelsHeader": "레이블"
       },
       "msgs": {
         "watchlistLoaded": "{count}개의 위성으로 워치리스트를 불러왔습니다"
@@ -48,7 +52,20 @@
     "WatchlistOverlay": {
       "bottomIconLabel": "오버레이",
       "title": "오버레이 메뉴",
-      "helpBody": "<p> 워치리스트 오버레이는 워치리스트에 있는 각 위성의 다음 패스 시간을 보여줍니다. 오버레이는 10초마다 업데이트됩니다. </p> <p> 오버레이는 다음 패스 시간을 나타내기 위해 색상 코드로 구분됩니다. 색상은 다음과 같습니다: </p> <ul> <li>노란색 - 보이는 중</li> <li>파란색 - 다음 패스 시간이 현재 시간 후 최대 30분 또는 현재 시간 전 10분</li> <li>흰색 - 위의 요구 사항에 맞지 않는 모든 미래 패스</li> </ul> <p> 오버레이에서 위성을 클릭하면 지도가 해당 위성을 중심으로 이동합니다. </p>"
+      "helpBody": "<p> 워치리스트 오버레이는 워치리스트에 있는 각 위성의 다음 패스 시간을 보여줍니다. 오버레이는 10초마다 업데이트됩니다. </p> <p> 오버레이는 다음 패스 시간을 나타내기 위해 색상 코드로 구분됩니다. 색상은 다음과 같습니다: </p> <ul> <li>노란색 - 보이는 중</li> <li>파란색 - 다음 패스 시간이 현재 시간 후 최대 30분 또는 현재 시간 전 10분</li> <li>흰색 - 위의 요구 사항에 맞지 않는 모든 미래 패스</li> </ul> <p> 오버레이에서 위성을 클릭하면 지도가 해당 위성을 중심으로 이동합니다. </p>",
+      "openOverlayCmd": "Watchlist 오버레이 열기",
+      "addSatellitesToast": "먼저 목록에 위성을 추가하세요!",
+      "noPassesMsg": "60분 이내 통과 없음",
+      "inFovToast": "위성 {sccNum}이(가) 시야에 들어왔습니다!",
+      "leftFovToast": "위성 {sccNum}이(가) 시야에서 벗어났습니다!",
+      "tiers": {
+        "inView": "시야 내",
+        "nextUp": "다음",
+        "upcoming": "예정",
+        "later": "나중에",
+        "background": "배경",
+        "departed": "지나감"
+      }
     }
   }
 }

@@ -416,12 +416,13 @@ body.drawer-mode {
 
   /* Pro-locked items — match bottom menu yellow tint, only while logged out.
      `&` is the enclosing body.drawer-mode, so this gates on the body-level
-     .user-logged-in class without a (never-matching) nested body descendant. */
-  &:not(.user-logged-in) .drawer-item.bmenu-item-pro .drawer-item-icon {
+     .user-logged-in class without a (never-matching) nested body descendant.
+     .login-gate-bypassed is the Konami-code bypass, which clears the tint too. */
+  &:not(.user-logged-in):not(.login-gate-bypassed) .drawer-item.bmenu-item-pro .drawer-item-icon {
     filter: hue-rotate(227deg) brightness(1.2);
   }
 
-  &:not(.user-logged-in) .drawer-item.bmenu-item-pro:hover .drawer-item-icon {
+  &:not(.user-logged-in):not(.login-gate-bypassed) .drawer-item.bmenu-item-pro:hover .drawer-item-icon {
     filter: hue-rotate(227deg) brightness(1.8);
   }
 

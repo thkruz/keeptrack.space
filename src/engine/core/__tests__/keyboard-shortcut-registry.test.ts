@@ -45,6 +45,8 @@ const pluginShortcuts: { pluginId: string; shortcuts: Omit<IKeyboardShortcut, 'c
   { pluginId: 'SensorListPlugin', shortcuts: [{ key: 'S' }, { key: 'Home', ctrl: true }] },
   // src/plugins-pro/scenario-management-pro/scenario-management-pro.ts (lowercase 's', distinct from 'S')
   { pluginId: 'ScenarioManagementMenu', shortcuts: [{ key: 's' }] },
+  // src/plugins-pro/user-account/user-account.ts ('u' opens login/profile; lowercase, distinct from UrlManager's 'U')
+  { pluginId: 'UserAccountPlugin', shortcuts: [{ key: 'u' }] },
 ];
 
 describe('KeyboardShortcutRegistry', () => {

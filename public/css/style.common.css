@@ -2697,12 +2697,21 @@ body:not(.user-logged-in) .bmenu-item-pro:hover img {
   padding: 6px 12px;
   min-height: 28px;
   cursor: pointer;
-  display: flex !important;
   align-items: center;
   margin: 0 4px;
   border-radius: var(--kt-radius-sm, 4px);
   transition: background-color var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   text-align: left;
+}
+
+/*
+ * The input manager shows/hides individual menu items by toggling the inline
+ * `display` (block to show, none to hide). Apply the flex layout only to items
+ * that are NOT inline-hidden, so a `display: flex` here can never override an
+ * inline `display: none` and leave a hidden item visible.
+ */
+.right-btn-menu ul li:not([style*="display: none"]) {
+  display: flex !important;
 }
 
 .right-btn-menu ul li:hover {

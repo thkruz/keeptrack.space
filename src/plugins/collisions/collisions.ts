@@ -54,10 +54,10 @@ export class Collisions extends KeepTrackPlugin {
 
   getBottomIconConfig(): IBottomIconConfig {
     return {
-      elementName: 'menu-satellite-collision',
+      elementName: 'conjunction-feed-icon',
       label: t7e('plugins.Collisions.bottomIconLabel'),
       image: CollisionsPng,
-      menuMode: [MenuMode.EVENTS, MenuMode.ALL],
+      menuMode: [MenuMode.CONJUNCTIONS, MenuMode.ALL],
     };
   }
 

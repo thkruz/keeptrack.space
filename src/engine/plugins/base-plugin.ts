@@ -998,6 +998,7 @@ export abstract class KeepTrackPlugin {
     [MenuMode.EVENTS]: [] as string[],
     [MenuMode.CREATE]: [] as string[],
     [MenuMode.ANALYSIS]: [] as string[],
+    [MenuMode.CONJUNCTIONS]: [] as string[],
     [MenuMode.DISPLAY]: [] as string[],
     [MenuMode.TOOLS]: [] as string[],
     [MenuMode.SETTINGS]: [] as string[],
@@ -1026,6 +1027,9 @@ export abstract class KeepTrackPlugin {
               break;
             case MenuMode.ANALYSIS:
               hideEl(BottomMenu.analysisMenuId);
+              break;
+            case MenuMode.CONJUNCTIONS:
+              hideEl(BottomMenu.conjunctionsMenuId);
               break;
             case MenuMode.DISPLAY:
               hideEl(BottomMenu.displayMenuId);

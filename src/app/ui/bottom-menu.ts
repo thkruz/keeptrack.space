@@ -16,6 +16,7 @@ import eventNotePng from '@public/img/icons/event-note.png';
 import radarPng from '@public/img/icons/radar.png';
 import sciencePng from '@public/img/icons/science.png';
 import settingsPng from '@public/img/icons/settings.png';
+import targetPng from '@public/img/icons/target.png';
 
 export class BottomMenu {
   static readonly catalogMenuId = 'menu-filter-catalog';
@@ -23,6 +24,7 @@ export class BottomMenu {
   static readonly eventsMenuId = 'menu-filter-events';
   static readonly createMenuId = 'menu-filter-create';
   static readonly analysisMenuId = 'menu-filter-analysis';
+  static readonly conjunctionsMenuId = 'menu-filter-conjunctions';
   static readonly displayMenuId = 'menu-filter-display';
   static readonly toolsMenuId = 'menu-filter-tools';
   static readonly settingsMenuId = 'menu-filter-settings';
@@ -77,6 +79,12 @@ export class BottomMenu {
               <img alt="Analysis" src="" delayedsrc="${barChart4BarsPng}" />
             </div>
             <span class="bmenu-filter-title">Analysis</span>
+          </div>
+          <div id="${BottomMenu.conjunctionsMenuId}" class="bmenu-filter-item">
+            <div class="bmenu-filter-item-inner">
+              <img alt="Conjunctions" src="" delayedsrc="${targetPng}" />
+            </div>
+            <span class="bmenu-filter-title">Conjunctions</span>
           </div>
           <div id="${BottomMenu.displayMenuId}" class="bmenu-filter-item">
             <div class="bmenu-filter-item-inner">
@@ -223,19 +231,21 @@ export class BottomMenu {
     const menuEventsDom = getEl(BottomMenu.eventsMenuId);
     const menuCreateDom = getEl(BottomMenu.createMenuId);
     const menuAnalysisDom = getEl(BottomMenu.analysisMenuId);
+    const menuConjunctionsDom = getEl(BottomMenu.conjunctionsMenuId);
     const menuDisplayDom = getEl(BottomMenu.displayMenuId);
     const menuToolsDom = getEl(BottomMenu.toolsMenuId);
     const menuSettingsDom = getEl(BottomMenu.settingsMenuId);
     const menuExperimentalDom = getEl(BottomMenu.experimentalMenuId);
     const menuAllDom = getEl(BottomMenu.allMenuId);
 
-    if (menuCatalogDom && menuSensorsDom && menuEventsDom && menuCreateDom && menuAnalysisDom &&
+    if (menuCatalogDom && menuSensorsDom && menuEventsDom && menuCreateDom && menuAnalysisDom && menuConjunctionsDom &&
         menuDisplayDom && menuToolsDom && menuSettingsDom && menuExperimentalDom && menuAllDom) {
       menuCatalogDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuCatalogDom, MenuMode.CATALOG));
       menuSensorsDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuSensorsDom, MenuMode.SENSORS));
       menuEventsDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuEventsDom, MenuMode.EVENTS));
       menuCreateDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuCreateDom, MenuMode.CREATE));
       menuAnalysisDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuAnalysisDom, MenuMode.ANALYSIS));
+      menuConjunctionsDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuConjunctionsDom, MenuMode.CONJUNCTIONS));
       menuDisplayDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuDisplayDom, MenuMode.DISPLAY));
       menuToolsDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuToolsDom, MenuMode.TOOLS));
       menuSettingsDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuSettingsDom, MenuMode.SETTINGS));

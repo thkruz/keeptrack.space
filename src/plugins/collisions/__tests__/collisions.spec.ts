@@ -8,7 +8,7 @@ test.describe('Collisions Plugin', () => {
       settings: { isMobileModeEnabled: true },
     });
 
-    const bottomIcon = page.locator('#menu-satellite-collision');
+    const bottomIcon = page.locator('#conjunction-feed-icon');
     const sideMenu = page.locator('#Collisions-menu');
 
     // Bottom icon should exist in the DOM
@@ -25,7 +25,7 @@ test.describe('Collisions Plugin', () => {
       await eventsGroup.locator('.drawer-group-header').click();
     }
 
-    const drawerItem = page.locator('.drawer-item[data-plugin-id="menu-satellite-collision"]');
+    const drawerItem = page.locator('.drawer-item[data-plugin-id="conjunction-feed-icon"]');
 
     await expect(drawerItem).toBeVisible();
 

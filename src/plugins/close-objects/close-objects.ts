@@ -54,10 +54,10 @@ export class CloseObjectsPlugin extends KeepTrackPlugin {
 
   getBottomIconConfig(): IBottomIconConfig {
     return {
-      elementName: 'close-objects-icon',
+      elementName: 'conjunction-nearby-icon',
       label: t7e('plugins.CloseObjectsPlugin.bottomIconLabel' as Parameters<typeof t7e>[0]),
       image: scatterPlotPng,
-      menuMode: [MenuMode.EVENTS, MenuMode.ALL],
+      menuMode: [MenuMode.CONJUNCTIONS, MenuMode.ALL],
     };
   }
 

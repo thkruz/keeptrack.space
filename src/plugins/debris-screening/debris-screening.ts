@@ -1,3 +1,4 @@
+import { jumpToTca } from '@app/engine/conjunction/conjunction-row-actions';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -70,10 +71,10 @@ export class DebrisScreening extends KeepTrackPlugin {
 
   getBottomIconConfig(): IBottomIconConfig {
     return {
-      elementName: 'debris-screening-bottom-icon',
+      elementName: 'conjunction-screen-icon',
       label: l('bottomIconLabel'),
       image: frameInspectPng,
-      menuMode: [MenuMode.EVENTS, MenuMode.ALL],
+      menuMode: [MenuMode.CONJUNCTIONS, MenuMode.ALL],
       isDisabledOnLoad: true,
     };
   }
@@ -357,10 +358,7 @@ export class DebrisScreening extends KeepTrackPlugin {
     }
 
     if (tcaMs) {
-      const timeManager = ServiceLocator.getTimeManager();
-      const tcaTime = parseInt(tcaMs, 10);
-
-      timeManager.changeStaticOffset(tcaTime - Date.now());
+      jumpToTca(parseInt(tcaMs, 10));
     }
   }
 

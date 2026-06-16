@@ -28,7 +28,7 @@ describe('CloseObjectsPlugin_capabilities', () => {
     expect(hasBottomIcon(plugin)).toBe(true);
     const config = plugin.getBottomIconConfig();
 
-    expect(config.elementName).toBe('close-objects-icon');
+    expect(config.elementName).toBe('conjunction-nearby-icon');
   });
 
   it('should have side menu capability', () => {

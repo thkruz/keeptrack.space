@@ -50,6 +50,7 @@ const MODE_LABEL_KEYS: Record<number, DrawerKey_> = {
   [MenuMode.EVENTS]: 'pluginDrawer.modeEvents' as DrawerKey_,
   [MenuMode.CREATE]: 'pluginDrawer.modeCreate' as DrawerKey_,
   [MenuMode.ANALYSIS]: 'pluginDrawer.modeAnalysis' as DrawerKey_,
+  [MenuMode.CONJUNCTIONS]: 'pluginDrawer.modeConjunctions' as DrawerKey_,
   [MenuMode.DISPLAY]: 'pluginDrawer.modeDisplay' as DrawerKey_,
   [MenuMode.TOOLS]: 'pluginDrawer.modeTools' as DrawerKey_,
   [MenuMode.SETTINGS]: 'pluginDrawer.modeSettings' as DrawerKey_,

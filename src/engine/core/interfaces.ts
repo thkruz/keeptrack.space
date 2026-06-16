@@ -220,6 +220,7 @@ export enum MenuMode {
   EVENTS,
   CREATE,
   ANALYSIS,
+  CONJUNCTIONS,
   DISPLAY,
   TOOLS,
   SETTINGS,

@@ -27,7 +27,7 @@ describe('DebrisScreening_capabilities', () => {
     expect(hasBottomIcon(plugin)).toBe(true);
     const config = plugin.getBottomIconConfig();
 
-    expect(config.elementName).toBe('debris-screening-bottom-icon');
+    expect(config.elementName).toBe('conjunction-screen-icon');
     expect(config.label).toBe('Debris Screening');
     expect(config.isDisabledOnLoad).toBe(true);
   });

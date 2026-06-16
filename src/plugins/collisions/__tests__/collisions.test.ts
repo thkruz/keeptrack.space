@@ -79,9 +79,9 @@ describe('Collisions_class', () => {
       const plugin = new Collisions();
       const config = plugin.getBottomIconConfig();
 
-      expect(config.elementName).toBe('menu-satellite-collision');
+      expect(config.elementName).toBe('conjunction-feed-icon');
       expect(config.image).toBeDefined();
-      expect(config.menuMode).toContain(MenuMode.EVENTS);
+      expect(config.menuMode).toContain(MenuMode.CONJUNCTIONS);
       expect(config.menuMode).toContain(MenuMode.ALL);
     });
 

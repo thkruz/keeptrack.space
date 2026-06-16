@@ -174,11 +174,15 @@ export class LineManager {
     this.add(new SensorToSatLine(sensor, sat, color));
   }
 
-  createObjToObj(obj1: Satellite | OemSatellite | MissileObject | null, obj2: Satellite | MissileObject | OemSatellite | null, color?: vec4): void {
+  createObjToObj(obj1: Satellite | OemSatellite | MissileObject | null, obj2: Satellite | MissileObject | OemSatellite | null, color?: vec4): ObjToObjLine | null {
     if (!obj1 || !obj2) {
-      return;
+      return null;
     }
-    this.add(new ObjToObjLine(obj1, obj2, color));
+    const line = new ObjToObjLine(obj1, obj2, color);
+
+    this.add(line);
+
+    return line;
   }
 
   createSensorToSatFovOnly(sensor: DetailedSensor | null, sat: Satellite | null, color?: vec4): void {

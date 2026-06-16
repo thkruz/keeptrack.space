@@ -5,8 +5,12 @@
  * refinement narrows it below the requested tolerance.
  *
  * Pure math (no astrodynamics dependencies) so it can run on the main thread or
- * inside a web worker.
+ * inside a web worker. The golden-section refinement delegates to ootk's
+ * GoldenSection so the whole conjunction family shares one optimizer
+ * implementation (see src/engine/conjunction).
  */
+
+import { GoldenSection } from '@ootk/src/main';
 
 /** Distance (km) between two objects at time t (ms since the search epoch). */
 export type DistanceFn = (tMs: number) => number;
@@ -18,38 +22,13 @@ export interface TcaResult {
   missKm: number;
 }
 
-const GOLDEN_RATIO = (Math.sqrt(5) - 1) / 2;
-
 /**
  * Golden-section search for the minimum of a unimodal function on [a, b].
- * Returns the abscissa of the minimum to within tolMs.
+ * Returns the abscissa of the minimum to within tolMs. Thin domain wrapper over
+ * ootk's GoldenSection so there is one optimizer across the codebase.
  */
-export const goldenSectionMin = (fn: DistanceFn, a: number, b: number, tolMs = 50): number => {
-  let lo = Math.min(a, b);
-  let hi = Math.max(a, b);
-  let x1 = hi - GOLDEN_RATIO * (hi - lo);
-  let x2 = lo + GOLDEN_RATIO * (hi - lo);
-  let f1 = fn(x1);
-  let f2 = fn(x2);
-
-  while (hi - lo > tolMs) {
-    if (f1 <= f2) {
-      hi = x2;
-      x2 = x1;
-      f2 = f1;
-      x1 = hi - GOLDEN_RATIO * (hi - lo);
-      f1 = fn(x1);
-    } else {
-      lo = x1;
-      x1 = x2;
-      f1 = f2;
-      x2 = lo + GOLDEN_RATIO * (hi - lo);
-      f2 = fn(x2);
-    }
-  }
-
-  return (lo + hi) / 2;
-};
+export const goldenSectionMin = (fn: DistanceFn, a: number, b: number, tolMs = 50): number =>
+  GoldenSection.searchMin(fn, Math.min(a, b), Math.max(a, b), tolMs);
 
 /**
  * Finds the time of closest approach inside [startMs, endMs].

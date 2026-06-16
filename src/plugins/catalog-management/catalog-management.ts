@@ -47,7 +47,7 @@ import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite } from '@ootk/src/main';
 import folderCodePng from '@public/img/icons/folder-code.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { downloadText, exportFileName, parseEphemerisParams } from './catalog-management-export';
+import { downloadText, exportFileName, formatStkEphemeris, parseEphemerisParams, StkEphemerisRow } from './catalog-management-export';
 import './catalog-management.css';
 
 type T7eKey = Parameters<typeof t7e>[0];
@@ -579,7 +579,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
 
     const { stepSec, numPoints } = parsed.params;
     const startTime = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
-    const lines: string[] = [];
+    const rows: StkEphemerisRow[] = [];
 
     for (let i = 0; i < numPoints; i++) {
       const offsetSec = i * stepSec;
@@ -596,52 +596,21 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
       const p = eci.position;
       const v = eci.velocity;
 
-      lines.push(
-        `${offsetSec.toFixed(6)}  ${p.x.toFixed(6)}  ${p.y.toFixed(6)}  ${p.z.toFixed(6)}  ${v.x.toFixed(6)}  ${v.y.toFixed(6)}  ${v.z.toFixed(6)}`,
-      );
+      rows.push({
+        offsetSec,
+        position: { x: p.x, y: p.y, z: p.z },
+        velocity: { x: v.x, y: v.y, z: v.z },
+      });
     }
 
-    if (lines.length === 0) {
+    if (rows.length === 0) {
       ServiceLocator.getUiManager().toast('Failed to propagate satellite!', ToastMsgType.critical);
 
       return;
     }
 
-    const epochStr = CatalogManagementPlugin.formatStkEpoch_(startTime);
-
-    const content = [
-      'stk.v.11.0',
-      'BEGIN Ephemeris',
-      `NumberOfEphemerisPoints ${lines.length}`,
-      `ScenarioEpoch ${epochStr}`,
-      'InterpolationMethod Lagrange',
-      'InterpolationOrder 7',
-      'CentralBody Earth',
-      'CoordinateSystem TEME',
-      'DistanceUnit Kilometers',
-      'EphemerisTimePosVel',
-      '',
-      ...lines,
-      '',
-      'END Ephemeris',
-    ].join('\n');
+    const content = formatStkEphemeris(rows, { scenarioEpoch: startTime });
 
     downloadText(content, exportFileName(satellite, 'e'));
-  }
-
-  /**
-   * Format a Date as STK epoch string: "DD Mon YYYY HH:MM:SS.sss"
-   */
-  private static formatStkEpoch_(date: Date): string {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const day = date.getUTCDate().toString().padStart(2, '0');
-    const mon = months[date.getUTCMonth()];
-    const year = date.getUTCFullYear();
-    const hrs = date.getUTCHours().toString().padStart(2, '0');
-    const min = date.getUTCMinutes().toString().padStart(2, '0');
-    const sec = date.getUTCSeconds().toString().padStart(2, '0');
-    const ms = date.getUTCMilliseconds().toString().padStart(3, '0');
-
-    return `${day} ${mon} ${year} ${hrs}:${min}:${sec}.${ms}`;
   }
 }

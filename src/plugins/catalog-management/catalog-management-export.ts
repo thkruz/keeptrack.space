@@ -95,3 +95,71 @@ export function downloadText(content: string, filename: string): void {
 
   saveAs(blob, filename);
 }
+
+// ============================================================================
+// STK .e ephemeris writer
+//
+// The pure serializer for STK .e files. It lives in OSS so the base
+// catalog-management export can use it, while the Pro STK file handler imports
+// it too (OSS cannot depend on Pro). Read+write therefore meet here.
+// ============================================================================
+
+/** One ephemeris sample for the STK writer: offset from the scenario epoch + state. */
+export interface StkEphemerisRow {
+  /** Seconds from the ScenarioEpoch. */
+  offsetSec: number;
+  position: { x: number; y: number; z: number };
+  velocity: { x: number; y: number; z: number };
+}
+
+/** Header fields for {@link formatStkEphemeris}; all but the epoch have STK-typical defaults. */
+export interface StkEphemerisExportOptions {
+  scenarioEpoch: Date;
+  /** STK CoordinateSystem keyword. @default 'TEME' */
+  coordinateSystem?: string;
+  /** STK CentralBody keyword. @default 'Earth' */
+  centralBody?: string;
+  /** STK InterpolationMethod keyword. @default 'Lagrange' */
+  interpolationMethod?: string;
+  /** STK InterpolationOrder keyword. @default 7 */
+  interpolationOrder?: number;
+}
+
+/** Format a Date as an STK epoch string: "DD Mon YYYY HH:MM:SS.sss" (UTC). */
+export function formatStkEpoch(date: Date): string {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const day = date.getUTCDate().toString().padStart(2, '0');
+  const mon = months[date.getUTCMonth()];
+  const year = date.getUTCFullYear();
+  const hrs = date.getUTCHours().toString().padStart(2, '0');
+  const min = date.getUTCMinutes().toString().padStart(2, '0');
+  const sec = date.getUTCSeconds().toString().padStart(2, '0');
+  const ms = date.getUTCMilliseconds().toString().padStart(3, '0');
+
+  return `${day} ${mon} ${year} ${hrs}:${min}:${sec}.${ms}`;
+}
+
+/** Build the full text of an STK .e (EphemerisTimePosVel, EpSec) file. */
+export function formatStkEphemeris(rows: StkEphemerisRow[], opts: StkEphemerisExportOptions): string {
+  const dataLines = rows.map((r) =>
+    `${r.offsetSec.toFixed(6)}  ${r.position.x.toFixed(6)}  ${r.position.y.toFixed(6)}  ${r.position.z.toFixed(6)}  ` +
+    `${r.velocity.x.toFixed(6)}  ${r.velocity.y.toFixed(6)}  ${r.velocity.z.toFixed(6)}`,
+  );
+
+  return [
+    'stk.v.11.0',
+    'BEGIN Ephemeris',
+    `NumberOfEphemerisPoints ${rows.length}`,
+    `ScenarioEpoch ${formatStkEpoch(opts.scenarioEpoch)}`,
+    `InterpolationMethod ${opts.interpolationMethod ?? 'Lagrange'}`,
+    `InterpolationOrder ${opts.interpolationOrder ?? 7}`,
+    `CentralBody ${opts.centralBody ?? 'Earth'}`,
+    `CoordinateSystem ${opts.coordinateSystem ?? 'TEME'}`,
+    'DistanceUnit Kilometers',
+    'EphemerisTimePosVel',
+    '',
+    ...dataLines,
+    '',
+    'END Ephemeris',
+  ].join('\n');
+}

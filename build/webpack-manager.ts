@@ -342,6 +342,7 @@ export class WebpackManager {
           fovPredictionWorker: ['./src/webworker/fovPredictionWorker.ts'],
           bestPassWorker: ['./src/webworker/bestPassWorker.ts'],
           closeObjectsWorker: ['./src/webworker/closeObjectsWorker.ts'],
+          tocaPocaWorker: ['./src/webworker/tocaPocaWorker.ts'],
         },
         output: {
           filename: '[name].js',

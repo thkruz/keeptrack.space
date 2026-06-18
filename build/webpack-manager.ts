@@ -343,6 +343,7 @@ export class WebpackManager {
           bestPassWorker: ['./src/webworker/bestPassWorker.ts'],
           closeObjectsWorker: ['./src/webworker/closeObjectsWorker.ts'],
           tocaPocaWorker: ['./src/webworker/tocaPocaWorker.ts'],
+          overflightWorker: ['./src/webworker/overflightWorker.ts'],
         },
         output: {
           filename: '[name].js',

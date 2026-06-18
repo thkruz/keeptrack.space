@@ -1590,7 +1590,13 @@ export abstract class KeepTrackPlugin {
     if (secondaryButtonElement) {
       secondaryButtonElement.style.color = 'var(--color-dark-text-accent)';
     }
-    slideOutLeft(getEl(`${this.sideMenuElementName}-secondary`), 1500, null, -300);
+    /*
+     * Match closeSideMenu's 300ms duration so the primary and secondary panels slide
+     * out together. A longer duration here made the secondary lag and linger after the
+     * primary had vanished, leaving an awkward gap. The -300 offset stays because the
+     * secondary sits to the right of the primary and needs the extra travel to clear.
+     */
+    slideOutLeft(getEl(`${this.sideMenuElementName}-secondary`), 300, null, -300);
   }
 
   registerSubmitButtonClicked(callback: ((() => void) | null) = null) {

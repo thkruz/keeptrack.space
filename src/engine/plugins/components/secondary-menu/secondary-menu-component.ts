@@ -332,7 +332,14 @@ export class SecondaryMenuComponent {
     const element = this.getElement();
 
     if (element) {
-      slideOutLeft(element, DEFAULTS.ANIMATION_DURATION * 1.5, null, DEFAULTS.CLOSE_OFFSET);
+      /*
+       * Use the same duration/easing as the parent side menu (SideMenuComponent.close)
+       * so both panels finish their slide-out together. A longer duration here made the
+       * secondary lag behind during the close and linger after the primary had vanished,
+       * leaving an awkward gap. The larger CLOSE_OFFSET stays because the secondary sits
+       * to the right of the primary and needs the extra travel to fully clear the viewport.
+       */
+      slideOutLeft(element, DEFAULTS.ANIMATION_DURATION, null, DEFAULTS.CLOSE_OFFSET);
       this.isOpen = false;
       this.updateButtonStyle(false);
       this.callbacks.onClose?.();

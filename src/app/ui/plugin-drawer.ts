@@ -5,6 +5,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
+import { shake } from '@app/engine/utils/shake';
 import { settingsManager } from '@app/settings/settings';
 import appsPng from '@public/img/icons/apps.png';
 import leftPanelClosePng from '@public/img/icons/left-panel-close.png';
@@ -335,12 +336,27 @@ export class PluginDrawer {
       drawerContent.addEventListener('click', (evt: Event) => {
         const itemEl = (evt.target as HTMLElement).closest('.drawer-item') as HTMLElement | null;
 
-        if (!itemEl || itemEl.classList.contains('disabled')) {
+        if (!itemEl) {
           return;
         }
 
         const pluginId = itemEl.dataset.pluginId;
         const topMenuId = itemEl.dataset.topMenuId;
+
+        // A disabled item should explain itself rather than silently ignore the
+        // click. Shake it for feedback, and for a plugin item forward the click
+        // so the plugin's onBottomIconClick can toast *why* it is unavailable
+        // (e.g. "add a satellite to the watchlist"). The base handler's
+        // isIconDisabled guard keeps the side menu from opening, matching the
+        // bottom-bar behavior; the drawer stays open so the hint is visible.
+        if (itemEl.classList.contains('disabled')) {
+          shake(itemEl);
+          if (pluginId) {
+            EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, pluginId);
+          }
+
+          return;
+        }
 
         if (pluginId) {
           ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);

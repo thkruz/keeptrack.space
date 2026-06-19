@@ -344,6 +344,7 @@ export class WebpackManager {
           closeObjectsWorker: ['./src/webworker/closeObjectsWorker.ts'],
           tocaPocaWorker: ['./src/webworker/tocaPocaWorker.ts'],
           overflightWorker: ['./src/webworker/overflightWorker.ts'],
+          neighborhoodHistoryWorker: ['./src/webworker/neighborhoodHistoryWorker.ts'],
         },
         output: {
           filename: '[name].js',

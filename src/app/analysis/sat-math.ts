@@ -577,11 +577,17 @@ export abstract class SatMath {
   /**
    * Calculates the latitude, longitude, altitude, and time for a given number of points along a satellite's current orbit.
    * @param sat The satellite object.
-   * @param points The number of points to calculate along the orbit.
+   * @param points The number of points to calculate along the orbit(s).
    * @param getOffsetTimeObj A function that returns a Date object with the specified offset from the current simulation time.
+   * @param orbits The number of orbital periods to span (default 1). Increase to sample multiple days of history.
    * @returns An array of objects containing the latitude, longitude, altitude, and time for each point along the orbit.
    */
-  static getLlaOfCurrentOrbit(sat: Satellite, points: number, getOffsetTimeObj: (offset: number) => Date): { lat: number; lon: number; alt: number; time: number }[] {
+  static getLlaOfCurrentOrbit(
+    sat: Satellite,
+    points: number,
+    getOffsetTimeObj: (offset: number) => Date,
+    orbits = 1,
+  ): { lat: number; lon: number; alt: number; time: number }[] {
     return SatMath.getOrbitPoints(sat, points, getOffsetTimeObj, (params: { eciPts: TemeVec3; offset: number }) => {
       const now = getOffsetTimeObj(params.offset);
       const { gmst } = SatMath.calculateTimeVariables(now);
@@ -589,7 +595,7 @@ export abstract class SatMath {
 
 
       return { ...lla, ...{ time: now.getTime() } };
-    });
+    }, undefined, orbits);
   }
 
   /**

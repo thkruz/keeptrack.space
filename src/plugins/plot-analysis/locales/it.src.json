@@ -35,7 +35,19 @@
       "bottomIconLabel": "Grafico a cascata",
       "title": "Menu grafico a cascata",
       "labels": {
-        "totalGeoPayloads": "Totale carichi utili GEO"
+        "statistics": "Statistiche",
+        "objectsShown": "Oggetti mostrati",
+        "unitMin": "min"
+      },
+      "chart": {
+        "title": "Grafico Tempo vs Longitudine (a cascata)",
+        "xAxis": "Longitudine (°)",
+        "yAxis": "Tempo da adesso (min)",
+        "tooltipCountry": "Paese",
+        "tooltipLongitude": "Longitudine",
+        "tooltipTime": "Tempo da adesso",
+        "loading": "Calcolo dei dati orbitali...",
+        "empty": "Nessun oggetto corrisponde ai filtri attuali"
       },
       "help": {
         "overview": "Il grafico a cascata segue la longitudine GEO nel tempo: ogni linea è la longitudine di un satellite che deriva (o si mantiene) nella finestra tracciata. I satelliti con mantenimento di posizione disegnano linee verticali; quelli in deriva si inclinano; le ricollocazioni appaiono come curve ampie.",

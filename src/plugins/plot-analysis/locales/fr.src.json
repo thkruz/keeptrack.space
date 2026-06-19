@@ -35,7 +35,19 @@
       "bottomIconLabel": "Graphique en Cascade",
       "title": "Menu Graphique en Cascade",
       "labels": {
-        "totalGeoPayloads": "Total des charges utiles GEO"
+        "statistics": "Statistiques",
+        "objectsShown": "Objets affichés",
+        "unitMin": "min"
+      },
+      "chart": {
+        "title": "Graphique Temps vs Longitude (Cascade)",
+        "xAxis": "Longitude (°)",
+        "yAxis": "Temps écoulé (min)",
+        "tooltipCountry": "Pays",
+        "tooltipLongitude": "Longitude",
+        "tooltipTime": "Temps écoulé",
+        "loading": "Calcul des données orbitales...",
+        "empty": "Aucun objet ne correspond aux filtres actuels"
       },
       "help": {
         "overview": "Le graphique en Cascade suit la longitude GEO au fil du temps : chaque ligne représente la longitude d'un satellite qui dérive (ou se maintient) sur la fenêtre tracée. Les satellites maintenus à poste dessinent des lignes verticales ; ceux qui dérivent s'inclinent ; les relocalisations apparaissent comme de larges courbes.",

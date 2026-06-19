@@ -35,7 +35,19 @@
       "bottomIconLabel": "Wasserfall-Diagramm",
       "title": "Wasserfall-Diagramm-Menü",
       "labels": {
-        "totalGeoPayloads": "Gesamtzahl GEO-Nutzlasten"
+        "statistics": "Statistik",
+        "objectsShown": "Angezeigte Objekte",
+        "unitMin": "Min"
+      },
+      "chart": {
+        "title": "Zeit-vs-Längengrad-Diagramm (Wasserfall)",
+        "xAxis": "Längengrad (°)",
+        "yAxis": "Zeit ab jetzt (Min)",
+        "tooltipCountry": "Land",
+        "tooltipLongitude": "Längengrad",
+        "tooltipTime": "Zeit ab jetzt",
+        "loading": "Bahndaten werden berechnet...",
+        "empty": "Keine Objekte entsprechen den aktuellen Filtern"
       },
       "help": {
         "overview": "Das Wasserfall-Diagramm verfolgt den GEO-Längengrad über die Zeit: Jede Linie zeigt, wie der Längengrad eines Satelliten im dargestellten Fenster driftet (oder gehalten wird). Satelliten mit Positionshaltung zeichnen vertikale Linien; driftende Satelliten verlaufen schräg; Umpositionierungen erscheinen als ausladende Kurven.",

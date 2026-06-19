@@ -35,7 +35,19 @@
       "bottomIconLabel": "Gráfico Cascada",
       "title": "Menú de Gráfico Cascada",
       "labels": {
-        "totalGeoPayloads": "Total de Cargas Útiles GEO"
+        "statistics": "Estadísticas",
+        "objectsShown": "Objetos mostrados",
+        "unitMin": "min"
+      },
+      "chart": {
+        "title": "Gráfico de Tiempo vs Longitud (Cascada)",
+        "xAxis": "Longitud (°)",
+        "yAxis": "Tiempo desde ahora (min)",
+        "tooltipCountry": "País",
+        "tooltipLongitude": "Longitud",
+        "tooltipTime": "Tiempo desde ahora",
+        "loading": "Calculando datos orbitales...",
+        "empty": "Ningún objeto coincide con los filtros actuales"
       },
       "help": {
         "overview": "El gráfico Cascada sigue la longitud GEO a lo largo del tiempo: cada línea es la longitud de un satélite derivando (o manteniéndose) dentro de la ventana representada. Los satélites con mantenimiento de posición dibujan líneas verticales; los que derivan se inclinan; las reubicaciones aparecen como curvas amplias.",

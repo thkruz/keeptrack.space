@@ -35,7 +35,19 @@
       "bottomIconLabel": "Wykres kaskadowy",
       "title": "Menu wykresu kaskadowego",
       "labels": {
-        "totalGeoPayloads": "Łączna liczba ładunków GEO"
+        "statistics": "Statystyki",
+        "objectsShown": "Wyświetlone obiekty",
+        "unitMin": "min"
+      },
+      "chart": {
+        "title": "Wykres czas–długość geograficzna (kaskadowy)",
+        "xAxis": "Długość geograficzna (°)",
+        "yAxis": "Czas od teraz (min)",
+        "tooltipCountry": "Kraj",
+        "tooltipLongitude": "Długość geograficzna",
+        "tooltipTime": "Czas od teraz",
+        "loading": "Obliczanie danych orbitalnych...",
+        "empty": "Żadne obiekty nie pasują do bieżących filtrów"
       },
       "help": {
         "overview": "Wykres kaskadowy śledzi długość geograficzną GEO w czasie: każda linia to długość geograficzna satelity dryfująca (lub utrzymywana) w wykreślonym oknie. Satelity utrzymujące pozycję rysują pionowe linie; dryfujące pochylają się; relokacje pojawiają się jako szerokie łuki.",

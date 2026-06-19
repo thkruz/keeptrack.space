@@ -35,7 +35,19 @@
       "bottomIconLabel": "워터폴 플롯",
       "title": "워터폴 플롯 메뉴",
       "labels": {
-        "totalGeoPayloads": "총 GEO 페이로드"
+        "statistics": "통계",
+        "objectsShown": "표시된 객체",
+        "unitMin": "분"
+      },
+      "chart": {
+        "title": "시간 대 경도(워터폴) 플롯",
+        "xAxis": "경도 (°)",
+        "yAxis": "현재로부터의 시간 (분)",
+        "tooltipCountry": "국가",
+        "tooltipLongitude": "경도",
+        "tooltipTime": "현재로부터의 시간",
+        "loading": "궤도 데이터 계산 중...",
+        "empty": "현재 필터와 일치하는 객체가 없습니다"
       },
       "help": {
         "overview": "워터폴 플롯은 시간에 따른 GEO 경도를 추적합니다. 각 선은 표시 구간 동안 표류하거나 유지되는 위성의 경도입니다. 위치 유지 중인 위성은 수직선을 그리고, 표류하는 위성은 기울어지며, 위치 이동은 크게 휘어지는 곡선으로 나타납니다.",

@@ -35,7 +35,19 @@
       "bottomIconLabel": "Waterfall Plot",
       "title": "Waterfall Plot Menu",
       "labels": {
-        "totalGeoPayloads": "Total GEO Payloads"
+        "statistics": "Statistics",
+        "objectsShown": "Objects shown",
+        "unitMin": "min"
+      },
+      "chart": {
+        "title": "Time vs Longitude (Waterfall) Plot",
+        "xAxis": "Longitude (°)",
+        "yAxis": "Time from now (min)",
+        "tooltipCountry": "Country",
+        "tooltipLongitude": "Longitude",
+        "tooltipTime": "Time from now",
+        "loading": "Computing orbit data...",
+        "empty": "No objects match the current filters"
       },
       "help": {
         "overview": "The Waterfall plot tracks GEO longitude over time: each line is a satellite's longitude drifting (or holding) across the plotted window. Station kept satellites draw vertical lines; drifters slant; relocations show as sweeping curves.",

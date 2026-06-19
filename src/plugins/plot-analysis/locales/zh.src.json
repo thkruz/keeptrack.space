@@ -35,7 +35,19 @@
       "bottomIconLabel": "瀑布图",
       "title": "瀑布图菜单",
       "labels": {
-        "totalGeoPayloads": "GEO有效载荷总数"
+        "statistics": "统计",
+        "objectsShown": "显示的对象",
+        "unitMin": "分钟"
+      },
+      "chart": {
+        "title": "时间-经度（瀑布）图",
+        "xAxis": "经度 (°)",
+        "yAxis": "距现在时间 (分钟)",
+        "tooltipCountry": "国家",
+        "tooltipLongitude": "经度",
+        "tooltipTime": "距现在时间",
+        "loading": "正在计算轨道数据...",
+        "empty": "没有对象符合当前筛选条件"
       },
       "help": {
         "overview": "瀑布图跟踪GEO经度随时间的变化：每条线都是一颗卫星的经度在绘制窗口内漂移（或保持）的轨迹。进行位置保持的卫星画出垂直线；漂移卫星的线倾斜；轨位迁移则表现为大幅弯曲的曲线。",

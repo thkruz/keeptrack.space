@@ -35,7 +35,19 @@
       "bottomIconLabel": "Kaskádový graf",
       "title": "Menu kaskádového grafu",
       "labels": {
-        "totalGeoPayloads": "Celkový počet GEO nákladů"
+        "statistics": "Statistika",
+        "objectsShown": "Zobrazené objekty",
+        "unitMin": "min"
+      },
+      "chart": {
+        "title": "Graf čas vs zeměpisná délka (kaskádový)",
+        "xAxis": "Zeměpisná délka (°)",
+        "yAxis": "Čas od teď (min)",
+        "tooltipCountry": "Země",
+        "tooltipLongitude": "Zeměpisná délka",
+        "tooltipTime": "Čas od teď",
+        "loading": "Výpočet dat o dráze...",
+        "empty": "Žádné objekty neodpovídají aktuálním filtrům"
       },
       "help": {
         "overview": "Kaskádový graf sleduje zeměpisnou délku GEO satelitů v čase: každá čára představuje délku satelitu, která ve vykresleném okně driftuje (nebo se drží). Satelity udržující pozici kreslí svislé čáry; driftující satelity se naklánějí; přesuny se projevují jako rozmáchlé křivky.",

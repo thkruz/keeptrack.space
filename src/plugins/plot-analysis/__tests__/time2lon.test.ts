@@ -161,6 +161,9 @@ describe('Time2LonPlots_class', () => {
         vimpel: false,
         minInclination: 0,
         maxInclination: 10,
+        maxEccentricity: 0.1,
+        minPeriod: 1340,
+        maxPeriod: 1540,
         samplePoints: 24,
         maxTimeMin: 1440,
       });
@@ -180,6 +183,9 @@ describe('Time2LonPlots_class', () => {
         vimpel: false,
         minInclination: 0,
         maxInclination: 10,
+        maxEccentricity: 0.1,
+        minPeriod: 1340,
+        maxPeriod: 1540,
         samplePoints: 24,
         maxTimeMin: 1440,
       });
@@ -197,6 +203,9 @@ describe('Time2LonPlots_class', () => {
         vimpel: false,
         minInclination: 0,
         maxInclination: 10,
+        maxEccentricity: 0.1,
+        minPeriod: 1340,
+        maxPeriod: 1540,
         samplePoints: 24,
         maxTimeMin: 1440,
       });
@@ -215,6 +224,9 @@ describe('Time2LonPlots_class', () => {
         vimpel: false,
         minInclination: 0,
         maxInclination: 10,
+        maxEccentricity: 0.1,
+        minPeriod: 1340,
+        maxPeriod: 1540,
         samplePoints: 24,
         maxTimeMin: 1440,
       });
@@ -232,6 +244,9 @@ describe('Time2LonPlots_class', () => {
         vimpel: false,
         minInclination: 0,
         maxInclination: 10,
+        maxEccentricity: 0.1,
+        minPeriod: 1340,
+        maxPeriod: 1540,
         samplePoints: 24,
         maxTimeMin: 1440,
       });
@@ -251,6 +266,9 @@ describe('Time2LonPlots_class', () => {
         vimpel: false,
         minInclination: 0,
         maxInclination: 10,
+        maxEccentricity: 0.1,
+        minPeriod: 1340,
+        maxPeriod: 1540,
         samplePoints: 24,
         maxTimeMin: 1440,
       });

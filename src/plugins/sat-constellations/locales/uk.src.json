@@ -29,7 +29,26 @@
         "aehf": "Milstar та AEHF",
         "wgs": "DSCS та WGS",
         "starlink": "Starlink",
-        "sbirs": "SBIRS"
+        "sbirs": "SBIRS",
+        "starlink-gen2": "Starlink Gen2",
+        "starlink-v2": "Starlink v2",
+        "starlink-snapshot": "Starlink (Концептуальний)",
+        "starshield": "Starshield",
+        "pwsa": "PWSA",
+        "kuiper": "Kuiper",
+        "ast-spaceobile": "AST SpaceMobile",
+        "oneweb": "OneWeb",
+        "telesat-lightspeed": "Telesat Lightspeed",
+        "boeing": "Boeing",
+        "astra": "Astra",
+        "spinlaunch": "SpinLaunch",
+        "hvnet": "HVNET",
+        "lynk": "Lynk",
+        "guanwang": "Гуован (Guowang)",
+        "qianfan": "Цяньфань (Qianfan)",
+        "honghu3": "Хунху-3 (Honghu-3)",
+        "yinhe": "Іньхе (Yinhe)",
+        "hanwha": "Hanwha"
       },
       "stats": {
         "satellites": "Супутники",
@@ -59,7 +78,8 @@
         "category": "Сузір'я"
       },
       "errorMsgs": {
-        "NoConstellationSelected": "Сузір'я не вибрано"
+        "NoConstellationSelected": "Сузір'я не вибрано",
+        "ConstellationEmpty": "Супутники не знайдені — ця сузір'я, можливо, ще не виведена на орбіту або потребує імпорту"
       }
     }
   }

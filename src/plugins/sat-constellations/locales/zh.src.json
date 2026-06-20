@@ -29,7 +29,26 @@
         "aehf": "Milstar和AEHF",
         "wgs": "DSCS和WGS",
         "starlink": "Starlink",
-        "sbirs": "SBIRS"
+        "sbirs": "SBIRS",
+        "starlink-gen2": "星链第二代",
+        "starlink-v2": "星链v2",
+        "starlink-snapshot": "星链（研究中）",
+        "starshield": "Starshield",
+        "pwsa": "PWSA",
+        "kuiper": "柯伊伯（Kuiper）",
+        "ast-spaceobile": "AST SpaceMobile",
+        "oneweb": "OneWeb",
+        "telesat-lightspeed": "Telesat Lightspeed",
+        "boeing": "波音（Boeing）",
+        "astra": "Astra",
+        "spinlaunch": "SpinLaunch",
+        "hvnet": "HVNET",
+        "lynk": "Lynk",
+        "guanwang": "国网",
+        "qianfan": "千帆",
+        "honghu3": "鸿鹄-3",
+        "yinhe": "银河",
+        "hanwha": "韩华（Hanwha）"
       },
       "stats": {
         "satellites": "卫星",
@@ -59,7 +78,8 @@
         "category": "星座"
       },
       "errorMsgs": {
-        "NoConstellationSelected": "未选择星座"
+        "NoConstellationSelected": "未选择星座",
+        "ConstellationEmpty": "未找到卫星 — 该星座可能尚未入轨或需要导入"
       }
     }
   }

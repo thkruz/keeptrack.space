@@ -29,7 +29,26 @@
         "aehf": "MilstarとAEHF",
         "wgs": "DSCSとWGS",
         "starlink": "Starlink",
-        "sbirs": "SBIRS"
+        "sbirs": "SBIRS",
+        "starlink-gen2": "Starlink Gen2",
+        "starlink-v2": "Starlink v2",
+        "starlink-snapshot": "Starlink（想定）",
+        "starshield": "Starshield",
+        "pwsa": "PWSA",
+        "kuiper": "Kuiper",
+        "ast-spaceobile": "AST SpaceMobile",
+        "oneweb": "OneWeb",
+        "telesat-lightspeed": "Telesat Lightspeed",
+        "boeing": "Boeing",
+        "astra": "Astra",
+        "spinlaunch": "SpinLaunch",
+        "hvnet": "HVNET",
+        "lynk": "Lynk",
+        "guanwang": "国網（Guowang）",
+        "qianfan": "千帆（Qianfan）",
+        "honghu3": "鴻鵠-3（Honghu-3）",
+        "yinhe": "銀河（Yinhe）",
+        "hanwha": "Hanwha"
       },
       "stats": {
         "satellites": "衛星",
@@ -59,7 +78,8 @@
         "category": "コンステレーション"
       },
       "errorMsgs": {
-        "NoConstellationSelected": "コンステレーションが選択されていません"
+        "NoConstellationSelected": "コンステレーションが選択されていません",
+        "ConstellationEmpty": "衛星が見つかりません — この星座はまだ軌道上にないか、インポートが必要な場合があります"
       }
     }
   }

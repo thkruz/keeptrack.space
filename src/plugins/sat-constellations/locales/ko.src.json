@@ -29,7 +29,26 @@
         "aehf": "Milstar 및 AEHF",
         "wgs": "DSCS 및 WGS",
         "starlink": "Starlink",
-        "sbirs": "SBIRS"
+        "sbirs": "SBIRS",
+        "starlink-gen2": "Starlink Gen2",
+        "starlink-v2": "Starlink v2",
+        "starlink-snapshot": "Starlink (개념)",
+        "starshield": "Starshield",
+        "pwsa": "PWSA",
+        "kuiper": "Kuiper",
+        "ast-spaceobile": "AST SpaceMobile",
+        "oneweb": "OneWeb",
+        "telesat-lightspeed": "Telesat Lightspeed",
+        "boeing": "Boeing",
+        "astra": "Astra",
+        "spinlaunch": "SpinLaunch",
+        "hvnet": "HVNET",
+        "lynk": "Lynk",
+        "guanwang": "국망 (Guowang)",
+        "qianfan": "천범 (Qianfan)",
+        "honghu3": "홍호-3 (Honghu-3)",
+        "yinhe": "은하 (Yinhe)",
+        "hanwha": "한화"
       },
       "stats": {
         "satellites": "위성",
@@ -59,7 +78,8 @@
         "category": "콘스텔레이션"
       },
       "errorMsgs": {
-        "NoConstellationSelected": "콘스텔레이션이 선택되지 않았습니다"
+        "NoConstellationSelected": "콘스텔레이션이 선택되지 않았습니다",
+        "ConstellationEmpty": "위성을 찾을 수 없습니다 — 이 별자리는 아직 궤도에 없거나 가져오기가 필요할 수 있습니다"
       }
     }
   }

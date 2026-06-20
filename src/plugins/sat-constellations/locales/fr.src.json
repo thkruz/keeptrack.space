@@ -29,7 +29,26 @@
         "aehf": "Milstar et AEHF",
         "wgs": "DSCS et WGS",
         "starlink": "Starlink",
-        "sbirs": "SBIRS"
+        "sbirs": "SBIRS",
+        "starlink-gen2": "Starlink Gen2",
+        "starlink-v2": "Starlink v2",
+        "starlink-snapshot": "Starlink (Théorique)",
+        "starshield": "Starshield",
+        "pwsa": "PWSA",
+        "kuiper": "Kuiper",
+        "ast-spaceobile": "AST SpaceMobile",
+        "oneweb": "OneWeb",
+        "telesat-lightspeed": "Telesat Lightspeed",
+        "boeing": "Boeing",
+        "astra": "Astra",
+        "spinlaunch": "SpinLaunch",
+        "hvnet": "HVNET",
+        "lynk": "Lynk",
+        "guanwang": "Guowang",
+        "qianfan": "Qianfan",
+        "honghu3": "Honghu-3",
+        "yinhe": "Yinhe",
+        "hanwha": "Hanwha"
       },
       "stats": {
         "satellites": "Satellites",
@@ -59,7 +78,8 @@
         "category": "Constellations de satellites"
       },
       "errorMsgs": {
-        "NoConstellationSelected": "Aucune constellation sélectionnée"
+        "NoConstellationSelected": "Aucune constellation sélectionnée",
+        "ConstellationEmpty": "Aucun satellite trouvé — cette constellation n'est peut-être pas encore en orbite ou doit être importée"
       }
     }
   }

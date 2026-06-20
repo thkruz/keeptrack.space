@@ -1,6 +1,6 @@
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
 import { GroupType } from '@app/app/data/object-group';
-import { MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -52,6 +52,25 @@ const BUILT_IN_CONSTELLATIONS = [
   'wgs',
   'starlink',
   'sbirs',
+  'starlink-gen2',
+  'starlink-v2',
+  'starlink-snapshot',
+  'starshield',
+  'pwsa',
+  'kuiper',
+  'ast-spaceobile',
+  'oneweb',
+  'telesat-lightspeed',
+  'boeing',
+  'astra',
+  'spinlaunch',
+  'hvnet',
+  'lynk',
+  'guanwang',
+  'qianfan',
+  'honghu3',
+  'yinhe',
+  'hanwha',
 ] as const;
 
 export class SatConstellations extends KeepTrackPlugin {
@@ -234,6 +253,25 @@ export class SatConstellations extends KeepTrackPlugin {
         <li class="menu-selectable" data-group="wgs">${l('wgs')}</li>
         <li class="menu-selectable" data-group="starlink">${l('starlink')}</li>
         <li class="menu-selectable" data-group="sbirs">${l('sbirs')}</li>
+        <li class="menu-selectable" data-group="starlink-gen2">${l('starlink-gen2')}</li>
+        <li class="menu-selectable" data-group="starlink-v2">${l('starlink-v2')}</li>
+        <li class="menu-selectable" data-group="starlink-snapshot">${l('starlink-snapshot')}</li>
+        <li class="menu-selectable" data-group="starshield">${l('starshield')}</li>
+        <li class="menu-selectable" data-group="pwsa">${l('pwsa')}</li>
+        <li class="menu-selectable" data-group="kuiper">${l('kuiper')}</li>
+        <li class="menu-selectable" data-group="ast-spaceobile">${l('ast-spaceobile')}</li>
+        <li class="menu-selectable" data-group="oneweb">${l('oneweb')}</li>
+        <li class="menu-selectable" data-group="telesat-lightspeed">${l('telesat-lightspeed')}</li>
+        <li class="menu-selectable" data-group="boeing">${l('boeing')}</li>
+        <li class="menu-selectable" data-group="astra">${l('astra')}</li>
+        <li class="menu-selectable" data-group="spinlaunch">${l('spinlaunch')}</li>
+        <li class="menu-selectable" data-group="hvnet">${l('hvnet')}</li>
+        <li class="menu-selectable" data-group="lynk">${l('lynk')}</li>
+        <li class="menu-selectable" data-group="guanwang">${l('guanwang')}</li>
+        <li class="menu-selectable" data-group="qianfan">${l('qianfan')}</li>
+        <li class="menu-selectable" data-group="honghu3">${l('honghu3')}</li>
+        <li class="menu-selectable" data-group="yinhe">${l('yinhe')}</li>
+        <li class="menu-selectable" data-group="hanwha">${l('hanwha')}</li>
       </ul>
       <div id="sc-stats" class="sc-stats start-hidden">
         <div class="sc-stats-row">
@@ -346,7 +384,7 @@ export class SatConstellations extends KeepTrackPlugin {
         break;
       case 'globalstar':
         if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /GLOBALSTAR/u, groupName);
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /globalstar/iu, groupName);
         }
         break;
       case 'ses':
@@ -392,6 +430,104 @@ export class SatConstellations extends KeepTrackPlugin {
           groupManagerInstance.createGroup(GroupType.SCC_NUM, catalogManagerInstance.id2satnum(sbirs), groupName);
         }
         break;
+      // These three notional Starlink sub-architectures use anchored patterns because real
+      // Starlink Gen2/v2/snapshot sats are already caught by the `starlink` case above.
+      case 'starlink-gen2':
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /^Starlink Gen2 \d+$/u, groupName);
+        }
+        break;
+      case 'starlink-v2':
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /^Starlink 2 \d+$/u, groupName);
+        }
+        break;
+      case 'starlink-snapshot':
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /^Starlink \d+$/u, groupName);
+        }
+        break;
+      case 'starshield':
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /starshield/iu, groupName);
+        }
+        break;
+      case 'pwsa':
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /pwsa/iu, groupName);
+        }
+        break;
+      case 'kuiper':
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /kuiper/iu, groupName);
+        }
+        break;
+      case 'ast-spaceobile':
+        // Real BlueBird satellites appear in the catalog under "BLUEBIRD"; notional imports use "AST SpaceMobile".
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /bluebird|ast.*mobile/iu, groupName);
+        }
+        break;
+      case 'oneweb':
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /oneweb/iu, groupName);
+        }
+        break;
+      case 'telesat-lightspeed':
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /telesat/iu, groupName);
+        }
+        break;
+      case 'boeing':
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /^Boeing \d+$/u, groupName);
+        }
+        break;
+      case 'astra':
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /^Astra \d+$/u, groupName);
+        }
+        break;
+      case 'spinlaunch':
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /^SpinLaunch \d+$/u, groupName);
+        }
+        break;
+      case 'hvnet':
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /hvnet/iu, groupName);
+        }
+        break;
+      case 'lynk':
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /lynk/iu, groupName);
+        }
+        break;
+      case 'guanwang':
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /guowang/iu, groupName);
+        }
+        break;
+      case 'qianfan':
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /qianfan/iu, groupName);
+        }
+        break;
+      case 'honghu3':
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /honghu/iu, groupName);
+        }
+        break;
+      case 'yinhe':
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /yinhe/iu, groupName);
+        }
+        break;
+      case 'hanwha':
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /hanwha/iu, groupName);
+        }
+        break;
       default: {
         if (!groupManagerInstance.groupList[groupName]) {
           const constellation = this.additionalConstellations_.find((c) => c.groupSlug === groupName);
@@ -430,6 +566,13 @@ export class SatConstellations extends KeepTrackPlugin {
     const sats = groupManagerInstance.groupList[groupName].ids
       .map((id: number) => catalogManagerInstance.getSat(id))
       .filter(Boolean) as Satellite[];
+
+    if (sats.length === 0) {
+      ServiceLocator.getUiManager().toast(
+        t7e('plugins.SatConstellations.errorMsgs.ConstellationEmpty' as Parameters<typeof t7e>[0]),
+        ToastMsgType.caution,
+      );
+    }
 
     this.updateSearchBar_(sats);
 

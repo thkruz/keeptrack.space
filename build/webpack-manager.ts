@@ -346,6 +346,7 @@ export class WebpackManager {
           overflightWorker: ['./src/webworker/overflightWorker.ts'],
           time2lonWorker: ['./src/webworker/time2lonWorker.ts'],
           neighborhoodHistoryWorker: ['./src/webworker/neighborhoodHistoryWorker.ts'],
+          azRangeHeatmapWorker: ['./src/webworker/azRangeHeatmapWorker.ts'],
         },
         output: {
           filename: '[name].js',

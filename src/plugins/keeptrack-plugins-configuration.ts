@@ -134,6 +134,8 @@ export type KeepTrackPluginsConfiguration = {
   Lat2LonPlots?: PluginConfiguration;
   Inc2AltPlots?: PluginConfiguration;
   Inc2LonPlots?: PluginConfiguration;
+  AltIncHeatmap?: PluginConfiguration;
+  AzRangeHeatmap?: PluginConfiguration;
   FilterMenuPlugin?: PluginConfiguration;
   SymbologyPlugin?: PluginConfiguration;
   ColorSchemeEditorPlugin?: PluginConfiguration;

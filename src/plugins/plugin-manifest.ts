@@ -807,6 +807,20 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 266 },
     isLoginRequired: true,
   },
+  {
+    configKey: 'AltIncHeatmap',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/alt-inc-heatmap/alt-inc-heatmap') : undefined,
+    proClassName: 'AltIncHeatmap',
+    defaultConfig: { enabled: true, order: 267 },
+    isLoginRequired: true,
+  },
+  {
+    configKey: 'AzRangeHeatmap',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/az-range-heatmap/az-range-heatmap') : undefined,
+    proClassName: 'AzRangeHeatmap',
+    defaultConfig: { enabled: true, order: 268 },
+    isLoginRequired: true,
+  },
 
   // ── Settings & Utility ─────────────────────────────────────────────────────
   {

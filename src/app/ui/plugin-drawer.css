@@ -762,7 +762,7 @@ body.drawer-mode {
 body.drawer-mode:not(.is-mobile-mode) {
 
   .plugin-drawer.desktop-mode {
-    width: 360px;
+    width: 420px;
     top: var(--top-menu-height);
     height: calc(100% - var(--top-menu-height));
   }
@@ -797,12 +797,12 @@ body.drawer-mode:not(.is-mobile-mode) {
   /* Always-open search bar on desktop */
   #search-holder {
     display: flex !important;
-    width: 360px !important;
+    width: 420px !important;
     transition: none !important;
   }
 
   #search-holder.search-slide-up {
-    width: 360px !important;
+    width: 420px !important;
     border-left: 5px solid var(--color-dark-border);
 
   }
@@ -1004,12 +1004,12 @@ body.drawer-mode:not(.is-mobile-mode) {
 
   /* Rail mode hover expansion — triggered by JS class on .drawer-inner hover */
   .plugin-drawer.rail-mode.rail-hover {
-    width: 360px;
+    width: 420px;
     box-shadow: 4px 0 16px rgba(0, 0, 0, 0.3);
   }
 
   .plugin-drawer.rail-mode.rail-hover .drawer-inner {
-    min-width: 360px;
+    min-width: 420px;
   }
 
   .plugin-drawer.rail-mode.rail-hover .drawer-search {

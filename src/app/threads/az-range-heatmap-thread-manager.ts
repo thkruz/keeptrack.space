@@ -63,7 +63,7 @@ export class AzRangeHeatmapThreadManager extends WebWorkerThreadManager {
   private aggregateBins_: number[][] = [];
   private aggregateSatNums_: string[][][] = [];
   private latestPartialBins_: (number[][] | null)[] = [];
-  private maxStepsProcessed_ = 0;
+  private workerStepsProcessed_: number[] = [];
   private curNumAzBins_ = 0;
   private curNumRngBins_ = 0;
   private curMaxRng_ = 0;
@@ -148,17 +148,19 @@ export class AzRangeHeatmapThreadManager extends WebWorkerThreadManager {
 
   private mergePartial_(workerIdx: number, partial: AzRangeOutPartial): void {
     this.latestPartialBins_[workerIdx] = partial.bins;
+    this.workerStepsProcessed_[workerIdx] = partial.stepsProcessed;
 
-    // Advance monotonically — workers run at slightly different speeds so the
-    // reported step count can oscillate if we forward each worker's own count.
-    this.maxStepsProcessed_ = Math.max(this.maxStepsProcessed_, partial.stepsProcessed);
+    // Progress = slowest worker so the bar never reports 100% while other
+    // workers are still running. Each worker independently iterates the full
+    // time window, so the first to finish would otherwise spike to 100%.
+    const minStepsProcessed = Math.min(...this.workerStepsProcessed_);
 
     const merged = this.sumBinArrays_(this.latestPartialBins_);
 
     this.callbacks_?.onPartial({
       ...partial,
       bins: merged,
-      stepsProcessed: this.maxStepsProcessed_,
+      stepsProcessed: minStepsProcessed,
     });
   }
 
@@ -239,7 +241,6 @@ export class AzRangeHeatmapThreadManager extends WebWorkerThreadManager {
     const chunks = this.splitArray_(params.tleData, activeWorkers.length);
 
     this.pendingWorkers_ = chunks.length;
-    this.maxStepsProcessed_ = 0;
     this.aggregateBins_ = Array.from({ length: params.numAzBins }, () =>
       new Array(params.numRngBins).fill(0),
     );
@@ -247,6 +248,7 @@ export class AzRangeHeatmapThreadManager extends WebWorkerThreadManager {
       Array.from({ length: params.numRngBins }, (): string[] => []),
     );
     this.latestPartialBins_ = new Array(chunks.length).fill(null);
+    this.workerStepsProcessed_ = new Array(chunks.length).fill(0);
 
     chunks.forEach((chunk, i) => {
       const msg: AzRangeMsgStart = {

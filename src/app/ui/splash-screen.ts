@@ -36,10 +36,11 @@ export abstract class SplashScreen {
     rootDom.innerHTML += html`
       <div id="loading-screen" class="valign-wrapper full-loader">
         <div id="logo-inner-container" class="valign">
-          <div style="display: flex;">
+          <div id="logo-edition-wrapper" style="position: relative;">
           <!-- <span id="logo-text" class="logo-font">KEEP TRACK</span> -->
           <img src="${logoPng}" alt="Keep Track" id="logo-text" class="logo-font">
           <!-- <span id="logo-text-version" class="logo-font">10</span> -->
+          ${__EDITION__ === 'celestrak' ? '' : html`<span id="logo-edition">${t7e(`loadingScreen.edition.${__EDITION__}` as TranslationKey)}</span>`}
           </div>
           <div style="height: 50px; min-height: 50px; max-height: 50px; margin-top: 1rem; display: flex; align-items: center;">
             <span id="loader-text" style="width: 100%;">${t7e('loadingScreen.downloadingScience' as TranslationKey)}</span>
@@ -104,6 +105,7 @@ export abstract class SplashScreen {
     showEl('canvas-holder');
 
     hideEl('logo-text');
+    hideEl('logo-edition');
     hideEl('loading-hint');
     hideEl('logo-text-version');
     hideEl('copyright-notice');

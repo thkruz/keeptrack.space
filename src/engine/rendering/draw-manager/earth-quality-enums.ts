@@ -21,7 +21,7 @@ export enum EarthSpecTextureQuality {
   LOW = '1k',
   MEDIUM = '2k',
   HIGH = '4k',
-  ULTRA = '16k'
+  ULTRA = '8k'
 }
 
 export enum EarthBumpTextureQuality {

@@ -25,6 +25,7 @@ export class WebpackManager {
       __VERSION_DATE__: JSON.stringify(new Date().toISOString()),
       __COMMIT_HASH__: JSON.stringify(commitHash),
       __IS_PRO__: JSON.stringify(this.config.isPro),
+      __EDITION__: JSON.stringify(this.config.edition),
     });
     const webpackConfig = [] as Configuration[];
     let baseConfig = this.createBaseConfig_(dirName);
@@ -347,6 +348,7 @@ export class WebpackManager {
           time2lonWorker: ['./src/webworker/time2lonWorker.ts'],
           neighborhoodHistoryWorker: ['./src/webworker/neighborhoodHistoryWorker.ts'],
           azRangeHeatmapWorker: ['./src/webworker/azRangeHeatmapWorker.ts'],
+          tipAndCueWorker: ['./src/webworker/tipAndCueWorker.ts'],
         },
         output: {
           filename: '[name].js',

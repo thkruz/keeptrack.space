@@ -5,6 +5,7 @@ declare global {
   const __VERSION_DATE__: string;
   const __COMMIT_HASH__: string;
   const __IS_PRO__: boolean;
+  const __EDITION__: string;
 
   interface Window {
     keepTrack: KeepTrack;

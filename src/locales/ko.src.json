@@ -12,7 +12,15 @@
   "loadingScreen": {
     "startButton": "클릭하여 시작",
     "hint": "힌트:",
-    "downloadingScience": "과학 데이터 다운로드 중..."
+    "downloadingScience": "과학 데이터 다운로드 중...",
+    "edition": {
+      "pro": "프로",
+      "oss": "오픈 소스",
+      "celestrak": "CelesTrak",
+      "embed": "임베드",
+      "offline": "Offline",
+      "epfl": "EPFL"
+    }
   },
   "errorMsgs": {
     "LoginRequired": "이 기능은 로그인이 필요합니다. 계속하려면 로그인해 주세요.",

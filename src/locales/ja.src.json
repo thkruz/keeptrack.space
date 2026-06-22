@@ -12,7 +12,15 @@
   "loadingScreen": {
     "startButton": "クリックで開始",
     "hint": "ヒント：",
-    "downloadingScience": "科学データをダウンロード中..."
+    "downloadingScience": "科学データをダウンロード中...",
+    "edition": {
+      "pro": "プロ",
+      "oss": "オープンソース",
+      "celestrak": "CelesTrak",
+      "embed": "埋め込み",
+      "offline": "Offline",
+      "epfl": "EPFL"
+    }
   },
   "errorMsgs": {
     "LoginRequired": "この機能にはログインが必要です。続行するにはサインインしてください。",

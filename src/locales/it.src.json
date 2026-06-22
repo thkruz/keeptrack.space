@@ -12,7 +12,15 @@
   "loadingScreen": {
     "startButton": "Clicca per iniziare",
     "hint": "Suggerimento:",
-    "downloadingScience": "Download dei dati scientifici..."
+    "downloadingScience": "Download dei dati scientifici...",
+    "edition": {
+      "pro": "Pro",
+      "oss": "Open Source",
+      "celestrak": "CelesTrak",
+      "embed": "Incorporato",
+      "offline": "Offline",
+      "epfl": "EPFL"
+    }
   },
   "errorMsgs": {
     "LoginRequired": "Questa funzione richiede l'accesso. Effettua il login per continuare.",

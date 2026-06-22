@@ -12,7 +12,15 @@
   "loadingScreen": {
     "startButton": "Klikněte pro zahájení",
     "hint": "Tip:",
-    "downloadingScience": "Stahování vědeckých dat..."
+    "downloadingScience": "Stahování vědeckých dat...",
+    "edition": {
+      "pro": "Profi",
+      "oss": "Otevřený software",
+      "celestrak": "CelesTrak",
+      "embed": "Vložené",
+      "offline": "Offline",
+      "epfl": "EPFL"
+    }
   },
   "errorMsgs": {
     "LoginRequired": "Tato funkce vyžaduje přihlášení. Přihlaste se prosím pro pokračování.",

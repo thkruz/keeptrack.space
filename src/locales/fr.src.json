@@ -12,7 +12,15 @@
   "loadingScreen": {
     "startButton": "Cliquez pour Commencer",
     "hint": "Astuce :",
-    "downloadingScience": "Téléchargement de la science..."
+    "downloadingScience": "Téléchargement de la science...",
+    "edition": {
+      "pro": "Pro",
+      "oss": "Open Source",
+      "celestrak": "CelesTrak",
+      "embed": "Intégré",
+      "offline": "Offline",
+      "epfl": "EPFL"
+    }
   },
   "errorMsgs": {
     "LoginRequired": "Cette fonctionnalité nécessite une connexion. Veuillez vous connecter pour continuer.",

@@ -12,7 +12,15 @@
   "loadingScreen": {
     "startButton": "Click to Begin",
     "hint": "Hint:",
-    "downloadingScience": "Downloading Science..."
+    "downloadingScience": "Downloading Science...",
+    "edition": {
+      "pro": "Pro",
+      "oss": "OSS",
+      "celestrak": "CelesTrak",
+      "embed": "Embed",
+      "offline": "Offline",
+      "epfl": "EPFL"
+    }
   },
   "errorMsgs": {
     "LoginRequired": "This feature requires login. Please sign in to continue.",

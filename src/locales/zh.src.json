@@ -12,7 +12,15 @@
   "loadingScreen": {
     "startButton": "点击开始",
     "hint": "提示：",
-    "downloadingScience": "正在下载科学数据..."
+    "downloadingScience": "正在下载科学数据...",
+    "edition": {
+      "pro": "专业版",
+      "oss": "开源软件",
+      "celestrak": "CelesTrak",
+      "embed": "嵌入式",
+      "offline": "Offline",
+      "epfl": "EPFL"
+    }
   },
   "errorMsgs": {
     "LoginRequired": "此功能需要登录。请登录后继续。",

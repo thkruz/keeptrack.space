@@ -12,7 +12,15 @@
   "loadingScreen": {
     "startButton": "Нажмите, чтобы начать",
     "hint": "Подсказка:",
-    "downloadingScience": "Загрузка научных данных..."
+    "downloadingScience": "Загрузка научных данных...",
+    "edition": {
+      "pro": "Про",
+      "oss": "Открытое ПО",
+      "celestrak": "CelesTrak",
+      "embed": "Встроенный",
+      "offline": "Offline",
+      "epfl": "EPFL"
+    }
   },
   "errorMsgs": {
     "LoginRequired": "Эта функция требует входа в систему. Пожалуйста, войдите, чтобы продолжить.",

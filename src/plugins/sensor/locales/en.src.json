@@ -17,7 +17,9 @@
         "maxRange": "Max Range",
         "band": "Band",
         "beamWidth": "Beam Width",
-        "unknown": "Unknown"
+        "unknown": "Unknown",
+        "details": "Details",
+        "visualizations": "Visualizations"
       },
       "buttons": {
         "drawLineToSun": "Draw Line to Sun",

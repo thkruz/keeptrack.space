@@ -17,7 +17,9 @@
         "maxRange": "Max. dosah",
         "band": "Pásmo",
         "beamWidth": "Šířka svazku",
-        "unknown": "Neznámé"
+        "unknown": "Neznámé",
+        "details": "Podrobnosti",
+        "visualizations": "Vizualizace"
       },
       "buttons": {
         "drawLineToSun": "Nakreslit čáru ke Slunci",

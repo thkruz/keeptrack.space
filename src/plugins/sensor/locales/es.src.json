@@ -17,7 +17,9 @@
         "maxRange": "Rango máx",
         "band": "Banda",
         "beamWidth": "Ancho de haz",
-        "unknown": "Desconocido"
+        "unknown": "Desconocido",
+        "details": "Detalles",
+        "visualizations": "Visualizaciones"
       },
       "buttons": {
         "drawLineToSun": "Dibujar línea al Sol",

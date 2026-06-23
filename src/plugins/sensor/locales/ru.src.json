@@ -17,7 +17,9 @@
         "maxRange": "Макс. дальность",
         "band": "Диапазон",
         "beamWidth": "Ширина луча",
-        "unknown": "Неизвестно"
+        "unknown": "Неизвестно",
+        "details": "Сведения",
+        "visualizations": "Визуализации"
       },
       "buttons": {
         "drawLineToSun": "Провести линию к Солнцу",

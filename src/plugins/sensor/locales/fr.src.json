@@ -17,7 +17,9 @@
         "maxRange": "Portée max",
         "band": "Bande",
         "beamWidth": "Largeur de faisceau",
-        "unknown": "Inconnu"
+        "unknown": "Inconnu",
+        "details": "Détails",
+        "visualizations": "Visualisations"
       },
       "buttons": {
         "drawLineToSun": "Tracer une ligne vers le Soleil",

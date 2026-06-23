@@ -17,7 +17,9 @@
         "maxRange": "Maks. zasięg",
         "band": "Pasmo",
         "beamWidth": "Szerokość wiązki",
-        "unknown": "Nieznany"
+        "unknown": "Nieznany",
+        "details": "Szczegóły",
+        "visualizations": "Wizualizacje"
       },
       "buttons": {
         "drawLineToSun": "Narysuj linię do Słońca",

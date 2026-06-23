@@ -17,7 +17,9 @@
         "maxRange": "最大距離",
         "band": "周波数帯",
         "beamWidth": "ビーム幅",
-        "unknown": "不明"
+        "unknown": "不明",
+        "details": "詳細",
+        "visualizations": "可視化"
       },
       "buttons": {
         "drawLineToSun": "太陽への線を描画",

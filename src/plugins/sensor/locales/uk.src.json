@@ -17,7 +17,9 @@
         "maxRange": "Макс. дальність",
         "band": "Діапазон",
         "beamWidth": "Ширина променя",
-        "unknown": "Невідомо"
+        "unknown": "Невідомо",
+        "details": "Деталі",
+        "visualizations": "Візуалізації"
       },
       "buttons": {
         "drawLineToSun": "Провести лінію до Сонця",

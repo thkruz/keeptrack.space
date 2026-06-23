@@ -17,7 +17,9 @@
         "maxRange": "最大距离",
         "band": "频段",
         "beamWidth": "波束宽度",
-        "unknown": "未知"
+        "unknown": "未知",
+        "details": "详情",
+        "visualizations": "可视化"
       },
       "buttons": {
         "drawLineToSun": "绘制到太阳的连线",

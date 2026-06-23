@@ -17,7 +17,9 @@
         "maxRange": "Max. Reichweite",
         "band": "Band",
         "beamWidth": "Strahlbreite",
-        "unknown": "Unbekannt"
+        "unknown": "Unbekannt",
+        "details": "Details",
+        "visualizations": "Visualisierungen"
       },
       "buttons": {
         "drawLineToSun": "Linie zur Sonne zeichnen",

@@ -55,6 +55,7 @@ export function findBestWorstHdop(dopsList: DopList): BestWorstHdop {
 }
 
 export interface DopCsvRow {
+  [key: string]: string | number;
   time: string;
   hdop: string;
   vdop: string;

@@ -56,6 +56,11 @@
         "tip1": "Ventanas más largas y cajas más grandes encuentran más encuentros, pero tardan más en calcularse; empiece con los valores predeterminados y amplíe solo si necesita más cobertura.",
         "tip2": "Hacer clic en una fila conserva el estado de reproducción: si el reloj estaba en pausa, permanece en pausa en el TCA.",
         "tip3": "Los niveles de riesgo son umbrales de Pc: por encima de 1e-4 es Crítico, por encima de 1e-6 es Alto y por encima de 1e-8 es Medio."
+      },
+      "sections": {
+        "parameters": "Parámetros",
+        "searchBox": "Cuadro de búsqueda RIC",
+        "results": "Resultados"
       }
     }
   }

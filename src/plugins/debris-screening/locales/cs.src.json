@@ -56,6 +56,11 @@
         "tip1": "Delší okna a větší rámečky najdou více setkání, ale výpočet trvá déle; začněte s výchozími hodnotami a rozšiřujte je, jen pokud potřebujete větší pokrytí.",
         "tip2": "Kliknutí na řádek zachová stav přehrávání: pokud byl čas pozastaven, zůstane pozastaven na TCA.",
         "tip3": "Úrovně rizika jsou prahy na Pc: nad 1e-4 je Kritická, nad 1e-6 Vysoká a nad 1e-8 Střední."
+      },
+      "sections": {
+        "parameters": "Parametry",
+        "searchBox": "Vyhledávací pole RIC",
+        "results": "Výsledky"
       }
     }
   }

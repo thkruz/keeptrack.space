@@ -56,6 +56,11 @@
         "tip1": "Dłuższe okna i większe ramki znajdują więcej zbliżeń, ale obliczenia trwają dłużej; zacznij od wartości domyślnych i poszerzaj tylko wtedy, gdy potrzebujesz większego zasięgu.",
         "tip2": "Kliknięcie wiersza zachowuje stan odtwarzania: jeśli zegar był wstrzymany, pozostaje wstrzymany na TCA.",
         "tip3": "Poziomy ryzyka to progi na Pc: powyżej 1e-4 to Krytyczny, powyżej 1e-6 Wysoki, a powyżej 1e-8 Średni."
+      },
+      "sections": {
+        "parameters": "Parametry",
+        "searchBox": "Pole wyszukiwania RIC",
+        "results": "Wyniki"
       }
     }
   }

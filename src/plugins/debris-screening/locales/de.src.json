@@ -56,6 +56,11 @@
         "tip1": "Längere Fenster und größere Boxen finden mehr Begegnungen, brauchen aber mehr Rechenzeit; beginnen Sie mit den Standardwerten und erweitern Sie nur bei Bedarf.",
         "tip2": "Ein Klick auf eine Zeile erhält den Wiedergabezustand: War die Uhr pausiert, bleibt sie am TCA pausiert.",
         "tip3": "Risikostufen sind Schwellenwerte für Pc: über 1e-4 ist Kritisch, über 1e-6 Hoch und über 1e-8 Mittel."
+      },
+      "sections": {
+        "parameters": "Parameter",
+        "searchBox": "RIC-Suchbereich",
+        "results": "Ergebnisse"
       }
     }
   }

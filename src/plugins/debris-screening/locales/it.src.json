@@ -56,6 +56,11 @@
         "tip1": "Finestre più lunghe e riquadri più grandi trovano più incontri ma richiedono più tempo di calcolo; inizia con i valori predefiniti e allarga solo se ti serve più copertura.",
         "tip2": "Fare clic su una riga conserva lo stato di riproduzione: se l'orologio era in pausa, resta in pausa al TCA.",
         "tip3": "I livelli di rischio sono soglie su Pc: sopra 1e-4 è Critico, sopra 1e-6 è Alto e sopra 1e-8 è Medio."
+      },
+      "sections": {
+        "parameters": "Parametri",
+        "searchBox": "Area di ricerca RIC",
+        "results": "Risultati"
       }
     }
   }

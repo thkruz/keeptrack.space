@@ -56,6 +56,11 @@
         "tip1": "Des fenêtres plus longues et des boîtes plus grandes trouvent plus de rencontres mais prennent plus de temps à calculer ; commencez avec les valeurs par défaut et n'élargissez que si vous avez besoin de plus de couverture.",
         "tip2": "Cliquer sur une ligne préserve l'état de lecture : si l'horloge était en pause, elle reste en pause au TCA.",
         "tip3": "Les niveaux de risque sont des seuils de Pc : au-dessus de 1e-4 c'est Critique, au-dessus de 1e-6 Élevé et au-dessus de 1e-8 Moyen."
+      },
+      "sections": {
+        "parameters": "Paramètres",
+        "searchBox": "Zone de recherche RIC",
+        "results": "Résultats"
       }
     }
   }

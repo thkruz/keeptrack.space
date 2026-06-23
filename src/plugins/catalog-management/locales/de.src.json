@@ -11,6 +11,8 @@
         "dropzone": "Ziehen Sie eine .tce-, .tle- oder .txt-Datei hierher, um den Katalog zu laden",
         "keepSatInfo": "Satelliteninformationen beibehalten",
         "keepSatInfoTooltip": "Aktualisiert die TLEs vorhandener Satelliten und behält dabei Name, Land und Missionsdaten bei. Satelliten, die nicht in der importierten Datei enthalten sind, werden entfernt.",
+        "importNewOnly": "Nur neue Satelliten importieren",
+        "importNewOnlyTooltip": "Fügt nur Satelliten hinzu, die noch nicht im aktuellen Katalog vorhanden sind. Vorhandene Satelliten bleiben unverändert.",
         "orbitalElements": "Bahnelemente",
         "tabularStk": "Tabellen & STK",
         "selectedSatellite": "Ausgewählter Satellit",
@@ -33,6 +35,18 @@
         "exportSatsInFov": "Satelliten im FOV exportieren",
         "exportEphemeris": ".e-Ephemeride exportieren",
         "selectSatelliteFirst": "Zuerst Satellit auswählen"
+      },
+      "toasts": {
+        "noValidFileInDrop": "Keine .tce-, .tle- oder .txt-Datei im Ablegen gefunden",
+        "noValidTleData": "Keine gültigen TLE-Daten in der Datei gefunden",
+        "unsupportedFileType": "Nicht unterstützter Dateityp. Verwenden Sie .tce, .tle oder .txt",
+        "noNewSats": "Keine neuen Satelliten in der Datei gefunden",
+        "addedNewSats": "{count} neue(r) Satellit(en) aus {file} hinzugefügt",
+        "loadedCatalog": "Katalog aus {file} geladen",
+        "failedToLoad": "{file} konnte nicht geladen werden",
+        "noSatelliteSelected": "Kein Satellit ausgewählt!",
+        "exportTooLarge": "Export zu groß. Verringern Sie das Zeitfenster oder vergrößern Sie die Schrittweite.",
+        "failedToPropagate": "Satellit konnte nicht propagiert werden!"
       },
       "help": {
         "overview": "Die Katalogverwaltung überträgt Satellitendaten in KeepTrack hinein und heraus. Der Tab Importieren lädt eine Katalogdatei von der Festplatte und ersetzt oder aktualisiert den aktuellen Katalog; der Tab Exportieren schreibt den aktiven Katalog in mehreren Formaten heraus, von einfachen TLE-Dateien bis zu Tabellenkalkulationen und STK-Produkten.",

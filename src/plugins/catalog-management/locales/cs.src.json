@@ -11,6 +11,8 @@
         "dropzone": "Přetáhněte sem soubor .tce, .tle nebo .txt pro načtení katalogu",
         "keepSatInfo": "Zachovat informace o satelitech",
         "keepSatInfoTooltip": "Aktualizuje TLE existujících satelitů a zachová jejich název, zemi a údaje o misi. Satelity, které nejsou v importovaném souboru, budou odstraněny.",
+        "importNewOnly": "Importovat pouze nové satelity",
+        "importNewOnlyTooltip": "Přidá pouze satelity, které dosud nejsou v aktuálním katalogu. Stávající satelity zůstanou nezměněny.",
         "orbitalElements": "Orbitální elementy",
         "tabularStk": "Tabulky a STK",
         "selectedSatellite": "Vybraný satelit",
@@ -33,6 +35,18 @@
         "exportSatsInFov": "Exportovat satelity v FOV",
         "exportEphemeris": "Exportovat efemeridy .e",
         "selectSatelliteFirst": "Nejprve vyberte satelit"
+      },
+      "toasts": {
+        "noValidFileInDrop": "V přetažení nebyl nalezen žádný soubor .tce, .tle ani .txt",
+        "noValidTleData": "V souboru nebyla nalezena žádná platná data TLE",
+        "unsupportedFileType": "Nepodporovaný typ souboru. Použijte .tce, .tle nebo .txt",
+        "noNewSats": "V souboru nebyly nalezeny žádné nové satelity",
+        "addedNewSats": "Přidáno {count} nových satelitů ze souboru {file}",
+        "loadedCatalog": "Katalog načten ze souboru {file}",
+        "failedToLoad": "Nepodařilo se načíst {file}",
+        "noSatelliteSelected": "Není vybrán žádný satelit!",
+        "exportTooLarge": "Export je příliš velký. Zmenšete časové rozpětí nebo zvětšete velikost kroku.",
+        "failedToPropagate": "Nepodařilo se propagovat satelit!"
       },
       "help": {
         "overview": "Správa katalogu přesouvá data o satelitech do KeepTracku a z něj. Karta Import načte soubor katalogu z disku a nahradí nebo aktualizuje aktuální katalog; karta Export zapíše aktuální katalog v několika formátech, od prostých souborů TLE po tabulky a produkty STK.",

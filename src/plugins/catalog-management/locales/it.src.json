@@ -11,6 +11,8 @@
         "dropzone": "Trascina qui un file .tce, .tle o .txt per caricare il catalogo",
         "keepSatInfo": "Mantieni informazioni satelliti",
         "keepSatInfoTooltip": "Aggiorna i TLE dei satelliti esistenti preservandone nome, paese e dati di missione. I satelliti non presenti nel file importato vengono rimossi.",
+        "importNewOnly": "Importa solo i nuovi satelliti",
+        "importNewOnlyTooltip": "Aggiunge solo i satelliti non ancora presenti nel catalogo corrente. I satelliti esistenti rimangono invariati.",
         "orbitalElements": "Elementi orbitali",
         "tabularStk": "Tabellare e STK",
         "selectedSatellite": "Satellite selezionato",
@@ -33,6 +35,18 @@
         "exportSatsInFov": "Esporta satelliti nel FOV",
         "exportEphemeris": "Esporta effemeridi .e",
         "selectSatelliteFirst": "Seleziona prima un satellite"
+      },
+      "toasts": {
+        "noValidFileInDrop": "Nessun file .tce, .tle o .txt trovato nel rilascio",
+        "noValidTleData": "Nessun dato TLE valido trovato nel file",
+        "unsupportedFileType": "Tipo di file non supportato. Usa .tce, .tle o .txt",
+        "noNewSats": "Nessun nuovo satellite trovato nel file",
+        "addedNewSats": "Aggiunti {count} nuovo/i satellite/i da {file}",
+        "loadedCatalog": "Catalogo caricato da {file}",
+        "failedToLoad": "Impossibile caricare {file}",
+        "noSatelliteSelected": "Nessun satellite selezionato!",
+        "exportTooLarge": "Esportazione troppo grande. Riduci l'intervallo di tempo o aumenta la dimensione del passo.",
+        "failedToPropagate": "Impossibile propagare il satellite!"
       },
       "help": {
         "overview": "Gestione catalogo sposta i dati dei satelliti dentro e fuori KeepTrack. La scheda Importa carica un file catalogo dal disco, sostituendo o aggiornando il catalogo corrente; la scheda Esporta scrive il catalogo attivo in diversi formati, dai semplici file TLE ai fogli di calcolo e ai prodotti STK.",

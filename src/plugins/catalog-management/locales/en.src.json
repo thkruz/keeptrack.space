@@ -11,6 +11,8 @@
         "dropzone": "Drop .tce, .tle, or .txt file to load catalog",
         "keepSatInfo": "Keep Satellite Information",
         "keepSatInfoTooltip": "Update TLEs for existing satellites while preserving name, country, and mission data. Satellites not in the imported file are removed.",
+        "importNewOnly": "Only Import New Satellites",
+        "importNewOnlyTooltip": "Only add satellites not already in the current catalog. Existing satellites are kept unchanged.",
         "orbitalElements": "Orbital Elements",
         "tabularStk": "Tabular & STK",
         "selectedSatellite": "Selected Satellite",
@@ -33,6 +35,18 @@
         "exportSatsInFov": "Export Satellites in FOV",
         "exportEphemeris": "Export .e Ephemeris",
         "selectSatelliteFirst": "Select Satellite First"
+      },
+      "toasts": {
+        "noValidFileInDrop": "No .tce, .tle, or .txt file found in drop",
+        "noValidTleData": "No valid TLE data found in file",
+        "unsupportedFileType": "Unsupported file type. Use .tce, .tle, or .txt",
+        "noNewSats": "No new satellites found in file",
+        "addedNewSats": "Added {count} new satellite(s) from {file}",
+        "loadedCatalog": "Loaded catalog from {file}",
+        "failedToLoad": "Failed to load {file}",
+        "noSatelliteSelected": "No satellite selected!",
+        "exportTooLarge": "Export too large. Reduce the time span or increase the step size.",
+        "failedToPropagate": "Failed to propagate satellite!"
       },
       "help": {
         "overview": "Catalog Management moves satellite data in and out of KeepTrack. The Import tab loads a catalog file from disk, replacing or updating the current catalog; the Export tab writes the live catalog out in several formats, from plain TLE files to spreadsheets and STK products.",

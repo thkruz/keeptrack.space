@@ -11,6 +11,8 @@
         "dropzone": ".tce、.tle、.txt ファイルをドロップしてカタログを読み込みます",
         "keepSatInfo": "衛星情報を保持",
         "keepSatInfoTooltip": "既存の衛星のTLEを更新しつつ、名前、国、ミッションデータを保持します。インポートしたファイルに含まれない衛星は削除されます。",
+        "importNewOnly": "新しい衛星のみをインポート",
+        "importNewOnlyTooltip": "現在のカタログにまだ存在しない衛星のみを追加します。既存の衛星は変更されません。",
         "orbitalElements": "軌道要素",
         "tabularStk": "表形式とSTK",
         "selectedSatellite": "選択中の衛星",
@@ -33,6 +35,18 @@
         "exportSatsInFov": "FOV内の衛星をエクスポート",
         "exportEphemeris": ".eエフェメリスをエクスポート",
         "selectSatelliteFirst": "まず衛星を選択してください"
+      },
+      "toasts": {
+        "noValidFileInDrop": "ドロップに .tce、.tle、.txt ファイルが見つかりません",
+        "noValidTleData": "ファイルに有効な TLE データが見つかりません",
+        "unsupportedFileType": "サポートされていないファイル形式です。.tce、.tle、または .txt を使用してください",
+        "noNewSats": "ファイルに新しい衛星が見つかりません",
+        "addedNewSats": "{file} から {count} 個の新しい衛星を追加しました",
+        "loadedCatalog": "{file} からカタログを読み込みました",
+        "failedToLoad": "{file} の読み込みに失敗しました",
+        "noSatelliteSelected": "衛星が選択されていません！",
+        "exportTooLarge": "エクスポートが大きすぎます。時間範囲を狭めるか、ステップサイズを大きくしてください。",
+        "failedToPropagate": "衛星の伝播に失敗しました！"
       },
       "help": {
         "overview": "カタログ管理は、衛星データをKeepTrackに取り込んだり、KeepTrackから書き出したりします。インポートタブはディスクからカタログファイルを読み込み、現在のカタログを置き換えるか更新します。エクスポートタブは、プレーンなTLEファイルからスプレッドシートやSTK製品まで、複数の形式で現在のカタログを書き出します。",

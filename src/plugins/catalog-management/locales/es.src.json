@@ -11,6 +11,8 @@
         "dropzone": "Suelte un archivo .tce, .tle o .txt para cargar el catálogo",
         "keepSatInfo": "Conservar información de satélites",
         "keepSatInfoTooltip": "Actualiza los TLE de los satélites existentes conservando su nombre, país y datos de misión. Los satélites que no estén en el archivo importado se eliminan.",
+        "importNewOnly": "Importar solo satélites nuevos",
+        "importNewOnlyTooltip": "Solo agrega satélites que no estén ya en el catálogo actual. Los satélites existentes no se modifican.",
         "orbitalElements": "Elementos orbitales",
         "tabularStk": "Tabular y STK",
         "selectedSatellite": "Satélite seleccionado",
@@ -33,6 +35,18 @@
         "exportSatsInFov": "Exportar satélites en FOV",
         "exportEphemeris": "Exportar efemérides .e",
         "selectSatelliteFirst": "Seleccione primero un satélite"
+      },
+      "toasts": {
+        "noValidFileInDrop": "No se encontró ningún archivo .tce, .tle o .txt en el elemento soltado",
+        "noValidTleData": "No se encontraron datos TLE válidos en el archivo",
+        "unsupportedFileType": "Tipo de archivo no compatible. Use .tce, .tle o .txt",
+        "noNewSats": "No se encontraron satélites nuevos en el archivo",
+        "addedNewSats": "Se añadieron {count} satélite(s) nuevo(s) de {file}",
+        "loadedCatalog": "Catálogo cargado desde {file}",
+        "failedToLoad": "No se pudo cargar {file}",
+        "noSatelliteSelected": "¡Ningún satélite seleccionado!",
+        "exportTooLarge": "Exportación demasiado grande. Reduzca el intervalo de tiempo o aumente el tamaño del paso.",
+        "failedToPropagate": "¡No se pudo propagar el satélite!"
       },
       "help": {
         "overview": "Gestión de catálogo mueve datos de satélites dentro y fuera de KeepTrack. La pestaña Importar carga un archivo de catálogo desde el disco, reemplazando o actualizando el catálogo actual; la pestaña Exportar escribe el catálogo activo en varios formatos, desde archivos TLE simples hasta hojas de cálculo y productos de STK.",

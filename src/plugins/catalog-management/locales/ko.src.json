@@ -11,6 +11,8 @@
         "dropzone": ".tce, .tle 또는 .txt 파일을 끌어다 놓아 카탈로그를 불러옵니다",
         "keepSatInfo": "위성 정보 유지",
         "keepSatInfoTooltip": "기존 위성의 이름, 국가, 임무 데이터를 유지하면서 TLE를 업데이트합니다. 가져온 파일에 없는 위성은 제거됩니다.",
+        "importNewOnly": "새 위성만 가져오기",
+        "importNewOnlyTooltip": "현재 카탈로그에 없는 위성만 추가합니다. 기존 위성은 변경되지 않습니다.",
         "orbitalElements": "궤도 요소",
         "tabularStk": "표 형식 및 STK",
         "selectedSatellite": "선택한 위성",
@@ -33,6 +35,18 @@
         "exportSatsInFov": "FOV 내 위성 내보내기",
         "exportEphemeris": ".e 천체력 내보내기",
         "selectSatelliteFirst": "먼저 위성을 선택하세요"
+      },
+      "toasts": {
+        "noValidFileInDrop": "드롭에서 .tce, .tle 또는 .txt 파일을 찾을 수 없습니다",
+        "noValidTleData": "파일에서 유효한 TLE 데이터를 찾을 수 없습니다",
+        "unsupportedFileType": "지원되지 않는 파일 형식입니다. .tce, .tle 또는 .txt를 사용하세요",
+        "noNewSats": "파일에서 새 위성을 찾을 수 없습니다",
+        "addedNewSats": "{file}에서 새 위성 {count}개를 추가했습니다",
+        "loadedCatalog": "{file}에서 카탈로그를 불러왔습니다",
+        "failedToLoad": "{file}을(를) 불러오지 못했습니다",
+        "noSatelliteSelected": "선택된 위성이 없습니다!",
+        "exportTooLarge": "내보내기가 너무 큽니다. 시간 범위를 줄이거나 단계 크기를 늘리세요.",
+        "failedToPropagate": "위성 전파에 실패했습니다!"
       },
       "help": {
         "overview": "카탈로그 관리는 위성 데이터를 KeepTrack 안팎으로 옮깁니다. 가져오기 탭은 디스크에서 카탈로그 파일을 불러와 현재 카탈로그를 교체하거나 업데이트하고, 내보내기 탭은 일반 TLE 파일부터 스프레드시트와 STK 산출물까지 여러 형식으로 현재 카탈로그를 내보냅니다.",

@@ -11,6 +11,8 @@
         "dropzone": "将 .tce、.tle 或 .txt 文件拖放到此处以加载目录",
         "keepSatInfo": "保留卫星信息",
         "keepSatInfoTooltip": "更新现有卫星的 TLE，同时保留名称、国家和任务数据。导入文件中不存在的卫星将被移除。",
+        "importNewOnly": "仅导入新卫星",
+        "importNewOnlyTooltip": "仅添加当前目录中尚未存在的卫星。现有卫星保持不变。",
         "orbitalElements": "轨道根数",
         "tabularStk": "表格与 STK",
         "selectedSatellite": "选中的卫星",
@@ -33,6 +35,18 @@
         "exportSatsInFov": "导出视场内卫星",
         "exportEphemeris": "导出 .e 星历",
         "selectSatelliteFirst": "请先选择卫星"
+      },
+      "toasts": {
+        "noValidFileInDrop": "未在拖放中找到 .tce、.tle 或 .txt 文件",
+        "noValidTleData": "文件中未找到有效的 TLE 数据",
+        "unsupportedFileType": "不支持的文件类型。请使用 .tce、.tle 或 .txt",
+        "noNewSats": "文件中未找到新卫星",
+        "addedNewSats": "已从 {file} 添加 {count} 颗新卫星",
+        "loadedCatalog": "已从 {file} 加载目录",
+        "failedToLoad": "无法加载 {file}",
+        "noSatelliteSelected": "未选择卫星！",
+        "exportTooLarge": "导出过大。请缩短时间跨度或增大步长。",
+        "failedToPropagate": "卫星轨道推算失败！"
       },
       "help": {
         "overview": "目录管理用于在 KeepTrack 中导入和导出卫星数据。导入选项卡从磁盘加载目录文件，替换或更新当前目录；导出选项卡以多种格式输出当前目录，从纯 TLE 文件到电子表格和 STK 产品。",

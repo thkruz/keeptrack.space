@@ -11,6 +11,8 @@
         "dropzone": "Déposez un fichier .tce, .tle ou .txt pour charger le catalogue",
         "keepSatInfo": "Conserver les informations des satellites",
         "keepSatInfoTooltip": "Met à jour les TLE des satellites existants tout en conservant leur nom, leur pays et leurs données de mission. Les satellites absents du fichier importé sont supprimés.",
+        "importNewOnly": "Importer uniquement les nouveaux satellites",
+        "importNewOnlyTooltip": "Ajoute uniquement les satellites absents du catalogue actuel. Les satellites existants restent inchangés.",
         "orbitalElements": "Éléments orbitaux",
         "tabularStk": "Tableur et STK",
         "selectedSatellite": "Satellite sélectionné",
@@ -33,6 +35,18 @@
         "exportSatsInFov": "Exporter les satellites dans le FOV",
         "exportEphemeris": "Exporter les éphémérides .e",
         "selectSatelliteFirst": "Sélectionnez d'abord un satellite"
+      },
+      "toasts": {
+        "noValidFileInDrop": "Aucun fichier .tce, .tle ou .txt trouvé dans le dépôt",
+        "noValidTleData": "Aucune donnée TLE valide trouvée dans le fichier",
+        "unsupportedFileType": "Type de fichier non pris en charge. Utilisez .tce, .tle ou .txt",
+        "noNewSats": "Aucun nouveau satellite trouvé dans le fichier",
+        "addedNewSats": "{count} nouveau(x) satellite(s) ajouté(s) depuis {file}",
+        "loadedCatalog": "Catalogue chargé depuis {file}",
+        "failedToLoad": "Échec du chargement de {file}",
+        "noSatelliteSelected": "Aucun satellite sélectionné !",
+        "exportTooLarge": "Export trop volumineux. Réduisez la plage de temps ou augmentez le pas.",
+        "failedToPropagate": "Échec de la propagation du satellite !"
       },
       "help": {
         "overview": "La gestion du catalogue fait entrer et sortir les données de satellites de KeepTrack. L'onglet Importer charge un fichier catalogue depuis le disque, en remplaçant ou en mettant à jour le catalogue actuel ; l'onglet Exporter écrit le catalogue actif dans plusieurs formats, des simples fichiers TLE aux feuilles de calcul et produits STK.",

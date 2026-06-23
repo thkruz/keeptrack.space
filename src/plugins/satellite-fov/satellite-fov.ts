@@ -312,7 +312,7 @@ export class SatelliteFov extends KeepTrackPlugin {
       const coneFactory = ServiceLocator.getScene().coneFactory;
 
       coneFactory.earthCenterMeshes.forEach((mesh) => {
-        coneFactory.removeByObjectId(mesh.obj.id);
+        coneFactory.removeBySourceAndTarget(mesh.obj.id, -1);
       });
       ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
     });
@@ -334,6 +334,15 @@ export class SatelliteFov extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
+    this.addMeshEventListeners_();
+  }
+
+  /**
+   * Registers the mesh-update and selection listeners.
+   * Protected so subclasses (e.g. the pro plugin) can replace the wiring
+   * without bypassing the KeepTrackPlugin lifecycle.
+   */
+  protected addMeshEventListeners_(): void {
     EventBus.getInstance().on(
       EventBusEvent.ConeMeshUpdate, this.updateListOfFovMeshes_.bind(this));
 
@@ -387,12 +396,20 @@ export class SatelliteFov extends KeepTrackPlugin {
       ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
     } else {
       coneFactory.generateMesh(currentSat, {
-        fieldOfView: parseFloat((getEl('sat-fov-s2s-fov-angle') as HTMLInputElement)?.value || '3') as Degrees,
+        fieldOfView: this.readS2sFov_(),
         color: this.readS2sColor_(),
         targetObj: secondarySat,
       });
       ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
     }
+  }
+
+  /**
+   * Reads the sat-to-sat field of view from the UI.
+   * Protected so subclasses with different form layouts can override the source field.
+   */
+  protected readS2sFov_(): Degrees {
+    return parseFloat((getEl('sat-fov-s2s-fov-angle') as HTMLInputElement)?.value || '3') as Degrees;
   }
 
   private handleUseSecondarySat_() {
@@ -577,7 +594,9 @@ export class SatelliteFov extends KeepTrackPlugin {
     SatelliteFov.bindConeListEvents_(
       '#sat-fov-earth-center-tab .remove-sensor',
       '#sat-fov-earth-center-tab .active-cone-sensor',
-      (id) => coneFactory.removeByObjectId(id),
+      // A targetId of -1 matches the earth-center cone exactly, so a satellite with
+      // both an earth-center and a sat-to-sat cone never loses the wrong one
+      (id) => coneFactory.removeBySourceAndTarget(id, -1),
     );
   }
 
@@ -626,7 +645,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     const currentSat = PluginRegistry.getPlugin(SelectSatManager)?.getSelectedSat();
     const isSelected = currentSat && mesh.obj.id === currentSat.id;
     const sourceName = mesh.obj.name;
-    const targetName = mesh.targetObj?.name ?? 'Unknown';
+    const targetName = mesh.targetObj?.name ?? t7e('Common.unknown');
     const label = `${sourceName} → ${targetName}`;
     const nameSpan = isSelected
       ? html`<span style="color: var(--color-dark-text-accent);">${label}</span>`
@@ -666,13 +685,14 @@ export class SatelliteFov extends KeepTrackPlugin {
 
     document.querySelectorAll(coneSelector).forEach((cone) => {
       cone.addEventListener('click', (e) => {
-        let id = parseInt((e.target as HTMLElement).dataset.id ?? '-1', 10);
+        let id = parseInt((e.target as HTMLElement).dataset.id ?? '', 10);
 
-        if (!id) {
-          id = parseInt((e.target as HTMLElement).parentElement?.dataset.id ?? '-1', 10);
+        if (isNaN(id)) {
+          id = parseInt((e.target as HTMLElement).parentElement?.dataset.id ?? '', 10);
         }
 
-        if (!id) {
+        // id 0 is a valid object id, so check the parse explicitly instead of truthiness
+        if (isNaN(id) || id < 0) {
           return;
         }
 

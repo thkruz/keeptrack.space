@@ -24,7 +24,7 @@
 
 import { SatMath } from '@app/app/analysis/sat-math';
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
-import { CatalogLoader } from '@app/app/data/catalog-loader';
+import { CatalogLoader, KeepTrackTLEFile } from '@app/app/data/catalog-loader';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -62,6 +62,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
   private isLoading_ = false;
   private docDragEnterCount_ = 0;
   private keepSatInfo_ = false;
+  private importNewOnly_ = false;
 
   // =========================================================================
   // Composition-based configuration methods
@@ -166,6 +167,14 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
           <input id="cm-keep-sat-info" type="checkbox" />
           <span class="lever"></span>
           ${l('labels.keepSatInfo')}
+        </label>
+      </div>
+      <div class="switch row cm-toggle-row">
+        <label for="cm-import-new-only" data-position="top" data-delay="50"
+          data-tooltip="${l('labels.importNewOnlyTooltip')}">
+          <input id="cm-import-new-only" type="checkbox" />
+          <span class="lever"></span>
+          ${l('labels.importNewOnly')}
         </label>
       </div>
       <div class="row">
@@ -309,9 +318,14 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
     const importBtn = getEl('cm-import-btn');
     const fileInput = getEl('cm-import-file') as HTMLInputElement | null;
     const keepSatToggle = getEl('cm-keep-sat-info') as HTMLInputElement | null;
+    const importNewOnlyToggle = getEl('cm-import-new-only') as HTMLInputElement | null;
 
     keepSatToggle?.addEventListener('change', () => {
       this.keepSatInfo_ = keepSatToggle.checked;
+    });
+
+    importNewOnlyToggle?.addEventListener('change', () => {
+      this.importNewOnly_ = importNewOnlyToggle.checked;
     });
 
     importBtn?.addEventListener('click', () => {
@@ -402,7 +416,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
 
       if (!validFile) {
         ServiceLocator.getUiManager().toast(
-          'No .tce, .tle, or .txt file found in drop',
+          l('toasts.noValidFileInDrop'),
           ToastMsgType.caution,
         );
 
@@ -456,6 +470,89 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
   // Import
   // =========================================================================
 
+  /**
+   * Parses the TLE content and adds only satellites whose SCC numbers are not
+   * already in the current catalog. Existing satellites are untouched.
+   * Returns the count of newly added satellites (0 means none were new).
+   */
+  private async importNewSatsOnly_(content: string): Promise<number> {
+    const asciiCatalog = CatalogLoader.parseTceContent(content);
+
+    if (asciiCatalog.length === 0) {
+      throw new Error(l('toasts.noValidTleData'));
+    }
+
+    const catalogManager = ServiceLocator.getCatalogManager();
+    const sccIndex = catalogManager.sccIndex;
+
+    const newEntries = asciiCatalog.filter((entry) => {
+      const key = CatalogLoader.canonicalSccKey(entry.SCC);
+
+      return key !== null && typeof sccIndex[key] === 'undefined';
+    });
+
+    if (newEntries.length === 0) {
+      return 0;
+    }
+
+    // Snapshot existing satellite metadata so existing satellites are preserved
+    const merged: KeepTrackTLEFile[] = [];
+
+    for (const obj of catalogManager.objectCache) {
+      if (!obj.isSatellite()) {
+        continue;
+      }
+      const sat = obj as Satellite;
+
+      merged.push({
+        tle1: sat.tle1,
+        tle2: sat.tle2,
+        name: sat.name,
+        altName: sat.altName,
+        country: sat.country,
+        owner: sat.owner,
+        mission: sat.mission,
+        purpose: sat.purpose,
+        type: sat.type,
+        bus: sat.bus,
+        configuration: sat.configuration,
+        dryMass: sat.dryMass,
+        equipment: sat.equipment,
+        lifetime: sat.lifetime,
+        manufacturer: sat.manufacturer,
+        motor: sat.motor,
+        payload: sat.payload,
+        power: sat.power,
+        shape: sat.shape,
+        span: sat.span,
+        launchDate: sat.launchDate,
+        launchMass: sat.launchMass,
+        launchSite: sat.launchSite,
+        launchPad: sat.launchPad,
+        launchVehicle: sat.launchVehicle,
+        length: sat.length,
+        diameter: sat.diameter,
+        rcs: typeof sat.rcs === 'number' ? sat.rcs.toString() : null,
+        vmag: sat.vmag ?? null,
+        status: sat.status,
+        altId: sat.altId,
+      });
+    }
+
+    for (const entry of newEntries) {
+      merged.push({
+        tle1: entry.TLE1,
+        tle2: entry.TLE2,
+        name: entry.ON ?? 'Unknown',
+        type: entry.OT,
+      });
+    }
+
+    await CatalogLoader.reloadCatalogFromData(merged);
+
+    return newEntries.length;
+  }
+
   protected handleImportFile_(file: File): void {
     if (this.isLoading_) {
       return;
@@ -465,7 +562,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
 
     if (!validExts.some((ext) => file.name.endsWith(ext))) {
       ServiceLocator.getUiManager().toast(
-        'Unsupported file type. Use .tce, .tle, or .txt',
+        l('toasts.unsupportedFileType'),
         ToastMsgType.caution,
       );
 
@@ -486,19 +583,37 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
       }
 
       try {
-        if (this.keepSatInfo_) {
+        if (this.importNewOnly_) {
+          const addedCount = await this.importNewSatsOnly_(content);
+
+          if (addedCount === 0) {
+            ServiceLocator.getUiManager().toast(
+              l('toasts.noNewSats'),
+              ToastMsgType.caution,
+            );
+          } else {
+            ServiceLocator.getUiManager().toast(
+              l('toasts.addedNewSats').replace('{count}', addedCount.toString()).replace('{file}', file.name),
+              ToastMsgType.normal,
+            );
+          }
+        } else if (this.keepSatInfo_) {
           await CatalogLoader.mergeAndReloadCatalog(content);
+          ServiceLocator.getUiManager().toast(
+            l('toasts.loadedCatalog').replace('{file}', file.name),
+            ToastMsgType.normal,
+          );
         } else {
           await CatalogLoader.reloadCatalog(content);
+          ServiceLocator.getUiManager().toast(
+            l('toasts.loadedCatalog').replace('{file}', file.name),
+            ToastMsgType.normal,
+          );
         }
-        ServiceLocator.getUiManager().toast(
-          `Loaded catalog from ${file.name}`,
-          ToastMsgType.normal,
-        );
       } catch (error) {
         errorManagerInstance.error(error, 'CatalogManagementPlugin');
         ServiceLocator.getUiManager().toast(
-          `Failed to load ${file.name}`,
+          l('toasts.failedToLoad').replace('{file}', file.name),
           ToastMsgType.critical,
         );
       } finally {
@@ -544,7 +659,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
    * null. Shared by the base ephemeris export and the Pro ODM exports.
    * @param noSelectionMsg - Message shown when no satellite is selected.
    */
-  protected getSelectedSatellite_(noSelectionMsg = 'No satellite selected!'): Satellite | null {
+  protected getSelectedSatellite_(noSelectionMsg = l('toasts.noSatelliteSelected')): Satellite | null {
     const sat = PluginRegistry.getPlugin(SelectSatManager)?.getSelectedSat();
 
     if (!sat || !sat.isSatellite()) {
@@ -568,9 +683,8 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
     const parsed = parseEphemerisParams(spanEl?.value, stepEl?.value);
 
     if (!parsed.ok) {
-      // TODO(localization): base plugin ephemeris messages are not yet localized.
       ServiceLocator.getUiManager().toast(
-        'Export too large. Reduce the time span or increase the step size.',
+        l('toasts.exportTooLarge'),
         ToastMsgType.critical,
       );
 
@@ -604,7 +718,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
     }
 
     if (rows.length === 0) {
-      ServiceLocator.getUiManager().toast('Failed to propagate satellite!', ToastMsgType.critical);
+      ServiceLocator.getUiManager().toast(l('toasts.failedToPropagate'), ToastMsgType.critical);
 
       return;
     }

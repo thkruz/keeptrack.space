@@ -331,9 +331,17 @@ export class CatalogLoader {
     await Promise.all([extraSats, asciiCatalog, externalCatalog, jsCatalog]).then(async ([extraSats, asciiCatalog, externalCatalog, jsCatalog]) => {
       asciiCatalog = externalCatalog || asciiCatalog;
 
-      // Make sure everyone agrees on what time it is
-      ServiceLocator.getTimeManager().init();
-      ServiceLocator.getTimeManager().synchronize();
+      // Make sure everyone agrees on what time it is.
+      // init() is only safe on first boot. It resets dynamicOffsetEpoch and staticOffset,
+      // which would wipe the user's simulation time during a mid-session catalog swap.
+      // For reloads, synchronize() alone is enough: it broadcasts the current time state
+      // to the new cruncher worker without touching the offsets.
+      const timeManager = ServiceLocator.getTimeManager();
+
+      if (!timeManager.isInitialized) {
+        timeManager.init();
+      }
+      timeManager.synchronize();
 
       // Allow data plugins (e.g., pro StarsPlugin) to inject static catalog data
       // before TLE filtering runs.

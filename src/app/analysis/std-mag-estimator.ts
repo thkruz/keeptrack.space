@@ -263,7 +263,12 @@ export const lookupKnownVmag = (sat: Satellite): number | null => {
  */
 export const estimateStdMagWithSource = (sat: Satellite): StdMagWithSource | null => {
   if (typeof sat.vmag === 'number' && !isNaN(sat.vmag)) {
-    return { vmag: sat.vmag, source: 'catalog' };
+    // A back-fill that flagged its value as estimated (e.g. the VMag database
+    // RCS fallback) keeps its 'estimate' provenance so the UI still renders the
+    // `(est.)` suffix rather than presenting a coarse value as catalog-grade.
+    const source: StdMagSource = (sat as Satellite & { isVmagEstimated?: boolean }).isVmagEstimated ? 'estimate' : 'catalog';
+
+    return { vmag: sat.vmag, source };
   }
 
   const preset = lookupKnownVmag(sat);

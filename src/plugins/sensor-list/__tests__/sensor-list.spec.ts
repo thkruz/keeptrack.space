@@ -32,7 +32,7 @@ test.describe('SensorListPlugin', () => {
     await expect(page.locator('#sensor-list-menu')).toBeVisible({ timeout: 5_000 });
 
     // ── Behavior: select a sensor (exercises the sensor-list click delegation + setSensor) ──
-    const firstSensor = page.locator('#sensor-list-content li.menu-selectable[data-sensor]').first();
+    const firstSensor = page.locator('#sensor-list-content .menu-selectable[data-sensor]').first();
 
     await expect(firstSensor).toBeVisible();
     await firstSensor.click();

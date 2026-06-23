@@ -47,7 +47,8 @@ describe('SensorListPlugin', () => {
 
   it('should generate correct side menu HTML', () => {
     expect(plugin.sideMenuElementHtml).toContain('<div id="sensor-list-menu"');
-    expect(plugin.sideMenuElementHtml).toContain('<ul id="list-of-sensors">');
+    expect(plugin.sideMenuElementHtml).toContain('kt-ui-v13');
+    expect(plugin.sideMenuElementHtml).toContain('<div id="list-of-sensors">');
   });
 
   it.skip('should handle sensorListContentClick with valid sensor group', () => {
@@ -76,9 +77,9 @@ describe('SensorListPlugin', () => {
     expect(mockSetSensor).not.toHaveBeenCalled();
   });
 
-  it.skip('should throw error if no sensors are found in createLiForSensor_', () => {
+  it.skip('should throw error if no sensors are found in createSensorRow_', () => {
     expect(() => {
-      (SensorListPlugin as unknown as { createLiForSensor_: (sensor: DetailedSensor) => void }).createLiForSensor_({} as DetailedSensor);
+      (SensorListPlugin as unknown as { createSensorRow_: (sensor: DetailedSensor) => void }).createSensorRow_({} as DetailedSensor);
     }).toThrow('No sensors found');
   });
 });

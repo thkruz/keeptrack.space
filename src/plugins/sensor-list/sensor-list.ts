@@ -58,16 +58,17 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
   sideMenuElementName: string = 'sensor-list-menu';
   sideMenuElementHtml: string =
     html`
-    <div id="sensor-list-menu" class="side-menu-parent start-hidden">
+    <div id="sensor-list-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div id="sensor-list-content" class="side-menu">
-        <div class="row">
-          <ul id="reset-sensor-text" class="sensor-reset-menu">
-            <button id="reset-sensor-button" class="center-align btn btn-ui waves-effect waves-light menu-selectable" type="button" disabled>${t7e('plugins.SensorListPlugin.buttons.resetSensor' as Parameters<typeof t7e>[0])} &#9658;</button>
-          </ul>
-          <ul id="list-of-sensors">` +
+          <section class="kt-section">
+            <button id="reset-sensor-button" class="kt-action waves-effect menu-selectable" type="button" disabled>
+              <span class="kt-action-label">${t7e('plugins.SensorListPlugin.buttons.resetSensor' as Parameters<typeof t7e>[0])}</span>
+            </button>
+          </section>
+          <div id="list-of-sensors">` +
     this.sensorGroups_.map((sensorGroup) => this.genericSensors_(sensorGroup.name)).join('') +
     html`
-          </ul>
+          </div>
         </div>
       </div>
     </div>`;
@@ -376,15 +377,17 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
     }
   }
 
-  private static createLiForSensor_(sensor: DetailedSensor) {
+  private static createSensorRow_(sensor: DetailedSensor) {
     const missingData = t7e('plugins.SensorListPlugin.labels.missingData' as Parameters<typeof t7e>[0]);
 
     return html`
-      <li class="menu-selectable" data-sensor="${sensor.objName ?? 'Missing Data'}">
-        <span>${sensor.uiName ?? missingData}</span>
-        <span>${sensor.system ?? missingData}</span>
-        <span class="badge dark-blue-badge" data-badge-caption="${sensor.operator ?? missingData}"></span>
-      </li>
+      <button type="button" class="kt-action waves-effect menu-selectable sensor-row" data-sensor="${sensor.objName ?? 'Missing Data'}">
+        <span class="kt-action-label">
+          <span class="sensor-name">${sensor.uiName ?? missingData}</span>
+          <span class="sensor-system">${sensor.system ?? missingData}</span>
+        </span>
+        <span class="sensor-badge">${sensor.operator ?? missingData}</span>
+      </button>
     `;
   }
 
@@ -432,17 +435,19 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
 
       const renderedTopLink = params.topLinks
         .map(
-          (link) => html`<li class="menu-selectable sensor-top-link" data-sensor="${params.name}">
-              <span>${link.name}</span>
-              <span class="badge dark-blue-badge" data-badge-caption="${link.badge}"></span>
-            </li>`,
+          (link) => html`<button type="button" class="kt-action waves-effect menu-selectable sensor-top-link" data-sensor="${params.name}">
+              <span class="kt-action-label">${link.name}</span>
+              <span class="sensor-badge">${link.badge}</span>
+            </button>`,
         )
         .join('');
 
       return html`
-        ${SensorListPlugin.genH5Title_(params.header)}
-        ${renderedTopLink}
-        ${params.sensors.map((sensor) => SensorListPlugin.createLiForSensor_(sensor)).join('')}
+        <section class="kt-section sensor-group-section">
+          <div class="kt-section-label">${params.header}</div>
+          ${renderedTopLink}
+          ${params.sensors.map((sensor) => SensorListPlugin.createSensorRow_(sensor)).join('')}
+        </section>
       `;
     } catch (error) {
       errorManagerInstance.warn('Error generating HTML:', error);

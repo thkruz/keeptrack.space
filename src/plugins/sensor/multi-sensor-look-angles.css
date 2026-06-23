@@ -1,0 +1,94 @@
+/*
+ * Multi-Sensor Look Angles menu styles. The menu (and its sensor-toggle
+ * secondary menu) opt into the shared v13 card system (.kt-ui-v13 +
+ * kt-section); see src/engine/ui/menu-v13.css. Only the results-table chrome
+ * and the green/red sensor toggle chips need plugin-specific styling.
+ */
+
+/* ===== Results table (inside a v13 section card) ===== */
+.msla-table {
+  width: 100%;
+  margin: 4px 0 0;
+  border-collapse: collapse;
+  line-height: 1.4;
+  font-size: 13px;
+}
+
+.msla-table td {
+  text-align: center;
+  padding: 5px 4px;
+  border-bottom: 1px solid var(--color-dark-border);
+}
+
+/* Header row (v13 uppercase-muted look; replaces the old per-cell underline) */
+.msla-table .msla-table-header td {
+  padding: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-dark-text-muted);
+  border-bottom: 1px solid var(--color-dark-border);
+}
+
+/* Clickable result rows */
+.msla-table tr.link {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.msla-table tr.link:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+/* ===== Sensor toggle chips (secondary menu, inside a v13 section card) ===== */
+.msla-sensor-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin: 4px 0 0;
+}
+
+.msla-sensor-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--color-dark-border);
+  border-radius: var(--kt-radius-md, 6px);
+  background: var(--color-dark-cell, rgba(255, 255, 255, 0.03));
+  color: var(--color-text-light, #f5f5f5);
+  font-size: 12px;
+  line-height: 1.2;
+  text-align: left;
+  text-transform: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+/* Status dot: green when included, red when excluded. */
+.msla-sensor-toggle::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-dark-text-muted);
+}
+
+.msla-sensor-toggle.is-on::before {
+  background: #2d7b31;
+}
+
+.msla-sensor-toggle.is-off::before {
+  background: #c62828;
+}
+
+.msla-sensor-toggle.is-off {
+  color: var(--color-dark-text-muted);
+}
+
+.msla-sensor-toggle:hover {
+  border-color: var(--color-primary-light, #e01a0e);
+}

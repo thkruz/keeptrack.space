@@ -32,6 +32,7 @@ import { sensorGroups } from '../../app/data/catalogs/sensor-groups';
 import { SensorManager } from '../../app/sensors/sensorManager';
 import { ClickDragOptions, fileExcelPng, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import './multi-sensor-look-angles.css';
 /** Shorthand for this plugin's locale keys. */
 const l = (key: string): string => t7e(`plugins.MultiSensorLookAnglesPlugin.${key}` as Parameters<typeof t7e>[0]);
 
@@ -97,15 +98,15 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
 
   sideMenuElementName: string = 'multi-sensor-look-angles-menu';
   sideMenuElementHtml: string = html`
-    <div class="row"></div>
-    <div class="row">
-      <table id="multi-sensor-look-angles-table" class="center-align striped-light centered"></table>
-    </div>`;
+    <section class="kt-section">
+      <div class="kt-section-label">${l('sections.results')}</div>
+      <table id="multi-sensor-look-angles-table" class="msla-table center-align"></table>
+    </section>`;
   sideMenuSecondaryHtml: string = html`
-    <div class="row" style="margin: 0 10px;">
-      <div id="multi-sensor-look-angles-sensor-list">
-      </div>
-    </div>`;
+    <section class="kt-section">
+      <div class="kt-section-label">${l('sections.sensors')}</div>
+      <div id="multi-sensor-look-angles-sensor-list" class="msla-sensor-list"></div>
+    </section>`;
   sideMenuSettingsWidth: number = 350;
   downloadIconSrc = fileExcelPng;
   downloadIconCb = () => {
@@ -164,6 +165,15 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
+
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerFinal,
+      () => {
+        // Opt this menu (and its sensor-toggle secondary menu) into the v13+ card UI.
+        getEl('multi-sensor-look-angles-menu')?.classList.add('kt-ui-v13');
+        getEl('multi-sensor-look-angles-menu-secondary')?.classList.add('kt-ui-v13');
+      },
+    );
 
     EventBus.getInstance().on(
       EventBusEvent.selectSatData,
@@ -226,25 +236,22 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
 
             const sensorButton = document.createElement('button');
 
-            sensorButton.classList.add('btn', 'darken-3', 'btn-ui', 'waves-effect', 'waves-light');
-            if (this.disabledSensors_.includes(sensor)) {
-              sensorButton.classList.add('red');
-            } else {
-              sensorButton.classList.add('green');
-            }
+            sensorButton.type = 'button';
+            sensorButton.classList.add('msla-sensor-toggle', 'waves-effect');
+            sensorButton.classList.add(this.disabledSensors_.includes(sensor) ? 'is-off' : 'is-on');
 
             allSensors.push(sensor);
 
             sensorButton.innerText = sensor.uiName ?? sensor.shortName ?? sensor.objName;
             sensorButton.addEventListener('click', () => {
-              if (sensorButton.classList.contains('red')) {
-                sensorButton.classList.remove('red');
-                sensorButton.classList.add('green');
+              if (sensorButton.classList.contains('is-off')) {
+                sensorButton.classList.remove('is-off');
+                sensorButton.classList.add('is-on');
                 this.disabledSensors_.splice(this.disabledSensors_.indexOf(sensor), 1);
                 ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
               } else {
-                sensorButton.classList.add('red');
-                sensorButton.classList.remove('green');
+                sensorButton.classList.add('is-off');
+                sensorButton.classList.remove('is-on');
                 this.disabledSensors_.push(sensor);
                 ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
               }
@@ -430,30 +437,26 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
 
     tbl.innerHTML = ''; // Clear the table from old object data
     let tr = tbl.insertRow();
+
+    tr.classList.add('msla-table-header');
     let tdT = tr.insertCell();
 
     tdT.appendChild(document.createTextNode(l('table.time')));
-    tdT.setAttribute('style', 'text-decoration: underline');
     let tdE = tr.insertCell();
 
     tdE.appendChild(document.createTextNode(l('table.el')));
-    tdE.setAttribute('style', 'text-decoration: underline');
     let tdA = tr.insertCell();
 
     tdA.appendChild(document.createTextNode(l('table.az')));
-    tdA.setAttribute('style', 'text-decoration: underline');
     let tdR = tr.insertCell();
 
     tdR.appendChild(document.createTextNode(l('table.rng')));
-    tdR.setAttribute('style', 'text-decoration: underline');
     let tdS = tr.insertCell();
 
     tdS.appendChild(document.createTextNode(l('table.sensor')));
-    tdS.setAttribute('style', 'text-decoration: underline');
     let tdV = tr.insertCell();
 
     tdV.appendChild(document.createTextNode(l('table.visible')));
-    tdV.setAttribute('style', 'text-decoration: underline');
 
     const timeManagerInstance = ServiceLocator.getTimeManager();
 

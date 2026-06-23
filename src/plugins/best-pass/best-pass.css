@@ -1,10 +1,29 @@
-.bp-title-row {
-  margin: 5px 1rem 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/**
+ * Styling for the Best Pass (OSS) plugin.
+ *
+ * The menu is on the v13 card UI. Both the OSS base and the Pro subclass share
+ * the `#best-pass-menu` root id, so the dense-form fixes below cover both builds
+ * (this file is imported by the OSS module, which the Pro subclass also pulls in).
+ */
+
+/* Standalone primary action: a `.kt-action` that is a direct child of the form
+   is width:100% and would run 12px past the inset cards. Subtract the side
+   margins so its edges line up with the cards. */
+#best-pass-menu-form > .kt-action {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
 }
 
-.bp-title-row h5 {
-  margin: 0 auto;
+/* Swap the app-wide :focus-visible outline (which overlaps the floating label)
+   for KeepTrack's underline. */
+#best-pass-menu .input-field input:focus,
+#best-pass-menu .input-field textarea:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#best-pass-menu .input-field input:focus-visible,
+#best-pass-menu .input-field textarea:focus-visible {
+  outline: none;
 }

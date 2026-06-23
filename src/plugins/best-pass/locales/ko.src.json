@@ -1,6 +1,9 @@
 {
   "plugins": {
     "BestPassPlugin": {
+      "sections": {
+        "search": "검색"
+      },
       "bottomIconLabel": "최적 통과",
       "title": "최적 통과",
       "satelliteNumbersLabel": "위성 번호",

@@ -1,6 +1,9 @@
 {
   "plugins": {
     "BestPassPlugin": {
+      "sections": {
+        "search": "検索"
+      },
       "bottomIconLabel": "最適パス",
       "title": "最適パス",
       "satelliteNumbersLabel": "衛星番号",

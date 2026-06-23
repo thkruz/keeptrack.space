@@ -1,6 +1,9 @@
 {
   "plugins": {
     "BestPassPlugin": {
+      "sections": {
+        "search": "Поиск"
+      },
       "bottomIconLabel": "Лучшие пролёты",
       "title": "Лучшие пролёты",
       "satelliteNumbersLabel": "Номера спутников",

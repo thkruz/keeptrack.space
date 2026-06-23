@@ -1,6 +1,9 @@
 {
   "plugins": {
     "BestPassPlugin": {
+      "sections": {
+        "search": "Suche"
+      },
       "bottomIconLabel": "Beste Überflüge",
       "title": "Beste Überflüge",
       "satelliteNumbersLabel": "Satellitennummern",

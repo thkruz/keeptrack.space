@@ -1,6 +1,9 @@
 {
   "plugins": {
     "BestPassPlugin": {
+      "sections": {
+        "search": "Hledání"
+      },
       "bottomIconLabel": "Nejlepší průlety",
       "title": "Nejlepší průlety",
       "satelliteNumbersLabel": "Čísla satelitů",

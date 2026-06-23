@@ -1,6 +1,9 @@
 {
   "plugins": {
     "BestPassPlugin": {
+      "sections": {
+        "search": "Recherche"
+      },
       "bottomIconLabel": "Meilleurs passages",
       "title": "Meilleurs passages",
       "satelliteNumbersLabel": "Numéros de satellite",

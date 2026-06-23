@@ -1,6 +1,9 @@
 {
   "plugins": {
     "BestPassPlugin": {
+      "sections": {
+        "search": "搜索"
+      },
       "bottomIconLabel": "最佳过境",
       "title": "最佳过境",
       "satelliteNumbersLabel": "卫星编号",

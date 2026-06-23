@@ -129,7 +129,7 @@ export class BestPassPlugin extends KeepTrackPlugin {
 
   protected buildSideMenuHtml_(): string {
     return html`
-      <div id="best-pass-menu" class="side-menu-parent start-hidden">
+      <div id="best-pass-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div class="side-menu">
           ${this.buildFormHtml_()}
         </div>
@@ -140,18 +140,18 @@ export class BestPassPlugin extends KeepTrackPlugin {
   protected buildFormHtml_(): string {
     return html`
       <form id="best-pass-menu-form">
-        <div class="row">
-          <div class="input-field col s12">
-            <input value="25544,00005" id="bp-sats" type="text" />
-            <label for="bp-sats" class="active">${t7e('plugins.BestPassPlugin.satelliteNumbersLabel' as Parameters<typeof t7e>[0])}</label>
+        <section class="kt-section">
+          <div class="kt-section-label">${t7e('plugins.BestPassPlugin.sections.search' as Parameters<typeof t7e>[0])}</div>
+          <div class="row">
+            <div class="input-field col s12">
+              <input value="25544,00005" id="bp-sats" type="text" />
+              <label for="bp-sats" class="active">${t7e('plugins.BestPassPlugin.satelliteNumbersLabel' as Parameters<typeof t7e>[0])}</label>
+            </div>
           </div>
-        </div>
-        <div class="row">
-          <center>
-            <button id="bp-submit" class="btn btn-ui waves-effect waves-light" type="submit"
-              name="action">${t7e('plugins.BestPassPlugin.generateButton' as Parameters<typeof t7e>[0])} &#9658;</button>
-          </center>
-        </div>
+        </section>
+        <button id="bp-submit" class="kt-action waves-effect" type="submit" name="action">
+          <span class="kt-action-label">${t7e('plugins.BestPassPlugin.generateButton' as Parameters<typeof t7e>[0])}</span>
+        </button>
       </form>
     `;
   }
@@ -252,10 +252,31 @@ export class BestPassPlugin extends KeepTrackPlugin {
 
     if (!sensor) {
       submitButtonDom.disabled = true;
-      submitButtonDom.textContent = t7e('plugins.BestPassPlugin.selectSensorFirst' as Parameters<typeof t7e>[0]);
+      BestPassPlugin.setActionLabel_('bp-submit', t7e('plugins.BestPassPlugin.selectSensorFirst' as Parameters<typeof t7e>[0]));
     } else {
       submitButtonDom.disabled = false;
-      submitButtonDom.textContent = `${t7e('plugins.BestPassPlugin.generateButton' as Parameters<typeof t7e>[0])} \u25B6`;
+      BestPassPlugin.setActionLabel_('bp-submit', t7e('plugins.BestPassPlugin.generateButton' as Parameters<typeof t7e>[0]));
+    }
+  }
+
+  /**
+   * Updates a v13 `.kt-action` button's label without clobbering the CSS chevron.
+   * Sets the text on the inner `.kt-action-label` span when present, falling back
+   * to the button text for any legacy markup.
+   */
+  protected static setActionLabel_(buttonId: string, text: string): void {
+    const btn = getEl(buttonId);
+
+    if (!btn) {
+      return;
+    }
+
+    const label = btn.querySelector('.kt-action-label');
+
+    if (label) {
+      label.textContent = text;
+    } else {
+      btn.textContent = text;
     }
   }
 

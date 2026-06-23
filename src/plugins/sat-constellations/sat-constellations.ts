@@ -189,6 +189,11 @@ export class SatConstellations extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
       const menuEl = getEl('constellations-menu');
+
+      // Opt this menu (and its filter secondary menu) into the v13+ card UI.
+      menuEl?.classList.add('kt-ui-v13');
+      getEl('constellations-menu-secondary')?.classList.add('kt-ui-v13');
+
       const ulEl = menuEl?.querySelector('ul');
 
       if (ulEl) {
@@ -237,62 +242,72 @@ export class SatConstellations extends KeepTrackPlugin {
 
   private buildSideMenuHtml_(): string {
     const l = (key: string) => t7e(`plugins.SatConstellations.constellations.${key}` as Parameters<typeof t7e>[0]);
+    const s = (key: string) => t7e(`plugins.SatConstellations.sections.${key}` as Parameters<typeof t7e>[0]);
 
     return html`
-      <ul id="sc-constellation-list">
-        <li class="menu-selectable" data-group="SpaceStations">${l('SpaceStations')}</li>
-        <li class="menu-selectable" data-group="AmateurRadio">${l('AmateurRadio')}</li>
-        <li class="menu-selectable" data-group="GPSGroup">${l('GPSGroup')}</li>
-        <li class="menu-selectable" data-group="GalileoGroup">${l('GalileoGroup')}</li>
-        <li class="menu-selectable" data-group="GlonassGroup">${l('GlonassGroup')}</li>
-        <li class="menu-selectable" data-group="iridium">${l('iridium')}</li>
-        <li class="menu-selectable" data-group="orbcomm">${l('orbcomm')}</li>
-        <li class="menu-selectable" data-group="globalstar">${l('globalstar')}</li>
-        <li class="menu-selectable" data-group="ses">${l('ses')}</li>
-        <li class="menu-selectable" data-group="aehf">${l('aehf')}</li>
-        <li class="menu-selectable" data-group="wgs">${l('wgs')}</li>
-        <li class="menu-selectable" data-group="starlink">${l('starlink')}</li>
-        <li class="menu-selectable" data-group="sbirs">${l('sbirs')}</li>
-        <li class="menu-selectable" data-group="starlink-gen2">${l('starlink-gen2')}</li>
-        <li class="menu-selectable" data-group="starlink-v2">${l('starlink-v2')}</li>
-        <li class="menu-selectable" data-group="starlink-snapshot">${l('starlink-snapshot')}</li>
-        <li class="menu-selectable" data-group="starshield">${l('starshield')}</li>
-        <li class="menu-selectable" data-group="pwsa">${l('pwsa')}</li>
-        <li class="menu-selectable" data-group="kuiper">${l('kuiper')}</li>
-        <li class="menu-selectable" data-group="ast-spaceobile">${l('ast-spaceobile')}</li>
-        <li class="menu-selectable" data-group="oneweb">${l('oneweb')}</li>
-        <li class="menu-selectable" data-group="telesat-lightspeed">${l('telesat-lightspeed')}</li>
-        <li class="menu-selectable" data-group="boeing">${l('boeing')}</li>
-        <li class="menu-selectable" data-group="astra">${l('astra')}</li>
-        <li class="menu-selectable" data-group="spinlaunch">${l('spinlaunch')}</li>
-        <li class="menu-selectable" data-group="hvnet">${l('hvnet')}</li>
-        <li class="menu-selectable" data-group="lynk">${l('lynk')}</li>
-        <li class="menu-selectable" data-group="guanwang">${l('guanwang')}</li>
-        <li class="menu-selectable" data-group="qianfan">${l('qianfan')}</li>
-        <li class="menu-selectable" data-group="honghu3">${l('honghu3')}</li>
-        <li class="menu-selectable" data-group="yinhe">${l('yinhe')}</li>
-        <li class="menu-selectable" data-group="hanwha">${l('hanwha')}</li>
-      </ul>
-      <div id="sc-stats" class="sc-stats start-hidden">
+      <section class="kt-section">
+        <div class="kt-section-label">${s('constellations')}</div>
+        <ul id="sc-constellation-list" class="sc-constellation-list">
+          <li class="menu-selectable" data-group="SpaceStations">${l('SpaceStations')}</li>
+          <li class="menu-selectable" data-group="AmateurRadio">${l('AmateurRadio')}</li>
+          <li class="menu-selectable" data-group="GPSGroup">${l('GPSGroup')}</li>
+          <li class="menu-selectable" data-group="GalileoGroup">${l('GalileoGroup')}</li>
+          <li class="menu-selectable" data-group="GlonassGroup">${l('GlonassGroup')}</li>
+          <li class="menu-selectable" data-group="iridium">${l('iridium')}</li>
+          <li class="menu-selectable" data-group="orbcomm">${l('orbcomm')}</li>
+          <li class="menu-selectable" data-group="globalstar">${l('globalstar')}</li>
+          <li class="menu-selectable" data-group="ses">${l('ses')}</li>
+          <li class="menu-selectable" data-group="aehf">${l('aehf')}</li>
+          <li class="menu-selectable" data-group="wgs">${l('wgs')}</li>
+          <li class="menu-selectable" data-group="starlink">${l('starlink')}</li>
+          <li class="menu-selectable" data-group="sbirs">${l('sbirs')}</li>
+          <li class="menu-selectable" data-group="starlink-gen2">${l('starlink-gen2')}</li>
+          <li class="menu-selectable" data-group="starlink-v2">${l('starlink-v2')}</li>
+          <li class="menu-selectable" data-group="starlink-snapshot">${l('starlink-snapshot')}</li>
+          <li class="menu-selectable" data-group="starshield">${l('starshield')}</li>
+          <li class="menu-selectable" data-group="pwsa">${l('pwsa')}</li>
+          <li class="menu-selectable" data-group="kuiper">${l('kuiper')}</li>
+          <li class="menu-selectable" data-group="ast-spaceobile">${l('ast-spaceobile')}</li>
+          <li class="menu-selectable" data-group="oneweb">${l('oneweb')}</li>
+          <li class="menu-selectable" data-group="telesat-lightspeed">${l('telesat-lightspeed')}</li>
+          <li class="menu-selectable" data-group="boeing">${l('boeing')}</li>
+          <li class="menu-selectable" data-group="astra">${l('astra')}</li>
+          <li class="menu-selectable" data-group="spinlaunch">${l('spinlaunch')}</li>
+          <li class="menu-selectable" data-group="hvnet">${l('hvnet')}</li>
+          <li class="menu-selectable" data-group="lynk">${l('lynk')}</li>
+          <li class="menu-selectable" data-group="guanwang">${l('guanwang')}</li>
+          <li class="menu-selectable" data-group="qianfan">${l('qianfan')}</li>
+          <li class="menu-selectable" data-group="honghu3">${l('honghu3')}</li>
+          <li class="menu-selectable" data-group="yinhe">${l('yinhe')}</li>
+          <li class="menu-selectable" data-group="hanwha">${l('hanwha')}</li>
+        </ul>
+      </section>
+      <section id="sc-stats" class="kt-section sc-stats start-hidden">
+        <div class="kt-section-label">${s('statistics')}</div>
         <div class="sc-stats-row">
           <span id="sc-stat-count"></span>
           <span id="sc-stat-alt"></span>
           <span id="sc-stat-inc"></span>
         </div>
-      </div>
-      <div id="sc-table-wrapper" class="start-hidden">
-        <table id="sc-results-table" class="sc-results-table center-align striped"></table>
+      </section>
+      <section id="sc-table-wrapper" class="kt-section start-hidden">
+        <div class="kt-section-label">${s('results')}</div>
+        <div class="sc-table-scroll">
+          <table id="sc-results-table" class="sc-results-table center-align striped"></table>
+        </div>
         <sub id="sc-results-count" class="center-align"></sub>
-      </div>
+      </section>
     `;
   }
 
   private buildSecondaryMenuHtml_(): string {
     const l = (key: string) => t7e(`plugins.SatConstellations.filters.${key}` as Parameters<typeof t7e>[0]);
+    const s = (key: string) => t7e(`plugins.SatConstellations.sections.${key}` as Parameters<typeof t7e>[0]);
 
     return html`
-      <div class="sc-filter-form">
-        <div class="row">
+      <section class="kt-section">
+        <div class="kt-section-label">${s('filters')}</div>
+        <div class="kt-field-row">
           <div class="input-field col s6">
             <input placeholder="0" id="sc-filter-inc-min" type="number" />
             <label for="sc-filter-inc-min" class="active">${l('incMin')}</label>
@@ -302,7 +317,7 @@ export class SatConstellations extends KeepTrackPlugin {
             <label for="sc-filter-inc-max" class="active">${l('incMax')}</label>
           </div>
         </div>
-        <div class="row">
+        <div class="kt-field-row">
           <div class="input-field col s6">
             <input placeholder="0" id="sc-filter-alt-min" type="number" />
             <label for="sc-filter-alt-min" class="active">${l('altMin')}</label>
@@ -312,7 +327,7 @@ export class SatConstellations extends KeepTrackPlugin {
             <label for="sc-filter-alt-max" class="active">${l('altMax')}</label>
           </div>
         </div>
-        <div class="row">
+        <div class="kt-field-row">
           <div class="input-field col s6">
             <input placeholder="0" id="sc-filter-raan-min" type="number" />
             <label for="sc-filter-raan-min" class="active">${l('raanMin')}</label>
@@ -322,17 +337,19 @@ export class SatConstellations extends KeepTrackPlugin {
             <label for="sc-filter-raan-max" class="active">${l('raanMax')}</label>
           </div>
         </div>
-        <div class="row">
+        <div class="kt-field-row">
           <div class="input-field col s12">
             <input placeholder=".*" id="sc-filter-name" type="text" />
             <label for="sc-filter-name" class="active">${l('nameFilter')}</label>
           </div>
         </div>
-        <div class="row sc-filter-buttons">
-          <button id="sc-filter-apply" class="btn btn-ui waves-effect waves-light">${l('apply')}</button>
-          <button id="sc-filter-reset" class="btn btn-ui waves-effect waves-light">${l('reset')}</button>
-        </div>
-      </div>
+        <button id="sc-filter-apply" type="button" class="kt-action waves-effect">
+          <span class="kt-action-label">${l('apply')}</span>
+        </button>
+        <button id="sc-filter-reset" type="button" class="kt-action waves-effect">
+          <span class="kt-action-label">${l('reset')}</span>
+        </button>
+      </section>
     `;
   }
 

@@ -3,13 +3,23 @@
   width: 650px !important;
 }
 
-/* Stats row */
-.sc-stats {
-  padding: 4px 8px;
-  border-top: 1px solid var(--color-dark-border);
-  border-bottom: 1px solid var(--color-dark-border);
+/* Constellation list (lives inside a v13 section card) */
+.sc-constellation-list {
+  margin: 0;
 }
 
+.sc-constellation-list .menu-selectable {
+  padding: 6px 8px;
+  border-radius: var(--kt-radius-sm, 4px);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.sc-constellation-list .menu-selectable:hover {
+  background-color: rgba(255, 255, 255, 0.09);
+}
+
+/* Stats row (inside a v13 section card) */
 .sc-stats-row {
   display: flex;
   flex-wrap: wrap;
@@ -18,8 +28,8 @@
   color: var(--color-dark-text-accent);
 }
 
-/* Results table */
-#sc-table-wrapper {
+/* Results table (inside a v13 section card) */
+.sc-table-scroll {
   max-height: 400px;
   overflow-y: auto;
 }
@@ -43,37 +53,30 @@
   background-color: var(--color-dark-border) !important;
 }
 
-/* Filter form in secondary menu */
-.sc-filter-form .row {
-  margin-bottom: 8px;
+#sc-results-count {
+  display: block;
+  margin-top: 6px;
+  color: var(--color-dark-text-muted);
 }
 
-.sc-filter-form .input-field {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
+/* ── v13 dense-form fixes for the filter secondary menu ──────────────────
+ * The filter card stacks multiple labelled rows, so stacked rows need extra
+ * headroom or the floating "active" labels render struck through the row above.
+ * The first row only needs the section-label gap. The focus-underline swap
+ * keeps the :focus-visible outline from overlapping the floating labels. */
+#constellations-menu-secondary .kt-field-row .input-field.col {
+  margin-top: 20px;
 }
 
-.sc-filter-form input[type="number"],
-.sc-filter-form input[type="text"] {
-  font-size: 0.85rem !important;
-  height: 2rem !important;
-  color: var(--color-dark-text-accent) !important;
+#constellations-menu-secondary .kt-section-label + .kt-field-row .input-field.col {
+  margin-top: 8px;
 }
 
-.sc-filter-form label {
-  font-size: 0.75rem !important;
+#constellations-menu-secondary .input-field input:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
 }
 
-.sc-filter-buttons {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  padding-top: 8px;
-}
-
-.sc-filter-buttons .btn {
-  font-size: 0.8rem;
-  padding: 0 12px;
-  height: 28px;
-  line-height: 28px;
+#constellations-menu-secondary .input-field input:focus-visible {
+  outline: none;
 }

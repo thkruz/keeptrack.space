@@ -32,6 +32,8 @@ export interface EngineEventMap {
   [EventBusEvent.resize]: [];
   [EventBusEvent.altCanvasResize]: [];
   [EventBusEvent.endOfDraw]: [Milliseconds];
+  [EventBusEvent.captureStart]: [];
+  [EventBusEvent.captureEnd]: [];
   [EventBusEvent.onWatchlistUpdated]: [{ id: number, inView: boolean }[]];
   [EventBusEvent.onWatchlistAdd]: [{ id: number, inView: boolean }[]];
   [EventBusEvent.onWatchlistRemove]: [{ id: number, inView: boolean }[]];

@@ -123,6 +123,7 @@ export type KeepTrackPluginsConfiguration = {
   CloseObjectsPlugin?: PluginConfiguration;
   BestPassPlugin?: PluginConfiguration;
   OverflightPlugin?: PluginConfiguration;
+  TipAndCuePlanner?: PluginConfiguration;
   EclipseSolarAnalysis?: PluginConfiguration;
   ManeuverPlugin?: PluginConfiguration;
   InitialOrbitDeterminationPlugin?: PluginConfiguration;

@@ -722,6 +722,13 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
   {
+    configKey: 'TipAndCuePlanner',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/tip-and-cue/tip-and-cue') : undefined,
+    proClassName: 'TipAndCuePlanner',
+    defaultConfig: { enabled: true, order: 424 },
+    isLoginRequired: true,
+  },
+  {
     configKey: 'OpticalSimulation',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/optical-simulation/optical-simulation') : undefined,
     proClassName: 'OpticalSimulation',

@@ -331,25 +331,32 @@ export class WebpackManager {
    * Returns the WebWorker configuration object.
    */
   private static createWorkerConfig_(baseConfig: Configuration, dirName: string, subFolder: string, pubPath: string) {
+    const entry: Record<string, string[]> = {
+      positionCruncher: ['./src/webworker/positionCruncher.ts'],
+      orbitCruncher: ['./src/webworker/orbitCruncher.ts'],
+      colorCruncher: ['./src/webworker/colorCruncher.ts'],
+      debrisScreeningWorker: ['./src/webworker/debrisScreeningWorker.ts'],
+      fovPredictionWorker: ['./src/webworker/fovPredictionWorker.ts'],
+      bestPassWorker: ['./src/webworker/bestPassWorker.ts'],
+      closeObjectsWorker: ['./src/webworker/closeObjectsWorker.ts'],
+      tocaPocaWorker: ['./src/webworker/tocaPocaWorker.ts'],
+      overflightWorker: ['./src/webworker/overflightWorker.ts'],
+      time2lonWorker: ['./src/webworker/time2lonWorker.ts'],
+      neighborhoodHistoryWorker: ['./src/webworker/neighborhoodHistoryWorker.ts'],
+      azRangeHeatmapWorker: ['./src/webworker/azRangeHeatmapWorker.ts'],
+    };
+
+    // Pro-only worker: its source lives in the plugins-pro submodule, so it is
+    // only built (and only present) for pro profiles - never bundled into OSS.
+    if (this.config.isPro) {
+      entry.tipAndCueWorker = ['./src/plugins-pro/tip-and-cue/tipAndCueWorker.ts'];
+    }
+
     return ({
       ...baseConfig,
       ...{
         name: 'WebWorkers',
-        entry: {
-          positionCruncher: ['./src/webworker/positionCruncher.ts'],
-          orbitCruncher: ['./src/webworker/orbitCruncher.ts'],
-          colorCruncher: ['./src/webworker/colorCruncher.ts'],
-          debrisScreeningWorker: ['./src/webworker/debrisScreeningWorker.ts'],
-          fovPredictionWorker: ['./src/webworker/fovPredictionWorker.ts'],
-          bestPassWorker: ['./src/webworker/bestPassWorker.ts'],
-          closeObjectsWorker: ['./src/webworker/closeObjectsWorker.ts'],
-          tocaPocaWorker: ['./src/webworker/tocaPocaWorker.ts'],
-          overflightWorker: ['./src/webworker/overflightWorker.ts'],
-          time2lonWorker: ['./src/webworker/time2lonWorker.ts'],
-          neighborhoodHistoryWorker: ['./src/webworker/neighborhoodHistoryWorker.ts'],
-          azRangeHeatmapWorker: ['./src/webworker/azRangeHeatmapWorker.ts'],
-          tipAndCueWorker: ['./src/webworker/tipAndCueWorker.ts'],
-        },
+        entry,
         output: {
           filename: '[name].js',
           path: `${dirName}/../${subFolder}/js`,

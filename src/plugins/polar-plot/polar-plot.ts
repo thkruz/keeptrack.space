@@ -10,6 +10,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
+import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
@@ -123,7 +124,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
         <div class="kt-section-label">${l('sections.export')}</div>
         <div class="polar-plot-size-field">
           <label for="polar-plot-size">${l('labels.imageSize')}</label>
-          <select id="polar-plot-size" class="browser-default">
+          <select id="polar-plot-size">
             ${SIZE_PRESETS.map((p) => html`<option value="${p.id}">${l(`labels.size_${p.id}`)}</option>`).join('')}
           </select>
         </div>
@@ -159,6 +160,9 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
         getEl('polar-plot-size')?.addEventListener('change', (e) => {
           this.selectedSizeId_ = (e.target as HTMLSelectElement).value;
         });
+        // Render the export-size select as a themed Materialize dropdown (native
+        // <select> popups can't be themed and show an OS-blue hover).
+        initMaterialSelects(getEl('polar-plot-menu') ?? document.body);
       },
     );
   }

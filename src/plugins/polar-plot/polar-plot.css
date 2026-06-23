@@ -31,10 +31,9 @@
   display: none;
 }
 
-/* Export size selector: a plain dark dropdown (browser-default) so it needs no
- * Materialize init and never collides with floating labels. The label sits above
- * a full-width select; the browser-default select is width:100% by default, so a
- * side-by-side row would overflow the card by the label's width. */
+/* Export size selector: a themed Materialize dropdown (so the open popup matches
+ * the brand theme instead of the OS-blue native one). The label sits above a
+ * full-width select wrapper. */
 #polar-plot-menu .polar-plot-size-field {
   margin: 0 2px 10px;
 }
@@ -46,13 +45,6 @@
   color: var(--color-dark-text-muted, #b0b0b0);
 }
 
-#polar-plot-menu .polar-plot-size-field select.browser-default {
-  display: block;
-  box-sizing: border-box;
+#polar-plot-menu .polar-plot-size-field .select-wrapper {
   width: 100%;
-  padding: 6px 8px;
-  background-color: var(--color-dark-background, #1b1b1b);
-  color: var(--color-text-light, #f5f5f5);
-  border: 1px solid var(--color-dark-border, #3a3a3a);
-  border-radius: 4px;
 }

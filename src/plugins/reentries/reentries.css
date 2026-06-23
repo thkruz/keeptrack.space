@@ -1,19 +1,64 @@
-.re-toolbar {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-}
+/*
+ * Reentries (OSS) menu styles. The menu opts into the shared v13 card system
+ * (.kt-ui-v13 + kt-section/kt-action); see src/engine/ui/menu-v13.css. Only the
+ * results-table chrome and the fly-to-corridor switch live here.
+ */
 
+/* Fly-to-corridor switch sits below the data-action rows inside its card. */
 .re-flyto-switch {
-  margin-left: 8px;
+  margin-top: 4px;
 }
 
 .re-flyto-switch .re-flyto-label {
   white-space: nowrap;
 }
 
+/* ===== Results tables (TIP + analysis) ===== */
+.reentries-table {
+  width: 100%;
+  margin-top: 4px;
+  border-collapse: collapse;
+  line-height: 1.4;
+  font-size: 13px;
+}
+
+.reentries-table td {
+  text-align: center;
+  padding: 5px 4px;
+  border-bottom: 1px solid var(--color-dark-border);
+}
+
+/* Header row */
+.reentries-table tr:first-child td {
+  padding: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-dark-text-muted);
+  border-bottom: 1px solid var(--color-dark-border);
+}
+
+/* Clickable event rows */
+.tip-object,
+.reentry-object {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.tip-object:hover,
+.reentry-object:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+.reentries-attribution {
+  display: block;
+  margin-top: 10px;
+  text-align: center;
+  color: var(--color-dark-text-muted);
+}
+
+/* Risk shading (id selectors win over the generic row hover above) */
 #reentries-analysis-table .reentry-critical {
   background-color: rgba(211, 47, 47, 0.35);
 }

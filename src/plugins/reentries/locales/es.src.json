@@ -37,7 +37,9 @@
         "reentered": "Reentrado",
         "payload": "Carga útil",
         "rocketBody": "R/B",
-        "debris": "Escombros"
+        "debris": "Escombros",
+        "dataActions": "Acciones de datos",
+        "results": "Resultados"
       },
       "help": {
         "overview": "El menú de Reentradas rastrea objetos que están cayendo de su órbita. Tiene dos pestañas: predicciones oficiales de reentrada del Comando Espacial de EE.UU. y un análisis en vivo de los objetos más bajos del catálogo.",

@@ -37,7 +37,9 @@
         "reentered": "Wiedereingetreten",
         "payload": "Nutzlast",
         "rocketBody": "R/B",
-        "debris": "Trümmer"
+        "debris": "Trümmer",
+        "dataActions": "Datenaktionen",
+        "results": "Ergebnisse"
       },
       "help": {
         "overview": "Das Wiedereintritte-Menü verfolgt Objekte, die aus der Umlaufbahn fallen. Es hat zwei Tabs: offizielle Wiedereintritts-Vorhersagen des US Space Command und eine Live-Analyse der niedrigsten Objekte im Katalog.",

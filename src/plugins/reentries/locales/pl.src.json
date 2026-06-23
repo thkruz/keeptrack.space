@@ -37,7 +37,9 @@
         "reentered": "Powrócił do atmosfery",
         "payload": "Ładunek",
         "rocketBody": "R/B",
-        "debris": "Odłamki"
+        "debris": "Odłamki",
+        "dataActions": "Operacje na danych",
+        "results": "Wyniki"
       },
       "help": {
         "overview": "Menu Powroty do atmosfery śledzi obiekty spadające z orbity. Ma dwie zakładki: oficjalne prognozy powrotów do atmosfery z US Space Command oraz analizę na żywo najniżej znajdujących się obiektów w katalogu.",

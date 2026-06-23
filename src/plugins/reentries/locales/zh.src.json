@@ -37,7 +37,9 @@
         "reentered": "已再入",
         "payload": "有效载荷",
         "rocketBody": "火箭体",
-        "debris": "碎片"
+        "debris": "碎片",
+        "dataActions": "数据操作",
+        "results": "结果"
       },
       "help": {
         "overview": "再入预测菜单跟踪正在脱离轨道的物体。它包含两个标签页：美国太空司令部的官方再入预测，以及目录中高度最低物体的实时分析。",

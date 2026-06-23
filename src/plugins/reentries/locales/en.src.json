@@ -37,7 +37,9 @@
         "reentered": "Reentered",
         "payload": "Payload",
         "rocketBody": "R/B",
-        "debris": "Debris"
+        "debris": "Debris",
+        "dataActions": "Data Actions",
+        "results": "Results"
       },
       "help": {
         "overview": "The Reentries menu tracks objects falling out of orbit. It has two tabs: official reentry predictions from US Space Command, and a live analysis of the lowest objects in the catalog.",

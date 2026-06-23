@@ -20,8 +20,6 @@ import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { hideLoading, showLoading, showLoadingSticky } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
 import { Degrees, RAD2DEG, Satellite, SpaceObjectType } from '@ootk/src/main';
-import fetchPng from '@public/img/icons/download.png';
-import refreshPng from '@public/img/icons/refresh.png';
 import sputnickPng from '@public/img/icons/sputnick.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './reentries.css';
@@ -109,34 +107,37 @@ export class Reentries extends KeepTrackPlugin {
 
   private buildSideMenuHtml_(): string {
     const tb = (key: string) => t7e(`plugins.Reentries.toolbar.${key}` as Parameters<typeof t7e>[0]);
+    const lbl = (key: string) => t7e(`plugins.Reentries.labels.${key}` as Parameters<typeof t7e>[0]);
     const tipMessagesContent = html`
-      <div class="row">
-        <div class="re-toolbar">
-          <button id="reentries-fetch-btn" class="btn btn-ui waves-effect waves-light icon-btn"
-            type="button" kt-tooltip="${tb('fetchData')}">
-            <img src="${fetchPng}" class="icon-btn-img" alt="" />
-          </button>
-          <button id="reentries-refresh-btn" class="btn btn-ui waves-effect waves-light icon-btn"
-            type="button" kt-tooltip="${tb('refresh')}" style="display:none;">
-            <img src="${refreshPng}" class="icon-btn-img" alt="" />
-          </button>
-          <div class="switch re-flyto-switch" kt-tooltip="${tb('flyToCorridorTooltip')}">
-            <label for="reentries-flyto-corridor">
-              <input id="reentries-flyto-corridor" type="checkbox" />
-              <span class="lever"></span>
-              <span class="re-flyto-label">${tb('flyToCorridor')}</span>
-            </label>
-          </div>
+      <section class="kt-section">
+        <div class="kt-section-label">${lbl('dataActions')}</div>
+        <button id="reentries-fetch-btn" class="kt-action waves-effect" type="button">
+          <span class="kt-action-label">${tb('fetchData')}</span>
+        </button>
+        <button id="reentries-refresh-btn" class="kt-action waves-effect" type="button" style="display:none;">
+          <span class="kt-action-label">${tb('refresh')}</span>
+        </button>
+        <div class="kt-divider"></div>
+        <div class="switch re-flyto-switch" kt-tooltip="${tb('flyToCorridorTooltip')}">
+          <label for="reentries-flyto-corridor">
+            <input id="reentries-flyto-corridor" type="checkbox" />
+            <span class="lever"></span>
+            <span class="re-flyto-label">${tb('flyToCorridor')}</span>
+          </label>
         </div>
-        <table id="reentries-tip-table" class="center-align"></table>
-        <sub class="center-align">*${t7e('plugins.Reentries.dataSource' as Parameters<typeof t7e>[0])}</sub>
-      </div>
+      </section>
+      <section class="kt-section">
+        <div class="kt-section-label">${lbl('results')}</div>
+        <table id="reentries-tip-table" class="reentries-table center-align"></table>
+        <sub class="reentries-attribution">*${t7e('plugins.Reentries.dataSource' as Parameters<typeof t7e>[0])}</sub>
+      </section>
     `;
 
     const reentryAnalysisContent = html`
-      <div class="row">
-        <table id="reentries-analysis-table" class="center-align"></table>
-      </div>
+      <section class="kt-section">
+        <div class="kt-section-label">${lbl('results')}</div>
+        <table id="reentries-analysis-table" class="reentries-table center-align"></table>
+      </section>
     `;
 
     const tabsHtml = buildSideMenuTabsHtml(TABS_ID, [
@@ -145,7 +146,7 @@ export class Reentries extends KeepTrackPlugin {
     ]);
 
     return html`
-      <div id="reentries-menu" class="side-menu-parent start-hidden">
+      <div id="reentries-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div id="reentries-content" class="side-menu">
           ${tabsHtml}
         </div>
@@ -221,7 +222,7 @@ export class Reentries extends KeepTrackPlugin {
 
     getEl('reentries-fetch-btn', true)?.addEventListener('click', () => {
       hideEl('reentries-fetch-btn');
-      showEl('reentries-refresh-btn', 'inline-flex');
+      showEl('reentries-refresh-btn', 'flex');
       this.fetchTipData_();
     });
 
@@ -310,7 +311,7 @@ export class Reentries extends KeepTrackPlugin {
         }
 
         hideEl('reentries-fetch-btn');
-        showEl('reentries-refresh-btn', 'inline-flex');
+        showEl('reentries-refresh-btn', 'flex');
       })
       .catch(() => {
         errorManagerInstance.warn(t7e('plugins.Reentries.errorMsgs.errorFetching' as Parameters<typeof t7e>[0]));
@@ -348,19 +349,19 @@ export class Reentries extends KeepTrackPlugin {
         hideEl(fetchBtn);
       }
       if (refreshBtn) {
-        showEl(refreshBtn, 'inline-flex');
+        showEl(refreshBtn, 'flex');
       }
     } else {
       if (fetchBtn) {
         if (this.tipList_.length === 0) {
-          showEl(fetchBtn, 'inline-flex');
+          showEl(fetchBtn, 'flex');
         } else {
           hideEl(fetchBtn);
         }
       }
       if (refreshBtn) {
         if (this.tipList_.length > 0) {
-          showEl(refreshBtn, 'inline-flex');
+          showEl(refreshBtn, 'flex');
         } else {
           hideEl(refreshBtn);
         }
@@ -472,7 +473,6 @@ export class Reentries extends KeepTrackPlugin {
       const column = tr.insertCell();
 
       column.appendChild(document.createTextNode(name));
-      column.setAttribute('style', 'text-decoration: underline');
       column.setAttribute('class', 'center');
     }
   }
@@ -598,7 +598,6 @@ export class Reentries extends KeepTrackPlugin {
       const column = tr.insertCell();
 
       column.appendChild(document.createTextNode(name));
-      column.setAttribute('style', 'text-decoration: underline');
       column.setAttribute('class', 'center');
     }
   }

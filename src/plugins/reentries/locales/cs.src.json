@@ -37,7 +37,9 @@
         "reentered": "Zaniklý",
         "payload": "Užitečné zatížení",
         "rocketBody": "R/B",
-        "debris": "Trosky"
+        "debris": "Trosky",
+        "dataActions": "Akce s daty",
+        "results": "Výsledky"
       },
       "help": {
         "overview": "Menu vstupů do atmosféry sleduje objekty padající z oběžné dráhy. Má dvě záložky: oficiální předpovědi vstupů do atmosféry od US Space Command a živou analýzu nejníže letících objektů v katalogu.",

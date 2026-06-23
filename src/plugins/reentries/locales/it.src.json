@@ -37,7 +37,9 @@
         "reentered": "Rientrato",
         "payload": "Carico utile",
         "rocketBody": "Corpo di razzo",
-        "debris": "Detriti"
+        "debris": "Detriti",
+        "dataActions": "Azioni dati",
+        "results": "Risultati"
       },
       "help": {
         "overview": "Il menu Rientri tiene traccia degli oggetti che stanno cadendo dall'orbita. Ha due schede: le previsioni ufficiali di rientro dello US Space Command e un'analisi in tempo reale degli oggetti più bassi del catalogo.",

@@ -37,7 +37,9 @@
         "reentered": "Rentré",
         "payload": "Charge utile",
         "rocketBody": "Corps de fusée",
-        "debris": "Débris"
+        "debris": "Débris",
+        "dataActions": "Actions de données",
+        "results": "Résultats"
       },
       "help": {
         "overview": "Le menu des Rentrées suit les objets en train de retomber de leur orbite. Il comporte deux onglets : les prédictions officielles de rentrée du Commandement spatial américain et une analyse en direct des objets les plus bas du catalogue.",

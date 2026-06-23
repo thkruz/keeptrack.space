@@ -120,6 +120,10 @@
     "LookAnglesPlugin": {
       "bottomIconLabel": "Blickwinkel",
       "title": "Blickwinkel",
+      "sections": {
+        "results": "Ergebnisse",
+        "settings": "Einstellungen"
+      },
       "settings": {
         "showRiseSetOnly": "Nur Auf- und Untergangszeiten anzeigen",
         "calculationLength": "Berechnungsdauer (Tage)",
@@ -156,6 +160,10 @@
     "MultiSensorLookAnglesPlugin": {
       "bottomIconLabel": "Multi-Sensor-Blickwinkel",
       "title": "Multi-Sensor-Blickwinkel",
+      "sections": {
+        "results": "Ergebnisse",
+        "sensors": "Sensoren"
+      },
       "table": {
         "time": "Zeit",
         "el": "El.",

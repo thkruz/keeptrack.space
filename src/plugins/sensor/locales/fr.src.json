@@ -120,6 +120,10 @@
     "LookAnglesPlugin": {
       "bottomIconLabel": "Angles de visée",
       "title": "Angles de visée",
+      "sections": {
+        "results": "Résultats",
+        "settings": "Paramètres"
+      },
       "settings": {
         "showRiseSetOnly": "Afficher uniquement les heures de lever et de coucher",
         "calculationLength": "Durée du calcul (jours)",
@@ -156,6 +160,10 @@
     "MultiSensorLookAnglesPlugin": {
       "bottomIconLabel": "Multi-capteurs",
       "title": "Angles de visée multi-capteurs",
+      "sections": {
+        "results": "Résultats",
+        "sensors": "Capteurs"
+      },
       "table": {
         "time": "Heure",
         "el": "Élév.",

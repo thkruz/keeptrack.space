@@ -120,6 +120,10 @@
     "LookAnglesPlugin": {
       "bottomIconLabel": "Angoli di osservazione",
       "title": "Angoli di osservazione",
+      "sections": {
+        "results": "Risultati",
+        "settings": "Impostazioni"
+      },
       "settings": {
         "showRiseSetOnly": "Mostra solo gli orari di sorgere e tramonto",
         "calculationLength": "Durata del calcolo (giorni)",
@@ -156,6 +160,10 @@
     "MultiSensorLookAnglesPlugin": {
       "bottomIconLabel": "Osservazione multi-sensore",
       "title": "Angoli di osservazione multi-sensore",
+      "sections": {
+        "results": "Risultati",
+        "sensors": "Sensori"
+      },
       "table": {
         "time": "Ora",
         "el": "El.",

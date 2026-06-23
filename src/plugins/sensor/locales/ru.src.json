@@ -120,6 +120,10 @@
     "LookAnglesPlugin": {
       "bottomIconLabel": "Углы обзора",
       "title": "Углы обзора",
+      "sections": {
+        "results": "Результаты",
+        "settings": "Настройки"
+      },
       "settings": {
         "showRiseSetOnly": "Показывать только время восхода и захода",
         "calculationLength": "Длительность расчета (дни)",
@@ -156,6 +160,10 @@
     "MultiSensorLookAnglesPlugin": {
       "bottomIconLabel": "Многосенсорные углы",
       "title": "Многосенсорные углы обзора",
+      "sections": {
+        "results": "Результаты",
+        "sensors": "Датчики"
+      },
       "table": {
         "time": "Время",
         "el": "Эл",

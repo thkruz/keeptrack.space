@@ -120,6 +120,10 @@
     "LookAnglesPlugin": {
       "bottomIconLabel": "視線角度",
       "title": "視線角度",
+      "sections": {
+        "results": "結果",
+        "settings": "設定"
+      },
       "settings": {
         "showRiseSetOnly": "上昇・下降時刻のみ表示",
         "calculationLength": "計算期間（日）",
@@ -156,6 +160,10 @@
     "MultiSensorLookAnglesPlugin": {
       "bottomIconLabel": "マルチセンサー視線",
       "title": "マルチセンサー視線角度",
+      "sections": {
+        "results": "結果",
+        "sensors": "センサー"
+      },
       "table": {
         "time": "時刻",
         "el": "仰角",

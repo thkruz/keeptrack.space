@@ -120,6 +120,10 @@
     "LookAnglesPlugin": {
       "bottomIconLabel": "Ángulos de Visión",
       "title": "Ángulos de Visión",
+      "sections": {
+        "results": "Resultados",
+        "settings": "Configuración"
+      },
       "settings": {
         "showRiseSetOnly": "Mostrar Solo Tiempos de Salida y Puesta",
         "calculationLength": "Duración del Cálculo (Días)",
@@ -156,6 +160,10 @@
     "MultiSensorLookAnglesPlugin": {
       "bottomIconLabel": "Vistas Multisensor",
       "title": "Ángulos de Visión Multisensor",
+      "sections": {
+        "results": "Resultados",
+        "sensors": "Sensores"
+      },
       "table": {
         "time": "Hora",
         "el": "El.",

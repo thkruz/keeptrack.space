@@ -120,6 +120,10 @@
     "LookAnglesPlugin": {
       "bottomIconLabel": "관측각",
       "title": "관측각",
+      "sections": {
+        "results": "결과",
+        "settings": "설정"
+      },
       "settings": {
         "showRiseSetOnly": "상승 및 하강 시간만 표시",
         "calculationLength": "계산 기간 (일)",
@@ -156,6 +160,10 @@
     "MultiSensorLookAnglesPlugin": {
       "bottomIconLabel": "다중 센서 관측각",
       "title": "다중 센서 관측각",
+      "sections": {
+        "results": "결과",
+        "sensors": "센서"
+      },
       "table": {
         "time": "시간",
         "el": "고도각",

@@ -120,6 +120,10 @@
     "LookAnglesPlugin": {
       "bottomIconLabel": "Úhly pohledu",
       "title": "Úhly pohledu",
+      "sections": {
+        "results": "Výsledky",
+        "settings": "Nastavení"
+      },
       "settings": {
         "showRiseSetOnly": "Zobrazit pouze časy východu a západu",
         "calculationLength": "Délka výpočtu (dny)",
@@ -156,6 +160,10 @@
     "MultiSensorLookAnglesPlugin": {
       "bottomIconLabel": "Pohledy z více senzorů",
       "title": "Úhly pohledu z více senzorů",
+      "sections": {
+        "results": "Výsledky",
+        "sensors": "Senzory"
+      },
       "table": {
         "time": "Čas",
         "el": "El.",

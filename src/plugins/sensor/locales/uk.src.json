@@ -120,6 +120,10 @@
     "LookAnglesPlugin": {
       "bottomIconLabel": "Кути огляду",
       "title": "Кути огляду",
+      "sections": {
+        "results": "Результати",
+        "settings": "Налаштування"
+      },
       "settings": {
         "showRiseSetOnly": "Показувати лише часи сходу та заходу",
         "calculationLength": "Тривалість розрахунку (дні)",
@@ -156,6 +160,10 @@
     "MultiSensorLookAnglesPlugin": {
       "bottomIconLabel": "Багатосенсорні кути",
       "title": "Багатосенсорні кути огляду",
+      "sections": {
+        "results": "Результати",
+        "sensors": "Сенсори"
+      },
       "table": {
         "time": "Час",
         "el": "Підн.",

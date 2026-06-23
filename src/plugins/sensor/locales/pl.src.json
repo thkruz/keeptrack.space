@@ -120,6 +120,10 @@
     "LookAnglesPlugin": {
       "bottomIconLabel": "Kąty obserwacji",
       "title": "Kąty obserwacji",
+      "sections": {
+        "results": "Wyniki",
+        "settings": "Ustawienia"
+      },
       "settings": {
         "showRiseSetOnly": "Pokaż tylko czasy wschodu i zachodu",
         "calculationLength": "Długość obliczeń (dni)",
@@ -156,6 +160,10 @@
     "MultiSensorLookAnglesPlugin": {
       "bottomIconLabel": "Obserwacje wieloczujnikowe",
       "title": "Wieloczujnikowe kąty obserwacji",
+      "sections": {
+        "results": "Wyniki",
+        "sensors": "Czujniki"
+      },
       "table": {
         "time": "Czas",
         "el": "El.",

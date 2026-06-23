@@ -120,6 +120,10 @@
     "LookAnglesPlugin": {
       "bottomIconLabel": "Look Angles",
       "title": "Look Angles",
+      "sections": {
+        "results": "Results",
+        "settings": "Settings"
+      },
       "settings": {
         "showRiseSetOnly": "Show Only Rise and Set Times",
         "calculationLength": "Calculation Length (Days)",
@@ -156,6 +160,10 @@
     "MultiSensorLookAnglesPlugin": {
       "bottomIconLabel": "Multi-Sensor Looks",
       "title": "Multi-Sensor Look Angles",
+      "sections": {
+        "results": "Results",
+        "sensors": "Sensors"
+      },
       "table": {
         "time": "Time",
         "el": "El",

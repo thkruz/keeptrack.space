@@ -120,6 +120,10 @@
     "LookAnglesPlugin": {
       "bottomIconLabel": "观测角",
       "title": "观测角",
+      "sections": {
+        "results": "结果",
+        "settings": "设置"
+      },
       "settings": {
         "showRiseSetOnly": "仅显示升起和落下时间",
         "calculationLength": "计算时长（天）",
@@ -156,6 +160,10 @@
     "MultiSensorLookAnglesPlugin": {
       "bottomIconLabel": "多传感器观测",
       "title": "多传感器观测角",
+      "sections": {
+        "results": "结果",
+        "sensors": "传感器"
+      },
       "table": {
         "time": "时间",
         "el": "仰角",

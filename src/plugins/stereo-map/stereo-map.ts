@@ -420,6 +420,7 @@ export class StereoMap extends KeepTrackPlugin {
           dotDom.style.left = `${groundTracePoints[i - 1].x - this.halfDotSize_}px`;
           dotDom.style.top = `${groundTracePoints[i - 1].y - this.halfDotSize_}px`;
           dotDom.dataset.time = mapPoints.time;
+          dotDom.dataset.inview = mapPoints.overallView ? 'true' : 'false';
           showEl(`map-look${selectableIdx}`);
         }
 

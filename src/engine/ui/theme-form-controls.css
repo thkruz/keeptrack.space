@@ -1,0 +1,35 @@
+/**
+ * Global native form-control theming.
+ *
+ * KeepTrack uses `browser-default` native form controls in many menus
+ * (calculator, watchlist, find-sat, symbology, heatmaps, optical-sim, polar-plot,
+ * the sensor chip picker, and the best-pass column toggles). Left raw, Chromium
+ * paints the focus ring, the selected/checked control, and the <select> dropdown
+ * with the OS blue, which clashes with the brand-red theme. This file themes them
+ * globally so every menu - v13 or legacy - matches.
+ *
+ * What CSS can theme (handled here):
+ *   - accent-color: checkbox / radio / range / progress.
+ *   - select:focus: red border + outline instead of the native blue.
+ *   - option:checked: the selected row in the open <select> popup.
+ *
+ * What CSS CANNOT theme: the *hover* highlight inside a native <select> popup is
+ * drawn by the OS and is not stylable in Chromium (accent-color and option:hover
+ * do not reach it). A Materialize dropdown (initMaterialSelects, which renders a
+ * custom .dropdown-content list) is the only way to fully theme that popup.
+ */
+
+:root {
+  accent-color: var(--color-primary);
+}
+
+select:focus {
+  border-color: var(--color-primary);
+  outline-color: var(--color-primary);
+}
+
+select option:checked,
+select option:hover {
+  background-color: var(--color-primary);
+  color: #fff;
+}

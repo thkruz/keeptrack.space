@@ -26,6 +26,7 @@ import { ServiceLocator } from './engine/core/service-locator';
 
 import 'material-icons/iconfont/material-icons.css';
 import './engine/ui/menu-v13.css'; // v13+ menu UI standard (opt-in via .kt-ui-v13)
+import './engine/ui/theme-form-controls.css'; // global brand theming for native form controls
 import 'requestidlecallback-polyfill';
 
 import { Localization } from './locales/locales'; // Ensure localization is imported first

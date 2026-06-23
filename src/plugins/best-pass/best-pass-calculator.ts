@@ -128,6 +128,7 @@ export const emptyPassRow = (): lookanglesRow => ({
   TIME_IN_COVERAGE_SECONDS: null,
   MINIMUM_RANGE: null,
   MAXIMUM_ELEVATION: null,
+  MAXIMUM_ELEVATION_DTG: null,
   SENSOR_TO_SUN_AZIMUTH: null,
   SENSOR_TO_SUN_ELEVATION: null,
 });
@@ -168,6 +169,7 @@ export const findPassesForSat = (
   let sTime: Date | null = null;
   let passMinrng: number = sensor.maxRng;
   let passMaxEl = 0;
+  let passMaxElTime: Date | null = null;
   let start3 = false;
   let stop3 = false;
 
@@ -230,6 +232,7 @@ export const findPassesForSat = (
           TIME_IN_COVERAGE_SECONDS: tic,
           MINIMUM_RANGE: passMinrng.toFixed(0),
           MAXIMUM_ELEVATION: passMaxEl.toFixed(1),
+          MAXIMUM_ELEVATION_DTG: (passMaxElTime ?? sTime).getTime(),
           SENSOR_TO_SUN_AZIMUTH: sunRae.az.toFixed(1),
           SENSOR_TO_SUN_ELEVATION: sunRae.el.toFixed(1),
         };
@@ -238,6 +241,7 @@ export const findPassesForSat = (
 
     if (passMaxEl < aer.el) {
       passMaxEl = aer.el;
+      passMaxElTime = now;
     }
     if (passMinrng > aer.rng) {
       passMinrng = aer.rng;
@@ -254,6 +258,7 @@ export const findPassesForSat = (
     sTime = null;
     passMinrng = sensor.maxRng;
     passMaxEl = 0;
+    passMaxElTime = null;
     start3 = false;
     stop3 = false;
   };

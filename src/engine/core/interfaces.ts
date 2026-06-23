@@ -126,6 +126,8 @@ export type lookanglesRow = {
   TIME_IN_COVERAGE_SECONDS: number | null;
   MINIMUM_RANGE: string | null;
   MAXIMUM_ELEVATION: string | null;
+  /** Epoch ms at which MAXIMUM_ELEVATION occurs (optional; set by findPassesForSat). */
+  MAXIMUM_ELEVATION_DTG?: number | null;
   SENSOR_TO_SUN_AZIMUTH: string | null;
   SENSOR_TO_SUN_ELEVATION: string | null;
 };

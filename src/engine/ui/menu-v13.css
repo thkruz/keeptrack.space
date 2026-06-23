@@ -191,3 +191,27 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* ===== Native form-control theming =====
+ * Some v13 menus keep a `browser-default` native <select> (e.g. the polar-plot
+ * export size, the sensor chip picker) and native checkboxes (e.g. the best-pass
+ * column toggles). Left raw, Chromium paints the focus ring, the dropdown's
+ * highlighted option, and the check box/tick with the OS blue, which clashes with
+ * the brand-red theme. `accent-color` inherits to every form control in the menu
+ * and tints the checkbox/radio/range and (in Chromium) the <select> dropdown
+ * highlight to the brand color; `option:checked` covers the selected row and the
+ * focus rule drops the blue border/outline. */
+.kt-ui-v13 {
+  accent-color: var(--color-primary);
+}
+
+.kt-ui-v13 select.browser-default:focus {
+  border-color: var(--color-primary);
+  outline-color: var(--color-primary);
+}
+
+.kt-ui-v13 select.browser-default option:checked,
+.kt-ui-v13 select.browser-default option:hover {
+  background-color: var(--color-primary);
+  color: #fff;
+}

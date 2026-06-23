@@ -15,6 +15,7 @@ import { t7e } from '@app/locales/keys';
 import { SpaceObjectType } from '@ootk/src/main';
 import sensorInfoPng from '@public/img/icons/sensor-info.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import './sensor-info.css';
 
 const l = (key: string): string => t7e(`plugins.SensorInfoPlugin.labels.${key}` as Parameters<typeof t7e>[0]);
 const b = (key: string): string => t7e(`plugins.SensorInfoPlugin.buttons.${key}` as Parameters<typeof t7e>[0]);
@@ -37,10 +38,11 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
   sideMenuElementName: string = 'sensor-info-menu';
   sideMenuElementHtml: string = html`
-    <div id="sensor-info-menu" class="side-menu-parent start-hidden">
+    <div id="sensor-info-menu" class="side-menu-parent start-hidden kt-ui-v13">
     <div id="sensor-content" class="side-menu">
-        <div class="row">
-        <h5 id="sensor-info-title" class="center-align">${l('sensorName')}</h5>
+        <div id="sensor-info-title" class="sensor-info-name">${l('sensorName')}</div>
+        <section class="kt-section">
+        <div class="kt-section-label">${l('details')}</div>
         <div class="sensor-info-row" style="margin-top: 0px;">
             <div class="sensor-info-key">${l('country')}</div>
             <div class="sensor-info-value" id="sensor-country">USA</div>
@@ -89,13 +91,16 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
             <div class="sensor-info-key">${l('beamWidth')}</div>
             <div class="sensor-info-value" id="sensor-beamwidth">10 deg</div>
         </div>
-        <div class="center-align row">
-            <button id="sensor-sun-btn" class="btn btn-ui waves-effect waves-light" type="button">${b('drawLineToSun')} &#9658;</button>
-        </div>
-        <div class="center-align row">
-            <button id="sensor-moon-btn" class="btn btn-ui waves-effect waves-light" type="button">${b('drawLineToMoon')} &#9658;</button>
-        </div>
-        </div>
+        </section>
+        <section class="kt-section">
+        <div class="kt-section-label">${l('visualizations')}</div>
+        <button id="sensor-sun-btn" class="kt-action waves-effect waves-light" type="button">
+            <span class="kt-action-label">${b('drawLineToSun')}</span>
+        </button>
+        <button id="sensor-moon-btn" class="kt-action waves-effect waves-light" type="button">
+            <span class="kt-action-label">${b('drawLineToMoon')}</span>
+        </button>
+        </section>
     </div>
     </div>`;
 
@@ -154,6 +159,18 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     );
   }
 
+  /**
+   * Update a `.kt-action` row's label without clobbering the CSS chevron
+   * pseudo-element (setting the button's textContent would delete it).
+   */
+  private static setActionLabel_(buttonElement: HTMLElement | null, text: string) {
+    const labelElement = buttonElement?.querySelector('.kt-action-label');
+
+    if (labelElement) {
+      labelElement.textContent = text;
+    }
+  }
+
   private checkIfLinesVisible_(lineManager: LineManager) {
     this.isSunLineVisible_ = lineManager.lines.some((line) => {
       if (line instanceof SensorToSunLine) {
@@ -168,10 +185,10 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
     if (sunButtonElement) {
       if (this.isSunLineVisible_) {
-        sunButtonElement.textContent = `${b('removeLineToSun')}  \u25B6`;
+        SensorInfoPlugin.setActionLabel_(sunButtonElement, b('removeLineToSun'));
         this.isSunLineVisible_ = true;
       } else {
-        sunButtonElement.textContent = `${b('addLineToSun')}  \u25B6`;
+        SensorInfoPlugin.setActionLabel_(sunButtonElement, b('addLineToSun'));
         this.isSunLineVisible_ = false;
       }
     }
@@ -186,10 +203,10 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
     if (moonButtonElement) {
       if (this.isMonnLineVisible_) {
-        moonButtonElement.textContent = `${b('removeLineToMoon')}  \u25B6`;
+        SensorInfoPlugin.setActionLabel_(moonButtonElement, b('removeLineToMoon'));
         this.isMonnLineVisible_ = true;
       } else {
-        moonButtonElement.textContent = `${b('addLineToMoon')}  \u25B6`;
+        SensorInfoPlugin.setActionLabel_(moonButtonElement, b('addLineToMoon'));
         this.isMonnLineVisible_ = false;
       }
     }
@@ -210,7 +227,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
           if (line instanceof SensorToMoonLine) {
             line.isGarbage = true;
 
-            sensorMoonBtnElement.textContent = `${b('addLineToMoon')}  \u25B6`;
+            SensorInfoPlugin.setActionLabel_(sensorMoonBtnElement, b('addLineToMoon'));
             this.isMonnLineVisible_ = false;
             ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
 
@@ -231,7 +248,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
           .createSensorToMoon(ServiceLocator.getSensorManager().currentSensors[0]);
 
         // Change Button Text
-        sensorMoonBtnElement.textContent = `${b('removeLineToMoon')}  \u25B6`;
+        SensorInfoPlugin.setActionLabel_(sensorMoonBtnElement, b('removeLineToMoon'));
         this.isMonnLineVisible_ = true;
         ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
       }
@@ -252,7 +269,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
         for (const line of lineManager.lines) {
           if (line instanceof SensorToSunLine) {
             line.isGarbage = true;
-            sensorSunBtnElement.textContent = `${b('addLineToSun')}  \u25B6`;
+            SensorInfoPlugin.setActionLabel_(sensorSunBtnElement, b('addLineToSun'));
             this.isSunLineVisible_ = false;
             ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
 
@@ -272,7 +289,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
           .createSensorToSun(ServiceLocator.getSensorManager().currentSensors[0]);
 
         // Change Button Text
-        sensorSunBtnElement.textContent = `${b('removeLineToSun')}  \u25B6`;
+        SensorInfoPlugin.setActionLabel_(sensorSunBtnElement, b('removeLineToSun'));
         this.isSunLineVisible_ = true;
         ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
       }

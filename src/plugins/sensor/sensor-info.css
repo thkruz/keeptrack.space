@@ -1,0 +1,43 @@
+/*
+ * Sensor Info plugin styles. The menu uses the shared v13 card system
+ * (.kt-ui-v13 + kt-section/kt-action/...); see src/engine/ui/menu-v13.css.
+ * Only the read-only sensor name banner and the key/value detail rows need
+ * plugin-specific chrome.
+ */
+
+/* Sensor name banner above the detail cards (replaces the old center <h5>,
+ * which the side-menu pipeline strips). Updated at runtime by sensorManager. */
+#sensor-info-menu .sensor-info-name {
+  margin: 0 6px 12px;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--color-text-light, #f5f5f5);
+}
+
+#sensor-info-menu .sensor-info-name a {
+  color: var(--color-text-light, #f5f5f5) !important;
+}
+
+/* Tighten the key/value detail rows inside the v13 card (the global
+ * `.sensor-info-row` margin of 10px is too loose for the inset card). */
+#sensor-info-menu .kt-section .sensor-info-row {
+  margin: 0;
+  padding: 6px 0;
+  text-align: left;
+  height: auto;
+}
+
+#sensor-info-menu .kt-section .sensor-info-row + .sensor-info-row {
+  border-top: 1px solid var(--color-dark-border);
+}
+
+#sensor-info-menu .kt-section .sensor-info-key {
+  float: none;
+  color: var(--color-dark-text-muted);
+}
+
+#sensor-info-menu .kt-section .sensor-info-value {
+  float: right;
+  color: var(--color-text-light, #f5f5f5);
+}

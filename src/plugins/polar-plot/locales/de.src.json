@@ -9,7 +9,24 @@
         "satellite": "Satellit {sccNum}",
         "unknownSensor": "Unbekannter Sensor",
         "unknownStartTime": "Unbekannte Startzeit",
-        "unknownStopTime": "Unbekannte Endzeit"
+        "unknownStopTime": "Unbekannte Endzeit",
+        "prevPass": "Vorheriger Überflug",
+        "nextPass": "Nächster Überflug",
+        "imageSize": "Bildgröße",
+        "size_square": "Quadratisch (1080)",
+        "size_wide": "Breit (1200x675)",
+        "size_large": "Groß (2000)",
+        "copyImage": "Bild kopieren",
+        "copied": "Polardiagramm in die Zwischenablage kopiert",
+        "passLabel": "Überflug {n} von {total}",
+        "maxEl": "Max. Elev. {deg}°"
+      },
+      "sections": {
+        "pass": "Überflug",
+        "export": "Exportieren"
+      },
+      "errorMsgs": {
+        "copyFailed": "Bild konnte nicht in die Zwischenablage kopiert werden"
       },
       "help": {
         "overview": "Das Polardiagramm zeichnet den nächsten Überflug des ausgewählten Satelliten über den ausgewählten Sensor als klassische Himmelskarte aus Azimut und Elevation: Norden oben, der Horizont am äußeren Ring und der Zenit in der Mitte. Es ist die Karte, mit der ein Beobachter oder Operator weiß, wohin am Himmel er schauen muss.",

@@ -1,8 +1,9 @@
-import { MenuMode } from '@app/engine/core/interfaces';
-import { getEl, hideEl, setInnerHtml, showEl } from '@app/engine/utils/get-el';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import polarPlotPng from '@public/img/icons/polar-plot.png';
 
 
+import { SatMath } from '@app/app/analysis/sat-math';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -10,37 +11,50 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
-import { BaseObject, Degrees, MILLISECONDS_PER_SECOND, Satellite, secondsPerDay } from '@ootk/src/main';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
+import { BestPassDeps } from '@app/plugins/best-pass/best-pass-calculator';
+import { BaseObject, Kilometers, Satellite, SatelliteRecord } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-
-type PolarPlotData = Array<[Degrees, Degrees]>
+import { findPolarPasses, PolarPass } from './polar-plot-pass';
+import { drawPolarChart, PolarChartLabels } from './polar-plot-renderer';
+import './polar-plot.css';
 
 /** Shorthand for this plugin's locale keys. */
 const l = (key: string): string => t7e(`plugins.PolarPlotPlugin.${key}` as Parameters<typeof t7e>[0]);
+
+/** Square-canvas background used for both the in-menu chart and exported images. */
+const CHART_BACKGROUND = '#101522';
+
+/** Image-size presets for export, biased toward common social aspect ratios. */
+interface SizePreset { id: string; w: number; h: number }
+const SIZE_PRESETS: SizePreset[] = [
+  { id: 'square', w: 1080, h: 1080 },
+  { id: 'wide', w: 1200, h: 675 },
+  { id: 'large', w: 2000, h: 2000 },
+];
 
 export class PolarPlotPlugin extends KeepTrackPlugin {
   readonly id = 'PolarPlotPlugin';
   dependencies_ = [SelectSatManager.name];
   private readonly selectSatManager_: SelectSatManager;
-  passStartTime_: Date | null = null;
-  passStopTime_: Date | null = null;
 
-  private readonly plotDuration_ = 3;
+  /** Days to look ahead when collecting upcoming passes. */
+  private readonly windowDays_ = 3;
+  /** Cap on how many passes are kept for stepping. */
+  private readonly maxPasses_ = 12;
+
+  /** Detected passes (current + upcoming) and which one is on screen. */
+  private passes_: PolarPass[] = [];
+  private currentIndex_ = 0;
+  private selectedSizeId_ = SIZE_PRESETS[0].id;
+  private recomputeTimer_: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     super();
     this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
-
-  private ctx_: CanvasRenderingContext2D;
-  private centerX_: number;
-  private centerY_: number;
-  private distanceUnit_: number;
-  private canvasSize_: number;
-  private readonly fontRatio_ = 0.03;
-  private plotData_: PolarPlotData = [];
 
   isRequireSatelliteSelected = true;
   isRequireSensorSelected = true;
@@ -49,7 +63,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
 
   bottomIconImg = polarPlotPng;
   bottomIconCallback: () => void = () => {
-    this.updatePlot_();
+    this.onMenuOpened_();
   };
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
@@ -91,11 +105,35 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   }
   sideMenuElementName: string = 'polar-plot-menu';
   sideMenuElementHtml: string = html`
-  <div id="polar-plot-menu" class="side-menu-parent start-hidden">
-    <div id="polar-plot-content" class="side-menu" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-      <span id="polar-plot-warning" class="text-center">${l('labels.notInView').replace('{hours}', (this.plotDuration_ * 24).toFixed(0))}</span>
-      <canvas id="polar-plot" class="w-96" width="1000" height="1000"></canvas>
-      <button id="polar-plot-save" class="btn btn-primary">${l('labels.saveImage')}</button>
+  <div id="polar-plot-menu" class="side-menu-parent start-hidden kt-ui-v13">
+    <div id="polar-plot-content" class="side-menu">
+      <div id="polar-plot-warning" class="kt-note text-center">${l('labels.notInView').replace('{hours}', (this.windowDays_ * 24).toFixed(0))}</div>
+      <canvas id="polar-plot" class="polar-plot-canvas" width="1000" height="1000"></canvas>
+      <section id="polar-plot-pass-section" class="kt-section">
+        <div class="kt-section-label">${l('sections.pass')}</div>
+        <div id="polar-plot-readout" class="polar-plot-readout"></div>
+        <button id="polar-plot-prev" type="button" class="kt-action waves-effect waves-light">
+          <span class="kt-action-label">${l('labels.prevPass')}</span>
+        </button>
+        <button id="polar-plot-next" type="button" class="kt-action waves-effect waves-light">
+          <span class="kt-action-label">${l('labels.nextPass')}</span>
+        </button>
+      </section>
+      <section id="polar-plot-export-section" class="kt-section">
+        <div class="kt-section-label">${l('sections.export')}</div>
+        <div class="polar-plot-size-field">
+          <label for="polar-plot-size">${l('labels.imageSize')}</label>
+          <select id="polar-plot-size" class="browser-default">
+            ${SIZE_PRESETS.map((p) => html`<option value="${p.id}">${l(`labels.size_${p.id}`)}</option>`).join('')}
+          </select>
+        </div>
+        <button id="polar-plot-save" type="button" class="kt-action waves-effect waves-light">
+          <span class="kt-action-label">${l('labels.saveImage')}</span>
+        </button>
+        <button id="polar-plot-copy" type="button" class="kt-action waves-effect waves-light">
+          <span class="kt-action-label">${l('labels.copyImage')}</span>
+        </button>
+      </section>
     </div>
   </div>
   `;
@@ -112,16 +150,14 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
-        getEl('polar-plot-save')!.addEventListener('click', () => {
-          const canvas = document.getElementById('polar-plot') as HTMLCanvasElement;
-          const image = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
-          const link = document.createElement('a');
-
-          link.href = image;
-          const polarSat = this.selectSatManager_.getSelectedSat() as Satellite;
-
-          link.download = `sat-${polarSat.sccNum6 ?? polarSat.sccNum}-polar-plot.png`;
-          link.click();
+        getEl('polar-plot-save')?.addEventListener('click', () => this.saveImage_());
+        getEl('polar-plot-copy')?.addEventListener('click', () => {
+          this.copyImage_();
+        });
+        getEl('polar-plot-prev')?.addEventListener('click', () => this.stepPass_(-1));
+        getEl('polar-plot-next')?.addEventListener('click', () => this.stepPass_(1));
+        getEl('polar-plot-size')?.addEventListener('change', (e) => {
+          this.selectedSizeId_ = (e.target as HTMLSelectElement).value;
         });
       },
     );
@@ -134,7 +170,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
       EventBusEvent.staticOffsetChange,
       () => {
         if (this.isMenuButtonActive) {
-          this.updatePlot_();
+          this.scheduleUpdate_();
         }
       },
     );
@@ -147,7 +183,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
           this.isIconDisabled = false;
           // If it is open then refresh the plot
           if (this.isMenuButtonActive) {
-            this.updatePlot_();
+            this.scheduleUpdate_();
           }
         } else {
           getEl(this.bottomIconElementName)?.classList.add('bmenu-item-disabled');
@@ -170,7 +206,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     if (!this.isMenuButtonActive) {
       this.openSideMenu();
       this.setBottomIconToSelected();
-      this.updatePlot_();
+      this.onMenuOpened_();
       ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
     } else {
       this.closeSideMenu();
@@ -179,235 +215,287 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     }
   }
 
-  private updatePlot_(): void {
-    if (this.generatePlotData_()) {
-      // If there is data draw it
-      this.drawPlot_();
-      hideEl('polar-plot-warning');
-      showEl('polar-plot');
-      showEl('polar-plot-save');
-    } else {
-      showEl('polar-plot-warning');
-      hideEl('polar-plot');
-      hideEl('polar-plot-save');
-      setInnerHtml('polar-plot-warning', `${l('labels.notInView').replace('{hours}', (this.plotDuration_ * 24).toFixed(0))}`);
-    }
+  /** Shared "the menu just opened" entry point used by both the bottom icon and the P shortcut. */
+  private onMenuOpened_(): void {
+    this.updatePlot_();
   }
 
-  private generatePlotData_(): boolean {
-    this.passStartTime_ = null;
-    this.passStopTime_ = null;
+  /** Coalesces rapid recompute triggers (e.g. time scrubbing) into a single pass search. */
+  private scheduleUpdate_(): void {
+    if (this.recomputeTimer_) {
+      clearTimeout(this.recomputeTimer_);
+    }
+    this.recomputeTimer_ = setTimeout(() => {
+      this.recomputeTimer_ = null;
+      this.updatePlot_();
+    }, 150);
+  }
 
+  private updatePlot_(): void {
+    this.passes_ = this.computePasses_();
+    this.currentIndex_ = 0;
+    this.renderCurrent_();
+  }
+
+  /** Finds the current and upcoming passes for the selected satellite/sensor. */
+  private computePasses_(): PolarPass[] {
     const sensor = ServiceLocator.getSensorManager().getSensor();
     const sat = this.selectSatManager_.getSelectedSat() as Satellite;
 
-    if (!sensor?.isSensor()) {
-      return false;
+    if (!sensor?.isSensor() || !sat?.isSatellite()) {
+      return [];
     }
 
-    if (!sat?.isSatellite()) {
-      return false;
-    }
-
-    let isSomethingInView = false;
-
+    // Fast reject: the satellite can never reach this sensor's range shell.
     if (sat.perigee > sensor.maxRng || sat.apogee < sensor.minRng) {
-      return false;
+      return [];
     }
 
-    this.plotData_ = [];
-    let now: Date | null = null;
+    let satrec: SatelliteRecord;
 
-    for (let i = 0; i < this.plotDuration_ * secondsPerDay; i++) {
-      now = ServiceLocator.getTimeManager().getOffsetTimeObj(i * MILLISECONDS_PER_SECOND);
-      const inView = sensor.isSatInFov(sat, now);
-
-      if (inView) {
-        this.passStartTime_ ??= now;
-        const rae = sensor.rae(sat, now);
-
-        if (!rae) {
-          continue;
-        }
-
-        this.plotData_.push([rae.az, rae.el]);
-        isSomethingInView = true;
-      } else if (isSomethingInView) {
-        break;
-      }
+    try {
+      satrec = ServiceLocator.getCatalogManager().calcSatrec(sat);
+    } catch {
+      return [];
     }
 
-    this.passStopTime_ = now;
-
-    return isSomethingInView;
+    return findPolarPasses(sat.sccNum, satrec, sensor, this.buildPassDeps_(), {
+      windowDays: this.windowDays_,
+      maxPasses: this.maxPasses_,
+    });
   }
 
-  private drawPlot_(): void {
-    this.setupCanvas_();
-    this.drawPlotBackground_();
-    this.drawOrbitLine_();
-    this.drawStartAndEnd_();
-    this.drawTitle_();
+  /** Assembles the application-state dependencies the pure pass finder needs (mirrors Best Pass / Polar View). */
+  private buildPassDeps_(): BestPassDeps {
+    const scene = ServiceLocator.getScene();
+
+    return {
+      baseTimeMs: ServiceLocator.getTimeManager().simulationTimeObj.getTime(),
+      // Suppress toasts: the search probes many times and a near-decay satellite legitimately fails at some.
+      getRae: (date, satrec, sensor) => SatMath.getRae(date, satrec, sensor, true),
+      checkIsInView: (sensor, rae) => SatMath.checkIsInView(sensor, rae as Parameters<typeof SatMath.checkIsInView>[1]),
+      sunEciKm: () => ({
+        x: scene.sun.position[0] as Kilometers,
+        y: scene.sun.position[1] as Kilometers,
+        z: scene.sun.position[2] as Kilometers,
+      }),
+    };
   }
 
-  private drawTitle_(): void {
-    this.ctx_.font = `${this.canvasSize_ * 0.035}px consolas`;
-    this.ctx_.fillStyle = 'rgb(255, 255, 255)';
-    this.ctx_.textAlign = 'left';
-    this.ctx_.textBaseline = 'top';
+  /** Draws the currently selected pass, or the not-in-view notice when there is none. */
+  private renderCurrent_(): void {
+    const pass = this.passes_[this.currentIndex_];
+
+    if (!pass) {
+      this.showWarning_();
+
+      return;
+    }
+
+    const canvas = getEl('polar-plot') as HTMLCanvasElement | null;
+    const ctx = canvas?.getContext('2d');
+
+    if (!ctx) {
+      return;
+    }
+
+    const sat = this.selectSatManager_.getSelectedSat() as Satellite;
+
+    drawPolarChart(ctx, pass, {
+      labels: this.buildLabels_(sat, this.passes_, this.currentIndex_),
+      backgroundColor: CHART_BACKGROUND,
+    });
+
+    hideEl('polar-plot-warning');
+    showEl('polar-plot');
+    showEl('polar-plot-pass-section');
+    showEl('polar-plot-export-section');
+    this.updateReadout_(pass);
+    this.updateNavButtons_();
+  }
+
+  private showWarning_(): void {
+    hideEl('polar-plot');
+    hideEl('polar-plot-pass-section');
+    hideEl('polar-plot-export-section');
+    showEl('polar-plot-warning');
+    const warning = getEl('polar-plot-warning');
+
+    if (warning) {
+      warning.textContent = l('labels.notInView').replace('{hours}', (this.windowDays_ * 24).toFixed(0));
+    }
+  }
+
+  private buildLabels_(sat: Satellite | null, passes: PolarPass[], index: number): PolarChartLabels {
     const sensorName = ServiceLocator.getSensorManager().getSensor()?.name ?? l('labels.unknownSensor');
-    const satNum = (this.selectSatManager_.getSelectedSat() as Satellite).sccNum;
-    const timeRange = `${this.passStartTime_?.toISOString().slice(11, 19) ?? l('labels.unknownStartTime')} - ${this.passStopTime_?.toISOString().slice(11, 19) ?? l('labels.unknownStopTime')}`;
 
-    this.ctx_.fillText(sensorName, 10, 10);
-    this.ctx_.fillText(l('labels.satellite').replace('{sccNum}', satNum), 10, this.canvasSize_ * 0.035 + 15);
-
-    this.ctx_.textAlign = 'center';
-    this.ctx_.fillText(timeRange, this.canvasSize_ / 2, this.canvasSize_ - 10 - (this.canvasSize_ * 0.035));
+    return {
+      sensorName,
+      satLabel: l('labels.satellite').replace('{sccNum}', sat?.sccNum ?? ''),
+      passLabel: passes.length > 1
+        ? l('labels.passLabel').replace('{n}', String(index + 1)).replace('{total}', String(passes.length))
+        : undefined,
+    };
   }
 
-  private setupCanvas_() {
-    const canvas = document.getElementById('polar-plot') as HTMLCanvasElement;
+  private updateReadout_(pass: PolarPass): void {
+    const readout = getEl('polar-plot-readout');
+
+    if (!readout) {
+      return;
+    }
+
+    const durationMin = Math.round(pass.durationMs / 60000);
+    const passOf = l('labels.passLabel').replace('{n}', String(this.currentIndex_ + 1)).replace('{total}', String(this.passes_.length));
+
+    readout.textContent = `${passOf} • ${l('labels.maxEl').replace('{deg}', pass.maxEl.toFixed(0))} • ${durationMin} min`;
+  }
+
+  private updateNavButtons_(): void {
+    const prev = getEl('polar-plot-prev') as HTMLButtonElement | null;
+    const next = getEl('polar-plot-next') as HTMLButtonElement | null;
+    const multiple = this.passes_.length > 1;
+
+    if (prev) {
+      prev.style.display = multiple ? '' : 'none';
+      prev.disabled = this.currentIndex_ <= 0;
+    }
+    if (next) {
+      next.style.display = multiple ? '' : 'none';
+      next.disabled = this.currentIndex_ >= this.passes_.length - 1;
+    }
+  }
+
+  private stepPass_(delta: number): void {
+    if (this.passes_.length === 0) {
+      return;
+    }
+    const nextIndex = Math.max(0, Math.min(this.passes_.length - 1, this.currentIndex_ + delta));
+
+    if (nextIndex === this.currentIndex_) {
+      return;
+    }
+    this.currentIndex_ = nextIndex;
+    this.renderCurrent_();
+    ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+  }
+
+  /** Renders the active pass into a fresh off-DOM canvas sized to the selected export preset. */
+  private renderExportCanvas_(): HTMLCanvasElement | null {
+    const pass = this.passes_[this.currentIndex_];
+
+    if (!pass) {
+      return null;
+    }
+
+    const preset = SIZE_PRESETS.find((p) => p.id === this.selectedSizeId_) ?? SIZE_PRESETS[0];
+    const sat = this.selectSatManager_.getSelectedSat() as Satellite;
+
+    return this.renderPassToCanvas_(pass, this.buildLabels_(sat, this.passes_, this.currentIndex_), preset.w, preset.h);
+  }
+
+  private renderPassToCanvas_(pass: PolarPass, labels: PolarChartLabels, width: number, height: number): HTMLCanvasElement | null {
+    const canvas = document.createElement('canvas');
+
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) {
+      return null;
+    }
+
+    drawPolarChart(ctx, pass, {
+      labels,
+      backgroundColor: CHART_BACKGROUND,
+      watermark: settingsManager.copyrightOveride ? undefined : 'keeptrack.space',
+    });
+
+    return canvas;
+  }
+
+  private saveImage_(): void {
+    const canvas = this.renderExportCanvas_();
 
     if (!canvas) {
       return;
     }
 
-    this.ctx_ = canvas.getContext('2d') as CanvasRenderingContext2D;
+    const polarSat = this.selectSatManager_.getSelectedSat() as Satellite;
+    const link = document.createElement('a');
 
-    if (!this.ctx_) {
+    link.href = canvas.toDataURL('image/png');
+    link.download = `sat-${polarSat.sccNum6 ?? polarSat.sccNum}-polar-plot.png`;
+    link.click();
+  }
+
+  private copyImage_(): void {
+    const canvas = this.renderExportCanvas_();
+
+    if (!canvas || typeof ClipboardItem === 'undefined' || !navigator.clipboard?.write) {
       return;
     }
 
-    this.canvasSize_ = Math.min(this.ctx_.canvas.width, this.ctx_.canvas.height);
-
-    this.ctx_.imageSmoothingEnabled = true;
-    this.centerX_ = this.ctx_.canvas.width / 2;
-    this.centerY_ = this.ctx_.canvas.height / 2;
-    this.distanceUnit_ = this.canvasSize_ / (2.5 * 90) * 0.9;
-
-    this.ctx_.clearRect(0, 0, this.ctx_.canvas.width, this.ctx_.canvas.height);
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        return;
+      }
+      navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+        .then(() => keepTrackApi.toast(l('labels.copied'), ToastMsgType.normal))
+        .catch(() => keepTrackApi.toast(l('errorMsgs.copyFailed'), ToastMsgType.caution));
+    }, 'image/png');
   }
 
-  private drawElevationLines_(): void {
-    let radius: number = 0;
-    let radians: number = 0;
+  /**
+   * Head-less render entry point: computes a pass for the given (or selected)
+   * satellite over the current sensor and returns it as a PNG data URL, without
+   * touching the menu. Used by automated content-generation scripts.
+   */
+  renderToDataUrl(opts: { sccNum?: string; satId?: number; passIndex?: number; size?: number; windowDays?: number } = {}): string | null {
+    const catalog = ServiceLocator.getCatalogManager();
+    const sensor = ServiceLocator.getSensorManager().getSensor();
 
-    this.ctx_.beginPath();
-    const altCircles = [15, 30, 45, 60, 75, 90];
-
-    for (const circleDistance of altCircles) {
-      radius = circleDistance * this.distanceUnit_;
-      this.ctx_.moveTo(this.centerX_ + radius, this.centerY_);
-      for (let th = 1; th <= 360; th++) {
-        radians = (Math.PI / 180) * th;
-        this.ctx_.lineTo(this.centerX_ + radius * Math.cos(radians), this.centerY_ + radius * Math.sin(radians));
-      }
+    if (!sensor?.isSensor()) {
+      return null;
     }
 
-    this.ctx_.lineWidth = 1;
-    this.ctx_.stroke();
-  }
+    let sat: Satellite | null = null;
 
-  private drawStartAndEnd_(): void {
-    this.drawDot_(this.plotData_[0][1], this.plotData_[0][0], 'lightgreen');
-    this.drawDot_(this.plotData_[this.plotData_.length - 1][1], this.plotData_[this.plotData_.length - 1][0], 'red');
-  }
+    if (typeof opts.satId === 'number') {
+      sat = catalog.getObject(opts.satId) as Satellite;
+    } else if (opts.sccNum) {
+      const id = catalog.sccNum2Id(opts.sccNum);
 
-  private drawDot_(radius: number, radians: number, color: 'lightgreen' | 'red' = 'lightgreen') {
-    radians = (Math.PI / 180) * (radians - 90);
-    radius = (90 - radius) * this.distanceUnit_;
-
-    this.ctx_.beginPath();
-    this.ctx_.arc(
-      this.centerX_ + radius * Math.cos(radians),
-      this.centerY_ + radius * Math.sin(radians),
-      15,
-      0,
-      2 * Math.PI,
-      false,
-    );
-    this.ctx_.fillStyle = color;
-    this.ctx_.fill();
-  }
-
-  private drawOrbitLine_(): void {
-    this.ctx_.beginPath();
-    this.ctx_.strokeStyle = 'rgb(255, 40, 39)';
-    this.ctx_.lineWidth = 2;
-
-    const dataLength = this.plotData_.length;
-    let radius = 0;
-
-    for (let j = 0; j < dataLength; j++) {
-      const radians = (Math.PI / 180) * (this.plotData_[j][0] - 90);
-
-      radius = (90 - this.plotData_[j][1]) * this.distanceUnit_;
-      if (j === 0) {
-        this.ctx_.beginPath();
-        this.ctx_.moveTo(this.centerX_ + radius * Math.cos(radians), this.centerY_ + radius * Math.sin(radians));
-      }
-
-      this.ctx_.lineTo(this.centerX_ + radius * Math.cos(radians), this.centerY_ + radius * Math.sin(radians));
+      sat = id !== null ? (catalog.getObject(id) as Satellite) : null;
+    } else {
+      sat = this.selectSatManager_.getSelectedSat() as Satellite;
     }
-    this.ctx_.stroke();
-  }
 
-  private drawPlotBackground_(): void {
-    this.drawElevationLines_();
-    this.drawPolarAxes_();
+    if (!sat?.isSatellite()) {
+      return null;
+    }
 
-    this.ctx_.font = `${this.canvasSize_ * this.fontRatio_}px serif`;
-    this.ctx_.strokeStyle = 'rgb(255, 255, 255)';
-    this.ctx_.fillStyle = 'rgb(255, 255, 255)';
-    this.ctx_.lineWidth = 1;
+    let satrec: SatelliteRecord;
 
-    this.labelAzimuthAxis_();
-    this.labelElevationAxis_();
-  }
+    try {
+      satrec = catalog.calcSatrec(sat);
+    } catch {
+      return null;
+    }
 
-  private drawPolarAxes_() {
-    const radius = 96 * this.distanceUnit_;
+    const passes = findPolarPasses(sat.sccNum, satrec, sensor, this.buildPassDeps_(), {
+      windowDays: opts.windowDays ?? this.windowDays_,
+      maxPasses: this.maxPasses_,
+    });
+    const pass = passes[opts.passIndex ?? 0];
 
-    this.ctx_.moveTo(this.centerX_, this.centerY_);
-    this.ctx_.lineTo(this.centerX_, this.centerY_ + radius);
-    this.ctx_.moveTo(this.centerX_, this.centerY_);
-    this.ctx_.lineTo(this.centerX_, this.centerY_ - radius);
-    this.ctx_.moveTo(this.centerX_, this.centerY_);
-    this.ctx_.lineTo(this.centerX_ + radius, this.centerY_);
-    this.ctx_.moveTo(this.centerX_, this.centerY_);
-    this.ctx_.lineTo(this.centerX_ - radius, this.centerY_);
-  }
+    if (!pass) {
+      return null;
+    }
 
-  private labelElevationAxis_() {
-    this.ctx_.textAlign = 'center';
-    this.ctx_.textBaseline = 'middle';
-    const diagDist = this.canvasSize_ / 700 * 0.91;
+    const size = opts.size ?? SIZE_PRESETS[0].w;
+    const canvas = this.renderPassToCanvas_(pass, this.buildLabels_(sat, passes, opts.passIndex ?? 0), size, size);
 
-    this.ctx_.fillText('90°', this.centerX_ + 18 * diagDist, this.centerY_ - 12 * diagDist);
-    this.ctx_.fillText('75°', this.centerX_ + 44 * diagDist, this.centerY_ - 44 * diagDist);
-    this.ctx_.fillText('60°', this.centerX_ + 76 * diagDist, this.centerY_ - 76 * diagDist);
-    this.ctx_.fillText('45°', this.centerX_ + 108 * diagDist, this.centerY_ - 108 * diagDist);
-    this.ctx_.fillText('30°', this.centerX_ + 143 * diagDist, this.centerY_ - 143 * diagDist);
-    this.ctx_.fillText('15°', this.centerX_ + 175 * diagDist, this.centerY_ - 175 * diagDist);
-    this.ctx_.fillText('0°', this.centerX_ + 206 * diagDist, this.centerY_ - 206 * diagDist);
-    this.ctx_.stroke();
-  }
-
-  private labelAzimuthAxis_() {
-    const radius = 98 * this.distanceUnit_;
-
-    this.ctx_.font = `${this.canvasSize_ * this.fontRatio_}px serif`;
-    this.ctx_.textAlign = 'center';
-    this.ctx_.textBaseline = 'bottom';
-    this.ctx_.fillText(' 0°', this.centerX_, this.centerY_ - radius);
-    this.ctx_.textBaseline = 'top';
-    this.ctx_.fillText('180°', this.centerX_, this.centerY_ + radius);
-    this.ctx_.textAlign = 'right';
-    this.ctx_.textBaseline = 'middle';
-    this.ctx_.fillText('270°', this.centerX_ - radius, this.centerY_);
-    this.ctx_.textAlign = 'left';
-    this.ctx_.fillText('90°', this.centerX_ + radius, this.centerY_);
-    this.ctx_.stroke();
+    return canvas?.toDataURL('image/png') ?? null;
   }
 }

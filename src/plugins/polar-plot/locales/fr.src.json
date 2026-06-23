@@ -9,7 +9,24 @@
         "satellite": "Satellite {sccNum}",
         "unknownSensor": "Capteur inconnu",
         "unknownStartTime": "Heure de début inconnue",
-        "unknownStopTime": "Heure de fin inconnue"
+        "unknownStopTime": "Heure de fin inconnue",
+        "prevPass": "Passage précédent",
+        "nextPass": "Passage suivant",
+        "imageSize": "Taille de l'image",
+        "size_square": "Carré (1080)",
+        "size_wide": "Large (1200x675)",
+        "size_large": "Grand (2000)",
+        "copyImage": "Copier l'image",
+        "copied": "Tracé polaire copié dans le presse-papiers",
+        "passLabel": "Passage {n} sur {total}",
+        "maxEl": "Élév. max {deg}°"
+      },
+      "sections": {
+        "pass": "Passage",
+        "export": "Exporter"
+      },
+      "errorMsgs": {
+        "copyFailed": "Impossible de copier l'image dans le presse-papiers"
       },
       "help": {
         "overview": "La Trace polaire dessine le prochain passage du satellite sélectionné au-dessus du capteur sélectionné sous la forme d'une carte du ciel classique en azimut et élévation : le nord en haut, l'horizon sur l'anneau extérieur et le zénith au centre. C'est la carte qu'un observateur ou un opérateur utilise pour savoir où regarder dans le ciel.",

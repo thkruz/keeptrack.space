@@ -9,7 +9,24 @@
         "satellite": "Satellite {sccNum}",
         "unknownSensor": "Unknown Sensor",
         "unknownStartTime": "Unknown Start Time",
-        "unknownStopTime": "Unknown Stop Time"
+        "unknownStopTime": "Unknown Stop Time",
+        "prevPass": "Previous Pass",
+        "nextPass": "Next Pass",
+        "imageSize": "Image Size",
+        "size_square": "Square (1080)",
+        "size_wide": "Wide (1200x675)",
+        "size_large": "Large (2000)",
+        "copyImage": "Copy Image",
+        "copied": "Polar plot copied to clipboard",
+        "passLabel": "Pass {n} of {total}",
+        "maxEl": "Max El {deg}°"
+      },
+      "sections": {
+        "pass": "Pass",
+        "export": "Export"
+      },
+      "errorMsgs": {
+        "copyFailed": "Could not copy image to clipboard"
       },
       "help": {
         "overview": "The Polar Plot draws the selected satellite's next pass over the selected sensor as a classic azimuth and elevation sky chart: north at the top, the horizon at the outer ring, and zenith in the center. It is the chart an observer or operator uses to know where in the sky to look.",

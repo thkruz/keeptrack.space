@@ -9,7 +9,24 @@
         "satellite": "Satellite {sccNum}",
         "unknownSensor": "Sensore sconosciuto",
         "unknownStartTime": "Ora di inizio sconosciuta",
-        "unknownStopTime": "Ora di fine sconosciuta"
+        "unknownStopTime": "Ora di fine sconosciuta",
+        "prevPass": "Passaggio precedente",
+        "nextPass": "Passaggio successivo",
+        "imageSize": "Dimensione immagine",
+        "size_square": "Quadrata (1080)",
+        "size_wide": "Larga (1200x675)",
+        "size_large": "Grande (2000)",
+        "copyImage": "Copia immagine",
+        "copied": "Grafico polare copiato negli appunti",
+        "passLabel": "Passaggio {n} di {total}",
+        "maxEl": "Elev. max {deg}°"
+      },
+      "sections": {
+        "pass": "Passaggio",
+        "export": "Esporta"
+      },
+      "errorMsgs": {
+        "copyFailed": "Impossibile copiare l'immagine negli appunti"
       },
       "help": {
         "overview": "Il Grafico polare disegna il prossimo passaggio del satellite selezionato sopra il sensore selezionato come una classica carta del cielo in azimut ed elevazione: il nord in alto, l'orizzonte sull'anello esterno e lo zenit al centro. È la carta che un osservatore o un operatore usa per sapere dove guardare nel cielo.",

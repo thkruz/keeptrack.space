@@ -9,7 +9,24 @@
         "satellite": "Satelit {sccNum}",
         "unknownSensor": "Neznámý senzor",
         "unknownStartTime": "Neznámý čas začátku",
-        "unknownStopTime": "Neznámý čas konce"
+        "unknownStopTime": "Neznámý čas konce",
+        "prevPass": "Předchozí přelet",
+        "nextPass": "Další přelet",
+        "imageSize": "Velikost obrázku",
+        "size_square": "Čtverec (1080)",
+        "size_wide": "Široký (1200x675)",
+        "size_large": "Velký (2000)",
+        "copyImage": "Kopírovat obrázek",
+        "copied": "Polární graf zkopírován do schránky",
+        "passLabel": "Přelet {n} z {total}",
+        "maxEl": "Max. elevace {deg}°"
+      },
+      "sections": {
+        "pass": "Přelet",
+        "export": "Export"
+      },
+      "errorMsgs": {
+        "copyFailed": "Obrázek se nepodařilo zkopírovat do schránky"
       },
       "help": {
         "overview": "Polární graf vykresluje další přelet vybraného satelitu nad vybraným senzorem jako klasickou mapu oblohy v azimutu a elevaci: sever nahoře, horizont na vnějším prstenci a zenit uprostřed. Je to mapa, kterou pozorovatel nebo operátor používá, aby věděl, kam se na obloze dívat.",

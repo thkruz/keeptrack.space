@@ -9,7 +9,24 @@
         "satellite": "衛星 {sccNum}",
         "unknownSensor": "不明なセンサー",
         "unknownStartTime": "不明な開始時刻",
-        "unknownStopTime": "不明な終了時刻"
+        "unknownStopTime": "不明な終了時刻",
+        "prevPass": "前のパス",
+        "nextPass": "次のパス",
+        "imageSize": "画像サイズ",
+        "size_square": "正方形 (1080)",
+        "size_wide": "ワイド (1200x675)",
+        "size_large": "大 (2000)",
+        "copyImage": "画像をコピー",
+        "copied": "極座標プロットをクリップボードにコピーしました",
+        "passLabel": "パス {n} / {total}",
+        "maxEl": "最大仰角 {deg}°"
+      },
+      "sections": {
+        "pass": "パス",
+        "export": "エクスポート"
+      },
+      "errorMsgs": {
+        "copyFailed": "画像をクリップボードにコピーできませんでした"
       },
       "help": {
         "overview": "極座標プロットは、選択した衛星が選択したセンサー上空を次に通過するパスを、方位角と仰角による古典的な天空チャートとして描画します。北が上、地平線が外側のリング、天頂が中心です。観測者やオペレーターが空のどこを見ればよいかを知るために使うチャートです。",

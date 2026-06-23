@@ -9,7 +9,24 @@
         "satellite": "위성 {sccNum}",
         "unknownSensor": "알 수 없는 센서",
         "unknownStartTime": "알 수 없는 시작 시간",
-        "unknownStopTime": "알 수 없는 종료 시간"
+        "unknownStopTime": "알 수 없는 종료 시간",
+        "prevPass": "이전 통과",
+        "nextPass": "다음 통과",
+        "imageSize": "이미지 크기",
+        "size_square": "정사각형 (1080)",
+        "size_wide": "와이드 (1200x675)",
+        "size_large": "크게 (2000)",
+        "copyImage": "이미지 복사",
+        "copied": "극좌표 플롯을 클립보드에 복사했습니다",
+        "passLabel": "통과 {n} / {total}",
+        "maxEl": "최대 고도각 {deg}°"
+      },
+      "sections": {
+        "pass": "통과",
+        "export": "내보내기"
+      },
+      "errorMsgs": {
+        "copyFailed": "이미지를 클립보드에 복사하지 못했습니다"
       },
       "help": {
         "overview": "극좌표 플롯은 선택한 위성이 선택한 센서 상공을 다음에 통과하는 패스를 방위각과 고도각으로 이루어진 고전적인 하늘 차트로 그립니다. 북쪽이 위, 지평선이 바깥 고리, 천정이 중앙입니다. 관측자나 운영자가 하늘의 어디를 봐야 하는지 알기 위해 사용하는 차트입니다.",

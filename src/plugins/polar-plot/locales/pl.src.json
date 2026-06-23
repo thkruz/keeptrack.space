@@ -9,7 +9,24 @@
         "satellite": "Satelita {sccNum}",
         "unknownSensor": "Nieznany czujnik",
         "unknownStartTime": "Nieznany czas rozpoczęcia",
-        "unknownStopTime": "Nieznany czas zakończenia"
+        "unknownStopTime": "Nieznany czas zakończenia",
+        "prevPass": "Poprzedni przelot",
+        "nextPass": "Następny przelot",
+        "imageSize": "Rozmiar obrazu",
+        "size_square": "Kwadrat (1080)",
+        "size_wide": "Szeroki (1200x675)",
+        "size_large": "Duży (2000)",
+        "copyImage": "Kopiuj obraz",
+        "copied": "Wykres polarny skopiowano do schowka",
+        "passLabel": "Przelot {n} z {total}",
+        "maxEl": "Maks. elewacja {deg}°"
+      },
+      "sections": {
+        "pass": "Przelot",
+        "export": "Eksport"
+      },
+      "errorMsgs": {
+        "copyFailed": "Nie udało się skopiować obrazu do schowka"
       },
       "help": {
         "overview": "Wykres biegunowy rysuje następny przelot wybranego satelity nad wybranym czujnikiem jako klasyczną mapę nieba w azymucie i elewacji: północ u góry, horyzont na zewnętrznym pierścieniu, a zenit w środku. To mapa, której obserwator lub operator używa, aby wiedzieć, gdzie patrzeć na niebie.",

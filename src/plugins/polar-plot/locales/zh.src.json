@@ -9,7 +9,24 @@
         "satellite": "卫星 {sccNum}",
         "unknownSensor": "未知传感器",
         "unknownStartTime": "未知开始时间",
-        "unknownStopTime": "未知结束时间"
+        "unknownStopTime": "未知结束时间",
+        "prevPass": "上一次过境",
+        "nextPass": "下一次过境",
+        "imageSize": "图像尺寸",
+        "size_square": "正方形 (1080)",
+        "size_wide": "宽屏 (1200x675)",
+        "size_large": "大图 (2000)",
+        "copyImage": "复制图像",
+        "copied": "极坐标图已复制到剪贴板",
+        "passLabel": "第 {n} 次，共 {total} 次过境",
+        "maxEl": "最大仰角 {deg}°"
+      },
+      "sections": {
+        "pass": "过境",
+        "export": "导出"
+      },
+      "errorMsgs": {
+        "copyFailed": "无法将图像复制到剪贴板"
       },
       "help": {
         "overview": "极坐标图以经典的方位角和仰角天空图绘制所选卫星下一次飞越所选传感器的过程：北方在顶部，地平线在外圈，天顶在中心。这是观测者或操作员用来确定在天空中观察方向的图表。",

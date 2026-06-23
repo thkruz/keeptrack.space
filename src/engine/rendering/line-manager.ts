@@ -113,8 +113,12 @@ export class LineManager {
     this.add(new SatToCelestialBodyLine(sat, body));
   }
 
-  createRef2Ref(ref1: vec3, ref2: vec3, color: vec4): void {
-    this.add(new RefToRefLine(ref1, ref2, color));
+  createRef2Ref(ref1: vec3, ref2: vec3, color: vec4): RefToRefLine {
+    const line = new RefToRefLine(ref1, ref2, color);
+
+    this.add(line);
+
+    return line;
   }
 
   createOrbitPath(path: vec3[] | vec4[], color: vec4, solarBody = SolarBody.Sun): OrbitPathLine | null {
@@ -690,6 +694,20 @@ export class LineManager {
       out float v_flatX;
       out float v_polarR;
 
+      // Rotate ECI -> ECEF about Z by -gmst.
+      vec3 eciToEcef(vec3 p, float gmst) {
+          float c = cos(gmst);
+          float s = sin(gmst);
+          return vec3(p.x * c + p.y * s, -p.x * s + p.y * c, p.z);
+      }
+
+      // Rotate ECEF -> ECI about Z by +gmst.
+      vec3 ecefToEci(vec3 p, float gmst) {
+          float c = cos(gmst);
+          float s = sin(gmst);
+          return vec3(p.x * c - p.y * s, p.x * s + p.y * c, p.z);
+      }
+
       void main(void) {
           // Apply offset in world space, then transform
           vec4 worldPosition = u_mVMatrix * vec4(a_position.xyz, 1.0);
@@ -712,14 +730,26 @@ export class LineManager {
                   return;
               }
 
+              // In ECF mode the first orbit vertex is patched with the live ECI
+              // position (negative alpha flag from OrbitManager) while the rest
+              // of the strip is ECEF. Rotate it into ECEF so the whole strip,
+              // and the v_eciPos varying the fragment shader interpolates for
+              // antimeridian checks, is in one consistent frame. Without this
+              // the vertex lands at lon + gmst, drawing a horizontal artifact
+              // segment at the satellite's latitude.
+              vec3 mapPos = eciPos;
+              if (u_ecfMode && a_position.w < 0.0) {
+                  mapPos = eciToEcef(eciPos, u_gmst);
+              }
+
               float lon;
               if (u_ecfMode) {
-                  lon = atan(eciPos.y, eciPos.x);
+                  lon = atan(mapPos.y, mapPos.x);
               } else {
-                  lon = atan(eciPos.y, eciPos.x) - u_gmst;
+                  lon = atan(mapPos.y, mapPos.x) - u_gmst;
               }
               lon = mod(lon + PI, 2.0 * PI) - PI;
-              float lat = atan(eciPos.z, length(eciPos.xy));
+              float lat = atan(mapPos.z, length(mapPos.xy));
               float alt = eciDist - u_earthRadius;
               // Use a fixed Z offset to ensure lines always render above the Earth surface
               vec3 flatPos = vec3(lon * u_earthRadius, lat * u_earthRadius, 10.0);
@@ -730,8 +760,8 @@ export class LineManager {
 
               position = u_pCamMatrix * vec4(flatPos, 1.0);
 
-              // Pass ECI position and flat X for antimeridian detection in fragment shader
-              v_eciPos = eciPos;
+              // Pass ECEF-consistent position and flat X for antimeridian detection
+              v_eciPos = mapPos;
               v_flatX = flatPos.x;
           } else if (u_polarViewMode) {
               float PI = 3.14159265359;
@@ -745,8 +775,13 @@ export class LineManager {
                   return;
               }
 
-              // Orbit data is already in ECEF (per-vertex GMST applied in orbit cruncher)
+              // Orbit data is already in ECEF (per-vertex GMST applied in orbit
+              // cruncher), except the first vertex, which OrbitManager patches
+              // with the live ECI position (negative alpha flag); rotate it.
               vec3 ecef = eciPos;
+              if (u_ecfMode && a_position.w < 0.0) {
+                  ecef = eciToEcef(eciPos, u_gmst);
+              }
 
               // ECEF to ENU
               vec3 d = ecef - u_sensorEcef;
@@ -775,14 +810,7 @@ export class LineManager {
                       position = u_pCamMatrix * vec4(eciPos, 1.0);
                   } else {
                       // Rotate raw ECEF → ECI before adding worldOffset
-                      vec3 ecefPos = worldPosition.xyz;
-                      float c = cos(u_gmst);
-                      float s = sin(u_gmst);
-                      vec3 rotated = vec3(
-                          ecefPos.x * c - ecefPos.y * s,
-                          ecefPos.x * s + ecefPos.y * c,
-                          ecefPos.z
-                      );
+                      vec3 rotated = ecefToEci(worldPosition.xyz, u_gmst);
                       position = u_pCamMatrix * vec4(rotated + worldOffset, 1.0);
                   }
               } else {

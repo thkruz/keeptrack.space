@@ -19,6 +19,7 @@ import { BaseObject, Satellite, SpaceObjectType } from '@ootk/src/main';
 import tableChartPng from '@public/img/icons/table-chart.png';
 import { ClickDragOptions, fileExcelPng, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import './look-angles.css';
 
 type LookAngleData = TearrData & { canStationObserve: boolean };
 
@@ -75,34 +76,33 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
   sideMenuElementName: string = 'look-angles-menu';
   sideMenuElementHtml: string = html`
-    <div class="row"></div>
-    <div class="row">
-      <table id="looks" class="center-align striped-light centered"></table>
-    </div>`;
+    <section class="kt-section">
+      <div class="kt-section-label">${l('sections.results')}</div>
+      <table id="looks" class="la-table center-align"></table>
+    </section>`;
   sideMenuSecondaryHtml = html`
-    <div class="switch row">
-        <label>
-            <input id="settings-riseset" type="checkbox" checked="true" />
-            <span class="lever"></span>
-            ${l('settings.showRiseSetOnly')}
-        </label>
-    </div>
-    <div class="row">
-      <div class="input-field col s12">
-          <input id="look-angles-length" value="2" type="text" data-position="bottom" data-delay="50" data-tooltip="How Many Days of Look Angles Should be Calculated"
-            style="text-align: center;"
-          />
-          <label for="look-anglesLength" class="active">${l('settings.calculationLength')}</label>
+    <section class="kt-section">
+      <div class="kt-section-label">${l('sections.settings')}</div>
+      <div class="switch la-switch-row">
+          <label>
+              <input id="settings-riseset" type="checkbox" checked="true" />
+              <span class="lever"></span>
+              ${l('settings.showRiseSetOnly')}
+          </label>
       </div>
-    </div>
-    <div class="row">
-      <div class="input-field col s12">
-          <input id="look-angles-interval" value="30" type="text" data-position="bottom" data-delay="50" data-tooltip="Seconds Between Each Line of Look Angles"
-            style="text-align: center;"
-          />
-          <label for="look-anglesInterval" class="active">${l('settings.interval')}</label>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+            <input id="look-angles-length" value="2" type="text" data-position="bottom" data-delay="50" data-tooltip="How Many Days of Look Angles Should be Calculated" />
+            <label for="look-angles-length" class="active">${l('settings.calculationLength')}</label>
+        </div>
       </div>
-    </div>`;
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+            <input id="look-angles-interval" value="30" type="text" data-position="bottom" data-delay="50" data-tooltip="Seconds Between Each Line of Look Angles" />
+            <label for="look-angles-interval" class="active">${l('settings.interval')}</label>
+        </div>
+      </div>
+    </section>`;
   downloadIconSrc = fileExcelPng;
   downloadIconCb = () => {
     const sensor = ServiceLocator.getSensorManager().getSensor();
@@ -180,6 +180,9 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
+        getEl('look-angles-menu')?.classList.add('kt-ui-v13');
+        getEl('look-angles-menu-secondary')?.classList.add('kt-ui-v13');
+
         getEl('look-angles-length')!.addEventListener('change', () => {
           this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('look-angles-length')).value);
           this.refreshSideMenuData_();
@@ -331,10 +334,11 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
     tbl.innerHTML = ''; // Clear the table from old object data
     const tr = tbl.insertRow();
+
+    tr.classList.add('la-table-header');
     const tdT = tr.insertCell();
 
     tdT.appendChild(document.createTextNode(l('table.time')));
-    tdT.setAttribute('style', 'text-decoration: underline');
 
     // If isRiseSetOnly is true, add a column for type
     const tdType: HTMLTableCellElement = tr.insertCell();
@@ -342,25 +346,20 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     if (lookAngleData.length > 0 && typeof lookAngleData[0].type !== 'undefined') {
 
       tdType.appendChild(document.createTextNode(l('table.type')));
-      tdType.setAttribute('style', 'text-decoration: underline');
     }
 
     const tdE = tr.insertCell();
 
     tdE.appendChild(document.createTextNode(l('table.el')));
-    tdE.setAttribute('style', 'text-decoration: underline');
     const tdA = tr.insertCell();
 
     tdA.appendChild(document.createTextNode(l('table.az')));
-    tdA.setAttribute('style', 'text-decoration: underline');
     const tdR = tr.insertCell();
 
     tdR.appendChild(document.createTextNode(l('table.rng')));
-    tdR.setAttribute('style', 'text-decoration: underline');
     const tdV = tr.insertCell();
 
     tdV.appendChild(document.createTextNode(l('table.visible')));
-    tdV.setAttribute('style', 'text-decoration: underline');
 
     for (const entry of lookAngleData) {
       LookAnglesPlugin.populateSideMenuRow_({ tbl, tdT, entry, timeManagerInstance, tdE, tdA, tdR, tdType, tdV });
@@ -371,7 +370,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       const td = tr.insertCell();
       const searchLength = (this.lengthOfLookAngles_ * 24).toFixed(1);
 
-      td.colSpan = 4;
+      td.colSpan = 6;
       td.appendChild(document.createTextNode(l('msgs.notVisible').replace('{hours}', searchLength)));
     }
   }

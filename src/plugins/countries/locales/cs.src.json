@@ -6,6 +6,9 @@
       "commands": {
         "selectCountry": "Vybrat zemi: {country}"
       },
+      "labels": {
+        "filterByCountry": "Filtrovat podle země"
+      },
       "help": {
         "overview": "Nabídka Země filtruje katalog podle země původu. Každá země s alespoň jedním objektem je uvedena s vlajkou a počtem objektů; výběrem země zvýrazníte všechny její satelity a načtete je do výsledků vyhledávání.",
         "imgAlt": "Nabídka Země se seznamem zemí s vlajkami a počty satelitů",

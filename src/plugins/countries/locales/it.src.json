@@ -6,6 +6,9 @@
       "commands": {
         "selectCountry": "Seleziona paese: {country}"
       },
+      "labels": {
+        "filterByCountry": "Filtra per paese"
+      },
       "help": {
         "overview": "Il menu Paesi filtra il catalogo per paese di origine. Ogni paese con almeno un oggetto è elencato con la bandiera e il numero di oggetti; selezionandone uno vengono evidenziati tutti i suoi satelliti, caricati nei risultati di ricerca.",
         "imgAlt": "Il menu Paesi che elenca i paesi con bandiere e conteggi dei satelliti",

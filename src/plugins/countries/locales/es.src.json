@@ -6,6 +6,9 @@
       "commands": {
         "selectCountry": "Seleccionar país: {country}"
       },
+      "labels": {
+        "filterByCountry": "Filtrar por país"
+      },
       "help": {
         "overview": "El Menú de Países filtra el catálogo por país de origen. Cada país con al menos un objeto aparece con su bandera y un recuento de objetos; al seleccionar uno se resaltan todos sus satélites y se cargan en los resultados de búsqueda.",
         "imgAlt": "El Menú de Países con países, banderas y recuentos de satélites",

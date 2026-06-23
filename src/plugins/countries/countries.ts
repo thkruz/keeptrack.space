@@ -77,10 +77,13 @@ export class CountriesMenu extends KeepTrackPlugin implements ICommandPaletteCap
 
   private buildSideMenuHtml_(): string {
     return html`
-      <div id="countries-menu" class="side-menu-parent start-hidden">
+      <div id="countries-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div id="country-menu" class="side-menu">
-          <ul id="country-list">
-          </ul>
+          <section class="kt-section">
+            <div class="kt-section-label">${t7e('plugins.CountriesMenu.labels.filterByCountry')}</div>
+            <div id="country-list" class="country-list">
+            </div>
+          </section>
         </div>
       </div>
     `;
@@ -183,7 +186,7 @@ export class CountriesMenu extends KeepTrackPlugin implements ICommandPaletteCap
 
     countryListEl.innerHTML = this.generateCountryList_();
 
-    countryMenuEl.querySelectorAll('li').forEach((element) => {
+    countryMenuEl.querySelectorAll('.country-option').forEach((element) => {
       element.addEventListener('click', () => {
         ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
         this.countryMenuClick_(element.getAttribute('data-group') ?? '');
@@ -224,21 +227,25 @@ export class CountriesMenu extends KeepTrackPlugin implements ICommandPaletteCap
       countryGroups[country].push(countryCode);
     });
 
-    // Create a single <li> per country, with all codes merged by '|'
+    // Create a single full-width v13 action row per country, with all codes
+    // merged by '|'. The flag + name live in the .kt-action-label so the count
+    // chip rides next to the chevron.
     const mergedList = Object.entries(countryGroups).reduce((acc, [country, codes]) => {
       const dataGroup = codes.join('|');
       const flagCode = countryFlagIconMap[codes[0]] ?? 'unknown';
       const flagClass = `fi fi-${flagCode.toLowerCase()}`;
       const satCount = codes.reduce((sum, code) => sum + (countByCode[code] ?? 0), 0);
 
-      return `${acc}<li class="menu-selectable country-option" data-group="${dataGroup}">` +
+      return `${acc}<button type="button" class="kt-action waves-effect country-option" data-group="${dataGroup}">` +
+        '<span class="kt-action-label">' +
         `<span class="${flagClass} country-flag"></span>` +
         `<span class="country-name">${country}</span>` +
+        '</span>' +
         `<span class="country-count">${satCount.toLocaleString()}</span>` +
-        '</li>';
+        '</button>';
     }, '');
 
-    return `${mergedList}<br/>`;
+    return mergedList;
   }
 
   private countryMenuClick_(countryCode: string): void {

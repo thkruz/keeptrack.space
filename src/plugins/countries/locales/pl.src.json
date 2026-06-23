@@ -6,6 +6,9 @@
       "commands": {
         "selectCountry": "Wybierz kraj: {country}"
       },
+      "labels": {
+        "filterByCountry": "Filtruj według kraju"
+      },
       "help": {
         "overview": "Menu krajów filtruje katalog według kraju pochodzenia. Każdy kraj z co najmniej jednym obiektem jest wymieniony z flagą i liczbą obiektów; wybranie kraju podświetla wszystkie jego satelity i ładuje je do wyników wyszukiwania.",
         "imgAlt": "Menu krajów z listą krajów, flagami i liczbą satelitów",

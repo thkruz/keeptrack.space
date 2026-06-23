@@ -6,6 +6,9 @@
       "commands": {
         "selectCountry": "Select Country: {country}"
       },
+      "labels": {
+        "filterByCountry": "Filter by Country"
+      },
       "help": {
         "overview": "The Countries menu filters the catalog by country of origin. Every country with at least one object is listed with its flag and an object count; selecting one highlights all of that country's satellites and loads them into the search results.",
         "imgAlt": "The Countries menu listing countries with flags and satellite counts",

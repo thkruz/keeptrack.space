@@ -6,6 +6,9 @@
       "commands": {
         "selectCountry": "选择国家：{country}"
       },
+      "labels": {
+        "filterByCountry": "按国家筛选"
+      },
       "help": {
         "overview": "国家菜单按原产国筛选目录。每个拥有至少一个物体的国家都会列出，并附带国旗和物体数量；选择某个国家会高亮显示其所有卫星，并将它们加载到搜索结果中。",
         "imgAlt": "列出各国及其国旗和卫星数量的国家菜单",

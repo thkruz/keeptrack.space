@@ -1,24 +1,29 @@
-.country-option {
+/* v13 country action rows: flag + name on the left (label grows so it fills the
+ * row), the object-count chip rides next to the chevron. */
+#countries-menu .country-option .kt-action-label {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
 }
 
-.country-flag {
+#countries-menu .country-flag {
   flex-shrink: 0;
   width: 20px;
   height: 15px;
 }
 
-.country-name {
-  flex: 1;
+#countries-menu .country-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.country-count {
+#countries-menu .country-count {
   flex-shrink: 0;
+  margin-left: 8px;
   background: var(--color-dark-background);
   border: 1px solid var(--color-dark-border);
   border-radius: 10px;

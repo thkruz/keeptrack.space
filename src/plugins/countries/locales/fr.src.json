@@ -6,6 +6,9 @@
       "commands": {
         "selectCountry": "Sélectionner le pays : {country}"
       },
+      "labels": {
+        "filterByCountry": "Filtrer par pays"
+      },
       "help": {
         "overview": "Le menu Pays filtre le catalogue par pays d'origine. Chaque pays possédant au moins un objet est listé avec son drapeau et le nombre d'objets ; en sélectionner un met en évidence tous ses satellites et les charge dans les résultats de recherche.",
         "imgAlt": "Le menu Pays listant les pays avec drapeaux et nombres de satellites",

@@ -952,6 +952,8 @@ export class ColorSchemeManager {
    * When set, each satellite's alpha is multiplied by the corresponding value before GPU upload.
    */
   setFovFadeAlpha(alpha: Float32Array | null): void {
+    const hadOverlay = this.fovFadeAlpha_ !== null;
+
     this.fovFadeAlpha_ = alpha;
 
     if (this.colorData.length === 0) {
@@ -961,6 +963,13 @@ export class ColorSchemeManager {
     // Restore clean color data before reapplying overlay to avoid compounding
     if (this.cleanColorData_ && this.cleanColorData_.length === this.colorData.length) {
       this.colorData.set(this.cleanColorData_);
+    } else if (alpha && !hadOverlay) {
+      // First time enabling the overlay with no clean snapshot yet: the current
+      // buffer is un-overlaid, so capture it as the base for future reapplies.
+      // Without this, rapid partial updates arriving before the next recolor
+      // (e.g. the worker's progressive sweep while the sim is paused) would
+      // compound the fade and darken everything.
+      this.cleanColorData_ = new Float32Array(this.colorData);
     }
 
     if (!alpha) {

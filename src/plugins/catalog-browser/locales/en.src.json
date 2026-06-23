@@ -4,6 +4,7 @@
       "bottomIconLabel": "Catalog Browser",
       "title": "Catalog Browser",
       "labels": {
+        "loadMode": "Load Mode",
         "allData": "All Data",
         "orbitalOnly": "Orbital Only",
         "allDataDesc": "Replaces entire catalog with selected data",

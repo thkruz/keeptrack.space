@@ -4,6 +4,7 @@
       "bottomIconLabel": "Navigateur de Catalogues",
       "title": "Navigateur de Catalogues",
       "labels": {
+        "loadMode": "Mode de chargement",
         "allData": "Toutes les Données",
         "orbitalOnly": "Orbital Uniquement",
         "allDataDesc": "Remplace l'ensemble du catalogue par les données sélectionnées",

@@ -4,6 +4,7 @@
       "bottomIconLabel": "Katalog-Browser",
       "title": "Katalog-Browser",
       "labels": {
+        "loadMode": "Lademodus",
         "allData": "Alle Daten",
         "orbitalOnly": "Nur Orbital",
         "allDataDesc": "Ersetzt den gesamten Katalog durch ausgewählte Daten",

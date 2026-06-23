@@ -4,6 +4,7 @@
       "bottomIconLabel": "Explorador de Catálogos",
       "title": "Explorador de Catálogos",
       "labels": {
+        "loadMode": "Modo de carga",
         "allData": "Todos los Datos",
         "orbitalOnly": "Solo Orbital",
         "allDataDesc": "Reemplaza todo el catálogo con los datos seleccionados",

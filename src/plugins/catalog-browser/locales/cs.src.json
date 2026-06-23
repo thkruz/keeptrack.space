@@ -4,6 +4,7 @@
       "bottomIconLabel": "Prohlížeč katalogu",
       "title": "Prohlížeč katalogu",
       "labels": {
+        "loadMode": "Režim načítání",
         "allData": "Všechna data",
         "orbitalOnly": "Pouze orbitální",
         "allDataDesc": "Nahradí celý katalog vybranými daty",

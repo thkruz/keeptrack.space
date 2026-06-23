@@ -4,6 +4,7 @@
       "bottomIconLabel": "Browser catalogo",
       "title": "Browser catalogo",
       "labels": {
+        "loadMode": "Modalità di caricamento",
         "allData": "Tutti i dati",
         "orbitalOnly": "Solo orbitali",
         "allDataDesc": "Sostituisce l'intero catalogo con i dati selezionati",

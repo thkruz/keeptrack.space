@@ -4,6 +4,7 @@
       "bottomIconLabel": "카탈로그 브라우저",
       "title": "카탈로그 브라우저",
       "labels": {
+        "loadMode": "로드 모드",
         "allData": "모든 데이터",
         "orbitalOnly": "궤도만",
         "allDataDesc": "선택한 데이터로 전체 카탈로그 교체",

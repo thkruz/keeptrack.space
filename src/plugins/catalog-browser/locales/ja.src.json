@@ -4,6 +4,7 @@
       "bottomIconLabel": "カタログブラウザ",
       "title": "カタログブラウザ",
       "labels": {
+        "loadMode": "読み込みモード",
         "allData": "全データ",
         "orbitalOnly": "軌道のみ",
         "allDataDesc": "選択したデータでカタログ全体を置換",

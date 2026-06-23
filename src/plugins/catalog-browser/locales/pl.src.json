@@ -4,6 +4,7 @@
       "bottomIconLabel": "Przeglądarka katalogu",
       "title": "Przeglądarka katalogu",
       "labels": {
+        "loadMode": "Tryb ładowania",
         "allData": "Wszystkie dane",
         "orbitalOnly": "Tylko orbitalne",
         "allDataDesc": "Zastępuje cały katalog wybranymi danymi",

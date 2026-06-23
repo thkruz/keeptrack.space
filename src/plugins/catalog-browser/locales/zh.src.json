@@ -4,6 +4,7 @@
       "bottomIconLabel": "目录浏览器",
       "title": "目录浏览器",
       "labels": {
+        "loadMode": "加载模式",
         "allData": "所有数据",
         "orbitalOnly": "仅轨道",
         "allDataDesc": "用所选数据替换整个目录",

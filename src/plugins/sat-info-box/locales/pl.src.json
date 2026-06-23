@@ -23,7 +23,17 @@
     },
     "Confidence": {
       "label": "Pewność",
-      "tooltip": "Poziom pewności danych (wyższy jest lepszy) w skali 1-10. Na podstawie źródła i wieku danych"
+      "tooltip": "Poziom pewności danych (wyższy jest lepszy) w skali 1-10. Na podstawie źródła i wieku danych",
+      "high": "Wysoka",
+      "medium": "Średnia",
+      "low": "Niska",
+      "external": "Zewnętrzna"
+    },
+    "notAvailable": "B/D",
+    "oemFile": "Plik OEM",
+    "copy": {
+      "copied": "Skopiowano do schowka",
+      "tooltip": "Kliknij, aby skopiować"
     }
   }
 }

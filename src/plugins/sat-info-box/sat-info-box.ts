@@ -4,6 +4,7 @@ import Draggabilly from 'draggabilly';
 import { country2flagIcon } from '@app/app/data/catalogs/countries';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { SoundNames } from '@app/engine/audio/sounds';
+import { ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -11,6 +12,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
 import { DraggableBox } from '@app/engine/ui/draggable-box';
 import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, setInnerHtml, showEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
 import { BaseObject, CatalogSource, Satellite } from '@ootk/src/main';
@@ -29,7 +31,8 @@ export class SatInfoBox extends KeepTrackPlugin {
   readonly id = 'SatInfoBox';
   dependencies_: string[] = [SelectSatManager.name];
 
-  private readonly isIdentifiersSectionCollapsed_ = false;
+  /** Maximum number of 500 ms retries while waiting for the info box HTML to be ready. */
+  private static readonly MAX_HTML_READY_RETRIES_ = 20;
 
   static readonly containerId_ = 'sat-infobox';
   private readonly infoBoxElements_: {
@@ -109,12 +112,12 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
 
     const searchBoxHeight = satInfoboxDom?.getBoundingClientRect().height ?? 0;
-    const bottomMenuTopVar = document.documentElement.style.getPropertyValue('--bottom-menu-top').split('px')[0];
+    const bottomMenuTop = parseFloat(document.documentElement.style.getPropertyValue('--bottom-menu-top')) || 0;
 
-    document.documentElement.style.setProperty('--search-box-bottom', `${searchBoxHeight + bottomMenuTopVar}px`);
+    document.documentElement.style.setProperty('--search-box-bottom', `${searchBoxHeight + bottomMenuTop}px`);
   }
 
-  addListenerToCollapseElement(section: HTMLElement | null, isCollapsedRef: { value: boolean }): void {
+  addListenerToCollapseElement(section: HTMLElement | null, isCollapsedRef?: { value: boolean }): void {
     const collapseEl = getEl(`${section?.id}-collapse`);
     const collapseElParent = getEl(`${section?.id}-collapse`)?.parentElement;
 
@@ -125,7 +128,11 @@ export class SatInfoBox extends KeepTrackPlugin {
     collapseElParent.addEventListener('click', () => {
       section.classList.toggle('collapsed');
       collapseEl.classList.toggle('collapse-closed');
-      isCollapsedRef.value = !isCollapsedRef.value;
+
+      // Optional legacy ref support for callers that still track collapse state externally
+      if (isCollapsedRef) {
+        isCollapsedRef.value = !isCollapsedRef.value;
+      }
 
       if (collapseEl.classList.contains('collapse-closed')) {
         collapseEl.textContent = 'expand_more';
@@ -175,9 +182,44 @@ export class SatInfoBox extends KeepTrackPlugin {
     // Now that is is loaded, reset the sizing and location
     this.initPosition(getEl(SatInfoBox.containerId_), false);
 
-    this.addListenerToCollapseElement(getEl(`${SECTIONS.IDENTIFIERS}`), { value: this.isIdentifiersSectionCollapsed_ });
+    this.addListenerToCollapseElement(getEl(`${SECTIONS.IDENTIFIERS}`));
+    this.addCopyListeners_();
 
     EventBus.getInstance().emit(EventBusEvent.satInfoBoxAddListeners);
+  }
+
+  /** Wires the click-to-copy behavior on the NORAD and COSPAR identifier values. */
+  private addCopyListeners_(): void {
+    [EL.OBJNUM, EL.INTL_DES].forEach((elementId) => {
+      getEl(elementId, true)?.addEventListener('click', this.withClickSound(() => this.copyIdentifier_(elementId)));
+    });
+  }
+
+  /**
+   * Copies the displayed identifier value to the clipboard and confirms with a toast.
+   * Skips empty or "not available" values and degrades gracefully when the
+   * Clipboard API is unavailable (e.g. insecure contexts or older browsers).
+   */
+  private copyIdentifier_(elementId: string): void {
+    const value = getEl(elementId, true)?.textContent?.trim() ?? '';
+    const notAvailable = t7e('satInfoBox.notAvailable' as Parameters<typeof t7e>[0]);
+
+    if (!value || value === notAvailable) {
+      return;
+    }
+
+    // Feature-detect: jsdom and insecure contexts do not provide navigator.clipboard
+    if (!navigator.clipboard?.writeText) {
+      return;
+    }
+
+    navigator.clipboard.writeText(value).then(() => {
+      const message = t7e('satInfoBox.copy.copied' as Parameters<typeof t7e>[0]);
+
+      ServiceLocator.getUiManager().toast(message, ToastMsgType.normal);
+    }).catch(() => {
+      // Clipboard write was rejected (e.g. permissions); nothing to clean up
+    });
   }
 
   private createContainer(): void {
@@ -230,11 +272,13 @@ export class SatInfoBox extends KeepTrackPlugin {
         </div>
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key" kt-tooltip="${t7e('satInfoBox.Cospar.tooltip')}">${t7e('satInfoBox.Cospar.label')}</div>
-          <div class="sat-info-value" id="${EL.INTL_DES}">xxxx-xxxA</div>
+          <div class="sat-info-value sat-info-copyable" id="${EL.INTL_DES}"
+            kt-tooltip="${t7e('satInfoBox.copy.tooltip' as Parameters<typeof t7e>[0])}">xxxx-xxxA</div>
         </div>
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key" kt-tooltip="${t7e('satInfoBox.Norad.tooltip')}">${t7e('satInfoBox.Norad.label')}</div>
-          <div class="sat-info-value" id="${EL.OBJNUM}">99999</div>
+          <div class="sat-info-value sat-info-copyable" id="${EL.OBJNUM}"
+            kt-tooltip="${t7e('satInfoBox.copy.tooltip' as Parameters<typeof t7e>[0])}">99999</div>
         </div>
         ${settingsManager.plugins.SatInfoBoxObject?.isShowAltName !== false ? html`
         <div class="sat-info-row sat-only-info">
@@ -257,13 +301,18 @@ export class SatInfoBox extends KeepTrackPlugin {
     `;
   }
 
-  private updateHeaderData_(obj: BaseObject): void {
+  private updateHeaderData_(obj: BaseObject, retries = 0): void {
     if (!obj || obj.isStatic() || obj.isSensor()) {
       return;
     }
 
     if (!this.isHtmlReady_) {
-      setTimeout(() => this.updateHeaderData_(obj), 500);
+      if (retries >= SatInfoBox.MAX_HTML_READY_RETRIES_) {
+        errorManagerInstance.warn('SatInfoBox HTML never became ready; giving up on header update');
+
+        return;
+      }
+      setTimeout(() => this.updateHeaderData_(obj, retries + 1), 500);
 
       return;
     }
@@ -328,23 +377,25 @@ export class SatInfoBox extends KeepTrackPlugin {
      * getEl('edit-satinfo-link').innerHTML = "<a class='iframe' href='editor.htm?scc=" + sat.sccNum + "&popup=true'>Edit Satellite Info</a>";
      */
 
+    const notAvailable = t7e('satInfoBox.notAvailable' as Parameters<typeof t7e>[0]);
+
     if (obj.isMissile()) {
-      setInnerHtml(EL.INTL_DES, 'N/A');
-      setInnerHtml(EL.OBJNUM, 'N/A');
-      setInnerHtml(EL.SOURCE, 'N/A');
+      setInnerHtml(EL.INTL_DES, notAvailable);
+      setInnerHtml(EL.OBJNUM, notAvailable);
+      setInnerHtml(EL.SOURCE, notAvailable);
     } else if (obj instanceof OemSatellite) {
       const oemSat = obj as OemSatellite;
 
-      setInnerHtml(EL.INTL_DES, oemSat.intlDes || 'N/A');
-      setInnerHtml(EL.OBJNUM, oemSat.sccNum || 'N/A');
-      setInnerHtml(EL.SOURCE, oemSat.source || 'OEM File');
+      setInnerHtml(EL.INTL_DES, oemSat.intlDes || notAvailable);
+      setInnerHtml(EL.OBJNUM, oemSat.sccNum || notAvailable);
+      setInnerHtml(EL.SOURCE, oemSat.source || t7e('satInfoBox.oemFile' as Parameters<typeof t7e>[0]));
     } else {
       const sat = obj as Satellite;
 
-      setInnerHtml(EL.INTL_DES, sat.intlDes === 'none' ? 'N/A' : sat.intlDes);
+      setInnerHtml(EL.INTL_DES, sat.intlDes === 'none' ? notAvailable : sat.intlDes);
       if (sat.source && sat.source === CatalogSource.VIMPEL) {
-        setInnerHtml(EL.OBJNUM, 'N/A');
-        setInnerHtml(EL.INTL_DES, 'N/A');
+        setInnerHtml(EL.OBJNUM, notAvailable);
+        setInnerHtml(EL.INTL_DES, notAvailable);
       } else {
         setInnerHtml(EL.OBJNUM, sat.sccNum);
         // satObjNumDom.setAttribute('data-tooltip', `${FormatTle.convert6DigitToA5(sat.sccNum)}`);
@@ -388,16 +439,16 @@ export class SatInfoBox extends KeepTrackPlugin {
       const confidenceScore = parseInt(sat.tle1.substring(64, 65)) || 0;
 
       if (settingsManager.dataSources.externalTLEsOnly) {
-        text = 'External';
+        text = t7e('satInfoBox.Confidence.external' as Parameters<typeof t7e>[0]);
         color = 'gray';
       } else if (confidenceScore >= 7) {
-        text = `High (${confidenceScore})`;
+        text = `${t7e('satInfoBox.Confidence.high' as Parameters<typeof t7e>[0])} (${confidenceScore})`;
         color = 'green';
       } else if (confidenceScore >= 4) {
-        text = `Medium (${confidenceScore})`;
+        text = `${t7e('satInfoBox.Confidence.medium' as Parameters<typeof t7e>[0])} (${confidenceScore})`;
         color = 'orange';
       } else {
-        text = `Low (${confidenceScore})`;
+        text = `${t7e('satInfoBox.Confidence.low' as Parameters<typeof t7e>[0])} (${confidenceScore})`;
         color = 'red';
       }
 
@@ -406,7 +457,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
   }
 
-  private selectSat_(satInfoBox: SatInfoBox, obj?: BaseObject): void {
+  private selectSat_(satInfoBox: SatInfoBox, obj?: BaseObject, retries = 0): void {
     if (!obj) {
       return;
     }
@@ -416,7 +467,12 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
 
     if (!this.isHtmlReady_) {
-      setTimeout(() => this.selectSat_(satInfoBox, obj), 500);
+      if (retries >= SatInfoBox.MAX_HTML_READY_RETRIES_) {
+        errorManagerInstance.warn('SatInfoBox HTML never became ready; giving up on select update');
+
+        return;
+      }
+      setTimeout(() => this.selectSat_(satInfoBox, obj, retries + 1), 500);
 
       return;
     }
@@ -425,12 +481,12 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     const satInfoBoxDom = getEl(SatInfoBox.containerId_);
     // Get the height of the DOM
-    const searchBoxHeight = ServiceLocator.getUiManager().searchManager.isResultsOpen ? satInfoBoxDom?.getBoundingClientRect().height : 0;
-    const bottomMenuTopVar = document.documentElement.style.getPropertyValue('--bottom-menu-top').split('px')[0];
+    const searchBoxHeight = (ServiceLocator.getUiManager().searchManager.isResultsOpen ? satInfoBoxDom?.getBoundingClientRect().height : 0) ?? 0;
+    const bottomMenuTop = parseFloat(document.documentElement.style.getPropertyValue('--bottom-menu-top')) || 0;
     const curVal = document.documentElement.style.getPropertyValue('--search-box-bottom');
 
-    if (curVal !== `${searchBoxHeight + bottomMenuTopVar}px`) {
-      document.documentElement.style.setProperty('--search-box-bottom', `${searchBoxHeight + bottomMenuTopVar}px`);
+    if (curVal !== `${searchBoxHeight + bottomMenuTop}px`) {
+      document.documentElement.style.setProperty('--search-box-bottom', `${searchBoxHeight + bottomMenuTop}px`);
     }
 
     if (obj.isSatellite()) {

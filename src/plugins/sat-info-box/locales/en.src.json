@@ -23,7 +23,17 @@
     },
     "Confidence": {
       "label": "Confidence",
-      "tooltip": "Confidence Level of the Data (Higher Is Better) on a 1-10. Based on the source and age of the data"
+      "tooltip": "Confidence Level of the Data (Higher Is Better) on a 1-10. Based on the source and age of the data",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "external": "External"
+    },
+    "notAvailable": "N/A",
+    "oemFile": "OEM File",
+    "copy": {
+      "copied": "Copied to clipboard",
+      "tooltip": "Click to copy"
     }
   }
 }

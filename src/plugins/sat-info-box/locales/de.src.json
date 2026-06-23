@@ -23,7 +23,17 @@
     },
     "Confidence": {
       "label": "Vertrauen",
-      "tooltip": "Vertrauensniveau der Daten (je höher, desto besser) auf einer Skala von 1-10. Basierend auf Quelle und Alter der Daten"
+      "tooltip": "Vertrauensniveau der Daten (je höher, desto besser) auf einer Skala von 1-10. Basierend auf Quelle und Alter der Daten",
+      "high": "Hoch",
+      "medium": "Mittel",
+      "low": "Niedrig",
+      "external": "Extern"
+    },
+    "notAvailable": "N/V",
+    "oemFile": "OEM-Datei",
+    "copy": {
+      "copied": "In die Zwischenablage kopiert",
+      "tooltip": "Zum Kopieren klicken"
     }
   }
 }

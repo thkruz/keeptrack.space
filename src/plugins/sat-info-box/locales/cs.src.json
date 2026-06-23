@@ -23,7 +23,17 @@
     },
     "Confidence": {
       "label": "Spolehlivost",
-      "tooltip": "Úroveň spolehlivosti dat (vyšší je lepší) na stupnici 1-10. Na základě zdroje a stáří dat"
+      "tooltip": "Úroveň spolehlivosti dat (vyšší je lepší) na stupnici 1-10. Na základě zdroje a stáří dat",
+      "high": "Vysoká",
+      "medium": "Střední",
+      "low": "Nízká",
+      "external": "Externí"
+    },
+    "notAvailable": "N/A",
+    "oemFile": "Soubor OEM",
+    "copy": {
+      "copied": "Zkopírováno do schránky",
+      "tooltip": "Kliknutím zkopírujete"
     }
   }
 }

@@ -23,7 +23,17 @@
     },
     "Confidence": {
       "label": "Confianza",
-      "tooltip": "Nivel de Confianza de los Datos (Mayor es Mejor) en una escala de 1-10. Basado en la fuente y antigüedad de los datos"
+      "tooltip": "Nivel de Confianza de los Datos (Mayor es Mejor) en una escala de 1-10. Basado en la fuente y antigüedad de los datos",
+      "high": "Alta",
+      "medium": "Media",
+      "low": "Baja",
+      "external": "Externa"
+    },
+    "notAvailable": "N/D",
+    "oemFile": "Archivo OEM",
+    "copy": {
+      "copied": "Copiado al portapapeles",
+      "tooltip": "Haz clic para copiar"
     }
   }
 }

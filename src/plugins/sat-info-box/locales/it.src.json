@@ -23,7 +23,17 @@
     },
     "Confidence": {
       "label": "Affidabilità",
-      "tooltip": "Livello di affidabilità dei dati (più alto è meglio) su una scala da 1 a 10. Basato sulla fonte e sull'età dei dati"
+      "tooltip": "Livello di affidabilità dei dati (più alto è meglio) su una scala da 1 a 10. Basato sulla fonte e sull'età dei dati",
+      "high": "Alta",
+      "medium": "Media",
+      "low": "Bassa",
+      "external": "Esterna"
+    },
+    "notAvailable": "N/D",
+    "oemFile": "File OEM",
+    "copy": {
+      "copied": "Copiato negli appunti",
+      "tooltip": "Clicca per copiare"
     }
   }
 }

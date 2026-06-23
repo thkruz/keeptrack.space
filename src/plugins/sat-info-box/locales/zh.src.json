@@ -23,7 +23,17 @@
     },
     "Confidence": {
       "label": "置信度",
-      "tooltip": "数据置信度等级（越高越好），范围1-10。基于数据来源和数据时效"
+      "tooltip": "数据置信度等级（越高越好），范围1-10。基于数据来源和数据时效",
+      "high": "高",
+      "medium": "中",
+      "low": "低",
+      "external": "外部"
+    },
+    "notAvailable": "不适用",
+    "oemFile": "OEM文件",
+    "copy": {
+      "copied": "已复制到剪贴板",
+      "tooltip": "点击复制"
     }
   }
 }

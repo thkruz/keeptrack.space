@@ -110,10 +110,6 @@
   transform: rotate(-90deg);
 }
 
-#search-links {
-  margin-top: 0;
-}
-
 .sat-info-section,
 #sat-identifier-data,
 #orbital-section,
@@ -164,4 +160,14 @@
   line-height: 1.3;
   text-overflow: ellipsis;
   overflow: hidden;
+}
+
+/* Click-to-copy affordance on identifier values (NORAD / COSPAR) */
+.sat-info-copyable {
+  cursor: copy;
+}
+
+.sat-info-copyable:hover {
+  color: var(--color-dark-text-accent);
+  text-decoration: underline dotted;
 }

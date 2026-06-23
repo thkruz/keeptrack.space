@@ -4,6 +4,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -145,7 +146,7 @@ export class Calculator extends KeepTrackPlugin {
         <div class="row calc-control-row">
           <div class="input-field col s12">
             <label for="calc-input-frame">${l('labels.inputFrame')}</label>
-            <select id="calc-input-frame" class="browser-default">
+            <select id="calc-input-frame">
               ${Object.values(CoordFrame).map((f) =>
     `<option value="${f}" ${f === CoordFrame.J2000 ? 'selected' : ''}>${coordFrameLabel(f)}</option>`,
   ).join('')}
@@ -178,7 +179,7 @@ export class Calculator extends KeepTrackPlugin {
       <div class="row calc-control-row">
         <div class="input-field col s12">
           <label for="calc-output-format">${l('labels.outputFormat')}</label>
-          <select id="calc-output-format" class="browser-default">
+          <select id="calc-output-format">
             <option value="4" selected>${l('formats.fixed4')}</option>
             <option value="6">${l('formats.fixed6')}</option>
             <option value="8">${l('formats.fixed8')}</option>
@@ -204,6 +205,9 @@ export class Calculator extends KeepTrackPlugin {
         this.setupEventListeners_();
         this.rebuildInputFields_();
         this.rebuildOutputSections_();
+        // Render the frame/format selects as themed Materialize dropdowns (native
+        // <select> popups can't be themed and show an OS-blue hover).
+        initMaterialSelects(getEl('calculator-menu') ?? document.body);
       },
     );
   }

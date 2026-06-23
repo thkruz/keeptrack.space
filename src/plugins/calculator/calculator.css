@@ -4,14 +4,8 @@
   margin-bottom: 4px;
 }
 
-#calculator-menu .calc-control-row select.browser-default {
-  background-color: var(--color-dark-background);
-  color: var(--color-dark-text-accent);
-  border: 1px solid var(--color-dark-border);
-  border-radius: 2px;
-  padding: 4px 8px;
-  height: 2.5rem;
-  font-size: 13px;
+#calculator-menu .calc-control-row .select-wrapper {
+  width: 100%;
 }
 
 #calculator-menu .calc-control-row label {

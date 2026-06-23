@@ -50,6 +50,12 @@
         "yinhe": "Yinhe",
         "hanwha": "Hanwha"
       },
+      "sections": {
+        "constellations": "Konstellationen",
+        "statistics": "Statistiken",
+        "results": "Ergebnisse",
+        "filters": "Filter"
+      },
       "stats": {
         "satellites": "Satelliten",
         "avgAltitude": "Ø Höhe",

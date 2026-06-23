@@ -50,6 +50,12 @@
         "yinhe": "银河",
         "hanwha": "韩华（Hanwha）"
       },
+      "sections": {
+        "constellations": "星座",
+        "statistics": "统计",
+        "results": "结果",
+        "filters": "筛选"
+      },
       "stats": {
         "satellites": "卫星",
         "avgAltitude": "平均高度",

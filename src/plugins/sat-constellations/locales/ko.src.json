@@ -50,6 +50,12 @@
         "yinhe": "은하 (Yinhe)",
         "hanwha": "한화"
       },
+      "sections": {
+        "constellations": "위성군",
+        "statistics": "통계",
+        "results": "결과",
+        "filters": "필터"
+      },
       "stats": {
         "satellites": "위성",
         "avgAltitude": "평균 고도",

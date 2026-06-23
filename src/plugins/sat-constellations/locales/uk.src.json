@@ -50,6 +50,12 @@
         "yinhe": "Іньхе (Yinhe)",
         "hanwha": "Hanwha"
       },
+      "sections": {
+        "constellations": "Угруповання",
+        "statistics": "Статистика",
+        "results": "Результати",
+        "filters": "Фільтри"
+      },
       "stats": {
         "satellites": "Супутники",
         "avgAltitude": "Сер висота",

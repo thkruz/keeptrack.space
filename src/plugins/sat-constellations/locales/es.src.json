@@ -50,6 +50,12 @@
         "yinhe": "Yinhe",
         "hanwha": "Hanwha"
       },
+      "sections": {
+        "constellations": "Constelaciones",
+        "statistics": "Estadísticas",
+        "results": "Resultados",
+        "filters": "Filtros"
+      },
       "stats": {
         "satellites": "Satélites",
         "avgAltitude": "Alt Media",

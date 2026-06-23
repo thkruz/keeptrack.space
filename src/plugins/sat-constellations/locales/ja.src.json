@@ -50,6 +50,12 @@
         "yinhe": "銀河（Yinhe）",
         "hanwha": "Hanwha"
       },
+      "sections": {
+        "constellations": "コンステレーション",
+        "statistics": "統計",
+        "results": "結果",
+        "filters": "フィルター"
+      },
       "stats": {
         "satellites": "衛星",
         "avgAltitude": "平均高度",

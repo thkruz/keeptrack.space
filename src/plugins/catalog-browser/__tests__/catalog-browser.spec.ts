@@ -49,8 +49,9 @@ test.describe('CatalogBrowserPlugin', () => {
 
     await expect(catalogList).toBeVisible();
 
-    // Should have category headers (KeepTrack + 7 CelesTrack categories)
-    const categoryHeaders = catalogList.locator('.cb-category-header');
+    // Should have category headers (KeepTrack + 7 CelesTrack categories).
+    // Each v13 category card carries exactly one .kt-section-label.
+    const categoryHeaders = catalogList.locator('.kt-section-label');
 
     await expect(categoryHeaders).toHaveCount(8); // keeptrack, special, debris, weather, comms, nav, science, military
 

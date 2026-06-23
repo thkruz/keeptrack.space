@@ -4,6 +4,7 @@
       "bottomIconLabel": "Couleurs",
       "title": "Schémas de Couleurs",
       "rmbLabel": "Schéma de Couleurs",
+      "sectionLabel": "Schémas",
       "help": {
         "overview": "Le menu Schémas de Couleurs change la façon dont chaque objet de la scène est coloré. Chaque schéma encode une propriété différente : pays d'origine, type d'objet, régime orbital, éclairage solaire, vitesse et plus encore. Choisir le bon schéma transforme le nuage de points en réponse à une question précise.",
         "imgAlt": "Le menu Schémas de Couleurs avec la liste des schémas disponibles",

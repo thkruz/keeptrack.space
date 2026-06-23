@@ -4,6 +4,7 @@
       "bottomIconLabel": "Kolory",
       "title": "Schematy kolorów",
       "rmbLabel": "Schemat kolorów",
+      "sectionLabel": "Schematy",
       "help": {
         "overview": "Menu Schematy kolorów zmienia sposób kolorowania każdego obiektu w scenie. Każdy schemat koduje inną właściwość: kraj pochodzenia, typ obiektu, reżim orbitalny, oświetlenie słoneczne, prędkość i inne, więc wybór właściwego schematu zamienia chmurę punktów w odpowiedź na konkretne pytanie.",
         "imgAlt": "Menu Schematy kolorów z listą dostępnych schematów",

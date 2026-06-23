@@ -4,6 +4,7 @@
       "bottomIconLabel": "Colori",
       "title": "Schemi di Colore",
       "rmbLabel": "Schema di Colore",
+      "sectionLabel": "Schemi",
       "help": {
         "overview": "Il menu Schemi di Colore cambia il modo in cui ogni oggetto della scena viene colorato. Ogni schema codifica una proprietà diversa: paese di origine, tipo di oggetto, regime orbitale, illuminazione solare, velocità e altro. Scegliere lo schema giusto trasforma la nuvola di punti nella risposta a una domanda precisa.",
         "imgAlt": "Il menu Schemi di Colore con l'elenco degli schemi disponibili",

@@ -4,6 +4,7 @@
       "bottomIconLabel": "Farben",
       "title": "Farbschemata",
       "rmbLabel": "Farbschema",
+      "sectionLabel": "Schemata",
       "help": {
         "overview": "Das Menü Farbschemata ändert, wie jedes Objekt in der Szene eingefärbt wird. Jedes Schema kodiert eine andere Eigenschaft: Herkunftsland, Objekttyp, Orbitalregime, Sonnenlichtstatus, Geschwindigkeit und mehr. Mit dem richtigen Schema wird die Punktwolke zur Antwort auf eine konkrete Frage.",
         "imgAlt": "Das Menü Farbschemata mit den verfügbaren Schemata",

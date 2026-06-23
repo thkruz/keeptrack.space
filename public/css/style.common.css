@@ -2289,11 +2289,6 @@ button.ui-button::-moz-focus-inner {
 
 /* ========== Navigation and Menus ========== */
 
-#colors-menu ul li {
-  text-align: center;
-  padding: 2px !important;
-}
-
 #constellation-menu ul li {
   text-align: center;
   padding: 2px !important;

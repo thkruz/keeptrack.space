@@ -215,8 +215,8 @@ describe('ColorMenu_class', () => {
       // Emit uiManagerFinal to attach event listeners
       EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
 
-      // Create a list of elements based on the li elements with data-color attributes
-      const elements = Array.from(KeepTrack.getInstance().containerRoot.querySelectorAll<HTMLElement>('li[data-color]'));
+      // Create a list of elements based on the v13 action rows with data-color attributes
+      const elements = Array.from(KeepTrack.getInstance().containerRoot.querySelectorAll<HTMLElement>('.colors-menu-item[data-color]'));
 
       // Click each element and make sure no errors are thrown
       elements.forEach((element) => {

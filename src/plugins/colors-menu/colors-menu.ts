@@ -23,6 +23,7 @@ import { t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
 import palettePng from '@public/img/icons/palette.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import './colors-menu.css';
 
 export class ColorMenu extends KeepTrackPlugin implements ICommandPaletteCapable {
   readonly id = 'ColorMenu';
@@ -58,11 +59,14 @@ export class ColorMenu extends KeepTrackPlugin implements ICommandPaletteCapable
 
   private buildSideMenuHtml_(): string {
     return html`
-      <div id="color-scheme-menu" class="side-menu-parent start-hidden">
+      <div id="color-scheme-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div id="colors-menu" class="side-menu">
-          <ul>
-            ${this.buildColorSchemeList_()}
-          </ul>
+          <section class="kt-section">
+            <div class="kt-section-label">${t7e('plugins.ColorMenu.sectionLabel')}</div>
+            <div id="colors-menu-list" class="colors-menu-list">
+              ${this.buildColorSchemeList_()}
+            </div>
+          </section>
         </div>
       </div>
     `;
@@ -77,7 +81,10 @@ export class ColorMenu extends KeepTrackPlugin implements ICommandPaletteCapable
         continue;
       }
 
-      result += `<li class="menu-selectable" data-color="${colorSchemes[colorScheme].id}">${colorSchemes[colorScheme].label}</li>`;
+      result += '<button type="button" class="kt-action waves-effect colors-menu-item" ' +
+        `data-color="${colorSchemes[colorScheme].id}">` +
+        `<span class="kt-action-label">${colorSchemes[colorScheme].label}</span>` +
+        '</button>';
     }
 
     return result;
@@ -203,15 +210,15 @@ export class ColorMenu extends KeepTrackPlugin implements ICommandPaletteCapable
   }
 
   private uiManagerFinal_(): void {
-    getEl('colors-menu')
-      ?.querySelectorAll('li')
-      .forEach((element) => {
-        element.addEventListener('click', () => {
-          const colorName = element.dataset.color;
+    getEl('colors-menu-list')?.addEventListener('click', (evt: Event) => {
+      const target = (evt.target as HTMLElement).closest('.colors-menu-item') as HTMLElement | null;
 
-          ColorMenu.colorsMenuClick(colorName ?? '');
-        });
-      });
+      if (!target) {
+        return;
+      }
+
+      ColorMenu.colorsMenuClick(target.dataset.color ?? '');
+    });
   }
 
   // =========================================================================

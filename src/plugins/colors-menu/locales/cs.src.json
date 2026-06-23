@@ -4,6 +4,7 @@
       "bottomIconLabel": "Barvy",
       "title": "Barevná schémata",
       "rmbLabel": "Barevné schéma",
+      "sectionLabel": "Schémata",
       "help": {
         "overview": "Nabídka Barevná schémata mění způsob, jakým je obarven každý objekt ve scéně. Každé schéma kóduje jinou vlastnost: zemi původu, typ objektu, orbitální režim, osvětlení Sluncem, rychlost a další, takže výběr správného schématu promění mračno bodů v odpověď na konkrétní otázku.",
         "imgAlt": "Nabídka Barevná schémata se seznamem dostupných schémat",

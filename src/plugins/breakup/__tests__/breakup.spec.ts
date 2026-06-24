@@ -47,5 +47,11 @@ test.describe('Breakup Plugin', () => {
     await expect(page.locator('#hc-per')).toBeAttached();
     await expect(page.locator('#hc-raan')).toBeAttached();
     await expect(page.locator('#hc-count')).toBeAttached();
+
+    // v13 UI markup: marker class, eccentricity control, and the create/clear actions.
+    await expect(sideMenu).toHaveClass(/kt-ui-v13/u);
+    await expect(page.locator('#hc-ecc')).toBeAttached();
+    await expect(page.locator('#breakup-create-btn')).toBeAttached();
+    await expect(page.locator('#breakup-clear-btn')).toBeAttached();
   });
 });

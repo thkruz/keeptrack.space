@@ -145,4 +145,7 @@ export enum StorageKey {
 
   // Proximity Ops (last-used search inputs: thresholds, orbit type, toggles)
   PROXIMITY_OPS_SETTINGS = 'v2-keepTrack-proximityOpsSettings',
+
+  // Breakup (last-used variation inputs: inc/period/RAAN/ecc spread, count, start number)
+  BREAKUP_SETTINGS = 'v2-keepTrack-breakupSettings',
 }

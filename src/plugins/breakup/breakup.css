@@ -1,0 +1,45 @@
+/*
+ * Breakup menu - v13 dense-form fixes.
+ *
+ * The Spread card stacks more than one labelled `.kt-field-row`, and the Create
+ * and Clear actions are standalone (direct children of the form, not nested in a
+ * .kt-section), so this menu needs the three dense-form rules from
+ * docs-local/ui/v13-menu-style.md.
+ */
+
+/* 1. Stacked-field headroom. Give stacked rows room so the floating "active"
+ *    label does not collide with the row (or section label) above. */
+#breakup-menu .kt-field-row .input-field.col {
+  margin-top: 20px;
+}
+#breakup-menu .kt-section-label + .kt-field-row .input-field.col {
+  margin-top: 8px;
+}
+
+/* 2. Standalone primary/secondary action width. The Create and Clear buttons are
+ *    direct children of #breakup (not inside a .kt-section), so width:100% runs
+ *    them 12px past the inset cards. Subtract the side margins (border-box) so
+ *    their edges line up with the cards. */
+#breakup > .kt-action {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
+}
+
+/* 3. Focus indication. Swap the app-wide :focus-visible outline (which overlaps
+ *    the floating label above each field) for KeepTrack's underline. */
+#breakup-menu .input-field input:focus,
+#breakup-menu .input-field textarea:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+#breakup-menu .input-field input:focus-visible,
+#breakup-menu .input-field textarea:focus-visible {
+  outline: none;
+}
+
+/* Clear Breakup is a destructive/undo action - tint its label so it reads apart
+ *    from the primary Create action. */
+#breakup-clear-btn .kt-action-label {
+  color: var(--color-danger, #ff5252);
+}

@@ -15,7 +15,17 @@
         "tip3": "Änderungen gelten nur für die Sitzung und berühren nie den echten Katalog. Laden Sie die Seite neu, um die ursprüngliche Umlaufbahn wiederherzustellen.",
         "shortcutToggle": "Das Menü 'Satellit bearbeiten' umschalten"
       },
+      "sections": {
+        "identity": "Identität",
+        "epoch": "Epoche",
+        "elements": "Bahnelemente",
+        "calculated": "Berechnete Parameter",
+        "actions": "Aktionen"
+      },
       "labels": {
+        "apogeeKm": "Apogäum (km)",
+        "perigeeKm": "Perigäum (km)",
+        "periodMin": "Periode (min)",
         "scc": "Satellit SCC#",
         "country": "Land",
         "epochYear": "Epochenjahr",
@@ -30,6 +40,7 @@
         "error": "Fehler"
       },
       "buttons": {
+        "resetOriginal": "Auf Original zurücksetzen",
         "updateSatellite": "Satellit aktualisieren",
         "updateEpoch": "Epoche auf Jetzt aktualisieren",
         "saveTle": "TLE speichern",

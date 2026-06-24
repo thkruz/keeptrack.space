@@ -15,7 +15,17 @@
         "tip3": "Les modifications ne durent que la session et ne touchent jamais le vrai catalogue. Rechargez la page pour restaurer l'orbite d'origine.",
         "shortcutToggle": "Basculer le menu Modifier le satellite"
       },
+      "sections": {
+        "identity": "Identité",
+        "epoch": "Époque",
+        "elements": "Éléments orbitaux",
+        "calculated": "Paramètres calculés",
+        "actions": "Actions"
+      },
       "labels": {
+        "apogeeKm": "Apogée (km)",
+        "perigeeKm": "Périgée (km)",
+        "periodMin": "Période (min)",
         "scc": "SCC# du satellite",
         "country": "Pays",
         "epochYear": "Année de l'époque",
@@ -30,6 +40,7 @@
         "error": "Erreur"
       },
       "buttons": {
+        "resetOriginal": "Réinitialiser à l'original",
         "updateSatellite": "Mettre à jour le satellite",
         "updateEpoch": "Mettre l'époque à maintenant",
         "saveTle": "Enregistrer TLE",

@@ -15,7 +15,17 @@
         "tip3": "编辑仅在本次会话中有效，绝不会影响真实目录；重新加载页面即可恢复原始轨道。",
         "shortcutToggle": "切换编辑卫星菜单"
       },
+      "sections": {
+        "identity": "标识",
+        "epoch": "历元",
+        "elements": "轨道根数",
+        "calculated": "计算参数",
+        "actions": "操作"
+      },
       "labels": {
+        "apogeeKm": "远地点 (km)",
+        "perigeeKm": "近地点 (km)",
+        "periodMin": "周期 (分钟)",
         "scc": "卫星 SCC#",
         "country": "国家",
         "epochYear": "历元年份",
@@ -30,6 +40,7 @@
         "error": "错误"
       },
       "buttons": {
+        "resetOriginal": "重置为原始值",
         "updateSatellite": "更新卫星",
         "updateEpoch": "将历元更新为当前时间",
         "saveTle": "保存 TLE",

@@ -15,7 +15,17 @@
         "tip3": "Edits are session-only and never touch the real catalog. Reload the page to restore the original orbit.",
         "shortcutToggle": "Toggle the Edit Satellite menu"
       },
+      "sections": {
+        "identity": "Identity",
+        "epoch": "Epoch",
+        "elements": "Orbital Elements",
+        "calculated": "Calculated Parameters",
+        "actions": "Actions"
+      },
       "labels": {
+        "apogeeKm": "Apogee (km)",
+        "perigeeKm": "Perigee (km)",
+        "periodMin": "Period (min)",
         "scc": "Satellite SCC#",
         "country": "Country",
         "epochYear": "Epoch Year",
@@ -30,6 +40,7 @@
         "error": "Error"
       },
       "buttons": {
+        "resetOriginal": "Reset to Original",
         "updateSatellite": "Update Satellite",
         "updateEpoch": "Update Epoch to Now",
         "saveTle": "Save TLE",

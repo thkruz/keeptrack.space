@@ -15,7 +15,17 @@
         "tip3": "Úpravy platí pouze pro aktuální relaci a nikdy se nedotknou skutečného katalogu. Pro obnovení původní dráhy stránku znovu načtěte.",
         "shortcutToggle": "Přepnout menu úpravy satelitu"
       },
+      "sections": {
+        "identity": "Identita",
+        "epoch": "Epocha",
+        "elements": "Orbitální elementy",
+        "calculated": "Vypočtené parametry",
+        "actions": "Akce"
+      },
       "labels": {
+        "apogeeKm": "Apogeum (km)",
+        "perigeeKm": "Perigeum (km)",
+        "periodMin": "Perioda (min)",
         "scc": "SCC# satelitu",
         "country": "Země",
         "epochYear": "Rok epochy",
@@ -30,6 +40,7 @@
         "error": "Chyba"
       },
       "buttons": {
+        "resetOriginal": "Obnovit původní",
         "updateSatellite": "Aktualizovat satelit",
         "updateEpoch": "Aktualizovat epochu na nyní",
         "saveTle": "Uložit TLE",

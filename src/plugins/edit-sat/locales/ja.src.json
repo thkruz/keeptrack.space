@@ -15,7 +15,17 @@
         "tip3": "編集はセッション内のみ有効で、実際のカタログには決して影響しません。ページを再読み込みすると元の軌道に戻ります。",
         "shortcutToggle": "衛星編集メニューの表示を切り替え"
       },
+      "sections": {
+        "identity": "識別情報",
+        "epoch": "元期",
+        "elements": "軌道要素",
+        "calculated": "計算パラメータ",
+        "actions": "操作"
+      },
       "labels": {
+        "apogeeKm": "遠地点 (km)",
+        "perigeeKm": "近地点 (km)",
+        "periodMin": "周期 (分)",
         "scc": "衛星 SCC#",
         "country": "国",
         "epochYear": "エポック年",
@@ -30,6 +40,7 @@
         "error": "エラー"
       },
       "buttons": {
+        "resetOriginal": "元に戻す",
         "updateSatellite": "衛星を更新",
         "updateEpoch": "エポックを現在に更新",
         "saveTle": "TLEを保存",

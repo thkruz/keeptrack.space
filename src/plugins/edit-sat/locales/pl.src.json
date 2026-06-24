@@ -15,7 +15,17 @@
         "tip3": "Edycje obowiązują tylko w bieżącej sesji i nigdy nie zmieniają prawdziwego katalogu. Przeładuj stronę, aby przywrócić pierwotną orbitę.",
         "shortcutToggle": "Przełącz menu edycji satelity"
       },
+      "sections": {
+        "identity": "Tożsamość",
+        "epoch": "Epoka",
+        "elements": "Elementy orbitalne",
+        "calculated": "Obliczone parametry",
+        "actions": "Akcje"
+      },
       "labels": {
+        "apogeeKm": "Apogeum (km)",
+        "perigeeKm": "Perygeum (km)",
+        "periodMin": "Okres (min)",
         "scc": "Numer SCC satelity",
         "country": "Kraj",
         "epochYear": "Rok epoki",
@@ -30,6 +40,7 @@
         "error": "Błąd"
       },
       "buttons": {
+        "resetOriginal": "Przywróć oryginał",
         "updateSatellite": "Aktualizuj satelitę",
         "updateEpoch": "Aktualizuj epokę do teraz",
         "saveTle": "Zapisz TLE",

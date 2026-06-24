@@ -15,7 +15,17 @@
         "tip3": "편집 내용은 세션 동안만 유지되며 실제 카탈로그에는 절대 영향을 주지 않습니다. 페이지를 새로 고치면 원래 궤도가 복원됩니다.",
         "shortcutToggle": "위성 편집 메뉴 전환"
       },
+      "sections": {
+        "identity": "식별 정보",
+        "epoch": "기준 시각",
+        "elements": "궤도 요소",
+        "calculated": "계산된 매개변수",
+        "actions": "작업"
+      },
       "labels": {
+        "apogeeKm": "원지점 (km)",
+        "perigeeKm": "근지점 (km)",
+        "periodMin": "주기 (분)",
         "scc": "위성 SCC#",
         "country": "국가",
         "epochYear": "에포크 연도",
@@ -30,6 +40,7 @@
         "error": "오류"
       },
       "buttons": {
+        "resetOriginal": "원본으로 재설정",
         "updateSatellite": "위성 업데이트",
         "updateEpoch": "에포크를 현재로 업데이트",
         "saveTle": "TLE 저장",

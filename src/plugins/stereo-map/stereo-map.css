@@ -1,6 +1,8 @@
 #map-menu-secondary {
   z-index: 5 !important;
-  left: 0px !important;
+  /* Clear the plugin-drawer rail on the left instead of pinning at 0 (where the
+     drawer would cover the settings panel). --drawer-offset tracks the rail width. */
+  left: var(--drawer-offset, 0px) !important;
   width: 280px;
   transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }

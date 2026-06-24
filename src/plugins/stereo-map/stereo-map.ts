@@ -52,6 +52,7 @@ import satellite2 from '@public/img/satellite-2.png';
 import yellowSquare from '@public/img/yellow-square.png';
 
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { Classification } from '@app/app/ui/classification';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -523,34 +524,15 @@ export class StereoMap extends KeepTrackPlugin {
       }
     }
 
-    // Draw classification text
-    if (settingsManager.classificationStr !== '') {
+    // Draw classification text. Use the canonical Classification helper, which
+    // matches with startsWith() so classifications carrying caveats (e.g.
+    // "Unclassified//FOUO") resolve to a color instead of throwing.
+    if (Classification.isValidClassification(settingsManager.classificationStr)) {
       ctx.font = '24px nasalization';
-      const textWidth = ctx.measureText(settingsManager.classificationStr ?? '').width;
+      const textWidth = ctx.measureText(settingsManager.classificationStr).width;
 
       ctx.globalAlpha = 1.0;
-      switch (settingsManager.classificationStr) {
-        case 'Top Secret//SCI':
-          ctx.fillStyle = '#fce93a';
-          break;
-        case 'Top Secret':
-          ctx.fillStyle = '#ff8c00';
-          break;
-        case 'Secret':
-          ctx.fillStyle = '#ff0000';
-          break;
-        case 'Confidential':
-          ctx.fillStyle = '#0033a0';
-          break;
-        case 'CUI':
-          ctx.fillStyle = '#512b85';
-          break;
-        case 'Unclassified':
-          ctx.fillStyle = '#007a33';
-          break;
-        default:
-          throw new Error('Invalid classification');
-      }
+      ctx.fillStyle = Classification.getColors(settingsManager.classificationStr).backgroundColor;
       ctx.fillText(settingsManager.classificationStr, cw / 2 - textWidth, ch - 20);
       ctx.fillText(settingsManager.classificationStr, cw / 2 - textWidth, 34);
     }

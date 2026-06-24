@@ -3,7 +3,75 @@
     "BreakupAnalysis": {
       "bottomIconLabel": "Analisi frammentazione",
       "title": "Analisi frammentazione",
-      "helpBody": "Il plugin Analisi frammentazione fornisce un database dei principali eventi di frammentazione satellitare nella storia. Seleziona un evento per visualizzare informazioni dettagliate, incluso l'oggetto principale, la causa della frammentazione, la cronologia dal lancio alla frammentazione e l'analisi della dispersione dei frammenti. Il plugin cerca nel catalogo attuale i detriti tracciati corrispondenti a ciascun evento e visualizza analisi statistiche degli intervalli di altitudine, eccentricità e distribuzioni di inclinazione."
+      "helpBody": "Il plugin Analisi frammentazione fornisce un database dei principali eventi di frammentazione satellitare nella storia. Seleziona un evento per visualizzare informazioni dettagliate, incluso l'oggetto principale, la causa della frammentazione, la cronologia dal lancio alla frammentazione e l'analisi della dispersione dei frammenti. Il plugin cerca nel catalogo attuale i detriti tracciati corrispondenti a ciascun evento e visualizza analisi statistiche degli intervalli di altitudine, eccentricità e distribuzioni di inclinazione.",
+      "sections": {
+        "events": "Eventi",
+        "debrisStatistics": "Statistiche detriti",
+        "fragmentDispersion": "Analisi dispersione frammenti",
+        "trackedFragments": "Frammenti tracciati",
+        "gabbardDiagram": "Diagramma di Gabbard",
+        "actions": "Azioni"
+      },
+      "actions": {
+        "backToEvents": "Torna agli eventi",
+        "jumpToDate": "Vai alla data di frammentazione",
+        "selectParent": "Seleziona oggetto principale",
+        "exportCsv": "Esporta frammenti (CSV)",
+        "showAll": "Mostra tutti i frammenti",
+        "showFewer": "Mostra meno frammenti"
+      },
+      "gabbard": {
+        "apogee": "Apogeo",
+        "perigee": "Perigeo",
+        "periodAxis": "Periodo (min)",
+        "altitudeAxis": "Altitudine (km)"
+      },
+      "commands": {
+        "open": "Apri Analisi frammentazione",
+        "export": "Esporta frammenti di frammentazione (CSV)"
+      },
+      "labels": {
+        "event": "Evento",
+        "date": "Data",
+        "cause": "Causa",
+        "altKm": "Alt (km)",
+        "estDebris": "Detriti stim.",
+        "parentObject": "Oggetto principale",
+        "country": "Paese",
+        "orbitType": "Tipo di orbita",
+        "breakupAltitude": "Altitudine di frammentazione",
+        "launchDate": "Data di lancio",
+        "breakupDate": "Data di frammentazione",
+        "timeToBreakup": "Tempo alla frammentazione",
+        "years": "anni",
+        "km": "km",
+        "trackedDebris": "Detriti tracciati",
+        "estimatedTotal": "Totale stimato",
+        "trackingRatio": "Rapporto di tracciamento",
+        "typeBreakdown": "Carichi utili / Corpi di razzo / Detriti",
+        "parameter": "Parametro",
+        "min": "Min",
+        "max": "Max",
+        "mean": "Media",
+        "spread": "Dispersione",
+        "perigeeParam": "Perigeo (km)",
+        "apogeeParam": "Apogeo (km)",
+        "eccentricityParam": "Eccentricità",
+        "inclinationParam": "Inclinazione (°)",
+        "noTrackedDebris": "Nessun detrito tracciato trovato nel catalogo attuale per questo evento.",
+        "showingOf": "(mostrati {shown} di {total})",
+        "norad": "NORAD",
+        "name": "Nome",
+        "type": "Tipo",
+        "perigee": "Perigeo",
+        "apogee": "Apogeo",
+        "incDeg": "Inc (°)",
+        "ecc": "Ecc"
+      },
+      "errorMsgs": {
+        "parentNotFound": "L'oggetto principale non è nel catalogo attuale.",
+        "noDataToExport": "Nessun frammento tracciato da esportare."
+      }
     }
   }
 }

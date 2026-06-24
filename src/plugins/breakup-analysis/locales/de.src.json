@@ -3,7 +3,75 @@
     "BreakupAnalysis": {
       "bottomIconLabel": "Zerfall-Analyse",
       "title": "Zerfall-Analyse",
-      "helpBody": "Das Zerfall-Analyse-Plugin bietet eine Datenbank der wichtigsten Satelliten-Zerfallereignisse in der Geschichte. Wählen Sie ein Ereignis aus, um detaillierte Informationen einschließlich des Ursprungsobjekts, der Zerfallursache, des Zeitrahmens vom Start bis zum Zerfall und der Trümmerverteilungsanalyse anzuzeigen. Das Plugin durchsucht den aktuellen Katalog nach verfolgten Trümmern, die mit jedem Ereignis übereinstimmen, und zeigt statistische Analysen der Höhenbereiche, Exzentrizität und Neigungsverteilungen an."
+      "helpBody": "Das Zerfall-Analyse-Plugin bietet eine Datenbank der wichtigsten Satelliten-Zerfallereignisse in der Geschichte. Wählen Sie ein Ereignis aus, um detaillierte Informationen einschließlich des Ursprungsobjekts, der Zerfallursache, des Zeitrahmens vom Start bis zum Zerfall und der Trümmerverteilungsanalyse anzuzeigen. Das Plugin durchsucht den aktuellen Katalog nach verfolgten Trümmern, die mit jedem Ereignis übereinstimmen, und zeigt statistische Analysen der Höhenbereiche, Exzentrizität und Neigungsverteilungen an.",
+      "sections": {
+        "events": "Ereignisse",
+        "debrisStatistics": "Trümmerstatistik",
+        "fragmentDispersion": "Fragment-Streuungsanalyse",
+        "trackedFragments": "Verfolgte Fragmente",
+        "gabbardDiagram": "Gabbard-Diagramm",
+        "actions": "Aktionen"
+      },
+      "actions": {
+        "backToEvents": "Zurück zu den Ereignissen",
+        "jumpToDate": "Zum Zerfallsdatum springen",
+        "selectParent": "Ursprungsobjekt auswählen",
+        "exportCsv": "Fragmente exportieren (CSV)",
+        "showAll": "Alle Fragmente anzeigen",
+        "showFewer": "Weniger Fragmente anzeigen"
+      },
+      "gabbard": {
+        "apogee": "Apogäum",
+        "perigee": "Perigäum",
+        "periodAxis": "Periode (min)",
+        "altitudeAxis": "Höhe (km)"
+      },
+      "commands": {
+        "open": "Zerfall-Analyse öffnen",
+        "export": "Zerfallsfragmente exportieren (CSV)"
+      },
+      "labels": {
+        "event": "Ereignis",
+        "date": "Datum",
+        "cause": "Ursache",
+        "altKm": "Höhe (km)",
+        "estDebris": "Gesch. Trümmer",
+        "parentObject": "Ursprungsobjekt",
+        "country": "Land",
+        "orbitType": "Orbittyp",
+        "breakupAltitude": "Zerfallshöhe",
+        "launchDate": "Startdatum",
+        "breakupDate": "Zerfallsdatum",
+        "timeToBreakup": "Zeit bis zum Zerfall",
+        "years": "Jahre",
+        "km": "km",
+        "trackedDebris": "Verfolgte Trümmer",
+        "estimatedTotal": "Geschätzte Gesamtzahl",
+        "trackingRatio": "Verfolgungsverhältnis",
+        "typeBreakdown": "Nutzlasten / Raketenkörper / Trümmer",
+        "parameter": "Parameter",
+        "min": "Min",
+        "max": "Max",
+        "mean": "Mittelwert",
+        "spread": "Streuung",
+        "perigeeParam": "Perigäum (km)",
+        "apogeeParam": "Apogäum (km)",
+        "eccentricityParam": "Exzentrizität",
+        "inclinationParam": "Neigung (°)",
+        "noTrackedDebris": "Im aktuellen Katalog wurden für dieses Ereignis keine verfolgten Trümmer gefunden.",
+        "showingOf": "(zeige {shown} von {total})",
+        "norad": "NORAD",
+        "name": "Name",
+        "type": "Typ",
+        "perigee": "Perigäum",
+        "apogee": "Apogäum",
+        "incDeg": "Neig. (°)",
+        "ecc": "Exz."
+      },
+      "errorMsgs": {
+        "parentNotFound": "Das Ursprungsobjekt befindet sich nicht im aktuellen Katalog.",
+        "noDataToExport": "Keine verfolgten Fragmente zum Exportieren vorhanden."
+      }
     }
   }
 }

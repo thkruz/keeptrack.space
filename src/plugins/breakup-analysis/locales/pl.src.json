@@ -3,7 +3,75 @@
     "BreakupAnalysis": {
       "bottomIconLabel": "Analiza rozpadu",
       "title": "Analiza rozpadu",
-      "helpBody": "Wtyczka Analiza rozpadu udostępnia bazę danych głównych wydarzeń rozpadu satelitów w historii. Wybierz wydarzenie, aby wyświetlić szczegółowe informacje, w tym obiekt macierzysty, przyczynę rozpadu, oś czasu od startu do rozpadu oraz analizę rozproszenia fragmentów. Wtyczka przeszukuje bieżący katalog w poszukiwaniu śledzonych odłamków pasujących do każdego wydarzenia i wyświetla analizę statystyczną zakresów wysokości, mimośrodu oraz rozkładów inklinacji."
+      "helpBody": "Wtyczka Analiza rozpadu udostępnia bazę danych głównych wydarzeń rozpadu satelitów w historii. Wybierz wydarzenie, aby wyświetlić szczegółowe informacje, w tym obiekt macierzysty, przyczynę rozpadu, oś czasu od startu do rozpadu oraz analizę rozproszenia fragmentów. Wtyczka przeszukuje bieżący katalog w poszukiwaniu śledzonych odłamków pasujących do każdego wydarzenia i wyświetla analizę statystyczną zakresów wysokości, mimośrodu oraz rozkładów inklinacji.",
+      "sections": {
+        "events": "Wydarzenia",
+        "debrisStatistics": "Statystyka odłamków",
+        "fragmentDispersion": "Analiza rozproszenia fragmentów",
+        "trackedFragments": "Śledzone fragmenty",
+        "gabbardDiagram": "Diagram Gabbarda",
+        "actions": "Akcje"
+      },
+      "actions": {
+        "backToEvents": "Powrót do wydarzeń",
+        "jumpToDate": "Przejdź do daty rozpadu",
+        "selectParent": "Wybierz obiekt macierzysty",
+        "exportCsv": "Eksportuj fragmenty (CSV)",
+        "showAll": "Pokaż wszystkie fragmenty",
+        "showFewer": "Pokaż mniej fragmentów"
+      },
+      "gabbard": {
+        "apogee": "Apogeum",
+        "perigee": "Perygeum",
+        "periodAxis": "Okres (min)",
+        "altitudeAxis": "Wysokość (km)"
+      },
+      "commands": {
+        "open": "Otwórz Analizę rozpadu",
+        "export": "Eksportuj fragmenty rozpadu (CSV)"
+      },
+      "labels": {
+        "event": "Wydarzenie",
+        "date": "Data",
+        "cause": "Przyczyna",
+        "altKm": "Wys. (km)",
+        "estDebris": "Szac. odłamki",
+        "parentObject": "Obiekt macierzysty",
+        "country": "Kraj",
+        "orbitType": "Typ orbity",
+        "breakupAltitude": "Wysokość rozpadu",
+        "launchDate": "Data startu",
+        "breakupDate": "Data rozpadu",
+        "timeToBreakup": "Czas do rozpadu",
+        "years": "lata",
+        "km": "km",
+        "trackedDebris": "Śledzone odłamki",
+        "estimatedTotal": "Szacowana liczba całkowita",
+        "trackingRatio": "Współczynnik śledzenia",
+        "typeBreakdown": "Ładunki / Człony rakiet / Odłamki",
+        "parameter": "Parametr",
+        "min": "Min",
+        "max": "Maks",
+        "mean": "Średnia",
+        "spread": "Rozrzut",
+        "perigeeParam": "Perygeum (km)",
+        "apogeeParam": "Apogeum (km)",
+        "eccentricityParam": "Mimośród",
+        "inclinationParam": "Inklinacja (°)",
+        "noTrackedDebris": "Nie znaleziono śledzonych odłamków w bieżącym katalogu dla tego wydarzenia.",
+        "showingOf": "(wyświetlanie {shown} z {total})",
+        "norad": "NORAD",
+        "name": "Nazwa",
+        "type": "Typ",
+        "perigee": "Perygeum",
+        "apogee": "Apogeum",
+        "incDeg": "Inkl. (°)",
+        "ecc": "Mim."
+      },
+      "errorMsgs": {
+        "parentNotFound": "Obiektu macierzystego nie ma w bieżącym katalogu.",
+        "noDataToExport": "Brak śledzonych fragmentów do wyeksportowania."
+      }
     }
   }
 }

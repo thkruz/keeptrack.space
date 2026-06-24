@@ -3,7 +3,75 @@
     "BreakupAnalysis": {
       "bottomIconLabel": "Breakup Analysis",
       "title": "Breakup Analysis",
-      "helpBody": "The Breakup Analysis plugin provides a database of major satellite breakup events in history. Select an event to view detailed information including the parent object, breakup cause, timeline from launch to breakup, and fragment dispersion analysis. The plugin searches the current catalog for tracked debris matching each event and displays statistical analysis of altitude ranges, eccentricity, and inclination distributions."
+      "helpBody": "The Breakup Analysis plugin provides a database of major satellite breakup events in history. Select an event to view detailed information including the parent object, breakup cause, timeline from launch to breakup, and fragment dispersion analysis. The plugin searches the current catalog for tracked debris matching each event and displays statistical analysis of altitude ranges, eccentricity, and inclination distributions.",
+      "sections": {
+        "events": "Events",
+        "debrisStatistics": "Debris Statistics",
+        "fragmentDispersion": "Fragment Dispersion Analysis",
+        "trackedFragments": "Tracked Fragments",
+        "gabbardDiagram": "Gabbard Diagram",
+        "actions": "Actions"
+      },
+      "actions": {
+        "backToEvents": "Back to Events",
+        "jumpToDate": "Jump to Breakup Date",
+        "selectParent": "Select Parent Object",
+        "exportCsv": "Export Fragments (CSV)",
+        "showAll": "Show All Fragments",
+        "showFewer": "Show Fewer Fragments"
+      },
+      "gabbard": {
+        "apogee": "Apogee",
+        "perigee": "Perigee",
+        "periodAxis": "Period (min)",
+        "altitudeAxis": "Altitude (km)"
+      },
+      "commands": {
+        "open": "Open Breakup Analysis",
+        "export": "Export Breakup Fragments (CSV)"
+      },
+      "labels": {
+        "event": "Event",
+        "date": "Date",
+        "cause": "Cause",
+        "altKm": "Alt (km)",
+        "estDebris": "Est. Debris",
+        "parentObject": "Parent Object",
+        "country": "Country",
+        "orbitType": "Orbit Type",
+        "breakupAltitude": "Breakup Altitude",
+        "launchDate": "Launch Date",
+        "breakupDate": "Breakup Date",
+        "timeToBreakup": "Time to Breakup",
+        "years": "years",
+        "km": "km",
+        "trackedDebris": "Tracked Debris",
+        "estimatedTotal": "Estimated Total",
+        "trackingRatio": "Tracking Ratio",
+        "typeBreakdown": "Payloads / R. Bodies / Debris",
+        "parameter": "Parameter",
+        "min": "Min",
+        "max": "Max",
+        "mean": "Mean",
+        "spread": "Spread",
+        "perigeeParam": "Perigee (km)",
+        "apogeeParam": "Apogee (km)",
+        "eccentricityParam": "Eccentricity",
+        "inclinationParam": "Inclination (°)",
+        "noTrackedDebris": "No tracked debris found in current catalog for this event.",
+        "showingOf": "(showing {shown} of {total})",
+        "norad": "NORAD",
+        "name": "Name",
+        "type": "Type",
+        "perigee": "Perigee",
+        "apogee": "Apogee",
+        "incDeg": "Inc (°)",
+        "ecc": "Ecc"
+      },
+      "errorMsgs": {
+        "parentNotFound": "Parent object is not in the current catalog.",
+        "noDataToExport": "No tracked fragments to export."
+      }
     }
   }
 }

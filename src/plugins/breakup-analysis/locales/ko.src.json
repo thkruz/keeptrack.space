@@ -3,7 +3,75 @@
     "BreakupAnalysis": {
       "bottomIconLabel": "파편 분석",
       "title": "파편 분석",
-      "helpBody": "파편 분석 플러그인은 역사상 주요 위성 파편화 사건의 데이터베이스를 제공합니다. 사건을 선택하면 모체 객체, 파편화 원인, 발사부터 파편화까지의 타임라인, 파편 분산 분석 등 상세 정보를 볼 수 있습니다. 이 플러그인은 현재 카탈로그에서 각 사건과 일치하는 추적된 잔해를 검색하고 고도 범위, 이심률 및 경사각 분포의 통계 분석을 표시합니다."
+      "helpBody": "파편 분석 플러그인은 역사상 주요 위성 파편화 사건의 데이터베이스를 제공합니다. 사건을 선택하면 모체 객체, 파편화 원인, 발사부터 파편화까지의 타임라인, 파편 분산 분석 등 상세 정보를 볼 수 있습니다. 이 플러그인은 현재 카탈로그에서 각 사건과 일치하는 추적된 잔해를 검색하고 고도 범위, 이심률 및 경사각 분포의 통계 분석을 표시합니다.",
+      "sections": {
+        "events": "사건",
+        "debrisStatistics": "잔해 통계",
+        "fragmentDispersion": "파편 분산 분석",
+        "trackedFragments": "추적된 파편",
+        "gabbardDiagram": "가바드 다이어그램",
+        "actions": "작업"
+      },
+      "actions": {
+        "backToEvents": "사건 목록으로 돌아가기",
+        "jumpToDate": "파편화 날짜로 이동",
+        "selectParent": "모체 객체 선택",
+        "exportCsv": "파편 내보내기 (CSV)",
+        "showAll": "모든 파편 표시",
+        "showFewer": "파편 적게 표시"
+      },
+      "gabbard": {
+        "apogee": "원지점",
+        "perigee": "근지점",
+        "periodAxis": "주기 (min)",
+        "altitudeAxis": "고도 (km)"
+      },
+      "commands": {
+        "open": "파편 분석 열기",
+        "export": "파편화 파편 내보내기 (CSV)"
+      },
+      "labels": {
+        "event": "사건",
+        "date": "날짜",
+        "cause": "원인",
+        "altKm": "고도 (km)",
+        "estDebris": "추정 잔해",
+        "parentObject": "모체 객체",
+        "country": "국가",
+        "orbitType": "궤도 유형",
+        "breakupAltitude": "파편화 고도",
+        "launchDate": "발사 날짜",
+        "breakupDate": "파편화 날짜",
+        "timeToBreakup": "파편화까지 소요 시간",
+        "years": "년",
+        "km": "km",
+        "trackedDebris": "추적된 잔해",
+        "estimatedTotal": "추정 총량",
+        "trackingRatio": "추적 비율",
+        "typeBreakdown": "탑재체 / 로켓 몸체 / 잔해",
+        "parameter": "매개변수",
+        "min": "최소",
+        "max": "최대",
+        "mean": "평균",
+        "spread": "분포 범위",
+        "perigeeParam": "근지점 (km)",
+        "apogeeParam": "원지점 (km)",
+        "eccentricityParam": "이심률",
+        "inclinationParam": "경사각 (°)",
+        "noTrackedDebris": "현재 카탈로그에서 이 사건에 해당하는 추적된 잔해를 찾을 수 없습니다.",
+        "showingOf": "(전체 {total}개 중 {shown}개 표시)",
+        "norad": "NORAD",
+        "name": "이름",
+        "type": "유형",
+        "perigee": "근지점",
+        "apogee": "원지점",
+        "incDeg": "경사각 (°)",
+        "ecc": "이심률"
+      },
+      "errorMsgs": {
+        "parentNotFound": "모체 객체가 현재 카탈로그에 없습니다.",
+        "noDataToExport": "내보낼 추적된 파편이 없습니다."
+      }
     }
   }
 }

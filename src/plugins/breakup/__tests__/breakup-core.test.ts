@@ -1,18 +1,36 @@
+import { Satellite, TleLine1, TleLine2 } from '@app/engine/ootk/src/main';
 import {
+  applyDeltaV,
+  BREAKUP_PRESETS,
   BreakupRawForm,
-  buildPieceTle,
-  formatEccentricity,
+  buildFragmentTle,
+  computeRicBasis,
+  DEFAULT_BREAKUP_PRESET,
+  getBreakupPreset,
   isAnalystRangeValid,
   makeRng,
-  MINUTES_PER_DAY,
+  MS_TO_KMS,
+  nextGaussian,
   parseBreakupParams,
-  planRaanBuckets,
-  RAAN_BUCKET_COUNT,
+  sampleDeltaV,
+  Vec3,
 } from '@app/plugins/breakup/breakup-core';
 
-// A real, 69-char ISS element set used as the reference orbit for piece builds.
-const REF_TLE1 = '1 25544U 98067A   17206.18396726  .00001961  00000-0  36771-4 0  9993';
-const REF_TLE2 = '2 25544  51.6400 208.9163 0006317  69.9862  25.2906 15.54225995 67660';
+const BREAKUP_DATE = new Date('2021-07-25T12:00:00Z');
+
+// A near-circular LEO (ISS) and a highly eccentric (Molniya-like) HEO parent.
+const ISS_TLE1 = '1 25544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991' as TleLine1;
+const ISS_TLE2 = '2 25544  51.6423 168.5744 0001475 184.3976 313.3642 15.48839820294053' as TleLine2;
+const HEO_TLE1 = '1 44444U 19999A   21203.40407588  .00000000  00000-0  00000-0 0  9991' as TleLine1;
+const HEO_TLE2 = '2 44444  63.4000 100.0000 7200000  270.0000  10.0000  2.00600000 00001' as TleLine2;
+
+const stateOf = (tle1: TleLine1, tle2: TleLine2) => {
+  const pv = new Satellite({ tle1, tle2 }).eci(BREAKUP_DATE)!;
+
+  return { position: pv.position as Vec3, velocity: pv.velocity as Vec3 };
+};
+
+const dist = (a: Vec3, b: Vec3) => Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
 
 describe('breakup-core', () => {
   describe('makeRng', () => {
@@ -35,18 +53,30 @@ describe('breakup-core', () => {
         expect(v).toBeLessThan(1);
       }
     });
+  });
 
-    it('produces different streams for different seeds', () => {
-      expect(makeRng(1)()).not.toBe(makeRng(2)());
+  describe('nextGaussian', () => {
+    it('produces a finite, roughly zero-mean distribution', () => {
+      const rng = makeRng(123);
+      let sum = 0;
+      const n = 5000;
+
+      for (let i = 0; i < n; i++) {
+        const g = nextGaussian(rng);
+
+        expect(Number.isFinite(g)).toBe(true);
+        sum += g;
+      }
+
+      expect(Math.abs(sum / n)).toBeLessThan(0.1);
     });
   });
 
   describe('parseBreakupParams', () => {
     const raw: BreakupRawForm = {
-      periodVariation: '0.1',
-      incVariation: '0.05',
-      rascVariation: '0.05',
-      eccVariation: '0.0001',
+      radialDv: '20',
+      inTrackDv: '50',
+      crossTrackDv: '20',
       count: '25',
       startNum: '90000',
     };
@@ -55,17 +85,11 @@ describe('breakup-core', () => {
       const { params, startNumWasInvalid } = parseBreakupParams(raw, 90000);
 
       expect(params.breakupCount).toBe(25);
-      expect(params.incVariation).toBeCloseTo(0.05);
-      expect(params.rascVariation).toBeCloseTo(0.05);
-      expect(params.eccVariation).toBeCloseTo(0.0001);
+      expect(params.radialDeltaV).toBe(20);
+      expect(params.inTrackDeltaV).toBe(50);
+      expect(params.crossTrackDeltaV).toBe(20);
       expect(params.startNum).toBe(90000);
       expect(startNumWasInvalid).toBe(false);
-    });
-
-    it('converts period (minutes) to mean-motion (rev/day)', () => {
-      const { params } = parseBreakupParams({ ...raw, periodVariation: '1.0' }, 90000);
-
-      expect(params.meanmoVariation).toBeCloseTo(1 / MINUTES_PER_DAY);
     });
 
     it('falls back to the default start number and flags invalid input', () => {
@@ -75,156 +99,165 @@ describe('breakup-core', () => {
       expect(startNumWasInvalid).toBe(true);
     });
 
-    it('coerces NaN variations to 0', () => {
-      const { params } = parseBreakupParams(
-        { periodVariation: '', incVariation: '', rascVariation: '', eccVariation: '', count: '', startNum: '90000' },
-        90000,
-      );
+    it('floors negative or NaN spreads at zero', () => {
+      const { params } = parseBreakupParams({ ...raw, radialDv: '-5', inTrackDv: '', crossTrackDv: '-1' }, 90000);
 
-      expect(params.incVariation).toBe(0);
-      expect(params.rascVariation).toBe(0);
-      expect(params.eccVariation).toBe(0);
-      expect(params.meanmoVariation).toBe(0);
-      expect(params.breakupCount).toBe(0);
+      expect(params.radialDeltaV).toBe(0);
+      expect(params.inTrackDeltaV).toBe(0);
+      expect(params.crossTrackDeltaV).toBe(0);
     });
   });
 
-  describe('planRaanBuckets', () => {
-    it('returns an empty plan for zero pieces', () => {
-      expect(planRaanBuckets(0, 1)).toEqual([]);
-    });
+  describe('computeRicBasis', () => {
+    it('returns an orthonormal basis with radial along the position', () => {
+      const position: Vec3 = { x: 7000, y: 0, z: 0 };
+      const velocity: Vec3 = { x: 0, y: 7.5, z: 0 };
+      const basis = computeRicBasis(position, velocity);
 
-    it('distributes all pieces with no loss', () => {
-      const total = 25;
-      const buckets = planRaanBuckets(total, 0.5);
+      const mag = (v: Vec3) => Math.hypot(v.x, v.y, v.z);
+      const d = (a: Vec3, b: Vec3) => a.x * b.x + a.y * b.y + a.z * b.z;
 
-      expect(buckets.reduce((sum, b) => sum + b.count, 0)).toBe(total);
-    });
-
-    it('produces the configured number of buckets when count allows', () => {
-      expect(planRaanBuckets(100, 1)).toHaveLength(RAAN_BUCKET_COUNT);
-    });
-
-    it('never makes more buckets than pieces', () => {
-      const buckets = planRaanBuckets(3, 1);
-
-      expect(buckets).toHaveLength(3);
-      expect(buckets.every((b) => b.count >= 1)).toBe(true);
-    });
-
-    it('spans the full symmetric RAAN range including both extremes', () => {
-      const variation = 0.8;
-      const buckets = planRaanBuckets(100, variation);
-      const offsets = buckets.map((b) => b.offset);
-
-      expect(offsets[0]).toBeCloseTo(-variation / 2);
-      expect(offsets[offsets.length - 1]).toBeCloseTo(variation / 2);
-    });
-
-    it('is mirror-symmetric about zero', () => {
-      const buckets = planRaanBuckets(100, 1);
-      const offsets = buckets.map((b) => b.offset);
-
-      for (let i = 0; i < offsets.length; i++) {
-        expect(offsets[i]).toBeCloseTo(-offsets[offsets.length - 1 - i]);
+      for (const v of [basis.radial, basis.inTrack, basis.crossTrack]) {
+        expect(mag(v)).toBeCloseTo(1, 6);
       }
-    });
-
-    it('centers a single bucket on zero offset', () => {
-      const buckets = planRaanBuckets(1, 1);
-
-      expect(buckets).toHaveLength(1);
-      expect(buckets[0].offset).toBeCloseTo(0);
-      expect(buckets[0].count).toBe(1);
-    });
-  });
-
-  describe('formatEccentricity', () => {
-    it('formats as a 7-digit implied-decimal field', () => {
-      expect(formatEccentricity(0.0006703)).toBe('0006703');
-      expect(formatEccentricity(0)).toBe('0000000');
-    });
-
-    it('always returns exactly 7 characters', () => {
-      for (const e of [0, 0.001, 0.5, 0.9999999, 1.5, -0.2]) {
-        expect(formatEccentricity(e)).toHaveLength(7);
-      }
-    });
-
-    it('clamps out-of-range values into [0, 1)', () => {
-      expect(formatEccentricity(-0.5)).toBe('0000000');
-      expect(formatEccentricity(2)).toBe('9999999');
+      expect(d(basis.radial, basis.inTrack)).toBeCloseTo(0, 6);
+      expect(d(basis.radial, basis.crossTrack)).toBeCloseTo(0, 6);
+      expect(d(basis.inTrack, basis.crossTrack)).toBeCloseTo(0, 6);
+      // radial=+x (position), in-track=+y (velocity), cross-track=+z (orbit normal)
+      expect(basis.radial.x).toBeCloseTo(1, 6);
+      expect(basis.inTrack.y).toBeCloseTo(1, 6);
+      expect(basis.crossTrack.z).toBeCloseTo(1, 6);
     });
   });
 
-  describe('buildPieceTle', () => {
-    const baseInput = {
-      a5Num: '90000',
-      baseInc: 51.64,
-      incVariation: 0,
-      meanmoVariation: 0,
-      baseEcc: 0.0006317,
-      eccVariation: 0,
-      rng: () => 0.5,
-    };
+  describe('sampleDeltaV', () => {
+    it('returns zero for zero spread', () => {
+      const dv = sampleDeltaV(makeRng(1), { radial: 0, inTrack: 0, crossTrack: 0 });
 
-    it('produces two 69-character lines', () => {
-      const { tle1, tle2 } = buildPieceTle(REF_TLE1, REF_TLE2, baseInput);
+      expect(Math.abs(dv.r)).toBe(0);
+      expect(Math.abs(dv.i)).toBe(0);
+      expect(Math.abs(dv.c)).toBe(0);
+    });
+
+    it('is deterministic for a given seed and stays within +/-3 sigma (km/s)', () => {
+      const spread = { radial: 10, inTrack: 30, crossTrack: 10 };
+      const a = sampleDeltaV(makeRng(5), spread);
+      const b = sampleDeltaV(makeRng(5), spread);
+
+      expect(a).toEqual(b);
+      expect(Math.abs(a.r)).toBeLessThanOrEqual(3 * 10 * MS_TO_KMS + 1e-12);
+      expect(Math.abs(a.i)).toBeLessThanOrEqual(3 * 30 * MS_TO_KMS + 1e-12);
+      expect(Math.abs(a.c)).toBeLessThanOrEqual(3 * 10 * MS_TO_KMS + 1e-12);
+    });
+  });
+
+  describe('applyDeltaV', () => {
+    it('adds the delta-V along the correct RIC axes', () => {
+      const position: Vec3 = { x: 7000, y: 0, z: 0 };
+      const velocity: Vec3 = { x: 0, y: 7.5, z: 0 };
+      const basis = computeRicBasis(position, velocity);
+      const v = applyDeltaV(velocity, basis, { r: 0.05, i: 0.1, c: 0.2 });
+
+      expect(v.x).toBeCloseTo(0.05, 9); // radial -> +x
+      expect(v.y).toBeCloseTo(7.6, 9); // in-track -> +y
+      expect(v.z).toBeCloseTo(0.2, 9); // cross-track -> +z
+    });
+  });
+
+  describe('buildFragmentTle', () => {
+    it('produces two 69-character lines with the analyst SCC stamped', () => {
+      const { position, velocity } = stateOf(ISS_TLE1, ISS_TLE2);
+      const basis = computeRicBasis(position, velocity);
+      const { tle1, tle2 } = buildFragmentTle(BREAKUP_DATE, position, velocity, basis, { r: 0, i: 0, c: 0 }, '90123');
 
       expect(tle1).toHaveLength(69);
       expect(tle2).toHaveLength(69);
-    });
-
-    it('stamps the analyst SCC number into both lines', () => {
-      const { tle1, tle2 } = buildPieceTle(REF_TLE1, REF_TLE2, { ...baseInput, a5Num: '90123' });
-
       expect(tle1.substring(2, 7)).toBe('90123');
       expect(tle2.substring(2, 7)).toBe('90123');
     });
 
-    it('splices the eccentricity into columns 27-33', () => {
-      const { tle2 } = buildPieceTle(REF_TLE1, REF_TLE2, baseInput);
+    // The bug this guards: a fragment built from osculating elements lands ~100+ km
+    // off the parent (worst for HEO). The rv2tle fit must reproduce the breakup point.
+    it('reproduces the LEO parent position at the breakup epoch for zero delta-V', () => {
+      const { position, velocity } = stateOf(ISS_TLE1, ISS_TLE2);
+      const basis = computeRicBasis(position, velocity);
+      const { tle1, tle2 } = buildFragmentTle(BREAKUP_DATE, position, velocity, basis, { r: 0, i: 0, c: 0 }, '90000');
+      const fragPos = new Satellite({ tle1, tle2 }).eci(BREAKUP_DATE)!.position as Vec3;
 
-      // rng()=0.5 with zero variation leaves the eccentricity equal to baseEcc.
-      expect(tle2.substring(26, 33)).toBe(formatEccentricity(baseInput.baseEcc));
+      expect(dist(fragPos, position)).toBeLessThan(1); // within 1 km of the breakup point
     });
 
-    it('keeps inclination within +/- the variation', () => {
-      for (const r of [0, 0.25, 0.5, 0.75, 0.999]) {
-        const { tle2 } = buildPieceTle(REF_TLE1, REF_TLE2, {
-          ...baseInput,
-          incVariation: 0.5,
-          rng: () => r,
-        });
-        const inc = parseFloat(tle2.substring(8, 16));
+    it('reproduces the HEO parent position at the breakup epoch for zero delta-V', () => {
+      const { position, velocity } = stateOf(HEO_TLE1, HEO_TLE2);
+      const basis = computeRicBasis(position, velocity);
+      const { tle1, tle2 } = buildFragmentTle(BREAKUP_DATE, position, velocity, basis, { r: 0, i: 0, c: 0 }, '90001');
+      const fragPos = new Satellite({ tle1, tle2 }).eci(BREAKUP_DATE)!.position as Vec3;
 
-        expect(inc).toBeGreaterThanOrEqual(51.64 - 0.5 - 1e-6);
-        expect(inc).toBeLessThanOrEqual(51.64 + 0.5 + 1e-6);
+      expect(dist(fragPos, position)).toBeLessThan(1); // the regime the old code refused
+    });
+
+    it('places a small in-track delta-V fragment near the breakup point at the epoch', () => {
+      const { position, velocity } = stateOf(HEO_TLE1, HEO_TLE2);
+      const basis = computeRicBasis(position, velocity);
+      // 50 m/s in-track: at the breakup instant the fragment still leaves the breakup point.
+      const { tle1, tle2 } = buildFragmentTle(BREAKUP_DATE, position, velocity, basis, { r: 0, i: 0.05, c: 0 }, '90002');
+      const fragPos = new Satellite({ tle1, tle2 }).eci(BREAKUP_DATE)!.position as Vec3;
+
+      expect(dist(fragPos, position)).toBeLessThan(2);
+    });
+
+    it('throws on a sub-orbital (reentering) fragment from a large delta-V on a low orbit', () => {
+      // -600 m/s in-track on the LEO ISS drops perigee below the surface (mean motion
+      // > 18 rev/day) - the exact case that errored on a low-altitude ASAT breakup.
+      const { position, velocity } = stateOf(ISS_TLE1, ISS_TLE2);
+      const basis = computeRicBasis(position, velocity);
+
+      expect(() => buildFragmentTle(BREAKUP_DATE, position, velocity, basis, { r: 0, i: -0.6, c: 0 }, '90000'))
+        .toThrow(/sub-orbital|reenter|mean motion/u);
+    });
+  });
+
+  describe('breakup presets', () => {
+    const rms = (p: { radial: number; inTrack: number; crossTrack: number }) =>
+      Math.sqrt(p.radial ** 2 + p.inTrack ** 2 + p.crossTrack ** 2);
+
+    it('defines the five event-type presets in increasing energy by type', () => {
+      const ids = BREAKUP_PRESETS.map((p) => p.id);
+
+      expect(ids).toEqual(['explosion', 'collision', 'asat_cosmos', 'asat_fy1c', 'venting']);
+
+      expect(rms(getBreakupPreset('venting')!)).toBeLessThan(rms(getBreakupPreset('explosion')!));
+      expect(rms(getBreakupPreset('asat_cosmos')!)).toBeLessThan(rms(getBreakupPreset('collision')!));
+      // The Cosmos 1408 ASAT was much lower energy than Fengyun-1C.
+      expect(rms(getBreakupPreset('asat_cosmos')!)).toBeLessThan(rms(getBreakupPreset('asat_fy1c')!));
+    });
+
+    it('keeps explosion/venting isotropic and collision/ASAT in-plane biased', () => {
+      for (const id of ['explosion', 'venting']) {
+        const p = getBreakupPreset(id)!;
+
+        expect(p.radial).toBe(p.inTrack);
+        expect(p.inTrack).toBe(p.crossTrack);
+      }
+
+      for (const id of ['collision', 'asat_cosmos', 'asat_fy1c']) {
+        const p = getBreakupPreset(id)!;
+
+        // In-plane axes equal; cross-track (out of plane) suppressed.
+        expect(p.radial).toBe(p.inTrack);
+        expect(p.crossTrack).toBeLessThan(p.radial);
       }
     });
 
-    it('keeps eccentricity non-negative even with large downward jitter', () => {
-      const { tle2 } = buildPieceTle(REF_TLE1, REF_TLE2, {
-        ...baseInput,
-        baseEcc: 0.0001,
-        eccVariation: 0.01,
-        rng: () => 0, // maximal downward jitter -> would go negative without clamping
-      });
-      const eccField = parseInt(tle2.substring(26, 33), 10);
-
-      expect(eccField).toBeGreaterThanOrEqual(0);
+    it('default preset matches the explosion preset', () => {
+      expect(DEFAULT_BREAKUP_PRESET).toBe('explosion');
+      expect(getBreakupPreset(DEFAULT_BREAKUP_PRESET)).not.toBeNull();
     });
 
-    it('varies mean motion around the reference value', () => {
-      const refMeanmo = parseFloat(REF_TLE2.substring(52, 63));
-      const { tle2 } = buildPieceTle(REF_TLE1, REF_TLE2, {
-        ...baseInput,
-        meanmoVariation: 0.001,
-        rng: () => 1, // maximal upward jitter
-      });
-      const meanmo = parseFloat(tle2.substring(52, 63));
-
-      expect(meanmo).toBeCloseTo(refMeanmo + 0.001, 6);
+    it('returns null for unknown / custom ids', () => {
+      expect(getBreakupPreset('custom')).toBeNull();
+      expect(getBreakupPreset('asat')).toBeNull();
+      expect(getBreakupPreset('nope')).toBeNull();
     });
   });
 

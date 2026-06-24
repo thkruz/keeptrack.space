@@ -43,14 +43,13 @@ test.describe('Breakup Plugin', () => {
     await expect(page.locator('form#breakup')).toBeAttached();
     await expect(page.locator('#hc-scc')).toBeAttached();
     await expect(page.locator('#hc-startNum')).toBeAttached();
-    await expect(page.locator('#hc-inc')).toBeAttached();
-    await expect(page.locator('#hc-per')).toBeAttached();
-    await expect(page.locator('#hc-raan')).toBeAttached();
     await expect(page.locator('#hc-count')).toBeAttached();
 
-    // v13 UI markup: marker class, eccentricity control, and the create/clear actions.
+    // v13 UI markup: marker class, delta-V dispersion controls, and the create/clear actions.
     await expect(sideMenu).toHaveClass(/kt-ui-v13/u);
-    await expect(page.locator('#hc-ecc')).toBeAttached();
+    await expect(page.locator('#hc-dv-radial')).toBeAttached();
+    await expect(page.locator('#hc-dv-intrack')).toBeAttached();
+    await expect(page.locator('#hc-dv-crosstrack')).toBeAttached();
     await expect(page.locator('#breakup-create-btn')).toBeAttached();
     await expect(page.locator('#breakup-clear-btn')).toBeAttached();
   });

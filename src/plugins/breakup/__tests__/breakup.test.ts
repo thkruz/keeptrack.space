@@ -4,13 +4,21 @@ import { vi } from 'vitest';
 /* eslint-disable dot-notation */
 import { SatMath } from '@app/app/analysis/sat-math';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { Kilometers, Satellite } from '@app/engine/ootk/src/main';
+import { Kilometers, Satellite, TleLine1, TleLine2 } from '@app/engine/ootk/src/main';
 import { Breakup } from '@app/plugins/breakup/breakup';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import * as OrbitFinderFile from '@ootk/src/orbit-design/OrbitFinder';
-import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment, standardSelectSat } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
+
+// A highly eccentric (Molniya-like) orbit - the regime the old algorithm refused.
+const ellipticalSat = () => new Satellite({
+  id: 0,
+  active: true,
+  sccNum: '00005',
+  name: 'Molniya',
+  tle1: '1 44444U 19999A   21203.40407588  .00000000  00000-0  00000-0 0  9991' as TleLine1,
+  tle2: '2 44444  63.4000 100.0000 7200000  270.0000  10.0000  2.00600000 00001' as TleLine2,
+});
 
 describe('Breakup_class', () => {
   beforeEach(() => {
@@ -26,14 +34,7 @@ describe('Breakup_class', () => {
 
       websiteInit(breakupPlugin);
       standardSelectSat();
-      // Mock OrbitFinder class
-      vi.spyOn(OrbitFinderFile, 'OrbitFinder').mockImplementation(
-        function mockOrbitFinder() {
-          return {
-            rotateOrbitToLatLon: () => [defaultSat.tle1, defaultSat.tle2],
-          };
-        } as any,
-      );
+
       expect(() => breakupPlugin['onSubmit_']()).not.toThrow();
     });
 
@@ -53,17 +54,17 @@ describe('Breakup_class', () => {
       expect(closeSpy).not.toHaveBeenCalled();
     });
 
-    it('should handle non-circular orbits in onBottomIconClick', () => {
+    it('should accept non-circular (elliptical) orbits in onBottomIconClick', () => {
       const breakupPlugin = new Breakup();
 
       websiteInit(breakupPlugin);
 
-      // Object.create(Satellite.prototype, …) keeps instanceof Satellite working
-      // (the plugin gates on instanceof to reject OemSatellite) while letting us
-      // pin apogee/perigee to test values.
+      // A highly elliptical Satellite must NOT be rejected anymore.
       const mockSat = Object.assign(Object.create(Satellite.prototype), {
-        apogee: 2000,
+        apogee: 39000,
         perigee: 500,
+        sccNum: '00005',
+        isSatellite: () => true,
       });
 
       vi.spyOn(breakupPlugin['selectSatManager_'], 'getSelectedSat').mockReturnValue(mockSat);
@@ -72,8 +73,8 @@ describe('Breakup_class', () => {
 
       breakupPlugin.onBottomIconClick();
 
-      expect(closeSpy).toHaveBeenCalled();
-      expect(disableSpy).toHaveBeenCalled();
+      expect(closeSpy).not.toHaveBeenCalled();
+      expect(disableSpy).not.toHaveBeenCalled();
     });
 
     it('should update SCC number in menu for valid satellite', () => {
@@ -82,9 +83,8 @@ describe('Breakup_class', () => {
       websiteInit(breakupPlugin);
 
       const mockSat = Object.assign(Object.create(Satellite.prototype), {
-        apogee: 500,
-        perigee: 400,
         sccNum: '12345',
+        isSatellite: () => true,
       });
 
       vi.spyOn(breakupPlugin['selectSatManager_'], 'getSelectedSat').mockReturnValue(mockSat);
@@ -109,21 +109,48 @@ describe('Breakup_class', () => {
       expect(config.html).toContain('breakup-menu');
       expect(config.title).toBe('Breakup Simulator');
       expect(config.html).toContain('hc-scc');
-      expect(config.html).toContain('hc-inc');
-      expect(config.html).toContain('hc-per');
-      expect(config.html).toContain('hc-raan');
+      expect(config.html).toContain('hc-startNum');
       expect(config.html).toContain('hc-count');
     });
 
-    it('should build a v13 side menu with the new controls', () => {
+    it('should build a v13 side menu with the delta-V controls', () => {
       const breakupPlugin = new Breakup();
       const config = breakupPlugin.getSideMenuConfig();
 
       expect(config.html).toContain('kt-ui-v13');
       expect(config.html).toContain('kt-section');
-      expect(config.html).toContain('hc-ecc');
+      expect(config.html).toContain('hc-dv-radial');
+      expect(config.html).toContain('hc-dv-intrack');
+      expect(config.html).toContain('hc-dv-crosstrack');
       expect(config.html).toContain('breakup-create-btn');
       expect(config.html).toContain('breakup-clear-btn');
+    });
+
+    it('should include the event-type preset dropdown with all five presets', () => {
+      const breakupPlugin = new Breakup();
+      const config = breakupPlugin.getSideMenuConfig();
+
+      expect(config.html).toContain('hc-event-preset');
+      expect(config.html).toContain('value="explosion"');
+      expect(config.html).toContain('value="collision"');
+      expect(config.html).toContain('value="asat_cosmos"');
+      expect(config.html).toContain('value="asat_fy1c"');
+      expect(config.html).toContain('value="venting"');
+      expect(config.html).toContain('value="custom"');
+    });
+
+    it('applyPreset_ fills the delta-V fields (anisotropic ASAT) and ignores custom', () => {
+      const breakupPlugin = new Breakup();
+
+      websiteInit(breakupPlugin);
+
+      breakupPlugin['applyPreset_']('asat_fy1c');
+      expect((<HTMLInputElement>document.getElementById('hc-dv-radial')).value).toBe('230');
+      expect((<HTMLInputElement>document.getElementById('hc-dv-intrack')).value).toBe('230');
+      expect((<HTMLInputElement>document.getElementById('hc-dv-crosstrack')).value).toBe('90');
+
+      breakupPlugin['applyPreset_']('custom');
+      expect((<HTMLInputElement>document.getElementById('hc-dv-radial')).value).toBe('230');
     });
 
     it('should not have a count option whose value disagrees with its label', () => {
@@ -135,11 +162,11 @@ describe('Breakup_class', () => {
       expect(config.html).toContain('<option value="250">250</option>');
     });
 
-    it('should expose a keyboard shortcut', () => {
+    it('should expose a Shift+B keyboard shortcut', () => {
       const breakupPlugin = new Breakup();
       const shortcuts = breakupPlugin.getKeyboardShortcuts();
 
-      expect(shortcuts.some((s) => s.key === 'B')).toBe(true);
+      expect(shortcuts.some((s) => s.key === 'B' && s.shift === true)).toBe(true);
     });
 
     it('should expose create and clear command-palette commands', () => {
@@ -147,7 +174,6 @@ describe('Breakup_class', () => {
       const commands = breakupPlugin.getCommandPaletteCommands();
 
       expect(commands.map((c) => c.id)).toEqual(['Breakup.create', 'Breakup.clear']);
-      // Clear is unavailable until a breakup exists.
       const clear = commands.find((c) => c.id === 'Breakup.clear');
 
       expect(clear?.isAvailable?.()).toBe(false);
@@ -172,6 +198,24 @@ describe('Breakup_class', () => {
       const formData = Breakup['getFormData_'](ServiceLocator.getCatalogManager());
 
       expect(formData.startNum).toBe(90000);
+      expect(formData.startNumWasInvalid).toBe(true);
+    });
+
+    it('should parse the delta-V inputs in getFormData', () => {
+      const breakupPlugin = new Breakup();
+
+      websiteInit(breakupPlugin);
+      standardSelectSat();
+
+      (<HTMLInputElement>document.getElementById('hc-dv-radial')).value = '15';
+      (<HTMLInputElement>document.getElementById('hc-dv-intrack')).value = '60';
+      (<HTMLInputElement>document.getElementById('hc-dv-crosstrack')).value = '15';
+
+      const formData = Breakup['getFormData_'](ServiceLocator.getCatalogManager());
+
+      expect(formData.radialDeltaV).toBe(15);
+      expect(formData.inTrackDeltaV).toBe(60);
+      expect(formData.crossTrackDeltaV).toBe(15);
     });
 
     it('should handle missing satellite in onSubmit', () => {
@@ -184,37 +228,13 @@ describe('Breakup_class', () => {
       expect(() => breakupPlugin['onSubmit_']()).not.toThrow();
     });
 
-    it('should handle Error direction in onSubmit', () => {
+    it('should handle an elliptical orbit in onSubmit (any regime)', () => {
       const breakupPlugin = new Breakup();
 
       websiteInit(breakupPlugin);
       standardSelectSat();
 
-      vi.spyOn(SatMath, 'getDirection').mockReturnValue('Error');
-      vi.spyOn(OrbitFinderFile, 'OrbitFinder').mockImplementation(
-        function test() {
-          return {
-            rotateOrbitToLatLon: () => [defaultSat.tle1, defaultSat.tle2],
-          };
-        } as any,
-      );
-
-      expect(() => breakupPlugin['onSubmit_']()).not.toThrow();
-    });
-
-    it('should handle TLE creation errors in onSubmit', () => {
-      const breakupPlugin = new Breakup();
-
-      websiteInit(breakupPlugin);
-      standardSelectSat();
-
-      vi.spyOn(OrbitFinderFile, 'OrbitFinder').mockImplementation(
-        function test() {
-          return {
-            rotateOrbitToLatLon: () => ['Error', 'Error message'],
-          };
-        } as any,
-      );
+      vi.spyOn(ServiceLocator.getCatalogManager(), 'getSat').mockReturnValue(ellipticalSat());
 
       expect(() => breakupPlugin['onSubmit_']()).not.toThrow();
     });
@@ -225,88 +245,9 @@ describe('Breakup_class', () => {
       websiteInit(breakupPlugin);
       standardSelectSat();
 
-      vi.spyOn(OrbitFinderFile, 'OrbitFinder').mockImplementation(
-        function test() {
-          return {
-            rotateOrbitToLatLon: () => [defaultSat.tle1, defaultSat.tle2],
-          };
-        } as any,
-      );
-
       vi.spyOn(SatMath, 'altitudeCheck').mockReturnValue(0 as Kilometers);
 
       expect(() => breakupPlugin['onSubmit_']()).not.toThrow();
-    });
-
-    it('should handle Satellite creation error in onSubmit', () => {
-      const breakupPlugin = new Breakup();
-
-      websiteInit(breakupPlugin);
-      standardSelectSat();
-
-      vi.spyOn(OrbitFinderFile, 'OrbitFinder').mockImplementation(
-        function test() {
-          return {
-            rotateOrbitToLatLon: () => [defaultSat.tle1, defaultSat.tle2],
-          };
-        } as any,
-      );
-
-      const originalSatellite = (global as any).Satellite;
-
-      (global as any).Satellite = vi.fn(() => {
-        throw new Error('Test error');
-      });
-
-      expect(() => breakupPlugin['onSubmit_']()).not.toThrow();
-
-      (global as any).Satellite = originalSatellite;
-    });
-
-    it('should handle non-circular orbit in onSubmit after initial checks', () => {
-      const breakupPlugin = new Breakup();
-
-      websiteInit(breakupPlugin);
-      standardSelectSat();
-
-      const mockSat = ServiceLocator.getCatalogManager().getSat(0);
-
-      if (mockSat) {
-        mockSat.apogee = 2000 as Kilometers;
-        mockSat.perigee = 500 as Kilometers;
-      }
-
-      vi.spyOn(OrbitFinderFile, 'OrbitFinder').mockImplementation(
-        function test() {
-          return {
-            rotateOrbitToLatLon: () => [defaultSat.tle1, defaultSat.tle2],
-          };
-        } as any,
-      );
-
-      expect(() => breakupPlugin['onSubmit_']()).not.toThrow();
-    });
-
-    it.skip('should update search limit when breakup count exceeds it', () => {
-      const breakupPlugin = new Breakup();
-
-      websiteInit(breakupPlugin);
-      standardSelectSat();
-
-      (<HTMLInputElement>document.getElementById('hc-count')).value = '1000';
-      (global as any).settingsManager.searchLimit = 100;
-
-      vi.spyOn(OrbitFinderFile, 'OrbitFinder').mockImplementation(
-        function test() {
-          return {
-            rotateOrbitToLatLon: () => [defaultSat.tle1, defaultSat.tle2],
-          };
-        } as any,
-      );
-
-      breakupPlugin['onSubmit_']();
-
-      expect((global as any).settingsManager.searchLimit).toBe(1000);
     });
 
     it('should not update SCC number when menu is not active', () => {

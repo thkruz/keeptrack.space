@@ -7,17 +7,21 @@
       "labels": {
         "satelliteScc": "SCC# satellite",
         "initialSatelliteNumber": "Numero iniziale del satellite",
-        "inclinationVariation": "Variazione di inclinazione",
-        "periodVariation": "Variazione di periodo",
-        "rightAscensionVariation": "Variazione di ascensione retta",
-        "eccentricityVariation": "Variazione di eccentricità",
         "pieces": "Frammenti",
-        "degrees": "Gradi",
-        "minute": "Minuto",
-        "minutes": "Minuti",
         "sourceSection": "Origine",
         "catalogSlotsSection": "Slot di catalogo",
-        "spreadSection": "Dispersione",
+        "dispersionSection": "Dispersione di velocità",
+        "eventTypeLabel": "Tipo di evento",
+        "preset_explosion": "Esplosione",
+        "preset_collision": "Collisione catastrofica",
+        "preset_asat_cosmos": "ASAT, Cosmos 1408 (energia inferiore)",
+        "preset_asat_fy1c": "ASAT, Fengyun-1C (energia superiore)",
+        "preset_venting": "Bassa energia / sfiato",
+        "preset_custom": "Personalizzato",
+        "radialDeltaV": "Radiale (m/s)",
+        "inTrackDeltaV": "Lungo l'orbita (m/s)",
+        "crossTrackDeltaV": "Trasversale all'orbita (m/s)",
+        "dispersionHint": "Variazione di velocità casuale applicata a ciascun frammento (1 sigma). La componente lungo l'orbita allunga la nube lungo l'orbita; quella trasversale la apre a ventaglio attraverso il piano orbitale; quella radiale la alza e la abbassa. Eventi tipici: esplosioni circa 10 a 100 m/s, collisioni circa 100 a 300 m/s.",
         "piecesSection": "Quantità"
       },
       "buttons": {
@@ -29,23 +33,22 @@
         "clear": "Cancella frammentazione"
       },
       "toasts": {
-        "cleared": "Frammentazione cancellata. Satellite originale ripristinato."
+        "cleared": "Frammentazione cancellata. Detriti rimossi.",
+        "fragmentsReentered": "{count} frammenti sono rientrati e non sono stati creati."
       },
       "help": {
-        "overview": "Il menu Frammentazione simula la frammentazione di un satellite nella sua posizione attuale. Clona il satellite selezionato in frammenti di detriti, ciascuno con una piccola variazione casuale della propria orbita, così da poter osservare la nube di detriti formarsi e disperdersi nel tempo.",
-        "imgAlt": "Il menu Frammentazione con i controlli di variazione e numero di frammenti",
-        "imgCaption": "Parametri di frammentazione. Variazioni maggiori allargano la nube di detriti simulata.",
+        "overview": "Il menu Frammentazione simula la frammentazione di un satellite nella sua posizione attuale. Genera frammenti di detriti dalla posizione esatta del satellite selezionato, ciascuno dei quali parte con una piccola variazione di velocità casuale (delta-V), così da poter osservare la nube di detriti formarsi e disperdersi nel tempo. Poiché lavora a partire dal vettore di stato del satellite, supporta qualsiasi regime orbitale.",
+        "imgAlt": "Il menu Frammentazione con i controlli di dispersione delta-V e numero di frammenti",
+        "imgCaption": "Parametri di frammentazione. Valori di delta-V maggiori allargano la nube di detriti simulata.",
         "parametersHeading": "Parametri",
-        "parameters": "<ul><li><strong>Variazione di inclinazione</strong>: gradi di dispersione dell'inclinazione orbitale.</li><li><strong>Variazione di ascensione retta</strong>: gradi di dispersione dell'orientamento del piano orbitale.</li><li><strong>Variazione di periodo</strong>: minuti di dispersione del periodo orbitale, che allunga la nube lungo l'orbita.</li><li><strong>Frammenti</strong>: quanti frammenti di detriti creare (da 5 a 1000).</li><li><strong>Numero iniziale del satellite</strong>: il primo numero di catalogo analista da assegnare ai frammenti (predefinito 90000).</li></ul>I valori predefiniti producono una dispersione dall'aspetto realistico; aumentali per un evento più energetico.",
-        "howToUse": "<ol><li>Seleziona un satellite su un'orbita quasi circolare. L'icona resta disabilitata finché non viene selezionato un satellite.</li><li>Apri il menu Frammentazione e regola le variazioni e il numero di frammenti.</li><li>Fai clic su <strong>Crea frammentazione</strong>. I frammenti vengono generati nella posizione attuale del satellite e la barra di ricerca si riempie con i nuovi detriti, così puoi vedere l'intera nube.</li><li>Accelera il tempo per osservare la nube disperdersi lungo l'orbita.</li></ol>",
-        "tip1": "Sono supportate solo orbite quasi circolari (apogeo meno perigeo di al massimo 1000 km), quindi il menu rifiuta orbite fortemente ellittiche.",
-        "tip2": "La frammentazione è simulata ed esiste solo in memoria. Usa Cancella frammentazione per rimuovere i detriti e ripristinare il satellite originale, oppure ricarica la pagina. Nota che l'orbita del satellite originale viene modificata per passare sopra il punto di frammentazione.",
+        "parameters": "<ul><li><strong>Radiale</strong>: dispersione di velocità verso e lontano dalla Terra (m/s), che alza e abbassa i frammenti.</li><li><strong>Lungo l'orbita</strong>: dispersione di velocità lungo la direzione del moto (m/s), che allunga la nube lungo l'orbita.</li><li><strong>Trasversale all'orbita</strong>: dispersione di velocità fuori dal piano orbitale (m/s), che apre la nube a ventaglio attraverso il piano.</li><li><strong>Frammenti</strong>: quanti frammenti di detriti creare (da 5 a 1000).</li><li><strong>Numero iniziale del satellite</strong>: il primo numero di catalogo analista da assegnare ai frammenti (predefinito 90000).</li></ul>I valori sono trattati come una dispersione di una sigma per frammento. I valori predefiniti (circa 40 m/s per asse) modellano un evento di classe esplosione; i frammenti reali di esplosioni si disperdono di circa 10 a 100 m/s, mentre le collisioni catastrofiche raggiungono circa 100 a 300 m/s (i frammenti piccoli possono superare 1 km/s). Mantieni i tre assi uguali per un evento fisicamente realistico e a simmetria sferica; la nube si allunga naturalmente lungo l'orbita nel tempo.",
+        "howToUse": "<ol><li>Seleziona un satellite qualsiasi. L'icona resta disabilitata finché non viene selezionato un satellite.</li><li>Apri il menu Frammentazione e regola la dispersione delta-V e il numero di frammenti.</li><li>Fai clic su <strong>Crea frammentazione</strong>. I frammenti vengono generati nella posizione attuale del satellite e la barra di ricerca si riempie con i nuovi detriti, così puoi vedere l'intera nube.</li><li>Accelera il tempo per osservare la nube disperdersi lungo l'orbita.</li></ol>",
+        "tip1": "Funziona in qualsiasi regime orbitale, comprese le orbite LEO, MEO, GEO e altamente ellittiche (HEO), perché ogni frammento viene propagato dal vettore di stato del satellite originale nel punto di frammentazione.",
+        "tip2": "La frammentazione è simulata ed esiste solo in memoria. Usa Cancella frammentazione per rimuovere i detriti, oppure ricarica la pagina. Il satellite originale stesso non viene mai modificato.",
         "tip3": "Tutti i frammenti vengono creati come oggetti di tipo detrito, quindi gli schemi di colore e i filtri basati sui detriti si applicano immediatamente."
       },
       "errorMsgs": {
         "SatelliteNotFound": "Satellite non trovato!",
-        "CannotCreateBreakupForNonCircularOrbits": "Impossibile creare una frammentazione per orbite non circolari. Correzione in corso.",
-        "CannotCalcDirectionOfSatellite": "Impossibile calcolare la direzione del satellite. Riprova più tardi.",
         "ErrorCreatingBreakup": "Errore nella creazione della frammentazione!",
         "InvalidStartNum": "Numero iniziale del satellite non valido! Impostazione predefinita a 90000!",
         "InvalidSlotRange": "Numero iniziale del satellite fuori intervallo. Usa da {start} a {end}.",

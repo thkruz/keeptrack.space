@@ -7,17 +7,21 @@
       "labels": {
         "satelliteScc": "SCC# du satellite",
         "initialSatelliteNumber": "Numéro de satellite initial",
-        "inclinationVariation": "Variation d'inclinaison",
-        "periodVariation": "Variation de période",
-        "rightAscensionVariation": "Variation d'ascension droite",
-        "eccentricityVariation": "Variation d'excentricité",
         "pieces": "Fragments",
-        "degrees": "Degrés",
-        "minute": "Minute",
-        "minutes": "Minutes",
         "sourceSection": "Source",
         "catalogSlotsSection": "Emplacements de catalogue",
-        "spreadSection": "Dispersion",
+        "dispersionSection": "Dispersion de vitesse",
+        "eventTypeLabel": "Type d'événement",
+        "preset_explosion": "Explosion",
+        "preset_collision": "Collision catastrophique",
+        "preset_asat_cosmos": "ASAT, Cosmos 1408 (énergie plus faible)",
+        "preset_asat_fy1c": "ASAT, Fengyun-1C (énergie plus élevée)",
+        "preset_venting": "Basse énergie / dégazage",
+        "preset_custom": "Personnalisé",
+        "radialDeltaV": "Radial (m/s)",
+        "inTrackDeltaV": "Le long de l'orbite (m/s)",
+        "crossTrackDeltaV": "Hors plan orbital (m/s)",
+        "dispersionHint": "Changement de vitesse aléatoire appliqué à chaque fragment (1 sigma). La composante le long de l'orbite étire le nuage le long de la trajectoire ; la composante hors plan l'étale à travers le plan orbital ; la composante radiale le monte et le descend. Événements typiques : explosions d'environ 10 à 100 m/s, collisions d'environ 100 à 300 m/s.",
         "piecesSection": "Nombre"
       },
       "buttons": {
@@ -29,23 +33,22 @@
         "clear": "Effacer la fragmentation"
       },
       "toasts": {
-        "cleared": "Fragmentation effacée. Satellite d'origine restauré."
+        "cleared": "Fragmentation effacée. Débris supprimés.",
+        "fragmentsReentered": "{count} fragments sont rentrés dans l'atmosphère et n'ont pas été créés."
       },
       "help": {
-        "overview": "Le menu Fragmentation simule la fragmentation d'un satellite à sa position actuelle. Il clone le satellite sélectionné en fragments de débris, chacun avec une petite variation aléatoire de son orbite, afin que vous puissiez observer le nuage de débris se former et s'étendre au fil du temps.",
-        "imgAlt": "Le menu Fragmentation avec les commandes de variation et de nombre de fragments",
-        "imgCaption": "Paramètres de fragmentation. Des variations plus grandes étalent davantage le nuage de débris simulé.",
+        "overview": "Le menu Fragmentation simule la fragmentation d'un satellite à sa position actuelle. Il génère des fragments de débris à l'emplacement exact du satellite sélectionné, chacun partant avec un petit changement de vitesse aléatoire (delta-V), afin que vous puissiez observer le nuage de débris se former et s'étendre au fil du temps. Comme il fonctionne à partir du vecteur d'état du satellite, il prend en charge tous les régimes orbitaux.",
+        "imgAlt": "Le menu Fragmentation avec les commandes de dispersion delta-V et de nombre de fragments",
+        "imgCaption": "Paramètres de fragmentation. Des valeurs de delta-V plus grandes étalent davantage le nuage de débris simulé.",
         "parametersHeading": "Paramètres",
-        "parameters": "<ul><li><strong>Variation d'inclinaison</strong> : degrés de dispersion de l'inclinaison orbitale.</li><li><strong>Variation d'ascension droite</strong> : degrés de dispersion de l'orientation du plan orbital.</li><li><strong>Variation de période</strong> : minutes de dispersion de la période orbitale, ce qui étire le nuage le long de l'orbite.</li><li><strong>Fragments</strong> : nombre de fragments de débris à créer (5 à 1000).</li><li><strong>Numéro de satellite initial</strong> : le premier numéro de catalogue analyste à attribuer aux fragments (90000 par défaut).</li></ul>Les valeurs par défaut produisent une dispersion d'aspect réaliste ; augmentez-les pour un événement plus énergétique.",
-        "howToUse": "<ol><li>Sélectionnez un satellite sur une orbite quasi circulaire. L'icône reste désactivée tant qu'aucun satellite n'est sélectionné.</li><li>Ouvrez le menu Fragmentation et ajustez les variations et le nombre de fragments.</li><li>Cliquez sur <strong>Créer une fragmentation</strong>. Les fragments sont générés à la position actuelle du satellite et la barre de recherche se remplit avec les nouveaux débris pour que vous puissiez voir tout le nuage.</li><li>Accélérez le temps pour observer le nuage se disperser le long de l'orbite.</li></ol>",
-        "tip1": "Seules les orbites quasi circulaires sont prises en charge (apogée moins périgée d'au plus 1000 km), donc le menu refuse les orbites très elliptiques.",
-        "tip2": "La fragmentation est simulée et n'existe qu'en mémoire. Utilisez Effacer la fragmentation pour supprimer les débris et restaurer le satellite d'origine, ou rechargez la page. Notez que l'orbite du satellite parent est ajustée pour passer au-dessus du point de fragmentation.",
+        "parameters": "<ul><li><strong>Radial</strong> : dispersion de vitesse vers et depuis la Terre (m/s), qui monte et descend les fragments.</li><li><strong>Le long de l'orbite</strong> : dispersion de vitesse dans la direction du mouvement (m/s), qui étire le nuage le long de l'orbite.</li><li><strong>Hors plan orbital</strong> : dispersion de vitesse hors du plan orbital (m/s), qui étale le nuage à travers le plan.</li><li><strong>Fragments</strong> : nombre de fragments de débris à créer (5 à 1000).</li><li><strong>Numéro de satellite initial</strong> : le premier numéro de catalogue analyste à attribuer aux fragments (90000 par défaut).</li></ul>Les valeurs sont traitées comme une dispersion à un sigma par fragment. Les valeurs par défaut (environ 40 m/s par axe) modélisent un événement de classe explosion ; les fragments réels d'explosions se dispersent d'environ 10 à 100 m/s, tandis que les collisions catastrophiques atteignent environ 100 à 300 m/s (les petits fragments peuvent dépasser 1 km/s). Gardez les trois axes égaux pour un événement physiquement réaliste et à symétrie sphérique ; le nuage s'étire naturellement le long de l'orbite au fil du temps.",
+        "howToUse": "<ol><li>Sélectionnez n'importe quel satellite. L'icône reste désactivée tant qu'aucun satellite n'est sélectionné.</li><li>Ouvrez le menu Fragmentation et ajustez la dispersion delta-V et le nombre de fragments.</li><li>Cliquez sur <strong>Créer une fragmentation</strong>. Les fragments sont générés à la position actuelle du satellite et la barre de recherche se remplit avec les nouveaux débris pour que vous puissiez voir tout le nuage.</li><li>Accélérez le temps pour observer le nuage se disperser le long de l'orbite.</li></ol>",
+        "tip1": "Fonctionne dans tous les régimes orbitaux, y compris LEO, MEO, GEO et les orbites très elliptiques (HEO), car chaque fragment est propagé à partir du vecteur d'état du satellite parent au point de fragmentation.",
+        "tip2": "La fragmentation est simulée et n'existe qu'en mémoire. Utilisez Effacer la fragmentation pour supprimer les débris, ou rechargez la page. Le satellite parent lui-même n'est jamais modifié.",
         "tip3": "Tous les fragments sont créés comme des objets de type débris, donc les schémas de couleurs et les filtres basés sur les débris s'y appliquent immédiatement."
       },
       "errorMsgs": {
         "SatelliteNotFound": "Satellite introuvable !",
-        "CannotCreateBreakupForNonCircularOrbits": "Impossible de créer une fragmentation pour des orbites non circulaires. Correction en cours.",
-        "CannotCalcDirectionOfSatellite": "Impossible de calculer la direction du satellite. Veuillez réessayer plus tard.",
         "ErrorCreatingBreakup": "Erreur lors de la création de la fragmentation !",
         "InvalidStartNum": "Numéro de départ du satellite invalide ! Valeur par défaut : 90000 !",
         "InvalidSlotRange": "Numéro de satellite initial hors plage. Utilisez {start} à {end}.",

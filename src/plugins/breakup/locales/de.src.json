@@ -7,17 +7,21 @@
       "labels": {
         "satelliteScc": "Satelliten-SCC#",
         "initialSatelliteNumber": "Anfangs-Satellitennummer",
-        "inclinationVariation": "Inklinationsvariation",
-        "periodVariation": "Periodenvariation",
-        "rightAscensionVariation": "Rektaszensionsvariation",
-        "eccentricityVariation": "Exzentrizitätsvariation",
         "pieces": "Teile",
-        "degrees": "Grad",
-        "minute": "Minute",
-        "minutes": "Minuten",
         "sourceSection": "Quelle",
         "catalogSlotsSection": "Katalogplätze",
-        "spreadSection": "Streuung",
+        "dispersionSection": "Geschwindigkeitsstreuung",
+        "eventTypeLabel": "Ereignistyp",
+        "preset_explosion": "Explosion",
+        "preset_collision": "Katastrophale Kollision",
+        "preset_asat_cosmos": "ASAT, Cosmos 1408 (geringere Energie)",
+        "preset_asat_fy1c": "ASAT, Fengyun-1C (höhere Energie)",
+        "preset_venting": "Niederenergetisch / Ausgasen",
+        "preset_custom": "Benutzerdefiniert",
+        "radialDeltaV": "Radial (m/s)",
+        "inTrackDeltaV": "In Bahnrichtung (m/s)",
+        "crossTrackDeltaV": "Quer zur Bahn (m/s)",
+        "dispersionHint": "Zufällige Geschwindigkeitsänderung, die auf jedes Fragment angewendet wird (1 Sigma). In Bahnrichtung streckt die Wolke entlang der Umlaufbahn; quer zur Bahn fächert sie über die Bahnebene auf; radial hebt und senkt sie. Typische Ereignisse: Explosionen etwa 10 bis 100 m/s, Kollisionen etwa 100 bis 300 m/s.",
         "piecesSection": "Anzahl"
       },
       "buttons": {
@@ -29,23 +33,22 @@
         "clear": "Zerfall löschen"
       },
       "toasts": {
-        "cleared": "Zerfall gelöscht. Ursprünglicher Satellit wiederhergestellt."
+        "cleared": "Zerfall gelöscht. Trümmer entfernt.",
+        "fragmentsReentered": "{count} Fragmente sind wiedereingetreten und wurden nicht erstellt."
       },
       "help": {
-        "overview": "Das Zerfall-Menü simuliert das Auseinanderbrechen eines Satelliten an seiner aktuellen Position. Es klont den ausgewählten Satelliten in Trümmerteile, jedes mit einer kleinen zufälligen Variation seiner Umlaufbahn, sodass Sie beobachten können, wie sich die Trümmerwolke bildet und mit der Zeit ausbreitet.",
-        "imgAlt": "Das Zerfall-Menü mit Reglern für Variationen und Teileanzahl",
-        "imgCaption": "Zerfallsparameter. Größere Variationen verteilen die simulierte Trümmerwolke weiter.",
+        "overview": "Das Zerfall-Menü simuliert das Auseinanderbrechen eines Satelliten an seiner aktuellen Position. Es erzeugt Trümmerteile an der exakten Position des ausgewählten Satelliten, wobei jedes Teil mit einer kleinen zufälligen Geschwindigkeitsänderung (Delta-V) abgeht, sodass Sie beobachten können, wie sich die Trümmerwolke bildet und mit der Zeit ausbreitet. Da es vom Zustandsvektor des Satelliten ausgeht, unterstützt es jeden Bahnbereich.",
+        "imgAlt": "Das Zerfall-Menü mit Reglern für Delta-V-Streuung und Teileanzahl",
+        "imgCaption": "Zerfallsparameter. Größere Delta-V-Werte verteilen die simulierte Trümmerwolke weiter.",
         "parametersHeading": "Parameter",
-        "parameters": "<ul><li><strong>Inklinationsvariation</strong>: Streuung der Bahnneigung in Grad.</li><li><strong>Rektaszensionsvariation</strong>: Streuung der Ausrichtung der Bahnebene in Grad.</li><li><strong>Periodenvariation</strong>: Streuung der Umlaufperiode in Minuten, wodurch sich die Wolke entlang der Umlaufbahn streckt.</li><li><strong>Teile</strong>: wie viele Trümmerfragmente erstellt werden (5 bis 1000).</li><li><strong>Anfangs-Satellitennummer</strong>: die erste Analysten-Katalognummer, die den Teilen zugewiesen wird (standardmäßig 90000).</li></ul>Die Standardwerte erzeugen eine realistisch aussehende Streuung; erhöhen Sie sie für ein energiereicheres Ereignis.",
-        "howToUse": "<ol><li>Wählen Sie einen Satelliten auf einer nahezu kreisförmigen Umlaufbahn aus; das Symbol bleibt deaktiviert, bis ein Satellit ausgewählt ist.</li><li>Öffnen Sie das Zerfall-Menü und passen Sie die Variationen und die Teileanzahl an.</li><li>Klicken Sie auf <strong>Zerfall erstellen</strong>. Die Teile werden an der aktuellen Position des Satelliten erzeugt und die Suchleiste füllt sich mit den neuen Trümmern, sodass Sie die gesamte Wolke sehen können.</li><li>Beschleunigen Sie die Zeit, um zu beobachten, wie sich die Wolke entlang der Umlaufbahn verteilt.</li></ol>",
-        "tip1": "Es werden nur nahezu kreisförmige Umlaufbahnen unterstützt (Apogäum minus Perigäum höchstens 1000 km); das Menü lehnt stark elliptische Umlaufbahnen ab.",
-        "tip2": "Der Zerfall ist nur simuliert und existiert nur im Speicher. Verwenden Sie Zerfall löschen, um die Trümmer zu entfernen und den ursprünglichen Satelliten wiederherzustellen, oder laden Sie die Seite neu. Beachten Sie, dass die Umlaufbahn des Muttersatelliten so angepasst wird, dass sie über den Zerfallspunkt verläuft.",
+        "parameters": "<ul><li><strong>Radial</strong>: Geschwindigkeitsstreuung zur Erde hin und von ihr weg (m/s), die die Fragmente anhebt und absenkt.</li><li><strong>In Bahnrichtung</strong>: Geschwindigkeitsstreuung entlang der Bewegungsrichtung (m/s), die die Wolke entlang der Umlaufbahn streckt.</li><li><strong>Quer zur Bahn</strong>: Geschwindigkeitsstreuung aus der Bahnebene heraus (m/s), die die Wolke über die Ebene auffächert.</li><li><strong>Teile</strong>: wie viele Trümmerfragmente erstellt werden (5 bis 1000).</li><li><strong>Anfangs-Satellitennummer</strong>: die erste Analysten-Katalognummer, die den Teilen zugewiesen wird (standardmäßig 90000).</li></ul>Die Werte werden als Ein-Sigma-Streuung pro Fragment behandelt. Die Standardwerte (etwa 40 m/s pro Achse) modellieren ein Ereignis der Explosionsklasse; echte Explosionsfragmente streuen um etwa 10 bis 100 m/s, während katastrophale Kollisionen etwa 100 bis 300 m/s erreichen (kleine Fragmente können 1 km/s überschreiten). Halten Sie die drei Achsen gleich für ein physikalisch realistisches, kugelsymmetrisches Ereignis; die Wolke streckt sich mit der Zeit auf natürliche Weise entlang der Umlaufbahn.",
+        "howToUse": "<ol><li>Wählen Sie einen beliebigen Satelliten aus. Das Symbol bleibt deaktiviert, bis ein Satellit ausgewählt ist.</li><li>Öffnen Sie das Zerfall-Menü und passen Sie die Delta-V-Streuung und die Teileanzahl an.</li><li>Klicken Sie auf <strong>Zerfall erstellen</strong>. Die Teile werden an der aktuellen Position des Satelliten erzeugt und die Suchleiste füllt sich mit den neuen Trümmern, sodass Sie die gesamte Wolke sehen können.</li><li>Beschleunigen Sie die Zeit, um zu beobachten, wie sich die Wolke entlang der Umlaufbahn verteilt.</li></ol>",
+        "tip1": "Funktioniert in jedem Bahnbereich, einschließlich LEO, MEO, GEO und stark elliptischen (HEO) Umlaufbahnen, da jedes Fragment vom Zustandsvektor des Muttersatelliten am Zerfallspunkt propagiert wird.",
+        "tip2": "Der Zerfall ist nur simuliert und existiert nur im Speicher. Verwenden Sie Zerfall löschen, um die Trümmer zu entfernen, oder laden Sie die Seite neu. Der Muttersatellit selbst wird nie verändert.",
         "tip3": "Alle Teile werden als Objekte vom Typ Trümmer erstellt, sodass trümmerbasierte Farbschemata und Filter sofort auf sie angewendet werden."
       },
       "errorMsgs": {
         "SatelliteNotFound": "Satellit nicht gefunden!",
-        "CannotCreateBreakupForNonCircularOrbits": "Für nicht-kreisförmige Umlaufbahnen kann kein Zerfall erstellt werden. Wir arbeiten an einer Lösung.",
-        "CannotCalcDirectionOfSatellite": "Die Richtung des Satelliten kann nicht berechnet werden. Versuchen Sie es später erneut.",
         "ErrorCreatingBreakup": "Fehler beim Erstellen des Zerfalls!",
         "InvalidStartNum": "Ungültige Satellitenstartnummer! Standardmäßig auf 90000 gesetzt!",
         "InvalidSlotRange": "Anfangs-Satellitennummer außerhalb des gültigen Bereichs. Verwenden Sie {start} bis {end}.",

@@ -1,5 +1,6 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
+import { findSatsAvAGeo, findSatsAvALeo } from '@app/plugins/proximity-ops/proximity-ops-core';
 import { ProximityOps } from '@app/plugins/proximity-ops/proximity-ops';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -22,6 +23,7 @@ const rpoEvent = (over: Record<string, unknown> = {}) => ({
   },
   dist: 12.34,
   vel: 0.56,
+  pc: null,
   ...over,
 });
 
@@ -50,13 +52,6 @@ describe('ProximityOps behavior', () => {
     expect(lines[1]).toContain('"00005"');
   });
 
-  it('getCurrentDist_ propagates both satellites and returns a finite distance', () => {
-    const result = p().getCurrentDist_(new Date('2022-01-01T00:00:00Z'), defaultSat, defaultSat);
-
-    expect(result.currentDist).toBeDefined();
-    expect(result.sat1State.position).toBeDefined();
-  });
-
   it('updateNoradId_ picks the LEO preset for a low-Earth satellite', () => {
     vi.spyOn(SelectSatManager.prototype, 'getSelectedSat').mockReturnValue(defaultSat as never);
 
@@ -74,7 +69,9 @@ describe('ProximityOps behavior', () => {
   });
 
   it('onEventClicked_ jumps time, selects both satellites and searches', () => {
-    const offsetSpy = vi.spyOn(p().timeManagerInstance, 'changeStaticOffset').mockImplementation(() => undefined);
+    // onEventClicked_ jumps the clock via the shared jumpToTca helper, which
+    // resolves ServiceLocator.getTimeManager() itself - so spy on that instance.
+    const offsetSpy = vi.spyOn(ServiceLocator.getTimeManager(), 'changeStaticOffset').mockImplementation(() => undefined);
     const secondarySpy = vi.spyOn(p().selectSatManagerInstance, 'setSecondarySat').mockImplementation(() => undefined);
     const selectSpy = vi.spyOn(p().selectSatManagerInstance, 'selectSat').mockImplementation(() => undefined);
 
@@ -100,7 +97,7 @@ describe('ProximityOps behavior', () => {
     }
   });
 
-  describe('satellite filtering', () => {
+  describe('satellite filtering (pure core bin filters)', () => {
     const fakeSat = (over: Record<string, unknown> = {}) => ({
       tle1: '1 ...',
       period: 95,
@@ -134,26 +131,24 @@ describe('ProximityOps behavior', () => {
       expect(p().getFilteredSatellites()).toHaveLength(1);
     });
 
-    it('findSatsAvALeo_ matches LEO satellites near the target plane', () => {
-      vi.spyOn(ServiceLocator.getCatalogManager(), 'getSats').mockReturnValue([
+    it('findSatsAvALeo matches LEO satellites near the target plane', () => {
+      const sats = [
         fakeSat({ inclination: 51.6, rightAscension: 100, period: 95 }),
         fakeSat({ inclination: 0, rightAscension: 300, period: 95 }),
-      ] as never);
-      setChecks(false, false);
+      ];
 
-      const matches = p().findSatsAvALeo_(51.6, 100);
+      const matches = findSatsAvALeo(sats as never, 51.6, 100);
 
       expect(matches.length).toBe(1);
     });
 
-    it('findSatsAvAGeo_ matches GEO satellites near the target longitude', () => {
-      vi.spyOn(ServiceLocator.getCatalogManager(), 'getSats').mockReturnValue([
+    it('findSatsAvAGeo matches GEO satellites near the target longitude', () => {
+      const sats = [
         fakeSat({ period: 24 * 60, lla: () => ({ lat: 0, lon: 10 }) }),
         fakeSat({ period: 24 * 60, lla: () => ({ lat: 0, lon: 120 }) }),
-      ] as never);
-      setChecks(false, false);
+      ];
 
-      const matches = p().findSatsAvAGeo_(10);
+      const matches = findSatsAvAGeo(sats as never, 10, new Date('2026-05-31T00:00:00.000Z'));
 
       expect(matches.length).toBe(1);
     });

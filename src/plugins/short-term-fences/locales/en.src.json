@@ -35,7 +35,9 @@
       },
       "errorMsgs": {
         "stfNotInView": "STF is not in view of the sensor!",
-        "noSelectSatManager": "No selectSatManager instance found"
+        "noSelectSatManager": "No selectSatManager instance found",
+        "invalidInput": "Enter a valid number in every field.",
+        "invalidRange": "Center range must be greater than zero."
       },
       "help": {
         "overview": "Short Term Fences visualize a sensor's search box: a wedge of sky defined by an azimuth, elevation, and range window. Operators use them to see exactly what volume a tasked search covers and whether an object of interest would pass through it.",
@@ -46,6 +48,19 @@
         "howToUse": "<ol><li>Select a sensor; the bottom icon is disabled until one is selected.</li><li>Open the <strong>Short Term Fence</strong> menu (Create mode) and enter the center point and extents.</li><li>Click <strong>Create New STF</strong>. The fence volume is drawn from the sensor in the 3D view.</li><li>Stack additional fences by submitting again; <strong>Remove Last</strong> deletes the newest one and <strong>Clear All STFs</strong> removes every fence.</li><li>With a satellite selected, the satellite info box gains a <strong>Build Short Term Fence on this object...</strong> link that pre-fills the form with the satellite's current azimuth, elevation, and range.</li></ol>",
         "tip1": "If the fence you request is outside what the sensor can see, creation is rejected with a notification instead of drawing an impossible box.",
         "tip2": "The kilometer extent fields update as you type, which makes it easy to sanity check how wide the search really is at range."
+      },
+      "sections": {
+        "azimuth": "Azimuth",
+        "elevation": "Elevation",
+        "range": "Range"
+      },
+      "fenceList": {
+        "activeFences": "Active Fences",
+        "empty": "No active fences. Create one above.",
+        "remove": "Remove fence",
+        "azimuth": "Azimuth",
+        "elevation": "Elevation",
+        "range": "Range"
       }
     }
   }

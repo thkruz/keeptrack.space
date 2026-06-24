@@ -35,7 +35,9 @@
       },
       "errorMsgs": {
         "stfNotInView": "¡La STF no está a la vista del sensor!",
-        "noSelectSatManager": "No se encontró ninguna instancia de selectSatManager"
+        "noSelectSatManager": "No se encontró ninguna instancia de selectSatManager",
+        "invalidInput": "Introduzca un número válido en cada campo.",
+        "invalidRange": "La distancia central debe ser mayor que cero."
       },
       "help": {
         "overview": "Las Cercas a Corto Plazo visualizan la caja de búsqueda de un sensor: una cuña de cielo definida por una ventana de azimut, elevación y distancia. Los operadores las usan para ver exactamente qué volumen cubre una búsqueda asignada y si un objeto de interés pasaría a través de ella.",
@@ -46,6 +48,19 @@
         "howToUse": "<ol><li>Selecciona un sensor; el icono inferior está deshabilitado hasta que se selecciona uno.</li><li>Abre el menú <strong>Cerca a Corto Plazo</strong> (modo Crear) e introduce el punto central y las extensiones.</li><li>Haz clic en <strong>Crear Nueva STF</strong>. El volumen de la cerca se dibuja desde el sensor en la vista 3D.</li><li>Apila cercas adicionales enviando el formulario de nuevo; <strong>Eliminar la Última</strong> borra la más reciente y <strong>Borrar Todas las STF</strong> elimina todas las cercas.</li><li>Con un satélite seleccionado, el cuadro de información del satélite muestra un enlace <strong>Construir una cerca a corto plazo en este objeto...</strong> que rellena el formulario con el azimut, la elevación y la distancia actuales del satélite.</li></ol>",
         "tip1": "Si la cerca solicitada está fuera de lo que el sensor puede ver, la creación se rechaza con una notificación en lugar de dibujar una caja imposible.",
         "tip2": "Los campos de extensión en kilómetros se actualizan mientras escribes, lo que facilita comprobar cuán amplia es realmente la búsqueda a esa distancia."
+      },
+      "sections": {
+        "azimuth": "Acimut",
+        "elevation": "Elevación",
+        "range": "Distancia"
+      },
+      "fenceList": {
+        "activeFences": "Cercas activas",
+        "empty": "No hay cercas activas. Cree una arriba.",
+        "remove": "Eliminar cerca",
+        "azimuth": "Acimut",
+        "elevation": "Elevación",
+        "range": "Distancia"
       }
     }
   }

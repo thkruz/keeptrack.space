@@ -35,7 +35,9 @@
       },
       "errorMsgs": {
         "stfNotInView": "STF liegt nicht im Sichtbereich des Sensors!",
-        "noSelectSatManager": "Keine selectSatManager-Instanz gefunden"
+        "noSelectSatManager": "Keine selectSatManager-Instanz gefunden",
+        "invalidInput": "Geben Sie in jedes Feld eine gültige Zahl ein.",
+        "invalidRange": "Die Mittenentfernung muss größer als null sein."
       },
       "help": {
         "overview": "Kurzzeit-Zäune visualisieren die Suchbox eines Sensors: einen Himmelsausschnitt, der durch ein Fenster aus Azimut, Elevation und Entfernung definiert ist. Operateure sehen damit genau, welches Volumen eine beauftragte Suche abdeckt und ob ein interessierendes Objekt hindurchfliegen würde.",
@@ -46,6 +48,19 @@
         "howToUse": "<ol><li>Wählen Sie einen Sensor aus; das untere Symbol ist deaktiviert, bis einer ausgewählt ist.</li><li>Öffnen Sie das Menü <strong>Kurzzeit-Zaun</strong> (Modus Erstellen) und geben Sie Mittelpunkt und Ausdehnungen ein.</li><li>Klicken Sie auf <strong>Neue STF erstellen</strong>. Das Zaunvolumen wird vom Sensor aus in der 3D-Ansicht gezeichnet.</li><li>Fügen Sie durch erneutes Absenden weitere Zäune hinzu; <strong>Letzte entfernen</strong> löscht den neuesten und <strong>Alle STFs löschen</strong> entfernt alle Zäune.</li><li>Bei einem ausgewählten Satelliten erhält die Satelliten-Infobox einen Link <strong>Kurzzeit-Zaun auf diesem Objekt erstellen...</strong>, der das Formular mit dem aktuellen Azimut, der Elevation und der Entfernung des Satelliten vorausfüllt.</li></ol>",
         "tip1": "Liegt der angeforderte Zaun außerhalb dessen, was der Sensor sehen kann, wird die Erstellung mit einer Benachrichtigung abgelehnt, statt eine unmögliche Box zu zeichnen.",
         "tip2": "Die Kilometer-Ausdehnungsfelder aktualisieren sich während der Eingabe, sodass sich leicht prüfen lässt, wie breit die Suche bei der gegebenen Entfernung wirklich ist."
+      },
+      "sections": {
+        "azimuth": "Azimut",
+        "elevation": "Elevation",
+        "range": "Entfernung"
+      },
+      "fenceList": {
+        "activeFences": "Aktive Zäune",
+        "empty": "Keine aktiven Zäune. Erstellen Sie oben einen.",
+        "remove": "Zaun entfernen",
+        "azimuth": "Azimut",
+        "elevation": "Elevation",
+        "range": "Entfernung"
       }
     }
   }

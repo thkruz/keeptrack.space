@@ -35,7 +35,9 @@
       },
       "errorMsgs": {
         "stfNotInView": "STF nie znajduje się w polu widzenia czujnika!",
-        "noSelectSatManager": "Nie znaleziono instancji selectSatManager"
+        "noSelectSatManager": "Nie znaleziono instancji selectSatManager",
+        "invalidInput": "Wprowadź prawidłową liczbę w każdym polu.",
+        "invalidRange": "Odległość środkowa musi być większa od zera."
       },
       "help": {
         "overview": "Krótkoterminowe ogrodzenia wizualizują obszar przeszukiwania czujnika: klin nieba zdefiniowany przez okno azymutu, elewacji i odległości. Operatorzy używają ich, aby dokładnie zobaczyć, jaką objętość obejmuje zlecone przeszukiwanie i czy interesujący obiekt przez nią przeleci.",
@@ -46,6 +48,19 @@
         "howToUse": "<ol><li>Wybierz czujnik; dolna ikona jest nieaktywna, dopóki żaden nie zostanie wybrany.</li><li>Otwórz menu <strong>Krótkoterminowe ogrodzenie</strong> (tryb Utwórz) i wprowadź punkt środkowy oraz zakresy.</li><li>Kliknij <strong>Utwórz nową STF</strong>. Objętość ogrodzenia zostanie narysowana od czujnika w widoku 3D.</li><li>Dodawaj kolejne ogrodzenia, wysyłając formularz ponownie; <strong>Usuń ostatnią</strong> kasuje najnowsze, a <strong>Wyczyść wszystkie STF</strong> usuwa każde ogrodzenie.</li><li>Przy wybranym satelicie w polu informacji o satelicie pojawia się łącze <strong>Zbuduj krótkoterminowe ogrodzenie na tym obiekcie...</strong>, które wstępnie wypełnia formularz bieżącym azymutem, elewacją i odległością satelity.</li></ol>",
         "tip1": "Jeśli żądane ogrodzenie wykracza poza to, co czujnik może zobaczyć, utworzenie zostaje odrzucone z powiadomieniem, zamiast rysować niemożliwy obszar.",
         "tip2": "Pola zakresów w kilometrach aktualizują się podczas pisania, dzięki czemu łatwo sprawdzić, jak szerokie naprawdę jest przeszukiwanie na danej odległości."
+      },
+      "sections": {
+        "azimuth": "Azymut",
+        "elevation": "Elewacja",
+        "range": "Odległość"
+      },
+      "fenceList": {
+        "activeFences": "Aktywne ogrodzenia",
+        "empty": "Brak aktywnych ogrodzeń. Utwórz jedno powyżej.",
+        "remove": "Usuń ogrodzenie",
+        "azimuth": "Azymut",
+        "elevation": "Elewacja",
+        "range": "Odległość"
       }
     }
   }

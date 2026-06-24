@@ -35,7 +35,9 @@
       },
       "errorMsgs": {
         "stfNotInView": "La STF non è nel campo visivo del sensore!",
-        "noSelectSatManager": "Nessuna istanza di selectSatManager trovata"
+        "noSelectSatManager": "Nessuna istanza di selectSatManager trovata",
+        "invalidInput": "Inserisci un numero valido in ogni campo.",
+        "invalidRange": "La distanza centrale deve essere maggiore di zero."
       },
       "help": {
         "overview": "Le barriere a breve termine visualizzano la casella di ricerca di un sensore: uno spicchio di cielo definito da una finestra di azimut, elevazione e distanza. Gli operatori le usano per vedere esattamente quale volume copre una ricerca assegnata e se un oggetto di interesse lo attraverserebbe.",
@@ -46,6 +48,19 @@
         "howToUse": "<ol><li>Seleziona un sensore; l'icona inferiore è disabilitata finché non ne viene selezionato uno.</li><li>Apri il menu <strong>Barriera a breve termine</strong> (modalità Crea) e inserisci il punto centrale e le estensioni.</li><li>Fai clic su <strong>Crea nuova STF</strong>. Il volume della barriera viene disegnato dal sensore nella vista 3D.</li><li>Aggiungi altre barriere inviando di nuovo il modulo; <strong>Rimuovi l'ultima</strong> elimina la più recente e <strong>Cancella tutte le STF</strong> rimuove ogni barriera.</li><li>Con un satellite selezionato, il riquadro informazioni del satellite mostra un collegamento <strong>Costruisci una barriera a breve termine su questo oggetto...</strong> che precompila il modulo con l'azimut, l'elevazione e la distanza attuali del satellite.</li></ol>",
         "tip1": "Se la barriera richiesta è al di fuori di ciò che il sensore può vedere, la creazione viene rifiutata con una notifica invece di disegnare una casella impossibile.",
         "tip2": "I campi di estensione in chilometri si aggiornano mentre digiti, rendendo facile verificare quanto sia davvero ampia la ricerca a quella distanza."
+      },
+      "sections": {
+        "azimuth": "Azimut",
+        "elevation": "Elevazione",
+        "range": "Distanza"
+      },
+      "fenceList": {
+        "activeFences": "Recinti attivi",
+        "empty": "Nessun recinto attivo. Creane uno sopra.",
+        "remove": "Rimuovi recinto",
+        "azimuth": "Azimut",
+        "elevation": "Elevazione",
+        "range": "Distanza"
       }
     }
   }

@@ -35,7 +35,9 @@
       },
       "errorMsgs": {
         "stfNotInView": "STF 不在传感器视野范围内！",
-        "noSelectSatManager": "未找到 selectSatManager 实例"
+        "noSelectSatManager": "未找到 selectSatManager 实例",
+        "invalidInput": "请在每个字段中输入有效数字。",
+        "invalidRange": "中心距离必须大于零。"
       },
       "help": {
         "overview": "短期搜索框可视化传感器的搜索区域：由方位角、仰角和距离窗口定义的一个楔形天空区域。操作员借此可以准确了解指派的搜索覆盖了哪些空间，以及关注的对象是否会穿过该区域。",
@@ -46,6 +48,19 @@
         "howToUse": "<ol><li>选择一个传感器；在选择之前，底部图标处于禁用状态。</li><li>打开<strong>短期搜索框</strong>菜单（创建模式），输入中心点和各范围。</li><li>点击<strong>创建新 STF</strong>。搜索框体积将从传感器出发绘制在 3D 视图中。</li><li>再次提交可叠加更多搜索框；<strong>移除最后一个</strong>删除最新的一个，<strong>清除所有 STF</strong>移除全部搜索框。</li><li>选中卫星后，卫星信息框会出现<strong>在此对象上构建短期搜索框...</strong>链接，它会用卫星当前的方位角、仰角和距离预填表单。</li></ol>",
         "tip1": "如果请求的搜索框超出了传感器的可视范围，创建会被拒绝并显示通知，而不是绘制一个不可能存在的区域。",
         "tip2": "千米范围字段会随输入实时更新，便于快速核对在该距离上搜索范围究竟有多宽。"
+      },
+      "sections": {
+        "azimuth": "方位角",
+        "elevation": "仰角",
+        "range": "距离"
+      },
+      "fenceList": {
+        "activeFences": "活动栅栏",
+        "empty": "没有活动栅栏。请在上方创建一个。",
+        "remove": "移除栅栏",
+        "azimuth": "方位角",
+        "elevation": "仰角",
+        "range": "距离"
       }
     }
   }

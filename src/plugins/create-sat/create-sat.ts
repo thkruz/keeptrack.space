@@ -38,7 +38,7 @@ import {
 } from './create-sat-actions';
 import { buildCreateSatHelp } from './create-sat-help';
 import { buildAdvancedTabHtml, buildBasicTabHtml, createSatActionButton } from './create-sat-menu-html';
-import { CreateSatOrbitPreview } from './create-sat-preview';
+import { OrbitPreview } from '../shared/orbit-preview';
 import { OrbitPresetId } from './create-sat-orbits';
 import { wireInlineValidation } from './create-sat-validation';
 import './create-sat.css';
@@ -77,7 +77,7 @@ export class CreateSat extends KeepTrackPlugin {
   static readonly elementPrefix = 'createSat';
 
   /** Live "ghost orbit" preview drawn while the user edits the element set. */
-  protected readonly orbitPreview_ = new CreateSatOrbitPreview();
+  protected readonly orbitPreview_ = new OrbitPreview();
 
   // Orbital mechanics constants
   private static readonly EARTH_RADIUS_KM_ = 6378.137;

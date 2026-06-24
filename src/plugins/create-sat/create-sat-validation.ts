@@ -69,13 +69,17 @@ function applyFieldState(el: HTMLInputElement, state: boolean | null): void {
 }
 
 /**
- * Wire live validation onto the Advanced-tab fields. Validates on every input and
+ * Wire live validation onto a form's element fields. Validates on every input and
  * once immediately so prefilled defaults are marked. Safe to call when fields are
  * absent (e.g. in unit tests) — missing elements are skipped.
- * @param prefix - The element-id prefix (CreateSat.elementPrefix).
+ * @param prefix - The element-id prefix (e.g. CreateSat/EditSat.elementPrefix).
+ * @param fields - Field-id suffixes to validate (defaults to VALIDATED_FIELDS).
+ *   Pass a subset when a menu reuses a field id for a different purpose (e.g. Edit
+ *   Satellite's read-only `scc` carries a real catalog number, not a 90000-range
+ *   analyst slot).
  */
-export function wireInlineValidation(prefix: string): void {
-  for (const key of VALIDATED_FIELDS) {
+export function wireInlineValidation(prefix: string, fields: readonly string[] = VALIDATED_FIELDS): void {
+  for (const key of fields) {
     const el = getEl(`${prefix}-${key}`, true) as HTMLInputElement | null;
 
     if (!el) {

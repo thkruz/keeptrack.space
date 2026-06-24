@@ -40,7 +40,7 @@ vi.mock('@app/settings/settings', () => ({
     isShowDebris: true,
     isDisableSensors: false,
     isDisableLaunchSites: false,
-    plugins: { MissilePlugin: true },
+    plugins: { MissileSimulatorPlugin: true },
   },
 }));
 

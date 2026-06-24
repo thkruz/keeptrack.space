@@ -69,7 +69,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
         this.objectTypeFlags.facility = false;
       }
 
-      if (!settingsManager.plugins?.MissilePlugin?.enabled) {
+      if (!settingsManager.plugins?.MissileSimulatorPlugin?.enabled) {
         this.objectTypeFlags.missile = false;
         const missileBox = document.querySelector('.layers-missile-box')?.parentElement as HTMLElement;
 

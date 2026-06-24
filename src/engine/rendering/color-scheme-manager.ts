@@ -1202,7 +1202,7 @@ export class ColorSchemeManager {
       isSensorManagerLoaded: catalogManager.isSensorManagerLoaded,
       sensorType: sensorManager?.currentSensors?.[0]?.type ?? 0,
       maxZoomDistance: settingsManager.maxZoomDistance,
-      isMissilePluginEnabled: !!settingsManager.plugins?.MissilePlugin?.enabled,
+      isMissileSimulatorEnabled: !!settingsManager.plugins?.MissileSimulatorPlugin?.enabled,
     };
 
     this.colorCruncher_.sendSettingsUpdate(flags);

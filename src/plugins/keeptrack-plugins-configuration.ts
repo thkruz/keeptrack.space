@@ -81,7 +81,7 @@ export type KeepTrackPluginsConfiguration = {
   NeighborhoodHistoryPlugin?: PluginConfiguration;
   EditSat?: PluginConfiguration;
   NewLaunch?: PluginConfiguration;
-  MissilePlugin?: PluginConfiguration;
+  MissileSimulatorPlugin?: PluginConfiguration;
   EarthCenteredView?: PluginConfiguration;
   SatelliteViewPlugin?: PluginConfiguration;
   SatelliteFixedView?: PluginConfiguration;

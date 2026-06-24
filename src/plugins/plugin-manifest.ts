@@ -454,9 +454,9 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
   {
-    configKey: 'MissilePlugin',
-    ossImport: () => import('./missile/missile-plugin'),
-    ossClassName: 'MissilePlugin',
+    configKey: 'MissileSimulatorPlugin',
+    ossImport: () => import('./missile/missile-simulator-plugin'),
+    ossClassName: 'MissileSimulatorPlugin',
     defaultConfig: { enabled: true, order: 74 },
   },
   {

@@ -267,7 +267,7 @@ describe('Color Worker Parity', () => {
     isSensorManagerLoaded: true,
     sensorType: 0,
     maxZoomDistance: 100000,
-    isMissilePluginEnabled: true,
+    isMissileSimulatorEnabled: true,
   };
 
   const defaultFilters: FilterState = {

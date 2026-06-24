@@ -50,7 +50,7 @@ describe('plugins', () => {
       InitialOrbitDeterminationPlugin: {
         enabled: true,
       },
-      MissilePlugin: {
+      MissileSimulatorPlugin: {
         enabled: true,
       },
       Breakup: {

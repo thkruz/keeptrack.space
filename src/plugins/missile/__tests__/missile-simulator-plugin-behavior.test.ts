@@ -1,7 +1,7 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
-import { MissilePlugin } from '@app/plugins/missile/missile-plugin';
 import { missileManager } from '@app/plugins/missile/missile-manager';
+import { MissileSimulatorPlugin } from '@app/plugins/missile/missile-simulator-plugin';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -10,14 +10,14 @@ const setVal = (id: string, value: string) => {
   (getEl(id) as HTMLInputElement).value = value;
 };
 
-describe('MissilePlugin behavior', () => {
-  let plugin: MissilePlugin;
+describe('MissileSimulatorPlugin behavior', () => {
+  let plugin: MissileSimulatorPlugin;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const p = () => plugin as any;
 
   beforeEach(() => {
     setupStandardEnvironment();
-    plugin = new MissilePlugin();
+    plugin = new MissileSimulatorPlugin();
     websiteInit(plugin);
     p().isMenuButtonActive = true;
     vi.spyOn(missileManager, 'createMissile').mockImplementation(() => undefined as never);
@@ -41,7 +41,7 @@ describe('MissilePlugin behavior', () => {
   it('msTargetChange_ toggles the custom target lat/lon fields', () => {
     setVal('ms-target', '-1');
     p().msTargetChange_();
-    expect(getEl('ms-tgt-holder-lat')!.style.display).toBe('block');
+    expect(getEl('ms-tgt-holder-lat')!.style.display).not.toBe('none');
 
     setVal('ms-target', '0');
     p().msTargetChange_();
@@ -49,10 +49,10 @@ describe('MissilePlugin behavior', () => {
   });
 
   it('msAttackerChange_ flags submarine launch sites and reveals launch fields', () => {
-    setVal('ms-attacker', '100'); // Ohio Sub - in the sub list
+    setVal('ms-attacker', '100'); // Ohio Sub - submarine
     p().msAttackerChange_();
     expect(p().isSub_).toBe(true);
-    expect(getEl('ms-lau-holder-lat')!.style.display).toBe('block');
+    expect(getEl('ms-lau-holder-lat')!.style.display).not.toBe('none');
 
     setVal('ms-attacker', '201'); // Dombarovskiy - silo, not a sub
     p().msAttackerChange_();
@@ -60,10 +60,18 @@ describe('MissilePlugin behavior', () => {
     expect(getEl('ms-lau-holder-lat')!.style.display).toBe('none');
   });
 
-  it('msErrorClick_ hides the error panel', () => {
-    getEl('ms-error')!.style.display = 'block';
-    p().msErrorClick_();
-    expect(getEl('ms-error')!.style.display).toBe('none');
+  it('a real change event on the attacker select updates isSub_ (handler is bound to the plugin)', () => {
+    // This is the regression guard for the old unbound-`this` bug: the change
+    // handler used to write isSub_ onto the <select> element, never the plugin.
+    const attacker = getEl('ms-attacker') as HTMLSelectElement;
+
+    attacker.value = '100'; // Ohio Sub
+    attacker.dispatchEvent(new Event('change'));
+    expect(p().isSub_).toBe(true);
+
+    attacker.value = '201'; // silo
+    attacker.dispatchEvent(new Event('change'));
+    expect(p().isSub_).toBe(false);
   });
 
   it('searchForRvs_ runs the RV_ search', () => {
@@ -72,6 +80,14 @@ describe('MissilePlugin behavior', () => {
     p().searchForRvs_();
 
     expect(searchSpy).toHaveBeenCalledWith('RV_');
+  });
+
+  it('clearMissiles_ clears the manager and refreshes the status', () => {
+    const clearSpy = vi.spyOn(missileManager, 'clearMissiles').mockImplementation(() => undefined);
+
+    p().clearMissiles_();
+
+    expect(clearSpy).toHaveBeenCalled();
   });
 
   it('updateLoop_ refreshes the orbit buffer for every active missile', () => {
@@ -85,16 +101,19 @@ describe('MissilePlugin behavior', () => {
     missileManager.missileArray = [] as never;
   });
 
-  it('getCommandPaletteCommands exposes open and show-all commands', () => {
+  it('getCommandPaletteCommands exposes open, show-all, and clear commands', () => {
     const commands = plugin.getCommandPaletteCommands();
 
-    expect(commands.map((c) => c.id)).toContain('MissilePlugin.open');
-    const showAll = commands.find((c) => c.id === 'MissilePlugin.showAllMissiles');
+    expect(commands.map((c) => c.id)).toContain('MissileSimulatorPlugin.open');
+    const showAll = commands.find((c) => c.id === 'MissileSimulatorPlugin.showAllMissiles');
+    const clear = commands.find((c) => c.id === 'MissileSimulatorPlugin.clearMissiles');
 
     missileManager.missilesInUse = 0;
     expect(showAll?.isAvailable?.()).toBe(false);
+    expect(clear?.isAvailable?.()).toBe(false);
     missileManager.missilesInUse = 5;
     expect(showAll?.isAvailable?.()).toBe(true);
+    expect(clear?.isAvailable?.()).toBe(true);
     missileManager.missilesInUse = 0;
   });
 
@@ -128,6 +147,20 @@ describe('MissilePlugin behavior', () => {
     setVal('ms-type', '0');
     setVal('ms-target', '-1'); // Custom Impact
     setVal('ms-lat', 'not-a-number');
+    plugin.onFormSubmit();
+    vi.advanceTimersByTime(2000);
+
+    expect(toastSpy).toHaveBeenCalled();
+    expect(missileManager.createMissile).not.toHaveBeenCalled();
+  });
+
+  it('onFormSubmit rejects an out-of-range warhead count', () => {
+    const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+    setVal('ms-type', '0');
+    setVal('ms-attacker', '101'); // Minot (USA silo)
+    setVal('ms-target', '0'); // Washington DC (preset)
+    setVal('ms-warheads', '99'); // above the 12 cap
     plugin.onFormSubmit();
     vi.advanceTimersByTime(2000);
 

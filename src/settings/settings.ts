@@ -670,14 +670,18 @@ export class SettingsManager {
       if (key === 'settingsManagerOverride') {
         const overrides = JSON.parse(decodeURIComponent(val));
 
-        Object.keys(overrides.plugins)
-          .filter((_key) => _key in plugins)
-          .forEach((_key) => {
-            if (typeof overrides.plugins[_key] === 'undefined') {
-              return;
-            }
-            this.plugins[_key] = overrides.plugins[_key];
-          });
+        // Back-compat: plugins renamed since their config key was minted are
+        // aliased here so existing embed links / saved overrides keep working.
+        const pluginKeyAliases: Record<string, string> = { MissilePlugin: 'MissileSimulatorPlugin' };
+
+        Object.keys(overrides.plugins).forEach((rawKey) => {
+          const _key = pluginKeyAliases[rawKey] ?? rawKey;
+
+          if (!(_key in plugins) || typeof overrides.plugins[rawKey] === 'undefined') {
+            return;
+          }
+          this.plugins[_key] = overrides.plugins[rawKey];
+        });
       }
     }
 

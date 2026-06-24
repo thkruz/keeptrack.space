@@ -74,7 +74,7 @@ let settings: SettingsFlags = {
   isSensorManagerLoaded: false,
   sensorType: 0,
   maxZoomDistance: 100000,
-  isMissilePluginEnabled: true,
+  isMissileSimulatorEnabled: true,
 };
 
 let inViewData: Int8Array | null = null;

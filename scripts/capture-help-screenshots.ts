@@ -491,16 +491,16 @@ const RECIPES: CaptureRecipe[] = [
   {
     id: 'next-launches',
     plugins: {
-      NextLaunchesPlugin: { enabled: true },
+      TheSpaceDevLaunchCalendarPlugin: { enabled: true },
     },
     steps: async (page) => {
-      await openPluginMenu(page, 'menu-nextLaunch');
-      await page.locator('#nextLaunch-menu').waitFor({ state: 'visible', timeout: 10_000 });
-      await page.evaluate('document.getElementById(\'nextLaunch-fetch-btn\')?.click()');
-      await page.locator('#nextLaunch-table tr').first().waitFor({ state: 'visible', timeout: 30_000 });
+      await openPluginMenu(page, 'menu-launch-calendar');
+      await page.locator('#launch-calendar-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.evaluate('document.getElementById(\'launch-calendar-fetch-btn\')?.click()');
+      await page.locator('#launch-calendar-table tr').first().waitFor({ state: 'visible', timeout: 30_000 });
       await page.waitForTimeout(500);
     },
-    shots: [{ name: 'next-launches-menu', selector: '#nextLaunch-menu' }],
+    shots: [{ name: 'next-launches-menu', selector: '#launch-calendar-menu' }],
   },
   {
     id: 'catalog-management',

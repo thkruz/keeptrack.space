@@ -1,13 +1,17 @@
 {
   "plugins": {
-    "NextLaunchesPlugin": {
-      "bottomIconLabel": "Prochains lancements",
-      "title": "Menu Prochains lancements",
-      "sideMenuTitle": "Prochains lancements",
+    "TheSpaceDevLaunchCalendarPlugin": {
+      "bottomIconLabel": "Calendrier des lancements",
+      "title": "Calendrier des lancements",
+      "sideMenuTitle": "Calendrier des lancements",
       "tooltips": {
         "fetchData": "Récupérer les données",
         "refresh": "Actualiser",
         "exportLaunchInfo": "Exporter les informations de lancement"
+      },
+      "labels": {
+        "dataActions": "Actions sur les données",
+        "results": "Prochains lancements"
       },
       "table": {
         "launchWindow": "Fenêtre de lancement",
@@ -17,6 +21,7 @@
         "country": "Pays"
       },
       "msgs": {
+        "fetching": "Récupération des prochains lancements...",
         "unknown": "Inconnu",
         "tbd": "À déterminer"
       },

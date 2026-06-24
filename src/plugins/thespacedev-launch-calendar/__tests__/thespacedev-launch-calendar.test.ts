@@ -1,11 +1,11 @@
 import { KeepTrack } from '@app/keeptrack';
-import { NextLaunchesPlugin } from '@app/plugins/next-launches/next-launches';
+import { TheSpaceDevLaunchCalendarPlugin } from '@app/plugins/thespacedev-launch-calendar/thespacedev-launch-calendar';
 import { readFileSync } from 'fs';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardChangeTests, standardClickTests, standardPluginMenuButtonTests, standardPluginSuite } from '@test/generic-tests';
 import { vi } from 'vitest';
 
-describe('NextLaunchesPlugin', () => {
+describe('TheSpaceDevLaunchCalendarPlugin', () => {
   beforeEach(() => {
     setupStandardEnvironment();
   });
@@ -14,13 +14,13 @@ describe('NextLaunchesPlugin', () => {
     vi.restoreAllMocks();
   });
 
-  standardPluginSuite(NextLaunchesPlugin, 'NextLaunchesPlugin');
-  standardPluginMenuButtonTests(NextLaunchesPlugin, 'NextLaunchesPlugin');
-  standardClickTests(NextLaunchesPlugin);
-  standardChangeTests(NextLaunchesPlugin);
+  standardPluginSuite(TheSpaceDevLaunchCalendarPlugin, 'TheSpaceDevLaunchCalendarPlugin');
+  standardPluginMenuButtonTests(TheSpaceDevLaunchCalendarPlugin, 'TheSpaceDevLaunchCalendarPlugin');
+  standardClickTests(TheSpaceDevLaunchCalendarPlugin);
+  standardChangeTests(TheSpaceDevLaunchCalendarPlugin);
 });
 
-describe('NextLaunches_class', () => {
+describe('TheSpaceDevLaunchCalendar_class', () => {
   beforeAll(() => {
     const url = 'https://Keeptrack.space';
 
@@ -56,6 +56,6 @@ describe('NextLaunches_class', () => {
     }));
   });
 
-  standardPluginSuite(NextLaunchesPlugin);
-  standardPluginMenuButtonTests(NextLaunchesPlugin);
+  standardPluginSuite(TheSpaceDevLaunchCalendarPlugin);
+  standardPluginMenuButtonTests(TheSpaceDevLaunchCalendarPlugin);
 });

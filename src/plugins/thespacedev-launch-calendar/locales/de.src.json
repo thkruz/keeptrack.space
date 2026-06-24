@@ -1,13 +1,17 @@
 {
   "plugins": {
-    "NextLaunchesPlugin": {
-      "bottomIconLabel": "Nächste Starts",
-      "title": "Menü für nächste Starts",
-      "sideMenuTitle": "Nächste Starts",
+    "TheSpaceDevLaunchCalendarPlugin": {
+      "bottomIconLabel": "Startkalender",
+      "title": "Startkalender",
+      "sideMenuTitle": "Startkalender",
       "tooltips": {
         "fetchData": "Daten abrufen",
         "refresh": "Aktualisieren",
         "exportLaunchInfo": "Startinformationen exportieren"
+      },
+      "labels": {
+        "dataActions": "Datenaktionen",
+        "results": "Bevorstehende Starts"
       },
       "table": {
         "launchWindow": "Startfenster",
@@ -17,6 +21,7 @@
         "country": "Land"
       },
       "msgs": {
+        "fetching": "Bevorstehende Starts werden geladen...",
         "unknown": "Unbekannt",
         "tbd": "Noch offen"
       },

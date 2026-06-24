@@ -9,18 +9,16 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
+import { hideAsyncIndicator, showAsyncIndicator } from '@app/engine/utils/asyncIndicator';
 import { truncateString } from '@app/engine/utils/truncate-string';
 import calendar2Png from '@public/img/icons/calendar2.png';
-import fetchPng from '@public/img/icons/download.png';
-import exportPng from '@public/img/icons/export.png';
-import refreshPng from '@public/img/icons/refresh.png';
 import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { t7e } from '@app/locales/keys';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import './next-launches.css';
+import './thespacedev-launch-calendar.css';
 
 /** Shorthand for this plugin's locale keys. */
-const l = (key: string): string => t7e(`plugins.NextLaunchesPlugin.${key}` as Parameters<typeof t7e>[0]);
+const l = (key: string): string => t7e(`plugins.TheSpaceDevLaunchCalendarPlugin.${key}` as Parameters<typeof t7e>[0]);
 
 interface LaunchInfoData {
   window_start: string | number | Date;
@@ -75,14 +73,14 @@ export interface LaunchInfoObject {
   windowStart: Date;
 }
 
-export class NextLaunchesPlugin extends KeepTrackPlugin {
-  readonly id = 'NextLaunchesPlugin';
+export class TheSpaceDevLaunchCalendarPlugin extends KeepTrackPlugin {
+  readonly id = 'TheSpaceDevLaunchCalendarPlugin';
   dependencies_ = [];
   private isLoggedIn_ = false;
   private isFetching_ = false;
   requiresInternet = true;
 
-  bottomIconElementName: string = 'menu-nextLaunch';
+  bottomIconElementName: string = 'menu-launch-calendar';
   bottomIconImg = calendar2Png;
 
   dragOptions: ClickDragOptions = {
@@ -115,28 +113,27 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
     };
   }
 
-  sideMenuElementName: string = 'nextLaunch-menu';
+  sideMenuElementName: string = 'launch-calendar-menu';
   sideMenuElementHtml: string = html`
-  <div id="nextLaunch-menu" class="side-menu-parent start-hidden">
-    <div id="nextLaunch-content" class="side-menu">
-      <div class="row">
-        <h5 class="center-align">${l('sideMenuTitle')}</h5>
-        <div class="nl-toolbar">
-          <button id="nextLaunch-fetch-btn" class="btn btn-ui waves-effect waves-light icon-btn"
-            type="button" kt-tooltip="${l('tooltips.fetchData')}">
-            <img src="${fetchPng}" class="icon-btn-img" alt="" />
-          </button>
-          <button id="nextLaunch-refresh-btn" class="btn btn-ui waves-effect waves-light icon-btn"
-            type="button" kt-tooltip="${l('tooltips.refresh')}" style="display:none;">
-            <img src="${refreshPng}" class="icon-btn-img" alt="" />
-          </button>
-          <button id="export-launch-info" class="btn btn-ui waves-effect waves-light icon-btn"
-            type="button" kt-tooltip="${l('tooltips.exportLaunchInfo')}">
-            <img src="" delayedsrc="${exportPng}" class="icon-btn-img" alt="" />
-          </button>
-        </div>
-        <table id="nextLaunch-table" class="center-align striped-light centered"></table>
-      </div>
+  <div id="launch-calendar-menu" class="side-menu-parent start-hidden kt-ui-v13" style="width: 900px;">
+    <div id="launch-calendar-content" class="side-menu">
+      <section class="kt-section">
+        <div class="kt-section-label">${l('labels.dataActions')}</div>
+        <button id="launch-calendar-fetch-btn" class="kt-action waves-effect" type="button">
+          <span class="kt-action-label">${l('tooltips.fetchData')}</span>
+        </button>
+        <button id="launch-calendar-refresh-btn" class="kt-action waves-effect" type="button" style="display:none;">
+          <span class="kt-action-label">${l('tooltips.refresh')}</span>
+        </button>
+        <div class="kt-divider"></div>
+        <button id="export-launch-info" class="kt-action waves-effect" type="button">
+          <span class="kt-action-label">${l('tooltips.exportLaunchInfo')}</span>
+        </button>
+      </section>
+      <section class="kt-section">
+        <div class="kt-section-label">${l('labels.results')}</div>
+        <table id="launch-calendar-table" class="launch-calendar-results-table"></table>
+      </section>
     </div>
   </div>`;
 
@@ -147,10 +144,13 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
       return;
     }
 
-    this.updateToolbarForLoginState_();
-
-    if (this.isLoggedIn_ && this.launchList.length === 0) {
+    // Fetch the launch list automatically the first time the menu is opened so
+    // the user does not have to hunt for a button. Subsequent opens reuse the
+    // already-loaded data (a manual Refresh re-downloads).
+    if (this.launchList.length === 0) {
       this.fetchLaunchData_();
+    } else {
+      this.updateToolbarForLoginState_();
     }
   }
 
@@ -167,15 +167,13 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
     EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
-        getEl('nextLaunch-fetch-btn', true)?.addEventListener('click', () => {
-          hideEl('nextLaunch-fetch-btn');
-          showEl('nextLaunch-refresh-btn', 'inline-flex');
+        getEl('launch-calendar-fetch-btn', true)?.addEventListener('click', () => {
           this.fetchLaunchData_();
         });
 
-        getEl('nextLaunch-refresh-btn', true)?.addEventListener('click', () => {
+        getEl('launch-calendar-refresh-btn', true)?.addEventListener('click', () => {
           this.launchList = [];
-          const tbl = getEl('nextLaunch-table') as HTMLTableElement | null;
+          const tbl = getEl('launch-calendar-table') as HTMLTableElement | null;
 
           if (tbl) {
             tbl.innerHTML = '';
@@ -197,6 +195,12 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
     }
     this.isFetching_ = true;
 
+    // The Space Devs detailed query is slow; show the non-modal async
+    // indicator (a small ring under the top bar) so the user knows the
+    // request is in flight but can still switch menus/screens meanwhile.
+    showAsyncIndicator(l('msgs.fetching'));
+    hideEl('launch-calendar-fetch-btn');
+
     const apiUrl = window.location.hostname === 'localhost' ? 'lldev' : 'll';
 
     fetch(`https://${apiUrl}.thespacedevs.com/2.0.0/launch/upcoming/?format=json&limit=20&mode=detailed`)
@@ -205,16 +209,17 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
       .catch(() => errorManagerInstance.warn(`https://${apiUrl}.thespacedevs.com/2.0.0/ is Unavailable!`))
       .finally(() => {
         this.isFetching_ = false;
+        hideAsyncIndicator();
 
-        const tbl = getEl('nextLaunch-table') as HTMLTableElement | null;
+        const tbl = getEl('launch-calendar-table') as HTMLTableElement | null;
 
         if (!tbl) {
           return;
         }
 
-        if (tbl.innerHTML === '') {
-          NextLaunchesPlugin.initTable(tbl, this.launchList);
-          const aElements = getEl('nextLaunch-table')!.querySelectorAll('a');
+        if (tbl.innerHTML === '' && this.launchList.length > 0) {
+          TheSpaceDevLaunchCalendarPlugin.initTable(tbl, this.launchList);
+          const aElements = getEl('launch-calendar-table')!.querySelectorAll('a');
 
           aElements.forEach((element) => {
             element.addEventListener('click', (e) => {
@@ -224,8 +229,14 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
           });
         }
 
-        hideEl('nextLaunch-fetch-btn');
-        showEl('nextLaunch-refresh-btn', 'inline-flex');
+        if (this.launchList.length > 0) {
+          hideEl('launch-calendar-fetch-btn');
+          showEl('launch-calendar-refresh-btn', 'flex');
+        } else {
+          // Fetch failed or returned nothing — let the user retry via Fetch.
+          showEl('launch-calendar-fetch-btn', 'flex');
+          hideEl('launch-calendar-refresh-btn');
+        }
       });
   }
 
@@ -249,27 +260,27 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
   }
 
   private updateToolbarForLoginState_(): void {
-    const fetchBtn = getEl('nextLaunch-fetch-btn', true);
-    const refreshBtn = getEl('nextLaunch-refresh-btn', true);
+    const fetchBtn = getEl('launch-calendar-fetch-btn', true);
+    const refreshBtn = getEl('launch-calendar-refresh-btn', true);
 
     if (this.isLoggedIn_) {
       if (fetchBtn) {
         hideEl(fetchBtn);
       }
       if (refreshBtn) {
-        showEl(refreshBtn, 'inline-flex');
+        showEl(refreshBtn, 'flex');
       }
     } else {
       if (fetchBtn) {
         if (this.launchList.length === 0) {
-          showEl(fetchBtn, 'inline-flex');
+          showEl(fetchBtn, 'flex');
         } else {
           hideEl(fetchBtn);
         }
       }
       if (refreshBtn) {
         if (this.launchList.length > 0) {
-          showEl(refreshBtn, 'inline-flex');
+          showEl(refreshBtn, 'flex');
         } else {
           hideEl(refreshBtn);
         }
@@ -346,27 +357,24 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
     const tdT = tr.insertCell();
 
     tdT.appendChild(document.createTextNode(l('table.launchWindow')));
-    tdT.setAttribute('style', 'text-decoration: underline; width: 120px;');
+    tdT.setAttribute('style', 'width: 120px;');
     const tdN = tr.insertCell();
 
     tdN.appendChild(document.createTextNode(l('table.mission')));
-    tdN.setAttribute('style', 'text-decoration: underline; width: 140px;');
+    tdN.setAttribute('style', 'width: 140px;');
     const tdL = tr.insertCell();
 
     tdL.appendChild(document.createTextNode(l('table.location')));
-    tdL.setAttribute('style', 'text-decoration: underline');
     const tdA = tr.insertCell();
 
     tdA.appendChild(document.createTextNode(l('table.agency')));
-    tdA.setAttribute('style', 'text-decoration: underline');
     const tdC = tr.insertCell();
 
     tdC.appendChild(document.createTextNode(l('table.country')));
-    tdC.setAttribute('style', 'text-decoration: underline');
   }
 
   static initTable(tbl: HTMLTableElement, launchList: LaunchInfoObject[]) {
-    NextLaunchesPlugin.makeTableHeaders(tbl);
+    TheSpaceDevLaunchCalendarPlugin.makeTableHeaders(tbl);
 
     for (const launchEvent of launchList) {
       const tr = tbl.insertRow();
@@ -413,10 +421,13 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
 
       tdA.innerHTML = agencyHTML;
 
-      // Country Cell
+      // Country Cell (wraps long comma-separated country lists, e.g. ESA members).
+      // Render a space after each comma so the cell wraps at code boundaries
+      // rather than mid-code.
       const tdC = tr.insertCell();
 
-      tdC.innerHTML = `<span class="badge dark-gray-badge" data-badge-caption="${launchEvent.country}"></span>`;
+      tdC.className = 'launch-calendar-country-cell';
+      tdC.textContent = launchEvent.country.replace(/,/gu, ', ');
     }
   }
 }

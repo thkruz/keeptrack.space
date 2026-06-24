@@ -1,13 +1,17 @@
 {
   "plugins": {
-    "NextLaunchesPlugin": {
-      "bottomIconLabel": "次の打ち上げ",
-      "title": "次の打ち上げメニュー",
-      "sideMenuTitle": "次の打ち上げ",
+    "TheSpaceDevLaunchCalendarPlugin": {
+      "bottomIconLabel": "打ち上げカレンダー",
+      "title": "打ち上げカレンダー",
+      "sideMenuTitle": "打ち上げカレンダー",
       "tooltips": {
         "fetchData": "データ取得",
         "refresh": "更新",
         "exportLaunchInfo": "打ち上げ情報をエクスポート"
+      },
+      "labels": {
+        "dataActions": "データ操作",
+        "results": "今後の打ち上げ"
       },
       "table": {
         "launchWindow": "打ち上げウィンドウ",
@@ -17,6 +21,7 @@
         "country": "国"
       },
       "msgs": {
+        "fetching": "今後の打ち上げを取得中...",
         "unknown": "不明",
         "tbd": "未定"
       },

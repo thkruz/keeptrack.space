@@ -1,13 +1,17 @@
 {
   "plugins": {
-    "NextLaunchesPlugin": {
-      "bottomIconLabel": "다음 발사",
-      "title": "다음 발사 메뉴",
-      "sideMenuTitle": "다음 발사",
+    "TheSpaceDevLaunchCalendarPlugin": {
+      "bottomIconLabel": "발사 캘린더",
+      "title": "발사 캘린더",
+      "sideMenuTitle": "발사 캘린더",
       "tooltips": {
         "fetchData": "데이터 가져오기",
         "refresh": "새로 고침",
         "exportLaunchInfo": "발사 정보 내보내기"
+      },
+      "labels": {
+        "dataActions": "데이터 작업",
+        "results": "예정된 발사"
       },
       "table": {
         "launchWindow": "발사 윈도우",
@@ -17,6 +21,7 @@
         "country": "국가"
       },
       "msgs": {
+        "fetching": "예정된 발사 정보를 가져오는 중...",
         "unknown": "알 수 없음",
         "tbd": "미정"
       },

@@ -1,0 +1,40 @@
+/*
+ * Launch Calendar (The Space Devs, OSS) menu styles. The menu opts into the shared v13 card system
+ * (.kt-ui-v13 + kt-section/kt-action); see src/engine/ui/menu-v13.css. Only the
+ * results-table chrome lives here.
+ */
+
+.launch-calendar-results-table {
+  width: 100%;
+  margin-top: 4px;
+  border-collapse: collapse;
+  line-height: 1.4;
+  font-size: 13px;
+}
+
+.launch-calendar-results-table td {
+  text-align: center;
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--color-dark-border);
+  vertical-align: middle;
+}
+
+/* Header row */
+.launch-calendar-results-table tr:first-child td {
+  padding: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-dark-text-muted);
+  border-bottom: 1px solid var(--color-dark-border);
+}
+
+/* Country cell: wrap long comma-separated lists (e.g. ESA member states) instead
+ * of letting one row blow out the table width. */
+.launch-calendar-results-table td.launch-calendar-country-cell {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.5;
+}

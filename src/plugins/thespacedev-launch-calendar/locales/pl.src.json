@@ -1,13 +1,17 @@
 {
   "plugins": {
-    "NextLaunchesPlugin": {
-      "bottomIconLabel": "Następne starty",
-      "title": "Menu następnych startów",
-      "sideMenuTitle": "Następne starty",
+    "TheSpaceDevLaunchCalendarPlugin": {
+      "bottomIconLabel": "Kalendarz startów",
+      "title": "Kalendarz startów",
+      "sideMenuTitle": "Kalendarz startów",
       "tooltips": {
         "fetchData": "Pobierz dane",
         "refresh": "Odśwież",
         "exportLaunchInfo": "Eksportuj informacje o startach"
+      },
+      "labels": {
+        "dataActions": "Działania na danych",
+        "results": "Nadchodzące starty"
       },
       "table": {
         "launchWindow": "Okno startowe",
@@ -17,6 +21,7 @@
         "country": "Kraj"
       },
       "msgs": {
+        "fetching": "Pobieranie nadchodzących startów...",
         "unknown": "Nieznane",
         "tbd": "Do ustalenia"
       },

@@ -1,13 +1,17 @@
 {
   "plugins": {
-    "NextLaunchesPlugin": {
-      "bottomIconLabel": "下次发射",
-      "title": "下次发射菜单",
-      "sideMenuTitle": "下次发射",
+    "TheSpaceDevLaunchCalendarPlugin": {
+      "bottomIconLabel": "发射日历",
+      "title": "发射日历",
+      "sideMenuTitle": "发射日历",
       "tooltips": {
         "fetchData": "获取数据",
         "refresh": "刷新",
         "exportLaunchInfo": "导出发射信息"
+      },
+      "labels": {
+        "dataActions": "数据操作",
+        "results": "即将进行的发射"
       },
       "table": {
         "launchWindow": "发射窗口",
@@ -17,6 +21,7 @@
         "country": "国家"
       },
       "msgs": {
+        "fetching": "正在获取即将进行的发射...",
         "unknown": "未知",
         "tbd": "待定"
       },

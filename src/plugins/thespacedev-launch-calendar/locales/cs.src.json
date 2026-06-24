@@ -1,13 +1,17 @@
 {
   "plugins": {
-    "NextLaunchesPlugin": {
-      "bottomIconLabel": "Další starty",
-      "title": "Menu dalších startů",
-      "sideMenuTitle": "Další starty",
+    "TheSpaceDevLaunchCalendarPlugin": {
+      "bottomIconLabel": "Kalendář startů",
+      "title": "Kalendář startů",
+      "sideMenuTitle": "Kalendář startů",
       "tooltips": {
         "fetchData": "Načíst data",
         "refresh": "Obnovit",
         "exportLaunchInfo": "Exportovat informace o startech"
+      },
+      "labels": {
+        "dataActions": "Akce s daty",
+        "results": "Nadcházející starty"
       },
       "table": {
         "launchWindow": "Startovní okno",
@@ -17,6 +21,7 @@
         "country": "Země"
       },
       "msgs": {
+        "fetching": "Načítání nadcházejících startů...",
         "unknown": "Neznámé",
         "tbd": "Bude upřesněno"
       },

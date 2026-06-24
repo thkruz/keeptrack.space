@@ -1,13 +1,17 @@
 {
   "plugins": {
-    "NextLaunchesPlugin": {
-      "bottomIconLabel": "Следующие запуски",
-      "title": "Меню следующих запусков",
-      "sideMenuTitle": "Следующие запуски",
+    "TheSpaceDevLaunchCalendarPlugin": {
+      "bottomIconLabel": "Календарь запусков",
+      "title": "Календарь запусков",
+      "sideMenuTitle": "Календарь запусков",
       "tooltips": {
         "fetchData": "Получить данные",
         "refresh": "Обновить",
         "exportLaunchInfo": "Экспортировать информацию о запусках"
+      },
+      "labels": {
+        "dataActions": "Действия с данными",
+        "results": "Предстоящие запуски"
       },
       "table": {
         "launchWindow": "Окно запуска",
@@ -17,6 +21,7 @@
         "country": "Страна"
       },
       "msgs": {
+        "fetching": "Загрузка предстоящих запусков...",
         "unknown": "Неизвестно",
         "tbd": "Уточняется"
       },

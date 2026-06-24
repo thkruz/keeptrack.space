@@ -3,7 +3,6 @@ import { CatalogManager } from '@app/app/data/catalog-manager';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { TimeManager } from '@app/engine/core/time-manager';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
@@ -25,37 +24,39 @@ import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, eci2lla, Kilometers, OrbitFinder, Satellite, SpaceObjectType, Tle, TleLine1, TleLine2 } from '@ootk/src/main';
+import { BaseObject, Satellite, SpaceObjectType, Tle, TleLine1, TleLine2 } from '@ootk/src/main';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import streamPng from '@public/img/icons/stream.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import {
+  BREAKUP_PRESETS,
   BreakupRawForm,
-  buildPieceTle,
+  buildFragmentTle,
+  computeRicBasis,
+  DEFAULT_BREAKUP_PRESET,
+  DeltaVSpreadMps,
+  getBreakupPreset,
   isAnalystRangeValid,
   makeRng,
   parseBreakupParams,
-  planRaanBuckets,
+  sampleDeltaV,
 } from './breakup-core';
 import './breakup.css';
 
 export interface BreakupParams {
   satId: number | null;
   breakupCount: number;
-  rascVariation: number;
-  incVariation: number;
-  meanmoVariation: number;
-  /** Optional so older callers (e.g. scenario restore) can omit it; onSubmit always sets it. */
-  eccVariation?: number;
+  /** Radial delta-V spread (m/s). */
+  radialDeltaV: number;
+  /** In-track delta-V spread (m/s). */
+  inTrackDeltaV: number;
+  /** Cross-track delta-V spread (m/s). */
+  crossTrackDeltaV: number;
   startNum: number;
 }
 
-/** Snapshot captured on a successful breakup so it can be fully undone (Clear Breakup). */
+/** State captured on a successful breakup so it can be fully undone (Clear Breakup). */
 interface BreakupUndoState {
-  parentId: number;
-  parentTle1: TleLine1;
-  parentTle2: TleLine2;
-  parentEcc: number;
   pieceIds: number[];
   priorSearchLimit: number;
 }
@@ -64,9 +65,6 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
   readonly id = 'Breakup';
   dependencies_ = [SelectSatManager.name];
   private readonly selectSatManager_: SelectSatManager;
-  private readonly maxDifApogeeVsPerigee_ = 1000;
-  /** Below this apogee-perigee spread the orbit is treated as round (argument of perigee ignored). */
-  private readonly roundOrbitThresholdKm_ = 300;
   private static readonly DEFAULT_START_NUM = 90000;
 
   lastBreakupParams: BreakupParams | null = null;
@@ -103,19 +101,12 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     const obj = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
 
     // Reject anything that isn't a true TLE-backed Satellite (e.g. OemSatellite returns
-    // true from isSatellite() but has no tle1/tle2/apogee/perigee, which would blow up
-    // downstream when OrbitFinder tries to synthesize TLEs from it).
+    // true from isSatellite() but has no tle1/tle2/satrec, which would blow up the
+    // state-vector propagation). Any orbital regime of a real Satellite is supported.
     if (!(obj instanceof Satellite)) {
       return;
     }
 
-    if (obj.apogee - obj.perigee > this.maxDifApogeeVsPerigee_) {
-      errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.CannotCreateBreakupForNonCircularOrbits'));
-      this.closeSideMenu();
-      this.setBottomIconToDisabled();
-
-      return;
-    }
     this.updateSccNumInMenu_();
   }
 
@@ -172,9 +163,6 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
 
   private buildSideMenuHtml_(): string {
     const l = (key: string) => t7e(`plugins.Breakup.labels.${key}` as Parameters<typeof t7e>[0]);
-    const degrees = l('degrees');
-    const minute = l('minute');
-    const minutes = l('minutes');
 
     return html`
       <div id="breakup-menu" class="side-menu-parent start-hidden kt-ui-v13">
@@ -195,80 +183,39 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
               </div>
             </section>
             <section class="kt-section">
-              <div class="kt-section-label">${l('spreadSection')}</div>
+              <div class="kt-section-label">${l('dispersionSection')}</div>
+              <div class="input-field col s12">
+                <select id="hc-event-preset">
+                  ${BREAKUP_PRESETS.map((p) => `<option value="${p.id}"${p.id === DEFAULT_BREAKUP_PRESET ? ' selected' : ''}>${l(`preset_${p.id}`)}</option>`).join('')}
+                  <option value="custom">${l('preset_custom')}</option>
+                </select>
+                <label>${l('eventTypeLabel')}</label>
+              </div>
+              <!--
+                Defaults are isotropic ~40 m/s per axis, an explosion-class event
+                (rocket-body / battery / propellant breakups, which dominate the real
+                catalog). Real breakup ΔV is spherically symmetric (NASA Standard
+                Breakup Model, EVOLVE 4.0), so the three axes share one value; the
+                cloud's in-track elongation emerges from orbital dynamics, not from
+                anisotropic input. With a per-axis 1σ Gaussian the median total ΔV is
+                ≈1.54σ, so 40 m/s → ~60 m/s median (explosion fragments are ~10-100 m/s;
+                catastrophic collisions run ~100-300 m/s, small fragments to ~1 km/s).
+              -->
               <div class="kt-field-row">
-                <div class="input-field col s6">
-                  <select id="hc-inc">
-                    <option value="0">0 ${degrees}</option>
-                    <option value="0.005">0.005 ${degrees}</option>
-                    <option value="0.025">0.025 ${degrees}</option>
-                    <option value="0.05" selected>0.05 ${degrees}</option>
-                    <option value="0.1">0.1 ${degrees}</option>
-                    <option value="0.2">0.2 ${degrees}</option>
-                    <option value="0.3">0.3 ${degrees}</option>
-                    <option value="0.4">0.4 ${degrees}</option>
-                    <option value="0.5">0.5 ${degrees}</option>
-                    <option value="0.6">0.6 ${degrees}</option>
-                    <option value="0.7">0.7 ${degrees}</option>
-                    <option value="0.8">0.8 ${degrees}</option>
-                    <option value="0.9">0.9 ${degrees}</option>
-                    <option value="1">1 ${degrees}</option>
-                  </select>
-                  <label>${l('inclinationVariation')}</label>
+                <div class="input-field col s4">
+                  <input id="hc-dv-radial" type="number" min="0" step="1" value="40" />
+                  <label for="hc-dv-radial" class="active">${l('radialDeltaV')}</label>
                 </div>
-                <div class="input-field col s6">
-                  <select id="hc-per">
-                    <option value="0">0 ${minutes}</option>
-                    <option value="0.1" selected>0.1 ${minutes}</option>
-                    <option value="0.15">0.15 ${minutes}</option>
-                    <option value="0.25">0.25 ${minutes}</option>
-                    <option value="0.3">0.3 ${minutes}</option>
-                    <option value="0.5">0.5 ${minutes}</option>
-                    <option value="0.75">0.75 ${minutes}</option>
-                    <option value="1">1 ${minute}</option>
-                    <option value="1.5">1.5 ${minutes}</option>
-                    <option value="2">2 ${minutes}</option>
-                    <option value="2.5">2.5 ${minutes}</option>
-                    <option value="3">3 ${minutes}</option>
-                    <option value="4">4 ${minutes}</option>
-                    <option value="5">5 ${minutes}</option>
-                  </select>
-                  <label>${l('periodVariation')}</label>
+                <div class="input-field col s4">
+                  <input id="hc-dv-intrack" type="number" min="0" step="1" value="40" />
+                  <label for="hc-dv-intrack" class="active">${l('inTrackDeltaV')}</label>
+                </div>
+                <div class="input-field col s4">
+                  <input id="hc-dv-crosstrack" type="number" min="0" step="1" value="40" />
+                  <label for="hc-dv-crosstrack" class="active">${l('crossTrackDeltaV')}</label>
                 </div>
               </div>
-              <div class="kt-field-row">
-                <div class="input-field col s6">
-                  <select id="hc-raan">
-                    <option value="0">0 ${degrees}</option>
-                    <option value="0.005">0.005 ${degrees}</option>
-                    <option value="0.025">0.025 ${degrees}</option>
-                    <option value="0.05" selected>0.05 ${degrees}</option>
-                    <option value="0.1">0.1 ${degrees}</option>
-                    <option value="0.2">0.2 ${degrees}</option>
-                    <option value="0.3">0.3 ${degrees}</option>
-                    <option value="0.4">0.4 ${degrees}</option>
-                    <option value="0.5">0.5 ${degrees}</option>
-                    <option value="0.6">0.6 ${degrees}</option>
-                    <option value="0.7">0.7 ${degrees}</option>
-                    <option value="0.8">0.8 ${degrees}</option>
-                    <option value="0.9">0.9 ${degrees}</option>
-                    <option value="1">1 ${degrees}</option>
-                  </select>
-                  <label>${l('rightAscensionVariation')}</label>
-                </div>
-                <div class="input-field col s6">
-                  <select id="hc-ecc">
-                    <option value="0">0</option>
-                    <option value="0.00005">0.00005</option>
-                    <option value="0.0001">0.0001</option>
-                    <option value="0.00015" selected>0.00015</option>
-                    <option value="0.0003">0.0003</option>
-                    <option value="0.0005">0.0005</option>
-                    <option value="0.001">0.001</option>
-                  </select>
-                  <label>${l('eccentricityVariation')}</label>
-                </div>
-              </div>
+              <div class="kt-note">${l('dispersionHint')}</div>
             </section>
             <section class="kt-section">
               <div class="kt-section-label">${l('piecesSection')}</div>
@@ -341,17 +288,10 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     // Custom satellite selection handling - KEEP: Custom plugin logic
     EventBus.getInstance().on(EventBusEvent.selectSatData, (sat: BaseObject) => {
       // Restrict to true TLE-backed Satellite - OemSatellite passes isSatellite() but
-      // can't be propagated through the SGP4 breakup pipeline.
+      // has no satrec to propagate. Any orbital regime of a real Satellite is supported.
       if (!(sat instanceof Satellite)) {
         if (this.isMenuButtonActive) {
           this.closeSideMenu();
-        }
-        this.setBottomIconToUnselected();
-        this.setBottomIconToDisabled();
-      } else if (sat.apogee - sat.perigee > this.maxDifApogeeVsPerigee_) {
-        if (this.isMenuButtonActive) {
-          this.closeSideMenu();
-          errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.CannotCreateBreakupForNonCircularOrbits'));
         }
         this.setBottomIconToUnselected();
         this.setBottomIconToDisabled();
@@ -372,6 +312,11 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
 
     getEl('breakup-clear-btn')?.addEventListener('click', () => {
       showLoading(() => this.clearBreakup_());
+    });
+
+    // Selecting an event-type preset fills the per-axis delta-V fields.
+    getEl('hc-event-preset')?.addEventListener('change', (e) => {
+      this.applyPreset_((e.target as HTMLSelectElement).value);
     });
 
     this.restoreInputs_();
@@ -395,26 +340,26 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     (<HTMLInputElement>getEl('hc-scc')).value = (obj as Satellite).sccNum;
   }
 
-  // eslint-disable-next-line max-statements, complexity
+  // eslint-disable-next-line max-statements
   private onSubmit_(): void {
     const timeManager = ServiceLocator.getTimeManager();
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const { simulationTimeObj } = timeManager;
 
-    const { satId, breakupCount, rascVariation, incVariation, meanmoVariation, eccVariation, startNum, startNumWasInvalid } =
+    const { satId, breakupCount, radialDeltaV, inTrackDeltaV, crossTrackDeltaV, startNum, startNumWasInvalid } =
       Breakup.getFormData_(catalogManagerInstance);
 
     if (startNumWasInvalid) {
       errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.InvalidStartNum'));
     }
 
-    this.lastBreakupParams = { satId, breakupCount, rascVariation, incVariation, meanmoVariation, eccVariation, startNum };
+    this.lastBreakupParams = { satId, breakupCount, radialDeltaV, inTrackDeltaV, crossTrackDeltaV, startNum };
     this.persistInputs_();
 
     const mainsat = catalogManagerInstance.getSat(satId ?? -1);
 
     // getSat's return type is Satellite, but at runtime it only checks isSatellite() -
-    // OemSatellite slips through that check and lacks tle1/tle2/apogee/perigee.
+    // OemSatellite slips through that check and lacks a propagatable satrec.
     if (!mainsat || satId === null || !(mainsat instanceof Satellite)) {
       errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.SatelliteNotFound'));
 
@@ -433,147 +378,100 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
       return;
     }
 
-    if (mainsat.apogee - mainsat.perigee > this.maxDifApogeeVsPerigee_) {
-      errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.CannotCreateBreakupForNonCircularOrbits'));
+    // The breakup happens at the parent's exact position/velocity at the current sim
+    // time. Working from the TEME state vector (the SGP4 frame) means every fragment
+    // shares that breakup point and the model is valid in any orbital regime.
+    const parentState = mainsat.eci(simulationTimeObj);
 
-      return;
-    }
-
-    // Launch Points are the Satellites Current Location
-    const gmst = timeManager.gmst;
-    const lla = eci2lla(mainsat.position, gmst);
-    const launchLat = lla.lat;
-    const launchLon = lla.lon;
-
-    const upOrDown = SatMath.getDirection(mainsat, simulationTimeObj);
-
-    if (upOrDown === 'Error') {
-      errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.CannotCalcDirectionOfSatellite'));
-    }
-
-    // Snapshot the parent's original orbit so Clear Breakup can fully restore it.
-    const originalParentTle1 = mainsat.tle1;
-    const originalParentTle2 = mainsat.tle2;
-    const originalParentEcc = mainsat.eccentricity;
-
-    const currentEpoch = TimeManager.currentEpoch(simulationTimeObj);
-    const reEpochedTle1 = (mainsat.tle1.substring(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.tle1.substring(32)) as TleLine1;
-
-    ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
-
-    // Ignore argument of perigee for round orbits (OPTIMIZE).
-    const isRoundOrbit = mainsat.apogee - mainsat.perigee < this.roundOrbitThresholdKm_;
-    const alt = (isRoundOrbit ? 0 : lla.alt) as Kilometers;
-
-    // Re-epoch + rotate the parent so its ground track passes over the breakup point.
-    // Work on a copy so a partial failure never mutates the live catalog object.
-    const parentSat = new Satellite({ ...mainsat, tle1: reEpochedTle1 });
-    const parentTles = new OrbitFinder(parentSat, launchLat, launchLon, <'N' | 'S'>upOrDown, simulationTimeObj, alt).rotateOrbitToLatLon();
-
-    if (parentTles[0] === 'Error') {
+    if (!parentState?.position || !parentState.velocity) {
       errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.ErrorCreatingBreakup'));
 
       return;
     }
 
-    const parentTle1 = parentTles[0] as TleLine1;
-    const parentTle2 = parentTles[1] as TleLine2;
+    const position = parentState.position;
+    const velocity = parentState.velocity;
+    const basis = computeRicBasis(position, velocity);
+    const spread: DeltaVSpreadMps = { radial: radialDeltaV, inTrack: inTrackDeltaV, crossTrack: crossTrackDeltaV };
+    // Seed from the parameters so a given configuration produces a reproducible cloud.
+    const rng = makeRng((startNum ^ breakupCount ^ Math.round((inTrackDeltaV + radialDeltaV + crossTrackDeltaV) * 1000)) >>> 0);
+
+    ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
+
     const orbitManagerInstance = ServiceLocator.getOrbitManager();
-    const newParentSat = new Satellite({ ...mainsat, id: satId, tle1: parentTle1, tle2: parentTle2, active: true });
-
-    catalogManagerInstance.objectCache[satId] = newParentSat;
-    catalogManagerInstance.satCruncherThread.sendSatEdit(satId, parentTle1, parentTle2);
-    orbitManagerInstance.changeOrbitBufferData(satId, parentTle1, parentTle2);
-
-    const baseInc = parseFloat(parentTle2.substring(8, 16));
-    const buckets = planRaanBuckets(breakupCount, rascVariation);
-    // Seed from the parameters so a given configuration is reproducible.
-    const rng = makeRng((startNum ^ breakupCount ^ Math.round(rascVariation * 1e6)) >>> 0);
     const createdIds: number[] = [];
-    let pieceIndex = 0;
+    // Fragments whose orbit can't be represented (reentering / sub-orbital). A high
+    // delta-V on a low orbit legitimately produces these; skip them, never abort.
+    let reenteredCount = 0;
 
-    for (const bucket of buckets) {
-      if (bucket.count <= 0) {
+    for (let i = 0; i < breakupCount; i++) {
+      const a5Num = Tle.convert6DigitToA5((startNum + i).toString());
+      const pieceSatId = catalogManagerInstance.sccNum2Id(a5Num);
+
+      if (!pieceSatId) {
+        errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.SatelliteNotFound'));
+
+        return;
+      }
+
+      const dv = sampleDeltaV(rng, spread);
+      let pieceTle1: TleLine1;
+      let pieceTle2: TleLine2;
+
+      try {
+        ({ tle1: pieceTle1, tle2: pieceTle2 } = buildFragmentTle(simulationTimeObj, position, velocity, basis, dv, a5Num));
+      } catch {
+        // Degenerate/sub-orbital fragment (hyperbolic from an absurd delta-V, or
+        // perigee below the surface from a large delta-V on a low orbit). Skip it.
+        reenteredCount++;
         continue;
       }
 
-      // One OrbitFinder solve per RAAN bucket (the expensive op), shared by every piece in it.
-      let bucketTles = new OrbitFinder(parentSat, launchLat, launchLon, <'N' | 'S'>upOrDown, simulationTimeObj, alt, bucket.offset).rotateOrbitToLatLon();
+      let newSat: Satellite;
 
-      if (bucketTles[0] === 'Error') {
-        // Retry once with a 1ms time nudge (OrbitFinder occasionally fails to converge).
-        bucketTles = new OrbitFinder(parentSat, launchLat, launchLon, <'N' | 'S'>upOrDown, new Date(simulationTimeObj.getTime() + 1), alt, bucket.offset).rotateOrbitToLatLon();
-        if (bucketTles[0] === 'Error') {
-          errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.ErrorCreatingBreakup'));
-
-          return;
-        }
+      try {
+        newSat = new Satellite({
+          ...catalogManagerInstance.objectCache[pieceSatId],
+          ...{
+            id: pieceSatId,
+            name: `Breakup Piece ${i + 1}`,
+            tle1: pieceTle1,
+            tle2: pieceTle2,
+            // The analyst-slot template is a PAYLOAD; pieces are debris and
+            // need the type overridden so color schemes and search treat
+            // them correctly.
+            type: SpaceObjectType.DEBRIS,
+            active: true,
+          },
+        });
+      } catch {
+        // A single unrepresentable fragment must not abort the whole cloud.
+        reenteredCount++;
+        continue;
       }
 
-      const refTle1 = bucketTles[0];
-      const refTle2 = bucketTles[1];
-
-      for (let b = 0; b < bucket.count; b++, pieceIndex++) {
-        const a5Num = Tle.convert6DigitToA5((startNum + pieceIndex).toString());
-        const pieceSatId = catalogManagerInstance.sccNum2Id(a5Num);
-
-        if (!pieceSatId) {
-          errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.SatelliteNotFound'));
-
-          return;
-        }
-
-        let pieceTle1: TleLine1;
-        let pieceTle2: TleLine2;
-
-        try {
-          ({ tle1: pieceTle1, tle2: pieceTle2 } = buildPieceTle(refTle1, refTle2, {
-            a5Num,
-            baseInc,
-            incVariation,
-            meanmoVariation,
-            baseEcc: originalParentEcc,
-            eccVariation,
-            rng,
-          }));
-        } catch (e) {
-          errorManagerInstance.error(e, 'breakup.ts', t7e('plugins.Breakup.errorMsgs.ErrorCreatingBreakup'));
-
-          return;
-        }
-
-        let newSat: Satellite;
-
-        try {
-          newSat = new Satellite({
-            ...catalogManagerInstance.objectCache[pieceSatId],
-            ...{
-              id: pieceSatId,
-              name: `Breakup Piece ${pieceIndex + 1}`,
-              tle1: pieceTle1,
-              tle2: pieceTle2,
-              // The analyst-slot template is a PAYLOAD; pieces are debris and
-              // need the type overridden so color schemes and search treat
-              // them correctly.
-              type: SpaceObjectType.DEBRIS,
-              active: true,
-            },
-          });
-        } catch (e) {
-          errorManagerInstance.error(e, 'breakup.ts', t7e('plugins.Breakup.errorMsgs.ErrorCreatingBreakup'));
-
-          return;
-        }
-
-        if (SatMath.altitudeCheck(newSat.satrec!, simulationTimeObj) > 1) {
-          catalogManagerInstance.objectCache[pieceSatId] = newSat;
-          catalogManagerInstance.satCruncherThread.sendSatEdit(pieceSatId, pieceTle1, pieceTle2, true);
-          orbitManagerInstance.changeOrbitBufferData(pieceSatId, pieceTle1, pieceTle2);
-          createdIds.push(pieceSatId);
-        } else {
-          errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.BreakupGeneratorFailed'));
-        }
+      if (SatMath.altitudeCheck(newSat.satrec!, simulationTimeObj) > 1) {
+        catalogManagerInstance.objectCache[pieceSatId] = newSat;
+        catalogManagerInstance.satCruncherThread.sendSatEdit(pieceSatId, pieceTle1, pieceTle2, true);
+        orbitManagerInstance.changeOrbitBufferData(pieceSatId, pieceTle1, pieceTle2);
+        createdIds.push(pieceSatId);
+      } else {
+        reenteredCount++;
       }
+    }
+
+    if (createdIds.length === 0) {
+      errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.ErrorCreatingBreakup'));
+
+      return;
+    }
+
+    // No silent caps: tell the user when fragments were dropped because they reentered.
+    if (reenteredCount > 0) {
+      ServiceLocator.getUiManager().toast(
+        t7e('plugins.Breakup.toasts.fragmentsReentered' as Parameters<typeof t7e>[0]).replace('{count}', reenteredCount.toString()),
+        ToastMsgType.caution,
+      );
     }
 
     const priorSearchLimit = settingsManager.searchLimit;
@@ -583,10 +481,6 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     }
 
     this.lastBreakup_ = {
-      parentId: satId,
-      parentTle1: originalParentTle1,
-      parentTle2: originalParentTle2,
-      parentEcc: originalParentEcc,
       pieceIds: createdIds,
       priorSearchLimit,
     };
@@ -605,15 +499,12 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
      * The sendSatEdit posts above are async, so position data for the pieces is
      * still all-zero for a few frames - the search filters out (0,0,0) sats as
      * "Decayed" (search-manager getSearchableObjects_), so an early search finds
-     * nothing and only a manual re-search shows the cloud. A fixed frame skip is
-     * not enough: with up to 1000 queued edits the pieces can still be zero after
-     * a couple of frames. Instead, wait until the LAST created piece actually has
-     * a non-zero position - the cruncher applies edits in id order, so the last
-     * piece going live means the whole batch has propagated.
+     * nothing and only a manual re-search shows the cloud. Wait until the LAST
+     * created piece actually has a non-zero position before searching.
      */
     const searchStr = `${mainsat.sccNum},Breakup Piece`;
     const dotsManagerInstance = ServiceLocator.getDotsManager();
-    const lastPieceId = createdIds.length > 0 ? createdIds[createdIds.length - 1] : null;
+    const lastPieceId = createdIds[createdIds.length - 1];
 
     waitForCruncher({
       cruncher: catalogManagerInstance.satCruncher,
@@ -622,14 +513,7 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
         if (typeof data.satPos === 'undefined') {
           return false;
         }
-        if (lastPieceId === null) {
-          return true;
-        }
 
-        // The dots manager updates positionData from this same frame (its listener
-        // runs before ours), so getCurrentPosition reflects the latest cruncher output.
-        // positionData can be nulled mid catalog-swap (undefined entries), so require
-        // finite coordinates before treating a non-zero position as "propagated".
         const pos = dotsManagerInstance.getCurrentPosition(lastPieceId);
         const isFinitePos = Number.isFinite(pos.x) && Number.isFinite(pos.y) && Number.isFinite(pos.z);
 
@@ -641,9 +525,9 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
   }
 
   /**
-   * Undo the most recent breakup: restore the parent satellite's original orbit,
-   * return every generated piece to its reserved (inactive) analyst slot, and
-   * restore the prior search limit. Removes the need to reload the page.
+   * Undo the most recent breakup: return every generated piece to its reserved
+   * (inactive) analyst slot and restore the prior search limit. The parent
+   * satellite is never modified by a breakup, so nothing to restore there.
    */
   private clearBreakup_(): void {
     if (!this.lastBreakup_) {
@@ -652,17 +536,7 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
 
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const orbitManagerInstance = ServiceLocator.getOrbitManager();
-    const { parentId, parentTle1, parentTle2, pieceIds, priorSearchLimit } = this.lastBreakup_;
-
-    const parent = catalogManagerInstance.getSat(parentId);
-
-    if (parent instanceof Satellite) {
-      const restored = new Satellite({ ...parent, id: parentId, tle1: parentTle1, tle2: parentTle2 });
-
-      catalogManagerInstance.objectCache[parentId] = restored;
-      catalogManagerInstance.satCruncherThread.sendSatEdit(parentId, parentTle1, parentTle2);
-      orbitManagerInstance.changeOrbitBufferData(parentId, parentTle1, parentTle2);
-    }
+    const { pieceIds, priorSearchLimit } = this.lastBreakup_;
 
     for (const id of pieceIds) {
       const obj = catalogManagerInstance.objectCache[id];
@@ -688,6 +562,27 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     ServiceLocator.getUiManager().toast(t7e('plugins.Breakup.toasts.cleared' as Parameters<typeof t7e>[0]), ToastMsgType.normal);
   }
 
+  /** Fill the per-axis delta-V fields from an event-type preset ("custom" is a no-op). */
+  private applyPreset_(presetId: string): void {
+    const preset = getBreakupPreset(presetId);
+
+    if (!preset) {
+      return;
+    }
+
+    const set = (id: string, value: number) => {
+      const el = getEl(id, true) as HTMLInputElement | null;
+
+      if (el) {
+        el.value = value.toString();
+      }
+    };
+
+    set('hc-dv-radial', preset.radial);
+    set('hc-dv-intrack', preset.inTrack);
+    set('hc-dv-crosstrack', preset.crossTrack);
+  }
+
   /** Show the Clear Breakup action only when there is a breakup to undo. */
   private updateClearButton_(): void {
     const btn = getEl('breakup-clear-btn', true);
@@ -697,7 +592,7 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     }
   }
 
-  /** Persist the current variation inputs so they are restored next session. */
+  /** Persist the current inputs so they are restored next session. */
   private persistInputs_(): void {
     const settings: Record<string, string> = {};
 
@@ -712,7 +607,7 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     PersistenceManager.getInstance().saveItem(StorageKey.BREAKUP_SETTINGS, JSON.stringify(settings));
   }
 
-  /** Restore the last-used variation inputs (call before initMaterialSelects). */
+  /** Restore the last-used inputs (call before initMaterialSelects). */
   private restoreInputs_(): void {
     const raw = PersistenceManager.getInstance().getItem(StorageKey.BREAKUP_SETTINGS);
 
@@ -738,15 +633,14 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     }
   }
 
-  private static readonly PERSISTED_INPUT_IDS = ['hc-startNum', 'hc-inc', 'hc-per', 'hc-raan', 'hc-ecc', 'hc-count'];
+  private static readonly PERSISTED_INPUT_IDS = ['hc-startNum', 'hc-event-preset', 'hc-dv-radial', 'hc-dv-intrack', 'hc-dv-crosstrack', 'hc-count'];
 
   private static getFormData_(catalogManagerInstance: CatalogManager) {
     const satId = catalogManagerInstance.sccNum2Id((<HTMLInputElement>getEl('hc-scc')).value);
     const raw: BreakupRawForm = {
-      periodVariation: (<HTMLInputElement>getEl('hc-per')).value,
-      incVariation: (<HTMLInputElement>getEl('hc-inc')).value,
-      rascVariation: (<HTMLInputElement>getEl('hc-raan')).value,
-      eccVariation: (<HTMLInputElement>getEl('hc-ecc')).value,
+      radialDv: (<HTMLInputElement>getEl('hc-dv-radial')).value,
+      inTrackDv: (<HTMLInputElement>getEl('hc-dv-intrack')).value,
+      crossTrackDv: (<HTMLInputElement>getEl('hc-dv-crosstrack')).value,
       count: (<HTMLInputElement>getEl('hc-count')).value,
       startNum: (<HTMLInputElement>getEl('hc-startNum')).value,
     };

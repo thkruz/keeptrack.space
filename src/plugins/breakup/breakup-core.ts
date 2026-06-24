@@ -1,10 +1,18 @@
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
- * breakup-core.ts holds the DOM-free, catalog-free math for the Breakup
- * simulator: variation parsing/validation, the symmetric RAAN bucket plan, the
- * per-piece TLE construction, and a seedable PRNG. Keeping this pure makes the
- * variation math unit-testable without OrbitFinder, the catalog, or the DOM.
+ * breakup-core.ts holds the DOM-free, catalog-free physics for the Breakup
+ * simulator. Fragments are modelled the way a real breakup behaves: every piece
+ * leaves the parent's exact position at the breakup instant with a small random
+ * velocity change (delta-V) sampled in the radial / in-track / cross-track (RIC)
+ * frame. The fragment state is then fit to SGP4 *mean* elements with `rv2tle`
+ * (a TLE built straight from osculating elements lands kilometres off, because
+ * SGP4 expects Brouwer mean elements). This works in ANY orbital regime
+ * (LEO/MEO/GEO/HEO/elliptical) - unlike the old OrbitFinder "rotate the ground
+ * track over a lat/lon" approach, which only approximated a near-circular breakup.
+ *
+ * Everything here works in the TEME frame (the SGP4 output frame KeepTrack uses),
+ * so there is no J2000-vs-TEME frame mismatch.
  *
  * https://keeptrack.space
  *
@@ -24,75 +32,130 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { TleLine1, TleLine2 } from '@ootk/src/main';
+import { rv2tle, RvVector, TleLine1, TleLine2 } from '@ootk/src/main';
 
-/** Minutes in a day, used to convert a period variation (minutes) to mean-motion (rev/day). */
-export const MINUTES_PER_DAY = 1440;
+/** Convert metres-per-second (UI units) to kilometres-per-second (ootk units). */
+export const MS_TO_KMS = 0.001;
 
-/**
- * Number of discrete RAAN buckets the debris cloud is split into. Each bucket is
- * one OrbitFinder solve (expensive), so this is kept small; the pieces inside a
- * bucket share the bucket's RAAN but get independent inc/period/ecc jitter.
- */
-export const RAAN_BUCKET_COUNT = 5;
-
-/** A TLE line-2 field is invalid if a spliced line is not exactly this long. */
+/** A spliced TLE line must be exactly this long. */
 const TLE_LINE_LENGTH = 69;
 
-/** Eccentricity must stay in [0, 1); clamp just below 1 so the 7-digit field never overflows. */
-const MAX_ECCENTRICITY = 0.9999999;
+/** Max mean motion (rev/day) the TLE format / ootk parser accepts; beyond this an orbit is sub-orbital. */
+const MAX_TLE_MEAN_MOTION = 18;
+
+/** A simple cartesian 3-vector (km for position, km/s for velocity). */
+export type Vec3 = RvVector;
+
+/**
+ * Event-type presets that fill the per-axis delta-V fields (one-sigma, m/s).
+ *
+ * Magnitudes are grounded in the NASA Standard Breakup Model (EVOLVE 4.0):
+ * fragment delta-V is log-normal, mu_v = 0.2*log10(A/M)+1.85 (explosion) or
+ * 0.9*log10(A/M)+2.90 (collision), sigma_v = 0.4. Per-axis sigmas target the
+ * observed median total delta-V for trackable (>~10 cm) debris (median total of
+ * an isotropic draw ~= 1.54*sigma; for the anisotropic presets it is ~0.89*RMS):
+ *   - explosion: ~60 m/s   (catalog-dominant rocket-body/battery breakups, ~10-100 m/s)
+ *   - collision: ~155 m/s  (catastrophic on-orbit collision; 80% of >10 cm fragments <250 m/s)
+ *   - asat_cosmos: ~130 m/s (Cosmos 1408, 2021; tighter 185-1440 km spread -> lower energy)
+ *   - asat_fy1c: ~300 m/s  (Fengyun-1C, 2007; ~9 km/s intercept, 200-4000 km spread)
+ *   - venting: ~23 m/s     (low-energy overpressure / propellant venting)
+ *
+ * Direction (anisotropy): the NASA SBM assigns directions isotropically (it
+ * averages over unknown impact geometry). That is physically right for an
+ * explosion / venting (internal energy release -> spherically symmetric), so
+ * those keep equal axes. A hypervelocity impact instead imparts momentum along
+ * the impact direction; for a direct-ascent ASAT the closing velocity is
+ * dominated by the target's in-plane orbital motion, so the spread concentrates
+ * in the orbital plane (radial + in-track) with suppressed cross-track. The
+ * collision/ASAT presets therefore use cross-track ~= 0.4x the in-plane axes.
+ * (A specific collision's geometry varies; this is the common LEO in-plane case.)
+ */
+export interface BreakupPreset {
+  id: string;
+  radial: number;
+  inTrack: number;
+  crossTrack: number;
+}
+
+export const BREAKUP_PRESETS: readonly BreakupPreset[] = [
+  { id: 'explosion', radial: 40, inTrack: 40, crossTrack: 40 },
+  { id: 'collision', radial: 120, inTrack: 120, crossTrack: 50 },
+  { id: 'asat_cosmos', radial: 100, inTrack: 100, crossTrack: 40 },
+  { id: 'asat_fy1c', radial: 230, inTrack: 230, crossTrack: 90 },
+  { id: 'venting', radial: 15, inTrack: 15, crossTrack: 15 },
+];
+
+/** Default event-type preset (matches the menu's initial delta-V field values). */
+export const DEFAULT_BREAKUP_PRESET = 'explosion';
+
+/** Look up a preset by id, or null (e.g. for the "custom" option). */
+export function getBreakupPreset(id: string): BreakupPreset | null {
+  return BREAKUP_PRESETS.find((p) => p.id === id) ?? null;
+}
+
+/** Per-axis delta-V spread (standard deviation), in metres per second, as entered in the menu. */
+export interface DeltaVSpreadMps {
+  /** Radial (toward/away from Earth) spread. */
+  radial: number;
+  /** In-track (along velocity) spread - dominates how the cloud stretches along the orbit. */
+  inTrack: number;
+  /** Cross-track (out of plane) spread - dominates how the cloud fans across the orbit plane. */
+  crossTrack: number;
+}
+
+/** A sampled delta-V for one fragment, in km/s, expressed in RIC components. */
+export interface DeltaVComponentsKms {
+  r: number;
+  i: number;
+  c: number;
+}
+
+/** Orthonormal radial / in-track / cross-track basis vectors for a parent state. */
+export interface RicBasis {
+  radial: Vec3;
+  inTrack: Vec3;
+  crossTrack: Vec3;
+}
 
 /** Raw (string) form values read from the menu, before parsing. */
 export interface BreakupRawForm {
-  periodVariation: string;
-  incVariation: string;
-  rascVariation: string;
-  eccVariation: string;
+  radialDv: string;
+  inTrackDv: string;
+  crossTrackDv: string;
   count: string;
   startNum: string;
 }
 
-/** Parsed, numeric breakup variation parameters. */
+/** Parsed, numeric breakup parameters. */
 export interface BreakupVariationParams {
   /** Number of debris pieces to create. */
   breakupCount: number;
-  /** RAAN spread in degrees (full width of the distribution). */
-  rascVariation: number;
-  /** Inclination spread in degrees (+/- half-width applied per piece). */
-  incVariation: number;
-  /** Mean-motion spread in rev/day (derived from the period variation). */
-  meanmoVariation: number;
-  /** Eccentricity spread (absolute, +/- half-width applied per piece). */
-  eccVariation: number;
+  /** Radial delta-V spread (m/s). */
+  radialDeltaV: number;
+  /** In-track delta-V spread (m/s). */
+  inTrackDeltaV: number;
+  /** Cross-track delta-V spread (m/s). */
+  crossTrackDeltaV: number;
   /** First analyst catalog number assigned to the pieces. */
   startNum: number;
 }
 
-/** A single RAAN bucket: an offset (degrees) shared by `count` pieces. */
-export interface RaanBucket {
-  /** RAAN offset for this bucket, in degrees, relative to the parent orbit. */
-  offset: number;
-  /** How many pieces fall into this bucket. */
-  count: number;
-}
+// --- Minimal vector helpers (kept local so the core has no class-construction quirks) ---
 
-/** Inputs for building one debris piece's TLE pair. */
-export interface PieceVariationInput {
-  /** Alpha-5 satellite number (5 chars) to stamp into both lines. */
-  a5Num: string;
-  /** Parent inclination in degrees (the variation is applied around this). */
-  baseInc: number;
-  /** Inclination spread in degrees. */
-  incVariation: number;
-  /** Mean-motion spread in rev/day. */
-  meanmoVariation: number;
-  /** Parent eccentricity (0..1) the variation is applied around. */
-  baseEcc: number;
-  /** Eccentricity spread (absolute). */
-  eccVariation: number;
-  /** Random source returning a value in [0, 1). */
-  rng: () => number;
-}
+const dot_ = (a: Vec3, b: Vec3): number => a.x * b.x + a.y * b.y + a.z * b.z;
+const cross_ = (a: Vec3, b: Vec3): Vec3 => ({
+  x: a.y * b.z - a.z * b.y,
+  y: a.z * b.x - a.x * b.z,
+  z: a.x * b.y - a.y * b.x,
+});
+const norm_ = (a: Vec3): number => Math.sqrt(dot_(a, a));
+const scale_ = (a: Vec3, s: number): Vec3 => ({ x: a.x * s, y: a.y * s, z: a.z * s });
+const add_ = (a: Vec3, b: Vec3): Vec3 => ({ x: a.x + b.x, y: a.y + b.y, z: a.z + b.z });
+const unit_ = (a: Vec3): Vec3 => {
+  const m = norm_(a) || 1;
+
+  return scale_(a, 1 / m);
+};
 
 /**
  * Mulberry32 - a tiny, fast, seedable PRNG. A fixed seed makes a debris cloud
@@ -113,16 +176,34 @@ export function makeRng(seed: number): () => number {
   };
 }
 
+/**
+ * Draw one sample from a standard normal distribution (mean 0, std 1) using the
+ * Box-Muller transform over a uniform [0,1) source. Real fragment velocity
+ * dispersions are roughly Gaussian, so this gives a more natural cloud than a
+ * flat distribution.
+ */
+export function nextGaussian(rng: () => number): number {
+  let u = 0;
+  let v = 0;
+
+  while (u === 0) {
+    u = rng();
+  }
+  while (v === 0) {
+    v = rng();
+  }
+
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
 /** Clamp a number to [min, max]. */
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
 /**
- * Parse the raw menu strings into numeric variation params. The period variation
- * (minutes) is converted to a mean-motion variation (rev/day). An invalid start
- * number falls back to the analyst block default and is flagged so the caller can
- * warn the user.
+ * Parse the raw menu strings into numeric parameters. An invalid start number
+ * falls back to the analyst block default and is flagged so the caller can warn.
  *
  * @param raw - Raw string values read from the form.
  * @param defaultStartNum - Fallback start number when the field is not a number.
@@ -131,11 +212,10 @@ export function parseBreakupParams(
   raw: BreakupRawForm,
   defaultStartNum: number,
 ): { params: BreakupVariationParams; startNumWasInvalid: boolean } {
-  const periodVariation = parseFloat(raw.periodVariation);
-  const incVariation = parseFloat(raw.incVariation);
-  const rascVariation = parseFloat(raw.rascVariation);
-  const eccVariation = parseFloat(raw.eccVariation);
   const breakupCount = parseInt(raw.count);
+  const radialDeltaV = parseFloat(raw.radialDv);
+  const inTrackDeltaV = parseFloat(raw.inTrackDv);
+  const crossTrackDeltaV = parseFloat(raw.crossTrackDv);
   let startNum = parseInt(raw.startNum);
   let startNumWasInvalid = false;
 
@@ -144,13 +224,15 @@ export function parseBreakupParams(
     startNumWasInvalid = true;
   }
 
+  // Negative spreads are meaningless (the distribution is already symmetric); floor at 0.
+  const nonNeg = (n: number) => (isNaN(n) ? 0 : Math.max(0, n));
+
   return {
     params: {
       breakupCount: isNaN(breakupCount) ? 0 : breakupCount,
-      rascVariation: isNaN(rascVariation) ? 0 : rascVariation,
-      incVariation: isNaN(incVariation) ? 0 : incVariation,
-      meanmoVariation: (isNaN(periodVariation) ? 0 : periodVariation) / MINUTES_PER_DAY,
-      eccVariation: isNaN(eccVariation) ? 0 : eccVariation,
+      radialDeltaV: nonNeg(radialDeltaV),
+      inTrackDeltaV: nonNeg(inTrackDeltaV),
+      crossTrackDeltaV: nonNeg(crossTrackDeltaV),
       startNum,
     },
     startNumWasInvalid,
@@ -158,98 +240,85 @@ export function parseBreakupParams(
 }
 
 /**
- * Split `count` pieces across a small number of evenly spaced, **symmetric** RAAN
- * buckets spanning the full [-rascVariation/2, +rascVariation/2] range.
- *
- * This replaces the legacy `rascIterat = 0..4` loop that normalized by 4 (so the
- * extreme +rascVariation/2 bucket never ran) and could leave the last bucket
- * empty - the cloud was biased to one side in RAAN. Here every bucket gets pieces
- * and the offsets are mirror-symmetric about 0.
- *
- * @param count - Total number of pieces.
- * @param rascVariation - Full RAAN spread in degrees.
- * @param bucketCount - Number of discrete RAAN solves (defaults to {@link RAAN_BUCKET_COUNT}).
+ * Build the orthonormal RIC (radial / in-track / cross-track) basis for a parent
+ * state. Radial points away from Earth; cross-track is the orbit normal (h);
+ * in-track completes the right-handed set (≈ velocity direction for near-circular
+ * orbits, exactly transverse in general).
  */
-export function planRaanBuckets(
-  count: number,
-  rascVariation: number,
-  bucketCount: number = RAAN_BUCKET_COUNT,
-): RaanBucket[] {
-  if (count <= 0) {
-    return [];
-  }
+export function computeRicBasis(position: Vec3, velocity: Vec3): RicBasis {
+  const radial = unit_(position);
+  const crossTrack = unit_(cross_(position, velocity));
+  const inTrack = cross_(crossTrack, radial);
 
-  const buckets = Math.min(Math.max(1, bucketCount), count);
-  const result: RaanBucket[] = [];
-
-  for (let b = 0; b < buckets; b++) {
-    const frac = buckets === 1 ? 0.5 : b / (buckets - 1);
-    const offset = -rascVariation / 2 + rascVariation * frac;
-    // Evenly distribute pieces; using floored cumulative boundaries guarantees
-    // the bucket counts sum to exactly `count` with no piece lost or doubled.
-    const start = Math.floor((b * count) / buckets);
-    const end = Math.floor(((b + 1) * count) / buckets);
-
-    result.push({ offset, count: end - start });
-  }
-
-  return result;
+  return { radial, inTrack, crossTrack };
 }
 
 /**
- * Format an eccentricity (0..1) as a TLE line-2 7-digit implied-decimal field.
- * e.g. 0.0006703 -> "0006703".
+ * Sample one fragment's delta-V (km/s) in RIC components. Each axis is an
+ * independent Gaussian whose standard deviation is the entered spread (m/s),
+ * clamped to +/-3 sigma so a rare Box-Muller outlier cannot fling a fragment
+ * onto a wildly different orbit.
  */
-export function formatEccentricity(ecc: number): string {
-  const clamped = clamp(ecc, 0, MAX_ECCENTRICITY);
+export function sampleDeltaV(rng: () => number, spread: DeltaVSpreadMps): DeltaVComponentsKms {
+  const axis = (sigmaMps: number) => clamp(nextGaussian(rng), -3, 3) * sigmaMps * MS_TO_KMS;
 
-  // toFixed(7) on a value < 1 always yields "0.xxxxxxx"; drop the "0." prefix.
-  return clamped.toFixed(7).slice(2);
+  return {
+    r: axis(spread.radial),
+    i: axis(spread.inTrack),
+    c: axis(spread.crossTrack),
+  };
 }
 
 /**
- * Build one debris piece's TLE pair from a reference orbit (the RAAN-rotated TLE
- * for the piece's bucket), applying per-piece inclination, mean-motion, and
- * eccentricity jitter and stamping the analyst SCC number.
- *
- * Unlike the legacy implementation, the eccentricity jitter is actually spliced
- * into the line-2 eccentricity field (columns 27-33); previously it was computed
- * onto a shared object and never reached the output.
- *
- * @throws if either constructed line is not 69 characters (a splice/format bug).
+ * Apply a RIC delta-V (km/s) to a velocity, returning the new velocity vector.
+ * The position is unchanged (the fragment leaves the breakup point).
  */
-export function buildPieceTle(
-  refTle1: string,
-  refTle2: string,
-  input: PieceVariationInput,
+export function applyDeltaV(velocity: Vec3, basis: RicBasis, dv: DeltaVComponentsKms): Vec3 {
+  return add_(velocity, add_(add_(scale_(basis.radial, dv.r), scale_(basis.inTrack, dv.i)), scale_(basis.crossTrack, dv.c)));
+}
+
+/**
+ * Build one debris fragment's TLE pair from the parent's TEME state and a sampled
+ * delta-V, stamping the analyst SCC number. The fragment is fit so SGP4
+ * reproduces (parent position, parent velocity + delta-V) at the breakup epoch,
+ * so every fragment leaves the breakup point. Works in any orbital regime.
+ *
+ * @param epoch - Breakup time (state vector epoch).
+ * @param position - Parent TEME position (km) at the breakup time.
+ * @param velocity - Parent TEME velocity (km/s) at the breakup time.
+ * @param basis - RIC basis for the parent state.
+ * @param dv - Sampled delta-V (km/s, RIC components).
+ * @param a5Num - 5-char alpha-5 analyst satellite number to stamp.
+ * @throws if SGP4 mean elements cannot be fit to the fragment state.
+ */
+export function buildFragmentTle(
+  epoch: Date,
+  position: Vec3,
+  velocity: Vec3,
+  basis: RicBasis,
+  dv: DeltaVComponentsKms,
+  a5Num: string,
 ): { tle1: TleLine1; tle2: TleLine2 } {
-  const { a5Num, baseInc, incVariation, meanmoVariation, baseEcc, eccVariation, rng } = input;
+  const newVelocity = applyDeltaV(velocity, basis, dv);
+  const fit = rv2tle(epoch, position, newVelocity, { maxIterations: 15, toleranceKm: 0.05 });
 
-  // Inclination (cols 9-16): jitter around the parent inclination, kept in [0, 180].
-  const inc = clamp(baseInc + rng() * incVariation * 2 - incVariation, 0, 180);
-  const incStr = inc.toFixed(4).padStart(8, '0');
-
-  if (incStr.length !== 8) {
-    throw new Error(`Inclination field is not 8 chars - "${incStr}"`);
+  if (!fit) {
+    throw new Error('Failed to fit SGP4 mean elements to the fragment state');
   }
 
-  // Mean motion (cols 53-63): jitter around the reference orbit's mean motion.
-  const meanmo = parseFloat(refTle2.substring(52, 63)) + rng() * meanmoVariation * 2 - meanmoVariation;
-  const meanmoStr = meanmo.toFixed(8).padStart(11, '0');
+  // A large delta-V on a low orbit can drop a fragment's perigee below the surface
+  // (it would reenter). Such a state has a mean motion the TLE format can't hold
+  // (the parser rejects > 18 rev/day, ~sub-orbital). Reject it here so the caller
+  // skips this fragment instead of throwing deep inside the Satellite constructor.
+  const meanMotion = parseFloat(fit.tle2.substring(52, 63));
 
-  if (meanmoStr.length !== 11) {
-    throw new Error(`Mean motion field is not 11 chars - "${meanmoStr}"`);
+  if (!(meanMotion > 0 && meanMotion <= MAX_TLE_MEAN_MOTION)) {
+    throw new Error(`Fragment is sub-orbital (mean motion ${meanMotion.toFixed(2)} rev/day) and would reenter`);
   }
 
-  // Eccentricity (cols 27-33): jitter around the parent eccentricity.
-  const eccStr = formatEccentricity(baseEcc + rng() * eccVariation * 2 - eccVariation);
-
-  const tle1 = `1 ${a5Num}${refTle1.substring(7)}` as TleLine1;
-  // Rebuild line 2 with the new SCC, inclination, and mean motion (preserving the
-  // reference RAAN/argPe/meanAnomaly), then splice the eccentricity field in place.
-  let tle2 = `2 ${a5Num} ${incStr} ${refTle2.substring(17, 52)}${meanmoStr}${refTle2.substring(63)}`;
-
-  tle2 = `${tle2.substring(0, 26)}${eccStr}${tle2.substring(33)}`;
+  // rv2tle stamps a fixed 5-char SCC ("00001"); replace it with the analyst number.
+  const tle1 = `1 ${a5Num}${fit.tle1.substring(7)}` as TleLine1;
+  const tle2 = `2 ${a5Num}${fit.tle2.substring(7)}` as TleLine2;
 
   if (tle1.length !== TLE_LINE_LENGTH) {
     throw new Error(`Invalid tle1: length is not ${TLE_LINE_LENGTH} - "${tle1}"`);
@@ -258,7 +327,7 @@ export function buildPieceTle(
     throw new Error(`Invalid tle2: length is not ${TLE_LINE_LENGTH} - "${tle2}"`);
   }
 
-  return { tle1, tle2: tle2 as TleLine2 };
+  return { tle1, tle2 };
 }
 
 /**

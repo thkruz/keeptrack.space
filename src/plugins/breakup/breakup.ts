@@ -22,10 +22,8 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
-import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite, SpaceObjectType, Tle, TleLine1, TleLine2 } from '@ootk/src/main';
-import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import streamPng from '@public/img/icons/stream.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import {
@@ -454,6 +452,10 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
         catalogManagerInstance.objectCache[pieceSatId] = newSat;
         catalogManagerInstance.satCruncherThread.sendSatEdit(pieceSatId, pieceTle1, pieceTle2, true);
         orbitManagerInstance.changeOrbitBufferData(pieceSatId, pieceTle1, pieceTle2);
+        // Seed the render buffer synchronously (the position cruncher's sendSatEdit
+        // is async) so the search below does not read the placeholder 0,0,0 position
+        // and filter the piece as "Decayed".
+        catalogManagerInstance.seedDotPosition(pieceSatId);
         createdIds.push(pieceSatId);
       } else {
         reenteredCount++;
@@ -495,46 +497,13 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     ServiceLocator.getColorSchemeManager().notifyObjectsChanged();
 
     /*
-     * Defer the search until the cruncher has actually propagated the new TLEs.
-     * The sendSatEdit posts above are async, so position data for the pieces is
-     * still all-zero for a few frames - the search filters out (0,0,0) sats as
-     * "Decayed" (search-manager getSearchableObjects_), so an early search finds
-     * nothing and only a manual re-search shows the cloud.
-     *
-     * Two timing hazards, both handled here:
-     *  1. Validate against the cruncher message's own satPos array (the freshest
-     *     source), not dotsManager.getCurrentPosition - the dots manager copies
-     *     satPos into positionData in a separate listener whose order vs ours is
-     *     not guaranteed, so getCurrentPosition can lag a frame.
-     *  2. Run doSearch on the NEXT tick. doSearch reads positionData (filled by
-     *     that other listener during this same message dispatch); deferring lets
-     *     the dispatch finish so positionData is current when the search runs.
+     * Search immediately. Each piece's render-buffer position was seeded
+     * synchronously above (seedDotPosition), so the search no longer reads the
+     * placeholder 0,0,0 position and filter the pieces as "Decayed" - no need to
+     * wait on the async position cruncher (the old waitForCruncher approach was
+     * racy and showed nothing until a manual re-search). Same pattern as create-sat.
      */
-    const searchStr = `${mainsat.sccNum},Breakup Piece`;
-    const lastPieceId = createdIds[createdIds.length - 1];
-    const lastPieceIdx = lastPieceId * 3;
-
-    waitForCruncher({
-      cruncher: catalogManagerInstance.satCruncher,
-      cb: () => {
-        setTimeout(() => ServiceLocator.getUiManager().doSearch(searchStr), 0);
-      },
-      validationFunc: (data: PositionCruncherOutgoingMsg) => {
-        const satPos = data.satPos;
-
-        if (!satPos || lastPieceIdx + 2 >= satPos.length) {
-          return false;
-        }
-
-        const x = satPos[lastPieceIdx];
-        const y = satPos[lastPieceIdx + 1];
-        const z = satPos[lastPieceIdx + 2];
-
-        return Number.isFinite(x) && Number.isFinite(y) && Number.isFinite(z) && (x !== 0 || y !== 0 || z !== 0);
-      },
-      maxRetries: 150,
-      isRunCbOnFailure: true,
-    });
+    ServiceLocator.getUiManager().doSearch(`${mainsat.sccNum},Breakup Piece`);
   }
 
   /**

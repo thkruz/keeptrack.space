@@ -540,8 +540,12 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
         Object.values(colorSchemeManagerInstance.colorSchemeInstances)[0].update;
 
       const lastSat = ServiceLocator.getCatalogManager().getObject(lastSelectedObject);
+      // Guard against a stale lastSelectedObject id that now exceeds the color buffer
+      // (e.g. after a catalog reload). Writing past the GPU buffer triggers
+      // "INVALID_VALUE: bufferSubData: buffer overflow".
+      const isLastInColorRange = lastSelectedObject >= 0 && lastSelectedObject < colorSchemeManagerInstance.colorData.length / 4;
 
-      if (lastSat && colorSchemeManagerInstance.colorData) {
+      if (lastSat && colorSchemeManagerInstance.colorData && isLastInColorRange) {
         const newColor = colorSchemeManagerInstance.currentColorScheme.update(lastSat).color;
 
         colorSchemeManagerInstance.colorData[lastSelectedObject * 4] = newColor[0]; // R

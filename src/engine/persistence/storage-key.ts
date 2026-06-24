@@ -148,4 +148,7 @@ export enum StorageKey {
 
   // Breakup (last-used variation inputs: inc/period/RAAN/ecc spread, count, start number)
   BREAKUP_SETTINGS = 'v2-keepTrack-breakupSettings',
+
+  // Reports (last-used output options: time window, sampling step, export format)
+  REPORTS_SETTINGS = 'v2-keepTrack-reportsSettings',
 }

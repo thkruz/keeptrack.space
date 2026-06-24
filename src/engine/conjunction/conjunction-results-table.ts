@@ -18,6 +18,12 @@ export interface ConjunctionColumn<T> {
   cell: (row: T) => string;
   /** Optional class on the `<td>` (e.g. a hook the plugin updates lazily). */
   className?: string;
+  /**
+   * Optional stable sort key for the column. When set and `options.sort` is
+   * provided, the header becomes click-to-sort: it gets the `kt-sortable` class
+   * and a `data-sort-key` attribute, and shows a ▲/▼ arrow when it is active.
+   */
+  sortKey?: string;
 }
 
 export interface ConjunctionTableOptions<T> {
@@ -29,6 +35,12 @@ export interface ConjunctionTableOptions<T> {
    * index) is always set as `data-row`.
    */
   rowData?: (row: T, index: number) => Record<string, string>;
+  /**
+   * Optional active-sort state. When provided, columns carrying a `sortKey`
+   * render sortable headers (the plugin owns the actual row reordering and the
+   * header click handler).
+   */
+  sort?: { key: string; asc: boolean };
 }
 
 /** Render `rows` into `tbl` using `columns`. Clears the table first. */
@@ -46,6 +58,17 @@ export const renderConjunctionTable = <T>(
     const th = document.createElement('th');
 
     th.textContent = column.header;
+
+    if (options.sort && column.sortKey) {
+      th.classList.add('kt-sortable');
+      th.dataset.sortKey = column.sortKey;
+
+      if (options.sort.key === column.sortKey) {
+        th.classList.add('kt-sort-active');
+        th.textContent = `${column.header} ${options.sort.asc ? '▲' : '▼'}`;
+      }
+    }
+
     headerRow.appendChild(th);
   }
 

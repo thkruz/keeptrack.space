@@ -313,13 +313,12 @@ describe('MissileManager (baseline - pre-refactor)', () => {
      */
 
     /**
-     * Bug 1: invalid launch lat/lon ([missile-manager.ts:225-230]) returns
-     * 0 silently - no error message, no error type, no toast. Target lat/lon
-     * sets a message correctly; only launch coords are silent.
-     *
-     * Flips to passing in PR 4 when validation is unified through MissileLaunchResult.
+     * Bug 1 (FIXED): invalid launch lat/lon used to return 0 silently - no
+     * error message, no error type, no toast (target lat/lon set a message, but
+     * launch coords were silent). The validation now populates lastMissileError
+     * the same way the target bounds checks do.
      */
-    it.fails('out-of-range launch latitude populates lastMissileError', () => {
+    it('out-of-range launch latitude populates lastMissileError', () => {
       const result = launch({
         launchLatitude: 95,
         launchLongitude: -75,
@@ -337,20 +336,16 @@ describe('MissileManager (baseline - pre-refactor)', () => {
     });
 
     /**
-     * Bug 2: when computed apogee falls below minAltitudeTrue, Missile()
-     * recursively calls itself with a higher burn rate at [missile-manager.ts:512]
-     * - then unconditionally returns 0, falsely signalling failure even when
-     * the recursive call succeeded.
+     * Bug 2 (FIXED): when computed apogee falls below minAltitudeTrue, Missile()
+     * recursively calls itself with a higher burn rate - and used to
+     * unconditionally return 0, falsely signalling failure even when the
+     * recursive call succeeded. It now returns the retry's result.
      *
      * Test setup: choose a launch where the default burn rate (0.042) is
      * insufficient and the retry-with-bumped-rate path kicks in. The retry
-     * should succeed, so the *caller* should observe success - but today
-     * sees a return of 0.
-     *
-     * Flips to passing in PR 4 when the retry becomes an internal loop
-     * returning the actual final result.
+     * should succeed, so the caller observes success.
      */
-    it.fails('retry-on-low-apogee reports success when the retry succeeds', () => {
+    it('retry-on-low-apogee reports success when the retry succeeds', () => {
       const result = launch({
         launchLatitude: 52.5,
         launchLongitude: 82.75,

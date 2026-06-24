@@ -255,9 +255,15 @@ export const Missile = (
   Diameter = Diameter || 3.1; // (m)
 
   if (CurrentLatitude > 90 || CurrentLatitude < -90) {
+    missileManager.lastMissileErrorType = ToastMsgType.critical;
+    missileManager.lastMissileError = 'Error: Launch Latitude must be<br>between 90 and -90 degrees';
+
     return 0;
   }
   if (CurrentLongitude > 180 || CurrentLongitude < -180) {
+    missileManager.lastMissileErrorType = ToastMsgType.critical;
+    missileManager.lastMissileError = 'Error: Launch Longitude must be<br>between 180 and -180 degrees';
+
     return 0;
   }
   if (TargetLatitude > 90 || TargetLatitude < -90) {
@@ -268,7 +274,7 @@ export const Missile = (
   }
   if (TargetLongitude > 180 || TargetLongitude < -180) {
     missileManager.lastMissileErrorType = ToastMsgType.critical;
-    missileManager.lastMissileError = 'Error: Target Longitude must be<br>between 90 and -90 degrees';
+    missileManager.lastMissileError = 'Error: Target Longitude must be<br>between 180 and -180 degrees';
 
     return 0;
   }
@@ -311,10 +317,10 @@ export const Missile = (
   }
 
   if (result.kind === 'lowApogee') {
-    // PRESERVED BUG (fixed in PR 4): the recursive retry may succeed in
-    // writing a missile to the catalog, but this function returns 0 anyway,
-    // falsely signalling failure to the caller.
-    missileManager.createMissile(
+    // The apogee came in under the requested minimum; retry with a higher burn
+    // rate and propagate that attempt's outcome. (Previously this path always
+    // returned 0, falsely signalling failure even when the retry succeeded.)
+    return missileManager.createMissile(
       CurrentLatitude,
       CurrentLongitude,
       TargetLatitude,
@@ -330,8 +336,6 @@ export const Missile = (
       country,
       minAltitude,
     );
-
-    return 0;
   }
 
   if (result.kind === 'tooClose') {
@@ -483,6 +487,20 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: DetailedSensor
       break;
     }
   }
+
+  // The missile is not in flight at the current sim time (pre-launch or post-impact):
+  // there is no trajectory sample to read, so return the zeroed, not-in-view TEARR
+  // rather than indexing the lists with `undefined` and producing NaN angles.
+  if (typeof curMissileTime === 'undefined') {
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
+
+    if (sensorManagerInstance) {
+      sensorManagerInstance.currentTEARR = currentTEARR;
+    }
+
+    return currentTEARR;
+  }
+
   const cosLat = Math.cos(missile.latList[curMissileTime] * DEG2RAD);
   const sinLat = Math.sin(missile.latList[curMissileTime] * DEG2RAD);
   const cosLon = Math.cos(missile.lonList[curMissileTime] * DEG2RAD + gmst);

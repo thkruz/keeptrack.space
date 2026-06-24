@@ -364,25 +364,45 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
         return;
       }
 
-      // Next free slot in the 500-missile reservation at the tail of the catalog.
-      const slot = ServiceLocator.getCatalogManager().missileSats - (MAX_MISSILES - missileManager.missilesInUse);
+      if (warheads > 1) {
+        // MIRV: one bus, N reentry vehicles fanning out across a footprint. The manager
+        // allocates the N catalog slots itself.
+        missileManager.createMirvAttack({
+          launchLatitude: launch.lat,
+          launchLongitude: launch.lon,
+          targetLatitude: target.lat,
+          targetLongitude: target.lon,
+          warheadCount: warheads,
+          startTime: launchTime,
+          description: attackerDesc(site),
+          length: 30,
+          diameter: 2.9,
+          burnRate: 0.07,
+          maxRangeKm: attackerRangeKm(site),
+          country: site.country,
+          minAltitudeKm: site.minAltKm,
+        });
+      } else {
+        // Single warhead: next free slot in the 500-missile reservation at the catalog tail.
+        const slot = ServiceLocator.getCatalogManager().missileSats - (MAX_MISSILES - missileManager.missilesInUse);
 
-      missileManager.createMissile(
-        launch.lat,
-        launch.lon,
-        target.lat,
-        target.lon,
-        warheads,
-        slot,
-        launchTime,
-        attackerDesc(site),
-        30,
-        2.9,
-        0.07,
-        attackerRangeKm(site),
-        site.country,
-        site.minAltKm,
-      );
+        missileManager.createMissile(
+          launch.lat,
+          launch.lon,
+          target.lat,
+          target.lon,
+          1,
+          slot,
+          launchTime,
+          attackerDesc(site),
+          30,
+          2.9,
+          0.07,
+          attackerRangeKm(site),
+          site.country,
+          site.minAltKm,
+        );
+      }
 
       uiManagerInstance.toast(missileManager.lastMissileError, missileManager.lastMissileErrorType);
       // The new missile was just activated in objectCache; nudge the (worker-mode) color worker

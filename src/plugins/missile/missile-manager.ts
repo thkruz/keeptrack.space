@@ -14,7 +14,8 @@ import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
 import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, globalBMTargets, ukSLBM } from './missile-data';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { MissileSimulation } from './missile-simulation';
-import { MissileSpec } from './missile-types';
+import { MissileSpec, MissileTrajectory } from './missile-types';
+import { generateFootprint, findSeparationIndex, retargetDescent } from './missile-mirv';
 
 const missileArray: MissileObject[] = [];
 
@@ -199,6 +200,145 @@ export const clearMissiles = () => {
   PluginRegistry.getPlugin(TimeSlider)?.updateSliderPosition();
 };
 
+/** Default footprint radius (km) over which a MIRV's reentry vehicles fan out. */
+export const MIRV_DEFAULT_SPREAD_KM = 75;
+
+/** Input contract for {@link MirvAttack}. */
+export interface MirvLaunchParams {
+  launchLatitude: number;
+  launchLongitude: number;
+  targetLatitude: number;
+  targetLongitude: number;
+  /** Number of reentry vehicles (1-12). 1 is equivalent to a single normal launch. */
+  warheadCount: number;
+  startTime: number;
+  description: string;
+  length?: number;
+  diameter?: number;
+  burnRate?: number;
+  maxRangeKm: number;
+  country?: string;
+  minAltitudeKm?: number;
+  /** Footprint radius (km); defaults to {@link MIRV_DEFAULT_SPREAD_KM}. */
+  spreadKm?: number;
+}
+
+/**
+ * Shared coordinate bounds check for launch + target lat/lon. Returns a
+ * human-readable error string, or null when every coordinate is in range.
+ */
+const validateLaunchBounds_ = (launchLat: number, launchLon: number, targetLat: number, targetLon: number): string | null => {
+  if (launchLat > 90 || launchLat < -90) {
+    return 'Error: Launch Latitude must be<br>between 90 and -90 degrees';
+  }
+  if (launchLon > 180 || launchLon < -180) {
+    return 'Error: Launch Longitude must be<br>between 180 and -180 degrees';
+  }
+  if (targetLat > 90 || targetLat < -90) {
+    return 'Error: Target Latitude must be<br>between 90 and -90 degrees';
+  }
+  if (targetLon > 180 || targetLon < -180) {
+    return 'Error: Target Longitude must be<br>between 180 and -180 degrees';
+  }
+
+  return null;
+};
+
+/**
+ * Runs the ballistic flight simulation and returns the smoothed trajectory, or a
+ * toast-ready error. Encapsulates the low-apogee retry (bump the burn rate and
+ * re-solve) so both the single-missile and MIRV paths share one implementation.
+ */
+const solveTrajectory_ = (spec: MissileSpec): { trajectory: MissileTrajectory } | { error: string; errorType: ToastMsgType } => {
+  const result = new MissileSimulation(spec).run();
+
+  if (result.kind === 'error' || result.kind === 'tooClose') {
+    return { error: result.errorMessage, errorType: result.errorType };
+  }
+
+  if (result.kind === 'lowApogee') {
+    return solveTrajectory_({ ...spec, burnRate: (spec.burnRate || 0.042) * result.burnMultiplier });
+  }
+
+  // Smooth the boost phase the same way the single-missile path always has.
+  return {
+    trajectory: {
+      latList: smoothList_(result.trajectory.latList, 35),
+      lonList: smoothList_(result.trajectory.lonList, 35),
+      altList: smoothList_(result.trajectory.altList, 35),
+      maxAltitudeKm: result.trajectory.maxAltitudeKm,
+    },
+  };
+};
+
+/**
+ * Writes a finished trajectory into a single pre-allocated missile slot: mutates
+ * the catalog `MissileObject`, pushes it onto the active array, hands it to the
+ * cruncher + orbit buffer, and seeds its main-thread position so it renders as
+ * active immediately. Returns the object, or null if the slot is missing.
+ *
+ * The caller owns `missilesInUse` and the scenario-bounds refresh, so this can be
+ * looped over for a MIRV without re-bounding per RV.
+ */
+const writeMissileToSlot_ = (
+  slot: number,
+  latList: Degrees[],
+  lonList: Degrees[],
+  altList: Kilometers[],
+  maxAltitudeKm: number,
+  startTime: number,
+  desc: string,
+  country?: string,
+): MissileObject | null => {
+  const catalogManagerInstance = ServiceLocator.getCatalogManager();
+  const missileObj = catalogManagerInstance.getObject(slot) as MissileObject | null;
+
+  if (!missileObj) {
+    return null;
+  }
+
+  missileObj.altList = altList;
+  missileObj.latList = latList;
+  missileObj.lonList = lonList;
+  missileObj.active = true;
+  missileObj.type = SpaceObjectType.BALLISTIC_MISSILE;
+  missileObj.id = slot;
+  missileObj.name = `RV_${slot}`;
+  missileObj.desc = desc;
+  missileObj.maxAlt = maxAltitudeKm; // used for zoom controls
+  missileObj.startTime = startTime;
+  if (country) {
+    missileObj.country = country;
+  }
+
+  missileArray.push(missileObj);
+
+  catalogManagerInstance.satCruncherThread.sendNewMissile({
+    id: missileObj.id,
+    active: missileObj.active,
+    type: missileObj.type,
+    latList,
+    lonList,
+    altList,
+    startTime,
+  });
+
+  ServiceLocator.getOrbitManager().updateOrbitBuffer(slot, { latList, lonList, altList });
+
+  // Seed the initial position on the main thread so the missile reads as active immediately,
+  // rather than "decayed" (position {0,0,0}) until the async position-cruncher's first cycle.
+  const dotsManagerInstance = ServiceLocator.getDotsManager();
+  const pv = missileObj.eci();
+
+  if (pv && dotsManagerInstance.positionData) {
+    dotsManagerInstance.positionData[slot * 3] = pv.position.x;
+    dotsManagerInstance.positionData[slot * 3 + 1] = pv.position.y;
+    dotsManagerInstance.positionData[slot * 3 + 2] = pv.position.z;
+  }
+
+  return missileObj;
+};
+
 /**
  * @warning This function stalls Jest for multiple minutes.
  *
@@ -234,8 +374,6 @@ export const Missile = (
   country: string,
   minAltitude: number,
 ) => {
-  const missileObj: MissileObject = <MissileObject>ServiceLocator.getCatalogManager().getObject(MissileObjectNum);
-
   if (isMassRaidLoaded) {
     clearMissiles();
     const satSetLen = ServiceLocator.getCatalogManager().missileSats;
@@ -254,27 +392,11 @@ export const Missile = (
   Length = Length || 17; // (m)
   Diameter = Diameter || 3.1; // (m)
 
-  if (CurrentLatitude > 90 || CurrentLatitude < -90) {
-    missileManager.lastMissileErrorType = ToastMsgType.critical;
-    missileManager.lastMissileError = 'Error: Launch Latitude must be<br>between 90 and -90 degrees';
+  const boundsError = validateLaunchBounds_(CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude);
 
-    return 0;
-  }
-  if (CurrentLongitude > 180 || CurrentLongitude < -180) {
+  if (boundsError) {
     missileManager.lastMissileErrorType = ToastMsgType.critical;
-    missileManager.lastMissileError = 'Error: Launch Longitude must be<br>between 180 and -180 degrees';
-
-    return 0;
-  }
-  if (TargetLatitude > 90 || TargetLatitude < -90) {
-    missileManager.lastMissileErrorType = ToastMsgType.critical;
-    missileManager.lastMissileError = 'Error: Target Latitude must be<br>between 90 and -90 degrees';
-
-    return 0;
-  }
-  if (TargetLongitude > 180 || TargetLongitude < -180) {
-    missileManager.lastMissileErrorType = ToastMsgType.critical;
-    missileManager.lastMissileError = 'Error: Target Longitude must be<br>between 180 and -180 degrees';
+    missileManager.lastMissileError = boundsError;
 
     return 0;
   }
@@ -306,95 +428,28 @@ export const Missile = (
     minAltitudeKm: minAltitude,
   };
 
-  const sim = new MissileSimulation(spec);
-  const result = sim.run();
+  const solved = solveTrajectory_(spec);
 
-  if (result.kind === 'error') {
-    missileManager.lastMissileErrorType = result.errorType;
-    missileManager.lastMissileError = result.errorMessage;
-
-    return 0;
-  }
-
-  if (result.kind === 'lowApogee') {
-    // The apogee came in under the requested minimum; retry with a higher burn
-    // rate and propagate that attempt's outcome. (Previously this path always
-    // returned 0, falsely signalling failure even when the retry succeeded.)
-    return missileManager.createMissile(
-      CurrentLatitude,
-      CurrentLongitude,
-      TargetLatitude,
-      TargetLongitude,
-      NumberWarheads,
-      MissileObjectNum,
-      CurrentTime,
-      MissileDesc,
-      Length,
-      Diameter,
-      NewBurnRate * result.burnMultiplier,
-      MaxMissileRange,
-      country,
-      minAltitude,
-    );
-  }
-
-  if (result.kind === 'tooClose') {
-    missileManager.lastMissileErrorType = result.errorType;
-    missileManager.lastMissileError = result.errorMessage;
+  if ('error' in solved) {
+    missileManager.lastMissileErrorType = solved.errorType;
+    missileManager.lastMissileError = solved.error;
 
     return 0;
   }
 
-  // result.kind === 'success'
-  const trajectory = result.trajectory;
+  const { trajectory } = solved;
+  const written = writeMissileToSlot_(
+    MissileObjectNum,
+    trajectory.latList,
+    trajectory.lonList,
+    trajectory.altList,
+    trajectory.maxAltitudeKm,
+    CurrentTime,
+    MissileDesc,
+    country,
+  );
 
-  if (missileObj) {
-    missileObj.altList = smoothList_(trajectory.altList, 35);
-    missileObj.latList = smoothList_(trajectory.latList, 35);
-    missileObj.lonList = smoothList_(trajectory.lonList, 35);
-    missileObj.active = true;
-    missileObj.type = SpaceObjectType.BALLISTIC_MISSILE;
-    missileObj.id = MissileObjectNum;
-    missileObj.name = `RV_${missileObj.id}`;
-    missileObj.desc = MissileDesc;
-    // maxAlt is used for zoom controls
-    missileObj.maxAlt = trajectory.maxAltitudeKm;
-    missileObj.startTime = CurrentTime;
-    if (country) {
-      missileObj.country = country;
-    }
-
-    missileArray.push(missileObj);
-    const catalogManagerInstance = ServiceLocator.getCatalogManager();
-
-    catalogManagerInstance.satCruncherThread.sendNewMissile({
-      id: missileObj.id,
-      active: missileObj.active,
-      type: missileObj.type,
-      latList: missileObj.latList,
-      lonList: missileObj.lonList,
-      altList: missileObj.altList,
-      startTime: missileObj.startTime,
-    });
-    const orbitManagerInstance = ServiceLocator.getOrbitManager();
-
-    orbitManagerInstance.updateOrbitBuffer(MissileObjectNum, {
-      latList: missileObj.latList,
-      lonList: missileObj.lonList,
-      altList: missileObj.altList,
-    });
-
-    // Seed the initial position on the main thread so the missile reads as active immediately,
-    // rather than "decayed" (position {0,0,0}) until the async position-cruncher's first cycle.
-    const dotsManagerInstance = ServiceLocator.getDotsManager();
-    const pv = missileObj.eci();
-
-    if (pv && dotsManagerInstance.positionData) {
-      dotsManagerInstance.positionData[MissileObjectNum * 3] = pv.position.x;
-      dotsManagerInstance.positionData[MissileObjectNum * 3 + 1] = pv.position.y;
-      dotsManagerInstance.positionData[MissileObjectNum * 3 + 2] = pv.position.z;
-    }
-
+  if (written) {
     missileManager.missileArray = missileArray;
 
     // Expand the scenario timeline to cover this missile alongside every other active one
@@ -403,9 +458,108 @@ export const Missile = (
   }
   missileManager.missilesInUse++;
   missileManager.lastMissileErrorType = ToastMsgType.normal;
-  missileManager.lastMissileError = `Missile Named RV_${missileObj.id}<br>has been created.`;
+  missileManager.lastMissileError = `Missile Named RV_${MissileObjectNum}<br>has been created.`;
 
   return 1; // Successful Launch
+};
+
+/**
+ * Spawns a MIRV (Multiple Independently-targetable Reentry Vehicle) attack: one
+ * shared "bus" trajectory to the primary aimpoint, then `warheadCount` reentry
+ * vehicles that separate at apogee and fan out across a footprint of nearby
+ * aimpoints. Each RV is written to its own catalog slot (so the 500-missile cap
+ * counts every RV).
+ *
+ * For `warheadCount <= 1` this defers to a single normal launch. Returns the
+ * number of reentry vehicles actually created (0 on validation/range failure).
+ */
+export const MirvAttack = (params: MirvLaunchParams): number => {
+  const catalogManagerInstance = ServiceLocator.getCatalogManager();
+
+  if (isMassRaidLoaded) {
+    clearMissiles();
+  }
+
+  const count = Math.max(1, Math.min(12, Math.floor(params.warheadCount)));
+  const boundsError = validateLaunchBounds_(params.launchLatitude, params.launchLongitude, params.targetLatitude, params.targetLongitude);
+
+  if (boundsError) {
+    missileManager.lastMissileErrorType = ToastMsgType.critical;
+    missileManager.lastMissileError = boundsError;
+
+    return 0;
+  }
+
+  if (missileManager.missilesInUse + count > 500) {
+    missileManager.lastMissileErrorType = ToastMsgType.critical;
+    missileManager.lastMissileError = 'Error: Maximum number of missiles<br>have been reached.';
+
+    return 0;
+  }
+
+  // The bus carries every warhead during ascent, so size its mass with the full count.
+  const busSpec: MissileSpec = {
+    launchLatitude: params.launchLatitude,
+    launchLongitude: params.launchLongitude,
+    targetLatitude: params.targetLatitude,
+    targetLongitude: params.targetLongitude,
+    numberOfWarheads: count,
+    missileObjectNum: 0,
+    startTime: params.startTime,
+    description: params.description,
+    length: params.length || 17,
+    diameter: params.diameter || 3.1,
+    burnRate: params.burnRate,
+    maxRangeKm: params.maxRangeKm,
+    country: params.country,
+    minAltitudeKm: params.minAltitudeKm ?? 0,
+  };
+
+  const solved = solveTrajectory_(busSpec);
+
+  if ('error' in solved) {
+    missileManager.lastMissileErrorType = solved.errorType;
+    missileManager.lastMissileError = solved.error;
+
+    return 0;
+  }
+
+  const bus = solved.trajectory;
+  const sepIdx = findSeparationIndex(bus.altList);
+  const footprint = generateFootprint(params.targetLatitude, params.targetLongitude, count, params.spreadKm ?? MIRV_DEFAULT_SPREAD_KM);
+  const base = catalogManagerInstance.missileSats - 500 + missileManager.missilesInUse;
+  let created = 0;
+
+  for (let i = 0; i < count; i++) {
+    const aim = footprint[i];
+    const rv = retargetDescent(bus.latList, bus.lonList, bus.altList, sepIdx, aim.lat - params.targetLatitude, aim.lon - params.targetLongitude);
+    const desc = count > 1 ? `${params.description} (RV ${i + 1}/${count})` : params.description;
+    const written = writeMissileToSlot_(
+      base + created,
+      rv.latList as Degrees[],
+      rv.lonList as Degrees[],
+      rv.altList as Kilometers[],
+      bus.maxAltitudeKm,
+      params.startTime,
+      desc,
+      params.country,
+    );
+
+    if (written) {
+      created++;
+    }
+  }
+
+  if (created > 0) {
+    missileManager.missilesInUse += created;
+    missileManager.missileArray = missileArray;
+    boundScenarioToActiveMissiles_();
+  }
+
+  missileManager.lastMissileErrorType = ToastMsgType.normal;
+  missileManager.lastMissileError = `${created} reentry vehicle(s) (MIRV)<br>have been created.`;
+
+  return created;
 };
 
 /**
@@ -597,6 +751,7 @@ const missileManager = {
   missileArray,
   clearMissiles,
   createMissile: Missile,
+  createMirvAttack: MirvAttack,
   massRaidPre: MassRaidPre,
   getMissileTEARR,
 };

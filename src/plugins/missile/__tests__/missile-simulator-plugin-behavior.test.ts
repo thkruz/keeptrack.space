@@ -21,6 +21,7 @@ describe('MissileSimulatorPlugin behavior', () => {
     websiteInit(plugin);
     p().isMenuButtonActive = true;
     vi.spyOn(missileManager, 'createMissile').mockImplementation(() => undefined as never);
+    vi.spyOn(missileManager, 'createMirvAttack').mockImplementation(() => 0 as never);
     vi.spyOn(missileManager, 'massRaidPre').mockImplementation(() => undefined as never);
   });
 
@@ -128,17 +129,34 @@ describe('MissileSimulatorPlugin behavior', () => {
     expect(toastSpy).toHaveBeenCalled();
   });
 
-  it('onFormSubmit with the custom type and a preset target launches a missile', () => {
+  it('onFormSubmit with a single warhead launches one missile (not MIRV)', () => {
     vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
     vi.spyOn(ServiceLocator.getUiManager(), 'doSearch').mockImplementation(() => undefined);
 
     setVal('ms-type', '0');
     setVal('ms-attacker', '101'); // Minot (USA silo)
     setVal('ms-target', '0'); // Washington DC (preset)
+    setVal('ms-warheads', '1');
     plugin.onFormSubmit();
     vi.advanceTimersByTime(2000);
 
     expect(missileManager.createMissile).toHaveBeenCalled();
+    expect(missileManager.createMirvAttack).not.toHaveBeenCalled();
+  });
+
+  it('onFormSubmit with multiple warheads launches a MIRV attack', () => {
+    vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+    vi.spyOn(ServiceLocator.getUiManager(), 'doSearch').mockImplementation(() => undefined);
+
+    setVal('ms-type', '0');
+    setVal('ms-attacker', '101'); // Minot (USA silo)
+    setVal('ms-target', '0'); // Washington DC (preset)
+    setVal('ms-warheads', '4');
+    plugin.onFormSubmit();
+    vi.advanceTimersByTime(2000);
+
+    expect(missileManager.createMirvAttack).toHaveBeenCalled();
+    expect(missileManager.createMissile).not.toHaveBeenCalled();
   });
 
   it('onFormSubmit with the custom type and an invalid custom target toasts critical', () => {

@@ -453,4 +453,65 @@ describe('MissileManager (baseline - pre-refactor)', () => {
       expect(trajectory).toMatchSnapshot();
     }, 60_000);
   });
+
+  describe('MIRV attacks', () => {
+    const mirv = (warheadCount: number, spreadKm = 75) =>
+      missileManager.createMirvAttack({
+        launchLatitude: 52.5,
+        launchLongitude: 82.75,
+        targetLatitude: 38.9,
+        targetLongitude: -77.0,
+        warheadCount,
+        startTime: Date.UTC(2024, 0, 1),
+        description: 'Aleysk (SS-18)',
+        burnRate: 0.07,
+        maxRangeKm: 16_000,
+        country: 'Russia',
+        minAltitudeKm: 200,
+        spreadKm,
+      });
+
+    it('writes one catalog object per reentry vehicle and counts them all', () => {
+      const count = mirv(3);
+
+      expect(count).toBe(3);
+      expect(missileManager.missilesInUse).toBe(3);
+    }, 60_000);
+
+    it('reentry vehicles share the boost track and diverge after apogee', () => {
+      const catalog = ServiceLocator.getCatalogManager();
+      const base = catalog.missileSats - 500 + missileManager.missilesInUse;
+
+      mirv(3, 150);
+
+      const rv0 = catalog.getObject(base) as MissileObject; // primary (exact target)
+      const rv1 = catalog.getObject(base + 1) as MissileObject; // first ring vehicle
+      const lastIdx = rv0.altList.length - 1;
+
+      // Early boost samples coincide (shared bus before apogee separation)...
+      expect(rv1.latList[5]).toBeCloseTo(rv0.latList[5], 6);
+      expect(rv1.lonList[5]).toBeCloseTo(rv0.lonList[5], 6);
+
+      // ...but the impact points are spread apart (the footprint).
+      const impactDelta = Math.abs(rv1.latList[lastIdx] - rv0.latList[lastIdx]) + Math.abs(rv1.lonList[lastIdx] - rv0.lonList[lastIdx]);
+
+      expect(impactDelta).toBeGreaterThan(0);
+    }, 60_000);
+
+    it('a single warhead count behaves like one missile', () => {
+      const count = mirv(1);
+
+      expect(count).toBe(1);
+      expect(missileManager.missilesInUse).toBe(1);
+    }, 60_000);
+
+    it('rejects when the footprint would exceed the 500-missile cap', () => {
+      missileManager.missilesInUse = 499;
+
+      const count = mirv(5);
+
+      expect(count).toBe(0);
+      expect(missileManager.lastMissileErrorType).toBe(ToastMsgType.critical);
+    });
+  });
 });

@@ -1,6 +1,6 @@
 {
   "plugins": {
-    "MissilePlugin": {
+    "MissileSimulatorPlugin": {
       "bottomIconLabel": "Misil",
       "title": "Crear ataque de misiles",
       "labels": {
@@ -11,7 +11,7 @@
         "customLaunchLongitude": "Longitud de lanzamiento personalizada",
         "customTargetLatitude": "Latitud del objetivo personalizada",
         "customTargetLongitude": "Longitud del objetivo personalizada",
-        "error": "Error"
+        "warheads": "Ojivas (MIRV)"
       },
       "types": {
         "customMissile": "Misil personalizado",
@@ -114,20 +114,24 @@
       },
       "buttons": {
         "launchMissileAttack": "Lanzar ataque de misiles",
-        "showAllMissiles": "Mostrar todos los misiles"
+        "showAllMissiles": "Mostrar todos los misiles",
+        "clearMissiles": "Borrar misiles"
       },
       "msgs": {
-        "simLoaded": "{sim} cargado"
+        "simLoaded": "{sim} cargado",
+        "missilesActive": "{n} / {max} misiles activos"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "¡Latitud del objetivo no válida!",
         "invalidTargetLongitude": "¡Longitud del objetivo no válida!",
         "invalidLaunchLatitude": "¡Latitud de lanzamiento no válida!",
-        "invalidLaunchLongitude": "¡Longitud de lanzamiento no válida!"
+        "invalidLaunchLongitude": "¡Longitud de lanzamiento no válida!",
+        "invalidWarheads": "Las ojivas deben ser un número entero del 1 al 12."
       },
       "commands": {
         "open": "Abrir el plugin de misiles",
-        "showAllMissiles": "Mostrar todos los misiles"
+        "showAllMissiles": "Mostrar todos los misiles",
+        "clearMissiles": "Borrar todos los misiles"
       },
       "help": {
         "overview": "El menú Misil simula lanzamientos ficticios de misiles balísticos: desde un único disparo personalizado entre dos puntos de la Tierra hasta escenarios programados de ataque masivo entre potencias nucleares. Las trayectorias usan un modelo balístico realista, pero cada lanzamiento es ficticio. Úselo para ejercitar la cobertura de sensores, los plazos de alerta de misiles y escenarios hipotéticos.",
@@ -139,6 +143,11 @@
         "tip1": "Los lanzamientos usan la hora de simulación actual, así que ajuste primero el reloj si el escenario debe comenzar en un momento concreto.",
         "tip2": "El nombre de cada misil empieza por RV_, por lo que buscar RV_ en la barra de búsqueda encuentra todos los misiles activos.",
         "tip3": "Si un lanzamiento se rechaza, una notificación explica el motivo; algunas combinaciones de sitio y objetivo quedan fuera del alcance modelado del misil."
+      },
+      "sections": {
+        "attackType": "Tipo de ataque",
+        "launch": "Lanzamiento",
+        "target": "Objetivo"
       }
     }
   }

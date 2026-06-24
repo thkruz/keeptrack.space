@@ -1,6 +1,6 @@
 {
   "plugins": {
-    "MissilePlugin": {
+    "MissileSimulatorPlugin": {
       "bottomIconLabel": "ミサイル",
       "title": "ミサイル攻撃を作成",
       "labels": {
@@ -11,7 +11,7 @@
         "customLaunchLongitude": "カスタム発射経度",
         "customTargetLatitude": "カスタム目標緯度",
         "customTargetLongitude": "カスタム目標経度",
-        "error": "エラー"
+        "warheads": "弾頭 (MIRV)"
       },
       "types": {
         "customMissile": "カスタムミサイル",
@@ -114,20 +114,24 @@
       },
       "buttons": {
         "launchMissileAttack": "ミサイル攻撃を開始",
-        "showAllMissiles": "すべてのミサイルを表示"
+        "showAllMissiles": "すべてのミサイルを表示",
+        "clearMissiles": "ミサイルを消去"
       },
       "msgs": {
-        "simLoaded": "{sim} を読み込みました"
+        "simLoaded": "{sim} を読み込みました",
+        "missilesActive": "{n} / {max} 発のミサイルが稼働中"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "目標緯度が無効です！",
         "invalidTargetLongitude": "目標経度が無効です！",
         "invalidLaunchLatitude": "発射緯度が無効です！",
-        "invalidLaunchLongitude": "発射経度が無効です！"
+        "invalidLaunchLongitude": "発射経度が無効です！",
+        "invalidWarheads": "弾頭数は1から12までの整数で指定してください。"
       },
       "commands": {
         "open": "ミサイルプラグインを開く",
-        "showAllMissiles": "すべてのミサイルを表示"
+        "showAllMissiles": "すべてのミサイルを表示",
+        "clearMissiles": "すべてのミサイルを消去"
       },
       "help": {
         "overview": "ミサイルメニューは想定上の弾道ミサイル発射をシミュレートします。地球上の2地点間の単発のカスタム発射から、核保有国間のスクリプト化された一斉攻撃シナリオまで対応します。軌道は現実的な弾道モデルを使用しますが、すべての発射は架空のものです。センサーカバレッジ、ミサイル警戒のタイムライン、想定シナリオの検討に活用してください。",
@@ -139,6 +143,11 @@
         "tip1": "発射には現在のシミュレーション時刻が使用されます。特定の時刻からシナリオを開始したい場合は、先に時計を設定してください。",
         "tip2": "すべてのミサイルの名前は RV_ で始まるため、検索バーで RV_ を検索するとアクティブなミサイルがすべて見つかります。",
         "tip3": "発射が拒否された場合はトースト通知で理由が表示されます。発射地点と目標の組み合わせによっては、ミサイルのモデル化された射程の範囲外になることがあります。"
+      },
+      "sections": {
+        "attackType": "攻撃の種類",
+        "launch": "発射",
+        "target": "目標"
       }
     }
   }

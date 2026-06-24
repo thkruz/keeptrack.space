@@ -1,6 +1,6 @@
 {
   "plugins": {
-    "MissilePlugin": {
+    "MissileSimulatorPlugin": {
       "bottomIconLabel": "Rakete",
       "title": "Raketenangriff erstellen",
       "labels": {
@@ -11,7 +11,7 @@
         "customLaunchLongitude": "Benutzerdefinierter Start-Längengrad",
         "customTargetLatitude": "Benutzerdefinierter Ziel-Breitengrad",
         "customTargetLongitude": "Benutzerdefinierter Ziel-Längengrad",
-        "error": "Fehler"
+        "warheads": "Sprengköpfe (MIRV)"
       },
       "types": {
         "customMissile": "Benutzerdefinierte Rakete",
@@ -114,20 +114,24 @@
       },
       "buttons": {
         "launchMissileAttack": "Raketenangriff starten",
-        "showAllMissiles": "Alle Raketen anzeigen"
+        "showAllMissiles": "Alle Raketen anzeigen",
+        "clearMissiles": "Raketen löschen"
       },
       "msgs": {
-        "simLoaded": "{sim} geladen"
+        "simLoaded": "{sim} geladen",
+        "missilesActive": "{n} / {max} Raketen aktiv"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "Ungültiger Ziel-Breitengrad!",
         "invalidTargetLongitude": "Ungültiger Ziel-Längengrad!",
         "invalidLaunchLatitude": "Ungültiger Start-Breitengrad!",
-        "invalidLaunchLongitude": "Ungültiger Start-Längengrad!"
+        "invalidLaunchLongitude": "Ungültiger Start-Längengrad!",
+        "invalidWarheads": "Sprengköpfe müssen eine ganze Zahl von 1 bis 12 sein."
       },
       "commands": {
         "open": "Raketen-Plugin öffnen",
-        "showAllMissiles": "Alle Raketen anzeigen"
+        "showAllMissiles": "Alle Raketen anzeigen",
+        "clearMissiles": "Alle Raketen löschen"
       },
       "help": {
         "overview": "Das Raketen-Menü simuliert fiktive Starts ballistischer Raketen: von einem einzelnen benutzerdefinierten Schuss zwischen zwei Punkten der Erde bis hin zu skriptgesteuerten Szenarien massiver Angriffe zwischen Atommächten. Die Flugbahnen verwenden ein realistisches ballistisches Modell, aber jeder Start ist fiktiv. Nutzen Sie das Menü, um Sensorabdeckung, Zeitabläufe der Raketenfrühwarnung und Was-wäre-wenn-Szenarien zu üben.",
@@ -139,6 +143,11 @@
         "tip1": "Starts verwenden die aktuelle Simulationszeit; stellen Sie also zuerst die Uhr ein, wenn das Szenario zu einem bestimmten Zeitpunkt beginnen soll.",
         "tip2": "Der Name jeder Rakete beginnt mit RV_, daher findet eine Suche nach RV_ in der Suchleiste alle aktiven Raketen.",
         "tip3": "Wird ein Start abgelehnt, erklärt eine Benachrichtigung den Grund; manche Kombinationen aus Startplatz und Ziel liegen außerhalb der modellierten Reichweite der Rakete."
+      },
+      "sections": {
+        "attackType": "Angriffsart",
+        "launch": "Start",
+        "target": "Ziel"
       }
     }
   }

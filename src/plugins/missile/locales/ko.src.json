@@ -1,6 +1,6 @@
 {
   "plugins": {
-    "MissilePlugin": {
+    "MissileSimulatorPlugin": {
       "bottomIconLabel": "미사일",
       "title": "미사일 공격 만들기",
       "labels": {
@@ -11,7 +11,7 @@
         "customLaunchLongitude": "사용자 지정 발사 경도",
         "customTargetLatitude": "사용자 지정 목표 위도",
         "customTargetLongitude": "사용자 지정 목표 경도",
-        "error": "오류"
+        "warheads": "탄두 (MIRV)"
       },
       "types": {
         "customMissile": "사용자 지정 미사일",
@@ -114,20 +114,24 @@
       },
       "buttons": {
         "launchMissileAttack": "미사일 공격 개시",
-        "showAllMissiles": "모든 미사일 표시"
+        "showAllMissiles": "모든 미사일 표시",
+        "clearMissiles": "미사일 지우기"
       },
       "msgs": {
-        "simLoaded": "{sim} 로드됨"
+        "simLoaded": "{sim} 로드됨",
+        "missilesActive": "{n} / {max}개 미사일 활성"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "목표 위도가 잘못되었습니다!",
         "invalidTargetLongitude": "목표 경도가 잘못되었습니다!",
         "invalidLaunchLatitude": "발사 위도가 잘못되었습니다!",
-        "invalidLaunchLongitude": "발사 경도가 잘못되었습니다!"
+        "invalidLaunchLongitude": "발사 경도가 잘못되었습니다!",
+        "invalidWarheads": "탄두 수는 1에서 12 사이의 정수여야 합니다."
       },
       "commands": {
         "open": "미사일 플러그인 열기",
-        "showAllMissiles": "모든 미사일 표시"
+        "showAllMissiles": "모든 미사일 표시",
+        "clearMissiles": "모든 미사일 지우기"
       },
       "help": {
         "overview": "미사일 메뉴는 가상의 탄도 미사일 발사를 시뮬레이션합니다. 지구상의 두 지점 사이 단발 사용자 지정 발사부터 핵보유국 간의 스크립트화된 대규모 공격 시나리오까지 다양합니다. 궤적은 현실적인 탄도 모델을 사용하지만 모든 발사는 허구입니다. 센서 커버리지, 미사일 경보 타임라인, 가상 시나리오를 연습하는 데 사용하세요.",
@@ -139,6 +143,11 @@
         "tip1": "발사는 현재 시뮬레이션 시간을 사용하므로 시나리오를 특정 시점에 시작하려면 먼저 시계를 설정하세요.",
         "tip2": "모든 미사일의 이름은 RV_로 시작하므로 검색창에서 RV_를 검색하면 모든 활성 미사일을 찾을 수 있습니다.",
         "tip3": "발사가 거부되면 토스트 알림이 이유를 설명합니다. 일부 발사 기지와 목표 조합은 미사일의 모델링된 사거리를 벗어납니다."
+      },
+      "sections": {
+        "attackType": "공격 유형",
+        "launch": "발사",
+        "target": "표적"
       }
     }
   }

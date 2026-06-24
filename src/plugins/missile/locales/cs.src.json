@@ -1,6 +1,6 @@
 {
   "plugins": {
-    "MissilePlugin": {
+    "MissileSimulatorPlugin": {
       "bottomIconLabel": "Raketa",
       "title": "Vytvořit raketový útok",
       "labels": {
@@ -11,7 +11,7 @@
         "customLaunchLongitude": "Vlastní zeměpisná délka startu",
         "customTargetLatitude": "Vlastní zeměpisná šířka cíle",
         "customTargetLongitude": "Vlastní zeměpisná délka cíle",
-        "error": "Chyba"
+        "warheads": "Hlavice (MIRV)"
       },
       "types": {
         "customMissile": "Vlastní raketa",
@@ -114,20 +114,24 @@
       },
       "buttons": {
         "launchMissileAttack": "Zahájit raketový útok",
-        "showAllMissiles": "Zobrazit všechny rakety"
+        "showAllMissiles": "Zobrazit všechny rakety",
+        "clearMissiles": "Vymazat rakety"
       },
       "msgs": {
-        "simLoaded": "{sim} načteno"
+        "simLoaded": "{sim} načteno",
+        "missilesActive": "{n} / {max} aktivních raket"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "Neplatná zeměpisná šířka cíle!",
         "invalidTargetLongitude": "Neplatná zeměpisná délka cíle!",
         "invalidLaunchLatitude": "Neplatná zeměpisná šířka startu!",
-        "invalidLaunchLongitude": "Neplatná zeměpisná délka startu!"
+        "invalidLaunchLongitude": "Neplatná zeměpisná délka startu!",
+        "invalidWarheads": "Počet hlavic musí být celé číslo od 1 do 12."
       },
       "commands": {
         "open": "Otevřít raketový plugin",
-        "showAllMissiles": "Zobrazit všechny rakety"
+        "showAllMissiles": "Zobrazit všechny rakety",
+        "clearMissiles": "Vymazat všechny rakety"
       },
       "help": {
         "overview": "Menu raket simuluje smyšlené starty balistických raket: od jediného vlastního výstřelu mezi dvěma body na Zemi až po předpřipravené scénáře hromadných útoků mezi jadernými mocnostmi. Trajektorie využívají realistický balistický model, ale každý start je fiktivní. Použijte jej k procvičení pokrytí senzorů, časových os varování před raketami a hypotetických scénářů.",
@@ -139,6 +143,11 @@
         "tip1": "Starty používají aktuální čas simulace, takže pokud má scénář začít v konkrétním okamžiku, nejprve nastavte hodiny.",
         "tip2": "Název každé rakety začíná na RV_, takže vyhledání RV_ ve vyhledávací liště najde všechny aktivní rakety.",
         "tip3": "Pokud je start zamítnut, oznámení vysvětlí proč; některé kombinace místa startu a cíle jsou mimo modelovaný dosah rakety."
+      },
+      "sections": {
+        "attackType": "Typ útoku",
+        "launch": "Start",
+        "target": "Cíl"
       }
     }
   }

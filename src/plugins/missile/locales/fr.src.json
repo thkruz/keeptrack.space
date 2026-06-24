@@ -1,6 +1,6 @@
 {
   "plugins": {
-    "MissilePlugin": {
+    "MissileSimulatorPlugin": {
       "bottomIconLabel": "Missile",
       "title": "Créer une attaque de missiles",
       "labels": {
@@ -11,7 +11,7 @@
         "customLaunchLongitude": "Longitude de lancement personnalisée",
         "customTargetLatitude": "Latitude de cible personnalisée",
         "customTargetLongitude": "Longitude de cible personnalisée",
-        "error": "Erreur"
+        "warheads": "Ogives (MIRV)"
       },
       "types": {
         "customMissile": "Missile personnalisé",
@@ -114,20 +114,24 @@
       },
       "buttons": {
         "launchMissileAttack": "Lancer l'attaque de missiles",
-        "showAllMissiles": "Afficher tous les missiles"
+        "showAllMissiles": "Afficher tous les missiles",
+        "clearMissiles": "Effacer les missiles"
       },
       "msgs": {
-        "simLoaded": "{sim} chargé"
+        "simLoaded": "{sim} chargé",
+        "missilesActive": "{n} / {max} missiles actifs"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "Latitude de la cible invalide !",
         "invalidTargetLongitude": "Longitude de la cible invalide !",
         "invalidLaunchLatitude": "Latitude de lancement invalide !",
-        "invalidLaunchLongitude": "Longitude de lancement invalide !"
+        "invalidLaunchLongitude": "Longitude de lancement invalide !",
+        "invalidWarheads": "Le nombre d'ogives doit être un entier de 1 à 12."
       },
       "commands": {
         "open": "Ouvrir le plugin Missile",
-        "showAllMissiles": "Afficher tous les missiles"
+        "showAllMissiles": "Afficher tous les missiles",
+        "clearMissiles": "Effacer tous les missiles"
       },
       "help": {
         "overview": "Le menu Missile simule des lancements fictifs de missiles balistiques : d'un tir personnalisé unique entre deux points de la Terre jusqu'à des scénarios scriptés d'attaque massive entre puissances nucléaires. Les trajectoires utilisent un modèle balistique réaliste, mais chaque lancement est fictif. Utilisez-le pour exercer la couverture des capteurs, les chronologies d'alerte missile et les scénarios hypothétiques.",
@@ -139,6 +143,11 @@
         "tip1": "Les lancements utilisent l'heure de simulation actuelle ; réglez donc d'abord l'horloge si le scénario doit commencer à un moment précis.",
         "tip2": "Le nom de chaque missile commence par RV_, donc rechercher RV_ dans la barre de recherche trouve tous les missiles actifs.",
         "tip3": "Si un lancement est refusé, une notification en explique la raison ; certaines combinaisons de site et de cible dépassent la portée modélisée du missile."
+      },
+      "sections": {
+        "attackType": "Type d'attaque",
+        "launch": "Lancement",
+        "target": "Cible"
       }
     }
   }

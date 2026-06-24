@@ -1,6 +1,6 @@
 {
   "plugins": {
-    "MissilePlugin": {
+    "MissileSimulatorPlugin": {
       "bottomIconLabel": "导弹",
       "title": "创建导弹攻击",
       "labels": {
@@ -11,7 +11,7 @@
         "customLaunchLongitude": "自定义发射经度",
         "customTargetLatitude": "自定义目标纬度",
         "customTargetLongitude": "自定义目标经度",
-        "error": "错误"
+        "warheads": "弹头 (MIRV)"
       },
       "types": {
         "customMissile": "自定义导弹",
@@ -114,20 +114,24 @@
       },
       "buttons": {
         "launchMissileAttack": "发动导弹攻击",
-        "showAllMissiles": "显示所有导弹"
+        "showAllMissiles": "显示所有导弹",
+        "clearMissiles": "清除导弹"
       },
       "msgs": {
-        "simLoaded": "{sim} 已加载"
+        "simLoaded": "{sim} 已加载",
+        "missilesActive": "{n} / {max} 枚导弹活动中"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "目标纬度无效！",
         "invalidTargetLongitude": "目标经度无效！",
         "invalidLaunchLatitude": "发射纬度无效！",
-        "invalidLaunchLongitude": "发射经度无效！"
+        "invalidLaunchLongitude": "发射经度无效！",
+        "invalidWarheads": "弹头数量必须是 1 到 12 之间的整数。"
       },
       "commands": {
         "open": "打开导弹插件",
-        "showAllMissiles": "显示所有导弹"
+        "showAllMissiles": "显示所有导弹",
+        "clearMissiles": "清除所有导弹"
       },
       "help": {
         "overview": "导弹菜单用于模拟假想的弹道导弹发射：从地球上两点之间的单枚自定义发射，到核大国之间脚本化的大规模齐射场景。弹道采用真实的弹道模型，但每次发射都是虚构的。可用它来演练传感器覆盖、导弹预警时间线以及假设场景。",
@@ -139,6 +143,11 @@
         "tip1": "发射使用当前模拟时间，因此如果场景需要在特定时刻开始，请先设置时钟。",
         "tip2": "每枚导弹的名称都以 RV_ 开头，因此在搜索栏中搜索 RV_ 即可找到所有活动导弹。",
         "tip3": "如果发射被拒绝，弹出提示会说明原因；某些发射场与目标的组合超出了导弹的建模射程。"
+      },
+      "sections": {
+        "attackType": "攻击类型",
+        "launch": "发射",
+        "target": "目标"
       }
     }
   }

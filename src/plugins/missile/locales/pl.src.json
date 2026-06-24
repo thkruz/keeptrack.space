@@ -1,6 +1,6 @@
 {
   "plugins": {
-    "MissilePlugin": {
+    "MissileSimulatorPlugin": {
       "bottomIconLabel": "Pocisk",
       "title": "Utwórz atak rakietowy",
       "labels": {
@@ -11,7 +11,7 @@
         "customLaunchLongitude": "Niestandardowa długość geograficzna startu",
         "customTargetLatitude": "Niestandardowa szerokość geograficzna celu",
         "customTargetLongitude": "Niestandardowa długość geograficzna celu",
-        "error": "Błąd"
+        "warheads": "Głowice (MIRV)"
       },
       "types": {
         "customMissile": "Pocisk niestandardowy",
@@ -114,20 +114,24 @@
       },
       "buttons": {
         "launchMissileAttack": "Rozpocznij atak rakietowy",
-        "showAllMissiles": "Pokaż wszystkie pociski"
+        "showAllMissiles": "Pokaż wszystkie pociski",
+        "clearMissiles": "Wyczyść pociski"
       },
       "msgs": {
-        "simLoaded": "Załadowano {sim}"
+        "simLoaded": "Załadowano {sim}",
+        "missilesActive": "{n} / {max} aktywnych pocisków"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "Nieprawidłowa szerokość geograficzna celu!",
         "invalidTargetLongitude": "Nieprawidłowa długość geograficzna celu!",
         "invalidLaunchLatitude": "Nieprawidłowa szerokość geograficzna startu!",
-        "invalidLaunchLongitude": "Nieprawidłowa długość geograficzna startu!"
+        "invalidLaunchLongitude": "Nieprawidłowa długość geograficzna startu!",
+        "invalidWarheads": "Liczba głowic musi być liczbą całkowitą od 1 do 12."
       },
       "commands": {
         "open": "Otwórz wtyczkę pocisków",
-        "showAllMissiles": "Pokaż wszystkie pociski"
+        "showAllMissiles": "Pokaż wszystkie pociski",
+        "clearMissiles": "Wyczyść wszystkie pociski"
       },
       "help": {
         "overview": "Menu pocisków symuluje hipotetyczne starty pocisków balistycznych: od pojedynczego, niestandardowego strzału między dwoma punktami na Ziemi po przygotowane scenariusze zmasowanych ataków między mocarstwami nuklearnymi. Trajektorie wykorzystują realistyczny model balistyczny, ale każdy start jest fikcyjny. Używaj go do ćwiczenia pokrycia czujników, harmonogramów ostrzegania przed pociskami i scenariuszy hipotetycznych.",
@@ -139,6 +143,11 @@
         "tip1": "Starty używają bieżącego czasu symulacji, więc najpierw ustaw zegar, jeśli scenariusz ma się rozpocząć w konkretnym momencie.",
         "tip2": "Nazwa każdego pocisku zaczyna się od RV_, więc wyszukanie RV_ w pasku wyszukiwania znajduje wszystkie aktywne pociski.",
         "tip3": "Jeśli start zostanie odrzucony, powiadomienie wyjaśni dlaczego; niektóre kombinacje miejsca startu i celu wykraczają poza modelowany zasięg pocisku."
+      },
+      "sections": {
+        "attackType": "Typ ataku",
+        "launch": "Start",
+        "target": "Cel"
       }
     }
   }

@@ -1,6 +1,6 @@
 {
   "plugins": {
-    "MissilePlugin": {
+    "MissileSimulatorPlugin": {
       "bottomIconLabel": "Missile",
       "title": "Crea attacco missilistico",
       "labels": {
@@ -11,7 +11,7 @@
         "customLaunchLongitude": "Longitudine di lancio personalizzata",
         "customTargetLatitude": "Latitudine del bersaglio personalizzata",
         "customTargetLongitude": "Longitudine del bersaglio personalizzata",
-        "error": "Errore"
+        "warheads": "Testate (MIRV)"
       },
       "types": {
         "customMissile": "Missile personalizzato",
@@ -114,20 +114,24 @@
       },
       "buttons": {
         "launchMissileAttack": "Lancia attacco missilistico",
-        "showAllMissiles": "Mostra tutti i missili"
+        "showAllMissiles": "Mostra tutti i missili",
+        "clearMissiles": "Cancella missili"
       },
       "msgs": {
-        "simLoaded": "{sim} caricato"
+        "simLoaded": "{sim} caricato",
+        "missilesActive": "{n} / {max} missili attivi"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "Latitudine del bersaglio non valida!",
         "invalidTargetLongitude": "Longitudine del bersaglio non valida!",
         "invalidLaunchLatitude": "Latitudine di lancio non valida!",
-        "invalidLaunchLongitude": "Longitudine di lancio non valida!"
+        "invalidLaunchLongitude": "Longitudine di lancio non valida!",
+        "invalidWarheads": "Le testate devono essere un numero intero da 1 a 12."
       },
       "commands": {
         "open": "Apri il plugin dei missili",
-        "showAllMissiles": "Mostra tutti i missili"
+        "showAllMissiles": "Mostra tutti i missili",
+        "clearMissiles": "Cancella tutti i missili"
       },
       "help": {
         "overview": "Il menu Missile simula lanci fittizi di missili balistici: da un singolo tiro personalizzato tra due punti della Terra fino a scenari preimpostati di attacco massiccio tra potenze nucleari. Le traiettorie usano un modello balistico realistico, ma ogni lancio è fittizio. Usalo per esercitare la copertura dei sensori, le tempistiche di allarme missilistico e gli scenari ipotetici.",
@@ -139,6 +143,11 @@
         "tip1": "I lanci usano l'ora di simulazione corrente, quindi imposta prima l'orologio se lo scenario deve iniziare in un momento specifico.",
         "tip2": "Il nome di ogni missile inizia con RV_, quindi cercare RV_ nella barra di ricerca trova tutti i missili attivi.",
         "tip3": "Se un lancio viene rifiutato, una notifica ne spiega il motivo; alcune combinazioni di sito e bersaglio sono oltre la portata modellata del missile."
+      },
+      "sections": {
+        "attackType": "Tipo di attacco",
+        "launch": "Lancio",
+        "target": "Bersaglio"
       }
     }
   }

@@ -1,6 +1,6 @@
 {
   "plugins": {
-    "MissilePlugin": {
+    "MissileSimulatorPlugin": {
       "bottomIconLabel": "Missile",
       "title": "Create Missile Attack",
       "labels": {
@@ -11,7 +11,7 @@
         "customLaunchLongitude": "Custom Launch Longitude",
         "customTargetLatitude": "Custom Target Latitude",
         "customTargetLongitude": "Custom Target Longitude",
-        "error": "Error"
+        "warheads": "Warheads (MIRV)"
       },
       "types": {
         "customMissile": "Custom Missile",
@@ -114,20 +114,24 @@
       },
       "buttons": {
         "launchMissileAttack": "Launch Missile Attack",
-        "showAllMissiles": "Show All Missiles"
+        "showAllMissiles": "Show All Missiles",
+        "clearMissiles": "Clear Missiles"
       },
       "msgs": {
-        "simLoaded": "{sim} Loaded"
+        "simLoaded": "{sim} Loaded",
+        "missilesActive": "{n} / {max} missiles active"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "Invalid Target Latitude!",
         "invalidTargetLongitude": "Invalid Target Longitude!",
         "invalidLaunchLatitude": "Invalid Launch Latitude!",
-        "invalidLaunchLongitude": "Invalid Launch Longitude!"
+        "invalidLaunchLongitude": "Invalid Launch Longitude!",
+        "invalidWarheads": "Warheads must be a whole number from 1 to 12."
       },
       "commands": {
         "open": "Open Missile Plugin",
-        "showAllMissiles": "Show All Missiles"
+        "showAllMissiles": "Show All Missiles",
+        "clearMissiles": "Clear All Missiles"
       },
       "help": {
         "overview": "The Missile menu simulates notional ballistic missile launches: anything from a single custom shot between two points on Earth to scripted mass raid scenarios between nuclear powers. Trajectories use a realistic ballistic model, but every launch is fictional. Use it to exercise sensor coverage, missile warning timelines, and what-if scenarios.",
@@ -139,6 +143,11 @@
         "tip1": "Launches use the current simulation time, so set the clock first if the scenario should start at a specific moment.",
         "tip2": "Every missile's name starts with RV_, so searching RV_ in the search bar finds all active missiles.",
         "tip3": "If a launch is rejected, a toast explains why; some site and target combinations are outside the missile's modeled range."
+      },
+      "sections": {
+        "attackType": "Attack Type",
+        "launch": "Launch",
+        "target": "Target"
       }
     }
   }

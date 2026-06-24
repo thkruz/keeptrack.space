@@ -40,11 +40,12 @@ test.describe('ReportsPlugin', () => {
     await expect(sideMenu).toBeHidden({ timeout: 2_000 });
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u);
 
-    // Verify report buttons container exists in the DOM
-    await expect(page.locator('#reports-buttons')).toBeAttached();
+    // Verify the v13 menu root carries the marker class
+    await expect(sideMenu).toHaveClass(/kt-ui-v13/u);
 
-    // Verify built-in report buttons are rendered
+    // Verify built-in report buttons are rendered as v13 action rows
     await expect(page.locator('#aer-report-btn')).toBeAttached();
+    await expect(page.locator('#aer-report-btn')).toHaveClass(/kt-action/u);
     await expect(page.locator('#lla-report-btn')).toBeAttached();
     await expect(page.locator('#eci-report-btn')).toBeAttached();
     await expect(page.locator('#coes-report-btn')).toBeAttached();

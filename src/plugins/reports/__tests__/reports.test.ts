@@ -80,13 +80,16 @@ describe('ReportsPlugin_class', () => {
       }
     });
 
-    it('should build side menu HTML with buttons container', () => {
+    it('should build v13 side menu HTML with report action rows and options', () => {
       const plugin = new ReportsPlugin();
       const sideMenuHtml = plugin['buildSideMenuHtml_']();
 
       expect(sideMenuHtml).toContain('reports-menu');
       expect(sideMenuHtml).toContain('reports-content');
-      expect(sideMenuHtml).toContain('reports-buttons');
+      expect(sideMenuHtml).toContain('kt-ui-v13');
+      expect(sideMenuHtml).toContain('aer-report-btn');
+      expect(sideMenuHtml).toContain('reports-window');
+      expect(sideMenuHtml).toContain('reports-format');
     });
   });
 
@@ -170,18 +173,32 @@ describe('ReportsPlugin report generation', () => {
   const p = () => plugin as any;
   const startTime = new Date('2022-01-01T00:00:00Z');
 
-  // A lightweight sensor stub so the dense 7-day / 72-hour loops don't run real
-  // SGP4 per step. A counter flips isRaeInFov so visibility windows open & close.
-  const makeFakeSensor = () => {
-    let n = 0;
+  // A lightweight sensor stub: AER samples sensor.rae() inside each injected pass window.
+  const makeFakeSensor = () => ({
+    name: 'FAKE', getTypeString: () => 'Optical',
+    lat: 0, lon: 0, alt: 0, minAz: 0, maxAz: 360, minEl: 0, maxEl: 90, minRng: 0, maxRng: 100000,
+    rae: () => ({ az: 100, el: 15, rng: 500 }),
+  });
 
-    return {
-      name: 'FAKE', getTypeString: () => 'Optical',
-      lat: 0, lon: 0, alt: 0, minAz: 0, maxAz: 360, minEl: 0, maxEl: 90, minRng: 0, maxRng: 100000,
-      rae: () => ({ az: 100, el: ((n++ % 20) < 10) ? 15 : -5, rng: 500 }),
-      isRaeInFov: () => (n % 20) < 5,
-    };
-  };
+  // A fake report context: pass windows and sun status are injected, so no real
+  // SGP4 pass scan runs in the test.
+  const makeCtx = (passes: { aos: Date; los: Date; maxEl: number; maxElTime: Date }[] = []) => ({
+    options: { startTime, windowSec: 3 * 24 * 60 * 60, stepSec: 30 },
+    generatedAt: startTime,
+    deps: {
+      findPasses: () => passes,
+      sunStatusAt: () => ({ illumination: 'sun' as const, sunAngleDeg: 90 }),
+    },
+  });
+
+  const onePass = () => [
+    {
+      aos: new Date(startTime.getTime() + 60_000),
+      los: new Date(startTime.getTime() + 180_000),
+      maxEl: 42,
+      maxElTime: new Date(startTime.getTime() + 120_000),
+    },
+  ];
 
   const getReport = (id: string) => ReportsPlugin.getRegisteredReports().find((r) => r.id === id)!;
 
@@ -195,39 +212,47 @@ describe('ReportsPlugin report generation', () => {
     vi.restoreAllMocks();
   });
 
-  it('lla / eci / coes / sun-eclipse generators produce a header and body', () => {
+  it('lla / eci / coes / sun-eclipse generators produce a header and table rows', () => {
     for (const id of ['lla-report', 'eci-report', 'coes-report', 'sun-eclipse-report']) {
-      const data = getReport(id).generate(defaultSat, null, startTime);
+      const data = getReport(id).generate(defaultSat, null, makeCtx() as never);
 
       expect(data.filename).toContain(id.replace('-report', ''));
       expect(data.header).toContain('Report');
-      expect(data.body.length).toBeGreaterThan(0);
+      expect(data.table!.rows.length).toBeGreaterThan(0);
     }
   });
 
-  it('aer generator produces az/el/range rows with a sensor', () => {
-    const data = getReport('aer-report').generate(defaultSat, makeFakeSensor() as never, startTime);
+  it('aer generator produces az/el/range rows inside the pass windows', () => {
+    const data = getReport('aer-report').generate(defaultSat, makeFakeSensor() as never, makeCtx(onePass()) as never);
 
     expect(data.header).toContain('Azimuth Elevation Range');
-    expect(data.body).toContain('Azimuth');
+    expect(data.table!.headers).toContain('Azimuth(°)');
+    expect(data.table!.rows.length).toBeGreaterThan(0);
   });
 
   it('aer generator throws without a sensor', () => {
-    expect(() => getReport('aer-report').generate(defaultSat, null, startTime)).toThrow('Sensor is required');
+    expect(() => getReport('aer-report').generate(defaultSat, null, makeCtx() as never)).toThrow('Sensor is required');
   });
 
-  it('visibility-windows generator records rise/set passes', () => {
-    const data = getReport('visibility-windows-report').generate(defaultSat, makeFakeSensor() as never, startTime);
+  it('visibility-windows generator records one row per pass', () => {
+    const data = getReport('visibility-windows-report').generate(defaultSat, makeFakeSensor() as never, makeCtx(onePass()) as never);
 
     expect(data.header).toContain('Visibility Windows');
-    expect(data.body).toContain('Pass #');
+    expect(data.table!.headers).toContain('Pass #');
+    expect(data.table!.rows.length).toBe(1);
   });
 
   it('visibility-windows generator throws without a sensor', () => {
-    expect(() => getReport('visibility-windows-report').generate(defaultSat, null, startTime)).toThrow('Sensor is required');
+    expect(() => getReport('visibility-windows-report').generate(defaultSat, null, makeCtx() as never)).toThrow('Sensor is required');
   });
 
   describe('generateReport_ + writeReport_', () => {
+    beforeEach(() => {
+      // jsdom does not implement object URLs; stub them for the Blob download path.
+      (URL as unknown as { createObjectURL: unknown }).createObjectURL = vi.fn(() => 'blob:mock');
+      (URL as unknown as { revokeObjectURL: unknown }).revokeObjectURL = vi.fn();
+    });
+
     afterEach(() => {
       vi.unstubAllGlobals();
     });

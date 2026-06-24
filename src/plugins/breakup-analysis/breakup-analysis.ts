@@ -1,4 +1,4 @@
-import { MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -6,134 +6,58 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import {
   IBottomIconConfig,
+  ICommandPaletteCapable,
+  ICommandPaletteCommand,
   IDragOptions,
   IHelpConfig,
   ISideMenuConfig,
 } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
+import { saveCsv } from '@app/engine/utils/saveVariable';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
-import { Satellite, SpaceObjectType } from '@ootk/src/main';
+import { Satellite } from '@ootk/src/main';
+import * as echarts from 'echarts';
 import scatterPlotPng from '@public/img/icons/scatter-plot.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import {
+  buildCsvRows,
+  buildGabbardData,
+  calcYearsBetween,
+  FragmentSortKey,
+  sortFragments,
+  SortDir,
+  summarizeEvent,
+} from './breakup-analysis-core';
+import {
+  buildEventInfoCard,
+  buildEventListTable,
+  buildFragmentTable,
+  buildStatsCard,
+  BreakupLabels,
+  FRAGMENT_DEFAULT_MAX_ROWS,
+} from './breakup-analysis-table';
 import './breakup-analysis.css';
+import { BREAKUP_EVENTS, BreakupEvent } from './breakup-events';
+import { buildGabbardOption } from './breakup-gabbard-chart';
 
-export interface BreakupEvent {
-  id: string;
-  name: string;
-  parentName: string;
-  parentNoradId: number;
-  intlDesPrefix: string;
-  breakupDate: string;
-  launchDate: string;
-  country: string;
-  orbitType: string;
-  altitudeKm: number;
-  cause: string;
-  estimatedDebrisCount: number;
-  description: string;
-}
+// Re-export so existing importers keep a single entry point.
+export { BREAKUP_EVENTS, BreakupEvent };
 
-const BREAKUP_EVENTS: BreakupEvent[] = [
-  {
-    id: 'fengyun1c',
-    name: 'Fengyun-1C ASAT Test',
-    parentName: 'Fengyun-1C',
-    parentNoradId: 25730,
-    intlDesPrefix: '1999-025',
-    breakupDate: '2007-01-11',
-    launchDate: '1999-05-10',
-    country: 'China',
-    orbitType: 'LEO Sun-Synchronous',
-    altitudeKm: 865,
-    cause: 'Intentional ASAT Test',
-    estimatedDebrisCount: 3433,
-    description: 'Chinese anti-satellite missile test that destroyed the Fengyun-1C weather satellite, creating the largest tracked debris cloud in history.',
-  },
-  {
-    id: 'cosmos2251',
-    name: 'Cosmos 2251 / Iridium 33 Collision',
-    parentName: 'Cosmos 2251',
-    parentNoradId: 22675,
-    intlDesPrefix: '1993-036',
-    breakupDate: '2009-02-10',
-    launchDate: '1993-06-16',
-    country: 'Russia',
-    orbitType: 'LEO',
-    altitudeKm: 790,
-    cause: 'Accidental Collision',
-    estimatedDebrisCount: 1668,
-    description: 'First accidental hypervelocity collision between two intact satellites. Cosmos 2251 collided with the operational Iridium 33 communications satellite.',
-  },
-  {
-    id: 'iridium33',
-    name: 'Iridium 33 (from Collision)',
-    parentName: 'Iridium 33',
-    parentNoradId: 24946,
-    intlDesPrefix: '1997-051',
-    breakupDate: '2009-02-10',
-    launchDate: '1997-09-14',
-    country: 'USA',
-    orbitType: 'LEO',
-    altitudeKm: 790,
-    cause: 'Accidental Collision',
-    estimatedDebrisCount: 628,
-    description: 'Debris field from the operational Iridium 33 satellite after collision with defunct Cosmos 2251.',
-  },
-  {
-    id: 'cosmos1408',
-    name: 'Cosmos 1408 ASAT Test',
-    parentName: 'Cosmos 1408',
-    parentNoradId: 13552,
-    intlDesPrefix: '1982-092',
-    breakupDate: '2021-11-15',
-    launchDate: '1982-09-16',
-    country: 'Russia',
-    orbitType: 'LEO',
-    altitudeKm: 480,
-    cause: 'Intentional ASAT Test',
-    estimatedDebrisCount: 1500,
-    description: 'Russian direct-ascent ASAT test that destroyed the defunct Cosmos 1408 ELINT satellite, generating debris that threatened the ISS crew.',
-  },
-  {
-    id: 'breezem',
-    name: 'Briz-M Upper Stage Explosion',
-    parentName: 'Briz-M (14S44 #3)',
-    parentNoradId: 28945,
-    intlDesPrefix: '2006-006',
-    breakupDate: '2007-02-19',
-    launchDate: '2006-02-28',
-    country: 'Russia',
-    orbitType: 'GTO',
-    altitudeKm: 500,
-    cause: 'Accidental Explosion',
-    estimatedDebrisCount: 1078,
-    description: 'Briz-M upper stage exploded after failed Arabsat-4A mission, likely due to residual propellant. Created debris across a wide range of altitudes.',
-  },
-  {
-    id: 'usa193',
-    name: 'USA-193 Shootdown',
-    parentName: 'USA-193',
-    parentNoradId: 29651,
-    intlDesPrefix: '2006-057',
-    breakupDate: '2008-02-21',
-    launchDate: '2006-12-14',
-    country: 'USA',
-    orbitType: 'LEO',
-    altitudeKm: 247,
-    cause: 'Intentional Shootdown',
-    estimatedDebrisCount: 174,
-    description: 'US Navy SM-3 missile destroyed the malfunctioning NRO satellite USA-193 (NROL-21). Low-altitude breakup meant most debris reentered within weeks.',
-  },
-];
-
-export class BreakupAnalysis extends KeepTrackPlugin {
+export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteCapable {
   readonly id = 'BreakupAnalysis';
   dependencies_ = [];
 
   private selectedEventId_: string | null = null;
   private debrisResults_: Satellite[] = [];
+  private sortKey_: FragmentSortKey = 'perigee';
+  private sortDir_: SortDir = 'asc';
+  private showAllFragments_ = false;
+  /** Search limit before this plugin bumped it, so it can be restored. null when not bumped. */
+  private priorSearchLimit_: number | null = null;
+  private gabbardChart_: echarts.ECharts | null = null;
+  private resizeHandler_: (() => void) | null = null;
 
   // =========================================================================
   // Composition-based configuration methods
@@ -162,6 +86,32 @@ export class BreakupAnalysis extends KeepTrackPlugin {
     this.onBottomIconClick();
   };
 
+  /** Restore globe state when the menu is closed (not just on the Back button). */
+  onBottomIconDeselect(): void {
+    this.restoreSearchLimit_();
+    this.disposeChart_();
+  }
+
+  getCommandPaletteCommands(): ICommandPaletteCommand[] {
+    const category = t7e('plugins.BreakupAnalysis.title' as Parameters<typeof t7e>[0]);
+
+    return [
+      {
+        id: 'BreakupAnalysis.open',
+        label: t7e('plugins.BreakupAnalysis.commands.open' as Parameters<typeof t7e>[0]),
+        category,
+        callback: () => this.bottomMenuClicked(),
+      },
+      {
+        id: 'BreakupAnalysis.export',
+        label: t7e('plugins.BreakupAnalysis.commands.export' as Parameters<typeof t7e>[0]),
+        category,
+        callback: () => this.exportCsv_(),
+        isAvailable: () => this.debrisResults_.length > 0,
+      },
+    ];
+  }
+
   getSideMenuConfig(): ISideMenuConfig {
     return {
       elementName: 'breakup-analysis-menu',
@@ -187,6 +137,56 @@ export class BreakupAnalysis extends KeepTrackPlugin {
   }
 
   // =========================================================================
+  // Localized labels
+  // =========================================================================
+
+  private getLabels_(): BreakupLabels {
+    const l = (key: string) => t7e(`plugins.BreakupAnalysis.${key}` as Parameters<typeof t7e>[0]);
+
+    return {
+      event: l('labels.event'),
+      date: l('labels.date'),
+      cause: l('labels.cause'),
+      altKm: l('labels.altKm'),
+      estDebris: l('labels.estDebris'),
+      parentObject: l('labels.parentObject'),
+      country: l('labels.country'),
+      orbitType: l('labels.orbitType'),
+      breakupAltitude: l('labels.breakupAltitude'),
+      launchDate: l('labels.launchDate'),
+      breakupDate: l('labels.breakupDate'),
+      timeToBreakup: l('labels.timeToBreakup'),
+      years: l('labels.years'),
+      km: l('labels.km'),
+      debrisStatistics: l('sections.debrisStatistics'),
+      trackedDebris: l('labels.trackedDebris'),
+      estimatedTotal: l('labels.estimatedTotal'),
+      trackingRatio: l('labels.trackingRatio'),
+      typeBreakdown: l('labels.typeBreakdown'),
+      fragmentDispersion: l('sections.fragmentDispersion'),
+      parameter: l('labels.parameter'),
+      min: l('labels.min'),
+      max: l('labels.max'),
+      mean: l('labels.mean'),
+      spread: l('labels.spread'),
+      perigeeParam: l('labels.perigeeParam'),
+      apogeeParam: l('labels.apogeeParam'),
+      eccentricityParam: l('labels.eccentricityParam'),
+      inclinationParam: l('labels.inclinationParam'),
+      noTrackedDebris: l('labels.noTrackedDebris'),
+      trackedFragments: l('sections.trackedFragments'),
+      showingOf: l('labels.showingOf'),
+      norad: l('labels.norad'),
+      name: l('labels.name'),
+      type: l('labels.type'),
+      perigee: l('labels.perigee'),
+      apogee: l('labels.apogee'),
+      incDeg: l('labels.incDeg'),
+      ecc: l('labels.ecc'),
+    };
+  }
+
+  // =========================================================================
   // Lifecycle methods
   // =========================================================================
 
@@ -199,12 +199,7 @@ export class BreakupAnalysis extends KeepTrackPlugin {
   private uiManagerFinal_(): void {
     getEl('breakup-analysis-event-list', true)?.addEventListener('click', (evt: MouseEvent) => {
       const row = (evt.target as HTMLElement).closest('[data-event-id]') as HTMLElement | null;
-
-      if (!row) {
-        return;
-      }
-
-      const eventId = row.dataset.eventId;
+      const eventId = row?.dataset.eventId;
 
       if (eventId) {
         showLoading(() => this.selectEvent_(eventId));
@@ -214,6 +209,31 @@ export class BreakupAnalysis extends KeepTrackPlugin {
     getEl('breakup-analysis-back-btn', true)?.addEventListener('click', () => {
       this.showEventList_();
     });
+
+    getEl('breakup-analysis-jump-btn', true)?.addEventListener('click', () => {
+      this.jumpToBreakupDate_();
+    });
+
+    getEl('breakup-analysis-parent-btn', true)?.addEventListener('click', () => {
+      this.selectParent_();
+    });
+
+    getEl('breakup-analysis-export-btn', true)?.addEventListener('click', () => {
+      this.exportCsv_();
+    });
+
+    getEl('breakup-analysis-showall-btn', true)?.addEventListener('click', () => {
+      this.showAllFragments_ = !this.showAllFragments_;
+      this.renderDispersion_();
+      this.updateShowAllButton_();
+    });
+
+    // One delegated listener on the persistent fragment container handles both
+    // row selection and header-driven sorting (avoids the per-render listener
+    // accumulation the old code had).
+    getEl('breakup-analysis-dispersion', true)?.addEventListener('click', (evt: MouseEvent) => {
+      this.onDispersionClick_(evt);
+    });
   }
 
   // =========================================================================
@@ -221,55 +241,48 @@ export class BreakupAnalysis extends KeepTrackPlugin {
   // =========================================================================
 
   private buildSideMenuHtml_(): string {
+    const labels = this.getLabels_();
+    const s = (key: string) => t7e(`plugins.BreakupAnalysis.sections.${key}` as Parameters<typeof t7e>[0]);
+    const a = (key: string) => t7e(`plugins.BreakupAnalysis.actions.${key}` as Parameters<typeof t7e>[0]);
+
     return html`
-      <div id="breakup-analysis-menu" class="side-menu-parent start-hidden">
+      <div id="breakup-analysis-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div id="breakup-analysis-content" class="side-menu">
           <div id="breakup-analysis-event-list">
-            ${this.buildEventListHtml_()}
+            <section class="kt-section">
+              <div class="kt-section-label">${s('events')}</div>
+              ${buildEventListTable(BREAKUP_EVENTS, labels)}
+            </section>
           </div>
           <div id="breakup-analysis-detail" style="display:none;">
-            <button id="breakup-analysis-back-btn" class="btn btn-ui waves-effect waves-light" style="margin-bottom:10px;">
-              &larr; Back to Events
+            <button id="breakup-analysis-back-btn" type="button" class="kt-action waves-effect">
+              <span class="kt-action-label">${a('backToEvents')}</span>
             </button>
             <div id="breakup-analysis-event-info"></div>
             <div id="breakup-analysis-stats"></div>
-            <div id="breakup-analysis-dispersion"></div>
+            <section id="breakup-analysis-gabbard-section" class="kt-section" style="display:none;">
+              <div class="kt-section-label">${s('gabbardDiagram')}</div>
+              <div id="breakup-analysis-gabbard" class="breakup-gabbard-chart"></div>
+            </section>
+            <section id="breakup-analysis-dispersion" class="kt-section"></section>
+            <section class="kt-section">
+              <div class="kt-section-label">${s('actions')}</div>
+              <button id="breakup-analysis-jump-btn" type="button" class="kt-action waves-effect">
+                <span class="kt-action-label">${a('jumpToDate')}</span>
+              </button>
+              <button id="breakup-analysis-parent-btn" type="button" class="kt-action waves-effect">
+                <span class="kt-action-label">${a('selectParent')}</span>
+              </button>
+              <button id="breakup-analysis-export-btn" type="button" class="kt-action waves-effect">
+                <span class="kt-action-label">${a('exportCsv')}</span>
+              </button>
+              <button id="breakup-analysis-showall-btn" type="button" class="kt-action waves-effect" style="display:none;">
+                <span class="kt-action-label">${a('showAll')}</span>
+              </button>
+            </section>
           </div>
         </div>
       </div>
-    `;
-  }
-
-  private buildEventListHtml_(): string {
-    let rows = '';
-
-    for (const evt of BREAKUP_EVENTS) {
-      rows += html`
-        <tr class="breakup-analysis-event-row link" data-event-id="${evt.id}">
-          <td>${evt.name}</td>
-          <td>${evt.breakupDate}</td>
-          <td>${evt.cause}</td>
-          <td>${evt.altitudeKm.toString()}</td>
-          <td>${evt.estimatedDebrisCount.toLocaleString()}</td>
-        </tr>
-      `;
-    }
-
-    return html`
-      <table id="breakup-analysis-event-table" class="center-align">
-        <thead>
-          <tr>
-            <th>Event</th>
-            <th>Date</th>
-            <th>Cause</th>
-            <th>Alt (km)</th>
-            <th>Est. Debris</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows}
-        </tbody>
-      </table>
     `;
   }
 
@@ -285,7 +298,10 @@ export class BreakupAnalysis extends KeepTrackPlugin {
     }
 
     this.selectedEventId_ = eventId;
-    this.debrisResults_ = this.findDebrisForEvent_(event);
+    this.showAllFragments_ = false;
+    this.sortKey_ = 'perigee';
+    this.sortDir_ = 'asc';
+    this.debrisResults_ = sortFragments(this.findDebrisForEvent_(event), this.sortKey_, this.sortDir_);
 
     this.renderEventDetail_(event);
     this.filterDebrisOnGlobe_();
@@ -304,6 +320,7 @@ export class BreakupAnalysis extends KeepTrackPlugin {
   private showEventList_(): void {
     this.selectedEventId_ = null;
     this.debrisResults_ = [];
+    this.disposeChart_();
 
     const listEl = getEl('breakup-analysis-event-list', true);
     const detailEl = getEl('breakup-analysis-detail', true);
@@ -315,6 +332,7 @@ export class BreakupAnalysis extends KeepTrackPlugin {
       detailEl.style.display = 'none';
     }
 
+    this.restoreSearchLimit_();
     ServiceLocator.getUiManager().doSearch('');
   }
 
@@ -350,6 +368,10 @@ export class BreakupAnalysis extends KeepTrackPlugin {
     }
 
     if (this.debrisResults_.length > settingsManager.searchLimit) {
+      // Remember the prior limit exactly once so closing/back restores it.
+      if (this.priorSearchLimit_ === null) {
+        this.priorSearchLimit_ = settingsManager.searchLimit;
+      }
       settingsManager.searchLimit = this.debrisResults_.length;
     }
 
@@ -358,154 +380,48 @@ export class BreakupAnalysis extends KeepTrackPlugin {
     ServiceLocator.getUiManager().doSearch(sccNums);
   }
 
+  /** Restore the search limit the plugin bumped in {@link filterDebrisOnGlobe_}. */
+  private restoreSearchLimit_(): void {
+    if (this.priorSearchLimit_ !== null) {
+      settingsManager.searchLimit = this.priorSearchLimit_;
+      this.priorSearchLimit_ = null;
+    }
+  }
+
   // =========================================================================
   // Rendering
   // =========================================================================
 
   private renderEventDetail_(event: BreakupEvent): void {
-    this.renderEventInfo_(event);
-    this.renderStats_(event);
+    const labels = this.getLabels_();
+
+    this.renderEventInfo_(event, labels);
+    this.renderStats_(event, labels);
     this.renderDispersion_();
+    this.renderGabbard_();
+    this.updateShowAllButton_();
   }
 
-  private renderEventInfo_(event: BreakupEvent): void {
+  private renderEventInfo_(event: BreakupEvent, labels: BreakupLabels): void {
     const infoEl = getEl('breakup-analysis-event-info', true);
 
     if (!infoEl) {
       return;
     }
 
-    const yearsToBreakup = BreakupAnalysis.calcYearsBetween_(event.launchDate, event.breakupDate);
+    const yearsToBreakup = calcYearsBetween(event.launchDate, event.breakupDate);
 
-    infoEl.innerHTML = html`
-      <div class="breakup-info-card">
-        <h5 class="center-align">${event.name}</h5>
-        <p class="breakup-description">${event.description}</p>
-        <div class="breakup-info-grid">
-          <div class="breakup-info-item">
-            <span class="breakup-info-label">Parent Object</span>
-            <span class="breakup-info-value">${event.parentName} (${event.parentNoradId.toString()})</span>
-          </div>
-          <div class="breakup-info-item">
-            <span class="breakup-info-label">Country</span>
-            <span class="breakup-info-value">${event.country}</span>
-          </div>
-          <div class="breakup-info-item">
-            <span class="breakup-info-label">Orbit Type</span>
-            <span class="breakup-info-value">${event.orbitType}</span>
-          </div>
-          <div class="breakup-info-item">
-            <span class="breakup-info-label">Breakup Altitude</span>
-            <span class="breakup-info-value">${event.altitudeKm.toString()} km</span>
-          </div>
-          <div class="breakup-info-item">
-            <span class="breakup-info-label">Cause</span>
-            <span class="breakup-info-value">${event.cause}</span>
-          </div>
-          <div class="breakup-info-item">
-            <span class="breakup-info-label">Launch Date</span>
-            <span class="breakup-info-value">${event.launchDate}</span>
-          </div>
-          <div class="breakup-info-item">
-            <span class="breakup-info-label">Breakup Date</span>
-            <span class="breakup-info-value">${event.breakupDate}</span>
-          </div>
-          <div class="breakup-info-item">
-            <span class="breakup-info-label">Time to Breakup</span>
-            <span class="breakup-info-value">${yearsToBreakup} years</span>
-          </div>
-        </div>
-      </div>
-    `;
+    infoEl.innerHTML = buildEventInfoCard(event, yearsToBreakup, labels);
   }
 
-  private renderStats_(event: BreakupEvent): void {
+  private renderStats_(event: BreakupEvent, labels: BreakupLabels): void {
     const statsEl = getEl('breakup-analysis-stats', true);
 
     if (!statsEl) {
       return;
     }
 
-    const tracked = this.debrisResults_.length;
-    const estimated = event.estimatedDebrisCount;
-    const trackingRatio = estimated > 0 ? ((tracked / estimated) * 100).toFixed(1) : '0';
-
-    const debrisCount = this.countByType_();
-    const altStats = this.calcAltitudeStats_();
-    const eccStats = this.calcEccentricityStats_();
-    const incStats = this.calcInclinationStats_();
-
-    statsEl.innerHTML = html`
-      <div class="breakup-stats-card">
-        <h6 class="center-align">Debris Statistics</h6>
-        <div class="breakup-info-grid">
-          <div class="breakup-info-item">
-            <span class="breakup-info-label">Tracked Debris</span>
-            <span class="breakup-info-value">${tracked.toLocaleString()}</span>
-          </div>
-          <div class="breakup-info-item">
-            <span class="breakup-info-label">Estimated Total</span>
-            <span class="breakup-info-value">${estimated.toLocaleString()}</span>
-          </div>
-          <div class="breakup-info-item">
-            <span class="breakup-info-label">Tracking Ratio</span>
-            <span class="breakup-info-value">${trackingRatio}%</span>
-          </div>
-          <div class="breakup-info-item">
-            <span class="breakup-info-label">Payloads / R. Bodies / Debris</span>
-            <span class="breakup-info-value">${debrisCount.payloads.toString()} / ${debrisCount.rocketBodies.toString()} / ${debrisCount.debris.toString()}</span>
-          </div>
-        </div>
-        ${tracked > 0 ? html`
-        <h6 class="center-align" style="margin-top:12px;">Fragment Dispersion Analysis</h6>
-        <table class="breakup-dispersion-table center-align">
-          <thead>
-            <tr>
-              <th>Parameter</th>
-              <th>Min</th>
-              <th>Max</th>
-              <th>Mean</th>
-              <th>Spread</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Perigee (km)</td>
-              <td>${altStats.minPerigee.toFixed(0)}</td>
-              <td>${altStats.maxPerigee.toFixed(0)}</td>
-              <td>${altStats.meanPerigee.toFixed(0)}</td>
-              <td>${(altStats.maxPerigee - altStats.minPerigee).toFixed(0)}</td>
-            </tr>
-            <tr>
-              <td>Apogee (km)</td>
-              <td>${altStats.minApogee.toFixed(0)}</td>
-              <td>${altStats.maxApogee.toFixed(0)}</td>
-              <td>${altStats.meanApogee.toFixed(0)}</td>
-              <td>${(altStats.maxApogee - altStats.minApogee).toFixed(0)}</td>
-            </tr>
-            <tr>
-              <td>Eccentricity</td>
-              <td>${eccStats.min.toFixed(4)}</td>
-              <td>${eccStats.max.toFixed(4)}</td>
-              <td>${eccStats.mean.toFixed(4)}</td>
-              <td>${(eccStats.max - eccStats.min).toFixed(4)}</td>
-            </tr>
-            <tr>
-              <td>Inclination (&deg;)</td>
-              <td>${incStats.min.toFixed(2)}</td>
-              <td>${incStats.max.toFixed(2)}</td>
-              <td>${incStats.mean.toFixed(2)}</td>
-              <td>${(incStats.max - incStats.min).toFixed(2)}</td>
-            </tr>
-          </tbody>
-        </table>
-        ` : html`
-        <p class="center-align" style="margin-top:12px;color:var(--color-dark-text-accent);">
-          No tracked debris found in current catalog for this event.
-        </p>
-        `}
-      </div>
-    `;
+    statsEl.innerHTML = buildStatsCard(summarizeEvent(event, this.debrisResults_), labels);
   }
 
   private renderDispersion_(): void {
@@ -517,178 +433,200 @@ export class BreakupAnalysis extends KeepTrackPlugin {
 
     if (this.debrisResults_.length === 0) {
       dispEl.innerHTML = '';
+      dispEl.style.display = 'none';
 
       return;
     }
 
-    let rows = '';
-    const maxRows = 100;
-    const displayResults = this.debrisResults_.slice(0, maxRows);
+    dispEl.style.display = 'block';
+    dispEl.innerHTML = buildFragmentTable(
+      this.debrisResults_,
+      {
+        sortKey: this.sortKey_,
+        sortDir: this.sortDir_,
+        showAll: this.showAllFragments_,
+        maxRows: FRAGMENT_DEFAULT_MAX_ROWS,
+      },
+      this.getLabels_(),
+    );
+  }
 
-    for (const sat of displayResults) {
-      rows += html`
-        <tr class="breakup-analysis-debris-row link" data-scc="${sat.sccNum}">
-          <td>${sat.sccNum}</td>
-          <td>${sat.name}</td>
-          <td>${sat.getTypeString()}</td>
-          <td>${sat.perigee.toFixed(0)}</td>
-          <td>${sat.apogee.toFixed(0)}</td>
-          <td>${sat.inclination.toFixed(2)}</td>
-          <td>${sat.eccentricity.toFixed(4)}</td>
-        </tr>
-      `;
+  private renderGabbard_(): void {
+    const section = getEl('breakup-analysis-gabbard-section', true);
+    const chartDom = getEl('breakup-analysis-gabbard', true);
+
+    if (!section || !chartDom) {
+      return;
     }
 
-    dispEl.innerHTML = html`
-      <div class="breakup-debris-card">
-        <h6 class="center-align">
-          Tracked Fragments${this.debrisResults_.length > maxRows ? ` (showing ${maxRows} of ${this.debrisResults_.length})` : ''}
-        </h6>
-        <div class="breakup-debris-table-wrapper">
-          <table class="breakup-debris-table center-align">
-            <thead>
-              <tr>
-                <th>NORAD</th>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Perigee</th>
-                <th>Apogee</th>
-                <th>Inc (&deg;)</th>
-                <th>Ecc</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rows}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    `;
+    const data = buildGabbardData(this.debrisResults_);
 
-    dispEl.addEventListener('click', (evt: MouseEvent) => {
-      const row = (evt.target as HTMLElement).closest('[data-scc]') as HTMLElement | null;
+    if (data.apogee.length === 0) {
+      section.style.display = 'none';
+      this.disposeChart_();
 
-      if (!row) {
+      return;
+    }
+
+    section.style.display = 'block';
+
+    const g = (key: string) => t7e(`plugins.BreakupAnalysis.gabbard.${key}` as Parameters<typeof t7e>[0]);
+    const option = buildGabbardOption(data, {
+      apogee: g('apogee'),
+      perigee: g('perigee'),
+      periodAxis: g('periodAxis'),
+      altitudeAxis: g('altitudeAxis'),
+    });
+
+    // Defer init + setOption to the next frame: the card was switched to
+    // display:block in this same tick, so measuring now gives a near-zero width
+    // and echarts wraps the legend into a vertical stack (and that wrap sticks
+    // even after a later resize). One frame later the card is laid out and the
+    // chart sizes against its real width.
+    requestAnimationFrame(() => {
+      const dom = getEl('breakup-analysis-gabbard', true);
+
+      if (!dom || this.selectedEventId_ === null) {
         return;
       }
 
-      const scc = row.dataset.scc;
-
-      if (scc) {
-        const catalogManager = ServiceLocator.getCatalogManager();
-        const satId = catalogManager.sccNum2Id(scc);
-
-        if (satId !== null) {
-          PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satId);
-        }
+      if (!this.gabbardChart_) {
+        this.gabbardChart_ = echarts.init(dom);
+        this.resizeHandler_ = () => this.gabbardChart_?.resize();
+        window.addEventListener('resize', this.resizeHandler_);
       }
+
+      this.gabbardChart_.setOption(option, true);
+      this.gabbardChart_.resize();
     });
   }
 
-  // =========================================================================
-  // Statistical helpers
-  // =========================================================================
-
-  private countByType_(): { payloads: number; rocketBodies: number; debris: number } {
-    let payloads = 0;
-    let rocketBodies = 0;
-    let debris = 0;
-
-    for (const sat of this.debrisResults_) {
-      if (sat.type === SpaceObjectType.PAYLOAD) {
-        payloads++;
-      } else if (sat.type === SpaceObjectType.ROCKET_BODY) {
-        rocketBodies++;
-      } else {
-        debris++;
-      }
+  private disposeChart_(): void {
+    if (this.resizeHandler_) {
+      window.removeEventListener('resize', this.resizeHandler_);
+      this.resizeHandler_ = null;
     }
-
-    return { payloads, rocketBodies, debris };
+    if (this.gabbardChart_) {
+      echarts.dispose(this.gabbardChart_);
+      this.gabbardChart_ = null;
+    }
   }
 
-  private calcAltitudeStats_(): {
-    minPerigee: number; maxPerigee: number; meanPerigee: number;
-    minApogee: number; maxApogee: number; meanApogee: number;
-  } {
+  // =========================================================================
+  // Fragment table interaction (delegated)
+  // =========================================================================
+
+  private onDispersionClick_(evt: MouseEvent): void {
+    const target = evt.target as HTMLElement;
+    const header = target.closest('[data-sort-key]') as HTMLElement | null;
+
+    if (header) {
+      this.applySort_(header.dataset.sortKey as FragmentSortKey);
+
+      return;
+    }
+
+    const row = target.closest('[data-scc]') as HTMLElement | null;
+    const scc = row?.dataset.scc;
+
+    if (scc) {
+      const catalogManager = ServiceLocator.getCatalogManager();
+      const satId = catalogManager.sccNum2Id(scc);
+
+      if (satId !== null) {
+        PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satId);
+      }
+    }
+  }
+
+  /** Sort fragments by a column; clicking the active column flips direction. */
+  private applySort_(key: FragmentSortKey): void {
+    if (this.sortKey_ === key) {
+      this.sortDir_ = this.sortDir_ === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortKey_ = key;
+      this.sortDir_ = 'asc';
+    }
+
+    this.debrisResults_ = sortFragments(this.debrisResults_, this.sortKey_, this.sortDir_);
+    this.renderDispersion_();
+  }
+
+  // =========================================================================
+  // Actions
+  // =========================================================================
+
+  /** Jump the simulation clock to the event's breakup date, preserving playback state. */
+  private jumpToBreakupDate_(): void {
+    const event = BREAKUP_EVENTS.find((e) => e.id === this.selectedEventId_);
+
+    if (!event) {
+      return;
+    }
+
+    const targetMs = new Date(`${event.breakupDate}T00:00:00Z`).getTime();
+
+    if (!Number.isFinite(targetMs)) {
+      return;
+    }
+
+    ServiceLocator.getTimeManager().changeStaticOffset(targetMs - Date.now());
+  }
+
+  /** Select the parent object on the globe if it is present in the catalog. */
+  private selectParent_(): void {
+    const event = BREAKUP_EVENTS.find((e) => e.id === this.selectedEventId_);
+
+    if (!event) {
+      return;
+    }
+
+    const satId = ServiceLocator.getCatalogManager().sccNum2Id(event.parentNoradId.toString());
+
+    if (satId !== null) {
+      PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satId);
+    } else {
+      ServiceLocator.getUiManager().toast(
+        t7e('plugins.BreakupAnalysis.errorMsgs.parentNotFound' as Parameters<typeof t7e>[0]),
+        ToastMsgType.caution,
+      );
+    }
+  }
+
+  private exportCsv_(): void {
     if (this.debrisResults_.length === 0) {
-      return { minPerigee: 0, maxPerigee: 0, meanPerigee: 0, minApogee: 0, maxApogee: 0, meanApogee: 0 };
+      ServiceLocator.getUiManager().toast(
+        t7e('plugins.BreakupAnalysis.errorMsgs.noDataToExport' as Parameters<typeof t7e>[0]),
+        ToastMsgType.caution,
+      );
+
+      return;
     }
 
-    let minPerigee = Infinity;
-    let maxPerigee = -Infinity;
-    let sumPerigee = 0;
-    let minApogee = Infinity;
-    let maxApogee = -Infinity;
-    let sumApogee = 0;
+    const event = BREAKUP_EVENTS.find((e) => e.id === this.selectedEventId_);
+    const name = `breakup-${event?.id ?? 'fragments'}`;
 
-    for (const sat of this.debrisResults_) {
-      const perigee = sat.perigee;
-      const apogee = sat.apogee;
+    saveCsv(buildCsvRows(this.debrisResults_), name);
+  }
 
-      if (perigee < minPerigee) {
-        minPerigee = perigee;
-      }
-      if (perigee > maxPerigee) {
-        maxPerigee = perigee;
-      }
-      sumPerigee += perigee;
+  private updateShowAllButton_(): void {
+    const btn = getEl('breakup-analysis-showall-btn', true);
+    const labelEl = btn?.querySelector('.kt-action-label');
 
-      if (apogee < minApogee) {
-        minApogee = apogee;
-      }
-      if (apogee > maxApogee) {
-        maxApogee = apogee;
-      }
-      sumApogee += apogee;
+    if (!btn || !labelEl) {
+      return;
     }
 
-    const count = this.debrisResults_.length;
+    // Only relevant once the list overflows the default cap.
+    if (this.debrisResults_.length <= FRAGMENT_DEFAULT_MAX_ROWS) {
+      btn.style.display = 'none';
 
-    return {
-      minPerigee, maxPerigee, meanPerigee: sumPerigee / count,
-      minApogee, maxApogee, meanApogee: sumApogee / count,
-    };
-  }
-
-  private calcEccentricityStats_(): { min: number; max: number; mean: number } {
-    return BreakupAnalysis.calcFieldStats_(this.debrisResults_, (s) => s.eccentricity);
-  }
-
-  private calcInclinationStats_(): { min: number; max: number; mean: number } {
-    return BreakupAnalysis.calcFieldStats_(this.debrisResults_, (s) => s.inclination);
-  }
-
-  private static calcFieldStats_(sats: Satellite[], getter: (s: Satellite) => number): { min: number; max: number; mean: number } {
-    if (sats.length === 0) {
-      return { min: 0, max: 0, mean: 0 };
+      return;
     }
 
-    let min = Infinity;
-    let max = -Infinity;
-    let sum = 0;
-
-    for (const sat of sats) {
-      const val = getter(sat);
-
-      if (val < min) {
-        min = val;
-      }
-      if (val > max) {
-        max = val;
-      }
-      sum += val;
-    }
-
-    return { min, max, mean: sum / sats.length };
-  }
-
-  private static calcYearsBetween_(date1: string, date2: string): string {
-    const d1 = new Date(date1);
-    const d2 = new Date(date2);
-    const diffMs = Math.abs(d2.getTime() - d1.getTime());
-    const years = diffMs / (1000 * 60 * 60 * 24 * 365.25);
-
-    return years.toFixed(1);
+    btn.style.display = 'flex';
+    labelEl.textContent = this.showAllFragments_
+      ? t7e('plugins.BreakupAnalysis.actions.showFewer' as Parameters<typeof t7e>[0])
+      : t7e('plugins.BreakupAnalysis.actions.showAll' as Parameters<typeof t7e>[0]);
   }
 }

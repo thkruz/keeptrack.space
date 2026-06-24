@@ -1,30 +1,61 @@
+/* =========================================================================
+ * Breakup Analysis - v13 (kt-ui-v13) menu styling
+ * ========================================================================= */
+
+/* The Back button is a standalone .kt-action that is a direct child of the
+ * detail view (not nested in a .kt-section), so it is width:100% and would run
+ * 12px past the inset cards. Subtract the side margins so its edges line up. */
+#breakup-analysis-detail > .kt-action {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
+}
+
+/* Shared table look: v13 uppercase-muted header (replaces the old underline). */
+.ba-table {
+  width: 100%;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.ba-table-header th {
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+  padding: 4px 6px;
+  font-weight: 600;
+}
+
+.ba-table td {
+  padding: 4px 6px;
+}
+
+.ba-cell-left {
+  text-align: left;
+}
+
 #breakup-analysis-event-table {
   line-height: 1.4;
   font-size: 13px;
 }
 
-#breakup-analysis-event-table th {
-  text-decoration: underline;
-  padding: 4px 6px;
-}
-
-#breakup-analysis-event-table td {
-  padding: 4px 6px;
-}
-
-.breakup-analysis-event-row:hover {
+.breakup-analysis-event-row:hover,
+.breakup-analysis-debris-row:hover {
   background-color: var(--color-dark-border);
 }
 
-.breakup-info-card,
-.breakup-stats-card,
-.breakup-debris-card {
-  margin-bottom: 12px;
-  padding: 8px;
-  border: 1px solid var(--color-dark-border);
-  border-radius: 4px;
+/* Sortable fragment headers. */
+.ba-sortable {
+  cursor: pointer;
+  user-select: none;
 }
 
+.ba-sortable:hover {
+  opacity: 0.9;
+}
+
+/* Info / description blocks. */
 .breakup-description {
   font-size: 12px;
   line-height: 1.5;
@@ -53,6 +84,13 @@
   font-size: 13px;
 }
 
+.ba-empty-state {
+  text-align: center;
+  margin-top: 12px;
+  color: var(--color-dark-text-accent);
+}
+
+/* Dispersion (min/max/mean/spread) table. */
 .breakup-dispersion-table {
   width: 100%;
   font-size: 12px;
@@ -60,38 +98,32 @@
   margin-top: 6px;
 }
 
-.breakup-dispersion-table th {
-  text-decoration: underline;
-  padding: 3px 4px;
-}
-
+.breakup-dispersion-table th,
 .breakup-dispersion-table td {
   padding: 3px 4px;
 }
 
+/* Fragment list - scrollable with a sticky header. */
 .breakup-debris-table-wrapper {
   max-height: 300px;
   overflow-y: auto;
 }
 
-.breakup-debris-table {
-  width: 100%;
-  font-size: 12px;
-  line-height: 1.4;
-}
-
 .breakup-debris-table th {
-  text-decoration: underline;
   padding: 3px 4px;
   position: sticky;
   top: 0;
   background-color: var(--color-dark-background);
+  z-index: 1;
 }
 
 .breakup-debris-table td {
   padding: 3px 4px;
 }
 
-.breakup-analysis-debris-row:hover {
-  background-color: var(--color-dark-border);
+/* Gabbard diagram canvas. */
+.breakup-gabbard-chart {
+  width: 100%;
+  height: 250px;
+  margin-top: 6px;
 }

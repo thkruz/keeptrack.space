@@ -103,7 +103,11 @@
         "elevation": "Elevation",
         "azimuth": "Azimuth",
         "elevationRange": "Elevation",
-        "range": "Range"
+        "range": "Range",
+        "altitude": "Altitude",
+        "activeSensors": "Active Custom Sensors",
+        "empty": "No custom sensors yet. Add one from the menu.",
+        "remove": "Remove sensor"
       },
       "errorMsgs": {
         "latRange": "Custom Sensor Latitude must be between -90 and 90 degrees.",
@@ -114,7 +118,15 @@
         "minElRange": "Custom Sensor Minimum Elevation must be between -90 and 90 degrees.",
         "maxElRange": "Custom Sensor Maximum Elevation must be between -90 and 90 degrees.",
         "minRangeValue": "Custom Sensor Minimum Range must be greater than or equal to 0 km.",
-        "maxRangeValue": "Custom Sensor Maximum Range must be greater than or equal to 0 km."
+        "maxRangeValue": "Custom Sensor Maximum Range must be greater than or equal to 0 km.",
+        "invalidNumber": "Custom Sensor values must be valid numbers.",
+        "elOrder": "Custom Sensor Minimum Elevation must not exceed Maximum Elevation.",
+        "rangeOrder": "Custom Sensor Minimum Range must not exceed Maximum Range."
+      },
+      "sections": {
+        "identity": "Identity",
+        "location": "Location",
+        "fieldOfView": "Field of View"
       }
     },
     "LookAnglesPlugin": {

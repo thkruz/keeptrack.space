@@ -103,7 +103,11 @@
         "elevation": "Nadmořská výška",
         "azimuth": "Azimut",
         "elevationRange": "Elevace",
-        "range": "Dosah"
+        "range": "Dosah",
+        "altitude": "Výška",
+        "activeSensors": "Aktivní vlastní senzory",
+        "empty": "Zatím žádné vlastní senzory. Přidejte jeden z nabídky.",
+        "remove": "Odebrat senzor"
       },
       "errorMsgs": {
         "latRange": "Zeměpisná šířka vlastního senzoru musí být mezi -90 a 90 stupni.",
@@ -114,7 +118,15 @@
         "minElRange": "Minimální elevace vlastního senzoru musí být mezi -90 a 90 stupni.",
         "maxElRange": "Maximální elevace vlastního senzoru musí být mezi -90 a 90 stupni.",
         "minRangeValue": "Minimální dosah vlastního senzoru musí být větší nebo roven 0 km.",
-        "maxRangeValue": "Maximální dosah vlastního senzoru musí být větší nebo roven 0 km."
+        "maxRangeValue": "Maximální dosah vlastního senzoru musí být větší nebo roven 0 km.",
+        "invalidNumber": "Hodnoty vlastního senzoru musí být platná čísla.",
+        "elOrder": "Minimální elevace vlastního senzoru nesmí překročit maximální elevaci.",
+        "rangeOrder": "Minimální dosah vlastního senzoru nesmí překročit maximální dosah."
+      },
+      "sections": {
+        "identity": "Identita",
+        "location": "Poloha",
+        "fieldOfView": "Zorné pole"
       }
     },
     "LookAnglesPlugin": {

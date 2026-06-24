@@ -103,7 +103,11 @@
         "elevation": "Wysokość",
         "azimuth": "Azymut",
         "elevationRange": "Elewacja",
-        "range": "Zasięg"
+        "range": "Zasięg",
+        "altitude": "Wysokość",
+        "activeSensors": "Aktywne czujniki niestandardowe",
+        "empty": "Brak czujników niestandardowych. Dodaj jeden z menu.",
+        "remove": "Usuń czujnik"
       },
       "errorMsgs": {
         "latRange": "Szerokość geograficzna własnego czujnika musi wynosić od -90 do 90 stopni.",
@@ -114,7 +118,15 @@
         "minElRange": "Minimalna elewacja własnego czujnika musi wynosić od -90 do 90 stopni.",
         "maxElRange": "Maksymalna elewacja własnego czujnika musi wynosić od -90 do 90 stopni.",
         "minRangeValue": "Minimalny zasięg własnego czujnika musi być większy lub równy 0 km.",
-        "maxRangeValue": "Maksymalny zasięg własnego czujnika musi być większy lub równy 0 km."
+        "maxRangeValue": "Maksymalny zasięg własnego czujnika musi być większy lub równy 0 km.",
+        "invalidNumber": "Wartości czujnika niestandardowego muszą być prawidłowymi liczbami.",
+        "elOrder": "Minimalna elewacja czujnika niestandardowego nie może przekraczać maksymalnej elewacji.",
+        "rangeOrder": "Minimalny zasięg czujnika niestandardowego nie może przekraczać maksymalnego zasięgu."
+      },
+      "sections": {
+        "identity": "Tożsamość",
+        "location": "Lokalizacja",
+        "fieldOfView": "Pole widzenia"
       }
     },
     "LookAnglesPlugin": {

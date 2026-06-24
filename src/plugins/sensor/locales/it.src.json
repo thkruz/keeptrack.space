@@ -103,7 +103,11 @@
         "elevation": "Altitudine",
         "azimuth": "Azimut",
         "elevationRange": "Elevazione",
-        "range": "Portata"
+        "range": "Portata",
+        "altitude": "Altitudine",
+        "activeSensors": "Sensori personalizzati attivi",
+        "empty": "Nessun sensore personalizzato. Aggiungine uno dal menu.",
+        "remove": "Rimuovi sensore"
       },
       "errorMsgs": {
         "latRange": "La latitudine del sensore personalizzato deve essere compresa tra -90 e 90 gradi.",
@@ -114,7 +118,15 @@
         "minElRange": "L'elevazione minima del sensore personalizzato deve essere compresa tra -90 e 90 gradi.",
         "maxElRange": "L'elevazione massima del sensore personalizzato deve essere compresa tra -90 e 90 gradi.",
         "minRangeValue": "La portata minima del sensore personalizzato deve essere maggiore o uguale a 0 km.",
-        "maxRangeValue": "La portata massima del sensore personalizzato deve essere maggiore o uguale a 0 km."
+        "maxRangeValue": "La portata massima del sensore personalizzato deve essere maggiore o uguale a 0 km.",
+        "invalidNumber": "I valori del sensore personalizzato devono essere numeri validi.",
+        "elOrder": "L'elevazione minima del sensore personalizzato non deve superare l'elevazione massima.",
+        "rangeOrder": "La portata minima del sensore personalizzato non deve superare la portata massima."
+      },
+      "sections": {
+        "identity": "Identità",
+        "location": "Posizione",
+        "fieldOfView": "Campo visivo"
       }
     },
     "LookAnglesPlugin": {

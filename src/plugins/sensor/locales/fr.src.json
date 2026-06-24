@@ -103,7 +103,11 @@
         "elevation": "Altitude",
         "azimuth": "Azimut",
         "elevationRange": "Élévation",
-        "range": "Portée"
+        "range": "Portée",
+        "altitude": "Altitude",
+        "activeSensors": "Capteurs personnalisés actifs",
+        "empty": "Aucun capteur personnalisé pour le moment. Ajoutez-en un depuis le menu.",
+        "remove": "Supprimer le capteur"
       },
       "errorMsgs": {
         "latRange": "La latitude du capteur personnalisé doit être comprise entre -90 et 90 degrés.",
@@ -114,7 +118,15 @@
         "minElRange": "L'élévation minimum du capteur personnalisé doit être comprise entre -90 et 90 degrés.",
         "maxElRange": "L'élévation maximum du capteur personnalisé doit être comprise entre -90 et 90 degrés.",
         "minRangeValue": "La portée minimum du capteur personnalisé doit être supérieure ou égale à 0 km.",
-        "maxRangeValue": "La portée maximum du capteur personnalisé doit être supérieure ou égale à 0 km."
+        "maxRangeValue": "La portée maximum du capteur personnalisé doit être supérieure ou égale à 0 km.",
+        "invalidNumber": "Les valeurs du capteur personnalisé doivent être des nombres valides.",
+        "elOrder": "L'élévation minimale du capteur personnalisé ne doit pas dépasser l'élévation maximale.",
+        "rangeOrder": "La portée minimale du capteur personnalisé ne doit pas dépasser la portée maximale."
+      },
+      "sections": {
+        "identity": "Identité",
+        "location": "Emplacement",
+        "fieldOfView": "Champ de vision"
       }
     },
     "LookAnglesPlugin": {

@@ -103,7 +103,11 @@
         "elevation": "高度",
         "azimuth": "方位角",
         "elevationRange": "仰角",
-        "range": "距離"
+        "range": "距離",
+        "altitude": "高度",
+        "activeSensors": "アクティブなカスタムセンサー",
+        "empty": "カスタムセンサーはまだありません。メニューから追加してください。",
+        "remove": "センサーを削除"
       },
       "errorMsgs": {
         "latRange": "カスタムセンサーの緯度は-90度から90度の間でなければなりません。",
@@ -114,7 +118,15 @@
         "minElRange": "カスタムセンサーの最小仰角は-90度から90度の間でなければなりません。",
         "maxElRange": "カスタムセンサーの最大仰角は-90度から90度の間でなければなりません。",
         "minRangeValue": "カスタムセンサーの最小距離は0 km以上でなければなりません。",
-        "maxRangeValue": "カスタムセンサーの最大距離は0 km以上でなければなりません。"
+        "maxRangeValue": "カスタムセンサーの最大距離は0 km以上でなければなりません。",
+        "invalidNumber": "カスタムセンサーの値は有効な数値である必要があります。",
+        "elOrder": "カスタムセンサーの最小仰角は最大仰角を超えてはなりません。",
+        "rangeOrder": "カスタムセンサーの最小範囲は最大範囲を超えてはなりません。"
+      },
+      "sections": {
+        "identity": "識別情報",
+        "location": "位置",
+        "fieldOfView": "視野"
       }
     },
     "LookAnglesPlugin": {

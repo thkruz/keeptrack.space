@@ -103,7 +103,11 @@
         "elevation": "海拔",
         "azimuth": "方位角",
         "elevationRange": "仰角",
-        "range": "距离"
+        "range": "距离",
+        "altitude": "高度",
+        "activeSensors": "活动的自定义传感器",
+        "empty": "尚无自定义传感器。从菜单中添加一个。",
+        "remove": "移除传感器"
       },
       "errorMsgs": {
         "latRange": "自定义传感器纬度必须在 -90 到 90 度之间。",
@@ -114,7 +118,15 @@
         "minElRange": "自定义传感器最小仰角必须在 -90 到 90 度之间。",
         "maxElRange": "自定义传感器最大仰角必须在 -90 到 90 度之间。",
         "minRangeValue": "自定义传感器最小距离必须大于或等于 0 公里。",
-        "maxRangeValue": "自定义传感器最大距离必须大于或等于 0 公里。"
+        "maxRangeValue": "自定义传感器最大距离必须大于或等于 0 公里。",
+        "invalidNumber": "自定义传感器的值必须是有效数字。",
+        "elOrder": "自定义传感器的最小仰角不得超过最大仰角。",
+        "rangeOrder": "自定义传感器的最小范围不得超过最大范围。"
+      },
+      "sections": {
+        "identity": "标识",
+        "location": "位置",
+        "fieldOfView": "视场"
       }
     },
     "LookAnglesPlugin": {

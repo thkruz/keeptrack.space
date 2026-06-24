@@ -103,7 +103,11 @@
         "elevation": "Höhe",
         "azimuth": "Azimut",
         "elevationRange": "Elevation",
-        "range": "Reichweite"
+        "range": "Reichweite",
+        "altitude": "Höhe",
+        "activeSensors": "Aktive benutzerdefinierte Sensoren",
+        "empty": "Noch keine benutzerdefinierten Sensoren. Fügen Sie einen über das Menü hinzu.",
+        "remove": "Sensor entfernen"
       },
       "errorMsgs": {
         "latRange": "Der Breitengrad des benutzerdefinierten Sensors muss zwischen -90 und 90 Grad liegen.",
@@ -114,7 +118,15 @@
         "minElRange": "Die minimale Elevation des benutzerdefinierten Sensors muss zwischen -90 und 90 Grad liegen.",
         "maxElRange": "Die maximale Elevation des benutzerdefinierten Sensors muss zwischen -90 und 90 Grad liegen.",
         "minRangeValue": "Die minimale Reichweite des benutzerdefinierten Sensors muss größer oder gleich 0 km sein.",
-        "maxRangeValue": "Die maximale Reichweite des benutzerdefinierten Sensors muss größer oder gleich 0 km sein."
+        "maxRangeValue": "Die maximale Reichweite des benutzerdefinierten Sensors muss größer oder gleich 0 km sein.",
+        "invalidNumber": "Die Werte des benutzerdefinierten Sensors müssen gültige Zahlen sein.",
+        "elOrder": "Die minimale Elevation des benutzerdefinierten Sensors darf die maximale Elevation nicht überschreiten.",
+        "rangeOrder": "Die minimale Reichweite des benutzerdefinierten Sensors darf die maximale Reichweite nicht überschreiten."
+      },
+      "sections": {
+        "identity": "Identität",
+        "location": "Standort",
+        "fieldOfView": "Sichtfeld"
       }
     },
     "LookAnglesPlugin": {

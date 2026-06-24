@@ -103,7 +103,11 @@
         "elevation": "고도",
         "azimuth": "방위각",
         "elevationRange": "고도각",
-        "range": "거리"
+        "range": "거리",
+        "altitude": "고도",
+        "activeSensors": "활성 사용자 지정 센서",
+        "empty": "아직 사용자 지정 센서가 없습니다. 메뉴에서 추가하세요.",
+        "remove": "센서 제거"
       },
       "errorMsgs": {
         "latRange": "커스텀 센서 위도는 -90도에서 90도 사이여야 합니다.",
@@ -114,7 +118,15 @@
         "minElRange": "커스텀 센서 최소 고도각은 -90도에서 90도 사이여야 합니다.",
         "maxElRange": "커스텀 센서 최대 고도각은 -90도에서 90도 사이여야 합니다.",
         "minRangeValue": "커스텀 센서 최소 거리는 0 km 이상이어야 합니다.",
-        "maxRangeValue": "커스텀 센서 최대 거리는 0 km 이상이어야 합니다."
+        "maxRangeValue": "커스텀 센서 최대 거리는 0 km 이상이어야 합니다.",
+        "invalidNumber": "사용자 지정 센서 값은 유효한 숫자여야 합니다.",
+        "elOrder": "사용자 지정 센서의 최소 고도는 최대 고도를 초과할 수 없습니다.",
+        "rangeOrder": "사용자 지정 센서의 최소 범위는 최대 범위를 초과할 수 없습니다."
+      },
+      "sections": {
+        "identity": "식별 정보",
+        "location": "위치",
+        "fieldOfView": "시야"
       }
     },
     "LookAnglesPlugin": {

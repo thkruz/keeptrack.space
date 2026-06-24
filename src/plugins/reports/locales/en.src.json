@@ -33,6 +33,24 @@
         "generateReport": "Generate {name} Report",
         "open": "Open Reports"
       },
+      "downloadButton": "Download Report",
+      "copyButton": "Copy to Clipboard",
+      "sensorNote": "These reports require a sensor to be selected.",
+      "sections": {
+        "orbitPosition": "Orbit and Position",
+        "sensor": "Sensor",
+        "options": "Output Options"
+      },
+      "options": {
+        "window": "Time Window",
+        "step": "Step",
+        "format": "Format",
+        "days": "{days} days",
+        "seconds": "{seconds} s",
+        "format_text": "Text (aligned)",
+        "format_csv": "CSV",
+        "format_json": "JSON"
+      },
       "help": {
         "overview": "The Reports menu generates text reports about the selected satellite: pass geometry, position over time, orbital elements, visibility windows, and eclipse analysis. Each report opens in its own window, neatly formatted with a download button, ready to paste into other tools or share.",
         "imgAlt": "The Reports menu listing the available report types",

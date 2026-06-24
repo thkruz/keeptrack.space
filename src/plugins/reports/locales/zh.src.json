@@ -33,6 +33,24 @@
         "generateReport": "生成{name}报告",
         "open": "打开报告"
       },
+      "downloadButton": "下载报告",
+      "copyButton": "复制到剪贴板",
+      "sensorNote": "这些报告需要先选择一个传感器。",
+      "sections": {
+        "orbitPosition": "轨道与位置",
+        "sensor": "传感器",
+        "options": "输出选项"
+      },
+      "options": {
+        "window": "时间窗口",
+        "step": "步长",
+        "format": "格式",
+        "days": "{days} 天",
+        "seconds": "{seconds} 秒",
+        "format_text": "文本（对齐）",
+        "format_csv": "CSV",
+        "format_json": "JSON"
+      },
       "help": {
         "overview": "报告菜单可为所选卫星生成文本报告：过境几何、随时间变化的位置、轨道根数、可见性窗口和地影分析。每份报告都会在独立窗口中打开，排版整齐并带有下载按钮，可直接粘贴到其他工具或与他人分享。",
         "imgAlt": "列出可用报告类型的报告菜单",

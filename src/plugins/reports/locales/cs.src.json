@@ -33,6 +33,24 @@
         "generateReport": "Vygenerovat zprávu {name}",
         "open": "Otevřít zprávy"
       },
+      "downloadButton": "Stáhnout zprávu",
+      "copyButton": "Kopírovat do schránky",
+      "sensorNote": "Tyto zprávy vyžadují vybraný senzor.",
+      "sections": {
+        "orbitPosition": "Dráha a poloha",
+        "sensor": "Senzor",
+        "options": "Možnosti výstupu"
+      },
+      "options": {
+        "window": "Časové okno",
+        "step": "Krok",
+        "format": "Formát",
+        "days": "{days} dní",
+        "seconds": "{seconds} s",
+        "format_text": "Text (zarovnaný)",
+        "format_csv": "CSV",
+        "format_json": "JSON"
+      },
       "help": {
         "overview": "Menu zpráv generuje textové zprávy o vybraném satelitu: geometrii přeletů, polohu v čase, orbitální elementy, okna viditelnosti a analýzu zatmění. Každá zpráva se otevře ve vlastním okně, úhledně naformátovaná s tlačítkem pro stažení, připravená k vložení do jiných nástrojů nebo ke sdílení.",
         "imgAlt": "Menu zpráv se seznamem dostupných typů zpráv",

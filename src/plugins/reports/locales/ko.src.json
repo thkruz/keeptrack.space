@@ -33,6 +33,24 @@
         "generateReport": "{name} 보고서 생성",
         "open": "보고서 열기"
       },
+      "downloadButton": "보고서 다운로드",
+      "copyButton": "클립보드에 복사",
+      "sensorNote": "이 보고서를 사용하려면 센서를 선택해야 합니다.",
+      "sections": {
+        "orbitPosition": "궤도 및 위치",
+        "sensor": "센서",
+        "options": "출력 옵션"
+      },
+      "options": {
+        "window": "시간 범위",
+        "step": "간격",
+        "format": "형식",
+        "days": "{days}일",
+        "seconds": "{seconds}초",
+        "format_text": "텍스트(정렬)",
+        "format_csv": "CSV",
+        "format_json": "JSON"
+      },
       "help": {
         "overview": "보고서 메뉴는 선택한 위성에 대한 텍스트 보고서를 생성합니다. 통과 기하, 시간에 따른 위치, 궤도 요소, 가시 시간대, 식 분석 등이 포함됩니다. 각 보고서는 다운로드 버튼과 함께 깔끔하게 정리된 형식으로 별도 창에서 열리며, 다른 도구에 붙여넣거나 공유할 수 있습니다.",
         "imgAlt": "사용 가능한 보고서 유형을 나열한 보고서 메뉴",

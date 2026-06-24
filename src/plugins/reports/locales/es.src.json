@@ -33,6 +33,24 @@
         "generateReport": "Generar informe {name}",
         "open": "Abrir Informes"
       },
+      "downloadButton": "Descargar informe",
+      "copyButton": "Copiar al portapapeles",
+      "sensorNote": "Estos informes requieren tener un sensor seleccionado.",
+      "sections": {
+        "orbitPosition": "Órbita y posición",
+        "sensor": "Sensor",
+        "options": "Opciones de salida"
+      },
+      "options": {
+        "window": "Ventana de tiempo",
+        "step": "Paso",
+        "format": "Formato",
+        "days": "{days} días",
+        "seconds": "{seconds} s",
+        "format_text": "Texto (alineado)",
+        "format_csv": "CSV",
+        "format_json": "JSON"
+      },
       "help": {
         "overview": "El Menú de Informes genera informes de texto sobre el satélite seleccionado: geometría de los pases, posición a lo largo del tiempo, elementos orbitales, ventanas de visibilidad y análisis de eclipses. Cada informe se abre en su propia ventana, bien formateado y con un botón de descarga, listo para pegar en otras herramientas o compartir.",
         "imgAlt": "El Menú de Informes con la lista de tipos de informe disponibles",

@@ -33,6 +33,24 @@
         "generateReport": "Bericht {name} erstellen",
         "open": "Berichte öffnen"
       },
+      "downloadButton": "Bericht herunterladen",
+      "copyButton": "In Zwischenablage kopieren",
+      "sensorNote": "Diese Berichte erfordern einen ausgewählten Sensor.",
+      "sections": {
+        "orbitPosition": "Orbit und Position",
+        "sensor": "Sensor",
+        "options": "Ausgabeoptionen"
+      },
+      "options": {
+        "window": "Zeitfenster",
+        "step": "Schritt",
+        "format": "Format",
+        "days": "{days} Tage",
+        "seconds": "{seconds} s",
+        "format_text": "Text (ausgerichtet)",
+        "format_csv": "CSV",
+        "format_json": "JSON"
+      },
       "help": {
         "overview": "Das Berichte-Menü erzeugt Textberichte über den ausgewählten Satelliten: Überfluggeometrie, Position über die Zeit, Bahnelemente, Sichtbarkeitsfenster und Eklipsen-Analyse. Jeder Bericht öffnet sich in einem eigenen Fenster, sauber formatiert mit einer Download-Schaltfläche, bereit zum Einfügen in andere Werkzeuge oder zum Teilen.",
         "imgAlt": "Das Berichte-Menü mit den verfügbaren Berichtstypen",

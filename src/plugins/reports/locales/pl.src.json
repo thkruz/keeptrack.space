@@ -33,6 +33,24 @@
         "generateReport": "Wygeneruj raport {name}",
         "open": "Otwórz raporty"
       },
+      "downloadButton": "Pobierz raport",
+      "copyButton": "Kopiuj do schowka",
+      "sensorNote": "Te raporty wymagają wybrania sensora.",
+      "sections": {
+        "orbitPosition": "Orbita i pozycja",
+        "sensor": "Sensor",
+        "options": "Opcje wyjścia"
+      },
+      "options": {
+        "window": "Okno czasowe",
+        "step": "Krok",
+        "format": "Format",
+        "days": "{days} dni",
+        "seconds": "{seconds} s",
+        "format_text": "Tekst (wyrównany)",
+        "format_csv": "CSV",
+        "format_json": "JSON"
+      },
       "help": {
         "overview": "Menu raportów generuje tekstowe raporty o wybranym satelicie: geometrię przelotów, położenie w czasie, elementy orbitalne, okna widoczności i analizę zaćmień. Każdy raport otwiera się w osobnym oknie, starannie sformatowany, z przyciskiem pobierania, gotowy do wklejenia do innych narzędzi lub udostępnienia.",
         "imgAlt": "Menu raportów z listą dostępnych typów raportów",

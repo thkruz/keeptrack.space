@@ -33,6 +33,24 @@
         "generateReport": "Genera rapporto {name}",
         "open": "Apri rapporti"
       },
+      "downloadButton": "Scarica rapporto",
+      "copyButton": "Copia negli appunti",
+      "sensorNote": "Questi rapporti richiedono la selezione di un sensore.",
+      "sections": {
+        "orbitPosition": "Orbita e posizione",
+        "sensor": "Sensore",
+        "options": "Opzioni di output"
+      },
+      "options": {
+        "window": "Finestra temporale",
+        "step": "Passo",
+        "format": "Formato",
+        "days": "{days} giorni",
+        "seconds": "{seconds} s",
+        "format_text": "Testo (allineato)",
+        "format_csv": "CSV",
+        "format_json": "JSON"
+      },
       "help": {
         "overview": "Il menu Rapporti genera rapporti testuali sul satellite selezionato: geometria dei passaggi, posizione nel tempo, elementi orbitali, finestre di visibilità e analisi delle eclissi. Ogni rapporto si apre in una finestra dedicata, formattato in modo ordinato con un pulsante di download, pronto da incollare in altri strumenti o da condividere.",
         "imgAlt": "Il menu Rapporti con l'elenco dei tipi di rapporto disponibili",

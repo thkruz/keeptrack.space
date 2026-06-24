@@ -33,6 +33,24 @@
         "generateReport": "Générer le rapport {name}",
         "open": "Ouvrir les rapports"
       },
+      "downloadButton": "Télécharger le rapport",
+      "copyButton": "Copier dans le presse-papiers",
+      "sensorNote": "Ces rapports nécessitent la sélection d'un capteur.",
+      "sections": {
+        "orbitPosition": "Orbite et position",
+        "sensor": "Capteur",
+        "options": "Options de sortie"
+      },
+      "options": {
+        "window": "Fenêtre temporelle",
+        "step": "Pas",
+        "format": "Format",
+        "days": "{days} jours",
+        "seconds": "{seconds} s",
+        "format_text": "Texte (aligné)",
+        "format_csv": "CSV",
+        "format_json": "JSON"
+      },
       "help": {
         "overview": "Le menu Rapports génère des rapports textuels sur le satellite sélectionné : géométrie des passages, position au fil du temps, éléments orbitaux, fenêtres de visibilité et analyse des éclipses. Chaque rapport s'ouvre dans sa propre fenêtre, soigneusement mis en forme avec un bouton de téléchargement, prêt à être collé dans d'autres outils ou partagé.",
         "imgAlt": "Le menu Rapports listant les types de rapports disponibles",

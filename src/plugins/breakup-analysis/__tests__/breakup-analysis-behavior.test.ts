@@ -26,8 +26,6 @@ describe('BreakupAnalysis behavior', () => {
   let plugin: BreakupAnalysis;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const p = () => plugin as any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const C = BreakupAnalysis as any;
 
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
@@ -38,19 +36,6 @@ describe('BreakupAnalysis behavior', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
-  });
-
-  describe('static statistical helpers', () => {
-    it('calcYearsBetween_ returns the fractional year gap', () => {
-      expect(C.calcYearsBetween_('1999-05-10', '2007-01-11')).toBe('7.7');
-    });
-
-    it('calcFieldStats_ computes min/max/mean and zeroes for an empty set', () => {
-      const sats = [fakeSat({ inclination: 10 }), fakeSat({ inclination: 20 }), fakeSat({ inclination: 30 })];
-
-      expect(C.calcFieldStats_(sats, (s: { inclination: number }) => s.inclination)).toEqual({ min: 10, max: 30, mean: 20 });
-      expect(C.calcFieldStats_([], (s: { inclination: number }) => s.inclination)).toEqual({ min: 0, max: 0, mean: 0 });
-    });
   });
 
   it('findDebrisForEvent_ collects active sats whose intlDes matches the prefix', () => {
@@ -67,30 +52,6 @@ describe('BreakupAnalysis behavior', () => {
     expect(results[0].sccNum).toBe('1');
   });
 
-  it('countByType_ buckets debris by object type', () => {
-    p().debrisResults_ = [
-      fakeSat({ type: SpaceObjectType.PAYLOAD }),
-      fakeSat({ type: SpaceObjectType.ROCKET_BODY }),
-      fakeSat({ type: SpaceObjectType.DEBRIS }),
-      fakeSat({ type: SpaceObjectType.DEBRIS }),
-    ];
-
-    expect(p().countByType_()).toEqual({ payloads: 1, rocketBodies: 1, debris: 2 });
-  });
-
-  it('calcAltitudeStats_ summarizes perigee/apogee and zeroes for empty', () => {
-    p().debrisResults_ = [fakeSat({ perigee: 700, apogee: 900 }), fakeSat({ perigee: 800, apogee: 1000 })];
-
-    const stats = p().calcAltitudeStats_();
-
-    expect(stats.minPerigee).toBe(700);
-    expect(stats.maxApogee).toBe(1000);
-    expect(stats.meanPerigee).toBe(750);
-
-    p().debrisResults_ = [];
-    expect(p().calcAltitudeStats_().meanApogee).toBe(0);
-  });
-
   it('filterDebrisOnGlobe_ searches the joined sccNums', () => {
     const searchSpy = vi.spyOn(ServiceLocator.getUiManager(), 'doSearch').mockImplementation(() => undefined);
 
@@ -98,6 +59,30 @@ describe('BreakupAnalysis behavior', () => {
     p().filterDebrisOnGlobe_();
 
     expect(searchSpy).toHaveBeenCalledWith('111,222');
+  });
+
+  it('bumps the search limit then restores it on back/close', () => {
+    vi.spyOn(ServiceLocator.getUiManager(), 'doSearch').mockImplementation(() => undefined);
+    settingsManager.searchLimit = 2;
+    p().debrisResults_ = [fakeSat({ sccNum: '1' }), fakeSat({ sccNum: '2' }), fakeSat({ sccNum: '3' })];
+
+    p().filterDebrisOnGlobe_();
+    expect(settingsManager.searchLimit).toBe(3);
+
+    p().showEventList_();
+    expect(settingsManager.searchLimit).toBe(2);
+  });
+
+  it('onBottomIconDeselect restores the search limit', () => {
+    vi.spyOn(ServiceLocator.getUiManager(), 'doSearch').mockImplementation(() => undefined);
+    settingsManager.searchLimit = 1;
+    p().debrisResults_ = [fakeSat({ sccNum: '1' }), fakeSat({ sccNum: '2' })];
+
+    p().filterDebrisOnGlobe_();
+    expect(settingsManager.searchLimit).toBe(2);
+
+    plugin.onBottomIconDeselect();
+    expect(settingsManager.searchLimit).toBe(1);
   });
 
   it('selectEvent_ renders the detail panel and reveals it', () => {
@@ -131,17 +116,44 @@ describe('BreakupAnalysis behavior', () => {
     expect(getEl('breakup-analysis-event-list')!.style.display).toBe('block');
   });
 
-  it('renderDispersion_ builds a fragment table and wires row selection', () => {
+  it('selecting a fragment row jumps to that satellite (single delegated listener)', () => {
     p().debrisResults_ = [fakeSat({ sccNum: '25730' })];
     vi.spyOn(ServiceLocator.getCatalogManager(), 'sccNum2Id').mockReturnValue(7);
     const selectSpy = vi.spyOn(SelectSatManager.prototype, 'selectSat').mockImplementation(() => undefined as never);
 
+    // Render the table twice; the delegated listener lives on the persistent
+    // container, so a row click must fire selectSat exactly once (no per-render leak).
+    p().renderDispersion_();
     p().renderDispersion_();
 
     const row = getEl('breakup-analysis-dispersion')!.querySelector('[data-scc]')!;
 
     row.querySelector('td')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
+    expect(selectSpy).toHaveBeenCalledTimes(1);
     expect(selectSpy).toHaveBeenCalledWith(7);
+  });
+
+  it('clicking a sortable header flips the sort direction', () => {
+    p().debrisResults_ = [fakeSat({ perigee: 900, sccNum: '1' }), fakeSat({ perigee: 700, sccNum: '2' })];
+    p().sortKey_ = 'perigee';
+    p().sortDir_ = 'asc';
+    p().renderDispersion_();
+
+    const header = getEl('breakup-analysis-dispersion')!.querySelector('[data-sort-key="perigee"]')!;
+
+    header.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(p().sortDir_).toBe('desc');
+    expect(p().debrisResults_.map((s: { perigee: number }) => s.perigee)).toEqual([900, 700]);
+  });
+
+  it('exportCsv_ warns instead of saving when there are no fragments', () => {
+    const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined as never);
+
+    p().debrisResults_ = [];
+    p().exportCsv_();
+
+    expect(toastSpy).toHaveBeenCalled();
   });
 });

@@ -14,10 +14,11 @@ test.describe('EditSat', () => {
     await expect(bottomIcon).toBeAttached();
     await expect(bottomIcon).toHaveClass(/bmenu-item-disabled/u);
 
-    // 2. Side menu should exist in DOM but be hidden
+    // 2. Side menu should exist in DOM but be hidden, and carry the v13 marker
     const sideMenu = page.locator('#editSat-menu');
 
     await expect(sideMenu).toBeAttached();
+    await expect(sideMenu).toHaveClass(/kt-ui-v13/u);
 
     // 3. Open drawer and find plugin in CREATE group
     await page.locator('#drawer-hamburger').click();
@@ -55,6 +56,7 @@ test.describe('EditSat', () => {
     // 6. Verify action buttons exist
     await expect(page.locator('#editSat-submit')).toBeAttached();
     await expect(page.locator('#editSat-newTLE')).toBeAttached();
+    await expect(page.locator('#editSat-reset')).toBeAttached();
     await expect(page.locator('#editSat-save')).toBeAttached();
     await expect(page.locator('#editSat-open')).toBeAttached();
     await expect(page.locator('#editSat-file')).toBeAttached();

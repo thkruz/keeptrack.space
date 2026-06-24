@@ -1,10 +1,8 @@
 import { CameraType } from '@app/engine/camera/camera-type';
-import { SatMath, StringifiedNumber } from '@app/app/analysis/sat-math';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { TimeManager } from '@app/engine/core/time-manager';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import {
@@ -19,18 +17,45 @@ import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { StringPad } from '@app/engine/utils/stringPad';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, FormatTle, OrbitFinder, Satellite, SatelliteRecord, Sgp4, Tle, TleLine1, ZoomValue, eci2lla } from '@ootk/src/main';
+import { BaseObject, Satellite, TleLine1, TleLine2 } from '@ootk/src/main';
 import editSatellitePng from '@public/img/icons/edit-satellite.png';
 import { saveAs } from 'file-saver';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { wireInlineValidation } from '../create-sat/create-sat-validation';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { OrbitPreview } from '../shared/orbit-preview';
+import {
+  applyTleToSat,
+  buildEditedTle,
+  buildPreviewTleFromForm,
+  buildSaveBlob,
+  calculateDerivedParams,
+  parseLoadedTle,
+  pickZoomForApogee,
+  reEpochToNow,
+} from './edit-sat-actions';
+import { buildEditSatHelp } from './edit-sat-help';
+import { buildEditSatMenuHtml } from './edit-sat-menu-html';
+import './edit-sat.css';
 
 type T7eKey = Parameters<typeof t7e>[0];
+
+/** Element fields that live inline validation applies to (read-only scc excluded). */
+const VALIDATED_FIELDS = ['inc', 'rasc', 'ecen', 'argPe', 'meana', 'meanmo', 'per'] as const;
+
+/** Element fields whose edits redraw the live preview / derived readout. */
+const ELEMENT_FIELDS = ['inc', 'rasc', 'ecen', 'argPe', 'meana', 'meanmo', 'per', 'year', 'day'] as const;
 
 export class EditSat extends KeepTrackPlugin {
   readonly id = 'EditSat';
   dependencies_ = [SelectSatManager.name];
   private readonly selectSatManager_: SelectSatManager;
+
+  /** Live "ghost orbit" preview drawn while the user edits the element set. */
+  private readonly orbitPreview_ = new OrbitPreview();
+
+  /** Pristine TLE captured the first time each satellite is shown, for Reset. */
+  private readonly originalTle_ = new Map<string, { tle1: TleLine1; tle2: TleLine2 }>();
 
   constructor() {
     super();
@@ -65,8 +90,8 @@ export class EditSat extends KeepTrackPlugin {
           const ct = ServiceLocator.getMainCamera().cameraType;
 
           if (ct === CameraType.FPS || ct === CameraType.SATELLITE_FIRST_PERSON || ct === CameraType.ASTRONOMY) {
- return;
-}
+            return;
+          }
           this.bottomMenuClicked();
         },
       },
@@ -88,7 +113,7 @@ export class EditSat extends KeepTrackPlugin {
     return {
       elementName: 'editSat-menu',
       title: t7e('plugins.EditSat.title' as T7eKey),
-      html: this.buildSideMenuHtml_(),
+      html: buildEditSatMenuHtml(),
       dragOptions: {
         isDraggable: true,
         minWidth: 320,
@@ -98,34 +123,7 @@ export class EditSat extends KeepTrackPlugin {
   }
 
   getHelpConfig(): IHelpConfig {
-    return {
-      title: t7e('plugins.EditSat.title'),
-      sections: [
-        {
-          heading: t7e('help.overview'),
-          content: t7e('plugins.EditSat.help.overview'),
-          image: {
-            src: 'img/help/edit-sat/edit-sat-menu.png',
-            alt: t7e('plugins.EditSat.help.imgAlt'),
-            caption: t7e('plugins.EditSat.help.imgCaption'),
-          },
-        },
-        {
-          heading: t7e('plugins.EditSat.help.fieldsHeading'),
-          content: t7e('plugins.EditSat.help.fields'),
-        },
-        {
-          heading: t7e('help.howToUse'),
-          content: t7e('plugins.EditSat.help.howToUse'),
-        },
-      ],
-      tips: [
-        t7e('plugins.EditSat.help.tip1'),
-        t7e('plugins.EditSat.help.tip2'),
-        t7e('plugins.EditSat.help.tip3'),
-      ],
-      shortcuts: [{ keys: ['E'], description: t7e('plugins.EditSat.help.shortcutToggle') }],
-    };
+    return buildEditSatHelp();
   }
 
   // =========================================================================
@@ -174,124 +172,38 @@ export class EditSat extends KeepTrackPlugin {
     </ul>`;
 
   // =========================================================================
-  // HTML
-  // =========================================================================
-
-  protected buildSideMenuHtml_(): string {
-    const p = EditSat.elementPrefix;
-    const l = (key: string) => t7e(`plugins.EditSat.labels.${key}` as T7eKey);
-    const b = (key: string) => t7e(`plugins.EditSat.buttons.${key}` as T7eKey);
-
-    return html`
-      <div class="row">
-        <form id="editSat-menu-form">
-          <div class="input-field col s12">
-            <input disabled value="AAAAA" id="${p}-scc" type="text" maxlength="9" />
-            <label for="disabled" class="active">${l('scc')}</label>
-          </div>
-          <div class="input-field col s12">
-            <input placeholder="${t7e('Common.unknown')}" id="${p}-country" type="text" />
-            <label for="${p}-country" class="active">${l('country')}</label>
-          </div>
-          <div class="input-field col s12">
-            <input placeholder="AA" id="${p}-year" type="text" maxlength="2" />
-            <label for="${p}-year" class="active">${l('epochYear')}</label>
-          </div>
-          <div class="input-field col s12">
-            <input placeholder="AAA.AAAAAAAA" id="${p}-day" type="text" maxlength="12" />
-            <label for="${p}-day" class="active">${l('epochDay')}</label>
-          </div>
-          <div class="input-field col s12">
-            <input placeholder="AAA.AAAA" id="${p}-inc" type="text" maxlength="8" />
-            <label for="${p}-inc" class="active">${l('inclination')}</label>
-          </div>
-          <div class="input-field col s12">
-            <input placeholder="AAA.AAAA" id="${p}-rasc" type="text" maxlength="8" />
-            <label for="${p}-rasc" class="active">${l('rightAscension')}</label>
-          </div>
-          <div class="input-field col s12">
-            <input placeholder="AAAAAAA" id="${p}-ecen" type="text" maxlength="7" />
-            <label for="${p}-ecen" class="active">${l('eccentricity')}</label>
-          </div>
-          <div class="input-field col s12">
-            <input placeholder="AA.AAAAAAAA" id="${p}-argPe" type="text" maxlength="8" />
-            <label for="${p}-argPe" class="active">${l('argOfPerigee')}</label>
-          </div>
-          <div class="input-field col s12">
-            <input placeholder="AAA.AAAA" id="${p}-meana" type="text" maxlength="8" />
-            <label for="${p}-meana" class="active">${l('meanAnomaly')}</label>
-          </div>
-          <div class="input-field col s12">
-            <input placeholder="AA.AAAAA" id="${p}-meanmo" type="text" maxlength="11" />
-            <label for="${p}-meanmo" class="active">${l('meanMotion')}</label>
-          </div>
-          <div class="input-field col s12">
-            <input placeholder="" id="${p}-per" type="text" maxlength="11" />
-            <label for="${p}-per" class="active">${l('period')}</label>
-          </div>
-          <div class="center-align row">
-            <button id="editSat-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">${b('updateSatellite')} &#9658;</button>
-          </div>
-          <div class="center-align row">
-            <button id="editSat-newTLE" class="btn btn-ui waves-effect waves-light" type="button" name="action">${b('updateEpoch')} &#9658;</button>
-          </div>
-          <div class="center-align row">
-            <button id="editSat-save" class="btn btn-ui waves-effect waves-light" type="button" name="action">${b('saveTle')} &#9658;</button>
-          </div>
-          <div class="center-align row">
-            <button id="editSat-open" class="btn btn-ui waves-effect waves-light" type="button" name="action">${b('loadTle')} &#9658;</button>
-            <input id="editSat-file" class="start-hidden" type="file" name="files[]" />
-          </div>
-        </form>
-      </div>
-      <div id="${p}-error" class="center-align menu-selectable start-hidden">
-        <h6 class="center-align">${l('error')}</h6>
-      </div>
-    `;
-  }
-
-  // =========================================================================
   // Lifecycle
   // =========================================================================
 
   addHtml(): void {
     super.addHtml();
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    // Drop the preview orbit whenever the side menu closes.
+    EventBus.getInstance().on(EventBusEvent.hideSideMenus, () => this.orbitPreview_.clear());
   }
 
   protected uiManagerFinal_(): void {
     const p = EditSat.elementPrefix;
 
+    // Opt the generated side-menu root into the v13 "FAANG card" styling.
+    getEl('editSat-menu')?.classList.add('kt-ui-v13');
+
     getEl('editSat-newTLE')!.addEventListener('click', this.editSatNewTleClick_.bind(this));
 
     getEl('editSat-menu-form')!.addEventListener('submit', (e: Event) => {
       e.preventDefault();
-      EditSat.editSatSubmit_();
+      this.editSatSubmit_();
     });
 
-    getEl(`${p}-per`)!.addEventListener('change', () => {
-      const per = (<HTMLInputElement>getEl(`${p}-per`)).value;
+    this.wirePeriodMeanMotionConverters_();
 
-      if (per === '') {
-        return;
-      }
-      const meanmo = 1440 / parseFloat(per);
+    // Redraw the ghost orbit + derived readout as the element set changes.
+    for (const id of ELEMENT_FIELDS) {
+      getEl(`${p}-${id}`)?.addEventListener('input', this.onElementInput_);
+    }
 
-      (<HTMLInputElement>getEl(`${p}-meanmo`)).value = meanmo.toFixed(4);
-    });
-
-    getEl(`${p}-meanmo`)!.addEventListener('change', () => {
-      const meanmo = (<HTMLInputElement>getEl(`${p}-meanmo`)).value;
-
-      if (meanmo === '') {
-        return;
-      }
-      const per = (1440 / parseFloat(meanmo)).toFixed(4);
-
-      (<HTMLInputElement>getEl(`${p}-per`)).value = per;
-    });
-
-    getEl('editSat-save')!.addEventListener('click', EditSat.editSatSaveClick_);
+    getEl('editSat-reset')!.addEventListener('click', this.editSatReset_.bind(this));
+    getEl('editSat-save')!.addEventListener('click', this.editSatSaveClick_.bind(this));
 
     getEl('editSat-open')!.addEventListener('click', () => {
       ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
@@ -302,12 +214,37 @@ export class EditSat extends KeepTrackPlugin {
       if (!window.FileReader) {
         return;
       }
-      EditSat.doReaderActions_(evt);
+      this.doReaderActions_(evt);
       evt.preventDefault();
     });
 
-    getEl(`${p}-error`)!.addEventListener('click', () => {
-      getEl(`${p}-error`)!.style.display = 'none';
+    getEl(`${p}-error`)!.addEventListener('click', () => this.hideError_());
+
+    wireInlineValidation(p, VALIDATED_FIELDS);
+  }
+
+  /** Keep the Period and Mean Motion fields mutually consistent. */
+  private wirePeriodMeanMotionConverters_(): void {
+    const p = EditSat.elementPrefix;
+
+    getEl(`${p}-per`)!.addEventListener('change', () => {
+      const per = (<HTMLInputElement>getEl(`${p}-per`)).value;
+
+      if (per === '') {
+        return;
+      }
+      (<HTMLInputElement>getEl(`${p}-meanmo`)).value = (1440 / parseFloat(per)).toFixed(4);
+      this.onElementInput_();
+    });
+
+    getEl(`${p}-meanmo`)!.addEventListener('change', () => {
+      const meanmo = (<HTMLInputElement>getEl(`${p}-meanmo`)).value;
+
+      if (meanmo === '') {
+        return;
+      }
+      (<HTMLInputElement>getEl(`${p}-per`)).value = (1440 / parseFloat(meanmo)).toFixed(4);
+      this.onElementInput_();
     });
   }
 
@@ -336,6 +273,12 @@ export class EditSat extends KeepTrackPlugin {
   protected populateFormFields_(sat: Satellite): void {
     const p = EditSat.elementPrefix;
 
+    // Capture the pristine orbit the first time we see this satellite, so Reset
+    // can restore it after any number of session edits.
+    if (!this.originalTle_.has(sat.sccNum)) {
+      this.originalTle_.set(sat.sccNum, { tle1: sat.tle1, tle2: sat.tle2 });
+    }
+
     (<HTMLInputElement>getEl(`${p}-scc`)).value = sat.sccNum;
     (<HTMLInputElement>getEl(`${p}-country`)).value = sat.country;
 
@@ -355,10 +298,14 @@ export class EditSat extends KeepTrackPlugin {
     const argPe = sat.argOfPerigee.toFixed(4).padStart(8, '0');
 
     (<HTMLInputElement>getEl(`${p}-argPe`)).value = StringPad.pad0(argPe, 8);
-    (<HTMLInputElement>getEl(`${p}-meana`)).value = sat.tle2.substr(44 - 1, 7 + 1);
+    // Mean anomaly occupies TLE2 columns 44-51 (0-indexed 43, length 8).
+    (<HTMLInputElement>getEl(`${p}-meana`)).value = sat.tle2.substr(43, 8);
+
+    this.hideError_();
+    this.onElementInput_();
   }
 
-  private populateSideMenu_() {
+  private populateSideMenu_(): void {
     const obj = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
 
     if (!obj?.isSatellite()) {
@@ -369,20 +316,107 @@ export class EditSat extends KeepTrackPlugin {
   }
 
   // =========================================================================
+  // Live preview + derived parameters
+  // =========================================================================
+
+  /** Combined handler: refresh the calculated readout and the ghost orbit. */
+  private onElementInput_ = (): void => {
+    this.updateDerived_();
+    this.updatePreview_();
+  };
+
+  /** Recompute the read-only apogee/perigee/period readout from the form. */
+  private updateDerived_(): void {
+    const p = EditSat.elementPrefix;
+    const meanmo = parseFloat((<HTMLInputElement>getEl(`${p}-meanmo`)).value);
+    const ecen = parseInt((<HTMLInputElement>getEl(`${p}-ecen`)).value, 10) / 1e7;
+
+    if (isNaN(meanmo) || meanmo <= 0 || isNaN(ecen)) {
+      return;
+    }
+
+    const derived = calculateDerivedParams(meanmo, ecen);
+    const set = (suffix: string, value: string): void => {
+      const el = getEl(`${p}-${suffix}`, true) as HTMLInputElement | null;
+
+      if (el) {
+        el.value = value;
+      }
+    };
+
+    set('calc-apogee', derived.apogee.toFixed(1));
+    set('calc-perigee', derived.perigee.toFixed(1));
+    set('calc-period', derived.period.toFixed(2));
+  }
+
+  /** Redraw (or clear) the live ghost-orbit preview from the current form. */
+  private updatePreview_(): void {
+    const p = EditSat.elementPrefix;
+
+    if (!this.isMenuButtonActive) {
+      this.orbitPreview_.clear();
+
+      return;
+    }
+
+    const read = (idSuffix: string): string => (getEl(`${p}-${idSuffix}`, true) as HTMLInputElement | null)?.value?.trim() ?? '';
+    // Pass the selected satellite so the preview carries its drag terms (B*/ndot);
+    // otherwise the dot drifts 1-2 km from the real satellite over the propagation
+    // from epoch to now.
+    const selected = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
+    const sat = selected?.isSatellite() ? (selected as Satellite) : undefined;
+    const tle = buildPreviewTleFromForm(read, sat);
+
+    if (tle) {
+      this.orbitPreview_.update(tle.tle1, tle.tle2);
+    } else {
+      this.orbitPreview_.clear();
+    }
+  }
+
+  // =========================================================================
+  // Inline error region
+  // =========================================================================
+
+  private showError_(msg: string): void {
+    const msgEl = getEl(`${EditSat.elementPrefix}-error-msg`, true);
+    const errEl = getEl(`${EditSat.elementPrefix}-error`, true);
+
+    if (msgEl) {
+      msgEl.textContent = msg;
+    }
+    if (errEl) {
+      errEl.style.display = 'block';
+    }
+  }
+
+  private hideError_(): void {
+    const errEl = getEl(`${EditSat.elementPrefix}-error`, true);
+
+    if (errEl) {
+      errEl.style.display = 'none';
+    }
+  }
+
+  // =========================================================================
   // Update Epoch to Now
   // =========================================================================
 
-  private editSatNewTleClick_() {
+  private editSatNewTleClick_(): void {
     showLoading(this.editSatNewTleClickFadeIn_.bind(this));
   }
 
-  private editSatNewTleClickFadeIn_() {
-    const timeManagerInstance = ServiceLocator.getTimeManager();
+  private editSatNewTleClickFadeIn_(): void {
     const uiManagerInstance = ServiceLocator.getUiManager();
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     try {
       const id = catalogManagerInstance.sccNum2Id((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value.trim());
+
+      if (id === null) {
+        return;
+      }
+
       const obj = catalogManagerInstance.getObject(id);
 
       if (!obj?.isSatellite()) {
@@ -390,60 +424,32 @@ export class EditSat extends KeepTrackPlugin {
       }
 
       const mainsat = obj as Satellite;
-      const gmst = timeManagerInstance.gmst;
-      const lla = eci2lla(mainsat.position, gmst);
-      const launchLon = lla.lon;
-      const launchLat = lla.lat;
-      const alt = lla.alt;
-
-      const upOrDown = SatMath.getDirection(mainsat, timeManagerInstance.simulationTimeObj);
-
-      if (upOrDown === 'Error') {
-        uiManagerInstance.toast(t7e('plugins.EditSat.errorMsgs.cannotCalculateDirection' as T7eKey), ToastMsgType.caution);
-      }
-
-      const simulationTimeObj = timeManagerInstance.simulationTimeObj;
-      const currentEpoch = TimeManager.currentEpoch(simulationTimeObj);
-
-      mainsat.tle1 = (mainsat.tle1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.tle1.substr(32)) as TleLine1;
 
       ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
 
-      let tles;
+      const result = reEpochToNow(mainsat);
 
-      if (mainsat.apogee - mainsat.perigee < 300) {
-        tles = new OrbitFinder(mainsat, launchLat, launchLon, <'N' | 'S'>upOrDown, simulationTimeObj).rotateOrbitToLatLon();
-      } else {
-        tles = new OrbitFinder(mainsat, launchLat, launchLon, <'N' | 'S'>upOrDown, simulationTimeObj, alt).rotateOrbitToLatLon();
-      }
-
-      const tle1 = tles[0];
-      const tle2 = tles[1];
-
-      if (tle1 === 'Error') {
-        uiManagerInstance.toast(`${tle2}`, ToastMsgType.critical, true);
+      if (!result.ok) {
+        uiManagerInstance.toast(result.error, ToastMsgType.critical, true);
 
         return;
       }
 
-      if (id === null) {
+      if (result.directionUnknown) {
+        uiManagerInstance.toast(t7e('plugins.EditSat.errorMsgs.cannotCalculateDirection' as T7eKey), ToastMsgType.caution);
+      }
+
+      const country = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-country`)).value;
+      const applied = applyTleToSat(id, result.tle1, result.tle2, country);
+
+      if (applied !== 'applied') {
+        uiManagerInstance.toast(t7e('plugins.EditSat.errorMsgs.failedToPropagate' as T7eKey), ToastMsgType.caution, true);
+
         return;
       }
 
-      catalogManagerInstance.satCruncherThread.sendSatEdit(id, tle1, tle2);
-      const orbitManagerInstance = ServiceLocator.getOrbitManager();
-
-      orbitManagerInstance.changeOrbitBufferData(id, tle1, tle2);
-      catalogManagerInstance.seedDotPosition(id);
-
-      // Reload menu with new TLE
-      const obj2 = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
-
-      if (!obj2.isSatellite()) {
-        return;
-      }
-
-      this.populateFormFields_(obj2 as Satellite);
+      this.orbitPreview_.clear();
+      this.populateFormFields_(mainsat);
     } catch (error) {
       errorManagerInstance.warn(error);
     }
@@ -453,17 +459,18 @@ export class EditSat extends KeepTrackPlugin {
   // Submit edited TLE
   // =========================================================================
 
-  protected static editSatSubmit_() {
+  protected editSatSubmit_(): void {
     ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
 
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const p = EditSat.elementPrefix;
 
-    getEl(`${p}-error`)!.style.display = 'none';
+    this.hideError_();
     const scc = (<HTMLInputElement>getEl(`${p}-scc`)).value.trim();
     const satId = catalogManagerInstance.sccNum2Id(scc);
 
     if (satId === null) {
+      this.showError_(t7e('plugins.EditSat.errorMsgs.notRealSatellite' as T7eKey));
       errorManagerInstance.info(t7e('plugins.EditSat.errorMsgs.notRealSatellite' as T7eKey));
 
       return;
@@ -476,49 +483,73 @@ export class EditSat extends KeepTrackPlugin {
     }
 
     const sat = obj as Satellite;
-    const country = (<HTMLInputElement>getEl(`${p}-country`)).value;
-    const intl = sat.tle1.substr(9, 8);
-    const inc = <StringifiedNumber>(<HTMLInputElement>getEl(`${p}-inc`)).value;
-    const meanmo = <StringifiedNumber>(<HTMLInputElement>getEl(`${p}-meanmo`)).value;
-    const rasc = <StringifiedNumber>(<HTMLInputElement>getEl(`${p}-rasc`)).value;
-    const ecen = (<HTMLInputElement>getEl(`${p}-ecen`)).value;
-    const argPe = <StringifiedNumber>(<HTMLInputElement>getEl(`${p}-argPe`)).value;
-    const meana = <StringifiedNumber>(<HTMLInputElement>getEl(`${p}-meana`)).value;
-    const epochyr = (<HTMLInputElement>getEl(`${p}-year`)).value;
-    const epochday = (<HTMLInputElement>getEl(`${p}-day`)).value;
+    const v = (suffix: string): string => (<HTMLInputElement>getEl(`${p}-${suffix}`)).value;
+    const { tle1, tle2 } = buildEditedTle(sat, {
+      scc,
+      inc: v('inc'),
+      meanmo: v('meanmo'),
+      rasc: v('rasc'),
+      ecen: v('ecen'),
+      argPe: v('argPe'),
+      meana: v('meana'),
+      epochyr: v('year'),
+      epochday: v('day'),
+    });
 
-    // FormatTle runs scc through Tle.convert6DigitToA5, which throws for
-    // extended (7+ digit) IDs. Pass the trailing 5 chars so the TLE line stays
-    // well-formed; the canonical id stays on the Satellite object.
-    const tleScc = Tle.classifySatNum(scc) === 'extended' ? scc.slice(-5) : scc;
-    const { tle1, tle2 } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc: tleScc });
+    const result = applyTleToSat(satId, tle1, tle2, v('country'));
 
-    let satrec: SatelliteRecord;
-
-    try {
-      satrec = Sgp4.createSatrec(tle1, tle2);
-    } catch (e) {
-      errorManagerInstance.error(e, 'edit-sat.ts', 'Error creating satellite record!');
+    if (result === 'too-low') {
+      this.showError_(t7e('plugins.EditSat.errorMsgs.failedToPropagate' as T7eKey));
+      ServiceLocator.getUiManager().toast(t7e('plugins.EditSat.errorMsgs.failedToPropagate' as T7eKey), ToastMsgType.caution, true);
 
       return;
     }
 
-    if (SatMath.altitudeCheck(satrec, ServiceLocator.getTimeManager().simulationTimeObj) > 1) {
-      catalogManagerInstance.satCruncherThread.sendSatEdit(satId, tle1, tle2, true);
-      const orbitManagerInstance = ServiceLocator.getOrbitManager();
+    if (result === 'satrec-error') {
+      this.showError_(t7e('plugins.EditSat.errorMsgs.failedToPropagate' as T7eKey));
 
-      orbitManagerInstance.changeOrbitBufferData(satId, tle1, tle2);
-      sat.active = true;
-      sat.editTle(tle1, tle2);
-      sat.country = country;
-      catalogManagerInstance.seedDotPosition(satId);
-      ServiceLocator.getMainCamera().state.zoomTarget = ZoomValue.GEO;
-    } else {
-      ServiceLocator.getUiManager().toast(
-        t7e('plugins.EditSat.errorMsgs.failedToPropagate' as T7eKey),
-        ToastMsgType.caution,
-        true,
-      );
+      return;
+    }
+
+    this.orbitPreview_.clear();
+    ServiceLocator.getMainCamera().state.zoomTarget = pickZoomForApogee(sat.apogee);
+    this.populateFormFields_(sat);
+  }
+
+  // =========================================================================
+  // Reset to original
+  // =========================================================================
+
+  protected editSatReset_(): void {
+    ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const scc = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value.trim();
+    const original = this.originalTle_.get(scc);
+
+    if (!original) {
+      return;
+    }
+
+    const satId = catalogManagerInstance.sccNum2Id(scc);
+
+    if (satId === null) {
+      return;
+    }
+
+    const result = applyTleToSat(satId, original.tle1, original.tle2);
+
+    if (result !== 'applied') {
+      return;
+    }
+
+    this.hideError_();
+    this.orbitPreview_.clear();
+
+    const obj = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY);
+
+    if (obj?.isSatellite()) {
+      this.populateFormFields_(obj as Satellite);
     }
   }
 
@@ -526,7 +557,7 @@ export class EditSat extends KeepTrackPlugin {
   // Save / Load TLE
   // =========================================================================
 
-  protected static editSatSaveClick_(e: Event) {
+  protected editSatSaveClick_(e: Event): void {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     ServiceLocator.getSoundManager()?.play(SoundNames.EXPORT);
@@ -535,12 +566,7 @@ export class EditSat extends KeepTrackPlugin {
       const scc = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value.trim();
       const satId = catalogManagerInstance.sccNum2Id(scc);
       const sat = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY) as Satellite;
-      const sat2 = {
-        tle1: sat.tle1,
-        tle2: sat.tle2,
-      };
-      const variable = JSON.stringify(sat2);
-      const blob = new Blob([variable], {
+      const blob = new Blob([buildSaveBlob(sat)], {
         type: 'text/plain;charset=utf-8',
       });
 
@@ -551,11 +577,11 @@ export class EditSat extends KeepTrackPlugin {
     e.preventDefault();
   }
 
-  private static doReaderActions_(evt: Event) {
+  private doReaderActions_(evt: Event): void {
     try {
       const reader = new FileReader();
 
-      reader.onload = EditSat.readerOnLoad_;
+      reader.onload = this.readerOnLoad_.bind(this);
       const eventTarget = evt.target as HTMLInputElement;
 
       reader.readAsText(eventTarget.files![0]);
@@ -564,7 +590,7 @@ export class EditSat extends KeepTrackPlugin {
     }
   }
 
-  private static readerOnLoad_(evt: Event) {
+  private readerOnLoad_(evt: Event): void {
     const eventTarget = evt.target as FileReader;
 
     if (eventTarget.readyState !== 2) {
@@ -576,46 +602,39 @@ export class EditSat extends KeepTrackPlugin {
       return;
     }
 
-    const timeManagerInstance = ServiceLocator.getTimeManager();
-    const orbitManagerInstance = ServiceLocator.getOrbitManager();
     const uiManagerInstance = ServiceLocator.getUiManager();
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
-    const object = JSON.parse(<string>eventTarget.result);
-    // Prefer the canonical sccNum from the file; fall back to the TLE column for
-    // legacy exports without it. The TLE column only carries 5 chars and loses
-    // identity for extended (7+ digit) catalog numbers.
-    const sccNumStr = typeof object.sccNum === 'string' || typeof object.sccNum === 'number'
-      ? String(object.sccNum)
-      : StringPad.pad0(object.tle1.substr(2, 5).trim(), 5);
-    const sat = catalogManagerInstance.sccNum2Sat(sccNumStr);
+    const parsed = parseLoadedTle(<string>eventTarget.result);
+
+    if (!parsed) {
+      errorManagerInstance.warn(t7e('plugins.EditSat.errorMsgs.errorReadingFile' as T7eKey));
+
+      return;
+    }
+
+    const sat = catalogManagerInstance.sccNum2Sat(parsed.sccNum);
 
     if (!sat) {
-      errorManagerInstance.warn(t7e('plugins.EditSat.errorMsgs.satelliteNotFound' as T7eKey).replace('{sccNum}', sccNumStr));
+      errorManagerInstance.warn(t7e('plugins.EditSat.errorMsgs.satelliteNotFound' as T7eKey).replace('{sccNum}', parsed.sccNum));
 
       return;
     }
 
-    let satrec: SatelliteRecord;
+    const result = applyTleToSat(sat.id, parsed.tle1, parsed.tle2);
 
-    try {
-      satrec = Sgp4.createSatrec(object.tle1, object.tle2);
-    } catch (e) {
-      errorManagerInstance.error(e, 'edit-sat.ts', 'Error creating satellite record!');
-
-      return;
-    }
-    if (SatMath.altitudeCheck(satrec, timeManagerInstance.simulationTimeObj) > 1) {
-      catalogManagerInstance.satCruncherThread.sendSatEdit(sat.id, object.tle1, object.tle2, true);
-      orbitManagerInstance.changeOrbitBufferData(sat.id, object.tle1, object.tle2);
-      sat.active = true;
-      catalogManagerInstance.seedDotPosition(sat.id);
-    } else {
+    if (result !== 'applied') {
       uiManagerInstance.toast(
         t7e('plugins.EditSat.errorMsgs.failedToPropagate' as T7eKey),
         ToastMsgType.caution,
         true,
       );
+
+      return;
     }
+
+    this.orbitPreview_.clear();
+    // Refresh the visible fields so the form reflects the freshly loaded orbit.
+    this.populateFormFields_(sat as Satellite);
   }
 }

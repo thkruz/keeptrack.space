@@ -14,8 +14,6 @@ describe('EditSat behavior', () => {
   let plugin: EditSat;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const p = () => plugin as any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const C = EditSat as any;
 
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
@@ -74,7 +72,7 @@ describe('EditSat behavior', () => {
     (getEl('es-scc') as HTMLInputElement).value = '99999';
     vi.spyOn(ServiceLocator.getCatalogManager(), 'sccNum2Id').mockReturnValue(null as never);
 
-    expect(() => C.editSatSubmit_()).not.toThrow();
+    expect(() => p().editSatSubmit_()).not.toThrow();
   });
 
   it('editSatSubmit_ returns early when the object is not a satellite', () => {
@@ -82,7 +80,7 @@ describe('EditSat behavior', () => {
     vi.spyOn(ServiceLocator.getCatalogManager(), 'sccNum2Id').mockReturnValue(5 as never);
     vi.spyOn(ServiceLocator.getCatalogManager(), 'getObject').mockReturnValue({ isSatellite: () => false } as never);
 
-    expect(() => C.editSatSubmit_()).not.toThrow();
+    expect(() => p().editSatSubmit_()).not.toThrow();
   });
 
   it('editSatSaveClick_ serializes the satellite TLE and prevents the default', () => {
@@ -94,7 +92,42 @@ describe('EditSat behavior', () => {
 
     // file-saver's saveAs binds the real export here (a module live-binding
     // quirk), so assert the path runs to completion rather than the mock call.
-    expect(() => C.editSatSaveClick_(evt)).not.toThrow();
+    expect(() => p().editSatSaveClick_(evt)).not.toThrow();
     expect(evt.preventDefault).toHaveBeenCalled();
+  });
+
+  it('marks the generated side-menu root as v13', () => {
+    expect(getEl('editSat-menu')?.classList.contains('kt-ui-v13')).toBe(true);
+  });
+
+  it('updateDerived_ fills the calculated apogee/perigee/period readout', () => {
+    (getEl('es-meanmo') as HTMLInputElement).value = '15.5';
+    (getEl('es-ecen') as HTMLInputElement).value = '0006000';
+
+    p().updateDerived_();
+
+    expect((getEl('es-calc-apogee') as HTMLInputElement).value).not.toBe('');
+    expect((getEl('es-calc-perigee') as HTMLInputElement).value).not.toBe('');
+    expect((getEl('es-calc-period') as HTMLInputElement).value).not.toBe('');
+  });
+
+  it('editSatReset_ restores the original TLE captured on first populate', () => {
+    // First populate captures the pristine orbit keyed by sccNum.
+    p().populateFormFields_(defaultSat);
+    (getEl('es-scc') as HTMLInputElement).value = defaultSat.sccNum;
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'sccNum2Id').mockReturnValue(5 as never);
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'getObject').mockReturnValue(defaultSat as never);
+
+    expect(() => p().editSatReset_()).not.toThrow();
+  });
+
+  it('editSatReset_ is a no-op when no original was captured', () => {
+    (getEl('es-scc') as HTMLInputElement).value = '99999';
+    const sccSpy = vi.spyOn(ServiceLocator.getCatalogManager(), 'sccNum2Id');
+
+    p().editSatReset_();
+
+    // Bails before any catalog lookup when nothing was captured for this scc.
+    expect(sccSpy).not.toHaveBeenCalled();
   });
 });

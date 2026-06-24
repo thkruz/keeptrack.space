@@ -5,6 +5,8 @@
       "title": "Зближення та операції зближення (RPO)",
       "titleSecondary": "Список зближень та операцій зближення",
       "noradId": "NORAD ID",
+      "useCurrentSat": "Використати поточний супутник",
+      "noSatSelected": "Супутник не вибрано",
       "maxDistThreshold": "Максимальний поріг відстані (км)",
       "maxRelativeVelocity": "Максимальна відносна швидкість (км/с)",
       "searchDuration": "Тривалість пошуку (години)",
@@ -17,7 +19,15 @@
       "comparePayloadsOnlyTooltip": "Шукати RPO лише між корисними навантаженнями",
       "ignoreVimpelRso": "Ігнорувати Vimpel RSO",
       "ignoreVimpelRsoTooltip": "Ігнорувати RSO з каталогу Vimpel",
-      "submitButton": "Знайти RPO ▶",
+      "submitButton": "Знайти RPO",
+      "cancelButton": "Скасувати пошук",
+      "resultCount": "{count} зближень (найближче {closest} км)",
+      "surveyError": "Пошук RPO не вдався: {error}",
+      "sections": {
+        "target": "Ціль",
+        "thresholds": "Пороги",
+        "orbitRegime": "Орбітальний режим"
+      },
       "noRposToDownload": "Немає RPO для завантаження!",
       "noRposFound": "RPO не знайдено!",
       "satNotFound": "Супутник з NORAD ID {sccNum} не знайдено",
@@ -31,6 +41,10 @@
         "chaserName": "Назва переслідувача",
         "relDistance": "Відн. відстань [км]",
         "relVelocity": "Відн. швидкість [км/с]",
+        "radial": "Радіальне [км]",
+        "intrack": "Вздовж орбіти [км]",
+        "crosstrack": "Поперечне [км]",
+        "pc": "Pc",
         "date": "Дата"
       },
       "help": {

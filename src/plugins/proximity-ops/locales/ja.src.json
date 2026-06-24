@@ -5,6 +5,8 @@
       "title": "ランデブー・近接運用（RPO）",
       "titleSecondary": "ランデブー・近接運用リスト",
       "noradId": "NORAD ID",
+      "useCurrentSat": "現在の衛星を使用",
+      "noSatSelected": "衛星が選択されていません",
       "maxDistThreshold": "最大距離閾値（km）",
       "maxRelativeVelocity": "最大相対速度（km/s）",
       "searchDuration": "検索期間（時間）",
@@ -17,7 +19,15 @@
       "comparePayloadsOnlyTooltip": "ペイロード間のみRPOを検索",
       "ignoreVimpelRso": "Vimpel RSOを無視",
       "ignoreVimpelRsoTooltip": "Vimpelカタログ由来のRSOを無視",
-      "submitButton": "RPOを検索 ▶",
+      "submitButton": "RPOを検索",
+      "cancelButton": "検索をキャンセル",
+      "resultCount": "{count} 件の接近（最接近 {closest} km）",
+      "surveyError": "RPO探索に失敗しました: {error}",
+      "sections": {
+        "target": "対象",
+        "thresholds": "しきい値",
+        "orbitRegime": "軌道領域"
+      },
       "noRposToDownload": "ダウンロードするRPOがありません！",
       "noRposFound": "RPOが見つかりませんでした！",
       "satNotFound": "NORAD ID {sccNum} の衛星が見つかりません",
@@ -31,6 +41,10 @@
         "chaserName": "チェイサー名",
         "relDistance": "相対距離 [km]",
         "relVelocity": "相対速度 [km/s]",
+        "radial": "動径 [km]",
+        "intrack": "進行方向 [km]",
+        "crosstrack": "横断方向 [km]",
+        "pc": "Pc",
         "date": "日付"
       },
       "help": {

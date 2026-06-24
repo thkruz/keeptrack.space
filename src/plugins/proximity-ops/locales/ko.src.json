@@ -5,6 +5,8 @@
       "title": "란데부 및 근접 조작(RPO)",
       "titleSecondary": "란데부 및 근접 조작 목록",
       "noradId": "NORAD ID",
+      "useCurrentSat": "현재 위성 사용",
+      "noSatSelected": "선택된 위성이 없습니다",
       "maxDistThreshold": "최대 거리 임계값 (km)",
       "maxRelativeVelocity": "최대 상대 속도 (km/s)",
       "searchDuration": "검색 기간 (시간)",
@@ -17,7 +19,15 @@
       "comparePayloadsOnlyTooltip": "페이로드 간의 RPO만 검색합니다.",
       "ignoreVimpelRso": "Vimpel RSO 무시",
       "ignoreVimpelRsoTooltip": "Vimpel 카탈로그에서 가져온 RSO를 무시합니다.",
-      "submitButton": "RPO 검색 ▶",
+      "submitButton": "RPO 검색",
+      "cancelButton": "검색 취소",
+      "resultCount": "{count}건 접근 (최근접 {closest} km)",
+      "surveyError": "RPO 검색 실패: {error}",
+      "sections": {
+        "target": "대상",
+        "thresholds": "임계값",
+        "orbitRegime": "궤도 영역"
+      },
       "noRposToDownload": "다운로드할 RPO가 없습니다!",
       "noRposFound": "RPO를 찾을 수 없습니다!",
       "satNotFound": "NORAD ID {sccNum}인 위성을 찾을 수 없습니다",
@@ -31,6 +41,10 @@
         "chaserName": "추적기 이름",
         "relDistance": "상대 거리 [km]",
         "relVelocity": "상대 속도 [km/s]",
+        "radial": "반경 방향 [km]",
+        "intrack": "진행 방향 [km]",
+        "crosstrack": "횡단 방향 [km]",
+        "pc": "Pc",
         "date": "날짜"
       },
       "help": {

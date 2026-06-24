@@ -5,6 +5,8 @@
       "title": "Blízké operace (RPO)",
       "titleSecondary": "Seznam blízkých operací",
       "noradId": "NORAD ID",
+      "useCurrentSat": "Použít aktuální satelit",
+      "noSatSelected": "Není vybrán žádný satelit",
       "maxDistThreshold": "Maximální prahová vzdálenost (km)",
       "maxRelativeVelocity": "Maximální relativní rychlost (km/s)",
       "searchDuration": "Doba vyhledávání (hodiny)",
@@ -17,7 +19,15 @@
       "comparePayloadsOnlyTooltip": "Hledat RPO pouze mezi náklady",
       "ignoreVimpelRso": "Ignorovat RSO Vimpel",
       "ignoreVimpelRsoTooltip": "Ignorovat RSO z katalogu Vimpel",
-      "submitButton": "Najít RPO ▶",
+      "submitButton": "Najít RPO",
+      "cancelButton": "Zrušit hledání",
+      "resultCount": "{count} přiblížení (nejbližší {closest} km)",
+      "surveyError": "Hledání RPO selhalo: {error}",
+      "sections": {
+        "target": "Cíl",
+        "thresholds": "Prahy",
+        "orbitRegime": "Orbitální režim"
+      },
       "noRposToDownload": "Žádné RPO ke stažení!",
       "noRposFound": "Nebyly nalezeny žádné RPO!",
       "satNotFound": "Satelit s NORAD ID {sccNum} nebyl nalezen",
@@ -31,6 +41,10 @@
         "chaserName": "Název pronásledovatele",
         "relDistance": "Rel. vzdálenost [km]",
         "relVelocity": "Rel. rychlost [km/s]",
+        "radial": "Radiální [km]",
+        "intrack": "Podél dráhy [km]",
+        "crosstrack": "Příčné [km]",
+        "pc": "Pc",
         "date": "Datum"
       },
       "help": {

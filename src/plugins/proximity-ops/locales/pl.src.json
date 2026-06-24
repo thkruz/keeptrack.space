@@ -5,6 +5,8 @@
       "title": "Operacje zbliżeniowe i spotkania (RPO)",
       "titleSecondary": "Lista operacji zbliżeniowych i spotkań",
       "noradId": "NORAD ID",
+      "useCurrentSat": "Użyj bieżącego satelity",
+      "noSatSelected": "Nie wybrano satelity",
       "maxDistThreshold": "Próg maksymalnej odległości (km)",
       "maxRelativeVelocity": "Maksymalna prędkość względna (km/s)",
       "searchDuration": "Czas wyszukiwania (godziny)",
@@ -17,7 +19,15 @@
       "comparePayloadsOnlyTooltip": "Szukaj RPO tylko między ładunkami",
       "ignoreVimpelRso": "Ignoruj RSO Vimpel",
       "ignoreVimpelRsoTooltip": "Ignoruj RSO pochodzące z katalogu Vimpel",
-      "submitButton": "Znajdź RPO ▶",
+      "submitButton": "Znajdź RPO",
+      "cancelButton": "Anuluj wyszukiwanie",
+      "resultCount": "{count} zbliżeń (najbliższe {closest} km)",
+      "surveyError": "Wyszukiwanie RPO nie powiodło się: {error}",
+      "sections": {
+        "target": "Cel",
+        "thresholds": "Progi",
+        "orbitRegime": "Reżim orbitalny"
+      },
       "noRposToDownload": "Brak RPO do pobrania!",
       "noRposFound": "Nie znaleziono RPO!",
       "satNotFound": "Nie znaleziono satelity o NORAD ID {sccNum}",
@@ -31,6 +41,10 @@
         "chaserName": "Nazwa obiektu ścigającego",
         "relDistance": "Odl. względna [km]",
         "relVelocity": "Prędk. względna [km/s]",
+        "radial": "Promieniowy [km]",
+        "intrack": "Wzdłuż toru [km]",
+        "crosstrack": "Poprzeczny [km]",
+        "pc": "Pc",
         "date": "Data"
       },
       "help": {

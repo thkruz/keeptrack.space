@@ -5,6 +5,8 @@
       "title": "Operazioni di rendez-vous e prossimità (RPO)",
       "titleSecondary": "Elenco operazioni di rendez-vous e prossimità",
       "noradId": "ID NORAD",
+      "useCurrentSat": "Usa satellite corrente",
+      "noSatSelected": "Nessun satellite selezionato",
       "maxDistThreshold": "Soglia distanza massima (km)",
       "maxRelativeVelocity": "Velocità relativa massima (km/s)",
       "searchDuration": "Durata ricerca (ore)",
@@ -17,7 +19,15 @@
       "comparePayloadsOnlyTooltip": "Cerca RPO solo tra carichi utili",
       "ignoreVimpelRso": "Ignora RSO Vimpel",
       "ignoreVimpelRsoTooltip": "Ignora RSO provenienti dal catalogo Vimpel",
-      "submitButton": "Trova RPO ▶",
+      "submitButton": "Trova RPO",
+      "cancelButton": "Annulla ricerca",
+      "resultCount": "{count} avvicinamenti (più vicino {closest} km)",
+      "surveyError": "Ricerca RPO non riuscita: {error}",
+      "sections": {
+        "target": "Bersaglio",
+        "thresholds": "Soglie",
+        "orbitRegime": "Regime orbitale"
+      },
       "noRposToDownload": "Nessun RPO da scaricare!",
       "noRposFound": "Nessun RPO trovato!",
       "satNotFound": "Satellite con ID NORAD {sccNum} non trovato",
@@ -31,6 +41,10 @@
         "chaserName": "Nome inseguitore",
         "relDistance": "Dist. relativa [km]",
         "relVelocity": "Vel. relativa [km/s]",
+        "radial": "Radiale [km]",
+        "intrack": "Lungo traccia [km]",
+        "crosstrack": "Trasversale [km]",
+        "pc": "Pc",
         "date": "Data"
       },
       "help": {

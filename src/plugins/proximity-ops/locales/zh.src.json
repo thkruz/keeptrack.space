@@ -5,6 +5,8 @@
       "title": "交会与近距离操作（RPO）",
       "titleSecondary": "交会与近距离操作列表",
       "noradId": "NORAD编号",
+      "useCurrentSat": "使用当前卫星",
+      "noSatSelected": "未选择卫星",
       "maxDistThreshold": "最大距离阈值（公里）",
       "maxRelativeVelocity": "最大相对速度（公里/秒）",
       "searchDuration": "搜索时长（小时）",
@@ -17,7 +19,15 @@
       "comparePayloadsOnlyTooltip": "仅搜索有效载荷之间的RPO",
       "ignoreVimpelRso": "忽略Vimpel RSO",
       "ignoreVimpelRsoTooltip": "忽略来自Vimpel目录的RSO",
-      "submitButton": "查找RPO ▶",
+      "submitButton": "查找RPO",
+      "cancelButton": "取消搜索",
+      "resultCount": "{count} 次接近（最近 {closest} 公里）",
+      "surveyError": "RPO 搜索失败：{error}",
+      "sections": {
+        "target": "目标",
+        "thresholds": "阈值",
+        "orbitRegime": "轨道区域"
+      },
       "noRposToDownload": "没有可下载的RPO！",
       "noRposFound": "未找到RPO！",
       "satNotFound": "未找到NORAD编号为{sccNum}的卫星",
@@ -31,6 +41,10 @@
         "chaserName": "追踪器名称",
         "relDistance": "相对距离 [公里]",
         "relVelocity": "相对速度 [公里/秒]",
+        "radial": "径向 [公里]",
+        "intrack": "沿迹 [公里]",
+        "crosstrack": "法向 [公里]",
+        "pc": "Pc",
         "date": "日期"
       },
       "help": {

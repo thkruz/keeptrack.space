@@ -5,6 +5,8 @@
       "title": "Rendezvous y Operaciones de Proximidad (RPO)",
       "titleSecondary": "Lista de Rendezvous y Operaciones de Proximidad",
       "noradId": "ID NORAD",
+      "useCurrentSat": "Usar satélite actual",
+      "noSatSelected": "Ningún satélite seleccionado",
       "maxDistThreshold": "Distancia Máxima de Umbral (km)",
       "maxRelativeVelocity": "Velocidad Relativa Máxima (km/s)",
       "searchDuration": "Duración de Búsqueda (horas)",
@@ -17,7 +19,15 @@
       "comparePayloadsOnlyTooltip": "Buscar solo RPOs entre cargas útiles",
       "ignoreVimpelRso": "Ignorar Vimpel RSO",
       "ignoreVimpelRsoTooltip": "Ignorar RSOs provenientes del Catálogo Vimpel",
-      "submitButton": "Buscar RPOs ▶",
+      "submitButton": "Buscar RPOs",
+      "cancelButton": "Cancelar búsqueda",
+      "resultCount": "{count} acercamientos (más cercano {closest} km)",
+      "surveyError": "La búsqueda de RPO falló: {error}",
+      "sections": {
+        "target": "Objetivo",
+        "thresholds": "Umbrales",
+        "orbitRegime": "Régimen orbital"
+      },
       "noRposToDownload": "¡No hay RPOs para descargar!",
       "noRposFound": "¡No se encontraron RPOs!",
       "satNotFound": "Satélite con ID NORAD {sccNum} no encontrado",
@@ -31,6 +41,10 @@
         "chaserName": "Nombre del Perseguidor",
         "relDistance": "Dist. Rel. [km]",
         "relVelocity": "Vel. Rel. [km/s]",
+        "radial": "Radial [km]",
+        "intrack": "A lo largo [km]",
+        "crosstrack": "Transversal [km]",
+        "pc": "Pc",
         "date": "Fecha"
       },
       "help": {

@@ -10,13 +10,26 @@
         "inclinationVariation": "Inclination Variation",
         "periodVariation": "Period Variation",
         "rightAscensionVariation": "Right Ascension Variation",
+        "eccentricityVariation": "Eccentricity Variation",
         "pieces": "Pieces",
         "degrees": "Degrees",
         "minute": "Minute",
-        "minutes": "Minutes"
+        "minutes": "Minutes",
+        "sourceSection": "Source",
+        "catalogSlotsSection": "Catalog Slots",
+        "spreadSection": "Spread",
+        "piecesSection": "Count"
       },
       "buttons": {
-        "createBreakup": "Create Breakup"
+        "createBreakup": "Create Breakup",
+        "clearBreakup": "Clear Breakup"
+      },
+      "commands": {
+        "create": "Create Breakup",
+        "clear": "Clear Breakup"
+      },
+      "toasts": {
+        "cleared": "Breakup cleared. Original satellite restored."
       },
       "help": {
         "overview": "The Breakup menu simulates a satellite breaking apart at its current position. It clones the selected satellite into debris pieces, each with a small random variation in its orbit, so you can watch the debris cloud form and spread over time.",
@@ -26,7 +39,7 @@
         "parameters": "<ul><li><strong>Inclination Variation</strong>: degrees of spread in orbital tilt.</li><li><strong>Right Ascension Variation</strong>: degrees of spread in the orbital plane's orientation.</li><li><strong>Period Variation</strong>: minutes of spread in orbital period, which stretches the cloud along the orbit.</li><li><strong>Pieces</strong>: how many debris fragments to create (5 to 1000).</li><li><strong>Initial Satellite Number</strong>: the first analyst catalog number to assign to the pieces (defaults to 90000).</li></ul>The defaults produce a realistic-looking spread; increase them for a more energetic event.",
         "howToUse": "<ol><li>Select a satellite in a near-circular orbit. The icon stays disabled until a satellite is selected.</li><li>Open the Breakup menu and adjust the variations and piece count.</li><li>Click <strong>Create Breakup</strong>. The pieces are generated at the satellite's current position and the search bar fills with the new debris so you can see the whole cloud.</li><li>Speed up time to watch the cloud disperse along the orbit.</li></ol>",
         "tip1": "Only near-circular orbits are supported (apogee minus perigee of at most 1000 km), so the menu refuses highly elliptical orbits.",
-        "tip2": "The breakup is simulated and in-memory only. Reload the page to restore the original catalog. Note that the parent satellite's orbit is adjusted to pass over the breakup point.",
+        "tip2": "The breakup is simulated and in-memory only. Use Clear Breakup to remove the debris and restore the original satellite, or reload the page. Note that the parent satellite's orbit is adjusted to pass over the breakup point.",
         "tip3": "All pieces are created as debris-type objects, so debris-based color schemes and filters apply to them immediately."
       },
       "errorMsgs": {
@@ -35,6 +48,7 @@
         "CannotCalcDirectionOfSatellite": "Cannot calculate direction of satellite. Try again later.",
         "ErrorCreatingBreakup": "Error creating breakup!",
         "InvalidStartNum": "Invalid satellite starting number! Defaulting to 90000!",
+        "InvalidSlotRange": "Initial satellite number out of range. Use {start} to {end}.",
         "BreakupGeneratorFailed": "Breakup Generator Failed!"
       }
     }

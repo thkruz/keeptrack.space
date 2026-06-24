@@ -10,13 +10,26 @@
         "inclinationVariation": "Variazione di inclinazione",
         "periodVariation": "Variazione di periodo",
         "rightAscensionVariation": "Variazione di ascensione retta",
+        "eccentricityVariation": "Variazione di eccentricità",
         "pieces": "Frammenti",
         "degrees": "Gradi",
         "minute": "Minuto",
-        "minutes": "Minuti"
+        "minutes": "Minuti",
+        "sourceSection": "Origine",
+        "catalogSlotsSection": "Slot di catalogo",
+        "spreadSection": "Dispersione",
+        "piecesSection": "Quantità"
       },
       "buttons": {
-        "createBreakup": "Crea frammentazione"
+        "createBreakup": "Crea frammentazione",
+        "clearBreakup": "Cancella frammentazione"
+      },
+      "commands": {
+        "create": "Crea frammentazione",
+        "clear": "Cancella frammentazione"
+      },
+      "toasts": {
+        "cleared": "Frammentazione cancellata. Satellite originale ripristinato."
       },
       "help": {
         "overview": "Il menu Frammentazione simula la frammentazione di un satellite nella sua posizione attuale. Clona il satellite selezionato in frammenti di detriti, ciascuno con una piccola variazione casuale della propria orbita, così da poter osservare la nube di detriti formarsi e disperdersi nel tempo.",
@@ -26,7 +39,7 @@
         "parameters": "<ul><li><strong>Variazione di inclinazione</strong>: gradi di dispersione dell'inclinazione orbitale.</li><li><strong>Variazione di ascensione retta</strong>: gradi di dispersione dell'orientamento del piano orbitale.</li><li><strong>Variazione di periodo</strong>: minuti di dispersione del periodo orbitale, che allunga la nube lungo l'orbita.</li><li><strong>Frammenti</strong>: quanti frammenti di detriti creare (da 5 a 1000).</li><li><strong>Numero iniziale del satellite</strong>: il primo numero di catalogo analista da assegnare ai frammenti (predefinito 90000).</li></ul>I valori predefiniti producono una dispersione dall'aspetto realistico; aumentali per un evento più energetico.",
         "howToUse": "<ol><li>Seleziona un satellite su un'orbita quasi circolare. L'icona resta disabilitata finché non viene selezionato un satellite.</li><li>Apri il menu Frammentazione e regola le variazioni e il numero di frammenti.</li><li>Fai clic su <strong>Crea frammentazione</strong>. I frammenti vengono generati nella posizione attuale del satellite e la barra di ricerca si riempie con i nuovi detriti, così puoi vedere l'intera nube.</li><li>Accelera il tempo per osservare la nube disperdersi lungo l'orbita.</li></ol>",
         "tip1": "Sono supportate solo orbite quasi circolari (apogeo meno perigeo di al massimo 1000 km), quindi il menu rifiuta orbite fortemente ellittiche.",
-        "tip2": "La frammentazione è simulata ed esiste solo in memoria. Ricarica la pagina per ripristinare il catalogo originale. Nota che l'orbita del satellite originale viene modificata per passare sopra il punto di frammentazione.",
+        "tip2": "La frammentazione è simulata ed esiste solo in memoria. Usa Cancella frammentazione per rimuovere i detriti e ripristinare il satellite originale, oppure ricarica la pagina. Nota che l'orbita del satellite originale viene modificata per passare sopra il punto di frammentazione.",
         "tip3": "Tutti i frammenti vengono creati come oggetti di tipo detrito, quindi gli schemi di colore e i filtri basati sui detriti si applicano immediatamente."
       },
       "errorMsgs": {
@@ -35,6 +48,7 @@
         "CannotCalcDirectionOfSatellite": "Impossibile calcolare la direzione del satellite. Riprova più tardi.",
         "ErrorCreatingBreakup": "Errore nella creazione della frammentazione!",
         "InvalidStartNum": "Numero iniziale del satellite non valido! Impostazione predefinita a 90000!",
+        "InvalidSlotRange": "Numero iniziale del satellite fuori intervallo. Usa da {start} a {end}.",
         "BreakupGeneratorFailed": "Generatore di frammentazione fallito!"
       }
     }

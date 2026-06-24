@@ -10,13 +10,26 @@
         "inclinationVariation": "Zmienność inklinacji",
         "periodVariation": "Zmienność okresu",
         "rightAscensionVariation": "Zmienność rektascensji",
+        "eccentricityVariation": "Zmienność mimośrodu",
         "pieces": "Fragmenty",
         "degrees": "Stopnie",
         "minute": "Minuta",
-        "minutes": "Minuty"
+        "minutes": "Minuty",
+        "sourceSection": "Źródło",
+        "catalogSlotsSection": "Sloty katalogu",
+        "spreadSection": "Rozproszenie",
+        "piecesSection": "Liczba"
       },
       "buttons": {
-        "createBreakup": "Utwórz rozpad"
+        "createBreakup": "Utwórz rozpad",
+        "clearBreakup": "Wyczyść rozpad"
+      },
+      "commands": {
+        "create": "Utwórz rozpad",
+        "clear": "Wyczyść rozpad"
+      },
+      "toasts": {
+        "cleared": "Rozpad wyczyszczony. Przywrócono oryginalnego satelitę."
       },
       "help": {
         "overview": "Menu rozpadu symuluje rozpad satelity w jego bieżącej pozycji. Klonuje wybranego satelitę na fragmenty odłamków, z których każdy ma niewielką losową zmienność orbity, dzięki czemu można obserwować, jak chmura odłamków powstaje i rozprasza się w czasie.",
@@ -26,7 +39,7 @@
         "parameters": "<ul><li><strong>Zmienność inklinacji</strong>: stopnie rozproszenia nachylenia orbity.</li><li><strong>Zmienność rektascensji</strong>: stopnie rozproszenia orientacji płaszczyzny orbity.</li><li><strong>Zmienność okresu</strong>: minuty rozproszenia okresu orbitalnego, co rozciąga chmurę wzdłuż orbity.</li><li><strong>Fragmenty</strong>: ile fragmentów odłamków utworzyć (od 5 do 1000).</li><li><strong>Początkowy numer satelity</strong>: pierwszy numer katalogu analityka przypisywany fragmentom (domyślnie 90000).</li></ul>Wartości domyślne dają realistycznie wyglądające rozproszenie; zwiększ je dla bardziej energetycznego zdarzenia.",
         "howToUse": "<ol><li>Wybierz satelitę na orbicie zbliżonej do kołowej. Ikona pozostaje nieaktywna, dopóki satelita nie zostanie wybrany.</li><li>Otwórz menu rozpadu i dostosuj zmienności oraz liczbę fragmentów.</li><li>Kliknij <strong>Utwórz rozpad</strong>. Fragmenty są generowane w bieżącej pozycji satelity, a pasek wyszukiwania wypełnia się nowymi odłamkami, dzięki czemu widać całą chmurę.</li><li>Przyspiesz czas, aby obserwować, jak chmura rozprasza się wzdłuż orbity.</li></ol>",
         "tip1": "Obsługiwane są tylko orbity zbliżone do kołowych (apogeum minus perygeum co najwyżej 1000 km). Menu odrzuca silnie eliptyczne orbity.",
-        "tip2": "Rozpad jest symulowany i istnieje tylko w pamięci. Przeładuj stronę, aby przywrócić oryginalny katalog. Pamiętaj, że orbita satelity macierzystego jest korygowana tak, aby przechodziła nad punktem rozpadu.",
+        "tip2": "Rozpad jest symulowany i istnieje tylko w pamięci. Użyj Wyczyść rozpad, aby usunąć odłamki i przywrócić oryginalnego satelitę, lub przeładuj stronę. Pamiętaj, że orbita satelity macierzystego jest korygowana tak, aby przechodziła nad punktem rozpadu.",
         "tip3": "Wszystkie fragmenty są tworzone jako obiekty typu odłamek, więc schematy kolorów i filtry oparte na odłamkach mają do nich zastosowanie natychmiast."
       },
       "errorMsgs": {
@@ -35,6 +48,7 @@
         "CannotCalcDirectionOfSatellite": "Nie można obliczyć kierunku satelity. Spróbuj ponownie później.",
         "ErrorCreatingBreakup": "Błąd tworzenia rozpadu!",
         "InvalidStartNum": "Nieprawidłowy numer początkowy satelity! Ustawiono domyślnie na 90000!",
+        "InvalidSlotRange": "Początkowy numer satelity poza zakresem. Użyj od {start} do {end}.",
         "BreakupGeneratorFailed": "Generator rozpadu nie powiódł się!"
       }
     }

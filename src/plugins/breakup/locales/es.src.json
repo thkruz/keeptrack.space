@@ -10,13 +10,26 @@
         "inclinationVariation": "Variación de Inclinación",
         "periodVariation": "Variación de Período",
         "rightAscensionVariation": "Variación de Ascensión Recta",
+        "eccentricityVariation": "Variación de Excentricidad",
         "pieces": "Piezas",
         "degrees": "Grados",
         "minute": "Minuto",
-        "minutes": "Minutos"
+        "minutes": "Minutos",
+        "sourceSection": "Origen",
+        "catalogSlotsSection": "Ranuras de Catálogo",
+        "spreadSection": "Dispersión",
+        "piecesSection": "Cantidad"
       },
       "buttons": {
-        "createBreakup": "Crear Desintegración"
+        "createBreakup": "Crear Desintegración",
+        "clearBreakup": "Borrar Desintegración"
+      },
+      "commands": {
+        "create": "Crear Desintegración",
+        "clear": "Borrar Desintegración"
+      },
+      "toasts": {
+        "cleared": "Desintegración borrada. Satélite original restaurado."
       },
       "help": {
         "overview": "El Menú de Desintegración simula la desintegración de un satélite en su posición actual. Clona el satélite seleccionado en piezas de escombros, cada una con una pequeña variación aleatoria en su órbita, para que pueda ver cómo la nube de escombros se forma y se dispersa con el tiempo.",
@@ -26,7 +39,7 @@
         "parameters": "<ul><li><strong>Variación de Inclinación</strong>: grados de dispersión en la inclinación orbital.</li><li><strong>Variación de Ascensión Recta</strong>: grados de dispersión en la orientación del plano orbital.</li><li><strong>Variación de Período</strong>: minutos de dispersión en el período orbital, lo que estira la nube a lo largo de la órbita.</li><li><strong>Piezas</strong>: cuántos fragmentos de escombros crear (5 a 1000).</li><li><strong>Número Inicial de Satélite</strong>: el primer número de catálogo de analista que se asignará a las piezas (por defecto 90000).</li></ul>Los valores predeterminados producen una dispersión de aspecto realista; auméntelos para un evento más energético.",
         "howToUse": "<ol><li>Seleccione un satélite en una órbita casi circular; el icono permanece deshabilitado hasta que se seleccione un satélite.</li><li>Abra el Menú de Desintegración y ajuste las variaciones y el número de piezas.</li><li>Haga clic en <strong>Crear Desintegración</strong>. Las piezas se generan en la posición actual del satélite y la barra de búsqueda se llena con los nuevos escombros para que pueda ver toda la nube.</li><li>Acelere el tiempo para ver cómo la nube se dispersa a lo largo de la órbita.</li></ol>",
         "tip1": "Solo se admiten órbitas casi circulares (apogeo menos perigeo de como máximo 1000 km), por lo que el menú rechaza órbitas muy elípticas.",
-        "tip2": "La desintegración es simulada y solo existe en memoria. Recargue la página para restaurar el catálogo original. Tenga en cuenta que la órbita del satélite original se ajusta para pasar sobre el punto de desintegración.",
+        "tip2": "La desintegración es simulada y solo existe en memoria. Use Borrar Desintegración para eliminar los escombros y restaurar el satélite original, o recargue la página. Tenga en cuenta que la órbita del satélite original se ajusta para pasar sobre el punto de desintegración.",
         "tip3": "Todas las piezas se crean como objetos de tipo escombro, por lo que los esquemas de color y filtros basados en escombros se les aplican de inmediato."
       },
       "errorMsgs": {
@@ -35,6 +48,7 @@
         "CannotCalcDirectionOfSatellite": "No se puede calcular la dirección del satélite. Intente de nuevo más tarde.",
         "ErrorCreatingBreakup": "¡Error al crear la ruptura!",
         "InvalidStartNum": "¡Número de inicio de satélite inválido! ¡Restableciendo a 90000!",
+        "InvalidSlotRange": "Número inicial de satélite fuera de rango. Use {start} a {end}.",
         "BreakupGeneratorFailed": "¡El generador de ruptura falló!"
       }
     }

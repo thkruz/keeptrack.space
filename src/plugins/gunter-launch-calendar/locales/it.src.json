@@ -1,7 +1,7 @@
 {
   "plugins": {
-    "LaunchCalendar": {
-      "bottomIconLabel": "Calendario lanci",
+    "GunterLaunchCalendar": {
+      "bottomIconLabel": "Gunter Calendario lanci",
       "title": "Calendario lanci",
       "commands": {
         "open": "Apri calendario lanci"

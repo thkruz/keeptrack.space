@@ -1,7 +1,7 @@
 {
   "plugins": {
-    "LaunchCalendar": {
-      "bottomIconLabel": "Calendario de Lanzamientos",
+    "GunterLaunchCalendar": {
+      "bottomIconLabel": "Gunter Calendario de Lanzamientos",
       "title": "Calendario de Lanzamientos",
       "commands": {
         "open": "Abrir Calendario de Lanzamientos"

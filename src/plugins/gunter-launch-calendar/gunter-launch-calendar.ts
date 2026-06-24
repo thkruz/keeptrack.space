@@ -1,7 +1,7 @@
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
- * launch-calendar.ts is a plugin for viewing the launch calendar on Gunter's Space Page.
+ * gunter-launch-calendar.ts is a plugin for viewing the launch calendar on Gunter's Space Page.
  *
  * https://keeptrack.space
  *
@@ -29,16 +29,16 @@ import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import calendarPng from '@public/img/icons/calendar.png';
 
-export class LaunchCalendar extends KeepTrackPlugin {
-  readonly id = 'LaunchCalendar';
+export class GunterLaunchCalendar extends KeepTrackPlugin {
+  readonly id = 'GunterLaunchCalendar';
   dependencies_ = [];
   requiresInternet = true;
   isForceHideSideMenus = true;
 
   getBottomIconConfig(): IBottomIconConfig {
     return {
-      elementName: 'launch-calendar-bottom-icon',
-      label: t7e('plugins.LaunchCalendar.bottomIconLabel' as Parameters<typeof t7e>[0]),
+      elementName: 'gunter-launch-calendar-bottom-icon',
+      label: t7e('plugins.GunterLaunchCalendar.bottomIconLabel' as Parameters<typeof t7e>[0]),
       image: calendarPng,
       menuMode: [MenuMode.EVENTS, MenuMode.ALL],
     };
@@ -46,20 +46,20 @@ export class LaunchCalendar extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.LaunchCalendar.title'),
+      title: t7e('plugins.GunterLaunchCalendar.title'),
       sections: [
         {
           heading: t7e('help.overview'),
-          content: t7e('plugins.LaunchCalendar.help.overview'),
+          content: t7e('plugins.GunterLaunchCalendar.help.overview'),
         },
         {
           heading: t7e('help.howToUse'),
-          content: t7e('plugins.LaunchCalendar.help.howToUse'),
+          content: t7e('plugins.GunterLaunchCalendar.help.howToUse'),
         },
       ],
       tips: [
-        t7e('plugins.LaunchCalendar.help.tip1'),
-        t7e('plugins.LaunchCalendar.help.tip2'),
+        t7e('plugins.GunterLaunchCalendar.help.tip1'),
+        t7e('plugins.GunterLaunchCalendar.help.tip2'),
       ],
     };
   }
@@ -86,8 +86,8 @@ export class LaunchCalendar extends KeepTrackPlugin {
   getCommandPaletteCommands(): ICommandPaletteCommand[] {
     return [
       {
-        id: 'LaunchCalendar.open',
-        label: t7e('plugins.LaunchCalendar.commands.open' as Parameters<typeof t7e>[0]),
+        id: 'GunterLaunchCalendar.open',
+        label: t7e('plugins.GunterLaunchCalendar.commands.open' as Parameters<typeof t7e>[0]),
         category: 'Plugins',
         callback: () => this.bottomMenuClicked(),
       },

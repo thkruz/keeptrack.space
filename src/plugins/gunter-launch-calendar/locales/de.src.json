@@ -1,7 +1,7 @@
 {
   "plugins": {
-    "LaunchCalendar": {
-      "bottomIconLabel": "Startkalender",
+    "GunterLaunchCalendar": {
+      "bottomIconLabel": "Gunter Startkalender",
       "title": "Startkalender",
       "commands": {
         "open": "Startkalender öffnen"

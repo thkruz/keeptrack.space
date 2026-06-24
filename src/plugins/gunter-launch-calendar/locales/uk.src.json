@@ -1,7 +1,7 @@
 {
   "plugins": {
-    "LaunchCalendar": {
-      "bottomIconLabel": "Календар запусків",
+    "GunterLaunchCalendar": {
+      "bottomIconLabel": "Gunter Календар запусків",
       "title": "Календар запусків",
       "commands": {
         "open": "Відкрити календар запусків"

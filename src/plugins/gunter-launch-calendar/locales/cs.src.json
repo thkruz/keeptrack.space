@@ -1,7 +1,7 @@
 {
   "plugins": {
-    "LaunchCalendar": {
-      "bottomIconLabel": "Kalendář startů",
+    "GunterLaunchCalendar": {
+      "bottomIconLabel": "Gunter Kalendář startů",
       "title": "Kalendář startů",
       "commands": {
         "open": "Otevřít kalendář startů"

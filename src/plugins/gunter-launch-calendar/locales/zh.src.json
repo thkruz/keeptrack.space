@@ -1,7 +1,7 @@
 {
   "plugins": {
-    "LaunchCalendar": {
-      "bottomIconLabel": "发射日历",
+    "GunterLaunchCalendar": {
+      "bottomIconLabel": "Gunter 发射日历",
       "title": "发射日历",
       "commands": {
         "open": "打开发射日历"

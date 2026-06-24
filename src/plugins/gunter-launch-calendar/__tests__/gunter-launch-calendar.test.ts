@@ -1,27 +1,27 @@
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { LaunchCalendar } from '@app/plugins/launch-calendar/launch-calendar';
+import { GunterLaunchCalendar } from '@app/plugins/gunter-launch-calendar/gunter-launch-calendar';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { createColorbox } from '@app/engine/utils/colorbox';
 import { setupDefaultHtml, setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
 
-describe('LaunchCalendar', () => {
-  let plugin: LaunchCalendar;
+describe('GunterLaunchCalendar', () => {
+  let plugin: GunterLaunchCalendar;
 
   beforeEach(() => {
     setupDefaultHtml();
-    plugin = new LaunchCalendar();
+    plugin = new GunterLaunchCalendar();
   });
 
-  standardPluginSuite(LaunchCalendar, 'LaunchCalendar');
+  standardPluginSuite(GunterLaunchCalendar, 'GunterLaunchCalendar');
 
   describe('getBottomIconConfig', () => {
     it('should return correct config', () => {
       const config = plugin.getBottomIconConfig();
 
-      expect(config.elementName).toBe('launch-calendar-bottom-icon');
+      expect(config.elementName).toBe('gunter-launch-calendar-bottom-icon');
       expect(config.image).toBeDefined();
       expect(config.menuMode).toBeDefined();
     });
@@ -41,7 +41,7 @@ describe('LaunchCalendar', () => {
       const commands = plugin.getCommandPaletteCommands();
 
       expect(commands.length).toBe(1);
-      expect(commands[0].id).toBe('LaunchCalendar.open');
+      expect(commands[0].id).toBe('GunterLaunchCalendar.open');
       expect(commands[0].callback).toBeInstanceOf(Function);
     });
 
@@ -74,17 +74,17 @@ describe('LaunchCalendar', () => {
   });
 });
 
-describe('launch_calendar_plugin', () => {
-  let launchCalendarPlugin: LaunchCalendar;
+describe('gunter_launch_calendar_plugin', () => {
+  let launchCalendarPlugin: GunterLaunchCalendar;
 
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
     createColorbox();
-    launchCalendarPlugin = new LaunchCalendar();
+    launchCalendarPlugin = new GunterLaunchCalendar();
   });
 
-  standardPluginSuite(LaunchCalendar, 'LaunchCalendar');
-  standardPluginMenuButtonTests(LaunchCalendar, 'LaunchCalendar');
+  standardPluginSuite(GunterLaunchCalendar, 'GunterLaunchCalendar');
+  standardPluginMenuButtonTests(GunterLaunchCalendar, 'GunterLaunchCalendar');
 
   test('close_colorbox', () => {
     launchCalendarPlugin.init();

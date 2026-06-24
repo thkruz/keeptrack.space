@@ -1,7 +1,7 @@
 {
   "plugins": {
-    "LaunchCalendar": {
-      "bottomIconLabel": "打ち上げカレンダー",
+    "GunterLaunchCalendar": {
+      "bottomIconLabel": "Gunter 打ち上げカレンダー",
       "title": "打ち上げカレンダー",
       "commands": {
         "open": "打ち上げカレンダーを開く"

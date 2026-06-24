@@ -1,7 +1,7 @@
 {
   "plugins": {
-    "LaunchCalendar": {
-      "bottomIconLabel": "Kalendarz startów",
+    "GunterLaunchCalendar": {
+      "bottomIconLabel": "Gunter Kalendarz startów",
       "title": "Kalendarz startów",
       "commands": {
         "open": "Otwórz kalendarz startów"

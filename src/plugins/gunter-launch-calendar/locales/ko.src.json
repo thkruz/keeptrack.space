@@ -1,7 +1,7 @@
 {
   "plugins": {
-    "LaunchCalendar": {
-      "bottomIconLabel": "발사 캘린더",
+    "GunterLaunchCalendar": {
+      "bottomIconLabel": "Gunter 발사 캘린더",
       "title": "발사 캘린더",
       "commands": {
         "open": "발사 캘린더 열기"

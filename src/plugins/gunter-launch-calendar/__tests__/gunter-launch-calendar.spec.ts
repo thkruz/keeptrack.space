@@ -1,23 +1,23 @@
 import { test, expect } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
-test.describe('LaunchCalendar Plugin', () => {
+test.describe('GunterLaunchCalendar Plugin', () => {
   test('open and close colorbox via drawer', async ({ page }) => {
     await waitForAppReady(page, {
-      plugins: { LaunchCalendar: { enabled: true } },
+      plugins: { GunterLaunchCalendar: { enabled: true } },
       settings: { isMobileModeEnabled: true },
     });
 
-    const bottomIcon = page.locator('#launch-calendar-bottom-icon');
+    const bottomIcon = page.locator('#gunter-launch-calendar-bottom-icon');
     const colorboxDiv = page.locator('#colorbox-div');
 
     // Bottom icon should exist in the DOM
     await expect(bottomIcon).toBeAttached();
 
-    // Open drawer and find the LaunchCalendar item
+    // Open drawer and find the GunterLaunchCalendar item
     await page.locator('#drawer-hamburger').click();
 
-    const drawerItem = page.locator('.drawer-item[data-plugin-id="launch-calendar-bottom-icon"]');
+    const drawerItem = page.locator('.drawer-item[data-plugin-id="gunter-launch-calendar-bottom-icon"]');
 
     await expect(drawerItem).toBeVisible();
 

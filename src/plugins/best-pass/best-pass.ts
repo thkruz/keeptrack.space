@@ -108,14 +108,14 @@ export class BestPassPlugin extends KeepTrackPlugin {
         t7e('plugins.BestPassPlugin.help.tip2'),
         t7e('plugins.BestPassPlugin.help.tip3'),
       ],
-      shortcuts: [{ keys: ['B'], description: t7e('plugins.BestPassPlugin.help.shortcutToggle') }],
+      shortcuts: [{ keys: ['b'], description: t7e('plugins.BestPassPlugin.help.shortcutToggle') }],
     };
   }
 
   getKeyboardShortcuts(): IKeyboardShortcut[] {
     return [
       {
-        key: 'B',
+        key: 'b',
         callback: () => {
           this.bottomMenuClicked();
         },

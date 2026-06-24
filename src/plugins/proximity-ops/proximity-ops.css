@@ -3,14 +3,153 @@
   user-select: none;
 }
 
+/* --- v13 dense-form fixes (see docs-local/ui/v13-menu-style.md) ------------- */
+
+/* 1. Stacked-field headroom: cards here stack several labelled rows, so the
+ *    floating "active" labels need clearance from the row above. The first row
+ *    under a section label only needs the section-label gap. */
+#proximityOps-menu .kt-field-row .input-field.col {
+  margin-top: 20px;
+}
+
+#proximityOps-menu .kt-section-label + .kt-field-row .input-field.col {
+  margin-top: 8px;
+}
+
+/* 2. Standalone submit row: the Find RPOs button is a direct child of the form
+ *    (not nested in a .kt-section), so width:100% runs it past the inset cards.
+ *    Subtract the side margins so its edges line up with the cards. */
+#proximityOps-menu-form > .kt-action {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
+}
+
+/* 3. Focus indication: swap the app-wide :focus-visible outline (which overlaps
+ *    the floating label) for KeepTrack's brand underline. */
+#proximityOps-menu .input-field input:focus,
+#proximityOps-menu .input-field textarea:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#proximityOps-menu .input-field input:focus-visible,
+#proximityOps-menu .input-field textarea:focus-visible {
+  outline: none;
+}
+
+/* The submit row turns red while it is acting as a Cancel button. */
+#proximity-ops-submit.proximity-ops-cancel {
+  background-color: var(--color-error, #b71c1c);
+}
+
+/* Progress bar (hidden until a search runs), mirroring the tip-and-cue pattern. */
+.proximity-ops-progress-section {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 10px 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.proximity-ops-progress-track {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.proximity-ops-progress-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: 4px;
+  background-color: var(--color-primary, #00bcd4);
+  transition: width 0.2s ease;
+}
+
+.proximity-ops-progress-label {
+  min-width: 36px;
+  text-align: right;
+  font-size: 11px;
+  color: var(--colorTextSecondary, #aaa);
+}
+
+/* --- Secondary results menu ------------------------------------------------- */
+
 .proximity-ops-secondary {
   margin: 0 10px;
 }
 
-.proximity-ops-header {
-  text-decoration: underline;
+.proximity-ops-count {
+  padding: 4px 6px 8px;
+  font-size: 0.85rem;
+  opacity: 0.85;
 }
 
+/* The widened results menu fits all columns; keep a plain scroll fallback for
+ * very narrow viewports. */
+.proximity-ops-table-container {
+  overflow-x: auto;
+}
+
+#proximity-ops-table {
+  width: 100%;
+}
+
+/* Tight cells so all 11 columns fit, even when the menu shrinks to clear the
+ * sat-info-box (Materialize's default cell padding is far too generous here). */
+#proximity-ops-table th,
+#proximity-ops-table td {
+  padding: 5px 8px;
+}
+
+#proximity-ops-table td {
+  font-size: 0.8rem;
+}
+
+/* v13 uppercase-muted header (replaces the old per-cell underline). The verbose
+ * unit headers are allowed to wrap so each column stays narrow and all 11 fit. */
+#proximity-ops-table thead th {
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+  white-space: normal;
+  vertical-align: bottom;
+}
+
+/* Data cells stay on one line; cap the two name columns so a long name can't
+ * blow the table past the panel. */
+#proximity-ops-table td {
+  white-space: nowrap;
+}
+
+#proximity-ops-table td:nth-child(2),
+#proximity-ops-table td:nth-child(4) {
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Click-to-sort headers. */
+#proximity-ops-table thead th.kt-sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+#proximity-ops-table thead th.kt-sortable:hover {
+  opacity: 1;
+  color: var(--color-primary, #c1272d);
+}
+
+#proximity-ops-table thead th.kt-sort-active {
+  opacity: 1;
+  color: var(--color-primary, #c1272d);
+}
+
+/* Keep the compact date column on one line. */
 #proximity-ops-table td:last-child {
-  min-width: 155px;
+  min-width: 125px;
 }

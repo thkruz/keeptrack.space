@@ -340,6 +340,7 @@ export class WebpackManager {
       bestPassWorker: ['./src/webworker/bestPassWorker.ts'],
       closeObjectsWorker: ['./src/webworker/closeObjectsWorker.ts'],
       tocaPocaWorker: ['./src/webworker/tocaPocaWorker.ts'],
+      proximityOpsWorker: ['./src/webworker/proximityOpsWorker.ts'],
       overflightWorker: ['./src/webworker/overflightWorker.ts'],
       time2lonWorker: ['./src/webworker/time2lonWorker.ts'],
       neighborhoodHistoryWorker: ['./src/webworker/neighborhoodHistoryWorker.ts'],

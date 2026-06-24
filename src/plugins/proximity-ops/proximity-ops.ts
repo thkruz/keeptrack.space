@@ -2,39 +2,49 @@ import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { getEl } from '@app/engine/utils/get-el';
 
 import { SatMath, StringifiedNumber } from '@app/app/analysis/sat-math';
+import { ProximityOpsThreadManager } from '@app/app/threads/proximity-ops-thread-manager';
+import { drawPairLine, jumpToTca, RemovableLine } from '@app/engine/conjunction/conjunction-row-actions';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
+import { StorageKey } from '@app/engine/persistence/storage-key';
 import { IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
+import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
+import { isThisNode } from '@app/engine/utils/isThisNode';
 import { t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
-import { BaseObject, CatalogSource, Degrees, Kilometers, KilometersPerSecond, RIC, Satellite, Seconds, Sgp4, TemeVec3 } from '@ootk/src/main';
+import { CatalogSource, Satellite, Seconds } from '@ootk/src/main';
 import rpo from '@public/img/icons/rpo.png';
+import tableViewPng from '@public/img/icons/table-view.png';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
+import {
+  buildRpoCsvRow, DEFAULT_REFINE_TOLERANCE_MS, DEFAULT_STEP_SECONDS, findClosestApproach as findClosestApproachCore,
+  findRpoPairs, ProximityOpsEvent, RPO_CSV_HEADERS, RpoSearchMode, RPOType, RpoSearchParams,
+  runAllVsAllGeo, runAllVsAllLeo, satToData,
+} from './proximity-ops-core';
+import { DEFAULT_SORT_ASC, DEFAULT_SORT_KEY, RpoSortKey, sortEvents } from './proximity-ops-sort';
+import { ProximityOpsTableLabels, renderProximityOpsTable } from './proximity-ops-table';
 import './proximity-ops.css';
 
-enum RPOType {
-  GEO = 'GEO',
-  LEO = 'LEO',
-}
+// Re-export so existing importers of the event shape keep working after the
+// search math moved into the pure core module.
+export type { ProximityOpsEvent } from './proximity-ops-core';
 
-interface ProximityOpsEvent {
-  sat1Id: number,
-  sat1SccNum: string,
-  sat1Name?: string,
-  sat2Id: number,
-  sat2SccNum: string,
-  sat2Name?: string,
-  ric: RIC,
-  dist: number | Kilometers,
-  vel: number,
-  date: Date,
+/** Persisted shape for the last-used search inputs (StorageKey.PROXIMITY_OPS_SETTINGS). */
+interface ProximityOpsSettings {
+  maxDis: string;
+  maxVel: string;
+  duration: string;
+  type: RPOType;
+  ava: boolean;
+  payloadOnly: boolean;
+  noVimpel: boolean;
 }
 
 export class ProximityOps extends KeepTrackPlugin {
@@ -47,22 +57,34 @@ export class ProximityOps extends KeepTrackPlugin {
   private readonly selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager)!;
   private readonly catalogManagerInstance = ServiceLocator.getCatalogManager()!;
 
+  private threadManager_: ProximityOpsThreadManager | null = null;
+  /** True while an all-vs-all worker survey is running (the submit row acts as Cancel). */
+  private isSearching_ = false;
+  /** The most recent sat-to-sat line drawn on a results-row click (for replacement). */
+  private approachLine_: RemovableLine | null = null;
+  /** Active results-table sort column (defaults to chronological by date). */
+  private sortKey_: RpoSortKey = DEFAULT_SORT_KEY;
+  /** Active results-table sort direction. */
+  private sortAsc_ = DEFAULT_SORT_ASC;
 
+  // Wide enough for the two-line title plus the title-bar icons.
   dragOptions: ClickDragOptions = {
     isDraggable: true,
-    minWidth: 480,
-    maxWidth: 650,
+    minWidth: 420,
+    maxWidth: 470,
   };
 
   dragOptionsSecondary: ClickDragOptions = {
     isDraggable: true,
     minWidth: 600,
-    maxWidth: 1000,
+    maxWidth: 1250,
   };
 
   RPOs: ProximityOpsEvent[] = [];
   bottomIconImg = rpo;
   bottomIconLabel = t7e('plugins.ProximityOps.bottomIconLabel');
+  // The secondary menu is a results table, not settings, so use a table icon.
+  secondaryMenuIcon = tableViewPng;
 
   getHelpConfig(): IHelpConfig {
     return {
@@ -101,133 +123,192 @@ export class ProximityOps extends KeepTrackPlugin {
 
   sideMenuElementName = 'proximityOps-menu';
   sideMenuElementHtml = html`
-    <form id="proximityOps-menu-form">
-    <div class="input-field col s12">
-        <input value="0" id="proximity-ops-norad" type="text" maxlength="9" />
-        <label for="proximity-ops-norad" class="active">${t7e('plugins.ProximityOps.noradId')}</label>
-    </div>
+    <form id="proximityOps-menu-form" class="kt-menu-body">
+      <section class="kt-section">
+        <div class="kt-section-label">${t7e('plugins.ProximityOps.sections.target')}</div>
+        <div class="kt-field-row">
+          <div class="input-field col s12">
+            <input value="0" id="proximity-ops-norad" type="text" maxlength="9" />
+            <label for="proximity-ops-norad" class="active">${t7e('plugins.ProximityOps.noradId')}</label>
+          </div>
+        </div>
+        <button id="proximity-ops-use-current" type="button" class="kt-action waves-effect">
+          <span class="kt-action-label">${t7e('plugins.ProximityOps.useCurrentSat')}</span>
+        </button>
+      </section>
 
-    <div class="input-field col s12">
-        <input placeholder="100" value="100" id="proximity-ops-maxDis" type="text" maxlength="5" />
-        <label for="proximity-ops-maxDis" class="active">${t7e('plugins.ProximityOps.maxDistThreshold')}</label>
-    </div>
+      <section class="kt-section">
+        <div class="kt-section-label">${t7e('plugins.ProximityOps.sections.thresholds')}</div>
+        <div class="kt-field-row">
+          <div class="input-field col s12">
+            <input placeholder="100" value="100" id="proximity-ops-maxDis" type="text" maxlength="5" />
+            <label for="proximity-ops-maxDis" class="active">${t7e('plugins.ProximityOps.maxDistThreshold')}</label>
+          </div>
+        </div>
+        <div class="kt-field-row">
+          <div class="input-field col s12">
+            <input placeholder="0.1" value="0.1" id="proximity-ops-maxVel" type="text" maxlength="5" />
+            <label for="proximity-ops-maxVel" class="active">${t7e('plugins.ProximityOps.maxRelativeVelocity')}</label>
+          </div>
+        </div>
+        <div class="kt-field-row">
+          <div class="input-field col s12">
+            <input placeholder="24" value="24" id="proximity-ops-duration" type="text" maxlength="5" />
+            <label for="proximity-ops-duration" class="active">${t7e('plugins.ProximityOps.searchDuration')}</label>
+          </div>
+        </div>
+      </section>
 
-    <div class="input-field col s12">
-        <input placeholder="0.1" value="0.1" id="proximity-ops-maxVel" type="text" maxlength="5" />
-        <label for="proximity-ops-maxVel" class="active">${t7e('plugins.ProximityOps.maxRelativeVelocity')}</label>
-    </div>
+      <section class="kt-section">
+        <div class="kt-section-label">${t7e('plugins.ProximityOps.sections.orbitRegime')}</div>
+        <div class="kt-field-row">
+          <div class="input-field col s12">
+            <select id="proximity-ops-type" type="text">
+              <option value="GEO" selected>${t7e('plugins.ProximityOps.geoText')}</option>
+              <option value="LEO">${t7e('plugins.ProximityOps.leoText')}</option>
+            </select>
+            <label for="proximity-ops-type">${t7e('plugins.ProximityOps.orbitType')}</label>
+          </div>
+        </div>
 
-    <div class="input-field col s12">
-        <input placeholder="24" value="24" id="proximity-ops-duration" type="text" maxlength="5" />
-        <label for="proximity-ops-duration" class="active">${t7e('plugins.ProximityOps.searchDuration')}</label>
-    </div>
-
-    <div class="input-field col s12">
-        <select id="proximity-ops-type" type="text">
-            <option value="GEO" selected>${t7e('plugins.ProximityOps.geoText')}</option>
-            <option value="LEO">${t7e('plugins.ProximityOps.leoText')}</option>
-        </select>
-        <label for="proximity-ops-type">${t7e('plugins.ProximityOps.orbitType')}</label>
-    </div>
-
-    <div class="input-field col s12">
-        <div class="switch row">
+        <div class="input-field col s12">
+          <div class="switch row">
             <label data-position="top" data-delay="50" data-tooltip="${t7e('plugins.ProximityOps.geoAllVsAllTooltip')}">
-                <input id="proximity-ops-ava" type="checkbox"/>
-                <span class="lever"></span>
-                ${t7e('plugins.ProximityOps.geoAllVsAll')}
+              <input id="proximity-ops-ava" type="checkbox"/>
+              <span class="lever"></span>
+              ${t7e('plugins.ProximityOps.geoAllVsAll')}
             </label>
+          </div>
         </div>
-    </div>
 
-    <div class="input-field col s12">
-        <div class="switch row">
+        <div class="input-field col s12">
+          <div class="switch row">
             <label data-position="top" data-delay="50" data-tooltip="${t7e('plugins.ProximityOps.comparePayloadsOnlyTooltip')}">
-                <input id="proximity-ops-payload-only" type="checkbox"/>
-                <span class="lever"></span>
-                ${t7e('plugins.ProximityOps.comparePayloadsOnly')}
+              <input id="proximity-ops-payload-only" type="checkbox"/>
+              <span class="lever"></span>
+              ${t7e('plugins.ProximityOps.comparePayloadsOnly')}
             </label>
+          </div>
         </div>
-    </div>
 
-    <div class="input-field col s12">
-        <div class="switch row">
+        <div class="input-field col s12">
+          <div class="switch row">
             <label data-position="top" data-delay="50" data-tooltip="${t7e('plugins.ProximityOps.ignoreVimpelRsoTooltip')}">
-                <input id="proximity-ops-no-vimpel" type="checkbox"/>
-                <span class="lever"></span>
-                ${t7e('plugins.ProximityOps.ignoreVimpelRso')}
+              <input id="proximity-ops-no-vimpel" type="checkbox"/>
+              <span class="lever"></span>
+              ${t7e('plugins.ProximityOps.ignoreVimpelRso')}
             </label>
+          </div>
         </div>
-    </div>
+      </section>
 
-    <div class="center-align row">
-        <button id="proximity-ops-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">${t7e('plugins.ProximityOps.submitButton' as Parameters<typeof t7e>[0])}</button>
-    </div>
+      <button id="proximity-ops-submit" class="kt-action waves-effect waves-light" type="submit" name="action">
+        <span class="kt-action-label">${t7e('plugins.ProximityOps.submitButton')}</span>
+      </button>
+
+      <div id="proximity-ops-progress-section" class="proximity-ops-progress-section" style="display:none;">
+        <div class="proximity-ops-progress-track">
+          <div id="proximity-ops-progress-bar" class="proximity-ops-progress-bar" style="width:0%;"></div>
+        </div>
+        <div id="proximity-ops-progress-label" class="proximity-ops-progress-label">0%</div>
+      </div>
     </form>
     `;
 
   sideMenuSecondaryHtml: string = html`
-    <div class="row proximity-ops-secondary">
-      <h5 class="center-align">${t7e('plugins.ProximityOps.titleSecondary')}</h5>
-      <table id="proximity-ops-table" class="center-align striped-light centered"></table>
+    <div class="proximity-ops-secondary">
+      <section class="kt-section">
+        <div class="kt-section-label">${t7e('plugins.ProximityOps.titleSecondary')}</div>
+        <div id="proximity-ops-count" class="proximity-ops-count"></div>
+        <div class="proximity-ops-table-container">
+          <table id="proximity-ops-table" class="striped-light"></table>
+        </div>
+      </section>
     </div>`;
   sideMenuSecondaryOptions: SideMenuSettingsOptions = {
-    width: 1000,
+    width: 1200,
     leftOffset: null,
     zIndex: 3,
   };
 
-  addHtml(): void {
-    super.addHtml();
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-
-        getEl('proximity-ops-submit')!.addEventListener('click', (e) => {
-          this.onSubmit_(e);
-        });
-
-        getEl('proximity-ops-type')!.addEventListener('change', () => {
-          const orbitTypeInput = <HTMLSelectElement>getEl('proximity-ops-type');
-          const rpoAvailabilityInput = <HTMLInputElement>getEl('proximity-ops-ava');
-          const isAllVsAllChecked = rpoAvailabilityInput.checked;
-
-          if (isAllVsAllChecked && orbitTypeInput.value !== RPOType.GEO) {
-            // Deselect the all vs all checkbox
-            rpoAvailabilityInput.checked = false;
-            rpoAvailabilityInput.dispatchEvent(new Event('change'));
-          }
-        });
-
-        getEl('proximity-ops-ava')!.addEventListener('change', () => {
-          const isAllVsAllChecked = (<HTMLInputElement>getEl('proximity-ops-ava')).checked;
-          const orbitTypeInput = <HTMLSelectElement>getEl('proximity-ops-type');
-
-          if (isAllVsAllChecked) {
-            orbitTypeInput.value = 'GEO';
-            orbitTypeInput.setAttribute('disabled', 'true');
-          } else {
-            orbitTypeInput.removeAttribute('disabled');
-          }
-
-          orbitTypeInput.dispatchEvent(new Event('change'));
-        });
-
-      },
-    );
-  }
-
   addJs(): void {
     super.addJs();
 
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (obj: BaseObject) => {
-        if (this.isMenuButtonActive && obj?.isSatellite() && (obj as Satellite).sccNum !== (<HTMLInputElement>getEl('proximity-ops-norad')).value) {
-          this.updateNoradId_();
-        }
-      },
-    );
+    this.threadManager_ = new ProximityOpsThreadManager([]);
+    this.threadManager_.init();
+
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
+  }
+
+  private uiManagerFinal_(): void {
+    getEl('proximityOps-menu')?.classList.add('kt-ui-v13');
+    getEl('proximityOps-menu-secondary')?.classList.add('kt-ui-v13');
+
+    const menuRoot = getEl('proximityOps-menu');
+
+    initMaterialSelects(menuRoot ?? document.body);
+
+    this.restoreInputs_();
+
+    // Set the primary from the currently-selected satellite on demand (the search
+    // otherwise just reads the typed NORAD ID - no live selection required).
+    getEl('proximity-ops-use-current')?.addEventListener('click', () => this.useCurrentSatellite_());
+
+    // Keep the orbit type and "all vs all" toggle mutually consistent: all-vs-all
+    // is GEO/LEO specific, and checking it locks the regime to a single survey.
+    getEl('proximity-ops-type')!.addEventListener('change', () => {
+      const orbitTypeInput = <HTMLSelectElement>getEl('proximity-ops-type');
+      const rpoAvailabilityInput = <HTMLInputElement>getEl('proximity-ops-ava');
+
+      if (rpoAvailabilityInput.checked && orbitTypeInput.value !== RPOType.GEO) {
+        rpoAvailabilityInput.checked = false;
+        rpoAvailabilityInput.dispatchEvent(new Event('change'));
+      }
+    });
+
+    getEl('proximity-ops-ava')!.addEventListener('change', () => {
+      const isAllVsAllChecked = (<HTMLInputElement>getEl('proximity-ops-ava')).checked;
+      const orbitTypeInput = <HTMLSelectElement>getEl('proximity-ops-type');
+
+      if (isAllVsAllChecked) {
+        orbitTypeInput.value = RPOType.GEO;
+        orbitTypeInput.setAttribute('disabled', 'true');
+      } else {
+        orbitTypeInput.removeAttribute('disabled');
+      }
+
+      orbitTypeInput.dispatchEvent(new Event('change'));
+    });
+
+    // Delegated click handler on the results table: a header cell sorts, a body
+    // row jumps to the encounter (the table is rebuilt each search / sort).
+    getEl('proximity-ops-table')?.addEventListener('click', (e: MouseEvent) => {
+      const th = (<HTMLElement>e.target).closest('th[data-sort-key]');
+
+      if (th) {
+        this.onSortHeaderClicked_((<HTMLElement>th).dataset.sortKey as RpoSortKey);
+
+        return;
+      }
+
+      const tr = (<HTMLElement>e.target).closest('tr[data-row]');
+
+      if (!tr) {
+        return;
+      }
+
+      const row = parseInt((<HTMLElement>tr).dataset.row ?? '', 10);
+
+      if (Number.isNaN(row)) {
+        return;
+      }
+
+      const event = this.RPOs[row];
+
+      if (event) {
+        this.onEventClicked_(event);
+      }
+    });
   }
 
   getKeyboardShortcuts(): IKeyboardShortcut[] {
@@ -242,8 +323,6 @@ export class ProximityOps extends KeepTrackPlugin {
   }
 
   bottomIconCallback = (): void => {
-    this.updateNoradId_();
-
     if (this.RPOs.length > 0 && !this.isSideMenuSettingsOpen) {
       this.openSecondaryMenu();
     }
@@ -252,7 +331,7 @@ export class ProximityOps extends KeepTrackPlugin {
   downloadIconCb = () => {
 
     if (this.RPOs.length === 0) {
-      ServiceLocator.getUiManager().toast(t7e('plugins.ProximityOps.noRposToDownload' as Parameters<typeof t7e>[0]), ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(t7e('plugins.ProximityOps.noRposToDownload'), ToastMsgType.caution, true);
 
       return;
     }
@@ -279,222 +358,320 @@ export class ProximityOps extends KeepTrackPlugin {
   };
 
   private convertRPOsToCSV_(rpoArray: ProximityOpsEvent[]) {
-    // Create the header of the CSV
-    const headers = [
-      't_id', 't_sccnum', 't_name', 'c_id', 'c_sccnum', 'c_name', 'date',
-      'dr(km)', 'dt(km)', 'dn(km)',
-      'dvr(km/s)', 'dvt(km/s)', 'dvn(km/s)',
-      'rel_dist(km)', 'rel_vel(km/s)',
-    ];
+    const csvRows: string[] = [RPO_CSV_HEADERS.join(',')];
 
-    // Initialize CSV content with headers
-    const csvRows: string[] = [];
-
-    csvRows.push(headers.join(','));
-
-    // Iterate over each RPO instance in the array
     rpoArray.forEach((rpo) => {
-      // Prepare a row with the RPO's values
-      const row = [
-        rpo.sat1Id,
-        rpo.sat1SccNum,
-        rpo.sat1Name,
-        rpo.sat2Id,
-        rpo.sat2SccNum,
-        rpo.sat2Name,
-        rpo.date.toISOString(), // Convert the date to a string
-        rpo.ric.position.x,
-        rpo.ric.position.y,
-        rpo.ric.position.z,
-        rpo.ric.velocity.x,
-        rpo.ric.velocity.y,
-        rpo.ric.velocity.z,
-        rpo.dist,
-        rpo.vel,
-      ];
-
-      csvRows.push(row.map((v) => `"${v}"`).join(','));
+      csvRows.push(buildRpoCsvRow(rpo).map((v) => `"${v}"`).join(','));
     });
 
-    // Join all rows and return as a single CSV string
-    const csvContent = csvRows.join('\n');
-
-    return csvContent;
-  }
-
-  private onSubmit_(e: MouseEvent) {
-    e.preventDefault();
-
-    showLoading(() => {
-      this.RPOs = this.processRPOSearch_();
-      // Sort RPOs
-      this.RPOs = [...this.RPOs].sort((a, b) => a.dist - b.dist);
-
-      this.populateTable_(this.RPOs);
-
-      if (this.RPOs.length > 0) {
-        if (!this.isSideMenuSettingsOpen) {
-          this.openSecondaryMenu();
-        }
-      } else if (this.isSideMenuSettingsOpen) {
-        this.closeSecondaryMenu();
-      }
-
-      hideLoading();
-    }, -1);
+    return csvRows.join('\n');
   }
 
   /**
-   * Step 1 of the RPO search process.
-   *
-   * Processes a search for Rendezvous and Proximity Operations (RPOs) based on user input from the UI.
-   *
-   * This method retrieves parameters such as availability check, maximum distance, maximum velocity,
-   * duration, and RPO type from the UI elements. Depending on the selected RPO type (GEO or LEO) and
-   * whether the availability check is enabled, it iterates through relevant orbital parameters to find
-   * satellite pairs and computes possible RPOs using helper methods.
-   *
-   * If a specific satellite is selected (availability check is off), it attempts to find the satellite by NORAD ID
-   * and computes RPOs for that satellite.
-   *
-   * Displays a toast notification if no RPOs are found or if the specified satellite cannot be found.
+   * Form submit handler (auto-wired by the base plugin). While a search is
+   * running the submit row acts as a Cancel button; otherwise it gathers the
+   * candidates and runs the search off-thread on the worker (the submit row
+   * shows progress + Cancel, so there is no blocking modal). When no worker is
+   * available - Node tests, or a browser without worker support - it falls back
+   * to a synchronous run.
    */
-  private processRPOSearch_() {
-    const isAvaChecked = (<HTMLInputElement>getEl('proximity-ops-ava')).checked;
+  onFormSubmit(): void {
+    if (this.isSearching_) {
+      this.cancelSearch_();
 
-    const maxDis = parseFloat(<StringifiedNumber>(<HTMLInputElement>getEl('proximity-ops-maxDis')).value) as Kilometers;
-    const maxVel = parseFloat(<StringifiedNumber>(<HTMLInputElement>getEl('proximity-ops-maxVel')).value) as KilometersPerSecond;
-    const duration = parseFloat(<StringifiedNumber>(<HTMLInputElement>getEl('proximity-ops-duration')).value) * 60 ** 2 as Seconds;
+      return;
+    }
+
+    this.persistInputs_();
+
+    const request = this.gatherSearch_();
+
+    if (!request) {
+      // gatherSearch_ already toasted (e.g. the primary satellite was not found).
+      return;
+    }
+
+    if (this.canUseWorker_()) {
+      this.runWorkerSearch_(request);
+
+      return;
+    }
+
+    this.finalizeResults_(this.runSearch_(request));
+  }
+
+  private canUseWorker_(): boolean {
+    return !isThisNode() && !!this.threadManager_ && this.threadManager_.isReady;
+  }
+
+  /** Build the (plain-number, clone-safe) search parameters from the current form. */
+  private buildParams_(): RpoSearchParams {
+    return {
+      maxDis: parseFloat(<StringifiedNumber>(<HTMLInputElement>getEl('proximity-ops-maxDis')).value) || 0,
+      maxVel: parseFloat(<StringifiedNumber>(<HTMLInputElement>getEl('proximity-ops-maxVel')).value) || 0,
+      durationSec: (parseFloat(<StringifiedNumber>(<HTMLInputElement>getEl('proximity-ops-duration')).value) || 0) * 60 ** 2,
+      baseTimeMs: this.timeManagerInstance.getOffsetTimeObj(0).getTime(),
+      stepSeconds: DEFAULT_STEP_SECONDS,
+      refineToleranceMs: DEFAULT_REFINE_TOLERANCE_MS,
+      confidenceLevel: settingsManager.covarianceConfidenceLevel,
+    };
+  }
+
+  /**
+   * Resolve the current form into a runnable search request: the mode, the
+   * candidate satellites (real catalog objects), and the parameters. Returns
+   * null (after toasting) when a single-satellite search names a primary that is
+   * not in the catalog. The same request feeds both the worker and the
+   * synchronous fallback, so the two paths can never diverge.
+   */
+  private gatherSearch_(): { mode: RpoSearchMode; sats: Satellite[]; params: RpoSearchParams } | null {
+    const isAva = (<HTMLInputElement>getEl('proximity-ops-ava')).checked;
     const type = (<HTMLInputElement>getEl('proximity-ops-type')).value as RPOType;
-    let RPOs: ProximityOpsEvent[] = [];
+    const params = this.buildParams_();
 
-    const satPairs: number[][] = [];
-
-    if (isAvaChecked && type === RPOType.GEO) {
-      for (let lon = -180; lon <= 180; lon += 1.5) {
-        const sats = this.findSatsAvAGeo_(lon as Degrees);
-        const rpos = this.findRPOs_(sats, maxDis, maxVel, duration as Seconds, isAvaChecked, satPairs);
-
-        RPOs = RPOs.concat(rpos);
-      }
-    } else if (isAvaChecked && type === RPOType.LEO) {
-      for (let inc = 0; inc <= 180; inc += 5) {
-        for (let raan = 0; raan <= 360; raan += 5) {
-          const sats = this.findSatsAvALeo_(inc as Degrees, raan as Degrees);
-
-          if (sats.length === 0) {
-            continue;
-          }
-
-          const rpos = this.findRPOs_(sats, maxDis, maxVel, duration as Seconds, isAvaChecked, satPairs);
-
-          RPOs = RPOs.concat(rpos);
-        }
-      }
-    } else {
-      const primarySatSccNum = (<HTMLInputElement>getEl('proximity-ops-norad')).value;
-      const satelliteId = this.catalogManagerInstance.sccNum2Id(primarySatSccNum);
-
-      if (!satelliteId) {
-        ServiceLocator.getUiManager().toast(
-          t7e('plugins.ProximityOps.satNotFound' as Parameters<typeof t7e>[0]).replace('{sccNum}', primarySatSccNum),
-          ToastMsgType.caution, true,
-        );
-
-        return [];
-      }
-
-      const primarySatId = satelliteId;
-      const sats = this.findSatsById_(primarySatId, type, duration);
-
-      RPOs = this.findRPOs_(sats, maxDis, maxVel, duration, isAvaChecked);
+    if (isAva) {
+      return {
+        mode: type === RPOType.LEO ? 'ava-leo' : 'ava-geo',
+        sats: this.getFilteredSatellites(),
+        params,
+      };
     }
 
-    if (RPOs.length === 0) {
-      ServiceLocator.getUiManager().toast(t7e('plugins.ProximityOps.noRposFound' as Parameters<typeof t7e>[0]), ToastMsgType.caution, true);
+    const primarySatSccNum = (<HTMLInputElement>getEl('proximity-ops-norad')).value;
+    const satelliteId = this.catalogManagerInstance.sccNum2Id(primarySatSccNum);
+
+    if (!satelliteId) {
+      ServiceLocator.getUiManager().toast(
+        t7e('plugins.ProximityOps.satNotFound').replace('{sccNum}', primarySatSccNum),
+        ToastMsgType.caution, true,
+      );
+
+      return null;
     }
 
-    return RPOs;
+    return {
+      mode: 'single',
+      sats: this.findSatsById_(satelliteId, type, params.durationSec as Seconds),
+      params,
+    };
+  }
+
+  /** Synchronous search over real catalog satellites (no-worker fallback + unit tests). */
+  private runSearch_(request: { mode: RpoSearchMode; sats: Satellite[]; params: RpoSearchParams }): ProximityOpsEvent[] {
+    const { mode, sats, params } = request;
+
+    switch (mode) {
+      case 'ava-geo':
+        return runAllVsAllGeo(sats, params);
+      case 'ava-leo':
+        return runAllVsAllLeo(sats, params);
+      default:
+        return findRpoPairs(sats, params, new Date(params.baseTimeMs), false);
+    }
   }
 
   /**
-   * Step 2 of the RPO search process.
-   *
-   * Finds and returns a list of Rendezvous and Proximity Operations (RPOs) between satellites based on distance, velocity, and other criteria.
-   *
-   * @param sats - An array of `Satellite` objects to be checked for potential RPOs.
-   * @param maxDis - The maximum allowed distance (in kilometers) between satellites for an RPO to be considered.
-   * @param maxVel - The maximum allowed relative velocity (in km/s or m/s, depending on implementation) for an RPO to be considered.
-   * @param duration - The time duration (in seconds) over which to search for the closest approach.
-   * @param isAvaChecked - If `true`, only consider satellite pairs not present in `satPairs`.
-   * @param satPairs - (Optional) An array of satellite ID pairs to exclude from RPO consideration if `isAvaChecked` is `true`.
-   * @returns An array of `RPO` objects representing the detected RPOs that meet the specified criteria.
+   * Run the gathered search off-thread. The submit row becomes Cancel + a
+   * progress percentage, so the main thread never blocks and there is no modal.
    */
-  private findRPOs_(sats: Satellite[], maxDis: number, maxVel: number, duration: Seconds, isAvaChecked: boolean, satPairs?: number[][]) {
+  private runWorkerSearch_(request: { mode: RpoSearchMode; sats: Satellite[]; params: RpoSearchParams }): void {
+    this.setSearchingState_(true);
 
-    const RPOs: ProximityOpsEvent[] = [];
-    const nowDate = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
+    this.threadManager_!.startSurvey(
+      { mode: request.mode, sats: request.sats.map(satToData), params: request.params },
+      {
+        onProgress: (done, total) => this.updateProgress_(done, total),
+        onComplete: (events) => {
+          this.setSearchingState_(false);
+          this.finalizeResults_(events);
+        },
+        onError: (message) => {
+          this.setSearchingState_(false);
+          errorManagerInstance.warn(t7e('plugins.ProximityOps.surveyError').replace('{error}', message));
+        },
+      },
+    );
+  }
 
-    if (isAvaChecked && satPairs) {
+  /** Cancel an in-progress worker search and reset the submit row. */
+  private cancelSearch_(): void {
+    this.threadManager_?.cancelSurvey();
+    this.setSearchingState_(false);
+  }
 
-      sats.forEach((primarySat, i) => {
-        sats.slice(i + 1).forEach((secondarySat) => {
-          const pairExists = satPairs.some((pair) =>
-            (pair[0] === primarySat.id && pair[1] === secondarySat.id) ||
-            (pair[0] === secondarySat.id && pair[1] === primarySat.id),
-          );
+  /** Sort, render, count, and reveal the results (shared by the sync and worker paths). */
+  private finalizeResults_(events: ProximityOpsEvent[]): void {
+    this.RPOs = events;
+    // Each new search starts from the default (chronological) sort.
+    this.sortKey_ = DEFAULT_SORT_KEY;
+    this.sortAsc_ = DEFAULT_SORT_ASC;
+    this.applySortAndRender_();
+    this.updateCount_(this.RPOs.length);
 
-          if (!pairExists) {
-            // Record pair as processed to avoid duplicate work across bins
-            satPairs.push([primarySat.id, secondarySat.id]);
-
-            if (((secondarySat.perigee - primarySat.apogee) > maxDis || (primarySat.perigee - secondarySat.apogee) > maxDis)) {
-              return;
-            }
-            if (!(Math.abs(primarySat.inclination - secondarySat.inclination) < 1)) {
-              return;
-            }
-
-            const res = this.findClosestApproach(primarySat, secondarySat, nowDate, duration);
-
-            if (res.dist <= maxDis && res.vel <= maxVel) {
-              RPOs.push(res);
-            }
-          }
-        });
-      });
-    } else {
-
-      const primarySat = sats[0];
-
-      sats.slice(1).forEach((secondarySat) => {
-
-        const res = this.findClosestApproach(primarySat, secondarySat, nowDate, duration);
-
-        if (res.dist <= maxDis && res.vel <= maxVel) {
-          RPOs.push(res);
-        }
-      });
+    if (this.RPOs.length === 0) {
+      ServiceLocator.getUiManager().toast(t7e('plugins.ProximityOps.noRposFound'), ToastMsgType.caution, true);
     }
 
-    return RPOs;
+    // Keep the results panel open on completion so the count / empty-state shows.
+    if (!this.isSideMenuSettingsOpen) {
+      this.openSecondaryMenu();
+    }
   }
 
   /**
-   * Step 3 of the RPO search process. (There are 3 possible step 3s)
+   * Re-order `this.RPOs` by the active sort column and re-render. The rendered
+   * order is kept identical to `this.RPOs` so the delegated row-click handler
+   * (keyed on `data-row`) and the CSV export stay aligned with the table.
+   */
+  private applySortAndRender_(): void {
+    this.RPOs = sortEvents(this.RPOs, this.sortKey_, this.sortAsc_);
+    this.populateTable_(this.RPOs);
+  }
+
+  /** Handle a results-table header click: toggle direction on the active column, else sort the new one ascending. */
+  private onSortHeaderClicked_(key: RpoSortKey): void {
+    if (this.sortKey_ === key) {
+      this.sortAsc_ = !this.sortAsc_;
+    } else {
+      this.sortKey_ = key;
+      this.sortAsc_ = true;
+    }
+
+    this.applySortAndRender_();
+  }
+
+  private setActionLabel_(text: string): void {
+    const label = getEl('proximity-ops-submit', true)?.querySelector('.kt-action-label');
+
+    if (label) {
+      label.textContent = text;
+    }
+  }
+
+  private setSearchingState_(searching: boolean): void {
+    this.isSearching_ = searching;
+
+    const section = getEl('proximity-ops-progress-section', true);
+
+    if (section) {
+      section.style.display = searching ? 'flex' : 'none';
+    }
+    if (!searching) {
+      this.updateProgressBar_(0);
+    }
+
+    getEl('proximity-ops-submit', true)?.classList.toggle('proximity-ops-cancel', searching);
+    this.setActionLabel_(searching ? t7e('plugins.ProximityOps.cancelButton') : t7e('plugins.ProximityOps.submitButton'));
+  }
+
+  private updateProgress_(done: number, total: number): void {
+    this.updateProgressBar_(total > 0 ? Math.round((done / total) * 100) : 0);
+  }
+
+  /** Move the visible progress bar (track fill + percentage label) to `pct`. */
+  private updateProgressBar_(pct: number): void {
+    const bar = getEl('proximity-ops-progress-bar', true);
+    const label = getEl('proximity-ops-progress-label', true);
+
+    if (bar) {
+      bar.style.width = `${pct}%`;
+    }
+    if (label) {
+      label.textContent = `${pct}%`;
+    }
+  }
+
+  private updateCount_(count: number): void {
+    const el = getEl('proximity-ops-count', true);
+
+    if (!el) {
+      return;
+    }
+
+    if (count === 0) {
+      el.textContent = t7e('plugins.ProximityOps.noRposFound');
+
+      return;
+    }
+
+    // Closest is the minimum miss distance regardless of the active sort column.
+    const closest = this.RPOs.reduce((min, rpo) => Math.min(min, rpo.dist), Infinity);
+
+    el.textContent = t7e('plugins.ProximityOps.resultCount')
+      .replace('{count}', count.toString())
+      .replace('{closest}', closest.toFixed(2));
+  }
+
+  /** Persist the current search inputs so they are restored next session. */
+  private persistInputs_(): void {
+    const settings: ProximityOpsSettings = {
+      maxDis: (<HTMLInputElement>getEl('proximity-ops-maxDis')).value,
+      maxVel: (<HTMLInputElement>getEl('proximity-ops-maxVel')).value,
+      duration: (<HTMLInputElement>getEl('proximity-ops-duration')).value,
+      type: (<HTMLInputElement>getEl('proximity-ops-type')).value as RPOType,
+      ava: (<HTMLInputElement>getEl('proximity-ops-ava')).checked,
+      payloadOnly: (<HTMLInputElement>getEl('proximity-ops-payload-only')).checked,
+      noVimpel: (<HTMLInputElement>getEl('proximity-ops-no-vimpel')).checked,
+    };
+
+    PersistenceManager.getInstance().saveItem(StorageKey.PROXIMITY_OPS_SETTINGS, JSON.stringify(settings));
+  }
+
+  /** Restore the last-used search inputs (thresholds, orbit type, toggles). */
+  private restoreInputs_(): void {
+    const raw = PersistenceManager.getInstance().getItem(StorageKey.PROXIMITY_OPS_SETTINGS);
+
+    if (!raw) {
+      return;
+    }
+
+    let settings: Partial<ProximityOpsSettings>;
+
+    try {
+      settings = JSON.parse(raw) as Partial<ProximityOpsSettings>;
+    } catch {
+      return;
+    }
+
+    const setValue = (id: string, value: string | undefined) => {
+      const el = getEl(id, true) as HTMLInputElement | null;
+
+      if (el && typeof value === 'string') {
+        el.value = value;
+      }
+    };
+    const setChecked = (id: string, value: boolean | undefined) => {
+      if (typeof value === 'boolean') {
+        const el = getEl(id, true) as HTMLInputElement | null;
+
+        if (el) {
+          el.checked = value;
+        }
+      }
+    };
+
+    setValue('proximity-ops-maxDis', settings.maxDis);
+    setValue('proximity-ops-maxVel', settings.maxVel);
+    setValue('proximity-ops-duration', settings.duration);
+    if (settings.type === RPOType.GEO || settings.type === RPOType.LEO) {
+      setValue('proximity-ops-type', settings.type);
+    }
+    setChecked('proximity-ops-payload-only', settings.payloadOnly);
+    setChecked('proximity-ops-no-vimpel', settings.noVimpel);
+    setChecked('proximity-ops-ava', settings.ava);
+
+    // Re-sync the regime lock and the styled <select> with the restored values.
+    getEl('proximity-ops-ava', true)?.dispatchEvent(new Event('change'));
+  }
+
+  /**
+   * Step 3 of the RPO search process (single-satellite mode).
    *
-   * Finds and returns a list of satellites related to a primary satellite based on the specified orbit type and duration.
-   * The primary satellite is always included as the first element in the returned array.
-   *
-   * @param primarySatID - The ID of the primary satellite to search around.
-   * @param type - The type of rendezvous proximity operation (RPO), e.g., GEO or LEO.
-   * @param duration - The duration (in seconds) to consider for proximity calculations.
-   * @returns An array of `Satellite` objects, with the primary satellite as the first element, followed by satellites matching the proximity criteria.
-   *
-   * @remarks
-   * - For GEO type, satellites are filtered based on longitude proximity and orbital period.
-   * - For LEO type, satellites are filtered based on perigee/apogee separation, inclination, and right ascension proximity.
-   * - Throws an error via `errorManagerInstance` if an unknown orbit type is provided.
+   * Finds the satellites related to a primary satellite based on the orbit type
+   * and duration, with the primary as the first element. GEO filters on longitude
+   * proximity and orbital period; LEO filters on inclination and RAAN proximity.
+   * Stays on the main thread because it uses `SatMath.normalizeRaan` and the live
+   * catalog.
    */
   private findSatsById_(primarySatID: number, type: string, duration: Seconds): Satellite[] {
     const allSats = this.getFilteredSatellites();
@@ -551,83 +728,20 @@ export class ProximityOps extends KeepTrackPlugin {
     return sats;
   }
 
-  /**
-   * Step 3 of the RPO search process. (There are 3 possible step 3s)
-   *
-   * Finds and returns a list of satellites in the filtered set that are in a specific type of low Earth orbit (LEO)
-   * based on the provided inclination and right ascension of the ascending node (RAAN).
-   *
-   * The function filters satellites that:
-   * - Have a valid TLE line 1 (`tle1` is defined)
-   * - Have an orbital period less than 180 minutes (3 hours)
-   * - Have an inclination within 5 degrees of the specified `inc`
-   * - Have a right ascension within 5 degrees of the specified `raan`
-   *
-   * @param inc - The target inclination in degrees.
-   * @param raan - The target right ascension of the ascending node in degrees.
-   * @returns An array of `Satellite` objects matching the specified orbital parameters.
-   */
-  private findSatsAvALeo_(inc: Degrees, raan: Degrees): Satellite[] {
-    const allSats = this.getFilteredSatellites();
-
-    const sats = allSats
-      .filter((sat) => sat.tle1 &&
-        sat.period < 3 * 60 &&
-        (180 - Math.abs(Math.abs(inc - sat.inclination) - 180)) < 5 &&
-        (360 - Math.abs(Math.abs(raan - sat.rightAscension) - 360)) < 5,
-      );
-
-    return sats;
+  /** Thin wrapper around the pure core closest-approach search (kept as a stable public entry point). */
+  findClosestApproach(sat1: Satellite, sat2: Satellite, start: Date, duration: Seconds): ProximityOpsEvent {
+    return findClosestApproachCore(sat1, sat2, start, duration);
   }
 
   /**
-   * Step 3 of the RPO search process. (There are 3 possible step 3s)
-   *
-   * Finds and returns a list of geostationary satellites that are available at a given longitude.
-   *
-   * This method filters the list of satellites to include only those that:
-   * - Have a valid TLE line 1 (`tle1` is defined).
-   * - Have an orbital period greater than 23 hours (in minutes).
-   * - Are located within 1 degree of the specified longitude, accounting for longitude wrapping.
-   *
-   * @param lon - The longitude (in degrees) to search for available geostationary satellites.
-   * @returns An array of `Satellite` objects that match the criteria.
-   */
-  private findSatsAvAGeo_(lon: Degrees): Satellite[] {
-    const allSats = this.getFilteredSatellites();
-
-    const sats = allSats
-      .filter((sat) => {
-        const lla2 = sat.lla();
-
-        if (!lla2) {
-          return false;
-        }
-
-        return (sat.tle1 &&
-          sat.period > 23 * 60 &&
-          (180 - Math.abs(Math.abs(lon - lla2.lon) - 180)) < 1);
-      });
-
-    return sats;
-  }
-
-  /**
-   * Retrieves a filtered list of satellites based on user-selected criteria.
-   *
-   * This method obtains all satellites from the catalog manager and applies filters
-   * depending on the state of two checkboxes in the UI:
-   * - "Payload Only": If checked, only satellites identified as payloads are included.
-   * - "No Vimpel": If checked, satellites with a source of `CatalogSource.VIMPEL` are excluded.
-   *
-   * The filtering is performed efficiently in a single pass if either filter is active.
+   * Retrieves a filtered list of satellites based on the "Payload Only" and
+   * "No Vimpel" toggles, in a single pass when either is active.
    */
   private getFilteredSatellites(): Satellite[] {
     let allSats = ServiceLocator.getCatalogManager().getSats();
     const isPayloadOnlyChecked = (<HTMLInputElement>getEl('proximity-ops-payload-only')).checked;
     const isVimpelChecked = (<HTMLInputElement>getEl('proximity-ops-no-vimpel')).checked;
 
-    // We only want to run filter once in total for performance reasons
     if (isPayloadOnlyChecked || isVimpelChecked) {
       allSats = allSats.filter((sat) => {
         if (isPayloadOnlyChecked && !sat.isPayload()) {
@@ -644,92 +758,44 @@ export class ProximityOps extends KeepTrackPlugin {
     return allSats;
   }
 
-  /**
-   * Populates the "proximity-ops-table" HTML table with a list of Rendezvous and Proximity Operations (RPO) data.
-   *
-   * This method clears any existing table content, creates a header row, and inserts a row for each RPO entry.
-   * Each row displays information such as target and chaser satellite numbers and names, relative distance and velocity,
-   * and the date of the event. Clicking a row triggers the `onRpoEventClicked_` handler with the corresponding RPO.
-   * If the provided list is empty, a single row indicating "No RPOs found" is displayed.
-   *
-   * @param events - An array of RPO objects to display in the table.
-   */
-  private populateTable_(events: ProximityOpsEvent[]) {
+  /** Render the results into the secondary-menu table (clears any prior rows). */
+  private populateTable_(events: ProximityOpsEvent[]): void {
+    const tbl = <HTMLTableElement>getEl('proximity-ops-table', true);
 
-    const tbl = <HTMLTableElement>getEl('proximity-ops-table'); // Identify the table to update
+    if (!tbl) {
+      return;
+    }
 
-    tbl.innerHTML = ''; // Clear the table from old object data
+    renderProximityOpsTable(tbl, events, 'proximity-ops-event', this.tableLabels_(), { key: this.sortKey_, asc: this.sortAsc_ });
+  }
 
+  private tableLabels_(): ProximityOpsTableLabels {
     const l = (key: string) => t7e(`plugins.ProximityOps.table.${key}` as Parameters<typeof t7e>[0]);
 
-    // Create header row
-    const headers = [
-      { text: l('target') },
-      { text: l('targetName') },
-      { text: l('chaser') },
-      { text: l('chaserName') },
-      { text: l('relDistance') },
-      { text: l('relVelocity') },
-      { text: l('date') },
-    ];
-    const headerRow = tbl.insertRow();
-
-    headers.forEach((header) => {
-      const th = headerRow.insertCell();
-
-      th.appendChild(document.createTextNode(header.text));
-      th.className = 'proximity-ops-header';
-    });
-
-    // Populate table rows
-    for (const rpo of events) {
-      const row = tbl.insertRow();
-
-      row.className = 'link';
-
-      const cells = [
-        rpo.sat1SccNum,
-        rpo.sat1Name ?? '',
-        rpo.sat2SccNum,
-        rpo.sat2Name ?? '',
-        rpo.dist.toFixed(2),
-        rpo.vel.toFixed(3),
-        rpo.date.toISOString().slice(0, 19),
-      ];
-
-      cells.forEach((cellText) => {
-        const td = row.insertCell();
-
-        td.appendChild(document.createTextNode(cellText));
-      });
-
-      row.addEventListener('click', () => this.onEventClicked_(rpo));
-    }
-
-    if (events.length === 0) {
-      const tr = tbl.insertRow();
-      const td = tr.insertCell();
-
-      td.colSpan = 7;
-      td.appendChild(document.createTextNode(t7e('plugins.ProximityOps.noRposFound' as Parameters<typeof t7e>[0])));
-    }
+    return {
+      target: l('target'),
+      targetName: l('targetName'),
+      chaser: l('chaser'),
+      chaserName: l('chaserName'),
+      relDistance: l('relDistance'),
+      radial: l('radial'),
+      intrack: l('intrack'),
+      crosstrack: l('crosstrack'),
+      relVelocity: l('relVelocity'),
+      pc: l('pc'),
+      date: l('date'),
+    };
   }
 
   /**
-   * Handles the event when an RPO (Rendezvous and Proximity Operations) event is clicked.
-   *
-   * This method performs the following actions:
-   * - Adjusts the static time offset based on the RPO event date.
-   * - Sets the secondary and primary satellites for selection, ensuring the primary satellite displays secondary info.
-   * - Determines the orbit display mode (ECF or ECI) based on the perigee of the primary satellite and updates the settings accordingly.
-   * - Synchronizes the settings menu plugin.
-   * - Initiates a search for the involved satellites using their SCC numbers.
-   * - Closes both the secondary and side menus.
-   *
-   * @param event - The RPO event object containing satellite IDs, SCC numbers, and the event date.
+   * Handles a results-row click: jumps the clock to the encounter (preserving
+   * playback state), selects both satellites, switches GEO orbits to ECF so the
+   * relative motion reads clearly, and draws the sat-to-sat line. Pc is already
+   * computed for every row during the search, so nothing is filled here. The
+   * secondary menu is left open per the convention.
    */
-  private onEventClicked_(event: ProximityOpsEvent) {
-    this.timeManagerInstance.changeStaticOffset(new Date(event.date).getTime() - new Date().getTime());
+  private onEventClicked_(event: ProximityOpsEvent): void {
+    jumpToTca(new Date(event.date).getTime());
 
     // Set the secondary first so that the primary shows secondary info in the sat-info-box
     this.selectSatManagerInstance.setSecondarySat(event.sat2Id);
@@ -738,27 +804,52 @@ export class ProximityOps extends KeepTrackPlugin {
     const uiManagerInstance = ServiceLocator.getUiManager();
 
     if (!settingsManager.isOrbitCruncherInEcf && (this.selectSatManagerInstance.primarySatObj as Satellite).perigee > 6000) {
-      uiManagerInstance.toast(t7e('plugins.ProximityOps.geoOrbitsEcf' as Parameters<typeof t7e>[0]), ToastMsgType.normal);
+      uiManagerInstance.toast(t7e('plugins.ProximityOps.geoOrbitsEcf'), ToastMsgType.normal);
       settingsManager.isOrbitCruncherInEcf = true;
     } else if (settingsManager.isOrbitCruncherInEcf) {
-      uiManagerInstance.toast(t7e('plugins.ProximityOps.geoOrbitsEci' as Parameters<typeof t7e>[0]), ToastMsgType.standby);
+      uiManagerInstance.toast(t7e('plugins.ProximityOps.geoOrbitsEci'), ToastMsgType.standby);
       settingsManager.isOrbitCruncherInEcf = false;
     }
     SettingsMenuPlugin.syncOnLoad();
 
     uiManagerInstance.doSearch(`${event.sat1SccNum},${event.sat2SccNum}`);
+
+    // Best-effort enhancement - never let it break the time jump / selection.
+    this.drawApproachLine_(event);
+  }
+
+  /** Draw (replacing any prior) the line between the target and chaser at the encounter. */
+  private drawApproachLine_(event: ProximityOpsEvent): void {
+    try {
+      const catalog = this.catalogManagerInstance;
+
+      this.approachLine_ = drawPairLine(this.approachLine_, catalog.getSat(event.sat1Id), catalog.getSat(event.sat2Id));
+    } catch {
+      // Line rendering is a non-critical enhancement.
+    }
   }
 
   /**
-   * Updates the NORAD ID and related proximity operation fields in the UI based on the currently selected satellite.
-   *
-   * - Determines the satellite type (LEO or GEO) by checking its orbital period and inclination,
-   *   and updates the proximity operation type and maximum distance fields accordingly.
-   * - Dispatches a 'change' event on the proximity operation type input to trigger any listeners.
-   * - If the selected satellite is from the Vimpel catalog, displays a message indicating unsupported status.
-   * - Otherwise, sets the NORAD ID field to the satellite's SCC number.
-   *
-   * Assumes that the relevant DOM elements exist and that the selected satellite is of type `Satellite`.
+   * "Use Current Satellite" handler: copies the currently-selected satellite into
+   * the NORAD field (and its orbit preset), or toasts if nothing is selected.
+   * Keeps the primary explicit so the search never requires a live selection.
+   */
+  private useCurrentSatellite_(): void {
+    const satellite = this.selectSatManagerInstance.getSelectedSat() as Satellite;
+
+    if (!satellite?.isSatellite()) {
+      ServiceLocator.getUiManager().toast(t7e('plugins.ProximityOps.noSatSelected'), ToastMsgType.caution, true);
+
+      return;
+    }
+
+    this.updateNoradId_();
+  }
+
+  /**
+   * Updates the NORAD ID and related fields based on the currently selected
+   * satellite: picks the LEO or GEO preset (orbit type + max distance), then
+   * fills the NORAD ID, or a "not supported" note for VIMPEL objects.
    */
   private updateNoradId_() {
     const satellite = PluginRegistry.getPlugin(SelectSatManager)!.getSelectedSat() as Satellite;
@@ -777,198 +868,14 @@ export class ProximityOps extends KeepTrackPlugin {
     }
     (<HTMLInputElement>getEl('proximity-ops-type')).dispatchEvent(new Event('change'));
 
-
     // Handle Vimpel satellites
     if (satellite.source === CatalogSource.VIMPEL) {
-      (<HTMLInputElement>getEl('proximity-ops-norad')).value = t7e('plugins.ProximityOps.vimpelNotSupported' as Parameters<typeof t7e>[0]);
+      (<HTMLInputElement>getEl('proximity-ops-norad')).value = t7e('plugins.ProximityOps.vimpelNotSupported');
 
       return;
     }
 
     // Handle other satellites
     (<HTMLInputElement>getEl('proximity-ops-norad')).value = satellite.sccNum;
-  }
-
-  getRIC(pos1: TemeVec3, vel1: TemeVec3<KilometersPerSecond>, pos2: TemeVec3, vel2: TemeVec3<KilometersPerSecond>): RIC {
-
-    const sat1 = { position: pos1, velocity: vel1 };
-    const sat2 = { position: pos2, velocity: vel2 };
-
-    return RIC.fromPosVel(sat1, sat2);
-  }
-
-  findClosestApproach(sat1: Satellite, sat2: Satellite, start: Date, duration: Seconds): ProximityOpsEvent {
-
-    /**
-     * This is the minimum distance between the two satellites at closest approach
-     */
-    let minDistAtToca = Infinity;
-    /**
-     * This is the relative velocity between the two satellites at closest approach
-     */
-    let relVelNormAtToca = Infinity as KilometersPerSecond;
-    /**
-     * This is the time of closest approach
-     */
-    let toca = new Date();
-
-    const shortestPeriod = ((sat1.period > sat2.period) ? sat2.period : sat1.period) * 60;
-
-    // large steps defined to be at least 2 points per orbit
-    const bigStep = shortestPeriod / 2;
-    // small steps defined to be at least 10 points per orbit
-    const littleStep = shortestPeriod / 10;
-    // very small steps defined to be at least 10 points per orbit
-    const veryLittleStep = shortestPeriod / 100;
-
-    let currentDist = Infinity as Kilometers;
-
-    for (let t = 0; t < duration; t += bigStep) {
-
-      const now = new Date(start.getTime() + t * 1000);
-
-      try {
-        ({ currentDist } = this.getCurrentDist_(now, sat1, sat2));
-      } catch (e) {
-        errorManagerInstance.log(e);
-      }
-
-      if (currentDist < minDistAtToca) {
-        minDistAtToca = currentDist;
-        toca = now;
-      }
-    }
-
-    start = new Date(toca.getTime() - shortestPeriod * 1000);
-    duration = 2 * shortestPeriod as Seconds;
-
-    for (let t = 0; t < duration; t += littleStep) {
-
-      const now = new Date(start.getTime() + t * 1000);
-
-      const m1 = SatMath.calculateTimeVariables(now, sat1.satrec).m as number;
-      const sat1State = Sgp4.propagate(sat1.satrec, m1);
-
-      const m2 = SatMath.calculateTimeVariables(now, sat2.satrec).m as number;
-      const sat2State = Sgp4.propagate(sat2.satrec, m2);
-
-      if (!sat2State.position || !sat1State.position || !sat2State.velocity || !sat1State.velocity) {
-        continue;
-      }
-
-      currentDist = SatMath.distance(sat2State.position, sat1State.position);
-
-      if (currentDist < minDistAtToca) {
-        minDistAtToca = currentDist;
-        toca = now;
-      }
-    }
-
-    start = new Date(toca.getTime() - shortestPeriod / 4 * 1000);
-    duration = shortestPeriod / 2 as Seconds;
-
-    let ric = RIC.fromPosVel(
-      { position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } },
-      { position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } },
-    );
-
-    for (let t = 0; t < duration; t += veryLittleStep) {
-
-      const now = new Date(start.getTime() + t * 1000);
-
-      const m1 = SatMath.calculateTimeVariables(now, sat1.satrec).m;
-      const sat1State = Sgp4.propagate(sat1.satrec, m1 as number);
-
-      const m2 = SatMath.calculateTimeVariables(now, sat2.satrec).m;
-      const sat2State = Sgp4.propagate(sat2.satrec, m2 as number);
-
-      const pos1 = <TemeVec3>sat1State.position;
-      const pos2 = <TemeVec3>sat2State.position;
-
-      currentDist = SatMath.distance(pos2, pos1);
-
-
-      if (currentDist < minDistAtToca) {
-        minDistAtToca = currentDist;
-        toca = now;
-
-        const vel1 = sat1State.velocity as TemeVec3<KilometersPerSecond>;
-        const vel2 = sat2State.velocity as TemeVec3<KilometersPerSecond>;
-
-        relVelNormAtToca = SatMath.velocity(vel2, vel1);
-
-        ric = this.getRIC(pos1, vel1, pos2, vel2);
-        /*
-         * TODO: Figure out why these have different answers
-         * and deprecate keeptrack method for ootk method
-         * console.log('Proposed Method');
-         * console.log(ric);
-         * console.log('Ootk Method');
-         * console.log(sat1.toRIC(sat2, now));
-         */
-
-      }
-    }
-    // Use VIMPEL number if needed.
-    let sat1Num: string;
-    let sat2Num: string;
-
-    if (sat1.source === CatalogSource.VIMPEL) {
-      sat1Num = `JSC${sat1.altId}`;
-    } else {
-      sat1Num = sat1.sccNum;
-    }
-    if (sat2.source === CatalogSource.VIMPEL) {
-      sat2Num = `JSC${sat2.altId}`;
-    } else {
-      sat2Num = sat2.sccNum;
-    }
-
-    const rpo: ProximityOpsEvent = {
-      sat1Id: sat1.id,
-      sat2Id: sat2.id,
-      sat1SccNum: sat1Num,
-      sat2SccNum: sat2Num,
-      sat1Name: sat1.name,
-      sat2Name: sat2.name,
-      ric,
-      dist: minDistAtToca,
-      vel: relVelNormAtToca,
-      date: toca,
-    };
-
-    return rpo;
-  }
-
-  private getCurrentDist_(now: Date, sat1: Satellite, sat2: Satellite) {
-    const m1 = SatMath.calculateTimeVariables(now, sat1.satrec).m as number;
-    const m2 = SatMath.calculateTimeVariables(now, sat2.satrec).m as number;
-    const sv1 = Sgp4.propagate(sat1.satrec, m1);
-    const sv2 = Sgp4.propagate(sat2.satrec, m2);
-
-    if (!sv1.position || !sv2.position) {
-      const invalidStateVector = {
-        position: {
-          x: 0 as Kilometers,
-          y: 0 as Kilometers,
-          z: 0 as Kilometers,
-        },
-        velocity: {
-          x: 0 as KilometersPerSecond,
-          y: 0 as KilometersPerSecond,
-          z: 0 as KilometersPerSecond,
-        },
-      };
-
-      return {
-        sat1State: invalidStateVector,
-        sat2State: invalidStateVector,
-        currentDist: Infinity as Kilometers,
-      };
-    }
-
-    const currentDist = SatMath.distance(sv2.position as TemeVec3, sv1.position as TemeVec3);
-
-    return { sat1State: sv1, sat2State: sv2, currentDist };
   }
 }

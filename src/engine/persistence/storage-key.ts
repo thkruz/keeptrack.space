@@ -142,4 +142,7 @@ export enum StorageKey {
 
   // User Account (epoch ms of the last successful cloud sync)
   USER_LAST_SYNCED = 'v2-keepTrack-userLastSynced',
+
+  // Proximity Ops (last-used search inputs: thresholds, orbit type, toggles)
+  PROXIMITY_OPS_SETTINGS = 'v2-keepTrack-proximityOpsSettings',
 }

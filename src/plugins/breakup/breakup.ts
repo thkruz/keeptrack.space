@@ -499,25 +499,38 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
      * The sendSatEdit posts above are async, so position data for the pieces is
      * still all-zero for a few frames - the search filters out (0,0,0) sats as
      * "Decayed" (search-manager getSearchableObjects_), so an early search finds
-     * nothing and only a manual re-search shows the cloud. Wait until the LAST
-     * created piece actually has a non-zero position before searching.
+     * nothing and only a manual re-search shows the cloud.
+     *
+     * Two timing hazards, both handled here:
+     *  1. Validate against the cruncher message's own satPos array (the freshest
+     *     source), not dotsManager.getCurrentPosition - the dots manager copies
+     *     satPos into positionData in a separate listener whose order vs ours is
+     *     not guaranteed, so getCurrentPosition can lag a frame.
+     *  2. Run doSearch on the NEXT tick. doSearch reads positionData (filled by
+     *     that other listener during this same message dispatch); deferring lets
+     *     the dispatch finish so positionData is current when the search runs.
      */
     const searchStr = `${mainsat.sccNum},Breakup Piece`;
-    const dotsManagerInstance = ServiceLocator.getDotsManager();
     const lastPieceId = createdIds[createdIds.length - 1];
+    const lastPieceIdx = lastPieceId * 3;
 
     waitForCruncher({
       cruncher: catalogManagerInstance.satCruncher,
-      cb: () => ServiceLocator.getUiManager().doSearch(searchStr),
+      cb: () => {
+        setTimeout(() => ServiceLocator.getUiManager().doSearch(searchStr), 0);
+      },
       validationFunc: (data: PositionCruncherOutgoingMsg) => {
-        if (typeof data.satPos === 'undefined') {
+        const satPos = data.satPos;
+
+        if (!satPos || lastPieceIdx + 2 >= satPos.length) {
           return false;
         }
 
-        const pos = dotsManagerInstance.getCurrentPosition(lastPieceId);
-        const isFinitePos = Number.isFinite(pos.x) && Number.isFinite(pos.y) && Number.isFinite(pos.z);
+        const x = satPos[lastPieceIdx];
+        const y = satPos[lastPieceIdx + 1];
+        const z = satPos[lastPieceIdx + 2];
 
-        return isFinitePos && (pos.x !== 0 || pos.y !== 0 || pos.z !== 0);
+        return Number.isFinite(x) && Number.isFinite(y) && Number.isFinite(z) && (x !== 0 || y !== 0 || z !== 0);
       },
       maxRetries: 150,
       isRunCbOnFailure: true,

@@ -24,6 +24,11 @@ const VALID = {
   'cs-maxrange': '1000',
 };
 
+/**
+ * Integration coverage for the DOM -> core -> sensorManager wiring. The pure
+ * validation rules are covered exhaustively in custom-sensor-core.test.ts; this
+ * file only confirms the form is read and routed correctly.
+ */
 describe('CustomSensorPlugin.processCustomSensorSubmit_', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const C = CustomSensorPlugin as any;
@@ -47,10 +52,6 @@ describe('CustomSensorPlugin.processCustomSensorSubmit_', () => {
     const plugin = new CustomSensorPlugin();
 
     websiteInit(plugin);
-    // 'sensor-type' is written to before validation; ensure it exists.
-    if (!getEl('sensor-type', true)) {
-      document.body.insertAdjacentHTML('beforeend', '<input id="sensor-type" />');
-    }
     addSpy = vi.spyOn(ServiceLocator.getSensorManager(), 'addSecondarySensor').mockImplementation(() => undefined as never);
     warnSpy = vi.spyOn(errorManagerInstance, 'warn').mockImplementation(() => undefined);
   });
@@ -67,40 +68,28 @@ describe('CustomSensorPlugin.processCustomSensorSubmit_', () => {
     expect(warnSpy).not.toHaveBeenCalled();
   });
 
-  it.each([
-    ['cs-lat', '95'],
-    ['cs-lon', '200'],
-    ['cs-hei', '-5'],
-    ['cs-minaz', '400'],
-    ['cs-maxaz', '400'],
-    ['cs-minel', '-100'],
-    ['cs-maxel', '100'],
-    ['cs-minrange', '-1'],
-    ['cs-maxrange', '-1'],
-  ])('rejects an out-of-range %s and warns', (field, badValue) => {
-    setForm({ [field]: badValue } as Partial<typeof VALID>);
+  it('warns and does not add when a field is out of range', () => {
+    setForm({ 'cs-lat': '95' });
     C.processCustomSensorSubmit_();
 
     expect(warnSpy).toHaveBeenCalled();
     expect(addSpy).not.toHaveBeenCalled();
   });
 
-  it.each([
-    ['Optical'],
-    ['Mechanical'],
-    ['Phased Array Radar'],
-  ])('builds a %s sensor', (sensorType) => {
-    setForm({ 'cs-type': sensorType });
+  it('warns and does not add when a field is not a number', () => {
+    setForm({ 'cs-lon': 'abc' });
     C.processCustomSensorSubmit_();
 
-    expect(addSpy).toHaveBeenCalledTimes(1);
+    expect(warnSpy).toHaveBeenCalled();
+    expect(addSpy).not.toHaveBeenCalled();
   });
 
-  it('defaults an unknown sensor type to Observer', () => {
-    setForm({ 'cs-type': 'Wormhole Array' });
+  it('warns and does not add when min elevation exceeds max elevation', () => {
+    setForm({ 'cs-minel': '80', 'cs-maxel': '10' });
     C.processCustomSensorSubmit_();
 
-    expect(addSpy).toHaveBeenCalledTimes(1);
+    expect(warnSpy).toHaveBeenCalled();
+    expect(addSpy).not.toHaveBeenCalled();
   });
 
   it('passes the replace flag through to addSecondarySensor', () => {
@@ -108,5 +97,16 @@ describe('CustomSensorPlugin.processCustomSensorSubmit_', () => {
     C.processCustomSensorSubmit_(true);
 
     expect(addSpy).toHaveBeenCalledWith(expect.anything(), true);
+  });
+
+  it('does not throw when SensorInfo DOM fields are absent', () => {
+    // The #sensor-type / #sensor-info-title writes target SensorInfoPlugin and
+    // must be guarded; removing them should not break submit.
+    getEl('sensor-type', true)?.remove();
+    getEl('sensor-info-title', true)?.remove();
+    setForm();
+
+    expect(() => C.processCustomSensorSubmit_()).not.toThrow();
+    expect(addSpy).toHaveBeenCalledTimes(1);
   });
 });

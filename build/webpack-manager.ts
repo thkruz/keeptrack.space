@@ -351,6 +351,7 @@ export class WebpackManager {
     // only built (and only present) for pro profiles - never bundled into OSS.
     if (this.config.isPro) {
       entry.tipAndCueWorker = ['./src/plugins-pro/tip-and-cue/tipAndCueWorker.ts'];
+      entry.eclipseWorker = ['./src/plugins-pro/eclipse-solar-analysis/eclipseWorker.ts'];
     }
 
     return ({

@@ -58,7 +58,7 @@ export type KeepTrackPluginsConfiguration = {
   WatchlistFilterPlugin?: PluginConfiguration;
   ReportsPlugin?: PluginConfiguration;
   PolarPlotPlugin?: PluginConfiguration;
-  NextLaunchesPlugin?: PluginConfiguration;
+  TheSpaceDevLaunchCalendarPlugin?: PluginConfiguration;
   SeismicActivityPlugin?: PluginConfiguration;
   AuroraPlugin?: PluginConfiguration;
   NaturalEventsPlugin?: PluginConfiguration;
@@ -112,7 +112,7 @@ export type KeepTrackPluginsConfiguration = {
   PlanetsMenuPlugin?: PluginConfiguration;
   DeepSpaceMissionsPlugin?: PluginConfiguration;
   Screenshot?: PluginConfiguration;
-  LaunchCalendar?: PluginConfiguration;
+  GunterLaunchCalendar?: PluginConfiguration;
   TimeMachine?: PluginConfiguration;
   SatellitePhotos?: PluginConfiguration;
   ScreenRecorder?: PluginConfiguration;

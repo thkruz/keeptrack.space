@@ -296,9 +296,9 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 60 },
   },
   {
-    configKey: 'NextLaunchesPlugin',
-    ossImport: () => import('./next-launches/next-launches'),
-    ossClassName: 'NextLaunchesPlugin',
+    configKey: 'TheSpaceDevLaunchCalendarPlugin',
+    ossImport: () => import('./thespacedev-launch-calendar/thespacedev-launch-calendar'),
+    ossClassName: 'TheSpaceDevLaunchCalendarPlugin',
     defaultConfig: { enabled: true, order: 350 },
   },
   {
@@ -646,10 +646,10 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 450 },
   },
   {
-    configKey: 'LaunchCalendar',
-    ossImport: () => import('./launch-calendar/launch-calendar'),
-    ossClassName: 'LaunchCalendar',
-    defaultConfig: { enabled: true, order: 351 },
+    configKey: 'GunterLaunchCalendar',
+    ossImport: () => import('./gunter-launch-calendar/gunter-launch-calendar'),
+    ossClassName: 'GunterLaunchCalendar',
+    defaultConfig: { enabled: false, order: 351 },
   },
   {
     configKey: 'TimeMachine',

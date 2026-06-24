@@ -173,10 +173,10 @@ const settingsOverride = {
     transponderChannelData: {
       enabled: false,
     },
-    NextLaunchesPlugin: {
+    TheSpaceDevLaunchCalendarPlugin: {
       enabled: false,
     },
-    LaunchCalendar: {
+    GunterLaunchCalendar: {
       enabled: false,
     },
     Calculator: {

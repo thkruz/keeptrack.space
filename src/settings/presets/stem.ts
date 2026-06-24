@@ -32,7 +32,7 @@ export const stemEnvironment = (settingsManager: SettingsManager) => {
   settingsManager.plugins.Collisions = { enabled: true };
   settingsManager.plugins.SatellitePhotos = { enabled: true };
   settingsManager.plugins.FilterMenuPlugin = { enabled: true };
-  settingsManager.plugins.NextLaunchesPlugin = { enabled: true };
+  settingsManager.plugins.TheSpaceDevLaunchCalendarPlugin = { enabled: true };
   settingsManager.plugins.TimeMachine = { enabled: true };
   settingsManager.plugins.StereoMap = { enabled: true };
   settingsManager.isShowSplashScreen = true;

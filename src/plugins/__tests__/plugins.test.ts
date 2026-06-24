@@ -23,13 +23,13 @@ describe('plugins', () => {
       FindSatPlugin: {
         enabled: true,
       },
-      LaunchCalendar: {
+      GunterLaunchCalendar: {
         enabled: true,
       },
       NewLaunch: {
         enabled: true,
       },
-      NextLaunchesPlugin: {
+      TheSpaceDevLaunchCalendarPlugin: {
         enabled: true,
       },
       NightToggle: {

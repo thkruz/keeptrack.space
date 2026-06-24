@@ -6,7 +6,8 @@ import { GlUtils } from './gl-utils';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { BaseObject, Kilometers, KilometersPerSecond, Satellite, Seconds, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
+import { BaseObject, calcGmst, DEG2RAD, Kilometers, KilometersPerSecond, lla2eci, Radians, Satellite, Seconds, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
+import { orbitLineSegment } from '@app/plugins/missile/missile-interpolation';
 import { mat4 } from 'gl-matrix';
 import { SettingsManager } from '../../settings/settings';
 import { CameraType } from '../camera/camera-type';
@@ -979,8 +980,63 @@ export class DotsManager {
     }
 
     this.interpolatePositionsOfOemSatellites();
+    this.interpolatePositionsOfMissiles_();
 
     this.lastUpdateSimTime = simTime;
+  }
+
+  /**
+   * Recompute every active missile's position from its trajectory each frame.
+   *
+   * Missiles live past `orbitalSats` in the catalog, so the per-frame TLE velocity
+   * extrapolation skips them and the position cruncher only refreshes them at ~1 Hz
+   * - which makes the dot stair-step once per second. Like OEM satellites, missiles
+   * instead get an exact position here every frame, interpolated between the
+   * 1-second trajectory samples so the dot glides smoothly.
+   *
+   * The position MUST sit on the trajectory line the orbit cruncher draws. That
+   * line is only `orbitSegments` (255) straight chords for the whole flight, so it
+   * sub-samples the trajectory ~7:1; interpolating the dot between *adjacent*
+   * samples makes it follow the true curve and leave the coarse chord near apogee.
+   * Instead, interpolate along the same chord the line draws - lerp in ECI between
+   * the two line vertices that bracket the current time - using the identical
+   * ellipsoidal `lla2eci` conversion as `drawMissileSegment_` (and `eci()`/the model).
+   */
+  private interpolatePositionsOfMissiles_() {
+    if (!this.positionData) {
+      return;
+    }
+
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const missileSats = catalogManagerInstance.missileSats;
+
+    if (!missileSats) {
+      return;
+    }
+
+    const now = ServiceLocator.getTimeManager().simulationTimeObj;
+    const nowMs = now.getTime();
+    const { gmst } = calcGmst(now);
+    const numSegments = settingsManager.orbitSegments;
+
+    // The missile reservation is the 500 slots ending at `missileSats`.
+    for (let id = missileSats - 500; id < missileSats; id++) {
+      const obj = catalogManagerInstance.objectCache[id];
+
+      if (!(obj instanceof MissileObject) || !obj.active || obj.altList.length === 0) {
+        continue;
+      }
+
+      const { i0, i1, frac } = orbitLineSegment(obj.altList.length, numSegments, (nowMs - obj.startTime) / 1000);
+
+      // Both bracketing line vertices in ECI (same ellipsoidal conversion the line uses), then lerp along the chord.
+      const v0 = lla2eci({ lat: (obj.latList[i0] * DEG2RAD) as Radians, lon: (obj.lonList[i0] * DEG2RAD) as Radians, alt: obj.altList[i0] }, gmst);
+      const v1 = lla2eci({ lat: (obj.latList[i1] * DEG2RAD) as Radians, lon: (obj.lonList[i1] * DEG2RAD) as Radians, alt: obj.altList[i1] }, gmst);
+
+      this.positionData[id * 3] = v0.x + (v1.x - v0.x) * frac;
+      this.positionData[id * 3 + 1] = v0.y + (v1.y - v0.y) * frac;
+      this.positionData[id * 3 + 2] = v0.z + (v1.z - v0.z) * frac;
+    }
   }
 
   getSize(i: number): number {

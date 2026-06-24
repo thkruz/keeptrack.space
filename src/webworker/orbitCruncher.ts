@@ -1,5 +1,4 @@
-import { DEG2RAD, eci2ecef, Sgp4, TemeVec3 } from '@ootk/src/main';
-import { RADIUS_OF_EARTH } from '../engine/utils/constants';
+import { DEG2RAD, eci2ecef, GreenwichMeanSiderealTime, Kilometers, lla2eci, Radians, Sgp4, TemeVec3 } from '@ootk/src/main';
 import { jday } from '../engine/utils/transforms';
 import {
   OrbitCruncherCachedObject, OrbitCruncherInMsgChangeOrbitType, OrbitCruncherInMsgInit, OrbitCruncherInMsgMissileUpdate,
@@ -166,14 +165,18 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
 const drawMissileSegment_ = (missile: OrbitCruncherMissileObject, i: number, pointsOut: Float32Array, len: number, gmst: number) => {
   const x = Math.round(missile.altList.length * (i / numberOfSegments));
 
-  const cosLat = Math.cos(missile.latList[x] * DEG2RAD);
-  const sinLat = Math.sin(missile.latList[x] * DEG2RAD);
-  const cosLon = Math.cos(missile.lonList[x] * DEG2RAD + gmst);
-  const sinLon = Math.sin(missile.lonList[x] * DEG2RAD + gmst);
+  // Use the ellipsoidal (WGS84) lat/lon/alt -> ECI conversion, the same one
+  // MissileObject.eci() and every other object use. A spherical approximation
+  // (geocentric, fixed 6371 km radius) drifts ~15-20 km from the true position at
+  // high latitude, putting the line off the dot/model near a polar apogee.
+  const eci = lla2eci(
+    { lat: (missile.latList[x] * DEG2RAD) as Radians, lon: (missile.lonList[x] * DEG2RAD) as Radians, alt: missile.altList[x] as Kilometers },
+    gmst as GreenwichMeanSiderealTime,
+  );
 
-  pointsOut[i * 4] = (RADIUS_OF_EARTH + missile.altList[x]) * cosLat * cosLon;
-  pointsOut[i * 4 + 1] = (RADIUS_OF_EARTH + missile.altList[x]) * cosLat * sinLon;
-  pointsOut[i * 4 + 2] = (RADIUS_OF_EARTH + missile.altList[x]) * sinLat;
+  pointsOut[i * 4] = eci.x;
+  pointsOut[i * 4 + 1] = eci.y;
+  pointsOut[i * 4 + 2] = eci.z;
   pointsOut[i * 4 + 3] = Math.min(orbitFadeFactor * (len / (i + 1)), 1.0);
 };
 

@@ -62,7 +62,7 @@ describe('BestPassPlugin_capabilities', () => {
     const shortcuts = plugin.getKeyboardShortcuts();
 
     expect(shortcuts).toHaveLength(1);
-    expect(shortcuts[0].key).toBe('B');
+    expect(shortcuts[0].key).toBe('b');
     expect(shortcuts[0].callback).toBeDefined();
   });
 

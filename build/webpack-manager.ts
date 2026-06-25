@@ -352,6 +352,7 @@ export class WebpackManager {
     if (this.config.isPro) {
       entry.tipAndCueWorker = ['./src/plugins-pro/tip-and-cue/tipAndCueWorker.ts'];
       entry.eclipseWorker = ['./src/plugins-pro/eclipse-solar-analysis/eclipseWorker.ts'];
+      entry.coverageWorker = ['./src/plugins-pro/coverage-analysis/coverageWorker.ts'];
     }
 
     return ({

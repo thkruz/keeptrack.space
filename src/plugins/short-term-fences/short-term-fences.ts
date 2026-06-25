@@ -360,7 +360,7 @@ export class ShortTermFences extends KeepTrackPlugin {
       rngExt: (<HTMLInputElement>getEl('stf-rngExt')).value,
     });
 
-    if (!validation.ok) {
+    if ('errorKey' in validation) {
       errorManagerInstance.warn(l(validation.errorKey));
 
       return;

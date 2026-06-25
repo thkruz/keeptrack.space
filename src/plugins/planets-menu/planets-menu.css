@@ -1,41 +1,61 @@
-/* === List items: spacing, borders, transitions === */
-#planets-menu-content ul li {
-  padding: var(--kt-space-2) var(--kt-space-3) !important;
-  overflow: hidden !important;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  border-bottom: 1px solid var(--kt-border-subtle);
-  transition: background-color var(--kt-duration-fast) var(--kt-easing-default);
+/* === Filter field (native input, not Materialize, so no floating-label rules needed) === */
+#planets-menu .planets-filter {
+  padding: var(--kt-space-2) var(--kt-space-2) 0;
 }
 
-/* === Hover state (supplements global .menu-selectable:hover) === */
-#planets-menu-content ul li.menu-selectable:hover {
-  background-color: var(--kt-bg-hover);
-}
-
-/* === Active/pressed feedback === */
-#planets-menu-content ul li.menu-selectable:active {
-  background-color: var(--kt-bg-active);
-}
-
-/* === Category section headers === */
-#planets-menu-content h5.side-menu-row-header {
-  font-size: var(--kt-font-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--kt-text-secondary);
-  padding: var(--kt-space-2) var(--kt-space-3);
-  margin: 0 -1px;
+#planets-menu .planets-filter-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 36px;
+  margin: 0;
+  padding: 0 var(--kt-space-3);
+  color: var(--kt-text-primary);
   background: var(--kt-bg-elevated);
-  border-bottom: 1px solid var(--kt-border-default);
+  border: 1px solid var(--kt-border-default);
+  border-radius: var(--kt-radius-sm, 4px);
+  font-size: var(--kt-font-sm);
+  transition: border-color var(--kt-duration-fast) var(--kt-easing-default);
 }
 
-/* === Disabled items === */
-#planets-menu-content .planets-menu-disabled {
+#planets-menu .planets-filter-input::placeholder {
+  color: var(--kt-text-tertiary);
+}
+
+#planets-menu .planets-filter-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+/* === Body rows: tighten the list so each kt-action sits flush in the card === */
+#planets-menu .planets-section-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* === Active (currently centered) body === */
+/* Signal "active" with a brand-red left accent bar (a border, where the saturated
+ * red reads cleanly) and keep the label near-white for contrast. Do NOT color the
+ * label red: brand red (#ba160c) on the lightened active background fails contrast. */
+#planets-menu .planets-menu-item.planets-menu-active {
+  background-color: var(--kt-bg-active);
+  box-shadow: inset 3px 0 0 0 var(--color-primary);
+}
+
+#planets-menu .planets-menu-item.planets-menu-active .kt-action-label {
+  color: var(--kt-text-primary);
+  font-weight: 600;
+}
+
+/* === Disabled (planned for future) bodies === */
+#planets-menu .planets-menu-disabled {
   opacity: var(--disabledOpacity, 0.4) !important;
   cursor: var(--disabledCursor, not-allowed) !important;
   color: var(--kt-text-tertiary);
   user-select: none !important;
+}
+
+/* The CSS chevron is meaningless on a non-actionable row. */
+#planets-menu .planets-menu-disabled::after {
+  display: none;
 }

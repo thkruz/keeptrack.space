@@ -183,6 +183,41 @@ describe('PlanetsMenuPlugin', () => {
       // Should return without error for unknown planet
       expect(() => plugin.changePlanet('InvalidPlanet' as SolarBody)).not.toThrow();
     });
+
+    it('should reject planned (not-yet-loaded) bodies before touching the scene', () => {
+      const plugin = new PlanetsMenuPlugin();
+      const sceneSpy = vi.spyOn(ServiceLocator, 'getScene');
+
+      // Io is listed but planned; the guard must return before any ServiceLocator use.
+      expect(() => plugin.changePlanet(SolarBody.Io)).not.toThrow();
+      expect(sceneSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('getCommandPaletteCommands', () => {
+    it('exposes a toggle command plus one center command per selectable body', () => {
+      const plugin = new PlanetsMenuPlugin();
+      const commands = plugin.getCommandPaletteCommands();
+      const ids = commands.map((c) => c.id);
+
+      expect(ids).toContain('PlanetsMenuPlugin.toggleMenu');
+      expect(ids).toContain(`PlanetsMenuPlugin.center.${SolarBody.Earth}`);
+      expect(ids).toContain(`PlanetsMenuPlugin.center.${SolarBody.Moon}`);
+      // Planned bodies must not get a command.
+      expect(ids).not.toContain(`PlanetsMenuPlugin.center.${SolarBody.Io}`);
+    });
+
+    it('does not invoke a planned-body center command path', () => {
+      const plugin = new PlanetsMenuPlugin();
+      const commands = plugin.getCommandPaletteCommands();
+      const earthCmd = commands.find((c) => c.id === `PlanetsMenuPlugin.center.${SolarBody.Earth}`);
+
+      plugin.changePlanet = vi.fn();
+      settingsManager.isDisablePlanets = true;
+      earthCmd?.callback();
+      expect(plugin.changePlanet).not.toHaveBeenCalled();
+      settingsManager.isDisablePlanets = false;
+    });
   });
 
   describe('planetsMenuClick', () => {

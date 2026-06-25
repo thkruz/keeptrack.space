@@ -1,9 +1,119 @@
-#TransponderChannelData-menu {
-  width: 1000px !important;
+/*
+ * Transponder & Channel Data menu styles. The menu opts into the shared v13
+ * card system (.kt-ui-v13 + kt-section/kt-action); see
+ * src/engine/ui/menu-v13.css. Only the results table chrome, the sort
+ * affordance, and the status/attribution lines live here.
+ */
+
+/* The initial menu width is set via the side-menu config (`width: 1030`) so the
+ * 9-column table fits; the drag handle then resizes between min/max. No CSS
+ * width here on purpose - an `!important` rule would freeze the drag (it beats
+ * the inline width the drag handle writes). */
+
+/* Keep the filter field at a readable width instead of stretching the full
+ * (wide) menu. */
+#TransponderChannelData-menu .tcd-filter-row .input-field.col {
+  max-width: 340px;
 }
 
-#TransponderChannelData-table th,
-#TransponderChannelData-table td {
-  padding: 4px 8px;
-  font-size: 0.85rem;
+/* Filter input: swap the app-wide :focus-visible outline for KeepTrack's
+ * underline (the outline overlaps the floating label). */
+#TransponderChannelData-menu .input-field input:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#TransponderChannelData-menu .input-field input:focus-visible {
+  outline: none;
+}
+
+/* Export actions sit side by side at a fixed width rather than spanning the
+ * full menu (a 1000px-wide button reads as a banner, not a button). */
+#TransponderChannelData-menu .tcd-export-row {
+  display: flex;
+  gap: 8px;
+}
+
+#TransponderChannelData-menu .tcd-export-row .kt-action {
+  width: 220px;
+  margin-top: 8px;
+}
+
+/* Horizontal-scroll safety net so a wide row never clips inside the card. */
+.tcd-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Results table. `min-width: 100%` fills the card when content is narrow;
+ * `width: max-content` lets it grow (and the wrapper scroll) when wide. */
+.tcd-table {
+  min-width: 100%;
+  width: max-content;
+  margin-top: 4px;
+  border-collapse: collapse;
+  line-height: 1.4;
+  font-size: 13px;
+}
+
+.tcd-table td {
+  text-align: left;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--color-dark-border);
+  white-space: nowrap;
+}
+
+/* Header row */
+.tcd-table th {
+  position: relative;
+  padding: 4px 16px 4px 8px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-dark-text-muted);
+  border-bottom: 1px solid var(--color-dark-border);
+}
+
+.tcd-sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s ease;
+}
+
+.tcd-sortable:hover {
+  color: var(--color-primary);
+}
+
+/* Sort direction caret on the active column */
+.tcd-sort-asc::after,
+.tcd-sort-desc::after {
+  position: absolute;
+  right: 4px;
+  color: var(--color-primary);
+}
+
+.tcd-sort-asc::after {
+  content: '\25B2'; /* ▲ */
+}
+
+.tcd-sort-desc::after {
+  content: '\25BC'; /* ▼ */
+}
+
+/* Status line (loading / empty / error) shown in place of the table */
+.tcd-status {
+  display: none;
+  padding: 16px 8px;
+  text-align: center;
+  color: var(--color-dark-text-muted);
+}
+
+.tcd-attribution {
+  display: block;
+  margin-top: 10px;
+  padding-bottom: 12px;
+  text-align: center;
+  color: var(--color-dark-text-muted);
 }

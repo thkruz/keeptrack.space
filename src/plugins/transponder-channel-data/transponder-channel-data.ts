@@ -4,7 +4,7 @@ import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
+import { fileExcelPng, KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import {
   IBottomIconConfig,
   IDragOptions,
@@ -15,36 +15,56 @@ import {
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import { saveXlsx } from '@app/engine/utils/saveVariable';
+import { saveCsv, saveXlsx } from '@app/engine/utils/saveVariable';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite } from '@ootk/src/main';
 import transponderChannelDataPng from '@public/img/icons/sat-channel-freq.png';
 import { SatConstellations } from '../sat-constellations/sat-constellations';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import {
+  buildExportRows,
+  ChannelColumnKey,
+  ChannelInfo,
+  CHANNEL_COLUMNS,
+  dedupeChannels,
+  filterChannels,
+  SortDirection,
+  sortChannels,
+} from './transponder-channel-data-core';
 import './transponder-channel-data.css';
+import { TV_SATELLITE_SCC_NUMS } from './tv-satellites';
 
-interface ChannelInfo {
-  satellite: string;
-  tvchannel: string;
-  beam: string;
-  freq: string;
-  system: string;
-  SRFEC: string;
-  video: string;
-  lang: string;
-  encryption: string;
-}
+type StatusKind = 'loading' | 'empty' | 'noMatch' | 'error';
 
 export class TransponderChannelData extends KeepTrackPlugin {
   readonly id = 'TransponderChannelData';
   dependencies_ = [];
-  // eslint-disable-next-line max-len
-  private readonly satsWithChannels_: string[] = ['39508', '41588', '40424', '25924', '37393', '43039', '35942', '39078', '42934', '44479', '32794', '39237', '28868', '31102', '39127', '43450', '38107', '40982', '36745', '37810', '44186', '40272', '40941', '35696', '37933', '42942', '29055', '31306', '33436', '37775', '39285', '38778', '40364', '36581', '32299', '39079', '43632', '36592', '41029', '56757', '43463', '41238', '32019', '28943', '37677', '39157', '39017', '44067', '52255', '33051', '49125', '42907', '28935', '42967', '33207', '36499', '39008', '39233', '43700', '54259', '40425', '41589', '42741', '38992', '39773', '41382', '39020', '44334', '40875', '41310', '45985', '45986', '41191', '39612', '39613', '29236', '32951', '33376', '46114', '54243', '54244', '54026', '54741', '54742', '27445', '42814', '37264', '43228', '43633', '54048', '54225', '28358', '36097', '37238', '37834', '38356', '38740', '38749', '38098', '38867', '40271', '41581', '41748', '40874', '42818', '41747', '42950', '44476', '26824', '41903', '41471', '29272', '38331', '37749', '39728', '29349', '42984', '37265', '42691', '41034', '35362', '40147', '52904', '38014', '36830', '52817', '33373', '35873', '38342', '28526', '36032', '33749', '44048', '40146', '32252', '35756', '37779', '37826', '36831', '36516', '42432', '43488', '43175', '42709', '55970', '55971', '37809', '53961', '52933', '37748', '38087', '38652', '39172', '34941', '39460', '41380', '28945', '37606', '32768', '38991', '40733', '41904', '49055', '33274', '14787', '41944', '34111', '41036', '37602', '43611', '28786', '39500', '41552', '32487', '36033', '40613', '39481', '33056', '39522', '47306', '50212', '32767', '38332', '40345', '39022', '44307'];
+  requiresInternet = true;
+  downloadIconSrc = fileExcelPng;
+
+  private readonly satsWithChannels_: readonly string[] = TV_SATELLITE_SCC_NUMS;
 
   isIconDisabled = true;
 
+  // Initial side-menu width (wide enough for the 9-column table). This is the
+  // lever the base wrapper uses for the rendered width; the drag handle then
+  // resizes between the dragOptions min/max. Must NOT be set via a CSS
+  // `!important` rule, which would freeze the drag (it beats the inline width
+  // the drag handle writes).
+  sideMenuSecondaryOptions = {
+    width: 1030,
+    leftOffset: null,
+    zIndex: 3,
+  };
+
   private lastLoadedSat_ = -1;
+  /** Full deduped result set for the current satellite (pre-filter/sort). */
+  private rawData_: ChannelInfo[] = [];
+  /** The rows currently displayed (filtered + sorted) — what export emits. */
   private dataCache_: ChannelInfo[] = [];
+  private filterQuery_ = '';
+  private sortKey_: ChannelColumnKey | null = null;
+  private sortDir_: SortDirection = 'asc';
 
   // =========================================================================
   // Composition-based configuration methods
@@ -78,8 +98,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
       return;
     }
 
-    this.showTable_();
-    this.lastLoadedSat_ = selectedSat.id;
+    this.loadChannelData_();
   }
 
   // Bridge for legacy event system (per CLAUDE.md)
@@ -105,10 +124,35 @@ export class TransponderChannelData extends KeepTrackPlugin {
   }
 
   private buildSideMenuHtml_(): string {
+    const l = (key: string) => t7e(`plugins.TransponderChannelData.labels.${key}` as Parameters<typeof t7e>[0]);
+    const attribution = t7e('plugins.TransponderChannelData.attribution' as Parameters<typeof t7e>[0]);
+
     return html`
-      <div class="row">
-        <table id="TransponderChannelData-table" class="center-align striped-light centered"></table>
-      </div>
+      <section class="kt-section">
+        <div class="kt-section-label">${l('controls')}</div>
+        <div class="kt-field-row tcd-filter-row">
+          <div class="input-field col s12">
+            <input id="TransponderChannelData-filter" type="text" autocomplete="off" />
+            <label for="TransponderChannelData-filter">${l('filterPlaceholder')}</label>
+          </div>
+        </div>
+        <div class="tcd-export-row">
+          <button id="TransponderChannelData-export-xlsx" class="kt-action waves-effect" type="button">
+            <span class="kt-action-label">${l('exportXlsx')}</span>
+          </button>
+          <button id="TransponderChannelData-export-csv" class="kt-action waves-effect" type="button">
+            <span class="kt-action-label">${l('exportCsv')}</span>
+          </button>
+        </div>
+      </section>
+      <section class="kt-section">
+        <div class="kt-section-label">${l('channels')}</div>
+        <div id="TransponderChannelData-status" class="tcd-status"></div>
+        <div class="tcd-table-wrap">
+          <table id="TransponderChannelData-table" class="tcd-table"></table>
+        </div>
+        <sub class="tcd-attribution">${attribution}</sub>
+      </section>
     `;
   }
 
@@ -152,7 +196,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
   }
 
   onDownload(): void {
-    this.exportData_();
+    this.exportData_('xlsx');
   }
 
   // =========================================================================
@@ -168,13 +212,19 @@ export class TransponderChannelData extends KeepTrackPlugin {
         // addConstellation now accepts (number | string)[] for SCC_NUM groups,
         // so we can pass the raw sccNum strings - alpha-5 / extended IDs in
         // the list would resolve correctly via sccNum2Id.
-        PluginRegistry.getPlugin(SatConstellations)?.addConstellation(t7e('plugins.TransponderChannelData.constellationName'), GroupType.SCC_NUM, this.satsWithChannels_);
+        PluginRegistry.getPlugin(SatConstellations)?.addConstellation(
+          t7e('plugins.TransponderChannelData.constellationName'),
+          GroupType.SCC_NUM,
+          [...this.satsWithChannels_],
+        );
       },
     );
   }
 
   addJs(): void {
     super.addJs();
+
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
 
     EventBus.getInstance().on(
       EventBusEvent.selectSatData,
@@ -193,19 +243,54 @@ export class TransponderChannelData extends KeepTrackPlugin {
           this.setBottomIconToEnabled();
 
           if (this.isMenuButtonActive && this.lastLoadedSat_ !== obj.id) {
-            this.showTable_();
-            this.lastLoadedSat_ = obj.id;
+            this.loadChannelData_();
           }
         }
       },
     );
   }
 
+  private uiManagerFinal_(): void {
+    // The side-menu wrapper is generated by the base class, so opt the generated
+    // root into the v13 card UI here (same approach as Close Objects).
+    getEl('TransponderChannelData-menu', true)?.classList.add('kt-ui-v13');
+
+    const filterInput = getEl('TransponderChannelData-filter', true) as HTMLInputElement | null;
+
+    filterInput?.addEventListener('input', () => {
+      this.filterQuery_ = filterInput.value;
+      this.renderTable_();
+    });
+
+    getEl('TransponderChannelData-export-xlsx', true)?.addEventListener('click', () => this.exportData_('xlsx'));
+    getEl('TransponderChannelData-export-csv', true)?.addEventListener('click', () => this.exportData_('csv'));
+
+    // Delegated column-header sorting (the <th>s are rebuilt on every render).
+    getEl('TransponderChannelData-table', true)?.addEventListener('click', (evt: MouseEvent) => {
+      const th = (evt.target as HTMLElement).closest('th[data-sort-key]') as HTMLElement | null;
+      const key = th?.dataset.sortKey as ChannelColumnKey | undefined;
+
+      if (key) {
+        this.toggleSort_(key);
+      }
+    });
+  }
+
   // =========================================================================
   // Private methods
   // =========================================================================
 
-  private async showTable_(): Promise<void> {
+  private toggleSort_(key: ChannelColumnKey): void {
+    if (this.sortKey_ === key) {
+      this.sortDir_ = this.sortDir_ === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortKey_ = key;
+      this.sortDir_ = 'asc';
+    }
+    this.renderTable_();
+  }
+
+  private async loadChannelData_(): Promise<void> {
     const selectedObj = PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj;
 
     if (!selectedObj?.isSatellite()) {
@@ -216,62 +301,80 @@ export class TransponderChannelData extends KeepTrackPlugin {
 
     const selectedSat = selectedObj as Satellite;
 
+    // Reset view state for the newly selected satellite.
+    this.rawData_ = [];
+    this.dataCache_ = [];
+    this.filterQuery_ = '';
+    this.sortKey_ = null;
+    this.sortDir_ = 'asc';
+
+    const filterInput = getEl('TransponderChannelData-filter', true) as HTMLInputElement | null;
+
+    if (filterInput) {
+      filterInput.value = '';
+    }
+
+    this.showStatus_('loading');
+
+    const data = await this.fetchChannels_(selectedSat);
+
+    if (data === null) {
+      // Fetch failed for both name and altName.
+      this.showStatus_('error');
+      errorManagerInstance.warn(
+        (t7e('plugins.TransponderChannelData.errorMsgs.FetchFailed' as Parameters<typeof t7e>[0]) as string)
+          .replace('{name}', selectedSat.name)
+          .replace('{altName}', selectedSat.altName),
+      );
+
+      // Leave lastLoadedSat_ unset so re-selecting the satellite retries.
+      return;
+    }
+
+    this.rawData_ = dedupeChannels(data);
+    this.lastLoadedSat_ = selectedSat.id;
+    this.renderTable_();
+  }
+
+  /**
+   * Fetches the channel list for a satellite, trying the primary name then the
+   * alternate name. Returns the raw array, or `null` if every attempt failed.
+   */
+  private async fetchChannels_(sat: Satellite): Promise<ChannelInfo[] | null> {
+    const primary = await this.fetchChannelsForName_(sat.name);
+
+    if (primary !== null) {
+      return primary;
+    }
+
+    if (sat.altName && sat.altName !== sat.name) {
+      return this.fetchChannelsForName_(sat.altName);
+    }
+
+    return null;
+  }
+
+  private async fetchChannelsForName_(name: string): Promise<ChannelInfo[] | null> {
     try {
-      const resp = await apiFetch(`https://api.keeptrack.space/v4/channels/${encodeURIComponent(selectedSat.name)}`);
+      const resp = await apiFetch(`https://api.keeptrack.space/v4/channels/${encodeURIComponent(name)}`);
 
       if (!resp.ok) {
         throw new Error(`HTTP ${resp.status}`);
       }
 
-      const data = await resp.json() as ChannelInfo[];
-
-      this.displayChannelData_(this.cleanData_(data));
+      return await resp.json() as ChannelInfo[];
     } catch {
-      try {
-        const resp = await apiFetch(`https://api.keeptrack.space/v4/channels/${encodeURIComponent(selectedSat.altName)}`);
-
-        if (!resp.ok) {
-          throw new Error(`HTTP ${resp.status}`);
-        }
-
-        const data = await resp.json() as ChannelInfo[];
-
-        this.displayChannelData_(this.cleanData_(data));
-      } catch {
-        errorManagerInstance.warn(
-          (t7e('plugins.TransponderChannelData.errorMsgs.FetchFailed' as Parameters<typeof t7e>[0]) as string)
-            .replace('{name}', selectedSat.name)
-            .replace('{altName}', selectedSat.altName),
-        );
-      }
+      return null;
     }
   }
 
-  private cleanData_(data: ChannelInfo[]): ChannelInfo[] {
-    const uniqueData: ChannelInfo[] = [];
-    const seen = new Set<string>();
+  private renderTable_(): void {
+    const filtered = filterChannels(this.rawData_, this.filterQuery_);
+    const rows = this.sortKey_ ? sortChannels(filtered, this.sortKey_, this.sortDir_) : filtered;
 
-    data.forEach((entry) => {
-      const identifier = `${entry.tvchannel}-${entry.freq}-${entry.beam}`;
+    this.dataCache_ = rows;
 
-      if (!seen.has(identifier)) {
-        seen.add(identifier);
-        uniqueData.push(entry);
-      }
-    });
-
-    return uniqueData;
-  }
-
-  private displayChannelData_(data: ChannelInfo[]): void {
-    if (!data || data.length === 0) {
-      errorManagerInstance.warn(t7e('plugins.TransponderChannelData.errorMsgs.NoData' as Parameters<typeof t7e>[0]));
-
-      return;
-    }
-
-    this.dataCache_ = data;
-    const tbl = getEl('TransponderChannelData-table', true) as HTMLTableElement;
+    const tbl = getEl('TransponderChannelData-table', true) as HTMLTableElement | null;
 
     if (!tbl) {
       return;
@@ -279,46 +382,96 @@ export class TransponderChannelData extends KeepTrackPlugin {
 
     tbl.innerHTML = '';
 
-    const header = tbl.createTHead();
-    const headerRow = header.insertRow();
+    if (this.rawData_.length === 0) {
+      this.showStatus_('empty');
 
-    Object.keys(data[0]).forEach((key) => {
-      const th = document.createElement('th');
-      const headerKeys: Record<string, string> = {
-        satellite: 'satellite',
-        tvchannel: 'tvchannel',
-        beam: 'beam',
-        freq: 'freq',
-        system: 'system',
-        SRFEC: 'SRFEC',
-        video: 'video',
-        lang: 'lang',
-        encryption: 'encryption',
-      };
+      return;
+    }
 
-      th.textContent = headerKeys[key]
-        ? t7e(`plugins.TransponderChannelData.table.${headerKeys[key]}` as Parameters<typeof t7e>[0])
-        : key.charAt(0).toUpperCase() + key.slice(1);
-      th.style.textAlign = 'left';
-      headerRow.appendChild(th);
-    });
+    if (rows.length === 0) {
+      this.showStatus_('noMatch');
 
-    data.forEach((info) => {
+      return;
+    }
+
+    this.hideStatus_();
+
+    this.buildHeader_(tbl);
+
+    rows.forEach((info) => {
       const row = tbl.insertRow();
 
-      Object.values(info).forEach((val) => {
+      CHANNEL_COLUMNS.forEach((col) => {
         const cell = row.insertCell();
 
-        cell.textContent = val;
+        cell.textContent = (info[col.key] ?? '').toString();
       });
     });
   }
 
-  private exportData_(): void {
+  private buildHeader_(tbl: HTMLTableElement): void {
+    const header = tbl.createTHead();
+    const headerRow = header.insertRow();
+
+    CHANNEL_COLUMNS.forEach((col) => {
+      const th = document.createElement('th');
+
+      th.textContent = t7e(`plugins.TransponderChannelData.table.${col.localeKey}` as Parameters<typeof t7e>[0]);
+      th.dataset.sortKey = col.key;
+      th.classList.add('tcd-sortable');
+
+      if (this.sortKey_ === col.key) {
+        th.classList.add(this.sortDir_ === 'asc' ? 'tcd-sort-asc' : 'tcd-sort-desc');
+      }
+
+      headerRow.appendChild(th);
+    });
+  }
+
+  private showStatus_(kind: StatusKind): void {
+    const statusEl = getEl('TransponderChannelData-status', true);
+    const tbl = getEl('TransponderChannelData-table', true);
+
+    if (!statusEl) {
+      return;
+    }
+
+    const keyByKind: Record<StatusKind, string> = {
+      loading: 'statusLoading',
+      empty: 'statusEmpty',
+      noMatch: 'statusNoMatch',
+      error: 'statusError',
+    };
+
+    statusEl.textContent = t7e(`plugins.TransponderChannelData.labels.${keyByKind[kind]}` as Parameters<typeof t7e>[0]);
+    statusEl.style.display = 'block';
+
+    if (tbl) {
+      tbl.innerHTML = '';
+    }
+  }
+
+  private hideStatus_(): void {
+    const statusEl = getEl('TransponderChannelData-status', true);
+
+    if (statusEl) {
+      statusEl.style.display = 'none';
+    }
+  }
+
+  private exportData_(format: 'csv' | 'xlsx'): void {
     if (this.dataCache_.length === 0) {
       return;
     }
 
-    saveXlsx(this.dataCache_.map((info) => ({ ...info })), 'channel-info');
+    const rows = buildExportRows(this.dataCache_);
+
+    if (format === 'csv') {
+      saveCsv(rows, 'channel-info');
+    } else {
+      saveXlsx(rows, 'channel-info').catch((e) =>
+        errorManagerInstance.error(e, 'TransponderChannelData', 'Error saving xlsx!'),
+      );
+    }
   }
 }

@@ -322,15 +322,15 @@ body.drawer-mode {
       transform var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
-  .drawer-item:hover {
+  .drawer-item:not(.disabled):hover {
     background: rgba(255, 255, 255, 0.08);
   }
 
-  .drawer-item:active {
+  .drawer-item:not(.disabled):active {
     background: rgba(255, 255, 255, 0.12);
   }
 
-  .drawer-item:active .drawer-item-icon {
+  .drawer-item:not(.disabled):active .drawer-item-icon {
     filter: hue-rotate(275deg) brightness(1.2);
   }
 
@@ -374,9 +374,15 @@ body.drawer-mode {
     color: var(--color-dark-text-accent);
   }
 
+  /*
+   * Stay clickable (and hoverable) even when disabled: a click forwards to the
+   * plugin so it can toast *why* it is unavailable, and the not-allowed cursor
+   * signals it is not a normal action. (pointer-events: none would swallow the
+   * click and the hint with it.)
+   */
   .drawer-item.disabled {
     opacity: 0.35;
-    pointer-events: none;
+    cursor: not-allowed;
   }
 
   .drawer-item.disabled .drawer-item-icon {
@@ -416,12 +422,13 @@ body.drawer-mode {
 
   /* Pro-locked items — match bottom menu yellow tint, only while logged out.
      `&` is the enclosing body.drawer-mode, so this gates on the body-level
-     .user-logged-in class without a (never-matching) nested body descendant. */
-  &:not(.user-logged-in) .drawer-item.bmenu-item-pro .drawer-item-icon {
+     .user-logged-in class without a (never-matching) nested body descendant.
+     .login-gate-bypassed is the Konami-code bypass, which clears the tint too. */
+  &:not(.user-logged-in):not(.login-gate-bypassed) .drawer-item.bmenu-item-pro .drawer-item-icon {
     filter: hue-rotate(227deg) brightness(1.2);
   }
 
-  &:not(.user-logged-in) .drawer-item.bmenu-item-pro:hover .drawer-item-icon {
+  &:not(.user-logged-in):not(.login-gate-bypassed) .drawer-item.bmenu-item-pro:hover .drawer-item-icon {
     filter: hue-rotate(227deg) brightness(1.8);
   }
 
@@ -755,7 +762,7 @@ body.drawer-mode {
 body.drawer-mode:not(.is-mobile-mode) {
 
   .plugin-drawer.desktop-mode {
-    width: 360px;
+    width: 420px;
     top: var(--top-menu-height);
     height: calc(100% - var(--top-menu-height));
   }
@@ -790,12 +797,12 @@ body.drawer-mode:not(.is-mobile-mode) {
   /* Always-open search bar on desktop */
   #search-holder {
     display: flex !important;
-    width: 360px !important;
+    width: 420px !important;
     transition: none !important;
   }
 
   #search-holder.search-slide-up {
-    width: 360px !important;
+    width: 420px !important;
     border-left: 5px solid var(--color-dark-border);
 
   }
@@ -997,12 +1004,12 @@ body.drawer-mode:not(.is-mobile-mode) {
 
   /* Rail mode hover expansion — triggered by JS class on .drawer-inner hover */
   .plugin-drawer.rail-mode.rail-hover {
-    width: 360px;
+    width: 420px;
     box-shadow: 4px 0 16px rgba(0, 0, 0, 0.3);
   }
 
   .plugin-drawer.rail-mode.rail-hover .drawer-inner {
-    min-width: 360px;
+    min-width: 420px;
   }
 
   .plugin-drawer.rail-mode.rail-hover .drawer-search {

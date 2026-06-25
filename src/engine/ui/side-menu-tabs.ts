@@ -1,3 +1,4 @@
+import { Tabs } from '@materializecss/materialize';
 import { html } from '../utils/development/formatter';
 
 /**
@@ -62,7 +63,32 @@ export function initSideMenuTabs(tabsId: string): void {
   const tabsEl = document.querySelector(`#${tabsId}`);
 
   if (tabsEl) {
-    (window.M as unknown as { Tabs: { init: (el: Element) => void } }).Tabs.init(tabsEl);
+    Tabs.init(tabsEl as HTMLElement);
+
+    /*
+     * Materialize positions the active-tab indicator with absolute pixel
+     * offsets, so a drag-resize of the side menu stretches it. Recompute the
+     * indicator whenever the tab bar's size changes.
+     */
+    if (typeof ResizeObserver !== 'undefined') {
+      const resizeObserver = new ResizeObserver(() => {
+        Tabs.getInstance(tabsEl as HTMLElement)?.updateTabIndicator();
+      });
+
+      resizeObserver.observe(tabsEl);
+    }
+
+    /*
+     * Materialize v2 bug: Tabs._handleTabClick walks parentElement until it finds
+     * a `.tab` li and dereferences `tab.classList` without a null check, so a click
+     * on the tab bar's whitespace (outside any li) throws. Swallow those clicks in
+     * the capture phase on the parent before they reach the Tabs listener.
+     */
+    tabsEl.parentElement?.addEventListener('click', (e) => {
+      if (e.target instanceof Element && e.target.closest('ul.tabs') && !e.target.closest('li.tab')) {
+        e.stopPropagation();
+      }
+    }, true);
   }
 }
 
@@ -78,11 +104,7 @@ export function updateSideMenuTabIndicator(tabsId: string): void {
     const tabsEl = document.querySelector(`#${tabsId}`);
 
     if (tabsEl) {
-      const tabsInstance = (window.M as unknown as {
-        Tabs: {
-          getInstance: (el: Element) => { updateTabIndicator: () => void } | null;
-        };
-      }).Tabs.getInstance(tabsEl);
+      const tabsInstance = Tabs.getInstance(tabsEl as HTMLElement);
 
       if (tabsInstance) {
         tabsInstance.updateTabIndicator();
@@ -104,11 +126,7 @@ export function selectSideMenuTab(tabsId: string, tabPanelId: string): void {
     return;
   }
 
-  const tabsInstance = (window.M as unknown as {
-    Tabs: {
-      getInstance: (el: Element) => { select: (id: string) => void } | null;
-    };
-  }).Tabs.getInstance(tabsEl);
+  const tabsInstance = Tabs.getInstance(tabsEl as HTMLElement);
 
   if (tabsInstance) {
     tabsInstance.select(tabPanelId);

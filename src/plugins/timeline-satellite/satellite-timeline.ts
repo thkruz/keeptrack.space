@@ -9,8 +9,10 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { shake } from '@app/engine/utils/shake';
+import { t7e } from '@app/locales/keys';
 import { BaseObject, Degrees, Hours, Kilometers, MILLISECONDS_PER_SECOND, Satellite, SatelliteRecord, Seconds } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -45,6 +47,39 @@ export class SatelliteTimeline extends KeepTrackPlugin {
 
   menuMode: MenuMode[] = [MenuMode.DISPLAY, MenuMode.ALL];
 
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: t7e('plugins.SatelliteTimeline.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.SatelliteTimeline.help.overview'),
+          image: {
+            src: 'img/help/timeline-satellite/timeline-satellite-menu.png',
+            alt: t7e('plugins.SatelliteTimeline.help.imgAlt'),
+            caption: t7e('plugins.SatelliteTimeline.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.SatelliteTimeline.help.readingHeading'),
+          content: t7e('plugins.SatelliteTimeline.help.reading'),
+        },
+        {
+          heading: t7e('plugins.SatelliteTimeline.help.settingsHeading'),
+          content: t7e('plugins.SatelliteTimeline.help.settings'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.SatelliteTimeline.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.SatelliteTimeline.help.tip1'),
+        t7e('plugins.SatelliteTimeline.help.tip2'),
+      ],
+    };
+  }
+
   bottomIconImg = viewTimelinePng;
   bottomIconCallback: () => void = () => {
     if (!this.verifySensorSelected()) {
@@ -52,7 +87,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     }
 
     if (PluginRegistry.getPlugin(WatchlistPlugin)?.watchlistList.length === 0 && PluginRegistry.getPlugin(SelectSatManager)?.selectedSat === -1) {
-      ServiceLocator.getUiManager().toast('Add Satellites to List or Select a Satellite', ToastMsgType.caution);
+      ServiceLocator.getUiManager().toast(t7e('plugins.SatelliteTimeline.errorMsgs.addSatellitesOrSelect'), ToastMsgType.caution);
       shake(getEl(this.bottomIconElementName));
 
       return;
@@ -77,7 +112,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
         <input id="satellite-timeline-setting-total-length" value="${this.lengthOfLookAngles_.toString()}" type="text"
           style="text-align: center;"
         />
-        <label for="satellite-timeline-setting-total-length" class="active">Calculation Length (Hours)</label>
+        <label for="satellite-timeline-setting-total-length" class="active">${t7e('plugins.SatelliteTimeline.labels.calculationLength')}</label>
       </div>
     </div>
     <div class="row">
@@ -85,7 +120,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
         <input id="satellite-timeline-setting-interval" value="${this.angleCalculationInterval_.toString()}" type="text"
           style="text-align: center;"
         />
-        <label for="satellite-timeline-setting-interval" class="active">Calculation Interval (Seconds)</label>
+        <label for="satellite-timeline-setting-interval" class="active">${t7e('plugins.SatelliteTimeline.labels.calculationInterval')}</label>
       </div>
     </div>
     <div class="row">
@@ -93,7 +128,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
         <input id="satellite-timeline-setting-bad-length" value="${this.lengthOfBadPass_.toString()}" type="text"
           style="text-align: center;"
         />
-        <label for="satellite-timeline-setting-bad-length" class="active">Bad Pass Length (Seconds)</label>
+        <label for="satellite-timeline-setting-bad-length" class="active">${t7e('plugins.SatelliteTimeline.labels.badPassLength')}</label>
       </div>
     </div>
     <div class="row">
@@ -101,7 +136,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
         <input id="satellite-timeline-setting-avg-length" value="${this.lengthOfAvgPass_.toString()}" type="text"
           style="text-align: center;"
         />
-        <label for="satellite-timeline-setting-avg-length" class="active">Average Pass Length (Seconds)</label>
+        <label for="satellite-timeline-setting-avg-length" class="active">${t7e('plugins.SatelliteTimeline.labels.avgPassLength')}</label>
       </div>
     </div>`;
   sideMenuSecondaryOptions = {
@@ -455,7 +490,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
 
         const drawEvent = (mouseX: number, mouseY: number): boolean => {
           if (mouseX >= leftOffset && mouseX <= leftOffset + width && mouseY >= y - 10 && mouseY <= y + 10) {
-            const text = `${satellitePass.satellite.sccNum}: No Passes`;
+            const text = `${satellitePass.satellite.sccNum}: ${t7e('plugins.SatelliteTimeline.msgs.noPasses')}`;
 
             this.ctx_.font = '14px Consolas';
 

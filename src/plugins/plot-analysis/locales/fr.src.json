@@ -3,25 +3,95 @@
     "Inc2AltPlots": {
       "bottomIconLabel": "Trace Inc vs Alt",
       "title": "Menu Inclinaison vs Altitude",
-      "helpBody": "Le menu Inclinaison vs Altitude permet de tracer l'inclinaison du satellite en fonction de son altitude.",
       "labels": {
         "totalLeoPayloads": "Total des charges utiles LEO"
+      },
+      "help": {
+        "overview": "La trace Inclinaison vs Altitude cartographie la population LEO : chaque charge utile est tracée selon son inclinaison en fonction de son altitude. Les constellations apparaissent comme des grappes serrées (coquilles Starlink, plans OneWeb), et les bandes d'altitude encombrées ressortent immédiatement.",
+        "imgAlt": "Nuage de points des charges utiles LEO par inclinaison et altitude",
+        "imgCaption": "Les constellations se regroupent en grappes visibles par inclinaison et altitude.",
+        "howToUse": "<ol><li>Ouvrez la <strong>Trace Inc vs Alt</strong> depuis la barre inférieure (mode Analyse).</li><li>La trace se calcule automatiquement ; survolez les points pour afficher les noms des satellites et cliquez sur un point pour sélectionner ce satellite.</li><li>Utilisez la légende pour masquer ou afficher les constellations et les pays.</li></ol>",
+        "tip1": "Cliquez sur une entrée de la légende pour basculer tout un groupe ; isoler une constellation rend la structure de ses coquilles évidente.",
+        "tip2": "La trace échantillonne le catalogue à l'instant courant ; rouvrez le menu pour l'actualiser après des modifications du catalogue."
       }
     },
     "Inc2LonPlots": {
       "bottomIconLabel": "Trace Inc vs Lon",
       "title": "Menu Inclinaison vs Longitude",
-      "helpBody": "Le menu Inc vs Lon permet de tracer l'inclinaison en fonction de la longitude dans la ceinture GEO.",
       "labels": {
         "totalGeoPayloads": "Total des charges utiles GEO"
+      },
+      "help": {
+        "overview": "La trace Inclinaison vs Longitude passe en revue la ceinture GEO : chaque charge utile géostationnaire est tracée selon sa position en longitude en fonction de son inclinaison. Les satellites à faible inclinaison sont activement maintenus à poste ; ceux à inclinaison plus élevée dérivent ou ont été retirés sur des orbites inclinées.",
+        "imgAlt": "Nuage de points des charges utiles GEO par longitude et inclinaison",
+        "imgCaption": "Chaque point est une charge utile GEO à sa position en longitude ; la hauteur indique l'inclinaison.",
+        "howToUse": "<ol><li>Ouvrez la <strong>Trace Inc vs Lon</strong> depuis la barre inférieure ou appuyez sur <strong>G</strong>.</li><li>La ceinture s'affiche automatiquement ; survolez les points pour voir les noms et cliquez pour sélectionner un satellite.</li><li>Utilisez la légende pour filtrer par pays opérateur.</li></ol>",
+        "tip1": "Une pile verticale de points à une même longitude est une grappe de satellites co-localisés partageant une position.",
+        "tip2": "Les satellites au-delà d'environ 7 degrés d'inclinaison sont généralement en orbite cimetière ou en stockage incliné ; la ceinture active reste proche de zéro.",
+        "shortcutToggle": "Basculer la trace Inc vs Lon"
       }
     },
     "Time2LonPlots": {
       "bottomIconLabel": "Graphique en Cascade",
       "title": "Menu Graphique en Cascade",
-      "helpBody": "Le graphique Temps-Longitude (Cascade) affiche la dérive en longitude des satellites GEO au fil du temps.",
       "labels": {
-        "totalGeoPayloads": "Total des charges utiles GEO"
+        "statistics": "Statistiques",
+        "objectsShown": "Objets affichés",
+        "unitMin": "min"
+      },
+      "chart": {
+        "title": "Graphique Temps vs Longitude (Cascade)",
+        "xAxis": "Longitude (°)",
+        "yAxis": "Temps écoulé (min)",
+        "tooltipCountry": "Pays",
+        "tooltipLongitude": "Longitude",
+        "tooltipTime": "Temps écoulé",
+        "loading": "Calcul des données orbitales...",
+        "empty": "Aucun objet ne correspond aux filtres actuels"
+      },
+      "help": {
+        "overview": "Le graphique en Cascade suit la longitude GEO au fil du temps : chaque ligne représente la longitude d'un satellite qui dérive (ou se maintient) sur la fenêtre tracée. Les satellites maintenus à poste dessinent des lignes verticales ; ceux qui dérivent s'inclinent ; les relocalisations apparaissent comme de larges courbes.",
+        "imgAlt": "Graphique en cascade de la longitude des satellites GEO au fil du temps",
+        "imgCaption": "Les lignes verticales sont des satellites maintenus à poste ; les lignes inclinées dérivent.",
+        "howToUse": "<ol><li>Ouvrez le <strong>Graphique en Cascade</strong> depuis la barre inférieure (mode Analyse).</li><li>Le graphique calcule automatiquement une journée d'historique de longitude ; survolez les lignes pour voir les noms et cliquez pour sélectionner.</li><li>Utilisez la légende pour filtrer par pays ou opérateur.</li></ol>",
+        "tip1": "Une ligne qui passe d'inclinée à verticale est un satellite qui vient de terminer une relocalisation et a repris son maintien à poste.",
+        "tip2": "Le calcul couvre toute la ceinture GEO et s'exécute par morceaux ; accordez-lui quelques secondes sur les machines plus lentes."
+      }
+    },
+    "Lat2LonPlots": {
+      "bottomIconLabel": "Trace Lat vs Lon",
+      "title": "Menu Latitude vs Longitude",
+      "help": {
+        "overview": "La trace Latitude vs Longitude est un instantané à plat de la position actuelle des satellites au-dessus de la Terre, tracée en positions au sol. Elle se lit comme une carte sans la carte : utile pour repérer les trous de couverture et la géométrie des traces en huit des satellites inclinés de la ceinture GEO.",
+        "howToUse": "<ol><li>Ouvrez la <strong>Trace Lat vs Lon</strong> depuis la barre inférieure (mode Analyse).</li><li>La trace s'affiche automatiquement ; survolez les points pour voir les noms et cliquez pour sélectionner un satellite.</li></ol>",
+        "tip1": "Les satellites GEO inclinés décrivent des excursions nord-sud à longitude fixe, qui apparaissent dans cette vue comme des étalements verticaux."
+      }
+    },
+    "EciPlot": {
+      "bottomIconLabel": "Trace ECI",
+      "title": "Menu Trace ECI",
+      "help": {
+        "overview": "La trace ECI dessine l'orbite du satellite sélectionné sous forme de courbe 3D dans le repère inertiel centré sur la Terre (ECI) : le repère fixe par rapport aux étoiles, où les orbites sont des ellipses nettes. Si un satellite secondaire est sélectionné, les deux orbites sont tracées ensemble pour comparaison.",
+        "howToUse": "<ol><li>Sélectionnez un satellite ; l'icône du bas est désactivée tant qu'aucun n'est sélectionné.</li><li>Ouvrez la <strong>Trace ECI</strong> depuis la barre inférieure (mode Analyse).</li><li>Faites glisser pour faire pivoter la vue 3D et utilisez la molette pour zoomer ; survolez la courbe pour afficher les valeurs de position.</li></ol>",
+        "tip1": "Sélectionnez d'abord un satellite secondaire (clic droit, ou les touches [ et ]) pour superposer deux orbites et comparer leur géométrie."
+      }
+    },
+    "EcfPlot": {
+      "bottomIconLabel": "Trace ECF",
+      "title": "Menu Trace ECF",
+      "help": {
+        "overview": "La trace ECF dessine la trajectoire du satellite sélectionné dans le repère terrestre fixe centré sur la Terre (ECF), qui tourne avec la planète. Les satellites géosynchrones se réduisent à de petites boucles, et les orbites à trace au sol répétitive se referment sur elles-mêmes, ce qui en fait le repère idéal pour étudier le comportement relatif à la Terre.",
+        "howToUse": "<ol><li>Sélectionnez un satellite ; l'icône du bas est désactivée tant qu'aucun n'est sélectionné.</li><li>Ouvrez la <strong>Trace ECF</strong> depuis la barre inférieure (mode Analyse).</li><li>Faites glisser pour faire pivoter la vue 3D et utilisez la molette pour zoomer ; survolez la courbe pour afficher les valeurs de position.</li></ol>",
+        "tip1": "Le petit huit serré d'un satellite GEO en ECF correspond à son cycle quotidien d'inclinaison et d'excentricité ; plus la boucle est serrée, meilleur est le maintien à poste."
+      }
+    },
+    "RicPlot": {
+      "bottomIconLabel": "Trace RIC",
+      "title": "Menu Trace RIC",
+      "help": {
+        "overview": "La trace RIC montre le mouvement relatif entre deux satellites dans le repère radial, le long de la trace et transverse (RIC), centré sur le satellite principal. C'est la vue standard pour les rendez-vous, le vol en formation et l'analyse des approches rapprochées : la trajectoire du satellite secondaire est dessinée telle qu'elle est vue depuis le principal.",
+        "howToUse": "<ol><li>Sélectionnez un satellite principal, puis un satellite secondaire (clic droit sur un satellite, ou les touches [ et ]).</li><li>Ouvrez la <strong>Trace RIC</strong> depuis la barre inférieure (mode Analyse).</li><li>Faites glisser pour faire pivoter la vue 3D ; l'origine est le satellite principal, et la courbe est la trajectoire relative du secondaire.</li></ol>",
+        "tip1": "Un satellite principal et un satellite secondaire doivent tous deux être sélectionnés, sinon la trace n'a rien à comparer ; choisissez des objets sur des orbites similaires pour une échelle lisible."
       }
     }
   }

@@ -1,9 +1,0 @@
-{
-  "plugins": {
-    "NextLaunchesPlugin": {
-      "bottomIconLabel": "下次发射",
-      "title": "下次发射菜单",
-      "helpBody": "下次发射菜单从<a href=\"https://thespacedevs.com/\" target=\"_blank\">The Space Devs</a>获取即将进行的发射信息。"
-    }
-  }
-}

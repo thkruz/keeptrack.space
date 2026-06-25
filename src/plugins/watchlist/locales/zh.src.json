@@ -3,16 +3,48 @@
     "WatchlistPlugin": {
       "bottomIconLabel": "监视列表",
       "title": "监视列表",
-      "helpBody": "监视列表菜单允许您创建优先跟踪的卫星列表，便于快速检索感兴趣的卫星。该列表保存在浏览器本地存储，下次访问网站时仍可用。<br><br>当监视列表中的卫星进入所选传感器视场时，会显示通知，从传感器到卫星会绘制一条连线，并在地球上显示卫星编号。<br><br>叠加功能依赖于监视列表已被填充。"
-,
+      "help": {
+        "overview": "监视列表是您优先跟踪的卫星列表。它保存在浏览器中，因此页面重新加载后仍然保留。当选中传感器且监视列表中的卫星进入其视场时，您会收到通知，从传感器到卫星会绘制一条连线，并在地球上显示卫星编号。",
+        "imgAlt": "已添加多颗卫星的监视列表菜单",
+        "imgCaption": "包含多颗卫星的监视列表。点击名称可选中卫星；书签图标可将其移除。",
+        "managingHeading": "管理列表",
+        "managing": "<ul><li><strong>添加</strong>：输入一个或多个以逗号或空格分隔的NORAD编号（也支持T0001这类alpha-5 ID），然后点击添加图标或按Enter键。</li><li><strong>快速添加/移除</strong>：在地球上选中任意卫星后，点击信息框中其名称旁边的书签图标。</li><li><strong>选择</strong>：点击列表中卫星的编号或名称即可飞至该卫星。</li><li><strong>保存 / 加载</strong>：将列表导出为JSON文件，之后可加载或分享。</li><li><strong>清空</strong>：清空整个列表。</li></ul>",
+        "howToUse": "<ol><li>从底部栏打开菜单，或按W键。</li><li>按NORAD编号添加卫星，例如ISS为25544。</li><li>在传感器菜单中选择一个传感器，即可开始接收进入视场的通知以及传感器到卫星的连线。</li><li>打开二级菜单（齿轮图标），可隐藏所有非监视列表对象，或更改标签的绘制时机（始终 / 仅FOV / 关闭）。</li></ol>",
+        "tip1": "\"隐藏其他对象\"会将地球变为仅显示监视列表的视图，非常适合在没有完整目录干扰的情况下跟踪少量对象。",
+        "tip2": "叠加菜单（监视列表中每颗卫星的下次通过时间）仅在监视列表有条目时才有效。",
+        "tip3": "重复项会被自动忽略，无效编号会弹出提示，说明未找到的卫星。",
+        "shortcutToggle": "切换监视列表菜单"
+      },
+      "labels": {
+        "newSatellites": "新卫星",
+        "saveList": "保存列表",
+        "loadList": "加载列表",
+        "clearList": "清空列表",
+        "hideOtherObjects": "隐藏其他对象",
+        "labelAlways": "始终",
+        "labelFovOnly": "仅FOV",
+        "labelOff": "关闭",
+        "satellitesHeader": "卫星",
+        "actionsHeader": "操作",
+        "displayHeader": "显示",
+        "labelsHeader": "标签"
+      },
+      "msgs": {
+        "watchlistLoaded": "监视列表已加载 {count} 颗卫星"
+      },
+      "errorMsgs": {
+        "NoradAlreadyInList": "NORAD: {sccNum} 已在列表中！",
+        "ObjectAlreadyInList": "对象 {id} 已在列表中！",
+        "SatNotFound": "未找到卫星 {id}！"
+      },
       "settings": {
         "satLabelMode": {
-          "label": "Satellite Label Mode",
-          "helpText": "Controls satellite label rendering on watchlist satellites.",
+          "label": "卫星标签模式",
+          "helpText": "控制监视列表卫星的标签渲染方式。",
           "options": {
-            "off": "Off",
-            "fovOnly": "FOV Only",
-            "all": "All Watchlist"
+            "off": "关闭",
+            "fovOnly": "仅FOV",
+            "all": "全部监视列表"
           }
         }
       }
@@ -20,7 +52,20 @@
     "WatchlistOverlay": {
       "bottomIconLabel": "叠加",
       "title": "叠加菜单",
-      "helpBody": "<p>监视列表叠加显示监视列表中卫星的下次通过时间，每10秒更新一次。</p><p>叠加颜色表示距离下次通过的时间：</p><ul><li>黄色 - 可见中</li><li>蓝色 - 距当前时间30分钟内或提前10分钟的通过</li><li>白色 - 其他未来通过</li></ul><p>点击叠加中的卫星会将地图中心定位到该卫星。</p>"
+      "helpBody": "<p>监视列表叠加显示监视列表中卫星的下次通过时间，每10秒更新一次。</p><p>叠加颜色表示距离下次通过的时间：</p><ul><li>黄色 - 可见中</li><li>蓝色 - 距当前时间30分钟内或提前10分钟的通过</li><li>白色 - 其他未来通过</li></ul><p>点击叠加中的卫星会将地图中心定位到该卫星。</p>",
+      "openOverlayCmd": "打开 Watchlist 叠加层",
+      "addSatellitesToast": "请先将卫星添加到列表中！",
+      "noPassesMsg": "60 分钟内无过境",
+      "inFovToast": "卫星 {sccNum} 已进入视野！",
+      "leftFovToast": "卫星 {sccNum} 已离开视野！",
+      "tiers": {
+        "inView": "可见",
+        "nextUp": "即将",
+        "upcoming": "未来",
+        "later": "稍后",
+        "background": "后台",
+        "departed": "已离开"
+      }
     }
   }
 }

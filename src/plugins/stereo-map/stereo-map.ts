@@ -52,6 +52,7 @@ import satellite2 from '@public/img/satellite-2.png';
 import yellowSquare from '@public/img/yellow-square.png';
 
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { Classification } from '@app/app/ui/classification';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -175,8 +176,32 @@ export class StereoMap extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.StereoMap.title' as Parameters<typeof t7e>[0]) ?? 'Stereographic Map Menu',
-      body: t7e('plugins.StereoMap.helpBody' as Parameters<typeof t7e>[0]) ?? '',
+      title: t7e('plugins.StereoMap.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.StereoMap.help.overview'),
+          image: {
+            src: 'img/help/stereo-map/stereo-map-menu.png',
+            alt: t7e('plugins.StereoMap.help.imgAlt'),
+            caption: t7e('plugins.StereoMap.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.StereoMap.help.readingTheMapHeading'),
+          content: t7e('plugins.StereoMap.help.readingTheMap'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.StereoMap.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.StereoMap.help.tip1'),
+        t7e('plugins.StereoMap.help.tip2'),
+        t7e('plugins.StereoMap.help.tip3'),
+      ],
+      shortcuts: [{ keys: ['M'], description: t7e('plugins.StereoMap.help.shortcutToggle') }],
     };
   }
 
@@ -193,14 +218,14 @@ export class StereoMap extends KeepTrackPlugin {
     return [
       {
         id: 'StereoMap.toggle',
-        label: 'Toggle Stereo Map',
+        label: t7e('plugins.StereoMap.commands.toggle' as Parameters<typeof t7e>[0]),
         category: 'Display',
         shortcutHint: 'M',
         callback: () => this.bottomMenuClicked(),
       },
       {
         id: 'StereoMap.export',
-        label: 'Export Stereo Map',
+        label: t7e('plugins.StereoMap.commands.export' as Parameters<typeof t7e>[0]),
         category: 'Export',
         callback: () => this.onDownload(),
         isAvailable: () => this.isMenuButtonActive,
@@ -396,6 +421,7 @@ export class StereoMap extends KeepTrackPlugin {
           dotDom.style.left = `${groundTracePoints[i - 1].x - this.halfDotSize_}px`;
           dotDom.style.top = `${groundTracePoints[i - 1].y - this.halfDotSize_}px`;
           dotDom.dataset.time = mapPoints.time;
+          dotDom.dataset.inview = mapPoints.overallView ? 'true' : 'false';
           showEl(`map-look${selectableIdx}`);
         }
 
@@ -498,34 +524,15 @@ export class StereoMap extends KeepTrackPlugin {
       }
     }
 
-    // Draw classification text
-    if (settingsManager.classificationStr !== '') {
+    // Draw classification text. Use the canonical Classification helper, which
+    // matches with startsWith() so classifications carrying caveats (e.g.
+    // "Unclassified//FOUO") resolve to a color instead of throwing.
+    if (Classification.isValidClassification(settingsManager.classificationStr)) {
       ctx.font = '24px nasalization';
-      const textWidth = ctx.measureText(settingsManager.classificationStr ?? '').width;
+      const textWidth = ctx.measureText(settingsManager.classificationStr).width;
 
       ctx.globalAlpha = 1.0;
-      switch (settingsManager.classificationStr) {
-        case 'Top Secret//SCI':
-          ctx.fillStyle = '#fce93a';
-          break;
-        case 'Top Secret':
-          ctx.fillStyle = '#ff8c00';
-          break;
-        case 'Secret':
-          ctx.fillStyle = '#ff0000';
-          break;
-        case 'Confidential':
-          ctx.fillStyle = '#0033a0';
-          break;
-        case 'CUI':
-          ctx.fillStyle = '#512b85';
-          break;
-        case 'Unclassified':
-          ctx.fillStyle = '#007a33';
-          break;
-        default:
-          throw new Error('Invalid classification');
-      }
+      ctx.fillStyle = Classification.getColors(settingsManager.classificationStr).backgroundColor;
       ctx.fillText(settingsManager.classificationStr, cw / 2 - textWidth, ch - 20);
       ctx.fillText(settingsManager.classificationStr, cw / 2 - textWidth, 34);
     }

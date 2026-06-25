@@ -3,13 +3,55 @@
     "Breakup": {
       "bottomIconLabel": "Vytvořit rozpad",
       "title": "Menu rozpadu",
-      "helpBody": "Menu rozpadu je nástroj pro simulaci rozpadu satelitu. <br><br> Duplikováním a úpravou dráhy satelitu můžeme modelovat rozpad satelitu. Po výběru satelitu a otevření menu může uživatel nastavit: <ul style=\"margin-left: 40px;\"> <li>Variaci inklinace</li> <li>Variaci RAAN</li> <li>Variaci periody</li> <li>Počet úlomků rozpadu</li> </ul> Čím větší variace, tím větší rozptyl v simulovaném rozpadu. Výchozí variace jsou dostatečné pro simulaci rozpadu s přiměřeným rozptylem.",
+      "sideMenuTitle": "Simulátor rozpadu",
+      "labels": {
+        "satelliteScc": "SCC# satelitu",
+        "initialSatelliteNumber": "Počáteční číslo satelitu",
+        "pieces": "Počet úlomků",
+        "sourceSection": "Zdroj",
+        "catalogSlotsSection": "Katalogové sloty",
+        "dispersionSection": "Rozptyl rychlosti",
+        "eventTypeLabel": "Typ události",
+        "preset_explosion": "Exploze",
+        "preset_collision": "Katastrofická srážka",
+        "preset_asat_cosmos": "Protisatelitní zbraň, Cosmos 1408 (nižší energie)",
+        "preset_asat_fy1c": "Protisatelitní zbraň, Fengyun-1C (vyšší energie)",
+        "preset_venting": "Nízkoenergetické / únik plynu",
+        "preset_custom": "Vlastní",
+        "radialDeltaV": "Radiální (m/s)",
+        "inTrackDeltaV": "Podél dráhy (m/s)",
+        "crossTrackDeltaV": "Napříč dráhou (m/s)",
+        "dispersionHint": "Náhodná změna rychlosti aplikovaná na každý úlomek (1 sigma). Složka podél dráhy protahuje oblak podél dráhy; složka napříč dráhou jej rozevírá do vějíře napříč rovinou dráhy; radiální složka jej zvedá a snižuje. Typické události: exploze asi 10 až 100 m/s, srážky asi 100 až 300 m/s.",
+        "piecesSection": "Počet"
+      },
+      "buttons": {
+        "createBreakup": "Vytvořit rozpad",
+        "clearBreakup": "Vymazat rozpad"
+      },
+      "commands": {
+        "create": "Vytvořit rozpad",
+        "clear": "Vymazat rozpad"
+      },
+      "toasts": {
+        "cleared": "Rozpad vymazán. Úlomky odstraněny.",
+        "fragmentsReentered": "{count} úlomků vstoupilo do atmosféry a nebylo vytvořeno."
+      },
+      "help": {
+        "overview": "Menu rozpadu simuluje rozpad satelitu v jeho aktuální poloze. Vytváří úlomky z přesné polohy vybraného satelitu, z nichž každý odlétá s malou náhodnou změnou rychlosti (delta-V), takže můžete sledovat, jak se oblak úlomků v čase tvoří a rozptyluje. Protože pracuje ze stavového vektoru satelitu, podporuje libovolný dráhový režim.",
+        "imgAlt": "Menu rozpadu s ovládacími prvky rozptylu delta-V a počtu úlomků",
+        "imgCaption": "Parametry rozpadu. Větší hodnoty delta-V rozptýlí simulovaný oblak úlomků šířeji.",
+        "parametersHeading": "Parametry",
+        "parameters": "<ul><li><strong>Radiální</strong>: rozptyl rychlosti směrem k Zemi a od ní (m/s), který zvedá a snižuje úlomky.</li><li><strong>Podél dráhy</strong>: rozptyl rychlosti ve směru pohybu (m/s), který protahuje oblak podél dráhy.</li><li><strong>Napříč dráhou</strong>: rozptyl rychlosti mimo rovinu dráhy (m/s), který rozevírá oblak do vějíře napříč rovinou.</li><li><strong>Počet úlomků</strong>: kolik úlomků vytvořit (5 až 1000).</li><li><strong>Počáteční číslo satelitu</strong>: první analytické katalogové číslo přiřazené úlomkům (výchozí hodnota 90000).</li></ul>Hodnoty se považují za rozptyl jedné sigma na úlomek. Výchozí hodnoty (asi 40 m/s na osu) modelují událost třídy exploze; skutečné úlomky exploze se rozptylují zhruba o 10 až 100 m/s, zatímco katastrofické srážky dosahují zhruba 100 až 300 m/s (malé úlomky mohou překročit 1 km/s). Pro fyzikálně realistickou, sféricky symetrickou událost ponechte všechny tři osy stejné; oblak se časem přirozeně protahuje podél dráhy.",
+        "howToUse": "<ol><li>Vyberte libovolný satelit. Ikona zůstává neaktivní, dokud není vybrán satelit.</li><li>Otevřete menu rozpadu a upravte rozptyl delta-V a počet úlomků.</li><li>Klikněte na <strong>Vytvořit rozpad</strong>. Úlomky se vygenerují v aktuální poloze satelitu a vyhledávací pole se naplní novými úlomky, takže uvidíte celý oblak.</li><li>Zrychlete čas a sledujte, jak se oblak rozptyluje podél dráhy.</li></ol>",
+        "tip1": "Funguje v libovolném dráhovém režimu, včetně LEO, MEO, GEO a silně eliptických (HEO) drah, protože každý úlomek je propagován ze stavového vektoru mateřského satelitu v bodě rozpadu.",
+        "tip2": "Rozpad je pouze simulovaný a existuje jen v paměti. Pomocí Vymazat rozpad odstraníte úlomky, nebo obnovte stránku. Samotný mateřský satelit se nikdy nemění.",
+        "tip3": "Všechny úlomky se vytvoří jako objekty typu úlomek, takže barevná schémata a filtry založené na úlomcích se na ně vztahují okamžitě."
+      },
       "errorMsgs": {
         "SatelliteNotFound": "Satelit nebyl nalezen!",
-        "CannotCreateBreakupForNonCircularOrbits": "Nelze vytvořit rozpad pro nekruhové dráhy. Pracujeme na opravě.",
-        "CannotCalcDirectionOfSatellite": "Nelze vypočítat směr satelitu. Zkuste to znovu později.",
         "ErrorCreatingBreakup": "Chyba při vytváření rozpadu!",
         "InvalidStartNum": "Neplatné počáteční číslo satelitu! Výchozí hodnota 90000!",
+        "InvalidSlotRange": "Počáteční číslo satelitu je mimo rozsah. Použijte {start} až {end}.",
         "BreakupGeneratorFailed": "Generátor rozpadu selhal!"
       }
     }

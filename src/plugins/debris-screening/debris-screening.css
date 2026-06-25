@@ -2,26 +2,49 @@
  * Styling for the Debris Screening Plugin
  */
 
-/* Side Menu Form */
-#debris-screening-menu-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+/* Side Menu Form (v13): keep the long RIC labels readable in the 3-up box row */
+#debris-screening-menu .kt-field-row .input-field > label {
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
 
-  #ds-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
+/*
+ * Stacked-field headroom (same fix as Create Satellite): the shared v13 default
+ * (.kt-field-row .input-field.col { margin-top: 6px }) is too tight when a card
+ * stacks a labelled row under a <select> - the floating label collides with the
+ * row above. Give stacked rows room; the first row in a card only needs the
+ * section-label gap (targeted by adjacency since the label is the first child).
+ */
+#debris-screening-menu .kt-field-row .input-field.col {
+  margin-top: 20px;
+}
+
+#debris-screening-menu .kt-section-label + .kt-field-row .input-field.col {
+  margin-top: 8px;
+}
+
+/*
+ * Align the standalone primary action (Screen for Debris) with the inset cards.
+ * .kt-action is width:100%, so margins alone would push it 12px past the cards;
+ * subtract the margins from the width (border-box) so its edges match the cards.
+ */
+#debris-screening-menu-form > .kt-action {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
 }
 
 
 /* Secondary Menu (Results Panel) */
 .debris-screening-results {
 
-  /* Header row with count and export button */
+  /* Header row: count on the left, export button on the right */
   & .ds-header-row {
-    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
   }
 
   & .ds-results-count {

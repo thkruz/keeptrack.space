@@ -1,0 +1,23 @@
+/*
+ * Satellite Imagery plugin: a flat list of v13 action rows inside section cards
+ * (Geostationary + DSCOVR), plus a standalone Refresh action. The shared v13
+ * system lives in src/engine/ui/menu-v13.css; only the per-menu tweaks needed
+ * for this layout are below.
+ */
+
+/* Tighten the gap above the first row in each list so it sits directly under
+ * the section label (the shared .kt-action top margin would otherwise stack
+ * with the label's bottom margin). */
+#sat-photo-menu #sat-photo-geo-list .kt-action:first-child,
+#sat-photo-menu #sat-photo-dscovr-list .kt-action:first-child {
+  margin-top: 0;
+}
+
+/* The Refresh action is a direct child of the side menu (not nested in a
+ * .kt-section), so it is width:100% and runs 12px past the inset cards.
+ * Subtract the side margins so its edges line up with the cards above. */
+#sat-photo-menu-content > .kt-action {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 8px 6px 12px;
+}

@@ -65,7 +65,7 @@ describe('SatConstellations_composition', () => {
     const config = plugin.getHelpConfig();
 
     expect(config.title).toBeDefined();
-    expect(config.body).toBeDefined();
+    expect(config.sections!.length).toBeGreaterThan(0);
   });
 
   test('getCommandPaletteCommands returns commands for built-in constellations', () => {

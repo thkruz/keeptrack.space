@@ -1,6 +1,8 @@
 {
   "plugins": {
     "DrawLinesPlugin": {
+      "title": "绘制线条",
+      "bottomIconLabel": "绘制线条",
       "rmbMenu": {
         "title": "绘制",
         "eciAxes": "ECI 坐标轴",
@@ -13,12 +15,39 @@
         "earthToSatellite": "地球到卫星",
         "sensorToSatellite": "传感器到卫星",
         "satelliteToSatellite": "卫星到卫星",
+        "satelliteRicAxes": "卫星 RIC 坐标轴",
         "satelliteToSun": "卫星到太阳",
         "satelliteToMoon": "卫星到月球",
         "moonOrbit": "绘制月球轨道"
       },
+      "sections": {
+        "activeLines": "活动线条",
+        "referenceGeometry": "参考几何",
+        "objectLines": "目标线条"
+      },
+      "referenceFrameLabel": "参考坐标系",
+      "clearAll": "清除所有线条",
+      "emptyList": "尚未绘制线条",
+      "remove": "移除",
+      "lineTypes": {
+        "reference": "参考线",
+        "satToRef": "卫星到点",
+        "satRic": "RIC 坐标轴",
+        "objToObj": "目标到目标",
+        "satToSun": "卫星到太阳",
+        "satToBody": "卫星到天体",
+        "sensorToSat": "传感器到卫星",
+        "sensorToSun": "传感器到太阳",
+        "sensorToMoon": "传感器到月球",
+        "orbitPath": "轨道路径",
+        "satScanEarth": "地球扫描",
+        "sensorScanHorizon": "地平线扫描",
+        "sensorToRae": "传感器到点",
+        "generic": "线条"
+      },
       "errorMsgs": {
-        "noPrimarySat": "未选择主卫星用于卫星到卫星连线。"
+        "noPrimarySat": "未选择主卫星用于卫星到卫星连线。",
+        "noSatSelected": "请先选择一颗卫星。"
       }
     }
   }

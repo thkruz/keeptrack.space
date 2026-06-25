@@ -22,6 +22,7 @@ import {
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { t7e } from '@app/locales/keys';
+import { COVARIANCE_RADII_FALLBACK, covarianceDisplayRadii, ricSigmasFromCovarianceMatrix } from '@app/engine/rendering/draw-manager/covariance-radii';
 import { createSampleCovarianceFromTle, Kilometers, LandObject, RADIUS_OF_EARTH, Satellite, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -386,32 +387,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     if (sat.id !== this.lastSelectedSat()) {
       this.selectSatChange_(sat);
       if (sat.id !== -1 && sat instanceof Satellite) {
-        let radii: vec3 = [1200, 1000, 5000];
-
-        try {
-          const covMatrix = createSampleCovarianceFromTle(sat.tle1, sat.tle2).matrix.elements;
-
-          // Cap radii at 1200 km (radial), 1000 km (cross-track), and 5000 km (in-track) to avoid huge bubbles
-          radii = [
-            Math.min(Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, 1200), // Radial
-            Math.min(Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, 1000), // Cross-track
-            Math.min(Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, 5000), // In-track
-          ] as vec3;
-
-          if (!radii[0] || !radii[1] || !radii[2]) {
-            errorManagerInstance.log('SelectSatManager.selectSatObject_: Invalid covariance matrix');
-            radii = [1200, 1000, 5000];
-          }
-        } catch {
-          errorManagerInstance.log('SelectSatManager.selectSatObject_: Failed to compute covariance from TLE');
-        }
-
-        this.primarySatCovMatrix = radii;
-
-        const primaryCovBubble = ServiceLocator.getScene().primaryCovBubble;
-
-        primaryCovBubble.setColor([1, 0, 0, 0.3]);
-        primaryCovBubble.setRadii(ServiceLocator.getRenderer().gl, radii);
+        this.updatePrimaryCovBubble_(sat);
       }
     }
 
@@ -427,6 +403,63 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     this.beginCameraTransition_();
     this.switchToSatCenteredCamera_();
     this.setSelectedSat_(sat.id);
+  }
+
+  /**
+   * Recompute the TLE-derived covariance ellipsoids for the current primary and
+   * secondary selection. Call after a global change (e.g. the confidence level)
+   * so the on-screen bubbles resize without re-selecting. The CovariancePlugin
+   * re-applies measured covariance on top where it has data.
+   */
+  recalculateCovarianceBubbles(): void {
+    if (this.selectedSat !== -1 && this.primarySatObj instanceof Satellite) {
+      this.updatePrimaryCovBubble_(this.primarySatObj);
+    }
+    if (this.secondarySat !== -1 && this.secondarySatObj instanceof Satellite) {
+      this.updateSecondaryCovBubble_(this.secondarySatObj);
+    }
+  }
+
+  private updatePrimaryCovBubble_(sat: Satellite): void {
+    const radii = SelectSatManager.computeTleCovRadii_(sat, 'SelectSatManager.updatePrimaryCovBubble_');
+
+    this.primarySatCovMatrix = radii;
+
+    const primaryCovBubble = ServiceLocator.getScene().primaryCovBubble;
+
+    primaryCovBubble.setColor([1, 0, 0, 0.3]);
+    primaryCovBubble.setRadii(ServiceLocator.getRenderer().gl, radii);
+  }
+
+  private updateSecondaryCovBubble_(sat: Satellite): void {
+    const radii = SelectSatManager.computeTleCovRadii_(sat, 'SelectSatManager.updateSecondaryCovBubble_');
+
+    this.secondarySatCovMatrix = radii;
+
+    const secondaryCovBubble = ServiceLocator.getScene().secondaryCovBubble;
+
+    secondaryCovBubble.setColor([0, 0, 1, 0.4]);
+    secondaryCovBubble.setRadii(ServiceLocator.getRenderer().gl, radii);
+  }
+
+  /** TLE-derived covariance ellipsoid radii, falling back to the capped default on failure. */
+  private static computeTleCovRadii_(sat: Satellite, logContext: string): vec3 {
+    let radii: vec3 = [...COVARIANCE_RADII_FALLBACK] as vec3;
+
+    try {
+      const covMatrix = createSampleCovarianceFromTle(sat.tle1, sat.tle2).matrix.elements;
+      const computed = covarianceDisplayRadii(ricSigmasFromCovarianceMatrix(covMatrix), settingsManager.covarianceConfidenceLevel);
+
+      if (computed && computed[0] && computed[1] && computed[2]) {
+        radii = computed;
+      } else {
+        errorManagerInstance.log(`${logContext}: Invalid covariance matrix`);
+      }
+    } catch {
+      errorManagerInstance.log(`${logContext}: Failed to compute covariance from TLE`);
+    }
+
+    return radii;
   }
 
   private switchToSatCenteredCamera_() {
@@ -507,8 +540,12 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
         Object.values(colorSchemeManagerInstance.colorSchemeInstances)[0].update;
 
       const lastSat = ServiceLocator.getCatalogManager().getObject(lastSelectedObject);
+      // Guard against a stale lastSelectedObject id that now exceeds the color buffer
+      // (e.g. after a catalog reload). Writing past the GPU buffer triggers
+      // "INVALID_VALUE: bufferSubData: buffer overflow".
+      const isLastInColorRange = lastSelectedObject >= 0 && lastSelectedObject < colorSchemeManagerInstance.colorData.length / 4;
 
-      if (lastSat && colorSchemeManagerInstance.colorData) {
+      if (lastSat && colorSchemeManagerInstance.colorData && isLastInColorRange) {
         const newColor = colorSchemeManagerInstance.currentColorScheme.update(lastSat).color;
 
         colorSchemeManagerInstance.colorData[lastSelectedObject * 4] = newColor[0]; // R
@@ -564,26 +601,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       }
 
       if ((this.secondarySatObj?.id ?? -1) !== -1 && this.secondarySatObj instanceof Satellite) {
-        const covMatrix = createSampleCovarianceFromTle(this.secondarySatObj.tle1, this.secondarySatObj.tle2).matrix.elements;
-
-        // Cap radii at 1200 km (radial), 1000 km (cross-track), and 5000 km (in-track) to avoid huge bubbles
-        let radii = [
-          Math.min(Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, 1200), // Radial
-          Math.min(Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, 1000), // Cross-track
-          Math.min(Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, 5000), // In-track
-        ] as vec3;
-
-        if (!radii[0] || !radii[1] || !radii[2]) {
-          errorManagerInstance.log('SelectSatManager.setSecondarySat: Invalid covariance matrix');
-          radii = [1200, 1000, 5000];
-        }
-
-        this.secondarySatCovMatrix = radii;
-
-        const secondaryCovBubble = ServiceLocator.getScene().secondaryCovBubble;
-
-        secondaryCovBubble.setColor([0, 0, 1, 0.4]);
-        secondaryCovBubble.setRadii(ServiceLocator.getRenderer().gl, radii);
+        this.updateSecondaryCovBubble_(this.secondarySatObj);
       }
     }
 

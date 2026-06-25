@@ -3,7 +3,21 @@
     "CountriesMenu": {
       "bottomIconLabel": "Countries",
       "title": "Countries Menu",
-      "helpBody": "The Countries Menu allows you to filter the satellites by country of origin."
+      "commands": {
+        "selectCountry": "Select Country: {country}"
+      },
+      "labels": {
+        "filterByCountry": "Filter by Country"
+      },
+      "help": {
+        "overview": "The Countries menu filters the catalog by country of origin. Every country with at least one object is listed with its flag and an object count; selecting one highlights all of that country's satellites and loads them into the search results.",
+        "imgAlt": "The Countries menu listing countries with flags and satellite counts",
+        "imgCaption": "Each entry shows the flag, country name, and how many objects it owns.",
+        "howToUse": "<ol><li>Open the <strong>Countries</strong> menu from the bottom bar or press <strong>O</strong>.</li><li>Click a country. Its satellites are grouped, highlighted in the 3D view, and listed in the search bar results.</li><li>Click any search result to inspect an individual satellite.</li></ol>",
+        "tip1": "Selecting a country replaces the current search and deselects the current satellite, so finish object level work first.",
+        "tip2": "Each country is also available from the command palette as a Select Country command.",
+        "shortcutToggle": "Toggle the Countries menu"
+      }
     }
   }
 }

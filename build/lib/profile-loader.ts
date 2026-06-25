@@ -86,6 +86,9 @@ export class ProfileLoader {
       if (envVars.IS_PRO) {
         config.isPro = envVars.IS_PRO === 'true';
       }
+      if (envVars.EDITION) {
+        config.edition = envVars.EDITION;
+      }
       if (envVars.PUBLIC_SUPABASE_URL) {
         config.PUBLIC_SUPABASE_URL = envVars.PUBLIC_SUPABASE_URL;
       }

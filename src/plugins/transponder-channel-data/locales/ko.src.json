@@ -3,13 +3,47 @@
     "TransponderChannelData": {
       "bottomIconLabel": "트랜스폰더 및 채널 정보",
       "title": "위성 주파수",
-      "helpBody": "<p>이 플러그인은 정지궤도 TV 위성의 트랜스폰더 및 채널 주파수 정보를 표시합니다. 알려진 채널 데이터가 있는 위성을 선택하고 이 패널을 열어 방송 주파수, 채널, 빔 커버리지 및 암호화 세부 정보를 확인하세요.</p><p>제목 표시줄의 다운로드 버튼을 사용하여 채널 데이터를 CSV 파일로 내보낼 수 있습니다.</p>",
+      "constellationName": "TV 위성",
+      "table": {
+        "satellite": "위성",
+        "tvchannel": "TV 채널",
+        "beam": "빔",
+        "freq": "주파수",
+        "system": "시스템",
+        "SRFEC": "SR/FEC",
+        "video": "비디오",
+        "lang": "언어",
+        "encryption": "암호화"
+      },
       "errorMsgs": {
         "NoChannelInfo": "이 위성에는 채널 정보가 없습니다",
         "NotSatellite": "선택된 객체는 위성이 아닙니다",
         "FetchFailed": "{name} 및 {altName}의 채널 정보를 가져올 수 없습니다",
         "NoData": "사용 가능한 채널 데이터가 없습니다"
-      }
+      },
+      "help": {
+        "overview": "트랜스폰더 및 채널 정보는 정지궤도 TV 또는 통신 위성이 실제로 무엇을 방송하고 있는지 보여 줍니다. 알려진 모든 채널의 주파수, 빔, 전송 방식, 암호화를 확인할 수 있습니다. 데이터는 잘 알려진 수백 개의 방송 위성을 다루며 메뉴를 열 때 실시간으로 가져옵니다.",
+        "imgAlt": "방송 위성의 위성 주파수 표",
+        "imgCaption": "각 행은 빔, 주파수, 시스템, 암호화 정보를 포함한 하나의 채널입니다.",
+        "columnsHeading": "표 읽는 법",
+        "columns": "<ul><li><strong>TV 채널</strong>: 방송 서비스 이름.</li><li><strong>빔</strong>: 채널을 전송하는 위성 안테나 빔으로, 커버리지 범위를 결정합니다.</li><li><strong>주파수</strong>: 다운링크 주파수와 편파.</li><li><strong>시스템</strong> 및 <strong>SR/FEC</strong>: 전송 표준(예: DVB-S2)과 심볼 속도 및 순방향 오류 정정.</li><li><strong>비디오</strong> 및 <strong>언어</strong>: 코덱과 오디오 언어.</li><li><strong>암호화</strong>: 채널이 무료 방송인지 스크램블 방송인지와 사용된 방식.</li></ul>",
+        "howToUse": "<ol><li>방송 위성을 선택합니다. 하단 아이콘은 알려진 채널 데이터가 있는 위성에서만 활성화됩니다.</li><li>하단 바에서 메뉴를 열거나 <strong>T</strong> 키를 누릅니다. 채널 목록이 다운로드되어 표를 채웁니다.</li><li>제목 표시줄의 다운로드 버튼을 사용하여 표를 스프레드시트로 내보냅니다.</li></ol>",
+        "tip1": "지원되는 위성은 콘스텔레이션 메뉴에 TV 위성 콘스텔레이션으로 등록되어 있으며, 살펴볼 위성을 찾는 가장 빠른 방법입니다.",
+        "tip2": "채널 데이터는 KeepTrack API에서 제공되며 공개 목록을 반영합니다. 인터넷 연결이 필요합니다.",
+        "shortcutToggle": "위성 주파수 메뉴 전환"
+      },
+      "labels": {
+        "controls": "컨트롤",
+        "channels": "채널",
+        "filterPlaceholder": "채널 필터링",
+        "exportXlsx": "XLSX로 내보내기",
+        "exportCsv": "CSV로 내보내기",
+        "statusLoading": "채널 불러오는 중…",
+        "statusEmpty": "사용 가능한 채널 데이터가 없습니다",
+        "statusNoMatch": "필터와 일치하는 채널이 없습니다",
+        "statusError": "채널 데이터를 불러올 수 없습니다"
+      },
+      "attribution": "채널 데이터는 KeepTrack API(공개 목록)에서 제공됩니다."
     }
   }
 }

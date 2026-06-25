@@ -3,7 +3,30 @@
     "OrbitGuardMenuPlugin": {
       "bottomIconLabel": "OrbitGuard",
       "title": "OrbitGuard",
-      "helpBody": "OrbitGuard異常検出メニューは、衛星の最新の軌道変更、軌道逸脱、および安定性変化イベントを表示します。"
+      "labels": {
+        "dataCredit": "*OrbitGuardのデータはMSBAIから提供されています。",
+        "previous": "前へ",
+        "next": "次へ",
+        "pageOf": "{total}ページ中{current}ページ目"
+      },
+      "table": {
+        "norad": "NORAD",
+        "eventStartTime": "イベント開始時刻",
+        "eventEndTime": "イベント終了時刻",
+        "maneuverClass": "機動クラス",
+        "maneuverProbability": "機動確率 (%)",
+        "orbitOutOfFamily": "ファミリー外軌道",
+        "stabilityChange": "安定性の変化",
+        "stabilityChangeProbability": "安定性変化の確率 (%)"
+      },
+      "help": {
+        "overview": "OrbitGuardは、カタログ全体で最近検出された異常を一覧表示します。疑わしい機動、ファミリーから外れた軌道、安定性の変化が、それぞれ信頼度の確率とともに表示されます。データはMSBAIのOrbitGuardサービスから提供され、詳しく確認する価値のある衛星をランク付けしたフィードとして得られます。",
+        "imgAlt": "検出イベントを表示するOrbitGuardの異常テーブル",
+        "imgCaption": "各行は検出されたイベントです。赤いセルはしきい値を超えた検出を示します。",
+        "howToUse": "<ol><li>下部バー（イベントモード）から<strong>OrbitGuard</strong>を開きます。最新のイベントが自動的に読み込まれます。</li><li>テーブルを確認します。赤くハイライトされたセルは陽性の検出です（分類された機動、ファミリー外の軌道、または安定性の変化）。</li><li>行をクリックすると、その衛星に移動し、時計がイベントの終了時刻にジャンプします。</li><li><strong>前へ</strong>と<strong>次へ</strong>でフィードをページ送りできます。1ページあたり20件のイベントです。</li></ol>",
+        "tip1": "イベントは衛星ごとに重複が除去され、新しい順に並べられるため、上位の行が最新のアクティビティです。",
+        "tip2": "確率はモデルの信頼度であり、確実性ではありません。中程度の値は結論ではなく、手動で確認するきっかけとして扱ってください。"
+      }
     }
   }
 }

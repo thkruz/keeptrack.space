@@ -3,8 +3,27 @@
     "FindSatPlugin": {
       "bottomIconLabel": "Najít satelit",
       "title": "Najít satelit",
-      "helpBody": "Menu Najít satelit umožňuje vyhledávat satelity podle různých kritérií:<br><br><ul style=\"margin-left: 40px;\"><li><strong>Typ objektu</strong> – Filtrovat podle užitečného zatížení, tělesa rakety nebo trosek</li><li><strong>Země</strong> – Filtrovat podle země vypuštění</li><li><strong>Platforma satelitu/Užitečné zatížení/Tvar/Zdroj</strong> – Filtrovat podle vlastností satelitu</li><li><strong>Azimut/Elevace/Dosah</strong> – Hledat podle pozorovacích úhlů (vyžaduje senzor)</li><li><strong>Orbitální parametry</strong> – Inklinace, perioda, RAAN, argument perigea</li><li><strong>Stáří TLE</strong> – Filtrovat podle aktuálnosti TLE</li><li><strong>RCS</strong> – Filtrovat podle efektivní odrazné plochy</li></ul><br>Výsledky se zobrazí ve vyhledávacím panelu. Pomocí tlačítka Export uložíte výsledky jako CSV.",
+      "help": {
+        "overview": "Funkce Najít satelit prohledává celý katalog a hledá objekty odpovídající kombinaci fyzikálních, orbitálních a pozorovacích kritérií. Je to nejrychlejší způsob, jak zodpovědět otázky jako \"která tělesa raket z Číny obíhají s periodou přibližně 100 minut?\" nebo \"která užitečná zatížení jsou právě teď v dosahu mého senzoru?\"",
+        "imgAlt": "Menu Najít satelit s filtry typu objektu, země, orbitálních parametrů a senzoru",
+        "imgCaption": "Menu Najít satelit. Každé vyplněné pole vyhledávání dále zužuje.",
+        "filtersHeading": "Dostupné filtry",
+        "filters": "<ul><li><strong>Typ objektu</strong>: užitečná zatížení, tělesa raket, trosky. Můžete vybrat více typů najednou; výběr konkrétního typu zruší volbu \"Vše\".</li><li><strong>Země</strong>: jedna nebo více zemí vypuštění.</li><li><strong>Platforma satelitu / Užitečné zatížení / Tvar / Zdroj</strong>: fyzikální vlastnosti a vlastnosti zdroje dat.</li><li><strong>Azimut / Elevace / Dosah</strong>: aktuální pozorovací úhly z vybraného senzoru. Vyžadují, aby byl nejprve vybrán senzor.</li><li><strong>Orbitální parametry</strong>: Inklinace, Perioda, Rektascenze a Argument perigea.</li><li><strong>Stáří TLE</strong>: jak nedávno byla orbitální data aktualizována, v hodinách.</li><li><strong>RCS</strong>: efektivní odrazná plocha v m².</li></ul>Každý číselný filtr má pole <strong>Tolerance</strong>, které definuje přijatelný rozsah kolem zadané hodnoty. Ponecháte-li je prázdné, použije se rozumná výchozí hodnota (například ±5° pro úhly).",
+        "howToUse": "<ol><li>Otevřete menu ze spodní lišty nebo stiskněte Ctrl+F.</li><li>Vyberte z rozbalovacích nabídek jeden nebo více typů objektů a zemí.</li><li>Zadejte číselná kritéria a volitelně zužte nebo rozšiřte jejich tolerance.</li><li>Klikněte na <strong>Najít satelity</strong>. Odpovídající objekty se načtou do vyhledávacího panelu nahoře a zvýrazní se na glóbu.</li><li>Kliknutím na <strong>Exportovat data</strong> uložíte aktuální výsledky jako soubor CSV.</li></ol>",
+        "tip1": "Filtry se kombinují logikou AND: každé kritérium musí odpovídat. Pokud nezískáte žádné výsledky, odeberte nejprve nejrestriktivnější filtr.",
+        "tip2": "Azimut, elevace a dosah se měří od aktuálně vybraného senzoru, proto před jejich použitím senzor vyberte.",
+        "tip3": "Počet výsledků je omezen. Pokud varování hlásí dosažení limitu, zužte kritéria, abyste měli jistotu, že vidíte vše.",
+        "tip4": "Protože výsledky končí ve vyhledávacím panelu, můžete je předat kterémukoli jinému menu pracujícímu s aktuálním vyhledáváním, nebo je upřesnit psaním.",
+        "shortcutToggle": "Přepnout menu Najít satelit"
+      },
       "labels": {
+        "typePayload": "Užitečné zatížení",
+        "typeRocketBody": "Těleso rakety",
+        "typeDebris": "Trosky",
+        "busFilterPlaceholder": "Pište pro filtrování možností platforem",
+        "satelliteBusFilter": "Filtr platformy satelitu",
+        "payloadFilterPlaceholder": "Pište pro filtrování možností užitečných zatížení",
+        "payloadFilter": "Filtr užitečného zatížení",
         "objectType": "Typ objektu",
         "country": "Země",
         "satelliteBus": "Platforma satelitu",
@@ -31,13 +50,20 @@
         "argOfPerigeeMargin": "Tolerance (°)",
         "all": "Vše",
         "findSatellites": "Najít satelity",
-        "exportData": "Exportovat data"
+        "exportData": "Exportovat data",
+        "sectionClassification": "Klasifikace",
+        "sectionLookAngles": "Pozorovací úhly",
+        "sectionOrbital": "Dráhové elementy",
+        "sectionPhysical": "Fyzikální a data",
+        "sensorNote": "Pozorovací úhly vyžadují vybraný senzor.",
+        "resultCount": "{count} výsledků"
       },
       "errorMsgs": {
         "NoSatellitesFound": "Žádné satelity nenalezeny",
         "NoSearchCriteriaEntered": "Nebyla zadána žádná kritéria vyhledávání",
         "TooManyResults": "Příliš mnoho výsledků, omezeno na {limit}",
-        "TryFindingFirst": "Nejprve zkuste vyhledat satelity!"
+        "TryFindingFirst": "Nejprve zkuste vyhledat satelity!",
+        "SearchFailed": "Hledání selhalo: {error}"
       }
     }
   }

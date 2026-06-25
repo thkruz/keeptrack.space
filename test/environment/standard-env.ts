@@ -203,27 +203,6 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   inputManagerInstance.init();
   catalogManagerInstance.staticSet = [defaultSensor];
 
-  window.M = {
-    AutoInit: vi.fn(),
-    toast: () => ({
-      $el: [
-        {
-          addEventListener: vi.fn(),
-          style: {
-            background: 'red',
-          },
-        },
-      ],
-    }),
-    Dropdown: {
-      init: vi.fn(),
-    },
-    Tabs: {
-      init: vi.fn(),
-      getInstance: vi.fn(() => ({ updateTabIndicator: vi.fn() })),
-    },
-  } as unknown as typeof window.M;
-
   dependencies?.forEach((Dependency) => {
     const instance = new Dependency();
 

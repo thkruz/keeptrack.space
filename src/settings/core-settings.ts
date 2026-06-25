@@ -35,6 +35,18 @@ export enum OfflineIconBehavior {
 }
 
 /**
+ * Which object fields a name/text search is allowed to match against.
+ */
+export interface SearchableFields {
+  name: boolean;
+  altName: boolean;
+  bus: boolean;
+  noradId: boolean;
+  intlDes: boolean;
+  launchVehicle: boolean;
+}
+
+/**
  * Core application settings and global flags
  */
 export class CoreSettings {
@@ -191,6 +203,23 @@ export class CoreSettings {
    * Whether to show decayed satellites (position 0,0,0) in search results.
    */
   isShowDecayedInSearch = true;
+  /**
+   * Whether to include Vimpel (analyst) objects in search results. These can
+   * slow searches down considerably, so they are opt-in.
+   */
+  isShowVimpelInSearch = false;
+  /**
+   * Which object fields a name/text search is allowed to match against. All
+   * fields default to enabled; disabling a field narrows the search.
+   */
+  searchableFields: SearchableFields = {
+    name: true,
+    altName: true,
+    bus: true,
+    noradId: true,
+    intlDes: true,
+    launchVehicle: true,
+  };
   /**
    * String to limit which satellites are loaded from the catalog
    */

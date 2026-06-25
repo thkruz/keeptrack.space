@@ -3,7 +3,55 @@
     "SettingsMenuPlugin": {
       "bottomIconLabel": "Ustawienia",
       "title": "Menu ustawień",
-      "helpBody": "Menu ustawień pozwala skonfigurować aplikację."
+      "filterPlaceholder": "Filtruj ustawienia...",
+      "buttons": {
+        "resetToDefaults": "Przywróć domyślne"
+      },
+      "commands": {
+        "open": "Otwórz ustawienia",
+        "reset": "Przywróć ustawienia domyślne"
+      },
+      "sections": {
+        "general": "Ustawienia ogólne",
+        "fastCpu": "Wymagany szybki procesor"
+      },
+      "labels": {
+        "showInfoOnHover": "Pokaż informacje po najechaniu",
+        "drawOrbits": "Rysuj orbity",
+        "drawTrailingOrbits": "Rysuj orbity śladu",
+        "drawOrbitsInEcf": "Rysuj orbity w ECF",
+        "numberOfEcfOrbits": "Liczba rysowanych orbit ECF",
+        "drawFovLines": "Rysuj linie FOV",
+        "displayEciOnHover": "Pokaż ECI po najechaniu",
+        "showCameraWidget": "Pokaż widżet kamery",
+        "showConfidenceLevels": "Pokaż poziomy ufności",
+        "enableDemoMode": "Włącz tryb demo",
+        "enableFreezeTime": "Zatrzymaj czas po kliknięciu",
+        "compensateEarthRotation": "Kompensuj obrót Ziemi",
+        "showNextPassOnHover": "Pokaż następny przelot po najechaniu"
+      },
+      "tooltips": {
+        "showInfoOnHover": "Pokazuje więcej informacji po najechaniu kursorem na satelitę.",
+        "drawOrbits": "Wyłącz, aby ukryć linie orbit",
+        "drawTrailingOrbits": "Włącz, aby pokazywać, gdzie satelita był, zamiast dokąd zmierza",
+        "drawOrbitsInEcf": "Orbity będą rysowane w ECF zamiast ECI (głównie dla orbit GEO)",
+        "drawFovLines": "Rysuj linie od czujnika do satelitów, gdy są w FOV",
+        "displayEciOnHover": "Pokaż współrzędne ECI po najechaniu",
+        "showCameraWidget": "Wyłącz, aby ukryć widżet kamery",
+        "showConfidenceLevels": "Pokaż poziomy ufności zestawów elementów orbitalnych satelity.",
+        "enableDemoMode": "Co 3 sekundy z FOV będzie wybierany nowy satelita",
+        "enableFreezeTime": "Czas zatrzyma się podczas obracania kamery.",
+        "compensateEarthRotation": "Kompensuje odchylenie kamery względem obrotu Ziemi, dzięki czemu widok pozostaje przypięty do współrzędnych geograficznych.",
+        "showNextPassOnHover": "Pokazuje czas następnego przelotu po najechaniu kursorem na satelitę w polu widzenia wybranego czujnika."
+      },
+      "help": {
+        "overview": "Menu ustawień zawiera ogólnoaplikacyjne opcje wyświetlania i interakcji: rysowanie orbit, zachowanie po najechaniu kursorem, pomoce kamery oraz dodatki obciążające wydajność. Inne wtyczki również dodają tu własne sekcje, więc to jedyne miejsce do dostrajania działania KeepTrack.",
+        "imgAlt": "Menu ustawień z przełącznikami opcji ogólnych",
+        "imgCaption": "Przełącz dowolną opcję, aby zastosować ją natychmiast; użyj filtra, aby szybko znaleźć ustawienia.",
+        "howToUse": "<ol><li>Otwórz <strong>Ustawienia</strong> z dolnego paska.</li><li>Przełącz dowolny przełącznik, aby zastosować go natychmiast; najedź na wiersz, aby zobaczyć objaśniającą go podpowiedź.</li><li>Użyj pola <strong>filtra</strong> u góry, aby szybko znaleźć ustawienie po nazwie.</li><li><strong>Przywróć domyślne</strong> przywraca wszystkie opcje, łącznie z sekcjami dodanymi przez wtyczki, do wartości fabrycznych.</li></ol>",
+        "tip1": "Opcje w sekcji Wymagany szybki procesor, takie jak pokazywanie następnego przelotu po najechaniu, wykonują dodatkowe obliczenia w każdej klatce; na wolniejszych komputerach zostaw je wyłączone.",
+        "tip2": "Sekcje wtyczek na dole pochodzą z innych wtyczek (Lista obserwacyjna, Wehikuł czasu i inne), więc menu rośnie w miarę włączania wtyczek."
+      }
     }
   }
 }

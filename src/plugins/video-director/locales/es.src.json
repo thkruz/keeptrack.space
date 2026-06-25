@@ -1,9 +1,42 @@
 {
   "plugins": {
     "VideoDirectorPlugin": {
-      "bottomIconLabel": "Director de Video",
       "title": "Menú de Director de Video",
-      "helpBody": "El Menú de Director de Video se usa para manipular la cámara y los objetos en la escena para crear un video."
+      "bottomIconLabel": "Director de Video",
+      "labels": {
+        "updateSettings": "Actualizar Configuración",
+        "cameraMovements": "Movimientos de Cámara",
+        "rotateSpeed": "Velocidad de Rotación",
+        "rotateLeft": "Rotar Cámara a la Izquierda",
+        "rotateRight": "Rotar Cámara a la Derecha",
+        "rotateUp": "Rotar Cámara hacia Arriba",
+        "rotateDown": "Rotar Cámara hacia Abajo",
+        "panSpeed": "Velocidad de Paneo",
+        "panLeft": "Panear Cámara a la Izquierda",
+        "panRight": "Panear Cámara a la Derecha",
+        "panUp": "Panear Cámara hacia Arriba",
+        "panDown": "Panear Cámara hacia Abajo",
+        "zoomSpeed": "Velocidad de Zoom",
+        "zoomIn": "Acercar Cámara",
+        "zoomOut": "Alejar Cámara",
+        "disableSelectedDot": "Desactivar Punto del Satélite Seleccionado",
+        "rotate": "Rotar",
+        "pan": "Paneo",
+        "zoom": "Zoom",
+        "scene": "Escena",
+        "blackEarth": "Tierra Negra",
+        "milkyWay": "Vía Láctea",
+        "startAutoRotate": "Iniciar Rotación Automática",
+        "stopAutoRotate": "Detener Rotación Automática"
+      },
+      "help": {
+        "overview": "El Director de Video configura movimientos de cámara suaves y repetibles para grabar clips cinematográficos de la simulación: rotaciones lentas, paneos y zooms a velocidades precisas, con la opción de ocultar el punto resaltado del satélite seleccionado para que no aparezca en la grabación.",
+        "imgAlt": "El menú de Director de Video con controles de rotación, paneo y zoom",
+        "imgCaption": "Elija una dirección y velocidad de movimiento, luego inicie el movimiento.",
+        "howToUse": "<ol><li>Abra <strong>Director de Video</strong> desde la barra inferior (modo Experimental).</li><li>Configure la <strong>Velocidad de Rotación</strong>, <strong>Velocidad de Paneo</strong> o <strong>Velocidad de Zoom</strong>, y active la dirección que desee; los cambios se aplican de inmediato y las direcciones opuestas son mutuamente excluyentes.</li><li>Haga clic en <strong>Iniciar Rotación Automática</strong> para comenzar el movimiento, y de nuevo para detenerlo.</li><li>Active <strong>Desactivar Punto del Satélite Seleccionado</strong>, <strong>Tierra Negra</strong> o <strong>Vía Láctea</strong> para un fondo cinematográfico limpio.</li></ol>",
+        "tip1": "Valores de velocidad muy pequeños producen un movimiento suave de calidad profesional; los valores predeterminados están ajustados para movimientos lentos y cinematográficos.",
+        "tip2": "Combine una rotación lenta con los controles de tiempo a alta velocidad para una clásica toma orbital a cámara rápida."
+      }
     }
   }
 }

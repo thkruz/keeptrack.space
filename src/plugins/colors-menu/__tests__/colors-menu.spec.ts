@@ -40,7 +40,7 @@ test.describe('ColorMenu Plugin', () => {
 
     await expect(colorsList).toBeVisible();
 
-    const colorItems = colorsList.locator('li.menu-selectable');
+    const colorItems = colorsList.locator('.colors-menu-item');
     const itemCount = await colorItems.count();
 
     expect(itemCount).toBeGreaterThan(3);

@@ -1,0 +1,38 @@
+{
+  "plugins": {
+    "TheSpaceDevLaunchCalendarPlugin": {
+      "bottomIconLabel": "Calendrier des lancements",
+      "title": "Calendrier des lancements",
+      "sideMenuTitle": "Calendrier des lancements",
+      "tooltips": {
+        "fetchData": "Récupérer les données",
+        "refresh": "Actualiser",
+        "exportLaunchInfo": "Exporter les informations de lancement"
+      },
+      "labels": {
+        "dataActions": "Actions sur les données",
+        "results": "Prochains lancements"
+      },
+      "table": {
+        "launchWindow": "Fenêtre de lancement",
+        "mission": "Mission",
+        "location": "Lieu",
+        "agency": "Agence",
+        "country": "Pays"
+      },
+      "msgs": {
+        "fetching": "Récupération des prochains lancements...",
+        "unknown": "Inconnu",
+        "tbd": "À déterminer"
+      },
+      "help": {
+        "overview": "Prochains lancements répertorie les lancements orbitaux à venir dans le monde entier, récupérés en direct depuis la bibliothèque de lancements de The Space Devs : la fenêtre de lancement, la mission, le site de lancement, l'agence et le pays de chacun. Les noms de missions et de sites renvoient vers des informations complémentaires lorsqu'elles sont disponibles.",
+        "imgAlt": "Le tableau Prochains lancements des missions à venir",
+        "imgCaption": "Chaque ligne est un lancement à venir avec sa fenêtre, sa mission, son site et son agence.",
+        "howToUse": "<ol><li>Ouvrez <strong>Prochains lancements</strong> depuis la barre inférieure (mode Événements).</li><li>Cliquez sur le bouton de récupération pour télécharger la liste actuelle des lancements ; une connexion internet est nécessaire.</li><li>Parcourez le tableau ; les noms de missions et de pas de tir liés ouvrent des pages d'information.</li><li>Utilisez le bouton d'export pour enregistrer la liste sous forme de feuille de calcul.</li></ol>",
+        "tip1": "Les fenêtres de lancement sont affichées en UTC ; les entrées datant de plus d'un jour affichent « À déterminer » jusqu'à la récupération de données récentes.",
+        "tip2": "Associez cette liste à l'outil Nouveau lancement pour modéliser la trajectoire d'un lancement à venir avant qu'il n'ait lieu."
+      }
+    }
+  }
+}

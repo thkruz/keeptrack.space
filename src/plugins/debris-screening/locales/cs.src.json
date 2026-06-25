@@ -3,7 +3,6 @@
     "DebrisScreening": {
       "bottomIconLabel": "Screening trosek",
       "title": "Screening trosek",
-      "helpBody": "Nástroj Screening trosek prověřuje vybraný satelit proti katalogu za účelem identifikace potenciálních konjunkcí. <br><br> Nastavte časové okno hodnocení a klikněte na 'Screening trosek' pro spuštění analýzy. Výsledky se zobrazí v tabulce obsahující: <ul style=\"margin-left: 40px;\"> <li><b>TCA</b> – Čas nejbližšího přiblížení</li> <li><b>Miss Distance</b> – Celková a RIC složky (radiální, podélná, příčná)</li> <li><b>Pc</b> – Pravděpodobnost kolize</li> <li><b>Úroveň rizika</b> – Kritická/Vysoká/Střední/Nízká na základě Pc</li> </ul> Kliknutím na ID satelitu jej vyberete. Exportujte výsledky do CSV pomocí tlačítka stažení.",
       "resultsTitle": "Výsledky screeningu",
       "resultsCount": "Nalezeno {count} konjunkcí",
       "exportCsv": "Exportovat CSV",
@@ -12,17 +11,56 @@
         "high": "Vysoká",
         "medium": "Střední",
         "low": "Nízká",
-        "unknown": "N/A"
+        "unknown": "Neznámé"
+      },
+      "sccLabel": "SCC# satelitu",
+      "timeWindowLabel": "Časové okno",
+      "timeOptions": {
+        "h1": "1 hodina",
+        "h4": "4 hodiny",
+        "h8": "8 hodin",
+        "h24": "24 hodin",
+        "h48": "48 hodin",
+        "h72": "72 hodin"
       },
       "uLabel": "U (radiální)",
       "vLabel": "V (podélná)",
       "wLabel": "W (příčná)",
+      "screenForDebris": "Provést screening trosek",
       "drawBox": "Nakreslit rámeček",
       "clearBox": "Vymazat rámeček",
+      "table": {
+        "secondary": "Sekundární",
+        "tca": "TCA",
+        "missKm": "Minutí (km)",
+        "rKm": "R (km)",
+        "iKm": "I (km)",
+        "cKm": "C (km)",
+        "pc": "Pc",
+        "risk": "Riziko"
+      },
       "errorMsgs": {
         "InvalidSatellite": "Vybrán neplatný satelit",
         "ScreeningFailed": "Screening selhal",
         "NoResultsToExport": "Žádné výsledky k exportu"
+      },
+      "help": {
+        "overview": "Screening trosek provádí vyhodnocení konjunkcí vybraného satelitu vůči zbytku katalogu. Najde každý objekt, který se během zvoleného časového okna dostane do screeningového rámečku definovaného kolem satelitu, a setkání seřadí podle pravděpodobnosti kolize.",
+        "imgAlt": "Menu Screening trosek s volbami časového okna a screeningového rámečku",
+        "imgCaption": "Nastavte časové okno a screeningový rámeček RIC a poté prověřte vybraný satelit vůči katalogu.",
+        "boxHeading": "Screeningový rámeček",
+        "box": "Screeningový objem je definován v souřadnicích RIC vzhledem k satelitu: <strong>U (radiální)</strong> je nahoru a dolů ve výšce orbity, <strong>V (podélná)</strong> je ve směru letu a <strong>W (příčná)</strong> je do stran. Nejvíce záleží na radiálním rozměru: většina setkání se čistě rozdělí podle výšky, takže obvyklou volbou je těsné U a širší V a W. <strong>Nakreslit rámeček</strong> vykreslí objem kolem satelitu ve 3D zobrazení; <strong>Vymazat rámeček</strong> jej odstraní.",
+        "resultsHeading": "Čtení výsledků",
+        "results": "Každý řádek tabulky výsledků je jedna předpovězená konjunkce: <strong>Sekundární</strong> je druhý objekt, <strong>TCA</strong> je čas nejbližšího přiblížení, <strong>Minutí (km)</strong> je celková vzdálenost minutí se složkami <strong>R</strong>, <strong>I</strong> a <strong>C</strong>, <strong>Pc</strong> je pravděpodobnost kolize a <strong>Riziko</strong> ji klasifikuje jako Kritická, Vysoká, Střední nebo Nízká. Kliknutím na řádek vyberete sekundární objekt a přesunete čas na TCA; menu zůstane otevřené, takže můžete procházet jednotlivé události. <strong>Exportovat CSV</strong> tabulku uloží.",
+        "howToUse": "<ol><li>Vyberte satelit; dokud žádný není vybrán, je spodní ikona neaktivní.</li><li>Otevřete <strong>Screening trosek</strong> ze spodního menu. Číslo SCC satelitu se doplní automaticky.</li><li>Zvolte <strong>Časové okno</strong> (1 až 72 hodin) a podle potřeby upravte rozměry rámečku <strong>U</strong>, <strong>V</strong> a <strong>W</strong>.</li><li>Klikněte na <strong>Provést screening trosek</strong>. Otevře se panel výsledků s nalezenými konjunkcemi seřazenými k posouzení.</li><li>Kliknutím na libovolný řádek prozkoumáte dané setkání v čase nejbližšího přiblížení.</li></ol>",
+        "tip1": "Delší okna a větší rámečky najdou více setkání, ale výpočet trvá déle; začněte s výchozími hodnotami a rozšiřujte je, jen pokud potřebujete větší pokrytí.",
+        "tip2": "Kliknutí na řádek zachová stav přehrávání: pokud byl čas pozastaven, zůstane pozastaven na TCA.",
+        "tip3": "Úrovně rizika jsou prahy na Pc: nad 1e-4 je Kritická, nad 1e-6 Vysoká a nad 1e-8 Střední."
+      },
+      "sections": {
+        "parameters": "Parametry",
+        "searchBox": "Vyhledávací pole RIC",
+        "results": "Výsledky"
       }
     }
   }

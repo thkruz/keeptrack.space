@@ -3,21 +3,27 @@
     "DopsPlugin": {
       "bottomIconLabel": "Zobrazit DOP",
       "title": "Menu DOP (zhoršení přesnosti)",
-      "helpTitle": "Menu DOP (zhoršení přesnosti)",
-      "helpBody": "Menu DOP (zhoršení přesnosti) slouží k výpočtu zhoršení přesnosti pro danou polohu a elevační masku.<br><br>HDOP je horizontální zhoršení přesnosti. Jedná se o míru přesnosti horizontální polohy.<br><br>PDOP je polohové zhoršení přesnosti. Jedná se o míru přesnosti polohy.<br><br>GDOP je geometrické zhoršení přesnosti. Jedná se o míru přesnosti polohy.",
       "labels": {
         "dopTable": "Tabulka DOP",
         "latitude": "Zeměpisná šířka",
         "longitude": "Zeměpisná délka",
         "altitude": "Nadmořská výška",
         "mask": "Maska",
-        "updateDopData": "Aktualizovat data DOP"
+        "updateDopData": "Aktualizovat data DOP",
+        "location": "Poloha",
+        "results": "Výsledky"
       },
       "tooltips": {
         "latitude": "Zeměpisná šířka ve stupních",
         "longitude": "Zeměpisná délka ve stupních",
         "altitude": "Nadmořská výška v km",
         "mask": "Minimální elevace pro GPS zámek"
+      },
+      "table": {
+        "time": "Čas",
+        "hdop": "HDOP",
+        "pdop": "PDOP",
+        "gdop": "GDOP"
       },
       "rmb": {
         "dops": "DOP",
@@ -29,6 +35,18 @@
       },
       "errorMsgs": {
         "invalidLocation": "Vyberte prosím platnou polohu na Zemi pro 24hodinové DOP!"
+      },
+      "help": {
+        "overview": "Menu zhoršení přesnosti (DOP) odhaduje, jak přesné bude určení polohy pomocí GPS na libovolném místě na Zemi. DOP popisuje geometrii viditelné konstelace GPS: když jsou satelity rozprostřeny široko po obloze, je určení polohy přesné (nízké DOP), a když jsou nahloučeny u sebe, přesnost se zhoršuje (vysoké DOP). Pomocí tohoto menu najdete nejlepší a nejhorší okna GPS na daném stanovišti během následujících 24 hodin.",
+        "imgAlt": "Menu zhoršení přesnosti s 24hodinovou tabulkou DOP",
+        "imgCaption": "Zadejte polohu a elevační masku a poté aktualizujte data, abyste viděli hodnoty DOP na následujících 24 hodin.",
+        "valuesHeading": "Jak číst hodnoty DOP",
+        "values": "<ul><li><strong>HDOP</strong>: horizontální přesnost (zeměpisná šířka a délka).</li><li><strong>VDOP</strong>: vertikální přesnost (nadmořská výška).</li><li><strong>PDOP</strong>: celková přesnost 3D polohy.</li><li><strong>GDOP</strong>: PDOP plus příspěvek hodin přijímače; nejúplnější souhrnný ukazatel kvality.</li><li><strong>TDOP</strong>: přesnost hodin přijímače.</li></ul>Čím nižší, tím lepší: hodnoty pod 2 jsou vynikající, 2 až 5 je přijatelné pro většinu použití a vyšší hodnoty znamenají zhoršené určení polohy. Tabulka uvádí čas, HDOP, PDOP a GDOP v minutových krocích.",
+        "howToUse": "<ol><li>Otevřete menu ze spodní lišty nebo stiskněte <strong>D</strong>.</li><li>Do polí <strong>Zeměpisná šířka</strong> a <strong>Zeměpisná délka</strong> zadejte hodnoty ve stupních, do pole <strong>Nadmořská výška</strong> výšku v kilometrech a do pole <strong>Maska</strong> minimální elevaci ve stupních, jíž musí satelit GPS dosáhnout nad obzorem, aby byl započítán.</li><li>Klikněte na <strong>Aktualizovat data DOP</strong>. Tabulka se naplní jedním řádkem za minutu na následujících 24 hodin.</li><li>Můžete také kliknout pravým tlačítkem kamkoli na Zemi a zvolit <strong>DOP</strong>: <strong>Aktuální GPS DOP</strong> zobrazí okamžité hodnoty pro vybraný bod a <strong>24hodinové GPS DOP</strong> vyplní formulář touto polohou a otevře toto menu.</li></ol>",
+        "tip1": "Zvýšení elevační masky vyloučí nízko letící satelity, což obvykle zvyšuje DOP. Použijte masku, kterou váš přijímač skutečně používá; běžnou výchozí hodnotou je 15 stupňů.",
+        "tip2": "Zadaná hodnota masky se uloží jako elevační maska GPS pro aktuální relaci, takže ji ostatní výpočty související s GPS znovu použijí.",
+        "tip3": "Zkratka D je ignorována při letu kamerou v pohledu první osoby.",
+        "shortcutToggle": "Přepnout menu zhoršení přesnosti"
       }
     }
   }

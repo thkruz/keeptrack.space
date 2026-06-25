@@ -156,6 +156,7 @@ describe('SearchManager', () => {
       settingsManager.searchLimit = 100;
       settingsManager.lastSearch = [];
       settingsManager.lastSearchResults = [];
+      settingsManager.searchableFields = { name: true, altName: true, bus: true, noradId: true, intlDes: true, launchVehicle: true };
     });
 
     it('finds a 5-digit sat by its sccNum', () => {
@@ -208,6 +209,22 @@ describe('SearchManager', () => {
       // so the user supplies digit-only forms for each.
       searchManager.doSearch('25544,270001,799500766');
       expect(settingsManager.lastSearchResults.sort((a, b) => a - b)).toEqual([0, 1, 2]);
+    });
+
+    it('respects the NORAD ID field toggle for numeric searches', () => {
+      sats = [new Satellite({ ...defaultSat, id: 0, sccNum: '25544' })];
+      wireUpServiceLocator(buildCatalog(sats));
+
+      // With NORAD ID matching disabled, a pure-number search must not hit the
+      // sccNum (it falls through to the regular search, which checks other fields).
+      settingsManager.searchableFields = { ...settingsManager.searchableFields, noradId: false };
+      searchManager.doSearch('25544');
+      expect(settingsManager.lastSearchResults).toEqual([]);
+
+      // Re-enabling finds it again.
+      settingsManager.searchableFields = { ...settingsManager.searchableFields, noradId: true };
+      searchManager.doSearch('25544');
+      expect(settingsManager.lastSearchResults).toEqual([0]);
     });
 
     it('does not crash when a satellite has an undefined sccNum (defensive coverage)', () => {

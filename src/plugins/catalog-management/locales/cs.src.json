@@ -7,7 +7,59 @@
         "import": "Import",
         "export": "Export"
       },
-      "helpBody": "Nabídka Správa katalogu poskytuje nástroje pro import a export dat katalogů satelitů. <b>Karta Import:</b> Načtěte soubor katalogu .tce, .tle nebo .txt pomocí výběru souborů nebo přetažením. <b>Karta Export:</b> <ul style=\"margin-left: 40px;\"> <li>Export oficiálních TLE – Export skutečných dvouřádkových elementů.</li> <li>Export 3LE – Export třířádkových elementů.</li> <li>Export KeepTrack TLE – Export všech dvouřádkových elementů KeepTrack včetně analytických.</li> <li>Export KeepTrack 3LE – Export všech třířádkových elementů KeepTrack včetně analytických.</li> <li>Export katalogu CSV – Export dat katalogu ve formátu CSV.</li> <li>Export STK .tce – Export dat TLE ve formátu databáze satelitů STK.</li> <li>Export satelitů v FOV – Export satelitů aktuálně v zorném poli.</li> <li>Export efemerid .e – Export propagovaných efemerid pro vybraný satelit ve formátu STK.</li> </ul>"
+      "labels": {
+        "dropzone": "Přetáhněte sem soubor .tce, .tle nebo .txt pro načtení katalogu",
+        "keepSatInfo": "Zachovat informace o satelitech",
+        "keepSatInfoTooltip": "Aktualizuje TLE existujících satelitů a zachová jejich název, zemi a údaje o misi. Satelity, které nejsou v importovaném souboru, budou odstraněny.",
+        "importNewOnly": "Importovat pouze nové satelity",
+        "importNewOnlyTooltip": "Přidá pouze satelity, které dosud nejsou v aktuálním katalogu. Stávající satelity zůstanou nezměněny.",
+        "orbitalElements": "Orbitální elementy",
+        "tabularStk": "Tabulky a STK",
+        "selectedSatellite": "Vybraný satelit",
+        "tleSource": "Zdroj",
+        "tleFormat": "Formát",
+        "timeSpanHrs": "Časové rozpětí (hod)",
+        "stepSizeSec": "Velikost kroku (s)"
+      },
+      "options": {
+        "sourceOfficial": "Oficiální",
+        "sourceKeepTrack": "KeepTrack",
+        "format2": "2 řádky (TLE)",
+        "format3": "3 řádky (s názvem)"
+      },
+      "buttons": {
+        "importCatalog": "Importovat katalog",
+        "downloadTle": "Exportovat formát TLE",
+        "exportCatalogXlsx": "Exportovat katalog XLSX",
+        "exportStkTce": "Exportovat STK .tce",
+        "exportSatsInFov": "Exportovat satelity v FOV",
+        "exportEphemeris": "Exportovat efemeridy .e",
+        "selectSatelliteFirst": "Nejprve vyberte satelit"
+      },
+      "toasts": {
+        "noValidFileInDrop": "V přetažení nebyl nalezen žádný soubor .tce, .tle ani .txt",
+        "noValidTleData": "V souboru nebyla nalezena žádná platná data TLE",
+        "unsupportedFileType": "Nepodporovaný typ souboru. Použijte .tce, .tle nebo .txt",
+        "noNewSats": "V souboru nebyly nalezeny žádné nové satelity",
+        "addedNewSats": "Přidáno {count} nových satelitů ze souboru {file}",
+        "loadedCatalog": "Katalog načten ze souboru {file}",
+        "failedToLoad": "Nepodařilo se načíst {file}",
+        "noSatelliteSelected": "Není vybrán žádný satelit!",
+        "exportTooLarge": "Export je příliš velký. Zmenšete časové rozpětí nebo zvětšete velikost kroku.",
+        "failedToPropagate": "Nepodařilo se propagovat satelit!"
+      },
+      "help": {
+        "overview": "Správa katalogu přesouvá data o satelitech do KeepTracku a z něj. Karta Import načte soubor katalogu z disku a nahradí nebo aktualizuje aktuální katalog; karta Export zapíše aktuální katalog v několika formátech, od prostých souborů TLE po tabulky a produkty STK.",
+        "imgAlt": "Menu Správa katalogu s kartami Import a Export",
+        "imgCaption": "Importujte soubor katalogu nebo exportujte aktuální katalog v několika formátech.",
+        "importHeading": "Import",
+        "import": "Načtěte soubor <strong>.tce</strong>, <strong>.tle</strong> nebo <strong>.txt</strong> tlačítkem <strong>Importovat katalog</strong> nebo přetažením souboru do oblasti pro přetažení. Se zapnutou volbou <strong>Zachovat informace o satelitech</strong> si existující satelity ponechají své názvy, země a údaje o misích a aktualizují se pouze jejich dráhy; satelity chybějící v souboru budou odstraněny. Při vypnuté volbě soubor nahradí celý katalog.",
+        "exportHeading": "Export",
+        "export": "<ul><li><strong>Orbitální elementy</strong>: stáhněte sady elementů TLE/3LE. Vyberte <strong>Zdroj</strong> (Oficiální zachová pouze skutečné katalogizované objekty; KeepTrack zahrnuje analytické satelity, které jste vytvořili) a <strong>Formát</strong> (2 řádky nebo 3 řádky s názvem satelitu), poté klikněte na <strong>Stáhnout TLE</strong>.</li><li><strong>Tabulky a STK</strong>: exportujte celý katalog jako tabulku XLSX, databázi STK .tce nebo pouze satelity, které se právě nacházejí v zorném poli vybraného senzoru.</li><li><strong>Vybraný satelit</strong>: s vybraným satelitem zapište propagované efemeridy STK .e s použitím nastavených hodnot <strong>Časové rozpětí (hod)</strong> a <strong>Velikost kroku (s)</strong>.</li></ul>",
+        "howToUse": "<ol><li>Otevřete <strong>Správa katalogu</strong> ze spodní lišty (režim Nástroje).</li><li>Pro import: zvolte kartu <strong>Import</strong>, rozhodněte, zda zachovat informace o satelitech, a poté vyberte nebo přetáhněte soubor.</li><li>Pro export: zvolte kartu <strong>Export</strong>, nastavte volby a klikněte na požadovaný export; soubory se stáhnou okamžitě.</li><li>Pro exporty jednotlivých satelitů nejprve vyberte satelit; tato tlačítka zůstávají neaktivní, dokud žádný není vybrán.</li></ol>",
+        "tip1": "Zachování informací o satelitech je bezpečnou výchozí volbou při obnovování drah z novějšího souboru TLE; vypněte ji pouze tehdy, když záměrně vyměňujete celý katalog.",
+        "tip2": "Importy a úpravy existují pouze ve vaší relaci; pokud si je chcete ponechat, exportujte je před opětovným načtením stránky."
+      }
     }
   }
 }

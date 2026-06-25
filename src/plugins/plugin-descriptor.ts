@@ -23,7 +23,7 @@ export interface PluginDescriptor {
   /** Exported class name in the Pro module (defaults to ossClassName if omitted) */
   proClassName?: string;
 
-  /** Default configuration — this is the single source of truth, replaces default-plugins.ts entries */
+  /** Default configuration - this is the single source of truth, replaces default-plugins.ts entries */
   defaultConfig: PluginConfiguration;
 
   /** When true, the plugin is always enabled regardless of user config */

@@ -25,9 +25,13 @@ import { ServiceLocator } from './engine/core/service-locator';
  */
 
 import 'material-icons/iconfont/material-icons.css';
+import './engine/ui/menu-v13.css'; // v13+ menu UI standard (opt-in via .kt-ui-v13)
+import './engine/ui/theme-form-controls.css'; // global brand theming for native form controls
 import 'requestidlecallback-polyfill';
 
 import { Localization } from './locales/locales'; // Ensure localization is imported first
+
+import { initMaterialSelects } from './engine/ui/material-select';
 
 import { CatalogLoader } from './app/data/catalog-loader';
 import { CatalogManager } from './app/data/catalog-manager';
@@ -229,7 +233,7 @@ export class KeepTrack {
       // Load the CSS
       if (!settingsManager.isDisableCss) {
         import('@css/fonts.css');
-        import(/* webpackMode: "eager" */ '@css/materialize.css').catch(() => {
+        import(/* webpackMode: "eager" */ '@materializecss/materialize/dist/css/materialize.css').catch(() => {
           // This is intentional
         });
         import(/* webpackMode: "eager" */ '@css/astroux/css/astro.css').catch(() => {
@@ -425,11 +429,9 @@ theodore.kruczek at gmail dot com.
 
       ServiceLocator.getUiManager().initMenuController();
 
-      // Update MaterialUI with new menu options
+      // Style every plugin menu's <select> (Tabs/Dropdown are initialized per-plugin)
       try {
-        // Jest workaround
-        // eslint-disable-next-line new-cap
-        window.M.AutoInit();
+        initMaterialSelects();
       } catch {
         // intentionally left blank
       }

@@ -2,7 +2,7 @@ import { pluginManifest } from '@app/plugins/plugin-manifest';
 
 /*
  * The plugin manifest is the single source of truth for plugin registration.
- * It is a pure descriptor array — importing it evaluates every entry. These
+ * It is a pure descriptor array - importing it evaluates every entry. These
  * tests validate the structural invariants every descriptor must satisfy.
  */
 

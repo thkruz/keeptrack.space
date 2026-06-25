@@ -23,6 +23,15 @@
 import { KeepTrack } from './keeptrack';
 import { registerServiceWorker } from './pwa/service-worker-registration';
 
+/*
+ * Materialize v2 themes its components via Material Design 3 tokens that default
+ * to a light palette unless the root element carries theme="dark". The HTML
+ * templates set this, but index.html is un-hashed and can be served stale from
+ * cache, so assert it here too (bundled JS is content-hashed) to guarantee the
+ * dark palette regardless of which entry point loads or what the browser cached.
+ */
+document.documentElement.setAttribute('theme', 'dark');
+
 const keepTrackInstance = KeepTrack.getInstance();
 
 // Load the main website class

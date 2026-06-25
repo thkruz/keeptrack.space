@@ -3,7 +3,82 @@
     "Calculator": {
       "bottomIconLabel": "Transformacje układów odniesienia",
       "title": "Menu transformacji układów odniesienia",
-      "helpBody": "Menu transformacji układów odniesienia służy do konwersji między różnymi układami odniesienia. <br><br> Menu pozwala na konwersję między następującymi układami odniesienia: <ul style=\"margin-left: 40px;\"> <li> ECI - Geocentryczny inercjalny </li> <li> ECEF - Geocentryczny obrotowy </li> <li> Geodezyjny </li> <li> Topocentryczny </li> </ul>"
+      "frames": {
+        "geodeticLla": "Geodezyjny (LLA)",
+        "raeTopocentric": "RAE (topocentryczny)",
+        "raDecGeocentric": "RA/Dec (geocentryczny)",
+        "classicalElements": "Klasyczne elementy orbitalne"
+      },
+      "sections": {
+        "input": "Wejście"
+      },
+      "labels": {
+        "inputFrame": "Układ wejściowy",
+        "loadSelectedSatellite": "Wczytaj wybranego satelitę",
+        "includeVelocity": "Uwzględnij prędkość",
+        "convert": "Konwertuj",
+        "outputFormat": "Format wyjściowy",
+        "drawLine": "Narysuj linię",
+        "copyResults": "Kopiuj wszystkie wyniki",
+        "clickToCopy": "Kliknij, aby skopiować",
+        "epoch": "Epoka",
+        "sensor": "Czujnik",
+        "latitude": "Szerokość geograficzna",
+        "longitude": "Długość geograficzna",
+        "altitude": "Wysokość",
+        "range": "Odległość",
+        "azimuth": "Azymut",
+        "elevation": "Elewacja",
+        "rightAscension": "Rektascensja",
+        "declination": "Deklinacja",
+        "semiMajorAxis": "Półoś wielka",
+        "eccentricity": "Mimośród",
+        "inclination": "Inklinacja",
+        "raan": "RAAN",
+        "argPerigee": "Arg. perycentrum",
+        "trueAnomaly": "Anomalia prawdziwa",
+        "period": "Okres",
+        "apogeeAlt": "Wys. apogeum",
+        "perigeeAlt": "Wys. perygeum"
+      },
+      "formats": {
+        "fixed4": "Stały (4 miejsca po przecinku)",
+        "fixed6": "Stały (6 miejsc po przecinku)",
+        "fixed8": "Stały (8 miejsc po przecinku)",
+        "scientific": "Notacja naukowa",
+        "dms": "DMS (kąty)"
+      },
+      "msgs": {
+        "noSensorSelected": "Nie wybrano czujnika",
+        "needsVelocity": "Wymaga prędkości",
+        "noSensorForRae": "Nie wybrano czujnika dla wyjścia RAE.",
+        "copied": "Skopiowano do schowka"
+      },
+      "errorMsgs": {
+        "conversionFailed": "Konwersja nie powiodła się: {error}",
+        "invalidInput": "Nieprawidłowe dane dla {field}: \"{value}\" nie jest liczbą.",
+        "fieldNotFound": "Nie znaleziono pola {field}.",
+        "invalidNumber": "Wszystkie dane wejściowe muszą być prawidłowymi liczbami.",
+        "badEccentricity": "Dla orbity zamkniętej mimośród musi mieścić się między 0 a 1 (wyłącznie).",
+        "badSemiMajorAxis": "Półoś wielka musi być większa od 0.",
+        "noSensorForRae": "Konwersja RAE wymaga wybrania czujnika.",
+        "noRaeData": "Brak dostępnych danych RAE. Najpierw wykonaj konwersję z wybranym czujnikiem.",
+        "noSatelliteSelected": "Nie wybrano satelity.",
+        "notASatellite": "Wybrany obiekt nie jest satelitą.",
+        "couldNotPropagate": "Nie udało się wyznaczyć pozycji satelity dla bieżącego czasu.",
+        "copyFailed": "Nie udało się skopiować do schowka."
+      },
+      "help": {
+        "overview": "Kalkulator transformacji układów odniesienia przelicza pozycję (i opcjonalnie prędkość) między wszystkimi układami współrzędnych, które rozumie KeepTrack: J2000 (ECI), ITRF (ECEF), TEME, Geodezyjny (LLA), RAE (topocentryczny), RA/Dec (geocentryczny) oraz Klasyczne elementy orbitalne. Wpisz stan w dowolnym układzie i odczytaj go we wszystkich pozostałych jednocześnie.",
+        "imgAlt": "Menu transformacji układów odniesienia z polami wejściowymi i przeliczonymi wynikami",
+        "imgCaption": "Wprowadź stan w jednym układzie; wszystkie pozostałe układy są obliczane jednym kliknięciem.",
+        "framesHeading": "Obsługiwane układy",
+        "frames": "<ul><li><strong>J2000 (ECI)</strong>, <strong>TEME</strong>: geocentryczne układy inercjalne; TEME to układ, w którym publikowane są TLE.</li><li><strong>ITRF (ECEF)</strong>: geocentryczny, związany z Ziemią; obraca się wraz z planetą.</li><li><strong>Geodezyjny (LLA)</strong>: szerokość geograficzna, długość geograficzna i wysokość.</li><li><strong>RAE (topocentryczny)</strong>: odległość, azymut i elewacja widziane z wybranego czujnika.</li><li><strong>RA/Dec (geocentryczny)</strong>: rektascensja i deklinacja.</li><li><strong>Klasyczne elementy orbitalne</strong>: keplerowskie elementy orbity, z okresem, apogeum i perygeum w wynikach.</li></ul>",
+        "howToUse": "<ol><li>Otwórz menu z dolnego paska (tryb Narzędzia).</li><li>Wybierz <strong>Układ wejściowy</strong>; pola wejściowe dostosują się odpowiednio.</li><li>Wpisz wartości lub kliknij <strong>Wczytaj wybranego satelitę</strong>, aby wypełnić je danymi aktualnie wybranego satelity.</li><li>Dla układów kartezjańskich zaznacz <strong>Uwzględnij prędkość</strong>, aby przeliczyć także wektor prędkości; wynik Klasycznych elementów orbitalnych go wymaga.</li><li>Kliknij <strong>Konwertuj</strong>. Wartości wszystkich pozostałych układów pojawią się poniżej, sformatowane zgodnie z wyborem <strong>Format wyjściowy</strong>.</li><li>Przy wybranym czujniku i obliczonym wyniku RAE przycisk <strong>Narysuj linię</strong> rysuje linię od czujnika do tego punktu w widoku 3D.</li></ol>",
+        "tip1": "Wejście i wyjście RAE wymagają najpierw wybrania czujnika; pole pokazuje używany czujnik, więc zawsze wiesz, które stanowisko jest punktem odniesienia.",
+        "tip2": "Format wyjściowy DMS przedstawia kąty jako stopnie, minuty i sekundy, co jest wygodne przy celowaniu teleskopem.",
+        "tip3": "Konwersja na Klasyczne elementy orbitalne wymaga prędkości: bez niej wynik informuje, że potrzebna jest prędkość, zamiast zgadywać orbitę."
+      }
     }
   }
 }

@@ -3,15 +3,62 @@
     "PlanetsMenuPlugin": {
       "bottomIconLabel": "Planètes",
       "title": "Menu de la liste des planètes",
-      "helpBody": "Ce menu vous permet de sélectionner et de visualiser différentes planètes dans la simulation.",
       "sections": {
         "planets": "Planètes",
         "dwarfPlanets": "Planètes naines",
         "otherCelestialBodies": "Autres corps célestes"
       },
+      "bodies": {
+        "Mercury": "Mercure",
+        "Venus": "Vénus",
+        "Earth": "Terre",
+        "Mars": "Mars",
+        "Jupiter": "Jupiter",
+        "Saturn": "Saturne",
+        "Uranus": "Uranus",
+        "Neptune": "Neptune",
+        "Pluto": "Pluton",
+        "Makemake": "Makémaké",
+        "Eris": "Éris",
+        "Haumea": "Hauméa",
+        "Ceres": "Cérès",
+        "Sedna": "Sedna",
+        "Quaoar": "Quaoar",
+        "Orcus": "Orcus",
+        "Gonggong": "Gonggong",
+        "Charon": "Charon",
+        "Moon": "Lune",
+        "Sun": "Soleil",
+        "Io": "Io",
+        "Europa": "Europe",
+        "Ganymede": "Ganymède",
+        "Callisto": "Callisto",
+        "Titan": "Titan",
+        "Rhea": "Rhéa",
+        "Iapetus": "Japet",
+        "Dione": "Dioné",
+        "Tethys": "Téthys",
+        "Enceladus": "Encelade"
+      },
       "tooltips": {
         "centerCamera": "Centrer la caméra sur {body}.",
         "plannedFuture": "Prévu pour une mise à jour future."
+      },
+      "filterPlaceholder": "Filtrer les corps…",
+      "commands": {
+        "toggleMenu": "Basculer le menu Planètes",
+        "centerOn": "Centrer la caméra sur {body}"
+      },
+      "help": {
+        "overview": "Le menu Planètes transforme KeepTrack en visionneuse du système solaire : sélectionnez une planète, une planète naine, la Lune ou le Soleil pour centrer la caméra dessus. C'est le moyen le plus rapide d'étudier la géométrie cislunaire et de l'espace lointain aux côtés du catalogue des objets en orbite terrestre.",
+        "imgAlt": "Le menu Liste des planètes avec planètes, planètes naines et autres corps",
+        "imgCaption": "Cliquez sur un corps pour centrer la caméra dessus.",
+        "howToUse": "<ol><li>Ouvrez le menu <strong>Planètes</strong> depuis la barre inférieure ou appuyez sur <strong>P</strong>.</li><li>Cliquez sur un corps, par exemple <strong>Mars</strong> ou <strong>Lune</strong>. La caméra se recentre dessus et les limites de zoom s'ajustent à la nouvelle échelle.</li><li>Appuyez sur <strong>Home</strong> pour revenir à la Terre, ou <strong>Shift</strong>+<strong>Home</strong> pour recentrer la Terre dans la vue.</li></ol>",
+        "tip1": "Plusieurs lunes (Io, Europe, Titan et d'autres) sont listées mais grisées ; elles sont prévues pour une mise à jour future.",
+        "tip2": "Vous pouvez aussi faire un clic droit dans l'espace vide et choisir un corps dans le menu contextuel.",
+        "shortcutToggle": "Basculer le menu Planètes",
+        "shortcutHome": "Définir la Terre comme corps central",
+        "shortcutCenterEarth": "Centrer la caméra sur la Terre"
       }
     }
   }

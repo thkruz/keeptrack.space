@@ -3,7 +3,19 @@
     "SatConstellations": {
       "bottomIconLabel": "Constellations",
       "title": "Constellations Menu",
-      "helpBody": "The Constellations menu allows you to view groups of satellites. <br><br> For some constellations, notional uplink/downlinks and/or crosslinks will be drawn between satellites in the constellation.",
+      "help": {
+        "overview": "The Constellations menu groups related satellites so you can study them as a system: navigation constellations like GPS and Galileo, communications fleets, space stations, and more. Selecting a constellation highlights its members, shows summary statistics, and lists every satellite in a sortable table.",
+        "imgAlt": "The Constellations menu with a constellation selected and its statistics and table",
+        "imgCaption": "Selecting a constellation shows its statistics and a table of members grouped by RAAN.",
+        "readingHeading": "Statistics and Table",
+        "reading": "After selecting a constellation, the header shows the <strong>Satellites</strong> count, the <strong>Avg Alt</strong> (average altitude), and the <strong>Inc</strong> (inclination) range. The table lists each member with its NORAD number, name, inclination, RAAN, perigee, and apogee, grouped by RAAN so orbital planes stand out. Click a row to select that satellite.",
+        "filtersHeading": "Filters",
+        "filters": "The filter panel narrows the table: set minimum and maximum <strong>inclination</strong>, <strong>altitude</strong>, or <strong>RAAN</strong>, or type a <strong>Name Filter</strong> (regular expressions work). <strong>Apply</strong> updates the table and <strong>Reset</strong> clears every filter.",
+        "howToUse": "<ol><li>Open the <strong>Constellations</strong> menu from the bottom bar (Catalog mode).</li><li>Click a constellation, for example <strong>GPS Satellites</strong>. Its members are highlighted in the 3D view and the statistics and table fill in.</li><li>For some constellations, notional uplink, downlink, or crosslink lines are drawn between members.</li><li>Use the filter panel to isolate planes or altitude shells, and click table rows to inspect individual satellites.</li></ol>",
+        "tip1": "The last selected constellation is remembered, so reopening KeepTrack restores your working group.",
+        "tip2": "Constellations are also exposed as command palette commands, so you can jump to one without opening the menu.",
+        "tip3": "Grouping by RAAN makes orbital planes obvious: satellites in the same plane share nearly the same RAAN value."
+      },
       "constellations": {
         "SpaceStations": "Space Stations",
         "AmateurRadio": "Amateur Radio",
@@ -17,7 +29,32 @@
         "aehf": "Milstar and AEHF",
         "wgs": "DSCS and WGS",
         "starlink": "Starlink",
-        "sbirs": "SBIRS"
+        "sbirs": "SBIRS",
+        "starlink-gen2": "Starlink Gen2",
+        "starlink-v2": "Starlink v2",
+        "starlink-snapshot": "Starlink (Notional)",
+        "starshield": "Starshield",
+        "pwsa": "PWSA",
+        "kuiper": "Kuiper",
+        "ast-spaceobile": "AST SpaceMobile",
+        "oneweb": "OneWeb",
+        "telesat-lightspeed": "Telesat Lightspeed",
+        "boeing": "Boeing",
+        "astra": "Astra",
+        "spinlaunch": "SpinLaunch",
+        "hvnet": "HVNET",
+        "lynk": "Lynk",
+        "guanwang": "Guowang",
+        "qianfan": "Qianfan",
+        "honghu3": "Honghu-3",
+        "yinhe": "Yinhe",
+        "hanwha": "Hanwha"
+      },
+      "sections": {
+        "constellations": "Constellations",
+        "statistics": "Statistics",
+        "results": "Results",
+        "filters": "Filters"
       },
       "stats": {
         "satellites": "Satellites",
@@ -47,7 +84,8 @@
         "category": "Constellations"
       },
       "errorMsgs": {
-        "NoConstellationSelected": "No constellation selected"
+        "NoConstellationSelected": "No constellation selected",
+        "ConstellationEmpty": "No satellites found — this constellation may not be in orbit yet or needs to be imported"
       }
     }
   }

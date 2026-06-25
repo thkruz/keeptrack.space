@@ -1,0 +1,50 @@
+/*
+ * Polar Plot plugin styles. The menu uses the shared v13 card system
+ * (.kt-ui-v13 + kt-section/kt-action/kt-note); see src/engine/ui/menu-v13.css.
+ * Only the full-bleed chart canvas, the pass readout, and the export size
+ * selector need plugin-specific chrome.
+ */
+
+/* The az/el chart sits full-bleed above the cards, matching the echarts menus.
+ * Square aspect, inset to line up with the inset card edges. */
+#polar-plot-menu .polar-plot-canvas {
+  display: block;
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  height: auto;
+  aspect-ratio: 1 / 1;
+  margin: 8px 6px 12px;
+  background: #101522;
+  border-radius: 8px;
+}
+
+/* One-line pass summary under the section label (Pass N of M, max EL, duration). */
+#polar-plot-menu .polar-plot-readout {
+  margin: 0 0 8px;
+  padding: 0 2px;
+  font-size: 13px;
+  text-align: center;
+  color: var(--color-dark-text-muted, #b0b0b0);
+}
+
+#polar-plot-menu .polar-plot-readout:empty {
+  display: none;
+}
+
+/* Export size selector: a themed Materialize dropdown (so the open popup matches
+ * the brand theme instead of the OS-blue native one). The label sits above a
+ * full-width select wrapper. */
+#polar-plot-menu .polar-plot-size-field {
+  margin: 0 2px 10px;
+}
+
+#polar-plot-menu .polar-plot-size-field label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13px;
+  color: var(--color-dark-text-muted, #b0b0b0);
+}
+
+#polar-plot-menu .polar-plot-size-field .select-wrapper {
+  width: 100%;
+}

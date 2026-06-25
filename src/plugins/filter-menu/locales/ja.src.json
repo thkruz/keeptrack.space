@@ -3,9 +3,18 @@
     "FilterMenuPlugin": {
       "title": "フィルタメニュー",
       "bottomIconLabel": "フィルタメニュー",
-      "helpBody": "このメニューでは、種類、軌道領域、データソースに基づいて地球儀に表示されるオブジェクトをフィルタリングできます。",
+      "help": {
+        "overview": "フィルタメニューは、どのオブジェクトを描画するかを制御します。スイッチはオブジェクトタイプ（ペイロード、デブリ、ロケット本体）、軌道領域（LEOからGEO以遠まで）、データソース、国ごとにグループ化されており、カタログを調査対象の集団だけに絞り込むことができます。",
+        "imgAlt": "グループ化された表示スイッチを備えたフィルタメニュー",
+        "imgCaption": "各スイッチはカタログの一部を即座に表示または非表示にします。",
+        "howToUse": "<ol><li>下部バーから<strong>フィルタメニュー</strong>を開くか、<strong>F</strong>キーを押します。</li><li>スイッチを切り替えます。各フィルタが適用されるとシーンは即座に更新されます。</li><li><strong>デフォルトにリセット</strong>をクリックすると標準の表示に戻ります。</li></ol>",
+        "tip1": "フィルタは組み合わせて適用されます。オブジェクトは表示され続けるためにすべてのアクティブなグループを通過する必要があるため、シーンが空に見える場合は通常、2つのフィルタが互いに除外し合っています。",
+        "tip2": "コマンドパレットには、LEOのみを表示する、デブリとロケット本体を非表示にするなどのワンクリックプリセットがあります。",
+        "shortcutToggle": "フィルタメニューの切り替え"
+      },
       "resetToDefaults": "デフォルトにリセット",
       "defaultTooltip": "{name}を非表示にするには無効にします",
+      "searchPlaceholder": "フィルタを検索...",
       "commands": {
         "category": "フィルタ",
         "open": "フィルタメニューを開く",
@@ -18,6 +27,7 @@
         "showOnlyPayloads": "ペイロードのみ表示",
         "hideDebrisAndRocketBodies": "デブリとロケット本体を非表示",
         "showAllObjectTypes": "すべてのオブジェクトタイプを表示",
+        "hideAllObjectTypes": "すべてのオブジェクトタイプを非表示",
         "toggleLEO": "LEOの表示切替",
         "toggleMEO": "MEOの表示切替",
         "toggleGEO": "GEOの表示切替",
@@ -25,6 +35,8 @@
         "showOnlyLEO": "LEO衛星のみ表示",
         "showOnlyGEO": "GEO衛星のみ表示",
         "showAllOrbitalRegimes": "すべての軌道領域を表示",
+        "showOnlyCelestrak": "CelesTrak衛星のみ表示",
+        "showAllSources": "すべてのソースを表示",
         "showOnlyUS": "米国のオブジェクトのみ表示",
         "showOnlyRussia": "ロシアのオブジェクトのみ表示",
         "showOnlyChina": "中国のオブジェクトのみ表示",

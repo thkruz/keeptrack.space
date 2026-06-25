@@ -8,7 +8,7 @@ test.describe('Collisions Plugin', () => {
       settings: { isMobileModeEnabled: true },
     });
 
-    const bottomIcon = page.locator('#menu-satellite-collision');
+    const bottomIcon = page.locator('#conjunction-feed-icon');
     const sideMenu = page.locator('#Collisions-menu');
 
     // Bottom icon should exist in the DOM
@@ -25,11 +25,11 @@ test.describe('Collisions Plugin', () => {
       await eventsGroup.locator('.drawer-group-header').click();
     }
 
-    const drawerItem = page.locator('.drawer-item[data-plugin-id="menu-satellite-collision"]');
+    const drawerItem = page.locator('.drawer-item[data-plugin-id="conjunction-feed-icon"]');
 
     await expect(drawerItem).toBeVisible();
 
-    // Click the drawer item — should open side menu and select the icon
+    // Click the drawer item - should open side menu and select the icon
     await drawerItem.click();
     await expect(sideMenu).toBeVisible({ timeout: 5_000 });
     await expect(bottomIcon).toHaveClass(/bmenu-item-selected/u);
@@ -41,10 +41,11 @@ test.describe('Collisions Plugin', () => {
     await expect(fetchBtn).toBeAttached();
     await expect(refreshBtn).toBeAttached();
 
-    // Verify the collision table exists
-    const table = page.locator('#Collisions-table');
+    // Verify the collision results container exists. The OSS build renders a
+    // #Collisions-table; the Pro build replaces it with a #Collisions-results card list.
+    const results = page.locator('#Collisions-table, #Collisions-results');
 
-    await expect(table).toBeAttached();
+    await expect(results).toBeAttached();
 
     // Close via DOM click (toast notifications may intercept Playwright clicks)
     await page.evaluate(() => {

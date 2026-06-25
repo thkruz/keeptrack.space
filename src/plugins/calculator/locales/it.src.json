@@ -3,7 +3,82 @@
     "Calculator": {
       "bottomIconLabel": "Trasformazioni di riferimento",
       "title": "Menu trasformazioni di riferimento",
-      "helpBody": "Il menu Trasformazioni di riferimento viene utilizzato per convertire tra diversi sistemi di riferimento. <br><br> Il menu consente di convertire tra i seguenti sistemi di riferimento: <ul style=\"margin-left: 40px;\"> <li> ECI - Earth Centered Inertial </li> <li> ECEF - Earth Centered Earth Fixed </li> <li> Geodetico </li> <li> Topocentrico </li> </ul>"
+      "frames": {
+        "geodeticLla": "Geodetico (LLA)",
+        "raeTopocentric": "RAE (topocentrico)",
+        "raDecGeocentric": "RA/Dec (geocentrico)",
+        "classicalElements": "Elementi classici"
+      },
+      "sections": {
+        "input": "Ingresso"
+      },
+      "labels": {
+        "inputFrame": "Sistema di ingresso",
+        "loadSelectedSatellite": "Carica satellite selezionato",
+        "includeVelocity": "Includi velocità",
+        "convert": "Converti",
+        "outputFormat": "Formato di output",
+        "drawLine": "Disegna linea",
+        "copyResults": "Copia tutti i risultati",
+        "clickToCopy": "Clicca per copiare",
+        "epoch": "Epoca",
+        "sensor": "Sensore",
+        "latitude": "Latitudine",
+        "longitude": "Longitudine",
+        "altitude": "Altitudine",
+        "range": "Distanza",
+        "azimuth": "Azimut",
+        "elevation": "Elevazione",
+        "rightAscension": "Ascensione retta",
+        "declination": "Declinazione",
+        "semiMajorAxis": "Semiasse maggiore",
+        "eccentricity": "Eccentricità",
+        "inclination": "Inclinazione",
+        "raan": "RAAN",
+        "argPerigee": "Arg. del perigeo",
+        "trueAnomaly": "Anomalia vera",
+        "period": "Periodo",
+        "apogeeAlt": "Alt. apogeo",
+        "perigeeAlt": "Alt. perigeo"
+      },
+      "formats": {
+        "fixed4": "Fisso (4 decimali)",
+        "fixed6": "Fisso (6 decimali)",
+        "fixed8": "Fisso (8 decimali)",
+        "scientific": "Notazione scientifica",
+        "dms": "DMS (angoli)"
+      },
+      "msgs": {
+        "noSensorSelected": "Nessun sensore selezionato",
+        "needsVelocity": "Richiede la velocità",
+        "noSensorForRae": "Nessun sensore selezionato per l'output RAE.",
+        "copied": "Copiato negli appunti"
+      },
+      "errorMsgs": {
+        "conversionFailed": "Conversione non riuscita: {error}",
+        "invalidInput": "Input non valido per {field}: \"{value}\" non è un numero.",
+        "fieldNotFound": "Campo {field} non trovato.",
+        "invalidNumber": "Tutti gli input devono essere numeri validi.",
+        "badEccentricity": "L'eccentricità deve essere compresa tra 0 e 1 (esclusi) per un'orbita chiusa.",
+        "badSemiMajorAxis": "Il semiasse maggiore deve essere maggiore di 0.",
+        "noSensorForRae": "La conversione RAE richiede che sia selezionato un sensore.",
+        "noRaeData": "Nessun dato RAE disponibile. Esegui prima una conversione con un sensore selezionato.",
+        "noSatelliteSelected": "Nessun satellite selezionato.",
+        "notASatellite": "L'oggetto selezionato non è un satellite.",
+        "couldNotPropagate": "Impossibile propagare il satellite all'ora attuale.",
+        "copyFailed": "Impossibile copiare negli appunti."
+      },
+      "help": {
+        "overview": "La calcolatrice delle trasformazioni di riferimento converte una posizione (e facoltativamente la velocità) tra tutti i sistemi di coordinate che KeepTrack conosce: J2000 (ECI), ITRF (ECEF), TEME, Geodetico (LLA), RAE (topocentrico), RA/Dec (geocentrico) ed Elementi classici. Digita uno stato in un sistema qualsiasi e leggilo in tutti gli altri contemporaneamente.",
+        "imgAlt": "Il menu delle trasformazioni di riferimento con i campi di input e gli output convertiti",
+        "imgCaption": "Inserisci uno stato in un sistema; tutti gli altri sistemi vengono calcolati con un clic.",
+        "framesHeading": "Sistemi supportati",
+        "frames": "<ul><li><strong>J2000 (ECI)</strong>, <strong>TEME</strong>: sistemi inerziali geocentrici; TEME è il sistema in cui vengono pubblicati i TLE.</li><li><strong>ITRF (ECEF)</strong>: geocentrico e solidale con la Terra; ruota con il pianeta.</li><li><strong>Geodetico (LLA)</strong>: latitudine, longitudine e altitudine.</li><li><strong>RAE (topocentrico)</strong>: distanza, azimut ed elevazione visti dal sensore selezionato.</li><li><strong>RA/Dec (geocentrico)</strong>: ascensione retta e declinazione.</li><li><strong>Elementi classici</strong>: elementi orbitali kepleriani, con periodo, apogeo e perigeo nell'output.</li></ul>",
+        "howToUse": "<ol><li>Apri il menu dalla barra inferiore (modalità Strumenti).</li><li>Scegli un <strong>Sistema di ingresso</strong>; i campi di input cambiano di conseguenza.</li><li>Digita i valori, oppure fai clic su <strong>Carica satellite selezionato</strong> per riempirli con il satellite attualmente selezionato.</li><li>Per i sistemi cartesiani, spunta <strong>Includi velocità</strong> per convertire anche il vettore di velocità; l'output degli Elementi classici lo richiede.</li><li>Fai clic su <strong>Converti</strong>. I valori di tutti gli altri sistemi compaiono sotto, formattati secondo il selettore <strong>Formato di output</strong>.</li><li>Con un sensore selezionato e un risultato RAE calcolato, <strong>Disegna linea</strong> traccia la linea dal sensore a quel punto nella vista 3D.</li></ol>",
+        "tip1": "L'input e l'output RAE richiedono prima un sensore selezionato; il campo mostra il sensore in uso, così conosci sempre il sito di riferimento.",
+        "tip2": "Il formato di output DMS presenta gli angoli come gradi, minuti e secondi, comodo per il puntamento del telescopio.",
+        "tip3": "La conversione in Elementi classici richiede la velocità: senza di essa l'output segnala che serve la velocità invece di indovinare un'orbita."
+      }
     }
   }
 }

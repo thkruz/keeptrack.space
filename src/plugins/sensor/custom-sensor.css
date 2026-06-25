@@ -1,0 +1,147 @@
+/*
+ * Custom Sensor v13 menu styling. Scoped to `#custom-sensor-menu`.
+ *
+ * The shared card / action / field building blocks live in
+ * src/engine/ui/menu-v13.css (scoped under .kt-ui-v13). This file only carries
+ * the required per-menu dense-form fixes (this menu stacks many labelled rows
+ * per card and has standalone Replace/Clear/Geolocation action rows).
+ */
+
+/* 1. Stacked-field headroom. Several labelled rows stack per card, so the
+ *    floating "active" label needs room to clear the row above. The first row in
+ *    a card only needs the section-label gap. */
+#custom-sensor-menu .kt-field-row .input-field.col {
+  margin-top: 20px;
+}
+
+#custom-sensor-menu .kt-section-label + .kt-field-row .input-field.col {
+  margin-top: 8px;
+}
+
+/* 2. Align standalone primary actions (direct children of the form, not nested
+ *    in a .kt-section) with the inset cards. */
+#custom-sensor-menu-form > .kt-action {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
+}
+
+/* 3. Focus indication. Swap the app-wide :focus-visible box (which overlaps the
+ *    floating label) for KeepTrack's primary underline. */
+#custom-sensor-menu .input-field input:focus,
+#custom-sensor-menu .input-field textarea:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#custom-sensor-menu .input-field input:focus-visible,
+#custom-sensor-menu .input-field textarea:focus-visible {
+  outline: none;
+}
+
+/*
+ * Secondary panel: the active-custom-sensor list. One v13 card per sensor (name
+ * header + remove control + a two-column attribute grid) instead of the old raw
+ * text rows. Scoped to the generated secondary root id.
+ */
+#custom-sensor-menu-secondary .cs-secondary-body {
+  padding: 6px;
+}
+
+#custom-sensor-menu-secondary #custom-sensors-sensor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#custom-sensor-menu-secondary .cs-sensor-card {
+  border: 1px solid var(--color-dark-border);
+  border-radius: var(--kt-radius-md, 6px);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 10px 12px;
+}
+
+#custom-sensor-menu-secondary .cs-sensor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+#custom-sensor-menu-secondary .cs-sensor-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-text-light, #f5f5f5);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#custom-sensor-menu-secondary .remove-sensor {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  background: transparent;
+  border: none;
+  border-radius: var(--kt-radius-sm, 4px);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+#custom-sensor-menu-secondary .remove-sensor:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/*
+ * Tint the remove icon to the brand red. The source PNG (bookmark-remove) is
+ * blue, so paint the theme color and use the icon's alpha as a mask rather than
+ * showing the raw image. The icon URL is passed in via the --cs-remove-icon
+ * custom property set inline by the renderer.
+ */
+#custom-sensor-menu-secondary .cs-remove-glyph {
+  width: 18px;
+  height: 18px;
+  display: block;
+  pointer-events: none;
+  background-color: var(--color-primary, #ba160c);
+  -webkit-mask: var(--cs-remove-icon) center / contain no-repeat;
+  mask: var(--cs-remove-icon) center / contain no-repeat;
+  transition: background-color 0.15s ease;
+}
+
+#custom-sensor-menu-secondary .remove-sensor:hover .cs-remove-glyph {
+  background-color: var(--color-primary-light, #e01a0e);
+}
+
+#custom-sensor-menu-secondary .cs-attr-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px 14px;
+}
+
+#custom-sensor-menu-secondary .cs-attr {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+}
+
+#custom-sensor-menu-secondary .cs-attr-k {
+  color: var(--color-dark-text-muted);
+}
+
+#custom-sensor-menu-secondary .cs-attr-v {
+  color: var(--color-text-light, #f5f5f5);
+  text-align: right;
+}
+
+#custom-sensor-menu-secondary .cs-empty {
+  padding: 14px 8px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-dark-text-muted);
+}

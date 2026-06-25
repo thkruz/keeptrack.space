@@ -17,6 +17,8 @@ export interface BuildConfig {
   loadingScreenCssPath: string;
   wallpapersPath: string;
   isPro: boolean;
+  /** Build edition shown on the splash screen (e.g. 'oss', 'pro', 'celestrak', 'embed'). */
+  edition: string;
   /** Path to the env file for dotenv-webpack (relative to project root). Defaults to '.env'. */
   envFilePath: string;
 
@@ -47,6 +49,7 @@ export class ConfigManager {
       primaryLogoPath: 'public/img/logo-primary.png',
       secondaryLogoPath: 'public/img/logo-secondary.png',
       isPro: false,
+      edition: 'oss',
       envFilePath: '.env',
     };
   }
@@ -186,6 +189,7 @@ export class ConfigManager {
     this.config.PUBLIC_SUPABASE_ANON_KEY = process.env.PUBLIC_SUPABASE_ANON_KEY ?? envVars.PUBLIC_SUPABASE_ANON_KEY;
 
     this.config.isPro = isPro === 'true';
+    this.config.edition = process.env.EDITION ?? envVars.EDITION ?? (this.config.isPro ? 'pro' : 'oss');
   }
 
   /**
@@ -221,6 +225,9 @@ export class ConfigManager {
     }
     if (env.IS_PRO) {
       this.config.isPro = env.IS_PRO === 'true';
+    }
+    if (env.EDITION) {
+      this.config.edition = env.EDITION;
     }
     if (env.PUBLIC_SUPABASE_URL) {
       this.config.PUBLIC_SUPABASE_URL = env.PUBLIC_SUPABASE_URL;

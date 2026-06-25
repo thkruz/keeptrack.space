@@ -34,10 +34,20 @@ test.describe('PlanetsMenuPlugin', () => {
 
     await expect(sideMenu).toBeVisible({ timeout: 5_000 });
 
-    // Verify section headers (use exact text to avoid matching title or partial matches)
-    await expect(sideMenu.locator('h5.side-menu-row-header', { hasText: /^Planets$/u })).toBeAttached();
-    await expect(sideMenu.locator('h5.side-menu-row-header', { hasText: /^Dwarf Planets$/u })).toBeAttached();
-    await expect(sideMenu.locator('h5.side-menu-row-header', { hasText: /^Other Celestial Bodies$/u })).toBeAttached();
+    // Verify v13 section labels (use exact text to avoid matching title or partial matches)
+    await expect(sideMenu.locator('.kt-section-label', { hasText: /^Planets$/u })).toBeAttached();
+    await expect(sideMenu.locator('.kt-section-label', { hasText: /^Dwarf Planets$/u })).toBeAttached();
+    await expect(sideMenu.locator('.kt-section-label', { hasText: /^Other Celestial Bodies$/u })).toBeAttached();
+
+    // Filter field narrows the list to matching bodies
+    const filter = sideMenu.locator('#planets-filter-input');
+
+    await expect(filter).toBeVisible();
+    await filter.fill('mars');
+    await expect(sideMenu.locator('[data-planet="Mars"]')).toBeVisible();
+    await expect(sideMenu.locator('[data-planet="Venus"]')).toBeHidden();
+    await filter.fill('');
+    await expect(sideMenu.locator('[data-planet="Venus"]')).toBeVisible();
 
     // Verify some planet items exist with data-planet attributes
     await expect(sideMenu.locator('[data-planet="Mercury"]')).toBeAttached();

@@ -3,10 +3,37 @@
     "Collisions": {
       "bottomIconLabel": "Colisiones",
       "title": "Menú de Colisiones",
-      "helpBody": "El Menú de Colisiones muestra satélites con alta probabilidad de colisión. <br><br> Hacer clic en una fila seleccionará los dos satélites involucrados en la colisión y cambiará el tiempo al momento de la colisión.",
+      "toolbar": {
+        "fetchData": "Obtener datos",
+        "refresh": "Actualizar"
+      },
+      "table": {
+        "toca": "TOCA",
+        "sat1": "#1",
+        "sat2": "#2",
+        "maxProb": "Prob. máx.",
+        "minRange": "Distancia mín. (km)",
+        "relSpeed": "Vel. rel. (km/s)"
+      },
+      "dataSource": "Datos de colisiones proporcionados por CelesTrak a través de {link}.",
+      "help": {
+        "overview": "El Menú de Colisiones muestra las próximas aproximaciones cercanas (conjunciones) entre objetos catalogados, utilizando los datos de evaluación de conjunciones SOCRATES de CelesTrak. Cada fila es un evento previsto con su probabilidad y geometría, y hacer clic en una fila te lleva directamente a él en la simulación.",
+        "imgAlt": "El Menú de Colisiones mostrando una tabla de próximas conjunciones",
+        "imgCaption": "Próximas conjunciones de SOCRATES, ordenadas para que los eventos de mayor riesgo sean visibles de un vistazo.",
+        "columnsHeading": "Cómo leer la tabla",
+        "columns": "<ul><li><strong>TOCA</strong>: hora de máxima aproximación (UTC).</li><li><strong>#1 / #2</strong>: los IDs NORAD de los dos objetos involucrados.</li><li><strong>Prob. máx.</strong>: la probabilidad máxima estimada de colisión.</li><li><strong>Distancia mín. (km)</strong>: distancia mínima prevista en la máxima aproximación.</li><li><strong>Vel. rel. (km/s)</strong>: la velocidad a la que los objetos pasan uno junto al otro.</li></ul>",
+        "howToUse": "<ol><li>Abre el menú y haz clic en el icono de descarga para obtener los datos más recientes de SOCRATES (requiere conexión a internet).</li><li>Haz clic en cualquier fila: el tiempo de la simulación salta a 30 segundos antes de la máxima aproximación y se selecciona el primer objeto, con ambos IDs cargados en la barra de búsqueda.</li><li>Observa cómo se desarrolla la conjunción en el globo, o pausa y avanza paso a paso con los controles de tiempo.</li><li>Usa el icono de actualizar para descargar datos actualizados más tarde.</li></ol>",
+        "tip1": "Los datos de SOCRATES son actualizados periódicamente por CelesTrak; es un producto de cribado, no un sistema de alerta en tiempo real.",
+        "tip2": "Después de hacer clic en una fila, ambos objetos están en la barra de búsqueda; haz clic en el segundo en los resultados para inspeccionarlo o establecerlo como objeto secundario.",
+        "tip3": "La simulación salta a 30 segundos antes del evento para que puedas observar la aproximación en lugar de sus consecuencias."
+      },
       "errorMsgs": {
         "noCollisionsData": "¡No se encontraron datos de colisión!",
         "errorProcessingCollisions": "¡Error al procesar los datos de SOCRATES!"
+      },
+      "labels": {
+        "dataActions": "Datos de conjunción",
+        "results": "Conjunciones próximas"
       }
     }
   }

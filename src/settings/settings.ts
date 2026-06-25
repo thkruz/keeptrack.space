@@ -69,6 +69,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   isDrawAtmosphere: 'graphics',
   isDrawAurora: 'graphics',
   isDrawGraticule: 'graphics',
+  isDrawFlatMapTerminator: 'graphics',
   isDrawSun: 'graphics',
   sizeOfSun: 'graphics',
   isUseSunTexture: 'graphics',
@@ -251,6 +252,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   isDisableLaunchSites: 'data',
   isDisableSensors: 'data',
   apiKey: 'data',
+  apiServer: 'data',
 
   // Performance
   lowPerf: 'performance',
@@ -326,6 +328,8 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   minimumSearchCharacters: 'core',
   searchLimit: 'core',
   isShowDecayedInSearch: 'core',
+  isShowVimpelInSearch: 'core',
+  searchableFields: 'core',
   limitSats: 'core',
   isDisableSelectSat: 'core',
   daysUntilObjectLost: 'core',
@@ -439,10 +443,12 @@ export class SettingsManager {
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_IN_COVERAGE_LINES, settingsManager.isDrawInCoverageLines.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_SUN, settingsManager.isDrawSun.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_COVARIANCE_ELLIPSOID, settingsManager.isDrawCovarianceEllipsoid.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_COVARIANCE_CONFIDENCE_LEVEL, settingsManager.covarianceConfidenceLevel.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_BLACK_EARTH, settingsManager.isBlackEarth.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE, settingsManager.isDrawAtmosphere.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_AURORA, settingsManager.isDrawAurora.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_GRATICULE, settingsManager.isDrawGraticule.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_FLAT_MAP_TERMINATOR, settingsManager.isDrawFlatMapTerminator.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_MILKY_WAY, settingsManager.isDrawMilkyWay.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_GRAY_SKYBOX, settingsManager.isGraySkybox.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_ECI_ON_HOVER, settingsManager.isEciOnHover.toString());
@@ -457,8 +463,7 @@ export class SettingsManager {
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG, settingsManager.isFreezePropRateOnDrag.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS, settingsManager.isDisableTimeMachineToasts.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED, settingsManager.isFocusOnSatelliteWhenSelected.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SEARCH_LIMIT, settingsManager.searchLimit.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SHOW_DECAYED_IN_SEARCH, settingsManager.isShowDecayedInSearch.toString());
+      // Search settings (searchLimit, decayed/Vimpel toggles, searchable fields) are owned by SearchSettingsPlugin.
       PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_SAMPLES, settingsManager.godraysSamples.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DECAY, settingsManager.godraysDecay.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_EXPOSURE, settingsManager.godraysExposure.toString());
@@ -485,10 +490,18 @@ export class SettingsManager {
     this.isDrawInCoverageLines = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_IN_COVERAGE_LINES, this.isDrawInCoverageLines) as boolean;
     this.isDrawSun = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_SUN, this.isDrawSun) as boolean;
     this.isDrawCovarianceEllipsoid = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_COVARIANCE_ELLIPSOID, this.isDrawCovarianceEllipsoid) as boolean;
+
+    const storedConfidence = parseInt(PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_COVARIANCE_CONFIDENCE_LEVEL) ?? '', 10);
+
+    if (storedConfidence >= 1 && storedConfidence <= 3) {
+      this.covarianceConfidenceLevel = storedConfidence;
+    }
     this.isBlackEarth = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_BLACK_EARTH, this.isBlackEarth) as boolean;
     this.isDrawAtmosphere = parseInt(PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE) ?? '1') as AtmosphereSettings;
     this.isDrawAurora = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_AURORA, this.isDrawAurora) as boolean;
     this.isDrawGraticule = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_GRATICULE, this.isDrawGraticule) as boolean;
+    this.isDrawFlatMapTerminator =
+      PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_FLAT_MAP_TERMINATOR, this.isDrawFlatMapTerminator) as boolean;
     this.isDrawMilkyWay = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_MILKY_WAY, this.isDrawMilkyWay) as boolean;
     this.isGraySkybox = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_GRAY_SKYBOX, this.isGraySkybox) as boolean;
     this.isEciOnHover = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_ECI_ON_HOVER, this.isEciOnHover) as boolean;
@@ -524,17 +537,7 @@ export class SettingsManager {
       this.earthNightTextureQuality = earthNightTextureQaulityString as EarthNightTextureQuality;
     }
 
-    const searchLimitString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_SEARCH_LIMIT);
-
-    if (searchLimitString !== null) {
-      this.searchLimit = parseInt(searchLimitString);
-    }
-
-    const showDecayedString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_SHOW_DECAYED_IN_SEARCH);
-
-    if (showDecayedString !== null) {
-      this.isShowDecayedInSearch = showDecayedString === 'true';
-    }
+    // Search settings (searchLimit, decayed/Vimpel toggles, searchable fields) are loaded by SearchSettingsPlugin.
   }
 
   init(settingsOverride?: SettingsManagerOverride) {
@@ -658,14 +661,18 @@ export class SettingsManager {
       if (key === 'settingsManagerOverride') {
         const overrides = JSON.parse(decodeURIComponent(val));
 
-        Object.keys(overrides.plugins)
-          .filter((_key) => _key in plugins)
-          .forEach((_key) => {
-            if (typeof overrides.plugins[_key] === 'undefined') {
-              return;
-            }
-            this.plugins[_key] = overrides.plugins[_key];
-          });
+        // Back-compat: plugins renamed since their config key was minted are
+        // aliased here so existing embed links / saved overrides keep working.
+        const pluginKeyAliases: Record<string, string> = { MissilePlugin: 'MissileSimulatorPlugin' };
+
+        Object.keys(overrides.plugins).forEach((rawKey) => {
+          const _key = pluginKeyAliases[rawKey] ?? rawKey;
+
+          if (!(_key in plugins) || typeof overrides.plugins[rawKey] === 'undefined') {
+            return;
+          }
+          this.plugins[_key] = overrides.plugins[rawKey];
+        });
       }
     }
 

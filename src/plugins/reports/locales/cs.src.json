@@ -3,7 +3,64 @@
     "ReportsPlugin": {
       "bottomIconLabel": "Zprávy",
       "title": "Menu zpráv",
-      "helpBody": "Menu zpráv je sbírka nástrojů, které vám pomohou analyzovat a pochopit zobrazovaná data."
+      "reports": {
+        "aer": {
+          "name": "Azimut, elevace, vzdálenost",
+          "description": "Generuje data azimutu, elevace a vzdálenosti pro přelety satelitu"
+        },
+        "lla": {
+          "name": "Zeměpisná šířka, délka, výška",
+          "description": "Generuje data zeměpisné šířky, délky a výšky v čase"
+        },
+        "eci": {
+          "name": "Geocentrické inerciální souřadnice (ECI)",
+          "description": "Generuje vektory polohy a rychlosti ECI v čase"
+        },
+        "coes": {
+          "name": "Klasické orbitální elementy",
+          "description": "Generuje klasické orbitální elementy v aktuální epoše"
+        },
+        "visibilityWindows": {
+          "name": "Okna viditelnosti",
+          "description": "Generuje okna viditelnosti s časy východu/západu a délkou přeletu"
+        },
+        "sunEclipse": {
+          "name": "Analýza Slunce/zatmění",
+          "description": "Generuje viditelnost Slunce a časy vstupu/výstupu do zatmění pro analýzu napájení a teploty"
+        }
+      },
+      "commands": {
+        "generateReport": "Vygenerovat zprávu {name}",
+        "open": "Otevřít zprávy"
+      },
+      "downloadButton": "Stáhnout zprávu",
+      "copyButton": "Kopírovat do schránky",
+      "sensorNote": "Tyto zprávy vyžadují vybraný senzor.",
+      "sections": {
+        "orbitPosition": "Dráha a poloha",
+        "sensor": "Senzor",
+        "options": "Možnosti výstupu"
+      },
+      "options": {
+        "window": "Časové okno",
+        "step": "Krok",
+        "format": "Formát",
+        "days": "{days} dní",
+        "seconds": "{seconds} s",
+        "format_text": "Text (zarovnaný)",
+        "format_csv": "CSV",
+        "format_json": "JSON"
+      },
+      "help": {
+        "overview": "Menu zpráv generuje textové zprávy o vybraném satelitu: geometrii přeletů, polohu v čase, orbitální elementy, okna viditelnosti a analýzu zatmění. Každá zpráva se otevře ve vlastním okně, úhledně naformátovaná s tlačítkem pro stažení, připravená k vložení do jiných nástrojů nebo ke sdílení.",
+        "imgAlt": "Menu zpráv se seznamem dostupných typů zpráv",
+        "imgCaption": "Každé tlačítko vygeneruje formátovanou textovou zprávu pro vybraný satelit.",
+        "typesHeading": "Dostupné zprávy",
+        "types": "<ul><li><strong>Azimut, elevace, vzdálenost</strong>: pozorovací úhly z vybraného senzoru během nadcházejících přeletů (vyžaduje senzor).</li><li><strong>Zeměpisná šířka, délka, výška</strong>: pozemní stopa v čase.</li><li><strong>Geocentrické inerciální souřadnice (ECI)</strong>: vektory polohy a rychlosti ECI v čase.</li><li><strong>Klasické orbitální elementy</strong>: keplerovské elementy v aktuální epoše.</li><li><strong>Okna viditelnosti</strong>: časy východu a západu s délkou přeletů (vyžaduje senzor).</li><li><strong>Analýza Slunce/zatmění</strong>: časy slunečního svitu a vstupu a výstupu do zatmění, užitečné pro analýzu napájení a teploty.</li></ul>",
+        "howToUse": "<ol><li>Vyberte satelit; spodní ikona je neaktivní, dokud žádný není vybrán.</li><li>Pro zprávy založené na senzoru vyberte také senzor.</li><li>Otevřete <strong>Zprávy</strong> ze spodní lišty a klikněte na tlačítko zprávy. Zpráva se otevře ve vyskakovacím okně.</li><li>Pomocí tlačítka pro stažení v okně zprávy ji uložíte jako textový soubor.</li></ol>",
+        "tip1": "Zprávy pokrývají několik dní dat; u zpráv založených na přeletech může generování trvat několik sekund.",
+        "tip2": "Pokud se okno se zprávou nezobrazí, obvyklým viníkem je blokování vyskakovacích oken ve vašem prohlížeči; povolte vyskakovací okna pro tento web."
+      }
     }
   }
 }

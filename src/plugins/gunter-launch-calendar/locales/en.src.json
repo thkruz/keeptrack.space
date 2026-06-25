@@ -1,0 +1,17 @@
+{
+  "plugins": {
+    "GunterLaunchCalendar": {
+      "bottomIconLabel": "Gunter Launch Calendar",
+      "title": "Launch Calendar",
+      "commands": {
+        "open": "Open Launch Calendar"
+      },
+      "help": {
+        "overview": "The Launch Calendar opens Gunter's Space Page launch list for the current year in an overlay: a comprehensive, regularly updated list of orbital launches with dates, vehicles, payloads, and launch sites. Use it to see what is launching next and then recreate upcoming launches with the New Launch tool.",
+        "howToUse": "<ol><li>Click the <strong>Launch Calendar</strong> icon in the bottom menu (Events mode). The calendar opens in an overlay; side menus close automatically.</li><li>Browse the list, then close the overlay to return to the 3D view.</li></ol>",
+        "tip1": "The calendar is an external page from Gunter's Space Page, so it requires an internet connection.",
+        "tip2": "It is also available from the command palette as Open Launch Calendar."
+      }
+    }
+  }
+}

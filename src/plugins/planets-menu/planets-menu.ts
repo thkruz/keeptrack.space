@@ -7,6 +7,8 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import {
   IBottomIconConfig,
+  ICommandPaletteCapable,
+  ICommandPaletteCommand,
   IContextMenuConfig,
   IDragOptions,
   IHelpConfig,
@@ -21,9 +23,20 @@ import { settingsManager } from '@app/settings/settings';
 import { Kilometers, RADIUS_OF_EARTH } from '@ootk/src/main';
 import planetPng from '@public/img/icons/planet.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import {
+  ALL_BODIES,
+  BodyCategory,
+  DWARF_PLANETS,
+  isKnownBody,
+  isPlanned,
+  isSelectableBody,
+  OTHER_CELESTIAL_BODIES,
+  PLANETS,
+} from './planets-bodies';
+import { getBodyViewConfig } from './planets-core';
 import './planets-menu.css';
 
-export class PlanetsMenuPlugin extends KeepTrackPlugin {
+export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPaletteCapable {
   readonly id = 'PlanetsMenuPlugin';
   dependencies_ = [];
 
@@ -33,12 +46,11 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
 
   private isPlanetsDisabled_ = false;
 
-  PLANETS = [SolarBody.Mercury, SolarBody.Venus, SolarBody.Earth, SolarBody.Mars, SolarBody.Jupiter, SolarBody.Saturn, SolarBody.Uranus, SolarBody.Neptune];
-  DWARF_PLANETS = [SolarBody.Pluto, SolarBody.Makemake, SolarBody.Eris, SolarBody.Haumea, SolarBody.Ceres, SolarBody.Sedna, SolarBody.Quaoar, SolarBody.Orcus, SolarBody.Gonggong, SolarBody.Charon];
-  OTHER_CELESTIAL_BODIES = [
-    SolarBody.Moon, SolarBody.Sun, SolarBody.Io, SolarBody.Europa, SolarBody.Ganymede,
-    SolarBody.Callisto, SolarBody.Titan, SolarBody.Rhea, SolarBody.Iapetus, SolarBody.Dione, SolarBody.Tethys, SolarBody.Enceladus,
-  ];
+  // Body taxonomy is owned by planets-bodies.ts; these aliases keep the existing
+  // references terse and let the scene-iterating helpers below read naturally.
+  PLANETS = PLANETS;
+  DWARF_PLANETS = DWARF_PLANETS;
+  OTHER_CELESTIAL_BODIES = OTHER_CELESTIAL_BODIES;
 
   getBottomIconConfig(): IBottomIconConfig {
     return {
@@ -61,8 +73,69 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
   getHelpConfig(): IHelpConfig {
     return {
       title: t7e('plugins.PlanetsMenuPlugin.title'),
-      body: t7e('plugins.PlanetsMenuPlugin.helpBody'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: this.t_('help.overview'),
+          image: {
+            src: 'img/help/planets-menu/planets-menu.png',
+            alt: this.t_('help.imgAlt'),
+            caption: this.t_('help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: this.t_('help.howToUse'),
+        },
+      ],
+      tips: [this.t_('help.tip1'), this.t_('help.tip2')],
+      shortcuts: [
+        { keys: ['P'], description: this.t_('help.shortcutToggle') },
+        { keys: ['Home'], description: this.t_('help.shortcutHome') },
+        { keys: ['Shift', 'Home'], description: this.t_('help.shortcutCenterEarth') },
+      ],
     };
+  }
+
+  getCommandPaletteCommands(): ICommandPaletteCommand[] {
+    const category = t7e('plugins.PlanetsMenuPlugin.bottomIconLabel');
+    const commands: ICommandPaletteCommand[] = [
+      {
+        id: 'PlanetsMenuPlugin.toggleMenu',
+        label: this.t_('commands.toggleMenu'),
+        category,
+        callback: () => {
+          if (ServiceLocator.getMainCamera().cameraType === CameraType.FPS) {
+            return;
+          }
+          this.bottomMenuClicked();
+        },
+      },
+    ];
+
+    for (const body of ALL_BODIES) {
+      if (!isSelectableBody(body)) {
+        continue;
+      }
+      commands.push({
+        id: `PlanetsMenuPlugin.center.${body}`,
+        label: this.t_('commands.centerOn').replace('{body}', this.bodyName_(body)),
+        category,
+        callback: () => {
+          if (settingsManager.isDisablePlanets) {
+            return;
+          }
+          this.changePlanet(body);
+        },
+      });
+    }
+
+    return commands;
+  }
+
+  /** Translated display name for a solar body. */
+  private bodyName_(body: string): string {
+    return this.t_(`bodies.${body}`);
   }
 
   getContextMenuConfig(): IContextMenuConfig {
@@ -84,11 +157,13 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
       return;
     }
 
+    let bodyId = targetId;
+
     // Convert 'planets-Moon-rmb' to 'Moon'
-    if (targetId.startsWith('planets-') && targetId.endsWith('-rmb')) {
-      targetId = targetId.slice(8, -4);
+    if (bodyId.startsWith('planets-') && bodyId.endsWith('-rmb')) {
+      bodyId = bodyId.slice(8, -4);
     }
-    this.changePlanet(targetId as SolarBody ?? SolarBody.Earth);
+    this.changePlanet(bodyId as SolarBody);
   }
 
   rmbCallback: (targetId: string | null, clickedSat?: number) => void = (targetId: string | null) => {
@@ -142,56 +217,49 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
   }
 
   private buildSideMenuHtml_(): string {
-    let html_ = html`
-        <ul>`;
+    return html`
+      <div class="planets-filter">
+        <input id="planets-filter-input" type="text" class="planets-filter-input"
+          placeholder="${this.t_('filterPlaceholder')}" autocomplete="off" spellcheck="false" />
+      </div>
+      ${this.buildSectionHtml_('planets', this.PLANETS)}
+      ${this.buildSectionHtml_('dwarfPlanets', this.DWARF_PLANETS)}
+      ${this.buildSectionHtml_('otherCelestialBodies', this.OTHER_CELESTIAL_BODIES)}
+    `;
+  }
 
+  private buildSectionHtml_(sectionKey: BodyCategory, bodies: readonly SolarBody[]): string {
     const centerTooltip = (body: string) => this.t_('tooltips.centerCamera').replace('{body}', body);
+    let rows = '';
 
-    html_ += html`
-      <h5 class="center-align side-menu-row-header">${this.t_('sections.planets')}</h5>
-    `;
+    for (const body of bodies) {
+      const name = this.bodyName_(body);
+      const filterKey = name.toLowerCase();
 
-    for (const object of this.PLANETS) {
-      html_ += `<li class="menu-selectable" kt-tooltip="${centerTooltip(object)}" data-planet="${object}">${object}</li>`;
-    }
-
-    html_ += html`
-      <div class="divider flow5out"></div>
-      <h5 class="center-align side-menu-row-header">${this.t_('sections.dwarfPlanets')}</h5>
-    `;
-
-    for (const object of this.DWARF_PLANETS) {
-      html_ += `<li class="menu-selectable" kt-tooltip="${centerTooltip(object)}" data-planet="${object}">${object}</li>`;
-    }
-
-    html_ += html`
-      <div class="divider flow5out"></div>
-      <h5 class="center-align side-menu-row-header">${this.t_('sections.otherCelestialBodies')}</h5>
-    `;
-
-    for (const object of this.OTHER_CELESTIAL_BODIES) {
-      const isDisabled = ['Io', 'Europa', 'Ganymede', 'Callisto', 'Titan', 'Rhea', 'Iapetus', 'Dione', 'Tethys', 'Enceladus'].includes(object);
-
-      if (isDisabled) {
-        html_ += `<li class="planets-menu-disabled" kt-tooltip="${this.t_('tooltips.plannedFuture')}" aria-disabled="true" disabled>${object}</li>`;
+      if (isPlanned(body)) {
+        rows += `<button type="button" class="kt-action planets-menu-disabled" kt-tooltip="${this.t_('tooltips.plannedFuture')}" ` +
+          `data-planet-name="${filterKey}" aria-disabled="true" disabled><span class="kt-action-label">${name}</span></button>`;
       } else {
-        html_ += `<li class="menu-selectable" kt-tooltip="${centerTooltip(object)}" data-planet="${object}">${object}</li>`;
+        rows += `<button type="button" class="kt-action waves-effect planets-menu-item" kt-tooltip="${centerTooltip(name)}" ` +
+          `data-planet="${body}" data-planet-name="${filterKey}"><span class="kt-action-label">${name}</span></button>`;
       }
     }
 
-    html_ += html`
-        </ul>`;
-
-    return html_;
+    return html`
+      <section class="kt-section">
+        <div class="kt-section-label">${this.t_(`sections.${sectionKey}`)}</div>
+        <div class="planets-section-list">${rows}</div>
+      </section>
+    `;
   }
 
   private buildRmbL2Html_(): string {
     let html_ = '';
 
     for (const planet of this.PLANETS) {
-      html_ += `<li id="planets-${planet}-rmb"><a href="#">${planet}</a></li>`;
+      html_ += `<li id="planets-${planet}-rmb"><a href="#">${this.bodyName_(planet)}</a></li>`;
       if (planet === SolarBody.Earth) {
-        html_ += `<li id="planets-${SolarBody.Moon}-rmb"><a href="#">Moon</a></li>`;
+        html_ += `<li id="planets-${SolarBody.Moon}-rmb"><a href="#">${this.bodyName_(SolarBody.Moon)}</a></li>`;
       }
     }
 
@@ -199,61 +267,52 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
   }
 
   changePlanet(planetName: SolarBody) {
-    if (
-      !this.PLANETS.includes(planetName) &&
-      !this.DWARF_PLANETS.includes(planetName) &&
-      !this.OTHER_CELESTIAL_BODIES.includes(planetName)
-    ) {
+    // Reject unknown bodies and bodies that are listed but not yet loaded.
+    if (!isKnownBody(planetName) || isPlanned(planetName)) {
       return;
     }
 
-    if (planetName === SolarBody.Earth || planetName === SolarBody.Moon) {
+    const scene = ServiceLocator.getScene();
+
+    // Resolve the body object (and radius) up front; Earth and Sun do not need it.
+    let selectedBody: CelestialBody | null = null;
+
+    if (planetName === SolarBody.Moon) {
+      selectedBody = scene.moons.Moon;
+    } else if (planetName !== SolarBody.Earth && planetName !== SolarBody.Sun) {
+      selectedBody = scene.getBodyById(planetName) as CelestialBody | null;
+      if (!selectedBody) {
+        return;
+      }
+    }
+
+    const view = getBodyViewConfig(planetName, (selectedBody?.RADIUS ?? 0) as Kilometers);
+
+    if (view.clearLines) {
       ServiceLocator.getLineManager().clear();
     }
 
     const catalogManager = ServiceLocator.getCatalogManager();
 
     ServiceLocator.getDotsManager().updateSizeBuffer(catalogManager.objectCache.length);
-
     PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
+
     settingsManager.centerBody = planetName;
     ServiceLocator.getMainCamera().cameraType = CameraType.FIXED_TO_EARTH;
     ServiceLocator.getUiManager().hideSideMenus();
 
-    if (planetName === SolarBody.Sun) {
-      this.drawOrbits_(planetName);
-      settingsManager.minZoomDistance = 62e6 as Kilometers; // 62 million km
-      settingsManager.maxZoomDistance = 1.5e10 as Kilometers; // 15 billion km
-      this.setAllPlanetsDotSize(1);
-    } else if (planetName === SolarBody.Earth) {
-      settingsManager.minZoomDistance = RADIUS_OF_EARTH + 50 as Kilometers;
-      settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
-      this.setAllPlanetsDotSize(0);
-    } else if (planetName === SolarBody.Moon) {
-      const scene = ServiceLocator.getScene();
-      const selectedPlanet = scene.moons.Moon;
-
-      selectedPlanet.useHighestQualityTexture();
-      settingsManager.minZoomDistance = selectedPlanet.RADIUS * 1.2 as Kilometers;
-      settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
-      this.setAllPlanetsDotSize(0);
-    } else {
-      // Anything but Earth, Moon or Sun
-      this.drawOrbits_(planetName);
-      const scene = ServiceLocator.getScene();
-      const selectedPlanet = scene.getBodyById(planetName);
-
-      if (!selectedPlanet) {
-        console.error(`Planet ${planetName} not found in scene.`);
-
-        return;
-      }
-
-      selectedPlanet.useHighestQualityTexture();
-      settingsManager.minZoomDistance = selectedPlanet.RADIUS * 1.2 as Kilometers;
-      settingsManager.maxZoomDistance = 1.3e10 as Kilometers; // 13 billion km
-      this.setAllPlanetsDotSize(1);
+    if (view.useHighestQualityTexture) {
+      selectedBody?.useHighestQualityTexture();
     }
+    if (view.drawOrbits) {
+      this.drawOrbits_(planetName);
+    }
+
+    settingsManager.minZoomDistance = view.minZoom;
+    settingsManager.maxZoomDistance = view.maxZoom;
+    this.setAllPlanetsDotSize(view.dotSize);
+
+    this.updateActiveBody_();
   }
 
   showBottomIcon(): void {
@@ -276,19 +335,65 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
       this.hideBottomIcon();
     }
 
-    getEl('planets-menu')
-      ?.querySelectorAll('li')
-      .forEach((element) => {
-        element.addEventListener('click', () => {
-          const planetName = element.dataset.planet;
+    getEl('planets-menu')?.classList.add('kt-ui-v13');
 
-          if (!planetName) {
-            return;
-          }
+    const contentEl = getEl('planets-menu-content');
 
-          this.planetsMenuClick(planetName);
-        });
-      });
+    // One delegated listener for every body row (replaces per-row listeners).
+    contentEl?.addEventListener('click', (e) => {
+      const row = (e.target as HTMLElement).closest<HTMLElement>('.planets-menu-item');
+      const planetName = row?.dataset.planet;
+
+      if (!planetName) {
+        return;
+      }
+      this.planetsMenuClick(planetName);
+    });
+
+    const filterEl = getEl('planets-filter-input') as HTMLInputElement | null;
+
+    filterEl?.addEventListener('input', () => this.applyFilter_(filterEl.value));
+
+    this.updateActiveBody_();
+  }
+
+  /** Filter the body rows by display name; hide sections that end up empty. */
+  private applyFilter_(query: string): void {
+    const contentEl = getEl('planets-menu-content');
+
+    if (!contentEl) {
+      return;
+    }
+
+    const q = query.trim().toLowerCase();
+
+    contentEl.querySelectorAll<HTMLElement>('.kt-action[data-planet-name]').forEach((row) => {
+      const match = q === '' || (row.dataset.planetName ?? '').includes(q);
+
+      row.style.display = match ? '' : 'none';
+    });
+
+    contentEl.querySelectorAll<HTMLElement>('.kt-section').forEach((section) => {
+      const rows = Array.from(section.querySelectorAll<HTMLElement>('.kt-action[data-planet-name]'));
+      const anyVisible = rows.some((row) => row.style.display !== 'none');
+
+      section.style.display = anyVisible ? '' : 'none';
+    });
+  }
+
+  /** Highlight the row matching the currently centered body. */
+  private updateActiveBody_(): void {
+    const contentEl = getEl('planets-menu-content');
+
+    if (!contentEl) {
+      return;
+    }
+
+    const active = settingsManager.centerBody;
+
+    contentEl.querySelectorAll<HTMLElement>('.planets-menu-item').forEach((row) => {
+      row.classList.toggle('planets-menu-active', row.dataset.planet === active);
+    });
   }
 
   private checkPlanetsDisabledState_(): void {
@@ -338,31 +443,22 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
 
     const scene = ServiceLocator.getScene();
     const gl = ServiceLocator.getRenderer().gl;
-    const moon = scene.getBodyById(SolarBody.Moon)!;
+    const moon = scene.getBodyById(SolarBody.Moon);
 
-    moon.isDrawOrbitPath = true;
-    moon.drawFullOrbitPath();
-    moon.planetObject?.setHoverDotSize(gl, 1);
-
-    for (const planetBody of this.PLANETS.filter((p) => p !== SolarBody.Moon)) {
-      const planet = scene.getBodyById(planetBody) as CelestialBody;
-
-      if (!planet) {
-        continue;
-      }
-
-      planet.isDrawOrbitPath = true;
-      planet.drawFullOrbitPath();
+    if (moon) {
+      moon.isDrawOrbitPath = true;
+      moon.drawFullOrbitPath();
+      moon.planetObject?.setHoverDotSize(gl, 1);
     }
-    for (const dwarfPlanetBody of this.DWARF_PLANETS) {
-      const dwarfPlanet = scene.getBodyById(dwarfPlanetBody) as CelestialBody;
 
-      if (!dwarfPlanet) {
+    for (const bodyId of [...this.PLANETS, ...this.DWARF_PLANETS]) {
+      const body = scene.getBodyById(bodyId) as CelestialBody | null;
+
+      if (!body) {
         continue;
       }
-
-      dwarfPlanet.isDrawOrbitPath = true;
-      dwarfPlanet.drawFullOrbitPath();
+      body.isDrawOrbitPath = true;
+      body.drawFullOrbitPath();
     }
     this.setAllPlanetsDotSize(1);
 
@@ -372,30 +468,14 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
   setAllPlanetsDotSize(size = 1): void {
     const scene = ServiceLocator.getScene();
     const gl = ServiceLocator.getRenderer().gl;
-    const moon = scene.getBodyById(SolarBody.Moon)!;
-    const earth = scene.getBodyById(SolarBody.Earth)!;
 
-    moon.planetObject?.setHoverDotSize(gl, size);
-    earth.planetObject?.setHoverDotSize(gl, size);
+    // Earth lives in PLANETS and Moon in OTHER_CELESTIAL_BODIES, so the union
+    // already covers them - no need to special-case either.
+    for (const bodyId of [...this.PLANETS, ...this.DWARF_PLANETS, ...this.OTHER_CELESTIAL_BODIES]) {
+      const body = scene.getBodyById(bodyId) as CelestialBody | null;
 
-    for (const planetBody of this.PLANETS) {
-      const planet = scene.getBodyById(planetBody) as CelestialBody;
-
-      planet?.planetObject?.setHoverDotSize(gl, size);
+      body?.planetObject?.setHoverDotSize(gl, size);
     }
-
-    for (const dwarfPlanetBody of this.DWARF_PLANETS) {
-      const dwarfPlanet = scene.getBodyById(dwarfPlanetBody as SolarBody) as CelestialBody;
-
-      dwarfPlanet?.planetObject?.setHoverDotSize(gl, size);
-    }
-
-    for (const otherBody of this.OTHER_CELESTIAL_BODIES) {
-      const otherCelestialBody = scene.getBodyById(otherBody as SolarBody) as CelestialBody;
-
-      otherCelestialBody?.planetObject?.setHoverDotSize(gl, size);
-    }
-
   }
 
   planetsMenuClick = (planetName: string) => {
@@ -403,6 +483,8 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
   };
 
   bottomIconCallback = (): void => {
-    // No-op: side menu is opened by the base class
+    // Refresh the active-body highlight each time the menu opens (the base
+    // class opens the side menu itself).
+    this.updateActiveBody_();
   };
 }

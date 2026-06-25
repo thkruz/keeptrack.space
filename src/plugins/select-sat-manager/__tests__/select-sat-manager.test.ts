@@ -41,6 +41,44 @@ describe('SelectSatManager_dots', () => {
     selectSatManager.checkIfSelectSatVisible();
   });
 
+  it('should not write past the color buffer when lastSelectedSat is stale (no buffer overflow)', () => {
+    // colorData holds 5 objects (20 floats / 4). The previously-selected id (10)
+    // still resolves to a real object but lies beyond the (since-shrunk) color buffer.
+    const colorData = new Float32Array(20);
+
+    ServiceLocator.getColorSchemeManager().colorData = colorData as unknown as Float32Array<ArrayBuffer>;
+    ServiceLocator.getDotsManager().sizeData = new Int8Array(5) as unknown as Int8Array;
+    ServiceLocator.getDotsManager().positionData = Array(20).fill(0) as unknown as Float32Array;
+
+    const currentSat = new Satellite({ ...defaultSat, id: 0 });
+
+    currentSat.position = { x: 10000, y: 10000, z: 10000 } as any;
+    ServiceLocator.getCatalogManager().objectCache = [currentSat];
+
+    // getObject still returns a valid object for the stale id (simulating a reload
+    // where the id is in range of the cache but not the color buffer).
+    const staleSat = new Satellite({ ...defaultSat, id: 10 });
+
+    ServiceLocator.getCatalogManager().getObject = vi.fn((id: number) => (id === 10 ? staleSat : currentSat)) as any;
+
+    // Simulate a stale id left over from a larger catalog that has since been reloaded.
+    (selectSatManager as any).lastSelectedSat_ = 10;
+
+    const gl = ServiceLocator.getRenderer().gl;
+    const bufferSubDataSpy = vi.spyOn(gl, 'bufferSubData');
+
+    expect(() => (selectSatManager as any).updateDotSizeAndColor_(0)).not.toThrow();
+
+    // No color-buffer write should target the stale (out-of-range) object's byte offset.
+    const colorByteLength = colorData.length * Float32Array.BYTES_PER_ELEMENT;
+    const staleOffset = 10 * 4 * Float32Array.BYTES_PER_ELEMENT;
+
+    expect(staleOffset).toBeGreaterThanOrEqual(colorByteLength);
+    for (const call of bufferSubDataSpy.mock.calls) {
+      expect(call[1]).not.toBe(staleOffset);
+    }
+  });
+
   it('should be able to select a sensor dot', () => {
     selectSatManager.init();
 

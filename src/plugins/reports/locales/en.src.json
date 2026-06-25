@@ -3,7 +3,64 @@
     "ReportsPlugin": {
       "bottomIconLabel": "Reports",
       "title": "Reports Menu",
-      "helpBody": "The Reports Menu is a collection of tools to help you analyze and understand the data you are viewing."
+      "reports": {
+        "aer": {
+          "name": "Azimuth Elevation Range",
+          "description": "Generate azimuth, elevation, and range data for satellite passes"
+        },
+        "lla": {
+          "name": "Latitude Longitude Altitude",
+          "description": "Generate latitude, longitude, and altitude data over time"
+        },
+        "eci": {
+          "name": "Earth Centered Inertial",
+          "description": "Generate ECI position and velocity vectors over time"
+        },
+        "coes": {
+          "name": "Classical Orbital Elements",
+          "description": "Generate classical orbital elements at current epoch"
+        },
+        "visibilityWindows": {
+          "name": "Visibility Windows",
+          "description": "Generate visibility windows with rise/set times and pass duration"
+        },
+        "sunEclipse": {
+          "name": "Sun/Eclipse Analysis",
+          "description": "Generate sun visibility and eclipse entry/exit times for power and thermal analysis"
+        }
+      },
+      "commands": {
+        "generateReport": "Generate {name} Report",
+        "open": "Open Reports"
+      },
+      "downloadButton": "Download Report",
+      "copyButton": "Copy to Clipboard",
+      "sensorNote": "These reports require a sensor to be selected.",
+      "sections": {
+        "orbitPosition": "Orbit and Position",
+        "sensor": "Sensor",
+        "options": "Output Options"
+      },
+      "options": {
+        "window": "Time Window",
+        "step": "Step",
+        "format": "Format",
+        "days": "{days} days",
+        "seconds": "{seconds} s",
+        "format_text": "Text (aligned)",
+        "format_csv": "CSV",
+        "format_json": "JSON"
+      },
+      "help": {
+        "overview": "The Reports menu generates text reports about the selected satellite: pass geometry, position over time, orbital elements, visibility windows, and eclipse analysis. Each report opens in its own window, neatly formatted with a download button, ready to paste into other tools or share.",
+        "imgAlt": "The Reports menu listing the available report types",
+        "imgCaption": "Each button generates a formatted text report for the selected satellite.",
+        "typesHeading": "Available Reports",
+        "types": "<ul><li><strong>Azimuth Elevation Range</strong>: look angles from the selected sensor through upcoming passes (needs a sensor).</li><li><strong>Latitude Longitude Altitude</strong>: the ground track over time.</li><li><strong>Earth Centered Inertial</strong>: ECI position and velocity vectors over time.</li><li><strong>Classical Orbital Elements</strong>: the Keplerian elements at the current epoch.</li><li><strong>Visibility Windows</strong>: rise and set times with pass durations (needs a sensor).</li><li><strong>Sun/Eclipse Analysis</strong>: sunlight and eclipse entry and exit times, useful for power and thermal work.</li></ul>",
+        "howToUse": "<ol><li>Select a satellite; the bottom icon is disabled until one is selected.</li><li>For sensor based reports, select a sensor too.</li><li>Open <strong>Reports</strong> from the bottom bar and click a report button. The report opens in a popup window.</li><li>Use the download button in the report window to save it as a text file.</li></ol>",
+        "tip1": "Reports cover several days of data; generation can take a few seconds for the pass based reports.",
+        "tip2": "If the report window does not appear, your browser's popup blocker is the usual culprit; allow popups for this site."
+      }
     }
   }
 }

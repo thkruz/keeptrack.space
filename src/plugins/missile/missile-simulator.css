@@ -1,0 +1,56 @@
+/*
+ * Missile Simulator (OSS) v13 menu styling.
+ *
+ * Scoped to `#MissileSimulatorPlugin-menu`. The shared card / action / field
+ * building blocks live in src/engine/ui/menu-v13.css (scoped under .kt-ui-v13);
+ * this file only carries the per-menu dense-form fixes required because the
+ * Launch and Target cards each stack several labelled rows.
+ */
+
+/*
+ * 1. Stacked-field headroom. The shared v13 default
+ *    (`.kt-field-row .input-field.col { margin-top: 6px }`) is too tight when a
+ *    card stacks more than one labelled row (or a row under a <select>): the
+ *    floating "active" label collides with the row above. Give stacked rows
+ *    enough room; the first row in a card only needs the section-label gap.
+ */
+#MissileSimulatorPlugin-menu .kt-field-row .input-field.col {
+  margin-top: 20px;
+}
+
+#MissileSimulatorPlugin-menu .kt-section-label + .kt-field-row .input-field.col {
+  margin-top: 8px;
+}
+
+/*
+ * 2. Standalone action width. The Launch / Show All / Clear rows are direct
+ *    children of the form (not nested in a .kt-section), so `.kt-action` is
+ *    width:100% and would run 12px past the inset cards. Subtract the side
+ *    margins from the width (border-box) so the edges line up with the cards.
+ */
+#MissileSimulatorPlugin-menu-form > .kt-action {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
+}
+
+/*
+ * 3. Focus indication. KeepTrack marks field focus with the underline, not a
+ *    box. The app-wide `:focus-visible` outline (offset 2px) would overlap the
+ *    floating label above each field, so swap it for a primary underline.
+ */
+#MissileSimulatorPlugin-menu .input-field input:focus,
+#MissileSimulatorPlugin-menu .input-field textarea:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#MissileSimulatorPlugin-menu .input-field input:focus-visible,
+#MissileSimulatorPlugin-menu .input-field textarea:focus-visible {
+  outline: none;
+}
+
+/* The status note sits below the action rows; give it the same inset as the cards. */
+#MissileSimulatorPlugin-menu #ms-status {
+  margin: 12px 6px 0;
+}

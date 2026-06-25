@@ -1,7 +1,52 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { ErrorManager } from '@app/engine/utils/errorManager';
+import { ErrorManager, isOpaqueWindowError } from '@app/engine/utils/errorManager';
+
+describe('isOpaqueWindowError (Global Error Trapper cross-origin gate)', () => {
+  const makeEvent = (over: Partial<Pick<ErrorEvent, 'error' | 'message' | 'filename'>>) => ({
+    error: null,
+    message: 'Script error.',
+    filename: '',
+    ...over,
+  });
+
+  it('flags the spec cross-origin sentinel (null error, "Script error.")', () => {
+    expect(isOpaqueWindowError(makeEvent({ message: 'Script error.', filename: 'https://cdn.example/lib.js' }))).toBe(true);
+  });
+
+  it('flags a Chromium-fork leak with a non-standard message and no filename (#1353)', () => {
+    // VivoBrowser (Chromium 131 fork) does not always honour the 'Script error.' sentinel; it
+    // leaks a vendor-specific message and drops the filename, so the exact-sentinel check missed it.
+    expect(isOpaqueWindowError(makeEvent({ message: 'unknown', filename: '' }))).toBe(true);
+  });
+
+  it('flags a null-error event with an empty message', () => {
+    expect(isOpaqueWindowError(makeEvent({ message: '', filename: 'https://app.keeptrack.space/js/main.js' }))).toBe(true);
+  });
+
+  it('flags a null-error event that dropped its filename', () => {
+    expect(isOpaqueWindowError(makeEvent({ message: 'ReferenceError: x', filename: '' }))).toBe(true);
+  });
+
+  it('does NOT flag a genuine same-origin error (real Error object present)', () => {
+    // A real uncaught error always carries the Error object, message, and filename — must surface.
+    expect(isOpaqueWindowError({
+      error: new Error('real bug'),
+      message: 'Uncaught Error: real bug',
+      filename: 'https://app.keeptrack.space/js/main.js',
+    })).toBe(false);
+  });
+
+  it('does NOT flag a null-error event that still has both a message and a source', () => {
+    // Null error but full context (some legacy reporting paths): leave it actionable.
+    expect(isOpaqueWindowError({
+      error: null,
+      message: 'TypeError: undefined is not a function',
+      filename: 'https://app.keeptrack.space/js/main.js',
+    })).toBe(false);
+  });
+});
 
 describe('ErrorManager.error', () => {
   let errorManager: ErrorManager;

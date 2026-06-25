@@ -3,7 +3,30 @@
     "OrbitGuardMenuPlugin": {
       "bottomIconLabel": "OrbitGuard",
       "title": "OrbitGuard",
-      "helpBody": "El menú de Detección de Anomalías OrbitGuard muestra los últimos eventos de maniobra, órbita fuera de familia y cambio de estabilidad para satélites."
+      "labels": {
+        "dataCredit": "*Datos de OrbitGuard proporcionados por MSBAI.",
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "pageOf": "Página {current} de {total}"
+      },
+      "table": {
+        "norad": "NORAD",
+        "eventStartTime": "Hora de inicio del evento",
+        "eventEndTime": "Hora de fin del evento",
+        "maneuverClass": "Clase de maniobra",
+        "maneuverProbability": "Probabilidad de maniobra (%)",
+        "orbitOutOfFamily": "Órbita fuera de familia",
+        "stabilityChange": "Cambio de estabilidad",
+        "stabilityChangeProbability": "Probabilidad de cambio de estabilidad (%)"
+      },
+      "help": {
+        "overview": "OrbitGuard muestra las detecciones recientes de anomalías en todo el catálogo: maniobras sospechadas, órbitas que se han desviado fuera de familia y cambios de estabilidad, cada una con una probabilidad de confianza. Los datos provienen del servicio OrbitGuard de MSBAI y ofrecen una lista ordenada de satélites que merecen un análisis más detallado.",
+        "imgAlt": "La tabla de anomalías de OrbitGuard con eventos detectados",
+        "imgCaption": "Cada fila es un evento detectado; las celdas rojas marcan detecciones que superaron su umbral.",
+        "howToUse": "<ol><li>Abre <strong>OrbitGuard</strong> desde la barra inferior (modo Eventos). Los últimos eventos se cargan automáticamente.</li><li>Revisa la tabla: las celdas resaltadas en rojo son detecciones positivas (una maniobra clasificada, una órbita fuera de familia o un cambio de estabilidad).</li><li>Haz clic en una fila para volar a ese satélite y saltar el reloj al final del evento.</li><li>Usa <strong>Anterior</strong> y <strong>Siguiente</strong> para recorrer la lista, 20 eventos por página.</li></ol>",
+        "tip1": "Los eventos se deduplican por satélite y se ordenan del más reciente al más antiguo, así que las filas superiores muestran la actividad más reciente.",
+        "tip2": "Las probabilidades son la confianza del modelo, no una certeza; toma los valores intermedios como una señal para revisar manualmente, no como una conclusión."
+      }
     }
   }
 }

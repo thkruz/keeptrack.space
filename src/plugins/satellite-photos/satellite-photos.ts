@@ -22,6 +22,8 @@ import { settingsManager } from '@app/settings/settings';
 import { Degrees } from '@ootk/src/main';
 import satellitePng from '@public/img/icons/satellite.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { IMAGERY_SOURCES, ImagerySource } from './imagery-sources';
+import './satellite-photos.css';
 
 interface DiscvrResponse {
   centroid_coordinates: {
@@ -37,7 +39,16 @@ export class SatellitePhotos extends KeepTrackPlugin {
   readonly id = 'SatellitePhotos';
   requiresInternet = true;
   protected dependencies_: string[] = [SelectSatManager.name];
-  protected discvrPhotos_: { imageUrl: string; lat: Degrees; lon: Degrees }[] = [];
+
+  /** DSCOVR (Deep Space Climate Observatory), the source of the EPIC whole-Earth images. */
+  private static readonly DSCOVR_SCC = 40390;
+
+  /** Imagery sources for the DSCOVR EPIC archive, built lazily on first menu open. */
+  protected discvrSources_: ImagerySource[] = [];
+  /** Guards the one-time DSCOVR fetch so it only fires when the menu is first opened. */
+  private isDiscvrRequested_ = false;
+  /** The last source the user opened, used by the Refresh action. */
+  private lastSource_: ImagerySource | null = null;
 
   // =========================================================================
   // Composition-based configuration methods
@@ -70,26 +81,57 @@ export class SatellitePhotos extends KeepTrackPlugin {
   }
 
   private buildSideMenuHtml_(): string {
+    const geoRows = IMAGERY_SOURCES.map((source) => SatellitePhotos.actionRow_(source.id, source.label)).join('');
+
     return html`
-      <div id="sat-photo-menu" class="side-menu-parent start-hidden">
+      <div id="sat-photo-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div id="sat-photo-menu-content" class="side-menu">
-          <ul id="sat-photo-menu-list">
-            <li id="meteosat9-link" class="menu-selectable">MeteoSat 9</li>
-            <li id="meteosat11-link" class="menu-selectable">MeteoSat 11</li>
-            <li id="himawari8-link" class="menu-selectable">Himawari 8</li>
-            <li id="goes16-link" class="menu-selectable">GOES 16</li>
-            <li id="goes18-link" class="menu-selectable">GOES 18</li>
-            <li id="elektro3-link" class="menu-selectable">Elektro-L 2</li>
-          </ul>
+          <section class="kt-section">
+            <div class="kt-section-label">${t7e('plugins.SatellitePhotos.sections.geostationary')}</div>
+            <div id="sat-photo-geo-list">${geoRows}</div>
+          </section>
+          <section class="kt-section" id="sat-photo-dscovr-section">
+            <div class="kt-section-label">${t7e('plugins.SatellitePhotos.sections.dscovr')}</div>
+            <div id="sat-photo-dscovr-list">
+              <div class="kt-note">${t7e('plugins.SatellitePhotos.labels.dscovrLoading')}</div>
+            </div>
+          </section>
+          <button type="button" id="sat-photo-refresh" class="kt-action waves-effect" style="display:none;">
+            <span class="kt-action-label">${t7e('plugins.SatellitePhotos.labels.refresh')}</span>
+          </button>
         </div>
       </div>
     `;
   }
 
+  private static actionRow_(id: string, label: string): string {
+    return `<button type="button" id="${id}-link" class="kt-action waves-effect sat-photo-link" data-source-id="${id}">` +
+      `<span class="kt-action-label">${label}</span></button>`;
+  }
+
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.SatellitePhotos.title' as Parameters<typeof t7e>[0]),
-      body: t7e('plugins.SatellitePhotos.helpBody' as Parameters<typeof t7e>[0]),
+      title: t7e('plugins.SatellitePhotos.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.SatellitePhotos.help.overview'),
+          image: {
+            src: 'img/help/satellite-photos/satellite-photos-menu.png',
+            alt: t7e('plugins.SatellitePhotos.help.imgAlt'),
+            caption: t7e('plugins.SatellitePhotos.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.SatellitePhotos.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.SatellitePhotos.help.tip1'),
+        t7e('plugins.SatellitePhotos.help.tip2'),
+      ],
+      shortcuts: [{ keys: ['H'], description: t7e('plugins.SatellitePhotos.help.shortcutToggle') }],
     };
   }
 
@@ -112,122 +154,119 @@ export class SatellitePhotos extends KeepTrackPlugin {
       EventBusEvent.uiManagerFinal,
       this.uiManagerFinal_.bind(this),
     );
-
-    EventBus.getInstance().on(
-      EventBusEvent.onKeepTrackReady,
-      () => {
-        this.initDISCOVR_();
-      },
-    );
   }
 
   private uiManagerFinal_(): void {
-    getEl('meteosat9-link', true)?.addEventListener('click', () => {
-      // IODC is Indian Ocean Data Coverage and is Meteosat 9 as of 2022
-      SatellitePhotos.loadPic_(28912, 'https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSGIODC_RGBNatColour_LowResolution.jpg');
+    getEl('sat-photo-menu-content', true)?.addEventListener('click', (evt: Event) => {
+      const row = (evt.target as HTMLElement).closest('.sat-photo-link') as HTMLElement | null;
+
+      if (!row) {
+        return;
+      }
+
+      const source = this.findSource_(row.dataset.sourceId);
+
+      if (source) {
+        this.loadSource_(source);
+      }
     });
-    getEl('meteosat11-link', true)?.addEventListener('click', () => {
-      // Meteosat 11 provides 0 deg full earth images every 15 minutes
-      SatellitePhotos.loadPic_(40732, 'https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSG_RGBNatColour_LowResolution.jpg');
-    });
-    getEl('himawari8-link', true)?.addEventListener('click', () => {
-      SatellitePhotos.himawari8_();
-    });
-    getEl('goes16-link', true)?.addEventListener('click', () => {
-      SatellitePhotos.loadPic_(41866, 'https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/latest.jpg');
-    });
-    getEl('goes18-link', true)?.addEventListener('click', () => {
-      SatellitePhotos.loadPic_(51850, 'https://cdn.star.nesdis.noaa.gov/GOES18/ABI/FD/GEOCOLOR/latest.jpg');
-    });
-    getEl('elektro3-link', true)?.addEventListener('click', () => {
-      this.loadElektro_();
-    });
+
+    getEl('sat-photo-refresh', true)?.addEventListener('click', () => this.refreshLatest_());
   }
 
-  // =========================================================================
-  // Elektro-L 2 time-based image loading
-  // =========================================================================
-
-  private loadElektro_(): void {
-    const timeManager = ServiceLocator.getTimeManager();
-    const simulationTime = timeManager.simulationTimeObj;
-    const realTime = Date.now();
-
-    if (realTime - simulationTime.getTime() < 0) {
-      this.loadElektroFuture_(simulationTime, realTime);
-
+  /** The DSCOVR feed is only fetched the first time the user opens the menu. */
+  onSideMenuOpen(): void {
+    if (this.isDiscvrRequested_) {
       return;
     }
-
-    this.loadElektroPastOrPresent_(simulationTime, realTime);
+    this.isDiscvrRequested_ = true;
+    this.initDscovr_();
   }
 
-  private loadElektroFuture_(simulationTime: Date, realTime: number): void {
-    const closestTime = new Date(simulationTime);
-
-    closestTime.setHours(closestTime.getHours() + 24);
-    closestTime.setMinutes(closestTime.getMinutes() - 30);
-    closestTime.setSeconds(0);
-
-    if ((closestTime.getTime() + 30 * 60 * 1000) - realTime > 0) {
-      closestTime.setMinutes(closestTime.getMinutes() - 30);
+  private findSource_(id?: string): ImagerySource | undefined {
+    if (!id) {
+      return undefined;
     }
 
-    const formattedDate = closestTime.toISOString().slice(0, 10).replace(/-/gu, '');
-    const closestTimeUTCString = SatellitePhotos.formatUtcTime_(closestTime);
-
-    SatellitePhotos.loadPic_(41105,
-      `https://electro.ntsomz.ru/i/splash/${formattedDate}-${(closestTime.getUTCHours() + 3).toString().padStart(2, '0')}00.jpg`,
-      `Electro-L 2 at ${closestTimeUTCString} UTC`,
-    );
-  }
-
-  private loadElektroPastOrPresent_(simulationTime: Date, realTime: number): void {
-    let closestTime: Date;
-
-    if (realTime - simulationTime.getTime() > 24 * 60 * 60 * 1000) {
-      closestTime = new Date(realTime);
-    } else {
-      closestTime = new Date(simulationTime);
-    }
-
-    closestTime.setMinutes(Math.floor(closestTime.getMinutes() / 30) * 30);
-    closestTime.setSeconds(0);
-
-    if (realTime - closestTime.getTime() > 24 * 60 * 60 * 1000) {
-      closestTime.setMinutes(closestTime.getMinutes() + 30);
-    }
-
-    if ((closestTime.getTime() + 60 * 60 * 1000) - realTime > 0) {
-      closestTime.setMinutes(closestTime.getMinutes() - 60);
-    }
-
-    const formattedDate = closestTime.toISOString().slice(0, 10).replace(/-/gu, '');
-    const closestTimeUTCString = SatellitePhotos.formatUtcTime_(closestTime);
-
-    SatellitePhotos.loadPic_(41105,
-      `https://electro.ntsomz.ru/i/splash/${formattedDate}-${(closestTime.getUTCHours() + 3).toString().padStart(2, '0')}00.jpg`,
-      `Electro-L 2 at ${closestTimeUTCString} UTC`,
-    );
-  }
-
-  private static formatUtcTime_(date: Date): string {
-    return date.toLocaleString('en-UK', {
-      year: 'numeric',
-      month: 'short',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-      timeZone: 'UTC',
-    });
+    return IMAGERY_SOURCES.find((source) => source.id === id) ?? this.discvrSources_.find((source) => source.id === id);
   }
 
   // =========================================================================
-  // DSCOVR image loading
+  // Image loading
   // =========================================================================
 
-  private initDISCOVR_(): void {
+  private loadSource_(source: ImagerySource, bustCache = false): void {
+    const timeManager = ServiceLocator.getTimeManager();
+    const uiManager = ServiceLocator.getUiManager();
+    const camera = ServiceLocator.getMainCamera();
+    const result = source.buildImage(timeManager.simulationTimeObj, Date.now());
+
+    this.lastSource_ = source;
+    uiManager.searchManager.hideResults();
+
+    if (source.sccNum !== null) {
+      const id = ServiceLocator.getCatalogManager().sccNum2Id(source.sccNum) ?? -1;
+
+      PluginRegistry.getPlugin(SelectSatManager)?.selectSat(id);
+    }
+
+    if (result.snap) {
+      camera.camSnap(lat2pitch(result.snap.lat), lon2yaw(result.snap.lon, timeManager.simulationTimeObj));
+    }
+    camera.changeZoom(0.7);
+
+    if (result.isFuture) {
+      uiManager.toast(
+        t7e('plugins.SatellitePhotos.errorMsgs.FuturePictures' as Parameters<typeof t7e>[0]),
+        ToastMsgType.caution,
+      );
+    }
+
+    const title = result.timestampUtc
+      ? t7e('plugins.SatellitePhotos.labels.imageAtUtc')
+        .replace('{name}', source.label)
+        .replace('{time}', result.timestampUtc)
+      : source.label;
+
+    let { url } = result;
+
+    if (bustCache) {
+      url += `${url.includes('?') ? '&' : '?'}_=${Date.now()}`;
+    }
+
+    SatellitePhotos.openImage_(url, title);
+    this.showRefresh_();
+  }
+
+  private static openImage_(url: string, title: string): void {
+    settingsManager.isPreventColorboxClose = true;
+    setTimeout(() => {
+      settingsManager.isPreventColorboxClose = false;
+    }, 2000);
+
+    openColorbox(url, { title, image: true });
+  }
+
+  private showRefresh_(): void {
+    const btn = getEl('sat-photo-refresh', true);
+
+    if (btn) {
+      btn.style.display = 'flex';
+    }
+  }
+
+  private refreshLatest_(): void {
+    if (!this.lastSource_) {
+      return;
+    }
+    this.loadSource_(this.lastSource_, true);
+  }
+
+  // =========================================================================
+  // DSCOVR EPIC image loading
+  // =========================================================================
+
+  private initDscovr_(): void {
     fetch('https://epic.gsfc.nasa.gov/api/natural')
       .then((response) => {
         if (!response.ok) {
@@ -237,113 +276,52 @@ export class SatellitePhotos extends KeepTrackPlugin {
         return response.json();
       })
       .then((res: DiscvrResponse[]) => {
-        res.forEach((photo) => {
-          const imageUrl = photo.image;
-          const dateStr = photo.identifier;
-          const year = dateStr.slice(0, 4);
-          const month = dateStr.slice(4, 6);
-          const day = dateStr.slice(6, 8);
-          const lat = photo.centroid_coordinates.lat;
-          const lon = photo.centroid_coordinates.lon;
-
-          this.discvrPhotos_.push({
-            imageUrl: `https://epic.gsfc.nasa.gov/archive/natural/${year}/${month}/${day}/png/${imageUrl}.png`,
-            lat,
-            lon,
-          });
-        });
-
-        this.addDiscvrLinks_();
+        this.discvrSources_ = res.map((photo, idx) => SatellitePhotos.buildDscovrSource_(photo, idx + 1));
+        this.renderDscovrRows_();
       })
       .catch(() => {
         errorManagerInstance.log('https://epic.gsfc.nasa.gov/ request failed!');
-        const unavailableHtml = '<li class="menu-selectable disabled">DSCOVR Temporarily Unavailable</li>';
-
-        getEl('sat-photo-menu-list', true)?.insertAdjacentHTML('beforeend', unavailableHtml);
+        this.setDscovrNote_(t7e('plugins.SatellitePhotos.labels.dscovrUnavailable'));
       });
   }
 
-  private addDiscvrLinks_(): void {
-    const listEl = getEl('sat-photo-menu-list', true);
+  private static buildDscovrSource_(photo: DiscvrResponse, index: number): ImagerySource {
+    const dateStr = photo.identifier;
+    const year = dateStr.slice(0, 4);
+    const month = dateStr.slice(4, 6);
+    const day = dateStr.slice(6, 8);
+    const url = `https://epic.gsfc.nasa.gov/archive/natural/${year}/${month}/${day}/png/${photo.image}.png`;
+    const { lat, lon } = photo.centroid_coordinates;
+
+    return {
+      id: `dscovr${index}`,
+      label: t7e('plugins.SatellitePhotos.labels.dscovrImage').replace('{index}', index.toString()),
+      sccNum: SatellitePhotos.DSCOVR_SCC,
+      buildImage: () => ({ url, snap: { lat, lon } }),
+    };
+  }
+
+  private renderDscovrRows_(): void {
+    const listEl = getEl('sat-photo-dscovr-list', true);
 
     if (!listEl) {
       return;
     }
 
-    for (let i = 1; i < this.discvrPhotos_.length + 1; i++) {
-      const linkHtml = `<li id="discovr-link${i}" class="menu-selectable">DSCOVR Image ${i}</li>`;
+    if (this.discvrSources_.length === 0) {
+      this.setDscovrNote_(t7e('plugins.SatellitePhotos.labels.dscovrUnavailable'));
 
-      listEl.insertAdjacentHTML('beforeend', linkHtml);
-      getEl(`discovr-link${i}`, true)?.addEventListener('click', () => {
-        const camera = ServiceLocator.getMainCamera();
-        const timeManager = ServiceLocator.getTimeManager();
-
-        SatellitePhotos.loadPic_(-1, this.discvrPhotos_[i - 1].imageUrl);
-        camera.camSnap(
-          lat2pitch(this.discvrPhotos_[i - 1].lat),
-          lon2yaw(this.discvrPhotos_[i - 1].lon, timeManager.simulationTimeObj),
-        );
-        camera.changeZoom(0.7);
-      });
+      return;
     }
+
+    listEl.innerHTML = this.discvrSources_.map((source) => SatellitePhotos.actionRow_(source.id, source.label)).join('');
   }
 
-  // =========================================================================
-  // Shared utilities
-  // =========================================================================
+  private setDscovrNote_(text: string): void {
+    const listEl = getEl('sat-photo-dscovr-list', true);
 
-  private static colorbox_(url: string, title?: string): void {
-    settingsManager.isPreventColorboxClose = true;
-    setTimeout(() => {
-      settingsManager.isPreventColorboxClose = false;
-    }, 2000);
-
-    openColorbox(url, {
-      title: title || t7e('plugins.SatellitePhotos.defaultImageTitle' as Parameters<typeof t7e>[0]),
-      image: true,
-    });
-  }
-
-  private static loadPic_(satId: number, url: string, title?: string): void {
-    ServiceLocator.getUiManager().searchManager.hideResults();
-    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(ServiceLocator.getCatalogManager().sccNum2Id(satId) ?? -1);
-    ServiceLocator.getMainCamera().changeZoom(0.7);
-    SatellitePhotos.colorbox_(url, title);
-  }
-
-  private static himawari8_(): void {
-    const catalogManager = ServiceLocator.getCatalogManager();
-    const camera = ServiceLocator.getMainCamera();
-    const timeManager = ServiceLocator.getTimeManager();
-
-    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(catalogManager.sccNum2Id(40267) ?? -1);
-    camera.changeZoom(0.7);
-
-    // Propagation time minus 30 minutes so that the pictures have time to become available
-    let propTime = timeManager.simulationTimeObj;
-
-    if (propTime.getTime() < Date.now()) {
-      propTime = new Date(propTime.getTime() - 1000 * 60 * 30);
-    } else {
-      const uiManagerInstance = ServiceLocator.getUiManager();
-
-      uiManagerInstance.toast(
-        t7e('plugins.SatellitePhotos.errorMsgs.FuturePictures' as Parameters<typeof t7e>[0]),
-        ToastMsgType.caution,
-      );
-      propTime = new Date(Date.now() - 1000 * 60 * 30);
+    if (listEl) {
+      listEl.innerHTML = `<div class="kt-note">${text}</div>`;
     }
-    const year = propTime.getUTCFullYear();
-    const mon = (propTime.getUTCMonth() + 1).toString().padStart(2, '0');
-    const day = propTime.getUTCDate().toString().padStart(2, '0');
-    const hour = propTime.getUTCHours().toString().padStart(2, '0');
-    const min = (Math.floor(propTime.getUTCMinutes() / 10) * 10).toString().padStart(2, '0');
-
-    settingsManager.isPreventColorboxClose = true;
-    setTimeout(() => {
-      settingsManager.isPreventColorboxClose = false;
-    }, 2000);
-
-    openColorbox(`https://himawari8.nict.go.jp/img/D531106/1d/550/${year}/${mon}/${day}/${hour}${min}00_0_0.png`, { image: true });
   }
 }

@@ -45,11 +45,11 @@ test.describe('CatalogManagement Plugin', () => {
     await expect(page.locator('#cm-import-btn')).toBeAttached();
     await expect(page.locator('#cm-dropzone')).toBeAttached();
 
-    // Verify Export tab elements — base buttons
-    await expect(page.locator('#de-export-tle-2a')).toBeAttached();
-    await expect(page.locator('#de-export-tle-3a')).toBeAttached();
-    await expect(page.locator('#de-export-tle-2b')).toBeAttached();
-    await expect(page.locator('#de-export-tle-3b')).toBeAttached();
+    // Verify Export tab elements - Orbital Elements (TLE source/format dropdowns)
+    await expect(page.locator('#de-tle-source')).toBeAttached();
+    await expect(page.locator('#de-tle-format')).toBeAttached();
+    await expect(page.locator('#de-export-tle')).toBeAttached();
+    // Tabular & STK
     await expect(page.locator('#de-export-csv')).toBeAttached();
     await expect(page.locator('#de-export-tce')).toBeAttached();
     await expect(page.locator('#de-export-fov')).toBeAttached();

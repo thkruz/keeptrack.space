@@ -3,7 +3,64 @@
     "ReportsPlugin": {
       "bottomIconLabel": "报告",
       "title": "报告菜单",
-      "helpBody": "报告菜单包含多种工具，帮助您分析和理解当前查看的数据。"
+      "reports": {
+        "aer": {
+          "name": "方位角、仰角、距离",
+          "description": "生成卫星过境的方位角、仰角和距离数据"
+        },
+        "lla": {
+          "name": "纬度、经度、高度",
+          "description": "生成随时间变化的纬度、经度和高度数据"
+        },
+        "eci": {
+          "name": "地心惯性坐标系（ECI）",
+          "description": "生成随时间变化的ECI位置和速度矢量"
+        },
+        "coes": {
+          "name": "经典轨道根数",
+          "description": "生成当前历元的经典轨道根数"
+        },
+        "visibilityWindows": {
+          "name": "可见性窗口",
+          "description": "生成包含升起/落下时间和过境持续时间的可见性窗口"
+        },
+        "sunEclipse": {
+          "name": "太阳/地影分析",
+          "description": "生成太阳可见性以及进出地影的时间，用于电源和热分析"
+        }
+      },
+      "commands": {
+        "generateReport": "生成{name}报告",
+        "open": "打开报告"
+      },
+      "downloadButton": "下载报告",
+      "copyButton": "复制到剪贴板",
+      "sensorNote": "这些报告需要先选择一个传感器。",
+      "sections": {
+        "orbitPosition": "轨道与位置",
+        "sensor": "传感器",
+        "options": "输出选项"
+      },
+      "options": {
+        "window": "时间窗口",
+        "step": "步长",
+        "format": "格式",
+        "days": "{days} 天",
+        "seconds": "{seconds} 秒",
+        "format_text": "文本（对齐）",
+        "format_csv": "CSV",
+        "format_json": "JSON"
+      },
+      "help": {
+        "overview": "报告菜单可为所选卫星生成文本报告：过境几何、随时间变化的位置、轨道根数、可见性窗口和地影分析。每份报告都会在独立窗口中打开，排版整齐并带有下载按钮，可直接粘贴到其他工具或与他人分享。",
+        "imgAlt": "列出可用报告类型的报告菜单",
+        "imgCaption": "每个按钮都会为所选卫星生成一份格式化的文本报告。",
+        "typesHeading": "可用报告",
+        "types": "<ul><li><strong>方位角、仰角、距离</strong>：未来过境期间从所选传感器观测的视角（需要传感器）。</li><li><strong>纬度、经度、高度</strong>：随时间变化的地面轨迹。</li><li><strong>地心惯性坐标系（ECI）</strong>：随时间变化的ECI位置和速度矢量。</li><li><strong>经典轨道根数</strong>：当前历元的开普勒根数。</li><li><strong>可见性窗口</strong>：升起和落下时间以及过境持续时间（需要传感器）。</li><li><strong>太阳/地影分析</strong>：日照时间以及进出地影的时间，对电源和热分析工作很有用。</li></ul>",
+        "howToUse": "<ol><li>选择一颗卫星；在选择卫星之前，底部图标处于禁用状态。</li><li>对于基于传感器的报告，还需选择一个传感器。</li><li>从底部栏打开<strong>报告</strong>并点击某个报告按钮。报告将在弹出窗口中打开。</li><li>使用报告窗口中的下载按钮将其保存为文本文件。</li></ol>",
+        "tip1": "报告涵盖数天的数据；基于过境的报告可能需要几秒钟才能生成。",
+        "tip2": "如果报告窗口没有出现，通常是浏览器的弹窗拦截器所致；请允许本站点的弹窗。"
+      }
     }
   }
 }

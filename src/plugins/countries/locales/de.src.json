@@ -3,7 +3,21 @@
     "CountriesMenu": {
       "bottomIconLabel": "Länder",
       "title": "Länder-Menü",
-      "helpBody": "Das Länder-Menü ermöglicht es Ihnen, die Satelliten nach Herkunftsland zu filtern."
+      "commands": {
+        "selectCountry": "Land auswählen: {country}"
+      },
+      "labels": {
+        "filterByCountry": "Nach Land filtern"
+      },
+      "help": {
+        "overview": "Das Länder-Menü filtert den Katalog nach Herkunftsland. Jedes Land mit mindestens einem Objekt wird mit Flagge und Objektanzahl aufgeführt; bei Auswahl eines Landes werden alle seine Satelliten hervorgehoben und in die Suchergebnisse geladen.",
+        "imgAlt": "Das Länder-Menü mit Ländern, Flaggen und Satellitenanzahlen",
+        "imgCaption": "Jeder Eintrag zeigt die Flagge, den Ländernamen und die Anzahl der Objekte des Landes.",
+        "howToUse": "<ol><li>Öffnen Sie das Menü <strong>Länder</strong> über die untere Leiste oder drücken Sie <strong>O</strong>.</li><li>Klicken Sie auf ein Land. Seine Satelliten werden gruppiert, in der 3D-Ansicht hervorgehoben und in den Suchergebnissen aufgelistet.</li><li>Klicken Sie auf ein Suchergebnis, um einen einzelnen Satelliten zu untersuchen.</li></ol>",
+        "tip1": "Die Auswahl eines Landes ersetzt die aktuelle Suche und hebt die Auswahl des aktuellen Satelliten auf; schließen Sie daher zuerst die Arbeit auf Objektebene ab.",
+        "tip2": "Jedes Land ist auch über die Befehlspalette als Befehl Land auswählen verfügbar.",
+        "shortcutToggle": "Länder-Menü umschalten"
+      }
     }
   }
 }

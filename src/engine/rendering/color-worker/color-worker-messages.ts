@@ -77,7 +77,7 @@ export interface SettingsFlags {
   isSensorManagerLoaded: boolean;
   sensorType: number; // SpaceObjectType of current sensor (0 if none)
   maxZoomDistance: number;
-  isMissilePluginEnabled: boolean;
+  isMissileSimulatorEnabled: boolean;
 }
 
 /** Incoming message from main thread → worker */

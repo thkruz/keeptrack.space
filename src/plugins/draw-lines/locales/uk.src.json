@@ -1,6 +1,8 @@
 {
   "plugins": {
     "DrawLinesPlugin": {
+      "title": "Малювання ліній",
+      "bottomIconLabel": "Малювання ліній",
       "rmbMenu": {
         "title": "Малювати",
         "eciAxes": "Осі ECI",
@@ -13,12 +15,39 @@
         "earthToSatellite": "Земля до супутника",
         "sensorToSatellite": "Датчик до супутника",
         "satelliteToSatellite": "Супутник до супутника",
+        "satelliteRicAxes": "Осі RIC супутника",
         "satelliteToSun": "Супутник до Сонця",
         "satelliteToMoon": "Супутник до Місяця",
         "moonOrbit": "Намалювати орбіту Місяця"
       },
+      "sections": {
+        "activeLines": "Активні лінії",
+        "referenceGeometry": "Опорна геометрія",
+        "objectLines": "Лінії об'єктів"
+      },
+      "referenceFrameLabel": "Система відліку",
+      "clearAll": "Очистити всі лінії",
+      "emptyList": "Лінії не намальовані",
+      "remove": "Видалити",
+      "lineTypes": {
+        "reference": "Опорна лінія",
+        "satToRef": "Супутник до точки",
+        "satRic": "Осі RIC",
+        "objToObj": "Об'єкт до об'єкта",
+        "satToSun": "Супутник до Сонця",
+        "satToBody": "Супутник до тіла",
+        "sensorToSat": "Датчик до супутника",
+        "sensorToSun": "Датчик до Сонця",
+        "sensorToMoon": "Датчик до Місяця",
+        "orbitPath": "Орбітальний шлях",
+        "satScanEarth": "Сканування Землі",
+        "sensorScanHorizon": "Сканування горизонту",
+        "sensorToRae": "Датчик до точки",
+        "generic": "Лінія"
+      },
       "errorMsgs": {
-        "noPrimarySat": "Не вибрано основний супутник для лінії між супутниками."
+        "noPrimarySat": "Не вибрано основний супутник для лінії між супутниками.",
+        "noSatSelected": "Спочатку виберіть супутник."
       }
     }
   }

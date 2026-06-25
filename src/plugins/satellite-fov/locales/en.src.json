@@ -3,7 +3,60 @@
     "SatelliteFov": {
       "bottomIconLabel": "Satellite FOV",
       "title": "Satellite Field of View",
-      "helpBody": "The Satellite Field of View plugin allows you to control the field of view of a satellite."
+      "tabs": {
+        "earthCenter": "Earth Center",
+        "satToSat": "Sat-to-Sat"
+      },
+      "labels": {
+        "sensorDesign": "Sensor Design",
+        "colorSettings": "Color Settings",
+        "defaultSensorDesign": "Default Sensor Design",
+        "defaultColorSettings": "Default Color Settings",
+        "activeSensors": "Active Sensors",
+        "targetSatellite": "Target Satellite",
+        "fovSettings": "FOV Settings",
+        "activeS2sCones": "Active Sat-to-Sat Cones",
+        "fovDegrees": "Field of View (Degrees)",
+        "opacity": "Opacity",
+        "targetCatalogNumber": "Target Catalog Number"
+      },
+      "tooltips": {
+        "fovOfSensor": "Field of View of the Sensor",
+        "red": "Red Color Value",
+        "green": "Green Color Value",
+        "blue": "Blue Color Value",
+        "opacity": "Opacity Value"
+      },
+      "buttons": {
+        "resetAllFovCones": "Reset All FOV Cones",
+        "useSecondarySat": "Use Secondary Sat",
+        "createS2sCone": "Create Sat-to-Sat Cone",
+        "resetS2sCones": "Reset Sat-to-Sat Cones"
+      },
+      "errorMsgs": {
+        "noSecondary": "No secondary satellite selected. Right-click a satellite or use [ ] keys.",
+        "selectSourceFirst": "Select a source satellite first.",
+        "enterTargetNumber": "Enter a target catalog number.",
+        "targetNotFound": "Target satellite not found in catalog.",
+        "targetSameAsSource": "Target satellite cannot be the same as source.",
+        "fovRange": "Field of View must be a number between 0 and 180 degrees.",
+        "redRange": "Red color value must be a number between 0 and 1.",
+        "greenRange": "Green color value must be a number between 0 and 1.",
+        "blueRange": "Blue color value must be a number between 0 and 1.",
+        "opacityRange": "Opacity value must be a number between 0 and 1."
+      },
+      "help": {
+        "overview": "Satellite FOV draws sensor cones from a satellite so you can see what it can see: either a nadir cone toward Earth (Earth Center) or a crosslink cone pointed at another satellite (Sat-to-Sat). Set the cone angle and color, and the volume renders live in the 3D view.",
+        "imgAlt": "The Satellite Field of View menu with its Earth Center and Sat-to-Sat tabs",
+        "imgCaption": "Configure the cone angle and color, then toggle cones per satellite.",
+        "tabsHeading": "Earth Center and Sat-to-Sat",
+        "tabs": "The <strong>Earth Center</strong> tab manages nadir pointing cones: set the default <strong>Field of View (Degrees)</strong> and color, press <strong>C</strong> to toggle a cone on the selected satellite, and manage every active cone in the <strong>Active Sensors</strong> list. The <strong>Sat-to-Sat</strong> tab builds a cone from a source satellite toward a target: enter a <strong>Target Catalog Number</strong> or click <strong>Use Secondary Sat</strong>, then <strong>Create Sat-to-Sat Cone</strong>; <strong>V</strong> toggles a cone toward the current secondary satellite.",
+        "howToUse": "<ol><li>Select a satellite; the bottom icon is disabled until one is selected.</li><li>Open the menu and adjust the cone angle, color, and opacity. Values apply to new cones.</li><li>Press <strong>C</strong> (or use the menu) to toggle an Earth pointing cone on the selected satellite.</li><li>For a crosslink, open the <strong>Sat-to-Sat</strong> tab, pick a target, and click <strong>Create Sat-to-Sat Cone</strong>.</li><li>Use the reset buttons to clear all cones of either type.</li></ol>",
+        "tip1": "Cones persist as you select other satellites, so you can build up a constellation wide coverage picture one satellite at a time.",
+        "tip2": "Set the secondary satellite by right-clicking a satellite or with the [ and ] keys; Use Secondary Sat then fills the target automatically.",
+        "shortcutToggleCone": "Toggle an Earth pointing FOV cone on the selected satellite",
+        "shortcutToggleS2s": "Toggle a cone toward the secondary satellite"
+      }
     }
   }
 }

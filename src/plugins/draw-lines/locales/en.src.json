@@ -1,6 +1,8 @@
 {
   "plugins": {
     "DrawLinesPlugin": {
+      "title": "Draw Lines",
+      "bottomIconLabel": "Draw Lines",
       "rmbMenu": {
         "title": "Draw",
         "eciAxes": "ECI Axes",
@@ -13,12 +15,39 @@
         "earthToSatellite": "Earth to Satellite",
         "sensorToSatellite": "Sensor to Satellite",
         "satelliteToSatellite": "Satellite to Satellite",
+        "satelliteRicAxes": "Satellite RIC Axes",
         "satelliteToSun": "Satellite to Sun",
         "satelliteToMoon": "Satellite to Moon",
         "moonOrbit": "Draw Moon's Orbit"
       },
+      "sections": {
+        "activeLines": "Active Lines",
+        "referenceGeometry": "Reference Geometry",
+        "objectLines": "Object Lines"
+      },
+      "referenceFrameLabel": "Reference Frame",
+      "clearAll": "Clear All Lines",
+      "emptyList": "No lines drawn",
+      "remove": "Remove",
+      "lineTypes": {
+        "reference": "Reference Line",
+        "satToRef": "Satellite to Point",
+        "satRic": "RIC Axes",
+        "objToObj": "Object to Object",
+        "satToSun": "Satellite to Sun",
+        "satToBody": "Satellite to Body",
+        "sensorToSat": "Sensor to Satellite",
+        "sensorToSun": "Sensor to Sun",
+        "sensorToMoon": "Sensor to Moon",
+        "orbitPath": "Orbit Path",
+        "satScanEarth": "Earth Scan",
+        "sensorScanHorizon": "Horizon Scan",
+        "sensorToRae": "Sensor to Point",
+        "generic": "Line"
+      },
       "errorMsgs": {
-        "noPrimarySat": "No primary satellite selected for Satellite to Satellite line."
+        "noPrimarySat": "No primary satellite selected for Satellite to Satellite line.",
+        "noSatSelected": "Select a satellite first."
       }
     }
   }

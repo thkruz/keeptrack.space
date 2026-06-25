@@ -3,7 +3,58 @@
     "ScenarioManagementMenu": {
       "title": "Szenarienverwaltung",
       "bottomIconLabel": "Szenarienverwaltung",
-      "helpBody": "Das Szenarienverwaltungs-Plugin ermöglicht es Ihnen, Ihre Arbeit für verschiedene Projekte oder Kontexte zu organisieren.<br/>Aktuelle Funktionen sind:<br/><br/>  - Name und Beschreibung für jedes Szenario<br/>  - Analysezeitraum: Start- und Enddatum/Uhrzeit<br/>  - Szenarien speichern/laden<br/><br/>Das Ziel ist es, schließlich eine einzelne Datei bereitzustellen, die alle für die Szenarienverwaltung notwendigen Informationen enthält. Weitere Funktionen folgen in Kürze!"
+      "sideMenuTitle": "Szenario-Einstellungen",
+      "labels": {
+        "scenarioName": "Szenarioname",
+        "description": "Beschreibung",
+        "scenarioStart": "Szenariobeginn",
+        "scenarioEnd": "Szenarioende"
+      },
+      "tooltips": {
+        "name": "Der Name des Szenarios.",
+        "description": "Die Beschreibung des Szenarios.",
+        "startDate": "Die Start-DTG des Szenarios in UTC (YYYY-MM-DD HH:MM:SS.sss).",
+        "endDate": "Die End-DTG des Szenarios in UTC (YYYY-MM-DD HH:MM:SS.sss)."
+      },
+      "placeholders": {
+        "description": "Szenariobeschreibung hier eingeben..."
+      },
+      "buttons": {
+        "updateScenario": "Szenario aktualisieren",
+        "saveScenario": "Szenario speichern",
+        "loadScenario": "Szenario laden"
+      },
+      "msgs": {
+        "settingsUpdated": "Szenario-Einstellungen erfolgreich aktualisiert!",
+        "scenarioLoaded": "Szenario erfolgreich geladen!"
+      },
+      "errorMsgs": {
+        "nameRequired": "Der Szenarioname ist erforderlich.",
+        "startDateInvalid": "Das Startdatum ist ungültig.",
+        "endDateInvalid": "Das Enddatum ist ungültig.",
+        "savingScenario": "Fehler beim Speichern des Szenarios!",
+        "loadingScenarioFile": "Fehler beim Laden der Szenariodatei!",
+        "decompressingScenarioFile": "Fehler beim Entpacken der Szenariodatei!"
+      },
+      "defaults": {
+        "scenarioName": "Mein Szenario",
+        "scenarioDescription": "Beschreibung von Mein Szenario"
+      },
+      "core": {
+        "beforeStartTime": "Die Simulationszeit liegt vor dem Szenariobeginn. Die Uhr pausiert am Startzeitpunkt.",
+        "afterStopTime": "Die Simulationszeit liegt nach dem Szenarioende. Die Uhr pausiert am Endzeitpunkt."
+      },
+      "help": {
+        "overview": "Die Szenarienverwaltung gibt Ihrer Sitzung einen benannten Kontext: ein Szenario mit Name, Beschreibung und einem optionalen Analysezeitraum mit Start- und Endzeit. Die Simulationsuhr wird dann innerhalb dieses Zeitfensters gehalten, und die gesamte Definition kann in einer Datei gespeichert, später erneut geladen oder mit Kollegen geteilt werden.",
+        "imgAlt": "Das Menü Szenario-Einstellungen mit Feldern für Name, Beschreibung und Zeitfenster",
+        "imgCaption": "Definieren Sie einen Szenarionamen, eine Beschreibung und optional eine Start- und Endzeit.",
+        "windowHeading": "Das Szenario-Zeitfenster",
+        "window": "Wenn Sie einen <strong>Szenariobeginn</strong> oder ein <strong>Szenarioende</strong> festlegen (UTC, im Format YYYY-MM-DD HH:MM:SS.sss), wird die Simulationsuhr auf dieses Zeitfenster begrenzt: Driftet die Zeit vor den Beginn oder über das Ende hinaus, pausiert die Uhr an der Grenze und eine Benachrichtigung erklärt den Grund. Lassen Sie die Felder leer für ein Szenario ohne Einschränkungen.",
+        "howToUse": "<ol><li>Öffnen Sie die <strong>Szenarienverwaltung</strong> über das untere Menü (Modus Werkzeuge).</li><li>Geben Sie unter <strong>Szenarioname</strong> einen Namen ein (erforderlich) sowie optional eine <strong>Beschreibung</strong>.</li><li>Legen Sie optional die Zeiten für <strong>Szenariobeginn</strong> und <strong>Szenarioende</strong> in UTC fest.</li><li>Klicken Sie auf <strong>Szenario aktualisieren</strong>, um die Änderungen zu übernehmen. Das Zeitfenster wird sofort durchgesetzt.</li><li>Verwenden Sie <strong>Szenario speichern</strong>, um die Definition als komprimierte .kts-Datei herunterzuladen, und <strong>Szenario laden</strong>, um sie von der Festplatte wiederherzustellen.</li></ol>",
+        "tip1": "Wenn die Wiedergabe festzuhängen scheint, prüfen Sie, ob die Uhr an einer Szenariogrenze festgehalten wird; leeren Sie die Start- und Endfelder, um sie freizugeben.",
+        "tip2": "Szenariodateien sind kleine komprimierte .kts-Dateien, praktisch um ein gemeinsames Analysezeitfenster mit einem Team zu teilen.",
+        "tip3": "Datumsfelder werden während der Eingabe validiert; ein ungültiges Datum wird hervorgehoben und beim Aktualisieren abgelehnt."
+      }
     }
   }
 }

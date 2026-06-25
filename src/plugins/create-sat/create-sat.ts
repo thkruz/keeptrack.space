@@ -23,12 +23,25 @@ import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces'
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { buildSideMenuTabsHtml, initSideMenuTabs, updateSideMenuTabIndicator } from '@app/engine/ui/side-menu-tabs';
+import { buildSideMenuTabsHtml, initSideMenuTabs, SideMenuTabDef, updateSideMenuTabIndicator } from '@app/engine/ui/side-menu-tabs';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { saveAs } from 'file-saver';
+import {
+  applyOrbitPreset,
+  applySunSyncInclination,
+  buildPreviewTleFromForm,
+  cloneSelectedSatellite,
+  getFreeAnalystScc,
+} from './create-sat-actions';
+import { buildCreateSatHelp } from './create-sat-help';
+import { buildAdvancedTabHtml, buildBasicTabHtml, createSatActionButton } from './create-sat-menu-html';
+import { OrbitPreview } from '../shared/orbit-preview';
+import { OrbitPresetId } from './create-sat-orbits';
+import { wireInlineValidation } from './create-sat-validation';
+import './create-sat.css';
 
 type T7eKey = Parameters<typeof t7e>[0];
 
@@ -62,6 +75,9 @@ export class CreateSat extends KeepTrackPlugin {
   isRequireSatelliteSelected = false;
 
   static readonly elementPrefix = 'createSat';
+
+  /** Live "ghost orbit" preview drawn while the user edits the element set. */
+  protected readonly orbitPreview_ = new OrbitPreview();
 
   // Orbital mechanics constants
   private static readonly EARTH_RADIUS_KM_ = 6378.137;
@@ -144,163 +160,62 @@ export class CreateSat extends KeepTrackPlugin {
   }
 
   getHelpConfig(): IHelpConfig {
-    return {
-      title: t7e('plugins.CreateSat.title'),
-      body: t7e('plugins.CreateSat.helpBody'),
-    };
+    return buildCreateSatHelp();
   }
 
   /**
-   * HTML template for the side menu
+   * HTML template for the side menu (v13+ "FAANG card" layout).
    */
   protected buildSideMenuHtml_(): string {
-    const p = CreateSat.elementPrefix;
-    const l = (key: string) => t7e(`plugins.CreateSat.labels.${key}` as T7eKey);
-    const o = (key: string) => t7e(`plugins.CreateSat.options.${key}` as T7eKey);
-    const b = (key: string) => t7e(`plugins.CreateSat.buttons.${key}` as T7eKey);
-
-    const basicTabContent = html`
-      <form id="createSat-basic-form">
-        <div class="input-field col s12">
-          <input value="90000" id="${p}-basic-scc" type="text" maxlength="9" />
-          <label for="${p}-basic-scc" class="active">${l('noradId')}</label>
-        </div>
-        <div class="input-field col s12">
-          <input placeholder="" id="${p}-basic-name" type="text" maxlength="24" />
-          <label for="${p}-basic-name" class="active">${l('satelliteName')}</label>
-        </div>
-        <div class="input-field col s12">
-          <input placeholder="51.6" id="${p}-basic-inc" type="text" />
-          <label for="${p}-basic-inc" class="active">${l('inclinationDeg')}</label>
-        </div>
-        <div class="input-field col s12">
-          <input placeholder="400" id="${p}-basic-apogee" type="text" />
-          <label for="${p}-basic-apogee" class="active">${l('apogeeAltKm')}</label>
-        </div>
-        <div class="input-field col s12">
-          <input placeholder="400" id="${p}-basic-perigee" type="text" />
-          <label for="${p}-basic-perigee" class="active">${l('perigeeAltKm')}</label>
-        </div>
-        <div class="center-align row" style="padding: 10px; margin: 10px 0;">
-          <button id="createSat-basic-submit" class="btn btn-ui waves-effect waves-light" type="button" name="action">${b('createSatellite')} &#9658;</button>
-        </div>
-      </form>
-    `;
-
-    const advancedTabContent = html`
-      <form id="createSat" style="scrollbar-gutter: stable;">
-        <div class="input-field col s12">
-          <input value="90000" id="${p}-scc" type="text" maxlength="9" />
-          <label for="${p}-scc" class="active">${l('noradId')}</label>
-        </div>
-        <div class="input-field col s12">
-          <select value=1 id="${p}-type" type="text">
-            <option value=1>${o('payload')}</option>
-            <option value=2>${o('rocketBody')}</option>
-            <option value=3>${o('debris')}</option>
-            <option value=4>${o('special')}</option>
-          </select>
-          <label for="${p}-type">${l('objectType')}</label>
-        </div>
-        <div class="input-field col s12">
-          <select value="TBD" id="${p}-country" type="text">
-            <option value="TBD">${o('unknown')}</option>
-          </select>
-          <label for="${p}-country">${l('country')}</label>
-        </div>
-        <div class="input-field col s12">
-          <input placeholder="AA" id="${p}-year" type="text" maxlength="2" />
-          <label for="${p}-year" class="active">${l('epochYear')}</label>
-        </div>
-        <div class="input-field col s12">
-          <input placeholder="AAA.AAAAAAAA" id="${p}-day" type="text" maxlength="12" />
-          <label for="${p}-day" class="active">${l('epochDay')}</label>
-        </div>
-        <div class="input-field col s12">
-          <input placeholder="AAA.AAAA" id="${p}-inc" type="text" maxlength="8" />
-          <label for="${p}-inc" class="active">${l('inclination')}</label>
-        </div>
-        <div class="input-field col s12">
-          <input placeholder="AAA.AAAA" id="${p}-rasc" type="text" maxlength="8" />
-          <label for="${p}-rasc" class="active">${l('rightAscension')}</label>
-        </div>
-        <div class="input-field col s12">
-          <input placeholder="AA.AAAAAAAA" id="${p}-ecen" type="text" maxlength="7" />
-          <label for="${p}-ecen" class="active">${l('eccentricity')}</label>
-        </div>
-        <div class="input-field col s12">
-          <input placeholder="AA.AAAAAAAA" id="${p}-argPe" type="text" maxlength="8" />
-          <label for="${p}-argPe" class="active">${l('argOfPerigee')}</label>
-        </div>
-        <div class="input-field col s12">
-          <input placeholder="AAA.AAAA" id="${p}-meana" type="text" maxlength="8" />
-          <label for="${p}-meana" class="active">${l('meanAnomaly')}</label>
-        </div>
-        <div class="input-field col s12">
-          <input placeholder="AAA.AAAA" id="${p}-meanmo" type="text" maxlength="11" />
-          <label for="${p}-meanmo" class="active">${l('meanMotion')}</label>
-        </div>
-        <div class="input-field col s12">
-          <input placeholder="AA.AAAA" id="${p}-per" type="text" maxlength="11" />
-          <label for="${p}-per" class="active">${l('period')}</label>
-        </div>
-        <div class="input-field col s12">
-          <input placeholder="" id="${p}-src" type="text" maxlength="24" />
-          <label for="${p}-src" class="active">${l('dataSource')}</label>
-        </div>
-        <div class="input-field col s12">
-          <input placeholder="" id="${p}-name" type="text" maxlength="24" />
-          <label for="${p}-name" class="active">${l('satelliteName')}</label>
-        </div>
-
-        <!-- Derived Parameters Section -->
-        <div id="createSat-derived" style="padding: 10px; margin: 10px 0;">
-          <div class="center-align" style="margin-bottom: 10px; font-weight: bold;">${l('calculatedParameters')}</div>
-          <div class="row" style="margin-bottom: 0;">
-            <div class="input-field col s6">
-              <input disabled id="${p}-calc-apogee" type="text" />
-              <label for="${p}-calc-apogee" class="active">${l('apogeeKm')}</label>
-            </div>
-            <div class="input-field col s6">
-              <input disabled id="${p}-calc-perigee" type="text" />
-              <label for="${p}-calc-perigee" class="active">${l('perigeeKm')}</label>
-            </div>
-          </div>
-          <div class="row" style="margin-bottom: 0;">
-            <div class="input-field col s6">
-              <input disabled id="${p}-calc-sma" type="text" />
-              <label for="${p}-calc-sma" class="active">${l('smaKm')}</label>
-            </div>
-            <div class="input-field col s6">
-              <input disabled id="${p}-calc-velocity" type="text" />
-              <label for="${p}-calc-velocity" class="active">${l('velocityKms')}</label>
-            </div>
-          </div>
-        </div>
-
-        <div class="center-align row">
-          <button id="createSat-submit" class="btn btn-ui waves-effect waves-light" type="button" name="action">${b('createSatellite')} &#9658;</button>
-        </div>
-        <div class="center-align row">
-          <button id="createSat-save" class="btn btn-ui waves-effect waves-light" type="button" name="action">${b('saveTle')} &#9658;</button>
-        </div>
-      </form>
-    `;
-
-    const tabsHtml = buildSideMenuTabsHtml('createSat-tabs', [
-      { id: 'createSat-basic-tab', label: t7e('plugins.CreateSat.tabs.basic' as T7eKey), content: basicTabContent },
-      { id: 'createSat-advanced-tab', label: t7e('plugins.CreateSat.tabs.advanced' as T7eKey), content: advancedTabContent },
-    ]);
+    const tabsHtml = buildSideMenuTabsHtml('createSat-tabs', this.getTabDefs_());
 
     return html`
-    <div id="createSat-menu" class="side-menu-parent start-hidden">
+    <div id="createSat-menu" class="side-menu-parent start-hidden kt-ui-v13">
       <div id="createSat-content" class="side-menu" style="scrollbar-gutter: stable;">
+        ${this.buildSideMenuExtras_()}
         <div class="row">
           ${tabsHtml}
         </div>
       </div>
     </div>
   `;
+  }
+
+  /**
+   * Tab definitions for the side menu. Pro overrides this to append the TLE
+   * Import tab, rather than string-rewriting the rendered base HTML.
+   */
+  protected getTabDefs_(): SideMenuTabDef[] {
+    return [
+      { id: 'createSat-basic-tab', label: t7e('plugins.CreateSat.tabs.basic' as T7eKey), content: this.buildBasicTabHtml_() },
+      { id: 'createSat-advanced-tab', label: t7e('plugins.CreateSat.tabs.advanced' as T7eKey), content: this.buildAdvancedTabHtml_() },
+    ];
+  }
+
+  /**
+   * Extra markup injected inside the side-menu container, before the tab row.
+   * Empty in OSS; Pro overrides it to add the drag-and-drop file dropzone.
+   */
+  protected buildSideMenuExtras_(): string {
+    return '';
+  }
+
+  /**
+   * A full-width v13 action row (label left, chevron added via CSS). Kept as a
+   * static so the Pro subclass can build matching rows (e.g. the TLE tab).
+   */
+  protected static actionButton_(id: string, label: string, opts: { submit?: boolean; disabled?: boolean } = {}): string {
+    return createSatActionButton(id, label, opts);
+  }
+
+  /** Basic tab: build an orbit from altitudes + inclination. */
+  protected buildBasicTabHtml_(): string {
+    return buildBasicTabHtml();
+  }
+
+  /** Advanced tab: full TLE element set with a live calculated-params readout. */
+  protected buildAdvancedTabHtml_(): string {
+    return buildAdvancedTabHtml();
   }
 
   // =========================================================================
@@ -318,6 +233,8 @@ export class CreateSat extends KeepTrackPlugin {
    */
   onBottomIconClick(): void {
     updateSideMenuTabIndicator('createSat-tabs');
+    // Defer so isMenuButtonActive has settled before drawing the preview orbit.
+    setTimeout(() => this.updatePreview_(), 0);
   }
 
   /**
@@ -326,6 +243,8 @@ export class CreateSat extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    // Drop the preview orbit whenever the side menu closes.
+    EventBus.getInstance().on(EventBusEvent.hideSideMenus, () => this.orbitPreview_.clear());
   }
 
   /**
@@ -357,12 +276,75 @@ export class CreateSat extends KeepTrackPlugin {
       getEl(`${CreateSat.elementPrefix}-country`)!.insertAdjacentHTML('beforeend', `<option value="${countryCode}">${countryName}</option>`);
     });
 
+    // Presets, clone, sun-sync, live preview, and inline validation
+    this.wireAdvancedTools_();
+
     // Populate default values
     this.populateSideMenu_();
     this.populateBasicTabDefaults_();
 
     // Trigger initial derived params calculation
     getEl(`${CreateSat.elementPrefix}-meanmo`)?.dispatchEvent(new Event('input'));
+  }
+
+  /**
+   * Wire the Advanced-tab power tools: orbit presets, clone-selected, the
+   * sun-synchronous inclination helper, the live orbit preview, and per-field
+   * inline validation.
+   */
+  private wireAdvancedTools_(): void {
+    const p = CreateSat.elementPrefix;
+    const uiManager = ServiceLocator.getUiManager();
+
+    getEl(`${p}-preset`)?.addEventListener('change', (e) => {
+      const id = (e.target as HTMLSelectElement).value as OrbitPresetId;
+
+      if (id) {
+        applyOrbitPreset(p, id);
+        this.updatePreview_();
+      }
+    });
+
+    getEl(`${p}-clone`)?.addEventListener('click', () => {
+      if (cloneSelectedSatellite(p)) {
+        updateSideMenuTabIndicator('createSat-tabs');
+        this.updatePreview_();
+      } else {
+        uiManager.toast(t7e('plugins.CreateSat.errorMsgs.noSatSelected' as T7eKey), ToastMsgType.caution, true);
+      }
+    });
+
+    getEl(`${p}-sso`)?.addEventListener('click', () => {
+      if (applySunSyncInclination(p)) {
+        this.updatePreview_();
+      } else {
+        uiManager.toast(t7e('plugins.CreateSat.errorMsgs.invalidMeanMotion' as T7eKey), ToastMsgType.caution, true);
+      }
+    });
+
+    // Redraw the ghost orbit as the element set changes.
+    for (const id of ['inc', 'rasc', 'ecen', 'argPe', 'meana', 'meanmo', 'per', 'year', 'day']) {
+      getEl(`${p}-${id}`)?.addEventListener('input', () => this.updatePreview_());
+    }
+
+    wireInlineValidation(p);
+  }
+
+  /** Redraw (or clear) the live ghost-orbit preview from the current form. */
+  protected updatePreview_(): void {
+    if (!this.isMenuButtonActive) {
+      this.orbitPreview_.clear();
+
+      return;
+    }
+
+    const tle = buildPreviewTleFromForm(CreateSat.elementPrefix);
+
+    if (tle) {
+      this.orbitPreview_.update(tle.tle1, tle.tle2);
+    } else {
+      this.orbitPreview_.clear();
+    }
   }
 
   /**
@@ -534,6 +516,15 @@ export class CreateSat extends KeepTrackPlugin {
         errorManagerInstance.warn(`Error converting mean motion to period: ${error}`);
       }
     });
+  }
+
+  /**
+   * Find the lowest free analyst slot SCC (90000-99999), or null if all are in
+   * use. Delegates to the shared helper; kept as a static so the Pro subclass
+   * and tests can reference (and stub) it.
+   */
+  protected static getFreeAnalystScc_(): string | null {
+    return getFreeAnalystScc();
   }
 
   /**
@@ -842,9 +833,26 @@ export class CreateSat extends KeepTrackPlugin {
       }
 
       const sat = obj as Satellite;
+
+      // Warn before overwriting a slot that already holds a real satellite. A
+      // free analyst slot still carries the 'ANALSAT' country; anything else
+      // means we are replacing a previously created (or catalog) object.
+      if (sat.country && sat.country !== 'ANALSAT') {
+        ServiceLocator.getUiManager().toast(
+          t7e('plugins.CreateSat.errorMsgs.slotOccupied' as T7eKey)
+            .replace('{name}', sat.name ?? '')
+            .replace('{scc}', inputParams.scc),
+          ToastMsgType.caution,
+          true,
+        );
+      }
+
       const country = inputParams.country;
       const type = parseInt(inputParams.type);
-      const intl = `${inputParams.epochyr}69B`; // International designator
+      // Preserve the imported international designator (set on the hidden field by
+      // the TLE/STK flows); fall back to a synthesized one for manual entry.
+      const intlInput = getEl(`${CreateSat.elementPrefix}-intl`, true) as HTMLInputElement | null;
+      const intl = intlInput?.value?.trim() || `${inputParams.epochyr}69B`;
       const scc = inputParams.scc.replace(/^0+/u, '');
       const convertedScc = Tle.convert6DigitToA5(scc); // Convert SCC to A5 format
 
@@ -932,6 +940,10 @@ export class CreateSat extends KeepTrackPlugin {
       } catch (e) {
         errorManagerInstance.error(e as Error, 'create-sat.ts', 'Changing orbit buffer data failed');
       }
+
+      // Seed the render buffers so the immediate search below does not read
+      // the placeholder 0,0,0 position as "Decayed"
+      catalogManagerInstance.seedDotPosition(satId);
 
       // Search for the new satellite
       ServiceLocator.getUiManager().doSearch(inputParams.scc);

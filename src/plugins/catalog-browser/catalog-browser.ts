@@ -77,7 +77,30 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
   getHelpConfig(): IHelpConfig {
     return {
       title: t7e('plugins.CatalogBrowserPlugin.title' as T7eKey),
-      body: t7e('plugins.CatalogBrowserPlugin.helpBody' as T7eKey),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.CatalogBrowserPlugin.help.overview' as T7eKey),
+          image: {
+            src: 'img/help/catalog-browser/catalog-browser-menu.png',
+            alt: t7e('plugins.CatalogBrowserPlugin.help.imgAlt' as T7eKey),
+            caption: t7e('plugins.CatalogBrowserPlugin.help.imgCaption' as T7eKey),
+          },
+        },
+        {
+          heading: t7e('plugins.CatalogBrowserPlugin.help.modesHeading' as T7eKey),
+          content: t7e('plugins.CatalogBrowserPlugin.help.modes' as T7eKey),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.CatalogBrowserPlugin.help.howToUse' as T7eKey),
+        },
+      ],
+      tips: [
+        t7e('plugins.CatalogBrowserPlugin.help.tip1' as T7eKey),
+        t7e('plugins.CatalogBrowserPlugin.help.tip2' as T7eKey),
+        t7e('plugins.CatalogBrowserPlugin.help.tip3' as T7eKey),
+      ],
     };
   }
 
@@ -405,7 +428,7 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
       // canonicalSccKey strips leading zeros so a zero-padded incoming SCC
       // ("025544") still matches the display-canonical cached.sccNum ("25544"),
       // and returns null for malformed SCCs (Satnogs-style corruption) or IDs
-      // beyond TLE alpha-5 capacity instead of throwing — skip those rather
+      // beyond TLE alpha-5 capacity instead of throwing - skip those rather
       // than crashing the whole merge.
       const scc6 = CatalogLoader.canonicalSccKey(entry.SCC);
 
@@ -463,10 +486,11 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
 
   private buildSideMenuHtml_(): string {
     return html`
-      <div id="catalog-browser-menu" class="side-menu-parent start-hidden">
+      <div id="catalog-browser-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div class="side-menu">
-          <div class="cb-toggle-row">
-            <div class="switch">
+          <section class="kt-section">
+            <div class="kt-section-label">${t7e('plugins.CatalogBrowserPlugin.labels.loadMode' as T7eKey)}</div>
+            <div class="switch cb-toggle-row">
               <label for="cb-orbital-data-only">
                 <span class="cb-toggle-label">${t7e('plugins.CatalogBrowserPlugin.labels.allData' as T7eKey)}</span>
                 <input id="cb-orbital-data-only" type="checkbox" />
@@ -474,11 +498,8 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
                 <span class="cb-toggle-label">${t7e('plugins.CatalogBrowserPlugin.labels.orbitalOnly' as T7eKey)}</span>
               </label>
             </div>
-          </div>
-          <div class="cb-info-note">
-            <span id="cb-mode-description">${t7e('plugins.CatalogBrowserPlugin.labels.allDataDesc' as T7eKey)}</span>
-          </div>
-          <div class="divider"></div>
+            <div id="cb-mode-description" class="kt-note">${t7e('plugins.CatalogBrowserPlugin.labels.allDataDesc' as T7eKey)}</div>
+          </section>
           <div id="cb-catalog-list" class="cb-catalog-list">
             ${this.buildCatalogListHtml_()}
           </div>
@@ -498,43 +519,44 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
 
     // KeepTrack catalogs at the top (hidden when hideKeepTrackCatalogs is set)
     if (!this.hideKeepTrackCatalogs_) {
-      listHtml += `<div class="cb-category-header">${catLabel('keeptrack')}</div>`;
-      listHtml += '<ul>';
-      listHtml += '<li class="menu-selectable cb-catalog-item" ' +
-        'data-query="DEFAULT" data-id="default">' +
-        `<span class="cb-item-name">${entryLabel('defaultCatalog')}</span>` +
-        '</li>';
-      listHtml += '<li class="menu-selectable cb-catalog-item" ' +
-        'data-query="CELESTRAK_ONLY" data-id="celestrak-only">' +
-        `<span class="cb-item-name">${entryLabel('celestrakOnly')}</span>` +
-        '</li>';
-      listHtml += '<li class="menu-selectable cb-catalog-item" ' +
-        'data-query="VIMPEL_ONLY" data-id="vimpel-only">' +
-        `<span class="cb-item-name">${entryLabel('vimpelOnly')}</span>` +
-        '</li>';
-      listHtml += '</ul>';
+      listHtml += this.buildCategoryCard_(catLabel('keeptrack'), [
+        this.buildCatalogRow_('DEFAULT', 'default', entryLabel('defaultCatalog')),
+        this.buildCatalogRow_('CELESTRAK_ONLY', 'celestrak-only', entryLabel('celestrakOnly')),
+        this.buildCatalogRow_('VIMPEL_ONLY', 'vimpel-only', entryLabel('vimpelOnly')),
+      ].join(''));
     }
 
     for (const cat of categories) {
-      listHtml += `<div class="cb-category-header">${catLabel(cat.nameKey)}</div>`;
-      listHtml += '<ul>';
-
-      for (const entry of cat.entries) {
+      const rows = cat.entries.map((entry) => {
         const isSupGp = entry.queryParam.startsWith('FILE=');
         const chipClass = isSupGp ? 'cb-chip cb-chip-supgp' : 'cb-chip cb-chip-gp';
         const chipText = isSupGp ? 'SupGP' : 'GP';
+        const chip = `<span class="${chipClass}">${chipText}</span>`;
 
-        listHtml += '<li class="menu-selectable cb-catalog-item" ' +
-          `data-query="${entry.queryParam}" ` +
-          `data-id="${entry.id}">` +
-          `<span class="cb-item-name">${entryLabel(entry.nameKey)}</span>` +
-          `<span class="${chipClass}">${chipText}</span>` +
-          '</li>';
-      }
+        return this.buildCatalogRow_(entry.queryParam, entry.id, entryLabel(entry.nameKey), chip);
+      }).join('');
 
-      listHtml += '</ul>';
+      listHtml += this.buildCategoryCard_(catLabel(cat.nameKey), rows);
     }
 
     return listHtml;
+  }
+
+  /** Wrap a set of catalog action rows in a titled v13 section card. */
+  private buildCategoryCard_(title: string, rows: string): string {
+    return html`
+      <section class="kt-section">
+        <div class="kt-section-label">${title}</div>
+        ${rows}
+      </section>
+    `;
+  }
+
+  /** A single full-width v13 action row for one catalog (label + optional chip + chevron). */
+  private buildCatalogRow_(query: string, id: string, label: string, chip = ''): string {
+    return '<button type="button" class="kt-action waves-effect cb-catalog-item" ' +
+      `data-query="${query}" data-id="${id}">` +
+      `<span class="kt-action-label">${label}</span>${chip}` +
+      '</button>';
   }
 }

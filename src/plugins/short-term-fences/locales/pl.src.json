@@ -3,7 +3,65 @@
     "ShortTermFences": {
       "bottomIconLabel": "Krótkoterminowe ogrodzenie",
       "title": "Menu krótkoterminowych ogrodzeń (STF)",
-      "helpBody": "Menu krótkoterminowych ogrodzeń (STF) służy do wizualizacji obszarów przeszukiwania czujników. <br><br> Jest to mało przydatne, chyba że posiadasz/obsługujesz czujnik z funkcją obszaru przeszukiwania."
+      "sideMenuTitle": "Krótkoterminowe ogrodzenie",
+      "labels": {
+        "centerAzimuth": "Azymut środkowy",
+        "azimuthExtentDeg": "Zakres azymutu (deg)",
+        "azimuthExtentKm": "Zakres azymutu (km)",
+        "centerElevation": "Elewacja środkowa",
+        "elevationExtentDeg": "Zakres elewacji (deg)",
+        "elevationExtentKm": "Zakres elewacji (km)",
+        "centerRange": "Odległość środkowa",
+        "rangeExtent": "Zakres odległości"
+      },
+      "tooltips": {
+        "centerAzimuth": "Azymut środka przeszukiwania w stopniach (np. 50)",
+        "azimuthExtentDeg": "Całkowity zakres wokół azymutu środkowego w stopniach (np. 4)",
+        "azimuthExtentKm": "Całkowity zakres wokół azymutu środkowego w kilometrach (np. 120)",
+        "centerElevation": "Elewacja środka przeszukiwania w stopniach (np. 20)",
+        "elevationExtentDeg": "Całkowity zakres wokół elewacji środkowej w stopniach (np. 4)",
+        "elevationExtentKm": "Całkowity zakres wokół elewacji środkowej w kilometrach (np. 120)",
+        "centerRange": "Odległość środka przeszukiwania w kilometrach (np. 1000)",
+        "rangeExtent": "Całkowity zakres wokół odległości środkowej w kilometrach (np. 100)",
+        "buildOnObject": "Wizualizacja możliwości przeszukiwania czujnika"
+      },
+      "buttons": {
+        "createNewStf": "Utwórz nową STF",
+        "removeLast": "Usuń ostatnią",
+        "clearAllStfs": "Wyczyść wszystkie STF"
+      },
+      "links": {
+        "buildOnObject": "Zbuduj krótkoterminowe ogrodzenie na tym obiekcie..."
+      },
+      "errorMsgs": {
+        "stfNotInView": "STF nie znajduje się w polu widzenia czujnika!",
+        "noSelectSatManager": "Nie znaleziono instancji selectSatManager",
+        "invalidInput": "Wprowadź prawidłową liczbę w każdym polu.",
+        "invalidRange": "Odległość środkowa musi być większa od zera."
+      },
+      "help": {
+        "overview": "Krótkoterminowe ogrodzenia wizualizują obszar przeszukiwania czujnika: klin nieba zdefiniowany przez okno azymutu, elewacji i odległości. Operatorzy używają ich, aby dokładnie zobaczyć, jaką objętość obejmuje zlecone przeszukiwanie i czy interesujący obiekt przez nią przeleci.",
+        "imgAlt": "Menu krótkoterminowego ogrodzenia z polami azymutu, elewacji i odległości",
+        "imgCaption": "Zdefiniuj ogrodzenie przez jego punkt środkowy oraz zakresy azymutu, elewacji i odległości.",
+        "fieldsHeading": "Definiowanie ogrodzenia",
+        "fields": "Ogrodzenie jest wyśrodkowane na punkcie określonym przez <strong>Azymut środkowy</strong>, <strong>Elewacja środkowa</strong> (stopnie) i <strong>Odległość środkowa</strong> (kilometry), wszystkie mierzone od wybranego czujnika. <strong>Zakres azymutu</strong> i <strong>Zakres elewacji</strong> ustalają całkowitą szerokość i wysokość w stopniach; równoważny rozmiar w kilometrach przy odległości środkowej jest obliczany automatycznie w polach km tylko do odczytu. <strong>Zakres odległości</strong> ustala głębokość obszaru w kilometrach.",
+        "howToUse": "<ol><li>Wybierz czujnik; dolna ikona jest nieaktywna, dopóki żaden nie zostanie wybrany.</li><li>Otwórz menu <strong>Krótkoterminowe ogrodzenie</strong> (tryb Utwórz) i wprowadź punkt środkowy oraz zakresy.</li><li>Kliknij <strong>Utwórz nową STF</strong>. Objętość ogrodzenia zostanie narysowana od czujnika w widoku 3D.</li><li>Dodawaj kolejne ogrodzenia, wysyłając formularz ponownie; <strong>Usuń ostatnią</strong> kasuje najnowsze, a <strong>Wyczyść wszystkie STF</strong> usuwa każde ogrodzenie.</li><li>Przy wybranym satelicie w polu informacji o satelicie pojawia się łącze <strong>Zbuduj krótkoterminowe ogrodzenie na tym obiekcie...</strong>, które wstępnie wypełnia formularz bieżącym azymutem, elewacją i odległością satelity.</li></ol>",
+        "tip1": "Jeśli żądane ogrodzenie wykracza poza to, co czujnik może zobaczyć, utworzenie zostaje odrzucone z powiadomieniem, zamiast rysować niemożliwy obszar.",
+        "tip2": "Pola zakresów w kilometrach aktualizują się podczas pisania, dzięki czemu łatwo sprawdzić, jak szerokie naprawdę jest przeszukiwanie na danej odległości."
+      },
+      "sections": {
+        "azimuth": "Azymut",
+        "elevation": "Elewacja",
+        "range": "Odległość"
+      },
+      "fenceList": {
+        "activeFences": "Aktywne ogrodzenia",
+        "empty": "Brak aktywnych ogrodzeń. Utwórz jedno powyżej.",
+        "remove": "Usuń ogrodzenie",
+        "azimuth": "Azymut",
+        "elevation": "Elewacja",
+        "range": "Odległość"
+      }
     }
   }
 }

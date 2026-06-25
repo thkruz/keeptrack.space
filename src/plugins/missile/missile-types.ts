@@ -29,7 +29,7 @@ export interface MissileSpec {
  * Structured public result of a missile launch attempt.
  *
  * Returned by the future `MissileManager.createMissile(spec)` (PR 4). For PR 2
- * this is defined alongside its consumer but not yet exposed to callers — the
+ * this is defined alongside its consumer but not yet exposed to callers - the
  * legacy `Missile()` still returns `1` / `0`.
  */
 export interface MissileLaunchResult {

@@ -1,3 +1,22 @@
+/*
+ * Materialize v2 themes its components (select, input, datepicker, etc.) via
+ * Material Design 3 design tokens (--md-sys-color-*). The <html theme="dark">
+ * attribute activates v2's dark palette; here we remap the tokens that drive
+ * component appearance onto KeepTrack's own palette so they match the brand
+ * (e.g. red accent instead of v2's default blue) instead of Material defaults.
+ */
+:root[theme='dark'] {
+    --md-sys-color-primary: var(--color-primary);
+    --md-sys-color-surface: var(--kt-bg-elevated);
+    --md-sys-color-on-surface: var(--kt-text-primary);
+    --md-sys-color-background: var(--kt-bg-primary);
+    --md-sys-color-on-background: var(--kt-text-primary);
+    --md-sys-color-surface-variant: var(--kt-bg-elevated);
+    --md-sys-color-on-surface-variant: var(--kt-text-secondary);
+    --md-sys-color-outline: var(--kt-border-strong);
+    --md-sys-color-outline-variant: var(--kt-border-default);
+}
+
 .page-footer {
     background-color: var(--color-dark-background) !important;
 }
@@ -111,13 +130,238 @@ textarea.materialize-textarea {
     to { width: 0%; }
 }
 
+/*
+ * Match select triggers to the v1 text-input metrics below: same 3rem height
+ * with vertically centered text and no v2 inset padding (20px top / 16px left),
+ * so select values align and read exactly like the text fields around them.
+ */
 .select-wrapper input.select-dropdown {
-    height: 2rem !important;
-    line-height: 2rem !important;
+    height: 3rem !important;
+    line-height: 3rem !important;
+    padding: 0 !important;
+    box-sizing: content-box;
+}
+
+/*
+ * Materialize v2 form fixes.
+ * v2 no longer makes .input-field inputs full-width (the old vendored v1 CSS
+ * did), and it floats labels purely via :placeholder-shown adjacency, which
+ * KeepTrack's class="active" labels and the select's nested input never
+ * trigger. KeepTrack uses always-above labels on transparent fields, so float
+ * every input-field label, restore full-width fields (which also pulls the
+ * select caret in to the field's right edge), and keep the field background
+ * transparent (v2 paints fields with --md-sys-color-surface; we reserve that
+ * token's fill for dropdown menus / modals, not the inline fields).
+ */
+.input-field input,
+.input-field textarea,
+.input-field .select-wrapper,
+.input-field .select-wrapper input.select-dropdown {
+    width: 100%;
+}
+
+.input-field input,
+.input-field textarea,
+.input-field .select-wrapper input.select-dropdown,
+.input-field .select-wrapper > .hide-select select {
+    background-color: transparent !important;
+}
+
+.input-field > label {
+    top: 0;
+    transform: translateY(-14px) scale(0.75);
+    transform-origin: 0 0;
+}
+
+/*
+ * v2 floats a filled input's label to top: 8px (inside the field box) via
+ * higher-specificity sibling selectors, which collides with the v1-height
+ * values restored above. Mirror those selectors to keep every label in the
+ * v1 position fully above the field.
+ */
+.input-field input:focus:not([readonly]) + label,
+.input-field input:not([placeholder=' ']) + label,
+.input-field input:not(:placeholder-shown) + label,
+.input-field textarea:focus:not([readonly]) + label,
+.input-field textarea:not([placeholder=' ']) + label,
+.input-field textarea:not(:placeholder-shown) + label {
+    top: 0;
+    transform: translateY(-14px) scale(0.75);
+}
+
+/*
+ * v2 draws a 2px box outline around a focused select (.select-wrapper:focus-within);
+ * KeepTrack (like v1) indicates focus with the field underline instead, so drop the
+ * boxed outline.
+ */
+.select-wrapper:focus-within {
+    outline: none;
+}
+
+/*
+ * v2's FormSelect adds the input-field class to its generated .select-wrapper
+ * (v1 added only select-wrapper), so KeepTrack's .input-field margins and
+ * padding double-apply inside every select field — doubling vertical spacing
+ * and indenting the field twice. Neutralize the nested wrapper.
+ */
+.input-field .select-wrapper.input-field {
+    margin: 0;
+    padding: 0;
+}
+
+/*
+ * Restore v1 text-input metrics. v1 gave text inputs height: 3rem and an 8px
+ * bottom margin; v2 sizes them by content (~15px shorter, no margin), which
+ * makes dense forms like Create Satellite feel overly compacted. Select
+ * triggers (.select-dropdown) are excluded — they keep the v2 padding the
+ * select styling above is tuned for.
+ */
+.input-field input:not([type]):not(.select-dropdown),
+.input-field input[type='text']:not(.browser-default):not(.select-dropdown),
+.input-field input[type='password']:not(.browser-default),
+.input-field input[type='email']:not(.browser-default),
+.input-field input[type='url']:not(.browser-default),
+.input-field input[type='time']:not(.browser-default),
+.input-field input[type='date']:not(.browser-default),
+.input-field input[type='datetime']:not(.browser-default),
+.input-field input[type='datetime-local']:not(.browser-default),
+.input-field input[type='tel']:not(.browser-default),
+.input-field input[type='number']:not(.browser-default),
+.input-field input[type='search']:not(.browser-default),
+.input-field textarea.materialize-textarea {
+    height: 3rem;
+    margin: 0 0 8px 0;
+    padding: 0;
+    box-sizing: content-box;
+}
+
+/*
+ * Restore v1 dropdown colors. v1 dropdown panels were white with #eee hover;
+ * v2 paints them with --md-sys-color-surface, which our dark token mapping
+ * turns into red-on-dark — unreadable. The red item text comes from the
+ * .dropdown-content overrides above, as in v1.
+ */
+.dropdown-content {
+    background-color: #fff;
+}
+
+.dropdown-content li:not(.disabled):hover,
+.dropdown-content li.active,
+body.keyboard-focused .dropdown-content li:focus {
+    background-color: #eee;
+}
+
+.dropdown-content li.selected {
+    background-color: rgba(0, 0, 0, 0.08);
+}
+
+/*
+ * Multi-select dropdown options. v2 renders them as checkbox labels inside the
+ * select wrapper, which carries the input-field class — so generic field-input
+ * rules bleed onto the checkbox: width 100% stretches it across the row (turning
+ * its round MD3 focus outline into a giant ellipse) and pushes the option text to
+ * the far edge, while the app's dark-theme label color renders white-on-white.
+ * Restore native checkbox geometry and match the single-select option styling.
+ */
+.dropdown-content input[type='checkbox'] {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    position: relative;
+    flex-shrink: 0;
+}
+
+/*
+ * v2 draws the box on ::before (absolute) but the checkmark on ::after in
+ * normal flow (position: relative, display: block), which can drift below the
+ * box. Anchor both to the 18px input so they always overlap.
+ */
+.dropdown-content input[type='checkbox']::before,
+.dropdown-content input[type='checkbox']::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 18px;
+    height: 18px;
+}
+
+.dropdown-content input[type='checkbox']:focus {
+    outline: none;
+}
+
+.dropdown-content li > span > label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: auto;
+    cursor: pointer;
+}
+
+.dropdown-content li > span > label,
+.dropdown-content [type='checkbox'] + span {
+    color: var(--color-primary);
+}
+
+/* Unchecked box border is on-surface-variant (near-white) — invisible on the white panel */
+.dropdown-content input[type='checkbox']:not(:checked)::before {
+    border-color: rgba(0, 0, 0, 0.45);
+}
+
+/*
+ * v2 makes dropdown options focusable; the app-wide :focus-visible outline
+ * (2px offset red) renders as clipped horizontal lines around the focused row
+ * inside the panel. Indicate focus with the hover background instead.
+ */
+.dropdown-content li:focus-visible {
+    outline: none;
+    background-color: #eee;
 }
 
 .row {
     margin-bottom: 1rem;
+}
+
+/*
+ * Materialize v2 replaced the v1 float grid with CSS Grid
+ * (.row { display: grid; grid-template-columns: repeat(12, 1fr) }). The default
+ * 1fr track is minmax(auto, 1fr), which refuses to shrink below its content's
+ * min-content, so wide content (long <option> text, buttons) forces the row
+ * wider than its fixed-width side-menu container and overflows. minmax(0, 1fr)
+ * lets the tracks shrink to fit the menu. gap:0 drops v2's 1.5rem grid gutters
+ * (KeepTrack spaces fields with margins, as in v1) so a full-width col spans the
+ * menu exactly.
+ */
+.row {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 0;
+}
+
+/*
+ * In v1's float grid, plain (non-.col) children of a .row were normal
+ * full-width blocks. v2's CSS Grid auto-places any child without a grid-column
+ * span (e.g. <div class="center-align"> button wrappers, spacer <div class="row">)
+ * into a single ~30px column, so their contents overflow and overlap. Make every
+ * non-.col row child span the full width to restore the v1 stacking behavior.
+ */
+.row > *:not([class*='col']) {
+    grid-column: 1 / -1;
+}
+
+/*
+ * Grid items stretch to their track by default, so a .btn placed directly in a
+ * .row becomes full-width (v1's float grid left it content-sized). Size buttons
+ * to their content; .center-align rows keep them centered, others left-aligned.
+ */
+.row > .btn:not([class*='col']),
+.row > button:not([class*='col']) {
+    justify-self: start;
+}
+
+.row.center-align > .btn,
+.row.center-align > button {
+    justify-self: center;
 }
 
 /** non-desktop */

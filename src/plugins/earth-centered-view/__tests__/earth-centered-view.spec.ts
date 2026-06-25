@@ -13,11 +13,11 @@ test.describe('EarthCenteredView Plugin', () => {
     await expect(utilityIcon).toBeVisible();
     await expect(utilityIcon).toHaveAttribute('data-plugin-id', 'earth-centered-bottom-icon');
 
-    // Default camera is FIXED_TO_EARTH — icon syncs with camera state on every
+    // Default camera is FIXED_TO_EARTH - icon syncs with camera state on every
     // update loop, so it should already be selected
     await expect(utilityIcon).toHaveClass(/bmenu-item-selected/u, { timeout: 5_000 });
 
-    // Click the icon — should remain in earth-centered mode (re-activates)
+    // Click the icon - should remain in earth-centered mode (re-activates)
     await utilityIcon.click({ force: true });
 
     // Icon should still be selected after clicking

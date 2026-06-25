@@ -3,8 +3,17 @@
     "CloseObjectsPlugin": {
       "bottomIconLabel": "Oggetti vicini",
       "title": "Ricerca oggetti vicini",
-      "helpBody": "La ricerca oggetti vicini trova satelliti e detriti in stretta prossimità tra loro. Utilizza un algoritmo di ricerca spaziale a due fasi per identificare oggetti entro 50 km l'uno dall'altro, verificando prima le posizioni attuali e poi confermando con le posizioni proiettate 30 minuti dopo.",
-      "findBtn": "Trova oggetti vicini"
+      "findBtn": "Trova oggetti vicini",
+      "help": {
+        "overview": "La ricerca oggetti vicini analizza l'intero catalogo alla ricerca di coppie di oggetti che in questo momento volano a meno di 50 km l'uno dall'altro. È un modo rapido per individuare carichi utili in co-orbita, frammentazioni recenti e zone affollate senza eseguire uno screening completo delle congiunzioni.",
+        "imgAlt": "Il menu di ricerca oggetti vicini con il suo pulsante di ricerca",
+        "imgCaption": "Un solo clic analizza l'intero catalogo alla ricerca di oggetti entro 50 km l'uno dall'altro.",
+        "methodHeading": "Come funziona",
+        "method": "La ricerca si svolge in due fasi. Prima, una passata rapida con riquadri di delimitazione confronta la posizione attuale di ogni oggetto per trovare le coppie candidate entro il raggio di ricerca. Poi ogni coppia candidata viene ripropagata 30 minuti nel futuro: le coppie ancora vicine vengono confermate, filtrando così gli oggetti che si sono incrociati solo per un istante.",
+        "howToUse": "<ol><li>Apri <strong>Oggetti vicini</strong> dal menu inferiore.</li><li>Fai clic su <strong>Trova oggetti vicini</strong>. La scansione dell'intero catalogo richiede alcuni secondi.</li><li>Le coppie confermate vengono caricate nella barra di ricerca, così ogni oggetto vicino è evidenziato ed elencato nei risultati di ricerca.</li><li>Fai clic su un risultato per esaminare un oggetto, oppure usa altri menu (come Screening detriti) per analizzare in dettaglio una coppia specifica.</li></ol>",
+        "tip1": "Le coppie vengono confermate solo se restano entro il raggio 30 minuti dopo, quindi i voli in formazione e le coppie in rendezvous compaiono, mentre gli incroci momentanei vengono filtrati.",
+        "tip2": "I risultati sostituiscono la ricerca corrente; copia prima il testo della ricerca se devi conservare un elenco esistente."
+      }
     }
   }
 }

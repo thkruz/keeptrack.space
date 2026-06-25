@@ -1970,6 +1970,17 @@ export class Camera {
       type === CameraType.SATELLITE_FIRST_PERSON;
   }
 
+  /**
+   * Set the field of view immediately, including the lerp target.
+   * Writing settingsManager.fieldOfView alone is not enough — updateFovLerp_()
+   * pulls the value back toward fovTarget_ on every update, so callers that need
+   * a stable FOV (e.g. offscreen capture) must go through this method.
+   */
+  setFieldOfView(fov: Radians): void {
+    settingsManager.fieldOfView = fov;
+    this.fovTarget_ = fov;
+  }
+
   private updateFovLerp_(dt: Milliseconds): void {
     if (this.fovTarget_ === null) {
       this.fovTarget_ = settingsManager.fieldOfView;

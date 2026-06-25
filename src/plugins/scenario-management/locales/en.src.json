@@ -3,7 +3,58 @@
     "ScenarioManagementMenu": {
       "title": "Scenario Management",
       "bottomIconLabel": "Scenario Management",
-      "helpBody": "The scenario management plugin allows you to organize your work for different projects or contexts.<br/>Current features are:<br/><br/>  - Name and description for each scenario<br/>  - Analysis period start and end date/time<br/>  - Save/Load scenarios<br/><br/>The goal is to eventually provide a single file that contains all information necessary for scenario management. More features coming soon!"
+      "sideMenuTitle": "Scenario Settings",
+      "labels": {
+        "scenarioName": "Scenario Name",
+        "description": "Description",
+        "scenarioStart": "Scenario Start",
+        "scenarioEnd": "Scenario End"
+      },
+      "tooltips": {
+        "name": "The name of the scenario.",
+        "description": "The description of the scenario.",
+        "startDate": "The start DTG of the scenario in UTC (YYYY-MM-DD HH:MM:SS.sss).",
+        "endDate": "The end DTG of the scenario in UTC (YYYY-MM-DD HH:MM:SS.sss)."
+      },
+      "placeholders": {
+        "description": "Enter scenario description here..."
+      },
+      "buttons": {
+        "updateScenario": "Update Scenario",
+        "saveScenario": "Save Scenario",
+        "loadScenario": "Load Scenario"
+      },
+      "msgs": {
+        "settingsUpdated": "Scenario settings updated successfully!",
+        "scenarioLoaded": "Scenario loaded successfully!"
+      },
+      "errorMsgs": {
+        "nameRequired": "Scenario Name is required.",
+        "startDateInvalid": "Start Date is invalid.",
+        "endDateInvalid": "End Date is invalid.",
+        "savingScenario": "Error saving scenario!",
+        "loadingScenarioFile": "Error loading scenario file!",
+        "decompressingScenarioFile": "Error decompressing scenario file!"
+      },
+      "defaults": {
+        "scenarioName": "My Scenario",
+        "scenarioDescription": "Description of My Scenario"
+      },
+      "core": {
+        "beforeStartTime": "Simulation time is before the scenario start time. Pausing at start time.",
+        "afterStopTime": "Simulation time is after the scenario stop time. Pausing at stop time."
+      },
+      "help": {
+        "overview": "Scenario Management gives your session a named context: a scenario with a name, a description, and an optional analysis window with a start and end time. The simulation clock is then kept inside that window, and the whole definition can be saved to a file and reloaded later or shared with a teammate.",
+        "imgAlt": "The Scenario Settings menu with name, description, and time window fields",
+        "imgCaption": "Define a scenario name, description, and an optional start and end time.",
+        "windowHeading": "The Scenario Window",
+        "window": "When you set a <strong>Scenario Start</strong> or <strong>Scenario End</strong> (UTC, formatted YYYY-MM-DD HH:MM:SS.sss), the simulation clock is clamped to that window: if time drifts before the start or past the end, the clock pauses at the boundary and a notification explains why. Leave the fields empty for an unconstrained scenario.",
+        "howToUse": "<ol><li>Open <strong>Scenario Management</strong> from the bottom menu (Tools mode).</li><li>Enter a <strong>Scenario Name</strong> (required) and an optional <strong>Description</strong>.</li><li>Optionally set the <strong>Scenario Start</strong> and <strong>Scenario End</strong> times in UTC.</li><li>Click <strong>Update Scenario</strong> to apply. The time window is enforced immediately.</li><li>Use <strong>Save Scenario</strong> to download the definition as a compressed .kts file, and <strong>Load Scenario</strong> to restore one from disk.</li></ol>",
+        "tip1": "If playback seems stuck, check whether the clock is pinned at a scenario boundary; clear the start and end fields to release it.",
+        "tip2": "Scenario files are small compressed .kts files, handy for sharing a common analysis window with a team.",
+        "tip3": "Date fields validate as you type; an invalid date is highlighted and rejected when updating."
+      }
     }
   }
 }

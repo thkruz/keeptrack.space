@@ -3,7 +3,64 @@
     "ReportsPlugin": {
       "bottomIconLabel": "Informes",
       "title": "Menú de Informes",
-      "helpBody": "El Menú de Informes es una colección de herramientas para ayudarte a analizar y entender los datos que estás viendo."
+      "reports": {
+        "aer": {
+          "name": "Azimut, Elevación, Rango",
+          "description": "Genera datos de azimut, elevación y rango para los pases del satélite"
+        },
+        "lla": {
+          "name": "Latitud, Longitud, Altitud",
+          "description": "Genera datos de latitud, longitud y altitud a lo largo del tiempo"
+        },
+        "eci": {
+          "name": "Inercial Centrado en la Tierra (ECI)",
+          "description": "Genera vectores de posición y velocidad ECI a lo largo del tiempo"
+        },
+        "coes": {
+          "name": "Elementos Orbitales Clásicos",
+          "description": "Genera elementos orbitales clásicos en la época actual"
+        },
+        "visibilityWindows": {
+          "name": "Ventanas de Visibilidad",
+          "description": "Genera ventanas de visibilidad con horas de salida/puesta y duración del pase"
+        },
+        "sunEclipse": {
+          "name": "Análisis de Sol/Eclipse",
+          "description": "Genera la visibilidad del sol y las horas de entrada/salida de eclipse para análisis de energía y térmico"
+        }
+      },
+      "commands": {
+        "generateReport": "Generar informe {name}",
+        "open": "Abrir Informes"
+      },
+      "downloadButton": "Descargar informe",
+      "copyButton": "Copiar al portapapeles",
+      "sensorNote": "Estos informes requieren tener un sensor seleccionado.",
+      "sections": {
+        "orbitPosition": "Órbita y posición",
+        "sensor": "Sensor",
+        "options": "Opciones de salida"
+      },
+      "options": {
+        "window": "Ventana de tiempo",
+        "step": "Paso",
+        "format": "Formato",
+        "days": "{days} días",
+        "seconds": "{seconds} s",
+        "format_text": "Texto (alineado)",
+        "format_csv": "CSV",
+        "format_json": "JSON"
+      },
+      "help": {
+        "overview": "El Menú de Informes genera informes de texto sobre el satélite seleccionado: geometría de los pases, posición a lo largo del tiempo, elementos orbitales, ventanas de visibilidad y análisis de eclipses. Cada informe se abre en su propia ventana, bien formateado y con un botón de descarga, listo para pegar en otras herramientas o compartir.",
+        "imgAlt": "El Menú de Informes con la lista de tipos de informe disponibles",
+        "imgCaption": "Cada botón genera un informe de texto formateado para el satélite seleccionado.",
+        "typesHeading": "Informes Disponibles",
+        "types": "<ul><li><strong>Azimut, Elevación, Rango</strong>: ángulos de observación desde el sensor seleccionado durante los próximos pases (necesita un sensor).</li><li><strong>Latitud, Longitud, Altitud</strong>: la traza terrestre a lo largo del tiempo.</li><li><strong>Inercial Centrado en la Tierra (ECI)</strong>: vectores de posición y velocidad ECI a lo largo del tiempo.</li><li><strong>Elementos Orbitales Clásicos</strong>: los elementos keplerianos en la época actual.</li><li><strong>Ventanas de Visibilidad</strong>: horas de salida y puesta con duración de los pases (necesita un sensor).</li><li><strong>Análisis de Sol/Eclipse</strong>: horas de luz solar y de entrada y salida de eclipse, útiles para trabajos de energía y térmicos.</li></ul>",
+        "howToUse": "<ol><li>Selecciona un satélite; el icono inferior está deshabilitado hasta que se seleccione uno.</li><li>Para informes basados en sensores, selecciona también un sensor.</li><li>Abre <strong>Informes</strong> desde la barra inferior y haz clic en un botón de informe. El informe se abre en una ventana emergente.</li><li>Usa el botón de descarga de la ventana del informe para guardarlo como archivo de texto.</li></ol>",
+        "tip1": "Los informes cubren varios días de datos; la generación puede tardar unos segundos en los informes basados en pases.",
+        "tip2": "Si la ventana del informe no aparece, el culpable habitual es el bloqueador de ventanas emergentes de tu navegador; permite las ventanas emergentes para este sitio."
+      }
     }
   }
 }

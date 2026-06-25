@@ -1,6 +1,8 @@
 {
   "plugins": {
     "DrawLinesPlugin": {
+      "title": "Kreslení čar",
+      "bottomIconLabel": "Kreslení čar",
       "rmbMenu": {
         "title": "Kreslit",
         "eciAxes": "Osy ECI",
@@ -13,12 +15,39 @@
         "earthToSatellite": "Země – satelit",
         "sensorToSatellite": "Senzor – satelit",
         "satelliteToSatellite": "Satelit – satelit",
+        "satelliteRicAxes": "Osy RIC satelitu",
         "satelliteToSun": "Satelit – Slunce",
         "satelliteToMoon": "Satelit – Měsíc",
         "moonOrbit": "Nakreslit oběžnou dráhu Měsíce"
       },
+      "sections": {
+        "activeLines": "Aktivní čáry",
+        "referenceGeometry": "Referenční geometrie",
+        "objectLines": "Čáry objektů"
+      },
+      "referenceFrameLabel": "Referenční soustava",
+      "clearAll": "Vymazat všechny čáry",
+      "emptyList": "Žádné čáry nenakresleny",
+      "remove": "Odebrat",
+      "lineTypes": {
+        "reference": "Referenční čára",
+        "satToRef": "Satelit k bodu",
+        "satRic": "Osy RIC",
+        "objToObj": "Objekt k objektu",
+        "satToSun": "Satelit ke Slunci",
+        "satToBody": "Satelit k tělesu",
+        "sensorToSat": "Senzor k satelitu",
+        "sensorToSun": "Senzor ke Slunci",
+        "sensorToMoon": "Senzor k Měsíci",
+        "orbitPath": "Dráha oběhu",
+        "satScanEarth": "Sken Země",
+        "sensorScanHorizon": "Sken horizontu",
+        "sensorToRae": "Senzor k bodu",
+        "generic": "Čára"
+      },
       "errorMsgs": {
-        "noPrimarySat": "Nebyl vybrán primární satelit pro linii satelit–satelit."
+        "noPrimarySat": "Nebyl vybrán primární satelit pro linii satelit–satelit.",
+        "noSatSelected": "Nejprve vyberte satelit."
       }
     }
   }

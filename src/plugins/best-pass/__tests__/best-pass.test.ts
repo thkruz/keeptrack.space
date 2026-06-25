@@ -53,7 +53,8 @@ describe('BestPassPlugin_capabilities', () => {
     const helpConfig = plugin.getHelpConfig();
 
     expect(helpConfig.title).toBeDefined();
-    expect(helpConfig.body).toBeDefined();
+    expect(helpConfig.sections!.length).toBeGreaterThan(0);
+    expect(helpConfig.shortcuts!.length).toBeGreaterThan(0);
   });
 
   it('should have keyboard shortcut capability', () => {
@@ -61,7 +62,7 @@ describe('BestPassPlugin_capabilities', () => {
     const shortcuts = plugin.getKeyboardShortcuts();
 
     expect(shortcuts).toHaveLength(1);
-    expect(shortcuts[0].key).toBe('B');
+    expect(shortcuts[0].key).toBe('b');
     expect(shortcuts[0].callback).toBeDefined();
   });
 

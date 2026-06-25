@@ -3,7 +3,82 @@
     "Calculator": {
       "bottomIconLabel": "座標系変換",
       "title": "座標系変換メニュー",
-      "helpBody": "座標系変換メニューは、異なる座標系間で変換するために使用されます。<br><br>このメニューでは、以下の座標系間で変換できます：<ul style=\"margin-left: 40px;\"><li>ECI - 地球中心慣性座標系</li><li>ECEF - 地球中心地球固定座標系</li><li>測地座標系</li><li>観測点中心座標系</li></ul>"
+      "frames": {
+        "geodeticLla": "測地座標 (LLA)",
+        "raeTopocentric": "RAE（観測点中心）",
+        "raDecGeocentric": "RA/Dec（地心）",
+        "classicalElements": "古典軌道要素"
+      },
+      "sections": {
+        "input": "入力"
+      },
+      "labels": {
+        "inputFrame": "入力座標系",
+        "loadSelectedSatellite": "選択中の衛星を読み込む",
+        "includeVelocity": "速度を含める",
+        "convert": "変換",
+        "outputFormat": "出力形式",
+        "drawLine": "線を描画",
+        "copyResults": "すべての結果をコピー",
+        "clickToCopy": "クリックしてコピー",
+        "epoch": "元期",
+        "sensor": "センサー",
+        "latitude": "緯度",
+        "longitude": "経度",
+        "altitude": "高度",
+        "range": "距離",
+        "azimuth": "方位角",
+        "elevation": "仰角",
+        "rightAscension": "赤経",
+        "declination": "赤緯",
+        "semiMajorAxis": "軌道長半径",
+        "eccentricity": "離心率",
+        "inclination": "軌道傾斜角",
+        "raan": "RAAN",
+        "argPerigee": "近地点引数",
+        "trueAnomaly": "真近点角",
+        "period": "周期",
+        "apogeeAlt": "遠地点高度",
+        "perigeeAlt": "近地点高度"
+      },
+      "formats": {
+        "fixed4": "固定（小数点以下4桁）",
+        "fixed6": "固定（小数点以下6桁）",
+        "fixed8": "固定（小数点以下8桁）",
+        "scientific": "指数表記",
+        "dms": "DMS（角度）"
+      },
+      "msgs": {
+        "noSensorSelected": "センサーが選択されていません",
+        "needsVelocity": "速度が必要です",
+        "noSensorForRae": "RAE出力用のセンサーが選択されていません。",
+        "copied": "クリップボードにコピーしました"
+      },
+      "errorMsgs": {
+        "conversionFailed": "変換に失敗しました: {error}",
+        "invalidInput": "{field} の入力が無効です: \"{value}\" は数値ではありません。",
+        "fieldNotFound": "フィールド {field} が見つかりません。",
+        "invalidNumber": "すべての入力は有効な数値である必要があります。",
+        "badEccentricity": "閉じた軌道の場合、離心率は0より大きく1未満である必要があります。",
+        "badSemiMajorAxis": "軌道長半径は0より大きくなければなりません。",
+        "noSensorForRae": "RAE変換にはセンサーを選択する必要があります。",
+        "noRaeData": "RAEデータがありません。まずセンサーを選択した状態で変換を実行してください。",
+        "noSatelliteSelected": "衛星が選択されていません。",
+        "notASatellite": "選択されたオブジェクトは衛星ではありません。",
+        "couldNotPropagate": "衛星を現在時刻まで伝播できませんでした。",
+        "copyFailed": "クリップボードにコピーできませんでした。"
+      },
+      "help": {
+        "overview": "座標系変換計算機は、KeepTrackが扱うすべての座標系の間で位置（および任意で速度）を変換します：J2000 (ECI)、ITRF (ECEF)、TEME、測地座標 (LLA)、RAE（観測点中心）、RA/Dec（地心）、古典軌道要素。いずれか1つの座標系で状態を入力すれば、他のすべての座標系で同時に読み取れます。",
+        "imgAlt": "入力フィールドと変換結果が表示された座標系変換メニュー",
+        "imgCaption": "1つの座標系で状態を入力すると、他のすべての座標系がワンクリックで計算されます。",
+        "framesHeading": "対応座標系",
+        "frames": "<ul><li><strong>J2000 (ECI)</strong>、<strong>TEME</strong>：地球中心の慣性座標系。TEMEはTLEが公開される座標系です。</li><li><strong>ITRF (ECEF)</strong>：地球中心・地球固定。地球とともに回転します。</li><li><strong>測地座標 (LLA)</strong>：緯度、経度、高度。</li><li><strong>RAE（観測点中心）</strong>：選択中のセンサーから見た距離、方位角、仰角。</li><li><strong>RA/Dec（地心）</strong>：赤経と赤緯。</li><li><strong>古典軌道要素</strong>：ケプラー軌道要素。出力には周期、遠地点、近地点も含まれます。</li></ul>",
+        "howToUse": "<ol><li>下部バー（ツールモード）からメニューを開きます。</li><li><strong>入力座標系</strong>を選択すると、入力フィールドがそれに合わせて変わります。</li><li>値を入力するか、<strong>選択中の衛星を読み込む</strong>をクリックして、現在選択中の衛星から値を取り込みます。</li><li>直交座標系では、<strong>速度を含める</strong>にチェックを入れると速度ベクトルも変換されます。古典軌道要素の出力には速度が必要です。</li><li><strong>変換</strong>をクリックします。他のすべての座標系の値が下に表示され、<strong>出力形式</strong>セレクターに従って整形されます。</li><li>センサーが選択され、RAEの結果が計算されている状態で、<strong>線を描画</strong>をクリックすると、3Dビューにセンサーからその地点までの線が描画されます。</li></ol>",
+        "tip1": "RAEの入力と出力には、先にセンサーを選択しておく必要があります。フィールドには使用中のセンサーが表示されるため、基準地点を常に確認できます。",
+        "tip2": "DMS出力形式は角度を度・分・秒で表示するため、望遠鏡の指向に便利です。",
+        "tip3": "古典軌道要素への変換には速度が必要です。速度がない場合、出力は軌道を推測するのではなく、速度が必要である旨を表示します。"
+      }
     }
   }
 }

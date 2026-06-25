@@ -22,6 +22,44 @@ const testFuncWithAllCameraTypes = (testFunc: () => void, cameraInstance: Camera
   expect(testFunc).not.toThrow();
 };
 
+describe('Camera.setFieldOfView', () => {
+  let cameraInstance: Camera;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const priv = () => cameraInstance as any;
+
+  beforeEach(() => {
+    cameraInstance = new Camera();
+    settingsManager.fieldOfView = 0.6 as Radians;
+  });
+
+  it('holds the FOV across lerp updates (value and target move together)', () => {
+    // Seed the lerp target at the current value
+    priv().updateFovLerp_(16 as Milliseconds);
+
+    cameraInstance.setFieldOfView(0.1047 as Radians);
+
+    for (let i = 0; i < 20; i++) {
+      priv().updateFovLerp_(100 as Milliseconds);
+    }
+
+    expect(settingsManager.fieldOfView).toBeCloseTo(0.1047, 6);
+  });
+
+  it('raw settingsManager.fieldOfView writes get pulled back toward the old target', () => {
+    // Seed the lerp target at 0.6
+    priv().updateFovLerp_(16 as Milliseconds);
+
+    settingsManager.fieldOfView = 0.1047 as Radians;
+
+    for (let i = 0; i < 200; i++) {
+      priv().updateFovLerp_(100 as Milliseconds);
+    }
+
+    // This is the behavior setFieldOfView exists to avoid
+    expect(settingsManager.fieldOfView).toBeCloseTo(0.6, 3);
+  });
+});
+
 describe('Camera Key Input', () => {
   let cameraInstance: Camera;
 

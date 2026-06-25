@@ -7,12 +7,18 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { LineManager } from '@app/engine/rendering/line-manager';
 import { SensorToMoonLine } from '@app/engine/rendering/line-manager/sensor-to-moon-line';
 import { SensorToSunLine } from '@app/engine/rendering/line-manager/sensor-to-sun-line';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { t7e } from '@app/locales/keys';
 import { SpaceObjectType } from '@ootk/src/main';
 import sensorInfoPng from '@public/img/icons/sensor-info.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import './sensor-info.css';
+
+const l = (key: string): string => t7e(`plugins.SensorInfoPlugin.labels.${key}` as Parameters<typeof t7e>[0]);
+const b = (key: string): string => t7e(`plugins.SensorInfoPlugin.buttons.${key}` as Parameters<typeof t7e>[0]);
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
   readonly id = 'SensorInfoPlugin';
@@ -26,72 +32,75 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
   menuMode: MenuMode[] = [MenuMode.SENSORS, MenuMode.ALL];
 
-  bottomIconLabel = 'Sensor Info';
   bottomIconImg = sensorInfoPng;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
 
   sideMenuElementName: string = 'sensor-info-menu';
   sideMenuElementHtml: string = html`
-    <div id="sensor-info-menu" class="side-menu-parent start-hidden">
+    <div id="sensor-info-menu" class="side-menu-parent start-hidden kt-ui-v13">
     <div id="sensor-content" class="side-menu">
-        <div class="row">
-        <h5 id="sensor-info-title" class="center-align">Sensor Name</h5>
+        <div id="sensor-info-title" class="sensor-info-name">${l('sensorName')}</div>
+        <section class="kt-section">
+        <div class="kt-section-label">${l('details')}</div>
         <div class="sensor-info-row" style="margin-top: 0px;">
-            <div class="sensor-info-key">Country</div>
+            <div class="sensor-info-key">${l('country')}</div>
             <div class="sensor-info-value" id="sensor-country">USA</div>
         </div>
         <div class="sensor-info-row">
-            <div class="sensor-info-key">Sensor Type</div>
-            <div class="sensor-info-value" id="sensor-type">Unknown</div>
+            <div class="sensor-info-key">${l('sensorType')}</div>
+            <div class="sensor-info-value" id="sensor-type">${l('unknown')}</div>
         </div>
         <div class="sensor-info-row">
-            <div class="sensor-info-key">Latitude</div>
+            <div class="sensor-info-key">${l('latitude')}</div>
             <div class="sensor-info-value" id="sensor-latitude">0</div>
         </div>
         <div class="sensor-info-row">
-            <div class="sensor-info-key">Longitude</div>
+            <div class="sensor-info-key">${l('longitude')}</div>
             <div class="sensor-info-value" id="sensor-longitude">0</div>
         </div>
         <div class="sensor-info-row">
-            <div class="sensor-info-key">Min Azimuth</div>
+            <div class="sensor-info-key">${l('minAzimuth')}</div>
             <div class="sensor-info-value" id="sensor-minazimuth">30 deg</div>
         </div>
         <div class="sensor-info-row">
-            <div class="sensor-info-key">Max Azimuth</div>
+            <div class="sensor-info-key">${l('maxAzimuth')}</div>
             <div class="sensor-info-value" id="sensor-maxazimuth">30 deg</div>
         </div>
         <div class="sensor-info-row">
-            <div class="sensor-info-key">Min Elevation</div>
+            <div class="sensor-info-key">${l('minElevation')}</div>
             <div class="sensor-info-value" id="sensor-minelevation">60 deg</div>
         </div>
         <div class="sensor-info-row">
-            <div class="sensor-info-key">Max Elevation</div>
+            <div class="sensor-info-key">${l('maxElevation')}</div>
             <div class="sensor-info-value" id="sensor-maxelevation">60 deg</div>
         </div>
         <div class="sensor-info-row">
-            <div class="sensor-info-key">Min Range</div>
+            <div class="sensor-info-key">${l('minRange')}</div>
             <div class="sensor-info-value" id="sensor-minrange">1000 km</div>
         </div>
         <div class="sensor-info-row">
-            <div class="sensor-info-key">Max Range</div>
+            <div class="sensor-info-key">${l('maxRange')}</div>
             <div class="sensor-info-value" id="sensor-maxrange">1000 km</div>
         </div>
         <div class="sensor-info-row">
-            <div class="sensor-info-key">Band</div>
+            <div class="sensor-info-key">${l('band')}</div>
             <div class="sensor-info-value" id="sensor-band">UHF</div>
         </div>
         <div class="sensor-info-row">
-            <div class="sensor-info-key">Beam Width</div>
+            <div class="sensor-info-key">${l('beamWidth')}</div>
             <div class="sensor-info-value" id="sensor-beamwidth">10 deg</div>
         </div>
-        <div class="center-align row">
-            <button id="sensor-sun-btn" class="btn btn-ui waves-effect waves-light" type="button">Draw Line to Sun &#9658;</button>
-        </div>
-        <div class="center-align row">
-            <button id="sensor-moon-btn" class="btn btn-ui waves-effect waves-light" type="button">Draw Line to Moon &#9658;</button>
-        </div>
-        </div>
+        </section>
+        <section class="kt-section">
+        <div class="kt-section-label">${l('visualizations')}</div>
+        <button id="sensor-sun-btn" class="kt-action waves-effect waves-light" type="button">
+            <span class="kt-action-label">${b('drawLineToSun')}</span>
+        </button>
+        <button id="sensor-moon-btn" class="kt-action waves-effect waves-light" type="button">
+            <span class="kt-action-label">${b('drawLineToMoon')}</span>
+        </button>
+        </section>
     </div>
     </div>`;
 
@@ -101,6 +110,36 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
   private isSunLineVisible_ = false;
   private isMonnLineVisible_ = false;
+
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: t7e('plugins.SensorInfoPlugin.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.SensorInfoPlugin.help.overview'),
+          image: {
+            src: 'img/help/sensor/sensor-info-menu.png',
+            alt: t7e('plugins.SensorInfoPlugin.help.imgAlt'),
+            caption: t7e('plugins.SensorInfoPlugin.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.SensorInfoPlugin.help.fieldsHeading'),
+          content: t7e('plugins.SensorInfoPlugin.help.fields'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.SensorInfoPlugin.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.SensorInfoPlugin.help.tip1'),
+        t7e('plugins.SensorInfoPlugin.help.tip2'),
+        t7e('plugins.SensorInfoPlugin.help.tip3'),
+      ],
+    };
+  }
 
   addHtml(): void {
     super.addHtml();
@@ -120,6 +159,18 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     );
   }
 
+  /**
+   * Update a `.kt-action` row's label without clobbering the CSS chevron
+   * pseudo-element (setting the button's textContent would delete it).
+   */
+  private static setActionLabel_(buttonElement: HTMLElement | null, text: string) {
+    const labelElement = buttonElement?.querySelector('.kt-action-label');
+
+    if (labelElement) {
+      labelElement.textContent = text;
+    }
+  }
+
   private checkIfLinesVisible_(lineManager: LineManager) {
     this.isSunLineVisible_ = lineManager.lines.some((line) => {
       if (line instanceof SensorToSunLine) {
@@ -134,10 +185,10 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
     if (sunButtonElement) {
       if (this.isSunLineVisible_) {
-        sunButtonElement.textContent = 'Remove Line to Sun  \u25B6';
+        SensorInfoPlugin.setActionLabel_(sunButtonElement, b('removeLineToSun'));
         this.isSunLineVisible_ = true;
       } else {
-        sunButtonElement.textContent = 'Add Line to Sun  \u25B6';
+        SensorInfoPlugin.setActionLabel_(sunButtonElement, b('addLineToSun'));
         this.isSunLineVisible_ = false;
       }
     }
@@ -152,10 +203,10 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
     if (moonButtonElement) {
       if (this.isMonnLineVisible_) {
-        moonButtonElement.textContent = 'Remove Line to Moon  \u25B6';
+        SensorInfoPlugin.setActionLabel_(moonButtonElement, b('removeLineToMoon'));
         this.isMonnLineVisible_ = true;
       } else {
-        moonButtonElement.textContent = 'Add Line to Moon  \u25B6';
+        SensorInfoPlugin.setActionLabel_(moonButtonElement, b('addLineToMoon'));
         this.isMonnLineVisible_ = false;
       }
     }
@@ -176,7 +227,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
           if (line instanceof SensorToMoonLine) {
             line.isGarbage = true;
 
-            sensorMoonBtnElement.textContent = 'Add Line to Moon  \u25B6';
+            SensorInfoPlugin.setActionLabel_(sensorMoonBtnElement, b('addLineToMoon'));
             this.isMonnLineVisible_ = false;
             ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
 
@@ -189,7 +240,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
         const sensors = ServiceLocator.getSensorManager().currentSensors;
 
         if (sensors.length !== 1) {
-          ServiceLocator.getUiManager().toast('Please Select Only One Sensor', ToastMsgType.caution);
+          ServiceLocator.getUiManager().toast(t7e('plugins.SensorInfoPlugin.errorMsgs.selectOnlyOneSensor' as Parameters<typeof t7e>[0]), ToastMsgType.caution);
         }
 
         keepTrackApi
@@ -197,7 +248,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
           .createSensorToMoon(ServiceLocator.getSensorManager().currentSensors[0]);
 
         // Change Button Text
-        sensorMoonBtnElement.textContent = 'Remove Line to Moon  \u25B6';
+        SensorInfoPlugin.setActionLabel_(sensorMoonBtnElement, b('removeLineToMoon'));
         this.isMonnLineVisible_ = true;
         ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
       }
@@ -218,7 +269,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
         for (const line of lineManager.lines) {
           if (line instanceof SensorToSunLine) {
             line.isGarbage = true;
-            sensorSunBtnElement.textContent = 'Add Line to Sun  \u25B6';
+            SensorInfoPlugin.setActionLabel_(sensorSunBtnElement, b('addLineToSun'));
             this.isSunLineVisible_ = false;
             ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
 
@@ -230,7 +281,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
         const sensors = ServiceLocator.getSensorManager().currentSensors;
 
         if (sensors.length !== 1) {
-          ServiceLocator.getUiManager().toast('Please Select Only One Sensor', ToastMsgType.caution);
+          ServiceLocator.getUiManager().toast(t7e('plugins.SensorInfoPlugin.errorMsgs.selectOnlyOneSensor' as Parameters<typeof t7e>[0]), ToastMsgType.caution);
         }
 
         keepTrackApi
@@ -238,7 +289,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
           .createSensorToSun(ServiceLocator.getSensorManager().currentSensors[0]);
 
         // Change Button Text
-        sensorSunBtnElement.textContent = 'Remove Line to Sun  \u25B6';
+        SensorInfoPlugin.setActionLabel_(sensorSunBtnElement, b('removeLineToSun'));
         this.isSunLineVisible_ = true;
         ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
       }
@@ -285,11 +336,11 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       hideEl(beamwidthElement?.parentElement ?? '');
     } else {
       showEl(sensorBandElement?.parentElement ?? '');
-      sensorBandElement.innerHTML = firstSensor.freqBand ? firstSensor.freqBand : 'Unknown';
+      sensorBandElement.innerHTML = firstSensor.freqBand ? firstSensor.freqBand : l('unknown');
 
       if (firstSensor instanceof DetailedSensor) {
         showEl(beamwidthElement?.parentElement ?? '');
-        beamwidthElement.innerHTML = firstSensor.beamwidth ? `${firstSensor.beamwidth.toFixed(1).toString()}°` : 'Unknown';
+        beamwidthElement.innerHTML = firstSensor.beamwidth ? `${firstSensor.beamwidth.toFixed(1).toString()}°` : l('unknown');
       } else {
         hideEl(beamwidthElement?.parentElement ?? '');
       }

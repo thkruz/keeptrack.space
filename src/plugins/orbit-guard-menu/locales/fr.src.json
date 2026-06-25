@@ -3,7 +3,30 @@
     "OrbitGuardMenuPlugin": {
       "bottomIconLabel": "OrbitGuard",
       "title": "OrbitGuard",
-      "helpBody": "Le menu de détection d'anomalies OrbitGuard affiche les derniers événements de manœuvre, orbite hors famille et changement de stabilité pour les satellites."
+      "labels": {
+        "dataCredit": "*Données OrbitGuard fournies par MSBAI.",
+        "previous": "Précédent",
+        "next": "Suivant",
+        "pageOf": "Page {current} sur {total}"
+      },
+      "table": {
+        "norad": "NORAD",
+        "eventStartTime": "Heure de début de l'événement",
+        "eventEndTime": "Heure de fin de l'événement",
+        "maneuverClass": "Classe de manœuvre",
+        "maneuverProbability": "Probabilité de manœuvre (%)",
+        "orbitOutOfFamily": "Orbite hors famille",
+        "stabilityChange": "Changement de stabilité",
+        "stabilityChangeProbability": "Probabilité de changement de stabilité (%)"
+      },
+      "help": {
+        "overview": "OrbitGuard liste les détections d'anomalies récentes dans tout le catalogue : manœuvres suspectées, orbites ayant dérivé hors famille et changements de stabilité, chacune avec une probabilité de confiance. Les données proviennent du service OrbitGuard de MSBAI et fournissent une liste classée de satellites méritant un examen plus attentif.",
+        "imgAlt": "La table des anomalies OrbitGuard avec les événements détectés",
+        "imgCaption": "Chaque ligne est un événement détecté ; les cellules rouges signalent les détections ayant franchi leur seuil.",
+        "howToUse": "<ol><li>Ouvrez <strong>OrbitGuard</strong> depuis la barre inférieure (mode Événements). Les derniers événements se chargent automatiquement.</li><li>Parcourez la table : les cellules surlignées en rouge sont des détections positives (une manœuvre classifiée, une orbite hors famille ou un changement de stabilité).</li><li>Cliquez sur une ligne pour voler vers ce satellite et avancer l'horloge à la fin de l'événement.</li><li>Utilisez <strong>Précédent</strong> et <strong>Suivant</strong> pour parcourir la liste, 20 événements par page.</li></ol>",
+        "tip1": "Les événements sont dédupliqués par satellite et triés du plus récent au plus ancien ; les premières lignes représentent donc l'activité la plus récente.",
+        "tip2": "Les probabilités reflètent la confiance du modèle, pas une certitude ; considérez les valeurs intermédiaires comme une invitation à un examen manuel plutôt que comme une conclusion."
+      }
     }
   }
 }

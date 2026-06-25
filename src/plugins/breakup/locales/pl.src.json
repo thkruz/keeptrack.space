@@ -3,13 +3,55 @@
     "Breakup": {
       "bottomIconLabel": "Utwórz rozpad",
       "title": "Menu rozpadu",
-      "helpBody": "Menu rozpadu to narzędzie do symulacji rozpadu satelity. <br><br> Poprzez duplikowanie i modyfikowanie orbity satelity możemy modelować rozpad satelity. Po wybraniu satelity i otwarciu menu użytkownik może wybrać: <ul style=\"margin-left: 40px;\"> <li>Zmienność inklinacji</li> <li>Zmienność RAAN</li> <li>Zmienność okresu</li> <li>Liczbę fragmentów rozpadu</li> </ul> Im większa zmienność, tym większe rozproszenie w symulowanym rozpadzie. Domyślne wartości zmienności są wystarczające do symulacji rozpadu z rozsądnym rozproszeniem.",
+      "sideMenuTitle": "Symulator rozpadu",
+      "labels": {
+        "satelliteScc": "Numer SCC satelity",
+        "initialSatelliteNumber": "Początkowy numer satelity",
+        "pieces": "Fragmenty",
+        "sourceSection": "Źródło",
+        "catalogSlotsSection": "Sloty katalogu",
+        "dispersionSection": "Rozrzut prędkości",
+        "eventTypeLabel": "Typ zdarzenia",
+        "preset_explosion": "Eksplozja",
+        "preset_collision": "Katastrofalna kolizja",
+        "preset_asat_cosmos": "Broń antysatelitarna, Cosmos 1408 (niższa energia)",
+        "preset_asat_fy1c": "Broń antysatelitarna, Fengyun-1C (wyższa energia)",
+        "preset_venting": "Niskoenergetyczne / odgazowanie",
+        "preset_custom": "Niestandardowy",
+        "radialDeltaV": "Radialny (m/s)",
+        "inTrackDeltaV": "Wzdłuż orbity (m/s)",
+        "crossTrackDeltaV": "W poprzek orbity (m/s)",
+        "dispersionHint": "Losowa zmiana prędkości stosowana do każdego fragmentu (1 sigma). Składowa wzdłuż orbity rozciąga chmurę wzdłuż orbity; składowa poprzeczna rozwija ją wachlarzowo w poprzek płaszczyzny orbity; składowa radialna podnosi ją i obniża. Typowe zdarzenia: eksplozje około 10 do 100 m/s, kolizje około 100 do 300 m/s.",
+        "piecesSection": "Liczba"
+      },
+      "buttons": {
+        "createBreakup": "Utwórz rozpad",
+        "clearBreakup": "Wyczyść rozpad"
+      },
+      "commands": {
+        "create": "Utwórz rozpad",
+        "clear": "Wyczyść rozpad"
+      },
+      "toasts": {
+        "cleared": "Rozpad wyczyszczony. Odłamki usunięte.",
+        "fragmentsReentered": "{count} fragmentów weszło w atmosferę i nie zostało utworzonych."
+      },
+      "help": {
+        "overview": "Menu rozpadu symuluje rozpad satelity w jego bieżącej pozycji. Generuje fragmenty odłamków z dokładnej lokalizacji wybranego satelity, z których każdy odlatuje z niewielką losową zmianą prędkości (delta-V), dzięki czemu można obserwować, jak chmura odłamków powstaje i rozprasza się w czasie. Ponieważ działa na podstawie wektora stanu satelity, obsługuje dowolny reżim orbitalny.",
+        "imgAlt": "Menu rozpadu z kontrolkami rozrzutu delta-V i liczby fragmentów",
+        "imgCaption": "Parametry rozpadu. Większe wartości delta-V szerzej rozpraszają symulowaną chmurę odłamków.",
+        "parametersHeading": "Parametry",
+        "parameters": "<ul><li><strong>Radialny</strong>: rozrzut prędkości w kierunku Ziemi i od niej (m/s), który podnosi i obniża fragmenty.</li><li><strong>Wzdłuż orbity</strong>: rozrzut prędkości wzdłuż kierunku ruchu (m/s), który rozciąga chmurę wzdłuż orbity.</li><li><strong>W poprzek orbity</strong>: rozrzut prędkości poza płaszczyzną orbity (m/s), który rozwija chmurę wachlarzowo w poprzek płaszczyzny.</li><li><strong>Fragmenty</strong>: ile fragmentów odłamków utworzyć (od 5 do 1000).</li><li><strong>Początkowy numer satelity</strong>: pierwszy numer katalogu analityka przypisywany fragmentom (domyślnie 90000).</li></ul>Wartości są traktowane jako rozrzut jednej sigmy na fragment. Wartości domyślne (około 40 m/s na oś) modelują zdarzenie klasy eksplozji; rzeczywiste fragmenty eksplozji rozpraszają się o około 10 do 100 m/s, podczas gdy katastrofalne kolizje osiągają około 100 do 300 m/s (małe fragmenty mogą przekraczać 1 km/s). Zachowaj trzy osie równe, aby uzyskać fizycznie realistyczne, sferycznie symetryczne zdarzenie; chmura z czasem w naturalny sposób rozciąga się wzdłuż orbity.",
+        "howToUse": "<ol><li>Wybierz dowolnego satelitę. Ikona pozostaje nieaktywna, dopóki satelita nie zostanie wybrany.</li><li>Otwórz menu rozpadu i dostosuj rozrzut delta-V oraz liczbę fragmentów.</li><li>Kliknij <strong>Utwórz rozpad</strong>. Fragmenty są generowane w bieżącej pozycji satelity, a pasek wyszukiwania wypełnia się nowymi odłamkami, dzięki czemu widać całą chmurę.</li><li>Przyspiesz czas, aby obserwować, jak chmura rozprasza się wzdłuż orbity.</li></ol>",
+        "tip1": "Działa w dowolnym reżimie orbitalnym, w tym na orbitach LEO, MEO, GEO i silnie eliptycznych (HEO), ponieważ każdy fragment jest propagowany z wektora stanu satelity macierzystego w punkcie rozpadu.",
+        "tip2": "Rozpad jest symulowany i istnieje tylko w pamięci. Użyj Wyczyść rozpad, aby usunąć odłamki, lub przeładuj stronę. Sam satelita macierzysty nigdy nie jest modyfikowany.",
+        "tip3": "Wszystkie fragmenty są tworzone jako obiekty typu odłamek, więc schematy kolorów i filtry oparte na odłamkach mają do nich zastosowanie natychmiast."
+      },
       "errorMsgs": {
         "SatelliteNotFound": "Nie znaleziono satelity!",
-        "CannotCreateBreakupForNonCircularOrbits": "Nie można utworzyć rozpadu dla orbit niekołowych. Pracujemy nad poprawką.",
-        "CannotCalcDirectionOfSatellite": "Nie można obliczyć kierunku satelity. Spróbuj ponownie później.",
         "ErrorCreatingBreakup": "Błąd tworzenia rozpadu!",
         "InvalidStartNum": "Nieprawidłowy numer początkowy satelity! Ustawiono domyślnie na 90000!",
+        "InvalidSlotRange": "Początkowy numer satelity poza zakresem. Użyj od {start} do {end}.",
         "BreakupGeneratorFailed": "Generator rozpadu nie powiódł się!"
       }
     }

@@ -24,7 +24,7 @@ test.describe('TopMenu', () => {
     await expect(searchInput).toBeAttached();
 
     // Type a 9-digit CelesTrak supplemental ID. Even with no matching satellite
-    // in the (empty) catalog, the numeric-search path must not throw — the
+    // in the (empty) catalog, the numeric-search path must not throw - the
     // pre-fix code at search-manager.ts:557 sorted by parseInt(sccNum6) which
     // is NaN for any extended ID and would produce undefined-behavior sort.
     await searchInput.fill('799500766');

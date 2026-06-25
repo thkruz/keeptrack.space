@@ -3,7 +3,22 @@
     "StereoMap": {
       "bottomIconLabel": "Mapa Estéreo",
       "title": "Menú de Mapa Estereográfico",
-      "helpBody": "El Menú de Mapa Estereográfico se usa para visualizar trazas terrestres de satélites en una proyección estereográfica. <br/><br/> Puedes hacer clic en un punto a lo largo de la traza terrestre para cambiar el tiempo de la simulación a cuando el satélite alcanza ese punto. <br/><br/> Los puntos amarillos indican cuándo el satélite está a la vista del sensor. Los puntos rojos indican cuándo el satélite no está a la vista del sensor. El punto más cercano al satélite es el tiempo actual.",
+      "help": {
+        "overview": "El Mapa Estereográfico proyecta la traza terrestre del satélite seleccionado sobre un mapa plano de la Tierra. Muestra dónde está el satélite en este momento, la trayectoria que seguirá durante la próxima órbita y, cuando hay un sensor seleccionado, exactamente cuándo será visible para ese sensor. El mapa se actualiza automáticamente a medida que avanza el tiempo de la simulación.",
+        "imgAlt": "Mapa estereográfico que muestra la traza terrestre de un satélite con los segmentos visibles resaltados",
+        "imgCaption": "La traza terrestre de un satélite. El icono del satélite marca la posición actual; los iconos de radar marcan los sensores seleccionados.",
+        "readingTheMapHeading": "Cómo leer el mapa",
+        "readingTheMap": "<ul><li><strong>Icono del satélite</strong>: la posición actual del satélite. Se mueve a medida que avanza el tiempo.</li><li><strong>Traza y puntos amarillos</strong>: partes de la órbita donde el satélite está dentro del campo de visión de un sensor seleccionado.</li><li><strong>Traza y puntos rojos</strong>: partes de la órbita donde ningún sensor seleccionado puede ver el satélite. Sin un sensor seleccionado, toda la traza es roja.</li><li><strong>Iconos de radar</strong>: las ubicaciones terrestres de los sensores actualmente seleccionados.</li></ul>",
+        "howToUse": "<ol><li>Selecciona un satélite; por ejemplo, busca \"ISS\" y haz clic en un resultado.</li><li>Opcionalmente, selecciona un sensor en el menú de Sensores para que las ventanas de visibilidad aparezcan en amarillo.</li><li>Abre el Mapa Estéreo desde el menú inferior (el icono está deshabilitado hasta que se selecciona un satélite).</li><li>Haz clic en cualquier punto a lo largo de la traza terrestre para saltar el tiempo de la simulación al momento en que el satélite alcanza ese punto.</li><li>Usa el botón de descarga para guardar el mapa actual como una imagen PNG.</li></ol>",
+        "tip1": "Haz clic en un punto amarillo para saltar directamente a un próximo pase sobre el sensor y luego observa el pase en el globo 3D.",
+        "tip2": "El mapa se redibuja aproximadamente cada 30 segundos; seleccionar un nuevo satélite o hacer clic en un punto lo actualiza de inmediato.",
+        "tip3": "El mapa también está disponible desde la paleta de comandos: \"Alternar Mapa Estéreo\" y \"Exportar Mapa Estéreo\".",
+        "shortcutToggle": "Alternar el Mapa Estéreo"
+      },
+      "commands": {
+        "toggle": "Alternar Mapa Estéreo",
+        "export": "Exportar Mapa Estéreo"
+      },
       "labels": {
         "orbitsToDisplay": "Órbitas a mostrar",
         "showGraticule": "Mostrar retícula",

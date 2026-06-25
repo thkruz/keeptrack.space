@@ -3,7 +3,30 @@
     "OrbitGuardMenuPlugin": {
       "bottomIconLabel": "Strážce orbity",
       "title": "Strážce orbity",
-      "helpBody": "Menu detekce anomálií Strážce orbity zobrazuje nejnovější události manévrů, odchylek od orbity a změn stability satelitů."
+      "labels": {
+        "dataCredit": "*Data Strážce orbity poskytuje MSBAI.",
+        "previous": "Předchozí",
+        "next": "Další",
+        "pageOf": "Strana {current} z {total}"
+      },
+      "table": {
+        "norad": "NORAD",
+        "eventStartTime": "Čas začátku události",
+        "eventEndTime": "Čas konce události",
+        "maneuverClass": "Třída manévru",
+        "maneuverProbability": "Pravděpodobnost manévru (%)",
+        "orbitOutOfFamily": "Orbita mimo rodinu",
+        "stabilityChange": "Změna stability",
+        "stabilityChangeProbability": "Pravděpodobnost změny stability (%)"
+      },
+      "help": {
+        "overview": "Strážce orbity zobrazuje nejnovější detekce anomálií v celém katalogu: podezřelé manévry, orbity vychýlené mimo svou rodinu a změny stability, každou s pravděpodobností spolehlivosti. Data pocházejí ze služby OrbitGuard společnosti MSBAI a poskytují seřazený přehled satelitů, které stojí za bližší pohled.",
+        "imgAlt": "Tabulka anomálií Strážce orbity s detekovanými událostmi",
+        "imgCaption": "Každý řádek je detekovaná událost; červené buňky označují detekce, které překročily svůj práh.",
+        "howToUse": "<ol><li>Otevřete <strong>Strážce orbity</strong> ze spodní lišty (režim Události). Nejnovější události se načtou automaticky.</li><li>Projděte tabulku: buňky zvýrazněné červeně jsou pozitivní detekce (klasifikovaný manévr, orbita mimo rodinu nebo změna stability).</li><li>Kliknutím na řádek přeletíte k danému satelitu a posunete čas na konec události.</li><li>Pomocí tlačítek <strong>Předchozí</strong> a <strong>Další</strong> listujete přehledem, 20 událostí na stránku.</li></ol>",
+        "tip1": "Události jsou deduplikovány podle satelitu a seřazeny od nejnovějších, takže horní řádky představují nejčerstvější aktivitu.",
+        "tip2": "Pravděpodobnosti vyjadřují spolehlivost modelu, nikoli jistotu; střední hodnoty berte jako podnět k ručnímu prověření, ne jako závěr."
+      }
     }
   }
 }

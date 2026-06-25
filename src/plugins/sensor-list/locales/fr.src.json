@@ -3,7 +3,32 @@
     "SensorListPlugin": {
       "bottomIconLabel": "Capteurs",
       "title": "Menu Liste des Capteurs",
-      "helpBody": "Le menu Capteurs vous permet de sélectionner un capteur à utiliser dans les calculs et les autres fonctions du menu. Les capteurs sont regroupés selon les réseaux qu'ils soutiennent principalement. Sur le côté gauche du menu se trouve le nom du capteur et à droite le pays/l'organisation propriétaire. <br><br> Sélectionner une option \"Tous...Capteurs\" permet de sélectionner tous les capteurs de ce groupe. Cela est utile pour visualiser la couverture des réseaux, mais ne fonctionne pas pour tous les calculs. Si vous souhaitez calculer les angles de visée pour un réseau, il est préférable d'utiliser l'outil multi-sites ou de calculer les angles pour chaque capteur individuellement. <br><br> Les capteurs de cette liste incluent des radars mécaniques et à réseau phasé, ainsi que des capteurs optiques : <ul style=\"margin-left: 40px;\"> <li> Les radars à réseau phasé sont généralement limités à l'orbite terrestre basse (LEO). </li> <li> Les radars mécaniques peuvent être utilisés pour LEO et l'orbite géostationnaire (GEO). </li> <li> Les capteurs optiques sont généralement utilisés pour GEO, mais peuvent aussi servir pour LEO. </li> <li> Les capteurs optiques sont limités aux observations nocturnes par ciel dégagé, tandis que les radars fonctionnent de jour comme de nuit. </li> </ul> <br> Les informations sur les capteurs sont basées sur des données publiques et peuvent être vérifiées dans le menu Info Capteur. Si vous avez des données publiques sur d'autres capteurs ou des corrections à apporter, contactez-moi à <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>."
+      "labels": {
+        "missingData": "Données manquantes",
+        "tooltipSensorsInFov": "Visualiser la couverture des capteurs"
+      },
+      "buttons": {
+        "resetSensor": "Réinitialiser le capteur",
+        "showSensorsWithFov": "Afficher tous les capteurs avec leur champ de vision..."
+      },
+      "commands": {
+        "category": "Capteurs",
+        "setSensor": "Définir le capteur actuel sur {name}",
+        "setSensorGroup": "Définir le groupe de capteurs : {name}"
+      },
+      "help": {
+        "overview": "Le menu Capteurs est l'endroit où vous choisissez la station au sol à partir de laquelle le reste de l'application effectue ses calculs. Les capteurs sont regroupés par le réseau qu'ils soutiennent principalement, chaque entrée affichant le nom du capteur à gauche et le pays ou l'organisation propriétaire à droite. Le capteur sélectionné détermine les angles de visée, les cônes de champ de vision, les alertes de passage de la liste de surveillance et tous les autres menus liés aux capteurs.",
+        "imgAlt": "Le menu Capteurs affichant des réseaux de capteurs regroupés",
+        "imgCaption": "Les capteurs sont regroupés par réseau. Cliquez sur l'en-tête d'un groupe pour sélectionner tout le réseau d'un coup.",
+        "sensorTypesHeading": "Types de Capteurs",
+        "sensorTypes": "<ul><li><strong>Radars à réseau phasé</strong> : balayage large et rapide ; généralement limités à l'orbite terrestre basse (LEO).</li><li><strong>Radars mécaniques</strong> : antennes orientables utilisables contre LEO et l'orbite géostationnaire (GEO).</li><li><strong>Télescopes optiques</strong> : principalement utilisés pour GEO et l'espace lointain ; ils ne fonctionnent que la nuit par ciel dégagé, tandis que les radars fonctionnent de jour comme de nuit.</li></ul>",
+        "howToUse": "<ol><li>Ouvrez le menu depuis la barre inférieure ou appuyez sur S.</li><li>Cliquez sur un capteur individuel pour le sélectionner. La caméra vole jusqu'à son emplacement.</li><li>Ou cliquez sur l'en-tête d'un groupe (p. ex. \"All Space Surveillance Network Sensors\") pour sélectionner tout le réseau, ce qui est idéal pour visualiser la couverture.</li><li>Utilisez <strong>Réinitialiser le capteur</strong> pour effacer la sélection.</li></ol>",
+        "tip1": "De nombreux calculs (comme les angles de visée) nécessitent un seul capteur. Si vous avez sélectionné un réseau entier, utilisez plutôt le menu des angles de visée multi-sites ou choisissez un capteur à la fois.",
+        "tip2": "Chaque capteur est également disponible depuis la palette de commandes : tapez le nom du capteur pour changer sans ouvrir ce menu.",
+        "tip3": "Les paramètres des capteurs proviennent de données publiques ; vous pouvez les consulter dans le menu Info Capteur. Les corrections sont les bienvenues à admin@keeptrack.space.",
+        "shortcutToggle": "Basculer le menu Capteurs",
+        "shortcutCamera": "Pointer la caméra sur le capteur actuel"
+      }
     }
   }
 }

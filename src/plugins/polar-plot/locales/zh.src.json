@@ -3,7 +3,42 @@
     "PolarPlotPlugin": {
       "bottomIconLabel": "极坐标图",
       "title": "极坐标图菜单",
-      "helpBody": "极坐标图菜单用于生成卫星方位角和仰角随时间变化的二维极坐标图。"
+      "labels": {
+        "notInView": "未来{hours}小时内卫星不可见",
+        "saveImage": "保存图像",
+        "satellite": "卫星 {sccNum}",
+        "unknownSensor": "未知传感器",
+        "unknownStartTime": "未知开始时间",
+        "unknownStopTime": "未知结束时间",
+        "prevPass": "上一次过境",
+        "nextPass": "下一次过境",
+        "imageSize": "图像尺寸",
+        "size_square": "正方形 (1080)",
+        "size_wide": "宽屏 (1200x675)",
+        "size_large": "大图 (2000)",
+        "copyImage": "复制图像",
+        "copied": "极坐标图已复制到剪贴板",
+        "passLabel": "第 {n} 次，共 {total} 次过境",
+        "maxEl": "最大仰角 {deg}°"
+      },
+      "sections": {
+        "pass": "过境",
+        "export": "导出"
+      },
+      "errorMsgs": {
+        "copyFailed": "无法将图像复制到剪贴板"
+      },
+      "help": {
+        "overview": "极坐标图以经典的方位角和仰角天空图绘制所选卫星下一次飞越所选传感器的过程：北方在顶部，地平线在外圈，天顶在中心。这是观测者或操作员用来确定在天空中观察方向的图表。",
+        "imgAlt": "显示卫星过境轨迹的极坐标天空图",
+        "imgCaption": "过境从绿点开始，到红点结束；圆环表示仰角。",
+        "readingHeading": "如何读图",
+        "reading": "轨迹从绿点（升起）开始，到红点（落下）结束。同心圆环从地平线（外缘）到天顶（中心）每15度标记一次仰角，罗盘方向沿外缘排列。标题显示传感器、卫星编号以及过境的开始和结束时间（UTC）。",
+        "howToUse": "<ol><li>选择传感器和卫星；在两者都选定之前，底部图标保持禁用状态。</li><li>从底部栏打开<strong>极坐标图</strong>。三天内的下一次过境会自动计算并绘制。</li><li>点击<strong>保存图像</strong>将图表下载为PNG文件。</li></ol>",
+        "tip1": "如果卫星在未来三天内始终不会升到地平线以上，图表将被一条提示取代，而不是显示空白图。",
+        "tip2": "靠近中心的轨迹表示高仰角过境：这是观测或通信的最佳几何条件。",
+        "shortcutToggle": "切换极坐标图菜单"
+      }
     }
   }
 }

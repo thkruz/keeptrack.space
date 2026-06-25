@@ -3,7 +3,6 @@
     "CreateSat": {
       "bottomIconLabel": "Create Satellite",
       "title": "Create Satellite",
-      "helpBody": "The Create Satellite menu allows you to create a satellite by entering orbital elements manually or by importing an STK ephemeris (.e) file.<br><br><b>Basic Tab</b>: Enter apogee, perigee, and inclination to quickly create a satellite.<br><br><b>Advanced Tab</b>: Enter full Keplerian elements (inclination, RAAN, eccentricity, argument of perigee, mean anomaly, mean motion).<br><br><b>STK .e Import</b>: Drag and drop an STK ephemeris file onto the menu. Supported formats: EphemerisTimePosVel, EphemerisTimePos, and EphemerisTimePosVelAcc in inertial coordinate systems (J2000, ICRF, TEME, etc.). Time formats EpSec and UTCG are supported. Keywords are case-insensitive.<br><br><b>Not Supported</b>: Geodetic formats (LLA, LLR, MSL, Terrain), non-inertial frames (Fixed, TrueOfDate), and covariance data are not supported.",
       "tabs": {
         "basic": "Basic",
         "advanced": "Advanced"
@@ -30,11 +29,18 @@
         "apogeeKm": "Apogee (km)",
         "perigeeKm": "Perigee (km)",
         "smaKm": "Semi-Major Axis (km)",
-        "velocityKms": "Orbital Velocity (km/s)"
+        "velocityKms": "Orbital Velocity (km/s)",
+        "sectionIdentity": "Identity",
+        "sectionOrbit": "Orbit",
+        "sectionEpoch": "Epoch",
+        "sectionElements": "Orbital Elements",
+        "sectionPresets": "Presets"
       },
       "buttons": {
         "createSatellite": "Create Satellite",
-        "saveTle": "Save TLE"
+        "saveTle": "Save TLE",
+        "makeSunSync": "Sun-Sync Inclination",
+        "cloneSelected": "Clone Selected Satellite"
       },
       "options": {
         "payload": "Payload",
@@ -67,11 +73,35 @@
         "invalidMeanMotion": "Invalid mean motion. Must be in the format NN.NNNNN (e.g., 16.00000).",
         "invalidPeriod": "Invalid period. Must be in the format NN.NNNN to NNNN.NNNN (e.g., 90.0000, 9999.9999) with 8 digits total.",
         "invalidSource": "Invalid source. Must not be empty.",
-        "invalidName": "Invalid name. Must not be empty."
+        "invalidName": "Invalid name. Must not be empty.",
+        "slotOccupied": "Overwriting existing satellite {name} in slot {scc}.",
+        "noFreeSlots": "No free analyst slots remain (90000-99999 are all in use).",
+        "noSatSelected": "Select a satellite to clone first."
       },
       "successMsgs": {
         "satCreated": "Satellite {name} ({scc}) created successfully",
         "tleExported": "TLE exported successfully"
+      },
+      "help": {
+        "overview": "The Create Satellite menu adds a brand new satellite to the catalog from orbital elements you type in. Use it to model a planned launch, recreate an object from published elements, or build test cases. Created satellites live in analyst slots (NORAD IDs 90000 to 99999) and exist only in your session.",
+        "imgAlt": "The Create Satellite menu showing the Basic tab",
+        "imgCaption": "The Basic tab builds an orbit from just apogee, perigee, and inclination.",
+        "tabsHeading": "Basic and Advanced Tabs",
+        "tabs": "The <strong>Basic</strong> tab needs only a NORAD ID, name, <strong>Inclination</strong>, <strong>Apogee Altitude</strong>, and <strong>Perigee Altitude</strong>; the rest of the orbit is derived automatically. The <strong>Advanced</strong> tab exposes the full element set: <strong>Object Type</strong>, <strong>Country</strong>, epoch, <strong>Right Ascension</strong>, <strong>Eccentricity</strong>, <strong>Argument of Perigee</strong>, <strong>Mean Anomaly</strong>, and <strong>Mean Motion</strong> or <strong>Period</strong> (editing one recalculates the other). A <strong>Calculated Parameters</strong> readout shows the resulting apogee, perigee, semi major axis, and orbital velocity as you type.",
+        "howToUse": "<ol><li>Open the <strong>Create Satellite</strong> menu from the bottom bar.</li><li>Pick a free NORAD ID between 90000 and 99999 and give the satellite a name.</li><li>On the <strong>Basic</strong> tab enter inclination, apogee, and perigee; or switch to the <strong>Advanced</strong> tab for the full element set.</li><li>Click <strong>Create Satellite</strong>. The new object appears immediately and a confirmation toast shows its name and number.</li><li>Use <strong>Save TLE</strong> to export the created satellite's elements as a file you can reload later.</li></ol>",
+        "tip1": "Every field is validated with a specific error message, so if creation fails the toast tells you exactly which value to fix.",
+        "tip2": "A perigee below roughly 100 km is rejected because the satellite would decay immediately.",
+        "tip3": "Created satellites are session only; export a TLE if you want to keep the object for another day."
+      },
+      "presets": {
+        "placeholder": "Load a preset…",
+        "selectLabel": "Orbit Preset",
+        "leoIss": "LEO (ISS-like)",
+        "sso": "Sun-Synchronous (800 km)",
+        "geo": "Geostationary (GEO)",
+        "gto": "GEO Transfer (GTO)",
+        "molniya": "Molniya",
+        "polar": "Polar (600 km)"
       }
     }
   }

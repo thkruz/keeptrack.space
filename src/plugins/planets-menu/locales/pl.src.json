@@ -3,15 +3,62 @@
     "PlanetsMenuPlugin": {
       "bottomIconLabel": "Planety",
       "title": "Menu listy planet",
-      "helpBody": "To menu umożliwia wybór i wyświetlanie różnych planet w symulacji.",
       "sections": {
         "planets": "Planety",
         "dwarfPlanets": "Planety karłowate",
         "otherCelestialBodies": "Inne ciała niebieskie"
       },
+      "bodies": {
+        "Mercury": "Merkury",
+        "Venus": "Wenus",
+        "Earth": "Ziemia",
+        "Mars": "Mars",
+        "Jupiter": "Jowisz",
+        "Saturn": "Saturn",
+        "Uranus": "Uran",
+        "Neptune": "Neptun",
+        "Pluto": "Pluton",
+        "Makemake": "Makemake",
+        "Eris": "Eris",
+        "Haumea": "Haumea",
+        "Ceres": "Ceres",
+        "Sedna": "Sedna",
+        "Quaoar": "Quaoar",
+        "Orcus": "Orkus",
+        "Gonggong": "Gonggong",
+        "Charon": "Charon",
+        "Moon": "Księżyc",
+        "Sun": "Słońce",
+        "Io": "Io",
+        "Europa": "Europa",
+        "Ganymede": "Ganimedes",
+        "Callisto": "Kallisto",
+        "Titan": "Tytan",
+        "Rhea": "Rea",
+        "Iapetus": "Japet",
+        "Dione": "Dione",
+        "Tethys": "Tetyda",
+        "Enceladus": "Enceladus"
+      },
       "tooltips": {
         "centerCamera": "Wyśrodkuj kamerę na {body}.",
         "plannedFuture": "Zaplanowane na przyszłą aktualizację."
+      },
+      "filterPlaceholder": "Filtruj ciała…",
+      "commands": {
+        "toggleMenu": "Przełącz menu Planety",
+        "centerOn": "Wyśrodkuj kamerę na {body}"
+      },
+      "help": {
+        "overview": "Menu Planety zamienia KeepTrack w przeglądarkę Układu Słonecznego: wybierz dowolną planetę, planetę karłowatą, Księżyc lub Słońce, aby wyśrodkować na nich kamerę. To najszybszy sposób na badanie geometrii cislunarnej i głębokiego kosmosu obok katalogu obiektów na orbicie Ziemi.",
+        "imgAlt": "Menu listy planet z planetami, planetami karłowatymi i innymi ciałami",
+        "imgCaption": "Kliknij dowolne ciało, aby wyśrodkować na nim kamerę.",
+        "howToUse": "<ol><li>Otwórz menu <strong>Planety</strong> z dolnego paska lub naciśnij <strong>P</strong>.</li><li>Kliknij ciało, na przykład <strong>Mars</strong> lub <strong>Księżyc</strong>. Kamera wyśrodkuje się na nim, a limity przybliżenia dostosują się do nowej skali.</li><li>Naciśnij <strong>Home</strong>, aby wrócić do Ziemi, lub <strong>Shift</strong>+<strong>Home</strong>, aby ponownie wyśrodkować Ziemię w widoku.</li></ol>",
+        "tip1": "Kilka księżyców (Io, Europa, Tytan i inne) znajduje się na liście, ale jest wyszarzonych; są zaplanowane na przyszłą aktualizację.",
+        "tip2": "Możesz też kliknąć prawym przyciskiem w pustą przestrzeń i wybrać ciało z menu kontekstowego.",
+        "shortcutToggle": "Przełącz menu Planety",
+        "shortcutHome": "Ustaw Ziemię jako ciało centralne",
+        "shortcutCenterEarth": "Wyśrodkuj kamerę na Ziemi"
       }
     }
   }

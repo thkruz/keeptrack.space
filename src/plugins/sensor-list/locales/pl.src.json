@@ -3,7 +3,32 @@
     "SensorListPlugin": {
       "bottomIconLabel": "Czujniki",
       "title": "Menu listy czujników",
-      "helpBody": "Menu czujników umożliwia wybranie czujnika do wykorzystania w obliczeniach i funkcjach innych menu. Czujniki są pogrupowane według sieci, które głównie obsługują. Po lewej stronie menu znajduje się nazwa czujnika, a po prawej stronie kraj/organizacja, która jest jego właścicielem. <br><br> Wybranie opcji \"Wszystkie...czujniki\" spowoduje wybranie wszystkich czujników w danej grupie. Jest to przydatne do wizualizacji zasięgu sieci, ale obecnie nie działa dla wszystkich obliczeń. Jeśli próbujesz obliczyć kąty obserwacji dla sieci, najlepiej użyć narzędzia wielostanowiskowych kątów obserwacji lub obliczyć kąty obserwacji dla każdego z czujników w sieci osobno. <br><br> Czujniki na tej liście obejmują radary mechaniczne i z anteną fazowaną, a także czujniki optyczne: <ul style=\"margin-left: 40px;\"> <li> Radary z anteną fazowaną są zazwyczaj ograniczone do niskiej orbity околoziemskiej (LEO). </li> <li> Radary mechaniczne mogą być używane zarówno na LEO, jak i na orbicie geostacjonarnej (GEO). </li> <li> Czujniki optyczne są zazwyczaj używane na GEO, ale mogą być również używane na LEO. </li> <li> Czujniki optyczne są ograniczone do obserwacji nocnych przy bezchmurnym niebie, podczas gdy radary mogą być używane zarówno w dzień, jak i w nocy. </li> </ul> <br> Informacje o czujnikach oparte są na publicznie dostępnych danych i można je zweryfikować w menu informacji o czujniku. Jeśli posiadasz publiczne dane o dodatkowych czujnikach lub poprawki do istniejących informacji o czujnikach, skontaktuj się ze mną pod adresem <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>."
+      "labels": {
+        "missingData": "Brak danych",
+        "tooltipSensorsInFov": "Wizualizuj zasięg czujników"
+      },
+      "buttons": {
+        "resetSensor": "Resetuj czujnik",
+        "showSensorsWithFov": "Pokaż wszystkie czujniki z FOV..."
+      },
+      "commands": {
+        "category": "Czujniki",
+        "setSensor": "Ustaw bieżący czujnik na {name}",
+        "setSensorGroup": "Ustaw grupę czujników: {name}"
+      },
+      "help": {
+        "overview": "Menu czujników to miejsce, w którym wybierasz stację naziemną, na podstawie której reszta aplikacji wykonuje obliczenia. Czujniki są pogrupowane według sieci, którą głównie obsługują, a każda pozycja pokazuje po lewej stronie nazwę czujnika, a po prawej kraj lub organizację, do której należy. Wybrany czujnik steruje kątami obserwacji, stożkami pola widzenia, alertami przelotów z listy obserwacyjnej i każdym innym menu korzystającym z czujnika.",
+        "imgAlt": "Menu czujników pokazujące pogrupowane sieci czujników",
+        "imgCaption": "Czujniki są pogrupowane według sieci. Kliknij nagłówek grupy, aby wybrać całą sieć naraz.",
+        "sensorTypesHeading": "Typy czujników",
+        "sensorTypes": "<ul><li><strong>Radary z anteną fazowaną</strong>: szerokie, szybkie skanowanie; zazwyczaj ograniczone do niskiej orbity okołoziemskiej (LEO).</li><li><strong>Radary mechaniczne</strong>: obrotowe anteny, których można używać zarówno wobec LEO, jak i orbity geostacjonarnej (GEO).</li><li><strong>Teleskopy optyczne</strong>: używane głównie dla GEO i dalekiego kosmosu; działają tylko w nocy przy bezchmurnym niebie, podczas gdy radary działają w dzień i w nocy.</li></ul>",
+        "howToUse": "<ol><li>Otwórz menu z dolnego paska lub naciśnij S.</li><li>Kliknij pojedynczy czujnik, aby go wybrać. Kamera przeleci do jego lokalizacji.</li><li>Lub kliknij nagłówek grupy (np. \"All Space Surveillance Network Sensors\"), aby wybrać całą sieć, co świetnie nadaje się do wizualizacji zasięgu.</li><li>Użyj <strong>Resetuj czujnik</strong>, aby wyczyścić wybór.</li></ol>",
+        "tip1": "Wiele obliczeń (np. kąty obserwacji) wymaga pojedynczego czujnika. Jeśli wybrano całą sieć, użyj zamiast tego menu wielostanowiskowych kątów obserwacji lub wybieraj czujniki pojedynczo.",
+        "tip2": "Każdy czujnik jest też dostępny z palety poleceń: wpisz nazwę czujnika, aby przełączyć się bez otwierania tego menu.",
+        "tip3": "Parametry czujników pochodzą z publicznie dostępnych danych; możesz je przejrzeć w menu informacji o czujniku. Poprawki są mile widziane pod adresem admin@keeptrack.space.",
+        "shortcutToggle": "Przełącz menu czujników",
+        "shortcutCamera": "Skieruj kamerę na bieżący czujnik"
+      }
     }
   }
 }

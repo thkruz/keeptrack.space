@@ -3,8 +3,8 @@
     "CatalogBrowserPlugin": {
       "bottomIconLabel": "Catalog Browser",
       "title": "Catalog Browser",
-      "helpBody": "Browse and load satellite catalogs. <br><br>Use the toggle to choose between replacing the entire catalog (All Data) or updating only orbital elements for existing satellites (Orbital Data Only).",
       "labels": {
+        "loadMode": "Load Mode",
         "allData": "All Data",
         "orbitalOnly": "Orbital Only",
         "allDataDesc": "Replaces entire catalog with selected data",
@@ -91,15 +91,27 @@
         "vimpelLoaded": "JSC Vimpel catalog loaded"
       },
       "commands": {
-        "category": "Catalog Browser"
+        "category": "Catalog Browser",
+        "loadCatalog": "Load Catalog: {name}"
       },
       "errorMsgs": {
         "FetchFailed": "Failed to fetch catalog",
         "DefaultFailed": "Failed to restore default catalog",
-        "Forbidden": "CelesTrak rejected the request (HTTP 403). This is usually a Cloudflare rate-limit — wait a minute and try again.",
+        "Forbidden": "CelesTrak rejected the request (HTTP 403). This is usually a Cloudflare rate limit; wait a minute and try again.",
         "RateLimited": "Too many catalog requests. Please wait a minute before trying again.",
         "ServerError": "CelesTrak is temporarily unavailable. Please try again in a few minutes.",
         "NetworkError": "Could not reach CelesTrak. Check your network connection."
+      },
+      "help": {
+        "overview": "The Catalog Browser swaps the satellite catalog you are viewing. Pick from curated lists (a constellation, a debris cloud, a mission category) or full catalogs from CelesTrak and JSC Vimpel, and the scene reloads with exactly those objects.",
+        "imgAlt": "The Catalog Browser menu with its load mode toggle and catalog list",
+        "imgCaption": "Pick a load mode, then click any catalog to load it.",
+        "modesHeading": "Load Modes",
+        "modes": "<strong>All Data</strong> replaces the entire catalog with the selected data set, including names, types, and metadata. <strong>Orbital Only</strong> keeps every satellite you already have and only refreshes their orbital elements, which is the safer choice when you have edited objects or rely on existing metadata.",
+        "howToUse": "<ol><li>Open the <strong>Catalog Browser</strong> from the bottom menu (Catalog mode).</li><li>Choose <strong>All Data</strong> or <strong>Orbital Only</strong> with the toggle; the description below it explains the current mode.</li><li>Click a catalog in the categorized list, such as <strong>Space Stations</strong>, <strong>Starlink</strong>, or <strong>COSMOS 1408 Debris</strong>. A toast confirms when it loads.</li><li>Load <strong>Default Catalog</strong> to return to the standard full catalog.</li></ol>",
+        "tip1": "Every catalog is also available from the command palette as a Load Catalog command, so you can switch without opening the menu.",
+        "tip2": "Loading a small catalog dramatically improves performance on slower machines; the 100 Brightest list is a good minimal set.",
+        "tip3": "Catalog downloads come from CelesTrak and can be rate limited; if a load fails with an HTTP 403 message, wait a minute and try again."
       }
     }
   }

@@ -3,7 +3,60 @@
     "SatelliteFov": {
       "bottomIconLabel": "Satelliten-Sichtfeld",
       "title": "Satelliten-Sichtfeld",
-      "helpBody": "Das Satelliten-Sichtfeld-Plugin ermöglicht es Ihnen, das Sichtfeld eines Satelliten zu steuern."
+      "tabs": {
+        "earthCenter": "Erdmittelpunkt",
+        "satToSat": "Sat-zu-Sat"
+      },
+      "labels": {
+        "sensorDesign": "Sensorauslegung",
+        "colorSettings": "Farbeinstellungen",
+        "defaultSensorDesign": "Standard-Sensorauslegung",
+        "defaultColorSettings": "Standard-Farbeinstellungen",
+        "activeSensors": "Aktive Sensoren",
+        "targetSatellite": "Zielsatellit",
+        "fovSettings": "FOV-Einstellungen",
+        "activeS2sCones": "Aktive Sat-zu-Sat-Kegel",
+        "fovDegrees": "Sichtfeld (Grad)",
+        "opacity": "Deckkraft",
+        "targetCatalogNumber": "Zielkatalognummer"
+      },
+      "tooltips": {
+        "fovOfSensor": "Sichtfeld des Sensors",
+        "red": "Rot-Farbwert",
+        "green": "Grün-Farbwert",
+        "blue": "Blau-Farbwert",
+        "opacity": "Deckkraftwert"
+      },
+      "buttons": {
+        "resetAllFovCones": "Alle FOV-Kegel zurücksetzen",
+        "useSecondarySat": "Sekundärsatellit verwenden",
+        "createS2sCone": "Sat-zu-Sat-Kegel erstellen",
+        "resetS2sCones": "Sat-zu-Sat-Kegel zurücksetzen"
+      },
+      "errorMsgs": {
+        "noSecondary": "Kein Sekundärsatellit ausgewählt. Klicken Sie mit der rechten Maustaste auf einen Satelliten oder verwenden Sie die Tasten [ ].",
+        "selectSourceFirst": "Wählen Sie zuerst einen Quellsatelliten aus.",
+        "enterTargetNumber": "Geben Sie eine Zielkatalognummer ein.",
+        "targetNotFound": "Zielsatellit wurde im Katalog nicht gefunden.",
+        "targetSameAsSource": "Der Zielsatellit darf nicht mit dem Quellsatelliten identisch sein.",
+        "fovRange": "Das Sichtfeld muss eine Zahl zwischen 0 und 180 Grad sein.",
+        "redRange": "Der Rot-Farbwert muss eine Zahl zwischen 0 und 1 sein.",
+        "greenRange": "Der Grün-Farbwert muss eine Zahl zwischen 0 und 1 sein.",
+        "blueRange": "Der Blau-Farbwert muss eine Zahl zwischen 0 und 1 sein.",
+        "opacityRange": "Der Deckkraftwert muss eine Zahl zwischen 0 und 1 sein."
+      },
+      "help": {
+        "overview": "Das Satelliten-Sichtfeld zeichnet Sensorkegel von einem Satelliten aus, damit Sie sehen, was er sehen kann: entweder einen Nadirkegel in Richtung Erde (Erdmittelpunkt) oder einen auf einen anderen Satelliten gerichteten Verbindungskegel (Sat-zu-Sat). Legen Sie Kegelwinkel und Farbe fest, und das Volumen wird live in der 3D-Ansicht dargestellt.",
+        "imgAlt": "Das Satelliten-Sichtfeld-Menü mit den Registerkarten Erdmittelpunkt und Sat-zu-Sat",
+        "imgCaption": "Konfigurieren Sie Kegelwinkel und Farbe und schalten Sie dann Kegel pro Satellit um.",
+        "tabsHeading": "Erdmittelpunkt und Sat-zu-Sat",
+        "tabs": "Die Registerkarte <strong>Erdmittelpunkt</strong> verwaltet nadirgerichtete Kegel: Legen Sie das Standard-<strong>Sichtfeld (Grad)</strong> und die Farbe fest, drücken Sie <strong>C</strong>, um einen Kegel am ausgewählten Satelliten umzuschalten, und verwalten Sie jeden aktiven Kegel in der Liste <strong>Aktive Sensoren</strong>. Die Registerkarte <strong>Sat-zu-Sat</strong> erstellt einen Kegel von einem Quellsatelliten zu einem Ziel: Geben Sie eine <strong>Zielkatalognummer</strong> ein oder klicken Sie auf <strong>Sekundärsatellit verwenden</strong> und dann auf <strong>Sat-zu-Sat-Kegel erstellen</strong>; <strong>V</strong> schaltet einen Kegel zum aktuellen Sekundärsatelliten um.",
+        "howToUse": "<ol><li>Wählen Sie einen Satelliten aus; das untere Symbol ist deaktiviert, bis einer ausgewählt ist.</li><li>Öffnen Sie das Menü und passen Sie Kegelwinkel, Farbe und Deckkraft an. Die Werte gelten für neue Kegel.</li><li>Drücken Sie <strong>C</strong> (oder verwenden Sie das Menü), um einen erdgerichteten Kegel am ausgewählten Satelliten umzuschalten.</li><li>Für eine Verbindung zwischen Satelliten öffnen Sie die Registerkarte <strong>Sat-zu-Sat</strong>, wählen ein Ziel und klicken auf <strong>Sat-zu-Sat-Kegel erstellen</strong>.</li><li>Verwenden Sie die Zurücksetzen-Schaltflächen, um alle Kegel eines Typs zu entfernen.</li></ol>",
+        "tip1": "Kegel bleiben bestehen, während Sie andere Satelliten auswählen, sodass Sie Satellit für Satellit ein Abdeckungsbild einer ganzen Konstellation aufbauen können.",
+        "tip2": "Legen Sie den Sekundärsatelliten per Rechtsklick auf einen Satelliten oder mit den Tasten [ und ] fest; Sekundärsatellit verwenden füllt dann das Ziel automatisch aus.",
+        "shortcutToggleCone": "Erdgerichteten FOV-Kegel am ausgewählten Satelliten umschalten",
+        "shortcutToggleS2s": "Kegel zum Sekundärsatelliten umschalten"
+      }
     }
   }
 }

@@ -3,8 +3,17 @@
     "CloseObjectsPlugin": {
       "bottomIconLabel": "Blízké objekty",
       "title": "Hledání blízkých objektů",
-      "helpBody": "Hledání blízkých objektů nachází satelity a trosky v těsné blízkosti. Používá dvoufázový algoritmus prostorového vyhledávání k identifikaci objektů do vzdálenosti 50 km od sebe, nejprve kontroluje aktuální polohy a poté ověřuje s předpokládanými polohami o 30 minut později.",
-      "findBtn": "Najít blízké objekty"
+      "findBtn": "Najít blízké objekty",
+      "help": {
+        "overview": "Hledání blízkých objektů prochází celý katalog a hledá dvojice objektů, které se právě teď nacházejí do 50 km od sebe. Je to rychlý způsob, jak odhalit společně obíhající družice, nedávné rozpady a přeplněné oblasti bez nutnosti spouštět úplnou analýzu konjunkcí.",
+        "imgAlt": "Menu hledání blízkých objektů s tlačítkem pro vyhledání",
+        "imgCaption": "Jedním kliknutím prohledáte celý katalog a najdete objekty do 50 km od sebe.",
+        "methodHeading": "Jak to funguje",
+        "method": "Hledání probíhá ve dvou fázích. Nejprve rychlý průchod pomocí ohraničujících kvádrů porovná aktuální polohu každého objektu a najde kandidátní dvojice v rámci vyhledávacího poloměru. Poté je každá kandidátní dvojice znovu propagována 30 minut do budoucnosti: dvojice, které jsou stále blízko, jsou potvrzeny, čímž se odfiltrují objekty, jejichž dráhy se jen na okamžik zkřížily.",
+        "howToUse": "<ol><li>Otevřete <strong>Blízké objekty</strong> ze spodního menu.</li><li>Klikněte na <strong>Najít blízké objekty</strong>. Prohledání celého katalogu trvá několik sekund.</li><li>Potvrzené dvojice se načtou do vyhledávacího pole, takže každý blízký objekt je zvýrazněn a uveden ve výsledcích vyhledávání.</li><li>Kliknutím na libovolný výsledek si objekt prohlédnete, nebo použijte jiná menu (například Screening trosek) k podrobné analýze konkrétní dvojice.</li></ol>",
+        "tip1": "Dvojice jsou potvrzeny pouze tehdy, pokud zůstanou v dosahu i o 30 minut později, takže se zobrazí formace a páry při setkání na orbitě, zatímco krátká míjení jsou odfiltrována.",
+        "tip2": "Výsledky nahradí aktuální vyhledávání; pokud si potřebujete stávající seznam ponechat, nejprve si zkopírujte text vyhledávání."
+      }
     }
   }
 }

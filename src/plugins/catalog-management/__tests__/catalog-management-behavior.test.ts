@@ -3,6 +3,7 @@ import { CatalogLoader } from '@app/app/data/catalog-loader';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
 import { CatalogManagementPlugin } from '@app/plugins/catalog-management/catalog-management';
+import { formatStkEpoch } from '@app/plugins/catalog-management/catalog-management-export';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -16,8 +17,6 @@ describe('CatalogManagementPlugin behavior', () => {
   let plugin: CatalogManagementPlugin;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const p = () => plugin as any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const C = CatalogManagementPlugin as any;
 
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
@@ -31,8 +30,8 @@ describe('CatalogManagementPlugin behavior', () => {
     vi.restoreAllMocks();
   });
 
-  it('formatStkEpoch_ formats a UTC date as the STK epoch string', () => {
-    const out = C.formatStkEpoch_(new Date('2026-05-31T04:05:06.007Z'));
+  it('formatStkEpoch formats a UTC date as the STK epoch string', () => {
+    const out = formatStkEpoch(new Date('2026-05-31T04:05:06.007Z'));
 
     expect(out).toBe('31 May 2026 04:05:06.007');
   });
@@ -100,7 +99,7 @@ describe('CatalogManagementPlugin behavior', () => {
     const csvSpy = vi.spyOn(CatalogExporter, 'exportTle2Csv').mockImplementation(() => undefined);
 
     p().initExportHandlers_();
-    getEl('de-export-tle-2a')!.dispatchEvent(new Event('click'));
+    getEl('de-export-tle')!.dispatchEvent(new Event('click'));
     getEl('de-export-csv')!.dispatchEvent(new Event('click'));
 
     expect(txtSpy).toHaveBeenCalled();

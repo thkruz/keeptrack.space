@@ -202,13 +202,13 @@ export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
 
       startLine.style.fontSize = '12px';
       startLine.style.opacity = '0.9';
-      startLine.textContent = `Start: ${det.event_start_timestamp ?? '—'}`;
+      startLine.textContent = `Start: ${det.event_start_timestamp ?? '-'}`;
 
       const endLine = document.createElement('div');
 
       endLine.style.fontSize = '12px';
       endLine.style.opacity = '0.9';
-      endLine.textContent = `End: ${det.event_end_timestamp ?? '—'}`;
+      endLine.textContent = `End: ${det.event_end_timestamp ?? '-'}`;
 
       header.appendChild(eventLine);
       header.appendChild(startLine);

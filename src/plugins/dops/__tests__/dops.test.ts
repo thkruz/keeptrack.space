@@ -2,6 +2,7 @@ import { vi } from 'vitest';
 /* eslint-disable dot-notation */
 import { CameraType } from '@app/engine/camera/camera-type';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { DopMath } from '@app/engine/math/dop-math';
 import { DopsPlugin } from '@app/plugins/dops/dops';
 import { getEl } from '@app/engine/utils/get-el';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -32,6 +33,18 @@ describe('DopsPlugin_class', () => {
       expect(config.html).toContain('dops-alt');
       expect(config.html).toContain('dops-el');
       expect(config.html).toContain('dops-submit');
+    });
+
+    it('uses the v13 card UI building blocks', () => {
+      const plugin = new DopsPlugin();
+      const config = plugin.getSideMenuConfig();
+
+      expect(config.html).toContain('kt-ui-v13');
+      expect(config.html).toContain('kt-section');
+      expect(config.html).toContain('kt-field-row');
+      expect(config.html).toContain('kt-action');
+      // The duplicate-stripped center <h5> heading must be gone.
+      expect(config.html).not.toContain('<h5');
     });
   });
 
@@ -144,5 +157,18 @@ describe('DopsPlugin behavior', () => {
     const sats = DopsPlugin.getGpsSats(catalog as never, group as never);
 
     expect(sats).toHaveLength(1);
+  });
+
+  it('updateSideMenu toasts and bails on an invalid location', () => {
+    ['dops-lat', 'dops-lon', 'dops-alt', 'dops-el'].forEach((id) => {
+      (getEl(id) as HTMLInputElement).value = 'not-a-number';
+    });
+    const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+    const listSpy = vi.spyOn(DopMath, 'getDopsList');
+
+    plugin['updateSideMenu']();
+
+    expect(toastSpy).toHaveBeenCalled();
+    expect(listSpy).not.toHaveBeenCalled();
   });
 });

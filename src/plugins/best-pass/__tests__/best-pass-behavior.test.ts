@@ -1,6 +1,7 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
+import { emptyPassRow } from '@app/plugins/best-pass/best-pass-calculator';
 import { BestPassPlugin } from '@app/plugins/best-pass/best-pass';
 import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -8,7 +9,7 @@ import { websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
 
 vi.mock('@app/engine/utils/saveVariable', () => ({
-  saveXlsx: vi.fn(),
+  saveXlsx: vi.fn(() => Promise.resolve()),
   saveCsv: vi.fn(),
   saveVariable: vi.fn(),
   copyTsvToClipboard: vi.fn(),
@@ -23,6 +24,11 @@ describe('BestPassPlugin behavior', () => {
   const C = BestPassPlugin as any;
 
   beforeEach(() => {
+    // onSubmit_ defers work behind showLoading's setTimeout. Other test files can
+    // leave real timers active in a shared worker, so re-assert fake timers here
+    // (preserving the canonical fake clock) to keep advanceTimersByTime deterministic.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2022-01-01T00:00:00Z'));
     setupStandardEnvironment();
     plugin = new BestPassPlugin();
     websiteInit(plugin);
@@ -35,8 +41,8 @@ describe('BestPassPlugin behavior', () => {
     vi.restoreAllMocks();
   });
 
-  it('emptyRow_ returns an all-null row', () => {
-    const row = C.emptyRow_();
+  it('emptyPassRow returns an all-null row', () => {
+    const row = emptyPassRow();
 
     expect(row.PASS_SCORE).toBeNull();
     expect(row.START_DTG).toBeNull();
@@ -65,20 +71,24 @@ describe('BestPassPlugin behavior', () => {
     vi.spyOn(ServiceLocator.getSensorManager(), 'isSensorSelected').mockReturnValue(true);
     vi.spyOn(ServiceLocator.getSensorManager(), 'getSensor').mockReturnValue(defaultSensor);
     const findSpy = vi.spyOn(p(), 'findBestPasses_').mockReturnValue([]);
+    // Spy the export on the instance (reliable across module-isolation), not the saveXlsx module mock.
+    const exportSpy = vi.spyOn(p(), 'exportPasses_').mockImplementation(() => undefined);
 
     p().onSubmit_();
+    // onSubmit_ defers the search behind showLoading's timer.
+    vi.advanceTimersByTime(2000);
 
     expect(findSpy).toHaveBeenCalled();
-    expect(saveXlsx).toHaveBeenCalledWith([], 'bestSatTimes');
+    expect(exportSpy).toHaveBeenCalledWith([]);
   });
 
-  it('findBestPass_ toasts and returns empty when the sensor has no minAz', () => {
+  it('findBestPasses_ toasts and returns empty when the sensor has no minAz', () => {
     const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
     const badSensor = defaultSensor.clone();
 
     (badSensor as unknown as { minAz: number | undefined }).minAz = undefined;
 
-    expect(p().findBestPass_(defaultSat, [badSensor])).toStrictEqual([]);
+    expect(p().findBestPasses_('25544', badSensor)).toStrictEqual([]);
     expect(toastSpy).toHaveBeenCalled();
   });
 

@@ -1,6 +1,8 @@
 {
   "plugins": {
     "DrawLinesPlugin": {
+      "title": "Tracer des lignes",
+      "bottomIconLabel": "Tracer des lignes",
       "rmbMenu": {
         "title": "Dessiner",
         "eciAxes": "Axes ECI",
@@ -13,12 +15,39 @@
         "earthToSatellite": "Terre vers satellite",
         "sensorToSatellite": "Capteur vers satellite",
         "satelliteToSatellite": "Satellite vers satellite",
+        "satelliteRicAxes": "Axes RIC du satellite",
         "satelliteToSun": "Satellite vers le Soleil",
         "satelliteToMoon": "Satellite vers la Lune",
         "moonOrbit": "Dessiner l'orbite de la Lune"
       },
+      "sections": {
+        "activeLines": "Lignes actives",
+        "referenceGeometry": "Géométrie de référence",
+        "objectLines": "Lignes d'objet"
+      },
+      "referenceFrameLabel": "Référentiel",
+      "clearAll": "Effacer toutes les lignes",
+      "emptyList": "Aucune ligne tracée",
+      "remove": "Supprimer",
+      "lineTypes": {
+        "reference": "Ligne de référence",
+        "satToRef": "Satellite vers point",
+        "satRic": "Axes RIC",
+        "objToObj": "Objet vers objet",
+        "satToSun": "Satellite vers le Soleil",
+        "satToBody": "Satellite vers corps céleste",
+        "sensorToSat": "Capteur vers satellite",
+        "sensorToSun": "Capteur vers le Soleil",
+        "sensorToMoon": "Capteur vers la Lune",
+        "orbitPath": "Trajectoire orbitale",
+        "satScanEarth": "Balayage de la Terre",
+        "sensorScanHorizon": "Balayage de l'horizon",
+        "sensorToRae": "Capteur vers point",
+        "generic": "Ligne"
+      },
       "errorMsgs": {
-        "noPrimarySat": "Aucun satellite principal sélectionné pour la ligne satellite vers satellite."
+        "noPrimarySat": "Aucun satellite principal sélectionné pour la ligne satellite vers satellite.",
+        "noSatSelected": "Sélectionnez d'abord un satellite."
       }
     }
   }

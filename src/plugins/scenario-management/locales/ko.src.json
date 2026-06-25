@@ -3,7 +3,58 @@
     "ScenarioManagementMenu": {
       "title": "시나리오 관리",
       "bottomIconLabel": "시나리오 관리",
-      "helpBody": "시나리오 관리 플러그인은 서로 다른 프로젝트나 상황에 맞게 작업을 구성할 수 있게 해줍니다.<br/>현재 기능은 다음과 같습니다:<br/><br/>  - 각 시나리오의 이름 및 설명<br/>  - 분석 기간의 시작 및 종료 일시<br/>  - 시나리오 저장/불러오기<br/><br/>목표는 궁극적으로 시나리오 관리를 위해 필요한 모든 정보를 포함하는 단일 파일을 제공하는 것입니다. 더 많은 기능이 곧 제공됩니다!"
+      "sideMenuTitle": "시나리오 설정",
+      "labels": {
+        "scenarioName": "시나리오 이름",
+        "description": "설명",
+        "scenarioStart": "시나리오 시작",
+        "scenarioEnd": "시나리오 종료"
+      },
+      "tooltips": {
+        "name": "시나리오의 이름입니다.",
+        "description": "시나리오의 설명입니다.",
+        "startDate": "UTC 기준 시나리오의 시작 DTG입니다 (YYYY-MM-DD HH:MM:SS.sss).",
+        "endDate": "UTC 기준 시나리오의 종료 DTG입니다 (YYYY-MM-DD HH:MM:SS.sss)."
+      },
+      "placeholders": {
+        "description": "여기에 시나리오 설명을 입력하세요..."
+      },
+      "buttons": {
+        "updateScenario": "시나리오 업데이트",
+        "saveScenario": "시나리오 저장",
+        "loadScenario": "시나리오 불러오기"
+      },
+      "msgs": {
+        "settingsUpdated": "시나리오 설정이 성공적으로 업데이트되었습니다!",
+        "scenarioLoaded": "시나리오를 성공적으로 불러왔습니다!"
+      },
+      "errorMsgs": {
+        "nameRequired": "시나리오 이름은 필수입니다.",
+        "startDateInvalid": "시작 날짜가 잘못되었습니다.",
+        "endDateInvalid": "종료 날짜가 잘못되었습니다.",
+        "savingScenario": "시나리오 저장 중 오류가 발생했습니다!",
+        "loadingScenarioFile": "시나리오 파일을 불러오는 중 오류가 발생했습니다!",
+        "decompressingScenarioFile": "시나리오 파일 압축 해제 중 오류가 발생했습니다!"
+      },
+      "defaults": {
+        "scenarioName": "내 시나리오",
+        "scenarioDescription": "내 시나리오의 설명"
+      },
+      "core": {
+        "beforeStartTime": "시뮬레이션 시간이 시나리오 시작 시간보다 이전입니다. 시작 시간에서 일시 정지합니다.",
+        "afterStopTime": "시뮬레이션 시간이 시나리오 종료 시간보다 이후입니다. 종료 시간에서 일시 정지합니다."
+      },
+      "help": {
+        "overview": "시나리오 관리는 세션에 이름이 지정된 컨텍스트를 부여합니다. 즉, 이름, 설명, 그리고 시작과 종료 시간이 있는 선택적 분석 기간을 가진 시나리오입니다. 시뮬레이션 시계는 해당 기간 안에 유지되며, 전체 정의를 파일로 저장하여 나중에 다시 불러오거나 팀원과 공유할 수 있습니다.",
+        "imgAlt": "이름, 설명, 시간 범위 필드가 있는 시나리오 설정 메뉴",
+        "imgCaption": "시나리오 이름, 설명, 그리고 선택적인 시작 및 종료 시간을 정의합니다.",
+        "windowHeading": "시나리오 기간",
+        "window": "<strong>시나리오 시작</strong> 또는 <strong>시나리오 종료</strong>(UTC, YYYY-MM-DD HH:MM:SS.sss 형식)를 설정하면 시뮬레이션 시계가 해당 기간으로 제한됩니다. 시간이 시작 이전이나 종료 이후로 벗어나면 시계가 경계에서 일시 정지하고 알림이 이유를 설명합니다. 제한 없는 시나리오를 원하면 필드를 비워 두세요.",
+        "howToUse": "<ol><li>하단 메뉴(도구 모드)에서 <strong>시나리오 관리</strong>를 엽니다.</li><li><strong>시나리오 이름</strong>(필수)과 선택적인 <strong>설명</strong>을 입력합니다.</li><li>필요한 경우 <strong>시나리오 시작</strong>과 <strong>시나리오 종료</strong> 시간을 UTC로 설정합니다.</li><li><strong>시나리오 업데이트</strong>를 클릭하여 적용합니다. 시간 범위는 즉시 적용됩니다.</li><li><strong>시나리오 저장</strong>으로 정의를 압축된 .kts 파일로 다운로드하고, <strong>시나리오 불러오기</strong>로 디스크에서 복원합니다.</li></ol>",
+        "tip1": "재생이 멈춘 것처럼 보이면 시계가 시나리오 경계에 고정되어 있는지 확인하세요. 시작과 종료 필드를 지우면 해제됩니다.",
+        "tip2": "시나리오 파일은 작은 압축 .kts 파일로, 공통 분석 기간을 팀과 공유하기에 편리합니다.",
+        "tip3": "날짜 필드는 입력하는 동안 검증됩니다. 잘못된 날짜는 강조 표시되며 업데이트 시 거부됩니다."
+      }
     }
   }
 }

@@ -4,7 +4,16 @@
       "bottomIconLabel": "Colores",
       "title": "Esquemas de Color",
       "rmbLabel": "Esquema de Color",
-      "helpBody": "El Menú de Colores le permite cambiar cómo se muestran los satélites en la pantalla. Diferentes esquemas de color resaltan diferentes características de los satélites, como el país de origen, el tipo de órbita o el tipo de objeto."
+      "sectionLabel": "Esquemas",
+      "help": {
+        "overview": "El menú Esquemas de Color cambia cómo se colorea cada objeto de la escena. Cada esquema codifica una propiedad distinta: país de origen, tipo de objeto, régimen orbital, estado de iluminación solar, velocidad y más, de modo que elegir el esquema adecuado convierte la nube de puntos en la respuesta a una pregunta concreta.",
+        "imgAlt": "El menú Esquemas de Color con la lista de esquemas disponibles",
+        "imgCaption": "Haga clic en cualquier esquema para recolorear todo el catálogo al instante.",
+        "howToUse": "<ol><li>Abra el menú <strong>Colores</strong> desde la barra inferior o pulse <strong>A</strong>.</li><li>Haga clic en un esquema de la lista. La escena se recolorea de inmediato y el menú se cierra.</li><li>Consulte la leyenda en la esquina de la pantalla para saber qué significa cada color en el esquema activo.</li><li>También puede hacer clic derecho en el espacio vacío y elegir <strong>Esquema de Color</strong> en el menú contextual.</li></ol>",
+        "tip1": "La leyenda se actualiza con el esquema; si no está seguro de qué significa un color, la leyenda es la referencia.",
+        "tip2": "Algunos esquemas requieren muchos datos (como la densidad espacial) y tardan un momento en calcularse la primera vez que se seleccionan.",
+        "shortcutToggle": "Alternar el menú Esquemas de Color"
+      }
     }
   }
 }

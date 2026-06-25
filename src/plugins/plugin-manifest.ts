@@ -1,6 +1,6 @@
 /* eslint-disable no-undefined */
 /**
- * Plugin Manifest — Single source of truth for all plugin registrations.
+ * Plugin Manifest - Single source of truth for all plugin registrations.
  *
  * Array order determines initialization order.
  *
@@ -245,9 +245,9 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
   {
-    configKey: 'MultiSiteLookAnglesPlugin',
-    ossImport: () => import('./sensor/multi-site-look-angles-plugin'),
-    ossClassName: 'MultiSiteLookAnglesPlugin',
+    configKey: 'MultiSensorLookAnglesPlugin',
+    ossImport: () => import('./sensor/multi-sensor-look-angles-plugin'),
+    ossClassName: 'MultiSensorLookAnglesPlugin',
     defaultConfig: { enabled: true, order: 21 },
   },
   {
@@ -296,9 +296,9 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 60 },
   },
   {
-    configKey: 'NextLaunchesPlugin',
-    ossImport: () => import('./next-launches/next-launches'),
-    ossClassName: 'NextLaunchesPlugin',
+    configKey: 'TheSpaceDevLaunchCalendarPlugin',
+    ossImport: () => import('./thespacedev-launch-calendar/thespacedev-launch-calendar'),
+    ossClassName: 'TheSpaceDevLaunchCalendarPlugin',
     defaultConfig: { enabled: true, order: 350 },
   },
   {
@@ -454,9 +454,9 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
   {
-    configKey: 'MissilePlugin',
-    ossImport: () => import('./missile/missile-plugin'),
-    ossClassName: 'MissilePlugin',
+    configKey: 'MissileSimulatorPlugin',
+    ossImport: () => import('./missile/missile-simulator-plugin'),
+    ossClassName: 'MissileSimulatorPlugin',
     defaultConfig: { enabled: true, order: 74 },
   },
   {
@@ -543,6 +543,12 @@ export const pluginManifest: PluginDescriptor[] = [
     ossImport: () => import('./graticule-toggle/graticule-toggle'),
     ossClassName: 'GraticuleToggle',
     defaultConfig: { enabled: true, order: 311 },
+  },
+  {
+    configKey: 'TerminatorToggle',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/terminator-toggle/terminator-toggle') : undefined,
+    proClassName: 'TerminatorToggle',
+    defaultConfig: { enabled: true, order: 312 },
   },
   {
     configKey: 'PoliticalMapToggle',
@@ -640,10 +646,10 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 450 },
   },
   {
-    configKey: 'LaunchCalendar',
-    ossImport: () => import('./launch-calendar/launch-calendar'),
-    ossClassName: 'LaunchCalendar',
-    defaultConfig: { enabled: true, order: 351 },
+    configKey: 'GunterLaunchCalendar',
+    ossImport: () => import('./gunter-launch-calendar/gunter-launch-calendar'),
+    ossClassName: 'GunterLaunchCalendar',
+    defaultConfig: { enabled: false, order: 351 },
   },
   {
     configKey: 'TimeMachine',
@@ -671,6 +677,12 @@ export const pluginManifest: PluginDescriptor[] = [
     proClassName: 'CatalogManagementPro',
     defaultConfig: { enabled: true, order: 420 },
     isLoginRequired: true,
+  },
+  {
+    configKey: 'StarManagementPlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/stars/star-management') : undefined,
+    proClassName: 'StarManagementPlugin',
+    defaultConfig: { enabled: true, order: 420.5 },
   },
   {
     configKey: 'CatalogBrowserPlugin',
@@ -710,6 +722,13 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
   {
+    configKey: 'TipAndCuePlanner',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/tip-and-cue/tip-and-cue') : undefined,
+    proClassName: 'TipAndCuePlanner',
+    defaultConfig: { enabled: true, order: 424 },
+    isLoginRequired: true,
+  },
+  {
     configKey: 'OpticalSimulation',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/optical-simulation/optical-simulation') : undefined,
     proClassName: 'OpticalSimulation',
@@ -721,6 +740,13 @@ export const pluginManifest: PluginDescriptor[] = [
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/eclipse-solar-analysis/eclipse-solar-analysis') : undefined,
     proClassName: 'EclipseSolarAnalysis',
     defaultConfig: { enabled: true, order: 93 },
+    isLoginRequired: true,
+  },
+  {
+    configKey: 'CoverageAnalysis',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/coverage-analysis/coverage-analysis') : undefined,
+    proClassName: 'CoverageAnalysis',
+    defaultConfig: { enabled: true, order: 94 },
     isLoginRequired: true,
   },
   {
@@ -793,6 +819,20 @@ export const pluginManifest: PluginDescriptor[] = [
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/plot-analysis/inc2lon') : undefined,
     proClassName: 'Inc2LonPlotsPro',
     defaultConfig: { enabled: true, order: 266 },
+    isLoginRequired: true,
+  },
+  {
+    configKey: 'AltIncHeatmap',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/alt-inc-heatmap/alt-inc-heatmap') : undefined,
+    proClassName: 'AltIncHeatmap',
+    defaultConfig: { enabled: true, order: 267 },
+    isLoginRequired: true,
+  },
+  {
+    configKey: 'AzRangeHeatmap',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/az-range-heatmap/az-range-heatmap') : undefined,
+    proClassName: 'AzRangeHeatmap',
+    defaultConfig: { enabled: true, order: 268 },
     isLoginRequired: true,
   },
 

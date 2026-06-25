@@ -1,5 +1,6 @@
 import { SolarBody } from '@app/engine/core/interfaces';
 import { vec3, vec4 } from 'gl-matrix';
+import { LineDescription } from './line';
 import { Path } from './path';
 
 export class OrbitPathLine extends Path {
@@ -24,5 +25,9 @@ export class OrbitPathLine extends Path {
 
   updateData(data: Float32Array, pointCount: number): void {
     this.updateVertBufDirect(data, pointCount);
+  }
+
+  getDescription(): LineDescription {
+    return { kind: 'orbitPath' };
   }
 }

@@ -3,10 +3,29 @@
     "SatellitePhotos": {
       "bottomIconLabel": "衛星画像",
       "title": "衛星画像",
-      "helpBody": "衛星画像プラグインは、静止気象衛星とDSCOVRの最新画像を表示します。衛星名をクリックすると最新の画像が表示されます。",
       "defaultImageTitle": "最新の衛星画像",
+      "labels": {
+        "dscovrUnavailable": "DSCOVRは一時的に利用できません",
+        "dscovrImage": "DSCOVR画像 {index}",
+        "dscovrLoading": "DSCOVR画像を読み込んでいます…",
+        "refresh": "最新画像を更新",
+        "imageAtUtc": "{name}（{time} UTC）"
+      },
+      "sections": {
+        "geostationary": "静止軌道",
+        "dscovr": "DSCOVR（L1）"
+      },
       "errorMsgs": {
         "FuturePictures": "未来の画像は読み込めません。最新の画像を読み込んでいます。"
+      },
+      "help": {
+        "overview": "衛星画像は、実際の気象衛星が撮影した最新の写真を表示します。静止軌道上のMeteoSat、Himawari、GOES、Elektro-Lによる全球（フルディスク）画像と、L1点にあるDSCOVRによる地球全体の画像です。シミュレーションで見ているものと、それらの衛星が今まさに撮影しているものを結び付けます。",
+        "imgAlt": "気象衛星の一覧が表示された衛星画像メニュー",
+        "imgCaption": "衛星をクリックすると最新画像が表示され、シーン内でその衛星まで移動します。",
+        "howToUse": "<ol><li>下部バーから<strong>衛星画像</strong>を開くか、<strong>H</strong>キーを押します。インターネット接続が必要です。</li><li>衛星をクリックします。カメラが3Dシーン内でその衛星まで移動し、最新の画像がオーバーレイで開きます。</li><li>DSCOVRの項目はリストの末尾に表示され、最近の画像1枚につき1項目です。</li></ol>",
+        "tip1": "画像は各機関の公開サービスからライブで取得されるため、項目が表示されない場合は通常そのフィードが一時的に停止しているだけで、バグではありません。",
+        "tip2": "シミュレーションの時計が未来に設定されている場合は、代わりに最新の実際の画像が表示されます。",
+        "shortcutToggle": "衛星画像メニューを切り替える"
       }
     }
   }

@@ -3,9 +3,18 @@
     "FilterMenuPlugin": {
       "title": "Menu filtrów",
       "bottomIconLabel": "Menu filtrów",
-      "helpBody": "To menu pozwala filtrować obiekty wyświetlane na globie według ich typu, reżimu orbitalnego i źródła danych.",
+      "help": {
+        "overview": "Menu filtrów decyduje, które obiekty są w ogóle rysowane. Przełączniki są pogrupowane według typu obiektu (ładunki, odłamki, korpusy rakiet), reżimu orbitalnego (od LEO przez GEO i dalej), źródła danych i kraju, dzięki czemu można ograniczyć katalog dokładnie do badanej populacji.",
+        "imgAlt": "Menu filtrów z pogrupowanymi przełącznikami widoczności",
+        "imgCaption": "Każdy przełącznik natychmiast ukrywa lub pokazuje część katalogu.",
+        "howToUse": "<ol><li>Otwórz <strong>Menu filtrów</strong> z dolnego paska lub naciśnij <strong>F</strong>.</li><li>Przestawiaj przełączniki; scena aktualizuje się natychmiast po zastosowaniu każdego filtra.</li><li>Kliknij <strong>Przywróć domyślne</strong>, aby przywrócić standardowy widok.</li></ol>",
+        "tip1": "Filtry się łączą: obiekt musi przejść przez każdą aktywną grupę, aby pozostać widocznym, więc pusto wyglądająca scena zwykle oznacza, że dwa filtry wzajemnie się wykluczają.",
+        "tip2": "Paleta poleceń oferuje gotowe ustawienia jednym kliknięciem, na przykład pokazanie tylko LEO lub ukrycie odłamków i korpusów rakiet.",
+        "shortcutToggle": "Przełącz menu filtrów"
+      },
       "resetToDefaults": "Przywróć domyślne",
       "defaultTooltip": "Wyłącz, aby ukryć {name}",
+      "searchPlaceholder": "Szukaj filtrów...",
       "commands": {
         "category": "Filtry",
         "open": "Otwórz menu filtrów",
@@ -18,6 +27,7 @@
         "showOnlyPayloads": "Pokaż tylko ładunki",
         "hideDebrisAndRocketBodies": "Ukryj odłamki i korpusy rakiet",
         "showAllObjectTypes": "Pokaż wszystkie typy obiektów",
+        "hideAllObjectTypes": "Ukryj wszystkie typy obiektów",
         "toggleLEO": "Przełącz widoczność LEO",
         "toggleMEO": "Przełącz widoczność MEO",
         "toggleGEO": "Przełącz widoczność GEO",
@@ -25,6 +35,8 @@
         "showOnlyLEO": "Pokaż tylko satelity LEO",
         "showOnlyGEO": "Pokaż tylko satelity GEO",
         "showAllOrbitalRegimes": "Pokaż wszystkie reżimy orbitalne",
+        "showOnlyCelestrak": "Pokaż tylko satelity CelesTrak",
+        "showAllSources": "Pokaż wszystkie źródła",
         "showOnlyUS": "Pokaż tylko obiekty USA",
         "showOnlyRussia": "Pokaż tylko obiekty rosyjskie",
         "showOnlyChina": "Pokaż tylko obiekty chińskie",

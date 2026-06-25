@@ -1,7 +1,7 @@
 import { ColorWorkerMsgType } from '@app/engine/rendering/color-worker/color-worker-messages';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ColorCruncherThreadManager } from '../color-cruncher-thread-manager';
 
 /** A Worker stub whose postMessage/terminate are spies, passed to init() as workerStub. */

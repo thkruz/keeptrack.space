@@ -3,7 +3,42 @@
     "PolarPlotPlugin": {
       "bottomIconLabel": "Polardiagramm",
       "title": "Polardiagramm-Menü",
-      "helpBody": "Das Polardiagramm-Menü wird verwendet, um ein 2D-Polardiagramm des Azimuts und der Elevation des Satelliten im Zeitverlauf zu generieren."
+      "labels": {
+        "notInView": "Der Satellit ist in den nächsten {hours} Stunden nicht sichtbar",
+        "saveImage": "Bild speichern",
+        "satellite": "Satellit {sccNum}",
+        "unknownSensor": "Unbekannter Sensor",
+        "unknownStartTime": "Unbekannte Startzeit",
+        "unknownStopTime": "Unbekannte Endzeit",
+        "prevPass": "Vorheriger Überflug",
+        "nextPass": "Nächster Überflug",
+        "imageSize": "Bildgröße",
+        "size_square": "Quadratisch (1080)",
+        "size_wide": "Breit (1200x675)",
+        "size_large": "Groß (2000)",
+        "copyImage": "Bild kopieren",
+        "copied": "Polardiagramm in die Zwischenablage kopiert",
+        "passLabel": "Überflug {n} von {total}",
+        "maxEl": "Max. Elev. {deg}°"
+      },
+      "sections": {
+        "pass": "Überflug",
+        "export": "Exportieren"
+      },
+      "errorMsgs": {
+        "copyFailed": "Bild konnte nicht in die Zwischenablage kopiert werden"
+      },
+      "help": {
+        "overview": "Das Polardiagramm zeichnet den nächsten Überflug des ausgewählten Satelliten über den ausgewählten Sensor als klassische Himmelskarte aus Azimut und Elevation: Norden oben, der Horizont am äußeren Ring und der Zenit in der Mitte. Es ist die Karte, mit der ein Beobachter oder Operator weiß, wohin am Himmel er schauen muss.",
+        "imgAlt": "Eine polare Himmelskarte mit der Spur eines Satellitenüberflugs",
+        "imgCaption": "Der Überflug beginnt am grünen Punkt und endet am roten Punkt; Ringe markieren die Elevation.",
+        "readingHeading": "Das Diagramm lesen",
+        "reading": "Die Spur beginnt an einem grünen Punkt (Aufgang) und endet an einem roten Punkt (Untergang). Konzentrische Ringe markieren die Elevation alle 15 Grad vom Horizont (äußerer Rand) bis zum Zenit (Mitte), und die Himmelsrichtungen verlaufen entlang des Randes. Die Kopfzeile zeigt den Sensor, die Satellitennummer sowie Beginn und Ende des Überflugs in UTC.",
+        "howToUse": "<ol><li>Wählen Sie einen Sensor und einen Satelliten aus; das untere Symbol bleibt deaktiviert, bis beide ausgewählt sind.</li><li>Öffnen Sie das <strong>Polardiagramm</strong> über die untere Leiste. Der nächste Überflug innerhalb von drei Tagen wird automatisch berechnet und gezeichnet.</li><li>Klicken Sie auf <strong>Bild speichern</strong>, um das Diagramm als PNG-Datei herunterzuladen.</li></ol>",
+        "tip1": "Wenn der Satellit in den nächsten drei Tagen nie über den Horizont steigt, wird das Diagramm durch einen Hinweis statt einer leeren Karte ersetzt.",
+        "tip2": "Eine Spur nahe der Mitte ist ein Überflug mit hoher Elevation: die beste Geometrie für Beobachtung oder Kommunikation.",
+        "shortcutToggle": "Polardiagramm-Menü umschalten"
+      }
     }
   }
 }

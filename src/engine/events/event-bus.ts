@@ -32,6 +32,8 @@ export interface EngineEventMap {
   [EventBusEvent.resize]: [];
   [EventBusEvent.altCanvasResize]: [];
   [EventBusEvent.endOfDraw]: [Milliseconds];
+  [EventBusEvent.captureStart]: [];
+  [EventBusEvent.captureEnd]: [];
   [EventBusEvent.onWatchlistUpdated]: [{ id: number, inView: boolean }[]];
   [EventBusEvent.onWatchlistAdd]: [{ id: number, inView: boolean }[]];
   [EventBusEvent.onWatchlistRemove]: [{ id: number, inView: boolean }[]];
@@ -44,6 +46,7 @@ export interface EngineEventMap {
   [EventBusEvent.onCruncherMessage]: [];
   [EventBusEvent.onCruncherReady]: [];
   [EventBusEvent.onHelpMenuClick]: [];
+  [EventBusEvent.helpMenuShown]: [string];
   [EventBusEvent.onKeepTrackReady]: [];
   [EventBusEvent.selectSatData]: [Satellite | MissileObject | BaseObject, number];
   [EventBusEvent.setSecondarySat]: [Satellite | null, number];

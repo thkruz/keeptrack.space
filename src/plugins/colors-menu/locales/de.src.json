@@ -4,7 +4,16 @@
       "bottomIconLabel": "Farben",
       "title": "Farbschemata",
       "rmbLabel": "Farbschema",
-      "helpBody": "Das Farbmenü ermöglicht es Ihnen, die Darstellung der Satelliten auf dem Display zu ändern. Verschiedene Farbschemata heben unterschiedliche Satelliteneigenschaften hervor, wie Herkunftsland, Orbittyp oder Objekttyp."
+      "sectionLabel": "Schemata",
+      "help": {
+        "overview": "Das Menü Farbschemata ändert, wie jedes Objekt in der Szene eingefärbt wird. Jedes Schema kodiert eine andere Eigenschaft: Herkunftsland, Objekttyp, Orbitalregime, Sonnenlichtstatus, Geschwindigkeit und mehr. Mit dem richtigen Schema wird die Punktwolke zur Antwort auf eine konkrete Frage.",
+        "imgAlt": "Das Menü Farbschemata mit den verfügbaren Schemata",
+        "imgCaption": "Klicken Sie auf ein Schema, um den gesamten Katalog sofort neu einzufärben.",
+        "howToUse": "<ol><li>Öffnen Sie das Menü <strong>Farben</strong> über die untere Leiste oder drücken Sie <strong>A</strong>.</li><li>Klicken Sie auf ein Schema in der Liste. Die Szene wird sofort neu eingefärbt und das Menü schließt sich.</li><li>Prüfen Sie die Legende in der Ecke des Bildschirms, um zu sehen, was jede Farbe im aktiven Schema bedeutet.</li><li>Sie können auch mit der rechten Maustaste in den leeren Raum klicken und im Kontextmenü <strong>Farbschema</strong> wählen.</li></ol>",
+        "tip1": "Die Legende wird mit dem Schema aktualisiert; wenn Sie unsicher sind, was eine Farbe bedeutet, ist die Legende maßgeblich.",
+        "tip2": "Einige Schemata sind datenintensiv (wie die räumliche Dichte) und brauchen beim ersten Auswählen einen Moment zur Berechnung.",
+        "shortcutToggle": "Menü Farbschemata umschalten"
+      }
     }
   }
 }

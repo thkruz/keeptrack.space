@@ -7,7 +7,59 @@
         "import": "导入",
         "export": "导出"
       },
-      "helpBody": "目录管理菜单提供导入和导出卫星目录数据的工具。<b>导入选项卡：</b>通过文件选择器或拖放加载 .tce、.tle 或 .txt 目录文件。<b>导出选项卡：</b><ul style=\"margin-left: 40px;\"> <li>导出官方TLE – 导出真实的两行轨道根数。</li> <li>导出3LE – 导出三行轨道根数。</li> <li>导出KeepTrack TLE – 导出所有KeepTrack两行轨道根数（包括分析员数据）。</li> <li>导出KeepTrack 3LE – 导出所有KeepTrack三行轨道根数（包括分析员数据）。</li> <li>导出目录CSV – 以CSV格式导出目录数据。</li> <li>导出STK .tce – 以STK卫星数据库格式导出TLE数据。</li> <li>导出视场内卫星 – 导出当前在视场范围内的卫星。</li> <li>导出.e星历 – 以STK格式导出所选卫星的传播星历。</li> </ul>"
+      "labels": {
+        "dropzone": "将 .tce、.tle 或 .txt 文件拖放到此处以加载目录",
+        "keepSatInfo": "保留卫星信息",
+        "keepSatInfoTooltip": "更新现有卫星的 TLE，同时保留名称、国家和任务数据。导入文件中不存在的卫星将被移除。",
+        "importNewOnly": "仅导入新卫星",
+        "importNewOnlyTooltip": "仅添加当前目录中尚未存在的卫星。现有卫星保持不变。",
+        "orbitalElements": "轨道根数",
+        "tabularStk": "表格与 STK",
+        "selectedSatellite": "选中的卫星",
+        "tleSource": "来源",
+        "tleFormat": "格式",
+        "timeSpanHrs": "时间跨度（小时）",
+        "stepSizeSec": "步长（秒）"
+      },
+      "options": {
+        "sourceOfficial": "官方",
+        "sourceKeepTrack": "KeepTrack",
+        "format2": "两行（TLE）",
+        "format3": "三行（含名称）"
+      },
+      "buttons": {
+        "importCatalog": "导入目录",
+        "downloadTle": "导出 TLE 格式",
+        "exportCatalogXlsx": "导出目录 XLSX",
+        "exportStkTce": "导出 STK .tce",
+        "exportSatsInFov": "导出视场内卫星",
+        "exportEphemeris": "导出 .e 星历",
+        "selectSatelliteFirst": "请先选择卫星"
+      },
+      "toasts": {
+        "noValidFileInDrop": "未在拖放中找到 .tce、.tle 或 .txt 文件",
+        "noValidTleData": "文件中未找到有效的 TLE 数据",
+        "unsupportedFileType": "不支持的文件类型。请使用 .tce、.tle 或 .txt",
+        "noNewSats": "文件中未找到新卫星",
+        "addedNewSats": "已从 {file} 添加 {count} 颗新卫星",
+        "loadedCatalog": "已从 {file} 加载目录",
+        "failedToLoad": "无法加载 {file}",
+        "noSatelliteSelected": "未选择卫星！",
+        "exportTooLarge": "导出过大。请缩短时间跨度或增大步长。",
+        "failedToPropagate": "卫星轨道推算失败！"
+      },
+      "help": {
+        "overview": "目录管理用于在 KeepTrack 中导入和导出卫星数据。导入选项卡从磁盘加载目录文件，替换或更新当前目录；导出选项卡以多种格式输出当前目录，从纯 TLE 文件到电子表格和 STK 产品。",
+        "imgAlt": "带有导入和导出选项卡的目录管理菜单",
+        "imgCaption": "导入目录文件，或以多种格式导出当前目录。",
+        "importHeading": "导入",
+        "import": "使用<strong>导入目录</strong>按钮或将文件拖到拖放区域，加载 <strong>.tce</strong>、<strong>.tle</strong> 或 <strong>.txt</strong> 文件。启用<strong>保留卫星信息</strong>后，现有卫星会保留其名称、国家和任务数据，仅更新轨道；文件中不存在的卫星将被移除。禁用时，文件会整体替换目录。",
+        "exportHeading": "导出",
+        "export": "<ul><li><strong>轨道根数</strong>：下载 TLE/3LE 根数集。选择<strong>来源</strong>（官方仅保留真实编目的物体；KeepTrack 包含您创建的分析卫星）和<strong>格式</strong>（两行，或含卫星名称的三行），然后点击<strong>下载 TLE</strong>。</li><li><strong>表格与 STK</strong>：将完整目录导出为 XLSX 电子表格、STK .tce 数据库，或仅导出当前位于所选传感器视场内的卫星。</li><li><strong>选中的卫星</strong>：选中一颗卫星后，使用您设置的<strong>时间跨度（小时）</strong>和<strong>步长（秒）</strong>，写出传播后的 STK .e 星历。</li></ul>",
+        "howToUse": "<ol><li>从底部栏（工具模式）打开<strong>目录管理</strong>。</li><li>要导入：选择<strong>导入</strong>选项卡，决定是否保留卫星信息，然后选择或拖放文件。</li><li>要导出：选择<strong>导出</strong>选项卡，设置选项并点击所需的导出；文件会立即下载。</li><li>对于单颗卫星的导出，请先选择一颗卫星；在选择之前这些按钮保持禁用状态。</li></ol>",
+        "tip1": "从较新的 TLE 文件刷新轨道时，保留卫星信息是安全的默认选项；只有在有意替换整个目录时才将其关闭。",
+        "tip2": "导入和编辑仅存在于您的会话中；如果想保留它们，请在重新加载页面前先导出。"
+      }
     }
   }
 }

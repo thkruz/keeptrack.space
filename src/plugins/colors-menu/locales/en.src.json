@@ -4,7 +4,16 @@
       "bottomIconLabel": "Colors",
       "title": "Color Schemes",
       "rmbLabel": "Color Scheme",
-      "helpBody": "The Color Menu allows you to change how satellites are colored on the display. Different color schemes highlight different satellite characteristics such as country of origin, orbit type, or object type."
+      "sectionLabel": "Schemes",
+      "help": {
+        "overview": "The Color Schemes menu changes how every object in the scene is colored. Each scheme encodes a different property: country of origin, object type, orbital regime, sunlight status, velocity, and more, so picking the right scheme turns the dot cloud into an answer to a specific question.",
+        "imgAlt": "The Color Schemes menu listing the available schemes",
+        "imgCaption": "Click any scheme to recolor the whole catalog instantly.",
+        "howToUse": "<ol><li>Open the <strong>Colors</strong> menu from the bottom bar or press <strong>A</strong>.</li><li>Click a scheme in the list. The scene recolors immediately and the menu closes.</li><li>Check the legend in the corner of the screen to read what each color means in the active scheme.</li><li>You can also right-click empty space and pick <strong>Color Scheme</strong> from the context menu.</li></ol>",
+        "tip1": "The legend updates with the scheme; if you are unsure what a color means, the legend is the authority.",
+        "tip2": "Some schemes are data heavy (like spatial density) and take a moment to compute the first time they are selected.",
+        "shortcutToggle": "Toggle the Color Schemes menu"
+      }
     }
   }
 }

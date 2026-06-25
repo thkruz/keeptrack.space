@@ -3,7 +3,6 @@
     "DebrisScreening": {
       "bottomIconLabel": "Przegląd odłamków",
       "title": "Przegląd odłamków",
-      "helpBody": "Narzędzie Przegląd odłamków analizuje wybrany satelitę względem katalogu w celu identyfikacji potencjalnych zbliżeń. <br><br> Skonfiguruj okno czasowe analizy i kliknij \u201EPrzeglądaj odłamki\u201C, aby uruchomić analizę. Wyniki zostaną wyświetlone w tabeli pokazującej: <ul style=\"margin-left: 40px;\"> <li><b>TCA</b> - Czas najbliższego zbliżenia</li> <li><b>Odległość minięcia</b> - Całkowita oraz składowe RIC (radialna, wzdłużna, poprzeczna)</li> <li><b>Pc</b> - Prawdopodobieństwo kolizji</li> <li><b>Poziom ryzyka</b> - Krytyczny/Wysoki/Średni/Niski na podstawie Pc</li> </ul> Kliknij dowolny identyfikator satelity, aby go wybrać. Eksportuj wyniki do CSV za pomocą przycisku pobierania.",
       "resultsTitle": "Wyniki przeglądu",
       "resultsCount": "Znaleziono {count} zbliżeń",
       "exportCsv": "Eksportuj CSV",
@@ -14,15 +13,54 @@
         "low": "Niski",
         "unknown": "N/D"
       },
+      "sccLabel": "SCC# satelity",
+      "timeWindowLabel": "Okno czasowe",
+      "timeOptions": {
+        "h1": "1 godzina",
+        "h4": "4 godziny",
+        "h8": "8 godzin",
+        "h24": "24 godziny",
+        "h48": "48 godzin",
+        "h72": "72 godziny"
+      },
       "uLabel": "U (radialna)",
       "vLabel": "V (wzdłużna)",
       "wLabel": "W (poprzeczna)",
+      "screenForDebris": "Przeglądaj odłamki",
       "drawBox": "Rysuj ramkę",
       "clearBox": "Wyczyść ramkę",
+      "table": {
+        "secondary": "Obiekt wtórny",
+        "tca": "TCA",
+        "missKm": "Minięcie (km)",
+        "rKm": "R (km)",
+        "iKm": "I (km)",
+        "cKm": "C (km)",
+        "pc": "Pc",
+        "risk": "Ryzyko"
+      },
       "errorMsgs": {
         "InvalidSatellite": "Nieprawidłowy satelita",
         "ScreeningFailed": "Przegląd nie powiódł się",
         "NoResultsToExport": "Brak wyników do eksportu"
+      },
+      "help": {
+        "overview": "Przegląd odłamków wykonuje ocenę zbliżeń wybranego satelity względem reszty katalogu. Znajduje każdy obiekt, który w wybranym oknie czasowym wejdzie w zdefiniowaną wokół satelity ramkę przeglądu, a następnie szereguje zbliżenia według prawdopodobieństwa kolizji.",
+        "imgAlt": "Menu Przegląd odłamków z opcjami okna czasowego i ramki przeglądu",
+        "imgCaption": "Ustaw okno czasowe i ramkę przeglądu RIC, a następnie sprawdź wybranego satelitę względem katalogu.",
+        "boxHeading": "Ramka przeglądu",
+        "box": "Objętość przeglądu jest zdefiniowana we współrzędnych RIC względem satelity: <strong>U (radialna)</strong> to góra i dół wysokości orbity, <strong>V (wzdłużna)</strong> biegnie wzdłuż kierunku lotu, a <strong>W (poprzeczna)</strong> na boki. Najbardziej liczy się rozmiar radialny: większość zbliżeń wyraźnie rozdziela się wysokością, więc zwykle wybiera się ciasne U oraz szersze V i W. <strong>Rysuj ramkę</strong> wyświetla objętość wokół satelity w widoku 3D; <strong>Wyczyść ramkę</strong> ją usuwa.",
+        "resultsHeading": "Odczytywanie wyników",
+        "results": "Każdy wiersz tabeli wyników to jedno przewidywane zbliżenie: <strong>Obiekt wtórny</strong> to drugi obiekt, <strong>TCA</strong> to czas największego zbliżenia, <strong>Minięcie (km)</strong> to całkowita odległość minięcia ze składowymi <strong>R</strong>, <strong>I</strong> i <strong>C</strong>, <strong>Pc</strong> to prawdopodobieństwo kolizji, a <strong>Ryzyko</strong> przypisuje poziom: Krytyczny, Wysoki, Średni lub Niski. Kliknij wiersz, aby wybrać obiekt wtórny i przeskoczyć zegarem do TCA; menu pozostaje otwarte, więc możesz przechodzić między zdarzeniami. <strong>Eksportuj CSV</strong> zapisuje tabelę.",
+        "howToUse": "<ol><li>Wybierz satelitę; dolna ikona jest nieaktywna, dopóki żaden nie jest wybrany.</li><li>Otwórz <strong>Przegląd odłamków</strong> z dolnego menu. Numer SCC satelity uzupełni się automatycznie.</li><li>Wybierz <strong>Okno czasowe</strong> (od 1 do 72 godzin) i w razie potrzeby dostosuj rozmiary ramki <strong>U</strong>, <strong>V</strong> i <strong>W</strong>.</li><li>Kliknij <strong>Przeglądaj odłamki</strong>. Otworzy się panel wyników ze znalezionymi zbliżeniami, uszeregowanymi do przeglądu.</li><li>Kliknij dowolny wiersz, aby zbadać dane zbliżenie w czasie największego zbliżenia.</li></ol>",
+        "tip1": "Dłuższe okna i większe ramki znajdują więcej zbliżeń, ale obliczenia trwają dłużej; zacznij od wartości domyślnych i poszerzaj tylko wtedy, gdy potrzebujesz większego zasięgu.",
+        "tip2": "Kliknięcie wiersza zachowuje stan odtwarzania: jeśli zegar był wstrzymany, pozostaje wstrzymany na TCA.",
+        "tip3": "Poziomy ryzyka to progi na Pc: powyżej 1e-4 to Krytyczny, powyżej 1e-6 Wysoki, a powyżej 1e-8 Średni."
+      },
+      "sections": {
+        "parameters": "Parametry",
+        "searchBox": "Pole wyszukiwania RIC",
+        "results": "Wyniki"
       }
     }
   }

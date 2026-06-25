@@ -1,9 +1,0 @@
-{
-  "plugins": {
-    "NextLaunchesPlugin": {
-      "bottomIconLabel": "Další starty",
-      "title": "Menu dalších startů",
-      "helpBody": "Menu dalších startů načítá data z <a href=\"https://thespacedevs.com/\" target=\"_blank\">The Space Devs</a> a zobrazuje nadcházející starty."
-    }
-  }
-}

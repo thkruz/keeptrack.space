@@ -3,7 +3,56 @@
     "Reentries": {
       "bottomIconLabel": "Powroty do atmosfery",
       "title": "Powroty do atmosfery",
-      "helpBody": "Menu Powroty do atmosfery ma dwie zakładki: <br><br> <b>Komunikaty TIP</b> pokazują ostatnie i nadchodzące prognozy powrotów satelitów do atmosfery z US Space Command. Kliknięcie wiersza spowoduje wybranie tego satelity i zmianę czasu na przewidywany czas rozpadu. <br><br> <b>Analiza powrotów</b> pokazuje obiekty posortowane według najniższego perygeum, które mają największe prawdopodobieństwo powrotu do atmosfery. Kliknij dowolny wiersz, aby wybrać satelitę.",
+      "tabLabels": {
+        "tipMessages": "Komunikaty TIP",
+        "reentryAnalysis": "Analiza powrotów"
+      },
+      "toolbar": {
+        "fetchData": "Pobierz dane",
+        "refresh": "Odśwież",
+        "flyToCorridor": "Leć do korytarza",
+        "flyToCorridorTooltip": "Po włączeniu kliknięcie wiersza TIP przenosi kamerę do przewidywanego korytarza wejścia w atmosferę na globie zamiast śledzić obiekt."
+      },
+      "table": {
+        "norad": "NORAD",
+        "decayDate": "Data rozpadu",
+        "latitude": "Szerokość geograficzna",
+        "longitude": "Długość geograficzna",
+        "window": "Okno (min)",
+        "nextReport": "Następny raport (godz.)",
+        "reentryAngle": "Kąt wejścia (°)",
+        "rcs": "RCS (m^2)",
+        "gpAge": "Wiek GP (godz.)",
+        "dryMass": "Masa sucha (kg)",
+        "volume": "Objętość (m^3)",
+        "name": "Nazwa",
+        "type": "Typ",
+        "perigee": "Perygeum (km)",
+        "apogee": "Apogeum (km)",
+        "meanAlt": "Śr. wysokość (km)",
+        "incl": "Inkl. (°)",
+        "rcsSup": "RCS (m²)"
+      },
+      "labels": {
+        "reentered": "Powrócił do atmosfery",
+        "payload": "Ładunek",
+        "rocketBody": "R/B",
+        "debris": "Odłamki",
+        "dataActions": "Operacje na danych",
+        "results": "Wyniki"
+      },
+      "help": {
+        "overview": "Menu Powroty do atmosfery śledzi obiekty spadające z orbity. Ma dwie zakładki: oficjalne prognozy powrotów do atmosfery z US Space Command oraz analizę na żywo najniżej znajdujących się obiektów w katalogu.",
+        "imgAlt": "Menu Powroty do atmosfery z tabelą Komunikatów TIP",
+        "imgCaption": "Prognozy powrotów TIP. Kliknięcie wiersza przenosi symulację do przewidywanego czasu rozpadu.",
+        "tabsHeading": "Dwie zakładki",
+        "tabs": "<ul><li><strong>Komunikaty TIP</strong>: komunikaty Tracking and Impact Prediction publikowane przez US Space Command, zawierające przewidywany czas rozpadu, lokalizację, okno niepewności (minuty), kąt wejścia w atmosferę, RCS i masę. Kliknięcie wiersza wybiera obiekt i przenosi czas symulacji do przewidywanej epoki rozpadu.</li><li><strong>Analiza powrotów</strong>: około 200 skatalogowanych obiektów posortowanych według najniższego perygeum. Wiersze są oznaczone kolorami: czerwony oznacza perygeum poniżej 120 km (powrót do atmosfery nieuchronny), żółty oznacza 120–160 km (wysokie ryzyko). Kliknięcie wiersza wybiera obiekt.</li></ul>",
+        "howToUse": "<ol><li>Otwórz menu z dolnego paska lub naciśnij R.</li><li>Kliknij ikonę pobierania, aby pobrać najnowsze dane TIP (wymaga połączenia z internetem).</li><li>Kliknij dowolną prognozę, aby przelecieć do tego obiektu w przewidywanym czasie rozpadu.</li><li>Przełącz się na zakładkę Analiza powrotów, aby zobaczyć, co rozpadnie się jako następne. Ładuje się przy pierwszym otwarciu.</li></ol>",
+        "tip1": "Wpis \"Powrócił do atmosfery\" w kolumnie Śr. wysokość oznacza, że obiektu nie można już propagować. Najprawdopodobniej już spadł.",
+        "tip2": "Prognozy TIP niosą rzeczywistą niepewność: kolumna Okno to niepewność w minutach, która na śladzie naziemnym może obejmować całe kontynenty.",
+        "tip3": "Kliknięcie wiersza TIP po cichu zmienia zegar symulacji na epokę rozpadu. Użyj kontrolek czasu, aby wrócić do teraźniejszości.",
+        "shortcutToggle": "Przełącz menu Powrotów do atmosfery"
+      },
       "dataSource": "Komunikaty Tracking and Impact Prediction (TIP) dostarczane przez US Space Command (USSPACECOM).",
       "errorMsgs": {
         "noTipData": "Nie znaleziono danych TIP!",

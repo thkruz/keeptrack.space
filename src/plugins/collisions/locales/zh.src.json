@@ -3,10 +3,37 @@
     "Collisions": {
       "bottomIconLabel": "碰撞",
       "title": "碰撞菜单",
-      "helpBody": "碰撞菜单显示高碰撞概率的卫星。<br><br>点击某一行会选中涉及碰撞的两颗卫星，并将时间切换到碰撞发生时刻。",
+      "toolbar": {
+        "fetchData": "获取数据",
+        "refresh": "刷新"
+      },
+      "table": {
+        "toca": "TOCA",
+        "sat1": "#1",
+        "sat2": "#2",
+        "maxProb": "最大概率",
+        "minRange": "最小距离 (km)",
+        "relSpeed": "相对速度 (km/s)"
+      },
+      "dataSource": "碰撞数据由CelesTrak通过{link}提供。",
+      "help": {
+        "overview": "碰撞菜单使用CelesTrak的SOCRATES交会评估数据，列出编目对象之间即将发生的近距离接近（交会）。每一行都是带有概率和几何信息的预测事件，点击某一行即可在模拟中直接跳转到该事件。",
+        "imgAlt": "显示即将发生交会表格的碰撞菜单",
+        "imgCaption": "来自SOCRATES的即将发生的交会，经过排序后可一眼看到风险最高的事件。",
+        "columnsHeading": "读懂表格",
+        "columns": "<ul><li><strong>TOCA</strong>：最接近时刻（UTC）。</li><li><strong>#1 / #2</strong>：涉及的两个对象的NORAD ID。</li><li><strong>最大概率</strong>：估计的最大碰撞概率。</li><li><strong>最小距离 (km)</strong>：最接近时的预测错过距离。</li><li><strong>相对速度 (km/s)</strong>：两个对象彼此掠过的速度。</li></ul>",
+        "howToUse": "<ol><li>打开菜单并点击下载图标以获取最新的SOCRATES数据（需要联网）。</li><li>点击任意一行：模拟时间会跳转到最接近时刻前30秒，第一个对象被选中，两个ID都会加载到搜索栏中。</li><li>在地球上观看交会的发生过程，或暂停后使用时间控件逐步查看。</li><li>之后可使用刷新图标获取更新的数据。</li></ol>",
+        "tip1": "SOCRATES数据由CelesTrak定期更新。它是一种筛查产品，而不是实时预警系统。",
+        "tip2": "点击某一行后，两个对象都在搜索栏中；点击结果中的第二个对象即可查看它或将其设为次要对象。",
+        "tip3": "模拟会跳转到事件发生前30秒，这样您可以观看接近的过程，而不是事后的情形。"
+      },
       "errorMsgs": {
         "noCollisionsData": "未找到碰撞数据！",
         "errorProcessingCollisions": "处理SOCRATES数据时出错！"
+      },
+      "labels": {
+        "dataActions": "交会数据",
+        "results": "即将发生的交会"
       }
     }
   }

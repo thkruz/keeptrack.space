@@ -3,7 +3,75 @@
     "BreakupAnalysis": {
       "bottomIconLabel": "解体分析",
       "title": "解体分析",
-      "helpBody": "解体分析插件提供历史上主要卫星解体事件的数据库。选择一个事件以查看详细信息，包括母体对象、解体原因、从发射到解体的时间线以及碎片扩散分析。该插件在当前目录中搜索与每个事件匹配的跟踪碎片，并显示高度范围、偏心率和倾角分布的统计分析。"
+      "helpBody": "解体分析插件提供历史上主要卫星解体事件的数据库。选择一个事件以查看详细信息，包括母体对象、解体原因、从发射到解体的时间线以及碎片扩散分析。该插件在当前目录中搜索与每个事件匹配的跟踪碎片，并显示高度范围、偏心率和倾角分布的统计分析。",
+      "sections": {
+        "events": "事件",
+        "debrisStatistics": "碎片统计",
+        "fragmentDispersion": "碎片扩散分析",
+        "trackedFragments": "已跟踪碎片",
+        "gabbardDiagram": "加巴德图",
+        "actions": "操作"
+      },
+      "actions": {
+        "backToEvents": "返回事件列表",
+        "jumpToDate": "跳转到解体日期",
+        "selectParent": "选择母体对象",
+        "exportCsv": "导出碎片 (CSV)",
+        "showAll": "显示全部碎片",
+        "showFewer": "显示较少碎片"
+      },
+      "gabbard": {
+        "apogee": "远地点",
+        "perigee": "近地点",
+        "periodAxis": "周期 (min)",
+        "altitudeAxis": "高度 (km)"
+      },
+      "commands": {
+        "open": "打开解体分析",
+        "export": "导出解体碎片 (CSV)"
+      },
+      "labels": {
+        "event": "事件",
+        "date": "日期",
+        "cause": "原因",
+        "altKm": "高度 (km)",
+        "estDebris": "估计碎片数",
+        "parentObject": "母体对象",
+        "country": "国家",
+        "orbitType": "轨道类型",
+        "breakupAltitude": "解体高度",
+        "launchDate": "发射日期",
+        "breakupDate": "解体日期",
+        "timeToBreakup": "至解体时间",
+        "years": "年",
+        "km": "km",
+        "trackedDebris": "已跟踪碎片",
+        "estimatedTotal": "估计总数",
+        "trackingRatio": "跟踪比例",
+        "typeBreakdown": "有效载荷 / 火箭体 / 碎片",
+        "parameter": "参数",
+        "min": "最小值",
+        "max": "最大值",
+        "mean": "平均值",
+        "spread": "离散度",
+        "perigeeParam": "近地点 (km)",
+        "apogeeParam": "远地点 (km)",
+        "eccentricityParam": "偏心率",
+        "inclinationParam": "倾角 (°)",
+        "noTrackedDebris": "在当前目录中未找到与此事件匹配的已跟踪碎片。",
+        "showingOf": "（显示 {total} 个中的 {shown} 个）",
+        "norad": "NORAD",
+        "name": "名称",
+        "type": "类型",
+        "perigee": "近地点",
+        "apogee": "远地点",
+        "incDeg": "倾角 (°)",
+        "ecc": "偏心率"
+      },
+      "errorMsgs": {
+        "parentNotFound": "母体对象不在当前目录中。",
+        "noDataToExport": "没有可导出的已跟踪碎片。"
+      }
     }
   }
 }

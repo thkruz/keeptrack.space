@@ -1,0 +1,7 @@
+/* Color scheme picker: a flat list of v13 action rows inside a single section
+ * card. Tighten the gap above the first row so it sits directly under the
+ * section label (the shared .kt-action top margin would otherwise stack with
+ * the label's bottom margin). */
+#colors-menu .colors-menu-list .colors-menu-item:first-child {
+  margin-top: 0;
+}

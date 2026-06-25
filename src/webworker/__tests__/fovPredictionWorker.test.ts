@@ -55,6 +55,34 @@ describe('fovPredictionWorker', () => {
     expect(complete!.minutesToEntry!.length).toBe(1);
   });
 
+  it('emits progressive INCREMENTAL_UPDATE snapshots during a multi-batch sweep', async () => {
+    await loadWorker();
+    posted = [];
+
+    // > 16 batches (BATCH_SIZE 200) so at least one partial snapshot is emitted
+    // before the final FULL_SWEEP_COMPLETE.
+    const big = JSON.stringify(Array.from({ length: 3400 }, () => ({ tle1: TLE1, tle2: TLE2, active: true })));
+
+    dispatch({
+      typ: IN.INIT,
+      catalogJson: big,
+      sensors: [],
+      simTimeMs: Date.UTC(2008, 8, 20, 0, 0, 0),
+      maxLookaheadMin: 120,
+      sweepStepMin: 30,
+    });
+
+    await vi.runAllTimersAsync();
+
+    const partials = posted.filter((p) => p.typ === OUT.INCREMENTAL_UPDATE);
+    const complete = posted.find((p) => p.typ === OUT.FULL_SWEEP_COMPLETE);
+
+    expect(partials.length).toBeGreaterThan(0);
+    expect(partials[0].minutesToEntry).toBeInstanceOf(Float32Array);
+    expect(complete).toBeDefined();
+    expect(complete!.minutesToEntry!.length).toBe(3400);
+  });
+
   it('handles UPDATE_TIME and CANCEL without throwing', async () => {
     await loadWorker();
 

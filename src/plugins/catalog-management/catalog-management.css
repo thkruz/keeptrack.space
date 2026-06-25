@@ -1,3 +1,9 @@
+/*
+ * Catalog-management plugin-specific styles. The export tab uses the shared
+ * v13 menu system (.kt-ui-v13 + kt-section/kt-action/...); see
+ * src/engine/ui/menu-v13.css. Only import-tab-specific chrome lives here.
+ */
+
 .cm-dropzone {
   display: none;
   position: absolute;

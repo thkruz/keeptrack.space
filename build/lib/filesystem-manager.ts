@@ -396,25 +396,24 @@ export class FileSystemManager {
     return JSON.stringify(mergedJson, null, 2);
   }
 
+  /**
+   * Recursively merges overlay onto base. Multiple locale source files can
+   * contribute to the same plugin namespace at any depth (e.g. the OSS and pro
+   * watchlist both define plugins.WatchlistPlugin.errorMsgs); a shallow merge
+   * would silently drop whichever file is processed first.
+   */
   private deepMergeLocaleContent_(base: any, overlay: any): any {
-    const result = { ...base, ...overlay };
+    if (
+      typeof base !== 'object' || base === null || Array.isArray(base) ||
+      typeof overlay !== 'object' || overlay === null || Array.isArray(overlay)
+    ) {
+      return overlay;
+    }
 
-    // Deep-merge known nested sections so plugin-level keys are merged, not overwritten
-    for (const section of ['plugins', 'errorMsgs']) {
-      if (base[section] && overlay[section]) {
-        const merged: any = { ...base[section] };
+    const result: any = { ...base };
 
-        for (const key of Object.keys(overlay[section])) {
-          if (typeof merged[key] === 'object' && merged[key] !== null &&
-              typeof overlay[section][key] === 'object' && overlay[section][key] !== null &&
-              !Array.isArray(merged[key])) {
-            merged[key] = { ...merged[key], ...overlay[section][key] };
-          } else {
-            merged[key] = overlay[section][key];
-          }
-        }
-        result[section] = merged;
-      }
+    for (const key of Object.keys(overlay)) {
+      result[key] = key in base ? this.deepMergeLocaleContent_(base[key], overlay[key]) : overlay[key];
     }
 
     return result;

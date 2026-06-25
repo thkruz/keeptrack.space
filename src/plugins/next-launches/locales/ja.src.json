@@ -1,9 +1,0 @@
-{
-  "plugins": {
-    "NextLaunchesPlugin": {
-      "bottomIconLabel": "次の打ち上げ",
-      "title": "次の打ち上げメニュー",
-      "helpBody": "次の打ち上げメニューは<a href=\"https://thespacedevs.com/\" target=\"_blank\">The Space Devs</a>からデータを取得し、今後の打ち上げを表示します。"
-    }
-  }
-}

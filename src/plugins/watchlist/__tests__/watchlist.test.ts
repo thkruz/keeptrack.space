@@ -47,16 +47,6 @@ describe('WatchlistPlugin_form', () => {
   beforeEach(() => {
     setupDefaultHtml();
     watchlistPlugin = new WatchlistPlugin();
-    window.M = {
-      keys: {
-        TAB: 9,
-        ENTER: 13,
-        ESC: 27,
-        ARROW_UP: 38,
-        ARROW_DOWN: 40,
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
     websiteInit(watchlistPlugin);
   });
 
@@ -352,11 +342,11 @@ describe('WatchlistPlugin settings contribution', () => {
     control.set(String(SatLabelMode.ALL));
 
     expect(settingsManager.satLabelMode).toBe(SatLabelMode.ALL);
-    expect(saveSpy).toHaveBeenCalledWith(StorageKey.SETTINGS_SAT_LABEL_MODE, String(SatLabelMode.ALL));
+    expect(saveSpy).toHaveBeenCalledWith(StorageKey.SETTINGS_SAT_LABEL_MODE_V2, String(SatLabelMode.ALL));
 
     control.set(String(SatLabelMode.OFF));
 
     expect(settingsManager.satLabelMode).toBe(SatLabelMode.OFF);
-    expect(saveSpy).toHaveBeenCalledWith(StorageKey.SETTINGS_SAT_LABEL_MODE, String(SatLabelMode.OFF));
+    expect(saveSpy).toHaveBeenCalledWith(StorageKey.SETTINGS_SAT_LABEL_MODE_V2, String(SatLabelMode.OFF));
   });
 });

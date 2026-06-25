@@ -3,8 +3,27 @@
     "FindSatPlugin": {
       "bottomIconLabel": "Trova satellite",
       "title": "Trova satellite",
-      "helpBody": "Il menu Trova satellite consente di cercare satelliti in base a vari criteri:<br><br><ul style=\"margin-left: 40px;\"><li><strong>Tipo di oggetto</strong> - Filtra per carico utile, corpo del razzo o detriti</li><li><strong>Paese</strong> - Filtra per paese di lancio</li><li><strong>Bus/Carico utile/Forma/Fonte del satellite</strong> - Filtra per caratteristiche del satellite</li><li><strong>Azimut/Elevazione/Distanza</strong> - Cerca per angoli di osservazione (richiede un sensore)</li><li><strong>Parametri orbitali</strong> - Inclinazione, periodo, RAAN, argomento del perigeo</li><li><strong>Età TLE</strong> - Filtra per quanto recentemente il TLE è stato aggiornato</li><li><strong>RCS</strong> - Filtra per sezione radar equivalente</li></ul><br>I risultati vengono visualizzati nella barra di ricerca. Usa il pulsante Esporta per salvare i risultati come CSV.",
+      "help": {
+        "overview": "Trova satellite cerca nell'intero catalogo gli oggetti che corrispondono a una combinazione di criteri fisici, orbitali e osservativi. È il modo più rapido per rispondere a domande come \"quali corpi di razzo cinesi si trovano su un'orbita di circa 100 minuti?\" oppure \"quali carichi utili sono in questo momento nel raggio del mio sensore?\"",
+        "imgAlt": "Il menu Trova satellite con i filtri per tipo di oggetto, paese, parametri orbitali e sensore",
+        "imgCaption": "Il menu Trova satellite. Ogni campo compilato restringe ulteriormente la ricerca.",
+        "filtersHeading": "Filtri disponibili",
+        "filters": "<ul><li><strong>Tipo di oggetto</strong>: carichi utili, corpi di razzo, detriti. Seleziona più tipi contemporaneamente; la scelta di un tipo specifico deseleziona \"Tutti\".</li><li><strong>Paese</strong>: uno o più paesi di lancio.</li><li><strong>Bus satellite / Carico utile / Forma / Fonte</strong>: caratteristiche fisiche e della fonte dei dati.</li><li><strong>Azimut / Elevazione / Distanza</strong>: angoli di osservazione attuali dal sensore selezionato. Richiedono che sia prima selezionato un sensore.</li><li><strong>Parametri orbitali</strong>: Inclinazione, Periodo, Ascensione retta e Argomento del perigeo.</li><li><strong>Età TLE</strong>: quanto recentemente i dati orbitali sono stati aggiornati, in ore.</li><li><strong>RCS</strong>: sezione radar equivalente in m².</li></ul>Ogni filtro numerico ha un campo <strong>Margine</strong> che definisce l'intervallo accettato attorno al valore inserito. Lascialo vuoto per usare un valore predefinito ragionevole (ad esempio ±5° per gli angoli).",
+        "howToUse": "<ol><li>Apri il menu dalla barra inferiore oppure premi Ctrl+F.</li><li>Scegli uno o più tipi di oggetto e paesi dai menu a discesa.</li><li>Inserisci i criteri numerici e, facoltativamente, restringi o amplia i loro margini.</li><li>Fai clic su <strong>Trova satellite/i</strong>. Gli oggetti corrispondenti vengono caricati nella barra di ricerca in alto ed evidenziati sul globo.</li><li>Fai clic su <strong>Esporta dati</strong> per salvare i risultati correnti come file CSV.</li></ol>",
+        "tip1": "I filtri si combinano con logica AND: ogni criterio deve corrispondere. Se non ottieni risultati, rimuovi prima il filtro più restrittivo.",
+        "tip2": "Azimut, elevazione e distanza sono misurati dal sensore attualmente selezionato, quindi seleziona un sensore prima di usarli.",
+        "tip3": "I risultati sono limitati. Se un avviso indica che il limite è stato raggiunto, restringi i criteri per essere sicuro di vedere tutto.",
+        "tip4": "Poiché i risultati finiscono nella barra di ricerca, puoi passarli a qualsiasi altro menu che operi sulla ricerca corrente, oppure affinarli digitando.",
+        "shortcutToggle": "Attiva/disattiva il menu Trova satellite"
+      },
       "labels": {
+        "typePayload": "Carico utile",
+        "typeRocketBody": "Corpo di razzo",
+        "typeDebris": "Detriti",
+        "busFilterPlaceholder": "Digita per filtrare le opzioni del bus",
+        "satelliteBusFilter": "Filtro bus satellite",
+        "payloadFilterPlaceholder": "Digita per filtrare le opzioni del carico utile",
+        "payloadFilter": "Filtro carico utile",
         "objectType": "Tipo di oggetto",
         "country": "Paese",
         "satelliteBus": "Bus satellite",
@@ -31,13 +50,20 @@
         "argOfPerigeeMargin": "Margine (gradi)",
         "all": "Tutti",
         "findSatellites": "Trova satellite/i",
-        "exportData": "Esporta dati"
+        "exportData": "Esporta dati",
+        "sectionClassification": "Classificazione",
+        "sectionLookAngles": "Angoli di osservazione",
+        "sectionOrbital": "Elementi orbitali",
+        "sectionPhysical": "Fisici e dati",
+        "sensorNote": "Gli angoli di osservazione richiedono un sensore selezionato.",
+        "resultCount": "{count} risultato/i"
       },
       "errorMsgs": {
         "NoSatellitesFound": "Nessun satellite trovato",
         "NoSearchCriteriaEntered": "Nessun criterio di ricerca inserito",
         "TooManyResults": "Troppi risultati, limitato a {limit}",
-        "TryFindingFirst": "Prova prima a cercare i satelliti!"
+        "TryFindingFirst": "Prova prima a cercare i satelliti!",
+        "SearchFailed": "Ricerca non riuscita: {error}"
       }
     }
   }

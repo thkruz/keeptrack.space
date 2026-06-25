@@ -3,7 +3,75 @@
     "BreakupAnalysis": {
       "bottomIconLabel": "Análisis de Fragmentación",
       "title": "Análisis de Fragmentación",
-      "helpBody": "El plugin de Análisis de Fragmentación proporciona una base de datos de los principales eventos de fragmentación de satélites en la historia. Seleccione un evento para ver información detallada, incluyendo el objeto principal, la causa de la fragmentación, la línea temporal desde el lanzamiento hasta la fragmentación y el análisis de dispersión de fragmentos. El plugin busca en el catálogo actual los restos rastreados que coinciden con cada evento y muestra análisis estadísticos de los rangos de altitud, excentricidad y distribuciones de inclinación."
+      "helpBody": "El plugin de Análisis de Fragmentación proporciona una base de datos de los principales eventos de fragmentación de satélites en la historia. Seleccione un evento para ver información detallada, incluyendo el objeto principal, la causa de la fragmentación, la línea temporal desde el lanzamiento hasta la fragmentación y el análisis de dispersión de fragmentos. El plugin busca en el catálogo actual los restos rastreados que coinciden con cada evento y muestra análisis estadísticos de los rangos de altitud, excentricidad y distribuciones de inclinación.",
+      "sections": {
+        "events": "Eventos",
+        "debrisStatistics": "Estadísticas de Restos",
+        "fragmentDispersion": "Análisis de Dispersión de Fragmentos",
+        "trackedFragments": "Fragmentos Rastreados",
+        "gabbardDiagram": "Diagrama de Gabbard",
+        "actions": "Acciones"
+      },
+      "actions": {
+        "backToEvents": "Volver a Eventos",
+        "jumpToDate": "Ir a la Fecha de Fragmentación",
+        "selectParent": "Seleccionar Objeto Principal",
+        "exportCsv": "Exportar Fragmentos (CSV)",
+        "showAll": "Mostrar Todos los Fragmentos",
+        "showFewer": "Mostrar Menos Fragmentos"
+      },
+      "gabbard": {
+        "apogee": "Apogeo",
+        "perigee": "Perigeo",
+        "periodAxis": "Período (min)",
+        "altitudeAxis": "Altitud (km)"
+      },
+      "commands": {
+        "open": "Abrir Análisis de Fragmentación",
+        "export": "Exportar Fragmentos de Fragmentación (CSV)"
+      },
+      "labels": {
+        "event": "Evento",
+        "date": "Fecha",
+        "cause": "Causa",
+        "altKm": "Alt (km)",
+        "estDebris": "Restos Est.",
+        "parentObject": "Objeto Principal",
+        "country": "País",
+        "orbitType": "Tipo de Órbita",
+        "breakupAltitude": "Altitud de Fragmentación",
+        "launchDate": "Fecha de Lanzamiento",
+        "breakupDate": "Fecha de Fragmentación",
+        "timeToBreakup": "Tiempo hasta la Fragmentación",
+        "years": "años",
+        "km": "km",
+        "trackedDebris": "Restos Rastreados",
+        "estimatedTotal": "Total Estimado",
+        "trackingRatio": "Proporción de Rastreo",
+        "typeBreakdown": "Cargas Útiles / Cuerpos de Cohete / Restos",
+        "parameter": "Parámetro",
+        "min": "Mín",
+        "max": "Máx",
+        "mean": "Media",
+        "spread": "Dispersión",
+        "perigeeParam": "Perigeo (km)",
+        "apogeeParam": "Apogeo (km)",
+        "eccentricityParam": "Excentricidad",
+        "inclinationParam": "Inclinación (°)",
+        "noTrackedDebris": "No se encontraron restos rastreados en el catálogo actual para este evento.",
+        "showingOf": "(mostrando {shown} de {total})",
+        "norad": "NORAD",
+        "name": "Nombre",
+        "type": "Tipo",
+        "perigee": "Perigeo",
+        "apogee": "Apogeo",
+        "incDeg": "Inc (°)",
+        "ecc": "Exc"
+      },
+      "errorMsgs": {
+        "parentNotFound": "El objeto principal no está en el catálogo actual.",
+        "noDataToExport": "No hay fragmentos rastreados para exportar."
+      }
     }
   }
 }

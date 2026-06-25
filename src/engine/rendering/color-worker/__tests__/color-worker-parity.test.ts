@@ -9,9 +9,7 @@
 import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
 import { buildColorDataArrays, TRACKED_COUNTRIES } from '@app/engine/rendering/color-worker/color-data-builder';
 import {
-  ColorDataArrays,
   CountryCode,
-  MissionCategory,
   ObjFlags,
   SourceCode,
 } from '@app/engine/rendering/color-worker/color-data-arrays';
@@ -22,14 +20,10 @@ import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { WebGLRenderer } from '@app/engine/rendering/webgl-renderer';
 import { defaultSat } from '@test/environment/apiMocks';
 import {
-  CatalogSource,
-  Degrees,
   Satellite,
   SpaceObjectType,
   Star,
-  TleLine1,
 } from '@ootk/src/main';
-import { Planet } from '@app/app/objects/planet';
 import { BaseObject } from '@app/engine/ootk/src/objects';
 
 // ─── Worker environment mock ────────────────────────────────────────────────
@@ -267,7 +261,7 @@ describe('Color Worker Parity', () => {
     isSensorManagerLoaded: true,
     sensorType: 0,
     maxZoomDistance: 100000,
-    isMissilePluginEnabled: true,
+    isMissileSimulatorEnabled: true,
   };
 
   const defaultFilters: FilterState = {
@@ -560,7 +554,6 @@ describe('Color Worker Parity', () => {
       initWorker('CelestrakColorScheme');
       const output = forceRecolorAndGetOutput();
 
-      const scheme = colorSchemeManager.colorSchemeInstances.CelestrakColorScheme;
       // defaultSat has status that should map to active payload
       const workerColor = getWorkerColor(output, 0);
 

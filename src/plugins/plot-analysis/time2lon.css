@@ -1,8 +1,12 @@
+/* The base .side-menu-parent is offset by left: var(--drawer-offset); a plain
+ * width: 100% then overflows the viewport by that offset and clips the chart's
+ * right edge (and the zoom slider). Subtract the offset from the viewport width
+ * so the menu ends exactly at the right edge. */
 #time2lon-plots-menu.side-menu-parent {
   z-index: 10001 !important;
-  width: 100% !important;
-  min-width: 100% !important;
-  max-width: 100% !important;
+  width: calc(100vw - var(--drawer-offset, 0px)) !important;
+  min-width: calc(100vw - var(--drawer-offset, 0px)) !important;
+  max-width: calc(100vw - var(--drawer-offset, 0px)) !important;
 }
 
 #time2lon-plots-menu .side-menu {
@@ -13,11 +17,19 @@
   overflow: hidden;
 }
 
+/* The stats card sits above the chart and never shrinks; the chart fills the rest. */
+#time2lon-plots-menu .kt-section {
+  flex-shrink: 0;
+  margin-top: 8px;
+}
+
 #time2lon-stats {
-  padding: 10px;
   color: #fff;
   font-size: 12px;
-  flex-shrink: 0;
+}
+
+#time2lon-total-count {
+  font-weight: 600;
 }
 
 #time2lon-country-counts {

@@ -160,10 +160,25 @@ window.matchMedia = vi.fn().mockImplementation((query) => ({
   dispatchEvent: vi.fn(),
 }));
 
-window.M = {
-  AutoInit: vi.fn(),
-  updateTextFields: vi.fn(),
-} as unknown as typeof window.M;
+// Mock @materializecss/materialize (v2 is a pure ESM module; stub its DOM-touching components in jsdom)
+vi.mock('@materializecss/materialize', () => {
+  class Toast {
+    el = document.createElement('div');
+    timeRemaining = 0;
+    dismiss = vi.fn();
+    static dismissAll = vi.fn();
+  }
+
+  const instance = { destroy: vi.fn(), updateTabIndicator: vi.fn(), select: vi.fn() };
+
+  return {
+    AutoInit: vi.fn(),
+    Toast,
+    Dropdown: { init: vi.fn(), getInstance: vi.fn(() => instance) },
+    Tabs: { init: vi.fn(), getInstance: vi.fn(() => instance) },
+    FormSelect: { init: vi.fn(), getInstance: vi.fn(() => instance) },
+  };
+});
 
 // Mock echarts to avoid noisy console warnings and side effects during tests
 vi.mock('echarts', () => {

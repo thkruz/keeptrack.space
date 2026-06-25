@@ -1,0 +1,38 @@
+{
+  "plugins": {
+    "TheSpaceDevLaunchCalendarPlugin": {
+      "bottomIconLabel": "Launch Calendar",
+      "title": "Launch Calendar",
+      "sideMenuTitle": "Launch Calendar",
+      "tooltips": {
+        "fetchData": "Fetch Data",
+        "refresh": "Refresh",
+        "exportLaunchInfo": "Export Launch Info"
+      },
+      "labels": {
+        "dataActions": "Data Actions",
+        "results": "Upcoming Launches"
+      },
+      "table": {
+        "launchWindow": "Launch Window",
+        "mission": "Mission",
+        "location": "Location",
+        "agency": "Agency",
+        "country": "Country"
+      },
+      "msgs": {
+        "fetching": "Fetching upcoming launches...",
+        "unknown": "Unknown",
+        "tbd": "TBD"
+      },
+      "help": {
+        "overview": "Next Launches lists upcoming orbital launches worldwide, pulled live from The Space Devs launch library: the launch window, mission, launch site, agency, and country for each. Mission and site names link to further reading where available.",
+        "imgAlt": "The Next Launches table of upcoming missions",
+        "imgCaption": "Each row is an upcoming launch with its window, mission, site, and agency.",
+        "howToUse": "<ol><li>Open <strong>Next Launches</strong> from the bottom bar (Events mode).</li><li>Click the fetch button to download the current launch list; it needs an internet connection.</li><li>Browse the table; linked mission and pad names open background pages.</li><li>Use the export button to save the list as a spreadsheet.</li></ol>",
+        "tip1": "Launch windows show in UTC; entries older than a day display TBD until fresh data is fetched.",
+        "tip2": "Pair this list with the New Launch tool to model an upcoming launch's trajectory before it happens."
+      }
+    }
+  }
+}

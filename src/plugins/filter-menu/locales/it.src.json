@@ -3,9 +3,18 @@
     "FilterMenuPlugin": {
       "title": "Menu Filtri",
       "bottomIconLabel": "Menu Filtri",
-      "helpBody": "Questo menu consente di filtrare gli oggetti visualizzati sul globo in base al tipo, al regime orbitale e alla fonte dei dati.",
+      "help": {
+        "overview": "Il Menu Filtri controlla quali oggetti vengono disegnati. Gli interruttori sono raggruppati per tipo di oggetto (carichi utili, detriti, corpi del razzo), regime orbitale (da LEO a GEO e oltre), fonte dei dati e paese, così da ridurre il catalogo esattamente alla popolazione che si sta studiando.",
+        "imgAlt": "Il Menu Filtri con i suoi interruttori di visibilità raggruppati",
+        "imgCaption": "Ogni interruttore nasconde o mostra istantaneamente una parte del catalogo.",
+        "howToUse": "<ol><li>Apri il <strong>Menu Filtri</strong> dalla barra inferiore o premi <strong>F</strong>.</li><li>Aziona gli interruttori; la scena si aggiorna immediatamente man mano che ogni filtro viene applicato.</li><li>Fai clic su <strong>Ripristina predefiniti</strong> per ripristinare la vista standard.</li></ol>",
+        "tip1": "I filtri si combinano: un oggetto deve superare ogni gruppo attivo per restare visibile, quindi una scena che sembra vuota di solito significa che due filtri si escludono a vicenda.",
+        "tip2": "La palette dei comandi offre preimpostazioni con un clic, come mostrare solo LEO o nascondere detriti e corpi del razzo.",
+        "shortcutToggle": "Attiva/Disattiva il Menu Filtri"
+      },
       "resetToDefaults": "Ripristina predefiniti",
       "defaultTooltip": "Disattiva per nascondere {name}",
+      "searchPlaceholder": "Cerca filtri...",
       "commands": {
         "category": "Filtri",
         "open": "Apri Menu Filtri",
@@ -18,6 +27,7 @@
         "showOnlyPayloads": "Mostra solo carichi utili",
         "hideDebrisAndRocketBodies": "Nascondi detriti e corpi del razzo",
         "showAllObjectTypes": "Mostra tutti i tipi di oggetti",
+        "hideAllObjectTypes": "Nascondi tutti i tipi di oggetti",
         "toggleLEO": "Attiva/Disattiva visibilit\u00e0 LEO",
         "toggleMEO": "Attiva/Disattiva visibilit\u00e0 MEO",
         "toggleGEO": "Attiva/Disattiva visibilit\u00e0 GEO",
@@ -25,6 +35,8 @@
         "showOnlyLEO": "Mostra solo satelliti LEO",
         "showOnlyGEO": "Mostra solo satelliti GEO",
         "showAllOrbitalRegimes": "Mostra tutti i regimi orbitali",
+        "showOnlyCelestrak": "Mostra solo satelliti CelesTrak",
+        "showAllSources": "Mostra tutte le fonti",
         "showOnlyUS": "Mostra solo oggetti USA",
         "showOnlyRussia": "Mostra solo oggetti russi",
         "showOnlyChina": "Mostra solo oggetti cinesi",

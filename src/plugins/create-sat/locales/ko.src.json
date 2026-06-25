@@ -3,7 +3,6 @@
     "CreateSat": {
       "bottomIconLabel": "위성 생성",
       "title": "위성 생성",
-      "helpBody": "위성 생성 메뉴에서는 궤도 요소를 수동으로 입력하거나 STK 천체력 파일 (.e)을 가져와 위성을 생성할 수 있습니다.<br><br><b>기본 탭</b>: 원지점, 근지점, 경사각을 입력하여 빠르게 위성을 생성합니다.<br><br><b>고급 탭</b>: 전체 케플러 요소(경사각, RAAN, 이심률, 근지점 편각, 평균 근점 이각, 평균 운동)를 입력합니다.<br><br><b>STK .e 가져오기</b>: STK 천체력 파일을 메뉴에 끌어다 놓으세요. 지원 형식: EphemerisTimePosVel, EphemerisTimePos, EphemerisTimePosVelAcc (관성 좌표계: J2000, ICRF, TEME 등). EpSec 및 UTCG 시간 형식을 지원합니다. 키워드는 대소문자를 구분하지 않습니다.<br><br><b>미지원</b>: 측지 형식(LLA, LLR, MSL, Terrain), 비관성 좌표계(Fixed, TrueOfDate) 및 공분산 데이터는 지원되지 않습니다.",
       "tabs": {
         "basic": "기본",
         "advanced": "고급"
@@ -30,11 +29,18 @@
         "apogeeKm": "원지점 (km)",
         "perigeeKm": "근지점 (km)",
         "smaKm": "장반경 (km)",
-        "velocityKms": "궤도 속도 (km/s)"
+        "velocityKms": "궤도 속도 (km/s)",
+        "sectionIdentity": "식별 정보",
+        "sectionOrbit": "궤도",
+        "sectionEpoch": "기준 시각",
+        "sectionElements": "궤도 요소",
+        "sectionPresets": "프리셋"
       },
       "buttons": {
         "createSatellite": "위성 생성",
-        "saveTle": "TLE 저장"
+        "saveTle": "TLE 저장",
+        "makeSunSync": "태양 동기 경사각",
+        "cloneSelected": "선택한 위성 복제"
       },
       "options": {
         "payload": "탑재체",
@@ -67,18 +73,36 @@
         "invalidMeanMotion": "잘못된 평균 운동입니다. NN.NNNNN 형식이어야 합니다 (예: 16.00000).",
         "invalidPeriod": "잘못된 주기입니다. NN.NNNN에서 NNNN.NNNN 형식이어야 합니다 (예: 90.0000, 9999.9999), 총 8자리.",
         "invalidSource": "잘못된 소스입니다. 비워둘 수 없습니다.",
-        "invalidName": "잘못된 이름입니다. 비워둘 수 없습니다."
+        "invalidName": "잘못된 이름입니다. 비워둘 수 없습니다.",
+        "slotOccupied": "슬롯 {scc}의 기존 위성 {name}을(를) 덮어씁니다.",
+        "noFreeSlots": "사용 가능한 분석 슬롯이 없습니다(90000-99999가 모두 사용 중입니다).",
+        "noSatSelected": "먼저 복제할 위성을 선택하세요."
       },
       "successMsgs": {
         "satCreated": "위성 {name} ({scc})이(가) 성공적으로 생성되었습니다",
         "tleExported": "TLE가 성공적으로 내보내졌습니다"
       },
-      "tleInputLabel": "TLE 데이터 입력",
-      "tleDataSource": "TLE 데이터 소스",
-      "tleEmpty": "TLE 데이터가 비어 있습니다",
-      "tleTwoLines": "TLE 데이터는 정확히 두 줄이어야 합니다",
-      "tleInvalidFormat": "잘못된 TLE 형식",
-      "tleParseError": "TLE 파싱 오류"
+      "help": {
+        "overview": "위성 생성 메뉴는 입력한 궤도 요소로 완전히 새로운 위성을 카탈로그에 추가합니다. 계획된 발사를 모델링하거나, 공개된 궤도 요소로 물체를 재현하거나, 테스트 케이스를 만들 때 사용하세요. 생성된 위성은 분석가 슬롯(NORAD ID 90000~99999)에 등록되며 현재 세션에서만 존재합니다.",
+        "imgAlt": "기본 탭이 표시된 위성 생성 메뉴",
+        "imgCaption": "기본 탭은 원지점, 근지점, 경사각만으로 궤도를 만듭니다.",
+        "tabsHeading": "기본 탭과 고급 탭",
+        "tabs": "<strong>기본</strong> 탭에는 NORAD ID, 이름, <strong>경사각</strong>, <strong>원지점 고도</strong>, <strong>근지점 고도</strong>만 입력하면 되며, 나머지 궤도는 자동으로 계산됩니다. <strong>고급</strong> 탭에서는 전체 궤도 요소를 설정할 수 있습니다: <strong>객체 유형</strong>, <strong>국가</strong>, 원기, <strong>적경</strong>, <strong>이심률</strong>, <strong>근지점 편각</strong>, <strong>평균 근점 이각</strong>, 그리고 <strong>평균 운동</strong> 또는 <strong>주기</strong>(하나를 수정하면 다른 하나가 다시 계산됩니다). <strong>계산된 매개변수</strong> 패널에는 입력하는 동안 결과 원지점, 근지점, 장반경, 궤도 속도가 표시됩니다.",
+        "howToUse": "<ol><li>하단 바에서 <strong>위성 생성</strong> 메뉴를 엽니다.</li><li>90000~99999 범위에서 비어 있는 NORAD ID를 고르고 위성에 이름을 지정합니다.</li><li><strong>기본</strong> 탭에서 경사각, 원지점, 근지점을 입력하거나, <strong>고급</strong> 탭으로 전환하여 전체 궤도 요소를 입력합니다.</li><li><strong>위성 생성</strong>을 클릭합니다. 새 물체가 즉시 나타나고 확인 알림에 이름과 번호가 표시됩니다.</li><li><strong>TLE 저장</strong>을 사용하면 생성한 위성의 궤도 요소를 나중에 다시 불러올 수 있는 파일로 내보낼 수 있습니다.</li></ol>",
+        "tip1": "모든 입력란은 구체적인 오류 메시지로 검증되므로, 생성에 실패하면 어떤 값을 고쳐야 하는지 알림에서 정확히 알려줍니다.",
+        "tip2": "약 100 km 미만의 근지점은 위성이 즉시 소멸하기 때문에 거부됩니다.",
+        "tip3": "생성된 위성은 세션 동안만 유지됩니다. 나중에도 사용하려면 TLE를 내보내세요."
+      },
+      "presets": {
+        "placeholder": "프리셋 불러오기…",
+        "selectLabel": "궤도 프리셋",
+        "leoIss": "LEO (ISS 유형)",
+        "sso": "태양 동기 (800 km)",
+        "geo": "정지궤도 (GEO)",
+        "gto": "정지천이궤도 (GTO)",
+        "molniya": "몰니야",
+        "polar": "극궤도 (600 km)"
+      }
     }
   }
 }

@@ -3,16 +3,39 @@
     "SearchSettingsPlugin": {
       "bottomIconLabel": "검색 설정",
       "title": "검색 설정",
+      "sections": {
+        "resultLimits": "결과 제한",
+        "searchFields": "검색 필드",
+        "filters": "필터",
+        "actions": "작업"
+      },
       "labels": {
         "maxResults": "검색 최대 결과 수",
-        "showDecayed": "소멸된 위성 표시"
+        "minSearchChars": "검색 전 최소 문자 수",
+        "showDecayed": "소멸된 위성 표시",
+        "showVimpel": "Vimpel 객체 포함",
+        "reset": "기본값으로 재설정",
+        "fields": {
+          "name": "이름",
+          "altName": "대체 이름",
+          "bus": "위성 버스",
+          "noradId": "NORAD ID",
+          "intlDes": "국제 식별자",
+          "launchVehicle": "발사체"
+        }
       },
       "tooltips": {
         "maxResults": "검색에 표시할 최대 위성 수",
-        "showDecayed": "검색 결과에 소멸된 위성(위치 0,0,0) 표시"
+        "minSearchChars": "검색이 실행되기 전에 입력해야 하는 최소 문자 수",
+        "showDecayed": "검색 결과에 소멸된 위성(위치 0,0,0) 표시",
+        "showVimpel": "검색 결과에 Vimpel(분석가) 객체를 포함합니다. 검색이 느려질 수 있습니다."
+      },
+      "toasts": {
+        "reset": "검색 설정이 기본값으로 재설정되었습니다"
       },
       "errorMsgs": {
-        "InvalidMaxResults": "검색 최대 결과 수 값이 유효하지 않습니다!"
+        "InvalidMaxResults": "검색 최대 결과 수 값이 유효하지 않습니다!",
+        "InvalidMinSearchChars": "검색 최소 문자 수 값이 유효하지 않습니다!"
       }
     }
   }

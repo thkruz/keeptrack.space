@@ -3,7 +3,82 @@
     "Calculator": {
       "bottomIconLabel": "Transformaciones de Marco de Referencia",
       "title": "Menú de Transformaciones de Marco de Referencia",
-      "helpBody": "El Menú de Transformaciones de Marco de Referencia se usa para convertir entre diferentes marcos de referencia. <br><br> El menú te permite convertir entre los siguientes marcos de referencia: <ul style=\"margin-left: 40px;\"> <li> ECI - Inercial Centrado en la Tierra </li> <li> ECEF - Fijo a la Tierra Centrado en la Tierra </li> <li> Geodésico </li> <li> Topocéntrico </li> </ul>"
+      "frames": {
+        "geodeticLla": "Geodésico (LLA)",
+        "raeTopocentric": "RAE (topocéntrico)",
+        "raDecGeocentric": "RA/Dec (geocéntrico)",
+        "classicalElements": "Elementos Clásicos"
+      },
+      "sections": {
+        "input": "Entrada"
+      },
+      "labels": {
+        "inputFrame": "Marco de Entrada",
+        "loadSelectedSatellite": "Cargar Satélite Seleccionado",
+        "includeVelocity": "Incluir Velocidad",
+        "convert": "Convertir",
+        "outputFormat": "Formato de Salida",
+        "drawLine": "Dibujar Línea",
+        "copyResults": "Copiar Todos los Resultados",
+        "clickToCopy": "Haz clic para copiar",
+        "epoch": "Época",
+        "sensor": "Sensor",
+        "latitude": "Latitud",
+        "longitude": "Longitud",
+        "altitude": "Altitud",
+        "range": "Distancia",
+        "azimuth": "Azimut",
+        "elevation": "Elevación",
+        "rightAscension": "Ascensión Recta",
+        "declination": "Declinación",
+        "semiMajorAxis": "Semieje Mayor",
+        "eccentricity": "Excentricidad",
+        "inclination": "Inclinación",
+        "raan": "RAAN",
+        "argPerigee": "Arg. del Perigeo",
+        "trueAnomaly": "Anomalía Verdadera",
+        "period": "Período",
+        "apogeeAlt": "Alt. del Apogeo",
+        "perigeeAlt": "Alt. del Perigeo"
+      },
+      "formats": {
+        "fixed4": "Fijo (4 decimales)",
+        "fixed6": "Fijo (6 decimales)",
+        "fixed8": "Fijo (8 decimales)",
+        "scientific": "Notación Científica",
+        "dms": "DMS (ángulos)"
+      },
+      "msgs": {
+        "noSensorSelected": "Ningún sensor seleccionado",
+        "needsVelocity": "Requiere velocidad",
+        "noSensorForRae": "Ningún sensor seleccionado para la salida RAE.",
+        "copied": "Copiado al portapapeles"
+      },
+      "errorMsgs": {
+        "conversionFailed": "Error en la conversión: {error}",
+        "invalidInput": "Entrada no válida para {field}: \"{value}\" no es un número.",
+        "fieldNotFound": "Campo {field} no encontrado.",
+        "invalidNumber": "Todas las entradas deben ser números válidos.",
+        "badEccentricity": "La excentricidad debe estar entre 0 y 1 (exclusivo) para una órbita cerrada.",
+        "badSemiMajorAxis": "El semieje mayor debe ser mayor que 0.",
+        "noSensorForRae": "La conversión RAE requiere que haya un sensor seleccionado.",
+        "noRaeData": "No hay datos RAE disponibles. Realiza primero una conversión con un sensor seleccionado.",
+        "noSatelliteSelected": "Ningún satélite seleccionado.",
+        "notASatellite": "El objeto seleccionado no es un satélite.",
+        "couldNotPropagate": "No se pudo propagar el satélite a la hora actual.",
+        "copyFailed": "No se pudo copiar al portapapeles."
+      },
+      "help": {
+        "overview": "La calculadora de Transformaciones de Marco de Referencia convierte una posición (y opcionalmente la velocidad) entre todos los marcos de coordenadas que KeepTrack conoce: J2000 (ECI), ITRF (ECEF), TEME, Geodésico (LLA), RAE (topocéntrico), RA/Dec (geocéntrico) y Elementos Clásicos. Escribe un estado en cualquier marco y léelo en todos los demás a la vez.",
+        "imgAlt": "El menú de Transformaciones de Marco de Referencia con campos de entrada y salidas convertidas",
+        "imgCaption": "Introduce un estado en un marco; todos los demás marcos se calculan con un clic.",
+        "framesHeading": "Marcos Compatibles",
+        "frames": "<ul><li><strong>J2000 (ECI)</strong>, <strong>TEME</strong>: marcos inerciales centrados en la Tierra; TEME es el marco en el que se publican los TLE.</li><li><strong>ITRF (ECEF)</strong>: centrado en la Tierra y fijo a la Tierra; rota con el planeta.</li><li><strong>Geodésico (LLA)</strong>: latitud, longitud y altitud.</li><li><strong>RAE (topocéntrico)</strong>: distancia, azimut y elevación vistos desde el sensor seleccionado.</li><li><strong>RA/Dec (geocéntrico)</strong>: ascensión recta y declinación.</li><li><strong>Elementos Clásicos</strong>: elementos orbitales keplerianos, con período, apogeo y perigeo en la salida.</li></ul>",
+        "howToUse": "<ol><li>Abre el menú desde la barra inferior (modo Herramientas).</li><li>Elige un <strong>Marco de Entrada</strong>; los campos de entrada cambian para coincidir.</li><li>Escribe los valores o haz clic en <strong>Cargar Satélite Seleccionado</strong> para rellenarlos con el satélite seleccionado actualmente.</li><li>Para los marcos cartesianos, marca <strong>Incluir Velocidad</strong> para convertir también el vector de velocidad; la salida de Elementos Clásicos lo necesita.</li><li>Haz clic en <strong>Convertir</strong>. Los valores de todos los demás marcos aparecen debajo, formateados según el selector <strong>Formato de Salida</strong>.</li><li>Con un sensor seleccionado y un resultado RAE calculado, <strong>Dibujar Línea</strong> traza la línea desde el sensor hasta ese punto en la vista 3D.</li></ol>",
+        "tip1": "La entrada y la salida RAE necesitan primero un sensor seleccionado; el campo muestra el sensor en uso para que siempre sepas cuál es el sitio de referencia.",
+        "tip2": "El formato de salida DMS presenta los ángulos como grados, minutos y segundos, lo que resulta práctico para apuntar telescopios.",
+        "tip3": "La conversión a Elementos Clásicos requiere la velocidad: sin ella, la salida indica que necesita la velocidad en lugar de adivinar una órbita."
+      }
     }
   }
 }

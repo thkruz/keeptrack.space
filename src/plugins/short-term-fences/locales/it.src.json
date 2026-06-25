@@ -3,7 +3,65 @@
     "ShortTermFences": {
       "bottomIconLabel": "Barriera a breve termine",
       "title": "Menu barriere a breve termine (STF)",
-      "helpBody": "Il menu Barriere a breve termine (STF) viene utilizzato per visualizzare le aree di ricerca dei sensori. <br><br> Questa funzione difficilmente sarà molto utile a meno che non si possieda/gestisca un sensore con funzionalità di area di ricerca."
+      "sideMenuTitle": "Barriera a breve termine",
+      "labels": {
+        "centerAzimuth": "Azimut centrale",
+        "azimuthExtentDeg": "Estensione azimut (deg)",
+        "azimuthExtentKm": "Estensione azimut (km)",
+        "centerElevation": "Elevazione centrale",
+        "elevationExtentDeg": "Estensione elevazione (deg)",
+        "elevationExtentKm": "Estensione elevazione (km)",
+        "centerRange": "Distanza centrale",
+        "rangeExtent": "Estensione distanza"
+      },
+      "tooltips": {
+        "centerAzimuth": "Azimut del centro di ricerca in gradi (es.: 50)",
+        "azimuthExtentDeg": "Estensione totale attorno all'azimut centrale in gradi (es.: 4)",
+        "azimuthExtentKm": "Estensione totale attorno all'azimut centrale in chilometri (es.: 120)",
+        "centerElevation": "Elevazione del centro di ricerca in gradi (es.: 20)",
+        "elevationExtentDeg": "Estensione totale attorno all'elevazione centrale in gradi (es.: 4)",
+        "elevationExtentKm": "Estensione totale attorno all'elevazione centrale in chilometri (es.: 120)",
+        "centerRange": "Distanza del centro di ricerca in chilometri (es.: 1000)",
+        "rangeExtent": "Estensione totale attorno alla distanza centrale in chilometri (es.: 100)",
+        "buildOnObject": "Visualizza la capacità di ricerca del sensore"
+      },
+      "buttons": {
+        "createNewStf": "Crea nuova STF",
+        "removeLast": "Rimuovi l'ultima",
+        "clearAllStfs": "Cancella tutte le STF"
+      },
+      "links": {
+        "buildOnObject": "Costruisci una barriera a breve termine su questo oggetto..."
+      },
+      "errorMsgs": {
+        "stfNotInView": "La STF non è nel campo visivo del sensore!",
+        "noSelectSatManager": "Nessuna istanza di selectSatManager trovata",
+        "invalidInput": "Inserisci un numero valido in ogni campo.",
+        "invalidRange": "La distanza centrale deve essere maggiore di zero."
+      },
+      "help": {
+        "overview": "Le barriere a breve termine visualizzano la casella di ricerca di un sensore: uno spicchio di cielo definito da una finestra di azimut, elevazione e distanza. Gli operatori le usano per vedere esattamente quale volume copre una ricerca assegnata e se un oggetto di interesse lo attraverserebbe.",
+        "imgAlt": "Il menu della barriera a breve termine con i campi di azimut, elevazione e distanza",
+        "imgCaption": "Definisci la barriera tramite il suo punto centrale e le estensioni in azimut, elevazione e distanza.",
+        "fieldsHeading": "Definire la barriera",
+        "fields": "La barriera è centrata su un punto dato da <strong>Azimut centrale</strong>, <strong>Elevazione centrale</strong> (gradi) e <strong>Distanza centrale</strong> (chilometri), tutti misurati dal sensore selezionato. L'<strong>Estensione azimut</strong> e l'<strong>Estensione elevazione</strong> impostano la larghezza e l'altezza totali in gradi; la dimensione equivalente in chilometri alla distanza centrale viene calcolata automaticamente nei campi km di sola lettura. L'<strong>Estensione distanza</strong> imposta la profondità della casella in chilometri.",
+        "howToUse": "<ol><li>Seleziona un sensore; l'icona inferiore è disabilitata finché non ne viene selezionato uno.</li><li>Apri il menu <strong>Barriera a breve termine</strong> (modalità Crea) e inserisci il punto centrale e le estensioni.</li><li>Fai clic su <strong>Crea nuova STF</strong>. Il volume della barriera viene disegnato dal sensore nella vista 3D.</li><li>Aggiungi altre barriere inviando di nuovo il modulo; <strong>Rimuovi l'ultima</strong> elimina la più recente e <strong>Cancella tutte le STF</strong> rimuove ogni barriera.</li><li>Con un satellite selezionato, il riquadro informazioni del satellite mostra un collegamento <strong>Costruisci una barriera a breve termine su questo oggetto...</strong> che precompila il modulo con l'azimut, l'elevazione e la distanza attuali del satellite.</li></ol>",
+        "tip1": "Se la barriera richiesta è al di fuori di ciò che il sensore può vedere, la creazione viene rifiutata con una notifica invece di disegnare una casella impossibile.",
+        "tip2": "I campi di estensione in chilometri si aggiornano mentre digiti, rendendo facile verificare quanto sia davvero ampia la ricerca a quella distanza."
+      },
+      "sections": {
+        "azimuth": "Azimut",
+        "elevation": "Elevazione",
+        "range": "Distanza"
+      },
+      "fenceList": {
+        "activeFences": "Recinti attivi",
+        "empty": "Nessun recinto attivo. Creane uno sopra.",
+        "remove": "Rimuovi recinto",
+        "azimuth": "Azimut",
+        "elevation": "Elevazione",
+        "range": "Distanza"
+      }
     }
   }
 }

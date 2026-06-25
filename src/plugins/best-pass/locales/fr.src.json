@@ -1,15 +1,28 @@
 {
   "plugins": {
     "BestPassPlugin": {
+      "sections": {
+        "search": "Recherche"
+      },
       "bottomIconLabel": "Meilleurs passages",
-      "title": "Meilleurs temps de passage",
-      "helpBody": "Le plugin Meilleurs temps de passage calcule les temps de passage optimaux des satellites en fonction du capteur actuellement s\u00e9lectionn\u00e9. Les passages sont \u00e9valu\u00e9s selon la dur\u00e9e, l'\u00e9l\u00e9vation maximale, la port\u00e9e minimale et la position du soleil. Les r\u00e9sultats sont export\u00e9s en CSV.",
-      "satelliteNumbersLabel": "Num\u00e9ros de satellite",
-      "generateButton": "G\u00e9n\u00e9rer les meilleurs temps de passage",
-      "selectSensorFirst": "S\u00e9lectionnez d'abord un capteur !",
+      "title": "Meilleurs passages",
+      "satelliteNumbersLabel": "Numéros de satellite",
+      "generateButton": "Générer les meilleurs temps de passage",
+      "selectSensorFirst": "Sélectionnez d'abord un capteur !",
       "errorMsgs": {
-        "SensorRequired": "Vous devez d'abord s\u00e9lectionner un capteur !",
-        "SensorFormatError": "Format du capteur incorrect. Avez-vous s\u00e9lectionn\u00e9 un capteur ?"
+        "SensorRequired": "Vous devez d'abord sélectionner un capteur !",
+        "SensorFormatError": "Format du capteur incorrect. Avez-vous sélectionné un capteur ?",
+        "ResultsTruncated": "Limite de résultats atteinte : seuls les {limit} premiers passages par satellite sont affichés."
+      },
+      "help": {
+        "overview": "Meilleurs temps de passage note chaque passage à venir des satellites que vous indiquez au-dessus du capteur actuellement sélectionné et enregistre les résultats dans une feuille de calcul. Le score favorise une longue durée, une élévation maximale élevée, une distance courte et une position du soleil favorable, de sorte que les meilleures opportunités d'observation remontent en tête.",
+        "imgAlt": "Le menu Meilleurs temps de passage avec une liste de numéros de satellite",
+        "imgCaption": "Indiquez les numéros de satellite, puis générez une feuille de calcul des passages classés.",
+        "howToUse": "<ol><li>Sélectionnez d'abord un capteur ; tant que ce n'est pas fait, l'icône du bas est désactivée et le bouton affiche <strong>Sélectionnez d'abord un capteur !</strong>.</li><li>Ouvrez <strong>Meilleurs passages</strong> depuis le menu inférieur ou appuyez sur <strong>B</strong>.</li><li>Saisissez les satellites à évaluer dans <strong>Numéros de satellite</strong>, séparés par des virgules ou des espaces (par exemple 25544, 20580).</li><li>Cliquez sur <strong>Générer les meilleurs temps de passage</strong>. Une feuille de calcul est téléchargée avec une ligne par passage, incluant les dates et heures de début et de fin ainsi que la géométrie du passage.</li></ol>",
+        "tip1": "Les désignations Alpha-5 telles que T0001 fonctionnent aussi bien que les numéros de catalogue classiques.",
+        "tip2": "Les numéros qui ne correspondent à aucun objet du catalogue sont ignorés silencieusement ; vérifiez donc la liste si la feuille de calcul contient moins de satellites que prévu.",
+        "tip3": "Les résultats sont triés par ordre chronologique ; parcourez les colonnes d'élévation et de durée pour repérer les passages les plus intéressants.",
+        "shortcutToggle": "Afficher ou masquer le menu Meilleurs temps de passage"
       }
     }
   }

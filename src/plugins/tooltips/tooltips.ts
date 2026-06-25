@@ -88,7 +88,26 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       return;
     }
 
+    let isHovered = false;
+
+    const dismiss = () => {
+      if (this.showTimer_) {
+        clearTimeout(this.showTimer_);
+        this.showTimer_ = null;
+      }
+      this.hideTooltip();
+      this.isVisible_ = false;
+    };
+
     el.addEventListener('mouseenter', () => {
+      isHovered = true;
+
+      // A pending show for another element would otherwise leak through the shared timer
+      if (this.showTimer_) {
+        clearTimeout(this.showTimer_);
+        this.showTimer_ = null;
+      }
+
       if (this.isVisible_) {
         return;
       }
@@ -97,19 +116,29 @@ export class TooltipsPlugin extends KeepTrackPlugin {
 
       // Delay showing tooltip to avoid flicker on fast mouse movement
       this.showTimer_ = setTimeout(() => {
+        this.showTimer_ = null;
+
+        // The target may be gone or no longer hovered by the time the delay elapses
+        if (!isHovered || !(el as HTMLElement).isConnected) {
+          return;
+        }
+
         this.showTooltip(el as HTMLElement, text);
         this.isVisible_ = true;
       }, TooltipsPlugin.SHOW_DELAY_);
     });
 
     el.addEventListener('mouseleave', () => {
-      if (this.showTimer_) {
-        clearTimeout(this.showTimer_);
-        this.showTimer_ = null;
-      }
-      this.hideTooltip();
-      this.isVisible_ = false;
+      isHovered = false;
+      dismiss();
     });
+
+    /*
+     * Clicking a tooltipped control usually toggles UI that hides or replaces the
+     * target (e.g. a drawer item closing the drawer); no mouseleave fires for an
+     * element hidden under the cursor, which left the tooltip stuck on screen.
+     */
+    el.addEventListener('click', dismiss);
 
     el.style.cursor = 'pointer';
   }

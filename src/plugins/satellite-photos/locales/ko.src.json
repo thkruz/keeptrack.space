@@ -3,10 +3,29 @@
     "SatellitePhotos": {
       "bottomIconLabel": "위성 영상",
       "title": "위성 영상",
-      "helpBody": "위성 영상 플러그인은 정지궤도 기상위성과 DSCOVR의 최신 영상을 표시합니다. 위성 이름을 클릭하면 최신 영상을 볼 수 있습니다.",
       "defaultImageTitle": "최신 위성 영상",
+      "labels": {
+        "dscovrUnavailable": "DSCOVR 일시적으로 사용 불가",
+        "dscovrImage": "DSCOVR 영상 {index}",
+        "dscovrLoading": "DSCOVR 영상 불러오는 중…",
+        "refresh": "최신 영상 새로고침",
+        "imageAtUtc": "{name} {time} UTC"
+      },
+      "sections": {
+        "geostationary": "정지궤도",
+        "dscovr": "DSCOVR (L1)"
+      },
       "errorMsgs": {
         "FuturePictures": "미래의 영상을 불러올 수 없습니다. 가장 최근 영상을 불러오고 있습니다."
+      },
+      "help": {
+        "overview": "위성 영상은 실제 기상위성이 촬영한 최신 사진을 보여줍니다. 정지궤도의 MeteoSat, Himawari, GOES, Elektro-L이 촬영한 전체 디스크 영상과 L1 지점의 DSCOVR이 촬영한 지구 전체 영상이 포함됩니다. 시뮬레이션에서 보는 것과 그 위성들이 지금 실제로 촬영하고 있는 것을 연결해 줍니다.",
+        "imgAlt": "기상위성 목록이 표시된 위성 영상 메뉴",
+        "imgCaption": "위성을 클릭하면 최신 영상을 보고 장면에서 해당 위성으로 이동합니다.",
+        "howToUse": "<ol><li>하단 바에서 <strong>위성 영상</strong>을 열거나 <strong>H</strong> 키를 누르세요. 인터넷 연결이 필요합니다.</li><li>위성을 클릭하세요. 카메라가 3D 장면에서 해당 위성으로 이동하고 최신 영상이 오버레이로 열립니다.</li><li>DSCOVR 항목은 목록 맨 아래에 표시되며, 최근 영상 한 장당 하나의 항목이 있습니다.</li></ol>",
+        "tip1": "영상은 각 기관의 공개 서비스에서 실시간으로 제공되므로, 항목이 없으면 보통 해당 피드가 일시적으로 중단된 것이지 버그가 아닙니다.",
+        "tip2": "시뮬레이션 시계가 미래로 설정되어 있으면 대신 가장 최근의 실제 영상이 표시됩니다.",
+        "shortcutToggle": "위성 영상 메뉴 전환"
       }
     }
   }

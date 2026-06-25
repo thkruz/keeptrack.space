@@ -199,6 +199,11 @@ function prioritySweep(simTimeMs: number): void {
 // ─── Full Sweep (batched with yields) ────────────────────────────────────────
 
 const BATCH_SIZE = 200;
+/**
+ * Emit a partial sweep snapshot every N batches so the overlay fades in
+ * progressively instead of staying blank until the whole catalog is swept.
+ */
+const PARTIAL_EMIT_BATCHES = 16;
 
 /** Run a full sweep of all satellites, batched with yields for responsiveness. */
 async function fullSweep(simTimeMs: number): Promise<void> {
@@ -216,6 +221,7 @@ async function fullSweep(simTimeMs: number): Promise<void> {
   // Phase 2: Process remaining satellites with coarser step
   const coarseStep = Math.max(sweepStepMin * 2, 2);
   let processed = 0;
+  let batchesSinceEmit = 0;
 
   for (let start = 0; start < numObjects && !cancelled; start += BATCH_SIZE) {
     const end = Math.min(start + BATCH_SIZE, numObjects);
@@ -246,6 +252,22 @@ async function fullSweep(simTimeMs: number): Promise<void> {
       typ: FovPredOutMsgType.PROGRESS,
       progress: processed / numObjects,
     });
+
+    // Periodically publish a partial snapshot so the overlay fills in as the
+    // sweep runs. Skip the final batch — FULL_SWEEP_COMPLETE below covers it.
+    batchesSinceEmit++;
+    if (batchesSinceEmit >= PARTIAL_EMIT_BATCHES && end < numObjects) {
+      batchesSinceEmit = 0;
+      const partial = new Float32Array(localMinutesToEntry);
+
+      postMessage(
+        {
+          typ: FovPredOutMsgType.INCREMENTAL_UPDATE,
+          minutesToEntry: partial,
+        },
+        { transfer: [partial.buffer] },
+      );
+    }
 
     // Yield to allow message processing
     await new Promise<void>((resolve) => setTimeout(resolve, 0));

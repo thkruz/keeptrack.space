@@ -7,7 +7,59 @@
         "import": "Importer",
         "export": "Exporter"
       },
-      "helpBody": "Le menu de gestion du catalogue fournit des outils pour importer et exporter les données du catalogue de satellites. <b>Onglet Importer :</b> Chargez un fichier catalogue .tce, .tle ou .txt via le sélecteur de fichiers ou le glisser-déposer. <b>Onglet Exporter :</b> <ul style=\"margin-left: 40px;\"> <li>Exporter les TLEs officiels – Exporter les vrais ensembles d'éléments à deux lignes.</li> <li>Exporter les 3LEs – Exporter les ensembles d'éléments à trois lignes.</li> <li>Exporter les TLEs KeepTrack – Exporter tous les ensembles d'éléments à deux lignes KeepTrack y compris les analystes.</li> <li>Exporter les 3LEs KeepTrack – Exporter tous les ensembles d'éléments à trois lignes KeepTrack y compris les analystes.</li> <li>Exporter le catalogue CSV – Exporter les données du catalogue en CSV.</li> <li>Exporter STK .tce – Exporter les données TLE au format de base de données de satellites STK.</li> <li>Exporter les satellites dans le FOV – Exporter les satellites actuellement dans le champ de vision.</li> <li>Exporter les éphémérides .e – Exporter les éphémérides propagées du satellite sélectionné au format STK.</li> </ul>"
+      "labels": {
+        "dropzone": "Déposez un fichier .tce, .tle ou .txt pour charger le catalogue",
+        "keepSatInfo": "Conserver les informations des satellites",
+        "keepSatInfoTooltip": "Met à jour les TLE des satellites existants tout en conservant leur nom, leur pays et leurs données de mission. Les satellites absents du fichier importé sont supprimés.",
+        "importNewOnly": "Importer uniquement les nouveaux satellites",
+        "importNewOnlyTooltip": "Ajoute uniquement les satellites absents du catalogue actuel. Les satellites existants restent inchangés.",
+        "orbitalElements": "Éléments orbitaux",
+        "tabularStk": "Tableur et STK",
+        "selectedSatellite": "Satellite sélectionné",
+        "tleSource": "Source",
+        "tleFormat": "Format",
+        "timeSpanHrs": "Durée (h)",
+        "stepSizeSec": "Pas de temps (s)"
+      },
+      "options": {
+        "sourceOfficial": "Officiel",
+        "sourceKeepTrack": "KeepTrack",
+        "format2": "2 lignes (TLE)",
+        "format3": "3 lignes (avec nom)"
+      },
+      "buttons": {
+        "importCatalog": "Importer le catalogue",
+        "downloadTle": "Exporter au format TLE",
+        "exportCatalogXlsx": "Exporter le catalogue XLSX",
+        "exportStkTce": "Exporter STK .tce",
+        "exportSatsInFov": "Exporter les satellites dans le FOV",
+        "exportEphemeris": "Exporter les éphémérides .e",
+        "selectSatelliteFirst": "Sélectionnez d'abord un satellite"
+      },
+      "toasts": {
+        "noValidFileInDrop": "Aucun fichier .tce, .tle ou .txt trouvé dans le dépôt",
+        "noValidTleData": "Aucune donnée TLE valide trouvée dans le fichier",
+        "unsupportedFileType": "Type de fichier non pris en charge. Utilisez .tce, .tle ou .txt",
+        "noNewSats": "Aucun nouveau satellite trouvé dans le fichier",
+        "addedNewSats": "{count} nouveau(x) satellite(s) ajouté(s) depuis {file}",
+        "loadedCatalog": "Catalogue chargé depuis {file}",
+        "failedToLoad": "Échec du chargement de {file}",
+        "noSatelliteSelected": "Aucun satellite sélectionné !",
+        "exportTooLarge": "Export trop volumineux. Réduisez la plage de temps ou augmentez le pas.",
+        "failedToPropagate": "Échec de la propagation du satellite !"
+      },
+      "help": {
+        "overview": "La gestion du catalogue fait entrer et sortir les données de satellites de KeepTrack. L'onglet Importer charge un fichier catalogue depuis le disque, en remplaçant ou en mettant à jour le catalogue actuel ; l'onglet Exporter écrit le catalogue actif dans plusieurs formats, des simples fichiers TLE aux feuilles de calcul et produits STK.",
+        "imgAlt": "Le menu Gestion du catalogue avec les onglets Importer et Exporter",
+        "imgCaption": "Importez un fichier catalogue ou exportez le catalogue actif dans plusieurs formats.",
+        "importHeading": "Importation",
+        "import": "Chargez un fichier <strong>.tce</strong>, <strong>.tle</strong> ou <strong>.txt</strong> avec le bouton <strong>Importer le catalogue</strong> ou en faisant glisser le fichier sur la zone de dépôt. Avec <strong>Conserver les informations des satellites</strong> activé, les satellites existants conservent leurs noms, pays et données de mission et seules leurs orbites sont mises à jour ; les satellites absents du fichier sont supprimés. Désactivé, le fichier remplace entièrement le catalogue.",
+        "exportHeading": "Exportation",
+        "export": "<ul><li><strong>Éléments orbitaux</strong> : téléchargez des ensembles d'éléments TLE/3LE. Choisissez une <strong>Source</strong> (Officiel ne conserve que les vrais objets catalogués ; KeepTrack inclut les satellites analystes que vous avez créés) et un <strong>Format</strong> (2 lignes, ou 3 lignes avec le nom du satellite), puis <strong>Télécharger le TLE</strong>.</li><li><strong>Tableur et STK</strong> : exportez le catalogue complet sous forme de feuille de calcul XLSX, de base de données STK .tce, ou uniquement les satellites actuellement dans le champ de vision du capteur sélectionné.</li><li><strong>Satellite sélectionné</strong> : avec un satellite sélectionné, écrivez des éphémérides STK .e propagées selon la <strong>Durée (h)</strong> et le <strong>Pas de temps (s)</strong> définis.</li></ul>",
+        "howToUse": "<ol><li>Ouvrez <strong>Gestion du catalogue</strong> depuis la barre inférieure (mode Outils).</li><li>Pour importer : choisissez l'onglet <strong>Importer</strong>, décidez de conserver ou non les informations des satellites, puis sélectionnez ou déposez un fichier.</li><li>Pour exporter : choisissez l'onglet <strong>Exporter</strong>, réglez les options et cliquez sur l'export souhaité ; les fichiers se téléchargent immédiatement.</li><li>Pour les exports par satellite, sélectionnez d'abord un satellite ; ces boutons restent désactivés tant qu'aucun n'est sélectionné.</li></ol>",
+        "tip1": "Conserver les informations des satellites est le choix sûr par défaut pour rafraîchir les orbites depuis un fichier TLE plus récent ; ne le désactivez que pour remplacer délibérément tout le catalogue.",
+        "tip2": "Les imports et modifications n'existent que dans votre session ; exportez avant de recharger la page si vous voulez les conserver."
+      }
     }
   }
 }

@@ -3,7 +3,32 @@
     "SensorListPlugin": {
       "bottomIconLabel": "传感器",
       "title": "传感器列表菜单",
-      "helpBody": "传感器菜单允许您选择用于计算和其他菜单功能的传感器。传感器根据其主要支持的网络分组。菜单左侧显示传感器名称，右侧显示所属国家/组织。<br><br>选择“全部...传感器”选项将选择该组中的所有传感器。这对于可视化网络覆盖范围很有用，但目前并非所有计算都支持。如果您想为网络计算观测角度，建议使用多站点观测角工具，或分别为网络中的每个传感器计算观测角。<br><br>此列表中的传感器包括机械和相控阵雷达，以及光学传感器：<ul style=\"margin-left: 40px;\"> <li>相控阵雷达通常仅限于近地轨道（LEO）。</li> <li>机械雷达可用于LEO和地球同步轨道（GEO）。</li> <li>光学传感器通常用于GEO，但也可用于LEO。</li> <li>光学传感器仅限于晴朗夜晚观测，而雷达可用于昼夜。</li> </ul><br>传感器信息基于公开数据，可在传感器信息菜单中验证。如果您有更多公开传感器数据或修正建议，请联系<a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>。"
+      "labels": {
+        "missingData": "缺失数据",
+        "tooltipSensorsInFov": "可视化传感器覆盖范围"
+      },
+      "buttons": {
+        "resetSensor": "重置传感器",
+        "showSensorsWithFov": "显示所有传感器及其视场..."
+      },
+      "commands": {
+        "category": "传感器",
+        "setSensor": "将当前传感器设为 {name}",
+        "setSensorGroup": "设置传感器组：{name}"
+      },
+      "help": {
+        "overview": "传感器菜单用于选择应用其余功能进行计算所依据的地面站。传感器按其主要支持的网络分组，每个条目左侧显示传感器名称，右侧显示所属国家或组织。所选传感器决定观测角、视场锥、监视列表过境提醒以及所有其他依赖传感器的菜单。",
+        "imgAlt": "显示按网络分组的传感器的传感器菜单",
+        "imgCaption": "传感器按网络分组。点击组标题可一次选择整个网络。",
+        "sensorTypesHeading": "传感器类型",
+        "sensorTypes": "<ul><li><strong>相控阵雷达</strong>：扫描范围广、速度快；通常仅限于近地轨道（LEO）。</li><li><strong>机械雷达</strong>：可转向的天线，可用于LEO和地球同步轨道（GEO）。</li><li><strong>光学望远镜</strong>：主要用于GEO和深空；它们只能在晴朗的夜间工作，而雷达可昼夜工作。</li></ul>",
+        "howToUse": "<ol><li>从底部栏打开菜单或按S键。</li><li>点击单个传感器进行选择，相机会飞到其位置。</li><li>或点击组标题（例如\"All Space Surveillance Network Sensors\"）选择整个网络，非常适合可视化覆盖范围。</li><li>使用<strong>重置传感器</strong>清除选择。</li></ol>",
+        "tip1": "许多计算（如观测角）需要单个传感器。如果您选择了整个网络，请改用多站观测角菜单，或一次选择一个传感器。",
+        "tip2": "每个传感器也可以从命令面板访问：输入传感器名称即可切换，无需打开此菜单。",
+        "tip3": "传感器参数来自公开数据；您可以在传感器信息菜单中查看。欢迎将修正建议发送至admin@keeptrack.space。",
+        "shortcutToggle": "切换传感器菜单",
+        "shortcutCamera": "将相机对准当前传感器"
+      }
     }
   }
 }

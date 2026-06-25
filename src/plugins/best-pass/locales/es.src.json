@@ -1,15 +1,28 @@
 {
   "plugins": {
     "BestPassPlugin": {
+      "sections": {
+        "search": "Búsqueda"
+      },
       "bottomIconLabel": "Mejores pases",
-      "title": "Mejores tiempos de pase",
-      "helpBody": "El plugin de Mejores tiempos de pase calcula los tiempos \u00f3ptimos de paso de sat\u00e9lites seg\u00fan el sensor seleccionado actualmente. Los pases se eval\u00faan por duraci\u00f3n, elevaci\u00f3n m\u00e1xima, alcance m\u00ednimo y posici\u00f3n del sol. Los resultados se exportan como CSV.",
-      "satelliteNumbersLabel": "N\u00fameros de sat\u00e9lite",
+      "title": "Mejores pases",
+      "satelliteNumbersLabel": "Números de satélite",
       "generateButton": "Generar mejores tiempos de pase",
-      "selectSensorFirst": "\u00a1Seleccione sensor primero!",
+      "selectSensorFirst": "¡Seleccione sensor primero!",
       "errorMsgs": {
-        "SensorRequired": "\u00a1Debe seleccionar un sensor primero!",
-        "SensorFormatError": "Formato del sensor incorrecto. \u00bfSeleccion\u00f3 un sensor primero?"
+        "SensorRequired": "¡Debe seleccionar un sensor primero!",
+        "SensorFormatError": "Formato del sensor incorrecto. ¿Seleccionó un sensor primero?",
+        "ResultsTruncated": "Límite de resultados alcanzado: solo se muestran los primeros {limit} pases por satélite."
+      },
+      "help": {
+        "overview": "Mejores tiempos de pase puntúa cada pase próximo de los satélites que indique sobre el sensor actualmente seleccionado y guarda los resultados en una hoja de cálculo. La puntuación premia la larga duración, la elevación máxima alta, el alcance corto y una posición del sol favorable, de modo que las mejores oportunidades de observación quedan arriba.",
+        "imgAlt": "El menú de Mejores tiempos de pase con una lista de números de satélite",
+        "imgCaption": "Indique los números de satélite y luego genere una hoja de cálculo con los pases clasificados.",
+        "howToUse": "<ol><li>Seleccione primero un sensor; hasta entonces el icono inferior está deshabilitado y el botón muestra <strong>¡Seleccione sensor primero!</strong>.</li><li>Abra <strong>Mejores pases</strong> desde el menú inferior o pulse <strong>B</strong>.</li><li>Introduzca los satélites a evaluar en <strong>Números de satélite</strong>, separados por comas o espacios (por ejemplo, 25544, 20580).</li><li>Haga clic en <strong>Generar mejores tiempos de pase</strong>. Se descarga una hoja de cálculo con una fila por pase, incluidas las fechas y horas de inicio y fin y la geometría del pase.</li></ol>",
+        "tip1": "Los designadores Alpha-5, como T0001, funcionan igual que los números de catálogo normales.",
+        "tip2": "Los números que no coinciden con ningún objeto del catálogo se omiten en silencio, así que revise la lista si la hoja de cálculo tiene menos satélites de los esperados.",
+        "tip3": "Los resultados se ordenan cronológicamente, así que examine las columnas de elevación y duración para encontrar los pases más destacados.",
+        "shortcutToggle": "Alternar el menú de Mejores tiempos de pase"
       }
     }
   }

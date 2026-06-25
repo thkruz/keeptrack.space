@@ -96,43 +96,19 @@ describe('BreakupAnalysis_class', () => {
     });
   });
 
-  describe('statistical helpers', () => {
-    it('should return zero stats for empty debris list', () => {
+  describe('command palette', () => {
+    it('exposes Open and Export commands', () => {
       const plugin = new BreakupAnalysis();
+      const commands = plugin.getCommandPaletteCommands();
 
-      plugin.debrisResults_ = [];
-
-      const altStats = plugin.calcAltitudeStats_();
-
-      expect(altStats.minPerigee).toBe(0);
-      expect(altStats.maxPerigee).toBe(0);
-      expect(altStats.meanPerigee).toBe(0);
+      expect(commands.map((c) => c.id)).toEqual(['BreakupAnalysis.open', 'BreakupAnalysis.export']);
     });
 
-    it('should return zero counts for empty debris list', () => {
+    it('gates Export availability on having tracked fragments', () => {
       const plugin = new BreakupAnalysis();
+      const exportCmd = plugin.getCommandPaletteCommands().find((c) => c.id === 'BreakupAnalysis.export')!;
 
-      plugin.debrisResults_ = [];
-
-      const counts = plugin.countByType_();
-
-      expect(counts.payloads).toBe(0);
-      expect(counts.rocketBodies).toBe(0);
-      expect(counts.debris).toBe(0);
-    });
-
-    it('should calculate field stats correctly', () => {
-      const result = BreakupAnalysis.calcFieldStats_([], () => 0);
-
-      expect(result.min).toBe(0);
-      expect(result.max).toBe(0);
-      expect(result.mean).toBe(0);
-    });
-
-    it('should calculate years between dates', () => {
-      const years = BreakupAnalysis.calcYearsBetween_('2000-01-01', '2010-01-01');
-
-      expect(parseFloat(years)).toBeCloseTo(10, 0);
+      expect(exportCmd.isAvailable?.()).toBe(false);
     });
   });
 
@@ -142,13 +118,16 @@ describe('BreakupAnalysis_class', () => {
 
       websiteInit(plugin);
 
-      plugin.selectedEventId_ = 'fengyun1c';
-      plugin.debrisResults_ = [{} as any];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const p = plugin as any;
 
-      plugin.showEventList_();
+      p.selectedEventId_ = 'fengyun1c';
+      p.debrisResults_ = [{}];
 
-      expect(plugin.selectedEventId_).toBeNull();
-      expect(plugin.debrisResults_).toHaveLength(0);
+      p.showEventList_();
+
+      expect(p.selectedEventId_).toBeNull();
+      expect(p.debrisResults_).toHaveLength(0);
     });
   });
 });

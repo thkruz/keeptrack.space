@@ -1,5 +1,6 @@
 /* eslint-disable prefer-const */
 /* eslint-disable complexity */
+import { initMaterialSelects, refreshMaterialSelect, syncMaterialSelect } from '@app/engine/ui/material-select';
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
 import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
 import { CameraType } from '@app/engine/camera/camera-type';
@@ -23,6 +24,18 @@ import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Degrees, Hours, Kilometers, Minutes, Satellite, eci2rae } from '@ootk/src/main';
 import findSatPng from '@public/img/icons/database-search.png';
+import './find-sat.css';
+import {
+  LookAngleResolver,
+  filterByArgOfPerigee,
+  filterByInclination,
+  filterByLookAngle,
+  filterByObjType,
+  filterByPeriod,
+  filterByRcs,
+  filterByRightAscension,
+  filterByTleAge,
+} from './find-sat-filters';
 
 export interface SearchSatParams {
   argPe: Degrees;
@@ -35,7 +48,8 @@ export interface SearchSatParams {
   elMarg: Degrees;
   inc: Degrees;
   incMarg: Degrees;
-  objType: number;
+  /** 0 = all types; a single type or a list of types to match */
+  objType: number | number[];
   payload: string;
   period: Minutes;
   periodMarg: Minutes;
@@ -56,6 +70,12 @@ export class FindSatPlugin extends KeepTrackPlugin {
   protected lastResults_ = <Satellite[]>[];
   protected hasSearchBeenRun_ = false;
 
+  /** Filter type ids that can only be evaluated relative to a selected sensor. */
+  protected static readonly SENSOR_REQUIRED_FILTER_IDS_ = ['az', 'el', 'rng'];
+
+  /** DOM id of the element that displays the result count (Pro overrides). */
+  protected resultCountElId_ = 'fbl-result-count';
+
   // =========================================================================
   // Composition-based configuration methods
   // =========================================================================
@@ -63,7 +83,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
   getBottomIconConfig(): IBottomIconConfig {
     return {
       elementName: 'find-satellite-bottom-icon',
-      label: 'Find Satellite',
+      label: t7e('plugins.FindSatPlugin.bottomIconLabel'),
       image: findSatPng,
       menuMode: [MenuMode.CATALOG, MenuMode.ALL],
     };
@@ -73,7 +93,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
   getSideMenuConfig(): ISideMenuConfig {
     return {
       elementName: 'findByLooks-menu',
-      title: 'Find Satellite',
+      title: t7e('plugins.FindSatPlugin.title'),
       html: this.buildSideMenuHtml_(),
       dragOptions: this.getDragOptions_(),
     };
@@ -90,7 +110,32 @@ export class FindSatPlugin extends KeepTrackPlugin {
   getHelpConfig(): IHelpConfig {
     return {
       title: t7e('plugins.FindSatPlugin.title'),
-      body: t7e('plugins.FindSatPlugin.helpBody'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.FindSatPlugin.help.overview'),
+          image: {
+            src: 'img/help/find-sat/find-sat-menu.png',
+            alt: t7e('plugins.FindSatPlugin.help.imgAlt'),
+            caption: t7e('plugins.FindSatPlugin.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.FindSatPlugin.help.filtersHeading'),
+          content: t7e('plugins.FindSatPlugin.help.filters'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.FindSatPlugin.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.FindSatPlugin.help.tip1'),
+        t7e('plugins.FindSatPlugin.help.tip2'),
+        t7e('plugins.FindSatPlugin.help.tip3'),
+        t7e('plugins.FindSatPlugin.help.tip4'),
+      ],
+      shortcuts: [{ keys: ['Ctrl', 'F'], description: t7e('plugins.FindSatPlugin.help.shortcutToggle') }],
     };
   }
 
@@ -123,178 +168,226 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
     return html`
       <form id="findByLooks-menu-form">
-        <div class="row">
-          <div class="input-field col s12">
-            <select value=0 id="fbl-type" type="text">
-              <option value=0>${l('all')}</option>
-              <option value=1>Payload</option>
-              <option value=2>Rocket Body</option>
-              <option value=3>Debris</option>
-            </select>
-            <label for="disabled">${l('objectType')}</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12">
-            <select value=0 id="fbl-country" type="text">
-              <option value='All'>${l('all')}</option>
-            </select>
-            <label for="disabled">${l('country')}</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12">
-            <input placeholder="Type to filter bus options" id="fbl-bus-filter" type="text">
-            <label for="fbl-bus-filter" class="active">${l('satelliteBus')} Filter</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12">
-            <select value=0 id="fbl-bus" type="text">
-              <option value='All'>${l('all')}</option>
-            </select>
-            <label for="disabled">${l('satelliteBus')}</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12">
-            <input placeholder="Type to filter payload options" id="fbl-payload-filter" type="text">
-            <label for="fbl-payload-filter" class="active">${l('payload')} Filter</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12">
-            <select value=0 id="fbl-payload" type="text">
-              <option value='All'>${l('all')}</option>
-            </select>
-            <label for="disabled">${l('payload')}</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12">
-            <select value=0 id="fbl-shape" type="text">
-              <option value='All'>${l('all')}</option>
-            </select>
-            <label for="disabled">${l('shape')}</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12">
-            <select value=0 id="fbl-source" type="text">
-              <option value='All'>${l('all')}</option>
-            </select>
-            <label for="disabled">${l('source')}</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12 m6 l6">
-            <input placeholder="xxx.x" id="fbl-azimuth" type="text">
-            <label for="fbl-azimuth" class="active">${l('azimuth')}</label>
-          </div>
-          <div class="input-field col s12 m6 l6">
-            <input placeholder="5" id="fbl-azimuth-margin" type="text">
-            <label for="fbl-azimuth-margin" class="active">${l('azimuthMargin')}</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12 m6 l6">
-            <input placeholder="XX.X" id="fbl-elevation" type="text">
-            <label for="fbl-elevation" class="active">${l('elevation')}</label>
-          </div>
-          <div class="input-field col s12 m6 l6">
-            <input placeholder="5" id="fbl-elevation-margin" type="text">
-            <label for="fbl-elevation-margin" class="active">${l('elevationMargin')}</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12 m6 l6">
-            <input placeholder="xxxx.x" id="fbl-range" type="text">
-            <label for="fbl-range" class="active">${l('range')}</label>
-          </div>
-          <div class="input-field col s12 m6 l6">
-            <input placeholder="500" id="fbl-range-margin" type="text">
-            <label for="fbl-range-margin" class="active">${l('rangeMargin')}</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12 m6 l6">
-            <input placeholder="XX.X" id="fbl-inc" type="text">
-            <label for="fbl-inc" class="active">${l('inclination')}</label>
-          </div>
-          <div class="input-field col s12 m6 l6">
-            <input value="0.5" placeholder="0.5" id="fbl-inc-margin" type="text">
-            <label for="fbl-inc-margin" class="active">${l('inclinationMargin')}</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12 m6 l6">
-            <input placeholder="XX.X" id="fbl-period" type="text">
-            <label for="fbl-period" class="active">${l('period')}</label>
-          </div>
-          <div class="input-field col s12 m6 l6">
-            <input value="10" placeholder="10" id="fbl-period-margin" type="text">
-            <label for="fbl-period-margin" class="active">${l('periodMargin')}</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12 m6 l6">
-            <input placeholder="XX.X" id="fbl-tleAge" type="text">
-            <label for="fbl-tleAge" class="active">${l('tleAge')}</label>
-          </div>
-          <div class="input-field col s12 m6 l6">
-            <input value="1" placeholder="1" id="fbl-tleAge-margin" type="text">
-            <label for="fbl-tleAge-margin" class="active">${l('tleAgeMargin')}</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12 m6 l6">
-            <input placeholder="XX.X" id="fbl-rcs" type="text">
-            <label for="fbl-rcs" class="active">${l('rcs')}</label>
-          </div>
-          <div class="input-field col s12 m6 l6">
-            <input value="10" placeholder="10" id="fbl-rcs-margin" type="text">
-            <label for="fbl-rcs-margin" class="active">${l('rcsMargin')}</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12 m6 l6">
-            <input placeholder="XX.X" id="fbl-raan" type="text">
-            <label for="fbl-raan" class="active">${l('rightAscension')}</label>
-          </div>
-          <div class="input-field col s12 m6 l6">
-            <input value="0.5" placeholder="0.5" id="fbl-raan-margin" type="text">
-            <label for="fbl-raan-margin" class="active">${l('rightAscensionMargin')}</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s12 m6 l6">
-            <input placeholder="XX.X" id="fbl-argPe" type="text">
-            <label for="fbl-argPe" class="active">${l('argOfPerigee')}</label>
-          </div>
-          <div class="input-field col s12 m6 l6">
-            <input value="0.5" placeholder="0.5" id="fbl-argPe-margin" type="text">
-            <label for="fbl-argPe-margin" class="active">${l('argOfPerigeeMargin')}</label>
-          </div>
-        </div>
-        <div class="row">
-          <center>
-            <button id="findByLooks-submit" class="btn btn-ui waves-effect waves-light" type="submit"
-              name="action">${l('findSatellites')} &#9658;
-            </button>
-          </center>
-        </div>
-        <div class="row">
-          <center>
-            <button id="findByLooks-export" class="btn btn-ui waves-effect waves-light" type="button"
-              name="action">${l('exportData')} &#9658;
-            </button>
-          </center>
-        </div>
+        ${this.classificationBody_()}
+        ${this.lookAnglesBody_()}
+        ${this.orbitalElementsBody_()}
+        ${this.physicalBody_()}
+        ${FindSatPlugin.actionButton_('findByLooks-submit', l('findSatellites'), { submit: true })}
+        ${FindSatPlugin.actionButton_('findByLooks-export', l('exportData'))}
       </form>
-      <div class="row center-align" style="margin-top:20px;">
+      <div id="fbl-result-count" class="fbl-result-count"></div>
+      <div class="row center-align" style="margin-top:12px;">
         <span id="fbl-error" class="menu-selectable"></span>
       </div>
     `;
+  }
+
+  /** Wrap a section's controls in a titled v13 card. */
+  protected wrapSection_(title: string, body: string): string {
+    return html`
+      <section class="kt-section">
+        <div class="kt-section-label">${title}</div>
+        ${body}
+      </section>
+    `;
+  }
+
+  /** A full-width v13 action row (label + trailing chevron via CSS). */
+  protected static actionButton_(id: string, label: string, opts: { submit?: boolean; disabled?: boolean } = {}): string {
+    const type = opts.submit ? 'submit' : 'button';
+    const disabled = opts.disabled ? ' disabled' : '';
+
+    return html`
+      <button id="${id}" type="${type}" class="kt-action waves-effect"${disabled}>
+        <span class="kt-action-label">${label}</span>
+      </button>
+    `;
+  }
+
+  /** Object classification filters (type, country, bus, payload, shape, source). */
+  protected classificationBody_(): string {
+    const l = (key: string) => t7e(`plugins.FindSatPlugin.labels.${key}` as Parameters<typeof t7e>[0]);
+
+    return this.wrapSection_(l('sectionClassification'), html`
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <select id="fbl-type" multiple>
+            <option value=0 selected>${l('all')}</option>
+            <option value=1>${l('typePayload')}</option>
+            <option value=2>${l('typeRocketBody')}</option>
+            <option value=3>${l('typeDebris')}</option>
+          </select>
+          <label for="fbl-type">${l('objectType')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <select id="fbl-country" multiple>
+            <option value='All' selected>${l('all')}</option>
+          </select>
+          <label for="fbl-country">${l('country')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <input placeholder="${l('busFilterPlaceholder')}" id="fbl-bus-filter" type="text">
+          <label for="fbl-bus-filter" class="active">${l('satelliteBusFilter')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <select value=0 id="fbl-bus" type="text">
+            <option value='All'>${l('all')}</option>
+          </select>
+          <label for="fbl-bus">${l('satelliteBus')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <input placeholder="${l('payloadFilterPlaceholder')}" id="fbl-payload-filter" type="text">
+          <label for="fbl-payload-filter" class="active">${l('payloadFilter')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <select value=0 id="fbl-payload" type="text">
+            <option value='All'>${l('all')}</option>
+          </select>
+          <label for="fbl-payload">${l('payload')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <select value=0 id="fbl-shape" type="text">
+            <option value='All'>${l('all')}</option>
+          </select>
+          <label for="fbl-shape">${l('shape')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <select value=0 id="fbl-source" type="text">
+            <option value='All'>${l('all')}</option>
+          </select>
+          <label for="fbl-source">${l('source')}</label>
+        </div>
+      </div>
+    `);
+  }
+
+  /** Sensor-relative look-angle filters (azimuth, elevation, range). */
+  protected lookAnglesBody_(): string {
+    const l = (key: string) => t7e(`plugins.FindSatPlugin.labels.${key}` as Parameters<typeof t7e>[0]);
+
+    return this.wrapSection_(l('sectionLookAngles'), html`
+      <div class="kt-note">${l('sensorNote')}</div>
+      <div class="kt-field-row">
+        <div class="input-field col s6">
+          <input placeholder="xxx.x" id="fbl-azimuth" type="text">
+          <label for="fbl-azimuth" class="active">${l('azimuth')}</label>
+        </div>
+        <div class="input-field col s6">
+          <input placeholder="5" id="fbl-azimuth-margin" type="text">
+          <label for="fbl-azimuth-margin" class="active">${l('azimuthMargin')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s6">
+          <input placeholder="XX.X" id="fbl-elevation" type="text">
+          <label for="fbl-elevation" class="active">${l('elevation')}</label>
+        </div>
+        <div class="input-field col s6">
+          <input placeholder="5" id="fbl-elevation-margin" type="text">
+          <label for="fbl-elevation-margin" class="active">${l('elevationMargin')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s6">
+          <input placeholder="xxxx.x" id="fbl-range" type="text">
+          <label for="fbl-range" class="active">${l('range')}</label>
+        </div>
+        <div class="input-field col s6">
+          <input placeholder="500" id="fbl-range-margin" type="text">
+          <label for="fbl-range-margin" class="active">${l('rangeMargin')}</label>
+        </div>
+      </div>
+    `);
+  }
+
+  /** Orbital-element filters (inclination, period, RAAN, argument of perigee). */
+  protected orbitalElementsBody_(): string {
+    const l = (key: string) => t7e(`plugins.FindSatPlugin.labels.${key}` as Parameters<typeof t7e>[0]);
+
+    return this.wrapSection_(l('sectionOrbital'), html`
+      <div class="kt-field-row">
+        <div class="input-field col s6">
+          <input placeholder="XX.X" id="fbl-inc" type="text">
+          <label for="fbl-inc" class="active">${l('inclination')}</label>
+        </div>
+        <div class="input-field col s6">
+          <input value="0.5" placeholder="0.5" id="fbl-inc-margin" type="text">
+          <label for="fbl-inc-margin" class="active">${l('inclinationMargin')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s6">
+          <input placeholder="XX.X" id="fbl-period" type="text">
+          <label for="fbl-period" class="active">${l('period')}</label>
+        </div>
+        <div class="input-field col s6">
+          <input value="10" placeholder="10" id="fbl-period-margin" type="text">
+          <label for="fbl-period-margin" class="active">${l('periodMargin')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s6">
+          <input placeholder="XX.X" id="fbl-raan" type="text">
+          <label for="fbl-raan" class="active">${l('rightAscension')}</label>
+        </div>
+        <div class="input-field col s6">
+          <input value="0.5" placeholder="0.5" id="fbl-raan-margin" type="text">
+          <label for="fbl-raan-margin" class="active">${l('rightAscensionMargin')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s6">
+          <input placeholder="XX.X" id="fbl-argPe" type="text">
+          <label for="fbl-argPe" class="active">${l('argOfPerigee')}</label>
+        </div>
+        <div class="input-field col s6">
+          <input value="0.5" placeholder="0.5" id="fbl-argPe-margin" type="text">
+          <label for="fbl-argPe-margin" class="active">${l('argOfPerigeeMargin')}</label>
+        </div>
+      </div>
+    `);
+  }
+
+  /** Physical and data-quality filters (TLE age, RCS). */
+  protected physicalBody_(): string {
+    const l = (key: string) => t7e(`plugins.FindSatPlugin.labels.${key}` as Parameters<typeof t7e>[0]);
+
+    return this.wrapSection_(l('sectionPhysical'), html`
+      <div class="kt-field-row">
+        <div class="input-field col s6">
+          <input placeholder="XX.X" id="fbl-tleAge" type="text">
+          <label for="fbl-tleAge" class="active">${l('tleAge')}</label>
+        </div>
+        <div class="input-field col s6">
+          <input value="1" placeholder="1" id="fbl-tleAge-margin" type="text">
+          <label for="fbl-tleAge-margin" class="active">${l('tleAgeMargin')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s6">
+          <input placeholder="XX.X" id="fbl-rcs" type="text">
+          <label for="fbl-rcs" class="active">${l('rcs')}</label>
+        </div>
+        <div class="input-field col s6">
+          <input value="10" placeholder="10" id="fbl-rcs-margin" type="text">
+          <label for="fbl-rcs-margin" class="active">${l('rcsMargin')}</label>
+        </div>
+      </div>
+    `);
   }
 
   // =========================================================================
@@ -339,6 +432,9 @@ export class FindSatPlugin extends KeepTrackPlugin {
       getEl('fbl-country')!.insertAdjacentHTML('beforeend', `<option value="${countryCodeList[countryName]}">${countryName}</option>`);
     });
 
+    FindSatPlugin.wireAllOptionExclusivity_('fbl-type', '0');
+    FindSatPlugin.wireAllOptionExclusivity_('fbl-country', 'All');
+
     getUnique(satData.filter((obj: BaseObject) => (obj as Satellite)?.shape).map((obj) => (obj as Satellite).shape))
       // Sort using lower case
       .sort((a, b) => (a).toLowerCase().localeCompare((b).toLowerCase()))
@@ -378,6 +474,14 @@ export class FindSatPlugin extends KeepTrackPlugin {
     getEl('findByLooks-export')?.addEventListener('click', () => {
       this.onDownload();
     });
+
+    // Opt this menu into the v13+ card UI and style its Materialize selects.
+    const menuRoot = getEl('findByLooks-menu', true);
+
+    if (menuRoot) {
+      menuRoot.classList.add('kt-ui-v13');
+      initMaterialSelects(menuRoot);
+    }
   }
 
   protected static addSelectFilter_(filterInputId: string, selectId: string): void {
@@ -405,133 +509,192 @@ export class FindSatPlugin extends KeepTrackPlugin {
   }
 
   protected static refreshMaterializeSelect_(select: HTMLSelectElement): void {
-    const formSelect = (window.M as typeof window.M & {
-      FormSelect?: {
-        getInstance?: (el: Element) => { destroy?: () => void } | undefined;
-        init?: (el: Element) => void;
-      };
-    } | undefined)?.FormSelect;
-
-    formSelect?.getInstance?.(select)?.destroy?.();
-    formSelect?.init?.(select);
+    refreshMaterialSelect(select);
   }
 
-  protected findByLooksSubmit_(): Promise<void> {
+  /**
+   * Keep the "All" option mutually exclusive with specific values in a
+   * multi-select: picking a specific value drops "All", and picking "All"
+   * clears the specific values.
+   */
+  private static wireAllOptionExclusivity_(selectId: string, allValue: string): void {
+    const select = getEl(selectId, true) as HTMLSelectElement | null;
+
+    if (!select) {
+      return;
+    }
+
+    let prevHadAll = Array.from(select.selectedOptions).some((option) => option.value === allValue);
+
+    select.addEventListener('change', () => {
+      const selected = Array.from(select.selectedOptions);
+      const hasAll = selected.some((option) => option.value === allValue);
+      const hasOthers = selected.some((option) => option.value !== allValue);
+
+      if (hasAll && hasOthers) {
+        if (prevHadAll) {
+          // A specific value was just picked - drop "All"
+          Array.from(select.options).forEach((option) => {
+            if (option.value === allValue) {
+              option.selected = false;
+            }
+          });
+        } else {
+          // "All" was just picked - clear the specific values
+          Array.from(select.options).forEach((option) => {
+            option.selected = option.value === allValue;
+          });
+        }
+        // Sync in place (a rebuild would close the open dropdown mid-selection)
+        syncMaterialSelect(select);
+      }
+      prevHadAll = Array.from(select.selectedOptions).some((option) => option.value === allValue);
+    });
+  }
+
+  /** Read the selected option values of a (multi-)select. */
+  private static readMultiSelect_(id: string): string[] {
+    const select = getEl(id, true) as HTMLSelectElement | null;
+
+    if (!select?.selectedOptions) {
+      return [];
+    }
+
+    return Array.from(select.selectedOptions).map((option) => option.value);
+  }
+
+  // eslint-disable-next-line require-await
+  protected async findByLooksSubmit_(): Promise<void> {
+    const az = parseFloat((<HTMLInputElement>getEl('fbl-azimuth')).value);
+    const el = parseFloat((<HTMLInputElement>getEl('fbl-elevation')).value);
+    const rng = parseFloat((<HTMLInputElement>getEl('fbl-range')).value);
+    const inc = parseFloat((<HTMLInputElement>getEl('fbl-inc')).value);
+    const period = parseFloat((<HTMLInputElement>getEl('fbl-period')).value);
+    const tleAge = parseFloat((<HTMLInputElement>getEl('fbl-tleAge')).value);
+    const rcs = parseFloat((<HTMLInputElement>getEl('fbl-rcs')).value);
+    const azMarg = parseFloat((<HTMLInputElement>getEl('fbl-azimuth-margin')).value);
+    const elMarg = parseFloat((<HTMLInputElement>getEl('fbl-elevation-margin')).value);
+    const rngMarg = parseFloat((<HTMLInputElement>getEl('fbl-range-margin')).value);
+    const incMarg = parseFloat((<HTMLInputElement>getEl('fbl-inc-margin')).value);
+    const periodMarg = parseFloat((<HTMLInputElement>getEl('fbl-period-margin')).value);
+    const tleAgeMarg = parseFloat((<HTMLInputElement>getEl('fbl-tleAge-margin')).value);
+    const rcsMarg = parseFloat((<HTMLInputElement>getEl('fbl-rcs-margin')).value);
+    const typeValues = FindSatPlugin.readMultiSelect_('fbl-type').map(Number).filter((n) => !isNaN(n));
+    const objType = typeValues.length === 0 || typeValues.includes(0) ? 0 : typeValues;
+    const raan = parseFloat((<HTMLInputElement>getEl('fbl-raan')).value);
+    const raanMarg = parseFloat((<HTMLInputElement>getEl('fbl-raan-margin')).value);
+    const argPe = parseFloat((<HTMLInputElement>getEl('fbl-argPe')).value);
+    const argPeMarg = parseFloat((<HTMLInputElement>getEl('fbl-argPe-margin')).value);
+    const countryValues = FindSatPlugin.readMultiSelect_('fbl-country');
+    // Country option values are already pipe-joined code groups, so joining selections keeps the searchSats_ format
+    const countryCode = countryValues.length === 0 || countryValues.includes('All') ? 'All' : countryValues.join('|');
+    const bus = (<HTMLInputElement>getEl('fbl-bus')).value;
+    const payload = (<HTMLInputElement>getEl('fbl-payload')).value;
+    const shape = (<HTMLInputElement>getEl('fbl-shape')).value;
+    const source = (<HTMLInputElement>getEl('fbl-source')).value;
+
+    const searchParams = {
+      az,
+      el,
+      rng,
+      inc,
+      azMarg,
+      elMarg,
+      rngMarg,
+      incMarg,
+      period,
+      periodMarg,
+      tleAge,
+      tleAgeMarg,
+      rcs,
+      rcsMarg,
+      objType,
+      raan,
+      raanMarg,
+      argPe,
+      argPeMarg,
+      countryCode,
+      bus,
+      payload,
+      shape,
+      source,
+    } as SearchSatParams;
+
+    // Az/el/range are computed relative to the selected sensor, so a search that
+    // uses them needs one. Block early with a clear message rather than letting
+    // it throw deep in the look-angle math.
+    const needsSensor = [az, el, rng].some((value) => !isNaN(value) && isFinite(value));
+
+    this.runSearch_(searchParams, needsSensor);
+  }
+
+  /**
+   * Runs a search after an optional sensor-selected check, resetting the global
+   * search box first and surfacing empty/failed results to the user. Shared by
+   * the OSS form submit and the Pro rule-builder / saved-search paths.
+   * @returns false if the search was blocked (no sensor); true otherwise.
+   */
+  protected runSearch_(searchParams: SearchSatParams, needsSensor: boolean): boolean {
+    const uiManagerInstance = ServiceLocator.getUiManager();
+
+    if (needsSensor && !ServiceLocator.getSensorManager().isSensorSelected()) {
+      uiManagerInstance.toast(t7e('errorMsgs.SelectSensorFirst'), ToastMsgType.critical);
+
+      return false;
+    }
+
     this.hasSearchBeenRun_ = true;
 
-    return new Promise(() => {
-      const uiManagerInstance = ServiceLocator.getUiManager();
+    const searchInput = getEl('search', true) as HTMLInputElement | null;
 
-      const az = parseFloat((<HTMLInputElement>getEl('fbl-azimuth')).value);
-      const el = parseFloat((<HTMLInputElement>getEl('fbl-elevation')).value);
-      const rng = parseFloat((<HTMLInputElement>getEl('fbl-range')).value);
-      const inc = parseFloat((<HTMLInputElement>getEl('fbl-inc')).value);
-      const period = parseFloat((<HTMLInputElement>getEl('fbl-period')).value);
-      const tleAge = parseFloat((<HTMLInputElement>getEl('fbl-tleAge')).value);
-      const rcs = parseFloat((<HTMLInputElement>getEl('fbl-rcs')).value);
-      const azMarg = parseFloat((<HTMLInputElement>getEl('fbl-azimuth-margin')).value);
-      const elMarg = parseFloat((<HTMLInputElement>getEl('fbl-elevation-margin')).value);
-      const rngMarg = parseFloat((<HTMLInputElement>getEl('fbl-range-margin')).value);
-      const incMarg = parseFloat((<HTMLInputElement>getEl('fbl-inc-margin')).value);
-      const periodMarg = parseFloat((<HTMLInputElement>getEl('fbl-period-margin')).value);
-      const tleAgeMarg = parseFloat((<HTMLInputElement>getEl('fbl-tleAge-margin')).value);
-      const rcsMarg = parseFloat((<HTMLInputElement>getEl('fbl-rcs-margin')).value);
-      const objType = parseInt((<HTMLInputElement>getEl('fbl-type')).value);
-      const raan = parseFloat((<HTMLInputElement>getEl('fbl-raan')).value);
-      const raanMarg = parseFloat((<HTMLInputElement>getEl('fbl-raan-margin')).value);
-      const argPe = parseFloat((<HTMLInputElement>getEl('fbl-argPe')).value);
-      const argPeMarg = parseFloat((<HTMLInputElement>getEl('fbl-argPe-margin')).value);
-      const countryCode = (<HTMLInputElement>getEl('fbl-country')).value;
-      const bus = (<HTMLInputElement>getEl('fbl-bus')).value;
-      const payload = (<HTMLInputElement>getEl('fbl-payload')).value;
-      const shape = (<HTMLInputElement>getEl('fbl-shape')).value;
-      const source = (<HTMLInputElement>getEl('fbl-source')).value;
+    if (searchInput) {
+      searchInput.value = '';
+    }
 
-      (<HTMLInputElement>getEl('search')).value = ''; // Reset the search first
-      try {
-        const searchParams = {
-          az,
-          el,
-          rng,
-          inc,
-          azMarg,
-          elMarg,
-          rngMarg,
-          incMarg,
-          period,
-          periodMarg,
-          tleAge,
-          tleAgeMarg,
-          rcs,
-          rcsMarg,
-          objType,
-          raan,
-          raanMarg,
-          argPe,
-          argPeMarg,
-          countryCode,
-          bus,
-          payload,
-          shape,
-          source,
-        };
+    try {
+      this.lastResults_ = this.searchSats_(searchParams);
+      this.onSearchComplete_(this.lastResults_);
+    } catch (e) {
+      this.handleSearchError_(e, uiManagerInstance);
+    }
 
-        this.lastResults_ = this.searchSats_(searchParams as SearchSatParams);
-        if (this.lastResults_.length === 0) {
-          uiManagerInstance.toast(t7e('plugins.FindSatPlugin.errorMsgs.NoSatellitesFound'), ToastMsgType.critical);
-        }
-      } catch (e) {
-        if (e.message === 'No Search Criteria Entered') {
-          uiManagerInstance.toast(t7e('plugins.FindSatPlugin.errorMsgs.NoSearchCriteriaEntered'), ToastMsgType.critical);
-        }
-      }
-    });
+    return true;
   }
 
-  protected static checkAz_(posAll: Satellite[], min: number, max: number) {
-    return posAll.filter((pos) => {
-      if (!pos.isSatellite() && !pos.isMissile()) {
-        return false;
-      }
-
-      const currentSatellite = ServiceLocator.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY);
-
-      if (!currentSatellite) {
-        return false;
-      }
-
-      const rae = eci2rae(
-        ServiceLocator.getTimeManager().simulationTimeObj,
-        currentSatellite.position,
-        ServiceLocator.getSensorManager().currentSensors[0],
-      );
-
-
-      return rae.az >= min && rae.az <= max;
-    });
+  /** Reports search results to the user (empty-result toast + result count). */
+  protected onSearchComplete_(results: Satellite[]): void {
+    if (results.length === 0) {
+      ServiceLocator.getUiManager().toast(t7e('plugins.FindSatPlugin.errorMsgs.NoSatellitesFound'), ToastMsgType.critical);
+    }
+    this.updateResultCount_(results.length);
   }
 
-  protected static checkEl_(posAll: Satellite[], min: number, max: number) {
-    return posAll.filter((pos) => {
-      if (!pos.isSatellite() && !pos.isMissile()) {
-        return false;
-      }
+  /** Updates the result-count readout in the side menu, when present. */
+  protected updateResultCount_(count: number): void {
+    const el = getEl(this.resultCountElId_, true);
 
-      const currentSatellite = ServiceLocator.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY);
+    if (el) {
+      el.textContent = t7e('plugins.FindSatPlugin.labels.resultCount' as Parameters<typeof t7e>[0]).replace('{count}', count.toString());
+    }
+  }
 
-      if (!currentSatellite) {
-        return false;
-      }
+  /**
+   * Surfaces search failures to the user instead of swallowing them.
+   * Known validation errors get their specific message; anything else gets a
+   * generic failure toast so errors (e.g. no sensor selected) are not silent.
+   */
+  protected handleSearchError_(e: unknown, uiManagerInstance: ReturnType<typeof ServiceLocator.getUiManager>): void {
+    const message = e instanceof Error ? e.message : String(e);
 
-      const rae = eci2rae(
-        ServiceLocator.getTimeManager().simulationTimeObj,
-        currentSatellite.position,
-        ServiceLocator.getSensorManager().currentSensors[0],
+    if (message === 'No Search Criteria Entered') {
+      uiManagerInstance.toast(t7e('plugins.FindSatPlugin.errorMsgs.NoSearchCriteriaEntered'), ToastMsgType.critical);
+    } else {
+      uiManagerInstance.toast(
+        t7e('plugins.FindSatPlugin.errorMsgs.SearchFailed' as Parameters<typeof t7e>[0]).replace('{error}', message),
+        ToastMsgType.critical,
       );
-
-
-      return rae.el >= min && rae.el <= max;
-    });
+      errorManagerInstance.debug(`FindSatPlugin search failed: ${message}`);
+    }
   }
 
   protected static checkInview_(posAll: Satellite[]) {
@@ -541,31 +704,25 @@ export class FindSatPlugin extends KeepTrackPlugin {
     return posAll.filter((pos) => dotsManagerInstance.inViewData[pos.id] === 1);
   }
 
-  protected static checkObjtype_(posAll: Satellite[], objtype: number) {
-    return posAll.filter((pos) => pos.type === objtype);
-  }
+  /**
+   * Builds a resolver that returns the current look angle for a satellite,
+   * relative to the selected sensor and simulation time. Used by the look-angle
+   * filters so the predicate logic stays pure and testable.
+   */
+  protected static buildLookAngleResolver_(): LookAngleResolver {
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const timeObj = ServiceLocator.getTimeManager().simulationTimeObj;
+    const sensor = ServiceLocator.getSensorManager().currentSensors[0];
 
-  protected static checkRange_(posAll: Satellite[], min: number, max: number) {
-    return posAll.filter((pos) => {
-      if (!pos.isSatellite() && !pos.isMissile()) {
-        return false;
+    return (sat: Satellite) => {
+      const positioned = catalogManagerInstance.getSat(sat.id, GetSatType.POSITION_ONLY);
+
+      if (!positioned) {
+        return null;
       }
 
-      const currentSatellite = ServiceLocator.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY);
-
-      if (!currentSatellite) {
-        return false;
-      }
-
-      const rae = eci2rae(
-        ServiceLocator.getTimeManager().simulationTimeObj,
-        currentSatellite.position,
-        ServiceLocator.getSensorManager().currentSensors[0],
-      );
-
-
-      return rae.rng >= min && rae.rng <= max;
-    });
+      return eci2rae(timeObj, positioned.position, sensor);
+    };
   }
 
   protected static limitPossibles_(possibles: Satellite[], limit: number): Satellite[] {
@@ -657,34 +814,40 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
     res = !isValidInc && !isValidPeriod && !isValidTleAge && (isValidAz || isValidEl || isValidRange) ? FindSatPlugin.checkInview_(res) : res;
 
-    res = objType !== 0 ? FindSatPlugin.checkObjtype_(res, objType) : res;
+    const objTypes = (Array.isArray(objType) ? objType : [objType]).filter((type) => type !== 0);
 
-    if (isValidAz) {
-      res = FindSatPlugin.checkAz_(res, az - azMarg, az + azMarg);
-    }
-    if (isValidEl) {
-      res = FindSatPlugin.checkEl_(res, el - elMarg, el + elMarg);
-    }
-    if (isValidRange) {
-      res = FindSatPlugin.checkRange_(res, rng - rngMarg, rng + rngMarg);
+    res = objTypes.length > 0 ? filterByObjType(res, objTypes) : res;
+
+    if (isValidAz || isValidEl || isValidRange) {
+      const resolveLookAngle = FindSatPlugin.buildLookAngleResolver_();
+
+      if (isValidAz) {
+        res = filterByLookAngle(res, resolveLookAngle, 'az', az - azMarg, az + azMarg);
+      }
+      if (isValidEl) {
+        res = filterByLookAngle(res, resolveLookAngle, 'el', el - elMarg, el + elMarg);
+      }
+      if (isValidRange) {
+        res = filterByLookAngle(res, resolveLookAngle, 'rng', rng - rngMarg, rng + rngMarg);
+      }
     }
     if (isValidInc) {
-      res = FindSatPlugin.checkInc_(res, (inc - incMarg) as Degrees, (inc + incMarg) as Degrees);
+      res = filterByInclination(res, (inc - incMarg) as Degrees, (inc + incMarg) as Degrees);
     }
     if (isValidRaan) {
-      res = FindSatPlugin.checkRightAscension_(res, (rightAscension - rightAscensionMarg) as Degrees, (rightAscension + rightAscensionMarg) as Degrees);
+      res = filterByRightAscension(res, (rightAscension - rightAscensionMarg) as Degrees, (rightAscension + rightAscensionMarg) as Degrees);
     }
     if (isValidArgPe) {
-      res = FindSatPlugin.checkArgPe_(res, (argPe - argPeMarg) as Degrees, (argPe + argPeMarg) as Degrees);
+      res = filterByArgOfPerigee(res, (argPe - argPeMarg) as Degrees, (argPe + argPeMarg) as Degrees);
     }
     if (isValidPeriod) {
-      res = FindSatPlugin.checkPeriod_(res, (period - periodMarg) as Minutes, (period + periodMarg) as Minutes);
+      res = filterByPeriod(res, (period - periodMarg) as Minutes, (period + periodMarg) as Minutes);
     }
     if (isValidTleAge) {
-      res = FindSatPlugin.checkTleAge_(res, (tleAge - tleAgeMarg) as Hours, (tleAge + tleAgeMarg) as Hours);
+      res = filterByTleAge(res, (tleAge - tleAgeMarg) as Hours, (tleAge + tleAgeMarg) as Hours, new Date());
     }
     if (isValidRcs) {
-      res = FindSatPlugin.checkRcs_(res, rcs - rcsMarg, rcs + rcsMarg);
+      res = filterByRcs(res, rcs - rcsMarg, rcs + rcsMarg);
     }
     if (countryCode !== 'All') {
       let country = countryCode.split('|');
@@ -694,23 +857,30 @@ export class FindSatPlugin extends KeepTrackPlugin {
       res = res.filter((obj: BaseObject) => country.includes((obj as Satellite).country));
     }
     if (bus !== 'All') {
-      res = res.filter((obj: BaseObject) => (obj as Satellite).bus === bus);
+      const buses = bus.split('|');
+
+      res = res.filter((obj: BaseObject) => buses.includes((obj as Satellite).bus));
     }
     if (shape !== 'All') {
-      res = res.filter((obj: BaseObject) => (obj as Satellite).shape === shape);
+      const shapes = shape.split('|');
+
+      res = res.filter((obj: BaseObject) => shapes.includes((obj as Satellite).shape));
     }
     if (source !== 'All') {
       res = res.filter((obj: BaseObject) => (obj as Satellite).source === source);
     }
 
     if (payload !== 'All') {
-      res = res.filter(
-        (obj: BaseObject) =>
-          (obj as Satellite).payload
-            ?.split(' ')[0]
-            ?.split('-')[0]
-            ?.replace(/[^a-zA-Z]/gu, '') === payload,
-      );
+      const payloads = payload.split('|');
+
+      res = res.filter((obj: BaseObject) => {
+        const partial = (obj as Satellite).payload
+          ?.split(' ')[0]
+          ?.split('-')[0]
+          ?.replace(/[^a-zA-Z]/gu, '');
+
+        return typeof partial === 'string' && payloads.includes(partial);
+      });
     }
 
     res = FindSatPlugin.limitPossibles_(res, settingsManager.searchLimit);
@@ -727,37 +897,5 @@ export class FindSatPlugin extends KeepTrackPlugin {
     uiManagerInstance.doSearch((<HTMLInputElement>getEl('search')).value);
 
     return res;
-  }
-
-  protected static checkArgPe_(possibles: Satellite[], min: Degrees, max: Degrees) {
-    return possibles.filter((possible) => possible.argOfPerigee < max && possible.argOfPerigee > min);
-  }
-
-  protected static checkInc_(possibles: Satellite[], min: Degrees, max: Degrees) {
-    return possibles.filter((possible) => possible.inclination < max && possible.inclination > min);
-  }
-
-  protected static checkPeriod_(possibles: Satellite[], minPeriod: Minutes, maxPeriod: Minutes) {
-    return possibles.filter((possible) => possible.period > minPeriod && possible.period < maxPeriod);
-  }
-
-  protected static checkTleAge_(possibles: Satellite[], minTleAge_: Hours, maxTleAge: Hours) {
-    const minTleAge = minTleAge_ < 0 ? 0 : minTleAge_;
-    const now = new Date();
-
-    return possibles.filter((possible) => {
-      const ageHours = possible.ageOfElset(now, 'hours');
-
-
-      return ageHours >= minTleAge && ageHours <= maxTleAge;
-    });
-  }
-
-  protected static checkRightAscension_(possibles: Satellite[], min: Degrees, max: Degrees) {
-    return possibles.filter((possible) => possible.rightAscension < max && possible.rightAscension > min);
-  }
-
-  protected static checkRcs_(possibles: Satellite[], minRcs: number, maxRcs: number) {
-    return possibles.filter((possible) => (possible?.rcs ?? -Infinity) > minRcs && (possible?.rcs ?? Infinity) < maxRcs);
   }
 }

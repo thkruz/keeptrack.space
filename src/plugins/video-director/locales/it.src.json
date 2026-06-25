@@ -3,7 +3,40 @@
     "VideoDirectorPlugin": {
       "title": "Regista Video",
       "bottomIconLabel": "Regista Video",
-      "helpBody": "Questo menu consente di aggiungere effetti della telecamera e controllare i movimenti della telecamera per creare video cinematografici all'interno della simulazione."
+      "labels": {
+        "updateSettings": "Aggiorna impostazioni",
+        "cameraMovements": "Movimenti della telecamera",
+        "rotateSpeed": "Velocità di rotazione",
+        "rotateLeft": "Ruota la telecamera a sinistra",
+        "rotateRight": "Ruota la telecamera a destra",
+        "rotateUp": "Ruota la telecamera verso l'alto",
+        "rotateDown": "Ruota la telecamera verso il basso",
+        "panSpeed": "Velocità di panoramica",
+        "panLeft": "Panoramica della telecamera a sinistra",
+        "panRight": "Panoramica della telecamera a destra",
+        "panUp": "Panoramica della telecamera verso l'alto",
+        "panDown": "Panoramica della telecamera verso il basso",
+        "zoomSpeed": "Velocità di zoom",
+        "zoomIn": "Zoom avanti della telecamera",
+        "zoomOut": "Zoom indietro della telecamera",
+        "disableSelectedDot": "Disattiva il punto del satellite selezionato",
+        "rotate": "Rotazione",
+        "pan": "Panoramica",
+        "zoom": "Zoom",
+        "scene": "Scena",
+        "blackEarth": "Terra nera",
+        "milkyWay": "Via Lattea",
+        "startAutoRotate": "Avvia rotazione automatica",
+        "stopAutoRotate": "Ferma rotazione automatica"
+      },
+      "help": {
+        "overview": "Il Regista Video imposta movimenti di telecamera fluidi e ripetibili per registrare clip cinematografiche della simulazione: rotazioni lente, panoramiche e zoom a velocità precise, con la possibilità di nascondere il punto evidenziato del satellite selezionato perché non compaia nelle riprese.",
+        "imgAlt": "Il menu Regista Video con i controlli di rotazione, panoramica e zoom",
+        "imgCaption": "Scegli una direzione e una velocità di movimento, quindi avvia il movimento.",
+        "howToUse": "<ol><li>Apri <strong>Regista Video</strong> dalla barra inferiore (modalità Sperimentale).</li><li>Imposta la <strong>Velocità di rotazione</strong>, la <strong>Velocità di panoramica</strong> o la <strong>Velocità di zoom</strong> e attiva la direzione desiderata; le modifiche si applicano immediatamente e le direzioni opposte si escludono a vicenda.</li><li>Fai clic su <strong>Avvia rotazione automatica</strong> per iniziare il movimento e di nuovo per fermarlo.</li><li>Abilita <strong>Disattiva il punto del satellite selezionato</strong>, <strong>Terra nera</strong> o <strong>Via Lattea</strong> per uno sfondo cinematografico pulito.</li></ol>",
+        "tip1": "Valori di velocità molto piccoli danno un movimento fluido di qualità professionale; i valori predefiniti sono regolati per movimenti lenti e cinematografici.",
+        "tip2": "Combina una rotazione lenta con i controlli del tempo ad alta velocità per una classica ripresa orbitale accelerata."
+      }
     }
   }
 }

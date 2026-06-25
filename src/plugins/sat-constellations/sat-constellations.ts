@@ -1,6 +1,6 @@
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
 import { GroupType } from '@app/app/data/object-group';
-import { MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -52,6 +52,25 @@ const BUILT_IN_CONSTELLATIONS = [
   'wgs',
   'starlink',
   'sbirs',
+  'starlink-gen2',
+  'starlink-v2',
+  'starlink-snapshot',
+  'starshield',
+  'pwsa',
+  'kuiper',
+  'ast-spaceobile',
+  'oneweb',
+  'telesat-lightspeed',
+  'boeing',
+  'astra',
+  'spinlaunch',
+  'hvnet',
+  'lynk',
+  'guanwang',
+  'qianfan',
+  'honghu3',
+  'yinhe',
+  'hanwha',
 ] as const;
 
 export class SatConstellations extends KeepTrackPlugin {
@@ -90,8 +109,35 @@ export class SatConstellations extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.SatConstellations.title' as Parameters<typeof t7e>[0]),
-      body: t7e('plugins.SatConstellations.helpBody' as Parameters<typeof t7e>[0]),
+      title: t7e('plugins.SatConstellations.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.SatConstellations.help.overview'),
+          image: {
+            src: 'img/help/sat-constellations/sat-constellations-menu.png',
+            alt: t7e('plugins.SatConstellations.help.imgAlt'),
+            caption: t7e('plugins.SatConstellations.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.SatConstellations.help.readingHeading'),
+          content: t7e('plugins.SatConstellations.help.reading'),
+        },
+        {
+          heading: t7e('plugins.SatConstellations.help.filtersHeading'),
+          content: t7e('plugins.SatConstellations.help.filters'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.SatConstellations.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.SatConstellations.help.tip1'),
+        t7e('plugins.SatConstellations.help.tip2'),
+        t7e('plugins.SatConstellations.help.tip3'),
+      ],
     };
   }
 
@@ -143,6 +189,11 @@ export class SatConstellations extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
       const menuEl = getEl('constellations-menu');
+
+      // Opt this menu (and its filter secondary menu) into the v13+ card UI.
+      menuEl?.classList.add('kt-ui-v13');
+      getEl('constellations-menu-secondary')?.classList.add('kt-ui-v13');
+
       const ulEl = menuEl?.querySelector('ul');
 
       if (ulEl) {
@@ -191,43 +242,72 @@ export class SatConstellations extends KeepTrackPlugin {
 
   private buildSideMenuHtml_(): string {
     const l = (key: string) => t7e(`plugins.SatConstellations.constellations.${key}` as Parameters<typeof t7e>[0]);
+    const s = (key: string) => t7e(`plugins.SatConstellations.sections.${key}` as Parameters<typeof t7e>[0]);
 
     return html`
-      <ul id="sc-constellation-list">
-        <li class="menu-selectable" data-group="SpaceStations">${l('SpaceStations')}</li>
-        <li class="menu-selectable" data-group="AmateurRadio">${l('AmateurRadio')}</li>
-        <li class="menu-selectable" data-group="GPSGroup">${l('GPSGroup')}</li>
-        <li class="menu-selectable" data-group="GalileoGroup">${l('GalileoGroup')}</li>
-        <li class="menu-selectable" data-group="GlonassGroup">${l('GlonassGroup')}</li>
-        <li class="menu-selectable" data-group="iridium">${l('iridium')}</li>
-        <li class="menu-selectable" data-group="orbcomm">${l('orbcomm')}</li>
-        <li class="menu-selectable" data-group="globalstar">${l('globalstar')}</li>
-        <li class="menu-selectable" data-group="ses">${l('ses')}</li>
-        <li class="menu-selectable" data-group="aehf">${l('aehf')}</li>
-        <li class="menu-selectable" data-group="wgs">${l('wgs')}</li>
-        <li class="menu-selectable" data-group="starlink">${l('starlink')}</li>
-        <li class="menu-selectable" data-group="sbirs">${l('sbirs')}</li>
-      </ul>
-      <div id="sc-stats" class="sc-stats start-hidden">
+      <section class="kt-section">
+        <div class="kt-section-label">${s('constellations')}</div>
+        <ul id="sc-constellation-list" class="sc-constellation-list">
+          <li class="menu-selectable" data-group="SpaceStations">${l('SpaceStations')}</li>
+          <li class="menu-selectable" data-group="AmateurRadio">${l('AmateurRadio')}</li>
+          <li class="menu-selectable" data-group="GPSGroup">${l('GPSGroup')}</li>
+          <li class="menu-selectable" data-group="GalileoGroup">${l('GalileoGroup')}</li>
+          <li class="menu-selectable" data-group="GlonassGroup">${l('GlonassGroup')}</li>
+          <li class="menu-selectable" data-group="iridium">${l('iridium')}</li>
+          <li class="menu-selectable" data-group="orbcomm">${l('orbcomm')}</li>
+          <li class="menu-selectable" data-group="globalstar">${l('globalstar')}</li>
+          <li class="menu-selectable" data-group="ses">${l('ses')}</li>
+          <li class="menu-selectable" data-group="aehf">${l('aehf')}</li>
+          <li class="menu-selectable" data-group="wgs">${l('wgs')}</li>
+          <li class="menu-selectable" data-group="starlink">${l('starlink')}</li>
+          <li class="menu-selectable" data-group="sbirs">${l('sbirs')}</li>
+          <li class="menu-selectable" data-group="starlink-gen2">${l('starlink-gen2')}</li>
+          <li class="menu-selectable" data-group="starlink-v2">${l('starlink-v2')}</li>
+          <li class="menu-selectable" data-group="starlink-snapshot">${l('starlink-snapshot')}</li>
+          <li class="menu-selectable" data-group="starshield">${l('starshield')}</li>
+          <li class="menu-selectable" data-group="pwsa">${l('pwsa')}</li>
+          <li class="menu-selectable" data-group="kuiper">${l('kuiper')}</li>
+          <li class="menu-selectable" data-group="ast-spaceobile">${l('ast-spaceobile')}</li>
+          <li class="menu-selectable" data-group="oneweb">${l('oneweb')}</li>
+          <li class="menu-selectable" data-group="telesat-lightspeed">${l('telesat-lightspeed')}</li>
+          <li class="menu-selectable" data-group="boeing">${l('boeing')}</li>
+          <li class="menu-selectable" data-group="astra">${l('astra')}</li>
+          <li class="menu-selectable" data-group="spinlaunch">${l('spinlaunch')}</li>
+          <li class="menu-selectable" data-group="hvnet">${l('hvnet')}</li>
+          <li class="menu-selectable" data-group="lynk">${l('lynk')}</li>
+          <li class="menu-selectable" data-group="guanwang">${l('guanwang')}</li>
+          <li class="menu-selectable" data-group="qianfan">${l('qianfan')}</li>
+          <li class="menu-selectable" data-group="honghu3">${l('honghu3')}</li>
+          <li class="menu-selectable" data-group="yinhe">${l('yinhe')}</li>
+          <li class="menu-selectable" data-group="hanwha">${l('hanwha')}</li>
+        </ul>
+      </section>
+      <section id="sc-stats" class="kt-section sc-stats start-hidden">
+        <div class="kt-section-label">${s('statistics')}</div>
         <div class="sc-stats-row">
           <span id="sc-stat-count"></span>
           <span id="sc-stat-alt"></span>
           <span id="sc-stat-inc"></span>
         </div>
-      </div>
-      <div id="sc-table-wrapper" class="start-hidden">
-        <table id="sc-results-table" class="sc-results-table center-align striped"></table>
+      </section>
+      <section id="sc-table-wrapper" class="kt-section start-hidden">
+        <div class="kt-section-label">${s('results')}</div>
+        <div class="sc-table-scroll">
+          <table id="sc-results-table" class="sc-results-table center-align striped"></table>
+        </div>
         <sub id="sc-results-count" class="center-align"></sub>
-      </div>
+      </section>
     `;
   }
 
   private buildSecondaryMenuHtml_(): string {
     const l = (key: string) => t7e(`plugins.SatConstellations.filters.${key}` as Parameters<typeof t7e>[0]);
+    const s = (key: string) => t7e(`plugins.SatConstellations.sections.${key}` as Parameters<typeof t7e>[0]);
 
     return html`
-      <div class="sc-filter-form">
-        <div class="row">
+      <section class="kt-section">
+        <div class="kt-section-label">${s('filters')}</div>
+        <div class="kt-field-row">
           <div class="input-field col s6">
             <input placeholder="0" id="sc-filter-inc-min" type="number" />
             <label for="sc-filter-inc-min" class="active">${l('incMin')}</label>
@@ -237,7 +317,7 @@ export class SatConstellations extends KeepTrackPlugin {
             <label for="sc-filter-inc-max" class="active">${l('incMax')}</label>
           </div>
         </div>
-        <div class="row">
+        <div class="kt-field-row">
           <div class="input-field col s6">
             <input placeholder="0" id="sc-filter-alt-min" type="number" />
             <label for="sc-filter-alt-min" class="active">${l('altMin')}</label>
@@ -247,7 +327,7 @@ export class SatConstellations extends KeepTrackPlugin {
             <label for="sc-filter-alt-max" class="active">${l('altMax')}</label>
           </div>
         </div>
-        <div class="row">
+        <div class="kt-field-row">
           <div class="input-field col s6">
             <input placeholder="0" id="sc-filter-raan-min" type="number" />
             <label for="sc-filter-raan-min" class="active">${l('raanMin')}</label>
@@ -257,24 +337,25 @@ export class SatConstellations extends KeepTrackPlugin {
             <label for="sc-filter-raan-max" class="active">${l('raanMax')}</label>
           </div>
         </div>
-        <div class="row">
+        <div class="kt-field-row">
           <div class="input-field col s12">
             <input placeholder=".*" id="sc-filter-name" type="text" />
             <label for="sc-filter-name" class="active">${l('nameFilter')}</label>
           </div>
         </div>
-        <div class="row sc-filter-buttons">
-          <button id="sc-filter-apply" class="btn btn-ui waves-effect waves-light">${l('apply')}</button>
-          <button id="sc-filter-reset" class="btn btn-ui waves-effect waves-light">${l('reset')}</button>
-        </div>
-      </div>
+        <button id="sc-filter-apply" type="button" class="kt-action waves-effect">
+          <span class="kt-action-label">${l('apply')}</span>
+        </button>
+        <button id="sc-filter-reset" type="button" class="kt-action waves-effect">
+          <span class="kt-action-label">${l('reset')}</span>
+        </button>
+      </section>
     `;
   }
 
   // ── Private: Constellation Selection ────────────────────────────────
 
   private constellationMenuClick_(groupName: string, skipCloseMenus = false): void {
-    const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const groupManagerInstance = ServiceLocator.getGroupsManager();
 
     if (typeof groupManagerInstance === 'undefined') {
@@ -286,103 +367,77 @@ export class SatConstellations extends KeepTrackPlugin {
       return;
     }
 
-    switch (groupName) {
-      case 'SpaceStations':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.SCC_NUM, [25544, 48274], groupName);
-        }
-        break;
-      case 'GlonassGroup':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /GLONASS/u, groupName);
-        }
-        break;
-      case 'GalileoGroup':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /GALILEO/u, groupName);
-        }
-        break;
-      case 'GPSGroup':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /NAVSTAR/u, groupName);
-        }
-        break;
-      case 'iridium':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /IRIDIUM/u, groupName);
-        }
-        break;
-      case 'orbcomm':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /ORBCOMM/u, groupName);
-        }
-        break;
-      case 'globalstar':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /GLOBALSTAR/u, groupName);
-        }
-        break;
-      case 'ses':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /SES-\d+/u, groupName);
-        }
-        break;
-      case 'AmateurRadio':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(
-            GroupType.SCC_NUM,
-            [
-              7530, 14781, 20442, 22826, 24278, 25338, 25397, 25544, 26931, 27607, 27844, 27848, 28895, 32785, 32788, 32789, 32791, 33493, 33498, 33499, 35932, 35933, 35935, 37224,
-              37839, 37841, 37855, 38760, 39090, 39134, 39136, 39161, 39417, 39430, 39436, 39439, 39440, 39444, 39469, 39770, 40014, 40021, 40024, 40025, 40030, 40032, 40042,
-              40043, 40057, 40071, 40074, 40377, 40378, 40379, 40380, 40654, 40719, 40900, 40903, 40906, 40907, 40908, 40910, 40911, 40912, 40926, 40927, 40928, 40931, 40967,
-              40968, 41168, 41171, 41340, 41459, 41460, 41465, 41474, 41600, 41619, 41789, 41932, 41935, 42017,
-            ],
-            groupName,
-          );
-        }
-        break;
-      case 'aehf':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.SCC_NUM, catalogManagerInstance.id2satnum(catalogManagerInstance.satLinkManager.aehf), groupName);
-        }
-        break;
-      case 'wgs':
-        if (!groupManagerInstance.groupList[groupName]) {
-          const wgs = catalogManagerInstance.satLinkManager.wgs.concat(catalogManagerInstance.satLinkManager.dscs);
+    if (!groupManagerInstance.groupList[groupName]) {
+      this.createConstellationGroup_(groupName);
+    }
 
-          groupManagerInstance.createGroup(GroupType.SCC_NUM, catalogManagerInstance.id2satnum(wgs), groupName);
-        }
-        break;
-      case 'starlink':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /STARLINK/u, groupName);
-        }
-        break;
-      case 'sbirs': // SBIRS and DSP
-        if (!groupManagerInstance.groupList[groupName]) {
-          const sbirs = [...catalogManagerInstance.satLinkManager.sbirs, ...catalogManagerInstance.satLinkManager.dsp];
-
-          groupManagerInstance.createGroup(GroupType.SCC_NUM, catalogManagerInstance.id2satnum(sbirs), groupName);
-        }
-        break;
-      default: {
-        if (!groupManagerInstance.groupList[groupName]) {
-          const constellation = this.additionalConstellations_.find((c) => c.groupSlug === groupName);
-
-          if (constellation) {
-            groupManagerInstance.createGroup(constellation.groupType, constellation.groupValue, groupName);
-          }
-        }
-
-        if (!groupManagerInstance.groupList[groupName]) {
-          throw new Error(`Unknown group name: ${groupName}`);
-        }
-      }
+    if (!groupManagerInstance.groupList[groupName]) {
+      throw new Error(`Unknown group name: ${groupName}`);
     }
 
     this.selectedGroupName_ = groupName;
     PersistenceManager.getInstance().saveItem(StorageKey.LAST_CONSTELLATION, groupName);
     this.groupSelected_(groupName, skipCloseMenus);
+  }
+
+  /**
+   * Creates the catalog group for a constellation, dispatching through the
+   * static name-pattern and SCC-list tables, the computed link-manager groups,
+   * and finally any constellations registered at runtime. Leaves the group
+   * uncreated (so the caller throws) when the name is unknown.
+   */
+  private createConstellationGroup_(groupName: string): void {
+    const groupManagerInstance = ServiceLocator.getGroupsManager();
+
+    const regexDef = SatConstellations.REGEX_GROUP_DEFS_[groupName];
+
+    if (regexDef) {
+      groupManagerInstance.createGroup(regexDef.type, regexDef.pattern, groupName);
+
+      return;
+    }
+
+    const sccList = SatConstellations.SCC_GROUP_DEFS_[groupName];
+
+    if (sccList) {
+      groupManagerInstance.createGroup(GroupType.SCC_NUM, sccList, groupName);
+
+      return;
+    }
+
+    const computedIds = this.computedConstellationIds_(groupName);
+
+    if (computedIds) {
+      groupManagerInstance.createGroup(GroupType.SCC_NUM, computedIds, groupName);
+
+      return;
+    }
+
+    const constellation = this.additionalConstellations_.find((c) => c.groupSlug === groupName);
+
+    if (constellation) {
+      groupManagerInstance.createGroup(constellation.groupType, constellation.groupValue, groupName);
+    }
+  }
+
+  /**
+   * Resolves the SCC numbers for the link-manager-derived constellations, whose
+   * membership is computed from the catalog rather than a static name pattern.
+   */
+  private computedConstellationIds_(groupName: string): string[] | null {
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const slm = catalogManagerInstance.satLinkManager;
+
+    switch (groupName) {
+      case 'aehf':
+        return catalogManagerInstance.id2satnum(slm.aehf);
+      case 'wgs':
+        return catalogManagerInstance.id2satnum(slm.wgs.concat(slm.dscs));
+      case 'sbirs': // SBIRS and DSP
+        return catalogManagerInstance.id2satnum([...slm.sbirs, ...slm.dsp]);
+      default:
+        return null;
+    }
   }
 
   private groupSelected_(groupName: string, skipCloseMenus = false): void {
@@ -403,6 +458,13 @@ export class SatConstellations extends KeepTrackPlugin {
     const sats = groupManagerInstance.groupList[groupName].ids
       .map((id: number) => catalogManagerInstance.getSat(id))
       .filter(Boolean) as Satellite[];
+
+    if (sats.length === 0) {
+      ServiceLocator.getUiManager().toast(
+        t7e('plugins.SatConstellations.errorMsgs.ConstellationEmpty' as Parameters<typeof t7e>[0]),
+        ToastMsgType.caution,
+      );
+    }
 
     this.updateSearchBar_(sats);
 
@@ -507,6 +569,54 @@ export class SatConstellations extends KeepTrackPlugin {
   }
 
   private static readonly MAX_TABLE_ROWS_ = 500;
+
+  /**
+   * Constellations matched by a satellite/payload name pattern. NAME_REGEX
+   * matches the object name; PAYLOAD_NAME_REGEX matches the payload name.
+   */
+  private static readonly REGEX_GROUP_DEFS_: Record<string, { type: GroupType; pattern: RegExp }> = {
+    GlonassGroup: { type: GroupType.PAYLOAD_NAME_REGEX, pattern: /GLONASS/u },
+    GalileoGroup: { type: GroupType.PAYLOAD_NAME_REGEX, pattern: /GALILEO/u },
+    GPSGroup: { type: GroupType.PAYLOAD_NAME_REGEX, pattern: /NAVSTAR/u },
+    iridium: { type: GroupType.PAYLOAD_NAME_REGEX, pattern: /IRIDIUM/u },
+    orbcomm: { type: GroupType.PAYLOAD_NAME_REGEX, pattern: /ORBCOMM/u },
+    ses: { type: GroupType.PAYLOAD_NAME_REGEX, pattern: /SES-\d+/u },
+    globalstar: { type: GroupType.NAME_REGEX, pattern: /globalstar/iu },
+    starlink: { type: GroupType.NAME_REGEX, pattern: /STARLINK/u },
+    // These three notional Starlink sub-architectures use anchored patterns because real
+    // Starlink Gen2/v2/snapshot sats are already caught by the `starlink` entry above.
+    'starlink-gen2': { type: GroupType.NAME_REGEX, pattern: /^Starlink Gen2 \d+$/u },
+    'starlink-v2': { type: GroupType.NAME_REGEX, pattern: /^Starlink 2 \d+$/u },
+    'starlink-snapshot': { type: GroupType.NAME_REGEX, pattern: /^Starlink \d+$/u },
+    starshield: { type: GroupType.NAME_REGEX, pattern: /starshield/iu },
+    pwsa: { type: GroupType.NAME_REGEX, pattern: /pwsa/iu },
+    kuiper: { type: GroupType.NAME_REGEX, pattern: /kuiper/iu },
+    // Real BlueBird satellites appear in the catalog under "BLUEBIRD"; notional imports use "AST SpaceMobile".
+    'ast-spaceobile': { type: GroupType.NAME_REGEX, pattern: /bluebird|ast.*mobile/iu },
+    oneweb: { type: GroupType.NAME_REGEX, pattern: /oneweb/iu },
+    'telesat-lightspeed': { type: GroupType.NAME_REGEX, pattern: /telesat/iu },
+    boeing: { type: GroupType.NAME_REGEX, pattern: /^Boeing \d+$/u },
+    astra: { type: GroupType.NAME_REGEX, pattern: /^Astra \d+$/u },
+    spinlaunch: { type: GroupType.NAME_REGEX, pattern: /^SpinLaunch \d+$/u },
+    hvnet: { type: GroupType.NAME_REGEX, pattern: /hvnet/iu },
+    lynk: { type: GroupType.NAME_REGEX, pattern: /lynk/iu },
+    guanwang: { type: GroupType.NAME_REGEX, pattern: /guowang/iu },
+    qianfan: { type: GroupType.NAME_REGEX, pattern: /qianfan/iu },
+    honghu3: { type: GroupType.NAME_REGEX, pattern: /honghu/iu },
+    yinhe: { type: GroupType.NAME_REGEX, pattern: /yinhe/iu },
+    hanwha: { type: GroupType.NAME_REGEX, pattern: /hanwha/iu },
+  };
+
+  /** Constellations defined by a fixed list of SCC numbers. */
+  private static readonly SCC_GROUP_DEFS_: Record<string, number[]> = {
+    SpaceStations: [25544, 48274],
+    AmateurRadio: [
+      7530, 14781, 20442, 22826, 24278, 25338, 25397, 25544, 26931, 27607, 27844, 27848, 28895, 32785, 32788, 32789, 32791, 33493, 33498, 33499, 35932, 35933, 35935, 37224,
+      37839, 37841, 37855, 38760, 39090, 39134, 39136, 39161, 39417, 39430, 39436, 39439, 39440, 39444, 39469, 39770, 40014, 40021, 40024, 40025, 40030, 40032, 40042,
+      40043, 40057, 40071, 40074, 40377, 40378, 40379, 40380, 40654, 40719, 40900, 40903, 40906, 40907, 40908, 40910, 40911, 40912, 40926, 40927, 40928, 40931, 40967,
+      40968, 41168, 41171, 41340, 41459, 41460, 41465, 41474, 41600, 41619, 41789, 41932, 41935, 42017,
+    ],
+  };
 
   private buildTable_(sats: Satellite[]): void {
     const tbl = getEl('sc-results-table') as HTMLTableElement | null;

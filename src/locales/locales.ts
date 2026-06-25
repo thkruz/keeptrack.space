@@ -38,6 +38,34 @@ const opts: InitOptions = {
 
 i18next.use(LanguageDetector).init(opts);
 
+export interface SupportedLocale {
+  /** BCP-47 base code matching a key in i18next `resources` above. */
+  code: string;
+  /** Endonym shown in language pickers (always rendered in its own script). */
+  nativeName: string;
+}
+
+/**
+ * Canonical list of UI languages. Keep this in lockstep with the `resources`
+ * map above - it is the single source of truth for language pickers (e.g. the
+ * Debug menu's locale switcher) so the option list cannot drift from what is
+ * actually bundled.
+ */
+export const SUPPORTED_LOCALES: SupportedLocale[] = [
+  { code: 'en', nativeName: 'English' },
+  { code: 'de', nativeName: 'Deutsch' },
+  { code: 'es', nativeName: 'Español' },
+  { code: 'fr', nativeName: 'Français' },
+  { code: 'ja', nativeName: '日本語' },
+  { code: 'ko', nativeName: '한국어' },
+  { code: 'ru', nativeName: 'Русский' },
+  { code: 'uk', nativeName: 'Українська' },
+  { code: 'zh', nativeName: '中文' },
+  { code: 'pl', nativeName: 'Polski' },
+  { code: 'cs', nativeName: 'Čeština' },
+  { code: 'it', nativeName: 'Italiano' },
+];
+
 export interface LocaleInformation {
   plugins: {
     [pluginName: string]: {

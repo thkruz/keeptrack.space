@@ -32,7 +32,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { KeyboardComponent } from '@app/engine/plugins/components/keyboard/keyboard-component';
 import { isThisNode } from '@app/engine/utils/isThisNode';
-import '@materializecss/materialize';
+import { Dropdown, Toast } from '@materializecss/materialize';
 import { BaseObject, Milliseconds, MILLISECONDS_PER_SECOND } from '@ootk/src/main';
 import cancelPng from '@public/img/icons/cancel.png';
 import checkCirclePng from '@public/img/icons/check-circle.png';
@@ -51,12 +51,11 @@ import { UiValidation } from './ui-validation';
 
 export class UiManager {
   private static readonly LONG_TIMER_DELAY = MILLISECONDS_PER_SECOND * 100;
+  private static readonly TOAST_TEMPLATE_ID = 'kt-toast';
 
   private isFooterVisible_ = true;
   private isInitialized_ = false;
 
-  // materializecss/materialize goes to window.M, but we want a local reference
-  M = window.M;
   bottomIconPress = (el: HTMLElement) => {
     ServiceLocator.getSoundManager()?.play(SoundNames.BEEP);
     EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, el.id);
@@ -149,6 +148,23 @@ export class UiManager {
     this.activeToastList_ = [];
   }
 
+  /**
+   * Ensure the toast template exists. Injected from code (not index.html) so every
+   * entry point (main, embed, celestrak) gets it. Toast clones this per toast via
+   * the v2 toastId option.
+   */
+  private static ensureToastTemplate_(): void {
+    if (document.getElementById(UiManager.TOAST_TEMPLATE_ID)) {
+      return;
+    }
+
+    const template = document.createElement('template');
+
+    template.id = UiManager.TOAST_TEMPLATE_ID;
+    template.innerHTML = '<div><img class="kt-toast-icon" alt="" /><span class="kt-toast-msg"></span><div class="kt-toast-progress"></div></div>';
+    document.body.appendChild(template);
+  }
+
   private makeToast_(toastText: string, type: ToastMsgType, isLong = false) {
     if (settingsManager.isDisableToasts) {
       return null;
@@ -181,13 +197,25 @@ export class UiManager {
         break;
     }
 
-    const iconHtml = `<img class="kt-toast-icon" src="${iconSrc}" alt="" />`;
+    /*
+     * Clone the toast structure from the template (v2 toastId option). `text` must
+     * stay empty — Toast renders it via innerText, which would wipe the children.
+     */
+    UiManager.ensureToastTemplate_();
+    const toastMsg = new Toast({ text: '', toastId: UiManager.TOAST_TEMPLATE_ID });
+    const toastEl = toastMsg.el;
 
-    const toastMsg = window.M.toast({
-      unsafeHTML: `${iconHtml}<span>${toastText}</span>`,
-    });
+    const icon = toastEl.querySelector<HTMLImageElement>('.kt-toast-icon');
 
-    const toastEl = toastMsg.$el[0] as HTMLElement;
+    if (icon) {
+      icon.src = iconSrc;
+    }
+
+    const message = toastEl.querySelector<HTMLElement>('.kt-toast-msg');
+
+    if (message) {
+      message.textContent = toastText;
+    }
 
     // Add an on click event to dismiss the toast
     toastEl.addEventListener('click', () => {
@@ -208,12 +236,12 @@ export class UiManager {
       toastMsg.timeRemaining = Math.min(Math.max(calculatedTime, 4000), 12000);
     }
 
-    // Add auto-dismiss progress bar
-    const progressBar = document.createElement('div');
+    // Auto-dismiss progress bar (part of the template)
+    const progressBar = toastEl.querySelector<HTMLElement>('.kt-toast-progress');
 
-    progressBar.className = 'kt-toast-progress';
-    progressBar.style.animationDuration = `${toastMsg.timeRemaining}ms`;
-    toastEl.appendChild(progressBar);
+    if (progressBar) {
+      progressBar.style.animationDuration = `${toastMsg.timeRemaining}ms`;
+    }
 
     setTimeout(() => {
       this.activeToastList_ = this.activeToastList_.filter((t) => t !== toastMsg);
@@ -349,7 +377,7 @@ export class UiManager {
       },
     ]).init();
 
-    window.M.Dropdown.init(elems);
+    Dropdown.init(elems);
     this.isInitialized_ = true;
   }
 
@@ -519,11 +547,7 @@ export class UiManager {
     }
   }
 
-  private activeToastList_ = [] as {
-    $el: NodeListOf<HTMLElement>;
-    timeRemaining: number;
-    dismiss: () => void;
-  }[];
+  private activeToastList_ = [] as Toast[];
 
   /**
    * Checks if enough time has elapsed and then calls all queued updateSelectBox callbacks

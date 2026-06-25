@@ -3,7 +3,6 @@
     "CreateSat": {
       "bottomIconLabel": "Utwórz satelitę",
       "title": "Utwórz satelitę",
-      "helpBody": "Menu Utwórz satelitę pozwala utworzyć satelitę poprzez ręczne wprowadzenie elementów orbitalnych lub import pliku efemerydy STK (.e).<br><br><b>Zakładka Podstawowe</b>: Wprowadź apogeum, perygeum i inklinację, aby szybko utworzyć satelitę.<br><br><b>Zakładka Zaawansowane</b>: Wprowadź pełne elementy keplerowskie (inklinacja, RAAN, mimośród, argument perycentrum, anomalia średnia, ruch średni).<br><br><b>Import STK .e</b>: Przeciągnij i upuść plik efemerydy STK na menu. Obsługiwane formaty: EphemerisTimePosVel, EphemerisTimePos i EphemerisTimePosVelAcc w inercjalnych układach współrzędnych (J2000, ICRF, TEME itp.). Obsługiwane formaty czasu: EpSec i UTCG. Słowa kluczowe nie rozróżniają wielkości liter.<br><br><b>Nieobsługiwane</b>: Formaty geodezyjne (LLA, LLR, MSL, Terrain), nieinercjalne układy odniesienia (Fixed, TrueOfDate) oraz dane kowariancji nie są obsługiwane.",
       "tabs": {
         "basic": "Podstawowe",
         "advanced": "Zaawansowane"
@@ -30,11 +29,18 @@
         "apogeeKm": "Apogeum (km)",
         "perigeeKm": "Perygeum (km)",
         "smaKm": "Półoś wielka (km)",
-        "velocityKms": "Prędkość orbitalna (km/s)"
+        "velocityKms": "Prędkość orbitalna (km/s)",
+        "sectionIdentity": "Tożsamość",
+        "sectionOrbit": "Orbita",
+        "sectionEpoch": "Epoka",
+        "sectionElements": "Elementy orbity",
+        "sectionPresets": "Ustawienia wstępne"
       },
       "buttons": {
         "createSatellite": "Utwórz satelitę",
-        "saveTle": "Zapisz TLE"
+        "saveTle": "Zapisz TLE",
+        "makeSunSync": "Nachylenie heliosynchroniczne",
+        "cloneSelected": "Klonuj wybranego satelitę"
       },
       "options": {
         "payload": "Ładunek użyteczny",
@@ -46,7 +52,7 @@
       "errorMsgs": {
         "errorCreatingSat": "Błąd tworzenia satelity!",
         "invalidNumericValues": "Wprowadź prawidłowe wartości liczbowe",
-        "perigeeTooLow": "Perygeum zbyt niskie — satelita uległby szybkiej deorbitacji",
+        "perigeeTooLow": "Perygeum zbyt niskie; satelita uległby szybkiej deorbitacji",
         "apogeeMustBeGtePerigee": "Apogeum musi być >= perygeum",
         "inclinationRange": "Inklinacja musi wynosić od 0 do 180 stopni",
         "invalidInputParams": "Nieprawidłowe parametry wejściowe",
@@ -67,11 +73,35 @@
         "invalidMeanMotion": "Nieprawidłowy ruch średni. Musi mieć format NN.NNNNN (np. 16.00000).",
         "invalidPeriod": "Nieprawidłowy okres. Musi mieć format NN.NNNN do NNNN.NNNN (np. 90.0000, 9999.9999) z łącznie 8 cyframi.",
         "invalidSource": "Nieprawidłowe źródło. Nie może być puste.",
-        "invalidName": "Nieprawidłowa nazwa. Nie może być pusta."
+        "invalidName": "Nieprawidłowa nazwa. Nie może być pusta.",
+        "slotOccupied": "Nadpisywanie istniejącego satelity {name} w slocie {scc}.",
+        "noFreeSlots": "Brak wolnych slotów analitycznych (90000-99999 są zajęte).",
+        "noSatSelected": "Najpierw wybierz satelitę do sklonowania."
       },
       "successMsgs": {
         "satCreated": "Satelita {name} ({scc}) utworzony pomyślnie",
         "tleExported": "TLE wyeksportowany pomyślnie"
+      },
+      "help": {
+        "overview": "Menu Utwórz satelitę dodaje do katalogu zupełnie nowego satelitę na podstawie wprowadzonych elementów orbitalnych. Użyj go do zamodelowania planowanego startu, odtworzenia obiektu z opublikowanych elementów lub budowy przypadków testowych. Utworzone satelity zajmują sloty analityczne (numery NORAD 90000 do 99999) i istnieją tylko w bieżącej sesji.",
+        "imgAlt": "Menu Utwórz satelitę z widoczną zakładką Podstawowe",
+        "imgCaption": "Zakładka Podstawowe buduje orbitę wyłącznie z apogeum, perygeum i inklinacji.",
+        "tabsHeading": "Zakładki Podstawowe i Zaawansowane",
+        "tabs": "Zakładka <strong>Podstawowe</strong> wymaga tylko numeru NORAD, nazwy oraz pól <strong>Inklinacja</strong>, <strong>Wysokość apogeum</strong> i <strong>Wysokość perygeum</strong>; reszta orbity jest wyznaczana automatycznie. Zakładka <strong>Zaawansowane</strong> udostępnia pełny zestaw elementów: <strong>Typ obiektu</strong>, <strong>Kraj</strong>, epokę oraz pola <strong>Rektascensja</strong>, <strong>Mimośród</strong>, <strong>Argument perycentrum</strong>, <strong>Anomalia średnia</strong> i <strong>Ruch średni</strong> lub <strong>Okres</strong> (edycja jednego przelicza drugie). Panel <strong>Obliczone parametry</strong> na bieżąco pokazuje wynikowe apogeum, perygeum, półoś wielką i prędkość orbitalną.",
+        "howToUse": "<ol><li>Otwórz menu <strong>Utwórz satelitę</strong> z dolnego paska.</li><li>Wybierz wolny numer NORAD z zakresu 90000 do 99999 i nadaj satelicie nazwę.</li><li>Na zakładce <strong>Podstawowe</strong> wprowadź inklinację, apogeum i perygeum; albo przełącz się na zakładkę <strong>Zaawansowane</strong>, aby podać pełny zestaw elementów.</li><li>Kliknij <strong>Utwórz satelitę</strong>. Nowy obiekt pojawia się natychmiast, a powiadomienie potwierdza jego nazwę i numer.</li><li>Użyj <strong>Zapisz TLE</strong>, aby wyeksportować elementy utworzonego satelity do pliku, który można później wczytać ponownie.</li></ol>",
+        "tip1": "Każde pole jest walidowane z osobnym komunikatem błędu; jeśli utworzenie się nie powiedzie, powiadomienie dokładnie wskaże, którą wartość poprawić.",
+        "tip2": "Perygeum poniżej około 100 km jest odrzucane, ponieważ satelita natychmiast uległby deorbitacji.",
+        "tip3": "Utworzone satelity istnieją tylko w bieżącej sesji; wyeksportuj TLE, jeśli chcesz zachować obiekt na inny dzień."
+      },
+      "presets": {
+        "placeholder": "Wczytaj ustawienie…",
+        "selectLabel": "Ustawienie orbity",
+        "leoIss": "LEO (jak ISS)",
+        "sso": "Heliosynchroniczna (800 km)",
+        "geo": "Geostacjonarna (GEO)",
+        "gto": "Transferowa do GEO (GTO)",
+        "molniya": "Molniya",
+        "polar": "Polarna (600 km)"
       }
     }
   }

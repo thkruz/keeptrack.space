@@ -1,0 +1,120 @@
+{
+  "Common": {
+    "orbitPreview": "Náhled dráhy",
+    "unknown": "Neznámý"
+  },
+  "help": {
+    "overview": "Přehled",
+    "howToUse": "Jak používat",
+    "tips": "Tipy",
+    "keyboardShortcuts": "Klávesové zkratky",
+    "troubleshooting": "Řešení problémů"
+  },
+  "loadingScreen": {
+    "startButton": "Klikněte pro zahájení",
+    "hint": "Tip:",
+    "downloadingScience": "Stahování vědeckých dat...",
+    "edition": {
+      "pro": "Profi",
+      "oss": "Otevřený software",
+      "celestrak": "CelesTrak",
+      "embed": "Vložené",
+      "offline": "Offline",
+      "epfl": "EPFL"
+    }
+  },
+  "errorMsgs": {
+    "LoginRequired": "Tato funkce vyžaduje přihlášení. Přihlaste se prosím pro pokračování.",
+    "catalogNotFullyInitialized": "Katalog ještě nebyl plně inicializován. Počkejte prosím několik sekund a zkuste to znovu.",
+    "sensorGroupsApiEmpty": "V API nebyly nalezeny žádné skupiny senzorů, návrat k přiložené databázi skupin senzorů.",
+    "SelectSensorFirst": "Nejprve vyberte senzor!",
+    "SelectSatelliteFirst": "Nejprve vyberte satelit!",
+    "SelectSecondarySatellite": "Nejprve vyberte sekundární satelit!",
+    "SatelliteNotDetailedSatellite": "Satelit není DetailedSatellite!",
+    "SensorNotFound": "Senzor nenalezen!",
+    "Scene": {
+      "disablingGodrays": "Váš počítač má potíže! Deaktivace paprsků.",
+      "disablingAurora": "Váš počítač má potíže! Deaktivace polární záře.",
+      "disablingAtmosphere": "Váš počítač má potíže! Deaktivace atmosféry.",
+      "disablingMoon": "Váš počítač má potíže! Deaktivace Měsíce.",
+      "disablingMilkyWay": "Váš počítač má potíže! Deaktivace Mléčné dráhy.",
+      "disablingSun": "Váš počítač má potíže! Deaktivace Slunce."
+    },
+    "Reports": {
+      "popupBlocker": "Povolte prosím vyskakovací okna pro tuto stránku pro zobrazení zpráv."
+    },
+    "SensorManager": {
+      "errorUpdatingUi": "Chyba při aktualizaci stylování UI senzoru."
+    }
+  },
+  "hoverManager": {
+    "launched": "Vypuštěno",
+    "launchedPlanned": "Vypuštění: Plánováno",
+    "launchedUnknown": "Vypuštění: Neznámé"
+  },
+  "darkClouds": {
+    "in": "V",
+    "satellites": "Satelity",
+    "and": "a",
+    "debris": "Trosky",
+    "buildingBuffers": "Budování bufferů...",
+    "presentDay": "Současnost"
+  },
+  "plugins": {
+    "proOnlyMsg": "Tento plugin je profesionální plugin. Váš soubor .env je nesprávně nakonfigurován nebo vám chybí soubory! Více informací na https://keeptrack.space/pro.",
+    "WatchlistOverlay": {
+      "bottomIconLabel": "Překrytí",
+      "title": "Menu překrytí",
+      "helpBody": "<p> Překrytí seznamu satelitů zobrazuje čas dalšího průletu pro každý satelit ve vašem seznamu. Překrytí se aktualizuje každých 10 sekund. </p> <p> Překrytí je barevně kódováno pro zobrazení času do dalšího průletu. Barvy jsou následující: </p> <ul> <li>Žlutá - V dohledu</li> <li>Modrá - Čas do dalšího průletu je do 30 minut po aktuálním čase nebo 10 minut před aktuálním časem</li> <li>Bílá - Jakýkoli budoucí průlet nesplňující výše uvedené požadavky</li> </ul> <p> Kliknutím na satelit v překrytí se mapa vycentruje na daný satelit. </p>"
+    },
+    "SensorFov": {
+      "bottomIconLabel": "FOV senzoru"
+    },
+    "SensorSurvFence": {
+      "bottomIconLabel": "Hradba senzoru"
+    },
+    "SatelliteViewPlugin": {
+      "bottomIconLabel": "Pohled ze satelitu"
+    },
+    "NightToggle": {
+      "bottomIconLabel": "Přepínač noci"
+    },
+    "Screenshot": {
+      "bottomIconLabel": "Pořídit snímek"
+    },
+    "TimeMachine": {
+      "bottomIconLabel": "Stroj času"
+    },
+    "ScreenRecorder": {
+      "bottomIconLabel": "Nahrát video"
+    },
+    "GraphicsMenuPlugin": {
+      "bottomIconLabel": "Menu grafiky",
+      "title": "Menu grafiky",
+      "helpBody": "Menu grafiky slouží ke změně grafických nastavení aplikace."
+    }
+  },
+  "pluginDrawer": {
+    "modeCatalog": "Katalog",
+    "modeSensors": "Senzory",
+    "modeEvents": "Události",
+    "modeCreate": "Vytvořit",
+    "modeAnalysis": "Analýza",
+    "modeConjunctions": "Přiblížení",
+    "modeDisplay": "Zobrazení",
+    "modeTools": "Nástroje",
+    "modeSettings": "Nastavení",
+    "modeExperimental": "Experimentální",
+    "modeRecent": "Nedávné",
+    "groupCameraModes": "Režimy kamery",
+    "groupLayerToggles": "Přepínače vrstev",
+    "groupSettingsToggles": "Přepínače nastavení",
+    "groupAbout": "O aplikaci"
+  },
+  "rightClickMenu": {
+    "pauseClock": "Pozastavit hodiny",
+    "resetCamera": "Obnovit kameru",
+    "clearLines": "Vymazat čáry",
+    "clearScreen": "Vymazat obrazovku"
+  }
+}

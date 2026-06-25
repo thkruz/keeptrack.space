@@ -3,7 +3,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { PluginDrawer } from '@app/app/ui/plugin-drawer';
-import { getShortcutHint } from '@app/app/ui/plugin-drawer-helpers';
+import { getShortcutHint, loadRecents, recordRecent } from '@app/app/ui/plugin-drawer-helpers';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
 
@@ -130,5 +130,52 @@ describe('PluginDrawer internals', () => {
     expect(p().allDrawerItems_.has('PluginA')).toBe(true);
     expect(p().allDrawerItems_.has('PluginB')).toBe(true);
     expect(result).toBeDefined();
+  });
+});
+
+describe('shared recents store', () => {
+  beforeEach(() => {
+    setupStandardEnvironment();
+    PersistenceManager.getInstance().clear();
+  });
+
+  afterEach(() => {
+    PersistenceManager.getInstance().clear();
+  });
+
+  it('recordRecent stores newest first and dedupes repeat activations', () => {
+    recordRecent('menu-apple');
+    recordRecent('menu-banana');
+    recordRecent('menu-apple');
+
+    const stored = loadRecents();
+
+    expect(stored.map((e) => e.id)).toEqual(['menu-apple', 'menu-banana']);
+    expect(typeof stored[0].t).toBe('number');
+  });
+
+  it('recordRecent caps the stored list at 20 entries', () => {
+    for (let i = 0; i < 25; i++) {
+      recordRecent(`menu-${i.toString()}`);
+    }
+
+    const stored = loadRecents();
+
+    expect(stored.length).toBe(20);
+    expect(stored[0].id).toBe('menu-24');
+  });
+
+  it('loadRecents tolerates malformed or non-array stored data', () => {
+    PersistenceManager.getInstance().saveItem(StorageKey.DRAWER_RECENT_PLUGINS, 'not-json');
+    expect(loadRecents()).toEqual([]);
+
+    PersistenceManager.getInstance().saveItem(StorageKey.DRAWER_RECENT_PLUGINS, '{"id":"x"}');
+    expect(loadRecents()).toEqual([]);
+  });
+
+  it('loadRecents migrates the legacy plain-string-array format', () => {
+    PersistenceManager.getInstance().saveItem(StorageKey.DRAWER_RECENT_PLUGINS, JSON.stringify(['menu-apple', 'menu-banana']));
+
+    expect(loadRecents()).toEqual([{ id: 'menu-apple', t: 0 }, { id: 'menu-banana', t: 0 }]);
   });
 });

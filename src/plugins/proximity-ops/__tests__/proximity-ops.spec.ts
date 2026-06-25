@@ -36,6 +36,10 @@ test.describe('ProximityOps', () => {
 
     await expect(sideMenu).toBeVisible({ timeout: 5_000 });
 
+    // v13 menu: the root carries the marker class and the submit is a kt-action row.
+    await expect(sideMenu).toHaveClass(/kt-ui-v13/u);
+    await expect(page.locator('#proximity-ops-submit .kt-action-label')).toBeAttached();
+
     // Verify form elements exist
     await expect(page.locator('#proximityOps-menu-form')).toBeAttached();
     await expect(page.locator('#proximity-ops-norad')).toBeAttached();

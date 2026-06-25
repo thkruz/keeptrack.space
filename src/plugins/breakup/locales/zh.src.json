@@ -3,13 +3,55 @@
     "Breakup": {
       "bottomIconLabel": "创建解体",
       "title": "解体菜单",
-      "helpBody": "解体菜单用于模拟卫星解体。<br><br>通过复制并修改卫星轨道，可对卫星解体进行建模。选择卫星并打开菜单后，可设置：<ul style=\"margin-left: 40px;\"> <li>倾角变化</li> <li>升交点赤经变化</li> <li>周期变化</li> <li>解体碎片数量</li> </ul>变化越大，模拟解体的碎片分布越广。默认参数足以模拟合理的解体分布。",
+      "sideMenuTitle": "解体模拟器",
+      "labels": {
+        "satelliteScc": "卫星 SCC#",
+        "initialSatelliteNumber": "初始卫星编号",
+        "pieces": "碎片数量",
+        "sourceSection": "来源",
+        "catalogSlotsSection": "目录槽位",
+        "dispersionSection": "速度离散",
+        "eventTypeLabel": "事件类型",
+        "preset_explosion": "爆炸",
+        "preset_collision": "灾难性碰撞",
+        "preset_asat_cosmos": "反卫星武器，Cosmos 1408（较低能量）",
+        "preset_asat_fy1c": "反卫星武器，Fengyun-1C（较高能量）",
+        "preset_venting": "低能量 / 泄气",
+        "preset_custom": "自定义",
+        "radialDeltaV": "径向 (m/s)",
+        "inTrackDeltaV": "沿轨 (m/s)",
+        "crossTrackDeltaV": "横向 (m/s)",
+        "dispersionHint": "施加于每个碎片的随机速度变化（1 西格玛）。沿轨方向使碎片云沿轨道拉伸；横向使其在轨道面内扇形展开；径向使其升高和降低。典型事件：爆炸约为 10 到 100 m/s，碰撞约为 100 到 300 m/s。",
+        "piecesSection": "数量"
+      },
+      "buttons": {
+        "createBreakup": "创建解体",
+        "clearBreakup": "清除解体"
+      },
+      "commands": {
+        "create": "创建解体",
+        "clear": "清除解体"
+      },
+      "toasts": {
+        "cleared": "已清除解体。碎片已移除。",
+        "fragmentsReentered": "{count} 个碎片已再入大气层，未被创建。"
+      },
+      "help": {
+        "overview": "解体菜单模拟卫星在其当前位置解体。它从所选卫星的精确位置生成碎片，每个碎片以微小的随机速度变化（delta-V）离开，因此您可以观察碎片云随时间形成并扩散。由于它基于卫星的状态矢量进行计算，因此支持任何轨道区域。",
+        "imgAlt": "带有 delta-V 离散和碎片数量控件的解体菜单",
+        "imgCaption": "解体参数。delta-V 值越大，模拟的碎片云扩散得越广。",
+        "parametersHeading": "参数",
+        "parameters": "<ul><li><strong>径向</strong>：朝向和远离地球的速度扩散（m/s），会使碎片升高和降低。</li><li><strong>沿轨</strong>：沿运动方向的速度扩散（m/s），会使碎片云沿轨道拉伸。</li><li><strong>横向</strong>：垂直于轨道面的速度扩散（m/s），会使碎片云在轨道面内扇形展开。</li><li><strong>碎片数量</strong>：要创建的碎片数量（5到1000）。</li><li><strong>初始卫星编号</strong>：分配给碎片的第一个分析目录编号（默认为90000）。</li></ul>这些值被视为每个碎片的一西格玛扩散。默认值（每个轴约 40 m/s）模拟爆炸级事件；真实的爆炸碎片以大约 10 到 100 m/s 扩散，而灾难性碰撞可达到大约 100 到 300 m/s（小碎片可超过 1 km/s）。保持三个轴相等可获得物理上真实、球对称的事件；随着时间推移，碎片云会自然地沿轨道拉伸。",
+        "howToUse": "<ol><li>选择任意一颗卫星。在选择卫星之前，图标保持禁用状态。</li><li>打开解体菜单，调整 delta-V 离散和碎片数量。</li><li>点击<strong>创建解体</strong>。碎片将在卫星当前位置生成，搜索栏会填入新的碎片，以便您查看整个碎片云。</li><li>加快时间，观察碎片云沿轨道扩散。</li></ol>",
+        "tip1": "可在任何轨道区域工作，包括 LEO、MEO、GEO 以及高椭圆（HEO）轨道，因为每个碎片都是从解体点处母卫星的状态矢量传播而来的。",
+        "tip2": "解体仅为模拟且只存在于内存中。使用清除解体可移除碎片，或重新加载页面。母卫星本身永远不会被修改。",
+        "tip3": "所有碎片都创建为碎片类型的物体，因此基于碎片的配色方案和筛选器会立即应用于它们。"
+      },
       "errorMsgs": {
         "SatelliteNotFound": "未找到卫星！",
-        "CannotCreateBreakupForNonCircularOrbits": "无法为非圆形轨道创建解体。正在修复中。",
-        "CannotCalcDirectionOfSatellite": "无法计算卫星方向。请稍后再试。",
         "ErrorCreatingBreakup": "创建解体时出错！",
         "InvalidStartNum": "无效的卫星起始编号！默认为90000！",
+        "InvalidSlotRange": "初始卫星编号超出范围。请使用 {start} 到 {end}。",
         "BreakupGeneratorFailed": "解体生成器失败！"
       }
     }

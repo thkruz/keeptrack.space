@@ -3,10 +3,29 @@
     "SatellitePhotos": {
       "bottomIconLabel": "Satelitní snímky",
       "title": "Satelitní snímky",
-      "helpBody": "Plugin satelitních snímků zobrazuje nejnovější snímky z geostacionárních meteorologických satelitů a DSCOVR. Klikněte na název satelitu pro zobrazení jeho nejnovějšího snímku.",
       "defaultImageTitle": "Nejnovější satelitní snímek",
+      "labels": {
+        "dscovrUnavailable": "DSCOVR dočasně nedostupný",
+        "dscovrImage": "Snímek DSCOVR {index}",
+        "dscovrLoading": "Načítání snímků DSCOVR…",
+        "refresh": "Obnovit nejnovější snímek",
+        "imageAtUtc": "{name} v {time} UTC"
+      },
+      "sections": {
+        "geostationary": "Geostacionární",
+        "dscovr": "DSCOVR (L1)"
+      },
       "errorMsgs": {
         "FuturePictures": "Nelze načíst snímky z budoucnosti. Načítám nejnovější snímky."
+      },
+      "help": {
+        "overview": "Satelitní snímky zobrazují nejnovější fotografie pořízené skutečnými meteorologickými satelity: snímky celého disku z družic MeteoSat, Himawari, GOES a Elektro-L na geostacionární dráze a snímky celé Země z DSCOVR v bodě L1. Propojují to, co vidíte v simulaci, s tím, co tyto satelity právě teď skutečně fotografují.",
+        "imgAlt": "Menu Satelitní snímky se seznamem meteorologických satelitů",
+        "imgCaption": "Kliknutím na satelit zobrazíte jeho nejnovější snímek a přeletíte k němu ve scéně.",
+        "howToUse": "<ol><li>Otevřete <strong>Satelitní snímky</strong> ze spodní lišty nebo stiskněte <strong>H</strong>; je vyžadováno připojení k internetu.</li><li>Klikněte na satelit. Kamera k němu přeletí ve 3D scéně a jeho nejnovější snímek se otevře v překryvném okně.</li><li>Položky DSCOVR se zobrazují na konci seznamu, jedna položka pro každý nedávný snímek.</li></ol>",
+        "tip1": "Snímky přicházejí živě z veřejných služeb jednotlivých agentur, takže chybějící položka obvykle znamená dočasný výpadek daného zdroje, ne chybu.",
+        "tip2": "Pokud jsou hodiny simulace nastaveny do budoucnosti, zobrazí se místo toho nejnovější skutečné snímky.",
+        "shortcutToggle": "Přepnout menu Satelitní snímky"
       }
     }
   }

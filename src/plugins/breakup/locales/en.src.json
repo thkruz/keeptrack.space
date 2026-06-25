@@ -3,13 +3,55 @@
     "Breakup": {
       "bottomIconLabel": "Create Breakup",
       "title": "Breakup Menu",
-      "helpBody": "The Breakup Menu is a tool for simulating the breakup of a satellite. <br><br> By modifying duplicating and modifying a satellite's orbit we can model the breakup of a satellite. After selecting a satellite and opening the menu, the user can select: <ul style=\"margin-left: 40px;\"> <li>Inclination Variation</li> <li>RAAN Variation</li> <li>Period Variation</li> <li>Number of Breakup Pieces</li> </ul> The larger the variation the bigger the spread in the simulated breakup. The default variations are sufficient to simulate a breakup with a reasonable spread.",
+      "sideMenuTitle": "Breakup Simulator",
+      "labels": {
+        "satelliteScc": "Satellite SCC#",
+        "initialSatelliteNumber": "Initial Satellite Number",
+        "pieces": "Pieces",
+        "sourceSection": "Source",
+        "catalogSlotsSection": "Catalog Slots",
+        "dispersionSection": "Velocity Dispersion",
+        "eventTypeLabel": "Event Type",
+        "preset_explosion": "Explosion",
+        "preset_collision": "Catastrophic Collision",
+        "preset_asat_cosmos": "ASAT, Cosmos 1408 (lower energy)",
+        "preset_asat_fy1c": "ASAT, Fengyun-1C (higher energy)",
+        "preset_venting": "Low-Energy / Venting",
+        "preset_custom": "Custom",
+        "radialDeltaV": "Radial (m/s)",
+        "inTrackDeltaV": "In-Track (m/s)",
+        "crossTrackDeltaV": "Cross-Track (m/s)",
+        "dispersionHint": "Random velocity change applied to each fragment (1 sigma). In-track stretches the cloud along the orbit; cross-track fans it across the orbital plane; radial raises and lowers it. Typical events: explosions about 10 to 100 m/s, collisions about 100 to 300 m/s.",
+        "piecesSection": "Count"
+      },
+      "buttons": {
+        "createBreakup": "Create Breakup",
+        "clearBreakup": "Clear Breakup"
+      },
+      "commands": {
+        "create": "Create Breakup",
+        "clear": "Clear Breakup"
+      },
+      "toasts": {
+        "cleared": "Breakup cleared. Debris removed.",
+        "fragmentsReentered": "{count} fragments reentered and were not created."
+      },
+      "help": {
+        "overview": "The Breakup menu simulates a satellite breaking apart at its current position. It spawns debris pieces from the selected satellite's exact location, each leaving with a small random velocity change (delta-V), so you can watch the debris cloud form and spread over time. Because it works from the satellite's state vector, it supports any orbital regime.",
+        "imgAlt": "The Breakup menu with delta-V dispersion and piece-count controls",
+        "imgCaption": "Breakup parameters. Larger delta-V values spread the simulated debris cloud wider.",
+        "parametersHeading": "Parameters",
+        "parameters": "<ul><li><strong>Radial</strong>: velocity spread toward and away from Earth (m/s), which raises and lowers the fragments.</li><li><strong>In-Track</strong>: velocity spread along the direction of motion (m/s), which stretches the cloud along the orbit.</li><li><strong>Cross-Track</strong>: velocity spread out of the orbital plane (m/s), which fans the cloud across the plane.</li><li><strong>Pieces</strong>: how many debris fragments to create (5 to 1000).</li><li><strong>Initial Satellite Number</strong>: the first analyst catalog number to assign to the pieces (defaults to 90000).</li></ul>The values are treated as a one-sigma spread per fragment. The defaults (about 40 m/s per axis) model an explosion-class event; real explosion fragments spread by roughly 10 to 100 m/s, while catastrophic collisions reach roughly 100 to 300 m/s (small fragments can exceed 1 km/s). Keep the three axes equal for a physically realistic, spherically symmetric event; the cloud naturally stretches along the orbit over time.",
+        "howToUse": "<ol><li>Select any satellite. The icon stays disabled until a satellite is selected.</li><li>Open the Breakup menu and adjust the delta-V dispersion and piece count.</li><li>Click <strong>Create Breakup</strong>. The pieces are generated at the satellite's current position and the search bar fills with the new debris so you can see the whole cloud.</li><li>Speed up time to watch the cloud disperse along the orbit.</li></ol>",
+        "tip1": "Works in any orbital regime, including LEO, MEO, GEO, and highly elliptical (HEO) orbits, because every fragment is propagated from the parent's state vector at the breakup point.",
+        "tip2": "The breakup is simulated and in-memory only. Use Clear Breakup to remove the debris, or reload the page. The parent satellite itself is never modified.",
+        "tip3": "All pieces are created as debris-type objects, so debris-based color schemes and filters apply to them immediately."
+      },
       "errorMsgs": {
         "SatelliteNotFound": "Satellite not found!",
-        "CannotCreateBreakupForNonCircularOrbits": "Cannot create a breakup for non-circular orbits. Working on a fix.",
-        "CannotCalcDirectionOfSatellite": "Cannot calculate direction of satellite. Try again later.",
         "ErrorCreatingBreakup": "Error creating breakup!",
         "InvalidStartNum": "Invalid satellite starting number! Defaulting to 90000!",
+        "InvalidSlotRange": "Initial satellite number out of range. Use {start} to {end}.",
         "BreakupGeneratorFailed": "Breakup Generator Failed!"
       }
     }

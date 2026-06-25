@@ -1,9 +1,0 @@
-{
-  "plugins": {
-    "NextLaunchesPlugin": {
-      "bottomIconLabel": "다음 발사",
-      "title": "다음 발사 메뉴",
-      "helpBody": "다음 발사 메뉴는 <a href=\"https://thespacedevs.com/\" target=\"_blank\">The Space Devs</a>에서 데이터를 가져와 예정된 발사를 표시합니다."
-    }
-  }
-}

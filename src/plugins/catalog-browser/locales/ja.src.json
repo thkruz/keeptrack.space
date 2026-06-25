@@ -3,8 +3,8 @@
     "CatalogBrowserPlugin": {
       "bottomIconLabel": "カタログブラウザ",
       "title": "カタログブラウザ",
-      "helpBody": "衛星カタログを閲覧・読み込みます。<br><br>トグルを使用して、カタログ全体を置換（全データ）するか、既存衛星の軌道要素のみを更新（軌道データのみ）するかを選択できます。",
       "labels": {
+        "loadMode": "読み込みモード",
         "allData": "全データ",
         "orbitalOnly": "軌道のみ",
         "allDataDesc": "選択したデータでカタログ全体を置換",
@@ -91,15 +91,27 @@
         "vimpelLoaded": "JSC Vimpel カタログを読み込みました"
       },
       "commands": {
-        "category": "カタログブラウザ"
+        "category": "カタログブラウザ",
+        "loadCatalog": "カタログを読み込む: {name}"
       },
       "errorMsgs": {
         "FetchFailed": "カタログの取得に失敗",
         "DefaultFailed": "デフォルトカタログの復元に失敗",
-        "Forbidden": "CelesTrak rejected the request (HTTP 403). This is usually a Cloudflare rate-limit — wait a minute and try again.",
-        "RateLimited": "Too many catalog requests. Please wait a minute before trying again.",
-        "ServerError": "CelesTrak is temporarily unavailable. Please try again in a few minutes.",
-        "NetworkError": "Could not reach CelesTrak. Check your network connection."
+        "Forbidden": "CelesTrak がリクエストを拒否しました（HTTP 403）。通常は Cloudflare のレート制限が原因です。1分ほど待ってから再試行してください。",
+        "RateLimited": "カタログのリクエストが多すぎます。1分ほど待ってから再試行してください。",
+        "ServerError": "CelesTrak は一時的に利用できません。数分後にもう一度お試しください。",
+        "NetworkError": "CelesTrak に接続できませんでした。ネットワーク接続を確認してください。"
+      },
+      "help": {
+        "overview": "カタログブラウザは、表示中の衛星カタログを切り替えます。厳選されたリスト（コンステレーション、デブリ群、ミッションカテゴリ）または CelesTrak と JSC Vimpel の完全なカタログから選択すると、シーンがそれらのオブジェクトだけで再読み込みされます。",
+        "imgAlt": "読み込みモードの切り替えとカタログ一覧を備えたカタログブラウザのメニュー",
+        "imgCaption": "読み込みモードを選択し、任意のカタログをクリックして読み込みます。",
+        "modesHeading": "読み込みモード",
+        "modes": "<strong>全データ</strong>は、名前、種類、メタデータを含むカタログ全体を選択したデータセットで置き換えます。<strong>軌道のみ</strong>は、既存のすべての衛星を保持し、その軌道要素のみを更新します。オブジェクトを編集している場合や既存のメタデータに依存している場合は、こちらの方が安全です。",
+        "howToUse": "<ol><li>下部メニュー（カタログモード）から<strong>カタログブラウザ</strong>を開きます。</li><li>トグルで<strong>全データ</strong>または<strong>軌道のみ</strong>を選択します。その下の説明が現在のモードを示します。</li><li>カテゴリ別リストの中から、<strong>宇宙ステーション</strong>、<strong>Starlink</strong>、<strong>COSMOS 1408 デブリ</strong>などのカタログをクリックします。読み込みが完了すると通知が表示されます。</li><li><strong>デフォルトカタログ</strong>を読み込むと、標準の完全なカタログに戻ります。</li></ol>",
+        "tip1": "すべてのカタログはコマンドパレットからもカタログ読み込みコマンドとして利用できるため、メニューを開かずに切り替えられます。",
+        "tip2": "小さなカタログを読み込むと、低速なマシンでのパフォーマンスが大幅に向上します。最も明るい100機のリストは最小構成として最適です。",
+        "tip3": "カタログのダウンロードは CelesTrak から行われ、レート制限を受けることがあります。HTTP 403 のメッセージで読み込みに失敗した場合は、1分ほど待ってから再試行してください。"
       }
     }
   }

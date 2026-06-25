@@ -205,7 +205,7 @@ export class Ellipsoid {
 
   private shaders_ = {
     frag: glsl`#version 300 es
-      precision mediump float;
+      precision highp float;
       in vec3 v_normal;
       out vec4 fragColor;
       uniform vec4 u_color;

@@ -28,12 +28,17 @@ export enum StorageKey {
   SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED = 'v2-keepTrack-settings-focusOnSatWhenSelected',
   SETTINGS_SEARCH_LIMIT = 'v2-keepTrack-settings-searchLimit',
   SETTINGS_SHOW_DECAYED_IN_SEARCH = 'v2-keepTrack-settings-showDecayedInSearch',
+  SETTINGS_MINIMUM_SEARCH_CHARACTERS = 'v2-keepTrack-settings-minimumSearchCharacters',
+  SETTINGS_SHOW_VIMPEL_IN_SEARCH = 'v2-keepTrack-settings-showVimpelInSearch',
+  SETTINGS_SEARCHABLE_FIELDS = 'v2-keepTrack-settings-searchableFields',
   SETTINGS_DRAW_TRAILING_ORBITS = 'v2-keepTrack-settings-drawTrailingOrbits',
   SETTINGS_DRAW_AURORA = 'v2-keepTrack-settings-drawAurora',
   SETTINGS_DRAW_GRATICULE = 'v2-keepTrack-settings-drawGraticule',
+  SETTINGS_DRAW_FLAT_MAP_TERMINATOR = 'v2-keepTrack-settings-drawFlatMapTerminator',
   SETTINGS_DRAW_SUN = 'v2-keepTrack-settings-drawSun',
   SETTINGS_CONFIDENCE_LEVELS = 'v2-keepTrack-settings-confidenceLevels',
   SETTINGS_DRAW_COVARIANCE_ELLIPSOID = 'v2-keepTrack-settings-drawCovarianceEllipsoid',
+  SETTINGS_COVARIANCE_CONFIDENCE_LEVEL = 'v2-keepTrack-settings-covarianceConfidenceLevel',
   GRAPHICS_SETTINGS_GODRAYS_SAMPLES = 'v2-keepTrack-graphicsSettings-godraysSamples',
   GRAPHICS_SETTINGS_GODRAYS_DECAY = 'v2-keepTrack-graphicsSettings-godraysDecay',
   GRAPHICS_SETTINGS_GODRAYS_EXPOSURE = 'v2-keepTrack-graphicsSettings-godraysExposure',
@@ -113,4 +118,46 @@ export enum StorageKey {
 
   // Color Scheme Editor
   COLOR_SCHEME_OVERRIDES = 'v2-keepTrack-colorSchemeOverrides',
+
+  // Achievement progress counters (mirrors the server-synced app_preferences copy)
+  ACHIEVEMENT_COUNTERS = 'v2-keepTrack-achievementCounters',
+
+  // Best Pass Pro (column visibility + propagation settings)
+  BEST_PASS_SETTINGS = 'v2-keepTrack-bestPassSettings',
+
+  // Sponsor ad dismissal (timestamp in ms until which the ad stays hidden)
+  SPONSOR_AD_DISMISSED_UNTIL = 'v2-keepTrack-sponsorAdDismissedUntil',
+
+  // Stereo Map (map style, graticule, political overlay, orbit multiplier)
+  STEREO_MAP_SETTINGS = 'v2-keepTrack-stereoMapSettings',
+
+  // Aurora Pro (opt-in NOAA OVATION auto-refresh toggle)
+  AURORA_AUTO_REFRESH = 'v2-keepTrack-auroraAutoRefresh',
+
+  // Aurora Pro (opt-in: enable the high-accuracy overlay automatically on fetch)
+  AURORA_AUTO_HIGH_ACCURACY = 'v2-keepTrack-auroraAutoHighAccuracy',
+
+  // Scenario Management Pro (saved scenario library: name -> { savedAt, data })
+  SCENARIO_LIBRARY = 'v2-keepTrack-scenarioLibrary',
+
+  // Stars Pro (vmag limit, constellation label toggle)
+  STARS_SETTINGS = 'v2-keepTrack-starsSettings',
+
+  // Seismic Activity Pro (feed selection, min magnitude, auto-refresh)
+  SEISMIC_ACTIVITY_SETTINGS = 'v2-keepTrack-seismicActivitySettings',
+
+  // User Account (epoch ms of the last successful cloud sync)
+  USER_LAST_SYNCED = 'v2-keepTrack-userLastSynced',
+
+  // Proximity Ops (last-used search inputs: thresholds, orbit type, toggles)
+  PROXIMITY_OPS_SETTINGS = 'v2-keepTrack-proximityOpsSettings',
+
+  // Breakup (last-used variation inputs: inc/period/RAAN/ecc spread, count, start number)
+  BREAKUP_SETTINGS = 'v2-keepTrack-breakupSettings',
+
+  // Reports (last-used output options: time window, sampling step, export format)
+  REPORTS_SETTINGS = 'v2-keepTrack-reportsSettings',
+
+  // Calculator (last-used input frame, output format, and field values)
+  CALCULATOR_SETTINGS = 'v2-keepTrack-calculatorSettings',
 }

@@ -1,6 +1,8 @@
 {
   "plugins": {
     "DrawLinesPlugin": {
+      "title": "Disegna linee",
+      "bottomIconLabel": "Disegna linee",
       "rmbMenu": {
         "title": "Disegna",
         "eciAxes": "Assi ECI",
@@ -13,12 +15,39 @@
         "earthToSatellite": "Terra-Satellite",
         "sensorToSatellite": "Sensore-Satellite",
         "satelliteToSatellite": "Satellite-Satellite",
+        "satelliteRicAxes": "Assi RIC del satellite",
         "satelliteToSun": "Satellite-Sole",
         "satelliteToMoon": "Satellite-Luna",
         "moonOrbit": "Disegna orbita della Luna"
       },
+      "sections": {
+        "activeLines": "Linee attive",
+        "referenceGeometry": "Geometria di riferimento",
+        "objectLines": "Linee oggetto"
+      },
+      "referenceFrameLabel": "Sistema di riferimento",
+      "clearAll": "Cancella tutte le linee",
+      "emptyList": "Nessuna linea disegnata",
+      "remove": "Rimuovi",
+      "lineTypes": {
+        "reference": "Linea di riferimento",
+        "satToRef": "Satellite-Punto",
+        "satRic": "Assi RIC",
+        "objToObj": "Oggetto-Oggetto",
+        "satToSun": "Satellite-Sole",
+        "satToBody": "Satellite-Corpo",
+        "sensorToSat": "Sensore-Satellite",
+        "sensorToSun": "Sensore-Sole",
+        "sensorToMoon": "Sensore-Luna",
+        "orbitPath": "Traiettoria orbitale",
+        "satScanEarth": "Scansione Terra",
+        "sensorScanHorizon": "Scansione orizzonte",
+        "sensorToRae": "Sensore-Punto",
+        "generic": "Linea"
+      },
       "errorMsgs": {
-        "noPrimarySat": "Nessun satellite primario selezionato per la linea satellite-satellite."
+        "noPrimarySat": "Nessun satellite primario selezionato per la linea satellite-satellite.",
+        "noSatSelected": "Seleziona prima un satellite."
       }
     }
   }

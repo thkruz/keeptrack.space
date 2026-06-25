@@ -8,7 +8,7 @@ test.describe('CloseObjects Plugin', () => {
       settings: { isDisableLoginGate: true, isMobileModeEnabled: true },
     });
 
-    const bottomIcon = page.locator('#close-objects-icon');
+    const bottomIcon = page.locator('#conjunction-nearby-icon');
     const sideMenu = page.locator('#close-objects-menu');
 
     // Bottom icon should exist and NOT be disabled
@@ -26,7 +26,7 @@ test.describe('CloseObjects Plugin', () => {
       await expect(groupItems).toBeVisible({ timeout: 2_000 });
     }
 
-    const drawerItem = page.locator('.drawer-item[data-plugin-id="close-objects-icon"]');
+    const drawerItem = page.locator('.drawer-item[data-plugin-id="conjunction-nearby-icon"]');
 
     await expect(drawerItem).toBeVisible();
 

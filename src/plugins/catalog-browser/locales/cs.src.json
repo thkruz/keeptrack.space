@@ -3,8 +3,8 @@
     "CatalogBrowserPlugin": {
       "bottomIconLabel": "Prohlížeč katalogu",
       "title": "Prohlížeč katalogu",
-      "helpBody": "Procházejte a načítejte katalogy satelitů. <br><br>Pomocí přepínače zvolte, zda chcete nahradit celý katalog (Všechna data) nebo aktualizovat pouze orbitální prvky pro stávající satelity (Pouze orbitální data).",
       "labels": {
+        "loadMode": "Režim načítání",
         "allData": "Všechna data",
         "orbitalOnly": "Pouze orbitální",
         "allDataDesc": "Nahradí celý katalog vybranými daty",
@@ -91,15 +91,27 @@
         "vimpelLoaded": "Katalog JSC Vimpel načten"
       },
       "commands": {
-        "category": "Prohlížeč katalogu"
+        "category": "Prohlížeč katalogu",
+        "loadCatalog": "Načíst katalog: {name}"
       },
       "errorMsgs": {
         "FetchFailed": "Nepodařilo se načíst katalog",
         "DefaultFailed": "Nepodařilo se obnovit výchozí katalog",
-        "Forbidden": "CelesTrak rejected the request (HTTP 403). This is usually a Cloudflare rate-limit — wait a minute and try again.",
-        "RateLimited": "Too many catalog requests. Please wait a minute before trying again.",
-        "ServerError": "CelesTrak is temporarily unavailable. Please try again in a few minutes.",
-        "NetworkError": "Could not reach CelesTrak. Check your network connection."
+        "Forbidden": "CelesTrak odmítl požadavek (HTTP 403). Obvykle jde o limit požadavků Cloudflare; počkejte minutu a zkuste to znovu.",
+        "RateLimited": "Příliš mnoho požadavků na katalog. Před dalším pokusem prosím počkejte minutu.",
+        "ServerError": "CelesTrak je dočasně nedostupný. Zkuste to prosím znovu za několik minut.",
+        "NetworkError": "Nepodařilo se připojit ke službě CelesTrak. Zkontrolujte připojení k síti."
+      },
+      "help": {
+        "overview": "Prohlížeč katalogu mění katalog satelitů, který si právě prohlížíte. Vyberte si z připravených seznamů (konstelace, oblak trosek, kategorie misí) nebo úplných katalogů CelesTrak a JSC Vimpel a scéna se znovu načte přesně s těmito objekty.",
+        "imgAlt": "Nabídka Prohlížeče katalogu s přepínačem režimu načítání a seznamem katalogů",
+        "imgCaption": "Zvolte režim načítání a poté klikněte na libovolný katalog pro jeho načtení.",
+        "modesHeading": "Režimy načítání",
+        "modes": "<strong>Všechna data</strong> nahradí celý katalog vybranou datovou sadou včetně názvů, typů a metadat. <strong>Pouze orbitální</strong> zachová všechny satelity, které již máte, a obnoví pouze jejich orbitální elementy, což je bezpečnější volba, pokud jste objekty upravovali nebo se spoléháte na stávající metadata.",
+        "howToUse": "<ol><li>Otevřete <strong>Prohlížeč katalogu</strong> ze spodní nabídky (režim Katalog).</li><li>Přepínačem zvolte <strong>Všechna data</strong> nebo <strong>Pouze orbitální</strong>; popis pod ním vysvětluje aktuální režim.</li><li>Klikněte na katalog v kategorizovaném seznamu, například <strong>Kosmické stanice</strong>, <strong>Starlink</strong> nebo <strong>Trosky COSMOS 1408</strong>. Načtení potvrdí oznámení.</li><li>Načtěte <strong>Výchozí katalog</strong> pro návrat ke standardnímu úplnému katalogu.</li></ol>",
+        "tip1": "Každý katalog je dostupný také z palety příkazů jako příkaz pro načtení katalogu, takže můžete přepínat bez otevírání nabídky.",
+        "tip2": "Načtení malého katalogu výrazně zlepšuje výkon na pomalejších počítačích; seznam 100 nejjasnějších je dobrá minimální sada.",
+        "tip3": "Katalogy se stahují z CelesTrak a mohou podléhat omezení počtu požadavků; pokud načtení selže se zprávou HTTP 403, počkejte minutu a zkuste to znovu."
       }
     }
   }

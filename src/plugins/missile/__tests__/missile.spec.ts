@@ -1,15 +1,15 @@
 import { test, expect } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
-test.describe('MissilePlugin', () => {
+test.describe('MissileSimulatorPlugin', () => {
   test('open side menu via drawer, verify form elements, then close', async ({ page }) => {
     await waitForAppReady(page, {
-      plugins: { MissilePlugin: { enabled: true } },
+      plugins: { MissileSimulatorPlugin: { enabled: true } },
       settings: { isMobileModeEnabled: true },
     });
 
-    // Composition-based: elementName is 'MissilePlugin-bottom-icon'
-    const bottomIcon = page.locator('#MissilePlugin-bottom-icon');
+    // Composition-based: elementName is 'MissileSimulatorPlugin-bottom-icon'
+    const bottomIcon = page.locator('#MissileSimulatorPlugin-bottom-icon');
 
     await expect(bottomIcon).toBeAttached();
 
@@ -24,20 +24,20 @@ test.describe('MissilePlugin', () => {
       await expect(groupItems).toBeVisible({ timeout: 2_000 });
     }
 
-    const drawerItem = page.locator('.drawer-item[data-plugin-id="MissilePlugin-bottom-icon"]');
+    const drawerItem = page.locator('.drawer-item[data-plugin-id="MissileSimulatorPlugin-bottom-icon"]');
 
     await expect(drawerItem).toBeVisible();
 
     // Click to open side menu
     await drawerItem.click();
 
-    const sideMenu = page.locator('#MissilePlugin-menu');
+    const sideMenu = page.locator('#MissileSimulatorPlugin-menu');
 
     await expect(sideMenu).toBeVisible({ timeout: 5_000 });
     await expect(bottomIcon).toHaveClass(/bmenu-item-selected/u);
 
     // Verify form exists (inside draggable wrapper, use toBeAttached)
-    await expect(page.locator('#MissilePlugin-menu-form')).toBeAttached();
+    await expect(page.locator('#MissileSimulatorPlugin-menu-form')).toBeAttached();
 
     // Verify attack type select
     const typeSelect = page.locator('#ms-type');
@@ -55,14 +55,15 @@ test.describe('MissilePlugin', () => {
     await expect(page.locator('#ms-lat')).toBeAttached();
     await expect(page.locator('#ms-lon')).toBeAttached();
 
-    // Verify "Show All Missiles" button
-    await expect(page.locator('#searchRvBtn')).toBeAttached();
+    // Verify warhead (MIRV) count input
+    await expect(page.locator('#ms-warheads')).toBeAttached();
 
-    // Verify error display element
-    await expect(page.locator('#ms-error')).toBeAttached();
+    // Verify the action rows
+    await expect(page.locator('#searchRvBtn')).toBeAttached();
+    await expect(page.locator('#clearMissilesBtn')).toBeAttached();
 
     // Close via close button
-    await page.locator('#MissilePlugin-menu-close-btn').click();
+    await page.locator('#MissileSimulatorPlugin-menu-close-btn').click();
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u, { timeout: 5_000 });
   });
 });

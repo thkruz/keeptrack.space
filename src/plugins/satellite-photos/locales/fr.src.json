@@ -3,10 +3,29 @@
     "SatellitePhotos": {
       "bottomIconLabel": "Imagerie Satellite",
       "title": "Imagerie Satellite",
-      "helpBody": "Le plugin Imagerie Satellite affiche les dernières images des satellites météorologiques géostationnaires et de DSCOVR. Cliquez sur le nom d'un satellite pour voir son image la plus récente.",
       "defaultImageTitle": "Dernière image satellite",
+      "labels": {
+        "dscovrUnavailable": "DSCOVR temporairement indisponible",
+        "dscovrImage": "Image DSCOVR {index}",
+        "dscovrLoading": "Chargement des images DSCOVR…",
+        "refresh": "Actualiser la dernière image",
+        "imageAtUtc": "{name} à {time} UTC"
+      },
+      "sections": {
+        "geostationary": "Géostationnaire",
+        "dscovr": "DSCOVR (L1)"
+      },
       "errorMsgs": {
         "FuturePictures": "Impossible de charger des images du futur. Chargement des images les plus récentes."
+      },
+      "help": {
+        "overview": "Imagerie Satellite affiche les photos les plus récentes prises par de vrais satellites météorologiques : vues du disque complet de MeteoSat, Himawari, GOES et Elektro-L en orbite géostationnaire, plus des images de la Terre entière prises par DSCOVR au point L1. Cela relie ce que vous voyez dans la simulation à ce que ces satellites photographient réellement en ce moment.",
+        "imgAlt": "Le menu Imagerie Satellite listant les satellites météorologiques",
+        "imgCaption": "Cliquez sur un satellite pour voir sa dernière image et voler vers lui dans la scène.",
+        "howToUse": "<ol><li>Ouvrez <strong>Imagerie Satellite</strong> depuis la barre inférieure ou appuyez sur <strong>H</strong> ; une connexion internet est nécessaire.</li><li>Cliquez sur un satellite. La caméra vole vers lui dans la scène 3D et sa dernière image s'ouvre en superposition.</li><li>Les entrées DSCOVR apparaissent en bas de la liste, avec une entrée par image récente.</li></ol>",
+        "tip1": "Les images proviennent en direct du service public de chaque agence ; une entrée manquante signifie donc généralement que ce flux est temporairement indisponible, pas qu'il y a un bogue.",
+        "tip2": "Si l'horloge de la simulation est réglée dans le futur, les images réelles les plus récentes sont affichées à la place.",
+        "shortcutToggle": "Basculer le menu Imagerie Satellite"
       }
     }
   }

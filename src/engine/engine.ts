@@ -13,7 +13,7 @@ import { EventBus } from './events/event-bus';
 import { EventBusEvent } from './events/event-bus-events';
 import { InputManager } from './input/input-manager';
 import { WebGLRenderer } from './rendering/webgl-renderer';
-import { errorManagerInstance } from './utils/errorManager';
+import { errorManagerInstance, isOpaqueWindowError } from './utils/errorManager';
 import { isThisNode } from './utils/isThisNode';
 
 
@@ -95,7 +95,7 @@ export class Engine {
         source: e.filename,
         line: e.lineno,
         col: e.colno,
-        isCrossOrigin: !e.error && e.message === 'Script error.',
+        isCrossOrigin: isOpaqueWindowError(e),
       });
     });
 
@@ -135,7 +135,9 @@ export class Engine {
 
     this.lastFrameTime_ = timestamp;
 
-    if (!this.isPaused && this.application_.isReady) {
+    // Stand down while a plugin runs a multi-frame offscreen capture — the capture
+    // drives renderer.update()/render() itself and owns camera, FOV, and time state.
+    if (!this.isPaused && !this.renderer.isCapturing && this.application_.isReady) {
       this.update_(dt); // Do any per frame calculations
       this.draw_(dt);
     }

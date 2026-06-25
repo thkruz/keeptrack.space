@@ -3,16 +3,39 @@
     "SearchSettingsPlugin": {
       "bottomIconLabel": "Sucheinstellungen",
       "title": "Sucheinstellungen",
+      "sections": {
+        "resultLimits": "Ergebnisgrenzen",
+        "searchFields": "Suchfelder",
+        "filters": "Filter",
+        "actions": "Aktionen"
+      },
       "labels": {
         "maxResults": "Maximale Suchergebnisse",
-        "showDecayed": "Verglühte Satelliten anzeigen"
+        "minSearchChars": "Mindestzeichen vor der Suche",
+        "showDecayed": "Verglühte Satelliten anzeigen",
+        "showVimpel": "Vimpel-Objekte einbeziehen",
+        "reset": "Auf Standard zurücksetzen",
+        "fields": {
+          "name": "Name",
+          "altName": "Alternativer Name",
+          "bus": "Satellitenbus",
+          "noradId": "NORAD-ID",
+          "intlDes": "Internationale Bezeichnung",
+          "launchVehicle": "Trägerrakete"
+        }
       },
       "tooltips": {
         "maxResults": "Maximale Anzahl der in der Suche angezeigten Satelliten",
-        "showDecayed": "Verglühte Satelliten (Position 0,0,0) in den Suchergebnissen anzeigen"
+        "minSearchChars": "Mindestanzahl der einzugebenden Zeichen, bevor eine Suche ausgeführt wird",
+        "showDecayed": "Verglühte Satelliten (Position 0,0,0) in den Suchergebnissen anzeigen",
+        "showVimpel": "Vimpel-Objekte (Analyst) in die Suchergebnisse einbeziehen. Dies kann die Suche verlangsamen."
+      },
+      "toasts": {
+        "reset": "Sucheinstellungen auf Standard zurückgesetzt"
       },
       "errorMsgs": {
-        "InvalidMaxResults": "Ungültiger Wert für maximale Suchergebnisse!"
+        "InvalidMaxResults": "Ungültiger Wert für maximale Suchergebnisse!",
+        "InvalidMinSearchChars": "Ungültiger Wert für Mindestzeichen der Suche!"
       }
     }
   }

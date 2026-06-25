@@ -2,14 +2,26 @@
   "plugins": {
     "SatConstellations": {
       "bottomIconLabel": "Constelaciones",
-      "title": "Men\u00fa de Constelaciones",
-      "helpBody": "El men\u00fa de Constelaciones te permite ver grupos de sat\u00e9lites. <br><br> Para algunas constelaciones, se dibujar\u00e1n enlaces ascendentes/descendentes y/o enlaces cruzados nocionales entre los sat\u00e9lites de la constelaci\u00f3n.",
+      "title": "Menú de Constelaciones",
+      "help": {
+        "overview": "El menú de Constelaciones agrupa satélites relacionados para que puedas estudiarlos como un sistema: constelaciones de navegación como GPS y Galileo, flotas de comunicaciones, estaciones espaciales y más. Al seleccionar una constelación se resaltan sus miembros, se muestran estadísticas resumidas y se lista cada satélite en una tabla ordenable.",
+        "imgAlt": "El menú de Constelaciones con una constelación seleccionada y sus estadísticas y tabla",
+        "imgCaption": "Al seleccionar una constelación se muestran sus estadísticas y una tabla de miembros agrupados por RAAN.",
+        "readingHeading": "Estadísticas y Tabla",
+        "reading": "Tras seleccionar una constelación, el encabezado muestra el recuento de <strong>Satélites</strong>, la <strong>Alt Media</strong> (altitud media) y el rango de <strong>Inc</strong> (inclinación). La tabla lista cada miembro con su número NORAD, nombre, inclinación, RAAN, perigeo y apogeo, agrupados por RAAN para que los planos orbitales destaquen. Haz clic en una fila para seleccionar ese satélite.",
+        "filtersHeading": "Filtros",
+        "filters": "El panel de filtros acota la tabla: establece la <strong>inclinación</strong>, la <strong>altitud</strong> o el <strong>RAAN</strong> mínimos y máximos, o escribe un <strong>Filtro de Nombre</strong> (las expresiones regulares funcionan). <strong>Aplicar</strong> actualiza la tabla y <strong>Restablecer</strong> borra todos los filtros.",
+        "howToUse": "<ol><li>Abre el menú <strong>Constelaciones</strong> desde la barra inferior (modo Catálogo).</li><li>Haz clic en una constelación, por ejemplo <strong>Satélites GPS</strong>. Sus miembros se resaltan en la vista 3D y se rellenan las estadísticas y la tabla.</li><li>Para algunas constelaciones se dibujan enlaces nocionales ascendentes, descendentes o cruzados entre los miembros.</li><li>Usa el panel de filtros para aislar planos o capas de altitud, y haz clic en las filas de la tabla para inspeccionar satélites individuales.</li></ol>",
+        "tip1": "La última constelación seleccionada se recuerda, así que al reabrir KeepTrack se restaura tu grupo de trabajo.",
+        "tip2": "Las constelaciones también están disponibles como comandos de la paleta de comandos, así que puedes saltar a una sin abrir el menú.",
+        "tip3": "Agrupar por RAAN hace evidentes los planos orbitales: los satélites del mismo plano comparten un valor de RAAN casi idéntico."
+      },
       "constellations": {
         "SpaceStations": "Estaciones Espaciales",
         "AmateurRadio": "Radio Amateur",
-        "GPSGroup": "Sat\u00e9lites GPS",
-        "GalileoGroup": "Sat\u00e9lites Galileo",
-        "GlonassGroup": "Sat\u00e9lites Glonass",
+        "GPSGroup": "Satélites GPS",
+        "GalileoGroup": "Satélites Galileo",
+        "GlonassGroup": "Satélites Glonass",
         "iridium": "Iridium",
         "orbcomm": "Orbcomm",
         "globalstar": "Globalstar",
@@ -17,10 +29,35 @@
         "aehf": "Milstar y AEHF",
         "wgs": "DSCS y WGS",
         "starlink": "Starlink",
-        "sbirs": "SBIRS"
+        "sbirs": "SBIRS",
+        "starlink-gen2": "Starlink Gen2",
+        "starlink-v2": "Starlink v2",
+        "starlink-snapshot": "Starlink (Teórico)",
+        "starshield": "Starshield",
+        "pwsa": "PWSA",
+        "kuiper": "Kuiper",
+        "ast-spaceobile": "AST SpaceMobile",
+        "oneweb": "OneWeb",
+        "telesat-lightspeed": "Telesat Lightspeed",
+        "boeing": "Boeing",
+        "astra": "Astra",
+        "spinlaunch": "SpinLaunch",
+        "hvnet": "HVNET",
+        "lynk": "Lynk",
+        "guanwang": "Guowang",
+        "qianfan": "Qianfan",
+        "honghu3": "Honghu-3",
+        "yinhe": "Yinhe",
+        "hanwha": "Hanwha"
+      },
+      "sections": {
+        "constellations": "Constelaciones",
+        "statistics": "Estadísticas",
+        "results": "Resultados",
+        "filters": "Filtros"
       },
       "stats": {
-        "satellites": "Sat\u00e9lites",
+        "satellites": "Satélites",
         "avgAltitude": "Alt Media",
         "incRange": "Inc"
       },
@@ -33,12 +70,12 @@
         "apogee": "Apogeo"
       },
       "filters": {
-        "incMin": "Inc M\u00edn (\u00B0)",
-        "incMax": "Inc M\u00e1x (\u00B0)",
-        "altMin": "Alt M\u00edn (km)",
-        "altMax": "Alt M\u00e1x (km)",
-        "raanMin": "RAAN M\u00edn (\u00B0)",
-        "raanMax": "RAAN M\u00e1x (\u00B0)",
+        "incMin": "Inc Mín (°)",
+        "incMax": "Inc Máx (°)",
+        "altMin": "Alt Mín (km)",
+        "altMax": "Alt Máx (km)",
+        "raanMin": "RAAN Mín (°)",
+        "raanMax": "RAAN Máx (°)",
         "nameFilter": "Filtro de Nombre",
         "apply": "Aplicar",
         "reset": "Restablecer"
@@ -47,7 +84,8 @@
         "category": "Constelaciones"
       },
       "errorMsgs": {
-        "NoConstellationSelected": "No se ha seleccionado constelaci\u00f3n"
+        "NoConstellationSelected": "No se ha seleccionado constelación",
+        "ConstellationEmpty": "No se encontraron satélites — esta constelación puede que aún no esté en órbita o necesita ser importada"
       }
     }
   }

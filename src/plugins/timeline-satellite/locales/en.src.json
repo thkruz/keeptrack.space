@@ -3,7 +3,30 @@
     "SatelliteTimeline": {
       "bottomIconLabel": "Satellite Timeline",
       "title": "Satellite Timeline Menu",
-      "helpBody": "The Satellite Timeline menu shows when a single sensor has visibility of a list of satellites. The timeline is color-coded to show the quality of the pass. Red is a bad pass, yellow is an average pass, and green is a good pass. Click on a pass to change the satellite and time to that pass. <br><br> The timeline can be modified by changing the start and end time of the simulation. Additionally, the timeline can be modified by changing the length and interval options."
+      "labels": {
+        "calculationLength": "Calculation Length (Hours)",
+        "calculationInterval": "Calculation Interval (Seconds)",
+        "badPassLength": "Bad Pass Length (Seconds)",
+        "avgPassLength": "Average Pass Length (Seconds)"
+      },
+      "msgs": {
+        "noPasses": "No Passes"
+      },
+      "errorMsgs": {
+        "addSatellitesOrSelect": "Add Satellites to List or Select a Satellite"
+      },
+      "help": {
+        "overview": "The Satellite Timeline is the mirror image of the Sensor Timeline: it shows when one selected sensor can see a list of satellites. Each row is a satellite from your watchlist (or the currently selected satellite) and each colored bar is a pass, so you can schedule a single site's observations across many targets.",
+        "imgAlt": "The Satellite Timeline showing color coded passes for several satellites",
+        "imgCaption": "Each row is a satellite; bar color shows the quality of each pass over the selected sensor.",
+        "readingHeading": "Reading the Timeline",
+        "reading": "<ul><li><strong>Green</strong>: a long pass, above the average pass threshold.</li><li><strong>Yellow</strong>: an average pass.</li><li><strong>Red</strong>: a short pass, below the bad pass threshold.</li><li><strong>Light gray row</strong>: that satellite never enters the sensor's field of view in the window.</li></ul>Hover a bar for the exact start and end times. Rows are labeled with each satellite's NORAD catalog number.",
+        "settingsHeading": "Settings",
+        "settings": "The settings panel controls the calculation: <strong>Calculation Length (Hours)</strong> sets the window, <strong>Calculation Interval (Seconds)</strong> trades speed for precision, and the <strong>Bad Pass Length</strong> and <strong>Average Pass Length</strong> thresholds define the red, yellow, and green coloring.",
+        "howToUse": "<ol><li>Select a sensor; the bottom icon stays disabled until one is selected.</li><li>Add satellites to the Watchlist, or select a single satellite, then open the <strong>Satellite Timeline</strong> from the bottom menu.</li><li>The timeline computes and draws automatically; adjust the settings panel to change the window or thresholds.</li><li>Click a pass to select that satellite and jump the clock to the pass start.</li><li>Use the download button to save the timeline as a PNG image.</li></ol>",
+        "tip1": "Populate the Watchlist first: with several satellites listed you can plan a whole observing session for the site in one view.",
+        "tip2": "The timeline defaults to a 6 hour window, which suits a single night shift; raise the calculation length for longer planning horizons."
+      }
     }
   }
 }

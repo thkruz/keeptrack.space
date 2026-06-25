@@ -3,16 +3,48 @@
     "WatchlistPlugin": {
       "bottomIconLabel": "Watchlist",
       "title": "Watchlist",
-      "helpBody": "Le menu Watchlist vous permet de créer une liste de satellites prioritaires à suivre. Cela permet de retrouver rapidement les satellites qui vous intéressent le plus. La liste est enregistrée dans le stockage local de votre navigateur et sera disponible lors de votre prochaine visite. <br><br> Lorsque les satellites de la watchlist entrent dans le champ de vision du capteur sélectionné, une notification s'affiche, une ligne est tracée du capteur au satellite, et le numéro du satellite s'affiche sur le globe. <br><br> La superposition dépend du fait que la watchlist soit remplie."
-,
+      "help": {
+        "overview": "La watchlist est votre liste de satellites prioritaires. Elle est enregistrée dans votre navigateur et survit donc aux rechargements. Lorsqu'un capteur est sélectionné et qu'un satellite de la watchlist entre dans son champ de vision, vous recevez une notification, une ligne est tracée du capteur au satellite, et le numéro du satellite apparaît sur le globe.",
+        "imgAlt": "Le menu Watchlist avec plusieurs satellites ajoutés",
+        "imgCaption": "Une watchlist avec plusieurs satellites. Cliquez sur un nom pour le sélectionner ; l'icône de signet le supprime.",
+        "managingHeading": "Gestion de la liste",
+        "managing": "<ul><li><strong>Ajouter</strong> : saisissez un ou plusieurs numéros NORAD séparés par des virgules ou des espaces (les identifiants alpha-5 comme T0001 fonctionnent aussi) puis cliquez sur l'icône d'ajout ou appuyez sur Entrée.</li><li><strong>Ajout/retrait rapide</strong> : lorsqu'un satellite est sélectionné sur le globe, cliquez sur l'icône de signet à côté de son nom dans la boîte d'information.</li><li><strong>Sélectionner</strong> : cliquez sur le numéro ou le nom d'un satellite dans la liste pour voler jusqu'à lui.</li><li><strong>Enregistrer / Charger</strong> : exportez la liste sous forme de fichier JSON puis chargez-la plus tard ou partagez-la.</li><li><strong>Effacer</strong> : vide toute la liste.</li></ul>",
+        "howToUse": "<ol><li>Ouvrez le menu depuis la barre inférieure ou appuyez sur W.</li><li>Ajoutez des satellites par numéro NORAD, par exemple 25544 pour l'ISS.</li><li>Sélectionnez un capteur dans le menu Capteurs pour commencer à recevoir des notifications de visibilité et des lignes du capteur au satellite.</li><li>Ouvrez le menu secondaire (icône d'engrenage) pour masquer tous les objets hors watchlist ou changer quand les étiquettes sont affichées (Toujours / FOV uniquement / Désactivé).</li></ol>",
+        "tip1": "\"Masquer les autres objets\" transforme le globe en une vue limitée à la watchlist. C'est parfait pour suivre une poignée d'objets sans l'encombrement du catalogue complet.",
+        "tip2": "Le menu Superposition (heures du prochain passage pour chaque satellite de la watchlist) ne fonctionne que lorsque la watchlist contient des entrées.",
+        "tip3": "Les doublons sont ignorés automatiquement, et les numéros invalides génèrent une notification indiquant le satellite introuvable.",
+        "shortcutToggle": "Afficher/masquer le menu Watchlist"
+      },
+      "labels": {
+        "newSatellites": "Nouveau(x) satellite(s)",
+        "saveList": "Enregistrer la liste",
+        "loadList": "Charger la liste",
+        "clearList": "Effacer la liste",
+        "hideOtherObjects": "Masquer les autres objets",
+        "labelAlways": "Toujours",
+        "labelFovOnly": "FOV uniquement",
+        "labelOff": "Désactivé",
+        "satellitesHeader": "Satellites",
+        "actionsHeader": "Actions",
+        "displayHeader": "Affichage",
+        "labelsHeader": "Étiquettes"
+      },
+      "msgs": {
+        "watchlistLoaded": "Watchlist chargée avec {count} satellites"
+      },
+      "errorMsgs": {
+        "NoradAlreadyInList": "NORAD : {sccNum} déjà dans la liste !",
+        "ObjectAlreadyInList": "L'objet {id} est déjà dans la liste !",
+        "SatNotFound": "Satellite {id} introuvable !"
+      },
       "settings": {
         "satLabelMode": {
-          "label": "Satellite Label Mode",
-          "helpText": "Controls satellite label rendering on watchlist satellites.",
+          "label": "Mode d'étiquetage des satellites",
+          "helpText": "Contrôle l'affichage des étiquettes sur les satellites de la watchlist.",
           "options": {
-            "off": "Off",
-            "fovOnly": "FOV Only",
-            "all": "All Watchlist"
+            "off": "Désactivé",
+            "fovOnly": "FOV uniquement",
+            "all": "Toute la watchlist"
           }
         }
       }
@@ -20,7 +52,20 @@
     "WatchlistOverlay": {
       "bottomIconLabel": "Superposition",
       "title": "Menu Superposition",
-      "helpBody": "<p> La superposition de la watchlist affiche l'heure du prochain passage pour chaque satellite de votre watchlist. La superposition est mise à jour toutes les 10 secondes. </p> <p> Le code couleur indique le temps jusqu'au prochain passage : </p> <ul> <li>Jaune - En vue</li> <li>Bleu - Prochain passage dans les 30 minutes après l'heure actuelle ou 10 minutes avant</li> <li>Blanc - Tout autre passage futur</li> </ul> <p> Cliquer sur un satellite dans la superposition centre la carte sur ce satellite. </p>"
+      "helpBody": "<p> La superposition de la watchlist affiche l'heure du prochain passage pour chaque satellite de votre watchlist. La superposition est mise à jour toutes les 10 secondes. </p> <p> Le code couleur indique le temps jusqu'au prochain passage : </p> <ul> <li>Jaune - En vue</li> <li>Bleu - Prochain passage dans les 30 minutes après l'heure actuelle ou 10 minutes avant</li> <li>Blanc - Tout autre passage futur</li> </ul> <p> Cliquer sur un satellite dans la superposition centre la carte sur ce satellite. </p>",
+      "openOverlayCmd": "Ouvrir la superposition Watchlist",
+      "addSatellitesToast": "Ajoutez d'abord des satellites à votre liste !",
+      "noPassesMsg": "Aucun passage dans les 60 minutes",
+      "inFovToast": "Le satellite {sccNum} est dans le champ de vision !",
+      "leftFovToast": "Le satellite {sccNum} a quitté le champ de vision !",
+      "tiers": {
+        "inView": "EN VUE",
+        "nextUp": "À SUIVRE",
+        "upcoming": "À VENIR",
+        "later": "PLUS TARD",
+        "background": "ARRIÈRE-PLAN",
+        "departed": "PARTIS"
+      }
     }
   }
 }

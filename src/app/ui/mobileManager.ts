@@ -66,8 +66,8 @@ export class MobileManager {
           settingsManager.plugins.GraticuleToggle = cachePlugins.GraticuleToggle;
           settingsManager.plugins.CloudsToggle = cachePlugins.CloudsToggle;
 
-          settingsManager.plugins.LaunchCalendar = cachePlugins.LaunchCalendar;
-          settingsManager.plugins.NextLaunchesPlugin = cachePlugins.NextLaunchesPlugin;
+          settingsManager.plugins.GunterLaunchCalendar = cachePlugins.GunterLaunchCalendar;
+          settingsManager.plugins.TheSpaceDevLaunchCalendarPlugin = cachePlugins.TheSpaceDevLaunchCalendarPlugin;
 
           settingsManager.defaultColorScheme = 'CelestrakColorScheme';
           settingsManager.isDisablePlanets = true;

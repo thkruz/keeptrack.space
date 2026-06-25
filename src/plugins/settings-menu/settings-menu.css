@@ -1,0 +1,64 @@
+/*
+ * Settings-menu plugin styles. The menu uses the shared v13 system
+ * (.kt-ui-v13 + kt-section/kt-action/...); see src/engine/ui/menu-v13.css.
+ * Only the filter box and the dense-form fixes (required when a card stacks
+ * many labelled rows + a standalone action) live here, scoped to #settings-menu.
+ */
+
+/* ===== Filter box ===== */
+.settings-filter-wrapper {
+  margin: 0 6px 12px;
+}
+
+#settings-filter {
+  box-sizing: border-box;
+  width: 100%;
+  height: 36px;
+  margin: 0;
+  padding: 0 12px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--color-dark-border);
+  border-radius: var(--kt-radius-md, 6px);
+  color: var(--color-text-light, #f5f5f5);
+  font-size: 13px;
+}
+
+#settings-filter::placeholder {
+  color: var(--color-dark-text-muted);
+}
+
+#settings-filter:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+/* ===== Dense-form fixes (recurring v13 miss) ===== */
+
+/* Stacked select/number fields: keep the floating "active" label from striking
+   through the row above. The first field after the section label only needs the
+   smaller gap. */
+#settings-menu .kt-section .input-field.col.s12 { margin-top: 18px; }
+#settings-menu .kt-section-label + .input-field.col.s12 { margin-top: 6px; }
+
+/* Toggle rows: tighten the Materialize .row default and give the switches a
+   little consistent vertical rhythm inside the card. */
+#settings-menu .kt-section .switch.row { margin-bottom: 0; margin-top: 12px; }
+#settings-menu .kt-section-label + .switch.row { margin-top: 4px; }
+
+/* Standalone "Reset to Defaults" action is a direct child of the form, so it is
+   width:100% and would run 12px past the inset cards; subtract the side margins
+   so its edges line up with the cards. */
+#settings-form > .kt-action {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
+}
+
+/* Focus indication: swap the app-wide :focus-visible outline (which overlaps the
+   floating label) for KeepTrack's underline. */
+#settings-menu .input-field input:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+#settings-menu .input-field input:focus-visible { outline: none; }

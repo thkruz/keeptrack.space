@@ -149,6 +149,14 @@ describe('estimateStdMagWithSource', () => {
     expect(estimateStdMagWithSource(sat)).toEqual({ vmag: 4.2, source: 'catalog' });
   });
 
+  it('reports estimate provenance for a back-filled vmag flagged as estimated', () => {
+    const sat = makeSat({ vmag: 4.2, name: 'STARLINK-1234' });
+
+    (sat as typeof sat & { isVmagEstimated?: boolean }).isVmagEstimated = true;
+
+    expect(estimateStdMagWithSource(sat)).toEqual({ vmag: 4.2, source: 'estimate' });
+  });
+
   it('prefers a preset over a property-derived estimate when both apply', () => {
     const sat = makeSat({
       name: 'STARLINK-1234',

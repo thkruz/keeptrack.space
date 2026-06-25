@@ -12,6 +12,7 @@ import { BaseObject, Satellite } from '@ootk/src/main';
 import scatterPlot3Png from '@public/img/icons/scatter-plot3.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -53,6 +54,23 @@ export class RicPlot extends KeepTrackPlugin {
 
   plotCanvasId = 'plot-analysis-chart-ric';
   chart: echarts.ECharts;
+
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: t7e('plugins.RicPlot.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.RicPlot.help.overview'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.RicPlot.help.howToUse'),
+        },
+      ],
+      tips: [t7e('plugins.RicPlot.help.tip1')],
+    };
+  }
 
   sideMenuElementName = 'ric-plots-menu';
   sideMenuElementHtml: string = html`

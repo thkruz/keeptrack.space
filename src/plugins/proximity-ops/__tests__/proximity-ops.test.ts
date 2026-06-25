@@ -5,6 +5,7 @@ import { vi } from 'vitest';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
 import { ProximityOps } from '@app/plugins/proximity-ops/proximity-ops';
+import { findRpoPairs } from '@app/plugins/proximity-ops/proximity-ops-core';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -45,8 +46,8 @@ describe('ProximityOps_class', () => {
       const plugin = new ProximityOps();
 
       expect(plugin.dragOptions.isDraggable).toBe(true);
-      expect(plugin.dragOptions.minWidth).toBe(480);
-      expect(plugin.dragOptions.maxWidth).toBe(650);
+      expect(plugin.dragOptions.minWidth).toBe(420);
+      expect(plugin.dragOptions.maxWidth).toBe(470);
     });
 
     it('should have draggable secondary menu', () => {
@@ -54,14 +55,16 @@ describe('ProximityOps_class', () => {
 
       expect(plugin.dragOptionsSecondary.isDraggable).toBe(true);
       expect(plugin.dragOptionsSecondary.minWidth).toBe(600);
-      expect(plugin.dragOptionsSecondary.maxWidth).toBe(1000);
+      expect(plugin.dragOptionsSecondary.maxWidth).toBe(1250);
     });
 
     it('should have help content', () => {
       const plugin = new ProximityOps();
+      const config = plugin.getHelpConfig();
 
-      expect(plugin.helpTitle).toBeDefined();
-      expect(plugin.helpBody).toBeDefined();
+      expect(config.title).toBeDefined();
+      expect(config.sections!.length).toBeGreaterThan(0);
+      expect(config.shortcuts!.length).toBeGreaterThan(0);
     });
 
     it('should have bottom icon label', () => {
@@ -82,16 +85,40 @@ describe('ProximityOps_class', () => {
   });
 
   describe('bottomIconCallback', () => {
-    it('should call updateNoradId_ bridge', () => {
+    it('does not auto-fill from the selection (primary is set explicitly now)', () => {
       const plugin = new ProximityOps();
 
       websiteInit(plugin);
 
       const spy = vi.spyOn(plugin as any, 'updateNoradId_');
 
-      plugin.bottomIconCallback();
+      expect(() => plugin.bottomIconCallback()).not.toThrow();
+      expect(spy).not.toHaveBeenCalled();
+    });
+  });
 
-      expect(spy).toHaveBeenCalled();
+  describe('useCurrentSatellite_', () => {
+    it('toasts and leaves the field unchanged when no satellite is selected', () => {
+      const plugin = new ProximityOps();
+
+      websiteInit(plugin);
+      vi.spyOn(SelectSatManager.prototype, 'getSelectedSat').mockReturnValue({ isSatellite: () => false } as never);
+      const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast');
+
+      (plugin as any).useCurrentSatellite_();
+
+      expect(toast).toHaveBeenCalled();
+    });
+
+    it('fills the NORAD field from the selected satellite', () => {
+      const plugin = new ProximityOps();
+
+      websiteInit(plugin);
+      vi.spyOn(SelectSatManager.prototype, 'getSelectedSat').mockReturnValue(defaultSat as never);
+
+      (plugin as any).useCurrentSatellite_();
+
+      expect((getEl('proximity-ops-norad') as HTMLInputElement).value).toBe(defaultSat.sccNum);
     });
   });
 
@@ -200,8 +227,16 @@ describe('ProximityOps_class', () => {
       expect(event.ric).toBeDefined();
     });
 
-    it('findRPOs_ collects pairs within the distance/velocity limits', () => {
-      const rpos = p().findRPOs_([defaultSat, cloneSat()], 1e9, 1e9, 5400, false);
+    it('findRpoPairs (core) collects pairs within the distance/velocity limits', () => {
+      const params = {
+        maxDis: 1e9,
+        maxVel: 1e9,
+        durationSec: 5400,
+        baseTimeMs: new Date('2022-01-01T00:00:00Z').getTime(),
+        stepSeconds: 60,
+        refineToleranceMs: 500,
+      };
+      const rpos = findRpoPairs([defaultSat, cloneSat()] as never, params, new Date(params.baseTimeMs), false);
 
       expect(Array.isArray(rpos)).toBe(true);
     });
@@ -224,16 +259,16 @@ describe('ProximityOps_class', () => {
       expect(getEl('proximity-ops-table')!.textContent).toBeTruthy();
     });
 
-    it('processRPOSearch_ toasts when the primary satellite is not found', () => {
+    it('gatherSearch_ toasts and returns null when the primary satellite is not found', () => {
       ServiceLocator.getCatalogManager().sccNum2Id = vi.fn(() => null) as never;
       (getEl('proximity-ops-ava') as HTMLInputElement).checked = false;
       (getEl('proximity-ops-type') as HTMLInputElement).value = 'GEO';
       (getEl('proximity-ops-norad') as HTMLInputElement).value = '99999';
       const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast');
 
-      const result = p().processRPOSearch_();
+      const result = p().gatherSearch_();
 
-      expect(result).toEqual([]);
+      expect(result).toBeNull();
       expect(toast).toHaveBeenCalled();
     });
   });

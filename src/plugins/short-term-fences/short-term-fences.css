@@ -1,0 +1,160 @@
+/*
+ * Short Term Fences (OSS) v13 menu styling.
+ *
+ * Scoped to `#stf-menu`. The shared card / action / field building blocks live
+ * in src/engine/ui/menu-v13.css (scoped under .kt-ui-v13); only the dense-form
+ * fixes and the Active Fences list chrome live here.
+ */
+
+/*
+ * 1. Stacked-field headroom. Each axis card holds a row of side-by-side fields,
+ *    so the floating "active" label needs room to clear the section label above
+ *    it. The first row in a card only needs the section-label gap.
+ */
+#stf-menu .kt-field-row .input-field.col {
+  margin-top: 20px;
+}
+
+#stf-menu .kt-section-label + .kt-field-row .input-field.col {
+  margin-top: 8px;
+}
+
+/*
+ * 2. Align the standalone Create New STF submit (a direct child of the form, not
+ *    nested in a card) with the inset section cards. Subtract the side margins
+ *    from the width (border-box) so its edges line up with the cards.
+ */
+#stf-menu-form > .kt-action {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
+}
+
+/*
+ * 3. Focus indication. Swap the app-wide :focus-visible box outline (which would
+ *    overlap the floating label) for KeepTrack's primary underline.
+ */
+#stf-menu .input-field input:focus,
+#stf-menu .input-field textarea:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#stf-menu .input-field input:focus-visible,
+#stf-menu .input-field textarea:focus-visible {
+  outline: none;
+}
+
+/* The km extent fields are read-only mirrors, so dim them as output, not input. */
+#stf-menu.kt-ui-v13 #stf-azExtKm:disabled,
+#stf-menu.kt-ui-v13 #stf-elExtKm:disabled {
+  color: var(--color-dark-text-muted);
+}
+
+/*
+ * Secondary panel: the active-fence list. One v13 card per fence (name header +
+ * remove control + a two-column attribute grid), mirroring the Custom Sensor
+ * active-sensor list so the two read identically. Scoped to the generated
+ * secondary root id.
+ */
+#stf-menu-secondary .stf-secondary-body {
+  padding: 6px;
+}
+
+#stf-menu-secondary #stf-active-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#stf-menu-secondary .stf-fence-card {
+  border: 1px solid var(--color-dark-border);
+  border-radius: var(--kt-radius-md, 6px);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 10px 12px;
+}
+
+#stf-menu-secondary .stf-fence-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+#stf-menu-secondary .stf-fence-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-text-light, #f5f5f5);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#stf-menu-secondary .remove-fence {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  background: transparent;
+  border: none;
+  border-radius: var(--kt-radius-sm, 4px);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+#stf-menu-secondary .remove-fence:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/*
+ * Tint the remove icon to the brand red. The source PNG (bookmark-remove) is
+ * blue, so paint the theme color and use the icon's alpha as a mask rather than
+ * showing the raw image. The icon URL is passed in via the --stf-remove-icon
+ * custom property set inline by the renderer.
+ */
+#stf-menu-secondary .stf-remove-glyph {
+  width: 18px;
+  height: 18px;
+  display: block;
+  pointer-events: none;
+  background-color: var(--color-primary, #ba160c);
+  -webkit-mask: var(--stf-remove-icon) center / contain no-repeat;
+  mask: var(--stf-remove-icon) center / contain no-repeat;
+  transition: background-color 0.15s ease;
+}
+
+#stf-menu-secondary .remove-fence:hover .stf-remove-glyph {
+  background-color: var(--color-primary-light, #e01a0e);
+}
+
+#stf-menu-secondary .stf-attr-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px 14px;
+}
+
+#stf-menu-secondary .stf-attr {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+}
+
+#stf-menu-secondary .stf-attr-k {
+  color: var(--color-dark-text-muted);
+}
+
+#stf-menu-secondary .stf-attr-v {
+  color: var(--color-text-light, #f5f5f5);
+  text-align: right;
+}
+
+#stf-menu-secondary .stf-empty {
+  padding: 14px 8px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-dark-text-muted);
+}

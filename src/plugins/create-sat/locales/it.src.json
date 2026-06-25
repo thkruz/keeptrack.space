@@ -3,7 +3,6 @@
     "CreateSat": {
       "bottomIconLabel": "Crea satellite",
       "title": "Crea satellite",
-      "helpBody": "Il menu Crea satellite consente di creare un satellite inserendo manualmente gli elementi orbitali o importando un file di effemeridi STK (.e).<br><br><b>Scheda Base</b>: Inserire apogeo, perigeo e inclinazione per creare rapidamente un satellite.<br><br><b>Scheda Avanzata</b>: Inserire gli elementi kepleriani completi (inclinazione, RAAN, eccentricità, argomento del perigeo, anomalia media, moto medio).<br><br><b>Importazione STK .e</b>: Trascinare e rilasciare un file di effemeridi STK sul menu. Formati supportati: EphemerisTimePosVel, EphemerisTimePos e EphemerisTimePosVelAcc in sistemi di coordinate inerziali (J2000, ICRF, TEME, ecc.). Sono supportati i formati temporali EpSec e UTCG. Le parole chiave non distinguono maiuscole e minuscole.<br><br><b>Non supportati</b>: Formati geodetici (LLA, LLR, MSL, Terrain), sistemi di riferimento non inerziali (Fixed, TrueOfDate) e dati di covarianza non sono supportati.",
       "tabs": {
         "basic": "Base",
         "advanced": "Avanzata"
@@ -30,11 +29,18 @@
         "apogeeKm": "Apogeo (km)",
         "perigeeKm": "Perigeo (km)",
         "smaKm": "Semiasse maggiore (km)",
-        "velocityKms": "Velocità orbitale (km/s)"
+        "velocityKms": "Velocità orbitale (km/s)",
+        "sectionIdentity": "Identità",
+        "sectionOrbit": "Orbita",
+        "sectionEpoch": "Epoca",
+        "sectionElements": "Elementi orbitali",
+        "sectionPresets": "Preimpostazioni"
       },
       "buttons": {
         "createSatellite": "Crea satellite",
-        "saveTle": "Salva TLE"
+        "saveTle": "Salva TLE",
+        "makeSunSync": "Inclinazione eliosincrona",
+        "cloneSelected": "Clona satellite selezionato"
       },
       "options": {
         "payload": "Carico utile",
@@ -67,11 +73,35 @@
         "invalidMeanMotion": "Moto medio non valido. Deve essere nel formato NN.NNNNN (es. 16.00000).",
         "invalidPeriod": "Periodo non valido. Deve essere nel formato da NN.NNNN a NNNN.NNNN (es. 90.0000, 9999.9999) con 8 cifre totali.",
         "invalidSource": "Fonte non valida. Non deve essere vuota.",
-        "invalidName": "Nome non valido. Non deve essere vuoto."
+        "invalidName": "Nome non valido. Non deve essere vuoto.",
+        "slotOccupied": "Sovrascrittura del satellite esistente {name} nello slot {scc}.",
+        "noFreeSlots": "Nessuno slot analista libero (90000-99999 sono tutti in uso).",
+        "noSatSelected": "Seleziona prima un satellite da clonare."
       },
       "successMsgs": {
         "satCreated": "Satellite {name} ({scc}) creato con successo",
         "tleExported": "TLE esportato con successo"
+      },
+      "help": {
+        "overview": "Il menu Crea satellite aggiunge al catalogo un satellite completamente nuovo a partire dagli elementi orbitali che digiti. Usalo per modellare un lancio pianificato, ricreare un oggetto da elementi pubblicati o costruire casi di prova. I satelliti creati occupano slot da analista (ID NORAD da 90000 a 99999) ed esistono solo nella tua sessione.",
+        "imgAlt": "Il menu Crea satellite con la scheda Base visualizzata",
+        "imgCaption": "La scheda Base costruisce un'orbita solo da apogeo, perigeo e inclinazione.",
+        "tabsHeading": "Schede Base e Avanzata",
+        "tabs": "La scheda <strong>Base</strong> richiede solo un ID NORAD, un nome, l'<strong>Inclinazione</strong>, l'<strong>Altitudine apogeo</strong> e l'<strong>Altitudine perigeo</strong>; il resto dell'orbita viene derivato automaticamente. La scheda <strong>Avanzata</strong> espone il set completo di elementi: <strong>Tipo di oggetto</strong>, <strong>Paese</strong>, epoca, <strong>Ascensione retta</strong>, <strong>Eccentricità</strong>, <strong>Argomento del perigeo</strong>, <strong>Anomalia media</strong> e <strong>Moto medio</strong> o <strong>Periodo</strong> (modificando uno si ricalcola l'altro). Un riquadro <strong>Parametri calcolati</strong> mostra mentre digiti l'apogeo, il perigeo, il semiasse maggiore e la velocità orbitale risultanti.",
+        "howToUse": "<ol><li>Apri il menu <strong>Crea satellite</strong> dalla barra inferiore.</li><li>Scegli un ID NORAD libero tra 90000 e 99999 e assegna un nome al satellite.</li><li>Nella scheda <strong>Base</strong> inserisci inclinazione, apogeo e perigeo; oppure passa alla scheda <strong>Avanzata</strong> per il set completo di elementi.</li><li>Fai clic su <strong>Crea satellite</strong>. Il nuovo oggetto compare subito e una notifica di conferma ne mostra nome e numero.</li><li>Usa <strong>Salva TLE</strong> per esportare gli elementi del satellite creato in un file da ricaricare in seguito.</li></ol>",
+        "tip1": "Ogni campo è validato con un messaggio di errore specifico: se la creazione fallisce, la notifica ti dice esattamente quale valore correggere.",
+        "tip2": "Un perigeo sotto circa 100 km viene rifiutato perché il satellite decadrebbe immediatamente.",
+        "tip3": "I satelliti creati valgono solo per la sessione; esporta un TLE se vuoi conservare l'oggetto per un altro giorno."
+      },
+      "presets": {
+        "placeholder": "Carica una preimpostazione…",
+        "selectLabel": "Preimpostazione orbita",
+        "leoIss": "LEO (tipo ISS)",
+        "sso": "Eliosincrona (800 km)",
+        "geo": "Geostazionaria (GEO)",
+        "gto": "Trasferimento geostazionario (GTO)",
+        "molniya": "Molniya",
+        "polar": "Polare (600 km)"
       }
     }
   }

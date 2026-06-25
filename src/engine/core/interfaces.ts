@@ -111,6 +111,7 @@ export interface SensorObjectCruncher {
 export type lookanglesRow = {
   START_DTG: number | string | null;
   SATELLITE_ID: string | null;
+  SENSOR: string | null;
   PASS_SCORE: string | null;
   START_DATE: Date | string | null;
   START_TIME: Date | string | null;
@@ -125,6 +126,8 @@ export type lookanglesRow = {
   TIME_IN_COVERAGE_SECONDS: number | null;
   MINIMUM_RANGE: string | null;
   MAXIMUM_ELEVATION: string | null;
+  /** Epoch ms at which MAXIMUM_ELEVATION occurs (optional; set by findPassesForSat). */
+  MAXIMUM_ELEVATION_DTG?: number | null;
   SENSOR_TO_SUN_AZIMUTH: string | null;
   SENSOR_TO_SUN_ELEVATION: string | null;
 };
@@ -219,6 +222,7 @@ export enum MenuMode {
   EVENTS,
   CREATE,
   ANALYSIS,
+  CONJUNCTIONS,
   DISPLAY,
   TOOLS,
   SETTINGS,

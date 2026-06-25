@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`MissileManager (baseline — pre-refactor) > Golden trajectory snapshots (regression baseline) > French SLBM (mid-Atlantic) → Moscow 1`] = `
+exports[`MissileManager (baseline - pre-refactor) > Golden trajectory snapshots (regression baseline) > French SLBM (mid-Atlantic) → Moscow 1`] = `
 {
   "altList": [
     2.3,
@@ -3534,7 +3534,7 @@ exports[`MissileManager (baseline — pre-refactor) > Golden trajectory snapshot
 }
 `;
 
-exports[`MissileManager (baseline — pre-refactor) > Golden trajectory snapshots (regression baseline) > North Korean BM (Sohae) → Tokyo 1`] = `
+exports[`MissileManager (baseline - pre-refactor) > Golden trajectory snapshots (regression baseline) > North Korean BM (Sohae) → Tokyo 1`] = `
 {
   "altList": [
     2.35,
@@ -6254,7 +6254,7 @@ exports[`MissileManager (baseline — pre-refactor) > Golden trajectory snapshot
 }
 `;
 
-exports[`MissileManager (baseline — pre-refactor) > Golden trajectory snapshots (regression baseline) > Russian SS-18 (Aleysk) → Washington DC 1`] = `
+exports[`MissileManager (baseline - pre-refactor) > Golden trajectory snapshots (regression baseline) > Russian SS-18 (Aleysk) → Washington DC 1`] = `
 {
   "altList": [
     2.31,

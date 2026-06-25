@@ -3,7 +3,42 @@
     "SensorTimeline": {
       "bottomIconLabel": "Časová osa senzoru",
       "title": "Menu časové osy senzoru",
-      "helpBody": "Menu časové osy senzoru zobrazuje, kdy má seznam senzorů viditelnost jednoho satelitu. Časová osa je barevně kódována pro zobrazení kvality přeletu. Červená je špatný přelet, žlutá je průměrný přelet a zelená je dobrý přelet. Kliknutím na přelet změníte senzor a čas na daný přelet. <br><br> Časovou osu lze upravit změnou počátečního a koncového času simulace. Dále lze časovou osu upravit změnou možností délky a intervalu."
+      "labels": {
+        "calculationLength": "Délka výpočtu (hodiny)",
+        "calculationInterval": "Interval výpočtu (sekundy)",
+        "badPassLength": "Délka špatného přeletu (sekundy)",
+        "avgPassLength": "Délka průměrného přeletu (sekundy)",
+        "detailedPlot": "Podrobný graf",
+        "useWeather": "Zohlednit počasí",
+        "useWeatherTooltip": "Zohlednit počasí při výpočtu přeletů pomocí předpovědí počasí"
+      },
+      "passTypes": {
+        "canObserve": "Lze pozorovat",
+        "inFov": "V zorném poli",
+        "satInSun": "Satelit osvětlen Sluncem",
+        "stationInNight": "Stanice ve stínu Země",
+        "clearSkies": "Jasná obloha"
+      },
+      "msgs": {
+        "observable": "Pozorovatelný",
+        "inFov": "Ve FOV",
+        "atNight": "V noci",
+        "clearSkies": "Jasná obloha",
+        "noPasses": "Žádné přelety"
+      },
+      "help": {
+        "overview": "Časová osa senzoru ukazuje, kdy síť senzorů uvidí vybraný satelit v nadcházejících hodinách. Každý řádek je jeden senzor a každý barevný pruh je jeden přelet, takže můžete na první pohled porovnat příležitosti všech stanovišť a vybrat nejlepší senzor pro další pozorování.",
+        "imgAlt": "Časová osa senzoru zobrazující barevně kódované přelety pro několik senzorů",
+        "imgCaption": "Každý řádek je jeden senzor; barva pruhu ukazuje kvalitu každého přeletu vybraného satelitu.",
+        "readingHeading": "Jak číst časovou osu",
+        "reading": "<ul><li><strong>Zelená</strong>: dlouhý přelet, nad prahem průměrného přeletu.</li><li><strong>Žlutá</strong>: průměrný přelet.</li><li><strong>Červená</strong>: krátký přelet, pod prahem špatného přeletu.</li><li><strong>Světle šedý řádek</strong>: tento senzor satelit v daném okně nikdy nevidí.</li></ul>Najetím myší na pruh zobrazíte přesný čas začátku a konce. Se zapnutou volbou <strong>Podrobný graf</strong> získají optické senzory další řádky zobrazující dílčí podmínky: <strong>V zorném poli</strong>, <strong>Satelit osvětlen Sluncem</strong>, <strong>Stanice ve stínu Země</strong> a <strong>Jasná obloha</strong>; přelet je pozorovatelný jen tam, kde jsou splněny všechny zároveň.",
+        "settingsHeading": "Nastavení",
+        "settings": "Panel nastavení řídí výpočet: <strong>Délka výpočtu (hodiny)</strong> určuje okno, <strong>Interval výpočtu (sekundy)</strong> vyvažuje rychlost a přesnost a prahy <strong>Délka špatného přeletu</strong> a <strong>Délka průměrného přeletu</strong> definují červené, žluté a zelené zbarvení. <strong>Zohlednit počasí</strong> zahrne hodinové předpovědi oblačnosti do přeletů optických senzorů. Tlačítka dole přepínají jednotlivé senzory: červená znamená vyloučeno z výpočtu.",
+        "howToUse": "<ol><li>Vyberte satelit; spodní ikona zůstává neaktivní, dokud žádný není vybrán.</li><li>Otevřete položku <strong>Časová osa senzoru</strong> ve spodním menu. Časová osa se automaticky vypočítá a vykreslí.</li><li>Otevřete panel nastavení a změňte okno, prahy, podrobnost grafu, použití počasí nebo zahrnuté senzory; graf se po změně hodnoty přepočítá.</li><li>Kliknutím na přelet přepnete na daný senzor a posunete hodiny na začátek přeletu, připraveni na pozorovací úhly nebo plánování pozorování.</li><li>Pomocí tlačítka stažení exportujete seznam přeletů jako soubor CSV.</li></ol>",
+        "tip1": "Počasí pochází z předpovědi oblačnosti Open-Meteo pro každé optické stanoviště; radary podmínky počasí, slunečního svitu a tmy zcela ignorují.",
+        "tip2": "Kliknutí na přelet po změně senzoru a času znovu vybere satelit, takže ostatní otevřená menu se obnoví s novou geometrií.",
+        "tip3": "Kratší intervaly výpočtu zachytí i krátké přelety, ale výpočet trvá déle; 30 sekund je dobrý kompromis pro 24hodinové okno."
+      }
     }
   }
 }

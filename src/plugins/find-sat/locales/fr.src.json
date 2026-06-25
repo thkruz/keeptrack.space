@@ -3,8 +3,27 @@
     "FindSatPlugin": {
       "bottomIconLabel": "Trouver satellite",
       "title": "Trouver satellite",
-      "helpBody": "Le menu Trouver satellite vous permet de rechercher des satellites selon divers critères:<br><br><ul style=\"margin-left: 40px;\"><li><strong>Type d'objet</strong> - Filtrer par charge utile, corps de fusée ou débris</li><li><strong>Pays</strong> - Filtrer par pays de lancement</li><li><strong>Bus/Charge utile/Forme/Source du satellite</strong> - Filtrer par caractéristiques du satellite</li><li><strong>Azimut/Élévation/Portée</strong> - Rechercher par angles de visée (nécessite un capteur)</li><li><strong>Paramètres orbitaux</strong> - Inclinaison, période, RAAN, argument du périgée</li><li><strong>Âge du TLE</strong> - Filtrer par actualité du TLE</li><li><strong>SER</strong> - Filtrer par section efficace radar</li></ul><br>Les résultats s'affichent dans la barre de recherche. Utilisez le bouton Exporter pour enregistrer les résultats en CSV.",
+      "help": {
+        "overview": "Trouver satellite parcourt l'ensemble du catalogue à la recherche d'objets correspondant à une combinaison de critères physiques, orbitaux et d'observation. C'est le moyen le plus rapide de répondre à des questions comme \"quels corps de fusée chinois sont sur une orbite d'environ 100 minutes ?\" ou \"quelles charges utiles sont actuellement à portée de mon capteur ?\"",
+        "imgAlt": "Le menu Trouver satellite avec les filtres de type d'objet, de pays, orbitaux et de capteur",
+        "imgCaption": "Le menu Trouver satellite. Chaque champ rempli affine davantage la recherche.",
+        "filtersHeading": "Filtres disponibles",
+        "filters": "<ul><li><strong>Type d'objet</strong> : charges utiles, corps de fusée, débris. Sélectionnez plusieurs types à la fois ; choisir un type spécifique désactive \"Tous\".</li><li><strong>Pays</strong> : un ou plusieurs pays de lancement.</li><li><strong>Bus satellite / Charge utile / Forme / Source</strong> : caractéristiques physiques et de source de données.</li><li><strong>Azimut / Élévation / Portée</strong> : angles de visée actuels depuis le capteur sélectionné. Ils nécessitent qu'un capteur soit d'abord sélectionné.</li><li><strong>Paramètres orbitaux</strong> : Inclinaison, Période, Ascension droite et Argument du périgée.</li><li><strong>Âge du TLE</strong> : l'ancienneté de la mise à jour des données orbitales, en heures.</li><li><strong>SER</strong> : section efficace radar en m².</li></ul>Chaque filtre numérique dispose d'un champ <strong>Marge</strong> définissant la plage acceptée autour de votre valeur. Laissez-le vide pour utiliser une valeur par défaut raisonnable (par exemple ±5° pour les angles).",
+        "howToUse": "<ol><li>Ouvrez le menu depuis la barre inférieure ou appuyez sur Ctrl+F.</li><li>Choisissez un ou plusieurs types d'objet et pays dans les listes déroulantes.</li><li>Saisissez des critères numériques et, si besoin, resserrez ou élargissez leurs marges.</li><li>Cliquez sur <strong>Trouver satellite(s)</strong>. Les objets correspondants sont chargés dans la barre de recherche en haut et mis en surbrillance sur le globe.</li><li>Cliquez sur <strong>Exporter données</strong> pour enregistrer les résultats actuels dans un fichier CSV.</li></ol>",
+        "tip1": "Les filtres se combinent avec une logique ET : chaque critère doit correspondre. Si vous n'obtenez aucun résultat, supprimez d'abord le filtre le plus restrictif.",
+        "tip2": "L'azimut, l'élévation et la portée sont mesurés depuis le capteur actuellement sélectionné ; sélectionnez donc un capteur avant de les utiliser.",
+        "tip3": "Les résultats sont plafonnés. Si un avertissement indique que la limite a été atteinte, affinez vos critères pour être sûr de tout voir.",
+        "tip4": "Comme les résultats arrivent dans la barre de recherche, vous pouvez les transmettre à tout autre menu qui opère sur la recherche actuelle, ou les affiner en tapant.",
+        "shortcutToggle": "Basculer le menu Trouver satellite"
+      },
       "labels": {
+        "typePayload": "Charge utile",
+        "typeRocketBody": "Corps de fusée",
+        "typeDebris": "Débris",
+        "busFilterPlaceholder": "Tapez pour filtrer les options de bus",
+        "satelliteBusFilter": "Filtre de bus satellite",
+        "payloadFilterPlaceholder": "Tapez pour filtrer les options de charge utile",
+        "payloadFilter": "Filtre de charge utile",
         "objectType": "Type d'objet",
         "country": "Pays",
         "satelliteBus": "Bus satellite",
@@ -31,13 +50,20 @@
         "argOfPerigeeMargin": "Marge (degrés)",
         "all": "Tous",
         "findSatellites": "Trouver satellite(s)",
-        "exportData": "Exporter données"
+        "exportData": "Exporter données",
+        "sectionClassification": "Classification",
+        "sectionLookAngles": "Angles de visée",
+        "sectionOrbital": "Éléments orbitaux",
+        "sectionPhysical": "Physique et données",
+        "sensorNote": "Les angles de visée nécessitent qu'un capteur soit sélectionné.",
+        "resultCount": "{count} résultat(s)"
       },
       "errorMsgs": {
         "NoSatellitesFound": "Aucun satellite trouvé",
         "NoSearchCriteriaEntered": "Aucun critère de recherche saisi",
         "TooManyResults": "Trop de résultats, limité à {limit}",
-        "TryFindingFirst": "Essayez d'abord de trouver des satellites!"
+        "TryFindingFirst": "Essayez d'abord de trouver des satellites!",
+        "SearchFailed": "Échec de la recherche : {error}"
       }
     }
   }

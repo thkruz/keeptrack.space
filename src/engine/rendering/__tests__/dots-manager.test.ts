@@ -66,6 +66,23 @@ describe('drawManager', () => {
       expect(() => dotsManagerInstance.updatePosVel(stubStaticObject, 0)).not.toThrow();
     });
   });
+
+  // FC-08: cruncher messages must not clobber hand-propagated positions mid-capture
+  describe('updateCruncherBuffers capture gate', () => {
+    it('drops cruncher position data while renderer.isCapturing, applies it after', () => {
+      const renderer = ServiceLocator.getRenderer();
+
+      dotsManagerInstance.positionData = new Float32Array([1, 2, 3]);
+
+      renderer.isCapturing = true;
+      dotsManagerInstance.updateCruncherBuffers({ satPos: new Float32Array([9, 9, 9]) } as never);
+      expect(Array.from(dotsManagerInstance.positionData)).toEqual([1, 2, 3]);
+
+      renderer.isCapturing = false;
+      dotsManagerInstance.updateCruncherBuffers({ satPos: new Float32Array([9, 9, 9]) } as never);
+      expect(Array.from(dotsManagerInstance.positionData)).toEqual([9, 9, 9]);
+    });
+  });
 });
 
 describe('DotsManager picking program lifecycle', () => {

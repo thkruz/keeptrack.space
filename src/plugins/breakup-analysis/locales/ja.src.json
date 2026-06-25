@@ -3,7 +3,75 @@
     "BreakupAnalysis": {
       "bottomIconLabel": "崩壊分析",
       "title": "崩壊分析",
-      "helpBody": "崩壊分析プラグインは、歴史上の主要な衛星崩壊イベントのデータベースを提供します。イベントを選択すると、親オブジェクト、崩壊原因、打ち上げから崩壊までのタイムライン、破片分散分析などの詳細情報が表示されます。プラグインは現在のカタログで各イベントに一致する追跡されたデブリを検索し、高度範囲、離心率、軌道傾斜角の分布の統計分析を表示します。"
+      "helpBody": "崩壊分析プラグインは、歴史上の主要な衛星崩壊イベントのデータベースを提供します。イベントを選択すると、親オブジェクト、崩壊原因、打ち上げから崩壊までのタイムライン、破片分散分析などの詳細情報が表示されます。プラグインは現在のカタログで各イベントに一致する追跡されたデブリを検索し、高度範囲、離心率、軌道傾斜角の分布の統計分析を表示します。",
+      "sections": {
+        "events": "イベント",
+        "debrisStatistics": "デブリ統計",
+        "fragmentDispersion": "破片分散分析",
+        "trackedFragments": "追跡中の破片",
+        "gabbardDiagram": "ガバード図",
+        "actions": "操作"
+      },
+      "actions": {
+        "backToEvents": "イベント一覧に戻る",
+        "jumpToDate": "崩壊日時へ移動",
+        "selectParent": "親オブジェクトを選択",
+        "exportCsv": "破片をエクスポート (CSV)",
+        "showAll": "すべての破片を表示",
+        "showFewer": "表示する破片を減らす"
+      },
+      "gabbard": {
+        "apogee": "遠地点",
+        "perigee": "近地点",
+        "periodAxis": "周期 (min)",
+        "altitudeAxis": "高度 (km)"
+      },
+      "commands": {
+        "open": "崩壊分析を開く",
+        "export": "崩壊破片をエクスポート (CSV)"
+      },
+      "labels": {
+        "event": "イベント",
+        "date": "日付",
+        "cause": "原因",
+        "altKm": "高度 (km)",
+        "estDebris": "推定デブリ数",
+        "parentObject": "親オブジェクト",
+        "country": "国",
+        "orbitType": "軌道タイプ",
+        "breakupAltitude": "崩壊高度",
+        "launchDate": "打ち上げ日",
+        "breakupDate": "崩壊日",
+        "timeToBreakup": "崩壊までの時間",
+        "years": "年",
+        "km": "km",
+        "trackedDebris": "追跡中のデブリ",
+        "estimatedTotal": "推定総数",
+        "trackingRatio": "追跡率",
+        "typeBreakdown": "ペイロード / ロケット機体 / デブリ",
+        "parameter": "パラメータ",
+        "min": "最小",
+        "max": "最大",
+        "mean": "平均",
+        "spread": "ばらつき",
+        "perigeeParam": "近地点 (km)",
+        "apogeeParam": "遠地点 (km)",
+        "eccentricityParam": "離心率",
+        "inclinationParam": "軌道傾斜角 (°)",
+        "noTrackedDebris": "このイベントに一致する追跡中のデブリは現在のカタログに見つかりませんでした。",
+        "showingOf": "({total} 件中 {shown} 件を表示)",
+        "norad": "NORAD",
+        "name": "名称",
+        "type": "タイプ",
+        "perigee": "近地点",
+        "apogee": "遠地点",
+        "incDeg": "傾斜角 (°)",
+        "ecc": "離心率"
+      },
+      "errorMsgs": {
+        "parentNotFound": "親オブジェクトは現在のカタログに存在しません。",
+        "noDataToExport": "エクスポートする追跡中の破片がありません。"
+      }
     }
   }
 }

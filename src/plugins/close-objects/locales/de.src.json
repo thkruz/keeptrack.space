@@ -3,8 +3,17 @@
     "CloseObjectsPlugin": {
       "bottomIconLabel": "Nahe Objekte",
       "title": "Suche nach nahen Objekten",
-      "helpBody": "Die Suche nach nahen Objekten findet Satelliten und Trümmer in unmittelbarer Nähe zueinander. Sie verwendet einen zweiphasigen räumlichen Suchalgorithmus, um Objekte innerhalb von 50 km voneinander zu identifizieren, wobei zuerst aktuelle Positionen geprüft und dann mit projizierten Positionen 30 Minuten später verifiziert wird.",
-      "findBtn": "Nahe Objekte suchen"
+      "findBtn": "Nahe Objekte suchen",
+      "help": {
+        "overview": "Die Suche nach nahen Objekten durchsucht den gesamten Katalog nach Objektpaaren, die sich gerade jetzt innerhalb von 50 km zueinander befinden. So lassen sich gemeinsam fliegende Nutzlasten, kürzliche Zerlegungen und dicht belegte Bahnbereiche schnell erkennen, ohne ein vollständiges Konjunktions-Screening durchzuführen.",
+        "imgAlt": "Das Menü der Suche nach nahen Objekten mit seiner Suchschaltfläche",
+        "imgCaption": "Ein Klick durchsucht den gesamten Katalog nach Objekten, die weniger als 50 km voneinander entfernt sind.",
+        "methodHeading": "Funktionsweise",
+        "method": "Die Suche läuft in zwei Phasen ab. Zuerst vergleicht ein schneller Durchgang mit Begrenzungsrahmen die aktuelle Position jedes Objekts, um Kandidatenpaare innerhalb des Suchradius zu finden. Anschließend wird jedes Kandidatenpaar 30 Minuten in die Zukunft propagiert: Paare, die dann immer noch nah beieinander sind, werden bestätigt; so werden Objekte herausgefiltert, deren Bahnen sich nur kurz gekreuzt haben.",
+        "howToUse": "<ol><li>Öffnen Sie <strong>Nahe Objekte</strong> über das untere Menü.</li><li>Klicken Sie auf <strong>Nahe Objekte suchen</strong>. Die Suche über den gesamten Katalog dauert einige Sekunden.</li><li>Die bestätigten Paare werden in die Suchleiste geladen, sodass jedes nahe Objekt hervorgehoben und in den Suchergebnissen aufgelistet wird.</li><li>Klicken Sie auf ein Ergebnis, um ein Objekt zu untersuchen, oder nutzen Sie andere Menüs (wie das Trümmer-Screening), um ein bestimmtes Paar genauer zu analysieren.</li></ol>",
+        "tip1": "Paare werden nur bestätigt, wenn sie 30 Minuten später noch in Reichweite sind; Formationsflieger und Rendezvous-Paare erscheinen also, während kurze Kreuzungen herausgefiltert werden.",
+        "tip2": "Die Ergebnisse ersetzen die aktuelle Suche; kopieren Sie zuerst den Suchtext, wenn Sie eine bestehende Liste behalten möchten."
+      }
     }
   }
 }

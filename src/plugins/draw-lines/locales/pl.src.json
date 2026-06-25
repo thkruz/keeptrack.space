@@ -1,6 +1,8 @@
 {
   "plugins": {
     "DrawLinesPlugin": {
+      "title": "Rysowanie linii",
+      "bottomIconLabel": "Rysowanie linii",
       "rmbMenu": {
         "title": "Rysuj",
         "eciAxes": "Osie ECI",
@@ -13,12 +15,39 @@
         "earthToSatellite": "Ziemia do satelity",
         "sensorToSatellite": "Czujnik do satelity",
         "satelliteToSatellite": "Satelita do satelity",
+        "satelliteRicAxes": "Osie RIC satelity",
         "satelliteToSun": "Satelita do Słońca",
         "satelliteToMoon": "Satelita do Księżyca",
         "moonOrbit": "Rysuj orbitę Księżyca"
       },
+      "sections": {
+        "activeLines": "Aktywne linie",
+        "referenceGeometry": "Geometria odniesienia",
+        "objectLines": "Linie obiektów"
+      },
+      "referenceFrameLabel": "Układ odniesienia",
+      "clearAll": "Wyczyść wszystkie linie",
+      "emptyList": "Nie narysowano linii",
+      "remove": "Usuń",
+      "lineTypes": {
+        "reference": "Linia odniesienia",
+        "satToRef": "Satelita do punktu",
+        "satRic": "Osie RIC",
+        "objToObj": "Obiekt do obiektu",
+        "satToSun": "Satelita do Słońca",
+        "satToBody": "Satelita do ciała",
+        "sensorToSat": "Czujnik do satelity",
+        "sensorToSun": "Czujnik do Słońca",
+        "sensorToMoon": "Czujnik do Księżyca",
+        "orbitPath": "Ścieżka orbity",
+        "satScanEarth": "Skan Ziemi",
+        "sensorScanHorizon": "Skan horyzontu",
+        "sensorToRae": "Czujnik do punktu",
+        "generic": "Linia"
+      },
       "errorMsgs": {
-        "noPrimarySat": "Nie wybrano głównego satelity dla linii satelita–satelita."
+        "noPrimarySat": "Nie wybrano głównego satelity dla linii satelita–satelita.",
+        "noSatSelected": "Najpierw wybierz satelitę."
       }
     }
   }

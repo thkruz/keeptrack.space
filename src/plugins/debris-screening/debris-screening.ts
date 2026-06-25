@@ -1,3 +1,4 @@
+import { jumpToTca } from '@app/engine/conjunction/conjunction-row-actions';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -11,27 +12,26 @@ import {
   ISecondaryMenuConfig,
   ISideMenuConfig,
 } from '@app/engine/plugins/core/plugin-capabilities';
+import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
+import { t7e } from '@app/locales/keys';
 import {
+  cappedScreeningCovarianceFromTle,
   CatalogObject,
   CatalogScreener,
-  CovarianceFrame,
-  createSampleCovarianceFromTle,
   EpochUTC,
   Hours,
   Kilometers,
-  Matrix,
   Satellite,
   ScreeningResult,
   Seconds,
-  StateCovariance,
 } from '@ootk/src/main';
 import frameInspectPng from '@public/img/icons/frame-inspect.png';
 import tableChartPng from '@public/img/icons/table-chart.png';
-import { vec3 } from 'gl-matrix';
+import type { DsResultRow } from '@app/webworker/debris-screening-messages';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './debris-screening.css';
 
@@ -39,6 +39,9 @@ interface RiskLevel {
   label: string;
   className: string;
 }
+
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.DebrisScreening.${key}` as Parameters<typeof t7e>[0]);
 
 export class DebrisScreening extends KeepTrackPlugin {
   readonly id = 'DebrisScreening';
@@ -48,8 +51,10 @@ export class DebrisScreening extends KeepTrackPlugin {
   protected readonly sideMenuName_ = 'debris-screening-menu';
   protected readonly secondaryMenuName_ = 'debris-screening-results';
 
-  // Screening results storage
-  protected screeningResults_: ScreeningResult[] = [];
+  // Normalized screening results (top 100, sorted by Pc desc) - the single
+  // source of truth for both the results table and the CSV export. The sync
+  // and Pro worker paths both populate this same shape.
+  protected rows_: DsResultRow[] = [];
 
   isRequireSatelliteSelected = true;
   isIconDisabledOnLoad = true;
@@ -66,10 +71,10 @@ export class DebrisScreening extends KeepTrackPlugin {
 
   getBottomIconConfig(): IBottomIconConfig {
     return {
-      elementName: 'debris-screening-bottom-icon',
-      label: 'Debris Screening',
+      elementName: 'conjunction-screen-icon',
+      label: l('bottomIconLabel'),
       image: frameInspectPng,
-      menuMode: [MenuMode.EVENTS, MenuMode.ALL],
+      menuMode: [MenuMode.CONJUNCTIONS, MenuMode.ALL],
       isDisabledOnLoad: true,
     };
   }
@@ -95,7 +100,7 @@ export class DebrisScreening extends KeepTrackPlugin {
   getSideMenuConfig(): ISideMenuConfig {
     return {
       elementName: this.sideMenuName_,
-      title: 'Debris Screening',
+      title: l('title'),
       html: this.buildSideMenuHtml_(),
       dragOptions: {
         isDraggable: true,
@@ -105,65 +110,112 @@ export class DebrisScreening extends KeepTrackPlugin {
     };
   }
 
-  private buildSideMenuHtml_(): string {
-    // Note: When using secondary menu, generateSideMenuHtml_() wraps this content
-    // So we only provide the form content, not the wrapper divs
+  /**
+   * Build the v13 side-menu form (inner content only — generateSideMenuHtml_()
+   * wraps it because this plugin has a secondary menu; the kt-ui-v13 marker is
+   * applied to the generated root in the uiManagerFinal handler). Split into
+   * section bodies so Pro subclasses can inject extra controls per card.
+   */
+  protected buildSideMenuHtml_(): string {
     return html`
-      <form id="${this.sideMenuName_}-form">
-        <div class="input-field col s12">
-          <input disabled value="00005" id="${this.formPrefix_}-scc" type="text" />
-          <label for="disabled" class="active">Satellite SCC#</label>
-        </div>
-        <div class="input-field col s12">
-          <select id="${this.formPrefix_}-time">
-            <option value="1" selected>1 Hour</option>
-            <option value="4">4 Hours</option>
-            <option value="8">8 Hours</option>
-            <option value="24">24 Hours</option>
-            <option value="48">48 Hours</option>
-            <option value="72">72 Hours</option>
-          </select>
-          <label>Time Window</label>
-        </div>
-        <div class="input-field col s12">
-          <select id="${this.formPrefix_}-u">
-            <option value="0.5">0.5 km</option>
-            <option value="1" selected>1 km</option>
-            <option value="2">2 km</option>
-            <option value="5">5 km</option>
-            <option value="10">10 km</option>
-          </select>
-          <label>U (Radial)</label>
-        </div>
-        <div class="input-field col s12">
-          <select id="${this.formPrefix_}-v">
-            <option value="10">10 km</option>
-            <option value="25" selected>25 km</option>
-            <option value="50">50 km</option>
-            <option value="100">100 km</option>
-          </select>
-          <label>V (In-track)</label>
-        </div>
-        <div class="input-field col s12">
-          <select id="${this.formPrefix_}-w">
-            <option value="10">10 km</option>
-            <option value="25" selected>25 km</option>
-            <option value="50">50 km</option>
-            <option value="100">100 km</option>
-          </select>
-          <label>W (Cross-track)</label>
-        </div>
-        <div id="${this.formPrefix_}-buttons" class="row center-align">
-          <button class="btn btn-ui waves-effect waves-light" type="submit" name="action">Screen for Debris &#9658;</button>
-          <button id="${this.formPrefix_}-draw-box" class="btn btn-ui waves-effect waves-light" type="button">
-            Draw Box
-          </button>
-          <button id="${this.formPrefix_}-clear-box" class="btn btn-ui waves-effect waves-light" type="button">
-            Clear Box
-          </button>
-        </div>
+      <form id="${this.sideMenuName_}-form" class="kt-menu-body">
+        ${this.wrapSection_(l('sections.parameters'), this.parametersBody_())}
+        ${this.wrapSection_(l('sections.searchBox'), this.searchBoxBody_())}
+        ${this.actionRow_(`${this.formPrefix_}-submit`, l('screenForDebris'), { submit: true })}
       </form>
     `;
+  }
+
+  /** "Parameters" card body: target SCC (read-only) and the screening window. */
+  protected parametersBody_(): string {
+    return html`
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <input disabled value="00005" id="${this.formPrefix_}-scc" type="text" />
+          <label for="${this.formPrefix_}-scc" class="active">${l('sccLabel')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <select id="${this.formPrefix_}-time">
+            <option value="1" selected>${l('timeOptions.h1')}</option>
+            <option value="4">${l('timeOptions.h4')}</option>
+            <option value="8">${l('timeOptions.h8')}</option>
+            <option value="24">${l('timeOptions.h24')}</option>
+            <option value="48">${l('timeOptions.h48')}</option>
+            <option value="72">${l('timeOptions.h72')}</option>
+          </select>
+          <label>${l('timeWindowLabel')}</label>
+        </div>
+      </div>
+    `;
+  }
+
+  /** "RIC Search Box" card body: U/V/W extents plus the draw/clear box actions. */
+  protected searchBoxBody_(): string {
+    return html`
+      <div class="kt-field-row">
+        <div class="input-field col s4">
+          <select id="${this.formPrefix_}-u">${this.ricBoxOptions_(1)}</select>
+          <label>${l('uLabel')}</label>
+        </div>
+        <div class="input-field col s4">
+          <select id="${this.formPrefix_}-v">${this.ricBoxOptions_(25)}</select>
+          <label>${l('vLabel')}</label>
+        </div>
+        <div class="input-field col s4">
+          <select id="${this.formPrefix_}-w">${this.ricBoxOptions_(25)}</select>
+          <label>${l('wLabel')}</label>
+        </div>
+      </div>
+      <div class="kt-divider"></div>
+      ${this.actionRow_(`${this.formPrefix_}-draw-box`, l('drawBox'))}
+      ${this.actionRow_(`${this.formPrefix_}-clear-box`, l('clearBox'))}
+    `;
+  }
+
+  /** Uniform RIC box-size options (km) shared by U/V/W, from small extents up to 500 km. */
+  private static readonly RIC_BOX_SIZES_KM: readonly number[] = [0.5, 1, 2, 5, 10, 25, 50, 100, 200, 500];
+
+  /** Build the shared U/V/W `<option>` list with `selectedKm` pre-selected. */
+  private ricBoxOptions_(selectedKm: number): string {
+    return DebrisScreening.RIC_BOX_SIZES_KM
+      .map((km) => `<option value="${km}"${km === selectedKm ? ' selected' : ''}>${km} km</option>`)
+      .join('');
+  }
+
+  /** Wrap a section's controls in a titled v13 card (uppercase label + bordered surface). */
+  protected wrapSection_(title: string, body: string): string {
+    return html`
+      <section class="kt-section">
+        <div class="kt-section-label">${title}</div>
+        ${body}
+      </section>
+    `;
+  }
+
+  /** A full-width v13 action row (label left; trailing chevron is a CSS pseudo-element). */
+  protected actionRow_(id: string, label: string, opts: { submit?: boolean; disabled?: boolean } = {}): string {
+    const type = opts.submit ? 'submit' : 'button';
+    const disabled = opts.disabled ? ' disabled' : '';
+
+    return html`
+      <button id="${id}" type="${type}" class="kt-action waves-effect"${disabled}>
+        <span class="kt-action-label">${label}</span>
+      </button>
+    `;
+  }
+
+  /**
+   * Set the label on a `.kt-action` row without clobbering the chevron (which is
+   * a CSS pseudo-element on the button, not in the label span).
+   */
+  protected setActionLabel_(id: string, label: string): void {
+    const labelEl = getEl(id)?.querySelector('.kt-action-label');
+
+    if (labelEl) {
+      labelEl.textContent = label;
+    }
   }
 
   getSecondaryMenuConfig(): ISecondaryMenuConfig {
@@ -185,54 +237,65 @@ export class DebrisScreening extends KeepTrackPlugin {
 
   private buildSecondaryMenuHtml_(): string {
     return html`
-      <div class="debris-screening-results">
-        <div class="row ds-header-row">
-          <div class="col s6">
-            <span id="${this.formPrefix_}-results-count" class="ds-results-count">0 conjunctions found</span>
-          </div>
-          <div class="col s6 right-align">
+      <div class="debris-screening-results kt-menu-body">
+        <section class="kt-section">
+          <div class="kt-section-label">${l('sections.results')}</div>
+          <div class="ds-header-row">
+            <span id="${this.formPrefix_}-results-count" class="ds-results-count">${l('resultsCount').replace('{count}', '0')}</span>
             <button id="${this.secondaryMenuName_}-export" class="btn btn-ui waves-effect waves-light btn-small">
-              <i class="material-icons left">file_download</i>Export CSV
+              <i class="material-icons left">file_download</i>${l('exportCsv')}
             </button>
           </div>
-        </div>
-        <div class="row ds-table-container">
-          <table id="${this.formPrefix_}-results-table" class="striped highlight">
-            <thead>
-              <tr>
-                <th>Secondary</th>
-                <th>TCA</th>
-                <th>Miss (km)</th>
-                <th>R (km)</th>
-                <th>I (km)</th>
-                <th>C (km)</th>
-                <th>Pc</th>
-                <th>Risk</th>
-              </tr>
-            </thead>
-            <tbody id="${this.formPrefix_}-results-body">
-            </tbody>
-          </table>
-        </div>
+          <div class="ds-table-container">
+            <table id="${this.formPrefix_}-results-table" class="striped highlight">
+              <thead>
+                <tr>
+                  <th>${l('table.secondary')}</th>
+                  <th>${l('table.tca')}</th>
+                  <th>${l('table.missKm')}</th>
+                  <th>${l('table.rKm')}</th>
+                  <th>${l('table.iKm')}</th>
+                  <th>${l('table.cKm')}</th>
+                  <th>${l('table.pc')}</th>
+                  <th>${l('table.risk')}</th>
+                </tr>
+              </thead>
+              <tbody id="${this.formPrefix_}-results-body">
+              </tbody>
+            </table>
+          </div>
+        </section>
       </div>
     `;
   }
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: 'Debris Screening',
-      body: html`
-        The Debris Screening tool screens a selected satellite against the catalog to identify potential conjunctions.
-        <br /><br />
-        Configure the assessment time window and click 'Screen for Debris' to run the analysis. Results will be displayed in a table showing:
-        <ul style="margin-left: 40px;">
-          <li><b>TCA</b> - Time of Closest Approach</li>
-          <li><b>Miss Distance</b> - Total and RIC components (Radial, In-track, Cross-track)</li>
-          <li><b>Pc</b> - Probability of Collision</li>
-          <li><b>Risk Level</b> - Critical/High/Medium/Low based on Pc</li>
-        </ul>
-        Click on any row to select the secondary satellite and jump to the TCA time. Export results to CSV using the download button.
-      `,
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/debris-screening/debris-screening-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: l('help.boxHeading'),
+          content: l('help.box'),
+        },
+        {
+          heading: l('help.resultsHeading'),
+          content: l('help.results'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2'), l('help.tip3')],
     };
   }
 
@@ -244,6 +307,13 @@ export class DebrisScreening extends KeepTrackPlugin {
     super.addJs();
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      // Mark the side menu and its generated secondary (results) menu as v13+ so
+      // the shared kt-* card styling applies; the wrappers are generated, so the
+      // marker can't be authored in the HTML. Then style the screening selects.
+      getEl(this.sideMenuName_)?.classList.add('kt-ui-v13');
+      getEl(`${this.sideMenuName_}-secondary`)?.classList.add('kt-ui-v13');
+      initMaterialSelects(getEl(this.sideMenuName_) ?? document.body);
+
       // Export button handler
       getEl(`${this.secondaryMenuName_}-export`)?.addEventListener('click', () => {
         this.onDownload();
@@ -265,22 +335,31 @@ export class DebrisScreening extends KeepTrackPlugin {
         const row = target.closest('tr');
 
         if (row) {
-          const secondaryScc = row.dataset.secondaryScc;
-          const tcaMs = row.dataset.tcaMs;
-
-          if (secondaryScc) {
-            this.selectSecondarySatelliteByScc_(secondaryScc);
-          }
-
-          if (tcaMs) {
-            const timeManager = ServiceLocator.getTimeManager();
-            const tcaTime = parseInt(tcaMs);
-
-            timeManager.changeStaticOffset(tcaTime - Date.now());
-          }
+          this.onResultsRowClick_(row);
         }
       });
     });
+  }
+
+  /**
+   * Handles a click on a results-table row: selects the secondary satellite
+   * and jumps the simulation to the time of closest approach.
+   *
+   * Subclasses (e.g. DebrisScreeningPro) override this to customize the
+   * behavior; only one handler is ever attached, so overriding here replaces
+   * the base behavior instead of stacking a second listener.
+   */
+  protected onResultsRowClick_(row: HTMLTableRowElement): void {
+    const secondaryScc = row.dataset.secondaryScc;
+    const tcaMs = row.dataset.tcaMs;
+
+    if (secondaryScc) {
+      this.selectSecondarySatelliteByScc_(secondaryScc);
+    }
+
+    if (tcaMs) {
+      jumpToTca(parseInt(tcaMs, 10));
+    }
   }
 
   // =========================================================================
@@ -300,9 +379,9 @@ export class DebrisScreening extends KeepTrackPlugin {
       const sat = catalogManager.getObject(satId, GetSatType.SKIP_POS_VEL);
 
       // OemSatellite passes isSatellite() but has no tle1/tle2/apogee/perigee
-      // — toTle() and the orbital-shell filter below would both throw.
+      // - toTle() and the orbital-shell filter below would both throw.
       if (!(sat instanceof Satellite)) {
-        errorManagerInstance.warn('Invalid satellite selected');
+        errorManagerInstance.warn(l('errorMsgs.InvalidSatellite'));
 
         return;
       }
@@ -335,7 +414,7 @@ export class DebrisScreening extends KeepTrackPlugin {
 
         try {
           const secondarySatelliteTle = sat2.toTle();
-          const covariance = this.calculateCovarianceFromSatellite(sat);
+          const covariance = this.calculateCovarianceFromSatellite(sat2);
 
           secondaries.push({
             tle: secondarySatelliteTle,
@@ -362,64 +441,51 @@ export class DebrisScreening extends KeepTrackPlugin {
         });
 
         // Filter by individual RIC components (box filter, not spherical)
-        this.screeningResults_ = allResults
+        this.rows_ = allResults
           .filter((result) =>
             Math.abs(result.event.radialDistance) <= uVal &&
             Math.abs(result.event.intrackDistance) <= vVal &&
             Math.abs(result.event.crosstrackDistance) <= wVal,
           )
           .sort((a, b) => b.event.probabilityOfCollision! - a.event.probabilityOfCollision!)
-          .slice(0, 100);
+          .slice(0, 100)
+          .map((result) => DebrisScreening.toRow_(result));
 
-        this.displayResults_();
+        this.renderRows_(this.rows_);
         this.openSecondaryMenu();
       } catch (error) {
-        errorManagerInstance.warn(`Screening failed: ${error}`);
+        errorManagerInstance.warn(`${l('errorMsgs.ScreeningFailed')}: ${error}`);
       }
     }, 500);
   }
 
   protected calculateCovarianceFromSatellite(sat: Satellite) {
-    let covMatrix = createSampleCovarianceFromTle(sat.tle1, sat.tle2).matrix.elements;
-
-    // Cap radii at 1200 km (radial), 1000 km (cross-track), and 5000 km (in-track) to avoid huge bubbles
-    covMatrix[0][0] = Math.min(Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, 1200); // Radial
-    covMatrix[1][1] = Math.min(Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, 1000); // Cross-track
-    covMatrix[2][2] = Math.min(Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, 5000); // In-track
-
-    if (!covMatrix[0][0] || !covMatrix[1][1] || !covMatrix[2][2]) {
-      errorManagerInstance.log('SelectSatManager.selectSatObject_: Invalid covariance matrix');
-      covMatrix = vec3.fromValues(1200, 1000, 5000) as unknown as number[][];
-    }
-
-    const covariance = new StateCovariance(new Matrix(covMatrix), CovarianceFrame.ECI);
-
-
-    return covariance;
+    // Caps radii (radial/cross-track/in-track) so a bad TLE can't produce a huge
+    // bubble; shared with the screening worker via ootk to avoid logic drift.
+    return cappedScreeningCovarianceFromTle(sat.tle1, sat.tle2, settingsManager.covarianceConfidenceLevel);
   }
 
   onDownload(): void {
-    if (this.screeningResults_.length === 0) {
-      errorManagerInstance.info('No results to export');
+    if (this.rows_.length === 0) {
+      errorManagerInstance.info(l('errorMsgs.NoResultsToExport'));
 
       return;
     }
 
     const headers = ['Secondary', 'TCA (UTC)', 'Miss Distance (km)', 'Radial (km)', 'Intrack (km)', 'Crosstrack (km)', 'Rel Velocity (km/s)', 'Pc', 'Risk Level'];
-    const rows = this.screeningResults_.map((result) => {
-      const event = result.event;
-      const risk = this.getRiskLevel_(event.probabilityOfCollision);
+    const rows = this.rows_.map((row) => {
+      const pc = row.probabilityOfCollision ?? undefined;
 
       return [
-        result.secondaryId,
-        this.formatTca_(event.tca),
-        event.missDistance.toFixed(6),
-        event.radialDistance.toFixed(6),
-        event.intrackDistance.toFixed(6),
-        event.crosstrackDistance.toFixed(6),
-        event.relativeVelocity.toFixed(6),
-        this.formatPc_(event.probabilityOfCollision),
-        risk.label,
+        row.secondaryId,
+        this.formatTcaMs_(row.tcaMs),
+        row.missDistance.toFixed(6),
+        row.radialDistance.toFixed(6),
+        row.intrackDistance.toFixed(6),
+        row.crosstrackDistance.toFixed(6),
+        row.relativeVelocity.toFixed(6),
+        this.formatPc_(pc),
+        this.getRiskLevel_(pc).label,
       ].join(',');
     });
 
@@ -447,61 +513,98 @@ export class DebrisScreening extends KeepTrackPlugin {
     }
   }
 
-  protected displayResults_(): void {
+  /**
+   * Normalize an ootk ScreeningResult (sync path) into the plain-number row
+   * shape shared with the Pro worker path.
+   */
+  protected static toRow_(result: ScreeningResult): DsResultRow {
+    const event = result.event;
+
+    return {
+      secondaryId: result.secondaryId,
+      tcaMs: event.tca.toDateTime().getTime(),
+      missDistance: event.missDistance,
+      radialDistance: event.radialDistance,
+      intrackDistance: event.intrackDistance,
+      crosstrackDistance: event.crosstrackDistance,
+      relativeVelocity: event.relativeVelocity,
+      probabilityOfCollision: event.probabilityOfCollision ?? null,
+      riskScore: result.riskScore,
+    };
+  }
+
+  /**
+   * Render a set of result rows into the secondary-menu table. Shared by the
+   * sync path, the Pro progressive stream, and the Pro finalizer so the row
+   * markup lives in exactly one place.
+   * @param rows Normalized result rows to display
+   * @param countText Optional override for the count label (e.g. progress text);
+   * defaults to the standard "N conjunctions found" message.
+   */
+  protected renderRows_(rows: DsResultRow[], countText?: string): void {
     const tbody = getEl(`${this.formPrefix_}-results-body`);
     const countEl = getEl(`${this.formPrefix_}-results-count`);
 
-    if (!tbody || !countEl) {
+    if (!tbody) {
       return;
     }
 
+    const fragment = document.createDocumentFragment();
+
+    for (const row of rows) {
+      fragment.appendChild(this.createResultRow_(row));
+    }
+
     tbody.innerHTML = '';
-    countEl.textContent = `${this.screeningResults_.length} conjunctions found`;
+    tbody.appendChild(fragment);
 
-    this.screeningResults_.forEach((result) => {
-      const event = result.event;
-      const risk = this.getRiskLevel_(event.probabilityOfCollision);
-      const tcaMs = event.tca.toDateTime().getTime();
+    if (countEl) {
+      countEl.textContent = countText ?? l('resultsCount').replace('{count}', rows.length.toString());
+    }
+  }
 
-      const tr = document.createElement('tr');
+  /** Build one `<tr>` (with the dataset hooks the row-click handler reads). */
+  protected createResultRow_(row: DsResultRow): HTMLTableRowElement {
+    const pc = row.probabilityOfCollision ?? undefined;
+    const risk = this.getRiskLevel_(pc);
+    const tr = document.createElement('tr');
 
-      tr.dataset.secondaryScc = result.secondaryId;
-      tr.dataset.tcaMs = tcaMs.toString();
-      tr.innerHTML = `
-        <td class="ds-secondary-link">${result.secondaryId}</td>
-        <td>${this.formatTca_(event.tca)}</td>
-        <td>${event.missDistance.toFixed(3)}</td>
-        <td>${event.radialDistance.toFixed(3)}</td>
-        <td>${event.intrackDistance.toFixed(3)}</td>
-        <td>${event.crosstrackDistance.toFixed(3)}</td>
-        <td>${this.formatPc_(event.probabilityOfCollision)}</td>
-        <td><span class="ds-risk-badge ${risk.className}">${risk.label}</span></td>
-      `;
+    tr.dataset.secondaryScc = row.secondaryId;
+    tr.dataset.tcaMs = row.tcaMs.toString();
+    tr.innerHTML = `
+      <td class="ds-secondary-link">${row.secondaryId}</td>
+      <td>${this.formatTcaMs_(row.tcaMs)}</td>
+      <td>${row.missDistance.toFixed(3)}</td>
+      <td>${row.radialDistance.toFixed(3)}</td>
+      <td>${row.intrackDistance.toFixed(3)}</td>
+      <td>${row.crosstrackDistance.toFixed(3)}</td>
+      <td>${this.formatPc_(pc)}</td>
+      <td><span class="ds-risk-badge ${risk.className}">${risk.label}</span></td>
+    `;
 
-      tbody.appendChild(tr);
-    });
+    return tr;
   }
 
   protected getRiskLevel_(pc?: number): RiskLevel {
     if (typeof pc !== 'number') {
-      return { label: 'N/A', className: 'risk-unknown' };
+      return { label: l('riskLevels.unknown'), className: 'risk-unknown' };
     }
 
     if (pc > 1e-4) {
-      return { label: 'Critical', className: 'risk-critical' };
+      return { label: l('riskLevels.critical'), className: 'risk-critical' };
     }
     if (pc > 1e-6) {
-      return { label: 'High', className: 'risk-high' };
+      return { label: l('riskLevels.high'), className: 'risk-high' };
     }
     if (pc > 1e-8) {
-      return { label: 'Medium', className: 'risk-medium' };
+      return { label: l('riskLevels.medium'), className: 'risk-medium' };
     }
 
-    return { label: 'Low', className: 'risk-low' };
+    return { label: l('riskLevels.low'), className: 'risk-low' };
   }
 
-  protected formatTca_(tca: EpochUTC): string {
-    return tca.toDateTime().toISOString().slice(0, 19).replace('T', ' ');
+  protected formatTcaMs_(tcaMs: number): string {
+    return new Date(tcaMs).toISOString().slice(0, 19).replace('T', ' ');
   }
 
   protected formatPc_(pc?: number): string {
@@ -515,9 +618,9 @@ export class DebrisScreening extends KeepTrackPlugin {
     return pc.toExponential(2);
   }
 
-  private selectSecondarySatelliteByScc_(sccNum: string): void {
+  protected selectSecondarySatelliteByScc_(sccNum: string): void {
     const catalogManager = ServiceLocator.getCatalogManager();
-    // Pass the string straight through — sccNum2Id handles numeric/alpha-5/extended.
+    // Pass the string straight through - sccNum2Id handles numeric/alpha-5/extended.
     const id = catalogManager.sccNum2Id(sccNum);
 
     if (id !== null && id !== -1) {

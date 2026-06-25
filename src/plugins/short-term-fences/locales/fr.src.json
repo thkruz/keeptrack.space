@@ -3,7 +3,65 @@
     "ShortTermFences": {
       "bottomIconLabel": "Barrière court terme",
       "title": "Menu Barrières court terme (STF)",
-      "helpBody": "Le menu Barrières court terme (STF) permet de visualiser les zones de recherche des capteurs. <br><br> Ceci n'est probablement utile que si vous possédez/exploitez un capteur avec cette fonctionnalité."
+      "sideMenuTitle": "Barrière court terme",
+      "labels": {
+        "centerAzimuth": "Azimut central",
+        "azimuthExtentDeg": "Étendue d'azimut (deg)",
+        "azimuthExtentKm": "Étendue d'azimut (km)",
+        "centerElevation": "Élévation centrale",
+        "elevationExtentDeg": "Étendue d'élévation (deg)",
+        "elevationExtentKm": "Étendue d'élévation (km)",
+        "centerRange": "Distance centrale",
+        "rangeExtent": "Étendue de distance"
+      },
+      "tooltips": {
+        "centerAzimuth": "Azimut du centre de recherche en degrés (ex. : 50)",
+        "azimuthExtentDeg": "Étendue totale autour de l'azimut central en degrés (ex. : 4)",
+        "azimuthExtentKm": "Étendue totale autour de l'azimut central en kilomètres (ex. : 120)",
+        "centerElevation": "Élévation du centre de recherche en degrés (ex. : 20)",
+        "elevationExtentDeg": "Étendue totale autour de l'élévation centrale en degrés (ex. : 4)",
+        "elevationExtentKm": "Étendue totale autour de l'élévation centrale en kilomètres (ex. : 120)",
+        "centerRange": "Distance du centre de recherche en kilomètres (ex. : 1000)",
+        "rangeExtent": "Étendue totale autour de la distance centrale en kilomètres (ex. : 100)",
+        "buildOnObject": "Visualiser la capacité de recherche du capteur"
+      },
+      "buttons": {
+        "createNewStf": "Créer une nouvelle STF",
+        "removeLast": "Supprimer la dernière",
+        "clearAllStfs": "Effacer toutes les STF"
+      },
+      "links": {
+        "buildOnObject": "Construire une barrière court terme sur cet objet..."
+      },
+      "errorMsgs": {
+        "stfNotInView": "La STF n'est pas dans le champ de vision du capteur !",
+        "noSelectSatManager": "Aucune instance de selectSatManager trouvée",
+        "invalidInput": "Saisissez un nombre valide dans chaque champ.",
+        "invalidRange": "La distance centrale doit être supérieure à zéro."
+      },
+      "help": {
+        "overview": "Les barrières court terme visualisent la boîte de recherche d'un capteur : une portion de ciel définie par une fenêtre d'azimut, d'élévation et de distance. Les opérateurs s'en servent pour voir exactement quel volume couvre une recherche planifiée et si un objet d'intérêt le traverserait.",
+        "imgAlt": "Le menu Barrière court terme avec les champs d'azimut, d'élévation et de distance",
+        "imgCaption": "Définissez la barrière par son point central et ses étendues en azimut, élévation et distance.",
+        "fieldsHeading": "Définir la barrière",
+        "fields": "La barrière est centrée sur un point donné par <strong>Azimut central</strong>, <strong>Élévation centrale</strong> (degrés) et <strong>Distance centrale</strong> (kilomètres), tous mesurés depuis le capteur sélectionné. L'<strong>Étendue d'azimut</strong> et l'<strong>Étendue d'élévation</strong> fixent la largeur et la hauteur totales en degrés ; la taille équivalente en kilomètres à la distance centrale est calculée automatiquement dans les champs km en lecture seule. L'<strong>Étendue de distance</strong> fixe la profondeur de la boîte en kilomètres.",
+        "howToUse": "<ol><li>Sélectionnez un capteur ; l'icône du bas est désactivée tant qu'aucun n'est sélectionné.</li><li>Ouvrez le menu <strong>Barrière court terme</strong> (mode Créer) et saisissez le point central et les étendues.</li><li>Cliquez sur <strong>Créer une nouvelle STF</strong>. Le volume de la barrière est dessiné depuis le capteur dans la vue 3D.</li><li>Empilez des barrières supplémentaires en soumettant à nouveau ; <strong>Supprimer la dernière</strong> efface la plus récente et <strong>Effacer toutes les STF</strong> supprime toutes les barrières.</li><li>Avec un satellite sélectionné, la boîte d'informations du satellite affiche un lien <strong>Construire une barrière court terme sur cet objet...</strong> qui préremplit le formulaire avec l'azimut, l'élévation et la distance actuels du satellite.</li></ol>",
+        "tip1": "Si la barrière demandée est en dehors de ce que le capteur peut voir, la création est rejetée avec une notification au lieu de dessiner une boîte impossible.",
+        "tip2": "Les champs d'étendue en kilomètres se mettent à jour pendant la saisie, ce qui permet de vérifier facilement la largeur réelle de la recherche à cette distance."
+      },
+      "sections": {
+        "azimuth": "Azimut",
+        "elevation": "Élévation",
+        "range": "Distance"
+      },
+      "fenceList": {
+        "activeFences": "Barrières actives",
+        "empty": "Aucune barrière active. Créez-en une ci-dessus.",
+        "remove": "Supprimer la barrière",
+        "azimuth": "Azimut",
+        "elevation": "Élévation",
+        "range": "Distance"
+      }
     }
   }
 }

@@ -1,15 +1,28 @@
 {
   "plugins": {
     "BestPassPlugin": {
+      "sections": {
+        "search": "Hledání"
+      },
       "bottomIconLabel": "Nejlepší průlety",
-      "title": "Časy nejlepších průletů",
-      "helpBody": "Plugin Časy nejlepších průletů vypočítá optimální časy průletů satelitů na základě aktuálně vybraného senzoru. Průlety jsou hodnoceny podle doby trvání, maximální elevace, minimální vzdálenosti a polohy Slunce. Výsledky se exportují jako CSV.",
+      "title": "Nejlepší průlety",
       "satelliteNumbersLabel": "Čísla satelitů",
       "generateButton": "Generovat časy nejlepších průletů",
       "selectSensorFirst": "Nejprve vyberte senzor!",
       "errorMsgs": {
         "SensorRequired": "Nejprve musíte vybrat senzor!",
-        "SensorFormatError": "Formát senzoru je nesprávný. Vybrali jste senzor?"
+        "SensorFormatError": "Formát senzoru je nesprávný. Vybrali jste senzor?",
+        "ResultsTruncated": "Dosažen limit výsledků: zobrazí se pouze prvních {limit} přeletů na satelit."
+      },
+      "help": {
+        "overview": "Časy nejlepších průletů ohodnotí každý nadcházející průlet satelitů ze zadaného seznamu nad aktuálně vybraným senzorem a uloží výsledky jako tabulku. Hodnocení zvýhodňuje dlouhou dobu trvání, vysokou maximální elevaci, krátkou vzdálenost a příznivou polohu Slunce, takže nejlepší pozorovací příležitosti vystoupají na vrchol.",
+        "imgAlt": "Menu Časy nejlepších průletů se seznamem čísel satelitů",
+        "imgCaption": "Zadejte čísla satelitů a poté vygenerujte tabulku ohodnocených průletů.",
+        "howToUse": "<ol><li>Nejprve vyberte senzor; dokud tak neučiníte, spodní ikona je neaktivní a na tlačítku je <strong>Nejprve vyberte senzor!</strong>.</li><li>Otevřete <strong>Nejlepší průlety</strong> ze spodního menu nebo stiskněte <strong>B</strong>.</li><li>Do pole <strong>Čísla satelitů</strong> zadejte satelity k vyhodnocení, oddělené čárkami nebo mezerami (například 25544, 20580).</li><li>Klikněte na <strong>Generovat časy nejlepších průletů</strong>. Stáhne se tabulkový soubor s jedním řádkem na průlet, včetně datumů a časů začátku a konce a geometrie průletu.</li></ol>",
+        "tip1": "Označení Alpha-5, například T0001, fungují stejně jako běžná katalogová čísla.",
+        "tip2": "Čísla, která neodpovídají žádnému objektu v katalogu, jsou tiše přeskočena, takže pokud tabulka obsahuje méně satelitů, než jste čekali, zkontrolujte seznam.",
+        "tip3": "Výsledky jsou seřazeny chronologicky, proto nejsilnější průlety najdete podle sloupců elevace a doby trvání.",
+        "shortcutToggle": "Přepnout menu časů nejlepších průletů"
       }
     }
   }

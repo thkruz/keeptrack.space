@@ -998,6 +998,7 @@ export abstract class KeepTrackPlugin {
     [MenuMode.EVENTS]: [] as string[],
     [MenuMode.CREATE]: [] as string[],
     [MenuMode.ANALYSIS]: [] as string[],
+    [MenuMode.CONJUNCTIONS]: [] as string[],
     [MenuMode.DISPLAY]: [] as string[],
     [MenuMode.TOOLS]: [] as string[],
     [MenuMode.SETTINGS]: [] as string[],
@@ -1026,6 +1027,9 @@ export abstract class KeepTrackPlugin {
               break;
             case MenuMode.ANALYSIS:
               hideEl(BottomMenu.analysisMenuId);
+              break;
+            case MenuMode.CONJUNCTIONS:
+              hideEl(BottomMenu.conjunctionsMenuId);
               break;
             case MenuMode.DISPLAY:
               hideEl(BottomMenu.displayMenuId);
@@ -1586,7 +1590,13 @@ export abstract class KeepTrackPlugin {
     if (secondaryButtonElement) {
       secondaryButtonElement.style.color = 'var(--color-dark-text-accent)';
     }
-    slideOutLeft(getEl(`${this.sideMenuElementName}-secondary`), 1500, null, -300);
+    /*
+     * Match closeSideMenu's 300ms duration so the primary and secondary panels slide
+     * out together. A longer duration here made the secondary lag and linger after the
+     * primary had vanished, leaving an awkward gap. The -300 offset stays because the
+     * secondary sits to the right of the primary and needs the extra travel to clear.
+     */
+    slideOutLeft(getEl(`${this.sideMenuElementName}-secondary`), 300, null, -300);
   }
 
   registerSubmitButtonClicked(callback: ((() => void) | null) = null) {
@@ -1660,6 +1670,7 @@ export abstract class KeepTrackPlugin {
       (): boolean => {
         if (this.isMenuButtonActive) {
           adviceManagerInstance.showAdvice(helpTitle, helpText);
+          EventBus.getInstance().emit(EventBusEvent.helpMenuShown, this.id);
 
           return true;
         }

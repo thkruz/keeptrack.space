@@ -1,5 +1,6 @@
 import numeric from 'numeric';
 import { AzEl, DEG2RAD, Degrees, Satellite, Kilometers, MILLISECONDS_PER_SECOND, ecef2rae, eci2ecef } from '@ootk/src/main';
+import { t7e } from '@app/locales/keys';
 import { SatMath } from '../../app/analysis/sat-math';
 import { dateFormat } from '../utils/dateFormat';
 import { getEl } from '../utils/get-el';
@@ -21,6 +22,24 @@ export type SatAzEl = {
   az: Degrees;
   el: Degrees;
   isVisible: boolean;
+  /** Catalog name of the satellite, used for sky plot identity labels */
+  name?: string;
+};
+
+/** Supported GNSS constellations for DOP analysis. */
+export type GnssConstellation = 'gps' | 'galileo' | 'glonass' | 'beidou' | 'all';
+
+/**
+ * Catalog-name matchers for each GNSS constellation.
+ * GLONASS satellites are cataloged as COSMOS objects; CelesTrak-style names carry
+ * a GLONASS tag or a 7xx Uragan series number in parentheses/brackets.
+ */
+export const GNSS_CONSTELLATION_PATTERNS: Record<GnssConstellation, RegExp> = {
+  gps: /NAVSTAR|\bGPS[\s-]/iu,
+  galileo: /GALILEO|\bGSAT-?\d{3,4}\b/iu,
+  glonass: /GLONASS|URAGAN|COSMOS\s*\d+\s*[([](?:GLONASS|7\d{2})/iu,
+  beidou: /BEIDOU|\bBDS[\s-]\d/iu,
+  all: /NAVSTAR|\bGPS[\s-]|GALILEO|\bGSAT-?\d{3,4}\b|GLONASS|URAGAN|COSMOS\s*\d+\s*[([](?:GLONASS|7\d{2})|BEIDOU|\bBDS[\s-]\d/iu,
 };
 
 /** Function that returns the minimum elevation at a given azimuth */
@@ -29,6 +48,8 @@ export type ElevationMaskFn = (az: Degrees) => Degrees;
 export type DopList = {
   time: Date;
   dops: DopValues;
+  /** Number of satellites visible above the elevation mask at this time */
+  visibleSats: number;
 }[];
 
 /**
@@ -118,7 +139,7 @@ export abstract class DopMath {
       }
 
       if (allSatAzEl) {
-        allSatAzEl.push({ az, el, isVisible });
+        allSatAzEl.push({ az, el, isVisible, name: sat.name });
       }
     });
 
@@ -149,16 +170,16 @@ export abstract class DopMath {
     let tr = tbl.insertRow();
     let tdT = tr.insertCell();
 
-    tdT.appendChild(document.createTextNode('Time'));
+    tdT.appendChild(document.createTextNode(t7e('plugins.DopsPlugin.table.time')));
     let tdH = tr.insertCell();
 
-    tdH.appendChild(document.createTextNode('HDOP'));
+    tdH.appendChild(document.createTextNode(t7e('plugins.DopsPlugin.table.hdop')));
     let tdP = tr.insertCell();
 
-    tdP.appendChild(document.createTextNode('PDOP'));
+    tdP.appendChild(document.createTextNode(t7e('plugins.DopsPlugin.table.pdop')));
     let tdG = tr.insertCell();
 
-    tdG.appendChild(document.createTextNode('GDOP'));
+    tdG.appendChild(document.createTextNode(t7e('plugins.DopsPlugin.table.gdop')));
 
     for (const result of dopsResults) {
       tr = tbl.insertRow();
@@ -171,6 +192,29 @@ export abstract class DopMath {
       tdG = tr.insertCell();
       tdG.appendChild(document.createTextNode(result.dops.gdop));
     }
+  }
+
+  /**
+   * Builds a short identity label for a sky plot dot from a satellite catalog name.
+   * Prefers a PRN designator when one is parseable, otherwise shortens the name by
+   * stripping parenthetical/bracketed suffixes and truncating.
+   */
+  public static getSatelliteShortLabel(name?: string): string {
+    if (!name) {
+      return '';
+    }
+
+    const prnMatch = (/PRN\s*(?<prn>\d+)/iu).exec(name);
+
+    if (prnMatch) {
+      return `PRN ${prnMatch.groups?.prn}`;
+    }
+
+    const shortened = name
+      .replace(/\s*[([].*$/u, '')
+      .trim();
+
+    return shortened.length > 12 ? `${shortened.slice(0, 11)}…` : shortened;
   }
 
   public static getDopsList(
@@ -189,7 +233,7 @@ export abstract class DopMath {
 
       const dops = DopMath.getDops(now, gpsSats, lat, lon, alt, el);
 
-      dopsResults.push({ time: now, dops });
+      dopsResults.push({ time: now, dops, visibleSats: dops.visibleSats });
     }
 
     return dopsResults;

@@ -3,7 +3,42 @@
     "PolarPlotPlugin": {
       "bottomIconLabel": "Wykres biegunowy",
       "title": "Menu wykresu biegunowego",
-      "helpBody": "Menu wykresu biegunowego służy do generowania dwuwymiarowego wykresu biegunowego azymutu i elewacji satelity w czasie."
+      "labels": {
+        "notInView": "Satelita nie będzie widoczny przez najbliższe {hours} godzin",
+        "saveImage": "Zapisz obraz",
+        "satellite": "Satelita {sccNum}",
+        "unknownSensor": "Nieznany czujnik",
+        "unknownStartTime": "Nieznany czas rozpoczęcia",
+        "unknownStopTime": "Nieznany czas zakończenia",
+        "prevPass": "Poprzedni przelot",
+        "nextPass": "Następny przelot",
+        "imageSize": "Rozmiar obrazu",
+        "size_square": "Kwadrat (1080)",
+        "size_wide": "Szeroki (1200x675)",
+        "size_large": "Duży (2000)",
+        "copyImage": "Kopiuj obraz",
+        "copied": "Wykres polarny skopiowano do schowka",
+        "passLabel": "Przelot {n} z {total}",
+        "maxEl": "Maks. elewacja {deg}°"
+      },
+      "sections": {
+        "pass": "Przelot",
+        "export": "Eksport"
+      },
+      "errorMsgs": {
+        "copyFailed": "Nie udało się skopiować obrazu do schowka"
+      },
+      "help": {
+        "overview": "Wykres biegunowy rysuje następny przelot wybranego satelity nad wybranym czujnikiem jako klasyczną mapę nieba w azymucie i elewacji: północ u góry, horyzont na zewnętrznym pierścieniu, a zenit w środku. To mapa, której obserwator lub operator używa, aby wiedzieć, gdzie patrzeć na niebie.",
+        "imgAlt": "Biegunowa mapa nieba pokazująca ślad przelotu satelity",
+        "imgCaption": "Przelot zaczyna się w zielonym punkcie i kończy w czerwonym punkcie; pierścienie oznaczają elewację.",
+        "readingHeading": "Jak czytać wykres",
+        "reading": "Ślad zaczyna się zielonym punktem (wschód) i kończy czerwonym punktem (zachód). Koncentryczne pierścienie oznaczają elewację co 15 stopni od horyzontu (zewnętrzna krawędź) do zenitu (środek), a kierunki kompasu biegną wzdłuż obrzeża. Nagłówek pokazuje czujnik, numer satelity oraz czasy rozpoczęcia i zakończenia przelotu w UTC.",
+        "howToUse": "<ol><li>Wybierz czujnik i satelitę; dolna ikona pozostaje nieaktywna, dopóki oba nie zostaną wybrane.</li><li>Otwórz <strong>Wykres biegunowy</strong> z dolnego paska. Następny przelot w ciągu trzech dni jest obliczany i rysowany automatycznie.</li><li>Kliknij <strong>Zapisz obraz</strong>, aby pobrać wykres jako plik PNG.</li></ol>",
+        "tip1": "Jeśli satelita nigdy nie wzniesie się nad horyzont w ciągu najbliższych trzech dni, wykres zostaje zastąpiony komunikatem zamiast pustej mapy.",
+        "tip2": "Ślad przechodzący blisko środka to przelot o wysokiej elewacji: najlepsza geometria do obserwacji lub komunikacji.",
+        "shortcutToggle": "Przełącz menu wykresu biegunowego"
+      }
     }
   }
 }

@@ -1,0 +1,213 @@
+/**
+ * v13+ Menu UI standard ("FAANG card" style).
+ *
+ * Opt-in per menu: add the `kt-ui-v13` marker class to the side-menu root
+ * element. Everything here is scoped under `.kt-ui-v13`, so legacy (pre-v13)
+ * menus are untouched until they migrate. The marker class is also the flag the
+ * migration tracker uses to mark a menu as "on the v13+ UI" — see CLAUDE.md and
+ * docs-local/ui/v13-menu-style.md.
+ *
+ * Building blocks (compose inside a `.kt-ui-v13` menu):
+ *   .kt-section        titled card grouping one family of controls
+ *   .kt-section-label  small uppercase section label (use a <div>, NOT an h5 —
+ *                      the side-menu pipeline strips the first center-aligned h5)
+ *   .kt-divider        full-bleed hairline separating sub-groups in a card
+ *   .kt-field-row      row of side-by-side form fields (Materialize input-fields)
+ *   .kt-action         full-width action row (label left, chevron right)
+ *   .kt-action-label   the label span inside a .kt-action button
+ */
+
+/* ===== Tab row: recessed segmented control ===== */
+.kt-ui-v13 .tabs {
+  display: flex;
+  gap: 4px;
+  height: auto;
+  padding: 4px;
+  margin-bottom: 4px;
+  background-color: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--color-dark-border);
+  border-radius: var(--kt-radius-md, 6px);
+  overflow: visible;
+}
+
+.kt-ui-v13 .tabs .tab {
+  flex: 1 1 0;
+  height: auto;
+  line-height: normal;
+}
+
+/* Override Materialize's grid width (the tabs are emitted as `.col sN`). */
+.kt-ui-v13 .tabs .tab.col {
+  width: auto;
+  padding: 0;
+}
+
+.kt-ui-v13 .tabs .tab a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  line-height: 32px;
+  padding: 0 12px;
+  text-align: center;
+  border-radius: var(--kt-radius-sm, 4px);
+  background-color: rgba(255, 255, 255, 0.06);
+  /* !important overrides the global `a { color: accent !important }` rule. */
+  color: rgba(255, 255, 255, 0.6) !important;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.kt-ui-v13 .tabs .tab a:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: var(--color-text-light, #f5f5f5) !important;
+}
+
+.kt-ui-v13 .tabs .tab a:focus,
+.kt-ui-v13 .tabs .tab a:focus.active {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.kt-ui-v13 .tabs .tab a.active,
+.kt-ui-v13 .tabs .tab a.active:focus {
+  background-color: var(--color-primary, #ba160c);
+  color: #fff !important;
+}
+
+/* The segmented active-fill replaces the sliding underline. */
+.kt-ui-v13 .tabs .indicator {
+  display: none;
+}
+
+/* ===== Section card ===== */
+.kt-ui-v13 .kt-section {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--color-dark-border);
+  border-radius: var(--kt-radius-lg, 8px);
+  padding: 12px 14px 14px;
+  margin: 0 6px 12px;
+}
+
+.kt-ui-v13 .kt-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-dark-text-muted);
+  margin: 0 0 8px;
+}
+
+/* A Materialize <select>'s popup (.dropdown-content, z-index 9999) is a
+   descendant of its card. With the card at the default `z-index: auto`, that
+   inner z-index only competes inside the card's own stacking context, so a
+   LATER sibling card (also auto) paints over the open dropdown - its labels and
+   toggles bleed through the popup. Promote the card holding the OPEN dropdown to
+   its own stacking context so the popup clears the cards stacked below it.
+
+   We key off the dropdown's inline `display: block` rather than `:focus-within`
+   because Materialize flips focus/aria-expanded at close-START but keeps the
+   popup mounted (display:block, opacity fading) for the full `outDuration`
+   (~250ms) close animation - it only resets `display` once the fade finishes.
+   `:focus-within` would drop the card's z-index the instant you click away,
+   re-exposing the cards behind for that 250ms fade. `:has(... display: block)`
+   stays true for the entire open + close-fade window and clears the moment the
+   popup is actually hidden. */
+.kt-ui-v13 .kt-section:has(.dropdown-content[style*="display: block"]) {
+  position: relative;
+  z-index: 5;
+}
+
+/* Full-bleed hairline between sub-groups within a card. */
+.kt-ui-v13 .kt-divider {
+  height: 1px;
+  margin: 14px -14px;
+  background: var(--color-dark-border);
+}
+
+/* Muted explanatory note inside a section card. */
+.kt-ui-v13 .kt-note {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-dark-text-muted);
+  margin: 0 0 8px;
+}
+
+/* ===== Field rows ===== */
+.kt-ui-v13 .kt-field-row {
+  display: flex;
+  gap: 12px;
+  margin: 0;
+}
+
+.kt-ui-v13 .kt-field-row .input-field.col {
+  width: auto;
+  flex: 1 1 0;
+  float: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+
+/* ===== Action rows ===== */
+.kt-ui-v13 .kt-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 40px;
+  padding: 0 14px;
+  margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-dark-border);
+  border-radius: var(--kt-radius-md, 6px);
+  color: var(--color-text-light, #f5f5f5);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: 0;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.kt-ui-v13 .kt-action:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: var(--color-primary-light, #e01a0e);
+}
+
+.kt-ui-v13 .kt-action::after {
+  content: '\203A'; /* › */
+  margin-left: 12px;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--color-dark-text-muted);
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.kt-ui-v13 .kt-action:hover::after {
+  color: var(--color-text-light, #f5f5f5);
+  transform: translateX(2px);
+}
+
+.kt-ui-v13 .kt-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.kt-ui-v13 .kt-action:disabled:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--color-dark-border);
+}
+
+.kt-ui-v13 .kt-action:disabled::after {
+  display: none;
+}
+
+.kt-ui-v13 .kt-action-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

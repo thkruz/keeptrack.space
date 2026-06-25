@@ -52,7 +52,7 @@ const settingsOverride = {
     LookAnglesPlugin: {
       enabled: false,
     },
-    MultiSiteLookAnglesPlugin: {
+    MultiSensorLookAnglesPlugin: {
       enabled: false,
     },
     SensorTimeline: {
@@ -173,10 +173,10 @@ const settingsOverride = {
     transponderChannelData: {
       enabled: false,
     },
-    NextLaunchesPlugin: {
+    TheSpaceDevLaunchCalendarPlugin: {
       enabled: false,
     },
-    LaunchCalendar: {
+    GunterLaunchCalendar: {
       enabled: false,
     },
     Calculator: {

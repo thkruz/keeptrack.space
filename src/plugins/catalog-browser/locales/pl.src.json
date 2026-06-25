@@ -3,8 +3,8 @@
     "CatalogBrowserPlugin": {
       "bottomIconLabel": "Przeglądarka katalogu",
       "title": "Przeglądarka katalogu",
-      "helpBody": "Przeglądaj i ładuj katalogi satelitów. <br><br>Użyj przełącznika, aby wybrać między zastąpieniem całego katalogu (Wszystkie dane) a aktualizacją tylko elementów orbitalnych dla istniejących satelitów (Tylko dane orbitalne).",
       "labels": {
+        "loadMode": "Tryb ładowania",
         "allData": "Wszystkie dane",
         "orbitalOnly": "Tylko orbitalne",
         "allDataDesc": "Zastępuje cały katalog wybranymi danymi",
@@ -91,15 +91,27 @@
         "vimpelLoaded": "Załadowano katalog JSC Vimpel"
       },
       "commands": {
-        "category": "Przeglądarka katalogu"
+        "category": "Przeglądarka katalogu",
+        "loadCatalog": "Załaduj katalog: {name}"
       },
       "errorMsgs": {
         "FetchFailed": "Nie udało się pobrać katalogu",
         "DefaultFailed": "Nie udało się przywrócić domyślnego katalogu",
-        "Forbidden": "CelesTrak rejected the request (HTTP 403). This is usually a Cloudflare rate-limit — wait a minute and try again.",
-        "RateLimited": "Too many catalog requests. Please wait a minute before trying again.",
-        "ServerError": "CelesTrak is temporarily unavailable. Please try again in a few minutes.",
-        "NetworkError": "Could not reach CelesTrak. Check your network connection."
+        "Forbidden": "CelesTrak odrzucił żądanie (HTTP 403). Zazwyczaj jest to limit żądań Cloudflare; odczekaj minutę i spróbuj ponownie.",
+        "RateLimited": "Zbyt wiele żądań katalogu. Odczekaj minutę przed kolejną próbą.",
+        "ServerError": "CelesTrak jest tymczasowo niedostępny. Spróbuj ponownie za kilka minut.",
+        "NetworkError": "Nie udało się połączyć z CelesTrak. Sprawdź połączenie sieciowe."
+      },
+      "help": {
+        "overview": "Przeglądarka katalogu zmienia katalog satelitów, który właśnie przeglądasz. Wybierz spośród przygotowanych list (konstelacja, chmura szczątków, kategoria misji) lub pełnych katalogów CelesTrak i JSC Vimpel, a scena załaduje się ponownie dokładnie z tymi obiektami.",
+        "imgAlt": "Menu Przeglądarki katalogu z przełącznikiem trybu ładowania i listą katalogów",
+        "imgCaption": "Wybierz tryb ładowania, a następnie kliknij dowolny katalog, aby go załadować.",
+        "modesHeading": "Tryby ładowania",
+        "modes": "<strong>Wszystkie dane</strong> zastępuje cały katalog wybranym zestawem danych, w tym nazwami, typami i metadanymi. <strong>Tylko orbitalne</strong> zachowuje wszystkie posiadane satelity i odświeża jedynie ich elementy orbitalne, co jest bezpieczniejszym wyborem, jeśli edytowano obiekty lub polega się na istniejących metadanych.",
+        "howToUse": "<ol><li>Otwórz menu <strong>Przeglądarka katalogu</strong> z dolnego paska (tryb Katalog).</li><li>Przełącznikiem wybierz <strong>Wszystkie dane</strong> lub <strong>Tylko orbitalne</strong>; opis poniżej wyjaśnia bieżący tryb.</li><li>Kliknij katalog na liście podzielonej na kategorie, na przykład <strong>Stacje kosmiczne</strong>, <strong>Starlink</strong> lub <strong>Szczątki COSMOS 1408</strong>. Powiadomienie potwierdzi załadowanie.</li><li>Załaduj <strong>Domyślny katalog</strong>, aby wrócić do standardowego pełnego katalogu.</li></ol>",
+        "tip1": "Każdy katalog jest też dostępny z palety poleceń jako polecenie ładowania katalogu, więc możesz przełączać się bez otwierania menu.",
+        "tip2": "Załadowanie małego katalogu znacznie poprawia wydajność na wolniejszych komputerach; lista 100 najjaśniejszych to dobry minimalny zestaw.",
+        "tip3": "Pobieranie katalogów odbywa się z CelesTrak i może podlegać ograniczeniom liczby żądań; jeśli ładowanie nie powiedzie się z komunikatem HTTP 403, odczekaj minutę i spróbuj ponownie."
       }
     }
   }

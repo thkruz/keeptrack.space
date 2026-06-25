@@ -3,7 +3,55 @@
     "SettingsMenuPlugin": {
       "bottomIconLabel": "Settings",
       "title": "Settings Menu",
-      "helpBody": "The Settings menu allows you to configure the application."
+      "filterPlaceholder": "Filter settings...",
+      "buttons": {
+        "resetToDefaults": "Reset to Defaults"
+      },
+      "commands": {
+        "open": "Open Settings",
+        "reset": "Reset Settings to Defaults"
+      },
+      "sections": {
+        "general": "General Settings",
+        "fastCpu": "Fast CPU Required"
+      },
+      "labels": {
+        "showInfoOnHover": "Show Info On Hover",
+        "drawOrbits": "Draw Orbits",
+        "drawTrailingOrbits": "Draw Trailing Orbits",
+        "drawOrbitsInEcf": "Draw Orbits in ECF",
+        "numberOfEcfOrbits": "Number of ECF Orbits to Draw",
+        "drawFovLines": "Draw FOV Lines",
+        "displayEciOnHover": "Display ECI on Hover",
+        "showCameraWidget": "Show Camera Widget",
+        "showConfidenceLevels": "Show Confidence Levels",
+        "enableDemoMode": "Enable Demo Mode",
+        "enableFreezeTime": "Enable Freeze Time on Click",
+        "compensateEarthRotation": "Compensate for Earth Rotation",
+        "showNextPassOnHover": "Show Next Pass on Hover"
+      },
+      "tooltips": {
+        "showInfoOnHover": "Show more information when hovering over a satellite.",
+        "drawOrbits": "Disable this to hide orbit lines",
+        "drawTrailingOrbits": "Enable this to show where a satellite was instead of where it is going",
+        "drawOrbitsInEcf": "Orbits will be drawn using ECF vs ECI (Mainly for GEO Orbits)",
+        "drawFovLines": "Draw lines from sensor to satellites when in FOV",
+        "displayEciOnHover": "Display ECI Coordinates on Hover",
+        "showCameraWidget": "Disable this to hide the camera widget",
+        "showConfidenceLevels": "Show confidence levels for satellite's element sets.",
+        "enableDemoMode": "Every 3 seconds a new satellite will be selected from FOV",
+        "enableFreezeTime": "Time will freeze as you rotate the camera.",
+        "compensateEarthRotation": "Compensate camera yaw for Earth rotation so the view stays fixed to geographic coordinates.",
+        "showNextPassOnHover": "Show the next pass time when hovering over a satellite in the selected sensor's field of view."
+      },
+      "help": {
+        "overview": "The Settings menu holds the application wide display and interaction options: orbit drawing, hover behavior, camera aids, and performance sensitive extras. Other plugins also contribute their own sections here, so this is the single place to tune how KeepTrack behaves.",
+        "imgAlt": "The Settings menu with its general option switches",
+        "imgCaption": "Toggle any option to apply it instantly; use the filter to find settings fast.",
+        "howToUse": "<ol><li>Open <strong>Settings</strong> from the bottom bar.</li><li>Toggle any switch to apply it instantly; hover a row for a tooltip explaining it.</li><li>Use the <strong>filter</strong> box at the top to quickly find a setting by name.</li><li><strong>Reset to Defaults</strong> restores every option, including plugin contributed sections, to factory values.</li></ol>",
+        "tip1": "Options under Fast CPU Required, like showing the next pass on hover, run extra calculations every frame; leave them off on slower machines.",
+        "tip2": "Plugin sections at the bottom come from other plugins (Watchlist, Time Machine, and more), so the menu grows as plugins are enabled."
+      }
     }
   }
 }

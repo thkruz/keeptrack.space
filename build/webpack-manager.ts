@@ -25,6 +25,7 @@ export class WebpackManager {
       __VERSION_DATE__: JSON.stringify(new Date().toISOString()),
       __COMMIT_HASH__: JSON.stringify(commitHash),
       __IS_PRO__: JSON.stringify(this.config.isPro),
+      __EDITION__: JSON.stringify(this.config.edition),
     });
     const webpackConfig = [] as Configuration[];
     let baseConfig = this.createBaseConfig_(dirName);
@@ -330,17 +331,35 @@ export class WebpackManager {
    * Returns the WebWorker configuration object.
    */
   private static createWorkerConfig_(baseConfig: Configuration, dirName: string, subFolder: string, pubPath: string) {
+    const entry: Record<string, string[]> = {
+      positionCruncher: ['./src/webworker/positionCruncher.ts'],
+      orbitCruncher: ['./src/webworker/orbitCruncher.ts'],
+      colorCruncher: ['./src/webworker/colorCruncher.ts'],
+      debrisScreeningWorker: ['./src/webworker/debrisScreeningWorker.ts'],
+      fovPredictionWorker: ['./src/webworker/fovPredictionWorker.ts'],
+      bestPassWorker: ['./src/webworker/bestPassWorker.ts'],
+      closeObjectsWorker: ['./src/webworker/closeObjectsWorker.ts'],
+      proximityOpsWorker: ['./src/webworker/proximityOpsWorker.ts'],
+      time2lonWorker: ['./src/webworker/time2lonWorker.ts'],
+      azRangeHeatmapWorker: ['./src/webworker/azRangeHeatmapWorker.ts'],
+    };
+
+    // Pro-only workers: their source lives in the plugins-pro submodule, so they are
+    // only built (and only present) for pro profiles - never bundled into OSS.
+    if (this.config.isPro) {
+      entry.tipAndCueWorker = ['./src/plugins-pro/tip-and-cue/tipAndCueWorker.ts'];
+      entry.eclipseWorker = ['./src/plugins-pro/eclipse-solar-analysis/eclipseWorker.ts'];
+      entry.coverageWorker = ['./src/plugins-pro/coverage-analysis/coverageWorker.ts'];
+      entry.tocaPocaWorker = ['./src/plugins-pro/toca-poca-plugin/tocaPocaWorker.ts'];
+      entry.overflightWorker = ['./src/plugins-pro/overflight/overflightWorker.ts'];
+      entry.neighborhoodHistoryWorker = ['./src/plugins-pro/neighborhood-history/neighborhoodHistoryWorker.ts'];
+    }
+
     return ({
       ...baseConfig,
       ...{
         name: 'WebWorkers',
-        entry: {
-          positionCruncher: ['./src/webworker/positionCruncher.ts'],
-          orbitCruncher: ['./src/webworker/orbitCruncher.ts'],
-          colorCruncher: ['./src/webworker/colorCruncher.ts'],
-          debrisScreeningWorker: ['./src/webworker/debrisScreeningWorker.ts'],
-          fovPredictionWorker: ['./src/webworker/fovPredictionWorker.ts'],
-        },
+        entry,
         output: {
           filename: '[name].js',
           path: `${dirName}/../${subFolder}/js`,

@@ -3,8 +3,17 @@
     "CloseObjectsPlugin": {
       "bottomIconLabel": "Bliskie obiekty",
       "title": "Wyszukiwanie bliskich obiektów",
-      "helpBody": "Wyszukiwanie bliskich obiektów znajduje satelity i odłamki w bliskiej odległości od siebie. Wykorzystuje dwufazowy algorytm przeszukiwania przestrzennego do identyfikacji obiektów w odległości 50 km od siebie, najpierw sprawdzając bieżące pozycje, a następnie weryfikując z prognozowanymi pozycjami 30 minut później.",
-      "findBtn": "Znajdź bliskie obiekty"
+      "findBtn": "Znajdź bliskie obiekty",
+      "help": {
+        "overview": "Wyszukiwanie bliskich obiektów przeszukuje cały katalog w poszukiwaniu par obiektów lecących w tej chwili w odległości mniejszej niż 50 km od siebie. To szybki sposób na wykrycie współorbitujących ładunków, niedawnych rozpadów i zatłoczonych rejonów bez uruchamiania pełnej analizy koniunkcji.",
+        "imgAlt": "Menu wyszukiwania bliskich obiektów z przyciskiem wyszukiwania",
+        "imgCaption": "Jedno kliknięcie przeszukuje cały katalog w poszukiwaniu obiektów w odległości do 50 km od siebie.",
+        "methodHeading": "Jak to działa",
+        "method": "Wyszukiwanie przebiega w dwóch fazach. Najpierw szybki przebieg z prostopadłościanami ograniczającymi porównuje bieżącą pozycję każdego obiektu, aby znaleźć pary kandydujące w promieniu wyszukiwania. Następnie każda para kandydująca jest ponownie propagowana 30 minut w przyszłość: pary, które nadal są blisko, zostają potwierdzone, co odfiltrowuje obiekty, które jedynie na chwilę przecięły swoje tory.",
+        "howToUse": "<ol><li>Otwórz <strong>Bliskie obiekty</strong> z dolnego menu.</li><li>Kliknij <strong>Znajdź bliskie obiekty</strong>. Przeszukanie całego katalogu zajmuje kilka sekund.</li><li>Potwierdzone pary są ładowane do paska wyszukiwania, dzięki czemu każdy bliski obiekt jest podświetlony i wymieniony w wynikach wyszukiwania.</li><li>Kliknij dowolny wynik, aby zbadać obiekt, lub użyj innych menu (np. Przeglądu odłamków), aby dogłębnie przeanalizować konkretną parę.</li></ol>",
+        "tip1": "Pary są potwierdzane tylko wtedy, gdy 30 minut później nadal pozostają w zasięgu, więc loty w formacji i pary w trakcie rendez-vous są widoczne, a krótkie przecięcia torów zostają odfiltrowane.",
+        "tip2": "Wyniki zastępują bieżące wyszukiwanie; skopiuj najpierw tekst wyszukiwania, jeśli chcesz zachować istniejącą listę."
+      }
     }
   }
 }

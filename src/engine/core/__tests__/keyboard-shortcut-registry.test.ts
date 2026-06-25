@@ -3,6 +3,52 @@ import { vi } from 'vitest';
 import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
 import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
 
+/**
+ * Real-world plugin shortcuts extracted from each plugin's getKeyboardShortcuts(),
+ * in approximate load order. Modifiers omitted mean undefined (don't care), which
+ * matches the real definitions. Add an entry when a plugin gains a shortcut so the
+ * audit below catches overlaps early. Kept at module scope so the audit describe
+ * block stays within the max-lines-per-function budget.
+ */
+const pluginShortcuts: { pluginId: string; shortcuts: Omit<IKeyboardShortcut, 'callback'>[] }[] = [
+  // src/app/ui/search-manager.ts
+  { pluginId: 'SearchManager', shortcuts: [{ key: 'F', ctrl: false, shift: false }] },
+  // src/plugins/select-sat-manager/select-sat-manager.ts
+  { pluginId: 'SelectSatManager', shortcuts: [{ key: '[' }, { key: ']' }, { key: '{' }, { key: '}' }] },
+  // src/plugins/watchlist/watchlist.ts
+  { pluginId: 'WatchlistPlugin', shortcuts: [{ key: 'W' }] },
+  // src/plugins/find-sat/find-sat.ts
+  { pluginId: 'FindSatPlugin', shortcuts: [{ key: 'F', ctrl: true }] },
+  // src/plugins/edit-sat/edit-sat.ts
+  { pluginId: 'EditSat', shortcuts: [{ key: 'E' }] },
+  // src/plugins/dops/dops.ts
+  { pluginId: 'DopsPlugin', shortcuts: [{ key: 'D' }] },
+  // src/plugins/colors-menu/colors-menu.ts
+  { pluginId: 'ColorsMenu', shortcuts: [{ key: 'A' }] },
+  // src/plugins/filter-menu/filter-menu.ts
+  { pluginId: 'FilterMenuPlugin', shortcuts: [{ key: 'f' }] },
+  // src/plugins/sound-toggle/sound-toggle.ts
+  { pluginId: 'SoundToggle', shortcuts: [{ key: 'M' }] },
+  // src/plugins/night-toggle/night-toggle.ts
+  { pluginId: 'NightToggle', shortcuts: [{ key: 'N' }] },
+  // src/plugins/stereo-map/stereo-map.ts
+  { pluginId: 'StereoMap', shortcuts: [{ key: 'm' }] },
+  // src/plugins/vcr/vcr.ts
+  { pluginId: 'VcrPlugin', shortcuts: [{ key: ' ' }] },
+  // src/plugins/plot-analysis/inc2alt.ts
+  { pluginId: 'Inc2AltPlots', shortcuts: [{ key: 'I' }] },
+  // src/plugins/plot-analysis/inc2lon.ts
+  { pluginId: 'Inc2LonPlots', shortcuts: [{ key: 'g' }] },
+  // src/plugins-pro/symbology/symbology-plugin.ts
+  { pluginId: 'SymbologyPlugin', shortcuts: [{ key: 'Y' }] },
+  // src/plugins/sensor-list/sensor-list.ts (uppercase 'S' = Shift+S; case-exact matcher)
+  { pluginId: 'SensorListPlugin', shortcuts: [{ key: 'S' }, { key: 'Home', ctrl: true }] },
+  // src/plugins-pro/scenario-management-pro/scenario-management-pro.ts (lowercase 's', distinct from 'S')
+  { pluginId: 'ScenarioManagementMenu', shortcuts: [{ key: 's' }] },
+  // src/plugins-pro/user-account/user-account.ts ('u' opens login/profile; lowercase, distinct from UrlManager's 'U')
+  { pluginId: 'UserAccountPlugin', shortcuts: [{ key: 'u' }] },
+];
+
 describe('KeyboardShortcutRegistry', () => {
   beforeEach(() => {
     KeyboardShortcutRegistry.clear();
@@ -241,41 +287,6 @@ describe('KeyboardShortcutRegistry', () => {
   describe('real-world shortcut audit', () => {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     const noop = () => { /* noop */ };
-
-    // Shortcuts extracted from each plugin's getKeyboardShortcuts(), in approximate load order.
-    // Modifiers omitted = undefined (don't care) — matches the real definitions.
-    const pluginShortcuts: { pluginId: string; shortcuts: Omit<IKeyboardShortcut, 'callback'>[] }[] = [
-      // src/app/ui/search-manager.ts
-      { pluginId: 'SearchManager', shortcuts: [{ key: 'F', ctrl: false, shift: false }] },
-      // src/plugins/select-sat-manager/select-sat-manager.ts
-      { pluginId: 'SelectSatManager', shortcuts: [{ key: '[' }, { key: ']' }, { key: '{' }, { key: '}' }] },
-      // src/plugins/watchlist/watchlist.ts
-      { pluginId: 'WatchlistPlugin', shortcuts: [{ key: 'W' }] },
-      // src/plugins/find-sat/find-sat.ts
-      { pluginId: 'FindSatPlugin', shortcuts: [{ key: 'F', ctrl: true }] },
-      // src/plugins/edit-sat/edit-sat.ts
-      { pluginId: 'EditSat', shortcuts: [{ key: 'E' }] },
-      // src/plugins/dops/dops.ts
-      { pluginId: 'DopsPlugin', shortcuts: [{ key: 'D' }] },
-      // src/plugins/colors-menu/colors-menu.ts
-      { pluginId: 'ColorsMenu', shortcuts: [{ key: 'A' }] },
-      // src/plugins/filter-menu/filter-menu.ts
-      { pluginId: 'FilterMenuPlugin', shortcuts: [{ key: 'f' }] },
-      // src/plugins/sound-toggle/sound-toggle.ts
-      { pluginId: 'SoundToggle', shortcuts: [{ key: 'M' }] },
-      // src/plugins/night-toggle/night-toggle.ts
-      { pluginId: 'NightToggle', shortcuts: [{ key: 'N' }] },
-      // src/plugins/stereo-map/stereo-map.ts
-      { pluginId: 'StereoMap', shortcuts: [{ key: 'm' }] },
-      // src/plugins/vcr/vcr.ts
-      { pluginId: 'VcrPlugin', shortcuts: [{ key: ' ' }] },
-      // src/plugins/plot-analysis/inc2alt.ts
-      { pluginId: 'Inc2AltPlots', shortcuts: [{ key: 'I' }] },
-      // src/plugins/plot-analysis/inc2lon.ts
-      { pluginId: 'Inc2LonPlots', shortcuts: [{ key: 'g' }] },
-      // src/plugins-pro/symbology/symbology-plugin.ts
-      { pluginId: 'SymbologyPlugin', shortcuts: [{ key: 'Y' }] },
-    ];
 
     it('should have no conflicts across all plugin shortcuts', () => {
       vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });

@@ -50,6 +50,7 @@ const MODE_LABEL_KEYS: Record<number, DrawerKey_> = {
   [MenuMode.EVENTS]: 'pluginDrawer.modeEvents' as DrawerKey_,
   [MenuMode.CREATE]: 'pluginDrawer.modeCreate' as DrawerKey_,
   [MenuMode.ANALYSIS]: 'pluginDrawer.modeAnalysis' as DrawerKey_,
+  [MenuMode.CONJUNCTIONS]: 'pluginDrawer.modeConjunctions' as DrawerKey_,
   [MenuMode.DISPLAY]: 'pluginDrawer.modeDisplay' as DrawerKey_,
   [MenuMode.TOOLS]: 'pluginDrawer.modeTools' as DrawerKey_,
   [MenuMode.SETTINGS]: 'pluginDrawer.modeSettings' as DrawerKey_,
@@ -439,50 +440,87 @@ export function syncInitialUtilityState(): void {
   });
 }
 
-// ---- Recent Plugins ----
+// ---- Recent Items (shared by the drawer and the Launchpad) ----
 
-/** Load the list of recently-used plugin IDs from persistence. */
-export function loadRecentPlugins(): string[] {
+/** Maximum number of recent activations persisted to storage. */
+const RECENTS_MAX_STORED_ = 20;
+
+/** One persisted recents entry: an item id plus the activation timestamp (epoch ms). */
+export interface RecentEntry {
+  id: string;
+  t: number;
+}
+
+/**
+ * Read the shared recents list (newest first), tolerating malformed data and
+ * migrating the legacy plain-string-array format to timestamped entries. This is
+ * the single source of truth for both the {@link PluginDrawer} "Recent" group and
+ * the Launchpad "Recent" row, so activations from either surface stay in sync.
+ */
+export function loadRecents(): RecentEntry[] {
   try {
     const stored = PersistenceManager.getInstance().getItem(StorageKey.DRAWER_RECENT_PLUGINS);
 
-    if (stored) {
-      return JSON.parse(stored) as string[];
+    if (!stored) {
+      return [];
     }
-  } catch {
-    // Ignore parse errors
-  }
 
-  return [];
+    const parsed: unknown = JSON.parse(stored);
+
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed
+      .map((entry): RecentEntry | null => {
+        // Legacy format: a bare string[] of plugin ids with no timestamps.
+        if (typeof entry === 'string') {
+          return { id: entry, t: 0 };
+        }
+        if (
+          typeof entry === 'object' && entry !== null &&
+          typeof (entry as RecentEntry).id === 'string' &&
+          typeof (entry as RecentEntry).t === 'number'
+        ) {
+          return { id: (entry as RecentEntry).id, t: (entry as RecentEntry).t };
+        }
+
+        return null;
+      })
+      .filter((entry): entry is RecentEntry => entry !== null);
+  } catch {
+    return [];
+  }
 }
 
-/** Persist the list of recently-used plugin IDs. */
-export function saveRecentPlugins(ids: string[]): void {
+/**
+ * Record an item activation: move it to the front of the shared recents list,
+ * stamp the time, cap the persisted list, and return the updated entries.
+ */
+export function recordRecent(id: string): RecentEntry[] {
+  const entries = loadRecents().filter((entry) => entry.id !== id);
+
+  entries.unshift({ id, t: Date.now() });
+  const capped = entries.slice(0, RECENTS_MAX_STORED_);
+
   try {
-    PersistenceManager.getInstance().saveItem(
-      StorageKey.DRAWER_RECENT_PLUGINS,
-      JSON.stringify(ids),
-    );
+    PersistenceManager.getInstance().saveItem(StorageKey.DRAWER_RECENT_PLUGINS, JSON.stringify(capped));
   } catch {
     // Ignore storage errors
   }
+
+  return capped;
 }
 
-/** Add a plugin to the front of the recent list, trimming to max size. */
-export function trackRecentPlugin(recentIds: string[], pluginId: string): string[] {
-  const updated = recentIds.filter((id) => id !== pluginId);
-
-  updated.unshift(pluginId);
-
-  if (updated.length > MAX_RECENT_PLUGINS_) {
-    updated.length = MAX_RECENT_PLUGINS_;
-  }
-
-  return updated;
-}
-
-/** Build a DrawerGroup from cached recent plugin IDs. */
-export function buildRecentGroupFromCache(recentIds: string[], allItems: Map<string, DrawerItemData>): DrawerGroup {
+/**
+ * Build a DrawerGroup from recent item IDs, resolving only ids present in the
+ * supplied cache and capping the resolved result to {@link maxItems}.
+ */
+export function buildRecentGroupFromCache(
+  recentIds: string[],
+  allItems: Map<string, DrawerItemData>,
+  maxItems = MAX_RECENT_PLUGINS_,
+): DrawerGroup {
   const recentItems: DrawerItemData[] = [];
 
   for (const pluginId of recentIds) {
@@ -490,6 +528,9 @@ export function buildRecentGroupFromCache(recentIds: string[], allItems: Map<str
 
     if (item) {
       recentItems.push({ ...item, order: recentItems.length });
+    }
+    if (recentItems.length >= maxItems) {
+      break;
     }
   }
 

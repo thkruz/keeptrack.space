@@ -45,7 +45,7 @@ export class CloseObjectsPlugin extends KeepTrackPlugin {
   readonly id = 'CloseObjectsPlugin';
   dependencies_ = [];
 
-  protected searchRadius_ = 50; // km — overridable by Pro
+  protected searchRadius_ = 50; // km - overridable by Pro
   protected closeObjectSearchStrCache_: string | null = null;
 
   // =========================================================================
@@ -54,10 +54,10 @@ export class CloseObjectsPlugin extends KeepTrackPlugin {
 
   getBottomIconConfig(): IBottomIconConfig {
     return {
-      elementName: 'close-objects-icon',
+      elementName: 'conjunction-nearby-icon',
       label: t7e('plugins.CloseObjectsPlugin.bottomIconLabel' as Parameters<typeof t7e>[0]),
       image: scatterPlotPng,
-      menuMode: [MenuMode.EVENTS, MenuMode.ALL],
+      menuMode: [MenuMode.CONJUNCTIONS, MenuMode.ALL],
     };
   }
 
@@ -79,8 +79,30 @@ export class CloseObjectsPlugin extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.CloseObjectsPlugin.title' as Parameters<typeof t7e>[0]),
-      body: t7e('plugins.CloseObjectsPlugin.helpBody' as Parameters<typeof t7e>[0]),
+      title: t7e('plugins.CloseObjectsPlugin.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.CloseObjectsPlugin.help.overview'),
+          image: {
+            src: 'img/help/close-objects/close-objects-menu.png',
+            alt: t7e('plugins.CloseObjectsPlugin.help.imgAlt'),
+            caption: t7e('plugins.CloseObjectsPlugin.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.CloseObjectsPlugin.help.methodHeading'),
+          content: t7e('plugins.CloseObjectsPlugin.help.method'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.CloseObjectsPlugin.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.CloseObjectsPlugin.help.tip1'),
+        t7e('plugins.CloseObjectsPlugin.help.tip2'),
+      ],
     };
   }
 
@@ -99,7 +121,7 @@ export class CloseObjectsPlugin extends KeepTrackPlugin {
       </div>
     `;
 
-    // Pro adds getSecondaryMenuConfig() — generateSideMenuHtml_() auto-wraps with title bar
+    // Pro adds getSecondaryMenuConfig() - generateSideMenuHtml_() auto-wraps with title bar
     if ('getSecondaryMenuConfig' in this) {
       return innerHtml;
     }

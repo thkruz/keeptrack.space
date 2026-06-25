@@ -3,7 +3,55 @@
     "SettingsMenuPlugin": {
       "bottomIconLabel": "Impostazioni",
       "title": "Menu impostazioni",
-      "helpBody": "Il menu Impostazioni consente di configurare l'applicazione."
+      "filterPlaceholder": "Filtra impostazioni...",
+      "buttons": {
+        "resetToDefaults": "Ripristina predefiniti"
+      },
+      "commands": {
+        "open": "Apri impostazioni",
+        "reset": "Ripristina le impostazioni predefinite"
+      },
+      "sections": {
+        "general": "Impostazioni generali",
+        "fastCpu": "Richiede CPU veloce"
+      },
+      "labels": {
+        "showInfoOnHover": "Mostra info al passaggio del mouse",
+        "drawOrbits": "Disegna orbite",
+        "drawTrailingOrbits": "Disegna orbite di scia",
+        "drawOrbitsInEcf": "Disegna orbite in ECF",
+        "numberOfEcfOrbits": "Numero di orbite ECF da disegnare",
+        "drawFovLines": "Disegna linee FOV",
+        "displayEciOnHover": "Mostra ECI al passaggio del mouse",
+        "showCameraWidget": "Mostra widget della camera",
+        "showConfidenceLevels": "Mostra livelli di confidenza",
+        "enableDemoMode": "Abilita modalità demo",
+        "enableFreezeTime": "Congela il tempo al clic",
+        "compensateEarthRotation": "Compensa la rotazione terrestre",
+        "showNextPassOnHover": "Mostra il prossimo passaggio al passaggio del mouse"
+      },
+      "tooltips": {
+        "showInfoOnHover": "Mostra più informazioni quando passi il mouse su un satellite.",
+        "drawOrbits": "Disattiva per nascondere le linee delle orbite",
+        "drawTrailingOrbits": "Attiva per mostrare dove si trovava un satellite invece di dove sta andando",
+        "drawOrbitsInEcf": "Le orbite saranno disegnate in ECF invece che in ECI (soprattutto per le orbite GEO)",
+        "drawFovLines": "Disegna linee dal sensore ai satelliti quando sono nel FOV",
+        "displayEciOnHover": "Mostra le coordinate ECI al passaggio del mouse",
+        "showCameraWidget": "Disattiva per nascondere il widget della camera",
+        "showConfidenceLevels": "Mostra i livelli di confidenza dei set di elementi del satellite.",
+        "enableDemoMode": "Ogni 3 secondi verrà selezionato un nuovo satellite dal FOV",
+        "enableFreezeTime": "Il tempo si congela mentre ruoti la camera.",
+        "compensateEarthRotation": "Compensa l'imbardata della camera in base alla rotazione terrestre, così la vista resta fissa sulle coordinate geografiche.",
+        "showNextPassOnHover": "Mostra l'orario del prossimo passaggio quando passi il mouse su un satellite nel campo visivo del sensore selezionato."
+      },
+      "help": {
+        "overview": "Il menu Impostazioni raccoglie le opzioni di visualizzazione e interazione dell'intera applicazione: disegno delle orbite, comportamento al passaggio del mouse, ausili della camera ed extra sensibili alle prestazioni. Anche altri plugin aggiungono qui le proprie sezioni, quindi questo è l'unico posto dove regolare il comportamento di KeepTrack.",
+        "imgAlt": "Il menu Impostazioni con i suoi interruttori delle opzioni generali",
+        "imgCaption": "Attiva qualsiasi opzione per applicarla all'istante; usa il filtro per trovare rapidamente le impostazioni.",
+        "howToUse": "<ol><li>Apri <strong>Impostazioni</strong> dalla barra inferiore.</li><li>Attiva qualsiasi interruttore per applicarlo all'istante; passa il mouse su una riga per vedere una descrizione che la spiega.</li><li>Usa la casella <strong>filtro</strong> in alto per trovare rapidamente un'impostazione per nome.</li><li><strong>Ripristina predefiniti</strong> riporta tutte le opzioni, comprese le sezioni aggiunte dai plugin, ai valori di fabbrica.</li></ol>",
+        "tip1": "Le opzioni sotto Richiede CPU veloce, come mostrare il prossimo passaggio al passaggio del mouse, eseguono calcoli extra a ogni fotogramma; lasciale disattivate sulle macchine più lente.",
+        "tip2": "Le sezioni dei plugin in fondo provengono da altri plugin (Lista di osservazione, Macchina del Tempo e altri), quindi il menu cresce man mano che i plugin vengono abilitati."
+      }
     }
   }
 }

@@ -28,7 +28,7 @@ test.describe('DopsPlugin', () => {
 
     await expect(drawerItem).toBeVisible();
 
-    // Click to open — should show side menu and select icon
+    // Click to open - should show side menu and select icon
     await drawerItem.click();
 
     const sideMenu = page.locator('#dops-menu');

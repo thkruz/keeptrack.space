@@ -1,0 +1,62 @@
+/*
+ * Look Angles menu styles. The menu (and its settings secondary menu) opt into
+ * the shared v13 card system (.kt-ui-v13 + kt-section/kt-field-row); see
+ * src/engine/ui/menu-v13.css. Only the results-table chrome and the dense-form
+ * fixes for the stacked settings fields need plugin-specific styling.
+ */
+
+/* ===== Results table (inside a v13 section card) ===== */
+.la-table {
+  width: 100%;
+  margin: 4px 0 0;
+  border-collapse: collapse;
+  line-height: 1.4;
+  font-size: 13px;
+}
+
+.la-table td {
+  text-align: center;
+  padding: 5px 4px;
+  border-bottom: 1px solid var(--color-dark-border);
+}
+
+/* Header row (v13 uppercase-muted look; replaces the old per-cell underline) */
+.la-table .la-table-header td {
+  padding: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-dark-text-muted);
+  border-bottom: 1px solid var(--color-dark-border);
+}
+
+/* Clickable result rows */
+.la-table tr.link {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.la-table tr.link:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+/* ===== Settings secondary menu (dense form: switch + stacked fields) ===== */
+.la-switch-row {
+  margin: 4px 0 0;
+}
+
+/* 1. Stacked-field headroom: this card stacks the rise/set switch plus two
+ *    labelled fields, so the floating "active" labels collide with the row
+ *    above without extra top margin. */
+#look-angles-menu-secondary .kt-field-row .input-field.col { margin-top: 20px; }
+#look-angles-menu-secondary .kt-section-label + .kt-field-row .input-field.col { margin-top: 8px; }
+
+/* 3. Focus indication: swap the app-wide :focus-visible outline (which overlaps
+ *    the floating label) for KeepTrack's underline. */
+#look-angles-menu-secondary .input-field input:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#look-angles-menu-secondary .input-field input:focus-visible { outline: none; }

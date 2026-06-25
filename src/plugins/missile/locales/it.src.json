@@ -1,9 +1,154 @@
 {
   "plugins": {
-    "MissilePlugin": {
-      "bottomIconLabel": "Missili",
-      "title": "Menu Missili",
-      "helpBody": "Il Menu Missili viene utilizzato per generare lanci missilistici teorici tra paesi. <br><br> Quando si utilizzano missili lanciati da sottomarini, il punto di lancio è una latitudine e longitudine personalizzata. Quando si utilizzano missili terrestri, il punto di lancio è una latitudine e longitudine fissa basata su fonti aperte. <br><br> Oltre ai missili personalizzati, sono disponibili alcuni scenari predefiniti che coinvolgono centinaia di missili. <br><br> Tutti i lanci missilistici sono teorici e non intendono rappresentare eventi reali. Le traiettorie di lancio sono tutte basate sullo stesso modello balistico, ma utilizzano gittate minime e massime diverse."
+    "MissileSimulatorPlugin": {
+      "bottomIconLabel": "Missile",
+      "title": "Crea attacco missilistico",
+      "labels": {
+        "typeOfAttack": "Tipo di attacco",
+        "launchLocation": "Luogo di lancio",
+        "targetLocation": "Posizione del bersaglio",
+        "customLaunchLatitude": "Latitudine di lancio personalizzata",
+        "customLaunchLongitude": "Longitudine di lancio personalizzata",
+        "customTargetLatitude": "Latitudine del bersaglio personalizzata",
+        "customTargetLongitude": "Longitudine del bersaglio personalizzata",
+        "warheads": "Testate (MIRV)"
+      },
+      "types": {
+        "customMissile": "Missile personalizzato",
+        "russiaToUsa": "Russia contro USA",
+        "russiaToUsaSubs": "Russia contro USA con sottomarini",
+        "chinaToUsa": "Cina contro USA",
+        "northKoreaToUsa": "Corea del Nord contro USA",
+        "usaToRussia": "USA contro Russia",
+        "usaToChina": "USA contro Cina",
+        "usaToNorthKorea": "USA contro Corea del Nord"
+      },
+      "groups": {
+        "russia": "Russia",
+        "china": "Cina",
+        "unitedStates": "Stati Uniti",
+        "unitedKingdom": "Regno Unito",
+        "france": "Francia",
+        "northKorea": "Corea del Nord",
+        "natoCountries": "Paesi NATO",
+        "nonNatoCountries": "Paesi non NATO"
+      },
+      "attackers": {
+        "aleysk": "Aleysk",
+        "dombarovskiy": "Dombarovskiy",
+        "uzhur": "Uzhur",
+        "kartaly": "Kartaly",
+        "irkutsk": "Irkutsk",
+        "kansk": "Kansk",
+        "krasnoyarsk": "Krasnoyarsk",
+        "nizhniyTagil": "Nizhniy Tagil",
+        "novosibirsk": "Novosibirsk",
+        "tatischevoSs19": "Tatishchevo (SS-19)",
+        "tatischevoSs27": "Tatishchevo (SS-27)",
+        "teykovo": "Teykovo",
+        "yoshkarOla": "Yoshkar-Ola",
+        "boreiSub": "Sottomarino Borei (Bulava)",
+        "deltaIvSubSineva": "Sottomarino Delta IV (Sineva)",
+        "deltaIvSubLayner": "Sottomarino Delta IV (Layner)",
+        "type092Sub": "Sottomarino Tipo 092 (JL-2)",
+        "nanyang": "Nanyang",
+        "xining": "Xining",
+        "delingha": "Delingha",
+        "haiyan": "Haiyan",
+        "datong": "Datong",
+        "tainshui": "Tianshui",
+        "xixia": "Xixia",
+        "shaoyang": "Shaoyang",
+        "yuxi": "Yuxi",
+        "luoyang": "Luoyang",
+        "wuzhai": "Wuzhai",
+        "xuanhua": "Xuanhua",
+        "tongdao": "Tongdao",
+        "lushi": "Lushi",
+        "jingxianA": "Jingxian A",
+        "jingxianB": "Jingxian B",
+        "hunan": "Hunan",
+        "daqingCity": "Città di Daqing",
+        "xinyangCity": "Città di Xinyang",
+        "xinjiangProvince": "Provincia dello Xinjiang",
+        "tibetProvince": "Provincia del Tibet",
+        "minot": "Minot",
+        "malmstrom": "Malmstrom",
+        "feWarren": "F.E. Warren",
+        "ohioSub": "Sottomarino Ohio (Trident II)",
+        "vanguardSub": "Sottomarino Vanguard (Trident II)",
+        "hmnbClyde": "HMNB Clyde (Trident II)",
+        "triomphantSub": "Sottomarino Triomphant (M51)",
+        "bayOfBiscay": "Golfo di Biscaglia",
+        "sinpoSub": "Sottomarino di Sinpo (Pukkŭksŏng-1)",
+        "sinpo": "Sinpo",
+        "pyongan": "P'yong'an",
+        "pyongyang": "Pyongyang"
+      },
+      "targets": {
+        "washingtonDc": "Washington DC",
+        "newYorkCity": "New York",
+        "losAngeles": "Los Angeles",
+        "chicago": "Chicago",
+        "boston": "Boston",
+        "seattle": "Seattle",
+        "miami": "Miami",
+        "dallas": "Dallas",
+        "coloradoSprings": "Colorado Springs",
+        "omaha": "Omaha",
+        "hawaii": "Hawaii",
+        "guam": "Guam",
+        "customImpact": "Impatto personalizzato",
+        "london": "Londra",
+        "paris": "Parigi",
+        "frenchCaribbean": "Caraibi francesi",
+        "madrid": "Madrid",
+        "rome": "Roma",
+        "berlin": "Berlino",
+        "toronto": "Toronto",
+        "moscow": "Mosca",
+        "stPetersburg": "San Pietroburgo",
+        "novosibirsk": "Novosibirsk",
+        "beijing": "Pechino",
+        "pyongyang": "Pyongyang"
+      },
+      "buttons": {
+        "launchMissileAttack": "Lancia attacco missilistico",
+        "showAllMissiles": "Mostra tutti i missili",
+        "clearMissiles": "Cancella missili"
+      },
+      "msgs": {
+        "simLoaded": "{sim} caricato",
+        "missilesActive": "{n} / {max} missili attivi"
+      },
+      "errorMsgs": {
+        "invalidTargetLatitude": "Latitudine del bersaglio non valida!",
+        "invalidTargetLongitude": "Longitudine del bersaglio non valida!",
+        "invalidLaunchLatitude": "Latitudine di lancio non valida!",
+        "invalidLaunchLongitude": "Longitudine di lancio non valida!",
+        "invalidWarheads": "Le testate devono essere un numero intero da 1 a 12."
+      },
+      "commands": {
+        "open": "Apri il plugin dei missili",
+        "showAllMissiles": "Mostra tutti i missili",
+        "clearMissiles": "Cancella tutti i missili"
+      },
+      "help": {
+        "overview": "Il menu Missile simula lanci fittizi di missili balistici: da un singolo tiro personalizzato tra due punti della Terra fino a scenari preimpostati di attacco massiccio tra potenze nucleari. Le traiettorie usano un modello balistico realistico, ma ogni lancio è fittizio. Usalo per esercitare la copertura dei sensori, le tempistiche di allarme missilistico e gli scenari ipotetici.",
+        "imgAlt": "Il menu Crea attacco missilistico con le opzioni di tipo di attacco, lancio e bersaglio",
+        "imgCaption": "Scegli un tipo di attacco, poi un luogo di lancio e un bersaglio per i missili personalizzati.",
+        "typesHeading": "Tipi di attacco",
+        "types": "<strong>Missile personalizzato</strong> lancia un singolo missile configurato da te. Le altre opzioni, come <strong>Russia contro USA</strong> o <strong>USA contro Cina</strong>, caricano uno scenario preimpostato di attacco massiccio che lancia molti missili contemporaneamente. I siti di lancio terrestri usano coordinate fisse dei silo tratte da fonti aperte; le voci dei sottomarini permettono di digitare latitudine e longitudine di lancio. I bersagli sono città predefinite, oppure scegli <strong>Impatto personalizzato</strong> per inserire coordinate esatte.",
+        "howToUse": "<ol><li>Apri il menu <strong>Missile</strong> dalla barra inferiore (si trova nella modalità menu Crea).</li><li>Scegli un <strong>Tipo di attacco</strong>. Selezionare un attacco massiccio predefinito lo lancia immediatamente all'invio; selezionare <strong>Missile personalizzato</strong> mostra i controlli di lancio e bersaglio.</li><li>Per un missile personalizzato, scegli il <strong>Luogo di lancio</strong> e la <strong>Posizione del bersaglio</strong>. Le voci dei sottomarini sbloccano i campi di latitudine e longitudine di lancio personalizzate, e <strong>Impatto personalizzato</strong> sblocca i campi delle coordinate del bersaglio.</li><li>Fai clic su <strong>Lancia attacco missilistico</strong>. Il missile viene creato e la barra di ricerca si riempie con RV_ in modo da evidenziare tutti i missili attivi.</li><li>Usa <strong>Mostra tutti i missili</strong> in qualsiasi momento per ripetere quella ricerca.</li></ol>",
+        "tip1": "I lanci usano l'ora di simulazione corrente, quindi imposta prima l'orologio se lo scenario deve iniziare in un momento specifico.",
+        "tip2": "Il nome di ogni missile inizia con RV_, quindi cercare RV_ nella barra di ricerca trova tutti i missili attivi.",
+        "tip3": "Se un lancio viene rifiutato, una notifica ne spiega il motivo; alcune combinazioni di sito e bersaglio sono oltre la portata modellata del missile."
+      },
+      "sections": {
+        "attackType": "Tipo di attacco",
+        "launch": "Lancio",
+        "target": "Bersaglio"
+      }
     }
   }
 }

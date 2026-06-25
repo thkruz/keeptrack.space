@@ -3,15 +3,62 @@
     "PlanetsMenuPlugin": {
       "bottomIconLabel": "惑星",
       "title": "惑星リストメニュー",
-      "helpBody": "このメニューでは、シミュレーション内のさまざまな惑星を選択して表示できます。",
       "sections": {
         "planets": "惑星",
         "dwarfPlanets": "矮小惑星",
         "otherCelestialBodies": "その他の天体"
       },
+      "bodies": {
+        "Mercury": "水星",
+        "Venus": "金星",
+        "Earth": "地球",
+        "Mars": "火星",
+        "Jupiter": "木星",
+        "Saturn": "土星",
+        "Uranus": "天王星",
+        "Neptune": "海王星",
+        "Pluto": "冥王星",
+        "Makemake": "マケマケ",
+        "Eris": "エリス",
+        "Haumea": "ハウメア",
+        "Ceres": "ケレス",
+        "Sedna": "セドナ",
+        "Quaoar": "クワオアー",
+        "Orcus": "オルクス",
+        "Gonggong": "ゴンゴン",
+        "Charon": "カロン",
+        "Moon": "月",
+        "Sun": "太陽",
+        "Io": "イオ",
+        "Europa": "エウロパ",
+        "Ganymede": "ガニメデ",
+        "Callisto": "カリスト",
+        "Titan": "タイタン",
+        "Rhea": "レア",
+        "Iapetus": "イアペトゥス",
+        "Dione": "ディオネ",
+        "Tethys": "テティス",
+        "Enceladus": "エンケラドゥス"
+      },
       "tooltips": {
         "centerCamera": "{body} にカメラを合わせる。",
         "plannedFuture": "将来のアップデートで予定。"
+      },
+      "filterPlaceholder": "天体を絞り込む…",
+      "commands": {
+        "toggleMenu": "惑星メニューの切り替え",
+        "centerOn": "{body} にカメラを合わせる"
+      },
+      "help": {
+        "overview": "惑星メニューはKeepTrackを太陽系ビューアに変えます。任意の惑星、矮小惑星、月、太陽を選択すると、カメラがその天体を中心に表示します。地球周回カタログと並行して、シスルナや深宇宙のジオメトリを調べる最も手軽な方法です。",
+        "imgAlt": "惑星、矮小惑星、その他の天体を表示する惑星リストメニュー",
+        "imgCaption": "任意の天体をクリックすると、カメラがその天体を中心に表示します。",
+        "howToUse": "<ol><li>下部バーから<strong>惑星</strong>メニューを開くか、<strong>P</strong>キーを押します。</li><li>天体（例えば<strong>火星</strong>や<strong>月</strong>）をクリックします。カメラがその天体を中心に再配置され、ズーム制限が新しいスケールに合わせて調整されます。</li><li><strong>Home</strong>キーで地球に戻るか、<strong>Shift</strong>+<strong>Home</strong>で地球を画面中央に戻します。</li></ol>",
+        "tip1": "いくつかの衛星（イオ、エウロパ、タイタンなど）は一覧に表示されますがグレーアウトされています。これらは将来のアップデートで予定されています。",
+        "tip2": "何もない空間を右クリックして、コンテキストメニューから天体を選ぶこともできます。",
+        "shortcutToggle": "惑星メニューを切り替える",
+        "shortcutHome": "地球を中心天体に設定する",
+        "shortcutCenterEarth": "カメラを地球に合わせる"
       }
     }
   }

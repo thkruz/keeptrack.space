@@ -8,7 +8,7 @@ test.describe('DebrisScreening Plugin', () => {
       settings: { isMobileModeEnabled: true },
     });
 
-    const bottomIcon = page.locator('#debris-screening-bottom-icon');
+    const bottomIcon = page.locator('#conjunction-screen-icon');
     const sideMenu = page.locator('#debris-screening-menu');
 
     // Bottom icon should exist but be disabled (no satellite selected)
@@ -29,7 +29,7 @@ test.describe('DebrisScreening Plugin', () => {
       await eventsGroup.locator('.drawer-group-header').click();
     }
 
-    const drawerItem = page.locator('.drawer-item[data-plugin-id="debris-screening-bottom-icon"]');
+    const drawerItem = page.locator('.drawer-item[data-plugin-id="conjunction-screen-icon"]');
 
     await expect(drawerItem).toBeVisible();
 

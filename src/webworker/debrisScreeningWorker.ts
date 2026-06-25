@@ -8,14 +8,12 @@
  */
 
 import {
+  cappedScreeningCovarianceFromTle,
   ConjunctionAssessment,
-  CovarianceFrame,
   EpochUTC,
-  Matrix,
   ScreeningFilter,
   StateCovariance,
   Tle,
-  createSampleCovarianceFromTle,
   type Kilometers,
   type Seconds,
 } from '@ootk/src/main';
@@ -33,45 +31,6 @@ import {
 let cancelledRunId = -1;
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
-
-/**
- * Compute a capped covariance matrix from TLE data.
- * Replicates the logic from DebrisScreening.calculateCovarianceFromSatellite.
- */
-function calculateCovariance_(tle1: string, tle2: string, confidenceLevel: number): StateCovariance {
-  let covMatrix: number[][];
-
-  try {
-    covMatrix = createSampleCovarianceFromTle(tle1, tle2).matrix.elements;
-  } catch {
-    // Fallback to safe defaults if covariance computation fails
-    return buildFallbackCovariance_();
-  }
-
-  // Cap radii at safe limits, scaled by confidence level
-  covMatrix[0][0] = Math.min(Math.sqrt(covMatrix[0][0]) * confidenceLevel, 1200); // Radial
-  covMatrix[1][1] = Math.min(Math.sqrt(covMatrix[2][2]) * confidenceLevel, 1000); // Cross-track
-  covMatrix[2][2] = Math.min(Math.sqrt(covMatrix[1][1]) * confidenceLevel, 5000); // In-track
-
-  if (!covMatrix[0][0] || !covMatrix[1][1] || !covMatrix[2][2]) {
-    return buildFallbackCovariance_();
-  }
-
-  return new StateCovariance(new Matrix(covMatrix), CovarianceFrame.ECI);
-}
-
-/**
- * Builds a fallback covariance matrix with safe default values when TLE-based computation fails.
- */
-function buildFallbackCovariance_(): StateCovariance {
-  const fallback = Array.from({ length: 6 }, () => new Array(6).fill(0) as number[]);
-
-  fallback[0][0] = 1200;
-  fallback[1][1] = 1000;
-  fallback[2][2] = 5000;
-
-  return new StateCovariance(new Matrix(fallback), CovarianceFrame.ECI);
-}
 
 /**
  * Assess a single candidate pair and return a serializable result row,
@@ -97,7 +56,7 @@ function assessCandidate_(
   // it's decayed/invalid and we skip it before doing expensive covariance + assessment work
   secondaryTle.propagate(startTime);
 
-  const secondaryCovariance = calculateCovariance_(secondary.tle1, secondary.tle2, confidenceLevel);
+  const secondaryCovariance = cappedScreeningCovarianceFromTle(secondary.tle1, secondary.tle2, confidenceLevel);
 
   const assessment = new ConjunctionAssessment(
     {
@@ -136,13 +95,7 @@ function assessCandidate_(
     return null;
   }
 
-  // Compute risk score using the same formula as ScreeningFilter.computeRiskScore
-  const distanceRisk = Math.exp(-event.missDistance);
-  let riskScore = distanceRisk;
-
-  if (typeof event.probabilityOfCollision !== 'undefined' && event.probabilityOfCollision > 0) {
-    riskScore = Math.max(distanceRisk, event.probabilityOfCollision * 1000);
-  }
+  const riskScore = ScreeningFilter.computeRiskScore(event);
 
   return {
     secondaryId: secondary.name,
@@ -170,7 +123,7 @@ function handleStartScreening_(msg: DsMsgStartScreening): void {
   try {
     // Reconstruct primary objects
     const primaryTle = new Tle(primary.tle1, primary.tle2);
-    const primaryCovariance = calculateCovariance_(primary.tle1, primary.tle2, covarianceConfidenceLevel);
+    const primaryCovariance = cappedScreeningCovarianceFromTle(primary.tle1, primary.tle2, covarianceConfidenceLevel);
 
     // Reconstruct secondary TLEs for coarse filter
     const secondaryTles: Tle[] = [];

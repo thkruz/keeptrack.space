@@ -27,7 +27,7 @@ describe('ScenarioManagementMenu', () => {
   beforeEach(() => {
     setupStandardEnvironment([ScenarioManagementPlugin]);
     plugin = new ScenarioManagementMenu();
-    // Inject the side-menu form directly and drive the handlers — the plugin's own
+    // Inject the side-menu form directly and drive the handlers - the plugin's own
     // addHtml() reads these inputs via getEl (which throws in node when missing).
     document.body.insertAdjacentHTML('beforeend',
       `<form id="${PREFIX}-form">` +

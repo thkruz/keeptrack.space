@@ -1,9 +1,154 @@
 {
   "plugins": {
-    "MissilePlugin": {
+    "MissileSimulatorPlugin": {
       "bottomIconLabel": "Pocisk",
-      "title": "Menu pocisków",
-      "helpBody": "Menu pocisków służy do generowania hipotetycznych startów pocisków między krajami. <br><br> W przypadku pocisków wystrzeliwanych z okrętów podwodnych punkt startu jest określony przez niestandardową szerokość i długość geograficzną. W przypadku pocisków lądowych punkt startu jest stałą szerokością i długością geograficzną opartą na raportach z otwartych źródeł. <br><br> Oprócz niestandardowych pocisków dostępnych jest kilka predefiniowanych scenariuszy obejmujących setki pocisków. <br><br> Wszystkie starty pocisków są hipotetyczne i nie mają na celu przedstawiania rzeczywistych wydarzeń. Trajektorie startów opierają się na tym samym modelu balistycznym, ale wykorzystują różne minimalne i maksymalne zasięgi."
+      "title": "Utwórz atak rakietowy",
+      "labels": {
+        "typeOfAttack": "Rodzaj ataku",
+        "launchLocation": "Miejsce startu",
+        "targetLocation": "Lokalizacja celu",
+        "customLaunchLatitude": "Niestandardowa szerokość geograficzna startu",
+        "customLaunchLongitude": "Niestandardowa długość geograficzna startu",
+        "customTargetLatitude": "Niestandardowa szerokość geograficzna celu",
+        "customTargetLongitude": "Niestandardowa długość geograficzna celu",
+        "warheads": "Głowice (MIRV)"
+      },
+      "types": {
+        "customMissile": "Pocisk niestandardowy",
+        "russiaToUsa": "Rosja na USA",
+        "russiaToUsaSubs": "Rosja na USA z okrętami podwodnymi",
+        "chinaToUsa": "Chiny na USA",
+        "northKoreaToUsa": "Korea Północna na USA",
+        "usaToRussia": "USA na Rosję",
+        "usaToChina": "USA na Chiny",
+        "usaToNorthKorea": "USA na Koreę Północną"
+      },
+      "groups": {
+        "russia": "Rosja",
+        "china": "Chiny",
+        "unitedStates": "Stany Zjednoczone",
+        "unitedKingdom": "Wielka Brytania",
+        "france": "Francja",
+        "northKorea": "Korea Północna",
+        "natoCountries": "Kraje NATO",
+        "nonNatoCountries": "Kraje spoza NATO"
+      },
+      "attackers": {
+        "aleysk": "Alejsk",
+        "dombarovskiy": "Dombarowski",
+        "uzhur": "Użur",
+        "kartaly": "Kartały",
+        "irkutsk": "Irkuck",
+        "kansk": "Kańsk",
+        "krasnoyarsk": "Krasnojarsk",
+        "nizhniyTagil": "Niżny Tagił",
+        "novosibirsk": "Nowosybirsk",
+        "tatischevoSs19": "Tatiszczewo (SS-19)",
+        "tatischevoSs27": "Tatiszczewo (SS-27)",
+        "teykovo": "Tiejkowo",
+        "yoshkarOla": "Joszkar-Oła",
+        "boreiSub": "Okręt podwodny typu Boriej (Buława)",
+        "deltaIvSubSineva": "Okręt podwodny typu Delta IV (Siniewa)",
+        "deltaIvSubLayner": "Okręt podwodny typu Delta IV (Lajner)",
+        "type092Sub": "Okręt podwodny typu 092 (JL-2)",
+        "nanyang": "Nanyang",
+        "xining": "Xining",
+        "delingha": "Delingha",
+        "haiyan": "Haiyan",
+        "datong": "Datong",
+        "tainshui": "Tianshui",
+        "xixia": "Xixia",
+        "shaoyang": "Shaoyang",
+        "yuxi": "Yuxi",
+        "luoyang": "Luoyang",
+        "wuzhai": "Wuzhai",
+        "xuanhua": "Xuanhua",
+        "tongdao": "Tongdao",
+        "lushi": "Lushi",
+        "jingxianA": "Jingxian A",
+        "jingxianB": "Jingxian B",
+        "hunan": "Hunan",
+        "daqingCity": "Miasto Daqing",
+        "xinyangCity": "Miasto Xinyang",
+        "xinjiangProvince": "Prowincja Sinciang",
+        "tibetProvince": "Prowincja Tybet",
+        "minot": "Minot",
+        "malmstrom": "Malmstrom",
+        "feWarren": "F.E. Warren",
+        "ohioSub": "Okręt podwodny typu Ohio (Trident II)",
+        "vanguardSub": "Okręt podwodny typu Vanguard (Trident II)",
+        "hmnbClyde": "HMNB Clyde (Trident II)",
+        "triomphantSub": "Okręt podwodny typu Triomphant (M51)",
+        "bayOfBiscay": "Zatoka Biskajska",
+        "sinpoSub": "Okręt podwodny z Sinpo (Pukkŭksŏng-1)",
+        "sinpo": "Sinpo",
+        "pyongan": "P'yong'an",
+        "pyongyang": "Pjongjang"
+      },
+      "targets": {
+        "washingtonDc": "Waszyngton",
+        "newYorkCity": "Nowy Jork",
+        "losAngeles": "Los Angeles",
+        "chicago": "Chicago",
+        "boston": "Boston",
+        "seattle": "Seattle",
+        "miami": "Miami",
+        "dallas": "Dallas",
+        "coloradoSprings": "Colorado Springs",
+        "omaha": "Omaha",
+        "hawaii": "Hawaje",
+        "guam": "Guam",
+        "customImpact": "Niestandardowe miejsce uderzenia",
+        "london": "Londyn",
+        "paris": "Paryż",
+        "frenchCaribbean": "Antyle Francuskie",
+        "madrid": "Madryt",
+        "rome": "Rzym",
+        "berlin": "Berlin",
+        "toronto": "Toronto",
+        "moscow": "Moskwa",
+        "stPetersburg": "Petersburg",
+        "novosibirsk": "Nowosybirsk",
+        "beijing": "Pekin",
+        "pyongyang": "Pjongjang"
+      },
+      "buttons": {
+        "launchMissileAttack": "Rozpocznij atak rakietowy",
+        "showAllMissiles": "Pokaż wszystkie pociski",
+        "clearMissiles": "Wyczyść pociski"
+      },
+      "msgs": {
+        "simLoaded": "Załadowano {sim}",
+        "missilesActive": "{n} / {max} aktywnych pocisków"
+      },
+      "errorMsgs": {
+        "invalidTargetLatitude": "Nieprawidłowa szerokość geograficzna celu!",
+        "invalidTargetLongitude": "Nieprawidłowa długość geograficzna celu!",
+        "invalidLaunchLatitude": "Nieprawidłowa szerokość geograficzna startu!",
+        "invalidLaunchLongitude": "Nieprawidłowa długość geograficzna startu!",
+        "invalidWarheads": "Liczba głowic musi być liczbą całkowitą od 1 do 12."
+      },
+      "commands": {
+        "open": "Otwórz wtyczkę pocisków",
+        "showAllMissiles": "Pokaż wszystkie pociski",
+        "clearMissiles": "Wyczyść wszystkie pociski"
+      },
+      "help": {
+        "overview": "Menu pocisków symuluje hipotetyczne starty pocisków balistycznych: od pojedynczego, niestandardowego strzału między dwoma punktami na Ziemi po przygotowane scenariusze zmasowanych ataków między mocarstwami nuklearnymi. Trajektorie wykorzystują realistyczny model balistyczny, ale każdy start jest fikcyjny. Używaj go do ćwiczenia pokrycia czujników, harmonogramów ostrzegania przed pociskami i scenariuszy hipotetycznych.",
+        "imgAlt": "Menu Utwórz atak rakietowy z opcjami rodzaju ataku, startu i celu",
+        "imgCaption": "Wybierz rodzaj ataku, a następnie miejsce startu i cel dla pocisków niestandardowych.",
+        "typesHeading": "Rodzaje ataków",
+        "types": "<strong>Pocisk niestandardowy</strong> wystrzeliwuje pojedynczy pocisk, który konfigurujesz. Pozostałe opcje, takie jak <strong>Rosja na USA</strong> lub <strong>USA na Chiny</strong>, wczytują przygotowany scenariusz zmasowanego ataku, który wystrzeliwuje wiele pocisków naraz. Lądowe miejsca startu używają stałych współrzędnych silosów z jawnych źródeł; pozycje okrętów podwodnych pozwalają wpisać szerokość i długość geograficzną startu. Cele to predefiniowane miasta, można też wybrać <strong>Niestandardowe miejsce uderzenia</strong>, aby podać dokładne współrzędne.",
+        "howToUse": "<ol><li>Otwórz menu <strong>Pocisk</strong> z dolnego paska (znajduje się w trybie menu Utwórz).</li><li>Wybierz <strong>Rodzaj ataku</strong>. Wybranie predefiniowanego zmasowanego ataku uruchamia go natychmiast po zatwierdzeniu; wybranie opcji <strong>Pocisk niestandardowy</strong> odsłania kontrolki startu i celu.</li><li>Dla pocisku niestandardowego wybierz <strong>Miejsce startu</strong> i <strong>Lokalizacja celu</strong>. Pozycje okrętów podwodnych odblokowują pola niestandardowej szerokości i długości geograficznej startu, a <strong>Niestandardowe miejsce uderzenia</strong> odblokowuje pola współrzędnych celu.</li><li>Kliknij <strong>Rozpocznij atak rakietowy</strong>. Pocisk zostaje utworzony, a pasek wyszukiwania wypełnia się tekstem RV_, dzięki czemu wszystkie aktywne pociski są wyróżnione.</li><li>W dowolnym momencie użyj <strong>Pokaż wszystkie pociski</strong>, aby powtórzyć to wyszukiwanie.</li></ol>",
+        "tip1": "Starty używają bieżącego czasu symulacji, więc najpierw ustaw zegar, jeśli scenariusz ma się rozpocząć w konkretnym momencie.",
+        "tip2": "Nazwa każdego pocisku zaczyna się od RV_, więc wyszukanie RV_ w pasku wyszukiwania znajduje wszystkie aktywne pociski.",
+        "tip3": "Jeśli start zostanie odrzucony, powiadomienie wyjaśni dlaczego; niektóre kombinacje miejsca startu i celu wykraczają poza modelowany zasięg pocisku."
+      },
+      "sections": {
+        "attackType": "Typ ataku",
+        "launch": "Start",
+        "target": "Cel"
+      }
     }
   }
 }

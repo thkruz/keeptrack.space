@@ -3,7 +3,42 @@
     "PolarPlotPlugin": {
       "bottomIconLabel": "Trace polaire",
       "title": "Menu Trace polaire",
-      "helpBody": "Le menu Trace polaire permet de générer un graphique polaire 2D de l’azimut et de l’élévation du satellite au fil du temps."
+      "labels": {
+        "notInView": "Le satellite ne sera pas visible pendant les {hours} prochaines heures",
+        "saveImage": "Enregistrer l'image",
+        "satellite": "Satellite {sccNum}",
+        "unknownSensor": "Capteur inconnu",
+        "unknownStartTime": "Heure de début inconnue",
+        "unknownStopTime": "Heure de fin inconnue",
+        "prevPass": "Passage précédent",
+        "nextPass": "Passage suivant",
+        "imageSize": "Taille de l'image",
+        "size_square": "Carré (1080)",
+        "size_wide": "Large (1200x675)",
+        "size_large": "Grand (2000)",
+        "copyImage": "Copier l'image",
+        "copied": "Tracé polaire copié dans le presse-papiers",
+        "passLabel": "Passage {n} sur {total}",
+        "maxEl": "Élév. max {deg}°"
+      },
+      "sections": {
+        "pass": "Passage",
+        "export": "Exporter"
+      },
+      "errorMsgs": {
+        "copyFailed": "Impossible de copier l'image dans le presse-papiers"
+      },
+      "help": {
+        "overview": "La Trace polaire dessine le prochain passage du satellite sélectionné au-dessus du capteur sélectionné sous la forme d'une carte du ciel classique en azimut et élévation : le nord en haut, l'horizon sur l'anneau extérieur et le zénith au centre. C'est la carte qu'un observateur ou un opérateur utilise pour savoir où regarder dans le ciel.",
+        "imgAlt": "Une carte du ciel polaire montrant la trace du passage d'un satellite",
+        "imgCaption": "Le passage commence au point vert et se termine au point rouge ; les anneaux indiquent l'élévation.",
+        "readingHeading": "Lire le graphique",
+        "reading": "La trace commence par un point vert (lever) et se termine par un point rouge (coucher). Des anneaux concentriques marquent l'élévation tous les 15 degrés, de l'horizon (bord extérieur) au zénith (centre), et les directions de la boussole courent le long du bord. L'en-tête affiche le capteur, le numéro du satellite et les heures de début et de fin du passage en UTC.",
+        "howToUse": "<ol><li>Sélectionnez un capteur et un satellite ; l'icône du bas reste désactivée tant que les deux ne sont pas sélectionnés.</li><li>Ouvrez la <strong>Trace polaire</strong> depuis la barre inférieure. Le prochain passage dans les trois jours est calculé et dessiné automatiquement.</li><li>Cliquez sur <strong>Enregistrer l'image</strong> pour télécharger le graphique au format PNG.</li></ol>",
+        "tip1": "Si le satellite ne s'élève jamais au-dessus de l'horizon dans les trois prochains jours, le graphique est remplacé par un avis au lieu d'une carte vide.",
+        "tip2": "Une trace passant près du centre correspond à un passage à haute élévation : la meilleure géométrie pour l'observation ou la communication.",
+        "shortcutToggle": "Basculer le menu Trace polaire"
+      }
     }
   }
 }

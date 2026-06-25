@@ -3,8 +3,27 @@
     "FindSatPlugin": {
       "bottomIconLabel": "Satellit suchen",
       "title": "Satellit suchen",
-      "helpBody": "Das Menü \"Satellit suchen\" ermöglicht die Suche nach Satelliten anhand verschiedener Kriterien:<br><br><ul style=\"margin-left: 40px;\"><li><strong>Objekttyp</strong> - Filtern nach Nutzlast, Raketenkörper oder Trümmer</li><li><strong>Land</strong> - Filtern nach Startland</li><li><strong>Satellitenbus/Nutzlast/Form/Quelle</strong> - Filtern nach Satelliteneigenschaften</li><li><strong>Azimut/Elevation/Reichweite</strong> - Suche nach Blickwinkeln (erfordert Sensor)</li><li><strong>Bahnparameter</strong> - Inklination, Periode, RAAN, Argument des Perigäums</li><li><strong>TLE-Alter</strong> - Filtern nach Aktualität der TLE</li><li><strong>RCS</strong> - Filtern nach Radarquerschnitt</li></ul><br>Ergebnisse werden in der Suchleiste angezeigt. Verwenden Sie die Export-Schaltfläche, um Ergebnisse als CSV zu speichern.",
+      "help": {
+        "overview": "Satellit suchen durchsucht den gesamten Katalog nach Objekten, die einer Kombination aus physikalischen, orbitalen und Beobachtungskriterien entsprechen. Es ist der schnellste Weg, Fragen zu beantworten wie \"welche Raketenkörper aus China befinden sich in einer etwa 100-minütigen Umlaufbahn?\" oder \"welche Nutzlasten sind gerade in Reichweite meines Sensors?\"",
+        "imgAlt": "Das Menü Satellit suchen mit Filtern für Objekttyp, Land, Bahnparameter und Sensor",
+        "imgCaption": "Das Menü Satellit suchen. Jedes ausgefüllte Feld grenzt die Suche weiter ein.",
+        "filtersHeading": "Verfügbare Filter",
+        "filters": "<ul><li><strong>Objekttyp</strong>: Nutzlasten, Raketenkörper, Trümmer. Wählen Sie mehrere Typen gleichzeitig; die Auswahl eines bestimmten Typs hebt \"Alle\" auf.</li><li><strong>Land</strong>: ein oder mehrere Startländer.</li><li><strong>Satellitenbus / Nutzlast / Form / Quelle</strong>: physikalische und datenquellenbezogene Eigenschaften.</li><li><strong>Azimut / Elevation / Reichweite</strong>: aktuelle Blickwinkel vom ausgewählten Sensor. Dafür muss zuerst ein Sensor ausgewählt sein.</li><li><strong>Bahnparameter</strong>: Inklination, Periode, Rektaszension und Argument des Perigäums.</li><li><strong>TLE-Alter</strong>: wie aktuell die Bahndaten sind, in Stunden.</li><li><strong>RCS</strong>: Radarquerschnitt in m².</li></ul>Jeder numerische Filter hat ein Feld <strong>Toleranz</strong>, das den akzeptierten Bereich um Ihren Wert definiert. Lassen Sie es leer, um einen sinnvollen Standardwert zu verwenden (zum Beispiel ±5° für Winkel).",
+        "howToUse": "<ol><li>Öffnen Sie das Menü über die untere Leiste oder drücken Sie Ctrl+F.</li><li>Wählen Sie einen oder mehrere Objekttypen und Länder aus den Dropdown-Menüs.</li><li>Geben Sie numerische Kriterien ein und verengen oder erweitern Sie optional deren Toleranzen.</li><li>Klicken Sie auf <strong>Satellit(en) suchen</strong>. Passende Objekte werden in die Suchleiste oben geladen und auf dem Globus hervorgehoben.</li><li>Klicken Sie auf <strong>Daten exportieren</strong>, um die aktuellen Ergebnisse als CSV-Datei zu speichern.</li></ol>",
+        "tip1": "Filter werden mit UND-Logik kombiniert: Jedes Kriterium muss zutreffen. Wenn Sie keine Ergebnisse erhalten, entfernen Sie zuerst den restriktivsten Filter.",
+        "tip2": "Azimut, Elevation und Reichweite werden vom aktuell ausgewählten Sensor aus gemessen, wählen Sie also vor deren Verwendung einen Sensor aus.",
+        "tip3": "Die Ergebnisse sind begrenzt. Wenn eine Warnung meldet, dass das Limit erreicht wurde, grenzen Sie Ihre Kriterien ein, um sicherzustellen, dass Sie alles sehen.",
+        "tip4": "Da die Ergebnisse in der Suchleiste landen, können Sie sie an jedes andere Menü übergeben, das mit der aktuellen Suche arbeitet, oder sie durch Tippen verfeinern.",
+        "shortcutToggle": "Menü Satellit suchen umschalten"
+      },
       "labels": {
+        "typePayload": "Nutzlast",
+        "typeRocketBody": "Raketenkörper",
+        "typeDebris": "Trümmer",
+        "busFilterPlaceholder": "Tippen, um Bus-Optionen zu filtern",
+        "satelliteBusFilter": "Satellitenbus-Filter",
+        "payloadFilterPlaceholder": "Tippen, um Nutzlast-Optionen zu filtern",
+        "payloadFilter": "Nutzlast-Filter",
         "objectType": "Objekttyp",
         "country": "Land",
         "satelliteBus": "Satellitenbus",
@@ -31,13 +50,20 @@
         "argOfPerigeeMargin": "Toleranz (Grad)",
         "all": "Alle",
         "findSatellites": "Satellit(en) suchen",
-        "exportData": "Daten exportieren"
+        "exportData": "Daten exportieren",
+        "sectionClassification": "Klassifizierung",
+        "sectionLookAngles": "Blickwinkel",
+        "sectionOrbital": "Bahnelemente",
+        "sectionPhysical": "Physikalisch & Daten",
+        "sensorNote": "Blickwinkel erfordern einen ausgewählten Sensor.",
+        "resultCount": "{count} Ergebnis(se)"
       },
       "errorMsgs": {
         "NoSatellitesFound": "Keine Satelliten gefunden",
         "NoSearchCriteriaEntered": "Keine Suchkriterien eingegeben",
         "TooManyResults": "Zu viele Ergebnisse, begrenzt auf {limit}",
-        "TryFindingFirst": "Versuchen Sie zuerst, Satelliten zu finden!"
+        "TryFindingFirst": "Versuchen Sie zuerst, Satelliten zu finden!",
+        "SearchFailed": "Suche fehlgeschlagen: {error}"
       }
     }
   }

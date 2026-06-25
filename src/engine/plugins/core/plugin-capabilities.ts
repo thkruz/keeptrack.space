@@ -41,11 +41,11 @@ export enum IconPlacement {
  * Which section of the utility panel a plugin's icon belongs to.
  */
 export enum UtilityGroup {
-  /** Camera/view mode icons (radio behavior — one active at a time). */
+  /** Camera/view mode icons (radio behavior - one active at a time). */
   CAMERA_MODE = 'camera-mode',
-  /** Layer toggle icons (checkbox behavior — multiple can be active). */
+  /** Layer toggle icons (checkbox behavior - multiple can be active). */
   LAYER_TOGGLE = 'layer-toggle',
-  /** Settings toggle icons (checkbox behavior — multiple can be active). */
+  /** Settings toggle icons (checkbox behavior - multiple can be active). */
   SETTINGS_TOGGLE = 'settings-toggle',
 }
 
@@ -359,7 +359,68 @@ export interface IContextMenuCapable {
 // ============================================================================
 
 /**
+ * An image displayed inside a help section.
+ */
+export interface IHelpImage {
+  /**
+   * Image path relative to the install directory (e.g. 'img/help/stereo-map/menu.png').
+   * Absolute URLs ('http...') and root-relative paths ('/...') are used as-is.
+   */
+  src: string;
+
+  /**
+   * Alt text for the image.
+   */
+  alt: string;
+
+  /**
+   * Optional caption rendered below the image.
+   */
+  caption?: string;
+}
+
+/**
+ * A single content block in a structured help dialog.
+ */
+export interface IHelpSection {
+  /**
+   * Optional heading. Use the shared t7e('help.*') keys for standard headings
+   * (Overview, How to Use, ...) so they are translated once.
+   */
+  heading?: string;
+
+  /**
+   * The section prose. Simple inline HTML is allowed (<ol>, <ul>, <li>, <strong>).
+   */
+  content: string;
+
+  /**
+   * Optional screenshot or diagram for this section.
+   */
+  image?: IHelpImage;
+}
+
+/**
+ * A keyboard shortcut row in the help dialog.
+ */
+export interface IHelpShortcut {
+  /**
+   * Keys pressed together, each rendered as a <kbd> chip (e.g. ['Ctrl', 'F']).
+   */
+  keys: string[];
+
+  /**
+   * What the shortcut does.
+   */
+  description: string;
+}
+
+/**
  * Configuration for a plugin's help content.
+ *
+ * Either provide the legacy `body` HTML string, or the structured
+ * `sections`/`tips`/`shortcuts` fields (preferred) which are rendered
+ * with consistent styling by `buildHelpHtml`.
  */
 export interface IHelpConfig {
   /**
@@ -368,9 +429,25 @@ export interface IHelpConfig {
   title: string;
 
   /**
-   * The body content of the help dialog (can be HTML).
+   * Legacy body content of the help dialog (can be HTML).
+   * Ignored when `sections` is provided.
    */
-  body: string;
+  body?: string;
+
+  /**
+   * Ordered content blocks (preferred over `body`).
+   */
+  sections?: IHelpSection[];
+
+  /**
+   * Short, non-obvious usage tips rendered as a highlighted callout list.
+   */
+  tips?: string[];
+
+  /**
+   * Keyboard shortcuts rendered as a table. Should mirror getKeyboardShortcuts().
+   */
+  shortcuts?: IHelpShortcut[];
 }
 
 /**
@@ -568,17 +645,34 @@ export interface ICommandPaletteCommand {
   label: string;
 
   /**
-   * Optional category for organizing commands.
+   * Optional category for organizing commands. The palette groups results under
+   * a section header per category, so this should be a stable group name shared
+   * by related commands (not per-command metadata - use {@link description} for that).
    * @example 'Display', 'Sensors', 'Analysis'
    */
   category?: string;
 
   /**
+   * Optional dim subtitle rendered under the label. Useful for clarifying what a
+   * non-obvious command does, or for per-row metadata (e.g. a satellite's NORAD
+   * number and country).
+   * @example 'Resets all filters to their defaults'
+   */
+  description?: string;
+
+  /**
    * Optional keyboard shortcut hint displayed alongside the command.
-   * This is purely informational — it does not register the shortcut.
+   * This is purely informational - it does not register the shortcut.
    * @example 'N', 'Ctrl+Shift+F'
    */
   shortcutHint?: string;
+
+  /**
+   * Optional synonyms/aliases scored by the command palette in addition to
+   * the label and category, so commands are findable under alternate names.
+   * @example ['dark mode', 'eclipse'] for a night-toggle command
+   */
+  keywords?: string[];
 
   /**
    * Callback invoked when the command is selected.
@@ -634,7 +728,7 @@ export type SettingControlType = 'toggle' | 'number' | 'select' | 'button';
 
 /**
  * Fields shared by every settings control variant. Not intended to be used
- * directly — consume {@link ISettingControl} instead.
+ * directly - consume {@link ISettingControl} instead.
  */
 interface ISettingControlBase {
   /**
@@ -664,7 +758,7 @@ interface ISettingControlBase {
 
   /**
    * Optional predicate returning true to render this control in a disabled
-   * (read-only) state — e.g., feature gated behind a pro license.
+   * (read-only) state - e.g., feature gated behind a pro license.
    */
   isDisabled?: () => boolean;
 }
@@ -679,7 +773,7 @@ export interface ISettingToggleControl extends ISettingControlBase {
 }
 
 /**
- * Numeric input. Optional min / max / step / unit drive rendering only —
+ * Numeric input. Optional min / max / step / unit drive rendering only -
  * plugins must still validate inside {@link set} if invariants matter.
  */
 export interface ISettingNumberControl extends ISettingControlBase {
@@ -728,7 +822,7 @@ export type ISettingControl =
 /**
  * One settings section, contributed by a single plugin. Rendered as a labeled
  * group inside the settings menu. Plugins persist their own state inside the
- * control's {@link ISettingControlBase.set} callback — settings-menu is
+ * control's {@link ISettingControlBase.set} callback - settings-menu is
  * unaware of where the value lives.
  */
 export interface ISettingsContribution {
@@ -757,7 +851,7 @@ export interface ISettingsContribution {
 
 /**
  * Interface for plugins that contribute one section to the settings menu.
- * Implementing this is the supported path for plugin-specific settings —
+ * Implementing this is the supported path for plugin-specific settings -
  * see issue #681. Do not add entries directly to the settings-menu plugin.
  */
 export interface ISettingsContributor {

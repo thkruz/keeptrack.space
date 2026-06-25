@@ -19,10 +19,9 @@ import { vi } from 'vitest';
  * `SatInfoBoxOrbital.updateOrbitData_` when a satellite is preselected
  * (e.g. via `?sat=` URL param) before the SatInfoBox DOM has been built.
  */
-describe('SatInfoBoxOrbital — update before DOM ready', () => {
+describe('SatInfoBoxOrbital - update before DOM ready', () => {
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager, SatInfoBox]);
-    window.M.AutoInit = vi.fn();
     // Ensure time manager has a real simulationTimeObj for gmst lookup
     ServiceLocator.getTimeManager().simulationTimeObj = new Date(2023, 1, 1);
     // Simulate browser behavior: getEl() returns null for missing elements
@@ -68,7 +67,6 @@ describe('SatInfoBoxOrbital data population', () => {
 
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager, SatInfoBox]);
-    window.M.AutoInit = vi.fn();
     ServiceLocator.getTimeManager().simulationTimeObj = new Date(2023, 1, 1);
     plugin = new SatInfoBoxOrbital();
     websiteInit(plugin);

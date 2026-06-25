@@ -4,8 +4,9 @@
       "bottomIconLabel": "Operazioni di rendez-vous e prossimità",
       "title": "Operazioni di rendez-vous e prossimità (RPO)",
       "titleSecondary": "Elenco operazioni di rendez-vous e prossimità",
-      "helpBody": "Trova i prossimi avvicinamenti ravvicinati tra satelliti. Configura i parametri di ricerca tra cui soglia di distanza, velocità relativa e tipo di orbita (GEO/LEO). Supporta modalità di ricerca per singolo satellite e tutti contro tutti.",
       "noradId": "ID NORAD",
+      "useCurrentSat": "Usa satellite corrente",
+      "noSatSelected": "Nessun satellite selezionato",
       "maxDistThreshold": "Soglia distanza massima (km)",
       "maxRelativeVelocity": "Velocità relativa massima (km/s)",
       "searchDuration": "Durata ricerca (ore)",
@@ -18,7 +19,15 @@
       "comparePayloadsOnlyTooltip": "Cerca RPO solo tra carichi utili",
       "ignoreVimpelRso": "Ignora RSO Vimpel",
       "ignoreVimpelRsoTooltip": "Ignora RSO provenienti dal catalogo Vimpel",
-      "submitButton": "Trova RPO \u25b6",
+      "submitButton": "Trova RPO",
+      "cancelButton": "Annulla ricerca",
+      "resultCount": "{count} avvicinamenti (più vicino {closest} km)",
+      "surveyError": "Ricerca RPO non riuscita: {error}",
+      "sections": {
+        "target": "Bersaglio",
+        "thresholds": "Soglie",
+        "orbitRegime": "Regime orbitale"
+      },
       "noRposToDownload": "Nessun RPO da scaricare!",
       "noRposFound": "Nessun RPO trovato!",
       "satNotFound": "Satellite con ID NORAD {sccNum} non trovato",
@@ -32,7 +41,25 @@
         "chaserName": "Nome inseguitore",
         "relDistance": "Dist. relativa [km]",
         "relVelocity": "Vel. relativa [km/s]",
+        "radial": "Radiale [km]",
+        "intrack": "Lungo traccia [km]",
+        "crosstrack": "Trasversale [km]",
+        "pc": "Pc",
         "date": "Data"
+      },
+      "help": {
+        "overview": "Le operazioni di rendez-vous e prossimità (RPO) trovano i prossimi avvicinamenti tra satelliti: un veicolo che manovra vicino a un altro, un'ispezione co-orbitale o semplicemente due oggetti che derivano vicini. Indica un satellite (o cerca in un intero regime orbitale) e restituisce ogni incontro previsto entro le tue soglie di distanza e velocità.",
+        "imgAlt": "Il menu RPO con i parametri di ricerca",
+        "imgCaption": "Imposta le soglie e il tipo di orbita, poi cerca un satellite o tutti contro tutti.",
+        "modesHeading": "Modalità di ricerca",
+        "modes": "Per impostazione predefinita la ricerca prende l'<strong>ID NORAD</strong> inserito e confronta quel satellite con il resto del suo regime orbitale. Selezionando <strong>Geostazionario tutti contro tutti</strong> viene invece confrontato ogni satellite GEO con tutti gli altri, che è il modo per esaminare l'attività dell'intera cintura. <strong>Confronta solo carichi utili</strong> salta detriti e corpi di razzo, e <strong>Ignora RSO Vimpel</strong> esclude gli oggetti provenienti dal catalogo JSC Vimpel.",
+        "resultsHeading": "Leggere i risultati",
+        "results": "Ogni riga abbina un <strong>Bersaglio</strong> e un <strong>Inseguitore</strong> con la loro minima <strong>Dist. relativa</strong>, la <strong>Vel. relativa</strong> e la <strong>Data</strong> dell'incontro. Fai clic su una riga per selezionare entrambi i satelliti e portare la camera e l'orologio all'avvicinamento; i risultati GEO commutano anche la visualizzazione delle orbite in ECF, così il moto relativo è facile da leggere. Il pulsante di scaricamento esporta l'elenco come file CSV.",
+        "howToUse": "<ol><li>Apri il menu dalla barra inferiore o premi <strong>X</strong>.</li><li>Scegli il <strong>Tipo di orbita</strong> (geostazionario o orbita terrestre bassa) e imposta la <strong>Soglia distanza massima</strong>, la <strong>Velocità relativa massima</strong> e la <strong>Durata ricerca</strong>.</li><li>Inserisci un <strong>ID NORAD</strong>, oppure seleziona <strong>Geostazionario tutti contro tutti</strong> per un'indagine sull'intera cintura.</li><li>Fai clic su <strong>Trova RPO</strong>. Le ricerche lunghe mostrano l'avanzamento; i risultati si aprono nel pannello elenco.</li><li>Fai clic su una riga qualsiasi per volare a quell'incontro.</li></ol>",
+        "tip1": "Una bassa velocità relativa a distanza ravvicinata è ciò che distingue operazioni di prossimità deliberate da un rapido passaggio di congiunzione; restringi la soglia di velocità per filtrare le manovre.",
+        "tip2": "Le ricerche GEO tutti contro tutti sono onerose; riduci prima la durata, poi ampliala quando le soglie sembrano corrette.",
+        "tip3": "Facendo clic su un risultato GEO le orbite passano alla visualizzazione fissa rispetto alla Terra (ECF); la notifica indica quale modalità è attiva.",
+        "shortcutToggle": "Attiva/disattiva il menu RPO"
       }
     }
   }

@@ -7,7 +7,59 @@
         "import": "インポート",
         "export": "エクスポート"
       },
-      "helpBody": "カタログ管理メニューは、衛星カタログデータのインポートとエクスポートのツールを提供します。<b>インポートタブ：</b>ファイル選択またはドラッグ＆ドロップで .tce、.tle、.txt カタログファイルを読み込みます。<b>エクスポートタブ：</b><ul style=\"margin-left: 40px;\"> <li>公式TLEのエクスポート – 実際の2行軌道要素をエクスポート。</li> <li>3LEのエクスポート – 3行軌道要素をエクスポート。</li> <li>KeepTrack TLEのエクスポート – アナリストを含むすべてのKeepTrack 2行軌道要素をエクスポート。</li> <li>KeepTrack 3LEのエクスポート – アナリストを含むすべてのKeepTrack 3行軌道要素をエクスポート。</li> <li>カタログCSVのエクスポート – カタログデータをCSVとしてエクスポート。</li> <li>STK .tceのエクスポート – TLEデータをSTK衛星データベース形式でエクスポート。</li> <li>FOV内衛星のエクスポート – 現在視野内にある衛星をエクスポート。</li> <li>.eエフェメリスのエクスポート – 選択した衛星の伝播エフェメリスをSTK形式でエクスポート。</li> </ul>"
+      "labels": {
+        "dropzone": ".tce、.tle、.txt ファイルをドロップしてカタログを読み込みます",
+        "keepSatInfo": "衛星情報を保持",
+        "keepSatInfoTooltip": "既存の衛星のTLEを更新しつつ、名前、国、ミッションデータを保持します。インポートしたファイルに含まれない衛星は削除されます。",
+        "importNewOnly": "新しい衛星のみをインポート",
+        "importNewOnlyTooltip": "現在のカタログにまだ存在しない衛星のみを追加します。既存の衛星は変更されません。",
+        "orbitalElements": "軌道要素",
+        "tabularStk": "表形式とSTK",
+        "selectedSatellite": "選択中の衛星",
+        "tleSource": "ソース",
+        "tleFormat": "形式",
+        "timeSpanHrs": "期間（時間）",
+        "stepSizeSec": "ステップサイズ（秒）"
+      },
+      "options": {
+        "sourceOfficial": "公式",
+        "sourceKeepTrack": "KeepTrack",
+        "format2": "2行（TLE）",
+        "format3": "3行（名前付き）"
+      },
+      "buttons": {
+        "importCatalog": "カタログをインポート",
+        "downloadTle": "TLE形式でエクスポート",
+        "exportCatalogXlsx": "カタログXLSXをエクスポート",
+        "exportStkTce": "STK .tceをエクスポート",
+        "exportSatsInFov": "FOV内の衛星をエクスポート",
+        "exportEphemeris": ".eエフェメリスをエクスポート",
+        "selectSatelliteFirst": "まず衛星を選択してください"
+      },
+      "toasts": {
+        "noValidFileInDrop": "ドロップに .tce、.tle、.txt ファイルが見つかりません",
+        "noValidTleData": "ファイルに有効な TLE データが見つかりません",
+        "unsupportedFileType": "サポートされていないファイル形式です。.tce、.tle、または .txt を使用してください",
+        "noNewSats": "ファイルに新しい衛星が見つかりません",
+        "addedNewSats": "{file} から {count} 個の新しい衛星を追加しました",
+        "loadedCatalog": "{file} からカタログを読み込みました",
+        "failedToLoad": "{file} の読み込みに失敗しました",
+        "noSatelliteSelected": "衛星が選択されていません！",
+        "exportTooLarge": "エクスポートが大きすぎます。時間範囲を狭めるか、ステップサイズを大きくしてください。",
+        "failedToPropagate": "衛星の伝播に失敗しました！"
+      },
+      "help": {
+        "overview": "カタログ管理は、衛星データをKeepTrackに取り込んだり、KeepTrackから書き出したりします。インポートタブはディスクからカタログファイルを読み込み、現在のカタログを置き換えるか更新します。エクスポートタブは、プレーンなTLEファイルからスプレッドシートやSTK製品まで、複数の形式で現在のカタログを書き出します。",
+        "imgAlt": "インポートタブとエクスポートタブのあるカタログ管理メニュー",
+        "imgCaption": "カタログファイルをインポートするか、現在のカタログを複数の形式でエクスポートします。",
+        "importHeading": "インポート",
+        "import": "<strong>カタログをインポート</strong>ボタンを使うか、ドロップゾーンにファイルをドラッグして、<strong>.tce</strong>、<strong>.tle</strong>、<strong>.txt</strong> ファイルを読み込みます。<strong>衛星情報を保持</strong>が有効な場合、既存の衛星は名前、国、ミッションデータを保持したまま軌道のみが更新され、ファイルに含まれない衛星は削除されます。無効な場合、ファイルがカタログを丸ごと置き換えます。",
+        "exportHeading": "エクスポート",
+        "export": "<ul><li><strong>軌道要素</strong>：TLE/3LEの軌道要素セットをダウンロードします。<strong>ソース</strong>（公式は実際にカタログ化された物体のみ、KeepTrackは作成したアナリスト衛星も含む）と<strong>形式</strong>（2行、または衛星名付きの3行）を選び、<strong>TLEをダウンロード</strong>をクリックします。</li><li><strong>表形式とSTK</strong>：カタログ全体をXLSXスプレッドシート、STK .tceデータベースとして、または選択中のセンサーの視野内に現在ある衛星のみをエクスポートします。</li><li><strong>選択中の衛星</strong>：衛星を選択した状態で、設定した<strong>期間（時間）</strong>と<strong>ステップサイズ（秒）</strong>を使って、伝播済みのSTK .eエフェメリスを書き出します。</li></ul>",
+        "howToUse": "<ol><li>下部バー（ツールモード）から<strong>カタログ管理</strong>を開きます。</li><li>インポートするには、<strong>インポート</strong>タブを選び、衛星情報を保持するかどうかを決めてから、ファイルを選択またはドロップします。</li><li>エクスポートするには、<strong>エクスポート</strong>タブを選び、オプションを設定して必要なエクスポートをクリックします。ファイルはすぐにダウンロードされます。</li><li>衛星ごとのエクスポートでは、まず衛星を選択します。選択されるまでそれらのボタンは無効のままです。</li></ol>",
+        "tip1": "新しいTLEファイルから軌道を更新するときは、衛星情報を保持が安全な既定です。カタログ全体を意図的に入れ替えるときだけ無効にしてください。",
+        "tip2": "インポートや編集はセッション内にのみ存在します。残したい場合は、ページを再読み込みする前にエクスポートしてください。"
+      }
     }
   }
 }

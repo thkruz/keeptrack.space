@@ -6,7 +6,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { Satellite, eci2rae } from '@ootk/src/main';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { vec4 } from 'gl-matrix';
-import { Line, LineColors } from './line';
+import { Line, LineColors, LineDescription } from './line';
 
 export class SensorToSatLine extends Line {
   sat: Satellite | OemSatellite;
@@ -70,5 +70,9 @@ export class SensorToSatLine extends Line {
     }
 
     this.updateVertBuf([eciArr, sensorEciArr]);
+  }
+
+  getDescription(): LineDescription {
+    return { kind: 'sensorToSat', detail: this.sat.name };
   }
 }

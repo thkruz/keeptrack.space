@@ -3,21 +3,27 @@
     "DopsPlugin": {
       "bottomIconLabel": "Ver DOPs",
       "title": "Menú de Dilución de Precisión",
-      "helpTitle": "Menú de Dilución de Precisión (DOP)",
-      "helpBody": "El menú de Dilución de Precisión (DOP) se utiliza para calcular la Dilución de Precisión (DOP) para una ubicación y máscara de elevación determinadas.<br><br>HDOP es la Dilución de Precisión Horizontal. Es una medida de la precisión de la posición horizontal.<br><br>PDOP es la Dilución de Precisión de Posición. Es una medida de la precisión de la posición.<br><br>GDOP es la Dilución de Precisión Geométrica. Es una medida de la precisión de la posición.",
       "labels": {
         "dopTable": "Tabla DOP",
         "latitude": "Latitud",
         "longitude": "Longitud",
         "altitude": "Altitud",
         "mask": "Máscara",
-        "updateDopData": "Actualizar datos DOP"
+        "updateDopData": "Actualizar datos DOP",
+        "location": "Ubicación",
+        "results": "Resultados"
       },
       "tooltips": {
         "latitude": "Latitud en grados",
         "longitude": "Longitud en grados",
         "altitude": "Altitud en KM",
         "mask": "Elevación mínima para señal GPS"
+      },
+      "table": {
+        "time": "Hora",
+        "hdop": "HDOP",
+        "pdop": "PDOP",
+        "gdop": "GDOP"
       },
       "rmb": {
         "dops": "DOPs",
@@ -29,6 +35,18 @@
       },
       "errorMsgs": {
         "invalidLocation": "¡Por favor, seleccione una ubicación válida en la Tierra para DOPs de 24 horas!"
+      },
+      "help": {
+        "overview": "El menú de Dilución de Precisión (DOP) estima la precisión que tendrá una posición GPS en cualquier lugar de la Tierra. La DOP describe la geometría de la constelación GPS visible: cuando los satélites están muy repartidos por el cielo la posición es precisa (DOP baja), y cuando están agrupados la precisión se degrada (DOP alta). Use este menú para encontrar las mejores y peores ventanas GPS en un sitio durante las próximas 24 horas.",
+        "imgAlt": "El menú de Dilución de Precisión con una tabla DOP de 24 horas",
+        "imgCaption": "Introduzca una ubicación y una máscara de elevación y luego actualice para ver los valores DOP de las próximas 24 horas.",
+        "valuesHeading": "Cómo leer los valores DOP",
+        "values": "<ul><li><strong>HDOP</strong>: precisión horizontal (latitud y longitud).</li><li><strong>VDOP</strong>: precisión vertical (altitud).</li><li><strong>PDOP</strong>: precisión global de la posición 3D.</li><li><strong>GDOP</strong>: PDOP más la contribución del reloj del receptor; la cifra de calidad individual más completa.</li><li><strong>TDOP</strong>: precisión del reloj del receptor.</li></ul>Cuanto más bajo, mejor: los valores por debajo de 2 son excelentes, de 2 a 5 es aceptable para la mayoría de los usos, y los valores mayores indican una posición degradada. La tabla muestra Hora, HDOP, PDOP y GDOP en pasos de un minuto.",
+        "howToUse": "<ol><li>Abra el menú desde la barra inferior o pulse <strong>D</strong>.</li><li>Introduzca la <strong>Latitud</strong> y la <strong>Longitud</strong> en grados, la <strong>Altitud</strong> en kilómetros y la <strong>Máscara</strong>: la elevación mínima en grados que un satélite GPS debe alcanzar sobre el horizonte para ser contado.</li><li>Haga clic en <strong>Actualizar datos DOP</strong>. La tabla se llena con una fila por minuto para las próximas 24 horas.</li><li>También puede hacer clic derecho en cualquier punto de la Tierra y elegir <strong>DOPs</strong>: <strong>DOPs GPS actuales</strong> muestra una lectura instantánea para el punto seleccionado, y <strong>DOPs GPS de 24 horas</strong> rellena el formulario con esa ubicación y abre este menú.</li></ol>",
+        "tip1": "Aumentar la máscara de elevación excluye los satélites bajos, lo que normalmente incrementa la DOP. Use la máscara que realmente aplica su receptor; 15 grados es un valor predeterminado habitual.",
+        "tip2": "El valor de máscara que introduzca se guarda como máscara de elevación GPS de la sesión, de modo que otros cálculos relacionados con GPS la reutilizan.",
+        "tip3": "El atajo D se ignora mientras se controla la cámara en primera persona.",
+        "shortcutToggle": "Alternar el menú de Dilución de Precisión"
       }
     }
   }

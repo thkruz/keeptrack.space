@@ -1,9 +1,154 @@
 {
   "plugins": {
-    "MissilePlugin": {
+    "MissileSimulatorPlugin": {
       "bottomIconLabel": "미사일",
-      "title": "미사일 메뉴",
-      "helpBody": "미사일 메뉴는 국가 간 개념적 미사일 발사를 생성하는 데 사용됩니다. <br><br> 잠수함 발사 미사일을 사용할 때 발사 지점은 사용자 지정 위도와 경도입니다. 지상 기반 미사일을 사용할 때는 공개 소스 보고에 기반한 고정 위도와 경도가 발사 지점입니다. <br><br> 사용자 지정 미사일 외에도, 수백 개의 미사일이 포함된 몇 가지 사전 정의된 시나리오를 사용할 수 있습니다. <br><br> 모든 미사일 발사는 개념적이며 실제 세계 이벤트를 나타내지 않습니다. 발사 궤적은 모두 동일한 탄도 모델을 기반으로 하지만 최소 및 최대 범위가 다릅니다."
+      "title": "미사일 공격 만들기",
+      "labels": {
+        "typeOfAttack": "공격 유형",
+        "launchLocation": "발사 위치",
+        "targetLocation": "목표 위치",
+        "customLaunchLatitude": "사용자 지정 발사 위도",
+        "customLaunchLongitude": "사용자 지정 발사 경도",
+        "customTargetLatitude": "사용자 지정 목표 위도",
+        "customTargetLongitude": "사용자 지정 목표 경도",
+        "warheads": "탄두 (MIRV)"
+      },
+      "types": {
+        "customMissile": "사용자 지정 미사일",
+        "russiaToUsa": "러시아의 미국 공격",
+        "russiaToUsaSubs": "러시아의 미국 공격 (잠수함 포함)",
+        "chinaToUsa": "중국의 미국 공격",
+        "northKoreaToUsa": "북한의 미국 공격",
+        "usaToRussia": "미국의 러시아 공격",
+        "usaToChina": "미국의 중국 공격",
+        "usaToNorthKorea": "미국의 북한 공격"
+      },
+      "groups": {
+        "russia": "러시아",
+        "china": "중국",
+        "unitedStates": "미국",
+        "unitedKingdom": "영국",
+        "france": "프랑스",
+        "northKorea": "북한",
+        "natoCountries": "NATO 회원국",
+        "nonNatoCountries": "비NATO 국가"
+      },
+      "attackers": {
+        "aleysk": "알레이스크",
+        "dombarovskiy": "돔바롭스키",
+        "uzhur": "우주르",
+        "kartaly": "카르탈리",
+        "irkutsk": "이르쿠츠크",
+        "kansk": "칸스크",
+        "krasnoyarsk": "크라스노야르스크",
+        "nizhniyTagil": "니즈니타길",
+        "novosibirsk": "노보시비르스크",
+        "tatischevoSs19": "타티셰보 (SS-19)",
+        "tatischevoSs27": "타티셰보 (SS-27)",
+        "teykovo": "테이코보",
+        "yoshkarOla": "요시카르올라",
+        "boreiSub": "보레이급 잠수함 (불라바)",
+        "deltaIvSubSineva": "델타 IV급 잠수함 (시네바)",
+        "deltaIvSubLayner": "델타 IV급 잠수함 (라이네르)",
+        "type092Sub": "092형 잠수함 (JL-2)",
+        "nanyang": "난양",
+        "xining": "시닝",
+        "delingha": "더링하",
+        "haiyan": "하이옌",
+        "datong": "다퉁",
+        "tainshui": "톈수이",
+        "xixia": "시샤",
+        "shaoyang": "사오양",
+        "yuxi": "위시",
+        "luoyang": "뤄양",
+        "wuzhai": "우자이",
+        "xuanhua": "쉬안화",
+        "tongdao": "퉁다오",
+        "lushi": "루스",
+        "jingxianA": "징셴 A",
+        "jingxianB": "징셴 B",
+        "hunan": "후난",
+        "daqingCity": "다칭시",
+        "xinyangCity": "신양시",
+        "xinjiangProvince": "신장",
+        "tibetProvince": "티베트",
+        "minot": "마이놋",
+        "malmstrom": "맘스트롬",
+        "feWarren": "F.E. 워런",
+        "ohioSub": "오하이오급 잠수함 (트라이던트 II)",
+        "vanguardSub": "뱅가드급 잠수함 (트라이던트 II)",
+        "hmnbClyde": "클라이드 해군기지 (트라이던트 II)",
+        "triomphantSub": "트리옹팡급 잠수함 (M51)",
+        "bayOfBiscay": "비스케이만",
+        "sinpoSub": "신포급 잠수함 (북극성-1)",
+        "sinpo": "신포",
+        "pyongan": "평안",
+        "pyongyang": "평양"
+      },
+      "targets": {
+        "washingtonDc": "워싱턴 D.C.",
+        "newYorkCity": "뉴욕",
+        "losAngeles": "로스앤젤레스",
+        "chicago": "시카고",
+        "boston": "보스턴",
+        "seattle": "시애틀",
+        "miami": "마이애미",
+        "dallas": "댈러스",
+        "coloradoSprings": "콜로라도스프링스",
+        "omaha": "오마하",
+        "hawaii": "하와이",
+        "guam": "괌",
+        "customImpact": "사용자 지정 탄착점",
+        "london": "런던",
+        "paris": "파리",
+        "frenchCaribbean": "프랑스령 카리브",
+        "madrid": "마드리드",
+        "rome": "로마",
+        "berlin": "베를린",
+        "toronto": "토론토",
+        "moscow": "모스크바",
+        "stPetersburg": "상트페테르부르크",
+        "novosibirsk": "노보시비르스크",
+        "beijing": "베이징",
+        "pyongyang": "평양"
+      },
+      "buttons": {
+        "launchMissileAttack": "미사일 공격 개시",
+        "showAllMissiles": "모든 미사일 표시",
+        "clearMissiles": "미사일 지우기"
+      },
+      "msgs": {
+        "simLoaded": "{sim} 로드됨",
+        "missilesActive": "{n} / {max}개 미사일 활성"
+      },
+      "errorMsgs": {
+        "invalidTargetLatitude": "목표 위도가 잘못되었습니다!",
+        "invalidTargetLongitude": "목표 경도가 잘못되었습니다!",
+        "invalidLaunchLatitude": "발사 위도가 잘못되었습니다!",
+        "invalidLaunchLongitude": "발사 경도가 잘못되었습니다!",
+        "invalidWarheads": "탄두 수는 1에서 12 사이의 정수여야 합니다."
+      },
+      "commands": {
+        "open": "미사일 플러그인 열기",
+        "showAllMissiles": "모든 미사일 표시",
+        "clearMissiles": "모든 미사일 지우기"
+      },
+      "help": {
+        "overview": "미사일 메뉴는 가상의 탄도 미사일 발사를 시뮬레이션합니다. 지구상의 두 지점 사이 단발 사용자 지정 발사부터 핵보유국 간의 스크립트화된 대규모 공격 시나리오까지 다양합니다. 궤적은 현실적인 탄도 모델을 사용하지만 모든 발사는 허구입니다. 센서 커버리지, 미사일 경보 타임라인, 가상 시나리오를 연습하는 데 사용하세요.",
+        "imgAlt": "공격 유형, 발사, 목표 옵션이 있는 미사일 공격 만들기 메뉴",
+        "imgCaption": "공격 유형을 선택한 다음 사용자 지정 미사일의 발사 위치와 목표를 선택하세요.",
+        "typesHeading": "공격 유형",
+        "types": "<strong>사용자 지정 미사일</strong>은 직접 구성한 미사일 한 발을 발사합니다. <strong>러시아의 미국 공격</strong>이나 <strong>미국의 중국 공격</strong> 같은 나머지 옵션은 한 번에 많은 미사일을 발사하는 스크립트화된 대규모 공격 시나리오를 불러옵니다. 지상 발사 기지는 공개 보도에 기반한 고정 사일로 좌표를 사용하며, 잠수함 항목에서는 발사 위도와 경도를 직접 입력할 수 있습니다. 목표는 미리 설정된 도시 중에서 고르거나 <strong>사용자 지정 탄착점</strong>을 선택해 정확한 좌표를 입력할 수 있습니다.",
+        "howToUse": "<ol><li>하단 바에서 <strong>미사일</strong> 메뉴를 엽니다(만들기 메뉴 모드에 있습니다).</li><li><strong>공격 유형</strong>을 선택합니다. 미리 설정된 대규모 공격을 선택하면 제출 시 즉시 발사되고, <strong>사용자 지정 미사일</strong>을 선택하면 발사 및 목표 컨트롤이 표시됩니다.</li><li>사용자 지정 미사일의 경우 <strong>발사 위치</strong>와 <strong>목표 위치</strong>를 선택합니다. 잠수함 항목을 선택하면 사용자 지정 발사 위도와 경도 입력란이 활성화되고, <strong>사용자 지정 탄착점</strong>을 선택하면 목표 좌표 입력란이 활성화됩니다.</li><li><strong>미사일 공격 개시</strong>를 클릭합니다. 미사일이 생성되고 검색창에 RV_가 입력되어 모든 활성 미사일이 강조 표시됩니다.</li><li>언제든지 <strong>모든 미사일 표시</strong>를 사용해 해당 검색을 반복할 수 있습니다.</li></ol>",
+        "tip1": "발사는 현재 시뮬레이션 시간을 사용하므로 시나리오를 특정 시점에 시작하려면 먼저 시계를 설정하세요.",
+        "tip2": "모든 미사일의 이름은 RV_로 시작하므로 검색창에서 RV_를 검색하면 모든 활성 미사일을 찾을 수 있습니다.",
+        "tip3": "발사가 거부되면 토스트 알림이 이유를 설명합니다. 일부 발사 기지와 목표 조합은 미사일의 모델링된 사거리를 벗어납니다."
+      },
+      "sections": {
+        "attackType": "공격 유형",
+        "launch": "발사",
+        "target": "표적"
+      }
     }
   }
 }

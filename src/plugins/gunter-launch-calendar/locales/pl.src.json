@@ -1,0 +1,17 @@
+{
+  "plugins": {
+    "GunterLaunchCalendar": {
+      "bottomIconLabel": "Gunter Kalendarz startów",
+      "title": "Kalendarz startów",
+      "commands": {
+        "open": "Otwórz kalendarz startów"
+      },
+      "help": {
+        "overview": "Kalendarz startów otwiera w nakładce listę startów z Gunter's Space Page na bieżący rok: kompleksową, regularnie aktualizowaną listę startów orbitalnych z datami, pojazdami, ładunkami i miejscami startu. Użyj go, aby zobaczyć, co wystartuje w najbliższym czasie, a następnie odtwórz nadchodzące starty narzędziem Nowy start.",
+        "howToUse": "<ol><li>Kliknij ikonę <strong>Kalendarz startów</strong> w dolnym menu (tryb Zdarzenia). Kalendarz otwiera się w nakładce; menu boczne zamykają się automatycznie.</li><li>Przejrzyj listę, a następnie zamknij nakładkę, aby wrócić do widoku 3D.</li></ol>",
+        "tip1": "Kalendarz jest zewnętrzną stroną z Gunter's Space Page, więc wymaga połączenia z internetem.",
+        "tip2": "Jest również dostępny z palety poleceń jako Otwórz kalendarz startów."
+      }
+    }
+  }
+}

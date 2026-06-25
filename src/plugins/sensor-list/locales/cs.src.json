@@ -3,7 +3,32 @@
     "SensorListPlugin": {
       "bottomIconLabel": "Senzory",
       "title": "Menu seznamu senzorů",
-      "helpBody": "Menu senzorů umožňuje vybrat senzor pro použití ve výpočtech a funkcích ostatních menu. Senzory jsou ve skupinách podle sítí, které primárně podporují. Na levé straně menu je název senzoru a na pravé straně je země/organizace, která jej vlastní. <br><br> Výběr možnosti \u201EVšechny...senzory\u201C vybere všechny senzory v dané skupině. To je užitečné pro vizualizaci pokrytí sítě, ale v současnosti nefunguje pro všechny výpočty. Pokud se pokoušíte vypočítat úhly pohledu pro síť, je nejlepší použít nástroj úhlů pohledu z více míst nebo použít úhly pohledu pro každý jednotlivý senzor v síti. <br><br> Senzory v tomto seznamu zahrnují mechanické a fázované radarové soustavy, stejně jako optické senzory: <ul style=\"margin-left: 40px;\"> <li> Fázované radarové soustavy jsou obvykle omezeny na nízkou oběžnou dráhu (LEO). </li> <li> Mechanické radary lze použít jak pro LEO, tak pro geostacionární oběžnou dráhu (GEO). </li> <li> Optické senzory se obvykle používají pro GEO, ale lze je použít i pro LEO. </li> <li> Optické senzory jsou omezeny na noční pozorování za jasného nebe, zatímco radary lze používat ve dne i v noci. </li> </ul> <br> Informace o senzorech jsou založeny na veřejně dostupných datech a lze je ověřit v menu Info o senzoru. Pokud máte veřejná data o dalších senzorech nebo opravy k existujícím informacím o senzorech, kontaktujte mě na <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>."
+      "labels": {
+        "missingData": "Chybějící data",
+        "tooltipSensorsInFov": "Vizualizovat pokrytí senzorů"
+      },
+      "buttons": {
+        "resetSensor": "Resetovat senzor",
+        "showSensorsWithFov": "Zobrazit všechny senzory se zorným polem..."
+      },
+      "commands": {
+        "category": "Senzory",
+        "setSensor": "Nastavit aktuální senzor na {name}",
+        "setSensorGroup": "Nastavit skupinu senzorů: {name}"
+      },
+      "help": {
+        "overview": "Menu senzorů je místo, kde vybíráte pozemní stanici, ze které zbytek aplikace počítá. Senzory jsou seskupeny podle sítě, kterou primárně podporují, přičemž každá položka zobrazuje vlevo název senzoru a vpravo zemi nebo organizaci, která jej vlastní. Vybraný senzor řídí úhly pohledu, kužely zorného pole, upozornění na přelety ze seznamu sledování a všechna ostatní menu pracující se senzory.",
+        "imgAlt": "Menu senzorů zobrazující senzory seskupené podle sítí",
+        "imgCaption": "Senzory jsou seskupeny podle sítě. Kliknutím na záhlaví skupiny vyberete celou síť najednou.",
+        "sensorTypesHeading": "Typy senzorů",
+        "sensorTypes": "<ul><li><strong>Fázované radarové soustavy</strong>: široké a rychlé skenování; obvykle omezené na nízkou oběžnou dráhu (LEO).</li><li><strong>Mechanické radary</strong>: otočné antény použitelné jak pro LEO, tak pro geostacionární oběžnou dráhu (GEO).</li><li><strong>Optické teleskopy</strong>: používají se především pro GEO a hluboký vesmír; fungují pouze v noci za jasného nebe, zatímco radary fungují ve dne i v noci.</li></ul>",
+        "howToUse": "<ol><li>Otevřete menu ze spodní lišty nebo stiskněte S.</li><li>Kliknutím na jednotlivý senzor jej vyberete; kamera přeletí na jeho polohu.</li><li>Nebo klikněte na záhlaví skupiny (např. \"All Space Surveillance Network Sensors\") a vyberte celou síť, což je skvělé pro vizualizaci pokrytí.</li><li>Pomocí <strong>Resetovat senzor</strong> výběr zrušíte.</li></ol>",
+        "tip1": "Mnoho výpočtů (například úhly pohledu) vyžaduje jediný senzor. Pokud jste vybrali celou síť, použijte místo toho menu úhlů pohledu z více míst, nebo vybírejte senzory po jednom.",
+        "tip2": "Každý senzor je dostupný také z palety příkazů: napište název senzoru a přepněte se bez otevírání tohoto menu.",
+        "tip3": "Parametry senzorů pocházejí z veřejně dostupných dat; můžete si je prohlédnout v menu Info o senzoru. Opravy jsou vítány na admin@keeptrack.space.",
+        "shortcutToggle": "Přepnout menu senzorů",
+        "shortcutCamera": "Přesunout kameru na aktuální senzor"
+      }
     }
   }
 }

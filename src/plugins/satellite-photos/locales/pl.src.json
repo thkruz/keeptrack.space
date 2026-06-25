@@ -3,10 +3,29 @@
     "SatellitePhotos": {
       "bottomIconLabel": "Zdjęcia satelitarne",
       "title": "Zdjęcia satelitarne",
-      "helpBody": "Wtyczka Zdjęcia satelitarne wyświetla najnowsze obrazy z geostacjonarnych satelitów meteorologicznych i DSCOVR. Kliknij nazwę satelity, aby wyświetlić jego najnowszy obraz.",
-      "defaultImageTitle": "Domyślny tytuł obrazu",
+      "defaultImageTitle": "Najnowsze zdjęcie satelitarne",
+      "labels": {
+        "dscovrUnavailable": "DSCOVR tymczasowo niedostępny",
+        "dscovrImage": "Zdjęcie DSCOVR {index}",
+        "dscovrLoading": "Ładowanie zdjęć DSCOVR…",
+        "refresh": "Odśwież najnowsze zdjęcie",
+        "imageAtUtc": "{name} o {time} UTC"
+      },
+      "sections": {
+        "geostationary": "Geostacjonarne",
+        "dscovr": "DSCOVR (L1)"
+      },
       "errorMsgs": {
         "FuturePictures": "Nie można załadować zdjęć z przyszłości. Ładowanie najnowszych zdjęć."
+      },
+      "help": {
+        "overview": "Zdjęcia satelitarne pokazują najnowsze fotografie wykonane przez prawdziwe satelity meteorologiczne: obrazy pełnej tarczy z satelitów MeteoSat, Himawari, GOES i Elektro-L na orbicie geostacjonarnej oraz zdjęcia całej Ziemi z DSCOVR w punkcie L1. Łączą to, co widzisz w symulacji, z tym, co te satelity właśnie teraz naprawdę fotografują.",
+        "imgAlt": "Menu Zdjęcia satelitarne z listą satelitów meteorologicznych",
+        "imgCaption": "Kliknij satelitę, aby zobaczyć jego najnowsze zdjęcie i przelecieć do niego na scenie.",
+        "howToUse": "<ol><li>Otwórz <strong>Zdjęcia satelitarne</strong> z dolnego paska lub naciśnij <strong>H</strong>; wymagane jest połączenie z internetem.</li><li>Kliknij satelitę. Kamera przeleci do niego w scenie 3D, a jego najnowsze zdjęcie otworzy się w nakładce.</li><li>Pozycje DSCOVR pojawiają się na końcu listy, po jednej pozycji na każde niedawne zdjęcie.</li></ol>",
+        "tip1": "Zdjęcia pochodzą na żywo z publicznych serwisów poszczególnych agencji, więc brak pozycji zwykle oznacza tymczasową awarię danego źródła, a nie błąd.",
+        "tip2": "Jeśli zegar symulacji jest ustawiony w przyszłości, zamiast tego wyświetlane są najnowsze rzeczywiste zdjęcia.",
+        "shortcutToggle": "Przełącz menu Zdjęcia satelitarne"
       }
     }
   }

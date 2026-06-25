@@ -12,6 +12,15 @@ import { getEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
 import { FilterMenuPlugin, FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
+import {
+  COUNTRY_FILTERS,
+  enableGroup,
+  FILTER_STORAGE_MAP,
+  getFilters,
+  ORBITAL_REGIME_FILTERS,
+  showOnlyInGroup,
+  showOnlyPayloads,
+} from '@app/plugins/filter-menu/filter-menu-core';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
@@ -53,7 +62,7 @@ describe('FilterMenuPlugin_class', () => {
       const helpConfig = plugin.getHelpConfig();
 
       expect(helpConfig.title).toBeDefined();
-      expect(helpConfig.body).toBeDefined();
+      expect(helpConfig.sections!.length).toBeGreaterThan(0);
     });
 
     it('should return correct keyboard shortcuts', () => {
@@ -97,14 +106,14 @@ describe('FilterMenuPlugin_class', () => {
 
   describe('Filters getter', () => {
     it('should return an array of filters', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
 
       expect(Array.isArray(filters)).toBe(true);
       expect(filters.length).toBeGreaterThan(0);
     });
 
     it('should have filters with required properties', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
 
       filters.forEach((filter) => {
         expect(filter.name).toBeDefined();
@@ -113,7 +122,7 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should include object type filters', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
       const filterNames = filters.map((f) => f.name);
 
       // Check for some expected filter types
@@ -121,7 +130,7 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should have agencies filter disabled by default', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
       const agenciesFilter = filters.find((f) => f.disabled === true);
 
       expect(agenciesFilter).toBeDefined();
@@ -129,7 +138,7 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should group filters into multiple categories', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
       const categories = new Set(filters.map((f) => f.category));
 
       expect(categories.size).toBeGreaterThan(1);
@@ -138,8 +147,8 @@ describe('FilterMenuPlugin_class', () => {
 
   describe('Settings persistence', () => {
     it('should have FILTER_STORAGE_MAP defined', () => {
-      expect(FilterMenuPlugin['FILTER_STORAGE_MAP']).toBeDefined();
-      expect(Object.keys(FilterMenuPlugin['FILTER_STORAGE_MAP']).length).toBeGreaterThan(0);
+      expect(FILTER_STORAGE_MAP).toBeDefined();
+      expect(Object.keys(FILTER_STORAGE_MAP).length).toBeGreaterThan(0);
     });
 
     it('should save settings without error', () => {
@@ -191,7 +200,7 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should have all expected filter keys in FILTER_STORAGE_MAP', () => {
-      const storageMap = FilterMenuPlugin['FILTER_STORAGE_MAP'];
+      const storageMap = FILTER_STORAGE_MAP;
       const expectedKeys = ['operationalPayloads', 'nonOperationalPayloads', 'rocketBodies', 'debris', 'unknownType', 'agencies', 'groundSensors', 'launchFacilities'];
 
       expectedKeys.forEach((key) => {
@@ -299,43 +308,30 @@ describe('FilterMenuPlugin_class', () => {
       const debrisCheckbox = getEl('filter-debris') as HTMLInputElement;
 
       if (debrisCheckbox) {
+        // settingsManager.filter is the source of truth, so drive the real change
+        // path (a bare DOM mutation no longer counts as a non-default state).
         debrisCheckbox.checked = false;
+        debrisCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
 
         expect(plugin.checkIfDefaults()).toBe(false);
       }
     });
   });
 
-  describe('generateFilterId_', () => {
-    it('should generate correct ID from filter name', () => {
-      const generateFilterId = FilterMenuPlugin['generateFilterId_'];
-
-      expect(generateFilterId('Payloads')).toBe('payloads');
-      expect(generateFilterId('Rocket Bodies')).toBe('rocketBodies');
-      expect(generateFilterId('Unknown Type')).toBe('unknownType');
-      expect(generateFilterId('vLEO Satellites')).toBe('vLEOSatellites');
-    });
-
-    it('should handle names with multiple spaces', () => {
-      const generateFilterId = FilterMenuPlugin['generateFilterId_'];
-
-      expect(generateFilterId('Some  Multiple   Spaces')).toBe('someMultipleSpaces');
-    });
-  });
-
-  describe('generateFilterHtml', () => {
-    it('should generate HTML with category headings', () => {
+  describe('generateFilterHtml_', () => {
+    it('should generate v13 section cards with switch toggles', () => {
       const plugin = new FilterMenuPlugin();
-      const html = plugin['generateFilterHtml']();
+      const html = plugin['generateFilterHtml_']();
 
-      expect(html).toContain('filter-category');
+      expect(html).toContain('kt-section');
+      expect(html).toContain('kt-section-label');
       expect(html).toContain('switch');
       expect(html).toContain('lever');
     });
 
     it('should include checkbox inputs in generated HTML', () => {
       const plugin = new FilterMenuPlugin();
-      const html = plugin['generateFilterHtml']();
+      const html = plugin['generateFilterHtml_']();
 
       expect(html).toContain('type="checkbox"');
       expect(html).toContain('filter-');
@@ -343,7 +339,7 @@ describe('FilterMenuPlugin_class', () => {
 
     it('should include tooltips in generated HTML', () => {
       const plugin = new FilterMenuPlugin();
-      const html = plugin['generateFilterHtml']();
+      const html = plugin['generateFilterHtml_']();
 
       expect(html).toContain('kt-tooltip');
     });
@@ -533,7 +529,7 @@ describe('FilterMenuPlugin_class', () => {
     ];
 
     it('should have all filter IDs be valid FilterPluginSettings keys', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
 
       filters.forEach((filter) => {
         expect(VALID_FILTER_SETTINGS_KEYS).toContain(filter.id);
@@ -541,7 +537,7 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should NOT use translation keys as filter IDs', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
 
       filters.forEach((filter) => {
         // Translation keys contain dots (e.g., 'filterMenu.payloads.name')
@@ -554,8 +550,8 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should have filter IDs that match FILTER_STORAGE_MAP keys', () => {
-      const filters = FilterMenuPlugin['filters'];
-      const storageMapKeys = Object.keys(FilterMenuPlugin['FILTER_STORAGE_MAP']);
+      const filters = getFilters();
+      const storageMapKeys = Object.keys(FILTER_STORAGE_MAP);
 
       filters.forEach((filter) => {
         if (filter.id) {
@@ -565,9 +561,9 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should have all FILTER_STORAGE_MAP keys represented in filters', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
       const filterIds = filters.map((f) => f.id);
-      const storageMapKeys = Object.keys(FilterMenuPlugin['FILTER_STORAGE_MAP']);
+      const storageMapKeys = Object.keys(FILTER_STORAGE_MAP);
 
       storageMapKeys.forEach((key) => {
         expect(filterIds).toContain(key);
@@ -575,8 +571,8 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should have filter count match FILTER_STORAGE_MAP key count', () => {
-      const filters = FilterMenuPlugin['filters'];
-      const storageMapKeys = Object.keys(FilterMenuPlugin['FILTER_STORAGE_MAP']);
+      const filters = getFilters();
+      const storageMapKeys = Object.keys(FILTER_STORAGE_MAP);
 
       expect(filters.length).toBe(storageMapKeys.length);
     });
@@ -628,7 +624,7 @@ describe('FilterMenuPlugin_class', () => {
     }, 30000);
 
     it('should have all filters include required id property', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
 
       filters.forEach((filter) => {
         expect(filter.id).toBeDefined();
@@ -637,7 +633,7 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should have unique filter IDs', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
       const ids = filters.map((f) => f.id).filter((id) => id !== undefined);
       const uniqueIds = new Set(ids);
 
@@ -645,7 +641,7 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should include all orbital regime filters', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
       const filterIds = filters.map((f) => f.id);
 
       expect(filterIds).toContain('vLEOSatellites');
@@ -657,7 +653,7 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should include all object type filters', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
       const filterIds = filters.map((f) => f.id);
 
       expect(filterIds).toContain('operationalPayloads');
@@ -670,7 +666,7 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should include all country filters', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
       const filterIds = filters.map((f) => f.id);
 
       expect(filterIds).toContain('unitedStates');
@@ -688,7 +684,7 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should include source filters', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
       const filterIds = filters.map((f) => f.id);
 
       expect(filterIds).toContain('vimpelSatellites');
@@ -696,14 +692,14 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should include notional satellites filter', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
       const filterIds = filters.map((f) => f.id);
 
       expect(filterIds).toContain('notionalSatellites');
     });
 
     it('should have tooltips for all filters', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
 
       filters.forEach((filter) => {
         expect(filter.tooltip).toBeDefined();
@@ -713,7 +709,7 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should only have agencies filter disabled', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
       const disabledFilters = filters.filter((f) => f.disabled === true);
 
       expect(disabledFilters.length).toBe(1);
@@ -721,14 +717,14 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should have agencies filter checked as false', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
       const agenciesFilter = filters.find((f) => f.id === 'agencies');
 
       expect(agenciesFilter?.checked).toBe(false);
     });
 
     it('should have filters without explicit checked property default to undefined', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
       const filtersWithExplicitChecked = new Set(['agencies', 'groundSensors', 'launchFacilities']);
       const filtersWithoutChecked = filters.filter((f) => !filtersWithExplicitChecked.has(f.id!));
 
@@ -738,7 +734,7 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should group filters into multiple categories', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
       const categories = new Set(filters.map((f) => f.category));
 
       // Should have at least: Object Type, Orbital Regime, Country, Source, Miscellaneous
@@ -746,7 +742,7 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should have Starlink filter in miscellaneous category', () => {
-      const filters = FilterMenuPlugin['filters'];
+      const filters = getFilters();
       const starlinkFilter = filters.find((f) => f.name.toLowerCase().includes('starlink'));
 
       expect(starlinkFilter).toBeDefined();
@@ -754,8 +750,8 @@ describe('FilterMenuPlugin_class', () => {
     });
 
     it('should return consistent filter array on multiple calls', () => {
-      const filters1 = FilterMenuPlugin['filters'];
-      const filters2 = FilterMenuPlugin['filters'];
+      const filters1 = getFilters();
+      const filters2 = getFilters();
 
       expect(filters1.length).toBe(filters2.length);
       expect(filters1.map((f) => f.id)).toEqual(filters2.map((f) => f.id));
@@ -800,12 +796,12 @@ describe('FilterMenuPlugin_class', () => {
   });
 
   describe('Command palette integration', () => {
-    it('should return 22 command palette commands', () => {
+    it('should return 25 command palette commands', () => {
       const plugin = new FilterMenuPlugin();
       const commands = plugin.getCommandPaletteCommands();
 
       expect(commands).toBeDefined();
-      expect(commands.length).toBe(22);
+      expect(commands.length).toBe(25);
     });
 
     it('should have unique command IDs', () => {
@@ -912,13 +908,13 @@ describe('FilterMenuPlugin_class', () => {
       expect(debrisCheckbox?.checked).toBe(!initialState);
     });
 
-    it('should show only payloads via showOnlyPayloads_', () => {
+    it('should show only payloads via applyPatch_(showOnlyPayloads())', () => {
       const plugin = new FilterMenuPlugin();
 
       websiteInit(plugin);
       EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
 
-      plugin['showOnlyPayloads_']();
+      plugin['applyPatch_'](showOnlyPayloads());
 
       expect((getEl('filter-operationalPayloads') as HTMLInputElement)?.checked).toBe(true);
       expect((getEl('filter-nonOperationalPayloads') as HTMLInputElement)?.checked).toBe(true);
@@ -939,31 +935,31 @@ describe('FilterMenuPlugin_class', () => {
       const usBefore = usCheckbox?.checked;
       const leoBefore = leoCheckbox?.checked;
 
-      plugin['showOnlyPayloads_']();
+      plugin['applyPatch_'](showOnlyPayloads());
 
       expect(usCheckbox?.checked).toBe(usBefore);
       expect(leoCheckbox?.checked).toBe(leoBefore);
     });
 
-    it('should set multiple filters via setFilters_', () => {
+    it('should set multiple filters via applyPatch_', () => {
       const plugin = new FilterMenuPlugin();
 
       websiteInit(plugin);
       EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
 
-      plugin['setFilters_']({ debris: false, rocketBodies: false });
+      plugin['applyPatch_']({ debris: false, rocketBodies: false });
 
       expect((getEl('filter-debris') as HTMLInputElement)?.checked).toBe(false);
       expect((getEl('filter-rocketBodies') as HTMLInputElement)?.checked).toBe(false);
     });
 
-    it('should show only one filter in a group via showOnlyInGroup_', () => {
+    it('should show only one filter in a group via showOnlyInGroup', () => {
       const plugin = new FilterMenuPlugin();
 
       websiteInit(plugin);
       EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
 
-      plugin['showOnlyInGroup_']('lEOSatellites', FilterMenuPlugin['ORBITAL_REGIME_FILTERS_']);
+      plugin['applyPatch_'](showOnlyInGroup('lEOSatellites', ORBITAL_REGIME_FILTERS));
 
       expect((getEl('filter-lEOSatellites') as HTMLInputElement)?.checked).toBe(true);
       expect((getEl('filter-gEOSatellites') as HTMLInputElement)?.checked).toBe(false);
@@ -973,45 +969,45 @@ describe('FilterMenuPlugin_class', () => {
       expect((getEl('filter-vLEOSatellites') as HTMLInputElement)?.checked).toBe(false);
     });
 
-    it('should enable all filters in a group via enableGroup_', () => {
+    it('should enable all filters in a group via enableGroup', () => {
       const plugin = new FilterMenuPlugin();
 
       websiteInit(plugin);
       EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
 
       // First disable all orbital regimes
-      plugin['enableGroup_'](FilterMenuPlugin['ORBITAL_REGIME_FILTERS_'], false);
+      plugin['applyPatch_'](enableGroup(ORBITAL_REGIME_FILTERS, false));
 
       expect((getEl('filter-lEOSatellites') as HTMLInputElement)?.checked).toBe(false);
       expect((getEl('filter-gEOSatellites') as HTMLInputElement)?.checked).toBe(false);
 
       // Then re-enable all
-      plugin['enableGroup_'](FilterMenuPlugin['ORBITAL_REGIME_FILTERS_'], true);
+      plugin['applyPatch_'](enableGroup(ORBITAL_REGIME_FILTERS, true));
 
       expect((getEl('filter-lEOSatellites') as HTMLInputElement)?.checked).toBe(true);
       expect((getEl('filter-gEOSatellites') as HTMLInputElement)?.checked).toBe(true);
     });
 
-    it('should show only US objects via showOnlyInGroup_ with country filters', () => {
+    it('should show only US objects via showOnlyInGroup with country filters', () => {
       const plugin = new FilterMenuPlugin();
 
       websiteInit(plugin);
       EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
 
-      plugin['showOnlyInGroup_']('unitedStates', FilterMenuPlugin['COUNTRY_FILTERS_']);
+      plugin['applyPatch_'](showOnlyInGroup('unitedStates', COUNTRY_FILTERS));
 
       expect((getEl('filter-unitedStates') as HTMLInputElement)?.checked).toBe(true);
       expect((getEl('filter-china') as HTMLInputElement)?.checked).toBe(false);
       expect((getEl('filter-russia') as HTMLInputElement)?.checked).toBe(false);
     });
 
-    it('should hide all countries via enableGroup_', () => {
+    it('should hide all countries via enableGroup', () => {
       const plugin = new FilterMenuPlugin();
 
       websiteInit(plugin);
       EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
 
-      plugin['enableGroup_'](FilterMenuPlugin['COUNTRY_FILTERS_'], false);
+      plugin['applyPatch_'](enableGroup(COUNTRY_FILTERS, false));
 
       expect((getEl('filter-unitedStates') as HTMLInputElement)?.checked).toBe(false);
       expect((getEl('filter-china') as HTMLInputElement)?.checked).toBe(false);
@@ -1019,7 +1015,7 @@ describe('FilterMenuPlugin_class', () => {
       expect((getEl('filter-japan') as HTMLInputElement)?.checked).toBe(false);
     });
 
-    it('should not modify disabled checkboxes via setFilters_', () => {
+    it('should not modify disabled filters via applyPatch_', () => {
       const plugin = new FilterMenuPlugin();
 
       websiteInit(plugin);
@@ -1028,19 +1024,19 @@ describe('FilterMenuPlugin_class', () => {
       const agenciesCheckbox = getEl('filter-agencies') as HTMLInputElement;
       const agenciesBefore = agenciesCheckbox?.checked;
 
-      plugin['setFilters_']({ agencies: true });
+      plugin['applyPatch_']({ agencies: true });
 
       expect(agenciesCheckbox?.checked).toBe(agenciesBefore);
     });
 
-    it('should call saveSettings_ when using setFilters_', () => {
+    it('should call saveSettings_ when using applyPatch_', () => {
       const plugin = new FilterMenuPlugin();
       const saveSettingsSpy = vi.spyOn(plugin as any, 'saveSettings_');
 
       websiteInit(plugin);
       EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
 
-      plugin['setFilters_']({ debris: false });
+      plugin['applyPatch_']({ debris: false });
 
       expect(saveSettingsSpy).toHaveBeenCalled();
     });

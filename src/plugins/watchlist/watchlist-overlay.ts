@@ -12,6 +12,7 @@ import { LineColors } from '@app/engine/rendering/line-manager/line';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
+import { t7e } from '@app/locales/keys';
 import { MILLISECONDS_PER_DAY, Satellite } from '@ootk/src/main';
 import pictureInPicturePng from '@public/img/icons/picture-in-picture.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -39,14 +40,21 @@ const TIER_ORDER: Record<string, number> = {
 const DEPARTED_MAX_VISIBLE_ = 5;
 const DEPARTED_ROTATE_MS_ = 10000;
 
-const TIER_LABELS: Record<string, string> = {
-  'wl-tier-active': 'IN VIEW',
-  'wl-tier-imminent': 'NEXT UP',
-  'wl-tier-upcoming': 'UPCOMING',
-  'wl-tier-aware': 'LATER',
-  'wl-tier-background': 'BACKGROUND',
-  'wl-tier-departed': 'DEPARTED',
+/** Helper for this plugin's locale keys. */
+const tOverlay = (key: string) => t7e(`plugins.WatchlistOverlay.${key}` as Parameters<typeof t7e>[0]);
+
+/** Maps a tier CSS class to its locale key. */
+const TIER_LABEL_KEYS: Record<string, string> = {
+  'wl-tier-active': 'tiers.inView',
+  'wl-tier-imminent': 'tiers.nextUp',
+  'wl-tier-upcoming': 'tiers.upcoming',
+  'wl-tier-aware': 'tiers.later',
+  'wl-tier-background': 'tiers.background',
+  'wl-tier-departed': 'tiers.departed',
 };
+
+/** Localized tier label, resolved lazily so t7e is not called at parse time. */
+const tierLabel = (tier: string): string => tOverlay(TIER_LABEL_KEYS[tier] ?? '');
 
 export class WatchlistOverlay extends KeepTrackPlugin {
   readonly id = 'WatchlistOverlay';
@@ -60,7 +68,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
   menuMode: MenuMode[] = [MenuMode.CATALOG, MenuMode.ALL];
 
-  /** ~72 minutes — just enough buffer beyond the 60-min display cap */
+  /** ~72 minutes - just enough buffer beyond the 60-min display cap */
   private readonly OVERLAY_CALC_LENGTH_IN_DAYS_ = 0.05;
 
   // Tier thresholds in milliseconds
@@ -84,7 +92,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   /** Cached FOV exit times keyed by satellite ID. Cleared on each recalc. */
   private readonly exitTimeCache_ = new Map<number, Date | null>();
 
-  /** Departed rotation state — avoids index jumps when departed count changes */
+  /** Departed rotation state - avoids index jumps when departed count changes */
   private departedRotationOffset_ = 0;
   private lastDepartedRotationTime_ = 0;
 
@@ -125,8 +133,8 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     return [
       {
         id: 'WatchlistOverlay.open',
-        label: 'Open Watchlist Overlay',
-        category: 'Watchlist',
+        label: tOverlay('openOverlayCmd'),
+        category: t7e('plugins.WatchlistPlugin.title'),
         callback: () => this.bottomMenuClicked(),
       },
     ];
@@ -161,7 +169,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       const watchlist = PluginRegistry.getPlugin(WatchlistPlugin);
 
       if (!watchlist || watchlist.watchlistList.length === 0) {
-        ServiceLocator.getUiManager().toast('Add Satellites to List!', ToastMsgType.caution);
+        ServiceLocator.getUiManager().toast(tOverlay('addSatellitesToast'), ToastMsgType.caution);
 
         return;
       }
@@ -244,14 +252,14 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     if (inView === 1 && inViewListVal === false) {
       // Is inview and wasn't previously
       this.watchlistPlugin_.watchlistList[idx].inView = true;
-      uiManagerInstance.toast(`Satellite ${sat.sccNum} is In Field of View!`, ToastMsgType.normal);
+      uiManagerInstance.toast(tOverlay('inFovToast').replace('{sccNum}', sat.sccNum), ToastMsgType.normal);
       lineManagerInstance.createSensorToSatFovOnly(ServiceLocator.getSensorManager().currentSensors[0], sat, LineColors.GREEN);
       ServiceLocator.getOrbitManager().addInViewOrbit(this.watchlistPlugin_.watchlistList[idx].id);
     }
     if (inView === 0 && inViewListVal === true) {
       // Isn't inview and was previously
       this.watchlistPlugin_.watchlistList[idx].inView = false;
-      uiManagerInstance.toast(`Satellite ${sat.sccNum} left Field of View!`, ToastMsgType.standby);
+      uiManagerInstance.toast(tOverlay('leftFovToast').replace('{sccNum}', sat.sccNum), ToastMsgType.standby);
       ServiceLocator.getOrbitManager().removeInViewOrbit(this.watchlistPlugin_.watchlistList[idx].id);
     }
   }
@@ -420,7 +428,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       return `${timeStr} +${agoMins}m ago`;
     }
 
-    // Upcoming, Aware, Background — HH:MM only
+    // Upcoming, Aware, Background - HH:MM only
     return dateFormat(passTime, 'HH:MM', true);
   }
 
@@ -465,7 +473,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
           try {
             exitTime = this.computeExitTime_(pass.sat, propTime);
           } catch {
-            // Bad satrec or sensor — fall back to pass-start countdown
+            // Bad satrec or sensor - fall back to pass-start countdown
           }
         }
         const timeStr = this.formatPassTime_(pass.time, propTime, tier, exitTime);
@@ -524,20 +532,20 @@ export class WatchlistOverlay extends KeepTrackPlugin {
             ? ` (${departedTotal})`
             : '';
 
-          htmlParts.push(`<div class="wl-group-header">${TIER_LABELS[tier]}${countSuffix}</div>`);
+          htmlParts.push(`<div class="wl-group-header">${tierLabel(tier)}${countSuffix}</div>`);
         }
         htmlParts.push(...buckets[tier]);
       }
 
       if (visibleCount === 0) {
-        const noPassesMsg = 'No passes within 60 minutes';
+        const noPassesMsg = tOverlay('noPassesMsg');
 
         htmlParts.push(`<div class="wl-entry wl-tier-background" style="justify-content:center">${noPassesMsg}</div>`);
       }
 
       htmlParts.push('</div>');
 
-      // Set innerHTML directly — requestIdleCallback (setInnerHtml) defers too
+      // Set innerHTML directly - requestIdleCallback (setInnerHtml) defers too
       // long in a busy render loop and can cause stale/empty overlay content
       const contentEl = getEl('info-overlay-content');
 

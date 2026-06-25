@@ -3,7 +3,56 @@
     "Reentries": {
       "bottomIconLabel": "再入预测",
       "title": "再入预测",
-      "helpBody": "再入预测菜单包含两个标签页：<br><br><b>TIP消息</b>显示美国太空司令部最近和即将进行的卫星再入预测。点击某一行将选择该卫星并将时间更改为预测的衰减时间。<br><br><b>再入分析</b>显示按最低近地点排序的最可能重新进入大气层的物体。点击任意行以选择卫星。",
+      "tabLabels": {
+        "tipMessages": "TIP消息",
+        "reentryAnalysis": "再入分析"
+      },
+      "toolbar": {
+        "fetchData": "获取数据",
+        "refresh": "刷新",
+        "flyToCorridor": "飞向走廊",
+        "flyToCorridorTooltip": "启用后，点击 TIP 行会将相机飞向地球上预测的再入走廊，而不是跟随目标。"
+      },
+      "table": {
+        "norad": "NORAD",
+        "decayDate": "衰减日期",
+        "latitude": "纬度",
+        "longitude": "经度",
+        "window": "窗口（分钟）",
+        "nextReport": "下次报告（小时）",
+        "reentryAngle": "再入角（度）",
+        "rcs": "雷达截面积 (m^2)",
+        "gpAge": "GP年龄（小时）",
+        "dryMass": "干质量（千克）",
+        "volume": "体积 (m^3)",
+        "name": "名称",
+        "type": "类型",
+        "perigee": "近地点 (km)",
+        "apogee": "远地点 (km)",
+        "meanAlt": "平均高度 (km)",
+        "incl": "倾角 (°)",
+        "rcsSup": "雷达截面积 (m²)"
+      },
+      "labels": {
+        "reentered": "已再入",
+        "payload": "有效载荷",
+        "rocketBody": "火箭体",
+        "debris": "碎片",
+        "dataActions": "数据操作",
+        "results": "结果"
+      },
+      "help": {
+        "overview": "再入预测菜单跟踪正在脱离轨道的物体。它包含两个标签页：美国太空司令部的官方再入预测，以及目录中高度最低物体的实时分析。",
+        "imgAlt": "显示TIP消息表格的再入预测菜单",
+        "imgCaption": "TIP再入预测。点击某一行可将模拟跳转到预测的衰减时间。",
+        "tabsHeading": "两个标签页",
+        "tabs": "<ul><li><strong>TIP消息</strong>：美国太空司令部发布的跟踪和撞击预测消息，包含预测的衰减时间、位置、不确定性窗口（分钟）、再入角、雷达截面积和质量。点击某一行将选择该物体，并将模拟时间跳转到预测的衰减时刻。</li><li><strong>再入分析</strong>：按最低近地点排序的约200个编目物体。各行以颜色区分：红色表示近地点低于120 km（即将再入），黄色表示120–160 km（高风险）。点击某一行即可选择该物体。</li></ul>",
+        "howToUse": "<ol><li>从底部栏打开菜单，或按R键。</li><li>点击下载图标以获取最新的TIP数据（需要互联网连接）。</li><li>点击任意预测，即可飞到该物体在预测衰减时间的位置。</li><li>切换到再入分析标签页查看接下来将坠落的物体，该标签页在首次打开时加载。</li></ol>",
+        "tip1": "平均高度列中的\"已再入\"条目表示该物体已无法继续外推计算：它很可能已经坠落。",
+        "tip2": "TIP预测带有真实的不确定性：窗口列是以分钟为单位的不确定性，其地面轨迹可能横跨数个大陆。",
+        "tip3": "点击TIP行会悄然将模拟时钟更改为衰减时刻；请使用时间控件返回当前时间。",
+        "shortcutToggle": "切换再入预测菜单"
+      },
       "dataSource": "跟踪和撞击预测(TIP)消息由美国太空司令部(USSPACECOM)提供。",
       "errorMsgs": {
         "noTipData": "未找到TIP数据!",

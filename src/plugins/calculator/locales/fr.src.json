@@ -3,7 +3,82 @@
     "Calculator": {
       "bottomIconLabel": "Transformations de repère",
       "title": "Menu Transformations de repère",
-      "helpBody": "Le menu Transformations de repère permet de convertir entre différents repères de référence. <br><br> Le menu permet de convertir entre les repères suivants : <ul style=\"margin-left: 40px;\"> <li> ECI - Terre centrée inertielle </li> <li> ECEF - Terre centrée fixe </li> <li> Géodésique </li> <li> Topocentrique </li> </ul>"
+      "frames": {
+        "geodeticLla": "Géodésique (LLA)",
+        "raeTopocentric": "RAE (topocentrique)",
+        "raDecGeocentric": "RA/Dec (géocentrique)",
+        "classicalElements": "Éléments classiques"
+      },
+      "sections": {
+        "input": "Entrée"
+      },
+      "labels": {
+        "inputFrame": "Repère d'entrée",
+        "loadSelectedSatellite": "Charger le satellite sélectionné",
+        "includeVelocity": "Inclure la vitesse",
+        "convert": "Convertir",
+        "outputFormat": "Format de sortie",
+        "drawLine": "Tracer une ligne",
+        "copyResults": "Copier tous les résultats",
+        "clickToCopy": "Cliquer pour copier",
+        "epoch": "Époque",
+        "sensor": "Capteur",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "altitude": "Altitude",
+        "range": "Distance",
+        "azimuth": "Azimut",
+        "elevation": "Élévation",
+        "rightAscension": "Ascension droite",
+        "declination": "Déclinaison",
+        "semiMajorAxis": "Demi-grand axe",
+        "eccentricity": "Excentricité",
+        "inclination": "Inclinaison",
+        "raan": "RAAN",
+        "argPerigee": "Arg. du périgée",
+        "trueAnomaly": "Anomalie vraie",
+        "period": "Période",
+        "apogeeAlt": "Alt. de l'apogée",
+        "perigeeAlt": "Alt. du périgée"
+      },
+      "formats": {
+        "fixed4": "Fixe (4 décimales)",
+        "fixed6": "Fixe (6 décimales)",
+        "fixed8": "Fixe (8 décimales)",
+        "scientific": "Notation scientifique",
+        "dms": "DMS (pour les angles)"
+      },
+      "msgs": {
+        "noSensorSelected": "Aucun capteur sélectionné",
+        "needsVelocity": "Vitesse requise",
+        "noSensorForRae": "Aucun capteur sélectionné pour la sortie RAE.",
+        "copied": "Copié dans le presse-papiers"
+      },
+      "errorMsgs": {
+        "conversionFailed": "Échec de la conversion : {error}",
+        "invalidInput": "Entrée non valide pour {field} : \"{value}\" n'est pas un nombre.",
+        "fieldNotFound": "Champ {field} introuvable.",
+        "invalidNumber": "Toutes les entrées doivent être des nombres valides.",
+        "badEccentricity": "L'excentricité doit être comprise entre 0 et 1 (exclus) pour une orbite fermée.",
+        "badSemiMajorAxis": "Le demi-grand axe doit être supérieur à 0.",
+        "noSensorForRae": "La conversion RAE nécessite qu'un capteur soit sélectionné.",
+        "noRaeData": "Aucune donnée RAE disponible. Effectuez d'abord une conversion avec un capteur sélectionné.",
+        "noSatelliteSelected": "Aucun satellite sélectionné.",
+        "notASatellite": "L'objet sélectionné n'est pas un satellite.",
+        "couldNotPropagate": "Impossible de propager le satellite jusqu'à l'heure actuelle.",
+        "copyFailed": "Impossible de copier dans le presse-papiers."
+      },
+      "help": {
+        "overview": "La calculatrice de transformations de repère convertit une position (et éventuellement une vitesse) entre tous les repères de coordonnées que KeepTrack connaît : J2000 (ECI), ITRF (ECEF), TEME, Géodésique (LLA), RAE (topocentrique), RA/Dec (géocentrique) et Éléments classiques. Saisissez un état dans n'importe quel repère et lisez-le dans tous les autres à la fois.",
+        "imgAlt": "Le menu Transformations de repère avec les champs de saisie et les sorties converties",
+        "imgCaption": "Saisissez un état dans un repère ; tous les autres repères sont calculés en un clic.",
+        "framesHeading": "Repères pris en charge",
+        "frames": "<ul><li><strong>J2000 (ECI)</strong>, <strong>TEME</strong> : repères inertiels centrés sur la Terre ; TEME est le repère dans lequel les TLE sont publiés.</li><li><strong>ITRF (ECEF)</strong> : centré sur la Terre et fixe par rapport à la Terre ; tourne avec la planète.</li><li><strong>Géodésique (LLA)</strong> : latitude, longitude et altitude.</li><li><strong>RAE (topocentrique)</strong> : distance, azimut et élévation vus depuis le capteur sélectionné.</li><li><strong>RA/Dec (géocentrique)</strong> : ascension droite et déclinaison.</li><li><strong>Éléments classiques</strong> : éléments orbitaux képlériens, avec la période, l'apogée et le périgée en sortie.</li></ul>",
+        "howToUse": "<ol><li>Ouvrez le menu depuis la barre inférieure (mode Outils).</li><li>Choisissez un <strong>Repère d'entrée</strong> ; les champs de saisie s'adaptent en conséquence.</li><li>Saisissez les valeurs, ou cliquez sur <strong>Charger le satellite sélectionné</strong> pour les remplir à partir du satellite actuellement sélectionné.</li><li>Pour les repères cartésiens, cochez <strong>Inclure la vitesse</strong> pour convertir aussi le vecteur vitesse ; la sortie des Éléments classiques en a besoin.</li><li>Cliquez sur <strong>Convertir</strong>. Les valeurs de tous les autres repères apparaissent en dessous, formatées selon le sélecteur <strong>Format de sortie</strong>.</li><li>Avec un capteur sélectionné et un résultat RAE calculé, <strong>Tracer une ligne</strong> dessine la ligne du capteur jusqu'à ce point dans la vue 3D.</li></ol>",
+        "tip1": "L'entrée et la sortie RAE nécessitent d'abord un capteur sélectionné ; le champ affiche le capteur utilisé afin que vous connaissiez toujours le site de référence.",
+        "tip2": "Le format de sortie DMS présente les angles en degrés, minutes et secondes, ce qui est pratique pour le pointage de télescope.",
+        "tip3": "La conversion en Éléments classiques nécessite la vitesse : sans elle, la sortie indique qu'elle a besoin de la vitesse plutôt que de deviner une orbite."
+      }
     }
   }
 }

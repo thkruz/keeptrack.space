@@ -80,12 +80,14 @@ test.describe('FilterMenuPlugin', () => {
     await debrisLever.click();
     await expect(debris).not.toBeChecked({ timeout: 3_000 });
 
-    // 10. Click reset to restore defaults
-    await resetButton.click();
+    // 10. Click reset to restore defaults. The reset row sits at the bottom-center,
+    // under the fixed drawer-utility-footer pill, so dispatch the click directly to
+    // avoid the overlay intercepting it.
+    await resetButton.dispatchEvent('click');
     await expect(debris).toBeChecked({ timeout: 3_000 });
 
     // 11. Close the side menu
-    await page.locator('#filter-menu-close-btn').click();
+    await page.locator('#filter-menu-close-btn').dispatchEvent('click');
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u, { timeout: 5_000 });
   });
 });

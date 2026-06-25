@@ -1,9 +1,154 @@
 {
   "plugins": {
-    "MissilePlugin": {
+    "MissileSimulatorPlugin": {
       "bottomIconLabel": "ミサイル",
-      "title": "ミサイルメニュー",
-      "helpBody": "ミサイルメニューは、国家間の仮想的なミサイル発射を生成するために使用されます。<br><br>潜水艦発射ミサイルを使用する場合、発射地点はカスタムの緯度と経度です。陸上発射ミサイルを使用する場合、発射地点はオープンソースの報告に基づいた固定の緯度と経度になります。<br><br>カスタムミサイルに加えて、数百のミサイルを含むいくつかの事前定義されたシナリオも利用可能です。<br><br>すべてのミサイル発射は仮想的なものであり、実際の世界のイベントを表すものではありません。発射軌道はすべて同じ弾道モデルに基づいていますが、異なる最小および最大範囲を使用しています。"
+      "title": "ミサイル攻撃を作成",
+      "labels": {
+        "typeOfAttack": "攻撃の種類",
+        "launchLocation": "発射地点",
+        "targetLocation": "目標地点",
+        "customLaunchLatitude": "カスタム発射緯度",
+        "customLaunchLongitude": "カスタム発射経度",
+        "customTargetLatitude": "カスタム目標緯度",
+        "customTargetLongitude": "カスタム目標経度",
+        "warheads": "弾頭 (MIRV)"
+      },
+      "types": {
+        "customMissile": "カスタムミサイル",
+        "russiaToUsa": "ロシアから米国へ",
+        "russiaToUsaSubs": "ロシアから米国へ（潜水艦込み）",
+        "chinaToUsa": "中国から米国へ",
+        "northKoreaToUsa": "北朝鮮から米国へ",
+        "usaToRussia": "米国からロシアへ",
+        "usaToChina": "米国から中国へ",
+        "usaToNorthKorea": "米国から北朝鮮へ"
+      },
+      "groups": {
+        "russia": "ロシア",
+        "china": "中国",
+        "unitedStates": "アメリカ合衆国",
+        "unitedKingdom": "イギリス",
+        "france": "フランス",
+        "northKorea": "北朝鮮",
+        "natoCountries": "NATO加盟国",
+        "nonNatoCountries": "NATO非加盟国"
+      },
+      "attackers": {
+        "aleysk": "アレイスク",
+        "dombarovskiy": "ドンバロフスキー",
+        "uzhur": "ウジュール",
+        "kartaly": "カルタリ",
+        "irkutsk": "イルクーツク",
+        "kansk": "カンスク",
+        "krasnoyarsk": "クラスノヤルスク",
+        "nizhniyTagil": "ニジニ・タギル",
+        "novosibirsk": "ノヴォシビルスク",
+        "tatischevoSs19": "タチシチェヴォ（SS-19）",
+        "tatischevoSs27": "タチシチェヴォ（SS-27）",
+        "teykovo": "テイコヴォ",
+        "yoshkarOla": "ヨシュカル・オラ",
+        "boreiSub": "ボレイ級潜水艦（ブラヴァ）",
+        "deltaIvSubSineva": "デルタIV級潜水艦（シネヴァ）",
+        "deltaIvSubLayner": "デルタIV級潜水艦（ライネル）",
+        "type092Sub": "092型潜水艦（JL-2）",
+        "nanyang": "南陽",
+        "xining": "西寧",
+        "delingha": "デリンハ",
+        "haiyan": "海晏",
+        "datong": "大同",
+        "tainshui": "天水",
+        "xixia": "西峡",
+        "shaoyang": "邵陽",
+        "yuxi": "玉渓",
+        "luoyang": "洛陽",
+        "wuzhai": "五寨",
+        "xuanhua": "宣化",
+        "tongdao": "通道",
+        "lushi": "盧氏",
+        "jingxianA": "靖県A",
+        "jingxianB": "靖県B",
+        "hunan": "湖南",
+        "daqingCity": "大慶市",
+        "xinyangCity": "信陽市",
+        "xinjiangProvince": "新疆",
+        "tibetProvince": "チベット",
+        "minot": "マイノット",
+        "malmstrom": "マルムストロム",
+        "feWarren": "F.E.ウォーレン",
+        "ohioSub": "オハイオ級潜水艦（トライデントII）",
+        "vanguardSub": "ヴァンガード級潜水艦（トライデントII）",
+        "hmnbClyde": "クライド海軍基地（トライデントII）",
+        "triomphantSub": "トリオンファン級潜水艦（M51）",
+        "bayOfBiscay": "ビスケー湾",
+        "sinpoSub": "新浦級潜水艦（北極星1号）",
+        "sinpo": "新浦",
+        "pyongan": "平安",
+        "pyongyang": "平壌"
+      },
+      "targets": {
+        "washingtonDc": "ワシントンD.C.",
+        "newYorkCity": "ニューヨーク",
+        "losAngeles": "ロサンゼルス",
+        "chicago": "シカゴ",
+        "boston": "ボストン",
+        "seattle": "シアトル",
+        "miami": "マイアミ",
+        "dallas": "ダラス",
+        "coloradoSprings": "コロラドスプリングス",
+        "omaha": "オマハ",
+        "hawaii": "ハワイ",
+        "guam": "グアム",
+        "customImpact": "カスタム着弾点",
+        "london": "ロンドン",
+        "paris": "パリ",
+        "frenchCaribbean": "フランス領カリブ",
+        "madrid": "マドリード",
+        "rome": "ローマ",
+        "berlin": "ベルリン",
+        "toronto": "トロント",
+        "moscow": "モスクワ",
+        "stPetersburg": "サンクトペテルブルク",
+        "novosibirsk": "ノヴォシビルスク",
+        "beijing": "北京",
+        "pyongyang": "平壌"
+      },
+      "buttons": {
+        "launchMissileAttack": "ミサイル攻撃を開始",
+        "showAllMissiles": "すべてのミサイルを表示",
+        "clearMissiles": "ミサイルを消去"
+      },
+      "msgs": {
+        "simLoaded": "{sim} を読み込みました",
+        "missilesActive": "{n} / {max} 発のミサイルが稼働中"
+      },
+      "errorMsgs": {
+        "invalidTargetLatitude": "目標緯度が無効です！",
+        "invalidTargetLongitude": "目標経度が無効です！",
+        "invalidLaunchLatitude": "発射緯度が無効です！",
+        "invalidLaunchLongitude": "発射経度が無効です！",
+        "invalidWarheads": "弾頭数は1から12までの整数で指定してください。"
+      },
+      "commands": {
+        "open": "ミサイルプラグインを開く",
+        "showAllMissiles": "すべてのミサイルを表示",
+        "clearMissiles": "すべてのミサイルを消去"
+      },
+      "help": {
+        "overview": "ミサイルメニューは想定上の弾道ミサイル発射をシミュレートします。地球上の2地点間の単発のカスタム発射から、核保有国間のスクリプト化された一斉攻撃シナリオまで対応します。軌道は現実的な弾道モデルを使用しますが、すべての発射は架空のものです。センサーカバレッジ、ミサイル警戒のタイムライン、想定シナリオの検討に活用してください。",
+        "imgAlt": "攻撃の種類、発射、目標のオプションがある「ミサイル攻撃を作成」メニュー",
+        "imgCaption": "攻撃の種類を選び、カスタムミサイルの場合は発射地点と目標を選択します。",
+        "typesHeading": "攻撃タイプ",
+        "types": "<strong>カスタムミサイル</strong>は、ユーザーが設定した1発のミサイルを発射します。<strong>ロシアから米国へ</strong>や<strong>米国から中国へ</strong>などの残りのオプションは、多数のミサイルを一斉に発射するスクリプト化された一斉攻撃シナリオを読み込みます。地上発射サイトは公開情報に基づく固定サイロ座標を使用し、潜水艦の項目では発射の緯度と経度を入力できます。目標はプリセットの都市から選ぶか、<strong>カスタム着弾点</strong>を選んで正確な座標を入力します。",
+        "howToUse": "<ol><li>下部バーから<strong>ミサイル</strong>メニューを開きます（作成メニューモード内にあります）。</li><li><strong>攻撃の種類</strong>を選択します。プリセットの一斉攻撃を選ぶと送信時に即座に発射されます。<strong>カスタムミサイル</strong>を選ぶと発射と目標のコントロールが表示されます。</li><li>カスタムミサイルの場合は<strong>発射地点</strong>と<strong>目標地点</strong>を選択します。潜水艦の項目を選ぶとカスタム発射緯度・経度の入力欄が有効になり、<strong>カスタム着弾点</strong>を選ぶと目標座標の入力欄が有効になります。</li><li><strong>ミサイル攻撃を開始</strong>をクリックします。ミサイルが作成され、検索バーに RV_ が入力されてすべてのアクティブなミサイルが強調表示されます。</li><li>いつでも<strong>すべてのミサイルを表示</strong>を使って同じ検索を繰り返せます。</li></ol>",
+        "tip1": "発射には現在のシミュレーション時刻が使用されます。特定の時刻からシナリオを開始したい場合は、先に時計を設定してください。",
+        "tip2": "すべてのミサイルの名前は RV_ で始まるため、検索バーで RV_ を検索するとアクティブなミサイルがすべて見つかります。",
+        "tip3": "発射が拒否された場合はトースト通知で理由が表示されます。発射地点と目標の組み合わせによっては、ミサイルのモデル化された射程の範囲外になることがあります。"
+      },
+      "sections": {
+        "attackType": "攻撃の種類",
+        "launch": "発射",
+        "target": "目標"
+      }
     }
   }
 }

@@ -5,6 +5,7 @@ import type { ClassicalElements } from '@app/engine/ootk/src/coordinate/Classica
 import type { ITRF } from '@app/engine/ootk/src/coordinate/ITRF';
 import type { J2000 } from '@app/engine/ootk/src/coordinate/J2000';
 import { calcGmst, DEG2RAD, Degrees, EcefVec3, eci2ecef, eci2lla, Kilometers, lla2eci, LlaVec3, PosVel, Radians, SpaceObject, SpaceObjectParams, SpaceObjectType, TemeVec3, Vector3D } from '@ootk/src/main';
+import { interpolateMissileSample } from '@app/plugins/missile/missile-interpolation';
 
 export class MissileObject extends SpaceObject {
   type = SpaceObjectType.BALLISTIC_MISSILE;
@@ -93,20 +94,21 @@ export class MissileObject extends SpaceObject {
   }
 
   eci(_date?: Date): PosVel | null {
-    const t = this.getTimeInTrajectory();
-    const { gmst } = calcGmst(ServiceLocator.getTimeManager().simulationTimeObj);
-    const lat = this.latList[t];
-    const lon = this.lonList[t];
-    const alt = this.altList[t];
+    const now = ServiceLocator.getTimeManager().simulationTimeObj;
+    const { gmst } = calcGmst(now);
 
-    if (lat === undefined || lon === undefined || alt === undefined) {
+    if (this.altList.length === 0) {
       return null;
     }
 
+    // Interpolate between 1-second samples so the position (and info-box readouts /
+    // camera follow) is continuous rather than stepping once per second.
+    const sample = interpolateMissileSample(this.latList, this.lonList, this.altList, this.startTime, now.getTime());
+
     const lla = {
-      lat: (lat * DEG2RAD) as Radians,
-      lon: (lon * DEG2RAD) as Radians,
-      alt,
+      lat: (sample.lat * DEG2RAD) as Radians,
+      lon: (sample.lon * DEG2RAD) as Radians,
+      alt: sample.alt as Kilometers,
     };
 
     const eciPos = lla2eci(lla, gmst);

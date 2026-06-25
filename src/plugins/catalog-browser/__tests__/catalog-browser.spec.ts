@@ -20,7 +20,7 @@ test.describe('CatalogBrowserPlugin', () => {
 
     await expect(drawerItem).toBeVisible();
 
-    // Click the drawer item — should open side menu and select the icon
+    // Click the drawer item - should open side menu and select the icon
     await drawerItem.click();
     await expect(sideMenu).toBeVisible({ timeout: 5_000 });
     await expect(bottomIcon).toHaveClass(/bmenu-item-selected/u);
@@ -49,8 +49,9 @@ test.describe('CatalogBrowserPlugin', () => {
 
     await expect(catalogList).toBeVisible();
 
-    // Should have category headers (KeepTrack + 7 CelesTrack categories)
-    const categoryHeaders = catalogList.locator('.cb-category-header');
+    // Should have category headers (KeepTrack + 7 CelesTrack categories).
+    // Each v13 category card carries exactly one .kt-section-label.
+    const categoryHeaders = catalogList.locator('.kt-section-label');
 
     await expect(categoryHeaders).toHaveCount(8); // keeptrack, special, debris, weather, comms, nav, science, military
 

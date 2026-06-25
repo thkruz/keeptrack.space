@@ -1,0 +1,48 @@
+/**
+ * Create Satellite menu (v13+) tweaks.
+ *
+ * The Advanced and TLE tabs stack many Materialize fields, each with a floating
+ * "active" label that sits ~14px above its input. Two shared-stylesheet defaults
+ * don't suit a form this dense, so they are corrected here, scoped to this menu.
+ */
+
+/*
+ * 1. Stacked-field headroom. The shared v13 default
+ *    (`.kt-field-row .input-field.col { margin-top: 6px }`) is tuned for menus
+ *    that never stack more than one labelled row per card; here the floating
+ *    label collides with the row above. Rows that follow a Materialize <select>
+ *    are the tightest case — selects keep their v2 padding and carry no bottom
+ *    margin — so give every stacked row enough room for the label to clear.
+ */
+#createSat-menu .kt-field-row .input-field.col {
+  margin-top: 20px;
+}
+
+/*
+ * The first row in a card sits directly under the section label, which already
+ * provides separation, so it does not need the full floating-label headroom.
+ * (Targeted by adjacency because the section label is itself the first <div>,
+ * which would otherwise capture `:first-of-type`.)
+ */
+#createSat-menu .kt-section-label + .kt-field-row .input-field.col {
+  margin-top: 8px;
+}
+
+/*
+ * 2. Focus indication. KeepTrack marks field focus with the underline, not a
+ *    box (see the select rule in materialize-local.css). The app-wide
+ *    `:focus-visible` rule in style.common.css otherwise draws a 2px outline
+ *    (offset 2px) that overlaps the floating label above each field. Swap the
+ *    box for a primary-colored underline so the indicator stays inside the
+ *    field's own footprint.
+ */
+#createSat-menu .input-field input:focus,
+#createSat-menu .input-field textarea:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#createSat-menu .input-field input:focus-visible,
+#createSat-menu .input-field textarea:focus-visible {
+  outline: none;
+}

@@ -3,16 +3,48 @@
     "WatchlistPlugin": {
       "bottomIconLabel": "Lista obserwacyjna",
       "title": "Lista obserwacyjna",
-      "helpBody": "Menu listy obserwacyjnej pozwala utworzyć listę priorytetowych satelitów do śledzenia. Umożliwia szybkie odnalezienie satelitów, które najbardziej Cię interesują. Lista jest zapisywana w pamięci lokalnej przeglądarki i będzie dostępna przy następnej wizycie na stronie. <br><br> Gdy satelity z listy obserwacyjnej wejdą w pole widzenia wybranego czujnika, zostanie wyświetlone powiadomienie, narysowana linia od czujnika do satelity, a numer satelity zostanie wyświetlony na globie. <br><br> Funkcja nakładki wymaga wypełnienia listy obserwacyjnej."
-,
+      "help": {
+        "overview": "Lista obserwacyjna to Twoja lista priorytetowych satelitów. Jest zapisywana w przeglądarce, więc przetrwa ponowne załadowanie strony. Gdy wybrany jest czujnik, a satelita z listy obserwacyjnej wejdzie w jego pole widzenia, otrzymasz powiadomienie, od czujnika do satelity zostanie narysowana linia, a numer satelity pojawi się na globie.",
+        "imgAlt": "Menu listy obserwacyjnej z kilkoma dodanymi satelitami",
+        "imgCaption": "Lista obserwacyjna z kilkoma satelitami. Kliknij nazwę, aby wybrać satelitę; ikona zakładki go usuwa.",
+        "managingHeading": "Zarządzanie listą",
+        "managing": "<ul><li><strong>Dodaj</strong>: wpisz jeden lub więcej numerów NORAD oddzielonych przecinkami lub spacjami (działają też identyfikatory alpha-5, np. T0001) i kliknij ikonę dodawania lub naciśnij Enter.</li><li><strong>Szybkie dodawanie/usuwanie</strong>: gdy na globie wybrany jest dowolny satelita, kliknij ikonę zakładki obok jego nazwy w polu informacyjnym.</li><li><strong>Wybierz</strong>: kliknij numer lub nazwę satelity na liście, aby do niego przelecieć.</li><li><strong>Zapisz / Wczytaj</strong>: wyeksportuj listę jako plik JSON i wczytaj ją później lub udostępnij.</li><li><strong>Wyczyść</strong>: opróżnia całą listę.</li></ul>",
+        "howToUse": "<ol><li>Otwórz menu z dolnego paska lub naciśnij W.</li><li>Dodaj satelity według numeru NORAD, na przykład 25544 dla ISS.</li><li>Wybierz czujnik w menu Czujniki, aby zacząć otrzymywać powiadomienia o widoczności i linie od czujnika do satelity.</li><li>Otwórz menu dodatkowe (ikona koła zębatego), aby ukryć wszystkie obiekty spoza listy obserwacyjnej lub zmienić, kiedy rysowane są etykiety (Zawsze / Tylko FOV / Wyłączone).</li></ol>",
+        "tip1": "\"Ukryj inne obiekty\" zamienia glob w widok wyłącznie listy obserwacyjnej. To idealne rozwiązanie do śledzenia kilku obiektów bez bałaganu pełnego katalogu.",
+        "tip2": "Menu nakładki (czasy następnych przelotów dla każdego satelity z listy obserwacyjnej) działa dopiero wtedy, gdy lista obserwacyjna zawiera wpisy.",
+        "tip3": "Duplikaty są automatycznie ignorowane, a nieprawidłowe numery powodują wyświetlenie powiadomienia z nazwą satelity, którego nie znaleziono.",
+        "shortcutToggle": "Przełącz menu listy obserwacyjnej"
+      },
+      "labels": {
+        "newSatellites": "Nowe satelity",
+        "saveList": "Zapisz listę",
+        "loadList": "Wczytaj listę",
+        "clearList": "Wyczyść listę",
+        "hideOtherObjects": "Ukryj inne obiekty",
+        "labelAlways": "Zawsze",
+        "labelFovOnly": "Tylko FOV",
+        "labelOff": "Wyłączone",
+        "satellitesHeader": "Satelity",
+        "actionsHeader": "Akcje",
+        "displayHeader": "Wyświetlanie",
+        "labelsHeader": "Etykiety"
+      },
+      "msgs": {
+        "watchlistLoaded": "Wczytano listę obserwacyjną z {count} satelitami"
+      },
+      "errorMsgs": {
+        "NoradAlreadyInList": "NORAD: {sccNum} jest już na liście!",
+        "ObjectAlreadyInList": "Obiekt {id} jest już na liście!",
+        "SatNotFound": "Nie znaleziono satelity {id}!"
+      },
       "settings": {
         "satLabelMode": {
-          "label": "Satellite Label Mode",
-          "helpText": "Controls satellite label rendering on watchlist satellites.",
+          "label": "Tryb etykiet satelitów",
+          "helpText": "Steruje wyświetlaniem etykiet satelitów z listy obserwacyjnej.",
           "options": {
-            "off": "Off",
-            "fovOnly": "FOV Only",
-            "all": "All Watchlist"
+            "off": "Wyłączone",
+            "fovOnly": "Tylko FOV",
+            "all": "Cała lista obserwacyjna"
           }
         }
       }
@@ -20,7 +52,20 @@
     "WatchlistOverlay": {
       "bottomIconLabel": "Nakładka",
       "title": "Menu nakładki",
-      "helpBody": "<p> Nakładka listy obserwacyjnej pokazuje czas następnego przelotu dla każdego satelity na liście obserwacyjnej. Nakładka jest aktualizowana co 10 sekund. </p> <p> Nakładka jest oznaczona kolorami, aby pokazać czas do następnego przelotu. Kolory są następujące: </p> <ul> <li>Żółty - w polu widzenia</li> <li>Niebieski - czas do następnego przelotu wynosi do 30 minut po bieżącym czasie lub 10 minut przed bieżącym czasem</li> <li>Biały - każdy przyszły przelot niespełniający powyższych wymagań</li> </ul> <p> Kliknięcie satelity na nakładce wycentruje mapę na tym satelicie. </p>"
+      "helpBody": "<p> Nakładka listy obserwacyjnej pokazuje czas następnego przelotu dla każdego satelity na liście obserwacyjnej. Nakładka jest aktualizowana co 10 sekund. </p> <p> Nakładka jest oznaczona kolorami, aby pokazać czas do następnego przelotu. Kolory są następujące: </p> <ul> <li>Żółty - w polu widzenia</li> <li>Niebieski - czas do następnego przelotu wynosi do 30 minut po bieżącym czasie lub 10 minut przed bieżącym czasem</li> <li>Biały - każdy przyszły przelot niespełniający powyższych wymagań</li> </ul> <p> Kliknięcie satelity na nakładce wycentruje mapę na tym satelicie. </p>",
+      "openOverlayCmd": "Otwórz nakładkę Watchlist",
+      "addSatellitesToast": "Najpierw dodaj satelity do listy!",
+      "noPassesMsg": "Brak przelotów w ciągu 60 minut",
+      "inFovToast": "Satelita {sccNum} jest w polu widzenia!",
+      "leftFovToast": "Satelita {sccNum} opuścił pole widzenia!",
+      "tiers": {
+        "inView": "W ZASIĘGU",
+        "nextUp": "NASTĘPNY",
+        "upcoming": "NADCHODZĄCE",
+        "later": "PÓŹNIEJ",
+        "background": "TŁO",
+        "departed": "ODDALONE"
+      }
     }
   }
 }

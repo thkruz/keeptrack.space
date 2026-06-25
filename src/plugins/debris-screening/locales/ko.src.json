@@ -3,7 +3,6 @@
     "DebrisScreening": {
       "bottomIconLabel": "잔해물 스크리닝",
       "title": "잔해물 스크리닝",
-      "helpBody": "잔해물 스크리닝 도구는 선택한 위성을 카탈로그와 대조하여 잠재적인 접근을 식별합니다. <br><br> 평가 시간 창을 구성하고 '잔해물 스크리닝'을 클릭하여 분석을 실행합니다. 결과는 테이블에 표시됩니다: <ul style=\"margin-left: 40px;\"> <li><b>TCA</b> - 최근접 시간</li> <li><b>미스 거리</b> - 총합 및 RIC 구성요소</li> <li><b>Pc</b> - 충돌 확률</li> <li><b>위험 수준</b> - Pc 기반 위험/높음/중간/낮음</li> </ul>",
       "resultsTitle": "스크리닝 결과",
       "resultsCount": "{count}개의 접근이 발견됨",
       "exportCsv": "CSV 내보내기",
@@ -12,17 +11,56 @@
         "high": "높음",
         "medium": "중간",
         "low": "낮음",
-        "unknown": "N/A"
+        "unknown": "해당 없음"
+      },
+      "sccLabel": "위성 SCC 번호",
+      "timeWindowLabel": "시간 창",
+      "timeOptions": {
+        "h1": "1시간",
+        "h4": "4시간",
+        "h8": "8시간",
+        "h24": "24시간",
+        "h48": "48시간",
+        "h72": "72시간"
       },
       "uLabel": "U (반경방향)",
       "vLabel": "V (진행방향)",
       "wLabel": "W (교차방향)",
+      "screenForDebris": "잔해물 스크리닝 실행",
       "drawBox": "상자 그리기",
       "clearBox": "상자 지우기",
+      "table": {
+        "secondary": "2차 객체",
+        "tca": "TCA",
+        "missKm": "미스 거리 (km)",
+        "rKm": "R (km)",
+        "iKm": "I (km)",
+        "cKm": "C (km)",
+        "pc": "Pc",
+        "risk": "위험도"
+      },
       "errorMsgs": {
         "InvalidSatellite": "잘못된 위성이 선택됨",
         "ScreeningFailed": "스크리닝 실패",
         "NoResultsToExport": "내보낼 결과가 없습니다"
+      },
+      "help": {
+        "overview": "잔해물 스크리닝은 선택한 위성을 카탈로그의 나머지 물체와 대조하여 접근 평가를 실행합니다. 선택한 시간 창 동안 위성 주위에 정의한 스크리닝 상자 안에 들어오는 모든 물체를 찾아낸 뒤, 접근 이벤트를 충돌 확률 순으로 정렬합니다.",
+        "imgAlt": "시간 창과 스크리닝 상자 옵션이 표시된 잔해물 스크리닝 메뉴",
+        "imgCaption": "시간 창과 RIC 스크리닝 상자를 설정한 뒤, 선택한 위성을 카탈로그와 대조하여 스크리닝하세요.",
+        "boxHeading": "스크리닝 상자",
+        "box": "스크리닝 부피는 위성을 기준으로 한 RIC 좌표로 정의됩니다: <strong>U (반경방향)</strong>은 궤도 고도의 위아래, <strong>V (진행방향)</strong>은 비행 방향, <strong>W (교차방향)</strong>은 좌우입니다. 반경방향 크기가 가장 중요합니다. 대부분의 접근은 고도에서 뚜렷하게 분리되므로, U를 좁게 하고 V와 W를 넓게 잡는 것이 일반적입니다. <strong>상자 그리기</strong>는 3D 화면에서 위성 주위에 부피를 표시하고, <strong>상자 지우기</strong>는 이를 제거합니다.",
+        "resultsHeading": "결과 읽는 법",
+        "results": "결과 테이블의 각 행은 예측된 하나의 접근입니다: <strong>2차 객체</strong>는 상대 물체, <strong>TCA</strong>는 최근접 시각, <strong>미스 거리 (km)</strong>는 <strong>R</strong>, <strong>I</strong>, <strong>C</strong> 성분을 포함한 총 미스 거리, <strong>Pc</strong>는 충돌 확률이며, <strong>위험도</strong>는 이를 위험, 높음, 중간, 낮음으로 분류합니다. 행을 클릭하면 2차 객체가 선택되고 시계가 TCA로 이동합니다. 메뉴는 열린 상태로 유지되므로 이벤트를 차례로 살펴볼 수 있습니다. <strong>CSV 내보내기</strong>로 테이블을 저장할 수 있습니다.",
+        "howToUse": "<ol><li>위성을 선택하세요. 위성이 선택될 때까지 하단 아이콘은 비활성화됩니다.</li><li>하단 메뉴에서 <strong>잔해물 스크리닝</strong>을 엽니다. 위성의 SCC 번호가 자동으로 입력됩니다.</li><li><strong>시간 창</strong>(1~72시간)을 선택하고 필요하면 상자 크기 <strong>U</strong>, <strong>V</strong>, <strong>W</strong>를 조정하세요.</li><li><strong>잔해물 스크리닝 실행</strong>을 클릭합니다. 발견된 접근 이벤트가 정렬된 결과 패널이 열립니다.</li><li>아무 행이나 클릭하면 해당 접근을 최근접 시각 시점에서 살펴볼 수 있습니다.</li></ol>",
+        "tip1": "시간 창이 길고 상자가 클수록 더 많은 접근을 찾지만 계산 시간이 늘어납니다. 기본값으로 시작하고, 더 넓은 범위가 필요할 때만 늘리세요.",
+        "tip2": "행을 클릭해도 재생 상태는 유지됩니다. 시계가 일시정지 상태였다면 TCA에서 일시정지된 채로 남습니다.",
+        "tip3": "위험 수준은 Pc에 대한 임계값입니다. 1e-4 초과는 위험, 1e-6 초과는 높음, 1e-8 초과는 중간입니다."
+      },
+      "sections": {
+        "parameters": "매개변수",
+        "searchBox": "RIC 검색 상자",
+        "results": "결과"
       }
     }
   }

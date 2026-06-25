@@ -35,7 +35,6 @@ const triggerFrameUpdate = () => {
 describe('SatInfoBoxSensor', () => {
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager, SatInfoBox]);
-    window.M.AutoInit = vi.fn();
   });
 
   it('does not throw when updateSelectBox fires before the sensor DOM is created', () => {
@@ -71,7 +70,7 @@ describe('SatInfoBoxSensor', () => {
       const sunEl = getEl('sat-sun');
 
       expect(sunEl).toBeDefined();
-      expect(sunEl!.innerHTML).not.toBe('—');
+      expect(sunEl!.innerHTML).not.toBe('-');
     });
 
     it('should update the Sun field on per-frame updateSelectBox event', () => {
@@ -90,7 +89,7 @@ describe('SatInfoBoxSensor', () => {
       const sunEl = getEl('sat-sun');
 
       expect(sunEl).toBeDefined();
-      expect(sunEl!.innerHTML).not.toBe('—');
+      expect(sunEl!.innerHTML).not.toBe('-');
     });
 
     it('should show No Effect for radar sensors', () => {
@@ -98,7 +97,7 @@ describe('SatInfoBoxSensor', () => {
 
       websiteInit(plugin);
 
-      // defaultSensor is PHASED_ARRAY_RADAR — sun has no effect on radar
+      // defaultSensor is PHASED_ARRAY_RADAR - sun has no effect on radar
       setupSensorAndSat(defaultSensor);
       triggerFrameUpdate();
 
@@ -129,14 +128,14 @@ describe('SatInfoBoxSensor', () => {
 
       expect(sectionEl).toBeDefined();
 
-      // Now select a sensor — Sun field should update immediately via updateSensorVisibility_
+      // Now select a sensor - Sun field should update immediately via updateSensorVisibility_
       ServiceLocator.getSensorManager().currentSensors = [defaultSensor];
       EventBus.getInstance().emit(EventBusEvent.setSensor, defaultSensor, 0);
 
       // Section should now be visible
       expect(sectionEl!.style.display).not.toBe('none');
-      // Sun field should NOT show the placeholder — it should be updated immediately
-      expect(sunEl!.innerHTML).not.toBe('—');
+      // Sun field should NOT show the placeholder - it should be updated immediately
+      expect(sunEl!.innerHTML).not.toBe('-');
     });
 
     it('should show sun illumination status for optical sensors', () => {
@@ -171,7 +170,7 @@ describe('SatInfoBoxSensor', () => {
 
       expect(sunEl).toBeDefined();
       // For optical sensors during nighttime, should show the computed sun status
-      expect(sunEl!.innerHTML).not.toBe('—');
+      expect(sunEl!.innerHTML).not.toBe('-');
     });
   });
 });

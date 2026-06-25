@@ -11,6 +11,8 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 // Define the maneuver data interface based on orbitguard_output.json
@@ -25,6 +27,9 @@ export interface OrbitGuardEvent {
   stability_change_detection: number;
   stability_change_probability: number;
 }
+
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.OrbitGuardMenuPlugin.${key}` as Parameters<typeof t7e>[0]);
 
 export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
   readonly id = 'OrbitGuardMenuPlugin';
@@ -45,13 +50,13 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
     <div id="maneuver-detection-menu" class="side-menu-parent start-hidden">
       <div id="maneuver-detection-content" class="side-menu">
         <div class="row">
-          <h1 class="center-align">OrbitGuard</h1>
+          <h1 class="center-align">${l('title')}</h1>
           <table id="maneuver-detection-table" class="center-align"></table>
-          <sub class="center-align">*OrbitGuard Data provided by MSBAI.</sub>
+          <sub class="center-align">${l('labels.dataCredit')}</sub>
           <div id="pagination-controls" class="pagination">
-            <button id="prev-page" class="pagination-btn">Previous</button>
+            <button id="prev-page" class="pagination-btn">${l('labels.previous')}</button>
             <span id="current-page" class="pagination-text">Page 1</span>
-            <button id="next-page" class="pagination-btn">Next</button>
+            <button id="next-page" class="pagination-btn">${l('labels.next')}</button>
           </div>
         </div>
       </div>
@@ -169,7 +174,7 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
     const totalPages = Math.ceil(this.orbitGuardEvents.length / this.pageSize);
     const pageText = getEl('current-page') as HTMLElement;
 
-    pageText.innerText = `Page ${this.currentPage} of ${totalPages}`;
+    pageText.innerText = l('labels.pageOf').replace('{current}', this.currentPage.toString()).replace('{total}', totalPages.toString());
 
     const prevBtn = getEl('prev-page') as HTMLButtonElement;
     const nextBtn = getEl('next-page') as HTMLButtonElement;
@@ -223,17 +228,39 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
     });
   }
 
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/orbit-guard-menu/orbit-guard-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2')],
+    };
+  }
+
   private createHeaders_(tbl: HTMLTableElement) {
     const tr = tbl.insertRow();
     const names = [
-      'NORAD',
-      'Event Start Time',
-      'Event End Time',
-      'Maneuver Class',
-      'Maneuver Probability (%)',
-      'Orbit Out of Family',
-      'Stability Change',
-      'Stability Change Probability (%)',
+      l('table.norad'),
+      l('table.eventStartTime'),
+      l('table.eventEndTime'),
+      l('table.maneuverClass'),
+      l('table.maneuverProbability'),
+      l('table.orbitOutOfFamily'),
+      l('table.stabilityChange'),
+      l('table.stabilityChangeProbability'),
     ];
 
     for (const name of names) {

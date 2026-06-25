@@ -3,7 +3,58 @@
     "NewLaunch": {
       "bottomIconLabel": "Nuevo Lanzamiento",
       "title": "Menú de Nuevo Lanzamiento",
-      "helpBody": "El Menú de Nuevo Lanzamiento se usa para generar lanzamientos orbitales nocionales modificando satélites existentes con parámetros similares. <br><br> Después de seleccionar un satélite, puedes seleccionar una ubicación de lanzamiento y un azimut norte/sur. El satélite seleccionado será modificado para alinearlo con el sitio de lanzamiento. El reloj se cambia entonces a 00:00:00 para representar el tiempo relativo después del lanzamiento. Esto puede ser útil para calcular la cobertura del sensor relativa al tiempo de lanzamiento. La relación del objeto con otros objetos orbitales será incorrecta."
+      "sideMenuTitle": "Nuevo Lanzamiento",
+      "leoOptimizedNote": "Nota: Esta herramienta está optimizada para satélites LEO y puede no funcionar correctamente para órbitas HEO o GEO.",
+      "labels": {
+        "satelliteScc": "SCC# del satélite",
+        "inclination": "Inclinación",
+        "launchingNorthOrSouth": "Lanzamiento hacia el Norte o el Sur",
+        "launchFacility": "Instalación de Lanzamiento",
+        "north": "Norte",
+        "south": "Sur"
+      },
+      "sections": {
+        "template": "Plantilla",
+        "launchSite": "Sitio de lanzamiento"
+      },
+      "buttons": {
+        "createLaunchNominal": "Crear Lanzamiento Nominal",
+        "inclinationTooLow": "¡Inclinación demasiado baja!"
+      },
+      "msgs": {
+        "launchNominalCreated": "¡Lanzamiento nominal creado!",
+        "timeRelativeToLaunch": "El tiempo ahora es relativo a la hora de lanzamiento."
+      },
+      "errorMsgs": {
+        "noMoreNominalSatellites": "¡No hay más satélites nominales disponibles!",
+        "launchSiteNotFound": "¡Sitio de lanzamiento {launchSite} no encontrado!",
+        "failedToCreateTle": "Error al crear el TLE: {error}",
+        "invalidTle1Length": "TLE1 creado no válido: la longitud no es 69 - {tle}",
+        "invalidTle2Length": "TLE2 creado no válido: la longitud no es 69 - {tle}",
+        "failedAltitudeTest": "Prueba de altitud fallida - ¡pruebe con otro satélite!",
+        "cruncherFailed": "¡El cruncher no cumplió el requisito tras varios intentos! ¿Es siquiera posible este lanzamiento?",
+        "errorCreatingSatRecord": "¡Error al crear el registro del satélite!",
+        "launchSiteNotInCatalog": "Sitio de lanzamiento {name} no encontrado en el catálogo launchSites.",
+        "invalidEccentricityFormat": "¡Formato de excentricidad no válido!",
+        "eccentricityFormatIssue": "Hubo un problema con el formato de excentricidad de este satélite. Pruebe con otro satélite.",
+        "invalidEpochYearFormat": "¡Formato de año de época no válido!",
+        "epochYearFormatIssue": "Hubo un problema con el formato de año de época de este satélite. Pruebe con otro satélite.",
+        "invalidEpochDayFormat": "¡Formato de día de época no válido! Debe tener 3 dígitos, un punto decimal y 8 dígitos después del punto.",
+        "epochDayFormatIssue": "Hubo un problema con el formato de día de época de este satélite. Pruebe con otro satélite.",
+        "failedToPropagate": "No se pudo propagar el satélite. Pruebe otros parámetros o informe de este problema si los parámetros son correctos.",
+        "changingOrbitBufferFailed": "Error al cambiar los datos del búfer de órbita"
+      },
+      "help": {
+        "overview": "El Menú de Nuevo Lanzamiento crea un lanzamiento nocional: copia la órbita de un satélite real, la rota para que despegue desde el sitio de lanzamiento que elijas y reinicia el reloj a T+0. Úsalo para responder \"si algo se lanza desde este sitio hacia este tipo de órbita, ¿cuándo lo verán mis sensores?\"",
+        "imgAlt": "El Menú de Nuevo Lanzamiento con opciones de instalación de lanzamiento y dirección",
+        "imgCaption": "Elige un satélite plantilla, una instalación de lanzamiento y un lanzamiento hacia el norte o hacia el sur.",
+        "howToUse": "<ol><li>Selecciona un satélite cuya órbita se parezca a la carga útil esperada; su inclinación y altitud se convierten en la plantilla. El icono está deshabilitado hasta que se selecciona un satélite.</li><li>Abre el menú y elige una <strong>Instalación de Lanzamiento</strong> (agrupadas por país) y si el lanzamiento se dirige hacia el <strong>Norte o el Sur</strong>.</li><li>Haz clic en <strong>Crear Lanzamiento Nominal</strong>. Se crea un nuevo objeto simulado en la órbita rotada y el reloj se reinicia a 00:00:00; el tiempo ahora es relativo al despegue.</li><li>Abre los menús de cobertura de sensores (Ángulos de Observación, Observaciones Multi-Sitio) para ver cuándo el nominal se vuelve visible por primera vez tras el lanzamiento.</li></ol>",
+        "limitsHeading": "Limitaciones",
+        "limits": "<ul><li>La inclinación de la plantilla debe ser al menos la latitud del sitio de lanzamiento: no puedes lanzar a una órbita con menos inclinación que el lugar desde donde lanzas, así que el botón se deshabilita en ese caso.</li><li>La herramienta está optimizada para LEO; las plantillas altamente elípticas o GEO pueden fallar.</li><li>El nominal es simulado: su posición relativa a otros objetos del catálogo no es significativa.</li><li>El satélite plantilla seleccionado queda sin cambios; el nominal es un objeto separado en una ranura del catálogo de analista.</li></ul>",
+        "tip1": "Tras la creación, el reloj muestra el tiempo desde el despegue: \"00:45:00\" significa 45 minutos después del lanzamiento, perfecto para cronologías de cobertura de sensores.",
+        "tip2": "Si la creación falla en su comprobación de altitud, prueba con otro satélite plantilla con una órbita más convencional.",
+        "shortcutOpen": "Abrir el menú de Nuevo lanzamiento"
+      }
     }
   }
 }

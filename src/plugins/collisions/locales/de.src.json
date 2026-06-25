@@ -3,10 +3,37 @@
     "Collisions": {
       "bottomIconLabel": "Kollisionen",
       "title": "Kollisionen-Menü",
-      "helpBody": "Das Kollisionen-Menü zeigt Satelliten mit einer hohen Kollisionswahrscheinlichkeit. <br><br> Durch Klicken auf eine Zeile werden die beiden an der Kollision beteiligten Satelliten ausgewählt und die Zeit auf den Zeitpunkt der Kollision geändert.",
+      "toolbar": {
+        "fetchData": "Daten abrufen",
+        "refresh": "Aktualisieren"
+      },
+      "table": {
+        "toca": "TOCA",
+        "sat1": "#1",
+        "sat2": "#2",
+        "maxProb": "Max. Wahrscheinlichkeit",
+        "minRange": "Min. Abstand (km)",
+        "relSpeed": "Rel. Geschwindigkeit (km/s)"
+      },
+      "dataSource": "Kollisionsdaten bereitgestellt von CelesTrak über {link}.",
+      "help": {
+        "overview": "Das Kollisionen-Menü listet bevorstehende enge Annäherungen (Konjunktionen) zwischen katalogisierten Objekten auf und nutzt dafür die SOCRATES-Konjunktionsdaten von CelesTrak. Jede Zeile ist ein vorhergesagtes Ereignis mit seiner Wahrscheinlichkeit und Geometrie, und ein Klick auf eine Zeile bringt Sie in der Simulation direkt dorthin.",
+        "imgAlt": "Das Kollisionen-Menü mit einer Tabelle bevorstehender Konjunktionen",
+        "imgCaption": "Bevorstehende Konjunktionen aus SOCRATES, so sortiert, dass die riskantesten Ereignisse auf einen Blick sichtbar sind.",
+        "columnsHeading": "Die Tabelle lesen",
+        "columns": "<ul><li><strong>TOCA</strong>: Zeitpunkt der größten Annäherung (UTC).</li><li><strong>#1 / #2</strong>: die NORAD-IDs der beiden beteiligten Objekte.</li><li><strong>Max. Wahrscheinlichkeit</strong>: die maximale geschätzte Kollisionswahrscheinlichkeit.</li><li><strong>Min. Abstand (km)</strong>: vorhergesagter Vorbeiflugabstand bei der größten Annäherung.</li><li><strong>Rel. Geschwindigkeit (km/s)</strong>: wie schnell die Objekte aneinander vorbeiziehen.</li></ul>",
+        "howToUse": "<ol><li>Öffnen Sie das Menü und klicken Sie auf das Download-Symbol, um die neuesten SOCRATES-Daten abzurufen (Internetverbindung erforderlich).</li><li>Klicken Sie auf eine beliebige Zeile: Die Simulationszeit springt auf 30 Sekunden vor die größte Annäherung, das erste Objekt wird ausgewählt und beide IDs werden in die Suchleiste geladen.</li><li>Verfolgen Sie die Konjunktion auf dem Globus oder pausieren Sie und gehen Sie sie mit der Zeitsteuerung schrittweise durch.</li><li>Verwenden Sie das Aktualisieren-Symbol, um später aktualisierte Daten abzurufen.</li></ol>",
+        "tip1": "SOCRATES-Daten werden von CelesTrak regelmäßig aktualisiert; es handelt sich um ein Screening-Produkt, nicht um ein Echtzeit-Warnsystem.",
+        "tip2": "Nach dem Klick auf eine Zeile befinden sich beide Objekte in der Suchleiste; klicken Sie auf das zweite in den Ergebnissen, um es zu untersuchen oder als Sekundärobjekt festzulegen.",
+        "tip3": "Die Simulation springt auf 30 Sekunden vor das Ereignis, damit Sie die Annäherung beobachten können statt nur die Folgen."
+      },
       "errorMsgs": {
         "noCollisionsData": "Keine Kollisionsdaten gefunden!",
         "errorProcessingCollisions": "Fehler bei der Verarbeitung der SOCRATES-Daten!"
+      },
+      "labels": {
+        "dataActions": "Konjunktionsdaten",
+        "results": "Bevorstehende Konjunktionen"
       }
     }
   }

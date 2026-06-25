@@ -5,6 +5,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
+import { shake } from '@app/engine/utils/shake';
 import { settingsManager } from '@app/settings/settings';
 import appsPng from '@public/img/icons/apps.png';
 import leftPanelClosePng from '@public/img/icons/left-panel-close.png';
@@ -12,11 +13,11 @@ import leftPanelOpenPng from '@public/img/icons/left-panel-open.png';
 import searchPng from '@public/img/icons/search.png';
 import ktsOrangeLogoPng from '@public/img/kts-orange-logo.png';
 import {
-  type DrawerBadge, type DrawerGroup, type DrawerItemData,
-  buildRecentGroupFromCache, collectDrawerItems, loadRecentPlugins, renderBadge,
-  renderStatusFooter, renderUtilityFooter, saveRecentPlugins,
+  type DrawerBadge, type DrawerGroup, type DrawerItemData, type RecentEntry,
+  buildRecentGroupFromCache, collectDrawerItems, loadRecents, recordRecent, renderBadge,
+  renderStatusFooter, renderUtilityFooter,
   syncBadgesFromEvents, syncInitialUtilityState, syncUtilityFooterState,
-  trackRecentPlugin, updateConnectivityStatus, updatePhoneLinkState,
+  updateConnectivityStatus, updatePhoneLinkState,
 } from './plugin-drawer-helpers';
 import './plugin-drawer.css';
 
@@ -28,7 +29,6 @@ export class PluginDrawer {
   private overlayEl_: HTMLElement | null = null;
   private hamburgerEl_: HTMLElement | null = null;
   private groupStates_: Record<string, boolean> = {};
-  private recentPluginIds_: string[] = [];
   private readonly allDrawerItems_: Map<string, DrawerItemData> = new Map();
   private isRailMode_ = false;
   private readonly badges_: Map<string, DrawerBadge> = new Map();
@@ -43,7 +43,6 @@ export class PluginDrawer {
     }
 
     this.loadGroupStates_();
-    this.recentPluginIds_ = loadRecentPlugins();
 
     // Rail mode is automatic on tablet+ (non-mobile)
     this.isRailMode_ = !this.isMobileMode_;
@@ -106,6 +105,8 @@ export class PluginDrawer {
     this.isOpen_ = true;
     this.exitRailMode_();
     this.syncActiveState_();
+    // Re-read recents so activations made from the Launchpad show up here too.
+    this.refreshRecentGroup_();
     this.drawerEl_?.classList.add('open');
     this.overlayEl_?.classList.add('open');
     this.hamburgerEl_?.classList.add('open');
@@ -335,12 +336,27 @@ export class PluginDrawer {
       drawerContent.addEventListener('click', (evt: Event) => {
         const itemEl = (evt.target as HTMLElement).closest('.drawer-item') as HTMLElement | null;
 
-        if (!itemEl || itemEl.classList.contains('disabled')) {
+        if (!itemEl) {
           return;
         }
 
         const pluginId = itemEl.dataset.pluginId;
         const topMenuId = itemEl.dataset.topMenuId;
+
+        // A disabled item should explain itself rather than silently ignore the
+        // click. Shake it for feedback, and for a plugin item forward the click
+        // so the plugin's onBottomIconClick can toast *why* it is unavailable
+        // (e.g. "add a satellite to the watchlist"). The base handler's
+        // isIconDisabled guard keeps the side menu from opening, matching the
+        // bottom-bar behavior; the drawer stays open so the hint is visible.
+        if (itemEl.classList.contains('disabled')) {
+          shake(itemEl);
+          if (pluginId) {
+            EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, pluginId);
+          }
+
+          return;
+        }
 
         if (pluginId) {
           ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
@@ -686,9 +702,8 @@ export class PluginDrawer {
   // ---- Recent Plugins ----
 
   private trackRecentPlugin_(pluginId: string): void {
-    this.recentPluginIds_ = trackRecentPlugin(this.recentPluginIds_, pluginId);
-    saveRecentPlugins(this.recentPluginIds_);
-    this.refreshRecentGroup_();
+    // recordRecent returns the updated list, so reuse it instead of re-reading storage.
+    this.refreshRecentGroup_(recordRecent(pluginId));
   }
 
   private buildRecentGroup_(menuGroups: Record<string, DrawerGroup>): DrawerGroup {
@@ -701,10 +716,10 @@ export class PluginDrawer {
       }
     }
 
-    return buildRecentGroupFromCache(this.recentPluginIds_, this.allDrawerItems_);
+    return buildRecentGroupFromCache(loadRecents().map((entry) => entry.id), this.allDrawerItems_);
   }
 
-  private refreshRecentGroup_(): void {
+  private refreshRecentGroup_(entries: RecentEntry[] = loadRecents()): void {
     const contentEl = getEl('drawer-content', true);
 
     if (!contentEl) {
@@ -716,7 +731,7 @@ export class PluginDrawer {
 
     oldRecent?.remove();
 
-    const recentGroup = buildRecentGroupFromCache(this.recentPluginIds_, this.allDrawerItems_);
+    const recentGroup = buildRecentGroupFromCache(entries.map((entry) => entry.id), this.allDrawerItems_);
 
     if (recentGroup.items.length === 0) {
       return;

@@ -3,7 +3,22 @@
     "StereoMap": {
       "bottomIconLabel": "Carte stéréographique",
       "title": "Menu Carte stéréographique",
-      "helpBody": "Le menu Carte stéréographique permet de visualiser les traces au sol des satellites en projection stéréographique. <br/><br/> Vous pouvez cliquer sur un point de la trace pour changer l'heure de la simulation à ce moment précis. <br/><br/> Les points jaunes indiquent que le satellite est visible du capteur. Les points rouges indiquent qu'il ne l'est pas. Le point le plus proche du satellite correspond à l'heure actuelle.",
+      "help": {
+        "overview": "La Carte stéréographique projette la trace au sol du satellite sélectionné sur une carte plane de la Terre. Elle montre où se trouve le satellite en ce moment, la trajectoire qu'il suivra au cours de la prochaine orbite et, lorsqu'un capteur est sélectionné, exactement quand il sera visible depuis ce capteur. La carte se met à jour automatiquement à mesure que le temps de la simulation avance.",
+        "imgAlt": "Carte stéréographique montrant la trace au sol d'un satellite avec les segments visibles mis en évidence",
+        "imgCaption": "La trace au sol d'un satellite. L'icône du satellite marque la position actuelle ; les icônes radar marquent les capteurs sélectionnés.",
+        "readingTheMapHeading": "Lire la carte",
+        "readingTheMap": "<ul><li><strong>Icône du satellite</strong> : la position actuelle du satellite. Elle se déplace à mesure que le temps avance.</li><li><strong>Trace et points jaunes</strong> : parties de l'orbite où le satellite se trouve dans le champ de vision d'un capteur sélectionné.</li><li><strong>Trace et points rouges</strong> : parties de l'orbite où aucun capteur sélectionné ne peut voir le satellite. Sans capteur sélectionné, toute la trace est rouge.</li><li><strong>Icônes radar</strong> : les emplacements au sol des capteurs actuellement sélectionnés.</li></ul>",
+        "howToUse": "<ol><li>Sélectionnez un satellite, par exemple recherchez \"ISS\" et cliquez sur un résultat.</li><li>Sélectionnez éventuellement un capteur dans le menu Capteurs pour que les fenêtres de visibilité apparaissent en jaune.</li><li>Ouvrez la Carte stéréographique depuis le menu du bas (l'icône est désactivée tant qu'aucun satellite n'est sélectionné).</li><li>Cliquez sur n'importe quel point de la trace au sol pour amener le temps de la simulation au moment où le satellite atteint ce point.</li><li>Utilisez le bouton de téléchargement pour enregistrer la carte actuelle en image PNG.</li></ol>",
+        "tip1": "Cliquez sur un point jaune pour passer directement à un prochain passage au-dessus du capteur, puis observez le passage sur le globe 3D.",
+        "tip2": "La carte se redessine environ toutes les 30 secondes ; sélectionner un nouveau satellite ou cliquer sur un point la rafraîchit immédiatement.",
+        "tip3": "La carte est également disponible depuis la palette de commandes : \"Basculer la Carte stéréographique\" et \"Exporter la Carte stéréographique\".",
+        "shortcutToggle": "Basculer la Carte stéréographique"
+      },
+      "commands": {
+        "toggle": "Basculer la Carte stéréographique",
+        "export": "Exporter la Carte stéréographique"
+      },
       "labels": {
         "orbitsToDisplay": "Orbites à afficher",
         "showGraticule": "Afficher le graticule",

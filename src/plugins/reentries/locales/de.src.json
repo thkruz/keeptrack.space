@@ -3,7 +3,56 @@
     "Reentries": {
       "bottomIconLabel": "Wiedereintritte",
       "title": "Wiedereintritte",
-      "helpBody": "Das Wiedereintritte-Menü hat zwei Tabs: <br><br> <b>TIP Nachrichten</b> zeigt aktuelle und bevorstehende Satelliten-Wiedereintritts-Vorhersagen des US Space Command. Durch Klicken auf eine Zeile wird der Satellit ausgewählt und die Zeit auf den vorhergesagten Zerfallszeitpunkt geändert. <br><br> <b>Wiedereintritts-Analyse</b> zeigt Objekte sortiert nach niedrigstem Perigäum, die am wahrscheinlichsten in die Atmosphäre eintreten werden. Klicken Sie auf eine Zeile, um den Satelliten auszuwählen.",
+      "tabLabels": {
+        "tipMessages": "TIP Nachrichten",
+        "reentryAnalysis": "Wiedereintritts-Analyse"
+      },
+      "toolbar": {
+        "fetchData": "Daten abrufen",
+        "refresh": "Aktualisieren",
+        "flyToCorridor": "Zum Korridor fliegen",
+        "flyToCorridorTooltip": "Wenn aktiviert, fliegt ein Klick auf eine TIP-Zeile die Kamera zum vorhergesagten Wiedereintrittskorridor auf dem Globus, anstatt dem Objekt zu folgen."
+      },
+      "table": {
+        "norad": "NORAD",
+        "decayDate": "Zerfallsdatum",
+        "latitude": "Breitengrad",
+        "longitude": "Längengrad",
+        "window": "Fenster (min)",
+        "nextReport": "Nächster Bericht (Std)",
+        "reentryAngle": "Wiedereintrittswinkel (Grad)",
+        "rcs": "RCS (m^2)",
+        "gpAge": "GP-Alter (Std)",
+        "dryMass": "Trockenmasse (kg)",
+        "volume": "Volumen (m^3)",
+        "name": "Name",
+        "type": "Typ",
+        "perigee": "Perigäum (km)",
+        "apogee": "Apogäum (km)",
+        "meanAlt": "Mittlere Höhe (km)",
+        "incl": "Inkl. (°)",
+        "rcsSup": "RCS (m²)"
+      },
+      "labels": {
+        "reentered": "Wiedereingetreten",
+        "payload": "Nutzlast",
+        "rocketBody": "R/B",
+        "debris": "Trümmer",
+        "dataActions": "Datenaktionen",
+        "results": "Ergebnisse"
+      },
+      "help": {
+        "overview": "Das Wiedereintritte-Menü verfolgt Objekte, die aus der Umlaufbahn fallen. Es hat zwei Tabs: offizielle Wiedereintritts-Vorhersagen des US Space Command und eine Live-Analyse der niedrigsten Objekte im Katalog.",
+        "imgAlt": "Das Wiedereintritte-Menü mit der Tabelle der TIP Nachrichten",
+        "imgCaption": "TIP-Wiedereintritts-Vorhersagen. Ein Klick auf eine Zeile springt in der Simulation zum vorhergesagten Zerfallszeitpunkt.",
+        "tabsHeading": "Die zwei Tabs",
+        "tabs": "<ul><li><strong>TIP Nachrichten</strong>: Tracking-and-Impact-Prediction-Nachrichten, veröffentlicht vom US Space Command, mit vorhergesagtem Zerfallszeitpunkt, Ort, Unsicherheitsfenster (Minuten), Wiedereintrittswinkel, RCS und Masse. Ein Klick auf eine Zeile wählt das Objekt aus und springt mit der Simulationszeit zur vorhergesagten Zerfallsepoche.</li><li><strong>Wiedereintritts-Analyse</strong>: rund 200 katalogisierte Objekte, sortiert nach niedrigstem Perigäum. Die Zeilen sind farblich codiert: Rot bedeutet Perigäum unter 120 km (Wiedereintritt steht unmittelbar bevor), Gelb bedeutet 120–160 km (hohes Risiko). Ein Klick auf eine Zeile wählt das Objekt aus.</li></ul>",
+        "howToUse": "<ol><li>Öffnen Sie das Menü über die untere Leiste oder drücken Sie R.</li><li>Klicken Sie auf das Download-Symbol, um die neuesten TIP-Daten abzurufen (erfordert eine Internetverbindung).</li><li>Klicken Sie auf eine Vorhersage, um zu diesem Objekt zum vorhergesagten Zerfallszeitpunkt zu fliegen.</li><li>Wechseln Sie zum Tab Wiedereintritts-Analyse, um zu sehen, was als Nächstes verglüht; er wird beim ersten Öffnen geladen.</li></ol>",
+        "tip1": "Ein Eintrag \"Wiedereingetreten\" in der Spalte Mittlere Höhe bedeutet, dass das Objekt nicht mehr propagiert werden kann; es ist höchstwahrscheinlich bereits verglüht.",
+        "tip2": "TIP-Vorhersagen tragen echte Unsicherheit: Die Spalte Fenster gibt die Unsicherheit in Minuten an, was ganze Kontinente an Bodenspur umfassen kann.",
+        "tip3": "Ein Klick auf eine TIP-Zeile ändert die Simulationsuhr stillschweigend auf die Zerfallsepoche; verwenden Sie die Zeitsteuerung, um in die Gegenwart zurückzukehren.",
+        "shortcutToggle": "Wiedereintritte-Menü umschalten"
+      },
       "dataSource": "Tracking and Impact Prediction (TIP) Nachrichten bereitgestellt vom US Space Command (USSPACECOM).",
       "errorMsgs": {
         "noTipData": "Keine TIP-Daten gefunden!",

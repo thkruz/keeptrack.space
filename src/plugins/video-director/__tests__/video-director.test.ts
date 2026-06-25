@@ -1,8 +1,9 @@
-import { vi } from 'vitest';
 import { getEl } from '@app/engine/utils/get-el';
 import { VideoDirectorPlugin } from '@app/plugins/video-director/video-director';
+import { DIRECTION_TOGGLES, getOppositeToDisable, parseSpeed, SPEED_CONFIGS } from '@app/plugins/video-director/video-director-core';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
-import { standardPluginSuite, standardPluginMenuButtonTests, standardClickTests, standardChangeTests } from '@test/generic-tests';
+import { standardChangeTests, standardClickTests, standardPluginMenuButtonTests, standardPluginSuite } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('VideoDirectorPlugin', () => {
   beforeEach(() => {
@@ -19,25 +20,60 @@ describe('VideoDirectorPlugin', () => {
   standardChangeTests(VideoDirectorPlugin);
 });
 
-const ALL_TOGGLES = [
-  'video-director-rotateL', 'video-director-rotateR', 'video-director-rotateU', 'video-director-rotateD',
-  'video-director-panL', 'video-director-panR', 'video-director-panU', 'video-director-panD',
-  'video-director-zoomIn', 'video-director-zoomOut',
-];
+describe('video-director-core', () => {
+  describe('parseSpeed', () => {
+    it('falls back to the default for blank or non-numeric input', () => {
+      const cfg = { def: 0.5, min: 0, max: 1 };
 
-const AUTO_FLAGS = [
-  'isAutoRotateL', 'isAutoRotateR', 'isAutoRotateU', 'isAutoRotateD',
-  'isAutoPanL', 'isAutoPanR', 'isAutoPanU', 'isAutoPanD', 'isAutoZoomIn', 'isAutoZoomOut',
-];
+      expect(parseSpeed('', cfg)).toBe(0.5);
+      expect(parseSpeed('abc', cfg)).toBe(0.5);
+      expect(parseSpeed(null, cfg)).toBe(0.5);
+      expect(parseSpeed(undefined, cfg)).toBe(0.5);
+    });
 
-type VideoStatics = {
-  onFormChange(e: unknown): void;
-  onSubmit(e: unknown): void;
-};
+    it('clamps to the configured bounds', () => {
+      const cfg = { def: 0.5, min: 0, max: 1 };
+
+      expect(parseSpeed('5', cfg)).toBe(1);
+      expect(parseSpeed('-3', cfg)).toBe(0);
+    });
+
+    it('passes through valid in-range values', () => {
+      expect(parseSpeed('0.25', { def: 0.5, min: 0, max: 1 })).toBe(0.25);
+    });
+  });
+
+  describe('getOppositeToDisable', () => {
+    it('returns the opposite id when a direction is turned on', () => {
+      expect(getOppositeToDisable('video-director-rotateL', true)).toBe('video-director-rotateR');
+      expect(getOppositeToDisable('video-director-zoomIn', true)).toBe('video-director-zoomOut');
+    });
+
+    it('returns null when the toggle is turned off', () => {
+      expect(getOppositeToDisable('video-director-rotateL', false)).toBeNull();
+    });
+
+    it('returns null for a non-direction element', () => {
+      expect(getOppositeToDisable('video-director-rotateSpeed', true)).toBeNull();
+    });
+  });
+
+  it('pairs every direction toggle with a reciprocal opposite', () => {
+    DIRECTION_TOGGLES.forEach((toggle) => {
+      const opposite = DIRECTION_TOGGLES.find((t) => t.id === toggle.opposite);
+
+      expect(opposite).toBeDefined();
+      expect(opposite!.opposite).toBe(toggle.id);
+    });
+  });
+
+  it('exposes the three speed configs in order', () => {
+    expect(SPEED_CONFIGS.map((c) => c.flag)).toEqual(['autoRotateSpeed', 'autoPanSpeed', 'autoZoomSpeed']);
+  });
+});
 
 describe('VideoDirectorPlugin form handlers', () => {
   let plugin: VideoDirectorPlugin;
-  const statics = VideoDirectorPlugin as unknown as VideoStatics;
 
   beforeEach(() => {
     setupStandardEnvironment();
@@ -52,52 +88,67 @@ describe('VideoDirectorPlugin form handlers', () => {
     getEl('video-director-menu')?.remove();
   });
 
-  it('onFormChange throws when the event is missing', () => {
-    expect(() => statics.onFormChange(undefined)).toThrow();
+  it('throws when the change event is missing', () => {
+    expect(() => plugin.triggerFormChange(undefined as unknown as Event)).toThrow();
   });
 
-  it('onSubmit throws when the event is missing', () => {
-    expect(() => statics.onSubmit(undefined)).toThrow();
+  it('turns off the opposite direction when one is enabled', () => {
+    const rotateL = getEl('video-director-rotateL') as HTMLInputElement;
+    const rotateR = getEl('video-director-rotateR') as HTMLInputElement;
+
+    rotateR.checked = true;
+    rotateL.checked = true;
+    plugin.triggerFormChange({ target: rotateL } as unknown as Event);
+
+    expect(rotateR.checked).toBe(false);
+    expect(settingsManager.isAutoRotateL).toBe(true);
+    expect(settingsManager.isAutoRotateR).toBe(false);
   });
 
-  it('onFormChange enables a toggle, hides opposites and stores the selected color', () => {
-    // Every toggle on, every auto-flag off, so each opposing-direction guard fires.
-    ALL_TOGGLES.forEach((id) => {
-      (getEl(id) as HTMLInputElement).checked = true;
-    });
-    AUTO_FLAGS.forEach((flag) => {
-      (settingsManager as unknown as Record<string, boolean>)[flag] = false;
-    });
-    (getEl('video-director-selectedColor') as HTMLInputElement).checked = true;
+  it('hides the selected dot and stores the fallback color', () => {
+    const selectedColor = getEl('video-director-selectedColor') as HTMLInputElement;
 
-    statics.onFormChange({ target: getEl('video-director-rotateL') });
+    selectedColor.checked = true;
+    plugin.triggerFormChange({ target: selectedColor } as unknown as Event);
 
     expect(settingsManager.selectedColor).toEqual([0, 0, 0, 0]);
     expect(settingsManager.selectedColorFallback).toEqual([1, 1, 1, 1]);
   });
 
-  it('onFormChange plays the disable sound and restores the color when the selected toggle is off', () => {
-    const rotateL = getEl('video-director-rotateL') as HTMLInputElement;
+  it('restores the color when the selected-dot toggle is off', () => {
+    const selectedColor = getEl('video-director-selectedColor') as HTMLInputElement;
 
-    rotateL.checked = false;
-    (getEl('video-director-selectedColor') as HTMLInputElement).checked = false;
-
-    statics.onFormChange({ target: rotateL });
+    selectedColor.checked = false;
+    plugin.triggerFormChange({ target: selectedColor } as unknown as Event);
 
     expect(settingsManager.selectedColor).toEqual(settingsManager.selectedColorFallback);
   });
 
-  it('onFormChange takes the default branch for non-toggle targets', () => {
-    expect(() => statics.onFormChange({ target: getEl('video-director-rotateSpeed') })).not.toThrow();
+  it('sanitizes invalid speed input back to the field default (no NaN)', () => {
+    const rotateSpeed = getEl('video-director-rotateSpeed') as HTMLInputElement;
+
+    rotateSpeed.value = 'not-a-number';
+    plugin.triggerFormChange({ target: rotateSpeed } as unknown as Event);
+
+    expect(settingsManager.autoRotateSpeed).toBe(0.000075);
+    expect(Number.isNaN(settingsManager.autoRotateSpeed)).toBe(false);
   });
 
-  it('onSubmit persists the rotate/pan/zoom flags', () => {
-    const e = { preventDefault: vi.fn() };
+  it('writes the Black Earth scene flag', () => {
+    const blackEarth = getEl('video-director-blackEarth') as HTMLInputElement;
 
-    (getEl('video-director-rotateR') as HTMLInputElement).checked = true;
-    statics.onSubmit(e);
+    blackEarth.checked = true;
+    plugin.triggerFormChange({ target: blackEarth } as unknown as Event);
 
-    expect(e.preventDefault).toHaveBeenCalled();
-    expect(settingsManager.isAutoRotateR).toBe(true);
+    expect(settingsManager.isBlackEarth).toBe(true);
+  });
+
+  it('writes the Milky Way scene flag', () => {
+    const milkyWay = getEl('video-director-milkyWay') as HTMLInputElement;
+
+    milkyWay.checked = false;
+    plugin.triggerFormChange({ target: milkyWay } as unknown as Event);
+
+    expect(settingsManager.isDrawMilkyWay).toBe(false);
   });
 });

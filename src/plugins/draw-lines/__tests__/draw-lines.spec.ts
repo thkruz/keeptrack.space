@@ -7,10 +7,13 @@ test.describe('DrawLinesPlugin', () => {
       plugins: { DrawLinesPlugin: { enabled: true } },
     });
 
-    // DrawLinesPlugin is RMB-only (no bottom icon, no side menu).
     // Verify that right-click menu L1 and L2 items are injected into the DOM.
     await expect(page.locator('#draw-rmb')).toBeAttached();
     await expect(page.locator('#draw-rmb-menu')).toBeAttached();
+
+    // The plugin also exposes a v13 bottom icon + side menu.
+    await expect(page.locator('#draw-lines-bottom-icon')).toBeAttached();
+    await expect(page.locator('#draw-lines-menu')).toBeAttached();
 
     // Verify individual line-drawing options exist
     await expect(page.locator('#line-eci-axis-rmb')).toBeAttached();

@@ -3,8 +3,27 @@
     "FindSatPlugin": {
       "bottomIconLabel": "Buscar satélite",
       "title": "Buscar satélite",
-      "helpBody": "El menú Buscar satélite permite buscar satélites según varios criterios:<br><br><ul style=\"margin-left: 40px;\"><li><strong>Tipo de objeto</strong> - Filtrar por carga útil, cuerpo de cohete o escombros</li><li><strong>País</strong> - Filtrar por país de lanzamiento</li><li><strong>Bus/Carga útil/Forma/Fuente del satélite</strong> - Filtrar por características del satélite</li><li><strong>Azimut/Elevación/Alcance</strong> - Buscar por ángulos de visión (requiere sensor)</li><li><strong>Parámetros orbitales</strong> - Inclinación, período, RAAN, argumento del perigeo</li><li><strong>Edad del TLE</strong> - Filtrar por actualidad del TLE</li><li><strong>RCS</strong> - Filtrar por sección transversal de radar</li></ul><br>Los resultados se muestran en la barra de búsqueda. Use el botón Exportar para guardar los resultados como CSV.",
+      "help": {
+        "overview": "Buscar satélite examina todo el catálogo en busca de objetos que coincidan con una combinación de criterios físicos, orbitales y de observación. Es la forma más rápida de responder preguntas como \"¿qué cuerpos de cohete de China están en una órbita de aproximadamente 100 minutos?\" o \"¿qué cargas útiles están al alcance de mi sensor en este momento?\"",
+        "imgAlt": "El menú Buscar satélite con filtros de tipo de objeto, país, orbitales y de sensor",
+        "imgCaption": "El menú Buscar satélite. Cada campo completado restringe aún más la búsqueda.",
+        "filtersHeading": "Filtros disponibles",
+        "filters": "<ul><li><strong>Tipo de objeto</strong>: cargas útiles, cuerpos de cohete, escombros. Seleccione varios tipos a la vez; elegir un tipo específico desactiva \"Todos\".</li><li><strong>País</strong>: uno o más países de lanzamiento.</li><li><strong>Bus del satélite / Carga útil / Forma / Fuente</strong>: características físicas y de la fuente de datos.</li><li><strong>Azimut / Elevación / Alcance</strong>: ángulos de visión actuales desde el sensor seleccionado. Requieren que primero se seleccione un sensor.</li><li><strong>Parámetros orbitales</strong>: Inclinación, Período, Ascensión recta y Argumento del perigeo.</li><li><strong>Edad del TLE</strong>: qué tan recientemente se actualizaron los datos orbitales, en horas.</li><li><strong>RCS</strong>: sección transversal de radar en m².</li></ul>Cada filtro numérico tiene un campo <strong>Margen</strong> que define el rango aceptado alrededor de su valor. Déjelo en blanco para usar un valor predeterminado razonable (por ejemplo, ±5° para ángulos).",
+        "howToUse": "<ol><li>Abra el menú desde la barra inferior o presione Ctrl+F.</li><li>Elija uno o más tipos de objeto y países en los menús desplegables.</li><li>Ingrese criterios numéricos y, opcionalmente, ajuste o amplíe sus márgenes.</li><li>Haga clic en <strong>Buscar satélite(s)</strong>. Los objetos coincidentes se cargan en la barra de búsqueda superior y se resaltan en el globo.</li><li>Haga clic en <strong>Exportar datos</strong> para guardar los resultados actuales como un archivo CSV.</li></ol>",
+        "tip1": "Los filtros se combinan con lógica AND: cada criterio debe coincidir. Si no obtiene resultados, elimine primero el filtro más restrictivo.",
+        "tip2": "El azimut, la elevación y el alcance se miden desde el sensor actualmente seleccionado, así que seleccione un sensor antes de usarlos.",
+        "tip3": "Los resultados están limitados. Si una advertencia indica que se alcanzó el límite, restrinja sus criterios para asegurarse de verlo todo.",
+        "tip4": "Como los resultados llegan a la barra de búsqueda, puede pasarlos a cualquier otro menú que opere sobre la búsqueda actual, o refinarlos escribiendo.",
+        "shortcutToggle": "Alternar el menú Buscar satélite"
+      },
       "labels": {
+        "typePayload": "Carga útil",
+        "typeRocketBody": "Cuerpo de cohete",
+        "typeDebris": "Escombros",
+        "busFilterPlaceholder": "Escriba para filtrar las opciones de bus",
+        "satelliteBusFilter": "Filtro de bus del satélite",
+        "payloadFilterPlaceholder": "Escriba para filtrar las opciones de carga útil",
+        "payloadFilter": "Filtro de carga útil",
         "objectType": "Tipo de objeto",
         "country": "País",
         "satelliteBus": "Bus del satélite",
@@ -31,13 +50,20 @@
         "argOfPerigeeMargin": "Margen (grados)",
         "all": "Todos",
         "findSatellites": "Buscar satélite(s)",
-        "exportData": "Exportar datos"
+        "exportData": "Exportar datos",
+        "sectionClassification": "Clasificación",
+        "sectionLookAngles": "Ángulos de observación",
+        "sectionOrbital": "Elementos orbitales",
+        "sectionPhysical": "Físicos y datos",
+        "sensorNote": "Los ángulos de observación requieren un sensor seleccionado.",
+        "resultCount": "{count} resultado(s)"
       },
       "errorMsgs": {
         "NoSatellitesFound": "No se encontraron satélites",
         "NoSearchCriteriaEntered": "No se ingresaron criterios de búsqueda",
         "TooManyResults": "Demasiados resultados, limitado a {limit}",
-        "TryFindingFirst": "¡Intente buscar satélites primero!"
+        "TryFindingFirst": "¡Intente buscar satélites primero!",
+        "SearchFailed": "Error en la búsqueda: {error}"
       }
     }
   }

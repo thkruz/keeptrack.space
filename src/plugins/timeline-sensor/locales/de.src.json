@@ -3,7 +3,42 @@
     "SensorTimeline": {
       "bottomIconLabel": "Sensor-Zeitachse",
       "title": "Sensor-Zeitachsen-Menü",
-      "helpBody": "Das Sensor-Zeitachsen-Menü zeigt, wann eine Liste von Sensoren Sichtbarkeit zu einem Satelliten hat. Die Zeitachse ist farbcodiert, um die Qualität des Durchgangs anzuzeigen. Rot ist ein schlechter Durchgang, Gelb ist ein durchschnittlicher Durchgang und Grün ist ein guter Durchgang. Klicken Sie auf einen Durchgang, um den Sensor und die Zeit für diesen Durchgang zu ändern. <br><br> Die Zeitachse kann durch Ändern der Start- und Endzeit der Simulation modifiziert werden. Zusätzlich kann die Zeitachse durch Ändern der Längen- und Intervalloptionen modifiziert werden."
+      "labels": {
+        "calculationLength": "Berechnungsdauer (Stunden)",
+        "calculationInterval": "Berechnungsintervall (Sekunden)",
+        "badPassLength": "Länge eines schlechten Durchgangs (Sekunden)",
+        "avgPassLength": "Länge eines durchschnittlichen Durchgangs (Sekunden)",
+        "detailedPlot": "Detaillierte Darstellung",
+        "useWeather": "Wetter berücksichtigen",
+        "useWeatherTooltip": "Wetter bei der Durchgangsberechnung anhand von Wettervorhersagen berücksichtigen"
+      },
+      "passTypes": {
+        "canObserve": "Beobachtung möglich",
+        "inFov": "Im Sichtfeld",
+        "satInSun": "Satellit im Sonnenlicht",
+        "stationInNight": "Station im Erdschatten",
+        "clearSkies": "Klarer Himmel"
+      },
+      "msgs": {
+        "observable": "Beobachtbar",
+        "inFov": "Im FOV",
+        "atNight": "Bei Nacht",
+        "clearSkies": "Klarer Himmel",
+        "noPasses": "Keine Durchgänge"
+      },
+      "help": {
+        "overview": "Die Sensor-Zeitachse zeigt, wann ein Netz von Sensoren den ausgewählten Satelliten in den kommenden Stunden sehen kann. Jede Zeile ist ein Sensor und jeder farbige Balken ein Durchgang, sodass Sie die Gelegenheiten aller Standorte auf einen Blick vergleichen und den besten Sensor für die nächste Beobachtung auswählen können.",
+        "imgAlt": "Die Sensor-Zeitachse mit farbcodierten Durchgängen für mehrere Sensoren",
+        "imgCaption": "Jede Zeile ist ein Sensor; die Balkenfarbe zeigt die Qualität jedes Durchgangs des ausgewählten Satelliten.",
+        "readingHeading": "Die Zeitachse lesen",
+        "reading": "<ul><li><strong>Grün</strong>: ein langer Durchgang oberhalb der Schwelle für durchschnittliche Durchgänge.</li><li><strong>Gelb</strong>: ein durchschnittlicher Durchgang.</li><li><strong>Rot</strong>: ein kurzer Durchgang unterhalb der Schwelle für schlechte Durchgänge.</li><li><strong>Hellgraue Zeile</strong>: dieser Sensor sieht den Satelliten im gesamten Zeitfenster nie.</li></ul>Fahren Sie mit der Maus über einen Balken, um die genauen Start- und Endzeiten zu sehen. Mit aktivierter Option <strong>Detaillierte Darstellung</strong> erhalten optische Sensoren zusätzliche Zeilen mit den Rohbedingungen: <strong>Im Sichtfeld</strong>, <strong>Satellit im Sonnenlicht</strong>, <strong>Station im Erdschatten</strong> und <strong>Klarer Himmel</strong>; ein Durchgang ist nur dort beobachtbar, wo alle gleichzeitig erfüllt sind.",
+        "settingsHeading": "Einstellungen",
+        "settings": "Das Einstellungsfeld steuert die Berechnung: <strong>Berechnungsdauer (Stunden)</strong> legt das Zeitfenster fest, <strong>Berechnungsintervall (Sekunden)</strong> wägt Geschwindigkeit gegen Genauigkeit ab, und die Schwellen <strong>Länge eines schlechten Durchgangs</strong> und <strong>Länge eines durchschnittlichen Durchgangs</strong> bestimmen die rote, gelbe und grüne Färbung. <strong>Wetter berücksichtigen</strong> bezieht stündliche Bewölkungsvorhersagen in die Durchgänge optischer Sensoren ein. Die Schaltflächen unten schalten einzelne Sensoren um: Rot bedeutet von der Berechnung ausgeschlossen.",
+        "howToUse": "<ol><li>Wählen Sie einen Satelliten aus; das untere Symbol bleibt deaktiviert, bis einer ausgewählt ist.</li><li>Öffnen Sie die <strong>Sensor-Zeitachse</strong> über das untere Menü. Die Zeitachse wird automatisch berechnet und gezeichnet.</li><li>Öffnen Sie das Einstellungsfeld, um Zeitfenster, Schwellen, Detailgrad, Wetternutzung oder die einbezogenen Sensoren zu ändern; die Darstellung wird bei jeder Wertänderung neu berechnet.</li><li>Klicken Sie auf einen Durchgang, um zu diesem Sensor zu wechseln und die Uhr an den Beginn des Durchgangs zu setzen, bereit für Blickwinkel oder Beobachtungsplanung.</li><li>Verwenden Sie die Download-Schaltfläche, um die Durchgangsliste als CSV-Datei zu exportieren.</li></ol>",
+        "tip1": "Die Wetterdaten stammen aus der Open-Meteo-Bewölkungsvorhersage für jeden optischen Standort; Radare ignorieren Wetter, Sonnenlicht und Dunkelheit vollständig.",
+        "tip2": "Ein Klick auf einen Durchgang wählt den Satelliten nach dem Wechsel von Sensor und Zeit erneut aus, sodass andere geöffnete Menüs mit der neuen Geometrie aktualisiert werden.",
+        "tip3": "Kürzere Berechnungsintervalle erfassen auch kurze Durchgänge, brauchen aber länger; 30 Sekunden sind ein guter Kompromiss für ein 24-Stunden-Fenster."
+      }
     }
   }
 }

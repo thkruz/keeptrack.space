@@ -3,7 +3,21 @@
     "CountriesMenu": {
       "bottomIconLabel": "Kraje",
       "title": "Menu krajów",
-      "helpBody": "Menu krajów pozwala filtrować satelity według kraju pochodzenia."
+      "commands": {
+        "selectCountry": "Wybierz kraj: {country}"
+      },
+      "labels": {
+        "filterByCountry": "Filtruj według kraju"
+      },
+      "help": {
+        "overview": "Menu krajów filtruje katalog według kraju pochodzenia. Każdy kraj z co najmniej jednym obiektem jest wymieniony z flagą i liczbą obiektów; wybranie kraju podświetla wszystkie jego satelity i ładuje je do wyników wyszukiwania.",
+        "imgAlt": "Menu krajów z listą krajów, flagami i liczbą satelitów",
+        "imgCaption": "Każda pozycja pokazuje flagę, nazwę kraju i liczbę posiadanych obiektów.",
+        "howToUse": "<ol><li>Otwórz menu <strong>Kraje</strong> z dolnego paska lub naciśnij <strong>O</strong>.</li><li>Kliknij kraj. Jego satelity zostaną zgrupowane, podświetlone w widoku 3D i wypisane w wynikach paska wyszukiwania.</li><li>Kliknij dowolny wynik wyszukiwania, aby przyjrzeć się pojedynczemu satelicie.</li></ol>",
+        "tip1": "Wybranie kraju zastępuje bieżące wyszukiwanie i usuwa zaznaczenie bieżącego satelity, więc najpierw zakończ pracę na poziomie obiektu.",
+        "tip2": "Każdy kraj jest też dostępny z palety poleceń jako polecenie Wybierz kraj.",
+        "shortcutToggle": "Przełącz menu krajów"
+      }
     }
   }
 }

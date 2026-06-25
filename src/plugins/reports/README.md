@@ -9,8 +9,8 @@ Other plugins can register custom reports using the static `ReportsPlugin.regist
 ### Example: Registering a Custom Report
 
 ```typescript
-import { ReportsPlugin, ReportGenerator } from '@app/plugins/reports/reports';
-import { DetailedSatellite, DetailedSensor } from '@ootk/src/main';
+import { ReportsPlugin, ReportGenerator, ReportContext } from '@app/plugins/reports/reports';
+import { Satellite, DetailedSensor } from '@ootk/src/main';
 
 // Define your custom report generator
 const myCustomReport: ReportGenerator = {
@@ -19,17 +19,19 @@ const myCustomReport: ReportGenerator = {
   description: 'This is a custom report that does something useful',
   requiresSensor: false, // Set to true if the report needs a sensor
 
-  generate: (sat: DetailedSatellite, sensor: DetailedSensor | null, startTime: Date) => {
-    // Generate your report data here
+  generate: (sat: Satellite, sensor: DetailedSensor | null, ctx: ReportContext) => {
+    // ctx.options carries the user-selected time window/step; ctx.deps injects the
+    // pass finder and sun/eclipse helpers; ctx.generatedAt is the report epoch.
     const header = `My Custom Report\n----------------\nSatellite: ${sat.name}\n`;
-    const body = `Custom data goes here...\n`;
 
     return {
       filename: `my-custom-report-${sat.sccNum}`,
       header,
-      body,
-      columns: 2,
-      isHeaders: true,
+      // Preferred: a structured table (rendered as aligned text, CSV, or JSON).
+      table: {
+        headers: ['Field', 'Value'],
+        rows: [['Apogee', `${sat.apogee.toFixed(1)} km`]],
+      },
     };
   },
 };
@@ -37,6 +39,10 @@ const myCustomReport: ReportGenerator = {
 // Register the report (typically in your plugin's constructor or init method)
 ReportsPlugin.registerReport(myCustomReport);
 ```
+
+> The legacy string `body` / `columns` / `isHeaders` fields are still accepted for
+> backward compatibility, but new reports should return a structured `table` so the
+> user's chosen export format (aligned text, CSV, or JSON) works automatically.
 
 ### Report Generator Interface
 
@@ -58,16 +64,35 @@ interface ReportGenerator {
    * Generate the report data
    * @param sat The selected satellite
    * @param sensor The selected sensor (if required)
-   * @param startTime The start time for the report
+   * @param ctx The report context (time window, injected dependencies, epoch)
    * @returns The report data to be written
    */
-  generate(sat: DetailedSatellite, sensor: DetailedSensor | null, startTime: Date): ReportData;
+  generate(sat: Satellite, sensor: DetailedSensor | null, ctx: ReportContext): ReportData;
+}
+
+interface ReportContext {
+  /** User-selected window: { startTime, windowSec, stepSec }. */
+  options: ReportOptions;
+  /** Injected application state: the sensor pass finder and the sun/eclipse helper. */
+  deps: ReportCoreDeps;
+  /** Simulation time the report is generated at (used in the metadata header). */
+  generatedAt: Date;
+}
+
+interface ReportTable {
+  headers: string[];
+  rows: string[][];
 }
 
 interface ReportData {
   filename: string;
   header: string;
-  body: string;
+  /** Preferred structured output. */
+  table?: ReportTable;
+  /** Message shown when the table has no rows. */
+  emptyMessage?: string;
+  /** @deprecated Legacy raw body fields. */
+  body?: string;
   columns?: number;
   isHeaders?: boolean;
 }
@@ -115,9 +140,10 @@ const sensorRequiredReport: ReportGenerator = {
   id: 'sensor-report',
   name: 'Sensor Report',
   requiresSensor: true,
-  generate: (sat, sensor, startTime) => {
-    // sensor is guaranteed to be non-null here
-    const rae = sensor.rae(sat, startTime);
+  generate: (sat, sensor, ctx) => {
+    // sensor is guaranteed to be non-null here. Use ctx.deps.findPasses(sensor, ctx.options)
+    // to reuse the shared pass finder, or sample directly:
+    const rae = sensor!.rae(sat, ctx.options.startTime);
     // ... generate report
   },
 };

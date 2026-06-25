@@ -38,27 +38,6 @@ declare global {
     dataLayer?: unknown[]; // For Google Tag Manager / gtag
     _numeric: unknown;
     satellite: SatMath;
-    M: {
-      AutoInit: () => void;
-      Toast: {
-        dismissAll: () => void;
-      };
-      toast: (options: { unsafeHTML?: string, html?: string; displayLength?: number }) => {
-        $el: NodeListOf<HTMLElement>;
-        timeRemaining: number;
-        dismiss: () => void;
-      };
-      Dropdown: {
-        init: (el: NodeListOf<Element>) => void;
-      };
-      keys: {
-        TAB: number;
-        ENTER: number;
-        ESC: number;
-        ARROW_UP: number;
-        ARROW_DOWN: number;
-      };
-    }
   }
 }
 

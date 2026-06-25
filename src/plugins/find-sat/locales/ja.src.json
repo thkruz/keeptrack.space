@@ -3,8 +3,27 @@
     "FindSatPlugin": {
       "bottomIconLabel": "衛星を検索",
       "title": "衛星を検索",
-      "helpBody": "衛星検索メニューでは、さまざまな条件で衛星を検索できます：<br><br><ul style=\"margin-left: 40px;\"><li><strong>オブジェクトタイプ</strong> - ペイロード、ロケット本体、デブリでフィルタ</li><li><strong>国</strong> - 打ち上げ国でフィルタ</li><li><strong>衛星バス/ペイロード/形状/ソース</strong> - 衛星特性でフィルタ</li><li><strong>方位角/仰角/距離</strong> - 視野角で検索（センサーが必要）</li><li><strong>軌道パラメータ</strong> - 傾斜角、周期、昇交点赤経、近地点引数</li><li><strong>TLE経過時間</strong> - TLEの更新時間でフィルタ</li><li><strong>RCS</strong> - レーダー断面積でフィルタ</li></ul><br>結果は検索バーに表示されます。エクスポートボタンを使用して結果をCSVとして保存できます。",
+      "help": {
+        "overview": "衛星検索は、物理的・軌道的・観測的な条件の組み合わせに一致するオブジェクトをカタログ全体から検索します。「中国のロケット本体のうち、約100分周期の軌道にあるものはどれか？」や「現在、自分のセンサーの範囲内にあるペイロードはどれか？」といった疑問に最も速く答える方法です。",
+        "imgAlt": "オブジェクトタイプ、国、軌道、センサーの各フィルタを備えた衛星検索メニュー",
+        "imgCaption": "衛星検索メニュー。入力した項目が増えるほど検索が絞り込まれます。",
+        "filtersHeading": "利用可能なフィルタ",
+        "filters": "<ul><li><strong>オブジェクトタイプ</strong>：ペイロード、ロケット本体、デブリ。複数のタイプを同時に選択できます。特定のタイプを選ぶと「すべて」は解除されます。</li><li><strong>国</strong>：1つまたは複数の打ち上げ国。</li><li><strong>衛星バス / ペイロード / 形状 / ソース</strong>：物理的特性およびデータソースの特性。</li><li><strong>方位角 / 仰角 / 距離</strong>：選択中のセンサーから見た現在の観測角。先にセンサーを選択する必要があります。</li><li><strong>軌道パラメータ</strong>：傾斜角、周期、昇交点赤経、近地点引数。</li><li><strong>TLE経過時間</strong>：軌道データが更新されてからの経過時間（時間単位）。</li><li><strong>RCS</strong>：レーダー断面積（m²）。</li></ul>各数値フィルタには、入力値の前後で許容する範囲を定める<strong>マージン</strong>欄があります。空欄のままにすると適切な既定値（例えば角度は±5°）が使われます。",
+        "howToUse": "<ol><li>下部バーからメニューを開くか、Ctrl+F を押します。</li><li>ドロップダウンからオブジェクトタイプと国を1つ以上選択します。</li><li>数値条件を入力し、必要に応じてマージンを狭めたり広げたりします。</li><li><strong>衛星を検索</strong>をクリックします。一致したオブジェクトが上部の検索バーに読み込まれ、地球儀上で強調表示されます。</li><li><strong>データをエクスポート</strong>をクリックすると、現在の結果がCSVファイルとして保存されます。</li></ol>",
+        "tip1": "フィルタはAND論理で組み合わされ、すべての条件に一致する必要があります。結果が得られない場合は、まず最も制限の強いフィルタを外してください。",
+        "tip2": "方位角・仰角・距離は現在選択中のセンサーから測定されるため、使用する前にセンサーを選択してください。",
+        "tip3": "結果数には上限があります。上限に達したという警告が表示された場合は、条件を絞り込んで、すべての結果が表示されていることを確認してください。",
+        "tip4": "結果は検索バーに入るため、現在の検索を対象とする他のメニューにそのまま渡したり、入力してさらに絞り込んだりできます。",
+        "shortcutToggle": "衛星検索メニューを切り替え"
+      },
       "labels": {
+        "typePayload": "ペイロード",
+        "typeRocketBody": "ロケット本体",
+        "typeDebris": "デブリ",
+        "busFilterPlaceholder": "入力してバスの選択肢を絞り込み",
+        "satelliteBusFilter": "衛星バスフィルタ",
+        "payloadFilterPlaceholder": "入力してペイロードの選択肢を絞り込み",
+        "payloadFilter": "ペイロードフィルタ",
         "objectType": "オブジェクトタイプ",
         "country": "国",
         "satelliteBus": "衛星バス",
@@ -31,13 +50,20 @@
         "argOfPerigeeMargin": "マージン（度）",
         "all": "すべて",
         "findSatellites": "衛星を検索",
-        "exportData": "データをエクスポート"
+        "exportData": "データをエクスポート",
+        "sectionClassification": "分類",
+        "sectionLookAngles": "観測角",
+        "sectionOrbital": "軌道要素",
+        "sectionPhysical": "物理・データ",
+        "sensorNote": "観測角の利用にはセンサーの選択が必要です。",
+        "resultCount": "{count}件の結果"
       },
       "errorMsgs": {
         "NoSatellitesFound": "衛星が見つかりません",
         "NoSearchCriteriaEntered": "検索条件が入力されていません",
         "TooManyResults": "結果が多すぎます。{limit}件に制限されました",
-        "TryFindingFirst": "まず衛星を検索してください！"
+        "TryFindingFirst": "まず衛星を検索してください！",
+        "SearchFailed": "検索に失敗しました: {error}"
       }
     }
   }

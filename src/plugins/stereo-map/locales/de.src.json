@@ -3,7 +3,22 @@
     "StereoMap": {
       "bottomIconLabel": "Stereokarte",
       "title": "Stereografisches Karten-Menü",
-      "helpBody": "Das Stereografische Karten-Menü wird verwendet, um Satellitenbodenspuren in einer stereografischen Projektion zu visualisieren. <br/><br/> Sie können auf einen Punkt entlang der Bodenspur klicken, um die Zeit der Simulation zu ändern, wenn der Satellit diesen Punkt erreicht. <br/><br/> Die gelben Punkte zeigen an, wann der Satellit im Sichtfeld des Sensors ist. Die roten Punkte zeigen an, wann der Satellit nicht im Sichtfeld des Sensors ist. Der Punkt, der dem Satelliten am nächsten ist, ist die aktuelle Zeit.",
+      "help": {
+        "overview": "Die Stereografische Karte projiziert die Bodenspur des ausgewählten Satelliten auf eine flache Erdkarte. Sie zeigt, wo sich der Satellit gerade befindet, welchen Pfad er auf der kommenden Umlaufbahn verfolgen wird und, wenn ein Sensor ausgewählt ist, genau wann er für diesen Sensor sichtbar sein wird. Die Karte aktualisiert sich automatisch, während die Simulationszeit voranschreitet.",
+        "imgAlt": "Stereografische Karte mit der Bodenspur eines Satelliten und hervorgehobenen sichtbaren Abschnitten",
+        "imgCaption": "Die Bodenspur eines Satelliten. Das Satellitensymbol markiert die aktuelle Position; Radarsymbole markieren ausgewählte Sensoren.",
+        "readingTheMapHeading": "Die Karte lesen",
+        "readingTheMap": "<ul><li><strong>Satellitensymbol</strong>: die aktuelle Position des Satelliten. Es bewegt sich, während die Zeit voranschreitet.</li><li><strong>Gelbe Spur und Punkte</strong>: Teile der Umlaufbahn, in denen sich der Satellit im Sichtfeld eines ausgewählten Sensors befindet.</li><li><strong>Rote Spur und Punkte</strong>: Teile der Umlaufbahn, in denen kein ausgewählter Sensor den Satelliten sehen kann. Ohne ausgewählten Sensor ist die gesamte Spur rot.</li><li><strong>Radarsymbole</strong>: die Bodenstandorte der aktuell ausgewählten Sensoren.</li></ul>",
+        "howToUse": "<ol><li>Wählen Sie einen Satelliten aus; suchen Sie zum Beispiel nach \"ISS\" und klicken Sie auf ein Ergebnis.</li><li>Wählen Sie optional einen Sensor aus dem Sensoren-Menü, damit Sichtbarkeitsfenster gelb angezeigt werden.</li><li>Öffnen Sie die Stereokarte über das untere Menü (das Symbol ist deaktiviert, bis ein Satellit ausgewählt ist).</li><li>Klicken Sie auf einen beliebigen Punkt entlang der Bodenspur, um die Simulationszeit auf den Moment zu setzen, in dem der Satellit diesen Punkt erreicht.</li><li>Verwenden Sie die Download-Schaltfläche, um die aktuelle Karte als PNG-Bild zu speichern.</li></ol>",
+        "tip1": "Klicken Sie auf einen gelben Punkt, um direkt zu einem bevorstehenden Sensor-Überflug zu springen, und verfolgen Sie den Überflug dann auf dem 3D-Globus.",
+        "tip2": "Die Karte zeichnet sich etwa alle 30 Sekunden neu; die Auswahl eines neuen Satelliten oder das Klicken auf einen Punkt aktualisiert sie sofort.",
+        "tip3": "Die Karte ist auch über die Befehlspalette verfügbar: \"Stereokarte umschalten\" und \"Stereokarte exportieren\".",
+        "shortcutToggle": "Stereokarte umschalten"
+      },
+      "commands": {
+        "toggle": "Stereokarte umschalten",
+        "export": "Stereokarte exportieren"
+      },
       "labels": {
         "orbitsToDisplay": "Anzuzeigende Umlaufbahnen",
         "showGraticule": "Gradnetz anzeigen",

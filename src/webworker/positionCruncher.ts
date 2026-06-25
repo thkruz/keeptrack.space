@@ -24,6 +24,7 @@
  */
 
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { interpolateMissileSample } from '@app/plugins/missile/missile-interpolation';
 import {
   DEG2RAD,
   Degrees,
@@ -685,8 +686,6 @@ export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: Gree
     return false;
   }
 
-  let cosLat: number, cosLon: number, sinLat: number, sinLon: number;
-
   const tLen = missile.altList.length;
 
   // Map sim time to a trajectory index (each point is 1 second). Clamp to the trajectory: before
@@ -704,10 +703,10 @@ export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: Gree
   const lon = missile.lonList[timeIndex];
   const alt = missile.altList[timeIndex];
 
-  cosLat = Math.cos(lat * DEG2RAD);
-  sinLat = Math.sin(lat * DEG2RAD);
-  cosLon = Math.cos(lon * DEG2RAD + gmstNext);
-  sinLon = Math.sin(lon * DEG2RAD + gmstNext);
+  const cosLat = Math.cos(lat * DEG2RAD);
+  const sinLat = Math.sin(lat * DEG2RAD);
+  const cosLon = Math.cos(lon * DEG2RAD + gmstNext);
+  const sinLon = Math.sin(lon * DEG2RAD + gmstNext);
 
   if (missile.lastTime === 0) {
     resetVelocity(satVel, i);
@@ -724,14 +723,20 @@ export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: Gree
     satVel[i * 3 + 2] *= 0.5;
   }
 
-  cosLat = Math.cos(missile.latList[curMissivarTime] * DEG2RAD);
-  sinLat = Math.sin(missile.latList[curMissivarTime] * DEG2RAD);
-  cosLon = Math.cos(missile.lonList[curMissivarTime] * DEG2RAD + gmst);
-  sinLon = Math.sin(missile.lonList[curMissivarTime] * DEG2RAD + gmst);
+  // Interpolate between the two bounding 1-second samples by the fractional elapsed time so the
+  // value glides instead of stair-stepping once per second, and convert with the ellipsoidal
+  // lla2eci (matching the rendered dot, the trajectory line, and MissileObject.eci()) rather than
+  // a spherical approximation. (The rendered dot is recomputed on the main thread every frame; this
+  // worker value feeds the 1 Hz sensor in-view check below.)
+  const sample = interpolateMissileSample(missile.latList, missile.lonList, missile.altList, missile.startTime, now.getTime());
+  const missileEci = lla2eci(
+    { lat: (sample.lat * DEG2RAD) as Radians, lon: (sample.lon * DEG2RAD) as Radians, alt: sample.alt as Kilometers },
+    gmst,
+  );
 
-  satPos[i * 3] = (6371 + missile.altList[curMissivarTime]) * cosLat * cosLon;
-  satPos[i * 3 + 1] = (6371 + missile.altList[curMissivarTime]) * cosLat * sinLon;
-  satPos[i * 3 + 2] = (6371 + missile.altList[curMissivarTime]) * sinLat;
+  satPos[i * 3] = missileEci.x;
+  satPos[i * 3 + 1] = missileEci.y;
+  satPos[i * 3 + 2] = missileEci.z;
 
   missile.lastTime = curMissivarTime;
 

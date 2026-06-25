@@ -65,6 +65,13 @@ export class WebGLRenderer {
   private selectSatManager_: SelectSatManager;
   sensorPos: { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } | null = null;
   lastResizeTime: number;
+  /**
+   * True while a plugin is running a multi-frame offscreen capture (e.g. OpticalSimulation).
+   * While set, the engine game loop skips its update/draw pass and cruncher position
+   * messages are dropped, so the capture owns canvas size, camera, FOV, and time.
+   * Bracketed by EventBusEvent.captureStart / captureEnd.
+   */
+  isCapturing = false;
 
   static getCanvasInfo(): { vw: number; vh: number } {
     // Using minimum allows the canvas to be full screen without fighting with scrollbars

@@ -18,7 +18,6 @@ describe('FindSatPlugin_class', () => {
   beforeEach(() => {
     KeepTrack.getInstance().containerRoot.innerHTML = '';
     setupStandardEnvironment();
-    window.M.AutoInit = vi.fn();
   });
 
   standardPluginSuite(FindSatPlugin);
@@ -57,17 +56,20 @@ describe('FindSatPlugin_class', () => {
   });
 
   describe('getHelpConfig', () => {
-    it('should return help configuration with title and body', () => {
+    it('should return help configuration with structured sections', () => {
       const plugin = new FindSatPlugin();
       const config = plugin.getHelpConfig();
 
       expect(config.title).toBeDefined();
-      expect(config.body).toBeDefined();
+      expect(config.sections!.length).toBeGreaterThanOrEqual(3);
+      expect(config.sections![0].image?.src).toContain('img/help/find-sat/');
+      expect(config.tips!.length).toBeGreaterThan(0);
+      expect(config.shortcuts).toEqual([expect.objectContaining({ keys: ['Ctrl', 'F'] })]);
     });
   });
 
   describe('getKeyboardShortcuts', () => {
-    it('should return keyboard shortcuts with Ctrl+Shift+F', () => {
+    it('should return keyboard shortcuts with Ctrl+F', () => {
       const plugin = new FindSatPlugin();
       const shortcuts = plugin.getKeyboardShortcuts();
 
@@ -80,7 +82,7 @@ describe('FindSatPlugin_class', () => {
     it('should call bottomMenuClicked when shortcut callback is executed', () => {
       const plugin = new FindSatPlugin();
       const shortcuts = plugin.getKeyboardShortcuts();
-      const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation();
+      const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
 
       shortcuts[0].callback();
 
@@ -96,7 +98,7 @@ describe('FindSatPlugin_class', () => {
   describe('onDownload', () => {
     it('should warn if no search has been run', () => {
       const plugin = new FindSatPlugin();
-      const warnSpy = vi.spyOn(errorManagerInstance, 'warn').mockImplementation();
+      const warnSpy = vi.spyOn(errorManagerInstance, 'warn').mockImplementation(() => undefined);
 
       plugin.onDownload();
 
@@ -115,7 +117,7 @@ describe('FindSatPlugin_class', () => {
       incInput.value = '50';
       plugin['findByLooksSubmit_']();
 
-      const warnSpy = vi.spyOn(errorManagerInstance, 'warn').mockImplementation();
+      const warnSpy = vi.spyOn(errorManagerInstance, 'warn').mockImplementation(() => undefined);
 
       plugin.onDownload();
 
@@ -131,7 +133,7 @@ describe('FindSatPlugin_class', () => {
   describe('printLastResults', () => {
     it('should call errorManagerInstance.info', () => {
       const plugin = new FindSatPlugin();
-      const infoSpy = vi.spyOn(errorManagerInstance, 'info').mockImplementation();
+      const infoSpy = vi.spyOn(errorManagerInstance, 'info').mockImplementation(() => undefined);
 
       plugin.printLastResults();
 

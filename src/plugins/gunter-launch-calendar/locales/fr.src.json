@@ -1,0 +1,17 @@
+{
+  "plugins": {
+    "GunterLaunchCalendar": {
+      "bottomIconLabel": "Gunter Calendrier des lancements",
+      "title": "Calendrier des lancements",
+      "commands": {
+        "open": "Ouvrir le calendrier des lancements"
+      },
+      "help": {
+        "overview": "Le Calendrier des lancements ouvre la liste des lancements de Gunter's Space Page pour l'année en cours dans une superposition : une liste complète et régulièrement mise à jour des lancements orbitaux avec dates, véhicules, charges utiles et sites de lancement. Utilisez-le pour voir ce qui sera lancé prochainement, puis recréez les lancements à venir avec l'outil Nouveau lancement.",
+        "howToUse": "<ol><li>Cliquez sur l'icône <strong>Calendrier des lancements</strong> dans le menu inférieur (mode Événements). Le calendrier s'ouvre dans une superposition ; les menus latéraux se ferment automatiquement.</li><li>Parcourez la liste, puis fermez la superposition pour revenir à la vue 3D.</li></ol>",
+        "tip1": "Le calendrier est une page externe de Gunter's Space Page, il nécessite donc une connexion internet.",
+        "tip2": "Il est également disponible depuis la palette de commandes sous le nom Ouvrir le calendrier des lancements."
+      }
+    }
+  }
+}

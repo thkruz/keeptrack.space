@@ -3,15 +3,62 @@
     "PlanetsMenuPlugin": {
       "bottomIconLabel": "Planetas",
       "title": "Menú de Lista de Planetas",
-      "helpBody": "Este menú te permite seleccionar y ver diferentes planetas en la simulación.",
       "sections": {
         "planets": "Planetas",
         "dwarfPlanets": "Planetas enanos",
         "otherCelestialBodies": "Otros cuerpos celestes"
       },
+      "bodies": {
+        "Mercury": "Mercurio",
+        "Venus": "Venus",
+        "Earth": "Tierra",
+        "Mars": "Marte",
+        "Jupiter": "Júpiter",
+        "Saturn": "Saturno",
+        "Uranus": "Urano",
+        "Neptune": "Neptuno",
+        "Pluto": "Plutón",
+        "Makemake": "Makemake",
+        "Eris": "Eris",
+        "Haumea": "Haumea",
+        "Ceres": "Ceres",
+        "Sedna": "Sedna",
+        "Quaoar": "Quaoar",
+        "Orcus": "Orcus",
+        "Gonggong": "Gonggong",
+        "Charon": "Caronte",
+        "Moon": "Luna",
+        "Sun": "Sol",
+        "Io": "Ío",
+        "Europa": "Europa",
+        "Ganymede": "Ganimedes",
+        "Callisto": "Calisto",
+        "Titan": "Titán",
+        "Rhea": "Rea",
+        "Iapetus": "Jápeto",
+        "Dione": "Dione",
+        "Tethys": "Tetis",
+        "Enceladus": "Encélado"
+      },
       "tooltips": {
         "centerCamera": "Centrar la cámara en {body}.",
         "plannedFuture": "Planeado para una actualización futura."
+      },
+      "filterPlaceholder": "Filtrar cuerpos…",
+      "commands": {
+        "toggleMenu": "Alternar el menú Planetas",
+        "centerOn": "Centrar la cámara en {body}"
+      },
+      "help": {
+        "overview": "El menú Planetas convierte KeepTrack en un visor del sistema solar: seleccione cualquier planeta, planeta enano, la Luna o el Sol para centrar la cámara en él. Es la forma más rápida de estudiar la geometría cislunar y del espacio profundo junto al catálogo de objetos en órbita terrestre.",
+        "imgAlt": "El menú de Lista de Planetas con planetas, planetas enanos y otros cuerpos",
+        "imgCaption": "Haga clic en cualquier cuerpo para centrar la cámara en él.",
+        "howToUse": "<ol><li>Abra el menú <strong>Planetas</strong> desde la barra inferior o pulse <strong>P</strong>.</li><li>Haga clic en un cuerpo, por ejemplo <strong>Marte</strong> o <strong>Luna</strong>. La cámara se recentra en él y los límites de zoom se ajustan a la nueva escala.</li><li>Pulse <strong>Home</strong> para volver a la Tierra, o <strong>Shift</strong>+<strong>Home</strong> para recentrar la Tierra en la vista.</li></ol>",
+        "tip1": "Varias lunas (Ío, Europa, Titán y otras) aparecen en la lista pero atenuadas; están previstas para una actualización futura.",
+        "tip2": "También puede hacer clic derecho en el espacio vacío y elegir un cuerpo en el menú contextual.",
+        "shortcutToggle": "Alternar el menú Planetas",
+        "shortcutHome": "Establecer la Tierra como cuerpo central",
+        "shortcutCenterEarth": "Centrar la cámara en la Tierra"
       }
     }
   }

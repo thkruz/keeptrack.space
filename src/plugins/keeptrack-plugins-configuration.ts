@@ -50,7 +50,7 @@ export type KeepTrackPluginsConfiguration = {
   ShortTermFences?: PluginConfiguration;
   LookAnglesPlugin?: PluginConfiguration;
   LinkBudgetPlugin?: PluginConfiguration;
-  MultiSiteLookAnglesPlugin?: PluginConfiguration;
+  MultiSensorLookAnglesPlugin?: PluginConfiguration;
   SensorTimeline?: PluginConfiguration;
   SatelliteTimeline?: PluginConfiguration;
   WatchlistPlugin?: PluginConfiguration;
@@ -58,7 +58,7 @@ export type KeepTrackPluginsConfiguration = {
   WatchlistFilterPlugin?: PluginConfiguration;
   ReportsPlugin?: PluginConfiguration;
   PolarPlotPlugin?: PluginConfiguration;
-  NextLaunchesPlugin?: PluginConfiguration;
+  TheSpaceDevLaunchCalendarPlugin?: PluginConfiguration;
   SeismicActivityPlugin?: PluginConfiguration;
   AuroraPlugin?: PluginConfiguration;
   NaturalEventsPlugin?: PluginConfiguration;
@@ -81,7 +81,7 @@ export type KeepTrackPluginsConfiguration = {
   NeighborhoodHistoryPlugin?: PluginConfiguration;
   EditSat?: PluginConfiguration;
   NewLaunch?: PluginConfiguration;
-  MissilePlugin?: PluginConfiguration;
+  MissileSimulatorPlugin?: PluginConfiguration;
   EarthCenteredView?: PluginConfiguration;
   SatelliteViewPlugin?: PluginConfiguration;
   SatelliteFixedView?: PluginConfiguration;
@@ -96,6 +96,7 @@ export type KeepTrackPluginsConfiguration = {
   NightToggle?: PluginConfiguration;
   OpticalSimulation?: PluginConfiguration;
   GraticuleToggle?: PluginConfiguration;
+  TerminatorToggle?: PluginConfiguration;
   CloudsToggle?: PluginConfiguration;
   PoliticalMapToggle?: PluginConfiguration;
   HideOtherSatellitesPlugin?: PluginConfiguration;
@@ -111,17 +112,20 @@ export type KeepTrackPluginsConfiguration = {
   PlanetsMenuPlugin?: PluginConfiguration;
   DeepSpaceMissionsPlugin?: PluginConfiguration;
   Screenshot?: PluginConfiguration;
-  LaunchCalendar?: PluginConfiguration;
+  GunterLaunchCalendar?: PluginConfiguration;
   TimeMachine?: PluginConfiguration;
   SatellitePhotos?: PluginConfiguration;
   ScreenRecorder?: PluginConfiguration;
   CatalogManagementPlugin?: PluginConfiguration;
+  StarManagementPlugin?: PluginConfiguration;
   CatalogBrowserPlugin?: CatalogBrowserConfiguration;
   HistoricCatalogPlugin?: PluginConfiguration;
   CloseObjectsPlugin?: PluginConfiguration;
   BestPassPlugin?: PluginConfiguration;
   OverflightPlugin?: PluginConfiguration;
+  TipAndCuePlanner?: PluginConfiguration;
   EclipseSolarAnalysis?: PluginConfiguration;
+  CoverageAnalysis?: PluginConfiguration;
   ManeuverPlugin?: PluginConfiguration;
   InitialOrbitDeterminationPlugin?: PluginConfiguration;
   Calculator?: PluginConfiguration;
@@ -132,6 +136,8 @@ export type KeepTrackPluginsConfiguration = {
   Lat2LonPlots?: PluginConfiguration;
   Inc2AltPlots?: PluginConfiguration;
   Inc2LonPlots?: PluginConfiguration;
+  AltIncHeatmap?: PluginConfiguration;
+  AzRangeHeatmap?: PluginConfiguration;
   FilterMenuPlugin?: PluginConfiguration;
   SymbologyPlugin?: PluginConfiguration;
   ColorSchemeEditorPlugin?: PluginConfiguration;

@@ -9,11 +9,6 @@ import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from 
 describe('DebrisScreening_class', () => {
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
-    window.M = {
-      AutoInit: () => {
-        // Mock the M.AutoInit function
-      },
-    } as unknown as typeof window.M;
   });
 
   standardPluginSuite(DebrisScreening, 'DebrisScreening');
@@ -25,11 +20,6 @@ describe('DebrisScreening_capabilities', () => {
 
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
-    window.M = {
-      AutoInit: () => {
-        // Mock the M.AutoInit function
-      },
-    } as unknown as typeof window.M;
     plugin = new DebrisScreening();
   });
 
@@ -37,7 +27,7 @@ describe('DebrisScreening_capabilities', () => {
     expect(hasBottomIcon(plugin)).toBe(true);
     const config = plugin.getBottomIconConfig();
 
-    expect(config.elementName).toBe('debris-screening-bottom-icon');
+    expect(config.elementName).toBe('conjunction-screen-icon');
     expect(config.label).toBe('Debris Screening');
     expect(config.isDisabledOnLoad).toBe(true);
   });
@@ -63,8 +53,10 @@ describe('DebrisScreening_capabilities', () => {
     const config = plugin.getHelpConfig();
 
     expect(config.title).toBe('Debris Screening');
-    expect(config.body).toContain('TCA');
-    expect(config.body).toContain('Probability of Collision');
+    const allContent = config.sections!.map((s) => s.content).join(' ');
+
+    expect(allContent).toContain('TCA');
+    expect(allContent).toContain('probability of collision');
   });
 });
 
@@ -73,11 +65,6 @@ describe('DebrisScreening_form', () => {
 
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
-    window.M = {
-      AutoInit: () => {
-        // Mock the M.AutoInit function
-      },
-    } as unknown as typeof window.M;
     debrisScreeningPlugin = new DebrisScreening();
   });
 
@@ -121,11 +108,6 @@ describe('DebrisScreening_risk_classification', () => {
 
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
-    window.M = {
-      AutoInit: () => {
-        // Mock the M.AutoInit function
-      },
-    } as unknown as typeof window.M;
     plugin = new DebrisScreening();
   });
 
@@ -171,11 +153,6 @@ describe('DebrisScreening_formatting', () => {
 
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
-    window.M = {
-      AutoInit: () => {
-        // Mock the M.AutoInit function
-      },
-    } as unknown as typeof window.M;
     plugin = new DebrisScreening();
   });
 

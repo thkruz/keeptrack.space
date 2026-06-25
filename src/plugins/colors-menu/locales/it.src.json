@@ -4,7 +4,16 @@
       "bottomIconLabel": "Colori",
       "title": "Schemi di Colore",
       "rmbLabel": "Schema di Colore",
-      "helpBody": "Il Menu Colori consente di cambiare il modo in cui i satelliti vengono colorati sul display. Diversi schemi di colore evidenziano diverse caratteristiche dei satelliti come il paese di origine, il tipo di orbita o il tipo di oggetto."
+      "sectionLabel": "Schemi",
+      "help": {
+        "overview": "Il menu Schemi di Colore cambia il modo in cui ogni oggetto della scena viene colorato. Ogni schema codifica una proprietà diversa: paese di origine, tipo di oggetto, regime orbitale, illuminazione solare, velocità e altro. Scegliere lo schema giusto trasforma la nuvola di punti nella risposta a una domanda precisa.",
+        "imgAlt": "Il menu Schemi di Colore con l'elenco degli schemi disponibili",
+        "imgCaption": "Fai clic su uno schema qualsiasi per ricolorare all'istante l'intero catalogo.",
+        "howToUse": "<ol><li>Apri il menu <strong>Colori</strong> dalla barra inferiore oppure premi <strong>A</strong>.</li><li>Fai clic su uno schema nell'elenco. La scena viene ricolorata immediatamente e il menu si chiude.</li><li>Controlla la legenda nell'angolo dello schermo per capire cosa significa ogni colore nello schema attivo.</li><li>Puoi anche fare clic destro nello spazio vuoto e scegliere <strong>Schema di Colore</strong> dal menu contestuale.</li></ol>",
+        "tip1": "La legenda si aggiorna con lo schema; se non sei sicuro del significato di un colore, la legenda è il riferimento.",
+        "tip2": "Alcuni schemi richiedono molti dati (come la densità spaziale) e impiegano un momento per essere calcolati alla prima selezione.",
+        "shortcutToggle": "Attiva/disattiva il menu Schemi di Colore"
+      }
     }
   }
 }

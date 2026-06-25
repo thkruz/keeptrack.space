@@ -3,7 +3,75 @@
     "BreakupAnalysis": {
       "bottomIconLabel": "Analýza rozpadu",
       "title": "Analýza rozpadu",
-      "helpBody": "Plugin Analýza rozpadu poskytuje databázi hlavních událostí rozpadu satelitů v historii. Vyberte událost pro zobrazení podrobných informací včetně mateřského objektu, příčiny rozpadu, časové osy od startu po rozpad a analýzy rozptylu úlomků. Plugin prohledává aktuální katalog sledovaných úlomků odpovídajících každé události a zobrazuje statistickou analýzu rozsahů výšek, excentricity a distribuce sklonu."
+      "helpBody": "Plugin Analýza rozpadu poskytuje databázi hlavních událostí rozpadu satelitů v historii. Vyberte událost pro zobrazení podrobných informací včetně mateřského objektu, příčiny rozpadu, časové osy od startu po rozpad a analýzy rozptylu úlomků. Plugin prohledává aktuální katalog sledovaných úlomků odpovídajících každé události a zobrazuje statistickou analýzu rozsahů výšek, excentricity a distribuce sklonu.",
+      "sections": {
+        "events": "Události",
+        "debrisStatistics": "Statistika úlomků",
+        "fragmentDispersion": "Analýza rozptylu úlomků",
+        "trackedFragments": "Sledované úlomky",
+        "gabbardDiagram": "Gabbardův diagram",
+        "actions": "Akce"
+      },
+      "actions": {
+        "backToEvents": "Zpět na události",
+        "jumpToDate": "Přejít na datum rozpadu",
+        "selectParent": "Vybrat mateřský objekt",
+        "exportCsv": "Exportovat úlomky (CSV)",
+        "showAll": "Zobrazit všechny úlomky",
+        "showFewer": "Zobrazit méně úlomků"
+      },
+      "gabbard": {
+        "apogee": "Apogeum",
+        "perigee": "Perigeum",
+        "periodAxis": "Perioda (min)",
+        "altitudeAxis": "Výška (km)"
+      },
+      "commands": {
+        "open": "Otevřít analýzu rozpadu",
+        "export": "Exportovat úlomky rozpadu (CSV)"
+      },
+      "labels": {
+        "event": "Událost",
+        "date": "Datum",
+        "cause": "Příčina",
+        "altKm": "Výška (km)",
+        "estDebris": "Odh. úlomků",
+        "parentObject": "Mateřský objekt",
+        "country": "Země",
+        "orbitType": "Typ dráhy",
+        "breakupAltitude": "Výška rozpadu",
+        "launchDate": "Datum startu",
+        "breakupDate": "Datum rozpadu",
+        "timeToBreakup": "Doba do rozpadu",
+        "years": "let",
+        "km": "km",
+        "trackedDebris": "Sledované úlomky",
+        "estimatedTotal": "Odhadovaný celkem",
+        "trackingRatio": "Poměr sledování",
+        "typeBreakdown": "Užitečná zatížení / Rak. stupně / Úlomky",
+        "parameter": "Parametr",
+        "min": "Min",
+        "max": "Max",
+        "mean": "Průměr",
+        "spread": "Rozptyl",
+        "perigeeParam": "Perigeum (km)",
+        "apogeeParam": "Apogeum (km)",
+        "eccentricityParam": "Excentricita",
+        "inclinationParam": "Sklon (°)",
+        "noTrackedDebris": "Pro tuto událost nebyly v aktuálním katalogu nalezeny žádné sledované úlomky.",
+        "showingOf": "(zobrazeno {shown} z {total})",
+        "norad": "NORAD",
+        "name": "Název",
+        "type": "Typ",
+        "perigee": "Perigeum",
+        "apogee": "Apogeum",
+        "incDeg": "Sklon (°)",
+        "ecc": "Exc"
+      },
+      "errorMsgs": {
+        "parentNotFound": "Mateřský objekt není v aktuálním katalogu.",
+        "noDataToExport": "Žádné sledované úlomky k exportu."
+      }
     }
   }
 }

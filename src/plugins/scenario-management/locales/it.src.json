@@ -3,7 +3,58 @@
     "ScenarioManagementMenu": {
       "title": "Gestione scenari",
       "bottomIconLabel": "Gestione scenari",
-      "helpBody": "Il plugin di gestione scenari consente di organizzare il lavoro per diversi progetti o contesti.<br/>Le funzionalità attuali sono:<br/><br/>  - Nome e descrizione per ogni scenario<br/>  - Data/ora di inizio e fine del periodo di analisi<br/>  - Salva/Carica scenari<br/><br/>L'obiettivo è fornire eventualmente un singolo file che contenga tutte le informazioni necessarie per la gestione degli scenari. Altre funzionalità in arrivo!"
+      "sideMenuTitle": "Impostazioni scenario",
+      "labels": {
+        "scenarioName": "Nome scenario",
+        "description": "Descrizione",
+        "scenarioStart": "Inizio scenario",
+        "scenarioEnd": "Fine scenario"
+      },
+      "tooltips": {
+        "name": "Il nome dello scenario.",
+        "description": "La descrizione dello scenario.",
+        "startDate": "Il DTG di inizio dello scenario in UTC (YYYY-MM-DD HH:MM:SS.sss).",
+        "endDate": "Il DTG di fine dello scenario in UTC (YYYY-MM-DD HH:MM:SS.sss)."
+      },
+      "placeholders": {
+        "description": "Inserisci qui la descrizione dello scenario..."
+      },
+      "buttons": {
+        "updateScenario": "Aggiorna scenario",
+        "saveScenario": "Salva scenario",
+        "loadScenario": "Carica scenario"
+      },
+      "msgs": {
+        "settingsUpdated": "Impostazioni dello scenario aggiornate con successo!",
+        "scenarioLoaded": "Scenario caricato con successo!"
+      },
+      "errorMsgs": {
+        "nameRequired": "Il nome dello scenario è obbligatorio.",
+        "startDateInvalid": "La data di inizio non è valida.",
+        "endDateInvalid": "La data di fine non è valida.",
+        "savingScenario": "Errore durante il salvataggio dello scenario!",
+        "loadingScenarioFile": "Errore durante il caricamento del file di scenario!",
+        "decompressingScenarioFile": "Errore durante la decompressione del file di scenario!"
+      },
+      "defaults": {
+        "scenarioName": "Il mio scenario",
+        "scenarioDescription": "Descrizione del mio scenario"
+      },
+      "core": {
+        "beforeStartTime": "Il tempo di simulazione è precedente all'inizio dello scenario. Pausa all'orario di inizio.",
+        "afterStopTime": "Il tempo di simulazione è successivo alla fine dello scenario. Pausa all'orario di fine."
+      },
+      "help": {
+        "overview": "La gestione scenari dà alla tua sessione un contesto con un nome: uno scenario con un nome, una descrizione e una finestra di analisi opzionale con un orario di inizio e di fine. L'orologio della simulazione viene quindi mantenuto entro quella finestra, e l'intera definizione può essere salvata su file e ricaricata in seguito o condivisa con un collega.",
+        "imgAlt": "Il menu Impostazioni scenario con i campi nome, descrizione e finestra temporale",
+        "imgCaption": "Definisci un nome di scenario, una descrizione e, facoltativamente, un orario di inizio e di fine.",
+        "windowHeading": "La finestra dello scenario",
+        "window": "Quando imposti un <strong>Inizio scenario</strong> o una <strong>Fine scenario</strong> (UTC, nel formato YYYY-MM-DD HH:MM:SS.sss), l'orologio della simulazione viene vincolato a quella finestra: se il tempo scivola prima dell'inizio o oltre la fine, l'orologio si mette in pausa al limite e una notifica ne spiega il motivo. Lascia i campi vuoti per uno scenario senza vincoli.",
+        "howToUse": "<ol><li>Apri <strong>Gestione scenari</strong> dal menu inferiore (modalità Strumenti).</li><li>Inserisci un <strong>Nome scenario</strong> (obbligatorio) e una <strong>Descrizione</strong> facoltativa.</li><li>Facoltativamente imposta gli orari di <strong>Inizio scenario</strong> e <strong>Fine scenario</strong> in UTC.</li><li>Fai clic su <strong>Aggiorna scenario</strong> per applicare. La finestra temporale viene applicata immediatamente.</li><li>Usa <strong>Salva scenario</strong> per scaricare la definizione come file .kts compresso e <strong>Carica scenario</strong> per ripristinarne uno dal disco.</li></ol>",
+        "tip1": "Se la riproduzione sembra bloccata, verifica se l'orologio è fermo a un limite dello scenario; svuota i campi di inizio e fine per sbloccarlo.",
+        "tip2": "I file di scenario sono piccoli file .kts compressi, comodi per condividere una finestra di analisi comune con un team.",
+        "tip3": "I campi data vengono convalidati durante la digitazione; una data non valida viene evidenziata e rifiutata all'aggiornamento."
+      }
     }
   }
 }

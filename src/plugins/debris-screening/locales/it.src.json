@@ -3,7 +3,6 @@
     "DebrisScreening": {
       "bottomIconLabel": "Screening detriti",
       "title": "Screening detriti",
-      "helpBody": "Lo strumento Screening detriti analizza un satellite selezionato rispetto al catalogo per identificare potenziali congiunzioni. <br><br> Configurare la finestra temporale di valutazione e fare clic su 'Screening detriti' per eseguire l'analisi. I risultati verranno visualizzati in una tabella che mostra: <ul style=\"margin-left: 40px;\"> <li><b>TCA</b> - Tempo di massimo avvicinamento</li> <li><b>Distanza di mancato impatto</b> - Componenti totali e RIC (radiale, lungo la traccia, trasversale)</li> <li><b>Pc</b> - Probabilità di collisione</li> <li><b>Livello di rischio</b> - Critico/Alto/Medio/Basso basato su Pc</li> </ul> Fare clic su qualsiasi ID satellite per selezionarlo. Esportare i risultati in CSV utilizzando il pulsante di download.",
       "resultsTitle": "Risultati dello screening",
       "resultsCount": "{count} congiunzioni trovate",
       "exportCsv": "Esporta CSV",
@@ -14,15 +13,54 @@
         "low": "Basso",
         "unknown": "N/D"
       },
+      "sccLabel": "SCC# del satellite",
+      "timeWindowLabel": "Finestra temporale",
+      "timeOptions": {
+        "h1": "1 ora",
+        "h4": "4 ore",
+        "h8": "8 ore",
+        "h24": "24 ore",
+        "h48": "48 ore",
+        "h72": "72 ore"
+      },
       "uLabel": "U (Radiale)",
       "vLabel": "V (Lungo la traccia)",
       "wLabel": "W (Trasversale)",
+      "screenForDebris": "Esegui screening detriti",
       "drawBox": "Disegna riquadro",
       "clearBox": "Cancella riquadro",
+      "table": {
+        "secondary": "Secondario",
+        "tca": "TCA",
+        "missKm": "Distanza (km)",
+        "rKm": "R (km)",
+        "iKm": "I (km)",
+        "cKm": "C (km)",
+        "pc": "Pc",
+        "risk": "Rischio"
+      },
       "errorMsgs": {
         "InvalidSatellite": "Satellite selezionato non valido",
         "ScreeningFailed": "Screening fallito",
         "NoResultsToExport": "Nessun risultato da esportare"
+      },
+      "help": {
+        "overview": "Lo Screening detriti esegue una valutazione delle congiunzioni del satellite selezionato rispetto al resto del catalogo. Trova ogni oggetto che entra in un riquadro di screening definito attorno al satellite durante la finestra temporale scelta, quindi ordina gli incontri per probabilità di collisione.",
+        "imgAlt": "Il menu Screening detriti con le opzioni di finestra temporale e riquadro di screening",
+        "imgCaption": "Imposta la finestra temporale e il riquadro di screening RIC, poi esegui lo screening del satellite selezionato rispetto al catalogo.",
+        "boxHeading": "Il riquadro di screening",
+        "box": "Il volume di screening è definito in coordinate RIC relative al satellite: <strong>U (Radiale)</strong> è su e giù in quota orbitale, <strong>V (Lungo la traccia)</strong> segue la direzione di volo e <strong>W (Trasversale)</strong> è da lato a lato. La dimensione radiale conta di più: la maggior parte degli incontri si separa nettamente in quota, quindi un U stretto con V e W più ampi è la scelta abituale. <strong>Disegna riquadro</strong> mostra il volume attorno al satellite nella vista 3D; <strong>Cancella riquadro</strong> lo rimuove.",
+        "resultsHeading": "Leggere i risultati",
+        "results": "Ogni riga della tabella dei risultati è una congiunzione prevista: <strong>Secondario</strong> è l'altro oggetto, <strong>TCA</strong> è il tempo di massimo avvicinamento, <strong>Distanza (km)</strong> è la distanza di mancato impatto totale con le sue componenti <strong>R</strong>, <strong>I</strong> e <strong>C</strong>, <strong>Pc</strong> è la probabilità di collisione e <strong>Rischio</strong> la classifica come Critico, Alto, Medio o Basso. Fai clic su una riga per selezionare l'oggetto secondario e portare l'orologio al TCA; il menu resta aperto così puoi scorrere gli eventi. <strong>Esporta CSV</strong> salva la tabella.",
+        "howToUse": "<ol><li>Seleziona un satellite; l'icona in basso è disabilitata finché non ne è selezionato uno.</li><li>Apri <strong>Screening detriti</strong> dal menu inferiore. Il numero SCC del satellite viene inserito automaticamente.</li><li>Scegli una <strong>Finestra temporale</strong> (da 1 a 72 ore) e regola se necessario le dimensioni del riquadro <strong>U</strong>, <strong>V</strong> e <strong>W</strong>.</li><li>Fai clic su <strong>Esegui screening detriti</strong>. Il pannello dei risultati si apre con le congiunzioni trovate, ordinate per la revisione.</li><li>Fai clic su una riga qualsiasi per esaminare quell'incontro al suo tempo di massimo avvicinamento.</li></ol>",
+        "tip1": "Finestre più lunghe e riquadri più grandi trovano più incontri ma richiedono più tempo di calcolo; inizia con i valori predefiniti e allarga solo se ti serve più copertura.",
+        "tip2": "Fare clic su una riga conserva lo stato di riproduzione: se l'orologio era in pausa, resta in pausa al TCA.",
+        "tip3": "I livelli di rischio sono soglie su Pc: sopra 1e-4 è Critico, sopra 1e-6 è Alto e sopra 1e-8 è Medio."
+      },
+      "sections": {
+        "parameters": "Parametri",
+        "searchBox": "Area di ricerca RIC",
+        "results": "Risultati"
       }
     }
   }

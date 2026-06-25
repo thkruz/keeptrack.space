@@ -8,6 +8,8 @@ import { Satellite, SpaceObjectType } from '@ootk/src/main';
 import scatterPlot4Png from '@public/img/icons/scatter-plot4.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { t7e } from '@app/locales/keys';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './lat2lon.css';
@@ -44,6 +46,23 @@ export class Lat2LonPlots extends KeepTrackPlugin {
 
   plotCanvasId = 'plot-analysis-chart-lat2lon';
   chart: echarts.ECharts;
+
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: t7e('plugins.Lat2LonPlots.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.Lat2LonPlots.help.overview'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.Lat2LonPlots.help.howToUse'),
+        },
+      ],
+      tips: [t7e('plugins.Lat2LonPlots.help.tip1')],
+    };
+  }
 
   sideMenuElementName = 'lat2lon-plots-menu';
   sideMenuElementHtml: string = html`

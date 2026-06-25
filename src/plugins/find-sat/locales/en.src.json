@@ -3,8 +3,27 @@
     "FindSatPlugin": {
       "bottomIconLabel": "Find Satellite",
       "title": "Find Satellite",
-      "helpBody": "The Find Satellite menu allows you to search for satellites based on various criteria:<br><br><ul style=\"margin-left: 40px;\"><li><strong>Object Type</strong> - Filter by Payload, Rocket Body, or Debris</li><li><strong>Country</strong> - Filter by launching country</li><li><strong>Satellite Bus/Payload/Shape/Source</strong> - Filter by satellite characteristics</li><li><strong>Azimuth/Elevation/Range</strong> - Search by look angles (requires sensor)</li><li><strong>Orbital Parameters</strong> - Inclination, Period, RAAN, Arg of Perigee</li><li><strong>TLE Age</strong> - Filter by how recently the TLE was updated</li><li><strong>RCS</strong> - Filter by Radar Cross Section</li></ul><br>Results are displayed in the search bar. Use the Export button to save results as CSV.",
+      "help": {
+        "overview": "Find Satellite searches the entire catalog for objects matching a combination of physical, orbital, and observational criteria. It is the fastest way to answer questions like \"which rocket bodies from China are in a roughly 100-minute orbit?\" or \"which payloads are within range of my sensor right now?\"",
+        "imgAlt": "The Find Satellite menu with object type, country, orbital, and sensor filters",
+        "imgCaption": "The Find Satellite menu. Every filled-in field narrows the search further.",
+        "filtersHeading": "Available Filters",
+        "filters": "<ul><li><strong>Object Type</strong>: payloads, rocket bodies, debris. Select multiple types at once; picking a specific type clears \"All\".</li><li><strong>Country</strong>: one or more launching countries.</li><li><strong>Satellite Bus / Payload / Shape / Source</strong>: physical and data-source characteristics.</li><li><strong>Azimuth / Elevation / Range</strong>: current look angles from the selected sensor. These require a sensor to be selected first.</li><li><strong>Orbital parameters</strong>: Inclination, Period, Right Ascension, and Argument of Perigee.</li><li><strong>TLE Age</strong>: how recently the orbit data was updated, in hours.</li><li><strong>RCS</strong>: radar cross section in m².</li></ul>Each numeric filter has a <strong>Margin</strong> field defining the accepted range around your value. Leave it blank to use a sensible default (for example ±5° for angles).",
+        "howToUse": "<ol><li>Open the menu from the bottom bar or press Ctrl+F.</li><li>Pick one or more Object Types and Countries from the dropdowns.</li><li>Enter numeric criteria and optionally tighten or widen their margins.</li><li>Click <strong>Find Satellite(s)</strong>. Matching objects are loaded into the search bar at the top and highlighted on the globe.</li><li>Click <strong>Export data</strong> to save the current results as a CSV file.</li></ol>",
+        "tip1": "Filters combine with AND logic: every criterion must match. If you get no results, remove the most restrictive filter first.",
+        "tip2": "Azimuth, Elevation, and Range are measured from the currently selected sensor, so select a sensor before using them.",
+        "tip3": "Results are capped. If a warning says the limit was hit, narrow your criteria to make sure you are seeing everything.",
+        "tip4": "Because results land in the search bar, you can hand them to any other menu that operates on the current search, or refine them by typing.",
+        "shortcutToggle": "Toggle the Find Satellite menu"
+      },
       "labels": {
+        "typePayload": "Payload",
+        "typeRocketBody": "Rocket Body",
+        "typeDebris": "Debris",
+        "busFilterPlaceholder": "Type to filter bus options",
+        "satelliteBusFilter": "Satellite Bus Filter",
+        "payloadFilterPlaceholder": "Type to filter payload options",
+        "payloadFilter": "Payload Filter",
         "objectType": "Object Type",
         "country": "Country",
         "satelliteBus": "Satellite Bus",
@@ -31,13 +50,20 @@
         "argOfPerigeeMargin": "Margin (deg)",
         "all": "All",
         "findSatellites": "Find Satellite(s)",
-        "exportData": "Export data"
+        "exportData": "Export data",
+        "sectionClassification": "Classification",
+        "sectionLookAngles": "Look Angles",
+        "sectionOrbital": "Orbital Elements",
+        "sectionPhysical": "Physical & Data",
+        "sensorNote": "Look angles require a sensor to be selected.",
+        "resultCount": "{count} result(s)"
       },
       "errorMsgs": {
         "NoSatellitesFound": "No Satellites Found",
         "NoSearchCriteriaEntered": "No Search Criteria Entered",
         "TooManyResults": "Too many results, limited to {limit}",
-        "TryFindingFirst": "Try finding satellites first!"
+        "TryFindingFirst": "Try finding satellites first!",
+        "SearchFailed": "Search failed: {error}"
       }
     }
   }

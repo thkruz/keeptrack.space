@@ -31,28 +31,51 @@ import analysisPng from '@public/img/icons/reports.png';
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
-import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
+import { StorageKey } from '@app/engine/persistence/storage-key';
 import {
   IBottomIconConfig,
   ICommandPaletteCommand,
   IHelpConfig,
   ISideMenuConfig,
 } from '@app/engine/plugins/core/plugin-capabilities';
+import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
-import { Kilometers, MILLISECONDS_PER_SECOND, Satellite, TemeVec3 } from '@ootk/src/main';
-import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { Kilometers, Satellite, TemeVec3 } from '@ootk/src/main';
 
-interface ReportData {
-  filename: string;
-  header: string;
-  body: string;
-  columns?: number;
-  isHeaders?: boolean;
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { BestPassDeps, findPassesForSat } from '../best-pass/best-pass-calculator';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { buildDownloadPayload, buildPreviewText, ReportFormat } from './report-formatter';
+import {
+  generateAerReport,
+  generateCoesReport,
+  generateEciReport,
+  generateLlaReport,
+  generateSunEclipseReport,
+  generateVisibilityWindowsReport,
+  REPORT_DEFAULTS,
+  ReportCoreDeps,
+  ReportData,
+  ReportOptions,
+  ReportPass,
+  SunIllumination,
+} from './reports-core';
+import './reports.css';
+
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.ReportsPlugin.${key}` as Parameters<typeof t7e>[0]);
+
+/** The context a report generator receives: the time window, injected app state, and the report epoch. */
+export interface ReportContext {
+  options: ReportOptions;
+  deps: ReportCoreDeps;
+  /** The simulation time the report is generated at (used in the metadata header). */
+  generatedAt: Date;
 }
 
 /**
@@ -71,11 +94,23 @@ export interface ReportGenerator {
    * Generate the report data
    * @param sat The selected satellite
    * @param sensor The selected sensor (if required)
-   * @param startTime The start time for the report
+   * @param ctx The report context (time window, injected dependencies, epoch)
    * @returns The report data to be written
    */
-  generate(sat: Satellite, sensor: DetailedSensor | null, startTime: Date): ReportData;
+  generate(sat: Satellite, sensor: DetailedSensor | null, ctx: ReportContext): ReportData;
 }
+
+/** Persisted shape for the last-used output options (StorageKey.REPORTS_SETTINGS). */
+interface ReportsSettings {
+  windowSec?: number;
+  stepSec?: number;
+  format?: ReportFormat;
+}
+
+/** Selectable look-ahead windows, in seconds. */
+const WINDOW_OPTIONS_SEC = [24 * 60 * 60, 3 * 24 * 60 * 60, 7 * 24 * 60 * 60, 14 * 24 * 60 * 60];
+/** Selectable sampling steps, in seconds. */
+const STEP_OPTIONS_SEC = [10, 30, 60, 300];
 
 export class ReportsPlugin extends KeepTrackPlugin {
   readonly id = 'ReportsPlugin';
@@ -87,7 +122,11 @@ export class ReportsPlugin extends KeepTrackPlugin {
    * Other plugins can register their reports by calling ReportsPlugin.registerReport()
    */
   private static readonly reportRegistry_: Map<string, ReportGenerator> = new Map();
-  private readonly buttons_: string;
+
+  /** Current output options (restored from persistence in uiManagerFinal_). */
+  private windowSec_: number = REPORT_DEFAULTS.windowSec;
+  private stepSec_: number = REPORT_DEFAULTS.stepSec;
+  private format_: ReportFormat = 'text';
 
   /**
    * Register a new report generator
@@ -122,19 +161,6 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
     // Register built-in reports
     this.registerBuiltInReports_();
-
-    this.buttons_ = ReportsPlugin.getRegisteredReports()
-      .map((report) => `
-          <button
-              id="${report.id}-btn"
-              class="btn btn-ui waves-effect waves-light"
-              type="button"
-              name="action"
-              title="${report.description || report.name}">
-            ${report.name} &#9658;
-          </button>
-      `)
-      .join('');
   }
 
   isRequireSatelliteSelected = true;
@@ -178,7 +204,26 @@ export class ReportsPlugin extends KeepTrackPlugin {
   getHelpConfig(): IHelpConfig {
     return {
       title: t7e('plugins.ReportsPlugin.title'),
-      body: t7e('plugins.ReportsPlugin.helpBody'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/reports/reports-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: l('help.typesHeading'),
+          content: l('help.types'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2')],
     };
   }
 
@@ -187,7 +232,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
     const reportCommands: ICommandPaletteCommand[] = ReportsPlugin.getRegisteredReports().map((report) => ({
       id: `ReportsPlugin.${report.id}`,
-      label: `Generate ${report.name} Report`,
+      label: l('commands.generateReport').replace('{name}', report.name),
       category,
       callback: () => this.generateReport_(report),
       isAvailable: () => {
@@ -209,7 +254,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     return [
       {
         id: 'ReportsPlugin.open',
-        label: 'Open Reports',
+        label: l('commands.open'),
         category,
         callback: () => this.bottomMenuClicked(),
         isAvailable: () => !!this.selectSatManager_?.primarySatObj?.isSatellite?.(),
@@ -218,51 +263,208 @@ export class ReportsPlugin extends KeepTrackPlugin {
     ];
   }
 
+  // =========================================================================
+  // Side menu HTML (v13 card UI)
+  // =========================================================================
+
   private buildSideMenuHtml_(): string {
+    const reports = ReportsPlugin.getRegisteredReports();
+    const orbitReports = reports.filter((r) => !r.requiresSensor);
+    const sensorReports = reports.filter((r) => r.requiresSensor);
+
     return html`
-      <div id="reports-menu" class="side-menu-parent start-hidden">
+      <div id="reports-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div id="reports-content" class="side-menu">
-          <div class="row">
-            <div id="reports-buttons" class="center-align" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px; margin-left: 10px; margin-right: 10px;">
+          <section class="kt-section">
+            <div class="kt-section-label">${l('sections.orbitPosition')}</div>
+            ${ReportsPlugin.buildActionRows_(orbitReports)}
+          </section>
+          <section class="kt-section">
+            <div class="kt-section-label">${l('sections.sensor')}</div>
+            <div class="kt-note" id="reports-sensor-note">${l('sensorNote')}</div>
+            ${ReportsPlugin.buildActionRows_(sensorReports)}
+          </section>
+          <section class="kt-section">
+            <div class="kt-section-label">${l('sections.options')}</div>
+            <div class="kt-field-row">
+              <div class="input-field col s12">
+                <select id="reports-window">${this.buildWindowOptions_()}</select>
+                <label for="reports-window">${l('options.window')}</label>
+              </div>
             </div>
-          </div>
+            <div class="kt-field-row">
+              <div class="input-field col s6">
+                <select id="reports-step">${this.buildStepOptions_()}</select>
+                <label for="reports-step">${l('options.step')}</label>
+              </div>
+              <div class="input-field col s6">
+                <select id="reports-format">${this.buildFormatOptions_()}</select>
+                <label for="reports-format">${l('options.format')}</label>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
     `;
   }
 
-  addHtml(): void {
-    super.addHtml();
-
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerInit,
-      () => {
-        // Insert the dynamically generated buttons into the side menu
-        const buttonsContainer = getEl('reports-buttons');
-
-        if (buttonsContainer) {
-          buttonsContainer.innerHTML = this.buttons_;
-        }
-      },
-    );
+  private static buildActionRows_(reports: ReportGenerator[]): string {
+    return reports
+      .map((report) => html`
+        <button id="${report.id}-btn" type="button" class="kt-action waves-effect" title="${report.description || report.name}">
+          <span class="kt-action-label">${report.name}</span>
+        </button>
+      `)
+      .join('');
   }
+
+  private buildWindowOptions_(): string {
+    return WINDOW_OPTIONS_SEC
+      .map((sec) => {
+        const days = sec / (24 * 60 * 60);
+
+        return `<option value="${sec}" ${sec === this.windowSec_ ? 'selected' : ''}>${l('options.days').replace('{days}', days.toString())}</option>`;
+      })
+      .join('');
+  }
+
+  private buildStepOptions_(): string {
+    return STEP_OPTIONS_SEC
+      .map((sec) => `<option value="${sec}" ${sec === this.stepSec_ ? 'selected' : ''}>${l('options.seconds').replace('{seconds}', sec.toString())}</option>`)
+      .join('');
+  }
+
+  private buildFormatOptions_(): string {
+    const formats: ReportFormat[] = ['text', 'csv', 'json'];
+
+    return formats
+      .map((fmt) => `<option value="${fmt}" ${fmt === this.format_ ? 'selected' : ''}>${l(`options.format_${fmt}`)}</option>`)
+      .join('');
+  }
+
+  // =========================================================================
+  // Lifecycle
+  // =========================================================================
 
   addJs(): void {
     super.addJs();
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        // Dynamically attach event listeners for all registered reports
-        ReportsPlugin.getRegisteredReports().forEach((report) => {
-          const button = getEl(`${report.id}-btn`);
-
-          if (button) {
-            button.addEventListener('click', () => this.generateReport_(report));
-          }
-        });
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => this.uiManagerFinal_());
+    EventBus.getInstance().on(EventBusEvent.setSensor, () => this.updateSensorReportsState_());
+    EventBus.getInstance().on(EventBusEvent.resetSensor, () => this.updateSensorReportsState_());
   }
+
+  private uiManagerFinal_(): void {
+    this.restoreOptions_();
+
+    // Attach click handlers for every registered report button.
+    ReportsPlugin.getRegisteredReports().forEach((report) => {
+      getEl(`${report.id}-btn`, true)?.addEventListener('click', () => this.generateReport_(report));
+    });
+
+    // Persist + apply the output options whenever they change.
+    getEl('reports-window', true)?.addEventListener('change', () => this.readOptionsFromForm_());
+    getEl('reports-step', true)?.addEventListener('change', () => this.readOptionsFromForm_());
+    getEl('reports-format', true)?.addEventListener('change', () => this.readOptionsFromForm_());
+
+    initMaterialSelects(getEl('reports-menu', true) ?? document.body);
+    this.updateSensorReportsState_();
+  }
+
+  /** Enables/disables the sensor-requiring report rows and toggles the requirement note. */
+  private updateSensorReportsState_(): void {
+    const hasSensor = (() => {
+      try {
+        return ServiceLocator.getSensorManager().isSensorSelected();
+      } catch {
+        return false;
+      }
+    })();
+
+    ReportsPlugin.getRegisteredReports()
+      .filter((r) => r.requiresSensor)
+      .forEach((r) => {
+        const btn = getEl(`${r.id}-btn`, true) as HTMLButtonElement | null;
+
+        if (btn) {
+          btn.disabled = !hasSensor;
+        }
+      });
+
+    const note = getEl('reports-sensor-note', true);
+
+    if (note) {
+      note.style.display = hasSensor ? 'none' : 'block';
+    }
+  }
+
+  // =========================================================================
+  // Options persistence
+  // =========================================================================
+
+  private readOptionsFromForm_(): void {
+    const windowEl = getEl('reports-window', true) as HTMLSelectElement | null;
+    const stepEl = getEl('reports-step', true) as HTMLSelectElement | null;
+    const formatEl = getEl('reports-format', true) as HTMLSelectElement | null;
+
+    if (windowEl) {
+      this.windowSec_ = parseInt(windowEl.value, 10) || REPORT_DEFAULTS.windowSec;
+    }
+    if (stepEl) {
+      this.stepSec_ = parseInt(stepEl.value, 10) || REPORT_DEFAULTS.stepSec;
+    }
+    if (formatEl) {
+      this.format_ = formatEl.value as ReportFormat;
+    }
+
+    this.persistOptions_();
+  }
+
+  private persistOptions_(): void {
+    const settings: ReportsSettings = { windowSec: this.windowSec_, stepSec: this.stepSec_, format: this.format_ };
+
+    PersistenceManager.getInstance().saveItem(StorageKey.REPORTS_SETTINGS, JSON.stringify(settings));
+  }
+
+  private restoreOptions_(): void {
+    const raw = PersistenceManager.getInstance().getItem(StorageKey.REPORTS_SETTINGS);
+
+    if (raw) {
+      try {
+        const settings = JSON.parse(raw) as ReportsSettings;
+
+        if (typeof settings.windowSec === 'number') {
+          this.windowSec_ = settings.windowSec;
+        }
+        if (typeof settings.stepSec === 'number') {
+          this.stepSec_ = settings.stepSec;
+        }
+        if (settings.format) {
+          this.format_ = settings.format;
+        }
+      } catch {
+        // Ignore corrupt settings and fall back to defaults.
+      }
+    }
+
+    // Reflect the restored values in the form controls.
+    const windowEl = getEl('reports-window', true) as HTMLSelectElement | null;
+    const stepEl = getEl('reports-step', true) as HTMLSelectElement | null;
+    const formatEl = getEl('reports-format', true) as HTMLSelectElement | null;
+
+    if (windowEl) {
+      windowEl.value = this.windowSec_.toString();
+    }
+    if (stepEl) {
+      stepEl.value = this.stepSec_.toString();
+    }
+    if (formatEl) {
+      formatEl.value = this.format_;
+    }
+  }
+
+  // =========================================================================
+  // Report generation
+  // =========================================================================
 
   /**
    * Generic report generation method that works with any registered report
@@ -283,10 +485,83 @@ export class ReportsPlugin extends KeepTrackPlugin {
       }
     }
 
-    const startTime = this.getStartTime_();
-    const reportData = report.generate(sat, sensor, startTime);
+    const reportData = report.generate(sat, sensor, this.buildContext_(sat));
 
     this.writeReport_(reportData);
+  }
+
+  /** Assembles the report context: time window, injected dependencies, and report epoch. */
+  private buildContext_(sat: Satellite): ReportContext {
+    const startTime = this.getStartTime_();
+    const options: ReportOptions = { startTime, windowSec: this.windowSec_, stepSec: this.stepSec_ };
+
+    return { options, deps: this.buildCoreDeps_(sat), generatedAt: startTime };
+  }
+
+  /**
+   * Builds the application-state dependencies the pure generators need. Everything
+   * is computed lazily inside the closures so non-sensor reports (e.g. COES) never
+   * trigger the satrec/pass machinery.
+   */
+  private buildCoreDeps_(sat: Satellite): ReportCoreDeps {
+    return {
+      findPasses: (sensor, opts) => this.findPasses_(sat, sensor, opts),
+      sunStatusAt: (date) => ReportsPlugin.sunStatusAt_(sat, date),
+    };
+  }
+
+  /** Finds in-view passes via the shared best-pass finder, mapping rows to {@link ReportPass}. */
+  private findPasses_(sat: Satellite, sensor: DetailedSensor, opts: ReportOptions): ReportPass[] {
+    const catalogManager = ServiceLocator.getCatalogManager();
+    const satrec = catalogManager.calcSatrec(sat);
+    const scene = ServiceLocator.getScene();
+    const deps: BestPassDeps = {
+      baseTimeMs: opts.startTime.getTime(),
+      getRae: (date, sr, sen) => SatMath.getRae(date, sr, sen),
+      checkIsInView: (sen, rae) => SatMath.checkIsInView(sen, rae as Parameters<typeof SatMath.checkIsInView>[1]),
+      sunEciKm: () => ({
+        x: scene.sun.position[0] as Kilometers,
+        y: scene.sun.position[1] as Kilometers,
+        z: scene.sun.position[2] as Kilometers,
+      }),
+    };
+
+    // Detect passes with a coarse step (short LEO passes are minutes long); the
+    // finer per-sample resolution for AER is applied separately via opts.stepSec.
+    const { passes } = findPassesForSat(sat.sccNum, satrec, sensor, {
+      lengthDays: opts.windowSec / (24 * 60 * 60),
+      intervalSec: Math.min(opts.stepSec, 30),
+      maxResults: 1000,
+    }, deps);
+
+    return passes.map((row) => ({
+      aos: row.START_DATE as Date,
+      los: row.STOP_DATE as Date,
+      maxEl: parseFloat((row.MAXIMUM_ELEVATION as string) ?? '0'),
+      maxElTime: new Date(row.MAXIMUM_ELEVATION_DTG as number),
+    }));
+  }
+
+  /** Computes the satellite's sun-illumination state and sun angle at a given time. */
+  private static sunStatusAt_(sat: Satellite, date: Date): { illumination: SunIllumination; sunAngleDeg: number } | null {
+    const stateVector = sat.eci(date);
+
+    if (!stateVector) {
+      return null;
+    }
+
+    const sunPosArr = ServiceLocator.getScene().sun.getEci(date);
+    const sunPos = { x: sunPosArr[0], y: sunPosArr[1], z: sunPosArr[2] } as TemeVec3<Kilometers>;
+    const status = SatMath.calculateIsInSun(stateVector, sunPos);
+    const sunAngleDeg = SatMath.sunSatEarthAngle(stateVector.position, sunPos);
+
+    const illuminationMap: Record<SunStatus, SunIllumination> = {
+      [SunStatus.SUN]: 'sun',
+      [SunStatus.PENUMBRAL]: 'penumbral',
+      [SunStatus.UMBRAL]: 'umbral',
+    } as Record<SunStatus, SunIllumination>;
+
+    return { illumination: illuminationMap[status] ?? 'unknown', sunAngleDeg };
   }
 
   /**
@@ -294,396 +569,121 @@ export class ReportsPlugin extends KeepTrackPlugin {
    * This is called during construction
    */
   private registerBuiltInReports_(): void {
-    // Azimuth Elevation Range Report
     ReportsPlugin.registerReport({
       id: 'aer-report',
-      name: 'Azimuth Elevation Range',
-      description: 'Generate azimuth, elevation, and range data for satellite passes',
+      name: l('reports.aer.name'),
+      description: l('reports.aer.description'),
       requiresSensor: true,
-      generate: (sat: Satellite, sensor: DetailedSensor | null, startTime: Date): ReportData => {
+      generate: (sat, sensor, ctx) => {
         if (!sensor) {
           throw new Error('Sensor is required for AER report');
         }
 
-        const header = `Azimuth Elevation Range Report\n-------------------------------\n${this.createHeader_(sat, sensor)}`;
-        let body = 'Time (UTC),Azimuth(°),Elevation(°),Range(km)\n';
-        const durationInSeconds = 72 * 60 * 60;
-        let isInCoverage = false;
-        let time = new Date(startTime.getTime());
-
-        for (let t = 0; t < durationInSeconds; t += 30) {
-          time = new Date(time.getTime() + MILLISECONDS_PER_SECOND * 30);
-          const rae = sensor.rae(sat, time);
-
-          if (!rae) {
-            continue;
-          }
-
-          if (rae.el > 0) {
-            isInCoverage = true;
-            body += `${this.formatTime_(time)},${rae.az.toFixed(3)},${rae.el.toFixed(3)},${rae.rng.toFixed(3)}\n`;
-          } else if (isInCoverage) {
-            body += '\n\n';
-            isInCoverage = false;
-          }
-        }
-
-        if (body === 'Time (UTC),Azimuth(°),Elevation(°),Range(km)\n') {
-          body += 'No passes found!';
-        }
-
-        return {
-          filename: `aer-${sat.sccNum}`,
-          header,
-          body,
-        };
+        return generateAerReport(sat, sensor, ctx.options, ctx.deps, ctx.generatedAt);
       },
     });
 
-    // Latitude Longitude Altitude Report
     ReportsPlugin.registerReport({
       id: 'lla-report',
-      name: 'Latitude Longitude Altitude',
-      description: 'Generate latitude, longitude, and altitude data over time',
+      name: l('reports.lla.name'),
+      description: l('reports.lla.description'),
       requiresSensor: false,
-      generate: (sat: Satellite, _sensor: DetailedSensor | null, startTime: Date): ReportData => {
-        const header = `Latitude Longitude Altitude Report\n-------------------------------\n${this.createHeader_(sat)}`;
-        let body = 'Time (UTC),Latitude(°),Longitude(°),Altitude(km)\n';
-        const durationInSeconds = 72 * 60 * 60;
-        let time = new Date(startTime.getTime());
-
-        for (let t = 0; t < durationInSeconds; t += 30) {
-          time = new Date(time.getTime() + 30 * MILLISECONDS_PER_SECOND);
-          const lla = sat.lla(time);
-
-          if (!lla) {
-            continue;
-          }
-
-          body += `${this.formatTime_(time)},${lla.lat.toFixed(3)},${lla.lon.toFixed(3)},${lla.alt.toFixed(3)}\n`;
-        }
-
-        return {
-          filename: `lla-${sat.sccNum}`,
-          header,
-          body,
-        };
-      },
+      generate: (sat, _sensor, ctx) => generateLlaReport(sat, ctx.options, ctx.generatedAt),
     });
 
-    // Earth Centered Inertial Report
     ReportsPlugin.registerReport({
       id: 'eci-report',
-      name: 'Earth Centered Inertial',
-      description: 'Generate ECI position and velocity vectors over time',
+      name: l('reports.eci.name'),
+      description: l('reports.eci.description'),
       requiresSensor: false,
-      generate: (sat: Satellite, _sensor: DetailedSensor | null, startTime: Date): ReportData => {
-        const header = `Earth Centered Inertial Report\n-------------------------------\n${this.createHeader_(sat)}`;
-        let body = 'Time (UTC),Position X(km),Position Y(km),Position Z(km),Velocity X(km/s),Velocity Y(km/s),Velocity Z(km/s)\n';
-        const durationInSeconds = 72 * 60 * 60;
-        let time = new Date(startTime.getTime());
-
-        for (let t = 0; t < durationInSeconds; t += 30) {
-          time = new Date(time.getTime() + 30 * MILLISECONDS_PER_SECOND);
-          const eci = sat.eci(time);
-
-          if (!eci) {
-            continue;
-          }
-
-          body += `${this.formatTime_(time)},${eci.position.x.toFixed(3)},${eci.position.y.toFixed(3)},${eci.position.z.toFixed(3)},` +
-            `${eci.velocity.x.toFixed(3)},${eci.velocity.y.toFixed(3)},${eci.velocity.z.toFixed(3)}\n`;
-        }
-
-        return {
-          filename: `eci-${sat.sccNum}`,
-          header,
-          body,
-          columns: 7,
-          isHeaders: true,
-        };
-      },
+      generate: (sat, _sensor, ctx) => generateEciReport(sat, ctx.options, ctx.generatedAt),
     });
 
-    // Classical Orbital Elements Report
     ReportsPlugin.registerReport({
       id: 'coes-report',
-      name: 'Classical Orbital Elements',
-      description: 'Generate classical orbital elements at current epoch',
+      name: l('reports.coes.name'),
+      description: l('reports.coes.description'),
       requiresSensor: false,
-      generate: (sat: Satellite): ReportData => {
-        const header = `Classic Orbit Elements Report\n-------------------------------\n${this.createHeader_(sat)}`;
-        const classicalEls = sat.toJ2000().toClassicalElements();
-        const body = '' +
-          `Epoch, ${classicalEls.epoch}\n` +
-          `Apogee, ${classicalEls.apogee.toFixed(3)} km\n` +
-          `Perigee, ${classicalEls.perigee.toFixed(3)} km\n` +
-          `Inclination, ${classicalEls.inclination.toFixed(3)}°\n` +
-          `Right Ascension, ${classicalEls.rightAscensionDegrees.toFixed(3)}°\n` +
-          `Argument of Perigee, ${classicalEls.argPerigeeDegrees.toFixed(3)}°\n` +
-          `True Anomaly, ${classicalEls.trueAnomalyDegrees.toFixed(3)}°\n` +
-          `Eccentricity, ${classicalEls.eccentricity.toFixed(3)}\n` +
-          `Period, ${classicalEls.period.toFixed(3)} min\n` +
-          `Semi-Major Axis, ${classicalEls.semimajorAxis.toFixed(3)} km\n` +
-          `Mean Motion, ${classicalEls.meanMotion.toFixed(3)} rev/day`;
-
-        return {
-          filename: `coes-${sat.sccNum}`,
-          header,
-          body,
-          columns: 2,
-          isHeaders: false,
-        };
-      },
+      generate: (sat, _sensor, ctx) => generateCoesReport(sat, ctx.generatedAt),
     });
 
-    // Visibility Windows Report
     ReportsPlugin.registerReport({
       id: 'visibility-windows-report',
-      name: 'Visibility Windows',
-      description: 'Generate visibility windows with rise/set times and pass duration',
+      name: l('reports.visibilityWindows.name'),
+      description: l('reports.visibilityWindows.description'),
       requiresSensor: true,
-      generate: (sat: Satellite, sensor: DetailedSensor | null, startTime: Date): ReportData => {
+      generate: (sat, sensor, ctx) => {
         if (!sensor) {
           throw new Error('Sensor is required for Visibility Windows report');
         }
 
-        const header = `Visibility Windows Report\n-------------------------------\n${this.createHeader_(sat, sensor)}`;
-        let body = 'Pass #,Rise Time (UTC),Set Time (UTC),Duration (min),Max Elevation(°),Max Elevation Time (UTC)\n';
-        const durationInSeconds = 7 * 24 * 60 * 60; // 7 days
-        let time: Date;
-        let passNumber = 0;
-        let inPass = false;
-        let riseTime: Date | null = null;
-        let maxEl = 0;
-        let maxElTime: Date | null = null;
-
-        for (let t = 0; t < durationInSeconds; t += 10) {
-          time = new Date(startTime.getTime() + t * MILLISECONDS_PER_SECOND);
-          const rae = sensor.rae(sat, time);
-
-          if (!rae) {
-            continue;
-          }
-
-          if (sensor.isRaeInFov(rae.az, rae.el, rae.rng) && !inPass) {
-            // Pass start
-            inPass = true;
-            riseTime = new Date(time.getTime());
-            maxEl = rae.el;
-            maxElTime = new Date(time.getTime());
-          } else if (sensor.isRaeInFov(rae.az, rae.el, rae.rng) && inPass) {
-            // During pass - track max elevation
-            if (rae.el > maxEl) {
-              maxEl = rae.el;
-              maxElTime = new Date(time.getTime());
-            }
-          } else if (!sensor.isRaeInFov(rae.az, rae.el, rae.rng) && inPass) {
-            // Pass end
-            inPass = false;
-            passNumber++;
-            const setTime = new Date(time.getTime());
-            const duration = riseTime ? (setTime.getTime() - riseTime.getTime()) / (MILLISECONDS_PER_SECOND * 60) : 0;
-
-            body += `${passNumber},${this.formatTime_(riseTime!)},${this.formatTime_(setTime)},${duration.toFixed(2)},` +
-              `${maxEl.toFixed(3)},${this.formatTime_(maxElTime!)}\n`;
-
-            maxEl = 0;
-            maxElTime = null;
-            riseTime = null;
-          }
-        }
-
-        if (passNumber === 0) {
-          body += 'No passes found in the next 7 days!';
-        }
-
-        return {
-          filename: `visibility-windows-${sat.sccNum}`,
-          header,
-          body,
-          columns: 6,
-          isHeaders: true,
-        };
+        return generateVisibilityWindowsReport(sat, sensor, ctx.options, ctx.deps, ctx.generatedAt);
       },
     });
 
-    // Sun/Eclipse Report
     ReportsPlugin.registerReport({
       id: 'sun-eclipse-report',
-      name: 'Sun/Eclipse Analysis',
-      description: 'Generate sun visibility and eclipse entry/exit times for power and thermal analysis',
+      name: l('reports.sunEclipse.name'),
+      description: l('reports.sunEclipse.description'),
       requiresSensor: false,
-      generate: (sat: Satellite, _sensor: DetailedSensor | null, startTime: Date): ReportData => {
-        const header = `Sun/Eclipse Analysis Report\n-------------------------------\n${this.createHeader_(sat)}`;
-        let body = 'Time (UTC),Sun Illuminated,Eclipse Type,Sun Angle(°)\n';
-        const durationInSeconds = 3 * 24 * 60 * 60; // 3 days
-        let time: Date;
-
-        for (let t = 0; t < durationInSeconds; t += 60) {
-          time = new Date(startTime.getTime() + t * MILLISECONDS_PER_SECOND);
-
-          // Calculate if satellite is illuminated by the sun
-          const stateVector = sat.eci(time);
-
-          if (!stateVector) {
-            continue;
-          }
-          const sunPosArr = Scene.getInstance().sun.getEci(time);
-          const sunPos = { x: sunPosArr[0], y: sunPosArr[1], z: sunPosArr[2] } as TemeVec3<Kilometers>;
-
-          // Calculate if satellite is in Earth's shadow
-          const sunStatus = SatMath.calculateIsInSun(stateVector, sunPos);
-          // Calculate sun angle (angle between satellite and sun from Earth center)
-          const sunAngle = SatMath.sunSatEarthAngle(stateVector.position, sunPos);
-
-          let illuminationStatus;
-          let eclipseType;
-
-          switch (sunStatus) {
-            case SunStatus.SUN:
-              illuminationStatus = 'Yes';
-              break;
-            case SunStatus.PENUMBRAL:
-              illuminationStatus = 'Partial';
-              break;
-            case SunStatus.UMBRAL:
-              illuminationStatus = 'No';
-              break;
-            default:
-              illuminationStatus = 'Unknown';
-              break;
-          }
-
-          switch (sunStatus) {
-            case SunStatus.SUN:
-              eclipseType = 'None';
-              break;
-            case SunStatus.PENUMBRAL:
-              eclipseType = 'Penumbral';
-              break;
-            case SunStatus.UMBRAL:
-              eclipseType = 'Umbral';
-              break;
-            default:
-              eclipseType = 'Unknown';
-          }
-
-          body += `${this.formatTime_(time)},${illuminationStatus},${eclipseType},${sunAngle.toFixed(3)}\n`;
-        }
-
-        return {
-          filename: `sun-eclipse-${sat.sccNum}`,
-          header,
-          body,
-          columns: 4,
-          isHeaders: true,
-        };
-      },
+      generate: (sat, _sensor, ctx) => generateSunEclipseReport(sat, ctx.options, ctx.deps, ctx.generatedAt),
     });
   }
 
-  private formatTime_(time: Date) {
-    const timeStr = time.toISOString();
-    const timeStrSplit = timeStr.split('T');
-    const date = timeStrSplit[0];
-    const timeSplit = timeStrSplit[1].split('.');
-    const timeOut = timeSplit[0];
+  // =========================================================================
+  // Output
+  // =========================================================================
 
-    return `${date} ${timeOut}`;
-  }
+  private writeReport_(data: ReportData): void {
+    const win = window.open('', data.filename);
 
-  private createHeader_(sat: Satellite, sensor?: DetailedSensor) {
-    const satData = '' +
-      `Date: ${new Date().toISOString()}\n` +
-      `Satellite: ${sat.name}\n` +
-      `NORAD ID: ${sat.sccNum}\n` +
-      `Alternate ID: ${sat.altId || 'None'}\n` +
-      `International Designator: ${sat.intlDes}\n\n`;
-    const sensorData = '' +
-      `Sensor: ${sensor ? sensor.name : 'None'}\n` +
-      `Type: ${sensor ? sensor.getTypeString() : 'None'}\n` +
-      `Latitude: ${sensor ? sensor.lat : 'None'}\n` +
-      `Longitude: ${sensor ? sensor.lon : 'None'}\n` +
-      `Altitude: ${sensor ? sensor.alt : 'None'}\n` +
-      `Min Azimuth: ${sensor ? sensor.minAz : 'None'}\n` +
-      `Max Azimuth: ${sensor ? sensor.maxAz : 'None'}\n` +
-      `Min Elevation: ${sensor ? sensor.minEl : 'None'}\n` +
-      `Max Elevation: ${sensor ? sensor.maxEl : 'None'}\n` +
-      `Min Range: ${sensor ? sensor.minRng : 'None'}\n` +
-      `Max Range: ${sensor ? sensor.maxRng : 'None'}\n\n`;
-
-
-    return sensor ? `${satData}${sensorData}` : `${satData}`;
-  }
-
-  private writeReport_({ filename, header, body, columns = 4, isHeaders = true }: ReportData) {
-    // Open a new window and write the report to it - the title of the window should be the satellite name
-    const win = window.open('text/plain', filename);
-
-    // Create an array that is columns long and fill it with 0s
-    const colWidths = new Array(columns).fill(0);
-
-    if (win) {
-      const formattedReport = body
-        .split('\n')
-        .map((line) => line.split(','))
-        .map((values, idx) => values.map((value, idx2) => {
-          if (idx === 0) {
-            if (idx2 === 0) {
-              colWidths[idx2] = Math.max(new Date().toISOString().length + 5, value.trim().length + 5);
-            } else {
-              colWidths[idx2] = Math.max(10, value.trim().length + 5);
-            }
-          }
-
-          return value.trim().padEnd(colWidths[idx2]);
-        },
-        ))
-        .map((values, idx) => {
-          const row = values.join('   ');
-
-          if (idx === 0 && isHeaders) {
-            // Add ---- under the entire header
-            const header = values.join('   ');
-            const headerUnderline = header.replace(/./gu, '-');
-
-
-            return `${header}\n${headerUnderline}`;
-          }
-
-
-          return row;
-        })
-        .join('\n');
-
-      // Create a download button at the top so you can download the report as a .txt file
-      // Avoid using deprecated document.write by creating elements directly
-      win.document.open();
-      win.document.close();
-
-      const downloadLink = win.document.createElement('a');
-
-      downloadLink.href = `data:text/plain;charset=utf-8,${encodeURIComponent(header + formattedReport)}`;
-      downloadLink.download = `${filename}.txt`;
-      downloadLink.textContent = 'Download Report';
-      win.document.body.appendChild(downloadLink);
-      win.document.body.appendChild(win.document.createElement('br'));
-
-      const pre = win.document.createElement('pre');
-
-      pre.textContent = `${header}${formattedReport}`;
-      win.document.body.appendChild(pre);
-
-      win.document.title = filename;
-      win.history.replaceState(null, filename, `/${filename}.txt`);
-    } else {
+    if (!win) {
       // eslint-disable-next-line no-alert
       alert(t7e('errorMsgs.Reports.popupBlocker'));
+
+      return;
     }
+
+    const preview = buildPreviewText(data);
+    const payload = buildDownloadPayload(data, this.format_);
+    const blob = new Blob([payload.content], { type: payload.mime });
+    const url = URL.createObjectURL(blob);
+
+    win.document.open();
+    win.document.close();
+
+    const downloadLink = win.document.createElement('a');
+
+    downloadLink.href = url;
+    downloadLink.download = `${data.filename}.${payload.ext}`;
+    downloadLink.textContent = t7e('plugins.ReportsPlugin.downloadButton' as Parameters<typeof t7e>[0]);
+    win.document.body.appendChild(downloadLink);
+
+    const copyButton = win.document.createElement('button');
+
+    copyButton.textContent = t7e('plugins.ReportsPlugin.copyButton' as Parameters<typeof t7e>[0]);
+    copyButton.style.marginLeft = '12px';
+    copyButton.addEventListener('click', () => {
+      try {
+        (win.navigator?.clipboard ?? navigator.clipboard)?.writeText(payload.content);
+      } catch {
+        // Clipboard may be unavailable (insecure context); ignore.
+      }
+    });
+    win.document.body.appendChild(copyButton);
+    win.document.body.appendChild(win.document.createElement('br'));
+
+    const pre = win.document.createElement('pre');
+
+    pre.textContent = preview;
+    win.document.body.appendChild(pre);
+
+    win.document.title = data.filename;
+    // Revoke the object URL when the report window closes so it is not leaked.
+    win.addEventListener?.('unload', () => URL.revokeObjectURL(url));
   }
 
-  private getStartTime_() {
+  private getStartTime_(): Date {
     const time = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
 
     time.setMilliseconds(0);

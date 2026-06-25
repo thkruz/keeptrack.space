@@ -3,7 +3,21 @@
     "CountriesMenu": {
       "bottomIconLabel": "Země",
       "title": "Nabídka zemí",
-      "helpBody": "Nabídka Země umožňuje filtrovat satelity podle země původu."
+      "commands": {
+        "selectCountry": "Vybrat zemi: {country}"
+      },
+      "labels": {
+        "filterByCountry": "Filtrovat podle země"
+      },
+      "help": {
+        "overview": "Nabídka Země filtruje katalog podle země původu. Každá země s alespoň jedním objektem je uvedena s vlajkou a počtem objektů; výběrem země zvýrazníte všechny její satelity a načtete je do výsledků vyhledávání.",
+        "imgAlt": "Nabídka Země se seznamem zemí s vlajkami a počty satelitů",
+        "imgCaption": "Každá položka zobrazuje vlajku, název země a počet objektů, které vlastní.",
+        "howToUse": "<ol><li>Otevřete nabídku <strong>Země</strong> ze spodní lišty nebo stiskněte <strong>O</strong>.</li><li>Klikněte na zemi. Její satelity se seskupí, zvýrazní ve 3D zobrazení a vypíší ve výsledcích vyhledávacího panelu.</li><li>Kliknutím na libovolný výsledek vyhledávání prozkoumáte jednotlivý satelit.</li></ol>",
+        "tip1": "Výběr země nahradí aktuální vyhledávání a zruší výběr aktuálního satelitu, proto nejprve dokončete práci s jednotlivými objekty.",
+        "tip2": "Každá země je dostupná také z palety příkazů jako příkaz Vybrat zemi.",
+        "shortcutToggle": "Přepnout nabídku Země"
+      }
     }
   }
 }

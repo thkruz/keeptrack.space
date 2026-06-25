@@ -3,7 +3,82 @@
     "Calculator": {
       "bottomIconLabel": "Transformace souřadnicových soustav",
       "title": "Menu transformace souřadnicových soustav",
-      "helpBody": "Menu transformace souřadnicových soustav slouží k převodu mezi různými souřadnicovými soustavami. <br><br> Menu umožňuje převod mezi následujícími souřadnicovými soustavami: <ul style=\"margin-left: 40px;\"> <li> ECI - Earth Centered Inertial </li> <li> ECEF - Earth Centered Earth Fixed </li> <li> Geodetická </li> <li> Topocentrická </li> </ul>"
+      "frames": {
+        "geodeticLla": "Geodetická (LLA)",
+        "raeTopocentric": "RAE (topocentrická)",
+        "raDecGeocentric": "RA/Dec (geocentrická)",
+        "classicalElements": "Klasické elementy"
+      },
+      "sections": {
+        "input": "Vstup"
+      },
+      "labels": {
+        "inputFrame": "Vstupní soustava",
+        "loadSelectedSatellite": "Načíst vybraný satelit",
+        "includeVelocity": "Včetně rychlosti",
+        "convert": "Převést",
+        "outputFormat": "Výstupní formát",
+        "drawLine": "Nakreslit čáru",
+        "copyResults": "Kopírovat všechny výsledky",
+        "clickToCopy": "Kliknutím zkopírovat",
+        "epoch": "Epocha",
+        "sensor": "Senzor",
+        "latitude": "Zeměpisná šířka",
+        "longitude": "Zeměpisná délka",
+        "altitude": "Výška",
+        "range": "Vzdálenost",
+        "azimuth": "Azimut",
+        "elevation": "Elevace",
+        "rightAscension": "Rektascenze",
+        "declination": "Deklinace",
+        "semiMajorAxis": "Hlavní poloosa",
+        "eccentricity": "Excentricita",
+        "inclination": "Inklinace",
+        "raan": "RAAN",
+        "argPerigee": "Arg. perigea",
+        "trueAnomaly": "Pravá anomálie",
+        "period": "Perioda",
+        "apogeeAlt": "Výška apogea",
+        "perigeeAlt": "Výška perigea"
+      },
+      "formats": {
+        "fixed4": "Pevný (4 desetinná místa)",
+        "fixed6": "Pevný (6 desetinných míst)",
+        "fixed8": "Pevný (8 desetinných míst)",
+        "scientific": "Vědecká notace",
+        "dms": "DMS (úhly)"
+      },
+      "msgs": {
+        "noSensorSelected": "Není vybrán žádný senzor",
+        "needsVelocity": "Vyžaduje rychlost",
+        "noSensorForRae": "Pro výstup RAE není vybrán žádný senzor.",
+        "copied": "Zkopírováno do schránky"
+      },
+      "errorMsgs": {
+        "conversionFailed": "Převod selhal: {error}",
+        "invalidInput": "Neplatný vstup pro {field}: \"{value}\" není číslo.",
+        "fieldNotFound": "Pole {field} nebylo nalezeno.",
+        "invalidNumber": "Všechny vstupy musí být platná čísla.",
+        "badEccentricity": "Pro uzavřenou dráhu musí být excentricita mezi 0 a 1 (vyjma krajních hodnot).",
+        "badSemiMajorAxis": "Hlavní poloosa musí být větší než 0.",
+        "noSensorForRae": "Převod RAE vyžaduje vybraný senzor.",
+        "noRaeData": "Nejsou k dispozici žádná data RAE. Nejprve proveďte převod s vybraným senzorem.",
+        "noSatelliteSelected": "Není vybrán žádný satelit.",
+        "notASatellite": "Vybraný objekt není satelit.",
+        "couldNotPropagate": "Satelit nelze propagovat na aktuální čas.",
+        "copyFailed": "Nepodařilo se zkopírovat do schránky."
+      },
+      "help": {
+        "overview": "Kalkulačka transformace souřadnicových soustav převádí polohu (a volitelně rychlost) mezi všemi souřadnicovými soustavami, které KeepTrack zná: J2000 (ECI), ITRF (ECEF), TEME, Geodetická (LLA), RAE (topocentrická), RA/Dec (geocentrická) a Klasické elementy. Zadejte stav v libovolné soustavě a přečtěte si jej ve všech ostatních najednou.",
+        "imgAlt": "Menu transformace souřadnicových soustav se vstupními poli a převedenými výstupy",
+        "imgCaption": "Zadejte stav v jedné soustavě; všechny ostatní soustavy se vypočítají jedním kliknutím.",
+        "framesHeading": "Podporované soustavy",
+        "frames": "<ul><li><strong>J2000 (ECI)</strong>, <strong>TEME</strong>: inerciální soustavy se středem v Zemi; TEME je soustava, ve které se publikují TLE.</li><li><strong>ITRF (ECEF)</strong>: soustava se středem v Zemi, pevně spojená se Zemí; rotuje spolu s planetou.</li><li><strong>Geodetická (LLA)</strong>: zeměpisná šířka, zeměpisná délka a výška.</li><li><strong>RAE (topocentrická)</strong>: vzdálenost, azimut a elevace z pohledu vybraného senzoru.</li><li><strong>RA/Dec (geocentrická)</strong>: rektascenze a deklinace.</li><li><strong>Klasické elementy</strong>: Keplerovské orbitální elementy, ve výstupu navíc perioda, apogeum a perigeum.</li></ul>",
+        "howToUse": "<ol><li>Otevřete menu ze spodní lišty (režim Nástroje).</li><li>Vyberte <strong>Vstupní soustava</strong>; vstupní pole se odpovídajícím způsobem změní.</li><li>Zadejte hodnoty, nebo klikněte na <strong>Načíst vybraný satelit</strong> a vyplňte je podle aktuálně vybraného satelitu.</li><li>U kartézských soustav zaškrtněte <strong>Včetně rychlosti</strong>, aby se převedl i vektor rychlosti; výstup Klasických elementů jej vyžaduje.</li><li>Klikněte na <strong>Převést</strong>. Hodnoty všech ostatních soustav se zobrazí níže, naformátované podle volby <strong>Výstupní formát</strong>.</li><li>S vybraným senzorem a vypočteným výsledkem RAE vykreslí <strong>Nakreslit čáru</strong> čáru od senzoru k danému bodu ve 3D zobrazení.</li></ol>",
+        "tip1": "Vstup i výstup RAE nejprve vyžadují vybraný senzor; pole zobrazuje používaný senzor, takže vždy víte, které referenční stanoviště se používá.",
+        "tip2": "Výstupní formát DMS zobrazuje úhly jako stupně, minuty a vteřiny, což je praktické pro zaměřování dalekohledu.",
+        "tip3": "Převod na Klasické elementy vyžaduje rychlost: bez ní výstup oznámí, že rychlost potřebuje, místo aby dráhu odhadoval."
+      }
     }
   }
 }

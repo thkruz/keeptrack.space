@@ -6,6 +6,17 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export type LineColor = typeof LineColors[keyof typeof LineColors] | vec4;
 
+/**
+ * A UI-facing summary of a line. The engine stays locale-free: `kind` is a stable
+ * key that the UI maps to a localized label, and `detail` is optional human context
+ * (a satellite name, an axis, etc.). Lines that share a `kind` + `detail` are grouped
+ * together in the line-management UI.
+ */
+export interface LineDescription {
+  kind: string;
+  detail?: string;
+}
+
 export const LineColors = {
   RED: [1.0, 0.0, 0.0, 1.0] as vec4,
   ORANGE: [1.0, 0.5, 0.0, 1.0] as vec4,
@@ -56,6 +67,14 @@ export abstract class Line {
   }
 
   abstract update(): void;
+
+  /**
+   * Describe this line for the line-management UI. Subclasses override to provide a
+   * stable `kind` key (and optional `detail`) so the UI can label and group lines.
+   */
+  getDescription(): LineDescription {
+    return { kind: 'generic' };
+  }
 
   updateVertBuf(points: vec3[]): void {
     const gl = ServiceLocator.getRenderer().gl;

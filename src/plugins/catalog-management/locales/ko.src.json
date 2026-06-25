@@ -7,7 +7,59 @@
         "import": "가져오기",
         "export": "내보내기"
       },
-      "helpBody": "카탈로그 관리 메뉴는 위성 카탈로그 데이터를 가져오고 내보내는 도구를 제공합니다. <b>가져오기 탭:</b> 파일 선택기 또는 드래그 앤 드롭으로 .tce, .tle 또는 .txt 카탈로그 파일을 로드합니다. <b>내보내기 탭:</b> <ul style=\"margin-left: 40px;\"> <li>공식 TLE 내보내기 – 실제 2행 궤도 요소를 내보냅니다.</li> <li>3LE 내보내기 – 3행 궤도 요소를 내보냅니다.</li> <li>KeepTrack TLE 내보내기 – 분석가를 포함한 모든 KeepTrack 2행 궤도 요소를 내보냅니다.</li> <li>KeepTrack 3LE 내보내기 – 분석가를 포함한 모든 KeepTrack 3행 궤도 요소를 내보냅니다.</li> <li>카탈로그 CSV 내보내기 – 카탈로그 데이터를 CSV로 내보냅니다.</li> <li>STK .tce 내보내기 – TLE 데이터를 STK 위성 데이터베이스 형식으로 내보냅니다.</li> <li>시야 내 위성 내보내기 – 현재 시야에 있는 위성을 내보냅니다.</li> <li>.e 천체력 내보내기 – 선택한 위성의 전파된 천체력을 STK 형식으로 내보냅니다.</li> </ul>"
+      "labels": {
+        "dropzone": ".tce, .tle 또는 .txt 파일을 끌어다 놓아 카탈로그를 불러옵니다",
+        "keepSatInfo": "위성 정보 유지",
+        "keepSatInfoTooltip": "기존 위성의 이름, 국가, 임무 데이터를 유지하면서 TLE를 업데이트합니다. 가져온 파일에 없는 위성은 제거됩니다.",
+        "importNewOnly": "새 위성만 가져오기",
+        "importNewOnlyTooltip": "현재 카탈로그에 없는 위성만 추가합니다. 기존 위성은 변경되지 않습니다.",
+        "orbitalElements": "궤도 요소",
+        "tabularStk": "표 형식 및 STK",
+        "selectedSatellite": "선택한 위성",
+        "tleSource": "소스",
+        "tleFormat": "형식",
+        "timeSpanHrs": "기간 (시간)",
+        "stepSizeSec": "스텝 크기 (초)"
+      },
+      "options": {
+        "sourceOfficial": "공식",
+        "sourceKeepTrack": "KeepTrack",
+        "format2": "2행 (TLE)",
+        "format3": "3행 (이름 포함)"
+      },
+      "buttons": {
+        "importCatalog": "카탈로그 가져오기",
+        "downloadTle": "TLE 형식 내보내기",
+        "exportCatalogXlsx": "카탈로그 XLSX 내보내기",
+        "exportStkTce": "STK .tce 내보내기",
+        "exportSatsInFov": "FOV 내 위성 내보내기",
+        "exportEphemeris": ".e 천체력 내보내기",
+        "selectSatelliteFirst": "먼저 위성을 선택하세요"
+      },
+      "toasts": {
+        "noValidFileInDrop": "드롭에서 .tce, .tle 또는 .txt 파일을 찾을 수 없습니다",
+        "noValidTleData": "파일에서 유효한 TLE 데이터를 찾을 수 없습니다",
+        "unsupportedFileType": "지원되지 않는 파일 형식입니다. .tce, .tle 또는 .txt를 사용하세요",
+        "noNewSats": "파일에서 새 위성을 찾을 수 없습니다",
+        "addedNewSats": "{file}에서 새 위성 {count}개를 추가했습니다",
+        "loadedCatalog": "{file}에서 카탈로그를 불러왔습니다",
+        "failedToLoad": "{file}을(를) 불러오지 못했습니다",
+        "noSatelliteSelected": "선택된 위성이 없습니다!",
+        "exportTooLarge": "내보내기가 너무 큽니다. 시간 범위를 줄이거나 단계 크기를 늘리세요.",
+        "failedToPropagate": "위성 전파에 실패했습니다!"
+      },
+      "help": {
+        "overview": "카탈로그 관리는 위성 데이터를 KeepTrack 안팎으로 옮깁니다. 가져오기 탭은 디스크에서 카탈로그 파일을 불러와 현재 카탈로그를 교체하거나 업데이트하고, 내보내기 탭은 일반 TLE 파일부터 스프레드시트와 STK 산출물까지 여러 형식으로 현재 카탈로그를 내보냅니다.",
+        "imgAlt": "가져오기 및 내보내기 탭이 있는 카탈로그 관리 메뉴",
+        "imgCaption": "카탈로그 파일을 가져오거나, 현재 카탈로그를 여러 형식으로 내보냅니다.",
+        "importHeading": "가져오기",
+        "import": "<strong>카탈로그 가져오기</strong> 버튼을 사용하거나 드롭 영역에 파일을 끌어다 놓아 <strong>.tce</strong>, <strong>.tle</strong> 또는 <strong>.txt</strong> 파일을 불러옵니다. <strong>위성 정보 유지</strong>를 켜면 기존 위성은 이름, 국가, 임무 데이터를 유지한 채 궤도만 업데이트되며, 파일에 없는 위성은 제거됩니다. 끄면 파일이 카탈로그 전체를 교체합니다.",
+        "exportHeading": "내보내기",
+        "export": "<ul><li><strong>궤도 요소</strong>: TLE/3LE 요소 세트를 다운로드합니다. <strong>소스</strong>(공식은 실제로 등재된 물체만, KeepTrack은 직접 만든 분석가 위성도 포함)와 <strong>형식</strong>(2행, 또는 위성 이름이 포함된 3행)을 선택한 다음 <strong>TLE 다운로드</strong>를 클릭합니다.</li><li><strong>표 형식 및 STK</strong>: 전체 카탈로그를 XLSX 스프레드시트, STK .tce 데이터베이스로, 또는 현재 선택한 센서의 시야 안에 있는 위성만 내보냅니다.</li><li><strong>선택한 위성</strong>: 위성을 선택한 상태에서 설정한 <strong>기간 (시간)</strong>과 <strong>스텝 크기 (초)</strong>를 사용해 전파된 STK .e 천체력을 작성합니다.</li></ul>",
+        "howToUse": "<ol><li>하단 바(도구 모드)에서 <strong>카탈로그 관리</strong>를 엽니다.</li><li>가져오려면 <strong>가져오기</strong> 탭을 선택하고 위성 정보를 유지할지 정한 다음 파일을 선택하거나 끌어다 놓습니다.</li><li>내보내려면 <strong>내보내기</strong> 탭을 선택하고 옵션을 설정한 뒤 필요한 내보내기를 클릭합니다. 파일이 즉시 다운로드됩니다.</li><li>위성별 내보내기의 경우 먼저 위성을 선택하세요. 위성이 선택될 때까지 해당 버튼은 비활성화 상태로 유지됩니다.</li></ol>",
+        "tip1": "최신 TLE 파일로 궤도를 갱신할 때는 위성 정보 유지가 안전한 기본값입니다. 카탈로그 전체를 의도적으로 교체할 때만 끄세요.",
+        "tip2": "가져오기와 편집 내용은 세션에만 존재합니다. 유지하려면 페이지를 새로 고치기 전에 내보내세요."
+      }
     }
   }
 }

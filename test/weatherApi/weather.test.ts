@@ -13,7 +13,6 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 describe('SensorTimeline Weather Integration', () => {
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
-    window.M.AutoInit = vi.fn();
   });
 
   it('should correctly calculate passes and integrate weather data', async () => {

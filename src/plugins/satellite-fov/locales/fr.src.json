@@ -3,7 +3,60 @@
     "SatelliteFov": {
       "bottomIconLabel": "Champ de vision satellite",
       "title": "Champ de vision satellite",
-      "helpBody": "Le plugin Champ de vision satellite permet de contrôler le champ de vision d’un satellite."
+      "tabs": {
+        "earthCenter": "Centre de la Terre",
+        "satToSat": "Sat à Sat"
+      },
+      "labels": {
+        "sensorDesign": "Conception du capteur",
+        "colorSettings": "Paramètres de couleur",
+        "defaultSensorDesign": "Conception du capteur par défaut",
+        "defaultColorSettings": "Paramètres de couleur par défaut",
+        "activeSensors": "Capteurs actifs",
+        "targetSatellite": "Satellite cible",
+        "fovSettings": "Paramètres FOV",
+        "activeS2sCones": "Cônes Sat à Sat actifs",
+        "fovDegrees": "Champ de vision (degrés)",
+        "opacity": "Opacité",
+        "targetCatalogNumber": "Numéro de catalogue de la cible"
+      },
+      "tooltips": {
+        "fovOfSensor": "Champ de vision du capteur",
+        "red": "Valeur de la composante rouge",
+        "green": "Valeur de la composante verte",
+        "blue": "Valeur de la composante bleue",
+        "opacity": "Valeur d'opacité"
+      },
+      "buttons": {
+        "resetAllFovCones": "Réinitialiser tous les cônes FOV",
+        "useSecondarySat": "Utiliser le satellite secondaire",
+        "createS2sCone": "Créer un cône Sat à Sat",
+        "resetS2sCones": "Réinitialiser les cônes Sat à Sat"
+      },
+      "errorMsgs": {
+        "noSecondary": "Aucun satellite secondaire sélectionné. Cliquez avec le bouton droit sur un satellite ou utilisez les touches [ ].",
+        "selectSourceFirst": "Sélectionnez d'abord un satellite source.",
+        "enterTargetNumber": "Saisissez un numéro de catalogue de la cible.",
+        "targetNotFound": "Satellite cible introuvable dans le catalogue.",
+        "targetSameAsSource": "Le satellite cible ne peut pas être identique au satellite source.",
+        "fovRange": "Le champ de vision doit être un nombre compris entre 0 et 180 degrés.",
+        "redRange": "La valeur de la composante rouge doit être un nombre compris entre 0 et 1.",
+        "greenRange": "La valeur de la composante verte doit être un nombre compris entre 0 et 1.",
+        "blueRange": "La valeur de la composante bleue doit être un nombre compris entre 0 et 1.",
+        "opacityRange": "La valeur d'opacité doit être un nombre compris entre 0 et 1."
+      },
+      "help": {
+        "overview": "Le champ de vision satellite dessine des cônes de capteur depuis un satellite afin de visualiser ce qu'il peut voir : soit un cône nadir vers la Terre (Centre de la Terre), soit un cône de liaison pointé vers un autre satellite (Sat à Sat). Définissez l'angle et la couleur du cône, et le volume s'affiche en direct dans la vue 3D.",
+        "imgAlt": "Le menu Champ de vision satellite avec ses onglets Centre de la Terre et Sat à Sat",
+        "imgCaption": "Configurez l'angle et la couleur du cône, puis activez ou désactivez les cônes par satellite.",
+        "tabsHeading": "Centre de la Terre et Sat à Sat",
+        "tabs": "L'onglet <strong>Centre de la Terre</strong> gère les cônes pointés au nadir : définissez le <strong>Champ de vision (degrés)</strong> et la couleur par défaut, appuyez sur <strong>C</strong> pour activer ou désactiver un cône sur le satellite sélectionné, et gérez chaque cône actif dans la liste <strong>Capteurs actifs</strong>. L'onglet <strong>Sat à Sat</strong> construit un cône d'un satellite source vers une cible : saisissez un <strong>Numéro de catalogue de la cible</strong> ou cliquez sur <strong>Utiliser le satellite secondaire</strong>, puis sur <strong>Créer un cône Sat à Sat</strong> ; <strong>V</strong> active ou désactive un cône vers le satellite secondaire actuel.",
+        "howToUse": "<ol><li>Sélectionnez un satellite ; l'icône du bas est désactivée tant qu'aucun n'est sélectionné.</li><li>Ouvrez le menu et ajustez l'angle, la couleur et l'opacité du cône. Les valeurs s'appliquent aux nouveaux cônes.</li><li>Appuyez sur <strong>C</strong> (ou utilisez le menu) pour activer ou désactiver un cône pointé vers la Terre sur le satellite sélectionné.</li><li>Pour une liaison entre satellites, ouvrez l'onglet <strong>Sat à Sat</strong>, choisissez une cible et cliquez sur <strong>Créer un cône Sat à Sat</strong>.</li><li>Utilisez les boutons de réinitialisation pour effacer tous les cônes de chaque type.</li></ol>",
+        "tip1": "Les cônes persistent lorsque vous sélectionnez d'autres satellites : vous pouvez ainsi construire, satellite par satellite, une image de couverture de toute une constellation.",
+        "tip2": "Définissez le satellite secondaire en cliquant avec le bouton droit sur un satellite ou avec les touches [ et ] ; Utiliser le satellite secondaire remplit ensuite la cible automatiquement.",
+        "shortcutToggleCone": "Activer ou désactiver un cône FOV pointé vers la Terre sur le satellite sélectionné",
+        "shortcutToggleS2s": "Activer ou désactiver un cône vers le satellite secondaire"
+      }
     }
   }
 }

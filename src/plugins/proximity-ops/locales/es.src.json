@@ -4,8 +4,9 @@
       "bottomIconLabel": "Rendezvous y Operaciones de Proximidad",
       "title": "Rendezvous y Operaciones de Proximidad (RPO)",
       "titleSecondary": "Lista de Rendezvous y Operaciones de Proximidad",
-      "helpBody": "Encuentra acercamientos próximos entre satélites. Configura parámetros de búsqueda incluyendo umbral de distancia, velocidad relativa y tipo de órbita (GEO/LEO). Soporta modos de búsqueda de satélite individual y todos contra todos.",
       "noradId": "ID NORAD",
+      "useCurrentSat": "Usar satélite actual",
+      "noSatSelected": "Ningún satélite seleccionado",
       "maxDistThreshold": "Distancia Máxima de Umbral (km)",
       "maxRelativeVelocity": "Velocidad Relativa Máxima (km/s)",
       "searchDuration": "Duración de Búsqueda (horas)",
@@ -18,7 +19,15 @@
       "comparePayloadsOnlyTooltip": "Buscar solo RPOs entre cargas útiles",
       "ignoreVimpelRso": "Ignorar Vimpel RSO",
       "ignoreVimpelRsoTooltip": "Ignorar RSOs provenientes del Catálogo Vimpel",
-      "submitButton": "Buscar RPOs \u25b6",
+      "submitButton": "Buscar RPOs",
+      "cancelButton": "Cancelar búsqueda",
+      "resultCount": "{count} acercamientos (más cercano {closest} km)",
+      "surveyError": "La búsqueda de RPO falló: {error}",
+      "sections": {
+        "target": "Objetivo",
+        "thresholds": "Umbrales",
+        "orbitRegime": "Régimen orbital"
+      },
       "noRposToDownload": "¡No hay RPOs para descargar!",
       "noRposFound": "¡No se encontraron RPOs!",
       "satNotFound": "Satélite con ID NORAD {sccNum} no encontrado",
@@ -32,7 +41,25 @@
         "chaserName": "Nombre del Perseguidor",
         "relDistance": "Dist. Rel. [km]",
         "relVelocity": "Vel. Rel. [km/s]",
+        "radial": "Radial [km]",
+        "intrack": "A lo largo [km]",
+        "crosstrack": "Transversal [km]",
+        "pc": "Pc",
         "date": "Fecha"
+      },
+      "help": {
+        "overview": "Rendezvous y Operaciones de Proximidad (RPO) encuentra próximos acercamientos entre satélites: una nave maniobrando cerca de otra, una inspección coorbital o simplemente dos objetos derivando cerca uno del otro. Indica un satélite (o busca en todo un régimen orbital) y devuelve cada encuentro previsto dentro de tus umbrales de distancia y velocidad.",
+        "imgAlt": "El menú RPO con los parámetros de búsqueda",
+        "imgCaption": "Establece los umbrales y el tipo de órbita, luego busca un satélite o todos contra todos.",
+        "modesHeading": "Modos de Búsqueda",
+        "modes": "Por defecto, la búsqueda toma el <strong>ID NORAD</strong> que introduces y compara ese satélite con el resto de su régimen orbital. Al marcar <strong>Geoestacionario Todos vs Todos</strong> se compara en cambio cada satélite GEO con todos los demás, que es la forma de examinar todo el cinturón en busca de actividad. <strong>Comparar Solo Cargas Útiles</strong> omite escombros y cuerpos de cohetes, e <strong>Ignorar Vimpel RSO</strong> excluye objetos provenientes del catálogo JSC Vimpel.",
+        "resultsHeading": "Interpretar los Resultados",
+        "results": "Cada fila empareja un <strong>Objetivo</strong> y un <strong>Perseguidor</strong> con su mínima <strong>Dist. Rel.</strong>, su <strong>Vel. Rel.</strong> y la <strong>Fecha</strong> del encuentro. Haz clic en una fila para seleccionar ambos satélites y llevar la cámara y el reloj al acercamiento; los resultados GEO también cambian la visualización de órbitas a ECF para que el movimiento relativo sea fácil de leer. El botón de descarga exporta la lista como un archivo CSV.",
+        "howToUse": "<ol><li>Abre el menú desde la barra inferior o pulsa <strong>X</strong>.</li><li>Elige el <strong>Tipo de Órbita</strong> (geoestacionario u órbita terrestre baja) y establece la <strong>Distancia Máxima de Umbral</strong>, la <strong>Velocidad Relativa Máxima</strong> y la <strong>Duración de Búsqueda</strong>.</li><li>Introduce un <strong>ID NORAD</strong> o marca <strong>Geoestacionario Todos vs Todos</strong> para examinar todo el cinturón.</li><li>Haz clic en <strong>Buscar RPOs</strong>. Las búsquedas largas muestran el progreso; los resultados se abren en el panel de lista.</li><li>Haz clic en cualquier fila para volar a ese encuentro.</li></ol>",
+        "tip1": "Una velocidad relativa baja a corta distancia es lo que distingue las operaciones de proximidad deliberadas de un sobrevuelo de conjunción rápido; ajusta el umbral de velocidad para filtrar maniobras.",
+        "tip2": "Las búsquedas GEO de todos contra todos son pesadas; reduce primero la duración y amplíala cuando los umbrales se vean correctos.",
+        "tip3": "Hacer clic en un resultado GEO cambia las órbitas a visualización fija a la Tierra (ECF); la notificación te indica qué modo está activo.",
+        "shortcutToggle": "Alternar el menú RPO"
       }
     }
   }

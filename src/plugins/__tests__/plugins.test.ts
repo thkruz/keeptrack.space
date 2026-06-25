@@ -23,13 +23,13 @@ describe('plugins', () => {
       FindSatPlugin: {
         enabled: true,
       },
-      LaunchCalendar: {
+      GunterLaunchCalendar: {
         enabled: true,
       },
       NewLaunch: {
         enabled: true,
       },
-      NextLaunchesPlugin: {
+      TheSpaceDevLaunchCalendarPlugin: {
         enabled: true,
       },
       NightToggle: {
@@ -50,7 +50,7 @@ describe('plugins', () => {
       InitialOrbitDeterminationPlugin: {
         enabled: true,
       },
-      MissilePlugin: {
+      MissileSimulatorPlugin: {
         enabled: true,
       },
       Breakup: {

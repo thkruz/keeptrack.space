@@ -68,6 +68,24 @@ describe('PluginDrawer', () => {
     expect(() => drawer.close()).not.toThrow();
   });
 
+  it('clicking a disabled drawer item forwards the click so the plugin can explain itself', () => {
+    buildDrawer();
+    const content = getEl('drawer-content', true)!;
+
+    content.insertAdjacentHTML(
+      'beforeend',
+      '<div class="drawer-item disabled" data-plugin-id="overflight-icon" role="button"><span class="drawer-item-label">Overflight</span></div>',
+    );
+    const item = content.querySelector('.drawer-item[data-plugin-id="overflight-icon"]') as HTMLElement;
+    const emitSpy = vi.spyOn(EventBus.getInstance(), 'emit');
+
+    item.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    // A disabled item must not be silently swallowed: it forwards bottomMenuClick
+    // (the plugin's onBottomIconClick runs and can toast the reason it is disabled).
+    expect(emitSpy).toHaveBeenCalledWith(EventBusEvent.bottomMenuClick, 'overflight-icon');
+  });
+
   it('toggleRailMode is a no-op in mobile mode', () => {
     settingsManager.isMobileModeEnabled = true;
     const drawer = buildDrawer();

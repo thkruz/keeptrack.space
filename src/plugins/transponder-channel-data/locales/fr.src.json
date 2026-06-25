@@ -3,13 +3,47 @@
     "TransponderChannelData": {
       "bottomIconLabel": "Informations transpondeur et canal",
       "title": "Fréquences satellite",
-      "helpBody": "<p>Ce plugin affiche les informations de fréquence des transpondeurs et des canaux pour les satellites TV géostationnaires. Sélectionnez un satellite avec des données de canal connues et ouvrez ce panneau pour voir ses fréquences de diffusion, canaux, couverture de faisceau et détails de chiffrement.</p><p>Utilisez le bouton de téléchargement dans la barre de titre pour exporter les données de canal en fichier CSV.</p>",
+      "constellationName": "Satellites TV",
+      "table": {
+        "satellite": "Satellite",
+        "tvchannel": "Chaîne TV",
+        "beam": "Faisceau",
+        "freq": "Fréquence",
+        "system": "Système",
+        "SRFEC": "SR/FEC",
+        "video": "Vidéo",
+        "lang": "Langue",
+        "encryption": "Chiffrement"
+      },
       "errorMsgs": {
         "NoChannelInfo": "Le satellite n'a pas d'informations de canal",
         "NotSatellite": "L'objet sélectionné n'est pas un satellite",
         "FetchFailed": "Impossible de récupérer les informations de canal pour {name} et {altName}",
         "NoData": "Aucune donnée de canal disponible"
-      }
+      },
+      "help": {
+        "overview": "Les informations transpondeur et canal montrent ce qu'un satellite géostationnaire de TV ou de communications diffuse réellement : chaque canal connu avec sa fréquence, son faisceau, son système de transmission et son chiffrement. Les données couvrent quelques centaines de satellites de diffusion bien connus et sont récupérées en direct à l'ouverture du menu.",
+        "imgAlt": "Le tableau des Fréquences satellite pour un satellite de diffusion",
+        "imgCaption": "Chaque ligne est un canal avec ses détails de faisceau, fréquence, système et chiffrement.",
+        "columnsHeading": "Lire le tableau",
+        "columns": "<ul><li><strong>Chaîne TV</strong> : le nom du service de diffusion.</li><li><strong>Faisceau</strong> : le faisceau d'antenne du satellite qui transporte le canal et détermine la zone de couverture.</li><li><strong>Fréquence</strong> : la fréquence de liaison descendante et la polarisation.</li><li><strong>Système</strong> et <strong>SR/FEC</strong> : le standard de transmission (par exemple DVB-S2) avec son débit de symboles et sa correction d'erreurs.</li><li><strong>Vidéo</strong> et <strong>Langue</strong> : le codec et les langues audio.</li><li><strong>Chiffrement</strong> : indique si le canal est en clair ou crypté, et avec quel système.</li></ul>",
+        "howToUse": "<ol><li>Sélectionnez un satellite de diffusion ; l'icône du bas ne s'active que pour les satellites avec des données de canal connues.</li><li>Ouvrez le menu depuis la barre inférieure ou appuyez sur <strong>T</strong>. La liste des canaux se télécharge et remplit le tableau.</li><li>Utilisez le bouton de téléchargement dans la barre de titre pour exporter le tableau en feuille de calcul.</li></ol>",
+        "tip1": "Les satellites pris en charge sont enregistrés comme constellation Satellites TV dans le menu Constellations, ce qui est le moyen le plus rapide d'en trouver un à inspecter.",
+        "tip2": "Les données de canal proviennent de l'API KeepTrack et reflètent des listes publiques ; une connexion internet est requise.",
+        "shortcutToggle": "Basculer le menu Fréquences satellite"
+      },
+      "labels": {
+        "controls": "Commandes",
+        "channels": "Chaînes",
+        "filterPlaceholder": "Filtrer les chaînes",
+        "exportXlsx": "Exporter en XLSX",
+        "exportCsv": "Exporter en CSV",
+        "statusLoading": "Chargement des chaînes…",
+        "statusEmpty": "Aucune donnée de chaîne disponible",
+        "statusNoMatch": "Aucune chaîne ne correspond au filtre",
+        "statusError": "Impossible de charger les données de chaîne"
+      },
+      "attribution": "Données de chaînes issues de l'API KeepTrack (listes publiques)."
     }
   }
 }

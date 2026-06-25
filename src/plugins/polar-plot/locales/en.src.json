@@ -3,7 +3,42 @@
     "PolarPlotPlugin": {
       "bottomIconLabel": "Polar Plot",
       "title": "Polar Plot Menu",
-      "helpBody": "The Polar Plot Menu is used to generate a 2D polar plot of the satellite's azimuth and elevation over time."
+      "labels": {
+        "notInView": "Satellite is not in view for the next {hours} hours",
+        "saveImage": "Save Image",
+        "satellite": "Satellite {sccNum}",
+        "unknownSensor": "Unknown Sensor",
+        "unknownStartTime": "Unknown Start Time",
+        "unknownStopTime": "Unknown Stop Time",
+        "prevPass": "Previous Pass",
+        "nextPass": "Next Pass",
+        "imageSize": "Image Size",
+        "size_square": "Square (1080)",
+        "size_wide": "Wide (1200x675)",
+        "size_large": "Large (2000)",
+        "copyImage": "Copy Image",
+        "copied": "Polar plot copied to clipboard",
+        "passLabel": "Pass {n} of {total}",
+        "maxEl": "Max El {deg}°"
+      },
+      "sections": {
+        "pass": "Pass",
+        "export": "Export"
+      },
+      "errorMsgs": {
+        "copyFailed": "Could not copy image to clipboard"
+      },
+      "help": {
+        "overview": "The Polar Plot draws the selected satellite's next pass over the selected sensor as a classic azimuth and elevation sky chart: north at the top, the horizon at the outer ring, and zenith in the center. It is the chart an observer or operator uses to know where in the sky to look.",
+        "imgAlt": "A polar sky chart showing a satellite pass track",
+        "imgCaption": "The pass starts at the green dot and ends at the red dot; rings mark elevation.",
+        "readingHeading": "Reading the Plot",
+        "reading": "The track begins at a green dot (rise) and ends at a red dot (set). Concentric rings mark elevation every 15 degrees from the horizon (outer edge) to overhead (center), and compass directions run around the rim. The header shows the sensor, the satellite number, and the pass start and end times in UTC.",
+        "howToUse": "<ol><li>Select a sensor and a satellite; the bottom icon stays disabled until both are selected.</li><li>Open the <strong>Polar Plot</strong> from the bottom bar. The next pass within three days is computed and drawn automatically.</li><li>Click <strong>Save Image</strong> to download the chart as a PNG file.</li></ol>",
+        "tip1": "If the satellite never rises above the horizon in the next three days, the plot is replaced by a notice instead of an empty chart.",
+        "tip2": "A track passing near the center is a high elevation pass: the best geometry for observation or communication.",
+        "shortcutToggle": "Toggle the Polar Plot menu"
+      }
     }
   }
 }

@@ -1,9 +1,0 @@
-{
-  "plugins": {
-    "NextLaunchesPlugin": {
-      "bottomIconLabel": "Nächste Starts",
-      "title": "Menü für nächste Starts",
-      "helpBody": "Das Menü für nächste Starts ruft Daten von <a href=\"https://thespacedevs.com/\" target=\"_blank\">The Space Devs</a> ab, um bevorstehende Starts anzuzeigen."
-    }
-  }
-}

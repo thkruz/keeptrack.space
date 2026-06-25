@@ -1,9 +1,42 @@
 {
   "plugins": {
     "VideoDirectorPlugin": {
-      "bottomIconLabel": "비디오 디렉터",
       "title": "비디오 디렉터 메뉴",
-      "helpBody": "비디오 디렉터 메뉴는 비디오를 만들기 위해 장면의 카메라와 객체를 조작하는 데 사용됩니다."
+      "bottomIconLabel": "비디오 디렉터",
+      "labels": {
+        "updateSettings": "설정 업데이트",
+        "cameraMovements": "카메라 움직임",
+        "rotateSpeed": "회전 속도",
+        "rotateLeft": "카메라 왼쪽으로 회전",
+        "rotateRight": "카메라 오른쪽으로 회전",
+        "rotateUp": "카메라 위로 회전",
+        "rotateDown": "카메라 아래로 회전",
+        "panSpeed": "팬 속도",
+        "panLeft": "카메라 왼쪽으로 팬",
+        "panRight": "카메라 오른쪽으로 팬",
+        "panUp": "카메라 위로 팬",
+        "panDown": "카메라 아래로 팬",
+        "zoomSpeed": "줌 속도",
+        "zoomIn": "카메라 줌 인",
+        "zoomOut": "카메라 줌 아웃",
+        "disableSelectedDot": "선택한 위성 점 비활성화",
+        "rotate": "회전",
+        "pan": "팬",
+        "zoom": "줌",
+        "scene": "장면",
+        "blackEarth": "검은 지구",
+        "milkyWay": "은하수",
+        "startAutoRotate": "자동 회전 시작",
+        "stopAutoRotate": "자동 회전 중지"
+      },
+      "help": {
+        "overview": "비디오 디렉터는 시뮬레이션의 영화 같은 클립을 녹화하기 위한 부드럽고 반복 가능한 카메라 움직임을 설정합니다. 정확한 속도의 느린 회전, 팬, 줌이 가능하며, 선택한 위성의 강조 점을 선택적으로 숨겨 영상에 나타나지 않게 할 수 있습니다.",
+        "imgAlt": "회전, 팬, 줌 컨트롤이 있는 비디오 디렉터 메뉴",
+        "imgCaption": "움직임 방향과 속도를 선택한 다음 움직임을 시작하세요.",
+        "howToUse": "<ol><li>하단 바(실험 모드)에서 <strong>비디오 디렉터</strong>를 엽니다.</li><li><strong>회전 속도</strong>, <strong>팬 속도</strong> 또는 <strong>줌 속도</strong>를 설정하고 원하는 방향을 켭니다. 변경 사항은 즉시 적용되며 반대 방향은 동시에 선택할 수 없습니다.</li><li><strong>자동 회전 시작</strong>을 클릭하여 움직임을 시작하고, 다시 클릭하여 중지합니다.</li><li><strong>선택한 위성 점 비활성화</strong>, <strong>검은 지구</strong> 또는 <strong>은하수</strong>를 켜면 깔끔한 영화 같은 배경을 얻을 수 있습니다.</li></ol>",
+        "tip1": "매우 작은 속도 값은 방송 품질의 부드러운 움직임을 만듭니다. 기본값은 느리고 영화 같은 움직임에 맞춰져 있습니다.",
+        "tip2": "느린 회전과 고속으로 진행되는 시간 컨트롤을 결합하면 고전적인 궤도 타임랩스 장면을 만들 수 있습니다."
+      }
     }
   }
 }

@@ -3,7 +3,21 @@
     "CountriesMenu": {
       "bottomIconLabel": "Países",
       "title": "Menú de Países",
-      "helpBody": "El Menú de Países te permite filtrar los satélites por país de origen."
+      "commands": {
+        "selectCountry": "Seleccionar país: {country}"
+      },
+      "labels": {
+        "filterByCountry": "Filtrar por país"
+      },
+      "help": {
+        "overview": "El Menú de Países filtra el catálogo por país de origen. Cada país con al menos un objeto aparece con su bandera y un recuento de objetos; al seleccionar uno se resaltan todos sus satélites y se cargan en los resultados de búsqueda.",
+        "imgAlt": "El Menú de Países con países, banderas y recuentos de satélites",
+        "imgCaption": "Cada entrada muestra la bandera, el nombre del país y cuántos objetos posee.",
+        "howToUse": "<ol><li>Abra el menú <strong>Países</strong> desde la barra inferior o pulse <strong>O</strong>.</li><li>Haga clic en un país. Sus satélites se agrupan, se resaltan en la vista 3D y se listan en los resultados de la barra de búsqueda.</li><li>Haga clic en cualquier resultado de búsqueda para inspeccionar un satélite individual.</li></ol>",
+        "tip1": "Seleccionar un país reemplaza la búsqueda actual y deselecciona el satélite actual, así que termine primero el trabajo a nivel de objeto.",
+        "tip2": "Cada país también está disponible en la paleta de comandos como un comando Seleccionar país.",
+        "shortcutToggle": "Alternar el Menú de Países"
+      }
     }
   }
 }

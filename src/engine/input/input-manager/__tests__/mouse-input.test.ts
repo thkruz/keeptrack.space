@@ -8,7 +8,6 @@ import { InputManager } from '@app/engine/input/input-manager';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
 

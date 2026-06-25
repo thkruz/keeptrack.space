@@ -1,0 +1,51 @@
+/*
+ * Shared v13 dense-form + layout rules for the #watchlist-menu root.
+ *
+ * This stylesheet is imported by the OSS WatchlistPlugin module, which the Pro
+ * subclass also pulls in, so one copy covers BOTH builds. The OSS and Pro
+ * watchlist menus share the #watchlist-menu root id, so any rule that both need
+ * (focus indication, stacked-field headroom, the add-satellite row) lives here;
+ * Pro-only chrome (results table, row actions, dropzone) lives in the Pro CSS.
+ */
+
+/* Stacked labelled rows in a card need headroom or the floating "active" label
+ * collides with / strikes through the row above (the shared kt-field-row
+ * default of 6px is too tight once a card stacks more than one labelled row). */
+#watchlist-menu .kt-field-row .input-field.col { margin-top: 20px; }
+#watchlist-menu .kt-section-label + .kt-field-row .input-field.col { margin-top: 8px; }
+
+/* Focus indication: the app-wide :focus-visible outline (offset 2px) overlaps
+ * the floating label above each field. Swap it for KeepTrack's underline. */
+#watchlist-menu .input-field input:focus,
+#watchlist-menu .input-field textarea:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#watchlist-menu .input-field input:focus-visible,
+#watchlist-menu .input-field textarea:focus-visible {
+  outline: none;
+}
+
+/* Add-satellite row: the NORAD input grows, the add control hugs the right. */
+.watchlist-add-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.watchlist-add-row .input-field {
+  flex: 1 1 auto;
+  margin: 12px 0 0;
+}
+
+.watchlist-add-row .icon-btn {
+  flex: 0 0 auto;
+}
+
+.watchlist-add-row .watchlist-add {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+}

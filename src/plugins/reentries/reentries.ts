@@ -19,9 +19,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { hideLoading, showLoading, showLoadingSticky } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
-import { RAD2DEG, Satellite, SpaceObjectType } from '@ootk/src/main';
-import fetchPng from '@public/img/icons/download.png';
-import refreshPng from '@public/img/icons/refresh.png';
+import { Degrees, RAD2DEG, Satellite, SpaceObjectType } from '@ootk/src/main';
 import sputnickPng from '@public/img/icons/sputnick.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './reentries.css';
@@ -54,6 +52,7 @@ export class Reentries extends KeepTrackPlugin {
   protected reentryList_: Satellite[] = [];
   private isLoggedIn_ = false;
   private isFetching_ = false;
+  private isFlyToCorridor_ = false;
 
   // =========================================================================
   // Composition-based configuration methods
@@ -107,36 +106,47 @@ export class Reentries extends KeepTrackPlugin {
   }
 
   private buildSideMenuHtml_(): string {
+    const tb = (key: string) => t7e(`plugins.Reentries.toolbar.${key}` as Parameters<typeof t7e>[0]);
+    const lbl = (key: string) => t7e(`plugins.Reentries.labels.${key}` as Parameters<typeof t7e>[0]);
     const tipMessagesContent = html`
-      <div class="row">
-        <div class="re-toolbar">
-          <button id="reentries-fetch-btn" class="btn btn-ui waves-effect waves-light icon-btn"
-            type="button" kt-tooltip="Fetch Data">
-            <img src="${fetchPng}" class="icon-btn-img" alt="" />
-          </button>
-          <button id="reentries-refresh-btn" class="btn btn-ui waves-effect waves-light icon-btn"
-            type="button" kt-tooltip="Refresh" style="display:none;">
-            <img src="${refreshPng}" class="icon-btn-img" alt="" />
-          </button>
+      <section class="kt-section">
+        <div class="kt-section-label">${lbl('dataActions')}</div>
+        <button id="reentries-fetch-btn" class="kt-action waves-effect" type="button">
+          <span class="kt-action-label">${tb('fetchData')}</span>
+        </button>
+        <button id="reentries-refresh-btn" class="kt-action waves-effect" type="button" style="display:none;">
+          <span class="kt-action-label">${tb('refresh')}</span>
+        </button>
+        <div class="kt-divider"></div>
+        <div class="switch re-flyto-switch" kt-tooltip="${tb('flyToCorridorTooltip')}">
+          <label for="reentries-flyto-corridor">
+            <input id="reentries-flyto-corridor" type="checkbox" />
+            <span class="lever"></span>
+            <span class="re-flyto-label">${tb('flyToCorridor')}</span>
+          </label>
         </div>
-        <table id="reentries-tip-table" class="center-align"></table>
-        <sub class="center-align">*${t7e('plugins.Reentries.dataSource' as Parameters<typeof t7e>[0])}</sub>
-      </div>
+      </section>
+      <section class="kt-section">
+        <div class="kt-section-label">${lbl('results')}</div>
+        <table id="reentries-tip-table" class="reentries-table center-align"></table>
+        <sub class="reentries-attribution">*${t7e('plugins.Reentries.dataSource' as Parameters<typeof t7e>[0])}</sub>
+      </section>
     `;
 
     const reentryAnalysisContent = html`
-      <div class="row">
-        <table id="reentries-analysis-table" class="center-align"></table>
-      </div>
+      <section class="kt-section">
+        <div class="kt-section-label">${lbl('results')}</div>
+        <table id="reentries-analysis-table" class="reentries-table center-align"></table>
+      </section>
     `;
 
     const tabsHtml = buildSideMenuTabsHtml(TABS_ID, [
-      { id: 'reentries-tip-tab', label: 'TIP Messages', content: tipMessagesContent },
-      { id: 'reentries-analysis-tab', label: 'Reentry Analysis', content: reentryAnalysisContent },
+      { id: 'reentries-tip-tab', label: t7e('plugins.Reentries.tabLabels.tipMessages' as Parameters<typeof t7e>[0]), content: tipMessagesContent },
+      { id: 'reentries-analysis-tab', label: t7e('plugins.Reentries.tabLabels.reentryAnalysis' as Parameters<typeof t7e>[0]), content: reentryAnalysisContent },
     ]);
 
     return html`
-      <div id="reentries-menu" class="side-menu-parent start-hidden">
+      <div id="reentries-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div id="reentries-content" class="side-menu">
           ${tabsHtml}
         </div>
@@ -146,8 +156,32 @@ export class Reentries extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.Reentries.title' as Parameters<typeof t7e>[0]),
-      body: t7e('plugins.Reentries.helpBody' as Parameters<typeof t7e>[0]),
+      title: t7e('plugins.Reentries.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.Reentries.help.overview'),
+          image: {
+            src: 'img/help/reentries/reentries-menu.png',
+            alt: t7e('plugins.Reentries.help.imgAlt'),
+            caption: t7e('plugins.Reentries.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.Reentries.help.tabsHeading'),
+          content: t7e('plugins.Reentries.help.tabs'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.Reentries.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.Reentries.help.tip1'),
+        t7e('plugins.Reentries.help.tip2'),
+        t7e('plugins.Reentries.help.tip3'),
+      ],
+      shortcuts: [{ keys: ['R'], description: t7e('plugins.Reentries.help.shortcutToggle') }],
     };
   }
 
@@ -188,13 +222,17 @@ export class Reentries extends KeepTrackPlugin {
 
     getEl('reentries-fetch-btn', true)?.addEventListener('click', () => {
       hideEl('reentries-fetch-btn');
-      showEl('reentries-refresh-btn', 'inline-flex');
+      showEl('reentries-refresh-btn', 'flex');
       this.fetchTipData_();
     });
 
     getEl('reentries-refresh-btn', true)?.addEventListener('click', () => {
       this.tipList_ = [];
       this.fetchTipData_();
+    });
+
+    getEl('reentries-flyto-corridor', true)?.addEventListener('change', (evt: Event) => {
+      this.isFlyToCorridor_ = (<HTMLInputElement>evt.target).checked;
     });
 
     // TIP Messages row click handler
@@ -247,7 +285,7 @@ export class Reentries extends KeepTrackPlugin {
   }
 
   // =========================================================================
-  // TIP Messages (Tab 1) — existing functionality
+  // TIP Messages (Tab 1) - existing functionality
   // =========================================================================
 
   private fetchTipData_(): void {
@@ -257,7 +295,13 @@ export class Reentries extends KeepTrackPlugin {
     this.isFetching_ = true;
 
     fetch(this.tipDataSrc_)
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to fetch TIP data: ${response.status}`);
+        }
+
+        return response.json();
+      })
       .then((tipList: TipMsg[]) => {
         this.setTipList_(tipList);
         this.createTipTable_();
@@ -267,7 +311,7 @@ export class Reentries extends KeepTrackPlugin {
         }
 
         hideEl('reentries-fetch-btn');
-        showEl('reentries-refresh-btn', 'inline-flex');
+        showEl('reentries-refresh-btn', 'flex');
       })
       .catch(() => {
         errorManagerInstance.warn(t7e('plugins.Reentries.errorMsgs.errorFetching' as Parameters<typeof t7e>[0]));
@@ -305,19 +349,19 @@ export class Reentries extends KeepTrackPlugin {
         hideEl(fetchBtn);
       }
       if (refreshBtn) {
-        showEl(refreshBtn, 'inline-flex');
+        showEl(refreshBtn, 'flex');
       }
     } else {
       if (fetchBtn) {
         if (this.tipList_.length === 0) {
-          showEl(fetchBtn, 'inline-flex');
+          showEl(fetchBtn, 'flex');
         } else {
           hideEl(fetchBtn);
         }
       }
       if (refreshBtn) {
         if (this.tipList_.length > 0) {
-          showEl(refreshBtn, 'inline-flex');
+          showEl(refreshBtn, 'flex');
         } else {
           hideEl(refreshBtn);
         }
@@ -358,9 +402,37 @@ export class Reentries extends KeepTrackPlugin {
     ServiceLocator.getTimeManager().changeStaticOffset(decayEpoch.getTime() - now.getTime());
     ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
 
+    if (this.isFlyToCorridor_) {
+      this.flyToCorridor_(this.tipList_[row], decayEpoch);
+
+      return;
+    }
+
     ServiceLocator.getUiManager().doSearch(`${sat.sccNum5 ?? sat.sccNum}`);
 
     this.selectSatIdOnCruncher_ = sat.id;
+  }
+
+  /**
+   * Flies the camera to the predicted reentry corridor location for a TIP
+   * message. The object is deselected first so the camera looks at the ground
+   * point on the globe rather than chasing the decaying satellite.
+   */
+  private flyToCorridor_(tip: TipMsg, decayEpoch: Date): void {
+    const lat = <Degrees>Reentries.parseLat_(tip.LAT);
+    const lon = <Degrees>Reentries.parseLon_(tip.LON);
+    const camera = ServiceLocator.getMainCamera();
+
+    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
+
+    /*
+     * Defer one frame so the time jump propagates before lon2yaw resolves the
+     * longitude. Flying on the same frame as changeStaticOffset would aim the
+     * camera at a stale corridor position.
+     */
+    requestAnimationFrame(() => {
+      camera.lookAtLatLon(lat, lon, 0, decayEpoch);
+    });
   }
 
   protected createTipTable_(): void {
@@ -381,26 +453,26 @@ export class Reentries extends KeepTrackPlugin {
   }
 
   private static createTipHeaders_(tbl: HTMLTableElement) {
+    const th = (key: string) => t7e(`plugins.Reentries.table.${key}` as Parameters<typeof t7e>[0]);
     const tr = tbl.insertRow();
     const names = [
-      'NORAD',
-      'Decay Date',
-      'Latitude',
-      'Longitude',
-      'Window (min)',
-      'Next Report (hrs)',
-      'Reentry Angle (deg)',
-      'RCS (m^2)',
-      'GP Age (hrs)',
-      'Dry Mass (kg)',
-      'Volume (m^3)',
+      th('norad'),
+      th('decayDate'),
+      th('latitude'),
+      th('longitude'),
+      th('window'),
+      th('nextReport'),
+      th('reentryAngle'),
+      th('rcs'),
+      th('gpAge'),
+      th('dryMass'),
+      th('volume'),
     ];
 
     for (const name of names) {
       const column = tr.insertCell();
 
       column.appendChild(document.createTextNode(name));
-      column.setAttribute('style', 'text-decoration: underline');
       column.setAttribute('class', 'center');
     }
   }
@@ -412,10 +484,12 @@ export class Reentries extends KeepTrackPlugin {
     tr.setAttribute('data-row', i.toString());
 
     const sat = ServiceLocator.getCatalogManager().sccNum2Sat(this.tipList_[i].NORAD_CAT_ID);
-    let rcs = 'Reentered';
-    let age = 'Reentered';
-    let volume = 'Reentered';
-    let gammaDegrees = 'Reentered';
+    const reentered = t7e('plugins.Reentries.labels.reentered' as Parameters<typeof t7e>[0]);
+    const unknown = t7e('Common.unknown');
+    let rcs = reentered;
+    let age = reentered;
+    let volume = reentered;
+    let gammaDegrees = reentered;
 
     if (sat) {
       const decayEpochDate = new Date(this.tipList_[i].DECAY_EPOCH);
@@ -433,7 +507,7 @@ export class Reentries extends KeepTrackPlugin {
 
         gammaDegrees = `${Math.abs(gamma * RAD2DEG).toFixed(2)}\u00B0`;
       } else {
-        gammaDegrees = 'Unknown';
+        gammaDegrees = unknown;
       }
 
       if (sat?.rcs) {
@@ -441,16 +515,16 @@ export class Reentries extends KeepTrackPlugin {
       } else {
         const rcsEst = SatMath.estimateRcsUsingHistoricalData(sat);
 
-        rcs = rcsEst ? `${rcsEst.toFixed(2)}` : 'Unknown';
+        rcs = rcsEst ? `${rcsEst.toFixed(2)}` : unknown;
       }
 
-      age = sat ? `${sat.ageOfElset(new Date(), 'hours').toFixed(2)}` : 'Unknown';
+      age = sat ? `${sat.ageOfElset(new Date(), 'hours').toFixed(2)}` : unknown;
 
       const span = sat?.span ? parseFloat(sat.span.replace(/[^0-9.]/gu, '')) : -1;
       const length = sat?.length ? parseFloat(sat.length.replace(/[^0-9.]/gu, '')) : -1;
       const diameter = sat?.diameter ? parseFloat(sat.diameter.replace(/[^0-9.]/gu, '')) : -1;
 
-      volume = span !== -1 && length !== -1 && diameter !== -1 ? `${((Math.PI / 6) * span * length * diameter).toFixed(2)}` : 'Unknown';
+      volume = span !== -1 && length !== -1 && diameter !== -1 ? `${((Math.PI / 6) * span * length * diameter).toFixed(2)}` : unknown;
     }
 
     Reentries.createCell_(tr, this.tipList_[i].NORAD_CAT_ID);
@@ -462,7 +536,7 @@ export class Reentries extends KeepTrackPlugin {
     Reentries.createCell_(tr, gammaDegrees);
     Reentries.createCell_(tr, rcs);
     Reentries.createCell_(tr, age);
-    Reentries.createCell_(tr, sat?.dryMass ?? 'Reentered');
+    Reentries.createCell_(tr, sat?.dryMass ?? reentered);
     Reentries.createCell_(tr, volume);
 
     return tr;
@@ -507,28 +581,30 @@ export class Reentries extends KeepTrackPlugin {
   }
 
   private static createReentryHeaders_(tbl: HTMLTableElement) {
+    const th = (key: string) => t7e(`plugins.Reentries.table.${key}` as Parameters<typeof t7e>[0]);
     const tr = tbl.insertRow();
     const names = [
-      'NORAD',
-      'Name',
-      'Type',
-      'Perigee (km)',
-      'Apogee (km)',
-      'Mean Alt (km)',
-      'Incl (\u00B0)',
-      'RCS (m\u00B2)',
+      th('norad'),
+      th('name'),
+      th('type'),
+      th('perigee'),
+      th('apogee'),
+      th('meanAlt'),
+      th('incl'),
+      th('rcsSup'),
     ];
 
     for (const name of names) {
       const column = tr.insertCell();
 
       column.appendChild(document.createTextNode(name));
-      column.setAttribute('style', 'text-decoration: underline');
       column.setAttribute('class', 'center');
     }
   }
 
   private static createReentryRow_(tbl: HTMLTableElement, sat: Satellite) {
+    const l = (key: string) => t7e(`plugins.Reentries.labels.${key}` as Parameters<typeof t7e>[0]);
+    const unknown = t7e('Common.unknown');
     const tr = tbl.insertRow();
 
     tr.setAttribute('class', 'reentry-object link');
@@ -550,32 +626,32 @@ export class Reentries extends KeepTrackPlugin {
       tr.classList.add('reentry-warning');
     }
 
-    let typeStr = 'Unknown';
+    let typeStr = unknown;
 
     if (sat.type === SpaceObjectType.PAYLOAD) {
-      typeStr = 'Payload';
+      typeStr = l('payload');
     } else if (sat.type === SpaceObjectType.ROCKET_BODY) {
-      typeStr = 'R/B';
+      typeStr = l('rocketBody');
     } else if (sat.type === SpaceObjectType.DEBRIS) {
-      typeStr = 'Debris';
+      typeStr = l('debris');
     }
 
-    let rcsStr = 'Unknown';
+    let rcsStr = unknown;
 
     if (sat.rcs) {
       rcsStr = `${sat.rcs}`;
     } else {
       const rcsEst = SatMath.estimateRcsUsingHistoricalData(sat);
 
-      rcsStr = rcsEst ? `${rcsEst.toFixed(2)}` : 'Unknown';
+      rcsStr = rcsEst ? `${rcsEst.toFixed(2)}` : unknown;
     }
 
     const meanAltStr = hasReentered
-      ? 'Reentered'
+      ? l('reentered')
       : ((sat.apogee + sat.perigee) / 2).toFixed(1);
 
     Reentries.createCell_(tr, sat.sccNum);
-    Reentries.createCell_(tr, sat.name || 'Unknown');
+    Reentries.createCell_(tr, sat.name || unknown);
     Reentries.createCell_(tr, typeStr);
     Reentries.createCell_(tr, sat.perigee.toFixed(1));
     Reentries.createCell_(tr, sat.apogee.toFixed(1));
@@ -602,13 +678,25 @@ export class Reentries extends KeepTrackPlugin {
   // Utilities
   // =========================================================================
 
-  private lon2degrees_(lon: string): string {
+  /** Parses a TIP latitude string into signed degrees (north positive). */
+  private static parseLat_(lat: string): number {
+    return parseFloat(lat);
+  }
+
+  /** Parses a TIP longitude string into signed degrees normalized to [-180, 180]. */
+  private static parseLon_(lon: string): number {
     let lonDeg = parseFloat(lon);
-    let direction = 'E';
 
     if (lonDeg > 180) {
       lonDeg -= 360;
     }
+
+    return lonDeg;
+  }
+
+  private lon2degrees_(lon: string): string {
+    let lonDeg = Reentries.parseLon_(lon);
+    let direction = 'E';
 
     if (lonDeg < 0) {
       direction = 'W';
@@ -619,7 +707,7 @@ export class Reentries extends KeepTrackPlugin {
   }
 
   private lat2degrees_(lat: string): string {
-    let latDeg = parseFloat(lat);
+    let latDeg = Reentries.parseLat_(lat);
     let direction = 'N';
 
     if (latDeg < 0) {

@@ -1,1 +1,53 @@
-/* EditSat plugin styles */
+/**
+ * Edit Satellite menu (v13+) tweaks.
+ *
+ * This is a dense form: each card stacks several Materialize fields whose
+ * floating "active" label sits ~14px above its input, so the shared-stylesheet
+ * defaults are corrected here, scoped to this menu. All action rows live inside
+ * .kt-section cards, so the standalone-action width rule is not needed.
+ */
+
+/*
+ * 1. Stacked-field headroom. The shared v13 default
+ *    (`.kt-field-row .input-field.col { margin-top: 6px }`) is too tight when a
+ *    card stacks more than one labelled row; the floating label collides with
+ *    the row above. Give every stacked row room for the label to clear.
+ */
+#editSat-menu .kt-field-row .input-field.col {
+  margin-top: 20px;
+}
+
+/*
+ * The first row in a card sits directly under the section label, which already
+ * provides separation, so it does not need the full floating-label headroom.
+ */
+#editSat-menu .kt-section-label + .kt-field-row .input-field.col {
+  margin-top: 8px;
+}
+
+/*
+ * 2. Focus indication. KeepTrack marks field focus with an underline, not a box.
+ *    The app-wide `:focus-visible` rule otherwise draws a 2px outline (offset
+ *    2px) that overlaps the floating label above each field. Swap the box for a
+ *    primary-colored underline so the indicator stays inside the field.
+ */
+#editSat-menu .input-field input:focus,
+#editSat-menu .input-field textarea:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#editSat-menu .input-field input:focus-visible,
+#editSat-menu .input-field textarea:focus-visible {
+  outline: none;
+}
+
+/* Inline submit-error note: red surface, dismissible on click. */
+#editSat-menu #es-error {
+  margin: 0 6px 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--color-light-text, #fff);
+  background-color: var(--color-error, #b00020);
+}

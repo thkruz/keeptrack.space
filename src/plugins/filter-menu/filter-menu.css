@@ -1,8 +1,51 @@
-#filter-menu .filter-category {
-  padding-top: 0.5rem;
+/*
+ * Filter-menu plugin styles. The menu uses the shared v13 system
+ * (.kt-ui-v13 + kt-section/kt-action/...); see src/engine/ui/menu-v13.css.
+ * Only the search box and the dense-form fixes (this menu stacks many switch
+ * rows per card plus a standalone Reset action) live here, scoped to #filter-menu.
+ */
+
+/* ===== Search box ===== */
+.filter-search-wrapper {
+  margin: 0 6px 12px;
 }
 
-#filter-menu .filter-reset-row {
-  display: flex;
-  justify-content: flex-end;
+#filter-search {
+  box-sizing: border-box;
+  width: 100%;
+  height: 36px;
+  margin: 0;
+  padding: 0 12px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--color-dark-border);
+  border-radius: var(--kt-radius-md, 6px);
+  color: var(--color-text-light, #f5f5f5);
+  font-size: 13px;
+}
+
+#filter-search::placeholder {
+  color: var(--color-dark-text-muted);
+}
+
+#filter-search:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+/* ===== Dense-form fixes (recurring v13 miss) ===== */
+
+/* Toggle rows: tighten the Materialize .row default and give the stacked
+   switches a consistent vertical rhythm inside the card. The first row after the
+   section label only needs the smaller gap. */
+#filter-menu .kt-section .switch.row { margin-bottom: 0; margin-top: 12px; }
+#filter-menu .kt-section-label + .switch.row { margin-top: 4px; }
+
+/* Standalone "Reset to Defaults" action is a direct child of the form, so it is
+   width:100% and would run 12px past the inset cards; subtract the side margins
+   so its edges line up with the cards. */
+#filter-form > .kt-action {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
 }

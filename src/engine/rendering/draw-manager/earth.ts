@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
@@ -105,8 +106,8 @@ export class Earth {
    * is missing (feature disabled or load failed). Day uses gray so failure is visible;
    * other channels use transparent so the shader produces a shader-correct "no effect".
    */
-  private placeholders_: Record<'day' | 'dayBlack' | 'night' | 'bump' | 'spec' | 'political' | 'clouds', WebGLTexture | null> =
-    { day: null, dayBlack: null, night: null, bump: null, spec: null, political: null, clouds: null };
+  private placeholders_: Record<'day' | 'dayBlack' | 'night' | 'bump' | 'spec' | 'political' | 'clouds' | 'coverage', WebGLTexture | null> =
+    { day: null, dayBlack: null, night: null, bump: null, spec: null, political: null, clouds: null, coverage: null };
   /** Keys of day textures whose load promise rejected — distinguishes failure from isBlackEarth. */
   private failedDayKeys_ = new Set<string>();
   private vaoOcclusion_: WebGLVertexArrayObject;
@@ -114,6 +115,15 @@ export class Earth {
   lightDirection = <vec3>[0, 0, 0];
   surfaceMesh: Mesh;
   atmosphereMesh: Mesh | null = null;
+  /**
+   * Generic equirectangular coverage overlay. This is an inert engine hook: it does
+   * nothing until a plugin (e.g. CoverageAnalysis Pro) creates a single-channel
+   * coverage texture and feeds it in via {@link setCoverageOverlay}. The texture's
+   * red channel is treated as a normalized 0..1 value the shader maps to a color ramp.
+   */
+  coverageTexture: WebGLTexture | null = null;
+  isDrawCoverageOverlay = false;
+  coverageOverlayOpacity = 0.6;
   imageCache: Record<string, HTMLImageElement> = {};
   cloudPosition_: number = 0;
   RADIUS: number = RADIUS_OF_EARTH;
@@ -161,6 +171,19 @@ export class Earth {
 
   useHighestQualityTexture(): void {
     // Nothing to do here since we always load the highest quality first
+  }
+
+  /**
+   * Feed the generic coverage overlay. Pass `texture = null` (or `enabled = false`)
+   * to turn the overlay off. The overlay owner (a plugin) is responsible for the
+   * texture's lifetime; Earth only binds and samples it.
+   */
+  setCoverageOverlay(texture: WebGLTexture | null, enabled: boolean, opacity?: number): void {
+    this.coverageTexture = texture;
+    this.isDrawCoverageOverlay = enabled && !!texture;
+    if (typeof opacity === 'number') {
+      this.coverageOverlayOpacity = opacity;
+    }
   }
 
   /**
@@ -239,6 +262,9 @@ export class Earth {
             uSpecMap: <WebGLUniformLocation><unknown>null,
             uPoliticalMap: <WebGLUniformLocation><unknown>null,
             uCloudsMap: <WebGLUniformLocation><unknown>null,
+            uCoverageMap: <WebGLUniformLocation><unknown>null,
+            uCoverageEnabled: <WebGLUniformLocation><unknown>null,
+            uCoverageOpacity: <WebGLUniformLocation><unknown>null,
             uRawZoomLevel: <WebGLUniformLocation><unknown>null,
             uisDrawNightAsDay: <WebGLUniformLocation><unknown>null,
           },
@@ -564,6 +590,8 @@ export class Earth {
     gl.uniform1f(this.surfaceMesh.material.uniforms.uisDrawNightAsDay, settingsManager.isDrawNightAsDay ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uIsDrawAurora, settingsManager.isDrawAurora ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uShowGraticule, settingsManager.isDrawGraticule ? 1.0 : 0.0);
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uCoverageEnabled, this.isDrawCoverageOverlay ? 1.0 : 0.0);
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uCoverageOpacity, this.coverageOverlayOpacity);
   }
 
   private setAtmosphereUniforms_(gl: WebGL2RenderingContext) {
@@ -604,6 +632,8 @@ export class Earth {
     this.placeholders_.spec = makePixel(transparent);
     this.placeholders_.political = makePixel(transparent);
     this.placeholders_.clouds = makePixel(transparent);
+    // Coverage: transparent (red channel 0 = zero dwell = nothing drawn)
+    this.placeholders_.coverage = makePixel(transparent);
   }
 
   private loadChannel_(label: string, store: Record<string, WebGLTexture>, key: string, url: string, onSuccess?: () => void, onFail?: () => void): void {
@@ -800,6 +830,16 @@ export class Earth {
     } else {
       gl.bindTexture(gl.TEXTURE_2D, this.placeholders_.clouds);
     }
+
+    // Coverage overlay (generic engine hook; fed by a plugin). Bind the real
+    // texture only when enabled, otherwise the transparent placeholder.
+    gl.uniform1i(this.surfaceMesh.material.uniforms.uCoverageMap, 6);
+    gl.activeTexture(gl.TEXTURE6);
+    if (this.isDrawCoverageOverlay && this.coverageTexture) {
+      gl.bindTexture(gl.TEXTURE_2D, this.coverageTexture);
+    } else {
+      gl.bindTexture(gl.TEXTURE_2D, this.placeholders_.coverage);
+    }
   }
 
   /**
@@ -833,11 +873,29 @@ export class Earth {
     uniform sampler2D uSpecMap;
     uniform sampler2D uPoliticalMap;
     uniform sampler2D uCloudsMap;
+    uniform sampler2D uCoverageMap;
+    uniform float uCoverageEnabled;
+    uniform float uCoverageOpacity;
 
     const float latitudeCenter = 67.5; // The latitude at which the Aurora Borealis appears
     const float latitudeMargin = 7.0; // The margin around the center latitude where the Aurora Borealis is visible
     const vec3 directionalLightColor = vec3(1.0, 1.0, 1.0);
     const vec3 ambientLightColor = vec3(0.1, 0.1, 0.1);
+
+    // Maps a normalized 0..1 coverage/dwell value to a blue -> cyan -> yellow -> red ramp.
+    vec3 coverageRamp(float t) {
+      t = clamp(t, 0.0, 1.0);
+      vec3 blue = vec3(0.0, 0.2, 1.0);
+      vec3 cyan = vec3(0.0, 0.9, 0.9);
+      vec3 yellow = vec3(1.0, 0.9, 0.0);
+      vec3 red = vec3(1.0, 0.15, 0.0);
+      if (t < 0.33) {
+        return mix(blue, cyan, t / 0.33);
+      } else if (t < 0.66) {
+        return mix(cyan, yellow, (t - 0.33) / 0.33);
+      }
+      return mix(yellow, red, (t - 0.66) / 0.34);
+    }
 
     // Function to calculate the intensity of the Aurora Borealis at a given latitude
     float calculateAuroraIntensity(float latitude, float noise) {
@@ -917,6 +975,19 @@ export class Earth {
       // lighting is off.
       vec4 politicalColor = textureLod(uPoliticalMap, vUv, -1.0);
       fragColor.rgb += politicalColor.rgb * politicalColor.a;
+
+      // ...............................................
+      // Coverage overlay (generic engine hook fed by a plugin). The red channel
+      // holds a normalized 0..1 dwell value; map it to a ramp and blend on top.
+      // Inert (zero cost visually) when uCoverageEnabled is off or dwell is 0.
+      if (uCoverageEnabled > 0.5) {
+        float dwell = texture(uCoverageMap, vUv).r;
+        if (dwell > 0.0039) { // ~1/255: ignore empty cells
+          vec3 covColor = coverageRamp(dwell);
+          float covAlpha = uCoverageOpacity * (0.45 + 0.55 * clamp(dwell, 0.0, 1.0));
+          fragColor.rgb = mix(fragColor.rgb, covColor, covAlpha);
+        }
+      }
 
       // ...............................................
 

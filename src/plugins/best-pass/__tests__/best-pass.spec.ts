@@ -2,7 +2,7 @@ import { test, expect } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('BestPassPlugin', () => {
-  test('icon disabled without sensor, drawer item visible, form elements in DOM', async ({ page }) => {
+  test('icon pro-gated (login gate), drawer item visible, form elements in DOM', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { BestPassPlugin: { enabled: true } },
       settings: { isMobileModeEnabled: true },
@@ -11,9 +11,10 @@ test.describe('BestPassPlugin', () => {
     const bottomIcon = page.locator('#best-pass-icon');
     const sideMenu = page.locator('#best-pass-menu');
 
-    // Bottom icon should exist but be disabled (no sensor selected)
+    // In the Pro build best-pass is a login-gated plugin. With the login gate
+    // active (default), the icon is marked pro-gated rather than sensor-disabled.
     await expect(bottomIcon).toBeAttached();
-    await expect(bottomIcon).toHaveClass(/bmenu-item-disabled/u);
+    await expect(bottomIcon).toHaveClass(/bmenu-item-pro/u);
 
     // Side menu HTML should exist in DOM but be hidden
     await expect(sideMenu).toBeAttached();
@@ -33,18 +34,17 @@ test.describe('BestPassPlugin', () => {
 
     await expect(drawerItem).toBeVisible();
 
-    // Clicking a disabled plugin's drawer item should NOT open the side menu
+    // Clicking a login-gated plugin's drawer item should NOT open the side menu
     await drawerItem.scrollIntoViewIfNeeded();
     await drawerItem.click({ force: true });
     await expect(sideMenu).toBeHidden({ timeout: 2_000 });
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u);
 
-    // Verify form elements exist in the DOM even though menu is hidden
+    // Verify form elements exist in the DOM even though the menu is hidden. The
+    // Pro form uses chip pickers (sensor selector + satellite input) rather than
+    // the OSS #bp-sats text field.
     await expect(page.locator('form#best-pass-menu-form')).toBeAttached();
-    await expect(page.locator('#bp-sats')).toBeAttached();
+    await expect(page.locator('#bp-sat-input')).toBeAttached();
     await expect(page.locator('#bp-submit')).toBeAttached();
-
-    // Verify default satellite numbers are pre-filled
-    await expect(page.locator('#bp-sats')).toHaveValue('25544,00005');
   });
 });

@@ -3,7 +3,65 @@
     "ShortTermFences": {
       "bottomIconLabel": "Krátkodobé hradby",
       "title": "Menu krátkodobých hradeb (STF)",
-      "helpBody": "Menu krátkodobých hradeb (STF) slouží k vizualizaci vyhledávacích oblastí senzoru. <br><br> Toto pravděpodobně nebude příliš užitečné, pokud nevlastníte/neprovozujete senzor s funkcí vyhledávací oblasti."
+      "sideMenuTitle": "Krátkodobá hradba",
+      "labels": {
+        "centerAzimuth": "Středový azimut",
+        "azimuthExtentDeg": "Rozsah azimutu (deg)",
+        "azimuthExtentKm": "Rozsah azimutu (km)",
+        "centerElevation": "Středová elevace",
+        "elevationExtentDeg": "Rozsah elevace (deg)",
+        "elevationExtentKm": "Rozsah elevace (km)",
+        "centerRange": "Středová vzdálenost",
+        "rangeExtent": "Rozsah vzdálenosti"
+      },
+      "tooltips": {
+        "centerAzimuth": "Azimut středu vyhledávání ve stupních (např. 50)",
+        "azimuthExtentDeg": "Celkový rozsah kolem středového azimutu ve stupních (např. 4)",
+        "azimuthExtentKm": "Celkový rozsah kolem středového azimutu v kilometrech (např. 120)",
+        "centerElevation": "Elevace středu vyhledávání ve stupních (např. 20)",
+        "elevationExtentDeg": "Celkový rozsah kolem středové elevace ve stupních (např. 4)",
+        "elevationExtentKm": "Celkový rozsah kolem středové elevace v kilometrech (např. 120)",
+        "centerRange": "Vzdálenost středu vyhledávání v kilometrech (např. 1000)",
+        "rangeExtent": "Celkový rozsah kolem středové vzdálenosti v kilometrech (např. 100)",
+        "buildOnObject": "Vizualizace vyhledávací schopnosti senzoru"
+      },
+      "buttons": {
+        "createNewStf": "Vytvořit novou STF",
+        "removeLast": "Odebrat poslední",
+        "clearAllStfs": "Vymazat všechny STF"
+      },
+      "links": {
+        "buildOnObject": "Vytvořit krátkodobou hradbu na tomto objektu..."
+      },
+      "errorMsgs": {
+        "stfNotInView": "STF není v zorném poli senzoru!",
+        "noSelectSatManager": "Nebyla nalezena žádná instance selectSatManager",
+        "invalidInput": "Zadejte platné číslo do každého pole.",
+        "invalidRange": "Střední vzdálenost musí být větší než nula."
+      },
+      "help": {
+        "overview": "Krátkodobé hradby vizualizují vyhledávací oblast senzoru: výseč oblohy definovanou oknem azimutu, elevace a vzdálenosti. Operátoři díky nim přesně vidí, jaký objem zadané vyhledávání pokrývá a zda by jím sledovaný objekt proletěl.",
+        "imgAlt": "Menu krátkodobé hradby s poli azimutu, elevace a vzdálenosti",
+        "imgCaption": "Definujte hradbu jejím středovým bodem a rozsahy v azimutu, elevaci a vzdálenosti.",
+        "fieldsHeading": "Definice hradby",
+        "fields": "Hradba je vystředěna na bod daný hodnotami <strong>Středový azimut</strong>, <strong>Středová elevace</strong> (stupně) a <strong>Středová vzdálenost</strong> (kilometry), vše měřeno od vybraného senzoru. <strong>Rozsah azimutu</strong> a <strong>Rozsah elevace</strong> určují celkovou šířku a výšku ve stupních; odpovídající velikost v kilometrech na středové vzdálenosti se automaticky vypočítá v polích km určených jen pro čtení. <strong>Rozsah vzdálenosti</strong> určuje hloubku oblasti v kilometrech.",
+        "howToUse": "<ol><li>Vyberte senzor; spodní ikona je neaktivní, dokud žádný není vybrán.</li><li>Otevřete menu <strong>Krátkodobá hradba</strong> (režim Vytvořit) a zadejte středový bod a rozsahy.</li><li>Klikněte na <strong>Vytvořit novou STF</strong>. Objem hradby se vykreslí od senzoru ve 3D zobrazení.</li><li>Dalším odesláním přidáte další hradby; <strong>Odebrat poslední</strong> smaže nejnovější a <strong>Vymazat všechny STF</strong> odstraní všechny hradby.</li><li>S vybraným satelitem se v informačním panelu satelitu objeví odkaz <strong>Vytvořit krátkodobou hradbu na tomto objektu...</strong>, který předvyplní formulář aktuálním azimutem, elevací a vzdáleností satelitu.</li></ol>",
+        "tip1": "Pokud je požadovaná hradba mimo to, co senzor vidí, je vytvoření odmítnuto s upozorněním, místo aby se vykreslila nemožná oblast.",
+        "tip2": "Kilometrová pole rozsahů se aktualizují během psaní, takže lze snadno ověřit, jak široké vyhledávání na dané vzdálenosti skutečně je."
+      },
+      "sections": {
+        "azimuth": "Azimut",
+        "elevation": "Elevace",
+        "range": "Vzdálenost"
+      },
+      "fenceList": {
+        "activeFences": "Aktivní ploty",
+        "empty": "Žádné aktivní ploty. Vytvořte jeden výše.",
+        "remove": "Odebrat plot",
+        "azimuth": "Azimut",
+        "elevation": "Elevace",
+        "range": "Vzdálenost"
+      }
     }
   }
 }

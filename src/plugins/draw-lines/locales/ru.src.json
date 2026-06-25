@@ -1,6 +1,8 @@
 {
   "plugins": {
     "DrawLinesPlugin": {
+      "title": "Рисование линий",
+      "bottomIconLabel": "Рисование линий",
       "rmbMenu": {
         "title": "Рисовать",
         "eciAxes": "Оси ECI",
@@ -13,12 +15,39 @@
         "earthToSatellite": "Земля к спутнику",
         "sensorToSatellite": "Датчик к спутнику",
         "satelliteToSatellite": "Спутник к спутнику",
+        "satelliteRicAxes": "Оси RIC спутника",
         "satelliteToSun": "Спутник к Солнцу",
         "satelliteToMoon": "Спутник к Луне",
         "moonOrbit": "Нарисовать орбиту Луны"
       },
+      "sections": {
+        "activeLines": "Активные линии",
+        "referenceGeometry": "Опорная геометрия",
+        "objectLines": "Линии объектов"
+      },
+      "referenceFrameLabel": "Система отсчёта",
+      "clearAll": "Очистить все линии",
+      "emptyList": "Линии не нарисованы",
+      "remove": "Удалить",
+      "lineTypes": {
+        "reference": "Опорная линия",
+        "satToRef": "Спутник к точке",
+        "satRic": "Оси RIC",
+        "objToObj": "Объект к объекту",
+        "satToSun": "Спутник к Солнцу",
+        "satToBody": "Спутник к телу",
+        "sensorToSat": "Датчик к спутнику",
+        "sensorToSun": "Датчик к Солнцу",
+        "sensorToMoon": "Датчик к Луне",
+        "orbitPath": "Орбитальный путь",
+        "satScanEarth": "Сканирование Земли",
+        "sensorScanHorizon": "Сканирование горизонта",
+        "sensorToRae": "Датчик к точке",
+        "generic": "Линия"
+      },
       "errorMsgs": {
-        "noPrimarySat": "Не выбран основной спутник для линии между спутниками."
+        "noPrimarySat": "Не выбран основной спутник для линии между спутниками.",
+        "noSatSelected": "Сначала выберите спутник."
       }
     }
   }

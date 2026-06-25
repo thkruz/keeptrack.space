@@ -3,8 +3,29 @@
     "EditSat": {
       "bottomIconLabel": "Upravit satelit",
       "title": "Menu úpravy satelitu",
-      "helpBody": "Menu úpravy satelitu slouží k úpravě dat satelitu. <br><br> <ul> <li> SCC# satelitu – Jedinečné číslo přiřazené každému satelitu americkými Vesmírnými silami. </li> <li> Rok epochy – Rok poslední aktualizace dráhy satelitu. </li> <li> Den epochy – Den v roce poslední aktualizace dráhy satelitu. </li> <li> Inklinace – Úhel mezi rovinou dráhy satelitu a rovinou rovníku. </li> <li> Rektascenze – Úhel mezi vzestupným uzlem a polohou satelitu v době poslední aktualizace dráhy. </li> <li> Excentricita – Míra odchylky dráhy satelitu od dokonalé kružnice. </li> <li> Argument perigea – Úhel mezi vzestupným uzlem a nejbližším bodem satelitu k Zemi. </li> <li> Střední anomálie – Úhel mezi polohou satelitu v době poslední aktualizace dráhy a nejbližším bodem satelitu k Zemi. </li> <li> Střední pohyb – Rychlost, jakou se mění střední anomálie satelitu. </li> </ul>",
+      "help": {
+        "overview": "Menu úpravy satelitu umožňuje měnit orbitální elementy vybraného satelitu (fakticky přepsat jeho TLE) a ukládat nebo načítat TLE jako soubory. Je to základní nástroj pro experimenty typu \"co kdyby\" s dráhou skutečného objektu.",
+        "imgAlt": "Menu úpravy satelitu s poli orbitálních elementů",
+        "imgCaption": "Každé pole odpovídá hodnotě TLE. Perioda a střední pohyb se synchronizují automaticky.",
+        "fieldsHeading": "Orbitální elementy",
+        "fields": "<ul><li><strong>Rok / den epochy</strong>: kdy byly elementy změřeny: dvouciferný rok a zlomkový den v roce (např. 173.25 = poledne 173. dne).</li><li><strong>Inklinace</strong>: sklon dráhy vůči rovníku, ve stupních.</li><li><strong>Rektascenze</strong>: kde dráha protíná rovník severním směrem, ve stupních.</li><li><strong>Excentricita</strong>: zadejte pouze číslice za \"0.\" (např. 0001234 znamená 0.0001234).</li><li><strong>Argument perigea</strong>: orientace nejnižšího bodu dráhy, ve stupních.</li><li><strong>Střední anomálie</strong>: kde na dráze se satelit nacházel v epoše, ve stupních.</li><li><strong>Střední pohyb / perioda</strong>: oběhy za den a minuty na oběh; úprava jednoho přepočítá druhé.</li></ul>",
+        "howToUse": "<ol><li>Vyberte satelit, poté otevřete menu ze spodní lišty, stiskněte E, nebo klikněte na satelit pravým tlačítkem a zvolte Upravit sat.</li><li>Upravte pole a klikněte na <strong>Aktualizovat satelit</strong> pro použití změn; satelit se okamžitě přesune na novou dráhu.</li><li><strong>Aktualizovat epochu na nyní</strong> přečasuje stávající dráhu na aktuální okamžik a ponechá satelit nad jeho současnou polohou.</li><li><strong>Uložit TLE</strong> exportuje aktuální elementy jako soubor JSON; <strong>Načíst TLE</strong> použije dříve uložený soubor.</li></ol>",
+        "tip1": "Aktualizace jsou odmítnuty, pokud by nová dráha klesla pod atmosféru; oznámení vás požádá o vyzkoušení jiných parametrů.",
+        "tip2": "Excentricita je nejčastější překlep: jde pouze o desetinné číslice, bez úvodního \"0.\".",
+        "tip3": "Úpravy platí pouze pro aktuální relaci a nikdy se nedotknou skutečného katalogu. Pro obnovení původní dráhy stránku znovu načtěte.",
+        "shortcutToggle": "Přepnout menu úpravy satelitu"
+      },
+      "sections": {
+        "identity": "Identita",
+        "epoch": "Epocha",
+        "elements": "Orbitální elementy",
+        "calculated": "Vypočtené parametry",
+        "actions": "Akce"
+      },
       "labels": {
+        "apogeeKm": "Apogeum (km)",
+        "perigeeKm": "Perigeum (km)",
+        "periodMin": "Perioda (min)",
         "scc": "SCC# satelitu",
         "country": "Země",
         "epochYear": "Rok epochy",
@@ -19,6 +40,7 @@
         "error": "Chyba"
       },
       "buttons": {
+        "resetOriginal": "Obnovit původní",
         "updateSatellite": "Aktualizovat satelit",
         "updateEpoch": "Aktualizovat epochu na nyní",
         "saveTle": "Uložit TLE",

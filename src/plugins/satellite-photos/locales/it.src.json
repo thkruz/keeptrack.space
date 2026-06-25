@@ -3,10 +3,29 @@
     "SatellitePhotos": {
       "bottomIconLabel": "Immagini Satellitari",
       "title": "Immagini Satellitari",
-      "helpBody": "Il plugin Immagini Satellitari visualizza le ultime immagini dai satelliti meteorologici geostazionari e da DSCOVR. Clicca sul nome di un satellite per visualizzare la sua immagine più recente.",
       "defaultImageTitle": "Ultima Immagine Satellitare",
+      "labels": {
+        "dscovrUnavailable": "DSCOVR temporaneamente non disponibile",
+        "dscovrImage": "Immagine DSCOVR {index}",
+        "dscovrLoading": "Caricamento immagini DSCOVR…",
+        "refresh": "Aggiorna ultima immagine",
+        "imageAtUtc": "{name} alle {time} UTC"
+      },
+      "sections": {
+        "geostationary": "Geostazionari",
+        "dscovr": "DSCOVR (L1)"
+      },
       "errorMsgs": {
         "FuturePictures": "Impossibile caricare immagini dal futuro. Caricamento delle immagini più recenti."
+      },
+      "help": {
+        "overview": "Immagini Satellitari mostra le fotografie più recenti scattate da veri satelliti meteorologici: viste a disco intero da MeteoSat, Himawari, GOES ed Elektro-L in orbita geostazionaria, oltre a immagini dell'intera Terra da DSCOVR nel punto L1. Collega ciò che vedi nella simulazione a ciò che quei satelliti stanno realmente fotografando in questo momento.",
+        "imgAlt": "Il menu Immagini Satellitari con l'elenco dei satelliti meteorologici",
+        "imgCaption": "Fai clic su un satellite per vedere la sua immagine più recente e volare verso di esso nella scena.",
+        "howToUse": "<ol><li>Apri <strong>Immagini Satellitari</strong> dalla barra inferiore o premi <strong>H</strong>; richiede una connessione a internet.</li><li>Fai clic su un satellite. La camera vola verso di esso nella scena 3D e la sua immagine più recente si apre in sovrapposizione.</li><li>Le voci DSCOVR compaiono in fondo all'elenco, con una voce per ogni immagine recente.</li></ol>",
+        "tip1": "Le immagini arrivano in diretta dal servizio pubblico di ciascuna agenzia, quindi una voce mancante di solito significa che quel flusso è temporaneamente fuori servizio, non che c'è un bug.",
+        "tip2": "Se l'orologio della simulazione è impostato nel futuro, vengono mostrate invece le immagini reali più recenti.",
+        "shortcutToggle": "Attiva/disattiva il menu Immagini Satellitari"
       }
     }
   }

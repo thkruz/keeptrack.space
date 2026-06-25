@@ -1,4 +1,4 @@
-import { fuzzyScore, fuzzySubsequenceScore } from '@app/engine/utils/fuzzy-match';
+import { fuzzyMatchIndices, fuzzyScore, fuzzySubsequenceScore } from '@app/engine/utils/fuzzy-match';
 
 describe('fuzzySubsequenceScore', () => {
   it('returns 0 when the query is not a subsequence of the label', () => {
@@ -39,5 +39,34 @@ describe('fuzzyScore', () => {
 
   it('returns 0 when nothing matches', () => {
     expect(fuzzyScore('Calculator', 'xyz')).toBe(0);
+  });
+});
+
+describe('fuzzyMatchIndices', () => {
+  it('returns an empty array for an empty query', () => {
+    expect(fuzzyMatchIndices('Settings Menu', '')).toEqual([]);
+  });
+
+  it('returns a contiguous range for a substring match', () => {
+    // 'sett' starts at index 0 of 'Settings'
+    expect(fuzzyMatchIndices('Settings Menu', 'sett')).toEqual([0, 1, 2, 3]);
+  });
+
+  it('matches a substring anywhere in the label', () => {
+    // 'sett' starts at index 5 of 'Open Settings'
+    expect(fuzzyMatchIndices('Open Settings', 'sett')).toEqual([5, 6, 7, 8]);
+  });
+
+  it('falls back to subsequence indices (covers acronyms)', () => {
+    // T(0) ell M(5)e A(8) J(10)oke
+    expect(fuzzyMatchIndices('Tell Me A Joke', 'tmaj')).toEqual([0, 5, 8, 10]);
+  });
+
+  it('is case-insensitive', () => {
+    expect(fuzzyMatchIndices('Settings Menu', 'SETT')).toEqual([0, 1, 2, 3]);
+  });
+
+  it('returns an empty array when the query is not a subsequence', () => {
+    expect(fuzzyMatchIndices('Calculator', 'xyz')).toEqual([]);
   });
 });

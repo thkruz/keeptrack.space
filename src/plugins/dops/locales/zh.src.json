@@ -3,21 +3,27 @@
     "DopsPlugin": {
       "bottomIconLabel": "查看DOP",
       "title": "精度因子菜单",
-      "helpTitle": "精度因子（DOP）菜单",
-      "helpBody": "精度因子（DOP）菜单用于计算给定位置和仰角遮罩的精度因子（DOP）。<br><br>HDOP 是水平精度因子，衡量水平位置的精度。<br><br>PDOP 是位置精度因子，衡量位置的精度。<br><br>GDOP 是几何精度因子，衡量几何位置的精度。",
       "labels": {
         "dopTable": "DOP 表",
         "latitude": "纬度",
         "longitude": "经度",
         "altitude": "高度",
         "mask": "遮罩",
-        "updateDopData": "更新 DOP 数据"
+        "updateDopData": "更新 DOP 数据",
+        "location": "位置",
+        "results": "结果"
       },
       "tooltips": {
         "latitude": "纬度（度）",
         "longitude": "经度（度）",
         "altitude": "高度（km）",
         "mask": "GPS 锁定的最低仰角"
+      },
+      "table": {
+        "time": "时间",
+        "hdop": "HDOP",
+        "pdop": "PDOP",
+        "gdop": "GDOP"
       },
       "rmb": {
         "dops": "DOPs",
@@ -29,6 +35,18 @@
       },
       "errorMsgs": {
         "invalidLocation": "请在地球上选择一个有效位置以查看 24 小时 DOPs！"
+      },
+      "help": {
+        "overview": "精度因子（DOP）菜单用于估算地球上任意位置的 GPS 定位精度。DOP 描述可见 GPS 星座的几何分布：当卫星在天空中分布广泛时定位精确（DOP 低），当卫星聚集在一起时精度下降（DOP 高）。使用此菜单可以找出某地点在未来 24 小时内 GPS 信号最佳和最差的时段。",
+        "imgAlt": "带有 24 小时 DOP 表的精度因子菜单",
+        "imgCaption": "输入位置和仰角遮罩，然后更新即可查看未来 24 小时的 DOP 值。",
+        "valuesHeading": "如何解读 DOP 值",
+        "values": "<ul><li><strong>HDOP</strong>：水平精度（纬度和经度）。</li><li><strong>VDOP</strong>：垂直精度（高度）。</li><li><strong>PDOP</strong>：整体三维位置精度。</li><li><strong>GDOP</strong>：PDOP 加上接收机时钟的影响，是最全面的单一质量指标。</li><li><strong>TDOP</strong>：接收机时钟精度。</li></ul>数值越低越好：小于 2 为优秀，2 到 5 对大多数用途可以接受，更大的值表示定位精度下降。表中以一分钟为间隔列出时间、HDOP、PDOP 和 GDOP。",
+        "howToUse": "<ol><li>从底部栏打开菜单，或按 <strong>D</strong> 键。</li><li>以度为单位输入<strong>纬度</strong>和<strong>经度</strong>，以千米为单位输入<strong>高度</strong>，并填写<strong>遮罩</strong>：即 GPS 卫星必须在地平线以上达到的最小仰角（度），才会被计入。</li><li>点击<strong>更新 DOP 数据</strong>。表格将填入未来 24 小时内每分钟一行的数据。</li><li>您也可以在地球上任意位置右键单击并选择 <strong>DOPs</strong>：<strong>当前 GPS DOPs</strong> 显示所点击位置的即时数值，<strong>24 小时 GPS DOPs</strong> 会将该位置填入表单并打开此菜单。</li></ol>",
+        "tip1": "提高仰角遮罩会排除低仰角卫星，通常会使 DOP 增大。请使用接收机实际采用的遮罩值；15 度是常见的默认值。",
+        "tip2": "输入的遮罩值会保存为本次会话的 GPS 仰角遮罩，其他与 GPS 相关的计算会复用该值。",
+        "tip3": "在第一人称相机飞行模式下，D 快捷键会被忽略。",
+        "shortcutToggle": "切换精度因子菜单"
       }
     }
   }

@@ -1,0 +1,38 @@
+{
+  "plugins": {
+    "TheSpaceDevLaunchCalendarPlugin": {
+      "bottomIconLabel": "Calendario lanci",
+      "title": "Calendario lanci",
+      "sideMenuTitle": "Calendario lanci",
+      "tooltips": {
+        "fetchData": "Recupera dati",
+        "refresh": "Aggiorna",
+        "exportLaunchInfo": "Esporta informazioni sui lanci"
+      },
+      "labels": {
+        "dataActions": "Azioni dati",
+        "results": "Prossimi lanci"
+      },
+      "table": {
+        "launchWindow": "Finestra di lancio",
+        "mission": "Missione",
+        "location": "Località",
+        "agency": "Agenzia",
+        "country": "Paese"
+      },
+      "msgs": {
+        "fetching": "Recupero dei prossimi lanci...",
+        "unknown": "Sconosciuto",
+        "tbd": "Da definire"
+      },
+      "help": {
+        "overview": "Prossimi lanci elenca i lanci orbitali imminenti in tutto il mondo, recuperati in tempo reale dalla libreria di lanci di The Space Devs: finestra di lancio, missione, sito di lancio, agenzia e paese per ciascuno. I nomi di missioni e siti rimandano ad approfondimenti quando disponibili.",
+        "imgAlt": "La tabella Prossimi lanci con le missioni imminenti",
+        "imgCaption": "Ogni riga è un lancio imminente con finestra, missione, sito e agenzia.",
+        "howToUse": "<ol><li>Apri <strong>Prossimi lanci</strong> dalla barra inferiore (modalità Eventi).</li><li>Fai clic sul pulsante di recupero per scaricare l'elenco dei lanci corrente; richiede una connessione internet.</li><li>Sfoglia la tabella; i nomi di missioni e rampe con collegamento aprono pagine di approfondimento.</li><li>Usa il pulsante di esportazione per salvare l'elenco come foglio di calcolo.</li></ol>",
+        "tip1": "Le finestre di lancio sono mostrate in UTC; le voci più vecchie di un giorno mostrano «Da definire» finché non vengono recuperati dati aggiornati.",
+        "tip2": "Abbina questo elenco allo strumento Nuovo lancio per modellare la traiettoria di un lancio imminente prima che avvenga."
+      }
+    }
+  }
+}

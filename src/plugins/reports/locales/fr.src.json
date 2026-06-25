@@ -3,7 +3,64 @@
     "ReportsPlugin": {
       "bottomIconLabel": "Rapports",
       "title": "Menu Rapports",
-      "helpBody": "Le menu Rapports est une collection d'outils pour vous aider à analyser et comprendre les données affichées."
+      "reports": {
+        "aer": {
+          "name": "Azimut, élévation, distance",
+          "description": "Génère des données d'azimut, d'élévation et de distance pour les passages du satellite"
+        },
+        "lla": {
+          "name": "Latitude, longitude, altitude",
+          "description": "Génère des données de latitude, longitude et altitude au fil du temps"
+        },
+        "eci": {
+          "name": "Inertiel géocentrique (ECI)",
+          "description": "Génère des vecteurs de position et de vitesse ECI au fil du temps"
+        },
+        "coes": {
+          "name": "Éléments orbitaux classiques",
+          "description": "Génère les éléments orbitaux classiques à l'époque actuelle"
+        },
+        "visibilityWindows": {
+          "name": "Fenêtres de visibilité",
+          "description": "Génère des fenêtres de visibilité avec les heures de lever/coucher et la durée des passages"
+        },
+        "sunEclipse": {
+          "name": "Analyse Soleil/éclipse",
+          "description": "Génère la visibilité du soleil et les heures d'entrée/sortie d'éclipse pour les analyses d'énergie et thermiques"
+        }
+      },
+      "commands": {
+        "generateReport": "Générer le rapport {name}",
+        "open": "Ouvrir les rapports"
+      },
+      "downloadButton": "Télécharger le rapport",
+      "copyButton": "Copier dans le presse-papiers",
+      "sensorNote": "Ces rapports nécessitent la sélection d'un capteur.",
+      "sections": {
+        "orbitPosition": "Orbite et position",
+        "sensor": "Capteur",
+        "options": "Options de sortie"
+      },
+      "options": {
+        "window": "Fenêtre temporelle",
+        "step": "Pas",
+        "format": "Format",
+        "days": "{days} jours",
+        "seconds": "{seconds} s",
+        "format_text": "Texte (aligné)",
+        "format_csv": "CSV",
+        "format_json": "JSON"
+      },
+      "help": {
+        "overview": "Le menu Rapports génère des rapports textuels sur le satellite sélectionné : géométrie des passages, position au fil du temps, éléments orbitaux, fenêtres de visibilité et analyse des éclipses. Chaque rapport s'ouvre dans sa propre fenêtre, soigneusement mis en forme avec un bouton de téléchargement, prêt à être collé dans d'autres outils ou partagé.",
+        "imgAlt": "Le menu Rapports listant les types de rapports disponibles",
+        "imgCaption": "Chaque bouton génère un rapport textuel mis en forme pour le satellite sélectionné.",
+        "typesHeading": "Rapports disponibles",
+        "types": "<ul><li><strong>Azimut, élévation, distance</strong> : angles de visée depuis le capteur sélectionné pendant les prochains passages (nécessite un capteur).</li><li><strong>Latitude, longitude, altitude</strong> : la trace au sol au fil du temps.</li><li><strong>Inertiel géocentrique (ECI)</strong> : vecteurs de position et de vitesse ECI au fil du temps.</li><li><strong>Éléments orbitaux classiques</strong> : les éléments képlériens à l'époque actuelle.</li><li><strong>Fenêtres de visibilité</strong> : heures de lever et de coucher avec la durée des passages (nécessite un capteur).</li><li><strong>Analyse Soleil/éclipse</strong> : heures d'ensoleillement et d'entrée et de sortie d'éclipse, utiles pour les travaux d'énergie et thermiques.</li></ul>",
+        "howToUse": "<ol><li>Sélectionnez un satellite ; l'icône du bas est désactivée tant qu'aucun n'est sélectionné.</li><li>Pour les rapports basés sur un capteur, sélectionnez aussi un capteur.</li><li>Ouvrez <strong>Rapports</strong> depuis la barre inférieure et cliquez sur un bouton de rapport. Le rapport s'ouvre dans une fenêtre contextuelle.</li><li>Utilisez le bouton de téléchargement dans la fenêtre du rapport pour l'enregistrer en fichier texte.</li></ol>",
+        "tip1": "Les rapports couvrent plusieurs jours de données ; la génération peut prendre quelques secondes pour les rapports basés sur les passages.",
+        "tip2": "Si la fenêtre du rapport n'apparaît pas, le bloqueur de fenêtres contextuelles de votre navigateur en est généralement la cause ; autorisez les fenêtres contextuelles pour ce site."
+      }
     }
   }
 }

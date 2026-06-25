@@ -1,9 +1,0 @@
-{
-  "plugins": {
-    "NextLaunchesPlugin": {
-      "bottomIconLabel": "Prochains lancements",
-      "title": "Menu Prochains lancements",
-      "helpBody": "Le menu Prochains lancements récupère les données de <a href=\"https://thespacedevs.com/\" target=\"_blank\">The Space Devs</a> pour afficher les lancements à venir."
-    }
-  }
-}

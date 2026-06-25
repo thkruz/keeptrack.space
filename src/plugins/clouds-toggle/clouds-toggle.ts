@@ -27,7 +27,7 @@ export class CloudsToggle extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    // Sync button state with the setting at launch — clouds may already be on
+    // Sync button state with the setting at launch - clouds may already be on
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
       if (settingsManager.isDrawCloudsMap) {
         this.setBottomIconToSelected();

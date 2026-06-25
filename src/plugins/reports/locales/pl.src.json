@@ -3,7 +3,64 @@
     "ReportsPlugin": {
       "bottomIconLabel": "Raporty",
       "title": "Menu raportów",
-      "helpBody": "Menu raportów to zbiór narzędzi pomagających analizować i rozumieć przeglądane dane."
+      "reports": {
+        "aer": {
+          "name": "Azymut, elewacja, zasięg",
+          "description": "Generuje dane azymutu, elewacji i zasięgu dla przelotów satelity"
+        },
+        "lla": {
+          "name": "Szerokość, długość, wysokość",
+          "description": "Generuje dane szerokości, długości i wysokości w czasie"
+        },
+        "eci": {
+          "name": "Geocentryczny układ inercjalny (ECI)",
+          "description": "Generuje wektory położenia i prędkości ECI w czasie"
+        },
+        "coes": {
+          "name": "Klasyczne elementy orbitalne",
+          "description": "Generuje klasyczne elementy orbitalne dla bieżącej epoki"
+        },
+        "visibilityWindows": {
+          "name": "Okna widoczności",
+          "description": "Generuje okna widoczności z czasami wschodu/zachodu i czasem trwania przelotu"
+        },
+        "sunEclipse": {
+          "name": "Analiza Słońca/zaćmienia",
+          "description": "Generuje widoczność Słońca oraz czasy wejścia/wyjścia z zaćmienia do analiz zasilania i termicznych"
+        }
+      },
+      "commands": {
+        "generateReport": "Wygeneruj raport {name}",
+        "open": "Otwórz raporty"
+      },
+      "downloadButton": "Pobierz raport",
+      "copyButton": "Kopiuj do schowka",
+      "sensorNote": "Te raporty wymagają wybrania sensora.",
+      "sections": {
+        "orbitPosition": "Orbita i pozycja",
+        "sensor": "Sensor",
+        "options": "Opcje wyjścia"
+      },
+      "options": {
+        "window": "Okno czasowe",
+        "step": "Krok",
+        "format": "Format",
+        "days": "{days} dni",
+        "seconds": "{seconds} s",
+        "format_text": "Tekst (wyrównany)",
+        "format_csv": "CSV",
+        "format_json": "JSON"
+      },
+      "help": {
+        "overview": "Menu raportów generuje tekstowe raporty o wybranym satelicie: geometrię przelotów, położenie w czasie, elementy orbitalne, okna widoczności i analizę zaćmień. Każdy raport otwiera się w osobnym oknie, starannie sformatowany, z przyciskiem pobierania, gotowy do wklejenia do innych narzędzi lub udostępnienia.",
+        "imgAlt": "Menu raportów z listą dostępnych typów raportów",
+        "imgCaption": "Każdy przycisk generuje sformatowany raport tekstowy dla wybranego satelity.",
+        "typesHeading": "Dostępne raporty",
+        "types": "<ul><li><strong>Azymut, elewacja, zasięg</strong>: kąty obserwacji z wybranego czujnika podczas nadchodzących przelotów (wymaga czujnika).</li><li><strong>Szerokość, długość, wysokość</strong>: ślad naziemny w czasie.</li><li><strong>Geocentryczny układ inercjalny (ECI)</strong>: wektory położenia i prędkości ECI w czasie.</li><li><strong>Klasyczne elementy orbitalne</strong>: elementy keplerowskie dla bieżącej epoki.</li><li><strong>Okna widoczności</strong>: czasy wschodu i zachodu wraz z czasem trwania przelotów (wymaga czujnika).</li><li><strong>Analiza Słońca/zaćmienia</strong>: czasy nasłonecznienia oraz wejścia i wyjścia z zaćmienia, przydatne w pracach nad zasilaniem i analizą termiczną.</li></ul>",
+        "howToUse": "<ol><li>Wybierz satelitę; dolna ikona jest nieaktywna, dopóki żaden nie zostanie wybrany.</li><li>W przypadku raportów opartych na czujniku wybierz także czujnik.</li><li>Otwórz <strong>Raporty</strong> z dolnego paska i kliknij przycisk raportu. Raport otworzy się w wyskakującym oknie.</li><li>Użyj przycisku pobierania w oknie raportu, aby zapisać go jako plik tekstowy.</li></ol>",
+        "tip1": "Raporty obejmują dane z kilku dni; generowanie raportów opartych na przelotach może potrwać kilka sekund.",
+        "tip2": "Jeśli okno raportu się nie pojawia, zwykle winna jest blokada wyskakujących okien w przeglądarce; zezwól na wyskakujące okna dla tej witryny."
+      }
     }
   }
 }

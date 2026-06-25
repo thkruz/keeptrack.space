@@ -1,36 +1,58 @@
-/* Calculator plugin styles */
+/* Calculator plugin styles (v13 menu) */
 
-#calculator-menu .calc-control-row {
-  margin-bottom: 4px;
+/* --- Required per-menu CSS for dense forms (v13-menu-style.md) -------------- */
+
+/* 1. Stacked-field headroom under the section label / a select. */
+#calculator-menu .kt-field-row .input-field.col { margin-top: 20px; }
+#calculator-menu .kt-section-label + .kt-field-row .input-field.col { margin-top: 8px; }
+
+/* 2. Standalone actions (Convert / Copy / Draw Line) line up with the inset cards. */
+#calculator-menu .calc-standalone-action {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
 }
 
-#calculator-menu .calc-control-row select.browser-default {
-  background-color: var(--color-dark-background);
-  color: var(--color-dark-text-accent);
-  border: 1px solid var(--color-dark-border);
-  border-radius: 2px;
-  padding: 4px 8px;
-  height: 2.5rem;
-  font-size: 13px;
+/* 3. Focus indication: KeepTrack underline instead of the app-wide outline. */
+#calculator-menu .input-field input:focus,
+#calculator-menu .input-field textarea:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+#calculator-menu .input-field input:focus-visible,
+#calculator-menu .input-field textarea:focus-visible { outline: none; }
+
+/* --- Input controls -------------------------------------------------------- */
+
+#calculator-menu .calc-control-row .select-wrapper { width: 100%; }
+
+#calculator-menu .calc-velocity-row {
+  margin-top: 4px;
+  margin-bottom: 0;
 }
 
-#calculator-menu .calc-control-row label {
-  font-size: 11px;
+#calculator-menu .calc-velocity-row label {
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.5);
-  position: relative;
-  top: -0.8rem;
-  display: block;
-  margin-bottom: 0.5rem;
 }
 
-#calculator-menu .calc-section-header {
-  font-weight: bold;
-  font-size: 13px;
-  padding: 6px 0 2px;
-  border-bottom: 1px solid var(--color-dark-border);
-  margin-bottom: 4px;
-  color: var(--color-primary);
+#calculator-menu .calc-velocity-row [type='checkbox'] + span:not(.lever) {
+  height: 20px;
+  padding-left: 25px;
+  line-height: 25px;
 }
+
+/* --- Epoch readout --------------------------------------------------------- */
+
+#calculator-menu .calc-epoch {
+  margin-top: 8px;
+  font-size: 11px;
+  font-family: 'Consolas', 'Courier New', monospace;
+  color: rgba(255, 255, 255, 0.55);
+  word-break: break-all;
+}
+
+/* --- Output rows ----------------------------------------------------------- */
 
 #calculator-menu .calc-output-row {
   margin-bottom: 0;
@@ -50,33 +72,8 @@
   font-family: 'Consolas', 'Courier New', monospace;
   color: var(--color-dark-text-accent);
   word-break: break-all;
+  cursor: pointer;
   user-select: all;
 }
 
-#calculator-menu .calc-output-section {
-  margin-bottom: 8px;
-}
-
-#calculator-menu #calc-velocity-toggle {
-  margin-top: -8px;
-}
-
-#calculator-menu #calc-velocity-toggle label {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 12px;
-}
-
-#calculator-menu #calc-velocity-toggle [type='checkbox']+span:not(.lever) {
-  padding-left: 25px;
-  height: 20px;
-  line-height: 25px;
-}
-
-
-#calculator-menu #calc-load-sat-btn {
-  margin-bottom: 8px;
-  font-size: 11px;
-  padding: 0 8px;
-  height: 28px;
-  line-height: 28px;
-}
+#calculator-menu .calc-output-value:hover { color: var(--color-primary); }

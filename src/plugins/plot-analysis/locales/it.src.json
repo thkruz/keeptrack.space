@@ -3,25 +3,95 @@
     "Inc2AltPlots": {
       "bottomIconLabel": "Grafico Inc vs Alt",
       "title": "Menu grafico inclinazione-altitudine",
-      "helpBody": "Il menu Grafico inclinazione-altitudine viene utilizzato per tracciare l'inclinazione del satellite rispetto alla sua altitudine.",
       "labels": {
         "totalLeoPayloads": "Totale carichi utili LEO"
+      },
+      "help": {
+        "overview": "Il grafico Inclinazione vs Altitudine mappa la popolazione LEO: ogni carico utile è tracciato per inclinazione rispetto all'altitudine. Le costellazioni appaiono come gruppi compatti (gusci Starlink, piani OneWeb), e le fasce di altitudine affollate risaltano immediatamente.",
+        "imgAlt": "Grafico a dispersione dei carichi utili LEO per inclinazione e altitudine",
+        "imgCaption": "Le costellazioni si raggruppano in insiemi visibili per inclinazione e altitudine.",
+        "howToUse": "<ol><li>Aprite il <strong>Grafico Inc vs Alt</strong> dalla barra inferiore (modalità Analisi).</li><li>Il grafico si calcola automaticamente; passate il cursore sui punti per vedere i nomi dei satelliti e fate clic su un punto per selezionare quel satellite.</li><li>Usate la legenda per nascondere o mostrare costellazioni e paesi.</li></ol>",
+        "tip1": "Fate clic su una voce della legenda per attivare o disattivare un intero gruppo; isolare una costellazione rende evidente la struttura dei suoi gusci.",
+        "tip2": "Il grafico campiona il catalogo all'istante corrente; riaprite il menu per aggiornarlo dopo modifiche al catalogo."
       }
     },
     "Inc2LonPlots": {
       "bottomIconLabel": "Grafico Inc vs Lon",
       "title": "Menu grafico inclinazione-longitudine",
-      "helpBody": "Il menu Grafico Inc vs Lon viene utilizzato per tracciare l'inclinazione rispetto alla longitudine nella fascia GEO.",
       "labels": {
         "totalGeoPayloads": "Totale carichi utili GEO"
+      },
+      "help": {
+        "overview": "Il grafico Inclinazione vs Longitudine esamina la fascia GEO: ogni carico utile geostazionario è tracciato per la sua posizione in longitudine rispetto all'inclinazione. I satelliti a bassa inclinazione sono mantenuti attivamente in posizione; quelli a inclinazione maggiore stanno derivando o sono stati ritirati su orbite inclinate.",
+        "imgAlt": "Grafico a dispersione dei carichi utili GEO per longitudine e inclinazione",
+        "imgCaption": "Ogni punto è un carico utile GEO nella sua posizione di longitudine; l'altezza mostra l'inclinazione.",
+        "howToUse": "<ol><li>Aprite il <strong>Grafico Inc vs Lon</strong> dalla barra inferiore o premete <strong>G</strong>.</li><li>La fascia viene disegnata automaticamente; passate il cursore sui punti per vedere i nomi e fate clic per selezionare un satellite.</li><li>Usate la legenda per filtrare per paese operatore.</li></ol>",
+        "tip1": "Una pila verticale di punti a una stessa longitudine è un gruppo di satelliti co-locati che condividono una posizione.",
+        "tip2": "I satelliti sopra circa 7 gradi di inclinazione sono di solito in orbita cimitero o in parcheggio inclinato; la fascia attiva resta vicino allo zero.",
+        "shortcutToggle": "Attiva/disattiva il grafico Inc vs Lon"
       }
     },
     "Time2LonPlots": {
       "bottomIconLabel": "Grafico a cascata",
       "title": "Menu grafico a cascata",
-      "helpBody": "Il grafico Tempo-Longitudine (a cascata) mostra la deriva in longitudine dei satelliti GEO nel tempo.",
       "labels": {
-        "totalGeoPayloads": "Totale carichi utili GEO"
+        "statistics": "Statistiche",
+        "objectsShown": "Oggetti mostrati",
+        "unitMin": "min"
+      },
+      "chart": {
+        "title": "Grafico Tempo vs Longitudine (a cascata)",
+        "xAxis": "Longitudine (°)",
+        "yAxis": "Tempo da adesso (min)",
+        "tooltipCountry": "Paese",
+        "tooltipLongitude": "Longitudine",
+        "tooltipTime": "Tempo da adesso",
+        "loading": "Calcolo dei dati orbitali...",
+        "empty": "Nessun oggetto corrisponde ai filtri attuali"
+      },
+      "help": {
+        "overview": "Il grafico a cascata segue la longitudine GEO nel tempo: ogni linea è la longitudine di un satellite che deriva (o si mantiene) nella finestra tracciata. I satelliti con mantenimento di posizione disegnano linee verticali; quelli in deriva si inclinano; le ricollocazioni appaiono come curve ampie.",
+        "imgAlt": "Grafico a cascata della longitudine dei satelliti GEO nel tempo",
+        "imgCaption": "Le linee verticali sono satelliti con mantenimento di posizione; le linee inclinate sono in deriva.",
+        "howToUse": "<ol><li>Aprite il <strong>Grafico a cascata</strong> dalla barra inferiore (modalità Analisi).</li><li>Il grafico calcola automaticamente un giorno di storico della longitudine; passate il cursore sulle linee per vedere i nomi e fate clic per selezionare.</li><li>Usate la legenda per filtrare per paese od operatore.</li></ol>",
+        "tip1": "Una linea che passa da inclinata a verticale è un satellite che ha appena completato una ricollocazione e ripreso il mantenimento di posizione.",
+        "tip2": "Il calcolo copre l'intera fascia GEO e procede a blocchi; concedetegli qualche secondo sulle macchine più lente."
+      }
+    },
+    "Lat2LonPlots": {
+      "bottomIconLabel": "Grafico Lat vs Lon",
+      "title": "Menu grafico latitudine-longitudine",
+      "help": {
+        "overview": "Il grafico Latitudine vs Longitudine è un'istantanea piatta di dove si trovano i satelliti sopra la Terra in questo momento, tracciati come posizioni al suolo. Si legge come una mappa senza la mappa: utile per individuare vuoti di copertura e la geometria delle tracce a forma di otto dei satelliti inclinati della fascia GEO.",
+        "howToUse": "<ol><li>Aprite il <strong>Grafico Lat vs Lon</strong> dalla barra inferiore (modalità Analisi).</li><li>Il grafico viene disegnato automaticamente; passate il cursore sui punti per vedere i nomi e fate clic per selezionare un satellite.</li></ol>",
+        "tip1": "I satelliti GEO inclinati descrivono escursioni nord-sud a longitudine fissa, che in questa vista appaiono come dispersioni verticali."
+      }
+    },
+    "EciPlot": {
+      "bottomIconLabel": "Grafico ECI",
+      "title": "Menu grafico ECI",
+      "help": {
+        "overview": "Il grafico ECI disegna l'orbita del satellite selezionato come curva 3D nel riferimento inerziale centrato sulla Terra (ECI): il riferimento fisso rispetto alle stelle, dove le orbite sono ellissi pulite. Se è selezionato un satellite secondario, entrambe le orbite vengono tracciate insieme per il confronto.",
+        "howToUse": "<ol><li>Selezionate un satellite; l'icona inferiore è disabilitata finché non ne è selezionato uno.</li><li>Aprite il <strong>Grafico ECI</strong> dalla barra inferiore (modalità Analisi).</li><li>Trascinate per ruotare il grafico 3D e scorrete per ingrandire; passate il cursore sulla curva per vedere i valori di posizione.</li></ol>",
+        "tip1": "Selezionate prima un satellite secondario (clic destro, oppure i tasti [ e ]) per sovrapporre due orbite e confrontarne la geometria."
+      }
+    },
+    "EcfPlot": {
+      "bottomIconLabel": "Grafico ECF",
+      "title": "Menu grafico ECF",
+      "help": {
+        "overview": "Il grafico ECF disegna la traiettoria del satellite selezionato nel riferimento terrestre fisso centrato sulla Terra (ECF), che ruota con il pianeta. I satelliti geosincroni si riducono a piccoli anelli, e le orbite con traccia al suolo ripetitiva si richiudono su se stesse, rendendolo il riferimento ideale per studiare il comportamento relativo alla Terra.",
+        "howToUse": "<ol><li>Selezionate un satellite; l'icona inferiore è disabilitata finché non ne è selezionato uno.</li><li>Aprite il <strong>Grafico ECF</strong> dalla barra inferiore (modalità Analisi).</li><li>Trascinate per ruotare il grafico 3D e scorrete per ingrandire; passate il cursore sulla curva per vedere i valori di posizione.</li></ol>",
+        "tip1": "La stretta figura a otto di un satellite GEO in ECF è il suo ciclo giornaliero di inclinazione ed eccentricità; più stretto è l'anello, migliore è il mantenimento di posizione."
+      }
+    },
+    "RicPlot": {
+      "bottomIconLabel": "Grafico RIC",
+      "title": "Menu grafico RIC",
+      "help": {
+        "overview": "Il grafico RIC mostra il moto relativo tra due satelliti nel riferimento radiale, lungo traccia e fuori traccia (RIC), centrato sul satellite primario. È la vista standard per rendezvous, volo in formazione e analisi degli avvicinamenti ravvicinati: il percorso del satellite secondario è disegnato come visto dal primario.",
+        "howToUse": "<ol><li>Selezionate un satellite primario, poi un satellite secondario (clic destro su un satellite, oppure i tasti [ e ]).</li><li>Aprite il <strong>Grafico RIC</strong> dalla barra inferiore (modalità Analisi).</li><li>Trascinate per ruotare il grafico 3D; l'origine è il satellite primario e la curva è la traiettoria relativa del secondario.</li></ol>",
+        "tip1": "Devono essere selezionati sia un satellite primario sia uno secondario, altrimenti il grafico non ha nulla da confrontare; scegliete oggetti su orbite simili per una scala leggibile."
       }
     }
   }

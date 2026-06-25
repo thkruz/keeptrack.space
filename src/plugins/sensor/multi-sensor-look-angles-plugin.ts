@@ -1,0 +1,503 @@
+import { t7e } from '@app/locales/keys';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { sensors } from '@app/app/data/catalogs/sensors';
+import { OemSatellite } from '@app/app/objects/oem-satellite';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
+import { SoundNames } from '@app/engine/audio/sounds';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { dateFormat } from '@app/engine/utils/dateFormat';
+import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
+import { saveXlsx } from '@app/engine/utils/saveVariable';
+import { showLoading } from '@app/engine/utils/showLoading';
+import {
+  BaseObject,
+  Degrees,
+  Kilometers,
+  MINUTES_PER_DAY,
+  Satellite,
+  SatelliteRecord, Seconds,
+  SpaceObjectType,
+  TAU,
+} from '@ootk/src/main';
+import tableRowsPng from '@public/img/icons/table-rows.png';
+import { sensorGroups } from '../../app/data/catalogs/sensor-groups';
+import { SensorManager } from '../../app/sensors/sensorManager';
+import { ClickDragOptions, fileExcelPng, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import './multi-sensor-look-angles.css';
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.MultiSensorLookAnglesPlugin.${key}` as Parameters<typeof t7e>[0]);
+
+export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
+  readonly id = 'MultiSensorLookAnglesPlugin';
+  dependencies_ = [SelectSatManager.name];
+  private readonly selectSatManager_: SelectSatManager;
+  // combine sensorListSsn, sesnorListLeoLabs, and SensorListRus
+  private readonly sensorList_: DetailedSensor[] = [];
+  isRequireSatelliteSelected = true;
+  isRequireSensorSelected = false;
+
+  menuMode: MenuMode[] = [MenuMode.SENSORS, MenuMode.ALL];
+
+  // Settings
+  private readonly lengthOfLookAngles_ = 1; // Days
+  private readonly angleCalculationInterval_ = <Seconds>30;
+  private readonly disabledSensors_: DetailedSensor[] = [];
+
+  constructor() {
+    super();
+    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
+    this.sensorList_ = sensorGroups.map((group) => group.list).flat().map((sensor) => {
+      if (sensors[sensor] instanceof DetailedSensor) {
+        return sensors[sensor];
+      }
+      errorManagerInstance.debug(`Sensor ${sensor} not found in sensor catalog`);
+
+      return null;
+    }).filter((sensor) => sensor !== null);
+
+    // remove duplicates in sensorList
+    this.sensorList_ = this.sensorList_.filter((sensor, index, self) =>
+      index === self.findIndex((s) => s.objName === sensor.objName),
+    );
+
+    // Default to only the MW sensors being enabled
+    this.disabledSensors_ = this.sensorList_.filter((sensor) =>
+      !sensorGroups.find((group) => group.name === 'mw')?.list.includes(sensor.objName ?? ''),
+    );
+  }
+
+
+  bottomIconCallback: () => void = () => {
+    const sat = this.selectSatManager_?.getSelectedSat();
+
+    if (!sat?.isSatellite()) {
+      return;
+    }
+    this.refreshSideMenuData(sat as Satellite);
+  };
+
+
+  bottomIconImg = tableRowsPng;
+  isIconDisabledOnLoad = true;
+  isIconDisabled = true;
+
+  dragOptions: ClickDragOptions = {
+    isDraggable: true,
+    minWidth: 500,
+    maxWidth: 750,
+  };
+
+  sideMenuElementName: string = 'multi-sensor-look-angles-menu';
+  sideMenuElementHtml: string = html`
+    <section class="kt-section">
+      <div class="kt-section-label">${l('sections.results')}</div>
+      <table id="multi-sensor-look-angles-table" class="msla-table center-align"></table>
+    </section>`;
+  sideMenuSecondaryHtml: string = html`
+    <section class="kt-section">
+      <div class="kt-section-label">${l('sections.sensors')}</div>
+      <div id="multi-sensor-look-angles-sensor-list" class="msla-sensor-list"></div>
+    </section>`;
+  sideMenuSettingsWidth: number = 350;
+  downloadIconSrc = fileExcelPng;
+  downloadIconCb = () => {
+    const lastArray = ServiceLocator.getSensorManager().lastMultiSiteArray;
+
+    if (lastArray.length === 0) {
+      ServiceLocator.getSoundManager()?.play(SoundNames.ERROR);
+
+      return;
+    }
+
+    ServiceLocator.getSoundManager()?.play(SoundNames.EXPORT);
+    const exportData = lastArray.map((look) => ({
+      time: look.time,
+      sensor: look.objName,
+      az: look.az?.toFixed(2) ?? l('msgs.na'),
+      el: look.el?.toFixed(2) ?? l('msgs.na'),
+      rng: look.rng?.toFixed(2) ?? l('msgs.na'),
+      visible: look.visible,
+    }));
+
+    saveXlsx(exportData, `multisite-${(this.selectSatManager_?.getSelectedSat() as Satellite | undefined)?.sccNum6 ?? '000000'}-look-angles`);
+  };
+  sideMenuSecondaryOptions: SideMenuSettingsOptions = {
+    width: 300,
+    leftOffset: null,
+    zIndex: 3,
+  };
+
+
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/multi-sensor-look-angles/multi-sensor-look-angles-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: l('help.readingHeading'),
+          content: l('help.reading'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2')],
+    };
+  }
+
+  addHtml(): void {
+    super.addHtml();
+
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerFinal,
+      () => {
+        // Opt this menu (and its sensor-toggle secondary menu) into the v13+ card UI.
+        getEl('multi-sensor-look-angles-menu')?.classList.add('kt-ui-v13');
+        getEl('multi-sensor-look-angles-menu-secondary')?.classList.add('kt-ui-v13');
+      },
+    );
+
+    EventBus.getInstance().on(
+      EventBusEvent.selectSatData,
+      (obj: BaseObject) => {
+        this.checkIfCanBeEnabled_(obj);
+      },
+    );
+  }
+
+  private checkIfCanBeEnabled_(obj: BaseObject) {
+    if (obj?.isSatellite() && ServiceLocator.getSensorManager().isSensorSelected()) {
+      this.setBottomIconToEnabled();
+      if (this.isMenuButtonActive && obj) {
+        this.refreshSideMenuData(obj as Satellite);
+      }
+    } else {
+      if (this.isMenuButtonActive) {
+        this.closeSideMenu();
+      }
+      this.setBottomIconToDisabled();
+    }
+  }
+
+  addJs(): void {
+    super.addJs();
+    EventBus.getInstance().on(
+      EventBusEvent.staticOffsetChange,
+      () => {
+        const sat = this.selectSatManager_?.getSelectedSat();
+
+        if (!sat?.isSatellite()) {
+          return;
+        }
+        this.refreshSideMenuData(sat as Satellite);
+      },
+    );
+  }
+
+  private refreshSideMenuData(sat: Satellite) {
+    if (this.isMenuButtonActive) {
+      if (sat) {
+        showLoading(() => {
+          // TODO: This should be a class property that persists between refreshes
+          const sensorListDom = getEl('multi-sensor-look-angles-sensor-list');
+
+          if (!sensorListDom) {
+            errorManagerInstance.warn('Could not find sensor list dom');
+
+            return;
+          }
+
+          sensorListDom.innerHTML = '';
+
+          const allSensors: DetailedSensor[] = [];
+
+          for (const sensor of this.sensorList_) {
+            if (!sensor.objName) {
+              continue;
+            }
+
+            const sensorButton = document.createElement('button');
+
+            sensorButton.type = 'button';
+            sensorButton.classList.add('msla-sensor-toggle', 'waves-effect');
+            sensorButton.classList.add(this.disabledSensors_.includes(sensor) ? 'is-off' : 'is-on');
+
+            allSensors.push(sensor);
+
+            sensorButton.innerText = sensor.uiName ?? sensor.shortName ?? sensor.objName;
+            sensorButton.addEventListener('click', () => {
+              if (sensorButton.classList.contains('is-off')) {
+                sensorButton.classList.remove('is-off');
+                sensorButton.classList.add('is-on');
+                this.disabledSensors_.splice(this.disabledSensors_.indexOf(sensor), 1);
+                ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
+              } else {
+                sensorButton.classList.add('is-off');
+                sensorButton.classList.remove('is-on');
+                this.disabledSensors_.push(sensor);
+                ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
+              }
+
+              this.getlookanglesMultiSite_(
+                sat,
+                allSensors.filter((s) => !this.disabledSensors_.includes(s)),
+              );
+            });
+            sensorListDom.appendChild(sensorButton);
+            sensorListDom.appendChild(document.createTextNode(' '));
+          }
+
+          this.getlookanglesMultiSite_(
+            sat,
+            allSensors.filter((s) => !this.disabledSensors_.includes(s)),
+          );
+        });
+      }
+    }
+  }
+
+  private getlookanglesMultiSite_(sat: Satellite, sensors?: DetailedSensor[]): void {
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
+
+    if (!sensors) {
+      sensors = this.sensorList_;
+    }
+
+    const isResetToDefault = !sensorManagerInstance.isSensorSelected();
+
+    // Save Current Sensor as a new array
+    const tempSensor = [...sensorManagerInstance.currentSensors];
+
+    const isOemSat = sat instanceof OemSatellite;
+    const satrec = isOemSat ? null : sat.satrec;
+
+    if (!isOemSat && !satrec) {
+      errorManagerInstance.warn('Satellite record not found');
+
+      return;
+    }
+
+    // Estimate orbital period for skip-ahead optimization
+    let orbitalPeriod: number;
+    let isHighOrbit: boolean;
+
+    if (satrec) {
+      orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU);
+      isHighOrbit = sat.semiMajorAxis > 30000;
+    } else {
+      // Estimate from current position magnitude
+      const pos = (sat as unknown as OemSatellite).position;
+      const r = Math.sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z);
+
+      orbitalPeriod = (TAU * Math.sqrt(r * r * r / 398600.4418)) / 60; // minutes
+      isHighOrbit = r > 30000;
+    }
+
+    // Cap loop to OEM ephemeris end time so we don't propagate beyond available data
+    const maxSeconds = isOemSat
+      ? Math.max(0, ((sat as unknown as OemSatellite).header.STOP_TIME.getTime() - timeManagerInstance.simulationTimeObj.getTime()) / 1000)
+      : this.lengthOfLookAngles_ * 24 * 60 * 60;
+
+    const multiSiteArray = <TearrData[]>[];
+
+    for (const sensor of sensors) {
+      // Skip if satellite is above the max range of the sensor (not applicable for OEM satellites without perigee)
+      if (!isOemSat && sensor.maxRng < sat.perigee && (!sensor.maxRng2 || sensor.maxRng2 < sat.perigee)) {
+        continue;
+      }
+
+      SensorManager.updateSensorUiStyling([sensor]);
+      let offset = 0;
+
+      for (let i = 0; i < maxSeconds; i += this.angleCalculationInterval_) {
+        offset = i * 1000; // Offset in seconds (msec * 1000)
+        const now = timeManagerInstance.getOffsetTimeObj(offset);
+
+        let multiSitePass: TearrData;
+
+        if (isOemSat) {
+          const oemSat = sat as unknown as OemSatellite;
+          const rae = oemSat.getRae(now, sensor);
+
+          if (!rae) {
+            continue; // outside ephemeris range
+          }
+          if (SatMath.checkIsInView(sensor, rae)) {
+            multiSitePass = {
+              time: now.toISOString(),
+              el: rae.el,
+              az: rae.az,
+              rng: rae.rng,
+              objName: sensor.objName ?? '',
+            };
+          } else {
+            multiSitePass = {
+              time: '',
+              el: <Degrees>0,
+              az: <Degrees>0,
+              rng: <Kilometers>0,
+              objName: '',
+            };
+          }
+        } else {
+          multiSitePass = MultiSensorLookAnglesPlugin.propagateMultiSite_(now, satrec!, sensor);
+        }
+
+        let canStationObserve = true;
+
+        if (multiSitePass.time !== '') {
+          // Check visibility and add to multiSitePass
+          if (sensor.type === SpaceObjectType.OPTICAL) {
+            canStationObserve = SensorMath.checkIfVisibleForOptical(sat, sensor, now);
+          }
+          multiSitePass.visible = canStationObserve;
+          multiSiteArray.push(multiSitePass);
+
+          // Jump ahead to avoid redundant calculations within the same pass
+          if (isHighOrbit) {
+            i += orbitalPeriod * 60 * 0.1;
+          } else {
+            i += orbitalPeriod * 60 * 0.75;
+          }
+        }
+      }
+    }
+
+    multiSiteArray.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+    sensorManagerInstance.lastMultiSiteArray = multiSiteArray;
+
+    // eslint-disable-next-line no-unused-expressions
+    if (isResetToDefault) {
+      sensorManagerInstance.setCurrentSensor(null);
+    } else {
+      sensorManagerInstance.setCurrentSensor(tempSensor);
+    }
+
+    this.populateMultiSiteTable_(multiSiteArray, sensors);
+  }
+
+  private static propagateMultiSite_(now: Date, satrec: SatelliteRecord, sensor: DetailedSensor): TearrData {
+    // Setup Realtime and Offset Time
+    const aer = SatMath.getRae(now, satrec, sensor);
+
+    if (aer.az === null || aer.el === null || aer.rng === null) {
+      return {
+        time: '',
+        el: <Degrees>0,
+        az: <Degrees>0,
+        rng: <Kilometers>0,
+        objName: '',
+      };
+    }
+
+    if (SatMath.checkIsInView(sensor, aer as TearrData)) {
+      return {
+        time: now.toISOString(),
+        el: aer.el ?? <Degrees>0,
+        az: aer.az ?? <Degrees>0,
+        rng: aer.rng ?? <Kilometers>0,
+        objName: sensor.objName ?? '',
+      };
+    }
+
+    return {
+      time: '',
+      el: <Degrees>0,
+      az: <Degrees>0,
+      rng: <Kilometers>0,
+      objName: '',
+    };
+
+  }
+
+  private populateMultiSiteTable_(multiSiteArray: TearrData[], sensors: DetailedSensor[]) {
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
+    const sensorMap = new Map(sensors.map((s) => [s.objName, s]));
+
+    const tbl = <HTMLTableElement>getEl('multi-sensor-look-angles-table'); // Identify the table to update
+
+    tbl.innerHTML = ''; // Clear the table from old object data
+    let tr = tbl.insertRow();
+
+    tr.classList.add('msla-table-header');
+    let tdT = tr.insertCell();
+
+    tdT.appendChild(document.createTextNode(l('table.time')));
+    let tdE = tr.insertCell();
+
+    tdE.appendChild(document.createTextNode(l('table.el')));
+    let tdA = tr.insertCell();
+
+    tdA.appendChild(document.createTextNode(l('table.az')));
+    let tdR = tr.insertCell();
+
+    tdR.appendChild(document.createTextNode(l('table.rng')));
+    let tdS = tr.insertCell();
+
+    tdS.appendChild(document.createTextNode(l('table.sensor')));
+    let tdV = tr.insertCell();
+
+    tdV.appendChild(document.createTextNode(l('table.visible')));
+
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+
+    for (const entry of multiSiteArray) {
+      const sensor = entry.objName ? sensorMap.get(entry.objName) : null;
+
+      if (!sensor) {
+        continue;
+      }
+      tr = tbl.insertRow();
+      tr.setAttribute('class', 'link');
+      tdT = tr.insertCell();
+      tdT.appendChild(document.createTextNode(dateFormat(entry.time, 'isoDateTime', true)));
+      tdE = tr.insertCell();
+      tdE.appendChild(document.createTextNode(entry.el?.toFixed(1) ?? l('msgs.na')));
+      tdA = tr.insertCell();
+      tdA.appendChild(document.createTextNode(entry.az?.toFixed(0) ?? l('msgs.na')));
+      tdR = tr.insertCell();
+      tdR.appendChild(document.createTextNode(entry.rng?.toFixed(0) ?? l('msgs.na')));
+      tdS = tr.insertCell();
+      tdS.appendChild(document.createTextNode(sensor.uiName ?? sensor.shortName ?? sensor.objName ?? ''));
+      tdV = tr.insertCell();
+      tdV.appendChild(document.createTextNode(entry.visible ? l('msgs.yes') : l('msgs.no')));
+      if (entry.visible) {
+        tdV.setAttribute('style', 'color: #2d7b31');
+      } else {
+        tdV.setAttribute('style', 'color: #c62828');
+      }
+      tr.addEventListener('click', () => {
+        timeManagerInstance.changeStaticOffset(new Date(entry.time).getTime() - new Date().getTime());
+        sensorManagerInstance.setSensor(sensor, sensor.sensorId);
+      });
+    }
+
+    if (multiSiteArray.length === 0) {
+      const tr = tbl.insertRow();
+      const td = tr.insertCell();
+      const searchLength = (this.lengthOfLookAngles_ * 24).toFixed(1);
+
+      td.colSpan = 4;
+      td.appendChild(document.createTextNode(l('msgs.notVisible').replace('{hours}', searchLength)));
+    }
+  }
+}

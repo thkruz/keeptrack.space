@@ -24,7 +24,7 @@
 
 import { SatMath } from '@app/app/analysis/sat-math';
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
-import { CatalogLoader } from '@app/app/data/catalog-loader';
+import { CatalogLoader, KeepTrackTLEFile } from '@app/app/data/catalog-loader';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -37,6 +37,7 @@ import {
   IHelpConfig,
   ISideMenuConfig,
 } from '@app/engine/plugins/core/plugin-capabilities';
+import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { buildSideMenuTabsHtml, initSideMenuTabs, updateSideMenuTabIndicator } from '@app/engine/ui/side-menu-tabs';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -45,11 +46,14 @@ import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite } from '@ootk/src/main';
 import folderCodePng from '@public/img/icons/folder-code.png';
-import { saveAs } from 'file-saver';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { downloadText, exportFileName, formatStkEphemeris, parseEphemerisParams, StkEphemerisRow } from './catalog-management-export';
 import './catalog-management.css';
 
 type T7eKey = Parameters<typeof t7e>[0];
+
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.CatalogManagementPlugin.${key}` as T7eKey);
 
 export class CatalogManagementPlugin extends KeepTrackPlugin {
   readonly id = 'CatalogManagementPlugin';
@@ -58,6 +62,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
   private isLoading_ = false;
   private docDragEnterCount_ = 0;
   private keepSatInfo_ = false;
+  private importNewOnly_ = false;
 
   // =========================================================================
   // Composition-based configuration methods
@@ -99,8 +104,31 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.CatalogManagementPlugin.title' as T7eKey),
-      body: t7e('plugins.CatalogManagementPlugin.helpBody' as T7eKey),
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/catalog-management/catalog-management-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: l('help.importHeading'),
+          content: l('help.import'),
+        },
+        {
+          heading: l('help.exportHeading'),
+          content: l('help.export'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2')],
     };
   }
 
@@ -118,10 +146,10 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
     ]);
 
     return html`
-      <div id="catalog-management-menu" class="side-menu-parent start-hidden">
+      <div id="catalog-management-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div class="side-menu" style="scrollbar-gutter: stable;">
           <div id="cm-dropzone" class="cm-dropzone">
-            Drop .tce, .tle, or .txt file to load catalog
+            ${l('labels.dropzone')}
           </div>
           <div class="row">
             ${tabsHtml}
@@ -135,17 +163,25 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
     return html`
       <div class="switch row cm-toggle-row">
         <label for="cm-keep-sat-info" data-position="top" data-delay="50"
-          data-tooltip="Update TLEs for existing satellites while preserving name, country, and mission data. Satellites not in the imported file are removed.">
+          data-tooltip="${l('labels.keepSatInfoTooltip')}">
           <input id="cm-keep-sat-info" type="checkbox" />
           <span class="lever"></span>
-          Keep Satellite Information
+          ${l('labels.keepSatInfo')}
+        </label>
+      </div>
+      <div class="switch row cm-toggle-row">
+        <label for="cm-import-new-only" data-position="top" data-delay="50"
+          data-tooltip="${l('labels.importNewOnlyTooltip')}">
+          <input id="cm-import-new-only" type="checkbox" />
+          <span class="lever"></span>
+          ${l('labels.importNewOnly')}
         </label>
       </div>
       <div class="row">
         <center>
           <input type="file" id="cm-import-file" accept=".tce,.tle,.txt" style="display:none" />
           <button id="cm-import-btn" class="btn btn-ui waves-effect waves-light">
-            Import Catalog &#9658;
+            ${l('buttons.importCatalog')} &#9658;
           </button>
         </center>
       </div>
@@ -154,78 +190,95 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
 
   protected buildExportTabHtml_(): string {
     return html`
-      <h5 class="center-align">Catalog Exports</h5>
-      <div class="divider"></div>
-      <div class="row"></div>
-      <div class="row">
-        <center>
-          <button id="de-export-tle-2a" class="btn btn-ui waves-effect waves-light">
-            Export Official TLEs &#9658;
-          </button>
-        </center>
+      <div class="kt-menu-body">
+        ${this.wrapSection_(l('labels.orbitalElements'), this.orbitalElementsBody_())}
+        ${this.wrapSection_(l('labels.tabularStk'), this.buildTabularStkBody_())}
+        ${this.wrapSection_(l('labels.selectedSatellite'), this.buildSelectedSatBody_())}
       </div>
-      <div class="row">
-        <center>
-          <button id="de-export-tle-3a" class="btn btn-ui waves-effect waves-light">
-            Export Official 3LEs &#9658;
-          </button>
-        </center>
+    `;
+  }
+
+  /**
+   * Wrap a section's controls in a titled v13 card. Centralizes the section
+   * chrome so every group reads consistently (uppercase label + bordered card).
+   */
+  protected wrapSection_(title: string, body: string): string {
+    return html`
+      <section class="kt-section">
+        <div class="kt-section-label">${title}</div>
+        ${body}
+      </section>
+    `;
+  }
+
+  /** A full-width v13 action row (label + trailing chevron via CSS). */
+  protected static actionButton_(id: string, label: string, opts: { submit?: boolean; disabled?: boolean } = {}): string {
+    const type = opts.submit ? 'submit' : 'button';
+    const disabled = opts.disabled ? ' disabled' : '';
+
+    return html`
+      <button id="${id}" type="${type}" class="kt-action waves-effect"${disabled}>
+        <span class="kt-action-label">${label}</span>
+      </button>
+    `;
+  }
+
+  /**
+   * "Orbital Elements" body: TLE/3LE text export. The historical 2x2 matrix of
+   * buttons (Official/KeepTrack x 2-line/3-line) is collapsed into a Source and
+   * a Format dropdown plus one download button. Pro extends this body with the
+   * OMM catalog export.
+   */
+  protected orbitalElementsBody_(): string {
+    return html`
+      <div class="kt-field-row">
+        <div class="input-field col s6">
+          <select id="de-tle-source">
+            <option value="official" selected>${l('options.sourceOfficial')}</option>
+            <option value="keeptrack">${l('options.sourceKeepTrack')}</option>
+          </select>
+          <label for="de-tle-source">${l('labels.tleSource')}</label>
+        </div>
+        <div class="input-field col s6">
+          <select id="de-tle-format">
+            <option value="3" selected>${l('options.format3')}</option>
+            <option value="2">${l('options.format2')}</option>
+          </select>
+          <label for="de-tle-format">${l('labels.tleFormat')}</label>
+        </div>
       </div>
-      <div class="row">
-        <center>
-          <button id="de-export-tle-2b" class="btn btn-ui waves-effect waves-light">
-            Export KeepTrack TLEs &#9658;
-          </button>
-        </center>
-      </div>
-      <div class="row">
-        <center>
-          <button id="de-export-tle-3b" class="btn btn-ui waves-effect waves-light">
-            Export KeepTrack 3LEs &#9658;
-          </button>
-        </center>
-      </div>
-      <div class="row">
-        <center>
-          <button id="de-export-csv" class="btn btn-ui waves-effect waves-light">
-            Export Catalog XLSX &#9658;
-          </button>
-        </center>
-      </div>
-      <div class="row">
-        <center>
-          <button id="de-export-tce" class="btn btn-ui waves-effect waves-light">
-            Export STK .tce &#9658;
-          </button>
-        </center>
-      </div>
-      <div class="row">
-        <center>
-          <button id="de-export-fov" class="btn btn-ui waves-effect waves-light">
-            Export Satellites in FOV &#9658;
-          </button>
-        </center>
-      </div>
-      <h5 class="center-align">Satellite Ephemeris</h5>
-      <div class="divider"></div>
-      <div class="row"></div>
+      ${CatalogManagementPlugin.actionButton_('de-export-tle', l('buttons.downloadTle'))}
+    `;
+  }
+
+  /** "Tabular & STK" body: spreadsheet, STK database, and FOV CSV exports. */
+  protected buildTabularStkBody_(): string {
+    return html`
+      ${CatalogManagementPlugin.actionButton_('de-export-csv', l('buttons.exportCatalogXlsx'))}
+      ${CatalogManagementPlugin.actionButton_('de-export-tce', l('buttons.exportStkTce'))}
+      ${CatalogManagementPlugin.actionButton_('de-export-fov', l('buttons.exportSatsInFov'))}
+    `;
+  }
+
+  /**
+   * "Selected Satellite" body: per-satellite exports that require a selection.
+   * Holds the shared time-span/step inputs and the STK .e ephemeris export. Pro
+   * extends this body with the OPM/OEM/OMM single-object exports.
+   */
+  protected buildSelectedSatBody_(): string {
+    return html`
       <form id="de-ephemeris-form">
-        <div class="row">
+        <div class="kt-field-row">
           <div class="input-field col s6">
             <input value="24" id="de-ephem-span" type="text" />
-            <label for="de-ephem-span" class="active">Time Span (hrs)</label>
+            <label for="de-ephem-span" class="active">${l('labels.timeSpanHrs')}</label>
           </div>
           <div class="input-field col s6">
             <input value="60" id="de-ephem-step" type="text" />
-            <label for="de-ephem-step" class="active">Step Size (sec)</label>
+            <label for="de-ephem-step" class="active">${l('labels.stepSizeSec')}</label>
           </div>
         </div>
-        <div class="row">
-          <center>
-            <button id="de-export-ephem" class="btn btn-ui waves-effect waves-light" type="submit"
-              name="action" disabled>Select Satellite First</button>
-          </center>
-        </div>
+        ${CatalogManagementPlugin.actionButton_('de-export-ephem', l('buttons.selectSatelliteFirst'), { submit: true, disabled: true })}
       </form>
     `;
   }
@@ -255,15 +308,24 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
 
     // --- Export tab ---
     this.initExportHandlers_();
+
+    // Style the Source/Format (and Pro scope) dropdowns. Scoped to this menu so
+    // we don't re-wrap every select on the page.
+    initMaterialSelects(getEl('catalog-management-menu') ?? document.body);
   }
 
   private initImportHandlers_(): void {
     const importBtn = getEl('cm-import-btn');
     const fileInput = getEl('cm-import-file') as HTMLInputElement | null;
     const keepSatToggle = getEl('cm-keep-sat-info') as HTMLInputElement | null;
+    const importNewOnlyToggle = getEl('cm-import-new-only') as HTMLInputElement | null;
 
     keepSatToggle?.addEventListener('change', () => {
       this.keepSatInfo_ = keepSatToggle.checked;
+    });
+
+    importNewOnlyToggle?.addEventListener('change', () => {
+      this.importNewOnly_ = importNewOnlyToggle.checked;
     });
 
     importBtn?.addEventListener('click', () => {
@@ -354,7 +416,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
 
       if (!validFile) {
         ServiceLocator.getUiManager().toast(
-          'No .tce, .tle, or .txt file found in drop',
+          l('toasts.noValidFileInDrop'),
           ToastMsgType.caution,
         );
 
@@ -368,20 +430,8 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
   private initExportHandlers_(): void {
     const objData = ServiceLocator.getCatalogManager().objectCache;
 
-    getEl('de-export-tle-2a')?.addEventListener('click', () => {
-      CatalogExporter.exportTle2Txt(objData);
-    });
-
-    getEl('de-export-tle-3a')?.addEventListener('click', () => {
-      CatalogExporter.exportTle2Txt(objData, 3);
-    });
-
-    getEl('de-export-tle-2b')?.addEventListener('click', () => {
-      CatalogExporter.exportTle2Txt(objData, 2, false);
-    });
-
-    getEl('de-export-tle-3b')?.addEventListener('click', () => {
-      CatalogExporter.exportTle2Txt(objData, 3, false);
+    getEl('de-export-tle')?.addEventListener('click', () => {
+      this.exportTle_(objData);
     });
 
     getEl('de-export-csv')?.addEventListener('click', () => {
@@ -402,9 +452,106 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
     });
   }
 
+  /**
+   * Export TLE/3LE text using the Source and Format dropdowns.
+   * Source: "official" drops analyst satellites, "keeptrack" keeps everything.
+   * Format: "3" prepends the satellite name line, "2" is the bare element set.
+   */
+  private exportTle_(objData: BaseObject[]): void {
+    const source = (getEl('de-tle-source') as HTMLSelectElement | null)?.value ?? 'official';
+    const format = (getEl('de-tle-format') as HTMLSelectElement | null)?.value ?? '3';
+    const numberOfLines = format === '2' ? 2 : 3;
+    const isDeleteAnalysts = source !== 'keeptrack';
+
+    CatalogExporter.exportTle2Txt(objData, numberOfLines, isDeleteAnalysts);
+  }
+
   // =========================================================================
   // Import
   // =========================================================================
+
+  /**
+   * Parses the TLE content and adds only satellites whose SCC numbers are not
+   * already in the current catalog. Existing satellites are untouched.
+   * Returns the count of newly added satellites (0 means none were new).
+   */
+  private async importNewSatsOnly_(content: string): Promise<number> {
+    const asciiCatalog = CatalogLoader.parseTceContent(content);
+
+    if (asciiCatalog.length === 0) {
+      throw new Error(l('toasts.noValidTleData'));
+    }
+
+    const catalogManager = ServiceLocator.getCatalogManager();
+    const sccIndex = catalogManager.sccIndex;
+
+    const newEntries = asciiCatalog.filter((entry) => {
+      const key = CatalogLoader.canonicalSccKey(entry.SCC);
+
+      return key !== null && typeof sccIndex[key] === 'undefined';
+    });
+
+    if (newEntries.length === 0) {
+      return 0;
+    }
+
+    // Snapshot existing satellite metadata so existing satellites are preserved
+    const merged: KeepTrackTLEFile[] = [];
+
+    for (const obj of catalogManager.objectCache) {
+      if (!obj.isSatellite()) {
+        continue;
+      }
+      const sat = obj as Satellite;
+
+      merged.push({
+        tle1: sat.tle1,
+        tle2: sat.tle2,
+        name: sat.name,
+        altName: sat.altName,
+        country: sat.country,
+        owner: sat.owner,
+        mission: sat.mission,
+        purpose: sat.purpose,
+        type: sat.type,
+        bus: sat.bus,
+        configuration: sat.configuration,
+        dryMass: sat.dryMass,
+        equipment: sat.equipment,
+        lifetime: sat.lifetime,
+        manufacturer: sat.manufacturer,
+        motor: sat.motor,
+        payload: sat.payload,
+        power: sat.power,
+        shape: sat.shape,
+        span: sat.span,
+        launchDate: sat.launchDate,
+        launchMass: sat.launchMass,
+        launchSite: sat.launchSite,
+        launchPad: sat.launchPad,
+        launchVehicle: sat.launchVehicle,
+        length: sat.length,
+        diameter: sat.diameter,
+        rcs: typeof sat.rcs === 'number' ? sat.rcs.toString() : null,
+        vmag: sat.vmag ?? null,
+        status: sat.status,
+        altId: sat.altId,
+      });
+    }
+
+    for (const entry of newEntries) {
+      merged.push({
+        tle1: entry.TLE1,
+        tle2: entry.TLE2,
+        name: entry.ON ?? 'Unknown',
+        type: entry.OT,
+      });
+    }
+
+    await CatalogLoader.reloadCatalogFromData(merged);
+
+    return newEntries.length;
+  }
 
   protected handleImportFile_(file: File): void {
     if (this.isLoading_) {
@@ -415,7 +562,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
 
     if (!validExts.some((ext) => file.name.endsWith(ext))) {
       ServiceLocator.getUiManager().toast(
-        'Unsupported file type. Use .tce, .tle, or .txt',
+        l('toasts.unsupportedFileType'),
         ToastMsgType.caution,
       );
 
@@ -436,19 +583,37 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
       }
 
       try {
-        if (this.keepSatInfo_) {
+        if (this.importNewOnly_) {
+          const addedCount = await this.importNewSatsOnly_(content);
+
+          if (addedCount === 0) {
+            ServiceLocator.getUiManager().toast(
+              l('toasts.noNewSats'),
+              ToastMsgType.caution,
+            );
+          } else {
+            ServiceLocator.getUiManager().toast(
+              l('toasts.addedNewSats').replace('{count}', addedCount.toString()).replace('{file}', file.name),
+              ToastMsgType.normal,
+            );
+          }
+        } else if (this.keepSatInfo_) {
           await CatalogLoader.mergeAndReloadCatalog(content);
+          ServiceLocator.getUiManager().toast(
+            l('toasts.loadedCatalog').replace('{file}', file.name),
+            ToastMsgType.normal,
+          );
         } else {
           await CatalogLoader.reloadCatalog(content);
+          ServiceLocator.getUiManager().toast(
+            l('toasts.loadedCatalog').replace('{file}', file.name),
+            ToastMsgType.normal,
+          );
         }
-        ServiceLocator.getUiManager().toast(
-          `Loaded catalog from ${file.name}`,
-          ToastMsgType.normal,
-        );
       } catch (error) {
         errorManagerInstance.error(error, 'CatalogManagementPlugin');
         ServiceLocator.getUiManager().toast(
-          `Failed to load ${file.name}`,
+          l('toasts.failedToLoad').replace('{file}', file.name),
           ToastMsgType.critical,
         );
       } finally {
@@ -463,6 +628,19 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
   // Ephemeris export (.e file)
   // =========================================================================
 
+  /**
+   * Set the label text on a `.kt-action` button without clobbering the trailing
+   * chevron (which is a CSS pseudo-element on the button, not in the label span).
+   */
+  protected static setActionLabel_(id: string, label: string): void {
+    const btn = getEl(id) as HTMLButtonElement | null;
+    const labelEl = btn?.querySelector('.kt-action-label');
+
+    if (labelEl) {
+      labelEl.textContent = label;
+    }
+  }
+
   protected updateEphemerisButton_(obj: BaseObject) {
     const btn = getEl('de-export-ephem') as HTMLButtonElement | null;
 
@@ -470,33 +648,52 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
       return;
     }
 
-    if (obj?.isSatellite()) {
-      btn.disabled = false;
-      btn.textContent = 'Export .e Ephemeris \u25B6';
-    } else {
-      btn.disabled = true;
-      btn.textContent = 'Select Satellite First';
+    const isSat = obj?.isSatellite() ?? false;
+
+    btn.disabled = !isSat;
+    CatalogManagementPlugin.setActionLabel_('de-export-ephem', isSat ? l('buttons.exportEphemeris') : l('buttons.selectSatelliteFirst'));
+  }
+
+  /**
+   * Resolve the currently selected object as a Satellite, or toast and return
+   * null. Shared by the base ephemeris export and the Pro ODM exports.
+   * @param noSelectionMsg - Message shown when no satellite is selected.
+   */
+  protected getSelectedSatellite_(noSelectionMsg = l('toasts.noSatelliteSelected')): Satellite | null {
+    const sat = PluginRegistry.getPlugin(SelectSatManager)?.getSelectedSat();
+
+    if (!sat || !sat.isSatellite()) {
+      ServiceLocator.getUiManager().toast(noSelectionMsg, ToastMsgType.critical);
+
+      return null;
     }
+
+    return sat as Satellite;
   }
 
   private exportEphemeris_() {
-    const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);
-    const sat = selectSatManager?.getSelectedSat();
+    const satellite = this.getSelectedSatellite_();
 
-    if (!sat || !sat.isSatellite()) {
-      ServiceLocator.getUiManager().toast('No satellite selected!', ToastMsgType.critical);
+    if (!satellite) {
+      return;
+    }
+
+    const spanEl = getEl('de-ephem-span') as HTMLInputElement | null;
+    const stepEl = getEl('de-ephem-step') as HTMLInputElement | null;
+    const parsed = parseEphemerisParams(spanEl?.value, stepEl?.value);
+
+    if (!parsed.ok) {
+      ServiceLocator.getUiManager().toast(
+        l('toasts.exportTooLarge'),
+        ToastMsgType.critical,
+      );
 
       return;
     }
 
-    const satellite = sat as Satellite;
-    const spanHours = parseFloat((<HTMLInputElement>getEl('de-ephem-span')).value) || 24;
-    const stepSec = parseFloat((<HTMLInputElement>getEl('de-ephem-step')).value) || 60;
-    const totalSeconds = spanHours * 3600;
-    const numPoints = Math.floor(totalSeconds / stepSec) + 1;
-
+    const { stepSec, numPoints } = parsed.params;
     const startTime = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
-    const lines: string[] = [];
+    const rows: StkEphemerisRow[] = [];
 
     for (let i = 0; i < numPoints; i++) {
       const offsetSec = i * stepSec;
@@ -513,54 +710,21 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
       const p = eci.position;
       const v = eci.velocity;
 
-      lines.push(
-        `${offsetSec.toFixed(6)}  ${p.x.toFixed(6)}  ${p.y.toFixed(6)}  ${p.z.toFixed(6)}  ${v.x.toFixed(6)}  ${v.y.toFixed(6)}  ${v.z.toFixed(6)}`,
-      );
+      rows.push({
+        offsetSec,
+        position: { x: p.x, y: p.y, z: p.z },
+        velocity: { x: v.x, y: v.y, z: v.z },
+      });
     }
 
-    if (lines.length === 0) {
-      ServiceLocator.getUiManager().toast('Failed to propagate satellite!', ToastMsgType.critical);
+    if (rows.length === 0) {
+      ServiceLocator.getUiManager().toast(l('toasts.failedToPropagate'), ToastMsgType.critical);
 
       return;
     }
 
-    const epochStr = CatalogManagementPlugin.formatStkEpoch_(startTime);
+    const content = formatStkEphemeris(rows, { scenarioEpoch: startTime });
 
-    const content = [
-      'stk.v.11.0',
-      'BEGIN Ephemeris',
-      `NumberOfEphemerisPoints ${lines.length}`,
-      `ScenarioEpoch ${epochStr}`,
-      'InterpolationMethod Lagrange',
-      'InterpolationOrder 7',
-      'CentralBody Earth',
-      'CoordinateSystem TEME',
-      'DistanceUnit Kilometers',
-      'EphemerisTimePosVel',
-      '',
-      ...lines,
-      '',
-      'END Ephemeris',
-    ].join('\n');
-
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-
-    saveAs(blob, `${satellite.sccNum5 ?? satellite.sccNum}.e`);
-  }
-
-  /**
-   * Format a Date as STK epoch string: "DD Mon YYYY HH:MM:SS.sss"
-   */
-  private static formatStkEpoch_(date: Date): string {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const day = date.getUTCDate().toString().padStart(2, '0');
-    const mon = months[date.getUTCMonth()];
-    const year = date.getUTCFullYear();
-    const hrs = date.getUTCHours().toString().padStart(2, '0');
-    const min = date.getUTCMinutes().toString().padStart(2, '0');
-    const sec = date.getUTCSeconds().toString().padStart(2, '0');
-    const ms = date.getUTCMilliseconds().toString().padStart(3, '0');
-
-    return `${day} ${mon} ${year} ${hrs}:${min}:${sec}.${ms}`;
+    downloadText(content, exportFileName(satellite, 'e'));
   }
 }

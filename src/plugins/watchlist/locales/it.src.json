@@ -3,16 +3,48 @@
     "WatchlistPlugin": {
       "bottomIconLabel": "Lista di osservazione",
       "title": "Lista di osservazione",
-      "helpBody": "Il menu Lista di osservazione consente di creare un elenco di satelliti prioritari da tracciare. Questo permette di recuperare rapidamente i satelliti di maggiore interesse. L'elenco viene salvato nella memoria locale del browser e sarà disponibile alla prossima visita del sito. <br><br> Quando i satelliti nella lista di osservazione entrano nel campo visivo del sensore selezionato, verrà visualizzata una notifica, verrà tracciata una linea dal sensore al satellite e il numero del satellite verrà visualizzato sul globo. <br><br> La funzione di sovrapposizione si basa sulla lista di osservazione compilata."
-,
+      "help": {
+        "overview": "La lista di osservazione è il tuo elenco di satelliti prioritari. Viene salvata nel browser, quindi sopravvive ai ricaricamenti della pagina. Quando un sensore è selezionato e un satellite della lista di osservazione entra nel suo campo visivo, ricevi una notifica, viene tracciata una linea dal sensore al satellite e il numero del satellite appare sul globo.",
+        "imgAlt": "Il menu Lista di osservazione con diversi satelliti aggiunti",
+        "imgCaption": "Una lista di osservazione con diversi satelliti. Fai clic su un nome per selezionarlo; l'icona del segnalibro lo rimuove.",
+        "managingHeading": "Gestione dell'elenco",
+        "managing": "<ul><li><strong>Aggiungi</strong>: digita uno o più numeri NORAD separati da virgole o spazi (funzionano anche gli ID alpha-5 come T0001) e fai clic sull'icona di aggiunta o premi Invio.</li><li><strong>Aggiunta/rimozione rapida</strong>: quando un satellite è selezionato sul globo, fai clic sull'icona del segnalibro accanto al suo nome nel riquadro informativo.</li><li><strong>Seleziona</strong>: fai clic sul numero o sul nome di un satellite nell'elenco per volare fino ad esso.</li><li><strong>Salva / Carica</strong>: esporta l'elenco come file JSON e caricalo in seguito o condividilo.</li><li><strong>Svuota</strong>: svuota l'intero elenco.</li></ul>",
+        "howToUse": "<ol><li>Apri il menu dalla barra inferiore o premi W.</li><li>Aggiungi i satelliti tramite numero NORAD, ad esempio 25544 per la ISS.</li><li>Seleziona un sensore nel menu Sensori per iniziare a ricevere notifiche di visibilità e linee dal sensore al satellite.</li><li>Apri il menu secondario (icona dell'ingranaggio) per nascondere tutti gli oggetti non presenti nella lista di osservazione o cambiare quando vengono disegnate le etichette (Sempre / Solo FOV / Disattivato).</li></ol>",
+        "tip1": "\"Nascondi altri oggetti\" trasforma il globo in una vista limitata alla lista di osservazione. È perfetto per seguire pochi oggetti senza il disordine dell'intero catalogo.",
+        "tip2": "Il menu Sovrapposizione (orari del prossimo passaggio per ogni satellite della lista di osservazione) funziona solo quando la lista di osservazione contiene delle voci.",
+        "tip3": "I duplicati vengono ignorati automaticamente e i numeri non validi generano una notifica con il nome del satellite non trovato.",
+        "shortcutToggle": "Attiva/disattiva il menu Lista di osservazione"
+      },
+      "labels": {
+        "newSatellites": "Nuovo/i satellite/i",
+        "saveList": "Salva elenco",
+        "loadList": "Carica elenco",
+        "clearList": "Svuota elenco",
+        "hideOtherObjects": "Nascondi altri oggetti",
+        "labelAlways": "Sempre",
+        "labelFovOnly": "Solo FOV",
+        "labelOff": "Disattivato",
+        "satellitesHeader": "Satelliti",
+        "actionsHeader": "Azioni",
+        "displayHeader": "Visualizzazione",
+        "labelsHeader": "Etichette"
+      },
+      "msgs": {
+        "watchlistLoaded": "Lista di osservazione caricata con {count} satelliti"
+      },
+      "errorMsgs": {
+        "NoradAlreadyInList": "NORAD: {sccNum} già nell'elenco!",
+        "ObjectAlreadyInList": "Oggetto {id} già nell'elenco!",
+        "SatNotFound": "Satellite {id} non trovato!"
+      },
       "settings": {
         "satLabelMode": {
-          "label": "Satellite Label Mode",
-          "helpText": "Controls satellite label rendering on watchlist satellites.",
+          "label": "Modalità etichette satelliti",
+          "helpText": "Controlla la visualizzazione delle etichette sui satelliti della lista di osservazione.",
           "options": {
-            "off": "Off",
-            "fovOnly": "FOV Only",
-            "all": "All Watchlist"
+            "off": "Disattivato",
+            "fovOnly": "Solo FOV",
+            "all": "Tutta la lista di osservazione"
           }
         }
       }
@@ -20,7 +52,20 @@
     "WatchlistOverlay": {
       "bottomIconLabel": "Sovrapposizione",
       "title": "Menu sovrapposizione",
-      "helpBody": "<p> La sovrapposizione della lista di osservazione mostra l'orario del prossimo passaggio per ogni satellite nella lista di osservazione. La sovrapposizione viene aggiornata ogni 10 secondi. </p> <p> La sovrapposizione è codificata a colori per mostrare il tempo al prossimo passaggio. I colori sono i seguenti: </p> <ul> <li>Giallo - In vista</li> <li>Blu - Il tempo al prossimo passaggio è fino a 30 minuti dopo l'orario corrente o 10 minuti prima dell'orario corrente</li> <li>Bianco - Qualsiasi passaggio futuro che non soddisfa i requisiti precedenti</li> </ul> <p> Facendo clic su un satellite nella sovrapposizione la mappa verrà centrata su quel satellite. </p>"
+      "helpBody": "<p> La sovrapposizione della lista di osservazione mostra l'orario del prossimo passaggio per ogni satellite nella lista di osservazione. La sovrapposizione viene aggiornata ogni 10 secondi. </p> <p> La sovrapposizione è codificata a colori per mostrare il tempo al prossimo passaggio. I colori sono i seguenti: </p> <ul> <li>Giallo - In vista</li> <li>Blu - Il tempo al prossimo passaggio è fino a 30 minuti dopo l'orario corrente o 10 minuti prima dell'orario corrente</li> <li>Bianco - Qualsiasi passaggio futuro che non soddisfa i requisiti precedenti</li> </ul> <p> Facendo clic su un satellite nella sovrapposizione la mappa verrà centrata su quel satellite. </p>",
+      "openOverlayCmd": "Apri overlay Watchlist",
+      "addSatellitesToast": "Aggiungi prima dei satelliti al tuo elenco!",
+      "noPassesMsg": "Nessun passaggio entro 60 minuti",
+      "inFovToast": "Il satellite {sccNum} è nel campo visivo!",
+      "leftFovToast": "Il satellite {sccNum} ha lasciato il campo visivo!",
+      "tiers": {
+        "inView": "IN VISTA",
+        "nextUp": "PROSSIMO",
+        "upcoming": "IN ARRIVO",
+        "later": "PIÙ TARDI",
+        "background": "SFONDO",
+        "departed": "USCITI"
+      }
     }
   }
 }

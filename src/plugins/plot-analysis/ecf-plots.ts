@@ -8,6 +8,8 @@ import { Satellite } from '@ootk/src/main';
 import scatterPlotPng from '@public/img/icons/scatter-plot.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { t7e } from '@app/locales/keys';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -40,6 +42,23 @@ export class EcfPlot extends KeepTrackPlugin {
 
   plotCanvasId = 'plot-analysis-chart-ecf';
   chart: echarts.ECharts;
+
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: t7e('plugins.EcfPlot.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.EcfPlot.help.overview'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.EcfPlot.help.howToUse'),
+        },
+      ],
+      tips: [t7e('plugins.EcfPlot.help.tip1')],
+    };
+  }
 
   sideMenuElementName = 'ecf-plots-menu';
   sideMenuElementHtml: string = html`

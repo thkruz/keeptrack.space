@@ -1,3 +1,4 @@
+import { CameraType } from '@app/engine/camera/camera-type';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { getEl } from '@app/engine/utils/get-el';
 import videoSettingsPng from '@public/img/icons/video-settings.png';
@@ -6,8 +7,12 @@ import { SoundNames } from '@app/engine/audio/sounds';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
+import { t7e } from '@app/locales/keys';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import './video-director.css';
+import { DIRECTION_TOGGLES, getOppositeToDisable, parseSpeed, ROTATE_TOGGLE_IDS, SPEED_CONFIGS } from './video-director-core';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -37,256 +42,319 @@ declare module '@app/engine/core/interfaces' {
   }
 }
 
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.VideoDirectorPlugin.${key}` as Parameters<typeof t7e>[0]);
+
+/** A Materialize lever switch row. */
+const lever = (id: string, labelKey: string, checked = false): string => html`
+  <div class="switch row">
+    <label data-position="top" data-delay="50" data-tooltip="${l(labelKey)}">
+      <input id="${id}" type="checkbox"${checked ? ' checked' : ''} />
+      <span class="lever"></span>
+      ${l(labelKey)}
+    </label>
+  </div>`;
+
+/** A single full-width speed text field. */
+const speedField = (id: string, value: string, labelKey: string): string => html`
+  <div class="kt-field-row">
+    <div class="input-field col s12">
+      <input value="${value}" id="${id}" type="text" maxlength="9" inputmode="decimal" />
+      <label for="${id}" class="active">${l(labelKey)}</label>
+    </div>
+  </div>`;
+
 export class VideoDirectorPlugin extends KeepTrackPlugin {
   readonly id = 'VideoDirectorPlugin';
   dependencies_ = [];
 
   menuMode: MenuMode[] = [MenuMode.EXPERIMENTAL, MenuMode.ALL];
 
-  isRotateL = true;
-  isRotateR = false;
-  isRotateU = false;
-  isRotateD = false;
   bottomIconElementName: string = 'video-director-icon';
   bottomIconImg = videoSettingsPng;
   sideMenuElementName: string = 'video-director-menu';
-  sideMenuElementHtml: string = html`
-  <div id="video-director-menu" class="side-menu-parent start-hidden">
-    <div id="video-director-content" class="side-menu">
-      <div class="row">
+  sideMenuElementHtml: string = VideoDirectorPlugin.buildMenuHtml_();
+
+  /** Sync the form from current settings whenever the menu is opened. */
+  bottomIconCallback = (): void => {
+    if (this.isMenuButtonActive) {
+      this.syncFormFromSettings_();
+    }
+  };
+
+  /** Build the v13 card-based side menu markup. */
+  private static buildMenuHtml_(): string {
+    return html`
+    <div id="video-director-menu" class="side-menu-parent start-hidden kt-ui-v13">
+      <div id="video-director-content" class="side-menu">
         <form id="video-director-form">
-          <div id="video-director-general">
-            <div class="row center"></div>
-            </br>
-            <div class="row center">
-              <button id="video-director-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Update video-director &#9658;</button>
-            </div>
-            <h5 class="center-align">General video-director</h5>
-            <div class="input-field col s12">
-              <input value="0.000075" id="video-director-rotateSpeed" type="text" maxlength="9" />
-              <label for="video-director-rotateSpeed" class="active">Rotate Speed</label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Rotate Camera to the Left">
-                <input id="video-director-rotateL" type="checkbox" checked/>
-                <span class="lever"></span>
-                Rotate Camera Left
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Rotate Camera to the Right">
-                <input id="video-director-rotateR" type="checkbox"/>
-                <span class="lever"></span>
-                Rotate Camera Right
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Rotate Camera Up">
-                <input id="video-director-rotateU" type="checkbox"/>
-                <span class="lever"></span>
-                Rotate Camera Up
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Rotate Camera Down">
-                <input id="video-director-rotateD" type="checkbox"/>
-                <span class="lever"></span>
-                Rotate Camera Down
-              </label>
-            </div>
-            <div class="input-field col s12">
-              <input value="0.05" id="video-director-panSpeed" type="text" maxlength="9" />
-              <label for="video-director-panSpeed" class="active">Pan Speed</label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Pan Camera Left">
-                <input id="video-director-panL" type="checkbox"/>
-                <span class="lever"></span>
-                Pan Camera Left
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Pan Camera Right">
-                <input id="video-director-panR" type="checkbox"/>
-                <span class="lever"></span>
-                Pan Camera Right
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Pan Camera Up">
-                <input id="video-director-panU" type="checkbox"/>
-                <span class="lever"></span>
-                Pan Camera Up
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Pan Camera Down">
-                <input id="video-director-panD" type="checkbox"/>
-                <span class="lever"></span>
-                Pan Camera Down
-              </label>
-            </div>
-            <div class="input-field col s12">
-              <input value="0.0005" id="video-director-zoomSpeed" type="text" maxlength="9" />
-              <label for="video-director-zoomSpeed" class="active">Zoom Speed</label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Zoom Camera In">
-                <input id="video-director-zoomIn" type="checkbox"/>
-                <span class="lever"></span>
-                Zoom Camera In
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Zoom Camera Out">
-                <input id="video-director-zoomOut" type="checkbox"/>
-                <span class="lever"></span>
-                Zoom Camera Out
-              </label>
-          </div>
-          <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable Selected Satellite Dot">
-                <input id="video-director-selectedColor" type="checkbox"/>
-                <span class="lever"></span>
-                Disable Selected Satellite Dot
-              </label>
-          </div>
-          <div class="center-align row">
-            <button id="video-director-rotate" class="btn btn-ui waves-effect waves-light" type="button" name="action">Start Auto Rotate &#9658;</button>
-          </div>
+          <section class="kt-section">
+            <div class="kt-section-label">${l('labels.rotate')}</div>
+            ${speedField('video-director-rotateSpeed', '0.000075', 'labels.rotateSpeed')}
+            ${lever('video-director-rotateL', 'labels.rotateLeft', true)}
+            ${lever('video-director-rotateR', 'labels.rotateRight')}
+            ${lever('video-director-rotateU', 'labels.rotateUp')}
+            ${lever('video-director-rotateD', 'labels.rotateDown')}
+          </section>
+          <section class="kt-section">
+            <div class="kt-section-label">${l('labels.pan')}</div>
+            ${speedField('video-director-panSpeed', '0.05', 'labels.panSpeed')}
+            ${lever('video-director-panL', 'labels.panLeft')}
+            ${lever('video-director-panR', 'labels.panRight')}
+            ${lever('video-director-panU', 'labels.panUp')}
+            ${lever('video-director-panD', 'labels.panDown')}
+          </section>
+          <section class="kt-section">
+            <div class="kt-section-label">${l('labels.zoom')}</div>
+            ${speedField('video-director-zoomSpeed', '0.0005', 'labels.zoomSpeed')}
+            ${lever('video-director-zoomIn', 'labels.zoomIn')}
+            ${lever('video-director-zoomOut', 'labels.zoomOut')}
+          </section>
+          <section class="kt-section">
+            <div class="kt-section-label">${l('labels.scene')}</div>
+            ${lever('video-director-selectedColor', 'labels.disableSelectedDot')}
+            ${lever('video-director-blackEarth', 'labels.blackEarth')}
+            ${lever('video-director-milkyWay', 'labels.milkyWay')}
+          </section>
+          <button id="video-director-rotate" type="button" class="kt-action waves-effect">
+            <span class="kt-action-label">${l('labels.startAutoRotate')}</span>
+          </button>
         </form>
       </div>
-    </div>
-  </div>`;
+    </div>`;
+  }
 
-  isNotColorPickerInitialSetup = false;
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/video-director/video-director-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2')],
+    };
+  }
+
+  getKeyboardShortcuts(): IKeyboardShortcut[] {
+    return [
+      {
+        // Open/close the Video Director menu.
+        key: 'V',
+        ctrl: true,
+        shift: true,
+        callback: () => {
+          if (ServiceLocator.getMainCamera().cameraType === CameraType.FPS) {
+            return;
+          }
+          this.bottomMenuClicked();
+        },
+      },
+      {
+        // Toggle auto-rotate without opening the menu.
+        key: 'R',
+        ctrl: true,
+        shift: true,
+        callback: () => this.toggleAutoRotate_(),
+      },
+    ];
+  }
 
   addHtml(): void {
     super.addHtml();
     EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
-        getEl('video-director-form')!.addEventListener('change', VideoDirectorPlugin.onFormChange);
-        getEl('video-director-form')!.addEventListener('submit', VideoDirectorPlugin.onSubmit);
-        getEl('video-director-rotate')!.addEventListener('click', () => {
-          ServiceLocator.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
-          ServiceLocator.getMainCamera().autoRotate(true);
-        });
+        getEl('video-director-form')!.addEventListener('change', this.onFormChange_);
+        // Prevent an accidental page reload if the user presses Enter in a speed field.
+        getEl('video-director-form')!.addEventListener('submit', (e) => e.preventDefault());
+        getEl('video-director-rotate')!.addEventListener('click', () => this.toggleAutoRotate_());
       },
     );
   }
 
-  private static onFormChange(e: Event) {
+  /** Read the form into settings whenever any control changes (immediate-apply). */
+  private onFormChange_ = (e: Event): void => {
     if (typeof e === 'undefined' || e === null) {
       throw new Error('e is undefined');
     }
 
-    const elementId = (<HTMLElement>e.target)?.id;
+    const target = e.target as HTMLInputElement | null;
+    const elementId = target?.id ?? '';
+    const isCheckbox = target?.type === 'checkbox';
 
-    switch (elementId) {
-      case 'video-director-rotateL':
-      case 'video-director-rotateR':
-      case 'video-director-rotateU':
-      case 'video-director-rotateD':
-      case 'video-director-panL':
-      case 'video-director-panR':
-      case 'video-director-panU':
-      case 'video-director-panD':
-      case 'video-director-zoomIn':
-      case 'video-director-zoomOut':
-        if ((<HTMLInputElement>getEl(elementId))?.checked) {
-          // Play sound for enabling option
-          ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
-        } else {
-          // Play sound for disabling option
-          ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
+    // Mutually-exclusive opposite direction: turning one on turns its opposite off.
+    if (isCheckbox) {
+      const oppositeId = getOppositeToDisable(elementId, target!.checked);
+
+      if (oppositeId) {
+        const opposite = getEl(oppositeId) as HTMLInputElement | null;
+
+        if (opposite) {
+          opposite.checked = false;
         }
-        break;
-      default:
-        break;
+      }
+
+      ServiceLocator.getSoundManager()?.play(target!.checked ? SoundNames.TOGGLE_ON : SoundNames.TOGGLE_OFF);
     }
 
-    if ((<HTMLInputElement>getEl('video-director-selectedColor')).checked && settingsManager.selectedColor[3] !== 0) {
+    this.applySpeeds_();
+    this.applyDirectionFlags_();
+    this.applySelectedDot_();
+    this.applySceneToggle_(elementId);
+  };
+
+  /** Parse, clamp and store the three speed fields (NaN-safe). */
+  private applySpeeds_(): void {
+    SPEED_CONFIGS.forEach((cfg) => {
+      const input = getEl(cfg.id) as HTMLInputElement | null;
+
+      if (!input) {
+        return;
+      }
+
+      const value = parseSpeed(input.value, cfg);
+
+      // Reflect the clamped/sanitized value so the user never sees a stale or invalid entry.
+      input.value = value.toString();
+      settingsManager[cfg.flag] = value;
+    });
+  }
+
+  /** Mirror every direction toggle into its settings flag. */
+  private applyDirectionFlags_(): void {
+    DIRECTION_TOGGLES.forEach((toggle) => {
+      const checkbox = getEl(toggle.id) as HTMLInputElement | null;
+
+      if (checkbox) {
+        settingsManager[toggle.flag] = checkbox.checked;
+      }
+    });
+  }
+
+  /** Hide or restore the selected-satellite highlight dot for clean footage. */
+  private applySelectedDot_(): void {
+    const isHide = (getEl('video-director-selectedColor') as HTMLInputElement)?.checked;
+
+    if (isHide && settingsManager.selectedColor[3] !== 0) {
       settingsManager.selectedColorFallback = settingsManager.selectedColor;
       settingsManager.selectedColor = [0, 0, 0, 0];
     } else {
       settingsManager.selectedColor = settingsManager.selectedColorFallback;
     }
+  }
 
-    settingsManager.autoRotateSpeed = parseFloat((<HTMLInputElement>getEl('video-director-rotateSpeed')).value);
-    settingsManager.autoPanSpeed = parseFloat((<HTMLInputElement>getEl('video-director-panSpeed')).value);
-    settingsManager.autoZoomSpeed = parseFloat((<HTMLInputElement>getEl('video-director-zoomSpeed')).value);
+  /** Apply Black Earth / Milky Way scene toggles, re-initializing only the affected renderer. */
+  private applySceneToggle_(elementId: string): void {
+    const scene = ServiceLocator.getScene();
 
-    const isRotateL = (<HTMLInputElement>getEl('video-director-rotateL')).checked;
-    const isRotateR = (<HTMLInputElement>getEl('video-director-rotateR')).checked;
-    const isRotateU = (<HTMLInputElement>getEl('video-director-rotateU')).checked;
-    const isRotateD = (<HTMLInputElement>getEl('video-director-rotateD')).checked;
-    const isPanL = (<HTMLInputElement>getEl('video-director-panL')).checked;
-    const isPanR = (<HTMLInputElement>getEl('video-director-panR')).checked;
-    const isPanU = (<HTMLInputElement>getEl('video-director-panU')).checked;
-    const isPanD = (<HTMLInputElement>getEl('video-director-panD')).checked;
-    const isZoomIn = (<HTMLInputElement>getEl('video-director-zoomIn')).checked;
-    const isZoomOut = (<HTMLInputElement>getEl('video-director-zoomOut')).checked;
-
-    if (isRotateL && !settingsManager.isAutoRotateL) {
-      (<HTMLInputElement>getEl('video-director-rotateR')).checked = false;
+    if (elementId === 'video-director-blackEarth') {
+      settingsManager.isBlackEarth = (getEl('video-director-blackEarth') as HTMLInputElement).checked;
+      scene?.earth?.init?.();
     }
 
-    if (isRotateR && !settingsManager.isAutoRotateR) {
-      (<HTMLInputElement>getEl('video-director-rotateL')).checked = false;
-    }
-
-    if (isRotateU && !settingsManager.isAutoRotateU) {
-      (<HTMLInputElement>getEl('video-director-rotateD')).checked = false;
-    }
-
-    if (isRotateD && !settingsManager.isAutoRotateD) {
-      (<HTMLInputElement>getEl('video-director-rotateU')).checked = false;
-    }
-
-    if (isPanL && !settingsManager.isAutoPanL) {
-      (<HTMLInputElement>getEl('video-director-panR')).checked = false;
-    }
-
-    if (isPanR && !settingsManager.isAutoPanR) {
-      (<HTMLInputElement>getEl('video-director-panL')).checked = false;
-    }
-
-    if (isPanU && !settingsManager.isAutoPanU) {
-      (<HTMLInputElement>getEl('video-director-panD')).checked = false;
-    }
-
-    if (isPanD && !settingsManager.isAutoPanD) {
-      (<HTMLInputElement>getEl('video-director-panU')).checked = false;
-    }
-
-    if (isZoomIn && !settingsManager.isAutoZoomIn) {
-      (<HTMLInputElement>getEl('video-director-zoomOut')).checked = false;
-    }
-
-    if (isZoomOut && !settingsManager.isAutoZoomOut) {
-      (<HTMLInputElement>getEl('video-director-zoomIn')).checked = false;
+    if (elementId === 'video-director-milkyWay') {
+      settingsManager.isDrawMilkyWay = (getEl('video-director-milkyWay') as HTMLInputElement).checked;
+      scene?.skybox?.init?.(ServiceLocator.getRenderer()?.gl);
     }
   }
 
-  private static onSubmit(e: SubmitEvent) {
-    if (typeof e === 'undefined' || e === null) {
-      throw new Error('e is undefined');
-    }
-    e.preventDefault();
-
+  /** Toggle auto-rotate on/off, seeding a direction if none is active, and update the button label. */
+  private toggleAutoRotate_(): void {
     ServiceLocator.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
 
-    settingsManager.isAutoRotateR = (<HTMLInputElement>getEl('video-director-rotateR')).checked;
-    settingsManager.isAutoRotateL = (<HTMLInputElement>getEl('video-director-rotateL')).checked;
-    settingsManager.isAutoRotateU = (<HTMLInputElement>getEl('video-director-rotateU')).checked;
-    settingsManager.isAutoRotateD = (<HTMLInputElement>getEl('video-director-rotateD')).checked;
-    settingsManager.isAutoPanR = (<HTMLInputElement>getEl('video-director-panR')).checked;
-    settingsManager.isAutoPanL = (<HTMLInputElement>getEl('video-director-panL')).checked;
-    settingsManager.isAutoPanU = (<HTMLInputElement>getEl('video-director-panU')).checked;
-    settingsManager.isAutoPanD = (<HTMLInputElement>getEl('video-director-panD')).checked;
-    settingsManager.isAutoZoomIn = (<HTMLInputElement>getEl('video-director-zoomIn')).checked;
-    settingsManager.isAutoZoomOut = (<HTMLInputElement>getEl('video-director-zoomOut')).checked;
+    const camera = ServiceLocator.getMainCamera();
+    const willStart = !camera.state.isAutoRotate;
+
+    if (willStart && !this.hasRotateDirection_()) {
+      // Default to rotate-left so "Start" always produces visible motion.
+      settingsManager.isAutoRotateL = true;
+      const rotateL = getEl('video-director-rotateL') as HTMLInputElement | null;
+
+      if (rotateL) {
+        rotateL.checked = true;
+      }
+    }
+
+    camera.autoRotate(willStart);
+    this.updateRotateButtonLabel_(willStart);
+  }
+
+  /** True when at least one rotate direction flag is enabled. */
+  private hasRotateDirection_(): boolean {
+    return settingsManager.isAutoRotateL || settingsManager.isAutoRotateR || settingsManager.isAutoRotateU || settingsManager.isAutoRotateD;
+  }
+
+  /** Swap the Start/Stop label without clobbering the chevron pseudo-element. */
+  private updateRotateButtonLabel_(isRotating: boolean): void {
+    const label = getEl('video-director-rotate')?.querySelector('.kt-action-label');
+
+    if (label) {
+      label.textContent = isRotating ? l('labels.stopAutoRotate') : l('labels.startAutoRotate');
+    }
+  }
+
+  /** Populate the form controls from the current settings when the menu opens. */
+  private syncFormFromSettings_(): void {
+    SPEED_CONFIGS.forEach((cfg) => {
+      const input = getEl(cfg.id) as HTMLInputElement | null;
+
+      if (input) {
+        input.value = (settingsManager[cfg.flag] as number).toString();
+      }
+    });
+
+    DIRECTION_TOGGLES.forEach((toggle) => {
+      const checkbox = getEl(toggle.id) as HTMLInputElement | null;
+
+      if (checkbox) {
+        checkbox.checked = Boolean(settingsManager[toggle.flag]);
+      }
+    });
+
+    const selectedColor = getEl('video-director-selectedColor') as HTMLInputElement | null;
+
+    if (selectedColor) {
+      selectedColor.checked = settingsManager.selectedColor[3] === 0;
+    }
+
+    const blackEarth = getEl('video-director-blackEarth') as HTMLInputElement | null;
+
+    if (blackEarth) {
+      blackEarth.checked = settingsManager.isBlackEarth;
+    }
+
+    const milkyWay = getEl('video-director-milkyWay') as HTMLInputElement | null;
+
+    if (milkyWay) {
+      milkyWay.checked = settingsManager.isDrawMilkyWay;
+    }
+
+    this.updateRotateButtonLabel_(ServiceLocator.getMainCamera().state.isAutoRotate);
+  }
+
+  /** Test seam: drive the change handler with a synthetic event. */
+  triggerFormChange(e: Event): void {
+    this.onFormChange_(e);
+  }
+
+  /** Ids of every rotate/pan/zoom direction toggle, exposed for tests. */
+  static get directionToggleIds(): string[] {
+    return DIRECTION_TOGGLES.map((t) => t.id);
+  }
+
+  /** Ids of the rotate-only direction toggles, exposed for tests. */
+  static get rotateToggleIds(): string[] {
+    return ROTATE_TOGGLE_IDS;
   }
 }
-

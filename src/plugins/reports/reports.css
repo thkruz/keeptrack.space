@@ -1,0 +1,38 @@
+/**
+ * Styling for the Reports plugin (v13 card UI).
+ *
+ * The Options card stacks more than one labelled row, so it needs the standard
+ * dense-form fixes (stacked-field headroom + focus underline) from
+ * docs-local/ui/v13-menu-style.md, scoped to the menu id.
+ */
+
+/* Stacked-field headroom: the shared 6px default is too tight when a card stacks
+   a labelled row under another row; give stacked rows room for the floating label,
+   and only the section-label gap for the first row in a card. */
+#reports-menu .kt-field-row .input-field.col {
+  margin-top: 20px;
+}
+
+#reports-menu .kt-section-label + .kt-field-row .input-field.col {
+  margin-top: 8px;
+}
+
+/* Swap the app-wide :focus-visible outline (which overlaps the floating label)
+   for KeepTrack's underline. */
+#reports-menu .input-field input:focus,
+#reports-menu .input-field textarea:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#reports-menu .input-field input:focus-visible,
+#reports-menu .input-field textarea:focus-visible {
+  outline: none;
+}
+
+/* A disabled report row (sensor-requiring report with no sensor selected) reads as
+   inactive but stays in the layout. */
+#reports-menu .kt-action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

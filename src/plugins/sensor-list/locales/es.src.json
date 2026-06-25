@@ -3,7 +3,32 @@
     "SensorListPlugin": {
       "bottomIconLabel": "Sensores",
       "title": "Menú de Lista de Sensores",
-      "helpBody": "El menú de Sensores te permite seleccionar un sensor para usar en cálculos y funciones de otros menús. Los sensores están agrupados según las redes que principalmente respaldan. En el lado izquierdo del menú está el nombre del sensor y en el lado derecho está el país/organización que lo posee. <br><br> Seleccionar una opción \"Todos...Sensores\" seleccionará todos los sensores en ese grupo. Esto es útil para visualizar la cobertura de las redes, pero actualmente no funciona para todos los cálculos. Si estás tratando de calcular ángulos de visión para una red, es mejor usar la herramienta de ángulos de visión multi-sitio o usar ángulos de visión para cada uno de los sensores individuales en la red. <br><br> Los sensores en esta lista incluyen Radares Mecánicos y de Array en Fase, además de sensores Ópticos: <ul style=\"margin-left: 40px;\"> <li> Los Radares de Array en Fase típicamente están limitados a la Órbita Terrestre Baja (LEO). </li> <li> Los Radares Mecánicos pueden usarse tanto para LEO como para la Órbita Geoestacionaria (GEO). </li> <li> Los sensores Ópticos se usan típicamente para GEO, pero también pueden usarse para LEO. </li> <li> Los sensores Ópticos están limitados a observaciones nocturnas en cielos despejados, mientras que los radares pueden usarse tanto de día como de noche. </li> </ul> <br> La información del sensor se basa en datos públicamente disponibles y puede verificarse en el menú de Información del Sensor. Si tienes datos públicos sobre sensores adicionales o correcciones a la información de sensores existentes, por favor contáctame en <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>."
+      "labels": {
+        "missingData": "Datos faltantes",
+        "tooltipSensorsInFov": "Visualizar cobertura de sensores"
+      },
+      "buttons": {
+        "resetSensor": "Restablecer sensor",
+        "showSensorsWithFov": "Mostrar todos los sensores con campo de visión..."
+      },
+      "commands": {
+        "category": "Sensores",
+        "setSensor": "Establecer el sensor actual en {name}",
+        "setSensorGroup": "Establecer grupo de sensores: {name}"
+      },
+      "help": {
+        "overview": "El menú de Sensores es donde eliges la estación terrestre desde la que calcula el resto de la aplicación. Los sensores están agrupados por la red que principalmente respaldan, y cada entrada muestra el nombre del sensor a la izquierda y el país u organización propietaria a la derecha. El sensor seleccionado determina los ángulos de visión, los conos de campo de visión, las alertas de pases de la lista de seguimiento y todos los demás menús que dependen de un sensor.",
+        "imgAlt": "El menú de Sensores mostrando redes de sensores agrupadas",
+        "imgCaption": "Los sensores están agrupados por red. Haz clic en el encabezado de un grupo para seleccionar toda la red de una vez.",
+        "sensorTypesHeading": "Tipos de Sensores",
+        "sensorTypes": "<ul><li><strong>Radares de array en fase</strong>: escaneo amplio y rápido; típicamente limitados a la Órbita Terrestre Baja (LEO).</li><li><strong>Radares mecánicos</strong>: antenas orientables utilizables tanto contra LEO como contra la Órbita Geoestacionaria (GEO).</li><li><strong>Telescopios ópticos</strong>: usados principalmente para GEO y el espacio profundo; solo funcionan de noche con cielos despejados, mientras que los radares funcionan de día y de noche.</li></ul>",
+        "howToUse": "<ol><li>Abre el menú desde la barra inferior o presiona S.</li><li>Haz clic en un sensor individual para seleccionarlo; la cámara vuela a su ubicación.</li><li>O haz clic en el encabezado de un grupo (p. ej. \"All Space Surveillance Network Sensors\") para seleccionar toda la red, lo cual es ideal para visualizar la cobertura.</li><li>Usa <strong>Restablecer sensor</strong> para borrar la selección.</li></ol>",
+        "tip1": "Muchos cálculos (como los ángulos de visión) necesitan un solo sensor. Si seleccionaste una red completa, usa el menú de ángulos de visión multi-sitio en su lugar o elige un sensor a la vez.",
+        "tip2": "Cada sensor también está disponible desde la paleta de comandos: escribe el nombre del sensor para cambiar sin abrir este menú.",
+        "tip3": "Los parámetros de los sensores provienen de datos públicamente disponibles; puedes revisarlos en el menú de Información del Sensor. Las correcciones son bienvenidas en admin@keeptrack.space.",
+        "shortcutToggle": "Alternar el menú de Sensores",
+        "shortcutCamera": "Ajustar la cámara al sensor actual"
+      }
     }
   }
 }

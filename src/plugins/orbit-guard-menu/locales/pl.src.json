@@ -3,7 +3,30 @@
     "OrbitGuardMenuPlugin": {
       "bottomIconLabel": "Strażnik orbity",
       "title": "Strażnik orbity",
-      "helpBody": "Menu wykrywania anomalii Strażnika orbity wyświetla najnowsze zdarzenia manewrów, odchyleń orbity od normy oraz zmian stabilności satelitów."
+      "labels": {
+        "dataCredit": "*Dane Strażnika orbity dostarcza MSBAI.",
+        "previous": "Poprzednia",
+        "next": "Następna",
+        "pageOf": "Strona {current} z {total}"
+      },
+      "table": {
+        "norad": "NORAD",
+        "eventStartTime": "Czas rozpoczęcia zdarzenia",
+        "eventEndTime": "Czas zakończenia zdarzenia",
+        "maneuverClass": "Klasa manewru",
+        "maneuverProbability": "Prawdopodobieństwo manewru (%)",
+        "orbitOutOfFamily": "Orbita poza rodziną",
+        "stabilityChange": "Zmiana stabilności",
+        "stabilityChangeProbability": "Prawdopodobieństwo zmiany stabilności (%)"
+      },
+      "help": {
+        "overview": "Strażnik orbity wyświetla najnowsze wykrycia anomalii w całym katalogu: podejrzewane manewry, orbity, które odbiegły od swojej rodziny, oraz zmiany stabilności, każde z prawdopodobieństwem pewności. Dane pochodzą z usługi OrbitGuard firmy MSBAI i tworzą uporządkowaną listę satelitów wartych bliższego przyjrzenia się.",
+        "imgAlt": "Tabela anomalii Strażnika orbity z wykrytymi zdarzeniami",
+        "imgCaption": "Każdy wiersz to wykryte zdarzenie; czerwone komórki oznaczają wykrycia, które przekroczyły próg.",
+        "howToUse": "<ol><li>Otwórz menu <strong>Strażnik orbity</strong> z dolnego paska (tryb Zdarzenia). Najnowsze zdarzenia ładują się automatycznie.</li><li>Przejrzyj tabelę: komórki podświetlone na czerwono to wykrycia pozytywne (sklasyfikowany manewr, orbita poza rodziną lub zmiana stabilności).</li><li>Kliknij wiersz, aby przelecieć do tego satelity i przeskoczyć zegarem do końca zdarzenia.</li><li>Użyj przycisków <strong>Poprzednia</strong> i <strong>Następna</strong>, aby przeglądać listę, po 20 zdarzeń na stronę.</li></ol>",
+        "tip1": "Zdarzenia są deduplikowane dla każdego satelity i sortowane od najnowszych, więc górne wiersze pokazują najświeższą aktywność.",
+        "tip2": "Prawdopodobieństwa to pewność modelu, a nie pewnik; wartości środkowe traktuj jako sygnał do ręcznej weryfikacji, a nie jako wniosek."
+      }
     }
   }
 }

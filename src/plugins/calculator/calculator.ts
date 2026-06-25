@@ -1,53 +1,50 @@
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import { MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { StorageKey } from '@app/engine/persistence/storage-key';
+import { IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
+import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
+import { t7e } from '@app/locales/keys';
 import {
-  ClassicalElements,
-  DEG2RAD,
   Degrees,
   EpochUTC,
-  Geodetic,
-  ITRF,
   J2000,
   Kilometers,
   KilometersPerSecond,
-  RadecGeocentric,
-  Radians,
   RaeVec3,
   Satellite,
   TEME,
   Vector3D,
-  eci2rae,
-  rae2eci,
 } from '@ootk/src/main';
 import calculatorPng from '@public/img/icons/calculator.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import {
+  CARTESIAN_FRAMES,
+  CoordFrame,
+  ConversionContext,
+  FrameInputValues,
+  FrameOutputs,
+  OutputFormat,
+  formatValue,
+  frameInputToJ2000,
+  j2000ToAllFrames,
+  j2000ToFrameValues,
+  validateFrameInput,
+} from './calculator-core';
 import './calculator.css';
 
-enum CoordFrame {
-  J2000 = 'J2000',
-  ITRF = 'ITRF',
-  TEME = 'TEME',
-  LLA = 'LLA',
-  RAE = 'RAE',
-  RADEC = 'RaDec',
-  CLASSICAL = 'Classical',
-}
+/** Shorthand for this plugin's locale keys. */
+const l = (key: string): string => t7e(`plugins.Calculator.${key}` as Parameters<typeof t7e>[0]);
 
-enum OutputFormat {
-  FIXED_4 = '4',
-  FIXED_6 = '6',
-  FIXED_8 = '8',
-  SCIENTIFIC = 'sci',
-  DMS = 'dms',
-}
+/** Error messages thrown by calculator-core that map to a locale key under errorMsgs.*. */
+const CORE_ERROR_KEYS = new Set(['noSensorForRae']);
 
 interface FieldDef {
   id: string;
@@ -58,17 +55,37 @@ interface FieldDef {
   isAngle?: boolean;
 }
 
-const COORD_FRAME_LABELS: Record<CoordFrame, string> = {
-  [CoordFrame.J2000]: 'J2000 (ECI)',
-  [CoordFrame.ITRF]: 'ITRF (ECEF)',
-  [CoordFrame.TEME]: 'TEME',
-  [CoordFrame.LLA]: 'Geodetic (LLA)',
-  [CoordFrame.RAE]: 'RAE (Topocentric)',
-  [CoordFrame.RADEC]: 'RA/Dec (Geocentric)',
-  [CoordFrame.CLASSICAL]: 'Classical Elements',
-};
+interface CalculatorSettings {
+  inputFrame: CoordFrame;
+  outputFormat: OutputFormat;
+  showVelocity: boolean;
+  values: Record<string, string>;
+}
 
-const CARTESIAN_FRAMES: CoordFrame[] = [CoordFrame.J2000, CoordFrame.ITRF, CoordFrame.TEME];
+/*
+ * Frame labels resolve lazily so t7e is not evaluated at module parse time,
+ * before localization has loaded.
+ */
+const coordFrameLabel = (frame: CoordFrame): string => {
+  switch (frame) {
+    case CoordFrame.J2000:
+      return 'J2000 (ECI)';
+    case CoordFrame.ITRF:
+      return 'ITRF (ECEF)';
+    case CoordFrame.TEME:
+      return 'TEME';
+    case CoordFrame.LLA:
+      return l('frames.geodeticLla');
+    case CoordFrame.RAE:
+      return l('frames.raeTopocentric');
+    case CoordFrame.RADEC:
+      return l('frames.raDecGeocentric');
+    case CoordFrame.CLASSICAL:
+      return l('frames.classicalElements');
+    default:
+      return frame;
+  }
+};
 
 export class Calculator extends KeepTrackPlugin {
   readonly id = 'Calculator';
@@ -85,10 +102,47 @@ export class Calculator extends KeepTrackPlugin {
     minWidth: 350,
   };
 
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: l('title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: l('help.overview'),
+          image: {
+            src: 'img/help/calculator/calculator-menu.png',
+            alt: l('help.imgAlt'),
+            caption: l('help.imgCaption'),
+          },
+        },
+        {
+          heading: l('help.framesHeading'),
+          content: l('help.frames'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: l('help.howToUse'),
+        },
+      ],
+      tips: [l('help.tip1'), l('help.tip2'), l('help.tip3')],
+    };
+  }
+
+  getKeyboardShortcuts(): IKeyboardShortcut[] {
+    return [
+      {
+        key: 'c',
+        shift: true,
+        callback: () => {
+          this.bottomMenuClicked();
+        },
+      },
+    ];
+  }
+
   private currentInputFrame_: CoordFrame = CoordFrame.J2000;
   private outputFormat_: OutputFormat = OutputFormat.FIXED_4;
-  private lastJ2000_: J2000 | null = null;
-  private lastEpoch_: EpochUTC | null = null;
+  private lastOutputs_: FrameOutputs | null = null;
   private lastRae_: RaeVec3<Kilometers, Degrees> | null = null;
   private sensorUsedInCalculation_: DetailedSensor | null = null;
   private showVelocity_ = false;
@@ -96,56 +150,63 @@ export class Calculator extends KeepTrackPlugin {
   sideMenuElementHtml = html`
     <div id="calculator-content">
       <form id="calculator-form">
-        <div class="row calc-control-row">
-          <div class="input-field col s12">
-            <label for="calc-input-frame">Input Frame</label>
-            <select id="calc-input-frame" class="browser-default">
+        <section class="kt-section">
+          <div class="kt-section-label">${l('sections.input')}</div>
+          <div class="input-field kt-field-row calc-control-row">
+            <select id="calc-input-frame">
               ${Object.values(CoordFrame).map((f) =>
-    `<option value="${f}" ${f === CoordFrame.J2000 ? 'selected' : ''}>${COORD_FRAME_LABELS[f]}</option>`,
+    `<option value="${f}" ${f === CoordFrame.J2000 ? 'selected' : ''}>${coordFrameLabel(f)}</option>`,
   ).join('')}
             </select>
+            <label for="calc-input-frame">${l('labels.inputFrame')}</label>
           </div>
-        </div>
 
-        <div class="center-align row" id="calc-load-sat-row">
-          <button id="calc-load-sat-btn" class="btn btn-ui waves-effect waves-light" type="button">Load Selected Satellite</button>
-        </div>
+          <button id="calc-load-sat-btn" class="kt-action calc-load-action waves-effect waves-light" type="button">
+            <span class="kt-action-label">${l('labels.loadSelectedSatellite')}</span>
+          </button>
 
-        <div id="calc-input-fields"></div>
+          <div id="calc-input-fields"></div>
 
-        <div id="calc-velocity-toggle" class="row" style="display:none;">
-          <div class="col s12">
+          <div id="calc-velocity-toggle" class="row calc-velocity-row" style="display:none;">
             <label>
               <input type="checkbox" id="calc-show-velocity" />
-              <span>Include Velocity</span>
+              <span>${l('labels.includeVelocity')}</span>
             </label>
           </div>
-        </div>
 
-        <div id="calc-velocity-fields" style="display:none;"></div>
+          <div id="calc-velocity-fields" style="display:none;"></div>
+        </section>
 
-        <div class="center-align row" style="margin: 1rem 0rem 0rem 0rem;">
-          <button id="calc-convert-btn" class="btn btn-ui waves-effect waves-light" type="submit">Convert &#9658;</button>
-        </div>
+        <button id="calc-convert-btn" class="kt-action calc-standalone-action waves-effect waves-light" type="button">
+          <span class="kt-action-label">${l('labels.convert')}</span>
+        </button>
       </form>
 
-      <div class="row calc-control-row">
-        <div class="input-field col s12">
-          <label for="calc-output-format">Output Format</label>
-          <select id="calc-output-format" class="browser-default">
-            <option value="4" selected>Fixed (4 decimals)</option>
-            <option value="6">Fixed (6 decimals)</option>
-            <option value="8">Fixed (8 decimals)</option>
-            <option value="sci">Scientific Notation</option>
-            <option value="dms">DMS (angles)</option>
+      <section class="kt-section">
+        <div class="kt-section-label">${l('labels.outputFormat')}</div>
+        <div class="input-field kt-field-row calc-control-row">
+          <select id="calc-output-format">
+            <option value="4" selected>${l('formats.fixed4')}</option>
+            <option value="6">${l('formats.fixed6')}</option>
+            <option value="8">${l('formats.fixed8')}</option>
+            <option value="sci">${l('formats.scientific')}</option>
+            <option value="dms">${l('formats.dms')}</option>
           </select>
+          <label for="calc-output-format">${l('labels.outputFormat')}</label>
         </div>
-      </div>
+        <div id="calc-epoch-readout" class="calc-epoch" style="display:none;"></div>
+      </section>
 
       <div id="calc-output-sections"></div>
 
-      <div id="calc-draw-line-row" class="center-align row" style="display:none;">
-        <button id="calc-draw-line-btn" class="btn btn-ui waves-effect waves-light" type="button">Draw Line</button>
+      <button id="calc-copy-btn" class="kt-action calc-standalone-action waves-effect waves-light" type="button" style="display:none;">
+        <span class="kt-action-label">${l('labels.copyResults')}</span>
+      </button>
+
+      <div id="calc-draw-line-row" style="display:none;">
+        <button id="calc-draw-line-btn" class="kt-action calc-standalone-action waves-effect waves-light" type="button">
+          <span class="kt-action-label">${l('labels.drawLine')}</span>
+        </button>
       </div>
     </div>
   `;
@@ -155,9 +216,15 @@ export class Calculator extends KeepTrackPlugin {
     EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
+        // The wrapper root is generated by the base plugin, so opt it into v13 styling here.
+        getEl(this.sideMenuElementName, true)?.classList.add('kt-ui-v13');
+        this.restoreSettings_();
         this.setupEventListeners_();
         this.rebuildInputFields_();
         this.rebuildOutputSections_();
+        // Render the frame/format selects as themed Materialize dropdowns (native
+        // <select> popups can't be themed and show an OS-blue hover).
+        initMaterialSelects(getEl(this.sideMenuElementName, true) ?? document.body);
       },
     );
   }
@@ -165,21 +232,25 @@ export class Calculator extends KeepTrackPlugin {
   private setupEventListeners_(): void {
     getEl('calc-input-frame')?.addEventListener('change', () => {
       this.currentInputFrame_ = (getEl('calc-input-frame') as HTMLSelectElement).value as CoordFrame;
-      this.lastJ2000_ = null;
+      this.lastOutputs_ = null;
       this.rebuildInputFields_();
       this.rebuildOutputSections_();
+      this.persistSettings_();
     });
 
     getEl('calc-output-format')?.addEventListener('change', () => {
       this.outputFormat_ = (getEl('calc-output-format') as HTMLSelectElement).value as OutputFormat;
-      if (this.lastJ2000_ && this.lastEpoch_) {
-        this.populateOutputs_(this.lastJ2000_);
+      // Re-render from the stored numeric result; no recomputation (which would re-read the
+      // clock and silently mix epochs between the conversion and the format change).
+      if (this.lastOutputs_) {
+        this.renderOutputs_();
       }
+      this.persistSettings_();
     });
 
     getEl('calc-show-velocity')?.addEventListener('change', () => {
       this.showVelocity_ = (getEl('calc-show-velocity') as HTMLInputElement).checked;
-      const velFields = getEl('calc-velocity-fields');
+      const velFields = getEl('calc-velocity-fields', true);
 
       if (velFields) {
         velFields.style.display = this.showVelocity_ ? 'block' : 'none';
@@ -191,12 +262,25 @@ export class Calculator extends KeepTrackPlugin {
       this.convert_();
     });
 
+    getEl('calc-copy-btn')?.addEventListener('click', () => {
+      this.copyResults_();
+    });
+
     getEl('calc-draw-line-btn')?.addEventListener('click', () => {
       this.drawLine_();
     });
 
     getEl('calc-load-sat-btn')?.addEventListener('click', () => {
       this.loadSelectedSatellite_();
+    });
+
+    // Click any output value to copy it.
+    getEl('calc-output-sections')?.addEventListener('click', (e) => {
+      const target = (e.target as HTMLElement).closest('.calc-output-value') as HTMLElement | null;
+
+      if (target && target.textContent && target.textContent !== '-') {
+        this.copyText_(target.textContent);
+      }
     });
   }
 
@@ -214,31 +298,31 @@ export class Calculator extends KeepTrackPlugin {
         ];
       case CoordFrame.LLA:
         return [
-          { id: 'lat', label: 'Latitude', unit: 'deg', default: '0', isAngle: true },
-          { id: 'lon', label: 'Longitude', unit: 'deg', default: '0', isAngle: true },
-          { id: 'alt', label: 'Altitude', unit: 'km', default: '400' },
+          { id: 'lat', label: l('labels.latitude'), unit: 'deg', default: '0', isAngle: true },
+          { id: 'lon', label: l('labels.longitude'), unit: 'deg', default: '0', isAngle: true },
+          { id: 'alt', label: l('labels.altitude'), unit: 'km', default: '400' },
         ];
       case CoordFrame.RAE:
         return [
-          { id: 'sensor', label: 'Sensor', unit: '', default: '', readonly: true },
-          { id: 'r', label: 'Range', unit: 'km', default: '3000' },
-          { id: 'a', label: 'Azimuth', unit: 'deg', default: '45', isAngle: true },
-          { id: 'e', label: 'Elevation', unit: 'deg', default: '30', isAngle: true },
+          { id: 'sensor', label: l('labels.sensor'), unit: '', default: '', readonly: true },
+          { id: 'r', label: l('labels.range'), unit: 'km', default: '3000' },
+          { id: 'a', label: l('labels.azimuth'), unit: 'deg', default: '45', isAngle: true },
+          { id: 'e', label: l('labels.elevation'), unit: 'deg', default: '30', isAngle: true },
         ];
       case CoordFrame.RADEC:
         return [
-          { id: 'ra', label: 'Right Ascension', unit: 'deg', default: '0', isAngle: true },
-          { id: 'dec', label: 'Declination', unit: 'deg', default: '0', isAngle: true },
-          { id: 'range', label: 'Range', unit: 'km', default: '6778' },
+          { id: 'ra', label: l('labels.rightAscension'), unit: 'deg', default: '0', isAngle: true },
+          { id: 'dec', label: l('labels.declination'), unit: 'deg', default: '0', isAngle: true },
+          { id: 'range', label: l('labels.range'), unit: 'km', default: '6778' },
         ];
       case CoordFrame.CLASSICAL:
         return [
-          { id: 'sma', label: 'Semi-major Axis', unit: 'km', default: '6778' },
-          { id: 'ecc', label: 'Eccentricity', unit: '', default: '0.001' },
-          { id: 'inc', label: 'Inclination', unit: 'deg', default: '51.6', isAngle: true },
-          { id: 'raan', label: 'RAAN', unit: 'deg', default: '0', isAngle: true },
-          { id: 'argpe', label: 'Arg. Perigee', unit: 'deg', default: '0', isAngle: true },
-          { id: 'nu', label: 'True Anomaly', unit: 'deg', default: '0', isAngle: true },
+          { id: 'sma', label: l('labels.semiMajorAxis'), unit: 'km', default: '6778' },
+          { id: 'ecc', label: l('labels.eccentricity'), unit: '', default: '0.001' },
+          { id: 'inc', label: l('labels.inclination'), unit: 'deg', default: '51.6', isAngle: true },
+          { id: 'raan', label: l('labels.raan'), unit: 'deg', default: '0', isAngle: true },
+          { id: 'argpe', label: l('labels.argPerigee'), unit: 'deg', default: '0', isAngle: true },
+          { id: 'nu', label: l('labels.trueAnomaly'), unit: 'deg', default: '0', isAngle: true },
         ];
       default:
         return [];
@@ -268,34 +352,34 @@ export class Calculator extends KeepTrackPlugin {
         ];
       case CoordFrame.LLA:
         return [
-          { id: 'lla-lat', label: 'Latitude', unit: 'deg', default: '', isAngle: true },
-          { id: 'lla-lon', label: 'Longitude', unit: 'deg', default: '', isAngle: true },
-          { id: 'lla-alt', label: 'Altitude', unit: 'km', default: '' },
+          { id: 'lla-lat', label: l('labels.latitude'), unit: 'deg', default: '', isAngle: true },
+          { id: 'lla-lon', label: l('labels.longitude'), unit: 'deg', default: '', isAngle: true },
+          { id: 'lla-alt', label: l('labels.altitude'), unit: 'km', default: '' },
         ];
       case CoordFrame.RAE:
         return [
-          { id: 'rae-sensor', label: 'Sensor', unit: '', default: '' },
-          { id: 'rae-r', label: 'Range', unit: 'km', default: '' },
-          { id: 'rae-a', label: 'Azimuth', unit: 'deg', default: '', isAngle: true },
-          { id: 'rae-e', label: 'Elevation', unit: 'deg', default: '', isAngle: true },
+          { id: 'rae-sensor', label: l('labels.sensor'), unit: '', default: '' },
+          { id: 'rae-r', label: l('labels.range'), unit: 'km', default: '' },
+          { id: 'rae-a', label: l('labels.azimuth'), unit: 'deg', default: '', isAngle: true },
+          { id: 'rae-e', label: l('labels.elevation'), unit: 'deg', default: '', isAngle: true },
         ];
       case CoordFrame.RADEC:
         return [
-          { id: 'radec-ra', label: 'Right Ascension', unit: 'deg', default: '', isAngle: true },
-          { id: 'radec-dec', label: 'Declination', unit: 'deg', default: '', isAngle: true },
-          { id: 'radec-range', label: 'Range', unit: 'km', default: '' },
+          { id: 'radec-ra', label: l('labels.rightAscension'), unit: 'deg', default: '', isAngle: true },
+          { id: 'radec-dec', label: l('labels.declination'), unit: 'deg', default: '', isAngle: true },
+          { id: 'radec-range', label: l('labels.range'), unit: 'km', default: '' },
         ];
       case CoordFrame.CLASSICAL:
         return [
-          { id: 'ce-sma', label: 'Semi-major Axis', unit: 'km', default: '' },
-          { id: 'ce-ecc', label: 'Eccentricity', unit: '', default: '' },
-          { id: 'ce-inc', label: 'Inclination', unit: 'deg', default: '', isAngle: true },
-          { id: 'ce-raan', label: 'RAAN', unit: 'deg', default: '', isAngle: true },
-          { id: 'ce-argpe', label: 'Arg. Perigee', unit: 'deg', default: '', isAngle: true },
-          { id: 'ce-nu', label: 'True Anomaly', unit: 'deg', default: '', isAngle: true },
-          { id: 'ce-period', label: 'Period', unit: 'min', default: '' },
-          { id: 'ce-apogee', label: 'Apogee Alt', unit: 'km', default: '' },
-          { id: 'ce-perigee', label: 'Perigee Alt', unit: 'km', default: '' },
+          { id: 'ce-sma', label: l('labels.semiMajorAxis'), unit: 'km', default: '' },
+          { id: 'ce-ecc', label: l('labels.eccentricity'), unit: '', default: '' },
+          { id: 'ce-inc', label: l('labels.inclination'), unit: 'deg', default: '', isAngle: true },
+          { id: 'ce-raan', label: l('labels.raan'), unit: 'deg', default: '', isAngle: true },
+          { id: 'ce-argpe', label: l('labels.argPerigee'), unit: 'deg', default: '', isAngle: true },
+          { id: 'ce-nu', label: l('labels.trueAnomaly'), unit: 'deg', default: '', isAngle: true },
+          { id: 'ce-period', label: l('labels.period'), unit: 'min', default: '' },
+          { id: 'ce-apogee', label: l('labels.apogeeAlt'), unit: 'km', default: '' },
+          { id: 'ce-perigee', label: l('labels.perigeeAlt'), unit: 'km', default: '' },
         ];
       default:
         return [];
@@ -305,7 +389,7 @@ export class Calculator extends KeepTrackPlugin {
   // ── DOM Rendering ──
 
   private rebuildInputFields_(): void {
-    const container = getEl('calc-input-fields');
+    const container = getEl('calc-input-fields', true);
 
     if (!container) {
       return;
@@ -326,8 +410,8 @@ export class Calculator extends KeepTrackPlugin {
 
     // Velocity toggle visibility
     const isCartesian = CARTESIAN_FRAMES.includes(this.currentInputFrame_);
-    const velToggle = getEl('calc-velocity-toggle');
-    const velFields = getEl('calc-velocity-fields');
+    const velToggle = getEl('calc-velocity-toggle', true);
+    const velFields = getEl('calc-velocity-fields', true);
 
     if (velToggle) {
       velToggle.style.display = isCartesian ? 'block' : 'none';
@@ -344,16 +428,19 @@ export class Calculator extends KeepTrackPlugin {
     // Auto-populate sensor name for RAE
     if (this.currentInputFrame_ === CoordFrame.RAE) {
       const sensor = ServiceLocator.getSensorManager().currentSensors[0];
-      const sensorInput = getEl('calc-in-sensor') as HTMLInputElement | null;
+      const sensorInput = getEl('calc-in-sensor', true) as HTMLInputElement | null;
 
       if (sensorInput) {
-        sensorInput.value = sensor?.name ?? 'No sensor selected';
+        sensorInput.value = sensor?.name ?? l('msgs.noSensorSelected');
       }
     }
+
+    // Apply any persisted field values now that the inputs exist.
+    this.applyPendingRestore_();
   }
 
   private rebuildVelocityFields_(): void {
-    const container = getEl('calc-velocity-fields');
+    const container = getEl('calc-velocity-fields', true);
 
     if (!container) {
       return;
@@ -370,7 +457,7 @@ export class Calculator extends KeepTrackPlugin {
   }
 
   private rebuildOutputSections_(): void {
-    const container = getEl('calc-output-sections');
+    const container = getEl('calc-output-sections', true);
 
     if (!container) {
       return;
@@ -381,136 +468,78 @@ export class Calculator extends KeepTrackPlugin {
     container.innerHTML = outputFrames.map((frame) => {
       const fields = this.getOutputFieldDefs_(frame);
 
-      return `<div class="calc-output-section" id="calc-out-${frame.toLowerCase()}-section">
-        <div class="center-align calc-section-header">${COORD_FRAME_LABELS[frame]}</div>
+      return `<section class="kt-section calc-output-section" id="calc-out-${frame.toLowerCase()}-section">
+        <div class="kt-section-label">${coordFrameLabel(frame)}</div>
         ${fields.map((f) => {
         const unitSuffix = f.unit ? ` (${f.unit})` : '';
 
         return `<div class="row calc-output-row">
             <div class="col s5 calc-output-label">${f.label}${unitSuffix}</div>
-            <div class="col s7 calc-output-value" id="calc-out-${f.id}">-</div>
+            <div class="col s7 calc-output-value" id="calc-out-${f.id}" title="${l('labels.clickToCopy')}">-</div>
           </div>`;
       }).join('')}
-      </div>`;
+      </section>`;
     }).join('');
 
-    // Reset draw line visibility
-    const drawLineRow = getEl('calc-draw-line-row');
-
-    if (drawLineRow) {
-      drawLineRow.style.display = 'none';
-    }
+    // Reset post-conversion controls.
+    this.setDisplay_('calc-draw-line-row', false);
+    this.setDisplay_('calc-copy-btn', false);
   }
 
-  // ── Formatting ──
+  // ── Formatting (thin wrapper over calculator-core) ──
 
   private formatValue_(value: number, isAngle = false): string {
-    switch (this.outputFormat_) {
-      case OutputFormat.FIXED_4:
-        return value.toFixed(4);
-      case OutputFormat.FIXED_6:
-        return value.toFixed(6);
-      case OutputFormat.FIXED_8:
-        return value.toFixed(8);
-      case OutputFormat.SCIENTIFIC:
-        return value.toExponential(6);
-      case OutputFormat.DMS:
-        return isAngle ? Calculator.toDms_(value) : value.toFixed(4);
-      default:
-        return value.toFixed(4);
-    }
-  }
-
-  private static toDms_(degrees: number): string {
-    const sign = degrees < 0 ? '-' : '';
-    const abs = Math.abs(degrees);
-    const d = Math.floor(abs);
-    const mFloat = (abs - d) * 60;
-    const m = Math.floor(mFloat);
-    const s = (mFloat - m) * 60;
-
-    return `${sign}${d}\u00B0 ${m}' ${s.toFixed(2)}"`;
+    return formatValue(value, this.outputFormat_, isAngle);
   }
 
   // ── Input Reading ──
 
   private readNumericInput_(fieldId: string, fieldName: string): number {
-    const el = getEl(fieldId) as HTMLInputElement | null;
+    const el = getEl(fieldId, true) as HTMLInputElement | null;
 
     if (!el) {
-      throw new Error(`Field ${fieldName} not found`);
+      throw new Error(l('errorMsgs.fieldNotFound').replace('{field}', fieldName));
     }
 
     const val = Number(el.value);
 
     if (isNaN(val)) {
-      throw new Error(`Invalid input for ${fieldName}: "${el.value}" is not a number.`);
+      throw new Error(l('errorMsgs.invalidInput').replace('{field}', fieldName).replace('{value}', el.value));
     }
 
     return val;
   }
 
-  private readCartesianInputs_(): { position: Vector3D<Kilometers>; velocity: Vector3D<KilometersPerSecond> } {
-    const x = this.readNumericInput_('calc-in-x', 'X') as Kilometers;
-    const y = this.readNumericInput_('calc-in-y', 'Y') as Kilometers;
-    const z = this.readNumericInput_('calc-in-z', 'Z') as Kilometers;
-    const position = new Vector3D<Kilometers>(x, y, z);
+  /** Read every editable field for the active frame into a parsed numeric bag. */
+  private readInputs_(frame: CoordFrame): FrameInputValues {
+    const values: FrameInputValues = {};
 
-    let velocity = Vector3D.origin as Vector3D<KilometersPerSecond>;
-
-    if (this.showVelocity_ && CARTESIAN_FRAMES.includes(this.currentInputFrame_)) {
-      const vx = this.readNumericInput_('calc-in-vx', 'Vx') as KilometersPerSecond;
-      const vy = this.readNumericInput_('calc-in-vy', 'Vy') as KilometersPerSecond;
-      const vz = this.readNumericInput_('calc-in-vz', 'Vz') as KilometersPerSecond;
-
-      velocity = new Vector3D<KilometersPerSecond>(vx, vy, vz);
+    for (const f of this.getInputFieldDefs_(frame)) {
+      if (f.readonly) {
+        continue;
+      }
+      values[f.id] = this.readNumericInput_(`calc-in-${f.id}`, f.label);
     }
 
-    return { position, velocity };
-  }
-
-  private readGeodeticInputs_(): { lat: Degrees; lon: Degrees; alt: Kilometers } {
-    const lat = this.readNumericInput_('calc-in-lat', 'Latitude') as Degrees;
-    const lon = this.readNumericInput_('calc-in-lon', 'Longitude') as Degrees;
-    const alt = this.readNumericInput_('calc-in-alt', 'Altitude') as Kilometers;
-
-    return { lat, lon, alt };
-  }
-
-  private readRaeInputs_(): { rae: RaeVec3<Kilometers, Degrees>; sensor: DetailedSensor } {
-    const sensor = ServiceLocator.getSensorManager().currentSensors[0];
-
-    if (!sensor) {
-      throw new Error('RAE conversion requires a sensor to be selected.');
+    if (CARTESIAN_FRAMES.includes(frame) && this.showVelocity_) {
+      for (const f of this.getVelocityFieldDefs_()) {
+        values[f.id] = this.readNumericInput_(`calc-in-${f.id}`, f.label);
+      }
     }
 
-    const rng = this.readNumericInput_('calc-in-r', 'Range') as Kilometers;
-    const az = this.readNumericInput_('calc-in-a', 'Azimuth') as Degrees;
-    const el = this.readNumericInput_('calc-in-e', 'Elevation') as Degrees;
+    return values;
+  }
+
+  private buildContext_(epoch: EpochUTC): ConversionContext {
+    const timeManager = ServiceLocator.getTimeManager();
+    const rawSensor = ServiceLocator.getSensorManager().currentSensors[0];
 
     return {
-      rae: { rng, az, el } as RaeVec3<Kilometers, Degrees>,
-      sensor: new DetailedSensor(sensor),
-    };
-  }
-
-  private readClassicalInputs_(epoch: EpochUTC): ClassicalElements {
-    const sma = this.readNumericInput_('calc-in-sma', 'Semi-major Axis') as Kilometers;
-    const ecc = this.readNumericInput_('calc-in-ecc', 'Eccentricity');
-    const inc = this.readNumericInput_('calc-in-inc', 'Inclination');
-    const raan = this.readNumericInput_('calc-in-raan', 'RAAN');
-    const argpe = this.readNumericInput_('calc-in-argpe', 'Arg. Perigee');
-    const nu = this.readNumericInput_('calc-in-nu', 'True Anomaly');
-
-    return new ClassicalElements({
       epoch,
-      semimajorAxis: sma,
-      eccentricity: ecc,
-      inclination: (inc * DEG2RAD) as Radians,
-      rightAscension: (raan * DEG2RAD) as Radians,
-      argPerigee: (argpe * DEG2RAD) as Radians,
-      trueAnomaly: (nu * DEG2RAD) as Radians,
-    });
+      date: timeManager.simulationTimeObj,
+      gmst: timeManager.gmst,
+      sensor: rawSensor ? new DetailedSensor(rawSensor) : null,
+    };
   }
 
   // ── Conversion Engine ──
@@ -519,220 +548,203 @@ export class Calculator extends KeepTrackPlugin {
     try {
       const timeManager = ServiceLocator.getTimeManager();
       const epoch = EpochUTC.fromDateTime(timeManager.simulationTimeObj);
-      const j2000 = this.inputToJ2000_(epoch);
+      const values = this.readInputs_(this.currentInputFrame_);
+      const validationError = validateFrameInput(this.currentInputFrame_, values);
 
-      this.lastJ2000_ = j2000;
-      this.lastEpoch_ = epoch;
-      this.populateOutputs_(j2000);
+      if (validationError) {
+        errorManagerInstance.warn(l(`errorMsgs.${validationError}`));
+
+        return;
+      }
+
+      const ctx = this.buildContext_(epoch);
+      const j2000 = frameInputToJ2000(this.currentInputFrame_, values, ctx);
+
+      this.lastOutputs_ = j2000ToAllFrames(j2000, this.currentInputFrame_, ctx);
+      this.renderOutputs_();
+      this.updateEpochReadout_(timeManager.simulationTimeObj);
+      this.setDisplay_('calc-copy-btn', true);
+      this.persistSettings_();
     } catch (err) {
-      errorManagerInstance.warn(`Conversion failed: ${(err as Error).message}`);
+      const message = (err as Error).message;
+
+      errorManagerInstance.warn(CORE_ERROR_KEYS.has(message)
+        ? l(`errorMsgs.${message}`)
+        : l('errorMsgs.conversionFailed').replace('{error}', message));
     }
   }
 
-  private inputToJ2000_(epoch: EpochUTC): J2000 {
-    const zeroVel = Vector3D.origin as Vector3D<KilometersPerSecond>;
-
-    switch (this.currentInputFrame_) {
-      case CoordFrame.J2000: {
-        const { position, velocity } = this.readCartesianInputs_();
-
-        return new J2000(epoch, position, velocity);
-      }
-      case CoordFrame.ITRF: {
-        const { position, velocity } = this.readCartesianInputs_();
-
-        return new ITRF(epoch, position, velocity).toJ2000();
-      }
-      case CoordFrame.TEME: {
-        const { position, velocity } = this.readCartesianInputs_();
-
-        return new TEME(epoch, position, velocity).toJ2000();
-      }
-      case CoordFrame.LLA: {
-        const { lat, lon, alt } = this.readGeodeticInputs_();
-
-        return Geodetic.fromDegrees(lat, lon, alt).toITRF(epoch).toJ2000();
-      }
-      case CoordFrame.RAE: {
-        const { rae, sensor } = this.readRaeInputs_();
-        const gmst = ServiceLocator.getTimeManager().gmst;
-        const eci = rae2eci(rae, sensor.lla(), gmst);
-
-        return new J2000(epoch,
-          new Vector3D<Kilometers>(eci.x, eci.y, eci.z),
-          zeroVel,
-        );
-      }
-      case CoordFrame.RADEC: {
-        const ra = this.readNumericInput_('calc-in-ra', 'Right Ascension');
-        const dec = this.readNumericInput_('calc-in-dec', 'Declination');
-        const range = this.readNumericInput_('calc-in-range', 'Range') as Kilometers;
-        const radec = RadecGeocentric.fromDegrees(epoch, ra as Degrees, dec as Degrees, range);
-        const pos = radec.position(range);
-
-        return new J2000(epoch, pos, zeroVel);
-      }
-      case CoordFrame.CLASSICAL: {
-        return this.readClassicalInputs_(epoch).toJ2000();
-      }
-      default:
-        throw new Error(`Unknown input frame: ${this.currentInputFrame_}`);
+  private renderOutputs_(): void {
+    if (!this.lastOutputs_) {
+      return;
     }
-  }
 
-  private populateOutputs_(j2000: J2000): void {
+    const o = this.lastOutputs_;
     const fmt = (v: number, isAngle = false) => this.formatValue_(v, isAngle);
     const set = (id: string, value: string) => {
-      const el = getEl(`calc-out-${id}`);
+      const el = getEl(`calc-out-${id}`, true);
 
       if (el) {
         el.textContent = value;
       }
     };
+    const setCartesian = (prefix: string, c: FrameOutputs['j2000']) => {
+      if (!c) {
+        return;
+      }
+      set(`${prefix}-x`, fmt(c.x));
+      set(`${prefix}-y`, fmt(c.y));
+      set(`${prefix}-z`, fmt(c.z));
+      set(`${prefix}-vx`, fmt(c.vx));
+      set(`${prefix}-vy`, fmt(c.vy));
+      set(`${prefix}-vz`, fmt(c.vz));
+    };
 
-    // J2000
-    if (this.currentInputFrame_ !== CoordFrame.J2000) {
-      set('j2000-x', fmt(j2000.position.x));
-      set('j2000-y', fmt(j2000.position.y));
-      set('j2000-z', fmt(j2000.position.z));
-      set('j2000-vx', fmt(j2000.velocity.x));
-      set('j2000-vy', fmt(j2000.velocity.y));
-      set('j2000-vz', fmt(j2000.velocity.z));
+    setCartesian('j2000', o.j2000);
+    setCartesian('itrf', o.itrf);
+    setCartesian('teme', o.teme);
+
+    if (o.lla) {
+      set('lla-lat', fmt(o.lla.lat, true));
+      set('lla-lon', fmt(o.lla.lon, true));
+      set('lla-alt', fmt(o.lla.alt));
     }
 
-    // ITRF
-    if (this.currentInputFrame_ !== CoordFrame.ITRF) {
-      const itrf = j2000.toITRF();
-
-      set('itrf-x', fmt(itrf.position.x));
-      set('itrf-y', fmt(itrf.position.y));
-      set('itrf-z', fmt(itrf.position.z));
-      set('itrf-vx', fmt(itrf.velocity.x));
-      set('itrf-vy', fmt(itrf.velocity.y));
-      set('itrf-vz', fmt(itrf.velocity.z));
+    if (o.rae !== undefined) {
+      this.renderRae_(o.rae, fmt, set);
     }
 
-    // TEME
-    if (this.currentInputFrame_ !== CoordFrame.TEME) {
-      const teme = j2000.toTEME();
-
-      set('teme-x', fmt(teme.position.x));
-      set('teme-y', fmt(teme.position.y));
-      set('teme-z', fmt(teme.position.z));
-      set('teme-vx', fmt(teme.velocity.x));
-      set('teme-vy', fmt(teme.velocity.y));
-      set('teme-vz', fmt(teme.velocity.z));
+    if (o.radec) {
+      set('radec-ra', fmt(o.radec.ra, true));
+      set('radec-dec', fmt(o.radec.dec, true));
+      set('radec-range', fmt(o.radec.range));
     }
 
-    // LLA (Geodetic)
-    if (this.currentInputFrame_ !== CoordFrame.LLA) {
-      const geodetic = j2000.toITRF().toGeodetic();
-
-      set('lla-lat', fmt(geodetic.latDeg, true));
-      set('lla-lon', fmt(geodetic.lonDeg, true));
-      set('lla-alt', fmt(geodetic.alt));
-    }
-
-    // RAE
-    this.populateRaeOutput_(j2000, fmt, set);
-
-    // RA/Dec (Geocentric)
-    if (this.currentInputFrame_ !== CoordFrame.RADEC) {
-      const radec = RadecGeocentric.fromStateVector(j2000);
-
-      set('radec-ra', fmt(radec.rightAscensionDegrees, true));
-      set('radec-dec', fmt(radec.declinationDegrees, true));
-      set('radec-range', fmt(j2000.position.magnitude()));
-    }
-
-    // Classical Elements
-    if (this.currentInputFrame_ !== CoordFrame.CLASSICAL) {
-      this.populateClassicalOutput_(j2000, fmt, set);
+    if (o.classical !== undefined) {
+      this.renderClassical_(o.classical, fmt, set);
     }
   }
 
-  private populateRaeOutput_(
-    j2000: J2000,
+  private renderRae_(
+    rae: FrameOutputs['rae'],
     fmt: (v: number, isAngle?: boolean) => string,
     set: (id: string, value: string) => void,
   ): void {
-    if (this.currentInputFrame_ === CoordFrame.RAE) {
-      return;
-    }
-
-    const sensor = ServiceLocator.getSensorManager().currentSensors[0];
-
-    if (sensor) {
-      const teme = j2000.toTEME();
-      const rae = eci2rae(
-        ServiceLocator.getTimeManager().simulationTimeObj,
-        { x: teme.position.x, y: teme.position.y, z: teme.position.z },
-        sensor,
-      );
-
-      this.sensorUsedInCalculation_ = new DetailedSensor(sensor);
-      this.lastRae_ = { rng: rae.rng, az: rae.az, el: rae.el } as RaeVec3<Kilometers, Degrees>;
-
-      set('rae-sensor', sensor.name);
-      set('rae-r', fmt(rae.rng));
-      set('rae-a', fmt(rae.az, true));
-      set('rae-e', fmt(rae.el, true));
-
-      const drawLineRow = getEl('calc-draw-line-row');
-
-      if (drawLineRow) {
-        drawLineRow.style.display = 'block';
-      }
-    } else {
+    if (!rae) {
       this.lastRae_ = null;
-      set('rae-sensor', 'No sensor selected');
+      this.sensorUsedInCalculation_ = null;
+      set('rae-sensor', l('msgs.noSensorSelected'));
       set('rae-r', '-');
       set('rae-a', '-');
       set('rae-e', '-');
-    }
-  }
-
-  private populateClassicalOutput_(
-    j2000: J2000,
-    fmt: (v: number, isAngle?: boolean) => string,
-    set: (id: string, value: string) => void,
-  ): void {
-    const velMag = j2000.velocity.magnitude();
-
-    if (velMag < 0.001) {
-      const noVel = 'Needs velocity';
-
-      set('ce-sma', noVel);
-      set('ce-ecc', noVel);
-      set('ce-inc', noVel);
-      set('ce-raan', noVel);
-      set('ce-argpe', noVel);
-      set('ce-nu', noVel);
-      set('ce-period', noVel);
-      set('ce-apogee', noVel);
-      set('ce-perigee', noVel);
+      this.setDisplay_('calc-draw-line-row', false);
 
       return;
     }
 
-    const ce = j2000.toClassicalElements();
+    this.lastRae_ = { rng: rae.range, az: rae.az, el: rae.el } as RaeVec3<Kilometers, Degrees>;
+    this.sensorUsedInCalculation_ = this.buildContext_(EpochUTC.fromDateTime(ServiceLocator.getTimeManager().simulationTimeObj)).sensor ?? null;
 
-    set('ce-sma', fmt(ce.semimajorAxis));
-    set('ce-ecc', ce.eccentricity.toFixed(7));
-    set('ce-inc', fmt(ce.inclinationDegrees, true));
-    set('ce-raan', fmt(ce.rightAscensionDegrees, true));
-    set('ce-argpe', fmt(ce.argPerigeeDegrees, true));
-    set('ce-nu', fmt(ce.trueAnomalyDegrees, true));
-    set('ce-period', fmt(ce.period));
-    set('ce-apogee', fmt(ce.apogee));
-    set('ce-perigee', fmt(ce.perigee));
+    set('rae-sensor', rae.sensorName);
+    set('rae-r', fmt(rae.range));
+    set('rae-a', fmt(rae.az, true));
+    set('rae-e', fmt(rae.el, true));
+    this.setDisplay_('calc-draw-line-row', true);
+  }
+
+  private renderClassical_(
+    classical: FrameOutputs['classical'],
+    fmt: (v: number, isAngle?: boolean) => string,
+    set: (id: string, value: string) => void,
+  ): void {
+    if (classical === 'needsVelocity') {
+      const noVel = l('msgs.needsVelocity');
+
+      for (const id of ['ce-sma', 'ce-ecc', 'ce-inc', 'ce-raan', 'ce-argpe', 'ce-nu', 'ce-period', 'ce-apogee', 'ce-perigee']) {
+        set(id, noVel);
+      }
+
+      return;
+    }
+
+    set('ce-sma', fmt(classical.sma));
+    set('ce-ecc', classical.ecc.toFixed(7));
+    set('ce-inc', fmt(classical.inc, true));
+    set('ce-raan', fmt(classical.raan, true));
+    set('ce-argpe', fmt(classical.argpe, true));
+    set('ce-nu', fmt(classical.nu, true));
+    set('ce-period', fmt(classical.period));
+    set('ce-apogee', fmt(classical.apogee));
+    set('ce-perigee', fmt(classical.perigee));
+  }
+
+  private updateEpochReadout_(date: Date): void {
+    const el = getEl('calc-epoch-readout', true);
+
+    if (el) {
+      el.textContent = `${l('labels.epoch')}: ${date.toISOString()}`;
+      el.style.display = 'block';
+    }
+  }
+
+  private setDisplay_(id: string, visible: boolean): void {
+    const el = getEl(id, true);
+
+    if (el) {
+      el.style.display = visible ? 'block' : 'none';
+    }
+  }
+
+  // ── Copy ──
+
+  private copyResults_(): void {
+    if (!this.lastOutputs_) {
+      return;
+    }
+
+    const lines: string[] = [];
+    const o = this.lastOutputs_;
+    const fmt = (v: number, isAngle = false) => this.formatValue_(v, isAngle);
+    const pushCart = (frame: CoordFrame, c: FrameOutputs['j2000']) => {
+      if (!c) {
+        return;
+      }
+      lines.push(`${coordFrameLabel(frame)}: X=${fmt(c.x)} Y=${fmt(c.y)} Z=${fmt(c.z)} Vx=${fmt(c.vx)} Vy=${fmt(c.vy)} Vz=${fmt(c.vz)}`);
+    };
+
+    pushCart(CoordFrame.J2000, o.j2000);
+    pushCart(CoordFrame.ITRF, o.itrf);
+    pushCart(CoordFrame.TEME, o.teme);
+    if (o.lla) {
+      lines.push(`${coordFrameLabel(CoordFrame.LLA)}: Lat=${fmt(o.lla.lat, true)} Lon=${fmt(o.lla.lon, true)} Alt=${fmt(o.lla.alt)}`);
+    }
+    if (o.rae) {
+      lines.push(`${coordFrameLabel(CoordFrame.RAE)} [${o.rae.sensorName}]: R=${fmt(o.rae.range)} A=${fmt(o.rae.az, true)} E=${fmt(o.rae.el, true)}`);
+    }
+    if (o.radec) {
+      lines.push(`${coordFrameLabel(CoordFrame.RADEC)}: RA=${fmt(o.radec.ra, true)} Dec=${fmt(o.radec.dec, true)} Range=${fmt(o.radec.range)}`);
+    }
+    if (o.classical && o.classical !== 'needsVelocity') {
+      const c = o.classical;
+
+      lines.push(`${coordFrameLabel(CoordFrame.CLASSICAL)}: a=${fmt(c.sma)} e=${c.ecc.toFixed(7)} i=${fmt(c.inc, true)} RAAN=${fmt(c.raan, true)} argPe=${fmt(c.argpe, true)} nu=${fmt(c.nu, true)}`);
+    }
+
+    this.copyText_(lines.join('\n'));
+  }
+
+  private copyText_(text: string): void {
+    navigator.clipboard?.writeText(text).then(
+      () => ServiceLocator.getUiManager().toast(l('msgs.copied'), ToastMsgType.normal),
+      () => errorManagerInstance.warn(l('errorMsgs.copyFailed')),
+    );
   }
 
   // ── Draw Line ──
 
   private drawLine_(): void {
     if (!this.lastRae_ || !this.sensorUsedInCalculation_) {
-      errorManagerInstance.warn('No RAE data available. Run a conversion first with a sensor selected.');
+      errorManagerInstance.warn(l('errorMsgs.noRaeData'));
 
       return;
     }
@@ -749,7 +761,7 @@ export class Calculator extends KeepTrackPlugin {
     const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);
 
     if (!selectSatManager || selectSatManager.selectedSat === -1) {
-      errorManagerInstance.warn('No satellite selected.');
+      errorManagerInstance.warn(l('errorMsgs.noSatelliteSelected'));
 
       return;
     }
@@ -757,7 +769,7 @@ export class Calculator extends KeepTrackPlugin {
     const sat = ServiceLocator.getCatalogManager().getObject(selectSatManager.selectedSat);
 
     if (!sat || !sat.isSatellite()) {
-      errorManagerInstance.warn('Selected object is not a satellite.');
+      errorManagerInstance.warn(l('errorMsgs.notASatellite'));
 
       return;
     }
@@ -766,141 +778,149 @@ export class Calculator extends KeepTrackPlugin {
     const pv = (sat as Satellite).eci(timeManager.simulationTimeObj);
 
     if (!pv) {
-      errorManagerInstance.warn('Could not propagate satellite to current time.');
+      errorManagerInstance.warn(l('errorMsgs.couldNotPropagate'));
 
       return;
     }
 
-    // Satellite.eci() returns TEME. Convert to the currently selected input frame.
+    // Satellite.eci() returns TEME. Convert to J2000, then into the selected input frame.
     const epoch = EpochUTC.fromDateTime(timeManager.simulationTimeObj);
     const teme = new TEME(epoch,
       new Vector3D<Kilometers>(pv.position.x, pv.position.y, pv.position.z),
       new Vector3D<KilometersPerSecond>(pv.velocity.x, pv.velocity.y, pv.velocity.z),
     );
-    const j2000 = teme.toJ2000();
 
-    this.populateInputFieldsFromJ2000_(j2000);
+    this.populateInputFieldsFromJ2000_(teme.toJ2000());
   }
 
   private populateInputFieldsFromJ2000_(j2000: J2000): void {
-    const setInput = (id: string, value: string) => {
-      const el = getEl(`calc-in-${id}`) as HTMLInputElement | null;
+    const ctx = this.buildContext_(j2000.epoch);
+
+    let values: FrameInputValues;
+
+    try {
+      values = j2000ToFrameValues(j2000, this.currentInputFrame_, ctx);
+    } catch (err) {
+      const message = (err as Error).message;
+
+      errorManagerInstance.warn(CORE_ERROR_KEYS.has(message) ? l(`errorMsgs.${message}`) : message);
+
+      return;
+    }
+
+    const setInput = (id: string, value: number) => {
+      const el = getEl(`calc-in-${id}`, true) as HTMLInputElement | null;
 
       if (el) {
-        el.value = value;
+        el.value = value.toFixed(4);
       }
     };
 
-    const f4 = (v: number) => v.toFixed(4);
-
-    switch (this.currentInputFrame_) {
-      case CoordFrame.J2000: {
-        setInput('x', f4(j2000.position.x));
-        setInput('y', f4(j2000.position.y));
-        setInput('z', f4(j2000.position.z));
-        this.enableVelocityAndSet_(j2000.velocity);
-        break;
-      }
-      case CoordFrame.ITRF: {
-        const itrf = j2000.toITRF();
-
-        setInput('x', f4(itrf.position.x));
-        setInput('y', f4(itrf.position.y));
-        setInput('z', f4(itrf.position.z));
-        this.enableVelocityAndSet_(itrf.velocity);
-        break;
-      }
-      case CoordFrame.TEME: {
-        const teme = j2000.toTEME();
-
-        setInput('x', f4(teme.position.x));
-        setInput('y', f4(teme.position.y));
-        setInput('z', f4(teme.position.z));
-        this.enableVelocityAndSet_(teme.velocity);
-        break;
-      }
-      case CoordFrame.LLA: {
-        const geo = j2000.toITRF().toGeodetic();
-
-        setInput('lat', f4(geo.latDeg));
-        setInput('lon', f4(geo.lonDeg));
-        setInput('alt', f4(geo.alt));
-        break;
-      }
-      case CoordFrame.RAE: {
-        const sensor = ServiceLocator.getSensorManager().currentSensors[0];
-
-        if (!sensor) {
-          errorManagerInstance.warn('No sensor selected for RAE output.');
-
-          return;
-        }
-        const teme = j2000.toTEME();
-        const rae = eci2rae(
-          ServiceLocator.getTimeManager().simulationTimeObj,
-          { x: teme.position.x, y: teme.position.y, z: teme.position.z },
-          sensor,
-        );
-
-        setInput('sensor', sensor.name);
-        setInput('r', f4(rae.rng));
-        setInput('a', f4(rae.az));
-        setInput('e', f4(rae.el));
-        break;
-      }
-      case CoordFrame.RADEC: {
-        const radec = RadecGeocentric.fromStateVector(j2000);
-
-        setInput('ra', f4(radec.rightAscensionDegrees));
-        setInput('dec', f4(radec.declinationDegrees));
-        setInput('range', f4(j2000.position.magnitude()));
-        break;
-      }
-      case CoordFrame.CLASSICAL: {
-        const ce = ClassicalElements.fromStateVector(j2000);
-
-        setInput('sma', f4(ce.semimajorAxis));
-        setInput('ecc', ce.eccentricity.toFixed(7));
-        setInput('inc', f4(ce.inclinationDegrees));
-        setInput('raan', f4(ce.rightAscensionDegrees));
-        setInput('argpe', f4(ce.argPerigeeDegrees));
-        setInput('nu', f4(ce.trueAnomalyDegrees));
-        break;
-      }
-      default:
-        break;
+    for (const [id, value] of Object.entries(values)) {
+      setInput(id, value);
     }
 
-    // Auto-convert after loading
+    // Cartesian frames carry velocity; surface the fields so the values are visible.
+    if (CARTESIAN_FRAMES.includes(this.currentInputFrame_) && ('vx' in values)) {
+      this.enableVelocity_();
+    }
+
+    // Auto-convert after loading.
     this.convert_();
   }
 
-  private enableVelocityAndSet_(vel: Vector3D<KilometersPerSecond>): void {
-    // Enable velocity toggle
+  private enableVelocity_(): void {
     this.showVelocity_ = true;
-    const checkbox = getEl('calc-show-velocity') as HTMLInputElement | null;
+    const checkbox = getEl('calc-show-velocity', true) as HTMLInputElement | null;
 
     if (checkbox) {
       checkbox.checked = true;
     }
+    this.setDisplay_('calc-velocity-fields', true);
+  }
 
-    const velFields = getEl('calc-velocity-fields');
+  // ── Persistence ──
 
-    if (velFields) {
-      velFields.style.display = 'block';
+  private persistSettings_(): void {
+    const values: Record<string, string> = {};
+
+    for (const f of [...this.getInputFieldDefs_(this.currentInputFrame_), ...this.getVelocityFieldDefs_()]) {
+      const el = getEl(`calc-in-${f.id}`, true) as HTMLInputElement | null;
+
+      if (el && !f.readonly) {
+        values[f.id] = el.value;
+      }
     }
 
-    const f4 = (v: number) => v.toFixed(4);
-    const setInput = (id: string, value: string) => {
-      const el = getEl(`calc-in-${id}`) as HTMLInputElement | null;
+    const settings: CalculatorSettings = {
+      inputFrame: this.currentInputFrame_,
+      outputFormat: this.outputFormat_,
+      showVelocity: this.showVelocity_,
+      values,
+    };
+
+    try {
+      localStorage.setItem(StorageKey.CALCULATOR_SETTINGS, JSON.stringify(settings));
+    } catch {
+      // Persistence is best-effort; ignore quota/availability errors.
+    }
+  }
+
+  private restoreSettings_(): void {
+    let settings: CalculatorSettings | null = null;
+
+    try {
+      const raw = localStorage.getItem(StorageKey.CALCULATOR_SETTINGS);
+
+      settings = raw ? JSON.parse(raw) as CalculatorSettings : null;
+    } catch {
+      settings = null;
+    }
+
+    if (!settings || !Object.values(CoordFrame).includes(settings.inputFrame)) {
+      return;
+    }
+
+    this.currentInputFrame_ = settings.inputFrame;
+    this.outputFormat_ = settings.outputFormat;
+    this.showVelocity_ = settings.showVelocity ?? false;
+
+    const frameSelect = getEl('calc-input-frame', true) as HTMLSelectElement | null;
+    const formatSelect = getEl('calc-output-format', true) as HTMLSelectElement | null;
+
+    if (frameSelect) {
+      frameSelect.value = settings.inputFrame;
+    }
+    if (formatSelect) {
+      formatSelect.value = settings.outputFormat;
+    }
+
+    const velCheckbox = getEl('calc-show-velocity', true) as HTMLInputElement | null;
+
+    if (velCheckbox) {
+      velCheckbox.checked = this.showVelocity_;
+    }
+
+    // rebuildInputFields_ (called after this in addJs) recreates the inputs; defer value
+    // restoration to a microtask so it runs against the freshly built fields.
+    this.pendingRestoreValues_ = settings.values ?? null;
+  }
+
+  private pendingRestoreValues_: Record<string, string> | null = null;
+
+  /** Apply persisted input values; called by rebuildInputFields_ after it builds the fields. */
+  private applyPendingRestore_(): void {
+    if (!this.pendingRestoreValues_) {
+      return;
+    }
+
+    for (const [id, value] of Object.entries(this.pendingRestoreValues_)) {
+      const el = getEl(`calc-in-${id}`, true) as HTMLInputElement | null;
 
       if (el) {
         el.value = value;
       }
-    };
-
-    setInput('vx', f4(vel.x));
-    setInput('vy', f4(vel.y));
-    setInput('vz', f4(vel.z));
+    }
+    this.pendingRestoreValues_ = null;
   }
 }

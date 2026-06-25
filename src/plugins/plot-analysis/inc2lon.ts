@@ -18,6 +18,7 @@ import barChart4BarsPng from '@public/img/icons/bar-chart-4-bars.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { PlotWatermark } from './plot-download';
 import './inc2lon.css';
 
 type T7eKey = Parameters<typeof t7e>[0];
@@ -69,8 +70,7 @@ export class Inc2LonPlots extends KeepTrackPlugin {
     maxPeriod: 1640,
   };
 
-  private readonly logo_ = new Image();
-  private readonly secondaryLogo_ = new Image();
+  private readonly watermark_ = new PlotWatermark();
 
   private static readonly chunkSize_ = 50;
   private static readonly topCountryCount_ = 15;
@@ -79,11 +79,6 @@ export class Inc2LonPlots extends KeepTrackPlugin {
     super();
     this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager;
     this.downloadIconCb = () => this.onDownload_();
-
-    this.logo_.src = `${settingsManager.installDirectory}img/logo-primary.png`;
-    if (settingsManager.isShowSecondaryLogo) {
-      this.secondaryLogo_.src = `${settingsManager.installDirectory}img/logo-secondary.png`;
-    }
   }
 
   // =========================================================================
@@ -110,8 +105,24 @@ export class Inc2LonPlots extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.Inc2LonPlots.title' as T7eKey),
-      body: t7e('plugins.Inc2LonPlots.helpBody' as T7eKey),
+      title: t7e('plugins.Inc2LonPlots.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.Inc2LonPlots.help.overview'),
+          image: {
+            src: 'img/help/plot-analysis/inc2lon-menu.png',
+            alt: t7e('plugins.Inc2LonPlots.help.imgAlt'),
+            caption: t7e('plugins.Inc2LonPlots.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.Inc2LonPlots.help.howToUse'),
+        },
+      ],
+      tips: [t7e('plugins.Inc2LonPlots.help.tip1'), t7e('plugins.Inc2LonPlots.help.tip2')],
+      shortcuts: [{ keys: ['G'], description: t7e('plugins.Inc2LonPlots.help.shortcutToggle') }],
     };
   }
 
@@ -382,55 +393,9 @@ export class Inc2LonPlots extends KeepTrackPlugin {
   }
 
   private onDownload_(): void {
-    if (!this.chart) {
-      return;
+    if (this.chart) {
+      this.watermark_.download(this.chart, 'inc2lon-scatter.png');
     }
-
-    const chartDataUrl = this.chart.getDataURL({
-      type: 'png',
-      backgroundColor: '#1f1f1f',
-      pixelRatio: 2,
-    });
-
-    const chartImg = new Image();
-
-    chartImg.onload = () => {
-      const canvas = document.createElement('canvas');
-
-      canvas.width = chartImg.width;
-      canvas.height = chartImg.height;
-      const ctx = canvas.getContext('2d');
-
-      if (!ctx) {
-        return;
-      }
-
-      ctx.drawImage(chartImg, 0, 0);
-
-      const paddingX = 40;
-      const paddingY = 50;
-      const logoHeight = Math.max(40, canvas.height * 0.06);
-
-      if (!settingsManager.copyrightOveride && this.logo_.complete && this.logo_.naturalWidth > 0) {
-        const logoWidth = this.logo_.width * (logoHeight / this.logo_.height);
-
-        if (settingsManager.isShowSecondaryLogo && this.secondaryLogo_.complete && this.secondaryLogo_.naturalWidth > 0) {
-          const secLogoWidth = this.secondaryLogo_.width * (logoHeight / this.secondaryLogo_.height);
-
-          ctx.drawImage(this.secondaryLogo_, paddingX, paddingY, secLogoWidth, logoHeight);
-          ctx.drawImage(this.logo_, paddingX + secLogoWidth + paddingX, paddingY, logoWidth, logoHeight);
-        } else {
-          ctx.drawImage(this.logo_, paddingX, paddingY, logoWidth, logoHeight);
-        }
-      }
-
-      const link = document.createElement('a');
-
-      link.download = 'inc2lon-scatter.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    };
-    chartImg.src = chartDataUrl;
   }
 
   // =========================================================================

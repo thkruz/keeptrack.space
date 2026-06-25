@@ -7,7 +7,59 @@
         "import": "Importar",
         "export": "Exportar"
       },
-      "helpBody": "El menú de Gestión de catálogo proporciona herramientas para importar y exportar datos del catálogo de satélites. <b>Pestaña Importar:</b> Cargue un archivo de catálogo .tce, .tle o .txt mediante selector de archivos o arrastrar y soltar. <b>Pestaña Exportar:</b> <ul style=\"margin-left: 40px;\"> <li>Exportar TLEs oficiales – Exportar conjuntos de elementos de dos líneas reales.</li> <li>Exportar 3LEs – Exportar conjuntos de elementos de tres líneas.</li> <li>Exportar TLEs de KeepTrack – Exportar todos los conjuntos de elementos de dos líneas de KeepTrack incluyendo analistas.</li> <li>Exportar 3LEs de KeepTrack – Exportar todos los conjuntos de elementos de tres líneas de KeepTrack incluyendo analistas.</li> <li>Exportar catálogo CSV – Exportar datos del catálogo como CSV.</li> <li>Exportar STK .tce – Exportar datos TLE en formato de base de datos de satélites STK.</li> <li>Exportar satélites en FOV – Exportar satélites actualmente en el campo de visión.</li> <li>Exportar efemérides .e – Exportar efemérides propagadas del satélite seleccionado en formato STK.</li> </ul>"
+      "labels": {
+        "dropzone": "Suelte un archivo .tce, .tle o .txt para cargar el catálogo",
+        "keepSatInfo": "Conservar información de satélites",
+        "keepSatInfoTooltip": "Actualiza los TLE de los satélites existentes conservando su nombre, país y datos de misión. Los satélites que no estén en el archivo importado se eliminan.",
+        "importNewOnly": "Importar solo satélites nuevos",
+        "importNewOnlyTooltip": "Solo agrega satélites que no estén ya en el catálogo actual. Los satélites existentes no se modifican.",
+        "orbitalElements": "Elementos orbitales",
+        "tabularStk": "Tabular y STK",
+        "selectedSatellite": "Satélite seleccionado",
+        "tleSource": "Fuente",
+        "tleFormat": "Formato",
+        "timeSpanHrs": "Intervalo de tiempo (h)",
+        "stepSizeSec": "Tamaño de paso (s)"
+      },
+      "options": {
+        "sourceOfficial": "Oficial",
+        "sourceKeepTrack": "KeepTrack",
+        "format2": "2 líneas (TLE)",
+        "format3": "3 líneas (con nombre)"
+      },
+      "buttons": {
+        "importCatalog": "Importar catálogo",
+        "downloadTle": "Exportar formato TLE",
+        "exportCatalogXlsx": "Exportar catálogo XLSX",
+        "exportStkTce": "Exportar STK .tce",
+        "exportSatsInFov": "Exportar satélites en FOV",
+        "exportEphemeris": "Exportar efemérides .e",
+        "selectSatelliteFirst": "Seleccione primero un satélite"
+      },
+      "toasts": {
+        "noValidFileInDrop": "No se encontró ningún archivo .tce, .tle o .txt en el elemento soltado",
+        "noValidTleData": "No se encontraron datos TLE válidos en el archivo",
+        "unsupportedFileType": "Tipo de archivo no compatible. Use .tce, .tle o .txt",
+        "noNewSats": "No se encontraron satélites nuevos en el archivo",
+        "addedNewSats": "Se añadieron {count} satélite(s) nuevo(s) de {file}",
+        "loadedCatalog": "Catálogo cargado desde {file}",
+        "failedToLoad": "No se pudo cargar {file}",
+        "noSatelliteSelected": "¡Ningún satélite seleccionado!",
+        "exportTooLarge": "Exportación demasiado grande. Reduzca el intervalo de tiempo o aumente el tamaño del paso.",
+        "failedToPropagate": "¡No se pudo propagar el satélite!"
+      },
+      "help": {
+        "overview": "Gestión de catálogo mueve datos de satélites dentro y fuera de KeepTrack. La pestaña Importar carga un archivo de catálogo desde el disco, reemplazando o actualizando el catálogo actual; la pestaña Exportar escribe el catálogo activo en varios formatos, desde archivos TLE simples hasta hojas de cálculo y productos de STK.",
+        "imgAlt": "El menú de Gestión de catálogo con las pestañas Importar y Exportar",
+        "imgCaption": "Importe un archivo de catálogo o exporte el catálogo activo en varios formatos.",
+        "importHeading": "Importación",
+        "import": "Cargue un archivo <strong>.tce</strong>, <strong>.tle</strong> o <strong>.txt</strong> con el botón <strong>Importar catálogo</strong> o arrastrando el archivo a la zona de soltado. Con <strong>Conservar información de satélites</strong> activado, los satélites existentes conservan sus nombres, países y datos de misión y solo se actualizan sus órbitas; los satélites ausentes del archivo se eliminan. Desactivado, el archivo reemplaza el catálogo por completo.",
+        "exportHeading": "Exportación",
+        "export": "<ul><li><strong>Elementos orbitales</strong>: descargue conjuntos de elementos TLE/3LE. Elija una <strong>Fuente</strong> (Oficial conserva solo objetos catalogados reales; KeepTrack incluye los satélites de analista que haya creado) y un <strong>Formato</strong> (2 líneas, o 3 líneas con el nombre del satélite), y luego <strong>Descargar TLE</strong>.</li><li><strong>Tabular y STK</strong>: exporte el catálogo completo como hoja de cálculo XLSX, una base de datos STK .tce, o solo los satélites que están actualmente dentro del campo de visión del sensor seleccionado.</li><li><strong>Satélite seleccionado</strong>: con un satélite seleccionado, escriba unas efemérides STK .e propagadas usando el <strong>Intervalo de tiempo (h)</strong> y el <strong>Tamaño de paso (s)</strong> configurados.</li></ul>",
+        "howToUse": "<ol><li>Abra <strong>Gestión de catálogo</strong> desde la barra inferior (modo Herramientas).</li><li>Para importar: elija la pestaña <strong>Importar</strong>, decida si conservar la información de los satélites y luego seleccione o suelte un archivo.</li><li>Para exportar: elija la pestaña <strong>Exportar</strong>, configure las opciones y haga clic en la exportación que necesite; los archivos se descargan de inmediato.</li><li>Para exportaciones por satélite, seleccione primero un satélite; esos botones permanecen desactivados hasta que haya uno seleccionado.</li></ol>",
+        "tip1": "Conservar información de satélites es la opción predeterminada segura al actualizar órbitas desde un archivo TLE más reciente; desactívela solo cuando reemplace deliberadamente todo el catálogo.",
+        "tip2": "Las importaciones y ediciones solo existen en su sesión; exporte antes de recargar la página si desea conservarlas."
+      }
     }
   }
 }

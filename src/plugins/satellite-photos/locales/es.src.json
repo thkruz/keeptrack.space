@@ -3,10 +3,29 @@
     "SatellitePhotos": {
       "bottomIconLabel": "Imágenes Satelitales",
       "title": "Imágenes Satelitales",
-      "helpBody": "El plugin de Imágenes Satelitales muestra las últimas imágenes de satélites meteorológicos geoestacionarios y DSCOVR. Haz clic en el nombre de un satélite para ver su imagen más reciente.",
       "defaultImageTitle": "Última imagen satelital",
+      "labels": {
+        "dscovrUnavailable": "DSCOVR temporalmente no disponible",
+        "dscovrImage": "Imagen DSCOVR {index}",
+        "dscovrLoading": "Cargando imágenes de DSCOVR…",
+        "refresh": "Actualizar última imagen",
+        "imageAtUtc": "{name} a las {time} UTC"
+      },
+      "sections": {
+        "geostationary": "Geoestacionario",
+        "dscovr": "DSCOVR (L1)"
+      },
       "errorMsgs": {
         "FuturePictures": "No se pueden cargar imágenes del futuro. Cargando las imágenes más recientes."
+      },
+      "help": {
+        "overview": "Imágenes Satelitales muestra las fotografías más recientes tomadas por satélites meteorológicos reales: vistas de disco completo de MeteoSat, Himawari, GOES y Elektro-L en órbita geoestacionaria, además de imágenes de la Tierra completa desde DSCOVR en el punto L1. Conecta lo que ves en la simulación con lo que esos satélites están fotografiando realmente ahora mismo.",
+        "imgAlt": "El menú de Imágenes Satelitales con la lista de satélites meteorológicos",
+        "imgCaption": "Haz clic en un satélite para ver su última imagen y volar hacia él en la escena.",
+        "howToUse": "<ol><li>Abre <strong>Imágenes Satelitales</strong> desde la barra inferior o pulsa <strong>H</strong>; requiere conexión a internet.</li><li>Haz clic en un satélite. La cámara vuela hacia él en la escena 3D y su imagen más reciente se abre en una superposición.</li><li>Las entradas de DSCOVR aparecen al final de la lista, con una entrada por cada imagen reciente.</li></ol>",
+        "tip1": "Las imágenes llegan en vivo desde el servicio público de cada agencia, así que una entrada ausente normalmente significa que ese servicio está temporalmente caído, no que haya un error.",
+        "tip2": "Si el reloj de la simulación está en el futuro, se muestran en su lugar las imágenes reales más recientes.",
+        "shortcutToggle": "Alternar el menú de Imágenes Satelitales"
       }
     }
   }

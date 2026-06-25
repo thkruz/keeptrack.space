@@ -13,12 +13,12 @@ test.describe('HideOtherSatellitesPlugin', () => {
     await expect(utilityIcon).toBeVisible();
     await expect(utilityIcon).toHaveAttribute('data-plugin-id', 'hide-other-sats-bottom-icon');
 
-    // Read initial transparent alpha — default is 0.1 (visible)
+    // Read initial transparent alpha - default is 0.1 (visible)
     const initialAlpha = await page.evaluate(
       () => (window as any).settingsManager?.colors?.transparent?.[3],
     );
 
-    // Click to toggle (hide other sats — sets alpha to 0)
+    // Click to toggle (hide other sats - sets alpha to 0)
     await utilityIcon.dispatchEvent('click');
 
     // Verify transparent alpha changed
@@ -33,7 +33,7 @@ test.describe('HideOtherSatellitesPlugin', () => {
     // Verify selected state on the icon
     await expect(utilityIcon).toHaveClass(/bmenu-item-selected/u);
 
-    // Click again to toggle off (show other sats — restores alpha to 0.1)
+    // Click again to toggle off (show other sats - restores alpha to 0.1)
     await utilityIcon.dispatchEvent('click');
 
     // Verify transparent alpha returned to initial

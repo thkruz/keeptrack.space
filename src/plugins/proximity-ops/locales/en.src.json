@@ -4,8 +4,9 @@
       "bottomIconLabel": "Rendezvous and Proximity Operations",
       "title": "Rendezvous and Proximity Operations (RPO)",
       "titleSecondary": "Rendezvous and Proximity Operations List",
-      "helpBody": "Find upcoming close approaches between satellites. Configure search parameters including distance threshold, relative velocity, and orbit type (GEO/LEO). Supports single-satellite and all-vs-all search modes.",
       "noradId": "NORAD ID",
+      "useCurrentSat": "Use Current Satellite",
+      "noSatSelected": "No satellite is selected",
       "maxDistThreshold": "Max Distance Threshold (km)",
       "maxRelativeVelocity": "Max Relative Velocity (km/s)",
       "searchDuration": "Search Duration (hours)",
@@ -18,7 +19,15 @@
       "comparePayloadsOnlyTooltip": "Only search for RPOs between payloads",
       "ignoreVimpelRso": "Ignore Vimpel RSO",
       "ignoreVimpelRsoTooltip": "Ignore RSOs sourced from Vimpel Catalog",
-      "submitButton": "Find RPOs \u25b6",
+      "submitButton": "Find RPOs",
+      "cancelButton": "Cancel Search",
+      "resultCount": "{count} approaches (closest {closest} km)",
+      "surveyError": "RPO survey failed: {error}",
+      "sections": {
+        "target": "Target",
+        "thresholds": "Thresholds",
+        "orbitRegime": "Orbit Regime"
+      },
       "noRposToDownload": "No RPOs to download!",
       "noRposFound": "No RPOs found!",
       "satNotFound": "Satellite with NORAD ID {sccNum} not found",
@@ -32,7 +41,25 @@
         "chaserName": "Chaser Name",
         "relDistance": "Rel. Distance [km]",
         "relVelocity": "Rel. Velocity [km/s]",
+        "radial": "Radial [km]",
+        "intrack": "In-track [km]",
+        "crosstrack": "Cross-track [km]",
+        "pc": "Pc",
         "date": "Date"
+      },
+      "help": {
+        "overview": "Rendezvous and Proximity Operations (RPO) finds upcoming close approaches between satellites: one spacecraft maneuvering near another, a co-orbital inspection, or simply two objects drifting close together. Give it a satellite (or search a whole orbit regime) and it returns every predicted encounter within your distance and velocity thresholds.",
+        "imgAlt": "The RPO menu with search parameters",
+        "imgCaption": "Set the thresholds and orbit type, then search one satellite or all against all.",
+        "modesHeading": "Search Modes",
+        "modes": "By default the search takes the <strong>NORAD ID</strong> you enter and screens that satellite against the rest of its orbit regime. Checking <strong>Geostationary All vs All</strong> instead screens every GEO satellite against every other, which is the way to survey the whole belt for activity. <strong>Compare Payloads Only</strong> skips debris and rocket bodies, and <strong>Ignore Vimpel RSO</strong> excludes objects sourced from the JSC Vimpel catalog.",
+        "resultsHeading": "Reading the Results",
+        "results": "Each row pairs a <strong>Target</strong> and a <strong>Chaser</strong> with their closest <strong>Rel. Distance</strong>, <strong>Rel. Velocity</strong>, and the <strong>Date</strong> of the encounter. Click a row to select both satellites and jump the camera and clock to the approach; GEO results also switch the orbit display to ECF so the relative motion is easy to read. The download button exports the list as a CSV file.",
+        "howToUse": "<ol><li>Open the menu from the bottom bar or press <strong>X</strong>.</li><li>Choose the <strong>Orbit Type</strong> (Geostationary or Low Earth Orbit) and set the <strong>Max Distance Threshold</strong>, <strong>Max Relative Velocity</strong>, and <strong>Search Duration</strong>.</li><li>Enter a <strong>NORAD ID</strong>, or check <strong>Geostationary All vs All</strong> for a belt wide survey.</li><li>Click <strong>Find RPOs</strong>. Long searches show progress; results open in the list panel.</li><li>Click any row to fly to that encounter.</li></ol>",
+        "tip1": "A low relative velocity at close range is what distinguishes deliberate proximity operations from a fast conjunction flyby; tighten the velocity threshold to filter for maneuvers.",
+        "tip2": "All vs all GEO searches are heavy; narrow the duration first, then expand once the thresholds look right.",
+        "tip3": "Clicking a GEO result switches orbits to Earth fixed (ECF) display; the toast tells you which mode is active.",
+        "shortcutToggle": "Toggle the RPO menu"
       }
     }
   }

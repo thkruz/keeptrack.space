@@ -1,4 +1,5 @@
 import { getCountryMapList } from '@app/app/data/catalogs/countries';
+import { Time2LonThreadManager } from '@app/app/threads/time2lon-thread-manager';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -6,43 +7,36 @@ import { SatMathApi } from '@app/engine/math/sat-math-api';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { IBottomIconConfig, IDragOptions, IHelpConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
-import { CatalogSource, PayloadStatus, Satellite, SpaceObjectType } from '@ootk/src/main';
+import type { T2lSatData } from '@app/webworker/time2lon-messages';
+import { Satellite, SpaceObjectType } from '@ootk/src/main';
 import waterfallPng from '@public/img/icons/waterfall.png';
 import * as echarts from 'echarts';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { buildChartOption, Time2LonChartLabels } from './time2lon-chart';
+import {
+  buildAllowedTypes,
+  buildSatLine,
+  buildTopCountries,
+  computeOrbits,
+  isSatelliteAllowed,
+  Time2LonFilters,
+  Time2LonSatLine,
+} from './time2lon-core';
+import { PlotWatermark } from './plot-download';
 import './time2lon.css';
 
 type T7eKey = Parameters<typeof t7e>[0];
 
-/** A single data point: [longitude, timeFromNowMinutes] with metadata */
-type Time2LonDataPoint = {
-  value: [number, number];
-  satName: string;
-  satId: number;
-};
+export type { Time2LonDataPoint, Time2LonFilters, Time2LonSatLine } from './time2lon-core';
 
-/** Per-satellite line data, grouped by country name for legend */
-interface Time2LonSatLine {
-  satName: string;
-  satId: number;
+/** A catalog object that passed the filters, paired with its objectCache index and display country. */
+interface Time2LonCandidate {
+  index: number;
+  sat: Satellite;
   country: string;
-  points: Time2LonDataPoint[];
-}
-
-/** Filter settings for the waterfall plot */
-export interface Time2LonFilters {
-  activePayloads: boolean;
-  inactivePayloads: boolean;
-  rocketBodies: boolean;
-  debris: boolean;
-  celestrak: boolean;
-  vimpel: boolean;
-  minInclination: number;
-  maxInclination: number;
-  samplePoints: number;
-  maxTimeMin: number;
 }
 
 export class Time2LonPlots extends KeepTrackPlugin {
@@ -54,6 +48,13 @@ export class Time2LonPlots extends KeepTrackPlugin {
   private readonly plotCanvasId_ = 'plot-analysis-chart-time2lon';
   chart: echarts.ECharts | null = null;
   private resizeHandler_: (() => void) | null = null;
+  /** Tracks the container's size so the canvas follows the menu's open animation (otherwise it inits too wide and the edge sliders clip). */
+  private resizeObserver_: ResizeObserver | null = null;
+
+  /** Off-thread propagation; null until first opened. Sync fallback runs when unavailable. */
+  private threadManager_: Time2LonThreadManager | null = null;
+  /** Lines accumulated from worker chunks; rendered on completion. */
+  private streamBuffer_: Time2LonSatLine[] = [];
 
   protected currentFilters_: Time2LonFilters = {
     activePayloads: true,
@@ -64,28 +65,26 @@ export class Time2LonPlots extends KeepTrackPlugin {
     vimpel: false,
     minInclination: 0,
     maxInclination: 10,
+    maxEccentricity: 0.1,
+    minPeriod: 1340,
+    maxPeriod: 1540,
     samplePoints: 24,
     maxTimeMin: 1440,
   };
 
-  private readonly logo_ = new Image();
-  private readonly secondaryLogo_ = new Image();
+  private readonly watermark_ = new PlotWatermark();
 
-  private static readonly maxEccentricity_ = 0.1;
-  private static readonly minSatellitePeriod_ = 1340;
-  private static readonly maxSatellitePeriod_ = 1540;
   private static readonly chunkSize_ = 50;
   private static readonly topCountryCount_ = 15;
 
   constructor() {
     super();
     this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager;
-    this.downloadIconCb = () => this.onDownload_();
-
-    this.logo_.src = `${settingsManager.installDirectory}img/logo-primary.png`;
-    if (settingsManager.isShowSecondaryLogo) {
-      this.secondaryLogo_.src = `${settingsManager.installDirectory}img/logo-secondary.png`;
-    }
+    this.downloadIconCb = () => {
+      if (this.chart) {
+        this.watermark_.download(this.chart, 'time2lon-waterfall.png');
+      }
+    };
   }
 
   // =========================================================================
@@ -112,8 +111,23 @@ export class Time2LonPlots extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.Time2LonPlots.title' as T7eKey),
-      body: t7e('plugins.Time2LonPlots.helpBody' as T7eKey),
+      title: t7e('plugins.Time2LonPlots.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.Time2LonPlots.help.overview'),
+          image: {
+            src: 'img/help/plot-analysis/time2lon-menu.png',
+            alt: t7e('plugins.Time2LonPlots.help.imgAlt'),
+            caption: t7e('plugins.Time2LonPlots.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.Time2LonPlots.help.howToUse'),
+        },
+      ],
+      tips: [t7e('plugins.Time2LonPlots.help.tip1'), t7e('plugins.Time2LonPlots.help.tip2')],
     };
   }
 
@@ -125,27 +139,51 @@ export class Time2LonPlots extends KeepTrackPlugin {
 
   private buildSideMenuHtml_(): string {
     const innerHtml = html`
-      <div id="time2lon-stats">
-        <div id="time2lon-total-count">--</div>
-        <div id="time2lon-country-counts"></div>
-      </div>
+      <section class="kt-section">
+        <div class="kt-section-label">${t7e('plugins.Time2LonPlots.labels.statistics' as T7eKey)}</div>
+        <div id="time2lon-stats">
+          <div id="time2lon-total-count">--</div>
+          <div id="time2lon-country-counts"></div>
+        </div>
+      </section>
       <div id="${this.plotCanvasId_}" class="time2lon-chart-container"></div>
     `;
 
     // When a secondary menu exists (pro), generateSideMenuHtml_() in the base plugin
-    // wraps sideMenuElementHtml in the standard side-menu template. Without a secondary
-    // menu (OSS), the raw HTML is inserted directly, so we must include the wrapper.
+    // wraps sideMenuElementHtml in the standard side-menu template (and the Pro plugin
+    // adds the kt-ui-v13 marker to the generated root in uiManagerFinal). Without a
+    // secondary menu (OSS), the raw HTML is inserted directly, so we include the wrapper
+    // and the marker here.
     if ('getSecondaryMenuConfig' in this) {
       return innerHtml;
     }
 
     return html`
-      <div id="time2lon-plots-menu" class="side-menu-parent start-hidden">
+      <div id="time2lon-plots-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div id="time2lon-plots-menu-content" class="side-menu">
           ${innerHtml}
         </div>
       </div>
     `;
+  }
+
+  // =========================================================================
+  // Lifecycle
+  // =========================================================================
+
+  addJs(): void {
+    super.addJs();
+    this.ensureThreadManager_();
+  }
+
+  /** Lazily creates the propagation worker once (kept alive across opens). */
+  private ensureThreadManager_(): void {
+    if (this.threadManager_) {
+      return;
+    }
+    // Single-purpose worker; the registry array is unused (lifecycle is local).
+    this.threadManager_ = new Time2LonThreadManager([]);
+    this.threadManager_.init();
   }
 
   // =========================================================================
@@ -168,6 +206,11 @@ export class Time2LonPlots extends KeepTrackPlugin {
   }
 
   onBottomIconDeselect(): void {
+    this.threadManager_?.cancelTime2Lon();
+    if (this.resizeObserver_) {
+      this.resizeObserver_.disconnect();
+      this.resizeObserver_ = null;
+    }
     if (this.resizeHandler_) {
       window.removeEventListener('resize', this.resizeHandler_);
       this.resizeHandler_ = null;
@@ -188,13 +231,84 @@ export class Time2LonPlots extends KeepTrackPlugin {
     }
 
     this.chart.showLoading({
-      text: 'Computing orbit data...',
+      text: t7e('plugins.Time2LonPlots.chart.loading' as T7eKey),
       color: '#4fc3f7',
       textColor: '#fff',
       maskColor: 'rgba(0, 0, 0, 0.7)',
     });
 
-    this.getPlotDataAsync_(this.currentFilters_).then((data) => {
+    this.computePlot_();
+  }
+
+  /** Dispatches the computation to the worker when ready, otherwise the sync fallback. */
+  private computePlot_(): void {
+    this.ensureThreadManager_();
+
+    if (this.threadManager_?.isReady) {
+      this.runWorkerCompute_(this.currentFilters_);
+
+      return;
+    }
+
+    this.runSyncCompute_(this.currentFilters_);
+  }
+
+  /** Off-thread propagation: streams per-satellite lines, renders on completion. */
+  private runWorkerCompute_(filters: Time2LonFilters): void {
+    const nowMs = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
+    const candidates = this.gatherCandidates_(filters);
+    const sats: T2lSatData[] = [];
+
+    for (const candidate of candidates) {
+      const { sat } = candidate;
+
+      if (!sat.tle1 || !sat.tle2) {
+        continue;
+      }
+
+      sats.push({
+        satId: sat.id,
+        satName: sat.name,
+        country: candidate.country,
+        tle1: sat.tle1,
+        tle2: sat.tle2,
+        periodMin: sat.period,
+      });
+    }
+
+    this.streamBuffer_ = [];
+
+    this.threadManager_!.startTime2Lon(
+      { sats, nowMs, samplePoints: filters.samplePoints, maxTimeMin: filters.maxTimeMin },
+      {
+        onChunk: (line) => {
+          if (line) {
+            this.streamBuffer_.push(line);
+          }
+        },
+        onProgress: () => {
+          // Lines are rendered together on completion; no incremental redraw.
+        },
+        onComplete: () => {
+          if (!this.isMenuButtonActive || !this.chart) {
+            return;
+          }
+          this.chart.hideLoading();
+          this.renderChart_(this.streamBuffer_);
+          this.updateStatistics_(this.streamBuffer_);
+          this.streamBuffer_ = [];
+        },
+        onError: (message) => {
+          this.chart?.hideLoading();
+          errorManagerInstance.warn(`${t7e('plugins.Time2LonPlots.title' as T7eKey)}: ${message}`);
+        },
+      },
+    );
+  }
+
+  /** Synchronous main-thread computation (used when the worker is unavailable). */
+  private runSyncCompute_(filters: Time2LonFilters): void {
+    this.getPlotDataAsync_(filters).then((data) => {
       if (!this.isMenuButtonActive || !this.chart) {
         return;
       }
@@ -226,6 +340,16 @@ export class Time2LonPlots extends KeepTrackPlugin {
     }
     this.resizeHandler_ = () => this.chart?.resize();
     window.addEventListener('resize', this.resizeHandler_);
+
+    // The menu animates open after the chart is created, so the container keeps
+    // growing for ~1s. Without tracking that, echarts keeps the initial (too
+    // wide/tall) canvas and the edge zoom sliders render past the menu's clipped
+    // bounds. A ResizeObserver re-fits the canvas as the container settles.
+    this.resizeObserver_?.disconnect();
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver_ = new ResizeObserver(() => this.chart?.resize());
+      this.resizeObserver_.observe(chartDom);
+    }
   }
 
   private renderChart_(data: Time2LonSatLine[]): void {
@@ -233,278 +357,103 @@ export class Time2LonPlots extends KeepTrackPlugin {
       return;
     }
 
-    this.chart.setOption({
-      animation: false,
-      title: {
-        text: 'Time vs Longitude (Waterfall) Plot',
-        textStyle: {
-          fontSize: 16,
-          color: '#fff',
-        },
-      },
-      legend: {
-        show: true,
-        top: 30,
-        textStyle: {
-          color: '#fff',
-        },
-      },
-      tooltip: {
-        trigger: 'item',
-        formatter: (params: { data?: Time2LonDataPoint; color?: string; seriesName?: string; seriesId?: string }) => {
-          const d = params.data;
-
-          if (!d?.value) {
-            return '';
-          }
-
-          const satName = (d as Time2LonDataPoint)?.satName ?? '';
-
-          return `
-            <div style="text-align: left;">
-              <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                <div style="width: 10px; height: 10px; background-color: ${params.color};
-                  border-radius: 50%; margin-right: 5px;"></div>
-                <span style="font-weight: bold;">${satName}</span>
-              </div>
-              <div><b>Country:</b> ${params.seriesName}</div>
-              <div><b>Longitude:</b> ${d.value[0].toFixed(3)}\u00B0</div>
-              <div><b>Time from now:</b> ${d.value[1].toFixed(2)} min</div>
-            </div>
-          `;
-        },
-      },
-      grid: {
-        bottom: 100,
-      },
-      xAxis: {
-        name: 'Longitude (\u00B0)',
-        type: 'value' as const,
-        position: 'bottom',
-        nameLocation: 'middle',
-        nameGap: 35,
-        axisLabel: { color: '#999' },
-        nameTextStyle: { color: '#fff', fontSize: 14 },
-      },
-      yAxis: {
-        name: 'Time from now (min)',
-        type: 'value' as const,
-        position: 'left',
-        nameLocation: 'middle',
-        nameGap: 50,
-        axisLabel: { color: '#999' },
-        nameTextStyle: { color: '#fff', fontSize: 14 },
-      },
-      dataZoom: [
-        {
-          type: 'slider' as const,
-          show: true,
-          xAxisIndex: [0],
-          startValue: -5,
-          endValue: 5,
-          maxValueSpan: 10,
-        },
-        {
-          type: 'slider' as const,
-          show: true,
-          yAxisIndex: [0],
-          left: '93%',
-          start: 0,
-          end: 100,
-        },
-        {
-          type: 'inside' as const,
-          xAxisIndex: [0],
-          maxValueSpan: 10,
-        },
-        {
-          type: 'inside' as const,
-          yAxisIndex: [0],
-        },
-      ],
-      series: data.map((sat) => ({
-        type: 'line' as const,
-        name: sat.country,
-        id: sat.satId.toString(),
-        data: sat.points,
-        symbol: 'circle',
-        symbolSize: 10,
-        lineStyle: { width: 1 },
-        itemStyle: { opacity: 1 },
-        emphasis: {
-          focus: 'series' as const,
-          itemStyle: { opacity: 1 },
-          lineStyle: {
-            color: '#fff',
-            width: 3,
-          },
-        },
-      })),
-    }, true);
+    // Data arrives after the menu has finished opening, so re-fit the canvas to
+    // the now-settled container before drawing (covers environments without a
+    // ResizeObserver).
+    this.chart.resize();
+    this.chart.setOption(buildChartOption(data, this.getChartLabels_()), true);
   }
 
-  private onDownload_(): void {
-    if (!this.chart) {
-      return;
+  /** Resolves the chart's user-facing strings once per render. */
+  private getChartLabels_(): Time2LonChartLabels {
+    const l = (key: string) => t7e(`plugins.Time2LonPlots.chart.${key}` as T7eKey);
+
+    return {
+      title: l('title'),
+      xAxis: l('xAxis'),
+      yAxis: l('yAxis'),
+      tooltipCountry: l('tooltipCountry'),
+      tooltipLongitude: l('tooltipLongitude'),
+      tooltipTime: l('tooltipTime'),
+      unitMin: t7e('plugins.Time2LonPlots.labels.unitMin' as T7eKey),
+      empty: l('empty'),
+    };
+  }
+
+  // =========================================================================
+  // Data gathering
+  // =========================================================================
+
+  /** Screens the catalog and resolves each survivor's top-N display country. */
+  private gatherCandidates_(filters: Time2LonFilters): Time2LonCandidate[] {
+    const catalogManager = ServiceLocator.getCatalogManager();
+    const objData = catalogManager.objectCache;
+    const allowedTypes = buildAllowedTypes(filters);
+    const matched: { index: number; sat: Satellite }[] = [];
+
+    for (let i = 0; i < objData.length; i++) {
+      const obj = objData[i];
+
+      if (!obj.isSatellite()) {
+        continue;
+      }
+
+      const sat = obj as Satellite;
+
+      if (!isSatelliteAllowed(sat, filters, allowedTypes)) {
+        continue;
+      }
+
+      matched.push({ index: i, sat });
     }
 
-    const chartDataUrl = this.chart.getDataURL({
-      type: 'png',
-      backgroundColor: '#1f1f1f',
-      pixelRatio: 2,
-    });
+    const countryCounts: Record<string, number> = {};
 
-    const chartImg = new Image();
+    for (const { sat } of matched) {
+      countryCounts[sat.country] = (countryCounts[sat.country] || 0) + 1;
+    }
+    const topCountries = buildTopCountries(countryCounts, getCountryMapList() as Record<string, string>, Time2LonPlots.topCountryCount_);
 
-    chartImg.onload = () => {
-      const canvas = document.createElement('canvas');
-
-      canvas.width = chartImg.width;
-      canvas.height = chartImg.height;
-      const ctx = canvas.getContext('2d');
-
-      if (!ctx) {
-        return;
-      }
-
-      // Draw chart
-      ctx.drawImage(chartImg, 0, 0);
-
-      // Draw logo watermark in top-left corner
-      const paddingX = 40;
-      const paddingY = 50;
-      const logoHeight = Math.max(40, canvas.height * 0.06);
-
-      if (!settingsManager.copyrightOveride && this.logo_.complete && this.logo_.naturalWidth > 0) {
-        const logoWidth = this.logo_.width * (logoHeight / this.logo_.height);
-
-        if (settingsManager.isShowSecondaryLogo && this.secondaryLogo_.complete && this.secondaryLogo_.naturalWidth > 0) {
-          const secLogoWidth = this.secondaryLogo_.width * (logoHeight / this.secondaryLogo_.height);
-
-          ctx.drawImage(this.secondaryLogo_, paddingX, paddingY, secLogoWidth, logoHeight);
-          ctx.drawImage(this.logo_, paddingX + secLogoWidth + paddingX, paddingY, logoWidth, logoHeight);
-        } else {
-          ctx.drawImage(this.logo_, paddingX, paddingY, logoWidth, logoHeight);
-        }
-      }
-
-      const link = document.createElement('a');
-
-      link.download = 'time2lon-waterfall.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    };
-    chartImg.src = chartDataUrl;
+    return matched.map(({ index, sat }) => ({ index, sat, country: topCountries.get(sat.country) ?? 'Other' }));
   }
 
-  // =========================================================================
-  // Async data gathering (chunked to prevent UI jank)
-  // =========================================================================
-
-  private getPlotDataAsync_(filters: Time2LonFilters): Promise<Time2LonSatLine[]> {
+  /**
+   * Synchronous, chunked data gathering used as the worker fallback. Kept as a
+   * separate method (and reused by the sync path) so the filtering + multi-orbit
+   * sampling is testable without a worker.
+   */
+  getPlotDataAsync_(filters: Time2LonFilters): Promise<Time2LonSatLine[]> {
     return new Promise((resolve) => {
       const catalogManager = ServiceLocator.getCatalogManager();
-      const timeManager = ServiceLocator.getTimeManager();
-      const now = timeManager.simulationTimeObj.getTime();
-      const objData = catalogManager.objectCache;
-      const allowedTypes = Time2LonPlots.buildAllowedTypes_(filters);
-
-      // Pre-filter to find GEO-regime object indices matching type filters
-      const geoIndices: number[] = [];
-
-      for (let i = 0; i < objData.length; i++) {
-        const obj = objData[i];
-
-        if (!obj.isSatellite()) {
-          continue;
-        }
-        if (!allowedTypes.has(obj.type)) {
-          continue;
-        }
-
-        // For payloads, check active/inactive status
-        if (obj.type === SpaceObjectType.PAYLOAD) {
-          const sat = obj as Satellite;
-          const isActive = sat.status === PayloadStatus.OPERATIONAL;
-
-          if (isActive && !filters.activePayloads) {
-            continue;
-          }
-          if (!isActive && !filters.inactivePayloads) {
-            continue;
-          }
-        }
-
-        const sat = obj as Satellite;
-
-        if (sat.eccentricity > Time2LonPlots.maxEccentricity_) {
-          continue;
-        }
-        if (sat.period < Time2LonPlots.minSatellitePeriod_) {
-          continue;
-        }
-        if (sat.period > Time2LonPlots.maxSatellitePeriod_) {
-          continue;
-        }
-        if (sat.inclination < filters.minInclination || sat.inclination > filters.maxInclination) {
-          continue;
-        }
-
-        // Source filter
-        if (sat.source === CatalogSource.VIMPEL && !filters.vimpel) {
-          continue;
-        }
-        if (sat.source !== CatalogSource.VIMPEL && !filters.celestrak) {
-          continue;
-        }
-
-        geoIndices.push(i);
-      }
-
-      // Build dynamic top-N country lookup from filtered objects
-      const countryCounts: Record<string, number> = {};
-
-      for (const idx of geoIndices) {
-        const sat = objData[idx] as Satellite;
-
-        countryCounts[sat.country] = (countryCounts[sat.country] || 0) + 1;
-      }
-      const topCountries = Time2LonPlots.buildTopCountries_(countryCounts);
-
+      const nowMs = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
+      const candidates = this.gatherCandidates_(filters);
       const satLines: Time2LonSatLine[] = [];
       let offset = 0;
 
       const processChunk = () => {
-        const end = Math.min(offset + Time2LonPlots.chunkSize_, geoIndices.length);
+        const end = Math.min(offset + Time2LonPlots.chunkSize_, candidates.length);
 
         for (let i = offset; i < end; i++) {
-          const sat = catalogManager.getObject(geoIndices[i], GetSatType.POSITION_ONLY) as Satellite;
-          const plotPoints = SatMathApi.getLlaOfCurrentOrbit(sat, filters.samplePoints);
-          const points: Time2LonDataPoint[] = [];
+          const candidate = candidates[i];
+          const sat = catalogManager.getObject(candidate.index, GetSatType.POSITION_ONLY) as Satellite;
+          const orbits = computeOrbits(filters.maxTimeMin, sat.period);
+          const totalPoints = filters.samplePoints * orbits;
+          const llaPoints = SatMathApi.getLlaOfCurrentOrbit(sat, totalPoints, orbits);
+          const line = buildSatLine(
+            { satId: sat.id, satName: sat.name, country: candidate.country },
+            llaPoints,
+            nowMs,
+            filters.maxTimeMin,
+          );
 
-          plotPoints.forEach((point) => {
-            const timeMin = (point.time - now) / 1000 / 60;
-
-            if (timeMin > filters.maxTimeMin || timeMin < 0) {
-              return;
-            }
-
-            points.push({ value: [point.lon as number, timeMin], satName: sat.name, satId: sat.id });
-          });
-
-          if (points.length > 0) {
-            satLines.push({
-              satName: sat.name,
-              satId: sat.id,
-              country: topCountries.get(sat.country) ?? 'Other',
-              points,
-            });
+          if (line) {
+            satLines.push(line);
           }
         }
 
         offset = end;
 
-        if (offset < geoIndices.length && this.isMenuButtonActive) {
+        if (offset < candidates.length && this.isMenuButtonActive) {
           setTimeout(processChunk, 0);
         } else {
           resolve(satLines);
@@ -516,46 +465,16 @@ export class Time2LonPlots extends KeepTrackPlugin {
   }
 
   static buildAllowedTypes_(filters: Time2LonFilters): Set<SpaceObjectType> {
-    const types = new Set<SpaceObjectType>();
-
-    if (filters.activePayloads || filters.inactivePayloads) {
-      types.add(SpaceObjectType.PAYLOAD);
-    }
-    if (filters.rocketBodies) {
-      types.add(SpaceObjectType.ROCKET_BODY);
-    }
-    if (filters.debris) {
-      types.add(SpaceObjectType.DEBRIS);
-    }
-
-    return types;
+    return buildAllowedTypes(filters);
   }
 
   /**
-   * Count objects per country code, pick the top N, and return
-   * a Map from raw country code to human-readable display name.
-   * Codes outside the top N map to 'Other'.
+   * Count objects per country code, pick the top N, and return a Map from raw
+   * country code to human-readable display name. Codes outside the top N map to
+   * 'Other'. Thin wrapper over the core helper that supplies the country map.
    */
   static buildTopCountries_(countryCounts: Record<string, number>): Map<string, string> {
-    const sorted = Object.entries(countryCounts)
-      .sort(([, a], [, b]) => b - a);
-
-    const countryMap = getCountryMapList() as Record<string, string>;
-    const topCodes = sorted.slice(0, Time2LonPlots.topCountryCount_).map(([code]) => code);
-    const lookup = new Map<string, string>();
-
-    for (const code of topCodes) {
-      lookup.set(code, countryMap[code] ?? code);
-    }
-
-    // Everything else maps to 'Other'
-    for (const [code] of sorted) {
-      if (!lookup.has(code)) {
-        lookup.set(code, 'Other');
-      }
-    }
-
-    return lookup;
+    return buildTopCountries(countryCounts, getCountryMapList() as Record<string, string>, Time2LonPlots.topCountryCount_);
   }
 
   // =========================================================================
@@ -580,7 +499,7 @@ export class Time2LonPlots extends KeepTrackPlugin {
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
 
-    totalEl.textContent = `${t7e('plugins.Time2LonPlots.labels.totalGeoPayloads' as T7eKey)}: ${data.length}`;
+    totalEl.textContent = `${t7e('plugins.Time2LonPlots.labels.objectsShown' as T7eKey)}: ${data.length}`;
 
     countsEl.textContent = '';
     counts.forEach((c) => {

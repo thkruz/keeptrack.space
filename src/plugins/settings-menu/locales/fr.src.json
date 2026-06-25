@@ -3,7 +3,55 @@
     "SettingsMenuPlugin": {
       "bottomIconLabel": "Paramètres",
       "title": "Menu Paramètres",
-      "helpBody": "Le menu Paramètres vous permet de configurer l'application."
+      "filterPlaceholder": "Filtrer les paramètres...",
+      "buttons": {
+        "resetToDefaults": "Réinitialiser par défaut"
+      },
+      "commands": {
+        "open": "Ouvrir les paramètres",
+        "reset": "Réinitialiser les paramètres par défaut"
+      },
+      "sections": {
+        "general": "Paramètres généraux",
+        "fastCpu": "CPU rapide requis"
+      },
+      "labels": {
+        "showInfoOnHover": "Afficher les infos au survol",
+        "drawOrbits": "Dessiner les orbites",
+        "drawTrailingOrbits": "Dessiner les orbites traînantes",
+        "drawOrbitsInEcf": "Dessiner les orbites en ECF",
+        "numberOfEcfOrbits": "Nombre d'orbites ECF à dessiner",
+        "drawFovLines": "Dessiner les lignes de FOV",
+        "displayEciOnHover": "Afficher l'ECI au survol",
+        "showCameraWidget": "Afficher le widget de caméra",
+        "showConfidenceLevels": "Afficher les niveaux de confiance",
+        "enableDemoMode": "Activer le mode démo",
+        "enableFreezeTime": "Figer le temps au clic",
+        "compensateEarthRotation": "Compenser la rotation de la Terre",
+        "showNextPassOnHover": "Afficher le prochain passage au survol"
+      },
+      "tooltips": {
+        "showInfoOnHover": "Affiche plus d'informations au survol d'un satellite.",
+        "drawOrbits": "Désactivez ceci pour masquer les lignes d'orbite",
+        "drawTrailingOrbits": "Activez ceci pour montrer où était un satellite plutôt que là où il va",
+        "drawOrbitsInEcf": "Les orbites seront dessinées en ECF plutôt qu'en ECI (surtout pour les orbites GEO)",
+        "drawFovLines": "Dessiner des lignes du capteur vers les satellites lorsqu'ils sont dans le FOV",
+        "displayEciOnHover": "Afficher les coordonnées ECI au survol",
+        "showCameraWidget": "Désactivez ceci pour masquer le widget de caméra",
+        "showConfidenceLevels": "Afficher les niveaux de confiance des jeux d'éléments du satellite.",
+        "enableDemoMode": "Toutes les 3 secondes, un nouveau satellite sera sélectionné dans le FOV",
+        "enableFreezeTime": "Le temps se figera pendant que vous faites pivoter la caméra.",
+        "compensateEarthRotation": "Compense le lacet de la caméra selon la rotation de la Terre afin que la vue reste fixée aux coordonnées géographiques.",
+        "showNextPassOnHover": "Affiche l'heure du prochain passage au survol d'un satellite situé dans le champ de vision du capteur sélectionné."
+      },
+      "help": {
+        "overview": "Le menu Paramètres regroupe les options d'affichage et d'interaction de toute l'application : tracé des orbites, comportement au survol, aides de caméra et extras sensibles aux performances. D'autres plugins y ajoutent aussi leurs propres sections, c'est donc l'endroit unique pour régler le comportement de KeepTrack.",
+        "imgAlt": "Le menu Paramètres avec ses interrupteurs d'options générales",
+        "imgCaption": "Basculez une option pour l'appliquer instantanément ; utilisez le filtre pour trouver rapidement un paramètre.",
+        "howToUse": "<ol><li>Ouvrez <strong>Paramètres</strong> depuis la barre inférieure.</li><li>Basculez un interrupteur pour l'appliquer instantanément ; survolez une ligne pour afficher une infobulle explicative.</li><li>Utilisez le champ de <strong>filtre</strong> en haut pour trouver rapidement un paramètre par son nom.</li><li><strong>Réinitialiser par défaut</strong> restaure toutes les options, y compris les sections ajoutées par les plugins, aux valeurs d'usine.</li></ol>",
+        "tip1": "Les options sous CPU rapide requis, comme l'affichage du prochain passage au survol, effectuent des calculs supplémentaires à chaque image ; laissez-les désactivées sur les machines lentes.",
+        "tip2": "Les sections de plugins en bas proviennent d'autres plugins (Watchlist, Machine à remonter le temps et plus encore) ; le menu s'enrichit donc à mesure que les plugins sont activés."
+      }
     }
   }
 }

@@ -3,7 +3,58 @@
     "ScenarioManagementMenu": {
       "title": "Gestión de escenarios",
       "bottomIconLabel": "Gestión de escenarios",
-      "helpBody": "El complemento de gestión de escenarios le permite organizar su trabajo para diferentes proyectos o contextos.<br/>Las funciones actuales son:<br/><br/>  - Nombre y descripción para cada escenario<br/>  - Fecha/hora de inicio y fin del período de análisis<br/>  - Guardar/Cargar escenarios<br/><br/>El objetivo es proporcionar eventualmente un único archivo que contenga toda la información necesaria para la gestión de escenarios. ¡Más funciones próximamente!"
+      "sideMenuTitle": "Configuración del escenario",
+      "labels": {
+        "scenarioName": "Nombre del escenario",
+        "description": "Descripción",
+        "scenarioStart": "Inicio del escenario",
+        "scenarioEnd": "Fin del escenario"
+      },
+      "tooltips": {
+        "name": "El nombre del escenario.",
+        "description": "La descripción del escenario.",
+        "startDate": "El DTG de inicio del escenario en UTC (YYYY-MM-DD HH:MM:SS.sss).",
+        "endDate": "El DTG de fin del escenario en UTC (YYYY-MM-DD HH:MM:SS.sss)."
+      },
+      "placeholders": {
+        "description": "Introduzca aquí la descripción del escenario..."
+      },
+      "buttons": {
+        "updateScenario": "Actualizar escenario",
+        "saveScenario": "Guardar escenario",
+        "loadScenario": "Cargar escenario"
+      },
+      "msgs": {
+        "settingsUpdated": "¡Configuración del escenario actualizada correctamente!",
+        "scenarioLoaded": "¡Escenario cargado correctamente!"
+      },
+      "errorMsgs": {
+        "nameRequired": "El nombre del escenario es obligatorio.",
+        "startDateInvalid": "La fecha de inicio no es válida.",
+        "endDateInvalid": "La fecha de fin no es válida.",
+        "savingScenario": "¡Error al guardar el escenario!",
+        "loadingScenarioFile": "¡Error al cargar el archivo de escenario!",
+        "decompressingScenarioFile": "¡Error al descomprimir el archivo de escenario!"
+      },
+      "defaults": {
+        "scenarioName": "Mi escenario",
+        "scenarioDescription": "Descripción de mi escenario"
+      },
+      "core": {
+        "beforeStartTime": "El tiempo de simulación es anterior al inicio del escenario. Pausando en el tiempo de inicio.",
+        "afterStopTime": "El tiempo de simulación es posterior al fin del escenario. Pausando en el tiempo de fin."
+      },
+      "help": {
+        "overview": "La gestión de escenarios da a su sesión un contexto con nombre: un escenario con un nombre, una descripción y una ventana de análisis opcional con una hora de inicio y de fin. El reloj de simulación se mantiene entonces dentro de esa ventana, y la definición completa puede guardarse en un archivo y recargarse más tarde o compartirse con un compañero.",
+        "imgAlt": "El menú Configuración del escenario con campos de nombre, descripción y ventana temporal",
+        "imgCaption": "Defina un nombre de escenario, una descripción y, opcionalmente, una hora de inicio y de fin.",
+        "windowHeading": "La ventana del escenario",
+        "window": "Cuando establece un <strong>Inicio del escenario</strong> o un <strong>Fin del escenario</strong> (UTC, con formato YYYY-MM-DD HH:MM:SS.sss), el reloj de simulación queda limitado a esa ventana: si el tiempo se desplaza antes del inicio o más allá del fin, el reloj se pausa en el límite y una notificación explica el motivo. Deje los campos vacíos para un escenario sin restricciones.",
+        "howToUse": "<ol><li>Abra <strong>Gestión de escenarios</strong> desde el menú inferior (modo Herramientas).</li><li>Introduzca un <strong>Nombre del escenario</strong> (obligatorio) y una <strong>Descripción</strong> opcional.</li><li>Opcionalmente, establezca las horas de <strong>Inicio del escenario</strong> y <strong>Fin del escenario</strong> en UTC.</li><li>Haga clic en <strong>Actualizar escenario</strong> para aplicar. La ventana temporal se aplica de inmediato.</li><li>Use <strong>Guardar escenario</strong> para descargar la definición como un archivo .kts comprimido, y <strong>Cargar escenario</strong> para restaurar uno desde el disco.</li></ol>",
+        "tip1": "Si la reproducción parece atascada, compruebe si el reloj está fijado en un límite del escenario; borre los campos de inicio y fin para liberarlo.",
+        "tip2": "Los archivos de escenario son pequeños archivos .kts comprimidos, útiles para compartir una ventana de análisis común con un equipo.",
+        "tip3": "Los campos de fecha se validan mientras escribe; una fecha no válida se resalta y se rechaza al actualizar."
+      }
     }
   }
 }

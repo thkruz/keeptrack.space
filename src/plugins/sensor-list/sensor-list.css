@@ -1,37 +1,48 @@
-#reset-sensor-button {
-  margin: 10px 0px;
-}
+/* v13 sensor list. The reset action is the primary control; each sensor group is
+ * a kt-section card holding a "select all" top-link plus one action row per
+ * sensor. */
 
-#reset-sensor-text {
-  text-align: center;
-}
-
-#list-of-sensors li:first-child {
+/* The first group's (SSN) "select all" top-link is intentionally hidden — the
+ * group is too large to select at once. The bottom-icon callback only clears the
+ * inline display, which reverts to this rule, so it stays hidden. */
+#list-of-sensors .sensor-group-section:first-child .sensor-top-link {
   display: none;
 }
 
-#sensor-list-content ul li {
-  padding: 2px !important;
-  overflow: hidden !important;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-gap: 10px;
-  align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-/* First span goes left */
-#sensor-list-content ul li span:first-child {
-  float: left;
-  text-align: left;
+/* Sensor row label: name grows to fill the row, the muted system tag sits beside
+ * it, and the operator chip rides next to the chevron. */
+#sensor-list-content .kt-action-label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
 }
 
-/* Second span is centered */
-#sensor-list-content ul li span:nth-child(2) {
+#sensor-list-content .sensor-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#sensor-list-content .sensor-system {
+  flex-shrink: 0;
+  font-size: 0.8em;
+  color: var(--color-dark-text-muted);
+}
+
+/* Operator / affiliation chip riding next to the chevron. */
+#sensor-list-content .sensor-badge {
+  flex-shrink: 0;
+  margin-left: 8px;
+  background: var(--color-dark-background);
+  border: 1px solid var(--color-dark-border);
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 0.72em;
+  letter-spacing: 0.04em;
+  color: var(--color-dark-text-accent);
   text-align: center;
-}
-
-/* Third span goes right */
-#sensor-list-content ul li span:last-child {
-  float: right;
-  text-align: right;
+  white-space: nowrap;
 }

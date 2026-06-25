@@ -3,16 +3,48 @@
     "WatchlistPlugin": {
       "bottomIconLabel": "워치리스트",
       "title": "워치리스트",
-      "helpBody": "워치리스트 메뉴를 사용하면 추적할 우선 순위 위성 목록을 만들 수 있습니다. 이를 통해 가장 관심 있는 위성을 빠르게 검색할 수 있습니다. 이 목록은 브라우저의 로컬 스토리지에 저장되며 다음에 사이트를 방문할 때도 사용할 수 있습니다. <br><br> 워치리스트의 위성이 선택된 센서의 시야에 들어오면 알림이 표시되고, 센서에서 위성까지 선이 그려지며, 위성 번호가 지구본에 표시됩니다. <br><br> 오버레이 기능은 워치리스트가 채워져 있어야 작동합니다."
-,
+      "help": {
+        "overview": "워치리스트는 우선적으로 추적할 위성 목록입니다. 브라우저에 저장되므로 페이지를 새로 고침해도 유지됩니다. 센서가 선택된 상태에서 워치리스트 위성이 해당 센서의 시야에 들어오면 알림이 표시되고, 센서에서 위성까지 선이 그려지며, 위성 번호가 지구본에 표시됩니다.",
+        "imgAlt": "여러 위성이 추가된 워치리스트 메뉴",
+        "imgCaption": "여러 위성이 있는 워치리스트. 이름을 클릭하면 선택되고, 북마크 아이콘을 클릭하면 제거됩니다.",
+        "managingHeading": "목록 관리",
+        "managing": "<ul><li><strong>추가</strong>: 쉼표나 공백으로 구분된 NORAD 번호를 하나 이상 입력하고(T0001과 같은 alpha-5 ID도 사용 가능) 추가 아이콘을 클릭하거나 Enter 키를 누릅니다.</li><li><strong>빠른 추가/제거</strong>: 지구본에서 위성이 선택된 상태에서 정보 상자의 이름 옆에 있는 북마크 아이콘을 클릭합니다.</li><li><strong>선택</strong>: 목록에서 위성의 번호나 이름을 클릭하면 해당 위성으로 이동합니다.</li><li><strong>저장 / 불러오기</strong>: 목록을 JSON 파일로 내보내고 나중에 불러오거나 공유할 수 있습니다.</li><li><strong>지우기</strong>: 전체 목록을 비웁니다.</li></ul>",
+        "howToUse": "<ol><li>하단 바에서 메뉴를 열거나 W 키를 누릅니다.</li><li>NORAD 번호로 위성을 추가합니다. 예를 들어 ISS는 25544입니다.</li><li>센서 메뉴에서 센서를 선택하면 시야 내 알림과 센서-위성 간 선 표시가 시작됩니다.</li><li>보조 메뉴(톱니바퀴 아이콘)를 열어 워치리스트 외의 모든 객체를 숨기거나 라벨 표시 시점(항상 / FOV만 / 끄기)을 변경할 수 있습니다.</li></ol>",
+        "tip1": "\"다른 객체 숨기기\"를 사용하면 지구본이 워치리스트 전용 보기로 바뀝니다. 전체 카탈로그의 혼잡함 없이 소수의 객체를 추적하기에 적합합니다.",
+        "tip2": "오버레이 메뉴(워치리스트의 각 위성에 대한 다음 패스 시간)는 워치리스트에 항목이 있어야 작동합니다.",
+        "tip3": "중복 항목은 자동으로 무시되며, 잘못된 번호를 입력하면 찾을 수 없는 위성의 이름이 포함된 토스트 알림이 표시됩니다.",
+        "shortcutToggle": "워치리스트 메뉴 전환"
+      },
+      "labels": {
+        "newSatellites": "새 위성",
+        "saveList": "목록 저장",
+        "loadList": "목록 불러오기",
+        "clearList": "목록 지우기",
+        "hideOtherObjects": "다른 객체 숨기기",
+        "labelAlways": "항상",
+        "labelFovOnly": "FOV만",
+        "labelOff": "끄기",
+        "satellitesHeader": "위성",
+        "actionsHeader": "작업",
+        "displayHeader": "표시",
+        "labelsHeader": "레이블"
+      },
+      "msgs": {
+        "watchlistLoaded": "{count}개의 위성으로 워치리스트를 불러왔습니다"
+      },
+      "errorMsgs": {
+        "NoradAlreadyInList": "NORAD: {sccNum}은(는) 이미 목록에 있습니다!",
+        "ObjectAlreadyInList": "객체 {id}은(는) 이미 목록에 있습니다!",
+        "SatNotFound": "위성 {id}을(를) 찾을 수 없습니다!"
+      },
       "settings": {
         "satLabelMode": {
-          "label": "Satellite Label Mode",
-          "helpText": "Controls satellite label rendering on watchlist satellites.",
+          "label": "위성 라벨 모드",
+          "helpText": "워치리스트 위성의 라벨 표시를 제어합니다.",
           "options": {
-            "off": "Off",
-            "fovOnly": "FOV Only",
-            "all": "All Watchlist"
+            "off": "끄기",
+            "fovOnly": "FOV만",
+            "all": "전체 워치리스트"
           }
         }
       }
@@ -20,7 +52,20 @@
     "WatchlistOverlay": {
       "bottomIconLabel": "오버레이",
       "title": "오버레이 메뉴",
-      "helpBody": "<p> 워치리스트 오버레이는 워치리스트에 있는 각 위성의 다음 패스 시간을 보여줍니다. 오버레이는 10초마다 업데이트됩니다. </p> <p> 오버레이는 다음 패스 시간을 나타내기 위해 색상 코드로 구분됩니다. 색상은 다음과 같습니다: </p> <ul> <li>노란색 - 보이는 중</li> <li>파란색 - 다음 패스 시간이 현재 시간 후 최대 30분 또는 현재 시간 전 10분</li> <li>흰색 - 위의 요구 사항에 맞지 않는 모든 미래 패스</li> </ul> <p> 오버레이에서 위성을 클릭하면 지도가 해당 위성을 중심으로 이동합니다. </p>"
+      "helpBody": "<p> 워치리스트 오버레이는 워치리스트에 있는 각 위성의 다음 패스 시간을 보여줍니다. 오버레이는 10초마다 업데이트됩니다. </p> <p> 오버레이는 다음 패스 시간을 나타내기 위해 색상 코드로 구분됩니다. 색상은 다음과 같습니다: </p> <ul> <li>노란색 - 보이는 중</li> <li>파란색 - 다음 패스 시간이 현재 시간 후 최대 30분 또는 현재 시간 전 10분</li> <li>흰색 - 위의 요구 사항에 맞지 않는 모든 미래 패스</li> </ul> <p> 오버레이에서 위성을 클릭하면 지도가 해당 위성을 중심으로 이동합니다. </p>",
+      "openOverlayCmd": "Watchlist 오버레이 열기",
+      "addSatellitesToast": "먼저 목록에 위성을 추가하세요!",
+      "noPassesMsg": "60분 이내 통과 없음",
+      "inFovToast": "위성 {sccNum}이(가) 시야에 들어왔습니다!",
+      "leftFovToast": "위성 {sccNum}이(가) 시야에서 벗어났습니다!",
+      "tiers": {
+        "inView": "시야 내",
+        "nextUp": "다음",
+        "upcoming": "예정",
+        "later": "나중에",
+        "background": "배경",
+        "departed": "지나감"
+      }
     }
   }
 }

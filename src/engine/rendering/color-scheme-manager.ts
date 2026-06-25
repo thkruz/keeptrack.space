@@ -189,6 +189,13 @@ export class ColorSchemeManager {
         return;
       }
 
+      // Periodic recolors are suppressed during a multi-frame offscreen capture
+      // so they cannot overwrite the capture's photometric colors. Forced
+      // recolors still run - state restoration after a capture relies on them.
+      if (!isForceRecolor && ServiceLocator.getRenderer()?.isCapturing) {
+        return;
+      }
+
       // In worker mode, delegate to the color worker instead of running main-thread loop
       if (this.useWorkerMode_ && this.colorCruncher_) {
         if (isForceRecolor) {
@@ -351,6 +358,13 @@ export class ColorSchemeManager {
     // Handle color buffer results from worker
     EventBus.getInstance().on(EventBusEvent.onColorBufferReady, () => {
       if (!this.colorCruncher_) {
+        return;
+      }
+
+      // During a multi-frame offscreen capture the capture owns colorData
+      // (photometric colors); applying a worker result would overwrite them
+      // mid-exposure. Drop it - the next result after captureEnd lands normally.
+      if (ServiceLocator.getRenderer()?.isCapturing) {
         return;
       }
       const data = this.colorCruncher_.consumeColorData();
@@ -548,6 +562,12 @@ export class ColorSchemeManager {
   isCelestrakSatOff(obj: BaseObject) {
     return settingsManager.filter?.celestrakSatellites === false && (obj as Satellite)?.source === CatalogSource.CELESTRAK;
   }
+  isCelestrakSupSatOff(obj: BaseObject) {
+    return settingsManager.filter?.celestrakSupSatellites === false && (obj as Satellite)?.source === CatalogSource.CELESTRAK_SUP;
+  }
+  isSatnogsSatOff(obj: BaseObject) {
+    return settingsManager.filter?.satnogsSatellites === false && (obj as Satellite)?.source === CatalogSource.SATNOGS;
+  }
   isStarlinkSatOff(obj: BaseObject) {
     return settingsManager.filter?.starlinkSatellites === false && obj.name?.includes('STARLINK');
   }
@@ -656,6 +676,18 @@ export class ColorSchemeManager {
       };
     }
     if (this.isCelestrakSatOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isCelestrakSupSatOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isSatnogsSatOff(sat)) {
       return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
@@ -938,6 +970,8 @@ export class ColorSchemeManager {
    * When set, each satellite's alpha is multiplied by the corresponding value before GPU upload.
    */
   setFovFadeAlpha(alpha: Float32Array | null): void {
+    const hadOverlay = this.fovFadeAlpha_ !== null;
+
     this.fovFadeAlpha_ = alpha;
 
     if (this.colorData.length === 0) {
@@ -947,6 +981,13 @@ export class ColorSchemeManager {
     // Restore clean color data before reapplying overlay to avoid compounding
     if (this.cleanColorData_ && this.cleanColorData_.length === this.colorData.length) {
       this.colorData.set(this.cleanColorData_);
+    } else if (alpha && !hadOverlay) {
+      // First time enabling the overlay with no clean snapshot yet: the current
+      // buffer is un-overlaid, so capture it as the base for future reapplies.
+      // Without this, rapid partial updates arriving before the next recolor
+      // (e.g. the worker's progressive sweep while the sim is paused) would
+      // compound the fade and darken everything.
+      this.cleanColorData_ = new Float32Array(this.colorData);
     }
 
     if (!alpha) {
@@ -969,6 +1010,14 @@ export class ColorSchemeManager {
     for (let i = 0; i < n; i++) {
       this.colorData[i * 4 + 3] *= this.fovFadeAlpha_[i];
     }
+  }
+
+  /**
+   * Re-upload colorData to the GPU after an external system wrote per-object
+   * colors directly (e.g. the optical-simulation capture's photometric pass).
+   */
+  uploadColorDataToGpu(): void {
+    this.sendColorBufferToGpu();
   }
 
   /**
@@ -1171,7 +1220,7 @@ export class ColorSchemeManager {
       isSensorManagerLoaded: catalogManager.isSensorManagerLoaded,
       sensorType: sensorManager?.currentSensors?.[0]?.type ?? 0,
       maxZoomDistance: settingsManager.maxZoomDistance,
-      isMissilePluginEnabled: !!settingsManager.plugins?.MissilePlugin?.enabled,
+      isMissileSimulatorEnabled: !!settingsManager.plugins?.MissileSimulatorPlugin?.enabled,
     };
 
     this.colorCruncher_.sendSettingsUpdate(flags);

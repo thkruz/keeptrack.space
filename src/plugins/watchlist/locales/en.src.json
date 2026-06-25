@@ -3,8 +3,40 @@
     "WatchlistPlugin": {
       "bottomIconLabel": "Watchlist",
       "title": "Watchlist",
-      "helpBody": "The Watchlist menu allows you to create a list of priority satellites to track. This allows you to quickly retrieve the satellites you are most interested in. The list is saved in your browser's local storage and will be available the next time you visit the site. <br><br> When satellites on the watchlist enter the selected sensor's field of view a notification will be displayed, a line will be drawn from the sensor to the satellite, and the satellite's number will be displayed on the globe. <br><br> The overlay feature relies on the watchlist being populated."
-,
+      "help": {
+        "overview": "The Watchlist is your priority list of satellites. It is saved in your browser, so it survives reloads. When a sensor is selected and a watchlist satellite enters its field of view, you get a notification, a line is drawn from the sensor to the satellite, and the satellite's number appears on the globe.",
+        "imgAlt": "The Watchlist menu with several satellites added",
+        "imgCaption": "A watchlist with several satellites. Click a name to select it; the bookmark icon removes it.",
+        "managingHeading": "Managing the List",
+        "managing": "<ul><li><strong>Add</strong>: type one or more NORAD numbers separated by commas or spaces (alpha-5 IDs like T0001 work too) and click the add icon or press Enter.</li><li><strong>Quick add/remove</strong>: when any satellite is selected on the globe, click the bookmark icon next to its name in the info box.</li><li><strong>Select</strong>: click a satellite's number or name in the list to fly to it.</li><li><strong>Save / Load</strong>: export the list as a JSON file and load it later or share it.</li><li><strong>Clear</strong>: empties the entire list.</li></ul>",
+        "howToUse": "<ol><li>Open the menu from the bottom bar or press W.</li><li>Add satellites by NORAD number, for example 25544 for the ISS.</li><li>Select a sensor in the Sensors menu to start getting in-view notifications and sensor-to-satellite lines.</li><li>Open the secondary menu (gear icon) to hide all non-watchlist objects or change when labels are drawn (Always / FOV Only / Off).</li></ol>",
+        "tip1": "\"Hide Other Objects\" turns the globe into a watchlist-only view. It is perfect for following a handful of objects without the clutter of the full catalog.",
+        "tip2": "The Overlay menu (next-pass times for every watchlist satellite) only works once the watchlist has entries.",
+        "tip3": "Duplicates are ignored automatically, and invalid numbers produce a toast naming the satellite that wasn't found.",
+        "shortcutToggle": "Toggle the Watchlist menu"
+      },
+      "labels": {
+        "newSatellites": "New Satellite(s)",
+        "saveList": "Save List",
+        "loadList": "Load List",
+        "clearList": "Clear List",
+        "hideOtherObjects": "Hide Other Objects",
+        "labelAlways": "Always",
+        "labelFovOnly": "FOV Only",
+        "labelOff": "Off",
+        "satellitesHeader": "Satellites",
+        "actionsHeader": "Actions",
+        "displayHeader": "Display",
+        "labelsHeader": "Labels"
+      },
+      "msgs": {
+        "watchlistLoaded": "Watchlist Loaded with {count} Satellites"
+      },
+      "errorMsgs": {
+        "NoradAlreadyInList": "NORAD: {sccNum} already in list!",
+        "ObjectAlreadyInList": "Object {id} already in list!",
+        "SatNotFound": "Sat {id} not found!"
+      },
       "settings": {
         "satLabelMode": {
           "label": "Satellite Label Mode",
@@ -20,7 +52,20 @@
     "WatchlistOverlay": {
       "bottomIconLabel": "Overlay",
       "title": "Overlay Menu",
-      "helpBody": "<p> The Watchlist Overlay shows the next pass time for each satellite in your watchlist. The overlay is updated every 10 seconds. </p> <p> The overlay is color coded to show the time to the next pass. The colors are as follows: </p> <ul> <li>Yellow - In View</li> <li>Blue - Time to Next Pass is up to 30 minutes after the current time or 10 minutes before the current time</li> <li>White - Any future pass not fitting the above requirements</li> </ul> <p> Clicking on a satellite in the overlay will center the map on that satellite. </p>"
+      "helpBody": "<p> The Watchlist Overlay shows the next pass time for each satellite in your watchlist. The overlay is updated every 10 seconds. </p> <p> The overlay is color coded to show the time to the next pass. The colors are as follows: </p> <ul> <li>Yellow - In View</li> <li>Blue - Time to Next Pass is up to 30 minutes after the current time or 10 minutes before the current time</li> <li>White - Any future pass not fitting the above requirements</li> </ul> <p> Clicking on a satellite in the overlay will center the map on that satellite. </p>",
+      "openOverlayCmd": "Open Watchlist Overlay",
+      "addSatellitesToast": "Add satellites to your list first!",
+      "noPassesMsg": "No passes within 60 minutes",
+      "inFovToast": "Satellite {sccNum} is in field of view!",
+      "leftFovToast": "Satellite {sccNum} left field of view!",
+      "tiers": {
+        "inView": "IN VIEW",
+        "nextUp": "NEXT UP",
+        "upcoming": "UPCOMING",
+        "later": "LATER",
+        "background": "BACKGROUND",
+        "departed": "DEPARTED"
+      }
     }
   }
 }

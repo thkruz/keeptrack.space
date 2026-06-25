@@ -1,0 +1,38 @@
+{
+  "plugins": {
+    "TheSpaceDevLaunchCalendarPlugin": {
+      "bottomIconLabel": "Kalendář startů",
+      "title": "Kalendář startů",
+      "sideMenuTitle": "Kalendář startů",
+      "tooltips": {
+        "fetchData": "Načíst data",
+        "refresh": "Obnovit",
+        "exportLaunchInfo": "Exportovat informace o startech"
+      },
+      "labels": {
+        "dataActions": "Akce s daty",
+        "results": "Nadcházející starty"
+      },
+      "table": {
+        "launchWindow": "Startovní okno",
+        "mission": "Mise",
+        "location": "Místo",
+        "agency": "Agentura",
+        "country": "Země"
+      },
+      "msgs": {
+        "fetching": "Načítání nadcházejících startů...",
+        "unknown": "Neznámé",
+        "tbd": "Bude upřesněno"
+      },
+      "help": {
+        "overview": "Další starty zobrazují seznam nadcházejících orbitálních startů z celého světa, načítaný živě z knihovny startů The Space Devs: startovní okno, misi, místo startu, agenturu a zemi každého z nich. Názvy misí a míst startu odkazují na další informace, pokud jsou k dispozici.",
+        "imgAlt": "Tabulka Další starty s nadcházejícími misemi",
+        "imgCaption": "Každý řádek je nadcházející start se svým oknem, misí, místem a agenturou.",
+        "howToUse": "<ol><li>Otevřete <strong>Další starty</strong> ze spodní lišty (režim Události).</li><li>Kliknutím na tlačítko načtení stáhněte aktuální seznam startů; je vyžadováno připojení k internetu.</li><li>Procházejte tabulku; odkazované názvy misí a ramp otevírají stránky s dalšími informacemi.</li><li>Pomocí tlačítka exportu uložte seznam jako tabulku.</li></ol>",
+        "tip1": "Startovní okna se zobrazují v UTC; u záznamů starších než jeden den se zobrazuje „Bude upřesněno“, dokud nejsou načtena čerstvá data.",
+        "tip2": "Zkombinujte tento seznam s nástrojem Nový start a namodelujte trajektorii nadcházejícího startu ještě před jeho uskutečněním."
+      }
+    }
+  }
+}

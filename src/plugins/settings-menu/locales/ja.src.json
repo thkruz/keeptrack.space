@@ -3,7 +3,55 @@
     "SettingsMenuPlugin": {
       "bottomIconLabel": "設定",
       "title": "設定メニュー",
-      "helpBody": "設定メニューでは、アプリケーションを構成できます。"
+      "filterPlaceholder": "設定をフィルター...",
+      "buttons": {
+        "resetToDefaults": "デフォルトにリセット"
+      },
+      "commands": {
+        "open": "設定を開く",
+        "reset": "設定をデフォルトにリセット"
+      },
+      "sections": {
+        "general": "一般設定",
+        "fastCpu": "高速なCPUが必要"
+      },
+      "labels": {
+        "showInfoOnHover": "ホバー時に情報を表示",
+        "drawOrbits": "軌道を描画",
+        "drawTrailingOrbits": "後方の軌道を描画",
+        "drawOrbitsInEcf": "ECFで軌道を描画",
+        "numberOfEcfOrbits": "描画するECF軌道の数",
+        "drawFovLines": "FOVラインを描画",
+        "displayEciOnHover": "ホバー時にECIを表示",
+        "showCameraWidget": "カメラウィジェットを表示",
+        "showConfidenceLevels": "信頼度レベルを表示",
+        "enableDemoMode": "デモモードを有効化",
+        "enableFreezeTime": "クリック時に時間を停止",
+        "compensateEarthRotation": "地球の自転を補正",
+        "showNextPassOnHover": "ホバー時に次のパスを表示"
+      },
+      "tooltips": {
+        "showInfoOnHover": "衛星にマウスを合わせると、より多くの情報を表示します。",
+        "drawOrbits": "無効にすると軌道線を非表示にします",
+        "drawTrailingOrbits": "有効にすると、衛星の進行方向ではなく、これまでの位置を表示します",
+        "drawOrbitsInEcf": "軌道がECIではなくECFで描画されます（主にGEO軌道向け）",
+        "drawFovLines": "FOV内にある衛星に向けてセンサーから線を描画します",
+        "displayEciOnHover": "ホバー時にECI座標を表示します",
+        "showCameraWidget": "無効にするとカメラウィジェットを非表示にします",
+        "showConfidenceLevels": "衛星の軌道要素セットの信頼度レベルを表示します。",
+        "enableDemoMode": "3秒ごとにFOVから新しい衛星が選択されます",
+        "enableFreezeTime": "カメラを回転している間、時間が停止します。",
+        "compensateEarthRotation": "地球の自転に合わせてカメラのヨーを補正し、視点を地理座標に固定したままにします。",
+        "showNextPassOnHover": "選択したセンサーの視野内にある衛星にマウスを合わせると、次のパスの時刻を表示します。"
+      },
+      "help": {
+        "overview": "設定メニューには、アプリケーション全体の表示および操作オプションが含まれます。軌道の描画、ホバー時の動作、カメラ補助、パフォーマンスに影響する追加機能などです。他のプラグインも独自のセクションをここに追加するため、KeepTrackの動作を調整する唯一の場所です。",
+        "imgAlt": "一般オプションのスイッチが並ぶ設定メニュー",
+        "imgCaption": "オプションを切り替えると即座に適用されます。フィルターを使うと設定をすばやく見つけられます。",
+        "howToUse": "<ol><li>下部バーから<strong>設定</strong>を開きます。</li><li>スイッチを切り替えると即座に適用されます。行にマウスを合わせると説明のツールチップが表示されます。</li><li>上部の<strong>フィルター</strong>ボックスを使うと、名前で設定をすばやく見つけられます。</li><li><strong>デフォルトにリセット</strong>は、プラグインが追加したセクションを含むすべてのオプションを初期値に戻します。</li></ol>",
+        "tip1": "高速なCPUが必要の下にあるオプション（ホバー時の次のパス表示など）は、毎フレーム余分な計算を行います。低速なマシンではオフのままにしてください。",
+        "tip2": "下部のプラグインセクションは他のプラグイン（ウォッチリスト、タイムマシンなど）によるものなので、プラグインを有効にするほどメニューは増えていきます。"
+      }
     }
   }
 }

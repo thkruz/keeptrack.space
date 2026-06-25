@@ -3,12 +3,60 @@
     "SensorInfoPlugin": {
       "bottomIconLabel": "Info Capteur",
       "title": "Menu Info Capteur",
-      "helpBody": "Info Capteur fournit des informations sur le capteur actuellement sélectionné. Les informations sont basées sur des données publiques et peuvent ne pas toujours être 100% exactes. Si vous avez des données publiques sur d'autres capteurs ou des corrections à apporter, contactez-moi à <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>. <br><br> Les informations fournies incluent : <ul style=\"margin-left: 40px;\"> <li> Nom du capteur </li> <li> Propriétaire du capteur </li> <li> Type de capteur </li> <li> Champ de vision du capteur </li> </ul> <br> De plus, des lignes peuvent être rapidement créées du capteur vers le soleil ou la lune depuis ce menu."
+      "labels": {
+        "sensorName": "Nom du capteur",
+        "country": "Pays",
+        "sensorType": "Type de capteur",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "minAzimuth": "Azimut min",
+        "maxAzimuth": "Azimut max",
+        "minElevation": "Élévation min",
+        "maxElevation": "Élévation max",
+        "minRange": "Portée min",
+        "maxRange": "Portée max",
+        "band": "Bande",
+        "beamWidth": "Largeur de faisceau",
+        "unknown": "Inconnu",
+        "details": "Détails",
+        "visualizations": "Visualisations"
+      },
+      "buttons": {
+        "drawLineToSun": "Tracer une ligne vers le Soleil",
+        "drawLineToMoon": "Tracer une ligne vers la Lune",
+        "addLineToSun": "Ajouter une ligne vers le Soleil",
+        "removeLineToSun": "Supprimer la ligne vers le Soleil",
+        "addLineToMoon": "Ajouter une ligne vers la Lune",
+        "removeLineToMoon": "Supprimer la ligne vers la Lune"
+      },
+      "errorMsgs": {
+        "selectOnlyOneSensor": "Veuillez sélectionner un seul capteur"
+      },
+      "help": {
+        "overview": "Info Capteur affiche les détails techniques du capteur actuellement sélectionné : son propriétaire, son type, son emplacement et les limites exactes de son champ de vision. L'icône reste désactivée jusqu'à ce que vous sélectionniez un capteur dans le menu Capteurs.",
+        "imgAlt": "Le menu Info Capteur affichant l'emplacement et les limites du champ de vision d'un capteur",
+        "imgCaption": "Info Capteur pour un radar sélectionné, y compris ses limites d'azimut, d'élévation et de portée.",
+        "fieldsHeading": "Signification des Champs",
+        "fields": "<ul><li><strong>Latitude / Longitude</strong> : l'emplacement au sol du capteur.</li><li><strong>Azimut min / max</strong> : l'arc de boussole que le capteur peut couvrir.</li><li><strong>Élévation min / max</strong> : jusqu'où il peut regarder au-dessus de l'horizon, du plus bas au plus haut.</li><li><strong>Portée min / max</strong> : la fenêtre de distance dans laquelle il peut suivre, en km.</li><li><strong>Bande / Largeur de faisceau</strong> : bande de fréquence du radar et largeur du faisceau ; masquées pour les capteurs optiques et les observateurs.</li></ul>Ensemble, les limites d'azimut, d'élévation et de portée définissent le volume du champ de vision dessiné sur le globe.",
+        "howToUse": "<ol><li>Sélectionnez un capteur dans le menu Capteurs.</li><li>Ouvrez Info Capteur depuis la barre inférieure.</li><li>Utilisez <strong>Ajouter une ligne vers le Soleil</strong> ou <strong>Ajouter une ligne vers la Lune</strong> pour tracer une ligne depuis le capteur. C'est pratique pour repérer les fenêtres d'exclusion solaire ou les interférences du clair de lune pour les capteurs optiques. Cliquez à nouveau sur le bouton pour supprimer la ligne.</li></ol>",
+        "tip1": "Les boutons de ligne vers le soleil et la lune nécessitent exactement un capteur sélectionné ; ils refuseront de tracer lorsqu'un réseau entier est actif.",
+        "tip2": "Les paramètres des capteurs sont basés sur des données publiques et peuvent ne pas être parfaitement exacts. Les corrections sont les bienvenues à admin@keeptrack.space.",
+        "tip3": "Pour expérimenter avec d'autres limites de champ de vision, construisez plutôt une copie de ce capteur dans le menu Capteur Personnalisé, car ce menu est en lecture seule."
+      }
     },
     "CustomSensorPlugin": {
       "bottomIconLabel": "Capteur personnalisé",
       "title": "Menu Capteur personnalisé",
-      "helpBody": "Cela vous permet de créer un capteur personnalisé à utiliser dans les calculs et autres fonctions du menu. Il peut s'agir d'un capteur totalement original ou d'une modification d'un capteur existant. <br><br> Après avoir défini la latitude, la longitude et l'altitude du capteur, vous pouvez définir son champ de vision. Sélectionner télescope créera un champ de vision à 360 degrés avec un masque d'élévation de 10 degrés et une portée illimitée. Désélectionner l'option télescope permet de définir manuellement le champ de vision. <br><br> Si vous souhaitez modifier un capteur existant, sélectionnez-le d'abord dans la liste et le capteur personnalisé sera mis à jour avec ses informations.",
+      "help": {
+        "overview": "Le capteur personnalisé construit un capteur au sol n'importe où sur Terre : un site entièrement nouveau, ou une copie modifiée d'un site existant. Le capteur fonctionne ensuite partout où un vrai capteur fonctionne, y compris les angles de visée, le rendu du champ de vision et les calculs de passages.",
+        "imgAlt": "Le menu Capteur personnalisé avec les champs d'emplacement et de champ de vision",
+        "imgCaption": "Définissez l'emplacement et le champ de vision, puis ajoutez le capteur.",
+        "fieldsHeading": "Définir le Capteur",
+        "fields": "Définissez la <strong>Latitude</strong>, la <strong>Longitude</strong> et l'<strong>Altitude au-dessus du niveau de la mer (km)</strong>, puis choisissez le <strong>Type de capteur</strong> : observateur, optique, radar à antenne réseau à commande de phase ou mécanique. Cocher <strong>Télescope</strong> donne une vue complète à 360 degrés en azimut avec un masque d'élévation de 10 degrés et une portée illimitée ; décochez-la pour définir vous-même les limites d'azimut, d'élévation et de portée.",
+        "howToUse": "<ol><li>Ouvrez le menu <strong>Capteur personnalisé</strong> (mode Créer), ou faites un clic droit n'importe où sur la Terre et choisissez <strong>Créer un capteur ici</strong> ou <strong>Créer un observateur ici</strong> pour préremplir l'emplacement.</li><li>Ajustez les champs, ou cliquez sur <strong>Utiliser la géolocalisation</strong> pour utiliser votre propre position (HTTPS uniquement).</li><li>Cliquez sur <strong>Ajouter un capteur personnalisé</strong>. Le nouveau capteur apparaît sur le globe et dans le panneau de la liste des capteurs actifs.</li><li>Activez <strong>Remplacer le capteur</strong> pour remplacer le capteur principal au lieu d'en ajouter un autre ; <strong>Effacer les capteurs personnalisés</strong> les supprime tous.</li></ol>",
+        "tip1": "Pour modifier les paramètres d'un vrai capteur, sélectionnez-le d'abord dans le menu Capteurs ; le formulaire se préremplit avec ses valeurs afin que vous puissiez les ajuster et le rajouter.",
+        "tip2": "Plusieurs capteurs personnalisés se cumulent : chaque ajout devient un capteur actif supplémentaire, ce qui est un moyen facile de simuler un petit réseau."
+      },
       "labels": {
         "sensorName": "Nom du capteur",
         "defaultSensorName": "Capteur personnalisé",
@@ -55,7 +103,11 @@
         "elevation": "Altitude",
         "azimuth": "Azimut",
         "elevationRange": "Élévation",
-        "range": "Portée"
+        "range": "Portée",
+        "altitude": "Altitude",
+        "activeSensors": "Capteurs personnalisés actifs",
+        "empty": "Aucun capteur personnalisé pour le moment. Ajoutez-en un depuis le menu.",
+        "remove": "Supprimer le capteur"
       },
       "errorMsgs": {
         "latRange": "La latitude du capteur personnalisé doit être comprise entre -90 et 90 degrés.",
@@ -66,18 +118,88 @@
         "minElRange": "L'élévation minimum du capteur personnalisé doit être comprise entre -90 et 90 degrés.",
         "maxElRange": "L'élévation maximum du capteur personnalisé doit être comprise entre -90 et 90 degrés.",
         "minRangeValue": "La portée minimum du capteur personnalisé doit être supérieure ou égale à 0 km.",
-        "maxRangeValue": "La portée maximum du capteur personnalisé doit être supérieure ou égale à 0 km."
+        "maxRangeValue": "La portée maximum du capteur personnalisé doit être supérieure ou égale à 0 km.",
+        "invalidNumber": "Les valeurs du capteur personnalisé doivent être des nombres valides.",
+        "elOrder": "L'élévation minimale du capteur personnalisé ne doit pas dépasser l'élévation maximale.",
+        "rangeOrder": "La portée minimale du capteur personnalisé ne doit pas dépasser la portée maximale."
+      },
+      "sections": {
+        "identity": "Identité",
+        "location": "Emplacement",
+        "fieldOfView": "Champ de vision"
       }
     },
     "LookAnglesPlugin": {
       "bottomIconLabel": "Angles de visée",
-      "title": "Menu Angles de visée",
-      "helpBody": "Le menu Angles de visée permet de calculer la distance, l'azimut et l'élévation entre un capteur et un satellite. Un satellite et un capteur doivent d'abord être sélectionnés pour utiliser ce menu. <br><br> L'option n'afficher que les heures de lever et de coucher ne calcule que ces moments pour le satellite. Cela permet de savoir rapidement quand un satellite sera visible d'un capteur. <br><br> La plage de recherche peut être modifiée en changeant la longueur et l'intervalle."
+      "title": "Angles de visée",
+      "sections": {
+        "results": "Résultats",
+        "settings": "Paramètres"
+      },
+      "settings": {
+        "showRiseSetOnly": "Afficher uniquement les heures de lever et de coucher",
+        "calculationLength": "Durée du calcul (jours)",
+        "interval": "Intervalle (secondes)"
+      },
+      "table": {
+        "time": "Heure",
+        "type": "Type",
+        "el": "Élév.",
+        "az": "Az.",
+        "rng": "Dist.",
+        "visible": "Visible"
+      },
+      "msgs": {
+        "notVisible": "Le satellite ne sera pas visible pendant les {hours} prochaines heures.",
+        "yes": "Oui",
+        "no": "Non",
+        "rise": "Lever",
+        "set": "Coucher",
+        "maxEl": "Élév. max.",
+        "unknown": "Inconnu"
+      },
+      "help": {
+        "overview": "Angles de visée calcule les données de pointage dont un capteur a besoin pour suivre le satellite sélectionné : l'heure, l'azimut, l'élévation et la distance de chaque prochaine opportunité d'observation. C'est le pont entre voir un passage en 3D et pointer réellement une antenne ou un télescope vers lui.",
+        "imgAlt": "Le tableau des angles de visée avec heures, azimuts, élévations et distances",
+        "imgCaption": "Chaque ligne est une solution de pointage ; cliquez sur l'une d'elles pour amener l'horloge à ce moment.",
+        "readingHeading": "Lire le Tableau",
+        "reading": "Chaque ligne indique l'<strong>Heure</strong>, l'élévation (<strong>Élév.</strong>), l'azimut (<strong>Az.</strong>) et la distance (<strong>Dist.</strong>) du satellite vu depuis le capteur, ainsi que s'il est optiquement <strong>Visible</strong>. Avec <strong>Afficher uniquement les heures de lever et de coucher</strong> activé, le tableau se réduit aux événements de lever, d'élévation maximale et de coucher de chaque passage, étiquetés dans la colonne <strong>Type</strong>.",
+        "howToUse": "<ol><li>Sélectionnez à la fois un capteur et un satellite ; l'icône inférieure reste désactivée tant que les deux ne sont pas définis.</li><li>Ouvrez <strong>Angles de visée</strong> depuis la barre inférieure. Le tableau se calcule automatiquement.</li><li>Ouvrez le panneau des paramètres pour basculer le mode lever/coucher ou modifier la <strong>Durée du calcul (jours)</strong> et l'<strong>Intervalle (secondes)</strong>.</li><li>Cliquez sur une ligne pour amener l'horloge de la simulation à ce moment, ou utilisez le bouton de téléchargement pour exporter le tableau.</li></ol>",
+        "tip1": "Le mode lever/coucher est le moyen le plus rapide de savoir quand vous pourrez voir le satellite la prochaine fois ; passez au tableau complet quand vous avez besoin d'angles de pointage seconde par seconde.",
+        "tip2": "Cliquer sur une ligne préserve votre état de lecture, de sorte qu'une horloge en pause reste en pause à la nouvelle heure."
+      }
     },
-    "MultiSiteLookAnglesPlugin": {
-      "bottomIconLabel": "Angles multi-sites",
-      "title": "Menu Angles multi-sites",
-      "helpBody": "Le menu Angles multi-sites permet de calculer la distance, l'azimut et l'élévation entre un satellite et plusieurs capteurs. Un satellite doit d'abord être sélectionné pour utiliser ce menu. <br><br> Par défaut, le menu calcule les angles de visée pour tous les capteurs du Space Surveillance Network. Pour calculer les angles pour d'autres capteurs, vous pouvez exporter un fichier csv en bas du menu. Le fichier csv contiendra les angles pour tous les capteurs. <br><br> Cliquer sur une ligne du tableau sélectionne le capteur et change l'heure de la simulation à celle de l'angle de visée."
+    "MultiSensorLookAnglesPlugin": {
+      "bottomIconLabel": "Multi-capteurs",
+      "title": "Angles de visée multi-capteurs",
+      "sections": {
+        "results": "Résultats",
+        "sensors": "Capteurs"
+      },
+      "table": {
+        "time": "Heure",
+        "el": "Élév.",
+        "az": "Az.",
+        "rng": "Dist.",
+        "sensor": "Capteur",
+        "visible": "Visible"
+      },
+      "msgs": {
+        "notVisible": "Le satellite ne sera pas visible pendant les {hours} prochaines heures.",
+        "yes": "Oui",
+        "no": "Non",
+        "na": "N/D"
+      },
+      "help": {
+        "overview": "Les angles multi-sites répondent à une question de réseau : parmi tous mes capteurs, lequel voit le satellite sélectionné, et quand ? Ils calculent les angles de visée sur de nombreux sites à la fois et les entrelacent dans un seul tableau chronologique.",
+        "imgAlt": "Le tableau des angles multi-sites avec capteurs et données de pointage",
+        "imgCaption": "Chaque ligne associe un moment du passage au capteur qui le voit.",
+        "readingHeading": "Lire le Tableau",
+        "reading": "Les lignes sont triées chronologiquement sur tous les sites activés, chacune indiquant l'<strong>Heure</strong>, l'élévation (<strong>Élév.</strong>), l'azimut (<strong>Az.</strong>), la distance (<strong>Dist.</strong>), le <strong>Capteur</strong> concerné et la visibilité optique. Le panneau de sélection des capteurs détermine quels sites sont calculés : les capteurs verts sont inclus et les rouges exclus.",
+        "howToUse": "<ol><li>Sélectionnez un satellite ; l'icône inférieure reste désactivée tant qu'aucun n'est sélectionné. Aucune sélection de capteur n'est nécessaire.</li><li>Ouvrez <strong>Angles multi-sites</strong> depuis la barre inférieure. Le réseau d'alerte aux missiles par défaut est calculé automatiquement.</li><li>Activez ou désactivez des capteurs dans le panneau de la liste des capteurs pour modifier le réseau.</li><li>Cliquez sur une ligne pour sélectionner ce capteur et amener l'horloge à ce moment, ou exportez le tableau avec le bouton de téléchargement.</li></ol>",
+        "tip1": "Utilisez-le pour planifier les transferts : là où la couverture d'un capteur se termine, la ligne suivante montre quel site prend le relais du satellite.",
+        "tip2": "Les sites optiques n'affichent la visibilité que lorsque les conditions d'éclairage permettent une observation réelle ; les radars affichent toujours N/D."
+      }
     }
   }
 }

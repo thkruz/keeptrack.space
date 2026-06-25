@@ -3,7 +3,55 @@
     "SettingsMenuPlugin": {
       "bottomIconLabel": "Configuración",
       "title": "Menú de Configuración",
-      "helpBody": "El menú de Configuración te permite configurar la aplicación."
+      "filterPlaceholder": "Filtrar ajustes...",
+      "buttons": {
+        "resetToDefaults": "Restablecer valores predeterminados"
+      },
+      "commands": {
+        "open": "Abrir configuración",
+        "reset": "Restablecer la configuración a los valores predeterminados"
+      },
+      "sections": {
+        "general": "Configuración general",
+        "fastCpu": "Requiere CPU rápida"
+      },
+      "labels": {
+        "showInfoOnHover": "Mostrar información al pasar el cursor",
+        "drawOrbits": "Dibujar órbitas",
+        "drawTrailingOrbits": "Dibujar órbitas de rastro",
+        "drawOrbitsInEcf": "Dibujar órbitas en ECF",
+        "numberOfEcfOrbits": "Número de órbitas ECF a dibujar",
+        "drawFovLines": "Dibujar líneas de FOV",
+        "displayEciOnHover": "Mostrar ECI al pasar el cursor",
+        "showCameraWidget": "Mostrar widget de cámara",
+        "showConfidenceLevels": "Mostrar niveles de confianza",
+        "enableDemoMode": "Activar modo demo",
+        "enableFreezeTime": "Congelar el tiempo al hacer clic",
+        "compensateEarthRotation": "Compensar la rotación de la Tierra",
+        "showNextPassOnHover": "Mostrar el próximo pase al pasar el cursor"
+      },
+      "tooltips": {
+        "showInfoOnHover": "Muestra más información al pasar el cursor sobre un satélite.",
+        "drawOrbits": "Desactívalo para ocultar las líneas de órbita",
+        "drawTrailingOrbits": "Actívalo para mostrar dónde estuvo un satélite en lugar de hacia dónde va",
+        "drawOrbitsInEcf": "Las órbitas se dibujarán en ECF en lugar de ECI (principalmente para órbitas GEO)",
+        "drawFovLines": "Dibujar líneas desde el sensor hasta los satélites cuando están en el FOV",
+        "displayEciOnHover": "Mostrar coordenadas ECI al pasar el cursor",
+        "showCameraWidget": "Desactívalo para ocultar el widget de cámara",
+        "showConfidenceLevels": "Mostrar los niveles de confianza de los conjuntos de elementos del satélite.",
+        "enableDemoMode": "Cada 3 segundos se seleccionará un nuevo satélite del FOV",
+        "enableFreezeTime": "El tiempo se congelará mientras rotas la cámara.",
+        "compensateEarthRotation": "Compensa el giro de la cámara según la rotación de la Tierra para que la vista permanezca fija a las coordenadas geográficas.",
+        "showNextPassOnHover": "Muestra la hora del próximo pase al pasar el cursor sobre un satélite dentro del campo de visión del sensor seleccionado."
+      },
+      "help": {
+        "overview": "El menú de Configuración reúne las opciones de visualización e interacción de toda la aplicación: dibujo de órbitas, comportamiento al pasar el cursor, ayudas de cámara y extras sensibles al rendimiento. Otros plugins también aportan aquí sus propias secciones, así que este es el único lugar para ajustar el comportamiento de KeepTrack.",
+        "imgAlt": "El menú de Configuración con sus interruptores de opciones generales",
+        "imgCaption": "Activa cualquier opción para aplicarla al instante; usa el filtro para encontrar ajustes rápidamente.",
+        "howToUse": "<ol><li>Abre <strong>Configuración</strong> desde la barra inferior.</li><li>Activa cualquier interruptor para aplicarlo al instante; pasa el cursor sobre una fila para ver una descripción que la explique.</li><li>Usa el cuadro de <strong>filtro</strong> de la parte superior para encontrar rápidamente un ajuste por su nombre.</li><li><strong>Restablecer valores predeterminados</strong> devuelve todas las opciones, incluidas las secciones aportadas por plugins, a los valores de fábrica.</li></ol>",
+        "tip1": "Las opciones bajo Requiere CPU rápida, como mostrar el próximo pase al pasar el cursor, ejecutan cálculos adicionales en cada fotograma; déjalas desactivadas en equipos lentos.",
+        "tip2": "Las secciones de plugins al final provienen de otros plugins (Watchlist, Máquina del Tiempo y más), así que el menú crece a medida que se activan los plugins."
+      }
     }
   }
 }

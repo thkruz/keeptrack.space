@@ -1,6 +1,6 @@
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { Satellite, KilometersPerSecond } from '@ootk/src/main';
-import { Line, LineColors } from './line';
+import { Line, LineColors, LineDescription } from './line';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SatRicLine extends Line {
@@ -105,5 +105,9 @@ export class SatRicLine extends Line {
     }
 
     this.updateVertBuf([eciArr, satArr]);
+  }
+
+  getDescription(): LineDescription {
+    return { kind: 'satRic', detail: this.sat.name };
   }
 }

@@ -37,7 +37,7 @@ import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { SatLabelMode } from '@app/settings/ui-settings';
-import { BaseObject, CatalogSource, Satellite } from '@ootk/src/main';
+import { BaseObject, CatalogSource } from '@ootk/src/main';
 import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import bookmarksPng from '@public/img/icons/bookmarks.png';
@@ -45,6 +45,7 @@ import saveAs from 'file-saver';
 import { t7e } from '@app/locales/keys';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import {
+  IHelpConfig,
   IKeyboardShortcut,
   ISettingsContribution,
   ISettingsContributor,
@@ -53,6 +54,7 @@ import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { EL as SAT_INFO_EL } from '../sat-info-box/sat-info-box-html';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { TopMenu } from '../top-menu/top-menu';
+import './watchlist.css';
 
 export interface UpdateWatchlistParams {
   updateWatchlistList?: { id: number, inView: boolean }[];
@@ -62,6 +64,37 @@ export interface UpdateWatchlistParams {
 export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContributor {
   readonly id = 'WatchlistPlugin';
   dependencies_ = [];
+
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: t7e('plugins.WatchlistPlugin.title'),
+      sections: [
+        {
+          heading: t7e('help.overview'),
+          content: t7e('plugins.WatchlistPlugin.help.overview'),
+          image: {
+            src: 'img/help/watchlist/watchlist-menu.png',
+            alt: t7e('plugins.WatchlistPlugin.help.imgAlt'),
+            caption: t7e('plugins.WatchlistPlugin.help.imgCaption'),
+          },
+        },
+        {
+          heading: t7e('plugins.WatchlistPlugin.help.managingHeading'),
+          content: t7e('plugins.WatchlistPlugin.help.managing'),
+        },
+        {
+          heading: t7e('help.howToUse'),
+          content: t7e('plugins.WatchlistPlugin.help.howToUse'),
+        },
+      ],
+      tips: [
+        t7e('plugins.WatchlistPlugin.help.tip1'),
+        t7e('plugins.WatchlistPlugin.help.tip2'),
+        t7e('plugins.WatchlistPlugin.help.tip3'),
+      ],
+      shortcuts: [{ keys: ['W'], description: t7e('plugins.WatchlistPlugin.help.shortcutToggle') }],
+    };
+  }
 
   getSettingsContribution(): ISettingsContribution {
     const l = (key: string) => t7e(`plugins.WatchlistPlugin.settings.satLabelMode.${key}` as Parameters<typeof t7e>[0]);
@@ -86,7 +119,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
 
             settingsManager.satLabelMode = parsed;
             PersistenceManager.getInstance().saveItem(
-              StorageKey.SETTINGS_SAT_LABEL_MODE,
+              StorageKey.SETTINGS_SAT_LABEL_MODE_V2,
               parsed.toString(),
             );
           },
@@ -128,39 +161,35 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
   menuMode: MenuMode[] = [MenuMode.CATALOG, MenuMode.ALL];
 
   isWatchlistChanged: boolean | null = null;
+  // v13+ "FAANG card" layout. The root carries the kt-ui-v13 marker directly
+  // (this HTML is self-authored, not generated, so no JS opt-in is needed here).
   sideMenuElementHtml = html`
-    <div id="watchlist-menu" class="side-menu-parent start-hidden">
+    <div id="watchlist-menu" class="side-menu-parent start-hidden kt-ui-v13">
       <div id="watchlist-content" class="side-menu">
-        <div class="row">
-          <h5 class="center-align">Watchlist</h5>
-          <div id="watchlist-list">
-          </div>
-          <br />
-          <div class="row">
-            <div class="input-field col s10 m10 l10">
-              <form id="watchlist-submit">
-                <input placeholder="xxxxx,xxxxx,xxxxx..." id="watchlist-new" type="text" />
-                <label for="watchlist-new">New Satellite(s)</label>
-              </form>
+        <section class="kt-section">
+          <div class="kt-section-label">${t7e('plugins.WatchlistPlugin.labels.satellitesHeader' as Parameters<typeof t7e>[0])}</div>
+          <div id="watchlist-list"></div>
+          <form id="watchlist-submit" class="watchlist-add-row">
+            <div class="input-field">
+              <input placeholder="xxxxx,xxxxx,xxxxx..." id="watchlist-new" type="text" />
+              <label for="watchlist-new">${t7e('plugins.WatchlistPlugin.labels.newSatellites' as Parameters<typeof t7e>[0])}</label>
             </div>
-            <div class="col s2 m2 l2 center-align add-icon">
-              <img
-                id="watchlist-add"
-                class="watchlist-add"
-                src="" delayedsrc="${bookmarkAddPng}" style="cursor: pointer;"/>
-            </div>
-          </div>
-          <div class="center-align row">
-            <button id="watchlist-save" class="btn btn-ui waves-effect waves-light" type="button" name="action">Save List &#9658;</button>
-          </div>
-          <div class="center-align row">
-            <button id="watchlist-open" class="btn btn-ui waves-effect waves-light" type="button" name="action">Load List &#9658;</button>
-            <input id="watchlist-file" type="file" name="files[]" style="display: none;" />
-          </div>
-          <div class="center-align row">
-            <button id="watchlist-clear" class="btn btn-ui waves-effect waves-light" type="button" name="action">Clear List &#9658;</button>
-          </div>
-        </div>
+            <img id="watchlist-add" class="watchlist-add" src="" delayedsrc="${bookmarkAddPng}" style="cursor: pointer;"/>
+          </form>
+        </section>
+        <section class="kt-section">
+          <div class="kt-section-label">${t7e('plugins.WatchlistPlugin.labels.actionsHeader' as Parameters<typeof t7e>[0])}</div>
+          <button id="watchlist-save" type="button" class="kt-action waves-effect">
+            <span class="kt-action-label">${t7e('plugins.WatchlistPlugin.labels.saveList' as Parameters<typeof t7e>[0])}</span>
+          </button>
+          <input id="watchlist-file" type="file" name="files[]" style="display: none;" />
+          <button id="watchlist-open" type="button" class="kt-action waves-effect">
+            <span class="kt-action-label">${t7e('plugins.WatchlistPlugin.labels.loadList' as Parameters<typeof t7e>[0])}</span>
+          </button>
+          <button id="watchlist-clear" type="button" class="kt-action waves-effect">
+            <span class="kt-action-label">${t7e('plugins.WatchlistPlugin.labels.clearList' as Parameters<typeof t7e>[0])}</span>
+          </button>
+        </section>
       </div>
     </div>`;
 
@@ -168,34 +197,37 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
   sideMenuTitle = 'Watchlist';
 
   sideMenuSecondaryHtml = html`
-    <div class="switch row">
-      <label>
-        <input id="watchlist-hide-others" type="checkbox" />
-        <span class="lever"></span>
-        Hide Other Objects
-      </label>
-    </div>
-    <div class="row" style="margin-bottom: 0;">
-      <label style="color: var(--color-dark-text-accent);">Labels</label>
-    </div>
-    <div class="row" style="margin-top: 5px;">
-      <label>
-        <input id="watchlist-label-always" name="watchlist-label-mode" type="radio" value="2" />
-        <span>Always</span>
-      </label>
-    </div>
-    <div class="row">
-      <label>
-        <input id="watchlist-label-fov" name="watchlist-label-mode" type="radio" value="1" checked />
-        <span>FOV Only</span>
-      </label>
-    </div>
-    <div class="row">
-      <label>
-        <input id="watchlist-label-off" name="watchlist-label-mode" type="radio" value="0" />
-        <span>Off</span>
-      </label>
-    </div>
+    <section class="kt-section">
+      <div class="kt-section-label">${t7e('plugins.WatchlistPlugin.labels.displayHeader' as Parameters<typeof t7e>[0])}</div>
+      <div class="switch row">
+        <label>
+          <input id="watchlist-hide-others" type="checkbox" />
+          <span class="lever"></span>
+          ${t7e('plugins.WatchlistPlugin.labels.hideOtherObjects' as Parameters<typeof t7e>[0])}
+        </label>
+      </div>
+    </section>
+    <section class="kt-section">
+      <div class="kt-section-label">${t7e('plugins.WatchlistPlugin.labels.labelsHeader' as Parameters<typeof t7e>[0])}</div>
+      <div class="row" style="margin-top: 5px;">
+        <label>
+          <input id="watchlist-label-always" name="watchlist-label-mode" type="radio" value="2" />
+          <span>${t7e('plugins.WatchlistPlugin.labels.labelAlways' as Parameters<typeof t7e>[0])}</span>
+        </label>
+      </div>
+      <div class="row">
+        <label>
+          <input id="watchlist-label-fov" name="watchlist-label-mode" type="radio" value="1" checked />
+          <span>${t7e('plugins.WatchlistPlugin.labels.labelFovOnly' as Parameters<typeof t7e>[0])}</span>
+        </label>
+      </div>
+      <div class="row">
+        <label>
+          <input id="watchlist-label-off" name="watchlist-label-mode" type="radio" value="0" />
+          <span>${t7e('plugins.WatchlistPlugin.labels.labelOff' as Parameters<typeof t7e>[0])}</span>
+        </label>
+      </div>
+    </section>
   `;
 
   sideMenuSecondaryOptions = {
@@ -308,13 +340,13 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     EventBus.getInstance().on(EventBusEvent.selectSatData, this.selectSatData_.bind(this));
   }
 
-  private satInfoBoxFinal_() {
+  protected satInfoBoxFinal_() {
     getEl(SAT_INFO_EL.NAME)?.insertAdjacentHTML('beforebegin', html`
       <img id="${this.EL.WATCHLIST_TOGGLE}" src="${bookmarkAddPng}" class="sat-watchlist-icon off-watchlist"/>
     `);
   }
 
-  private selectSatData_(obj?: BaseObject) {
+  protected selectSatData_(obj?: BaseObject) {
     if (!obj) {
       return;
     }
@@ -334,7 +366,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     }
   }
 
-  private addRemoveWatchlist_() {
+  protected addRemoveWatchlist_() {
     const id = PluginRegistry.getPlugin(SelectSatManager)!.selectedSat;
 
     ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
@@ -349,7 +381,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
    * Handles the logic when the Cruncher is ready.
    * @returns A promise that resolves to void.
    */
-  private async onCruncherReady_(): Promise<void> {
+  protected async onCruncherReady_(): Promise<void> {
     if (!settingsManager.offlineMode) {
       return;
     }
@@ -398,7 +430,10 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
       }
     }
     if (newWatchlist.length > 0) {
-      ServiceLocator.getUiManager().toast(`Watchlist Loaded with ${newWatchlist.length} Satellites`, ToastMsgType.normal);
+      ServiceLocator.getUiManager().toast(
+        t7e('plugins.WatchlistPlugin.msgs.watchlistLoaded' as Parameters<typeof t7e>[0]).replace('{count}', newWatchlist.length.toString()),
+        ToastMsgType.normal,
+      );
     }
 
     return newWatchlist;
@@ -435,8 +470,12 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
    * Initializes the UI manager for the watchlist feature.
    * Attaches event listeners to various elements in the watchlist menu.
    */
-  private uiManagerFinal_(): void {
+  protected uiManagerFinal_(): void {
     clickAndDragWidth(getEl('watchlist-menu'));
+
+    // Opt the generated secondary menu into the v13 UI (its content is authored
+    // in sideMenuSecondaryHtml as kt-section cards; the wrapper is generated).
+    getEl('watchlist-menu-secondary')?.classList.add('kt-ui-v13');
 
     // Secondary menu: Hide non-watchlist objects toggle
     getEl('watchlist-hide-others')?.addEventListener('change', () => {
@@ -532,29 +571,32 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
       return;
     }
     this.isWatchlistChanged = this.isWatchlistChanged !== null;
-    let watchlistString = '';
-    let watchlistListHTML = '';
-    let sat: Satellite | null;
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
-    for (let i = 0; i < this.watchlistList.length; i++) {
-      sat = catalogManagerInstance.getSat(this.watchlistList[i].id, GetSatType.EXTRA_ONLY);
-      if (sat === null) {
-        this.watchlistList.splice(i, 1);
-      } else {
-        watchlistListHTML += `
+    // Drop entries whose satellite is no longer in the catalog. Filtering up
+    // front avoids splicing the array during the render loop, which skipped the
+    // entry immediately after every removed one.
+    this.watchlistList = this.watchlistList.filter(
+      ({ id }) => catalogManagerInstance.getSat(id, GetSatType.EXTRA_ONLY) !== null,
+    );
+
+    let watchlistListHTML = '';
+
+    for (const { id } of this.watchlistList) {
+      const sat = catalogManagerInstance.getSat(id, GetSatType.EXTRA_ONLY)!;
+
+      watchlistListHTML += `
         <div class="row">
           <div class="col s3 m3 l3">
              <span class="sat-sccnum" data-sat-sccnum="${sat.id}" style="cursor: pointer;">${sat.sccNum}</span>
           </div>
           <div class="col s7 m7 l7">
-             <span class="sat-name" data-sat-name="${sat.id || 'Unknown'}" style="cursor: pointer;">${sat.name || 'Unknown'}</span>
+             <span class="sat-name" data-sat-name="${sat.id}" style="cursor: pointer;">${sat.name || t7e('Common.unknown')}</span>
           </div>
           <div class="col s2 m2 l2 center-align remove-icon">
             <img class="watchlist-remove" data-sat-id="${sat.id}" src="${bookmarkRemovePng}" style="cursor: pointer;"></img>
           </div>
         </div>`;
-      }
     }
 
     const watchlistElement = getEl('watchlist-list');
@@ -565,13 +607,9 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
 
     EventBus.getInstance().emit(EventBusEvent.onWatchlistUpdated, this.watchlistList);
 
-    for (let i = 0; i < this.watchlistList.length; i++) {
-      // No duplicates
-      watchlistString += catalogManagerInstance.getSat(this.watchlistList[i].id, GetSatType.EXTRA_ONLY)?.sccNum ?? '';
-      if (i !== this.watchlistList.length - 1) {
-        watchlistString += ',';
-      }
-    }
+    const watchlistString = this.watchlistList
+      .map(({ id }) => catalogManagerInstance.getSat(id, GetSatType.EXTRA_ONLY)?.sccNum ?? '')
+      .join(',');
 
     if (this.watchlistList.length > 0) {
       showEl('top-menu-watchlist-li');
@@ -641,11 +679,11 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
       const sat = ServiceLocator.getCatalogManager().getSat(id);
 
       if (sat?.sccNum) {
-        errorManagerInstance.warnToast(`NORAD: ${sat.sccNum} already in list!`);
+        errorManagerInstance.warnToast(t7e('plugins.WatchlistPlugin.errorMsgs.NoradAlreadyInList' as Parameters<typeof t7e>[0]).replace('{sccNum}', `${sat.sccNum}`));
       } else if (sat) {
         const jscString = sat.source === CatalogSource.VIMPEL ? ` (JSC Vimpel ${sat.altId})` : '';
 
-        errorManagerInstance.warnToast(`Object ${id}${jscString} already in list!`);
+        errorManagerInstance.warnToast(t7e('plugins.WatchlistPlugin.errorMsgs.ObjectAlreadyInList' as Parameters<typeof t7e>[0]).replace('{id}', `${id}${jscString}`));
       }
     }
 
@@ -666,7 +704,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
   }
 
   isOnWatchlist(id: number) {
-    if (id === null) {
+    if (typeof id !== 'number') {
       return false;
     }
 
@@ -740,7 +778,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
       const id = ServiceLocator.getCatalogManager().sccNum2Id(satNum.trim()) ?? -1;
 
       if (id === -1) {
-        errorManagerInstance.warnToast(`Sat ${satNum} not found!`);
+        errorManagerInstance.warnToast(t7e('plugins.WatchlistPlugin.errorMsgs.SatNotFound' as Parameters<typeof t7e>[0]).replace('{id}', `${satNum}`));
 
         return;
       }
@@ -851,7 +889,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
       if (sat !== null && sat.id !== -1) {
         this.watchlistList.push({ id: sat.id, inView: false });
       } else {
-        errorManagerInstance.warnToast(`Sat ${obj.id} not found!`);
+        errorManagerInstance.warnToast(t7e('plugins.WatchlistPlugin.errorMsgs.SatNotFound' as Parameters<typeof t7e>[0]).replace('{id}', `${obj.id}`));
       }
     }
     this.updateWatchlist();
@@ -880,28 +918,14 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
   }
 
   serialize() {
-    const satIds: string[] = [];
+    const catalogManager = ServiceLocator.getCatalogManager();
 
-    this.watchlistList = this.watchlistList.filter(({ id }) => {
-      const sat = ServiceLocator.getCatalogManager().getSat(id, GetSatType.EXTRA_ONLY);
+    // Build from a filtered copy - serialize must not mutate watchlistList.
+    const satIds = this.watchlistList
+      .map(({ id }) => catalogManager.getSat(id, GetSatType.EXTRA_ONLY)?.sccNum)
+      .filter((sccNum): sccNum is string => typeof sccNum === 'string');
 
-      return sat !== null;
-    });
-
-    for (let i = 0; i < this.watchlistList.length; i++) {
-      const sat = ServiceLocator.getCatalogManager().getSat(this.watchlistList[i].id, GetSatType.EXTRA_ONLY);
-
-      if (sat === null) {
-        errorManagerInstance.warnToast(`Sat ${this.watchlistList[i].id} not found!`);
-
-        continue;
-      }
-      satIds[i] = sat.sccNum;
-    }
-    const watchlistString = JSON.stringify(satIds);
-
-
-    return watchlistString;
+    return JSON.stringify(satIds);
   }
 
   unserialize(watchlistString: string): string[] {

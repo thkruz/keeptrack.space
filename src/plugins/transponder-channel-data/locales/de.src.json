@@ -3,13 +3,47 @@
     "TransponderChannelData": {
       "bottomIconLabel": "Transponder- und Kanalinformationen",
       "title": "Satellitenfrequenzen",
-      "helpBody": "<p>Dieses Plugin zeigt Transponder- und Kanalfrequenzinformationen für geostationäre TV-Satelliten an. Wählen Sie einen Satelliten mit bekannten Kanaldaten aus und öffnen Sie dieses Panel, um seine Sendefrequenzen, Kanäle, Strahlabdeckung und Verschlüsselungsdetails anzuzeigen.</p><p>Verwenden Sie die Download-Schaltfläche in der Titelleiste, um die Kanaldaten als CSV-Datei zu exportieren.</p>",
+      "constellationName": "TV-Satelliten",
+      "table": {
+        "satellite": "Satellit",
+        "tvchannel": "TV-Kanal",
+        "beam": "Ausleuchtzone",
+        "freq": "Frequenz",
+        "system": "System",
+        "SRFEC": "SR/FEC",
+        "video": "Video",
+        "lang": "Sprache",
+        "encryption": "Verschlüsselung"
+      },
       "errorMsgs": {
         "NoChannelInfo": "Der Satellit hat keine Kanalinformationen",
         "NotSatellite": "Das ausgewählte Objekt ist kein Satellit",
         "FetchFailed": "Kanalinformationen für {name} und {altName} konnten nicht abgerufen werden",
         "NoData": "Keine Kanaldaten verfügbar"
-      }
+      },
+      "help": {
+        "overview": "Transponder- und Kanalinformationen zeigen, was ein geostationärer TV- oder Kommunikationssatellit tatsächlich ausstrahlt: jeden bekannten Kanal mit seiner Frequenz, Ausleuchtzone, seinem Übertragungssystem und seiner Verschlüsselung. Die Daten decken einige hundert bekannte Rundfunksatelliten ab und werden beim Öffnen des Menüs live abgerufen.",
+        "imgAlt": "Die Satellitenfrequenzen-Tabelle für einen Rundfunksatelliten",
+        "imgCaption": "Jede Zeile ist ein Kanal mit Details zu Ausleuchtzone, Frequenz, System und Verschlüsselung.",
+        "columnsHeading": "Die Tabelle lesen",
+        "columns": "<ul><li><strong>TV-Kanal</strong>: der Name des Rundfunkdienstes.</li><li><strong>Ausleuchtzone</strong>: der Antennenstrahl des Satelliten, der den Kanal überträgt und das Versorgungsgebiet bestimmt.</li><li><strong>Frequenz</strong>: die Downlink-Frequenz und Polarisation.</li><li><strong>System</strong> und <strong>SR/FEC</strong>: der Übertragungsstandard (zum Beispiel DVB-S2) mit Symbolrate und Vorwärtsfehlerkorrektur.</li><li><strong>Video</strong> und <strong>Sprache</strong>: Codec und Audiosprachen.</li><li><strong>Verschlüsselung</strong>: ob der Kanal frei empfangbar oder verschlüsselt ist und mit welchem System.</li></ul>",
+        "howToUse": "<ol><li>Wählen Sie einen Rundfunksatelliten aus; das untere Symbol wird nur für Satelliten mit bekannten Kanaldaten aktiviert.</li><li>Öffnen Sie das Menü über die untere Leiste oder drücken Sie <strong>T</strong>. Die Kanalliste wird heruntergeladen und füllt die Tabelle.</li><li>Verwenden Sie die Download-Schaltfläche in der Titelleiste, um die Tabelle als Tabellenkalkulationsdatei zu exportieren.</li></ol>",
+        "tip1": "Die unterstützten Satelliten sind als Konstellation TV-Satelliten im Konstellationen-Menü registriert; das ist der schnellste Weg, einen Satelliten zum Untersuchen zu finden.",
+        "tip2": "Die Kanaldaten stammen von der KeepTrack-API und geben öffentliche Listen wieder; eine Internetverbindung ist erforderlich.",
+        "shortcutToggle": "Satellitenfrequenzen-Menü umschalten"
+      },
+      "labels": {
+        "controls": "Steuerung",
+        "channels": "Kanäle",
+        "filterPlaceholder": "Kanäle filtern",
+        "exportXlsx": "Als XLSX exportieren",
+        "exportCsv": "Als CSV exportieren",
+        "statusLoading": "Kanäle werden geladen…",
+        "statusEmpty": "Keine Kanaldaten verfügbar",
+        "statusNoMatch": "Keine Kanäle entsprechen dem Filter",
+        "statusError": "Kanaldaten konnten nicht geladen werden"
+      },
+      "attribution": "Kanaldaten von der KeepTrack-API (öffentliche Listen)."
     }
   }
 }

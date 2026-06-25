@@ -1,11 +1,27 @@
 {
   "Common": {
+    "orbitPreview": "Aperçu de l'orbite",
     "unknown": "Inconnu"
+  },
+  "help": {
+    "overview": "Aperçu",
+    "howToUse": "Utilisation",
+    "tips": "Astuces",
+    "keyboardShortcuts": "Raccourcis clavier",
+    "troubleshooting": "Dépannage"
   },
   "loadingScreen": {
     "startButton": "Cliquez pour Commencer",
     "hint": "Astuce :",
-    "downloadingScience": "Téléchargement de la science..."
+    "downloadingScience": "Téléchargement de la science...",
+    "edition": {
+      "pro": "Pro",
+      "oss": "Open Source",
+      "celestrak": "CelesTrak",
+      "embed": "Intégré",
+      "offline": "Offline",
+      "epfl": "EPFL"
+    }
   },
   "errorMsgs": {
     "LoginRequired": "Cette fonctionnalité nécessite une connexion. Veuillez vous connecter pour continuer.",
@@ -46,100 +62,10 @@
   },
   "plugins": {
     "proOnlyMsg": "Ce plugin est réservé aux utilisateurs pro. Votre fichier .env est mal configuré ou il vous manque des fichiers ! Vous pouvez en savoir plus sur https://keeptrack.space/pro.",
-    "SensorListPlugin": {
-      "bottomIconLabel": "Capteurs",
-      "title": "Menu Liste des Capteurs",
-      "helpBody": "Le menu Capteurs vous permet de sélectionner un capteur à utiliser dans les calculs et les autres fonctions du menu. Les capteurs sont regroupés selon les réseaux qu'ils soutiennent principalement. Sur le côté gauche du menu se trouve le nom du capteur et à droite le pays/l'organisation propriétaire. <br><br> Sélectionner une option \"Tous...Capteurs\" permet de sélectionner tous les capteurs de ce groupe. Cela est utile pour visualiser la couverture des réseaux, mais ne fonctionne pas pour tous les calculs. Si vous souhaitez calculer les angles de visée pour un réseau, il est préférable d'utiliser l'outil multi-sites ou de calculer les angles pour chaque capteur individuellement. <br><br> Les capteurs de cette liste incluent des radars mécaniques et à réseau phasé, ainsi que des capteurs optiques : <ul style=\"margin-left: 40px;\"> <li> Les radars à réseau phasé sont généralement limités à l'orbite terrestre basse (LEO). </li> <li> Les radars mécaniques peuvent être utilisés pour LEO et l'orbite géostationnaire (GEO). </li> <li> Les capteurs optiques sont généralement utilisés pour GEO, mais peuvent aussi servir pour LEO. </li> <li> Les capteurs optiques sont limités aux observations nocturnes par ciel dégagé, tandis que les radars fonctionnent de jour comme de nuit. </li> </ul> <br> Les informations sur les capteurs sont basées sur des données publiques et peuvent être vérifiées dans le menu Info Capteur. Si vous avez des données publiques sur d'autres capteurs ou des corrections à apporter, contactez-moi à <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>."
-    },
-    "SensorInfoPlugin": {
-      "bottomIconLabel": "Info Capteur",
-      "title": "Menu Info Capteur",
-      "helpBody": "Info Capteur fournit des informations sur le capteur actuellement sélectionné. Les informations sont basées sur des données publiques et peuvent ne pas toujours être 100% exactes. Si vous avez des données publiques sur d'autres capteurs ou des corrections à apporter, contactez-moi à <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>. <br><br> Les informations fournies incluent : <ul style=\"margin-left: 40px;\"> <li> Nom du capteur </li> <li> Propriétaire du capteur </li> <li> Type de capteur </li> <li> Champ de vision du capteur </li> </ul> <br> De plus, des lignes peuvent être rapidement créées du capteur vers le soleil ou la lune depuis ce menu."
-    },
-    "CustomSensorPlugin": {
-      "bottomIconLabel": "Capteur personnalisé",
-      "title": "Menu Capteur personnalisé",
-      "helpBody": "Cela vous permet de créer un capteur personnalisé à utiliser dans les calculs et autres fonctions du menu. Il peut s'agir d'un capteur totalement original ou d'une modification d'un capteur existant. <br><br> Après avoir défini la latitude, la longitude et l'altitude du capteur, vous pouvez définir son champ de vision. Sélectionner télescope créera un champ de vision à 360 degrés avec un masque d'élévation de 10 degrés et une portée illimitée. Désélectionner l'option télescope permet de définir manuellement le champ de vision. <br><br> Si vous souhaitez modifier un capteur existant, sélectionnez-le d'abord dans la liste et le capteur personnalisé sera mis à jour avec ses informations."
-    },
-    "LookAnglesPlugin": {
-      "bottomIconLabel": "Angles de visée",
-      "title": "Menu Angles de visée",
-      "helpBody": "Le menu Angles de visée permet de calculer la distance, l'azimut et l'élévation entre un capteur et un satellite. Un satellite et un capteur doivent d'abord être sélectionnés pour utiliser ce menu. <br><br> L'option n'afficher que les heures de lever et de coucher ne calcule que ces moments pour le satellite. Cela permet de savoir rapidement quand un satellite sera visible d'un capteur. <br><br> La plage de recherche peut être modifiée en changeant la longueur et l'intervalle."
-    },
-    "MultiSiteLookAnglesPlugin": {
-      "bottomIconLabel": "Angles multi-sites",
-      "title": "Menu Angles multi-sites",
-      "helpBody": "Le menu Angles multi-sites permet de calculer la distance, l'azimut et l'élévation entre un satellite et plusieurs capteurs. Un satellite doit d'abord être sélectionné pour utiliser ce menu. <br><br> Par défaut, le menu calcule les angles de visée pour tous les capteurs du Space Surveillance Network. Pour calculer les angles pour d'autres capteurs, vous pouvez exporter un fichier csv en bas du menu. Le fichier csv contiendra les angles pour tous les capteurs. <br><br> Cliquer sur une ligne du tableau sélectionne le capteur et change l'heure de la simulation à celle de l'angle de visée."
-    },
-    "SensorTimeline": {
-      "bottomIconLabel": "Chronologie Capteur",
-      "title": "Menu Chronologie Capteur",
-      "helpBody": "Le menu Chronologie Capteur montre quand une liste de capteurs a une visibilité sur un satellite. La chronologie est colorée pour indiquer la qualité du passage. Rouge = mauvais passage, jaune = passage moyen, vert = bon passage. Cliquez sur un passage pour changer le capteur et l'heure. <br><br> La chronologie peut être modifiée en changeant l'heure de début et de fin de la simulation, ainsi que la longueur et l'intervalle."
-    },
-    "SatelliteTimeline": {
-      "bottomIconLabel": "Chronologie Satellite",
-      "title": "Menu Chronologie Satellite",
-      "helpBody": "Le menu Chronologie Satellite montre quand un capteur unique a une visibilité sur une liste de satellites. La chronologie est colorée pour indiquer la qualité du passage. Rouge = mauvais passage, jaune = passage moyen, vert = bon passage. Cliquez sur un passage pour changer le satellite et l'heure. <br><br> La chronologie peut être modifiée en changeant l'heure de début et de fin de la simulation, ainsi que la longueur et l'intervalle."
-    },
-    "WatchlistPlugin": {
-      "bottomIconLabel": "Liste de satellites",
-      "title": "Liste de satellites",
-      "helpBody": "Le menu liste de satellites vous permet de créer une liste de satellites prioritaires à suivre. Cela permet de retrouver rapidement les satellites qui vous intéressent le plus. La liste est enregistrée dans le stockage local de votre navigateur et sera disponible lors de votre prochaine visite. <br><br> Lorsque les satellites de la liste entrent dans le champ de vision du capteur sélectionné, une notification s'affiche, une ligne est tracée du capteur au satellite, et le numéro du satellite s'affiche sur le globe. <br><br> La superposition dépend du fait que la liste de satellites soit remplie."
-    },
     "WatchlistOverlay": {
       "bottomIconLabel": "Superposition",
       "title": "Menu Superposition",
       "helpBody": "<p> La superposition de la liste de satellites affiche l'heure du prochain passage pour chaque satellite de votre liste. La superposition est mise à jour toutes les 10 secondes. </p> <p> Le code couleur indique le temps jusqu'au prochain passage : </p> <ul> <li>Jaune - En vue</li> <li>Bleu - Prochain passage dans les 30 minutes après l'heure actuelle ou 10 minutes avant</li> <li>Blanc - Tout autre passage futur</li> </ul> <p> Cliquer sur un satellite dans la superposition centre la carte sur ce satellite. </p>"
-    },
-    "ReportsPlugin": {
-      "bottomIconLabel": "Rapports",
-      "title": "Menu Rapports",
-      "helpBody": "Le menu Rapports est une collection d'outils pour vous aider à analyser et comprendre les données affichées."
-    },
-    "PolarPlotPlugin": {
-      "bottomIconLabel": "Trace polaire",
-      "title": "Menu Trace polaire",
-      "helpBody": "Le menu Trace polaire permet de générer un graphique polaire 2D de l’azimut et de l’élévation du satellite au fil du temps."
-    },
-    "NextLaunchesPlugin": {
-      "bottomIconLabel": "Prochains lancements",
-      "title": "Menu Prochains lancements",
-      "helpBody": "Le menu Prochains lancements récupère les données de <a href=\"https://thespacedevs.com/\" target=\"_blank\">The Space Devs</a> pour afficher les lancements à venir."
-    },
-    "FindSatPlugin": {
-      "bottomIconLabel": "Trouver un satellite",
-      "title": "Menu Trouver un satellite",
-      "helpBody": "Le menu Trouver un satellite permet de rechercher des satellites par paramètres orbitaux ou caractéristiques. <br><br> Pour la plupart des paramètres, saisissez la valeur cible à gauche et une marge d’erreur à droite. Par exemple, pour trouver tous les satellites avec une inclinaison de 51 à 52 degrés, saisissez 51,5 à gauche et 0,5 à droite. La recherche affichera alors tous les satellites dans cette plage d’inclinaison dans la barre de recherche."
-    },
-    "ShortTermFences": {
-      "bottomIconLabel": "Barrière court terme",
-      "title": "Menu Barrières court terme (STF)",
-      "helpBody": "Le menu Barrières court terme (STF) permet de visualiser les zones de recherche des capteurs. <br><br> Ceci n'est probablement utile que si vous possédez/exploitez un capteur avec cette fonctionnalité."
-    },
-    "Reentries": {
-      "bottomIconLabel": "Prédiction de rentrée",
-      "title": "Menu Prédiction de suivi et d'impact",
-      "helpBody": "Le menu Prédiction de suivi et d'impact (TIP) affiche les derniers messages de suivi et de prédiction d'impact pour les satellites. Le tableau affiche les colonnes suivantes :<br><br> <b>NORAD</b> : L’ID catalogue NORAD du satellite.<br><br> <b>Date de désintégration</b> : La date prévue de désintégration du satellite.<br><br> <b>Latitude</b> : La latitude du satellite au moment de la désintégration.<br><br> <b>Longitude</b> : La longitude du satellite au moment de la désintégration.<br><br> <b>Fenêtre (min)</b> : La fenêtre temporelle en minutes pour la prédiction.<br><br> <b>Prochain rapport (h)</b> : Le temps en heures avant le prochain rapport.<br><br> <b>Angle de rentrée (°)</b> : L’angle de rentrée du satellite en degrés.<br><br> <b>RCS (m²)</b> : La section efficace radar du satellite en mètres carrés.<br><br> <b>Âge GP (h)</b> : L’âge du dernier jeu d’éléments en heures.<br><br> <b>Masse à vide (kg)</b> : La masse à vide du satellite en kilogrammes.<br><br> <b>Volume (m³)</b> : Le volume estimé du satellite en mètres cubes.<br><br>"
-    },
-    "DebrisScreening": {
-      "bottomIconLabel": "Filtrage des débris",
-      "title": "Menu Filtrage des débris",
-      "helpBody": "Le menu Filtrage des débris permet de générer une liste d’objets de débris susceptibles d’être vus par un satellite. La liste est générée en calculant les paramètres orbitaux des débris et en les comparant à ceux du satellite. L’utilisateur peut choisir de générer la liste à l’aide du TLE ou du propagateur SGP4. Il est également possible de filtrer la liste par taille ou magnitude des débris."
-    },
-    "TransponderChannelData": {
-      "bottomIconLabel": "Infos transpondeur et canaux",
-      "title": "Infos transpondeur et canaux satellites",
-      "helpBody": "<p>Ce tableau contient des détails techniques sur les canaux satellites, y compris TV, radio et autres services de communication :</p><ul><li><strong>satellite :</strong> Nom du satellite diffusant le canal</li><li><strong>tvchannel :</strong> Nom du canal TV/radio ou service de communication</li><li><strong>beam :</strong> Direction du faisceau satellite (ex : hémisphère ouest)</li><li><strong>freq :</strong> Fréquence et polarité du transpondeur (ex : 3840 V)</li><li><strong>system :</strong> Système de diffusion (ex : DVB-S2 8PSK)</li><li><strong>SRFEC :</strong> Débit symbole et FEC (ex : 30000 3/4)</li><li><strong>video :</strong> Format de compression vidéo/données (ex : MPEG-4/HD)</li><li><strong>lang :</strong> Langues audio/communication disponibles (ex : Ang, Chi)</li><li><strong>encryption :</strong> Système de chiffrement utilisé (ex : PowerVu)</li></ul><p>Ces informations sont utiles pour les professionnels, techniciens, passionnés et toute personne installant ou dépannant des équipements de réception satellite.</p>"
-    },
-    "NewLaunch": {
-      "bottomIconLabel": "Nouveau lancement",
-      "title": "Menu Nouveau lancement",
-      "helpBody": "Le menu Nouveau lancement permet de générer des lancements orbitaux notionnels en modifiant des satellites existants avec des paramètres similaires. <br><br> Après avoir sélectionné un satellite, vous pouvez choisir un site de lancement et un azimut nord/sud. Le satellite sélectionné sera modifié pour l’aligner avec le site de lancement. L’horloge est alors remise à 00:00:00 pour représenter le temps relatif après le lancement. Cela peut aider à calculer la couverture capteur par rapport à l’heure de lancement. La relation de l’objet avec les autres objets orbitaux sera incorrecte."
-    },
-    "MissilePlugin": {
-      "bottomIconLabel": "Missile",
-      "title": "Menu Missile",
-      "helpBody": "Le menu Missile permet de générer des lancements de missiles notionnels entre pays. <br><br> Pour les missiles lancés depuis un sous-marin, le point de lancement est une latitude et longitude personnalisées. Pour les missiles terrestres, le point de lancement est une latitude et longitude fixes selon des sources ouvertes. <br><br> En plus des missiles personnalisés, quelques scénarios prédéfinis impliquant des centaines de missiles sont disponibles. <br><br> Tous les lancements de missiles sont notionnels et ne représentent pas des événements réels. Les trajectoires sont basées sur le même modèle balistique, mais avec différentes portées minimales et maximales."
     },
     "SensorFov": {
       "bottomIconLabel": "Champ de vision capteur"
@@ -150,21 +76,8 @@
     "SatelliteViewPlugin": {
       "bottomIconLabel": "Vue satellite"
     },
-    "SatelliteFov": {
-      "bottomIconLabel": "Champ de vision satellite",
-      "title": "Champ de vision satellite",
-      "helpBody": "Le plugin Champ de vision satellite permet de contrôler le champ de vision d’un satellite."
-    },
-    "Planetarium": {
-      "bottomIconLabel": "Vue planétarium"
-    },
     "NightToggle": {
       "bottomIconLabel": "Mode nuit"
-    },
-    "ColorMenu": {
-      "bottomIconLabel": "Schémas de couleurs",
-      "title": "Menu Schéma de couleurs",
-      "helpBody": "Le menu Couleurs permet de changer le thème de couleurs utilisé pour afficher les objets. <br><br> Les différents thèmes peuvent modifier les couleurs en fonction des orbites des objets, de leurs caractéristiques ou de leur relation avec le soleil et/ou la Terre."
     },
     "Screenshot": {
       "bottomIconLabel": "Prendre une photo"
@@ -172,66 +85,8 @@
     "TimeMachine": {
       "bottomIconLabel": "Machine à remonter le temps"
     },
-    "SatellitePhotos": {
-      "bottomIconLabel": "Photos satellites",
-      "title": "Menu Photos satellites",
-      "helpBody": "Le menu Photos satellites permet d'afficher des photos en direct de certains satellites. <br><br> Remarque : des changements dans l'API d'images peuvent entraîner la sélection du mauvais satellite dans KeepTrack."
-    },
     "ScreenRecorder": {
       "bottomIconLabel": "Enregistrer une vidéo"
-    },
-    "Astronomy": {
-      "bottomIconLabel": "Astronomie"
-    },
-    "Calculator": {
-      "bottomIconLabel": "Transformations de repère",
-      "title": "Menu Transformations de repère",
-      "helpBody": "Le menu Transformations de repère permet de convertir entre différents repères de référence. <br><br> Le menu permet de convertir entre les repères suivants : <ul style=\"margin-left: 40px;\"> <li> ECI - Terre centrée inertielle </li> <li> ECEF - Terre centrée fixe </li> <li> Géodésique </li> <li> Topocentrique </li> </ul>"
-    },
-    "ManeuverPlugin": {
-      "bottomIconLabel": "Manœuvre",
-      "title": "Menu Manœuvre",
-      "helpBody": "Le menu Manœuvre permet de créer une manœuvre pour un satellite.<br><br>Le menu vous permet de sélectionner le type de manœuvre, l'heure de la manœuvre et l'amplitude de la manœuvre. La manœuvre peut être appliquée à un satellite en le sélectionnant dans la liste des satellites."
-    },
-    "SettingsMenuPlugin": {
-      "bottomIconLabel": "Paramètres",
-      "title": "Menu Paramètres",
-      "helpBody": "Le menu Paramètres vous permet de configurer l'application."
-    },
-    "VideoDirectorPlugin": {
-      "bottomIconLabel": "Réalisateur vidéo",
-      "title": "Menu Réalisateur vidéo",
-      "helpBody": "Le menu Réalisateur vidéo permet de manipuler la caméra et les objets de la scène pour créer une vidéo."
-    },
-    "EciPlot": {
-      "bottomIconLabel": "Trace ECI",
-      "title": "Menu Trace ECI",
-      "helpBody": "Le menu Trace ECI permet de tracer la position du satellite dans le repère Terre centrée inertielle (ECI)."
-    },
-    "EcfPlot": {
-      "bottomIconLabel": "Trace ECF",
-      "title": "Menu Trace ECF",
-      "helpBody": "Le menu Trace ECF permet de tracer la position du satellite dans le repère Terre centrée fixe (ECF)."
-    },
-    "RicPlot": {
-      "bottomIconLabel": "Trace RIC",
-      "title": "Menu Trace RIC",
-      "helpBody": "Le menu Trace RIC permet de tracer la position du satellite dans le repère Radial, In-Track, Cross-Track (RIC)."
-    },
-    "Time2LonPlots": {
-      "bottomIconLabel": "Trace en cascade",
-      "title": "Menu Cascade",
-      "helpBody": "Le menu Trace Cascade (Time to Longitude) permet de tracer la longitude du satellite en fonction du temps."
-    },
-    "Lat2LonPlots": {
-      "bottomIconLabel": "Trace Lat vs Lon",
-      "title": "Menu Latitude vs Longitude",
-      "helpBody": "Le menu Latitude vs Longitude permet de tracer la latitude en fonction de la longitude dans la ceinture GEO."
-    },
-    "Inc2LonPlots": {
-      "bottomIconLabel": "Trace Inc vs Lon",
-      "title": "Menu Inclinaison vs Longitude",
-      "helpBody": "Le menu Inclinaison vs Longitude permet de tracer l'inclinaison en fonction de la longitude dans la ceinture GEO."
     },
     "GraphicsMenuPlugin": {
       "bottomIconLabel": "Menu Graphismes",
@@ -245,6 +100,7 @@
     "modeEvents": "Événements",
     "modeCreate": "Créer",
     "modeAnalysis": "Analyse",
+    "modeConjunctions": "Conjonctions",
     "modeDisplay": "Affichage",
     "modeTools": "Outils",
     "modeSettings": "Paramètres",

@@ -1,0 +1,17 @@
+{
+  "plugins": {
+    "GunterLaunchCalendar": {
+      "bottomIconLabel": "Gunter Startkalender",
+      "title": "Startkalender",
+      "commands": {
+        "open": "Startkalender öffnen"
+      },
+      "help": {
+        "overview": "Der Startkalender öffnet die Startliste von Gunter's Space Page für das aktuelle Jahr in einem Overlay: eine umfassende, regelmäßig aktualisierte Liste orbitaler Starts mit Daten, Trägerraketen, Nutzlasten und Startplätzen. Nutzen Sie ihn, um zu sehen, was als Nächstes startet, und bauen Sie bevorstehende Starts anschließend mit dem Werkzeug Neuer Start nach.",
+        "howToUse": "<ol><li>Klicken Sie auf das Symbol <strong>Startkalender</strong> im unteren Menü (Modus Ereignisse). Der Kalender öffnet sich in einem Overlay; Seitenmenüs schließen sich automatisch.</li><li>Durchstöbern Sie die Liste und schließen Sie dann das Overlay, um zur 3D-Ansicht zurückzukehren.</li></ol>",
+        "tip1": "Der Kalender ist eine externe Seite von Gunter's Space Page und benötigt daher eine Internetverbindung.",
+        "tip2": "Er ist auch über die Befehlspalette als Startkalender öffnen verfügbar."
+      }
+    }
+  }
+}

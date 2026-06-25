@@ -3,6 +3,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { GunterLaunchCalendar } from '@app/plugins/gunter-launch-calendar/gunter-launch-calendar';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { createColorbox } from '@app/engine/utils/colorbox';
+import { settingsManager } from '@app/settings/settings';
 import { setupDefaultHtml, setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -12,6 +13,8 @@ describe('GunterLaunchCalendar', () => {
 
   beforeEach(() => {
     setupDefaultHtml();
+    // Disabled by default in the manifest; enable so init() runs fully under test.
+    settingsManager.plugins.GunterLaunchCalendar = { enabled: true };
     plugin = new GunterLaunchCalendar();
   });
 
@@ -79,6 +82,8 @@ describe('gunter_launch_calendar_plugin', () => {
 
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
+    // Disabled by default in the manifest; enable so init() runs fully under test.
+    settingsManager.plugins.GunterLaunchCalendar = { enabled: true };
     createColorbox();
     launchCalendarPlugin = new GunterLaunchCalendar();
   });

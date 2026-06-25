@@ -6,7 +6,14 @@
       "defaultImageTitle": "最新の衛星画像",
       "labels": {
         "dscovrUnavailable": "DSCOVRは一時的に利用できません",
-        "dscovrImage": "DSCOVR画像 {index}"
+        "dscovrImage": "DSCOVR画像 {index}",
+        "dscovrLoading": "DSCOVR画像を読み込んでいます…",
+        "refresh": "最新画像を更新",
+        "imageAtUtc": "{name}（{time} UTC）"
+      },
+      "sections": {
+        "geostationary": "静止軌道",
+        "dscovr": "DSCOVR（L1）"
       },
       "errorMsgs": {
         "FuturePictures": "未来の画像は読み込めません。最新の画像を読み込んでいます。"

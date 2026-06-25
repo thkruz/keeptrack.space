@@ -6,7 +6,14 @@
       "defaultImageTitle": "Последний спутниковый снимок",
       "labels": {
         "dscovrUnavailable": "DSCOVR временно недоступен",
-        "dscovrImage": "Снимок DSCOVR {index}"
+        "dscovrImage": "Снимок DSCOVR {index}",
+        "dscovrLoading": "Загрузка снимков DSCOVR…",
+        "refresh": "Обновить последний снимок",
+        "imageAtUtc": "{name} в {time} UTC"
+      },
+      "sections": {
+        "geostationary": "Геостационарные",
+        "dscovr": "DSCOVR (L1)"
       },
       "errorMsgs": {
         "FuturePictures": "Невозможно загрузить снимки из будущего. Загружаются последние снимки."

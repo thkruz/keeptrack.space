@@ -6,7 +6,14 @@
       "defaultImageTitle": "最新卫星影像",
       "labels": {
         "dscovrUnavailable": "DSCOVR 暂时不可用",
-        "dscovrImage": "DSCOVR 影像 {index}"
+        "dscovrImage": "DSCOVR 影像 {index}",
+        "dscovrLoading": "正在加载 DSCOVR 影像…",
+        "refresh": "刷新最新影像",
+        "imageAtUtc": "{name}，{time} UTC"
+      },
+      "sections": {
+        "geostationary": "地球静止轨道",
+        "dscovr": "DSCOVR（L1）"
       },
       "errorMsgs": {
         "FuturePictures": "无法加载未来的影像。正在加载最新影像。"

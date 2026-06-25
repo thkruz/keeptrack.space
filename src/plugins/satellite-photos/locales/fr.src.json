@@ -6,7 +6,14 @@
       "defaultImageTitle": "Dernière image satellite",
       "labels": {
         "dscovrUnavailable": "DSCOVR temporairement indisponible",
-        "dscovrImage": "Image DSCOVR {index}"
+        "dscovrImage": "Image DSCOVR {index}",
+        "dscovrLoading": "Chargement des images DSCOVR…",
+        "refresh": "Actualiser la dernière image",
+        "imageAtUtc": "{name} à {time} UTC"
+      },
+      "sections": {
+        "geostationary": "Géostationnaire",
+        "dscovr": "DSCOVR (L1)"
       },
       "errorMsgs": {
         "FuturePictures": "Impossible de charger des images du futur. Chargement des images les plus récentes."

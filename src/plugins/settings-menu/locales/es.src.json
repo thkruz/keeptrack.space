@@ -3,9 +3,13 @@
     "SettingsMenuPlugin": {
       "bottomIconLabel": "Configuración",
       "title": "Menú de Configuración",
+      "filterPlaceholder": "Filtrar ajustes...",
       "buttons": {
-        "updateSettings": "Actualizar configuración",
         "resetToDefaults": "Restablecer valores predeterminados"
+      },
+      "commands": {
+        "open": "Abrir configuración",
+        "reset": "Restablecer la configuración a los valores predeterminados"
       },
       "sections": {
         "general": "Configuración general",
@@ -37,13 +41,14 @@
         "showConfidenceLevels": "Mostrar los niveles de confianza de los conjuntos de elementos del satélite.",
         "enableDemoMode": "Cada 3 segundos se seleccionará un nuevo satélite del FOV",
         "enableFreezeTime": "El tiempo se congelará mientras rotas la cámara.",
-        "compensateEarthRotation": "Compensa el giro de la cámara según la rotación de la Tierra para que la vista permanezca fija a las coordenadas geográficas."
+        "compensateEarthRotation": "Compensa el giro de la cámara según la rotación de la Tierra para que la vista permanezca fija a las coordenadas geográficas.",
+        "showNextPassOnHover": "Muestra la hora del próximo pase al pasar el cursor sobre un satélite dentro del campo de visión del sensor seleccionado."
       },
       "help": {
         "overview": "El menú de Configuración reúne las opciones de visualización e interacción de toda la aplicación: dibujo de órbitas, comportamiento al pasar el cursor, ayudas de cámara y extras sensibles al rendimiento. Otros plugins también aportan aquí sus propias secciones, así que este es el único lugar para ajustar el comportamiento de KeepTrack.",
         "imgAlt": "El menú de Configuración con sus interruptores de opciones generales",
-        "imgCaption": "Activa o desactiva opciones y aplícalas con Actualizar configuración.",
-        "howToUse": "<ol><li>Abre <strong>Configuración</strong> desde la barra inferior.</li><li>Activa los interruptores que quieras; pasa el cursor sobre cualquier fila para ver una descripción.</li><li>Haz clic en <strong>Actualizar configuración</strong> para aplicar. Algunas opciones redibujan la escena de inmediato.</li><li><strong>Restablecer valores predeterminados</strong> devuelve todas las opciones, incluidas las secciones aportadas por plugins, a los valores de fábrica.</li></ol>",
+        "imgCaption": "Activa cualquier opción para aplicarla al instante; usa el filtro para encontrar ajustes rápidamente.",
+        "howToUse": "<ol><li>Abre <strong>Configuración</strong> desde la barra inferior.</li><li>Activa cualquier interruptor para aplicarlo al instante; pasa el cursor sobre una fila para ver una descripción que la explique.</li><li>Usa el cuadro de <strong>filtro</strong> de la parte superior para encontrar rápidamente un ajuste por su nombre.</li><li><strong>Restablecer valores predeterminados</strong> devuelve todas las opciones, incluidas las secciones aportadas por plugins, a los valores de fábrica.</li></ol>",
         "tip1": "Las opciones bajo Requiere CPU rápida, como mostrar el próximo pase al pasar el cursor, ejecutan cálculos adicionales en cada fotograma; déjalas desactivadas en equipos lentos.",
         "tip2": "Las secciones de plugins al final provienen de otros plugins (Watchlist, Máquina del Tiempo y más), así que el menú crece a medida que se activan los plugins."
       }

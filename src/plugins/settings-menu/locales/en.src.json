@@ -3,9 +3,13 @@
     "SettingsMenuPlugin": {
       "bottomIconLabel": "Settings",
       "title": "Settings Menu",
+      "filterPlaceholder": "Filter settings...",
       "buttons": {
-        "updateSettings": "Update Settings",
         "resetToDefaults": "Reset to Defaults"
+      },
+      "commands": {
+        "open": "Open Settings",
+        "reset": "Reset Settings to Defaults"
       },
       "sections": {
         "general": "General Settings",
@@ -37,13 +41,14 @@
         "showConfidenceLevels": "Show confidence levels for satellite's element sets.",
         "enableDemoMode": "Every 3 seconds a new satellite will be selected from FOV",
         "enableFreezeTime": "Time will freeze as you rotate the camera.",
-        "compensateEarthRotation": "Compensate camera yaw for Earth rotation so the view stays fixed to geographic coordinates."
+        "compensateEarthRotation": "Compensate camera yaw for Earth rotation so the view stays fixed to geographic coordinates.",
+        "showNextPassOnHover": "Show the next pass time when hovering over a satellite in the selected sensor's field of view."
       },
       "help": {
         "overview": "The Settings menu holds the application wide display and interaction options: orbit drawing, hover behavior, camera aids, and performance sensitive extras. Other plugins also contribute their own sections here, so this is the single place to tune how KeepTrack behaves.",
         "imgAlt": "The Settings menu with its general option switches",
-        "imgCaption": "Toggle options, then apply them with Update Settings.",
-        "howToUse": "<ol><li>Open <strong>Settings</strong> from the bottom bar.</li><li>Toggle the switches you want; hover any row for a tooltip explaining it.</li><li>Click <strong>Update Settings</strong> to apply. Some options redraw the scene immediately.</li><li><strong>Reset to Defaults</strong> restores every option, including plugin contributed sections, to factory values.</li></ol>",
+        "imgCaption": "Toggle any option to apply it instantly; use the filter to find settings fast.",
+        "howToUse": "<ol><li>Open <strong>Settings</strong> from the bottom bar.</li><li>Toggle any switch to apply it instantly; hover a row for a tooltip explaining it.</li><li>Use the <strong>filter</strong> box at the top to quickly find a setting by name.</li><li><strong>Reset to Defaults</strong> restores every option, including plugin contributed sections, to factory values.</li></ol>",
         "tip1": "Options under Fast CPU Required, like showing the next pass on hover, run extra calculations every frame; leave them off on slower machines.",
         "tip2": "Plugin sections at the bottom come from other plugins (Watchlist, Time Machine, and more), so the menu grows as plugins are enabled."
       }

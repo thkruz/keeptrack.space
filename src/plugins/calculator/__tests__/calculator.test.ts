@@ -3,6 +3,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
 import { Calculator } from '@app/plugins/calculator/calculator';
+import { toDms } from '@app/plugins/calculator/calculator-core';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -35,8 +36,6 @@ describe('Calculator pure helpers', () => {
     setupStandardEnvironment();
     calc = new Calculator() as unknown as CalcInternals;
   });
-
-  const toDms = (Calculator as unknown as { toDms_(d: number): string }).toDms_;
 
   it('toDms_ formats degrees as sign/deg/min/sec', () => {
     expect(toDms(0)).toBe('0° 0\' 0.00"');
@@ -97,6 +96,7 @@ describe('Calculator conversion engine', () => {
 
   beforeEach(() => {
     KeepTrack.getInstance().containerRoot.innerHTML = '';
+    localStorage.clear();
     setupStandardEnvironment([SelectSatManager]);
     plugin = new Calculator();
     websiteInit(plugin);

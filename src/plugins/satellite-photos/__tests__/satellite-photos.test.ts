@@ -74,7 +74,7 @@ describe('SatellitePhotos', () => {
 
     it('should return correct drag options', () => {
       const plugin = new SatellitePhotos();
-      const dragOptions = plugin.getDragOptions_();
+      const dragOptions = (plugin as any).getDragOptions_();
 
       expect(dragOptions.isDraggable).toBe(true);
       expect(dragOptions.minWidth).toBe(200);
@@ -90,15 +90,18 @@ describe('SatellitePhotos', () => {
       expect(shortcuts[0].callback).toBeInstanceOf(Function);
     });
 
-    it('should build side menu HTML with satellite list', () => {
+    it('should build a v13 side menu with action rows for each fixed source', () => {
       const plugin = new SatellitePhotos();
-      const menuHtml = plugin.buildSideMenuHtml_();
+      const menuHtml = (plugin as any).buildSideMenuHtml_();
 
-      expect(menuHtml).toContain('sat-photo-menu');
-      expect(menuHtml).toContain('sat-photo-menu-list');
+      expect(menuHtml).toContain('kt-ui-v13');
+      expect(menuHtml).toContain('sat-photo-menu-content');
       expect(menuHtml).toContain('meteosat9-link');
-      expect(menuHtml).toContain('goes16-link');
+      expect(menuHtml).toContain('goes19-link');
+      expect(menuHtml).toContain('goes18-link');
       expect(menuHtml).toContain('elektro3-link');
+      expect(menuHtml).toContain('sat-photo-dscovr-list');
+      expect(menuHtml).toContain('sat-photo-refresh');
     });
   });
 
@@ -113,15 +116,6 @@ describe('SatellitePhotos', () => {
       plugin.addJs();
 
       expect(onSpy).toHaveBeenCalledWith(EventBusEvent.uiManagerFinal, expect.any(Function));
-    });
-
-    it('should register onKeepTrackReady handler on addJs', () => {
-      const plugin = new SatellitePhotos();
-      const onSpy = vi.spyOn(EventBus.getInstance(), 'on');
-
-      plugin.addJs();
-
-      expect(onSpy).toHaveBeenCalledWith(EventBusEvent.onKeepTrackReady, expect.any(Function));
     });
   });
 });
@@ -140,7 +134,9 @@ describe('SatellitePhotos_test_links', () => {
   const tempSatellitePhotosPlugin = new SatellitePhotos();
 
   websiteInit(tempSatellitePhotosPlugin);
-  const links = Array.from(getEl('sat-photo-menu-content')!.getElementsByTagName('li')).map((li) => li.id);
+  const links = Array.from(
+    getEl('sat-photo-menu-content')!.querySelectorAll('.sat-photo-link'),
+  ).map((el) => el.id);
 
   let satellitePhotosPlugin: SatellitePhotos;
 
@@ -150,6 +146,10 @@ describe('SatellitePhotos_test_links', () => {
     satellitePhotosPlugin = new SatellitePhotos();
     websiteInit(satellitePhotosPlugin);
     KeepTrack.getInstance().containerRoot.innerHTML += '<div id="colorbox-div"></div>';
+  });
+
+  it('renders one action row per fixed imagery source', () => {
+    expect(links.length).toBeGreaterThan(0);
   });
 
   links.forEach((link) => {
@@ -164,8 +164,6 @@ describe('SatellitePhotos behavior', () => {
   let plugin: SatellitePhotos;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const p = () => plugin as any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const statics = SatellitePhotos as any;
 
   beforeEach(() => {
     PluginRegistry.unregisterAllPlugins();
@@ -192,57 +190,62 @@ describe('SatellitePhotos behavior', () => {
     expect(spy).toHaveBeenCalled();
   });
 
-  it('clicking each weather-sat link loads an image', () => {
-    ['meteosat9-link', 'meteosat11-link', 'himawari8-link', 'goes16-link', 'goes18-link', 'elektro3-link'].forEach((id) => {
+  it('clicking each fixed imagery link loads an image', () => {
+    ['meteosat9-link', 'meteosat11-link', 'himawari8-link', 'goes19-link', 'goes18-link', 'elektro3-link'].forEach((id) => {
       getEl(id)!.click();
     });
 
     expect(colorbox.openColorbox).toHaveBeenCalled();
-    // Runs the colorbox_ setTimeout that re-enables colorbox close.
+    // Runs the openImage_ setTimeout that re-enables colorbox close.
     vi.advanceTimersByTime(2500);
   });
 
-  it('loadElektro_ handles future, distant-past and present sim times', () => {
+  it('clicking the Elektro link is safe across future, distant-past and present sim times', () => {
     const tm = ServiceLocator.getTimeManager();
 
     tm.simulationTimeObj = new Date(Date.now() + 1000 * 60 * 60 * 48) as never;
-    expect(() => p().loadElektro_()).not.toThrow();
+    expect(() => getEl('elektro3-link')!.click()).not.toThrow();
 
     tm.simulationTimeObj = new Date(Date.now() - 1000 * 60 * 60 * 48) as never;
-    expect(() => p().loadElektro_()).not.toThrow();
+    expect(() => getEl('elektro3-link')!.click()).not.toThrow();
 
     tm.simulationTimeObj = new Date(Date.now() - 1000 * 60 * 60) as never;
-    expect(() => p().loadElektro_()).not.toThrow();
-  });
-
-  it('loadElektroPastOrPresent_ adjusts a sim time near the 24h boundary', () => {
-    // Frozen test time is midnight, which makes the >24h adjustment unreachable; use a non-midnight clock.
-    vi.setSystemTime(new Date('2022-06-15T14:23:00Z'));
-    const tm = ServiceLocator.getTimeManager();
-
-    // Gap just under 24h so flooring the minutes pushes closestTime past the 24h mark.
-    tm.simulationTimeObj = new Date(Date.now() - (24 * 60 - 1) * 60 * 1000) as never;
-    expect(() => p().loadElektro_()).not.toThrow();
-
-    vi.setSystemTime(new Date('2022-01-01T00:00:00Z'));
-  });
-
-  it('himawari8_ loads a past image and warns for future sim times', () => {
-    const tm = ServiceLocator.getTimeManager();
-
-    tm.simulationTimeObj = new Date(Date.now() - 1000 * 60 * 60) as never;
-    expect(() => statics.himawari8_()).not.toThrow();
+    expect(() => getEl('elektro3-link')!.click()).not.toThrow();
     vi.advanceTimersByTime(2500);
+  });
 
+  it('Himawari warns for future sim times', () => {
+    const tm = ServiceLocator.getTimeManager();
     const toast = vi.fn();
 
     ServiceLocator.getUiManager().toast = toast;
     tm.simulationTimeObj = new Date(Date.now() + 1000 * 60 * 60 * 48) as never;
-    statics.himawari8_();
+    getEl('himawari8-link')!.click();
+
     expect(toast).toHaveBeenCalled();
+    vi.advanceTimersByTime(2500);
   });
 
-  it('initDISCOVR_ runs on keepTrackReady and adds image links when the API responds', async () => {
+  it('refresh reloads the last opened source with a cache-busted URL', () => {
+    getEl('goes19-link')!.click();
+    const openCalls = (colorbox.openColorbox as ReturnType<typeof vi.fn>).mock.calls.length;
+
+    expect(getEl('sat-photo-refresh')!.style.display).toBe('flex');
+    getEl('sat-photo-refresh')!.click();
+
+    expect((colorbox.openColorbox as ReturnType<typeof vi.fn>).mock.calls.length).toBe(openCalls + 1);
+    const lastUrl = (colorbox.openColorbox as ReturnType<typeof vi.fn>).mock.calls.at(-1)![0];
+
+    expect(lastUrl).toContain('_=');
+    vi.advanceTimersByTime(2500);
+  });
+
+  it('refresh is a no-op before any source has been opened', () => {
+    expect(() => getEl('sat-photo-refresh')!.click()).not.toThrow();
+    expect(colorbox.openColorbox).not.toHaveBeenCalled();
+  });
+
+  it('opening the side menu fetches DSCOVR and adds image links that snap the camera', async () => {
     global.fetch = vi.fn(() => Promise.resolve({
       ok: true,
       // eslint-disable-next-line camelcase
@@ -250,38 +253,46 @@ describe('SatellitePhotos behavior', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     })) as any;
 
-    // The onKeepTrackReady handler (wired in addJs) is what kicks off initDISCOVR_.
-    EventBus.getInstance().emit(EventBusEvent.onKeepTrackReady);
+    plugin.onSideMenuOpen();
     await flushAsync();
 
-    expect(getEl('discovr-link1', true)).not.toBeNull();
-    // The added link snaps the camera to the photo coordinates.
-    getEl('discovr-link1', true)!.click();
+    expect(getEl('dscovr1-link', true)).not.toBeNull();
+    getEl('dscovr1-link', true)!.click();
     expect(ServiceLocator.getMainCamera().camSnap).toHaveBeenCalled();
+    vi.advanceTimersByTime(2500);
   });
 
-  it('initDISCOVR_ falls into the catch on a non-ok HTTP response', async () => {
+  it('only fetches DSCOVR once even if the menu is opened repeatedly', () => {
+    global.fetch = vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve([]) })) as never;
+
+    plugin.onSideMenuOpen();
+    plugin.onSideMenuOpen();
+
+    expect((global.fetch as ReturnType<typeof vi.fn>).mock.calls.length).toBe(1);
+  });
+
+  it('shows an unavailable note on a non-ok HTTP response', async () => {
     global.fetch = vi.fn(() => Promise.resolve({ ok: false, status: 503 })) as never;
 
-    p().initDISCOVR_();
+    plugin.onSideMenuOpen();
     await flushAsync();
 
-    expect(getEl('sat-photo-menu-list')!.innerHTML).toContain('Temporarily Unavailable');
+    expect(getEl('sat-photo-dscovr-list')!.innerHTML).toContain('Temporarily Unavailable');
   });
 
-  it('initDISCOVR_ shows an unavailable entry when the API fails', async () => {
+  it('shows an unavailable note when the API fails', async () => {
     global.fetch = vi.fn(() => Promise.reject(new Error('network'))) as never;
 
-    p().initDISCOVR_();
+    plugin.onSideMenuOpen();
     await flushAsync();
 
-    expect(getEl('sat-photo-menu-list')!.innerHTML).toContain('Temporarily Unavailable');
+    expect(getEl('sat-photo-dscovr-list')!.innerHTML).toContain('Temporarily Unavailable');
   });
 
-  it('addDiscvrLinks_ returns early when the list element is absent', () => {
-    getEl('sat-photo-menu-list', true)?.remove();
-    p().discvrPhotos_ = [{ imageUrl: 'u', lat: 0, lon: 0 }];
+  it('renderDscovrRows_ returns early when the list element is absent', () => {
+    getEl('sat-photo-dscovr-list', true)?.remove();
+    p().discvrSources_ = [{ id: 'dscovr1', label: 'x', sccNum: 40390, buildImage: () => ({ url: 'u' }) }];
 
-    expect(() => p().addDiscvrLinks_()).not.toThrow();
+    expect(() => p().renderDscovrRows_()).not.toThrow();
   });
 });

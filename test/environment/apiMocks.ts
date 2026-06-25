@@ -181,6 +181,9 @@ export const keepTrackApiStubs = {
       zoomLevel: () => 0,
       zoomTarget: () => 0,
       autoRotate: vi.fn(),
+      state: {
+        isAutoRotate: false,
+      },
       panCurrent: {
         x: 0,
         y: 0,

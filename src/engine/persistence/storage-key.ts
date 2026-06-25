@@ -131,6 +131,9 @@ export enum StorageKey {
   // Aurora Pro (opt-in NOAA OVATION auto-refresh toggle)
   AURORA_AUTO_REFRESH = 'v2-keepTrack-auroraAutoRefresh',
 
+  // Aurora Pro (opt-in: enable the high-accuracy overlay automatically on fetch)
+  AURORA_AUTO_HIGH_ACCURACY = 'v2-keepTrack-auroraAutoHighAccuracy',
+
   // Scenario Management Pro (saved scenario library: name -> { savedAt, data })
   SCENARIO_LIBRARY = 'v2-keepTrack-scenarioLibrary',
 

@@ -20,13 +20,20 @@
         "zoomIn": "Przybliż kamerę",
         "zoomOut": "Oddal kamerę",
         "disableSelectedDot": "Wyłącz punkt wybranego satelity",
-        "startAutoRotate": "Rozpocznij automatyczny obrót"
+        "rotate": "Obrót",
+        "pan": "Panoramowanie",
+        "zoom": "Zbliżenie",
+        "scene": "Scena",
+        "blackEarth": "Czarna Ziemia",
+        "milkyWay": "Droga Mleczna",
+        "startAutoRotate": "Rozpocznij automatyczny obrót",
+        "stopAutoRotate": "Zatrzymaj automatyczny obrót"
       },
       "help": {
         "overview": "Reżyser wideo konfiguruje płynne, powtarzalne ruchy kamery do nagrywania filmowych ujęć symulacji: powolne obroty, panoramy i zbliżenia z precyzyjnymi prędkościami, z opcjonalnym ukryciem punktu podświetlenia wybranego satelity, aby nie pojawiał się w nagraniu.",
         "imgAlt": "Menu Reżysera wideo z kontrolkami obrotu, panoramowania i zbliżenia",
         "imgCaption": "Wybierz kierunek i prędkość ruchu, a następnie rozpocznij ruch.",
-        "howToUse": "<ol><li>Otwórz <strong>Reżyser wideo</strong> z dolnego paska (tryb Narzędzia).</li><li>Ustaw <strong>Prędkość obrotu</strong>, <strong>Prędkość panoramowania</strong> lub <strong>Prędkość zbliżenia</strong> i włącz żądany kierunek; przeciwne kierunki wzajemnie się wykluczają.</li><li>Kliknij <strong>Aktualizuj ustawienia</strong>, aby zastosować, a następnie <strong>Rozpocznij automatyczny obrót</strong>, aby rozpocząć ruch.</li><li>Włącz <strong>Wyłącz punkt wybranego satelity</strong>, aby znacznik wyboru nie pojawił się w nagraniu.</li></ol>",
+        "howToUse": "<ol><li>Otwórz <strong>Reżyser wideo</strong> z dolnego paska (tryb Eksperymentalny).</li><li>Ustaw <strong>Prędkość obrotu</strong>, <strong>Prędkość panoramowania</strong> lub <strong>Prędkość zbliżenia</strong> i włącz żądany kierunek; zmiany są stosowane natychmiast, a przeciwne kierunki wzajemnie się wykluczają.</li><li>Kliknij <strong>Rozpocznij automatyczny obrót</strong>, aby rozpocząć ruch, i ponownie, aby go zatrzymać.</li><li>Włącz <strong>Wyłącz punkt wybranego satelity</strong>, <strong>Czarna Ziemia</strong> lub <strong>Droga Mleczna</strong>, aby uzyskać czyste, filmowe tło.</li></ol>",
         "tip1": "Bardzo małe wartości prędkości dają płynny, profesjonalny ruch; wartości domyślne są dostrojone do powolnych, filmowych ujęć.",
         "tip2": "Połącz powolny obrót z szybko biegnącym czasem symulacji, aby uzyskać klasyczne poklatkowe ujęcie orbity."
       }

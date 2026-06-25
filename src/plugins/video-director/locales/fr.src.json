@@ -20,13 +20,20 @@
         "zoomIn": "Zoom avant de la caméra",
         "zoomOut": "Zoom arrière de la caméra",
         "disableSelectedDot": "Désactiver le point du satellite sélectionné",
-        "startAutoRotate": "Démarrer la rotation automatique"
+        "rotate": "Rotation",
+        "pan": "Panoramique",
+        "zoom": "Zoom",
+        "scene": "Scène",
+        "blackEarth": "Terre noire",
+        "milkyWay": "Voie lactée",
+        "startAutoRotate": "Démarrer la rotation automatique",
+        "stopAutoRotate": "Arrêter la rotation automatique"
       },
       "help": {
         "overview": "Le Réalisateur vidéo met en place des mouvements de caméra fluides et reproductibles pour enregistrer des clips cinématographiques de la simulation : rotations lentes, panoramiques et zooms à des vitesses précises, avec la possibilité de masquer le point de surbrillance du satellite sélectionné pour qu'il n'apparaisse pas dans les images.",
         "imgAlt": "Le menu Réalisateur vidéo avec les commandes de rotation, de panoramique et de zoom",
         "imgCaption": "Choisissez une direction et une vitesse de mouvement, puis lancez le déplacement.",
-        "howToUse": "<ol><li>Ouvrez le <strong>Réalisateur vidéo</strong> depuis la barre inférieure (mode Outils).</li><li>Réglez la <strong>Vitesse de rotation</strong>, la <strong>Vitesse de panoramique</strong> ou la <strong>Vitesse de zoom</strong>, et activez la direction souhaitée ; les directions opposées s'excluent mutuellement.</li><li>Cliquez sur <strong>Mettre à jour les paramètres</strong> pour appliquer, puis sur <strong>Démarrer la rotation automatique</strong> pour lancer le mouvement.</li><li>Activez <strong>Désactiver le point du satellite sélectionné</strong> pour garder le marqueur de sélection hors de votre enregistrement.</li></ol>",
+        "howToUse": "<ol><li>Ouvrez le <strong>Réalisateur vidéo</strong> depuis la barre inférieure (mode Expérimental).</li><li>Réglez la <strong>Vitesse de rotation</strong>, la <strong>Vitesse de panoramique</strong> ou la <strong>Vitesse de zoom</strong>, et activez la direction souhaitée ; les modifications s'appliquent immédiatement et les directions opposées s'excluent mutuellement.</li><li>Cliquez sur <strong>Démarrer la rotation automatique</strong> pour lancer le mouvement, et à nouveau pour l'arrêter.</li><li>Activez <strong>Désactiver le point du satellite sélectionné</strong>, <strong>Terre noire</strong> ou <strong>Voie lactée</strong> pour un arrière-plan cinématographique épuré.</li></ol>",
         "tip1": "De très petites valeurs de vitesse donnent un mouvement fluide de qualité professionnelle ; les valeurs par défaut sont réglées pour des mouvements lents et cinématographiques.",
         "tip2": "Combinez une rotation lente avec les commandes de temps en vitesse accélérée pour un plan d'orbite en accéléré classique."
       }

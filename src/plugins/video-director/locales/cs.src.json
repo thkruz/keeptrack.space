@@ -20,13 +20,20 @@
         "zoomIn": "Přiblížit kameru",
         "zoomOut": "Oddálit kameru",
         "disableSelectedDot": "Vypnout bod vybraného satelitu",
-        "startAutoRotate": "Spustit automatickou rotaci"
+        "rotate": "Rotace",
+        "pan": "Posun",
+        "zoom": "Přiblížení",
+        "scene": "Scéna",
+        "blackEarth": "Černá Země",
+        "milkyWay": "Mléčná dráha",
+        "startAutoRotate": "Spustit automatickou rotaci",
+        "stopAutoRotate": "Zastavit automatickou rotaci"
       },
       "help": {
         "overview": "Video režisér nastavuje plynulé, opakovatelné pohyby kamery pro natáčení filmových klipů ze simulace: pomalé rotace, posuny a přiblížení s přesnými rychlostmi, přičemž zvýrazňovací bod vybraného satelitu lze volitelně skrýt, aby se neobjevil v záběrech.",
         "imgAlt": "Menu Video režiséra s ovládacími prvky rotace, posunu a přiblížení",
         "imgCaption": "Vyberte směr a rychlost pohybu a poté pohyb spusťte.",
-        "howToUse": "<ol><li>Otevřete <strong>Video režisér</strong> ze spodní lišty (režim Nástroje).</li><li>Nastavte <strong>Rychlost rotace</strong>, <strong>Rychlost posunu</strong> nebo <strong>Rychlost přiblížení</strong> a zapněte požadovaný směr; opačné směry se vzájemně vylučují.</li><li>Klikněte na <strong>Aktualizovat nastavení</strong> pro použití a poté na <strong>Spustit automatickou rotaci</strong> pro zahájení pohybu.</li><li>Zapněte <strong>Vypnout bod vybraného satelitu</strong>, aby značka výběru nebyla v nahrávce.</li></ol>",
+        "howToUse": "<ol><li>Otevřete <strong>Video režisér</strong> ze spodní lišty (režim Experimentální).</li><li>Nastavte <strong>Rychlost rotace</strong>, <strong>Rychlost posunu</strong> nebo <strong>Rychlost přiblížení</strong> a zapněte požadovaný směr; změny se projeví okamžitě a opačné směry se vzájemně vylučují.</li><li>Klikněte na <strong>Spustit automatickou rotaci</strong> pro zahájení pohybu a znovu pro jeho zastavení.</li><li>Zapněte <strong>Vypnout bod vybraného satelitu</strong>, <strong>Černá Země</strong> nebo <strong>Mléčná dráha</strong> pro čisté filmové pozadí.</li></ol>",
         "tip1": "Velmi malé hodnoty rychlosti dávají hladký pohyb vysílací kvality; výchozí hodnoty jsou vyladěny pro pomalé, filmové pohyby.",
         "tip2": "Zkombinujte pomalou rotaci s rychle běžícím časem simulace pro klasický časosběrný záběr orbity."
       }

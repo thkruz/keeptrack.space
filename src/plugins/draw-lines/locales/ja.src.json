@@ -1,6 +1,8 @@
 {
   "plugins": {
     "DrawLinesPlugin": {
+      "title": "ラインを描画",
+      "bottomIconLabel": "ラインを描画",
       "rmbMenu": {
         "title": "描画",
         "eciAxes": "ECI 座標軸",
@@ -13,12 +15,39 @@
         "earthToSatellite": "地球から衛星",
         "sensorToSatellite": "センサーから衛星",
         "satelliteToSatellite": "衛星から衛星",
+        "satelliteRicAxes": "衛星 RIC 座標軸",
         "satelliteToSun": "衛星から太陽",
         "satelliteToMoon": "衛星から月",
         "moonOrbit": "月の軌道を描画"
       },
+      "sections": {
+        "activeLines": "アクティブなライン",
+        "referenceGeometry": "基準ジオメトリ",
+        "objectLines": "オブジェクトライン"
+      },
+      "referenceFrameLabel": "基準座標系",
+      "clearAll": "すべてのラインを消去",
+      "emptyList": "ラインが描画されていません",
+      "remove": "削除",
+      "lineTypes": {
+        "reference": "基準ライン",
+        "satToRef": "衛星から点",
+        "satRic": "RIC 座標軸",
+        "objToObj": "オブジェクト間",
+        "satToSun": "衛星から太陽",
+        "satToBody": "衛星から天体",
+        "sensorToSat": "センサーから衛星",
+        "sensorToSun": "センサーから太陽",
+        "sensorToMoon": "センサーから月",
+        "orbitPath": "軌道パス",
+        "satScanEarth": "地球スキャン",
+        "sensorScanHorizon": "地平線スキャン",
+        "sensorToRae": "センサーから点",
+        "generic": "ライン"
+      },
       "errorMsgs": {
-        "noPrimarySat": "衛星間ラインの主衛星が選択されていません。"
+        "noPrimarySat": "衛星間ラインの主衛星が選択されていません。",
+        "noSatSelected": "最初に衛星を選択してください。"
       }
     }
   }

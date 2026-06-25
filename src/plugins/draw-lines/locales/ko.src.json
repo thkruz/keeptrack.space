@@ -1,6 +1,8 @@
 {
   "plugins": {
     "DrawLinesPlugin": {
+      "title": "선 그리기",
+      "bottomIconLabel": "선 그리기",
       "rmbMenu": {
         "title": "그리기",
         "eciAxes": "ECI 축",
@@ -13,12 +15,39 @@
         "earthToSatellite": "지구에서 위성으로",
         "sensorToSatellite": "센서에서 위성으로",
         "satelliteToSatellite": "위성에서 위성으로",
+        "satelliteRicAxes": "위성 RIC 축",
         "satelliteToSun": "위성에서 태양으로",
         "satelliteToMoon": "위성에서 달로",
         "moonOrbit": "달 궤도 그리기"
       },
+      "sections": {
+        "activeLines": "활성 선",
+        "referenceGeometry": "기준 형상",
+        "objectLines": "객체 선"
+      },
+      "referenceFrameLabel": "기준 좌표계",
+      "clearAll": "모든 선 지우기",
+      "emptyList": "그려진 선이 없습니다",
+      "remove": "제거",
+      "lineTypes": {
+        "reference": "기준선",
+        "satToRef": "위성에서 점으로",
+        "satRic": "RIC 축",
+        "objToObj": "객체에서 객체로",
+        "satToSun": "위성에서 태양으로",
+        "satToBody": "위성에서 천체로",
+        "sensorToSat": "센서에서 위성으로",
+        "sensorToSun": "센서에서 태양으로",
+        "sensorToMoon": "센서에서 달로",
+        "orbitPath": "궤도 경로",
+        "satScanEarth": "지구 스캔",
+        "sensorScanHorizon": "수평선 스캔",
+        "sensorToRae": "센서에서 점으로",
+        "generic": "선"
+      },
       "errorMsgs": {
-        "noPrimarySat": "위성 간 연결선을 위한 주 위성이 선택되지 않았습니다."
+        "noPrimarySat": "위성 간 연결선을 위한 주 위성이 선택되지 않았습니다.",
+        "noSatSelected": "먼저 위성을 선택하세요."
       }
     }
   }

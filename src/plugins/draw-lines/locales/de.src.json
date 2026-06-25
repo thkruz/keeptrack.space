@@ -1,6 +1,8 @@
 {
   "plugins": {
     "DrawLinesPlugin": {
+      "title": "Linien zeichnen",
+      "bottomIconLabel": "Linien zeichnen",
       "rmbMenu": {
         "title": "Zeichnen",
         "eciAxes": "ECI-Achsen",
@@ -13,12 +15,39 @@
         "earthToSatellite": "Erde zu Satellit",
         "sensorToSatellite": "Sensor zu Satellit",
         "satelliteToSatellite": "Satellit zu Satellit",
+        "satelliteRicAxes": "RIC-Achsen des Satelliten",
         "satelliteToSun": "Satellit zur Sonne",
         "satelliteToMoon": "Satellit zum Mond",
         "moonOrbit": "Mondumlaufbahn zeichnen"
       },
+      "sections": {
+        "activeLines": "Aktive Linien",
+        "referenceGeometry": "Referenzgeometrie",
+        "objectLines": "Objektlinien"
+      },
+      "referenceFrameLabel": "Referenzsystem",
+      "clearAll": "Alle Linien löschen",
+      "emptyList": "Keine Linien gezeichnet",
+      "remove": "Entfernen",
+      "lineTypes": {
+        "reference": "Referenzlinie",
+        "satToRef": "Satellit zu Punkt",
+        "satRic": "RIC-Achsen",
+        "objToObj": "Objekt zu Objekt",
+        "satToSun": "Satellit zur Sonne",
+        "satToBody": "Satellit zu Himmelskörper",
+        "sensorToSat": "Sensor zu Satellit",
+        "sensorToSun": "Sensor zur Sonne",
+        "sensorToMoon": "Sensor zum Mond",
+        "orbitPath": "Umlaufbahn",
+        "satScanEarth": "Erd-Scan",
+        "sensorScanHorizon": "Horizont-Scan",
+        "sensorToRae": "Sensor zu Punkt",
+        "generic": "Linie"
+      },
       "errorMsgs": {
-        "noPrimarySat": "Kein Primärsatellit für die Satellit-zu-Satellit-Linie ausgewählt."
+        "noPrimarySat": "Kein Primärsatellit für die Satellit-zu-Satellit-Linie ausgewählt.",
+        "noSatSelected": "Wählen Sie zuerst einen Satelliten aus."
       }
     }
   }

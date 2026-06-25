@@ -429,7 +429,7 @@ export class EditSat extends KeepTrackPlugin {
 
       const result = reEpochToNow(mainsat);
 
-      if (!result.ok) {
+      if ('error' in result) {
         uiManagerInstance.toast(result.error, ToastMsgType.critical, true);
 
         return;

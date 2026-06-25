@@ -3,16 +3,39 @@
     "SearchSettingsPlugin": {
       "bottomIconLabel": "Search Settings",
       "title": "Search Settings",
+      "sections": {
+        "resultLimits": "Result Limits",
+        "searchFields": "Search Fields",
+        "filters": "Filters",
+        "actions": "Actions"
+      },
       "labels": {
         "maxResults": "Maximum Results in Search",
-        "showDecayed": "Show Decayed Satellites"
+        "minSearchChars": "Minimum Characters Before Searching",
+        "showDecayed": "Show Decayed Satellites",
+        "showVimpel": "Include Vimpel Objects",
+        "reset": "Reset to Defaults",
+        "fields": {
+          "name": "Name",
+          "altName": "Alternate Name",
+          "bus": "Satellite Bus",
+          "noradId": "NORAD ID",
+          "intlDes": "International Designator",
+          "launchVehicle": "Launch Vehicle"
+        }
       },
       "tooltips": {
         "maxResults": "Maximum satellites to display in search",
-        "showDecayed": "Show decayed satellites (position 0,0,0) in search results"
+        "minSearchChars": "Minimum number of characters to type before a search runs",
+        "showDecayed": "Show decayed satellites (position 0,0,0) in search results",
+        "showVimpel": "Include Vimpel (analyst) objects in search results. This can slow searches down."
+      },
+      "toasts": {
+        "reset": "Search settings reset to defaults"
       },
       "errorMsgs": {
-        "InvalidMaxResults": "Invalid max search results value!"
+        "InvalidMaxResults": "Invalid max search results value!",
+        "InvalidMinSearchChars": "Invalid minimum search characters value!"
       }
     }
   }

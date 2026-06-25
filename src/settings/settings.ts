@@ -328,6 +328,8 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   minimumSearchCharacters: 'core',
   searchLimit: 'core',
   isShowDecayedInSearch: 'core',
+  isShowVimpelInSearch: 'core',
+  searchableFields: 'core',
   limitSats: 'core',
   isDisableSelectSat: 'core',
   daysUntilObjectLost: 'core',
@@ -461,8 +463,7 @@ export class SettingsManager {
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG, settingsManager.isFreezePropRateOnDrag.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS, settingsManager.isDisableTimeMachineToasts.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED, settingsManager.isFocusOnSatelliteWhenSelected.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SEARCH_LIMIT, settingsManager.searchLimit.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SHOW_DECAYED_IN_SEARCH, settingsManager.isShowDecayedInSearch.toString());
+      // Search settings (searchLimit, decayed/Vimpel toggles, searchable fields) are owned by SearchSettingsPlugin.
       PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_SAMPLES, settingsManager.godraysSamples.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DECAY, settingsManager.godraysDecay.toString());
       PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_EXPOSURE, settingsManager.godraysExposure.toString());
@@ -536,17 +537,7 @@ export class SettingsManager {
       this.earthNightTextureQuality = earthNightTextureQaulityString as EarthNightTextureQuality;
     }
 
-    const searchLimitString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_SEARCH_LIMIT);
-
-    if (searchLimitString !== null) {
-      this.searchLimit = parseInt(searchLimitString);
-    }
-
-    const showDecayedString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_SHOW_DECAYED_IN_SEARCH);
-
-    if (showDecayedString !== null) {
-      this.isShowDecayedInSearch = showDecayedString === 'true';
-    }
+    // Search settings (searchLimit, decayed/Vimpel toggles, searchable fields) are loaded by SearchSettingsPlugin.
   }
 
   init(settingsOverride?: SettingsManagerOverride) {

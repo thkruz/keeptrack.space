@@ -3,16 +3,39 @@
     "SearchSettingsPlugin": {
       "bottomIconLabel": "Ustawienia wyszukiwania",
       "title": "Ustawienia wyszukiwania",
+      "sections": {
+        "resultLimits": "Limity wyników",
+        "searchFields": "Pola wyszukiwania",
+        "filters": "Filtry",
+        "actions": "Akcje"
+      },
       "labels": {
         "maxResults": "Maks. wyników wyszukiwania",
-        "showDecayed": "Pokaż rozpadłe satelity"
+        "minSearchChars": "Minimalna liczba znaków przed wyszukiwaniem",
+        "showDecayed": "Pokaż rozpadłe satelity",
+        "showVimpel": "Uwzględnij obiekty Vimpel",
+        "reset": "Przywróć domyślne",
+        "fields": {
+          "name": "Nazwa",
+          "altName": "Nazwa alternatywna",
+          "bus": "Platforma satelity",
+          "noradId": "Numer NORAD",
+          "intlDes": "Oznaczenie międzynarodowe",
+          "launchVehicle": "Rakieta nośna"
+        }
       },
       "tooltips": {
         "maxResults": "Maksymalna liczba satelitów wyświetlanych w wynikach wyszukiwania",
-        "showDecayed": "Pokaż rozpadłe satelity (pozycja 0,0,0) w wynikach wyszukiwania"
+        "minSearchChars": "Minimalna liczba znaków do wpisania, zanim uruchomi się wyszukiwanie",
+        "showDecayed": "Pokaż rozpadłe satelity (pozycja 0,0,0) w wynikach wyszukiwania",
+        "showVimpel": "Uwzględnij obiekty Vimpel (analityczne) w wynikach wyszukiwania. Może to spowolnić wyszukiwanie."
+      },
+      "toasts": {
+        "reset": "Ustawienia wyszukiwania przywrócone do domyślnych"
       },
       "errorMsgs": {
-        "InvalidMaxResults": "Nieprawidłowa wartość maks. wyników wyszukiwania!"
+        "InvalidMaxResults": "Nieprawidłowa wartość maks. wyników wyszukiwania!",
+        "InvalidMinSearchChars": "Nieprawidłowa wartość minimalnej liczby znaków wyszukiwania!"
       }
     }
   }

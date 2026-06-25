@@ -90,16 +90,8 @@ describe('SettingsManager persistence', () => {
       expect(settings.isDrawSun).toBe(false);
     });
 
-    it('parses the numeric search-limit value', () => {
-      const settings = new SettingsManager();
-
-      settings.offlineMode = true;
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SEARCH_LIMIT, '1234');
-
-      settings.loadPersistedSettings();
-
-      expect(settings.searchLimit).toBe(1234);
-    });
+    // Search-setting persistence (searchLimit, decayed/Vimpel toggles, searchable fields)
+    // is owned by SearchSettingsPlugin and covered by its own tests.
 
     it('migrates the legacy boolean sat-label key when the v2 key is absent', () => {
       const settings = new SettingsManager();

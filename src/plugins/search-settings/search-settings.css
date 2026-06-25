@@ -1,0 +1,29 @@
+/*
+ * Search Settings plugin styles. The menu uses the shared v13 card system
+ * (.kt-ui-v13 + kt-section/kt-action/...); see src/engine/ui/menu-v13.css.
+ * Only the per-menu dense-form fixes live here (see docs-local/ui/v13-menu-style.md).
+ */
+
+/* 1. Stacked-field headroom — the Result Limits card stacks two labelled
+ *    number rows, so the floating label would collide with the row above. */
+#search-settings-menu .kt-field-row .input-field.col { margin-top: 20px; }
+#search-settings-menu .kt-section-label + .kt-field-row .input-field.col { margin-top: 8px; }
+
+/* 2. Standalone primary action width (defensive — the reset action lives inside
+ *    a .kt-section so it already inherits the card inset, but keep the rule in
+ *    case it is ever promoted to a direct child of the form). */
+#search-settings-menu-form > .kt-action {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
+}
+
+/* 3. Focus indication — swap the app-wide :focus-visible outline (which overlaps
+ *    the floating label) for KeepTrack's underline. */
+#search-settings-menu .input-field input:focus,
+#search-settings-menu .input-field textarea:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+#search-settings-menu .input-field input:focus-visible,
+#search-settings-menu .input-field textarea:focus-visible { outline: none; }

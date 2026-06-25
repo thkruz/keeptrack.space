@@ -31,7 +31,15 @@ test.describe('SearchSettingsPlugin', () => {
     await expect(page.locator('#search-settings-menu')).toBeVisible({ timeout: 5_000 });
 
     await expect(page.locator('#search-settings-maxResults')).toBeAttached();
+    await expect(page.locator('#search-settings-minSearchChars')).toBeAttached();
     await expect(page.locator('#search-settings-showDecayed')).toBeAttached();
+    await expect(page.locator('#search-settings-showVimpel')).toBeAttached();
+    await expect(page.locator('#search-settings-field-name')).toBeAttached();
+    await expect(page.locator('#search-settings-reset')).toBeAttached();
+
+    // v13 menu marker + card structure
+    await expect(page.locator('#search-settings-menu.kt-ui-v13')).toBeAttached();
+    await expect(page.locator('#search-settings-menu .kt-section').first()).toBeAttached();
 
     // Close
     await page.evaluate(() => {

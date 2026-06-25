@@ -3,16 +3,39 @@
     "SearchSettingsPlugin": {
       "bottomIconLabel": "搜索设置",
       "title": "搜索设置",
+      "sections": {
+        "resultLimits": "结果限制",
+        "searchFields": "搜索字段",
+        "filters": "过滤器",
+        "actions": "操作"
+      },
       "labels": {
         "maxResults": "搜索最大结果数",
-        "showDecayed": "显示已陨落卫星"
+        "minSearchChars": "搜索前的最少字符数",
+        "showDecayed": "显示已陨落卫星",
+        "showVimpel": "包含 Vimpel 对象",
+        "reset": "恢复默认设置",
+        "fields": {
+          "name": "名称",
+          "altName": "别名",
+          "bus": "卫星平台",
+          "noradId": "NORAD 编号",
+          "intlDes": "国际标识符",
+          "launchVehicle": "运载火箭"
+        }
       },
       "tooltips": {
         "maxResults": "搜索中显示的最大卫星数量",
-        "showDecayed": "在搜索结果中显示已陨落卫星（位置 0,0,0）"
+        "minSearchChars": "执行搜索前需要输入的最少字符数",
+        "showDecayed": "在搜索结果中显示已陨落卫星（位置 0,0,0）",
+        "showVimpel": "在搜索结果中包含 Vimpel（分析）对象。这可能会减慢搜索速度。"
+      },
+      "toasts": {
+        "reset": "搜索设置已恢复为默认值"
       },
       "errorMsgs": {
-        "InvalidMaxResults": "搜索最大结果数值无效！"
+        "InvalidMaxResults": "搜索最大结果数值无效！",
+        "InvalidMinSearchChars": "搜索最少字符数值无效！"
       }
     }
   }

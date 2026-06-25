@@ -3,16 +3,39 @@
     "SearchSettingsPlugin": {
       "bottomIconLabel": "Configuración de búsqueda",
       "title": "Configuración de búsqueda",
+      "sections": {
+        "resultLimits": "Límites de resultados",
+        "searchFields": "Campos de búsqueda",
+        "filters": "Filtros",
+        "actions": "Acciones"
+      },
       "labels": {
         "maxResults": "Resultados máximos en la búsqueda",
-        "showDecayed": "Mostrar satélites desintegrados"
+        "minSearchChars": "Caracteres mínimos antes de buscar",
+        "showDecayed": "Mostrar satélites desintegrados",
+        "showVimpel": "Incluir objetos Vimpel",
+        "reset": "Restablecer valores predeterminados",
+        "fields": {
+          "name": "Nombre",
+          "altName": "Nombre alternativo",
+          "bus": "Bus del satélite",
+          "noradId": "ID NORAD",
+          "intlDes": "Designador internacional",
+          "launchVehicle": "Vehículo de lanzamiento"
+        }
       },
       "tooltips": {
         "maxResults": "Número máximo de satélites a mostrar en la búsqueda",
-        "showDecayed": "Mostrar satélites desintegrados (posición 0,0,0) en los resultados de búsqueda"
+        "minSearchChars": "Número mínimo de caracteres a escribir antes de ejecutar una búsqueda",
+        "showDecayed": "Mostrar satélites desintegrados (posición 0,0,0) en los resultados de búsqueda",
+        "showVimpel": "Incluir objetos Vimpel (analista) en los resultados de búsqueda. Esto puede ralentizar las búsquedas."
+      },
+      "toasts": {
+        "reset": "Configuración de búsqueda restablecida a los valores predeterminados"
       },
       "errorMsgs": {
-        "InvalidMaxResults": "¡Valor no válido para resultados máximos de búsqueda!"
+        "InvalidMaxResults": "¡Valor no válido para resultados máximos de búsqueda!",
+        "InvalidMinSearchChars": "¡Valor no válido para caracteres mínimos de búsqueda!"
       }
     }
   }

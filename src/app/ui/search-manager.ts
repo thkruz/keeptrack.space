@@ -370,8 +370,13 @@ export class SearchManager {
 
     let searchResult: { results: SearchResult[]; totalFound: number };
 
-    // If so, then do a number only search
-    if ((/^[0-9,]+$/u).test(searchString)) {
+    /*
+     * A pure-number search uses the fast NORAD-only path, but only when NORAD ID
+     * matching is enabled. With it disabled, fall through to the regular search so
+     * the toggle actually takes effect (other fields like the intl. designator can
+     * still match the digits).
+     */
+    if ((/^[0-9,]+$/u).test(searchString) && settingsManager.searchableFields.noradId) {
       searchResult = SearchManager.doNumOnlySearch_(searchString);
     } else {
       // If not, then do a regular search
@@ -413,6 +418,7 @@ export class SearchManager {
     const results: SearchResult[] = [];
     let totalFound = 0;
     const limit = settingsManager.searchLimit;
+    const { searchableFields } = settingsManager;
 
     const addResult_ = (result: SearchResult) => {
       totalFound++;
@@ -442,8 +448,12 @@ export class SearchManager {
           continue;
         } // Skip non satellites and missiles
 
-        // TODO: Vimpel additions may slow things down - perhaps make it a setting?
-        if ((sat.name.toUpperCase().indexOf(searchStringIn) !== -1 && !sat.name.includes('Vimpel'))) { // || sat.name.toUpperCase() === searchStringIn) {
+        // Vimpel (analyst) objects can slow searches considerably, so they are opt-in.
+        if (!settingsManager.isShowVimpelInSearch && sat.name.includes('Vimpel')) {
+          continue;
+        }
+
+        if (searchableFields.name && sat.name.toUpperCase().indexOf(searchStringIn) !== -1) {
           addResult_({
             strIndex: sat.name.indexOf(searchStringIn),
             searchType: SearchResultType.OBJECT_NAME,
@@ -454,7 +464,7 @@ export class SearchManager {
           continue;
         }
 
-        if (sat.altName && sat.altName.toUpperCase().indexOf(searchStringIn) !== -1) {
+        if (searchableFields.altName && sat.altName && sat.altName.toUpperCase().indexOf(searchStringIn) !== -1) {
           addResult_({
             strIndex: sat.altName.toUpperCase().indexOf(searchStringIn),
             searchType: SearchResultType.ALT_NAME,
@@ -465,7 +475,7 @@ export class SearchManager {
           continue;
         }
 
-        if (typeof sat.bus !== 'undefined' && sat.bus.toUpperCase().indexOf(searchStringIn) !== -1) {
+        if (searchableFields.bus && typeof sat.bus !== 'undefined' && sat.bus.toUpperCase().indexOf(searchStringIn) !== -1) {
           addResult_({
             strIndex: sat.bus.toUpperCase().indexOf(searchStringIn),
             searchType: SearchResultType.BUS,
@@ -491,7 +501,7 @@ export class SearchManager {
           continue; // Last check for missiles
         }
 
-        if (sat.sccNum && sat.sccNum.indexOf(searchStringIn) !== -1) {
+        if (searchableFields.noradId && sat.sccNum && sat.sccNum.indexOf(searchStringIn) !== -1) {
           // Ignore Notional Satellites unless all 6 characters are entered
           if (sat.name.includes(' Notional)') && searchStringIn.length < 6) {
             continue;
@@ -507,7 +517,7 @@ export class SearchManager {
           continue;
         }
 
-        if (sat.intlDes && sat.intlDes.indexOf(searchStringIn) !== -1 && !sat.name.includes('Vimpel')) {
+        if (searchableFields.intlDes && sat.intlDes && sat.intlDes.indexOf(searchStringIn) !== -1) {
           // Ignore Notional Satellites
           if (sat.name.includes(' Notional)')) {
             continue;
@@ -523,7 +533,7 @@ export class SearchManager {
           continue;
         }
 
-        if (sat.launchVehicle && sat.launchVehicle.toUpperCase().indexOf(searchStringIn) !== -1) {
+        if (searchableFields.launchVehicle && sat.launchVehicle && sat.launchVehicle.toUpperCase().indexOf(searchStringIn) !== -1) {
           addResult_({
             strIndex: sat.launchVehicle.toUpperCase().indexOf(searchStringIn),
             searchType: SearchResultType.LAUNCH_VEHICLE,

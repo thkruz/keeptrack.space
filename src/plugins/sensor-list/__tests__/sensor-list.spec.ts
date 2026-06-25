@@ -32,7 +32,9 @@ test.describe('SensorListPlugin', () => {
     await expect(page.locator('#sensor-list-menu')).toBeVisible({ timeout: 5_000 });
 
     // ── Behavior: select a sensor (exercises the sensor-list click delegation + setSensor) ──
-    const firstSensor = page.locator('#sensor-list-content .menu-selectable[data-sensor]').first();
+    // The first group's (SSN) "select all" top-link is intentionally hidden via CSS, so
+    // target the first individual sensor row, which is the first visible selectable sensor.
+    const firstSensor = page.locator('#sensor-list-content .sensor-row[data-sensor]').first();
 
     await expect(firstSensor).toBeVisible();
     await firstSensor.click();

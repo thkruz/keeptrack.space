@@ -562,6 +562,12 @@ export class ColorSchemeManager {
   isCelestrakSatOff(obj: BaseObject) {
     return settingsManager.filter?.celestrakSatellites === false && (obj as Satellite)?.source === CatalogSource.CELESTRAK;
   }
+  isCelestrakSupSatOff(obj: BaseObject) {
+    return settingsManager.filter?.celestrakSupSatellites === false && (obj as Satellite)?.source === CatalogSource.CELESTRAK_SUP;
+  }
+  isSatnogsSatOff(obj: BaseObject) {
+    return settingsManager.filter?.satnogsSatellites === false && (obj as Satellite)?.source === CatalogSource.SATNOGS;
+  }
   isStarlinkSatOff(obj: BaseObject) {
     return settingsManager.filter?.starlinkSatellites === false && obj.name?.includes('STARLINK');
   }
@@ -670,6 +676,18 @@ export class ColorSchemeManager {
       };
     }
     if (this.isCelestrakSatOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isCelestrakSupSatOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isSatnogsSatOff(sat)) {
       return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,

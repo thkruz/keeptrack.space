@@ -2,7 +2,7 @@ import { EciArr3 } from '@app/engine/core/interfaces';
 import { rae2eci, RaeVec3 } from '@ootk/src/main';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { vec4 } from 'gl-matrix';
-import { Line, LineColors } from './line';
+import { Line, LineColors, LineDescription } from './line';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SensorToRaeLine extends Line {
@@ -35,5 +35,9 @@ export class SensorToRaeLine extends Line {
     this.isDraw_ = true;
 
     this.updateVertBuf([eciArr, sensorEciArr]);
+  }
+
+  getDescription(): LineDescription {
+    return { kind: 'sensorToRae' };
   }
 }

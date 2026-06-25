@@ -1,6 +1,6 @@
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { vec3, vec4 } from 'gl-matrix';
-import { Line } from './line';
+import { Line, LineDescription } from './line';
 
 export class RefToRefLine extends Line {
   private readonly ref1_: vec3;
@@ -20,5 +20,9 @@ export class RefToRefLine extends Line {
 
   update(): void {
     // Do nothing
+  }
+
+  getDescription(): LineDescription {
+    return { kind: 'reference' };
   }
 }

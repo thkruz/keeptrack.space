@@ -2,7 +2,7 @@ import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { Satellite } from '@ootk/src/main';
 import { vec3, vec4 } from 'gl-matrix';
-import { Line } from './line';
+import { Line, LineDescription } from './line';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SatToRefLine extends Line {
@@ -35,5 +35,9 @@ export class SatToRefLine extends Line {
     const satArr = [position.x, position.y, position.z] as EciArr3;
 
     this.updateVertBuf([satArr, this.ref2_ as EciArr3]);
+  }
+
+  getDescription(): LineDescription {
+    return { kind: 'satToRef', detail: this.sat.name };
   }
 }

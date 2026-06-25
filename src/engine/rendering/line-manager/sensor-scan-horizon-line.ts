@@ -2,7 +2,7 @@ import { EciArr3 } from '@app/engine/core/interfaces';
 import { Degrees, ecef2eci, rae2ecef } from '@ootk/src/main';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { vec4 } from 'gl-matrix';
-import { Line, LineColors } from './line';
+import { Line, LineColors, LineDescription } from './line';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SensorScanHorizonLine extends Line {
@@ -76,5 +76,9 @@ export class SensorScanHorizonLine extends Line {
     );
 
     return [eci.x, eci.y, eci.z] as EciArr3;
+  }
+
+  getDescription(): LineDescription {
+    return { kind: 'sensorScanHorizon' };
   }
 }

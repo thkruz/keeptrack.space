@@ -3,7 +3,7 @@ import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { Satellite } from '@ootk/src/main';
-import { Line, LineColors } from './line';
+import { Line, LineColors, LineDescription } from './line';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class ObjToObjLine extends Line {
@@ -62,5 +62,9 @@ export class ObjToObjLine extends Line {
     }
 
     this.updateVertBuf([eciArr, eciArr2]);
+  }
+
+  getDescription(): LineDescription {
+    return { kind: 'objToObj', detail: `${this.obj.name} - ${this.obj2.name}` };
   }
 }

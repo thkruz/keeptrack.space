@@ -1,7 +1,7 @@
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { Satellite } from '@ootk/src/main';
-import { Line, LineColors } from './line';
+import { Line, LineColors, LineDescription } from './line';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SatToSunLine extends Line {
@@ -25,5 +25,9 @@ export class SatToSunLine extends Line {
     const eciArr = [eci.position.x, eci.position.y, eci.position.z] as EciArr3;
 
     this.updateVertBuf([eciArr, ServiceLocator.getScene().sun.position as EciArr3]);
+  }
+
+  getDescription(): LineDescription {
+    return { kind: 'satToSun', detail: this.sat.name };
   }
 }

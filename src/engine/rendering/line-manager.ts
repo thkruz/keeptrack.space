@@ -79,6 +79,42 @@ export class LineManager {
     EventBus.getInstance().emit(EventBusEvent.onLineAdded, this);
   }
 
+  /** Remove a single line. Emits {@link EventBusEvent.onLineAdded} so listeners refresh. */
+  removeLine(line: Line): void {
+    this.removeLineByIndex(this.lines.indexOf(line));
+  }
+
+  /** Remove the line at `index`. No-op for an out-of-range index. */
+  removeLineByIndex(index: number): void {
+    if (index < 0 || index >= this.lines.length) {
+      return;
+    }
+
+    this.lines.splice(index, 1);
+    EventBus.getInstance().emit(EventBusEvent.onLineAdded, this);
+  }
+
+  /**
+   * Remove every line whose {@link Line.getDescription} matches `kind` (and `detail`, when
+   * provided). Used by the line-management UI to drop a whole group at once.
+   */
+  removeLinesByKind(kind: string, detail?: string): void {
+    let didRemove = false;
+
+    for (let i = this.lines.length - 1; i >= 0; i--) {
+      const desc = this.lines[i].getDescription();
+
+      if (desc.kind === kind && (typeof detail !== 'string' || desc.detail === detail)) {
+        this.lines.splice(i, 1);
+        didRemove = true;
+      }
+    }
+
+    if (didRemove) {
+      EventBus.getInstance().emit(EventBusEvent.onLineAdded, this);
+    }
+  }
+
   createSatRicFrame(sat: Satellite | MissileObject | OemSatellite | null): void {
     if (!sat || !(sat instanceof Satellite)) {
       return;
@@ -113,9 +149,10 @@ export class LineManager {
     this.add(new SatToCelestialBodyLine(sat, body));
   }
 
-  createRef2Ref(ref1: vec3, ref2: vec3, color: vec4): RefToRefLine {
+  createRef2Ref(ref1: vec3, ref2: vec3, color: vec4, referenceFrame = ReferenceFrame.TEME): RefToRefLine {
     const line = new RefToRefLine(ref1, ref2, color);
 
+    line.referenceFrame = referenceFrame;
     this.add(line);
 
     return line;
@@ -223,7 +260,7 @@ export class LineManager {
     }
   }
 
-  createGrid(type: 'x' | 'y' | 'z', color: LineColor, scalar = 1): void {
+  createGrid(type: 'x' | 'y' | 'z', color: LineColor, scalar = 1, referenceFrame = ReferenceFrame.TEME): void {
     if (type !== 'x' && type !== 'y' && type !== 'z') {
       throw new Error('Invalid type');
     }
@@ -237,6 +274,13 @@ export class LineManager {
     const segments = 10;
     const segmentLength = (num2 * 2) / segments; // Total length divided by segments
 
+    const addSegment = (ref1: vec3, ref2: vec3): void => {
+      const line = new RefToRefLine(ref1, ref2, color);
+
+      line.referenceFrame = referenceFrame;
+      this.add(line);
+    };
+
     switch (type) {
       case 'x':
         for (let i = min; i <= max; i++) {
@@ -245,14 +289,14 @@ export class LineManager {
             const startX = -num2 + seg * segmentLength;
             const endX = startX + segmentLength;
 
-            this.add(new RefToRefLine([startX, i * num1, 0], [endX, i * num1, 0], color));
+            addSegment([startX, i * num1, 0], [endX, i * num1, 0]);
           }
           // Vertical lines (varying y)
           for (let seg = 0; seg < segments; seg++) {
             const startY = -num2 + seg * segmentLength;
             const endY = startY + segmentLength;
 
-            this.add(new RefToRefLine([i * num1, startY, 0], [i * num1, endY, 0], color));
+            addSegment([i * num1, startY, 0], [i * num1, endY, 0]);
           }
         }
         break;
@@ -263,14 +307,14 @@ export class LineManager {
             const startY = -num2 + seg * segmentLength;
             const endY = startY + segmentLength;
 
-            this.add(new RefToRefLine([0, startY, i * num1], [0, endY, i * num1], color));
+            addSegment([0, startY, i * num1], [0, endY, i * num1]);
           }
           // Lines perpendicular to y-axis (varying z)
           for (let seg = 0; seg < segments; seg++) {
             const startZ = -num2 + seg * segmentLength;
             const endZ = startZ + segmentLength;
 
-            this.add(new RefToRefLine([0, i * num1, startZ], [0, i * num1, endZ], color));
+            addSegment([0, i * num1, startZ], [0, i * num1, endZ]);
           }
         }
         break;
@@ -281,14 +325,14 @@ export class LineManager {
             const startZ = -num2 + seg * segmentLength;
             const endZ = startZ + segmentLength;
 
-            this.add(new RefToRefLine([i * num1, 0, startZ], [i * num1, 0, endZ], color));
+            addSegment([i * num1, 0, startZ], [i * num1, 0, endZ]);
           }
           // Lines perpendicular to z-axis (varying x)
           for (let seg = 0; seg < segments; seg++) {
             const startX = -num2 + seg * segmentLength;
             const endX = startX + segmentLength;
 
-            this.add(new RefToRefLine([startX, 0, i * num1], [endX, 0, i * num1], color));
+            addSegment([startX, 0, i * num1], [endX, 0, i * num1]);
           }
         }
         break;

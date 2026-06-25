@@ -2,7 +2,7 @@ import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EciArr3, SolarBody } from '@app/engine/core/interfaces';
 import { Satellite } from '@ootk/src/main';
 import { CelestialBody } from '../draw-manager/celestial-bodies/celestial-body';
-import { Line, LineColors } from './line';
+import { Line, LineColors, LineDescription } from './line';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SatToCelestialBodyLine extends Line {
@@ -28,5 +28,9 @@ export class SatToCelestialBodyLine extends Line {
     const eciArr = [eci.position.x, eci.position.y, eci.position.z] as EciArr3;
 
     this.updateVertBuf([eciArr, (ServiceLocator.getScene().getBodyById(this.body) as CelestialBody).position]);
+  }
+
+  getDescription(): LineDescription {
+    return { kind: 'satToBody', detail: this.sat.name };
   }
 }

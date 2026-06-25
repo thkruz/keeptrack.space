@@ -1,6 +1,7 @@
 import { CameraType } from '@app/engine/camera/camera-type';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SolarBody } from '@app/engine/core/interfaces';
+import { ReferenceFrame } from '@app/engine/math/reference-frames';
 import { LineManager } from '@app/engine/rendering/line-manager';
 import { LineColors } from '@app/engine/rendering/line-manager/line';
 import { RefToRefLine } from '@app/engine/rendering/line-manager/ref-to-ref-line';
@@ -33,6 +34,47 @@ describe('LineManager', () => {
 
       lm.clear();
       expect(lm.lines).toHaveLength(0);
+    });
+
+    it('removeLine drops a specific line, removeLineByIndex ignores out-of-range', () => {
+      const a = lm.createRef2Ref([0, 0, 0], [1, 0, 0], LineColors.RED);
+      const b = lm.createRef2Ref([0, 0, 0], [0, 1, 0], LineColors.GREEN);
+
+      lm.removeLine(a);
+      expect(lm.lines).toEqual([b]);
+
+      lm.removeLineByIndex(99);
+      lm.removeLineByIndex(-1);
+      expect(lm.lines).toEqual([b]);
+
+      lm.removeLineByIndex(0);
+      expect(lm.lines).toHaveLength(0);
+    });
+
+    it('removeLinesByKind removes only the matching group', () => {
+      lm.createSatRicFrame(defaultSat); // three 'satRic' lines
+      lm.createRef2Ref([0, 0, 0], [1, 0, 0], LineColors.RED); // one 'reference' line
+      expect(lm.lines).toHaveLength(4);
+
+      lm.removeLinesByKind('satRic');
+      expect(lm.lines).toHaveLength(1);
+      expect(lm.lines[0].getDescription().kind).toBe('reference');
+
+      // A detail filter that matches nothing leaves the list untouched.
+      lm.removeLinesByKind('reference', 'does-not-exist');
+      expect(lm.lines).toHaveLength(1);
+    });
+  });
+
+  describe('reference frame', () => {
+    it('createRef2Ref and createGrid default to TEME and honor an explicit frame', () => {
+      const teme = lm.createRef2Ref([0, 0, 0], [1, 0, 0], LineColors.RED);
+
+      expect(teme.referenceFrame).toBe('TEME');
+
+      lm.clear();
+      lm.createGrid('x', LineColors.WHITE, 1, ReferenceFrame.J2000);
+      expect(lm.lines.every((line) => line.referenceFrame === 'J2000')).toBe(true);
     });
   });
 

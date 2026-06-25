@@ -743,6 +743,13 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
   {
+    configKey: 'CoverageAnalysis',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/coverage-analysis/coverage-analysis') : undefined,
+    proClassName: 'CoverageAnalysis',
+    defaultConfig: { enabled: true, order: 94 },
+    isLoginRequired: true,
+  },
+  {
     configKey: 'ManeuverPlugin',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/maneuver/maneuver') : undefined,
     proClassName: 'ManeuverPlugin',

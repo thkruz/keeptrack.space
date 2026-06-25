@@ -44,6 +44,11 @@
         "centerCamera": "Center the camera on {body}.",
         "plannedFuture": "Planned for future update."
       },
+      "filterPlaceholder": "Filter bodies...",
+      "commands": {
+        "toggleMenu": "Toggle Planets menu",
+        "centerOn": "Center camera on {body}"
+      },
       "help": {
         "overview": "The Planets menu turns KeepTrack into a solar system viewer: select any planet, dwarf planet, the Moon, or the Sun to center the camera on it. It is the quickest way to study cislunar and deep space geometry alongside the Earth orbiting catalog.",
         "imgAlt": "The Planets List menu with planets, dwarf planets, and other bodies",

@@ -44,6 +44,11 @@
         "centerCamera": "Centrer la caméra sur {body}.",
         "plannedFuture": "Prévu pour une mise à jour future."
       },
+      "filterPlaceholder": "Filtrer les corps…",
+      "commands": {
+        "toggleMenu": "Basculer le menu Planètes",
+        "centerOn": "Centrer la caméra sur {body}"
+      },
       "help": {
         "overview": "Le menu Planètes transforme KeepTrack en visionneuse du système solaire : sélectionnez une planète, une planète naine, la Lune ou le Soleil pour centrer la caméra dessus. C'est le moyen le plus rapide d'étudier la géométrie cislunaire et de l'espace lointain aux côtés du catalogue des objets en orbite terrestre.",
         "imgAlt": "Le menu Liste des planètes avec planètes, planètes naines et autres corps",

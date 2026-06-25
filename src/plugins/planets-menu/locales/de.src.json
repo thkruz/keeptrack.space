@@ -44,6 +44,11 @@
         "centerCamera": "Kamera auf {body} zentrieren.",
         "plannedFuture": "Für zukünftiges Update geplant."
       },
+      "filterPlaceholder": "Körper filtern…",
+      "commands": {
+        "toggleMenu": "Planetenmenü umschalten",
+        "centerOn": "Kamera auf {body} zentrieren"
+      },
       "help": {
         "overview": "Das Planeten-Menü macht KeepTrack zu einem Sonnensystem-Viewer: Wählen Sie einen Planeten, Zwergplaneten, den Mond oder die Sonne, um die Kamera darauf zu zentrieren. Es ist der schnellste Weg, cislunare Geometrie und Geometrie im tiefen Weltraum neben dem Katalog der Erdumlaufbahnen zu untersuchen.",
         "imgAlt": "Das Planetenlisten-Menü mit Planeten, Zwergplaneten und anderen Körpern",

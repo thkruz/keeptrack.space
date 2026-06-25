@@ -44,6 +44,11 @@
         "centerCamera": "Zaměřit kameru na {body}.",
         "plannedFuture": "Plánováno pro budoucí aktualizaci."
       },
+      "filterPlaceholder": "Filtrovat tělesa…",
+      "commands": {
+        "toggleMenu": "Přepnout nabídku Planety",
+        "centerOn": "Vystředit kameru na {body}"
+      },
       "help": {
         "overview": "Nabídka Planety promění KeepTrack v prohlížeč sluneční soustavy: vyberte libovolnou planetu, trpasličí planetu, Měsíc nebo Slunce a kamera se na ně vystředí. Je to nejrychlejší způsob, jak studovat cislunární geometrii a geometrii hlubokého vesmíru vedle katalogu objektů na oběžné dráze Země.",
         "imgAlt": "Nabídka seznamu planet s planetami, trpasličími planetami a dalšími tělesy",

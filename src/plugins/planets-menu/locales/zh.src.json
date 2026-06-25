@@ -44,6 +44,11 @@
         "centerCamera": "将相机对准 {body}。",
         "plannedFuture": "计划在未来更新中实现。"
       },
+      "filterPlaceholder": "筛选天体…",
+      "commands": {
+        "toggleMenu": "切换行星菜单",
+        "centerOn": "将相机对准{body}"
+      },
       "help": {
         "overview": "行星菜单将 KeepTrack 变成太阳系查看器：选择任意行星、矮行星、月球或太阳，即可将相机对准它。这是在地球轨道目录之外研究地月空间和深空几何关系的最快方式。",
         "imgAlt": "包含行星、矮行星和其他天体的行星列表菜单",

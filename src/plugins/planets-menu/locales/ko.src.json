@@ -44,6 +44,11 @@
         "centerCamera": "{body}에 카메라를 맞춥니다.",
         "plannedFuture": "향후 업데이트에 계획됨."
       },
+      "filterPlaceholder": "천체 필터링…",
+      "commands": {
+        "toggleMenu": "행성 메뉴 전환",
+        "centerOn": "{body}에 카메라 맞추기"
+      },
       "help": {
         "overview": "행성 메뉴는 KeepTrack을 태양계 뷰어로 바꿉니다. 행성, 왜소행성, 달, 태양 중 하나를 선택하면 카메라가 해당 천체를 중심으로 이동합니다. 지구 궤도 카탈로그와 함께 지구-달 공간 및 심우주 기하학을 살펴보는 가장 빠른 방법입니다.",
         "imgAlt": "행성, 왜소행성, 기타 천체가 있는 행성 목록 메뉴",

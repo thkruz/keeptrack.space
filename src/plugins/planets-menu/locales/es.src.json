@@ -44,6 +44,11 @@
         "centerCamera": "Centrar la cámara en {body}.",
         "plannedFuture": "Planeado para una actualización futura."
       },
+      "filterPlaceholder": "Filtrar cuerpos…",
+      "commands": {
+        "toggleMenu": "Alternar el menú Planetas",
+        "centerOn": "Centrar la cámara en {body}"
+      },
       "help": {
         "overview": "El menú Planetas convierte KeepTrack en un visor del sistema solar: seleccione cualquier planeta, planeta enano, la Luna o el Sol para centrar la cámara en él. Es la forma más rápida de estudiar la geometría cislunar y del espacio profundo junto al catálogo de objetos en órbita terrestre.",
         "imgAlt": "El menú de Lista de Planetas con planetas, planetas enanos y otros cuerpos",

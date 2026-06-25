@@ -44,6 +44,11 @@
         "centerCamera": "Wyśrodkuj kamerę na {body}.",
         "plannedFuture": "Zaplanowane na przyszłą aktualizację."
       },
+      "filterPlaceholder": "Filtruj ciała…",
+      "commands": {
+        "toggleMenu": "Przełącz menu Planety",
+        "centerOn": "Wyśrodkuj kamerę na {body}"
+      },
       "help": {
         "overview": "Menu Planety zamienia KeepTrack w przeglądarkę Układu Słonecznego: wybierz dowolną planetę, planetę karłowatą, Księżyc lub Słońce, aby wyśrodkować na nich kamerę. To najszybszy sposób na badanie geometrii cislunarnej i głębokiego kosmosu obok katalogu obiektów na orbicie Ziemi.",
         "imgAlt": "Menu listy planet z planetami, planetami karłowatymi i innymi ciałami",

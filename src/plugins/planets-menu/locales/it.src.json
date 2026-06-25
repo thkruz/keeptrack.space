@@ -44,6 +44,11 @@
         "centerCamera": "Centra la fotocamera su {body}.",
         "plannedFuture": "Previsto per un aggiornamento futuro."
       },
+      "filterPlaceholder": "Filtra corpi…",
+      "commands": {
+        "toggleMenu": "Attiva/disattiva il menu Pianeti",
+        "centerOn": "Centra la fotocamera su {body}"
+      },
       "help": {
         "overview": "Il menu Pianeti trasforma KeepTrack in un visualizzatore del sistema solare: seleziona un pianeta, un pianeta nano, la Luna o il Sole per centrare la fotocamera su di esso. È il modo più rapido per studiare la geometria cislunare e dello spazio profondo accanto al catalogo degli oggetti in orbita terrestre.",
         "imgAlt": "Il menu elenco pianeti con pianeti, pianeti nani e altri corpi",

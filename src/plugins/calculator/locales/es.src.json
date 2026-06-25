@@ -9,6 +9,9 @@
         "raDecGeocentric": "RA/Dec (geocéntrico)",
         "classicalElements": "Elementos Clásicos"
       },
+      "sections": {
+        "input": "Entrada"
+      },
       "labels": {
         "inputFrame": "Marco de Entrada",
         "loadSelectedSatellite": "Cargar Satélite Seleccionado",
@@ -16,6 +19,9 @@
         "convert": "Convertir",
         "outputFormat": "Formato de Salida",
         "drawLine": "Dibujar Línea",
+        "copyResults": "Copiar Todos los Resultados",
+        "clickToCopy": "Haz clic para copiar",
+        "epoch": "Época",
         "sensor": "Sensor",
         "latitude": "Latitud",
         "longitude": "Longitud",
@@ -45,7 +51,22 @@
       "msgs": {
         "noSensorSelected": "Ningún sensor seleccionado",
         "needsVelocity": "Requiere velocidad",
-        "noSensorForRae": "Ningún sensor seleccionado para la salida RAE."
+        "noSensorForRae": "Ningún sensor seleccionado para la salida RAE.",
+        "copied": "Copiado al portapapeles"
+      },
+      "errorMsgs": {
+        "conversionFailed": "Error en la conversión: {error}",
+        "invalidInput": "Entrada no válida para {field}: \"{value}\" no es un número.",
+        "fieldNotFound": "Campo {field} no encontrado.",
+        "invalidNumber": "Todas las entradas deben ser números válidos.",
+        "badEccentricity": "La excentricidad debe estar entre 0 y 1 (exclusivo) para una órbita cerrada.",
+        "badSemiMajorAxis": "El semieje mayor debe ser mayor que 0.",
+        "noSensorForRae": "La conversión RAE requiere que haya un sensor seleccionado.",
+        "noRaeData": "No hay datos RAE disponibles. Realiza primero una conversión con un sensor seleccionado.",
+        "noSatelliteSelected": "Ningún satélite seleccionado.",
+        "notASatellite": "El objeto seleccionado no es un satélite.",
+        "couldNotPropagate": "No se pudo propagar el satélite a la hora actual.",
+        "copyFailed": "No se pudo copiar al portapapeles."
       },
       "help": {
         "overview": "La calculadora de Transformaciones de Marco de Referencia convierte una posición (y opcionalmente la velocidad) entre todos los marcos de coordenadas que KeepTrack conoce: J2000 (ECI), ITRF (ECEF), TEME, Geodésico (LLA), RAE (topocéntrico), RA/Dec (geocéntrico) y Elementos Clásicos. Escribe un estado en cualquier marco y léelo en todos los demás a la vez.",

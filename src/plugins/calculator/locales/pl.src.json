@@ -9,6 +9,9 @@
         "raDecGeocentric": "RA/Dec (geocentryczny)",
         "classicalElements": "Klasyczne elementy orbitalne"
       },
+      "sections": {
+        "input": "Wejście"
+      },
       "labels": {
         "inputFrame": "Układ wejściowy",
         "loadSelectedSatellite": "Wczytaj wybranego satelitę",
@@ -16,6 +19,9 @@
         "convert": "Konwertuj",
         "outputFormat": "Format wyjściowy",
         "drawLine": "Narysuj linię",
+        "copyResults": "Kopiuj wszystkie wyniki",
+        "clickToCopy": "Kliknij, aby skopiować",
+        "epoch": "Epoka",
         "sensor": "Czujnik",
         "latitude": "Szerokość geograficzna",
         "longitude": "Długość geograficzna",
@@ -45,7 +51,22 @@
       "msgs": {
         "noSensorSelected": "Nie wybrano czujnika",
         "needsVelocity": "Wymaga prędkości",
-        "noSensorForRae": "Nie wybrano czujnika dla wyjścia RAE."
+        "noSensorForRae": "Nie wybrano czujnika dla wyjścia RAE.",
+        "copied": "Skopiowano do schowka"
+      },
+      "errorMsgs": {
+        "conversionFailed": "Konwersja nie powiodła się: {error}",
+        "invalidInput": "Nieprawidłowe dane dla {field}: \"{value}\" nie jest liczbą.",
+        "fieldNotFound": "Nie znaleziono pola {field}.",
+        "invalidNumber": "Wszystkie dane wejściowe muszą być prawidłowymi liczbami.",
+        "badEccentricity": "Dla orbity zamkniętej mimośród musi mieścić się między 0 a 1 (wyłącznie).",
+        "badSemiMajorAxis": "Półoś wielka musi być większa od 0.",
+        "noSensorForRae": "Konwersja RAE wymaga wybrania czujnika.",
+        "noRaeData": "Brak dostępnych danych RAE. Najpierw wykonaj konwersję z wybranym czujnikiem.",
+        "noSatelliteSelected": "Nie wybrano satelity.",
+        "notASatellite": "Wybrany obiekt nie jest satelitą.",
+        "couldNotPropagate": "Nie udało się wyznaczyć pozycji satelity dla bieżącego czasu.",
+        "copyFailed": "Nie udało się skopiować do schowka."
       },
       "help": {
         "overview": "Kalkulator transformacji układów odniesienia przelicza pozycję (i opcjonalnie prędkość) między wszystkimi układami współrzędnych, które rozumie KeepTrack: J2000 (ECI), ITRF (ECEF), TEME, Geodezyjny (LLA), RAE (topocentryczny), RA/Dec (geocentryczny) oraz Klasyczne elementy orbitalne. Wpisz stan w dowolnym układzie i odczytaj go we wszystkich pozostałych jednocześnie.",

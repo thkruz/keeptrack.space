@@ -9,6 +9,9 @@
         "raDecGeocentric": "RA/Dec (geozentrisch)",
         "classicalElements": "Klassische Bahnelemente"
       },
+      "sections": {
+        "input": "Eingabe"
+      },
       "labels": {
         "inputFrame": "Eingaberahmen",
         "loadSelectedSatellite": "Ausgewählten Satelliten laden",
@@ -16,6 +19,9 @@
         "convert": "Konvertieren",
         "outputFormat": "Ausgabeformat",
         "drawLine": "Linie zeichnen",
+        "copyResults": "Alle Ergebnisse kopieren",
+        "clickToCopy": "Zum Kopieren klicken",
+        "epoch": "Epoche",
         "sensor": "Sensor",
         "latitude": "Breitengrad",
         "longitude": "Längengrad",
@@ -45,7 +51,22 @@
       "msgs": {
         "noSensorSelected": "Kein Sensor ausgewählt",
         "needsVelocity": "Benötigt Geschwindigkeit",
-        "noSensorForRae": "Kein Sensor für die RAE-Ausgabe ausgewählt."
+        "noSensorForRae": "Kein Sensor für die RAE-Ausgabe ausgewählt.",
+        "copied": "In die Zwischenablage kopiert"
+      },
+      "errorMsgs": {
+        "conversionFailed": "Konvertierung fehlgeschlagen: {error}",
+        "invalidInput": "Ungültige Eingabe für {field}: \"{value}\" ist keine Zahl.",
+        "fieldNotFound": "Feld {field} nicht gefunden.",
+        "invalidNumber": "Alle Eingaben müssen gültige Zahlen sein.",
+        "badEccentricity": "Die Exzentrizität muss für eine geschlossene Bahn zwischen 0 und 1 (exklusiv) liegen.",
+        "badSemiMajorAxis": "Die große Halbachse muss größer als 0 sein.",
+        "noSensorForRae": "Die RAE-Konvertierung erfordert einen ausgewählten Sensor.",
+        "noRaeData": "Keine RAE-Daten verfügbar. Führen Sie zuerst eine Konvertierung mit ausgewähltem Sensor durch.",
+        "noSatelliteSelected": "Kein Satellit ausgewählt.",
+        "notASatellite": "Das ausgewählte Objekt ist kein Satellit.",
+        "couldNotPropagate": "Der Satellit konnte nicht auf die aktuelle Zeit propagiert werden.",
+        "copyFailed": "Kopieren in die Zwischenablage nicht möglich."
       },
       "help": {
         "overview": "Der Rechner für Referenzrahmen-Transformationen konvertiert eine Position (und optional die Geschwindigkeit) zwischen allen Koordinatenrahmen, die KeepTrack kennt: J2000 (ECI), ITRF (ECEF), TEME, Geodätisch (LLA), RAE (topozentrisch), RA/Dec (geozentrisch) und Klassische Bahnelemente. Geben Sie einen Zustand in einem beliebigen Rahmen ein und lesen Sie ihn in allen anderen gleichzeitig ab.",

@@ -9,6 +9,9 @@
         "raDecGeocentric": "RA/Dec (Geocentric)",
         "classicalElements": "Classical Elements"
       },
+      "sections": {
+        "input": "Input"
+      },
       "labels": {
         "inputFrame": "Input Frame",
         "loadSelectedSatellite": "Load Selected Satellite",
@@ -16,6 +19,9 @@
         "convert": "Convert",
         "outputFormat": "Output Format",
         "drawLine": "Draw Line",
+        "copyResults": "Copy All Results",
+        "clickToCopy": "Click to copy",
+        "epoch": "Epoch",
         "sensor": "Sensor",
         "latitude": "Latitude",
         "longitude": "Longitude",
@@ -45,7 +51,22 @@
       "msgs": {
         "noSensorSelected": "No sensor selected",
         "needsVelocity": "Needs velocity",
-        "noSensorForRae": "No sensor selected for RAE output."
+        "noSensorForRae": "No sensor selected for RAE output.",
+        "copied": "Copied to clipboard"
+      },
+      "errorMsgs": {
+        "conversionFailed": "Conversion failed: {error}",
+        "invalidInput": "Invalid input for {field}: \"{value}\" is not a number.",
+        "fieldNotFound": "Field {field} not found.",
+        "invalidNumber": "All inputs must be valid numbers.",
+        "badEccentricity": "Eccentricity must be between 0 and 1 (exclusive) for a closed orbit.",
+        "badSemiMajorAxis": "Semi-major axis must be greater than 0.",
+        "noSensorForRae": "RAE conversion requires a sensor to be selected.",
+        "noRaeData": "No RAE data available. Run a conversion first with a sensor selected.",
+        "noSatelliteSelected": "No satellite selected.",
+        "notASatellite": "Selected object is not a satellite.",
+        "couldNotPropagate": "Could not propagate satellite to current time.",
+        "copyFailed": "Could not copy to clipboard."
       },
       "help": {
         "overview": "The Reference Frame Transforms calculator converts a position (and optionally velocity) between every coordinate frame KeepTrack understands: J2000 (ECI), ITRF (ECEF), TEME, Geodetic (LLA), RAE (Topocentric), RA/Dec (Geocentric), and Classical Elements. Type a state in any one frame and read it out in all the others at once.",

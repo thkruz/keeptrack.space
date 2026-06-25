@@ -9,6 +9,9 @@
         "raDecGeocentric": "RA/Dec (geocentrická)",
         "classicalElements": "Klasické elementy"
       },
+      "sections": {
+        "input": "Vstup"
+      },
       "labels": {
         "inputFrame": "Vstupní soustava",
         "loadSelectedSatellite": "Načíst vybraný satelit",
@@ -16,6 +19,9 @@
         "convert": "Převést",
         "outputFormat": "Výstupní formát",
         "drawLine": "Nakreslit čáru",
+        "copyResults": "Kopírovat všechny výsledky",
+        "clickToCopy": "Kliknutím zkopírovat",
+        "epoch": "Epocha",
         "sensor": "Senzor",
         "latitude": "Zeměpisná šířka",
         "longitude": "Zeměpisná délka",
@@ -45,7 +51,22 @@
       "msgs": {
         "noSensorSelected": "Není vybrán žádný senzor",
         "needsVelocity": "Vyžaduje rychlost",
-        "noSensorForRae": "Pro výstup RAE není vybrán žádný senzor."
+        "noSensorForRae": "Pro výstup RAE není vybrán žádný senzor.",
+        "copied": "Zkopírováno do schránky"
+      },
+      "errorMsgs": {
+        "conversionFailed": "Převod selhal: {error}",
+        "invalidInput": "Neplatný vstup pro {field}: \"{value}\" není číslo.",
+        "fieldNotFound": "Pole {field} nebylo nalezeno.",
+        "invalidNumber": "Všechny vstupy musí být platná čísla.",
+        "badEccentricity": "Pro uzavřenou dráhu musí být excentricita mezi 0 a 1 (vyjma krajních hodnot).",
+        "badSemiMajorAxis": "Hlavní poloosa musí být větší než 0.",
+        "noSensorForRae": "Převod RAE vyžaduje vybraný senzor.",
+        "noRaeData": "Nejsou k dispozici žádná data RAE. Nejprve proveďte převod s vybraným senzorem.",
+        "noSatelliteSelected": "Není vybrán žádný satelit.",
+        "notASatellite": "Vybraný objekt není satelit.",
+        "couldNotPropagate": "Satelit nelze propagovat na aktuální čas.",
+        "copyFailed": "Nepodařilo se zkopírovat do schránky."
       },
       "help": {
         "overview": "Kalkulačka transformace souřadnicových soustav převádí polohu (a volitelně rychlost) mezi všemi souřadnicovými soustavami, které KeepTrack zná: J2000 (ECI), ITRF (ECEF), TEME, Geodetická (LLA), RAE (topocentrická), RA/Dec (geocentrická) a Klasické elementy. Zadejte stav v libovolné soustavě a přečtěte si jej ve všech ostatních najednou.",

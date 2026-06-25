@@ -9,6 +9,9 @@
         "raDecGeocentric": "RA/Dec (géocentrique)",
         "classicalElements": "Éléments classiques"
       },
+      "sections": {
+        "input": "Entrée"
+      },
       "labels": {
         "inputFrame": "Repère d'entrée",
         "loadSelectedSatellite": "Charger le satellite sélectionné",
@@ -16,6 +19,9 @@
         "convert": "Convertir",
         "outputFormat": "Format de sortie",
         "drawLine": "Tracer une ligne",
+        "copyResults": "Copier tous les résultats",
+        "clickToCopy": "Cliquer pour copier",
+        "epoch": "Époque",
         "sensor": "Capteur",
         "latitude": "Latitude",
         "longitude": "Longitude",
@@ -45,7 +51,22 @@
       "msgs": {
         "noSensorSelected": "Aucun capteur sélectionné",
         "needsVelocity": "Vitesse requise",
-        "noSensorForRae": "Aucun capteur sélectionné pour la sortie RAE."
+        "noSensorForRae": "Aucun capteur sélectionné pour la sortie RAE.",
+        "copied": "Copié dans le presse-papiers"
+      },
+      "errorMsgs": {
+        "conversionFailed": "Échec de la conversion : {error}",
+        "invalidInput": "Entrée non valide pour {field} : \"{value}\" n'est pas un nombre.",
+        "fieldNotFound": "Champ {field} introuvable.",
+        "invalidNumber": "Toutes les entrées doivent être des nombres valides.",
+        "badEccentricity": "L'excentricité doit être comprise entre 0 et 1 (exclus) pour une orbite fermée.",
+        "badSemiMajorAxis": "Le demi-grand axe doit être supérieur à 0.",
+        "noSensorForRae": "La conversion RAE nécessite qu'un capteur soit sélectionné.",
+        "noRaeData": "Aucune donnée RAE disponible. Effectuez d'abord une conversion avec un capteur sélectionné.",
+        "noSatelliteSelected": "Aucun satellite sélectionné.",
+        "notASatellite": "L'objet sélectionné n'est pas un satellite.",
+        "couldNotPropagate": "Impossible de propager le satellite jusqu'à l'heure actuelle.",
+        "copyFailed": "Impossible de copier dans le presse-papiers."
       },
       "help": {
         "overview": "La calculatrice de transformations de repère convertit une position (et éventuellement une vitesse) entre tous les repères de coordonnées que KeepTrack connaît : J2000 (ECI), ITRF (ECEF), TEME, Géodésique (LLA), RAE (topocentrique), RA/Dec (géocentrique) et Éléments classiques. Saisissez un état dans n'importe quel repère et lisez-le dans tous les autres à la fois.",

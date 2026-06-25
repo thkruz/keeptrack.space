@@ -9,6 +9,9 @@
         "raDecGeocentric": "RA/Dec (geocentrico)",
         "classicalElements": "Elementi classici"
       },
+      "sections": {
+        "input": "Ingresso"
+      },
       "labels": {
         "inputFrame": "Sistema di ingresso",
         "loadSelectedSatellite": "Carica satellite selezionato",
@@ -16,6 +19,9 @@
         "convert": "Converti",
         "outputFormat": "Formato di output",
         "drawLine": "Disegna linea",
+        "copyResults": "Copia tutti i risultati",
+        "clickToCopy": "Clicca per copiare",
+        "epoch": "Epoca",
         "sensor": "Sensore",
         "latitude": "Latitudine",
         "longitude": "Longitudine",
@@ -45,7 +51,22 @@
       "msgs": {
         "noSensorSelected": "Nessun sensore selezionato",
         "needsVelocity": "Richiede la velocità",
-        "noSensorForRae": "Nessun sensore selezionato per l'output RAE."
+        "noSensorForRae": "Nessun sensore selezionato per l'output RAE.",
+        "copied": "Copiato negli appunti"
+      },
+      "errorMsgs": {
+        "conversionFailed": "Conversione non riuscita: {error}",
+        "invalidInput": "Input non valido per {field}: \"{value}\" non è un numero.",
+        "fieldNotFound": "Campo {field} non trovato.",
+        "invalidNumber": "Tutti gli input devono essere numeri validi.",
+        "badEccentricity": "L'eccentricità deve essere compresa tra 0 e 1 (esclusi) per un'orbita chiusa.",
+        "badSemiMajorAxis": "Il semiasse maggiore deve essere maggiore di 0.",
+        "noSensorForRae": "La conversione RAE richiede che sia selezionato un sensore.",
+        "noRaeData": "Nessun dato RAE disponibile. Esegui prima una conversione con un sensore selezionato.",
+        "noSatelliteSelected": "Nessun satellite selezionato.",
+        "notASatellite": "L'oggetto selezionato non è un satellite.",
+        "couldNotPropagate": "Impossibile propagare il satellite all'ora attuale.",
+        "copyFailed": "Impossibile copiare negli appunti."
       },
       "help": {
         "overview": "La calcolatrice delle trasformazioni di riferimento converte una posizione (e facoltativamente la velocità) tra tutti i sistemi di coordinate che KeepTrack conosce: J2000 (ECI), ITRF (ECEF), TEME, Geodetico (LLA), RAE (topocentrico), RA/Dec (geocentrico) ed Elementi classici. Digita uno stato in un sistema qualsiasi e leggilo in tutti gli altri contemporaneamente.",

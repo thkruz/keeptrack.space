@@ -9,6 +9,9 @@
         "raDecGeocentric": "RA/Dec（地心）",
         "classicalElements": "经典轨道根数"
       },
+      "sections": {
+        "input": "输入"
+      },
       "labels": {
         "inputFrame": "输入参考系",
         "loadSelectedSatellite": "载入所选卫星",
@@ -16,6 +19,9 @@
         "convert": "转换",
         "outputFormat": "输出格式",
         "drawLine": "绘制连线",
+        "copyResults": "复制所有结果",
+        "clickToCopy": "点击复制",
+        "epoch": "历元",
         "sensor": "传感器",
         "latitude": "纬度",
         "longitude": "经度",
@@ -45,7 +51,22 @@
       "msgs": {
         "noSensorSelected": "未选择传感器",
         "needsVelocity": "需要速度",
-        "noSensorForRae": "未选择用于 RAE 输出的传感器。"
+        "noSensorForRae": "未选择用于 RAE 输出的传感器。",
+        "copied": "已复制到剪贴板"
+      },
+      "errorMsgs": {
+        "conversionFailed": "转换失败：{error}",
+        "invalidInput": "{field} 的输入无效：\"{value}\" 不是数字。",
+        "fieldNotFound": "未找到字段 {field}。",
+        "invalidNumber": "所有输入都必须是有效数字。",
+        "badEccentricity": "对于闭合轨道，离心率必须介于 0 和 1 之间（不含端点）。",
+        "badSemiMajorAxis": "半长轴必须大于 0。",
+        "noSensorForRae": "RAE 转换需要先选择一个传感器。",
+        "noRaeData": "没有可用的 RAE 数据。请先在选择传感器的情况下进行一次转换。",
+        "noSatelliteSelected": "未选择卫星。",
+        "notASatellite": "所选对象不是卫星。",
+        "couldNotPropagate": "无法将卫星推算到当前时间。",
+        "copyFailed": "无法复制到剪贴板。"
       },
       "help": {
         "overview": "参考系转换计算器可在 KeepTrack 支持的所有坐标系之间转换位置（以及可选的速度）：J2000 (ECI)、ITRF (ECEF)、TEME、大地坐标 (LLA)、RAE（站心）、RA/Dec（地心）和经典轨道根数。在任意一个参考系中输入状态，即可同时在所有其他参考系中读出结果。",

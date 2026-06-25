@@ -9,6 +9,9 @@
         "raDecGeocentric": "RA/Dec（地心）",
         "classicalElements": "古典軌道要素"
       },
+      "sections": {
+        "input": "入力"
+      },
       "labels": {
         "inputFrame": "入力座標系",
         "loadSelectedSatellite": "選択中の衛星を読み込む",
@@ -16,6 +19,9 @@
         "convert": "変換",
         "outputFormat": "出力形式",
         "drawLine": "線を描画",
+        "copyResults": "すべての結果をコピー",
+        "clickToCopy": "クリックしてコピー",
+        "epoch": "元期",
         "sensor": "センサー",
         "latitude": "緯度",
         "longitude": "経度",
@@ -45,7 +51,22 @@
       "msgs": {
         "noSensorSelected": "センサーが選択されていません",
         "needsVelocity": "速度が必要です",
-        "noSensorForRae": "RAE出力用のセンサーが選択されていません。"
+        "noSensorForRae": "RAE出力用のセンサーが選択されていません。",
+        "copied": "クリップボードにコピーしました"
+      },
+      "errorMsgs": {
+        "conversionFailed": "変換に失敗しました: {error}",
+        "invalidInput": "{field} の入力が無効です: \"{value}\" は数値ではありません。",
+        "fieldNotFound": "フィールド {field} が見つかりません。",
+        "invalidNumber": "すべての入力は有効な数値である必要があります。",
+        "badEccentricity": "閉じた軌道の場合、離心率は0より大きく1未満である必要があります。",
+        "badSemiMajorAxis": "軌道長半径は0より大きくなければなりません。",
+        "noSensorForRae": "RAE変換にはセンサーを選択する必要があります。",
+        "noRaeData": "RAEデータがありません。まずセンサーを選択した状態で変換を実行してください。",
+        "noSatelliteSelected": "衛星が選択されていません。",
+        "notASatellite": "選択されたオブジェクトは衛星ではありません。",
+        "couldNotPropagate": "衛星を現在時刻まで伝播できませんでした。",
+        "copyFailed": "クリップボードにコピーできませんでした。"
       },
       "help": {
         "overview": "座標系変換計算機は、KeepTrackが扱うすべての座標系の間で位置（および任意で速度）を変換します：J2000 (ECI)、ITRF (ECEF)、TEME、測地座標 (LLA)、RAE（観測点中心）、RA/Dec（地心）、古典軌道要素。いずれか1つの座標系で状態を入力すれば、他のすべての座標系で同時に読み取れます。",

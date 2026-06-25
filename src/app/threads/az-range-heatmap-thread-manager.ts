@@ -227,12 +227,19 @@ export class AzRangeHeatmapThreadManager extends WebWorkerThreadManager {
 
   // ── Public API ─────────────────────────────────────────────────────────────
 
+  private getActiveWorkers_(): Worker[] {
+    if (this.fleet_.length > 0) {
+      return this.fleet_;
+    }
+
+    return this.worker_ ? [this.worker_] : [];
+  }
+
   start(params: AzRangeParams, callbacks: AzRangeCallbacks): number {
     this.currentRunId_++;
     this.callbacks_ = callbacks;
 
-    const activeWorkers: Worker[] =
-      this.fleet_.length > 0 ? this.fleet_ : this.worker_ ? [this.worker_] : [];
+    const activeWorkers = this.getActiveWorkers_();
 
     this.curNumAzBins_ = params.numAzBins;
     this.curNumRngBins_ = params.numRngBins;
@@ -257,6 +264,7 @@ export class AzRangeHeatmapThreadManager extends WebWorkerThreadManager {
         ...params,
         tleData: chunk,
       };
+
       activeWorkers[i].postMessage(msg);
     });
 
@@ -264,8 +272,7 @@ export class AzRangeHeatmapThreadManager extends WebWorkerThreadManager {
   }
 
   cancel(): void {
-    const activeWorkers: Worker[] =
-      this.fleet_.length > 0 ? this.fleet_ : this.worker_ ? [this.worker_] : [];
+    const activeWorkers = this.getActiveWorkers_();
 
     for (const w of activeWorkers) {
       w.postMessage({ typ: AzRangeMsgType.CANCEL, runId: this.currentRunId_ });

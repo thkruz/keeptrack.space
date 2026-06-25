@@ -51,6 +51,11 @@ interface SatRecord {
 
 let cancelled = false;
 
+/**
+ * Converts a millisecond timestamp into its Julian date and GMST angle.
+ * @param timeMs Epoch time in milliseconds.
+ * @returns The Julian date (`j`) and Greenwich Mean Sidereal Time (`gmst`).
+ */
 function timeToJdayGmst(timeMs: number): { j: number; gmst: number } {
   const d = new Date(timeMs);
   const j =

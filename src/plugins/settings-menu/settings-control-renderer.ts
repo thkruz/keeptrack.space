@@ -97,12 +97,9 @@ const renderSelect_ = (c: ISettingSelectControl, domId: string): string => {
 };
 
 const renderButton_ = (c: ISettingButtonControl, domId: string): string => `
-        <div class="row"${tooltipAttrs_(c.helpText)}>
-          <span class="col s6">${escapeText_(c.label)}</span>
-          <div class="col s6">
-            <button id="${domId}" class="btn btn-ui waves-effect waves-light" type="button"${disabledAttr_(c)}>${escapeText_(c.buttonLabel)}</button>
-          </div>
-        </div>`;
+        <button id="${domId}" type="button" class="kt-action waves-effect"${tooltipAttrs_(c.helpText)}${disabledAttr_(c)}>
+          <span class="kt-action-label">${escapeText_(c.label)}</span>
+        </button>`;
 
 /**
  * Renders a single control to its HTML representation. Listeners are NOT
@@ -140,11 +137,10 @@ export const renderSettingsSection = (contribution: ISettingsContribution): stri
   }
 
   return `
-      <div id="settings-plugin-${slugify_(contribution.sectionId)}" class="row">
-        <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
-        <h5 class="center-align">${escapeText_(contribution.sectionLabel)}</h5>
+      <section id="settings-section-${slugify_(contribution.sectionId)}" class="kt-section">
+        <div class="kt-section-label">${escapeText_(contribution.sectionLabel)}</div>
 ${controlsHtml}
-      </div>`;
+      </section>`;
 };
 
 const attachToggleListeners_ = (c: ISettingToggleControl, el: HTMLInputElement): void => {

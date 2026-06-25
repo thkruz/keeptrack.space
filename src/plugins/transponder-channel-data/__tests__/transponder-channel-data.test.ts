@@ -57,6 +57,12 @@ describe('TransponderChannelData_class', () => {
       expect(config.isDisabledOnLoad).toBe(true);
     });
 
+    it('should require internet', () => {
+      const plugin = new TransponderChannelData();
+
+      expect(plugin.requiresInternet).toBe(true);
+    });
+
     it('should return correct side menu config', () => {
       const plugin = new TransponderChannelData();
       const config = plugin.getSideMenuConfig();
@@ -84,11 +90,14 @@ describe('TransponderChannelData_class', () => {
       expect(shortcuts[0].callback).toBeDefined();
     });
 
-    it('should build side menu HTML with table', () => {
+    it('should build side menu HTML with table, filter, and export buttons', () => {
       const plugin = new TransponderChannelData();
       const menuHtml = plugin['buildSideMenuHtml_']();
 
       expect(menuHtml).toContain('TransponderChannelData-table');
+      expect(menuHtml).toContain('TransponderChannelData-filter');
+      expect(menuHtml).toContain('TransponderChannelData-export-csv');
+      expect(menuHtml).toContain('TransponderChannelData-export-xlsx');
     });
   });
 
@@ -117,58 +126,42 @@ describe('TransponderChannelData_class', () => {
     });
   });
 
-  describe('cleanData_', () => {
-    it('should remove duplicate entries', () => {
-      const plugin = new TransponderChannelData();
-      const duplicateData = [
-        ...mockChannelData,
-        mockChannelData[0], // exact duplicate
-      ];
-
-      const result = plugin['cleanData_'](duplicateData);
-
-      expect(result.length).toBe(2);
-    });
-
-    it('should handle empty data', () => {
-      const plugin = new TransponderChannelData();
-      const result = plugin['cleanData_']([]);
-
-      expect(result.length).toBe(0);
-    });
-  });
-
-  describe('displayChannelData_', () => {
-    it('should handle empty data array', () => {
+  describe('renderTable_', () => {
+    it('should handle empty data without throwing', () => {
       const plugin = new TransponderChannelData();
 
       websiteInit(plugin);
 
-      expect(() => plugin['displayChannelData_']([])).not.toThrow();
+      expect(() => plugin['renderTable_']()).not.toThrow();
     });
 
-    it('should populate table with data', () => {
+    it('should populate the table and cache from rawData_', () => {
       const plugin = new TransponderChannelData();
 
       websiteInit(plugin);
 
-      plugin['displayChannelData_'](mockChannelData);
+      plugin['rawData_'] = [...mockChannelData];
+      plugin['renderTable_']();
 
       const table = document.getElementById('TransponderChannelData-table') as HTMLTableElement;
 
       if (table) {
         expect(table.rows.length).toBeGreaterThan(0);
       }
+      expect(plugin['dataCache_'].length).toBe(2);
     });
 
-    it('should cache data for export', () => {
+    it('should apply the filter to the displayed rows', () => {
       const plugin = new TransponderChannelData();
 
       websiteInit(plugin);
 
-      plugin['displayChannelData_'](mockChannelData);
+      plugin['rawData_'] = [...mockChannelData];
+      plugin['filterQuery_'] = 'BBC Two';
+      plugin['renderTable_']();
 
-      expect(plugin['dataCache_'].length).toBe(2);
+      expect(plugin['dataCache_'].length).toBe(1);
+      expect(plugin['dataCache_'][0].tvchannel).toBe('BBC Two');
     });
   });
 
@@ -182,20 +175,20 @@ describe('TransponderChannelData_class', () => {
     it('should export data when cache is populated', () => {
       const plugin = new TransponderChannelData();
 
-      plugin['dataCache_'] = mockChannelData;
+      plugin['dataCache_'] = [...mockChannelData];
 
       expect(() => plugin.onDownload()).not.toThrow();
+      expect(() => plugin['exportData_']('csv')).not.toThrow();
     });
   });
 
-  describe('showTable_', () => {
-    it('should URL-encode satellite name in fetch', async () => {
+  describe('loadChannelData_', () => {
+    it('should URL-encode the satellite name in the fetch', async () => {
       const plugin = new TransponderChannelData();
 
       websiteInit(plugin);
       plugin['isMenuButtonActive'] = true;
 
-      // Mock a satellite with spaces in name
       const mockSat = {
         id: 0,
         isSatellite: () => true,
@@ -209,12 +202,35 @@ describe('TransponderChannelData_class', () => {
         'getPlugin',
       ).mockReturnValue({ primarySatObj: mockSat } as never);
 
-      await plugin['showTable_']();
+      await plugin['loadChannelData_']();
 
       expect(global.fetch).toHaveBeenCalledWith(
         'https://api.keeptrack.space/v4/channels/ASTRA%201N',
         expect.objectContaining({}),
       );
+    });
+
+    it('should not re-request the alternate name when it matches the primary name', async () => {
+      const plugin = new TransponderChannelData();
+
+      websiteInit(plugin);
+
+      const mockSat = {
+        id: 0,
+        isSatellite: () => true,
+        sccNum: '39508',
+        name: 'ASTRA 1N',
+        altName: 'ASTRA 1N',
+      };
+
+      vi.spyOn(
+        (await import('@app/engine/core/plugin-registry')).PluginRegistry,
+        'getPlugin',
+      ).mockReturnValue({ primarySatObj: mockSat } as never);
+
+      await plugin['loadChannelData_']();
+
+      expect(global.fetch).toHaveBeenCalledTimes(1);
     });
   });
 });

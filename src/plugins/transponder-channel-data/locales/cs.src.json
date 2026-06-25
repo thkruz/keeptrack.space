@@ -31,7 +31,19 @@
         "tip1": "Podporované satelity jsou registrovány jako konstelace TV satelity v nabídce Konstelace, což je nejrychlejší způsob, jak najít satelit k prozkoumání.",
         "tip2": "Data o kanálech pocházejí z KeepTrack API a odrážejí veřejné seznamy; vyžadují připojení k internetu.",
         "shortcutToggle": "Přepnout nabídku Frekvence satelitu"
-      }
+      },
+      "labels": {
+        "controls": "Ovládání",
+        "channels": "Kanály",
+        "filterPlaceholder": "Filtrovat kanály",
+        "exportXlsx": "Exportovat jako XLSX",
+        "exportCsv": "Exportovat jako CSV",
+        "statusLoading": "Načítání kanálů…",
+        "statusEmpty": "Nejsou k dispozici žádná data o kanálech",
+        "statusNoMatch": "Žádný kanál neodpovídá filtru",
+        "statusError": "Nelze načíst data o kanálech"
+      },
+      "attribution": "Data kanálů z rozhraní KeepTrack API (veřejné seznamy)."
     }
   }
 }

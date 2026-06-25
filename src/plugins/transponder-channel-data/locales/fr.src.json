@@ -31,7 +31,19 @@
         "tip1": "Les satellites pris en charge sont enregistrés comme constellation Satellites TV dans le menu Constellations, ce qui est le moyen le plus rapide d'en trouver un à inspecter.",
         "tip2": "Les données de canal proviennent de l'API KeepTrack et reflètent des listes publiques ; une connexion internet est requise.",
         "shortcutToggle": "Basculer le menu Fréquences satellite"
-      }
+      },
+      "labels": {
+        "controls": "Commandes",
+        "channels": "Chaînes",
+        "filterPlaceholder": "Filtrer les chaînes",
+        "exportXlsx": "Exporter en XLSX",
+        "exportCsv": "Exporter en CSV",
+        "statusLoading": "Chargement des chaînes…",
+        "statusEmpty": "Aucune donnée de chaîne disponible",
+        "statusNoMatch": "Aucune chaîne ne correspond au filtre",
+        "statusError": "Impossible de charger les données de chaîne"
+      },
+      "attribution": "Données de chaînes issues de l'API KeepTrack (listes publiques)."
     }
   }
 }

@@ -31,7 +31,19 @@
         "tip1": "지원되는 위성은 콘스텔레이션 메뉴에 TV 위성 콘스텔레이션으로 등록되어 있으며, 살펴볼 위성을 찾는 가장 빠른 방법입니다.",
         "tip2": "채널 데이터는 KeepTrack API에서 제공되며 공개 목록을 반영합니다. 인터넷 연결이 필요합니다.",
         "shortcutToggle": "위성 주파수 메뉴 전환"
-      }
+      },
+      "labels": {
+        "controls": "컨트롤",
+        "channels": "채널",
+        "filterPlaceholder": "채널 필터링",
+        "exportXlsx": "XLSX로 내보내기",
+        "exportCsv": "CSV로 내보내기",
+        "statusLoading": "채널 불러오는 중…",
+        "statusEmpty": "사용 가능한 채널 데이터가 없습니다",
+        "statusNoMatch": "필터와 일치하는 채널이 없습니다",
+        "statusError": "채널 데이터를 불러올 수 없습니다"
+      },
+      "attribution": "채널 데이터는 KeepTrack API(공개 목록)에서 제공됩니다."
     }
   }
 }

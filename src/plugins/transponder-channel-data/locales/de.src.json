@@ -31,7 +31,19 @@
         "tip1": "Die unterstützten Satelliten sind als Konstellation TV-Satelliten im Konstellationen-Menü registriert; das ist der schnellste Weg, einen Satelliten zum Untersuchen zu finden.",
         "tip2": "Die Kanaldaten stammen von der KeepTrack-API und geben öffentliche Listen wieder; eine Internetverbindung ist erforderlich.",
         "shortcutToggle": "Satellitenfrequenzen-Menü umschalten"
-      }
+      },
+      "labels": {
+        "controls": "Steuerung",
+        "channels": "Kanäle",
+        "filterPlaceholder": "Kanäle filtern",
+        "exportXlsx": "Als XLSX exportieren",
+        "exportCsv": "Als CSV exportieren",
+        "statusLoading": "Kanäle werden geladen…",
+        "statusEmpty": "Keine Kanaldaten verfügbar",
+        "statusNoMatch": "Keine Kanäle entsprechen dem Filter",
+        "statusError": "Kanaldaten konnten nicht geladen werden"
+      },
+      "attribution": "Kanaldaten von der KeepTrack-API (öffentliche Listen)."
     }
   }
 }

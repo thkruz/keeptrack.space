@@ -31,7 +31,19 @@
         "tip1": "Los satélites compatibles están registrados como una constelación Satélites de TV en el menú Constelaciones, que es la forma más rápida de encontrar uno para inspeccionar.",
         "tip2": "Los datos de canal provienen de la API de KeepTrack y reflejan listados públicos; se requiere conexión a internet.",
         "shortcutToggle": "Alternar el menú de Frecuencias de satélite"
-      }
+      },
+      "labels": {
+        "controls": "Controles",
+        "channels": "Canales",
+        "filterPlaceholder": "Filtrar canales",
+        "exportXlsx": "Exportar como XLSX",
+        "exportCsv": "Exportar como CSV",
+        "statusLoading": "Cargando canales…",
+        "statusEmpty": "No hay datos de canales disponibles",
+        "statusNoMatch": "Ningún canal coincide con el filtro",
+        "statusError": "No se pudieron cargar los datos de canales"
+      },
+      "attribution": "Datos de canales de la API de KeepTrack (listados públicos)."
     }
   }
 }

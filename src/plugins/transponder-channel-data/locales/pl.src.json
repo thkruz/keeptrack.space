@@ -31,7 +31,19 @@
         "tip1": "Obsługiwane satelity są zarejestrowane jako konstelacja Satelity TV w menu Konstelacje, co jest najszybszym sposobem na znalezienie satelity do sprawdzenia.",
         "tip2": "Dane kanałów pochodzą z API KeepTrack i odzwierciedlają publiczne listy; wymagają połączenia z internetem.",
         "shortcutToggle": "Przełącz menu Częstotliwości satelitarne"
-      }
+      },
+      "labels": {
+        "controls": "Sterowanie",
+        "channels": "Kanały",
+        "filterPlaceholder": "Filtruj kanały",
+        "exportXlsx": "Eksportuj jako XLSX",
+        "exportCsv": "Eksportuj jako CSV",
+        "statusLoading": "Ładowanie kanałów…",
+        "statusEmpty": "Brak dostępnych danych o kanałach",
+        "statusNoMatch": "Żaden kanał nie pasuje do filtra",
+        "statusError": "Nie można załadować danych o kanałach"
+      },
+      "attribution": "Dane kanałów z API KeepTrack (publiczne wykazy)."
     }
   }
 }

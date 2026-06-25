@@ -31,7 +31,19 @@
         "tip1": "The supported satellites are registered as a TV Satellites constellation in the Constellations menu, which is the quickest way to find one to inspect.",
         "tip2": "Channel data comes from the KeepTrack API and reflects public listings; it requires an internet connection.",
         "shortcutToggle": "Toggle the Satellite Frequencies menu"
-      }
+      },
+      "labels": {
+        "controls": "Controls",
+        "channels": "Channels",
+        "filterPlaceholder": "Filter channels",
+        "exportXlsx": "Export as XLSX",
+        "exportCsv": "Export as CSV",
+        "statusLoading": "Loading channels…",
+        "statusEmpty": "No channel data available",
+        "statusNoMatch": "No channels match the filter",
+        "statusError": "Could not load channel data"
+      },
+      "attribution": "Channel data from the KeepTrack API (public listings)."
     }
   }
 }

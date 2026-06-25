@@ -31,7 +31,19 @@
         "tip1": "受支持的卫星已在星座菜单中注册为电视卫星星座，这是查找可查看卫星的最快方式。",
         "tip2": "频道数据来自 KeepTrack API，反映公开列表；需要互联网连接。",
         "shortcutToggle": "切换卫星频率菜单"
-      }
+      },
+      "labels": {
+        "controls": "控制",
+        "channels": "频道",
+        "filterPlaceholder": "筛选频道",
+        "exportXlsx": "导出为 XLSX",
+        "exportCsv": "导出为 CSV",
+        "statusLoading": "正在加载频道…",
+        "statusEmpty": "无可用频道数据",
+        "statusNoMatch": "没有符合筛选条件的频道",
+        "statusError": "无法加载频道数据"
+      },
+      "attribution": "频道数据来自 KeepTrack API（公开列表）。"
     }
   }
 }

@@ -31,7 +31,19 @@
         "tip1": "対応する衛星はコンステレーションメニューにTV衛星コンステレーションとして登録されており、調べたい衛星を見つける最も手早い方法です。",
         "tip2": "チャンネルデータは KeepTrack API から取得され、公開されているリストを反映しています。インターネット接続が必要です。",
         "shortcutToggle": "衛星周波数メニューを切り替え"
-      }
+      },
+      "labels": {
+        "controls": "コントロール",
+        "channels": "チャンネル",
+        "filterPlaceholder": "チャンネルを絞り込む",
+        "exportXlsx": "XLSXとしてエクスポート",
+        "exportCsv": "CSVとしてエクスポート",
+        "statusLoading": "チャンネルを読み込み中…",
+        "statusEmpty": "チャンネルデータがありません",
+        "statusNoMatch": "フィルターに一致するチャンネルがありません",
+        "statusError": "チャンネルデータを読み込めませんでした"
+      },
+      "attribution": "チャンネルデータはKeepTrack API（公開リスト）から取得しています。"
     }
   }
 }

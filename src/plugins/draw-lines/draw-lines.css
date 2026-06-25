@@ -1,0 +1,78 @@
+/* ==========================================================================
+ * Draw Lines plugin (v13 menu)
+ * ========================================================================== */
+
+/* --- Required per-menu CSS for dense forms (v13-menu-style.md) -------------- */
+
+/* 1. Stacked-field headroom so floating labels don't strike through the row above. */
+#draw-lines-menu .kt-field-row .input-field.col { margin-top: 20px; }
+#draw-lines-menu .kt-section-label + .kt-field-row .input-field.col { margin-top: 8px; }
+
+/* 2. Standalone action width: keep its edges aligned with the inset cards. */
+#draw-lines-menu .draw-lines-standalone-action {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
+}
+
+/* 3. Focus indication: swap the app-wide outline for KeepTrack's underline. */
+#draw-lines-menu .input-field input:focus,
+#draw-lines-menu .input-field textarea:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+#draw-lines-menu .input-field input:focus-visible,
+#draw-lines-menu .input-field textarea:focus-visible { outline: none; }
+
+/* --- Active-lines list ----------------------------------------------------- */
+
+#draw-lines-menu .draw-lines-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 4px 0;
+}
+
+#draw-lines-menu .draw-lines-empty {
+  padding: 8px 6px;
+  font-size: 13px;
+  font-style: italic;
+  opacity: 0.6;
+  text-align: center;
+}
+
+#draw-lines-menu .draw-lines-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: var(--color-dark-background, rgba(255, 255, 255, 0.04));
+}
+
+#draw-lines-menu .draw-lines-row-label {
+  overflow: hidden;
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+#draw-lines-menu .draw-lines-remove {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  opacity: 0.65;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+#draw-lines-menu .draw-lines-remove:hover {
+  background: rgba(255, 80, 80, 0.18);
+  opacity: 1;
+}

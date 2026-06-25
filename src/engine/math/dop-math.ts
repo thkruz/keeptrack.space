@@ -204,10 +204,10 @@ export abstract class DopMath {
       return '';
     }
 
-    const prnMatch = (/PRN\s*(\d+)/iu).exec(name);
+    const prnMatch = (/PRN\s*(?<prn>\d+)/iu).exec(name);
 
     if (prnMatch) {
-      return `PRN ${prnMatch[1]}`;
+      return `PRN ${prnMatch.groups?.prn}`;
     }
 
     const shortened = name

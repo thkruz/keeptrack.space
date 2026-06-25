@@ -41,10 +41,11 @@ test.describe('Collisions Plugin', () => {
     await expect(fetchBtn).toBeAttached();
     await expect(refreshBtn).toBeAttached();
 
-    // Verify the collision table exists
-    const table = page.locator('#Collisions-table');
+    // Verify the collision results container exists. The OSS build renders a
+    // #Collisions-table; the Pro build replaces it with a #Collisions-results card list.
+    const results = page.locator('#Collisions-table, #Collisions-results');
 
-    await expect(table).toBeAttached();
+    await expect(results).toBeAttached();
 
     // Close via DOM click (toast notifications may intercept Playwright clicks)
     await page.evaluate(() => {

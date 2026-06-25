@@ -154,4 +154,7 @@ export enum StorageKey {
 
   // Reports (last-used output options: time window, sampling step, export format)
   REPORTS_SETTINGS = 'v2-keepTrack-reportsSettings',
+
+  // Calculator (last-used input frame, output format, and field values)
+  CALCULATOR_SETTINGS = 'v2-keepTrack-calculatorSettings',
 }

@@ -49,7 +49,9 @@ test.describe('SettingsMenuPlugin', () => {
       .toBe(true);
 
     // Reset to defaults deterministically clears demo mode and trailing orbits.
-    await page.locator('#settings-reset').click();
+    // The reset row sits at the bottom-center, under the fixed drawer-utility-footer
+    // pill, so dispatch the click directly to avoid the overlay intercepting it.
+    await page.locator('#settings-reset').dispatchEvent('click');
     await expect
       .poll(() => page.evaluate(() => (window as unknown as { settingsManager?: { isDemoModeOn?: boolean } }).settingsManager?.isDemoModeOn), { timeout: 5_000 })
       .toBe(false);

@@ -356,7 +356,6 @@ export class SatConstellations extends KeepTrackPlugin {
   // ── Private: Constellation Selection ────────────────────────────────
 
   private constellationMenuClick_(groupName: string, skipCloseMenus = false): void {
-    const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const groupManagerInstance = ServiceLocator.getGroupsManager();
 
     if (typeof groupManagerInstance === 'undefined') {
@@ -368,201 +367,77 @@ export class SatConstellations extends KeepTrackPlugin {
       return;
     }
 
-    switch (groupName) {
-      case 'SpaceStations':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.SCC_NUM, [25544, 48274], groupName);
-        }
-        break;
-      case 'GlonassGroup':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /GLONASS/u, groupName);
-        }
-        break;
-      case 'GalileoGroup':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /GALILEO/u, groupName);
-        }
-        break;
-      case 'GPSGroup':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /NAVSTAR/u, groupName);
-        }
-        break;
-      case 'iridium':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /IRIDIUM/u, groupName);
-        }
-        break;
-      case 'orbcomm':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /ORBCOMM/u, groupName);
-        }
-        break;
-      case 'globalstar':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /globalstar/iu, groupName);
-        }
-        break;
-      case 'ses':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /SES-\d+/u, groupName);
-        }
-        break;
-      case 'AmateurRadio':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(
-            GroupType.SCC_NUM,
-            [
-              7530, 14781, 20442, 22826, 24278, 25338, 25397, 25544, 26931, 27607, 27844, 27848, 28895, 32785, 32788, 32789, 32791, 33493, 33498, 33499, 35932, 35933, 35935, 37224,
-              37839, 37841, 37855, 38760, 39090, 39134, 39136, 39161, 39417, 39430, 39436, 39439, 39440, 39444, 39469, 39770, 40014, 40021, 40024, 40025, 40030, 40032, 40042,
-              40043, 40057, 40071, 40074, 40377, 40378, 40379, 40380, 40654, 40719, 40900, 40903, 40906, 40907, 40908, 40910, 40911, 40912, 40926, 40927, 40928, 40931, 40967,
-              40968, 41168, 41171, 41340, 41459, 41460, 41465, 41474, 41600, 41619, 41789, 41932, 41935, 42017,
-            ],
-            groupName,
-          );
-        }
-        break;
-      case 'aehf':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.SCC_NUM, catalogManagerInstance.id2satnum(catalogManagerInstance.satLinkManager.aehf), groupName);
-        }
-        break;
-      case 'wgs':
-        if (!groupManagerInstance.groupList[groupName]) {
-          const wgs = catalogManagerInstance.satLinkManager.wgs.concat(catalogManagerInstance.satLinkManager.dscs);
+    if (!groupManagerInstance.groupList[groupName]) {
+      this.createConstellationGroup_(groupName);
+    }
 
-          groupManagerInstance.createGroup(GroupType.SCC_NUM, catalogManagerInstance.id2satnum(wgs), groupName);
-        }
-        break;
-      case 'starlink':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /STARLINK/u, groupName);
-        }
-        break;
-      case 'sbirs': // SBIRS and DSP
-        if (!groupManagerInstance.groupList[groupName]) {
-          const sbirs = [...catalogManagerInstance.satLinkManager.sbirs, ...catalogManagerInstance.satLinkManager.dsp];
-
-          groupManagerInstance.createGroup(GroupType.SCC_NUM, catalogManagerInstance.id2satnum(sbirs), groupName);
-        }
-        break;
-      // These three notional Starlink sub-architectures use anchored patterns because real
-      // Starlink Gen2/v2/snapshot sats are already caught by the `starlink` case above.
-      case 'starlink-gen2':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /^Starlink Gen2 \d+$/u, groupName);
-        }
-        break;
-      case 'starlink-v2':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /^Starlink 2 \d+$/u, groupName);
-        }
-        break;
-      case 'starlink-snapshot':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /^Starlink \d+$/u, groupName);
-        }
-        break;
-      case 'starshield':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /starshield/iu, groupName);
-        }
-        break;
-      case 'pwsa':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /pwsa/iu, groupName);
-        }
-        break;
-      case 'kuiper':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /kuiper/iu, groupName);
-        }
-        break;
-      case 'ast-spaceobile':
-        // Real BlueBird satellites appear in the catalog under "BLUEBIRD"; notional imports use "AST SpaceMobile".
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /bluebird|ast.*mobile/iu, groupName);
-        }
-        break;
-      case 'oneweb':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /oneweb/iu, groupName);
-        }
-        break;
-      case 'telesat-lightspeed':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /telesat/iu, groupName);
-        }
-        break;
-      case 'boeing':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /^Boeing \d+$/u, groupName);
-        }
-        break;
-      case 'astra':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /^Astra \d+$/u, groupName);
-        }
-        break;
-      case 'spinlaunch':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /^SpinLaunch \d+$/u, groupName);
-        }
-        break;
-      case 'hvnet':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /hvnet/iu, groupName);
-        }
-        break;
-      case 'lynk':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /lynk/iu, groupName);
-        }
-        break;
-      case 'guanwang':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /guowang/iu, groupName);
-        }
-        break;
-      case 'qianfan':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /qianfan/iu, groupName);
-        }
-        break;
-      case 'honghu3':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /honghu/iu, groupName);
-        }
-        break;
-      case 'yinhe':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /yinhe/iu, groupName);
-        }
-        break;
-      case 'hanwha':
-        if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /hanwha/iu, groupName);
-        }
-        break;
-      default: {
-        if (!groupManagerInstance.groupList[groupName]) {
-          const constellation = this.additionalConstellations_.find((c) => c.groupSlug === groupName);
-
-          if (constellation) {
-            groupManagerInstance.createGroup(constellation.groupType, constellation.groupValue, groupName);
-          }
-        }
-
-        if (!groupManagerInstance.groupList[groupName]) {
-          throw new Error(`Unknown group name: ${groupName}`);
-        }
-      }
+    if (!groupManagerInstance.groupList[groupName]) {
+      throw new Error(`Unknown group name: ${groupName}`);
     }
 
     this.selectedGroupName_ = groupName;
     PersistenceManager.getInstance().saveItem(StorageKey.LAST_CONSTELLATION, groupName);
     this.groupSelected_(groupName, skipCloseMenus);
+  }
+
+  /**
+   * Creates the catalog group for a constellation, dispatching through the
+   * static name-pattern and SCC-list tables, the computed link-manager groups,
+   * and finally any constellations registered at runtime. Leaves the group
+   * uncreated (so the caller throws) when the name is unknown.
+   */
+  private createConstellationGroup_(groupName: string): void {
+    const groupManagerInstance = ServiceLocator.getGroupsManager();
+
+    const regexDef = SatConstellations.REGEX_GROUP_DEFS_[groupName];
+
+    if (regexDef) {
+      groupManagerInstance.createGroup(regexDef.type, regexDef.pattern, groupName);
+
+      return;
+    }
+
+    const sccList = SatConstellations.SCC_GROUP_DEFS_[groupName];
+
+    if (sccList) {
+      groupManagerInstance.createGroup(GroupType.SCC_NUM, sccList, groupName);
+
+      return;
+    }
+
+    const computedIds = this.computedConstellationIds_(groupName);
+
+    if (computedIds) {
+      groupManagerInstance.createGroup(GroupType.SCC_NUM, computedIds, groupName);
+
+      return;
+    }
+
+    const constellation = this.additionalConstellations_.find((c) => c.groupSlug === groupName);
+
+    if (constellation) {
+      groupManagerInstance.createGroup(constellation.groupType, constellation.groupValue, groupName);
+    }
+  }
+
+  /**
+   * Resolves the SCC numbers for the link-manager-derived constellations, whose
+   * membership is computed from the catalog rather than a static name pattern.
+   */
+  private computedConstellationIds_(groupName: string): string[] | null {
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const slm = catalogManagerInstance.satLinkManager;
+
+    switch (groupName) {
+      case 'aehf':
+        return catalogManagerInstance.id2satnum(slm.aehf);
+      case 'wgs':
+        return catalogManagerInstance.id2satnum(slm.wgs.concat(slm.dscs));
+      case 'sbirs': // SBIRS and DSP
+        return catalogManagerInstance.id2satnum([...slm.sbirs, ...slm.dsp]);
+      default:
+        return null;
+    }
   }
 
   private groupSelected_(groupName: string, skipCloseMenus = false): void {
@@ -694,6 +569,54 @@ export class SatConstellations extends KeepTrackPlugin {
   }
 
   private static readonly MAX_TABLE_ROWS_ = 500;
+
+  /**
+   * Constellations matched by a satellite/payload name pattern. NAME_REGEX
+   * matches the object name; PAYLOAD_NAME_REGEX matches the payload name.
+   */
+  private static readonly REGEX_GROUP_DEFS_: Record<string, { type: GroupType; pattern: RegExp }> = {
+    GlonassGroup: { type: GroupType.PAYLOAD_NAME_REGEX, pattern: /GLONASS/u },
+    GalileoGroup: { type: GroupType.PAYLOAD_NAME_REGEX, pattern: /GALILEO/u },
+    GPSGroup: { type: GroupType.PAYLOAD_NAME_REGEX, pattern: /NAVSTAR/u },
+    iridium: { type: GroupType.PAYLOAD_NAME_REGEX, pattern: /IRIDIUM/u },
+    orbcomm: { type: GroupType.PAYLOAD_NAME_REGEX, pattern: /ORBCOMM/u },
+    ses: { type: GroupType.PAYLOAD_NAME_REGEX, pattern: /SES-\d+/u },
+    globalstar: { type: GroupType.NAME_REGEX, pattern: /globalstar/iu },
+    starlink: { type: GroupType.NAME_REGEX, pattern: /STARLINK/u },
+    // These three notional Starlink sub-architectures use anchored patterns because real
+    // Starlink Gen2/v2/snapshot sats are already caught by the `starlink` entry above.
+    'starlink-gen2': { type: GroupType.NAME_REGEX, pattern: /^Starlink Gen2 \d+$/u },
+    'starlink-v2': { type: GroupType.NAME_REGEX, pattern: /^Starlink 2 \d+$/u },
+    'starlink-snapshot': { type: GroupType.NAME_REGEX, pattern: /^Starlink \d+$/u },
+    starshield: { type: GroupType.NAME_REGEX, pattern: /starshield/iu },
+    pwsa: { type: GroupType.NAME_REGEX, pattern: /pwsa/iu },
+    kuiper: { type: GroupType.NAME_REGEX, pattern: /kuiper/iu },
+    // Real BlueBird satellites appear in the catalog under "BLUEBIRD"; notional imports use "AST SpaceMobile".
+    'ast-spaceobile': { type: GroupType.NAME_REGEX, pattern: /bluebird|ast.*mobile/iu },
+    oneweb: { type: GroupType.NAME_REGEX, pattern: /oneweb/iu },
+    'telesat-lightspeed': { type: GroupType.NAME_REGEX, pattern: /telesat/iu },
+    boeing: { type: GroupType.NAME_REGEX, pattern: /^Boeing \d+$/u },
+    astra: { type: GroupType.NAME_REGEX, pattern: /^Astra \d+$/u },
+    spinlaunch: { type: GroupType.NAME_REGEX, pattern: /^SpinLaunch \d+$/u },
+    hvnet: { type: GroupType.NAME_REGEX, pattern: /hvnet/iu },
+    lynk: { type: GroupType.NAME_REGEX, pattern: /lynk/iu },
+    guanwang: { type: GroupType.NAME_REGEX, pattern: /guowang/iu },
+    qianfan: { type: GroupType.NAME_REGEX, pattern: /qianfan/iu },
+    honghu3: { type: GroupType.NAME_REGEX, pattern: /honghu/iu },
+    yinhe: { type: GroupType.NAME_REGEX, pattern: /yinhe/iu },
+    hanwha: { type: GroupType.NAME_REGEX, pattern: /hanwha/iu },
+  };
+
+  /** Constellations defined by a fixed list of SCC numbers. */
+  private static readonly SCC_GROUP_DEFS_: Record<string, number[]> = {
+    SpaceStations: [25544, 48274],
+    AmateurRadio: [
+      7530, 14781, 20442, 22826, 24278, 25338, 25397, 25544, 26931, 27607, 27844, 27848, 28895, 32785, 32788, 32789, 32791, 33493, 33498, 33499, 35932, 35933, 35935, 37224,
+      37839, 37841, 37855, 38760, 39090, 39134, 39136, 39161, 39417, 39430, 39436, 39439, 39440, 39444, 39469, 39770, 40014, 40021, 40024, 40025, 40030, 40032, 40042,
+      40043, 40057, 40071, 40074, 40377, 40378, 40379, 40380, 40654, 40719, 40900, 40903, 40906, 40907, 40908, 40910, 40911, 40912, 40926, 40927, 40928, 40931, 40967,
+      40968, 41168, 41171, 41340, 41459, 41460, 41465, 41474, 41600, 41619, 41789, 41932, 41935, 42017,
+    ],
+  };
 
   private buildTable_(sats: Satellite[]): void {
     const tbl = getEl('sc-results-table') as HTMLTableElement | null;

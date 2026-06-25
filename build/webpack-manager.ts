@@ -339,20 +339,20 @@ export class WebpackManager {
       fovPredictionWorker: ['./src/webworker/fovPredictionWorker.ts'],
       bestPassWorker: ['./src/webworker/bestPassWorker.ts'],
       closeObjectsWorker: ['./src/webworker/closeObjectsWorker.ts'],
-      tocaPocaWorker: ['./src/webworker/tocaPocaWorker.ts'],
       proximityOpsWorker: ['./src/webworker/proximityOpsWorker.ts'],
-      overflightWorker: ['./src/webworker/overflightWorker.ts'],
       time2lonWorker: ['./src/webworker/time2lonWorker.ts'],
-      neighborhoodHistoryWorker: ['./src/webworker/neighborhoodHistoryWorker.ts'],
       azRangeHeatmapWorker: ['./src/webworker/azRangeHeatmapWorker.ts'],
     };
 
-    // Pro-only worker: its source lives in the plugins-pro submodule, so it is
+    // Pro-only workers: their source lives in the plugins-pro submodule, so they are
     // only built (and only present) for pro profiles - never bundled into OSS.
     if (this.config.isPro) {
       entry.tipAndCueWorker = ['./src/plugins-pro/tip-and-cue/tipAndCueWorker.ts'];
       entry.eclipseWorker = ['./src/plugins-pro/eclipse-solar-analysis/eclipseWorker.ts'];
       entry.coverageWorker = ['./src/plugins-pro/coverage-analysis/coverageWorker.ts'];
+      entry.tocaPocaWorker = ['./src/plugins-pro/toca-poca-plugin/tocaPocaWorker.ts'];
+      entry.overflightWorker = ['./src/plugins-pro/overflight/overflightWorker.ts'];
+      entry.neighborhoodHistoryWorker = ['./src/plugins-pro/neighborhood-history/neighborhoodHistoryWorker.ts'];
     }
 
     return ({

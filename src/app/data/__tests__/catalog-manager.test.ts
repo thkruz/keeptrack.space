@@ -91,7 +91,7 @@ describe('calcSatrec', () => {
     // mock new Date() with new Date(2021, 6, 22, 12);
     const mockDate = new Date(2021, 6, 22, 12);
 
-    vi.spyOn(global, 'Date').mockImplementation(function() {
+    vi.spyOn(global, 'Date').mockImplementation(function mockDateConstructor() {
       return mockDate;
     } as any);
 

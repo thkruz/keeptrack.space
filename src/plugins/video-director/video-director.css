@@ -1,0 +1,37 @@
+/*
+ * Video Director dense-form fixes for the v13 card UI.
+ *
+ * This menu stacks a speed field plus several lever rows inside each card and has
+ * a standalone primary action, so it needs the three dense-form rules from
+ * docs-local/ui/v13-menu-style.md ("Required per-menu CSS for dense forms").
+ */
+
+/* 1. Stacked-field headroom so the floating speed label clears the section label. */
+#video-director-menu .kt-field-row .input-field.col {
+  margin-top: 20px;
+}
+#video-director-menu .kt-section-label + .kt-field-row .input-field.col {
+  margin-top: 8px;
+}
+
+/* 2. Standalone Start/Stop action: line its edges up with the inset cards. */
+#video-director-form > .kt-action {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
+}
+
+/* 3. Swap the app-wide focus-visible outline for KeepTrack's underline so it does
+ *    not overlap the floating label above each speed field. */
+#video-director-menu .input-field input:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+#video-director-menu .input-field input:focus-visible {
+  outline: none;
+}
+
+/* Give the lever rows a little breathing room below the speed field. */
+#video-director-menu .kt-section .switch.row {
+  margin-bottom: 8px;
+}

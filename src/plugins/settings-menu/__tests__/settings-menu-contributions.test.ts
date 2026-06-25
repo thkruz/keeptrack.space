@@ -44,7 +44,7 @@ const makeToggleContribution = (sectionId: string, sectionLabel: string, order?:
 
 const collectStatic = SettingsMenuPlugin as unknown as {
   collectPluginContributions_(): ISettingsContribution[];
-  renderPluginContributions_(): void;
+  renderAllSections_(): void;
 };
 
 describe('SettingsMenuPlugin.collectPluginContributions_', () => {
@@ -148,7 +148,7 @@ describe('SettingsMenuPlugin.renderPluginContributions_', () => {
     const container = document.getElementById('settings-plugin-sections');
 
     expect(container).not.toBeNull();
-    expect(container?.querySelector('h5')?.textContent?.trim()).toBe('Contrib Label');
+    expect(container?.querySelector('.kt-section-label')?.textContent?.trim()).toBe('Contrib Label');
     expect(container?.querySelector('#setting-Contrib-flag')).not.toBeNull();
   });
 
@@ -204,6 +204,6 @@ describe('SettingsMenuPlugin.renderPluginContributions_', () => {
 
   it('does not throw when the container element is missing (e.g., outside the settings menu lifecycle)', () => {
     document.getElementById('settings-plugin-sections')?.remove();
-    expect(() => collectStatic.renderPluginContributions_()).not.toThrow();
+    expect(() => collectStatic.renderAllSections_()).not.toThrow();
   });
 });

@@ -180,7 +180,7 @@ describe('renderSettingControl - select', () => {
 });
 
 describe('renderSettingControl - button', () => {
-  it('renders a button with the supplied label and button text', () => {
+  it('renders a v13 kt-action button labeled with the control label', () => {
     const ctrl: ISettingButtonControl = {
       type: 'button', id: 'reset', label: 'Reset to defaults', buttonLabel: 'Reset', onClick: vi.fn(),
     };
@@ -189,8 +189,8 @@ describe('renderSettingControl - button', () => {
     const btn = host.querySelector('button') as HTMLButtonElement;
 
     expect(btn.id).toBe('setting-sec-reset');
-    expect(btn.textContent?.trim()).toBe('Reset');
-    expect(host.textContent).toContain('Reset to defaults');
+    expect(btn.classList.contains('kt-action')).toBe(true);
+    expect(btn.querySelector('.kt-action-label')?.textContent?.trim()).toBe('Reset to defaults');
   });
 });
 
@@ -207,7 +207,8 @@ describe('renderSettingsSection', () => {
 
     const host = mountHtml(renderSettingsSection(contribution));
 
-    expect(host.querySelector('h5')?.textContent?.trim()).toBe('Test Plugin');
+    expect(host.querySelector('section.kt-section')).not.toBeNull();
+    expect(host.querySelector('.kt-section-label')?.textContent?.trim()).toBe('Test Plugin');
     expect(host.querySelector('#setting-TestPlugin-a')).not.toBeNull();
     expect(host.querySelector('#setting-TestPlugin-b')).not.toBeNull();
   });
@@ -256,7 +257,7 @@ describe('renderSettingsSection', () => {
 
     const host = mountHtml(renderSettingsSection(contribution));
 
-    expect(host.querySelector('#settings-plugin-My_Plugin')).not.toBeNull();
+    expect(host.querySelector('#settings-section-My_Plugin')).not.toBeNull();
   });
 });
 

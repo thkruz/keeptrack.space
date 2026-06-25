@@ -32,18 +32,21 @@ test.describe('SettingsMenuPlugin', () => {
 
     // Verify settings form elements
     await expect(page.locator('#settings-form')).toBeAttached();
-    await expect(page.locator('#settings-submit')).toBeAttached();
+    await expect(page.locator('#settings-filter')).toBeAttached();
     await expect(page.locator('#settings-reset')).toBeAttached();
+    // Settings now apply immediately, so there is no submit button.
+    await expect(page.locator('#settings-submit')).toHaveCount(0);
 
-    // ── Behavior: change settings, apply, then reset (exercises onFormChange_, onSubmit_, resetToDefaults) ──
+    // ── Behavior: toggle applies instantly, then reset restores defaults ──
 
     // Toggle a checkbox. The Materialize input is positioned off-viewport, so dispatch the
-    // click directly - it still toggles the box and fires the change the form listens for.
-    await page.locator('#settings-demo-mode').dispatchEvent('click');
+    // click directly - it still toggles the box and fires the change the control listens for.
+    await page.locator('#setting-general-enableDemoMode').dispatchEvent('click');
 
-    // Apply - onSubmit_ reads the entire form into settingsManager.
-    await page.locator('#settings-submit').click();
-    await expect(page.locator('#settings-menu')).toBeVisible();
+    // Immediate-apply: the change reaches settingsManager without any submit step.
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as { settingsManager?: { isDemoModeOn?: boolean } }).settingsManager?.isDemoModeOn), { timeout: 5_000 })
+      .toBe(true);
 
     // Reset to defaults deterministically clears demo mode and trailing orbits.
     await page.locator('#settings-reset').click();

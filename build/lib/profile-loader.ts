@@ -70,35 +70,59 @@ export class ProfileLoader {
     const config: Partial<BuildConfig> = {};
 
     // 1. Load profile.env if it exists
-    const envPath = join(profileDir, 'profile.env');
-
-    if (existsSync(envPath)) {
-      // Use dotenv.parse() instead of dotenv.config() to avoid polluting process.env.
-      // This ensures CLI args and process.env take proper precedence over profile values.
-      const envVars = dotenv.parse(readFileSync(envPath));
-
-      // Point dotenv-webpack at this profile's env file
-      config.envFilePath = relative(this.rootDir_, envPath).replace(/\\/gu, '/');
-
-      if (envVars.MODE) {
-        config.mode = envVars.MODE as BuildConfig['mode'];
-      }
-      if (envVars.IS_PRO) {
-        config.isPro = envVars.IS_PRO === 'true';
-      }
-      if (envVars.EDITION) {
-        config.edition = envVars.EDITION;
-      }
-      if (envVars.PUBLIC_SUPABASE_URL) {
-        config.PUBLIC_SUPABASE_URL = envVars.PUBLIC_SUPABASE_URL;
-      }
-      if (envVars.PUBLIC_SUPABASE_ANON_KEY) {
-        config.PUBLIC_SUPABASE_ANON_KEY = envVars.PUBLIC_SUPABASE_ANON_KEY;
-      }
-    }
+    Object.assign(config, this.parseProfileEnv_(profileDir));
 
     // 2. Resolve file-based overrides: check each known file in profile dir
-    // Paths must be relative to rootDir because webpack-manager prefixes them with `${dirName}/../`
+    Object.assign(config, this.resolveFileOverrides_(profileDir));
+
+    return config;
+  }
+
+  /**
+   * Parses profile.env (if present) into a partial BuildConfig.
+   * Uses dotenv.parse() instead of dotenv.config() to avoid polluting process.env,
+   * which ensures CLI args and process.env take proper precedence over profile values.
+   */
+  private parseProfileEnv_(profileDir: string): Partial<BuildConfig> {
+    const config: Partial<BuildConfig> = {};
+    const envPath = join(profileDir, 'profile.env');
+
+    if (!existsSync(envPath)) {
+      return config;
+    }
+
+    const envVars = dotenv.parse(readFileSync(envPath));
+
+    // Point dotenv-webpack at this profile's env file
+    config.envFilePath = relative(this.rootDir_, envPath).replace(/\\/gu, '/');
+
+    if (envVars.MODE) {
+      config.mode = envVars.MODE as BuildConfig['mode'];
+    }
+    if (envVars.IS_PRO) {
+      config.isPro = envVars.IS_PRO === 'true';
+    }
+    if (envVars.EDITION) {
+      config.edition = envVars.EDITION;
+    }
+    if (envVars.PUBLIC_SUPABASE_URL) {
+      config.PUBLIC_SUPABASE_URL = envVars.PUBLIC_SUPABASE_URL;
+    }
+    if (envVars.PUBLIC_SUPABASE_ANON_KEY) {
+      config.PUBLIC_SUPABASE_ANON_KEY = envVars.PUBLIC_SUPABASE_ANON_KEY;
+    }
+
+    return config;
+  }
+
+  /**
+   * Resolves file-based overrides by checking each known file in the profile dir.
+   * Paths must be relative to rootDir because webpack-manager prefixes them with `${dirName}/../`.
+   * If a file is not present, ConfigManager defaults will apply.
+   */
+  private resolveFileOverrides_(profileDir: string): Partial<BuildConfig> {
+    const config: Partial<BuildConfig> = {};
+
     for (const [fileName, mapping] of Object.entries(PROFILE_FILE_MAP)) {
       const profileFilePath = join(profileDir, fileName);
 
@@ -108,7 +132,6 @@ export class ProfileLoader {
         (config as Record<string, string>)[mapping.configKey] = relativePath;
         logWithStyle(`  ${mapping.configKey}: ${relativePath}`, ConsoleStyles.DEBUG);
       }
-      // If not present, ConfigManager defaults will apply
     }
 
     return config;

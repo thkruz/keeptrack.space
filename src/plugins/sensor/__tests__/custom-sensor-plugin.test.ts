@@ -20,6 +20,10 @@ describe('CustomSensorPlugin_class', () => {
     vi.advanceTimersByTime(1000);
   });
 
+  it('constructs without throwing', () => {
+    expect(() => new CustomSensorPlugin()).not.toThrow();
+  });
+
   standardPluginSuite(CustomSensorPlugin);
   standardPluginMenuButtonTests(CustomSensorPlugin);
   standardClickTests(CustomSensorPlugin);

@@ -303,7 +303,7 @@ describe('CollisionsPlugin_class', () => {
         MAX_PROB: 6,
       } as CollisionEvent,
     ];
-    satConstellationsPlugin['eventClicked_'](0);
+    expect(() => satConstellationsPlugin['eventClicked_'](0)).not.toThrow();
   });
 });
 

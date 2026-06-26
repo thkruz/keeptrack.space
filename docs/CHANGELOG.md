@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
-### [v13.0.0](https://github.com/thkruz/keeptrack.space/compare/v12.5.0...v13.0.0)
+#### [v13.0.0](https://github.com/thkruz/keeptrack.space/compare/v12.5.0...v13.0.0)
 
 >  
 
@@ -22,7 +22,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - feat(reports): :sparkles: v13 menu, structured reports, export formats, and shared pass finder [`07aa132`](https://github.com/thkruz/keeptrack.space/commit/07aa132ca5e7379999dbda4c9dfa042f662ae335)
 - feat(calculator): :sparkles: v13 menu, DOM-free core, and conversion fixes [`2bc7bf7`](https://github.com/thkruz/keeptrack.space/commit/2bc7bf7219b1f835afa3fc10bb64317f009e2798)
 - feat(create-sat): :sparkles: v13 UI plus presets, sun-sync, clone, live preview, inline validation [`74d25d1`](https://github.com/thkruz/keeptrack.space/commit/74d25d17f4dca006c2569b1bb9305274c53cd496)
-- @ [`1c64d5c`](https://github.com/thkruz/keeptrack.space/commit/1c64d5c27d17cc32ece37d812d84d055c631ca32)
+- feat(edit-sat): :sparkles: v13 menu, logic split, live preview, and fixes [`1c64d5c`](https://github.com/thkruz/keeptrack.space/commit/1c64d5c27d17cc32ece37d812d84d055c631ca32)
 - feat(find-sat): :sparkles: v13 card UI, pure filter predicates, and sensor guard [`836b838`](https://github.com/thkruz/keeptrack.space/commit/836b8388fc3c0c188ff1bcd2b31e6d91d275962c)
 - feat(search-settings): :sparkles: v13 menu, field filters, vimpel toggle, min-chars, and reset [`d29b859`](https://github.com/thkruz/keeptrack.space/commit/d29b85985cc0ac222f6d9c2bc884ff5866c691ab)
 - feat(settings-menu): :sparkles: render plugin settings contributions [`0d103f6`](https://github.com/thkruz/keeptrack.space/commit/0d103f686c6252515b07749695fb62b8f0754c58)
@@ -83,7 +83,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - feat(conjunction): :sparkles: shared conjunction engine (TCA scan, row actions, results table) [`c014992`](https://github.com/thkruz/keeptrack.space/commit/c01499265f623019d86d7d8a05311e0b2ba8d97d)
 - feat(transponder-channel-data): :sparkles: structured help dialog and localized channel table [`8b25d93`](https://github.com/thkruz/keeptrack.space/commit/8b25d93df30b6415fe6ac2b651151ba3e3b5dfc8)
 - test(reports): :white_check_mark: cover reports-core generators and the formatter [`b2a00c2`](https://github.com/thkruz/keeptrack.space/commit/b2a00c27dfadfa26b4ae156a95e55cc9b8929449)
-- @ [`c8b3fea`](https://github.com/thkruz/keeptrack.space/commit/c8b3fea91f9e88b08285b4f45391f0cfcc70f296)
+- refactor(create-sat): :recycle: promote ghost-orbit preview to a shared module [`c8b3fea`](https://github.com/thkruz/keeptrack.space/commit/c8b3fea91f9e88b08285b4f45391f0cfcc70f296)
 - i18n(create-sat): :globe_with_meridians: add v13 section and feature locale strings [`0d0df1e`](https://github.com/thkruz/keeptrack.space/commit/0d0df1e905d5752b3c5fe1c6e23548beb2873dc7)
 - test(breakup-analysis): :white_check_mark: cover core math, chart, and plugin behavior [`bd83918`](https://github.com/thkruz/keeptrack.space/commit/bd83918a3f4e630bf5aa01b9cc486781a6b359da)
 - feat(find-sat): :sparkles: structured help dialog with screenshots [`b09ceb8`](https://github.com/thkruz/keeptrack.space/commit/b09ceb8c6e9255da25c9655fe46bba3c4ece45f3)

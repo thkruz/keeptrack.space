@@ -95,7 +95,7 @@ export class RcsColorScheme extends ColorScheme {
     };
   }
 
-  override calculateParams() {
+  override calculateParams(): void {
     const catalog = ServiceLocator.getCatalogManager();
     const sats = catalog?.getSats() ?? [];
 
@@ -112,7 +112,7 @@ export class RcsColorScheme extends ColorScheme {
     }
 
     if (rcsValues.length < RcsColorScheme.BUCKET_SLUGS.length) {
-      return null;
+      return;
     }
 
     rcsValues.sort((a, b) => a - b);
@@ -155,8 +155,6 @@ export class RcsColorScheme extends ColorScheme {
     }
 
     this.thresholds_ = thresholds;
-
-    return null;
   }
 
   update(obj: BaseObject): ColorInformation {

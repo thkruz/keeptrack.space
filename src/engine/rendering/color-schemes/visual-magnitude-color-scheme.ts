@@ -85,7 +85,7 @@ export class VisualMagnitudeColorScheme extends ColorScheme {
     };
   }
 
-  override calculateParams() {
+  override calculateParams(): void {
     const catalog = ServiceLocator.getCatalogManager();
     const sats = catalog?.getSats() ?? [];
     const mags: number[] = [];
@@ -102,7 +102,7 @@ export class VisualMagnitudeColorScheme extends ColorScheme {
     // fewer points the previous thresholds remain in effect — better than
     // collapsing every object into one band.
     if (mags.length < VisualMagnitudeColorScheme.BUCKET_SLUGS.length) {
-      return null;
+      return;
     }
 
     mags.sort((a, b) => a - b);
@@ -143,8 +143,6 @@ export class VisualMagnitudeColorScheme extends ColorScheme {
     }
 
     this.thresholds_ = thresholds;
-
-    return null;
   }
 
   update(obj: BaseObject): ColorInformation {

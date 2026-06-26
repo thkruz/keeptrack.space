@@ -1172,7 +1172,7 @@ export class CatalogLoader {
 
     notionalSatNum++;
 
-    meanAnom = parseFloat(debris.tle2.substr(43, 51)) + meanAnom;
+    meanAnom = Number.parseFloat(debris.tle2.substr(43, 51)) + meanAnom;
     if (meanAnom > 360) {
       meanAnom -= 360;
     }
@@ -1214,7 +1214,7 @@ export class CatalogLoader {
   }
 
   private static isCsvGpHeader_(firstLine: string | undefined): boolean {
-    if (!firstLine || !firstLine.includes(',')) {
+    if (!firstLine?.includes(',')) {
       return false;
     }
     const upper = firstLine.toUpperCase();
@@ -1267,11 +1267,11 @@ export class CatalogLoader {
 
       return 'None';
     }
-    if (isNaN(parseInt(year))) {
+    if (Number.isNaN(Number.parseInt(year))) {
       // eslint-disable-next-line no-debugger
       debugger;
     }
-    const prefix = parseInt(year) > 50 ? '19' : '20';
+    const prefix = Number.parseInt(year) > 50 ? '19' : '20';
 
     year = prefix + year;
     const rest = TLE1.substring(9, 17).trim().substring(2);
@@ -1322,7 +1322,7 @@ export class CatalogLoader {
       rcs = resp[i].rcs === 'LARGE' ? 5 : rcs;
       rcs = resp[i].rcs === 'MEDIUM' ? 0.5 : rcs;
       rcs = resp[i].rcs === 'SMALL' ? 0.05 : rcs;
-      rcs = resp[i].rcs && !isNaN(parseFloat(resp[i].rcs)) ? parseFloat(resp[i].rcs) : rcs;
+      rcs = resp[i].rcs && !Number.isNaN(Number.parseFloat(resp[i].rcs)) ? Number.parseFloat(resp[i].rcs) : rcs;
 
       // Never fail just because of one bad satellite
       let isAddedToCatalog = false;
@@ -1477,7 +1477,7 @@ export class CatalogLoader {
       // alpha-5 inputs too (alpha-5 sats that land in the analyst range get
       // labeled accordingly). Extended (7+ digit) IDs parse to large numbers
       // and fall through to element.ON.
-      name: parseInt(sccNum) >= 90000 && parseInt(sccNum) <= 99999 ? `Analyst ${sccNum}` : element.ON,
+      name: Number.parseInt(sccNum) >= 90000 && Number.parseInt(sccNum) <= 99999 ? `Analyst ${sccNum}` : element.ON,
       type: element.OT,
       country: 'Unknown',
       rocket: 'Unknown',
@@ -1704,10 +1704,10 @@ export class CatalogLoader {
    * Uses the same apogee/eccentricity thresholds as color-scheme-manager.ts.
    */
   private static getRegimeFromTle_(tle2: string): string {
-    const n = parseFloat(tle2.substring(52, 63)); // mean motion (rev/day)
-    const ecc = parseFloat(`0.${tle2.substring(26, 33).trim()}`); // eccentricity (implied decimal)
+    const n = Number.parseFloat(tle2.substring(52, 63)); // mean motion (rev/day)
+    const ecc = Number.parseFloat(`0.${tle2.substring(26, 33).trim()}`); // eccentricity (implied decimal)
 
-    if (isNaN(n) || isNaN(ecc) || n <= 0) {
+    if (Number.isNaN(n) || Number.isNaN(ecc) || n <= 0) {
       return 'unknown';
     }
 

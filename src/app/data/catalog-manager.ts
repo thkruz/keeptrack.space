@@ -322,7 +322,7 @@ export class CatalogManager {
    */
   getObject(i: string | number | null | undefined, type: GetSatType = GetSatType.DEFAULT): BaseObject | null {
     // Convert string IDs to numbers for array access
-    const index = typeof i === 'string' ? parseInt(i, 10) : i;
+    const index = typeof i === 'string' ? Number.parseInt(i, 10) : i;
 
     if (index === null || typeof index === 'undefined' || (index ?? -1) <= -1) {
       // errorManagerInstance.debug('getSat: i is null'); - This happens a lot but is useful for debugging

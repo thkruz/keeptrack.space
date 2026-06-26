@@ -171,6 +171,7 @@ textarea.materialize-textarea {
     top: 0;
     transform: translateY(-14px) scale(0.75);
     transform-origin: 0 0;
+    color: var(--color-dark-text-muted);
 }
 
 /*
@@ -319,10 +320,6 @@ body.keyboard-focused .dropdown-content li:focus {
     background-color: #eee;
 }
 
-.row {
-    margin-bottom: 1rem;
-}
-
 /*
  * Materialize v2 replaced the v1 float grid with CSS Grid
  * (.row { display: grid; grid-template-columns: repeat(12, 1fr) }). The default
@@ -334,6 +331,7 @@ body.keyboard-focused .dropdown-content li:focus {
  * menu exactly.
  */
 .row {
+    margin-bottom: 1rem;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: 0;
 }
@@ -454,10 +452,6 @@ input[type='search']:not(.browser-default)[readonly='readonly'],
 textarea.materialize-textarea:disabled,
 textarea.materialize-textarea[readonly='readonly'] {
     color: var(--color-dark-text-muted)
-}
-
-.input-field>label {
-    color: var(--color-dark-text-muted);
 }
 
 @media only screen and (min-width: 601px) {

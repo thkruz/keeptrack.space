@@ -15,6 +15,10 @@ describe('TopMenu', () => {
     vi.restoreAllMocks();
   });
 
+  it('constructs without throwing', () => {
+    expect(() => new TopMenu()).not.toThrow();
+  });
+
   standardPluginSuite(TopMenu, 'TopMenu');
 });
 

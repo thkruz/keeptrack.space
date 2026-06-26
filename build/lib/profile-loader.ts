@@ -1,7 +1,7 @@
 /* eslint-disable no-process-env */
 import dotenv from 'dotenv';
-import { existsSync, readFileSync, readdirSync } from 'fs';
-import { join, relative, resolve } from 'path';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { join, relative, resolve } from 'node:path';
 import { BuildConfig } from './config-manager';
 import { BuildError, ConsoleStyles, ErrorCodes, logWithStyle } from './build-error';
 

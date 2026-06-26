@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import { mergeAllLocales } from './utils/generate-translation-json';
 import { generateKeysFile } from './utils/generate-translation-keys';
 

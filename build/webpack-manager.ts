@@ -1,10 +1,10 @@
 import { Configuration, DefinePlugin, DefinePluginOptions, HtmlRspackPlugin, LightningCssMinimizerRspackPlugin, ProgressPlugin, SwcJsMinimizerRspackPlugin } from '@rspack/core';
-import { execSync } from 'child_process';
+import { execSync } from 'node:child_process';
 import CleanTerminalPlugin from 'clean-terminal-webpack-plugin';
 import DotEnv from 'dotenv-webpack';
-import { readFileSync } from 'fs';
-import { dirname, resolve } from 'path';
-import { fileURLToPath } from 'url';
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { BuildConfig } from './lib/config-manager';
 export class WebpackManager {
   static readonly DEFAULT_MODE = 'development';

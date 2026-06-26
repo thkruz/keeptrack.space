@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-import { writeFileSync } from 'fs';
-import { dirname, join, resolve, sep } from 'path';
-import { fileURLToPath } from 'url';
+import { writeFileSync } from 'node:fs';
+import { dirname, join, resolve, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // Verify current directory is scripts
 const __filename = fileURLToPath(import.meta.url);

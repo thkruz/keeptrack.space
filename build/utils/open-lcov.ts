@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import { openFile } from './open-file';
 
 const __dirname = path.resolve(path.dirname(''));

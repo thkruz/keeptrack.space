@@ -1,7 +1,7 @@
 /* eslint-disable no-process-env */
 // src/scripts/utils/configManager.ts
 import dotenv from 'dotenv';
-import { existsSync } from 'fs';
+import { existsSync } from 'node:fs';
 import { BuildError, ConsoleStyles, ErrorCodes, logWithStyle } from './build-error';
 import { ProfileLoader } from './profile-loader';
 

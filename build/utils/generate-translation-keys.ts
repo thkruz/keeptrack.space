@@ -5,8 +5,8 @@
  * You can run this script with Node.js whenever your translations change
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { ConsoleStyles, logWithStyle } from '../lib/build-error';
 
 // Function to generate TypeScript code for the Keys object

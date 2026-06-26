@@ -13,8 +13,8 @@
  * producing much cleaner orbit paths with zero noise artifacts.
  */
 
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import { GeoVector, Body, KM_PER_AU } from 'astronomy-engine';
 
 // ---------- Types ----------
@@ -353,7 +353,7 @@ async function parseHorizonsFile(filePath: string): Promise<HorizonsSVData[]> {
       continue;
     }
 
-    const jd = parseFloat(jdMatch.groups.jd);
+    const jd = Number.parseFloat(jdMatch.groups.jd);
     const posixMs = (jd - 2440587.5) * 86400000;
     const [x, y, z] = posLine.split(/\s+/u).map(Number);
 

@@ -1,4 +1,4 @@
-import { copyFileSync, existsSync } from 'fs';
+import { copyFileSync, existsSync } from 'node:fs';
 
 // read the 1st argument from the command line
 const env = process.argv[2] ?? 'app';

@@ -117,6 +117,97 @@ function extractHtmlTags(text: string): string[] {
 
 // ─── Phase 1: Deterministic checks ──────────────────────────────────────────
 
+/** 1. Placeholder consistency */
+function checkPlaceholders(key: string, enVal: string, langVal: string, lang: string): Issue | null {
+  const enPlaceholders = extractPlaceholders(enVal);
+  const langPlaceholders = extractPlaceholders(langVal);
+
+  if (enPlaceholders.length > 0 && JSON.stringify(enPlaceholders) !== JSON.stringify(langPlaceholders)) {
+    return {
+      key, category: 'placeholder',
+      enValue: enVal, langValue: langVal,
+      reason: `Placeholders mismatch: en=${enPlaceholders.join(',')} ${lang}=${langPlaceholders.join(',')}`,
+    };
+  }
+
+  return null;
+}
+
+/** 2. HTML tag consistency */
+function checkHtmlTags(key: string, enVal: string, langVal: string, lang: string): Issue | null {
+  const enTags = extractHtmlTags(enVal);
+  const langTags = extractHtmlTags(langVal);
+
+  if (enTags.length > 0 && JSON.stringify(enTags) !== JSON.stringify(langTags)) {
+    return {
+      key, category: 'html-tags',
+      enValue: enVal.substring(0, 80), langValue: langVal.substring(0, 80),
+      reason: `HTML tags differ: en has ${enTags.length} tags, ${lang} has ${langTags.length}`,
+    };
+  }
+
+  return null;
+}
+
+/** 3. Empty translations */
+function checkEmpty(key: string, enVal: string, langVal: string): Issue | null {
+  if (enVal.trim().length >= 4 && langVal.trim().length === 0) {
+    return {
+      key, category: 'empty',
+      enValue: enVal, langValue: '(empty)',
+      reason: 'Translation is empty',
+    };
+  }
+
+  return null;
+}
+
+/** 4. Untranslated strings (identical to English) */
+function checkUntranslated(key: string, enVal: string, langVal: string): Issue | null {
+  if (enVal.length > 10 && enVal === langVal && !key.startsWith('countries.') && !PROPER_NOUN_KEYS.has(key) && !(/^[A-Z0-9\-_.:/]+$/u).test(enVal)) {
+    return {
+      key, category: 'untranslated',
+      enValue: enVal.substring(0, 80), langValue: langVal.substring(0, 80),
+      reason: 'Identical to English (possibly untranslated)',
+    };
+  }
+
+  return null;
+}
+
+/** 5. Suspiciously short */
+function checkTooShort(key: string, enVal: string, langVal: string, lang: string): Issue | null {
+  if (enVal.length < 20 || key.startsWith('countries.')) {
+    return null;
+  }
+
+  const minRatio = CJK_LANGUAGES.has(lang) ? 0.15 : 0.25;
+  const ratio = langVal.length / enVal.length;
+
+  if (ratio < minRatio && langVal.trim().length > 0) {
+    return {
+      key, category: 'too-short',
+      enValue: enVal.substring(0, 80), langValue: langVal,
+      reason: `Only ${(ratio * 100).toFixed(0)}% of English length`,
+    };
+  }
+
+  return null;
+}
+
+/** Run all per-key deterministic checks and collect the issues that fire. */
+function checkKey(key: string, enVal: string, langVal: string, lang: string): Issue[] {
+  const candidates = [
+    checkPlaceholders(key, enVal, langVal, lang),
+    checkHtmlTags(key, enVal, langVal, lang),
+    checkEmpty(key, enVal, langVal),
+    checkUntranslated(key, enVal, langVal),
+    checkTooShort(key, enVal, langVal, lang),
+  ];
+
+  return candidates.filter((issue): issue is Issue => issue !== null);
+}
+
 function runDeterministicChecks(enMap: Map<string, string>, langMap: Map<string, string>, lang: string): Issue[] {
   const issues: Issue[] = [];
 
@@ -133,62 +224,7 @@ function runDeterministicChecks(enMap: Map<string, string>, langMap: Map<string,
       continue;
     }
 
-    // 1. Placeholder consistency
-    const enPlaceholders = extractPlaceholders(enVal);
-    const langPlaceholders = extractPlaceholders(langVal);
-
-    if (enPlaceholders.length > 0 && JSON.stringify(enPlaceholders) !== JSON.stringify(langPlaceholders)) {
-      issues.push({
-        key, category: 'placeholder',
-        enValue: enVal, langValue: langVal,
-        reason: `Placeholders mismatch: en=${enPlaceholders.join(',')} ${lang}=${langPlaceholders.join(',')}`,
-      });
-    }
-
-    // 2. HTML tag consistency
-    const enTags = extractHtmlTags(enVal);
-    const langTags = extractHtmlTags(langVal);
-
-    if (enTags.length > 0 && JSON.stringify(enTags) !== JSON.stringify(langTags)) {
-      issues.push({
-        key, category: 'html-tags',
-        enValue: enVal.substring(0, 80), langValue: langVal.substring(0, 80),
-        reason: `HTML tags differ: en has ${enTags.length} tags, ${lang} has ${langTags.length}`,
-      });
-    }
-
-    // 3. Empty translations
-    if (enVal.trim().length >= 4 && langVal.trim().length === 0) {
-      issues.push({
-        key, category: 'empty',
-        enValue: enVal, langValue: '(empty)',
-        reason: 'Translation is empty',
-      });
-    }
-
-    // 4. Untranslated strings (identical to English)
-    if (enVal.length > 10 && enVal === langVal && !key.startsWith('countries.') && !PROPER_NOUN_KEYS.has(key) && !(/^[A-Z0-9\-_.:/]+$/u).test(enVal)) {
-      issues.push({
-        key, category: 'untranslated',
-        enValue: enVal.substring(0, 80), langValue: langVal.substring(0, 80),
-        reason: 'Identical to English (possibly untranslated)',
-      });
-    }
-
-    // 5. Suspiciously short
-    if (enVal.length >= 20 && !key.startsWith('countries.')) {
-      const isCjk = CJK_LANGUAGES.has(lang);
-      const minRatio = isCjk ? 0.15 : 0.25;
-      const ratio = langVal.length / enVal.length;
-
-      if (ratio < minRatio && langVal.trim().length > 0) {
-        issues.push({
-          key, category: 'too-short',
-          enValue: enVal.substring(0, 80), langValue: langVal,
-          reason: `Only ${(ratio * 100).toFixed(0)}% of English length`,
-        });
-      }
-    }
+    issues.push(...checkKey(key, enVal, langVal, lang));
   }
 
   return issues;
@@ -252,15 +288,8 @@ Do NOT flag minor stylistic differences. Do NOT flag technical terms kept in Eng
 ${entries}`;
 }
 
-async function runLlmReview(
-  enMap: Map<string, string>,
-  langMap: Map<string, string>,
-  lang: string,
-  batchSize: number,
-): Promise<Issue[]> {
-  const issues: Issue[] = [];
-
-  // Build batches of [key, enValue, langValue]
+/** Build review entries of [key, enValue, langValue], skipping untranslatable rows. */
+function buildLlmEntries(enMap: Map<string, string>, langMap: Map<string, string>): [string, string, string][] {
   const entries: [string, string, string][] = [];
 
   for (const [key, enVal] of enMap) {
@@ -276,6 +305,75 @@ async function runLlmReview(
     entries.push([key, enVal, langVal]);
   }
 
+  return entries;
+}
+
+/** Parse one Ollama response into llm-quality issues. */
+function parseLlmResponse(response: string, enMap: Map<string, string>, langMap: Map<string, string>): Issue[] {
+  if (response.includes('ALL_OK')) {
+    return [];
+  }
+
+  const lines = response.split('\n').filter((l) => l.startsWith('ISSUE:'));
+  const issues: Issue[] = [];
+
+  for (const line of lines) {
+    const match = (/^ISSUE:\s*(.+?)\s*\|\s*(.+)$/u).exec(line);
+
+    if (match) {
+      const [, flaggedKey, reason] = match;
+      const enVal = enMap.get(flaggedKey) ?? '';
+      const langVal = langMap.get(flaggedKey) ?? '';
+
+      issues.push({
+        key: flaggedKey, category: 'llm-quality',
+        enValue: enVal.substring(0, 80), langValue: langVal.substring(0, 80),
+        reason,
+      });
+    }
+  }
+
+  return issues;
+}
+
+/** Review a single batch; reports progress and returns any issues found. */
+async function reviewLlmBatch(
+  batch: [string, string, string][],
+  lang: string,
+  enMap: Map<string, string>,
+  langMap: Map<string, string>,
+): Promise<Issue[]> {
+  try {
+    const prompt = buildLlmPrompt(lang, batch);
+    const response = await queryOllama(prompt);
+
+    if (response.includes('ALL_OK')) {
+      process.stdout.write(' OK\n');
+
+      return [];
+    }
+
+    const issues = parseLlmResponse(response, enMap, langMap);
+    const lineCount = response.split('\n').filter((l) => l.startsWith('ISSUE:')).length;
+
+    process.stdout.write(` ${lineCount} issue(s)\n`);
+
+    return issues;
+  } catch (err) {
+    process.stdout.write(` ERROR: ${(err as Error).message}\n`);
+
+    return [];
+  }
+}
+
+async function runLlmReview(
+  enMap: Map<string, string>,
+  langMap: Map<string, string>,
+  lang: string,
+  batchSize: number,
+): Promise<Issue[]> {
+  const issues: Issue[] = [];
+  const entries = buildLlmEntries(enMap, langMap);
   const totalBatches = Math.ceil(entries.length / batchSize);
 
   process.stdout.write(`  LLM review: ${entries.length} entries in ${totalBatches} batches\n`);
@@ -286,36 +384,7 @@ async function runLlmReview(
 
     process.stdout.write(`  Batch ${batchNum}/${totalBatches}...`);
 
-    try {
-      const prompt = buildLlmPrompt(lang, batch);
-      const response = await queryOllama(prompt);
-
-      if (!response.includes('ALL_OK')) {
-        const lines = response.split('\n').filter((l) => l.startsWith('ISSUE:'));
-
-        for (const line of lines) {
-          const match = (/^ISSUE:\s*(.+?)\s*\|\s*(.+)$/u).exec(line);
-
-          if (match) {
-            const [, flaggedKey, reason] = match;
-            const enVal = enMap.get(flaggedKey) ?? '';
-            const langVal = langMap.get(flaggedKey) ?? '';
-
-            issues.push({
-              key: flaggedKey, category: 'llm-quality',
-              enValue: enVal.substring(0, 80), langValue: langVal.substring(0, 80),
-              reason,
-            });
-          }
-        }
-
-        process.stdout.write(` ${lines.length} issue(s)\n`);
-      } else {
-        process.stdout.write(' OK\n');
-      }
-    } catch (err) {
-      process.stdout.write(` ERROR: ${(err as Error).message}\n`);
-    }
+    issues.push(...await reviewLlmBatch(batch, lang, enMap, langMap));
 
     // Pause between batches
     if (i + batchSize < entries.length) {
@@ -330,12 +399,10 @@ async function runLlmReview(
 
 // ─── Phase 3: Report ─────────────────────────────────────────────────────────
 
-function printReport(allIssues: Map<string, Issue[]>): void {
-  process.stdout.write('\n# Locale Quality Report\n\n');
+const REPORT_CATEGORIES = ['missing-key', 'placeholder', 'html-tags', 'empty', 'untranslated', 'too-short', 'llm-quality'];
 
-  // Summary table
-  const categories = ['missing-key', 'placeholder', 'html-tags', 'empty', 'untranslated', 'too-short', 'llm-quality'];
-
+/** Print the summary table header and separator rows. */
+function printSummaryHeader(categories: string[]): void {
   process.stdout.write('| Language |');
   for (const cat of categories) {
     process.stdout.write(` ${cat} |`);
@@ -347,23 +414,46 @@ function printReport(allIssues: Map<string, Issue[]>): void {
     process.stdout.write('--------|');
   }
   process.stdout.write('-------|\n');
+}
+
+/** Print one language's per-category summary row. */
+function printSummaryRow(lang: string, issues: Issue[], categories: string[]): void {
+  const counts = new Map<string, number>();
+
+  for (const issue of issues) {
+    counts.set(issue.category, (counts.get(issue.category) ?? 0) + 1);
+  }
+
+  process.stdout.write(`| ${lang} |`);
+  for (const cat of categories) {
+    const count = counts.get(cat) ?? 0;
+
+    process.stdout.write(` ${count > 0 ? `**${count}**` : '0'} |`);
+  }
+  process.stdout.write(` ${issues.length} |\n`);
+}
+
+/** Print the detailed issue list for one language. */
+function printLangDetails(lang: string, issues: Issue[]): void {
+  process.stdout.write(`### ${lang} (${issues.length} issues)\n\n`);
+  for (const issue of issues) {
+    process.stdout.write(`- **[${issue.category}]** \`${issue.key}\`\n`);
+    process.stdout.write(`  EN: ${issue.enValue}\n`);
+    process.stdout.write(`  ${lang.toUpperCase()}: ${issue.langValue}\n`);
+    process.stdout.write(`  Reason: ${issue.reason}\n\n`);
+  }
+}
+
+function printReport(allIssues: Map<string, Issue[]>): void {
+  process.stdout.write('\n# Locale Quality Report\n\n');
+
+  // Summary table
+  printSummaryHeader(REPORT_CATEGORIES);
 
   let totalIssues = 0;
 
   for (const [lang, issues] of allIssues) {
-    const counts = new Map<string, number>();
-
-    for (const issue of issues) {
-      counts.set(issue.category, (counts.get(issue.category) ?? 0) + 1);
-    }
-
-    process.stdout.write(`| ${lang} |`);
-    for (const cat of categories) {
-      const count = counts.get(cat) ?? 0;
-
-      process.stdout.write(` ${count > 0 ? `**${count}**` : '0'} |`);
-    }
-    process.stdout.write(` ${issues.length} |\n`);
+    printSummaryRow(lang, issues, REPORT_CATEGORIES);
     totalIssues += issues.length;
   }
 
@@ -377,13 +467,7 @@ function printReport(allIssues: Map<string, Issue[]>): void {
       if (issues.length === 0) {
         continue;
       }
-      process.stdout.write(`### ${lang} (${issues.length} issues)\n\n`);
-      for (const issue of issues) {
-        process.stdout.write(`- **[${issue.category}]** \`${issue.key}\`\n`);
-        process.stdout.write(`  EN: ${issue.enValue}\n`);
-        process.stdout.write(`  ${lang.toUpperCase()}: ${issue.langValue}\n`);
-        process.stdout.write(`  Reason: ${issue.reason}\n\n`);
-      }
+      printLangDetails(lang, issues);
     }
   }
 }

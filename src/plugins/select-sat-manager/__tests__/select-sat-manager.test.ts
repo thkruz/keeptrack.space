@@ -87,7 +87,7 @@ describe('SelectSatManager_dots', () => {
     ServiceLocator.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
     ServiceLocator.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
     ServiceLocator.getCatalogManager().objectCache = [defaultSensor as DetailedSensor];
-    selectSatManager.selectSat(0);
+    expect(() => selectSatManager.selectSat(0)).not.toThrow();
   });
 });
 describe('SelectSatManager_class', () => {

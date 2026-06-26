@@ -80,7 +80,7 @@ describe('Lat2LonPlots.getPlotData', () => {
 
     const data = Lat2LonPlots.getPlotData();
 
-    expect(Object.keys(data).sort()).toEqual(['China', 'France', 'India', 'Japan', 'Other', 'Russia']);
+    expect(Object.keys(data).sort((a, b) => a.localeCompare(b))).toEqual(['China', 'France', 'India', 'Japan', 'Other', 'Russia']);
   });
 });
 

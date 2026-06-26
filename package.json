@@ -1,6 +1,6 @@
 {
   "name": "keeptrack.space",
-  "version": "12.5.0",
+  "version": "13.0.0",
   "type": "module",
   "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
   "author": "Theodore Kruczek",
@@ -72,6 +72,7 @@
     "test:watch": "vitest",
     "test:watchCoverage": "vitest --coverage",
     "prepublishOnly": "npm run build:lib",
+    "version": "npx tsx ./build/update-version-references.ts && git add README.md CITATION.cff",
     "version:major": "npm version major && npm run changelog",
     "version:minor": "npm version minor && npm run changelog",
     "version:patch": "npm version patch && npm run changelog",

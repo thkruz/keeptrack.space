@@ -1,11 +1,29 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import { writeFileSync } from 'fs';
-import { dirname } from 'path';
+import { dirname, join, resolve, sep } from 'path';
 import { fileURLToPath } from 'url';
 
 // Verify current directory is scripts
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+const TEST_DIR = join(__dirname, '..', 'test');
+
+/**
+ * Resolve the destination test file and ensure it stays inside TEST_DIR. The
+ * file name comes from a CLI argument / stdin, so a value containing `..` or an
+ * absolute path could otherwise escape the project directory. Throws on escape.
+ */
+const safeTestPath = (name: string): string => {
+  const baseResolved = resolve(TEST_DIR);
+  const target = resolve(baseResolved, `${name}.test.ts`);
+
+  if (!target.startsWith(baseResolved + sep)) {
+    throw new Error(`Refusing to write test file outside ${baseResolved}: ${name}`);
+  }
+
+  return target;
+};
 
 // Get first argument from command line
 const fileName = process.argv[2];
@@ -27,7 +45,7 @@ if (!fileName) {
     const fileName: string = input.toString().trim();
 
     // Create an empty .test.ts file
-    writeFileSync(`${__dirname}/../test/${fileName}.test.ts`, '');
+    writeFileSync(safeTestPath(fileName), '');
 
     // Exit process
     // eslint-disable-next-line no-process-exit
@@ -36,5 +54,5 @@ if (!fileName) {
 } else {
 
   // Create an empty .test.ts file
-  writeFileSync(`${__dirname}/../test/${fileName}.test.ts`, '');
+  writeFileSync(safeTestPath(fileName), '');
 }

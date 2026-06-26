@@ -12,5 +12,9 @@ describe('ScenarioManagementPlugin', () => {
     vi.restoreAllMocks();
   });
 
+  it('constructs without throwing', () => {
+    expect(() => new ScenarioManagementPlugin()).not.toThrow();
+  });
+
   standardPluginSuite(ScenarioManagementPlugin, 'ScenarioManagementPlugin');
 });

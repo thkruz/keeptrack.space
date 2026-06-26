@@ -8,5 +8,9 @@ describe('EcfPlot_class', () => {
     setupStandardEnvironment([SelectSatManager]);
   });
 
+  it('constructs without throwing', () => {
+    expect(() => new EcfPlot()).not.toThrow();
+  });
+
   standardPluginSmokeSuite(EcfPlot, 'EcfPlot');
 });

@@ -8,5 +8,9 @@ describe('EciPlot_class', () => {
     setupStandardEnvironment([SelectSatManager]);
   });
 
+  it('constructs without throwing', () => {
+    expect(() => new EciPlot()).not.toThrow();
+  });
+
   standardPluginSmokeSuite(EciPlot, 'EciPlot');
 });

@@ -8,5 +8,9 @@ describe('Lat2LonPlots_class', () => {
     setupStandardEnvironment([SelectSatManager]);
   });
 
+  it('constructs without throwing', () => {
+    expect(() => new Lat2LonPlots()).not.toThrow();
+  });
+
   standardPluginSmokeSuite(Lat2LonPlots, 'Lat2LonPlots');
 });

@@ -58,7 +58,7 @@ export class SoundManager {
     // Find the maxClickClip_
     Object.keys(sounds).forEach((key) => {
       if (key.startsWith('click')) {
-        const clipNumber = parseInt(key.replace('click', ''));
+        const clipNumber = Number.parseInt(key.replace('click', ''));
 
         if (clipNumber > this.maxClickClip_) {
           this.maxClickClip_ = clipNumber;
@@ -255,7 +255,7 @@ export class SoundManager {
       this.voices = speechSynthesis.getVoices();
     }
 
-    msg.voice = this.voices.filter((voice) => voice.name === 'Google UK English Female')[0];
+    msg.voice = this.voices.find((voice) => voice.name === 'Google UK English Female') ?? null;
 
     window.speechSynthesis.speak(msg);
   }

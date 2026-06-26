@@ -50,7 +50,7 @@ export const enum MissionCategory {
 // Bit flags for special object properties (packed into nameFlags)
 export const enum ObjFlags {
   NONE = 0,
-  IS_PLANET = 1 << 0,
+  IS_PLANET = 1,
   IS_OEM = 1 << 1,
   IS_STARLINK = 1 << 2,
   IS_STAR = 1 << 3,

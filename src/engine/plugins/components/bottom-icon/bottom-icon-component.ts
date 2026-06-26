@@ -190,7 +190,7 @@ export class BottomIconComponent {
     const button = document.createElement('div');
 
     button.id = this.config.elementName;
-    button.setAttribute('data-order', this.config.order.toString());
+    button.dataset.order = this.config.order.toString();
     button.classList.add(CSS_CLASSES.ITEM);
 
     if (this.config.isDisabledOnLoad) {

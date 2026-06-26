@@ -142,19 +142,19 @@ describe('calcSatrec', () => {
   // should process exportTle2Csv
   it('process_export_tle_csv', () => {
     catalogManagerInstance.objectCache = [];
-    CatalogExporter.exportTle2Csv(catalogManagerInstance.objectCache as BaseObject[]);
+    expect(() => CatalogExporter.exportTle2Csv(catalogManagerInstance.objectCache as BaseObject[])).not.toThrow();
 
     catalogManagerInstance.objectCache = [defaultSat];
-    CatalogExporter.exportTle2Csv(catalogManagerInstance.objectCache as BaseObject[]);
+    expect(() => CatalogExporter.exportTle2Csv(catalogManagerInstance.objectCache as BaseObject[])).not.toThrow();
   });
 
   // should process exportTle2Txt
   it('process_export_tle_txt', () => {
     catalogManagerInstance.objectCache = [];
-    CatalogExporter.exportTle2Txt(catalogManagerInstance.objectCache as BaseObject[]);
+    expect(() => CatalogExporter.exportTle2Txt(catalogManagerInstance.objectCache as BaseObject[])).not.toThrow();
 
     catalogManagerInstance.objectCache = [defaultSat];
-    CatalogExporter.exportTle2Txt(catalogManagerInstance.objectCache as BaseObject[]);
+    expect(() => CatalogExporter.exportTle2Txt(catalogManagerInstance.objectCache as BaseObject[])).not.toThrow();
   });
 
   // should process getIdFromIntlDes

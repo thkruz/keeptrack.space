@@ -39,8 +39,11 @@ const resolveWithin = (base: string, target: string): string => {
   const baseResolved = path.resolve(base);
   const resolved = path.resolve(baseResolved, target);
 
-  if (resolved !== baseResolved && !resolved.startsWith(baseResolved + path.sep)) {
-    throw new Error(`Refusing to access path outside ${baseResolved}: ${target}`);
+  // Require a STRICT subpath: rejects `..` traversal AND the base dir itself
+  // (e.g. an empty/"." target), so callers can't write into or escape the
+  // project root, only into a subfolder/file under it.
+  if (!resolved.startsWith(baseResolved + path.sep)) {
+    throw new Error(`Refusing to access path outside ${baseResolved} (must be a subpath): ${target}`);
   }
 
   return resolved;

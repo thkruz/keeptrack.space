@@ -161,7 +161,7 @@ export abstract class ColorScheme {
     orbitDensityMax?: number,
     orbitalPlaneDensity?: number[][],
     orbitalPlaneDensityMax?: number,
-  } | null | void {
+  } | null {
     return null;
   }
 

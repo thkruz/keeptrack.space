@@ -85,7 +85,7 @@ export class VisualMagnitudeColorScheme extends ColorScheme {
     };
   }
 
-  override calculateParams(): void {
+  override calculateParams() { // NOSONAR: S3516 - returns null by design; results are stored in this.thresholds_ and the manager treats null as "no params"
     const catalog = ServiceLocator.getCatalogManager();
     const sats = catalog?.getSats() ?? [];
     const mags: number[] = [];
@@ -102,7 +102,7 @@ export class VisualMagnitudeColorScheme extends ColorScheme {
     // fewer points the previous thresholds remain in effect — better than
     // collapsing every object into one band.
     if (mags.length < VisualMagnitudeColorScheme.BUCKET_SLUGS.length) {
-      return;
+      return null;
     }
 
     mags.sort((a, b) => a - b);
@@ -143,6 +143,8 @@ export class VisualMagnitudeColorScheme extends ColorScheme {
     }
 
     this.thresholds_ = thresholds;
+
+    return null;
   }
 
   update(obj: BaseObject): ColorInformation {

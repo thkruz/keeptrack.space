@@ -95,7 +95,7 @@ export class RcsColorScheme extends ColorScheme {
     };
   }
 
-  override calculateParams(): void {
+  override calculateParams() { // NOSONAR: S3516 - returns null by design; results are stored in this.thresholds_ and the manager treats null as "no params"
     const catalog = ServiceLocator.getCatalogManager();
     const sats = catalog?.getSats() ?? [];
 
@@ -112,7 +112,7 @@ export class RcsColorScheme extends ColorScheme {
     }
 
     if (rcsValues.length < RcsColorScheme.BUCKET_SLUGS.length) {
-      return;
+      return null;
     }
 
     rcsValues.sort((a, b) => a - b);
@@ -155,6 +155,8 @@ export class RcsColorScheme extends ColorScheme {
     }
 
     this.thresholds_ = thresholds;
+
+    return null;
   }
 
   update(obj: BaseObject): ColorInformation {

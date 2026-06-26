@@ -279,7 +279,7 @@ describe('VisualMagnitudeColorScheme', () => {
     it('exposes a non-empty layersHtml with the eight expected swatches', () => {
       const slugs = ColorSchemeTestUtils.extractLegendSlugs(VisualMagnitudeColorScheme.layersHtml);
 
-      expect(slugs.sort()).toEqual(
+      expect(slugs.sort((a, b) => a.localeCompare(b))).toEqual(
         ['vmagBright', 'vmagBright2', 'vmagDim1', 'vmagDim2', 'vmagFaint', 'vmagMed1', 'vmagMed2', 'vmagUnknown'],
       );
     });

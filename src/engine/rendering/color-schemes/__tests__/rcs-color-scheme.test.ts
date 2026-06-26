@@ -261,7 +261,7 @@ describe('RcsColorScheme', () => {
     it('exposes layersHtml with the eight expected swatches', () => {
       const slugs = ColorSchemeTestUtils.extractLegendSlugs(RcsColorScheme.layersHtml);
 
-      expect(slugs.sort()).toEqual(
+      expect(slugs.sort((a, b) => a.localeCompare(b))).toEqual(
         ['rcsLarge', 'rcsMed', 'rcsSmall', 'rcsUnknown', 'rcsXLarge', 'rcsXSmall', 'rcsXXSmall', 'rcsXXXSmall'],
       );
     });

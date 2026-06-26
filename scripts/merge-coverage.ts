@@ -43,6 +43,50 @@ const emptyFile = (): FileCov => ({
   fnName: new Map(), fnHits: new Map(), lines: new Map(), branches: new Map(),
 });
 
+const handleFN = (cur: FileCov, rest: string): void => {
+  const [lineNo, ...nameParts] = rest.split(',');
+  const name = nameParts.join(',');
+
+  cur.fnName.set(name, Number(lineNo));
+  if (!cur.fnHits.has(name)) {
+    cur.fnHits.set(name, 0);
+  }
+};
+
+const handleFNDA = (cur: FileCov, rest: string): void => {
+  const [hits, ...nameParts] = rest.split(',');
+  const name = nameParts.join(',');
+
+  cur.fnHits.set(name, (cur.fnHits.get(name) ?? 0) + Number(hits));
+};
+
+const handleDA = (cur: FileCov, rest: string): void => {
+  const [lineNo, hits] = rest.split(',');
+
+  cur.lines.set(Number(lineNo), (cur.lines.get(Number(lineNo)) ?? 0) + Number(hits));
+};
+
+const handleBRDA = (cur: FileCov, rest: string): void => {
+  const [lineNo, block, branch, taken] = rest.split(',');
+  const key = `${lineNo},${block},${branch}`;
+  const add = taken === '-' ? 0 : Number(taken);
+
+  cur.branches.set(key, (cur.branches.get(key) ?? 0) + add);
+};
+
+// Apply a non-SF data line to the current file record. Returns nothing; mutates `cur`.
+const handleDataLine = (cur: FileCov, line: string): void => {
+  if (line.startsWith('FN:')) {
+    handleFN(cur, line.slice(3));
+  } else if (line.startsWith('FNDA:')) {
+    handleFNDA(cur, line.slice(5));
+  } else if (line.startsWith('DA:')) {
+    handleDA(cur, line.slice(3));
+  } else if (line.startsWith('BRDA:')) {
+    handleBRDA(cur, line.slice(5));
+  }
+};
+
 const parseLcov = (text: string, into: Map<string, FileCov>): void => {
   let cur: FileCov | null = null;
 
@@ -56,31 +100,8 @@ const parseLcov = (text: string, into: Map<string, FileCov>): void => {
       }
       cur = into.get(key) ?? emptyFile();
       into.set(key, cur);
-    } else if (!cur) {
-      continue;
-    } else if (line.startsWith('FN:')) {
-      const [lineNo, ...nameParts] = line.slice(3).split(',');
-      const name = nameParts.join(',');
-
-      cur.fnName.set(name, Number(lineNo));
-      if (!cur.fnHits.has(name)) {
-        cur.fnHits.set(name, 0);
-      }
-    } else if (line.startsWith('FNDA:')) {
-      const [hits, ...nameParts] = line.slice(5).split(',');
-      const name = nameParts.join(',');
-
-      cur.fnHits.set(name, (cur.fnHits.get(name) ?? 0) + Number(hits));
-    } else if (line.startsWith('DA:')) {
-      const [lineNo, hits] = line.slice(3).split(',');
-
-      cur.lines.set(Number(lineNo), (cur.lines.get(Number(lineNo)) ?? 0) + Number(hits));
-    } else if (line.startsWith('BRDA:')) {
-      const [lineNo, block, branch, taken] = line.slice(5).split(',');
-      const key = `${lineNo},${block},${branch}`;
-      const add = taken === '-' ? 0 : Number(taken);
-
-      cur.branches.set(key, (cur.branches.get(key) ?? 0) + add);
+    } else if (cur !== null) {
+      handleDataLine(cur, line);
     }
   }
 };

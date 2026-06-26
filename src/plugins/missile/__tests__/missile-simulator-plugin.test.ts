@@ -7,5 +7,9 @@ describe('MissileSimulatorPlugin_class', () => {
     setupStandardEnvironment();
   });
 
+  it('constructs without throwing', () => {
+    expect(() => new MissileSimulatorPlugin()).not.toThrow();
+  });
+
   standardPluginSmokeSuite(MissileSimulatorPlugin, 'MissileSimulatorPlugin');
 });

@@ -14,6 +14,10 @@ describe('TheSpaceDevLaunchCalendarPlugin', () => {
     vi.restoreAllMocks();
   });
 
+  it('constructs without throwing', () => {
+    expect(() => new TheSpaceDevLaunchCalendarPlugin()).not.toThrow();
+  });
+
   standardPluginSuite(TheSpaceDevLaunchCalendarPlugin, 'TheSpaceDevLaunchCalendarPlugin');
   standardPluginMenuButtonTests(TheSpaceDevLaunchCalendarPlugin, 'TheSpaceDevLaunchCalendarPlugin');
   standardClickTests(TheSpaceDevLaunchCalendarPlugin);

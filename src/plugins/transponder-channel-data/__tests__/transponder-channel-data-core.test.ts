@@ -23,8 +23,8 @@ const makeEntry = (over: Partial<ChannelInfo> = {}): ChannelInfo => ({
 describe('transponder-channel-data-core', () => {
   describe('CHANNEL_COLUMNS', () => {
     it('covers every ChannelInfo field exactly once', () => {
-      const keys = CHANNEL_COLUMNS.map((c) => c.key).sort();
-      const expected = Object.keys(makeEntry()).sort();
+      const keys = CHANNEL_COLUMNS.map((c) => c.key).sort((a, b) => a.localeCompare(b));
+      const expected = Object.keys(makeEntry()).sort((a, b) => a.localeCompare(b));
 
       expect(keys).toEqual(expected);
     });

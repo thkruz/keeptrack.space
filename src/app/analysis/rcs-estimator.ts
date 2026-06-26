@@ -108,7 +108,7 @@ export const EMPTY_CATALOG_RCS_STATS: CatalogRcsStats = {
   sampleSize: 0,
 };
 
-const isUsableRcs = (rcs: unknown): rcs is number => typeof rcs === 'number' && isFinite(rcs) && rcs > 0;
+const isUsableRcs = (rcs: unknown): rcs is number => typeof rcs === 'number' && Number.isFinite(rcs) && rcs > 0;
 
 /**
  * "STARLINK-1234" → "STARLINK", "ISS (ZARYA)" → "ISS", "COSMOS 2543" → "COSMOS".
@@ -232,9 +232,9 @@ export const mineRcsFromCatalog = (sat: Satellite, stats: CatalogRcsStats): numb
 };
 
 export const estimateRcsFromGeometry = (sat: Satellite): number | null => {
-  const length = parseFloat(sat.length);
-  const diameter = parseFloat(sat.diameter);
-  const span = parseFloat(sat.span);
+  const length = Number.parseFloat(sat.length);
+  const diameter = Number.parseFloat(sat.diameter);
+  const span = Number.parseFloat(sat.span);
 
   if (!(length > 0) || !(diameter > 0) || !(span > 0)) {
     return null;
@@ -270,7 +270,7 @@ const LAMBERT_SPHERE_FACTOR = 2 / (3 * Math.PI);
 export const estimateRcsFromVmag = (sat: Satellite): number | null => {
   const vmag = estimateStdMag(sat);
 
-  if (vmag === null || !isFinite(vmag)) {
+  if (vmag === null || !Number.isFinite(vmag)) {
     return null;
   }
 
@@ -281,7 +281,7 @@ export const estimateRcsFromVmag = (sat: Satellite): number | null => {
   const logExp = (SUN_APPARENT_MAGNITUDE + 5 * Math.log10(STD_REFERENCE_DISTANCE_M) - vmag) / 2.5;
   const area = (10 ** logExp) / (LAMBERT_SPHERE_FACTOR * DEFAULT_ALBEDO);
 
-  if (!isFinite(area) || area <= 0) {
+  if (!Number.isFinite(area) || area <= 0) {
     return null;
   }
 

@@ -84,7 +84,7 @@ export abstract class SatMath {
    */
   static mag2db(magnitude: number) {
     if (magnitude <= 0) {
-      return NaN; // KeepTrack returns NaN instead of throwing
+      return Number.NaN; // KeepTrack returns NaN instead of throwing
     }
 
     return ootkMag2db(magnitude);
@@ -259,7 +259,7 @@ export abstract class SatMath {
     );
 
     // The object is likely eclipsing the sun
-    if (isNaN(phaseAngle)) {
+    if (Number.isNaN(phaseAngle)) {
       return 30;
     }
 
@@ -268,7 +268,7 @@ export abstract class SatMath {
      *  DEBUG:
      *  if (!sat.vmag) console.debug('No standard magnitude in the database defaulting to 8');
      */
-    const intrinsicMagnitude = (typeof intrinsicMagOverride === 'number' && !isNaN(intrinsicMagOverride))
+    const intrinsicMagnitude = (typeof intrinsicMagOverride === 'number' && !Number.isNaN(intrinsicMagOverride))
       ? intrinsicMagOverride
       : (sat.vmag || 8);
 
@@ -396,7 +396,7 @@ export abstract class SatMath {
         alt = Math.sqrt(positionEci.x ** 2 + positionEci.y ** 2 + positionEci.z ** 2) - radius;
       }
 
-      if (isNaN(alt)) {
+      if (Number.isNaN(alt)) {
         return <Kilometers>0;
       }
     } catch {
@@ -516,7 +516,7 @@ export abstract class SatMath {
 
     // Check if positions are identical
     if (pos1.x === pos2.x && pos1.y === pos2.y && pos1.z === pos2.z) {
-      return NaN;
+      return Number.NaN;
     }
     // Sanity checks
     if (typeof pos1 === 'undefined') {
@@ -837,10 +837,10 @@ export abstract class SatMath {
   static sunAngle(hoverSat: BaseObject, secondaryObj?: DetailedSensor | Satellite): Degrees {
     // Validate Objects
     if (!secondaryObj || !hoverSat) {
-      return NaN as Degrees;
+      return Number.NaN as Degrees;
     }
     if (secondaryObj.type === SpaceObjectType.STAR || hoverSat.type === SpaceObjectType.STAR) {
-      return NaN as Degrees;
+      return Number.NaN as Degrees;
     }
 
     // Calculate Sun Angle
@@ -872,7 +872,7 @@ export abstract class SatMath {
     const mag2 = Math.hypot(s2earthX, s2earthY, s2earthZ);
 
     if (mag1 === 0 || mag2 === 0) {
-      return NaN;
+      return Number.NaN;
     }
 
     const dot = s2sunX * s2earthX + s2sunY * s2earthY + s2sunZ * s2earthZ;

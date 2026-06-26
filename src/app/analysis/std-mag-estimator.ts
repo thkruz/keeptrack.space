@@ -150,14 +150,14 @@ export const KNOWN_OBJECT_MAGNITUDES: readonly KnownObjectEntry[] = [
  */
 const parseLeadingNumber = (raw: string | number | null | undefined): number | null => {
   if (typeof raw === 'number') {
-    return isFinite(raw) && raw > 0 ? raw : null;
+    return Number.isFinite(raw) && raw > 0 ? raw : null;
   }
   if (typeof raw !== 'string' || raw.length === 0) {
     return null;
   }
-  const parsed = parseFloat(raw);
+  const parsed = Number.parseFloat(raw);
 
-  return isFinite(parsed) && parsed > 0 ? parsed : null;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 };
 
 /**

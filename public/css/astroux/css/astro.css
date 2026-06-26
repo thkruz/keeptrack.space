@@ -1195,7 +1195,6 @@ label {
   padding: 0 1rem;
   height: 2.125rem;
   min-width: 2.25rem;
-  /* max-width: 10.125rem; */
   border-radius: 3px;
   border-radius: var(--buttonBorderRadius);
   color: var(--buttonTextColor);
@@ -1317,7 +1316,6 @@ label {
   height: 1.75rem;
   width: 1.75rem;
   margin-left: -0.8rem;
-  /* margin: -0.65rem 0.25rem -0.3rem calc((1.5rem - 0.625rem) * -1); */
 }
 
 .rux-button__icon .rux-icon {
@@ -1644,11 +1642,6 @@ label {
 }
 
 /* FOCUS RULES */
-.rux-form-field input:focus,
-.rux-form-field input:invalid:focus {
-  /* outline: none; */
-}
-
 .rux-form-field input:not([type='search']):focus,
 .rux-form-field input:not([type='search']):invalid:focus {
   border: 1px solid var(--inputFocusBorderColor) !important;
@@ -1659,19 +1652,6 @@ label {
   background-color: var(--colorSecondaryLighten3);
 }
 
-/*
-.rux-form-field input:invalid + label::before {
-  content: "";
-  display: block;
-  height: 1rem;
-  width: 1.25rem;
-  margin-right: 0.25rem;
-
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20128%20128%22%3E%0A%20%20%3Cpath%20fill%3D%22%23FF3030%22%20fill-rule%3D%22evenodd%22%20d%3D%22M64.031%205c8.461%200%2068.88%20107.243%2063.648%20114.184-5.232%206.942-120.805%205.477-127.212%200C-5.941%20113.708%2055.57%205%2064.03%205zm3.45%2075.894l1.822-34.893H56.946l1.82%2034.893h8.715zM56.803%2093.108c0%201.929.547%203.423%201.643%204.483%201.095%201.06%202.642%201.589%204.642%201.589%201.953%200%203.477-.542%204.572-1.625%201.095-1.084%201.643-2.566%201.643-4.447%200-1.952-.542-3.452-1.625-4.5-1.084-1.047-2.613-1.571-4.59-1.571-2.047%200-3.607.512-4.678%201.536-1.072%201.023-1.607%202.535-1.607%204.535z%22%2F%3E%0A%3C%2Fsvg%3E");
-  background-repeat: no-repeat;
-  background-size: 1rem;
-  background-position: center center;
-} */
 .rux-form-field__validation-message {
   display: none;
   position: absolute;
@@ -1688,16 +1668,6 @@ label {
   display: block;
 }
 
-/* .rux-form-field
-  input:not([type="search"]):not([type="checkbox"]):not([type="radio"]):optional
-  + label::after {
-  display: block;
-  content: "(optional)";
-  font-size: 0.875rem;
-  margin: 0.1rem auto 0 0.25rem;
-
-  opacity: 0.4;
-} */
 .rux-form-field input:disabled {
   opacity: 0.4;
   opacity: var(--disabledOpacity);
@@ -1868,7 +1838,6 @@ label {
   height: 8px;
   width: 8px;
   border-radius: 100%;
-  /* box-shadow: inset 0 0 1px 0 rgba(255, 255, 255, 0.9); */
   background-color: var(--primary);
 }
 
@@ -2056,7 +2025,6 @@ label {
   position: relative;
   margin: 0 0.75rem;
   line-height: 0;
-  /* width: 6.25rem; */
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -2070,17 +2038,6 @@ label {
   max-width: 6.25rem;
   min-width: 4rem;
   /* fauxicon grid. Usefull for gross alignment */
-  /*  border: 1px solid red;
-
-  background-image: linear-gradient(
-    to right,
-    rgba(255, 0, 0, 0) 0,
-    rgba(255, 0, 0, 0) 49%,
-    rgba(0, 255, 0, 1) 50%,
-    rgba(0, 255, 0, 1) 51%,
-    rgba(0, 255, 0, 0) 52%,
-    rgba(0, 255, 0, 0) 100%
-  ); */
 }
 
 .rux-advanced-status__status-icon {
@@ -2323,9 +2280,6 @@ i.rux-icon {
   justify-content: space-between;
 }
 
-/* ol li:nth-child(even) {
-  background-color: #283f58;
-} */
 .rux-log__filter-enabled {
   position: sticky;
   top: 0;
@@ -2594,10 +2548,6 @@ i.rux-icon {
   z-index: 2;
 }
 
-/* .rux-pop-up li,
-.satcom-pop-up li {
-  border-bottom: 1px solid #f0f1f3;
-} */
 .rux-pop-up a {
   display: block;
   padding: 0.5em;
@@ -2740,7 +2690,6 @@ i.rux-icon {
 
 .rux-progress progress[value] {
   appearance: none;
-  /* background: #21384f; */
   background-color: rgba(0, 0, 0, 0.3);
   background-color: var(--progressDeterminateTrackBackgroundColor, rgba(0, 0, 0, 0.3));
   border: 1px solid #14202c;
@@ -2779,13 +2728,10 @@ i.rux-icon {
 
 .rux-progress progress[value]::-ms-fill {
   border-radius: 10px;
-  /*  var(--progressRadius, 10px);*/
   border: none;
   height: 14px;
-  /* var(--progressHeight), 14px); */
   margin: 2px;
   max-width: calc(100% - 6px);
-  /* var(--progressWidth);*/
   background-color: #4dacff;
   background-color: var(--progressDeterminateBarBackgroundColor, #4dacff);
 }
@@ -2868,7 +2814,6 @@ i.rux-icon {
 .rux-pushbutton {
   display: inline-block;
   height: 1.3125rem;
-  /* width: auto; */
   -webkit-font-smoothing: subpixel-antialiased;
 }
 
@@ -3065,7 +3010,6 @@ input[type='range']:focus {
   display: flex;
   align-items: center;
   max-width: 100%;
-  /* width: 100%; */
   height: 3px;
   height: var(--trackHeight, 2px);
   cursor: pointer;
@@ -3091,7 +3035,6 @@ input[type='range']:focus {
 .rux-range::-moz-range-track {
   display: flex;
   align-items: center;
-  /* width: 100%; */
   height: 3px;
   height: var(--trackHeight);
   cursor: pointer;
@@ -3123,14 +3066,12 @@ input[type='range']:focus {
 .rux-range::-ms-track {
   display: flex;
   align-items: center;
-  /* width: 100%; */
   height: 1.25rem;
   padding: 2px 0;
   cursor: pointer;
   color: transparent;
   background-color: transparent;
   border: none;
-  /* background-color: var(--sliderTrackBackgroundColor); */
   outline: var(--sliderTrackBorderSize) solid transparent;
 }
 
@@ -3309,14 +3250,6 @@ input:-moz-focusring {
   width: 4rem !important;
 }
 
-/*
-  Fake tick marks, sort of works, but label using flex are imprecise
-  .rux-slider__control__labels li::before {
-    position: absolute;
-    content: "|";
-    font-size: 0.5rem;
-    top: -100%;
-  } */
 input[type='range']::-moz-focus-outer {
   border: 0;
 }
@@ -3493,13 +3426,8 @@ input[type='range']::-moz-focus-outer {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  /* outline: 1px solid green; */
 }
 
-/* .rux-tabs li:not(:last-child),
-.satcom-tabs li:not(:last-child) {
-   border-right: 1px solid var(--tabBorderColor, rgb(20, 32, 44));
-} */
 .rux-tabs li::before {
   display: none !important;
 }
@@ -3511,8 +3439,6 @@ input[type='range']::-moz-focus-outer {
   padding: 3px 2rem 0;
   text-decoration: none;
   color: var(--tabTextColor);
-  /* background-color: var(--tabBackgroundColor, rgb(30, 47, 66)); */
-  /* overflow: auto; */
 }
 
 .rux-tabs a[disabled] {
@@ -3572,7 +3498,6 @@ input[type='range']::-moz-focus-outer {
   border-radius: var(--defaultBorderRadius, 0.1875rem);
   border: 1px solid black;
   border: 1px solid var(--toggleBaseBorderColor, black);
-  /* box-shadow: inset 0 0 2px rgba(0, 0, 0, 1); */
   user-select: none;
   overflow: hidden;
 }

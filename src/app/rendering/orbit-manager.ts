@@ -669,7 +669,7 @@ export class OrbitManager {
   }
 
   /** Reusable buffer for ECF first-point correction to avoid per-frame allocation. */
-  private static ecfFirstPoint_ = new Float32Array(4);
+  private static readonly ecfFirstPoint_ = new Float32Array(4);
 
   private writePathToGpu_(id: number) {
     if (id === -1) {

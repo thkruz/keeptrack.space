@@ -141,7 +141,7 @@ export class ModelResolver {
           }
 
           // TODO: Add more debris models
-          const nNum = parseInt(sat.sccNum);
+          const nNum = Number.parseInt(sat.sccNum);
 
           if (nNum <= 20000) {
             return SatelliteModels.debris0;
@@ -185,11 +185,11 @@ export class ModelResolver {
       return SatelliteModels.jwst;
     }
 
-    if (this.sccNumAehf_.findIndex((num) => sat.sccNum === num) !== -1) {
+    if (this.sccNumAehf_.indexOf(sat.sccNum) !== -1) {
       return SatelliteModels.aehf;
     }
 
-    if (this.sccNumDsp_.findIndex((num) => sat.sccNum === num) !== -1) {
+    if (this.sccNumDsp_.indexOf(sat.sccNum) !== -1) {
       return SatelliteModels.dsp;
     }
 
@@ -258,7 +258,7 @@ export class ModelResolver {
       // Do Nothing
     }
 
-    switch (!isNaN(sat.rcs as number)) {
+    switch (!Number.isNaN(sat.rcs as number)) {
       case sat.rcs! < 0.1 && sat.rcs! > 0.04:
         return SatelliteModels.s1u;
       case sat.rcs! < 0.22 && sat.rcs! >= 0.1:
@@ -328,7 +328,7 @@ export class ModelResolver {
     const lastNumberInName = RegExp(/\d+$/u, 'u').exec(misl.name);
 
     if (lastNumberInName) {
-      const number = parseInt(lastNumberInName[0]);
+      const number = Number.parseInt(lastNumberInName[0]);
 
       if (number <= 2) {
         return SatelliteModels.misl;

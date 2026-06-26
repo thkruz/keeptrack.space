@@ -200,8 +200,8 @@ describe('ColorMenu_class', () => {
     });
 
     it('should warn when color scheme is not found', () => {
-      ColorMenu.colorsMenuClick('nonexistent-scheme');
-      // The warning is logged but the test passes as long as no error is thrown
+      // The warning is logged; the click must be handled gracefully without throwing.
+      expect(() => ColorMenu.colorsMenuClick('nonexistent-scheme')).not.toThrow();
     });
   });
 

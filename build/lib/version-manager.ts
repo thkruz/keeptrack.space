@@ -23,6 +23,7 @@ export class VersionManager {
       const version = this.readVersionFromPackageJson_(packageJsonPath);
 
       this.updateReadmeVersion_(version);
+      this.updateCitationVersion_(version);
 
       logWithStyle(`Version ${version} has been set`, ConsoleStyles.SUCCESS);
     } catch (error) {
@@ -106,5 +107,26 @@ export class VersionManager {
 
     this.fileManager.writeFile(readmePath, updatedReadme);
     logWithStyle(`Updated version in README.md to ${version}`, ConsoleStyles.SUCCESS);
+  }
+
+  /**
+   * Updates the version and release date in CITATION.cff
+   */
+  private updateCitationVersion_(version: string): void {
+    const citationPath = 'CITATION.cff';
+
+    if (!this.fileManager.fileExists(citationPath)) {
+      return;
+    }
+
+    const citationContent = this.fileManager.readFile(citationPath);
+    const today = new Date().toISOString().split('T')[0];
+
+    const updatedCitation = citationContent
+      .replace(/^version:.*$/mu, `version: ${version}`)
+      .replace(/^date-released:.*$/mu, `date-released: ${today}`);
+
+    this.fileManager.writeFile(citationPath, updatedCitation);
+    logWithStyle(`Updated version in CITATION.cff to ${version} (${today})`, ConsoleStyles.SUCCESS);
   }
 }

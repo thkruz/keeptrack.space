@@ -516,9 +516,9 @@
         y3Forward = false;
       }
 
-      y1Forward ? y1 += 1 : y1 -= 1;
-      y2Forward ? y2 += 1 : y2 -= 1;
-      y3Forward ? y3 += 1 : y3 -= 1;
+      if (y1Forward) { y1 += 1; } else { y1 -= 1; }
+      if (y2Forward) { y2 += 1; } else { y2 -= 1; }
+      if (y3Forward) { y3 += 1; } else { y3 -= 1; }
     }
     function populateError() {
       const errorTitle = document.querySelector('.error__title');

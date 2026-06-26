@@ -1139,13 +1139,13 @@ export abstract class KeepTrackPlugin {
 
         button.id = this.bottomIconElementName;
         // embed an order id to allow for sorting
-        button.setAttribute('data-order', this.bottomIconOrder?.toString() ?? KeepTrackPlugin.MAX_BOTTOM_ICON_ORDER.toString());
+        button.dataset.order = this.bottomIconOrder?.toString() ?? KeepTrackPlugin.MAX_BOTTOM_ICON_ORDER.toString();
         button.classList.add('bmenu-item');
         if (isDisabled) {
           button.classList.add('bmenu-item-disabled');
         }
         if (this.isLoginRequired) {
-          button.setAttribute('data-pro-gated', '');
+          button.dataset.proGated = '';
           if (!settingsManager.isDisableLoginGate) {
             button.classList.add('bmenu-item-pro');
           }
@@ -1187,13 +1187,13 @@ export abstract class KeepTrackPlugin {
         const item = document.createElement('div');
 
         item.id = `${this.id}-utility-icon`;
-        item.setAttribute('data-order', this.bottomIconOrder?.toString() ?? '100');
+        item.dataset.order = this.bottomIconOrder?.toString() ?? '100';
         item.classList.add('bmenu-filter-item');
         if (isDisabled) {
           item.classList.add('bmenu-item-disabled');
         }
         if (this.isLoginRequired) {
-          item.setAttribute('data-pro-gated', '');
+          item.dataset.proGated = '';
           if (!settingsManager.isDisableLoginGate) {
             item.classList.add('bmenu-item-pro');
           }

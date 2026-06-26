@@ -73,73 +73,73 @@ export abstract class UiValidation {
   }
 
   private static esArgPe360_(): void {
-    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-argPe`)).value) < 0) {
+    if (Number.parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-argPe`)).value) < 0) {
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-argPe`)).value = '000.0000';
     }
-    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-argPe`)).value) > 360) {
+    if (Number.parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-argPe`)).value) > 360) {
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-argPe`)).value = '360.0000';
     }
   }
 
   private static esDay366_() {
-    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value) < 0) {
+    if (Number.parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value) < 0) {
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value = '000.00000000';
     }
-    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value) >= 367) {
+    if (Number.parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value) >= 367) {
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value = '366.00000000';
     }
   }
 
   private static esInc180_(): void {
-    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value) < 0) {
+    if (Number.parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value) < 0) {
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value = '000.0000';
     }
-    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value) > 180) {
+    if (Number.parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value) > 180) {
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value = '180.0000';
     }
   }
 
   private static esMeana360_(): void {
-    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value) < 0) {
+    if (Number.parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value) < 0) {
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value = '000.0000';
     }
-    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value) > 360) {
+    if (Number.parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value) > 360) {
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value = '360.0000';
     }
   }
 
   private static esMeanmo18_(): void {
-    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value) < 0) {
+    if (Number.parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value) < 0) {
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value = '00.00000000';
     }
-    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value) > 18) {
+    if (Number.parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value) > 18) {
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value = '18.00000000';
     }
   }
 
   private static esRasc360_(): void {
-    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-rasc`)).value) < 0) {
+    if (Number.parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-rasc`)).value) < 0) {
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-rasc`)).value = '000.0000';
     }
-    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-rasc`)).value) > 360) {
+    if (Number.parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-rasc`)).value) > 360) {
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-rasc`)).value = '360.0000';
     }
   }
 
   private static msLat90_(): void {
-    if (parseInt((<HTMLInputElement>getEl('ms-lat')).value) < -90) {
+    if (Number.parseInt((<HTMLInputElement>getEl('ms-lat')).value) < -90) {
       (<HTMLInputElement>getEl('ms-lat')).value = '-90.000';
     }
-    if (parseInt((<HTMLInputElement>getEl('ms-lat')).value) > 90) {
+    if (Number.parseInt((<HTMLInputElement>getEl('ms-lat')).value) > 90) {
       (<HTMLInputElement>getEl('ms-lat')).value = '90.000';
     }
   }
 
   private static msLon180_(): void {
-    if (parseInt((<HTMLInputElement>getEl('ms-lon')).value) < -180) {
+    if (Number.parseInt((<HTMLInputElement>getEl('ms-lon')).value) < -180) {
       (<HTMLInputElement>getEl('ms-lon')).value = '-180.000';
     }
-    if (parseInt((<HTMLInputElement>getEl('ms-lon')).value) > 180) {
+    if (Number.parseInt((<HTMLInputElement>getEl('ms-lon')).value) > 180) {
       (<HTMLInputElement>getEl('ms-lon')).value = '180.000';
     }
   }

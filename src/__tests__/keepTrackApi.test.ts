@@ -70,23 +70,25 @@ test('keepTrackApi Unit Testing', () => {
     // Do nothing
   });
 
-  EventBus.getInstance().emit(EventBusEvent.updateSelectBox, 'test' as unknown as Satellite);
-  EventBus.getInstance().emit(EventBusEvent.onCruncherReady);
-  EventBus.getInstance().emit(EventBusEvent.onCruncherMessage);
-  EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
-  EventBus.getInstance().emit(EventBusEvent.uiManagerOnReady);
-  EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, 'test');
-  EventBus.getInstance().emit(EventBusEvent.hideSideMenus);
+  expect(() => {
+    EventBus.getInstance().emit(EventBusEvent.updateSelectBox, 'test' as unknown as Satellite);
+    EventBus.getInstance().emit(EventBusEvent.onCruncherReady);
+    EventBus.getInstance().emit(EventBusEvent.onCruncherMessage);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerOnReady);
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, 'test');
+    EventBus.getInstance().emit(EventBusEvent.hideSideMenus);
 
-  EventBus.getInstance().emit(EventBusEvent.orbitManagerInit);
-  EventBus.getInstance().emit(EventBusEvent.drawManagerLoadScene);
-  EventBus.getInstance().emit(EventBusEvent.drawOptionalScenery);
-  EventBus.getInstance().emit(EventBusEvent.updateLoop);
-  EventBus.getInstance().emit(EventBusEvent.rmbMenuActions, 'test', -1);
-  EventBus.getInstance().emit(EventBusEvent.updateDateTime, new Date());
-  EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
-  EventBus.getInstance().emit(EventBusEvent.rightBtnMenuAdd);
-  EventBus.getInstance().emit(EventBusEvent.selectSatData, defaultSat, 0);
+    EventBus.getInstance().emit(EventBusEvent.orbitManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.drawManagerLoadScene);
+    EventBus.getInstance().emit(EventBusEvent.drawOptionalScenery);
+    EventBus.getInstance().emit(EventBusEvent.updateLoop);
+    EventBus.getInstance().emit(EventBusEvent.rmbMenuActions, 'test', -1);
+    EventBus.getInstance().emit(EventBusEvent.updateDateTime, new Date());
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+    EventBus.getInstance().emit(EventBusEvent.rightBtnMenuAdd);
+    EventBus.getInstance().emit(EventBusEvent.selectSatData, defaultSat, 0);
+  }).not.toThrow();
 });
 
 describe('html', () => {

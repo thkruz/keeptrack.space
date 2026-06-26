@@ -9,9 +9,9 @@
  *   npx tsx scripts/check-locale-quality.ts --verbose          # Show all checked keys
  */
 
-import { readFileSync } from 'fs';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
+import { readFileSync } from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename_ = fileURLToPath(import.meta.url);
 const __dirname_ = path.dirname(__filename_);
@@ -62,7 +62,7 @@ function parseArgs(): CliArgs {
     } else if (arg.startsWith('--language=')) {
       result.language = arg.split('=')[1];
     } else if (arg.startsWith('--batch-size=')) {
-      result.batchSize = parseInt(arg.split('=')[1], 10);
+      result.batchSize = Number.parseInt(arg.split('=')[1], 10);
     }
   }
 

@@ -308,9 +308,35 @@
     },
     {
       "files": [
-        "**/test/**/*.{js,ts}"
+        "**/test/**/*.{js,ts}",
+        "**/__tests__/**/*.{js,ts,tsx}",
+        "**/*.test.{js,ts,tsx}",
+        "**/*.spec.{js,ts,tsx}"
       ],
       "extends": "./.eslintrc.test.json"
+    },
+    {
+      // Compute kernels: workers and astrodynamics search/parse routines legitimately nest
+      // loops and take many cohesive scalar params. App/UI code keeps the strict defaults.
+      "files": [
+        "**/webworker/**/*.{js,ts}",
+        "**/plugins-pro/initial-orbit/**/*.{js,ts}",
+        "**/plugins-pro/observation-reader/**/*.{js,ts}"
+      ],
+      "rules": {
+        "max-depth": ["warn", 6],
+        "max-params": ["warn", 9],
+        "max-statements": ["warn", 90]
+      }
+    },
+    {
+      // Ambient declaration files legitimately use any-shaped fallbacks.
+      "files": [
+        "**/*.d.ts"
+      ],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off"
+      }
     }
   ]
 }

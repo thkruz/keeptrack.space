@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import type { PluginDescriptor } from '@app/plugins/plugin-descriptor';
 import { PluginManager } from '@app/plugins/plugins';
 

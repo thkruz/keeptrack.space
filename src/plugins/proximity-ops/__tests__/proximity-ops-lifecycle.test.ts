@@ -49,7 +49,7 @@ describe('ProximityOps lifecycle / search orchestration', () => {
   });
 
   describe('getKeyboardShortcuts callback', () => {
-    it("the 'X' shortcut callback invokes bottomMenuClicked without throwing", () => {
+    it('the \'X\' shortcut callback invokes bottomMenuClicked without throwing', () => {
       const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
       const shortcut = plugin.getKeyboardShortcuts()[0];
 

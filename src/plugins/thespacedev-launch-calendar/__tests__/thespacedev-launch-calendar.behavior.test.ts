@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
@@ -158,9 +159,7 @@ describe('TheSpaceDevLaunchCalendarPlugin behavior', () => {
     it('renders the TBD placeholder for a launch window more than a day in the past', () => {
       const tbl = document.createElement('table');
 
-      TheSpaceDevLaunchCalendarPlugin.initTable(tbl, [
-        futureLaunch({ windowStart: new Date('2000-01-01T00:00:00Z') }),
-      ]);
+      TheSpaceDevLaunchCalendarPlugin.initTable(tbl, [futureLaunch({ windowStart: new Date('2000-01-01T00:00:00Z') })]);
 
       // The first data-row's first cell is the time text.
       const timeText = tbl.rows[1].cells[0].textContent ?? '';
@@ -171,9 +170,7 @@ describe('TheSpaceDevLaunchCalendarPlugin behavior', () => {
     it('renders plain text (no anchor) for fields without URLs', () => {
       const tbl = document.createElement('table');
 
-      TheSpaceDevLaunchCalendarPlugin.initTable(tbl, [
-        futureLaunch({ missionURL: '', locationURL: '', agencyURL: '', rocketURL: '' }),
-      ]);
+      TheSpaceDevLaunchCalendarPlugin.initTable(tbl, [futureLaunch({ missionURL: '', locationURL: '', agencyURL: '', rocketURL: '' })]);
 
       expect(tbl.querySelectorAll('a.iframe')).toHaveLength(0);
     });

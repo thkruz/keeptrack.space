@@ -477,6 +477,7 @@ export class DetailedSensor extends GroundStation {
    * Check if coordinates are within FOV bounds.
    * Handles azimuth wraparound (e.g., minAz=350, maxAz=10).
    */
+  // eslint-disable-next-line max-params -- 9 cohesive frustum bounds (az/el/rng + min/max each); bundling would allocate per call on a hot path
   private checkFovBounds_(
     az: Degrees, el: Degrees, rng: Kilometers,
     minAz: Degrees, maxAz: Degrees,

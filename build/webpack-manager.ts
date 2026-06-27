@@ -124,9 +124,6 @@ export class WebpackManager {
    * Returns the base configuration for webpack.
    */
   private static createBaseConfig_(dirName: string): Configuration {
-    console.log(`styleCssPath: ${this.config.styleCssPath}`);
-    console.log(`loadingScreenCssPath: ${this.config.loadingScreenCssPath}`);
-
     return {
       resolve: {
         extensions: ['.ts', '.js'],

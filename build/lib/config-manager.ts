@@ -254,16 +254,32 @@ export class ConfigManager {
    * Logs the current configuration
    */
   private logConfiguration(): void {
+    /*
+     * Asset paths and mode can be supplied via environment variables / profiles, so we
+     * must not echo their raw values into build output that CI may capture. Instead we log
+     * non-sensitive, re-derived indicators: a 'set'/'default' flag per path and the mode as
+     * a fixed literal. These helpers return constant strings, so the env-tainted values
+     * never reach the log sink (CodeQL js/clear-text-logging).
+     */
+    const flag = (value?: string): string => (typeof value === 'string' && value.length > 0 ? 'set' : 'default');
+    let safeMode: 'development' | 'production' | 'none' = 'development';
+
+    if (this.config.mode === 'production') {
+      safeMode = 'production';
+    } else if (this.config.mode === 'none') {
+      safeMode = 'none';
+    }
+
     logWithStyle('Build Configuration:', ConsoleStyles.DEBUG);
-    logWithStyle(`Mode: ${this.config.mode}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Mode: ${safeMode}`, ConsoleStyles.DEBUG);
     logWithStyle(`Watch: ${this.config.isWatch}`, ConsoleStyles.DEBUG);
-    logWithStyle(`Settings path: ${this.config.settingsPath}`, ConsoleStyles.DEBUG);
-    logWithStyle(`Favicon path: ${this.config.favIconPath}`, ConsoleStyles.DEBUG);
-    logWithStyle(`Text logo path: ${this.config.textLogoPath}`, ConsoleStyles.DEBUG);
-    logWithStyle(`Style CSS path: ${this.config.styleCssPath}`, ConsoleStyles.DEBUG);
-    logWithStyle(`Loading screen CSS path: ${this.config.loadingScreenCssPath}`, ConsoleStyles.DEBUG);
-    logWithStyle(`Primary logo path: ${this.config.primaryLogoPath}`, ConsoleStyles.DEBUG);
-    logWithStyle(`Secondary logo path: ${this.config.secondaryLogoPath}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Settings path: ${flag(this.config.settingsPath)}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Favicon path: ${flag(this.config.favIconPath)}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Text logo path: ${flag(this.config.textLogoPath)}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Style CSS path: ${flag(this.config.styleCssPath)}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Loading screen CSS path: ${flag(this.config.loadingScreenCssPath)}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Primary logo path: ${flag(this.config.primaryLogoPath)}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Secondary logo path: ${flag(this.config.secondaryLogoPath)}`, ConsoleStyles.DEBUG);
     logWithStyle(`Pro features: ${this.config.isPro ? 'Enabled' : 'Disabled'}`, this.config.isPro ? ConsoleStyles.SUCCESS : ConsoleStyles.INFO);
   }
 }

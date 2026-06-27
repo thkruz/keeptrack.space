@@ -4,7 +4,7 @@ describe('plugins', () => {
   it('should be able to initialize all plugins', () => {
     const pluginManager = new PluginManager();
 
-    pluginManager.loadPlugins({
+    expect(() => pluginManager.loadPlugins({
       DebugMenuPlugin: {
         enabled: true,
       },
@@ -125,6 +125,6 @@ describe('plugins', () => {
       GamepadPlugin: {
         enabled: true,
       },
-    });
+    })).not.toThrow();
   });
 });

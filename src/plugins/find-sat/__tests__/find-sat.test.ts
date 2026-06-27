@@ -343,7 +343,7 @@ describe('FindSatPlugin_class', () => {
 
     shapeInput.value = '';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   it('should find satellites with all inputs set to 1', () => {
@@ -415,7 +415,7 @@ describe('FindSatPlugin_class', () => {
 
     shapeInput.value = 'C';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   it('should find satellites with all inputs set to their maximum values', () => {
@@ -487,7 +487,7 @@ describe('FindSatPlugin_class', () => {
 
     shapeInput.value = 'C';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   it('should find satellites with random inputs', () => {
@@ -559,7 +559,7 @@ describe('FindSatPlugin_class', () => {
 
     shapeInput.value = 'D';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   it('should find satellites with only minimal inputs', () => {
@@ -571,7 +571,7 @@ describe('FindSatPlugin_class', () => {
 
     rangeInput.value = '50';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   it('should find satellites with only country code', () => {
@@ -583,7 +583,7 @@ describe('FindSatPlugin_class', () => {
 
     countryCodeInput.value = 'US';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   it('should find satellites with only bus', () => {
@@ -594,7 +594,7 @@ describe('FindSatPlugin_class', () => {
 
     busInput.value = 'A';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   it('should find satellites with only mandatory inputs and payload', () => {
@@ -615,7 +615,7 @@ describe('FindSatPlugin_class', () => {
 
     payloadInput.value = 'A';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   it('should find satellites with only mandatory inputs and shape', () => {
@@ -636,7 +636,7 @@ describe('FindSatPlugin_class', () => {
 
     shapeInput.value = 'A';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   it('should find satellites with only mandatory inputs and all optional inputs', () => {
@@ -675,7 +675,7 @@ describe('FindSatPlugin_class', () => {
 
     shapeInput.value = 'C';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   // =========================================================================
@@ -694,7 +694,7 @@ describe('FindSatPlugin_class', () => {
 
     tleAgeMargInput.value = '12';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   it('should find satellites with source filter', () => {
@@ -706,7 +706,7 @@ describe('FindSatPlugin_class', () => {
 
     sourceInput.value = 'AFSPC';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   it('should find satellites with period filter', () => {
@@ -721,7 +721,7 @@ describe('FindSatPlugin_class', () => {
 
     periodMargInput.value = '5';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   it('should find satellites with RCS filter', () => {
@@ -736,7 +736,7 @@ describe('FindSatPlugin_class', () => {
 
     rcsMargInput.value = '2';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   it('should find satellites with RAAN filter', () => {
@@ -751,7 +751,7 @@ describe('FindSatPlugin_class', () => {
 
     raanMargInput.value = '10';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   it('should find satellites with argument of perigee filter', () => {
@@ -766,7 +766,7 @@ describe('FindSatPlugin_class', () => {
 
     argPeMargInput.value = '5';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   it('should find satellites with object type Payload', () => {
@@ -781,7 +781,7 @@ describe('FindSatPlugin_class', () => {
 
     incInput.value = '50';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   it('should find satellites with object type Rocket Body', () => {
@@ -796,7 +796,7 @@ describe('FindSatPlugin_class', () => {
 
     incInput.value = '50';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   it('should find satellites with object type Debris', () => {
@@ -811,7 +811,7 @@ describe('FindSatPlugin_class', () => {
 
     incInput.value = '50';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   it('should find satellites with multiple country codes', () => {
@@ -823,7 +823,7 @@ describe('FindSatPlugin_class', () => {
 
     countryCodeInput.value = 'US|RU';
 
-    plugin['findByLooksSubmit_']();
+    expect(() => plugin['findByLooksSubmit_']()).not.toThrow();
   });
 
   // =========================================================================

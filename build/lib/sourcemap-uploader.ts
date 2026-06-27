@@ -6,10 +6,10 @@
  * Requires wrangler CLI to be installed and authenticated.
  * Source maps are keyed as: sourcemaps/{version}/{filename}
  */
-import { execSync } from 'child_process';
-import { readdirSync, readFileSync, rmSync } from 'fs';
-import { dirname, join, resolve } from 'path';
-import { fileURLToPath } from 'url';
+import { execSync } from 'node:child_process';
+import { readdirSync, readFileSync, rmSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { ConsoleStyles, handleBuildError, logWithStyle } from './build-error';
 
 const BUCKET_NAME = 'keeptrack-sourcemaps';

@@ -242,7 +242,7 @@ export class HoverManager {
       let color: string = 'black';
 
       if (settingsManager.isShowConfidenceLevels) {
-        const confidenceScore = parseInt(sat.tle1.substring(64, 65)) || 0;
+        const confidenceScore = Number.parseInt(sat.tle1.substring(64, 65)) || 0;
 
         if (confidenceScore >= 7) {
           color = 'green';
@@ -311,7 +311,7 @@ export class HoverManager {
       return t7e('hoverManager.launchedUnknown');
     }
 
-    const launchYear = parseInt(sat.intlDes.slice(2, 4));
+    const launchYear = Number.parseInt(sat.intlDes.slice(2, 4));
 
     if (launchYear < 57) {
       if (i18next.language === 'zh') {

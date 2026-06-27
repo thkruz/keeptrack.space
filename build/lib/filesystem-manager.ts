@@ -1,7 +1,7 @@
 // src/scripts/utils/fileSystemManager.ts
-import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
-import { dirname, join, resolve } from 'path';
-import { fileURLToPath } from 'url';
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { BuildError, ConsoleStyles, ErrorCodes, logWithStyle, tryCatchWithBuildError } from './build-error';
 
 /**

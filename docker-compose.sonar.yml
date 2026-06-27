@@ -1,0 +1,53 @@
+# Offline SonarQube analysis for KeepTrack.
+#
+# Quick start (anyone with Docker — no Java/scanner/account setup needed):
+#   npm run sonar         # starts the server, mints a token, runs tests + scan, opens dashboard
+#   npm run sonar:down    # stop the server when done (data persists in volumes)
+#
+# The orchestration (auto-start, token minting via the default admin API, scan, open)
+# lives in scripts/sonar.ts. Everything runs on this Compose network, so the scanner
+# reaches the server at http://sonarqube:9000 with no host-networking quirks across OSes.
+# scripts/sonar.ts injects SONAR_TOKEN at run time via `docker compose run -e`.
+
+services:
+  sonarqube:
+    image: sonarqube:community
+    container_name: keeptrack-sonarqube
+    ports:
+      - '9000:9000'
+    environment:
+      # Local single-node use: skip the production Elasticsearch bootstrap checks.
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    healthcheck:
+      # The image ships curl (not wget); require status UP, not just a reachable endpoint.
+      test: ['CMD-SHELL', 'curl -sf http://localhost:9000/api/system/status | grep -q ''"status":"UP"'' || exit 1']
+      interval: 15s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+
+  # Run on demand via `npm run sonar:scan` (or `docker compose -f docker-compose.sonar.yml run --rm sonar-scanner`).
+  # The `scan` profile keeps it from starting with `up`.
+  sonar-scanner:
+    image: sonarsource/sonar-scanner-cli:latest
+    profiles: ['scan']
+    depends_on:
+      sonarqube:
+        condition: service_healthy
+    environment:
+      - SONAR_HOST_URL=http://sonarqube:9000
+      - SONAR_TOKEN=${SONAR_TOKEN}
+    volumes:
+      - ./:/usr/src
+    working_dir: /usr/src
+    # Our config file is dot-prefixed, so point the scanner at it explicitly.
+    command: ['-Dproject.settings=.sonar-project.properties']
+
+volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:

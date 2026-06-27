@@ -2934,12 +2934,8 @@ nav {
   top: 0;
   left: 0;
   width: 100%;
-}
-
-nav {
   color: #fff;
   background-color: var(--color-dark-background);
-  width: 100%;
   height: 50px;
   line-height: 50px;
 }
@@ -3102,6 +3098,7 @@ nav a.sidenav-trigger i {
   flex-wrap: nowrap;
   justify-content: space-between;
   align-items: center;
+  transition: background-color var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
 .search-result:hover {
@@ -4432,11 +4429,6 @@ a {
 .bmenu-item .bmenu-item-inner:active,
 .search-result:active:not(.search-result-decayed) {
   transform: scale(0.97);
-}
-
-/* Smooth transition for interactive element backgrounds */
-.search-result {
-  transition: background-color var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
 /* Keyboard selected search result */

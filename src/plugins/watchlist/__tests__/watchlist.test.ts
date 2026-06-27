@@ -59,6 +59,8 @@ describe('WatchlistPlugin_form', () => {
     const satellites = '1,1,5,5,25544,25544';
     const watchlistNewElement = <HTMLInputElement>getEl('watchlist-new');
 
+    expect(watchlistNewElement).toBeTruthy();
+
     if (watchlistNewElement) {
       watchlistNewElement.value = satellites;
     }

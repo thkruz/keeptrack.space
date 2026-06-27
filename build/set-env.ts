@@ -1,7 +1,14 @@
-import { copyFileSync, existsSync } from 'fs';
+import { copyFileSync, existsSync } from 'node:fs';
 
 // read the 1st argument from the command line
 const env = process.argv[2] ?? 'app';
+
+// Validate the environment name before building a file path with it. Restricting
+// to a simple token (no slashes, dots, or "..") prevents a faulty/hostile CLI
+// argument from escaping the project directory via the constructed `.env.<env>` path.
+if (!(/^[a-zA-Z0-9_-]+$/u).test(env)) {
+  throw new Error(`Invalid environment name "${env}". Use letters, digits, '-' or '_' only.`);
+}
 
 // check if there is a .env file for the environment
 const envFilePath = `.env.${env}`;

@@ -13,6 +13,10 @@ describe('PolarPlotPlugin', () => {
     vi.restoreAllMocks();
   });
 
+  it('constructs without throwing', () => {
+    expect(() => new PolarPlotPlugin()).not.toThrow();
+  });
+
   standardPluginSuite(PolarPlotPlugin, 'PolarPlotPlugin');
   standardPluginMenuButtonTests(PolarPlotPlugin, 'PolarPlotPlugin');
   standardClickTests(PolarPlotPlugin);

@@ -87,7 +87,7 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
 
     const data = m.data as OrbitCruncherOutMsgPoints;
 
-    if (!data || data.typ !== OrbitCruncherMsgType.RESPONSE_DATA) {
+    if (data?.typ !== OrbitCruncherMsgType.RESPONSE_DATA) {
       return;
     }
 

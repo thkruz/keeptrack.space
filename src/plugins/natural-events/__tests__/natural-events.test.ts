@@ -7,5 +7,9 @@ describe('NaturalEventsPlugin_class', () => {
     setupStandardEnvironment();
   });
 
+  it('constructs without throwing', () => {
+    expect(() => new NaturalEventsPlugin()).not.toThrow();
+  });
+
   standardPluginSmokeSuite(NaturalEventsPlugin, 'NaturalEventsPlugin');
 });

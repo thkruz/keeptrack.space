@@ -12,6 +12,10 @@ describe('SensorInfoPlugin_class', () => {
     vi.advanceTimersByTime(1000);
   });
 
+  it('constructs without throwing', () => {
+    expect(() => new SensorInfoPlugin()).not.toThrow();
+  });
+
   standardPluginSuite(SensorInfoPlugin);
   standardPluginMenuButtonTests(SensorInfoPlugin);
   standardClickTests(SensorInfoPlugin);

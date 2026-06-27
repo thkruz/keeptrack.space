@@ -214,7 +214,7 @@ export class CatalogSearch {
     return satData.filter((sat) => {
       const tleYear = sat?.tle1?.substring(9, 11) || '-1';
 
-      return parseInt(tleYear) === yr;
+      return Number.parseInt(tleYear) === yr;
     });
   }
 
@@ -275,10 +275,10 @@ export class CatalogSearch {
       const launchYear = launchDate?.slice(2, 4) ?? sat?.tle1.slice(9, 11) ?? '-1';
 
       if (yr >= 57 && yr < 100) {
-        return parseInt(launchYear) <= yr && parseInt(launchYear) >= 57;
+        return Number.parseInt(launchYear) <= yr && Number.parseInt(launchYear) >= 57;
       }
 
-      return parseInt(launchYear) <= yr || parseInt(launchYear) >= 57;
+      return Number.parseInt(launchYear) <= yr || Number.parseInt(launchYear) >= 57;
 
     });
   }

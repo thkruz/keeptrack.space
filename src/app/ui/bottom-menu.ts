@@ -134,7 +134,7 @@ export class BottomMenu {
   }
 
   private static updateBottomMenuVisibility_() {
-    if (settingsManager.isDisableBottomMenu || (getEl('bottom-icons') && getEl('bottom-icons')!.innerText === '')) {
+    if (settingsManager.isDisableBottomMenu || getEl('bottom-icons')?.innerText === '') {
       getEl('nav-footer')!.style.visibility = 'hidden';
       hideEl('nav-footer');
     } else {

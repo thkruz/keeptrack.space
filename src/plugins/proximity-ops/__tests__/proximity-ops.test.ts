@@ -197,9 +197,8 @@ describe('ProximityOps_class', () => {
       websiteInit(plugin);
       plugin.RPOs = [];
 
-      plugin.downloadIconCb();
-
       // No error should be thrown, toast is shown
+      expect(() => plugin.downloadIconCb()).not.toThrow();
     });
   });
 

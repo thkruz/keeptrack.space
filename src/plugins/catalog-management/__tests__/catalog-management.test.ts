@@ -12,6 +12,10 @@ describe('CatalogManagementPlugin', () => {
     vi.restoreAllMocks();
   });
 
+  it('constructs without throwing', () => {
+    expect(() => new CatalogManagementPlugin()).not.toThrow();
+  });
+
   standardPluginSuite(CatalogManagementPlugin, 'CatalogManagementPlugin');
   standardPluginMenuButtonTests(CatalogManagementPlugin, 'CatalogManagementPlugin');
 });

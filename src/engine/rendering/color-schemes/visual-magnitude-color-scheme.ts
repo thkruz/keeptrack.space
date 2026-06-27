@@ -85,7 +85,7 @@ export class VisualMagnitudeColorScheme extends ColorScheme {
     };
   }
 
-  override calculateParams() {
+  override calculateParams() { // NOSONAR: S3516 - returns null by design; results are stored in this.thresholds_ and the manager treats null as "no params"
     const catalog = ServiceLocator.getCatalogManager();
     const sats = catalog?.getSats() ?? [];
     const mags: number[] = [];

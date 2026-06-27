@@ -89,6 +89,10 @@ coverage/
 coverage-e2e/
 coverage-combined/
 
+# SonarQube scanner working directory + exported issues (offline analysis)
+.scannerwork/
+.sonarqube/
+
 # Build Folder
 dist
 /lib

@@ -148,6 +148,19 @@ npm start
 | `npm run lint` | Check code style |
 | `npm run lint:fix` | Auto-fix linting issues |
 | `npm test` | Run test suite |
+| `npm run sonar:up` | Start a local offline SonarQube server (Docker) |
+| `npm run sonar` | Run tests with coverage, then analyze against local SonarQube |
+| `npm run sonar:down` | Stop the local SonarQube server |
+
+### Offline Code Quality Analysis (SonarQube)
+
+Run the same static analysis we use, fully offline and self-hosted, with only **Docker** installed. No account setup, token juggling, or cloud service. See [docs-local/sonarqube.md](docs-local/sonarqube.md) for details. The whole thing is one command:
+
+```bash
+npm run sonar     # starts SonarQube, runs tests + coverage, scans, opens the dashboard
+```
+
+It auto-starts a local SonarQube server, mints an analysis token for you, enables anonymous access so the dashboard needs **no login**, runs the scan, and opens `http://localhost:9000/dashboard?id=keeptrack`. Run `npm run sonar:down` to stop the server when you're done.
 
 ### Troubleshooting
 

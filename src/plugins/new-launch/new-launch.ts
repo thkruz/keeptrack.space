@@ -153,7 +153,7 @@ export class NewLaunch extends KeepTrackPlugin {
     }
 
     // Sort countries alphabetically, and sites by name
-    const countryKeys = Object.keys(grouped).sort();
+    const countryKeys = Object.keys(grouped).sort((a, b) => a.localeCompare(b));
 
     for (const country of countryKeys) {
       grouped[country].sort((a, b) => {

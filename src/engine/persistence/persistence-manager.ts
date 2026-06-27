@@ -6,6 +6,7 @@ import type { StorageProvider, StorageProviderConfig } from './storage-provider'
 import { StorageProviderFactory } from './storage-provider-factory';
 
 // Access settingsManager via global to avoid circular dependency with settings.ts
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- intentionally untyped to break the settings.ts circular import
 const getSettingsManager_ = (): any => (globalThis as any).settingsManager;
 
 interface SyncProviderEntry_ {
@@ -64,7 +65,7 @@ export class PersistenceManager {
 
   /** For testing — resets the singleton. */
   static resetInstance(): void {
-    PersistenceManager.instance_ = undefined as any;
+    PersistenceManager.instance_ = undefined as unknown as PersistenceManager;
   }
 
   /**

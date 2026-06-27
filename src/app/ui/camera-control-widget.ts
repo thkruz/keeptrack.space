@@ -332,9 +332,9 @@ export class CameraControlWidget {
       return rgb;
     }
 
-    const r = Math.min(255, parseInt(match.groups.r) + amount);
-    const g = Math.min(255, parseInt(match.groups.g) + amount);
-    const b = Math.min(255, parseInt(match.groups.b) + amount);
+    const r = Math.min(255, Number.parseInt(match.groups.r) + amount);
+    const g = Math.min(255, Number.parseInt(match.groups.g) + amount);
+    const b = Math.min(255, Number.parseInt(match.groups.b) + amount);
 
     return `rgb(${r}, ${g}, ${b})`;
   }
@@ -346,9 +346,9 @@ export class CameraControlWidget {
       return rgb;
     }
 
-    const r = Math.max(0, parseInt(match.groups.r) - amount);
-    const g = Math.max(0, parseInt(match.groups.g) - amount);
-    const b = Math.max(0, parseInt(match.groups.b) - amount);
+    const r = Math.max(0, Number.parseInt(match.groups.r) - amount);
+    const g = Math.max(0, Number.parseInt(match.groups.g) - amount);
+    const b = Math.max(0, Number.parseInt(match.groups.b) - amount);
 
     return `rgb(${r}, ${g}, ${b})`;
   }

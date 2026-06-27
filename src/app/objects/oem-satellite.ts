@@ -719,7 +719,7 @@ export class OemSatellite extends SpaceObject {
     try {
       const periodMin = this.toClassicalElements().period;
 
-      if (periodMin > 0 && isFinite(periodMin)) {
+      if (periodMin > 0 && Number.isFinite(periodMin)) {
         const endEpochMs = this.epochCache_[currentIndex] + periodMin * 60_000;
         let left = currentIndex;
         let right = totalPoints - 1;

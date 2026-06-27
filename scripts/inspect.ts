@@ -49,6 +49,25 @@ const EPHEMERAL_DIR = path.join(ROOT_DIR, 'test-results', 'visual-inspect');
 const LIBRARY_DIR = path.join(ROOT_DIR, 'docs-local', 'visual-inspect');
 const MANIFEST = path.join(LIBRARY_DIR, 'manifest.json');
 
+/**
+ * Resolve `target` against `base` and ensure the result stays inside `base`.
+ * Guards the file-system reads/writes below against `..`/absolute-path traversal
+ * from untrusted CLI/spec input. Throws on escape.
+ */
+const resolveWithin = (base: string, target: string): string => {
+  const baseResolved = path.resolve(base);
+  const resolved = path.resolve(baseResolved, target);
+
+  // Require a STRICT subpath: rejects `..` traversal AND the base dir itself
+  // (e.g. an empty/"." target), so callers can't write into or escape the
+  // shared output root, only into a per-run subfolder/file under it.
+  if (!resolved.startsWith(baseResolved + path.sep)) {
+    throw new Error(`Refusing to access path outside ${baseResolved} (must be a subpath): ${target}`);
+  }
+
+  return resolved;
+};
+
 interface InspectSpec {
   id: string;
   catalog?: boolean;
@@ -120,7 +139,7 @@ const readSpec = (): InspectSpec => {
   } else if (arg.trimStart().startsWith('{')) {
     raw = arg;
   } else {
-    raw = fs.readFileSync(arg, 'utf8');
+    raw = fs.readFileSync(resolveWithin(ROOT_DIR, arg), 'utf8');
   }
 
   const spec = JSON.parse(raw) as InspectSpec;
@@ -322,7 +341,7 @@ const main = async (): Promise<void> => {
 
   const viewport = spec.viewport ?? { width: 1920, height: 1080 };
   const baseDir = spec.keep ? LIBRARY_DIR : EPHEMERAL_DIR;
-  const outDir = path.join(baseDir, spec.id);
+  const outDir = resolveWithin(baseDir, spec.id);
 
   fs.mkdirSync(outDir, { recursive: true });
 

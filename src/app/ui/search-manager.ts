@@ -226,7 +226,7 @@ export class SearchManager {
     const satIdStr = selectedEl?.dataset.objId;
 
     if (satIdStr) {
-      const satId = parseInt(satIdStr, 10);
+      const satId = Number.parseInt(satIdStr, 10);
 
       ServiceLocator.getHoverManager().setHoverId(satId);
       ServiceLocator.getUiManager().searchHoverSatId = satId;
@@ -239,15 +239,15 @@ export class SearchManager {
     if ((<HTMLElement>evt.target).classList.contains('search-result')) {
       const satIdStr = (<HTMLElement>evt.target).dataset.objId;
 
-      satId = satIdStr ? parseInt(satIdStr, 10) : -1;
+      satId = satIdStr ? Number.parseInt(satIdStr, 10) : -1;
     } else if ((<HTMLElement>evt.target).parentElement?.classList.contains('search-result')) {
       const satIdStr = (<HTMLElement>evt.target).parentElement?.dataset.objId;
 
-      satId = satIdStr ? parseInt(satIdStr, 10) : -1;
+      satId = satIdStr ? Number.parseInt(satIdStr, 10) : -1;
     } else if ((<HTMLElement>evt.target).parentElement?.parentElement?.classList.contains('search-result')) {
       const satIdStr = (<HTMLElement>evt.target).parentElement?.parentElement?.dataset.objId;
 
-      satId = satIdStr ? parseInt(satIdStr, 10) : -1;
+      satId = satIdStr ? Number.parseInt(satIdStr, 10) : -1;
     }
 
     return satId;
@@ -558,7 +558,7 @@ export class SearchManager {
     let searchList = searchString.split(/,/u).filter((str) => str.length > 0);
     // Sort the numbers so that the lowest numbers are searched first
 
-    searchList = searchList.sort((a, b) => parseInt(a) - parseInt(b));
+    searchList = searchList.sort((a, b) => Number.parseInt(a) - Number.parseInt(b));
 
     // Update last search with the most recent search results
     settingsManager.lastSearch = searchList;
@@ -644,7 +644,7 @@ export class SearchManager {
         if (!settingsManager.isShowDecayedInSearch && dotsManagerInstance.positionData) {
           const pos = dotsManagerInstance.getCurrentPosition(Number(obj.id));
 
-          if (pos && pos.x === 0 && pos.y === 0 && pos.z === 0) {
+          if (pos?.x === 0 && pos?.y === 0 && pos?.z === 0) {
             return false;
           }
         }
@@ -654,7 +654,7 @@ export class SearchManager {
     ).sort((a, b) => {
       // Sort by sccNum
       if ((a as Satellite).sccNum && (b as Satellite).sccNum) {
-        return parseInt((a as Satellite).sccNum) - parseInt((b as Satellite).sccNum);
+        return Number.parseInt((a as Satellite).sccNum) - Number.parseInt((b as Satellite).sccNum);
       }
 
       return 0;
@@ -680,7 +680,7 @@ export class SearchManager {
     htmlStr += results.reduce((html, result) => {
       const obj = <Satellite | OemSatellite | MissileObject>satData[result.id];
       const pos = dotsManagerInstance.positionData ? dotsManagerInstance.getCurrentPosition(Number(obj.id)) : null;
-      const isDecayed = pos && pos.x === 0 && pos.y === 0 && pos.z === 0;
+      const isDecayed = pos?.x === 0 && pos?.y === 0 && pos?.z === 0;
       const decayedClass = isDecayed ? ' search-result-decayed' : '';
 
       html += `<div class="search-result${decayedClass}" data-obj-id="${obj.id}">`;

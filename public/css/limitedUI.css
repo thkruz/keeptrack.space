@@ -3,7 +3,6 @@
 }
 
 #keeptrack-canvas {
-  /* position: absolute; */
   background: var(--colorBlack);
   /* Inconsistent brightness without this */
   z-index: 0;
@@ -85,7 +84,6 @@
   height: auto;
   min-height: 48px;
   line-height: 1.5em;
-  /* background-color: #323232; */
   background-color: rgb(160, 232, 255);
   padding: 10px 25px;
   font-size: 1.1rem;

@@ -30,6 +30,25 @@ import { type Browser, chromium, type Page } from 'playwright';
 const BASE_URL = process.env.BASE_URL ?? 'http://localhost:5544';
 const ROOT_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 
+/**
+ * Resolve `target` against `base` and ensure the result stays inside `base`.
+ * Guards the file-system reads/writes below against `..`/absolute-path traversal
+ * from untrusted CLI/spec input. Throws on escape.
+ */
+const resolveWithin = (base: string, target: string): string => {
+  const baseResolved = path.resolve(base);
+  const resolved = path.resolve(baseResolved, target);
+
+  // Require a STRICT subpath: rejects `..` traversal AND the base dir itself
+  // (e.g. an empty/"." target), so callers can't write into or escape the
+  // project root, only into a subfolder/file under it.
+  if (!resolved.startsWith(baseResolved + path.sep)) {
+    throw new Error(`Refusing to access path outside ${baseResolved} (must be a subpath): ${target}`);
+  }
+
+  return resolved;
+};
+
 interface GenerateSpec {
   sensor: string;
   sats: string[];
@@ -59,7 +78,7 @@ const readSpec = (): GenerateSpec => {
   } else if (arg.trimStart().startsWith('{')) {
     raw = arg;
   } else {
-    raw = fs.readFileSync(arg, 'utf8');
+    raw = fs.readFileSync(resolveWithin(ROOT_DIR, arg), 'utf8');
   }
 
   const spec = JSON.parse(raw) as GenerateSpec;
@@ -136,9 +155,7 @@ const main = async (): Promise<void> => {
     throw new Error(`No server at ${BASE_URL}. Start one with "npm run start" (or set BASE_URL).`);
   }
 
-  const outDir = path.isAbsolute(spec.outDir ?? '')
-    ? (spec.outDir as string)
-    : path.join(ROOT_DIR, spec.outDir ?? path.join('test-results', 'polar-plots'));
+  const outDir = resolveWithin(ROOT_DIR, spec.outDir ?? path.join('test-results', 'polar-plots'));
 
   fs.mkdirSync(outDir, { recursive: true });
 

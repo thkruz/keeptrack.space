@@ -7,5 +7,9 @@ describe('FovFadePlugin_class', () => {
     setupStandardEnvironment();
   });
 
+  it('constructs without throwing', () => {
+    expect(() => new FovFadePlugin()).not.toThrow();
+  });
+
   standardPluginSmokeSuite(FovFadePlugin, 'FovFadePlugin');
 });

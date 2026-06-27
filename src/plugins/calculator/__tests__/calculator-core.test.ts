@@ -81,9 +81,9 @@ describe('j2000ToFrameValues', () => {
   it('produces the input-field bag for the requested frame', () => {
     const j2000 = frameInputToJ2000(CoordFrame.J2000, { x: 6778, y: 100, z: 200, vx: 0, vy: 7.5, vz: 1 }, ctx());
 
-    expect(Object.keys(j2000ToFrameValues(j2000, CoordFrame.J2000, ctx())).sort()).toEqual(['vx', 'vy', 'vz', 'x', 'y', 'z']);
-    expect(Object.keys(j2000ToFrameValues(j2000, CoordFrame.LLA, ctx())).sort()).toEqual(['alt', 'lat', 'lon']);
-    expect(Object.keys(j2000ToFrameValues(j2000, CoordFrame.CLASSICAL, ctx())).sort()).toEqual(['argpe', 'ecc', 'inc', 'nu', 'raan', 'sma']);
+    expect(Object.keys(j2000ToFrameValues(j2000, CoordFrame.J2000, ctx())).sort((a, b) => a.localeCompare(b))).toEqual(['vx', 'vy', 'vz', 'x', 'y', 'z']);
+    expect(Object.keys(j2000ToFrameValues(j2000, CoordFrame.LLA, ctx())).sort((a, b) => a.localeCompare(b))).toEqual(['alt', 'lat', 'lon']);
+    expect(Object.keys(j2000ToFrameValues(j2000, CoordFrame.CLASSICAL, ctx())).sort((a, b) => a.localeCompare(b))).toEqual(['argpe', 'ecc', 'inc', 'nu', 'raan', 'sma']);
   });
 
   it('throws for RAE without a sensor', () => {

@@ -81,8 +81,8 @@ describe('filter-menu-core', () => {
     });
 
     it('covers exactly the group ids', () => {
-      expect(Object.keys(showOnlyInGroup('lEOSatellites', ORBITAL_REGIME_FILTERS)).sort())
-        .toEqual([...ORBITAL_REGIME_FILTERS].sort());
+      expect(Object.keys(showOnlyInGroup('lEOSatellites', ORBITAL_REGIME_FILTERS)).sort((a, b) => a.localeCompare(b)))
+        .toEqual([...ORBITAL_REGIME_FILTERS].sort((a, b) => a.localeCompare(b)));
     });
   });
 
@@ -91,7 +91,7 @@ describe('filter-menu-core', () => {
       const off = enableGroup(COUNTRY_FILTERS, false);
 
       expect(Object.values(off).every((v) => v === false)).toBe(true);
-      expect(Object.keys(off).sort()).toEqual([...COUNTRY_FILTERS].sort());
+      expect(Object.keys(off).sort((a, b) => a.localeCompare(b))).toEqual([...COUNTRY_FILTERS].sort((a, b) => a.localeCompare(b)));
     });
   });
 

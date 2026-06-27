@@ -79,10 +79,10 @@ export abstract class StringExtractor {
     }
 
     const label = displayName ?? user;
-    const userUrl = userUrls.filter((url) => url.user === user);
+    const userUrl = userUrls.find((url) => url.user === user);
 
-    if (userUrl?.[0]?.url) {
-      return `<a href="${userUrl[0].url}" target="_blank">${label}</a>`;
+    if (userUrl?.url) {
+      return `<a href="${userUrl.url}" target="_blank">${label}</a>`;
     }
 
     return label;

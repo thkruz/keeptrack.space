@@ -250,7 +250,7 @@ export class SensorMath {
 
         const firstSensor = sensorManagerInstance.currentSensors[0];
 
-        if (firstSensor instanceof Sensor && firstSensor.beamwidth && parseFloat(distanceApart) < sensorManagerInstance.currentTEARR.rng! * Math.sin(DEG2RAD * firstSensor.beamwidth)) {
+        if (firstSensor instanceof Sensor && firstSensor.beamwidth && Number.parseFloat(distanceApart) < sensorManagerInstance.currentTEARR.rng! * Math.sin(DEG2RAD * firstSensor.beamwidth)) {
           if (sensorManagerInstance.currentTEARR.rng! < sensorManagerInstance.currentSensors[0].maxRng && sensorManagerInstance.currentTEARR.rng! > 0) {
             sameBeamStr = ' (Within One Beam)';
           }

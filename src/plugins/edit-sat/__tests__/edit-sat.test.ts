@@ -121,7 +121,8 @@ describe('EditSatPlugin_class', () => {
     standardSelectSat();
     const button = <HTMLButtonElement>KeepTrack.getInstance().containerRoot.querySelector('button[type="submit"]');
 
-    button.click();
+    expect(button).toBeTruthy();
+    expect(() => button.click()).not.toThrow();
   });
 
   it('should create new TLE at Epoch', () => {
@@ -136,7 +137,8 @@ describe('EditSatPlugin_class', () => {
     ServiceLocator.getCatalogManager().getObject = () => defaultSat;
     const button = getEl('editSat-newTLE');
 
-    button!.click();
+    expect(button).toBeTruthy();
+    expect(() => button!.click()).not.toThrow();
     vi.advanceTimersByTime(1000);
   });
 
@@ -152,7 +154,8 @@ describe('EditSatPlugin_class', () => {
     ServiceLocator.getCatalogManager().getObject = () => defaultSat;
     const button = getEl('editSat-save');
 
-    button!.click();
+    expect(button).toBeTruthy();
+    expect(() => button!.click()).not.toThrow();
     vi.advanceTimersByTime(1000);
   });
 

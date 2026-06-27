@@ -31,6 +31,7 @@ describe('uiManager', () => {
     const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     sensorManagerInstance.currentSensors = [defaultSensor];
+    expect(sensorManagerInstance.currentSensors).toContain(defaultSensor);
   });
 
   // Should process updateSettingsManager

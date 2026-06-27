@@ -94,10 +94,6 @@
     width: 500px;
   }
 
-  /* ::-webkit-scrollbar {
-    display: none;
-  } */
-
   .search-slide-down {
     width: 355px;
     /* This should match the #search-results */

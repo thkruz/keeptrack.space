@@ -33,7 +33,7 @@ export class GroupsManager {
     EventBus.getInstance().on(EventBusEvent.catalogReloaded, this.onCatalogReloaded_);
   }
 
-  private onCatalogReloaded_ = (): void => {
+  private readonly onCatalogReloaded_ = (): void => {
     this.init();
   };
 

@@ -1,7 +1,7 @@
 /* eslint-disable no-process-env */
 // src/scripts/utils/configManager.ts
 import dotenv from 'dotenv';
-import { existsSync } from 'fs';
+import { existsSync } from 'node:fs';
 import { BuildError, ConsoleStyles, ErrorCodes, logWithStyle } from './build-error';
 import { ProfileLoader } from './profile-loader';
 
@@ -67,64 +67,9 @@ export class ConfigManager {
       this.parseCommandLineArgs(args);
 
       if (this.profileName_) {
-        // Profile mode: load from configs/<name>/
-        const profileLoader = new ProfileLoader(rootDir ?? process.cwd());
-        const errors = profileLoader.validateProfile(this.profileName_);
-
-        if (errors.length > 0) {
-          throw new BuildError(
-            `Profile validation failed:\n  ${errors.join('\n  ')}`,
-            ErrorCodes.PROFILE_NOT_FOUND,
-          );
-        }
-
-        // Snapshot OS-level process.env BEFORE dotenv pollutes it. Only true OS
-        // env vars (set by CI/CD or the shell) should be allowed to override
-        // profile config; values loaded from the root .env must not silently
-        // override profile paths (the legacy .env still defines SETTINGS_PATH,
-        // STYLE_CSS_PATH, etc., which would otherwise clobber the profile).
-        const osEnv: NodeJS.ProcessEnv = { ...process.env };
-
-        const profileOverrides = profileLoader.loadProfile(this.profileName_);
-
-        Object.assign(this.config, profileOverrides);
-
-        // CLI args override profile settings (e.g., "production --profile=celestrak")
-        if (this.cliMode_) {
-          this.config.mode = this.cliMode_;
-        }
-        this.config.isWatch = this.cliWatch_;
-
-        // Populate process.env so dotenv-webpack's systemvars picks up secrets that live
-        // in the root .env (e.g., KEEPTRACK_API_KEY) but aren't duplicated in profile.env.
-        // Load profile.env first so its values take precedence over root .env on conflicts;
-        // OS env wins over both because dotenv.config does not overwrite existing keys.
-        if (this.config.envFilePath !== '.env' && existsSync(this.config.envFilePath)) {
-          dotenv.config({ path: this.config.envFilePath });
-        }
-        if (existsSync('./.env')) {
-          dotenv.config({ path: './.env' });
-        }
-
-        // Apply only OS-level env overrides (CI/CD), using the pre-dotenv snapshot
-        // so .env file values cannot silently override profile config.
-        this.applyProcessEnvOverrides_(osEnv);
+        this.loadProfileConfig_(rootDir);
       } else {
-        // Legacy mode: load from .env file
-        const envFilePath = './.env';
-        const envConfig = existsSync(envFilePath)
-          ? dotenv.config({ path: envFilePath })
-          : { parsed: null } as unknown as dotenv.DotenvConfigOutput;
-
-        if (envConfig.error) {
-          throw new BuildError(
-            `Error loading .env file: ${envConfig.error.message}`,
-            ErrorCodes.ENV_CONFIG,
-          );
-        }
-
-        // Load environment variables (environment variables take precedence over .env)
-        this.loadEnvironmentVariables_(envConfig.parsed || {});
+        this.loadLegacyConfig_();
       }
 
       // Log the configuration
@@ -140,6 +85,74 @@ export class ConfigManager {
         ErrorCodes.ENV_CONFIG,
       );
     }
+  }
+
+  /**
+   * Profile mode: load from configs/<name>/.
+   * @param rootDir Project root directory (for resolving profile paths)
+   */
+  private loadProfileConfig_(rootDir?: string): void {
+    const profileLoader = new ProfileLoader(rootDir ?? process.cwd());
+    const errors = profileLoader.validateProfile(this.profileName_!);
+
+    if (errors.length > 0) {
+      throw new BuildError(
+        `Profile validation failed:\n  ${errors.join('\n  ')}`,
+        ErrorCodes.PROFILE_NOT_FOUND,
+      );
+    }
+
+    // Snapshot OS-level process.env BEFORE dotenv pollutes it. Only true OS
+    // env vars (set by CI/CD or the shell) should be allowed to override
+    // profile config; values loaded from the root .env must not silently
+    // override profile paths (the legacy .env still defines SETTINGS_PATH,
+    // STYLE_CSS_PATH, etc., which would otherwise clobber the profile).
+    const osEnv: NodeJS.ProcessEnv = { ...process.env };
+
+    const profileOverrides = profileLoader.loadProfile(this.profileName_!);
+
+    Object.assign(this.config, profileOverrides);
+
+    // CLI args override profile settings (e.g., "production --profile=celestrak")
+    if (this.cliMode_) {
+      this.config.mode = this.cliMode_;
+    }
+    this.config.isWatch = this.cliWatch_;
+
+    // Populate process.env so dotenv-webpack's systemvars picks up secrets that live
+    // in the root .env (e.g., KEEPTRACK_API_KEY) but aren't duplicated in profile.env.
+    // Load profile.env first so its values take precedence over root .env on conflicts;
+    // OS env wins over both because dotenv.config does not overwrite existing keys.
+    if (this.config.envFilePath !== '.env' && existsSync(this.config.envFilePath)) {
+      dotenv.config({ path: this.config.envFilePath });
+    }
+    if (existsSync('./.env')) {
+      dotenv.config({ path: './.env' });
+    }
+
+    // Apply only OS-level env overrides (CI/CD), using the pre-dotenv snapshot
+    // so .env file values cannot silently override profile config.
+    this.applyProcessEnvOverrides_(osEnv);
+  }
+
+  /**
+   * Legacy mode: load from .env file.
+   */
+  private loadLegacyConfig_(): void {
+    const envFilePath = './.env';
+    const envConfig = existsSync(envFilePath)
+      ? dotenv.config({ path: envFilePath })
+      : { parsed: null } as unknown as dotenv.DotenvConfigOutput;
+
+    if (envConfig.error) {
+      throw new BuildError(
+        `Error loading .env file: ${envConfig.error.message}`,
+        ErrorCodes.ENV_CONFIG,
+      );
+    }
+
+    // Load environment variables (environment variables take precedence over .env)
+    this.loadEnvironmentVariables_(envConfig.parsed || {});
   }
 
   /**
@@ -241,16 +254,32 @@ export class ConfigManager {
    * Logs the current configuration
    */
   private logConfiguration(): void {
+    /*
+     * Asset paths and mode can be supplied via environment variables / profiles, so we
+     * must not echo their raw values into build output that CI may capture. Instead we log
+     * non-sensitive, re-derived indicators: a 'set'/'default' flag per path and the mode as
+     * a fixed literal. These helpers return constant strings, so the env-tainted values
+     * never reach the log sink (CodeQL js/clear-text-logging).
+     */
+    const flag = (value?: string): string => (typeof value === 'string' && value.length > 0 ? 'set' : 'default');
+    let safeMode: 'development' | 'production' | 'none' = 'development';
+
+    if (this.config.mode === 'production') {
+      safeMode = 'production';
+    } else if (this.config.mode === 'none') {
+      safeMode = 'none';
+    }
+
     logWithStyle('Build Configuration:', ConsoleStyles.DEBUG);
-    logWithStyle(`Mode: ${this.config.mode}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Mode: ${safeMode}`, ConsoleStyles.DEBUG);
     logWithStyle(`Watch: ${this.config.isWatch}`, ConsoleStyles.DEBUG);
-    logWithStyle(`Settings path: ${this.config.settingsPath}`, ConsoleStyles.DEBUG);
-    logWithStyle(`Favicon path: ${this.config.favIconPath}`, ConsoleStyles.DEBUG);
-    logWithStyle(`Text logo path: ${this.config.textLogoPath}`, ConsoleStyles.DEBUG);
-    logWithStyle(`Style CSS path: ${this.config.styleCssPath}`, ConsoleStyles.DEBUG);
-    logWithStyle(`Loading screen CSS path: ${this.config.loadingScreenCssPath}`, ConsoleStyles.DEBUG);
-    logWithStyle(`Primary logo path: ${this.config.primaryLogoPath}`, ConsoleStyles.DEBUG);
-    logWithStyle(`Secondary logo path: ${this.config.secondaryLogoPath}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Settings path: ${flag(this.config.settingsPath)}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Favicon path: ${flag(this.config.favIconPath)}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Text logo path: ${flag(this.config.textLogoPath)}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Style CSS path: ${flag(this.config.styleCssPath)}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Loading screen CSS path: ${flag(this.config.loadingScreenCssPath)}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Primary logo path: ${flag(this.config.primaryLogoPath)}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Secondary logo path: ${flag(this.config.secondaryLogoPath)}`, ConsoleStyles.DEBUG);
     logWithStyle(`Pro features: ${this.config.isPro ? 'Enabled' : 'Disabled'}`, this.config.isPro ? ConsoleStyles.SUCCESS : ConsoleStyles.INFO);
   }
 }

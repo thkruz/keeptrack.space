@@ -315,7 +315,7 @@ export class PluginDrawer {
         const groupEl = header.parentElement;
 
         groupEl?.classList.toggle('collapsed');
-        const key = groupEl?.getAttribute('data-group-key');
+        const key = groupEl?.dataset.groupKey;
 
         if (key) {
           this.groupStates_[key] = !groupEl?.classList.contains('collapsed');

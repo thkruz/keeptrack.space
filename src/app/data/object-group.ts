@@ -115,7 +115,7 @@ export class ObjectGroup<T extends GroupType> {
     }
   }
 
-  hasObject = (id: number) => this.ids.findIndex((id_) => id_ === id) !== -1;
+  hasObject = (id: number) => this.ids.indexOf(id) !== -1;
 
   // What calls the orbit buffer when selected a group from the menu.
   updateOrbits = (): this => {

@@ -384,8 +384,8 @@ export class UiManager {
   private sortBottomIcons() {
     const bottomIcons = document.querySelectorAll('#bottom-icons > div');
     const sortedIcons = Array.from(bottomIcons).sort((a, b) => {
-      const aOrder = parseInt(a.getAttribute('data-order') ?? KeepTrackPlugin.MAX_BOTTOM_ICON_ORDER.toString(), 10);
-      const bOrder = parseInt(b.getAttribute('data-order') ?? KeepTrackPlugin.MAX_BOTTOM_ICON_ORDER.toString(), 10);
+      const aOrder = Number.parseInt((a as HTMLElement).dataset.order ?? KeepTrackPlugin.MAX_BOTTOM_ICON_ORDER.toString(), 10);
+      const bOrder = Number.parseInt((b as HTMLElement).dataset.order ?? KeepTrackPlugin.MAX_BOTTOM_ICON_ORDER.toString(), 10);
 
       return aOrder - bOrder;
     });
@@ -409,9 +409,9 @@ export class UiManager {
       }
 
       const icons = Array.from(container.querySelectorAll(':scope > div'));
-      const sorted = icons.sort((a, b) => {
-        const aOrder = parseInt(a.getAttribute('data-order') ?? '100', 10);
-        const bOrder = parseInt(b.getAttribute('data-order') ?? '100', 10);
+      const sorted = [...icons].sort((a, b) => {
+        const aOrder = Number.parseInt((a as HTMLElement).dataset.order ?? '100', 10);
+        const bOrder = Number.parseInt((b as HTMLElement).dataset.order ?? '100', 10);
 
         return aOrder - bOrder;
       });
@@ -450,7 +450,7 @@ export class UiManager {
     this.footerToggle();
     const navFooterDom = getEl('nav-footer');
 
-    if (navFooterDom && parseInt(window.getComputedStyle(navFooterDom).bottom.replace('px', '')) < 0) {
+    if (navFooterDom && Number.parseInt(window.getComputedStyle(navFooterDom).bottom.replace('px', '')) < 0) {
       ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
       setTimeout(() => {
         const bottomHeight = getEl('bottom-icons-container')?.offsetHeight;

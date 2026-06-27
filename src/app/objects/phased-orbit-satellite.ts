@@ -30,7 +30,7 @@ export interface OrbitPhase {
  * J2000.toClassicalElements() (inherited from OemSatellite).
  */
 export class PhasedOrbitSatellite extends OemSatellite {
-  private phases_: OrbitPhase[];
+  private readonly phases_: OrbitPhase[];
 
   constructor(oem: ParsedOem, phases: OrbitPhase[], allStates: J2000[], boundaryIndices: number | number[]) {
     super(oem);

@@ -8,5 +8,9 @@ describe('RicPlot_class', () => {
     setupStandardEnvironment([SelectSatManager]);
   });
 
+  it('constructs without throwing', () => {
+    expect(() => new RicPlot()).not.toThrow();
+  });
+
   standardPluginSmokeSuite(RicPlot, 'RicPlot');
 });

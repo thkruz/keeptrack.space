@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { exec } from 'node:child_process';
 
 export const openFile = (filePath: string) => {
   const platform = process.platform;

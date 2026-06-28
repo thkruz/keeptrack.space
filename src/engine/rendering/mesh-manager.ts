@@ -127,6 +127,21 @@ export class MeshManager {
     }
   }
 
+  /**
+   * Kick off a fire-and-forget mesh load. Callers gate this on
+   * meshRegistry_.isLoadingOrFailed() so it dispatches exactly once per mesh:
+   * not again while the load is in flight, and never again after it fails. That
+   * single attempt's rejection MUST still be handled here, otherwise a failed
+   * fetch (offline, 404, transient mobile blip) becomes an unhandled promise
+   * rejection. Because the dispatch happens once, this also logs once.
+   */
+  private loadMesh_(meshName: string): void {
+    this.meshRegistry_.load(meshName, `${settingsManager.installDirectory}meshes/${meshName}.obj`, this.gl_)
+      .catch(() => {
+        errorManagerInstance.debug(`Failed to load mesh model: ${meshName}`);
+      });
+  }
+
   setCurrentModel(model: MeshModel) {
     if (this.currentMeshObject.model?.name !== model.name) {
       this.currentMeshObject.rotation = {
@@ -153,8 +168,8 @@ export class MeshManager {
 
     this.setCurrentModel(resolvedMesh);
 
-    if (!this.currentMeshObject.model?.mesh && this.currentMeshObject.model?.name) {
-      this.meshRegistry_.load(modelName, `${settingsManager.installDirectory}meshes/${modelName}.obj`, this.gl_);
+    if (!this.currentMeshObject.model?.mesh && this.currentMeshObject.model?.name && !this.meshRegistry_.isLoadingOrFailed(modelName)) {
+      this.loadMesh_(modelName);
     }
 
     const drawPosition = position.map((coord) => coord / 1e11) as EciArr3;
@@ -178,10 +193,10 @@ export class MeshManager {
 
     this.updateModel_(selectedDate, sat);
 
-    if (!this.currentMeshObject.model?.mesh && this.currentMeshObject.model?.name) {
-      const meshName = this.currentMeshObject.model.name;
+    const meshName = this.currentMeshObject.model?.name;
 
-      this.meshRegistry_.load(meshName, `${settingsManager.installDirectory}meshes/${meshName}.obj`, this.gl_);
+    if (!this.currentMeshObject.model?.mesh && meshName && !this.meshRegistry_.isLoadingOrFailed(meshName)) {
+      this.loadMesh_(meshName);
     }
 
     const posData = ServiceLocator.getDotsManager().positionData;

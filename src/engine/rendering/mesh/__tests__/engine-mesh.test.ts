@@ -37,6 +37,19 @@ describe('MeshRegistry', () => {
     expect(registry.get('teapot')).toStrictEqual({ name: 'teapot' });
   });
 
+  it('serves a second load of the same mesh from cache without refetching', async () => {
+    const loader = { supports: () => true, load: vi.fn(() => Promise.resolve(meshModel('teapot'))) };
+
+    registry.registerLoader(loader as never, ['.obj']);
+
+    const first = await registry.load('teapot', 'http://x/teapot.obj', gl());
+    // A later render frame asks for the same mesh again — it must hit the cache, not the loader.
+    const second = await registry.load('teapot', 'http://x/teapot.obj', gl());
+
+    expect(second).toBe(first);
+    expect(loader.load).toHaveBeenCalledTimes(1);
+  });
+
   it('throws when no loader is registered for the extension', async () => {
     await expect(registry.load('x', 'http://x/model.fbx', gl())).rejects.toThrow(/No loader/u);
   });
@@ -47,6 +60,17 @@ describe('MeshRegistry', () => {
     registry.registerLoader(loader as never, ['.obj']);
 
     await expect(registry.load('x', 'http://x/bad.obj', gl())).rejects.toThrow(/Failed to load/u);
+  });
+
+  it('does not refetch a url after it failed, and keeps rejecting', async () => {
+    const loader = { supports: () => true, load: vi.fn(() => Promise.reject(new Error('Failed to fetch'))) };
+
+    registry.registerLoader(loader as never, ['.obj']);
+
+    await expect(registry.load('x', 'http://x/gone.obj', gl())).rejects.toThrow(/Failed to fetch/u);
+    // Second call (e.g. the very next render frame) must reject without hitting the loader again.
+    await expect(registry.load('x', 'http://x/gone.obj', gl())).rejects.toThrow(/previously failed/u);
+    expect(loader.load).toHaveBeenCalledTimes(1);
   });
 
   it('deduplicates concurrent loads of the same url', async () => {

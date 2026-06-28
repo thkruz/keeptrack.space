@@ -144,6 +144,42 @@ export class SensorFovMesh extends CustomMesh {
     this.createHorzIndices_(azSegments, elSegments, startIndex, reverse);
   }
 
+  /**
+   * Adds a conical skirt from the sensor location to the inner edge of the
+   * bottom FOV surface. This prevents the FOV from looking like a floating
+   * circle when the sensor has a high minimum elevation (e.g., Poker Flats).
+   *
+   * The inner ring is the first column of the bottom surface vertex grid
+   * (range = minRange, elevation = minEl). We create a triangle fan from
+   * the sensor center to each adjacent pair of inner ring vertices.
+   */
+  private addBottomCone_(innerRingStartIndex: number, innerRingCount: number) {
+    const centerIndex = this.vertexCount_;
+    const center = rae2eci({ az: 0 as Degrees, el: 0 as Degrees, rng: 0 as Kilometers }, this.sensor, 0);
+
+    this.verticesTmp_.push(center.x, center.y, center.z);
+    this.vertexCount_++;
+
+    // Triangle fan: center vertex to each adjacent pair of inner ring vertices
+    for (let i = 0; i < innerRingCount - 1; i++) {
+      const ringA = innerRingStartIndex + i;
+      const ringB = innerRingStartIndex + i + 1;
+
+      // Counter-clockwise when viewed from below (outside the FOV)
+      this.indicesTmp_.push(
+        // center → ringB → ringA
+        centerIndex, ringB, ringA,
+      );
+    }
+
+    // Close the fan (last vertex back to first)
+    this.indicesTmp_.push(
+      centerIndex,
+      innerRingStartIndex,
+      innerRingStartIndex + innerRingCount - 1,
+    );
+  }
+
   private createHorzIndices_(azSegments: number, elSegments: number, startIndex: number, reverse: boolean) {
     for (let i = 0; i < azSegments; i++) {
       for (let j = 0; j < elSegments; j++) {
@@ -281,6 +317,17 @@ export class SensorFovMesh extends CustomMesh {
       );
 
       this.indiciesBottom_ = new Uint16Array(this.indicesTmp_);
+
+      // For sensors with a high minimum elevation (>= 20°), the bottom surface
+      // appears as a small floating circle. Add a conical skirt from the sensor
+      // to the inner ring so the FOV looks like a cone instead.
+      if (minEl > 20 && azRange >= 360) {
+        // Inner ring is the first column in the bottom surface grid (j=0)
+        this.addBottomCone_(
+          0, // inner ring starts at vertex 0 (first column of step 1 grid)
+          this.azimuthSegments + 1,
+        );
+      }
     }
 
     // 2. Left side (if not 360 degrees)

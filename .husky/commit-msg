@@ -1,0 +1,31 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Guard against corrupt commit subjects that poison the generated changelog.
+#
+# docs/CHANGELOG.md is fully regenerated from git history by `npm run changelog`
+# on every version bump, so a bad subject line is baked in permanently and
+# reappears on every release (manual edits to the changelog never hold).
+#
+# The classic offender is a PowerShell here-string leak (`@'...'@`) where the
+# `@` delimiters bleed into `git commit -m`, leaving the subject as a bare `@`.
+# Reject those (and empty subjects) here so the changelog stays clean.
+
+msg_file="$1"
+
+# First non-comment, non-blank line = the subject git uses for the changelog.
+subject=$(grep -vE '^\s*#' "$msg_file" | grep -vE '^\s*$' | head -n1)
+
+case "$subject" in
+  '@'*)
+    echo "commit-msg: subject line starts with '@': \"$subject\"" >&2
+    echo "  This is almost always a PowerShell here-string (@'...'@) leak." >&2
+    echo "  Fix the message so the first line is the real conventional-commit" >&2
+    echo "  summary, e.g. feat(scope): :sparkles: message" >&2
+    exit 1
+    ;;
+  '')
+    echo "commit-msg: empty subject line. Provide a conventional-commit summary." >&2
+    exit 1
+    ;;
+esac

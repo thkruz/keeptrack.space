@@ -189,7 +189,7 @@ export class CountriesMenu extends KeepTrackPlugin implements ICommandPaletteCap
     countryMenuEl.querySelectorAll('.country-option').forEach((element) => {
       element.addEventListener('click', () => {
         ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
-        this.countryMenuClick_(element.getAttribute('data-group') ?? '');
+        this.countryMenuClick_((element as HTMLElement).dataset.group ?? '');
       });
     });
   }

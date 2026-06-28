@@ -9,8 +9,9 @@ import { DotsManager } from '@app/engine/rendering/dots-manager';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { settingsManager } from '@app/settings/settings';
-import { Satellite } from '@ootk/src/main';
-import { defaultMisl, defaultSat } from '@test/environment/apiMocks';
+import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
+import { BaseObject, Degrees, Radians, Satellite, Star } from '@ootk/src/main';
+import { defaultMisl, defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 
 describe('SearchManager', () => {
@@ -242,6 +243,88 @@ describe('SearchManager', () => {
       expect(() => searchManager.doSearch('99999')).not.toThrow();
     });
   });
+
+  // #855: stars, sensors, launch sites, and planets are searchable by name,
+  // gated by the per-type searchableTypes toggles (off by default).
+  describe('searchable object types (#855)', () => {
+    let objects: BaseObject[];
+
+    const buildCatalog = (objs: BaseObject[]) => ({
+      objectCache: objs,
+      numSatellites: objs.length,
+      getObject: (id: number) => objs[id],
+    }) as unknown as CatalogManager;
+
+    const wireUpServiceLocator = (catalog: CatalogManager) => {
+      vi.spyOn(ServiceLocator, 'getCatalogManager').mockReturnValue(catalog);
+      vi.spyOn(ServiceLocator, 'getDotsManager').mockReturnValue({
+        updateSizeBuffer: vi.fn(),
+        getCurrentPosition: vi.fn().mockReturnValue({ x: 1, y: 1, z: 1 }),
+        positionData: new Float32Array((catalog.objectCache.length + 1) * 3),
+      } as unknown as DotsManager);
+      vi.spyOn(ServiceLocator, 'getGroupsManager').mockReturnValue({
+        createGroup: vi.fn().mockReturnValue({}),
+        selectGroup: vi.fn(),
+        clearSelect: vi.fn(),
+      } as unknown as GroupsManager);
+      vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ toast: vi.fn() } as never);
+    };
+
+    beforeEach(() => {
+      settingsManager.minimumSearchCharacters = 0;
+      settingsManager.searchLimit = 100;
+      settingsManager.isShowDecayedInSearch = true;
+      settingsManager.isShowVimpelInSearch = false;
+      settingsManager.searchableFields = { name: true, altName: true, bus: true, noradId: true, intlDes: true, launchVehicle: true };
+      settingsManager.searchableTypes = { satellite: true, missile: true, star: false, sensor: false, launchSite: false, planet: false };
+
+      objects = [
+        new Satellite({ ...defaultSat, id: 0, name: 'ISS (ZARYA)', sccNum: '25544' }),
+        new Star({ id: 1, name: 'POLARIS', ra: 0 as Radians, dec: 0 as Radians }),
+        new LaunchSite({ id: 2, name: 'BAIKONUR', lat: 45.9 as Degrees, lon: 63.3 as Degrees, alt: 0 }),
+        defaultSensor, // id 3, name 'Cape Cod SFS, Massachusetts'
+      ];
+      wireUpServiceLocator(buildCatalog(objects));
+    });
+
+    it('still finds satellites by name with the default toggles', () => {
+      searchManager.doSearch('ZARYA');
+      expect(settingsManager.lastSearchResults).toEqual([0]);
+    });
+
+    it('does not return a star, sensor, or launch site when those types are disabled', () => {
+      searchManager.doSearch('POLARIS');
+      expect(settingsManager.lastSearchResults).toEqual([]);
+      searchManager.doSearch('CAPE');
+      expect(settingsManager.lastSearchResults).toEqual([]);
+      searchManager.doSearch('BAIKONUR');
+      expect(settingsManager.lastSearchResults).toEqual([]);
+    });
+
+    it('returns a star only when the star type is enabled', () => {
+      settingsManager.searchableTypes = { ...settingsManager.searchableTypes, star: true };
+      searchManager.doSearch('POLARIS');
+      expect(settingsManager.lastSearchResults).toEqual([1]);
+    });
+
+    it('returns a launch site only when the launch-site type is enabled', () => {
+      settingsManager.searchableTypes = { ...settingsManager.searchableTypes, launchSite: true };
+      searchManager.doSearch('BAIKONUR');
+      expect(settingsManager.lastSearchResults).toEqual([2]);
+    });
+
+    it('returns a sensor only when the sensor type is enabled', () => {
+      settingsManager.searchableTypes = { ...settingsManager.searchableTypes, sensor: true };
+      searchManager.doSearch('CAPE');
+      expect(settingsManager.lastSearchResults).toEqual([3]);
+    });
+
+    it('disabling the satellite type removes satellites from results', () => {
+      settingsManager.searchableTypes = { ...settingsManager.searchableTypes, satellite: false };
+      searchManager.doSearch('ZARYA');
+      expect(settingsManager.lastSearchResults).toEqual([]);
+    });
+  });
 });
 
 describe('SearchManager interactions', () => {
@@ -342,6 +425,47 @@ describe('SearchManager interactions', () => {
 
     document.getElementById('search-icon')!.dispatchEvent(new Event('click'));
     expect(toggleSpy).toHaveBeenCalled();
+  });
+
+  // #855: clicking any search result rotates the camera toward the object.
+  const clickFirstResult = (objId: number) => {
+    p().addListeners_();
+    document.getElementById('search-results')!.innerHTML = `<div class="search-result" data-obj-id="${objId}"></div>`;
+    (document.querySelector('.search-result') as HTMLElement).dispatchEvent(new Event('click', { bubbles: true }));
+  };
+
+  it('clicking a star result rotates the camera via lookAtStar', () => {
+    const star = new Star({ id: 5, name: 'VEGA', ra: 0 as Radians, dec: 0 as Radians });
+
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'getObject').mockReturnValue(star);
+    const lookAtStarSpy = vi.fn();
+
+    ServiceLocator.getMainCamera().lookAtStar = lookAtStarSpy;
+
+    clickFirstResult(5);
+    expect(lookAtStarSpy).toHaveBeenCalledWith(star);
+  });
+
+  it('clicking a launch-site result rotates the camera to its lat/lon', () => {
+    const site = new LaunchSite({ id: 6, name: 'KOUROU', lat: 5.2 as Degrees, lon: -52.7 as Degrees, alt: 0 });
+
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'getObject').mockReturnValue(site);
+    const lookAtLatLonSpy = vi.spyOn(ServiceLocator.getMainCamera(), 'lookAtLatLon').mockImplementation(() => undefined);
+
+    vi.spyOn(PluginRegistry.getPlugin(SelectSatManager)!, 'selectSat').mockImplementation(() => undefined);
+
+    clickFirstResult(6);
+    expect(lookAtLatLonSpy).toHaveBeenCalledWith(5.2, -52.7, expect.anything(), expect.anything());
+  });
+
+  it('clicking a sensor result rotates the camera to its lat/lon', () => {
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'getObject').mockReturnValue(defaultSensor);
+    const lookAtLatLonSpy = vi.spyOn(ServiceLocator.getMainCamera(), 'lookAtLatLon').mockImplementation(() => undefined);
+
+    vi.spyOn(PluginRegistry.getPlugin(SelectSatManager)!, 'selectSat').mockImplementation(() => undefined);
+
+    clickFirstResult(defaultSensor.id);
+    expect(lookAtLatLonSpy).toHaveBeenCalledWith(defaultSensor.lat, defaultSensor.lon, expect.anything(), expect.anything());
   });
 
   it('keyboard ArrowDown selects the first result row', () => {

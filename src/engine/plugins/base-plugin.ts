@@ -506,44 +506,7 @@ export abstract class KeepTrackPlugin {
 
     // Initialize bottom icon component if config method exists
     if (hasBottomIcon(this)) {
-      const config = this.getBottomIconConfig();
-
-      // Sync with legacy properties for backwards compatibility
-      this.bottomIconElementName = config.elementName;
-      this.bottomIconLabel = config.label;
-      this.bottomIconImg = config.image as unknown as Module;
-      this.isIconDisabledOnLoad = config.isDisabledOnLoad ?? this.isIconDisabledOnLoad;
-      if (config.menuMode) {
-        this.menuMode = config.menuMode;
-      }
-      if (config.order !== undefined) {
-        this.bottomIconOrder = config.order;
-      }
-      if (config.placement) {
-        this.iconPlacement = config.placement;
-      }
-      if (config.utilityGroup) {
-        this.utilityGroup = config.utilityGroup;
-      }
-
-      this.bottomIconComponent_ = new BottomIconComponent(
-        this.id,
-        config,
-        {
-          onClick: () => {
-            if ('onBottomIconClick' in this && typeof this.onBottomIconClick === 'function') {
-              return this.onBottomIconClick();
-            }
-
-            return undefined;
-          },
-          onDeselect: () => {
-            if ('onBottomIconDeselect' in this && typeof this.onBottomIconDeselect === 'function') {
-              this.onBottomIconDeselect();
-            }
-          },
-        },
-      );
+      this.initBottomIconComponent_();
     }
 
     // Initialize side menu component if config method exists
@@ -669,6 +632,55 @@ export abstract class KeepTrackPlugin {
     if (hasDownload(this) && !hasSecondaryMenu(this)) {
       this.downloadIconCb = () => this.onDownload();
     }
+  }
+
+  /**
+   * Initialize the bottom icon component from its config method and sync the
+   * legacy properties for backwards compatibility.
+   */
+  private initBottomIconComponent_(): void {
+    if (!hasBottomIcon(this)) {
+      return;
+    }
+
+    const config = this.getBottomIconConfig();
+
+    // Sync with legacy properties for backwards compatibility
+    this.bottomIconElementName = config.elementName;
+    this.bottomIconLabel = config.label;
+    this.bottomIconImg = config.image as unknown as Module;
+    this.isIconDisabledOnLoad = config.isDisabledOnLoad ?? this.isIconDisabledOnLoad;
+    if (config.menuMode) {
+      this.menuMode = config.menuMode;
+    }
+    if (config.order !== undefined) {
+      this.bottomIconOrder = config.order;
+    }
+    if (config.placement) {
+      this.iconPlacement = config.placement;
+    }
+    if (config.utilityGroup) {
+      this.utilityGroup = config.utilityGroup;
+    }
+
+    this.bottomIconComponent_ = new BottomIconComponent(
+      this.id,
+      config,
+      {
+        onClick: () => {
+          if ('onBottomIconClick' in this && typeof this.onBottomIconClick === 'function') {
+            return this.onBottomIconClick();
+          }
+
+          return undefined;
+        },
+        onDeselect: () => {
+          if ('onBottomIconDeselect' in this && typeof this.onBottomIconDeselect === 'function') {
+            this.onBottomIconDeselect();
+          }
+        },
+      },
+    );
   }
 
   protected isSettingsMenuEnabled_ = true;

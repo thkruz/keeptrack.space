@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v13.0.3](https://github.com/thkruz/keeptrack.space/compare/v13.0.2...v13.0.3)
+
+>  
+
+- fix(mesh): :bug: key mesh registry by name and load each model once [`07baa28`](https://github.com/thkruz/keeptrack.space/commit/07baa28be96c5358655e9a0d8d845cbc8db7f69a)
+- chore(changelog): :wrench: reject corrupt commit subjects via commit-msg hook [`03fcac2`](https://github.com/thkruz/keeptrack.space/commit/03fcac253504868d0660b711b125bedafaa761ea)
+- docs(changelog): :memo: update changelog for v13.0.2 release [`17da80b`](https://github.com/thkruz/keeptrack.space/commit/17da80bd577c17a83773021a6af87ac3367ee03b)
+- fix(changelog): :bug: always render version headings at #### level [`2e50edb`](https://github.com/thkruz/keeptrack.space/commit/2e50edb2174a2ff5352512718e16407a26efe82a)
+
 #### [v13.0.2](https://github.com/thkruz/keeptrack.space/compare/v13.0.1...v13.0.2)
 
 >  
@@ -107,7 +116,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - chore(tsconfig): :wrench: update ignoreDeprecations option [`922db35`](https://github.com/thkruz/keeptrack.space/commit/922db3597a037e094076bd55330c59a28cd9277a)
 - test(ui-manager): :white_check_mark: assert sensor info state is set [`8c63a27`](https://github.com/thkruz/keeptrack.space/commit/8c63a27ee5b16676773eb6bf5535460ce79a18aa)
 
-### [v13.0.0](https://github.com/thkruz/keeptrack.space/compare/v12.5.0...v13.0.0)
+#### [v13.0.0](https://github.com/thkruz/keeptrack.space/compare/v12.5.0...v13.0.0)
 
 >  
 
@@ -1695,7 +1704,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - chore(assets): :wrench: add new icon assets [`9538ba9`](https://github.com/thkruz/keeptrack.space/commit/9538ba9b51cdecd32dd99a0472290514fbb002b1)
 - feat(icons): :sparkles: add high-resolution and SD icons [`9669922`](https://github.com/thkruz/keeptrack.space/commit/966992267e2e43c12bb4832c818d30ece6a45a3f)
 
-### [v12.0.0](https://github.com/thkruz/keeptrack.space/compare/v11.1.0...v12.0.0)
+#### [v12.0.0](https://github.com/thkruz/keeptrack.space/compare/v11.1.0...v12.0.0)
 
 >  
 
@@ -2088,7 +2097,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - build: :lock: fix security issues with some dependencies [`15289c4`](https://github.com/thkruz/keeptrack.space/commit/15289c4adc3738577e92be4a169ee891bf0bd805)
 - refactor: :truck: move unit tests for SelectSatManager, SoundToggle, and VCR plugin to enhance test coverage [`120bf5a`](https://github.com/thkruz/keeptrack.space/commit/120bf5a7c52caa1e57522821ee6ccc191a390ed2)
 
-### [v11.0.2](https://github.com/thkruz/keeptrack.space/compare/v3.2.0...v11.0.2)
+#### [v11.0.2](https://github.com/thkruz/keeptrack.space/compare/v3.2.0...v11.0.2)
 
 >  
 
@@ -4948,7 +4957,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - Remove highres images [`dfff3ef`](https://github.com/thkruz/keeptrack.space/commit/dfff3ef86cfd5d938e884df454012e337936d559)
 - Remove 8k images [`51be69d`](https://github.com/thkruz/keeptrack.space/commit/51be69d83f2992a8df18794b5ebbca59b77b2a20)
 
-### [v3.0.0](https://github.com/thkruz/keeptrack.space/compare/v2.8.1...v3.0.0)
+#### [v3.0.0](https://github.com/thkruz/keeptrack.space/compare/v2.8.1...v3.0.0)
 
 >  
 
@@ -5056,7 +5065,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 - Offline fixes and rmManager [`ec4d89f`](https://github.com/thkruz/keeptrack.space/commit/ec4d89fe9bd47db5fb6ee31402f72a32f3a4e447)
 
-### [v2.0.0](https://github.com/thkruz/keeptrack.space/compare/v1.20.12...v2.0.0)
+#### [v2.0.0](https://github.com/thkruz/keeptrack.space/compare/v1.20.12...v2.0.0)
 
 >  
 
@@ -5442,7 +5451,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - Delete .jshintrc [`246ef1e`](https://github.com/thkruz/keeptrack.space/commit/246ef1ef065b3d05e45d7cef48cd418e64443fed)
 - License Typo [`d6d488f`](https://github.com/thkruz/keeptrack.space/commit/d6d488f3782bfe8eb294cb87227320a5dbb446c6)
 
-### [v1.0.0](https://github.com/thkruz/keeptrack.space/compare/v0.48.2...v1.0.0)
+#### [v1.0.0](https://github.com/thkruz/keeptrack.space/compare/v0.48.2...v1.0.0)
 
 >  
 

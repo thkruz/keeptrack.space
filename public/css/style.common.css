@@ -3159,6 +3159,14 @@ nav a.sidenav-trigger i {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  /*
+   * Pin the name column immediately after the badge. The row uses
+   * justify-content: space-between, which would otherwise center this middle
+   * column in the leftover space and shift its left edge per row depending on
+   * the right column's width. The auto margin absorbs the slack instead, so the
+   * name always starts at the same x and the right column stays right-aligned.
+   */
+  margin-right: auto;
 }
 
 #search-results {
@@ -4448,9 +4456,32 @@ a {
   background: var(--kt-bg-surface, #424242);
   color: var(--kt-text-secondary, rgba(255, 255, 255, 0.7));
   margin-right: 8px;
-  min-width: 42px;
+  /*
+   * Fixed width sized to the longest label ("MISSILE"/"SENSOR") so every badge
+   * is identical and the name column lines up across rows regardless of type.
+   */
+  width: 64px;
+  box-sizing: border-box;
   text-align: center;
   flex-shrink: 0;
+}
+
+/*
+ * Right-hand column of a search result (sccNum / intl. designator for sats,
+ * country for sensors and launch sites). Keep it on one line and right-aligned;
+ * longer values (e.g. "United States") get an ellipsis instead of wrapping, and
+ * the main name column shrinks to make room.
+ */
+.search-result-scc {
+  flex-shrink: 0;
+  max-width: 45%;
+  margin-left: 8px;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.9em;
+  color: var(--kt-text-secondary, rgba(255, 255, 255, 0.7));
 }
 
 /* Focus-visible for keyboard navigation */

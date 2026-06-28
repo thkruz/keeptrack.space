@@ -1,7 +1,6 @@
 {
   "SelectSatManager": {
-    "objectInsideEarth": "Объект находится внутри Земли, выбор невозможен",
-    "noSatellitesFound": "Спутники для этого владельца/производителя не найдены"
+    "objectInsideEarth": "Объект находится внутри Земли, выбор невозможен"
   },
   "plugins": {
     "SelectSatManager": {

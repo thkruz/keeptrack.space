@@ -1,7 +1,6 @@
 {
   "SelectSatManager": {
-    "objectInsideEarth": "Objekt je uvnitř Země, nelze jej vybrat",
-    "noSatellitesFound": "Pro tohoto vlastníka/výrobce nebyly nalezeny žádné satelity"
+    "objectInsideEarth": "Objekt je uvnitř Země, nelze jej vybrat"
   },
   "plugins": {
     "SelectSatManager": {

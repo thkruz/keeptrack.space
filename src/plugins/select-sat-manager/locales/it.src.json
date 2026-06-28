@@ -1,7 +1,6 @@
 {
   "SelectSatManager": {
-    "objectInsideEarth": "L'oggetto si trova all'interno della Terra, impossibile selezionarlo",
-    "noSatellitesFound": "Nessun satellite trovato per questo proprietario/produttore"
+    "objectInsideEarth": "L'oggetto si trova all'interno della Terra, impossibile selezionarlo"
   },
   "plugins": {
     "SelectSatManager": {

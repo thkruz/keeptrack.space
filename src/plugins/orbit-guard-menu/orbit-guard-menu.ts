@@ -276,7 +276,7 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
     const tr = tbl.insertRow();
 
     tr.setAttribute('class', 'maneuver-object link');
-    tr.setAttribute('data-row', i.toString());
+    tr.dataset.row = i.toString();
 
     const formatDateTime = (isoString: string) => {
       const date = new Date(isoString.slice(-1).toUpperCase() === 'Z' ? isoString : `${isoString}Z`); // Ensure UTC parsing

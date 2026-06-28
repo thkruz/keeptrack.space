@@ -49,6 +49,17 @@ describe('MeshRegistry', () => {
     await expect(registry.load('x', 'http://x/bad.obj', gl())).rejects.toThrow(/Failed to load/u);
   });
 
+  it('does not refetch a url after it failed, and keeps rejecting', async () => {
+    const loader = { supports: () => true, load: vi.fn(() => Promise.reject(new Error('Failed to fetch'))) };
+
+    registry.registerLoader(loader as never, ['.obj']);
+
+    await expect(registry.load('x', 'http://x/gone.obj', gl())).rejects.toThrow(/Failed to fetch/u);
+    // Second call (e.g. the very next render frame) must reject without hitting the loader again.
+    await expect(registry.load('x', 'http://x/gone.obj', gl())).rejects.toThrow(/previously failed/u);
+    expect(loader.load).toHaveBeenCalledTimes(1);
+  });
+
   it('deduplicates concurrent loads of the same url', async () => {
     let resolveFn: (m: unknown) => void = () => undefined;
     const pending = new Promise((r) => {

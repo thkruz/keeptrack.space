@@ -5,6 +5,7 @@ export class MeshRegistry {
   private readonly meshes = new Map<string, MeshModel>();
   private readonly loaders = new Map<string, MeshLoader>();
   private readonly loadingPromises = new Map<string, Promise<MeshModel>>();
+  private readonly failedUrls = new Set<string>();
 
   registerLoader(loader: MeshLoader, extensions: string[]) {
     extensions.forEach((ext) => this.loaders.set(ext, loader));
@@ -19,6 +20,15 @@ export class MeshRegistry {
     // Check cache
     if (this.meshes.has(url)) {
       return this.meshes.get(url)!;
+    }
+
+    /*
+     * A previous attempt failed (e.g. the model file 404'd or the network
+     * dropped). The render loop calls load() every frame, so without this guard
+     * a single failure becomes a per-frame fetch + unhandled-rejection storm.
+     */
+    if (this.failedUrls.has(url)) {
+      throw new Error(`Mesh previously failed to load from ${url}`);
     }
 
     // Check if already loading
@@ -43,6 +53,12 @@ export class MeshRegistry {
       this.loadingPromises.delete(url);
 
       return mesh;
+    }).catch((error: unknown) => {
+      // Drop the in-flight entry and remember the failure so we don't refetch every frame.
+      this.loadingPromises.delete(url);
+      this.failedUrls.add(url);
+
+      throw error;
     });
 
     this.loadingPromises.set(url, promise);

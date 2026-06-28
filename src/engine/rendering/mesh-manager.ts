@@ -127,6 +127,19 @@ export class MeshManager {
     }
   }
 
+  /**
+   * Kick off a fire-and-forget mesh load. The render loop calls this every frame
+   * until the model resolves, so the rejection MUST be handled here, otherwise a
+   * failed fetch (offline, 404, transient mobile blip) becomes an unhandled
+   * promise rejection. The registry remembers the failure so we only log once.
+   */
+  private loadMesh_(meshName: string): void {
+    this.meshRegistry_.load(meshName, `${settingsManager.installDirectory}meshes/${meshName}.obj`, this.gl_)
+      .catch(() => {
+        errorManagerInstance.debug(`Failed to load mesh model: ${meshName}`);
+      });
+  }
+
   setCurrentModel(model: MeshModel) {
     if (this.currentMeshObject.model?.name !== model.name) {
       this.currentMeshObject.rotation = {
@@ -154,7 +167,7 @@ export class MeshManager {
     this.setCurrentModel(resolvedMesh);
 
     if (!this.currentMeshObject.model?.mesh && this.currentMeshObject.model?.name) {
-      this.meshRegistry_.load(modelName, `${settingsManager.installDirectory}meshes/${modelName}.obj`, this.gl_);
+      this.loadMesh_(modelName);
     }
 
     const drawPosition = position.map((coord) => coord / 1e11) as EciArr3;
@@ -179,9 +192,7 @@ export class MeshManager {
     this.updateModel_(selectedDate, sat);
 
     if (!this.currentMeshObject.model?.mesh && this.currentMeshObject.model?.name) {
-      const meshName = this.currentMeshObject.model.name;
-
-      this.meshRegistry_.load(meshName, `${settingsManager.installDirectory}meshes/${meshName}.obj`, this.gl_);
+      this.loadMesh_(this.currentMeshObject.model.name);
     }
 
     const posData = ServiceLocator.getDotsManager().positionData;

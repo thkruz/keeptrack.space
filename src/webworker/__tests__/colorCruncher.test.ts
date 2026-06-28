@@ -260,7 +260,7 @@ describe('colorCruncher', () => {
     // Three rapid updates collapse to a single debounced recolor.
     dispatch({ typ: MSG.UPDATE_SETTINGS, settingsFlags: {
       cameraType: 0, isShowPayloads: true, isShowRocketBodies: true, isShowDebris: true,
-      isShowAgencies: true, isDisableLaunchSites: false, isDisableSensors: false,
+      isDisableLaunchSites: false, isDisableSensors: false,
       isSensorManagerLoaded: false, sensorType: 0, maxZoomDistance: 100000, isMissileSimulatorEnabled: true,
     } });
     dispatch({ typ: MSG.UPDATE_OBJ_TYPE_FLAGS, objectTypeFlags: { sensor: true, payload: true } });

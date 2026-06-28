@@ -175,18 +175,12 @@ export abstract class ColorScheme {
       case SpaceObjectType.PAYLOAD_MANUFACTURER:
       case SpaceObjectType.LAUNCH_AGENCY:
       case SpaceObjectType.CONTROL_FACILITY:
-        // If the facility flag is off then we don't want to show this
-        if (!settingsManager.isShowAgencies || this.objectTypeFlags.facility === false || ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM) {
-          return {
-            color: this.colorTheme.deselected,
-            pickable: Pickable.No,
-          };
-          // Otherwise we want to show it
-        }
-
+        // Agencies/operators are no longer drawn on the globe. They are not
+        // loaded into the catalog (see StringExtractor.controlSiteTypeFilter),
+        // but keep them hidden defensively in case the data is referenced.
         return {
-          color: this.colorTheme.starHi,
-          pickable: Pickable.Yes,
+          color: this.colorTheme.deselected,
+          pickable: Pickable.No,
         };
 
       case SpaceObjectType.LAUNCH_SITE:

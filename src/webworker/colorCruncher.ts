@@ -68,7 +68,6 @@ let settings: SettingsFlags = {
   isShowPayloads: true,
   isShowRocketBodies: true,
   isShowDebris: true,
-  isShowAgencies: true,
   isDisableLaunchSites: false,
   isDisableSensors: false,
   isSensorManagerLoaded: false,
@@ -204,11 +203,9 @@ function isLaunchSiteType(type: number): boolean {
  */
 function checkFacility(colorData: Float32Array, pickableData: Int8Array, i: number, type: number): boolean {
   if (isFacilityType(type)) {
-    if (!settings.isShowAgencies || objectTypeFlags.facility === false || settings.cameraType === CAM_PLANETARIUM) {
-      writeDeselected(colorData, pickableData, i);
-    } else {
-      writeColorArr(colorData, pickableData, i, colorTheme.starHi ?? [1, 1, 1, 1], PICKABLE_YES);
-    }
+    // Agencies/operators are no longer drawn on the globe (and are not loaded
+    // into the catalog). Keep them hidden defensively.
+    writeDeselected(colorData, pickableData, i);
 
     return true;
   }

@@ -1214,7 +1214,6 @@ export class ColorSchemeManager {
       isShowPayloads: settingsManager.isShowPayloads,
       isShowRocketBodies: settingsManager.isShowRocketBodies,
       isShowDebris: settingsManager.isShowDebris,
-      isShowAgencies: settingsManager.isShowAgencies,
       isDisableLaunchSites: settingsManager.isDisableLaunchSites,
       isDisableSensors: settingsManager.isDisableSensors,
       isSensorManagerLoaded: catalogManager.isSensorManagerLoaded,

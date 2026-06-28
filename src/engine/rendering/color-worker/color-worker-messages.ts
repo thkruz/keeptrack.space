@@ -71,7 +71,6 @@ export interface SettingsFlags {
   isShowPayloads: boolean;
   isShowRocketBodies: boolean;
   isShowDebris: boolean;
-  isShowAgencies: boolean;
   isDisableLaunchSites: boolean;
   isDisableSensors: boolean;
   isSensorManagerLoaded: boolean;

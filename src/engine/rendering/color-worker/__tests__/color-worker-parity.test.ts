@@ -255,7 +255,6 @@ describe('Color Worker Parity', () => {
     isShowPayloads: true,
     isShowRocketBodies: true,
     isShowDebris: true,
-    isShowAgencies: true,
     isDisableLaunchSites: false,
     isDisableSensors: false,
     isSensorManagerLoaded: true,

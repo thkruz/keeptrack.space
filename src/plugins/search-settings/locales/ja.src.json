@@ -5,6 +5,7 @@
       "title": "検索設定",
       "sections": {
         "resultLimits": "結果の上限",
+        "objectTypes": "オブジェクトタイプ",
         "searchFields": "検索フィールド",
         "filters": "フィルター",
         "actions": "アクション"
@@ -22,6 +23,14 @@
           "noradId": "NORAD ID",
           "intlDes": "国際識別符号",
           "launchVehicle": "打ち上げロケット"
+        },
+        "types": {
+          "satellite": "衛星",
+          "missile": "ミサイル",
+          "star": "恒星",
+          "sensor": "センサー",
+          "launchSite": "打上げサイト",
+          "planet": "惑星"
         }
       },
       "tooltips": {

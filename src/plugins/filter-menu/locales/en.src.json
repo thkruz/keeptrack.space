@@ -76,13 +76,6 @@
       "category": "Object Types",
       "tooltip": "Satellites that are planned or proposed but not yet launched."
     },
-    "agencies": {
-      "name": "Agencies",
-      "category": "Object Types",
-      "tooltip": "Planned feature - This will show agencies on the globe.",
-      "checked": false,
-      "disabled": true
-    },
     "groundSensors": {
       "name": "Ground Sensors",
       "category": "Object Types",

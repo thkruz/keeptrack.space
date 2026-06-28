@@ -4,7 +4,7 @@
  * this pure makes it unit-testable without jsdom and keeps the plugin file
  * focused on DOM wiring.
  */
-import type { SearchableFields } from '@app/settings/core-settings';
+import type { SearchableFields, SearchableTypes } from '@app/settings/core-settings';
 
 /** Allowed range and default for the maximum number of search results. */
 export const SEARCH_LIMIT_MIN = 1;
@@ -28,6 +28,16 @@ export const DEFAULT_SEARCHABLE_FIELDS: SearchableFields = {
   noradId: true,
   intlDes: true,
   launchVehicle: true,
+};
+
+/** Every searchable object type enabled — the default and the reset target. */
+export const DEFAULT_SEARCHABLE_TYPES: SearchableTypes = {
+  satellite: true,
+  missile: true,
+  star: true,
+  sensor: true,
+  launchSite: true,
+  planet: true,
 };
 
 export interface ParsedNumber {
@@ -107,3 +117,33 @@ export const parseSearchableFields = (raw: string | null): SearchableFields => {
 
 /** Serialize the searchable-fields map for persistence. */
 export const serializeSearchableFields = (fields: SearchableFields): string => JSON.stringify(fields);
+
+/**
+ * Parse a persisted searchable-types JSON blob. Unknown keys are dropped and
+ * missing keys fall back to their default (satellites/missiles on, the rest
+ * off), so an old or corrupt value never changes a toggle the user never set.
+ */
+export const parseSearchableTypes = (raw: string | null): SearchableTypes => {
+  const result: SearchableTypes = { ...DEFAULT_SEARCHABLE_TYPES };
+
+  if (raw === null) {
+    return result;
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+
+    for (const key of Object.keys(DEFAULT_SEARCHABLE_TYPES) as (keyof SearchableTypes)[]) {
+      if (typeof parsed[key] === 'boolean') {
+        result[key] = parsed[key];
+      }
+    }
+  } catch {
+    // Corrupt value — keep the defaults.
+  }
+
+  return result;
+};
+
+/** Serialize the searchable-types map for persistence. */
+export const serializeSearchableTypes = (types: SearchableTypes): string => JSON.stringify(types);

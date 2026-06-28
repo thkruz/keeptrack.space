@@ -5,6 +5,7 @@
       "title": "Search Settings",
       "sections": {
         "resultLimits": "Result Limits",
+        "objectTypes": "Object Types",
         "searchFields": "Search Fields",
         "filters": "Filters",
         "actions": "Actions"
@@ -22,6 +23,14 @@
           "noradId": "NORAD ID",
           "intlDes": "International Designator",
           "launchVehicle": "Launch Vehicle"
+        },
+        "types": {
+          "satellite": "Satellites",
+          "missile": "Missiles",
+          "star": "Stars",
+          "sensor": "Sensors",
+          "launchSite": "Launch Sites",
+          "planet": "Planets"
         }
       },
       "tooltips": {

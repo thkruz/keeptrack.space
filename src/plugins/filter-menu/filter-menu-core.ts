@@ -38,7 +38,6 @@ export interface FilterPluginSettings {
   rocketBodies?: boolean;
   debris?: boolean;
   unknownType?: boolean;
-  agencies?: boolean;
   groundSensors?: boolean;
   launchFacilities?: boolean;
   starlinkSatellites?: boolean;
@@ -81,7 +80,6 @@ export const FILTER_STORAGE_MAP: Record<string, StorageKey> = {
   rocketBodies: StorageKey.FILTER_SETTINGS_ROCKET_BODIES,
   debris: StorageKey.FILTER_SETTINGS_DEBRIS,
   unknownType: StorageKey.FILTER_SETTINGS_UNKNOWN_TYPE,
-  agencies: StorageKey.FILTER_SETTINGS_AGENCIES,
   vLEOSatellites: StorageKey.FILTER_SETTINGS_VLEO,
   lEOSatellites: StorageKey.FILTER_SETTINGS_LEO,
   hEOSatellites: StorageKey.FILTER_SETTINGS_HEO,
@@ -176,14 +174,6 @@ export const getFilters = (): Filters[] => [
     name: t7e('filterMenu.notionalSatellites.name'),
     category: t7e('filterMenu.notionalSatellites.category'),
     tooltip: t7e('filterMenu.notionalSatellites.tooltip'),
-  },
-  {
-    id: 'agencies',
-    name: t7e('filterMenu.agencies.name'),
-    category: t7e('filterMenu.agencies.category'),
-    tooltip: t7e('filterMenu.agencies.tooltip'),
-    checked: false,
-    disabled: true,
   },
   {
     id: 'groundSensors',

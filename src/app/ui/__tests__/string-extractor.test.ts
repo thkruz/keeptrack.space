@@ -99,9 +99,11 @@ describe('StringExtractor_class', () => {
 });
 
 describe('StringExtractor_more', () => {
-  it('controlSiteTypeFilter accepts launch/agency types and rejects others', () => {
+  it('controlSiteTypeFilter accepts launch sites and rejects agencies and other types', () => {
     expect(StringExtractor.controlSiteTypeFilter({ type: SpaceObjectType.LAUNCH_SITE } as BaseObject)).toBe(true);
-    expect(StringExtractor.controlSiteTypeFilter({ type: SpaceObjectType.LAUNCH_AGENCY } as BaseObject)).toBe(true);
+    expect(StringExtractor.controlSiteTypeFilter({ type: SpaceObjectType.LAUNCH_POSITION } as BaseObject)).toBe(true);
+    // Agencies are no longer drawn on the globe, so they must not be loaded
+    expect(StringExtractor.controlSiteTypeFilter({ type: SpaceObjectType.LAUNCH_AGENCY } as BaseObject)).toBe(false);
     expect(StringExtractor.controlSiteTypeFilter({ type: SpaceObjectType.PAYLOAD } as BaseObject)).toBe(false);
   });
 

@@ -15,25 +15,16 @@ export abstract class StringExtractor {
    */
   static controlSiteTypeFilter(controlSite: BaseObject): boolean {
     switch (controlSite.type) {
-      case SpaceObjectType.INTERGOVERNMENTAL_ORGANIZATION:
-      case SpaceObjectType.LAUNCH_AGENCY:
-      case SpaceObjectType.SUBORBITAL_PAYLOAD_OPERATOR:
-      case SpaceObjectType.PAYLOAD_OWNER:
-      case SpaceObjectType.METEOROLOGICAL_ROCKET_LAUNCH_AGENCY_OR_MANUFACTURER:
       case SpaceObjectType.LAUNCH_SITE:
       case SpaceObjectType.LAUNCH_POSITION:
         return true;
       /*
-       * case 'Payload Manufacturer':
-       * case 'Country':
-       * case 'Astronomical Polity':
-       * case 'Engine Manufacturer':
-       * case 'Launch Vehicle Manufacturer':
-       * case 'Parent Organization of Another Entry':
-       * case 'Launch Cruise':
-       * case 'Launch Zone':
-       * case 'Suborbital Target Area':
-       * case 'Organization Type Unknown':
+       * Agency/operator types (LAUNCH_AGENCY, PAYLOAD_OWNER,
+       * INTERGOVERNMENTAL_ORGANIZATION, SUBORBITAL_PAYLOAD_OPERATOR,
+       * METEOROLOGICAL_ROCKET_LAUNCH_AGENCY_OR_MANUFACTURER, etc.) are
+       * intentionally NOT loaded. Drawing agencies on the globe is no longer
+       * supported (their locations rarely link cleanly to satellites). The
+       * underlying data in control-sites.ts is retained for future use.
        */
       default:
         return false;

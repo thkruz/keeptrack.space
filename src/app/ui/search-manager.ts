@@ -8,7 +8,9 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeyboardComponent } from '@app/engine/plugins/components/keyboard/keyboard-component';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { Satellite, SpaceObjectType, Star } from '@ootk/src/main';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { SearchableFields } from '@app/settings/core-settings';
+import { BaseObject, Satellite, SpaceObjectType, Star, ZoomValue } from '@ootk/src/main';
 import searchPng from '@public/img/icons/search.png';
 import { settingsManager } from '@app/settings/settings';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
@@ -16,6 +18,7 @@ import { getEl } from '../../engine/utils/get-el';
 import { slideInDown, slideOutUp } from '../../engine/utils/slide';
 import { TopMenu } from '../../plugins/top-menu/top-menu';
 import { CatalogManager } from '../data/catalog-manager';
+import { LaunchSite } from '../data/catalog-manager/LaunchFacility';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
 
 export interface SearchResult {
@@ -34,6 +37,9 @@ export enum SearchResultType {
   LAUNCH_VEHICLE,
   MISSILE,
   STAR,
+  SENSOR,
+  LAUNCH_SITE,
+  PLANET,
 }
 
 /**
@@ -50,6 +56,9 @@ const SEARCH_TYPE_LABELS: Record<SearchResultType, string> = {
   [SearchResultType.LAUNCH_VEHICLE]: 'LV',
   [SearchResultType.MISSILE]: 'MISSILE',
   [SearchResultType.STAR]: 'STAR',
+  [SearchResultType.SENSOR]: 'SENSOR',
+  [SearchResultType.LAUNCH_SITE]: 'SITE',
+  [SearchResultType.PLANET]: 'PLANET',
 };
 
 export class SearchManager {
@@ -120,10 +129,8 @@ export class SearchManager {
       const catalogManagerInstance = ServiceLocator.getCatalogManager();
       const obj = catalogManagerInstance.getObject(satId);
 
-      if (obj?.type === SpaceObjectType.STAR) {
-        ServiceLocator.getMainCamera().lookAtStar(obj as Star);
-      } else {
-        PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satId);
+      if (obj) {
+        SearchManager.lookAtSearchResult_(obj, satId);
       }
     });
     getEl('search-results')?.addEventListener('mouseover', (evt) => {
@@ -251,6 +258,34 @@ export class SearchManager {
     }
 
     return satId;
+  }
+
+  /**
+   * Point the camera at a clicked search result. Stars use lookAtStar; sensors
+   * and launch sites are ground-fixed, so the camera rotates to their lat/lon.
+   * Everything else (satellites, missiles, planets) routes through selectSat,
+   * which performs its own camera move.
+   */
+  private static lookAtSearchResult_(obj: BaseObject, satId: number): void {
+    const camera = ServiceLocator.getMainCamera();
+
+    if (obj.isStar()) {
+      camera.lookAtStar(obj as Star);
+
+      return;
+    }
+
+    if (obj.isSensor() || obj.type === SpaceObjectType.LAUNCH_SITE) {
+      const ground = obj as DetailedSensor;
+
+      camera.lookAtLatLon(ground.lat, ground.lon, ground.zoom ?? ZoomValue.GEO, ServiceLocator.getTimeManager().selectedDate);
+      // Sensors carry selection side-effects (menus, FOV); launch sites no-op harmlessly.
+      PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satId);
+
+      return;
+    }
+
+    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satId);
   }
 
   /**
@@ -434,119 +469,181 @@ export class SearchManager {
     settingsManager.lastSearch = searchList;
 
     // Initialize search results
-    const satData = SearchManager.getSearchableObjects_(true) as (Satellite & MissileObject)[];
+    const satData = SearchManager.getSearchableObjects_();
 
     searchList.forEach((searchStringIn) => {
-      for (const sat of satData) {
-        const len = searchStringIn.length;
+      const len = searchStringIn.length;
 
-        if (len === 0) {
-          continue;
-        } // Skip empty strings
-        // TODO: #855 Allow searching for other types of objects
-        if (!sat.isMissile() && !sat.isSatellite()) {
-          continue;
-        } // Skip non satellites and missiles
+      if (len === 0) {
+        return;
+      } // Skip empty strings
 
+      for (const obj of satData) {
         // Vimpel (analyst) objects can slow searches considerably, so they are opt-in.
-        if (!settingsManager.isShowVimpelInSearch && sat.name.includes('Vimpel')) {
+        if (!settingsManager.isShowVimpelInSearch && obj.name.includes('Vimpel')) {
           continue;
         }
 
-        if (searchableFields.name && sat.name.toUpperCase().indexOf(searchStringIn) !== -1) {
-          addResult_({
-            strIndex: sat.name.indexOf(searchStringIn),
-            searchType: SearchResultType.OBJECT_NAME,
-            patlen: len,
-            id: sat.id,
-          });
-
-          continue;
-        }
-
-        if (searchableFields.altName && sat.altName && sat.altName.toUpperCase().indexOf(searchStringIn) !== -1) {
-          addResult_({
-            strIndex: sat.altName.toUpperCase().indexOf(searchStringIn),
-            searchType: SearchResultType.ALT_NAME,
-            patlen: len,
-            id: sat.id,
-          });
-
-          continue;
-        }
-
-        if (searchableFields.bus && typeof sat.bus !== 'undefined' && sat.bus.toUpperCase().indexOf(searchStringIn) !== -1) {
-          addResult_({
-            strIndex: sat.bus.toUpperCase().indexOf(searchStringIn),
-            searchType: SearchResultType.BUS,
-            patlen: len,
-            id: sat.id,
-          });
-
-          continue;
-        }
-
-        if (!sat.desc) {
-          // Do nothing there is no description property
-        } else if (sat.desc.toUpperCase().indexOf(searchStringIn) !== -1) {
-          addResult_({
-            strIndex: sat.desc.toUpperCase().indexOf(searchStringIn),
-            searchType: SearchResultType.MISSILE,
-            patlen: len,
-            id: sat.id,
-          });
-
-          continue;
+        if (obj.isSatellite() || obj.isMissile()) {
+          SearchManager.matchSatelliteOrMissile_(obj as Satellite & MissileObject, searchStringIn, len, searchableFields, addResult_);
         } else {
-          continue; // Last check for missiles
-        }
-
-        if (searchableFields.noradId && sat.sccNum && sat.sccNum.indexOf(searchStringIn) !== -1) {
-          // Ignore Notional Satellites unless all 6 characters are entered
-          if (sat.name.includes(' Notional)') && searchStringIn.length < 6) {
-            continue;
-          }
-
-          addResult_({
-            strIndex: sat.sccNum.indexOf(searchStringIn),
-            searchType: SearchResultType.NORAD_ID,
-            patlen: len,
-            id: sat.id,
-          });
-
-          continue;
-        }
-
-        if (searchableFields.intlDes && sat.intlDes && sat.intlDes.indexOf(searchStringIn) !== -1) {
-          // Ignore Notional Satellites
-          if (sat.name.includes(' Notional)')) {
-            continue;
-          }
-
-          addResult_({
-            strIndex: sat.intlDes.indexOf(searchStringIn),
-            searchType: SearchResultType.INTLDES,
-            patlen: len,
-            id: sat.id,
-          });
-
-          continue;
-        }
-
-        if (searchableFields.launchVehicle && sat.launchVehicle && sat.launchVehicle.toUpperCase().indexOf(searchStringIn) !== -1) {
-          addResult_({
-            strIndex: sat.launchVehicle.toUpperCase().indexOf(searchStringIn),
-            searchType: SearchResultType.LAUNCH_VEHICLE,
-            patlen: len,
-            id: sat.id,
-          });
-
-          continue;
+          SearchManager.matchOtherObject_(obj, searchStringIn, len, addResult_);
         }
       }
     });
 
     return { results, totalFound };
+  }
+
+  /**
+   * Match a satellite or missile against a single search token, emitting at most
+   * one result (the first field that matches, in priority order).
+   */
+  private static matchSatelliteOrMissile_(
+    sat: Satellite & MissileObject,
+    searchStringIn: string,
+    len: number,
+    searchableFields: SearchableFields,
+    addResult_: (result: SearchResult) => void,
+  ): void {
+    if (searchableFields.name && sat.name.toUpperCase().includes(searchStringIn)) {
+      addResult_({ strIndex: sat.name.toUpperCase().indexOf(searchStringIn), searchType: SearchResultType.OBJECT_NAME, patlen: len, id: sat.id });
+
+      return;
+    }
+
+    if (searchableFields.altName && sat.altName?.toUpperCase().includes(searchStringIn)) {
+      addResult_({ strIndex: sat.altName.toUpperCase().indexOf(searchStringIn), searchType: SearchResultType.ALT_NAME, patlen: len, id: sat.id });
+
+      return;
+    }
+
+    if (searchableFields.bus && sat.bus?.toUpperCase().includes(searchStringIn)) {
+      addResult_({ strIndex: sat.bus.toUpperCase().indexOf(searchStringIn), searchType: SearchResultType.BUS, patlen: len, id: sat.id });
+
+      return;
+    }
+
+    // Missiles only carry a name and a description; the satellite-only fields below never apply.
+    if (sat.isMissile()) {
+      if (sat.desc?.toUpperCase().includes(searchStringIn)) {
+        addResult_({ strIndex: sat.desc.toUpperCase().indexOf(searchStringIn), searchType: SearchResultType.MISSILE, patlen: len, id: sat.id });
+      }
+
+      return;
+    }
+
+    if (searchableFields.noradId && sat.sccNum?.includes(searchStringIn)) {
+      // Ignore Notional Satellites unless all 6 characters are entered
+      if (sat.name.includes(' Notional)') && searchStringIn.length < 6) {
+        return;
+      }
+
+      addResult_({ strIndex: sat.sccNum.indexOf(searchStringIn), searchType: SearchResultType.NORAD_ID, patlen: len, id: sat.id });
+
+      return;
+    }
+
+    if (searchableFields.intlDes && sat.intlDes?.includes(searchStringIn)) {
+      // Ignore Notional Satellites
+      if (sat.name.includes(' Notional)')) {
+        return;
+      }
+
+      addResult_({ strIndex: sat.intlDes.indexOf(searchStringIn), searchType: SearchResultType.INTLDES, patlen: len, id: sat.id });
+
+      return;
+    }
+
+    if (searchableFields.launchVehicle && sat.launchVehicle?.toUpperCase().includes(searchStringIn)) {
+      addResult_({ strIndex: sat.launchVehicle.toUpperCase().indexOf(searchStringIn), searchType: SearchResultType.LAUNCH_VEHICLE, patlen: len, id: sat.id });
+    }
+  }
+
+  /**
+   * Match a non-satellite/missile object (star, sensor, launch site, planet) by
+   * name. These types are gated by {@link settingsManager.searchableTypes} and
+   * already filtered upstream, so a match here just needs the right result type.
+   */
+  private static matchOtherObject_(
+    obj: BaseObject,
+    searchStringIn: string,
+    len: number,
+    addResult_: (result: SearchResult) => void,
+  ): void {
+    const searchType = SearchManager.otherObjectSearchType_(obj);
+
+    if (searchType === null) {
+      return;
+    }
+
+    const upperName = obj.name.toUpperCase();
+
+    if (upperName.includes(searchStringIn)) {
+      addResult_({ strIndex: upperName.indexOf(searchStringIn), searchType, patlen: len, id: obj.id });
+    }
+  }
+
+  /** Result types whose match landed on the object's name, so the name should be highlighted. */
+  private static isNameHighlightType_(searchType: SearchResultType): boolean {
+    return searchType === SearchResultType.OBJECT_NAME ||
+      searchType === SearchResultType.STAR ||
+      searchType === SearchResultType.SENSOR ||
+      searchType === SearchResultType.LAUNCH_SITE ||
+      searchType === SearchResultType.PLANET;
+  }
+
+  /** Map a non-satellite/missile object to its search-result type, or null if not searchable. */
+  private static otherObjectSearchType_(obj: BaseObject): SearchResultType | null {
+    if (obj.isStar()) {
+      return SearchResultType.STAR;
+    }
+    if (obj.isSensor()) {
+      return SearchResultType.SENSOR;
+    }
+    if (obj.type === SpaceObjectType.LAUNCH_SITE) {
+      return SearchResultType.LAUNCH_SITE;
+    }
+    if (SearchManager.isCelestialBody_(obj)) {
+      return SearchResultType.PLANET;
+    }
+
+    return null;
+  }
+
+  /** True for actual celestial bodies (planets/moons), excluding placeholder Planet slots (UNKNOWN type). */
+  private static isCelestialBody_(obj: BaseObject): boolean {
+    return obj.type === SpaceObjectType.TERRESTRIAL_PLANET ||
+      obj.type === SpaceObjectType.GAS_GIANT ||
+      obj.type === SpaceObjectType.ICE_GIANT ||
+      obj.type === SpaceObjectType.DWARF_PLANET ||
+      obj.type === SpaceObjectType.MOON;
+  }
+
+  /** True when the object's kind is enabled in the searchable-type toggles. */
+  private static isSearchableType_(obj: BaseObject): boolean {
+    const { searchableTypes } = settingsManager;
+
+    if (obj.isSatellite()) {
+      return searchableTypes.satellite;
+    }
+    if (obj.isMissile()) {
+      return searchableTypes.missile;
+    }
+    if (obj.isStar()) {
+      return searchableTypes.star;
+    }
+    if (obj.isSensor()) {
+      return searchableTypes.sensor;
+    }
+    if (obj.type === SpaceObjectType.LAUNCH_SITE) {
+      return searchableTypes.launchSite;
+    }
+    if (SearchManager.isCelestialBody_(obj)) {
+      return searchableTypes.planet;
+    }
+
+    return false;
   }
 
   private static doNumOnlySearch_(searchString: string): { results: SearchResult[]; totalFound: number } {
@@ -564,7 +661,7 @@ export class SearchManager {
     settingsManager.lastSearch = searchList;
 
     // Initialize search results
-    const satData = (SearchManager.getSearchableObjects_(false) as Satellite[])
+    const satData = (SearchManager.getSearchableObjects_(true) as Satellite[])
       .sort((a, b) => (a.sccNum6 ?? a.sccNum ?? '').localeCompare(b.sccNum6 ?? b.sccNum ?? '', 'en', { numeric: true }));
 
     let i = 0;
@@ -618,50 +715,56 @@ export class SearchManager {
     return { results, totalFound };
   }
 
-  private static getSearchableObjects_(isIncludeMissiles = true): (Satellite | MissileObject)[] | Satellite[] {
+  /**
+   * Collect the catalog objects eligible for the current search. The kind
+   * allow-list is driven by {@link settingsManager.searchableTypes}; pass
+   * `onlySatellites` for the numeric (NORAD-only) path, where statics and
+   * missiles never apply.
+   */
+  private static getSearchableObjects_(onlySatellites = false): BaseObject[] {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const dotsManagerInstance = ServiceLocator.getDotsManager();
-    const searchableObjects = (
-      catalogManagerInstance.objectCache.filter((obj) => {
-        // Allow-list: only satellites (incl. OemSatellite) and missiles are searchable.
-        // Planets, markers, sensors, ground objects, stars, and unused OEM placeholder slots
-        // (which are Planet instances and would otherwise have undefined sccNum) are rejected.
-        if (!obj.isSatellite() && !(isIncludeMissiles && obj.isMissile())) {
+
+    return catalogManagerInstance.objectCache.filter((obj) => {
+      // Type allow-list. The numeric path is satellites-only; everything else
+      // respects the per-type toggles (satellites, missiles, stars, sensors,
+      // launch sites, and planets). Markers and unused OEM placeholder slots
+      // (UNKNOWN-type Planet instances) are never matched.
+      if (onlySatellites) {
+        if (!obj.isSatellite() || !settingsManager.searchableTypes.satellite) {
           return false;
         }
+      } else if (!SearchManager.isSearchableType_(obj)) {
+        return false;
+      }
 
-        if (!(obj as MissileObject).active) {
-          return false;
-        } // Skip inactive missiles.
-        if ((obj as Satellite).country === 'ANALSAT' && !obj.active) {
-          return false;
-        } // Skip Fake Analyst satellites
-        if (!obj.name) {
-          return false;
-        } // Everything has a name. If it doesn't then assume it isn't what we are searching for.
+      if (!obj.active) {
+        return false;
+      } // Skip inactive objects (decayed missiles, fake analyst sats, etc.)
+      if (!obj.name) {
+        return false;
+      } // Everything has a name. If it doesn't then assume it isn't what we are searching for.
 
-        // Skip decayed satellites (position 0,0,0) if setting is disabled
-        if (!settingsManager.isShowDecayedInSearch && dotsManagerInstance.positionData) {
-          const pos = dotsManagerInstance.getCurrentPosition(Number(obj.id));
+      // Skip decayed satellites (position 0,0,0) if setting is disabled. Static
+      // objects (stars, sensors, launch sites, planets) hold fixed positions that
+      // are not in the dots position buffer, so never treat them as decayed.
+      if (!obj.isStatic() && !settingsManager.isShowDecayedInSearch && dotsManagerInstance.positionData) {
+        const pos = dotsManagerInstance.getCurrentPosition(Number(obj.id));
 
-          if (pos?.x === 0 && pos?.y === 0 && pos?.z === 0) {
-            return false;
-          }
+        if (pos?.x === 0 && pos?.y === 0 && pos?.z === 0) {
+          return false;
         }
+      }
 
-        return true;
-      }) as (Satellite & MissileObject)[]
-    ).sort((a, b) => {
+      return true;
+    }).sort((a, b) => {
       // Sort by sccNum
       if ((a as Satellite).sccNum && (b as Satellite).sccNum) {
         return Number.parseInt((a as Satellite).sccNum) - Number.parseInt((b as Satellite).sccNum);
       }
 
       return 0;
-
     });
-
-    return isIncludeMissiles ? (searchableObjects as (Satellite | MissileObject)[]) : (searchableObjects as Satellite[]);
   }
 
   fillResultBox(results: SearchResult[], catalogManagerInstance: CatalogManager, totalFound?: number) {
@@ -690,7 +793,7 @@ export class SearchManager {
       // Left half of search results
       if (obj.isMissile()) {
         html += obj.name;
-      } else if (result.searchType === SearchResultType.OBJECT_NAME) {
+      } else if (SearchManager.isNameHighlightType_(result.searchType)) {
         // If the name matched - highlight it
         html += obj.name.substring(0, result.strIndex);
         html += '<span class="search-hilight">';
@@ -783,6 +886,15 @@ export class SearchManager {
           break;
         case SearchResultType.STAR:
           html += 'Star';
+          break;
+        case SearchResultType.SENSOR:
+          html += (obj as unknown as DetailedSensor).country ?? 'Sensor';
+          break;
+        case SearchResultType.LAUNCH_SITE:
+          html += (obj as unknown as LaunchSite).country ?? 'Launch Site';
+          break;
+        case SearchResultType.PLANET:
+          html += 'Planet';
           break;
         default:
           if (obj instanceof MissileObject) {

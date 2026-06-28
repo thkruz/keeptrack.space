@@ -61,7 +61,6 @@ export const darkClouds = (settingsManager: SettingsManager) => {
   settingsManager.maxFieldOfViewMarkers = 1;
   settingsManager.noMeshManager = true;
   settingsManager.isLoadLastMap = false;
-  settingsManager.isShowAgencies = false;
   settingsManager.isAllowRightClick = false;
   settingsManager.isDisableSelectSat = false;
   settingsManager.isDisableSensors = true;

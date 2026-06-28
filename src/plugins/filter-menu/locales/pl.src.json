@@ -76,13 +76,6 @@
       "category": "Typy obiektów",
       "tooltip": "Satelity, które są planowane lub proponowane, ale jeszcze nie wystrzelone."
     },
-    "agencies": {
-      "name": "Agencje",
-      "category": "Typy obiektów",
-      "tooltip": "Planowana funkcja - wyświetli agencje na globie.",
-      "checked": false,
-      "disabled": true
-    },
     "groundSensors": {
       "name": "Czujniki naziemne",
       "category": "Typy obiektów",

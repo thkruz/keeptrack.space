@@ -5,6 +5,7 @@
       "title": "Налаштування пошуку",
       "sections": {
         "resultLimits": "Обмеження результатів",
+        "objectTypes": "Типи об'єктів",
         "searchFields": "Поля пошуку",
         "filters": "Фільтри",
         "actions": "Дії"
@@ -22,6 +23,14 @@
           "noradId": "Номер NORAD",
           "intlDes": "Міжнародне позначення",
           "launchVehicle": "Ракета-носій"
+        },
+        "types": {
+          "satellite": "Супутники",
+          "missile": "Ракети",
+          "star": "Зорі",
+          "sensor": "Сенсори",
+          "launchSite": "Стартові майданчики",
+          "planet": "Планети"
         }
       },
       "tooltips": {

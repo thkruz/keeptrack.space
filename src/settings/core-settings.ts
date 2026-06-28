@@ -47,6 +47,19 @@ export interface SearchableFields {
 }
 
 /**
+ * Which kinds of catalog objects a search is allowed to return. All types are
+ * enabled by default; disabling one narrows the search to the remaining kinds.
+ */
+export interface SearchableTypes {
+  satellite: boolean;
+  missile: boolean;
+  star: boolean;
+  sensor: boolean;
+  launchSite: boolean;
+  planet: boolean;
+}
+
+/**
  * Core application settings and global flags
  */
 export class CoreSettings {
@@ -219,6 +232,18 @@ export class CoreSettings {
     noradId: true,
     intlDes: true,
     launchVehicle: true,
+  };
+  /**
+   * Which kinds of catalog objects a search may return. All types are enabled by
+   * default; disable individual kinds in the Search Settings menu.
+   */
+  searchableTypes: SearchableTypes = {
+    satellite: true,
+    missile: true,
+    star: true,
+    sensor: true,
+    launchSite: true,
+    planet: true,
   };
   /**
    * String to limit which satellites are loaded from the catalog

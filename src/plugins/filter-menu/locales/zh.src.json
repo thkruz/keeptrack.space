@@ -76,13 +76,6 @@
       "category": "对象类型",
       "tooltip": "计划或提议但尚未发射的卫星。"
     },
-    "agencies": {
-      "name": "机构",
-      "category": "对象类型",
-      "tooltip": "计划功能 - 这将在地球仪上显示机构。",
-      "checked": false,
-      "disabled": true
-    },
     "groundSensors": {
       "name": "地面传感器",
       "category": "对象类型",

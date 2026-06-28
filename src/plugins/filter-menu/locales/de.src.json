@@ -76,13 +76,6 @@
       "category": "Objekttypen",
       "tooltip": "Satelliten, die geplant oder vorgeschlagen sind, aber noch nicht gestartet wurden."
     },
-    "agencies": {
-      "name": "Agenturen",
-      "category": "Objekttypen",
-      "tooltip": "Geplante Funktion – Dies wird Agenturen auf dem Globus anzeigen.",
-      "checked": false,
-      "disabled": true
-    },
     "groundSensors": {
       "name": "Bodensensoren",
       "category": "Objekttypen",

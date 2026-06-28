@@ -5,6 +5,7 @@
       "title": "Настройки поиска",
       "sections": {
         "resultLimits": "Ограничения результатов",
+        "objectTypes": "Типы объектов",
         "searchFields": "Поля поиска",
         "filters": "Фильтры",
         "actions": "Действия"
@@ -22,6 +23,14 @@
           "noradId": "Номер NORAD",
           "intlDes": "Международное обозначение",
           "launchVehicle": "Ракета-носитель"
+        },
+        "types": {
+          "satellite": "Спутники",
+          "missile": "Ракеты",
+          "star": "Звёзды",
+          "sensor": "Сенсоры",
+          "launchSite": "Стартовые площадки",
+          "planet": "Планеты"
         }
       },
       "tooltips": {

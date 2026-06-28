@@ -126,7 +126,6 @@ export class SettingsPresets {
     settings.isShowStarlinkSats = true;
     settings.isEnableJscCatalog = false;
 
-    settings.isShowAgencies = false;
     settings.isAllowRightClick = false;
     settings.isDisableSelectSat = true;
     settings.isDisableSensors = true;
@@ -149,7 +148,6 @@ export class SettingsPresets {
     settings.maxFieldOfViewMarkers = 1;
     // settings.isNotionalDebris = true;
     settings.isEnableExtendedCatalog = true;
-    settings.isShowAgencies = false;
     settings.isDisableLaunchSites = true;
     settings.isDisableControlSites = true;
     settings.isDisableSensors = true;
@@ -246,7 +244,6 @@ export class SettingsPresets {
     settings.isShowRocketBodies = true;
     settings.isShowDebris = true;
     settings.isShowPayloads = false;
-    settings.isShowAgencies = false;
     settings.isAllowRightClick = false;
     settings.isDisableSelectSat = false;
     settings.isDisableSensors = true;
@@ -300,7 +297,6 @@ export class SettingsPresets {
     settings.isDrawCloudsMap = true;
     settings.earthCloudTextureQuality = EarthCloudTextureQuality.MEDIUM;
     settings.isShowPayloads = true;
-    settings.isShowAgencies = false;
     settings.isShowNotionalSats = false;
     settings.isAllowRightClick = false;
     settings.isDisableSelectSat = true;
@@ -329,7 +325,6 @@ export class SettingsPresets {
     settings.isShowRocketBodies = true;
     settings.isShowDebris = true;
     settings.isShowPayloads = true;
-    settings.isShowAgencies = false;
     settings.earthTextureStyle = EarthTextureStyle.BLUE_MARBLE;
     settings.isAllowRightClick = false;
     settings.isDisableSelectSat = false;

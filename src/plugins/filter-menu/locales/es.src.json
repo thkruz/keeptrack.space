@@ -76,13 +76,6 @@
       "category": "Tipos de objetos",
       "tooltip": "Satélites que están planeados o propuestos pero aún no han sido lanzados."
     },
-    "agencies": {
-      "name": "Agencias",
-      "category": "Tipos de objetos",
-      "tooltip": "Función planificada - Esto mostrará agencias en el globo.",
-      "checked": false,
-      "disabled": true
-    },
     "groundSensors": {
       "name": "Sensores terrestres",
       "category": "Tipos de objetos",

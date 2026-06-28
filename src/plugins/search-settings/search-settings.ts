@@ -9,19 +9,22 @@ import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager } from '@app/engine/utils/persistence-manager';
 import { t7e } from '@app/locales/keys';
-import { SearchableFields } from '@app/settings/core-settings';
+import { SearchableFields, SearchableTypes } from '@app/settings/core-settings';
 import { SettingsManager } from '@app/settings/settings';
 import searchGearPng from '@public/img/icons/search-gear.png';
 import './search-settings.css';
 import {
   DEFAULT_SEARCHABLE_FIELDS,
+  DEFAULT_SEARCHABLE_TYPES,
   MIN_SEARCH_CHARS_DEFAULT,
   parseBool,
   parseMaxResults,
   parseMinSearchChars,
   parseSearchableFields,
+  parseSearchableTypes,
   SEARCH_LIMIT_DEFAULT,
   serializeSearchableFields,
+  serializeSearchableTypes,
   SHOW_DECAYED_DEFAULT,
   SHOW_VIMPEL_DEFAULT,
 } from './search-settings-core';
@@ -31,6 +34,9 @@ const l = (key: string): string => t7e(`plugins.SearchSettingsPlugin.${key}` as 
 
 /** The searchable-field toggles, in display order, paired with their DOM ids. */
 const SEARCHABLE_FIELD_KEYS: (keyof SearchableFields)[] = ['name', 'altName', 'bus', 'noradId', 'intlDes', 'launchVehicle'];
+
+/** The searchable object-type toggles, in display order, paired with their DOM ids. */
+const SEARCHABLE_TYPE_KEYS: (keyof SearchableTypes)[] = ['satellite', 'missile', 'star', 'sensor', 'launchSite', 'planet'];
 
 export class SearchSettingsPlugin extends KeepTrackPlugin {
   readonly id = 'SearchSettingsPlugin';
@@ -59,6 +65,7 @@ export class SearchSettingsPlugin extends KeepTrackPlugin {
         <div class="side-menu">
           <form id="search-settings-menu-form" class="kt-menu-body">
             ${this.wrapSection_(l('sections.resultLimits'), this.resultLimitsBody_())}
+            ${this.wrapSection_(l('sections.objectTypes'), this.searchTypesBody_())}
             ${this.wrapSection_(l('sections.searchFields'), this.searchFieldsBody_())}
             ${this.wrapSection_(l('sections.filters'), this.filtersBody_())}
             ${this.wrapSection_(l('sections.actions'), this.actionsBody_())}
@@ -104,6 +111,18 @@ export class SearchSettingsPlugin extends KeepTrackPlugin {
           <input id="search-settings-field-${key}" type="checkbox" ${settingsManager.searchableFields[key] ? 'checked' : ''}/>
           <span class="lever"></span>
           ${l(`labels.fields.${key}`)}
+        </label>
+      </div>
+    `).join('');
+  }
+
+  private searchTypesBody_(): string {
+    return SEARCHABLE_TYPE_KEYS.map((key) => html`
+      <div class="switch row">
+        <label>
+          <input id="search-settings-type-${key}" type="checkbox" ${settingsManager.searchableTypes[key] ? 'checked' : ''}/>
+          <span class="lever"></span>
+          ${l(`labels.types.${key}`)}
         </label>
       </div>
     `).join('');
@@ -180,6 +199,12 @@ export class SearchSettingsPlugin extends KeepTrackPlugin {
       });
     });
 
+    SEARCHABLE_TYPE_KEYS.forEach((key) => {
+      getEl(`search-settings-type-${key}`)?.addEventListener('change', () => {
+        this.applyType_(key);
+      });
+    });
+
     getEl('search-settings-reset')?.addEventListener('click', () => {
       this.resetToDefaults_();
     });
@@ -232,12 +257,24 @@ export class SearchSettingsPlugin extends KeepTrackPlugin {
     this.persistSettings_();
   }
 
+  private applyType_(key: keyof SearchableTypes) {
+    const typeEl = <HTMLInputElement>getEl(`search-settings-type-${key}`);
+
+    settingsManager.searchableTypes = {
+      ...settingsManager.searchableTypes,
+      [key]: typeEl?.checked ?? DEFAULT_SEARCHABLE_TYPES[key],
+    };
+    this.rerunSearch_();
+    this.persistSettings_();
+  }
+
   private resetToDefaults_() {
     settingsManager.searchLimit = SEARCH_LIMIT_DEFAULT;
     settingsManager.minimumSearchCharacters = MIN_SEARCH_CHARS_DEFAULT;
     settingsManager.isShowDecayedInSearch = SHOW_DECAYED_DEFAULT;
     settingsManager.isShowVimpelInSearch = SHOW_VIMPEL_DEFAULT;
     settingsManager.searchableFields = { ...DEFAULT_SEARCHABLE_FIELDS };
+    settingsManager.searchableTypes = { ...DEFAULT_SEARCHABLE_TYPES };
 
     this.syncUi_();
     this.rerunSearch_();
@@ -262,6 +299,7 @@ export class SearchSettingsPlugin extends KeepTrackPlugin {
     persistenceManagerInstance.saveItem(StorageKey.SETTINGS_SHOW_DECAYED_IN_SEARCH, settingsManager.isShowDecayedInSearch.toString());
     persistenceManagerInstance.saveItem(StorageKey.SETTINGS_SHOW_VIMPEL_IN_SEARCH, settingsManager.isShowVimpelInSearch.toString());
     persistenceManagerInstance.saveItem(StorageKey.SETTINGS_SEARCHABLE_FIELDS, serializeSearchableFields(settingsManager.searchableFields));
+    persistenceManagerInstance.saveItem(StorageKey.SETTINGS_SEARCHABLE_TYPES, serializeSearchableTypes(settingsManager.searchableTypes));
     SettingsManager.preserveSettings();
   }
 
@@ -297,6 +335,7 @@ export class SearchSettingsPlugin extends KeepTrackPlugin {
       settingsManager.isShowVimpelInSearch,
     );
     settingsManager.searchableFields = parseSearchableFields(persistenceManagerInstance.getItem(StorageKey.SETTINGS_SEARCHABLE_FIELDS));
+    settingsManager.searchableTypes = parseSearchableTypes(persistenceManagerInstance.getItem(StorageKey.SETTINGS_SEARCHABLE_TYPES));
   }
 
   private syncUi_() {
@@ -329,6 +368,14 @@ export class SearchSettingsPlugin extends KeepTrackPlugin {
 
       if (fieldEl) {
         fieldEl.checked = settingsManager.searchableFields[key];
+      }
+    });
+
+    SEARCHABLE_TYPE_KEYS.forEach((key) => {
+      const typeEl = <HTMLInputElement>getEl(`search-settings-type-${key}`);
+
+      if (typeEl) {
+        typeEl.checked = settingsManager.searchableTypes[key];
       }
     });
   }

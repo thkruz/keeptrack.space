@@ -23,7 +23,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { t7e } from '@app/locales/keys';
 import { COVARIANCE_RADII_FALLBACK, covarianceDisplayRadii, ricSigmasFromCovarianceMatrix } from '@app/engine/rendering/draw-manager/covariance-radii';
-import { createSampleCovarianceFromTle, Kilometers, LandObject, RADIUS_OF_EARTH, Satellite, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
+import { createSampleCovarianceFromTle, Kilometers, RADIUS_OF_EARTH, Satellite, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { PlanetsMenuPlugin } from '../planets-menu/planets-menu';
@@ -228,8 +228,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
         case SpaceObjectType.PAYLOAD_MANUFACTURER:
         case SpaceObjectType.METEOROLOGICAL_ROCKET_LAUNCH_AGENCY_OR_MANUFACTURER:
         case SpaceObjectType.INTERGOVERNMENTAL_ORGANIZATION:
-          SelectSatManager.selectOwnerManufacturer_(obj as LandObject);
-
+          // Agencies/operators are no longer drawn on the globe or selectable.
           return;
         case SpaceObjectType.LAUNCH_SITE:
           // Handled elsewhere
@@ -485,27 +484,6 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       cam.state.isAutoPitchYawToTarget = false;
     } else {
       cam.state.camAngleSnappedOnSat = true;
-    }
-  }
-
-  private static selectOwnerManufacturer_(obj: LandObject) {
-    const catalogManagerInstance = ServiceLocator.getCatalogManager();
-    const searchStr = catalogManagerInstance.objectCache
-      .filter((_sat) => {
-        const isOwner = (_sat as Satellite).owner === obj.Code;
-        const isManufacturer = (_sat as Satellite).manufacturer === obj.Code; // TODO: This might not work anymore without country codes
-
-
-        return isOwner || isManufacturer;
-      })
-      .map((_sat) => (_sat as Satellite).sccNum)
-      .join(',');
-
-    if (searchStr.length === 0) {
-      ServiceLocator.getUiManager().toast(t7e('SelectSatManager.noSatellitesFound'), ToastMsgType.caution, false);
-    } else {
-      ServiceLocator.getUiManager().searchManager.doSearch(searchStr);
-      ServiceLocator.getMainCamera().changeZoom(0.9);
     }
   }
 

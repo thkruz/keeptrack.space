@@ -115,158 +115,206 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     }
 
     if (obj instanceof Satellite) {
-      setInnerHtml(EL.APOGEE, `${obj.apogee.toFixed(0)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
-      setInnerHtml(EL.PERIGEE, `${obj.perigee.toFixed(0)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
-      setInnerHtml(EL.INCLINATION, `${obj.inclination.toFixed(2)}°`);
-      setInnerHtml(EL.ECCENTRICITY, obj.eccentricity.toFixed(3));
-      setInnerHtml(EL.RAAN, `${obj.rightAscension.toFixed(2)}°`);
-      setInnerHtml(EL.ARG_PE, `${obj.argOfPerigee.toFixed(2)}°`);
-
-      const periodDom = getEl(EL.PERIOD);
-
-      if (periodDom) {
-        periodDom.innerHTML = `${obj.period.toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.min')}`;
-        periodDom.dataset.position = 'top';
-        periodDom.dataset.delay = '50';
-        periodDom.setAttribute(
-          'kt-tooltip',
-          `${t7e('SatInfoBoxOrbital.Period.meanMotion')}: ${(MINUTES_PER_DAY / obj.period).toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.revPerDay')}`,
-        );
-      }
-
-      const now: Date | number | string = getCatalogReferenceDate();
-      const daysold = obj.ageOfElset(now);
-      const age = daysold >= 1 ? daysold : daysold * 24;
-      const units = daysold >= 1 ? t7e('SatInfoBoxOrbital.AgeOfGP.days') : t7e('SatInfoBoxOrbital.AgeOfGP.hours');
-
-      const elsetAgeDom = getEl(EL.ELSET_AGE);
-
-      if (elsetAgeDom) {
-        elsetAgeDom.innerHTML = `${age.toFixed(2)} ${units}`;
-        elsetAgeDom.dataset.position = 'top';
-        elsetAgeDom.dataset.delay = '50';
-        elsetAgeDom.setAttribute(
-          'kt-tooltip',
-          `${t7e('SatInfoBoxOrbital.AgeOfGP.epochYear')}: ${obj.tle1.substring(18, 20)}<br/>
-           ${t7e('SatInfoBoxOrbital.AgeOfGP.epochDay')}: ${obj.tle1.substring(20, 28)}`,
-        );
-      }
-
-      const gmst = ServiceLocator.getTimeManager().gmst;
-      const lla = eci2lla(obj.position, gmst);
-
-      const satLonElement = getEl(EL.LONGITUDE);
-      const satLatElement = getEl(EL.LATITUDE);
-
-      if (satLonElement && satLatElement) {
-        if (lla.lon >= 0) {
-          satLonElement.innerHTML = `${lla.lon.toFixed(3)}°${t7e('SatInfoBoxOrbital.Longitude.east')}`;
-        } else {
-          satLonElement.innerHTML = `${(lla.lon * -1).toFixed(3)}°${t7e('SatInfoBoxOrbital.Longitude.west')}`;
-        }
-        if (lla.lat >= 0) {
-          satLatElement.innerHTML = `${lla.lat.toFixed(3)}°${t7e('SatInfoBoxOrbital.Latitude.north')}`;
-        } else {
-          satLatElement.innerHTML = `${(lla.lat * -1).toFixed(3)}°${t7e('SatInfoBoxOrbital.Latitude.south')}`;
-        }
-      }
-
-      this.updateSectionHeader_();
+      this.updateSatelliteOrbitalElements_(obj);
     } else if (obj instanceof OemSatellite) {
       this.updateOemOrbitalElements_(obj);
     }
 
+    if (this.updateAltitudeAndVelocity_(obj) === false) {
+      return;
+    }
+
+    this.updateCovariance_();
+    this.updateSecondarySatellite_(obj);
+  }
+
+  private updateSatelliteOrbitalElements_(obj: Satellite): void {
+    setInnerHtml(EL.APOGEE, `${obj.apogee.toFixed(0)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
+    setInnerHtml(EL.PERIGEE, `${obj.perigee.toFixed(0)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
+    setInnerHtml(EL.INCLINATION, `${obj.inclination.toFixed(2)}°`);
+    setInnerHtml(EL.ECCENTRICITY, obj.eccentricity.toFixed(3));
+    setInnerHtml(EL.RAAN, `${obj.rightAscension.toFixed(2)}°`);
+    setInnerHtml(EL.ARG_PE, `${obj.argOfPerigee.toFixed(2)}°`);
+
+    this.updatePeriodElement_(obj.period);
+    this.updateElsetAgeElement_(obj);
+    this.updateLatLonElements_(obj.position);
+
+    this.updateSectionHeader_();
+  }
+
+  private updatePeriodElement_(period: number): void {
+    const periodDom = getEl(EL.PERIOD);
+
+    if (periodDom) {
+      periodDom.innerHTML = `${period.toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.min')}`;
+      periodDom.dataset.position = 'top';
+      periodDom.dataset.delay = '50';
+      periodDom.setAttribute(
+        'kt-tooltip',
+        `${t7e('SatInfoBoxOrbital.Period.meanMotion')}: ${(MINUTES_PER_DAY / period).toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.revPerDay')}`,
+      );
+    }
+  }
+
+  private updateElsetAgeElement_(obj: Satellite): void {
+    const now: Date | number | string = getCatalogReferenceDate();
+    const daysold = obj.ageOfElset(now);
+    const age = daysold >= 1 ? daysold : daysold * 24;
+    const units = daysold >= 1 ? t7e('SatInfoBoxOrbital.AgeOfGP.days') : t7e('SatInfoBoxOrbital.AgeOfGP.hours');
+
+    const elsetAgeDom = getEl(EL.ELSET_AGE);
+
+    if (elsetAgeDom) {
+      elsetAgeDom.innerHTML = `${age.toFixed(2)} ${units}`;
+      elsetAgeDom.dataset.position = 'top';
+      elsetAgeDom.dataset.delay = '50';
+      elsetAgeDom.setAttribute(
+        'kt-tooltip',
+        `${t7e('SatInfoBoxOrbital.AgeOfGP.epochYear')}: ${obj.tle1.substring(18, 20)}<br/>
+           ${t7e('SatInfoBoxOrbital.AgeOfGP.epochDay')}: ${obj.tle1.substring(20, 28)}`,
+      );
+    }
+  }
+
+  private updateLatLonElements_(position: Parameters<typeof eci2lla>[0]): void {
+    const gmst = ServiceLocator.getTimeManager().gmst;
+    const lla = eci2lla(position, gmst);
+
+    const satLonElement = getEl(EL.LONGITUDE);
+    const satLatElement = getEl(EL.LATITUDE);
+
+    if (satLonElement && satLatElement) {
+      if (lla.lon >= 0) {
+        satLonElement.innerHTML = `${lla.lon.toFixed(3)}°${t7e('SatInfoBoxOrbital.Longitude.east')}`;
+      } else {
+        satLonElement.innerHTML = `${(lla.lon * -1).toFixed(3)}°${t7e('SatInfoBoxOrbital.Longitude.west')}`;
+      }
+      if (lla.lat >= 0) {
+        satLatElement.innerHTML = `${lla.lat.toFixed(3)}°${t7e('SatInfoBoxOrbital.Latitude.north')}`;
+      } else {
+        satLatElement.innerHTML = `${(lla.lat * -1).toFixed(3)}°${t7e('SatInfoBoxOrbital.Latitude.south')}`;
+      }
+    }
+  }
+
+  /**
+   * Updates the altitude/velocity rows. Returns false when the caller should
+   * abort the rest of the update (non-Earth center body not found).
+   */
+  private updateAltitudeAndVelocity_(obj: BaseObject): boolean {
     const satAltitudeElement = getEl(EL.ALTITUDE);
     const satVelocityElement = getEl(EL.VELOCITY);
 
     if (satAltitudeElement && satVelocityElement) {
-
       if (obj instanceof Satellite || obj instanceof OemSatellite) {
-        const gmst = ServiceLocator.getTimeManager().gmst;
-
-        if (((obj as OemSatellite).centerBody ?? SolarBody.Earth) !== SolarBody.Earth) {
-          const centerBody = ServiceLocator.getScene().getBodyById((obj as OemSatellite).centerBody) as CelestialBody | null;
-
-          if (!centerBody) {
-            errorManagerInstance.debug(`Error calculating altitude for non-Earth centered object ${obj.name}: center body not found.`);
-
-            return;
-          }
-          const position = {
-            x: obj.position.x - centerBody.position[0] as Kilometers,
-            y: obj.position.y - centerBody.position[1] as Kilometers,
-            z: obj.position.z - centerBody.position[2] as Kilometers,
-          };
-
-          satAltitudeElement.innerHTML = `${SatMath.getAlt(position, gmst, centerBody.RADIUS as Kilometers).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
-        } else {
-          satAltitudeElement.innerHTML = `${SatMath.getAlt(obj.position, gmst).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
-        }
-
-
-        satVelocityElement.innerHTML = `${obj.totalVelocity.toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}/${t7e('SatInfoBoxOrbital.second')}`;
-      } else {
-        const misl = obj as MissileObject;
-
-        satAltitudeElement.innerHTML = `${(ServiceLocator.getSensorManager().currentTEARR?.alt ?? 0).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
-        if (misl.totalVelocity) {
-          satVelocityElement.innerHTML = `${misl.totalVelocity.toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}/${t7e('SatInfoBoxOrbital.second')}`;
-        } else {
-          satVelocityElement.innerHTML = t7e('SatInfoBoxOrbital.unknown');
-        }
+        return this.updateSatelliteAltitudeAndVelocity_(obj, satAltitudeElement, satVelocityElement);
       }
+
+      this.updateMissileAltitudeAndVelocity_(obj as MissileObject, satAltitudeElement, satVelocityElement);
     }
 
+    return true;
+  }
+
+  private updateSatelliteAltitudeAndVelocity_(
+    obj: Satellite | OemSatellite,
+    satAltitudeElement: HTMLElement,
+    satVelocityElement: HTMLElement,
+  ): boolean {
+    const gmst = ServiceLocator.getTimeManager().gmst;
+
+    if (((obj as OemSatellite).centerBody ?? SolarBody.Earth) !== SolarBody.Earth) {
+      const centerBody = ServiceLocator.getScene().getBodyById((obj as OemSatellite).centerBody) as CelestialBody | null;
+
+      if (!centerBody) {
+        errorManagerInstance.debug(`Error calculating altitude for non-Earth centered object ${obj.name}: center body not found.`);
+
+        return false;
+      }
+      const position = {
+        x: obj.position.x - centerBody.position[0] as Kilometers,
+        y: obj.position.y - centerBody.position[1] as Kilometers,
+        z: obj.position.z - centerBody.position[2] as Kilometers,
+      };
+
+      satAltitudeElement.innerHTML = `${SatMath.getAlt(position, gmst, centerBody.RADIUS as Kilometers).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
+    } else {
+      satAltitudeElement.innerHTML = `${SatMath.getAlt(obj.position, gmst).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
+    }
+
+
+    satVelocityElement.innerHTML = `${obj.totalVelocity.toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}/${t7e('SatInfoBoxOrbital.second')}`;
+
+    return true;
+  }
+
+  private updateMissileAltitudeAndVelocity_(misl: MissileObject, satAltitudeElement: HTMLElement, satVelocityElement: HTMLElement): void {
+    satAltitudeElement.innerHTML = `${(ServiceLocator.getSensorManager().currentTEARR?.alt ?? 0).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
+    if (misl.totalVelocity) {
+      satVelocityElement.innerHTML = `${misl.totalVelocity.toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}/${t7e('SatInfoBoxOrbital.second')}`;
+    } else {
+      satVelocityElement.innerHTML = t7e('SatInfoBoxOrbital.unknown');
+    }
+  }
+
+  private updateCovariance_(): void {
     const covMatrix = PluginRegistry.getPlugin(SelectSatManager)!.primarySatCovMatrix;
 
-    if (covMatrix) {
-      let covRadial = covMatrix[0];
-      let covCrossTrack = covMatrix[1];
-      let covInTrack = covMatrix[2];
-
-      const useKm =
-        covRadial > 0.5 &&
-        covCrossTrack > 0.5 &&
-        covInTrack > 0.5;
-
-      if (useKm) {
-        setInnerHtml(EL.UNCERTAINTY_RADIAL, `${(covMatrix[0]).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
-        setInnerHtml(EL.UNCERTAINTY_CROSSTRACK, `${(covMatrix[1]).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
-        setInnerHtml(EL.UNCERTAINTY_INTRACK, `${(covMatrix[2]).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
-      } else {
-        covRadial *= 1000;
-        covCrossTrack *= 1000;
-        covInTrack *= 1000;
-        setInnerHtml(EL.UNCERTAINTY_RADIAL, `${covRadial.toFixed(2)} ${t7e('SatInfoBoxOrbital.meter')}`);
-        setInnerHtml(EL.UNCERTAINTY_CROSSTRACK, `${covCrossTrack.toFixed(2)} ${t7e('SatInfoBoxOrbital.meter')}`);
-        setInnerHtml(EL.UNCERTAINTY_INTRACK, `${covInTrack.toFixed(2)} ${t7e('SatInfoBoxOrbital.meter')}`);
-      }
-    } else {
+    if (!covMatrix) {
       setInnerHtml(EL.UNCERTAINTY_RADIAL, t7e('SatInfoBoxOrbital.unknown'));
       setInnerHtml(EL.UNCERTAINTY_CROSSTRACK, t7e('SatInfoBoxOrbital.unknown'));
       setInnerHtml(EL.UNCERTAINTY_INTRACK, t7e('SatInfoBoxOrbital.unknown'));
+
+      return;
     }
 
+    let covRadial = covMatrix[0];
+    let covCrossTrack = covMatrix[1];
+    let covInTrack = covMatrix[2];
+
+    const useKm =
+      covRadial > 0.5 &&
+      covCrossTrack > 0.5 &&
+      covInTrack > 0.5;
+
+    if (useKm) {
+      setInnerHtml(EL.UNCERTAINTY_RADIAL, `${(covMatrix[0]).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
+      setInnerHtml(EL.UNCERTAINTY_CROSSTRACK, `${(covMatrix[1]).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
+      setInnerHtml(EL.UNCERTAINTY_INTRACK, `${(covMatrix[2]).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
+    } else {
+      covRadial *= 1000;
+      covCrossTrack *= 1000;
+      covInTrack *= 1000;
+      setInnerHtml(EL.UNCERTAINTY_RADIAL, `${covRadial.toFixed(2)} ${t7e('SatInfoBoxOrbital.meter')}`);
+      setInnerHtml(EL.UNCERTAINTY_CROSSTRACK, `${covCrossTrack.toFixed(2)} ${t7e('SatInfoBoxOrbital.meter')}`);
+      setInnerHtml(EL.UNCERTAINTY_INTRACK, `${covInTrack.toFixed(2)} ${t7e('SatInfoBoxOrbital.meter')}`);
+    }
+  }
+
+  private updateSecondarySatellite_(obj: BaseObject): void {
     const secondarySatObj = PluginRegistry.getPlugin(SelectSatManager)!.secondarySatObj;
 
-    if (secondarySatObj && obj.isSatellite()) {
-      const sat = obj as Satellite;
-      const ric = secondarySatObj.toRIC(sat, ServiceLocator.getTimeManager().simulationTimeObj);
-      const dist = SensorMath.distanceString(sat, secondarySatObj).split(' ')[2];
+    if (!secondarySatObj || !obj.isSatellite()) {
+      return;
+    }
 
-      const satDistanceElement = getEl('sat-sec-dist');
-      const satRadiusElement = getEl('sat-sec-rad');
-      const satInTrackElement = getEl('sat-sec-intrack');
-      const satCrossTrackElement = getEl('sat-sec-crosstrack');
+    const sat = obj as Satellite;
+    const ric = secondarySatObj.toRIC(sat, ServiceLocator.getTimeManager().simulationTimeObj);
+    const dist = SensorMath.distanceString(sat, secondarySatObj).split(' ')[2];
 
-      if (satDistanceElement && satRadiusElement && satInTrackElement && satCrossTrackElement) {
-        satDistanceElement.innerHTML = `${dist} km`;
-        satRadiusElement.innerHTML = `${ric.position.x.toFixed(2)}km`;
-        satInTrackElement.innerHTML = `${ric.position.y.toFixed(2)}km`;
-        satCrossTrackElement.innerHTML = `${ric.position.z.toFixed(2)}km`;
-      } else {
-        errorManagerInstance.debug('Error updating secondary satellite info!');
-      }
+    const satDistanceElement = getEl('sat-sec-dist');
+    const satRadiusElement = getEl('sat-sec-rad');
+    const satInTrackElement = getEl('sat-sec-intrack');
+    const satCrossTrackElement = getEl('sat-sec-crosstrack');
+
+    if (satDistanceElement && satRadiusElement && satInTrackElement && satCrossTrackElement) {
+      satDistanceElement.innerHTML = `${dist} km`;
+      satRadiusElement.innerHTML = `${ric.position.x.toFixed(2)}km`;
+      satInTrackElement.innerHTML = `${ric.position.y.toFixed(2)}km`;
+      satCrossTrackElement.innerHTML = `${ric.position.z.toFixed(2)}km`;
+    } else {
+      errorManagerInstance.debug('Error updating secondary satellite info!');
     }
   }
 
@@ -281,38 +329,11 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       setInnerHtml(EL.RAAN, `${elements.rightAscensionDegrees.toFixed(2)}°`);
       setInnerHtml(EL.ARG_PE, `${elements.argPerigeeDegrees.toFixed(2)}°`);
 
-      const periodDom = getEl(EL.PERIOD);
-
-      if (periodDom) {
-        periodDom.innerHTML = `${elements.period.toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.min')}`;
-        periodDom.dataset.position = 'top';
-        periodDom.dataset.delay = '50';
-        periodDom.setAttribute(
-          'kt-tooltip',
-          `${t7e('SatInfoBoxOrbital.Period.meanMotion')}: ${(MINUTES_PER_DAY / elements.period).toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.revPerDay')}`,
-        );
-      }
+      this.updatePeriodElement_(elements.period);
 
       setInnerHtml(EL.ELSET_AGE, 'N/A');
 
-      const gmst = ServiceLocator.getTimeManager().gmst;
-      const lla = eci2lla(obj.position, gmst);
-
-      const satLonElement = getEl(EL.LONGITUDE);
-      const satLatElement = getEl(EL.LATITUDE);
-
-      if (satLonElement && satLatElement) {
-        if (lla.lon >= 0) {
-          satLonElement.innerHTML = `${lla.lon.toFixed(3)}°${t7e('SatInfoBoxOrbital.Longitude.east')}`;
-        } else {
-          satLonElement.innerHTML = `${(lla.lon * -1).toFixed(3)}°${t7e('SatInfoBoxOrbital.Longitude.west')}`;
-        }
-        if (lla.lat >= 0) {
-          satLatElement.innerHTML = `${lla.lat.toFixed(3)}°${t7e('SatInfoBoxOrbital.Latitude.north')}`;
-        } else {
-          satLatElement.innerHTML = `${(lla.lat * -1).toFixed(3)}°${t7e('SatInfoBoxOrbital.Latitude.south')}`;
-        }
-      }
+      this.updateLatLonElements_(obj.position);
     } catch {
       setInnerHtml(EL.APOGEE, t7e('SatInfoBoxOrbital.unknown'));
       setInnerHtml(EL.PERIGEE, t7e('SatInfoBoxOrbital.unknown'));

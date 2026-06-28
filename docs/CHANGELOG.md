@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v13.0.4](https://github.com/thkruz/keeptrack.space/compare/v13.0.3...v13.0.4)
+
+>  
+
+- docs(changelog): :memo: update changelog for v13.0.3 release [`4ac9e00`](https://github.com/thkruz/keeptrack.space/commit/4ac9e0001f0b08e5df251f28807f62b14f38bf6b)
+- chore(deps): :wrench: override esbuild to 0.28.1 to fix dependabot alert [`4ca7148`](https://github.com/thkruz/keeptrack.space/commit/4ca7148e840091cebdf11b2b2fec12926fc52fda)
+
 #### [v13.0.3](https://github.com/thkruz/keeptrack.space/compare/v13.0.2...v13.0.3)
 
 >  

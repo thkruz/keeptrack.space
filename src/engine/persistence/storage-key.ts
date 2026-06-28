@@ -31,6 +31,7 @@ export enum StorageKey {
   SETTINGS_MINIMUM_SEARCH_CHARACTERS = 'v2-keepTrack-settings-minimumSearchCharacters',
   SETTINGS_SHOW_VIMPEL_IN_SEARCH = 'v2-keepTrack-settings-showVimpelInSearch',
   SETTINGS_SEARCHABLE_FIELDS = 'v2-keepTrack-settings-searchableFields',
+  SETTINGS_SEARCHABLE_TYPES = 'v2-keepTrack-settings-searchableTypes',
   SETTINGS_DRAW_TRAILING_ORBITS = 'v2-keepTrack-settings-drawTrailingOrbits',
   SETTINGS_DRAW_AURORA = 'v2-keepTrack-settings-drawAurora',
   SETTINGS_DRAW_GRATICULE = 'v2-keepTrack-settings-drawGraticule',

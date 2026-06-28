@@ -329,6 +329,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   isShowDecayedInSearch: 'core',
   isShowVimpelInSearch: 'core',
   searchableFields: 'core',
+  searchableTypes: 'core',
   limitSats: 'core',
   isDisableSelectSat: 'core',
   daysUntilObjectLost: 'core',

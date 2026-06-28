@@ -350,46 +350,32 @@ function missileColor(colorData: Float32Array, pickableData: Int8Array, i: numbe
 
 // ─── Filter Check (port of getColorIfDisabledSat_) ──────────────────────────
 
-/** Returns true if the object at index i should be hidden based on current filter settings. */
-function isFilteredOut(i: number): boolean {
-  if (!catalogData) {
-    return false;
-  }
-
-  const type = catalogData.type[i];
-  const flags = catalogData.objFlags[i];
-
-  // Only apply filters to satellite-like objects (not stars, sensors, markers, etc.)
-  if (flags & (ObjFlags.IS_STAR | ObjFlags.IS_SENSOR | ObjFlags.IS_MARKER | ObjFlags.IS_STATIC)) {
-    return false;
-  }
-  if (flags & ObjFlags.IS_PLANET) {
-    return false;
-  }
-
-  // Object type filters
+/** Returns true if the object at index i is hidden by the source/object-type filters. */
+function isFilteredBySource_(cd: ColorDataArrays, i: number, type: number, flags: number): boolean {
   if (!filterState.debris && type === SOT_DEBRIS) {
     return true;
   }
-  if (!filterState.vimpelSatellites && catalogData.source[i] === SourceCode.VIMPEL) {
+  if (!filterState.vimpelSatellites && cd.source[i] === SourceCode.VIMPEL) {
     return true;
   }
   if (!filterState.starlinkSatellites && (flags & ObjFlags.IS_STARLINK)) {
     return true;
   }
-  if (!filterState.celestrakSatellites && catalogData.source[i] === SourceCode.CELESTRAK) {
+  if (!filterState.celestrakSatellites && cd.source[i] === SourceCode.CELESTRAK) {
     return true;
   }
-  if (!filterState.celestrakSupSatellites && catalogData.source[i] === SourceCode.CELESTRAK_SUP) {
+  if (!filterState.celestrakSupSatellites && cd.source[i] === SourceCode.CELESTRAK_SUP) {
     return true;
   }
-  if (!filterState.satnogsSatellites && catalogData.source[i] === SourceCode.SATNOGS) {
+  if (!filterState.satnogsSatellites && cd.source[i] === SourceCode.SATNOGS) {
     return true;
   }
 
-  // Country filters
-  const country = catalogData.country[i];
+  return false;
+}
 
+/** Returns true if the object at index i is hidden by the country filters. */
+function isFilteredByCountry_(country: number): boolean {
   if (!filterState.unitedStates && country === CountryCode.US) {
     return true;
   }
@@ -427,9 +413,13 @@ function isFilteredOut(i: number): boolean {
     return true;
   }
 
-  // Orbital regime filters (use apogee/eccentricity)
-  const apogee = catalogData.apogee[i];
-  const ecc = catalogData.eccentricity[i];
+  return false;
+}
+
+/** Returns true if the object at index i is hidden by the orbital-regime or payload-status filters. */
+function isFilteredByRegime_(cd: ColorDataArrays, i: number, type: number): boolean {
+  const apogee = cd.apogee[i];
+  const ecc = cd.eccentricity[i];
 
   if (!filterState.vLEOSatellites && apogee < 400) {
     return true;
@@ -441,7 +431,7 @@ function isFilteredOut(i: number): boolean {
     return true;
   }
 
-  const status = catalogData.status[i];
+  const status = cd.status[i];
 
   if (!filterState.operationalPayloads && type === SOT_PAYLOAD &&
     status !== PS_NONOPERATIONAL && status !== PS_UNKNOWN) {
@@ -473,11 +463,182 @@ function isFilteredOut(i: number): boolean {
   return false;
 }
 
+/** Returns true if the object at index i should be hidden based on current filter settings. */
+function isFilteredOut(i: number): boolean {
+  if (!catalogData) {
+    return false;
+  }
+
+  const cd = catalogData;
+  const type = cd.type[i];
+  const flags = cd.objFlags[i];
+
+  // Only apply filters to satellite-like objects (not stars, sensors, markers, etc.)
+  if (flags & (ObjFlags.IS_STAR | ObjFlags.IS_SENSOR | ObjFlags.IS_MARKER | ObjFlags.IS_STATIC)) {
+    return false;
+  }
+  if (flags & ObjFlags.IS_PLANET) {
+    return false;
+  }
+
+  return isFilteredBySource_(cd, i, type, flags) ||
+    isFilteredByCountry_(cd.country[i]) ||
+    isFilteredByRegime_(cd, i, type);
+}
+
 // ─── Color Scheme Update Functions ───────────────────────────────────────────
 // Each function operates on index i, writing to colorData/pickableData.
 // Returns void — all output is via the write* helpers.
 
 type SchemeUpdateFn = (cd: Float32Array, pd: Int8Array, i: number) => void;
+
+/**
+ * Handles the shared early-return prologue for the ObjectType scheme (planet, OEM, zoom,
+ * notional, star, astronomy, facility, marker, sensor, missile, show/hide-by-type).
+ * Returns true if a color was written and the caller should return.
+ * @param sensorFlagKey objectTypeFlags key gating sensor visibility
+ * @param sensorThemeKey colorTheme key for the sensor color
+ */
+function objectTypePrologue_(
+  cd: Float32Array, pd: Int8Array, i: number, flags: number, type: number,
+  sensor: { flagKey: string; themeKey: string; fallback: number[] },
+): boolean {
+  if (!catalogData) {
+    return true;
+  }
+
+  if (flags & (ObjFlags.IS_PLANET | ObjFlags.IS_OEM)) {
+    writeColor(cd, pd, i,
+      catalogData.specialColor[i * 4],
+      catalogData.specialColor[i * 4 + 1],
+      catalogData.specialColor[i * 4 + 2],
+      catalogData.specialColor[i * 4 + 3],
+      PICKABLE_YES);
+
+    return true;
+  }
+
+  if (settings.maxZoomDistance > 2e6) {
+    writeDeselected(cd, pd, i);
+
+    return true;
+  }
+
+  if (type === SOT_NOTIONAL) {
+    writeDeselected(cd, pd, i);
+
+    return true;
+  }
+
+  if (flags & ObjFlags.IS_STAR) {
+    starColor(cd, pd, i);
+
+    return true;
+  }
+
+  if (settings.cameraType === CAM_ASTRONOMY) {
+    writeDeselected(cd, pd, i);
+
+    return true;
+  }
+
+  if (checkFacility(cd, pd, i, type)) {
+    return true;
+  }
+
+  if (flags & ObjFlags.IS_MARKER) {
+    writeColor(cd, pd, i, 1, 0, 0, 1, PICKABLE_NO);
+
+    return true;
+  }
+
+  if (flags & ObjFlags.IS_SENSOR) {
+    if (settings.isDisableSensors || objectTypeFlags[sensor.flagKey] === false || settings.cameraType === CAM_PLANETARIUM) {
+      writeDeselected(cd, pd, i);
+    } else {
+      writeColorArr(cd, pd, i, colorTheme[sensor.themeKey] ?? sensor.fallback, PICKABLE_YES);
+    }
+
+    return true;
+  }
+
+  if (flags & ObjFlags.IS_MISSILE) {
+    missileColor(cd, pd, i);
+
+    return true;
+  }
+
+  // Show/hide by type
+  if (type === SOT_PAYLOAD && !settings.isShowPayloads) {
+    writeDeselected(cd, pd, i);
+
+    return true;
+  }
+  if (type === SOT_ROCKET_BODY && !settings.isShowRocketBodies) {
+    writeDeselected(cd, pd, i);
+
+    return true;
+  }
+  if (type === SOT_DEBRIS && !settings.isShowDebris) {
+    writeDeselected(cd, pd, i);
+
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Layer visibility check for the ObjectType scheme. Returns true if the object's layer flag
+ * is off in a hide context (not in view / planetarium / observer without vmag), meaning the
+ * caller should write deselected and return.
+ */
+function objectTypeLayerHidden_(type: number, noInView: boolean, isObserver: boolean, noVmag: boolean): boolean {
+  const hideCtx = noInView || settings.cameraType === CAM_PLANETARIUM || (isObserver && noVmag);
+
+  if (!hideCtx) {
+    return false;
+  }
+
+  if (type === SOT_PAYLOAD) {
+    return objectTypeFlags.payload === false;
+  }
+  if (type === SOT_ROCKET_BODY) {
+    return objectTypeFlags.rocketBody === false;
+  }
+  if (type === SOT_DEBRIS) {
+    return objectTypeFlags.debris === false;
+  }
+  if (type === SOT_SPECIAL || type === SOT_UNKNOWN || type === SOT_NOTIONAL) {
+    return objectTypeFlags.pink === false;
+  }
+
+  return false;
+}
+
+/** Picks the final type-based color for the ObjectType scheme. */
+function objectTypeFinalColor_(country: number, type: number): number[] {
+  if (country === CountryCode.ANALSAT) {
+    return colorTheme.analyst ?? [0, 0, 1, 1];
+  }
+  if (type === SOT_PAYLOAD) {
+    return colorTheme.payload ?? [0, 1, 0, 1];
+  }
+  if (type === SOT_ROCKET_BODY) {
+    return colorTheme.rocketBody ?? [1, 0, 0, 1];
+  }
+  if (type === SOT_DEBRIS) {
+    return colorTheme.debris ?? [0.5, 0.5, 0.5, 1];
+  }
+  if (type === SOT_SPECIAL || type === SOT_UNKNOWN) {
+    return colorTheme.pink ?? [1, 0, 1, 1];
+  }
+  if (type === SOT_NOTIONAL) {
+    return colorTheme.notional ?? [0.5, 0.5, 0, 1];
+  }
+
+  return colorTheme.unknown ?? [1, 1, 1, 1];
+}
 
 /** Colors objects by their space object type (payload, debris, rocket body, etc.). */
 function objectTypeScheme(cd: Float32Array, pd: Int8Array, i: number): void {
@@ -488,94 +649,7 @@ function objectTypeScheme(cd: Float32Array, pd: Int8Array, i: number): void {
   const flags = catalogData.objFlags[i];
   const type = catalogData.type[i];
 
-  // Planets
-  if (flags & ObjFlags.IS_PLANET) {
-    writeColor(cd, pd, i,
-      catalogData.specialColor[i * 4],
-      catalogData.specialColor[i * 4 + 1],
-      catalogData.specialColor[i * 4 + 2],
-      catalogData.specialColor[i * 4 + 3],
-      PICKABLE_YES);
-
-    return;
-  }
-
-  // OEM satellites
-  if (flags & ObjFlags.IS_OEM) {
-    writeColor(cd, pd, i,
-      catalogData.specialColor[i * 4],
-      catalogData.specialColor[i * 4 + 1],
-      catalogData.specialColor[i * 4 + 2],
-      catalogData.specialColor[i * 4 + 3],
-      PICKABLE_YES);
-
-    return;
-  }
-
-  if (settings.maxZoomDistance > 2e6) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-
-  if (type === SOT_NOTIONAL) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-
-  if (flags & ObjFlags.IS_STAR) {
-    starColor(cd, pd, i);
-
-    return;
-  }
-
-  if (settings.cameraType === CAM_ASTRONOMY) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-
-  if (checkFacility(cd, pd, i, type)) {
-    return;
-  }
-
-  if (flags & ObjFlags.IS_MARKER) {
-    writeColor(cd, pd, i, 1, 0, 0, 1, PICKABLE_NO);
-
-    return;
-  }
-
-  if (flags & ObjFlags.IS_SENSOR) {
-    if (settings.isDisableSensors || objectTypeFlags.sensor === false || settings.cameraType === CAM_PLANETARIUM) {
-      writeDeselected(cd, pd, i);
-    } else {
-      writeColorArr(cd, pd, i, colorTheme.sensor ?? [0, 0, 1, 1], PICKABLE_YES);
-    }
-
-    return;
-  }
-
-  if (flags & ObjFlags.IS_MISSILE) {
-    missileColor(cd, pd, i);
-
-    return;
-  }
-
-  // Show/hide by type
-  if (type === SOT_PAYLOAD && !settings.isShowPayloads) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-  if (type === SOT_ROCKET_BODY && !settings.isShowRocketBodies) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-  if (type === SOT_DEBRIS && !settings.isShowDebris) {
-    writeDeselected(cd, pd, i);
-
+  if (objectTypePrologue_(cd, pd, i, flags, type, { flagKey: 'sensor', themeKey: 'sensor', fallback: [0, 0, 1, 1] })) {
     return;
   }
 
@@ -585,34 +659,7 @@ function objectTypeScheme(cd: Float32Array, pd: Int8Array, i: number): void {
   const isObserver = settings.isSensorManagerLoaded && settings.sensorType === SOT_OBSERVER;
   const noVmag = isNaN(vmag);
 
-  // Complex layer visibility checks
-  if ((noInView && type === SOT_PAYLOAD && objectTypeFlags.payload === false) ||
-    (settings.cameraType === CAM_PLANETARIUM && type === SOT_PAYLOAD && objectTypeFlags.payload === false) ||
-    (isObserver && noVmag && type === SOT_PAYLOAD && objectTypeFlags.payload === false)) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-
-  if ((noInView && type === SOT_ROCKET_BODY && objectTypeFlags.rocketBody === false) ||
-    (settings.cameraType === CAM_PLANETARIUM && type === SOT_ROCKET_BODY && objectTypeFlags.rocketBody === false) ||
-    (isObserver && noVmag && type === SOT_ROCKET_BODY && objectTypeFlags.rocketBody === false)) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-
-  if ((noInView && type === SOT_DEBRIS && objectTypeFlags.debris === false) ||
-    (settings.cameraType === CAM_PLANETARIUM && type === SOT_DEBRIS && objectTypeFlags.debris === false) ||
-    (isObserver && noVmag && type === SOT_DEBRIS && objectTypeFlags.debris === false)) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-
-  if ((noInView && (type === SOT_SPECIAL || type === SOT_UNKNOWN || type === SOT_NOTIONAL) && objectTypeFlags.pink === false) ||
-    (settings.cameraType === CAM_PLANETARIUM && (type === SOT_SPECIAL || type === SOT_UNKNOWN || type === SOT_NOTIONAL) && objectTypeFlags.pink === false) ||
-    (isObserver && noVmag && (type === SOT_SPECIAL || type === SOT_UNKNOWN || type === SOT_NOTIONAL) && objectTypeFlags.pink === false)) {
+  if (objectTypeLayerHidden_(type, noInView, isObserver, noVmag)) {
     writeDeselected(cd, pd, i);
 
     return;
@@ -624,37 +671,13 @@ function objectTypeScheme(cd: Float32Array, pd: Int8Array, i: number): void {
     return;
   }
 
-  if (inView && settings.cameraType !== CAM_PLANETARIUM) {
-    if (isObserver && noVmag) {
-      // Intentional fall-through
-    } else {
-      writeColorArr(cd, pd, i, colorTheme.inFOV ?? [0, 0, 1, 1], PICKABLE_YES);
+  if (inView && settings.cameraType !== CAM_PLANETARIUM && !(isObserver && noVmag)) {
+    writeColorArr(cd, pd, i, colorTheme.inFOV ?? [0, 0, 1, 1], PICKABLE_YES);
 
-      return;
-    }
+    return;
   }
 
-  // Final type-based coloring
-  const country = catalogData.country[i];
-  let c: number[];
-
-  if (country === CountryCode.ANALSAT) {
-    c = colorTheme.analyst ?? [0, 0, 1, 1];
-  } else if (type === SOT_PAYLOAD) {
-    c = colorTheme.payload ?? [0, 1, 0, 1];
-  } else if (type === SOT_ROCKET_BODY) {
-    c = colorTheme.rocketBody ?? [1, 0, 0, 1];
-  } else if (type === SOT_DEBRIS) {
-    c = colorTheme.debris ?? [0.5, 0.5, 0.5, 1];
-  } else if (type === SOT_SPECIAL || type === SOT_UNKNOWN) {
-    c = colorTheme.pink ?? [1, 0, 1, 1];
-  } else if (type === SOT_NOTIONAL) {
-    c = colorTheme.notional ?? [0.5, 0.5, 0, 1];
-  } else {
-    c = colorTheme.unknown ?? [1, 1, 1, 1];
-  }
-
-  writeColorArr(cd, pd, i, c, PICKABLE_YES);
+  writeColorArr(cd, pd, i, objectTypeFinalColor_(catalogData.country[i], type), PICKABLE_YES);
 }
 
 /** Colors objects by type, hiding those not in the active group. */
@@ -721,152 +744,37 @@ function objectTypeGroupScheme(cd: Float32Array, pd: Int8Array, i: number): void
   writeColorArr(cd, pd, i, c, PICKABLE_YES);
 }
 
-/** Colors objects using the CelesTrak default color scheme with active/inactive payload distinction. */
-function celestrakScheme(cd: Float32Array, pd: Int8Array, i: number): void {
-  if (!catalogData) {
-    return;
+/**
+ * Layer visibility check for the CelesTrak scheme. Returns true if the object's layer flag is off
+ * in a hide context (not in view / planetarium / observer without vmag), meaning the caller should
+ * write deselected and return.
+ */
+function celestrakLayerHidden_(type: number, isActive: boolean, shouldHide: boolean): boolean {
+  if (!shouldHide) {
+    return false;
   }
 
-  const flags = catalogData.objFlags[i];
-  const type = catalogData.type[i];
-
-  if (flags & ObjFlags.IS_PLANET) {
-    writeColor(cd, pd, i,
-      catalogData.specialColor[i * 4], catalogData.specialColor[i * 4 + 1],
-      catalogData.specialColor[i * 4 + 2], catalogData.specialColor[i * 4 + 3], PICKABLE_YES);
-
-    return;
+  if (type === SOT_PAYLOAD && isActive) {
+    return objectTypeFlags.celestrakDefaultActivePayload === false;
+  }
+  if (type === SOT_PAYLOAD && !isActive) {
+    return objectTypeFlags.celestrakDefaultInactivePayload === false;
+  }
+  if (type === SOT_UNKNOWN) {
+    return objectTypeFlags.celestrakDefaultUnknown === false;
+  }
+  if (type === SOT_ROCKET_BODY) {
+    return objectTypeFlags.celestrakDefaultRocketBody === false;
+  }
+  if (type === SOT_DEBRIS) {
+    return objectTypeFlags.celestrakDefaultDebris === false;
   }
 
-  if (flags & ObjFlags.IS_OEM) {
-    writeColor(cd, pd, i,
-      catalogData.specialColor[i * 4], catalogData.specialColor[i * 4 + 1],
-      catalogData.specialColor[i * 4 + 2], catalogData.specialColor[i * 4 + 3], PICKABLE_YES);
+  return false;
+}
 
-    return;
-  }
-
-  if (settings.maxZoomDistance > 2e6) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-
-  if (type === SOT_NOTIONAL) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-
-  if (flags & ObjFlags.IS_STAR) {
-    starColor(cd, pd, i);
-
-    return;
-  }
-
-  if (settings.cameraType === CAM_ASTRONOMY) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-
-  if (checkFacility(cd, pd, i, type)) {
-    return;
-  }
-
-  if (flags & ObjFlags.IS_MARKER) {
-    writeColor(cd, pd, i, 1, 0, 0, 1, PICKABLE_NO);
-
-    return;
-  }
-
-  if (flags & ObjFlags.IS_SENSOR) {
-    if (settings.isDisableSensors || objectTypeFlags.celestrakDefaultSensor === false || settings.cameraType === CAM_PLANETARIUM) {
-      writeDeselected(cd, pd, i);
-    } else {
-      writeColorArr(cd, pd, i, colorTheme.celestrakDefaultSensor ?? [0, 0, 1, 0.85], PICKABLE_YES);
-    }
-
-    return;
-  }
-
-  if (flags & ObjFlags.IS_MISSILE) {
-    missileColor(cd, pd, i);
-
-    return;
-  }
-
-  // Show/hide by type
-  if (type === SOT_PAYLOAD && !settings.isShowPayloads) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-  if (type === SOT_ROCKET_BODY && !settings.isShowRocketBodies) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-  if (type === SOT_DEBRIS && !settings.isShowDebris) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-
-  const inView = inViewData ? inViewData[i] === 1 : false;
-  const vmag = catalogData.vmag[i];
-  const isObserver = settings.isSensorManagerLoaded && settings.sensorType === SOT_OBSERVER;
-  const noVmag = isNaN(vmag);
-  const status = catalogData.status[i];
-  const isActive = status !== PS_NONOPERATIONAL && status !== PS_UNKNOWN;
-  const shouldHide = !inView || settings.cameraType === CAM_PLANETARIUM || (isObserver && noVmag);
-
-  // Type-based flag checks (only hide when not in view / planetarium / observer without vmag)
-  if (shouldHide && type === SOT_PAYLOAD && isActive && objectTypeFlags.celestrakDefaultActivePayload === false) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-  if (shouldHide && type === SOT_PAYLOAD && !isActive && objectTypeFlags.celestrakDefaultInactivePayload === false) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-  if (shouldHide && type === SOT_UNKNOWN && objectTypeFlags.celestrakDefaultUnknown === false) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-  if (shouldHide && type === SOT_ROCKET_BODY && objectTypeFlags.celestrakDefaultRocketBody === false) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-  if (shouldHide && type === SOT_DEBRIS && objectTypeFlags.celestrakDefaultDebris === false) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-
-  // FOV flag check
-  if (inView && objectTypeFlags.celestrakDefaultFov === false && settings.cameraType !== CAM_PLANETARIUM) {
-    writeDeselected(cd, pd, i);
-
-    return;
-  }
-
-  // FOV coloring
-  if (inView && settings.cameraType !== CAM_PLANETARIUM) {
-    if (isObserver && noVmag) {
-      // Intentional fall-through to type coloring
-    } else {
-      writeColorArr(cd, pd, i, colorTheme.inFOVAlt ?? colorTheme.celestrakDefaultFov ?? [0, 0, 1, 0.85], PICKABLE_YES);
-
-      return;
-    }
-  }
-
-  // Celestrak-specific payload status coloring
+/** Picks the final CelesTrak status/type-based color and writes it. */
+function celestrakFinalColor_(cd: Float32Array, pd: Int8Array, i: number, type: number, isActive: boolean): void {
   if (type === SOT_PAYLOAD) {
     if (!isActive) {
       writeColorArr(cd, pd, i, colorTheme.celestrakDefaultInactivePayload ?? [1, 0.5, 0, 1], PICKABLE_YES);
@@ -888,6 +796,51 @@ function celestrakScheme(cd: Float32Array, pd: Int8Array, i: number): void {
   }
 
   writeColorArr(cd, pd, i, colorTheme.celestrakDefaultUnknown ?? [1, 1, 1, 0.85], PICKABLE_YES);
+}
+
+/** Colors objects using the CelesTrak default color scheme with active/inactive payload distinction. */
+function celestrakScheme(cd: Float32Array, pd: Int8Array, i: number): void {
+  if (!catalogData) {
+    return;
+  }
+
+  const flags = catalogData.objFlags[i];
+  const type = catalogData.type[i];
+
+  if (objectTypePrologue_(cd, pd, i, flags, type,
+    { flagKey: 'celestrakDefaultSensor', themeKey: 'celestrakDefaultSensor', fallback: [0, 0, 1, 0.85] })) {
+    return;
+  }
+
+  const inView = inViewData ? inViewData[i] === 1 : false;
+  const vmag = catalogData.vmag[i];
+  const isObserver = settings.isSensorManagerLoaded && settings.sensorType === SOT_OBSERVER;
+  const noVmag = isNaN(vmag);
+  const status = catalogData.status[i];
+  const isActive = status !== PS_NONOPERATIONAL && status !== PS_UNKNOWN;
+  const shouldHide = !inView || settings.cameraType === CAM_PLANETARIUM || (isObserver && noVmag);
+
+  if (celestrakLayerHidden_(type, isActive, shouldHide)) {
+    writeDeselected(cd, pd, i);
+
+    return;
+  }
+
+  // FOV flag check
+  if (inView && objectTypeFlags.celestrakDefaultFov === false && settings.cameraType !== CAM_PLANETARIUM) {
+    writeDeselected(cd, pd, i);
+
+    return;
+  }
+
+  // FOV coloring
+  if (inView && settings.cameraType !== CAM_PLANETARIUM && !(isObserver && noVmag)) {
+    writeColorArr(cd, pd, i, colorTheme.inFOVAlt ?? colorTheme.celestrakDefaultFov ?? [0, 0, 1, 0.85], PICKABLE_YES);
+
+    return;
+  }
+
+  celestrakFinalColor_(cd, pd, i, type, isActive);
 }
 
 /** Colors objects by their country of origin. */

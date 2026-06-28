@@ -229,9 +229,9 @@ export class Calendar {
     const slider = document.getElementById(sliderId);
 
     if (slider) {
-      const min = parseInt(slider.getAttribute('data-min') || '0');
-      const max = parseInt(slider.getAttribute('data-max') || '59');
-      const step = parseInt(slider.getAttribute('data-step') || '1');
+      const min = parseInt(slider.dataset.min || '0');
+      const max = parseInt(slider.dataset.max || '59');
+      const step = parseInt(slider.dataset.step || '1');
       const handle: HTMLElement | null = slider.querySelector('.ui-slider-handle');
 
       const updateSliderPosition = (clientX: number) => {

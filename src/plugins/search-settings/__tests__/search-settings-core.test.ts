@@ -1,13 +1,16 @@
 import {
   DEFAULT_SEARCHABLE_FIELDS,
+  DEFAULT_SEARCHABLE_TYPES,
   MIN_SEARCH_CHARS_DEFAULT,
   parseBool,
   parseMaxResults,
   parseMinSearchChars,
   parseSearchableFields,
+  parseSearchableTypes,
   SEARCH_LIMIT_DEFAULT,
   SEARCH_LIMIT_MAX,
   serializeSearchableFields,
+  serializeSearchableTypes,
 } from '@app/plugins/search-settings/search-settings-core';
 
 describe('search-settings-core', () => {
@@ -80,6 +83,31 @@ describe('search-settings-core', () => {
       const fields = { ...DEFAULT_SEARCHABLE_FIELDS, noradId: false, intlDes: false };
 
       expect(parseSearchableFields(serializeSearchableFields(fields))).toEqual(fields);
+    });
+  });
+
+  describe('parseSearchableTypes', () => {
+    it('returns defaults (sats/missiles on, rest off) for null', () => {
+      expect(parseSearchableTypes(null)).toEqual(DEFAULT_SEARCHABLE_TYPES);
+    });
+
+    it('returns defaults for corrupt JSON', () => {
+      expect(parseSearchableTypes('{not json')).toEqual(DEFAULT_SEARCHABLE_TYPES);
+    });
+
+    it('applies known boolean keys and falls back to defaults for the rest', () => {
+      const result = parseSearchableTypes(JSON.stringify({ star: false, bogus: true }));
+
+      expect(result.star).toBe(false); // overridden by the persisted value
+      expect(result.satellite).toBe(true); // missing key falls back to default
+      expect(result.planet).toBe(true); // missing key falls back to default
+      expect((result as unknown as Record<string, unknown>).bogus).toBeUndefined();
+    });
+
+    it('round-trips through serialize', () => {
+      const types = { ...DEFAULT_SEARCHABLE_TYPES, star: true, launchSite: true };
+
+      expect(parseSearchableTypes(serializeSearchableTypes(types))).toEqual(types);
     });
   });
 });

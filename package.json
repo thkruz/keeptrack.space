@@ -173,6 +173,9 @@
     "uuid": "^11.1.0",
     "webgl-obj-loader": "^2.0.8"
   },
+  "overrides": {
+    "esbuild": "0.28.1"
+  },
   "volta": {
     "node": "24.14.0"
   }

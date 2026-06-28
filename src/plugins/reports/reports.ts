@@ -664,11 +664,10 @@ export class ReportsPlugin extends KeepTrackPlugin {
     copyButton.textContent = t7e('plugins.ReportsPlugin.copyButton' as Parameters<typeof t7e>[0]);
     copyButton.style.marginLeft = '12px';
     copyButton.addEventListener('click', () => {
-      try {
-        (win.navigator?.clipboard ?? navigator.clipboard)?.writeText(payload.content);
-      } catch {
-        // Clipboard may be unavailable (insecure context); ignore.
-      }
+      // Clipboard may be unavailable (insecure context); ignore sync and async failures.
+      (win.navigator?.clipboard ?? navigator.clipboard)?.writeText(payload.content)?.catch(() => {
+        // Ignore clipboard write rejection.
+      });
     });
     win.document.body.appendChild(copyButton);
     win.document.body.appendChild(win.document.createElement('br'));

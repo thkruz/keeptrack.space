@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v13.0.2](https://github.com/thkruz/keeptrack.space/compare/v13.0.1...v13.0.2)
+
+>  
+
+- fix(sensor-fov): sensor FOV drawn as small circle for high minimum elevation sensors [`#1386`](https://github.com/thkruz/keeptrack.space/pull/1386)
+- 12.5.0 [`#1381`](https://github.com/thkruz/keeptrack.space/pull/1381)
+- 12.4.0 [`#1375`](https://github.com/thkruz/keeptrack.space/pull/1375)
+- Enhance catalog handling with CSV ingestion, parsing, and sorting improvements [`#1362`](https://github.com/thkruz/keeptrack.space/pull/1362)
+- Guard against null data and stale references during catalog swap [`#1361`](https://github.com/thkruz/keeptrack.space/pull/1361)
+- Fix null positionData handling during catalog swap [`#1360`](https://github.com/thkruz/keeptrack.space/pull/1360)
+- Develop [`#1356`](https://github.com/thkruz/keeptrack.space/pull/1356)
+- v12.2.7 [`#1350`](https://github.com/thkruz/keeptrack.space/pull/1350)
+- v12.2.6 [`#1348`](https://github.com/thkruz/keeptrack.space/pull/1348)
+- fix(sensor-fov): add conical bottom skirt for high minimum elevation sensors [`#333`](https://github.com/thkruz/keeptrack.space/issues/333)
+- docs(changelog): :memo: update changelog for v13.0.1 release [`a3b64bf`](https://github.com/thkruz/keeptrack.space/commit/a3b64bf41581b453a34108f7c82d27afcfda4f9a)
+- chore(build-pipeline): :wrench: fail PRs when package.json version is not bumped past last release [`43bf87b`](https://github.com/thkruz/keeptrack.space/commit/43bf87b42d2040dd89942a4a44b202f1e8e4525f)
+
 #### [v13.0.1](https://github.com/thkruz/keeptrack.space/compare/v13.0.0...v13.0.1)
 
 >  

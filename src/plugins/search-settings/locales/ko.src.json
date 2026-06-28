@@ -5,6 +5,7 @@
       "title": "검색 설정",
       "sections": {
         "resultLimits": "결과 제한",
+        "objectTypes": "객체 유형",
         "searchFields": "검색 필드",
         "filters": "필터",
         "actions": "작업"
@@ -22,6 +23,14 @@
           "noradId": "NORAD ID",
           "intlDes": "국제 식별자",
           "launchVehicle": "발사체"
+        },
+        "types": {
+          "satellite": "위성",
+          "missile": "미사일",
+          "star": "별",
+          "sensor": "센서",
+          "launchSite": "발사장",
+          "planet": "행성"
         }
       },
       "tooltips": {

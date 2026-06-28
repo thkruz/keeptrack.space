@@ -5,6 +5,7 @@
       "title": "Ustawienia wyszukiwania",
       "sections": {
         "resultLimits": "Limity wyników",
+        "objectTypes": "Typy obiektów",
         "searchFields": "Pola wyszukiwania",
         "filters": "Filtry",
         "actions": "Akcje"
@@ -22,6 +23,14 @@
           "noradId": "Numer NORAD",
           "intlDes": "Oznaczenie międzynarodowe",
           "launchVehicle": "Rakieta nośna"
+        },
+        "types": {
+          "satellite": "Satelity",
+          "missile": "Pociski",
+          "star": "Gwiazdy",
+          "sensor": "Czujniki",
+          "launchSite": "Miejsca startu",
+          "planet": "Planety"
         }
       },
       "tooltips": {

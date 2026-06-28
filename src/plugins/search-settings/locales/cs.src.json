@@ -5,6 +5,7 @@
       "title": "Nastavení vyhledávání",
       "sections": {
         "resultLimits": "Omezení výsledků",
+        "objectTypes": "Typy objektů",
         "searchFields": "Pole vyhledávání",
         "filters": "Filtry",
         "actions": "Akce"
@@ -22,6 +23,14 @@
           "noradId": "NORAD ID",
           "intlDes": "Mezinárodní označení",
           "launchVehicle": "Nosná raketa"
+        },
+        "types": {
+          "satellite": "Satelity",
+          "missile": "Rakety",
+          "star": "Hvězdy",
+          "sensor": "Senzory",
+          "launchSite": "Startovací místa",
+          "planet": "Planety"
         }
       },
       "tooltips": {

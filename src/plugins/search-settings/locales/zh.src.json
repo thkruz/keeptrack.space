@@ -5,6 +5,7 @@
       "title": "搜索设置",
       "sections": {
         "resultLimits": "结果限制",
+        "objectTypes": "对象类型",
         "searchFields": "搜索字段",
         "filters": "过滤器",
         "actions": "操作"
@@ -22,6 +23,14 @@
           "noradId": "NORAD 编号",
           "intlDes": "国际标识符",
           "launchVehicle": "运载火箭"
+        },
+        "types": {
+          "satellite": "卫星",
+          "missile": "导弹",
+          "star": "恒星",
+          "sensor": "传感器",
+          "launchSite": "发射场",
+          "planet": "行星"
         }
       },
       "tooltips": {

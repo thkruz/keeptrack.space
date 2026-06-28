@@ -301,6 +301,25 @@ export class SatInfoBox extends KeepTrackPlugin {
     `;
   }
 
+  /**
+   * Show or hide an optional alternate-identity field (alt name / alt id) and,
+   * when shown, set its value. No-op if the element or its parent is missing.
+   */
+  private static updateAltField_(elId: string, isVisible: boolean, value: string): void {
+    const el = getEl(elId, true);
+
+    if (!el?.parentElement) {
+      return;
+    }
+
+    if (isVisible) {
+      showEl(el.parentElement, 'flex');
+      el.innerHTML = value;
+    } else {
+      hideEl(el.parentElement);
+    }
+  }
+
   private updateHeaderData_(obj: BaseObject, retries = 0): void {
     if (!obj || obj.isStatic() || obj.isSensor()) {
       return;
@@ -342,35 +361,8 @@ export class SatInfoBox extends KeepTrackPlugin {
       }
     }
 
-    if (isHasAltName) {
-      const altNameEl = getEl(EL.ALT_NAME, true);
-
-      if (altNameEl && altNameEl.parentElement) {
-        showEl(altNameEl.parentElement, 'flex');
-        altNameEl.innerHTML = (obj as Satellite).altName;
-      }
-    } else {
-      const altNameEl = getEl(EL.ALT_NAME, true);
-
-      if (altNameEl && altNameEl.parentElement) {
-        hideEl(altNameEl.parentElement);
-      }
-    }
-
-    if (isHasAltId) {
-      const altIdEl = getEl(EL.ALT_ID, true);
-
-      if (altIdEl && altIdEl.parentElement) {
-        showEl(altIdEl.parentElement, 'flex');
-        altIdEl.innerHTML = (obj as Satellite).altId;
-      }
-    } else {
-      const altIdEl = getEl(EL.ALT_ID, true);
-
-      if (altIdEl && altIdEl.parentElement) {
-        hideEl(altIdEl.parentElement);
-      }
-    }
+    SatInfoBox.updateAltField_(EL.ALT_NAME, isHasAltName, (obj as Satellite).altName);
+    SatInfoBox.updateAltField_(EL.ALT_ID, isHasAltId, (obj as Satellite).altId);
 
     /*
      * TODO:

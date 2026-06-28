@@ -347,7 +347,7 @@ export class Collisions extends KeepTrackPlugin {
     const tr = tbl.insertRow();
 
     tr.setAttribute('class', `${this.id}-object link`);
-    tr.setAttribute('data-row', i.toString());
+    tr.dataset.row = i.toString();
 
     // Populate the table with the data
     Collisions.createCell_(tr, this.collisionList_[i].TOCA.slice(0, 19).replace('T', ' '));

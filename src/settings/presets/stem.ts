@@ -62,7 +62,6 @@ export const stemEnvironment = (settingsManager: SettingsManager) => {
   settingsManager.isAllowRightClick = false;
   settingsManager.isDisableSelectSat = false;
 
-  settingsManager.isShowAgencies = false;
   settingsManager.isDisableSensors = true;
   settingsManager.isDisableControlSites = true;
   settingsManager.isDisableLaunchSites = true;

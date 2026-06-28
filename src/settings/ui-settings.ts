@@ -234,12 +234,6 @@ export class UiSettings {
    * /tle/TLE.txt
    */
   isDisableAsciiCatalog = true;
-  /**
-   * Indicates whether or not Payload Owners/Manufacturers should be displayed on globe.
-   *
-   * TODO: This needs to be revamped. Most agencies are not linked to any satellites!
-   */
-  isShowAgencies = false;
   isDisableUrlBar: boolean | null = null;
   /**
    * Determines whether or not to hide the propagation rate text on the GUI.

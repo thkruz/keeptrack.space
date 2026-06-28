@@ -65,6 +65,37 @@ export interface SearchSatParams {
   source: string;
 }
 
+/** Flags describing which search criteria were actually supplied by the user. */
+interface SearchValidityFlags {
+  isValidAz: boolean;
+  isValidEl: boolean;
+  isValidRange: boolean;
+  isValidInc: boolean;
+  isValidRaan: boolean;
+  isValidArgPe: boolean;
+  isValidPeriod: boolean;
+  isValidTleAge: boolean;
+  isValidRcs: boolean;
+  isSpecificCountry: boolean;
+  isSpecificBus: boolean;
+  isSpecificShape: boolean;
+  isSpecificSource: boolean;
+  isSpecificPayload: boolean;
+}
+
+/** Resolved (defaulted) margins applied to each numeric search filter. */
+interface SearchMargins {
+  azMarg: Degrees;
+  elMarg: Degrees;
+  rngMarg: Kilometers;
+  incMarg: Degrees;
+  periodMarg: Minutes;
+  tleAgeMarg: Hours;
+  rcsMarg: number;
+  raanMarg: Degrees;
+  argPeMarg: Degrees;
+}
+
 export class FindSatPlugin extends KeepTrackPlugin {
   readonly id = 'FindSatPlugin';
   protected lastResults_ = <Satellite[]>[];
@@ -738,142 +769,134 @@ export class FindSatPlugin extends KeepTrackPlugin {
     return possibles;
   }
 
-  protected searchSats_(searchParams: SearchSatParams): Satellite[] {
-    let {
-      az,
-      el,
-      rng,
-      countryCode,
-      inc,
-      azMarg,
-      elMarg,
-      rngMarg,
-      incMarg,
-      period,
-      periodMarg,
-      tleAge,
-      tleAgeMarg,
-      rcs,
-      rcsMarg,
-      objType,
-      raan: rightAscension,
-      raanMarg: rightAscensionMarg,
-      argPe,
-      argPeMarg,
-      bus,
-      shape,
-      payload,
-      source,
-    } = searchParams;
+  /** True when a numeric parameter was actually supplied (not NaN / Infinity). */
+  private static isNumericCriteria_(value: number): boolean {
+    return !isNaN(value) && isFinite(value);
+  }
 
-    const isValidAz = !isNaN(az) && isFinite(az);
-    const isValidEl = !isNaN(el) && isFinite(el);
-    const isValidRange = !isNaN(rng) && isFinite(rng);
-    const isValidInc = !isNaN(inc) && isFinite(inc);
-    const isValidRaan = !isNaN(rightAscension) && isFinite(rightAscension);
-    const isValidArgPe = !isNaN(argPe) && isFinite(argPe);
-    const isValidPeriod = !isNaN(period) && isFinite(period);
-    const isValidTleAge = !isNaN(tleAge) && isFinite(tleAge);
-    const isValidRcs = !isNaN(rcs) && isFinite(rcs);
-    const isSpecificCountry = countryCode !== 'All';
-    const isSpecificBus = bus !== 'All';
-    const isSpecificShape = shape !== 'All';
-    const isSpecificSource = source !== 'All';
-    const isSpecificPayload = payload !== 'All';
+  /** Returns the supplied margin when valid, otherwise the provided fallback. */
+  private static marginOrDefault_<T extends number>(margin: number, fallback: number): T {
+    return (FindSatPlugin.isNumericCriteria_(margin) ? margin : fallback) as T;
+  }
 
-    azMarg = !isNaN(azMarg) && isFinite(azMarg) ? azMarg : (5 as Degrees);
-    elMarg = !isNaN(elMarg) && isFinite(elMarg) ? elMarg : (5 as Degrees);
-    rngMarg = !isNaN(rngMarg) && isFinite(rngMarg) ? rngMarg : (200 as Kilometers);
-    incMarg = !isNaN(incMarg) && isFinite(incMarg) ? incMarg : (1 as Degrees);
-    periodMarg = !isNaN(periodMarg) && isFinite(periodMarg) ? periodMarg : (0.5 as Minutes);
-    tleAgeMarg = !isNaN(tleAgeMarg) && isFinite(tleAgeMarg) ? tleAgeMarg : (1 as Hours);
-    rcsMarg = !isNaN(rcsMarg) && isFinite(rcsMarg) ? rcsMarg : rcs / 10;
-    rightAscensionMarg = !isNaN(rightAscensionMarg) && isFinite(rightAscensionMarg) ? rightAscensionMarg : (1 as Degrees);
-    argPeMarg = !isNaN(argPeMarg) && isFinite(argPeMarg) ? argPeMarg : (1 as Degrees);
+  /** Computes which search criteria were actually provided by the user. */
+  private static buildValidityFlags_(params: SearchSatParams): SearchValidityFlags {
+    const isNumeric = FindSatPlugin.isNumericCriteria_;
 
-    if (
-      !isValidEl &&
-      !isValidRange &&
-      !isValidAz &&
-      !isValidInc &&
-      !isValidPeriod &&
-      !isValidTleAge &&
-      !isValidRcs &&
-      !isValidArgPe &&
-      !isValidRaan &&
-      !isSpecificCountry &&
-      !isSpecificBus &&
-      !isSpecificShape &&
-      !isSpecificSource &&
-      !isSpecificPayload
-    ) {
-      throw new Error('No Search Criteria Entered');
+    return {
+      isValidAz: isNumeric(params.az),
+      isValidEl: isNumeric(params.el),
+      isValidRange: isNumeric(params.rng),
+      isValidInc: isNumeric(params.inc),
+      isValidRaan: isNumeric(params.raan),
+      isValidArgPe: isNumeric(params.argPe),
+      isValidPeriod: isNumeric(params.period),
+      isValidTleAge: isNumeric(params.tleAge),
+      isValidRcs: isNumeric(params.rcs),
+      isSpecificCountry: params.countryCode !== 'All',
+      isSpecificBus: params.bus !== 'All',
+      isSpecificShape: params.shape !== 'All',
+      isSpecificSource: params.source !== 'All',
+      isSpecificPayload: params.payload !== 'All',
+    };
+  }
+
+  /** True when no search criteria of any kind were supplied. */
+  private static hasNoCriteria_(flags: SearchValidityFlags): boolean {
+    return (
+      !flags.isValidEl &&
+      !flags.isValidRange &&
+      !flags.isValidAz &&
+      !flags.isValidInc &&
+      !flags.isValidPeriod &&
+      !flags.isValidTleAge &&
+      !flags.isValidRcs &&
+      !flags.isValidArgPe &&
+      !flags.isValidRaan &&
+      !flags.isSpecificCountry &&
+      !flags.isSpecificBus &&
+      !flags.isSpecificShape &&
+      !flags.isSpecificSource &&
+      !flags.isSpecificPayload
+    );
+  }
+
+  /** Applies the look-angle (az / el / range) filters relative to the selected sensor. */
+  private static applyLookAngleFilters_(res: Satellite[], params: SearchSatParams, margins: SearchMargins, flags: SearchValidityFlags): Satellite[] {
+    if (!flags.isValidAz && !flags.isValidEl && !flags.isValidRange) {
+      return res;
     }
 
-    let res = ServiceLocator.getCatalogManager().getSats();
+    const resolveLookAngle = FindSatPlugin.buildLookAngleResolver_();
+    let filtered = res;
 
-    res = !isValidInc && !isValidPeriod && !isValidTleAge && (isValidAz || isValidEl || isValidRange) ? FindSatPlugin.checkInview_(res) : res;
+    if (flags.isValidAz) {
+      filtered = filterByLookAngle(filtered, resolveLookAngle, 'az', params.az - margins.azMarg, params.az + margins.azMarg);
+    }
+    if (flags.isValidEl) {
+      filtered = filterByLookAngle(filtered, resolveLookAngle, 'el', params.el - margins.elMarg, params.el + margins.elMarg);
+    }
+    if (flags.isValidRange) {
+      filtered = filterByLookAngle(filtered, resolveLookAngle, 'rng', params.rng - margins.rngMarg, params.rng + margins.rngMarg);
+    }
 
-    const objTypes = (Array.isArray(objType) ? objType : [objType]).filter((type) => type !== 0);
+    return filtered;
+  }
 
-    res = objTypes.length > 0 ? filterByObjType(res, objTypes) : res;
+  /** Applies the orbital-element (inc / raan / argPe / period / tleAge / rcs) filters. */
+  private static applyOrbitalFilters_(res: Satellite[], params: SearchSatParams, margins: SearchMargins, flags: SearchValidityFlags): Satellite[] {
+    let filtered = res;
 
-    if (isValidAz || isValidEl || isValidRange) {
-      const resolveLookAngle = FindSatPlugin.buildLookAngleResolver_();
+    if (flags.isValidInc) {
+      filtered = filterByInclination(filtered, (params.inc - margins.incMarg) as Degrees, (params.inc + margins.incMarg) as Degrees);
+    }
+    if (flags.isValidRaan) {
+      filtered = filterByRightAscension(filtered, (params.raan - margins.raanMarg) as Degrees, (params.raan + margins.raanMarg) as Degrees);
+    }
+    if (flags.isValidArgPe) {
+      filtered = filterByArgOfPerigee(filtered, (params.argPe - margins.argPeMarg) as Degrees, (params.argPe + margins.argPeMarg) as Degrees);
+    }
+    if (flags.isValidPeriod) {
+      filtered = filterByPeriod(filtered, (params.period - margins.periodMarg) as Minutes, (params.period + margins.periodMarg) as Minutes);
+    }
+    if (flags.isValidTleAge) {
+      filtered = filterByTleAge(filtered, (params.tleAge - margins.tleAgeMarg) as Hours, (params.tleAge + margins.tleAgeMarg) as Hours, new Date());
+    }
+    if (flags.isValidRcs) {
+      filtered = filterByRcs(filtered, params.rcs - margins.rcsMarg, params.rcs + margins.rcsMarg);
+    }
 
-      if (isValidAz) {
-        res = filterByLookAngle(res, resolveLookAngle, 'az', az - azMarg, az + azMarg);
-      }
-      if (isValidEl) {
-        res = filterByLookAngle(res, resolveLookAngle, 'el', el - elMarg, el + elMarg);
-      }
-      if (isValidRange) {
-        res = filterByLookAngle(res, resolveLookAngle, 'rng', rng - rngMarg, rng + rngMarg);
-      }
-    }
-    if (isValidInc) {
-      res = filterByInclination(res, (inc - incMarg) as Degrees, (inc + incMarg) as Degrees);
-    }
-    if (isValidRaan) {
-      res = filterByRightAscension(res, (rightAscension - rightAscensionMarg) as Degrees, (rightAscension + rightAscensionMarg) as Degrees);
-    }
-    if (isValidArgPe) {
-      res = filterByArgOfPerigee(res, (argPe - argPeMarg) as Degrees, (argPe + argPeMarg) as Degrees);
-    }
-    if (isValidPeriod) {
-      res = filterByPeriod(res, (period - periodMarg) as Minutes, (period + periodMarg) as Minutes);
-    }
-    if (isValidTleAge) {
-      res = filterByTleAge(res, (tleAge - tleAgeMarg) as Hours, (tleAge + tleAgeMarg) as Hours, new Date());
-    }
-    if (isValidRcs) {
-      res = filterByRcs(res, rcs - rcsMarg, rcs + rcsMarg);
-    }
-    if (countryCode !== 'All') {
-      let country = countryCode.split('|');
+    return filtered;
+  }
+
+  /** Applies the categorical (country / bus / shape / source / payload) filters. */
+  private static applyCategoricalFilters_(res: Satellite[], params: SearchSatParams): Satellite[] {
+    let filtered = res;
+
+    if (params.countryCode !== 'All') {
+      let country = params.countryCode.split('|');
       // Remove duplicates and undefined
 
       country = country.filter((item, index) => item && country.indexOf(item) === index);
-      res = res.filter((obj: BaseObject) => country.includes((obj as Satellite).country));
+      filtered = filtered.filter((obj: BaseObject) => country.includes((obj as Satellite).country));
     }
-    if (bus !== 'All') {
-      const buses = bus.split('|');
+    if (params.bus !== 'All') {
+      const buses = params.bus.split('|');
 
-      res = res.filter((obj: BaseObject) => buses.includes((obj as Satellite).bus));
+      filtered = filtered.filter((obj: BaseObject) => buses.includes((obj as Satellite).bus));
     }
-    if (shape !== 'All') {
-      const shapes = shape.split('|');
+    if (params.shape !== 'All') {
+      const shapes = params.shape.split('|');
 
-      res = res.filter((obj: BaseObject) => shapes.includes((obj as Satellite).shape));
+      filtered = filtered.filter((obj: BaseObject) => shapes.includes((obj as Satellite).shape));
     }
-    if (source !== 'All') {
-      res = res.filter((obj: BaseObject) => (obj as Satellite).source === source);
+    if (params.source !== 'All') {
+      filtered = filtered.filter((obj: BaseObject) => (obj as Satellite).source === params.source);
     }
+    if (params.payload !== 'All') {
+      const payloads = params.payload.split('|');
 
-    if (payload !== 'All') {
-      const payloads = payload.split('|');
-
-      res = res.filter((obj: BaseObject) => {
+      filtered = filtered.filter((obj: BaseObject) => {
         const partial = (obj as Satellite).payload
           ?.split(' ')[0]
           ?.split('-')[0]
@@ -883,8 +906,11 @@ export class FindSatPlugin extends KeepTrackPlugin {
       });
     }
 
-    res = FindSatPlugin.limitPossibles_(res, settingsManager.searchLimit);
+    return filtered;
+  }
 
+  /** Pushes the matched SCC numbers into the global search box and runs the search. */
+  private static commitSearchResults_(res: Satellite[]): void {
     let result = '';
 
     res.forEach((obj: BaseObject, i: number) => {
@@ -895,6 +921,44 @@ export class FindSatPlugin extends KeepTrackPlugin {
     const uiManagerInstance = ServiceLocator.getUiManager();
 
     uiManagerInstance.doSearch((<HTMLInputElement>getEl('search')).value);
+  }
+
+  protected searchSats_(searchParams: SearchSatParams): Satellite[] {
+    const flags = FindSatPlugin.buildValidityFlags_(searchParams);
+
+    if (FindSatPlugin.hasNoCriteria_(flags)) {
+      throw new Error('No Search Criteria Entered');
+    }
+
+    const margins: SearchMargins = {
+      azMarg: FindSatPlugin.marginOrDefault_(searchParams.azMarg, 5),
+      elMarg: FindSatPlugin.marginOrDefault_(searchParams.elMarg, 5),
+      rngMarg: FindSatPlugin.marginOrDefault_(searchParams.rngMarg, 200),
+      incMarg: FindSatPlugin.marginOrDefault_(searchParams.incMarg, 1),
+      periodMarg: FindSatPlugin.marginOrDefault_(searchParams.periodMarg, 0.5),
+      tleAgeMarg: FindSatPlugin.marginOrDefault_(searchParams.tleAgeMarg, 1),
+      rcsMarg: FindSatPlugin.marginOrDefault_(searchParams.rcsMarg, searchParams.rcs / 10),
+      raanMarg: FindSatPlugin.marginOrDefault_(searchParams.raanMarg, 1),
+      argPeMarg: FindSatPlugin.marginOrDefault_(searchParams.argPeMarg, 1),
+    };
+
+    let res = ServiceLocator.getCatalogManager().getSats();
+
+    res = !flags.isValidInc && !flags.isValidPeriod && !flags.isValidTleAge && (flags.isValidAz || flags.isValidEl || flags.isValidRange)
+      ? FindSatPlugin.checkInview_(res)
+      : res;
+
+    const objTypes = (Array.isArray(searchParams.objType) ? searchParams.objType : [searchParams.objType]).filter((type) => type !== 0);
+
+    res = objTypes.length > 0 ? filterByObjType(res, objTypes) : res;
+
+    res = FindSatPlugin.applyLookAngleFilters_(res, searchParams, margins, flags);
+    res = FindSatPlugin.applyOrbitalFilters_(res, searchParams, margins, flags);
+    res = FindSatPlugin.applyCategoricalFilters_(res, searchParams);
+
+    res = FindSatPlugin.limitPossibles_(res, settingsManager.searchLimit);
+
+    FindSatPlugin.commitSearchResults_(res);
 
     return res;
   }

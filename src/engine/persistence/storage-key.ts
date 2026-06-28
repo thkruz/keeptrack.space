@@ -52,7 +52,6 @@ export enum StorageKey {
   FILTER_SETTINGS_ROCKET_BODIES = 'v2-filter-settings-rocket-bodies',
   FILTER_SETTINGS_DEBRIS = 'v2-filter-settings-debris',
   FILTER_SETTINGS_UNKNOWN_TYPE = 'v2-filter-settings-unknown-type',
-  FILTER_SETTINGS_AGENCIES = 'v2-filter-settings-agencies',
   FILTER_SETTINGS_VLEO = 'v2-filter-settings-vleo',
   FILTER_SETTINGS_LEO = 'v2-filter-settings-leo',
   FILTER_SETTINGS_HEO = 'v2-filter-settings-heo',

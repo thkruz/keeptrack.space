@@ -76,13 +76,6 @@
       "category": "オブジェクトタイプ",
       "tooltip": "計画中または提案中で、まだ打ち上げられていない衛星です。"
     },
-    "agencies": {
-      "name": "機関",
-      "category": "オブジェクトタイプ",
-      "tooltip": "予定されている機能 - 地球儀上に機関を表示します。",
-      "checked": false,
-      "disabled": true
-    },
     "groundSensors": {
       "name": "地上センサー",
       "category": "オブジェクトタイプ",

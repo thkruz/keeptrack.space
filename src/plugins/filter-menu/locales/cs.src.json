@@ -76,13 +76,6 @@
       "category": "Typy objektů",
       "tooltip": "Satelity, které jsou plánované nebo navržené, ale dosud nebyly vypuštěny."
     },
-    "agencies": {
-      "name": "Agentury",
-      "category": "Typy objektů",
-      "tooltip": "Plánovaná funkce – zobrazí agentury na glóbu.",
-      "checked": false,
-      "disabled": true
-    },
     "groundSensors": {
       "name": "Pozemní senzory",
       "category": "Typy objektů",

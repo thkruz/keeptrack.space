@@ -425,8 +425,8 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
       const id = filter.id!;
       const value = settingsManager.filter[id] ?? defaultFilterValue(filter);
 
-      // Seed every filter (including the disabled "Agencies" placeholder) so the
-      // persisted state and the rendered checkboxes match settingsManager.
+      // Seed every filter so the persisted state and the rendered checkboxes
+      // match settingsManager.
       this.writeFilterValue_(id, value);
     });
 
@@ -457,8 +457,8 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
   }
 
   /**
-   * Set a user-driven filter value, ignoring disabled filters (e.g. the
-   * placeholder "Agencies" row) so presets and toggles can never enable them.
+   * Set a user-driven filter value, ignoring any filters marked disabled so
+   * presets and toggles can never enable them.
    */
   private setFilterValue_(filterId: string, checked: boolean): void {
     if (getFilters().find((f) => f.id === filterId)?.disabled) {

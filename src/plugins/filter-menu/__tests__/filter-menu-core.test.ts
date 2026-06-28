@@ -44,11 +44,8 @@ describe('filter-menu-core', () => {
       expect(getFilters().every((f) => typeof f.id === 'string' && f.id.length > 0)).toBe(true);
     });
 
-    it('marks the placeholder agencies filter disabled and unchecked', () => {
-      const agencies = getFilters().find((f) => f.id === 'agencies');
-
-      expect(agencies?.disabled).toBe(true);
-      expect(defaultFilterValue(agencies!)).toBe(false);
+    it('no longer exposes the removed agencies filter', () => {
+      expect(getFilters().find((f) => f.id === 'agencies')).toBeUndefined();
     });
 
     it('groups the data-source filters under one category', () => {

@@ -76,13 +76,6 @@
       "category": "객체 유형",
       "tooltip": "아직 발사되지 않은 계획 또는 제안된 위성입니다."
     },
-    "agencies": {
-      "name": "기관",
-      "category": "객체 유형",
-      "tooltip": "계획된 기능 - 지구본에 기관을 표시합니다.",
-      "checked": false,
-      "disabled": true
-    },
     "groundSensors": {
       "name": "지상 센서",
       "category": "객체 유형",

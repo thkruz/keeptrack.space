@@ -129,12 +129,10 @@ describe('FilterMenuPlugin_class', () => {
       expect(filterNames.some((name) => name.toLowerCase().includes('payload') || name.toLowerCase().includes('debris'))).toBe(true);
     });
 
-    it('should have agencies filter disabled by default', () => {
+    it('no longer includes the removed agencies filter', () => {
       const filters = getFilters();
-      const agenciesFilter = filters.find((f) => f.disabled === true);
 
-      expect(agenciesFilter).toBeDefined();
-      expect(agenciesFilter?.checked).toBe(false);
+      expect(filters.find((f) => f.id === 'agencies')).toBeUndefined();
     });
 
     it('should group filters into multiple categories', () => {
@@ -201,7 +199,7 @@ describe('FilterMenuPlugin_class', () => {
 
     it('should have all expected filter keys in FILTER_STORAGE_MAP', () => {
       const storageMap = FILTER_STORAGE_MAP;
-      const expectedKeys = ['operationalPayloads', 'nonOperationalPayloads', 'rocketBodies', 'debris', 'unknownType', 'agencies', 'groundSensors', 'launchFacilities'];
+      const expectedKeys = ['operationalPayloads', 'nonOperationalPayloads', 'rocketBodies', 'debris', 'unknownType', 'groundSensors', 'launchFacilities'];
 
       expectedKeys.forEach((key) => {
         expect(storageMap[key]).toBeDefined();
@@ -501,7 +499,6 @@ describe('FilterMenuPlugin_class', () => {
       'rocketBodies',
       'debris',
       'unknownType',
-      'agencies',
       'groundSensors',
       'launchFacilities',
       'starlinkSatellites',
@@ -708,24 +705,16 @@ describe('FilterMenuPlugin_class', () => {
       });
     });
 
-    it('should only have agencies filter disabled', () => {
+    it('should not have any disabled filters', () => {
       const filters = getFilters();
       const disabledFilters = filters.filter((f) => f.disabled === true);
 
-      expect(disabledFilters.length).toBe(1);
-      expect(disabledFilters[0].id).toBe('agencies');
-    });
-
-    it('should have agencies filter checked as false', () => {
-      const filters = getFilters();
-      const agenciesFilter = filters.find((f) => f.id === 'agencies');
-
-      expect(agenciesFilter?.checked).toBe(false);
+      expect(disabledFilters.length).toBe(0);
     });
 
     it('should have filters without explicit checked property default to undefined', () => {
       const filters = getFilters();
-      const filtersWithExplicitChecked = new Set(['agencies', 'groundSensors', 'launchFacilities']);
+      const filtersWithExplicitChecked = new Set(['groundSensors', 'launchFacilities']);
       const filtersWithoutChecked = filters.filter((f) => !filtersWithExplicitChecked.has(f.id!));
 
       filtersWithoutChecked.forEach((filter) => {
@@ -1013,20 +1002,6 @@ describe('FilterMenuPlugin_class', () => {
       expect((getEl('filter-china') as HTMLInputElement)?.checked).toBe(false);
       expect((getEl('filter-russia') as HTMLInputElement)?.checked).toBe(false);
       expect((getEl('filter-japan') as HTMLInputElement)?.checked).toBe(false);
-    });
-
-    it('should not modify disabled filters via applyPatch_', () => {
-      const plugin = new FilterMenuPlugin();
-
-      websiteInit(plugin);
-      EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
-
-      const agenciesCheckbox = getEl('filter-agencies') as HTMLInputElement;
-      const agenciesBefore = agenciesCheckbox?.checked;
-
-      plugin['applyPatch_']({ agencies: true });
-
-      expect(agenciesCheckbox?.checked).toBe(agenciesBefore);
     });
 
     it('should call saveSettings_ when using applyPatch_', () => {

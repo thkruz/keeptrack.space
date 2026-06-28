@@ -440,124 +440,150 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     }
 
     const mainCameraInstance = ServiceLocator.getMainCamera();
+    const isUpdateDue = Date.now() > this.lastOverlayUpdateTime * 1 + 5000 && !mainCameraInstance.state.isDragging;
 
-    if ((Date.now() > this.lastOverlayUpdateTime * 1 + 5000 && !mainCameraInstance.state.isDragging) || isForceUpdate) {
-      const propTime = timeManagerInstance.simulationTimeObj.getTime();
-      const dotsManager = ServiceLocator.getDotsManager();
+    if (!isUpdateDue && !isForceUpdate) {
+      return;
+    }
 
-      // Bucket entries by tier
-      const buckets: Record<string, string[]> = {};
+    const propTime = timeManagerInstance.simulationTimeObj.getTime();
 
-      for (const tier of Object.keys(TIER_ORDER)) {
-        buckets[tier] = [];
+    // Bucket entries by tier, then rotate the departed tier in place
+    const { buckets, visibleCount } = this.buildPassBuckets_(propTime);
+    const departedTotal = buckets['wl-tier-departed'].length;
+
+    this.applyDepartedRotation_(buckets);
+
+    const html = this.assembleOverlayHtml_(buckets, visibleCount, departedTotal);
+
+    // Set innerHTML directly - requestIdleCallback (setInnerHtml) defers too
+    // long in a busy render loop and can cause stale/empty overlay content
+    const contentEl = getEl('info-overlay-content');
+
+    if (contentEl) {
+      contentEl.innerHTML = html;
+    }
+    this.lastOverlayUpdateTime = timeManagerInstance.realTime;
+
+    // Auto-recalc when list empties (with cooldown to prevent rapid-fire)
+    if (visibleCount === 0 && this.isMenuButtonActive && Date.now() - this.lastRecalcTime_ > WatchlistOverlay.RECALC_COOLDOWN_MS_) {
+      this.openOverlayMenu_();
+    }
+  }
+
+  /** Group each upcoming pass into its tier bucket as ready-to-render HTML. */
+  private buildPassBuckets_(propTime: number): { buckets: Record<string, string[]>; visibleCount: number } {
+    const dotsManager = ServiceLocator.getDotsManager();
+    const buckets: Record<string, string[]> = {};
+
+    for (const tier of Object.keys(TIER_ORDER)) {
+      buckets[tier] = [];
+    }
+
+    let visibleCount = 0;
+
+    for (const pass of this.nextPassArray_) {
+      const deltaMs = pass.time.getTime() - propTime;
+      const isSatInView = dotsManager.inViewData?.[pass.sat.id];
+      const tier = this.classifyTier_(deltaMs, isSatInView);
+
+      if (tier === null) {
+        continue;
       }
 
-      let visibleCount = 0;
+      buckets[tier].push(this.buildEntryHtml_(pass, propTime, tier));
+      visibleCount++;
+    }
 
-      for (let s = 0; s < this.nextPassArray_.length; s++) {
-        const pass = this.nextPassArray_[s];
-        const deltaMs = pass.time.getTime() - propTime;
-        const isSatInView = dotsManager.inViewData?.[pass.sat.id];
-        const tier = this.classifyTier_(deltaMs, isSatInView);
+    return { buckets, visibleCount };
+  }
 
-        if (tier === null) {
-          continue;
-        }
+  /** Build the HTML for a single overlay pass entry. */
+  private buildEntryHtml_(pass: SatPassTimes, propTime: number, tier: Exclude<TierClass, null>): string {
+    const name = pass.sat.sccNum ? pass.sat.sccNum : pass.sat.name;
 
-        const name = pass.sat.sccNum ? pass.sat.sccNum : pass.sat.name;
+    // For active satellites, compute when they leave FOV
+    let exitTime: Date | null = null;
 
-        // For active satellites, compute when they leave FOV
-        let exitTime: Date | null = null;
-
-        if (tier === 'wl-tier-active') {
-          try {
-            exitTime = this.computeExitTime_(pass.sat, propTime);
-          } catch {
-            // Bad satrec or sensor - fall back to pass-start countdown
-          }
-        }
-        const timeStr = this.formatPassTime_(pass.time, propTime, tier, exitTime);
-
-        // Build countdown span only for imminent/active tiers
-        let countdownHtml = '';
-        let clockHtml = timeStr;
-
-        if (tier === 'wl-tier-active' || tier === 'wl-tier-imminent') {
-          const parts = timeStr.split(' ');
-
-          countdownHtml = `<span class="wl-countdown">${parts[0]}</span>`;
-          clockHtml = parts[1] || '';
-        }
-
-        buckets[tier].push(
-          `<div class="wl-entry ${tier}" data-sat-id="${pass.sat.id}"><span class="wl-name">${name}</span>${countdownHtml}<span class="wl-time">${clockHtml}</span></div>`,
-        );
-        visibleCount++;
-      }
-
-      // Rotate departed entries: show up to 5, advancing offset every 10 seconds
-      const allDeparted = buckets['wl-tier-departed'];
-      const departedTotal = allDeparted.length;
-
-      if (departedTotal > DEPARTED_MAX_VISIBLE_) {
-        const now = Date.now();
-
-        if (now - this.lastDepartedRotationTime_ >= DEPARTED_ROTATE_MS_) {
-          this.departedRotationOffset_++;
-          this.lastDepartedRotationTime_ = now;
-        }
-
-        // Keep offset in bounds even when count shrinks
-        const offset = this.departedRotationOffset_ % departedTotal;
-        const visible: string[] = [];
-
-        for (let i = 0; i < DEPARTED_MAX_VISIBLE_; i++) {
-          visible.push(allDeparted[(offset + i) % departedTotal]);
-        }
-        buckets['wl-tier-departed'] = visible;
-      } else {
-        this.departedRotationOffset_ = 0;
-      }
-
-      // Build final HTML with group headers
-      const htmlParts: string[] = ['<div>'];
-      const tiersWithEntries = Object.keys(TIER_ORDER)
-        .sort((a, b) => TIER_ORDER[a] - TIER_ORDER[b])
-        .filter((tier) => buckets[tier].length > 0);
-      const showHeaders = tiersWithEntries.length > 1;
-
-      for (const tier of tiersWithEntries) {
-        if (showHeaders) {
-          const countSuffix = tier === 'wl-tier-departed' && departedTotal > DEPARTED_MAX_VISIBLE_
-            ? ` (${departedTotal})`
-            : '';
-
-          htmlParts.push(`<div class="wl-group-header">${tierLabel(tier)}${countSuffix}</div>`);
-        }
-        htmlParts.push(...buckets[tier]);
-      }
-
-      if (visibleCount === 0) {
-        const noPassesMsg = tOverlay('noPassesMsg');
-
-        htmlParts.push(`<div class="wl-entry wl-tier-background" style="justify-content:center">${noPassesMsg}</div>`);
-      }
-
-      htmlParts.push('</div>');
-
-      // Set innerHTML directly - requestIdleCallback (setInnerHtml) defers too
-      // long in a busy render loop and can cause stale/empty overlay content
-      const contentEl = getEl('info-overlay-content');
-
-      if (contentEl) {
-        contentEl.innerHTML = htmlParts.join('');
-      }
-      this.lastOverlayUpdateTime = timeManagerInstance.realTime;
-
-      // Auto-recalc when list empties (with cooldown to prevent rapid-fire)
-      if (visibleCount === 0 && this.isMenuButtonActive && Date.now() - this.lastRecalcTime_ > WatchlistOverlay.RECALC_COOLDOWN_MS_) {
-        this.openOverlayMenu_();
+    if (tier === 'wl-tier-active') {
+      try {
+        exitTime = this.computeExitTime_(pass.sat, propTime);
+      } catch {
+        // Bad satrec or sensor - fall back to pass-start countdown
       }
     }
+
+    const timeStr = this.formatPassTime_(pass.time, propTime, tier, exitTime);
+
+    // Build countdown span only for imminent/active tiers
+    let countdownHtml = '';
+    let clockHtml = timeStr;
+
+    if (tier === 'wl-tier-active' || tier === 'wl-tier-imminent') {
+      const parts = timeStr.split(' ');
+
+      countdownHtml = `<span class="wl-countdown">${parts[0]}</span>`;
+      clockHtml = parts[1] || '';
+    }
+
+    return `<div class="wl-entry ${tier}" data-sat-id="${pass.sat.id}"><span class="wl-name">${name}</span>${countdownHtml}<span class="wl-time">${clockHtml}</span></div>`;
+  }
+
+  /** Rotate departed entries in place: show up to 5, advancing offset every 10 seconds. */
+  private applyDepartedRotation_(buckets: Record<string, string[]>): void {
+    const allDeparted = buckets['wl-tier-departed'];
+    const departedTotal = allDeparted.length;
+
+    if (departedTotal <= DEPARTED_MAX_VISIBLE_) {
+      this.departedRotationOffset_ = 0;
+
+      return;
+    }
+
+    const now = Date.now();
+
+    if (now - this.lastDepartedRotationTime_ >= DEPARTED_ROTATE_MS_) {
+      this.departedRotationOffset_++;
+      this.lastDepartedRotationTime_ = now;
+    }
+
+    // Keep offset in bounds even when count shrinks
+    const offset = this.departedRotationOffset_ % departedTotal;
+    const visible: string[] = [];
+
+    for (let i = 0; i < DEPARTED_MAX_VISIBLE_; i++) {
+      visible.push(allDeparted[(offset + i) % departedTotal]);
+    }
+    buckets['wl-tier-departed'] = visible;
+  }
+
+  /** Assemble the final overlay HTML string with group headers and empty-state fallback. */
+  private assembleOverlayHtml_(buckets: Record<string, string[]>, visibleCount: number, departedTotal: number): string {
+    const htmlParts: string[] = ['<div>'];
+    const tiersWithEntries = Object.keys(TIER_ORDER)
+      .sort((a, b) => TIER_ORDER[a] - TIER_ORDER[b])
+      .filter((tier) => buckets[tier].length > 0);
+    const showHeaders = tiersWithEntries.length > 1;
+
+    for (const tier of tiersWithEntries) {
+      if (showHeaders) {
+        const countSuffix = tier === 'wl-tier-departed' && departedTotal > DEPARTED_MAX_VISIBLE_
+          ? ` (${departedTotal})`
+          : '';
+
+        htmlParts.push(`<div class="wl-group-header">${tierLabel(tier)}${countSuffix}</div>`);
+      }
+      htmlParts.push(...buckets[tier]);
+    }
+
+    if (visibleCount === 0) {
+      const noPassesMsg = tOverlay('noPassesMsg');
+
+      htmlParts.push(`<div class="wl-entry wl-tier-background" style="justify-content:center">${noPassesMsg}</div>`);
+    }
+
+    htmlParts.push('</div>');
+
+    return htmlParts.join('');
   }
 }

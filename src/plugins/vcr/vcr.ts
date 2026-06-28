@@ -70,7 +70,11 @@ export class VcrPlugin extends KeepTrackPlugin {
           `;
 
           // Insert before nav-top-right so VCR appears on the right side
-          navWrapper.insertBefore(vcrEl, navRight);
+          if (navRight) {
+            navRight.before(vcrEl);
+          } else {
+            navWrapper.appendChild(vcrEl);
+          }
         }
       },
     );

@@ -141,11 +141,29 @@ export class UiManager {
     // }
   }
 
+  /**
+   * Tracks toasts that have already been dismissed so a single toast is never
+   * dismissed twice. Materialize's `Toast.dismiss()` is not idempotent: each call
+   * schedules a teardown timer, and a second teardown runs `_removeContainer()`
+   * against an already-null `_container`, throwing "Cannot read properties of null
+   * (reading 'remove')". See issue #1394.
+   */
+  private readonly dismissedToasts_ = new WeakSet<Toast>();
+
+  private dismissToast_(toast: Toast) {
+    if (this.dismissedToasts_.has(toast)) {
+      return;
+    }
+    this.dismissedToasts_.add(toast);
+    toast.dismiss();
+    this.activeToastList_ = this.activeToastList_.filter((t) => t !== toast);
+  }
+
   dismissAllToasts() {
-    this.activeToastList_.forEach((toast) => {
-      toast.dismiss();
-    });
+    const toasts = this.activeToastList_;
+
     this.activeToastList_ = [];
+    toasts.forEach((toast) => this.dismissToast_(toast));
   }
 
   /**
@@ -219,8 +237,7 @@ export class UiManager {
 
     // Add an on click event to dismiss the toast
     toastEl.addEventListener('click', () => {
-      toastMsg.dismiss();
-      this.activeToastList_ = this.activeToastList_.filter((t) => t !== toastMsg);
+      this.dismissToast_(toastMsg);
     });
 
     toastEl.addEventListener('contextmenu', () => {

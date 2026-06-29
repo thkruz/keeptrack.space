@@ -1,4 +1,3 @@
-import { Toast } from '@materializecss/materialize';
 import { GroupType } from '@app/app/data/object-group';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -52,7 +51,7 @@ export class SettingsPresets {
     settings.isDrawOrbits = false;
 
     settings.timeMachineString = (yearStr) => {
-      Toast.dismissAll(); // Dismiss All Toast Messages (workaround to avoid animations)
+      ServiceLocator.getUiManager().dismissAllToasts(); // Dismiss All Toast Messages (workaround to avoid animations)
       const yearPrefix = parseInt(yearStr) < 57 ? '20' : '19';
       const english = `In ${yearPrefix}${yearStr}`;
       /*
@@ -181,7 +180,7 @@ export class SettingsPresets {
     settings.autoRotateSpeed = 0.000025;
 
     settings.timeMachineString = (yearStr) => {
-      Toast.dismissAll(); // Dismiss All Toast Messages (workaround to avoid animations)
+      ServiceLocator.getUiManager().dismissAllToasts(); // Dismiss All Toast Messages (workaround to avoid animations)
       const yearPrefix = parseInt(yearStr) < 57 ? '20' : '19';
       const english = `In ${yearPrefix}${yearStr}`;
       /*

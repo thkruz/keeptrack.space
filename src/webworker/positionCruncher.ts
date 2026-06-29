@@ -297,7 +297,7 @@ const handleSatEditMsg_ = (m: PositionCruncherIncomingMsg): void => {
   const eccentricity = satrec.ecco;
 
   const extra: ExtraDataMessage = {
-    isLowAlt: false,
+    isLowAlt: satrec.isimp,
     // keplerian elements
     inclination: satrec.inclo as Radians,
     eccentricity,
@@ -827,7 +827,7 @@ const writeValidatedSatState_ = (i: number, m: number, pv: { position: TemeVec3;
    * Make sure that objects with an imprecise orbit or an old elset
    * are not failing to propagate
    */
-  if (objCache[i].isimp || m / 1440 > 20) {
+  if (objCache[i].satrec.isimp || m / 1440 > 20) {
     validateImpreciseOrbitAltitude_(i, pv.position, gmst);
   }
 
@@ -926,6 +926,8 @@ export const updateSatellite = (now: Date, i: number, gmst: GreenwichMeanSiderea
     }
   } catch {
     markSatelliteAsBad_(i);
+
+    return false;
   }
 
   if (isSunlightView) {

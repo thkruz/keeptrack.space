@@ -160,6 +160,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   copyrightOveride: 'ui',
   isDisableAsciiCatalog: 'ui',
   isDisableUrlBar: 'ui',
+  isUpdateUrlBarLive: 'ui',
   isAlwaysHidePropRate: 'ui',
   isDisableTimeMachineToasts: 'ui',
   isDisableToasts: 'ui',

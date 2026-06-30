@@ -236,6 +236,14 @@ export class UiSettings {
   isDisableAsciiCatalog = true;
   isDisableUrlBar: boolean | null = null;
   /**
+   * Continuously rewrite the browser URL bar as the application state changes
+   * (satellite selection, search, propagation rate, time). Off by default so the
+   * URL bar stays clean and to avoid frequent history.replaceState churn; the
+   * Share menu generates the shareable URL on demand instead. Enable this to
+   * restore the legacy always-live URL behavior.
+   */
+  isUpdateUrlBarLive = false;
+  /**
    * Determines whether or not to hide the propagation rate text on the GUI.
    */
   isAlwaysHidePropRate = false;

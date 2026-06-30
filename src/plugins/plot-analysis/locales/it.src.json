@@ -88,9 +88,34 @@
     "RicPlot": {
       "bottomIconLabel": "Grafico RIC",
       "title": "Menu grafico RIC",
+      "orbitsLabel": "Numero di orbite",
+      "labels": {
+        "primary": "Primario",
+        "secondary": "Secondario"
+      },
+      "assessment": {
+        "title": "Relazione",
+        "plane": "piano",
+        "closelySpaced": "Oggetti ravvicinati",
+        "coOrbital": "Co-orbitale",
+        "coPlanar": "Complanare",
+        "unrelated": "Non correlati",
+        "unknown": "Sconosciuto"
+      },
+      "chart": {
+        "radial": "Radiale",
+        "inTrack": "Lungo l'orbita",
+        "crossTrack": "Trasversale all'orbita",
+        "range": "Distanza",
+        "timeAxis": "Tempo (min)",
+        "distanceAxis": "Distanza (km)",
+        "empty": "Seleziona un satellite primario e uno secondario",
+        "unitKm": "km",
+        "unitMin": "min"
+      },
       "help": {
         "overview": "Il grafico RIC mostra il moto relativo tra due satelliti nel riferimento radiale, lungo traccia e fuori traccia (RIC), centrato sul satellite primario. È la vista standard per rendezvous, volo in formazione e analisi degli avvicinamenti ravvicinati: il percorso del satellite secondario è disegnato come visto dal primario.",
-        "howToUse": "<ol><li>Selezionate un satellite primario, poi un satellite secondario (clic destro su un satellite, oppure i tasti [ e ]).</li><li>Aprite il <strong>Grafico RIC</strong> dalla barra inferiore (modalità Analisi).</li><li>Trascinate per ruotare il grafico 3D; l'origine è il satellite primario e la curva è la traiettoria relativa del secondario.</li></ol>",
+        "howToUse": "<ol><li>Selezionate un satellite primario, poi un satellite secondario (clic destro su un satellite, oppure i tasti [ e ]).</li><li>Aprite il <strong>Grafico RIC</strong> dalla barra inferiore (modalità Analisi).</li><li>Leggi i quattro grafici 2D: radiale, lungo l'orbita, trasversale all'orbita e distanza totale nel tempo. Trascina il cursore o scorri per ingrandire l'asse temporale.</li></ol>",
         "tip1": "Devono essere selezionati sia un satellite primario sia uno secondario, altrimenti il grafico non ha nulla da confrontare; scegliete oggetti su orbite simili per una scala leggibile."
       }
     }

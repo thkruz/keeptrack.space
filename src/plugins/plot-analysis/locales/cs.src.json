@@ -88,9 +88,34 @@
     "RicPlot": {
       "bottomIconLabel": "Graf RIC",
       "title": "Menu grafu RIC",
+      "orbitsLabel": "Počet oběhů",
+      "labels": {
+        "primary": "Primární",
+        "secondary": "Sekundární"
+      },
+      "assessment": {
+        "title": "Vztah",
+        "plane": "rovina",
+        "closelySpaced": "Blízko sebe ležící objekty",
+        "coOrbital": "Koorbitální",
+        "coPlanar": "Koplanární",
+        "unrelated": "Nesouvisející",
+        "unknown": "Neznámé"
+      },
+      "chart": {
+        "radial": "Radiální",
+        "inTrack": "Podél dráhy",
+        "crossTrack": "Napříč dráhou",
+        "range": "Vzdálenost",
+        "timeAxis": "Čas (min)",
+        "distanceAxis": "Vzdálenost (km)",
+        "empty": "Vyberte primární a sekundární satelit",
+        "unitKm": "km",
+        "unitMin": "min"
+      },
       "help": {
         "overview": "Graf RIC zobrazuje relativní pohyb dvou satelitů v soustavě radiální, podélné a příčné složky (RIC) se středem v primárním satelitu. Je to standardní pohled pro sbližování, let ve formaci a analýzu blízkých přiblížení: dráha sekundárního satelitu je vykreslena tak, jak ji vidí primární.",
-        "howToUse": "<ol><li>Vyberte primární satelit a poté sekundární satelit (pravým kliknutím na satelit nebo klávesami [ a ]).</li><li>Otevřete <strong>Graf RIC</strong> ze spodní lišty (režim Analýza).</li><li>Tažením 3D graf otáčejte; počátek je primární satelit a křivka je relativní trajektorie sekundárního.</li></ol>",
+        "howToUse": "<ol><li>Vyberte primární satelit a poté sekundární satelit (pravým kliknutím na satelit nebo klávesami [ a ]).</li><li>Otevřete <strong>Graf RIC</strong> ze spodní lišty (režim Analýza).</li><li>Přečtěte si čtyři 2D grafy: radiální, podél dráhy, napříč dráhou a celkovou vzdálenost v čase. Přetažením posuvníku nebo posouváním přibližte časovou osu.</li></ol>",
         "tip1": "Musí být vybrán primární i sekundární satelit, jinak graf nemá co porovnávat; pro čitelné měřítko vybírejte objekty na podobných drahách."
       }
     }

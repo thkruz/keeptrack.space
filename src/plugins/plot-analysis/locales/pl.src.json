@@ -88,9 +88,34 @@
     "RicPlot": {
       "bottomIconLabel": "Wykres RIC",
       "title": "Menu wykresu RIC",
+      "orbitsLabel": "Liczba orbit",
+      "labels": {
+        "primary": "Główny",
+        "secondary": "Drugorzędny"
+      },
+      "assessment": {
+        "title": "Relacja",
+        "plane": "płaszczyzna",
+        "closelySpaced": "Obiekty blisko siebie",
+        "coOrbital": "Koorbitalne",
+        "coPlanar": "Komplanarne",
+        "unrelated": "Niepowiązane",
+        "unknown": "Nieznane"
+      },
+      "chart": {
+        "radial": "Radialny",
+        "inTrack": "Wzdłuż orbity",
+        "crossTrack": "Poprzecznie do orbity",
+        "range": "Odległość",
+        "timeAxis": "Czas (min)",
+        "distanceAxis": "Odległość (km)",
+        "empty": "Wybierz satelitę główną i drugorzędną",
+        "unitKm": "km",
+        "unitMin": "min"
+      },
       "help": {
         "overview": "Wykres RIC pokazuje ruch względny dwóch satelitów w układzie składowych promieniowej, wzdłuż toru i w poprzek toru (RIC), o środku w satelicie głównym. To standardowy widok dla spotkań orbitalnych, lotu w formacji i analizy bliskich zbliżeń: trasa satelity dodatkowego jest rysowana tak, jak widzi ją satelita główny.",
-        "howToUse": "<ol><li>Wybierz satelitę głównego, a następnie satelitę dodatkowego (kliknij satelitę prawym przyciskiem lub użyj klawiszy [ i ]).</li><li>Otwórz <strong>Wykres RIC</strong> z dolnego paska (tryb Analiza).</li><li>Przeciągaj, aby obracać wykres 3D; początek układu to satelita główny, a krzywa to względna trajektoria satelity dodatkowego.</li></ol>",
+        "howToUse": "<ol><li>Wybierz satelitę głównego, a następnie satelitę dodatkowego (kliknij satelitę prawym przyciskiem lub użyj klawiszy [ i ]).</li><li>Otwórz <strong>Wykres RIC</strong> z dolnego paska (tryb Analiza).</li><li>Odczytaj cztery wykresy 2D: radialny, wzdłuż orbity, poprzecznie do orbity oraz całkowita odległość w czasie. Przeciągnij suwak lub przewiń, aby przybliżyć oś czasu.</li></ol>",
         "tip1": "Muszą być wybrane zarówno satelita główny, jak i dodatkowy, inaczej wykres nie ma czego porównywać; dla czytelnej skali wybieraj obiekty na podobnych orbitach."
       }
     }

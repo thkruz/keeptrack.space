@@ -88,9 +88,34 @@
     "RicPlot": {
       "bottomIconLabel": "Trace RIC",
       "title": "Menu Trace RIC",
+      "orbitsLabel": "Nombre d'orbites",
+      "labels": {
+        "primary": "Primaire",
+        "secondary": "Secondaire"
+      },
+      "assessment": {
+        "title": "Relation",
+        "plane": "plan",
+        "closelySpaced": "Objets très rapprochés",
+        "coOrbital": "Co-orbital",
+        "coPlanar": "Coplanaire",
+        "unrelated": "Sans relation",
+        "unknown": "Inconnu"
+      },
+      "chart": {
+        "radial": "Radial",
+        "inTrack": "Le long de l'orbite",
+        "crossTrack": "Transversal à l'orbite",
+        "range": "Distance",
+        "timeAxis": "Temps (min)",
+        "distanceAxis": "Distance (km)",
+        "empty": "Sélectionnez un satellite primaire et un secondaire",
+        "unitKm": "km",
+        "unitMin": "min"
+      },
       "help": {
         "overview": "La trace RIC montre le mouvement relatif entre deux satellites dans le repère radial, le long de la trace et transverse (RIC), centré sur le satellite principal. C'est la vue standard pour les rendez-vous, le vol en formation et l'analyse des approches rapprochées : la trajectoire du satellite secondaire est dessinée telle qu'elle est vue depuis le principal.",
-        "howToUse": "<ol><li>Sélectionnez un satellite principal, puis un satellite secondaire (clic droit sur un satellite, ou les touches [ et ]).</li><li>Ouvrez la <strong>Trace RIC</strong> depuis la barre inférieure (mode Analyse).</li><li>Faites glisser pour faire pivoter la vue 3D ; l'origine est le satellite principal, et la courbe est la trajectoire relative du secondaire.</li></ol>",
+        "howToUse": "<ol><li>Sélectionnez un satellite principal, puis un satellite secondaire (clic droit sur un satellite, ou les touches [ et ]).</li><li>Ouvrez la <strong>Trace RIC</strong> depuis la barre inférieure (mode Analyse).</li><li>Lisez les quatre tracés 2D : radial, le long de l'orbite, transversal à l'orbite et distance totale au fil du temps. Faites glisser le curseur ou faites défiler pour zoomer sur l'axe temporel.</li></ol>",
         "tip1": "Un satellite principal et un satellite secondaire doivent tous deux être sélectionnés, sinon la trace n'a rien à comparer ; choisissez des objets sur des orbites similaires pour une échelle lisible."
       }
     }

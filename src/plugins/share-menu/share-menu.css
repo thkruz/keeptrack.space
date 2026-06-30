@@ -1,0 +1,22 @@
+/* Share menu (v13). The single URL field sits directly under the section label,
+ * so it only needs the section-label gap (not the larger stacked-row headroom). */
+#share-menu .kt-section-label + .kt-field-row .input-field.col {
+  margin-top: 8px;
+}
+
+/* The read-only URL field should still read as selectable text. */
+#share-menu #share-url-input {
+  cursor: text;
+  text-overflow: ellipsis;
+}
+
+/* Focus indication: swap the app-wide :focus-visible outline (which overlaps the
+ * floating label) for KeepTrack's underline. */
+#share-menu .input-field input:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#share-menu .input-field input:focus-visible {
+  outline: none;
+}

@@ -1,0 +1,24 @@
+{
+  "plugins": {
+    "ShareMenuPlugin": {
+      "bottomIconLabel": "Partager",
+      "title": "Partager la vue",
+      "helpBody": "Génère un lien partageable qui capture la vue actuelle, y compris le satellite sélectionné, la recherche, l'heure, le taux de propagation et l'angle de la caméra. Ouvrez ce menu pour créer le lien à la demande, puis copiez-le ou utilisez la fonction de partage de votre appareil. La barre d'adresse n'est plus réécrite automatiquement pendant l'exploration ; activez \"Mise à jour en direct de la barre d'adresse\" dans les paramètres pour rétablir ce comportement.",
+      "commandPalette": {
+        "share": "Partager la vue actuelle"
+      },
+      "labels": {
+        "shareLink": "Lien de partage",
+        "url": "URL partageable"
+      },
+      "buttons": {
+        "copyLink": "Copier le lien",
+        "share": "Partager..."
+      },
+      "toasts": {
+        "copied": "Lien copié dans le presse-papiers !",
+        "copyFailed": "Échec de la copie du lien dans le presse-papiers."
+      }
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "plugins": {
+    "ShareMenuPlugin": {
+      "bottomIconLabel": "Compartir",
+      "title": "Compartir vista",
+      "helpBody": "Genera un enlace para compartir que captura la vista actual, incluido el satélite seleccionado, la búsqueda, la hora, la tasa de propagación y el ángulo de la cámara. Abre este menú para crear el enlace cuando lo necesites y luego cópialo o usa la función de compartir de tu dispositivo. La barra de direcciones ya no se reescribe automáticamente mientras exploras; activa \"Actualización en vivo de la barra de direcciones\" en los ajustes para restaurar ese comportamiento.",
+      "commandPalette": {
+        "share": "Compartir vista actual"
+      },
+      "labels": {
+        "shareLink": "Enlace para compartir",
+        "url": "URL para compartir"
+      },
+      "buttons": {
+        "copyLink": "Copiar enlace",
+        "share": "Compartir..."
+      },
+      "toasts": {
+        "copied": "¡Enlace copiado al portapapeles!",
+        "copyFailed": "No se pudo copiar el enlace al portapapeles."
+      }
+    }
+  }
+}

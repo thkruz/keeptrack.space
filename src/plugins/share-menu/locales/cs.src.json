@@ -1,0 +1,24 @@
+{
+  "plugins": {
+    "ShareMenuPlugin": {
+      "bottomIconLabel": "Sdílet",
+      "title": "Sdílet pohled",
+      "helpBody": "Vygeneruje odkaz ke sdílení, který zachycuje aktuální pohled včetně vybrané družice, vyhledávání, času, rychlosti propagace a úhlu kamery. Otevřením tohoto menu vytvoříte odkaz na vyžádání, který pak můžete zkopírovat nebo použít funkci sdílení vašeho zařízení. Adresní řádek se již při prohlížení automaticky nepřepisuje; chcete-li toto chování obnovit, povolte v nastavení „Živá aktualizace adresního řádku“.",
+      "commandPalette": {
+        "share": "Sdílet aktuální pohled"
+      },
+      "labels": {
+        "shareLink": "Odkaz ke sdílení",
+        "url": "URL ke sdílení"
+      },
+      "buttons": {
+        "copyLink": "Kopírovat odkaz",
+        "share": "Sdílet..."
+      },
+      "toasts": {
+        "copied": "Odkaz zkopírován do schránky!",
+        "copyFailed": "Odkaz se nepodařilo zkopírovat do schránky."
+      }
+    }
+  }
+}

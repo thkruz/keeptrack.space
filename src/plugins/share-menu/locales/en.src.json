@@ -1,0 +1,24 @@
+{
+  "plugins": {
+    "ShareMenuPlugin": {
+      "bottomIconLabel": "Share",
+      "title": "Share View",
+      "helpBody": "Generate a shareable link that captures the current view, including the selected satellite, search, time, propagation rate, and camera angle. Open this menu to create the link on demand, then copy it or use your device's share sheet. The URL bar is no longer rewritten automatically as you explore; enable \"Live URL bar updates\" in the settings to restore that behavior.",
+      "commandPalette": {
+        "share": "Share Current View"
+      },
+      "labels": {
+        "shareLink": "Share Link",
+        "url": "Shareable URL"
+      },
+      "buttons": {
+        "copyLink": "Copy Link",
+        "share": "Share..."
+      },
+      "toasts": {
+        "copied": "Link copied to clipboard!",
+        "copyFailed": "Failed to copy link to clipboard."
+      }
+    }
+  }
+}

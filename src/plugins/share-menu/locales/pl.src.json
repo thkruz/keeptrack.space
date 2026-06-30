@@ -1,0 +1,24 @@
+{
+  "plugins": {
+    "ShareMenuPlugin": {
+      "bottomIconLabel": "Udostępnij",
+      "title": "Udostępnij widok",
+      "helpBody": "Generuje link do udostępniania, który zapisuje bieżący widok, w tym wybranego satelitę, wyszukiwanie, czas, tempo propagacji i kąt kamery. Otwórz to menu, aby utworzyć link na żądanie, a następnie skopiuj go lub użyj funkcji udostępniania swojego urządzenia. Pasek adresu nie jest już automatycznie nadpisywany podczas eksploracji; aby przywrócić to zachowanie, włącz w ustawieniach „Aktualizacja paska adresu na żywo”.",
+      "commandPalette": {
+        "share": "Udostępnij bieżący widok"
+      },
+      "labels": {
+        "shareLink": "Link do udostępniania",
+        "url": "Adres URL do udostępniania"
+      },
+      "buttons": {
+        "copyLink": "Kopiuj link",
+        "share": "Udostępnij..."
+      },
+      "toasts": {
+        "copied": "Link skopiowany do schowka!",
+        "copyFailed": "Nie udało się skopiować linku do schowka."
+      }
+    }
+  }
+}

@@ -73,6 +73,12 @@ export class PluginDrawer {
       this.syncDisabledState_();
     });
 
+    EventBus.getInstance().on(EventBusEvent.setSecondarySat, () => {
+      // Selecting a secondary satellite can enable plugins (e.g. RIC plots) without
+      // firing selectSatData, so re-sync the drawer item disabled state here too.
+      this.syncDisabledState_();
+    });
+
     EventBus.getInstance().on(EventBusEvent.setSensor, () => {
       this.syncDisabledState_();
       this.syncBadgesFromEvents_();

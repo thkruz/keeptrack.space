@@ -862,66 +862,99 @@ export class Camera {
 
     this.state.camRotateSpeed *= settingsManager.momentumDamping ** dt;
 
-    if (this.cameraType === CameraType.ASTRONOMY || this.cameraType === CameraType.PLANETARIUM) {
-      this.updateAstronomyLookAround_(dt);
-    } else if (this.cameraType === CameraType.FPS) {
-      this.updateFpsMovement_(dt);
-    } else if (this.cameraModeDelegates_.has(this.cameraType)) {
-      this.cameraModeDelegates_.get(this.cameraType)!.update(this, dt);
-    } else {
-      if (this.state.camPitchSpeed !== 0) {
-        this.state.camPitch = <Radians>(this.state.camPitch + this.state.camPitchSpeed * dt);
-      }
-      if (this.state.camYawSpeed !== 0) {
-        this.state.camYaw = <Radians>(this.state.camYaw + this.state.camYawSpeed * dt);
-      }
-      if (this.state.camRotateSpeed !== 0) {
-        this.state.fpsRotate = <Degrees>(this.state.fpsRotate + this.state.camRotateSpeed * dt);
-      }
-    }
-
-    if (this.state.isAutoRotate) {
-      if (settingsManager.isAutoRotateL) {
-        this.state.camYaw = <Radians>(this.state.camYaw - settingsManager.autoRotateSpeed * dt * (this.inputHandler.isHoldingDownAKey));
-      }
-      if (settingsManager.isAutoRotateR) {
-        this.state.camYaw = <Radians>(this.state.camYaw + settingsManager.autoRotateSpeed * dt * (this.inputHandler.isHoldingDownAKey));
-      }
-      if (settingsManager.isAutoRotateU) {
-        this.state.camPitch = <Radians>(this.state.camPitch + (settingsManager.autoRotateSpeed / 2) * dt * (this.inputHandler.isHoldingDownAKey));
-      }
-      if (settingsManager.isAutoRotateD) {
-        this.state.camPitch = <Radians>(this.state.camPitch - (settingsManager.autoRotateSpeed / 2) * dt * (this.inputHandler.isHoldingDownAKey));
-      }
-    }
+    this.updateModeMovement_(dt);
+    this.updateAutoRotate_(dt);
 
     this.updateZoom_(dt);
     this.updateFovLerp_(dt);
 
     this.updateCameraSnapMode(dt);
 
-    // Compensate for Earth rotation in FIXED_TO_EARTH mode
-    // so the camera stays fixed to geographic coordinates
-    if (this.cameraType === CameraType.FIXED_TO_EARTH && settingsManager.isCompensateForEarthRotation) {
-      const currentGmst = ServiceLocator.getTimeManager().gmst;
+    this.updateEarthRotationCompensation_();
+    this.clampCamPitch_();
 
-      if (this.state.hasPrevGmst) {
-        const deltaGmst = <Radians>(currentGmst - this.state.prevGmst);
+    // Wrap camYaw to [0, TAU) — use modulo to handle multi-revolution overflow
+    this.state.camYaw = <Radians>(((this.state.camYaw % TAU) + TAU) % TAU);
 
-        if (deltaGmst !== 0) {
-          this.state.camYaw = <Radians>(this.state.camYaw + deltaGmst);
-          if (!this.state.camAngleSnappedOnSat) {
-            this.state.camYawTarget = <Radians>(this.state.camYawTarget + deltaGmst);
-          }
-        }
-      }
+    this.syncEarthCenteredAngles_();
+  }
 
-      this.state.prevGmst = currentGmst;
-      this.state.hasPrevGmst = true;
-    } else {
-      this.state.hasPrevGmst = false;
+  private updateModeMovement_(dt: Milliseconds): void {
+    if (this.cameraType === CameraType.ASTRONOMY || this.cameraType === CameraType.PLANETARIUM) {
+      this.updateAstronomyLookAround_(dt);
+
+      return;
+    }
+    if (this.cameraType === CameraType.FPS) {
+      this.updateFpsMovement_(dt);
+
+      return;
+    }
+    if (this.cameraModeDelegates_.has(this.cameraType)) {
+      this.cameraModeDelegates_.get(this.cameraType)!.update(this, dt);
+
+      return;
     }
 
+    if (this.state.camPitchSpeed !== 0) {
+      this.state.camPitch = <Radians>(this.state.camPitch + this.state.camPitchSpeed * dt);
+    }
+    if (this.state.camYawSpeed !== 0) {
+      this.state.camYaw = <Radians>(this.state.camYaw + this.state.camYawSpeed * dt);
+    }
+    if (this.state.camRotateSpeed !== 0) {
+      this.state.fpsRotate = <Degrees>(this.state.fpsRotate + this.state.camRotateSpeed * dt);
+    }
+  }
+
+  private updateAutoRotate_(dt: Milliseconds): void {
+    if (!this.state.isAutoRotate) {
+      return;
+    }
+
+    if (settingsManager.isAutoRotateL) {
+      this.state.camYaw = <Radians>(this.state.camYaw - settingsManager.autoRotateSpeed * dt * (this.inputHandler.isHoldingDownAKey));
+    }
+    if (settingsManager.isAutoRotateR) {
+      this.state.camYaw = <Radians>(this.state.camYaw + settingsManager.autoRotateSpeed * dt * (this.inputHandler.isHoldingDownAKey));
+    }
+    if (settingsManager.isAutoRotateU) {
+      this.state.camPitch = <Radians>(this.state.camPitch + (settingsManager.autoRotateSpeed / 2) * dt * (this.inputHandler.isHoldingDownAKey));
+    }
+    if (settingsManager.isAutoRotateD) {
+      this.state.camPitch = <Radians>(this.state.camPitch - (settingsManager.autoRotateSpeed / 2) * dt * (this.inputHandler.isHoldingDownAKey));
+    }
+  }
+
+  /**
+   * Compensate for Earth rotation in FIXED_TO_EARTH mode
+   * so the camera stays fixed to geographic coordinates
+   */
+  private updateEarthRotationCompensation_(): void {
+    if (this.cameraType !== CameraType.FIXED_TO_EARTH || !settingsManager.isCompensateForEarthRotation) {
+      this.state.hasPrevGmst = false;
+
+      return;
+    }
+
+    const currentGmst = ServiceLocator.getTimeManager().gmst;
+
+    if (this.state.hasPrevGmst) {
+      const deltaGmst = <Radians>(currentGmst - this.state.prevGmst);
+
+      if (deltaGmst !== 0) {
+        this.state.camYaw = <Radians>(this.state.camYaw + deltaGmst);
+        if (!this.state.camAngleSnappedOnSat) {
+          this.state.camYawTarget = <Radians>(this.state.camYawTarget + deltaGmst);
+        }
+      }
+    }
+
+    this.state.prevGmst = currentGmst;
+    this.state.hasPrevGmst = true;
+  }
+
+  private clampCamPitch_(): void {
     if (this.cameraType === CameraType.FIXED_TO_SAT_LVLH || this.cameraType === CameraType.FIXED_TO_SAT_ECI || this.cameraType === CameraType.SATELLITE_FIRST_PERSON) {
       // No pitch clamping — allow continuous rotation around the satellite
       // Wrap to [-TAU, TAU] to prevent unbounded growth
@@ -931,24 +964,27 @@ export class Camera {
       if (this.state.camPitch < -TAU) {
         this.state.camPitch = <Radians>(this.state.camPitch + TAU);
       }
-    } else {
-      if (this.state.camPitch > TAU / 4) {
-        this.state.camPitch = <Radians>(TAU / 4);
-      }
-      if (this.state.camPitch < -TAU / 4) {
-        this.state.camPitch = <Radians>(-TAU / 4);
-      }
+
+      return;
     }
 
-    // Wrap camYaw to [0, TAU) — use modulo to handle multi-revolution overflow
-    this.state.camYaw = <Radians>(((this.state.camYaw % TAU) + TAU) % TAU);
+    if (this.state.camPitch > TAU / 4) {
+      this.state.camPitch = <Radians>(TAU / 4);
+    }
+    if (this.state.camPitch < -TAU / 4) {
+      this.state.camPitch = <Radians>(-TAU / 4);
+    }
+  }
 
-    if (this.cameraType === CameraType.FIXED_TO_EARTH) {
-      this.state.earthCenteredPitch = this.state.camPitch;
-      this.state.earthCenteredYaw = this.state.camYaw;
-      if (this.state.earthCenteredYaw < 0) {
-        this.state.earthCenteredYaw = <Radians>(this.state.earthCenteredYaw + TAU);
-      }
+  private syncEarthCenteredAngles_(): void {
+    if (this.cameraType !== CameraType.FIXED_TO_EARTH) {
+      return;
+    }
+
+    this.state.earthCenteredPitch = this.state.camPitch;
+    this.state.earthCenteredYaw = this.state.camYaw;
+    if (this.state.earthCenteredYaw < 0) {
+      this.state.earthCenteredYaw = <Radians>(this.state.earthCenteredYaw + TAU);
     }
   }
 
@@ -1441,7 +1477,30 @@ export class Camera {
     this.state.fpsYaw = <Degrees>(this.state.fpsYaw - 20 * this.state.camYawSpeed * dt);
     this.state.fpsRotate = <Degrees>(this.state.fpsRotate - 20 * this.state.camRotateSpeed * dt);
 
-    // Prevent Over Rotation
+    this.clampFpsRotation_();
+
+    const fpsTimeNow = <Milliseconds>Date.now();
+
+    if (this.fpsLastTime_ !== 0) {
+      const fpsElapsed = <Milliseconds>(fpsTimeNow - this.fpsLastTime_);
+
+      this.applyFpsSpeedLocks_(fpsElapsed);
+
+      if (this.cameraType === CameraType.FPS) {
+        this.applyFpsPositionMovement_(fpsElapsed);
+      }
+
+      this.dampenFpsSpeeds_(fpsElapsed);
+
+      this.state.fpsPitch = <Degrees>(this.state.fpsPitch + this.state.fpsPitchRate * fpsElapsed);
+      this.state.fpsRotate = <Degrees>(this.state.fpsRotate + this.state.fpsRotateRate * fpsElapsed);
+      this.state.fpsYaw = <Degrees>(this.state.fpsYaw + this.state.fpsYawRate * fpsElapsed);
+    }
+    this.fpsLastTime_ = fpsTimeNow;
+  }
+
+  /** Prevent over-rotation: clamp pitch to ±90 and wrap rotate/yaw to [0, 360). */
+  private clampFpsRotation_(): void {
     if (this.state.fpsPitch > 90) {
       this.state.fpsPitch = <Degrees>90;
     }
@@ -1460,70 +1519,66 @@ export class Camera {
     if (this.state.fpsYaw < 0) {
       this.state.fpsYaw = <Degrees>(this.state.fpsYaw + 360);
     }
+  }
 
-    const fpsTimeNow = <Milliseconds>Date.now();
-
-    if (this.fpsLastTime_ !== 0) {
-      const fpsElapsed = <Milliseconds>(fpsTimeNow - this.fpsLastTime_);
-
-      if (this.state.isFPSForwardSpeedLock && this.state.fpsForwardSpeed < 0) {
-        this.state.fpsForwardSpeed = Math.max(this.state.fpsForwardSpeed + Math.min(this.state.fpsForwardSpeed * -1.02 * fpsElapsed, -0.2), -settingsManager.fpsForwardSpeed);
-      } else if (this.state.isFPSForwardSpeedLock && this.state.fpsForwardSpeed > 0) {
-        this.state.fpsForwardSpeed = Math.min(this.state.fpsForwardSpeed + Math.max(this.state.fpsForwardSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsForwardSpeed);
-      }
-
-      if (this.state.isFPSSideSpeedLock && this.state.fpsSideSpeed < 0) {
-        this.state.fpsSideSpeed = Math.max(this.state.fpsSideSpeed + Math.min(this.state.fpsSideSpeed * -1.02 * fpsElapsed, -0.2), -settingsManager.fpsSideSpeed);
-      } else if (this.state.isFPSSideSpeedLock && this.state.fpsSideSpeed > 0) {
-        this.state.fpsSideSpeed = Math.min(this.state.fpsSideSpeed + Math.max(this.state.fpsSideSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsSideSpeed);
-      }
-
-      if (this.state.isFPSVertSpeedLock && this.state.fpsVertSpeed < 0) {
-        this.state.fpsVertSpeed = Math.max(this.state.fpsVertSpeed + Math.min(this.state.fpsVertSpeed * -1.02 * fpsElapsed, -0.2), -settingsManager.fpsVertSpeed);
-      } else if (this.state.isFPSVertSpeedLock && this.state.fpsVertSpeed > 0) {
-        this.state.fpsVertSpeed = Math.min(this.state.fpsVertSpeed + Math.max(this.state.fpsVertSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsVertSpeed);
-      }
-
-      if (this.cameraType === CameraType.FPS) {
-        if (this.state.fpsForwardSpeed !== 0) {
-          this.state.fpsPos[0] -= Math.sin(this.state.fpsYaw * DEG2RAD) * this.state.fpsForwardSpeed * this.state.fpsRun * fpsElapsed;
-          this.state.fpsPos[1] -= Math.cos(this.state.fpsYaw * DEG2RAD) * this.state.fpsForwardSpeed * this.state.fpsRun * fpsElapsed;
-          this.state.fpsPos[2] += Math.sin(this.state.fpsPitch * DEG2RAD) * this.state.fpsForwardSpeed * this.state.fpsRun * fpsElapsed;
-        }
-        if (this.state.fpsVertSpeed !== 0) {
-          this.state.fpsPos[2] -= this.state.fpsVertSpeed * this.state.fpsRun * fpsElapsed;
-        }
-        if (this.state.fpsSideSpeed !== 0) {
-          this.state.fpsPos[0] -= Math.cos(-this.state.fpsYaw * DEG2RAD) * this.state.fpsSideSpeed * this.state.fpsRun * fpsElapsed;
-          this.state.fpsPos[1] -= Math.sin(-this.state.fpsYaw * DEG2RAD) * this.state.fpsSideSpeed * this.state.fpsRun * fpsElapsed;
-        }
-      }
-
-      if (!this.state.isFPSForwardSpeedLock) {
-        this.state.fpsForwardSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
-      }
-      if (!this.state.isFPSSideSpeedLock) {
-        this.state.fpsSideSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
-      }
-      if (!this.state.isFPSVertSpeedLock) {
-        this.state.fpsVertSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
-      }
-
-      if (this.state.fpsForwardSpeed < 0.01 && this.state.fpsForwardSpeed > -0.01) {
-        this.state.fpsForwardSpeed = 0;
-      }
-      if (this.state.fpsSideSpeed < 0.01 && this.state.fpsSideSpeed > -0.01) {
-        this.state.fpsSideSpeed = 0;
-      }
-      if (this.state.fpsVertSpeed < 0.01 && this.state.fpsVertSpeed > -0.01) {
-        this.state.fpsVertSpeed = 0;
-      }
-
-      this.state.fpsPitch = <Degrees>(this.state.fpsPitch + this.state.fpsPitchRate * fpsElapsed);
-      this.state.fpsRotate = <Degrees>(this.state.fpsRotate + this.state.fpsRotateRate * fpsElapsed);
-      this.state.fpsYaw = <Degrees>(this.state.fpsYaw + this.state.fpsYawRate * fpsElapsed);
+  /** Accelerate the locked movement speeds toward their max while a movement key is held. */
+  private applyFpsSpeedLocks_(fpsElapsed: Milliseconds): void {
+    if (this.state.isFPSForwardSpeedLock && this.state.fpsForwardSpeed < 0) {
+      this.state.fpsForwardSpeed = Math.max(this.state.fpsForwardSpeed + Math.min(this.state.fpsForwardSpeed * -1.02 * fpsElapsed, -0.2), -settingsManager.fpsForwardSpeed);
+    } else if (this.state.isFPSForwardSpeedLock && this.state.fpsForwardSpeed > 0) {
+      this.state.fpsForwardSpeed = Math.min(this.state.fpsForwardSpeed + Math.max(this.state.fpsForwardSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsForwardSpeed);
     }
-    this.fpsLastTime_ = fpsTimeNow;
+
+    if (this.state.isFPSSideSpeedLock && this.state.fpsSideSpeed < 0) {
+      this.state.fpsSideSpeed = Math.max(this.state.fpsSideSpeed + Math.min(this.state.fpsSideSpeed * -1.02 * fpsElapsed, -0.2), -settingsManager.fpsSideSpeed);
+    } else if (this.state.isFPSSideSpeedLock && this.state.fpsSideSpeed > 0) {
+      this.state.fpsSideSpeed = Math.min(this.state.fpsSideSpeed + Math.max(this.state.fpsSideSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsSideSpeed);
+    }
+
+    if (this.state.isFPSVertSpeedLock && this.state.fpsVertSpeed < 0) {
+      this.state.fpsVertSpeed = Math.max(this.state.fpsVertSpeed + Math.min(this.state.fpsVertSpeed * -1.02 * fpsElapsed, -0.2), -settingsManager.fpsVertSpeed);
+    } else if (this.state.isFPSVertSpeedLock && this.state.fpsVertSpeed > 0) {
+      this.state.fpsVertSpeed = Math.min(this.state.fpsVertSpeed + Math.max(this.state.fpsVertSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsVertSpeed);
+    }
+  }
+
+  /** Translate the FPS position from the current forward/vertical/side speeds. */
+  private applyFpsPositionMovement_(fpsElapsed: Milliseconds): void {
+    if (this.state.fpsForwardSpeed !== 0) {
+      this.state.fpsPos[0] -= Math.sin(this.state.fpsYaw * DEG2RAD) * this.state.fpsForwardSpeed * this.state.fpsRun * fpsElapsed;
+      this.state.fpsPos[1] -= Math.cos(this.state.fpsYaw * DEG2RAD) * this.state.fpsForwardSpeed * this.state.fpsRun * fpsElapsed;
+      this.state.fpsPos[2] += Math.sin(this.state.fpsPitch * DEG2RAD) * this.state.fpsForwardSpeed * this.state.fpsRun * fpsElapsed;
+    }
+    if (this.state.fpsVertSpeed !== 0) {
+      this.state.fpsPos[2] -= this.state.fpsVertSpeed * this.state.fpsRun * fpsElapsed;
+    }
+    if (this.state.fpsSideSpeed !== 0) {
+      this.state.fpsPos[0] -= Math.cos(-this.state.fpsYaw * DEG2RAD) * this.state.fpsSideSpeed * this.state.fpsRun * fpsElapsed;
+      this.state.fpsPos[1] -= Math.sin(-this.state.fpsYaw * DEG2RAD) * this.state.fpsSideSpeed * this.state.fpsRun * fpsElapsed;
+    }
+  }
+
+  /** Apply friction to unlocked speeds and snap near-zero speeds to zero. */
+  private dampenFpsSpeeds_(fpsElapsed: Milliseconds): void {
+    if (!this.state.isFPSForwardSpeedLock) {
+      this.state.fpsForwardSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
+    }
+    if (!this.state.isFPSSideSpeedLock) {
+      this.state.fpsSideSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
+    }
+    if (!this.state.isFPSVertSpeedLock) {
+      this.state.fpsVertSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
+    }
+
+    if (this.state.fpsForwardSpeed < 0.01 && this.state.fpsForwardSpeed > -0.01) {
+      this.state.fpsForwardSpeed = 0;
+    }
+    if (this.state.fpsSideSpeed < 0.01 && this.state.fpsSideSpeed > -0.01) {
+      this.state.fpsSideSpeed = 0;
+    }
+    if (this.state.fpsVertSpeed < 0.01 && this.state.fpsVertSpeed > -0.01) {
+      this.state.fpsVertSpeed = 0;
+    }
   }
 
   private isSatelliteCameraMode_(): boolean {
@@ -1616,83 +1671,105 @@ export class Camera {
       return;
     }
 
-    if (this.state.isLocalRotateRoll || this.state.isLocalRotateYaw || this.state.isLocalRotateReset || this.state.isLocalRotateOverride) {
-      this.state.localRotateTarget.pitch = normalizeAngle(this.state.localRotateTarget.pitch);
-      this.state.localRotateTarget.yaw = normalizeAngle(this.state.localRotateTarget.yaw);
-      this.state.localRotateTarget.roll = normalizeAngle(this.state.localRotateTarget.roll);
-      this.state.localRotateCurrent.pitch = normalizeAngle(this.state.localRotateCurrent.pitch);
-      this.state.localRotateCurrent.yaw = normalizeAngle(this.state.localRotateCurrent.yaw);
-      this.state.localRotateCurrent.roll = normalizeAngle(this.state.localRotateCurrent.roll);
+    if (!(this.state.isLocalRotateRoll || this.state.isLocalRotateYaw || this.state.isLocalRotateReset || this.state.isLocalRotateOverride)) {
+      return;
+    }
 
-      // If user is actively moving
-      if (this.state.isLocalRotateRoll || this.state.isLocalRotateYaw) {
-        this.state.localRotateDif.pitch = <Radians>(this.state.screenDragPoint[1] - this.state.mouseY);
-        this.state.localRotateTarget.pitch = <Radians>(this.state.localRotateStartPosition.pitch + this.state.localRotateDif.pitch * -settingsManager.cameraMovementSpeed);
-        this.state.localRotateSpeed.pitch =
-          normalizeAngle(<Radians>(this.state.localRotateCurrent.pitch - this.state.localRotateTarget.pitch)) * -settingsManager.cameraMovementSpeed;
+    this.state.localRotateTarget.pitch = normalizeAngle(this.state.localRotateTarget.pitch);
+    this.state.localRotateTarget.yaw = normalizeAngle(this.state.localRotateTarget.yaw);
+    this.state.localRotateTarget.roll = normalizeAngle(this.state.localRotateTarget.roll);
+    this.state.localRotateCurrent.pitch = normalizeAngle(this.state.localRotateCurrent.pitch);
+    this.state.localRotateCurrent.yaw = normalizeAngle(this.state.localRotateCurrent.yaw);
+    this.state.localRotateCurrent.roll = normalizeAngle(this.state.localRotateCurrent.roll);
 
-        if (this.state.isLocalRotateRoll) {
-          this.state.localRotateDif.roll = <Radians>(this.state.screenDragPoint[0] - this.state.mouseX);
-          this.state.localRotateTarget.roll = <Radians>(this.state.localRotateStartPosition.roll + this.state.localRotateDif.roll * settingsManager.cameraMovementSpeed);
-          this.state.localRotateSpeed.roll =
-            normalizeAngle(<Radians>(this.state.localRotateCurrent.roll - this.state.localRotateTarget.roll)) * -settingsManager.cameraMovementSpeed;
-        }
-        if (this.state.isLocalRotateYaw) {
-          this.state.localRotateDif.yaw = <Radians>(this.state.screenDragPoint[0] - this.state.mouseX);
-          this.state.localRotateTarget.yaw = <Radians>(this.state.localRotateStartPosition.yaw + this.state.localRotateDif.yaw * settingsManager.cameraMovementSpeed);
-          this.state.localRotateSpeed.yaw = normalizeAngle(<Radians>(this.state.localRotateCurrent.yaw - this.state.localRotateTarget.yaw)) * -settingsManager.cameraMovementSpeed;
-        }
-      }
+    // If user is actively moving
+    if (this.state.isLocalRotateRoll || this.state.isLocalRotateYaw) {
+      this.applyLocalRotateDrag_();
+    }
 
-      if (this.state.isLocalRotateOverride) {
-        this.state.localRotateTarget.pitch = <Radians>(this.state.localRotateStartPosition.pitch + this.state.localRotateDif.pitch * -settingsManager.cameraMovementSpeed);
-        this.state.localRotateSpeed.pitch =
-          normalizeAngle(<Radians>(this.state.localRotateCurrent.pitch - this.state.localRotateTarget.pitch)) * -settingsManager.cameraMovementSpeed;
-        this.state.localRotateTarget.yaw = <Radians>(this.state.localRotateStartPosition.yaw + this.state.localRotateDif.yaw * settingsManager.cameraMovementSpeed);
-        this.state.localRotateSpeed.yaw = normalizeAngle(<Radians>(this.state.localRotateCurrent.yaw - this.state.localRotateTarget.yaw)) * -settingsManager.cameraMovementSpeed;
-      }
+    if (this.state.isLocalRotateOverride) {
+      this.applyLocalRotateOverride_();
+    }
 
-      if (this.state.isLocalRotateReset) {
-        this.state.localRotateTarget.pitch = <Radians>0;
-        this.state.localRotateTarget.roll = <Radians>0;
-        this.state.localRotateTarget.yaw = <Radians>0;
-        this.state.localRotateDif.pitch = <Radians>-this.state.localRotateCurrent.pitch;
-        this.state.localRotateDif.roll = <Radians>-this.state.localRotateCurrent.roll;
-        this.state.localRotateDif.yaw = <Radians>-this.state.localRotateCurrent.yaw;
-      }
+    if (this.state.isLocalRotateReset) {
+      this.applyLocalRotateResetTargets_();
+    }
 
-      const resetModifier = this.state.isLocalRotateReset ? 750 : 1;
+    this.integrateLocalRotate_(dt);
 
-      this.state.localRotateSpeed.pitch -= this.state.localRotateSpeed.pitch * dt * this.localRotateMovementSpeed_;
-      this.state.localRotateCurrent.pitch = <Radians>(this.state.localRotateCurrent.pitch + resetModifier * this.localRotateMovementSpeed_ * this.state.localRotateDif.pitch);
+    if (this.state.isLocalRotateReset) {
+      this.finalizeLocalRotateReset_();
+    }
+  }
 
-      if (this.state.isLocalRotateRoll || this.state.isLocalRotateReset) {
-        this.state.localRotateSpeed.roll -= this.state.localRotateSpeed.roll * dt * this.localRotateMovementSpeed_;
-        this.state.localRotateCurrent.roll = <Radians>(this.state.localRotateCurrent.roll + resetModifier * this.localRotateMovementSpeed_ * this.state.localRotateDif.roll);
-      }
+  private applyLocalRotateDrag_(): void {
+    this.state.localRotateDif.pitch = <Radians>(this.state.screenDragPoint[1] - this.state.mouseY);
+    this.state.localRotateTarget.pitch = <Radians>(this.state.localRotateStartPosition.pitch + this.state.localRotateDif.pitch * -settingsManager.cameraMovementSpeed);
+    this.state.localRotateSpeed.pitch =
+      normalizeAngle(<Radians>(this.state.localRotateCurrent.pitch - this.state.localRotateTarget.pitch)) * -settingsManager.cameraMovementSpeed;
 
-      if (this.state.isLocalRotateYaw || this.state.isLocalRotateReset || this.state.isLocalRotateOverride) {
-        const localYawDiff = normalizeAngle(<Radians>(this.state.localRotateTarget.yaw - this.state.localRotateCurrent.yaw));
-        const leftOrRight = localYawDiff > 0 ? 1 : -1;
+    if (this.state.isLocalRotateRoll) {
+      this.state.localRotateDif.roll = <Radians>(this.state.screenDragPoint[0] - this.state.mouseX);
+      this.state.localRotateTarget.roll = <Radians>(this.state.localRotateStartPosition.roll + this.state.localRotateDif.roll * settingsManager.cameraMovementSpeed);
+      this.state.localRotateSpeed.roll =
+        normalizeAngle(<Radians>(this.state.localRotateCurrent.roll - this.state.localRotateTarget.roll)) * -settingsManager.cameraMovementSpeed;
+    }
+    if (this.state.isLocalRotateYaw) {
+      this.state.localRotateDif.yaw = <Radians>(this.state.screenDragPoint[0] - this.state.mouseX);
+      this.state.localRotateTarget.yaw = <Radians>(this.state.localRotateStartPosition.yaw + this.state.localRotateDif.yaw * settingsManager.cameraMovementSpeed);
+      this.state.localRotateSpeed.yaw = normalizeAngle(<Radians>(this.state.localRotateCurrent.yaw - this.state.localRotateTarget.yaw)) * -settingsManager.cameraMovementSpeed;
+    }
+  }
 
-        this.state.localRotateSpeed.yaw += leftOrRight * this.state.localRotateSpeed.yaw * dt * this.localRotateMovementSpeed_;
-        this.state.localRotateCurrent.yaw = <Radians>(this.state.localRotateCurrent.yaw + resetModifier * this.localRotateMovementSpeed_ * this.state.localRotateDif.yaw);
-      }
+  private applyLocalRotateOverride_(): void {
+    this.state.localRotateTarget.pitch = <Radians>(this.state.localRotateStartPosition.pitch + this.state.localRotateDif.pitch * -settingsManager.cameraMovementSpeed);
+    this.state.localRotateSpeed.pitch =
+      normalizeAngle(<Radians>(this.state.localRotateCurrent.pitch - this.state.localRotateTarget.pitch)) * -settingsManager.cameraMovementSpeed;
+    this.state.localRotateTarget.yaw = <Radians>(this.state.localRotateStartPosition.yaw + this.state.localRotateDif.yaw * settingsManager.cameraMovementSpeed);
+    this.state.localRotateSpeed.yaw = normalizeAngle(<Radians>(this.state.localRotateCurrent.yaw - this.state.localRotateTarget.yaw)) * -settingsManager.cameraMovementSpeed;
+  }
 
-      if (this.state.isLocalRotateReset) {
-        if (this.state.localRotateCurrent.pitch > -0.001 && this.state.localRotateCurrent.pitch < 0.001) {
-          this.state.localRotateCurrent.pitch = <Radians>0;
-        }
-        if (this.state.localRotateCurrent.roll > -0.001 && this.state.localRotateCurrent.roll < 0.001) {
-          this.state.localRotateCurrent.roll = <Radians>0;
-        }
-        if (this.state.localRotateCurrent.yaw > -0.001 && this.state.localRotateCurrent.yaw < 0.001) {
-          this.state.localRotateCurrent.yaw = <Radians>0;
-        }
-        if (this.state.localRotateCurrent.pitch === 0 && this.state.localRotateCurrent.roll === 0 && this.state.localRotateCurrent.yaw === <Radians>0) {
-          this.state.isLocalRotateReset = false;
-        }
-      }
+  private applyLocalRotateResetTargets_(): void {
+    this.state.localRotateTarget.pitch = <Radians>0;
+    this.state.localRotateTarget.roll = <Radians>0;
+    this.state.localRotateTarget.yaw = <Radians>0;
+    this.state.localRotateDif.pitch = <Radians>-this.state.localRotateCurrent.pitch;
+    this.state.localRotateDif.roll = <Radians>-this.state.localRotateCurrent.roll;
+    this.state.localRotateDif.yaw = <Radians>-this.state.localRotateCurrent.yaw;
+  }
+
+  private integrateLocalRotate_(dt: number): void {
+    const resetModifier = this.state.isLocalRotateReset ? 750 : 1;
+
+    this.state.localRotateSpeed.pitch -= this.state.localRotateSpeed.pitch * dt * this.localRotateMovementSpeed_;
+    this.state.localRotateCurrent.pitch = <Radians>(this.state.localRotateCurrent.pitch + resetModifier * this.localRotateMovementSpeed_ * this.state.localRotateDif.pitch);
+
+    if (this.state.isLocalRotateRoll || this.state.isLocalRotateReset) {
+      this.state.localRotateSpeed.roll -= this.state.localRotateSpeed.roll * dt * this.localRotateMovementSpeed_;
+      this.state.localRotateCurrent.roll = <Radians>(this.state.localRotateCurrent.roll + resetModifier * this.localRotateMovementSpeed_ * this.state.localRotateDif.roll);
+    }
+
+    if (this.state.isLocalRotateYaw || this.state.isLocalRotateReset || this.state.isLocalRotateOverride) {
+      const localYawDiff = normalizeAngle(<Radians>(this.state.localRotateTarget.yaw - this.state.localRotateCurrent.yaw));
+      const leftOrRight = localYawDiff > 0 ? 1 : -1;
+
+      this.state.localRotateSpeed.yaw += leftOrRight * this.state.localRotateSpeed.yaw * dt * this.localRotateMovementSpeed_;
+      this.state.localRotateCurrent.yaw = <Radians>(this.state.localRotateCurrent.yaw + resetModifier * this.localRotateMovementSpeed_ * this.state.localRotateDif.yaw);
+    }
+  }
+
+  private finalizeLocalRotateReset_(): void {
+    if (this.state.localRotateCurrent.pitch > -0.001 && this.state.localRotateCurrent.pitch < 0.001) {
+      this.state.localRotateCurrent.pitch = <Radians>0;
+    }
+    if (this.state.localRotateCurrent.roll > -0.001 && this.state.localRotateCurrent.roll < 0.001) {
+      this.state.localRotateCurrent.roll = <Radians>0;
+    }
+    if (this.state.localRotateCurrent.yaw > -0.001 && this.state.localRotateCurrent.yaw < 0.001) {
+      this.state.localRotateCurrent.yaw = <Radians>0;
+    }
+    if (this.state.localRotateCurrent.pitch === 0 && this.state.localRotateCurrent.roll === 0 && this.state.localRotateCurrent.yaw === <Radians>0) {
+      this.state.isLocalRotateReset = false;
     }
   }
 
@@ -1700,92 +1777,107 @@ export class Camera {
     if (this.state.isScreenPan || this.state.isWorldPan || this.state.isPanReset) {
       // If user is actively moving
       if (this.state.isScreenPan || this.state.isWorldPan) {
-        this.state.camPitchSpeed = 0;
-        this.state.camYawSpeed = 0;
-        this.state.panDif.x = this.state.screenDragPoint[0] - this.state.mouseX;
-        this.state.panDif.y = this.state.screenDragPoint[1] - this.state.mouseY;
-        this.state.panDif.z = this.state.screenDragPoint[1] - this.state.mouseY;
-
-        // Slow down the panning if a satellite is selected
-        if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? '-1') !== '-1') {
-          this.state.panDif.x /= 30;
-          this.state.panDif.y /= 30;
-          this.state.panDif.z /= 30;
-        }
-
-        this.state.panTarget.x = this.state.panStartPosition.x + this.state.panDif.x * this.panMovementSpeed_ * this.state.zoomLevel;
-        if (this.state.isWorldPan) {
-          this.state.panTarget.y = this.state.panStartPosition.y + this.state.panDif.y * this.panMovementSpeed_ * this.state.zoomLevel;
-        }
-        if (this.state.isScreenPan) {
-          this.state.panTarget.z = this.state.panStartPosition.z + this.state.panDif.z * this.panMovementSpeed_ * this.state.zoomLevel;
-        }
+        this.applyPanDrag_();
       }
 
       this.state.resetPan();
 
-      const panResetModifier = this.state.isPanReset ? 0.5 : 1;
-
-      // X is X no matter what
-      this.state.panSpeed.x = (this.state.panCurrent.x - this.state.panTarget.x) * this.panMovementSpeed_ * this.state.zoomLevel;
-      this.state.panSpeed.x -= this.state.panSpeed.x * dt * this.panMovementSpeed_ * this.state.zoomLevel;
-      this.state.panCurrent.x += panResetModifier * this.panMovementSpeed_ * this.state.panDif.x;
-      // If we are moving like an FPS then Y and Z are based on the angle of the this
-      if (this.state.isWorldPan) {
-        this.state.fpsPos[1] = <Radians>(this.state.fpsPos[1] - Math.cos(this.state.localRotateCurrent.yaw) * panResetModifier * this.panMovementSpeed_ * this.state.panDif.y);
-        this.state.fpsPos[2] = <Radians>(this.state.fpsPos[1] + Math.sin(this.state.localRotateCurrent.pitch) * panResetModifier * this.panMovementSpeed_ * this.state.panDif.y);
-        this.state.fpsPos[1] = <Radians>(this.state.fpsPos[1] - Math.sin(-this.state.localRotateCurrent.yaw) * panResetModifier * this.panMovementSpeed_ * this.state.panDif.x);
-      }
-      // If we are moving the screen then Z is always up and Y is not relevant
-      if (this.state.isScreenPan || this.state.isPanReset) {
-        this.state.panSpeed.z = (this.state.panCurrent.z - this.state.panTarget.z) * this.panMovementSpeed_ * this.state.zoomLevel;
-        this.state.panSpeed.z -= this.state.panSpeed.z * dt * this.panMovementSpeed_ * this.state.zoomLevel;
-        this.state.panCurrent.z -= panResetModifier * this.panMovementSpeed_ * this.state.panDif.z;
-      }
+      this.integratePan_(dt);
 
       if (this.state.isPanReset) {
-        this.state.fpsPos[0] -= this.state.fpsPos[0] / 25;
-        this.state.fpsPos[1] -= this.state.fpsPos[1] / 25;
-        this.state.fpsPos[2] -= this.state.fpsPos[2] / 25;
-
-        if (this.state.panCurrent.x > -0.5 && this.state.panCurrent.x < 0.5) {
-          this.state.panCurrent.x = 0;
-        }
-        if (this.state.panCurrent.y > -0.5 && this.state.panCurrent.y < 0.5) {
-          this.state.panCurrent.y = 0;
-        }
-        if (this.state.panCurrent.z > -0.5 && this.state.panCurrent.z < 0.5) {
-          this.state.panCurrent.z = 0;
-        }
-        if (this.state.fpsPos[0] > -0.5 && this.state.fpsPos[0] < 0.5) {
-          this.state.fpsPos[0] = 0;
-        }
-        if (this.state.fpsPos[1] > -0.5 && this.state.fpsPos[1] < 0.5) {
-          this.state.fpsPos[1] = 0;
-        }
-        if (this.state.fpsPos[2] > -0.5 && this.state.fpsPos[2] < 0.5) {
-          this.state.fpsPos[2] = 0;
-        }
-
-        if (this.state.panCurrent.x === 0 && this.state.panCurrent.y === 0 && this.state.panCurrent.z === 0 &&
-          this.state.fpsPos[0] === 0 && this.state.fpsPos[1] === 0 && this.state.fpsPos[2] === 0) {
-          this.state.isPanReset = false;
-        }
+        this.finalizePanReset_();
       }
     }
-    if (settingsManager.isAutoPanD || settingsManager.isAutoPanU || settingsManager.isAutoPanL || settingsManager.isAutoPanR) {
-      if (settingsManager.isAutoPanD) {
-        this.state.panCurrent.z += settingsManager.autoPanSpeed * dt;
-      }
-      if (settingsManager.isAutoPanU) {
-        this.state.panCurrent.z -= settingsManager.autoPanSpeed * dt;
-      }
-      if (settingsManager.isAutoPanL) {
-        this.state.panCurrent.x += settingsManager.autoPanSpeed * dt;
-      }
-      if (settingsManager.isAutoPanR) {
-        this.state.panCurrent.x -= settingsManager.autoPanSpeed * dt;
-      }
+
+    this.applyAutoPan_(dt);
+  }
+
+  private applyPanDrag_(): void {
+    this.state.camPitchSpeed = 0;
+    this.state.camYawSpeed = 0;
+    this.state.panDif.x = this.state.screenDragPoint[0] - this.state.mouseX;
+    this.state.panDif.y = this.state.screenDragPoint[1] - this.state.mouseY;
+    this.state.panDif.z = this.state.screenDragPoint[1] - this.state.mouseY;
+
+    // Slow down the panning if a satellite is selected
+    if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? '-1') !== '-1') {
+      this.state.panDif.x /= 30;
+      this.state.panDif.y /= 30;
+      this.state.panDif.z /= 30;
+    }
+
+    this.state.panTarget.x = this.state.panStartPosition.x + this.state.panDif.x * this.panMovementSpeed_ * this.state.zoomLevel;
+    if (this.state.isWorldPan) {
+      this.state.panTarget.y = this.state.panStartPosition.y + this.state.panDif.y * this.panMovementSpeed_ * this.state.zoomLevel;
+    }
+    if (this.state.isScreenPan) {
+      this.state.panTarget.z = this.state.panStartPosition.z + this.state.panDif.z * this.panMovementSpeed_ * this.state.zoomLevel;
+    }
+  }
+
+  private integratePan_(dt: number): void {
+    const panResetModifier = this.state.isPanReset ? 0.5 : 1;
+
+    // X is X no matter what
+    this.state.panSpeed.x = (this.state.panCurrent.x - this.state.panTarget.x) * this.panMovementSpeed_ * this.state.zoomLevel;
+    this.state.panSpeed.x -= this.state.panSpeed.x * dt * this.panMovementSpeed_ * this.state.zoomLevel;
+    this.state.panCurrent.x += panResetModifier * this.panMovementSpeed_ * this.state.panDif.x;
+    // If we are moving like an FPS then Y and Z are based on the angle of the this
+    if (this.state.isWorldPan) {
+      this.state.fpsPos[1] = <Radians>(this.state.fpsPos[1] - Math.cos(this.state.localRotateCurrent.yaw) * panResetModifier * this.panMovementSpeed_ * this.state.panDif.y);
+      this.state.fpsPos[2] = <Radians>(this.state.fpsPos[1] + Math.sin(this.state.localRotateCurrent.pitch) * panResetModifier * this.panMovementSpeed_ * this.state.panDif.y);
+      this.state.fpsPos[1] = <Radians>(this.state.fpsPos[1] - Math.sin(-this.state.localRotateCurrent.yaw) * panResetModifier * this.panMovementSpeed_ * this.state.panDif.x);
+    }
+    // If we are moving the screen then Z is always up and Y is not relevant
+    if (this.state.isScreenPan || this.state.isPanReset) {
+      this.state.panSpeed.z = (this.state.panCurrent.z - this.state.panTarget.z) * this.panMovementSpeed_ * this.state.zoomLevel;
+      this.state.panSpeed.z -= this.state.panSpeed.z * dt * this.panMovementSpeed_ * this.state.zoomLevel;
+      this.state.panCurrent.z -= panResetModifier * this.panMovementSpeed_ * this.state.panDif.z;
+    }
+  }
+
+  private finalizePanReset_(): void {
+    this.state.fpsPos[0] -= this.state.fpsPos[0] / 25;
+    this.state.fpsPos[1] -= this.state.fpsPos[1] / 25;
+    this.state.fpsPos[2] -= this.state.fpsPos[2] / 25;
+
+    if (this.state.panCurrent.x > -0.5 && this.state.panCurrent.x < 0.5) {
+      this.state.panCurrent.x = 0;
+    }
+    if (this.state.panCurrent.y > -0.5 && this.state.panCurrent.y < 0.5) {
+      this.state.panCurrent.y = 0;
+    }
+    if (this.state.panCurrent.z > -0.5 && this.state.panCurrent.z < 0.5) {
+      this.state.panCurrent.z = 0;
+    }
+    if (this.state.fpsPos[0] > -0.5 && this.state.fpsPos[0] < 0.5) {
+      this.state.fpsPos[0] = 0;
+    }
+    if (this.state.fpsPos[1] > -0.5 && this.state.fpsPos[1] < 0.5) {
+      this.state.fpsPos[1] = 0;
+    }
+    if (this.state.fpsPos[2] > -0.5 && this.state.fpsPos[2] < 0.5) {
+      this.state.fpsPos[2] = 0;
+    }
+
+    if (this.state.panCurrent.x === 0 && this.state.panCurrent.y === 0 && this.state.panCurrent.z === 0 &&
+      this.state.fpsPos[0] === 0 && this.state.fpsPos[1] === 0 && this.state.fpsPos[2] === 0) {
+      this.state.isPanReset = false;
+    }
+  }
+
+  private applyAutoPan_(dt: number): void {
+    if (settingsManager.isAutoPanD) {
+      this.state.panCurrent.z += settingsManager.autoPanSpeed * dt;
+    }
+    if (settingsManager.isAutoPanU) {
+      this.state.panCurrent.z -= settingsManager.autoPanSpeed * dt;
+    }
+    if (settingsManager.isAutoPanL) {
+      this.state.panCurrent.x += settingsManager.autoPanSpeed * dt;
+    }
+    if (settingsManager.isAutoPanR) {
+      this.state.panCurrent.x -= settingsManager.autoPanSpeed * dt;
     }
   }
 

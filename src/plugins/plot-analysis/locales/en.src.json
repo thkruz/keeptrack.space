@@ -88,9 +88,34 @@
     "RicPlot": {
       "bottomIconLabel": "RIC Plot",
       "title": "RIC Plot Menu",
+      "orbitsLabel": "Number of Orbits",
+      "labels": {
+        "primary": "Primary",
+        "secondary": "Secondary"
+      },
+      "assessment": {
+        "title": "Relationship",
+        "plane": "plane",
+        "closelySpaced": "Closely Spaced Objects",
+        "coOrbital": "Co-orbital",
+        "coPlanar": "Co-planar",
+        "unrelated": "Unrelated",
+        "unknown": "Unknown"
+      },
+      "chart": {
+        "radial": "Radial",
+        "inTrack": "In-Track",
+        "crossTrack": "Cross-Track",
+        "range": "Range",
+        "timeAxis": "Time (min)",
+        "distanceAxis": "Distance (km)",
+        "empty": "Select a primary and a secondary satellite",
+        "unitKm": "km",
+        "unitMin": "min"
+      },
       "help": {
-        "overview": "The RIC plot shows the relative motion between two satellites in the Radial, In-Track, Cross-Track frame centered on the primary. It is the standard view for rendezvous, formation flying, and close approach analysis: the secondary satellite's path is drawn as seen from the primary.",
-        "howToUse": "<ol><li>Select a primary satellite, then a secondary satellite (right-click a satellite, or use the [ and ] keys).</li><li>Open the <strong>RIC Plot</strong> from the bottom bar (Analysis mode).</li><li>Drag to rotate the 3D plot; the origin is the primary satellite, and the curve is the secondary's relative trajectory.</li></ol>",
+        "overview": "The RIC plot shows the relative motion between two satellites in the Radial, In-Track, Cross-Track frame centered on the primary. It is the standard view for rendezvous, formation flying, and close approach analysis: the secondary satellite's offset from the primary is plotted over time.",
+        "howToUse": "<ol><li>Select a primary satellite, then a secondary satellite (right-click a satellite, or use the [ and ] keys).</li><li>Open the <strong>RIC Plot</strong> from the bottom bar (Analysis mode).</li><li>Read the four 2D plots: Radial, In-Track, Cross-Track, and total Range over time. Drag the slider or scroll to zoom the time axis.</li></ol>",
         "tip1": "Both a primary and a secondary satellite must be selected or the plot has nothing to compare; pick objects in similar orbits for a readable scale."
       }
     }

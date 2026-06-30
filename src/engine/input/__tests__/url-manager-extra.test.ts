@@ -159,10 +159,52 @@ describe('UrlManager.updateURL', () => {
     expect(() => UrlManager.updateURL()).not.toThrow();
   });
 
+  it('skips the write when live updates are off and not forced', () => {
+    settingsManager.isUpdateUrlBarLive = false;
+    const before = window.location.href;
+
+    UrlManager.updateURL();
+    expect(window.location.href).toBe(before);
+  });
+
+  it('writes when forced even if live updates are off', () => {
+    settingsManager.isUpdateUrlBarLive = false;
+    expect(() => UrlManager.updateURL(true, true)).not.toThrow();
+  });
+
   afterEach(() => {
+    settingsManager.isUpdateUrlBarLive = false;
     Url.selectedSat_ = null;
     Url.searchString_ = '';
     Url.propRate_ = 1;
     settingsManager.core.regimeFilter = [];
+  });
+});
+
+describe('UrlManager.getShareUrl', () => {
+  beforeEach(() => {
+    setupStandardEnvironment();
+    const cam = ServiceLocator.getMainCamera();
+
+    cam.zoomLevel = vi.fn(() => 0.5) as never;
+    cam.state = { ftsPitch: 0, ftsYaw: 0, camPitch: 0, camYaw: 0, camDistBuffer: 100 } as never;
+    const tm = ServiceLocator.getTimeManager();
+
+    tm.staticOffset = 0;
+    tm.dynamicOffsetEpoch = Date.now();
+  });
+
+  it('returns a non-empty URL containing the current zoom', () => {
+    const url = UrlManager.getShareUrl();
+
+    expect(typeof url).toBe('string');
+    expect(url).toContain('zoom=0.50');
+  });
+
+  it('does not navigate (leaves window.location unchanged)', () => {
+    const before = window.location.href;
+
+    UrlManager.getShareUrl();
+    expect(window.location.href).toBe(before);
   });
 });

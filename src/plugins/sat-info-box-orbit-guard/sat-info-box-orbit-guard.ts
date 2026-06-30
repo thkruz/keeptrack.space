@@ -274,7 +274,7 @@ export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
 
         if (prevParent) {
           if (prevNext) {
-            prevParent.insertBefore(el, prevNext);
+            prevNext.before(el);
           } else {
             prevParent.appendChild(el);
           }

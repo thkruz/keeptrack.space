@@ -1,0 +1,24 @@
+{
+  "plugins": {
+    "ShareMenuPlugin": {
+      "bottomIconLabel": "Teilen",
+      "title": "Ansicht teilen",
+      "helpBody": "Erzeugt einen teilbaren Link, der die aktuelle Ansicht erfasst, einschließlich ausgewähltem Satellit, Suche, Zeit, Propagationsrate und Kamerawinkel. Öffnen Sie dieses Menü, um den Link bei Bedarf zu erstellen, und kopieren Sie ihn dann oder nutzen Sie das Teilen-Menü Ihres Geräts. Die Adressleiste wird beim Erkunden nicht mehr automatisch aktualisiert; aktivieren Sie \"Live-Aktualisierung der Adressleiste\" in den Einstellungen, um dieses Verhalten wiederherzustellen.",
+      "commandPalette": {
+        "share": "Aktuelle Ansicht teilen"
+      },
+      "labels": {
+        "shareLink": "Link teilen",
+        "url": "Teilbare URL"
+      },
+      "buttons": {
+        "copyLink": "Link kopieren",
+        "share": "Teilen..."
+      },
+      "toasts": {
+        "copied": "Link in die Zwischenablage kopiert!",
+        "copyFailed": "Link konnte nicht in die Zwischenablage kopiert werden."
+      }
+    }
+  }
+}

@@ -212,7 +212,7 @@ const sampleNearest = (samples: PolarSample[], when: Date): PolarSample | null =
     }
 
     return best;
-  });
+  }, samples[0]);
 };
 
 const drawCulmination = (ctx: CanvasRenderingContext2D, geom: Geometry, pass: PolarPass): void => {

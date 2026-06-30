@@ -116,6 +116,7 @@ export type KeepTrackPluginsConfiguration = {
   TimeMachine?: PluginConfiguration;
   SatellitePhotos?: PluginConfiguration;
   ScreenRecorder?: PluginConfiguration;
+  ShareMenuPlugin?: PluginConfiguration;
   CatalogManagementPlugin?: PluginConfiguration;
   StarManagementPlugin?: PluginConfiguration;
   CatalogBrowserPlugin?: CatalogBrowserConfiguration;

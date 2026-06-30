@@ -1,0 +1,24 @@
+{
+  "plugins": {
+    "ShareMenuPlugin": {
+      "bottomIconLabel": "Condividi",
+      "title": "Condividi vista",
+      "helpBody": "Genera un link condivisibile che cattura la vista corrente, incluso il satellite selezionato, la ricerca, l'ora, il tasso di propagazione e l'angolo della telecamera. Apri questo menu per creare il link su richiesta, quindi copialo o usa la funzione di condivisione del tuo dispositivo. La barra degli indirizzi non viene più riscritta automaticamente durante l'esplorazione; abilita \"Aggiornamento live della barra degli indirizzi\" nelle impostazioni per ripristinare questo comportamento.",
+      "commandPalette": {
+        "share": "Condividi vista corrente"
+      },
+      "labels": {
+        "shareLink": "Link di condivisione",
+        "url": "URL condivisibile"
+      },
+      "buttons": {
+        "copyLink": "Copia link",
+        "share": "Condividi..."
+      },
+      "toasts": {
+        "copied": "Link copiato negli appunti!",
+        "copyFailed": "Impossibile copiare il link negli appunti."
+      }
+    }
+  }
+}

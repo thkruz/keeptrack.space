@@ -59,7 +59,7 @@ describe('RicPlot getPlotData / createPlot', () => {
     expect(warnSpy).toHaveBeenCalled();
   });
 
-  it('builds an origin series plus a RIC series for the secondary', () => {
+  it('builds a RIC-over-time series for the secondary', () => {
     p().selectSatManager_.selectedSat = 0;
     p().selectSatManager_.secondarySat = 1;
     p().selectSatManager_.secondarySatObj = satS;
@@ -67,10 +67,23 @@ describe('RicPlot getPlotData / createPlot', () => {
     const data = plugin.getPlotData();
 
     expect(data).toHaveLength(2);
-    expect(data[0].name).toBe('PRIMARY');
-    expect(data[0].value).toEqual([[0, 0, 0, expect.any(String)]]);
-    expect(data[1].name).toBe('SECONDARY');
-    expect(data[1].value![0]).toEqual([1, 2, 3, expect.any(String)]);
+    expect(data[0]).toMatchObject({ t: 0, r: 1, i: 2, c: 3 });
+    expect(data[0].range).toBeCloseTo(Math.sqrt(1 + 4 + 9));
+    expect(data[1]).toMatchObject({ r: 4, i: 5, c: 6 });
+    expect(data[1].t).toBeGreaterThan(0);
+  });
+
+  it('propagates the selected number of orbits (default 5, 100 points each)', () => {
+    p().selectSatManager_.selectedSat = 0;
+    p().selectSatManager_.secondarySat = 1;
+    p().selectSatManager_.secondarySatObj = satS;
+
+    plugin.getPlotData();
+    expect(SatMathApi.getRicOfCurrentOrbit).toHaveBeenLastCalledWith(satS, satP, 500, 5);
+
+    p().orbits_ = 10;
+    plugin.getPlotData();
+    expect(SatMathApi.getRicOfCurrentOrbit).toHaveBeenLastCalledWith(satS, satP, 1000, 10);
   });
 
   it('renders the chart via echarts and exercises the tooltip formatter', () => {
@@ -85,9 +98,9 @@ describe('RicPlot getPlotData / createPlot', () => {
     const chart = vi.mocked(echarts.init).mock.results.at(-1)!.value;
     const opt = vi.mocked(chart.setOption).mock.calls.at(-1)![0];
 
-    const tip = opt.tooltip.formatter({ value: [1, 2, 3, '2026-05-31'], color: '#fff', seriesName: 'SECONDARY' });
+    const tip = opt.tooltip.formatter([{ axisValue: 0, value: [0, 1], color: '#fff', seriesName: 'Radial' }]);
 
-    expect(tip).toContain('Radial: 1.00 km');
+    expect(tip).toContain('Radial: <b>1.00');
   });
 
   it('disposes the previous chart before re-initializing', () => {

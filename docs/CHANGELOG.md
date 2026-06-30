@@ -2,6 +2,61 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v13.0.6](https://github.com/thkruz/keeptrack.space/compare/v13.0.5...v13.0.6)
+
+>  
+
+- fix(ui-manager): :bug: make toast dismissal idempotent [`#1394`](https://github.com/thkruz/keeptrack.space/issues/1394)
+- feat(ric-plots): :sparkles: replace 3D RIC scatter with 2D time-series plots [`4c5ac01`](https://github.com/thkruz/keeptrack.space/commit/4c5ac016bafa1ab3cc277ad7ad28287ec10027b0)
+- feat(share-menu): :sparkles: add on-demand Share menu plugin [`6477618`](https://github.com/thkruz/keeptrack.space/commit/6477618e15508743348d43b5dbe8f247de2688dd)
+- feat(url-manager): :sparkles: build share URL on demand instead of live updates [`cedacd6`](https://github.com/thkruz/keeptrack.space/commit/cedacd6efb9705b572ca8368cb52e47dc0a037ed)
+- docs(changelog): :memo: update changelog for v13.0.5 release [`e7ad22f`](https://github.com/thkruz/keeptrack.space/commit/e7ad22f8b837ed34bc8e822812b9b699c62c1571)
+- feat(settings): :sparkles: add isUpdateUrlBarLive option [`07a8022`](https://github.com/thkruz/keeptrack.space/commit/07a80225ffe948929d6de382629e45d5c939c4f4)
+- feat(plugins): :sparkles: register ShareMenuPlugin [`e7d93b2`](https://github.com/thkruz/keeptrack.space/commit/e7d93b2807e18462005255fd2cebe15db7027479)
+- fix(edit-sat): :bug: guard side menu against ephemeris satellites [`0a814fe`](https://github.com/thkruz/keeptrack.space/commit/0a814fe371fb66b761dd3da54b12b1115a448619)
+- fix(plugin-drawer): :bug: sync drawer item disabled state on secondary sat select [`bcea158`](https://github.com/thkruz/keeptrack.space/commit/bcea158a0e5693482ae0266924d1a80a621cb860)
+- fix(positionCruncher): :bug: update satellite state handling [`49e164a`](https://github.com/thkruz/keeptrack.space/commit/49e164ae4558f34dd491e67c78491c62995598cf)
+- fix(presets): :bug: route timeMachine toast dismissal through UiManager [`fc8b32d`](https://github.com/thkruz/keeptrack.space/commit/fc8b32ddedd2a051a9001ae60c36c59c1a767646)
+- chore(plugins-pro): :wrench: update subproject commit reference [`57e170c`](https://github.com/thkruz/keeptrack.space/commit/57e170c98fa240f89ff21c400f7be1297439f83a)
+- chore(ootk): :wrench: update subproject commit reference [`8ad4e28`](https://github.com/thkruz/keeptrack.space/commit/8ad4e28af49be3584af4747bdce466d147f39dcf)
+
+#### [v13.0.5](https://github.com/thkruz/keeptrack.space/compare/v13.0.4...v13.0.5)
+
+>  
+
+- refactor(camera): :recycle: reduce cognitive complexity of update/fps/local-rotation/pan loops [`8ac4504`](https://github.com/thkruz/keeptrack.space/commit/8ac4504ae1e4fcfb33f329eb5eaf57489e907978)
+- refactor(position-cruncher): :recycle: extract message/satellite helpers to reduce cognitive complexity [`2323df3`](https://github.com/thkruz/keeptrack.space/commit/2323df3b29f1083f81c0e7386ab11624434097dc)
+- feat(search-manager): :sparkles: search stars, sensors, launch sites, and planets and rotate camera to any result (#855) [`f1c051f`](https://github.com/thkruz/keeptrack.space/commit/f1c051fc369b76632504b448bc876ecd6751b6b8)
+- refactor(missile): :recycle: extract flight-phase helpers to reduce cognitive complexity [`718e750`](https://github.com/thkruz/keeptrack.space/commit/718e7509ce5fa45b9969de96549b4d148460c4c1)
+- refactor(color-cruncher): :recycle: extract filter/scheme helpers to reduce cognitive complexity [`31aada0`](https://github.com/thkruz/keeptrack.space/commit/31aada0e82b996bfdb127e02ff3b0fd3b66809d7)
+- refactor(sat-info-box-orbital): :recycle: extract orbital-element update helpers to reduce cognitive complexity [`a353a6f`](https://github.com/thkruz/keeptrack.space/commit/a353a6f9e7d624f3a920adb9e1ad603b1aae492f)
+- refactor(find-sat): :recycle: extract search filter helpers to reduce cognitive complexity [`d4b34d5`](https://github.com/thkruz/keeptrack.space/commit/d4b34d5df97d08ab96ff91101300d819a1a03f2a)
+- refactor(watchlist-overlay): :recycle: extract pass-bucket/html helpers to reduce cognitive complexity [`e4ddecd`](https://github.com/thkruz/keeptrack.space/commit/e4ddecd3fa0443c32de78680cc38784cedeccba5)
+- refactor(sunlight-color-scheme): :recycle: extract in-view/sunlit color helpers to reduce cognitive complexity [`d3f3224`](https://github.com/thkruz/keeptrack.space/commit/d3f322416bae8ded86597ff17dd084ba3cf921bb)
+- refactor(filter-menu): :recycle: remove disabled agencies filter toggle [`f02a576`](https://github.com/thkruz/keeptrack.space/commit/f02a57676a9ec0a2e8639ebb126c8ff2c367839e)
+- feat(search-settings): :sparkles: add Object Types toggles to search settings (#855) [`e8a89e7`](https://github.com/thkruz/keeptrack.space/commit/e8a89e75ae64c428b82b19b54f40cb5864117e44)
+- i18n(search-settings): :globe_with_meridians: add Object Types locale strings (#855) [`643d6ca`](https://github.com/thkruz/keeptrack.space/commit/643d6caaaf3e05e75ecd068f1d1eb3a53278d6b4)
+- refactor(base-plugin): :recycle: extract initBottomIconComponent_ to lower complexity [`6bfdbae`](https://github.com/thkruz/keeptrack.space/commit/6bfdbae89683e8845702612a852065d486541b9a)
+- refactor(select-sat-manager): :recycle: remove agency click-to-search handling [`19404a8`](https://github.com/thkruz/keeptrack.space/commit/19404a8e85ce19a9b78470604c4b4bce65fda918)
+- refactor(sat-info-box): :recycle: extract updateAltField_ to lower complexity [`80aea9a`](https://github.com/thkruz/keeptrack.space/commit/80aea9a1c7c42e03e639f449ff81ddd31b878ad8)
+- style(search-manager): :art: align search-result columns and stop country text wrapping (#855) [`42f45a7`](https://github.com/thkruz/keeptrack.space/commit/42f45a71916b4acad1675f47d344d82be6dd04eb)
+- refactor(color-scheme): :recycle: stop rendering agency markers on globe [`ce4f44d`](https://github.com/thkruz/keeptrack.space/commit/ce4f44d28c4bac17b4f96208e47e3c9a0479f330)
+- feat(settings): :sparkles: add searchableTypes setting for object-type search (#855) [`9dea815`](https://github.com/thkruz/keeptrack.space/commit/9dea815037e48c0362c7d802d8bf075d2e22a898)
+- refactor(catalog): :recycle: stop loading agency control sites [`d865d32`](https://github.com/thkruz/keeptrack.space/commit/d865d3258f6ca02bb9ea756579650aaff52d28ea)
+- refactor(settings): :recycle: remove isShowAgencies setting [`bda7be0`](https://github.com/thkruz/keeptrack.space/commit/bda7be0268321b817364a7ec3a8b1b18b59761c6)
+- fix(reports-plugin): :bug: handle clipboard write failures [`8d09626`](https://github.com/thkruz/keeptrack.space/commit/8d09626d279a92fd470a7ab6d564f599c67c17b0)
+- docs(changelog): :memo: update changelog for v13.0.4 release [`1c510b9`](https://github.com/thkruz/keeptrack.space/commit/1c510b9102dfe33fdb1855a2cf7786610865971d)
+- refactor(vcr): :recycle: use Element.before over insertBefore for VCR placement [`c1da892`](https://github.com/thkruz/keeptrack.space/commit/c1da89279fb50af1aeaed12e3779a219f317b1b6)
+- refactor(date-time-manager): :recycle: use dataset over getAttribute for slider bounds [`8c80d7b`](https://github.com/thkruz/keeptrack.space/commit/8c80d7bd4cfd5c4afa61db91e875f073e7f06bba)
+- refactor(time-slider): :recycle: use dataset over getAttribute for slider bounds [`e2305b4`](https://github.com/thkruz/keeptrack.space/commit/e2305b4887a94559673fcbf48d1ccc33bcc84ec5)
+- refactor(reentries): :recycle: use dataset over setAttribute for row data [`0f22a15`](https://github.com/thkruz/keeptrack.space/commit/0f22a1534cb59ffbb6275fbb4d58e3d3a6e9671e)
+- refactor(sat-info-box-orbit-guard): :recycle: use ChildNode.before over insertBefore on fullscreen exit [`d4b0436`](https://github.com/thkruz/keeptrack.space/commit/d4b0436bff7af2ca0f33290300f9236ea8e90a2b)
+- refactor(orbit-guard-menu): :recycle: use dataset over setAttribute for row data [`983490e`](https://github.com/thkruz/keeptrack.space/commit/983490e46a86c788bc103c0991b5c0cdb9c999f1)
+- refactor(collisions): :recycle: use dataset over setAttribute for row data [`e171e5f`](https://github.com/thkruz/keeptrack.space/commit/e171e5fef14c879e1f694bd0e8108011992dc6e1)
+- refactor(countries): :recycle: use dataset over getAttribute for country group [`15a10ed`](https://github.com/thkruz/keeptrack.space/commit/15a10edb62c346302f0e5b5480a5c234821a0e6b)
+- refactor(polar-plot): :recycle: simplify sampleNearest return logic [`c9a2785`](https://github.com/thkruz/keeptrack.space/commit/c9a2785844707733c58358f4fa544e211968dfc5)
+- chore(eslint): :wrench: disable max-lines-per-function for test files [`6e3f5ce`](https://github.com/thkruz/keeptrack.space/commit/6e3f5ced46d4114c06186938afd9d68d24d798da)
+
 #### [v13.0.4](https://github.com/thkruz/keeptrack.space/compare/v13.0.3...v13.0.4)
 
 >  

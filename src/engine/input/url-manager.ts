@@ -62,7 +62,8 @@ export abstract class UrlManager {
     new KeyboardComponent('UrlManager', [
       {
         key: 'U',
-        callback: () => this.updateURL(true),
+        // Force-write the full state to the URL bar even when live updates are disabled.
+        callback: () => this.updateURL(true, true),
       },
     ]).init();
   }
@@ -303,24 +304,19 @@ export abstract class UrlManager {
     }
   }
 
+  /**
+   * Builds a shareable URL that captures the current application state.
+   *
+   * This is a pure builder: it reads live state but performs no navigation and
+   * ignores the live-update / disable settings (those are the writer's concern).
+   * Heavy params are progressively dropped to keep the URL under MAX_URL_LENGTH_.
+   * @param isMaxData When true, include extended/heavy params (date, external TLEs, etc.).
+   * @returns The full shareable URL string.
+   */
   // eslint-disable-next-line complexity
-  static updateURL(isMaxData: boolean = false): void {
-    // Throttling navigation to prevent the browser from hanging.
-    if (Date.now() - this.lastUpdateTime_ < 250) {
-      return;
-    }
-    this.lastUpdateTime_ = Date.now();
-
-    const uiManagerInstance = ServiceLocator.getUiManager();
+  static getShareUrl(isMaxData: boolean = true): string {
     const timeManagerInstance = ServiceLocator.getTimeManager();
     const mainCamera = ServiceLocator.getMainCamera();
-
-    if (!uiManagerInstance?.searchManager) {
-      return;
-    }
-    if (settingsManager.isDisableUrlBar) {
-      return;
-    }
 
     const arr = window.location.href.split('?');
     let url = arr[0];
@@ -432,6 +428,41 @@ export abstract class UrlManager {
         }
       }
     }
+
+    return url;
+  }
+
+  /**
+   * Writes the current application state to the browser URL bar.
+   *
+   * Live updates are opt-in (see {@link SettingsManager.isUpdateUrlBarLive}) so the
+   * URL bar is not continuously rewritten on every state change. Pass `isForce` to
+   * write regardless of that setting (e.g. the 'U' shortcut or the Share menu).
+   * @param isMaxData When true, include extended/heavy params in the URL.
+   * @param isForce When true, bypass the live-update opt-in gate.
+   */
+  static updateURL(isMaxData: boolean = false, isForce: boolean = false): void {
+    // Live URL-bar updates are off by default — only write when forced or explicitly enabled.
+    if (!isForce && !settingsManager.isUpdateUrlBarLive) {
+      return;
+    }
+
+    // Throttling navigation to prevent the browser from hanging.
+    if (Date.now() - this.lastUpdateTime_ < 250) {
+      return;
+    }
+    this.lastUpdateTime_ = Date.now();
+
+    const uiManagerInstance = ServiceLocator.getUiManager();
+
+    if (!uiManagerInstance?.searchManager) {
+      return;
+    }
+    if (settingsManager.isDisableUrlBar) {
+      return;
+    }
+
+    let url = this.getShareUrl(isMaxData);
 
     // If still too long after dropping heavy params, skip the update entirely
     if (url.length > UrlManager.MAX_URL_LENGTH_) {

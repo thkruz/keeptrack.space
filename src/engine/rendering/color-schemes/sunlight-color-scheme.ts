@@ -121,102 +121,72 @@ export class SunlightColorScheme extends ColorScheme {
 
     // In FOV
     if (dotsManagerInstance.inViewData?.[obj.id] === 1) {
-      if (this.objectTypeFlags.sunlightFov === false) {
-        return {
-          color: this.colorTheme.deselected,
-          pickable: Pickable.No,
-        };
-      }
+      return this.getInViewColor_(obj);
+    }
 
-      if (dotsManagerInstance.inSunData[obj.id] > 0) {
-        // TODO: Work out a system for vmag filtering
-        return {
-          color: this.colorTheme.sunlightInview,
-          pickable: Pickable.Yes,
-        };
-      }
+    // Not in FOV
+    return this.getNotInViewColor_(obj as Satellite);
+  }
 
-      // In FOV but in umbral
-      if (this.objectTypeFlags.satLow) {
-        return {
-          color: this.colorTheme.umbral,
-          pickable: Pickable.No,
-        };
-      }
+  private getInViewColor_(obj: BaseObject): ColorInformation {
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
 
+    if (this.objectTypeFlags.sunlightFov === false) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
 
-    // Not in FOV
-    const sat = obj as Satellite;
+    if (dotsManagerInstance.inSunData[obj.id] > 0) {
+      // TODO: Work out a system for vmag filtering
+      return {
+        color: this.colorTheme.sunlightInview,
+        pickable: Pickable.Yes,
+      };
+    }
 
-    if (!dotsManagerInstance.inViewData?.[sat.id]) {
-      if (dotsManagerInstance.inSunData[sat.id] === SunStatus.SUN && this.objectTypeFlags.satHi) {
-        if (sat.vmag !== null) {
-          if (sat.vmag < 3) {
-            return {
-              color: this.colorTheme.sunlight100,
-              pickable: Pickable.Yes,
-            };
-          }
-          if (sat.vmag <= 4.5) {
-            return {
-              color: this.colorTheme.sunlight80,
-              pickable: Pickable.Yes,
-            };
-          }
-          if (sat.vmag > 4.5) {
-            return {
-              color: this.colorTheme.sunlight60,
-              pickable: Pickable.Yes,
-            };
-          }
-        }
-        if (sat.isPayload()) {
-          return {
-            color: this.colorTheme.sunlight80,
-            pickable: Pickable.Yes,
-          };
-        }
-        if (sat.isRocketBody()) {
-          return {
-            color: this.colorTheme.sunlight100,
-            pickable: Pickable.Yes,
-          };
-        }
-        if (sat.isDebris()) {
-          return {
-            color: this.colorTheme.sunlight60,
-            pickable: Pickable.Yes,
-          };
-        }
+    // In FOV but in umbral
+    if (this.objectTypeFlags.satLow) {
+      return {
+        color: this.colorTheme.umbral,
+        pickable: Pickable.No,
+      };
+    }
 
-        return {
-          color: this.colorTheme.sunlight60,
-          pickable: Pickable.Yes,
-        };
-      }
+    return {
+      color: this.colorTheme.deselected,
+      pickable: Pickable.No,
+    };
+  }
 
-      if (dotsManagerInstance.inSunData[sat.id] === SunStatus.PENUMBRAL && this.objectTypeFlags.satMed) {
-        return {
-          color: this.colorTheme.penumbral,
-          pickable: Pickable.Yes,
-        };
-      }
+  private getNotInViewColor_(sat: Satellite): ColorInformation {
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
 
-      if (dotsManagerInstance.inSunData[sat.id] === SunStatus.UMBRAL && this.objectTypeFlags.satLow) {
-        return {
-          color: this.colorTheme.umbral,
-          pickable: Pickable.No,
-        };
-      }
-
+    if (dotsManagerInstance.inViewData?.[sat.id]) {
       // The color was deselected
       return {
         color: this.colorTheme.deselected,
+        pickable: Pickable.No,
+      };
+    }
+
+    const sunStatus = dotsManagerInstance.inSunData[sat.id];
+
+    if (sunStatus === SunStatus.SUN && this.objectTypeFlags.satHi) {
+      return this.getSunlitSatColor_(sat);
+    }
+
+    if (sunStatus === SunStatus.PENUMBRAL && this.objectTypeFlags.satMed) {
+      return {
+        color: this.colorTheme.penumbral,
+        pickable: Pickable.Yes,
+      };
+    }
+
+    if (sunStatus === SunStatus.UMBRAL && this.objectTypeFlags.satLow) {
+      return {
+        color: this.colorTheme.umbral,
         pickable: Pickable.No,
       };
     }
@@ -225,6 +195,52 @@ export class SunlightColorScheme extends ColorScheme {
     return {
       color: this.colorTheme.deselected,
       pickable: Pickable.No,
+    };
+  }
+
+  private getSunlitSatColor_(sat: Satellite): ColorInformation {
+    if (sat.vmag !== null) {
+      if (sat.vmag < 3) {
+        return {
+          color: this.colorTheme.sunlight100,
+          pickable: Pickable.Yes,
+        };
+      }
+      if (sat.vmag <= 4.5) {
+        return {
+          color: this.colorTheme.sunlight80,
+          pickable: Pickable.Yes,
+        };
+      }
+      if (sat.vmag > 4.5) {
+        return {
+          color: this.colorTheme.sunlight60,
+          pickable: Pickable.Yes,
+        };
+      }
+    }
+    if (sat.isPayload()) {
+      return {
+        color: this.colorTheme.sunlight80,
+        pickable: Pickable.Yes,
+      };
+    }
+    if (sat.isRocketBody()) {
+      return {
+        color: this.colorTheme.sunlight100,
+        pickable: Pickable.Yes,
+      };
+    }
+    if (sat.isDebris()) {
+      return {
+        color: this.colorTheme.sunlight60,
+        pickable: Pickable.Yes,
+      };
+    }
+
+    return {
+      color: this.colorTheme.sunlight60,
+      pickable: Pickable.Yes,
     };
   }
 

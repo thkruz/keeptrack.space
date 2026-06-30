@@ -481,7 +481,7 @@ export class Reentries extends KeepTrackPlugin {
     const tr = tbl.insertRow();
 
     tr.setAttribute('class', 'tip-object link');
-    tr.setAttribute('data-row', i.toString());
+    tr.dataset.row = i.toString();
 
     const sat = ServiceLocator.getCatalogManager().sccNum2Sat(this.tipList_[i].NORAD_CAT_ID);
     const reentered = t7e('plugins.Reentries.labels.reentered' as Parameters<typeof t7e>[0]);
@@ -608,7 +608,7 @@ export class Reentries extends KeepTrackPlugin {
     const tr = tbl.insertRow();
 
     tr.setAttribute('class', 'reentry-object link');
-    tr.setAttribute('data-scc', sat.sccNum);
+    tr.dataset.scc = sat.sccNum;
 
     let hasReentered = sat.perigee < 120;
 

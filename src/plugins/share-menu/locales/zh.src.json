@@ -1,0 +1,24 @@
+{
+  "plugins": {
+    "ShareMenuPlugin": {
+      "bottomIconLabel": "分享",
+      "title": "分享视图",
+      "helpBody": "生成一个可分享的链接，记录当前视图，包括所选卫星、搜索、时间、传播速率和相机角度。打开此菜单可按需创建链接，然后复制链接或使用设备的分享功能。在浏览时地址栏不再自动重写；在设置中启用“地址栏实时更新”可恢复该行为。",
+      "commandPalette": {
+        "share": "分享当前视图"
+      },
+      "labels": {
+        "shareLink": "分享链接",
+        "url": "可分享的网址"
+      },
+      "buttons": {
+        "copyLink": "复制链接",
+        "share": "分享..."
+      },
+      "toasts": {
+        "copied": "链接已复制到剪贴板！",
+        "copyFailed": "无法将链接复制到剪贴板。"
+      }
+    }
+  }
+}

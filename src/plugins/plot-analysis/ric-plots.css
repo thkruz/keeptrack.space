@@ -1,0 +1,109 @@
+#ric-plots-menu.side-menu-parent {
+  z-index: 10001 !important;
+  /*
+   * Anchor both edges instead of forcing width:100%. In rail mode the parent is
+   * shifted right by --drawer-offset (the icon rail), so a literal 100% width
+   * overflows the viewport and pushes the title-bar close button off-screen.
+   * left stays inherited (0, or the rail offset); right:0 + width:auto fills
+   * exactly the available space and keeps the close button visible.
+   */
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  right: 0 !important;
+}
+
+#ric-plots-menu .side-menu {
+  height: 100%;
+  position: relative !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#ric-plots-menu .plot-analysis-chart.plot-analysis-menu-maximized {
+  width: 100%;
+  flex: 1;
+  min-height: 200px;
+}
+
+#ric-plots-menu .ric-plots-controls {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  padding: 8px 20px 0 20px;
+}
+
+#ric-plots-menu .ric-orbits-field {
+  width: 160px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+#ric-plots-menu .ric-plots-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 6px;
+}
+
+#ric-plots-menu .ric-sat-ids {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-size: 13px;
+}
+
+#ric-plots-menu .ric-sat-id {
+  color: var(--kt-text-primary, #e8e8e8);
+}
+
+#ric-plots-menu .ric-sat-primary {
+  border-left: 3px solid #ff5252;
+  padding-left: 8px;
+}
+
+#ric-plots-menu .ric-sat-secondary {
+  border-left: 3px solid #42a5f5;
+  padding-left: 8px;
+}
+
+#ric-plots-menu .ric-assessment {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  align-self: flex-start;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.06);
+  border-left: 3px solid var(--kt-text-secondary, #9e9e9e);
+}
+
+#ric-plots-menu .ric-assessment-label {
+  font-weight: 600;
+  color: var(--kt-text-primary, #e8e8e8);
+}
+
+#ric-plots-menu .ric-assessment-metrics {
+  color: var(--kt-text-secondary, #9e9e9e);
+  font-size: 12px;
+}
+
+/* Relationship-specific accent colors (left bar only; text stays light for contrast). */
+#ric-plots-menu .ric-assessment[data-relationship="closely-spaced"] {
+  border-left-color: #ff7043;
+}
+
+#ric-plots-menu .ric-assessment[data-relationship="co-orbital"] {
+  border-left-color: #66bb6a;
+}
+
+#ric-plots-menu .ric-assessment[data-relationship="co-planar"] {
+  border-left-color: #42a5f5;
+}
+
+#ric-plots-menu .ric-assessment[data-relationship="unrelated"] {
+  border-left-color: #9e9e9e;
+}

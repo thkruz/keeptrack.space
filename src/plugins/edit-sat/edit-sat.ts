@@ -308,11 +308,14 @@ export class EditSat extends KeepTrackPlugin {
   private populateSideMenu_(): void {
     const obj = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
 
-    if (!obj?.isSatellite()) {
+    // EditSat only operates on TLE-based satellites. Ephemeris-based satellites
+    // (e.g. OEM imports) also report isSatellite() === true but lack TLE-derived
+    // orbital elements, which would crash populateFormFields_ on undefined.toFixed().
+    if (!(obj instanceof Satellite)) {
       return;
     }
 
-    this.populateFormFields_(obj as Satellite);
+    this.populateFormFields_(obj);
   }
 
   // =========================================================================

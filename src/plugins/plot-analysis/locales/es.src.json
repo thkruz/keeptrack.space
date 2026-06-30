@@ -88,9 +88,34 @@
     "RicPlot": {
       "bottomIconLabel": "Gráfico RIC",
       "title": "Menú de Gráfico RIC",
+      "orbitsLabel": "Número de órbitas",
+      "labels": {
+        "primary": "Primario",
+        "secondary": "Secundario"
+      },
+      "assessment": {
+        "title": "Relación",
+        "plane": "plano",
+        "closelySpaced": "Objetos muy próximos",
+        "coOrbital": "Coorbital",
+        "coPlanar": "Coplanar",
+        "unrelated": "Sin relación",
+        "unknown": "Desconocido"
+      },
+      "chart": {
+        "radial": "Radial",
+        "inTrack": "A lo largo de la órbita",
+        "crossTrack": "Transversal a la órbita",
+        "range": "Distancia",
+        "timeAxis": "Tiempo (min)",
+        "distanceAxis": "Distancia (km)",
+        "empty": "Seleccione un satélite primario y uno secundario",
+        "unitKm": "km",
+        "unitMin": "min"
+      },
       "help": {
         "overview": "El gráfico RIC muestra el movimiento relativo entre dos satélites en el marco Radial, A lo Largo de la Trayectoria y Transversal (RIC), centrado en el primario. Es la vista estándar para encuentros orbitales, vuelo en formación y análisis de aproximaciones cercanas: la trayectoria del satélite secundario se dibuja tal como se ve desde el primario.",
-        "howToUse": "<ol><li>Seleccione un satélite primario y luego un satélite secundario (clic derecho sobre un satélite, o use las teclas [ y ]).</li><li>Abra el <strong>Gráfico RIC</strong> desde la barra inferior (modo Análisis).</li><li>Arrastre para rotar el gráfico 3D; el origen es el satélite primario, y la curva es la trayectoria relativa del secundario.</li></ol>",
+        "howToUse": "<ol><li>Seleccione un satélite primario y luego un satélite secundario (clic derecho sobre un satélite, o use las teclas [ y ]).</li><li>Abra el <strong>Gráfico RIC</strong> desde la barra inferior (modo Análisis).</li><li>Lea las cuatro gráficas 2D: radial, a lo largo de la órbita, transversal a la órbita y distancia total a lo largo del tiempo. Arrastre el control deslizante o desplácese para ampliar el eje temporal.</li></ol>",
         "tip1": "Deben estar seleccionados un satélite primario y uno secundario, o el gráfico no tendrá nada que comparar; elija objetos en órbitas similares para obtener una escala legible."
       }
     }

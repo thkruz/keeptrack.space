@@ -88,9 +88,34 @@
     "RicPlot": {
       "bottomIconLabel": "RIC-Diagramm",
       "title": "RIC-Diagramm-Menü",
+      "orbitsLabel": "Anzahl der Umläufe",
+      "labels": {
+        "primary": "Primär",
+        "secondary": "Sekundär"
+      },
+      "assessment": {
+        "title": "Beziehung",
+        "plane": "Ebene",
+        "closelySpaced": "Eng beieinander liegende Objekte",
+        "coOrbital": "Ko-orbital",
+        "coPlanar": "Koplanar",
+        "unrelated": "Unabhängig",
+        "unknown": "Unbekannt"
+      },
+      "chart": {
+        "radial": "Radial",
+        "inTrack": "In Bahnrichtung",
+        "crossTrack": "Quer zur Bahn",
+        "range": "Abstand",
+        "timeAxis": "Zeit (min)",
+        "distanceAxis": "Distanz (km)",
+        "empty": "Wählen Sie einen Primär- und einen Sekundärsatelliten aus",
+        "unitKm": "km",
+        "unitMin": "min"
+      },
       "help": {
         "overview": "Das RIC-Diagramm zeigt die Relativbewegung zwischen zwei Satelliten im radial, entlang der Bahn und quer zur Bahn ausgerichteten Bezugssystem (RIC), zentriert auf den Primärsatelliten. Es ist die Standardansicht für Rendezvous, Formationsflug und Annäherungsanalysen: Die Bahn des Sekundärsatelliten wird so dargestellt, wie sie vom Primärsatelliten aus erscheint.",
-        "howToUse": "<ol><li>Wählen Sie einen Primärsatelliten und dann einen Sekundärsatelliten aus (Rechtsklick auf einen Satelliten oder die Tasten [ und ]).</li><li>Öffnen Sie das <strong>RIC-Diagramm</strong> über die untere Leiste (Modus Analyse).</li><li>Ziehen Sie, um das 3D-Diagramm zu drehen; der Ursprung ist der Primärsatellit, und die Kurve ist die relative Trajektorie des Sekundärsatelliten.</li></ol>",
+        "howToUse": "<ol><li>Wählen Sie einen Primärsatelliten und dann einen Sekundärsatelliten aus (Rechtsklick auf einen Satelliten oder die Tasten [ und ]).</li><li>Öffnen Sie das <strong>RIC-Diagramm</strong> über die untere Leiste (Modus Analyse).</li><li>Lesen Sie die vier 2D-Diagramme: radial, in Bahnrichtung, quer zur Bahn und Gesamtabstand über die Zeit. Ziehen Sie den Schieberegler oder scrollen Sie, um die Zeitachse zu zoomen.</li></ol>",
         "tip1": "Es müssen sowohl ein Primär- als auch ein Sekundärsatellit ausgewählt sein, sonst hat das Diagramm nichts zu vergleichen; wählen Sie Objekte auf ähnlichen Bahnen für einen gut lesbaren Maßstab."
       }
     }

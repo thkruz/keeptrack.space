@@ -203,164 +203,147 @@ export interface ExtraDataMessage {
   tle2?: string;
 }
 
-export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
-  let satData: CruncherSat[];
-  let i = 0;
-  let extraData = [] as ExtraDataMessage[];
-  const extra = {
-    isLowAlt: false,
-    inclination: 0 as Radians,
-    eccentricity: 0,
-    raan: 0 as Radians,
-    argOfPerigee: 0 as Radians,
-    meanMotion: 0,
-    semiMajorAxis: 0 as Kilometers,
-    semiMinorAxis: 0 as Kilometers,
-    apogee: 0 as Kilometers,
-    perigee: 0 as Kilometers,
-    period: 0 as Minutes,
-    tle1: '',
-    tle2: '',
+/**
+ * Handles the OFFSET message: updates time variables and forces a full propagation on the next cycle.
+ */
+const handleOffsetMsg_ = (m: PositionCruncherIncomingMsg): void => {
+  staticOffset = m.data.staticOffset ?? 0;
+  dynamicOffsetEpoch = m.data.dynamicOffsetEpoch ?? Date.now();
+  propRate = m.data.propRate ?? 1;
+  isInterrupted = true;
+
+  // Scale propagation frequency linearly with propRate
+  divisor = Math.max(1, Math.abs(propRate));
+
+  // Force all satellites to propagate on next cycle (time jump invalidates extrapolated positions)
+  if (isOnScreen_.length > 0) {
+    isOnScreen_.fill(1);
+  }
+  skipNextVisibilityUpdate_ = true;
+  lastPropSimTime_ = 0;
+};
+
+/**
+ * Builds and pushes a single objCache entry from one incoming satData record.
+ * Satellites (with tle1+tle2) get a satrec plus derived apogee/perigee; everything else
+ * (sensors, missiles, markers) is stored with its active flag normalized.
+ */
+const buildCacheEntry_ = (obj: CruncherSat): void => {
+  const tle1 = obj?.tle1;
+  const tle2 = obj?.tle2;
+
+  // Sensors, Missiles, and Markers don't have TLEs
+  if (!tle1 || !tle2) {
+    // Sensors Start Active; Markers and Missiles Start Inactive
+    obj.active = Boolean(obj.lat);
+    objCache.push({ ...obj, ...{ active: obj.active } });
+
+    return;
+  }
+
+  // perform and store sat init calcs
+  const satrec = Sgp4.createSatrec(tle1, tle2);
+  const meanMotion = (satrec.no * 60 * 24) / TAU; // convert rads/minute to rev/day
+  const semiMajorAxis = (8681663.653 / meanMotion) ** (2 / 3);
+  const apogee = <Kilometers>(semiMajorAxis * (1 + satrec.ecco) - RADIUS_OF_EARTH);
+  const perigee = <Kilometers>(semiMajorAxis * (1 - satrec.ecco) - RADIUS_OF_EARTH);
+
+  objCache.push({
+    active: obj.active ?? true,
+    satrec,
+    apogee,
+    perigee,
+  });
+};
+
+/**
+ * Handles the OBJ_DATA message: parses the new catalog, rebuilds objCache, and resets swap state.
+ */
+const handleObjDataMsg_ = (m: PositionCruncherIncomingMsg): void => {
+  const satData: CruncherSat[] = JSON.parse(m.data.dat);
+
+  len = satData.length;
+
+  // Clear previous catalog data for catalog swap support
+  objCache = [];
+
+  for (let i = 0; i < len; i++) {
+    buildCacheEntry_(satData[i]);
+  }
+
+  resetForCatalogSwap(len, m.data.fieldOfViewSetLength ?? 0, m.data.seqNum ?? 0);
+
+  if (m.data.isLowPerf) {
+    isLowPerf = true;
+  }
+};
+
+/**
+ * Handles the SAT_EDIT message: replaces a single satellite's TLE/satrec and posts derived
+ * keplerian/extra data back to the main thread.
+ */
+const handleSatEditMsg_ = (m: PositionCruncherIncomingMsg): void => {
+  if (m.data.id === undefined) {
+    return;
+  }
+  // Discard edits for ids outside the current catalog (e.g. in-flight after a swap to a smaller catalog).
+  if (m.data.id >= objCache.length || !objCache[m.data.id]) {
+    return;
+  }
+  // replace old TLEs
+  const satrec = Sgp4.createSatrec(m.data.tle1, m.data.tle2);
+  const meanMotion = (satrec.no * 60 * 24) / TAU; // convert rads/minute to rev/day
+  const semiMajorAxis = ((8681663.653 / meanMotion) ** (2 / 3)) as Kilometers;
+  const eccentricity = satrec.ecco;
+
+  const extra: ExtraDataMessage = {
+    isLowAlt: satrec.isimp,
+    // keplerian elements
+    inclination: satrec.inclo as Radians,
+    eccentricity,
+    raan: satrec.nodeo as Radians,
+    argOfPerigee: satrec.argpo as Radians,
+    meanMotion,
+    // fun other data
+    semiMajorAxis,
+    semiMinorAxis: (semiMajorAxis * Math.sqrt(1 - eccentricity ** 2)) as Kilometers,
+    apogee: (semiMajorAxis * (1 + eccentricity) - RADIUS_OF_EARTH) as Kilometers,
+    perigee: (semiMajorAxis * (1 - eccentricity) - RADIUS_OF_EARTH) as Kilometers,
+    period: (1440.0 / meanMotion) as Minutes,
+    tle1: m.data.tle1,
+    tle2: m.data.tle2,
   };
 
+  // Update the object cache
+  objCache[m.data.id].satrec = satrec;
+  objCache[m.data.id].active = true;
+  objCache[m.data.id].apogee = extra.apogee;
+  objCache[m.data.id].perigee = extra.perigee;
+  objCache[m.data.id].isUpdated = true;
+
+  if (isThisJest) {
+    return;
+  }
+  // istanbul ignore next
+  postMessage({
+    extraUpdate: true,
+    extraData: JSON.stringify([extra]),
+    satId: m.data.id,
+  });
+  isInterrupted = true;
+};
+
+export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
   switch (m.data.typ) {
     case PosCruncherMsgType.OFFSET:
-      staticOffset = m.data.staticOffset ?? 0;
-      dynamicOffsetEpoch = m.data.dynamicOffsetEpoch ?? Date.now();
-      propRate = m.data.propRate ?? 1;
-      isInterrupted = true;
-
-      // Scale propagation frequency linearly with propRate
-      divisor = Math.max(1, Math.abs(propRate));
-
-      // Force all satellites to propagate on next cycle (time jump invalidates extrapolated positions)
-      if (isOnScreen_.length > 0) {
-        isOnScreen_.fill(1);
-      }
-      skipNextVisibilityUpdate_ = true;
-      lastPropSimTime_ = 0;
+      handleOffsetMsg_(m);
 
       return;
     case PosCruncherMsgType.OBJ_DATA:
-      satData = JSON.parse(m.data.dat);
-      len = satData.length;
-
-      // Clear previous catalog data for catalog swap support
-      objCache = [];
-
-      while (i < len) {
-        const extraRec = {
-          isLowAlt: false,
-          inclination: 0 as Radians,
-          eccentricity: 0,
-          raan: 0 as Radians,
-          argOfPerigee: 0 as Radians,
-          meanMotion: 0,
-          semiMajorAxis: 0,
-          semiMinorAxis: 0,
-          apogee: 0 as Kilometers,
-          perigee: 0 as Kilometers,
-          period: 0 as Minutes,
-        };
-        // Satellites always have a tle1
-
-        const tle1 = satData[i]?.tle1;
-        const tle2 = satData[i]?.tle2;
-
-        if (tle1 && tle2) {
-          // perform and store sat init calcs
-          const satrec = Sgp4.createSatrec(tle1, tle2);
-
-          extraRec.isLowAlt = satrec.isimp;
-          extraRec.inclination = <Radians>satrec.inclo;
-          extraRec.eccentricity = satrec.ecco;
-          extraRec.raan = <Radians>satrec.nodeo;
-          extraRec.argOfPerigee = <Radians>satrec.argpo;
-          extraRec.meanMotion = (satrec.no * 60 * 24) / TAU; // convert rads/minute to rev/day
-          extraRec.semiMajorAxis = (8681663.653 / extraRec.meanMotion) ** (2 / 3);
-          extraRec.semiMinorAxis = extraRec.semiMajorAxis * Math.sqrt(1 - extraRec.eccentricity ** 2);
-          extraRec.apogee = <Kilometers>(extraRec.semiMajorAxis * (1 + extraRec.eccentricity) - RADIUS_OF_EARTH);
-          extraRec.perigee = <Kilometers>(extraRec.semiMajorAxis * (1 - extraRec.eccentricity) - RADIUS_OF_EARTH);
-          extraRec.period = <Minutes>(1440.0 / extraRec.meanMotion);
-
-          objCache.push({
-            active: satData[i].active ?? true,
-            satrec,
-            apogee: extraRec.apogee,
-            perigee: extraRec.perigee,
-          });
-          i++;
-        } else {
-          // Sensors, Missiles, and Markers
-          const obj = satData[i];
-          // Sensors Start Active
-
-          if (obj.lat) {
-            obj.active = true;
-          } else {
-            // Markers and Missiles Start Inactive
-            obj.active = false;
-          }
-          objCache.push({ ...obj, ...{ active: obj.active } });
-          i++;
-        }
-      }
-
-      resetForCatalogSwap(len, m.data.fieldOfViewSetLength ?? 0, m.data.seqNum ?? 0);
-
-      if (m.data.isLowPerf) {
-        isLowPerf = true;
-      }
+      handleObjDataMsg_(m);
       break;
     case PosCruncherMsgType.SAT_EDIT:
-      {
-        if (m.data.id === undefined) {
-          break;
-        }
-        // Discard edits for ids outside the current catalog (e.g. in-flight after a swap to a smaller catalog).
-        if (m.data.id >= objCache.length || !objCache[m.data.id]) {
-          break;
-        }
-        // replace old TLEs
-        const satrec = Sgp4.createSatrec(m.data.tle1, m.data.tle2);
-
-        extraData = [];
-
-        // keplerian elements
-        extra.inclination = satrec.inclo as Radians;
-        extra.eccentricity = satrec.ecco;
-        extra.raan = satrec.nodeo as Radians;
-        extra.argOfPerigee = satrec.argpo as Radians;
-        extra.meanMotion = (satrec.no * 60 * 24) / TAU; // convert rads/minute to rev/day
-
-        // fun other data
-        extra.semiMajorAxis = ((8681663.653 / extra.meanMotion) ** (2 / 3)) as Kilometers;
-        extra.semiMinorAxis = (extra.semiMajorAxis * Math.sqrt(1 - extra.eccentricity ** 2)) as Kilometers;
-        extra.apogee = (extra.semiMajorAxis * (1 + extra.eccentricity) - RADIUS_OF_EARTH) as Kilometers;
-        extra.perigee = (extra.semiMajorAxis * (1 - extra.eccentricity) - RADIUS_OF_EARTH) as Kilometers;
-        extra.period = (1440.0 / extra.meanMotion) as Minutes;
-        extra.tle1 = m.data.tle1;
-        extra.tle2 = m.data.tle2;
-        extraData.push(extra);
-
-        // Update the object cache
-        objCache[m.data.id].satrec = satrec;
-        objCache[m.data.id].active = true;
-        objCache[m.data.id].apogee = extra.apogee;
-        objCache[m.data.id].perigee = extra.perigee;
-        objCache[m.data.id].isUpdated = true;
-
-        if (isThisJest) {
-          return;
-        }
-        // istanbul ignore next
-        postMessage({
-          extraUpdate: true,
-          extraData: JSON.stringify(extraData),
-          satId: m.data.id,
-        });
-        isInterrupted = true;
-      }
+      handleSatEditMsg_(m);
       break;
     case PosCruncherMsgType.NEW_MISSILE:
       if (m.data.id !== undefined && m.data.id < objCache.length) {
@@ -780,9 +763,154 @@ export const updateLandObject = (i: number, gmst: GreenwichMeanSiderealTime): vo
   satPos[i * 3 + 2] = eci.z;
 };
 
+/** Validates an imprecise/old-elset satellite's geodetic altitude against its apogee/perigee band; throws 'Impossible orbit' when out of band. */
+const validateImpreciseOrbitAltitude_ = (i: number, position: TemeVec3, gmst: GreenwichMeanSiderealTime): void => {
+  const a = 6378.137;
+  const b = 6356.7523142;
+  const R = Math.sqrt(position.x * position.x + position.y * position.y);
+  const f = (a - b) / a;
+  const e2 = 2 * f - f * f;
+
+  let lon = Math.atan2(position.y, position.x) - gmst;
+
+  while (lon < -PI) {
+    lon += TAU;
+  }
+  while (lon > PI) {
+    lon -= TAU;
+  }
+
+  const kmax = 20;
+  let k = 0;
+  let lat = Math.atan2(position.z, Math.sqrt(position.x * position.x + position.y * position.y));
+  let C = 1 / Math.sqrt(1 - e2 * (Math.sin(lat) * Math.sin(lat)));
+
+  while (k < kmax) {
+    C = 1 / Math.sqrt(1 - e2 * (Math.sin(lat) * Math.sin(lat)));
+    lat = Math.atan2(position.z + a * C * e2 * Math.sin(lat), R);
+    k += 1;
+  }
+  const alt = R / Math.cos(lat) - a * C;
+
+  const apogee = objCache[i].apogee ?? Infinity;
+  const perigee = objCache[i].perigee ?? 0;
+
+  if (alt > apogee + 1000 || alt < perigee - 100) {
+    throw new Error('Impossible orbit');
+  }
+};
+
+/** Writes a satellite's validated TEME position/velocity into the shared arrays. Returns false on NaN propagation; throws 'Impossible orbit' for unbound/sub-surface/out-of-band orbits. */
+const writeValidatedSatState_ = (i: number, m: number, pv: { position: TemeVec3; velocity: TemeVec3<KilometersPerSecond> }, gmst: GreenwichMeanSiderealTime): boolean => {
+  if (isNaN(pv.position.x) || isNaN(pv.position.y) || isNaN(pv.position.z)) {
+    return false;
+  }
+
+  // Specific orbital energy: E = v²/2 - μ/r. Positive = unbound (impossible for cataloged satellite).
+  // Also reject positions inside Earth (rMag < 6350 km, below polar radius).
+  const rMag = Math.sqrt(pv.position.x * pv.position.x + pv.position.y * pv.position.y + pv.position.z * pv.position.z);
+  const vMagSq = pv.velocity.x * pv.velocity.x + pv.velocity.y * pv.velocity.y + pv.velocity.z * pv.velocity.z;
+
+  if (0.5 * vMagSq - 398600.4418 / rMag > 0 || rMag < 6350) {
+    throw new Error('Impossible orbit');
+  }
+
+  satPos[i * 3] = pv.position.x;
+  satPos[i * 3 + 1] = pv.position.y;
+  satPos[i * 3 + 2] = pv.position.z;
+
+  satVel[i * 3] = pv.velocity.x;
+  satVel[i * 3 + 1] = pv.velocity.y;
+  satVel[i * 3 + 2] = pv.velocity.z;
+
+  /*
+   * Make sure that objects with an imprecise orbit or an old elset
+   * are not failing to propagate
+   */
+  if (objCache[i].satrec.isimp || m / 1440 > 20) {
+    validateImpreciseOrbitAltitude_(i, pv.position, gmst);
+  }
+
+  return true;
+};
+
+/**
+ * Marks a satellite as a reentry: deactivates it, zeroes its position/velocity, and notifies
+ * the main thread so it stops being rendered.
+ */
+const markSatelliteAsBad_ = (i: number): void => {
+  // This is probably a reentry and should be skipped from now on.
+  objCache[i].active = false;
+
+  postMessage({
+    badObjectId: i,
+  });
+
+  satPos[i * 3] = 0;
+  satPos[i * 3 + 1] = 0;
+  satPos[i * 3 + 2] = 0;
+
+  satVel[i * 3] = 0;
+  satVel[i * 3 + 1] = 0;
+  satVel[i * 3 + 2] = 0;
+};
+
+/**
+ * Updates a satellite's sunlight status (umbral/penumbral/sun) into the satInSun array.
+ */
+const updateSatelliteSunStatus_ = (i: number, now: Date, position: TemeVec3): void => {
+  const sunPos = Sun.eci(now);
+  const lighting = Sun.lightingRatio(new Vector3D(position.x, position.y, position.z), sunPos);
+
+  satInSun[i] = SunStatus.SUN;
+
+  if (lighting < 0.05) {
+    satInSun[i] = SunStatus.UMBRAL;
+  } else if (lighting < 1.0) {
+    satInSun[i] = SunStatus.PENUMBRAL;
+  }
+};
+
+/**
+ * Updates the satInView flag for a satellite against every active sensor (multi-sensor case).
+ */
+const updateSatelliteInViewMulti_ = (i: number, position: TemeVec3, gmst: GreenwichMeanSiderealTime): void => {
+  for (const sensor of sensors) {
+    // Skip satellites in the dark if you are an optical sensor
+    if (sensor.type === SpaceObjectType.OPTICAL && satInSun[i] === SunStatus.UMBRAL) {
+      continue;
+    }
+    if (satInView[i] === 1) {
+      // If the satellite is already in view, skip the rest of the sensors
+      break;
+    }
+
+    let rae: RaeVec3<Kilometers, Degrees>;
+
+    try {
+      const positionEcf: EcefVec3 = eci2ecef(position, gmst); // pv.position is called positionEci originally
+
+      rae = ecefRad2rae(sensor.llaRad(), positionEcf);
+    } catch {
+      continue;
+    }
+    satInView[i] = sensor.isRaeInFov(rae.az, rae.el, rae.rng) ? 1 : 0;
+  }
+};
+
+/**
+ * Updates the satInView flag for a satellite against the single selected sensor.
+ */
+const updateSatelliteInViewSingle_ = (i: number, position: TemeVec3, gmst: GreenwichMeanSiderealTime): void => {
+  const rae = ecefRad2rae(sensors[0].llaRad(), eci2ecef(position, gmst));
+
+  // If it is an optical sensor and the satellite is in the dark, skip it
+  if (!(sensors[0].type === SpaceObjectType.OPTICAL && satInSun[i] === SunStatus.UMBRAL)) {
+    satInView[i] = sensors[0].isRaeInFov(rae.az, rae.el, rae.rng) ? 1 : 0;
+  }
+};
+
 export const updateSatellite = (now: Date, i: number, gmst: GreenwichMeanSiderealTime, j: number, isSunExclusion: boolean): boolean => {
-  let positionEcf: EcefVec3 | null;
-  let rae: RaeVec3<Kilometers, Degrees>;
   const satelliteData = objCache[i] as unknown as Satellite; // This is checked in updateSatCache
 
   // Skip reentries
@@ -793,125 +921,26 @@ export const updateSatellite = (now: Date, i: number, gmst: GreenwichMeanSiderea
   const pv = Sgp4.propagate(satelliteData.satrec, m) as { position: TemeVec3; velocity: TemeVec3<KilometersPerSecond> };
 
   try {
-    if (isNaN(pv.position.x) || isNaN(pv.position.y) || isNaN(pv.position.z)) {
+    if (!writeValidatedSatState_(i, m, pv, gmst)) {
       return false;
     }
-
-    // Specific orbital energy: E = v²/2 - μ/r. Positive = unbound (impossible for cataloged satellite).
-    // Also reject positions inside Earth (rMag < 6350 km, below polar radius).
-    const rMag = Math.sqrt(pv.position.x * pv.position.x + pv.position.y * pv.position.y + pv.position.z * pv.position.z);
-    const vMagSq = pv.velocity.x * pv.velocity.x + pv.velocity.y * pv.velocity.y + pv.velocity.z * pv.velocity.z;
-
-    if (0.5 * vMagSq - 398600.4418 / rMag > 0 || rMag < 6350) {
-      throw new Error('Impossible orbit');
-    }
-
-    satPos[i * 3] = pv.position.x;
-    satPos[i * 3 + 1] = pv.position.y;
-    satPos[i * 3 + 2] = pv.position.z;
-
-    satVel[i * 3] = pv.velocity.x;
-    satVel[i * 3 + 1] = pv.velocity.y;
-    satVel[i * 3 + 2] = pv.velocity.z;
-
-    /*
-     * Make sure that objects with an imprecise orbit or an old elset
-     * are not failing to propagate
-     */
-    if (objCache[i].isimp || m / 1440 > 20) {
-      const a = 6378.137;
-      const b = 6356.7523142;
-      const R = Math.sqrt(pv.position.x * pv.position.x + pv.position.y * pv.position.y);
-      const f = (a - b) / a;
-      const e2 = 2 * f - f * f;
-
-      let lon = Math.atan2(pv.position.y, pv.position.x) - gmst;
-
-      while (lon < -PI) {
-        lon += TAU;
-      }
-      while (lon > PI) {
-        lon -= TAU;
-      }
-
-      const kmax = 20;
-      let k = 0;
-      let lat = Math.atan2(pv.position.z, Math.sqrt(pv.position.x * pv.position.x + pv.position.y * pv.position.y));
-      let C = 1 / Math.sqrt(1 - e2 * (Math.sin(lat) * Math.sin(lat)));
-
-      while (k < kmax) {
-        C = 1 / Math.sqrt(1 - e2 * (Math.sin(lat) * Math.sin(lat)));
-        lat = Math.atan2(pv.position.z + a * C * e2 * Math.sin(lat), R);
-        k += 1;
-      }
-      const alt = R / Math.cos(lat) - a * C;
-
-      const apogee = objCache[i].apogee ?? Infinity;
-      const perigee = objCache[i].perigee ?? 0;
-
-      if (alt > apogee + 1000 || alt < perigee - 100) {
-        throw new Error('Impossible orbit');
-      }
-    }
   } catch {
-    // This is probably a reentry and should be skipped from now on.
-    objCache[i].active = false;
+    markSatelliteAsBad_(i);
 
-    postMessage({
-      badObjectId: i,
-    });
-
-    satPos[i * 3] = 0;
-    satPos[i * 3 + 1] = 0;
-    satPos[i * 3 + 2] = 0;
-
-    satVel[i * 3] = 0;
-    satVel[i * 3 + 1] = 0;
-    satVel[i * 3 + 2] = 0;
-
-    positionEcf = null;
-    rae = { az: 0 as Degrees, el: 0 as Degrees, rng: 0 as Kilometers };
+    return false;
   }
 
   if (isSunlightView) {
-    const sunPos = Sun.eci(now);
-    const lighting = Sun.lightingRatio(new Vector3D(pv.position.x, pv.position.y, pv.position.z), sunPos);
-
-    satInSun[i] = SunStatus.SUN;
-
-    if (lighting < 0.05) {
-      satInSun[i] = SunStatus.UMBRAL;
-    } else if (lighting < 1.0) {
-      satInSun[i] = SunStatus.PENUMBRAL;
-    }
+    updateSatelliteSunStatus_(i, now, pv.position);
   }
 
   if (isSensor && !isSunExclusion) {
     satInView[i] = 0; // 0 = FALSE - Default in case no sensor selected
     if (isSensors) {
-      for (const sensor of sensors) {
-        // Skip satellites in the dark if you are an optical sensor
-        if (!(sensor.type === SpaceObjectType.OPTICAL && satInSun[i] === SunStatus.UMBRAL)) {
-          if (satInView[i] === 1) {
-            // If the satellite is already in view, skip the rest of the sensors
-            break;
-          }
-          try {
-            positionEcf = eci2ecef(pv.position, gmst); // pv.position is called positionEci originally
-            rae = ecefRad2rae(sensor.llaRad(), positionEcf);
-          } catch {
-            continue;
-          }
-          satInView[i] = sensor.isRaeInFov(rae.az, rae.el, rae.rng) ? 1 : 0;
-        }
-      }
+      updateSatelliteInViewMulti_(i, pv.position, gmst);
       // Skip Calculating Lookangles if No Sensor is Selected
     } else if (isSensor) {
-      rae = ecefRad2rae(sensors[0].llaRad(), eci2ecef(pv.position, gmst));
-      // If it is an optical sensor and the satellite is in the dark, skip it
-      if (!(sensors[0].type === SpaceObjectType.OPTICAL && satInSun[i] === SunStatus.UMBRAL)) {
-        satInView[i] = sensors[0].isRaeInFov(rae.az, rae.el, rae.rng) ? 1 : 0;
-      }
+      updateSatelliteInViewSingle_(i, pv.position, gmst);
     }
   }
 

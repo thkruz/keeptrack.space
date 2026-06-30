@@ -670,6 +670,12 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 451 },
   },
   {
+    configKey: 'ShareMenuPlugin',
+    ossImport: () => import('./share-menu/share-menu'),
+    ossClassName: 'ShareMenuPlugin',
+    defaultConfig: { enabled: true, order: 452 },
+  },
+  {
     configKey: 'CatalogManagementPlugin',
     ossImport: () => import('./catalog-management/catalog-management'),
     ossClassName: 'CatalogManagementPlugin',

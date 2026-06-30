@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v13.0.6](https://github.com/thkruz/keeptrack.space/compare/v13.0.5...v13.0.6)
+
+>  
+
+- fix(ui-manager): :bug: make toast dismissal idempotent [`#1394`](https://github.com/thkruz/keeptrack.space/issues/1394)
+- feat(ric-plots): :sparkles: replace 3D RIC scatter with 2D time-series plots [`4c5ac01`](https://github.com/thkruz/keeptrack.space/commit/4c5ac016bafa1ab3cc277ad7ad28287ec10027b0)
+- feat(share-menu): :sparkles: add on-demand Share menu plugin [`6477618`](https://github.com/thkruz/keeptrack.space/commit/6477618e15508743348d43b5dbe8f247de2688dd)
+- feat(url-manager): :sparkles: build share URL on demand instead of live updates [`cedacd6`](https://github.com/thkruz/keeptrack.space/commit/cedacd6efb9705b572ca8368cb52e47dc0a037ed)
+- docs(changelog): :memo: update changelog for v13.0.5 release [`e7ad22f`](https://github.com/thkruz/keeptrack.space/commit/e7ad22f8b837ed34bc8e822812b9b699c62c1571)
+- feat(settings): :sparkles: add isUpdateUrlBarLive option [`07a8022`](https://github.com/thkruz/keeptrack.space/commit/07a80225ffe948929d6de382629e45d5c939c4f4)
+- feat(plugins): :sparkles: register ShareMenuPlugin [`e7d93b2`](https://github.com/thkruz/keeptrack.space/commit/e7d93b2807e18462005255fd2cebe15db7027479)
+- fix(edit-sat): :bug: guard side menu against ephemeris satellites [`0a814fe`](https://github.com/thkruz/keeptrack.space/commit/0a814fe371fb66b761dd3da54b12b1115a448619)
+- fix(plugin-drawer): :bug: sync drawer item disabled state on secondary sat select [`bcea158`](https://github.com/thkruz/keeptrack.space/commit/bcea158a0e5693482ae0266924d1a80a621cb860)
+- fix(positionCruncher): :bug: update satellite state handling [`49e164a`](https://github.com/thkruz/keeptrack.space/commit/49e164ae4558f34dd491e67c78491c62995598cf)
+- fix(presets): :bug: route timeMachine toast dismissal through UiManager [`fc8b32d`](https://github.com/thkruz/keeptrack.space/commit/fc8b32ddedd2a051a9001ae60c36c59c1a767646)
+- chore(plugins-pro): :wrench: update subproject commit reference [`57e170c`](https://github.com/thkruz/keeptrack.space/commit/57e170c98fa240f89ff21c400f7be1297439f83a)
+- chore(ootk): :wrench: update subproject commit reference [`8ad4e28`](https://github.com/thkruz/keeptrack.space/commit/8ad4e28af49be3584af4747bdce466d147f39dcf)
+
 #### [v13.0.5](https://github.com/thkruz/keeptrack.space/compare/v13.0.4...v13.0.5)
 
 >  

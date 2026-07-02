@@ -27,6 +27,7 @@ import { PostProcessingManager } from './draw-manager/post-processing';
 import { Sun } from './draw-manager/sun';
 import { MeshManager } from './mesh-manager';
 import { showFatalError } from './show-fatal-error';
+import { ViewportManager } from './viewport-manager';
 
 export class WebGLRenderer {
   private isRotationEvent_: boolean;
@@ -94,7 +95,9 @@ export class WebGLRenderer {
       return;
     }
 
-    ServiceLocator.getMainCamera().projectionMatrix = Camera.calculatePMatrix(this.gl);
+    const mainCamera = ServiceLocator.getMainCamera();
+
+    mainCamera.projectionMatrix = Camera.calculatePMatrix(this.gl, mainCamera);
   }
 
   private isAltCanvasSize_ = false;
@@ -104,23 +107,30 @@ export class WebGLRenderer {
       return;
     }
 
+    let isResized = false;
+
     if (EventBus.getInstance().methods.altCanvasResize()) {
       this.resizeCanvas(true);
       this.isAltCanvasSize_ = true;
-      // Re-invoke camera draw so delegates (flat-map, polar-view) recompute projection for the new canvas size.
-      // resizeCanvas calls updatePMatrix which overwrites projectionMatrix with a perspective matrix,
-      // but delegates need their own orthographic projection.
-      camera.draw(this.sensorPos);
+      isResized = true;
     } else if (this.isAltCanvasSize_) {
       this.resizeCanvas(false);
       this.isAltCanvasSize_ = false;
+      isResized = true;
+    }
+
+    if (isResized) {
+      // resizeCanvas set a full-canvas viewport and a perspective projection.
+      // Re-apply the multi-view pass viewport/scissor for the new buffer size,
+      // then re-invoke camera.draw so delegates (flat-map, polar-view)
+      // recompute their own orthographic projection.
+      ViewportManager.getInstance().applyPassViewport(this.gl);
       camera.draw(this.sensorPos);
     }
 
-    const mainCamera = ServiceLocator.getMainCamera();
-
-    // Apply the camera matrix
-    this.projectionCameraMatrix = mat4.mul(mat4.create(), mainCamera.projectionMatrix, mainCamera.matrixWorldInverse);
+    // Apply the camera matrix (from the camera being rendered, not the singleton,
+    // so multi-viewport passes each compose their own matrix)
+    this.projectionCameraMatrix = mat4.mul(mat4.create(), camera.projectionMatrix, camera.matrixWorldInverse);
 
     scene.render(this, camera);
   }
@@ -807,6 +817,9 @@ export class WebGLRenderer {
     this.updatePrimarySatellite_();
     this.updateSecondarySatellite_();
     ServiceLocator.getMainCamera().update(this.dt);
+    // Update secondary viewports (rects + camera state) before the projection
+    // rebuild so the main camera's viewport-aware aspect ratio is current
+    ViewportManager.getInstance().update(this.dt);
     // Rebuild projection matrix after camera update so FOV lerps are reflected immediately
     this.updatePMatrix();
 
@@ -869,7 +882,7 @@ export class WebGLRenderer {
 
     for (let i = 0; i < 16; i++) {
       if (isNaN(projectionMatrix[i])) {
-        const fov = settingsManager.fieldOfView;
+        const fov = mainCamera.fov;
         const aspect = this.gl ? this.gl.drawingBufferWidth / this.gl.drawingBufferHeight : 'no-gl';
         const cameraType = mainCamera.cameraType;
 

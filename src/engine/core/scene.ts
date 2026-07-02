@@ -108,9 +108,18 @@ export class Scene {
   secondaryCovBubble: Ellipsoid;
   worldShift = [0, 0, 0];
 
-  /** Override for worldShift, set by plugin camera modes (e.g. flat map sets [0,0,0]). */
+  /** worldShift before any override is applied; used to re-resolve worldShift per camera pass. */
+  private worldShiftBase_: [number, number, number] = [0, 0, 0];
+
+  /**
+   * Scene-wide override for worldShift (e.g. offscreen captures that own the whole canvas).
+   * Per-view overrides belong on Camera.worldShiftOverride instead.
+   */
   worldShiftOverride: [number, number, number] | null = null;
-  /** Override for gl.clearColor, set by plugin camera modes (e.g. polar view uses dark gray). */
+  /**
+   * Scene-wide override for gl.clearColor. Per-view overrides belong on
+   * Camera.clearColorOverride instead.
+   */
   clearColorOverride: [number, number, number, number] | null = null;
 
   static getInstance(): Scene {
@@ -196,13 +205,22 @@ export class Scene {
   }
 
   updateWorldShift() {
-    // Plugin camera modes (e.g. flat map) can override worldShift
-    if (this.worldShiftOverride) {
-      this.worldShift = [...this.worldShiftOverride];
+    this.updateWorldShiftBase_();
+    this.applyWorldShiftForCamera(ServiceLocator.getMainCamera());
+  }
 
-      return;
-    }
+  /**
+   * Re-resolves the effective worldShift for the camera about to render.
+   * Scene-wide overrides (offscreen captures) win, then the camera's own
+   * override (2D modes), then the computed base value.
+   */
+  applyWorldShiftForCamera(camera: Camera | null): void {
+    const override = this.worldShiftOverride ?? camera?.worldShiftOverride ?? null;
 
+    this.worldShift = override ? [...override] : [...this.worldShiftBase_];
+  }
+
+  private updateWorldShiftBase_() {
     switch (settingsManager.centerBody) {
       case SolarBody.Mercury:
       case SolarBody.Venus:
@@ -212,7 +230,7 @@ export class Scene {
       case SolarBody.Saturn:
       case SolarBody.Uranus:
       case SolarBody.Neptune:
-        this.worldShift = (this.getBodyById(settingsManager.centerBody)!.position as [number, number, number]).map((coord: number) => -coord) as [number, number, number];
+        this.worldShiftBase_ = (this.getBodyById(settingsManager.centerBody)!.position as [number, number, number]).map((coord: number) => -coord) as [number, number, number];
         break;
       case SolarBody.Pluto:
       case SolarBody.Makemake:
@@ -224,21 +242,21 @@ export class Scene {
       case SolarBody.Orcus:
       case SolarBody.Gonggong:
       case SolarBody.Charon:
-        this.worldShift = (this.dwarfPlanets[settingsManager.centerBody]!.position as [number, number, number]).map((coord: number) => -coord) as [number, number, number];
+        this.worldShiftBase_ = (this.dwarfPlanets[settingsManager.centerBody]!.position as [number, number, number]).map((coord: number) => -coord) as [number, number, number];
         break;
       case SolarBody.Sun:
-        this.worldShift = [this.sun.eci.x, this.sun.eci.y, this.sun.eci.z].map((coord: number) => -coord) as [number, number, number];
+        this.worldShiftBase_ = [this.sun.eci.x, this.sun.eci.y, this.sun.eci.z].map((coord: number) => -coord) as [number, number, number];
         break;
       case SolarBody.Earth:
-        this.worldShift = [0, 0, 0];
+        this.worldShiftBase_ = [0, 0, 0];
         break;
       default:
         if (this.deepSpaceSatellites?.[settingsManager.centerBody]) {
           const sat = this.deepSpaceSatellites[settingsManager.centerBody];
 
-          this.worldShift = (sat.position as [number, number, number]).map((coord: number) => -coord) as [number, number, number];
+          this.worldShiftBase_ = (sat.position as [number, number, number]).map((coord: number) => -coord) as [number, number, number];
         } else {
-          this.worldShift = [0, 0, 0];
+          this.worldShiftBase_ = [0, 0, 0];
         }
     }
 
@@ -249,12 +267,12 @@ export class Scene {
     if (selectSatManager && selectSatManager.primarySatObj.id !== -1) {
       const satelliteOffset = ServiceLocator.getDotsManager().getPositionArray(selectSatManager.primarySatObj.id).map((coord) => -coord);
 
-      this.worldShift = satelliteOffset as [number, number, number];
+      this.worldShiftBase_ = satelliteOffset as [number, number, number];
     }
   }
 
   render(renderer: WebGLRenderer, camera: Camera): void {
-    this.clear();
+    this.clear(camera);
 
     this.renderBackground(renderer, camera);
     this.renderOpaque(renderer, camera);
@@ -285,8 +303,12 @@ export class Scene {
       return; // Plugin handled background rendering
     }
 
+    // Sun/godrays only render in the main pane; their screen-space compositing
+    // assumes the full canvas and produces artifacts in small scissored panes
+    const isSecondaryPass = ServiceLocator.getViewportManager()?.isSecondaryRenderPass() ?? false;
+
     if (!settingsManager.isDrawLess) {
-      if (settingsManager.isDrawSun) {
+      if (settingsManager.isDrawSun && !isSecondaryPass) {
         const fb = settingsManager.isDisableGodrays ? null : this.frameBuffers.godrays;
 
         // Draw the Sun to the Godrays Frame Buffer
@@ -478,7 +500,7 @@ export class Scene {
     }
   }
 
-  clear(): void {
+  clear(camera?: Camera | null): void {
     const gl = this.gl_;
     /*
      * NOTE: clearColor is set here because two different colors are used. If you set it during
@@ -496,13 +518,15 @@ export class Scene {
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
 
-    // Switch back to the canvas
+    // Switch back to the canvas. Scene-wide override wins, then the camera's own.
+    const clearColorOverride = this.clearColorOverride ?? camera?.clearColorOverride ?? null;
+
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    if (this.clearColorOverride) {
-      gl.clearColor(...this.clearColorOverride);
+    if (clearColorOverride) {
+      gl.clearColor(...clearColorOverride);
     }
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    if (this.clearColorOverride) {
+    if (clearColorOverride) {
       gl.clearColor(0.0, 0.0, 0.0, 1.0);
     }
 

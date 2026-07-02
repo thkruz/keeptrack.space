@@ -21,6 +21,7 @@ import { glsl } from '../utils/development/formatter';
 import { ensureVelocityVec3 } from '../utils/space-object-invariants';
 import { BufferAttribute } from './buffer-attribute';
 import { DepthManager } from './depth-manager';
+import { ViewportManager } from './viewport-manager';
 import { IDotsShaderProvider } from './dots-shader-provider';
 import { createBaseFragShader, createBaseVertShader } from './dots-shaders-base';
 import { WebGlProgramHelper } from './webgl-program';
@@ -258,8 +259,9 @@ export class DotsManager {
       gl.uniform1f(this.programs.dots.uniforms.u_maxSize, this.settings_.satShader.maxSizePlanetarium);
       gl.uniform1f(this.programs.dots.uniforms.u_starMinSize, this.settings_.satShader.minSizePlanetarium);
     } else {
-      gl.uniform1f(this.programs.dots.uniforms.u_minSize, this.settings_.satShader.minSize);
-      gl.uniform1f(this.programs.dots.uniforms.u_maxSize, this.settings_.satShader.maxSize);
+      // Per-camera dot sizes (driven by that camera's zoom), falling back to settings defaults
+      gl.uniform1f(this.programs.dots.uniforms.u_minSize, mainCamera.satShaderSizes.minSize ?? this.settings_.satShader.minSize);
+      gl.uniform1f(this.programs.dots.uniforms.u_maxSize, mainCamera.satShaderSizes.maxSize ?? this.settings_.satShader.maxSize);
       gl.uniform1f(this.programs.dots.uniforms.u_starMinSize, this.settings_.satShader.starMinSize);
     }
 
@@ -379,7 +381,8 @@ export class DotsManager {
     gl.bindVertexArray(null);
 
     if (!settingsManager.isMobileModeEnabled) {
-      gl.disable(gl.SCISSOR_TEST);
+      // Restore the active viewport pass's scissor (disables it in single view)
+      ViewportManager.getInstance().applyPassScissor(gl);
     }
   }
 

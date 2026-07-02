@@ -71,6 +71,20 @@ export interface ICameraModeDelegate {
   onExit(camera: Camera): void;
 }
 
+/**
+ * Sub-region of the canvas a camera renders into, in canvas pixels with the
+ * GL convention of y measured from the BOTTOM of the drawing buffer.
+ * Null viewport means the camera fills the whole drawing buffer.
+ */
+export interface CameraViewportRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export type CameraModeDelegateFactory = () => ICameraModeDelegate;
+
 export class Camera {
   state = new CameraState();
   inputHandler = new CameraInputHandler(this);
@@ -99,12 +113,57 @@ export class Camera {
   private fovTarget_: Radians | null = null;
   private fovDefault_: Radians | null = null;
 
+  /**
+   * Static factories for plugin camera modes. Each Camera instance lazily creates
+   * its own delegate from the factory (delegates hold per-view pan/zoom state, so
+   * a single instance must never be shared between cameras).
+   */
+  private static readonly modeDelegateFactories_ = new Map<CameraType, CameraModeDelegateFactory>();
+
+  static registerModeDelegateFactory(type: CameraType, factory: CameraModeDelegateFactory): void {
+    Camera.modeDelegateFactories_.set(type, factory);
+  }
+
+  static unregisterModeDelegateFactory(type: CameraType): void {
+    Camera.modeDelegateFactories_.delete(type);
+  }
+
   registerCameraModeDelegate(type: CameraType, delegate: ICameraModeDelegate): void {
     this.cameraModeDelegates_.set(type, delegate);
   }
 
   unregisterCameraModeDelegate(type: CameraType): void {
     this.cameraModeDelegates_.delete(type);
+  }
+
+  /** Instance delegate if registered, otherwise lazily instantiated from the static factory. */
+  private getModeDelegate_(type: CameraType): ICameraModeDelegate | undefined {
+    let delegate = this.cameraModeDelegates_.get(type);
+
+    if (!delegate) {
+      const factory = Camera.modeDelegateFactories_.get(type);
+
+      if (factory) {
+        delegate = factory();
+        this.cameraModeDelegates_.set(type, delegate);
+      }
+    }
+
+    return delegate;
+  }
+
+  hasModeDelegate(type: CameraType): boolean {
+    return this.cameraModeDelegates_.has(type) || Camera.modeDelegateFactories_.has(type);
+  }
+
+  /**
+   * Runs the current mode delegate's onExit (if any). Call before discarding a
+   * camera that may be in a delegate mode, so global overrides the delegate
+   * installed (e.g. selected-color override) are cleaned up.
+   */
+  deactivateModeDelegate(): void {
+    this.getModeDelegate_(this.cameraType)?.onExit(this);
+    this.lastCameraType_ = this.cameraType;
   }
 
   private normForward_ = vec3.create();
@@ -144,6 +203,62 @@ export class Camera {
   }
   matrixWorldInverse = mat4.create();
   cameraType: CameraType = CameraType.FIXED_TO_EARTH;
+
+  /**
+   * Sub-region of the canvas this camera renders into (canvas px, y from bottom).
+   * Null means the full drawing buffer (single-view default).
+   */
+  viewport: CameraViewportRect | null = null;
+
+  private fov_: Radians | null = null;
+
+  /**
+   * Per-camera field of view. Falls back to settingsManager.fieldOfView until the
+   * camera writes its own value, so the setting remains the initial/default FOV.
+   */
+  get fov(): Radians {
+    return this.fov_ ?? settingsManager.fieldOfView;
+  }
+
+  set fov(val: Radians) {
+    this.fov_ = val;
+  }
+
+  /**
+   * Per-camera dot size range for the dots shader, driven by zoom level.
+   * Null entries fall back to settingsManager.satShader values.
+   */
+  satShaderSizes: { minSize: number | null; maxSize: number | null } = { minSize: null, maxSize: null };
+
+  /** Per-camera world shift override (2D modes pin the world at the origin). */
+  worldShiftOverride: [number, number, number] | null = null;
+  /** Per-camera clear color override (e.g. polar view uses dark gray). */
+  clearColorOverride: [number, number, number, number] | null = null;
+
+  /** Resolved viewport rect, falling back to the full drawing buffer. */
+  getViewportRect(gl: WebGL2RenderingContext): CameraViewportRect {
+    return this.viewport ?? { x: 0, y: 0, width: gl.drawingBufferWidth, height: gl.drawingBufferHeight };
+  }
+
+  /** Aspect ratio of this camera's viewport (full buffer when no viewport set). */
+  getAspectRatio(gl: WebGL2RenderingContext): number {
+    const rect = this.getViewportRect(gl);
+
+    return rect.width / rect.height;
+  }
+
+  /**
+   * Converts canvas-relative mouse coordinates (y from TOP) to this camera's
+   * viewport-local normalized device coordinates.
+   */
+  getViewportNdc(gl: WebGL2RenderingContext, mouseX: number, mouseY: number): { x: number; y: number } {
+    const rect = this.getViewportRect(gl);
+    const topOffset = gl.drawingBufferHeight - (rect.y + rect.height);
+    const x = ((mouseX - rect.x) / rect.width) * 2 - 1;
+    const y = -(((mouseY - topOffset) / rect.height) * 2 - 1);
+
+    return { x, y };
+  }
 
   resetRotation() {
     if (this.cameraType !== CameraType.FPS) {
@@ -248,7 +363,7 @@ export class Camera {
     }
 
     // Skip delegate-backed camera modes if their delegate isn't registered (pro plugin not loaded)
-    if (this.cameraType === CameraType.FLAT_MAP && !this.cameraModeDelegates_.has(CameraType.FLAT_MAP)) {
+    if (this.cameraType === CameraType.FLAT_MAP && !this.hasModeDelegate(CameraType.FLAT_MAP)) {
       this.cameraType++;
     }
 
@@ -263,7 +378,7 @@ export class Camera {
       this.cameraType++;
     }
 
-    if (this.cameraType === CameraType.POLAR_VIEW && !this.cameraModeDelegates_.has(CameraType.POLAR_VIEW)) {
+    if (this.cameraType === CameraType.POLAR_VIEW && !this.hasModeDelegate(CameraType.POLAR_VIEW)) {
       this.cameraType++;
     }
 
@@ -287,7 +402,7 @@ export class Camera {
       const renderer = ServiceLocator.getRenderer();
 
       this.state.isLocalRotateReset = true;
-      settingsManager.fieldOfView = 0.6 as Radians;
+      this.fov = 0.6 as Radians;
       renderer.glInit();
       if ((selectSatManagerInstance?.selectedSat ?? '-1') !== '-1') {
         this.state.camZoomSnappedOnSat = true;
@@ -325,7 +440,7 @@ export class Camera {
     }
 
     // Delegate to plugin camera mode (e.g. flat map, polar view) if registered
-    if (this.cameraModeDelegates_.get(this.cameraType)?.zoomWheel(this, delta)) {
+    if (this.getModeDelegate_(this.cameraType)?.zoomWheel(this, delta)) {
       return;
     }
 
@@ -357,15 +472,14 @@ export class Camera {
 
   private zoomWheelFov_(delta: number) {
     if (this.cameraType === CameraType.PLANETARIUM || this.cameraType === CameraType.FPS || this.cameraType === CameraType.ASTRONOMY) {
-      settingsManager.fieldOfView = settingsManager.fieldOfView + (delta * 0.0002) as Radians;
-      // getEl('fov-text').innerHTML = 'FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg';
-      if (settingsManager.fieldOfView > settingsManager.fieldOfViewMax) {
-        settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
+      this.fov = this.fov + (delta * 0.0002) as Radians;
+      if (this.fov > settingsManager.fieldOfViewMax) {
+        this.fov = settingsManager.fieldOfViewMax;
       }
-      if (settingsManager.fieldOfView < settingsManager.fieldOfViewMin) {
-        settingsManager.fieldOfView = settingsManager.fieldOfViewMin as Radians;
+      if (this.fov < settingsManager.fieldOfViewMin) {
+        this.fov = settingsManager.fieldOfViewMin as Radians;
       }
-      this.fovTarget_ = settingsManager.fieldOfView;
+      this.fovTarget_ = this.fov;
       ServiceLocator.getRenderer().glInit();
     }
   }
@@ -397,8 +511,8 @@ export class Camera {
 
     // Detect camera mode transitions for delegate enter/exit (handles direct cameraType assignment)
     if (this.lastCameraType_ !== this.cameraType) {
-      this.cameraModeDelegates_.get(this.lastCameraType_)?.onExit(this);
-      this.cameraModeDelegates_.get(this.cameraType)?.onEnter(this);
+      this.getModeDelegate_(this.lastCameraType_)?.onExit(this);
+      this.getModeDelegate_(this.cameraType)?.onEnter(this);
 
       // Set FOV target based on new camera mode
       if (this.isSatelliteFocusedMode_(this.cameraType)) {
@@ -410,8 +524,8 @@ export class Camera {
         this.fovTarget_ = settingsManager.fieldOfViewSatellite;
       } else if (this.isSatelliteFocusedMode_(this.lastCameraType_)) {
         // We are exiting a satellite-focused mode; restore the last non-satellite FOV
-        // (fall back to the current settings value if none was captured).
-        this.fovTarget_ = this.fovDefault_ ?? settingsManager.fieldOfView;
+        // (fall back to the current value if none was captured).
+        this.fovTarget_ = this.fovDefault_ ?? this.fov;
       }
     }
     this.lastCameraType_ = this.cameraType;
@@ -476,7 +590,7 @@ export class Camera {
         break;
       }
       default:
-        this.cameraModeDelegates_.get(this.cameraType)?.draw(this);
+        this.getModeDelegate_(this.cameraType)?.draw(this);
         break;
     }
 
@@ -716,7 +830,7 @@ export class Camera {
     if (typeof val !== 'number') {
       throw new TypeError();
     }
-    if (val > 6 || val < 0) {
+    if (val >= CameraType.MAX_CAMERA_TYPES || val < 0) {
       throw new RangeError();
     }
 
@@ -731,7 +845,7 @@ export class Camera {
    *
    * Splitting it into subfunctions would not be optimal
    */
-  snapToSat(sat: Satellite | MissileObject, simulationTime: Date) {
+  snapToSat(sat: Satellite | MissileObject, simulationTime: Date, isApplyGlobalEffects = true) {
     if (typeof sat === 'undefined' || sat === null) {
       return;
     }
@@ -810,10 +924,12 @@ export class Camera {
       this.state.zoomTarget =
         ((this.state.camSnapToSat.camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance)) ** (1 / ZOOM_EXP);
 
-      if (!settingsManager.isMobileModeEnabled) {
-        settingsManager.selectedColor = [0, 0, 0, 0];
-      } else {
-        settingsManager.selectedColor = settingsManager.selectedColorFallback;
+      if (isApplyGlobalEffects) {
+        if (!settingsManager.isMobileModeEnabled) {
+          settingsManager.selectedColor = [0, 0, 0, 0];
+        } else {
+          settingsManager.selectedColor = settingsManager.selectedColorFallback;
+        }
       }
 
       // Only Zoom in Once on Mobile
@@ -823,7 +939,7 @@ export class Camera {
     }
 
     // Switch near/far renderer based on satellite distance for z-buffer precision
-    if (this.state.camZoomSnappedOnSat) {
+    if (this.state.camZoomSnappedOnSat && isApplyGlobalEffects) {
       if (this.state.camDistBuffer <= settingsManager.nearZoomLevel) {
         ServiceLocator.getRenderer().setNearRenderer();
       } else {
@@ -890,8 +1006,10 @@ export class Camera {
 
       return;
     }
-    if (this.cameraModeDelegates_.has(this.cameraType)) {
-      this.cameraModeDelegates_.get(this.cameraType)!.update(this, dt);
+    const modeDelegate = this.getModeDelegate_(this.cameraType);
+
+    if (modeDelegate) {
+      modeDelegate.update(this, dt);
 
       return;
     }
@@ -1885,7 +2003,7 @@ export class Camera {
     if (this.state.isDragging) {
 
       // Delegate to plugin camera mode (e.g. flat map, polar view) if registered
-      if (this.cameraModeDelegates_.get(this.cameraType)?.handleDrag(this)) {
+      if (this.getModeDelegate_(this.cameraType)?.handleDrag(this)) {
         return;
       }
 
@@ -1996,13 +2114,13 @@ export class Camera {
       const endDist = 280000;
 
       if (cameraDistance <= startDist) {
-        settingsManager.satShader.minSize = minSizeMax;
+        this.satShaderSizes.minSize = minSizeMax;
       } else if (cameraDistance >= endDist) {
-        settingsManager.satShader.minSize = minSizeMin;
+        this.satShaderSizes.minSize = minSizeMin;
       } else {
         const t = (cameraDistance - startDist) / (endDist - startDist); // 0..1
 
-        settingsManager.satShader.minSize = minSizeMax + (minSizeMin - minSizeMax) * t;
+        this.satShaderSizes.minSize = minSizeMax + (minSizeMin - minSizeMax) * t;
       }
     }
 
@@ -2048,11 +2166,11 @@ export class Camera {
 
   updateSatShaderSizes() {
     if (this.state.zoomLevel > settingsManager.satShader.largeObjectMaxZoom) {
-      settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize * 1.5;
+      this.satShaderSizes.maxSize = settingsManager.satShader.maxAllowedSize * 1.5;
     } else if (this.state.zoomLevel < settingsManager.satShader.largeObjectMinZoom) {
-      settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize / 3;
+      this.satShaderSizes.maxSize = settingsManager.satShader.maxAllowedSize / 3;
     } else {
-      settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize;
+      this.satShaderSizes.maxSize = settingsManager.satShader.maxAllowedSize;
     }
   }
 
@@ -2064,27 +2182,27 @@ export class Camera {
 
   /**
    * Set the field of view immediately, including the lerp target.
-   * Writing settingsManager.fieldOfView alone is not enough — updateFovLerp_()
-   * pulls the value back toward fovTarget_ on every update, so callers that need
-   * a stable FOV (e.g. offscreen capture) must go through this method.
+   * Writing camera.fov alone is not enough — updateFovLerp_() pulls the value
+   * back toward fovTarget_ on every update, so callers that need a stable FOV
+   * (e.g. offscreen capture) must go through this method.
    */
   setFieldOfView(fov: Radians): void {
-    settingsManager.fieldOfView = fov;
+    this.fov = fov;
     this.fovTarget_ = fov;
   }
 
   private updateFovLerp_(dt: Milliseconds): void {
     if (this.fovTarget_ === null) {
-      this.fovTarget_ = settingsManager.fieldOfView;
-      this.fovDefault_ = settingsManager.fieldOfView;
+      this.fovTarget_ = this.fov;
+      this.fovDefault_ = this.fov;
     }
 
-    const current = settingsManager.fieldOfView;
+    const current = this.fov;
     const diff = this.fovTarget_ - current;
 
     if (Math.abs(diff) < 0.0001) {
       if (current !== this.fovTarget_) {
-        settingsManager.fieldOfView = this.fovTarget_;
+        this.fov = this.fovTarget_;
       }
 
       return;
@@ -2092,14 +2210,16 @@ export class Camera {
 
     const alpha = 1 - Math.exp(-settingsManager.fieldOfViewLerpSpeed * dt / 1000);
 
-    settingsManager.fieldOfView = (current + diff * alpha) as Radians;
+    this.fov = (current + diff * alpha) as Radians;
   }
 
-  static calculatePMatrix(gl: WebGL2RenderingContext): mat4 {
+  static calculatePMatrix(gl: WebGL2RenderingContext, camera?: Camera | null): mat4 {
     const depthConfig = DepthManager.getConfig();
     const pMatrix = mat4.create();
+    const fov = camera?.fov ?? settingsManager.fieldOfView;
+    const aspect = camera ? camera.getAspectRatio(gl) : gl.drawingBufferWidth / gl.drawingBufferHeight;
 
-    mat4.perspective(pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, depthConfig.near, depthConfig.far);
+    mat4.perspective(pMatrix, fov, aspect, depthConfig.near, depthConfig.far);
 
     // This converts everything from 3D space to ECI (z and y planes are swapped)
     const eciToOpenGlMat: mat4 = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];

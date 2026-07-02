@@ -703,10 +703,10 @@ export class WebGLRenderer {
       const primarySat = ServiceLocator.getCatalogManager().getObject(this.selectSatManager_.primarySatObj.id, GetSatType.POSITION_ONLY) as Satellite | MissileObject;
       const satelliteOffset = ServiceLocator.getDotsManager().getPositionArray(this.selectSatManager_.primarySatObj.id).map((coord) => -coord);
 
-      sceneInstance.worldShift = satelliteOffset as [number, number, number];
-      // sceneInstance.worldShift[0] = satelliteOffset[0] - sceneInstance.worldShift[0];
-      // sceneInstance.worldShift[1] = satelliteOffset[1] - sceneInstance.worldShift[1];
-      // sceneInstance.worldShift[2] = satelliteOffset[2] - sceneInstance.worldShift[2];
+      // Route through the base+resolve path (NOT a raw worldShift write): the
+      // mesh position baked below must use the resolved shift, which is [0,0,0]
+      // when the main camera is in a 2D mode with a world-shift override
+      sceneInstance.setWorldShiftBase(satelliteOffset as [number, number, number]);
 
       this.meshManager.update(timeManagerInstance.selectedDate, primarySat as Satellite);
       ServiceLocator.getMainCamera().snapToSat(primarySat, timeManagerInstance.simulationTimeObj);

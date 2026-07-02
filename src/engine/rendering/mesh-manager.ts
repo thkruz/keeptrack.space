@@ -6,6 +6,7 @@ import { mat3, mat4, vec3 } from 'gl-matrix';
 import { Layout, Mesh } from 'webgl-obj-loader';
 import { MissileObject } from '../../app/data/catalog-manager/MissileObject';
 import { SplashScreen } from '../../app/ui/splash-screen';
+import { Scene } from '../core/scene';
 import { ServiceLocator } from '../core/service-locator';
 import { errorManagerInstance } from '../utils/errorManager';
 import { BufferAttribute } from './buffer-attribute';
@@ -172,10 +173,15 @@ export class MeshManager {
       this.loadMesh_(modelName);
     }
 
-    const drawPosition = position.map((coord) => coord / 1e11) as EciArr3;
+    // Shifted-world location (exactly [0,0,0] when the frame shift centers on this body)
+    const worldShift = Scene.getInstance().worldShift;
 
     this.mvMatrix_ = mat4.create();
-    mat4.translate(this.mvMatrix_, this.mvMatrix_, drawPosition);
+    mat4.translate(this.mvMatrix_, this.mvMatrix_, [
+      position[0] + worldShift[0],
+      position[1] + worldShift[1],
+      position[2] + worldShift[2],
+    ]);
 
     // Apply manual rotation
     mat4.rotateX(this.mvMatrix_, this.mvMatrix_, settingsManager.meshRotation.x * DEG2RAD);
@@ -210,9 +216,18 @@ export class MeshManager {
     // We need to avoid zero values. They break mat4.targetTo
     drawPosition = drawPosition.map((coord) => coord / 1e11) as EciArr3;
 
-    // Move the mesh to its location in world space
+    // Move the mesh to its shifted-world location. When the frame shift is the
+    // classic satellite-centered one this is exactly [0,0,0]; when a 2D main
+    // camera resolves the shift to zero (multi-view), the mesh must sit at its
+    // true ECI position or it renders at the Earth's center in other panes.
+    const worldShift = Scene.getInstance().worldShift;
+
     this.mvMatrix_ = mat4.create();
-    mat4.translate(this.mvMatrix_, this.mvMatrix_, drawPosition);
+    mat4.translate(this.mvMatrix_, this.mvMatrix_, [
+      position.x + worldShift[0],
+      position.y + worldShift[1],
+      position.z + worldShift[2],
+    ]);
 
     if (
       this.currentMeshObject.isRotationStable ||

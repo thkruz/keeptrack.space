@@ -220,6 +220,17 @@ export class Scene {
     this.worldShift = override ? [...override] : [...this.worldShiftBase_];
   }
 
+  /**
+   * Sets the frame's base world shift (satellite tracking writes this every
+   * frame) and immediately re-resolves the effective shift for the main
+   * camera. Update-time consumers (mesh positions, Earth's model matrix) must
+   * bake the SAME value that render passes later read, or panes desync.
+   */
+  setWorldShiftBase(base: [number, number, number]): void {
+    this.worldShiftBase_ = base;
+    this.applyWorldShiftForCamera(ServiceLocator.getMainCamera());
+  }
+
   private updateWorldShiftBase_() {
     switch (settingsManager.centerBody) {
       case SolarBody.Mercury:

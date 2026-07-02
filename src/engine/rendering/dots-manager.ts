@@ -228,12 +228,15 @@ export class DotsManager {
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
     gl.uniformMatrix4fv(this.programs.dots.uniforms.u_pMvCamMatrix, false, projectionCameraMatrix);
-    gl.uniform3fv(this.programs.dots.uniforms.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     const mainCamera = ServiceLocator.getMainCamera();
     const isFlatMap = mainCamera.cameraType === CameraType.FLAT_MAP;
 
     const isPolarView = mainCamera.cameraType === CameraType.POLAR_VIEW;
+
+    // 2D projections reproject raw ECI in-shader; the world offset must be
+    // zero for them even when the frame shift is satellite-centered
+    gl.uniform3fv(this.programs.dots.uniforms.worldOffset, isFlatMap || isPolarView ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     gl.uniform1i(this.programs.dots.uniforms.u_flatMapMode, isFlatMap ? 1 : 0);
     gl.uniform1i(this.programs.dots.uniforms.u_polarViewMode, isPolarView ? 1 : 0);
@@ -343,11 +346,13 @@ export class DotsManager {
     gl.bindFramebuffer(gl.FRAMEBUFFER, ServiceLocator.getScene().frameBuffers.gpuPicking);
 
     gl.uniformMatrix4fv(this.programs.picking.uniforms.u_pMvCamMatrix, false, pMvCamMatrix);
-    gl.uniform3fv(this.programs.picking.uniforms.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     const mainCam = ServiceLocator.getMainCamera();
     const isFlatMapPick = mainCam.cameraType === CameraType.FLAT_MAP;
     const isPolarViewPick = mainCam.cameraType === CameraType.POLAR_VIEW;
+
+    // 2D projections reproject raw ECI in-shader; zero the world offset for them
+    gl.uniform3fv(this.programs.picking.uniforms.worldOffset, isFlatMapPick || isPolarViewPick ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     gl.uniform1i(this.programs.picking.uniforms.u_flatMapMode, isFlatMapPick ? 1 : 0);
     gl.uniform1i(this.programs.picking.uniforms.u_polarViewMode, isPolarViewPick ? 1 : 0);
@@ -396,11 +401,13 @@ export class DotsManager {
     gl.useProgram(this.programs.picking.program);
 
     gl.uniformMatrix4fv(this.programs.picking.uniforms.u_pMvCamMatrix, false, pMvCamMatrix);
-    gl.uniform3fv(this.programs.picking.uniforms.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     const mainCam = ServiceLocator.getMainCamera();
     const isFlatMap = mainCam.cameraType === CameraType.FLAT_MAP;
     const isPolarView = mainCam.cameraType === CameraType.POLAR_VIEW;
+
+    // 2D projections reproject raw ECI in-shader; zero the world offset for them
+    gl.uniform3fv(this.programs.picking.uniforms.worldOffset, isFlatMap || isPolarView ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     gl.uniform1i(this.programs.picking.uniforms.u_flatMapMode, isFlatMap ? 1 : 0);
     gl.uniform1i(this.programs.picking.uniforms.u_polarViewMode, isPolarView ? 1 : 0);

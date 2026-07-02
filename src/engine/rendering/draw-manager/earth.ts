@@ -457,10 +457,12 @@ export class Earth {
     const mainCam = ServiceLocator.getMainCamera();
 
     gl.uniformMatrix4fv(uniforms.u_pMvCamMatrix, false, ServiceLocator.getRenderer().projectionCameraMatrix);
-    gl.uniform3fv(uniforms.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     const isFlatMap = mainCam.cameraType === CameraType.FLAT_MAP;
     const isPolarView = mainCam.cameraType === CameraType.POLAR_VIEW;
+
+    // 2D projections reproject raw ECI in-shader; zero the world offset for them
+    gl.uniform3fv(uniforms.worldOffset, isFlatMap || isPolarView ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     gl.uniform1i(uniforms.u_flatMapMode, isFlatMap ? 1 : 0);
     gl.uniform1i(uniforms.u_polarViewMode, isPolarView ? 1 : 0);

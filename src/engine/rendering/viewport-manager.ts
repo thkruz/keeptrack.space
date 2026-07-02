@@ -286,11 +286,11 @@ export class ViewportManager {
       ServiceLocator.setActiveRenderCamera(camera);
       try {
         this.applyPassViewport(gl);
-        // Panes without their own world-shift override inherit the main pane's
-        // shift: update-time transforms (Earth model matrix, mesh positions)
-        // were computed with the main camera's shift, so re-resolving per
-        // camera would desync the dots from them
-        scene.applyWorldShiftForCamera(camera.worldShiftOverride ? camera : mainViewport.camera);
+        // NOTE: Scene.worldShift is intentionally NOT re-resolved per pass.
+        // Update-time transforms (Earth model matrix, mesh positions) baked the
+        // frame's resolved shift once; every pass must use that same value or
+        // draw-time consumers (dot shader offsets, camera eyes) desync from
+        // them. 2D projection shaders ignore the offset via their uniforms.
 
         // Secondary perspective cameras rebuild their projection each pass
         // (the renderer's updatePMatrix only maintains the main camera's).
@@ -311,7 +311,6 @@ export class ViewportManager {
     // post-draw consumers (picking readback, worker culling, overlays)
     gl.disable(gl.SCISSOR_TEST);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-    scene.applyWorldShiftForCamera(mainViewport.camera);
     renderer.projectionCameraMatrix = mat4.mul(mat4.create(), mainViewport.camera.projectionMatrix, mainViewport.camera.matrixWorldInverse);
   }
 

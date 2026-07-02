@@ -616,10 +616,12 @@ export class LineManager {
 
     gl.uniformMatrix4fv(this.uniforms_.u_pCamMatrix, false, projectionCameraMatrix);
     gl.uniformMatrix4fv(this.uniforms_.u_mVMatrix, false, modelViewMatrix);
-    gl.uniform3fv(this.uniforms_.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     const isFlatMap = mainCamera.cameraType === CameraType.FLAT_MAP;
     const isPolarView = mainCamera.cameraType === CameraType.POLAR_VIEW;
+
+    // 2D projections reproject raw ECI in-shader; zero the world offset for them
+    gl.uniform3fv(this.uniforms_.worldOffset, isFlatMap || isPolarView ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     // Always set u_gmst — needed by flat map, polar view, AND ECF mode
     gl.uniform1f(this.uniforms_.u_gmst, ServiceLocator.getTimeManager().gmst);

@@ -208,9 +208,11 @@ export class SatLabelManager {
 
     // Set uniforms
     gl.uniformMatrix4fv(this.uniforms_.u_pMvCamMatrix, false, projectionCameraMatrix);
-    gl.uniform3fv(this.uniforms_.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     const isFlatMapLabel = ServiceLocator.getMainCamera().cameraType === CameraType.FLAT_MAP;
+
+    // 2D projections reproject raw ECI in-shader; zero the world offset for them
+    gl.uniform3fv(this.uniforms_.worldOffset, isFlatMapLabel ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     gl.uniform1i(this.uniforms_.u_flatMapMode, isFlatMapLabel ? 1 : 0);
     gl.uniform1f(this.uniforms_.u_gmst, ServiceLocator.getDotsManager().cruncherGmst);

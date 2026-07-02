@@ -30,6 +30,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { GlUtils } from '@app/engine/rendering/gl-utils';
 import { GLSL3 } from '@app/engine/rendering/material';
+import { ViewportManager } from '@app/engine/rendering/viewport-manager';
 import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
@@ -498,7 +499,8 @@ export class Earth {
     gl.drawElements(gl.TRIANGLES, this.surfaceMesh.geometry.indexLength, this.surfaceMesh.geometry.indexType, 0);
 
     if (!settingsManager.isMobileModeEnabled) {
-      gl.disable(gl.SCISSOR_TEST);
+      // Restore the active viewport pass's scissor (disables it in single view)
+      ViewportManager.getInstance().applyPassScissor(gl);
     }
 
     gl.bindVertexArray(null);

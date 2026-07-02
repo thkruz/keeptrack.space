@@ -139,7 +139,7 @@ export class InputManager {
     return outputArray;
   }
 
-  public static getEarthScreenPoint(x: number, y: number): Kilometers[] {
+  public static getEarthScreenPoint(x: number, y: number, camera = ServiceLocator.getMainCamera()): Kilometers[] {
     if (typeof x === 'undefined' || typeof y === 'undefined') {
       throw new Error('x and y must be defined');
     }
@@ -148,9 +148,9 @@ export class InputManager {
     }
 
     // Where is the camera
-    const rayOrigin = ServiceLocator.getMainCamera().getForwardVector();
+    const rayOrigin = camera.getForwardVector();
     // What did we click on
-    const ptThru = InputManager.unProject(x, y);
+    const ptThru = InputManager.unProject(x, y, camera);
 
     // Clicked on minus starting point is our direction vector
     const rayDir = vec3.create();
@@ -226,17 +226,17 @@ export class InputManager {
     }
   }
 
-  public static unProject(x: number, y: number): [number, number, number] {
+  public static unProject(x: number, y: number, camera = ServiceLocator.getMainCamera()): [number, number, number] {
     const renderer = ServiceLocator.getRenderer();
     const { gl } = renderer;
 
-    const glScreenX = (x / gl.drawingBufferWidth) * 2 - 1.0;
-    const glScreenY = 1.0 - (y / gl.drawingBufferHeight) * 2;
+    // Viewport-local NDC so panes that only cover part of the canvas unproject correctly
+    const { x: glScreenX, y: glScreenY } = camera.getViewportNdc(gl, x, y);
     const screenVec = <vec4>[glScreenX, glScreenY, -0.01, 1.0]; // gl screen coords
     const comboPMat = mat4.create();
     const invMat = mat4.create();
 
-    mat4.mul(comboPMat, ServiceLocator.getMainCamera().projectionMatrix, ServiceLocator.getMainCamera().matrixWorldInverse);
+    mat4.mul(comboPMat, camera.projectionMatrix, camera.matrixWorldInverse);
     mat4.invert(invMat, comboPMat);
     const worldVec = <[number, number, number, number]>(<unknown>vec4.create());
 
@@ -529,15 +529,15 @@ export class InputManager {
      * Offset size is based on size in style.css
      * TODO: Make this dynamic
      */
-    const mainCameraInstance = ServiceLocator.getMainCamera();
-    const offsetX = mainCameraInstance.state.mouseX < canvasDOM!.clientWidth / 2 ? 0 : -1 * 180;
-    const offsetY = mainCameraInstance.state.mouseY < canvasDOM!.clientHeight / 2 ? 0 : numMenuItems * -25;
+    const inputCamera = ServiceLocator.getViewportManager()?.getInputCamera() ?? ServiceLocator.getMainCamera();
+    const offsetX = inputCamera.state.mouseX < canvasDOM!.clientWidth / 2 ? 0 : -1 * 180;
+    const offsetY = inputCamera.state.mouseY < canvasDOM!.clientHeight / 2 ? 0 : numMenuItems * -25;
 
     rightBtnMenuDOM!.style.display = 'block';
     rightBtnMenuDOM!.style.textAlign = 'center';
     rightBtnMenuDOM!.style.position = 'absolute';
-    rightBtnMenuDOM!.style.left = `${mainCameraInstance.state.mouseX + offsetX}px`;
-    rightBtnMenuDOM!.style.top = `${mainCameraInstance.state.mouseY + offsetY}px`;
+    rightBtnMenuDOM!.style.left = `${inputCamera.state.mouseX + offsetX}px`;
+    rightBtnMenuDOM!.style.top = `${inputCamera.state.mouseY + offsetY}px`;
   }
 
   earthClicked({ clickedSatId }: { clickedSatId: number }) {
@@ -594,14 +594,14 @@ export class InputManager {
       this.updateHoverDelayLimit = settingsManager.updateHoverDelayLimitBig;
     }
 
-    if (ServiceLocator.getMainCamera().state.isDragging) {
+    // Hover picking follows the pane under the cursor in multi-view
+    const inputCamera = ServiceLocator.getViewportManager()?.getInputCamera() ?? ServiceLocator.getMainCamera();
+
+    if (inputCamera.state.isDragging) {
       return;
     }
 
-    const mainCameraInstance = ServiceLocator.getMainCamera();
-
     if (settingsManager.isMobileModeEnabled) {
-      // this.mouse.mouseSat = this.getSatIdFromCoord(mainCameraInstance.mouseX, mainCameraInstance.mouseY);
       return;
     }
 
@@ -614,7 +614,7 @@ export class InputManager {
         this.mouse.mouseSat = uiManagerInstance.searchHoverSatId;
       } else if (!settingsManager.isMobileModeEnabled) {
         if (Date.now() - this.lastUpdateTime > 100) {
-          this.mouse.mouseSat = this.getSatIdFromCoord(mainCameraInstance.state.mouseX, mainCameraInstance.state.mouseY);
+          this.mouse.mouseSat = this.getSatIdFromCoord(inputCamera.state.mouseX, inputCamera.state.mouseY);
           this.lastUpdateTime = Date.now();
         }
       }

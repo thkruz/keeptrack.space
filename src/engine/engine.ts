@@ -12,6 +12,7 @@ import { TimeManager } from './core/time-manager';
 import { EventBus } from './events/event-bus';
 import { EventBusEvent } from './events/event-bus-events';
 import { InputManager } from './input/input-manager';
+import { ViewportManager } from './rendering/viewport-manager';
 import { WebGLRenderer } from './rendering/webgl-renderer';
 import { errorManagerInstance, isOpaqueWindowError } from './utils/errorManager';
 import { isThisNode } from './utils/isThisNode';
@@ -64,6 +65,7 @@ export class Engine {
     Container.getInstance().registerSingleton(Singletons.Scene, this.scene);
     Container.getInstance().registerSingleton(Singletons.InputManager, this.inputManager);
     Container.getInstance().registerSingleton(Singletons.MainCamera, this.camera);
+    Container.getInstance().registerSingleton(Singletons.ViewportManager, ViewportManager.getInstance());
     if (!existingSoundManager) {
       Container.getInstance().registerSingleton(Singletons.SoundManager, this.soundManager);
     }
@@ -164,8 +166,7 @@ export class Engine {
   }
 
   private draw_(dt = <Milliseconds>0) {
-    this.camera.draw(this.renderer.sensorPos);
-    this.renderer.render(this.scene, this.camera);
+    ViewportManager.getInstance().renderAll(this.renderer, this.scene, this.camera);
 
     this.sendCameraDataToWorker_();
 
@@ -203,13 +204,15 @@ export class Engine {
 
     const mainCamera = ServiceLocator.getMainCamera();
     const isFlatOrPolar = mainCamera.cameraType === CameraType.FLAT_MAP || mainCamera.cameraType === CameraType.POLAR_VIEW;
+    // Culling against one camera would hide dots in the other viewport(s)
+    const isMultiView = ViewportManager.getInstance().isMultiViewActive();
     const camPos = mainCamera.getCamPosEarthCentered();
 
     catalogManager.satCruncher.postMessage({
       typ: PosCruncherMsgType.CAMERA_DATA,
       vpMatrix: new Float32Array(this.renderer.projectionCameraMatrix),
       camPosEci: new Float32Array([camPos[0], camPos[1], camPos[2]]),
-      isFrustumCullingEnabled: !isFlatOrPolar,
+      isFrustumCullingEnabled: !isFlatOrPolar && !isMultiView,
     });
   }
 

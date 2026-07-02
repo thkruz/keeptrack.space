@@ -192,6 +192,11 @@ export enum EventBusEvent {
    */
   cameraTypeChanged = 'cameraTypeChanged',
   /**
+   * Emitted when the multi-view viewport layout changes (single, split, PIP).
+   * Parameters: (layout: ViewportLayout)
+   */
+  viewportLayoutChanged = 'viewportLayoutChanged',
+  /**
    * Emitted when the color worker has new color/pickable buffers ready.
    * ColorSchemeManager consumes the data and uploads to GPU.
    */

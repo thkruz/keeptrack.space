@@ -1,5 +1,4 @@
 import { SoundNames } from '@app/engine/audio/sounds';
-import { Camera } from '@app/engine/camera/camera';
 import { CameraType } from '@app/engine/camera/camera-type';
 import { GetSatType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -57,7 +56,7 @@ export class MouseInput {
 
     this.mouseMoveTimeout = -1;
     canvasDOM.addEventListener('mousemove', (e) => {
-      this.canvasMouseMove_(e, ServiceLocator.getMainCamera());
+      this.canvasMouseMove_(e);
       settingsManager.lastInteractionTime = Date.now();
     });
 
@@ -116,7 +115,7 @@ export class MouseInput {
     if (!settingsManager.disableCameraControls) {
       // prettier-ignore
       window.addEventListener('mousedown', (evt) => {
-        const cameraState = ServiceLocator.getMainCamera().state;
+        const cameraState = (ServiceLocator.getViewportManager()?.getInputCamera() ?? ServiceLocator.getMainCamera()).state;
 
         /*
          * Camera Manager Events
@@ -151,7 +150,7 @@ export class MouseInput {
 
     if (!settingsManager.disableCameraControls) {
       window.addEventListener('mouseup', (evt: MouseEvent) => {
-        const cameraState = ServiceLocator.getMainCamera().state;
+        const cameraState = (ServiceLocator.getViewportManager()?.getInputCamera() ?? ServiceLocator.getMainCamera()).state;
 
         // Camera Manager Events
         if (evt.button === 1) {
@@ -197,24 +196,32 @@ export class MouseInput {
     this.keyboard_ = keyboard;
   }
 
-  private canvasMouseMove_(evt: MouseEvent, mainCameraInstance: Camera): void {
+  private canvasMouseMove_(evt: MouseEvent): void {
     if (this.mouseMoveTimeout === -1) {
       this.mouseMoveTimeout = requestAnimationFrame(() => {
-        this.canvasMouseMoveFire_(mainCameraInstance, evt);
+        this.canvasMouseMoveFire_(evt);
       });
     }
   }
 
-  private canvasMouseMoveFire_(mainCameraInstance: Camera, evt: MouseEvent) {
-    // Cache DOM lookups
+  /** Canvas-relative cursor coordinates (y from top) for a mouse event. */
+  static getCanvasCoords(evt: MouseEvent): { x: number; y: number } {
     const container = KeepTrack.getInstance().containerRoot;
     const offsetX = container.scrollLeft - window.scrollX + container.offsetLeft;
     const offsetY = container.scrollTop - window.scrollY + container.offsetTop;
 
-    const state = mainCameraInstance.state;
+    return { x: evt.clientX - offsetX, y: evt.clientY - offsetY };
+  }
 
-    state.mouseX = evt.clientX - offsetX;
-    state.mouseY = evt.clientY - offsetY;
+  private canvasMouseMoveFire_(evt: MouseEvent) {
+    const { x, y } = MouseInput.getCanvasCoords(evt);
+
+    // Route to the pane under the cursor (or the pane that captured the drag)
+    const camera = ServiceLocator.getViewportManager()?.cameraForInput(x, y) ?? ServiceLocator.getMainCamera();
+    const state = camera.state;
+
+    state.mouseX = x;
+    state.mouseY = y;
 
     // Check for drag movement
     if (state.isDragging &&
@@ -253,8 +260,14 @@ export class MouseInput {
 
     this.isStartedOnCanvas = true;
 
+    // Capture the pane under the cursor so the whole drag routes to it
+    const coords = MouseInput.getCanvasCoords(evt);
+
+    ServiceLocator.getViewportManager()?.beginInputCapture(coords.x, coords.y);
+    const camera = ServiceLocator.getViewportManager()?.getInputCamera() ?? ServiceLocator.getMainCamera();
+
     if (evt.button === 2) {
-      this.dragPosition = InputManager.getEarthScreenPoint(ServiceLocator.getMainCamera().state.mouseX, ServiceLocator.getMainCamera().state.mouseY);
+      this.dragPosition = InputManager.getEarthScreenPoint(camera.state.mouseX, camera.state.mouseY, camera);
 
       const gmst = ServiceLocator.getTimeManager().gmst;
 
@@ -296,9 +309,10 @@ export class MouseInput {
       this.clickedSat = this.mouseSat;
       if (evt.button === 0) {
         const catalogManagerInstance = ServiceLocator.getCatalogManager();
+        const inputCamera = ServiceLocator.getViewportManager()?.getInputCamera() ?? ServiceLocator.getMainCamera();
 
         // Left Mouse Button Clicked
-        if (ServiceLocator.getMainCamera().cameraType === CameraType.SATELLITE_FIRST_PERSON) {
+        if (inputCamera.cameraType === CameraType.SATELLITE_FIRST_PERSON) {
           if (this.clickedSat !== -1 && !catalogManagerInstance.getObject(this.clickedSat, GetSatType.EXTRA_ONLY)?.isStatic()) {
             PluginRegistry.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
           }
@@ -319,7 +333,11 @@ export class MouseInput {
 
     // Force the search bar to get repainted because it gets overwritten a lot
     this.dragHasMoved = false;
-    ServiceLocator.getMainCamera().state.isDragging = false;
+    const viewportManager = ServiceLocator.getViewportManager();
+    const releasedCamera = viewportManager?.getInputCamera() ?? ServiceLocator.getMainCamera();
+
+    releasedCamera.state.isDragging = false;
+    viewportManager?.endInputCapture();
 
     if (settingsManager.isFreezePropRateOnDrag) {
       timeManagerInstance.calculateSimulationTime();
@@ -327,7 +345,7 @@ export class MouseInput {
     }
 
     if (!settingsManager.disableUI) {
-      ServiceLocator.getMainCamera().autoRotate(false);
+      releasedCamera.autoRotate(false);
     }
   }
 
@@ -351,7 +369,11 @@ export class MouseInput {
       delta *= 33.3333333;
     }
 
-    ServiceLocator.getMainCamera().zoomWheel(delta);
+    // Route the zoom to the pane under the cursor
+    const coords = MouseInput.getCanvasCoords(evt);
+    const camera = ServiceLocator.getViewportManager()?.cameraForInput(coords.x, coords.y) ?? ServiceLocator.getMainCamera();
+
+    camera.zoomWheel(delta);
   }
 
   private rmbMenuActions_(e: MouseEvent) {

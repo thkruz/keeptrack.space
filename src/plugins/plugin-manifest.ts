@@ -516,6 +516,13 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
   {
+    configKey: 'MultiView',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/multi-view/multi-view') : undefined,
+    proClassName: 'MultiView',
+    defaultConfig: { enabled: true, order: 157 },
+    isLoginRequired: true,
+  },
+  {
     configKey: 'SatelliteFov',
     ossImport: () => import('./satellite-fov/satellite-fov'),
     ossClassName: 'SatelliteFov',

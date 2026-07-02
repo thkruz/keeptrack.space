@@ -89,6 +89,7 @@ export type KeepTrackPluginsConfiguration = {
   FpsView?: PluginConfiguration;
   FlatMapView?: PluginConfiguration;
   PolarView?: PluginConfiguration;
+  MultiView?: PluginConfiguration;
   SatelliteFov?: PluginConfiguration;
   StereoMap?: PluginConfiguration;
   Planetarium?: PluginConfiguration;

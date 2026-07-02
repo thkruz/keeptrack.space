@@ -160,4 +160,7 @@ export enum StorageKey {
 
   // Calculator (last-used input frame, output format, and field values)
   CALCULATOR_SETTINGS = 'v2-keepTrack-calculatorSettings',
+
+  // Multi-View Pro (split fraction + last-used secondary pane mode)
+  MULTI_VIEW_SETTINGS = 'v2-keepTrack-multiViewSettings',
 }

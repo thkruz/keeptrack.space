@@ -275,6 +275,7 @@ export enum Singletons {
   SoundManager = 'SoundManager',
   SensorMath = 'SensorMathManager',
   MainCamera = 'MainCamera',
+  ViewportManager = 'ViewportManager',
   PersistenceManager = 'PersistenceManager',
   Scene = 'Scene',
   MeshManager = 'MeshManager',

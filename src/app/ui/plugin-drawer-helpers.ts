@@ -172,11 +172,15 @@ export function collectDrawerItems(): CollectedDrawerItems {
       });
     }
 
-    // Put in first matching MenuMode group (only if not in the utility footer)
+    // Put in first matching MenuMode group (only if not in the utility footer).
+    // A plugin can override its group via drawerGroupKey (e.g. 'about').
     if (plugin.iconPlacement === IconPlacement.BOTTOM_ONLY) {
       const primaryMode = plugin.menuMode.find((m) => m !== MenuMode.ALL) ?? MenuMode.CATALOG;
+      const groupKey = plugin.drawerGroupKey && menuGroups[plugin.drawerGroupKey]
+        ? plugin.drawerGroupKey
+        : `mode-${primaryMode}`;
 
-      menuGroups[`mode-${primaryMode}`]?.items.push({
+      menuGroups[groupKey]?.items.push({
         id: plugin.bottomIconElementName,
         label: plugin.bottomIconLabel,
         imgSrc,

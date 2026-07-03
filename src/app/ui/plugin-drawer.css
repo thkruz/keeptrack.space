@@ -629,7 +629,10 @@ body.drawer-mode {
       border-radius var(--kt-duration-slow, 300ms) var(--kt-easing-enter, cubic-bezier(0, 0, 0.2, 1));
   }
 
-  .drawer-utility-footer:hover {
+  /* .expanded pins the hover state open (mobile tap-to-expand reuses it, and
+     the onboarding tour pins it while a step spotlights a footer icon) */
+  .drawer-utility-footer:hover,
+  .drawer-utility-footer.expanded {
     max-width: 90vw;
     padding: 6px 12px;
     gap: 2px;
@@ -653,7 +656,8 @@ body.drawer-mode {
       margin var(--kt-duration-slow, 300ms);
   }
 
-  .drawer-utility-footer:hover::before {
+  .drawer-utility-footer:hover::before,
+  .drawer-utility-footer.expanded::before {
     width: 0;
     opacity: 0;
     overflow: hidden;
@@ -674,7 +678,8 @@ body.drawer-mode {
       opacity var(--kt-duration-slow, 300ms) var(--kt-easing-enter, cubic-bezier(0, 0, 0.2, 1));
   }
 
-  .drawer-utility-footer:hover .drawer-utility-section {
+  .drawer-utility-footer:hover .drawer-utility-section,
+  .drawer-utility-footer.expanded .drawer-utility-section {
     max-width: 600px;
     opacity: 1;
   }

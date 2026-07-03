@@ -167,4 +167,7 @@ export enum StorageKey {
   // Onboarding (tour/checklist progress; survives version wipes via the
   // preservation allowlist in PersistenceManager.validateStorage)
   ONBOARDING_STATE = 'v2-keepTrack-onboardingState',
+
+  // Access Timeline Pro (sensor objNames shown in the docked timeline strip)
+  ACCESS_TIMELINE_ENABLED_SENSORS = 'v2-keepTrack-accessTimelineEnabledSensors',
 }

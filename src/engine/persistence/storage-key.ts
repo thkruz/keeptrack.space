@@ -163,4 +163,8 @@ export enum StorageKey {
 
   // Multi-View Pro (split fraction + last-used secondary pane mode)
   MULTI_VIEW_SETTINGS = 'v2-keepTrack-multiViewSettings',
+
+  // Onboarding (tour/checklist progress; survives version wipes via the
+  // preservation allowlist in PersistenceManager.validateStorage)
+  ONBOARDING_STATE = 'v2-keepTrack-onboardingState',
 }

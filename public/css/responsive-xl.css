@@ -54,9 +54,10 @@
   }
 
   #search {
-    height: 20px;
+    height: 28px;
     margin: 0;
-    padding-top: 5px;
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
   #ui-datepicker-div {

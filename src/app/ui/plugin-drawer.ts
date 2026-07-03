@@ -579,16 +579,21 @@ export class PluginDrawer {
     const contentEl = getEl('drawer-content', true);
 
     contentEl?.querySelectorAll('.drawer-item[data-plugin-id]').forEach((el) => {
-      const pluginId = (el as HTMLElement).dataset.pluginId;
-      const bottomIcon = pluginId ? getEl(pluginId, true) : null;
-      const isSelected = bottomIcon?.classList.contains('bmenu-item-selected') ?? false;
-      const isDisabled = bottomIcon?.classList.contains('bmenu-item-disabled') ?? false;
-
-      el.classList.toggle('active', isSelected);
-      el.classList.toggle('disabled', isDisabled);
+      PluginDrawer.syncItemState_(el as HTMLElement);
     });
 
     this.syncUtilityFooterState_();
+  }
+
+  /** Mirror the live bottom-icon selected/disabled classes onto a drawer item. */
+  private static syncItemState_(el: HTMLElement): void {
+    const pluginId = el.dataset.pluginId;
+    const bottomIcon = pluginId ? getEl(pluginId, true) : null;
+    const isSelected = bottomIcon?.classList.contains('bmenu-item-selected') ?? false;
+    const isDisabled = bottomIcon?.classList.contains('bmenu-item-disabled') ?? false;
+
+    el.classList.toggle('active', isSelected);
+    el.classList.toggle('disabled', isDisabled);
   }
 
   private syncUtilityFooterState_(): void {
@@ -751,6 +756,14 @@ export class PluginDrawer {
 
     if (newGroupEl) {
       contentEl.prepend(newGroupEl);
+
+      // The cached item data only knows load-time state, so the rebuilt rows
+      // would otherwise show plugins as disabled/inactive even when their
+      // bottom icon says otherwise. Re-sync each row and re-apply badges.
+      newGroupEl.querySelectorAll('.drawer-item[data-plugin-id]').forEach((el) => {
+        PluginDrawer.syncItemState_(el as HTMLElement);
+      });
+      this.badges_.forEach((_badge, pluginId) => renderBadge(pluginId, this.badges_));
 
       // Wire collapsible header for the new group
       const header = newGroupEl.querySelector('.drawer-group-header');

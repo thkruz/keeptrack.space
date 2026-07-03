@@ -51,6 +51,10 @@ export async function waitForAppReady(page: Page, options: AppReadyOptions = {})
     // intercept side-menu close-button clicks. Disabling the downgrade loop entirely keeps
     // every plugin/feature enabled (so icons stay clickable) while killing the toast band.
     isDisablePerformanceDowngrade: true,
+    // The onboarding tour auto-starts for a fresh profile (every e2e run) and its
+    // welcome dialog would block every spec. Onboarding specs opt back in with
+    // settings: { isDisableOnboarding: false }.
+    isDisableOnboarding: true,
     plugins: options.plugins ?? {},
     ...(options.settings ?? {}),
   };

@@ -157,4 +157,5 @@ export type KeepTrackPluginsConfiguration = {
   CommandPalettePlugin?: PluginConfiguration;
   LaunchpadPlugin?: PluginConfiguration;
   FavoritesMenuPlugin?: PluginConfiguration;
+  OnboardingPlugin?: PluginConfiguration;
 };

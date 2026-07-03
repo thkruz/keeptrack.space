@@ -961,4 +961,14 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: false, order: 520 },
     isLoginRequired: true,
   },
+
+  // ── Onboarding (last: its tour targets look up other plugins) ─────────────
+  {
+    configKey: 'OnboardingPlugin',
+    ossImport: () => import('./onboarding/onboarding'),
+    ossClassName: 'OnboardingPlugin',
+    // order -1 places Get Started above the built-in About entries (order 0,
+    // e.g. View on GitHub) in the drawer's About group.
+    defaultConfig: { enabled: true, order: -1 },
+  },
 ];

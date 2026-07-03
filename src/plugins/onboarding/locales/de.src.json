@@ -1,0 +1,321 @@
+{
+  "plugins": {
+    "OnboardingPlugin": {
+      "bottomIconLabel": "Erste Schritte",
+      "title": "Erste Schritte",
+      "helpBody": "Das Erste-Schritte-Menü verfolgt Ihre ersten Missionen in KeepTrack und lässt Sie die geführten Touren neu starten. Die Grundlagen-Tour behandelt den Globus, die Suche und die Zeitsteuerung. Die Power-Tour ist ein Hub aus kurzen Kapiteln zu Sensoren, Beobachtungsliste, Zeit, Analyse und Visualisierung.",
+      "stepLabel": "{current} von {total}",
+      "buttons": {
+        "next": "Weiter",
+        "back": "Zurück",
+        "skipTour": "Tour überspringen",
+        "skipConfirm": "Den Rest der Tour überspringen?",
+        "skipYes": "Ja, überspringen",
+        "skipNo": "Weitermachen",
+        "startTour": "Tour starten",
+        "exploreOnMyOwn": "Selbst erkunden",
+        "keepGoing": "Weiter: Power-Tour",
+        "finishUp": "Danke, das reicht",
+        "createAccount": "Kostenloses Konto erstellen",
+        "maybeLater": "Vielleicht später",
+        "doItForMe": "Für mich erledigen",
+        "openIt": "Öffnen"
+      },
+      "welcome": {
+        "title": "Willkommen bei KeepTrack",
+        "body": "Verfolgen Sie Tausende Objekte im Orbit, live. In zwei Minuten lernen Sie die Grundlagen.",
+        "personaQuestion": "Was führt Sie zu KeepTrack?"
+      },
+      "personas": {
+        "explorer": "Einfach den Weltraum erkunden",
+        "student": "Studierende oder Lehrende",
+        "operator": "Satellitenbetreiber oder Analyst",
+        "developer": "Entwickler oder API-Nutzer"
+      },
+      "steps": {
+        "b1Globe": {
+          "title": "Sie sehen die Erde, live",
+          "body": "Jeder Punkt ist ein reales Objekt, das sich gerade im Orbit befindet. Klicken und ziehen Sie, um den Globus zu drehen."
+        },
+        "b2Zoom": {
+          "title": "Drehen und zoomen",
+          "body": "Scrollen Sie zum Zoomen. Ein Rechtsklick bietet weitere Optionen zu allem, was Sie sehen."
+        },
+        "b3Search": {
+          "title": "Einen Satelliten finden",
+          "body": "Geben Sie ISS in das Suchfeld ein, um die Internationale Raumstation zu finden."
+        },
+        "b4Select": {
+          "title": "Die ISS auswählen",
+          "body": "Klicken Sie auf ein Suchergebnis, um es auszuwählen und die Kamera dorthin zu bewegen."
+        },
+        "b5Infobox": {
+          "title": "Das Info-Panel",
+          "body": "Alles über das ausgewählte Objekt: Orbit, Größe, Land und Missionsdaten finden Sie hier."
+        },
+        "b6Time": {
+          "title": "Die Zeit steuern",
+          "body": "Beschleunigen, pausieren oder spulen Sie die Simulation mit der Zeitsteuerung. Ändern Sie die Geschwindigkeit, um Orbits in Bewegung zu sehen."
+        },
+        "b7Drawer": {
+          "title": "Hier ist Ihr Werkzeugkasten",
+          "body": "Jedes Werkzeug in KeepTrack steckt in diesem Menü. Die Highlights lernen Sie in der Power-Tour kennen."
+        }
+      },
+      "bridge": {
+        "title": "Die Grundlagen sitzen",
+        "body": "Lust auf das Operator-Toolkit? Sensoren, Beobachtungslisten und schnelle Tastatur-Workflows. Etwa zwei weitere Minuten.",
+        "recap1": "Einen Satelliten gefunden und ausgewählt",
+        "recap2": "Seine Live-Orbitdaten gelesen",
+        "recap3": "Die Simulationszeit gesteuert"
+      },
+      "account": {
+        "title": "Fortschritt speichern?",
+        "body": "Ein kostenloses Konto nimmt Ihre Einrichtung auf jedes Gerät mit.",
+        "bodyPower": "Ein kostenloses Konto nimmt die gerade eingerichtete Beobachtungsliste und den Sensor auf jedes Gerät mit.",
+        "benefit1": "Einstellungen und Beobachtungsliste geräteübergreifend synchronisieren",
+        "benefit2": "Werbung entfernen",
+        "benefit3": "Das komplette Pro-Toolset kostenlos freischalten"
+      },
+      "toasts": {
+        "restartHint": "Sie können die Tour jederzeit über das Erste-Schritte-Menü neu starten.",
+        "accountCreated": "Willkommen an Bord. Die Synchronisierung ist aktiv.",
+        "finished": "Tour abgeschlossen. Ihre ersten Missionen warten im Menü.",
+        "allChaptersDone": "Power-Tour abgeschlossen. Alle Kapitel sind erledigt."
+      },
+      "card": {
+        "title": "Erste Schritte",
+        "allSet": "Alles erledigt!",
+        "dismiss": "Ausblenden"
+      },
+      "checklist": {
+        "powerTour": "Ein Kapitel der Power-Tour abschließen",
+        "watchlist3": "3 Satelliten zur Beobachtungsliste hinzufügen",
+        "selectSensor": "Einen Sensor wählen und seine Abdeckung sehen",
+        "lookAngles": "Blickwinkel für einen Überflug prüfen",
+        "colorScheme": "Das Farbschema ändern"
+      },
+      "menu": {
+        "missionsLabel": "Erste Missionen",
+        "toursLabel": "Geführte Touren",
+        "restoreCard": "Erste-Schritte-Karte wieder anzeigen"
+      },
+      "commands": {
+        "startTour": "Tutorial starten",
+        "startPowerTour": "Power-Tour öffnen",
+        "openChecklist": "Erste-Schritte-Checkliste öffnen"
+      },
+      "settings": {
+        "showOnFirstRun": "Tutorial für neue Nutzer anzeigen",
+        "restartTutorial": "Die geführte Tour von vorn beginnen",
+        "restartTutorialButton": "Tutorial neu starten"
+      },
+      "chapters": {
+        "essentials": {
+          "steps": {
+            "drawerGroups": {
+              "title": "Das App-Menü",
+              "body": "Werkzeuge sind nach Aufgaben gruppiert. Klappen Sie ungenutzte Gruppen ein; Ihre zuletzt genutzten Werkzeuge erscheinen oben. Mit Tab fixieren oder verkleinern Sie die Leiste."
+            },
+            "commandPalette": {
+              "title": "Die Befehlspalette",
+              "body": "Drücken Sie Ctrl+Shift+K, um jedes Werkzeug oder jeden Satelliten per Name zu erreichen. Der schnellste Weg durch KeepTrack."
+            },
+            "utility": {
+              "title": "Schnellschalter",
+              "body": "Kameramodi, Ebenen und Anzeige-Schalter liegen in diesem Dock, immer nur einen Klick entfernt."
+            },
+            "help": {
+              "title": "Hilfe ist überall",
+              "body": "Öffnen Sie die Einstellungen zum Feinjustieren und drücken Sie Shift+F1 in jedem Menü für kontextbezogene Hilfe."
+            }
+          },
+          "title": "Werkzeugleiste im Griff",
+          "description": "Die Leiste, Befehlspalette, Schnellschalter und Hilfe"
+        },
+        "sensors": {
+          "title": "Sensoren & Abdeckung",
+          "description": "Sensoren wählen, Abdeckung lesen, eigene bauen",
+          "demoCustomSensorName": "Demo-Sensor",
+          "steps": {
+            "openList": {
+              "title": "Die Sensorliste öffnen",
+              "body": "Bodenradare und Teleskope weltweit speisen KeepTrack. Öffnen Sie die Sensorliste über die Werkzeugleiste."
+            },
+            "selectSensor": {
+              "title": "Einen Sensor auswählen",
+              "body": "Wählen Sie ein Radar oder Teleskop aus der Liste. Standort und Sichtfeld erscheinen auf dem Globus."
+            },
+            "coverage": {
+              "title": "Die Abdeckung lesen",
+              "body": "Der farbige Kegel ist das ins All projizierte Sichtfeld des Sensors. Alles, was ihn kreuzt, kann von dort verfolgt werden."
+            },
+            "fovLayer": {
+              "title": "Die Sichtfeld-Ebene umschalten",
+              "body": "Dieser Schalter zeichnet oder verbirgt das Sichtfeld des Sensors, damit die Szene übersichtlich bleibt."
+            },
+            "sensorInfo": {
+              "title": "Sensordetails",
+              "body": "Öffnen Sie die Sensorinfo für Reichweiten, Frequenzbänder und Typ der Station, und was diese Zahlen fürs Tracking bedeuten."
+            },
+            "customSensor": {
+              "title": "Einen eigenen Sensor bauen",
+              "body": "Legen Sie Standort und Sichtgrenzen fest und drücken Sie dann \"Sensor ersetzen\", um Ihre eigene Station zur aktiven zu machen. KeepTrack behandelt sie wie die echten."
+            },
+            "multiSensor": {
+              "title": "Blickwinkel über mehrere Sensoren",
+              "body": "Vergleichen Sie nebeneinander, wann der ausgewählte Satellit von jedem Sensor aus sichtbar ist. War kein Satellit ausgewählt, haben wir einen für Sie gewählt."
+            }
+          }
+        },
+        "watchlist": {
+          "title": "Beobachtungsliste & Überflüge",
+          "description": "Ziele verfolgen und ihre nächsten Überflüge planen",
+          "steps": {
+            "pickTarget": {
+              "title": "Ein Ziel wählen",
+              "body": "Suchen Sie einen Satelliten, der Sie interessiert, etwa die ISS, und wählen Sie ihn aus."
+            },
+            "addToWatchlist": {
+              "title": "Zur Beobachtungsliste hinzufügen",
+              "body": "Setzen Sie den gewählten Satelliten auf Ihre Beobachtungsliste, damit KeepTrack ihn für Sie im Auge behält."
+            },
+            "overlay": {
+              "title": "Das Overlay",
+              "body": "Das Overlay listet kommende Überflüge Ihrer Beobachtungsliste über dem aktuellen Sensor, laufend aktualisiert."
+            },
+            "lookAngles": {
+              "title": "Blickwinkel für den nächsten Überflug",
+              "body": "Öffnen Sie die Blickwinkel für Azimut, Elevation und Entfernung, wenn Ihr Ziel das nächste Mal den Himmel des Sensors kreuzt."
+            },
+            "bestPasses": {
+              "title": "Beste Überflüge",
+              "body": "Beste Überflüge bewertet jeden kommenden Überflug, damit Sie wissen, welche Ihre Teleskopzeit wert sind."
+            },
+            "timelines": {
+              "title": "Überflüge als Zeitplan",
+              "body": "Die Sensor-Zeitleiste ordnet jeden Überflug in einen Zeitplan, sodass Sie eine ganze Session auf einen Blick planen."
+            }
+          }
+        },
+        "time": {
+          "title": "Zeit & Szenarien",
+          "description": "Simulationszeit steuern und Setups speichern",
+          "steps": {
+            "speedUp": {
+              "title": "Zeit beschleunigen",
+              "body": "Drehen Sie die Simulationsrate über 1x und sehen Sie den Orbits zu. Die Zeitsteuerung ist oben."
+            },
+            "pauseRewind": {
+              "title": "Pausieren und zurückspulen",
+              "body": "Nutzen Sie die VCR-Tasten, um die Simulation anzuhalten oder rückwärts laufen zu lassen."
+            },
+            "jumpToMoment": {
+              "title": "Zu einem Zeitpunkt springen",
+              "body": "Stellen Sie mit dem Kalender ein genaues Datum und eine Uhrzeit ein, um den Himmel in diesem Moment zu sehen."
+            },
+            "timeSlider": {
+              "title": "Die Zeitleiste durchfahren",
+              "body": "Ziehen Sie den Zeitregler, um Minuten oder Stunden vor- und zurückzuspringen."
+            },
+            "scenarios": {
+              "title": "Ein Szenario speichern",
+              "body": "Szenarien speichern Ihre aktuellen Sensoren, Satelliten und die Zeit, damit Sie das ganze Setup später neu laden können."
+            },
+            "backToNow": {
+              "title": "Zurück zu jetzt",
+              "body": "Setzen Sie Versatz und Rate zurück, um zur Echtzeit zurückzukehren. Simulationszeit und Echtzeit sind immer einen Klick entfernt."
+            }
+          }
+        },
+        "analysis": {
+          "title": "Analysewerkzeuge",
+          "description": "Orbitsuche, Filter, Diagramme und Was-wäre-wenn",
+          "steps": {
+            "advancedSearch": {
+              "title": "Nach Orbit suchen",
+              "body": "Finden Sie Satelliten über Bahnparameter statt Namen: Höhe, Inklination, Umlaufzeit und mehr."
+            },
+            "filterCatalog": {
+              "title": "Den Katalog filtern",
+              "body": "Reduzieren Sie den Himmel aufs Wesentliche: filtern nach Objekttyp, Land oder Orbitregime."
+            },
+            "polarPlot": {
+              "title": "Das Polardiagramm",
+              "body": "Ein Überflug auf einer Azimut-Elevations-Skala aus Sicht des Sensors. Lesen Sie die Form eines Überflugs auf einen Blick."
+            },
+            "dops": {
+              "title": "GPS-Genauigkeit (DOPs)",
+              "body": "Die Genauigkeitsverdünnung zeigt, wie scharf eine GPS-Position an jedem Ort und zu jeder Zeit ist."
+            },
+            "whatIf": {
+              "title": "Was-wäre-wenn-Werkzeuge",
+              "body": "Simulieren Sie ein Auseinanderbrechen, prüfen Sie auf Annäherungen oder modellieren Sie einen neuen Start. Die Analysegruppe enthält die Was-wäre-wenn-Werkzeuge."
+            }
+          }
+        },
+        "visualization": {
+          "title": "Visualisierung & Teilen",
+          "description": "Farbschemata, Kameraansichten und Teilen",
+          "steps": {
+            "colorSchemes": {
+              "title": "Den Himmel einfärben",
+              "body": "Farbschemata färben jedes Objekt nach Land, Typ, Geschwindigkeit und mehr. Ändern Sie jetzt eines."
+            },
+            "flatMap": {
+              "title": "Die Flachkarte",
+              "body": "Der Globus als 2D-Karte mit Bodenspuren in Echtzeit, das klassische Lagebild."
+            },
+            "polarView": {
+              "title": "Die Polaransicht",
+              "body": "Sehen Sie den Himmel, wie der Sensor ihn sieht: eine Ganzhimmelskuppel von seinem Horizont aus."
+            },
+            "backTo3d": {
+              "title": "Zurück zu 3D, plus Nacht",
+              "body": "Kehren Sie zum 3D-Globus zurück und schalten Sie die Nachtebene ein, um die Tag-Nacht-Grenze wandern zu sehen."
+            },
+            "screenshots": {
+              "title": "Screenshots und Video",
+              "body": "Halten Sie die aktuelle Ansicht als Bild fest oder nehmen Sie ein Video auf. Das Screenshot-Werkzeug ist hier."
+            },
+            "share": {
+              "title": "Eine Ansicht teilen",
+              "body": "Das Teilen-Menü erzeugt einen Link, der Ihre exakte Ansicht für jeden reproduziert, der ihn öffnet."
+            }
+          }
+        }
+      },
+      "hub": {
+        "title": "Power-Tour",
+        "body": "Kurze, praktische Kapitel. Wählen Sie eine beliebige Reihenfolge, hören Sie jederzeit auf und machen Sie dort weiter, wo Sie aufgehört haben.",
+        "progress": "{done} von {total} Kapiteln abgeschlossen",
+        "steps": "{count} Schritte",
+        "minutes": "~{minutes} Min.",
+        "recommended": "Empfohlen",
+        "close": "Schließen",
+        "catalogMissing": "Satellitenkatalog nicht geladen",
+        "allDone": "Alle Kapitel sind erledigt. Sie haben das volle Operator-Werkzeug."
+      },
+      "teasers": {
+        "signInCta": "Kostenlos anmelden zum Freischalten",
+        "bestPass": {
+          "title": "Beste Überflüge (Pro)",
+          "body": "Bewertet jeden kommenden Überflug Ihrer Beobachtungsliste über dem gewählten Sensor. Planen Sie eine Beobachtungsnacht in Sekunden."
+        },
+        "dops": {
+          "title": "GPS-Genauigkeit (Pro)",
+          "body": "Zeigt die Genauigkeitsverdünnung (DOP) für jeden Ort und Zeitpunkt. Wissen Sie im Voraus, wann Ihre GPS-Position scharf sein wird."
+        },
+        "polarView": {
+          "title": "Polaransicht (Pro)",
+          "body": "Ein Ganzhimmelsdiagramm aus Sicht des Sensors. Sehen Sie genau, wo ein Überflug Ihren Himmel kreuzt."
+        },
+        "flatMap": {
+          "title": "Flachkarte (Pro)",
+          "body": "Eine 2D-Weltkarte mit Bodenspuren in Echtzeit. Das klassische Lagebild, was wo über uns fliegt."
+        }
+      },
+      "stepDone": "Erledigt. Sehen Sie sich das an."
+    }
+  }
+}

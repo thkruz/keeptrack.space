@@ -1,0 +1,567 @@
+/* Onboarding tour + get-started card styles.
+ * Z-index contract: above the drawer/side menus (~1000), below toasts (10000)
+ * so transient feedback always wins. */
+:root {
+  --z-tour: 9990;
+}
+
+/* ---- Tour root + spotlight shades ---- */
+
+.kt-tour-root {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-tour);
+  pointer-events: none;
+}
+
+.kt-tour-shade {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.4);
+  /* Coachmarks never block the app: task steps need clicks on menus, pickers,
+     and dropdowns that render OUTSIDE the spotlight hole (sensor rows, the
+     datetime calendar, search results). The dim is purely visual here. */
+  pointer-events: none;
+  /* Fades out during the task-done dwell (kt-tour-dwell) */
+  transition: background 0.25s ease;
+}
+
+/* Centered cards (welcome / bridge / hub / account) stay modal */
+.kt-tour-card-mode .kt-tour-shade {
+  background: rgba(0, 0, 0, 0.6);
+  pointer-events: auto;
+}
+
+.kt-tour-ring {
+  position: fixed;
+  border: 2px solid var(--color-primary, #ba160c);
+  border-radius: 8px;
+  box-shadow: 0 0 0 4px rgba(186, 22, 12, 0.25);
+  pointer-events: none;
+  animation: kt-tour-ring-pulse 2s ease-in-out infinite;
+}
+
+@keyframes kt-tour-ring-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px rgba(186, 22, 12, 0.25);
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px rgba(186, 22, 12, 0.12);
+  }
+}
+
+/* ---- Popover ---- */
+
+.kt-tour-popover {
+  position: fixed;
+  width: 340px;
+  max-width: calc(100vw - 16px);
+  background: rgba(24, 24, 26, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-left: 3px solid var(--color-primary, #ba160c);
+  border-radius: 10px;
+  padding: 14px 16px 10px;
+  color: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+  outline: none;
+}
+
+.kt-tour-popover-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.kt-tour-popover-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.kt-tour-step-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+}
+
+.kt-tour-popover-body {
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.kt-tour-popover-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.kt-tour-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.kt-tour-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.kt-tour-dot-active {
+  background: var(--color-primary, #ba160c);
+}
+
+.kt-tour-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.kt-tour-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.82rem;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.kt-tour-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.kt-tour-btn-primary {
+  background: var(--color-primary, #ba160c);
+  border-color: var(--color-primary, #ba160c);
+  color: #fff;
+}
+
+.kt-tour-btn-primary:hover {
+  filter: brightness(1.15);
+}
+
+.kt-tour-btn-action {
+  border-style: dashed;
+}
+
+.kt-tour-skip-row {
+  text-align: center;
+  margin-top: 6px;
+}
+
+.kt-tour-skip-link {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.75rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.kt-tour-skip-link:hover {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.kt-tour-confirm-skip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.kt-tour-confirm-skip.start-hidden {
+  display: none;
+}
+
+/* ---- Centered cards (welcome / bridge / account) ---- */
+
+.kt-tour-popover-card {
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%);
+  width: 420px;
+}
+
+.kt-tour-persona-label {
+  margin: 12px 0 6px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.kt-tour-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.kt-tour-chip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.78rem;
+  padding: 5px 12px;
+  cursor: pointer;
+}
+
+.kt-tour-chip-selected {
+  background: var(--color-primary, #ba160c);
+  border-color: var(--color-primary, #ba160c);
+  color: #fff;
+}
+
+.kt-tour-recap {
+  margin: 10px 0 0;
+  padding-left: 20px;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ---- Mobile: dock the popover to the bottom ---- */
+
+.kt-tour-mobile .kt-tour-popover {
+  left: 8px !important;
+  right: 8px;
+  bottom: 8px;
+  top: auto !important;
+  width: auto;
+  transform: none;
+}
+
+/* ---- Finish celebration ---- */
+
+.kt-onboarding-pulse {
+  animation: kt-onboarding-pulse 1s ease-in-out 3;
+}
+
+@keyframes kt-onboarding-pulse {
+  0%,
+  100% {
+    filter: none;
+  }
+
+  50% {
+    filter: drop-shadow(0 0 8px rgba(186, 22, 12, 0.9));
+  }
+}
+
+/* ---- Get-started drawer card ---- */
+
+.drawer-getting-started-slot:empty {
+  display: none;
+}
+
+.kt-get-started-card {
+  margin: 8px 10px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-left: 3px solid var(--color-primary, #ba160c);
+  border-radius: 8px;
+}
+
+.kt-get-started-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kt-get-started-title {
+  flex: 1;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.kt-get-started-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.kt-get-started-ring {
+  width: 22px;
+  height: 22px;
+  transform: rotate(-90deg);
+}
+
+.kt-get-started-ring-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.15);
+  stroke-width: 3;
+}
+
+.kt-get-started-ring-fg {
+  fill: none;
+  stroke: var(--color-primary, #ba160c);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.4s ease;
+}
+
+.kt-get-started-percent {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.kt-get-started-dismiss {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 2px 4px;
+}
+
+.kt-get-started-dismiss:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.kt-get-started-rows {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kt-get-started-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.78rem;
+  padding: 4px 2px;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 4px;
+}
+
+.kt-get-started-row:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.kt-get-started-check {
+  width: 15px;
+  height: 15px;
+  min-width: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  color: #fff;
+}
+
+.kt-get-started-row-done .kt-get-started-check {
+  background: var(--color-primary, #ba160c);
+  border-color: var(--color-primary, #ba160c);
+}
+
+.kt-get-started-row-done .kt-get-started-row-label {
+  text-decoration: line-through;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.kt-get-started-complete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Rail mode: compact the card to just the progress ring */
+.plugin-drawer.rail-mode:not(.rail-hover) .kt-get-started-card {
+  padding: 6px;
+  margin: 8px 6px;
+}
+
+.plugin-drawer.rail-mode:not(.rail-hover) .kt-get-started-title,
+.plugin-drawer.rail-mode:not(.rail-hover) .kt-get-started-percent,
+.plugin-drawer.rail-mode:not(.rail-hover) .kt-get-started-dismiss,
+.plugin-drawer.rail-mode:not(.rail-hover) .kt-get-started-rows {
+  display: none;
+}
+
+/* ---- Checklist side menu ---- */
+
+.kt-onboarding-mission-check {
+  display: inline-block;
+  width: 18px;
+  color: var(--color-primary, #ba160c);
+}
+
+.kt-onboarding-mission-done .kt-action-label {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+
+/* ---- Task-done dwell: lift the dim so the result is visible ---- */
+
+.kt-tour-dwell .kt-tour-shade {
+  background: transparent;
+}
+
+.kt-tour-dwell .kt-tour-ring {
+  opacity: 0;
+  animation: none;
+}
+
+.kt-tour-popover-done {
+  border-left-color: #2e9e46;
+}
+
+.kt-tour-done-note {
+  color: #7bd88a;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* ---- Deferred "Do it for me" hint reveal ---- */
+
+.kt-tour-btn.start-hidden {
+  display: none;
+}
+
+.kt-tour-btn-hint-pulse {
+  animation: kt-tour-hint-pulse 1.2s ease-in-out 3;
+}
+
+@keyframes kt-tour-hint-pulse {
+  0%,
+  100% {
+    box-shadow: none;
+  }
+
+  50% {
+    box-shadow: 0 0 0 5px rgba(186, 22, 12, 0.35);
+  }
+}
+
+/* ---- Power tour hub ---- */
+
+.kt-hub-progress {
+  margin: 10px 0 6px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.kt-hub-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: min(52vh, 380px);
+  overflow-y: auto;
+}
+
+.kt-hub-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: #232326;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 9px 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.kt-hub-row:hover:not(.kt-hub-row-disabled) {
+  background: #313135;
+}
+
+.kt-hub-row-disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.kt-hub-status {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  color: #fff;
+}
+
+.kt-hub-status-half {
+  /* Half-filled circle for an in-progress chapter */
+  background: linear-gradient(to right, var(--color-primary, #ba160c) 50%, transparent 50%);
+  border-color: var(--color-primary, #ba160c);
+}
+
+.kt-hub-status-done {
+  background: var(--color-primary, #ba160c);
+  border-color: var(--color-primary, #ba160c);
+}
+
+.kt-hub-row-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.kt-hub-row-title {
+  font-size: 0.86rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kt-hub-row-meta {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.kt-hub-badge {
+  background: rgba(186, 22, 12, 0.25);
+  border: 1px solid var(--color-primary, #ba160c);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.62rem;
+  font-weight: 600;
+  padding: 1px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.kt-hub-chevron {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ---- Reduced motion ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .kt-tour-ring,
+  .kt-onboarding-pulse,
+  .kt-tour-btn-hint-pulse {
+    animation: none;
+  }
+
+  .kt-get-started-ring-fg {
+    transition: none;
+  }
+}

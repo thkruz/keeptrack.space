@@ -1,0 +1,321 @@
+{
+  "plugins": {
+    "OnboardingPlugin": {
+      "bottomIconLabel": "Get Started",
+      "title": "Getting Started",
+      "helpBody": "The Getting Started menu tracks your first missions in KeepTrack and lets you restart the guided tours. The basics tour covers the globe, search, and time controls. The power tour is a hub of short chapters covering sensors, the watchlist, time, analysis, and visualization.",
+      "stepLabel": "{current} of {total}",
+      "buttons": {
+        "next": "Next",
+        "back": "Back",
+        "skipTour": "Skip tour",
+        "skipConfirm": "Skip the rest of the tour?",
+        "skipYes": "Yes, skip",
+        "skipNo": "Keep going",
+        "startTour": "Start the tour",
+        "exploreOnMyOwn": "Explore on my own",
+        "keepGoing": "Keep going: power tour",
+        "finishUp": "I'm good, finish up",
+        "createAccount": "Create free account",
+        "maybeLater": "Maybe later",
+        "doItForMe": "Do it for me",
+        "openIt": "Open it"
+      },
+      "welcome": {
+        "title": "Welcome to KeepTrack",
+        "body": "Track thousands of objects in orbit, live. Two minutes is all it takes to learn the basics.",
+        "personaQuestion": "What brings you to KeepTrack?"
+      },
+      "personas": {
+        "explorer": "Just exploring space",
+        "student": "Student or educator",
+        "operator": "Satellite operator or analyst",
+        "developer": "Developer or API user"
+      },
+      "steps": {
+        "b1Globe": {
+          "title": "You are looking at Earth, live",
+          "body": "Every dot is a real object in orbit right now. Click and drag to spin the globe."
+        },
+        "b2Zoom": {
+          "title": "Spin and zoom",
+          "body": "Scroll to zoom in and out. Right-click for more options on anything you see."
+        },
+        "b3Search": {
+          "title": "Find a satellite",
+          "body": "Type ISS in the search box to find the International Space Station."
+        },
+        "b4Select": {
+          "title": "Select the ISS",
+          "body": "Click a search result to select it and fly the camera to it."
+        },
+        "b5Infobox": {
+          "title": "Meet the info panel",
+          "body": "Everything about the selected object: orbit, size, country, and mission data live here."
+        },
+        "b6Time": {
+          "title": "Bend time",
+          "body": "Speed up, pause, or rewind the simulation with the time controls. Try changing the speed to watch orbits move."
+        },
+        "b7Drawer": {
+          "title": "Your toolbox lives here",
+          "body": "Every tool in KeepTrack is in this drawer. You will meet the highlights in the power tour."
+        }
+      },
+      "bridge": {
+        "title": "You know the basics",
+        "body": "Want the operator toolkit? Sensors, watchlists, and keyboard-speed workflows. About two more minutes.",
+        "recap1": "Found and selected a satellite",
+        "recap2": "Read its live orbit data",
+        "recap3": "Controlled simulation time"
+      },
+      "account": {
+        "title": "Save your progress?",
+        "body": "A free account keeps your setup with you on any device.",
+        "bodyPower": "A free account keeps the watchlist and sensor you just set up with you on any device.",
+        "benefit1": "Sync your settings and watchlist across devices",
+        "benefit2": "Remove ads",
+        "benefit3": "Unlock the full Pro toolset for free"
+      },
+      "toasts": {
+        "restartHint": "You can restart the tour anytime from the Getting Started menu in the drawer.",
+        "accountCreated": "Welcome aboard. Settings sync is on.",
+        "finished": "Tour complete. Your first missions are waiting in the drawer.",
+        "allChaptersDone": "Power tour complete. Every chapter is done."
+      },
+      "card": {
+        "title": "Get started",
+        "allSet": "You're all set!",
+        "dismiss": "Dismiss"
+      },
+      "checklist": {
+        "powerTour": "Complete a power tour chapter",
+        "watchlist3": "Add 3 satellites to your watchlist",
+        "selectSensor": "Select a sensor and see its coverage",
+        "lookAngles": "Check look angles for a pass",
+        "colorScheme": "Change the color scheme"
+      },
+      "menu": {
+        "missionsLabel": "First missions",
+        "toursLabel": "Guided tours",
+        "restoreCard": "Show the get-started card"
+      },
+      "commands": {
+        "startTour": "Start tutorial",
+        "startPowerTour": "Open the power tour",
+        "openChecklist": "Open getting started checklist"
+      },
+      "settings": {
+        "showOnFirstRun": "Show tutorial for new users",
+        "restartTutorial": "Restart the guided tour from the beginning",
+        "restartTutorialButton": "Restart tutorial"
+      },
+      "chapters": {
+        "essentials": {
+          "steps": {
+            "drawerGroups": {
+              "title": "The app drawer",
+              "body": "Tools are grouped by task. Collapse groups you do not use, and your recent tools appear at the top. Press Tab to pin or collapse the rail."
+            },
+            "commandPalette": {
+              "title": "The command palette",
+              "body": "Press Ctrl+Shift+K to jump to any tool or satellite by name. The fastest way around KeepTrack."
+            },
+            "utility": {
+              "title": "Quick toggles",
+              "body": "Camera modes, layers, and display toggles live in this dock so they are always one click away."
+            },
+            "help": {
+              "title": "Help is everywhere",
+              "body": "Open settings to tune the app, and press Shift+F1 on any menu for contextual help."
+            }
+          },
+          "title": "Drawer essentials",
+          "description": "The drawer, command palette, quick toggles, and help"
+        },
+        "sensors": {
+          "title": "Sensors & coverage",
+          "description": "Select sensors, read coverage, build your own",
+          "demoCustomSensorName": "Demo sensor",
+          "steps": {
+            "openList": {
+              "title": "Open the sensor list",
+              "body": "Ground radars and telescopes around the world feed KeepTrack. Open the sensor list from the drawer."
+            },
+            "selectSensor": {
+              "title": "Select a sensor",
+              "body": "Pick any radar or telescope from the list. Its location and field of view load onto the globe."
+            },
+            "coverage": {
+              "title": "Read the coverage",
+              "body": "The colored cone is the sensor's field of view projected into space. Anything crossing it can be tracked from that site."
+            },
+            "fovLayer": {
+              "title": "Toggle the FOV layer",
+              "body": "This switch draws or hides the sensor's field of view so you can keep the scene clean."
+            },
+            "sensorInfo": {
+              "title": "Sensor details",
+              "body": "Open sensor info to see the site's ranges, bands, and type, and what those numbers mean for tracking."
+            },
+            "customSensor": {
+              "title": "Build a custom sensor",
+              "body": "Set a location and view limits, then press \"Replace Sensor\" to make your own site the active one. KeepTrack treats it like the real thing."
+            },
+            "multiSensor": {
+              "title": "Look angles across sensors",
+              "body": "Compare when the selected satellite is visible from each sensor, side by side. If no satellite was selected, we picked one for you."
+            }
+          }
+        },
+        "watchlist": {
+          "title": "Watchlist & passes",
+          "description": "Track targets and plan their next passes",
+          "steps": {
+            "pickTarget": {
+              "title": "Pick a target",
+              "body": "Search for a satellite you care about, like the ISS, and select it."
+            },
+            "addToWatchlist": {
+              "title": "Add it to the watchlist",
+              "body": "Put the selected satellite on your watchlist so KeepTrack keeps an eye on it for you."
+            },
+            "overlay": {
+              "title": "The overlay",
+              "body": "The overlay lists upcoming passes of your watchlist over the current sensor, updating live."
+            },
+            "lookAngles": {
+              "title": "Look angles for the next pass",
+              "body": "Open look angles to get azimuth, elevation, and range for the next time your target crosses the sensor's sky."
+            },
+            "bestPasses": {
+              "title": "Best passes",
+              "body": "Best passes ranks every upcoming pass so you know which ones are worth your telescope time."
+            },
+            "timelines": {
+              "title": "Passes as a schedule",
+              "body": "The sensor timeline lays out every pass on a schedule, so you can plan a whole session at a glance."
+            }
+          }
+        },
+        "time": {
+          "title": "Time & scenarios",
+          "description": "Bend simulation time and save setups",
+          "steps": {
+            "speedUp": {
+              "title": "Speed up time",
+              "body": "Crank the propagation rate above 1x and watch orbits move. The clock controls are at the top."
+            },
+            "pauseRewind": {
+              "title": "Pause and rewind",
+              "body": "Use the VCR controls to pause the simulation or run it backwards."
+            },
+            "jumpToMoment": {
+              "title": "Jump to a moment",
+              "body": "Set an exact date and time with the calendar to see the sky at that moment."
+            },
+            "timeSlider": {
+              "title": "Scrub the timeline",
+              "body": "Drag the time slider to sweep minutes or hours forward and back."
+            },
+            "scenarios": {
+              "title": "Save a scenario",
+              "body": "Scenarios save your current sensors, satellites, and time so you can reload the whole setup later."
+            },
+            "backToNow": {
+              "title": "Back to now",
+              "body": "Reset the offset and rate to return to live time. Sim time and live time are always one click apart."
+            }
+          }
+        },
+        "analysis": {
+          "title": "Analysis tools",
+          "description": "Orbit search, filters, plots, and what-ifs",
+          "steps": {
+            "advancedSearch": {
+              "title": "Search by orbit",
+              "body": "Find satellites by orbital parameters instead of names: altitude, inclination, period, and more."
+            },
+            "filterCatalog": {
+              "title": "Filter the catalog",
+              "body": "Trim the sky to what matters: filter by object type, country, or orbit regime."
+            },
+            "polarPlot": {
+              "title": "The polar plot",
+              "body": "A pass drawn on an azimuth-elevation dial from the sensor's point of view. Read a pass shape at a glance."
+            },
+            "dops": {
+              "title": "GPS accuracy (DOPs)",
+              "body": "Dilution of precision shows how sharp a GPS fix is at any place and time."
+            },
+            "whatIf": {
+              "title": "What-if tools",
+              "body": "Simulate a breakup, screen for close approaches, or model a new launch. The analysis group holds the what-if tools."
+            }
+          }
+        },
+        "visualization": {
+          "title": "Visualization & sharing",
+          "description": "Color schemes, camera views, and sharing",
+          "steps": {
+            "colorSchemes": {
+              "title": "Color the sky",
+              "body": "Color schemes repaint every object by country, type, velocity, and more. Change one now."
+            },
+            "flatMap": {
+              "title": "The flat map",
+              "body": "Flatten the globe into a 2D map with live ground tracks, the classic ops-floor picture."
+            },
+            "polarView": {
+              "title": "The polar view",
+              "body": "See the sky as the sensor sees it: an all-sky dome plotted from its horizon."
+            },
+            "backTo3d": {
+              "title": "Back to 3D, plus night",
+              "body": "Return to the 3D globe, then flip the night toggle to watch the day-night line move."
+            },
+            "screenshots": {
+              "title": "Screenshots and video",
+              "body": "Capture the current view as an image, or record a video. The screenshot tool lives here."
+            },
+            "share": {
+              "title": "Share a view",
+              "body": "The share menu builds a link that reproduces your exact view for anyone who opens it."
+            }
+          }
+        }
+      },
+      "hub": {
+        "title": "Power tour",
+        "body": "Short, hands-on chapters. Pick any order, leave anytime, and come back where you left off.",
+        "progress": "{done} of {total} chapters complete",
+        "steps": "{count} steps",
+        "minutes": "~{minutes} min",
+        "recommended": "Recommended",
+        "close": "Close",
+        "catalogMissing": "Satellite catalog not loaded",
+        "allDone": "Every chapter is done. You have the full operator toolkit."
+      },
+      "teasers": {
+        "signInCta": "Sign in free to unlock",
+        "bestPass": {
+          "title": "Best passes (Pro)",
+          "body": "Ranks every upcoming pass of your watchlist over the selected sensor. Plan a night of observations in seconds."
+        },
+        "dops": {
+          "title": "GPS accuracy (Pro)",
+          "body": "Maps dilution of precision for any place and time. Know when your GPS fix will be sharp before you rely on it."
+        },
+        "polarView": {
+          "title": "Polar view (Pro)",
+          "body": "An all-sky plot from the sensor's point of view. See exactly where a pass crosses your sky."
+        },
+        "flatMap": {
+          "title": "Flat map view (Pro)",
+          "body": "A 2D world map with live ground tracks. The classic ops-floor picture of what is overhead where."
+        }
+      },
+      "stepDone": "Done. Take a look."
+    }
+  }
+}

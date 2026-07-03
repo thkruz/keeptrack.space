@@ -378,6 +378,12 @@ export class CoreSettings {
   isDisableLoginGate = false;
 
   /**
+   * When true, the first-run onboarding tour never auto-starts (manual restart
+   * surfaces still work). Intended for kiosk/embedded/offline deployments.
+   */
+  isDisableOnboarding = false;
+
+  /**
    * When true, the override's `plugins` map is treated as an exhaustive allowlist:
    * any plugin not listed (regardless of manifest default) is forced to enabled:false.
    * Profiles like celestrak/embed should set this to true so new plugins added to the

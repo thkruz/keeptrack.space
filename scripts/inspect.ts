@@ -161,6 +161,10 @@ const buildOverride = (spec: InspectSpec): Record<string, unknown> => ({
   isDisablePerformanceDowngrade: true,
   // Pro builds gate some plugins behind a login modal that hijacks the icon click.
   isDisableLoginGate: true,
+  // Headless runs use a fresh profile, so the first-run onboarding tour would
+  // auto-start over every surface. Inspect the tour explicitly via
+  // getPluginByName('OnboardingPlugin').restartTour() in an evaluate step.
+  isDisableOnboarding: true,
   plugins: spec.plugins ?? {},
   ...(spec.settings ?? {}),
 });

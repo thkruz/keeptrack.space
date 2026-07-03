@@ -363,6 +363,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   settingsManager: 'core',
   isAutoStart: 'core',
   isDisableLoginGate: 'core',
+  isDisableOnboarding: 'core',
   onLoadCb: 'core',
 };
 

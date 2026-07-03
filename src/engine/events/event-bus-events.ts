@@ -219,4 +219,10 @@ export enum EventBusEvent {
    * are collected automatically the first time the settings menu opens.
    */
   settingsMenuRefresh = 'settingsMenuRefresh',
+  /**
+   * Emitted when the loading/splash screen has actually been dismissed and the
+   * globe is visible (start button clicked or auto-start). Unlike onKeepTrackReady,
+   * this is the reliable "the user can see the app" signal.
+   */
+  splashScreenHidden = 'splashScreenHidden',
 }

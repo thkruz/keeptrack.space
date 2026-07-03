@@ -22,6 +22,7 @@ export type KeepTrackPluginsConfiguration = {
   ScenarioManagementMenu?: PluginConfiguration;
   TopMenu?: PluginConfiguration;
   TimeSlider?: PluginConfiguration;
+  AccessTimelinePlugin?: PluginConfiguration;
   TooltipsPlugin?: PluginConfiguration;
   UserAccountPlugin?: PluginConfiguration;
   DebugMenuPlugin?: PluginConfiguration;

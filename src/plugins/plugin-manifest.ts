@@ -68,9 +68,16 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true },
   },
   {
+    // Replaced by AccessTimelinePlugin in Pro builds; still the default in OSS.
     configKey: 'TimeSlider',
     ossImport: () => import('./time-slider/time-slider'),
     ossClassName: 'TimeSlider',
+    defaultConfig: { enabled: !__IS_PRO__, order: 1001 },
+  },
+  {
+    configKey: 'AccessTimelinePlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/access-timeline/access-timeline') : undefined,
+    proClassName: 'AccessTimelinePlugin',
     defaultConfig: { enabled: true, order: 1001 },
   },
   {
@@ -251,16 +258,18 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 21 },
   },
   {
+    // Replaced by AccessTimelinePlugin in Pro builds; still the default in OSS.
     configKey: 'SensorTimeline',
     ossImport: () => import('./timeline-sensor/sensor-timeline'),
     ossClassName: 'SensorTimeline',
-    defaultConfig: { enabled: true, order: 30 },
+    defaultConfig: { enabled: !__IS_PRO__, order: 30 },
   },
   {
+    // Replaced by AccessTimelinePlugin in Pro builds; still the default in OSS.
     configKey: 'SatelliteTimeline',
     ossImport: () => import('./timeline-satellite/satellite-timeline'),
     ossClassName: 'SatelliteTimeline',
-    defaultConfig: { enabled: true, order: 31 },
+    defaultConfig: { enabled: !__IS_PRO__, order: 31 },
   },
   {
     configKey: 'WatchlistPlugin',

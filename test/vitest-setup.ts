@@ -39,6 +39,9 @@ if (typeof global !== 'undefined') {
   global.CustomEvent = dom.window.CustomEvent;
   global.KeyboardEvent = dom.window.KeyboardEvent;
   global.MouseEvent = dom.window.MouseEvent;
+  // MutationObserver must come from the same JSDOM realm as global.document,
+  // or observe() rejects its nodes as foreign ("parameter 1 is not of type 'Node'").
+  global.MutationObserver = dom.window.MutationObserver;
   // Ensure HTML element classes from JSDOM are available globally
   global.HTMLElement = dom.window.HTMLElement;
   global.HTMLDivElement = dom.window.HTMLDivElement;

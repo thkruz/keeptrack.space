@@ -55,6 +55,7 @@ export class PluginDrawer {
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
       this.populateDrawerItems_();
       this.wireEventListeners_();
+      this.observeBottomIconState_();
     });
 
     EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
@@ -232,6 +233,10 @@ export class PluginDrawer {
       '    </div>',
       launcherHtml,
       '  </div>',
+      // Stable slot for the onboarding "Get started" card. It must live OUTSIDE
+      // #drawer-content because renderMenuGroups_ rebuilds that element with
+      // innerHTML and would clobber anything injected inside it.
+      '  <div id="drawer-getting-started-slot" class="drawer-getting-started-slot"></div>',
       '  <div id="drawer-content" class="drawer-content"></div>',
       '</div>',
       '<div id="drawer-user-account" class="drawer-user-account"></div>',
@@ -583,6 +588,47 @@ export class PluginDrawer {
     });
 
     this.syncUtilityFooterState_();
+  }
+
+  /**
+   * The hidden bottom-icon bar is the single source of truth for a plugin's
+   * selected/disabled state, but its classes flip through several code paths
+   * (base-plugin setters, the bottomMenuClick toggle handler, hideSideMenus
+   * listeners, and a few plugins that toggle classList directly). Observing the
+   * icons themselves keeps every drawer row — including the duplicate rows in
+   * the Recent group — in sync no matter which path changed the state, even
+   * while the drawer is closed or in rail mode. Without this, rows are only
+   * synced on open()/rebuild, which happens *before* the deferred
+   * bottomMenuClick toggle lands, leaving the Recent rows showing the inverse
+   * of the real state.
+   */
+  private observeBottomIconState_(): void {
+    const bottomIcons = getEl('bottom-icons', true);
+
+    if (!bottomIcons) {
+      return;
+    }
+
+    const observer = new MutationObserver((mutations) => {
+      const syncedIds = new Set<string>();
+
+      for (const mutation of mutations) {
+        const id = (mutation.target as HTMLElement).id;
+
+        if (!id || syncedIds.has(id)) {
+          continue;
+        }
+        syncedIds.add(id);
+
+        getEl('drawer-content', true)
+          ?.querySelectorAll(`.drawer-item[data-plugin-id="${id}"]`)
+          .forEach((el) => PluginDrawer.syncItemState_(el as HTMLElement));
+      }
+
+      this.syncUtilityFooterState_();
+    });
+
+    observer.observe(bottomIcons, { attributes: true, attributeFilter: ['class'], subtree: true });
   }
 
   /** Mirror the live bottom-icon selected/disabled classes onto a drawer item. */

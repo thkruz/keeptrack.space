@@ -155,4 +155,56 @@ describe('PluginDrawer', () => {
 
     expect(document.body.classList.contains('is-mobile-mode')).toBe(true);
   });
+
+  describe('bottom icon state observer', () => {
+    // MutationObserver delivers on a task boundary; the suite runs on fake
+    // timers, so advance them (which also drains microtasks) to let it run.
+    const flushObserver = () => vi.advanceTimersByTimeAsync(0);
+
+    beforeEach(() => {
+      // The hidden bottom-icon bar must exist before uiManagerFinal so the observer attaches.
+      getEl('bottom-icons', true)?.remove();
+      document.body.insertAdjacentHTML('beforeend', '<div id="bottom-icons"><div id="custom-sensor-icon"></div></div>');
+    });
+
+    it('mirrors bottom-icon selection onto every duplicate drawer row, even after the deferred toggle', async () => {
+      buildDrawer();
+      const content = getEl('drawer-content', true)!;
+
+      // Same plugin listed twice: once in the Recent group, once in its category group.
+      content.insertAdjacentHTML(
+        'beforeend',
+        '<div class="drawer-item" data-plugin-id="custom-sensor-icon"></div>' +
+        '<div class="drawer-item" data-plugin-id="custom-sensor-icon"></div>',
+      );
+      const rows = [...content.querySelectorAll('.drawer-item[data-plugin-id="custom-sensor-icon"]')];
+
+      getEl('custom-sensor-icon')!.classList.add('bmenu-item-selected');
+      await flushObserver();
+      rows.forEach((row) => expect(row.classList.contains('active')).toBe(true));
+
+      getEl('custom-sensor-icon')!.classList.remove('bmenu-item-selected');
+      await flushObserver();
+      rows.forEach((row) => expect(row.classList.contains('active')).toBe(false));
+    });
+
+    it('mirrors bottom-icon disabled state onto drawer rows', async () => {
+      buildDrawer();
+      const content = getEl('drawer-content', true)!;
+
+      content.insertAdjacentHTML(
+        'beforeend',
+        '<div class="drawer-item" data-plugin-id="custom-sensor-icon"></div>',
+      );
+      const row = content.querySelector('.drawer-item[data-plugin-id="custom-sensor-icon"]')!;
+
+      getEl('custom-sensor-icon')!.classList.add('bmenu-item-disabled');
+      await flushObserver();
+      expect(row.classList.contains('disabled')).toBe(true);
+
+      getEl('custom-sensor-icon')!.classList.remove('bmenu-item-disabled');
+      await flushObserver();
+      expect(row.classList.contains('disabled')).toBe(false);
+    });
+  });
 });

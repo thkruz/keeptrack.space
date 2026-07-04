@@ -176,6 +176,11 @@ function runBuildWatch(args: string[]): void {
     buildArgs.push('--watch');
   }
 
+  // generate-translation.ts below already merges src/locales; the build must not redo it
+  if (!buildArgs.includes('--skip-locales')) {
+    buildArgs.push('--skip-locales');
+  }
+
   const cwd = rootDir;
 
   // Run translations first, then start build in watch mode

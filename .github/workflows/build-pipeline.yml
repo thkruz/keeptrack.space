@@ -305,7 +305,7 @@ jobs:
           npx tsx ./build/generate-translation.ts
           PROFILE=${{ matrix.profile }}
           npx tsx ./build/build-manager.ts production \
-            --profile="$PROFILE"
+            --profile="$PROFILE" --skip-locales
 
       - name: Verify output
         run: |
@@ -364,7 +364,7 @@ jobs:
       - name: Build (oss)
         run: |
           npx tsx ./build/generate-translation.ts
-          npx tsx ./build/build-manager.ts production --profile=oss
+          npx tsx ./build/build-manager.ts production --profile=oss --skip-locales
 
       - name: Run Boot Smoke Test
         run: |

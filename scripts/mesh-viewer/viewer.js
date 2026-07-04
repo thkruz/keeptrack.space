@@ -689,7 +689,7 @@
     if (autoSelect && state.meshes.length) {
       const fromHash = decodeURIComponent(location.hash.slice(1));
       const preferred = state.meshes.find((m) => m.name === fromHash)
-        ?? state.meshes.find((m) => m.name === 'rocketbody')
+        ?? state.meshes.find((m) => m.name === 'rb-cyl-kerolox')
         ?? state.meshes[0];
 
       loadModel(preferred.name);

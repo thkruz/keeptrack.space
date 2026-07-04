@@ -65,6 +65,20 @@ describe('ModelResolver satellite model selection', () => {
     });
   });
 
+  describe('Kuiper routing', () => {
+    it('routes the Kuiper bus to the amazon-leo model', () => {
+      expect(resolver.resolve(makeSat({ name: 'KUIPER-00008', bus: 'Kuiper' }))).toBe(SatelliteModels['amazon-leo']);
+    });
+
+    it('falls back on the KUIPER name prefix when bus metadata is missing', () => {
+      expect(resolver.resolve(makeSat({ name: 'KUIPER-P2', bus: 'Unknown' }))).toBe(SatelliteModels['amazon-leo']);
+    });
+
+    it('matches the Kuiper bus even when the name does not start with KUIPER', () => {
+      expect(resolver.resolve(makeSat({ name: 'OBJECT A', bus: 'Kuiper' }))).toBe(SatelliteModels['amazon-leo']);
+    });
+  });
+
   describe('special sccNum lookups', () => {
     it('maps the ISS, Hubble and Tiangong catalog numbers', () => {
       expect(resolver.resolve(makeSat({ sccNum: '25544' }))).toBe(SatelliteModels.iss);

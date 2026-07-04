@@ -1,0 +1,42 @@
+# amazon-leo.mtl - authored for KeepTrack's shader (Ka = diffuse GAIN,
+# Ks = flat additive; see docs-local/3d-model-authoring.md)
+
+newmtl leoBus
+Ka 0.8500 0.8500 0.8500
+Kd 0.7000 0.7200 0.7600
+Ks 0.3000 0.3000 0.3000
+Ns 96.0
+d 1.0
+illum 2
+
+newmtl leoCell
+Ka 0.5500 0.5500 0.5500
+Kd 0.1500 0.1600 0.1900
+Ks 0.0400 0.0400 0.0400
+Ns 24.0
+d 1.0
+illum 2
+
+newmtl leoSubstrate
+Ka 0.5500 0.5500 0.5500
+Kd 0.2600 0.2700 0.2900
+Ks 0.0400 0.0400 0.0400
+Ns 24.0
+d 1.0
+illum 2
+
+newmtl leoAntenna
+Ka 0.4500 0.4500 0.4500
+Kd 0.0700 0.0700 0.0800
+Ks 0.0200 0.0200 0.0200
+Ns 12.0
+d 1.0
+illum 2
+
+newmtl leoThruster
+Ka 0.6500 0.6500 0.6500
+Kd 0.3800 0.3800 0.4000
+Ks 0.1200 0.1200 0.1200
+Ns 48.0
+d 1.0
+illum 2

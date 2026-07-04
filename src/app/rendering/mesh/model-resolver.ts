@@ -5,6 +5,7 @@ import { BaseObject, Satellite, SpaceObjectType, Tle } from '@ootk/src/main';
 
 export const SatelliteModels = {
   aehf: 'aehf',
+  'amazon-leo': 'amazon-leo',
   debris0: 'debris0',
   debris1: 'debris1',
   debris2: 'debris2',
@@ -59,6 +60,7 @@ enum SatelliteNumber {
 export class ModelResolver {
   modelMap = {
     'aehf': null as MeshModel | null,
+    'amazon-leo': null as MeshModel | null,
     // beidou: null,
     'debris0': null as MeshModel | null,
     'debris1': null as MeshModel | null,
@@ -165,6 +167,12 @@ export class ModelResolver {
   private resolveSatModelName_(sat: Satellite): string {
     if (sat.name.startsWith('STARLINK')) {
       return this.resolveStarlinkModelName_(sat);
+    }
+
+    // Amazon Leo (Project Kuiper): bus metadata first, name-prefix fallback
+    // so prototypes (KUIPER-P*) and records missing bus data still match.
+    if (sat.bus === 'Kuiper' || sat.name.startsWith('KUIPER')) {
+      return SatelliteModels['amazon-leo'];
     }
 
     const knownSatelliteModel = this.resolveByName_(sat.name);

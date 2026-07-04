@@ -253,19 +253,49 @@ export function computeRicBasis(position: Vec3, velocity: Vec3): RicBasis {
   return { radial, inTrack, crossTrack };
 }
 
+/** Zero bias — the isotropic default (an explosion/venting has no preferred direction). */
+const NO_BIAS: DeltaVComponentsKms = { r: 0, i: 0, c: 0 };
+
 /**
  * Sample one fragment's delta-V (km/s) in RIC components. Each axis is an
  * independent Gaussian whose standard deviation is the entered spread (m/s),
  * clamped to +/-3 sigma so a rare Box-Muller outlier cannot fling a fragment
  * onto a wildly different orbit.
+ *
+ * An optional `biasKms` shifts the mean of every fragment along a fixed RIC
+ * direction. This models a kinetic impact, where the whole cloud's centre of
+ * mass gains the impactor's momentum (a hypervelocity intercept is not
+ * isotropic); the sign of the radial component is what makes an ascending hit
+ * add radial energy and a descending hit drop perigee toward reentry.
+ * @param rng - Seeded uniform source.
+ * @param spread - Per-axis 1-sigma spread (m/s).
+ * @param biasKms - Optional RIC mean shift (km/s); defaults to isotropic (no bias).
  */
-export function sampleDeltaV(rng: () => number, spread: DeltaVSpreadMps): DeltaVComponentsKms {
+export function sampleDeltaV(rng: () => number, spread: DeltaVSpreadMps, biasKms: DeltaVComponentsKms = NO_BIAS): DeltaVComponentsKms {
   const axis = (sigmaMps: number) => clamp(nextGaussian(rng), -3, 3) * sigmaMps * MS_TO_KMS;
 
   return {
-    r: axis(spread.radial),
-    i: axis(spread.inTrack),
-    c: axis(spread.crossTrack),
+    r: biasKms.r + axis(spread.radial),
+    i: biasKms.i + axis(spread.inTrack),
+    c: biasKms.c + axis(spread.crossTrack),
+  };
+}
+
+/**
+ * Project a kinetic-impact relative velocity onto the parent's RIC axes and scale
+ * it by a momentum-transfer fraction to get the mean delta-V the debris cloud
+ * inherits. `relativeVelocity` is the impactor's velocity *relative to the target*
+ * (km/s, same inertial frame as `basis`); the fraction stands in for the notional
+ * (impactor mass / target mass) ratio.
+ * @param relativeVelocity - Impactor velocity minus target velocity (km/s).
+ * @param basis - The target's RIC basis.
+ * @param transferFraction - Fraction of the relative velocity imparted to the cloud.
+ */
+export function computeImpactBias(relativeVelocity: Vec3, basis: RicBasis, transferFraction: number): DeltaVComponentsKms {
+  return {
+    r: dot_(relativeVelocity, basis.radial) * transferFraction,
+    i: dot_(relativeVelocity, basis.inTrack) * transferFraction,
+    c: dot_(relativeVelocity, basis.crossTrack) * transferFraction,
   };
 }
 

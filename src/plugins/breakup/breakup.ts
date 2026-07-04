@@ -1,4 +1,3 @@
-import { SatMath } from '@app/app/analysis/sat-math';
 import { CatalogManager } from '@app/app/data/catalog-manager';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -23,22 +22,17 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, Satellite, SpaceObjectType, Tle, TleLine1, TleLine2 } from '@ootk/src/main';
+import { BaseObject, Satellite } from '@ootk/src/main';
 import streamPng from '@public/img/icons/stream.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import {
   BREAKUP_PRESETS,
   BreakupRawForm,
-  buildFragmentTle,
-  computeRicBasis,
   DEFAULT_BREAKUP_PRESET,
-  DeltaVSpreadMps,
   getBreakupPreset,
-  isAnalystRangeValid,
-  makeRng,
   parseBreakupParams,
-  sampleDeltaV,
 } from './breakup-core';
+import { clearBreakupPieces, runBreakup } from './breakup-runner';
 import './breakup.css';
 
 export interface BreakupParams {
@@ -364,9 +358,14 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
       return;
     }
 
-    // Guard the analyst-slot range so generated pieces never overwrite real catalog
-    // satellites (below the block) or unallocated slots (above it).
-    if (!isAnalystRangeValid(startNum, breakupCount, CatalogManager.ANALYST_START_ID, settingsManager.maxAnalystSats)) {
+    ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
+
+    // The breakup happens at the parent's exact position/velocity at the current sim
+    // time. The catalog-facing orchestration lives in runBreakup so other plugins
+    // (e.g. the interceptor) can trigger a breakup at an arbitrary epoch too.
+    const result = runBreakup(mainsat, { breakupCount, radialDeltaV, inTrackDeltaV, crossTrackDeltaV, startNum }, simulationTimeObj);
+
+    if (result.error === 'invalidSlotRange') {
       errorManagerInstance.warn(
         t7e('plugins.Breakup.errorMsgs.InvalidSlotRange')
           .replace('{start}', CatalogManager.ANALYST_START_ID.toString())
@@ -376,102 +375,16 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
       return;
     }
 
-    // The breakup happens at the parent's exact position/velocity at the current sim
-    // time. Working from the TEME state vector (the SGP4 frame) means every fragment
-    // shares that breakup point and the model is valid in any orbital regime.
-    const parentState = mainsat.eci(simulationTimeObj);
-
-    if (!parentState?.position || !parentState.velocity) {
-      errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.ErrorCreatingBreakup'));
-
-      return;
-    }
-
-    const position = parentState.position;
-    const velocity = parentState.velocity;
-    const basis = computeRicBasis(position, velocity);
-    const spread: DeltaVSpreadMps = { radial: radialDeltaV, inTrack: inTrackDeltaV, crossTrack: crossTrackDeltaV };
-    // Seed from the parameters so a given configuration produces a reproducible cloud.
-    const rng = makeRng((startNum ^ breakupCount ^ Math.round((inTrackDeltaV + radialDeltaV + crossTrackDeltaV) * 1000)) >>> 0);
-
-    ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
-
-    const orbitManagerInstance = ServiceLocator.getOrbitManager();
-    const createdIds: number[] = [];
-    // Fragments whose orbit can't be represented (reentering / sub-orbital). A high
-    // delta-V on a low orbit legitimately produces these; skip them, never abort.
-    let reenteredCount = 0;
-
-    for (let i = 0; i < breakupCount; i++) {
-      const a5Num = Tle.convert6DigitToA5((startNum + i).toString());
-      const pieceSatId = catalogManagerInstance.sccNum2Id(a5Num);
-
-      if (!pieceSatId) {
-        errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.SatelliteNotFound'));
-
-        return;
-      }
-
-      const dv = sampleDeltaV(rng, spread);
-      let pieceTle1: TleLine1;
-      let pieceTle2: TleLine2;
-
-      try {
-        ({ tle1: pieceTle1, tle2: pieceTle2 } = buildFragmentTle(simulationTimeObj, position, velocity, basis, dv, a5Num));
-      } catch {
-        // Degenerate/sub-orbital fragment (hyperbolic from an absurd delta-V, or
-        // perigee below the surface from a large delta-V on a low orbit). Skip it.
-        reenteredCount++;
-        continue;
-      }
-
-      let newSat: Satellite;
-
-      try {
-        newSat = new Satellite({
-          ...catalogManagerInstance.objectCache[pieceSatId],
-          ...{
-            id: pieceSatId,
-            name: `Breakup Piece ${i + 1}`,
-            tle1: pieceTle1,
-            tle2: pieceTle2,
-            // The analyst-slot template is a PAYLOAD; pieces are debris and
-            // need the type overridden so color schemes and search treat
-            // them correctly.
-            type: SpaceObjectType.DEBRIS,
-            active: true,
-          },
-        });
-      } catch {
-        // A single unrepresentable fragment must not abort the whole cloud.
-        reenteredCount++;
-        continue;
-      }
-
-      if (SatMath.altitudeCheck(newSat.satrec!, simulationTimeObj) > 1) {
-        catalogManagerInstance.objectCache[pieceSatId] = newSat;
-        catalogManagerInstance.satCruncherThread.sendSatEdit(pieceSatId, pieceTle1, pieceTle2, true);
-        orbitManagerInstance.changeOrbitBufferData(pieceSatId, pieceTle1, pieceTle2);
-        // Seed the render buffer synchronously (the position cruncher's sendSatEdit
-        // is async) so the search below does not read the placeholder 0,0,0 position
-        // and filter the piece as "Decayed".
-        catalogManagerInstance.seedDotPosition(pieceSatId);
-        createdIds.push(pieceSatId);
-      } else {
-        reenteredCount++;
-      }
-    }
-
-    if (createdIds.length === 0) {
+    if (result.createdIds.length === 0) {
       errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.ErrorCreatingBreakup'));
 
       return;
     }
 
     // No silent caps: tell the user when fragments were dropped because they reentered.
-    if (reenteredCount > 0) {
+    if (result.reenteredCount > 0) {
       ServiceLocator.getUiManager().toast(
-        t7e('plugins.Breakup.toasts.fragmentsReentered' as Parameters<typeof t7e>[0]).replace('{count}', reenteredCount.toString()),
+        t7e('plugins.Breakup.toasts.fragmentsReentered' as Parameters<typeof t7e>[0]).replace('{count}', result.reenteredCount.toString()),
         ToastMsgType.caution,
       );
     }
@@ -483,7 +396,7 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     }
 
     this.lastBreakup_ = {
-      pieceIds: createdIds,
+      pieceIds: result.createdIds,
       priorSearchLimit,
     };
     this.updateClearButton_();
@@ -516,24 +429,9 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
       return;
     }
 
-    const catalogManagerInstance = ServiceLocator.getCatalogManager();
-    const orbitManagerInstance = ServiceLocator.getOrbitManager();
     const { pieceIds, priorSearchLimit } = this.lastBreakup_;
 
-    for (const id of pieceIds) {
-      const obj = catalogManagerInstance.objectCache[id];
-
-      if (!(obj instanceof Satellite)) {
-        continue;
-      }
-
-      // Deactivate the slot and revert it to the reserved analyst PAYLOAD type.
-      const reset = new Satellite({ ...obj, id, active: false, type: SpaceObjectType.PAYLOAD });
-
-      catalogManagerInstance.objectCache[id] = reset;
-      catalogManagerInstance.satCruncherThread.sendSatEdit(id, obj.tle1, obj.tle2, false);
-      orbitManagerInstance.changeOrbitBufferData(id, obj.tle1, obj.tle2);
-    }
+    clearBreakupPieces(pieceIds);
 
     settingsManager.searchLimit = priorSearchLimit;
     this.lastBreakup_ = null;

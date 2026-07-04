@@ -1,11 +1,11 @@
 import { Configuration, DefinePlugin, DefinePluginOptions, HtmlRspackPlugin, LightningCssMinimizerRspackPlugin, ProgressPlugin, SwcJsMinimizerRspackPlugin } from '@rspack/core';
 import { execSync } from 'node:child_process';
-import CleanTerminalPlugin from 'clean-terminal-webpack-plugin';
 import DotEnv from 'dotenv-webpack';
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BuildConfig } from './lib/config-manager';
+import { reporter } from './lib/reporter';
 export class WebpackManager {
   static readonly DEFAULT_MODE = 'development';
   static readonly DEFAULT_WATCH = false;
@@ -230,16 +230,6 @@ export class WebpackManager {
     baseConfig.experiments = {
       topLevelAwait: true,
     };
-    baseConfig.plugins!.push(
-      new CleanTerminalPlugin({
-        beforeCompile: true,
-      }),
-      /*
-       * new CopyRspackPlugin({
-       *   patterns: [{ from: 'public', to: '..' }],
-       * }),
-       */
-    );
     baseConfig.module!.rules!.push({
       test: /\.(?:woff|woff2|eot|ttf|otf)$/iu,
       include: [/src/u],
@@ -268,9 +258,6 @@ export class WebpackManager {
         },
         plugins: [
           this.versionDefine_,
-          new CleanTerminalPlugin({
-            beforeCompile: true,
-          }),
           new HtmlRspackPlugin({
             filename: '../index.html',
             template: './public/index.html',
@@ -280,9 +267,7 @@ export class WebpackManager {
             path: `./${this.config.envFilePath}`,
             allowEmptyValues: true,
           }),
-          new ProgressPlugin({
-            prefix: 'KeepTrack Main Code',
-          }),
+          new ProgressPlugin(reporter.createCompileProgressHandler('main')),
         ],
       },
     });
@@ -316,9 +301,7 @@ export class WebpackManager {
             path: `./${this.config.envFilePath}`,
             allowEmptyValues: true,
           }),
-          new ProgressPlugin({
-            prefix: 'KeepTrack Auth',
-          }),
+          new ProgressPlugin(reporter.createCompileProgressHandler('auth')),
         ],
       },
     });
@@ -365,9 +348,7 @@ export class WebpackManager {
           publicPath: `./${pubPath}js/`,
         },
         plugins: [
-          new ProgressPlugin({
-            prefix: 'KeepTrack Workers',
-          }),
+          new ProgressPlugin(reporter.createCompileProgressHandler('workers')),
         ],
       },
     });

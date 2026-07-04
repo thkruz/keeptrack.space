@@ -119,7 +119,6 @@
     "@vitest/coverage-v8": "^4.0.18",
     "auto-changelog-thkruz": "^1.0.0",
     "babel-loader": "^9.1.3",
-    "clean-terminal-webpack-plugin": "^3.0.0",
     "cross-env": "^7.0.3",
     "css-loader": "^7.1.4",
     "dotenv-webpack": "^8.1.1",

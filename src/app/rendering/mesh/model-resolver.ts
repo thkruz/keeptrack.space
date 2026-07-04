@@ -27,7 +27,23 @@ export const SatelliteModels = {
   oneweb: 'oneweb',
   orbcomm: 'orbcomm',
   orion: 'orion',
-  rocketbody: 'rocketbody',
+  'rb-cyl-centaur': 'rb-cyl-centaur',
+  'rb-cyl-china': 'rb-cyl-china',
+  'rb-cyl-delta': 'rb-cyl-delta',
+  'rb-cyl-electron': 'rb-cyl-electron',
+  'rb-cyl-euro': 'rb-cyl-euro',
+  'rb-cyl-gray-s': 'rb-cyl-gray-s',
+  'rb-cyl-gray-m': 'rb-cyl-gray-m',
+  'rb-cyl-gray-l': 'rb-cyl-gray-l',
+  'rb-cyl-kerolox': 'rb-cyl-kerolox',
+  'rb-cyl-proton': 'rb-cyl-proton',
+  'rb-cyl-soviet': 'rb-cyl-soviet',
+  'rb-cyl-soviet-b': 'rb-cyl-soviet-b',
+  'rb-cyl2n-legacy': 'rb-cyl2n-legacy',
+  'rb-cylcone-soviet': 'rb-cylcone-soviet',
+  'rb-sphercone-kick': 'rb-sphercone-kick',
+  'rb-stepcyl-soviet': 'rb-stepcyl-soviet',
+  'rb-trunccone-gray': 'rb-trunccone-gray',
   rv: 'rv',
   s1u: 's1u',
   s2u: 's2u',
@@ -58,52 +74,10 @@ enum SatelliteNumber {
 }
 
 export class ModelResolver {
-  modelMap = {
-    'aehf': null as MeshModel | null,
-    'amazon-leo': null as MeshModel | null,
-    // beidou: null,
-    'debris0': null as MeshModel | null,
-    'debris1': null as MeshModel | null,
-    'debris2': null as MeshModel | null,
-    'dsp': null as MeshModel | null,
-    'flock': null as MeshModel | null,
-    'galileo': null as MeshModel | null,
-    'globalstar': null as MeshModel | null,
-    'glonass': null as MeshModel | null,
-    'gps': null as MeshModel | null,
-    'hubble': null as MeshModel | null,
-    'iridium': null as MeshModel | null,
-    'iss': null as MeshModel | null,
-    'lemur': null as MeshModel | null,
-    'misl': null as MeshModel | null,
-    'misl2': null as MeshModel | null,
-    'misl3': null as MeshModel | null,
-    'misl4': null as MeshModel | null,
-    'o3b': null as MeshModel | null,
-    'oneweb': null as MeshModel | null,
-    'orbcomm': null as MeshModel | null,
-    'orion': null as MeshModel | null,
-    // other: null,
-    'rocketbody': null as MeshModel | null,
-    'rv': null as MeshModel | null,
-    's1u': null as MeshModel | null,
-    's2u': null as MeshModel | null,
-    's3u': null as MeshModel | null,
-    's6u': null as MeshModel | null,
-    's12u': null as MeshModel | null,
-    'sat2': null as MeshModel | null,
-    'sbirs': null as MeshModel | null,
-    'ses': null as MeshModel | null,
-    'spacebee1gen': null as MeshModel | null,
-    'spacebee2gen': null as MeshModel | null,
-    'spacebee3gen': null as MeshModel | null,
-    'starlink': null as MeshModel | null,
-    'starlink-v2mini': null as MeshModel | null,
-    'sateliotsat': null as MeshModel | null,
-    'sateliotsat2': null as MeshModel | null,
-    'saturn-iv-b': null as MeshModel | null,
-    'tianhe': null as MeshModel | null,
-  };
+  /** One slot per registered model; existence of a key gates meshOverride. */
+  modelMap: Record<string, MeshModel | null> = Object.fromEntries(
+    Object.values(SatelliteModels).map((name) => [name, null]),
+  );
 
   private readonly sccNumAehf_ = ['36868', '38254', '39256', '43651', '44481', '45465'];
   private readonly sccNumDsp_ = [
@@ -132,8 +106,7 @@ export class ModelResolver {
         case SpaceObjectType.PAYLOAD:
           return this.resolveSatModelName_(sat);
         case SpaceObjectType.ROCKET_BODY:
-          // TODO: Add more rocket body models
-          return SatelliteModels.rocketbody;
+          return this.resolveRocketBodyModelName_(sat);
         case SpaceObjectType.DEBRIS: {
           // The numeric thresholds below only make sense for legacy 5-digit
           // numeric sccNums. Alpha-5 / extended IDs would parseInt to NaN or
@@ -161,6 +134,114 @@ export class ModelResolver {
     }
 
     return SatelliteModels.sat2;
+  }
+
+  /**
+   * Non-cylinder silhouettes, matched on the catalog `shape` field with all
+   * whitespace stripped (the data mixes "Sphere + Cone" / "Sphere+Cone" etc.).
+   */
+  private static readonly rbSilhouettes_: Record<string, string> = {
+    'sphere+cone': SatelliteModels['rb-sphercone-kick'],
+    'trunccone': SatelliteModels['rb-trunccone-gray'],
+    'truncatedcone': SatelliteModels['rb-trunccone-gray'],
+    'stepcyl': SatelliteModels['rb-stepcyl-soviet'],
+    'cyl+cyl': SatelliteModels['rb-stepcyl-soviet'],
+    'cyl+cone': SatelliteModels['rb-cylcone-soviet'],
+    'cyl+2nozzle': SatelliteModels['rb-cyl2n-legacy'],
+  };
+
+  /**
+   * Launch-vehicle families for cylinder stages, checked in order. A null
+   * model is a deliberate opt-out (e.g. hydrolox Delta IV is not the teal
+   * Delta II) that falls through to the size buckets. Soviet vehicles are
+   * handled separately because they split by length.
+   */
+  private static readonly rbFamilies_: { match: RegExp; model: string | null }[] = [
+    { match: /falcon/u, model: SatelliteModels['rb-cyl-kerolox'] },
+    { match: /electron/u, model: SatelliteModels['rb-cyl-electron'] },
+    { match: /ariane|vega/u, model: SatelliteModels['rb-cyl-euro'] },
+    { match: /chang zheng|long march|^cz[\s-]/u, model: SatelliteModels['rb-cyl-china'] },
+    { match: /atlas|centaur|titan/u, model: SatelliteModels['rb-cyl-centaur'] },
+    { match: /delta (?:iv|4)/u, model: null },
+    { match: /delta/u, model: SatelliteModels['rb-cyl-delta'] },
+    { match: /proton|briz|fregat/u, model: SatelliteModels['rb-cyl-proton'] },
+  ];
+
+  private static readonly rbSovietVehicles_ =
+    /kosmos|cosmos|tsiklon|tsyklon|cyclone|vostok|voskhod|molniya|soyuz|rokot|dnepr|zenit|shtil|angara|sputnik/u;
+
+  /**
+   * Rocket bodies, most-specific signal first: catalog `shape` picks the
+   * silhouette, `launchVehicle` picks the palette family for plain cylinders,
+   * and real dimensions bucket everything else into the gray sizes.
+   */
+  private resolveRocketBodyModelName_(sat: Satellite): string {
+    const shape = sat.shape.toLowerCase().replace(/\s+/gu, '');
+    const silhouette = ModelResolver.rbSilhouettes_[shape];
+
+    if (silhouette) {
+      return silhouette;
+    }
+
+    const family = this.resolveRbFamilyModelName_(sat);
+
+    if (family) {
+      return family;
+    }
+
+    return this.resolveRbSizeBucket_(sat);
+  }
+
+  private resolveRbFamilyModelName_(sat: Satellite): string | null {
+    const launchVehicle = sat.launchVehicle.toLowerCase();
+
+    if (!launchVehicle) {
+      return null;
+    }
+
+    for (const { match, model } of ModelResolver.rbFamilies_) {
+      if (match.test(launchVehicle)) {
+        return model;
+      }
+    }
+
+    if (ModelResolver.rbSovietVehicles_.test(launchVehicle)) {
+      const length = Number.parseFloat(sat.length);
+
+      // Short Soviet stages (Tsiklon S5M class) get the squat variant
+      return length > 0 && length <= 4 ? SatelliteModels['rb-cyl-soviet-b'] : SatelliteModels['rb-cyl-soviet'];
+    }
+
+    return null;
+  }
+
+  /**
+   * Size-bucketed generic gray stages. Catalog diameter (meters) drives the
+   * bucket, length is the fallback, medium the default; 99.7% of rocket-body
+   * records carry both fields.
+   */
+  private resolveRbSizeBucket_(sat: Satellite): string {
+    const diameter = Number.parseFloat(sat.diameter);
+
+    if (diameter > 0) {
+      if (diameter < 2.0) {
+        return SatelliteModels['rb-cyl-gray-s'];
+      }
+
+      return diameter <= 3.2 ? SatelliteModels['rb-cyl-gray-m'] : SatelliteModels['rb-cyl-gray-l'];
+    }
+
+    const length = Number.parseFloat(sat.length);
+
+    if (length > 0) {
+      if (length < 5) {
+        return SatelliteModels['rb-cyl-gray-s'];
+      }
+
+      return length <= 9 ? SatelliteModels['rb-cyl-gray-m'] : SatelliteModels['rb-cyl-gray-l'];
+    }
+
+    return SatelliteModels['rb-cyl-gray-m'];
   }
 
   // eslint-disable-next-line complexity

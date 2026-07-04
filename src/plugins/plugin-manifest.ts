@@ -758,6 +758,13 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
   {
+    configKey: 'TransitFinderPlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/transit-finder/transit-finder') : undefined,
+    proClassName: 'TransitFinderPlugin',
+    defaultConfig: { enabled: true, order: 426 },
+    isLoginRequired: true,
+  },
+  {
     configKey: 'EclipseSolarAnalysis',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/eclipse-solar-analysis/eclipse-solar-analysis') : undefined,
     proClassName: 'EclipseSolarAnalysis',

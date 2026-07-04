@@ -351,6 +351,7 @@ export class WebpackManager {
       entry.overflightWorker = ['./src/plugins-pro/overflight/overflightWorker.ts'];
       entry.neighborhoodHistoryWorker = ['./src/plugins-pro/neighborhood-history/neighborhoodHistoryWorker.ts'];
       entry.interceptorWorker = ['./src/plugins-pro/satellite-interceptor/interceptorWorker.ts'];
+      entry.transitFinderWorker = ['./src/plugins-pro/transit-finder/transitFinderWorker.ts'];
     }
 
     return ({

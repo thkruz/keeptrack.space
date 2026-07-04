@@ -126,6 +126,7 @@ export type KeepTrackPluginsConfiguration = {
   CloseObjectsPlugin?: PluginConfiguration;
   BestPassPlugin?: PluginConfiguration;
   OverflightPlugin?: PluginConfiguration;
+  TransitFinderPlugin?: PluginConfiguration;
   TipAndCuePlanner?: PluginConfiguration;
   EclipseSolarAnalysis?: PluginConfiguration;
   CoverageAnalysis?: PluginConfiguration;

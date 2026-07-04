@@ -65,7 +65,7 @@ export class ProfileLoader {
       );
     }
 
-    logWithStyle(`Loading profile: ${profileName}`, ConsoleStyles.INFO);
+    logWithStyle(`Loading profile: ${profileName}`, ConsoleStyles.DEBUG);
 
     const config: Partial<BuildConfig> = {};
 

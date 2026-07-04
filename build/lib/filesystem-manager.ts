@@ -23,7 +23,7 @@ export class FileSystemManager {
       this.rootDir = process.cwd();
     }
 
-    logWithStyle(`Root directory: ${this.rootDir}`, ConsoleStyles.INFO);
+    logWithStyle(`Root directory: ${this.rootDir}`, ConsoleStyles.DEBUG);
   }
 
   /**
@@ -33,7 +33,7 @@ export class FileSystemManager {
   public prepareBuildDirectory(buildDir: string): void {
     const fullPath = this.resolvePath(buildDir);
 
-    logWithStyle(`Preparing build directory: ${fullPath}`, ConsoleStyles.INFO);
+    logWithStyle(`Preparing build directory: ${fullPath}`, ConsoleStyles.DEBUG);
 
     this.cleanDirectory(buildDir);
     this.createDirectory(buildDir);
@@ -49,7 +49,7 @@ export class FileSystemManager {
     tryCatchWithBuildError(
       () => {
         if (existsSync(fullPath)) {
-          logWithStyle(`Cleaning directory: ${fullPath}`, ConsoleStyles.INFO);
+          logWithStyle(`Cleaning directory: ${fullPath}`, ConsoleStyles.DEBUG);
           rmSync(fullPath, { recursive: true });
         }
       },
@@ -68,7 +68,7 @@ export class FileSystemManager {
     tryCatchWithBuildError(
       () => {
         if (!existsSync(fullPath)) {
-          logWithStyle(`Creating directory: ${fullPath}`, ConsoleStyles.INFO);
+          logWithStyle(`Creating directory: ${fullPath}`, ConsoleStyles.DEBUG);
           mkdirSync(fullPath, { recursive: true });
         }
       },
@@ -123,7 +123,7 @@ export class FileSystemManager {
 
     tryCatchWithBuildError(
       () => {
-        logWithStyle(`Copying directory: ${fullSourcePath} -> ${fullDestPath}`, ConsoleStyles.INFO);
+        logWithStyle(`Copying directory: ${fullSourcePath} -> ${fullDestPath}`, ConsoleStyles.DEBUG);
         cpSync(fullSourcePath, fullDestPath, {
           recursive: options.recursive ?? true,
           preserveTimestamps: options.preserveTimestamps ?? true,
@@ -257,28 +257,26 @@ export class FileSystemManager {
   /**
    * Recursively finds all .json files inside any 'locales' folder under the given directory.
    * @param dir The directory to search.
+   * @param found Accumulator for recursion.
+   * @param excludeDir Absolute path of a subtree to skip (e.g. the pro plugins directory when it is scanned separately).
    * @returns Array of absolute paths to .json files in 'locales' folders.
    */
-  private findLocalesJsonFiles(dir: string, found: string[] = []): string[] {
+  private findLocalesJsonFiles(dir: string, found: string[] = [], excludeDir?: string): string[] {
     const fullDir = this.resolvePath(dir);
-
-    logWithStyle(`Searching for locale files in: ${fullDir}`, ConsoleStyles.DEBUG);
     const entries = readdirSync(fullDir, { withFileTypes: true });
 
     for (const entry of entries) {
       const entryPath = join(fullDir, entry.name);
 
-      if (entry.isDirectory()) {
+      if (entry.isDirectory() && entryPath !== excludeDir) {
         if (entry.name === 'locales') {
-          logWithStyle(`Found 'locales' directory: ${entryPath}`, ConsoleStyles.DEBUG);
           const localeFiles = readdirSync(entryPath, { withFileTypes: true })
             .filter((f) => f.isFile() && f.name.endsWith('.src.json'))
             .map((f) => join(entryPath, f.name));
 
-          localeFiles.forEach((file) => logWithStyle(`Found locale file: ${file}`, ConsoleStyles.DEBUG));
           found.push(...localeFiles);
         } else {
-          this.findLocalesJsonFiles(entryPath, found);
+          this.findLocalesJsonFiles(entryPath, found, excludeDir);
         }
       }
     }
@@ -291,23 +289,21 @@ export class FileSystemManager {
    * Files from pluginDir overwrite those from srcDir if conflicts exist.
    * @param srcDir The public directory to search for locales.
    * @param proDir The pro directory to search for locales.
+   * @returns Summary counts of the merge (source files read, locale files written).
    */
-  mergeLocales(srcDir: string, proDir?: string) {
+  mergeLocales(srcDir: string, proDir?: string): { files: number; languages: number } {
     let srcJsonFiles: string[] = [];
 
     if (!proDir) {
-      logWithStyle('No proDir specified, compiling locales only from srcDir', ConsoleStyles.INFO);
+      logWithStyle('No proDir specified, compiling locales only from srcDir', ConsoleStyles.DEBUG);
 
       srcJsonFiles = this.findLocalesJsonFiles(srcDir);
     } else {
-      logWithStyle(`ProDir specified: ${proDir}`, ConsoleStyles.INFO);
+      logWithStyle(`Merging locales from: ${srcDir} and ${proDir}`, ConsoleStyles.DEBUG);
+      // Find all .json files in 'locales' folders under srcDir, skipping the proDir subtree (it is scanned separately below)
+      srcJsonFiles = this.findLocalesJsonFiles(srcDir, [], this.resolvePath(proDir));
 
-      logWithStyle(`Merging locales from: ${srcDir} and ${proDir}`, ConsoleStyles.INFO);
-      // Find all .json files in 'locales' folders under srcDir (excluding pluginDir)
-      srcJsonFiles = this.findLocalesJsonFiles(srcDir)
-        .filter((p) => !p.startsWith(this.resolvePath(proDir)));
-
-      logWithStyle(`Source locale files: ${JSON.stringify(srcJsonFiles, null, 2)}`, ConsoleStyles.SUCCESS);
+      logWithStyle(`Found ${srcJsonFiles.length} source locale files under ${srcDir}`, ConsoleStyles.DEBUG);
 
       // Find all .json files in 'locales' folders under pluginDir
       const pluginJsonFiles = this.findLocalesJsonFiles(proDir);
@@ -315,7 +311,7 @@ export class FileSystemManager {
       // Append plugin files to src files, plugin files take precedence
       srcJsonFiles.push(...pluginJsonFiles);
 
-      logWithStyle(`Plugin locale files: ${JSON.stringify(pluginJsonFiles, null, 2)}`, ConsoleStyles.SUCCESS);
+      logWithStyle(`Found ${pluginJsonFiles.length} pro locale files under ${proDir}`, ConsoleStyles.DEBUG);
     }
 
 
@@ -343,9 +339,19 @@ export class FileSystemManager {
       const paths = srcFilesByName[fileName];
       let mergedContent: any = {};
 
+      logWithStyle(`Merging ${paths.length} '${fileName}' locale files`, ConsoleStyles.DEBUG);
+
       for (const srcPath of paths) {
-        logWithStyle(`Reading source locale file: ${srcPath}`, ConsoleStyles.DEBUG);
-        const srcContent = JSON.parse(this.readFile(srcPath));
+        let srcContent: any;
+
+        try {
+          srcContent = JSON.parse(this.readFile(srcPath));
+        } catch (error) {
+          throw new BuildError(
+            `Failed to parse locale file: ${srcPath} (${error instanceof Error ? error.message : String(error)})`,
+            ErrorCodes.FILE_OPERATION,
+          );
+        }
 
         mergedContent = this.deepMergeLocaleContent_(mergedContent, srcContent);
       }
@@ -369,9 +375,11 @@ export class FileSystemManager {
 
       const absPath = join(targetDir, fileName);
 
-      logWithStyle(`Writing merged locale file: ${absPath}`, ConsoleStyles.INFO);
+      logWithStyle(`Writing merged locale file: ${absPath}`, ConsoleStyles.DEBUG);
       this.writeFile(absPath, JSON.stringify(mergedLocales[rel], null, 2));
     }
+
+    return { files: srcJsonFiles.length, languages: Object.keys(mergedLocales).length };
   }
 
   /**
@@ -391,7 +399,7 @@ export class FileSystemManager {
 
     const mergedJson = this.deepMergeLocaleContent_(srcJson, pluginJson);
 
-    console.log(`Merged locale files: ${srcPath} + ${pluginPath}`);
+    logWithStyle(`Merged locale files: ${srcPath} + ${pluginPath}`, ConsoleStyles.DEBUG);
 
     return JSON.stringify(mergedJson, null, 2);
   }

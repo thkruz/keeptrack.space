@@ -1,4 +1,5 @@
 // src/scripts/utils/errorHandling.ts
+import { LogLevel, reporter } from './reporter';
 
 /**
  * Custom error class for build process errors
@@ -61,19 +62,16 @@ export function tryCatchWithBuildError<T>(
  * @param exitProcess Whether to exit the process (defaults to true)
  */
 export function handleBuildError(error: unknown, exitProcess = true): void {
+  // A failure mid-phase must not leave a dangling spinner line
+  reporter.failActive();
+
   if (error instanceof BuildError) {
-    console.error(
-      `${ConsoleStyles.ERROR}Build Error [${error.code}]: ${error.message}${ConsoleStyles.RESET}`,
-    );
+    reporter.log(`Build Error [${error.code}]: ${error.message}`, 'error');
   } else if (error instanceof Error) {
-    console.error(
-      `${ConsoleStyles.ERROR}Unexpected Error: ${error.message}${ConsoleStyles.RESET}`,
-    );
+    reporter.log(`Unexpected Error: ${error.message}`, 'error');
     console.error(error.stack);
   } else {
-    console.error(
-      `${ConsoleStyles.ERROR}Unknown Error: ${String(error)}${ConsoleStyles.RESET}`,
-    );
+    reporter.log(`Unknown Error: ${String(error)}`, 'error');
   }
 
   if (exitProcess) {
@@ -82,11 +80,22 @@ export function handleBuildError(error: unknown, exitProcess = true): void {
   }
 }
 
+const STYLE_TO_LEVEL: Record<ConsoleStyles, LogLevel> = {
+  [ConsoleStyles.DEBUG]: 'debug',
+  [ConsoleStyles.INFO]: 'info',
+  [ConsoleStyles.ERROR]: 'error',
+  [ConsoleStyles.WARNING]: 'warn',
+  [ConsoleStyles.SUCCESS]: 'success',
+  [ConsoleStyles.RESET]: 'info',
+};
+
 /**
- * Logs a styled message to the console
+ * Logs a styled message to the console via the shared reporter, which keeps
+ * output cooperative with active spinner/progress lines and hides DEBUG
+ * messages unless --verbose is set.
  * @param message Message to log
  * @param style Style to use
  */
 export function logWithStyle(message: string, style: ConsoleStyles = ConsoleStyles.INFO): void {
-  console.log(`${style}${message}${ConsoleStyles.RESET}`);
+  reporter.log(message, STYLE_TO_LEVEL[style]);
 }

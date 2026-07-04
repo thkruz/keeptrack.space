@@ -3,8 +3,8 @@ import { ConsoleStyles, logWithStyle } from '../lib/build-error';
 import { ConfigManager } from '../lib/config-manager';
 import { FileSystemManager } from '../lib/filesystem-manager';
 
-export function mergeAllLocales(): void {
-  logWithStyle('Starting locale build process', ConsoleStyles.INFO);
+export function mergeAllLocales(): { files: number; languages: number } {
+  logWithStyle('Starting locale build process', ConsoleStyles.DEBUG);
 
   // Initialize utilities
   const fileManager = new FileSystemManager(import.meta.url);
@@ -21,8 +21,8 @@ export function mergeAllLocales(): void {
   // Always include pro plugin locales when the directory exists, even in OSS builds.
   // The submodule is checked out in CI and locale keys must be consistent across all languages.
   if (config.isPro || fileManager.fileExists('../src/plugins-pro')) {
-    fileManager.mergeLocales('../src', '../src/plugins-pro');
-  } else {
-    fileManager.mergeLocales('../src');
+    return fileManager.mergeLocales('../src', '../src/plugins-pro');
   }
+
+  return fileManager.mergeLocales('../src');
 }

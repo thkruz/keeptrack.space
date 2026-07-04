@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KeepTrack Mesh Viewer</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    display: flex;
+    background: #000;
+    color: #cfd2d6;
+    font: 12px/1.5 ui-monospace, Consolas, monospace;
+  }
+  #sidebar {
+    width: 240px;
+    min-width: 240px;
+    display: flex;
+    flex-direction: column;
+    background: #0c0d0f;
+    border-right: 1px solid #24262a;
+  }
+  #sidebar h1 {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: #8b929c;
+    padding: 10px 12px 6px;
+    text-transform: uppercase;
+  }
+  #filter {
+    margin: 0 10px 8px;
+    padding: 5px 8px;
+    background: #16181c;
+    border: 1px solid #2b2e34;
+    border-radius: 4px;
+    color: #e5e8ec;
+    font: inherit;
+    outline: none;
+  }
+  #filter:focus { border-color: #3d80c4; }
+  #mesh-list {
+    flex: 1;
+    overflow-y: auto;
+    list-style: none;
+    padding-bottom: 8px;
+  }
+  #mesh-list li {
+    padding: 3px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #mesh-list li:hover { background: #1a1d22; }
+  #mesh-list li.active { background: #1e3a56; color: #fff; }
+  #hint {
+    padding: 8px 12px;
+    border-top: 1px solid #24262a;
+    color: #5d636c;
+    font-size: 11px;
+  }
+  #main { flex: 1; position: relative; }
+  #canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .panel {
+    position: absolute;
+    background: rgba(10, 11, 13, 0.82);
+    border: 1px solid #24262a;
+    border-radius: 6px;
+    padding: 8px 10px;
+    max-width: 320px;
+  }
+  .panel h2 {
+    font-size: 11px;
+    font-weight: 600;
+    color: #8b929c;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+  #info { top: 10px; left: 10px; }
+  #info .model-name { color: #fff; font-size: 14px; font-weight: 600; }
+  #info table td { padding-right: 10px; color: #9aa1ab; }
+  #info table td:last-child { color: #dfe3e8; padding-right: 0; }
+  #controls { top: 10px; right: 10px; width: 230px; }
+  #controls .row { display: flex; align-items: center; gap: 6px; margin: 4px 0; }
+  #controls label { color: #9aa1ab; min-width: 30px; }
+  #controls input[type=range] { flex: 1; accent-color: #3d80c4; }
+  #controls .val { min-width: 38px; text-align: right; color: #dfe3e8; }
+  .seg { display: flex; border: 1px solid #2b2e34; border-radius: 4px; overflow: hidden; }
+  .seg button {
+    flex: 1;
+    background: #16181c;
+    border: none;
+    color: #9aa1ab;
+    font: inherit;
+    padding: 3px 0;
+    cursor: pointer;
+  }
+  .seg button + button { border-left: 1px solid #2b2e34; }
+  .seg button.active { background: #1e3a56; color: #fff; }
+  #materials { bottom: 10px; left: 10px; max-height: 40%; overflow-y: auto; }
+  #materials .mat { display: flex; align-items: center; gap: 6px; margin: 2px 0; }
+  #materials .swatch {
+    width: 14px; height: 14px;
+    border-radius: 3px;
+    border: 1px solid #383c42;
+    flex: none;
+  }
+  #materials .mat-name { color: #dfe3e8; margin-right: 4px; }
+  #materials .mat-vals { color: #7d838d; }
+  #materials .warn { color: #e8a13d; }
+  #cam { bottom: 10px; right: 10px; text-align: right; }
+  #cam .dist { color: #dfe3e8; font-size: 13px; }
+  #cam .warn { color: #e8a13d; }
+  #error {
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ef6a5a;
+    display: none;
+  }
+  .axis-label {
+    position: absolute;
+    font-size: 11px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: rgba(10, 11, 13, 0.75);
+    pointer-events: none;
+    white-space: nowrap;
+    transform: translate(-50%, -50%);
+    display: none;
+  }
+</style>
+</head>
+<body>
+  <div id="sidebar">
+    <h1>Mesh Viewer</h1>
+    <input id="filter" type="text" placeholder="filter..." spellcheck="false">
+    <ul id="mesh-list"></ul>
+    <div id="hint">drag rotate &middot; right-drag pan<br>wheel zoom &middot; dbl-click reset<br>&uarr;/&darr; cycle meshes</div>
+  </div>
+  <div id="main">
+    <canvas id="canvas"></canvas>
+    <div class="panel" id="info">
+      <div class="model-name">loading&hellip;</div>
+      <table></table>
+    </div>
+    <div class="panel" id="controls">
+      <h2>Shading</h2>
+      <div class="seg" id="mode-seg">
+        <button data-mode="keeptrack" class="active">KeepTrack</button>
+        <button data-mode="normals">Normals</button>
+        <button data-mode="wireframe">Wire</button>
+      </div>
+      <h2 style="margin-top:8px">Sun</h2>
+      <div class="row"><label>az</label><input id="sun-az" type="range" min="0" max="360" value="45"><span class="val" id="sun-az-val">45&deg;</span></div>
+      <div class="row"><label>el</label><input id="sun-el" type="range" min="-90" max="90" value="30"><span class="val" id="sun-el-val">30&deg;</span></div>
+      <div class="seg" id="sun-seg" style="margin-top:4px">
+        <button data-insun="1" class="active">Sunlit</button>
+        <button data-insun="0.5">Penumbra</button>
+        <button data-insun="0">Eclipse</button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <label style="min-width:auto"><input id="axes-toggle" type="checkbox" checked> orientation axes</label>
+      </div>
+    </div>
+    <div class="panel" id="materials"><h2>Materials</h2><div id="mat-rows"></div></div>
+    <div class="panel" id="cam"><div class="dist" id="cam-dist"></div><div id="cam-warn" class="warn"></div></div>
+    <div class="panel" id="error"></div>
+  </div>
+  <script src="/lib/gl-matrix-min.js"></script>
+  <script src="/lib/webgl-obj-loader.min.js"></script>
+  <script src="/viewer.js"></script>
+</body>
+</html>

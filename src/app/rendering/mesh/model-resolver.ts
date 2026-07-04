@@ -41,6 +41,7 @@ export const SatelliteModels = {
   spacebee2gen: 'spacebee2gen',
   spacebee3gen: 'spacebee3gen',
   starlink: 'starlink',
+  'starlink-v2mini': 'starlink-v2mini',
   sateliotsat: 'sateliotsat',
   sateliotsat2: 'sateliotsat2',
   tiangong: 'tiangong',
@@ -95,6 +96,7 @@ export class ModelResolver {
     'spacebee2gen': null as MeshModel | null,
     'spacebee3gen': null as MeshModel | null,
     'starlink': null as MeshModel | null,
+    'starlink-v2mini': null as MeshModel | null,
     'sateliotsat': null as MeshModel | null,
     'sateliotsat2': null as MeshModel | null,
     'saturn-iv-b': null as MeshModel | null,
@@ -161,6 +163,10 @@ export class ModelResolver {
 
   // eslint-disable-next-line complexity
   private resolveSatModelName_(sat: Satellite): string {
+    if (sat.name.startsWith('STARLINK')) {
+      return this.resolveStarlinkModelName_(sat);
+    }
+
     const knownSatelliteModel = this.resolveByName_(sat.name);
 
     if (knownSatelliteModel) {
@@ -272,12 +278,28 @@ export class ModelResolver {
     return SatelliteModels.sat2;
   }
 
+  /**
+   * The catalog metadata marks v2 Mini variants with a "Starlink V2M" bus
+   * prefix (V2M, V2MD direct-to-cell, V2MO optimized). When bus metadata is
+   * missing, fall back on SpaceX naming: v1.x names are 4-digit (max 6380),
+   * v2 Mini names are 5-digit (11072+).
+   */
+  private resolveStarlinkModelName_(sat: Satellite): string {
+    if (sat.bus.startsWith('Starlink V2M')) {
+      return SatelliteModels['starlink-v2mini'];
+    }
+    if (sat.bus === 'Starlink') {
+      return SatelliteModels.starlink;
+    }
+
+    const nameNumber = Number.parseInt(sat.name.replace(/\D+/gu, ''), 10);
+
+    return nameNumber >= 10000 ? SatelliteModels['starlink-v2mini'] : SatelliteModels.starlink;
+  }
+
   private resolveByName_(name: string): string | null {
     // TODO: Currently all named models aim at nadir - that isn't always true
 
-    if (name.startsWith('STARLINK')) {
-      return SatelliteModels.starlink;
-    }
     if (name.startsWith('GLOBALSTAR')) {
       return SatelliteModels.globalstar;
     }

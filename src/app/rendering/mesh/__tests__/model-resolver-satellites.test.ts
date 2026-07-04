@@ -48,6 +48,23 @@ describe('ModelResolver satellite model selection', () => {
     });
   });
 
+  describe('Starlink version routing', () => {
+    it('routes v2 Mini bus variants to the starlink-v2mini model', () => {
+      expect(resolver.resolve(makeSat({ name: 'STARLINK-30107', bus: 'Starlink V2M' }))).toBe(SatelliteModels['starlink-v2mini']);
+      expect(resolver.resolve(makeSat({ name: 'STARLINK-11347', bus: 'Starlink V2MD' }))).toBe(SatelliteModels['starlink-v2mini']);
+      expect(resolver.resolve(makeSat({ name: 'STARLINK-33531', bus: 'Starlink V2MO' }))).toBe(SatelliteModels['starlink-v2mini']);
+    });
+
+    it('routes the v1.x bus to the original starlink model', () => {
+      expect(resolver.resolve(makeSat({ name: 'STARLINK-1008', bus: 'Starlink' }))).toBe(SatelliteModels.starlink);
+    });
+
+    it('falls back on the name number when bus metadata is missing', () => {
+      expect(resolver.resolve(makeSat({ name: 'STARLINK-30107', bus: '' }))).toBe(SatelliteModels['starlink-v2mini']);
+      expect(resolver.resolve(makeSat({ name: 'STARLINK-6380', bus: '' }))).toBe(SatelliteModels.starlink);
+    });
+  });
+
   describe('special sccNum lookups', () => {
     it('maps the ISS, Hubble and Tiangong catalog numbers', () => {
       expect(resolver.resolve(makeSat({ sccNum: '25544' }))).toBe(SatelliteModels.iss);

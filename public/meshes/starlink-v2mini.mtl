@@ -1,0 +1,57 @@
+# Starlink V2 Mini - low poly - colored meshes only
+
+newmtl bus_gray
+Ka 0.1120 0.1160 0.1240
+Kd 0.2800 0.2900 0.3100
+Ks 0.1500 0.1500 0.1500
+Ns 20
+d 1.0
+illum 2
+
+newmtl phased_array
+Ka 0.0200 0.0280 0.0520
+Kd 0.0500 0.0700 0.1300
+Ks 0.3000 0.3200 0.4000
+Ns 90
+d 1.0
+illum 2
+
+newmtl solar_cell
+Ka 0.0280 0.0400 0.0800
+Kd 0.0700 0.1000 0.2000
+Ks 0.3500 0.3800 0.5000
+Ns 120
+d 1.0
+illum 2
+
+newmtl panel_back
+Ka 0.2880 0.2920 0.3000
+Kd 0.7200 0.7300 0.7500
+Ks 0.2000 0.2000 0.2000
+Ns 15
+d 1.0
+illum 2
+
+newmtl silver
+Ka 0.2480 0.2520 0.2640
+Kd 0.6200 0.6300 0.6600
+Ks 0.4500 0.4500 0.4500
+Ns 60
+d 1.0
+illum 2
+
+newmtl white
+Ka 0.3520 0.3520 0.3600
+Kd 0.8800 0.8800 0.9000
+Ks 0.1000 0.1000 0.1000
+Ns 10
+d 1.0
+illum 2
+
+newmtl dark_detail
+Ka 0.0480 0.0480 0.0520
+Kd 0.1200 0.1200 0.1300
+Ks 0.0500 0.0500 0.0500
+Ns 5
+d 1.0
+illum 2

@@ -129,6 +129,7 @@ export type KeepTrackPluginsConfiguration = {
   TipAndCuePlanner?: PluginConfiguration;
   EclipseSolarAnalysis?: PluginConfiguration;
   CoverageAnalysis?: PluginConfiguration;
+  SatelliteInterceptor?: PluginConfiguration;
   ManeuverPlugin?: PluginConfiguration;
   InitialOrbitDeterminationPlugin?: PluginConfiguration;
   Calculator?: PluginConfiguration;

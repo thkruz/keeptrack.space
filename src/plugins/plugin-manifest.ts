@@ -772,6 +772,13 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
   {
+    configKey: 'SatelliteInterceptor',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/satellite-interceptor/satellite-interceptor') : undefined,
+    proClassName: 'SatelliteInterceptor',
+    defaultConfig: { enabled: true, order: 95 },
+    isLoginRequired: true,
+  },
+  {
     configKey: 'ManeuverPlugin',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/maneuver/maneuver') : undefined,
     proClassName: 'ManeuverPlugin',

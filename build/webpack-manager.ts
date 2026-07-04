@@ -350,6 +350,7 @@ export class WebpackManager {
       entry.tocaPocaWorker = ['./src/plugins-pro/toca-poca-plugin/tocaPocaWorker.ts'];
       entry.overflightWorker = ['./src/plugins-pro/overflight/overflightWorker.ts'];
       entry.neighborhoodHistoryWorker = ['./src/plugins-pro/neighborhood-history/neighborhoodHistoryWorker.ts'];
+      entry.interceptorWorker = ['./src/plugins-pro/satellite-interceptor/interceptorWorker.ts'];
     }
 
     return ({

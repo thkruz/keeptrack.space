@@ -991,7 +991,7 @@ export const pluginManifest: PluginDescriptor[] = [
     configKey: 'PluginManagerPlugin',
     ossImport: () => import('./plugin-manager/plugin-manager'),
     ossClassName: 'PluginManagerPlugin',
-    defaultConfig: { enabled: true, order: 950 },
+    defaultConfig: { enabled: false, order: 950 },
   },
 
   // ── Onboarding (last: its tour targets look up other plugins) ─────────────

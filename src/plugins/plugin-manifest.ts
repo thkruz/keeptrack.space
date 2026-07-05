@@ -1,4 +1,5 @@
 /* eslint-disable no-undefined */
+/* eslint-disable max-lines -- flat registry of every plugin; grows with each addition */
 /**
  * Plugin Manifest - Single source of truth for all plugin registrations.
  *
@@ -13,6 +14,7 @@
  * rspack never resolves the plugins-pro path → no stub files needed.
  */
 import type { PluginDescriptor } from './plugin-descriptor';
+import { externalPluginManifest } from './plugin-manifest.external.generated';
 import { satInfoBoxOrbitalConfigurationDefaults } from './sat-info-box-orbital/sat-info-box-orbital-settings';
 
 export const pluginManifest: PluginDescriptor[] = [
@@ -985,6 +987,13 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
 
+  {
+    configKey: 'PluginManagerPlugin',
+    ossImport: () => import('./plugin-manager/plugin-manager'),
+    ossClassName: 'PluginManagerPlugin',
+    defaultConfig: { enabled: true, order: 950 },
+  },
+
   // ── Onboarding (last: its tour targets look up other plugins) ─────────────
   {
     configKey: 'OnboardingPlugin',
@@ -994,4 +1003,8 @@ export const pluginManifest: PluginDescriptor[] = [
     // e.g. View on GitHub) in the drawer's About group.
     defaultConfig: { enabled: true, order: -1 },
   },
+
+  // ── External plugins (generated — always init after every built-in) ──────────
+  // Empty upstream; populated by `npm run plugin -- sync` from installed clones.
+  ...externalPluginManifest,
 ];

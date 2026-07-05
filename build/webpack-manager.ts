@@ -132,6 +132,7 @@ export class WebpackManager {
           '@engine': `${dirName}/../src/engine`,
           '@ootk': `${dirName}/../src/engine/ootk`,
           '@plugins-pro': `${dirName}/../src/plugins-pro`,
+          '@plugins-external': `${dirName}/../src/plugins-external`,
           // Specific aliases must come before @public so they match first
           '@public/img/logo.png': `${dirName}/../${this.config.textLogoPath}`,
           '@public/img/logo-primary.png': `${dirName}/../${this.config.primaryLogoPath}`,

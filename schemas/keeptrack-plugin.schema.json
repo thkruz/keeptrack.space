@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/thkruz/keeptrack.space/main/schemas/keeptrack-plugin.schema.json",
+  "title": "KeepTrack Plugin Manifest",
+  "description": "Manifest for a third-party KeepTrack plugin installed via `npm run plugin -- add`.",
+  "type": "object",
+  "required": ["formatVersion", "name", "version", "engine", "plugins"],
+  "additionalProperties": true,
+  "properties": {
+    "formatVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Manifest format version. Currently 1."
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "kebab-case package name; must equal the install directory name."
+    },
+    "version": {
+      "type": "string",
+      "description": "The plugin's own semver."
+    },
+    "description": { "type": "string" },
+    "author": { "type": "string" },
+    "repository": {
+      "type": "string",
+      "description": "Repository URL, shown in the in-app Plugin Manager."
+    },
+    "engine": {
+      "type": "string",
+      "description": "semver range of compatible KeepTrack host versions, e.g. \">=13.0.0 <14.0.0\"."
+    },
+    "plugins": {
+      "type": "array",
+      "minItems": 1,
+      "description": "One or more plugin classes contributed by this repo.",
+      "items": {
+        "type": "object",
+        "required": ["configKey", "className", "entry", "defaultConfig"],
+        "additionalProperties": false,
+        "properties": {
+          "configKey": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9]*$",
+            "description": "Unique key; MUST equal the plugin class's `readonly id`."
+          },
+          "className": {
+            "type": "string",
+            "description": "Named export of `entry` to instantiate."
+          },
+          "entry": {
+            "type": "string",
+            "description": "Repo-relative path to the entry module (explicit extension, POSIX separators)."
+          },
+          "defaultConfig": {
+            "type": "object",
+            "required": ["enabled"],
+            "properties": {
+              "enabled": { "type": "boolean" },
+              "order": { "type": "number" },
+              "hideBottomIcon": { "type": "boolean" }
+            }
+          },
+          "dependencies": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "configKeys of built-in plugins this plugin needs (used by the dev harness)."
+          },
+          "alwaysEnabled": { "type": "boolean" }
+        }
+      }
+    },
+    "localesDir": {
+      "type": "string",
+      "description": "Folder of {lang}.src.json files, keyed under plugins.<configKey>.*. Conventionally \"locales\"."
+    },
+    "workers": {
+      "type": "array",
+      "maxItems": 0,
+      "description": "Reserved. Web workers are not supported in format version 1."
+    },
+    "runtime": {
+      "type": "object",
+      "description": "Reserved for a future runtime loader (prebuilt ESM bundle). Ignored by the build-time installer.",
+      "properties": {
+        "bundle": { "type": "string" },
+        "format": { "type": "string", "enum": ["esm"] }
+      }
+    }
+  }
+}

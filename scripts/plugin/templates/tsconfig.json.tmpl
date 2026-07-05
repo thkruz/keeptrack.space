@@ -1,0 +1,28 @@
+{
+  "//": "IDE intellisense against the KeepTrack engine. Point the paths below at a",
+  "//2": "sibling checkout of keeptrack.space (or a gitignored .keeptrack-space/ clone).",
+  "//3": "The host build ignores this file — ts-loader uses the host's tsconfig.build.json.",
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "strict": false,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "newLine": "LF",
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["../keeptrack.space/src/*", ".keeptrack-space/src/*"],
+      "@engine/*": ["../keeptrack.space/src/engine/*", ".keeptrack-space/src/engine/*"],
+      "@ootk/*": ["../keeptrack.space/src/engine/ootk/*", ".keeptrack-space/src/engine/ootk/*"],
+      "@public/*": ["../keeptrack.space/public/*", ".keeptrack-space/public/*"],
+      "@test/*": ["../keeptrack.space/test/*", ".keeptrack-space/test/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "__tests__/**/*.ts"]
+}

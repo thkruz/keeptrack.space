@@ -1,0 +1,47 @@
+# __PLUGIN_PKG__
+
+__DESCRIPTION__
+
+A plugin for [KeepTrack.space](https://github.com/thkruz/keeptrack.space).
+
+## Develop
+
+The plugin needs the KeepTrack engine to compile against. Two common setups:
+
+**A. Develop inside a KeepTrack checkout (recommended)**
+
+```bash
+git clone https://github.com/thkruz/keeptrack.space
+cd keeptrack.space
+npm install
+npm run plugin -- create my-plugin      # scaffolds src/plugins-external/keeptrack-plugin-my-plugin
+npm run plugin -- dev __CONFIG_KEY__    # boots the app with only this plugin, live-reload
+```
+
+Edit the files under `src/plugins-external/__PLUGIN_PKG__/`, then push them to
+their own git repo (`git remote add origin …` from inside the plugin folder).
+
+**B. Develop standalone**
+
+Clone this repo next to a `keeptrack.space` checkout (so the `../keeptrack.space`
+paths in `tsconfig.json` resolve), or clone KeepTrack into `.keeptrack-space/`.
+Then `npm install` here for editor type-checking.
+
+## Install (for users)
+
+```bash
+# From a KeepTrack checkout:
+npm run plugin -- add https://github.com/YOU/__PLUGIN_PKG__
+npm run build   # or restart `npm start`
+```
+
+## The two hard rules
+
+1. The entry (`src/plugin.ts`) must have a **named export** matching `className`
+   in `keeptrack-plugin.json` (`__CLASS_NAME__`).
+2. The class's `readonly id` must **equal** its `configKey` (`__CONFIG_KEY__`).
+
+## License
+
+MIT. Note: KeepTrack itself is AGPL-3.0. A plugin compiled into a KeepTrack build
+becomes part of that combined work, so distribute accordingly.

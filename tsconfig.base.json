@@ -62,6 +62,9 @@
       "@plugins-pro/*": [
         "src/plugins-pro/*"
       ],
+      "@plugins-external/*": [
+        "src/plugins-external/*"
+      ],
       "@public/*": [
         "public/*"
       ],

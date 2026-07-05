@@ -30,7 +30,8 @@
     "src/engine/ootk/test/**/*",
     "src/engine/ootk/**/__tests__/**/*",
     "src/**/*.test.ts",
-    "src/**/*.test.tsx"
+    "src/**/*.test.tsx",
+    "src/plugins-external/**/__tests__/**/*"
   ],
   "filesGlob": [
     "src/**/*.ts",

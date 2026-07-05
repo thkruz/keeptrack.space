@@ -149,6 +149,32 @@ class BuildManager {
           source: false,
         }),
       );
+
+      BuildManager.hintExternalPluginFailure(stats);
+    }
+  }
+
+  /**
+   * When a compile error originates in an installed third-party plugin, point the
+   * user at the plugin CLI instead of leaving them to decode an engine-internal
+   * stack from code they did not write.
+   */
+  private static hintExternalPluginFailure(stats: MultiStats) {
+    const errorsText = JSON.stringify(stats.toJson({ errors: true, all: false }).children ?? []);
+    const names = new Set<string>();
+    const re = /src[\\/]plugins-external[\\/]([^\\/"]+)/gu;
+    let m: RegExpExecArray | null = re.exec(errorsText);
+
+    while (m !== null) {
+      names.add(m[1]);
+      m = re.exec(errorsText);
+    }
+
+    for (const name of names) {
+      logWithStyle(
+        `External plugin "${name}" failed to compile. Try "npm run plugin -- update ${name}" or "npm run plugin -- remove ${name}".`,
+        ConsoleStyles.WARNING,
+      );
     }
   }
 

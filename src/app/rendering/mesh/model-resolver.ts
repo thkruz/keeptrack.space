@@ -87,6 +87,20 @@ export const SatelliteModels = {
   's12u-w': 's12u-w',
   s16u: 's16u',
   's16u-b': 's16u-b',
+  'gen-box-s': 'gen-box-s',
+  'gen-box-m': 'gen-box-m',
+  'gen-box-l': 'gen-box-l',
+  'gen-box-xl': 'gen-box-xl',
+  'gen-box-xl-b': 'gen-box-xl-b',
+  'gen-box-dish': 'gen-box-dish',
+  'gen-box-solar': 'gen-box-solar',
+  'gen-trap-geo': 'gen-trap-geo',
+  'gen-cyl': 'gen-cyl',
+  'gen-cyl-dish': 'gen-cyl-dish',
+  'gen-cyl-pan': 'gen-cyl-pan',
+  'gen-poly': 'gen-poly',
+  'gen-hex-pan': 'gen-hex-pan',
+  'gen-sphere': 'gen-sphere',
   sat2: 'sat2',
   'saturn-iv-b': 'saturn-iv-b',
   sbirs: 'sbirs',
@@ -475,6 +489,74 @@ export class ModelResolver {
       // Generic Model
     }
 
+    return this.resolveGenericModelName_(sat);
+  }
+
+  /**
+   * Generic payload fallback. The catalog `shape` field is populated on ~100% of
+   * payloads and describes the silhouette ("Box + pan", "Trapezoid+2 pan",
+   * "Cyl + Ant", "Poly", ...), so parse it into (bus, panels, antenna) and route
+   * into a shape-matched archetype, sized by the `span` field (a big GEO comsat
+   * must not render at smallsat scale). The sccNum hash breaks ties where a
+   * bucket has more than one variant. Unparseable/empty shapes keep the legacy
+   * `sat2` mesh for continuity.
+   */
+  private resolveGenericModelName_(sat: Satellite): string {
+    const s = sat.shape.toLowerCase().replaceAll(/\s+/gu, '').replaceAll('+', '');
+
+    if (s === '') {
+      return SatelliteModels.sat2;
+    }
+
+    const span = Number.parseFloat(sat.span);
+    const spanM = Number.isFinite(span) ? span : 0;
+    const hasAnt = s.includes('ant');
+    let panels = 0;
+
+    if (/[234]pan/u.test(s)) {
+      panels = 2;
+    } else if (s.includes('pan')) {
+      panels = 1;
+    }
+
+    if (s.includes('trap')) {
+      return SatelliteModels['gen-trap-geo'];
+    }
+    if (s.includes('cyl')) {
+      if (panels >= 2) {
+        return SatelliteModels['gen-cyl-pan'];
+      }
+
+      return hasAnt ? SatelliteModels['gen-cyl-dish'] : SatelliteModels['gen-cyl'];
+    }
+    if (s.includes('hex')) {
+      return panels >= 2 ? SatelliteModels['gen-hex-pan'] : SatelliteModels['gen-poly'];
+    }
+    if (s.includes('poly')) {
+      return SatelliteModels['gen-poly'];
+    }
+    if (s.includes('spher')) {
+      return SatelliteModels['gen-sphere'];
+    }
+    if (s.includes('box')) {
+      if (panels === 0) {
+        return hasAnt ? SatelliteModels['gen-box-dish'] : SatelliteModels['gen-box-solar'];
+      }
+      if (spanM < 2) {
+        return SatelliteModels['gen-box-s'];
+      }
+      if (spanM < 10) {
+        return SatelliteModels['gen-box-m'];
+      }
+      if (spanM < 18) {
+        return SatelliteModels['gen-box-l'];
+      }
+      const xl = [SatelliteModels['gen-box-xl'], SatelliteModels['gen-box-xl-b']];
+
+      return xl[this.variantIndex_(sat.sccNum, xl.length)];
+    }
+
+    // cone / other / unrecognized silhouettes keep the legacy generic mesh.
     return SatelliteModels.sat2;
   }
 

@@ -15,6 +15,8 @@ const makeSat = (over: Partial<Satellite> = {}): Satellite =>
     bus: 'Unknown',
     intlDes: '2020-001A',
     rcs: undefined,
+    shape: '',
+    span: '',
     tle1: '' as TleLine1,
     tle2: '' as TleLine2,
     ...over,
@@ -171,8 +173,47 @@ describe('ModelResolver satellite model selection', () => {
         .toContain(resolver.resolve(makeSat({ rcs: 0.25 })));
     });
 
-    it('falls back to the generic sat2 model when nothing matches', () => {
-      expect(resolver.resolve(makeSat({ rcs: 5 }))).toBe(SatelliteModels.sat2);
+    it('falls back to the generic sat2 model when the shape is empty', () => {
+      expect(resolver.resolve(makeSat({ rcs: 5, shape: '' }))).toBe(SatelliteModels.sat2);
+    });
+  });
+
+  describe('generic payload shape routing', () => {
+    const cases: [Partial<Satellite>, string][] = [
+      // box + panels, sized by span
+      [{ shape: 'Box + pan', span: '1.2' }, SatelliteModels['gen-box-s']],
+      [{ shape: 'Box + pan', span: '6' }, SatelliteModels['gen-box-m']],
+      [{ shape: 'Box + 2 Pan', span: '14' }, SatelliteModels['gen-box-l']],
+      // box, no panels
+      [{ shape: 'Box + Ant', span: '3' }, SatelliteModels['gen-box-dish']],
+      [{ shape: 'Box', span: '1' }, SatelliteModels['gen-box-solar']],
+      // other buses
+      [{ shape: 'Trapezoid+2 pan', span: '12' }, SatelliteModels['gen-trap-geo']],
+      [{ shape: 'Cyl + Ant', span: '6' }, SatelliteModels['gen-cyl-dish']],
+      [{ shape: 'Cyl + 2 Pan', span: '7' }, SatelliteModels['gen-cyl-pan']],
+      [{ shape: 'Cyl', span: '5' }, SatelliteModels['gen-cyl']],
+      [{ shape: 'Poly', span: '1.5' }, SatelliteModels['gen-poly']],
+      [{ shape: 'Half Hex Prism+2 pan', span: '6' }, SatelliteModels['gen-hex-pan']],
+      [{ shape: 'Sphere', span: '1' }, SatelliteModels['gen-sphere']],
+      // unrecognized silhouette keeps the legacy mesh
+      [{ shape: 'Cone', span: '2' }, SatelliteModels.sat2],
+    ];
+
+    it.each(cases)('routes shape %o to its archetype', (over, expected) => {
+      expect(resolver.resolve(makeSat(over))).toBe(expected);
+    });
+
+    it('routes a huge box span into one of the two XL variants, deterministically', () => {
+      const xl = [SatelliteModels['gen-box-xl'], SatelliteModels['gen-box-xl-b']];
+      const first = resolver.resolve(makeSat({ shape: 'Box + 2 pan', span: '22', sccNum: '55123' }));
+
+      expect(xl).toContain(first);
+      expect(resolver.resolve(makeSat({ shape: 'Box + 2 pan', span: '22', sccNum: '55123' }))).toBe(first);
+    });
+
+    it('tolerates messy shape spellings and casing', () => {
+      expect(resolver.resolve(makeSat({ shape: 'BOX+2PAN', span: '6' }))).toBe(SatelliteModels['gen-box-m']);
+      expect(resolver.resolve(makeSat({ shape: '  cyl  ', span: '5' }))).toBe(SatelliteModels['gen-cyl']);
     });
   });
 

@@ -170,4 +170,8 @@ export enum StorageKey {
 
   // Access Timeline Pro (sensor objNames shown in the docked timeline strip)
   ACCESS_TIMELINE_ENABLED_SENSORS = 'v2-keepTrack-accessTimelineEnabledSensors',
+
+  // Plugin Manager (per-plugin enable/disable overrides, diffed from manifest
+  // defaults; survives version wipes via the preservation allowlist)
+  PLUGIN_ENABLE_OVERRIDES = 'v2-keepTrack-pluginEnableOverrides',
 }

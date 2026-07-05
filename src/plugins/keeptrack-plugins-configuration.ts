@@ -26,6 +26,7 @@ export type KeepTrackPluginsConfiguration = {
   TooltipsPlugin?: PluginConfiguration;
   UserAccountPlugin?: PluginConfiguration;
   DebugMenuPlugin?: PluginConfiguration;
+  PluginManagerPlugin?: PluginConfiguration;
   SatInfoBoxCore?: PluginConfiguration;
   SatInfoBoxActions?: PluginConfiguration;
   SatInfoBoxLinks?: PluginConfiguration;

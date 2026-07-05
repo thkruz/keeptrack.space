@@ -190,7 +190,7 @@ export class PersistenceManager {
    * Keys that survive the version-bump wipe. Onboarding progress must not reset
    * on every release, or the tour would replay for every existing user.
    */
-  private static readonly PRESERVED_KEYS_: readonly StorageKey[] = [StorageKey.ONBOARDING_STATE];
+  private static readonly PRESERVED_KEYS_: readonly StorageKey[] = [StorageKey.ONBOARDING_STATE, StorageKey.PLUGIN_ENABLE_OVERRIDES];
 
   validateStorage(): void {
     const sm = getSettingsManager_();

@@ -1,0 +1,245 @@
+/* Plugin Manager (v13). Dense list of plugin rows with toggles, plus an external
+ * plugins section and a copy-install-command box. */
+
+#plugin-manager-menu .side-menu {
+  min-width: 380px;
+  max-width: 460px;
+}
+
+/* Reload banner — a left accent bar (not saturated-red text on a light fill).
+ * The .start-hidden hide rule must beat this display:flex (equal specificity, so
+ * make it explicit). */
+#plugin-manager-menu .pm-reload-banner.start-hidden {
+  display: none;
+}
+
+#plugin-manager-menu .pm-reload-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 6px 12px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--color-primary, #ba160c);
+  background: var(--kt-bg-active, rgba(255, 255, 255, 0.06));
+  border-radius: 4px;
+}
+
+#plugin-manager-menu .pm-reload-text {
+  flex: 1;
+  color: var(--kt-text-primary, #f5f7fa);
+  font-size: 0.85rem;
+}
+
+#plugin-manager-menu .pm-reload-banner .kt-action {
+  width: auto;
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+/* Search field: give the floating label room above the input (dense-form rule). */
+#plugin-manager-menu .pm-search-field {
+  margin-top: 12px;
+}
+
+/* Plugin rows */
+#plugin-manager-menu .pm-row {
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--kt-divider, rgba(255, 255, 255, 0.06));
+}
+
+#plugin-manager-menu .pm-row-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  cursor: pointer;
+  color: var(--kt-text-primary, #f5f7fa);
+}
+
+#plugin-manager-menu .pm-row-name {
+  font-size: 0.9rem;
+}
+
+#plugin-manager-menu .pm-lock {
+  margin-left: 6px;
+  opacity: 0.6;
+  font-size: 0.75rem;
+}
+
+/* External-plugin row metadata line */
+#plugin-manager-menu .pm-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+  font-size: 0.75rem;
+  color: var(--kt-text-secondary, #b0b6be);
+}
+
+#plugin-manager-menu .pm-badge {
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+#plugin-manager-menu .pm-badge-ok {
+  background: rgba(46, 160, 67, 0.2);
+  color: #6fdd8b;
+}
+
+#plugin-manager-menu .pm-badge-warn {
+  background: rgba(210, 153, 34, 0.2);
+  color: #e3b341;
+}
+
+#plugin-manager-menu .pm-repo-link {
+  color: var(--color-primary-light, #4aa3ff);
+}
+
+#plugin-manager-menu .pm-empty,
+#plugin-manager-menu .pm-install-hint {
+  margin: 6px;
+  color: var(--kt-text-secondary, #b0b6be);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+/* Install box */
+#plugin-manager-menu .pm-install-field {
+  margin-top: 16px;
+}
+
+#plugin-manager-menu .pm-install-field input:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+/* Standalone action button matches the card width (v13 dense-form rule). */
+#plugin-manager-menu section > .kt-action {
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
+}
+
+/* Tabs / panes */
+#plugin-manager-menu .pm-tabs {
+  margin: 6px 6px 10px;
+}
+
+#plugin-manager-menu .pm-pane.start-hidden {
+  display: none;
+}
+
+/* Develop tab */
+#plugin-manager-menu .pm-develop-text {
+  margin: 0 0 6px;
+  color: var(--kt-text-secondary, #b0b6be);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+#plugin-manager-menu .pm-develop-rules {
+  margin: 4px 0 10px;
+  padding-left: 18px;
+  color: var(--kt-text-secondary, #b0b6be);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+#plugin-manager-menu .pm-develop-rules li {
+  list-style: disc;
+  margin-bottom: 4px;
+}
+
+#plugin-manager-menu .pm-doc-link {
+  display: inline-block;
+  margin-top: 4px;
+  color: var(--color-primary-light, #4aa3ff);
+  font-size: 0.85rem;
+}
+
+/* Copyable command line */
+#plugin-manager-menu .pm-command {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--color-dark-border, rgba(255, 255, 255, 0.1));
+  border-radius: 4px;
+}
+
+#plugin-manager-menu .pm-command-text {
+  flex: 1;
+  overflow-x: auto;
+  white-space: nowrap;
+  color: var(--kt-text-primary, #f5f7fa);
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+
+#plugin-manager-menu .pm-copy-btn {
+  flex: 0 0 auto;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 3px;
+  color: var(--kt-text-primary, #f5f7fa);
+  cursor: pointer;
+}
+
+#plugin-manager-menu .pm-copy-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* Browse gallery cards */
+#plugin-manager-menu .pm-card-title {
+  color: var(--kt-text-primary, #f5f7fa);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+#plugin-manager-menu .pm-card-author {
+  margin-top: 1px;
+  color: var(--kt-text-secondary, #b0b6be);
+  font-size: 0.75rem;
+}
+
+#plugin-manager-menu .pm-card-desc {
+  margin: 6px 0 8px;
+  color: var(--kt-text-secondary, #b0b6be);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+#plugin-manager-menu .pm-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+#plugin-manager-menu .pm-tag {
+  padding: 1px 7px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: var(--kt-text-secondary, #b0b6be);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+#plugin-manager-menu .pm-card-engine {
+  margin-left: auto;
+  color: var(--kt-text-secondary, #b0b6be);
+  font-family: monospace;
+  font-size: 0.68rem;
+}
+
+#plugin-manager-menu .pm-card .kt-action {
+  width: 100%;
+  margin: 0;
+}

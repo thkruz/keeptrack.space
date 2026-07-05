@@ -75,6 +75,11 @@ export class KeepTrackApi {
     <T extends KeepTrackPlugin>(pluginClass: new (...args: unknown[]) => T) => PluginRegistry.getPlugin(pluginClass);
   checkIfLoaded = PluginRegistry.checkIfLoaded.bind(PluginRegistry);
   getPluginByName = PluginRegistry.getPluginByName.bind(PluginRegistry);
+  /**
+   * The list of all loaded plugins. For debugging/tooling from the console
+   * (e.g. enumerating side menus); mirrors the getPluginByName debug helper.
+   */
+  getPluginList: () => readonly KeepTrackPlugin[] = () => PluginRegistry.plugins;
   unregisterAllPlugins = PluginRegistry.unregisterAllPlugins.bind(PluginRegistry);
 
   // Service locator methods

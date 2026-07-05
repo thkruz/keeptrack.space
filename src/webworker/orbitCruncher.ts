@@ -7,6 +7,9 @@ import {
   OrbitCruncherMsgType, OrbitCruncherOtherObject, OrbitCruncherSatelliteObject, OrbitDrawTypes,
 } from './orbit-cruncher-messages';
 
+/** Earth's sidereal rotation rate (rad/s) — the rate GMST advances. */
+const EARTH_ROTATION_RAD_PER_SEC = 7.2921159e-5;
+
 const objCache = [] as OrbitCruncherCachedObject[];
 let numberOfSegments: number;
 let orbitType = OrbitDrawTypes.ORBIT;
@@ -98,14 +101,24 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
       return;
     }
 
-    // Compute GMST once for all missile segments (same time for all points)
-    const missileJ =
-      jday(nowDate.getUTCFullYear(), nowDate.getUTCMonth() + 1, nowDate.getUTCDate(), nowDate.getUTCHours(), nowDate.getUTCMinutes(), nowDate.getUTCSeconds()) +
-      nowDate.getUTCMilliseconds() * 1.15741e-8;
-    const missileGmst = Sgp4.gstime(missileJ);
+    // Each sample is a ground-referenced point captured at launch + x seconds, so it
+    // must be rotated to ECI by the GMST at *its* time. When the launch epoch is known
+    // we derive a per-sample GMST from it (essential for multi-hour trajectories such
+    // as a GEO intercept, which spans ~78° of Earth rotation); otherwise we fall back
+    // to a single GMST at the current time (accurate enough for short ballistic arcs).
+    const startMs = missile.startTime;
+    const usePerSampleGmst = typeof startMs === 'number';
+    const gmstAnchorDate = typeof startMs === 'number' ? new Date(startMs) : nowDate;
+    const gmstAnchorJ =
+      jday(
+        gmstAnchorDate.getUTCFullYear(), gmstAnchorDate.getUTCMonth() + 1, gmstAnchorDate.getUTCDate(),
+        gmstAnchorDate.getUTCHours(), gmstAnchorDate.getUTCMinutes(), gmstAnchorDate.getUTCSeconds(),
+      ) +
+      gmstAnchorDate.getUTCMilliseconds() * 1.15741e-8;
+    const gmstAnchor = Sgp4.gstime(gmstAnchorJ);
 
     while (i < len) {
-      drawMissileSegment_(missile, i, pointsOut, len, missileGmst);
+      drawMissileSegment_(missile, i, pointsOut, len, gmstAnchor, usePerSampleGmst);
       i++;
     }
   } else if ((objCache[id] as OrbitCruncherOtherObject).ignore || !(objCache[id] as OrbitCruncherSatelliteObject).satrec) {
@@ -162,8 +175,18 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
   }, { transfer: [pointsOut.buffer as ArrayBuffer] });
 };
 
-const drawMissileSegment_ = (missile: OrbitCruncherMissileObject, i: number, pointsOut: Float32Array, len: number, gmst: number) => {
-  const x = Math.round(missile.altList.length * (i / numberOfSegments));
+const drawMissileSegment_ = (
+  missile: OrbitCruncherMissileObject, i: number, pointsOut: Float32Array, len: number,
+  gmstAnchor: number, usePerSampleGmst: boolean,
+) => {
+  // Clamp so the final segment (i === numberOfSegments) does not read one past the
+  // end of the lists (which produced a NaN vertex).
+  const x = Math.min(missile.altList.length - 1, Math.round(missile.altList.length * (i / numberOfSegments)));
+  // Sample x is captured at launch + x seconds (1 Hz cadence). With a known launch
+  // epoch, rotate it to ECI by the GMST at that time (anchor + Earth rotation over x
+  // seconds); a single GMST for the whole arc spins a multi-hour trajectory off its
+  // dots. Without a launch epoch, gmstAnchor is already the current-time GMST.
+  const gmst = usePerSampleGmst ? gmstAnchor + EARTH_ROTATION_RAD_PER_SEC * x : gmstAnchor;
 
   // Use the ellipsoidal (WGS84) lat/lon/alt -> ECI conversion, the same one
   // MissileObject.eci() and every other object use. A spherical approximation
@@ -290,12 +313,17 @@ const handleMsgMissileUpdate_ = (data: OrbitCruncherInMsgMissileUpdate) => {
   if (data.id >= objCache.length || !objCache[data.id]) {
     return;
   }
-  if (data.latList && data.lonList && data.altList) {
-    const missileCacheEntry = objCache[data.id] as OrbitCruncherMissileObject;
+  const missileCacheEntry = objCache[data.id] as OrbitCruncherMissileObject;
 
+  if (data.latList && data.lonList && data.altList) {
     missileCacheEntry.latList = data.latList;
     missileCacheEntry.lonList = data.lonList;
     missileCacheEntry.altList = data.altList;
+  }
+  // Sent every redraw once known; cache it so per-frame updates (which omit the
+  // heavy lists) still have the launch epoch for per-sample GMST.
+  if (typeof data.startTime === 'number') {
+    missileCacheEntry.startTime = data.startTime;
   }
 };
 

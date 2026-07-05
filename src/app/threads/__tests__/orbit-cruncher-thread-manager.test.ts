@@ -97,7 +97,9 @@ describe('OrbitCruncherThreadManager', () => {
     it('sendMissileUpdate posts MISSILE_UPDATE with lat/lon/alt lists', () => {
       const { mgr, worker } = makeMgr();
 
-      mgr.sendMissileUpdate(9, 2000, false, true, [1, 2] as never, [3, 4] as never, [5, 6] as never);
+      mgr.sendMissileUpdate(9, 2000, false, true, {
+        latList: [1, 2] as never, lonList: [3, 4] as never, altList: [5, 6] as never, startTime: 1000,
+      });
 
       expect(lastMsg(worker)).toMatchObject({
         typ: OrbitCruncherMsgType.MISSILE_UPDATE,
@@ -105,6 +107,10 @@ describe('OrbitCruncherThreadManager', () => {
         simulationTime: 2000,
         isEcfOutput: false,
         isPolarViewEcf: true,
+        latList: [1, 2],
+        lonList: [3, 4],
+        altList: [5, 6],
+        startTime: 1000,
       });
     });
 

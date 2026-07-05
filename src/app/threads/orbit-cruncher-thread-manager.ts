@@ -46,7 +46,7 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
   sendMissileUpdate(
     id: number, simulationTime: number,
     isEcfOutput: boolean, isPolarViewEcf?: boolean,
-    latList?: Degrees[], lonList?: Degrees[], altList?: Kilometers[],
+    trajectory?: { latList?: Degrees[]; lonList?: Degrees[]; altList?: Kilometers[]; startTime?: number },
   ): void {
     this.postMessage({
       typ: OrbitCruncherMsgType.MISSILE_UPDATE,
@@ -54,9 +54,10 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
       simulationTime,
       isEcfOutput,
       isPolarViewEcf,
-      latList,
-      lonList,
-      altList,
+      latList: trajectory?.latList,
+      lonList: trajectory?.lonList,
+      altList: trajectory?.altList,
+      startTime: trajectory?.startTime,
       seqNum: this.currentSeqNum_,
     });
   }

@@ -57,6 +57,14 @@ export interface OrbitCruncherInMsgMissileUpdate {
   latList?: Degrees[];
   lonList?: Degrees[];
   altList?: Kilometers[];
+  /**
+   * Launch epoch (ms since Unix epoch) of sample index 0. Each sample sits one
+   * second later (the 1 Hz cadence the position cruncher indexes by), so the
+   * worker can rotate every sample to ECI with the GMST at *its* time instead of
+   * one GMST for the whole arc — which otherwise spins a multi-hour trajectory
+   * (e.g. a GEO intercept) far off its dots.
+   */
+  startTime?: number;
   isEcfOutput: boolean;
   isPolarViewEcf?: boolean;
   seqNum?: number;
@@ -106,6 +114,8 @@ export interface OrbitCruncherMissileObject {
   latList: Degrees[];
   lonList: Degrees[];
   altList: Kilometers[];
+  /** Launch epoch (ms) of sample 0; enables per-sample GMST. See the update message. */
+  startTime?: number;
 }
 
 export type OrbitCruncherCachedObject =

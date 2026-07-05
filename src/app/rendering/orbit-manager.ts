@@ -399,7 +399,14 @@ export class OrbitManager {
           Number(id), simTime,
           false, // Missiles use their own GMST-based conversion; ECF toggle does not apply
           isPolarView,
-          missileParams?.latList, missileParams?.lonList, missileParams?.altList,
+          {
+            latList: missileParams?.latList,
+            lonList: missileParams?.lonList,
+            altList: missileParams?.altList,
+            // Launch epoch lets the worker rotate each sample by the GMST at its own
+            // time — essential for multi-hour trajectories (e.g. a GEO interceptor).
+            startTime: (obj as unknown as { startTime?: number }).startTime,
+          },
         );
       } else if (obj instanceof OemSatellite) {
         this.setOemSatelliteOrbitBuffer_(id, obj.getOrbitPath());

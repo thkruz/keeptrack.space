@@ -2,7 +2,7 @@
  * Standalone mesh viewer server.
  *
  * Serves a small web tool that renders public/meshes OBJ+MTL files with the
- * exact KeepTrack mesh pipeline (layout, x0.05 scale, shader, log depth) so a
+ * exact KeepTrack mesh pipeline (layout, x0.001 scale, shader, log depth) so a
  * mesh can be validated without booting the full app.
  *
  * Usage: npm run mesh-viewer [-- --port=5533 --no-open]

@@ -5,7 +5,7 @@
  * what renders in the app:
  * - webgl-obj-loader with the engine's Layout order (POSITION, NORMAL,
  *   AMBIENT, DIFFUSE, UV, SPECULAR, SPECULAR_EXPONENT)
- * - positions scaled x0.05 at load (file units to world km)
+ * - positions scaled x0.001 at load (real meters to world km, lifelike 1:1)
  * - Uint32 indices when buffer vertices exceed 65535
  * - the exact mesh-renderer.ts shaders, including vertex-only log depth with
  *   DepthManager's constant, LEQUAL depth, no back-face culling
@@ -18,7 +18,8 @@
   const LOG_DEPTH_BUF_FC = 2.0 / Math.log2(3e10 + 1.0);
   // settingsManager.nearZoomLevel: the engine skips mesh drawing beyond this
   const NEAR_ZOOM_LEVEL_KM = 25;
-  const FILE_UNIT_TO_KM = 0.05;
+  // Real-meter (1:1) OBJ -> world km: 1 m = 0.001 km, lifelike physical size.
+  const FILE_UNIT_TO_KM = 0.001;
 
   const canvas = document.getElementById('canvas');
   const gl = canvas.getContext('webgl2', { antialias: true, alpha: false });

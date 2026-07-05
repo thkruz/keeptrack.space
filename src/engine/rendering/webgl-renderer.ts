@@ -262,7 +262,6 @@ export class WebGLRenderer {
 
     this.resizeCanvas();
 
-    gl.getExtension('EXT_frag_depth');
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     DepthManager.setupDepthBuffer(gl);
@@ -467,31 +466,6 @@ export class WebGLRenderer {
     ServiceLocator.getSatLabelManager()?.updateLabels(visibleSatIds, labelTexts);
 
     this.satLabelModeLastTime_ = timeManagerInstance.realTime;
-  }
-
-  setNearRenderer() {
-    if (!this.gl) {
-      return;
-    }
-
-    if (settingsManager.zNear !== 0.1) {
-      settingsManager.selectedColor = [0, 0, 0, 0];
-      settingsManager.zNear = 0.1;
-      settingsManager.zFar = 200000;
-      this.updatePMatrix();
-    }
-  }
-
-  setFarRenderer() {
-    if (!this.gl) {
-      return;
-    }
-
-    if (settingsManager.zNear !== 2) {
-      settingsManager.zNear = 2;
-      settingsManager.zFar = 450000;
-      this.updatePMatrix();
-    }
   }
 
   getScreenCoords(obj: BaseObject): {

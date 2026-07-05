@@ -234,7 +234,7 @@ export class MeshRenderer {
 
   private readonly shader_ = {
     frag: glsl`#version 300 es
-    precision mediump float;
+    precision highp float;
 
     in vec3 vLightDirection;
     in float vInSun;
@@ -245,6 +245,8 @@ export class MeshRenderer {
     in vec3 vDiffuse;
     in vec3 vSpecular;
     in float vSpecularExponent;
+
+    uniform float logDepthBufFC;
 
     out vec4 fragColor;
 
@@ -258,6 +260,8 @@ export class MeshRenderer {
       vec3 color = ambientColor + dirColor + specColor;
 
       fragColor = vec4(color, 1.0);
+
+      ${DepthManager.getLogDepthFragCode()}
     }
   `,
     vert: glsl`#version 300 es

@@ -273,8 +273,6 @@ export class Godrays {
         vec3 blended = dist > u_sunRadius ? mix(scene.rgb + rays, rays, blendFactor) : scene.rgb + rays;
 
         fragColor = vec4(blended, 1.0);
-
-        ${DepthManager.getLogDepthFragCode()}
       }
     `,
     vert: glsl`

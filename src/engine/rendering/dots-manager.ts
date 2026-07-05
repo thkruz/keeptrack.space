@@ -1271,18 +1271,14 @@ export class DotsManager {
                 }
             `,
       frag: glsl`#version 300 es
-                #extension GL_EXT_frag_depth : enable
                 precision highp float;
 
                 in vec3 vColor;
-
-                uniform float logDepthBufFC;
 
                 out vec4 fragColor;
 
                 void main(void) {
                     fragColor = vec4(vColor, 1.0);
-                    ${DepthManager.getLogDepthFragCode()}
                 }
             `,
     };

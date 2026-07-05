@@ -66,8 +66,10 @@ describe('ModelResolver debris model selection across sccNum forms', () => {
   });
 
   it('does not throw on alpha-5, extended, empty, or non-numeric debris sccNums', () => {
+    const r = resolver;
+
     for (const scc of ['T0001', 'A0000', '1234567', '999999', '', 'not-a-number']) {
-      expect(() => resolver.resolve(makeSat(scc, SpaceObjectType.DEBRIS))).not.toThrow();
+      expect(() => r.resolve(makeSat(scc, SpaceObjectType.DEBRIS))).not.toThrow();
     }
   });
 
@@ -209,9 +211,11 @@ describe('ModelResolver mesh registry disk consistency', () => {
       if (KNOWN_UNBACKED.has(name)) {
         continue;
       }
+      // eslint-disable-next-line no-sync -- one-time filesystem assertion in a test
       if (!fs.existsSync(path.join(meshDir, `${name}.obj`))) {
         missing.push(`${name}.obj`);
       }
+      // eslint-disable-next-line no-sync -- one-time filesystem assertion in a test
       if (!fs.existsSync(path.join(meshDir, `${name}.mtl`))) {
         missing.push(`${name}.mtl`);
       }

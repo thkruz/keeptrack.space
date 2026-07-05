@@ -513,7 +513,7 @@ export class ModelResolver {
     const hasAnt = s.includes('ant');
     let panels = 0;
 
-    if (/[234]pan/u.test(s)) {
+    if ((/[234]pan/u).test(s)) {
       panels = 2;
     } else if (s.includes('pan')) {
       panels = 1;

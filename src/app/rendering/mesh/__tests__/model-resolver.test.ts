@@ -1,3 +1,5 @@
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { ModelResolver, SatelliteModels } from '@app/app/rendering/mesh/model-resolver';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { Satellite, SpaceObjectType, TleLine1, TleLine2 } from '@ootk/src/main';
@@ -27,42 +29,86 @@ describe('ModelResolver debris model selection across sccNum forms', () => {
     resolver = new ModelResolver();
   });
 
-  // The legacy numeric-bucket logic only makes sense for numeric5 / numeric6
-  // sccNums. Alpha-5 ("T0001") would parseInt to NaN and previously hit the
-  // always-true `else if (parseInt > 35000)` branch returning debris2. Extended
-  // (9-digit) IDs parseInt to a huge number and likewise always landed on
-  // debris2. Both now route to the safe default (debris0).
-  it('routes numeric5 sccNums by 20000/35000 thresholds', () => {
-    expect(resolver.resolve(makeSat('00005', SpaceObjectType.DEBRIS))).toBe(SatelliteModels.debris0);
-    expect(resolver.resolve(makeSat('20000', SpaceObjectType.DEBRIS))).toBe(SatelliteModels.debris0);
-    expect(resolver.resolve(makeSat('25544', SpaceObjectType.DEBRIS))).toBe(SatelliteModels.debris1);
-    expect(resolver.resolve(makeSat('35000', SpaceObjectType.DEBRIS))).toBe(SatelliteModels.debris1);
-    expect(resolver.resolve(makeSat('35001', SpaceObjectType.DEBRIS))).toBe(SatelliteModels.debris2);
-    expect(resolver.resolve(makeSat('99999', SpaceObjectType.DEBRIS))).toBe(SatelliteModels.debris2);
+  // Debris carries almost no catalog signal (shape empty on ~96% of records,
+  // rcs null), so the legacy sccNum era-buckets are gone: routing is now a
+  // stable FNV hash of the sccNum across the generic archetype pool (the
+  // deb-panel-* family in this Phase 2 slice). The hash handles every sccNum
+  // form uniformly - no more parseInt collapsing alpha-5/extended ids into one
+  // bucket.
+  const DEBRIS_POOL: string[] = [
+    SatelliteModels['deb-panel-01'], SatelliteModels['deb-panel-02'], SatelliteModels['deb-panel-03'],
+    SatelliteModels['deb-bracket-01'], SatelliteModels['deb-bracket-02'], SatelliteModels['deb-bracket-03'],
+    SatelliteModels['deb-skin-01'], SatelliteModels['deb-skin-02'], SatelliteModels['deb-skin-03'],
+    SatelliteModels['deb-clampband-01'], SatelliteModels['deb-clampband-02'], SatelliteModels['deb-clampband-03'],
+    SatelliteModels['deb-mli-01'], SatelliteModels['deb-mli-02'], SatelliteModels['deb-mli-03'], SatelliteModels['deb-mli-04'],
+    SatelliteModels['deb-strut-01'], SatelliteModels['deb-strut-02'], SatelliteModels['deb-strut-03'],
+  ];
+  const CONE_POOL = [SatelliteModels['deb-cone-01'], SatelliteModels['deb-cone-02']];
+  const CYL_POOL = [SatelliteModels['deb-cyl-01'], SatelliteModels['deb-cyl-02']];
+  const TORUS_POOL = [SatelliteModels['deb-torus-01'], SatelliteModels['deb-torus-02']];
+
+  it('routes debris into the generic archetype pool for every sccNum form', () => {
+    const forms = ['00005', '25544', '99999', '123456', '339999', 'T0001', 'Z9999', '1234567', '799500766', '', 'not-a-number'];
+
+    for (const scc of forms) {
+      expect(DEBRIS_POOL).toContain(resolver.resolve(makeSat(scc, SpaceObjectType.DEBRIS)));
+    }
   });
 
-  it('routes numeric6 sccNums through the same numeric thresholds', () => {
-    // 6-digit numerics ≤ 339999 are A5-capable and have a meaningful parseInt.
-    expect(resolver.resolve(makeSat('123456', SpaceObjectType.DEBRIS))).toBe(SatelliteModels.debris2);
-    expect(resolver.resolve(makeSat('339999', SpaceObjectType.DEBRIS))).toBe(SatelliteModels.debris2);
+  it('is deterministic: a given debris object always resolves to the same mesh', () => {
+    for (const scc of ['25544', 'T0001', '', '799500766']) {
+      const first = resolver.resolve(makeSat(scc, SpaceObjectType.DEBRIS));
+
+      expect(resolver.resolve(makeSat(scc, SpaceObjectType.DEBRIS))).toBe(first);
+      // A fresh resolver instance must agree (no per-instance state in the hash)
+      expect(new ModelResolver().resolve(makeSat(scc, SpaceObjectType.DEBRIS))).toBe(first);
+    }
   });
 
-  it('routes alpha-5 sccNums to the default debris model (debris0)', () => {
-    expect(resolver.resolve(makeSat('T0001', SpaceObjectType.DEBRIS))).toBe(SatelliteModels.debris0);
-    expect(resolver.resolve(makeSat('A0000', SpaceObjectType.DEBRIS))).toBe(SatelliteModels.debris0);
-    expect(resolver.resolve(makeSat('Z9999', SpaceObjectType.DEBRIS))).toBe(SatelliteModels.debris0);
+  it('does not throw on alpha-5, extended, empty, or non-numeric debris sccNums', () => {
+    for (const scc of ['T0001', 'A0000', '1234567', '999999', '', 'not-a-number']) {
+      expect(() => resolver.resolve(makeSat(scc, SpaceObjectType.DEBRIS))).not.toThrow();
+    }
   });
 
-  it('routes extended (7+ digit) sccNums to the default debris model (debris0)', () => {
-    expect(resolver.resolve(makeSat('1234567', SpaceObjectType.DEBRIS))).toBe(SatelliteModels.debris0);
-    expect(resolver.resolve(makeSat('799500766', SpaceObjectType.DEBRIS))).toBe(SatelliteModels.debris0);
-    // 6-digit > 339999 also classifies as extended.
-    expect(resolver.resolve(makeSat('999999', SpaceObjectType.DEBRIS))).toBe(SatelliteModels.debris0);
+  it('spreads debris broadly across the variant pool (hash distribution)', () => {
+    const seen = new Set<string>();
+
+    for (let i = 0; i < 400; i++) {
+      seen.add(resolver.resolve(makeSat(String(10000 + i), SpaceObjectType.DEBRIS)));
+    }
+
+    // The FNV hash should reach most of the pool; require broad (not perfect) coverage.
+    expect(seen.size).toBeGreaterThanOrEqual(Math.ceil(DEBRIS_POOL.length * 0.75));
+    for (const model of seen) {
+      expect(DEBRIS_POOL).toContain(model);
+    }
   });
 
-  it('routes invalid sccNums to the default debris model (debris0)', () => {
-    expect(resolver.resolve(makeSat('', SpaceObjectType.DEBRIS))).toBe(SatelliteModels.debris0);
-    expect(resolver.resolve(makeSat('not-a-number', SpaceObjectType.DEBRIS))).toBe(SatelliteModels.debris0);
+  it('routes debris by catalog shape special before the generic hash', () => {
+    const shaped = (shape: string): string => resolver.resolve(makeSat('54321', SpaceObjectType.DEBRIS, { shape }));
+
+    expect(CONE_POOL).toContain(shaped('Cone'));
+    expect(CYL_POOL).toContain(shaped('Cyl'));
+    expect(CYL_POOL).toContain(shaped('Cylinder'));
+    expect(TORUS_POOL).toContain(shaped('Torus'));
+    // whitespace/case variants normalize the same way
+    expect(TORUS_POOL).toContain(shaped('  torus '));
+    // unknown or empty shape falls through to the generic pool
+    expect(DEBRIS_POOL).toContain(shaped(''));
+    expect(DEBRIS_POOL).toContain(shaped('Disk + Cable'));
+  });
+
+  it('varies within a shape special by sccNum but stays in-family', () => {
+    const seen = new Set<string>();
+
+    for (let i = 0; i < 40; i++) {
+      const model = resolver.resolve(makeSat(String(60000 + i), SpaceObjectType.DEBRIS, { shape: 'Torus' }));
+
+      expect(TORUS_POOL).toContain(model);
+      seen.add(model);
+    }
+    expect(seen.size).toBe(TORUS_POOL.length);
   });
 
   it('buckets ROCKET_BODY by catalog diameter into the gray size variants', () => {
@@ -145,5 +191,32 @@ describe('ModelResolver debris model selection across sccNum forms', () => {
 
     expect(() => resolver.resolve(oem)).not.toThrow();
     expect(resolver.resolve(oem)).toBe(SatelliteModels.aehf);
+  });
+});
+
+describe('ModelResolver mesh registry disk consistency', () => {
+  // Registered names that intentionally ship no mesh: jwst is gated off ("not
+  // ready") and issmodel is an aspirational alias. The resolver never returns
+  // either, so neither can 404 at runtime. Every other registered name MUST
+  // have a matching OBJ+MTL so any resolved (or meshOverride) name loads.
+  const KNOWN_UNBACKED = new Set<string>(['jwst', 'issmodel']);
+
+  it('has a matching OBJ and MTL in public/meshes for every registered model', () => {
+    const meshDir = path.join(process.cwd(), 'public', 'meshes');
+    const missing: string[] = [];
+
+    for (const name of Object.values(SatelliteModels)) {
+      if (KNOWN_UNBACKED.has(name)) {
+        continue;
+      }
+      if (!fs.existsSync(path.join(meshDir, `${name}.obj`))) {
+        missing.push(`${name}.obj`);
+      }
+      if (!fs.existsSync(path.join(meshDir, `${name}.mtl`))) {
+        missing.push(`${name}.mtl`);
+      }
+    }
+
+    expect(missing).toEqual([]);
   });
 });

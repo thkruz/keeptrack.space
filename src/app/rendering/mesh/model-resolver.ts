@@ -1,7 +1,7 @@
 import type { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import type { MeshModel } from '@app/engine/rendering/mesh-manager';
-import { BaseObject, Satellite, SpaceObjectType, Tle } from '@ootk/src/main';
+import { BaseObject, Satellite, SpaceObjectType } from '@ootk/src/main';
 
 export const SatelliteModels = {
   aehf: 'aehf',
@@ -9,6 +9,31 @@ export const SatelliteModels = {
   debris0: 'debris0',
   debris1: 'debris1',
   debris2: 'debris2',
+  'deb-panel-01': 'deb-panel-01',
+  'deb-panel-02': 'deb-panel-02',
+  'deb-panel-03': 'deb-panel-03',
+  'deb-bracket-01': 'deb-bracket-01',
+  'deb-bracket-02': 'deb-bracket-02',
+  'deb-bracket-03': 'deb-bracket-03',
+  'deb-skin-01': 'deb-skin-01',
+  'deb-skin-02': 'deb-skin-02',
+  'deb-skin-03': 'deb-skin-03',
+  'deb-clampband-01': 'deb-clampband-01',
+  'deb-clampband-02': 'deb-clampband-02',
+  'deb-clampband-03': 'deb-clampband-03',
+  'deb-mli-01': 'deb-mli-01',
+  'deb-mli-02': 'deb-mli-02',
+  'deb-mli-03': 'deb-mli-03',
+  'deb-mli-04': 'deb-mli-04',
+  'deb-strut-01': 'deb-strut-01',
+  'deb-strut-02': 'deb-strut-02',
+  'deb-strut-03': 'deb-strut-03',
+  'deb-cone-01': 'deb-cone-01',
+  'deb-cone-02': 'deb-cone-02',
+  'deb-torus-01': 'deb-torus-01',
+  'deb-torus-02': 'deb-torus-02',
+  'deb-cyl-01': 'deb-cyl-01',
+  'deb-cyl-02': 'deb-cyl-02',
   dsp: 'dsp',
   flock: 'flock',
   galileo: 'galileo',
@@ -107,27 +132,8 @@ export class ModelResolver {
           return this.resolveSatModelName_(sat);
         case SpaceObjectType.ROCKET_BODY:
           return this.resolveRocketBodyModelName_(sat);
-        case SpaceObjectType.DEBRIS: {
-          // The numeric thresholds below only make sense for legacy 5-digit
-          // numeric sccNums. Alpha-5 / extended IDs would parseInt to NaN or
-          // huge values and always fall into the debris2 bucket — bypass that.
-          const kind = Tle.classifySatNum(sat.sccNum);
-
-          if (kind !== 'numeric5' && kind !== 'numeric6') {
-            return SatelliteModels.debris0;
-          }
-
-          // TODO: Add more debris models
-          const nNum = Number.parseInt(sat.sccNum);
-
-          if (nNum <= 20000) {
-            return SatelliteModels.debris0;
-          } else if (nNum <= 35000) {
-            return SatelliteModels.debris1;
-          }
-
-          return SatelliteModels.debris2;
-        }
+        case SpaceObjectType.DEBRIS:
+          return this.resolveDebrisModelName_(sat);
         default:
         // Generic Model
       }
@@ -242,6 +248,66 @@ export class ModelResolver {
     }
 
     return SatelliteModels['rb-cyl-gray-m'];
+  }
+
+  /**
+   * Generic debris archetype pool (6 archetypes x 3-4 seeds). Objects with no
+   * distinguishing catalog metadata are spread across these by a stable hash of
+   * their sccNum.
+   */
+  private static readonly debrisGenericPool_ = [
+    SatelliteModels['deb-panel-01'], SatelliteModels['deb-panel-02'], SatelliteModels['deb-panel-03'],
+    SatelliteModels['deb-bracket-01'], SatelliteModels['deb-bracket-02'], SatelliteModels['deb-bracket-03'],
+    SatelliteModels['deb-skin-01'], SatelliteModels['deb-skin-02'], SatelliteModels['deb-skin-03'],
+    SatelliteModels['deb-clampband-01'], SatelliteModels['deb-clampband-02'], SatelliteModels['deb-clampband-03'],
+    SatelliteModels['deb-mli-01'], SatelliteModels['deb-mli-02'], SatelliteModels['deb-mli-03'], SatelliteModels['deb-mli-04'],
+    SatelliteModels['deb-strut-01'], SatelliteModels['deb-strut-02'], SatelliteModels['deb-strut-03'],
+  ];
+
+  /**
+   * Shape-driven debris specials, matched on the catalog `shape` field (all
+   * whitespace stripped, lowercased) BEFORE the generic hash. Covers the ~4% of
+   * debris that carry a shape: cone (154 records), cyl (108), torus (83 - the
+   * Proton SOZ ullage-motor rings). Each maps to a small sub-pool; the hash then
+   * picks a variant within it. disk / disk+cable fall through to the generic pool.
+   */
+  private static readonly debrisShapeSpecials_: Record<string, string[]> = {
+    cone: [SatelliteModels['deb-cone-01'], SatelliteModels['deb-cone-02']],
+    cyl: [SatelliteModels['deb-cyl-01'], SatelliteModels['deb-cyl-02']],
+    cylinder: [SatelliteModels['deb-cyl-01'], SatelliteModels['deb-cyl-02']],
+    torus: [SatelliteModels['deb-torus-01'], SatelliteModels['deb-torus-02']],
+    toroid: [SatelliteModels['deb-torus-01'], SatelliteModels['deb-torus-02']],
+  };
+
+  /**
+   * Debris. The catalog gives almost no signal here (`shape` is empty on ~96%
+   * of records and `rcs` is null): match the shape special when present, else
+   * spread across the generic archetype pool. Either way a stable per-object
+   * hash of the sccNum picks the variant, so a given piece always renders the
+   * same mesh across sessions and screenshots.
+   */
+  private resolveDebrisModelName_(sat: Satellite): string {
+    const shape = sat.shape.toLowerCase().replace(/\s+/gu, '');
+    const pool = ModelResolver.debrisShapeSpecials_[shape] ?? ModelResolver.debrisGenericPool_;
+
+    return pool[this.variantIndex_(sat.sccNum, pool.length)];
+  }
+
+  /**
+   * Stable FNV-1a hash of an identity string into [0, count). Spreads objects
+   * with no distinguishing metadata across a variant pool while guaranteeing
+   * the same object always maps to the same variant. Handles alpha-5 and
+   * extended sccNums (it hashes characters), unlike the parseInt bucketing it
+   * replaced, which collapsed every non-5-digit id into one bucket.
+   */
+  private variantIndex_(key: string, count: number): number {
+    let h = 0x811c9dc5;
+
+    for (const ch of key) {
+      h = Math.imul(h ^ (ch.codePointAt(0) ?? 0), 0x01000193);
+    }
+
+    return (h >>> 0) % count;
   }
 
   // eslint-disable-next-line complexity

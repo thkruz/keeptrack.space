@@ -43,6 +43,17 @@
       }
   `;
 
+  // Per-fragment logarithmic depth (DepthManager.getLogDepthFragCode). Makes log depth exact
+  // across large triangles so sparsely tessellated surfaces no longer z-fight. Requires highp.
+  const LOG_DEPTH_FRAG_GLSL = `
+      if (logDepthBufFC > 0.0) {
+        float wFrag = max(1.0 / gl_FragCoord.w, 1e-9);
+        gl_FragDepth = log2(1.0 + wFrag) * logDepthBufFC * 0.5;
+      } else {
+        gl_FragDepth = gl_FragCoord.z;
+      }
+  `;
+
   // Exact copy of mesh-renderer.ts shaders
   const MESH_VERT = `#version 300 es
     in vec3 aVertexPosition;
@@ -89,7 +100,7 @@
   `;
 
   const MESH_FRAG = `#version 300 es
-    precision mediump float;
+    precision highp float;
 
     in vec3 vLightDirection;
     in float vInSun;
@@ -100,6 +111,8 @@
     in vec3 vDiffuse;
     in vec3 vSpecular;
     in float vSpecularExponent;
+
+    uniform float logDepthBufFC;
 
     out vec4 fragColor;
 
@@ -113,6 +126,7 @@
       vec3 color = ambientColor + dirColor + specColor;
 
       fragColor = vec4(color, 1.0);
+      ${LOG_DEPTH_FRAG_GLSL}
     }
   `;
 
@@ -133,11 +147,13 @@
   `;
 
   const NORMALS_FRAG = `#version 300 es
-    precision mediump float;
+    precision highp float;
+    uniform float logDepthBufFC;
     in vec3 vNormal;
     out vec4 fragColor;
     void main(void) {
       fragColor = vec4(normalize(vNormal) * 0.5 + 0.5, 1.0);
+      ${LOG_DEPTH_FRAG_GLSL}
     }
   `;
 
@@ -157,11 +173,13 @@
   `;
 
   const FLAT_FRAG = `#version 300 es
-    precision mediump float;
+    precision highp float;
+    uniform float logDepthBufFC;
     in vec3 vColor;
     out vec4 fragColor;
     void main(void) {
       fragColor = vec4(vColor, 1.0);
+      ${LOG_DEPTH_FRAG_GLSL}
     }
   `;
 

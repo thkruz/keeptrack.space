@@ -68,7 +68,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
   readonly id = 'VideoDirectorPlugin';
   dependencies_ = [];
 
-  menuMode: MenuMode[] = [MenuMode.EXPERIMENTAL, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.TOOLS, MenuMode.ALL];
 
   bottomIconElementName: string = 'video-director-icon';
   bottomIconImg = videoSettingsPng;

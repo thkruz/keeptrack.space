@@ -70,11 +70,23 @@ export const SatelliteModels = {
   'rb-stepcyl-soviet': 'rb-stepcyl-soviet',
   'rb-trunccone-gray': 'rb-trunccone-gray',
   rv: 'rv',
+  's0.5u': 's0.5u',
   s1u: 's1u',
+  's1u-b': 's1u-b',
+  's1.5u': 's1.5u',
   s2u: 's2u',
   s3u: 's3u',
+  's3u-b': 's3u-b',
+  's3u-w': 's3u-w',
+  s4u: 's4u',
   s6u: 's6u',
+  's6u-b': 's6u-b',
+  's6u-w': 's6u-w',
+  s8u: 's8u',
   s12u: 's12u',
+  's12u-w': 's12u-w',
+  s16u: 's16u',
+  's16u-b': 's16u-b',
   sat2: 'sat2',
   'saturn-iv-b': 'saturn-iv-b',
   sbirs: 'sbirs',
@@ -294,6 +306,32 @@ export class ModelResolver {
   }
 
   /**
+   * Cubesat variant pools keyed by bus size. The base mesh anchors index 0 (so
+   * a size with no variants stays deterministic); sizes with skin (`-b`) and
+   * deployable-wing (`-w`) variants add pool entries the sccNum hash spreads
+   * across. 0.25U stays SPACEBEE-routed above; 0.3U/0.5U alias to the half-U.
+   */
+  private static readonly cubesatPools_: Record<string, readonly string[]> = {
+    '0.5u': [SatelliteModels['s0.5u']],
+    '1u': [SatelliteModels.s1u, SatelliteModels['s1u-b']],
+    '1.5u': [SatelliteModels['s1.5u']],
+    '2u': [SatelliteModels.s2u],
+    '3u': [SatelliteModels.s3u, SatelliteModels['s3u-b'], SatelliteModels['s3u-w']],
+    '4u': [SatelliteModels.s4u],
+    '6u': [SatelliteModels.s6u, SatelliteModels['s6u-b'], SatelliteModels['s6u-w']],
+    '8u': [SatelliteModels.s8u],
+    '12u': [SatelliteModels.s12u, SatelliteModels['s12u-w']],
+    '16u': [SatelliteModels.s16u, SatelliteModels['s16u-b']],
+  };
+
+  /** Pick the size's base/skin/wing variant deterministically from the sccNum. */
+  private resolveCubesatModelName_(sat: Satellite, sizeKey: string): string {
+    const pool = ModelResolver.cubesatPools_[sizeKey];
+
+    return pool[this.variantIndex_(sat.sccNum, pool.length)];
+  }
+
+  /**
    * Stable FNV-1a hash of an identity string into [0, count). Spreads objects
    * with no distinguishing metadata across a variant pool while guaranteeing
    * the same object always maps to the same variant. Handles alpha-5 and
@@ -384,16 +422,27 @@ export class ModelResolver {
           return SatelliteModels.spacebee2gen;
         }
 
-        return SatelliteModels.s1u;
+        return this.resolveCubesatModelName_(sat, '1u');
+      case 'Cubesat 0.5U':
+      case 'Cubesat 0.3U':
+        return this.resolveCubesatModelName_(sat, '0.5u');
+      case 'Cubesat 1.5U':
+        return this.resolveCubesatModelName_(sat, '1.5u');
       case 'Cubesat 2U':
-        return SatelliteModels.s2u;
+        return this.resolveCubesatModelName_(sat, '2u');
       case 'Cubesat 3U':
       case 'Cubesat 3U+':
-        return SatelliteModels.s3u;
+        return this.resolveCubesatModelName_(sat, '3u');
+      case 'Cubesat 4U':
+        return this.resolveCubesatModelName_(sat, '4u');
       case 'Cubesat 6U':
-        return SatelliteModels.s6u;
+        return this.resolveCubesatModelName_(sat, '6u');
+      case 'Cubesat 8U':
+        return this.resolveCubesatModelName_(sat, '8u');
       case 'Cubesat 12U':
-        return SatelliteModels.s12u;
+        return this.resolveCubesatModelName_(sat, '12u');
+      case 'Cubesat 16U':
+        return this.resolveCubesatModelName_(sat, '16u');
       case 'DSP':
       case 'DSP B14':
       case 'DSP B18':
@@ -411,21 +460,17 @@ export class ModelResolver {
         return SatelliteModels.iridium;
       case 'ARROW':
         return SatelliteModels.oneweb;
-      case 'Cubesat 1.5U':
-      case 'Cubesat 0.5U':
-      case 'Cubesat 16U':
-      case 'Cubesat 0.3U':
       default:
       // Do Nothing
     }
 
     switch (!Number.isNaN(sat.rcs as number)) {
       case sat.rcs! < 0.1 && sat.rcs! > 0.04:
-        return SatelliteModels.s1u;
+        return this.resolveCubesatModelName_(sat, '1u');
       case sat.rcs! < 0.22 && sat.rcs! >= 0.1:
-        return SatelliteModels.s2u;
+        return this.resolveCubesatModelName_(sat, '2u');
       case sat.rcs! < 0.33 && sat.rcs! >= 0.22:
-        return SatelliteModels.s3u;
+        return this.resolveCubesatModelName_(sat, '3u');
       default:
       // Generic Model
     }

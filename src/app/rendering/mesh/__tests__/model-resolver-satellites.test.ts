@@ -104,9 +104,6 @@ describe('ModelResolver satellite model selection', () => {
       [{ bus: 'GPS IIF' }, SatelliteModels.gps],
       [{ bus: 'Iridium' }, SatelliteModels.iridium],
       [{ bus: 'Cubesat 2U' }, SatelliteModels.s2u],
-      [{ bus: 'Cubesat 3U' }, SatelliteModels.s3u],
-      [{ bus: 'Cubesat 6U' }, SatelliteModels.s6u],
-      [{ bus: 'Cubesat 12U' }, SatelliteModels.s12u],
       [{ bus: 'ARROW' }, SatelliteModels.oneweb],
       [{ bus: 'DSP B14' }, SatelliteModels.dsp],
       [{ bus: 'sateliotsat' }, SatelliteModels.sateliotsat],
@@ -115,23 +112,63 @@ describe('ModelResolver satellite model selection', () => {
     it.each(cases)('routes %o to its model', (over, expected) => {
       expect(resolver.resolve(makeSat(over))).toBe(expected);
     });
+  });
 
-    it('routes a plain Cubesat 1U to s1u, but a SPACEBEE 1U to spacebee2gen', () => {
-      expect(resolver.resolve(makeSat({ bus: 'Cubesat 1U', name: 'GENERIC' }))).toBe(SatelliteModels.s1u);
-      expect(resolver.resolve(makeSat({ bus: 'Cubesat 1U', name: 'SPACEBEE-7' }))).toBe(SatelliteModels.spacebee2gen);
+  describe('cubesat size + variant routing', () => {
+    // Every bus size lands inside its pool; sizes with -b/-w variants have a
+    // multi-entry pool the sccNum hash spreads across (base at index 0).
+    const pools: Record<string, string[]> = {
+      'Cubesat 0.5U': [SatelliteModels['s0.5u']],
+      'Cubesat 0.3U': [SatelliteModels['s0.5u']],
+      'Cubesat 1U': [SatelliteModels.s1u, SatelliteModels['s1u-b']],
+      'Cubesat 1.5U': [SatelliteModels['s1.5u']],
+      'Cubesat 2U': [SatelliteModels.s2u],
+      'Cubesat 3U': [SatelliteModels.s3u, SatelliteModels['s3u-b'], SatelliteModels['s3u-w']],
+      'Cubesat 3U+': [SatelliteModels.s3u, SatelliteModels['s3u-b'], SatelliteModels['s3u-w']],
+      'Cubesat 4U': [SatelliteModels.s4u],
+      'Cubesat 6U': [SatelliteModels.s6u, SatelliteModels['s6u-b'], SatelliteModels['s6u-w']],
+      'Cubesat 8U': [SatelliteModels.s8u],
+      'Cubesat 12U': [SatelliteModels.s12u, SatelliteModels['s12u-w']],
+      'Cubesat 16U': [SatelliteModels.s16u, SatelliteModels['s16u-b']],
+    };
+
+    it.each(Object.entries(pools))('routes bus %s into its size pool', (bus, pool) => {
+      expect(pool).toContain(resolver.resolve(makeSat({ bus, name: 'GENERIC', sccNum: '54321' })));
     });
 
-    it('routes a 2018 Cubesat 0.25U to spacebee1gen', () => {
+    it('is deterministic: the same sccNum always maps to the same variant', () => {
+      const first = resolver.resolve(makeSat({ bus: 'Cubesat 3U', name: 'GENERIC', sccNum: '43210' }));
+      const second = resolver.resolve(makeSat({ bus: 'Cubesat 3U', name: 'GENERIC', sccNum: '43210' }));
+
+      expect(first).toBe(second);
+    });
+
+    it('spreads a multi-variant size across more than one mesh', () => {
+      const results = new Set<string>();
+
+      for (let i = 0; i < 60; i++) {
+        results.add(resolver.resolve(makeSat({ bus: 'Cubesat 6U', name: 'GENERIC', sccNum: String(10_000 + i) })));
+      }
+      expect(results.size).toBeGreaterThan(1);
+    });
+
+    it('does not throw on alpha-5 sccNums', () => {
+      expect(() => resolver.resolve(makeSat({ bus: 'Cubesat 3U', name: 'GENERIC', sccNum: 'E1234' }))).not.toThrow();
+    });
+
+    it('keeps the SPACEBEE and 2018 0.25U specials ahead of the generic pool', () => {
+      expect(resolver.resolve(makeSat({ bus: 'Cubesat 1U', name: 'SPACEBEE-7' }))).toBe(SatelliteModels.spacebee2gen);
       expect(resolver.resolve(makeSat({ bus: 'Cubesat 0.25U', intlDes: '2018-099A', name: 'GENERIC' })))
         .toBe(SatelliteModels.spacebee1gen);
     });
   });
 
   describe('rcs-based fallback routing', () => {
-    it('buckets generic payloads by radar cross section', () => {
-      expect(resolver.resolve(makeSat({ rcs: 0.05 }))).toBe(SatelliteModels.s1u);
+    it('buckets generic payloads by radar cross section into the cubesat pools', () => {
+      expect([SatelliteModels.s1u, SatelliteModels['s1u-b']]).toContain(resolver.resolve(makeSat({ rcs: 0.05 })));
       expect(resolver.resolve(makeSat({ rcs: 0.15 }))).toBe(SatelliteModels.s2u);
-      expect(resolver.resolve(makeSat({ rcs: 0.25 }))).toBe(SatelliteModels.s3u);
+      expect([SatelliteModels.s3u, SatelliteModels['s3u-b'], SatelliteModels['s3u-w']])
+        .toContain(resolver.resolve(makeSat({ rcs: 0.25 })));
     });
 
     it('falls back to the generic sat2 model when nothing matches', () => {

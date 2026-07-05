@@ -71,6 +71,56 @@ export const alt2zoom = (alt: Kilometers, minZoomDistance: Kilometers, maxZoomDi
   return Math.min(Math.max(zoomLevel, 0), 1);
 };
 
+/** Default bounding radii (meters) used when an object carries no usable size metadata. */
+const DEFAULT_RADIUS_M = {
+  rocketBody: 5,
+  payload: 2,
+  debris: 0.3,
+} as const;
+
+/**
+ * Estimate an object's bounding radius (km) from catalog metadata, for scaling the minimum
+ * camera standoff so the camera can approach small objects at true physical scale. Priority:
+ * explicit dimensions (span/length/diameter, in meters) → RCS-derived (m² → equivalent-area
+ * radius) → object-type default. span/length/diameter are catalog strings that may be empty.
+ */
+export const estimateObjectRadiusKm = (dims: {
+  span?: string | null;
+  length?: string | null;
+  diameter?: string | null;
+  rcs?: number | null;
+  isRocketBody?: boolean;
+  isPayload?: boolean;
+}): Kilometers => {
+  const meters = [dims.span, dims.length, dims.diameter]
+    .map((v) => (typeof v === 'string' ? Number.parseFloat(v) : Number.NaN))
+    .filter((v) => Number.isFinite(v) && v > 0);
+
+  let radiusM: number;
+
+  if (meters.length > 0) {
+    radiusM = Math.max(...meters) / 2;
+  } else if (typeof dims.rcs === 'number' && dims.rcs > 0) {
+    radiusM = Math.sqrt(dims.rcs / Math.PI);
+  } else if (dims.isRocketBody) {
+    radiusM = DEFAULT_RADIUS_M.rocketBody;
+  } else if (dims.isPayload) {
+    radiusM = DEFAULT_RADIUS_M.payload;
+  } else {
+    radiusM = DEFAULT_RADIUS_M.debris;
+  }
+
+  return (radiusM / 1000) as Kilometers;
+};
+
+/**
+ * Minimum camera standoff (km) for an object of the given bounding radius: three times the
+ * radius so the whole object stays in frame, floored at 2 m so the camera never lands inside a
+ * point-like target.
+ */
+export const targetStandoffDistanceKm = (radiusKm: Kilometers): Kilometers =>
+  Math.max(3 * radiusKm, 0.002) as Kilometers;
+
 const isLeapYear_ = (dateIn: Date) => {
   const year = dateIn.getUTCFullYear();
 

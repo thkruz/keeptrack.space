@@ -452,7 +452,7 @@ export class ViewportManager {
       camera.state.camZoomSnappedOnSat = true;
       camera.state.camAngleSnappedOnSat = false;
       camera.state.ftsRotateReset = true;
-      camera.state.camDistBuffer = settingsManager.minDistanceFromSatellite ?? (100 as Kilometers);
+      camera.state.camDistBuffer = camera.state.effectiveMinDistanceFromTarget ?? (100 as Kilometers);
     }
   }
 

@@ -539,9 +539,10 @@ export class Camera {
         this.cameraType = CameraType.FIXED_TO_EARTH;
       } else {
         const satAlt = <Kilometers>(Math.sqrt(target.position.x ** 2 + target.position.y ** 2 + target.position.z ** 2) - RADIUS_OF_EARTH);
+        const minDist = this.state.effectiveMinDistanceFromTarget;
 
-        if (this.calcDistanceBasedOnZoom() < satAlt + RADIUS_OF_EARTH + settingsManager.minDistanceFromSatellite) {
-          this.state.zoomTarget = alt2zoom(satAlt, settingsManager.minZoomDistance, settingsManager.maxZoomDistance, settingsManager.minDistanceFromSatellite);
+        if (this.calcDistanceBasedOnZoom() < satAlt + RADIUS_OF_EARTH + minDist) {
+          this.state.zoomTarget = alt2zoom(satAlt, settingsManager.minZoomDistance, settingsManager.maxZoomDistance, minDist);
           this.state.zoomLevel = this.state.zoomTarget;
         }
       }
@@ -646,8 +647,8 @@ export class Camera {
    * Zoom level is ALWAYS raised to the power of ZOOM_EXP to ensure that zooming out is faster than zooming in
    * TODO: This should be handled before getting the zoomLevel_ value
    */
-  calcDistanceBasedOnZoom(): Kilometers {
-    return <Kilometers>(this.state.zoomLevel ** ZOOM_EXP * (settingsManager.maxZoomDistance - settingsManager.minZoomDistance) + settingsManager.minZoomDistance);
+  calcDistanceBasedOnZoom(zoom: number = this.state.zoomLevel): Kilometers {
+    return <Kilometers>(zoom ** ZOOM_EXP * (settingsManager.maxZoomDistance - settingsManager.minZoomDistance) + settingsManager.minZoomDistance);
   }
 
   /**
@@ -938,14 +939,13 @@ export class Camera {
       }
     }
 
-    // Switch near/far renderer based on satellite distance for z-buffer precision
+    // Hide the selected satellite's dot once the camera is close enough that the 3D mesh model
+    // renders in its place; restore it when zoomed back out. (The logarithmic depth buffer means
+    // there is no longer a near/far renderer to switch for z-buffer precision.)
     if (this.state.camZoomSnappedOnSat && isApplyGlobalEffects) {
-      if (this.state.camDistBuffer <= settingsManager.nearZoomLevel) {
-        ServiceLocator.getRenderer().setNearRenderer();
-      } else {
-        settingsManager.selectedColor = settingsManager.selectedColorFallback;
-        ServiceLocator.getRenderer().setFarRenderer();
-      }
+      settingsManager.selectedColor = this.state.camDistBuffer <= settingsManager.nearZoomLevel
+        ? [0, 0, 0, 0]
+        : settingsManager.selectedColorFallback;
     }
 
     this.updateSatShaderSizes();
@@ -2141,8 +2141,15 @@ export class Camera {
     this.state.zoomLevel += remaining * (1 - Math.exp(-settingsManager.zoomSpeed * dt));
 
     if (!this.state.isAutoPitchYawToTarget) {
-      // Snap when close enough to prevent floating-point oscillation
-      if (Math.abs(this.state.zoomLevel - this.state.zoomTarget) < 0.0001) {
+      // Snap on actual camera distance rather than zoom-level delta. The exponential zoom curve is
+      // extremely compressed near an object, so a fixed zoom-level epsilon (1e-4) maps to a
+      // km-scale position pop when close - which breaks smooth approach to a satellite. Threshold
+      // is 1 m, scaled up to 0.001% of the current distance so far-field snapping stays responsive.
+      const curDist = this.calcDistanceBasedOnZoom(this.state.zoomLevel);
+      const tgtDist = this.calcDistanceBasedOnZoom(this.state.zoomTarget);
+      const snapThreshold = Math.max(0.001, curDist * 1e-5);
+
+      if (Math.abs(curDist - tgtDist) < snapThreshold) {
         this.state.zoomLevel = this.state.zoomTarget;
       } else if ((this.state.zoomLevel > this.state.zoomTarget && !this.state.isZoomIn) || (this.state.zoomLevel < this.state.zoomTarget && this.state.isZoomIn)) {
         this.state.zoomTarget = this.state.zoomLevel; // If we change direction then consider us at the target

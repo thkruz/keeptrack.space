@@ -20,6 +20,7 @@ import {
   ISettingsContributor,
 } from '@app/engine/plugins/core/plugin-capabilities';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { estimateObjectRadiusKm, targetStandoffDistanceKm } from '@app/engine/utils/transforms';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { t7e } from '@app/locales/keys';
 import { COVARIANCE_RADII_FALLBACK, covarianceDisplayRadii, ricSigmasFromCovarianceMatrix } from '@app/engine/rendering/draw-manager/covariance-radii';
@@ -365,8 +366,9 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
         // Reset isZoomIn so the direction guard in updateZoom_ doesn't cancel
         // the zoom-out transition to earthCenteredLastZoom.
         cam.state.isZoomIn = false;
+        // Restore the global minimum standoff now that no sized target is selected.
+        cam.state.minDistanceFromTarget = null;
         settingsManager.selectedColor = settingsManager.selectedColorFallback;
-        ServiceLocator.getRenderer().setFarRenderer();
 
         if (!wasSatMode) {
           // FIXED_TO_EARTH: exitFixedToSat returned early, restore zoom ourselves
@@ -400,7 +402,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     };
 
     this.beginCameraTransition_();
-    this.switchToSatCenteredCamera_();
+    this.switchToSatCenteredCamera_(sat);
     this.setSelectedSat_(sat.id);
   }
 
@@ -461,7 +463,29 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     return radii;
   }
 
-  private switchToSatCenteredCamera_() {
+  /**
+   * Per-target minimum camera standoff (km) scaled to the object's physical size, so the camera
+   * can approach small debris at true scale. Returns null for objects without size metadata
+   * (e.g. missiles), which falls back to the global minimum.
+   */
+  private static calcTargetStandoff_(target?: Satellite | MissileObject): Kilometers | null {
+    if (!(target instanceof Satellite)) {
+      return null;
+    }
+
+    const radiusKm = estimateObjectRadiusKm({
+      span: target.span,
+      length: target.length,
+      diameter: target.diameter,
+      rcs: target.rcs,
+      isRocketBody: target.type === SpaceObjectType.ROCKET_BODY,
+      isPayload: target.type === SpaceObjectType.PAYLOAD,
+    });
+
+    return targetStandoffDistanceKm(radiusKm);
+  }
+
+  private switchToSatCenteredCamera_(target?: Satellite | MissileObject) {
     if (!settingsManager.isFocusOnSatelliteWhenSelected) {
       return;
     }
@@ -474,6 +498,9 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     }
 
     cam.state.camZoomSnappedOnSat = true;
+    // Lower the zoom-in floor to the object's size before setting the initial framing distance
+    // (the camDistBuffer setter clamps against this).
+    cam.state.minDistanceFromTarget = SelectSatManager.calcTargetStandoff_(target);
     cam.state.camDistBuffer = settingsManager.minDistanceFromSatellite;
 
     if (cam.cameraType === CameraType.FIXED_TO_SAT_LVLH || cam.cameraType === CameraType.FIXED_TO_SAT_ECI) {

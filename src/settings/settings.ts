@@ -95,8 +95,6 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   satShader: 'graphics',
   vertShadersSize: 'graphics',
   pickingDotSize: 'graphics',
-  zFar: 'graphics',
-  zNear: 'graphics',
   meshOverride: 'graphics',
   meshRotation: 'graphics',
   meshListOverride: 'graphics',

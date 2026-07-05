@@ -169,7 +169,6 @@ describe('parseGetVariables', () => {
     expect(settingsManager.isShowSplashScreen).toBe(false);
     expect(settingsManager.isDrawMilkyWay).toBe(false);
     expect(settingsManager.isDrawLess).toBe(true);
-    expect(settingsManager.zFar).toBe(250000.0);
     expect(settingsManager.noMeshManager).toBe(true);
     expect(settingsManager.maxFieldOfViewMarkers).toBe(1);
   });
@@ -190,7 +189,6 @@ describe('parseGetVariables', () => {
     parseGetVariables(['draw-less='], settingsManager);
     expect(settingsManager.isDrawMilkyWay).toBe(false);
     expect(settingsManager.isDrawLess).toBe(true);
-    expect(settingsManager.zFar).toBe(250000.0);
     expect(settingsManager.noMeshManager).toBe(true);
   });
 

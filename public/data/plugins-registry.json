@@ -1,0 +1,16 @@
+{
+  "formatVersion": 1,
+  "updated": "2026-07-05",
+  "plugins": [
+    {
+      "name": "keeptrack-plugin-example",
+      "configKey": "ExamplePlugin",
+      "displayName": "Example Plugin",
+      "description": "A minimal reference plugin demonstrating a drawer icon, side menu, help, and command palette. Fork it as a starting point.",
+      "author": "KeepTrack",
+      "repository": "https://github.com/thkruz/keeptrack-plugin-example",
+      "tags": ["example", "template"],
+      "engine": ">=13.0.0 <14.0.0"
+    }
+  ]
+}

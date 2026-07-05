@@ -104,6 +104,7 @@
     "groupCameraModes": "Camera Modes",
     "groupLayerToggles": "Layer Toggles",
     "groupSettingsToggles": "Settings Toggles",
+    "groupDevTools": "Development Tools",
     "groupAbout": "About"
   },
   "rightClickMenu": {

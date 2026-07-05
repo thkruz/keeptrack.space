@@ -140,6 +140,7 @@
     "groupCameraModes": "相机模式",
     "groupLayerToggles": "图层切换",
     "groupSettingsToggles": "设置切换",
+    "groupDevTools": "开发工具",
     "groupAbout": "关于"
   },
   "rightClickMenu": {

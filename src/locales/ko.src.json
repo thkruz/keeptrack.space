@@ -109,6 +109,7 @@
     "groupCameraModes": "카메라 모드",
     "groupLayerToggles": "레이어 토글",
     "groupSettingsToggles": "설정 토글",
+    "groupDevTools": "개발 도구",
     "groupAbout": "정보"
   },
   "rightClickMenu": {

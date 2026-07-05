@@ -140,6 +140,7 @@
     "groupCameraModes": "カメラモード",
     "groupLayerToggles": "レイヤー切替",
     "groupSettingsToggles": "設定切替",
+    "groupDevTools": "開発ツール",
     "groupAbout": "概要"
   },
   "rightClickMenu": {

@@ -111,6 +111,10 @@ export function collectDrawerItems(): CollectedDrawerItems {
   utilityGroups['utility-layers'] = { label: t7e('pluginDrawer.groupLayerToggles' as DrawerKey_), items: [] };
   utilityGroups['utility-settings'] = { label: t7e('pluginDrawer.groupSettingsToggles' as DrawerKey_), items: [] };
 
+  // Development Tools group (Plugin Manager, Debug) — inserted just before About
+  // so it renders as the second-to-last category.
+  menuGroups['dev-tools'] = { label: t7e('pluginDrawer.groupDevTools' as DrawerKey_), items: [] };
+
   // About group for TopMenuPlugin instances (e.g., GithubLink)
   menuGroups.about = { label: t7e('pluginDrawer.groupAbout' as DrawerKey_), items: [] };
 

@@ -109,6 +109,7 @@
     "groupCameraModes": "Modes caméra",
     "groupLayerToggles": "Couches d'affichage",
     "groupSettingsToggles": "Paramètres d'affichage",
+    "groupDevTools": "Outils de développement",
     "groupAbout": "À propos"
   },
   "rightClickMenu": {

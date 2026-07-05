@@ -109,6 +109,7 @@
     "groupCameraModes": "Режимы камеры",
     "groupLayerToggles": "Переключатели слоёв",
     "groupSettingsToggles": "Переключатели настроек",
+    "groupDevTools": "Инструменты разработки",
     "groupAbout": "О программе"
   },
   "rightClickMenu": {

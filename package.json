@@ -54,6 +54,7 @@
     "scenario:constellations": "npx tsx --tsconfig src/plugins-pro/offline-scenario-creator/tsconfig.json src/plugins-pro/offline-scenario-creator/src/bin/generate-constellations.ts",
     "capture-shots": "npx tsx ./scripts/capture-verification-shots.ts",
     "mesh-viewer": "npx tsx ./scripts/mesh-viewer/server.ts",
+    "locale-matrix": "npx tsx ./scripts/locale-matrix/locale-matrix.ts",
     "start": "npx tsx ./build/dev-server.ts --profile=oss",
     "start:pro": "npx tsx ./build/dev-server.ts --profile=pro",
     "start:celestrak": "npx tsx ./build/dev-server.ts --profile=celestrak",

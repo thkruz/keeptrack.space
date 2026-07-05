@@ -116,10 +116,21 @@ export const estimateObjectRadiusKm = (dims: {
 /**
  * Minimum camera standoff (km) for an object of the given bounding radius: three times the
  * radius so the whole object stays in frame, floored at 2 m so the camera never lands inside a
- * point-like target.
+ * point-like target. This is the zoom-in floor (closest the camera may get), not the initial
+ * framing distance - see initialFramingDistanceKm.
  */
 export const targetStandoffDistanceKm = (radiusKm: Kilometers): Kilometers =>
   Math.max(3 * radiusKm, 0.002) as Kilometers;
+
+/**
+ * Initial camera framing distance (km) when a satellite is selected: six times the radius so the
+ * object sits comfortably in frame with room to zoom in, but floored at 30 m so small objects are
+ * not framed uncomfortably close (the user should not have to zoom out after selecting). Large
+ * objects scale with 6x radius; small objects are lifted off by the floor. Always at least the
+ * standoff minimum, so the camDistBuffer clamp never has to raise it.
+ */
+export const initialFramingDistanceKm = (radiusKm: Kilometers): Kilometers =>
+  Math.max(6 * radiusKm, 0.03) as Kilometers;
 
 const isLeapYear_ = (dateIn: Date) => {
   const year = dateIn.getUTCFullYear();

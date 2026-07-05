@@ -20,7 +20,7 @@ import {
   ISettingsContributor,
 } from '@app/engine/plugins/core/plugin-capabilities';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { estimateObjectRadiusKm, targetStandoffDistanceKm } from '@app/engine/utils/transforms';
+import { estimateObjectRadiusKm, initialFramingDistanceKm, targetStandoffDistanceKm } from '@app/engine/utils/transforms';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { t7e } from '@app/locales/keys';
 import { COVARIANCE_RADII_FALLBACK, covarianceDisplayRadii, ricSigmasFromCovarianceMatrix } from '@app/engine/rendering/draw-manager/covariance-radii';
@@ -464,16 +464,16 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
   }
 
   /**
-   * Per-target minimum camera standoff (km) scaled to the object's physical size, so the camera
-   * can approach small debris at true scale. Returns null for objects without size metadata
-   * (e.g. missiles), which falls back to the global minimum.
+   * Per-target bounding radius (km) estimated from the object's physical size, used to scale both
+   * the zoom-in floor and the initial framing distance. Returns null for objects without size
+   * metadata (e.g. missiles), which fall back to the global minimum.
    */
-  private static calcTargetStandoff_(target?: Satellite | MissileObject): Kilometers | null {
+  private static calcTargetRadiusKm_(target?: Satellite | MissileObject): Kilometers | null {
     if (!(target instanceof Satellite)) {
       return null;
     }
 
-    const radiusKm = estimateObjectRadiusKm({
+    return estimateObjectRadiusKm({
       span: target.span,
       length: target.length,
       diameter: target.diameter,
@@ -481,8 +481,6 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       isRocketBody: target.type === SpaceObjectType.ROCKET_BODY,
       isPayload: target.type === SpaceObjectType.PAYLOAD,
     });
-
-    return targetStandoffDistanceKm(radiusKm);
   }
 
   private switchToSatCenteredCamera_(target?: Satellite | MissileObject) {
@@ -498,10 +496,14 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     }
 
     cam.state.camZoomSnappedOnSat = true;
-    // Lower the zoom-in floor to the object's size before setting the initial framing distance
-    // (the camDistBuffer setter clamps against this).
-    cam.state.minDistanceFromTarget = SelectSatManager.calcTargetStandoff_(target);
-    cam.state.camDistBuffer = settingsManager.minDistanceFromSatellite;
+    // Set the zoom-in floor to the object's size (3x radius), then frame at a comfortably larger
+    // initial distance (6x radius, floored at 30 m) so selecting a satellite lands with room to
+    // spare instead of at the floor - the user should never have to zoom out after selecting.
+    // Objects without size metadata (e.g. missiles) fall back to the global minimum for both.
+    const radiusKm = SelectSatManager.calcTargetRadiusKm_(target);
+
+    cam.state.minDistanceFromTarget = radiusKm === null ? null : targetStandoffDistanceKm(radiusKm);
+    cam.state.camDistBuffer = radiusKm === null ? cam.state.effectiveMinDistanceFromTarget : initialFramingDistanceKm(radiusKm);
 
     if (cam.cameraType === CameraType.FIXED_TO_SAT_LVLH || cam.cameraType === CameraType.FIXED_TO_SAT_ECI) {
       // In satellite modes the LVLH/ECI frame already tracks the satellite.

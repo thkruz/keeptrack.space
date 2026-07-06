@@ -55,6 +55,12 @@ export class LineManager {
     u_earthRadius: null as unknown as WebGLUniformLocation,
     u_flatMapCenterX: null as unknown as WebGLUniformLocation,
     u_ecfMode: null as unknown as WebGLUniformLocation,
+    u_anchorMode: null as unknown as WebGLUniformLocation,
+    u_anchorLocal: null as unknown as WebGLUniformLocation,
+    u_anchorRawBuf: null as unknown as WebGLUniformLocation,
+    u_anchorRawEci: null as unknown as WebGLUniformLocation,
+    u_gmstCos: null as unknown as WebGLUniformLocation,
+    u_gmstSin: null as unknown as WebGLUniformLocation,
   };
 
   /** Polar view uniforms assigned separately — some ANGLE backends strip them from conditional branches. */
@@ -622,6 +628,26 @@ export class LineManager {
     gl.uniform1i(this.uniforms_.u_ecfMode, isEcf ? 1 : 0);
   }
 
+  /**
+   * Enable anchor-relative mode for the next orbit-strip draw. The strip's
+   * vertices are small offsets from a float64 anchor (subtracted in the orbit
+   * cruncher / path builder BEFORE float32 quantization), so full orbital
+   * magnitudes never hit float32 - the ~4 m-per-ULP rounding re-roll of
+   * absolute buffers is what made zoomed-in ECF orbit lines shiver.
+   *
+   * @param local anchorEciNow + worldShift, computed in float64 (small near the camera target)
+   * @param rawBuf full-magnitude anchor in the buffer frame (ECEF in ECF mode, ECI else) for 2D projections
+   * @param rawEci full-magnitude anchor rotated to current ECI, for the negative-alpha head vertex in 2D projections
+   */
+  setAnchorUniforms(local: [number, number, number], rawBuf: [number, number, number], rawEci: [number, number, number]) {
+    const gl = ServiceLocator.getRenderer().gl;
+
+    gl.uniform1i(this.uniforms_.u_anchorMode, 1);
+    gl.uniform3fv(this.uniforms_.u_anchorLocal, local);
+    gl.uniform3fv(this.uniforms_.u_anchorRawBuf, rawBuf);
+    gl.uniform3fv(this.uniforms_.u_anchorRawEci, rawEci);
+  }
+
   setWorldUniforms(modelViewMatrix: mat4, projectionCameraMatrix: mat4) {
     const gl = ServiceLocator.getRenderer().gl;
     const mainCamera = ServiceLocator.getMainCamera();
@@ -633,11 +659,26 @@ export class LineManager {
     const isPolarView = mainCamera.cameraType === CameraType.POLAR_VIEW;
 
     // 2D projections reproject raw ECI in-shader; zero the world offset for them
-    gl.uniform3fv(this.uniforms_.worldOffset, isFlatMap || isPolarView ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0]);
+    const worldShift = isFlatMap || isPolarView ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0];
+
+    gl.uniform3fv(this.uniforms_.worldOffset, worldShift);
 
     // Always set u_gmst — needed by flat map, polar view, AND ECF mode
-    gl.uniform1f(this.uniforms_.u_gmst, ServiceLocator.getTimeManager().gmst);
+    const gmst = ServiceLocator.getTimeManager().gmst;
+
+    gl.uniform1f(this.uniforms_.u_gmst, gmst);
+
+    // Precomputed GMST cos/sin for the ECF-mode rotation (see ecefToEciCS in the
+    // vertex shader). Uploading the raw gmst angle instead quantizes it to ~4.8e-7
+    // rad as a float32 uniform - one frame of Earth rotation - jittering GEO-ECF
+    // and missile lines. cos/sin are O(1) so float32 keeps them stable.
+    gl.uniform1f(this.uniforms_.u_gmstCos, Math.cos(gmst));
+    gl.uniform1f(this.uniforms_.u_gmstSin, Math.sin(gmst));
     gl.uniform1i(this.uniforms_.u_ecfMode, settingsManager.isOrbitCruncherInEcf ? 1 : 0);
+
+    // Anchor mode is a per-orbit-strip override (see setAnchorUniforms); every
+    // pass starts in legacy absolute-vertex mode so ad-hoc lines are unaffected.
+    gl.uniform1i(this.uniforms_.u_anchorMode, 0);
 
     gl.uniform1i(this.uniforms_.u_flatMapMode, isFlatMap ? 1 : 0);
     if (this.polarUniforms_.u_polarViewMode) {
@@ -745,6 +786,21 @@ export class LineManager {
       uniform vec3 u_sensorEcef;
       uniform mat3 u_ecefToEnu;
       uniform float u_polarRadius;
+      // Anchor-relative orbit strips (see OrbitManager.writePathToGpu_):
+      // vertices are stored relative to a float64 anchor so full orbital
+      // magnitudes (~42164 km, ~4 m per float32 ULP) never touch float32.
+      uniform bool u_anchorMode;
+      // (anchor rotated to current ECI) + worldShift, computed in float64 on the
+      // CPU each frame; small near the camera target, so float32-exact there.
+      uniform vec3 u_anchorLocal;
+      // Full-magnitude anchor in the buffer's frame (ECEF in ECF mode, ECI else)
+      // for the 2D projections, which need absolute positions reconstructed.
+      uniform vec3 u_anchorRawBuf;
+      // Full-magnitude anchor rotated to current ECI, for the negative-alpha
+      // head vertex (stored relative to the CURRENT-ECI anchor, not the buffer frame).
+      uniform vec3 u_anchorRawEci;
+      uniform float u_gmstCos;
+      uniform float u_gmstSin;
 
       out vec4 vColor;
       out float vAlpha;
@@ -759,17 +815,28 @@ export class LineManager {
           return vec3(p.x * c + p.y * s, -p.x * s + p.y * c, p.z);
       }
 
-      // Rotate ECEF -> ECI about Z by +gmst.
-      vec3 ecefToEci(vec3 p, float gmst) {
-          float c = cos(gmst);
-          float s = sin(gmst);
+      // Rotate ECEF -> ECI about Z using precomputed cos/sin. GMST in [0, 2pi)
+      // quantizes to ~4.8e-7 rad as a float32 uniform - the same order as one
+      // frame of Earth rotation at 1x - so passing the raw angle jittered 42164 km
+      // ECF lines ~10-30 m/frame. cos/sin are O(1), so float32 resolves them to
+      // ~6e-8 and they vary smoothly frame to frame.
+      vec3 ecefToEciCS(vec3 p, float c, float s) {
           return vec3(p.x * c - p.y * s, p.x * s + p.y * c, p.z);
       }
 
       void main(void) {
           // Apply offset in world space, then transform
           vec4 worldPosition = u_mVMatrix * vec4(a_position.xyz, 1.0);
-          vec3 eciPos = worldPosition.xyz + worldOffset;
+          // Absolute position for the 2D projections: anchor-relative orbit strips
+          // reconstruct it from the full-magnitude raw anchor (head vertex is
+          // relative to the current-ECI anchor, body to the buffer-frame anchor);
+          // legacy lines carry absolute vertices and use the world offset.
+          vec3 eciPos;
+          if (u_anchorMode) {
+              eciPos = worldPosition.xyz + (a_position.w < 0.0 ? u_anchorRawEci : u_anchorRawBuf);
+          } else {
+              eciPos = worldPosition.xyz + worldOffset;
+          }
           vec4 position;
 
           v_eciPos = vec3(0.0);
@@ -861,16 +928,25 @@ export class LineManager {
 
               position = u_pCamMatrix * vec4(polarPos, 1.0);
           } else {
-              if (u_ecfMode) {
-                  if (a_position.w < 0.0) {
-                      // First orbit point stored in ECI (negative alpha flag)
-                      // — skip ECEF→ECI rotation to avoid float32 roundtrip jitter
-                      position = u_pCamMatrix * vec4(eciPos, 1.0);
-                  } else {
-                      // Rotate raw ECEF → ECI before adding worldOffset
-                      vec3 rotated = ecefToEci(worldPosition.xyz, u_gmst);
-                      position = u_pCamMatrix * vec4(rotated + worldOffset, 1.0);
+              if (u_anchorMode) {
+                  // Anchor-relative orbit strip: vertices are small offsets from a
+                  // float64 anchor, so only small vectors pass through float32 here.
+                  // ECF bodies rotate the small offset to ECI (the anchor was rotated
+                  // in float64 on the CPU); the negative-alpha head vertex is already
+                  // a current-ECI offset and skips the rotation. Adding u_anchorLocal
+                  // (anchorEciNow + worldShift, float64-computed, near-camera small)
+                  // reconstructs the world-shifted position with sub-mm stability -
+                  // absolute float32 orbit buffers re-rolled their ~4 m ULP rounding
+                  // every frame, which made zoomed-in ECF lines visibly shiver.
+                  vec3 p = worldPosition.xyz;
+                  if (u_ecfMode && a_position.w >= 0.0) {
+                      p = ecefToEciCS(p, u_gmstCos, u_gmstSin);
                   }
+                  position = u_pCamMatrix * vec4(p + u_anchorLocal, 1.0);
+              } else if (u_ecfMode) {
+                  // Legacy absolute ECEF line: rotate to ECI, then apply world offset.
+                  vec3 rotated = ecefToEciCS(worldPosition.xyz, u_gmstCos, u_gmstSin);
+                  position = u_pCamMatrix * vec4(rotated + worldOffset, 1.0);
               } else {
                   position = u_pCamMatrix * vec4(eciPos, 1.0);
               }

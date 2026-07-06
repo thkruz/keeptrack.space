@@ -78,6 +78,34 @@ describe('MissileObject', () => {
 
       expect(m.getTimeInTrajectory()).toBe(1);
     });
+
+    it('moves the index back when the sim clock is scrubbed backwards', () => {
+      const start = simTime.getTime();
+      const m = makeMissile({
+        startTime: start,
+        latList: [0, 0, 0, 0, 0] as Degrees[],
+        lonList: [0, 0, 0, 0, 0] as Degrees[],
+        altList: [0, 100, 200, 100, 0] as Kilometers[],
+        timeList: [0, 1000, 2000, 3000, 4000],
+      });
+
+      // Scrub forward to 3s into flight, then back to 1s: the index must follow
+      // the clock both ways (the old forward-only walk got stuck at the peak).
+      vi.spyOn(ServiceLocator, 'getTimeManager').mockReturnValue({ simulationTimeObj: new Date(start + 3000) } as never);
+      expect(m.getTimeInTrajectory()).toBe(3);
+
+      vi.spyOn(ServiceLocator, 'getTimeManager').mockReturnValue({ simulationTimeObj: new Date(start + 1000) } as never);
+      expect(m.getTimeInTrajectory()).toBe(1);
+    });
+
+    it('clamps to the final sample after impact', () => {
+      const start = simTime.getTime();
+      const m = makeMissile({ startTime: start });
+
+      vi.spyOn(ServiceLocator, 'getTimeManager').mockReturnValue({ simulationTimeObj: new Date(start + 60_000) } as never);
+      // altList has 2 samples -> last index is 1.
+      expect(m.getTimeInTrajectory()).toBe(1);
+    });
   });
 
   describe('eci', () => {
@@ -179,6 +207,126 @@ describe('MissileObject', () => {
 
       // t=1: altList[1]=200 > altList[0]=100.
       expect(m.isGoingUp()).toBe(true);
+    });
+  });
+
+  describe('getApogeeIndex', () => {
+    it('returns the index of the highest-altitude sample (the RV separation point)', () => {
+      const m = makeMissile({
+        latList: [0, 0, 0, 0, 0] as Degrees[],
+        lonList: [0, 0, 0, 0, 0] as Degrees[],
+        altList: [0, 100, 200, 100, 0] as Kilometers[],
+        timeList: [0, 1000, 2000, 3000, 4000],
+      });
+
+      expect(m.getApogeeIndex()).toBe(2);
+    });
+
+    it('caches the result across calls (altList is written once)', () => {
+      const m = makeMissile({ altList: [10, 90, 40] as Kilometers[] });
+
+      expect(m.getApogeeIndex()).toBe(1);
+      // Second call hits the cache and returns the same value.
+      expect(m.getApogeeIndex()).toBe(1);
+    });
+  });
+
+  describe('isVisibleNow (MIRV separation gating)', () => {
+    const start = simTime.getTime();
+    // Apogee (separation) at index 2 of this 5-sample arc.
+    const mirvChild = () => {
+      const m = makeMissile({
+        startTime: start,
+        latList: [0, 0, 0, 0, 0] as Degrees[],
+        lonList: [0, 0, 0, 0, 0] as Degrees[],
+        altList: [0, 100, 200, 100, 0] as Kilometers[],
+        timeList: [0, 1000, 2000, 3000, 4000],
+      });
+
+      m.hideUntilSeparation = true;
+
+      return m;
+    };
+
+    it('is always visible for the primary (hideUntilSeparation false)', () => {
+      const m = mirvChild();
+
+      m.hideUntilSeparation = false;
+      vi.spyOn(ServiceLocator, 'getTimeManager').mockReturnValue({ simulationTimeObj: new Date(start) } as never);
+      expect(m.isVisibleNow()).toBe(true);
+    });
+
+    it('hides a child before separation (apogee)', () => {
+      const m = mirvChild();
+
+      vi.spyOn(ServiceLocator, 'getTimeManager').mockReturnValue({ simulationTimeObj: new Date(start + 1000) } as never);
+      expect(m.isVisibleNow()).toBe(false);
+    });
+
+    it('shows a child from separation onward', () => {
+      const m = mirvChild();
+
+      vi.spyOn(ServiceLocator, 'getTimeManager').mockReturnValue({ simulationTimeObj: new Date(start + 2000) } as never);
+      expect(m.isVisibleNow()).toBe(true);
+    });
+
+    it('re-hides a child when rewound before separation', () => {
+      const m = mirvChild();
+
+      vi.spyOn(ServiceLocator, 'getTimeManager').mockReturnValue({ simulationTimeObj: new Date(start + 3000) } as never);
+      expect(m.isVisibleNow()).toBe(true);
+
+      vi.spyOn(ServiceLocator, 'getTimeManager').mockReturnValue({ simulationTimeObj: new Date(start + 1000) } as never);
+      expect(m.isVisibleNow()).toBe(false);
+    });
+  });
+
+  describe('getOrbitPath', () => {
+    const start = simTime.getTime();
+    const ascendingMissile = () => makeMissile({
+      startTime: start,
+      latList: [0, 0, 0, 0, 0] as Degrees[],
+      lonList: [0, 0, 0, 0, 0] as Degrees[],
+      altList: [0, 100, 200, 100, 0] as Kilometers[],
+      timeList: [0, 1000, 2000, 3000, 4000],
+    });
+
+    it('omits already-flown history: the vertex count shrinks as time advances', () => {
+      const m = ascendingMissile();
+
+      // At launch: head vertex + all 5 samples = 6 vertices (24 floats).
+      vi.spyOn(ServiceLocator, 'getTimeManager').mockReturnValue({ simulationTimeObj: new Date(start) } as never);
+      expect(m.getOrbitPath()).toHaveLength(6 * 4);
+
+      // 2s into flight: head vertex + remaining samples [2,3,4] = 4 vertices.
+      vi.spyOn(ServiceLocator, 'getTimeManager').mockReturnValue({ simulationTimeObj: new Date(start + 2000) } as never);
+      expect(m.getOrbitPath()).toHaveLength(4 * 4);
+    });
+
+    it('starts the line at the current interpolated position (vertex 0)', () => {
+      const m = ascendingMissile();
+
+      vi.spyOn(ServiceLocator, 'getTimeManager').mockReturnValue({ simulationTimeObj: new Date(start + 2000) } as never);
+      const path = m.getOrbitPath();
+      const eci = m.eci();
+
+      // Vertex 0 is the current position in ECEF (gmst=0). At sim epoch the ECI
+      // and ECEF frames differ by GMST, so compare magnitudes (frame-invariant).
+      const headMag = Math.hypot(path[0], path[1], path[2]);
+      const eciMag = Math.hypot(eci!.position.x, eci!.position.y, eci!.position.z);
+
+      expect(headMag).toBeCloseTo(eciMag, 3);
+      expect(path[3]).toBe(1.0); // head vertex is fully opaque
+    });
+
+    it('rebuilds when the clock is scrubbed backwards (cache keyed on sample index)', () => {
+      const m = ascendingMissile();
+
+      vi.spyOn(ServiceLocator, 'getTimeManager').mockReturnValue({ simulationTimeObj: new Date(start + 3000) } as never);
+      expect(m.getOrbitPath()).toHaveLength(3 * 4); // head + samples [3,4]
+
+      vi.spyOn(ServiceLocator, 'getTimeManager').mockReturnValue({ simulationTimeObj: new Date(start + 1000) } as never);
+      expect(m.getOrbitPath()).toHaveLength(5 * 4); // head + samples [1,2,3,4]
     });
   });
 

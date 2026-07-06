@@ -32,6 +32,15 @@ export class MissileSimulation {
   private readonly fuelDensity_ = 1750; // kg/m^3
   private readonly stepSize_ = 1; // s
 
+  /**
+   * Hard ceiling on integration steps (= seconds of flight at `stepSize_`). A real
+   * ballistic flight tops out near ~1900 s; a coast loop only runs longer than this if
+   * the motor reached near-orbital velocity and the vehicle never falls back (Altitude
+   * stays > 0 forever). That used to hang the whole simulation on certain oversized
+   * motor / short-range combinations, so every flight loop is bounded by this.
+   */
+  private static readonly MAX_FLIGHT_STEPS = 6000;
+
   // Per-launch derived state.
   private readonly burnRate_: number;
   private readonly warheadMass_: number;
@@ -151,7 +160,7 @@ export class MissileSimulation {
       dthetadt = out[18];
       NozzleAltitude2 = Altitude;
 
-      AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2 as Kilometers);
+      AltitudeList.push(Altitude / 1000 as Kilometers);
       this.pushCoordsAtDistance_(LatList, LongList, EstLatList, EstLongList, EstDistanceList, Distance);
 
       let hListSum = 0;
@@ -186,7 +195,7 @@ export class MissileSimulation {
       dthetadt = out[18];
       NozzleAltitude3 = Altitude;
 
-      AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2 as Kilometers);
+      AltitudeList.push(Altitude / 1000 as Kilometers);
       this.pushCoordsAtDistance_(LatList, LongList, EstLatList, EstLongList, EstDistanceList, Distance);
 
       let hListSum = 0;
@@ -220,7 +229,7 @@ export class MissileSimulation {
       ArcDistance = out[16];
       dthetadt = out[18];
 
-      AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2 as Kilometers);
+      AltitudeList.push(Altitude / 1000 as Kilometers);
       this.pushCoordsAtDistance_(LatList, LongList, EstLatList, EstLongList, EstDistanceList, Distance);
 
       let hListSum = 0;
@@ -231,7 +240,9 @@ export class MissileSimulation {
       hList.push(this.stepSize_ + hListSum);
     }
 
-    while (Altitude > 0) {
+    // Ballistic coast to impact. Bounded by MAX_FLIGHT_STEPS: if the burn left the vehicle
+    // at (near-)orbital velocity it never falls back and this loop would spin forever.
+    while (Altitude > 0 && AltitudeList.length < MissileSimulation.MAX_FLIGHT_STEPS) {
       FuelMass = 0;
       const out = this.launchDetailed_(
         FuelArea2,
@@ -255,8 +266,34 @@ export class MissileSimulation {
       ArcDistance = out[16];
       dthetadt = out[18];
 
-      AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2 as Kilometers);
+      AltitudeList.push(Altitude / 1000 as Kilometers);
       this.pushCoordsAtDistance_(LatList, LongList, EstLatList, EstLongList, EstDistanceList, Distance);
+    }
+
+    // Runaway guard: hitting the step ceiling means the vehicle never came back down
+    // (effectively went to orbit), so there is no ballistic impact to report.
+    if (AltitudeList.length >= MissileSimulation.MAX_FLIGHT_STEPS) {
+      return {
+        kind: 'error',
+        errorMessage: 'Error: The missile reached orbital velocity<br>(motor too large for this range).',
+        errorType: ToastMsgType.critical,
+      };
+    }
+
+    // Guard against overshoot corruption. The coordinate table (EstDistanceList) only
+    // spans ~1.2x the great-circle arc to the target. When the motor carries more energy
+    // than the range needs - e.g. an ICBM-sized rocket fired at a short regional target -
+    // the missile flies past that span, pushCoordsAtDistance_ finds no bracketing sample
+    // and stops appending, so the lat/lon lists fall short of the altitude list and their
+    // tail reads as `undefined`/NaN. This used to slip through as a `success` with a broken
+    // track (the regional IRBM/SRBM scenarios were full of them). Report it instead so the
+    // caller retries with a smaller motor or skips the shot.
+    if (LatList.length !== AltitudeList.length || LongList.length !== AltitudeList.length) {
+      return {
+        kind: 'error',
+        errorMessage: 'Error: The missile overshot its target<br>(motor too large for this range).',
+        errorType: ToastMsgType.critical,
+      };
     }
 
     const MaxAltitude = AltitudeList.reduce((a, b) => Math.max(a, b), 0);
@@ -275,6 +312,20 @@ export class MissileSimulation {
       };
     }
 
+    // Guard against a non-converged solve. The angle search should land the missile on
+    // the aimpoint (GoalDistance); if the downrange distance it actually flew misses that
+    // by more than 10% of the range, the trajectory ends in open country short of - or well
+    // past - the target. Reject rather than bake a track that does not reach its target.
+    const impactErrorFraction = Math.abs(Distance - GoalDistance) / GoalDistance;
+
+    if (impactErrorFraction > 0.1) {
+      return {
+        kind: 'error',
+        errorMessage: 'Error: The missile could not be guided<br>to its target at this range.',
+        errorType: ToastMsgType.critical,
+      };
+    }
+
     return {
       kind: 'success',
       trajectory: {
@@ -287,10 +338,15 @@ export class MissileSimulation {
   }
 
   /**
-   * Find the (lat, lon) on the great-circle path that corresponds to the
-   * current Distance, and append rounded values to the running trajectory
-   * lists. Duplicates the inline `for` loop that appeared four times in the
-   * original `Missile()`.
+   * Find the (lat, lon) on the great-circle path that corresponds to the current
+   * Distance and append it to the running trajectory lists, interpolated between the
+   * two bracketing samples at full precision.
+   *
+   * The previous implementation snapped to the nearest sample and rounded to
+   * `0.01deg` (~1 km), which turned the 1 Hz track into a visible staircase once the
+   * renderer drew every sample. Interpolating along the bracketing chord and keeping
+   * full precision yields the smooth arc (the interceptor/launch trajectories never
+   * quantize their coordinates, which is why only this solver looked jagged).
    */
   private pushCoordsAtDistance_(
     LatList: Degrees[],
@@ -300,10 +356,29 @@ export class MissileSimulation {
     EstDistanceList: number[],
     Distance: number,
   ): void {
+    const distanceKm = Distance / 1000;
+
     for (let i = 0; i < EstDistanceList.length; i++) {
-      if (EstDistanceList[i] <= Distance / 1000 && EstDistanceList[i + 1] > Distance / 1000) {
-        LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2 as Degrees);
-        LongList.push(Math.round(EstLongList[i] * 1e2) / 1e2 as Degrees);
+      if (EstDistanceList[i] <= distanceKm && EstDistanceList[i + 1] > distanceKm) {
+        const d0 = EstDistanceList[i];
+        const d1 = EstDistanceList[i + 1];
+        const lat0 = EstLatList[i];
+        const lon0 = EstLongList[i];
+        const lat1 = EstLatList[i + 1];
+        const lon1 = EstLongList[i + 1];
+        const frac = d1 > d0 ? Math.max(0, Math.min((distanceKm - d0) / (d1 - d0), 1)) : 0;
+
+        // Blend longitude along the shorter arc so an antimeridian step interpolates cleanly.
+        let lonStep = lon1 - lon0;
+
+        if (lonStep > 180) {
+          lonStep -= 360;
+        } else if (lonStep < -180) {
+          lonStep += 360;
+        }
+
+        LatList.push(lat0 + (lat1 - lat0) * frac as Degrees);
+        LongList.push(lon0 + lonStep * frac as Degrees);
         break;
       }
     }
@@ -671,7 +746,11 @@ export class MissileSimulation {
       ArcDistance = out[16];
       dthetadt = out[18];
     }
-    while (Altitude > 0) {
+    // Coast to impact, bounded so a near-orbital solve cannot spin this predictor forever
+    // (it runs 500+ times inside the angle search, so an unbounded loop here hangs the solve).
+    let coastSteps = 0;
+
+    while (Altitude > 0 && coastSteps < MissileSimulation.MAX_FLIGHT_STEPS) {
       FuelMass = 0;
       out = this.launchDetailed_(FuelArea2, FuelMass, RocketArea, Altitude, RocketCasingMass3, NozzleAltitude3!, drdt, dthetadt, Distance, ArcDistance, MassIn, AngleCoefficient);
       FuelMass = out[0];
@@ -680,6 +759,7 @@ export class MissileSimulation {
       Distance = out[14];
       ArcDistance = out[16];
       dthetadt = out[18];
+      coastSteps++;
     }
 
     return Distance;

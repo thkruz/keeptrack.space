@@ -115,3 +115,76 @@ export const retargetDescent = (
 
   return { latList, lonList, altList };
 };
+
+/**
+ * Notional reentry-vehicle load per missile designator, keyed by the code that
+ * appears in the raid data's `desc` ("Aleysk (SS-18) -> ..."). Only MIRV-capable
+ * types are listed; anything absent is a single warhead (see {@link warheadCountForDesc}).
+ * Counts are the systems' generally-cited MIRV capacity, capped at 12 (the sim's
+ * per-missile ceiling) so a mass raid reads as realistically MIRVed rather than a
+ * field of single RVs.
+ */
+export const MISSILE_WARHEAD_COUNTS: Readonly<Record<string, number>> = {
+  // Russia
+  'SS-18': 10, // R-36M2 Voevoda ("Satan")
+  'SS-19': 6, // UR-100N
+  'SS-N-23A': 4, // R-29RMU Sineva family (SLBM)
+  Sineva: 4,
+  Layner: 4, // R-29RMU2.1
+  Bulava: 6, // R-30 (SLBM)
+  // China
+  'DF-5A/B': 5, // DF-5B is MIRVed
+  'DF-41': 6,
+  // North Korea
+  'KN-22': 3, // Hwasong-17 (claimed MIRV-capable)
+  // USA
+  'Trident II': 8, // UGM-133A (SLBM)
+  'Minuteman III': 3, // LGM-30G design capacity
+};
+
+/** Upper bound on warheads per missile (matches the interactive MIRV launcher). */
+export const MAX_WARHEADS_PER_MISSILE = 12;
+
+/**
+ * Reentry-vehicle count for a raid missile, parsed from the designator in its
+ * `desc` (the text inside the first parentheses, e.g. "Aleysk (SS-18) -> Boston"
+ * -> "SS-18"). Unknown or single-warhead systems return 1. Clamped to
+ * [1, {@link MAX_WARHEADS_PER_MISSILE}].
+ */
+export const warheadCountForDesc = (desc: string | undefined): number => {
+  if (!desc) {
+    return 1;
+  }
+
+  const designator = (/\(([^)]+)\)/u).exec(desc)?.[1]?.trim();
+  const count = designator ? MISSILE_WARHEAD_COUNTS[designator] ?? 1 : 1;
+
+  return Math.max(1, Math.min(count, MAX_WARHEADS_PER_MISSILE));
+};
+
+/**
+ * Fan an existing bus trajectory into `count` reentry-vehicle tracks. Every RV
+ * shares the bus track up to apogee (the separation point) and then bends toward
+ * its own aimpoint on a footprint around the bus's impact (the last sample), so the
+ * tracks coincide on the way up and spread on the way down - a MIRV footprint. RV 0
+ * keeps the bus's exact impact; `count <= 1` returns a single copy of the bus.
+ */
+export const expandTrajectoryToMirv = (
+  busLatList: number[],
+  busLonList: number[],
+  busAltList: number[],
+  count: number,
+  spreadKm: number,
+): GroundTrack[] => {
+  if (count <= 1 || busAltList.length === 0) {
+    return [{ latList: busLatList.slice(), lonList: busLonList.slice(), altList: busAltList.slice() }];
+  }
+
+  const lastIdx = busAltList.length - 1;
+  const targetLat = busLatList[lastIdx];
+  const targetLon = busLonList[lastIdx];
+  const sepIdx = findSeparationIndex(busAltList);
+  const footprint = generateFootprint(targetLat, targetLon, count, spreadKm);
+
+  return footprint.map((aim) => retargetDescent(busLatList, busLonList, busAltList, sepIdx, aim.lat - targetLat, aim.lon - targetLon));
+};

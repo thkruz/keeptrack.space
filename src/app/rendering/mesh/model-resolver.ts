@@ -47,7 +47,15 @@ export const SatelliteModels = {
   misl: 'misl',
   misl2: 'misl2',
   misl3: 'misl3',
+  'misl3-2': 'misl3-2',
+  'misl3-6': 'misl3-6',
+  'misl3-8': 'misl3-8',
+  'misl3-10': 'misl3-10',
   misl4: 'misl4',
+  'misl4-2': 'misl4-2',
+  'misl4-6': 'misl4-6',
+  'misl4-8': 'misl4-8',
+  'misl4-10': 'misl4-10',
   o3b: 'o3b',
   oneweb: 'oneweb',
   orbcomm: 'orbcomm',
@@ -142,7 +150,7 @@ export class ModelResolver {
 
   private resolveModelName_(obj: BaseObject): string {
     if (obj.isMissile()) {
-      this.resolveMislModelName_(obj as MissileObject);
+      return this.resolveMislModelName_(obj as MissileObject);
     } else if (obj instanceof OemSatellite) {
       if (obj.model) {
         return obj.model;
@@ -619,35 +627,95 @@ export class ModelResolver {
     return null;
   }
 
-  private resolveMislModelName_(misl: MissileObject): string {
-    // After max alt it looks like an RV
-    if (!misl.isGoingUp() && misl.lastTime > 20) {
-      return SatelliteModels.rv;
+  /** Karman line (km). Below this apogee a shot never stages/deploys RVs. */
+  private static readonly mislKarmanKm_ = 100;
+  /** Ascending below this fraction of apogee is still boosting the full stack. */
+  private static readonly mislBoostTop_ = 0.25;
+  /**
+   * Fraction of the ascent (launch -> apogee) spent in the deploy sequence. The
+   * shroud-separation (misl3) and RV-separation (misl4) meshes only show during
+   * this short window right before the RVs separate at apogee.
+   */
+  private static readonly mislDeployFrac_ = 0.05;
+
+  /**
+   * Reentry-vehicle counts for which a dedicated deploy mesh (misl3-N / misl4-N)
+   * exists. The count-4 mesh is the original unsuffixed `misl3`/`misl4`, so it is
+   * represented here as the empty suffix. A missile's warhead count is snapped to
+   * the nearest of these so the revealed/separating RV cluster shows the right
+   * number of reentry vehicles (see {@link mislVariantSuffix_}).
+   */
+  private static readonly mislRvVariants_ = [2, 4, 6, 8, 10] as const;
+
+  /**
+   * Model-name suffix for the RV-count variant nearest `warheadCount` (e.g. 6 ->
+   * "-6", 4 -> "" for the original mesh). Ties round up, so a between-sizes count
+   * reads as the more heavily MIRVed option. Non-MIRV missiles default to a
+   * warhead count of 1 and snap to the 2-RV mesh.
+   */
+  private static mislVariantSuffix_(warheadCount: number): string {
+    const count = Number.isFinite(warheadCount) ? warheadCount : 1;
+    let best = ModelResolver.mislRvVariants_[0];
+
+    for (const v of ModelResolver.mislRvVariants_) {
+      if (Math.abs(v - count) <= Math.abs(best - count)) {
+        best = v;
+      }
     }
 
-    /*
-     * Otherwise pick a random missile model, but use the
-     * name so that it stays consistent between draws
-     */
-    const lastNumberInName = RegExp(/\d+$/u, 'u').exec(misl.name);
+    return best === 4 ? '' : `-${best}`;
+  }
 
-    if (lastNumberInName) {
-      const number = Number.parseInt(lastNumberInName[0]);
+  /**
+   * Ballistic-missile mesh, chosen by where the object sits in its trajectory so
+   * the model reads out the current flight phase. The mesh manager re-resolves
+   * every frame, so scrubbing the sim clock either direction updates the mesh
+   * live as the missile advances along (or back down) its arc.
+   *
+   * Every MIRV reentry vehicle shares the bus trajectory up to apogee and then
+   * separates and flies its own descent (see MirvAttack / findSeparationIndex),
+   * so apogee is the deploy/separation point. The sequence around it:
+   *
+   *   ascending, low                  -> misl   (full multi-stage boost stack)
+   *   ascending, high                 -> misl2  (final stage, boosters dropped)
+   *   short window before apogee (1)  -> misl3  (shroud separating, RVs revealed)
+   *   short window before apogee (2)  -> misl4  (RVs separating from the spent bus)
+   *   at/after apogee (separation)    -> rv     (a single reentry vehicle, all the way down)
+   *
+   * Short, purely atmospheric shots (apogee below the Karman line) keep the boost
+   * model the whole way: they neither stage to an exo-atmospheric bus nor deploy
+   * reentry vehicles, so the RV sequence would misrepresent them.
+   */
+  private resolveMislModelName_(misl: MissileObject): string {
+    const { altList, maxAlt } = misl;
 
-      if (number <= 2) {
-        return SatelliteModels.misl;
-      } else if (number <= 4) {
-        return SatelliteModels.misl2;
-      } else if (number <= 6) {
-        return SatelliteModels.misl3;
-      } else if (number <= 8) {
-        return SatelliteModels.misl4;
-      }
-
+    if (!altList || altList.length === 0 || maxAlt < ModelResolver.mislKarmanKm_) {
       return SatelliteModels.misl;
     }
 
-    return SatelliteModels.misl;
+    const lastIdx = altList.length - 1;
+    const t = Math.max(0, Math.min(misl.getTimeInTrajectory(), lastIdx));
+    const sepIdx = misl.getApogeeIndex();
 
+    // At/after separation the object is a lone reentry vehicle coasting down to
+    // its aimpoint - use the single-RV mesh the rest of the way down.
+    if (t >= sepIdx) {
+      return SatelliteModels.rv;
+    }
+
+    // The deploy sequence plays out in a short window just before separation: the
+    // shroud comes off to reveal the RVs (misl3), then the RVs pull away from the
+    // spent bus (misl4). Keep it brief so it reads as a discrete event. The mesh
+    // carries the right number of reentry vehicles for this missile's warhead load.
+    const deploySamples = Math.max(2, Math.round(sepIdx * ModelResolver.mislDeployFrac_));
+
+    if (t >= sepIdx - deploySamples) {
+      const suffix = ModelResolver.mislVariantSuffix_(misl.warheadCount);
+
+      return t >= sepIdx - Math.ceil(deploySamples / 2) ? `${SatelliteModels.misl4}${suffix}` : `${SatelliteModels.misl3}${suffix}`;
+    }
+
+    // Still climbing below the deploy window: full boost stack low, final stage high.
+    return altList[t] / maxAlt < ModelResolver.mislBoostTop_ ? SatelliteModels.misl : SatelliteModels.misl2;
   }
 }

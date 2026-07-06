@@ -228,33 +228,97 @@ describe('ModelResolver satellite model selection', () => {
   });
 
   describe('missile model selection', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const mislName = (name: string, over: Record<string, unknown> = {}) => ({
-      isGoingUp: () => true,
-      lastTime: 0,
-      name,
-      ...over,
+    // A missile mesh is chosen from where the object sits along its trajectory
+    // relative to apogee (the reentry-vehicle separation point). Build a triangular
+    // altitude profile that climbs to maxAlt at index 100 and falls back to 0 at
+    // index 200, then stub the current sample index (t).
+    const buildAltList = (maxAlt: number) => {
+      const altList: number[] = [];
+
+      for (let i = 0; i <= 200; i++) {
+        altList.push((i <= 100 ? i / 100 : (200 - i) / 100) * maxAlt);
+      }
+
+      return altList;
+    };
+
+    const apogeeIndexOf = (altList: number[]) => {
+      let m = 0;
+
+      for (let i = 1; i < altList.length; i++) {
+        if (altList[i] > altList[m]) {
+          m = i;
+        }
+      }
+
+      return m;
+    };
+
+    const mislAt = (t: number, maxAlt = 1200, warheadCount = 4, altList = buildAltList(maxAlt)) => ({
+      altList,
+      maxAlt,
+      warheadCount,
+      getTimeInTrajectory: () => t,
+      getApogeeIndex: () => apogeeIndexOf(altList),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any;
 
-    it('returns an RV once the missile is descending past its apex', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const r = resolver as any;
+    // With apogee at index 100 the deploy window spans max(2, round(100*0.05)) = 5
+    // samples: misl3 at [95,97), misl4 at [97,100), then rv from apogee down.
 
-      expect(r.resolveMislModelName_(mislName('THREAT 5', { isGoingUp: () => false, lastTime: 30 })))
-        .toBe(SatelliteModels.rv);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const resolveMisl = (misl: any) => (resolver as any).resolveMislModelName_(misl);
+
+    it('shows the full boost stack while ascending low', () => {
+      expect(resolveMisl(mislAt(10))).toBe(SatelliteModels.misl); // altFrac 0.1
     });
 
-    it('buckets ascending missiles by the trailing number in the name', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const r = resolver as any;
+    it('shows the final stage once ascending high (boosters dropped)', () => {
+      expect(resolveMisl(mislAt(60))).toBe(SatelliteModels.misl2); // altFrac 0.6
+    });
 
-      expect(r.resolveMislModelName_(mislName('THREAT 2'))).toBe(SatelliteModels.misl);
-      expect(r.resolveMislModelName_(mislName('THREAT 4'))).toBe(SatelliteModels.misl2);
-      expect(r.resolveMislModelName_(mislName('THREAT 6'))).toBe(SatelliteModels.misl3);
-      expect(r.resolveMislModelName_(mislName('THREAT 8'))).toBe(SatelliteModels.misl4);
-      expect(r.resolveMislModelName_(mislName('THREAT 9'))).toBe(SatelliteModels.misl);
-      expect(r.resolveMislModelName_(mislName('NO NUMBER'))).toBe(SatelliteModels.misl);
+    it('shows the shroud separating in the first half of the deploy window', () => {
+      expect(resolveMisl(mislAt(95))).toBe(SatelliteModels.misl3);
+      expect(resolveMisl(mislAt(96))).toBe(SatelliteModels.misl3);
+    });
+
+    it('shows the RVs separating in the second half of the deploy window', () => {
+      expect(resolveMisl(mislAt(97))).toBe(SatelliteModels.misl4);
+      expect(resolveMisl(mislAt(99))).toBe(SatelliteModels.misl4);
+    });
+
+    it('picks the deploy mesh variant matching the warhead count', () => {
+      // Reveal window (misl3) and separation window (misl4) carry the RV-count suffix.
+      expect(resolveMisl(mislAt(95, 1200, 2))).toBe('misl3-2');
+      expect(resolveMisl(mislAt(97, 1200, 2))).toBe('misl4-2');
+      expect(resolveMisl(mislAt(95, 1200, 6))).toBe('misl3-6');
+      expect(resolveMisl(mislAt(97, 1200, 8))).toBe('misl4-8');
+      expect(resolveMisl(mislAt(95, 1200, 10))).toBe('misl3-10');
+      // Count 4 keeps the original unsuffixed mesh.
+      expect(resolveMisl(mislAt(95, 1200, 4))).toBe(SatelliteModels.misl3);
+    });
+
+    it('snaps an off-size warhead count to the nearest RV variant (ties round up)', () => {
+      expect(resolveMisl(mislAt(95, 1200, 1))).toBe('misl3-2'); // non-MIRV default
+      expect(resolveMisl(mislAt(95, 1200, 3))).toBe(SatelliteModels.misl3); // 3 -> 4
+      expect(resolveMisl(mislAt(95, 1200, 5))).toBe('misl3-6'); // tie 4/6 -> 6
+      expect(resolveMisl(mislAt(95, 1200, 12))).toBe('misl3-10'); // clamp to largest
+    });
+
+    it('shows a single RV from separation (apogee) all the way down', () => {
+      expect(resolveMisl(mislAt(100))).toBe(SatelliteModels.rv); // at separation
+      expect(resolveMisl(mislAt(120))).toBe(SatelliteModels.rv); // high descent
+      expect(resolveMisl(mislAt(199))).toBe(SatelliteModels.rv); // terminal
+    });
+
+    it('keeps the boost model for sub-orbital atmospheric shots', () => {
+      // Apogee below the Karman line: never stages to an RV bus.
+      expect(resolveMisl(mislAt(120, 50))).toBe(SatelliteModels.misl);
+    });
+
+    it('falls back to the boost model when the trajectory is empty', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect(resolveMisl({ altList: [], maxAlt: 1200 } as any)).toBe(SatelliteModels.misl);
     });
   });
 });

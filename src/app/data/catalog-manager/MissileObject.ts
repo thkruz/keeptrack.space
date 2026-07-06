@@ -30,6 +30,13 @@ export class MissileObject extends SpaceObject {
   orbitPathCache_: Float32Array | null = null;
   private orbitPathCacheKey_ = '';
 
+  /**
+   * Float64 ECEF anchor of orbitPathCache_. Path vertices are stored RELATIVE to
+   * this (subtracted in float64 before the float32 write) so full orbital
+   * magnitudes never hit float32 - see OrbitManager.orbitAnchors_ for why.
+   */
+  orbitPathAnchor_: [number, number, number] = [0, 0, 0];
+
   private totalVelocity_: number = 0;
 
   /**
@@ -304,6 +311,7 @@ export class MissileObject extends SpaceObject {
 
     if (len === 0) {
       this.orbitPathCache_ = new Float32Array(0);
+      this.orbitPathAnchor_ = [0, 0, 0];
       this.orbitPathCacheKey_ = key;
 
       return this.orbitPathCache_;
@@ -319,12 +327,17 @@ export class MissileObject extends SpaceObject {
     const fade = settingsManager.orbitFadeFactor;
 
     // Vertex 0: the current interpolated position, so the line begins at the dot.
+    // It doubles as the float64 anchor: all vertices are stored relative to it
+    // (subtracted BEFORE the float32 write) so full ECEF magnitudes never hit
+    // float32 - see OrbitManager.orbitAnchors_ for why that matters.
     const head = interpolateMissileSample(this.latList, this.lonList, this.altList, this.startTime, now);
     const headEcef = toEcef(head.lat, head.lon, head.alt);
 
-    out[0] = headEcef.x;
-    out[1] = headEcef.y;
-    out[2] = headEcef.z;
+    this.orbitPathAnchor_ = [headEcef.x, headEcef.y, headEcef.z];
+
+    out[0] = 0;
+    out[1] = 0;
+    out[2] = 0;
     out[3] = 1.0;
 
     for (let i = 0; i < remaining; i++) {
@@ -332,9 +345,9 @@ export class MissileObject extends SpaceObject {
       const ecef = toEcef(this.latList[idx], this.lonList[idx], this.altList[idx]);
       const o = (i + 1) * 4;
 
-      out[o] = ecef.x;
-      out[o + 1] = ecef.y;
-      out[o + 2] = ecef.z;
+      out[o] = ecef.x - headEcef.x;
+      out[o + 1] = ecef.y - headEcef.y;
+      out[o + 2] = ecef.z - headEcef.z;
       // Brightest at the object, fading toward impact.
       out[o + 3] = Math.min(fade * (remaining / (i + 1)), 1.0);
     }

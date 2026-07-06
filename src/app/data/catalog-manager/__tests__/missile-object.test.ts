@@ -303,19 +303,25 @@ describe('MissileObject', () => {
       expect(m.getOrbitPath()).toHaveLength(4 * 4);
     });
 
-    it('starts the line at the current interpolated position (vertex 0)', () => {
+    it('starts the line at the current interpolated position (vertex 0 = anchor)', () => {
       const m = ascendingMissile();
 
       vi.spyOn(ServiceLocator, 'getTimeManager').mockReturnValue({ simulationTimeObj: new Date(start + 2000) } as never);
       const path = m.getOrbitPath();
       const eci = m.eci();
 
-      // Vertex 0 is the current position in ECEF (gmst=0). At sim epoch the ECI
-      // and ECEF frames differ by GMST, so compare magnitudes (frame-invariant).
-      const headMag = Math.hypot(path[0], path[1], path[2]);
+      // The path is anchor-relative: vertex 0 IS the anchor, so it is stored as
+      // the zero vector and the interpolated current position lives in
+      // orbitPathAnchor_ (ECEF, gmst=0). At sim epoch the ECI and ECEF frames
+      // differ by GMST, so compare magnitudes (frame-invariant).
+      expect(path[0]).toBe(0);
+      expect(path[1]).toBe(0);
+      expect(path[2]).toBe(0);
+
+      const anchorMag = Math.hypot(m.orbitPathAnchor_[0], m.orbitPathAnchor_[1], m.orbitPathAnchor_[2]);
       const eciMag = Math.hypot(eci!.position.x, eci!.position.y, eci!.position.z);
 
-      expect(headMag).toBeCloseTo(eciMag, 3);
+      expect(anchorMag).toBeCloseTo(eciMag, 3);
       expect(path[3]).toBe(1.0); // head vertex is fully opaque
     });
 

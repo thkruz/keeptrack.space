@@ -53,6 +53,25 @@ export class OrbitManager {
    */
   private readonly lastUploadedPath_ = new Map<number, Float32Array>();
 
+  /**
+   * Float64 anchor of each object's orbit buffer, in the buffer's frame (ECEF
+   * when the path is Earth-fixed, ECI otherwise). Orbit buffers store vertices
+   * RELATIVE to this anchor - the subtraction happens in float64 BEFORE the
+   * float32 GL buffer write, so full orbital magnitudes (~42164 km at GEO,
+   * where one float32 ULP is ~4 m) never touch float32. Absolute float32
+   * buffers re-rolled that ~4 m rounding every constant-redraw frame, which
+   * made zoomed-in ECF orbit and missile lines visibly shiver. The anchor is
+   * re-added per frame in writePathToGpu_ via float64-computed uniforms.
+   */
+  private readonly orbitAnchors_ = new Map<number, [number, number, number]>();
+
+  private static readonly zeroAnchor_: [number, number, number] = [0, 0, 0];
+
+  /** Stores the float64 anchor for an object's (anchor-relative) orbit buffer. */
+  setOrbitAnchor(satId: number, anchor: [number, number, number]): void {
+    this.orbitAnchors_.set(satId, anchor);
+  }
+
   orbitThreadMgr = new OrbitCruncherThreadManager(KeepTrack.getInstance().threads);
   playNextSatellite = null;
   tempTransColor: [number, number, number, number] = [0, 0, 0, 0];
@@ -86,6 +105,7 @@ export class OrbitManager {
     this.orbitCache.clear();
     this.bufferByteSizes_.clear();
     this.lastUploadedPath_.clear();
+    this.orbitAnchors_.clear();
     this.currentInView_ = [];
     this.currentSelectId_ = -1;
     this.secondarySelectId_ = -1;
@@ -318,6 +338,7 @@ export class OrbitManager {
     // Cache is in wrong reference frame — clear and re-request
     this.orbitCache.clear();
     this.lastUploadedPath_.clear();
+    this.orbitAnchors_.clear();
     this.inProgress_ = [];
     this.reRequestActiveOrbits_();
   }
@@ -424,9 +445,11 @@ export class OrbitManager {
         // vertex per 1 Hz sample instead of the coarse orbitSegments-chord worker
         // path, so it stays smooth up close. The ECI shape is time-invariant and
         // cached on the object, so this is a cheap buffer upload each frame.
-        this.setVariableLengthOrbitBuffer_(id, (obj as MissileObject).getOrbitPath());
+        const missile = obj as MissileObject;
+
+        this.setVariableLengthOrbitBuffer_(id, missile.getOrbitPath(), missile.orbitPathAnchor_);
       } else if (obj instanceof OemSatellite) {
-        this.setVariableLengthOrbitBuffer_(id, obj.getOrbitPath());
+        this.setVariableLengthOrbitBuffer_(id, obj.getOrbitPath(), obj.orbitPathAnchor_);
       } else {
         // Then it is a satellite
         this.orbitThreadMgr.sendSatelliteUpdate(
@@ -597,7 +620,11 @@ export class OrbitManager {
    * the fixed orbitSegments satellite path, these are drawn with a per-object vertex
    * count (see writePathToGpu_).
    */
-  private setVariableLengthOrbitBuffer_(satId: number, pointsOut: Float32Array): void {
+  private setVariableLengthOrbitBuffer_(satId: number, pointsOut: Float32Array, anchor: [number, number, number]): void {
+    // The path is anchor-relative (float64 rebase in the path builder); record the
+    // anchor so writePathToGpu_ can re-add it via float64-computed uniforms.
+    this.orbitAnchors_.set(satId, anchor);
+
     // The path is a stable cached reference (MissileObject.getOrbitPath /
     // OemSatellite) that only changes ~1 Hz as the track advances. When it is the
     // same reference we uploaded last, the GPU buffer already holds it - skip the
@@ -637,64 +664,6 @@ export class OrbitManager {
     this.inProgress_[satId] = false;
   }
 
-  /**
-   * Updates the orbit data for a satellite by shifting its position relative
-   * to the new first point. This compensates for floating point precision issues
-   * when dealing with large coordinate values.
-   */
-  alignOrbitSelectedObject(satId: number, firstPosition: number[], isShiftFirstOnly = false): void {
-    let satOrbitData: Float32Array | null;
-
-    if (this.orbitCache.has(satId)) {
-      satOrbitData = this.orbitCache.get(satId) ?? null;
-    } else {
-      satOrbitData = this.getBufferData(satId);
-      if (satOrbitData) {
-        this.orbitCache.set(satId, satOrbitData);
-      }
-    }
-
-    if (!satOrbitData) {
-      return;
-    }
-
-    const deltaOfFirstPoint = [
-      firstPosition[0] - satOrbitData[0],
-      firstPosition[1] - satOrbitData[1],
-      firstPosition[2] - satOrbitData[2],
-    ];
-
-    for (let i = 0; i < (isShiftFirstOnly ? 4 : satOrbitData.length); i += 4) {
-      satOrbitData[i] += deltaOfFirstPoint[0];
-      satOrbitData[i + 1] += deltaOfFirstPoint[1];
-      satOrbitData[i + 2] += deltaOfFirstPoint[2];
-      // Ignore oppacity
-    }
-
-    const gl = this.gl_ ?? ServiceLocator.getRenderer().gl;
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[satId]);
-
-    // get current buffer size
-    // DEBUG: Disabled reallocation check for now to see if it helps with performance
-    // const currentBufferSize = gl.getBufferParameter(gl.ARRAY_BUFFER, gl.BUFFER_SIZE);
-
-    // if (currentBufferSize !== satOrbitData.byteLength) {
-    //   // Delete the buffer first
-    //   gl.deleteBuffer(this.glBuffers_[satId]);
-    //   // Create a new buffer
-    //   this.glBuffers_[satId] = this.allocateBuffer(settingsManager.oemOrbitSegments * 4);
-    //   gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[satId]);
-    //   // reallocate buffer if size has changed
-    //   gl.bufferData(gl.ARRAY_BUFFER, satOrbitData, gl.DYNAMIC_DRAW);
-    // } else {
-    //   // update buffer data
-    //   gl.bufferSubData(gl.ARRAY_BUFFER, 0, satOrbitData);
-    // }
-
-    gl.bufferSubData(gl.ARRAY_BUFFER, 0, satOrbitData);
-  }
-
   /** Returns the current data from the buffer for the given satId. */
   getBufferData(satId: number): Float32Array | null {
     const gl = this.gl_ ?? ServiceLocator.getRenderer().gl;
@@ -715,8 +684,8 @@ export class OrbitManager {
     return out;
   }
 
-  /** Reusable buffer for ECF first-point correction to avoid per-frame allocation. */
-  private static readonly ecfFirstPoint_ = new Float32Array(4);
+  /** Reusable buffer for the per-frame head-vertex patch to avoid allocation. */
+  private static readonly headVertex_ = new Float32Array(4);
 
   private writePathToGpu_(id: number) {
     if (id === -1) {
@@ -741,67 +710,73 @@ export class OrbitManager {
       return;
     }
 
-    // In ECF mode, patch the first orbit point with the satellite's current
-    // ECI position every frame. A negative alpha flags the shader to skip the
-    // ECEF→ECI rotation for this vertex, avoiding any CPU/GPU float32 roundtrip.
-    if (settingsManager.isOrbitCruncherInEcf && !obj.isStatic() && !obj.isMissile()) {
-      const eciPos = ServiceLocator.getDotsManager().getPositionArray(Number(id));
-
-      if (eciPos[0] !== 0 || eciPos[1] !== 0 || eciPos[2] !== 0) {
-        const buf = OrbitManager.ecfFirstPoint_;
-
-        buf[0] = eciPos[0];
-        buf[1] = eciPos[1];
-        buf[2] = eciPos[2];
-        buf[3] = -1.0; // negative alpha signals ECI vertex to shader
-
-        const gl = this.gl_ ?? ServiceLocator.getRenderer().gl;
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[id]);
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, buf);
-      }
-    }
-
     // Missile lines are stored Earth-fixed (ECEF) and drawn in ECF mode so the
     // shader rotates them to ECI by the live GMST each frame (the track follows the
     // ground); everything else keeps the global ECF setting.
-    this.lineManagerInstance_.setEcfMode(obj.isMissile() || settingsManager.isOrbitCruncherInEcf);
+    const isEcfBuffer = obj.isMissile() || settingsManager.isOrbitCruncherInEcf;
 
-    // Patch the missile line's head (vertex 0) every frame with the dot's OWN
-    // rendered position, so the line start is pixel-identical to the dot instead
-    // of jittering. Two reasons this must come straight from positionData (not a
-    // re-computed ECEF vertex the shader rotates): (1) the cached path body only
-    // advances once per 1 Hz sample, so a frozen head swings around the per-frame
-    // dot; (2) routing the head through the shader's full-GMST ECEF->ECI rotation
-    // float32-diverges from the dot's own value and jitters. A negative alpha flags
-    // the shader to draw this vertex as-is (ECI, no rotation) - the same trick the
-    // satellite ECF path uses.
-    if (obj instanceof MissileObject && obj.orbitPathCache_ && obj.orbitPathCache_.length >= 4) {
-      // The rendered dot position (ground rotation applied) - the single source of
-      // truth shared with the camera follow, world shift, and mesh - so the line
-      // head is pixel-identical to the dot instead of jittering.
-      const pos = ServiceLocator.getDotsManager().getRenderedPositionArray(Number(id));
+    this.lineManagerInstance_.setEcfMode(isEcfBuffer);
 
-      // Skip the {0,0,0} pre-seed (object not yet positioned this frame).
-      if (pos[0] !== 0 || pos[1] !== 0 || pos[2] !== 0) {
-        const buf = OrbitManager.ecfFirstPoint_;
+    // The buffer's vertices are relative to a float64 anchor (see orbitAnchors_).
+    // Rotate the anchor to current ECI here in float64 - the shader then rotates
+    // only the SMALL relative vertices in float32 and re-adds the anchor, so the
+    // ~4 m float32 rounding of full orbital magnitudes never re-rolls per frame
+    // (that re-roll is what made zoomed-in ECF lines shiver).
+    const anchor = this.orbitAnchors_.get(id) ?? OrbitManager.zeroAnchor_;
+    let anchorEciNow = anchor;
 
-        buf[0] = pos[0];
-        buf[1] = pos[1];
-        buf[2] = pos[2];
-        buf[3] = -1.0; // negative alpha: shader draws this vertex as-is (ECI), no rotation
+    if (isEcfBuffer) {
+      const gmst = ServiceLocator.getTimeManager().gmst;
+      const c = Math.cos(gmst);
+      const s = Math.sin(gmst);
 
-        const gl = this.gl_ ?? ServiceLocator.getRenderer().gl;
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[id]);
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, buf);
-      }
+      anchorEciNow = [
+        anchor[0] * c - anchor[1] * s,
+        anchor[0] * s + anchor[1] * c,
+        anchor[2],
+      ];
     }
+
+    const worldShift = ServiceLocator.getScene().worldShift ?? [0, 0, 0];
+
+    this.lineManagerInstance_.setAnchorUniforms(
+      [anchorEciNow[0] + worldShift[0], anchorEciNow[1] + worldShift[1], anchorEciNow[2] + worldShift[2]],
+      anchor,
+      anchorEciNow,
+    );
 
     // OEM satellites and missiles carry a variable-length, high-resolution path
     // and are drawn with their own vertex count; everything else uses the fixed
     // orbitSegments buffer.
     const variableLengthPath = (obj instanceof OemSatellite || obj instanceof MissileObject) ? obj.orbitPathCache_ : null;
+
+    // Patch the line's head (vertex 0) every frame with the object's OWN dot
+    // position - the single source of truth shared with the camera follow, world
+    // shift, and mesh - so the line start is pixel-identical to the dot. The value
+    // is written RELATIVE to the current-ECI anchor (float64 subtraction), and a
+    // negative alpha flags the shader to skip the ECEF->ECI rotation for it. This
+    // is what alignOrbitSelectedObject used to approximate with a whole-buffer
+    // shift + GPU readback; anchored buffers make the head patch exact instead.
+    if (!obj.isStatic() && (!variableLengthPath || variableLengthPath.length >= 4)) {
+      // The RENDERED dot position (dots-shader ground rotation applied below the
+      // 6421 km band; identical to the stored value above it, i.e. all satellites).
+      const pos = ServiceLocator.getDotsManager().getRenderedPositionArray(Number(id));
+
+      // Skip the {0,0,0} pre-seed (object not yet positioned this frame).
+      if (pos[0] !== 0 || pos[1] !== 0 || pos[2] !== 0) {
+        const buf = OrbitManager.headVertex_;
+
+        buf[0] = pos[0] - anchorEciNow[0];
+        buf[1] = pos[1] - anchorEciNow[1];
+        buf[2] = pos[2] - anchorEciNow[2];
+        buf[3] = -1.0; // negative alpha: current-ECI-relative vertex, no rotation
+
+        const gl = this.gl_ ?? ServiceLocator.getRenderer().gl;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[id]);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, buf);
+      }
+    }
 
     if (variableLengthPath) {
       this.lineManagerInstance_.setAttribsAndDrawLineStrip(this.glBuffers_[id], variableLengthPath.length / 4);

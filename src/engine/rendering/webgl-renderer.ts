@@ -1,6 +1,4 @@
-import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
-import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -701,45 +699,12 @@ export class WebGLRenderer {
         ServiceLocator.getOrbitManager().setSelectOrbit(primarySat.id);
       }
 
-      // If in satellite view the orbit buffer needs to be updated every time
-      // Skip alignment in ECF mode — the shader rotates ECEF data per-frame using GMST
-      if (
-        !settingsManager.isOrbitCruncherInEcf &&
-        !primarySat.isMissile() &&
-        (ServiceLocator.getMainCamera().cameraType === CameraType.SATELLITE_FIRST_PERSON || ServiceLocator.getMainCamera().cameraType === CameraType.FIXED_TO_SAT_LVLH || ServiceLocator.getMainCamera().cameraType === CameraType.FIXED_TO_SAT_ECI)
-      ) {
-        /*
-         * Force an update so that the orbit is always using recent data - this
-         * will not fix this draw call
-         */
-        // ServiceLocator.getOrbitManager().updateOrbitBuffer(this.selectSatManager_.primarySatObj.id);
-
-        // Now we can fix this draw call
-        const firstPointOut = ServiceLocator.getDotsManager().getPositionArray(Number(this.selectSatManager_.primarySatObj.id));
-        const firstRelativePointOut = SatMath.getPositionFromCenterBody({
-          x: firstPointOut[0] as Kilometers,
-          y: firstPointOut[1] as Kilometers,
-          z: firstPointOut[2] as Kilometers,
-        });
-
-        if (primarySat instanceof Satellite) {
-          ServiceLocator.getOrbitManager().alignOrbitSelectedObject(
-            this.selectSatManager_.primarySatObj.id, [firstRelativePointOut.x, firstRelativePointOut.y, firstRelativePointOut.z],
-          );
-        } else if (primarySat instanceof OemSatellite) {
-          ServiceLocator.getOrbitManager().alignOrbitSelectedObject(
-            this.selectSatManager_.primarySatObj.id,
-            [firstPointOut[0], firstPointOut[1], firstPointOut[2]],
-            false,
-          );
-        } else {
-          ServiceLocator.getOrbitManager().alignOrbitSelectedObject(
-            this.selectSatManager_.primarySatObj.id,
-            [firstRelativePointOut.x, firstRelativePointOut.y, firstRelativePointOut.z],
-            true,
-          );
-        }
-      }
+      /*
+       * NOTE: the old alignOrbitSelectedObject whole-buffer shift (a GPU readback
+       * plus CPU rewrite per frame) is gone: orbit buffers are anchor-relative and
+       * OrbitManager.writePathToGpu_ patches the head vertex onto the rendered dot
+       * every frame, so the line inherently matches the dot in every camera mode.
+       */
 
       sceneInstance.searchBox.update(primarySat, timeManagerInstance.selectedDate);
 

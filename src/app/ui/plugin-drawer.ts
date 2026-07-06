@@ -221,16 +221,25 @@ export class PluginDrawer {
       ].join('')
       : '';
 
+    // The search trigger only opens the command palette, so only show it when the
+    // CommandPalette plugin is loaded (it's pro-only; absent in OSS builds).
+    const hasCommandPalette = PluginRegistry.checkIfLoaded('CommandPalettePlugin');
+    const searchHtml = hasCommandPalette
+      ? [
+        '    <div class="drawer-search" id="drawer-search-trigger" role="button" tabindex="0">',
+        `      <img class="drawer-search-icon" src=${searchPng} alt="Search" />`,
+        '      <span class="drawer-search-label">Search…</span>',
+        '      <span class="drawer-search-shortcut">Ctrl+⇧+K</span>',
+        '    </div>',
+      ].join('')
+      : '';
+
     drawer.id = 'plugin-drawer';
     drawer.className = `plugin-drawer ${modeClass}`;
     drawer.innerHTML = [
       '<div class="drawer-inner">',
       '  <div class="drawer-top-actions">',
-      '    <div class="drawer-search" id="drawer-search-trigger" role="button" tabindex="0">',
-      `      <img class="drawer-search-icon" src=${searchPng} alt="Search" />`,
-      '      <span class="drawer-search-label">Search\u2026</span>',
-      '      <span class="drawer-search-shortcut">Ctrl+\u21E7+K</span>',
-      '    </div>',
+      searchHtml,
       launcherHtml,
       '  </div>',
       // Stable slot for the onboarding "Get started" card. It must live OUTSIDE

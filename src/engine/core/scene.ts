@@ -276,7 +276,14 @@ export class Scene {
     const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);
 
     if (selectSatManager && selectSatManager.primarySatObj.id !== -1) {
-      const satelliteOffset = ServiceLocator.getDotsManager().getPositionArray(selectSatManager.primarySatObj.id).map((coord) => -coord);
+      // Use the RENDERED dot position (ground rotation applied), not the raw stored
+      // positionData. For a low-altitude missile the two differ by the dots shader's
+      // (currentGmst - cruncherGmst) rotation; centering on the raw value put the
+      // selected object off-screen-center during boost and snapped it back once the
+      // missile climbed past the ground-rotation radius. No-op above that radius, so
+      // satellites are unaffected. This runs per frame and is the authoritative
+      // world-shift for the selected object.
+      const satelliteOffset = ServiceLocator.getDotsManager().getRenderedPositionArray(selectSatManager.primarySatObj.id).map((coord) => -coord);
 
       this.worldShiftBase_ = satelliteOffset as [number, number, number];
     }

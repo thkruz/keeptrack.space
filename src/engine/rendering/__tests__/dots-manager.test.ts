@@ -67,6 +67,44 @@ describe('drawManager', () => {
     });
   });
 
+  // getRenderedPositionArray mirrors the dots vertex shader's ground rotation so
+  // CPU consumers (camera follow, world shift, mesh, orbit-line head) line up with
+  // the rendered dot. Above the ground-rotation radius it must be an exact passthrough.
+  describe('getRenderedPositionArray', () => {
+    it('returns the stored position unchanged above the ground-rotation radius', () => {
+      // A high-altitude position (well above 6421 km from Earth's center).
+      dotsManagerInstance.positionData = new Float32Array([0, 0, 0, 10000, 0, 0]);
+
+      expect(dotsManagerInstance.getRenderedPositionArray(1)).toEqual([10000, 0, 0]);
+    });
+
+    it('applies the (currentGmst - cruncherGmst) rotation below the radius', () => {
+      // A low position (< 6421 km from center) that the shader would rotate.
+      dotsManagerInstance.positionData = new Float32Array([1000, 0, 0]);
+      dotsManagerInstance.cruncherGmst = 0;
+      ServiceLocator.getTimeManager().gmst = (Math.PI / 2) as never;
+
+      const [x, y, z] = dotsManagerInstance.getRenderedPositionArray(0);
+
+      // Rotating (1000,0,0) by +90deg about Z -> (0, 1000, 0).
+      expect(x).toBeCloseTo(0, 6);
+      expect(y).toBeCloseTo(1000, 6);
+      expect(z).toBe(0);
+    });
+
+    it('is a no-op below the radius when currentGmst equals cruncherGmst', () => {
+      dotsManagerInstance.positionData = new Float32Array([1000, 500, 0]);
+      dotsManagerInstance.cruncherGmst = 0.3 as never;
+      ServiceLocator.getTimeManager().gmst = 0.3 as never;
+
+      const [x, y, z] = dotsManagerInstance.getRenderedPositionArray(0);
+
+      expect(x).toBeCloseTo(1000, 6);
+      expect(y).toBeCloseTo(500, 6);
+      expect(z).toBe(0);
+    });
+  });
+
   // FC-08: cruncher messages must not clobber hand-propagated positions mid-capture
   describe('updateCruncherBuffers capture gate', () => {
     it('drops cruncher position data while renderer.isCapturing, applies it after', () => {

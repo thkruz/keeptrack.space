@@ -1,3 +1,4 @@
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { OrbitCruncherThreadManager } from '@app/app/threads/orbit-cruncher-thread-manager';
 import { CameraType } from '@app/engine/camera/camera-type';
@@ -36,6 +37,22 @@ export class OrbitManager {
   private updateAllThrottle_ = 0;
   orbitCache = new Map<number, Float32Array>();
 
+  /**
+   * CPU-side mirror of each variable-length GL buffer's byte size, so we can decide
+   * between bufferData (realloc) and bufferSubData without calling
+   * gl.getBufferParameter(BUFFER_SIZE) - a synchronous query that stalls the CPU/GPU
+   * pipeline. Querying it once per missile per frame (2500+) costs ~100ms/frame.
+   */
+  private readonly bufferByteSizes_ = new Map<number, number>();
+
+  /**
+   * The last orbit-path array reference uploaded to each object's GL buffer. The
+   * missile/OEM paths are stable cached references (see MissileObject.getOrbitPath)
+   * that only change ~1 Hz as the track advances, so an unchanged reference means the
+   * GPU buffer is already correct and the whole upload can be skipped.
+   */
+  private readonly lastUploadedPath_ = new Map<number, Float32Array>();
+
   orbitThreadMgr = new OrbitCruncherThreadManager(KeepTrack.getInstance().threads);
   playNextSatellite = null;
   tempTransColor: [number, number, number, number] = [0, 0, 0, 0];
@@ -67,6 +84,8 @@ export class OrbitManager {
     // Clear state
     this.inProgress_ = [];
     this.orbitCache.clear();
+    this.bufferByteSizes_.clear();
+    this.lastUploadedPath_.clear();
     this.currentInView_ = [];
     this.currentSelectId_ = -1;
     this.secondarySelectId_ = -1;
@@ -298,6 +317,7 @@ export class OrbitManager {
 
     // Cache is in wrong reference frame — clear and re-request
     this.orbitCache.clear();
+    this.lastUploadedPath_.clear();
     this.inProgress_ = [];
     this.reRequestActiveOrbits_();
   }
@@ -371,9 +391,14 @@ export class OrbitManager {
     );
   }
 
+  /**
+   * @param _missileParams Vestigial. Missiles now build their line from their own
+   * trajectory (see the missile branch below), so callers no longer need to forward
+   * the lists here; the parameter is kept only for call-site compatibility.
+   */
   updateOrbitBuffer(
     id: number,
-    missileParams?: {
+    _missileParams?: {
       latList: Degrees[];
       lonList: Degrees[];
       altList: Kilometers[];
@@ -395,21 +420,13 @@ export class OrbitManager {
       const simTime = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
 
       if (obj.isMissile()) {
-        this.orbitThreadMgr.sendMissileUpdate(
-          Number(id), simTime,
-          false, // Missiles use their own GMST-based conversion; ECF toggle does not apply
-          isPolarView,
-          {
-            latList: missileParams?.latList,
-            lonList: missileParams?.lonList,
-            altList: missileParams?.altList,
-            // Launch epoch lets the worker rotate each sample by the GMST at its own
-            // time — essential for multi-hour trajectories (e.g. a GEO interceptor).
-            startTime: (obj as unknown as { startTime?: number }).startTime,
-          },
-        );
+        // Build the line on the main thread from the object's own trajectory: one
+        // vertex per 1 Hz sample instead of the coarse orbitSegments-chord worker
+        // path, so it stays smooth up close. The ECI shape is time-invariant and
+        // cached on the object, so this is a cheap buffer upload each frame.
+        this.setVariableLengthOrbitBuffer_(id, (obj as MissileObject).getOrbitPath());
       } else if (obj instanceof OemSatellite) {
-        this.setOemSatelliteOrbitBuffer_(id, obj.getOrbitPath());
+        this.setVariableLengthOrbitBuffer_(id, obj.getOrbitPath());
       } else {
         // Then it is a satellite
         this.orbitThreadMgr.sendSatelliteUpdate(
@@ -574,21 +591,44 @@ export class OrbitManager {
     }
   }
 
-  private setOemSatelliteOrbitBuffer_(satId: number, pointsOut: Float32Array): void {
+  /**
+   * Upload a variable-length orbit path (OEM satellites and missiles) straight to
+   * the object's GL buffer, reallocating only when the vertex count changes. Unlike
+   * the fixed orbitSegments satellite path, these are drawn with a per-object vertex
+   * count (see writePathToGpu_).
+   */
+  private setVariableLengthOrbitBuffer_(satId: number, pointsOut: Float32Array): void {
+    // The path is a stable cached reference (MissileObject.getOrbitPath /
+    // OemSatellite) that only changes ~1 Hz as the track advances. When it is the
+    // same reference we uploaded last, the GPU buffer already holds it - skip the
+    // whole bind + upload. The per-frame head vertex is patched separately in
+    // writePathToGpu_, so freshness is preserved. This turns a per-frame upload for
+    // every missile into a ~1 Hz upload.
+    if (this.lastUploadedPath_.get(satId) === pointsOut) {
+      this.inProgress_[satId] = false;
+
+      return;
+    }
+
     const gl = this.gl_ ?? ServiceLocator.getRenderer().gl;
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[satId]);
 
-    // get current buffer size
-    const currentBufferSize = gl.getBufferParameter(gl.ARRAY_BUFFER, gl.BUFFER_SIZE);
+    // Compare against the CPU-side mirror instead of
+    // gl.getBufferParameter(BUFFER_SIZE): that query forces a synchronous CPU/GPU
+    // pipeline stall, and doing it once per missile per frame (2500+) costs ~100ms.
+    const knownByteSize = this.bufferByteSizes_.get(satId);
 
-    if (currentBufferSize !== pointsOut.byteLength) {
-      // reallocate buffer if size has changed
-      gl.bufferData(gl.ARRAY_BUFFER, pointsOut, gl.DYNAMIC_DRAW);
-    } else {
-      // update buffer data
+    if (knownByteSize === pointsOut.byteLength) {
+      // same size - update in place
       gl.bufferSubData(gl.ARRAY_BUFFER, 0, pointsOut);
+    } else {
+      // reallocate buffer if size has changed (or this is the first upload for this id)
+      gl.bufferData(gl.ARRAY_BUFFER, pointsOut, gl.DYNAMIC_DRAW);
+      this.bufferByteSizes_.set(satId, pointsOut.byteLength);
     }
+
+    this.lastUploadedPath_.set(satId, pointsOut);
 
     // Invalidate the alignment cache so alignOrbitSelectedObject reads the
     // fresh GPU data next frame instead of reusing a stale orbit shape.
@@ -695,10 +735,16 @@ export class OrbitManager {
       return;
     }
 
+    // A MIRV child rides the shared bus track until the vehicles separate, so its
+    // line is hidden until then - the ascent shows one trajectory, not N stacked.
+    if (obj instanceof MissileObject && !obj.isVisibleNow()) {
+      return;
+    }
+
     // In ECF mode, patch the first orbit point with the satellite's current
     // ECI position every frame. A negative alpha flags the shader to skip the
     // ECEF→ECI rotation for this vertex, avoiding any CPU/GPU float32 roundtrip.
-    if (settingsManager.isOrbitCruncherInEcf && !obj.isStatic()) {
+    if (settingsManager.isOrbitCruncherInEcf && !obj.isStatic() && !obj.isMissile()) {
       const eciPos = ServiceLocator.getDotsManager().getPositionArray(Number(id));
 
       if (eciPos[0] !== 0 || eciPos[1] !== 0 || eciPos[2] !== 0) {
@@ -716,8 +762,49 @@ export class OrbitManager {
       }
     }
 
-    if (obj instanceof OemSatellite && obj.orbitPathCache_) {
-      this.lineManagerInstance_.setAttribsAndDrawLineStrip(this.glBuffers_[id], obj.orbitPathCache_.length / 4);
+    // Missile lines are stored Earth-fixed (ECEF) and drawn in ECF mode so the
+    // shader rotates them to ECI by the live GMST each frame (the track follows the
+    // ground); everything else keeps the global ECF setting.
+    this.lineManagerInstance_.setEcfMode(obj.isMissile() || settingsManager.isOrbitCruncherInEcf);
+
+    // Patch the missile line's head (vertex 0) every frame with the dot's OWN
+    // rendered position, so the line start is pixel-identical to the dot instead
+    // of jittering. Two reasons this must come straight from positionData (not a
+    // re-computed ECEF vertex the shader rotates): (1) the cached path body only
+    // advances once per 1 Hz sample, so a frozen head swings around the per-frame
+    // dot; (2) routing the head through the shader's full-GMST ECEF->ECI rotation
+    // float32-diverges from the dot's own value and jitters. A negative alpha flags
+    // the shader to draw this vertex as-is (ECI, no rotation) - the same trick the
+    // satellite ECF path uses.
+    if (obj instanceof MissileObject && obj.orbitPathCache_ && obj.orbitPathCache_.length >= 4) {
+      // The rendered dot position (ground rotation applied) - the single source of
+      // truth shared with the camera follow, world shift, and mesh - so the line
+      // head is pixel-identical to the dot instead of jittering.
+      const pos = ServiceLocator.getDotsManager().getRenderedPositionArray(Number(id));
+
+      // Skip the {0,0,0} pre-seed (object not yet positioned this frame).
+      if (pos[0] !== 0 || pos[1] !== 0 || pos[2] !== 0) {
+        const buf = OrbitManager.ecfFirstPoint_;
+
+        buf[0] = pos[0];
+        buf[1] = pos[1];
+        buf[2] = pos[2];
+        buf[3] = -1.0; // negative alpha: shader draws this vertex as-is (ECI), no rotation
+
+        const gl = this.gl_ ?? ServiceLocator.getRenderer().gl;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[id]);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, buf);
+      }
+    }
+
+    // OEM satellites and missiles carry a variable-length, high-resolution path
+    // and are drawn with their own vertex count; everything else uses the fixed
+    // orbitSegments buffer.
+    const variableLengthPath = (obj instanceof OemSatellite || obj instanceof MissileObject) ? obj.orbitPathCache_ : null;
+
+    if (variableLengthPath) {
+      this.lineManagerInstance_.setAttribsAndDrawLineStrip(this.glBuffers_[id], variableLengthPath.length / 4);
     } else {
       this.lineManagerInstance_.setAttribsAndDrawLineStrip(this.glBuffers_[id], settingsManager.orbitSegments + 1);
     }

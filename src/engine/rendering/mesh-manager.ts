@@ -205,11 +205,17 @@ export class MeshManager {
       this.loadMesh_(meshName);
     }
 
-    const posData = ServiceLocator.getDotsManager().positionData;
+    // Use the RENDERED dot position (ground rotation applied) so the mesh sits on
+    // the dot. For a low-altitude missile the shader rotates the dot by
+    // (currentGmst - cruncherGmst) and the world shift is built from that same
+    // rendered value; a raw-positionData mesh would drift off the dot during boost.
+    // No-op above the ground-rotation radius, so satellites are unaffected.
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
+    const renderedPos = dotsManagerInstance.getRenderedPositionArray(Number(sat.id));
     const position = {
-      x: posData[Number(sat.id) * 3],
-      y: posData[Number(sat.id) * 3 + 1],
-      z: posData[Number(sat.id) * 3 + 2],
+      x: renderedPos[0],
+      y: renderedPos[1],
+      z: renderedPos[2],
     };
     let drawPosition = [position.x, position.y, position.z] as EciArr3;
 
@@ -229,7 +235,11 @@ export class MeshManager {
       position.z + worldShift[2],
     ]);
 
-    if (
+    if (sat.isMissile()) {
+      // A missile is not tumbling debris: point the model's nose along its
+      // trajectory so it reads as a vehicle flying its arc.
+      this.updateRotationAlongTrajectory_(drawPosition, sat as MissileObject);
+    } else if (
       this.currentMeshObject.isRotationStable ||
       (sat.type === SpaceObjectType.PAYLOAD && (sat as Satellite).status === PayloadStatus.OPERATIONAL) ||
       (sat as OemSatellite).isStable
@@ -287,6 +297,43 @@ export class MeshManager {
     }
 
     mat4.targetTo(this.mvMatrix_, drawPosition, lookAtPos, up);
+  }
+
+  /**
+   * Orient a missile mesh so its nose points along the trajectory. The direction
+   * comes from the trajectory samples (not the worker velocity, which is not
+   * synced to the main-thread object), so it stays correct when the sim clock is
+   * scrubbed either way.
+   *
+   * The missile meshes (misl*.obj, rv.obj) are authored nose-up along the model
+   * +Y axis. `mat4.targetTo` aligns the model's -Z with the travel direction and
+   * +Y with the `up` vector, which would leave the nose (+Y) perpendicular to the
+   * trajectory. So after building the look-at basis we roll the model -90deg about
+   * X, mapping its +Y axis onto the basis -Z (travel) direction so the nose points
+   * forward. The radial (away-from-Earth) direction is used as the roll reference.
+   */
+  private updateRotationAlongTrajectory_(drawPosition: EciArr3, misl: MissileObject) {
+    const dir = misl.getVelocityDirection();
+
+    if (!dir) {
+      return; // No usable direction: keep the translation-only matrix (no tumble).
+    }
+
+    const dirVec = vec3.normalize(vec3.create(), vec3.fromValues(dir.x, dir.y, dir.z));
+    const lookAtPos = [drawPosition[0] + dir.x, drawPosition[1] + dir.y, drawPosition[2] + dir.z] as EciArr3;
+
+    // Roll reference: radial (zenith). If travel is (near) parallel to the radial
+    // (a straight-up/down leg), fall back to world Y so the basis stays valid.
+    let up = vec3.normalize(vec3.create(), drawPosition);
+
+    if (Math.abs(vec3.dot(up, dirVec)) > 0.9999) {
+      up = vec3.fromValues(0, 1, 0);
+    }
+
+    mat4.targetTo(this.mvMatrix_, drawPosition, lookAtPos, up);
+
+    // Rotate the nose (+Y) forward onto the travel (-Z) direction.
+    mat4.rotateX(this.mvMatrix_, this.mvMatrix_, -Math.PI / 2);
   }
 
   private updateModel_(selectedDate: Date, obj: BaseObject) {

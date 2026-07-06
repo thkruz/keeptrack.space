@@ -610,6 +610,18 @@ export class LineManager {
     gl.uniform4fv(this.uniforms_.u_color, color);
   }
 
+  /**
+   * Override the ECF-mode uniform for the next draw call. setWorldUniforms sets it
+   * once per pass from the global isOrbitCruncherInEcf; the orbit manager flips it
+   * per object so a missile's Earth-fixed (ECEF) line rotates to ECI in-shader each
+   * frame (following the ground) while ECI satellite orbits in the same pass do not.
+   */
+  setEcfMode(isEcf: boolean) {
+    const gl = ServiceLocator.getRenderer().gl;
+
+    gl.uniform1i(this.uniforms_.u_ecfMode, isEcf ? 1 : 0);
+  }
+
   setWorldUniforms(modelViewMatrix: mat4, projectionCameraMatrix: mat4) {
     const gl = ServiceLocator.getRenderer().gl;
     const mainCamera = ServiceLocator.getMainCamera();

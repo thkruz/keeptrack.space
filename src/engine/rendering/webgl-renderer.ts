@@ -675,7 +675,20 @@ export class WebGLRenderer {
     if (this.selectSatManager_?.primarySatObj.id !== -1) {
       const timeManagerInstance = ServiceLocator.getTimeManager();
       const primarySat = ServiceLocator.getCatalogManager().getObject(this.selectSatManager_.primarySatObj.id, GetSatType.POSITION_ONLY) as Satellite | MissileObject;
-      const satelliteOffset = ServiceLocator.getDotsManager().getPositionArray(this.selectSatManager_.primarySatObj.id).map((coord) => -coord);
+      // Use the RENDERED dot position (ground rotation applied), not the raw stored
+      // positionData. For a low-altitude missile the two differ by the shader's
+      // (currentGmst - cruncherGmst) rotation; following the raw value centered the
+      // camera off the dot during boost and snapped back once the missile climbed
+      // past the ground-rotation radius. getRenderedPositionArray is a no-op above
+      // that radius, so satellites are unaffected.
+      const renderedPos = ServiceLocator.getDotsManager().getRenderedPositionArray(this.selectSatManager_.primarySatObj.id);
+      const satelliteOffset = renderedPos.map((coord) => -coord);
+
+      // Keep the followed object's .position on the rendered dot so snapToSat aims
+      // the camera where the pixels are (POSITION_ONLY seeded it with the raw value).
+      if (primarySat.isMissile()) {
+        primarySat.position = { x: renderedPos[0] as Kilometers, y: renderedPos[1] as Kilometers, z: renderedPos[2] as Kilometers };
+      }
 
       // Route through the base+resolve path (NOT a raw worldShift write): the
       // mesh position baked below must use the resolved shift, which is [0,0,0]

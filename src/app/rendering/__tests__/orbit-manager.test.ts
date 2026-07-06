@@ -195,12 +195,15 @@ describe('OrbitManager', () => {
       expect(o().inProgress_[2]).toBe(true);
     });
 
-    it('sends a missile update for a missile', () => {
-      catalog.getObject.mockReturnValue({ isStatic: () => false, isMissile: () => true });
+    it('builds a missile line on the main thread instead of round-tripping the worker', () => {
+      const getOrbitPath = vi.fn(() => new Float32Array(8));
+
+      catalog.getObject.mockReturnValue({ isStatic: () => false, isMissile: () => true, getOrbitPath, orbitPathCache_: null });
 
       om.updateOrbitBuffer(2);
 
-      expect(om.orbitThreadMgr.sendMissileUpdate).toHaveBeenCalled();
+      expect(getOrbitPath).toHaveBeenCalled();
+      expect(om.orbitThreadMgr.sendMissileUpdate).not.toHaveBeenCalled();
     });
 
     it('does nothing for a static object', () => {

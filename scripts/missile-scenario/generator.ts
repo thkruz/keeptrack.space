@@ -15,18 +15,25 @@
  * lists with N stationary "on the pad" samples (one per second).
  */
 import { generateBallisticTrajectory } from '@app/plugins/missile/ballistic-trajectory';
+import { warheadCountForDesc, RvTarget } from '@app/plugins/missile/missile-mirv';
 import { MissileTrajectory } from '@app/plugins/missile/missile-types';
 import { Degrees, SpaceObjectType } from '@ootk/src/main';
 import { Doctrine, Salvo, Scenario, DEFAULT_TOTAL_CAP } from './scenario-config';
 import { LaunchSite, Target } from './scenario-data';
 
-/** One missile as stored in a mass-raid JSON file (only the fields the loader reads). */
+/**
+ * One bus as stored in a mass-raid JSON file. Each entry is a launcher flying to its
+ * primary aimpoint (`rvTargets[0]`); at load time the app fans it into one reentry
+ * vehicle per {@link RvTarget}, each landing on a distinct real target with its own
+ * label. This is what spreads a raid across the whole target set instead of clustering
+ * every warhead of a bus onto one city.
+ */
 export interface RaidEntry {
   /** Object name (the loader also derives it from this). */
   ON: string;
   /** Country label. */
   C: string;
-  /** Human-readable "site -> target" description. */
+  /** Human-readable "site -> primary target" description. */
   desc: string;
   active: boolean;
   /** SpaceObjectType.BALLISTIC_MISSILE. */
@@ -38,12 +45,20 @@ export interface RaidEntry {
   startTime: number;
   /** Apogee (km) - used by the app's zoom controls. */
   maxAlt: number;
+  /** Distinct aimpoints for this bus's reentry vehicles (index 0 is the primary/bus impact). */
+  rvTargets: RvTarget[];
 }
 
 /** Summary returned alongside the entries so the CLI can report coverage. */
 export interface GenerationStats {
-  requested: number;
-  created: number;
+  /** Number of bus entries written. */
+  buses: number;
+  /** Total reentry vehicles (warheads) across all buses - what fills the app's missile slots. */
+  warheads: number;
+  /** Distinct targets struck at least once. */
+  targetsCovered: number;
+  /** Total distinct targets available across the scenario's salvos. */
+  targetsAvailable: number;
   skippedOutOfRange: number;
   skippedSolverError: number;
   cappedAt: number;
@@ -162,9 +177,8 @@ const round = (value: number, decimals: number): number => {
 };
 
 /**
- * Build one raid entry from a solved trajectory: apply a small aimpoint jitter's
- * result (already baked into the trajectory), front-pad `delaySec` on-pad samples
- * to stagger the launch, and round coordinates.
+ * Build one bus entry from a solved trajectory: front-pad `delaySec` on-pad samples to
+ * stagger the launch, round coordinates, and attach the distinct reentry-vehicle targets.
  */
 const buildEntry = (
   attacker: string,
@@ -172,14 +186,16 @@ const buildEntry = (
   trajectory: MissileTrajectory,
   site: LaunchSite,
   delaySec: number,
+  rvTargets: RvTarget[],
 ): RaidEntry => {
   const latList: number[] = [];
   const lonList: number[] = [];
   const altList: number[] = [];
 
-  // On-pad hold: the missile sits at its launch site (alt 0) until its slot in the salvo.
-  const padLat = round(site.lat, 4);
-  const padLon = round(site.lon, 4);
+  // 3 decimals of lat/lon is ~110 m - imperceptible on the globe, and it keeps the big raids
+  // (the strategic exchanges reach ~2,000-2,300 reentry vehicles) to a manageable file size.
+  const padLat = round(site.lat, 3);
+  const padLon = round(site.lon, 3);
 
   for (let i = 0; i < delaySec; i++) {
     latList.push(padLat);
@@ -188,8 +204,8 @@ const buildEntry = (
   }
 
   for (let i = 0; i < trajectory.altList.length; i++) {
-    latList.push(round(trajectory.latList[i], 4));
-    lonList.push(round(trajectory.lonList[i], 4));
+    latList.push(round(trajectory.latList[i], 3));
+    lonList.push(round(trajectory.lonList[i], 3));
     altList.push(round(Math.max(0, trajectory.altList[i]), 2));
   }
 
@@ -204,10 +220,11 @@ const buildEntry = (
     altList,
     startTime: 0,
     maxAlt: round(trajectory.maxAltitudeKm, 2),
+    rvTargets,
   };
 };
 
-/** Expand a salvo into individual (site, shot-index) pairs, one per round fired. */
+/** Expand a salvo into individual launch origins, one per round fired (site repeated `salvo` times). */
 const expandShots = (salvo: Salvo): LaunchSite[] => {
   const shots: LaunchSite[] = [];
 
@@ -220,64 +237,141 @@ const expandShots = (salvo: Salvo): LaunchSite[] => {
   return shots;
 };
 
+/** Fisher-Yates shuffle into a new array, driven by the injected rng. */
+const shuffled = <T>(items: readonly T[], rng: () => number): T[] => {
+  const out = items.slice();
+
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+
+  return out;
+};
+
 /**
- * Generate every missile for a scenario. Deterministic for a given scenario id
- * (+ optional extra seed offset).
+ * Order a target set for maximum-coverage assignment: a doctrine-weighted random
+ * permutation (draw without replacement, weighting military/population by doctrine). The
+ * generator walks this order handing each still-unstruck target to the next bus, so every
+ * target is hit once before any is doubled up.
+ */
+const coverageOrder = (targets: readonly Target[], doctrine: Doctrine, rng: () => number): Target[] => {
+  const remaining = targets.slice();
+  const order: Target[] = [];
+
+  while (remaining.length > 0) {
+    const pick = weightedPick(remaining.map((t) => ({ item: t, weight: targetWeight(t, doctrine) })), rng);
+
+    if (!pick) {
+      break;
+    }
+    order.push(pick);
+    remaining.splice(remaining.indexOf(pick), 1);
+  }
+
+  return order;
+};
+
+/** A reentry-vehicle footprint radius (km) scaled to the shot: wide for an ICBM, tight for an SRBM. */
+const footprintRadiusKm = (arcKm: number): number => Math.min(1200, Math.max(120, arcKm * 0.22));
+
+/** Small deterministic jitter (deg) so warheads doubled onto one target don't render exactly stacked. */
+const jitter = (rng: () => number): number => (rng() - 0.5) * 0.12;
+
+/**
+ * Generate every bus for a scenario, maximizing distinct-target coverage.
+ *
+ * For each salvo the target set is walked in a coverage order (every target struck once
+ * before any repeat). Each launcher becomes a MIRV bus: it takes the next unstruck target
+ * in range as its primary aimpoint, then packs up to its warhead capacity with additional
+ * distinct targets inside a range-scaled footprint - so a bus's reentry vehicles fan out
+ * across several real nearby targets rather than clustering on one. Warheads are capped at
+ * the scenario's slot budget. Deterministic for a given scenario id (+ optional seed offset).
  */
 export const generateScenario = (scenario: Scenario, seedOffset = 0): { entries: RaidEntry[]; stats: GenerationStats } => {
   const rng = makeRng(hashSeed(scenario.id) + seedOffset);
   const cap = scenario.totalCap ?? DEFAULT_TOTAL_CAP;
   const entries: RaidEntry[] = [];
-  const stats: GenerationStats = { requested: 0, created: 0, skippedOutOfRange: 0, skippedSolverError: 0, cappedAt: cap };
+  const allTargets = new Set<Target>();
+  const struckTargets = new Set<Target>();
+  const stats: GenerationStats = {
+    buses: 0, warheads: 0, targetsCovered: 0, targetsAvailable: 0, skippedOutOfRange: 0, skippedSolverError: 0, cappedAt: cap,
+  };
+
+  let warheadTotal = 0;
 
   for (const salvo of scenario.salvos) {
-    const shots = expandShots(salvo);
-    const salvoCap = salvo.maxMissiles ?? shots.length;
-    let salvoCreated = 0;
+    for (const t of salvo.targets) {
+      allTargets.add(t);
+    }
 
-    for (const site of shots) {
-      stats.requested++;
+    const budget = Math.min(cap - warheadTotal, salvo.maxMissiles ?? Number.MAX_SAFE_INTEGER);
 
-      if (entries.length >= cap || salvoCreated >= salvoCap) {
-        continue;
-      }
+    if (budget <= 0) {
+      continue;
+    }
 
+    const sitePool = shuffled(expandShots(salvo), rng);
+    const order = coverageOrder(salvo.targets, salvo.doctrine, rng);
+    const assigned = new Set<Target>(); // struck within this salvo (for coverage-first)
+    let salvoWarheads = 0;
+    let siteIdx = 0;
+    let guard = 0;
+    const maxIterations = sitePool.length * 6 + salvo.targets.length * 2;
+
+    const reaches = (site: LaunchSite, t: Target): boolean => {
+      const d = greatCircleKm(site.lat, site.lon, t.lat, t.lon);
       const { min, max } = validRange(site);
-      const inRange = salvo.targets.filter((t) => {
-        const d = greatCircleKm(site.lat, site.lon, t.lat, t.lon);
 
-        return d >= min && d <= max;
-      });
+      return d >= min && d <= max;
+    };
 
-      if (inRange.length === 0) {
+    while (salvoWarheads < budget && guard < maxIterations) {
+      guard++;
+      const site = sitePool[siteIdx % sitePool.length];
+
+      siteIdx++;
+
+      // Primary: the next not-yet-struck target this site can reach; once all are struck,
+      // fall back to any reachable target so extra warheads pile realistic double taps.
+      let primary = order.find((t) => !assigned.has(t) && reaches(site, t)) ?? order.find((t) => reaches(site, t));
+
+      if (!primary) {
         stats.skippedOutOfRange++;
-        continue;
+        continue; // this launcher can't range any target (e.g. a short-range site vs far pool)
       }
 
-      const target = weightedPick(
-        inRange.map((t) => ({ item: t, weight: targetWeight(t, salvo.doctrine) })),
-        rng,
-      );
+      const warheadCap = Math.min(warheadCountForDesc(site.name), budget - salvoWarheads);
+      const rvTargets: Target[] = [primary];
 
-      if (!target) {
-        stats.skippedOutOfRange++;
-        continue;
+      assigned.add(primary);
+      struckTargets.add(primary);
+
+      // Pack the rest of the bus with distinct nearby targets inside a range-scaled footprint,
+      // preferring not-yet-struck ones so the footprint adds coverage rather than repeats.
+      if (warheadCap > 1) {
+        const arcKm = greatCircleKm(site.lat, site.lon, primary.lat, primary.lon);
+        const radius = footprintRadiusKm(arcKm);
+        const nearby = salvo.targets
+          .filter((t) => t !== primary && reaches(site, t) && greatCircleKm(primary.lat, primary.lon, t.lat, t.lon) <= radius)
+          .sort((a, b) => greatCircleKm(primary.lat, primary.lon, a.lat, a.lon) - greatCircleKm(primary.lat, primary.lon, b.lat, b.lon));
+        const orderedNearby = [...nearby.filter((t) => !assigned.has(t)), ...nearby.filter((t) => assigned.has(t))];
+
+        for (const t of orderedNearby) {
+          if (rvTargets.length >= warheadCap) {
+            break;
+          }
+          if (rvTargets.includes(t)) {
+            continue;
+          }
+          rvTargets.push(t);
+          assigned.add(t);
+          struckTargets.add(t);
+        }
       }
 
-      // Jitter the aimpoint (~15 km) so several shots at one city fan out like
-      // separate warheads instead of stacking on an identical track.
-      const jitterLat = (rng() - 0.5) * 0.3;
-      const jitterLon = (rng() - 0.5) * 0.3;
-      const aimLat = (target.lat + jitterLat) as Degrees;
-      const aimLon = (target.lon + jitterLon) as Degrees;
-
-      // Re-validate the jittered arc against the hard 320 km floor before solving.
-      if (greatCircleKm(site.lat, site.lon, aimLat, aimLon) < 322) {
-        stats.skippedOutOfRange++;
-        continue;
-      }
-
-      const trajectory = solveTrajectory(site, aimLat, aimLon);
+      const trajectory = solveTrajectory(site, primary.lat as Degrees, primary.lon as Degrees);
 
       if (!trajectory) {
         stats.skippedSolverError++;
@@ -285,20 +379,27 @@ export const generateScenario = (scenario: Scenario, seedOffset = 0): { entries:
       }
 
       const delaySec = Math.floor(rng() * scenario.launchWindowSec);
-      const desc = `${site.name} -> ${target.name}`;
+      const bakedRvs: RvTarget[] = rvTargets.map((t) => ({
+        lat: round(t.lat + jitter(rng), 3),
+        lon: round(t.lon + jitter(rng), 3),
+        name: t.name,
+      }));
 
-      entries.push(buildEntry(salvo.attacker, desc, trajectory, site, delaySec));
-      salvoCreated++;
-      stats.created++;
+      entries.push(buildEntry(salvo.attacker, `${site.name} -> ${primary.name}`, trajectory, site, delaySec, bakedRvs));
+      salvoWarheads += rvTargets.length;
+      warheadTotal += rvTargets.length;
+      stats.buses++;
     }
   }
 
-  // Name the missiles in final order (RV_0, RV_1, ...), matching the app's convention.
+  stats.warheads = warheadTotal;
+  stats.targetsAvailable = allTargets.size;
+  stats.targetsCovered = struckTargets.size;
+
+  // Name the buses in final order (RV_0, RV_1, ...), matching the app's convention.
   entries.forEach((entry, i) => {
     entry.ON = `RV_${i}`;
   });
 
   return { entries, stats };
 };
-
-export type { Kilometers };

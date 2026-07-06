@@ -96,12 +96,11 @@ for (const scenario of selected) {
   writeFileSync(outPath, JSON.stringify(entries));
 
   const elapsed = ((performance.now() - start) / 1000).toFixed(1);
-  const skipped = stats.skippedOutOfRange + stats.skippedSolverError;
-  const capped = stats.created >= stats.cappedAt ? ' (hit cap)' : '';
+  const capped = stats.warheads >= stats.cappedAt ? ' (hit cap)' : '';
 
   log(
-    `  ${scenario.file.padEnd(30)} ${String(stats.created).padStart(3)} missiles${capped}` +
-    `  [${skipped} skipped: ${stats.skippedOutOfRange} range / ${stats.skippedSolverError} solver]  ${elapsed}s`,
+    `  ${scenario.file.padEnd(30)} ${String(stats.warheads).padStart(3)} warheads / ${String(stats.buses).padStart(3)} buses${capped}` +
+    `  cover ${stats.targetsCovered}/${stats.targetsAvailable} targets  ${elapsed}s`,
   );
 }
 

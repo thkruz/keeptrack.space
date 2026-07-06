@@ -89,8 +89,8 @@ export const SCENARIOS: Scenario[] = [
     description: 'A two-sided regional exchange: Iranian MRBMs saturate Israeli cities and bases while Israeli Jericho missiles strike Iranian nuclear and leadership targets.',
     launchWindowSec: 300,
     salvos: [
-      { attacker: 'Iran', sites: IRAN_SITES, targets: ISRAEL_TARGETS, doctrine: 'mixed' },
-      { attacker: 'Israel', sites: ISRAEL_SITES, targets: IRAN_TARGETS, doctrine: 'counterforce' },
+      { attacker: 'Iran', sites: IRAN_SITES, targets: ISRAEL_TARGETS, doctrine: 'mixed', maxMissiles: 30 },
+      { attacker: 'Israel', sites: ISRAEL_SITES, targets: IRAN_TARGETS, doctrine: 'counterforce', maxMissiles: 22 },
     ],
   },
   {
@@ -100,8 +100,8 @@ export const SCENARIOS: Scenario[] = [
     description: 'A two-sided tactical exchange: Russian Iskander launchers strike Ukrainian command and cities while Ukrainian short-range ballistic missiles hit Russian border-region military targets.',
     launchWindowSec: 300,
     salvos: [
-      { attacker: 'Russia', sites: RUSSIA_TACTICAL_SITES, targets: UKRAINE_TARGETS, doctrine: 'mixed' },
-      { attacker: 'Ukraine', sites: UKRAINE_SITES, targets: RUSSIA_TARGETS, doctrine: 'counterforce' },
+      { attacker: 'Russia', sites: RUSSIA_TACTICAL_SITES, targets: UKRAINE_TARGETS, doctrine: 'mixed', maxMissiles: 32 },
+      { attacker: 'Ukraine', sites: UKRAINE_SITES, targets: RUSSIA_TARGETS, doctrine: 'counterforce', maxMissiles: 20 },
     ],
   },
   {
@@ -111,8 +111,8 @@ export const SCENARIOS: Scenario[] = [
     description: 'A two-sided South Asian exchange between Indian Agni and Pakistani Shaheen/Ghauri ballistic forces, striking each other\'s command centers, strategic bases, and metros.',
     launchWindowSec: 300,
     salvos: [
-      { attacker: 'India', sites: INDIA_SITES, targets: PAKISTAN_TARGETS, doctrine: 'mixed' },
-      { attacker: 'Pakistan', sites: PAKISTAN_SITES, targets: INDIA_TARGETS, doctrine: 'mixed' },
+      { attacker: 'India', sites: INDIA_SITES, targets: PAKISTAN_TARGETS, doctrine: 'mixed', maxMissiles: 26 },
+      { attacker: 'Pakistan', sites: PAKISTAN_SITES, targets: INDIA_TARGETS, doctrine: 'mixed', maxMissiles: 26 },
     ],
   },
 
@@ -125,9 +125,10 @@ export const SCENARIOS: Scenario[] = [
     title: 'USA / Russia Exchange',
     description: 'A full two-sided strategic exchange: both arsenals - silo, road-mobile, and submarine-launched - fire on each other\'s forces and cities at once.',
     launchWindowSec: 420,
+    totalCap: 2000,
     salvos: [
-      { attacker: 'Russia', sites: RUSSIA_ARSENAL, targets: USA_TARGETS, doctrine: 'mixed' },
-      { attacker: 'United States', sites: USA_ARSENAL, targets: RUSSIA_TARGETS, doctrine: 'mixed' },
+      { attacker: 'Russia', sites: RUSSIA_ARSENAL, targets: USA_TARGETS, doctrine: 'mixed', maxMissiles: 1000 },
+      { attacker: 'United States', sites: USA_ARSENAL, targets: RUSSIA_TARGETS, doctrine: 'mixed', maxMissiles: 1000 },
     ],
   },
   {
@@ -136,9 +137,10 @@ export const SCENARIOS: Scenario[] = [
     title: 'USA / China Exchange',
     description: 'A full two-sided Pacific strategic exchange between US and Chinese silo, road-mobile, and submarine-launched forces.',
     launchWindowSec: 420,
+    totalCap: 1200,
     salvos: [
-      { attacker: 'China', sites: CHINA_ARSENAL, targets: USA_TARGETS, doctrine: 'mixed' },
-      { attacker: 'United States', sites: USA_ARSENAL, targets: CHINA_TARGETS, doctrine: 'mixed' },
+      { attacker: 'China', sites: CHINA_ARSENAL, targets: USA_TARGETS, doctrine: 'mixed', maxMissiles: 500 },
+      { attacker: 'United States', sites: USA_ARSENAL, targets: CHINA_TARGETS, doctrine: 'mixed', maxMissiles: 700 },
     ],
   },
   {
@@ -148,8 +150,8 @@ export const SCENARIOS: Scenario[] = [
     description: 'North Korea launches its road-mobile ICBMs on US Pacific and mainland targets while the US executes a counterforce strike against North Korean leadership and missile infrastructure.',
     launchWindowSec: 240,
     salvos: [
-      { attacker: 'North Korea', sites: NORTH_KOREA_SITES, targets: USA_TARGETS, doctrine: 'countervalue' },
-      { attacker: 'United States', sites: USA_ARSENAL, targets: NORTH_KOREA_TARGETS, doctrine: 'counterforce', maxMissiles: 45 },
+      { attacker: 'North Korea', sites: NORTH_KOREA_SITES, targets: USA_TARGETS, doctrine: 'countervalue', maxMissiles: 60 },
+      { attacker: 'United States', sites: USA_ARSENAL, targets: NORTH_KOREA_TARGETS, doctrine: 'counterforce', maxMissiles: 160 },
     ],
   },
   {
@@ -158,9 +160,10 @@ export const SCENARIOS: Scenario[] = [
     title: 'China / India Exchange',
     description: 'A two-sided Himalayan-theater exchange: Chinese DF missiles strike Indian cities and bases while Indian Agni-IV/V missiles reach Chinese command and industrial centers.',
     launchWindowSec: 360,
+    totalCap: 560,
     salvos: [
-      { attacker: 'China', sites: CHINA_SITES, targets: INDIA_TARGETS, doctrine: 'mixed', maxMissiles: 60 },
-      { attacker: 'India', sites: INDIA_SITES, targets: CHINA_TARGETS, doctrine: 'mixed' },
+      { attacker: 'China', sites: CHINA_SITES, targets: INDIA_TARGETS, doctrine: 'mixed', maxMissiles: 320 },
+      { attacker: 'India', sites: INDIA_SITES, targets: CHINA_TARGETS, doctrine: 'mixed', maxMissiles: 200 },
     ],
   },
 
@@ -173,16 +176,16 @@ export const SCENARIOS: Scenario[] = [
     title: 'Global Thermonuclear War',
     description: 'A worldwide exchange spanning every major nuclear power - the US, Russia, China, North Korea, the UK, and France - firing silo, road-mobile, and submarine-launched missiles across the globe.',
     launchWindowSec: 600,
-    totalCap: 500,
+    totalCap: 2300,
     salvos: [
-      { attacker: 'Russia', sites: RUSSIA_ARSENAL, targets: USA_TARGETS, doctrine: 'mixed', maxMissiles: 110 },
-      { attacker: 'China', sites: CHINA_ARSENAL, targets: USA_TARGETS, doctrine: 'mixed', maxMissiles: 55 },
-      { attacker: 'North Korea', sites: NORTH_KOREA_SITES, targets: USA_TARGETS, doctrine: 'countervalue', maxMissiles: 20 },
-      { attacker: 'United Kingdom', sites: UK_SUB_SITES, targets: RUSSIA_TARGETS, doctrine: 'mixed', maxMissiles: 16 },
-      { attacker: 'France', sites: FRANCE_SUB_SITES, targets: RUSSIA_TARGETS, doctrine: 'mixed', maxMissiles: 16 },
-      { attacker: 'United States', sites: USA_ARSENAL, targets: RUSSIA_TARGETS, doctrine: 'mixed', maxMissiles: 110 },
-      { attacker: 'United States', sites: USA_ARSENAL, targets: CHINA_TARGETS, doctrine: 'mixed', maxMissiles: 65 },
-      { attacker: 'United States', sites: USA_ARSENAL, targets: NORTH_KOREA_TARGETS, doctrine: 'counterforce', maxMissiles: 15 },
+      { attacker: 'Russia', sites: RUSSIA_ARSENAL, targets: USA_TARGETS, doctrine: 'mixed', maxMissiles: 720 },
+      { attacker: 'China', sites: CHINA_ARSENAL, targets: USA_TARGETS, doctrine: 'mixed', maxMissiles: 240 },
+      { attacker: 'North Korea', sites: NORTH_KOREA_SITES, targets: USA_TARGETS, doctrine: 'countervalue', maxMissiles: 40 },
+      { attacker: 'United Kingdom', sites: UK_SUB_SITES, targets: RUSSIA_TARGETS, doctrine: 'mixed', maxMissiles: 110 },
+      { attacker: 'France', sites: FRANCE_SUB_SITES, targets: RUSSIA_TARGETS, doctrine: 'mixed', maxMissiles: 110 },
+      { attacker: 'United States', sites: USA_ARSENAL, targets: RUSSIA_TARGETS, doctrine: 'mixed', maxMissiles: 720 },
+      { attacker: 'United States', sites: USA_ARSENAL, targets: CHINA_TARGETS, doctrine: 'mixed', maxMissiles: 300 },
+      { attacker: 'United States', sites: USA_ARSENAL, targets: NORTH_KOREA_TARGETS, doctrine: 'counterforce', maxMissiles: 60 },
     ],
   },
 ];

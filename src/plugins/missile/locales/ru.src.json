@@ -21,7 +21,24 @@
         "northKoreaToUsa": "Удар КНДР по США",
         "usaToRussia": "Удар США по России",
         "usaToChina": "Удар США по Китаю",
-        "usaToNorthKorea": "Удар США по КНДР"
+        "usaToNorthKorea": "Удар США по КНДР",
+        "exchangeUsaRussia": "Полный обмен ударами: США / Россия",
+        "exchangeUsaChina": "Полный обмен ударами: США / Китай",
+        "exchangeUsaNorthKorea": "Обмен ударами: США / КНДР",
+        "exchangeChinaIndia": "Обмен ударами: Китай / Индия",
+        "exchangeRussiaUkraine": "Обмен ударами: Россия / Украина",
+        "exchangeIndiaPakistan": "Обмен ударами: Индия / Пакистан",
+        "globalThermonuclearWar": "Глобальная термоядерная война",
+        "iranToIsrael": "Удар Ирана по Израилю",
+        "israelToIran": "Удар Израиля по Ирану",
+        "exchangeIranIsrael": "Обмен ударами: Иран / Израиль",
+        "russiaToUkraine": "Удар России по Украине",
+        "ukraineToRussia": "Удар Украины по России"
+      },
+      "typeGroups": {
+        "strategic": "Стратегические удары",
+        "exchanges": "Полные обмены ударами",
+        "regional": "Региональные конфликты"
       },
       "groups": {
         "russia": "Россия",
@@ -31,7 +48,13 @@
         "france": "Франция",
         "northKorea": "Северная Корея",
         "natoCountries": "Страны НАТО",
-        "nonNatoCountries": "Страны вне НАТО"
+        "nonNatoCountries": "Страны вне НАТО",
+        "usMilitaryBases": "Военные базы США",
+        "usLargestCities": "50 крупнейших городов США",
+        "russiaMilitaryBases": "Военные базы России",
+        "russiaLargestCities": "50 крупнейших городов России",
+        "chinaMilitaryBases": "Военные базы Китая",
+        "chinaLargestCities": "50 крупнейших городов Китая"
       },
       "attackers": {
         "aleysk": "Алейск",

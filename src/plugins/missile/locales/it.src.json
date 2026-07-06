@@ -21,7 +21,24 @@
         "northKoreaToUsa": "Corea del Nord contro USA",
         "usaToRussia": "USA contro Russia",
         "usaToChina": "USA contro Cina",
-        "usaToNorthKorea": "USA contro Corea del Nord"
+        "usaToNorthKorea": "USA contro Corea del Nord",
+        "exchangeUsaRussia": "Scambio nucleare totale USA / Russia",
+        "exchangeUsaChina": "Scambio nucleare totale USA / Cina",
+        "exchangeUsaNorthKorea": "Scambio USA / Corea del Nord",
+        "exchangeChinaIndia": "Scambio Cina / India",
+        "exchangeRussiaUkraine": "Scambio Russia / Ucraina",
+        "exchangeIndiaPakistan": "Scambio India / Pakistan",
+        "globalThermonuclearWar": "Guerra termonucleare globale",
+        "iranToIsrael": "Iran contro Israele",
+        "israelToIran": "Israele contro Iran",
+        "exchangeIranIsrael": "Scambio Iran / Israele",
+        "russiaToUkraine": "Russia contro Ucraina",
+        "ukraineToRussia": "Ucraina contro Russia"
+      },
+      "typeGroups": {
+        "strategic": "Attacchi strategici",
+        "exchanges": "Scambi totali",
+        "regional": "Conflitti regionali"
       },
       "groups": {
         "russia": "Russia",
@@ -31,7 +48,13 @@
         "france": "Francia",
         "northKorea": "Corea del Nord",
         "natoCountries": "Paesi NATO",
-        "nonNatoCountries": "Paesi non NATO"
+        "nonNatoCountries": "Paesi non NATO",
+        "usMilitaryBases": "Basi militari USA",
+        "usLargestCities": "50 città più grandi degli USA",
+        "russiaMilitaryBases": "Basi militari russe",
+        "russiaLargestCities": "50 città più grandi della Russia",
+        "chinaMilitaryBases": "Basi militari cinesi",
+        "chinaLargestCities": "50 città più grandi della Cina"
       },
       "attackers": {
         "aleysk": "Aleysk",

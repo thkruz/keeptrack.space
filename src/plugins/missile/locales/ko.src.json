@@ -21,7 +21,24 @@
         "northKoreaToUsa": "북한의 미국 공격",
         "usaToRussia": "미국의 러시아 공격",
         "usaToChina": "미국의 중국 공격",
-        "usaToNorthKorea": "미국의 북한 공격"
+        "usaToNorthKorea": "미국의 북한 공격",
+        "exchangeUsaRussia": "미국·러시아 전면 핵교전",
+        "exchangeUsaChina": "미국·중국 전면 핵교전",
+        "exchangeUsaNorthKorea": "미국·북한 핵교전",
+        "exchangeChinaIndia": "중국·인도 핵교전",
+        "exchangeRussiaUkraine": "러시아·우크라이나 핵교전",
+        "exchangeIndiaPakistan": "인도·파키스탄 핵교전",
+        "globalThermonuclearWar": "전 세계 열핵전쟁",
+        "iranToIsrael": "이란의 이스라엘 공격",
+        "israelToIran": "이스라엘의 이란 공격",
+        "exchangeIranIsrael": "이란·이스라엘 핵교전",
+        "russiaToUkraine": "러시아의 우크라이나 공격",
+        "ukraineToRussia": "우크라이나의 러시아 공격"
+      },
+      "typeGroups": {
+        "strategic": "전략 핵공격",
+        "exchanges": "전면 핵교전",
+        "regional": "지역 분쟁"
       },
       "groups": {
         "russia": "러시아",
@@ -31,7 +48,13 @@
         "france": "프랑스",
         "northKorea": "북한",
         "natoCountries": "NATO 회원국",
-        "nonNatoCountries": "비NATO 국가"
+        "nonNatoCountries": "비NATO 국가",
+        "usMilitaryBases": "미군 기지",
+        "usLargestCities": "미국 50대 도시",
+        "russiaMilitaryBases": "러시아 군 기지",
+        "russiaLargestCities": "러시아 50대 도시",
+        "chinaMilitaryBases": "중국 군 기지",
+        "chinaLargestCities": "중국 50대 도시"
       },
       "attackers": {
         "aleysk": "알레이스크",

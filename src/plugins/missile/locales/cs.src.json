@@ -21,7 +21,24 @@
         "northKoreaToUsa": "Severní Korea na USA",
         "usaToRussia": "USA na Rusko",
         "usaToChina": "USA na Čínu",
-        "usaToNorthKorea": "USA na Severní Koreu"
+        "usaToNorthKorea": "USA na Severní Koreu",
+        "exchangeUsaRussia": "Plná výměna úderů: USA / Rusko",
+        "exchangeUsaChina": "Plná výměna úderů: USA / Čína",
+        "exchangeUsaNorthKorea": "Výměna úderů: USA / Severní Korea",
+        "exchangeChinaIndia": "Výměna úderů: Čína / Indie",
+        "exchangeRussiaUkraine": "Výměna úderů: Rusko / Ukrajina",
+        "exchangeIndiaPakistan": "Výměna úderů: Indie / Pákistán",
+        "globalThermonuclearWar": "Globální termonukleární válka",
+        "iranToIsrael": "Írán na Izrael",
+        "israelToIran": "Izrael na Írán",
+        "exchangeIranIsrael": "Výměna úderů: Írán / Izrael",
+        "russiaToUkraine": "Rusko na Ukrajinu",
+        "ukraineToRussia": "Ukrajina na Rusko"
+      },
+      "typeGroups": {
+        "strategic": "Strategické útoky",
+        "exchanges": "Plné výměny úderů",
+        "regional": "Regionální konflikty"
       },
       "groups": {
         "russia": "Rusko",
@@ -31,7 +48,13 @@
         "france": "Francie",
         "northKorea": "Severní Korea",
         "natoCountries": "Země NATO",
-        "nonNatoCountries": "Země mimo NATO"
+        "nonNatoCountries": "Země mimo NATO",
+        "usMilitaryBases": "Vojenské základny USA",
+        "usLargestCities": "50 největších měst USA",
+        "russiaMilitaryBases": "Ruské vojenské základny",
+        "russiaLargestCities": "50 největších ruských měst",
+        "chinaMilitaryBases": "Čínské vojenské základny",
+        "chinaLargestCities": "50 největších čínských měst"
       },
       "attackers": {
         "aleysk": "Alejsk",

@@ -1,4 +1,4 @@
-import { expandTrajectoryToMirv, findSeparationIndex, generateFootprint, MAX_WARHEADS_PER_MISSILE, retargetDescent, warheadCountForDesc } from '@app/plugins/missile/missile-mirv';
+import { expandTrajectoryToMirv, expandTrajectoryToTargets, findSeparationIndex, generateFootprint, MAX_WARHEADS_PER_MISSILE, retargetDescent, RvTarget, warheadCountForDesc } from '@app/plugins/missile/missile-mirv';
 
 describe('missile-mirv geometry', () => {
   describe('generateFootprint', () => {
@@ -135,6 +135,59 @@ describe('missile-mirv geometry', () => {
       expect(tracks[0].latList[last]).toBeCloseTo(busLat[last], 6);
       expect(tracks[0].lonList[last]).toBeCloseTo(busLon[last], 6);
       expect(tracks[1].latList[last] !== busLat[last] || tracks[1].lonList[last] !== busLon[last]).toBe(true);
+    });
+  });
+
+  describe('expandTrajectoryToTargets', () => {
+    // Bus arc: climbs to apogee at index 2, then descends to impact at (10, 20).
+    const busLat = [0, 5, 8, 9, 10];
+    const busLon = [0, 5, 12, 16, 20];
+    const busAlt = [0, 100, 200, 100, 0];
+    const last = busAlt.length - 1;
+
+    it('returns a single bus copy for a single (or empty) target list', () => {
+      const one = expandTrajectoryToTargets(busLat, busLon, busAlt, [{ lat: 10, lon: 20, name: 'Primary' }]);
+
+      expect(one).toHaveLength(1);
+      expect(one[0].name).toBe('Primary');
+      expect(one[0].track.latList).toEqual(busLat);
+
+      expect(expandTrajectoryToTargets(busLat, busLon, busAlt, [])).toHaveLength(1);
+    });
+
+    it('lands each reentry vehicle on its own distinct target and carries that target name', () => {
+      const targets: RvTarget[] = [
+        { lat: 10, lon: 20, name: 'Alpha' }, // primary == bus impact
+        { lat: 12, lon: 25, name: 'Bravo' },
+        { lat: 7, lon: 18, name: 'Charlie' },
+      ];
+
+      const rvs = expandTrajectoryToTargets(busLat, busLon, busAlt, targets);
+
+      expect(rvs).toHaveLength(3);
+      // Each RV's final position is exactly its own target, and the name matches.
+      for (let i = 0; i < targets.length; i++) {
+        expect(rvs[i].name).toBe(targets[i].name);
+        expect(rvs[i].track.latList[last]).toBeCloseTo(targets[i].lat, 6);
+        expect(rvs[i].track.lonList[last]).toBeCloseTo(targets[i].lon, 6);
+      }
+      // Distinct impacts - the whole point of the fix (no clustering on one spot).
+      const impacts = new Set(rvs.map((r) => `${r.track.latList[last]},${r.track.lonList[last]}`));
+
+      expect(impacts.size).toBe(3);
+    });
+
+    it('shares the bus track up to apogee, then bends each RV toward its target', () => {
+      const sepIdx = findSeparationIndex(busAlt); // 2
+      const rvs = expandTrajectoryToTargets(busLat, busLon, busAlt, [
+        { lat: 10, lon: 20, name: 'A' },
+        { lat: 15, lon: 30, name: 'B' },
+      ]);
+
+      for (const rv of rvs) {
+        expect(rv.track.latList.slice(0, sepIdx + 1)).toEqual(busLat.slice(0, sepIdx + 1));
+        expect(rv.track.altList).toEqual(busAlt);
+      }
     });
   });
 });

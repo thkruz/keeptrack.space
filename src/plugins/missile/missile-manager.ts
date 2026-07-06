@@ -16,8 +16,8 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { MissileSimulation } from './missile-simulation';
 import { generateBallisticTrajectory } from './ballistic-trajectory';
 import { MissileSpec, MissileTrajectory } from './missile-types';
-import { expandTrajectoryToMirv, generateFootprint, findSeparationIndex, retargetDescent, warheadCountForDesc } from './missile-mirv';
-import { isSubmarineLaunch, planSubmarineLaunches, SubLaunchEntry } from './sub-launch';
+import { expandTrajectoryToMirv, expandTrajectoryToTargets, generateFootprint, findSeparationIndex, retargetDescent, warheadCountForDesc, RvTarget } from './missile-mirv';
+import { isSubmarineLaunch, planSubmarineBoats, SubLaunchEntry } from './sub-launch';
 
 const missileArray: MissileObject[] = [];
 
@@ -85,41 +85,23 @@ export const MassRaidPre = async (time: number, simFile: string) => {
       const firstSlot = satSetLen - maxMissiles;
       let slotOffset = 0; // running index into the missile reservation
 
-      // Submarine launchers were authored from land (the USA "Ohio Sub" shots start over North
-      // Dakota) and often piled onto one city. Plan every SLBM entry up front: cluster them onto a
-      // realistic number of hulls (never more than the class fleet), place each boat in one of its
-      // class's patrol oceans, and spread its missiles across the attacker's target pool within
-      // range. Build that pool per attacking country from the raid's distinct targets.
-      const targetsByAttacker = new Map<string, { lat: number; lon: number }[]>();
-
-      for (const entry of newMissileArray) {
-        if (!entry.latList?.length) {
-          continue;
-        }
-        const li = entry.latList.length - 1;
-        const key = String(entry.C ?? '');
-        const seen = targetsByAttacker.get(key) ?? [];
-        const target = { lat: entry.latList[li], lon: entry.lonList[li] };
-
-        // Dedupe to ~0.1 deg so distribution spreads across distinct places, not repeats of one city.
-        if (!seen.some((t) => Math.abs(t.lat - target.lat) < 0.1 && Math.abs(t.lon - target.lon) < 0.1)) {
-          seen.push(target);
-        }
-        targetsByAttacker.set(key, seen);
-      }
-
-      const subLaunchEntries: SubLaunchEntry[] = [];
+      // Submarine launchers are baked from a homeport placeholder over land. Plan all of them up
+      // front: gather each nation's SLBM buses onto a realistic number of hulls (never more than the
+      // real class fleet) placed at distinct open-ocean patrol points spread across the class's
+      // basins, so the raid shows a plausible handful of well-separated boats rather than one
+      // submarine per missile. Each bus then re-flies from its assigned hull to its own baked target.
+      const subEntries: SubLaunchEntry[] = [];
 
       for (let i = 0; i < newMissileArray.length; i++) {
         const raw = newMissileArray[i];
 
         if (isSubmarineLaunch(raw.desc) && raw.altList?.length >= 2) {
-          const lastIdx = raw.altList.length - 1;
+          const li = raw.altList.length - 1;
 
-          subLaunchEntries.push({ index: i, desc: raw.desc, country: String(raw.C ?? ''), targetLat: raw.latList[lastIdx], targetLon: raw.lonList[lastIdx] });
+          subEntries.push({ index: i, desc: String(raw.desc), targetLat: raw.latList[li], targetLon: raw.lonList[li] });
         }
       }
-      const subLaunches = planSubmarineLaunches(subLaunchEntries, targetsByAttacker);
+      const boatPositions = planSubmarineBoats(subEntries);
 
       for (let i = 0; i < newMissileArray.length && slotOffset < maxMissiles; i++) {
         const raw = newMissileArray[i];
@@ -128,28 +110,45 @@ export const MassRaidPre = async (time: number, simFile: string) => {
         raw.name = raw.ON;
         raw.country = raw.C;
 
-        // Re-fly a planned submarine launcher from its boat's ocean point to its assigned target.
-        const subLaunch = subLaunches.get(i);
+        // Re-fly this SLBM from its assigned hull to its baked primary aimpoint (the bus's last
+        // sample). The primary target - and every reentry vehicle's baked target below - is
+        // preserved, so each warhead's label keeps matching where it actually lands.
+        const boat = boatPositions.get(i);
 
-        if (subLaunch) {
-          const traj = generateBallisticTrajectory(subLaunch.launchLat, subLaunch.launchLon, subLaunch.targetLat, subLaunch.targetLon);
+        if (boat && raw.altList?.length >= 2) {
+          const li = raw.altList.length - 1;
+          const traj = generateBallisticTrajectory(boat.launchLat, boat.launchLon, raw.latList[li], raw.lonList[li]);
 
           raw.latList = traj.latList;
           raw.lonList = traj.lonList;
           raw.altList = traj.altList;
         }
 
-        // Fan each raid missile into a realistic number of reentry vehicles based on its
-        // designator (the sim files carry one bus trajectory per launcher). The RVs share
-        // the bus track up to apogee and spread across a footprint on the way down; every RV
-        // but the first is hidden until separation, so the raid reads as N missiles that each
-        // split into their warheads rather than a field of single RVs. Clamp to the slots left.
-        const warheads = Math.min(warheadCountForDesc(raw.desc), maxMissiles - slotOffset);
-        const tracks = expandTrajectoryToMirv(raw.latList, raw.lonList, raw.altList, warheads, MIRV_DEFAULT_SPREAD_KM);
+        // Fan the bus into one reentry vehicle per baked target: every RV shares the bus track to
+        // apogee, then bends to its own distinct real aimpoint and carries that target's name, so
+        // the warheads spread across separate targets instead of clustering on one. Files without
+        // rvTargets (legacy) fall back to a designator-based footprint. Clamp to the slots left.
+        const launcher = String(raw.desc ?? '').split(' -> ')[0];
+        const primaryLabel = String(raw.desc ?? '').split(' -> ').slice(1).join(' -> ');
+        const rvTargets = (raw.rvTargets as RvTarget[] | undefined) ?? [];
+        const tracks = rvTargets.length > 0
+          ? expandTrajectoryToTargets(raw.latList, raw.lonList, raw.altList, rvTargets).map((r) => ({ ...r.track, name: r.name }))
+          : expandTrajectoryToMirv(raw.latList, raw.lonList, raw.altList, warheadCountForDesc(raw.desc), MIRV_DEFAULT_SPREAD_KM).map((track) => ({ ...track, name: '' }));
+        const count = Math.min(tracks.length, maxMissiles - slotOffset);
 
-        for (let w = 0; w < tracks.length; w++) {
+        for (let w = 0; w < count; w++) {
           const x = firstSlot + slotOffset;
           const track = tracks[w];
+
+          // Each RV is labeled with its own distinct target ("launcher -> target"). The legacy
+          // footprint path (no per-RV name) keeps the "(RV n/N)" suffix off the shared primary.
+          let desc = raw.desc as string;
+
+          if (track.name) {
+            desc = `${launcher} -> ${track.name}`;
+          } else if (count > 1) {
+            desc = `${launcher} -> ${primaryLabel} (RV ${w + 1}/${count})`;
+          }
 
           // Build the real MissileObject directly from the sim data and store that in the
           // catalog. Never stage raw JSON in the cache: a plain object has no class methods, so any
@@ -159,7 +158,7 @@ export const MassRaidPre = async (time: number, simFile: string) => {
             id: x,
             name: `RV_${x}`,
             country: raw.country,
-            desc: tracks.length > 1 ? `${raw.desc} (RV ${w + 1}/${tracks.length})` : raw.desc,
+            desc,
             active: raw.active,
             type: raw.type,
             latList: track.latList,
@@ -173,7 +172,7 @@ export const MassRaidPre = async (time: number, simFile: string) => {
           // The whole load flies as one bus until apogee, so tag every RV with the full
           // count: the visible ascent object (w === 0) then resolves to the deploy mesh
           // that shows this many reentry vehicles.
-          missileObj.warheadCount = tracks.length;
+          missileObj.warheadCount = count;
 
           catalogManagerInstance.objectCache[x] = missileObj;
           builtMissiles.push(missileObj);

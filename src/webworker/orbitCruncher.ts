@@ -54,6 +54,34 @@ export const onMessage = (m: {
   }
 };
 
+/**
+ * Rebase `points` (x, y, z, alpha quads, float64) so every vertex is relative to
+ * the first finite vertex, writing the result into a Float32Array. The anchor
+ * subtraction happens here in float64 - BEFORE the float32 quantization - so
+ * near-anchor vertices keep sub-mm precision. Full-magnitude float32 orbit
+ * points (~42164 km at GEO, ~4 m per ULP) re-rolled their rounding every
+ * constant-redraw frame, which is what made ECF lines shiver when zoomed in.
+ */
+const toAnchorRelative_ = (points: Float64Array): { pointsOut: Float32Array; anchor: [number, number, number] } => {
+  const pointsOut = new Float32Array(points.length);
+  const anchor: [number, number, number] = [points[0], points[1], points[2]];
+
+  if (!Number.isFinite(anchor[0]) || !Number.isFinite(anchor[1]) || !Number.isFinite(anchor[2])) {
+    anchor[0] = 0;
+    anchor[1] = 0;
+    anchor[2] = 0;
+  }
+
+  for (let i = 0; i < points.length; i += 4) {
+    pointsOut[i] = points[i] - anchor[0];
+    pointsOut[i + 1] = points[i + 1] - anchor[1];
+    pointsOut[i + 2] = points[i + 2] - anchor[2];
+    pointsOut[i + 3] = points[i + 3];
+  }
+
+  return { pointsOut, anchor };
+};
+
 const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCruncherInMsgMissileUpdate) => {
   /*
   * TODO: figure out how to calculate the orbit points on constant
@@ -64,16 +92,20 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
   const id = data.id;
   const isEcfOutput = data.isEcfOutput || false;
   const isPolarViewEcf = data.isPolarViewEcf || false;
-  const pointsOut = new Float32Array((numberOfSegments + 1) * 4);
+  // Float64 scratch: quantized to float32 only AFTER the anchor rebase below.
+  const points = new Float64Array((numberOfSegments + 1) * 4);
 
   // Defensive bounds check: a catalog swap can shrink objCache, but in-flight
   // update messages for old ids may still arrive. Reply with the zero buffer
   // so the consumer (orbit-cruncher-thread-manager) sees a normal response
   // and any waiting state (inProgress_, orbitCache) gets cleared.
   if (id >= objCache.length || !objCache[id]) {
+    const pointsOut = new Float32Array((numberOfSegments + 1) * 4);
+
     postMessage({
       typ: OrbitCruncherMsgType.RESPONSE_DATA,
       pointsOut,
+      anchor: [0, 0, 0],
       satId: id,
       seqNum: currentSeqNum,
     }, { transfer: [pointsOut.buffer as ArrayBuffer] });
@@ -90,10 +122,13 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
     const hasTrajectory = missile.latList && missile.lonList && missile.altList && missile.altList.length > 0;
 
     if (!hasTrajectory) {
-      // pointsOut is already zero-initialized; nothing to draw until the missile trajectory is populated
+      // Nothing to draw until the missile trajectory is populated
+      const pointsOut = new Float32Array((numberOfSegments + 1) * 4);
+
       postMessage({
         typ: OrbitCruncherMsgType.RESPONSE_DATA,
         pointsOut,
+        anchor: [0, 0, 0],
         satId: id,
         seqNum: currentSeqNum,
       }, { transfer: [pointsOut.buffer as ArrayBuffer] });
@@ -118,14 +153,17 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
     const gmstAnchor = Sgp4.gstime(gmstAnchorJ);
 
     while (i < len) {
-      drawMissileSegment_(missile, i, pointsOut, len, gmstAnchor, usePerSampleGmst);
+      drawMissileSegment_(missile, i, points, len, gmstAnchor, usePerSampleGmst);
       i++;
     }
   } else if ((objCache[id] as OrbitCruncherOtherObject).ignore || !(objCache[id] as OrbitCruncherSatelliteObject).satrec) {
     // Invalid objects or OemSatellite with no TLEs
+    const pointsOut = new Float32Array((numberOfSegments + 1) * 4);
+
     postMessage({
       typ: OrbitCruncherMsgType.RESPONSE_DATA,
       pointsOut,
+      anchor: [0, 0, 0],
       satId: id,
       seqNum: currentSeqNum,
     }, { transfer: [pointsOut.buffer as ArrayBuffer] });
@@ -151,32 +189,47 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
       timeslice *= numberOfOrbitsToDraw;
     }
 
+    /*
+     * Quantize the sampling start to the timeslice grid so constant-redraw
+     * resamples reuse IDENTICAL sample times until sim time crosses the next
+     * slice boundary. Sampling from the raw `now` slid every vertex along the
+     * track each frame, and the coarse polyline's chords swayed laterally
+     * within the curve's sagitta - a visible shimmer on zoomed-in ECF lines
+     * (ECI hides it because the slide is along-track near the satellite). The
+     * per-frame head-vertex patch (OrbitManager.writePathToGpu_) keeps the
+     * line glued to the dot between boundary crossings.
+     */
+    const quantizedNow = Math.floor(now / timeslice) * timeslice;
+
     // For polar view, center the orbit on the current position (±half period)
-    const orbitStart = isPolarViewEcf ? now - period / 2 : now;
+    const orbitStart = isPolarViewEcf ? quantizedNow - period / 2 : quantizedNow;
 
     if (orbitType === OrbitDrawTypes.ORBIT) {
       while (i < len) {
-        drawTleOrbitSegment_(orbitStart, i, timeslice, id, isEcfOutput, pointsOut, len, isPolarViewEcf, satrec.jdsatepoch);
+        drawTleOrbitSegment_(orbitStart, i, timeslice, id, isEcfOutput, points, len, isPolarViewEcf, satrec.jdsatepoch);
         i++;
       }
     } else if (orbitType === OrbitDrawTypes.TRAIL) {
       while (i < len) {
-        drawTleOrbitSegmentTrail_(orbitStart, i, timeslice, id, isEcfOutput, pointsOut, len, isPolarViewEcf, satrec.jdsatepoch);
+        drawTleOrbitSegmentTrail_(orbitStart, i, timeslice, id, isEcfOutput, points, len, isPolarViewEcf, satrec.jdsatepoch);
         i++;
       }
     }
   }
 
+  const { pointsOut, anchor } = toAnchorRelative_(points);
+
   postMessage({
     typ: OrbitCruncherMsgType.RESPONSE_DATA,
     pointsOut,
+    anchor,
     satId: id,
     seqNum: currentSeqNum,
   }, { transfer: [pointsOut.buffer as ArrayBuffer] });
 };
 
 const drawMissileSegment_ = (
-  missile: OrbitCruncherMissileObject, i: number, pointsOut: Float32Array, len: number,
+  missile: OrbitCruncherMissileObject, i: number, pointsOut: Float64Array, len: number,
   gmstAnchor: number, usePerSampleGmst: boolean,
 ) => {
   // Clamp so the final segment (i === numberOfSegments) does not read one past the
@@ -205,7 +258,7 @@ const drawMissileSegment_ = (
 
 const drawTleOrbitSegmentTrail_ = (
   now: number, i: number, timeslice: number, id: number, isEcfOutput: boolean,
-  pointsOut: Float32Array, len: number,
+  pointsOut: Float64Array, len: number,
   isPolarViewEcf: boolean, jdsatepoch: number,
 ) => {
   const t = now + i * timeslice;
@@ -235,7 +288,7 @@ const drawTleOrbitSegmentTrail_ = (
 
 const drawTleOrbitSegment_ = (
   now: number, i: number, timeslice: number, id: number, isEcfOutput: boolean,
-  pointsOut: Float32Array, len: number,
+  pointsOut: Float64Array, len: number,
   isPolarViewEcf: boolean, jdsatepoch: number,
 ) => {
   const t = now + i * timeslice;

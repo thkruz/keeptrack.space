@@ -91,7 +91,21 @@ export type OrbitCruncherInMsgs =
 
 export interface OrbitCruncherOutMsgPoints {
   typ: OrbitCruncherMsgType.RESPONSE_DATA;
+  /**
+   * Orbit path vertices RELATIVE to `anchor` (x, y, z, alpha per vertex). The
+   * subtraction happens in the worker in float64, BEFORE the float32 write, so
+   * near-anchor vertices survive the float32 buffer with sub-mm precision. At
+   * full orbital magnitude (~42164 km for GEO) one float32 ULP is ~4 m and its
+   * per-frame rounding re-roll made ECF orbit lines visibly shiver when zoomed
+   * in; the renderer re-adds the anchor via a float64-computed uniform.
+   */
   pointsOut: Float32Array;
+  /**
+   * Float64 anchor (the first computed path point) in the same frame as
+   * `pointsOut` (ECEF when isEcfOutput/isPolarViewEcf, TEME otherwise).
+   * [0, 0, 0] for empty/invalid responses.
+   */
+  anchor: [number, number, number];
   satId: number;
   /** Echoes the seqNum the worker was on when it produced these points. Main thread drops stale responses. */
   seqNum?: number;

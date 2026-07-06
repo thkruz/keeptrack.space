@@ -9,6 +9,7 @@ import { OrbitCruncherThreadManager } from '../orbit-cruncher-thread-manager';
 const orbitCache = new Map<number, Float32Array>();
 const glBuffers: Record<number, unknown> = { 7: { id: 'buf7' } };
 const inProgress: Record<number, boolean> = { 7: true };
+const setOrbitAnchor = vi.fn();
 const gl = { ARRAY_BUFFER: 0x8892, DYNAMIC_DRAW: 0x88e8, bindBuffer: vi.fn(), bufferData: vi.fn() };
 
 const stubServiceLocator = () => {
@@ -16,6 +17,7 @@ const stubServiceLocator = () => {
     orbitCache,
     glBuffers_: glBuffers,
     inProgress_: inProgress,
+    setOrbitAnchor,
   } as unknown as ReturnType<typeof ServiceLocator.getOrbitManager>);
   vi.spyOn(ServiceLocator, 'getRenderer').mockReturnValue({ gl } as unknown as ReturnType<typeof ServiceLocator.getRenderer>);
 };
@@ -189,10 +191,11 @@ describe('OrbitCruncherThreadManager', () => {
       const pts = new Float32Array([1, 2, 3]);
 
       handler.onMessage({
-        data: { typ: OrbitCruncherMsgType.RESPONSE_DATA, satId: 7, pointsOut: pts, seqNum: 0 },
+        data: { typ: OrbitCruncherMsgType.RESPONSE_DATA, satId: 7, pointsOut: pts, anchor: [7000, -42, 3], seqNum: 0 },
       });
 
       expect(orbitCache.get(7)).toEqual(pts);
+      expect(setOrbitAnchor).toHaveBeenCalledWith(7, [7000, -42, 3]);
       expect(gl.bindBuffer).toHaveBeenCalledWith(gl.ARRAY_BUFFER, glBuffers[7]);
       expect(gl.bufferData).toHaveBeenCalledTimes(1);
       expect(inProgress[7]).toBe(false);

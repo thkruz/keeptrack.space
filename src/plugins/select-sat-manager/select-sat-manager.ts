@@ -320,10 +320,19 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     // If deselecting a satellite, clear the selected orbit
     if (id === -1 && this.lastSelectedSat_ !== -1) {
       ServiceLocator.getOrbitManager().clearSelectOrbit();
+      // Restore the free-camera zoom floor (a selected missile drops it to the surface).
+      settingsManager.minZoomDistance = RADIUS_OF_EARTH + 50 as Kilometers;
     } else if (!(obj instanceof OemSatellite)) {
       // Currently Satellites and Missiles assume Earth center
       settingsManager.centerBody = SolarBody.Earth;
-      settingsManager.minZoomDistance = RADIUS_OF_EARTH + 50 as Kilometers;
+      // Missiles fly from the surface up, so drop the zoom-in floor to the surface
+      // so the camera can close in on the mesh at ANY point in the flight, including
+      // the low-altitude boost phase. The per-target mesh standoff
+      // (minDistanceFromTarget) still keeps the camera off the model, and because the
+      // floor equals the surface the camera never dips below it. Satellites keep the
+      // 50 km floor. Previously both used +50 km, which held the camera above a
+      // boosting missile and blocked close inspection of the mesh early in flight.
+      settingsManager.minZoomDistance = (obj?.isMissile() ? RADIUS_OF_EARTH : RADIUS_OF_EARTH + 50) as Kilometers;
       settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
       PluginRegistry.getPlugin(PlanetsMenuPlugin)?.setAllPlanetsDotSize(0);
     }
@@ -464,11 +473,23 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
   }
 
   /**
+   * Approximate bounding radius (km) of a missile/RV mesh. Missiles carry no
+   * span/length/diameter catalog metadata, so a fixed small radius lets the
+   * camera close in on the model at true scale (like small debris) instead of
+   * being held at the global 0.75 km floor.
+   */
+  private static readonly missileRadiusKm_ = 0.01 as Kilometers;
+
+  /**
    * Per-target bounding radius (km) estimated from the object's physical size, used to scale both
-   * the zoom-in floor and the initial framing distance. Returns null for objects without size
-   * metadata (e.g. missiles), which fall back to the global minimum.
+   * the zoom-in floor and the initial framing distance. Returns null only for objects with no size
+   * basis at all, which fall back to the global minimum.
    */
   private static calcTargetRadiusKm_(target?: Satellite | MissileObject): Kilometers | null {
+    if (target instanceof MissileObject) {
+      return SelectSatManager.missileRadiusKm_;
+    }
+
     if (!(target instanceof Satellite)) {
       return null;
     }
@@ -499,7 +520,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     // Set the zoom-in floor to the object's size (3x radius), then frame at a comfortably larger
     // initial distance (6x radius, floored at 30 m) so selecting a satellite lands with room to
     // spare instead of at the floor - the user should never have to zoom out after selecting.
-    // Objects without size metadata (e.g. missiles) fall back to the global minimum for both.
+    // Missiles use a small fixed radius; only truly size-less objects fall back to the global minimum.
     const radiusKm = SelectSatManager.calcTargetRadiusKm_(target);
 
     cam.state.minDistanceFromTarget = radiusKm === null ? null : targetStandoffDistanceKm(radiusKm);

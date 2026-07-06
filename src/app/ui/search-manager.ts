@@ -741,6 +741,15 @@ export class SearchManager {
       if (!obj.active) {
         return false;
       } // Skip inactive objects (decayed missiles, fake analyst sats, etc.)
+
+      // MIRV children ride on top of the bus during ascent and are hidden until the
+      // reentry vehicles separate at apogee; keep them out of results until then. The
+      // missile plugin re-runs this search at separation, so they appear in the menu
+      // in step with their dots (and rewinding past separation removes them again).
+      if (obj instanceof MissileObject && !obj.isVisibleNow()) {
+        return false;
+      }
+
       if (!obj.name) {
         return false;
       } // Everything has a name. If it doesn't then assume it isn't what we are searching for.

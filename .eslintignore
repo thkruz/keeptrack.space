@@ -134,12 +134,16 @@ cypress.config.ts
 src/locales/keys.ts
 src/locales/*.json
 
+# Generated external-plugin manifest wiring (emitted by `npm run plugin -- sync`)
+src/plugins/plugin-manifest.external.generated.ts
+
 # ESLINT ignore file
 package.json
 webpack.config.js
 README.md
 src/wip
 src/lib/external
+src/plugins-external
 **/*.min.*
 **/*.css
 dist/**/*

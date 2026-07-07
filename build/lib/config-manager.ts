@@ -280,6 +280,6 @@ export class ConfigManager {
     logWithStyle(`Loading screen CSS path: ${flag(this.config.loadingScreenCssPath)}`, ConsoleStyles.DEBUG);
     logWithStyle(`Primary logo path: ${flag(this.config.primaryLogoPath)}`, ConsoleStyles.DEBUG);
     logWithStyle(`Secondary logo path: ${flag(this.config.secondaryLogoPath)}`, ConsoleStyles.DEBUG);
-    logWithStyle(`Pro features: ${this.config.isPro ? 'Enabled' : 'Disabled'}`, this.config.isPro ? ConsoleStyles.SUCCESS : ConsoleStyles.INFO);
+    logWithStyle(`Pro features: ${this.config.isPro ? 'Enabled' : 'Disabled'}`, ConsoleStyles.DEBUG);
   }
 }

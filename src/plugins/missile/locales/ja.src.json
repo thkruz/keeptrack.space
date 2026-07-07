@@ -21,7 +21,24 @@
         "northKoreaToUsa": "北朝鮮から米国へ",
         "usaToRussia": "米国からロシアへ",
         "usaToChina": "米国から中国へ",
-        "usaToNorthKorea": "米国から北朝鮮へ"
+        "usaToNorthKorea": "米国から北朝鮮へ",
+        "exchangeUsaRussia": "米国・ロシア 全面核交戦",
+        "exchangeUsaChina": "米国・中国 全面核交戦",
+        "exchangeUsaNorthKorea": "米国・北朝鮮 核交戦",
+        "exchangeChinaIndia": "中国・インド 核交戦",
+        "exchangeRussiaUkraine": "ロシア・ウクライナ 核交戦",
+        "exchangeIndiaPakistan": "インド・パキスタン 核交戦",
+        "globalThermonuclearWar": "全世界規模の熱核戦争",
+        "iranToIsrael": "イランからイスラエルへ",
+        "israelToIran": "イスラエルからイランへ",
+        "exchangeIranIsrael": "イラン・イスラエル 核交戦",
+        "russiaToUkraine": "ロシアからウクライナへ",
+        "ukraineToRussia": "ウクライナからロシアへ"
+      },
+      "typeGroups": {
+        "strategic": "戦略核攻撃",
+        "exchanges": "全面核交戦",
+        "regional": "地域紛争"
       },
       "groups": {
         "russia": "ロシア",
@@ -31,7 +48,13 @@
         "france": "フランス",
         "northKorea": "北朝鮮",
         "natoCountries": "NATO加盟国",
-        "nonNatoCountries": "NATO非加盟国"
+        "nonNatoCountries": "NATO非加盟国",
+        "usMilitaryBases": "米軍基地",
+        "usLargestCities": "米国の大都市50",
+        "russiaMilitaryBases": "ロシア軍基地",
+        "russiaLargestCities": "ロシアの大都市50",
+        "chinaMilitaryBases": "中国軍基地",
+        "chinaLargestCities": "中国の大都市50"
       },
       "attackers": {
         "aleysk": "アレイスク",

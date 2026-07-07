@@ -11,7 +11,24 @@ import { FormSelect } from '@materializecss/materialize';
  */
 export function refreshMaterialSelect(select: HTMLSelectElement): void {
   FormSelect.getInstance(select)?.destroy();
-  FormSelect.init(select);
+  FormSelect.init(select, {
+    dropdownOptions: {
+      /*
+       * Promote the enclosing v13 section card to its own stacking context for as
+       * long as this dropdown is open (open-START through close-fade END), so the
+       * popup paints over later sibling cards. This replaces a CSS
+       * `.kt-section:has(.dropdown-content[style*="display: block"])` rule: a
+       * `:has()` matching on the `style` attribute forces Chrome to re-run a
+       * full-document style recalc on EVERY style-attribute mutation anywhere on
+       * the page - i.e. every animation frame, since the timeline playhead moves
+       * each frame - which tanks the frame rate. Keying the promotion off these
+       * open/close callbacks plus a plain class keeps invalidation scoped. See
+       * `.kt-section.kt-dropdown-open` in menu-v13.css.
+       */
+      onOpenStart: () => select.closest('.kt-section')?.classList.add('kt-dropdown-open'),
+      onCloseEnd: () => select.closest('.kt-section')?.classList.remove('kt-dropdown-open'),
+    },
+  });
 
   /*
    * v2 bug: for multi-selects, _toggleEntryFromArray updates the option, the li

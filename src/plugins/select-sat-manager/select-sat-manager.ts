@@ -20,6 +20,7 @@ import {
   ISettingsContributor,
 } from '@app/engine/plugins/core/plugin-capabilities';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { estimateObjectRadiusKm, initialFramingDistanceKm, targetStandoffDistanceKm } from '@app/engine/utils/transforms';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { t7e } from '@app/locales/keys';
 import { COVARIANCE_RADII_FALLBACK, covarianceDisplayRadii, ricSigmasFromCovarianceMatrix } from '@app/engine/rendering/draw-manager/covariance-radii';
@@ -61,6 +62,14 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
   }
 
   lastCssStyle = '';
+  /**
+   * Cached viewport width. `window.innerWidth` is a layout-reading property, so
+   * reading it inside the per-frame updateLoop handler (checkIfSelectSatVisible)
+   * forces a synchronous reflow every frame once anything has dirtied layout
+   * (e.g. the clock's textContent write). It only changes on resize, so read it
+   * once and refresh on the resize event instead.
+   */
+  private viewportWidth_ = window.innerWidth;
   selectedSat = -1;
   private readonly noSatObj_ = <Satellite>(<unknown>{
     id: -1,
@@ -105,6 +114,12 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
 
     EventBus.getInstance().on(EventBusEvent.updateLoop, this.checkIfSelectSatVisible.bind(this));
 
+    // Refresh the cached viewport width off the render loop so checkIfSelectSatVisible
+    // never has to read window.innerWidth (a forced-reflow trigger) each frame.
+    window.addEventListener('resize', () => {
+      this.viewportWidth_ = window.innerWidth;
+    });
+
     EventBus.getInstance().on(EventBusEvent.endOfDraw, () => {
       if ((this.selectedSat ?? -1) !== -1) {
         const timeManagerInstance = ServiceLocator.getTimeManager();
@@ -139,7 +154,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       let cssStyle = currentSearch.length > 0 ? 'display: block; max-height:auto;' : 'display: none; max-height:auto;';
 
       // If a satellite is selected on a desktop computer then shrink the search box
-      if (window.innerWidth > 1000 && this.selectedSat !== -1) {
+      if (this.viewportWidth_ > 1000 && this.selectedSat !== -1) {
         cssStyle = cssStyle.replace('max-height:auto', 'max-height:27%');
       }
 
@@ -319,10 +334,19 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     // If deselecting a satellite, clear the selected orbit
     if (id === -1 && this.lastSelectedSat_ !== -1) {
       ServiceLocator.getOrbitManager().clearSelectOrbit();
+      // Restore the free-camera zoom floor (a selected missile drops it to the surface).
+      settingsManager.minZoomDistance = RADIUS_OF_EARTH + 50 as Kilometers;
     } else if (!(obj instanceof OemSatellite)) {
       // Currently Satellites and Missiles assume Earth center
       settingsManager.centerBody = SolarBody.Earth;
-      settingsManager.minZoomDistance = RADIUS_OF_EARTH + 50 as Kilometers;
+      // Missiles fly from the surface up, so drop the zoom-in floor to the surface
+      // so the camera can close in on the mesh at ANY point in the flight, including
+      // the low-altitude boost phase. The per-target mesh standoff
+      // (minDistanceFromTarget) still keeps the camera off the model, and because the
+      // floor equals the surface the camera never dips below it. Satellites keep the
+      // 50 km floor. Previously both used +50 km, which held the camera above a
+      // boosting missile and blocked close inspection of the mesh early in flight.
+      settingsManager.minZoomDistance = (obj?.isMissile() ? RADIUS_OF_EARTH : RADIUS_OF_EARTH + 50) as Kilometers;
       settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
       PluginRegistry.getPlugin(PlanetsMenuPlugin)?.setAllPlanetsDotSize(0);
     }
@@ -365,8 +389,9 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
         // Reset isZoomIn so the direction guard in updateZoom_ doesn't cancel
         // the zoom-out transition to earthCenteredLastZoom.
         cam.state.isZoomIn = false;
+        // Restore the global minimum standoff now that no sized target is selected.
+        cam.state.minDistanceFromTarget = null;
         settingsManager.selectedColor = settingsManager.selectedColorFallback;
-        ServiceLocator.getRenderer().setFarRenderer();
 
         if (!wasSatMode) {
           // FIXED_TO_EARTH: exitFixedToSat returned early, restore zoom ourselves
@@ -400,7 +425,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     };
 
     this.beginCameraTransition_();
-    this.switchToSatCenteredCamera_();
+    this.switchToSatCenteredCamera_(sat);
     this.setSelectedSat_(sat.id);
   }
 
@@ -461,7 +486,39 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     return radii;
   }
 
-  private switchToSatCenteredCamera_() {
+  /**
+   * Approximate bounding radius (km) of a missile/RV mesh. Missiles carry no
+   * span/length/diameter catalog metadata, so a fixed small radius lets the
+   * camera close in on the model at true scale (like small debris) instead of
+   * being held at the global 0.75 km floor.
+   */
+  private static readonly missileRadiusKm_ = 0.01 as Kilometers;
+
+  /**
+   * Per-target bounding radius (km) estimated from the object's physical size, used to scale both
+   * the zoom-in floor and the initial framing distance. Returns null only for objects with no size
+   * basis at all, which fall back to the global minimum.
+   */
+  private static calcTargetRadiusKm_(target?: Satellite | MissileObject): Kilometers | null {
+    if (target instanceof MissileObject) {
+      return SelectSatManager.missileRadiusKm_;
+    }
+
+    if (!(target instanceof Satellite)) {
+      return null;
+    }
+
+    return estimateObjectRadiusKm({
+      span: target.span,
+      length: target.length,
+      diameter: target.diameter,
+      rcs: target.rcs,
+      isRocketBody: target.type === SpaceObjectType.ROCKET_BODY,
+      isPayload: target.type === SpaceObjectType.PAYLOAD,
+    });
+  }
+
+  private switchToSatCenteredCamera_(target?: Satellite | MissileObject) {
     if (!settingsManager.isFocusOnSatelliteWhenSelected) {
       return;
     }
@@ -474,7 +531,14 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     }
 
     cam.state.camZoomSnappedOnSat = true;
-    cam.state.camDistBuffer = settingsManager.minDistanceFromSatellite;
+    // Set the zoom-in floor to the object's size (3x radius), then frame at a comfortably larger
+    // initial distance (6x radius, floored at 30 m) so selecting a satellite lands with room to
+    // spare instead of at the floor - the user should never have to zoom out after selecting.
+    // Missiles use a small fixed radius; only truly size-less objects fall back to the global minimum.
+    const radiusKm = SelectSatManager.calcTargetRadiusKm_(target);
+
+    cam.state.minDistanceFromTarget = radiusKm === null ? null : targetStandoffDistanceKm(radiusKm);
+    cam.state.camDistBuffer = radiusKm === null ? cam.state.effectiveMinDistanceFromTarget : initialFramingDistanceKm(radiusKm);
 
     if (cam.cameraType === CameraType.FIXED_TO_SAT_LVLH || cam.cameraType === CameraType.FIXED_TO_SAT_ECI) {
       // In satellite modes the LVLH/ECI frame already tracks the satellite.

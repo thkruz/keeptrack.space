@@ -1,0 +1,17 @@
+/* __DISPLAY_NAME__ (v13 menu). Per-menu CSS is co-located with the plugin and
+ * imported from plugin.ts. See the v13 menu style guide for the dense-form rules
+ * (stacked-field margins, standalone-action width, focus underline) if you add
+ * multiple labelled rows or a standalone submit button. */
+
+#__ELEMENT_BASE__-menu .__ELEMENT_BASE__-hint {
+  margin: 8px 6px 12px;
+  color: var(--kt-text-secondary, #b0b6be);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* Standalone action button: match the card width (v13 dense-form rule). */
+#__ELEMENT_BASE__-menu .kt-action {
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
+}

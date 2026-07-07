@@ -21,7 +21,24 @@
         "northKoreaToUsa": "Nordkorea gegen USA",
         "usaToRussia": "USA gegen Russland",
         "usaToChina": "USA gegen China",
-        "usaToNorthKorea": "USA gegen Nordkorea"
+        "usaToNorthKorea": "USA gegen Nordkorea",
+        "exchangeUsaRussia": "Vollständiger Schlagabtausch USA / Russland",
+        "exchangeUsaChina": "Vollständiger Schlagabtausch USA / China",
+        "exchangeUsaNorthKorea": "Schlagabtausch USA / Nordkorea",
+        "exchangeChinaIndia": "Schlagabtausch China / Indien",
+        "exchangeRussiaUkraine": "Schlagabtausch Russland / Ukraine",
+        "exchangeIndiaPakistan": "Schlagabtausch Indien / Pakistan",
+        "globalThermonuclearWar": "Globaler thermonuklearer Krieg",
+        "iranToIsrael": "Iran gegen Israel",
+        "israelToIran": "Israel gegen Iran",
+        "exchangeIranIsrael": "Schlagabtausch Iran / Israel",
+        "russiaToUkraine": "Russland gegen Ukraine",
+        "ukraineToRussia": "Ukraine gegen Russland"
+      },
+      "typeGroups": {
+        "strategic": "Strategische Angriffe",
+        "exchanges": "Vollständige Schlagabtausche",
+        "regional": "Regionale Konflikte"
       },
       "groups": {
         "russia": "Russland",
@@ -31,7 +48,13 @@
         "france": "Frankreich",
         "northKorea": "Nordkorea",
         "natoCountries": "NATO-Länder",
-        "nonNatoCountries": "Nicht-NATO-Länder"
+        "nonNatoCountries": "Nicht-NATO-Länder",
+        "usMilitaryBases": "US-Militärbasen",
+        "usLargestCities": "50 größte US-Städte",
+        "russiaMilitaryBases": "Russische Militärbasen",
+        "russiaLargestCities": "50 größte russische Städte",
+        "chinaMilitaryBases": "Chinesische Militärbasen",
+        "chinaLargestCities": "50 größte chinesische Städte"
       },
       "attackers": {
         "aleysk": "Alejsk",

@@ -1,11 +1,11 @@
 import { Configuration, DefinePlugin, DefinePluginOptions, HtmlRspackPlugin, LightningCssMinimizerRspackPlugin, ProgressPlugin, SwcJsMinimizerRspackPlugin } from '@rspack/core';
 import { execSync } from 'node:child_process';
-import CleanTerminalPlugin from 'clean-terminal-webpack-plugin';
 import DotEnv from 'dotenv-webpack';
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BuildConfig } from './lib/config-manager';
+import { reporter } from './lib/reporter';
 export class WebpackManager {
   static readonly DEFAULT_MODE = 'development';
   static readonly DEFAULT_WATCH = false;
@@ -132,6 +132,7 @@ export class WebpackManager {
           '@engine': `${dirName}/../src/engine`,
           '@ootk': `${dirName}/../src/engine/ootk`,
           '@plugins-pro': `${dirName}/../src/plugins-pro`,
+          '@plugins-external': `${dirName}/../src/plugins-external`,
           // Specific aliases must come before @public so they match first
           '@public/img/logo.png': `${dirName}/../${this.config.textLogoPath}`,
           '@public/img/logo-primary.png': `${dirName}/../${this.config.primaryLogoPath}`,
@@ -230,16 +231,6 @@ export class WebpackManager {
     baseConfig.experiments = {
       topLevelAwait: true,
     };
-    baseConfig.plugins!.push(
-      new CleanTerminalPlugin({
-        beforeCompile: true,
-      }),
-      /*
-       * new CopyRspackPlugin({
-       *   patterns: [{ from: 'public', to: '..' }],
-       * }),
-       */
-    );
     baseConfig.module!.rules!.push({
       test: /\.(?:woff|woff2|eot|ttf|otf)$/iu,
       include: [/src/u],
@@ -268,9 +259,6 @@ export class WebpackManager {
         },
         plugins: [
           this.versionDefine_,
-          new CleanTerminalPlugin({
-            beforeCompile: true,
-          }),
           new HtmlRspackPlugin({
             filename: '../index.html',
             template: './public/index.html',
@@ -280,9 +268,7 @@ export class WebpackManager {
             path: `./${this.config.envFilePath}`,
             allowEmptyValues: true,
           }),
-          new ProgressPlugin({
-            prefix: 'KeepTrack Main Code',
-          }),
+          new ProgressPlugin(reporter.createCompileProgressHandler('main')),
         ],
       },
     });
@@ -316,9 +302,7 @@ export class WebpackManager {
             path: `./${this.config.envFilePath}`,
             allowEmptyValues: true,
           }),
-          new ProgressPlugin({
-            prefix: 'KeepTrack Auth',
-          }),
+          new ProgressPlugin(reporter.createCompileProgressHandler('auth')),
         ],
       },
     });
@@ -350,6 +334,8 @@ export class WebpackManager {
       entry.tocaPocaWorker = ['./src/plugins-pro/toca-poca-plugin/tocaPocaWorker.ts'];
       entry.overflightWorker = ['./src/plugins-pro/overflight/overflightWorker.ts'];
       entry.neighborhoodHistoryWorker = ['./src/plugins-pro/neighborhood-history/neighborhoodHistoryWorker.ts'];
+      entry.interceptorWorker = ['./src/plugins-pro/satellite-interceptor/interceptorWorker.ts'];
+      entry.transitFinderWorker = ['./src/plugins-pro/transit-finder/transitFinderWorker.ts'];
     }
 
     return ({
@@ -363,9 +349,7 @@ export class WebpackManager {
           publicPath: `./${pubPath}js/`,
         },
         plugins: [
-          new ProgressPlugin({
-            prefix: 'KeepTrack Workers',
-          }),
+          new ProgressPlugin(reporter.createCompileProgressHandler('workers')),
         ],
       },
     });

@@ -87,6 +87,43 @@ describe('PersistenceManager', () => {
     });
   });
 
+  describe('validateStorage version wipe', () => {
+    let originalVersion: string;
+
+    beforeEach(() => {
+      originalVersion = settingsManager.versionNumber;
+    });
+
+    afterEach(() => {
+      settingsManager.versionNumber = originalVersion;
+    });
+
+    it('clears storage on version bump but preserves ONBOARDING_STATE', () => {
+      localStorage.setItem(StorageKey.VERSION, '0.0.1');
+      localStorage.setItem(StorageKey.COLOR_SCHEME, 'wiped');
+      localStorage.setItem(StorageKey.ONBOARDING_STATE, '{"status":"done"}');
+      settingsManager.versionNumber = '99.0.0';
+
+      PersistenceManager.resetInstance();
+      pm = PersistenceManager.getInstance();
+
+      expect(pm.getItem(StorageKey.COLOR_SCHEME)).toBeNull();
+      expect(pm.getItem(StorageKey.ONBOARDING_STATE)).toBe('{"status":"done"}');
+      expect(pm.getItem(StorageKey.VERSION)).toBe('99.0.0');
+    });
+
+    it('does not wipe when the version is unchanged', () => {
+      localStorage.setItem(StorageKey.VERSION, '99.0.0');
+      localStorage.setItem(StorageKey.COLOR_SCHEME, 'kept');
+      settingsManager.versionNumber = '99.0.0';
+
+      PersistenceManager.resetInstance();
+      pm = PersistenceManager.getInstance();
+
+      expect(pm.getItem(StorageKey.COLOR_SCHEME)).toBe('kept');
+    });
+  });
+
   describe('compareSemver_', () => {
     it.each([
       ['1.0.0', '1.0.1', -1],

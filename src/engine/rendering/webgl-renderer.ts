@@ -1,6 +1,4 @@
-import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
-import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -27,6 +25,7 @@ import { PostProcessingManager } from './draw-manager/post-processing';
 import { Sun } from './draw-manager/sun';
 import { MeshManager } from './mesh-manager';
 import { showFatalError } from './show-fatal-error';
+import { ViewportManager } from './viewport-manager';
 
 export class WebGLRenderer {
   private isRotationEvent_: boolean;
@@ -94,7 +93,9 @@ export class WebGLRenderer {
       return;
     }
 
-    ServiceLocator.getMainCamera().projectionMatrix = Camera.calculatePMatrix(this.gl);
+    const mainCamera = ServiceLocator.getMainCamera();
+
+    mainCamera.projectionMatrix = Camera.calculatePMatrix(this.gl, mainCamera);
   }
 
   private isAltCanvasSize_ = false;
@@ -104,23 +105,30 @@ export class WebGLRenderer {
       return;
     }
 
+    let isResized = false;
+
     if (EventBus.getInstance().methods.altCanvasResize()) {
       this.resizeCanvas(true);
       this.isAltCanvasSize_ = true;
-      // Re-invoke camera draw so delegates (flat-map, polar-view) recompute projection for the new canvas size.
-      // resizeCanvas calls updatePMatrix which overwrites projectionMatrix with a perspective matrix,
-      // but delegates need their own orthographic projection.
-      camera.draw(this.sensorPos);
+      isResized = true;
     } else if (this.isAltCanvasSize_) {
       this.resizeCanvas(false);
       this.isAltCanvasSize_ = false;
+      isResized = true;
+    }
+
+    if (isResized) {
+      // resizeCanvas set a full-canvas viewport and a perspective projection.
+      // Re-apply the multi-view pass viewport/scissor for the new buffer size,
+      // then re-invoke camera.draw so delegates (flat-map, polar-view)
+      // recompute their own orthographic projection.
+      ViewportManager.getInstance().applyPassViewport(this.gl);
       camera.draw(this.sensorPos);
     }
 
-    const mainCamera = ServiceLocator.getMainCamera();
-
-    // Apply the camera matrix
-    this.projectionCameraMatrix = mat4.mul(mat4.create(), mainCamera.projectionMatrix, mainCamera.matrixWorldInverse);
+    // Apply the camera matrix (from the camera being rendered, not the singleton,
+    // so multi-viewport passes each compose their own matrix)
+    this.projectionCameraMatrix = mat4.mul(mat4.create(), camera.projectionMatrix, camera.matrixWorldInverse);
 
     scene.render(this, camera);
   }
@@ -252,7 +260,6 @@ export class WebGLRenderer {
 
     this.resizeCanvas();
 
-    gl.getExtension('EXT_frag_depth');
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     DepthManager.setupDepthBuffer(gl);
@@ -457,31 +464,6 @@ export class WebGLRenderer {
     ServiceLocator.getSatLabelManager()?.updateLabels(visibleSatIds, labelTexts);
 
     this.satLabelModeLastTime_ = timeManagerInstance.realTime;
-  }
-
-  setNearRenderer() {
-    if (!this.gl) {
-      return;
-    }
-
-    if (settingsManager.zNear !== 0.1) {
-      settingsManager.selectedColor = [0, 0, 0, 0];
-      settingsManager.zNear = 0.1;
-      settingsManager.zFar = 200000;
-      this.updatePMatrix();
-    }
-  }
-
-  setFarRenderer() {
-    if (!this.gl) {
-      return;
-    }
-
-    if (settingsManager.zNear !== 2) {
-      settingsManager.zNear = 2;
-      settingsManager.zFar = 450000;
-      this.updatePMatrix();
-    }
   }
 
   getScreenCoords(obj: BaseObject): {
@@ -691,12 +673,25 @@ export class WebGLRenderer {
     if (this.selectSatManager_?.primarySatObj.id !== -1) {
       const timeManagerInstance = ServiceLocator.getTimeManager();
       const primarySat = ServiceLocator.getCatalogManager().getObject(this.selectSatManager_.primarySatObj.id, GetSatType.POSITION_ONLY) as Satellite | MissileObject;
-      const satelliteOffset = ServiceLocator.getDotsManager().getPositionArray(this.selectSatManager_.primarySatObj.id).map((coord) => -coord);
+      // Use the RENDERED dot position (ground rotation applied), not the raw stored
+      // positionData. For a low-altitude missile the two differ by the shader's
+      // (currentGmst - cruncherGmst) rotation; following the raw value centered the
+      // camera off the dot during boost and snapped back once the missile climbed
+      // past the ground-rotation radius. getRenderedPositionArray is a no-op above
+      // that radius, so satellites are unaffected.
+      const renderedPos = ServiceLocator.getDotsManager().getRenderedPositionArray(this.selectSatManager_.primarySatObj.id);
+      const satelliteOffset = renderedPos.map((coord) => -coord);
 
-      sceneInstance.worldShift = satelliteOffset as [number, number, number];
-      // sceneInstance.worldShift[0] = satelliteOffset[0] - sceneInstance.worldShift[0];
-      // sceneInstance.worldShift[1] = satelliteOffset[1] - sceneInstance.worldShift[1];
-      // sceneInstance.worldShift[2] = satelliteOffset[2] - sceneInstance.worldShift[2];
+      // Keep the followed object's .position on the rendered dot so snapToSat aims
+      // the camera where the pixels are (POSITION_ONLY seeded it with the raw value).
+      if (primarySat.isMissile()) {
+        primarySat.position = { x: renderedPos[0] as Kilometers, y: renderedPos[1] as Kilometers, z: renderedPos[2] as Kilometers };
+      }
+
+      // Route through the base+resolve path (NOT a raw worldShift write): the
+      // mesh position baked below must use the resolved shift, which is [0,0,0]
+      // when the main camera is in a 2D mode with a world-shift override
+      sceneInstance.setWorldShiftBase(satelliteOffset as [number, number, number]);
 
       this.meshManager.update(timeManagerInstance.selectedDate, primarySat as Satellite);
       ServiceLocator.getMainCamera().snapToSat(primarySat, timeManagerInstance.simulationTimeObj);
@@ -704,45 +699,12 @@ export class WebGLRenderer {
         ServiceLocator.getOrbitManager().setSelectOrbit(primarySat.id);
       }
 
-      // If in satellite view the orbit buffer needs to be updated every time
-      // Skip alignment in ECF mode — the shader rotates ECEF data per-frame using GMST
-      if (
-        !settingsManager.isOrbitCruncherInEcf &&
-        !primarySat.isMissile() &&
-        (ServiceLocator.getMainCamera().cameraType === CameraType.SATELLITE_FIRST_PERSON || ServiceLocator.getMainCamera().cameraType === CameraType.FIXED_TO_SAT_LVLH || ServiceLocator.getMainCamera().cameraType === CameraType.FIXED_TO_SAT_ECI)
-      ) {
-        /*
-         * Force an update so that the orbit is always using recent data - this
-         * will not fix this draw call
-         */
-        // ServiceLocator.getOrbitManager().updateOrbitBuffer(this.selectSatManager_.primarySatObj.id);
-
-        // Now we can fix this draw call
-        const firstPointOut = ServiceLocator.getDotsManager().getPositionArray(Number(this.selectSatManager_.primarySatObj.id));
-        const firstRelativePointOut = SatMath.getPositionFromCenterBody({
-          x: firstPointOut[0] as Kilometers,
-          y: firstPointOut[1] as Kilometers,
-          z: firstPointOut[2] as Kilometers,
-        });
-
-        if (primarySat instanceof Satellite) {
-          ServiceLocator.getOrbitManager().alignOrbitSelectedObject(
-            this.selectSatManager_.primarySatObj.id, [firstRelativePointOut.x, firstRelativePointOut.y, firstRelativePointOut.z],
-          );
-        } else if (primarySat instanceof OemSatellite) {
-          ServiceLocator.getOrbitManager().alignOrbitSelectedObject(
-            this.selectSatManager_.primarySatObj.id,
-            [firstPointOut[0], firstPointOut[1], firstPointOut[2]],
-            false,
-          );
-        } else {
-          ServiceLocator.getOrbitManager().alignOrbitSelectedObject(
-            this.selectSatManager_.primarySatObj.id,
-            [firstRelativePointOut.x, firstRelativePointOut.y, firstRelativePointOut.z],
-            true,
-          );
-        }
-      }
+      /*
+       * NOTE: the old alignOrbitSelectedObject whole-buffer shift (a GPU readback
+       * plus CPU rewrite per frame) is gone: orbit buffers are anchor-relative and
+       * OrbitManager.writePathToGpu_ patches the head vertex onto the rendered dot
+       * every frame, so the line inherently matches the dot in every camera mode.
+       */
 
       sceneInstance.searchBox.update(primarySat, timeManagerInstance.selectedDate);
 
@@ -807,6 +769,9 @@ export class WebGLRenderer {
     this.updatePrimarySatellite_();
     this.updateSecondarySatellite_();
     ServiceLocator.getMainCamera().update(this.dt);
+    // Update secondary viewports (rects + camera state) before the projection
+    // rebuild so the main camera's viewport-aware aspect ratio is current
+    ViewportManager.getInstance().update(this.dt);
     // Rebuild projection matrix after camera update so FOV lerps are reflected immediately
     this.updatePMatrix();
 
@@ -869,7 +834,7 @@ export class WebGLRenderer {
 
     for (let i = 0; i < 16; i++) {
       if (isNaN(projectionMatrix[i])) {
-        const fov = settingsManager.fieldOfView;
+        const fov = mainCamera.fov;
         const aspect = this.gl ? this.gl.drawingBufferWidth / this.gl.drawingBufferHeight : 'no-gl';
         const cameraType = mainCamera.cameraType;
 

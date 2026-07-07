@@ -7,7 +7,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { ConsoleStyles, logWithStyle } from '../lib/build-error';
+import { ConsoleStyles, handleBuildError, logWithStyle } from '../lib/build-error';
 
 // Function to generate TypeScript code for the Keys object
 function generateKeysFromJSON(jsonObj: Record<string, string>, prefix: string = ''): string {
@@ -73,7 +73,7 @@ export function generateKeysFile(inputJsonPath: string, outputTsPath: string): v
     // Recursively search for 'locales' directories containing 'en.json'
     const enJsonPaths: string[] = findLocalesDirs(path.dirname(inputJsonPath));
 
-    console.log('Translation files found:', enJsonPaths);
+    logWithStyle(`Found ${enJsonPaths.length} en.json translation files`, ConsoleStyles.DEBUG);
 
     // Read all the json files and merge them into one object
     const jsonData: Record<string, string> = {};
@@ -133,9 +133,13 @@ export function t7e(key: TranslationKey, options?: Record<string, any>): string 
 
     // Write the TypeScript file
     fs.writeFileSync(outputTsPath, tsContent);
-    console.log(`Generated Keys file at ${outputTsPath}`);
+    logWithStyle(`Generated Keys file at ${outputTsPath}`, ConsoleStyles.DEBUG);
 
   } catch (error) {
-    console.error('Error generating Keys file:', error);
+    /*
+     * A stale keys.ts breaks the type-checked t7e() calls at compile time, so a
+     * failure here must fail the script instead of being logged and swallowed.
+     */
+    handleBuildError(error);
   }
 }

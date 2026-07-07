@@ -130,8 +130,14 @@ export class DateTimeManager extends KeepTrackPlugin {
     this.calendar.setDate(simulationDateObj);
     this.calendar.toggleDatePicker();
 
-    if (!this.isEditTimeOpen) {
-      const datetimeInput = getEl('datetime-input');
+    const datetimeInput = getEl('datetime-input');
+
+    if (this.isEditTimeOpen) {
+      if (datetimeInput) {
+        datetimeInput.style.display = 'none';
+      }
+      this.isEditTimeOpen = false;
+    } else {
       const datetimeInputTb = getEl(this.dateTimeInputTbId_);
 
       if (datetimeInput && datetimeInputTb) {
@@ -139,7 +145,6 @@ export class DateTimeManager extends KeepTrackPlugin {
         (datetimeInputTb as HTMLInputElement).focus();
         this.isEditTimeOpen = true;
       }
-
     }
   }
 
@@ -196,14 +201,11 @@ export class DateTimeManager extends KeepTrackPlugin {
     if (datetimeInputTb && !isThisNode()) {
       datetimeInputTb.addEventListener('change', () => {
         if (this.isEditTimeOpen) {
-          // const datetimeInputElement = document.getElementById('datetime-input');
+          const datetimeInputElement = document.getElementById('datetime-input');
 
-          /*
-           * TODO: Why was this originally !datetimeInputElement???
-           * if (datetimeInputElement) {
-           * datetimeInputElement.style.display = 'none';
-           * }
-           */
+          if (datetimeInputElement) {
+            datetimeInputElement.style.display = 'none';
+          }
           setTimeout(() => {
             this.isEditTimeOpen = false;
           }, 500);

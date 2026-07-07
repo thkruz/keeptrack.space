@@ -10,6 +10,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { settingsManager } from '@app/settings/settings';
 import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { BaseObject, Degrees, Radians, Satellite, Star } from '@ootk/src/main';
 import { defaultMisl, defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -323,6 +324,29 @@ describe('SearchManager', () => {
       settingsManager.searchableTypes = { ...settingsManager.searchableTypes, satellite: false };
       searchManager.doSearch('ZARYA');
       expect(settingsManager.lastSearchResults).toEqual([]);
+    });
+
+    it('hides a MIRV child until it separates, then includes it', () => {
+      const rv = new MissileObject({
+        id: 4, name: 'RV_4', active: true, desc: 'Test (TST)',
+        latList: [0, 0], lonList: [0, 0], altList: [100, 200],
+        timeList: [0, 1000], startTime: 0, maxAlt: 200, country: 'USA', launchVehicle: 'TST',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
+
+      objects.push(rv);
+      wireUpServiceLocator(buildCatalog(objects));
+
+      // Before separation the child is hidden, so the RV_ search must not list it.
+      const visibleSpy = vi.spyOn(rv, 'isVisibleNow').mockReturnValue(false);
+
+      searchManager.doSearch('RV_');
+      expect(settingsManager.lastSearchResults).toEqual([]);
+
+      // Once it separates it appears (the plugin re-runs this search at that moment).
+      visibleSpy.mockReturnValue(true);
+      searchManager.doSearch('RV_');
+      expect(settingsManager.lastSearchResults).toEqual([4]);
     });
   });
 });

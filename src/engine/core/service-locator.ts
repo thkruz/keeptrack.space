@@ -15,11 +15,28 @@ import type { DotsManager } from '../rendering/dots-manager';
 import type { LineManager } from '../rendering/line-manager';
 import type { MeshManager } from '../rendering/mesh-manager';
 import type { SatLabelManager } from '../rendering/sat-label-manager';
+import type { ViewportManager } from '../rendering/viewport-manager';
 import type { WebGLRenderer } from '../rendering/webgl-renderer';
 import type { Scene } from './scene';
 import type { TimeManager } from './time-manager';
 
 export class ServiceLocator {
+  /**
+   * Camera currently being rendered by a viewport pass. While set (synchronously,
+   * inside the render loop only), getMainCamera() resolves to it so all draw code
+   * transparently uses the correct camera in multi-viewport rendering. Outside a
+   * render pass this MUST be null. Managed by ViewportManager via try/finally.
+   */
+  private static activeRenderCamera_: Camera | null = null;
+
+  static setActiveRenderCamera(camera: Camera | null): void {
+    ServiceLocator.activeRenderCamera_ = camera;
+  }
+
+  static getActiveRenderCamera(): Camera | null {
+    return ServiceLocator.activeRenderCamera_;
+  }
+
   static readonly getSoundManager = () => Container.getInstance().get<SoundManager>(Singletons.SoundManager) as SoundManager | null;
   static readonly getRenderer = () => Container.getInstance().get<WebGLRenderer>(Singletons.WebGLRenderer);
   static readonly getScene = () => Container.getInstance().get<Scene>(Singletons.Scene);
@@ -35,7 +52,8 @@ export class ServiceLocator {
   static readonly getSensorMath = () => Container.getInstance().get<SensorMath>(Singletons.SensorMath);
   static readonly getLineManager = () => Container.getInstance().get<LineManager>(Singletons.LineManager);
   static readonly getHoverManager = () => Container.getInstance().get<HoverManager>(Singletons.HoverManager);
-  static readonly getMainCamera = () => Container.getInstance().get<Camera>(Singletons.MainCamera);
+  static readonly getMainCamera = () => ServiceLocator.activeRenderCamera_ ?? Container.getInstance().get<Camera>(Singletons.MainCamera);
+  static readonly getViewportManager = () => Container.getInstance().get<ViewportManager>(Singletons.ViewportManager) as ViewportManager | null;
   static readonly getMeshManager = () => Container.getInstance().get<MeshManager>(Singletons.MeshManager);
   static readonly getSatLabelManager = () => Container.getInstance().get<SatLabelManager>(Singletons.SatLabelManager);
 }

@@ -1,0 +1,73 @@
+{
+  "plugins": {
+    "PluginManagerPlugin": {
+      "bottomIconLabel": "Plugins",
+      "title": "Plugin Manager",
+      "helpBody": "Enable or disable built-in plugins and review installed third-party plugins.",
+      "commandPalette": {
+        "open": "Open Plugin Manager"
+      },
+      "tabs": {
+        "installed": "Installed",
+        "browse": "Browse",
+        "develop": "Develop"
+      },
+      "browse": {
+        "loading": "Loading available plugins…",
+        "empty": "No plugins are listed in the registry yet.",
+        "error": "Could not load the plugin registry.",
+        "by": "by",
+        "install": "Install",
+        "installing": "Installing…",
+        "installed": "Installed. Rebuilding — the app will reload shortly.",
+        "installedBtn": "Installed",
+        "installFailed": "Install failed. See the terminal for details.",
+        "copyCommand": "Copy install command"
+      },
+      "develop": {
+        "introHeading": "What is a plugin?",
+        "intro": "KeepTrack is built from dozens of standalone plugins, and you can write your own. A plugin is a small package that adds a drawer icon, menu, overlay, or tool. Plugins are developed and installed with the plugin CLI from a KeepTrack checkout.",
+        "createHeading": "1. Create",
+        "create": "Scaffold a new plugin (interactive: it asks for a name, kind, and description).",
+        "previewHeading": "2. Preview",
+        "preview": "Boot the app with only your plugin enabled, with live reload as you edit.",
+        "rulesHeading": "The two rules",
+        "rule1": "Your entry file must export a class matching className in keeptrack-plugin.json.",
+        "rule2": "That class's readonly id must equal its configKey.",
+        "docsLink": "Open the plugin development guide"
+      },
+      "reload": {
+        "pending": "{count} change(s) pending",
+        "button": "Reload"
+      },
+      "labels": {
+        "search": "Search plugins",
+        "builtInSection": "Built-in Plugins",
+        "externalSection": "External Plugins",
+        "externalEmpty": "No external plugins installed. Add one with the plugin CLI.",
+        "installSection": "Install a Plugin",
+        "installHint": "Installing a plugin requires rebuilding KeepTrack. Copy this command and run it in your KeepTrack checkout.",
+        "gitUrl": "Git URL",
+        "source": "Source"
+      },
+      "badge": {
+        "compatible": "Compatible",
+        "incompatible": "Check version"
+      },
+      "buttons": {
+        "copyInstall": "Copy Install Command"
+      },
+      "toasts": {
+        "installCopied": "Install command copied to clipboard!",
+        "commandCopied": "Command copied to clipboard!"
+      },
+      "help": {
+        "overview": "The Plugin Manager lets you turn KeepTrack's built-in plugins on or off and see which third-party plugins are installed. Because plugins load when the app starts, changes take effect after a reload.",
+        "togglesHeading": "Enabling and disabling",
+        "toggles": "Flip a switch to enable or disable a plugin, then click Reload to apply. Always-on infrastructure plugins are locked and cannot be disabled.",
+        "externalHeading": "External plugins",
+        "external": "Third-party plugins installed via the plugin CLI appear in their own section with their version, a compatibility badge, and a link to their source. To install a new one, copy the command from the Install section and run it in your KeepTrack checkout."
+      }
+    }
+  }
+}

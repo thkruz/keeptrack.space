@@ -34,19 +34,22 @@ import './missile-simulator.css';
 /** Shorthand for this plugin's locale keys. */
 const l = (key: string): string => t7e(`plugins.MissileSimulatorPlugin.${key}` as Parameters<typeof t7e>[0]);
 
-/** Maps a preset "Type of Attack" value to its scripted mass-raid simulation file. */
+/**
+ * Maps a preset "Type of Attack" value to its scripted mass-raid simulation file.
+ * Regenerate every file here with `npm run missile:scenarios -- --all` (the ids
+ * live in scripts/missile-scenario/scenario-config.ts).
+ */
 const PRESET_RAIDS: Readonly<Record<number, string>> = {
-  1: 'simulation/Russia2USA.json',
-  2: 'simulation/Russia2USAalt.json',
-  3: 'simulation/China2USA.json',
-  4: 'simulation/NorthKorea2USA.json',
-  5: 'simulation/USA2Russia.json',
-  6: 'simulation/USA2China.json',
-  7: 'simulation/USA2NorthKorea.json',
+  1: 'simulation/Exchange_Iran_Israel.json',
+  2: 'simulation/Exchange_Russia_Ukraine.json',
+  3: 'simulation/Exchange_India_Pakistan.json',
+  4: 'simulation/Exchange_USA_Russia.json',
+  5: 'simulation/Exchange_USA_China.json',
+  6: 'simulation/Exchange_USA_NorthKorea.json',
+  7: 'simulation/Exchange_China_India.json',
+  8: 'simulation/GlobalThermonuclearWar.json',
 };
 
-/** Hard cap on simultaneous missiles, mirrored from the 500-slot reservation in the catalog. */
-const MAX_MISSILES = 500;
 /** Default warhead (MIRV) count if the user leaves the field at its placeholder. */
 const DEFAULT_WARHEADS = 3;
 
@@ -154,7 +157,9 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
           out += `<optgroup label="${l(`groups.${group}`)}">`;
         }
       }
-      out += `<option value="${target.id}">${l(`targets.${target.labelKey}`)}</option>`;
+      const label = target.label ?? l(`targets.${target.labelKey}`);
+
+      out += `<option value="${target.id}">${label}</option>`;
     }
     if (currentGroup) {
       out += '</optgroup>';
@@ -175,13 +180,18 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
                 <div class="input-field col s12">
                   <select id="ms-type">
                     <option value="0">${l('types.customMissile')}</option>
-                    <option value="1">${l('types.russiaToUsa')}</option>
-                    <option value="2">${l('types.russiaToUsaSubs')}</option>
-                    <option value="3">${l('types.chinaToUsa')}</option>
-                    <option value="4">${l('types.northKoreaToUsa')}</option>
-                    <option value="5">${l('types.usaToRussia')}</option>
-                    <option value="6">${l('types.usaToChina')}</option>
-                    <option value="7">${l('types.usaToNorthKorea')}</option>
+                    <optgroup label="${l('typeGroups.regional')}">
+                      <option value="1">${l('types.exchangeIranIsrael')}</option>
+                      <option value="2">${l('types.exchangeRussiaUkraine')}</option>
+                      <option value="3">${l('types.exchangeIndiaPakistan')}</option>
+                    </optgroup>
+                    <optgroup label="${l('typeGroups.exchanges')}">
+                      <option value="4">${l('types.exchangeUsaRussia')}</option>
+                      <option value="5">${l('types.exchangeUsaChina')}</option>
+                      <option value="6">${l('types.exchangeUsaNorthKorea')}</option>
+                      <option value="7">${l('types.exchangeChinaIndia')}</option>
+                      <option value="8">${l('types.globalThermonuclearWar')}</option>
+                    </optgroup>
                   </select>
                   <label>${l('labels.typeOfAttack')}</label>
                 </div>
@@ -384,7 +394,7 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
         });
       } else {
         // Single warhead: next free slot in the 500-missile reservation at the catalog tail.
-        const slot = ServiceLocator.getCatalogManager().missileSats - (MAX_MISSILES - missileManager.missilesInUse);
+        const slot = ServiceLocator.getCatalogManager().missileSats - (settingsManager.maxMissiles - missileManager.missilesInUse);
 
         missileManager.createMissile(
           launch.lat,
@@ -497,15 +507,39 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
     this.updateStatus_();
   }
 
+  /** Visible reentry-vehicle count last frame; -1 when no missiles are active. */
+  private lastVisibleRvCount_ = -1;
+
   private updateLoop_(): void {
     if (typeof missileManager === 'undefined' || missileManager.missileArray.length === 0) {
+      this.lastVisibleRvCount_ = -1;
+
       return;
     }
 
     const orbitManagerInstance = ServiceLocator.getOrbitManager();
+    let visibleCount = 0;
 
     for (const missile of missileManager.missileArray) {
       orbitManagerInstance.updateOrbitBuffer(missile.id);
+      if (missile.isVisibleNow()) {
+        visibleCount++;
+      }
+    }
+
+    // MIRV children appear at separation (apogee) and vanish again on rewind, so the
+    // set of visible reentry vehicles changes at those moments. When it does, re-run
+    // the RV_ search so the results menu tracks the dots (the search filter hides the
+    // children until they separate). Only refresh while RV_ is the active search, so
+    // a user searching for something else - or a specific RV - is left alone.
+    if (visibleCount !== this.lastVisibleRvCount_) {
+      this.lastVisibleRvCount_ = visibleCount;
+
+      const searchManager = ServiceLocator.getUiManager().searchManager;
+
+      if (searchManager?.getCurrentSearch().toUpperCase() === 'RV_') {
+        searchManager.doSearch('RV_');
+      }
     }
   }
 
@@ -516,7 +550,7 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
     if (statusEl) {
       statusEl.textContent = l('msgs.missilesActive')
         .replace('{n}', missileManager.missilesInUse.toString())
-        .replace('{max}', MAX_MISSILES.toString());
+        .replace('{max}', settingsManager.maxMissiles.toString());
     }
 
     const clearBtn = getEl('clearMissilesBtn') as HTMLButtonElement | null;

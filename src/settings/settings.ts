@@ -95,8 +95,6 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   satShader: 'graphics',
   vertShadersSize: 'graphics',
   pickingDotSize: 'graphics',
-  zFar: 'graphics',
-  zNear: 'graphics',
   meshOverride: 'graphics',
   meshRotation: 'graphics',
   meshListOverride: 'graphics',
@@ -363,6 +361,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   settingsManager: 'core',
   isAutoStart: 'core',
   isDisableLoginGate: 'core',
+  isDisableOnboarding: 'core',
   onLoadCb: 'core',
 };
 
@@ -559,6 +558,11 @@ export class SettingsManager {
     MobileManager.checkMobileMode();
     this.setEmbedOverrides_();
     this.setColorSettings_();
+
+    // Lowest-precedence plugin enable/disable layer: the user's Plugin Manager
+    // toggles. Loaded before URL params / settingsOverride / strict-list so those
+    // deterministically win (e.g. a dev-harness boot overrides stale toggles).
+    this.loadPersistedPluginToggles_();
 
     const params = this.loadOverridesFromUrl_();
 
@@ -835,6 +839,37 @@ export class SettingsManager {
           this.plugins[key] = { ...this.plugins[key], enabled: false };
         }
       }
+    }
+  }
+
+  /**
+   * Apply the user's persisted per-plugin enable/disable overrides (set from the
+   * Plugin Manager UI). Stored as a sparse { configKey: boolean } diff from the
+   * manifest defaults. alwaysEnabled infrastructure plugins are never toggled.
+   */
+  private loadPersistedPluginToggles_() {
+    const raw = PersistenceManager.getInstance().getItem(StorageKey.PLUGIN_ENABLE_OVERRIDES);
+
+    if (!raw) {
+      return;
+    }
+
+    let overrides: Record<string, boolean>;
+
+    try {
+      overrides = JSON.parse(raw) as Record<string, boolean>;
+    } catch {
+      return;
+    }
+
+    const alwaysEnabled = new Set(pluginManifest.filter((d) => d.alwaysEnabled).map((d) => d.configKey));
+    const plugins = this.plugins as unknown as Record<string, { enabled?: boolean } | undefined>;
+
+    for (const [key, enabled] of Object.entries(overrides)) {
+      if (alwaysEnabled.has(key)) {
+        continue;
+      }
+      plugins[key] = { ...plugins[key], enabled };
     }
   }
 

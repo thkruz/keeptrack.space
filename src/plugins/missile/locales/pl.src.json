@@ -21,7 +21,24 @@
         "northKoreaToUsa": "Korea Północna na USA",
         "usaToRussia": "USA na Rosję",
         "usaToChina": "USA na Chiny",
-        "usaToNorthKorea": "USA na Koreę Północną"
+        "usaToNorthKorea": "USA na Koreę Północną",
+        "exchangeUsaRussia": "Pełna wymiana uderzeń: USA / Rosja",
+        "exchangeUsaChina": "Pełna wymiana uderzeń: USA / Chiny",
+        "exchangeUsaNorthKorea": "Wymiana uderzeń: USA / Korea Północna",
+        "exchangeChinaIndia": "Wymiana uderzeń: Chiny / Indie",
+        "exchangeRussiaUkraine": "Wymiana uderzeń: Rosja / Ukraina",
+        "exchangeIndiaPakistan": "Wymiana uderzeń: Indie / Pakistan",
+        "globalThermonuclearWar": "Globalna wojna termojądrowa",
+        "iranToIsrael": "Iran na Izrael",
+        "israelToIran": "Izrael na Iran",
+        "exchangeIranIsrael": "Wymiana uderzeń: Iran / Izrael",
+        "russiaToUkraine": "Rosja na Ukrainę",
+        "ukraineToRussia": "Ukraina na Rosję"
+      },
+      "typeGroups": {
+        "strategic": "Uderzenia strategiczne",
+        "exchanges": "Pełne wymiany uderzeń",
+        "regional": "Konflikty regionalne"
       },
       "groups": {
         "russia": "Rosja",
@@ -31,7 +48,13 @@
         "france": "Francja",
         "northKorea": "Korea Północna",
         "natoCountries": "Kraje NATO",
-        "nonNatoCountries": "Kraje spoza NATO"
+        "nonNatoCountries": "Kraje spoza NATO",
+        "usMilitaryBases": "Bazy wojskowe USA",
+        "usLargestCities": "50 największych miast USA",
+        "russiaMilitaryBases": "Rosyjskie bazy wojskowe",
+        "russiaLargestCities": "50 największych rosyjskich miast",
+        "chinaMilitaryBases": "Chińskie bazy wojskowe",
+        "chinaLargestCities": "50 największych chińskich miast"
       },
       "attackers": {
         "aleysk": "Alejsk",

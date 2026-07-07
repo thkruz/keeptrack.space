@@ -168,7 +168,7 @@ describe('MouseInput handlers', () => {
       camera.state.isDragging = true;
       camera.state.screenDragPoint = [0, 0];
 
-      m().canvasMouseMoveFire_(camera, { clientX: 50, clientY: 60 } as never);
+      m().canvasMouseMoveFire_({ clientX: 50, clientY: 60 } as never);
 
       expect(camera.state.mouseX).toBe(50);
       expect(camera.state.mouseY).toBe(60);

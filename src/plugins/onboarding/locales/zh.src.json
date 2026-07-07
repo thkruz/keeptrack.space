@@ -1,0 +1,321 @@
+{
+  "plugins": {
+    "OnboardingPlugin": {
+      "bottomIconLabel": "新手入门",
+      "title": "新手入门",
+      "helpBody": "“快速入门”菜单记录你在 KeepTrack 中的首批任务，并可重新启动引导教程。基础教程涵盖地球、搜索和时间控制。进阶教程是一个由短章节组成的中心，涵盖传感器、关注列表、时间、分析和可视化。",
+      "stepLabel": "第 {current} 步，共 {total} 步",
+      "buttons": {
+        "next": "下一步",
+        "back": "上一步",
+        "skipTour": "跳过游览",
+        "skipConfirm": "跳过剩余的游览?",
+        "skipYes": "是，跳过",
+        "skipNo": "继续",
+        "startTour": "开始游览",
+        "exploreOnMyOwn": "自己探索",
+        "keepGoing": "继续: 进阶游览",
+        "finishUp": "够了，结束吧",
+        "createAccount": "创建免费账户",
+        "maybeLater": "以后再说",
+        "doItForMe": "帮我完成",
+        "openIt": "打开"
+      },
+      "welcome": {
+        "title": "欢迎使用 KeepTrack",
+        "body": "实时追踪轨道上的数千个物体。只需两分钟即可掌握基础操作。",
+        "personaQuestion": "你为什么使用 KeepTrack?"
+      },
+      "personas": {
+        "explorer": "只是探索太空",
+        "student": "学生或教师",
+        "operator": "卫星操作员或分析师",
+        "developer": "开发者或 API 用户"
+      },
+      "steps": {
+        "b1Globe": {
+          "title": "你正在实时观看地球",
+          "body": "每个点都是此刻真实在轨的物体。点击并拖动即可旋转地球。"
+        },
+        "b2Zoom": {
+          "title": "旋转与缩放",
+          "body": "滚动滚轮进行缩放。右键点击任何可见对象可获得更多选项。"
+        },
+        "b3Search": {
+          "title": "查找卫星",
+          "body": "在搜索框中输入 ISS，找到国际空间站。"
+        },
+        "b4Select": {
+          "title": "选择国际空间站",
+          "body": "点击搜索结果即可选中它，镜头会飞向该卫星。"
+        },
+        "b5Infobox": {
+          "title": "信息面板",
+          "body": "所选物体的一切信息: 轨道、尺寸、国家和任务数据都在这里。"
+        },
+        "b6Time": {
+          "title": "掌控时间",
+          "body": "使用时间控制加速、暂停或回放模拟。试着改变速度，观察轨道的运动。"
+        },
+        "b7Drawer": {
+          "title": "你的工具箱在这里",
+          "body": "KeepTrack 的所有工具都在这个抽屉里。进阶游览会带你认识其中的重点。"
+        }
+      },
+      "bridge": {
+        "title": "基础已掌握",
+        "body": "想要操作员工具箱吗? 传感器、关注列表和键盘快捷操作。大约还需两分钟。",
+        "recap1": "找到并选中了一颗卫星",
+        "recap2": "阅读了它的实时轨道数据",
+        "recap3": "控制了模拟时间"
+      },
+      "account": {
+        "title": "保存你的进度?",
+        "body": "免费账户让你的配置随身携带，任何设备都能用。",
+        "bodyPower": "免费账户会把你刚设置的关注列表和传感器带到任何设备上。",
+        "benefit1": "跨设备同步设置和关注列表",
+        "benefit2": "移除广告",
+        "benefit3": "免费解锁完整的 Pro 工具集"
+      },
+      "toasts": {
+        "restartHint": "你可以随时从新手入门菜单重新启动游览。",
+        "accountCreated": "欢迎加入。同步已开启。",
+        "finished": "游览完成。你的首批任务在抽屉中等着你。",
+        "allChaptersDone": "进阶教程完成。所有章节都已完成。"
+      },
+      "card": {
+        "title": "新手入门",
+        "allSet": "全部完成!",
+        "dismiss": "关闭"
+      },
+      "checklist": {
+        "powerTour": "完成一个进阶教程章节",
+        "watchlist3": "向关注列表添加 3 颗卫星",
+        "selectSensor": "选择一个传感器并查看其覆盖范围",
+        "lookAngles": "查看一次过境的观测角",
+        "colorScheme": "更换配色方案"
+      },
+      "menu": {
+        "missionsLabel": "首批任务",
+        "toursLabel": "引导游览",
+        "restoreCard": "重新显示新手入门卡片"
+      },
+      "commands": {
+        "startTour": "开始教程",
+        "startPowerTour": "打开进阶教程",
+        "openChecklist": "打开新手入门清单"
+      },
+      "settings": {
+        "showOnFirstRun": "为新用户显示教程",
+        "restartTutorial": "从头重新开始引导游览",
+        "restartTutorialButton": "重新开始教程"
+      },
+      "chapters": {
+        "essentials": {
+          "steps": {
+            "drawerGroups": {
+              "title": "应用抽屉",
+              "body": "工具按任务分组。折叠不用的分组，最近使用的工具会出现在顶部。按 Tab 键固定或收起侧栏。"
+            },
+            "commandPalette": {
+              "title": "命令面板",
+              "body": "按 Ctrl+Shift+K 即可按名称跳转到任何工具或卫星。这是在 KeepTrack 中最快的操作方式。"
+            },
+            "utility": {
+              "title": "快速开关",
+              "body": "相机模式、图层和显示开关都在这个停靠栏中，始终一键可达。"
+            },
+            "help": {
+              "title": "帮助无处不在",
+              "body": "打开设置微调应用，在任何菜单中按 Shift+F1 获取上下文帮助。"
+            }
+          },
+          "title": "抽屉栏基础",
+          "description": "抽屉栏、命令面板、快速开关和帮助"
+        },
+        "sensors": {
+          "title": "传感器与覆盖",
+          "description": "选择传感器、读懂覆盖范围、构建自己的传感器",
+          "demoCustomSensorName": "演示传感器",
+          "steps": {
+            "openList": {
+              "title": "打开传感器列表",
+              "body": "全球各地的地面雷达和望远镜为 KeepTrack 提供数据。从抽屉栏打开传感器列表。"
+            },
+            "selectSensor": {
+              "title": "选择一个传感器",
+              "body": "从列表中挑选任意雷达或望远镜。它的位置和视场会加载到地球上。"
+            },
+            "coverage": {
+              "title": "读懂覆盖范围",
+              "body": "彩色圆锥是传感器投射到太空的视场。凡是穿过它的目标都能从该站点跟踪。"
+            },
+            "fovLayer": {
+              "title": "切换视场图层",
+              "body": "这个开关可以绘制或隐藏传感器的视场，让画面保持整洁。"
+            },
+            "sensorInfo": {
+              "title": "传感器详情",
+              "body": "打开传感器信息，查看站点的距离、频段和类型，以及这些数字对跟踪意味着什么。"
+            },
+            "customSensor": {
+              "title": "构建自定义传感器",
+              "body": "设置位置和视场范围，然后按\"替换传感器\"让你自己的站点成为当前传感器。KeepTrack 会像对待真实传感器一样对待它。"
+            },
+            "multiSensor": {
+              "title": "多传感器观测角",
+              "body": "并排比较所选卫星何时从各个传感器可见。如果之前没有选中卫星，我们已为你选好一颗。"
+            }
+          }
+        },
+        "watchlist": {
+          "title": "关注列表与过境",
+          "description": "跟踪目标并规划它们的下次过境",
+          "steps": {
+            "pickTarget": {
+              "title": "选一个目标",
+              "body": "搜索你关心的卫星，比如国际空间站，并选中它。"
+            },
+            "addToWatchlist": {
+              "title": "加入关注列表",
+              "body": "把选中的卫星放进关注列表，KeepTrack 会替你盯着它。"
+            },
+            "overlay": {
+              "title": "过境总览",
+              "body": "总览会实时列出关注列表在当前传感器上空的即将过境。"
+            },
+            "lookAngles": {
+              "title": "下次过境的观测角",
+              "body": "打开观测角，获取目标下次穿越传感器天空时的方位角、仰角和距离。"
+            },
+            "bestPasses": {
+              "title": "最佳过境",
+              "body": "最佳过境对每次即将到来的过境排序，让你知道哪些值得动用望远镜。"
+            },
+            "timelines": {
+              "title": "过境即日程",
+              "body": "传感器时间线把每次过境排进日程表，一眼就能规划整场观测。"
+            }
+          }
+        },
+        "time": {
+          "title": "时间与场景",
+          "description": "操控模拟时间并保存配置",
+          "steps": {
+            "speedUp": {
+              "title": "加速时间",
+              "body": "把推演速率调到 1 倍以上，看轨道动起来。时钟控制在顶部。"
+            },
+            "pauseRewind": {
+              "title": "暂停与倒带",
+              "body": "使用录像机式按钮暂停模拟或让它倒着走。"
+            },
+            "jumpToMoment": {
+              "title": "跳到某一时刻",
+              "body": "用日历设定精确的日期和时间，查看那一刻的天空。"
+            },
+            "timeSlider": {
+              "title": "拖动时间轴",
+              "body": "拖动时间滑块，在几分钟或几小时间前后扫动。"
+            },
+            "scenarios": {
+              "title": "保存场景",
+              "body": "场景会保存当前的传感器、卫星和时间，之后可以重新加载整套配置。"
+            },
+            "backToNow": {
+              "title": "回到现在",
+              "body": "重置偏移和速率即可回到实时。模拟时间和实时时间永远只差一次点击。"
+            }
+          }
+        },
+        "analysis": {
+          "title": "分析工具",
+          "description": "轨道搜索、筛选、图表和假设推演",
+          "steps": {
+            "advancedSearch": {
+              "title": "按轨道搜索",
+              "body": "用轨道参数而不是名字查找卫星：高度、倾角、周期等等。"
+            },
+            "filterCatalog": {
+              "title": "筛选目录",
+              "body": "把天空精简到要紧的部分：按目标类型、国家或轨道类型筛选。"
+            },
+            "polarPlot": {
+              "title": "极坐标图",
+              "body": "以传感器视角画在方位-仰角刻度盘上的过境。一眼读懂过境形态。"
+            },
+            "dops": {
+              "title": "GPS 精度 (DOPs)",
+              "body": "精度衰减显示任意地点和时间的 GPS 定位有多精准。"
+            },
+            "whatIf": {
+              "title": "假设推演工具",
+              "body": "模拟解体、筛查近距离接近或建模新发射。分析组里就有这些假设推演工具。"
+            }
+          }
+        },
+        "visualization": {
+          "title": "可视化与分享",
+          "description": "配色方案、相机视图和分享",
+          "steps": {
+            "colorSchemes": {
+              "title": "给天空上色",
+              "body": "配色方案按国家、类型、速度等给每个目标重新着色。现在就换一个试试。"
+            },
+            "flatMap": {
+              "title": "平面地图",
+              "body": "把地球展开成带实时地面轨迹的二维地图，经典的运控画面。"
+            },
+            "polarView": {
+              "title": "极坐标视图",
+              "body": "以传感器的视角看天空：从它的地平线绘出的全天穹顶。"
+            },
+            "backTo3d": {
+              "title": "回到 3D，再看夜晚",
+              "body": "回到 3D 地球，然后切换夜晚开关，看昼夜分界线移动。"
+            },
+            "screenshots": {
+              "title": "截图与视频",
+              "body": "把当前视图存成图片，或录制视频。截图工具就在这里。"
+            },
+            "share": {
+              "title": "分享视图",
+              "body": "分享菜单会生成一个链接，任何人打开都能复现你此刻的视图。"
+            }
+          }
+        }
+      },
+      "hub": {
+        "title": "进阶教程",
+        "body": "简短的实操章节。顺序随意，随时离开，随时从上次的位置继续。",
+        "progress": "已完成 {done} / {total} 个章节",
+        "steps": "{count} 步",
+        "minutes": "约 {minutes} 分钟",
+        "recommended": "推荐",
+        "close": "关闭",
+        "catalogMissing": "卫星目录未加载",
+        "allDone": "所有章节都已完成。你已拥有完整的操作员工具箱。"
+      },
+      "teasers": {
+        "signInCta": "免费登录以解锁",
+        "bestPass": {
+          "title": "最佳过境 (Pro)",
+          "body": "对关注列表在所选传感器上空的每次过境进行排序。几秒钟就能规划一整晚的观测。"
+        },
+        "dops": {
+          "title": "GPS 精度 (Pro)",
+          "body": "为任意地点和时间绘制精度衰减 (DOP)。在依赖 GPS 定位之前就知道它何时精准。"
+        },
+        "polarView": {
+          "title": "极坐标视图 (Pro)",
+          "body": "以传感器视角绘制的全天图。精确看到过境在天空中的轨迹。"
+        },
+        "flatMap": {
+          "title": "平面地图 (Pro)",
+          "body": "带实时地面轨迹的二维世界地图。经典的运控大屏画面，一目了然谁在哪片上空。"
+        }
+      },
+      "stepDone": "完成了，看看效果吧。"
+    }
+  }
+}

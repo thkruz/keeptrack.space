@@ -41,23 +41,28 @@ export class CameraInputHandler {
   }
 
   canvasMouseDown_(evt: MouseEvent) {
-    if (this.state.speedModifier === 1) {
+    // Only the main camera's handler is subscribed; it dispatches the drag
+    // start to whichever pane captured the pointer (multi-view input routing)
+    const camera = ServiceLocator.getViewportManager()?.getInputCamera() ?? this.camera;
+    const state = camera.state;
+
+    if (state.speedModifier === 1) {
       settingsManager.cameraMovementSpeed = 0.003;
       settingsManager.cameraMovementSpeedMin = 0.005;
     }
 
-    this.state.screenDragPoint = [this.state.mouseX, this.state.mouseY];
-    this.state.dragStartPitch = this.state.camPitch;
-    this.state.dragStartYaw = this.state.camYaw;
+    state.screenDragPoint = [state.mouseX, state.mouseY];
+    state.dragStartPitch = state.camPitch;
+    state.dragStartYaw = state.camYaw;
 
     if (evt.button === 0) {
-      this.state.isDragging = true;
+      state.isDragging = true;
     }
 
-    this.camera.transition.cancel();
-    this.state.isAutoPitchYawToTarget = false;
+    camera.transition.cancel();
+    state.isAutoPitchYawToTarget = false;
     if (!settingsManager.disableUI) {
-      this.camera.autoRotate(false);
+      camera.autoRotate(false);
     }
   }
 

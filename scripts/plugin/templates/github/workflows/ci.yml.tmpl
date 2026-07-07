@@ -1,0 +1,35 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the KeepTrack engine at this plugin's minimum supported version.
+      - name: Checkout KeepTrack
+        uses: actions/checkout@v4
+        with:
+          repository: thkruz/keeptrack.space
+          ref: __ENGINE_REF__
+
+      # Check out this plugin into the engine's external-plugins folder.
+      - name: Checkout plugin
+        uses: actions/checkout@v4
+        with:
+          path: src/plugins-external/__PLUGIN_PKG__
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - run: npm ci
+
+      # Validate + wire the plugin into the manifest (local add: no clone).
+      - run: npm run plugin -- add ./src/plugins-external/__PLUGIN_PKG__ --yes
+
+      - name: Typecheck (host + plugin)
+        run: npm run typecheck
+
+      - name: Test plugin
+        run: npm run plugin -- test __CONFIG_KEY__

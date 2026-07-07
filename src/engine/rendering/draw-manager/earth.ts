@@ -30,6 +30,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { GlUtils } from '@app/engine/rendering/gl-utils';
 import { GLSL3 } from '@app/engine/rendering/material';
+import { ViewportManager } from '@app/engine/rendering/viewport-manager';
 import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
@@ -456,10 +457,12 @@ export class Earth {
     const mainCam = ServiceLocator.getMainCamera();
 
     gl.uniformMatrix4fv(uniforms.u_pMvCamMatrix, false, ServiceLocator.getRenderer().projectionCameraMatrix);
-    gl.uniform3fv(uniforms.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     const isFlatMap = mainCam.cameraType === CameraType.FLAT_MAP;
     const isPolarView = mainCam.cameraType === CameraType.POLAR_VIEW;
+
+    // 2D projections reproject raw ECI in-shader; zero the world offset for them
+    gl.uniform3fv(uniforms.worldOffset, isFlatMap || isPolarView ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     gl.uniform1i(uniforms.u_flatMapMode, isFlatMap ? 1 : 0);
     gl.uniform1i(uniforms.u_polarViewMode, isPolarView ? 1 : 0);
@@ -498,7 +501,8 @@ export class Earth {
     gl.drawElements(gl.TRIANGLES, this.surfaceMesh.geometry.indexLength, this.surfaceMesh.geometry.indexType, 0);
 
     if (!settingsManager.isMobileModeEnabled) {
-      gl.disable(gl.SCISSOR_TEST);
+      // Restore the active viewport pass's scissor (disables it in single view)
+      ViewportManager.getInstance().applyPassScissor(gl);
     }
 
     gl.bindVertexArray(null);

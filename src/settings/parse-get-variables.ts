@@ -86,7 +86,6 @@ export const parseGetVariables = (params: string[], settingsManager: SettingsMan
         settingsManager.isShowSplashScreen = false;
         settingsManager.isDrawMilkyWay = false;
         settingsManager.isDrawLess = true;
-        settingsManager.zFar = 250000.0;
         settingsManager.noMeshManager = true;
         settingsManager.maxFieldOfViewMarkers = 1;
         settingsManager.earthDayTextureQuality = '512' as EarthDayTextureQuality;
@@ -106,7 +105,6 @@ export const parseGetVariables = (params: string[], settingsManager: SettingsMan
       case 'draw-less':
         settingsManager.isDrawMilkyWay = false;
         settingsManager.isDrawLess = true;
-        settingsManager.zFar = 250000.0;
         settingsManager.noMeshManager = true;
         break;
       case 'draw-more':

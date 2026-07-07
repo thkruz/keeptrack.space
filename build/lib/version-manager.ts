@@ -18,14 +18,14 @@ export class VersionManager {
    */
   public updateVersionReferences(packageJsonPath: string): void {
     try {
-      logWithStyle('Updating version information', ConsoleStyles.INFO);
+      logWithStyle('Updating version information', ConsoleStyles.DEBUG);
 
       const version = this.readVersionFromPackageJson_(packageJsonPath);
 
       this.updateReadmeVersion_(version);
       this.updateCitationVersion_(version);
 
-      logWithStyle(`Version ${version} has been set`, ConsoleStyles.SUCCESS);
+      logWithStyle(`Version ${version} has been set`, ConsoleStyles.DEBUG);
     } catch (error) {
       if (error instanceof BuildError) {
         throw error;
@@ -90,7 +90,7 @@ export class VersionManager {
       );
 
     this.fileManager.writeFile(swPath, updated);
-    logWithStyle(`Updated service worker (cache: KeepTrack-v${version}, build: ${buildId})`, ConsoleStyles.SUCCESS);
+    logWithStyle(`Updated service worker (cache: KeepTrack-v${version}, build: ${buildId})`, ConsoleStyles.DEBUG);
   }
 
   /**
@@ -106,7 +106,7 @@ export class VersionManager {
     );
 
     this.fileManager.writeFile(readmePath, updatedReadme);
-    logWithStyle(`Updated version in README.md to ${version}`, ConsoleStyles.SUCCESS);
+    logWithStyle(`Updated version in README.md to ${version}`, ConsoleStyles.DEBUG);
   }
 
   /**

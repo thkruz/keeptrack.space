@@ -186,6 +186,12 @@ export class PersistenceManager {
   // Version validation — preserved from original
   // ---------------------------------------------------------------------------
 
+  /**
+   * Keys that survive the version-bump wipe. Onboarding progress must not reset
+   * on every release, or the tour would replay for every existing user.
+   */
+  private static readonly PRESERVED_KEYS_: readonly StorageKey[] = [StorageKey.ONBOARDING_STATE, StorageKey.PLUGIN_ENABLE_OVERRIDES];
+
   validateStorage(): void {
     const sm = getSettingsManager_();
     const currentVersion = this.cache_.get(StorageKey.VERSION) ?? null;
@@ -197,8 +203,24 @@ export class PersistenceManager {
     ) {
       errorManagerInstance.warn(`Version mismatch: ${currentVersion} < ${sm.versionNumber}`);
       errorManagerInstance.warn('Clearing local storage...');
+
+      const preserved = new Map<StorageKey, string>();
+
+      for (const key of PersistenceManager.PRESERVED_KEYS_) {
+        const value = this.cache_.get(key);
+
+        if (typeof value === 'string') {
+          preserved.set(key, value);
+        }
+      }
+
       this.cache_.clear();
       this.primary_.clear();
+
+      for (const [key, value] of preserved) {
+        this.cache_.set(key, value);
+        this.primary_.write(key, value);
+      }
     }
 
     if (typeof sm?.versionNumber === 'string') {

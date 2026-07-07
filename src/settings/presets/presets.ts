@@ -21,7 +21,6 @@ import { SettingsManager } from '../settings';
 export class SettingsPresets {
   static loadPresetMillionYear(settings: SettingsManager) {
     settings.maxZoomDistance = <Kilometers>200000;
-    settings.zFar = 600000;
     settings.isDrawSun = false;
     settings.isDisablePlanets = true;
     settings.satShader.minSize = 2.0;
@@ -169,7 +168,6 @@ export class SettingsPresets {
     settings.satShader.minSize = 8.0;
     settings.isDisableAsciiCatalog = true;
     settings.plugins.VideoDirectorPlugin = { enabled: true };
-    settings.zFar = 1250000.0;
     settings.isDisablePlanets = false;
 
     settings.hiresMilkWay = true;

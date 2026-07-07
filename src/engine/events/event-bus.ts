@@ -90,10 +90,12 @@ export interface EngineEventMap {
   [EventBusEvent.scenarioBoundsChanged]: [unknown]; // ScenarioData
   [EventBusEvent.scenarioUpdated]: [unknown]; // ScenarioData
   [EventBusEvent.cameraTypeChanged]: [string]; // camera type name
+  [EventBusEvent.viewportLayoutChanged]: [string]; // ViewportLayout value
   [EventBusEvent.onColorBufferReady]: [];
   [EventBusEvent.onFovPredictionReady]: [];
   [EventBusEvent.textureStatusChanged]: [TextureStatus];
   [EventBusEvent.settingsMenuRefresh]: [];
+  [EventBusEvent.splashScreenHidden]: [];
 }
 
 interface EventBusRegisterParams<T extends EventBusEvent> {

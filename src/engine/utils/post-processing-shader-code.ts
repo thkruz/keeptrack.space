@@ -126,7 +126,6 @@ export const postProcessingShaderCode = {
   },
   occlusion: {
     vert: glsl`#version 300 es
-                #extension GL_EXT_frag_depth : enable
                 in vec3 a_position;
 
                 uniform mat4 uCamMatrix;

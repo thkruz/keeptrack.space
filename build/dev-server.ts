@@ -5,6 +5,7 @@ import { readFile, stat } from 'node:fs/promises';
 import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ConsoleStyles, logWithStyle } from './lib/build-error';
+import { handlePluginEndpoint } from './plugin-install-endpoint';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = resolve(__dirname, '..');
@@ -61,6 +62,13 @@ function startServer() {
       });
       sseClients.add(res);
       req.on('close', () => sseClients.delete(res));
+
+      return;
+    }
+
+    // One-click plugin install (dev-server only; localhost + same-origin guarded).
+    if (pathname.startsWith('/__plugin/')) {
+      await handlePluginEndpoint(req, res, pathname, rootDir);
 
       return;
     }
@@ -176,27 +184,43 @@ function runBuildWatch(args: string[]): void {
     buildArgs.push('--watch');
   }
 
+  // generate-translation.ts below already merges src/locales; the build must not redo it
+  if (!buildArgs.includes('--skip-locales')) {
+    buildArgs.push('--skip-locales');
+  }
+
   const cwd = rootDir;
 
-  // Run translations first, then start build in watch mode
-  const t7e = spawn('npx', ['tsx', './build/generate-translation.ts'], {
+  // Reconcile external plugins first (restore clones a fork committed + regenerate
+  // the manifest), then translations, then start the watch build. --skip-locales on
+  // sync avoids a redundant t7e run since we run generate-translation right after.
+  const sync = spawn('npx', ['tsx', './scripts/plugin/index.ts', 'sync', '--skip-locales'], {
     stdio: 'inherit',
     shell: true,
     cwd,
   });
 
-  t7e.on('close', (code) => {
-    if (code !== 0) {
-      logWithStyle(`Translation generation failed with code ${code}`, ConsoleStyles.ERROR);
-
-      return;
-    }
-
-    // Start build in watch mode (runs indefinitely)
-    spawn('npx', ['tsx', './build/build-manager.ts', ...buildArgs], {
+  sync.on('close', () => {
+    // Run translations, then start build in watch mode
+    const t7e = spawn('npx', ['tsx', './build/generate-translation.ts'], {
       stdio: 'inherit',
       shell: true,
       cwd,
+    });
+
+    t7e.on('close', (code) => {
+      if (code !== 0) {
+        logWithStyle(`Translation generation failed with code ${code}`, ConsoleStyles.ERROR);
+
+        return;
+      }
+
+      // Start build in watch mode (runs indefinitely)
+      spawn('npx', ['tsx', './build/build-manager.ts', ...buildArgs], {
+        stdio: 'inherit',
+        shell: true,
+        cwd,
+      });
     });
   });
 }

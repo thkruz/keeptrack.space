@@ -87,6 +87,13 @@ export class OemSatellite extends SpaceObject {
   isStable = true;
   source: string;
   orbitPathCache_: Float32Array | null = null;
+  /**
+   * Float64 anchor of orbitPathCache_, in the path's frame (ECEF in ECF mode,
+   * TEME otherwise). Path vertices are stored RELATIVE to this (subtracted in
+   * float64 before the float32 write) so full orbital magnitudes never hit
+   * float32 - see OrbitManager.orbitAnchors_ for why.
+   */
+  orbitPathAnchor_: [number, number, number] = [0, 0, 0];
   stateVectorIdx_: number = 0;
   dataBlockIdx_: number = 0;
   orbitFullPathCache_: Float32Array | null = null;
@@ -673,8 +680,9 @@ export class OemSatellite extends SpaceObject {
       return this.getSegmentsFromCache_();
     }
 
-    // Fallback: return the whole cached path
+    // Fallback: return the whole cached path (absolute coords, so zero anchor)
     this.orbitPathCache_ = this.orbitFullPathCache_;
+    this.orbitPathAnchor_ = [0, 0, 0];
 
     return this.orbitFullPathCache_!;
   }
@@ -696,6 +704,7 @@ export class OemSatellite extends SpaceObject {
     const pointsOut = new Float32Array(this.pointsTeme.flat());
 
     this.orbitPathCache_ = pointsOut;
+    this.orbitPathAnchor_ = [0, 0, 0]; // absolute coords until getSegmentsFromCache_ rebases
     this.orbitFullPathCache_ = pointsOut;
     this.epochCache_ = new Float64Array(epochs);
 
@@ -798,9 +807,15 @@ export class OemSatellite extends SpaceObject {
       pz = ecef.z;
     }
 
-    pointsOut[0] = px;
-    pointsOut[1] = py;
-    pointsOut[2] = pz;
+    // The interpolated current position doubles as the float64 anchor: every
+    // vertex is stored relative to it (float64 subtraction BEFORE the float32
+    // write) so full orbital magnitudes never hit float32 - see
+    // OrbitManager.orbitAnchors_ for why that matters.
+    this.orbitPathAnchor_ = [px, py, pz];
+
+    pointsOut[0] = 0;
+    pointsOut[1] = 0;
+    pointsOut[2] = 0;
     pointsOut[3] = 1.0;
 
     // Remaining points: use every raw ephemeris data point (no downsampling)
@@ -839,9 +854,9 @@ export class OemSatellite extends SpaceObject {
           z = ecef.z;
         }
 
-        pointsOut[i * 4] = x;
-        pointsOut[i * 4 + 1] = y;
-        pointsOut[i * 4 + 2] = z;
+        pointsOut[i * 4] = x - px;
+        pointsOut[i * 4 + 1] = y - py;
+        pointsOut[i * 4 + 2] = z - pz;
         pointsOut[i * 4 + 3] = 1.0;
       } else {
         // Past end of data — make invisible (alpha=0 hides the segment)

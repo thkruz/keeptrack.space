@@ -109,6 +109,7 @@
     "groupCameraModes": "Modalità fotocamera",
     "groupLayerToggles": "Interruttori livelli",
     "groupSettingsToggles": "Interruttori impostazioni",
+    "groupDevTools": "Strumenti di sviluppo",
     "groupAbout": "Informazioni"
   },
   "rightClickMenu": {

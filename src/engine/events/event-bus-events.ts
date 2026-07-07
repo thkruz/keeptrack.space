@@ -192,6 +192,11 @@ export enum EventBusEvent {
    */
   cameraTypeChanged = 'cameraTypeChanged',
   /**
+   * Emitted when the multi-view viewport layout changes (single, split, PIP).
+   * Parameters: (layout: ViewportLayout)
+   */
+  viewportLayoutChanged = 'viewportLayoutChanged',
+  /**
    * Emitted when the color worker has new color/pickable buffers ready.
    * ColorSchemeManager consumes the data and uploads to GPU.
    */
@@ -214,4 +219,10 @@ export enum EventBusEvent {
    * are collected automatically the first time the settings menu opens.
    */
   settingsMenuRefresh = 'settingsMenuRefresh',
+  /**
+   * Emitted when the loading/splash screen has actually been dismissed and the
+   * globe is visible (start button clicked or auto-start). Unlike onKeepTrackReady,
+   * this is the reliable "the user can see the app" signal.
+   */
+  splashScreenHidden = 'splashScreenHidden',
 }

@@ -150,8 +150,6 @@ export class Mesh {
       fragmentShaderHeader = '#version 100\n';
     }
 
-    fragmentShaderHeader += '#extension GL_EXT_frag_depth : enable\n';
-
     fragmentShaderHeader += `precision ${this.precision} float;\n\n`;
 
     if (!params.disabledUniforms?.viewMatrix) {

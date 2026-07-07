@@ -1,6 +1,5 @@
 // app/keeptrack/camera/camera-state.ts
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Degrees, GreenwichMeanSiderealTime, Kilometers, Radians } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
@@ -23,6 +22,12 @@ export class CameraState {
   /** This buffer distance is used for close up camera positioning - it MUST match the MAX_CAM_DIST_BUFFER (25km)
    */
   private camDistBuffer_: Kilometers = CameraState.MAX_CAM_DIST_BUFFER;
+  /**
+   * Per-selected-target minimum camera standoff (km), scaled to the object's physical size so the
+   * camera can approach small debris at true scale. Null falls back to the global
+   * settingsManager.minDistanceFromSatellite (which mobile overrides to 25 km).
+   */
+  minDistanceFromTarget: Kilometers | null = null;
   earthCenteredLastZoom = CameraState.DEFAULT_ZOOM;
   isZoomIn = false;
 
@@ -165,13 +170,21 @@ export class CameraState {
     this.zoomTargetChange();
   }
 
+  /**
+   * The minimum camera standoff (km) currently in effect: the per-target value if one was set on
+   * selection, otherwise the global setting (mobile overrides that to 25 km).
+   */
+  get effectiveMinDistanceFromTarget(): Kilometers {
+    return this.minDistanceFromTarget ?? settingsManager.minDistanceFromSatellite;
+  }
+
   get camDistBuffer(): Kilometers {
     return this.camDistBuffer_;
   }
 
   set camDistBuffer(val: Kilometers) {
     this.camDistBuffer_ = Math.min(
-      Math.max(val, settingsManager.minDistanceFromSatellite),
+      Math.max(val, this.effectiveMinDistanceFromTarget),
       settingsManager.maxZoomDistance,
     ) as Kilometers;
   }
@@ -251,7 +264,6 @@ export class CameraState {
 
       // Earth-centered mode — no satellite snapped or snapping disabled
       settingsManager.selectedColor = settingsManager.selectedColorFallback;
-      ServiceLocator.getRenderer().setFarRenderer();
       this.camZoomSnappedOnSat = false;
 
       // When unsnapping, restore zoom to where the user was before selecting

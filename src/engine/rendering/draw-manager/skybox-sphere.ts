@@ -230,8 +230,6 @@ export class SkyBoxSphere {
             }
 
             fragColor = texture(u_texMilkyWay, v_texcoord) * u_fMilkyWay * 0.1;
-
-            ${DepthManager.getLogDepthFragCode()}
         }
         `,
     vert: glsl`

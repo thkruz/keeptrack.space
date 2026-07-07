@@ -1,0 +1,321 @@
+{
+  "plugins": {
+    "OnboardingPlugin": {
+      "bottomIconLabel": "Začínáme",
+      "title": "Začínáme",
+      "helpBody": "Nabídka Začínáme sleduje vaše první mise v KeepTracku a umožňuje znovu spustit průvodce. Základní prohlídka pokrývá glóbus, vyhledávání a ovládání času. Pokročilá prohlídka je rozcestník krátkých kapitol o senzorech, seznamu sledování, čase, analýze a vizualizaci.",
+      "stepLabel": "{current} z {total}",
+      "buttons": {
+        "next": "Další",
+        "back": "Zpět",
+        "skipTour": "Přeskočit prohlídku",
+        "skipConfirm": "Přeskočit zbytek prohlídky?",
+        "skipYes": "Ano, přeskočit",
+        "skipNo": "Pokračovat",
+        "startTour": "Spustit prohlídku",
+        "exploreOnMyOwn": "Prozkoumám sám",
+        "keepGoing": "Pokračovat: pokročilá prohlídka",
+        "finishUp": "Stačí, dokončit",
+        "createAccount": "Vytvořit účet zdarma",
+        "maybeLater": "Možná později",
+        "doItForMe": "Udělej to za mě",
+        "openIt": "Otevřít"
+      },
+      "welcome": {
+        "title": "Vítejte v KeepTracku",
+        "body": "Sledujte tisíce objektů na oběžné dráze, živě. Základy se naučíte za dvě minuty.",
+        "personaQuestion": "Co vás do KeepTracku přivádí?"
+      },
+      "personas": {
+        "explorer": "Jen objevuji vesmír",
+        "student": "Student nebo pedagog",
+        "operator": "Operátor družic nebo analytik",
+        "developer": "Vývojář nebo uživatel API"
+      },
+      "steps": {
+        "b1Globe": {
+          "title": "Díváte se na Zemi, živě",
+          "body": "Každá tečka je skutečný objekt, který je právě na oběžné dráze. Kliknutím a tažením glóbus otočíte."
+        },
+        "b2Zoom": {
+          "title": "Otáčení a přiblížení",
+          "body": "Rolováním přibližujete a oddalujete. Pravé tlačítko nabízí další možnosti ke všemu, co vidíte."
+        },
+        "b3Search": {
+          "title": "Najděte družici",
+          "body": "Napište ISS do vyhledávacího pole a najděte Mezinárodní vesmírnou stanici."
+        },
+        "b4Select": {
+          "title": "Vyberte ISS",
+          "body": "Kliknutím na výsledek vyhledávání jej vyberete a kamera k němu přeletí."
+        },
+        "b5Infobox": {
+          "title": "Informační panel",
+          "body": "Vše o vybraném objektu: oběžná dráha, velikost, země a data mise jsou zde."
+        },
+        "b6Time": {
+          "title": "Ohněte čas",
+          "body": "Zrychlete, pozastavte nebo přetočte simulaci ovládáním času. Zkuste změnit rychlost a sledujte pohyb oběžných drah."
+        },
+        "b7Drawer": {
+          "title": "Tady je vaše sada nástrojů",
+          "body": "Každý nástroj KeepTracku je v tomto panelu. To nejlepší poznáte v pokročilé prohlídce."
+        }
+      },
+      "bridge": {
+        "title": "Základy máte za sebou",
+        "body": "Chcete operátorskou výbavu? Senzory, seznamy sledování a rychlou práci s klávesnicí. Zhruba dvě minuty navíc.",
+        "recap1": "Našli a vybrali jste družici",
+        "recap2": "Přečetli jste její živá orbitální data",
+        "recap3": "Ovládli jste čas simulace"
+      },
+      "account": {
+        "title": "Uložit váš postup?",
+        "body": "Bezplatný účet přenese vaše nastavení na jakékoli zařízení.",
+        "bodyPower": "Bezplatný účet přenese právě nastavený seznam sledování a senzor na jakékoli zařízení.",
+        "benefit1": "Synchronizace nastavení a seznamu sledování mezi zařízeními",
+        "benefit2": "Odstranění reklam",
+        "benefit3": "Bezplatné odemčení celé sady nástrojů Pro"
+      },
+      "toasts": {
+        "restartHint": "Prohlídku můžete kdykoli znovu spustit z nabídky Začínáme.",
+        "accountCreated": "Vítejte na palubě. Synchronizace je zapnutá.",
+        "finished": "Prohlídka dokončena. První mise na vás čekají v panelu.",
+        "allChaptersDone": "Pokročilá prohlídka dokončena. Všechny kapitoly jsou hotové."
+      },
+      "card": {
+        "title": "Začínáme",
+        "allSet": "Vše hotovo!",
+        "dismiss": "Zavřít"
+      },
+      "checklist": {
+        "powerTour": "Dokončete kapitolu pokročilé prohlídky",
+        "watchlist3": "Přidat 3 družice do seznamu sledování",
+        "selectSensor": "Vybrat senzor a zobrazit jeho pokrytí",
+        "lookAngles": "Zkontrolovat pozorovací úhly přeletu",
+        "colorScheme": "Změnit barevné schéma"
+      },
+      "menu": {
+        "missionsLabel": "První mise",
+        "toursLabel": "Prohlídky s průvodcem",
+        "restoreCard": "Znovu zobrazit kartu Začínáme"
+      },
+      "commands": {
+        "startTour": "Spustit výuku",
+        "startPowerTour": "Otevřít pokročilou prohlídku",
+        "openChecklist": "Otevřít seznam Začínáme"
+      },
+      "settings": {
+        "showOnFirstRun": "Zobrazit výuku novým uživatelům",
+        "restartTutorial": "Spustit prohlídku s průvodcem od začátku",
+        "restartTutorialButton": "Restartovat výuku"
+      },
+      "chapters": {
+        "essentials": {
+          "steps": {
+            "drawerGroups": {
+              "title": "Panel aplikací",
+              "body": "Nástroje jsou seskupeny podle úkolů. Nepoužívané skupiny sbalte; nedávné nástroje se objeví nahoře. Klávesou Tab lištu připnete nebo sbalíte."
+            },
+            "commandPalette": {
+              "title": "Paleta příkazů",
+              "body": "Stiskněte Ctrl+Shift+K a skočte na jakýkoli nástroj nebo družici podle názvu. Nejrychlejší cesta po KeepTracku."
+            },
+            "utility": {
+              "title": "Rychlé přepínače",
+              "body": "Režimy kamery, vrstvy a přepínače zobrazení jsou v tomto doku, vždy na jedno kliknutí."
+            },
+            "help": {
+              "title": "Nápověda je všude",
+              "body": "V nastavení aplikaci doladíte a klávesami Shift+F1 v každé nabídce vyvoláte kontextovou nápovědu."
+            }
+          },
+          "title": "Základy panelu",
+          "description": "Panel, paleta příkazů, rychlé přepínače a nápověda"
+        },
+        "sensors": {
+          "title": "Senzory a pokrytí",
+          "description": "Vyberte senzory, čtěte pokrytí, postavte vlastní",
+          "demoCustomSensorName": "Ukázkový senzor",
+          "steps": {
+            "openList": {
+              "title": "Otevřete seznam senzorů",
+              "body": "KeepTrack napájejí pozemní radary a dalekohledy z celého světa. Otevřete seznam senzorů z panelu."
+            },
+            "selectSensor": {
+              "title": "Vyberte senzor",
+              "body": "Zvolte ze seznamu libovolný radar nebo dalekohled. Jeho poloha a zorné pole se načtou na glóbus."
+            },
+            "coverage": {
+              "title": "Přečtěte si pokrytí",
+              "body": "Barevný kužel je zorné pole senzoru promítnuté do vesmíru. Vše, co jím projde, lze z daného místa sledovat."
+            },
+            "fovLayer": {
+              "title": "Přepněte vrstvu zorného pole",
+              "body": "Tento přepínač vykreslí nebo skryje zorné pole senzoru, aby scéna zůstala přehledná."
+            },
+            "sensorInfo": {
+              "title": "Podrobnosti senzoru",
+              "body": "Otevřete informace o senzoru a podívejte se na dosahy, pásma a typ stanice, a co ta čísla znamenají pro sledování."
+            },
+            "customSensor": {
+              "title": "Postavte vlastní senzor",
+              "body": "Nastavte polohu a meze výhledu a stiskněte \"Nahradit senzor\", aby se vaše stanoviště stalo aktivním senzorem. KeepTrack s ním zachází jako se skutečnými."
+            },
+            "multiSensor": {
+              "title": "Pozorovací úhly napříč senzory",
+              "body": "Porovnejte vedle sebe, kdy je vybraný satelit viditelný z jednotlivých senzorů. Pokud nebyl vybrán žádný satelit, vybrali jsme ho za vás."
+            }
+          }
+        },
+        "watchlist": {
+          "title": "Seznam sledování a přelety",
+          "description": "Sledujte cíle a plánujte jejich další přelety",
+          "steps": {
+            "pickTarget": {
+              "title": "Vyberte cíl",
+              "body": "Vyhledejte satelit, který vás zajímá, třeba ISS, a vyberte ho."
+            },
+            "addToWatchlist": {
+              "title": "Přidejte ho na seznam sledování",
+              "body": "Zařaďte vybraný satelit na svůj seznam sledování, aby ho KeepTrack hlídal za vás."
+            },
+            "overlay": {
+              "title": "Překryv",
+              "body": "Překryv vypisuje nadcházející přelety vašeho seznamu sledování nad aktuálním senzorem a průběžně se aktualizuje."
+            },
+            "lookAngles": {
+              "title": "Úhly dalšího přeletu",
+              "body": "Otevřete pozorovací úhly a získejte azimut, elevaci a vzdálenost při příštím průchodu cíle oblohou senzoru."
+            },
+            "bestPasses": {
+              "title": "Nejlepší přelety",
+              "body": "Nejlepší přelety seřadí každý nadcházející přelet, takže víte, které stojí za váš čas u dalekohledu."
+            },
+            "timelines": {
+              "title": "Přelety jako rozvrh",
+              "body": "Časová osa senzoru rozloží každý přelet do rozvrhu, takže celou seanci naplánujete jedním pohledem."
+            }
+          }
+        },
+        "time": {
+          "title": "Čas a scénáře",
+          "description": "Ovládejte simulační čas a ukládejte nastavení",
+          "steps": {
+            "speedUp": {
+              "title": "Zrychlete čas",
+              "body": "Zvyšte rychlost simulace nad 1x a sledujte pohyb orbit. Ovládání hodin je nahoře."
+            },
+            "pauseRewind": {
+              "title": "Pauza a přetáčení",
+              "body": "Pomocí ovládacích prvků VCR simulaci pozastavte nebo ji nechte běžet pozpátku."
+            },
+            "jumpToMoment": {
+              "title": "Skočte na okamžik",
+              "body": "Nastavte v kalendáři přesné datum a čas a podívejte se na oblohu v tu chvíli."
+            },
+            "timeSlider": {
+              "title": "Projeďte časovou osu",
+              "body": "Tažením posuvníku času se posouvejte o minuty nebo hodiny vpřed i vzad."
+            },
+            "scenarios": {
+              "title": "Uložte scénář",
+              "body": "Scénáře ukládají aktuální senzory, satelity a čas, takže celé nastavení později znovu načtete."
+            },
+            "backToNow": {
+              "title": "Zpět do současnosti",
+              "body": "Vynulujte posun a rychlost a vraťte se do reálného času. Simulovaný a skutečný čas jsou vždy na jedno kliknutí."
+            }
+          }
+        },
+        "analysis": {
+          "title": "Analytické nástroje",
+          "description": "Hledání podle orbity, filtry, grafy a simulace",
+          "steps": {
+            "advancedSearch": {
+              "title": "Hledejte podle orbity",
+              "body": "Najděte satelity podle orbitálních parametrů místo jmen: výška, sklon, perioda a další."
+            },
+            "filterCatalog": {
+              "title": "Filtrujte katalog",
+              "body": "Zredukujte oblohu na to podstatné: filtrujte podle typu objektu, země nebo orbitálního režimu."
+            },
+            "polarPlot": {
+              "title": "Polární graf",
+              "body": "Přelet vykreslený na stupnici azimut-elevace z pohledu senzoru. Tvar přeletu přečtete jedním pohledem."
+            },
+            "dops": {
+              "title": "Přesnost GPS (DOPs)",
+              "body": "Rozostření přesnosti ukazuje, jak ostrá je poloha GPS na libovolném místě a v libovolném čase."
+            },
+            "whatIf": {
+              "title": "Nástroje co-kdyby",
+              "body": "Nasimulujte rozpad, prověřte těsná přiblížení nebo namodelujte nový start. Skupina analýzy obsahuje nástroje co-kdyby."
+            }
+          }
+        },
+        "visualization": {
+          "title": "Vizualizace a sdílení",
+          "description": "Barevná schémata, pohledy kamery a sdílení",
+          "steps": {
+            "colorSchemes": {
+              "title": "Obarvěte oblohu",
+              "body": "Barevná schémata přebarví každý objekt podle země, typu, rychlosti a dalšího. Změňte teď jedno."
+            },
+            "flatMap": {
+              "title": "Plochá mapa",
+              "body": "Zploštěte glóbus do 2D mapy s pozemními stopami v reálném čase, klasický operační obraz."
+            },
+            "polarView": {
+              "title": "Polární pohled",
+              "body": "Vidíte oblohu tak, jak ji vidí senzor: kupole celé oblohy vykreslená od jeho obzoru."
+            },
+            "backTo3d": {
+              "title": "Zpět do 3D, a k tomu noc",
+              "body": "Vraťte se ke 3D glóbu a přepněte noční vrstvu, ať vidíte pohyb hranice dne a noci."
+            },
+            "screenshots": {
+              "title": "Snímky a video",
+              "body": "Zachyťte aktuální pohled jako obrázek nebo nahrajte video. Nástroj pro snímky je zde."
+            },
+            "share": {
+              "title": "Sdílejte pohled",
+              "body": "Nabídka sdílení vytvoří odkaz, který přesně zopakuje váš pohled každému, kdo ho otevře."
+            }
+          }
+        }
+      },
+      "hub": {
+        "title": "Pokročilá prohlídka",
+        "body": "Krátké praktické kapitoly. Zvolte libovolné pořadí, kdykoli odejděte a vraťte se tam, kde jste skončili.",
+        "progress": "Dokončeno {done} z {total} kapitol",
+        "steps": "{count} kroků",
+        "minutes": "~{minutes} min",
+        "recommended": "Doporučeno",
+        "close": "Zavřít",
+        "catalogMissing": "Katalog satelitů není načten",
+        "allDone": "Všechny kapitoly jsou hotové. Máte kompletní sadu nástrojů operátora."
+      },
+      "teasers": {
+        "signInCta": "Přihlaste se zdarma pro odemčení",
+        "bestPass": {
+          "title": "Nejlepší přelety (Pro)",
+          "body": "Seřadí každý nadcházející přelet vašeho seznamu sledování nad vybraným senzorem. Naplánujte noc pozorování během vteřin."
+        },
+        "dops": {
+          "title": "Přesnost GPS (Pro)",
+          "body": "Mapuje rozostření přesnosti (DOP) pro libovolné místo a čas. Vězte předem, kdy bude vaše poloha GPS ostrá."
+        },
+        "polarView": {
+          "title": "Polární pohled (Pro)",
+          "body": "Graf celé oblohy z pohledu senzoru. Přesně uvidíte, kudy přelet protíná vaši oblohu."
+        },
+        "flatMap": {
+          "title": "Plochá mapa (Pro)",
+          "body": "2D mapa světa s pozemními stopami v reálném čase. Klasický operační obraz toho, co kde právě letí."
+        }
+      },
+      "stepDone": "Hotovo. Podívejte se."
+    }
+  }
+}

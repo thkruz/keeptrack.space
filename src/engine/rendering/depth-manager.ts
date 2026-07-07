@@ -6,8 +6,18 @@ export interface DepthConfig {
 }
 
 export class DepthManager {
-  private static readonly SATELLITE_NEAR = 0.1;
-  private static readonly SATELLITE_FAR = 3e10; // 3496000000;
+  // 1e-6 km = 1 mm. With a logarithmic depth buffer the near plane only affects
+  // clipping (not precision), so it can sit arbitrarily close to allow the camera
+  // to approach objects at true physical scale.
+  private static readonly SATELLITE_NEAR = 1e-6;
+  /**
+   * 1e12 km (~6700 AU). Must exceed STAR_DISTANCE (3e10 km) plus the largest camera-to-origin
+   * distance so background stars never clip. The heliocentric view alone pulls the camera up to
+   * 1.5e10 km from the origin, making a star on the far side ~4.5e10 km away - beyond the old 3e10
+   * far plane, which clipped a black hole in the star field. The logarithmic depth buffer makes a
+   * far plane this large essentially free in precision.
+   */
+  private static readonly SATELLITE_FAR = 1e12;
   private static readonly LOG_DEPTH_FC = 2.0 / Math.log2(DepthManager.SATELLITE_FAR + 1.0);
 
   static getConfig(): DepthConfig {
@@ -17,6 +27,16 @@ export class DepthManager {
       far: this.SATELLITE_FAR,
       useLogDepth: true,
     };
+  }
+
+  /**
+   * JS reference encoder for the logarithmic window-space depth (gl_FragDepth, range [0, 1]).
+   * Must stay in lockstep with getLogDepthFragCode(). `w` is the clip-space w (== view-space
+   * distance in km for our projection). Used by unit tests to verify monotonicity and that the
+   * fragment encoding matches the vertex encoding at shared vertices.
+   */
+  static encodeDepth(w: number): number {
+    return Math.log2(1.0 + w) * this.LOG_DEPTH_FC * 0.5;
   }
 
   static setupDepthBuffer(gl: WebGL2RenderingContext): void {
@@ -39,11 +59,35 @@ export class DepthManager {
     `;
   }
 
-  static getLogDepthFragCode(): string {
-    // TODO: This doesn't work correctly - need to figure out why
+  /**
+   * Per-fragment logarithmic depth. Writing gl_FragDepth makes the log depth exact across large
+   * triangles (the vertex-only remap sags between vertices and causes z-fighting on sparsely
+   * tessellated surfaces). The encoding matches getLogDepthVertCode() exactly at vertices, so
+   * fragment-depth passes and vertex-only passes remain mutually depth-consistent.
+   *
+   * REQUIREMENTS at every injection site: the fragment shader must be `#version 300 es`, use
+   * `precision highp float;` (mediump overflows on log2(1 + 3e10)), and declare
+   * `uniform float logDepthBufFC;`. gl_FragDepth is a core output in GLSL ES 3.00 (no extension).
+   *
+   * Do NOT inject this into point-sprite (dots) or GPU-picking shaders: gl_FragCoord.w is constant
+   * across a point sprite so it adds nothing, and writing gl_FragDepth defeats early-Z on the
+   * heaviest fill passes. Do NOT combine with gl.polygonOffset (offset is ignored once a shader
+   * writes gl_FragDepth) - use the wScale bias argument instead.
+   *
+   * @param wScale Multiplies the reconstructed view-space w before the log encode. Values < 1.0
+   *   pull the surface toward the camera (a shader-side replacement for a negative polygonOffset),
+   *   e.g. '0.9995' biases by 0.05% of distance.
+   */
+  static getLogDepthFragCode(wScale = '1.0'): string {
     return `
-      // float w = 1.0 / gl_FragCoord.w;  // Recover original gl_Position.w
-      // gl_FragDepth = (log2(max(1e-6, 1.0 + w)) * logDepthBufFC - 1.0) * 0.5 + 0.5;
+      // gl_FragDepth must be written on EVERY path once it is written on any path (GLSL ES 3.0),
+      // so the ortho / 2D-mode branch (logDepthBufFC == 0.0) writes the interpolated depth.
+      if (logDepthBufFC > 0.0) {
+        float wFrag = max((1.0 / gl_FragCoord.w) * ${wScale}, 1e-9); // recover clip-space w
+        gl_FragDepth = log2(1.0 + wFrag) * logDepthBufFC * 0.5;
+      } else {
+        gl_FragDepth = gl_FragCoord.z;
+      }
     `;
   }
 }

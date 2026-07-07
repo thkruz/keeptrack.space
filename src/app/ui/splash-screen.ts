@@ -120,6 +120,7 @@ export abstract class SplashScreen {
     setTimeout(() => {
       hideEl('loading-screen');
       showEl('keeptrack-header');
+      EventBus.getInstance().emit(EventBusEvent.splashScreenHidden);
     }, 100);
   }
 

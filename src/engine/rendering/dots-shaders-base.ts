@@ -4,10 +4,7 @@ import { DepthManager } from './depth-manager';
 
 export const createBaseFragShader = (settings: SettingsManager): string => (
     glsl`#version 300 es
-    #extension GL_EXT_frag_depth : enable
     precision highp float;
-
-    uniform float logDepthBufFC;
 
     in vec4 vColor;
     in float vSize;
@@ -25,8 +22,6 @@ export const createBaseFragShader = (settings: SettingsManager): string => (
       if (alpha < 0.01) discard;
 
       fragColor = vec4(vColor.rgb, vColor.a * alpha);
-
-      ${DepthManager.getLogDepthFragCode()}
     }
     `
 );

@@ -6,8 +6,7 @@ import { GlUtils } from './gl-utils';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { BaseObject, calcGmst, DEG2RAD, Kilometers, KilometersPerSecond, lla2eci, Radians, Satellite, Seconds, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
-import { orbitLineSegment } from '@app/plugins/missile/missile-interpolation';
+import { BaseObject, DEG2RAD, GreenwichMeanSiderealTime, Kilometers, KilometersPerSecond, lla2eci, Radians, Satellite, Seconds, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
 import { mat4 } from 'gl-matrix';
 import { SettingsManager } from '../../settings/settings';
 import { CameraType } from '../camera/camera-type';
@@ -21,6 +20,7 @@ import { glsl } from '../utils/development/formatter';
 import { ensureVelocityVec3 } from '../utils/space-object-invariants';
 import { BufferAttribute } from './buffer-attribute';
 import { DepthManager } from './depth-manager';
+import { ViewportManager } from './viewport-manager';
 import { IDotsShaderProvider } from './dots-shader-provider';
 import { createBaseFragShader, createBaseVertShader } from './dots-shaders-base';
 import { WebGlProgramHelper } from './webgl-program';
@@ -46,6 +46,14 @@ declare module '@app/engine/core/interfaces' {
  */
 export class DotsManager {
   readonly PICKING_READ_PIXEL_BUFFER_SIZE = 1;
+
+  /**
+   * Distance from Earth's center (km) below which the dots shader rotates a dot by
+   * (currentGmst - cruncherGmst) to un-lag worker-updated ground objects. MUST match the
+   * `6421.0` literal in the dots vertex shaders (base + symbology); missile positions are
+   * pre-expressed in the cruncher frame below this so the shader lands them on their line.
+   */
+  static readonly MISSILE_GROUND_ROTATION_RADIUS_KM = 6421;
 
   private pickingColorData: number[] = [];
   /*
@@ -227,12 +235,15 @@ export class DotsManager {
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
     gl.uniformMatrix4fv(this.programs.dots.uniforms.u_pMvCamMatrix, false, projectionCameraMatrix);
-    gl.uniform3fv(this.programs.dots.uniforms.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     const mainCamera = ServiceLocator.getMainCamera();
     const isFlatMap = mainCamera.cameraType === CameraType.FLAT_MAP;
 
     const isPolarView = mainCamera.cameraType === CameraType.POLAR_VIEW;
+
+    // 2D projections reproject raw ECI in-shader; the world offset must be
+    // zero for them even when the frame shift is satellite-centered
+    gl.uniform3fv(this.programs.dots.uniforms.worldOffset, isFlatMap || isPolarView ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     gl.uniform1i(this.programs.dots.uniforms.u_flatMapMode, isFlatMap ? 1 : 0);
     gl.uniform1i(this.programs.dots.uniforms.u_polarViewMode, isPolarView ? 1 : 0);
@@ -258,8 +269,9 @@ export class DotsManager {
       gl.uniform1f(this.programs.dots.uniforms.u_maxSize, this.settings_.satShader.maxSizePlanetarium);
       gl.uniform1f(this.programs.dots.uniforms.u_starMinSize, this.settings_.satShader.minSizePlanetarium);
     } else {
-      gl.uniform1f(this.programs.dots.uniforms.u_minSize, this.settings_.satShader.minSize);
-      gl.uniform1f(this.programs.dots.uniforms.u_maxSize, this.settings_.satShader.maxSize);
+      // Per-camera dot sizes (driven by that camera's zoom), falling back to settings defaults
+      gl.uniform1f(this.programs.dots.uniforms.u_minSize, mainCamera.satShaderSizes.minSize ?? this.settings_.satShader.minSize);
+      gl.uniform1f(this.programs.dots.uniforms.u_maxSize, mainCamera.satShaderSizes.maxSize ?? this.settings_.satShader.maxSize);
       gl.uniform1f(this.programs.dots.uniforms.u_starMinSize, this.settings_.satShader.starMinSize);
     }
 
@@ -341,11 +353,13 @@ export class DotsManager {
     gl.bindFramebuffer(gl.FRAMEBUFFER, ServiceLocator.getScene().frameBuffers.gpuPicking);
 
     gl.uniformMatrix4fv(this.programs.picking.uniforms.u_pMvCamMatrix, false, pMvCamMatrix);
-    gl.uniform3fv(this.programs.picking.uniforms.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     const mainCam = ServiceLocator.getMainCamera();
     const isFlatMapPick = mainCam.cameraType === CameraType.FLAT_MAP;
     const isPolarViewPick = mainCam.cameraType === CameraType.POLAR_VIEW;
+
+    // 2D projections reproject raw ECI in-shader; zero the world offset for them
+    gl.uniform3fv(this.programs.picking.uniforms.worldOffset, isFlatMapPick || isPolarViewPick ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     gl.uniform1i(this.programs.picking.uniforms.u_flatMapMode, isFlatMapPick ? 1 : 0);
     gl.uniform1i(this.programs.picking.uniforms.u_polarViewMode, isPolarViewPick ? 1 : 0);
@@ -379,7 +393,8 @@ export class DotsManager {
     gl.bindVertexArray(null);
 
     if (!settingsManager.isMobileModeEnabled) {
-      gl.disable(gl.SCISSOR_TEST);
+      // Restore the active viewport pass's scissor (disables it in single view)
+      ViewportManager.getInstance().applyPassScissor(gl);
     }
   }
 
@@ -393,11 +408,13 @@ export class DotsManager {
     gl.useProgram(this.programs.picking.program);
 
     gl.uniformMatrix4fv(this.programs.picking.uniforms.u_pMvCamMatrix, false, pMvCamMatrix);
-    gl.uniform3fv(this.programs.picking.uniforms.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     const mainCam = ServiceLocator.getMainCamera();
     const isFlatMap = mainCam.cameraType === CameraType.FLAT_MAP;
     const isPolarView = mainCam.cameraType === CameraType.POLAR_VIEW;
+
+    // 2D projections reproject raw ECI in-shader; zero the world offset for them
+    gl.uniform3fv(this.programs.picking.uniforms.worldOffset, isFlatMap || isPolarView ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     gl.uniform1i(this.programs.picking.uniforms.u_flatMapMode, isFlatMap ? 1 : 0);
     gl.uniform1i(this.programs.picking.uniforms.u_polarViewMode, isPolarView ? 1 : 0);
@@ -449,6 +466,38 @@ export class DotsManager {
     }
 
     return [posData[idx], posData[idx + 1], posData[idx + 2]] as EciArr3;
+  }
+
+  /**
+   * The ON-SCREEN ECI position of an object's dot: {@link getPositionArray} with
+   * the vertex shader's ground rotation already applied. Below
+   * {@link DotsManager.MISSILE_GROUND_ROTATION_RADIUS_KM} the shader rotates the
+   * stored position by (currentGmst - cruncherGmst); a missile's positionData is
+   * pre-expressed in the cruncher frame precisely so that rotation lands the dot
+   * on its line. CPU consumers that must line up with the rendered dot rather than
+   * the stored value - the camera follow, the world-shift that centers the selected
+   * object, the mesh, the orbit-line head - go through this so they all agree with
+   * the pixels. Above the radius the shader does not rotate, so this returns the
+   * stored value unchanged.
+   */
+  getRenderedPositionArray(i: number): EciArr3 {
+    const pos = this.getPositionArray(i);
+
+    if (Math.hypot(pos[0], pos[1], pos[2]) >= DotsManager.MISSILE_GROUND_ROTATION_RADIUS_KM) {
+      return pos;
+    }
+
+    const currentGmst = ServiceLocator.getTimeManager().gmst;
+    const cruncherGmst = this.cruncherGmst ?? currentGmst;
+    const d = currentGmst - cruncherGmst;
+    const cosD = Math.cos(d);
+    const sinD = Math.sin(d);
+
+    return [
+      pos[0] * cosD - pos[1] * sinD,
+      pos[0] * sinD + pos[1] * cosD,
+      pos[2],
+    ] as EciArr3;
   }
 
   /**
@@ -994,13 +1043,20 @@ export class DotsManager {
    * instead get an exact position here every frame, interpolated between the
    * 1-second trajectory samples so the dot glides smoothly.
    *
-   * The position MUST sit on the trajectory line the orbit cruncher draws. That
-   * line is only `orbitSegments` (255) straight chords for the whole flight, so it
-   * sub-samples the trajectory ~7:1; interpolating the dot between *adjacent*
-   * samples makes it follow the true curve and leave the coarse chord near apogee.
-   * Instead, interpolate along the same chord the line draws - lerp in ECI between
-   * the two line vertices that bracket the current time - using the identical
-   * ellipsoidal `lla2eci` conversion as `drawMissileSegment_` (and `eci()`/the model).
+   * The position MUST sit on the trajectory line. That line is an Earth-fixed (ECEF)
+   * strip the shader rotates to ECI by the current GMST, with one vertex per 1 Hz
+   * sample (`MissileObject.getOrbitPath`), so the dot lerps in ECI between the two
+   * adjacent sample vertices that bracket the current time.
+   *
+   * Frame subtlety: the dots shader rotates any dot below
+   * {@link DotsManager.MISSILE_GROUND_ROTATION_RADIUS_KM} by (currentGmst - cruncherGmst)
+   * to un-lag worker-updated ground objects. During its low-altitude boost a missile is
+   * inside that band, so we must express its position in the CRUNCHER frame (like every
+   * other worker-updated ground object); the shader's rotation then lands it back at the
+   * current frame, on the line. Above the band the shader leaves it alone, so the current
+   * frame is used. Without this, the main-thread (current-frame) position is double-rotated
+   * and the dot drifts off the line during the first minutes of flight, snapping back on
+   * each ~1 Hz cruncher update.
    */
   private interpolatePositionsOfMissiles_() {
     if (!this.positionData) {
@@ -1014,28 +1070,61 @@ export class DotsManager {
       return;
     }
 
-    const now = ServiceLocator.getTimeManager().simulationTimeObj;
-    const nowMs = now.getTime();
-    const { gmst } = calcGmst(now);
-    const numSegments = settingsManager.orbitSegments;
+    const nowMs = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
+    // Match the shader's frames exactly: u_currentGmst = timeManager.gmst, u_gmst = cruncherGmst.
+    const currentGmst = ServiceLocator.getTimeManager().gmst as GreenwichMeanSiderealTime;
+    const cruncherGmst = (this.cruncherGmst ?? currentGmst) as GreenwichMeanSiderealTime;
 
-    // The missile reservation is the 500 slots ending at `missileSats`.
-    for (let id = missileSats - 500; id < missileSats; id++) {
+    // The missile reservation is the maxMissiles slots ending at `missileSats`.
+    for (let id = missileSats - settingsManager.maxMissiles; id < missileSats; id++) {
       const obj = catalogManagerInstance.objectCache[id];
 
       if (!(obj instanceof MissileObject) || !obj.active || obj.altList.length === 0) {
         continue;
       }
 
-      const { i0, i1, frac } = orbitLineSegment(obj.altList.length, numSegments, (nowMs - obj.startTime) / 1000);
+      if (!obj.isVisibleNow()) {
+        // MIRV child before separation: it rides on top of the bus, so hide it by
+        // parking the dot at the origin (the shader discards positions < 100 km from
+        // Earth's center). Rewinding past separation re-hides it automatically.
+        this.positionData[id * 3] = 0;
+        this.positionData[id * 3 + 1] = 0;
+        this.positionData[id * 3 + 2] = 0;
+        continue;
+      }
 
-      // Both bracketing line vertices in ECI (same ellipsoidal conversion the line uses), then lerp along the chord.
-      const v0 = lla2eci({ lat: (obj.latList[i0] * DEG2RAD) as Radians, lon: (obj.lonList[i0] * DEG2RAD) as Radians, alt: obj.altList[i0] }, gmst);
-      const v1 = lla2eci({ lat: (obj.latList[i1] * DEG2RAD) as Radians, lon: (obj.lonList[i1] * DEG2RAD) as Radians, alt: obj.altList[i1] }, gmst);
+      const lastIdx = obj.altList.length - 1;
+      const elapsedSec = Math.max(0, Math.min((nowMs - obj.startTime) / 1000, lastIdx));
+      const i0 = Math.min(Math.floor(elapsedSec), Math.max(0, lastIdx - 1));
+      const i1 = Math.min(i0 + 1, lastIdx);
+      const frac = elapsedSec - i0;
 
-      this.positionData[id * 3] = v0.x + (v1.x - v0.x) * frac;
-      this.positionData[id * 3 + 1] = v0.y + (v1.y - v0.y) * frac;
-      this.positionData[id * 3 + 2] = v0.z + (v1.z - v0.z) * frac;
+      const toEci = (idx: number, g: GreenwichMeanSiderealTime) => lla2eci(
+        { lat: (obj.latList[idx] * DEG2RAD) as Radians, lon: (obj.lonList[idx] * DEG2RAD) as Radians, alt: obj.altList[idx] },
+        g,
+      );
+
+      // Current-frame position first; its magnitude (invariant under the Earth-rotation
+      // choice) decides whether the shader will apply the ground rotation.
+      let v0 = toEci(i0, currentGmst);
+      let v1 = toEci(i1, currentGmst);
+      let px = v0.x + (v1.x - v0.x) * frac;
+      let py = v0.y + (v1.y - v0.y) * frac;
+      let pz = v0.z + (v1.z - v0.z) * frac;
+
+      if (Math.hypot(px, py, pz) < DotsManager.MISSILE_GROUND_ROTATION_RADIUS_KM) {
+        // Inside the shader's ground band: pre-express in the cruncher frame so the
+        // shader's (currentGmst - cruncherGmst) rotation lands it back on the line.
+        v0 = toEci(i0, cruncherGmst);
+        v1 = toEci(i1, cruncherGmst);
+        px = v0.x + (v1.x - v0.x) * frac;
+        py = v0.y + (v1.y - v0.y) * frac;
+        pz = v0.z + (v1.z - v0.z) * frac;
+      }
+
+      this.positionData[id * 3] = px;
+      this.positionData[id * 3 + 1] = py;
+      this.positionData[id * 3 + 2] = pz;
     }
   }
 
@@ -1261,18 +1350,14 @@ export class DotsManager {
                 }
             `,
       frag: glsl`#version 300 es
-                #extension GL_EXT_frag_depth : enable
                 precision highp float;
 
                 in vec3 vColor;
-
-                uniform float logDepthBufFC;
 
                 out vec4 fragColor;
 
                 void main(void) {
                     fragColor = vec4(vColor, 1.0);
-                    ${DepthManager.getLogDepthFragCode()}
                 }
             `,
     };

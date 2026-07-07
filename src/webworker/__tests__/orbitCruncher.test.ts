@@ -138,4 +138,48 @@ describe('orbitCruncher worker', () => {
     expect(last.typ).toBe(MSG.RESPONSE_DATA);
     expect(last.pointsOut.some((v) => v !== 0)).toBe(true);
   });
+
+  it('rotates each missile sample by the GMST at its own time when a launch epoch is given', () => {
+    // A 2-hour trajectory whose ground-referenced position never changes. With a
+    // per-sample GMST each sample is rotated by the Earth's spin at its own time, so
+    // the drawn line sweeps a ~30° arc; with a single GMST (no launch epoch) every
+    // sample collapses onto the same ECI point. This is the GEO-interceptor fix:
+    // a multi-hour arc must not be drawn with one GMST or it drifts off its dots.
+    const durationSec = 7200;
+    const lat = new Array(durationSec + 1).fill(0);
+    const lon = new Array(durationSec + 1).fill(0);
+    const alt = new Array(durationSec + 1).fill(35786);
+
+    onMessage({
+      data: {
+        typ: MSG.INIT,
+        numSegs: NUM_SEGS,
+        objData: JSON.stringify([{ missile: true, latList: lat, lonList: lon, altList: alt }]),
+        seqNum: 20,
+      },
+    } as unknown as Parameters<typeof onMessage>[0]);
+
+    const spreadOfXCoords = (startTime?: number): number => {
+      posted = [];
+      onMessage({
+        data: {
+          typ: MSG.MISSILE_UPDATE, id: 0, simulationTime: Date.UTC(2022, 0, 1), seqNum: 20,
+          latList: lat, lonList: lon, altList: alt, startTime,
+        },
+      } as unknown as Parameters<typeof onMessage>[0]);
+      const { pointsOut } = posted.at(-1)!.payload as { pointsOut: Float32Array };
+      const xs: number[] = [];
+
+      for (let p = 0; p < NUM_SEGS + 1; p++) {
+        xs.push(pointsOut[p * 4]);
+      }
+
+      return Math.max(...xs) - Math.min(...xs);
+    };
+
+    // Single GMST: identical ground point → identical ECI point (no spread).
+    expect(spreadOfXCoords(undefined)).toBeLessThan(1);
+    // Per-sample GMST: 2 hours of Earth rotation spreads the samples by thousands of km.
+    expect(spreadOfXCoords(Date.UTC(2022, 0, 1))).toBeGreaterThan(1000);
+  });
 });

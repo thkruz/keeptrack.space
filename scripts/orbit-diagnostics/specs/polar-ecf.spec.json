@@ -1,0 +1,10 @@
+{
+  "id": "anchor-polar-ecf",
+  "catalog": true,
+  "settings": { "isOrbitCruncherInEcf": true },
+  "sensor": "GEODDSSOC",
+  "camera": 5,
+  "selectSat": "25544",
+  "settleMs": 2000,
+  "captures": ["canvas"]
+}

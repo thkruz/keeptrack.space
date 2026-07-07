@@ -22,6 +22,14 @@ export interface LatLon {
   lon: number;
 }
 
+/** A named reentry-vehicle aimpoint, baked per bus so each RV can carry its own label. */
+export interface RvTarget {
+  lat: number;
+  lon: number;
+  /** Display name of the target this RV strikes (used verbatim in the RV's desc). */
+  name: string;
+}
+
 export interface GroundTrack {
   latList: number[];
   lonList: number[];
@@ -114,4 +122,115 @@ export const retargetDescent = (
   }
 
   return { latList, lonList, altList };
+};
+
+/**
+ * Notional reentry-vehicle load per missile designator, keyed by the code that
+ * appears in the raid data's `desc` ("Aleysk (SS-18) -> ..."). Only MIRV-capable
+ * types are listed; anything absent is a single warhead (see {@link warheadCountForDesc}).
+ * Counts are the systems' generally-cited MIRV capacity, capped at 12 (the sim's
+ * per-missile ceiling) so a mass raid reads as realistically MIRVed rather than a
+ * field of single RVs.
+ */
+export const MISSILE_WARHEAD_COUNTS: Readonly<Record<string, number>> = {
+  // Russia
+  'SS-18': 10, // R-36M2 Voevoda ("Satan")
+  'SS-19': 6, // UR-100N
+  'SS-N-23A': 4, // R-29RMU Sineva family (SLBM)
+  Sineva: 4,
+  Layner: 4, // R-29RMU2.1
+  Bulava: 6, // R-30 (SLBM)
+  // China
+  'DF-5A/B': 5, // DF-5B is MIRVed
+  'DF-41': 6,
+  'JL-2': 3, // JL-2 SLBM (Type 094)
+  'JL-3': 3, // JL-3 SLBM
+  // North Korea
+  'KN-22': 3, // Hwasong-17 (claimed MIRV-capable)
+  // USA
+  'Trident II': 8, // UGM-133A (SLBM)
+  'Minuteman III': 3, // LGM-30G design capacity
+  // UK / France (SLBM)
+  'M51': 6, // M51 (Triomphant class)
+};
+
+/** Upper bound on warheads per missile (matches the interactive MIRV launcher). */
+export const MAX_WARHEADS_PER_MISSILE = 12;
+
+/**
+ * Reentry-vehicle count for a raid missile, parsed from the designator in its
+ * `desc` (the text inside the first parentheses, e.g. "Aleysk (SS-18) -> Boston"
+ * -> "SS-18"). Unknown or single-warhead systems return 1. Clamped to
+ * [1, {@link MAX_WARHEADS_PER_MISSILE}].
+ */
+export const warheadCountForDesc = (desc: string | undefined): number => {
+  if (!desc) {
+    return 1;
+  }
+
+  const designator = (/\((?<designator>[^)]+)\)/u).exec(desc)?.groups?.designator?.trim();
+  const count = designator ? MISSILE_WARHEAD_COUNTS[designator] ?? 1 : 1;
+
+  return Math.max(1, Math.min(count, MAX_WARHEADS_PER_MISSILE));
+};
+
+/**
+ * Fan an existing bus trajectory into `count` reentry-vehicle tracks. Every RV
+ * shares the bus track up to apogee (the separation point) and then bends toward
+ * its own aimpoint on a footprint around the bus's impact (the last sample), so the
+ * tracks coincide on the way up and spread on the way down - a MIRV footprint. RV 0
+ * keeps the bus's exact impact; `count <= 1` returns a single copy of the bus.
+ */
+export const expandTrajectoryToMirv = (
+  busLatList: number[],
+  busLonList: number[],
+  busAltList: number[],
+  count: number,
+  spreadKm: number,
+): GroundTrack[] => {
+  if (count <= 1 || busAltList.length === 0) {
+    return [{ latList: busLatList.slice(), lonList: busLonList.slice(), altList: busAltList.slice() }];
+  }
+
+  const lastIdx = busAltList.length - 1;
+  const targetLat = busLatList[lastIdx];
+  const targetLon = busLonList[lastIdx];
+  const sepIdx = findSeparationIndex(busAltList);
+  const footprint = generateFootprint(targetLat, targetLon, count, spreadKm);
+
+  return footprint.map((aim) => retargetDescent(busLatList, busLonList, busAltList, sepIdx, aim.lat - targetLat, aim.lon - targetLon));
+};
+
+/**
+ * Fan a bus trajectory into one reentry-vehicle track per {@link RvTarget}. Unlike
+ * {@link expandTrajectoryToMirv} (which spreads RVs over a synthetic ring), this bends
+ * each RV toward a *real, distinct* aimpoint baked by the scenario generator, so the
+ * warheads land on separate targets and each carries its target's name. The bus's own
+ * impact (its last sample) is the reference point every RV offsets from - the generator
+ * flies the bus to `rvTargets[0]`, so RV 0 keeps the exact bus track.
+ *
+ * Returns `{ track, name }` per RV. An empty/absent `rvTargets` yields a single copy of
+ * the bus with an empty name (caller falls back to the bus desc).
+ */
+export const expandTrajectoryToTargets = (
+  busLatList: number[],
+  busLonList: number[],
+  busAltList: number[],
+  rvTargets: readonly RvTarget[],
+): { track: GroundTrack; name: string }[] => {
+  const busTrack: GroundTrack = { latList: busLatList.slice(), lonList: busLonList.slice(), altList: busAltList.slice() };
+
+  if (rvTargets.length <= 1 || busAltList.length === 0) {
+    return [{ track: busTrack, name: rvTargets[0]?.name ?? '' }];
+  }
+
+  const lastIdx = busAltList.length - 1;
+  const primaryLat = busLatList[lastIdx];
+  const primaryLon = busLonList[lastIdx];
+  const sepIdx = findSeparationIndex(busAltList);
+
+  return rvTargets.map((t, i) => ({
+    track: i === 0 ? busTrack : retargetDescent(busLatList, busLonList, busAltList, sepIdx, t.lat - primaryLat, t.lon - primaryLon),
+    name: t.name,
+  }));
 };

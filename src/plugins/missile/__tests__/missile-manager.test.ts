@@ -87,6 +87,9 @@ const seedMissileSlots = () => {
   }
   catalog.objectCache = slots;
   catalog.missileSats = 500;
+  // The reservation math (missileSats - maxMissiles) derives the first missile slot
+  // from this setting; match it to the 500 slots seeded above so the base index is 0.
+  settingsManager.maxMissiles = 500;
 };
 
 const nextSlot = () => missileManager.missilesInUse;
@@ -496,6 +499,18 @@ describe('MissileManager (baseline - pre-refactor)', () => {
       const impactDelta = Math.abs(rv1.latList[lastIdx] - rv0.latList[lastIdx]) + Math.abs(rv1.lonList[lastIdx] - rv0.lonList[lastIdx]);
 
       expect(impactDelta).toBeGreaterThan(0);
+    }, 60_000);
+
+    it('tags every reentry vehicle with the full warhead count for mesh selection', () => {
+      const catalog = ServiceLocator.getCatalogManager();
+      const base = catalog.missileSats - 500 + missileManager.missilesInUse;
+
+      mirv(6);
+
+      // The visible ascent object (primary) and its hidden children all carry the
+      // full load so the resolver picks the matching deploy mesh (misl3-6/misl4-6).
+      expect((catalog.getObject(base) as MissileObject).warheadCount).toBe(6);
+      expect((catalog.getObject(base + 5) as MissileObject).warheadCount).toBe(6);
     }, 60_000);
 
     it('a single warhead count behaves like one missile', () => {

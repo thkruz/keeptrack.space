@@ -14,8 +14,10 @@ import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
 import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, globalBMTargets, ukSLBM } from './missile-data';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { MissileSimulation } from './missile-simulation';
+import { generateBallisticTrajectory } from './ballistic-trajectory';
 import { MissileSpec, MissileTrajectory } from './missile-types';
-import { generateFootprint, findSeparationIndex, retargetDescent } from './missile-mirv';
+import { expandTrajectoryToMirv, expandTrajectoryToTargets, generateFootprint, findSeparationIndex, retargetDescent, warheadCountForDesc, RvTarget } from './missile-mirv';
+import { isSubmarineLaunch, planSubmarineBoats, SubLaunchEntry } from './sub-launch';
 
 const missileArray: MissileObject[] = [];
 
@@ -38,7 +40,7 @@ const boundScenarioToActiveMissiles_ = (): void => {
   }
 
   const catalogManagerInstance = ServiceLocator.getCatalogManager();
-  const firstMissileId = catalogManagerInstance.missileSats - 500;
+  const firstMissileId = catalogManagerInstance.missileSats - settingsManager.maxMissiles;
   let minStartMs = Infinity;
   let maxEndMs = -Infinity;
 
@@ -74,65 +76,140 @@ export const MassRaidPre = async (time: number, simFile: string) => {
       const orbitManagerInstance = ServiceLocator.getOrbitManager();
       const satSetLen = catalogManagerInstance.missileSats;
 
-      missileManager.missilesInUse = newMissileArray.length;
-      for (let i = 0; i < newMissileArray.length; i++) {
-        const x = satSetLen - 500 + i;
+      // Collect the real MissileObjects we build below (not the raw JSON) so the
+      // per-frame orbit redraw in the plugin's updateLoop_ reads a correct catalog
+      // id off each entry. The raw JSON carries no id, and even the legacy files'
+      // baked ids were stale relative to the runtime catalog slot.
+      const builtMissiles: MissileObject[] = [];
+      const maxMissiles = settingsManager.maxMissiles;
+      const firstSlot = satSetLen - maxMissiles;
+      let slotOffset = 0; // running index into the missile reservation
 
+      // Submarine launchers are baked from a homeport placeholder over land. Plan all of them up
+      // front: gather each nation's SLBM buses onto a realistic number of hulls (never more than the
+      // real class fleet) placed at distinct open-ocean patrol points spread across the class's
+      // basins, so the raid shows a plausible handful of well-separated boats rather than one
+      // submarine per missile. Each bus then re-flies from its assigned hull to its own baked target.
+      const subEntries: SubLaunchEntry[] = [];
+
+      for (let i = 0; i < newMissileArray.length; i++) {
+        const raw = newMissileArray[i];
+
+        if (isSubmarineLaunch(raw.desc) && raw.altList?.length >= 2) {
+          const li = raw.altList.length - 1;
+
+          subEntries.push({ index: i, desc: String(raw.desc), targetLat: raw.latList[li], targetLon: raw.lonList[li] });
+        }
+      }
+      const boatPositions = planSubmarineBoats(subEntries);
+
+      for (let i = 0; i < newMissileArray.length && slotOffset < maxMissiles; i++) {
         const raw = newMissileArray[i];
 
         raw.startTime = time;
         raw.name = raw.ON;
         raw.country = raw.C;
 
-        // Build the real MissileObject directly from the raw sim data and store that in the
-        // catalog. Never stage raw JSON in the cache: a plain object has no class methods, so any
-        // catalog read that runs updatePosVel() would call isStatic() on it and throw. The
-        // MissileObject constructor already defaults velocity/totalVelocity to zero. (issue #1373)
-        const missileObj = new MissileObject({
-          id: x,
-          name: raw.name,
-          country: raw.country,
-          desc: raw.desc,
-          active: raw.active,
-          type: raw.type,
-          latList: raw.latList,
-          lonList: raw.lonList,
-          altList: raw.altList,
-          startTime: raw.startTime,
-        } as unknown as MissileParams);
+        // Re-fly this SLBM from its assigned hull to its baked primary aimpoint (the bus's last
+        // sample). The primary target - and every reentry vehicle's baked target below - is
+        // preserved, so each warhead's label keeps matching where it actually lands.
+        const boat = boatPositions.get(i);
 
-        catalogManagerInstance.objectCache[x] = missileObj;
+        if (boat && raw.altList?.length >= 2) {
+          const li = raw.altList.length - 1;
+          const traj = generateBallisticTrajectory(boat.launchLat, boat.launchLon, raw.latList[li], raw.lonList[li]);
 
-        // Seed the missile's initial position on the main thread. The position-cruncher worker
-        // fills positionData asynchronously on its next cycle, but the doSearch('RV_') below runs
-        // synchronously - without this seed every missile reads position {0,0,0} and is flagged as
-        // "decayed" until the user searches a second time. The cruncher overwrites these with
-        // matching values once it runs, so this only bridges the startup gap.
-        const pv = missileObj.eci();
-
-        if (pv && dotsManagerInstance.positionData) {
-          dotsManagerInstance.positionData[x * 3] = pv.position.x;
-          dotsManagerInstance.positionData[x * 3 + 1] = pv.position.y;
-          dotsManagerInstance.positionData[x * 3 + 2] = pv.position.z;
+          raw.latList = traj.latList;
+          raw.lonList = traj.lonList;
+          raw.altList = traj.altList;
         }
 
-        catalogManagerInstance.satCruncherThread.sendNewMissile({
-          id: missileObj.id,
-          active: missileObj.active,
-          type: missileObj.type,
-          latList: missileObj.latList,
-          lonList: missileObj.lonList,
-          altList: missileObj.altList,
-          startTime: missileObj.startTime,
-        });
+        // Fan the bus into one reentry vehicle per baked target: every RV shares the bus track to
+        // apogee, then bends to its own distinct real aimpoint and carries that target's name, so
+        // the warheads spread across separate targets instead of clustering on one. Files without
+        // rvTargets (legacy) fall back to a designator-based footprint. Clamp to the slots left.
+        const launcher = String(raw.desc ?? '').split(' -> ')[0];
+        const primaryLabel = String(raw.desc ?? '').split(' -> ').slice(1).join(' -> ');
+        const rvTargets = (raw.rvTargets as RvTarget[] | undefined) ?? [];
+        const tracks = rvTargets.length > 0
+          ? expandTrajectoryToTargets(raw.latList, raw.lonList, raw.altList, rvTargets).map((r) => ({ ...r.track, name: r.name }))
+          : expandTrajectoryToMirv(raw.latList, raw.lonList, raw.altList, warheadCountForDesc(raw.desc), MIRV_DEFAULT_SPREAD_KM).map((track) => ({ ...track, name: '' }));
+        const count = Math.min(tracks.length, maxMissiles - slotOffset);
 
-        orbitManagerInstance.updateOrbitBuffer(missileObj.id, missileObj);
+        for (let w = 0; w < count; w++) {
+          const x = firstSlot + slotOffset;
+          const track = tracks[w];
+
+          // Each RV is labeled with its own distinct target ("launcher -> target"). The legacy
+          // footprint path (no per-RV name) keeps the "(RV n/N)" suffix off the shared primary.
+          let desc = raw.desc as string;
+
+          if (track.name) {
+            desc = `${launcher} -> ${track.name}`;
+          } else if (count > 1) {
+            desc = `${launcher} -> ${primaryLabel} (RV ${w + 1}/${count})`;
+          }
+
+          // Build the real MissileObject directly from the sim data and store that in the
+          // catalog. Never stage raw JSON in the cache: a plain object has no class methods, so any
+          // catalog read that runs updatePosVel() would call isStatic() on it and throw. The
+          // MissileObject constructor already defaults velocity/totalVelocity to zero. (issue #1373)
+          const missileObj = new MissileObject({
+            id: x,
+            name: `RV_${x}`,
+            country: raw.country,
+            desc,
+            active: raw.active,
+            type: raw.type,
+            latList: track.latList,
+            lonList: track.lonList,
+            altList: track.altList,
+            startTime: raw.startTime,
+          } as unknown as MissileParams);
+
+          // Children ride on top of the bus during ascent; hide them until separation.
+          missileObj.hideUntilSeparation = w > 0;
+          // The whole load flies as one bus until apogee, so tag every RV with the full
+          // count: the visible ascent object (w === 0) then resolves to the deploy mesh
+          // that shows this many reentry vehicles.
+          missileObj.warheadCount = count;
+
+          catalogManagerInstance.objectCache[x] = missileObj;
+          builtMissiles.push(missileObj);
+
+          // Seed the missile's initial position on the main thread. The position-cruncher worker
+          // fills positionData asynchronously on its next cycle, but the doSearch('RV_') below runs
+          // synchronously - without this seed every missile reads position {0,0,0} and is flagged as
+          // "decayed" until the user searches a second time. The cruncher overwrites these with
+          // matching values once it runs, so this only bridges the startup gap.
+          const pv = missileObj.eci();
+
+          if (pv && dotsManagerInstance.positionData) {
+            dotsManagerInstance.positionData[x * 3] = pv.position.x;
+            dotsManagerInstance.positionData[x * 3 + 1] = pv.position.y;
+            dotsManagerInstance.positionData[x * 3 + 2] = pv.position.z;
+          }
+
+          catalogManagerInstance.satCruncherThread.sendNewMissile({
+            id: missileObj.id,
+            active: missileObj.active,
+            type: missileObj.type,
+            latList: missileObj.latList,
+            lonList: missileObj.lonList,
+            altList: missileObj.altList,
+            startTime: missileObj.startTime,
+          });
+
+          orbitManagerInstance.updateOrbitBuffer(missileObj.id, missileObj);
+          slotOffset++;
+        }
       }
-      missileManager.missileArray = newMissileArray;
+      missileManager.missilesInUse = slotOffset;
+      missileManager.missileArray = builtMissiles;
     });
 
   ServiceLocator.getUiManager().toast('Missile Mass Raid Loaded Successfully', ToastMsgType.normal);
-  settingsManager.searchLimit = settingsManager.searchLimit > 500 ? settingsManager.searchLimit : 500;
+  settingsManager.searchLimit = Math.max(settingsManager.searchLimit, settingsManager.maxMissiles);
   SettingsMenuPlugin.syncOnLoad();
 
   isMassRaidLoaded = true;
@@ -158,8 +235,8 @@ export const clearMissiles = () => {
   uiManagerInstance.doSearch('');
   const satSetLen = catalogManagerInstance.missileSats;
 
-  for (let i = 0; i < 500; i++) {
-    const x = satSetLen - 500 + i;
+  for (let i = 0; i < settingsManager.maxMissiles; i++) {
+    const x = satSetLen - settingsManager.maxMissiles + i;
 
     const missileObj: MissileObject = <MissileObject>catalogManagerInstance.getObject(x);
 
@@ -244,31 +321,57 @@ const validateLaunchBounds_ = (launchLat: number, launchLon: number, targetLat: 
   return null;
 };
 
+/** Great-circle distance (km) between two lat/lon points. */
+const greatCircleKm_ = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const p1 = lat1 * DEG2RAD;
+  const p2 = lat2 * DEG2RAD;
+  const dp = (lat2 - lat1) * DEG2RAD;
+  const dl = (lon2 - lon1) * DEG2RAD;
+  const a = Math.sin(dp / 2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) ** 2;
+
+  return 2 * RADIUS_OF_EARTH * Math.asin(Math.min(1, Math.sqrt(a)));
+};
+
 /**
  * Runs the ballistic flight simulation and returns the smoothed trajectory, or a
  * toast-ready error. Encapsulates the low-apogee retry (bump the burn rate and
  * re-solve) so both the single-missile and MIRV paths share one implementation.
+ *
+ * The rocket-integration model in {@link MissileSimulation} was tuned for ICBMs and
+ * cannot fly short regional (IRBM/SRBM) arcs: fired at a nearby target it carries too
+ * much energy, overshoots, and its solver now reports an error rather than baking a
+ * corrupted track (the old behaviour was a NaN-tailed "success"). For any target that
+ * is inside the missile's stated range but too short for the rocket model, fall back to
+ * the analytic minimum-energy ballistic arc, which is well-behaved at every range and
+ * always lands on the aimpoint. Genuinely out-of-range targets keep surfacing the error.
  */
 const solveTrajectory_ = (spec: MissileSpec): { trajectory: MissileTrajectory } | { error: string; errorType: ToastMsgType } => {
   const result = new MissileSimulation(spec).run();
 
-  if (result.kind === 'error' || result.kind === 'tooClose') {
-    return { error: result.errorMessage, errorType: result.errorType };
+  if (result.kind === 'success') {
+    // The simulation emits a smooth, full-precision great-circle track (samples are
+    // interpolated, not snapped to a 0.01deg grid), so no post-smoothing is needed.
+    return { trajectory: result.trajectory };
   }
 
   if (result.kind === 'lowApogee') {
     return solveTrajectory_({ ...spec, burnRate: (spec.burnRate || 0.042) * result.burnMultiplier });
   }
 
-  // Smooth the boost phase the same way the single-missile path always has.
-  return {
-    trajectory: {
-      latList: smoothList_(result.trajectory.latList, 35),
-      lonList: smoothList_(result.trajectory.lonList, 35),
-      altList: smoothList_(result.trajectory.altList, 35),
-      maxAltitudeKm: result.trajectory.maxAltitudeKm,
-    },
-  };
+  // result.kind is 'error' or 'tooClose'. Try the analytic fallback for in-range shots.
+  const arcKm = greatCircleKm_(spec.launchLatitude, spec.launchLongitude, spec.targetLatitude, spec.targetLongitude);
+
+  if (arcKm >= 320 && arcKm <= spec.maxRangeKm) {
+    try {
+      return {
+        trajectory: generateBallisticTrajectory(spec.launchLatitude, spec.launchLongitude, spec.targetLatitude, spec.targetLongitude),
+      };
+    } catch {
+      // Degenerate geometry - fall through to the solver's original error.
+    }
+  }
+
+  return { error: result.errorMessage, errorType: result.errorType };
 };
 
 /**
@@ -350,7 +453,7 @@ const writeMissileToSlot_ = (
  *   - Argument validation (lat/lon/warheads/range bounds).
  *   - Catalog interaction (`getObject`, `satCruncherThread.sendNewMissile`,
  *     `orbitManager.updateOrbitBuffer`).
- *   - Trajectory post-processing (`smoothList_`) and writing to the missile object.
+ *   - Writing the finished trajectory to the missile object.
  *   - The low-apogee retry recursion (preserved verbatim - the bug where this
  *     path returns 0 even when the recursive call succeeded is fixed in PR 4).
  *
@@ -378,10 +481,10 @@ export const Missile = (
     clearMissiles();
     const satSetLen = ServiceLocator.getCatalogManager().missileSats;
 
-    MissileObjectNum = satSetLen - 500;
+    MissileObjectNum = satSetLen - settingsManager.maxMissiles;
   }
 
-  if (missileManager.missilesInUse >= 500) {
+  if (missileManager.missilesInUse >= settingsManager.maxMissiles) {
     missileManager.lastMissileErrorType = ToastMsgType.critical;
     missileManager.lastMissileError = 'Error: Maximum number of missiles<br>have been reached.';
 
@@ -467,8 +570,8 @@ export const Missile = (
  * Spawns a MIRV (Multiple Independently-targetable Reentry Vehicle) attack: one
  * shared "bus" trajectory to the primary aimpoint, then `warheadCount` reentry
  * vehicles that separate at apogee and fan out across a footprint of nearby
- * aimpoints. Each RV is written to its own catalog slot (so the 500-missile cap
- * counts every RV).
+ * aimpoints. Each RV is written to its own catalog slot (so the missile
+ * reservation, settingsManager.maxMissiles, counts every RV).
  *
  * For `warheadCount <= 1` this defers to a single normal launch. Returns the
  * number of reentry vehicles actually created (0 on validation/range failure).
@@ -490,7 +593,7 @@ export const MirvAttack = (params: MirvLaunchParams): number => {
     return 0;
   }
 
-  if (missileManager.missilesInUse + count > 500) {
+  if (missileManager.missilesInUse + count > settingsManager.maxMissiles) {
     missileManager.lastMissileErrorType = ToastMsgType.critical;
     missileManager.lastMissileError = 'Error: Maximum number of missiles<br>have been reached.';
 
@@ -527,7 +630,7 @@ export const MirvAttack = (params: MirvLaunchParams): number => {
   const bus = solved.trajectory;
   const sepIdx = findSeparationIndex(bus.altList);
   const footprint = generateFootprint(params.targetLatitude, params.targetLongitude, count, params.spreadKm ?? MIRV_DEFAULT_SPREAD_KM);
-  const base = catalogManagerInstance.missileSats - 500 + missileManager.missilesInUse;
+  const base = catalogManagerInstance.missileSats - settingsManager.maxMissiles + missileManager.missilesInUse;
   let created = 0;
 
   for (let i = 0; i < count; i++) {
@@ -546,6 +649,13 @@ export const MirvAttack = (params: MirvLaunchParams): number => {
     );
 
     if (written) {
+      // Every RV but the primary (index 0) rides the shared bus track during ascent,
+      // so hide it until the vehicles separate at apogee: the MIRV reads as a single
+      // missile on the way up and fans into N reentry vehicles after separation.
+      written.hideUntilSeparation = i > 0;
+      // Tag every RV with the full load so the ascent object resolves to the deploy
+      // mesh that shows this many reentry vehicles.
+      written.warheadCount = count;
       created++;
     }
   }
@@ -560,30 +670,6 @@ export const MirvAttack = (params: MirvLaunchParams): number => {
   missileManager.lastMissileError = `${created} reentry vehicle(s) (MIRV)<br>have been created.`;
 
   return created;
-};
-
-/**
- * Removes jagged edges to create a more perfect parabolic path.
- * @param list A list of points along a rough parabolic path.
- * @param smoothingFactor  A smoothed list of points along a parabolic path.
- */
-export const smoothList_ = <T extends number>(list: T[], smoothingFactor: number): T[] => {
-  const newList: T[] = [];
-
-  for (let i = 0; i < list.length; i++) {
-    if (i < list.length / 3) {
-      let sum = 0;
-
-      for (let j = 0; j < smoothingFactor; j++) {
-        sum += list[i + j];
-      }
-      newList.push((sum / smoothingFactor) as T);
-    } else {
-      newList.push(list[i]);
-    }
-  }
-
-  return newList;
 };
 
 /**

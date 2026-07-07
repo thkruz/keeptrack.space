@@ -120,6 +120,13 @@ public/tle/TLEold.json
 # Custom Builds
 custom-builds
 
+# External plugins — nested git clones, restored from external-plugins.json via
+# `npm run plugin -- restore`. The clones themselves are never committed; the
+# lockfile + committed plugin-manifest.external.generated.ts capture the set.
+/src/plugins-external/*
+!/src/plugins-external/.gitkeep
+!/src/plugins-external/README.md
+
 # Library Build
 lib/keepTrack
 lib/example*
@@ -170,3 +177,5 @@ src/offline-tools
 .wrangler
 
 scripts/**/*.png
+# ...but the scaffolder ships template icon assets that must be committed.
+!scripts/plugin/templates/**/*.png

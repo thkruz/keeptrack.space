@@ -911,9 +911,16 @@ export class Missile {
 
   /**
    * Finds the point along the estimated great-circle path that the missile has
-   * reached at the supplied ground distance and appends its rounded latitude and
-   * longitude to the output lists. Mirrors the inline loop used by each flight
-   * phase in {@link Missile.create}.
+   * reached at the supplied ground distance and appends its latitude and longitude
+   * to the output lists, interpolated between the two bracketing samples at full
+   * precision. Mirrors the inline loop used by each flight phase in
+   * {@link Missile.create}.
+   *
+   * The previous implementation snapped to the nearest sample and rounded to
+   * `0.01deg` (~1 km), which turned the 1 Hz track into a visible staircase once
+   * rendered at full resolution. Interpolating along the bracketing chord and
+   * keeping full precision yields the smooth arc (matching the interceptor/launch
+   * trajectories, which never quantize their coordinates).
    *
    * @param useStrictUpper When `true` the next sample must be strictly greater
    *   than the current distance (`> `); when `false` the original negated form
@@ -941,8 +948,33 @@ export class Missile {
       const nextBeyond = useStrictUpper ? EstDistanceList[i + 1] > distanceKm : !(EstDistanceList[i + 1] <= distanceKm);
 
       if (EstDistanceList[i] <= distanceKm && nextBeyond) {
-        LatList.push(Math.round(EstLatList[i] * 100) / 100);
-        LongList.push(Math.round(EstLongList[i] * 100) / 100);
+        const lat0 = EstLatList[i];
+        const lon0 = EstLongList[i];
+        const d0 = EstDistanceList[i];
+        const d1 = EstDistanceList[i + 1];
+        const lat1 = EstLatList[i + 1];
+        const lon1 = EstLongList[i + 1];
+
+        // No usable next sample (end of path): emit the current point unrounded.
+        if (typeof lat1 !== 'number' || typeof d1 !== 'number' || d1 <= d0) {
+          LatList.push(lat0);
+          LongList.push(lon0);
+          break;
+        }
+
+        const frac = Math.max(0, Math.min((distanceKm - d0) / (d1 - d0), 1));
+
+        // Blend longitude along the shorter arc so an antimeridian step interpolates cleanly.
+        let lonStep = lon1 - lon0;
+
+        if (lonStep > 180) {
+          lonStep -= 360;
+        } else if (lonStep < -180) {
+          lonStep += 360;
+        }
+
+        LatList.push(lat0 + (lat1 - lat0) * frac);
+        LongList.push(lon0 + lonStep * frac);
         break;
       }
     }
@@ -964,9 +996,10 @@ export class Missile {
   /**
    * Runs a single flight integration step: invokes {@link Missile.iterationFun_}
    * with the supplied stage parameters, writes the returned running variables back
-   * into {@link state}, records the rounded altitude, and appends the matching
-   * great-circle path coordinate. Returns the new altitude so callers can capture
-   * stage-separation nozzle altitudes exactly as the original loops did.
+   * into {@link state}, records the altitude (km, full precision - rounding to 10 m
+   * added a needless vertical staircase), and appends the matching great-circle path
+   * coordinate. Returns the new altitude so callers can capture stage-separation
+   * nozzle altitudes exactly as the original loops did.
    */
   private static applyPhaseStep_(
     state: MissileFlightState,
@@ -1001,7 +1034,7 @@ export class Missile {
     state.ArcDistance = iterationFunOutput[16];
     state.dthetadt = iterationFunOutput[18];
 
-    fixed.AltitudeList.push(Math.round((state.Altitude / 1000) * 100) / 100);
+    fixed.AltitudeList.push(state.Altitude / 1000);
 
     Missile.appendPathCoordinate_(fixed.EstDistanceList, fixed.EstLatList, fixed.EstLongList, fixed.LatList, fixed.LongList, state.Distance, useStrictUpper);
 

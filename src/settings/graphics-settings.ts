@@ -295,19 +295,6 @@ export class GraphicsSettings {
    */
   pickingDotSize: string = '18.0';
 
-  // WebGL Depth Settings
-  /**
-   * The maximum z-depth for the WebGL renderer.
-   *
-   * Increasing this causes z-fighting
-   * Decreasing this causes clipping of stars and satellites
-   */
-  zFar = 149600000;
-  /**
-   * The minimum z-depth for the WebGL renderer.
-   */
-  zNear = 1.0;
-
   // Mesh Settings
   /**
    * Which mesh to use if meshOverride is set

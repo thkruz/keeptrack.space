@@ -15,6 +15,8 @@ export class Calendar {
   private simulationDate: Date;
   private propagationRate: number = 1;
   private isVisible: boolean = false;
+  /** attachEvents() runs after every render; the container persists, so only bind its click once */
+  private isContainerClickBound_ = false;
 
   // PropRate Slider limits
   private readonly propRateLimitMin = -20;
@@ -89,7 +91,14 @@ export class Calendar {
   }
 
   private attachEvents(): void {
-    document.querySelector(`#${this.containerId}`)?.addEventListener('click', this.toggleDatePicker.bind(this));
+    if (!this.isContainerClickBound_) {
+      const container = document.querySelector(`#${this.containerId}`);
+
+      if (container) {
+        container.addEventListener('click', this.toggleDatePicker.bind(this));
+        this.isContainerClickBound_ = true;
+      }
+    }
 
     const prevButton = document.querySelector('#ui-datepicker-div .ui-datepicker-prev');
     const nextButton = document.querySelector('#ui-datepicker-div .ui-datepicker-next');

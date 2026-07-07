@@ -293,6 +293,20 @@ export const mockUiManager: UiManager = <UiManager>(<unknown>{
 export const mockCameraManager = <Camera>(<unknown>{
   camAngleSnappedOnSat: false,
   camMatrix: mat4.create(),
+  // Per-camera state mirrored from the production Camera class (multi-viewport support)
+  fov: 0.6,
+  viewport: null,
+  satShaderSizes: { minSize: null, maxSize: null },
+  worldShiftOverride: null,
+  clearColorOverride: null,
+  getViewportRect: (gl: WebGL2RenderingContext) => ({ x: 0, y: 0, width: gl?.drawingBufferWidth ?? 1920, height: gl?.drawingBufferHeight ?? 1080 }),
+  getAspectRatio: (gl: WebGL2RenderingContext) => (gl?.drawingBufferWidth ?? 1920) / (gl?.drawingBufferHeight ?? 1080),
+  getViewportNdc: (gl: WebGL2RenderingContext, mouseX: number, mouseY: number) => ({
+    x: (mouseX / (gl?.drawingBufferWidth ?? 1920)) * 2 - 1,
+    y: -((mouseY / (gl?.drawingBufferHeight ?? 1080)) * 2 - 1),
+  }),
+  hasModeDelegate: vi.fn().mockReturnValue(false),
+  setFieldOfView: vi.fn(),
   camPitch: null,
   camPitchSpeed: 0,
   camPitchTarget: null,

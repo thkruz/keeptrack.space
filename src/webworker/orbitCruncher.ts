@@ -1,4 +1,5 @@
 import { DEG2RAD, eci2ecef, GreenwichMeanSiderealTime, Kilometers, lla2eci, Radians, Sgp4, TemeVec3 } from '@ootk/src/main';
+import { rebaseToAnchor } from '../engine/math/orbit-anchor-math';
 import { jday } from '../engine/utils/transforms';
 import {
   OrbitCruncherCachedObject, OrbitCruncherInMsgChangeOrbitType, OrbitCruncherInMsgInit, OrbitCruncherInMsgMissileUpdate,
@@ -6,6 +7,9 @@ import {
   OrbitCruncherMissileObject,
   OrbitCruncherMsgType, OrbitCruncherOtherObject, OrbitCruncherSatelliteObject, OrbitDrawTypes,
 } from './orbit-cruncher-messages';
+
+/** Earth's sidereal rotation rate (rad/s) — the rate GMST advances. */
+const EARTH_ROTATION_RAD_PER_SEC = 7.2921159e-5;
 
 const objCache = [] as OrbitCruncherCachedObject[];
 let numberOfSegments: number;
@@ -61,16 +65,20 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
   const id = data.id;
   const isEcfOutput = data.isEcfOutput || false;
   const isPolarViewEcf = data.isPolarViewEcf || false;
-  const pointsOut = new Float32Array((numberOfSegments + 1) * 4);
+  // Float64 scratch: quantized to float32 only AFTER the anchor rebase below.
+  const points = new Float64Array((numberOfSegments + 1) * 4);
 
   // Defensive bounds check: a catalog swap can shrink objCache, but in-flight
   // update messages for old ids may still arrive. Reply with the zero buffer
   // so the consumer (orbit-cruncher-thread-manager) sees a normal response
   // and any waiting state (inProgress_, orbitCache) gets cleared.
   if (id >= objCache.length || !objCache[id]) {
+    const pointsOut = new Float32Array((numberOfSegments + 1) * 4);
+
     postMessage({
       typ: OrbitCruncherMsgType.RESPONSE_DATA,
       pointsOut,
+      anchor: [0, 0, 0],
       satId: id,
       seqNum: currentSeqNum,
     }, { transfer: [pointsOut.buffer as ArrayBuffer] });
@@ -87,10 +95,13 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
     const hasTrajectory = missile.latList && missile.lonList && missile.altList && missile.altList.length > 0;
 
     if (!hasTrajectory) {
-      // pointsOut is already zero-initialized; nothing to draw until the missile trajectory is populated
+      // Nothing to draw until the missile trajectory is populated
+      const pointsOut = new Float32Array((numberOfSegments + 1) * 4);
+
       postMessage({
         typ: OrbitCruncherMsgType.RESPONSE_DATA,
         pointsOut,
+        anchor: [0, 0, 0],
         satId: id,
         seqNum: currentSeqNum,
       }, { transfer: [pointsOut.buffer as ArrayBuffer] });
@@ -98,21 +109,34 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
       return;
     }
 
-    // Compute GMST once for all missile segments (same time for all points)
-    const missileJ =
-      jday(nowDate.getUTCFullYear(), nowDate.getUTCMonth() + 1, nowDate.getUTCDate(), nowDate.getUTCHours(), nowDate.getUTCMinutes(), nowDate.getUTCSeconds()) +
-      nowDate.getUTCMilliseconds() * 1.15741e-8;
-    const missileGmst = Sgp4.gstime(missileJ);
+    // Each sample is a ground-referenced point captured at launch + x seconds, so it
+    // must be rotated to ECI by the GMST at *its* time. When the launch epoch is known
+    // we derive a per-sample GMST from it (essential for multi-hour trajectories such
+    // as a GEO intercept, which spans ~78° of Earth rotation); otherwise we fall back
+    // to a single GMST at the current time (accurate enough for short ballistic arcs).
+    const startMs = missile.startTime;
+    const usePerSampleGmst = typeof startMs === 'number';
+    const gmstAnchorDate = typeof startMs === 'number' ? new Date(startMs) : nowDate;
+    const gmstAnchorJ =
+      jday(
+        gmstAnchorDate.getUTCFullYear(), gmstAnchorDate.getUTCMonth() + 1, gmstAnchorDate.getUTCDate(),
+        gmstAnchorDate.getUTCHours(), gmstAnchorDate.getUTCMinutes(), gmstAnchorDate.getUTCSeconds(),
+      ) +
+      gmstAnchorDate.getUTCMilliseconds() * 1.15741e-8;
+    const gmstAnchor = Sgp4.gstime(gmstAnchorJ);
 
     while (i < len) {
-      drawMissileSegment_(missile, i, pointsOut, len, missileGmst);
+      drawMissileSegment_(missile, i, points, len, gmstAnchor, usePerSampleGmst);
       i++;
     }
   } else if ((objCache[id] as OrbitCruncherOtherObject).ignore || !(objCache[id] as OrbitCruncherSatelliteObject).satrec) {
     // Invalid objects or OemSatellite with no TLEs
+    const pointsOut = new Float32Array((numberOfSegments + 1) * 4);
+
     postMessage({
       typ: OrbitCruncherMsgType.RESPONSE_DATA,
       pointsOut,
+      anchor: [0, 0, 0],
       satId: id,
       seqNum: currentSeqNum,
     }, { transfer: [pointsOut.buffer as ArrayBuffer] });
@@ -138,32 +162,57 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
       timeslice *= numberOfOrbitsToDraw;
     }
 
+    /*
+     * Quantize the sampling start to the timeslice grid so constant-redraw
+     * resamples reuse IDENTICAL sample times until sim time crosses the next
+     * slice boundary. Sampling from the raw `now` slid every vertex along the
+     * track each frame, and the coarse polyline's chords swayed laterally
+     * within the curve's sagitta - a visible shimmer on zoomed-in ECF lines
+     * (ECI hides it because the slide is along-track near the satellite). The
+     * per-frame head-vertex patch (OrbitManager.writePathToGpu_) keeps the
+     * line glued to the dot between boundary crossings.
+     */
+    const quantizedNow = Math.floor(now / timeslice) * timeslice;
+
     // For polar view, center the orbit on the current position (±half period)
-    const orbitStart = isPolarViewEcf ? now - period / 2 : now;
+    const orbitStart = isPolarViewEcf ? quantizedNow - period / 2 : quantizedNow;
 
     if (orbitType === OrbitDrawTypes.ORBIT) {
       while (i < len) {
-        drawTleOrbitSegment_(orbitStart, i, timeslice, id, isEcfOutput, pointsOut, len, isPolarViewEcf, satrec.jdsatepoch);
+        drawTleOrbitSegment_(orbitStart, i, timeslice, id, isEcfOutput, points, len, isPolarViewEcf, satrec.jdsatepoch);
         i++;
       }
     } else if (orbitType === OrbitDrawTypes.TRAIL) {
       while (i < len) {
-        drawTleOrbitSegmentTrail_(orbitStart, i, timeslice, id, isEcfOutput, pointsOut, len, isPolarViewEcf, satrec.jdsatepoch);
+        drawTleOrbitSegmentTrail_(orbitStart, i, timeslice, id, isEcfOutput, points, len, isPolarViewEcf, satrec.jdsatepoch);
         i++;
       }
     }
   }
 
+  const { pointsOut, anchor } = rebaseToAnchor(points);
+
   postMessage({
     typ: OrbitCruncherMsgType.RESPONSE_DATA,
     pointsOut,
+    anchor,
     satId: id,
     seqNum: currentSeqNum,
   }, { transfer: [pointsOut.buffer as ArrayBuffer] });
 };
 
-const drawMissileSegment_ = (missile: OrbitCruncherMissileObject, i: number, pointsOut: Float32Array, len: number, gmst: number) => {
-  const x = Math.round(missile.altList.length * (i / numberOfSegments));
+const drawMissileSegment_ = (
+  missile: OrbitCruncherMissileObject, i: number, pointsOut: Float64Array, len: number,
+  gmstAnchor: number, usePerSampleGmst: boolean,
+) => {
+  // Clamp so the final segment (i === numberOfSegments) does not read one past the
+  // end of the lists (which produced a NaN vertex).
+  const x = Math.min(missile.altList.length - 1, Math.round(missile.altList.length * (i / numberOfSegments)));
+  // Sample x is captured at launch + x seconds (1 Hz cadence). With a known launch
+  // epoch, rotate it to ECI by the GMST at that time (anchor + Earth rotation over x
+  // seconds); a single GMST for the whole arc spins a multi-hour trajectory off its
+  // dots. Without a launch epoch, gmstAnchor is already the current-time GMST.
+  const gmst = usePerSampleGmst ? gmstAnchor + EARTH_ROTATION_RAD_PER_SEC * x : gmstAnchor;
 
   // Use the ellipsoidal (WGS84) lat/lon/alt -> ECI conversion, the same one
   // MissileObject.eci() and every other object use. A spherical approximation
@@ -182,7 +231,7 @@ const drawMissileSegment_ = (missile: OrbitCruncherMissileObject, i: number, poi
 
 const drawTleOrbitSegmentTrail_ = (
   now: number, i: number, timeslice: number, id: number, isEcfOutput: boolean,
-  pointsOut: Float32Array, len: number,
+  pointsOut: Float64Array, len: number,
   isPolarViewEcf: boolean, jdsatepoch: number,
 ) => {
   const t = now + i * timeslice;
@@ -212,7 +261,7 @@ const drawTleOrbitSegmentTrail_ = (
 
 const drawTleOrbitSegment_ = (
   now: number, i: number, timeslice: number, id: number, isEcfOutput: boolean,
-  pointsOut: Float32Array, len: number,
+  pointsOut: Float64Array, len: number,
   isPolarViewEcf: boolean, jdsatepoch: number,
 ) => {
   const t = now + i * timeslice;
@@ -290,12 +339,17 @@ const handleMsgMissileUpdate_ = (data: OrbitCruncherInMsgMissileUpdate) => {
   if (data.id >= objCache.length || !objCache[data.id]) {
     return;
   }
-  if (data.latList && data.lonList && data.altList) {
-    const missileCacheEntry = objCache[data.id] as OrbitCruncherMissileObject;
+  const missileCacheEntry = objCache[data.id] as OrbitCruncherMissileObject;
 
+  if (data.latList && data.lonList && data.altList) {
     missileCacheEntry.latList = data.latList;
     missileCacheEntry.lonList = data.lonList;
     missileCacheEntry.altList = data.altList;
+  }
+  // Sent every redraw once known; cache it so per-frame updates (which omit the
+  // heavy lists) still have the launch epoch for per-sample GMST.
+  if (typeof data.startTime === 'number') {
+    missileCacheEntry.startTime = data.startTime;
   }
 };
 

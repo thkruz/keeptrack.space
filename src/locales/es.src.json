@@ -109,6 +109,7 @@
     "groupCameraModes": "Modos de cámara",
     "groupLayerToggles": "Alternar capas",
     "groupSettingsToggles": "Alternar configuración",
+    "groupDevTools": "Herramientas de desarrollo",
     "groupAbout": "Acerca de"
   },
   "rightClickMenu": {

@@ -1,0 +1,48 @@
+{
+  "$schema": "./preset.schema.json",
+  "$doc": "Two layers. `presets` = named single-menu runs (plugin + menuRoot, for `npm run locale-matrix -- <name>`). `preconditions` = per-menu setup hints keyed by the side-menu-parent element id, consumed by --sweep whole-app mode: only menus that need a selected sat / sensor / catalog / custom setup need an entry here; every other v13 menu is discovered and opened automatically with no config.",
+  "preconditions": {
+    "editSat-menu": { "needsCatalog": true, "selectSat": "25544" },
+    "MissileSimulatorPlugin-menu": { "needsCatalog": true }
+  },
+  "presets": {
+    "catalog-management": {
+      "plugin": "CatalogManagementPlugin",
+      "menuRoot": "catalog-management-menu"
+    },
+    "create-sat": {
+      "plugin": "CreateSat",
+      "menuRoot": "createSat-menu"
+    },
+    "find-sat": {
+      "plugin": "FindSatPlugin",
+      "menuRoot": "findByLooks-menu"
+    },
+    "filter-menu": {
+      "plugin": "FilterMenuPlugin",
+      "menuRoot": "filter-menu"
+    },
+    "breakup": {
+      "plugin": "Breakup",
+      "menuRoot": "breakup-menu"
+    },
+    "breakup-analysis": {
+      "plugin": "BreakupAnalysis",
+      "menuRoot": "breakup-analysis-menu"
+    },
+    "reports": {
+      "plugin": "ReportsPlugin",
+      "menuRoot": "reports-menu"
+    },
+    "settings-menu": {
+      "plugin": "SettingsMenuPlugin",
+      "menuRoot": "settings-menu"
+    },
+    "edit-sat": {
+      "plugin": "EditSat",
+      "menuRoot": "editSat-menu",
+      "catalog": true,
+      "selectSat": "25544"
+    }
+  }
+}

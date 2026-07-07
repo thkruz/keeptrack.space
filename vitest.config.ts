@@ -66,6 +66,8 @@ export default defineConfig({
         '**/test.js',
         '**/*.stories.ts',
         '**/*.stories.js',
+        // Third-party external plugins are not held to the host coverage ratchet.
+        'src/plugins-external/**',
       ],
       reportOnFailure: true,
       // Re-baselined against the full src denominator (coverage.include now counts every
@@ -85,6 +87,14 @@ export default defineConfig({
       'dist/**',
       'src/admin/**',
       'src/engine/ootk/**',
+      // External plugin tests run in the plugin's own repo CI, not the host suite.
+      'src/plugins-external/**',
+      // Bare "test.ts" files are CLI commands/tooling (e.g. the plugin CLI's
+      // `test` command), not vitest suites. Real tests are named "*.test.ts".
+      '**/test.ts',
+      // CI helper scripts (e.g. the plugins-pro supgp logic tests) use Node's
+      // built-in `node:test` runner and run in their own repo CI, not vitest.
+      '**/.github/**',
     ],
   },
   resolve: {
@@ -93,6 +103,7 @@ export default defineConfig({
       '@engine': path.resolve(__dirname, './src/engine'),
       '@ootk': path.resolve(__dirname, './src/engine/ootk'),
       '@plugins-pro': path.resolve(__dirname, './src/plugins-pro'),
+      '@plugins-external': path.resolve(__dirname, './src/plugins-external'),
       '@public': path.resolve(__dirname, './public'),
       '@css': path.resolve(__dirname, './public/css'),
       '@test': path.resolve(__dirname, './test'),

@@ -1,0 +1,87 @@
+/**
+ * __DISPLAY_NAME__ — a KeepTrack overlay/toggle plugin.
+ *
+ * This "overlay" starter has no side menu: it is a single drawer icon that
+ * toggles some state on and off (like the built-in Night mode toggle). Good for
+ * layers, overlays, and on/off features.
+ *
+ * The entry MUST export a class named `__CLASS_NAME__` whose `readonly id`
+ * equals its configKey (`__CONFIG_KEY__`).
+ */
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
+import {
+  IBottomIconConfig, ICommandPaletteCommand, IconPlacement, IHelpConfig, IKeyboardShortcut, UtilityGroup,
+} from '@app/engine/plugins/core/plugin-capabilities';
+import { t7e } from '@app/locales/keys';
+import pluginIcon from './__ELEMENT_BASE__-icon.png';
+import './plugin.css';
+
+type T7eKey = Parameters<typeof t7e>[0];
+
+const l = (key: string): string => t7e(`plugins.__CONFIG_KEY__.${key}` as T7eKey);
+
+export class __CLASS_NAME__ extends KeepTrackPlugin {
+  readonly id = '__CONFIG_KEY__';
+  dependencies_ = [];
+
+  private isActive_ = false;
+
+  // Bridge to onBottomIconClick until the base class wires up component callbacks.
+  bottomIconCallback = (): void => {
+    this.onBottomIconClick();
+  };
+
+  getBottomIconConfig(): IBottomIconConfig {
+    return {
+      elementName: '__ELEMENT_BASE__-bottom-icon',
+      label: l('bottomIconLabel'),
+      // Ships with the plugin and is bundled by the build. Replace the PNG in
+      // src/ (keep the import) to use your own 32x32 icon.
+      image: pluginIcon,
+      menuMode: [MenuMode.DISPLAY, MenuMode.ALL],
+      placement: IconPlacement.UTILITY_ONLY,
+      utilityGroup: UtilityGroup.LAYER_TOGGLE,
+    };
+  }
+
+  getHelpConfig(): IHelpConfig {
+    return {
+      title: l('title'),
+      sections: [{ heading: t7e('help.overview'), content: l('helpBody') }],
+    };
+  }
+
+  getKeyboardShortcuts(): IKeyboardShortcut[] {
+    // Pick a key that is intuitive for your feature (and not already taken).
+    return [{ key: 'U', callback: () => this.toggle_() }];
+  }
+
+  getCommandPaletteCommands(): ICommandPaletteCommand[] {
+    return [
+      {
+        id: '__CONFIG_KEY__.toggle',
+        label: l('commandPalette.toggle'),
+        category: 'Display',
+        callback: () => this.toggle_(),
+      },
+    ];
+  }
+
+  onBottomIconClick(): void {
+    this.toggle_();
+  }
+
+  private toggle_(): void {
+    this.isActive_ = !this.isActive_;
+
+    if (this.isActive_) {
+      this.setBottomIconToSelected();
+    } else {
+      this.setBottomIconToUnselected();
+    }
+
+    ServiceLocator.getUiManager().toast(l(this.isActive_ ? 'toasts.on' : 'toasts.off'), ToastMsgType.normal);
+  }
+}

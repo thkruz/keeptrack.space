@@ -4,6 +4,7 @@ import {
   BREAKUP_PRESETS,
   BreakupRawForm,
   buildFragmentTle,
+  computeImpactBias,
   computeRicBasis,
   DEFAULT_BREAKUP_PRESET,
   getBreakupPreset,
@@ -148,6 +149,52 @@ describe('breakup-core', () => {
       expect(Math.abs(a.r)).toBeLessThanOrEqual(3 * 10 * MS_TO_KMS + 1e-12);
       expect(Math.abs(a.i)).toBeLessThanOrEqual(3 * 30 * MS_TO_KMS + 1e-12);
       expect(Math.abs(a.c)).toBeLessThanOrEqual(3 * 10 * MS_TO_KMS + 1e-12);
+    });
+
+    it('shifts the sample mean by the bias (kinetic-impact offset)', () => {
+      const spread = { radial: 40, inTrack: 40, crossTrack: 40 };
+      const bias = { r: 0.2, i: -0.1, c: 0.05 }; // km/s
+      const rng = makeRng(42);
+      const n = 4000;
+      const sum = { r: 0, i: 0, c: 0 };
+
+      for (let k = 0; k < n; k++) {
+        const dv = sampleDeltaV(rng, spread, bias);
+
+        sum.r += dv.r;
+        sum.i += dv.i;
+        sum.c += dv.c;
+      }
+      // The zero-mean Gaussian spread averages out, leaving the bias.
+      expect(sum.r / n).toBeCloseTo(bias.r, 1);
+      expect(sum.i / n).toBeCloseTo(bias.i, 1);
+      expect(sum.c / n).toBeCloseTo(bias.c, 1);
+    });
+  });
+
+  describe('computeImpactBias', () => {
+    // Axis-aligned RIC basis so projection is trivial to reason about.
+    const basis = {
+      radial: { x: 1, y: 0, z: 0 },
+      inTrack: { x: 0, y: 1, z: 0 },
+      crossTrack: { x: 0, y: 0, z: 1 },
+    };
+
+    it('projects the relative velocity onto RIC and scales by the transfer fraction', () => {
+      const relVel = { x: 2, y: -4, z: 1 }; // km/s
+      const bias = computeImpactBias(relVel, basis, 0.05);
+
+      expect(bias.r).toBeCloseTo(0.1, 12);
+      expect(bias.i).toBeCloseTo(-0.2, 12);
+      expect(bias.c).toBeCloseTo(0.05, 12);
+    });
+
+    it('gives an ascending hit positive radial bias and a descending hit negative', () => {
+      const ascending = computeImpactBias({ x: 3, y: 0, z: 0 }, basis, 0.05);
+      const descending = computeImpactBias({ x: -3, y: 0, z: 0 }, basis, 0.05);
+
+      expect(ascending.r).toBeGreaterThan(0);
+      expect(descending.r).toBeLessThan(0);
     });
   });
 

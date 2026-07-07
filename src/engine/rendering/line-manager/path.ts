@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import { SolarBody } from '@app/engine/core/interfaces';
 import { Scene } from '@app/engine/core/scene';
+import { settingsManager } from '@app/settings/settings';
 import { vec3, vec4 } from 'gl-matrix';
 import { GlUtils } from '../gl-utils';
 import { LineManager } from '../line-manager';
@@ -39,6 +40,15 @@ export abstract class Path extends Line {
     }
 
     gl.uniform4fv(lineManager.uniforms_.u_color, this.color_);
+
+    // Celestial/orbit paths are stored as absolute inertial positions
+    // (heliocentric or ECI/TEME) and their dots render unrotated, so they must
+    // ALWAYS draw in ECI - never the GMST-rotated ECF branch. In ECF mode
+    // setWorldUniforms leaves u_ecfMode=1 for the whole line pass, which would
+    // spin these paths off their bodies; force it (and the anchor override) off.
+    gl.uniform1i(lineManager.uniforms_.u_ecfMode, 0);
+    gl.uniform1i(lineManager.uniforms_.u_anchorMode, 0);
+
     const sceneManager = Scene.getInstance();
     const centerBodyEntity = sceneManager.getBodyById(this.centerBody);
 
@@ -54,6 +64,10 @@ export abstract class Path extends Line {
     gl.vertexAttribPointer(lineManager.attribs.a_position.location, 4, gl.FLOAT, false, 0, 0);
 
     gl.drawArrays(gl.LINE_STRIP, 0, this.pathLength_);
+
+    // Restore the pass-level ECF mode so a non-Path line drawn after this one is
+    // unaffected (the general line pass sets u_ecfMode from isOrbitCruncherInEcf).
+    gl.uniform1i(lineManager.uniforms_.u_ecfMode, settingsManager.isOrbitCruncherInEcf ? 1 : 0);
   }
 
   abstract update(): void;

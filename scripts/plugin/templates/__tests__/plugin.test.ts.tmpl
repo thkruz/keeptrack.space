@@ -1,0 +1,42 @@
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { standardPluginMenuButtonTests, standardPluginSuite } from '@test/generic-tests';
+import { vi } from 'vitest';
+import { __CLASS_NAME__ } from '../src/plugin';
+
+describe('__CLASS_NAME__', () => {
+  beforeEach(() => {
+    setupStandardEnvironment();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  standardPluginSuite(__CLASS_NAME__, '__CONFIG_KEY__');
+  standardPluginMenuButtonTests(__CLASS_NAME__, '__CONFIG_KEY__');
+});
+
+describe('__CLASS_NAME__ behavior', () => {
+  let plugin: __CLASS_NAME__;
+
+  beforeEach(() => {
+    setupStandardEnvironment();
+    plugin = new __CLASS_NAME__();
+    plugin.init();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('exposes the bottom icon, side menu, and a command palette command', () => {
+    expect(plugin.getBottomIconConfig().elementName).toBe('__ELEMENT_BASE__-bottom-icon');
+    expect(plugin.getSideMenuConfig().elementName).toBe('__ELEMENT_BASE__-menu');
+    expect(plugin.getCommandPaletteCommands()[0].id).toBe('__CONFIG_KEY__.open');
+    expect(() => plugin.getCommandPaletteCommands()[0].callback()).not.toThrow();
+  });
+});

@@ -39,6 +39,9 @@ if (typeof global !== 'undefined') {
   global.CustomEvent = dom.window.CustomEvent;
   global.KeyboardEvent = dom.window.KeyboardEvent;
   global.MouseEvent = dom.window.MouseEvent;
+  // MutationObserver must come from the same JSDOM realm as global.document,
+  // or observe() rejects its nodes as foreign ("parameter 1 is not of type 'Node'").
+  global.MutationObserver = dom.window.MutationObserver;
   // Ensure HTML element classes from JSDOM are available globally
   global.HTMLElement = dom.window.HTMLElement;
   global.HTMLDivElement = dom.window.HTMLDivElement;
@@ -243,45 +246,80 @@ global.requestIdleCallback = ((cb: IdleRequestCallback) => setTimeout(() => cb({
 }), 0)) as unknown as typeof requestIdleCallback;
 global.cancelIdleCallback = ((handle: number) => clearTimeout(handle)) as unknown as typeof cancelIdleCallback;
 
-global.console = {
-  error: console.error.bind(console),
-  warn: console.warn.bind(console),
-  log: console.log.bind(console),
+/*
+ * Known-noise console patterns that carry no signal in the test environment.
+ * Dropping them keeps the test log readable without hiding real failures
+ * (console output never affects pass/fail). To silence a new class of noise,
+ * add its pattern here rather than sprinkling per-call guards:
+ *   - jsdom "Not implemented: ..." stubs for browser APIs we never exercise
+ *     (HTMLMediaElement.load/play/pause, window.scrollTo, ...). jsdom routes
+ *     these to console.error via its virtual console.
+ *   - "[KeyboardShortcutRegistry] Shortcut conflict: ..." — suites re-init the
+ *     same plugins repeatedly, so each run re-registers (and self-conflicts on)
+ *     the same shortcuts. Benign in tests; noisy in the log.
+ *   - echarts-gl's "geo3D exists." re-registration warning.
+ */
+const suppressedConsolePatterns: RegExp[] = [
+  /Not implemented:/u,
+  /\[KeyboardShortcutRegistry\] Shortcut conflict:/u,
+  /geo3D exists\./u,
+];
 
-  // Ignore console.log() type statements during test
+const isSuppressedConsoleMessage = (args: unknown[]): boolean =>
+  args.some((arg) => typeof arg === 'string' && suppressedConsolePatterns.some((pattern) => pattern.test(arg)));
+
+const withNoiseFilter = (base: (...args: unknown[]) => void) => (...args: unknown[]): void => {
+  if (isSuppressedConsoleMessage(args)) {
+    return;
+  }
+  base(...args);
+};
+
+global.console = {
+  error: withNoiseFilter(console.error.bind(console)),
+  warn: withNoiseFilter(console.warn.bind(console)),
+  log: withNoiseFilter(console.log.bind(console)),
+
+  // Ignore console.info()/debug() statements during test
   info: vi.fn(),
   debug: vi.fn(),
 } as unknown as Console;
 
-// Note: echarts-gl warning filtered below during tests
+/*
+ * jsdom leaves HTMLMediaElement's media methods unimplemented and logs
+ * "Not implemented: HTMLMediaElement's load() method" (etc.) through its virtual
+ * console every time one is called. That virtual console is wired to vitest's own
+ * console, so it bypasses the global.console noise filter above — the only way to
+ * silence it is to give the methods a no-op body.
+ *
+ * Crucially this must be done on EVERY realm test code can reach: `new Audio()`
+ * resolves to the vitest jsdom environment (globalThis.HTMLMediaElement), while
+ * document.createElement('audio'/'video') resolves to the manual JSDOM created
+ * above (dom.window.HTMLMediaElement). Patching only one leaves the other noisy.
+ */
+for (const realm of [globalThis as unknown as Window, dom.window]) {
+  const MediaElement = (realm as { HTMLMediaElement?: typeof HTMLMediaElement }).HTMLMediaElement;
 
-// If console.warn tries to warn "geo3D exists." ignore it.
-const consoleWarn = global.console.warn;
-
-global.console.warn = (message, ...optionalParams) => {
-  if (typeof message === 'string' && message.includes('geo3D exists.')) {
-    return;
+  if (!MediaElement) {
+    continue;
   }
-  consoleWarn(message, ...optionalParams);
-};
 
-window.HTMLMediaElement.prototype.load = () => {
-  /* do nothing */
-};
-window.HTMLMediaElement.prototype.play = async () => {
-  /* do nothing */
-};
-window.HTMLMediaElement.prototype.pause = () => {
-  /* do nothing */
-};
-window.HTMLMediaElement.prototype.addTextTrack = (kind, label, language) => {
-  return {
+  MediaElement.prototype.load = () => {
+    /* do nothing */
+  };
+  MediaElement.prototype.play = async () => {
+    /* do nothing */
+  };
+  MediaElement.prototype.pause = () => {
+    /* do nothing */
+  };
+  MediaElement.prototype.addTextTrack = ((kind: TextTrackKind, label?: string, language?: string) => ({
     kind,
     label,
     language,
-    addCue: () => { },
-  } as unknown as TextTrack;
-};
+    addCue: () => { /* do nothing */ },
+  })) as unknown as HTMLMediaElement['addTextTrack'];
+}
 
 /*
  * Eruda is a console for mobile web browsers

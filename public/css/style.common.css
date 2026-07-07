@@ -3923,6 +3923,8 @@ body.drawer-mode:not(.is-mobile-mode) footer#nav-footer {
   position: absolute;
   bottom: 10px;
   display: none;
+  /* Invisible edit-time anchor that overlaps #datetime-text once opened; must never eat its clicks */
+  pointer-events: none;
 }
 
 #datetime-input-tb {

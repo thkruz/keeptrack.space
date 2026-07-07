@@ -1,4 +1,5 @@
 /* eslint-disable no-undefined */
+/* eslint-disable max-lines -- flat registry of every plugin; grows with each addition */
 /**
  * Plugin Manifest - Single source of truth for all plugin registrations.
  *
@@ -13,6 +14,7 @@
  * rspack never resolves the plugins-pro path → no stub files needed.
  */
 import type { PluginDescriptor } from './plugin-descriptor';
+import { externalPluginManifest } from './plugin-manifest.external.generated';
 import { satInfoBoxOrbitalConfigurationDefaults } from './sat-info-box-orbital/sat-info-box-orbital-settings';
 
 export const pluginManifest: PluginDescriptor[] = [
@@ -68,9 +70,16 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true },
   },
   {
+    // Replaced by AccessTimelinePlugin in Pro builds; still the default in OSS.
     configKey: 'TimeSlider',
     ossImport: () => import('./time-slider/time-slider'),
     ossClassName: 'TimeSlider',
+    defaultConfig: { enabled: !__IS_PRO__, order: 1001 },
+  },
+  {
+    configKey: 'AccessTimelinePlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/access-timeline/access-timeline') : undefined,
+    proClassName: 'AccessTimelinePlugin',
     defaultConfig: { enabled: true, order: 1001 },
   },
   {
@@ -139,6 +148,12 @@ export const pluginManifest: PluginDescriptor[] = [
     configKey: 'SatInfoBoxSponsor',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/sat-info-box-sponsor/sat-info-box-sponsor') : undefined,
     proClassName: 'SatInfoBoxSponsor',
+    defaultConfig: { enabled: true },
+  },
+  {
+    configKey: 'BottomBannerSponsor',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/bottom-banner-sponsor/bottom-banner-sponsor') : undefined,
+    proClassName: 'BottomBannerSponsor',
     defaultConfig: { enabled: true },
   },
   {
@@ -251,16 +266,18 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 21 },
   },
   {
+    // Replaced by AccessTimelinePlugin in Pro builds; still the default in OSS.
     configKey: 'SensorTimeline',
     ossImport: () => import('./timeline-sensor/sensor-timeline'),
     ossClassName: 'SensorTimeline',
-    defaultConfig: { enabled: true, order: 30 },
+    defaultConfig: { enabled: !__IS_PRO__, order: 30 },
   },
   {
+    // Replaced by AccessTimelinePlugin in Pro builds; still the default in OSS.
     configKey: 'SatelliteTimeline',
     ossImport: () => import('./timeline-satellite/satellite-timeline'),
     ossClassName: 'SatelliteTimeline',
-    defaultConfig: { enabled: true, order: 31 },
+    defaultConfig: { enabled: !__IS_PRO__, order: 31 },
   },
   {
     configKey: 'WatchlistPlugin',
@@ -516,6 +533,13 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
   {
+    configKey: 'MultiView',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/multi-view/multi-view') : undefined,
+    proClassName: 'MultiView',
+    defaultConfig: { enabled: true, order: 157 },
+    isLoginRequired: true,
+  },
+  {
     configKey: 'SatelliteFov',
     ossImport: () => import('./satellite-fov/satellite-fov'),
     ossClassName: 'SatelliteFov',
@@ -742,6 +766,13 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
   {
+    configKey: 'TransitFinderPlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/transit-finder/transit-finder') : undefined,
+    proClassName: 'TransitFinderPlugin',
+    defaultConfig: { enabled: true, order: 426 },
+    isLoginRequired: true,
+  },
+  {
     configKey: 'EclipseSolarAnalysis',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/eclipse-solar-analysis/eclipse-solar-analysis') : undefined,
     proClassName: 'EclipseSolarAnalysis',
@@ -753,6 +784,13 @@ export const pluginManifest: PluginDescriptor[] = [
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/coverage-analysis/coverage-analysis') : undefined,
     proClassName: 'CoverageAnalysis',
     defaultConfig: { enabled: true, order: 94 },
+    isLoginRequired: true,
+  },
+  {
+    configKey: 'SatelliteInterceptor',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/satellite-interceptor/satellite-interceptor') : undefined,
+    proClassName: 'SatelliteInterceptor',
+    defaultConfig: { enabled: true, order: 95 },
     isLoginRequired: true,
   },
   {
@@ -954,4 +992,25 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: false, order: 520 },
     isLoginRequired: true,
   },
+
+  {
+    configKey: 'PluginManagerPlugin',
+    ossImport: () => import('./plugin-manager/plugin-manager'),
+    ossClassName: 'PluginManagerPlugin',
+    defaultConfig: { enabled: false, order: 950 },
+  },
+
+  // ── Onboarding (last: its tour targets look up other plugins) ─────────────
+  {
+    configKey: 'OnboardingPlugin',
+    ossImport: () => import('./onboarding/onboarding'),
+    ossClassName: 'OnboardingPlugin',
+    // order -1 places Get Started above the built-in About entries (order 0,
+    // e.g. View on GitHub) in the drawer's About group.
+    defaultConfig: { enabled: true, order: -1 },
+  },
+
+  // ── External plugins (generated — always init after every built-in) ──────────
+  // Empty upstream; populated by `npm run plugin -- sync` from installed clones.
+  ...externalPluginManifest,
 ];

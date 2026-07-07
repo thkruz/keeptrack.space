@@ -128,6 +128,9 @@ export enum StorageKey {
   // Sponsor ad dismissal (timestamp in ms until which the ad stays hidden)
   SPONSOR_AD_DISMISSED_UNTIL = 'v2-keepTrack-sponsorAdDismissedUntil',
 
+  // Bottom banner ad dismissal (timestamp in ms until which the banner stays hidden)
+  BOTTOM_BANNER_AD_DISMISSED_UNTIL = 'v2-keepTrack-bottomBannerAdDismissedUntil',
+
   // Stereo Map (map style, graticule, political overlay, orbit multiplier)
   STEREO_MAP_SETTINGS = 'v2-keepTrack-stereoMapSettings',
 
@@ -160,4 +163,18 @@ export enum StorageKey {
 
   // Calculator (last-used input frame, output format, and field values)
   CALCULATOR_SETTINGS = 'v2-keepTrack-calculatorSettings',
+
+  // Multi-View Pro (split fraction + last-used secondary pane mode)
+  MULTI_VIEW_SETTINGS = 'v2-keepTrack-multiViewSettings',
+
+  // Onboarding (tour/checklist progress; survives version wipes via the
+  // preservation allowlist in PersistenceManager.validateStorage)
+  ONBOARDING_STATE = 'v2-keepTrack-onboardingState',
+
+  // Access Timeline Pro (sensor objNames shown in the docked timeline strip)
+  ACCESS_TIMELINE_ENABLED_SENSORS = 'v2-keepTrack-accessTimelineEnabledSensors',
+
+  // Plugin Manager (per-plugin enable/disable overrides, diffed from manifest
+  // defaults; survives version wipes via the preservation allowlist)
+  PLUGIN_ENABLE_OVERRIDES = 'v2-keepTrack-pluginEnableOverrides',
 }

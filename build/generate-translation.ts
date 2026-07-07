@@ -1,8 +1,13 @@
 import path from 'node:path';
+import { reporter } from './lib/reporter';
 import { mergeAllLocales } from './utils/generate-translation-json';
 import { generateKeysFile } from './utils/generate-translation-keys';
 
-mergeAllLocales();
+reporter.phase(
+  'Merge locales',
+  () => mergeAllLocales(),
+  (result) => `${result.files} files, ${result.languages} languages`,
+);
 
 /*
  * Usage
@@ -11,17 +16,15 @@ mergeAllLocales();
  */
 let __dirname = path.dirname(new URL(import.meta.url).pathname).replace(/^\/+/u, '');
 
-console.log(__dirname);
-
-// Check if __dirname is a Windows path
-if ((/^[a-zA-Z]:/u).test(__dirname)) {
-  console.log('Windows path detected');
-} else {
-  console.log('POSIX path detected');
+// POSIX paths need their leading slash restored; Windows paths (C:/...) do not
+if (!(/^[a-zA-Z]:/u).test(__dirname)) {
   __dirname = `/${__dirname}`;
 }
 
-generateKeysFile(
-  `${__dirname}/../src/*`,
-  `${__dirname}/../src/locales/keys.ts`,
+reporter.phase(
+  'Generate translation keys',
+  () => generateKeysFile(
+    `${__dirname}/../src/*`,
+    `${__dirname}/../src/locales/keys.ts`,
+  ),
 );

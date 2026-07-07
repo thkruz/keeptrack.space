@@ -36,8 +36,10 @@ export class OBJLoader extends MeshLoader {
       const vertexData = mesh[meshName].makeBufferData(layout);
 
       /*
-       * Scale positions to 1/20th (assuming positions are first in layout)
-       * Find the position attribute in the layout
+       * OBJ positions are authored in real meters (1:1). World units are km, so
+       * convert with the true physical factor: 1 m = 0.001 km. Meshes therefore
+       * render at lifelike physical size (no visibility exaggeration).
+       * Find the position attribute in the layout.
        */
       const positionAttr = layout.attributeMap[OBJ.Layout.POSITION.key];
 
@@ -52,9 +54,9 @@ export class OBJLoader extends MeshLoader {
           // positionAttr.offset is in bytes, convert to floats
           const posOffset = positionAttr.offset / 4;
 
-          vertexArray[i + posOffset + 0] *= 0.05;
-          vertexArray[i + posOffset + 1] *= 0.05;
-          vertexArray[i + posOffset + 2] *= 0.05;
+          vertexArray[i + posOffset + 0] *= 0.001;
+          vertexArray[i + posOffset + 1] *= 0.001;
+          vertexArray[i + posOffset + 2] *= 0.001;
         }
       }
 

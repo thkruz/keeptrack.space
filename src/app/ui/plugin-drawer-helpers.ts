@@ -111,6 +111,10 @@ export function collectDrawerItems(): CollectedDrawerItems {
   utilityGroups['utility-layers'] = { label: t7e('pluginDrawer.groupLayerToggles' as DrawerKey_), items: [] };
   utilityGroups['utility-settings'] = { label: t7e('pluginDrawer.groupSettingsToggles' as DrawerKey_), items: [] };
 
+  // Development Tools group (Plugin Manager, Debug) — inserted just before About
+  // so it renders as the second-to-last category.
+  menuGroups['dev-tools'] = { label: t7e('pluginDrawer.groupDevTools' as DrawerKey_), items: [] };
+
   // About group for TopMenuPlugin instances (e.g., GithubLink)
   menuGroups.about = { label: t7e('pluginDrawer.groupAbout' as DrawerKey_), items: [] };
 
@@ -172,11 +176,15 @@ export function collectDrawerItems(): CollectedDrawerItems {
       });
     }
 
-    // Put in first matching MenuMode group (only if not in the utility footer)
+    // Put in first matching MenuMode group (only if not in the utility footer).
+    // A plugin can override its group via drawerGroupKey (e.g. 'about').
     if (plugin.iconPlacement === IconPlacement.BOTTOM_ONLY) {
       const primaryMode = plugin.menuMode.find((m) => m !== MenuMode.ALL) ?? MenuMode.CATALOG;
+      const groupKey = plugin.drawerGroupKey && menuGroups[plugin.drawerGroupKey]
+        ? plugin.drawerGroupKey
+        : `mode-${primaryMode}`;
 
-      menuGroups[`mode-${primaryMode}`]?.items.push({
+      menuGroups[groupKey]?.items.push({
         id: plugin.bottomIconElementName,
         label: plugin.bottomIconLabel,
         imgSrc,

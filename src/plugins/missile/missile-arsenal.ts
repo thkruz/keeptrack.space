@@ -1,4 +1,7 @@
 import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, UsaICBM, globalBMTargets, ukSLBM } from './missile-data';
+import { CHINA_LARGEST_CITIES, CHINA_MILITARY_BASES } from './china-targets';
+import { RUSSIA_LARGEST_CITIES, RUSSIA_MILITARY_BASES } from './russia-targets';
+import { US_LARGEST_CITIES, US_MILITARY_BASES, type GeoTarget } from './us-targets';
 
 /**
  * A single selectable launch site in the Missile Simulator menu.
@@ -36,16 +39,73 @@ export interface AttackerSite {
 
 /** A selectable impact point in the `ms-target` select. `id === CUSTOM_TARGET_ID` means "type your own". */
 export interface TargetOption {
-  /** Stable option value (index into `globalBMTargets`, or `CUSTOM_TARGET_ID`). */
+  /** Stable option value: index into `globalBMTargets`, a value in the extended
+   *  ranges below (US bases / cities), or `CUSTOM_TARGET_ID`. */
   id: number;
-  /** Locale sub-key under `targets.*`. */
-  labelKey: string;
+  /** Locale sub-key under `targets.*`. Ignored when `label` is set. */
+  labelKey?: string;
+  /** Literal display name (proper place name); used verbatim instead of `labelKey`. */
+  label?: string;
   /** Locale sub-key under `groups.*`, or `undefined` for a standalone (ungrouped) option. */
   groupKey?: string;
 }
 
 /** Sentinel target id meaning the user enters custom impact coordinates. */
 export const CUSTOM_TARGET_ID = -1;
+
+/**
+ * Id ranges for the expanded impact catalogs (kept clear of the legacy
+ * `globalBMTargets` indices 0-24 and the attacker-site ids). A target id at or above
+ * a base maps to `(id - base)` into that range's list. Ranges are spaced by 10,000,
+ * far above any list length, and {@link EXTENDED_TARGET_RANGES} is scanned high-to-low.
+ */
+export const MILITARY_TARGET_ID_BASE = 10_000;
+export const CITY_TARGET_ID_BASE = 20_000;
+export const RUSSIA_MILITARY_TARGET_ID_BASE = 30_000;
+export const RUSSIA_CITY_TARGET_ID_BASE = 40_000;
+export const CHINA_MILITARY_TARGET_ID_BASE = 50_000;
+export const CHINA_CITY_TARGET_ID_BASE = 60_000;
+
+/** Lowest id claimed by the extended catalogs; below this, ids index `globalBMTargets`. */
+const EXTENDED_TARGET_ID_MIN = MILITARY_TARGET_ID_BASE;
+
+/** One extended-catalog range: ids `[base, base + list.length)` resolve into `list`. */
+interface ExtendedTargetRange {
+  base: number;
+  groupKey: string;
+  list: readonly GeoTarget[];
+}
+
+/**
+ * Every extended target range, in dropdown order. `targetLat`/`targetLon` scan these
+ * (highest base first) and the option generator emits one `<option>` group per range.
+ */
+const EXTENDED_TARGET_RANGES: readonly ExtendedTargetRange[] = [
+  { base: MILITARY_TARGET_ID_BASE, groupKey: 'usMilitaryBases', list: US_MILITARY_BASES },
+  { base: CITY_TARGET_ID_BASE, groupKey: 'usLargestCities', list: US_LARGEST_CITIES },
+  { base: RUSSIA_MILITARY_TARGET_ID_BASE, groupKey: 'russiaMilitaryBases', list: RUSSIA_MILITARY_BASES },
+  { base: RUSSIA_CITY_TARGET_ID_BASE, groupKey: 'russiaLargestCities', list: RUSSIA_LARGEST_CITIES },
+  { base: CHINA_MILITARY_TARGET_ID_BASE, groupKey: 'chinaMilitaryBases', list: CHINA_MILITARY_BASES },
+  { base: CHINA_CITY_TARGET_ID_BASE, groupKey: 'chinaLargestCities', list: CHINA_LARGEST_CITIES },
+];
+
+/** Resolve an extended-catalog id to its place, or `undefined` if it's not one. */
+const extendedTargetFor = (id: number): GeoTarget | undefined => {
+  for (let i = EXTENDED_TARGET_RANGES.length - 1; i >= 0; i--) {
+    const range = EXTENDED_TARGET_RANGES[i];
+
+    if (id >= range.base) {
+      return range.list[id - range.base];
+    }
+  }
+
+  return undefined;
+};
+
+/** Generated `<option>` entries for every extended catalog (literal place-name labels). */
+const extendedTargetOptions: readonly TargetOption[] = EXTENDED_TARGET_RANGES.flatMap((range) =>
+  range.list.map((place, i) => ({ id: range.base + i, label: place.name, groupKey: range.groupKey })),
+);
 
 /** Per-nation min apogee (km). USA silos differ from the Ohio sub, so USA is set per-entry below. */
 const MIN_ALT_RUSSIA = 1120;
@@ -153,6 +213,7 @@ export const TARGET_OPTIONS: readonly TargetOption[] = [
   { id: 21, labelKey: 'novosibirsk', groupKey: 'nonNatoCountries' },
   { id: 22, labelKey: 'beijing', groupKey: 'nonNatoCountries' },
   { id: 23, labelKey: 'pyongyang', groupKey: 'nonNatoCountries' },
+  ...extendedTargetOptions,
 ];
 
 /** Look up a launch site by its `ms-attacker` option value. */
@@ -171,7 +232,25 @@ export const attackerDesc = (site: AttackerSite): string => site.data[site.index
 export const attackerRangeKm = (site: AttackerSite): number => site.data[site.index * 4 + 3] as number;
 
 /** Latitude (deg) of a preset target, or `undefined` for the custom-impact sentinel. */
-export const targetLat = (id: number): number | undefined => (id === CUSTOM_TARGET_ID ? undefined : (globalBMTargets[id * 3] as number));
+export const targetLat = (id: number): number | undefined => {
+  if (id === CUSTOM_TARGET_ID) {
+    return undefined;
+  }
+  if (id >= EXTENDED_TARGET_ID_MIN) {
+    return extendedTargetFor(id)?.lat;
+  }
+
+  return globalBMTargets[id * 3] as number;
+};
 
 /** Longitude (deg) of a preset target, or `undefined` for the custom-impact sentinel. */
-export const targetLon = (id: number): number | undefined => (id === CUSTOM_TARGET_ID ? undefined : (globalBMTargets[id * 3 + 1] as number));
+export const targetLon = (id: number): number | undefined => {
+  if (id === CUSTOM_TARGET_ID) {
+    return undefined;
+  }
+  if (id >= EXTENDED_TARGET_ID_MIN) {
+    return extendedTargetFor(id)?.lon;
+  }
+
+  return globalBMTargets[id * 3 + 1] as number;
+};

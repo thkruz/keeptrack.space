@@ -309,6 +309,14 @@ export abstract class KeepTrackPlugin {
   utilityGroup: UtilityGroup | null = null;
 
   /**
+   * Overrides the plugin drawer group this plugin's item is placed in. By
+   * default the drawer groups items by the plugin's first MenuMode; set this
+   * to a group key (e.g. 'about') to place the item elsewhere. Unknown keys
+   * fall back to the MenuMode group.
+   */
+  drawerGroupKey: string | null = null;
+
+  /**
    * The maximum order for the bottom icon.
    * This is used to ensure that the bottom icons are sorted correctly.
    */

@@ -94,7 +94,10 @@ describe('MissileSimulatorPlugin behavior', () => {
   it('updateLoop_ refreshes the orbit buffer for every active missile', () => {
     const updateSpy = vi.spyOn(ServiceLocator.getOrbitManager(), 'updateOrbitBuffer').mockImplementation(() => undefined);
 
-    missileManager.missileArray = [{ id: 11 }, { id: 22 }] as never;
+    missileManager.missileArray = [
+      { id: 11, isVisibleNow: () => true },
+      { id: 22, isVisibleNow: () => true },
+    ] as never;
     p().updateLoop_();
 
     expect(updateSpy).toHaveBeenCalledTimes(2);

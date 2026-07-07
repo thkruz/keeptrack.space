@@ -42,7 +42,9 @@ describe('Camera.setFieldOfView', () => {
       priv().updateFovLerp_(100 as Milliseconds);
     }
 
-    expect(settingsManager.fieldOfView).toBeCloseTo(0.1047, 6);
+    expect(cameraInstance.fov).toBeCloseTo(0.1047, 6);
+    // The camera no longer clobbers the settings default
+    expect(settingsManager.fieldOfView).toBeCloseTo(0.6, 6);
   });
 
   it('raw settingsManager.fieldOfView writes get pulled back toward the old target', () => {
@@ -56,7 +58,19 @@ describe('Camera.setFieldOfView', () => {
     }
 
     // This is the behavior setFieldOfView exists to avoid
-    expect(settingsManager.fieldOfView).toBeCloseTo(0.6, 3);
+    expect(cameraInstance.fov).toBeCloseTo(0.6, 3);
+  });
+
+  it('falls back to the settings FOV until the camera writes its own value', () => {
+    expect(cameraInstance.fov).toBeCloseTo(0.6, 6);
+
+    settingsManager.fieldOfView = 0.8 as Radians;
+    expect(cameraInstance.fov).toBeCloseTo(0.8, 6);
+
+    // Once the camera owns its FOV, settings writes no longer leak in
+    cameraInstance.setFieldOfView(0.5 as Radians);
+    settingsManager.fieldOfView = 1.0 as Radians;
+    expect(cameraInstance.fov).toBeCloseTo(0.5, 6);
   });
 });
 

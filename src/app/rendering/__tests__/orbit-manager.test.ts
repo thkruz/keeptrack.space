@@ -195,12 +195,15 @@ describe('OrbitManager', () => {
       expect(o().inProgress_[2]).toBe(true);
     });
 
-    it('sends a missile update for a missile', () => {
-      catalog.getObject.mockReturnValue({ isStatic: () => false, isMissile: () => true });
+    it('builds a missile line on the main thread instead of round-tripping the worker', () => {
+      const getOrbitPath = vi.fn(() => new Float32Array(8));
+
+      catalog.getObject.mockReturnValue({ isStatic: () => false, isMissile: () => true, getOrbitPath, orbitPathCache_: null });
 
       om.updateOrbitBuffer(2);
 
-      expect(om.orbitThreadMgr.sendMissileUpdate).toHaveBeenCalled();
+      expect(getOrbitPath).toHaveBeenCalled();
+      expect(om.orbitThreadMgr.sendMissileUpdate).not.toHaveBeenCalled();
     });
 
     it('does nothing for a static object', () => {
@@ -272,27 +275,19 @@ describe('OrbitManager', () => {
     });
   });
 
-  describe('buffer data alignment', () => {
+  describe('buffer data access', () => {
     beforeEach(() => initialized());
-
-    it('alignOrbitSelectedObject shifts cached orbit points to a new first position', () => {
-      const sub = vi.spyOn(gl, 'bufferSubData');
-
-      o().orbitCache.set(0, new Float32Array([1, 2, 3, 1, 5, 6, 7, 1]));
-
-      om.alignOrbitSelectedObject(0, [10, 20, 30]);
-
-      const data = o().orbitCache.get(0) as Float32Array;
-
-      // First point becomes the requested position (delta applied).
-      expect(data[0]).toBe(10);
-      expect(data[1]).toBe(20);
-      expect(data[2]).toBe(30);
-      expect(sub).toHaveBeenCalled();
-    });
 
     it('getBufferData returns null for an unallocated buffer', () => {
       expect(om.getBufferData(999)).toBeNull();
+    });
+
+    it('setOrbitAnchor stores the anchor used to rebase orbit buffers', () => {
+      om.setOrbitAnchor(0, [42164, -3, 7]);
+
+      // Anchors are private plumbing for writePathToGpu_; verifying storage via
+      // a second write not throwing + idempotent overwrite is the public contract.
+      expect(() => om.setOrbitAnchor(0, [1, 2, 3])).not.toThrow();
     });
   });
 

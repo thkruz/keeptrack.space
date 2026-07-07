@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": "../..",
+    "paths": {
+      "@app/*": ["src/*"],
+      "@engine/*": ["src/engine/*"],
+      "@ootk/*": ["src/engine/ootk/*"],
+      "@plugins-pro/*": ["src/plugins-pro/*"],
+      "@public/*": ["public/*"],
+      "@css/*": ["public/css/*"]
+    },
+    "noEmit": true
+  },
+  "include": ["*.ts"]
+}

@@ -22,9 +22,11 @@ export type KeepTrackPluginsConfiguration = {
   ScenarioManagementMenu?: PluginConfiguration;
   TopMenu?: PluginConfiguration;
   TimeSlider?: PluginConfiguration;
+  AccessTimelinePlugin?: PluginConfiguration;
   TooltipsPlugin?: PluginConfiguration;
   UserAccountPlugin?: PluginConfiguration;
   DebugMenuPlugin?: PluginConfiguration;
+  PluginManagerPlugin?: PluginConfiguration;
   SatInfoBoxCore?: PluginConfiguration;
   SatInfoBoxActions?: PluginConfiguration;
   SatInfoBoxLinks?: PluginConfiguration;
@@ -33,6 +35,7 @@ export type KeepTrackPluginsConfiguration = {
   SatInfoBoxObject?: SatInfoBoxObjectConfiguration;
   SatInfoBoxMission?: PluginConfiguration;
   SatInfoBoxSponsor?: PluginConfiguration;
+  BottomBannerSponsor?: PluginConfiguration;
   SatInfoBoxSensor?: PluginConfiguration;
   SatInfoBoxDoppler?: PluginConfiguration;
   DateTimeManager?: PluginConfiguration;
@@ -89,6 +92,7 @@ export type KeepTrackPluginsConfiguration = {
   FpsView?: PluginConfiguration;
   FlatMapView?: PluginConfiguration;
   PolarView?: PluginConfiguration;
+  MultiView?: PluginConfiguration;
   SatelliteFov?: PluginConfiguration;
   StereoMap?: PluginConfiguration;
   Planetarium?: PluginConfiguration;
@@ -124,9 +128,11 @@ export type KeepTrackPluginsConfiguration = {
   CloseObjectsPlugin?: PluginConfiguration;
   BestPassPlugin?: PluginConfiguration;
   OverflightPlugin?: PluginConfiguration;
+  TransitFinderPlugin?: PluginConfiguration;
   TipAndCuePlanner?: PluginConfiguration;
   EclipseSolarAnalysis?: PluginConfiguration;
   CoverageAnalysis?: PluginConfiguration;
+  SatelliteInterceptor?: PluginConfiguration;
   ManeuverPlugin?: PluginConfiguration;
   InitialOrbitDeterminationPlugin?: PluginConfiguration;
   Calculator?: PluginConfiguration;
@@ -156,4 +162,5 @@ export type KeepTrackPluginsConfiguration = {
   CommandPalettePlugin?: PluginConfiguration;
   LaunchpadPlugin?: PluginConfiguration;
   FavoritesMenuPlugin?: PluginConfiguration;
+  OnboardingPlugin?: PluginConfiguration;
 };

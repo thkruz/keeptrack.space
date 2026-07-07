@@ -1,0 +1,9 @@
+{
+  "id": "anchor-flatmap-ecf",
+  "catalog": true,
+  "settings": { "isOrbitCruncherInEcf": true },
+  "camera": 2,
+  "selectSat": "41866",
+  "settleMs": 2000,
+  "captures": ["canvas"]
+}

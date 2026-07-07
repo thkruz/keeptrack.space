@@ -55,6 +55,7 @@ export class PluginDrawer {
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
       this.populateDrawerItems_();
       this.wireEventListeners_();
+      this.observeBottomIconState_();
     });
 
     EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
@@ -220,18 +221,31 @@ export class PluginDrawer {
       ].join('')
       : '';
 
+    // The search trigger only opens the command palette, so only show it when the
+    // CommandPalette plugin is loaded (it's pro-only; absent in OSS builds).
+    const hasCommandPalette = PluginRegistry.checkIfLoaded('CommandPalettePlugin');
+    const searchHtml = hasCommandPalette
+      ? [
+        '    <div class="drawer-search" id="drawer-search-trigger" role="button" tabindex="0">',
+        `      <img class="drawer-search-icon" src=${searchPng} alt="Search" />`,
+        '      <span class="drawer-search-label">Search…</span>',
+        '      <span class="drawer-search-shortcut">Ctrl+⇧+K</span>',
+        '    </div>',
+      ].join('')
+      : '';
+
     drawer.id = 'plugin-drawer';
     drawer.className = `plugin-drawer ${modeClass}`;
     drawer.innerHTML = [
       '<div class="drawer-inner">',
       '  <div class="drawer-top-actions">',
-      '    <div class="drawer-search" id="drawer-search-trigger" role="button" tabindex="0">',
-      `      <img class="drawer-search-icon" src=${searchPng} alt="Search" />`,
-      '      <span class="drawer-search-label">Search\u2026</span>',
-      '      <span class="drawer-search-shortcut">Ctrl+\u21E7+K</span>',
-      '    </div>',
+      searchHtml,
       launcherHtml,
       '  </div>',
+      // Stable slot for the onboarding "Get started" card. It must live OUTSIDE
+      // #drawer-content because renderMenuGroups_ rebuilds that element with
+      // innerHTML and would clobber anything injected inside it.
+      '  <div id="drawer-getting-started-slot" class="drawer-getting-started-slot"></div>',
       '  <div id="drawer-content" class="drawer-content"></div>',
       '</div>',
       '<div id="drawer-user-account" class="drawer-user-account"></div>',
@@ -579,16 +593,62 @@ export class PluginDrawer {
     const contentEl = getEl('drawer-content', true);
 
     contentEl?.querySelectorAll('.drawer-item[data-plugin-id]').forEach((el) => {
-      const pluginId = (el as HTMLElement).dataset.pluginId;
-      const bottomIcon = pluginId ? getEl(pluginId, true) : null;
-      const isSelected = bottomIcon?.classList.contains('bmenu-item-selected') ?? false;
-      const isDisabled = bottomIcon?.classList.contains('bmenu-item-disabled') ?? false;
-
-      el.classList.toggle('active', isSelected);
-      el.classList.toggle('disabled', isDisabled);
+      PluginDrawer.syncItemState_(el as HTMLElement);
     });
 
     this.syncUtilityFooterState_();
+  }
+
+  /**
+   * The hidden bottom-icon bar is the single source of truth for a plugin's
+   * selected/disabled state, but its classes flip through several code paths
+   * (base-plugin setters, the bottomMenuClick toggle handler, hideSideMenus
+   * listeners, and a few plugins that toggle classList directly). Observing the
+   * icons themselves keeps every drawer row — including the duplicate rows in
+   * the Recent group — in sync no matter which path changed the state, even
+   * while the drawer is closed or in rail mode. Without this, rows are only
+   * synced on open()/rebuild, which happens *before* the deferred
+   * bottomMenuClick toggle lands, leaving the Recent rows showing the inverse
+   * of the real state.
+   */
+  private observeBottomIconState_(): void {
+    const bottomIcons = getEl('bottom-icons', true);
+
+    if (!bottomIcons) {
+      return;
+    }
+
+    const observer = new MutationObserver((mutations) => {
+      const syncedIds = new Set<string>();
+
+      for (const mutation of mutations) {
+        const id = (mutation.target as HTMLElement).id;
+
+        if (!id || syncedIds.has(id)) {
+          continue;
+        }
+        syncedIds.add(id);
+
+        getEl('drawer-content', true)
+          ?.querySelectorAll(`.drawer-item[data-plugin-id="${id}"]`)
+          .forEach((el) => PluginDrawer.syncItemState_(el as HTMLElement));
+      }
+
+      this.syncUtilityFooterState_();
+    });
+
+    observer.observe(bottomIcons, { attributes: true, attributeFilter: ['class'], subtree: true });
+  }
+
+  /** Mirror the live bottom-icon selected/disabled classes onto a drawer item. */
+  private static syncItemState_(el: HTMLElement): void {
+    const pluginId = el.dataset.pluginId;
+    const bottomIcon = pluginId ? getEl(pluginId, true) : null;
+    const isSelected = bottomIcon?.classList.contains('bmenu-item-selected') ?? false;
+    const isDisabled = bottomIcon?.classList.contains('bmenu-item-disabled') ?? false;
+
+    el.classList.toggle('active', isSelected);
+    el.classList.toggle('disabled', isDisabled);
   }
 
   private syncUtilityFooterState_(): void {
@@ -751,6 +811,14 @@ export class PluginDrawer {
 
     if (newGroupEl) {
       contentEl.prepend(newGroupEl);
+
+      // The cached item data only knows load-time state, so the rebuilt rows
+      // would otherwise show plugins as disabled/inactive even when their
+      // bottom icon says otherwise. Re-sync each row and re-apply badges.
+      newGroupEl.querySelectorAll('.drawer-item[data-plugin-id]').forEach((el) => {
+        PluginDrawer.syncItemState_(el as HTMLElement);
+      });
+      this.badges_.forEach((_badge, pluginId) => renderBadge(pluginId, this.badges_));
 
       // Wire collapsible header for the new group
       const header = newGroupEl.querySelector('.drawer-group-header');

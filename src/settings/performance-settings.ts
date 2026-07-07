@@ -47,9 +47,11 @@ export class PerformanceSettings {
   /**
    * Preallocate the maximum number of missiles that can be displayed
    *
-   * NOTE: New attack scenarios are limited to this number
+   * NOTE: New attack scenarios are limited to this number. Sized to hold the
+   * largest preset mass raid once every missile is expanded into its MIRV reentry
+   * vehicles (GlobalThermonuclearWar tops out near 1,600 RVs), with headroom.
    */
-  maxMissiles = 500;
+  maxMissiles = 2500;
   /**
    * Preallocate the maximum number of labels that can be displayed
    *

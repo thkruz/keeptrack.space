@@ -46,7 +46,7 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
   sendMissileUpdate(
     id: number, simulationTime: number,
     isEcfOutput: boolean, isPolarViewEcf?: boolean,
-    latList?: Degrees[], lonList?: Degrees[], altList?: Kilometers[],
+    trajectory?: { latList?: Degrees[]; lonList?: Degrees[]; altList?: Kilometers[]; startTime?: number },
   ): void {
     this.postMessage({
       typ: OrbitCruncherMsgType.MISSILE_UPDATE,
@@ -54,9 +54,10 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
       simulationTime,
       isEcfOutput,
       isPolarViewEcf,
-      latList,
-      lonList,
-      altList,
+      latList: trajectory?.latList,
+      lonList: trajectory?.lonList,
+      altList: trajectory?.altList,
+      startTime: trajectory?.startTime,
       seqNum: this.currentSeqNum_,
     });
   }
@@ -107,23 +108,28 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
 
   private handleResponseData_(data: OrbitCruncherOutMsgPoints) {
     const satId = data.satId;
-    const cachedOrbitData = ServiceLocator.getOrbitManager().orbitCache.get(satId);
+    const orbitManager = ServiceLocator.getOrbitManager();
+    const cachedOrbitData = orbitManager.orbitCache.get(satId);
     let pointsOut: Float32Array;
 
     if (!cachedOrbitData) {
       pointsOut = new Float32Array(data.pointsOut);
 
-      ServiceLocator.getOrbitManager().orbitCache.set(satId, pointsOut);
+      orbitManager.orbitCache.set(satId, pointsOut);
     } else {
       cachedOrbitData.set(data.pointsOut);
       pointsOut = cachedOrbitData;
     }
 
+    // The points are anchor-relative (float64 rebase in the worker); the renderer
+    // re-adds this anchor per frame via a float64-computed uniform.
+    orbitManager.setOrbitAnchor(satId, data.anchor ?? [0, 0, 0]);
+
     const gl = ServiceLocator.getRenderer().gl;
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, ServiceLocator.getOrbitManager().glBuffers_[satId]);
+    gl.bindBuffer(gl.ARRAY_BUFFER, orbitManager.glBuffers_[satId]);
     gl.bufferData(gl.ARRAY_BUFFER, pointsOut, gl.DYNAMIC_DRAW);
 
-    ServiceLocator.getOrbitManager().inProgress_[satId] = false;
+    orbitManager.inProgress_[satId] = false;
   }
 }

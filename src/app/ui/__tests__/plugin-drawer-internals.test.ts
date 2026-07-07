@@ -124,6 +124,23 @@ describe('PluginDrawer internals', () => {
     expect(p().drawerEl_.querySelector('#drawer-app-launcher')).toBeNull();
   });
 
+  it('refreshRecentGroup_ re-syncs rebuilt rows against live bottom-icon state', () => {
+    p().createDrawerDom_();
+    // The cached item data holds the stale load-time state (disabled) …
+    p().allDrawerItems_.set('recent-sync-icon', {
+      id: 'recent-sync-icon', label: 'Recent Sync', imgSrc: 'a.png', isTopMenu: false, isDisabled: true, order: 0,
+    });
+    // … while the live bottom icon says the plugin is now enabled and active.
+    document.body.insertAdjacentHTML('beforeend', '<div id="recent-sync-icon" class="bmenu-item bmenu-item-selected"></div>');
+
+    p().refreshRecentGroup_([{ id: 'recent-sync-icon', t: 1 }]);
+
+    const item = getEl('drawer-content')!.querySelector('.drawer-item[data-plugin-id="recent-sync-icon"]') as HTMLElement;
+
+    expect(item.classList.contains('disabled')).toBe(false);
+    expect(item.classList.contains('active')).toBe(true);
+  });
+
   it('buildRecentGroup_ indexes non-top-menu items into the drawer cache', () => {
     const result = p().buildRecentGroup_({ analysis: group() });
 

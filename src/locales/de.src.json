@@ -392,6 +392,7 @@
     "groupCameraModes": "Kameramodi",
     "groupLayerToggles": "Ebenen-Schalter",
     "groupSettingsToggles": "Einstellungen-Schalter",
+    "groupDevTools": "Entwicklungstools",
     "groupAbout": "Über"
   },
   "rightClickMenu": {

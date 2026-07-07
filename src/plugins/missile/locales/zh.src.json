@@ -21,7 +21,24 @@
         "northKoreaToUsa": "朝鲜打击美国",
         "usaToRussia": "美国打击俄罗斯",
         "usaToChina": "美国打击中国",
-        "usaToNorthKorea": "美国打击朝鲜"
+        "usaToNorthKorea": "美国打击朝鲜",
+        "exchangeUsaRussia": "美俄全面核交战",
+        "exchangeUsaChina": "美中全面核交战",
+        "exchangeUsaNorthKorea": "美朝核交战",
+        "exchangeChinaIndia": "中印核交战",
+        "exchangeRussiaUkraine": "俄乌核交战",
+        "exchangeIndiaPakistan": "印巴核交战",
+        "globalThermonuclearWar": "全球热核战争",
+        "iranToIsrael": "伊朗打击以色列",
+        "israelToIran": "以色列打击伊朗",
+        "exchangeIranIsrael": "伊以核交战",
+        "russiaToUkraine": "俄罗斯打击乌克兰",
+        "ukraineToRussia": "乌克兰打击俄罗斯"
+      },
+      "typeGroups": {
+        "strategic": "战略打击",
+        "exchanges": "全面核交战",
+        "regional": "地区冲突"
       },
       "groups": {
         "russia": "俄罗斯",
@@ -31,7 +48,13 @@
         "france": "法国",
         "northKorea": "朝鲜",
         "natoCountries": "北约国家",
-        "nonNatoCountries": "非北约国家"
+        "nonNatoCountries": "非北约国家",
+        "usMilitaryBases": "美国军事基地",
+        "usLargestCities": "美国50大城市",
+        "russiaMilitaryBases": "俄罗斯军事基地",
+        "russiaLargestCities": "俄罗斯50大城市",
+        "chinaMilitaryBases": "中国军事基地",
+        "chinaLargestCities": "中国50大城市"
       },
       "attackers": {
         "aleysk": "阿列伊斯克",

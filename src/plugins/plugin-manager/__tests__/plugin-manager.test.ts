@@ -3,6 +3,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { getEl } from '@app/engine/utils/get-el';
 import { PluginManagerPlugin } from '@app/plugins/plugin-manager/plugin-manager';
+import { settingsManager } from '@app/settings/settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -10,6 +11,8 @@ import { vi } from 'vitest';
 describe('PluginManagerPlugin', () => {
   beforeEach(() => {
     setupStandardEnvironment();
+    // Disabled by default in the manifest; enable so init() runs fully under test.
+    settingsManager.plugins.PluginManagerPlugin = { enabled: true };
   });
 
   afterEach(() => {
@@ -25,6 +28,8 @@ describe('PluginManagerPlugin behavior', () => {
 
   beforeEach(() => {
     setupStandardEnvironment();
+    // Disabled by default in the manifest; enable so init() runs fully under test.
+    settingsManager.plugins.PluginManagerPlugin = { enabled: true };
     plugin = new PluginManagerPlugin();
     plugin.init();
     EventBus.getInstance().emit(EventBusEvent.uiManagerInit);

@@ -62,6 +62,14 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
   }
 
   lastCssStyle = '';
+  /**
+   * Cached viewport width. `window.innerWidth` is a layout-reading property, so
+   * reading it inside the per-frame updateLoop handler (checkIfSelectSatVisible)
+   * forces a synchronous reflow every frame once anything has dirtied layout
+   * (e.g. the clock's textContent write). It only changes on resize, so read it
+   * once and refresh on the resize event instead.
+   */
+  private viewportWidth_ = window.innerWidth;
   selectedSat = -1;
   private readonly noSatObj_ = <Satellite>(<unknown>{
     id: -1,
@@ -106,6 +114,12 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
 
     EventBus.getInstance().on(EventBusEvent.updateLoop, this.checkIfSelectSatVisible.bind(this));
 
+    // Refresh the cached viewport width off the render loop so checkIfSelectSatVisible
+    // never has to read window.innerWidth (a forced-reflow trigger) each frame.
+    window.addEventListener('resize', () => {
+      this.viewportWidth_ = window.innerWidth;
+    });
+
     EventBus.getInstance().on(EventBusEvent.endOfDraw, () => {
       if ((this.selectedSat ?? -1) !== -1) {
         const timeManagerInstance = ServiceLocator.getTimeManager();
@@ -140,7 +154,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       let cssStyle = currentSearch.length > 0 ? 'display: block; max-height:auto;' : 'display: none; max-height:auto;';
 
       // If a satellite is selected on a desktop computer then shrink the search box
-      if (window.innerWidth > 1000 && this.selectedSat !== -1) {
+      if (this.viewportWidth_ > 1000 && this.selectedSat !== -1) {
         cssStyle = cssStyle.replace('max-height:auto', 'max-height:27%');
       }
 

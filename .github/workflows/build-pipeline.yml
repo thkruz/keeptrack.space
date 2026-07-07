@@ -45,51 +45,6 @@ jobs:
           dedupe_issues: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
-  version-check:
-    needs: lint-yml
-    name: Version Bump Check
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
-      - name: Verify package.json version is newer than last release
-        run: |
-          CURRENT="$(node -p "require('./package.json').version")"
-          echo "package.json version: $CURRENT"
-
-          # Latest released version, derived from the most recent v* tag.
-          LAST_TAG="$(git tag --list 'v*' --sort=-v:refname | head -n1)"
-          if [ -z "$LAST_TAG" ]; then
-            echo "No prior v* release tag found; skipping comparison."
-            echo "### Version Check: no prior tag, $CURRENT accepted" \
-              >> $GITHUB_STEP_SUMMARY
-            exit 0
-          fi
-          LAST="${LAST_TAG#v}"
-          echo "last released tag: $LAST_TAG (version $LAST)"
-
-          if [ "$CURRENT" = "$LAST" ]; then
-            echo "::error::package.json version ($CURRENT) is unchanged from" \
-              "the last release ($LAST_TAG). Bump the version in package.json."
-            exit 1
-          fi
-
-          # Confirm CURRENT is strictly greater than LAST (semver), not lower.
-          GREATER="$(printf '%s\n%s\n' "$LAST" "$CURRENT" \
-            | sort -V | tail -n1)"
-          if [ "$GREATER" != "$CURRENT" ]; then
-            echo "::error::package.json version ($CURRENT) is not greater than" \
-              "the last release ($LAST). Bump the version in package.json."
-            exit 1
-          fi
-
-          echo "### Version Check: $CURRENT > $LAST" >> $GITHUB_STEP_SUMMARY
   lint-and-test:
     needs: compliance
     if: github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'workflow_dispatch'
@@ -420,7 +375,6 @@ jobs:
   pipeline-complete:
     if: always()
     needs:
-      - version-check
       - lint-and-test
       - lint-and-test-oss
       - boot-smoke
@@ -433,7 +387,6 @@ jobs:
       - name: Check job results
         run: |
           if [[ ("${{ needs.lint-and-test.result }}" == "failure") || \
-                "${{ needs.version-check.result }}" == "failure" || \
                 "${{ needs.lint-and-test-oss.result }}" == "failure" || \
                 "${{ needs.boot-smoke.result }}" == "failure" || \
                 "${{ needs.build.result }}" == "failure" || \

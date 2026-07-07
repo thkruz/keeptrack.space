@@ -89,6 +89,12 @@ export default defineConfig({
       'src/engine/ootk/**',
       // External plugin tests run in the plugin's own repo CI, not the host suite.
       'src/plugins-external/**',
+      // Bare "test.ts" files are CLI commands/tooling (e.g. the plugin CLI's
+      // `test` command), not vitest suites. Real tests are named "*.test.ts".
+      '**/test.ts',
+      // CI helper scripts (e.g. the plugins-pro supgp logic tests) use Node's
+      // built-in `node:test` runner and run in their own repo CI, not vitest.
+      '**/.github/**',
     ],
   },
   resolve: {

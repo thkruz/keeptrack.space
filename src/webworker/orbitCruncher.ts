@@ -1,4 +1,5 @@
 import { DEG2RAD, eci2ecef, GreenwichMeanSiderealTime, Kilometers, lla2eci, Radians, Sgp4, TemeVec3 } from '@ootk/src/main';
+import { rebaseToAnchor } from '../engine/math/orbit-anchor-math';
 import { jday } from '../engine/utils/transforms';
 import {
   OrbitCruncherCachedObject, OrbitCruncherInMsgChangeOrbitType, OrbitCruncherInMsgInit, OrbitCruncherInMsgMissileUpdate,
@@ -52,34 +53,6 @@ export const onMessage = (m: {
     default:
       break;
   }
-};
-
-/**
- * Rebase `points` (x, y, z, alpha quads, float64) so every vertex is relative to
- * the first finite vertex, writing the result into a Float32Array. The anchor
- * subtraction happens here in float64 - BEFORE the float32 quantization - so
- * near-anchor vertices keep sub-mm precision. Full-magnitude float32 orbit
- * points (~42164 km at GEO, ~4 m per ULP) re-rolled their rounding every
- * constant-redraw frame, which is what made ECF lines shiver when zoomed in.
- */
-const toAnchorRelative_ = (points: Float64Array): { pointsOut: Float32Array; anchor: [number, number, number] } => {
-  const pointsOut = new Float32Array(points.length);
-  const anchor: [number, number, number] = [points[0], points[1], points[2]];
-
-  if (!Number.isFinite(anchor[0]) || !Number.isFinite(anchor[1]) || !Number.isFinite(anchor[2])) {
-    anchor[0] = 0;
-    anchor[1] = 0;
-    anchor[2] = 0;
-  }
-
-  for (let i = 0; i < points.length; i += 4) {
-    pointsOut[i] = points[i] - anchor[0];
-    pointsOut[i + 1] = points[i + 1] - anchor[1];
-    pointsOut[i + 2] = points[i + 2] - anchor[2];
-    pointsOut[i + 3] = points[i + 3];
-  }
-
-  return { pointsOut, anchor };
 };
 
 const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCruncherInMsgMissileUpdate) => {
@@ -217,7 +190,7 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
     }
   }
 
-  const { pointsOut, anchor } = toAnchorRelative_(points);
+  const { pointsOut, anchor } = rebaseToAnchor(points);
 
   postMessage({
     typ: OrbitCruncherMsgType.RESPONSE_DATA,

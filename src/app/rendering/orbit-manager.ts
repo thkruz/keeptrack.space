@@ -16,6 +16,7 @@ import { PluginRegistry } from '../../engine/core/plugin-registry';
 import { ServiceLocator } from '../../engine/core/service-locator';
 import { EventBus } from '../../engine/events/event-bus';
 import { EventBusEvent } from '../../engine/events/event-bus-events';
+import { rotateEcefToEciZ } from '../../engine/math/orbit-anchor-math';
 import { KeyboardComponent } from '../../engine/plugins/components/keyboard/keyboard-component';
 import { ColorSchemeManager } from '../../engine/rendering/color-scheme-manager';
 import { LineManager } from '../../engine/rendering/line-manager';
@@ -723,18 +724,12 @@ export class OrbitManager {
     // ~4 m float32 rounding of full orbital magnitudes never re-rolls per frame
     // (that re-roll is what made zoomed-in ECF lines shiver).
     const anchor = this.orbitAnchors_.get(id) ?? OrbitManager.zeroAnchor_;
-    let anchorEciNow = anchor;
+    let anchorEciNow: [number, number, number] = anchor;
 
     if (isEcfBuffer) {
       const gmst = ServiceLocator.getTimeManager().gmst;
-      const c = Math.cos(gmst);
-      const s = Math.sin(gmst);
 
-      anchorEciNow = [
-        anchor[0] * c - anchor[1] * s,
-        anchor[0] * s + anchor[1] * c,
-        anchor[2],
-      ];
+      anchorEciNow = rotateEcefToEciZ(anchor[0], anchor[1], anchor[2], Math.cos(gmst), Math.sin(gmst));
     }
 
     const worldShift = ServiceLocator.getScene().worldShift ?? [0, 0, 0];

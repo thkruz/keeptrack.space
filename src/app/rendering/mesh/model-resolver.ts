@@ -158,19 +158,19 @@ export class ModelResolver {
 
       // Currently no specific model for OEM satellites - default to aehf
       return SatelliteModels.aehf;
-    } else {
-      const sat = obj as Satellite;
+    }
 
-      switch (sat.type) {
-        case SpaceObjectType.PAYLOAD:
-          return this.resolveSatModelName_(sat);
-        case SpaceObjectType.ROCKET_BODY:
-          return this.resolveRocketBodyModelName_(sat);
-        case SpaceObjectType.DEBRIS:
-          return this.resolveDebrisModelName_(sat);
-        default:
-        // Generic Model
-      }
+    const sat = obj as Satellite;
+
+    switch (sat.type) {
+      case SpaceObjectType.PAYLOAD:
+        return this.resolveSatModelName_(sat);
+      case SpaceObjectType.ROCKET_BODY:
+        return this.resolveRocketBodyModelName_(sat);
+      case SpaceObjectType.DEBRIS:
+        return this.resolveDebrisModelName_(sat);
+      default:
+      // Generic Model
     }
 
     return SatelliteModels.sat2;

@@ -655,7 +655,7 @@ export class ModelResolver {
    */
   private static mislVariantSuffix_(warheadCount: number): string {
     const count = Number.isFinite(warheadCount) ? warheadCount : 1;
-    let best = ModelResolver.mislRvVariants_[0];
+    let best = ModelResolver.mislRvVariants_[0] as 2 | 4 | 6 | 8 | 10;
 
     for (const v of ModelResolver.mislRvVariants_) {
       if (Math.abs(v - count) <= Math.abs(best - count)) {

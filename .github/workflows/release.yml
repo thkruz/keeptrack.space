@@ -1,0 +1,117 @@
+---
+name: Release
+
+# semantic-release owns versioning, git tags, and GitHub releases. It runs on
+# every push to main (i.e. after a release-worthy PR is merged) and:
+#   1. reads Conventional Commits since the last v* tag to pick the next version,
+#   2. bumps package.json / package-lock.json (npmPublish is disabled),
+#   3. regenerates docs/CHANGELOG.md from git tags via auto-changelog
+#      (the single source of truth) and syncs README / CITATION version refs,
+#   4. commits + tags on main and cuts the GitHub release.
+#
+# The commit and tag are pushed with GITHUB_TOKEN, which does NOT re-trigger
+# workflows, so this never loops. The back-merge job then keeps develop in sync.
+
+"on":
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Semantic Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # push the release commit + tag
+      issues: write # semantic-release comments on referenced issues
+      pull-requests: write # semantic-release comments on referenced PRs
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Cache node modules
+        uses: actions/cache@v5
+        with:
+          path: ~/.npm
+          key: >-
+            ${{ runner.os }}-build-node-modules-${{
+            hashFiles('**/package-lock.json') }}
+          restore-keys: >-
+            ${{ runner.os }}-build-node-modules-${{
+            runner.os }}-
+
+      # semantic-release only needs the source tree + git history: it bumps
+      # package.json, regenerates the changelog from tags, and cuts the release.
+      # It does not build the app, so submodules are not required here.
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Run semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
+
+  back-merge:
+    name: Back-merge main into develop
+    needs: release
+    if: success()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # push the fast-forward/merge to develop
+      pull-requests: write # open a sync PR when the merge conflicts
+    steps:
+      - name: Checkout develop
+        uses: actions/checkout@v6
+        with:
+          ref: develop
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge main into develop (or open a sync PR on conflict)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git fetch origin main
+          if git merge --no-edit origin/main; then
+            # Pushed with GITHUB_TOKEN, which does not re-trigger workflows.
+            git push origin develop
+            echo "### Back-merge: main -> develop pushed" \
+              >> "$GITHUB_STEP_SUMMARY"
+          else
+            git merge --abort
+            echo "Merge conflict; opening a sync PR instead of guessing."
+            # Reuse an existing open sync PR if one is already there.
+            if gh pr list --base develop --head main --state open \
+                 --json number --jq 'length' | grep -qv '^0$'; then
+              echo "A main -> develop sync PR is already open."
+            else
+              gh pr create --base develop --head main \
+                --title "chore(release): sync main into develop" \
+                --body "Automated back-merge after a release hit a conflict. Resolve and merge to bring develop back in sync with main."
+            fi
+            echo "### Back-merge: conflict, sync PR opened/again" \
+              >> "$GITHUB_STEP_SUMMARY"
+          fi

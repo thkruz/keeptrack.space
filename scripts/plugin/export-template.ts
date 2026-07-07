@@ -8,9 +8,13 @@
  */
 import { rmSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { resolveStrictlyWithin } from '../lib/safe-path';
 import { hostVersion } from './lib/host-version';
 import { log } from './lib/log';
+import { REPO_ROOT } from './lib/paths';
 import { buildVars, renderPlugin } from './lib/render-template';
+
+const WORKSPACE_ROOT = resolve(REPO_ROOT, '..');
 
 function main(): number {
   const outArg = process.argv[2];
@@ -22,7 +26,18 @@ function main(): number {
   }
 
   const kind = process.argv.includes('--overlay') ? 'overlay' : 'menu';
-  const outDir = resolve(outArg);
+  // outArg is CLI-controlled and feeds a recursive rmSync below. Resolve it
+  // (relative to cwd, as before) then confine it to the workspace so it can
+  // never delete a path outside the repo's containing folder; also refuse the
+  // workspace root and the repo root themselves.
+  const outDir = resolveStrictlyWithin(WORKSPACE_ROOT, resolve(outArg));
+
+  if (outDir === REPO_ROOT) {
+    log.error('Refusing to export onto the repo root itself.');
+
+    return 1;
+  }
+
   const vars = buildVars('example', hostVersion(), {
     description: 'An example KeepTrack plugin — use this repo as a template.',
     author: 'Your Name',

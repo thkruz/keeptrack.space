@@ -7,9 +7,14 @@
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { resolveWithin } from '../lib/safe-path';
 
-const DIR = process.argv[2] ?? 'test-results/visual-inspect/jitter-ecf-r1';
+const ROOT_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+// DIR is CLI-supplied; confine it to the repo before reading the frame files so a
+// stray argument can't enumerate an arbitrary directory outside the workspace.
+const DIR = resolveWithin(ROOT_DIR, process.argv[2] ?? 'test-results/visual-inspect/jitter-ecf-r1');
 const PX = Number(process.argv[3] ?? '400');
 const PY = Number(process.argv[4] ?? '300');
 

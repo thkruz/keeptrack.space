@@ -13,6 +13,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium, type ConsoleMessage } from 'playwright';
+import { resolveWithin } from '../lib/safe-path';
 
 const BASE_URL = process.env.BASE_URL ?? 'http://localhost:5544';
 const ROOT_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -22,7 +23,9 @@ const CAM_DIST = Number(process.argv[3] ?? '200');
 const MODE = (process.argv[4] ?? 'ecf').toLowerCase();
 const PROP_RATE = Number(process.argv[5] ?? '1');
 const RUN_ID = `jitter-${MODE}-r${PROP_RATE}`;
-const OUT_DIR = path.join(ROOT_DIR, 'test-results', 'visual-inspect', RUN_ID);
+// RUN_ID embeds the CLI-supplied MODE, so confine the output dir to the
+// visual-inspect results root before any mkdir/write touches the filesystem.
+const OUT_DIR = resolveWithin(path.join(ROOT_DIR, 'test-results', 'visual-inspect'), RUN_ID);
 
 const FRAMES = 8;
 const FRAME_GAP_MS = 150;

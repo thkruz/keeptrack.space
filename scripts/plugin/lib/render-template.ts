@@ -1,11 +1,16 @@
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveWithin } from '../../lib/safe-path';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
 export const BASE_TEMPLATES_DIR = resolve(HERE, '..', 'templates');
 export const OVERLAY_TEMPLATES_DIR = resolve(HERE, '..', 'templates-overlay');
+// The destination ultimately derives from a CLI argument (create/export), so
+// every scaffold write is confined to the workspace that contains this repo:
+// `create` targets src/plugins-external/ inside the repo, `export` a sibling repo.
+const WORKSPACE_ROOT = resolve(HERE, '..', '..', '..', '..');
 export const LANGS = ['en', 'cs', 'de', 'es', 'fr', 'it', 'ja', 'ko', 'pl', 'ru', 'uk', 'zh'];
 
 export type PluginKind = 'menu' | 'overlay';
@@ -81,7 +86,9 @@ function renderTree(srcDir: string, destDir: string, vars: TemplateVars, rel = '
       continue;
     }
 
-    const destAbs = join(destDir, targetRelPath(childRel, vars));
+    // targetRelPath is derived from template file names + vars; confine the write
+    // to destDir so a template path can never escape the scaffold directory.
+    const destAbs = resolveWithin(destDir, targetRelPath(childRel, vars));
 
     mkdirSync(dirname(destAbs), { recursive: true });
 
@@ -112,13 +119,17 @@ function writeAllLocales(dir: string): void {
 
 /** Render a full plugin skeleton of the given kind into `destDir`. */
 export function renderPlugin(destDir: string, kind: PluginKind, vars: TemplateVars): void {
-  mkdirSync(destDir, { recursive: true });
-  renderTree(BASE_TEMPLATES_DIR, destDir, vars);
+  // destDir traces back to a CLI argument — validate it lands inside the
+  // workspace before creating anything, then thread the validated path through.
+  const safeDest = resolveWithin(WORKSPACE_ROOT, destDir);
+
+  mkdirSync(safeDest, { recursive: true });
+  renderTree(BASE_TEMPLATES_DIR, safeDest, vars);
   // Overlay kind replaces the menu-specific source/test/locale with toggle variants.
   if (kind === 'overlay') {
-    renderTree(OVERLAY_TEMPLATES_DIR, destDir, vars);
+    renderTree(OVERLAY_TEMPLATES_DIR, safeDest, vars);
   }
-  writeAllLocales(destDir);
+  writeAllLocales(safeDest);
 }
 
 /** Build template vars for a plugin from its kebab base name + metadata. */

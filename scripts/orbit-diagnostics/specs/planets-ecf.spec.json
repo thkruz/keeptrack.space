@@ -1,0 +1,12 @@
+{
+  "id": "planets-ecf-align",
+  "catalog": true,
+  "settings": { "isOrbitCruncherInEcf": true },
+  "plugins": { "PlanetsMenuPlugin": { "enabled": true } },
+  "evaluate": [
+    "window.keepTrack.api.getPluginByName('PlanetsMenuPlugin').changePlanet('Sun')",
+    "window.keepTrack.api.getMainCamera().state.zoomTarget = 0.9; window.keepTrack.api.getMainCamera().state.zoomLevel = 0.9"
+  ],
+  "settleMs": 4000,
+  "captures": ["canvas"]
+}

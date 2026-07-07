@@ -151,6 +151,12 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true },
   },
   {
+    configKey: 'BottomBannerSponsor',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/bottom-banner-sponsor/bottom-banner-sponsor') : undefined,
+    proClassName: 'BottomBannerSponsor',
+    defaultConfig: { enabled: true },
+  },
+  {
     configKey: 'SatInfoBoxSensor',
     ossImport: () => import('./sat-info-box-sensor/sat-info-box-sensor'),
     ossClassName: 'SatInfoBoxSensor',

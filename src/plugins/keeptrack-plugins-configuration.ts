@@ -35,6 +35,7 @@ export type KeepTrackPluginsConfiguration = {
   SatInfoBoxObject?: SatInfoBoxObjectConfiguration;
   SatInfoBoxMission?: PluginConfiguration;
   SatInfoBoxSponsor?: PluginConfiguration;
+  BottomBannerSponsor?: PluginConfiguration;
   SatInfoBoxSensor?: PluginConfiguration;
   SatInfoBoxDoppler?: PluginConfiguration;
   DateTimeManager?: PluginConfiguration;

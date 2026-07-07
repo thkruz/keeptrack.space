@@ -128,6 +128,9 @@ export enum StorageKey {
   // Sponsor ad dismissal (timestamp in ms until which the ad stays hidden)
   SPONSOR_AD_DISMISSED_UNTIL = 'v2-keepTrack-sponsorAdDismissedUntil',
 
+  // Bottom banner ad dismissal (timestamp in ms until which the banner stays hidden)
+  BOTTOM_BANNER_AD_DISMISSED_UNTIL = 'v2-keepTrack-bottomBannerAdDismissedUntil',
+
   // Stereo Map (map style, graticule, political overlay, orbit multiplier)
   STEREO_MAP_SETTINGS = 'v2-keepTrack-stereoMapSettings',
 

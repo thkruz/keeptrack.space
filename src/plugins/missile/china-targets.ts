@@ -58,7 +58,7 @@ export const CHINA_LARGEST_CITIES: readonly GeoTarget[] = [
   { name: 'Tianjin', lat: 39.34, lon: 117.36 },
   { name: 'Wuhan', lat: 30.59, lon: 114.30 },
   { name: 'Dongguan', lat: 23.02, lon: 113.75 },
-  { name: "Xi'an", lat: 34.34, lon: 108.94 },
+  { name: 'Xi\'an', lat: 34.34, lon: 108.94 },
   { name: 'Hangzhou', lat: 30.27, lon: 120.15 },
   { name: 'Foshan', lat: 23.02, lon: 113.12 },
   { name: 'Nanjing', lat: 32.06, lon: 118.80 },

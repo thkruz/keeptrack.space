@@ -1,8 +1,7 @@
 import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, UsaICBM, globalBMTargets, ukSLBM } from './missile-data';
 import { CHINA_LARGEST_CITIES, CHINA_MILITARY_BASES } from './china-targets';
 import { RUSSIA_LARGEST_CITIES, RUSSIA_MILITARY_BASES } from './russia-targets';
-import type { GeoTarget } from './us-targets';
-import { US_LARGEST_CITIES, US_MILITARY_BASES } from './us-targets';
+import { US_LARGEST_CITIES, US_MILITARY_BASES, type GeoTarget } from './us-targets';
 
 /**
  * A single selectable launch site in the Missile Simulator menu.

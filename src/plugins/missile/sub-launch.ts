@@ -210,16 +210,7 @@ export const planSubmarineBoats = (
       }
 
       if (chosen === -1) {
-        let nearestDist = Infinity;
-
-        for (let b = 0; b < boatCount; b++) {
-          const d = greatCircleKm(boats[b].lat, boats[b].lon, entry.targetLat, entry.targetLon);
-
-          if (d < nearestDist) {
-            nearestDist = d;
-            chosen = b;
-          }
-        }
+        chosen = nearestBoat(boats, entry.targetLat, entry.targetLon);
       }
 
       load[chosen]++;
@@ -228,6 +219,23 @@ export const planSubmarineBoats = (
   }
 
   return result;
+};
+
+/** Index of the boat closest (great-circle) to a target lat/lon. */
+const nearestBoat = (boats: readonly { lat: number; lon: number }[], targetLat: number, targetLon: number): number => {
+  let chosen = -1;
+  let nearestDist = Infinity;
+
+  for (let b = 0; b < boats.length; b++) {
+    const d = greatCircleKm(boats[b].lat, boats[b].lon, targetLat, targetLon);
+
+    if (d < nearestDist) {
+      nearestDist = d;
+      chosen = b;
+    }
+  }
+
+  return chosen;
 };
 
 /** Great-circle distance (km) between two lat/lon points on a spherical Earth. */

@@ -2,7 +2,7 @@
 import dotenv from 'dotenv';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
-import { BuildConfig } from './config-manager';
+import { BuildConfig, normalizePropagatorBackend } from './config-manager';
 import { BuildError, ConsoleStyles, ErrorCodes, logWithStyle } from './build-error';
 
 /**
@@ -104,6 +104,9 @@ export class ProfileLoader {
     }
     if (envVars.EDITION) {
       config.edition = envVars.EDITION;
+    }
+    if (envVars.PROPAGATOR_BACKEND) {
+      config.propagatorBackend = normalizePropagatorBackend(envVars.PROPAGATOR_BACKEND);
     }
     if (envVars.PUBLIC_SUPABASE_URL) {
       config.PUBLIC_SUPABASE_URL = envVars.PUBLIC_SUPABASE_URL;

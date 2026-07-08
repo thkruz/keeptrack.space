@@ -14,6 +14,7 @@ export default defineConfig({
     __COMMIT_HASH__: JSON.stringify(execSync('git rev-parse --short HEAD').toString().trim()),
     __IS_PRO__: JSON.stringify(false),
     __EDITION__: JSON.stringify('oss'),
+    __PROPAGATOR_BACKEND__: JSON.stringify('sgp4'),
   },
   plugins: [
     {

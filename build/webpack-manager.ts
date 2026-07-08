@@ -26,6 +26,7 @@ export class WebpackManager {
       __COMMIT_HASH__: JSON.stringify(commitHash),
       __IS_PRO__: JSON.stringify(this.config.isPro),
       __EDITION__: JSON.stringify(this.config.edition),
+      __PROPAGATOR_BACKEND__: JSON.stringify(this.config.propagatorBackend),
     });
     const webpackConfig = [] as Configuration[];
     let baseConfig = this.createBaseConfig_(dirName);

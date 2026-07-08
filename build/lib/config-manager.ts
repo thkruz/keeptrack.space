@@ -5,6 +5,20 @@ import { existsSync } from 'node:fs';
 import { BuildError, ConsoleStyles, ErrorCodes, logWithStyle } from './build-error';
 import { ProfileLoader } from './profile-loader';
 
+/** SGP4 propagator backend a build can default to. */
+export type PropagatorBackend = 'sgp4' | 'sgp4-wasm' | 'sgp4-xp-wasm';
+
+/** Valid PROPAGATOR_BACKEND values; anything else falls back to pure-TypeScript 'sgp4'. */
+export const PROPAGATOR_BACKENDS: readonly PropagatorBackend[] = ['sgp4', 'sgp4-wasm', 'sgp4-xp-wasm'];
+
+/**
+ * Normalizes an untrusted PROPAGATOR_BACKEND string to a valid backend,
+ * defaulting to 'sgp4' (the license-free pure-TypeScript propagator that every
+ * edition can run).
+ */
+export const normalizePropagatorBackend = (value: string | undefined): PropagatorBackend =>
+  (PROPAGATOR_BACKENDS as readonly string[]).includes(value ?? '') ? value as PropagatorBackend : 'sgp4';
+
 export interface BuildConfig {
   primaryLogoPath: string;
   secondaryLogoPath: string;
@@ -21,6 +35,12 @@ export interface BuildConfig {
   edition: string;
   /** Path to the env file for dotenv-webpack (relative to project root). Defaults to '.env'. */
   envFilePath: string;
+  /**
+   * SGP4 backend this build defaults to (overridable at runtime via
+   * settingsManager.propagatorBackend). Set per profile via PROPAGATOR_BACKEND.
+   * OSS defaults to 'sgp4' (pure TypeScript); Pro selects a wasm build.
+   */
+  propagatorBackend: PropagatorBackend;
 
   PUBLIC_SUPABASE_URL?: string;
   PUBLIC_SUPABASE_ANON_KEY?: string;
@@ -51,6 +71,7 @@ export class ConfigManager {
       isPro: false,
       edition: 'oss',
       envFilePath: '.env',
+      propagatorBackend: 'sgp4',
     };
   }
 
@@ -71,6 +92,16 @@ export class ConfigManager {
       } else {
         this.loadLegacyConfig_();
       }
+
+      /*
+       * Only Pro builds bundle the license-restricted Sgp4Prop wasm artifacts,
+       * so a non-Pro build must always default to pure-TypeScript 'sgp4' (a
+       * clean fallback, no missing-artifact warning). Pro clamps any
+       * profile/env-supplied value to a known backend.
+       */
+      this.config.propagatorBackend = this.config.isPro
+        ? normalizePropagatorBackend(this.config.propagatorBackend)
+        : 'sgp4';
 
       // Log the configuration
       this.logConfiguration();
@@ -203,6 +234,7 @@ export class ConfigManager {
 
     this.config.isPro = isPro === 'true';
     this.config.edition = process.env.EDITION ?? envVars.EDITION ?? (this.config.isPro ? 'pro' : 'oss');
+    this.config.propagatorBackend = normalizePropagatorBackend(process.env.PROPAGATOR_BACKEND ?? envVars.PROPAGATOR_BACKEND);
   }
 
   /**
@@ -241,6 +273,9 @@ export class ConfigManager {
     }
     if (env.EDITION) {
       this.config.edition = env.EDITION;
+    }
+    if (env.PROPAGATOR_BACKEND) {
+      this.config.propagatorBackend = normalizePropagatorBackend(env.PROPAGATOR_BACKEND);
     }
     if (env.PUBLIC_SUPABASE_URL) {
       this.config.PUBLIC_SUPABASE_URL = env.PUBLIC_SUPABASE_URL;

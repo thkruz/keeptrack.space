@@ -381,24 +381,15 @@ export class TouchInput {
   pinchMove(evt: PinchTouchEvent) {
     this.lastEvent = evt;
 
-    const mainCameraInstance = ServiceLocator.getMainCamera();
-
     // Ratio-based zoom: spread fingers (ratio > 1) = zoom in, pinch (ratio < 1) = zoom out
     const pinchRatio = evt.pinchDistance / this.startPinchDistance;
 
     // Reset for next frame's incremental calculation (prevents quadratic accumulation)
     this.startPinchDistance = evt.pinchDistance;
 
-    let zoomTarget = mainCameraInstance.state.zoomTarget;
-
-    // Dampen ratio toward 1.0 to reduce pinch sensitivity (~50%)
-    const dampenedRatio = 1 + (pinchRatio - 1) * 0.5;
-
-    // Divide by ratio for logarithmic feel proportional to current zoom level
-    zoomTarget /= dampenedRatio;
-    zoomTarget = Math.min(Math.max(zoomTarget, 0.0001), 1);
-    mainCameraInstance.state.isZoomIn = pinchRatio > 1;
-    mainCameraInstance.state.zoomTarget = zoomTarget;
+    // Zoom in distance-from-satellite space when a satellite is focused so the feel stays smooth
+    // and consistent at any altitude, instead of scaling the exponential normalized zoom level.
+    ServiceLocator.getMainCamera().zoomTouchPinch(pinchRatio);
   }
 
   rotate(evt: TouchEvent) {

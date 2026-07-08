@@ -28,6 +28,7 @@ import {
   T2lWorkerOutMsgType,
   type T2lWorkerInMsg,
 } from './time2lon-messages';
+import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
 const MS_PER_MIN = 60_000;
 
@@ -94,6 +95,12 @@ function computeLine(sat: T2lSatData, nowMs: number, samplePoints: number, maxTi
 /** Handle incoming messages from the main thread. */
 onmessage = async function onmessage(event: MessageEvent<T2lWorkerInMsg>) {
   const msg = event.data;
+
+  if (isSgp4WasmBackendMsg(msg)) {
+    handleSgp4WasmBackendMsg(msg);
+
+    return;
+  }
 
   if (msg.typ === T2lWorkerMsgType.CANCEL) {
     cancelledRunId = msg.runId;

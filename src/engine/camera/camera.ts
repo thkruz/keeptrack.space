@@ -484,6 +484,60 @@ export class Camera {
     }
   }
 
+  /**
+   * Touch pinch-zoom (mobile). `pinchRatio` is the finger-spread ratio: > 1 = fingers spreading
+   * (zoom in / move closer), < 1 = fingers pinching (zoom out / move away).
+   *
+   * When a satellite is focused, the zoom is applied in distance-from-satellite (standoff) space
+   * via camDistBuffer, so each pinch step changes the distance by a consistent percentage at any
+   * orbit altitude - the same smooth feel as the desktop mouse wheel. This avoids the hypersensitive
+   * response you get from scaling the normalized zoom level directly, whose exponential curve
+   * (distance = zoomLevel^ZOOM_EXP) makes a small pinch jump the camera kilometers near an object.
+   * The camDistBuffer setter clamps to the target's minimum standoff, so this also honors the
+   * minimum distance. Falls back to Earth-centered normalized zoom when no satellite is selected.
+   */
+  zoomTouchPinch(pinchRatio: number): void {
+    if (!Number.isFinite(pinchRatio) || pinchRatio <= 0) {
+      return;
+    }
+
+    // Dampen the raw ratio toward 1.0 to soften pinch sensitivity.
+    const dampenedRatio = 1 + (pinchRatio - 1) * settingsManager.touchPinchSensitivity;
+
+    if (dampenedRatio <= 0) {
+      return;
+    }
+
+    this.state.isZoomIn = pinchRatio > 1;
+
+    if (settingsManager.isZoomStopsRotation) {
+      this.autoRotate(false);
+    }
+
+    const target = PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj;
+    const isSatFocused = !!target && target.id !== -1 && (
+      this.cameraType === CameraType.FIXED_TO_SAT_ECI ||
+      this.cameraType === CameraType.FIXED_TO_SAT_LVLH ||
+      this.state.camZoomSnappedOnSat
+    );
+
+    if (isSatFocused && target!.position) {
+      const targetDist = Math.sqrt(target!.position.x ** 2 + target!.position.y ** 2 + target!.position.z ** 2);
+
+      if (targetDist > 0) {
+        // Proportional zoom in standoff space. Dividing by the ratio (> 1 when zooming in) shrinks
+        // the standoff. camDistBuffer's setter clamps to [effectiveMinDistanceFromTarget, max].
+        this.state.camDistBuffer = <Kilometers>(this.state.camDistBuffer / dampenedRatio);
+        this.state.zoomTarget = this.getZoomFromDistance(<Kilometers>(targetDist + this.state.camDistBuffer));
+
+        return;
+      }
+    }
+
+    // Earth-centered fallback: proportional in normalized zoom space.
+    this.state.zoomTarget /= dampenedRatio;
+  }
+
   changeZoom(zoom: ZoomValue | number): void {
     if (typeof zoom !== 'number') {
       throw new Error('Invalid Zoom Value');

@@ -2,7 +2,7 @@ import { Scene } from '@app/engine/core/scene';
 import { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { DepthManager } from '@app/engine/rendering/depth-manager';
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
-import { mat3, mat4, vec3, vec4 } from 'gl-matrix';
+import { mat4, vec3, vec4 } from 'gl-matrix';
 import { BaseObject, TemeVec3 } from '@ootk/src/main';
 import { GlUtils } from '../gl-utils';
 import { glsl } from '@app/engine/utils/development/formatter';
@@ -12,16 +12,12 @@ import { glsl } from '@app/engine/utils/development/formatter';
 
 export class Ellipsoid {
   private readonly attribs_ = {
+    // Vertices are interleaved position + normal (6 floats), but the flat
+    // translucent ellipsoid only reads position; the normal data is skipped by stride.
     a_position: new BufferAttribute({
       location: 0,
       vertices: 3,
       offset: 0,
-      stride: Float32Array.BYTES_PER_ELEMENT * 6,
-    }),
-    a_normal: new BufferAttribute({
-      location: 1,
-      vertices: 3,
-      offset: Float32Array.BYTES_PER_ELEMENT * 3,
       stride: Float32Array.BYTES_PER_ELEMENT * 6,
     }),
   };
@@ -36,7 +32,6 @@ export class Ellipsoid {
   private isLoaded_ = false;
   private hasValidPose_ = false;
   private mvMatrix_: mat4;
-  private readonly nMatrix_ = mat3.create();
   private program_: WebGLProgram;
   private vao: WebGLVertexArrayObject;
 
@@ -47,7 +42,6 @@ export class Ellipsoid {
   }
 
   private readonly uniforms_ = {
-    u_nMatrix: <WebGLUniformLocation><unknown>null,
     u_pMatrix: <WebGLUniformLocation><unknown>null,
     u_camMatrix: <WebGLUniformLocation><unknown>null,
     u_mvMatrix: <WebGLUniformLocation><unknown>null,
@@ -96,7 +90,6 @@ export class Ellipsoid {
       gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     }
 
-    gl.uniformMatrix3fv(this.uniforms_.u_nMatrix, false, this.nMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.u_mvMatrix, false, this.mvMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
     gl.uniform4fv(this.uniforms_.u_color, this.color_);
@@ -161,9 +154,6 @@ export class Ellipsoid {
 
     mat4.targetTo(this.mvMatrix_, this.drawPosition, lookAtPos, up);
 
-    // Calculate normal matrix
-    mat3.normalFromMat4(this.nMatrix_, this.mvMatrix_);
-
     this.hasValidPose_ = true;
   }
 
@@ -181,8 +171,8 @@ export class Ellipsoid {
     this.program_ = new WebGlProgramHelper(gl, this.shaders_.vert, this.shaders_.frag).program;
     this.gl_.useProgram(this.program_);
 
-    GlUtils.assignAttributes(this.attribs_, gl, this.program_, ['a_position', 'a_normal']);
-    GlUtils.assignUniforms(this.uniforms_, gl, this.program_, ['u_pMatrix', 'u_camMatrix', 'u_mvMatrix', 'u_nMatrix', 'u_color', 'logDepthBufFC', 'worldShift']);
+    GlUtils.assignAttributes(this.attribs_, gl, this.program_, ['a_position']);
+    GlUtils.assignUniforms(this.uniforms_, gl, this.program_, ['u_pMatrix', 'u_camMatrix', 'u_mvMatrix', 'u_color', 'logDepthBufFC', 'worldShift']);
   }
 
   private initVao_() {
@@ -195,9 +185,6 @@ export class Ellipsoid {
     gl.enableVertexAttribArray(this.attribs_.a_position.location);
     gl.vertexAttribPointer(this.attribs_.a_position.location, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 6, 0);
 
-    gl.enableVertexAttribArray(this.attribs_.a_normal.location);
-    gl.vertexAttribPointer(this.attribs_.a_normal.location, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 6, Float32Array.BYTES_PER_ELEMENT * 3);
-
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers_.vertIndexBuf);
 
     gl.bindVertexArray(null);
@@ -206,13 +193,11 @@ export class Ellipsoid {
   private shaders_ = {
     frag: glsl`#version 300 es
       precision highp float;
-      in vec3 v_normal;
       out vec4 fragColor;
       uniform vec4 u_color;
       uniform float logDepthBufFC;
 
       void main(void) {
-        float dummy = v_normal.x + v_normal.y + v_normal.z;
         fragColor = vec4(u_color.rgb * u_color.a, u_color.a);
 
         ${DepthManager.getLogDepthFragCode()}
@@ -222,14 +207,10 @@ export class Ellipsoid {
       uniform mat4 u_pMatrix;
       uniform mat4 u_camMatrix;
       uniform mat4 u_mvMatrix;
-      uniform mat3 u_nMatrix;
       uniform vec3 worldShift;
       uniform float logDepthBufFC;
 
       in vec3 a_position;
-      in vec3 a_normal;
-
-      out vec3 v_normal;
 
       void main(void) {
         vec4 position = u_mvMatrix * vec4(a_position, 1.0);
@@ -237,8 +218,6 @@ export class Ellipsoid {
         gl_Position = u_pMatrix * u_camMatrix * position;
 
         ${DepthManager.getLogDepthVertCode()}
-
-        v_normal = u_nMatrix * a_normal;
       }
     `,
   };

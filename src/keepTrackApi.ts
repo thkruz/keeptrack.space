@@ -6,6 +6,7 @@ import { PluginRegistry } from './engine/core/plugin-registry';
 import { ServiceLocator } from './engine/core/service-locator';
 import { EventBus } from './engine/events/event-bus';
 import { copyTsvToClipboard, saveCsv, saveVariable, saveXlsx } from './engine/utils/saveVariable';
+import type { Sgp4Wasm, Sgp4XpWasm } from '@ootk/src/main';
 
 import type { CatalogManager } from './app/data/catalog-manager';
 import type { GroupsManager } from './app/data/groups-manager';
@@ -106,6 +107,16 @@ export class KeepTrackApi {
   saveXlsx = saveXlsx;
   copyTsvToClipboard = copyTsvToClipboard;
   saveVariable = saveVariable;
+
+  /*
+   * USSF Astro Standards SGP4 wasm propagators (optional, license-restricted
+   * artifacts served from dist/wasm/sgp4prop/ when present locally). Loaded
+   * lazily so the wasm loader stays out of the static import graph.
+   */
+  loadSgp4Wasm = async (): Promise<Sgp4Wasm> => (await import('./engine/utils/sgp4-wasm-loader')).loadSgp4Wasm();
+  loadSgp4XpWasm = async (): Promise<Sgp4XpWasm> => (await import('./engine/utils/sgp4-wasm-loader')).loadSgp4XpWasm();
+  /** Whether main-thread Sgp4 propagation is routed through the wasm backend. */
+  isWasmPropagatorActive = async (): Promise<boolean> => (await import('./engine/utils/sgp4-wasm-loader')).isWasmPropagatorActive();
 }
 
 export const keepTrackApi = new KeepTrackApi();

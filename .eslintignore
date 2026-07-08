@@ -157,3 +157,7 @@ public
 public/analysis/js/analysis-tools.js
 
 src/engine/ootk/
+
+# License-restricted USSF Astro Standards Sgp4Prop WebAssembly artifacts
+# (machine-generated Emscripten glue + binaries, bundled by Pro only)
+src/plugins-pro/wasm/

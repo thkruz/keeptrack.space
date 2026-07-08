@@ -21,6 +21,13 @@ const makeCamera = () => ({
     camAngleSnappedOnSat: true,
   },
   autoRotate: vi.fn(),
+  // Mirror the Camera.zoomTouchPinch Earth-centered fallback (no satellite focused here).
+  zoomTouchPinch(pinchRatio: number) {
+    const dampenedRatio = 1 + (pinchRatio - 1) * (settingsManager.touchPinchSensitivity ?? 0.5);
+
+    this.state.isZoomIn = pinchRatio > 1;
+    this.state.zoomTarget /= dampenedRatio;
+  },
 });
 
 const touchEvt = (touches: { clientX?: number; clientY?: number; pageX?: number; pageY?: number }[]) => ({

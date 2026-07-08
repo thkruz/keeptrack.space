@@ -22,12 +22,19 @@ import {
   type BpWorkerInMsg,
 } from './best-pass-messages';
 import { workerCheckIsInView, workerGetRae } from './shared/pass-worker-helpers';
+import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
 let cancelledRunId = -1;
 
 /** Handle incoming messages from the main thread. */
 onmessage = async function onmessage(event: MessageEvent<BpWorkerInMsg>) {
   const msg = event.data;
+
+  if (isSgp4WasmBackendMsg(msg)) {
+    handleSgp4WasmBackendMsg(msg);
+
+    return;
+  }
 
   if (msg.typ === BpWorkerMsgType.CANCEL) {
     cancelledRunId = msg.runId;

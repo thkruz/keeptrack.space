@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
@@ -35,7 +36,6 @@ import {
   LandObject,
   Milliseconds,
   Minutes,
-  PI,
   Radians,
   RaeVec3,
   Satellite,
@@ -53,6 +53,7 @@ import {
 import { GROUND_BUFFER_DISTANCE, RADIUS_OF_EARTH, STAR_DISTANCE } from '../engine/utils/constants';
 import { PosCruncherCachedObject, PositionCruncherIncomingMsg, PositionCruncherOutgoingMsg } from './constants';
 import { MarkerMode, PosCruncherMsgType } from './position-cruncher-messages';
+import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 import { setupTimeVariables } from './positionCruncher/calculations';
 import { resetPosition, resetVelocity } from './positionCruncher/satCache';
 
@@ -334,6 +335,12 @@ const handleSatEditMsg_ = (m: PositionCruncherIncomingMsg): void => {
 };
 
 export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
+  if (isSgp4WasmBackendMsg(m.data)) {
+    handleSgp4WasmBackendMsg(m.data);
+
+    return;
+  }
+
   switch (m.data.typ) {
     case PosCruncherMsgType.OFFSET:
       handleOffsetMsg_(m);
@@ -375,7 +382,8 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
 
       break;
     case PosCruncherMsgType.SUNLIGHT_VIEW:
-      if (m.data.isSunlightView) {
+      // Assign both states — the old truthy guard latched sunlight view on forever
+      if (typeof m.data.isSunlightView === 'boolean') {
         isSunlightView = m.data.isSunlightView;
       }
       break;
@@ -591,6 +599,10 @@ export const checkForNaN = (satPos: Float32Array, satVel: Float32Array): void =>
 };
 
 export const updateSatCache = (now: Date, j: number, gmst: GreenwichMeanSiderealTime, gmstNext: number, isSunExclusion: boolean, cycleDtSec = 0) => {
+  // Recomputed lazily once per cycle; the previous per-satellite Sun.eci() calls
+  // cost tens of milliseconds per cycle in sunlight view
+  cycleSunEci_ = null;
+
   let i = -1;
   // Using a while loop since some methods may update multiple cache objects
 
@@ -763,45 +775,28 @@ export const updateLandObject = (i: number, gmst: GreenwichMeanSiderealTime): vo
   satPos[i * 3 + 2] = eci.z;
 };
 
-/** Validates an imprecise/old-elset satellite's geodetic altitude against its apogee/perigee band; throws 'Impossible orbit' when out of band. */
-const validateImpreciseOrbitAltitude_ = (i: number, position: TemeVec3, gmst: GreenwichMeanSiderealTime): void => {
-  const a = 6378.137;
-  const b = 6356.7523142;
-  const R = Math.sqrt(position.x * position.x + position.y * position.y);
-  const f = (a - b) / a;
-  const e2 = 2 * f - f * f;
-
-  let lon = Math.atan2(position.y, position.x) - gmst;
-
-  while (lon < -PI) {
-    lon += TAU;
-  }
-  while (lon > PI) {
-    lon -= TAU;
-  }
-
-  const kmax = 20;
-  let k = 0;
-  let lat = Math.atan2(position.z, Math.sqrt(position.x * position.x + position.y * position.y));
-  let C = 1 / Math.sqrt(1 - e2 * (Math.sin(lat) * Math.sin(lat)));
-
-  while (k < kmax) {
-    C = 1 / Math.sqrt(1 - e2 * (Math.sin(lat) * Math.sin(lat)));
-    lat = Math.atan2(position.z + a * C * e2 * Math.sin(lat), R);
-    k += 1;
-  }
-  const alt = R / Math.cos(lat) - a * C;
+/**
+ * Validates an imprecise/old-elset satellite's altitude against its apogee/perigee band;
+ * throws 'Impossible orbit' when out of band.
+ *
+ * Uses the geocentric radius the caller already computed instead of an iterative geodetic
+ * conversion: the spherical approximation is within ~30 km of geodetic height, absorbed by
+ * widening the band margins. The old 20-iteration trig loop cost ~28 ms per cycle for a
+ * full catalog of stale elsets (every satellite takes this path when elsets are >20 days old).
+ */
+const validateImpreciseOrbitAltitude_ = (i: number, rMag: number): void => {
+  const alt = rMag - RADIUS_OF_EARTH;
 
   const apogee = objCache[i].apogee ?? Infinity;
   const perigee = objCache[i].perigee ?? 0;
 
-  if (alt > apogee + 1000 || alt < perigee - 100) {
+  if (alt > apogee + 1030 || alt < perigee - 130) {
     throw new Error('Impossible orbit');
   }
 };
 
 /** Writes a satellite's validated TEME position/velocity into the shared arrays. Returns false on NaN propagation; throws 'Impossible orbit' for unbound/sub-surface/out-of-band orbits. */
-const writeValidatedSatState_ = (i: number, m: number, pv: { position: TemeVec3; velocity: TemeVec3<KilometersPerSecond> }, gmst: GreenwichMeanSiderealTime): boolean => {
+const writeValidatedSatState_ = (i: number, m: number, pv: { position: TemeVec3; velocity: TemeVec3<KilometersPerSecond> }): boolean => {
   if (isNaN(pv.position.x) || isNaN(pv.position.y) || isNaN(pv.position.z)) {
     return false;
   }
@@ -828,7 +823,7 @@ const writeValidatedSatState_ = (i: number, m: number, pv: { position: TemeVec3;
    * are not failing to propagate
    */
   if (objCache[i].satrec.isimp || m / 1440 > 20) {
-    validateImpreciseOrbitAltitude_(i, pv.position, gmst);
+    validateImpreciseOrbitAltitude_(i, rMag);
   }
 
   return true;
@@ -855,12 +850,15 @@ const markSatelliteAsBad_ = (i: number): void => {
   satVel[i * 3 + 2] = 0;
 };
 
+/** Sun ECI position computed once per propagation cycle (identical for every satellite). */
+let cycleSunEci_: ReturnType<typeof Sun.eci> | null = null;
+
 /**
  * Updates a satellite's sunlight status (umbral/penumbral/sun) into the satInSun array.
  */
 const updateSatelliteSunStatus_ = (i: number, now: Date, position: TemeVec3): void => {
-  const sunPos = Sun.eci(now);
-  const lighting = Sun.lightingRatio(new Vector3D(position.x, position.y, position.z), sunPos);
+  cycleSunEci_ ??= Sun.eci(now);
+  const lighting = Sun.lightingRatio(new Vector3D(position.x, position.y, position.z), cycleSunEci_);
 
   satInSun[i] = SunStatus.SUN;
 
@@ -921,7 +919,7 @@ export const updateSatellite = (now: Date, i: number, gmst: GreenwichMeanSiderea
   const pv = Sgp4.propagate(satelliteData.satrec, m) as { position: TemeVec3; velocity: TemeVec3<KilometersPerSecond> };
 
   try {
-    if (!writeValidatedSatState_(i, m, pv, gmst)) {
+    if (!writeValidatedSatState_(i, m, pv)) {
       return false;
     }
   } catch {

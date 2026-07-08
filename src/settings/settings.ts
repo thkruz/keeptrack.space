@@ -210,6 +210,8 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   fpsYawRate: 'camera',
   touchCameraDecayFactor: 'camera',
   touchCameraMovementSpeed: 'camera',
+  touchPinchSensitivity: 'camera',
+  touchMinSatDistance: 'camera',
   momentumDamping: 'camera',
   touchMomentumDamping: 'camera',
   isLocalRotateEnabled: 'camera',
@@ -217,6 +219,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   isCompensateForEarthRotation: 'camera',
 
   // Orbital
+  propagatorBackend: 'orbital',
   isDrawOrbits: 'orbital',
   isDrawTrailingOrbits: 'orbital',
   enableConstantSelectedSatRedraw: 'orbital',

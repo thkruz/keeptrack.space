@@ -1,4 +1,11 @@
-:root {
+/**
+ * Only reserve height for the slider bar when it is actually rendered. The
+ * TimeSlider plugin is disabled on mobile, so an unconditional :root value
+ * left --top-menu-height (which adds --time-slider-height) 25px too tall,
+ * dropping the search-results dropdown 25px below the nav and exposing a
+ * black band under the top menu.
+ */
+:root:has(#time-slider-container) {
   /** The height of the time slider bar */
   --time-slider-height: 25px;
 }

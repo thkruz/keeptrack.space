@@ -1,3 +1,5 @@
+import { settingsManager } from '@app/settings/settings';
+import { Sgp4WasmBackendMsgData, SGP4_WASM_BACKEND_MSG_TYPE } from '@app/webworker/shared/sgp4-wasm-backend-messages';
 import { errorManagerInstance } from '../utils/errorManager';
 import { isThisNode } from '../utils/isThisNode';
 
@@ -35,6 +37,7 @@ export abstract class WebWorkerThreadManager {
       }
 
       this.worker_.onmessage = this.onMessage.bind(this);
+      this.sendSgp4WasmBackendConfig_();
       this.worker_.onerror = (event: ErrorEvent) => {
         // A cross-origin/opaque worker surfaces an onerror with no usable diagnostics: null error,
         // empty message, empty filename. There's nothing to act on, so flag it as opaque — errorManager
@@ -62,6 +65,32 @@ export abstract class WebWorkerThreadManager {
         throw new Error(error);
       }
     }
+  }
+
+  /**
+   * Broadcasts the configured Astro Standards SGP4 wasm backend to the fresh
+   * worker (no-op for the default 'sgp4' backend). Workers that propagate
+   * with Sgp4 opt in via the shared handler in
+   * webworker/shared/sgp4-wasm-backend-handler.ts; all others ignore the
+   * message (its string `typ` cannot collide with numeric message enums).
+   */
+  private sendSgp4WasmBackendConfig_(): void {
+    const backend = settingsManager.propagatorBackend;
+
+    if (backend !== 'sgp4-wasm' && backend !== 'sgp4-xp-wasm') {
+      return;
+    }
+
+    const baseUrl = `${settingsManager.installDirectory}wasm/sgp4prop/`;
+    const isXp = backend === 'sgp4-xp-wasm';
+    const msg: Sgp4WasmBackendMsgData = {
+      typ: SGP4_WASM_BACKEND_MSG_TYPE,
+      backend,
+      glueUrl: `${baseUrl}${isXp ? 'Sgp4Prop.xp.js' : 'Sgp4Prop.js'}`,
+      wasmUrl: `${baseUrl}${isXp ? 'Sgp4Prop.xp.wasm' : 'Sgp4Prop.wasm'}`,
+    };
+
+    this.postMessage(msg);
   }
 
   protected initNodeConfig_(workerStub: Worker | undefined, workerScriptUrl: string) {

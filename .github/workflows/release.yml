@@ -9,8 +9,12 @@ name: Release
 #      (the single source of truth) and syncs README / CITATION version refs,
 #   4. commits + tags on main and cuts the GitHub release.
 #
-# The commit and tag are pushed with GITHUB_TOKEN, which does NOT re-trigger
-# workflows, so this never loops. The back-merge job then keeps develop in sync.
+# The commit and tag are pushed with RELEASE_TOKEN, a fine-grained PAT whose
+# owner is on the `main`/`develop` ruleset Bypass list (the default GITHUB_TOKEN
+# is not, so its direct push to a protected branch is rejected with GH013).
+# Because a PAT push DOES re-trigger workflows, the release commit carries
+# `[skip ci]` (see .releaserc.json) so this never loops. The back-merge job
+# then keeps develop in sync.
 
 "on":
   push:
@@ -39,7 +43,11 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
+          # persist-credentials stores this token as the git push credential;
+          # RELEASE_TOKEN (not GITHUB_TOKEN) is what lets the release push
+          # bypass the branch ruleset.
           persist-credentials: true
+          token: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -65,7 +73,9 @@ jobs:
 
       - name: Run semantic-release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Same PAT: authenticates the GitHub Release API call and matches the
+          # bypass identity used for the push.
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: npx semantic-release
 
   back-merge:
@@ -82,7 +92,9 @@ jobs:
         with:
           ref: develop
           fetch-depth: 0
+          # Push with the same bypass PAT in case `develop` is also protected.
           persist-credentials: true
+          token: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Configure git identity
         run: |
@@ -92,7 +104,7 @@ jobs:
 
       - name: Merge main into develop (or open a sync PR on conflict)
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
           git fetch origin main
           if git merge --no-edit origin/main; then

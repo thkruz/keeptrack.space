@@ -43,7 +43,7 @@
           "README.md",
           "CITATION.cff"
         ],
-        "message": "chore(release): :bookmark: ${nextRelease.version}\n\n${nextRelease.notes}"
+        "message": "chore(release): :bookmark: ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ],
     "@semantic-release/github"

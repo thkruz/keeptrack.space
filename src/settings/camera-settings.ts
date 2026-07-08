@@ -148,6 +148,19 @@ export class CameraSettings {
    * touch movements are coarser.
    */
   touchCameraMovementSpeed = 0.005;
+  /**
+   * Pinch-zoom sensitivity for touch (mobile). The raw finger-spread ratio is dampened toward 1.0
+   * by this factor before it is applied to the camera distance: 1 = full sensitivity, 0 = no zoom.
+   * Lower values give a smoother, less twitchy pinch. Only used by the touch pinch handler.
+   */
+  touchPinchSensitivity = 0.5;
+  /**
+   * Minimum camera standoff (km) from a selected object on mobile. Pinch gestures are coarser than
+   * a mouse wheel, so the per-object standoff is floored to this value so the camera never lands on
+   * top of (or inside) the 3D mesh. The initial framing distance is floored to twice this value.
+   * Mobile only - desktop uses the size-scaled targetStandoffDistanceKm without this floor.
+   */
+  touchMinSatDistance = 0.15 as Kilometers;
 
   // Frame-rate independent momentum damping
   /**

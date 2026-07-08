@@ -63,6 +63,18 @@ class BuildManager {
         // Copy pro examples if available
         fileManager.copyDirectory('src/plugins-pro/examples', 'dist/examples', { isOptional: true, recursive: true });
 
+        /*
+         * Bundle the USSF Astro Standards Sgp4Prop WebAssembly artifacts for Pro
+         * builds only. They live in the proprietary plugins-pro submodule
+         * (src/plugins-pro/wasm/sgp4prop/) together with LICENSE.txt (the USSF
+         * Open Source Agreement), which is copied alongside so a copy of the
+         * Agreement travels with each distribution (Agreement 3.A.1). OSS builds
+         * ship without them and fall back to ootk's pure-TypeScript SGP4.
+         */
+        if (config.isPro) {
+          fileManager.copyDirectory('src/plugins-pro/wasm/sgp4prop', 'dist/wasm/sgp4prop', { isOptional: true, recursive: true });
+        }
+
         // Copy profile-specific runtime files (not bundled by webpack)
         if (config.settingsPath && config.settingsPath !== 'public/settings/settingsOverride.js') {
           fileManager.copyFile(config.settingsPath, './dist/settings/settingsOverride.js', { force: true });

@@ -89,6 +89,13 @@ coverage/
 coverage-e2e/
 coverage-combined/
 
+# Generated benchmark reports
+benchmark-results/
+
+# Non-redistributable ComSpOC TLE/XTLE sample data for the SGP4 validation
+scripts/sgp4-benchmark/*.tle
+scripts/sgp4-benchmark/*.xtle
+
 # SonarQube scanner working directory + exported issues (offline analysis)
 .scannerwork/
 .sonarqube/

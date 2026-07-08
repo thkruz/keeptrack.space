@@ -3,7 +3,7 @@ import { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { BaseObject, Kilometers, KilometersPerSecond, TemeVec3 } from '@ootk/src/main';
-import { mat3, mat4, vec3, vec4 } from 'gl-matrix';
+import { mat4, vec3, vec4 } from 'gl-matrix';
 import { DepthManager } from '../depth-manager';
 import { GlUtils } from '../gl-utils';
 
@@ -35,16 +35,12 @@ export class Box {
   }
 
   private attribs_ = {
+    // Vertices are interleaved position + normal (6 floats), but the flat
+    // translucent box only reads position; the normal data is skipped by stride.
     a_position: new BufferAttribute({
       location: 0,
       vertices: 3,
       offset: 0,
-      stride: Float32Array.BYTES_PER_ELEMENT * 6,
-    }),
-    a_normal: new BufferAttribute({
-      location: 1,
-      vertices: 3,
-      offset: Float32Array.BYTES_PER_ELEMENT * 3,
       stride: Float32Array.BYTES_PER_ELEMENT * 6,
     }),
   };
@@ -61,7 +57,6 @@ export class Box {
   private isLoaded_ = false;
   private hasValidPose_ = false;
   private mvMatrix_: mat4;
-  private nMatrix_ = mat3.create();
   private program_: WebGLProgram;
 
   get hasValidPose(): boolean {
@@ -74,7 +69,6 @@ export class Box {
   };
 
   private uniforms_ = {
-    u_nMatrix: <WebGLUniformLocation><unknown>null,
     u_pMatrix: <WebGLUniformLocation><unknown>null,
     u_camMatrix: <WebGLUniformLocation><unknown>null,
     u_mvMatrix: <WebGLUniformLocation><unknown>null,
@@ -110,7 +104,6 @@ export class Box {
     }
 
     // Set the uniforms
-    gl.uniformMatrix3fv(this.uniforms_.u_nMatrix, false, this.nMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.u_mvMatrix, false, this.mvMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
     gl.uniform4fv(this.uniforms_.u_color, this.color_);
@@ -183,9 +176,6 @@ export class Box {
     // Scale the cube to the correct size
     mat4.scale(this.mvMatrix_, this.mvMatrix_, [this.drawSizeU, this.drawSizeV, this.drawSizeW]);
 
-    // Calculate the normal matrix
-    mat3.normalFromMat4(this.nMatrix_, this.mvMatrix_);
-
     this.hasValidPose_ = true;
   }
 
@@ -204,8 +194,8 @@ export class Box {
     this.gl_.useProgram(this.program_);
 
     // Assign Attributes
-    GlUtils.assignAttributes(this.attribs_, gl, this.program_, ['a_position', 'a_normal']);
-    GlUtils.assignUniforms(this.uniforms_, gl, this.program_, ['u_pMatrix', 'u_camMatrix', 'u_mvMatrix', 'u_nMatrix', 'u_color', 'logDepthBufFC', 'worldOffset']);
+    GlUtils.assignAttributes(this.attribs_, gl, this.program_, ['a_position']);
+    GlUtils.assignUniforms(this.uniforms_, gl, this.program_, ['u_pMatrix', 'u_camMatrix', 'u_mvMatrix', 'u_color', 'logDepthBufFC', 'worldOffset']);
   }
 
   private initVao_() {
@@ -219,9 +209,6 @@ export class Box {
     gl.enableVertexAttribArray(this.attribs_.a_position.location);
     gl.vertexAttribPointer(this.attribs_.a_position.location, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 6, 0);
 
-    gl.enableVertexAttribArray(this.attribs_.a_normal.location);
-    gl.vertexAttribPointer(this.attribs_.a_normal.location, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 6, Float32Array.BYTES_PER_ELEMENT * 3);
-
     // Select the vertex indicies buffer
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers_.vertIndexBuf);
 
@@ -231,7 +218,6 @@ export class Box {
   private shaders_ = {
     frag: glsl`#version 300 es
       precision highp float;
-      in vec3 v_normal;
       out vec4 fragColor;
       uniform vec4 u_color;
       uniform float logDepthBufFC;
@@ -246,22 +232,16 @@ export class Box {
       uniform mat4 u_pMatrix;
       uniform mat4 u_camMatrix;
       uniform mat4 u_mvMatrix;
-      uniform mat3 u_nMatrix;
       uniform vec3 worldOffset;
       uniform float logDepthBufFC;
 
       in vec3 a_position;
-      in vec3 a_normal;
-
-      out vec3 v_normal;
 
       void main(void) {
           vec4 worldPosition = u_mvMatrix * vec4(a_position.xyz, 1.0);
           gl_Position = u_pMatrix * u_camMatrix * vec4(worldPosition.xyz + worldOffset, 1.0);
 
           ${DepthManager.getLogDepthVertCode()}
-
-          v_normal = u_nMatrix * a_normal;
       }
       `,
   };

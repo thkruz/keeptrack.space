@@ -84,8 +84,10 @@ export const activateConfiguredPropagatorBackend = async (): Promise<boolean> =>
 
     return true;
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+
     errorManagerInstance.warn(
-      `Failed to activate the ${backend} propagator backend; falling back to the TypeScript SGP4. ${(error as Error).message}`,
+      `Failed to activate the ${backend} propagator backend; falling back to the TypeScript SGP4. ${message}`,
     );
 
     return false;

@@ -537,8 +537,26 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     // Missiles use a small fixed radius; only truly size-less objects fall back to the global minimum.
     const radiusKm = SelectSatManager.calcTargetRadiusKm_(target);
 
-    cam.state.minDistanceFromTarget = radiusKm === null ? null : targetStandoffDistanceKm(radiusKm);
-    cam.state.camDistBuffer = radiusKm === null ? cam.state.effectiveMinDistanceFromTarget : initialFramingDistanceKm(radiusKm);
+    if (radiusKm === null) {
+      cam.state.minDistanceFromTarget = null;
+      cam.state.camDistBuffer = cam.state.effectiveMinDistanceFromTarget;
+    } else {
+      let minStandoff = targetStandoffDistanceKm(radiusKm);
+      let framing = initialFramingDistanceKm(radiusKm);
+
+      if (settingsManager.isMobileModeEnabled) {
+        // Pinch zoom is coarser than a mouse wheel, so keep a larger floor: the camera never lands
+        // on top of the mesh (min standoff) and selecting frames the whole object with room to zoom
+        // in (framing = 2x the floor). Larger objects still scale past these floors.
+        const mobileFloor = settingsManager.touchMinSatDistance;
+
+        minStandoff = Math.max(minStandoff, mobileFloor) as Kilometers;
+        framing = Math.max(framing, mobileFloor * 2) as Kilometers;
+      }
+
+      cam.state.minDistanceFromTarget = minStandoff;
+      cam.state.camDistBuffer = framing;
+    }
 
     if (cam.cameraType === CameraType.FIXED_TO_SAT_LVLH || cam.cameraType === CameraType.FIXED_TO_SAT_ECI) {
       // In satellite modes the LVLH/ECI frame already tracks the satellite.

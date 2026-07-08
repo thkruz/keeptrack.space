@@ -107,6 +107,17 @@ export class KeepTrack {
 
     settingsManager.init(this.settingsOverride_);
 
+    /*
+     * Route SGP4 propagation through the configured Astro Standards wasm
+     * backend (no-op for the default 'sgp4'). Fire-and-forget: satKeys attach
+     * lazily, so propagation upgrades seamlessly once the runtime is ready.
+     */
+    import('./engine/utils/sgp4-wasm-loader')
+      .then(({ activateConfiguredPropagatorBackend }) => activateConfiguredPropagatorBackend())
+      .catch(() => {
+        // Failures are logged inside activateConfiguredPropagatorBackend
+      });
+
     KeepTrack.setContainerElement();
 
     if (!this.settingsOverride_.isPreventDefaultHtml) {

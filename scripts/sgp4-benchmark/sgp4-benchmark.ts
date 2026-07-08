@@ -456,7 +456,7 @@ const main = async (): Promise<void> => {
     singleIters: SINGLE_ITERS,
     medianElsetAgeDays: elsetAgeDays,
     maxPositionDeltaKm: maxDelta,
-    parologySampleSize: paritySample,
+    paritySampleSize: paritySample,
     enginesSkipped,
     rows,
   };

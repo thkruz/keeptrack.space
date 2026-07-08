@@ -41,7 +41,7 @@ export interface BenchmarkReport {
   /** Median elset age at the propagation target (drives the cruncher's validation path). */
   medianElsetAgeDays: number;
   maxPositionDeltaKm: number;
-  parologySampleSize: number;
+  paritySampleSize: number;
   enginesSkipped: string[];
   rows: BenchmarkRow[];
 }
@@ -52,7 +52,12 @@ const ENGINE_COLOR: Record<string, string> = {
   'sgp4-xp-wasm': 'var(--series-3)',
 };
 
-const esc = (s: string): string => s.replace(/&/gu, '&amp;').replace(/</gu, '&lt;').replace(/>/gu, '&gt;');
+const esc = (s: string): string => s
+  .replaceAll('&', '&amp;')
+  .replaceAll('"', '&quot;')
+  .replaceAll("'", '&#39;')
+  .replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;');
 
 const fmt = (v: number, digits = 2): string => v.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 
@@ -281,7 +286,7 @@ export const renderHtmlReport = (r: BenchmarkReport): string => {
       Timing uses <code>process.hrtime.bigint()</code>. “seam (app path)” is <code>Sgp4.propagate</code> with the wasm backend installed — exactly what
       KeepTrack executes when <code>propagatorBackend</code> is set. “fast call” is the direct <code>propagateOnePosVelFast</code> scratch-buffer call.
       “batch (api)” is one <code>propagateDs50UtcPosVel</code> call per frame including per-frame key marshalling; “batch (prebuilt)” reuses key/result
-      buffers across frames and reads positions out, modeling an optimized cruncher. Cross-engine agreement was verified on ${r.parologySampleSize}
+      buffers across frames and reads positions out, modeling an optimized cruncher. Cross-engine agreement was verified on ${r.paritySampleSize}
       random satellites: max position delta ${r.maxPositionDeltaKm.toExponential(2)} km. Loop outputs allocate one record per satellite (inherent to the
       per-call APIs); batch modes copy positions into preallocated arrays inside the timed region.
     </p>

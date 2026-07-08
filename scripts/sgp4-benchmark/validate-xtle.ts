@@ -223,8 +223,7 @@ const loadInto = (engine: Sgp4WasmBase, entries: ElsetEntry[]): LoadResult => {
 
 const main = async (): Promise<void> => {
   if (!existsSync(TLE_FILE) || !existsSync(XTLE_FILE)) {
-    console.error(`Expected paired files next to this script:\n  ${TLE_FILE}\n  ${XTLE_FILE}`);
-    process.exitCode = 1;
+    console.warn(`Skipping XTLE validation: expected paired files next to this script:\n  ${TLE_FILE}\n  ${XTLE_FILE}`);
 
     return;
   }

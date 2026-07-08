@@ -27,6 +27,7 @@ import {
   type RpoMsgStart,
   type RpoWorkerInMsg,
 } from './proximity-ops-messages';
+import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
 let cancelledRunId = -1;
 
@@ -158,6 +159,12 @@ async function handleStart_(msg: RpoMsgStart): Promise<void> {
 /** Worker message router: dispatches START to the survey and records CANCEL. */
 onmessage = async function onmessage(event: MessageEvent<RpoWorkerInMsg>) {
   const msg = event.data;
+
+  if (isSgp4WasmBackendMsg(msg)) {
+    handleSgp4WasmBackendMsg(msg);
+
+    return;
+  }
 
   switch (msg.typ) {
     case RpoWorkerMsgType.START:

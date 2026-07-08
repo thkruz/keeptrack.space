@@ -31,6 +31,7 @@ import {
   AzRangeOutMsgType,
   type AzRangeWorkerInMsg,
 } from './az-range-heatmap-messages';
+import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
 const DEG2RAD = Math.PI / 180;
 
@@ -91,6 +92,12 @@ globalThis.onunhandledrejection = (event: PromiseRejectionEvent) => {
 
 onmessage = async function onmessage(event: MessageEvent<AzRangeWorkerInMsg>) {
   const msg = event.data;
+
+  if (isSgp4WasmBackendMsg(msg)) {
+    handleSgp4WasmBackendMsg(msg);
+
+    return;
+  }
 
   if (msg.typ === AzRangeMsgType.CANCEL) {
     cancelled = true;

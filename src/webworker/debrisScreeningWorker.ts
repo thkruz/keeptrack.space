@@ -25,6 +25,7 @@ import {
   type DsSatelliteData,
   type DsWorkerInMsg,
 } from './debris-screening-messages';
+import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
 // ─── Module-level state ─────────────────────────────────────────────────────
 
@@ -231,6 +232,12 @@ function handleStartScreening_(msg: DsMsgStartScreening): void {
  */
 function onmessageProcessing_(m: MessageEvent<DsWorkerInMsg>): void {
   const msg = m.data;
+
+  if (isSgp4WasmBackendMsg(msg)) {
+    handleSgp4WasmBackendMsg(msg);
+
+    return;
+  }
 
   switch (msg.typ) {
     case DsWorkerMsgType.START_SCREENING:

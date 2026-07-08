@@ -18,6 +18,7 @@ import {
   type CoSatelliteData,
   type CoWorkerInMsg,
 } from './close-objects-messages';
+import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
 // ─── Module-level state ─────────────────────────────────────────────────────
 
@@ -242,6 +243,12 @@ function handleStartSearch_(msg: CoMsgStartSearch): void {
  */
 function onmessageProcessing_(m: MessageEvent<CoWorkerInMsg>): void {
   const msg = m.data;
+
+  if (isSgp4WasmBackendMsg(msg)) {
+    handleSgp4WasmBackendMsg(msg);
+
+    return;
+  }
 
   switch (msg.typ) {
     case CoWorkerMsgType.START_SEARCH:

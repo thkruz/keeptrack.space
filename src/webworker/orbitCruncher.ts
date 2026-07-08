@@ -7,6 +7,7 @@ import {
   OrbitCruncherMissileObject,
   OrbitCruncherMsgType, OrbitCruncherOtherObject, OrbitCruncherSatelliteObject, OrbitDrawTypes,
 } from './orbit-cruncher-messages';
+import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
 /** Earth's sidereal rotation rate (rad/s) — the rate GMST advances. */
 const EARTH_ROTATION_RAD_PER_SEC = 7.2921159e-5;
@@ -25,6 +26,12 @@ export const onMessage = (m: {
   data: OrbitCruncherInMsgs;
 }) => {
   const msg = m.data;
+
+  if (isSgp4WasmBackendMsg(msg)) {
+    handleSgp4WasmBackendMsg(msg);
+
+    return;
+  }
 
   switch (msg.typ) {
     case OrbitCruncherMsgType.INIT:

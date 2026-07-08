@@ -29,6 +29,7 @@ import {
   FovPredOutMsgType,
   type FovPredInMsg,
 } from './fov-prediction-messages';
+import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
 // ─── Worker State ────────────────────────────────────────────────────────────
 
@@ -342,6 +343,12 @@ function incrementalUpdate(simTimeMs: number): void {
 /** Handle incoming messages from the main thread. */
 onmessage = function onmessage(event: MessageEvent<FovPredInMsg>) {
   const msg = event.data;
+
+  if (isSgp4WasmBackendMsg(msg)) {
+    handleSgp4WasmBackendMsg(msg);
+
+    return;
+  }
 
   switch (msg.typ) {
     case FovPredMsgType.INIT: {

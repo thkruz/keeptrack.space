@@ -23,6 +23,23 @@ import { Kilometers } from '@app/engine/ootk/src/main';
  * Orbital mechanics and orbit rendering settings
  */
 export class OrbitalSettings {
+  // Propagation
+  /**
+   * Which SGP4 implementation propagates satellites.
+   *
+   * - `'sgp4'` — the built-in pure-TypeScript SGP4.
+   * - `'sgp4-wasm'` — the official USSF Astro Standards SGP4 WebAssembly build.
+   * - `'sgp4-xp-wasm'` — the Astro Standards SGP4-XP variant (also handles
+   *   ephemeris-type-4 TLEs).
+   *
+   * The default comes from the build (`__PROPAGATOR_BACKEND__`, set per profile
+   * via `PROPAGATOR_BACKEND`): OSS builds default to `'sgp4'`, while Pro builds
+   * bundle the license-restricted Sgp4Prop artifacts (`wasm/sgp4prop/`) and
+   * default to a wasm build. When a wasm backend is selected but its artifacts
+   * are missing, KeepTrack warns once and falls back to `'sgp4'`.
+   */
+  propagatorBackend: 'sgp4' | 'sgp4-wasm' | 'sgp4-xp-wasm' = __PROPAGATOR_BACKEND__;
+
   // Orbit Drawing
   /**
    * Determines whether or not to draw orbits.

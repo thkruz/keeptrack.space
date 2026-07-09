@@ -161,14 +161,16 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     // Set tooltip content
     tooltipDiv.innerHTML = text;
 
-    // Force layout to measure tooltip size
+    // Make the tooltip measurable, then read both rects back-to-back. The target's
+    // bounds are independent of the measuring class, so reading them before removing
+    // the class keeps the second read on the same clean layout instead of forcing a
+    // second reflow (batched read → single forced layout).
     tooltipDiv.classList.add('kt-tooltip-measuring');
     const tooltipRect = tooltipDiv.getBoundingClientRect();
+    const targetRect = targetEl.getBoundingClientRect();
 
     tooltipDiv.classList.remove('kt-tooltip-measuring');
 
-    // Get target element bounds for stable positioning
-    const targetRect = targetEl.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 

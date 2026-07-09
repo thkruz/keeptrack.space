@@ -121,6 +121,31 @@ describe('PluginManager.warnProImportFailed_', () => {
 
     expect(warnSpy.mock.calls[0][0]).toContain('Reason: plain string failure');
   });
+
+  it('serializes thrown objects as JSON instead of [object Object]', () => {
+    const descriptor = makeDescriptor({ ossImport: () => Promise.resolve({}) });
+
+    PM.warnProImportFailed_(descriptor, { code: 'MODULE_NOT_FOUND' });
+
+    const msg = warnSpy.mock.calls[0][0] as string;
+
+    expect(msg).toContain('Reason: {"code":"MODULE_NOT_FOUND"}');
+    expect(msg).not.toContain('[object Object]');
+  });
+
+  it('degrades to the type name for values JSON cannot serialize', () => {
+    const descriptor = makeDescriptor({ ossImport: () => Promise.resolve({}) });
+    const circular: Record<string, unknown> = {};
+
+    circular.self = circular;
+
+    PM.warnProImportFailed_(descriptor, circular);
+
+    const msg = warnSpy.mock.calls[0][0] as string;
+
+    expect(msg).toContain('Reason: object');
+    expect(msg).not.toContain('[object Object]');
+  });
 });
 
 describe('PluginManager.initPlugin_', () => {

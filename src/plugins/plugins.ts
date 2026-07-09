@@ -22,7 +22,10 @@ export class PluginManager {
     if (__IS_PRO__ && descriptor.proImport) {
       try {
         return { mod: await descriptor.proImport(), usedPro: true };
-      } catch { /* fall through to OSS */ }
+      } catch (error) {
+        PluginManager.warnProImportFailed_(descriptor, error);
+        // fall through to OSS
+      }
     }
 
     if (!descriptor.ossImport) {
@@ -30,6 +33,23 @@ export class PluginManager {
     }
 
     return { mod: await descriptor.ossImport(), usedPro: false };
+  }
+
+  /**
+   * Tell the user why a Pro feature is missing and what to do about it,
+   * rather than silently degrading to the OSS variant.
+   */
+  private static warnProImportFailed_(descriptor: PluginDescriptor, error: unknown): void {
+    const reason = error instanceof Error ? error.message : String(error);
+    const fallback = descriptor.ossImport
+      ? 'Falling back to the standard version.'
+      : 'The feature will be unavailable.';
+
+    errorManagerInstance.warn(
+      `Pro plugin "${descriptor.configKey}" failed to load. ${fallback} ` +
+      'Pro builds require the keeptrack-space-pro files in src/plugins-pro and IS_PRO=true in your .env ' +
+      `(see https://keeptrack.space/). Reason: ${reason}`,
+    );
   }
 
   /**

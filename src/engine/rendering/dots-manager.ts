@@ -17,6 +17,7 @@ import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { RADIUS_OF_EARTH } from '../utils/constants';
 import { glsl } from '../utils/development/formatter';
+import { FrameProfiler, GpuStage } from '../utils/frame-profiler';
 import { ensureVelocityVec3 } from '../utils/space-object-invariants';
 import { BufferAttribute } from './buffer-attribute';
 import { DepthManager } from './depth-manager';
@@ -280,6 +281,9 @@ export class DotsManager {
       this.shaderProvider_.setExtraUniforms(gl, this.programs.dots.uniforms);
     }
 
+    const profiler = FrameProfiler.getInstance();
+
+    profiler.beginGpu(GpuStage.dots);
     gl.bindVertexArray(this.programs.dots.vao);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.position);
@@ -317,6 +321,7 @@ export class DotsManager {
 
     gl.drawArrays(gl.POINTS, 0, drawCount);
     gl.bindVertexArray(null);
+    profiler.endGpu(GpuStage.dots);
 
     // Debug: draw picking dots to screen using the same GL state as visual dots
     if (this.debugShowPicking) {
@@ -327,7 +332,9 @@ export class DotsManager {
     gl.disable(gl.BLEND);
 
     // Draw GPU Picking Overlay -- This is what lets us pick a satellite
+    profiler.beginGpu(GpuStage.picking);
     this.drawGpuPickingFrameBuffer(projectionCameraMatrix, ServiceLocator.getMainCamera().state.mouseX, ServiceLocator.getMainCamera().state.mouseY);
+    profiler.endGpu(GpuStage.picking);
   }
 
   /**

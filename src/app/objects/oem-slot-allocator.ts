@@ -30,6 +30,11 @@ export class OemSlotAllocator {
 
     for (let i = 0; i < settingsManager.maxOemSatellites; i++) {
       if (!(catalogManager.objectCache[firstSlot + i] instanceof OemSatellite)) {
+        // Track the slot so DotsManager.interpolatePositionsOfOemSatellites can iterate
+        // only occupied slots. The caller assigns the OemSatellite right after; if it
+        // does not, the stale id is harmless (the interpolation re-checks instanceof).
+        catalogManager.oemSatelliteIds.add(firstSlot + i);
+
         return firstSlot + i;
       }
     }
@@ -58,6 +63,9 @@ export class OemSlotAllocator {
 
     oemSat.removeOrbitHistory();
     oemSat.removeFullOrbitPath();
+
+    // Free the slot from the occupied-id set (reverses the add in allocate()).
+    catalogManager.oemSatelliteIds.delete(oemSat.id);
 
     // Reset the slot back to its original unused Planet placeholder
     const oemSlotNum = oemSat.id - catalogManager.numSatellites + 1;

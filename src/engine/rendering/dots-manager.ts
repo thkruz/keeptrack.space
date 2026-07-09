@@ -1065,8 +1065,9 @@ export class DotsManager {
 
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const missileSats = catalogManagerInstance.missileSats;
+    const missileSet = catalogManagerInstance.missileSet;
 
-    if (!missileSats) {
+    if (!missileSats || missileSet.length === 0) {
       return;
     }
 
@@ -1075,13 +1076,20 @@ export class DotsManager {
     const currentGmst = ServiceLocator.getTimeManager().gmst as GreenwichMeanSiderealTime;
     const cruncherGmst = (this.cruncherGmst ?? currentGmst) as GreenwichMeanSiderealTime;
 
-    // The missile reservation is the maxMissiles slots ending at `missileSats`.
-    for (let id = missileSats - settingsManager.maxMissiles; id < missileSats; id++) {
-      const obj = catalogManagerInstance.objectCache[id];
+    // missileSet is exactly the objectCache missile reservation (same objects by reference),
+    // ending at `missileSats`. Iterate it directly instead of scanning objectCache with an
+    // instanceof per slot - inactive missiles then cost only a boolean read, not an
+    // instanceof + array lookup across all maxMissiles reserved slots.
+    const missileStartId = missileSats - missileSet.length;
 
-      if (!(obj instanceof MissileObject) || !obj.active || obj.altList.length === 0) {
+    for (let k = 0; k < missileSet.length; k++) {
+      const obj = missileSet[k];
+
+      if (!obj.active || obj.altList.length === 0) {
         continue;
       }
+
+      const id = missileStartId + k;
 
       if (!obj.isVisibleNow()) {
         // MIRV child before separation: it rides on top of the bus, so hide it by
@@ -1385,8 +1393,11 @@ export class DotsManager {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const simTime = (ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000) as Seconds;
 
-    for (let i = 0; i < settingsManager.maxOemSatellites; i++) {
-      const oemSat = catalogManagerInstance.objectCache[catalogManagerInstance.numSatellites + i];
+    // Iterate only the occupied OEM slots (usually zero), not all maxOemSatellites reserved
+    // placeholder slots. The instanceof check remains as a safety net for a slot that was
+    // allocated but not yet assigned (see OemSlotAllocator).
+    for (const id of catalogManagerInstance.oemSatelliteIds) {
+      const oemSat = catalogManagerInstance.objectCache[id];
 
       if (!oemSat || !(oemSat instanceof OemSatellite)) {
         continue;

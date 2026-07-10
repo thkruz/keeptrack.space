@@ -323,8 +323,14 @@ export class Scene {
 
     this.updateVisualsBasedOnPerformance_();
 
+    const profiler = FrameProfiler.getInstance();
+
     // Plugin-provided background renderer (e.g. flat map mode)
-    if (EventBus.getInstance().methods.renderCustomBackground()) {
+    profiler.beginGpu(GpuStage.customBackground);
+    const isCustomBackground = EventBus.getInstance().methods.renderCustomBackground();
+
+    profiler.endGpu(GpuStage.customBackground);
+    if (isCustomBackground) {
       return; // Plugin handled background rendering
     }
 
@@ -335,7 +341,6 @@ export class Scene {
     if (!settingsManager.isDrawLess) {
       if (settingsManager.isDrawSun && !isSecondaryPass) {
         const fb = settingsManager.isDisableGodrays ? null : this.frameBuffers.godrays;
-        const profiler = FrameProfiler.getInstance();
 
         // Draw the Sun to the Godrays Frame Buffer
         profiler.beginGpu(GpuStage.sun);
@@ -344,6 +349,8 @@ export class Scene {
 
         const sceneManager = ServiceLocator.getScene();
         const centerBodyEntity = sceneManager.getBodyById(settingsManager.centerBody);
+
+        profiler.beginGpu(GpuStage.occlusion);
 
         // Draw a black earth mesh on top of the sun in the godrays frame buffer
         // Skip in astronomy mode since Earth is hidden
@@ -373,6 +380,7 @@ export class Scene {
         ) {
           renderer.meshManager.drawOcclusion(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.programs.occlusion, this.frameBuffers.godrays);
         }
+        profiler.endGpu(GpuStage.occlusion);
 
         // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
         renderer.postProcessingManager.curBuffer = null;
@@ -381,22 +389,34 @@ export class Scene {
         profiler.endGpu(GpuStage.godrays);
       }
 
+      profiler.beginGpu(GpuStage.skybox);
       this.skybox.render(renderer.postProcessingManager.curBuffer);
+      profiler.endGpu(GpuStage.skybox);
 
       if (!settingsManager.isDisablePlanets) {
         if (settingsManager.centerBody !== SolarBody.Earth && settingsManager.centerBody !== SolarBody.Sun) {
+          profiler.beginGpu(GpuStage.planets);
           this.getBodyById(settingsManager.centerBody)?.draw(this.sun.position, renderer.postProcessingManager.curBuffer);
+          profiler.endGpu(GpuStage.planets);
         }
 
       }
       if (settingsManager.centerBody === SolarBody.Earth || settingsManager.centerBody === SolarBody.Moon) {
         if (settingsManager.isDrawEarth !== false && camera.cameraType !== CameraType.ASTRONOMY && camera.cameraType !== CameraType.PLANETARIUM) {
+          // Timed separately from gpu:earth so the profile exposes that the
+          // Earth renders here AND in renderOpaque (a real double-draw cost).
+          profiler.beginGpu(GpuStage.earthBackground);
           this.earth.draw(renderer.postProcessingManager.curBuffer);
+          profiler.endGpu(GpuStage.earthBackground);
         }
+        profiler.beginGpu(GpuStage.planets);
         this.getBodyById(SolarBody.Moon)?.draw(this.sun.position, renderer.postProcessingManager.curBuffer);
+        profiler.endGpu(GpuStage.planets);
       }
 
+      profiler.beginGpu(GpuStage.scenery);
       EventBus.getInstance().emit(EventBusEvent.drawOptionalScenery);
+      profiler.endGpu(GpuStage.scenery);
     }
 
     renderer.postProcessingManager.curBuffer = null;
@@ -470,7 +490,7 @@ export class Scene {
     const profiler = FrameProfiler.getInstance();
 
     // Draw Earth (skip if plugin handles it; atmosphere-only in ground view modes; full draw otherwise)
-    profiler.beginGpu(GpuStage.earth);
+    // GPU timing lives inside Earth.draw so surface and atmosphere profile separately
     if (EventBus.getInstance().methods.shouldSkipEarthDraw()) {
       // Earth is drawn by plugin (e.g. 2D quad in renderBackground)
     } else if (settingsManager.isDrawEarth !== false) {
@@ -480,7 +500,6 @@ export class Scene {
         this.earth.draw(renderer.postProcessingManager.curBuffer);
       }
     }
-    profiler.endGpu(GpuStage.earth);
 
     // Draw Dots (dots + GPU picking are timed inside DotsManager.draw)
     dotsManagerInstance.draw(renderer.projectionCameraMatrix, renderer.postProcessingManager.curBuffer);

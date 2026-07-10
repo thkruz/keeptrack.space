@@ -4,6 +4,7 @@ import { Scene } from '../core/scene';
 import { ServiceLocator } from '../core/service-locator';
 import { RADIUS_OF_EARTH } from '../utils/constants';
 import { glsl } from '../utils/development/formatter';
+import { CounterStage, FrameProfiler } from '../utils/frame-profiler';
 import { BufferAttribute } from './buffer-attribute';
 import { DepthManager } from './depth-manager';
 import { WebGlProgramHelper } from './webgl-program';
@@ -200,6 +201,8 @@ export class SatLabelManager {
     if (!this.isReady_ || this.instanceCount_ === 0) {
       return;
     }
+
+    FrameProfiler.getInstance().addCounter(CounterStage.labelGlyphs, this.instanceCount_);
 
     const gl = this.gl_;
 

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { CpuStage, FrameProfiler } from '@app/engine/utils/frame-profiler';
+import { CounterStage, CpuStage, FrameProfiler } from '@app/engine/utils/frame-profiler';
 
 /**
  * The profiler is a singleton; each test resets it to a clean, disabled state.
@@ -118,5 +118,45 @@ describe('FrameProfiler', () => {
 
     expect(snap.frames).toBe(0);
     expect(snap.cpu).toHaveLength(0);
+  });
+
+  it('accumulates counters within a frame and flushes one sample per frame', () => {
+    profiler.setEnabled(true);
+    // Two render passes in the same frame add up (multi-viewport)
+    profiler.frameStart(16);
+    profiler.addCounter(CounterStage.dots, 20000);
+    profiler.addCounter(CounterStage.dots, 5000);
+    profiler.frameEnd();
+    // A lighter second frame
+    profiler.frameStart(16);
+    profiler.addCounter(CounterStage.dots, 10000);
+    profiler.frameEnd();
+
+    const dots = profiler.getSnapshot().counters.find((s) => s.id === CounterStage.dots);
+
+    expect(dots).toBeDefined();
+    expect(dots!.samples).toBe(2);
+    expect(dots!.max).toBe(25000);
+    expect(dots!.avg).toBeCloseTo(17500, 3);
+  });
+
+  it('records nothing for counters while disabled', () => {
+    profiler.frameStart(16);
+    profiler.addCounter(CounterStage.orbits, 100);
+    profiler.frameEnd();
+
+    expect(profiler.getSnapshot().counters).toHaveLength(0);
+  });
+
+  it('tallies frames slower than the 30fps budget as long frames', () => {
+    profiler.setEnabled(true);
+    runFrame(16, CpuStage.camera, 1);
+    runFrame(50, CpuStage.camera, 1);
+    runFrame(40, CpuStage.camera, 1);
+
+    const snap = profiler.getSnapshot();
+
+    expect(snap.frames).toBe(3);
+    expect(snap.longFrames).toBe(2);
   });
 });

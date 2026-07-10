@@ -42,6 +42,7 @@ import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { BaseObject } from '../ootk/src/objects';
+import { CpuStage, FrameProfiler } from '../utils/frame-profiler';
 import { PersistenceManager, StorageKey } from '../utils/persistence-manager';
 import { CelestrakColorScheme } from './color-schemes/celestrak-color-scheme';
 import { ColorScheme, ColorSchemeColorMap, ColorSchemeParams } from './color-schemes/color-scheme';
@@ -180,6 +181,11 @@ export class ColorSchemeManager {
   }
 
   calculateColorBuffers(isForceRecolor = false): void {
+    // Main-thread coloring loop + GPU upload; a top jank source on weak
+    // machines, so it is profiled per occurrence (it does not run every frame)
+    const profiler = FrameProfiler.getInstance();
+
+    profiler.beginCpu(CpuStage.colorBuffers);
     try {
       /*
        * These two variables only need to be set once, but we want to make sure they aren't called before the satellites
@@ -271,6 +277,8 @@ export class ColorSchemeManager {
       this.lastColorScheme = this.currentColorScheme;
       this.isUseGroupColorScheme = false;
       errorManagerInstance.debug(e);
+    } finally {
+      profiler.endCpu(CpuStage.colorBuffers);
     }
   }
 

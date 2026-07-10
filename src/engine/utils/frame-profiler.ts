@@ -30,6 +30,8 @@ const RING_CAPACITY = 240;
 const MAX_PENDING_QUERIES = 64;
 /** Free-list cap for recycled query objects. */
 const QUERY_POOL_CAP = 32;
+/** Frames slower than this (30fps budget) count toward the long-frame tally. */
+const LONG_FRAME_MS = 33.4;
 
 /** CPU stage identifiers. Kept stable - the UI humanizes them for display. */
 export const CpuStage = {
@@ -40,13 +42,25 @@ export const CpuStage = {
   sceneUpdate: 'cpu:scene-update',
   orbitsAbove: 'cpu:orbits-above',
   drawSubmit: 'cpu:draw-submit',
+  endOfDraw: 'cpu:end-of-draw',
+  pickRead: 'cpu:pick-readback',
+  colorBuffers: 'cpu:color-buffers',
+  dotBuffers: 'cpu:dot-buffer-upload',
+  cruncherMsg: 'cpu:cruncher-message',
 } as const;
 
 /** GPU stage identifiers (non-overlapping leaves within one frame). */
 export const GpuStage = {
   sun: 'gpu:sun',
+  occlusion: 'gpu:occlusion',
   godrays: 'gpu:godrays',
+  skybox: 'gpu:skybox',
+  planets: 'gpu:planets',
+  earthBackground: 'gpu:earth-background',
+  scenery: 'gpu:scenery',
+  customBackground: 'gpu:custom-background',
   earth: 'gpu:earth',
+  atmosphere: 'gpu:atmosphere',
   dots: 'gpu:dots',
   picking: 'gpu:picking',
   labels: 'gpu:labels',
@@ -58,11 +72,24 @@ export const GpuStage = {
 } as const;
 
 /**
+ * Per-frame workload counters (how MUCH was drawn, to correlate with how LONG
+ * stages took). Values accumulate across render passes within one frame.
+ */
+export const CounterStage = {
+  dots: 'count:dots-drawn',
+  orbits: 'count:orbits-drawn',
+  labelGlyphs: 'count:label-glyphs',
+  lines: 'count:lines-drawn',
+  viewportPasses: 'count:viewport-passes',
+} as const;
+
+/**
  * Top-level CPU stages whose averages sum to a meaningful main-thread total.
  * Excludes the renderer sub-stages (camera/scene/etc.) which are nested inside
- * {@link CpuStage.rendererUpdate} and would double-count.
+ * {@link CpuStage.rendererUpdate} and would double-count, plus the off-loop
+ * stages (cruncher messages) that don't run every frame.
  */
-const TOP_LEVEL_CPU_STAGES = new Set<string>([CpuStage.updateEvent, CpuStage.rendererUpdate, CpuStage.drawSubmit]);
+const TOP_LEVEL_CPU_STAGES = new Set<string>([CpuStage.updateEvent, CpuStage.rendererUpdate, CpuStage.drawSubmit, CpuStage.endOfDraw]);
 
 export interface StageStat {
   id: string;
@@ -82,10 +109,14 @@ export interface ProfilerSnapshot {
   frameTimeMs: { avg: number; p50: number; p95: number; p99: number; max: number };
   cpu: StageStat[];
   gpu: StageStat[];
+  /** Per-frame workload counts (dots/orbits/labels drawn, render passes). */
+  counters: StageStat[];
   /** Sum of GPU stage averages. Valid because GPU stages never overlap. */
   gpuTotalAvgMs: number;
   /** Sum of the top-level CPU stage averages (no nested double-counting). */
   cpuTopAvgMs: number;
+  /** Cumulative frames slower than the 30fps budget since profiling started. */
+  longFrames: number;
   /** Count of GPU_DISJOINT events - high values mean GPU timings are unreliable. */
   disjointEvents: number;
 }
@@ -112,6 +143,22 @@ class Ring {
     if (this.count_ < this.buf_.length) {
       this.count_++;
     }
+  }
+
+  /**
+   * Adds to the most recent sample instead of pushing a new one. Used to merge
+   * results from the same stage rendered multiple times in one frame (e.g.
+   * multi-viewport passes) so a sample always means "ms per frame".
+   */
+  addToLast(value: number): void {
+    if (this.count_ === 0) {
+      this.push(value);
+
+      return;
+    }
+    const i = (this.idx_ - 1 + this.buf_.length) % this.buf_.length;
+
+    this.buf_[i] += value;
   }
 
   clear(): void {
@@ -172,6 +219,8 @@ function percentile(sortedAsc: number[], p: number): number {
 interface PendingQuery {
   stage: string;
   query: WebGLQuery;
+  /** Frame the query was issued in, so same-stage passes merge per frame. */
+  frameId: number;
 }
 
 /**
@@ -187,6 +236,8 @@ class GpuTimer {
   private readonly pending_: PendingQuery[] = [];
   private readonly free_: WebGLQuery[] = [];
   disjointEvents = 0;
+  /** Set once per frame by the profiler; stamps queries issued that frame. */
+  frameId = 0;
 
   get supported(): boolean {
     return this.supported_;
@@ -226,7 +277,7 @@ class GpuTimer {
     }
     this.gl_.beginQuery(this.ext_.TIME_ELAPSED_EXT, query);
     this.activeStage_ = stage;
-    this.pending_.push({ stage, query });
+    this.pending_.push({ stage, query, frameId: this.frameId });
   }
 
   end(stage: string): void {
@@ -237,8 +288,8 @@ class GpuTimer {
     this.activeStage_ = null;
   }
 
-  /** Resolves completed queries, feeding each stage's elapsed ms to `sink`. */
-  poll(sink: (stage: string, ms: number) => void): void {
+  /** Resolves completed queries, feeding each stage's elapsed ms + frame to `sink`. */
+  poll(sink: (stage: string, ms: number, frameId: number) => void): void {
     if (!this.supported_ || !this.gl_ || !this.ext_) {
       return;
     }
@@ -274,7 +325,7 @@ class GpuTimer {
       }
       const ns = gl.getQueryParameter(head.query, gl.QUERY_RESULT) as number;
 
-      sink(head.stage, ns / 1e6);
+      sink(head.stage, ns / 1e6, head.frameId);
       this.recycle_(head.query);
       this.pending_.shift();
     }
@@ -334,9 +385,14 @@ export class FrameProfiler {
   private readonly frameTime_ = new Ring(RING_CAPACITY);
   private readonly cpuRings_ = new Map<string, Ring>();
   private readonly gpuRings_ = new Map<string, Ring>();
+  private readonly counterRings_ = new Map<string, Ring>();
   private readonly cpuStart_ = new Map<string, number>();
   private readonly cpuFrameSum_ = new Map<string, number>();
+  private readonly counterFrameSum_ = new Map<string, number>();
+  /** Last frame each GPU stage pushed a sample for, to merge same-frame passes. */
+  private readonly gpuLastFrame_ = new Map<string, number>();
   private frames_ = 0;
+  private longFrames_ = 0;
 
   get enabled(): boolean {
     return this.enabled_;
@@ -363,9 +419,13 @@ export class FrameProfiler {
     this.frameTime_.clear();
     this.cpuRings_.clear();
     this.gpuRings_.clear();
+    this.counterRings_.clear();
     this.cpuStart_.clear();
     this.cpuFrameSum_.clear();
+    this.counterFrameSum_.clear();
+    this.gpuLastFrame_.clear();
     this.frames_ = 0;
+    this.longFrames_ = 0;
     this.gpu_.disjointEvents = 0;
   }
 
@@ -376,8 +436,12 @@ export class FrameProfiler {
     }
     if (dt > 0) {
       this.frameTime_.push(dt);
+      if (dt > LONG_FRAME_MS) {
+        this.longFrames_++;
+      }
     }
     this.frames_++;
+    this.gpu_.frameId = this.frames_;
   }
 
   /** Called once at the end of the frame: flush CPU sums, resolve GPU queries. */
@@ -389,8 +453,22 @@ export class FrameProfiler {
       this.ringFor_(this.cpuRings_, stage).push(sum);
     }
     this.cpuFrameSum_.clear();
-    this.gpu_.poll((stage, ms) => {
-      this.ringFor_(this.gpuRings_, stage).push(ms);
+    for (const [stage, sum] of this.counterFrameSum_) {
+      this.ringFor_(this.counterRings_, stage).push(sum);
+    }
+    this.counterFrameSum_.clear();
+    this.gpu_.poll((stage, ms, frameId) => {
+      const ring = this.ringFor_(this.gpuRings_, stage);
+
+      // Same stage rendered again in the same frame (second earth draw,
+      // multi-viewport pass): merge into that frame's sample so one sample
+      // always means "ms per frame", not "ms per pass".
+      if (this.gpuLastFrame_.get(stage) === frameId) {
+        ring.addToLast(ms);
+      } else {
+        ring.push(ms);
+        this.gpuLastFrame_.set(stage, frameId);
+      }
     });
   }
 
@@ -429,12 +507,25 @@ export class FrameProfiler {
     this.gpu_.end(stage);
   }
 
+  /**
+   * Accumulates a per-frame workload count (dots drawn, orbits drawn, render
+   * passes...). Multiple calls within one frame add up; the total is flushed
+   * as one sample at {@link frameEnd}.
+   */
+  addCounter(stage: string, value: number): void {
+    if (!this.enabled_ || value <= 0) {
+      return;
+    }
+    this.counterFrameSum_.set(stage, (this.counterFrameSum_.get(stage) ?? 0) + value);
+  }
+
   getSnapshot(): ProfilerSnapshot {
     const frameSorted = this.frameTime_.sorted();
     const frameAvg = this.frameTime_.avg();
     const frameP99 = percentile(frameSorted, 99);
     const cpu = this.collectStats_(this.cpuRings_);
     const gpu = this.collectStats_(this.gpuRings_);
+    const counters = this.collectStats_(this.counterRings_);
     const gpuTotalAvgMs = gpu.reduce((sum, s) => sum + s.avg, 0);
     const cpuTopAvgMs = cpu
       .filter((s) => TOP_LEVEL_CPU_STAGES.has(s.id))
@@ -457,8 +548,10 @@ export class FrameProfiler {
       },
       cpu,
       gpu,
+      counters,
       gpuTotalAvgMs,
       cpuTopAvgMs,
+      longFrames: this.longFrames_,
       disjointEvents: this.gpu_.disjointEvents,
     };
   }

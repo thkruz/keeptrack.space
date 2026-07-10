@@ -11,6 +11,7 @@ import { t7e } from '@app/locales/keys';
 import { html } from '../utils/development/formatter';
 import { getEl, hideEl } from '../utils/get-el';
 import { errorManagerInstance } from '../utils/errorManager';
+import { CpuStage, FrameProfiler } from '../utils/frame-profiler';
 import { isThisNode } from '../utils/isThisNode';
 import { KeyboardInput } from './input-manager/keyboard-input';
 import { MouseInput } from './input-manager/mouse-input';
@@ -262,18 +263,26 @@ export class InputManager {
 
     // NOTE: gl.readPixels is a huge bottleneck but readPixelsAsync doesn't work properly on mobile.
     // readPixelsAsync swallows its own errors and flips isAsyncWorking; safe to fire-and-forget.
-    gl.bindFramebuffer(gl.FRAMEBUFFER, ServiceLocator.getScene().frameBuffers.gpuPicking);
-    if (!isThisNode() && this.isAsyncWorking && !settingsManager.isDisableAsyncReadPixels) {
-      this.readPixelsAsync(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManagerInstance.pickReadPixelBuffer);
-    }
-    if (!this.isAsyncWorking) {
-      try {
-        gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManagerInstance.pickReadPixelBuffer);
-      } catch (e) {
-        this.disablePicking_(e);
+    // The sync path stalls the whole GL pipeline, so it is profiled per occurrence.
+    const profiler = FrameProfiler.getInstance();
 
-        return -1;
+    profiler.beginCpu(CpuStage.pickRead);
+    try {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, ServiceLocator.getScene().frameBuffers.gpuPicking);
+      if (!isThisNode() && this.isAsyncWorking && !settingsManager.isDisableAsyncReadPixels) {
+        this.readPixelsAsync(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManagerInstance.pickReadPixelBuffer);
       }
+      if (!this.isAsyncWorking) {
+        try {
+          gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManagerInstance.pickReadPixelBuffer);
+        } catch (e) {
+          this.disablePicking_(e);
+
+          return -1;
+        }
+      }
+    } finally {
+      profiler.endCpu(CpuStage.pickRead);
     }
 
     const buf = dotsManagerInstance.pickReadPixelBuffer;

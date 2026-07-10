@@ -8,6 +8,7 @@ import { Scene } from '../core/scene';
 import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
+import { CounterStage, FrameProfiler } from '../utils/frame-profiler';
 import { LayoutInsets, Viewport, ViewportLayout } from './viewport';
 import type { WebGLRenderer } from './webgl-renderer';
 
@@ -256,8 +257,10 @@ export class ViewportManager {
    */
   renderAll(renderer: WebGLRenderer, scene: Scene, mainCamera: Camera): void {
     const mainViewport = this.ensureMainViewport(mainCamera);
+    const profiler = FrameProfiler.getInstance();
 
     if (!this.isMultiViewActive()) {
+      profiler.addCounter(CounterStage.viewportPasses, 1);
       mainViewport.camera.viewport = null;
       mainViewport.camera.draw(renderer.sensorPos);
       renderer.render(scene, mainViewport.camera);
@@ -282,6 +285,7 @@ export class ViewportManager {
 
       const camera = viewport.camera;
 
+      profiler.addCounter(CounterStage.viewportPasses, 1);
       this.activePass_ = viewport;
       ServiceLocator.setActiveRenderCamera(camera);
       try {

@@ -19,6 +19,7 @@ import { EventBusEvent } from '../events/event-bus-events';
 import { getTemeToJ2000Matrix, ReferenceFrame } from '../math/reference-frames';
 import { EARTH_OBLIQUITY_RADIANS, RADIUS_OF_EARTH } from '../utils/constants';
 import { glsl } from '../utils/development/formatter';
+import { CounterStage, FrameProfiler } from '../utils/frame-profiler';
 import { DepthManager } from './depth-manager';
 import { Line, LineColor, LineColors } from './line-manager/line';
 import { ObjToObjLine } from './line-manager/obj-to-obj-line';
@@ -502,6 +503,8 @@ export class LineManager {
     if (this.lines.length === 0) {
       return;
     }
+
+    FrameProfiler.getInstance().addCounter(CounterStage.lines, this.lines.length);
 
     const modelViewMatrix = mat4.create();
     const gl = ServiceLocator.getRenderer().gl;

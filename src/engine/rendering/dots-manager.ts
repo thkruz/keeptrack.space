@@ -17,7 +17,7 @@ import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { RADIUS_OF_EARTH } from '../utils/constants';
 import { glsl } from '../utils/development/formatter';
-import { FrameProfiler, GpuStage } from '../utils/frame-profiler';
+import { CounterStage, CpuStage, FrameProfiler, GpuStage } from '../utils/frame-profiler';
 import { ensureVelocityVec3 } from '../utils/space-object-invariants';
 import { BufferAttribute } from './buffer-attribute';
 import { DepthManager } from './depth-manager';
@@ -286,6 +286,9 @@ export class DotsManager {
     profiler.beginGpu(GpuStage.dots);
     gl.bindVertexArray(this.programs.dots.vao);
 
+    // The per-frame position upload is driver/CPU time that hits shared-memory
+    // (integrated) GPUs hardest, so it gets its own CPU stage
+    profiler.beginCpu(CpuStage.dotBuffers);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.position);
     gl.enableVertexAttribArray(this.programs.dots.attribs.a_position.location);
     /*
@@ -305,6 +308,7 @@ export class DotsManager {
     if (this.shaderProvider_) {
       this.shaderProvider_.updateExtraBuffers(gl, this.extraBuffers_);
     }
+    profiler.endCpu(CpuStage.dotBuffers);
 
     /*
      * DEBUG:
@@ -319,6 +323,7 @@ export class DotsManager {
     const maxDrawable = this.positionData ? Math.floor(this.positionData.length / 3) : 0;
     const drawCount = Math.min(settingsManager.dotsOnScreen, maxDrawable);
 
+    profiler.addCounter(CounterStage.dots, drawCount);
     gl.drawArrays(gl.POINTS, 0, drawCount);
     gl.bindVertexArray(null);
     profiler.endGpu(GpuStage.dots);
@@ -888,6 +893,20 @@ export class DotsManager {
       return;
     }
 
+    // Main-thread time copying worker results (100k+ element typed arrays) —
+    // arrives between frames and competes with the render loop, so it is
+    // profiled per occurrence rather than per frame
+    const profiler = FrameProfiler.getInstance();
+
+    profiler.beginCpu(CpuStage.cruncherMsg);
+    try {
+      this.applyCruncherBuffers_(mData);
+    } finally {
+      profiler.endCpu(CpuStage.cruncherMsg);
+    }
+  }
+
+  private applyCruncherBuffers_(mData: SatCruncherMessageData) {
     if (typeof mData.gmst === 'number') {
       this.cruncherGmst = mData.gmst;
     }

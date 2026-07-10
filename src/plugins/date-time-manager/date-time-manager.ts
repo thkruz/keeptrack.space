@@ -26,6 +26,10 @@ export class DateTimeManager extends KeepTrackPlugin {
   dateDOM: HTMLElement | null = null;
   /** Time in Milliseconds the last time sim time was updated */
   private lastTime = 0 as Milliseconds;
+  /** Last value written to each DOM node, so we can skip redundant writes that trigger style recalcs every frame */
+  private lastDateStr_: string | null = null;
+  private lastJdayStr_: string | null = null;
+  private lastTimeTextStr_: string | null = null;
   calendar: Calendar;
 
   // =========================================================================
@@ -52,10 +56,19 @@ export class DateTimeManager extends KeepTrackPlugin {
       return;
     }
 
-    const dateTimeInputTb = document.getElementById(this.dateTimeInputTbId_) as HTMLInputElement;
+    // Only rewrite the editable date input when the day actually changes (avoids a
+    // per-frame style recalc from setting .value with an unchanged string).
+    if (!isThisNode()) {
+      const dateStr = date.toISOString().split('T')[0]; // Format the date as yyyy-mm-dd
 
-    if (dateTimeInputTb && !isThisNode()) {
-      dateTimeInputTb.value = date.toISOString().split('T')[0]; // Format the date as yyyy-mm-dd
+      if (dateStr !== this.lastDateStr_) {
+        const dateTimeInputTb = document.getElementById(this.dateTimeInputTbId_) as HTMLInputElement | null;
+
+        if (dateTimeInputTb) {
+          dateTimeInputTb.value = dateStr;
+          this.lastDateStr_ = dateStr;
+        }
+      }
     }
 
     //  Jday isn't initalized right away, so we need to check if it exists
@@ -63,15 +76,16 @@ export class DateTimeManager extends KeepTrackPlugin {
       return;
     }
 
-    if (settingsManager.isUseJdayOnTopMenu) {
-      const jday = ServiceLocator.getTimeManager().getUTCDayOfYear(ServiceLocator.getTimeManager().simulationTimeObj);
-
-      setInnerHtml('jday', jday.toString());
-    } else {
-      setInnerHtml('jday', ServiceLocator.getTimeManager().simulationTimeObj.toLocaleDateString());
-    }
-
     const timeManagerInstance = ServiceLocator.getTimeManager();
+    const jdayStr = settingsManager.isUseJdayOnTopMenu
+      ? timeManagerInstance.getUTCDayOfYear(timeManagerInstance.simulationTimeObj).toString()
+      : timeManagerInstance.simulationTimeObj.toLocaleDateString();
+
+    // Only touch the jday DOM on change; setInnerHtml rewrites innerHTML which triggers a style recalc.
+    if (jdayStr !== this.lastJdayStr_) {
+      setInnerHtml('jday', jdayStr);
+      this.lastJdayStr_ = jdayStr;
+    }
 
     if (!this.simulationTimeSerialized_ || Math.abs(this.lastTime - timeManagerInstance.simulationTimeObj.getTime()) > (1000 as Milliseconds)) {
       this.simulationTimeSerialized_ = timeManagerInstance.simulationTimeObj.toJSON();
@@ -99,25 +113,19 @@ export class DateTimeManager extends KeepTrackPlugin {
       }
     }
 
-    if (!settingsManager.disableUI) {
-      const datetimeTextElement = getEl('datetime-text', true);
-
-      if (!datetimeTextElement) {
-        errorManagerInstance.debug('Datetime text element not found');
-
-        return;
-      }
-
-      if (!this.isCreateClockDOMOnce_ || datetimeTextElement.childNodes.length === 0) {
-        datetimeTextElement.innerText = this.timeTextStr;
+    // The clock text (HH:MM:SS) only changes once per second, so skip the DOM write
+    // otherwise. Writing every frame is what showed up as "Recalculate Style" in the
+    // game loop. Update the existing text node in place rather than replacing it.
+    if (this.timeTextStr !== this.lastTimeTextStr_) {
+      if (!this.isCreateClockDOMOnce_ || this.dateDOM.childNodes.length === 0) {
+        this.dateDOM.innerText = this.timeTextStr;
         this.isCreateClockDOMOnce_ = true;
       } else {
-        datetimeTextElement.childNodes[0].nodeValue = this.timeTextStr;
+        // nodeValue doesn't remove the Node! No unnecessary DOM changes every time the time updates.
+        this.dateDOM.childNodes[0].nodeValue = this.timeTextStr;
       }
+      this.lastTimeTextStr_ = this.timeTextStr;
     }
-
-    // textContent doesn't remove the Node! No unecessary DOM changes everytime time updates.
-    this.dateDOM.textContent = this.timeTextStr;
   }
 
   datetimeTextClick(): void {

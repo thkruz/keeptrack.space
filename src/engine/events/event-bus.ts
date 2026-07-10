@@ -132,7 +132,29 @@ export class EventBus {
   emit<T extends EventBusEvent>(event: T, ...args: EngineEventMap[T]) {
     this.verifyEvent_(event);
 
-    (<EventBusRegisterParams<T>[]>this.events[event]).forEach((cb: EventBusRegisterParams<T>) => cb.cb(...args));
+    const listeners = <EventBusRegisterParams<T>[]>this.events[event];
+
+    // Hot path: this runs for every per-frame emit (update, updateLoop, endOfDraw, ...).
+    // Branch on arity so the common 0/1-arg emits call the listener directly, avoiding the
+    // per-listener arguments array + spread that forEach(cb => cb.cb(...args)) allocates.
+    // for-of yields only in-range elements, so a once() listener that splices itself out
+    // mid-emit stays crash-safe (same as the previous forEach).
+    switch (args.length) {
+      case 0:
+        for (const listener of listeners) {
+          (listener.cb as (...a: unknown[]) => void)();
+        }
+        break;
+      case 1:
+        for (const listener of listeners) {
+          (listener.cb as (a: unknown) => void)(args[0]);
+        }
+        break;
+      default:
+        for (const listener of listeners) {
+          listener.cb(...args);
+        }
+    }
   }
 
   async emitAsync<T extends EventBusEvent>(event: T, ...args: EngineEventMap[T]): Promise<void> {

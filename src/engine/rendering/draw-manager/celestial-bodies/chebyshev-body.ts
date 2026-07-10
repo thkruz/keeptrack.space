@@ -20,6 +20,10 @@ export abstract class ChebyshevBody extends CelestialBody {
   }
 
   updatePosition(simTime: Date): void {
+    if (this.canReusePosition_(simTime)) {
+      return;
+    }
+
     const epoch = new EpochUTC((simTime.getTime() / 1000) as Seconds);
     const j2000 = this.interpolator_.interpolate(epoch);
 

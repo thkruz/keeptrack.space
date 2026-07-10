@@ -17,6 +17,7 @@ import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
 import { RADIUS_OF_EARTH } from '../utils/constants';
 import { errorManagerInstance } from '../utils/errorManager';
+import { CpuStage, FrameProfiler } from '../utils/frame-profiler';
 import { getEl } from '../utils/get-el';
 import { isThisNode } from '../utils/isThisNode';
 import { DepthManager } from './depth-manager';
@@ -765,19 +766,28 @@ export class WebGLRenderer {
   update(): void {
     this.validateProjectionMatrix_();
     const timeManagerInstance = ServiceLocator.getTimeManager();
+    const profiler = FrameProfiler.getInstance();
 
+    profiler.beginCpu(CpuStage.primarySat);
     this.updatePrimarySatellite_();
+    profiler.endCpu(CpuStage.primarySat);
     this.updateSecondarySatellite_();
+    profiler.beginCpu(CpuStage.camera);
     ServiceLocator.getMainCamera().update(this.dt);
+    profiler.endCpu(CpuStage.camera);
     // Update secondary viewports (rects + camera state) before the projection
     // rebuild so the main camera's viewport-aware aspect ratio is current
     ViewportManager.getInstance().update(this.dt);
     // Rebuild projection matrix after camera update so FOV lerps are reflected immediately
     this.updatePMatrix();
 
+    profiler.beginCpu(CpuStage.sceneUpdate);
     ServiceLocator.getScene().update(timeManagerInstance.simulationTimeObj);
+    profiler.endCpu(CpuStage.sceneUpdate);
 
+    profiler.beginCpu(CpuStage.orbitsAbove);
     this.orbitsAbove(); // this.sensorPos is set here for the Camera Manager
+    profiler.endCpu(CpuStage.orbitsAbove);
 
     EventBus.getInstance().emit(EventBusEvent.updateLoop);
   }

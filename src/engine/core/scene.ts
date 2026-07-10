@@ -42,6 +42,7 @@ import { SkyBoxSphere } from '../rendering/draw-manager/skybox-sphere';
 import { Sun } from '../rendering/draw-manager/sun';
 import { WebGLRenderer } from '../rendering/webgl-renderer';
 import { errorManagerInstance } from '../utils/errorManager';
+import { FrameProfiler, GpuStage } from '../utils/frame-profiler';
 import { PluginRegistry } from './plugin-registry';
 import { ServiceLocator } from './service-locator';
 
@@ -292,16 +293,22 @@ export class Scene {
   render(renderer: WebGLRenderer, camera: Camera): void {
     this.clear(camera);
 
+    const profiler = FrameProfiler.getInstance();
+
     this.renderBackground(renderer, camera);
     this.renderOpaque(renderer, camera);
 
     EventBus.getInstance().emit(EventBusEvent.drawOverlay);
 
+    profiler.beginGpu(GpuStage.transparent);
     this.renderTransparent(renderer, camera);
+    profiler.endGpu(GpuStage.transparent);
 
+    profiler.beginGpu(GpuStage.fov);
     this.sensorFovFactory.drawAll(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer as WebGLBuffer);
     this.coneFactory.drawAll(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer as WebGLBuffer);
     this.frustumFactory.drawAll(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer as WebGLBuffer);
+    profiler.endGpu(GpuStage.fov);
   }
 
   averageDrawTime = 0;
@@ -328,9 +335,12 @@ export class Scene {
     if (!settingsManager.isDrawLess) {
       if (settingsManager.isDrawSun && !isSecondaryPass) {
         const fb = settingsManager.isDisableGodrays ? null : this.frameBuffers.godrays;
+        const profiler = FrameProfiler.getInstance();
 
         // Draw the Sun to the Godrays Frame Buffer
+        profiler.beginGpu(GpuStage.sun);
         this.sun.draw(this.earth.lightDirection, fb);
+        profiler.endGpu(GpuStage.sun);
 
         const sceneManager = ServiceLocator.getScene();
         const centerBodyEntity = sceneManager.getBodyById(settingsManager.centerBody);
@@ -366,7 +376,9 @@ export class Scene {
 
         // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
         renderer.postProcessingManager.curBuffer = null;
+        profiler.beginGpu(GpuStage.godrays);
         this.godrays.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
+        profiler.endGpu(GpuStage.godrays);
       }
 
       this.skybox.render(renderer.postProcessingManager.curBuffer);
@@ -455,8 +467,10 @@ export class Scene {
     const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
     const orbitManagerInstance = ServiceLocator.getOrbitManager();
     const hoverManagerInstance = ServiceLocator.getHoverManager();
+    const profiler = FrameProfiler.getInstance();
 
     // Draw Earth (skip if plugin handles it; atmosphere-only in ground view modes; full draw otherwise)
+    profiler.beginGpu(GpuStage.earth);
     if (EventBus.getInstance().methods.shouldSkipEarthDraw()) {
       // Earth is drawn by plugin (e.g. 2D quad in renderBackground)
     } else if (settingsManager.isDrawEarth !== false) {
@@ -466,19 +480,26 @@ export class Scene {
         this.earth.draw(renderer.postProcessingManager.curBuffer);
       }
     }
+    profiler.endGpu(GpuStage.earth);
 
-    // Draw Dots
+    // Draw Dots (dots + GPU picking are timed inside DotsManager.draw)
     dotsManagerInstance.draw(renderer.projectionCameraMatrix, renderer.postProcessingManager.curBuffer);
 
     // Draw Satellite Labels (GPU-rendered)
     const satLabelManager = ServiceLocator.getSatLabelManager();
 
     satLabelManager?.updatePositions();
+    profiler.beginGpu(GpuStage.labels);
     satLabelManager?.draw(renderer.projectionCameraMatrix, renderer.postProcessingManager.curBuffer);
+    profiler.endGpu(GpuStage.labels);
 
+    profiler.beginGpu(GpuStage.orbits);
     orbitManagerInstance.draw(renderer.projectionCameraMatrix, renderer.postProcessingManager.curBuffer, hoverManagerInstance, colorSchemeManagerInstance, camera);
+    profiler.endGpu(GpuStage.orbits);
 
+    profiler.beginGpu(GpuStage.lines);
     ServiceLocator.getLineManager().draw(renderer.projectionCameraMatrix, renderer.postProcessingManager.curBuffer);
+    profiler.endGpu(GpuStage.lines);
 
     // Draw Satellite Model if a satellite is selected (or deep-space satellite is centered) and meshManager is loaded
     const hasSatSelected = Number(PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1;
@@ -488,7 +509,9 @@ export class Scene {
       const isCloseEnough = camera.state.camDistBuffer <= settingsManager.nearZoomLevel;
 
       if (!settingsManager.modelsOnSatelliteViewOverride && (isCloseEnough || hasDeepSpaceSatCentered)) {
+        profiler.beginGpu(GpuStage.mesh);
         renderer.meshManager.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
+        profiler.endGpu(GpuStage.mesh);
       }
     }
   }

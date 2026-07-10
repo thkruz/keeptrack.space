@@ -811,6 +811,10 @@ export class CatalogLoader {
 
     catalogManagerInstance.numSatellites = tempObjData.length;
 
+    // Reserved OEM slots start as Planet placeholders (unoccupied); reset the occupied-id
+    // set so it matches this fresh reservation.
+    catalogManagerInstance.oemSatelliteIds.clear();
+
     for (let i = 0; i < settingsManager.maxOemSatellites; i++) {
       tempObjData.push(new Planet({
         id: tempObjData.length,

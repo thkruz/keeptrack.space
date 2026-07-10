@@ -161,6 +161,35 @@ export abstract class CelestialBody {
   lastCenterBody: SolarBody | null = null;
   minimumUpdateIntervalSeconds = 600; // 10 minutes
 
+  /** Sim time (ms) of the last actual position recompute; NaN until the first update. */
+  private lastPositionUpdateSimMs_ = Number.NaN;
+  /**
+   * Skip re-interpolating this body's position until the simulation clock advances at least
+   * this far. Planets, dwarf planets and deep-space satellites move imperceptibly between
+   * frames, so recomputing an identical position every frame is pure waste - most visibly
+   * when time is paused (sim time never changes, yet every body re-interpolated per frame).
+   * The gate self-disengages at high propagation rates (sim delta exceeds it every frame).
+   */
+  protected minimumPositionUpdateIntervalMs_ = 1000;
+
+  /**
+   * Returns true when the cached `position` is still fresh enough to reuse for `simTime`
+   * (skip the recompute). On a miss it records `simTime` as the new reference and returns
+   * false so the caller proceeds to recompute.
+   */
+  protected canReusePosition_(simTime: Date): boolean {
+    const nowMs = simTime.getTime();
+
+    if (!Number.isNaN(this.lastPositionUpdateSimMs_) &&
+      Math.abs(nowMs - this.lastPositionUpdateSimMs_) < this.minimumPositionUpdateIntervalMs_) {
+      return true;
+    }
+
+    this.lastPositionUpdateSimMs_ = nowMs;
+
+    return false;
+  }
+
   getJ2000(simTime: Date, centerBody = SolarBody.Earth): J2000 {
     if (
       this.lastJ2000 && Math.abs(simTime.getTime() - this.lastJ2000.epoch.posix * 1000) < this.minimumUpdateIntervalSeconds * 1000 &&
@@ -190,6 +219,10 @@ export abstract class CelestialBody {
    * Update the position of the celestial body relative to earth based on the simulation time.
    */
   updatePosition(simTime: Date): void {
+    if (this.canReusePosition_(simTime)) {
+      return;
+    }
+
     const posTeme = this.getTeme(simTime, SolarBody.Sun).position;
     const sunEntity = ServiceLocator.getScene().sun;
 

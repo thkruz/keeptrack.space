@@ -23,6 +23,8 @@ export class CameraControlWidget {
   private lastMousePosition_ = { x: 0, y: 0 };
   private hoveredAxis_: string | null = null;
   private isMouseOverCanvas_ = false;
+  /** Last visibility written to the canvas, so draw_ can skip redundant inline-style writes each frame. */
+  private lastWidgetVisible_: boolean | null = null;
 
   // Sizing
   private readonly size_ = 120;
@@ -450,13 +452,20 @@ export class CameraControlWidget {
 
   private draw_() {
     if (!settingsManager.drawCameraWidget || !this.ctx_) {
-      this.canvas_.style.display = 'none';
-      this.canvas_.style.pointerEvents = 'none';
+      // Only touch the DOM on a visibility transition; this runs every frame even when the widget is off.
+      if (this.lastWidgetVisible_ !== false) {
+        this.canvas_.style.display = 'none';
+        this.canvas_.style.pointerEvents = 'none';
+        this.lastWidgetVisible_ = false;
+      }
 
       return;
     }
-    this.canvas_.style.display = 'block';
-    this.canvas_.style.pointerEvents = 'auto';
+    if (this.lastWidgetVisible_ !== true) {
+      this.canvas_.style.display = 'block';
+      this.canvas_.style.pointerEvents = 'auto';
+      this.lastWidgetVisible_ = true;
+    }
     this.ctx_.clearRect(0, 0, this.canvas_.width, this.canvas_.height);
 
     const camera = ServiceLocator.getMainCamera();

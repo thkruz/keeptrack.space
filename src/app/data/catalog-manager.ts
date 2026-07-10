@@ -106,6 +106,13 @@ export class CatalogManager {
 
   missileSats: number = 0;
   missileSet = [] as MissileObject[];
+  /**
+   * Absolute objectCache ids of the currently-occupied OEM satellite slots. Maintained
+   * by {@link OemSlotAllocator} (add on allocate, remove on free) so the per-frame
+   * position interpolation can iterate only the handful of live OEM satellites instead
+   * of scanning all `settingsManager.maxOemSatellites` reserved placeholder slots.
+   */
+  oemSatelliteIds = new Set<number>();
   numSatellites: number = 0;
   numObjects: number = 0;
   orbitDensity: DensityBin[] = [];

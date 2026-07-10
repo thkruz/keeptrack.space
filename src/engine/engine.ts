@@ -14,6 +14,7 @@ import { EventBusEvent } from './events/event-bus-events';
 import { InputManager } from './input/input-manager';
 import { ViewportManager } from './rendering/viewport-manager';
 import { WebGLRenderer } from './rendering/webgl-renderer';
+import { CpuStage, FrameProfiler } from './utils/frame-profiler';
 import { errorManagerInstance, isOpaqueWindowError } from './utils/errorManager';
 import { isThisNode } from './utils/isThisNode';
 
@@ -146,6 +147,10 @@ export class Engine {
   }
 
   private update_(dt = <Milliseconds>0) {
+    const profiler = FrameProfiler.getInstance();
+
+    profiler.frameStart(dt);
+
     this.renderer.dt = dt;
     this.renderer.dtAdjusted = <Milliseconds>(Math.min(this.renderer.dt / 1000.0, 0.1) * this.timeManager.propRate);
 
@@ -160,13 +165,21 @@ export class Engine {
       }, 500);
     }
 
+    profiler.beginCpu(CpuStage.updateEvent);
     this.eventBus.emit(EventBusEvent.update, dt);
+    profiler.endCpu(CpuStage.updateEvent);
 
+    profiler.beginCpu(CpuStage.rendererUpdate);
     this.renderer.update();
+    profiler.endCpu(CpuStage.rendererUpdate);
   }
 
   private draw_(dt = <Milliseconds>0) {
+    const profiler = FrameProfiler.getInstance();
+
+    profiler.beginCpu(CpuStage.drawSubmit);
     ViewportManager.getInstance().renderAll(this.renderer, this.scene, this.camera);
+    profiler.endCpu(CpuStage.drawSubmit);
 
     this.sendCameraDataToWorker_();
 
@@ -175,6 +188,8 @@ export class Engine {
     }
 
     this.eventBus.emit(EventBusEvent.endOfDraw, dt);
+
+    profiler.frameEnd();
   }
 
   /**

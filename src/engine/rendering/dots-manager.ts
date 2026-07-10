@@ -17,6 +17,7 @@ import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { RADIUS_OF_EARTH } from '../utils/constants';
 import { glsl } from '../utils/development/formatter';
+import { FrameProfiler, GpuStage } from '../utils/frame-profiler';
 import { ensureVelocityVec3 } from '../utils/space-object-invariants';
 import { BufferAttribute } from './buffer-attribute';
 import { DepthManager } from './depth-manager';
@@ -280,6 +281,9 @@ export class DotsManager {
       this.shaderProvider_.setExtraUniforms(gl, this.programs.dots.uniforms);
     }
 
+    const profiler = FrameProfiler.getInstance();
+
+    profiler.beginGpu(GpuStage.dots);
     gl.bindVertexArray(this.programs.dots.vao);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.position);
@@ -317,6 +321,7 @@ export class DotsManager {
 
     gl.drawArrays(gl.POINTS, 0, drawCount);
     gl.bindVertexArray(null);
+    profiler.endGpu(GpuStage.dots);
 
     // Debug: draw picking dots to screen using the same GL state as visual dots
     if (this.debugShowPicking) {
@@ -327,7 +332,9 @@ export class DotsManager {
     gl.disable(gl.BLEND);
 
     // Draw GPU Picking Overlay -- This is what lets us pick a satellite
+    profiler.beginGpu(GpuStage.picking);
     this.drawGpuPickingFrameBuffer(projectionCameraMatrix, ServiceLocator.getMainCamera().state.mouseX, ServiceLocator.getMainCamera().state.mouseY);
+    profiler.endGpu(GpuStage.picking);
   }
 
   /**
@@ -1065,8 +1072,9 @@ export class DotsManager {
 
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const missileSats = catalogManagerInstance.missileSats;
+    const missileSet = catalogManagerInstance.missileSet;
 
-    if (!missileSats) {
+    if (!missileSats || missileSet.length === 0) {
       return;
     }
 
@@ -1075,11 +1083,20 @@ export class DotsManager {
     const currentGmst = ServiceLocator.getTimeManager().gmst as GreenwichMeanSiderealTime;
     const cruncherGmst = (this.cruncherGmst ?? currentGmst) as GreenwichMeanSiderealTime;
 
-    // The missile reservation is the maxMissiles slots ending at `missileSats`.
-    for (let id = missileSats - settingsManager.maxMissiles; id < missileSats; id++) {
-      const obj = catalogManagerInstance.objectCache[id];
+    // The missile reservation is the contiguous objectCache block ending at `missileSats`
+    // (missileSet.length === maxMissiles gives its size). Read each slot from objectCache by id
+    // rather than from missileSet[k]: some load paths (mass raid, scenario restore) REPLACE
+    // objectCache[id] with a freshly constructed MissileObject, which leaves missileSet[k]
+    // pointing at the stale, inactive placeholder. Indexing objectCache keeps us on the
+    // authoritative object; the `active` early-out still skips idle slots with just a boolean read.
+    const missileStartId = missileSats - missileSet.length;
+    const objectCache = catalogManagerInstance.objectCache;
 
-      if (!(obj instanceof MissileObject) || !obj.active || obj.altList.length === 0) {
+    for (let k = 0; k < missileSet.length; k++) {
+      const id = missileStartId + k;
+      const obj = objectCache[id] as MissileObject;
+
+      if (!obj.active || obj.altList.length === 0) {
         continue;
       }
 
@@ -1385,8 +1402,11 @@ export class DotsManager {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const simTime = (ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000) as Seconds;
 
-    for (let i = 0; i < settingsManager.maxOemSatellites; i++) {
-      const oemSat = catalogManagerInstance.objectCache[catalogManagerInstance.numSatellites + i];
+    // Iterate only the occupied OEM slots (usually zero), not all maxOemSatellites reserved
+    // placeholder slots. The instanceof check remains as a safety net for a slot that was
+    // allocated but not yet assigned (see OemSlotAllocator).
+    for (const id of catalogManagerInstance.oemSatelliteIds) {
+      const oemSat = catalogManagerInstance.objectCache[id];
 
       if (!oemSat || !(oemSat instanceof OemSatellite)) {
         continue;

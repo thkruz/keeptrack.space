@@ -121,7 +121,7 @@ export class DateTimeManager extends KeepTrackPlugin {
         this.dateDOM.innerText = this.timeTextStr;
         this.isCreateClockDOMOnce_ = true;
       } else {
-        // nodeValue doesn't remove the Node! No unnecessary DOM changes everytime time updates.
+        // nodeValue doesn't remove the Node! No unnecessary DOM changes every time the time updates.
         this.dateDOM.childNodes[0].nodeValue = this.timeTextStr;
       }
       this.lastTimeTextStr_ = this.timeTextStr;

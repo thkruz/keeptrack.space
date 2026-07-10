@@ -1083,20 +1083,22 @@ export class DotsManager {
     const currentGmst = ServiceLocator.getTimeManager().gmst as GreenwichMeanSiderealTime;
     const cruncherGmst = (this.cruncherGmst ?? currentGmst) as GreenwichMeanSiderealTime;
 
-    // missileSet is exactly the objectCache missile reservation (same objects by reference),
-    // ending at `missileSats`. Iterate it directly instead of scanning objectCache with an
-    // instanceof per slot - inactive missiles then cost only a boolean read, not an
-    // instanceof + array lookup across all maxMissiles reserved slots.
+    // The missile reservation is the contiguous objectCache block ending at `missileSats`
+    // (missileSet.length === maxMissiles gives its size). Read each slot from objectCache by id
+    // rather than from missileSet[k]: some load paths (mass raid, scenario restore) REPLACE
+    // objectCache[id] with a freshly constructed MissileObject, which leaves missileSet[k]
+    // pointing at the stale, inactive placeholder. Indexing objectCache keeps us on the
+    // authoritative object; the `active` early-out still skips idle slots with just a boolean read.
     const missileStartId = missileSats - missileSet.length;
+    const objectCache = catalogManagerInstance.objectCache;
 
     for (let k = 0; k < missileSet.length; k++) {
-      const obj = missileSet[k];
+      const id = missileStartId + k;
+      const obj = objectCache[id] as MissileObject;
 
       if (!obj.active || obj.altList.length === 0) {
         continue;
       }
-
-      const id = missileStartId + k;
 
       if (!obj.isVisibleNow()) {
         // MIRV child before separation: it rides on top of the bus, so hide it by

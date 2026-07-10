@@ -36,6 +36,7 @@ import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { glsl } from '@app/engine/utils/development/formatter';
+import { FrameProfiler, GpuStage } from '@app/engine/utils/frame-profiler';
 import { CameraType } from '@app/engine/camera/camera-type';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, Sun, TEME, Vector3D } from '@ootk/src/main';
@@ -147,18 +148,35 @@ export class Earth {
 
   /**
    * This is run once per frame to render the earth.
+   *
+   * GPU stages are timed here (not at the call site) so the surface and the
+   * atmosphere — very different fill-rate costs on weak GPUs — profile
+   * separately. When a caller wraps this whole draw in its own GPU stage
+   * (renderBackground's gpu:earth-background), these inner hooks are no-ops.
    */
   draw(tgtBuffer: WebGLFramebuffer | null) {
+    const profiler = FrameProfiler.getInstance();
+
+    profiler.beginGpu(GpuStage.earth);
     this.drawEarthSurface_(tgtBuffer);
+    profiler.endGpu(GpuStage.earth);
     if (settingsManager.isDrawAtmosphere === AtmosphereSettings.ON) {
+      profiler.beginGpu(GpuStage.atmosphere);
       this.drawEarthAtmosphere_(tgtBuffer);
+      profiler.endGpu(GpuStage.atmosphere);
     }
+    profiler.beginGpu(GpuStage.earth);
     this.drawBlackGpuPickingEarth_();
+    profiler.endGpu(GpuStage.earth);
   }
 
   drawAtmosphereOnly(tgtBuffer: WebGLFramebuffer | null) {
     if (settingsManager.isDrawAtmosphere === AtmosphereSettings.ON) {
+      const profiler = FrameProfiler.getInstance();
+
+      profiler.beginGpu(GpuStage.atmosphere);
       this.drawEarthAtmosphere_(tgtBuffer);
+      profiler.endGpu(GpuStage.atmosphere);
     }
   }
 

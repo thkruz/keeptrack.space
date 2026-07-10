@@ -20,6 +20,7 @@ import { rotateEcefToEciZ } from '../../engine/math/orbit-anchor-math';
 import { KeyboardComponent } from '../../engine/plugins/components/keyboard/keyboard-component';
 import { ColorSchemeManager } from '../../engine/rendering/color-scheme-manager';
 import { LineManager } from '../../engine/rendering/line-manager';
+import { CounterStage, FrameProfiler } from '../../engine/utils/frame-profiler';
 import { HoverManager } from '../ui/hover-manager';
 
 export class OrbitManager {
@@ -772,6 +773,9 @@ export class OrbitManager {
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, buf);
       }
     }
+
+    // Every orbit line drawn passes through here, so this is the one counter site
+    FrameProfiler.getInstance().addCounter(CounterStage.orbits, 1);
 
     if (variableLengthPath) {
       this.lineManagerInstance_.setAttribsAndDrawLineStrip(this.glBuffers_[id], variableLengthPath.length / 4);

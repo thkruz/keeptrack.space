@@ -183,11 +183,15 @@ export class Engine {
 
     this.sendCameraDataToWorker_();
 
+    // Post-draw plugin/UI work (DOM writes, orbit refreshes) — a common
+    // main-thread cost that is invisible to the GPU stages
+    profiler.beginCpu(CpuStage.endOfDraw);
     if (Engine.isFpsAboveLimit(dt, 5) && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
       this.eventBus.emit(EventBusEvent.highPerformanceRender, dt);
     }
 
     this.eventBus.emit(EventBusEvent.endOfDraw, dt);
+    profiler.endCpu(CpuStage.endOfDraw);
 
     profiler.frameEnd();
   }

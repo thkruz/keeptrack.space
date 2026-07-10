@@ -142,7 +142,7 @@ export class EventBus {
     switch (args.length) {
       case 0:
         for (const listener of listeners) {
-          listener.cb();
+          (listener.cb as (...a: unknown[]) => void)();
         }
         break;
       case 1:

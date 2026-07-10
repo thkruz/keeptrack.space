@@ -2,7 +2,29 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v13.2.0](https://github.com/thkruz/keeptrack.space/compare/v13.1.0...v13.2.0)
+
+- Optimize performance and refactor date-time management [`#1401`](https://github.com/thkruz/keeptrack.space/pull/1401)
+- Update dependencies and add asset size limit checks [`#1398`](https://github.com/thkruz/keeptrack.space/pull/1398)
+- feat(frame-profiler): :sparkles: add per-stage CPU/GPU frame profiler with render-loop instrumentation [`cced310`](https://github.com/thkruz/keeptrack.space/commit/cced3101d2f1b13fac2212ce8fe7e452d74d347c)
+- test(deploy-asset-size): :white_check_mark: add asset size limit checks [`d28c15b`](https://github.com/thkruz/keeptrack.space/commit/d28c15b457298dd1e0096236c04c7746146bb304)
+- refactor(date-time-manager): :recycle: optimize DOM updates for date and time [`c1b6e1c`](https://github.com/thkruz/keeptrack.space/commit/c1b6e1c6752815f02a725c2f42f854cc3b46d9ca)
+- perf(dots-manager): :zap: iterate only live OEM and missile slots per frame [`d04964b`](https://github.com/thkruz/keeptrack.space/commit/d04964bf4fe972f5ee238d90973def475a373c03)
+- perf(celestial-bodies): :zap: throttle celestial body position updates [`3db4249`](https://github.com/thkruz/keeptrack.space/commit/3db4249b2db2a33df2fc4e945b4c11ff4fd3bb64)
+- perf(event-bus): :zap: branch emit on arity to cut per-listener args allocation [`f651390`](https://github.com/thkruz/keeptrack.space/commit/f6513907d93b3c1a5e9b97c6acf2998a5d9bb63e)
+- refactor(dots-manager): :recycle: optimize missile object access [`2cf03bc`](https://github.com/thkruz/keeptrack.space/commit/2cf03bc1e9df73ccea69671c7f8ff91f05ef05cf)
+- perf(camera-control-widget): :zap: skip redundant per-frame visibility style writes [`bdf7c14`](https://github.com/thkruz/keeptrack.space/commit/bdf7c148a391c25da52f3e77a86e7c9142efa9ee)
+- perf(tooltips): :zap: batch tooltip rect reads to avoid a second reflow [`1bffc52`](https://github.com/thkruz/keeptrack.space/commit/1bffc52500f6d8419b1d4493b44cc6b4ddb1d1e4)
+- fix(event-bus): :bug: cast listener callback to any type [`406f74c`](https://github.com/thkruz/keeptrack.space/commit/406f74c43a8ba9ece082d4259420f848fc8d8355)
+- chore(plugins-pro): :wrench: update subproject commit reference [`fd3c39e`](https://github.com/thkruz/keeptrack.space/commit/fd3c39e521f43317a53c23afa21de5a00f4f1a7b)
+- chore(plugins-pro): :wrench: update subproject commit reference [`bf8d1da`](https://github.com/thkruz/keeptrack.space/commit/bf8d1dad7c4b3772ab9c2fba1c0cdb0524786f3d)
+- chore: :wrench: update subproject commit reference [`0ba49d2`](https://github.com/thkruz/keeptrack.space/commit/0ba49d27980dba79472d583d61d80faf82220bd1)
+- chore: :wrench: update dependencies for improved stability [`8fb4fea`](https://github.com/thkruz/keeptrack.space/commit/8fb4fea841631c31299a3aa6b8a216f02d3e15fb)
+- chore(package-lock): :wrench: update package-lock.json [`505a29a`](https://github.com/thkruz/keeptrack.space/commit/505a29a7e77ed42b2e8ccf1d97acc493358a8a07)
+
 #### [v13.1.0](https://github.com/thkruz/keeptrack.space/compare/v13.0.6...v13.1.0)
+
+>  
 
 - Add SGP4 wasm backend settings and improve performance [`#1397`](https://github.com/thkruz/keeptrack.space/pull/1397)
 - v13.1.0 [`#1395`](https://github.com/thkruz/keeptrack.space/pull/1395)
@@ -50,6 +72,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - feat(webworker): :sparkles: route workers through the configured SGP4 wasm backend [`5eb7196`](https://github.com/thkruz/keeptrack.space/commit/5eb71967879a525f1b93d877a92850ce6f15b233)
 - feat(dev-server): :sparkles: add plugin registry and localhost one-click install endpoint [`d6ba5c8`](https://github.com/thkruz/keeptrack.space/commit/d6ba5c880556cb86e3e389bfdc37b29c7c143a83)
 - feat(rendering): :sparkles: exact per-fragment logarithmic depth buffer [`d065211`](https://github.com/thkruz/keeptrack.space/commit/d065211886a66b8ab013a8e7628421b450fcacf9)
+- chore(release): :bookmark: 13.1.0 [skip ci] [`287ed56`](https://github.com/thkruz/keeptrack.space/commit/287ed562d47ea650114af8f061c034015e04ab17)
 - fix(orbit-cruncher): :bug: rotate each missile orbit-line sample by the GMST at its own time [`719dbc5`](https://github.com/thkruz/keeptrack.space/commit/719dbc5dd22e0f34a735da0de360e8e692f32480)
 - feat(sgp4-wasm): :sparkles: lazy-load and activate the main-thread SGP4 wasm backend [`d0967b5`](https://github.com/thkruz/keeptrack.space/commit/d0967b5cc54a493f342796c4495ac7ed7f48ff16)
 - chore(release): :wrench: add release workflow with main to develop back-merge [`7a84a0e`](https://github.com/thkruz/keeptrack.space/commit/7a84a0ea814d444053e2f1b29e57a207cc7e121b)

@@ -1,6 +1,6 @@
 {
   "name": "keeptrack.space",
-  "version": "13.1.0",
+  "version": "13.2.0",
   "type": "module",
   "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
   "author": "Theodore Kruczek",
@@ -172,7 +172,7 @@
     "astronomy-engine": "^2.1.19",
     "dotenv": "^16.5.0",
     "draggabilly": "^3.0.0",
-    "echarts": "^5.6.0",
+    "echarts": "^6.1.0",
     "echarts-gl": "^2.0.9",
     "eruda": "^3.4.3",
     "file-saver": "^2.0.5",

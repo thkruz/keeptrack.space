@@ -1,0 +1,53 @@
+---
+name: CodeQL
+
+# Runs CodeQL against the default branch (push) so the Security tab / code
+# scanning alerts stay current, against PRs so regressions are caught in review,
+# and weekly so newly released CodeQL queries re-scan existing code.
+"on":
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+  schedule:
+    # Mondays at 07:00 UTC
+    - cron: '0 7 * * 1'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      # Required to upload results to the code scanning dashboard.
+      security-events: write
+      # Only needed for workflows in private repos; harmless here.
+      actions: read
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: javascript-typescript
+            build-mode: none
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"

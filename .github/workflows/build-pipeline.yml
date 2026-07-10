@@ -350,28 +350,6 @@ jobs:
       - name: Run TruffleHog
         uses: trufflesecurity/trufflehog@v3.82.6
 
-  codeql:
-    needs: build
-    name: CodeQL Security Scan
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      actions: read
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v6
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: javascript
-
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-
   pipeline-complete:
     if: always()
     needs:
@@ -380,7 +358,6 @@ jobs:
       - boot-smoke
       - build
       - trufflehog
-      - codeql
     name: Build Pipeline Complete
     runs-on: ubuntu-latest
     steps:
@@ -389,8 +366,7 @@ jobs:
           if [[ ("${{ needs.lint-and-test.result }}" == "failure") || \
                 "${{ needs.lint-and-test-oss.result }}" == "failure" || \
                 "${{ needs.boot-smoke.result }}" == "failure" || \
-                "${{ needs.build.result }}" == "failure" || \
-                "${{ needs.codeql.result }}" == "failure" ]]; then
+                "${{ needs.build.result }}" == "failure" ]]; then
             echo "One or more required jobs failed"
             exit 1
           fi

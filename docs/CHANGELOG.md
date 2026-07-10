@@ -2,7 +2,20 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v13.3.0](https://github.com/thkruz/keeptrack.space/compare/v13.2.0...v13.3.0)
+
+- Add workload counters and instrument render pipeline for diagnostics [`#1405`](https://github.com/thkruz/keeptrack.space/pull/1405)
+- Add dedicated CodeQL workflow and remove redundant job [`#1404`](https://github.com/thkruz/keeptrack.space/pull/1404)
+- chore(deps): bump echarts from 5.6.0 to 6.1.0 [`#1403`](https://github.com/thkruz/keeptrack.space/pull/1403)
+- feat(frame-profiler): :sparkles: add workload counters, long-frame tally, and per-frame GPU merge [`6b64bcb`](https://github.com/thkruz/keeptrack.space/commit/6b64bcbfb00a8ba7dcc2bdfc37d6fef8d1f2bb37)
+- feat(engine): :sparkles: instrument render pipeline for low-end bottleneck diagnosis [`6fd319a`](https://github.com/thkruz/keeptrack.space/commit/6fd319ae3d9b1a879f3e8e096652afd2c98b8379)
+- chore(codeql): :wrench: add dedicated CodeQL workflow for default-branch scans [`84fc699`](https://github.com/thkruz/keeptrack.space/commit/84fc69913e0f2ffb374d9c19f57aac92741d0fbc)
+- chore(build-pipeline): :wrench: remove redundant CodeQL job now in codeql.yml [`16b4302`](https://github.com/thkruz/keeptrack.space/commit/16b4302cfb5bea0de85e953f275e4a1b8b0f136b)
+- chore(plugins-pro): :wrench: update subproject commit reference [`9c01c85`](https://github.com/thkruz/keeptrack.space/commit/9c01c855da1832aeb11a3825243d81d389da84e1)
+
 #### [v13.2.0](https://github.com/thkruz/keeptrack.space/compare/v13.1.0...v13.2.0)
+
+>  
 
 - Optimize performance and refactor date-time management [`#1401`](https://github.com/thkruz/keeptrack.space/pull/1401)
 - Update dependencies and add asset size limit checks [`#1398`](https://github.com/thkruz/keeptrack.space/pull/1398)
@@ -11,6 +24,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - refactor(date-time-manager): :recycle: optimize DOM updates for date and time [`c1b6e1c`](https://github.com/thkruz/keeptrack.space/commit/c1b6e1c6752815f02a725c2f42f854cc3b46d9ca)
 - perf(dots-manager): :zap: iterate only live OEM and missile slots per frame [`d04964b`](https://github.com/thkruz/keeptrack.space/commit/d04964bf4fe972f5ee238d90973def475a373c03)
 - perf(celestial-bodies): :zap: throttle celestial body position updates [`3db4249`](https://github.com/thkruz/keeptrack.space/commit/3db4249b2db2a33df2fc4e945b4c11ff4fd3bb64)
+- chore(release): :bookmark: 13.2.0 [skip ci] [`d0e6c12`](https://github.com/thkruz/keeptrack.space/commit/d0e6c12a8a3b2962d9b8a9a5f93f90269caaf8d1)
 - perf(event-bus): :zap: branch emit on arity to cut per-listener args allocation [`f651390`](https://github.com/thkruz/keeptrack.space/commit/f6513907d93b3c1a5e9b97c6acf2998a5d9bb63e)
 - refactor(dots-manager): :recycle: optimize missile object access [`2cf03bc`](https://github.com/thkruz/keeptrack.space/commit/2cf03bc1e9df73ccea69671c7f8ff91f05ef05cf)
 - perf(camera-control-widget): :zap: skip redundant per-frame visibility style writes [`bdf7c14`](https://github.com/thkruz/keeptrack.space/commit/bdf7c148a391c25da52f3e77a86e7c9142efa9ee)

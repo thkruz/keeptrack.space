@@ -157,6 +157,10 @@ export class Godrays {
     return screenPosition;
   }
 
+  /** Drawing-buffer size the FBO attachments were allocated at (resize detection). */
+  private fbWidth_ = 0;
+  private fbHeight_ = 0;
+
   private initFrameBuffer_(): void {
     const gl = this.gl_;
 
@@ -165,10 +169,46 @@ export class Godrays {
 
     this.renderBuffer = gl.createRenderbuffer(); // create RB to store the depth buffer
     gl.bindRenderbuffer(gl.RENDERBUFFER, this.renderBuffer);
-    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    // DEPTH_COMPONENT24 (guaranteed in WebGL2): 16-bit quantizes the logarithmic
+    // depth so coarsely that orbit lines z-fight through the Earth (see the same
+    // fix in post-processing.ts).
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT24, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.mesh.material.map, 0);
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.renderBuffer);
+
+    this.fbWidth_ = gl.drawingBufferWidth;
+    this.fbHeight_ = gl.drawingBufferHeight;
+  }
+
+  /**
+   * Reallocate the FBO attachments when the drawing buffer changed size. The sun,
+   * occlusion, and background passes all render THROUGH this FBO whenever godrays
+   * are enabled — a stale-size attachment corrupts the whole composite (invisible
+   * atmosphere, stippled orbit lines). Canvas resizes are routine on phones
+   * (DPR scaling, viewport chrome settling, rotation), so the renderer calls this
+   * from resizeCanvas alongside the GPU-picking buffer resize.
+   */
+  resize(): void {
+    if (!this.isLoaded_) {
+      return;
+    }
+    const gl = this.gl_;
+
+    if (this.fbWidth_ === gl.drawingBufferWidth && this.fbHeight_ === gl.drawingBufferHeight) {
+      return;
+    }
+
+    gl.bindTexture(gl.TEXTURE_2D, this.mesh.material.map);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.drawingBufferWidth, gl.drawingBufferHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+
+    gl.bindRenderbuffer(gl.RENDERBUFFER, this.renderBuffer);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT24, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+
+    this.fbWidth_ = gl.drawingBufferWidth;
+    this.fbHeight_ = gl.drawingBufferHeight;
   }
 
   /*
@@ -279,16 +319,18 @@ export class Godrays {
       in vec2 a_position;
       in vec2 a_texCoord;
 
-      uniform vec2 u_resolution;
-
       out vec2 v_texCoord;
 
       void main() {
-        vec2 zeroToOne = a_position / u_resolution;
-        vec2 zeroToTwo = zeroToOne * 2.0;
-        vec2 clipSpace = zeroToTwo - 1.0;
-
-        gl_Position = vec4(clipSpace, 0, 1);
+        // Derive clip-space position from the texture coordinate (0..1), NOT from
+        // a_position/u_resolution. a_position is baked into the geometry buffer once
+        // at init using the drawing-buffer size at that instant, while u_resolution
+        // is read at draw time; when the canvas grows afterwards (DPR/viewport
+        // settling on mobile — routine in the companion WebView) the two disagree and
+        // the fullscreen quad collapses into the bottom-left quadrant, taking the sun
+        // and background composite with it. Texture coordinates always span the full
+        // quad, so this is resolution- and resize-independent.
+        gl_Position = vec4(a_texCoord * 2.0 - 1.0, 0, 1);
         v_texCoord = a_texCoord;
 
         ${DepthManager.getLogDepthVertCode()}

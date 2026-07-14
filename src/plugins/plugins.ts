@@ -22,7 +22,10 @@ export class PluginManager {
     if (__IS_PRO__ && descriptor.proImport) {
       try {
         return { mod: await descriptor.proImport(), usedPro: true };
-      } catch { /* fall through to OSS */ }
+      } catch (error) {
+        PluginManager.warnProImportFailed_(descriptor, error);
+        // fall through to OSS
+      }
     }
 
     if (!descriptor.ossImport) {
@@ -30,6 +33,42 @@ export class PluginManager {
     }
 
     return { mod: await descriptor.ossImport(), usedPro: false };
+  }
+
+  /**
+   * Tell the user why a Pro feature is missing and what to do about it,
+   * rather than silently degrading to the OSS variant.
+   */
+  private static warnProImportFailed_(descriptor: PluginDescriptor, error: unknown): void {
+    const reason = PluginManager.stringifyReason_(error);
+    const fallback = descriptor.ossImport
+      ? 'Falling back to the standard version.'
+      : 'The feature will be unavailable.';
+
+    errorManagerInstance.warn(
+      `Pro plugin "${descriptor.configKey}" failed to load. ${fallback} ` +
+      'Pro builds require the keeptrack-space-pro files in src/plugins-pro and IS_PRO=true in your .env ' +
+      `(see https://keeptrack.space/). Reason: ${reason}`,
+    );
+  }
+
+  /**
+   * Import rejections are usually Errors, but a thrown object must not degrade
+   * to '[object Object]' (typescript:S6551) — mirror errorManager's toError_.
+   */
+  private static stringifyReason_(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+    if (typeof error === 'string') {
+      return error;
+    }
+    try {
+      return JSON.stringify(error) ?? typeof error;
+    } catch {
+      // Circular structure — the type name is all that can be said about it.
+      return typeof error;
+    }
   }
 
   /**

@@ -1,4 +1,5 @@
 /* eslint-disable max-classes-per-file */
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import type { PluginDescriptor } from '@app/plugins/plugin-descriptor';
 import { PluginManager } from '@app/plugins/plugins';
 
@@ -17,6 +18,7 @@ import { PluginManager } from '@app/plugins/plugins';
 type PrivateStatics = {
   resolveModule_(descriptor: PluginDescriptor): Promise<{ mod: Record<string, unknown>; usedPro: boolean } | null>;
   initPlugin_(descriptor: PluginDescriptor, resolved: { mod: Record<string, unknown>; usedPro: boolean }): void;
+  warnProImportFailed_(descriptor: PluginDescriptor, error: unknown): void;
 };
 const PM = PluginManager as unknown as PrivateStatics;
 
@@ -58,6 +60,91 @@ describe('PluginManager.resolveModule_', () => {
     });
 
     await expect(PM.resolveModule_(descriptor)).rejects.toThrow('download-failed');
+  });
+});
+
+describe('PluginManager.warnProImportFailed_', () => {
+  /*
+   * The catch in resolveModule_ that calls this is unreachable here (__IS_PRO__
+   * is compile-time false in the OSS test build), so the warning logic is
+   * exercised directly. Guards issue #1206: a failed Pro import must produce an
+   * actionable message, not a silent fallback or a generic unavailable-feature
+   * message.
+   */
+  let warnSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    warnSpy = vi.spyOn(errorManagerInstance, 'warn').mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    warnSpy.mockRestore();
+  });
+
+  it('names the failed feature, the setup requirements, and the underlying reason', () => {
+    const descriptor = makeDescriptor({
+      configKey: 'Telemetry',
+      ossImport: () => Promise.resolve({}),
+    });
+
+    PM.warnProImportFailed_(descriptor, new Error('license missing'));
+
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    const msg = warnSpy.mock.calls[0][0] as string;
+
+    expect(msg).toContain('"Telemetry"');
+    expect(msg).toContain('IS_PRO=true');
+    expect(msg).toContain('src/plugins-pro');
+    expect(msg).toContain('Reason: license missing');
+  });
+
+  it('says it fell back to the standard version when an OSS variant exists', () => {
+    const descriptor = makeDescriptor({ ossImport: () => Promise.resolve({}) });
+
+    PM.warnProImportFailed_(descriptor, new Error('boom'));
+
+    expect(warnSpy.mock.calls[0][0]).toContain('Falling back to the standard version.');
+  });
+
+  it('says the feature is unavailable when there is no OSS variant', () => {
+    const descriptor = makeDescriptor({ proClassName: 'ProOnly' });
+
+    PM.warnProImportFailed_(descriptor, new Error('boom'));
+
+    expect(warnSpy.mock.calls[0][0]).toContain('The feature will be unavailable.');
+  });
+
+  it('stringifies non-Error rejection reasons', () => {
+    const descriptor = makeDescriptor({ ossImport: () => Promise.resolve({}) });
+
+    PM.warnProImportFailed_(descriptor, 'plain string failure');
+
+    expect(warnSpy.mock.calls[0][0]).toContain('Reason: plain string failure');
+  });
+
+  it('serializes thrown objects as JSON instead of [object Object]', () => {
+    const descriptor = makeDescriptor({ ossImport: () => Promise.resolve({}) });
+
+    PM.warnProImportFailed_(descriptor, { code: 'MODULE_NOT_FOUND' });
+
+    const msg = warnSpy.mock.calls[0][0] as string;
+
+    expect(msg).toContain('Reason: {"code":"MODULE_NOT_FOUND"}');
+    expect(msg).not.toContain('[object Object]');
+  });
+
+  it('degrades to the type name for values JSON cannot serialize', () => {
+    const descriptor = makeDescriptor({ ossImport: () => Promise.resolve({}) });
+    const circular: Record<string, unknown> = {};
+
+    circular.self = circular;
+
+    PM.warnProImportFailed_(descriptor, circular);
+
+    const msg = warnSpy.mock.calls[0][0] as string;
+
+    expect(msg).toContain('Reason: object');
+    expect(msg).not.toContain('[object Object]');
   });
 });
 

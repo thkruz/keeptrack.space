@@ -52,6 +52,7 @@
     "createtest": "npx tsx ./scripts/create-test-file.ts",
     "scenario:generate": "npx tsx --tsconfig src/plugins-pro/offline-scenario-creator/tsconfig.json src/plugins-pro/offline-scenario-creator/src/bin/generate-scenario.ts",
     "scenario:constellations": "npx tsx --tsconfig src/plugins-pro/offline-scenario-creator/tsconfig.json src/plugins-pro/offline-scenario-creator/src/bin/generate-constellations.ts",
+    "scenario:validate": "npx tsx --tsconfig src/plugins-pro/offline-scenario-creator/tsconfig.json src/plugins-pro/offline-scenario-creator/src/bin/validate-maneuver-error.ts",
     "missile:scenarios": "npx tsx --tsconfig scripts/missile-scenario/tsconfig.json scripts/missile-scenario/generate-scenarios.ts",
     "mirv:meshes": "npx tsx --tsconfig scripts/missile-mesh/tsconfig.json scripts/missile-mesh/gen-mirv.ts",
     "capture-shots": "npx tsx ./scripts/capture-verification-shots.ts",

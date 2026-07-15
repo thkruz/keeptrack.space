@@ -68,6 +68,24 @@ export class GraphicsSettings {
    * The number of longitude segments used to render the Earth.
    */
   earthNumLonSegs = 256;
+  /**
+   * Gain applied to the Earth's night (city-lights) texture on the unlit hemisphere
+   * (1 = stock brightness, >1 brightens). Lifts the dark limb so it's readable on dim
+   * mobile screens without touching the day side. The companion profile raises it.
+   */
+  earthNightBrightness = 1;
+  /**
+   * Draws a soft, smoothly-pulsing glow around the selected satellite in non-ride-along
+   * views (mirrors the 2D companion map's live marker). Off by default so the stock
+   * keeptrack.space look is unchanged; the companion profile turns it on.
+   */
+  isDrawSelectionGlow = false;
+  /**
+   * "You are here" observer marker. When set to a { lat, lon } in DEGREES the globe draws
+   * a green ground marker there (depth-occluded on the far side); null draws nothing.
+   * Data-driven — the companion feeds the device GPS position through the embed bridge.
+   */
+  observerMarkerLla: { lat: number; lon: number } | null = null;
 
   // Atmosphere and Aurora
   /**
@@ -179,6 +197,31 @@ export class GraphicsSettings {
   godraysIlluminationDecay = 2.7;
 
   // Skybox and Space
+  /**
+   * Far clipping plane distance in km. The default (1e12 km ≈ 6700 AU) covers the
+   * full heliocentric view + star field. Deployments that never leave Earth orbit
+   * (e.g. the companion embed) should set this to ~2e5 km: even with the
+   * logarithmic depth buffer, a tighter window buys depth precision and avoids
+   * z-artifacts on close geometry.
+   */
+  zFar = 1e12;
+  /**
+   * Backing-store scale for the WebGL canvas. 1 (default) renders at CSS pixels —
+   * the historical behavior, which on high-DPR phones means rendering at 1/2–1/3
+   * of native resolution and upscaling (visible aliasing). 0 = automatic:
+   * min(window.devicePixelRatio, 2), the mobile sweet spot. Values > 1 are used
+   * as-is (clamped to 3). Fill-rate cost scales with the square of this value.
+   */
+  canvasPixelRatio = 1;
+  /**
+   * WebGL context `preserveDrawingBuffer` attribute (read once at context
+   * creation). True (default) lets the Screenshot/ScreenRecorder plugins read the
+   * canvas outside the render callback, but forces the compositor to copy —
+   * rather than swap — the drawing buffer every frame and blocks tile-memory
+   * discard on mobile GPUs. Profiles that ship no canvas-capture UI (e.g. the
+   * companion embed) should set this false for a per-frame bandwidth win.
+   */
+  isPreserveDrawingBuffer = true;
   /**
    * Determines whether the Milky Way should be drawn on the screen.
    */

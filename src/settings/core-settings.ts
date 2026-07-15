@@ -384,6 +384,39 @@ export class CoreSettings {
   isDisableOnboarding = false;
 
   /**
+   * When true, the PWA service worker is never registered. Embedded deployments
+   * (e.g. the companion app's WebView, which serves the build from its own
+   * https origin) must not install a service worker inside the host app.
+   */
+  isDisableServiceWorker = false;
+
+  /**
+   * When true, GA telemetry never loads regardless of consent state. Embedded
+   * deployments must set this: they serve from localhost-like origins where the
+   * dev-convenience consent shortcut would otherwise always grant.
+   */
+  isDisableTelemetry = false;
+
+  /**
+   * When true, the SoundManager never initializes its AudioContext or preloads any
+   * clips. Deployments that ship no audio/ assets (e.g. the companion embed, whose
+   * sync prunes the ~40 sound files) must set this — otherwise every clip 404s at
+   * boot and floods the console with "Failed to load audio" warnings.
+   */
+  isDisableSounds = false;
+
+  /**
+   * When true, the per-frame GPU-picking pass (renders the catalog into an
+   * offscreen id-buffer so a click/tap can identify the object under the cursor)
+   * is skipped entirely. Deployments with no tap-to-select (e.g. the companion
+   * embed, which drives selection programmatically) don't need it — and on
+   * mobile, where the pass runs unscissored full-screen, it corrupts the visible
+   * scene (missing atmosphere, orbit lines z-fighting through the Earth). Off by
+   * default so normal builds keep interactive picking.
+   */
+  isDisableGpuPicking = false;
+
+  /**
    * When true, the override's `plugins` map is treated as an exhaustive allowlist:
    * any plugin not listed (regardless of manifest default) is forced to enabled:false.
    * Profiles like celestrak/embed should set this to true so new plugins added to the

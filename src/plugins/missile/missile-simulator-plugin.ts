@@ -11,6 +11,7 @@ import {
 } from '@app/engine/plugins/core/plugin-capabilities';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
@@ -333,8 +334,18 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
         const sim = PRESET_RAIDS[type];
 
         if (sim) {
-          missileManager.massRaidPre(launchTime, sim);
           uiManagerInstance.toast(l('msgs.simLoaded').replace('{sim}', sim), ToastMsgType.standby, true);
+          // Handle the rejection here so a missing/misdeployed scenario file surfaces a clear toast
+          // and a telemetry error with a real funcName, instead of an unhandled "Unexpected token
+          // '<'" promise rejection with no context (the SPA index.html fallback parsed as JSON).
+          missileManager.massRaidPre(launchTime, sim).catch((err: unknown) => {
+            errorManagerInstance.error(
+              err as Error,
+              'MissileSimulatorPlugin.massRaidPre',
+              l('msgs.simLoadFailed').replace('{sim}', sim),
+              { skipAutoFile: true },
+            );
+          });
         }
         hideLoading();
 

@@ -22,7 +22,7 @@ describe('MissileSimulatorPlugin behavior', () => {
     p().isMenuButtonActive = true;
     vi.spyOn(missileManager, 'createMissile').mockImplementation(() => undefined as never);
     vi.spyOn(missileManager, 'createMirvAttack').mockImplementation(() => 0 as never);
-    vi.spyOn(missileManager, 'massRaidPre').mockImplementation(() => undefined as never);
+    vi.spyOn(missileManager, 'massRaidPre').mockResolvedValue(undefined as never);
   });
 
   afterEach(() => {

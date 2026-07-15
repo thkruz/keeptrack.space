@@ -142,6 +142,7 @@
       },
       "msgs": {
         "simLoaded": "{sim} завантажено",
+        "simLoadFailed": "Не вдалося завантажити {sim}",
         "missilesActive": "{n} / {max} ракет активно"
       },
       "errorMsgs": {

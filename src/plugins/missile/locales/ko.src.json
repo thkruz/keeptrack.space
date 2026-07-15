@@ -142,6 +142,7 @@
       },
       "msgs": {
         "simLoaded": "{sim} 로드됨",
+        "simLoadFailed": "{sim}을(를) 불러오지 못했습니다",
         "missilesActive": "{n} / {max}개 미사일 활성"
       },
       "errorMsgs": {

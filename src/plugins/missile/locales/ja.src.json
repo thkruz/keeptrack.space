@@ -142,6 +142,7 @@
       },
       "msgs": {
         "simLoaded": "{sim} を読み込みました",
+        "simLoadFailed": "{sim} の読み込みに失敗しました",
         "missilesActive": "{n} / {max} 発のミサイルが稼働中"
       },
       "errorMsgs": {

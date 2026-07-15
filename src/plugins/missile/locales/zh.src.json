@@ -142,6 +142,7 @@
       },
       "msgs": {
         "simLoaded": "{sim} 已加载",
+        "simLoadFailed": "无法加载 {sim}",
         "missilesActive": "{n} / {max} 枚导弹活动中"
       },
       "errorMsgs": {

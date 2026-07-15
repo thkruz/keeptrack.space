@@ -28,6 +28,13 @@ export class CameraState {
    * settingsManager.minDistanceFromSatellite (which mobile overrides to 25 km).
    */
   minDistanceFromTarget: Kilometers | null = null;
+  /**
+   * Per-mode maximum camera standoff (km) while snapped to a target. Null falls back to the
+   * global settingsManager.maxZoomDistance (the historical behavior). Embedded/kiosk hosts set
+   * this to keep a satellite-fixed camera near its target (e.g. 100 km in the companion app's
+   * ride-along mode) while leaving earth-centered framing free to pull back.
+   */
+  maxDistanceFromTarget: Kilometers | null = null;
   earthCenteredLastZoom = CameraState.DEFAULT_ZOOM;
   isZoomIn = false;
 
@@ -185,7 +192,7 @@ export class CameraState {
   set camDistBuffer(val: Kilometers) {
     this.camDistBuffer_ = Math.min(
       Math.max(val, this.effectiveMinDistanceFromTarget),
-      settingsManager.maxZoomDistance,
+      this.maxDistanceFromTarget ?? settingsManager.maxZoomDistance,
     ) as Kilometers;
   }
 

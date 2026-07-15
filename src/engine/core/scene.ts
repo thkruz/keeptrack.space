@@ -37,6 +37,7 @@ import { AtmosphereSettings } from '../rendering/draw-manager/earth-quality-enum
 import { Ellipsoid } from '../rendering/draw-manager/ellipsoid';
 import { FrustumMeshFactory } from '../rendering/draw-manager/frustum-mesh-factory';
 import { Godrays } from '../rendering/draw-manager/godrays';
+import { WorldMarkers } from '../rendering/draw-manager/world-markers';
 import { SensorFovMeshFactory } from '../rendering/draw-manager/sensor-fov-mesh-factory';
 import { SkyBoxSphere } from '../rendering/draw-manager/skybox-sphere';
 import { Sun } from '../rendering/draw-manager/sun';
@@ -95,6 +96,7 @@ export class Scene {
   deepSpaceSatellites: Record<string, DeepSpaceSatellite>;
   sun: Sun;
   godrays: Godrays;
+  worldMarkers: WorldMarkers;
   sensorFovFactory: SensorFovMeshFactory;
   coneFactory: ConeMeshFactory;
   frustumFactory: FrustumMeshFactory;
@@ -168,6 +170,7 @@ export class Scene {
     this.deepSpaceSatellites = createDeepSpaceSatellites();
     this.sun = new Sun();
     this.godrays = new Godrays();
+    this.worldMarkers = new WorldMarkers();
     this.searchBox = new Box();
     this.searchBox.setColor([1, 0, 0, 0.3]);
     this.primaryCovBubble = new Ellipsoid(([0, 0, 0]));
@@ -314,7 +317,16 @@ export class Scene {
   averageDrawTime = 0;
   drawTimeArray: number[] = Array(150).fill(16);
 
+  /**
+   * Set when renderBackground rendered the earth surface for the current pass, so
+   * renderOpaque draws only the remaining atmosphere shell instead of a second
+   * full earth. Reset at the top of every renderBackground (each viewport pass
+   * runs its own background→opaque pair).
+   */
+  private isEarthSurfaceDrawnInBackground_ = false;
+
   renderBackground(renderer: WebGLRenderer, camera: Camera): void {
+    this.isEarthSurfaceDrawnInBackground_ = false;
     this.drawTimeArray.push(Math.min(100, renderer.dt));
     if (this.drawTimeArray.length > 150) {
       this.drawTimeArray.shift();
@@ -340,52 +352,62 @@ export class Scene {
 
     if (!settingsManager.isDrawLess) {
       if (settingsManager.isDrawSun && !isSecondaryPass) {
-        const fb = settingsManager.isDisableGodrays ? null : this.frameBuffers.godrays;
+        // A dead/never-initialized godrays must degrade to the plain sun path —
+        // its stale framebuffer would otherwise swallow the sun entirely.
+        const fb = settingsManager.isDisableGodrays || !this.godrays ? null : this.frameBuffers.godrays;
 
         // Draw the Sun to the Godrays Frame Buffer
         profiler.beginGpu(GpuStage.sun);
         this.sun.draw(this.earth.lightDirection, fb);
         profiler.endGpu(GpuStage.sun);
 
-        const sceneManager = ServiceLocator.getScene();
-        const centerBodyEntity = sceneManager.getBodyById(settingsManager.centerBody);
+        // Occlusion passes exist ONLY to mask the sun inside the godrays buffer.
+        // With godrays off/dead (fb === null) they must not run: binding the
+        // missing FBO falls back to the DEFAULT framebuffer and paints black
+        // occlusion meshes over the visible scene.
+        if (fb) {
+          const sceneManager = ServiceLocator.getScene();
+          const centerBodyEntity = sceneManager.getBodyById(settingsManager.centerBody);
 
-        profiler.beginGpu(GpuStage.occlusion);
+          profiler.beginGpu(GpuStage.occlusion);
 
-        // Draw a black earth mesh on top of the sun in the godrays frame buffer
-        // Skip in astronomy mode since Earth is hidden
-        if (centerBodyEntity?.drawOcclusion && camera.cameraType !== CameraType.ASTRONOMY && camera.cameraType !== CameraType.PLANETARIUM) {
-          centerBodyEntity?.drawOcclusion(
-            camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
-          );
+          // Draw a black earth mesh on top of the sun in the godrays frame buffer
+          // Skip in astronomy mode since Earth is hidden
+          if (centerBodyEntity?.drawOcclusion && camera.cameraType !== CameraType.ASTRONOMY && camera.cameraType !== CameraType.PLANETARIUM) {
+            centerBodyEntity?.drawOcclusion(
+              camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
+            );
+          }
+
+          if (settingsManager.centerBody === SolarBody.Earth) {
+            sceneManager.getBodyById(SolarBody.Moon)?.drawOcclusion(
+              camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
+            );
+          }
+
+          if (settingsManager.centerBody === SolarBody.Moon) {
+            this.earth.drawOcclusion(
+              camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
+            );
+          }
+
+          // Draw a black object mesh on top of the sun in the godrays frame buffer
+          if (
+            !settingsManager.modelsOnSatelliteViewOverride &&
+            Number(PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1 &&
+            ServiceLocator.getMainCamera().state.camDistBuffer <= settingsManager.nearZoomLevel
+          ) {
+            renderer.meshManager.drawOcclusion(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.programs.occlusion, this.frameBuffers.godrays);
+          }
+          profiler.endGpu(GpuStage.occlusion);
         }
 
-        if (settingsManager.centerBody === SolarBody.Earth) {
-          sceneManager.getBodyById(SolarBody.Moon)?.drawOcclusion(
-            camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
-          );
-        }
-
-        if (settingsManager.centerBody === SolarBody.Moon) {
-          this.earth.drawOcclusion(
-            camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
-          );
-        }
-
-        // Draw a black object mesh on top of the sun in the godrays frame buffer
-        if (
-          !settingsManager.modelsOnSatelliteViewOverride &&
-          Number(PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1 &&
-          ServiceLocator.getMainCamera().state.camDistBuffer <= settingsManager.nearZoomLevel
-        ) {
-          renderer.meshManager.drawOcclusion(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.programs.occlusion, this.frameBuffers.godrays);
-        }
-        profiler.endGpu(GpuStage.occlusion);
-
-        // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
+        // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two.
+        // Null-safe: a throw here used to abort renderBackground before the earth/
+        // atmosphere draws below — one godrays failure blanked the atmosphere.
         renderer.postProcessingManager.curBuffer = null;
         profiler.beginGpu(GpuStage.godrays);
-        this.godrays.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
+        this.godrays?.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
         profiler.endGpu(GpuStage.godrays);
       }
 
@@ -403,11 +425,17 @@ export class Scene {
       }
       if (settingsManager.centerBody === SolarBody.Earth || settingsManager.centerBody === SolarBody.Moon) {
         if (settingsManager.isDrawEarth !== false && camera.cameraType !== CameraType.ASTRONOMY && camera.cameraType !== CameraType.PLANETARIUM) {
-          // Timed separately from gpu:earth so the profile exposes that the
-          // Earth renders here AND in renderOpaque (a real double-draw cost).
+          /*
+           * Surface only (plus depth): the moon draw below and the dots/orbits in
+           * renderOpaque depth-test against it. The atmosphere shell is deferred
+           * to renderOpaque (drawAtmospherePass) so it blends exactly once per
+           * frame — the pipeline historically drew surface AND atmosphere in both
+           * passes, paying the full fragment cost twice.
+           */
           profiler.beginGpu(GpuStage.earthBackground);
-          this.earth.draw(renderer.postProcessingManager.curBuffer);
+          this.earth.drawSurfacePass(renderer.postProcessingManager.curBuffer);
           profiler.endGpu(GpuStage.earthBackground);
+          this.isEarthSurfaceDrawnInBackground_ = true;
         }
         profiler.beginGpu(GpuStage.planets);
         this.getBodyById(SolarBody.Moon)?.draw(this.sun.position, renderer.postProcessingManager.curBuffer);
@@ -496,6 +524,14 @@ export class Scene {
     } else if (settingsManager.isDrawEarth !== false) {
       if (camera.cameraType === CameraType.PLANETARIUM || camera.cameraType === CameraType.ASTRONOMY) {
         this.earth.drawAtmosphereOnly(renderer.postProcessingManager.curBuffer);
+      } else if (this.isEarthSurfaceDrawnInBackground_) {
+        /*
+         * Surface (+depth) already rendered in renderBackground — only the
+         * atmosphere shell remains. Intensity 2.0 reproduces the additive
+         * brightness of the legacy pipeline, which blended the shell twice
+         * (once per pass): dst + src + src === dst + 2·src under SRC_ALPHA/ONE.
+         */
+        this.earth.drawAtmospherePass(renderer.postProcessingManager.curBuffer, 2.0);
       } else {
         this.earth.draw(renderer.postProcessingManager.curBuffer);
       }
@@ -519,6 +555,10 @@ export class Scene {
     profiler.beginGpu(GpuStage.lines);
     ServiceLocator.getLineManager().draw(renderer.projectionCameraMatrix, renderer.postProcessingManager.curBuffer);
     profiler.endGpu(GpuStage.lines);
+
+    // "You are here" + selected-sat glow markers (depth-occluded against the globe).
+    // Cheap no-op unless observerMarkerLla / isDrawSelectionGlow are set (both off in OSS).
+    this.worldMarkers.draw(renderer.projectionCameraMatrix, this.worldShift as [number, number, number], renderer.postProcessingManager.curBuffer);
 
     // Draw Satellite Model if a satellite is selected (or deep-space satellite is centered) and meshManager is loaded
     const hasSatSelected = Number(PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1;
@@ -567,9 +607,18 @@ export class Scene {
      * frameBuffer init then the wrong color will be applied (this can break gpuPicking)
      */
 
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffers.gpuPicking);
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    /*
+     * With GPU picking disabled nothing writes OR reads the picking buffer
+     * (draws and readPixels are all gated), so skip its per-frame clear — a
+     * render-target switch per frame that tiled mobile GPUs pay dearly for.
+     * WebGL zero-initializes the attachment, so even a stray read decodes to
+     * "no object" (id -1).
+     */
+    if (!settingsManager.isDisableGpuPicking) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffers.gpuPicking);
+      gl.clearColor(0.0, 0.0, 0.0, 1.0);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    }
 
     if (!settingsManager.isDisableGodrays) {
       // Clear the godrays Frame Buffer
@@ -632,6 +681,7 @@ export class Scene {
   async loadScene(): Promise<void> {
     try {
       this.earth.init(this.gl_);
+      this.worldMarkers.init(this.gl_);
       EventBus.getInstance().emit(EventBusEvent.drawManagerLoadScene);
       await this.sun.init(this.gl_);
 

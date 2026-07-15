@@ -20,7 +20,8 @@
       "celestrak": "CelesTrak",
       "embed": "Intégré",
       "offline": "Offline",
-      "epfl": "EPFL"
+      "epfl": "EPFL",
+      "companion": "Companion"
     }
   },
   "errorMsgs": {

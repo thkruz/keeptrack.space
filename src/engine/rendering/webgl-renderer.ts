@@ -21,7 +21,6 @@ import { CpuStage, FrameProfiler } from '../utils/frame-profiler';
 import { getEl } from '../utils/get-el';
 import { isThisNode } from '../utils/isThisNode';
 import { DepthManager } from './depth-manager';
-import { Godrays } from './draw-manager/godrays';
 import { PostProcessingManager } from './draw-manager/post-processing';
 import { Sun } from './draw-manager/sun';
 import { MeshManager } from './mesh-manager';
@@ -236,7 +235,9 @@ export class WebGLRenderer {
         desynchronized: false, // Setting to true causes flickering on mobile devices
         antialias: true,
         powerPreference: 'high-performance',
-        preserveDrawingBuffer: true,
+        // Screenshot/ScreenRecorder need post-frame canvas reads; profiles without
+        // them (e.g. the companion embed) set false to skip the per-frame copy.
+        preserveDrawingBuffer: settingsManager.isPreserveDrawingBuffer ?? true,
         stencil: false,
       });
 
@@ -567,9 +568,19 @@ export class WebGLRenderer {
     }
 
     const { vw, vh } = WebGLRenderer.getCanvasInfo();
+    /*
+     * Backing-store scale (settingsManager.canvasPixelRatio): 1 = historical
+     * CSS-pixel rendering; 0 = auto min(devicePixelRatio, 2); >1 used as-is
+     * (clamped to 3). High-DPR phones render at native resolution instead of
+     * upscaling a 1/2–1/3 size buffer. CSS size is pinned so layout never moves.
+     */
+    const configuredRatio = settingsManager.canvasPixelRatio ?? 1;
+    const ratio = configuredRatio === 0 ? Math.min(window.devicePixelRatio || 1, 2) : Math.min(Math.max(configuredRatio, 1), 3);
+    const bw = Math.round(vw * ratio);
+    const bh = Math.round(vh * ratio);
 
     // If taking a screenshot then resize no matter what to get high resolution
-    if (!isForcedResize && (gl.canvas.width !== vw || gl.canvas.height !== vh)) {
+    if (!isForcedResize && (gl.canvas.width !== bw || gl.canvas.height !== bh)) {
       // If not autoresizing then don't do anything to the canvas
       if (settingsManager.isAutoResizeCanvas) {
         /*
@@ -582,10 +593,14 @@ export class WebGLRenderer {
          * Changes more than 35% of height but not due to rotation are likely the keyboard! Ignore them
          * but make sure we have set this at least once to trigger
          */
-        const isKeyboardOut = Math.abs((vw - oldWidth) / oldWidth) < 0.35 && Math.abs((vh - oldHeight) / oldHeight) > 0.35;
+        const isKeyboardOut = Math.abs((bw - oldWidth) / oldWidth) < 0.35 && Math.abs((bh - oldHeight) / oldHeight) > 0.35;
 
         if (!settingsManager.isMobileModeEnabled || !isKeyboardOut || this.isRotationEvent_ || !ServiceLocator.getMainCamera().projectionMatrix) {
-          this.setCanvasSize(vh, vw);
+          this.setCanvasSize(bh, bw);
+          if (ratio !== 1) {
+            this.domElement.style.width = `${vw}px`;
+            this.domElement.style.height = `${vh}px`;
+          }
           this.isRotationEvent_ = false;
         } else {
           // No Canvas Change
@@ -620,16 +635,20 @@ export class WebGLRenderer {
       }
     }
 
-    // Fix flat geometry if it has already been created. Wrap in try/catch so a failing
-    // shader compile (observed on iOS Safari during the initial postStart resize) only
-    // disables godrays instead of aborting the whole startup chain.
+    /*
+     * Reallocate the godrays FBO attachments at the new drawing-buffer size. This
+     * used to be a FULL godrays re-init (geometry + shader recompile) on every
+     * resize — expensive, and a single transient failure (GL hiccup mid-resize,
+     * common on mobile during boot when the viewport settles repeatedly) nulled
+     * godrays permanently and corrupted the whole background pass. resize() only
+     * touches the texture/renderbuffer storage; there is nothing to recompile.
+     */
     const scene = ServiceLocator.getScene();
 
     try {
-      scene.godrays?.init(gl, scene.sun);
+      scene.godrays?.resize();
     } catch (error) {
-      errorManagerInstance.warn(`Godrays init failed during resizeCanvas; disabling godrays. ${error instanceof Error ? error.message : error}`);
-      scene.godrays = null as unknown as Godrays;
+      errorManagerInstance.warn(`Godrays resize failed during resizeCanvas; retrying on next resize. ${error instanceof Error ? error.message : error}`);
     }
   }
 

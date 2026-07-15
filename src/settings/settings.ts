@@ -82,6 +82,8 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   godraysDensity: 'graphics',
   godraysWeight: 'graphics',
   godraysIlluminationDecay: 'graphics',
+  zFar: 'graphics',
+  canvasPixelRatio: 'graphics',
   isDrawMilkyWay: 'graphics',
   milkyWayTextureQuality: 'graphics',
   hiresMilkWay: 'graphics',

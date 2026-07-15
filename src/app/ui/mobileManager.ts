@@ -2,7 +2,7 @@ import { ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { EarthCloudTextureQuality, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
+import { AtmosphereSettings, EarthCloudTextureQuality, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { KeepTrack } from '@app/keeptrack';
 import { Kilometers, Radians } from '@ootk/src/main';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
@@ -93,8 +93,8 @@ export class MobileManager {
             isShowLoadingHints: false,
             isBlockPersistence: true,
             isDisableBottomMenu: false,
-            isDrawSun: false,
-            isDrawMilkyWay: false,
+            isDrawSun: true,
+            isDrawMilkyWay: true,
             isDisableGodrays: true,
             godraysSamples: -1,
             isDisableMoon: false,
@@ -111,7 +111,8 @@ export class MobileManager {
             // earthPoliticalTextureQuality: '1k',
             isDrawPoliticalMap: false,
             earthTextureStyle: EarthTextureStyle.BLUE_MARBLE,
-            isDisableSkybox: true,
+            isDrawAtmosphere: AtmosphereSettings.ON,
+            isDisableSkybox: false,
             isDisableSearchBox: false,
             isDrawCovarianceEllipsoid: false,
             isDisableAsyncReadPixels: true,
@@ -169,6 +170,11 @@ export class MobileManager {
   }
 
   static checkIfMobileDevice() {
+    // Check if we are manually overriding this setting in the settingsOverride.js file
+    if (typeof window.settingsOverride?.isForceMobileMode === 'boolean') {
+      return window.settingsOverride.isForceMobileMode;
+    }
+
     return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/iu).test(navigator.userAgent);
   }
 }

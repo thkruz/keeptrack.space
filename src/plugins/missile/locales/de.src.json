@@ -142,6 +142,7 @@
       },
       "msgs": {
         "simLoaded": "{sim} geladen",
+        "simLoadFailed": "{sim} konnte nicht geladen werden",
         "missilesActive": "{n} / {max} Raketen aktiv"
       },
       "errorMsgs": {

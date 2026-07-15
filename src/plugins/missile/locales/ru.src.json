@@ -142,6 +142,7 @@
       },
       "msgs": {
         "simLoaded": "{sim} загружен",
+        "simLoadFailed": "Не удалось загрузить {sim}",
         "missilesActive": "{n} / {max} ракет активно"
       },
       "errorMsgs": {

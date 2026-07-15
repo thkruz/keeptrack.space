@@ -142,6 +142,7 @@
       },
       "msgs": {
         "simLoaded": "Załadowano {sim}",
+        "simLoadFailed": "Nie udało się załadować {sim}",
         "missilesActive": "{n} / {max} aktywnych pocisków"
       },
       "errorMsgs": {

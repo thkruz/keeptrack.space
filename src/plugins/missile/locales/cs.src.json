@@ -142,6 +142,7 @@
       },
       "msgs": {
         "simLoaded": "{sim} načteno",
+        "simLoadFailed": "Nepodařilo se načíst {sim}",
         "missilesActive": "{n} / {max} aktivních raket"
       },
       "errorMsgs": {

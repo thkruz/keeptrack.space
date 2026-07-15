@@ -253,7 +253,9 @@ export class InputManager {
    * @returns The ID of the satellite at the given screen coordinates.
    */
   public getSatIdFromCoord(x: number, y: number): number {
-    if (!this.isPickingSupported) {
+    // With GPU picking disabled nothing ever writes the picking buffer (and its
+    // per-frame clear is skipped) — skip the sync readPixels pipeline stall too.
+    if (!this.isPickingSupported || settingsManager.isDisableGpuPicking) {
       return -1;
     }
     const renderer = ServiceLocator.getRenderer();
@@ -303,7 +305,7 @@ export class InputManager {
    * Enable via settingsManager.debugMobilePicking = true.
    */
   public getSatIdFromCoordNeighborhood(x: number, y: number, patchSize = 21): { id: number; offsetX: number; offsetY: number; hitCount: number; patchData: string } {
-    if (!this.isPickingSupported) {
+    if (!this.isPickingSupported || settingsManager.isDisableGpuPicking) {
       return { id: -1, offsetX: 0, offsetY: 0, hitCount: 0, patchData: '(picking disabled)' };
     }
     const renderer = ServiceLocator.getRenderer();

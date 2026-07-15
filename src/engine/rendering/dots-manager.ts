@@ -349,7 +349,7 @@ export class DotsManager {
    * @param mouseY - The y-coordinate of the mouse.
    */
   drawGpuPickingFrameBuffer(pMvCamMatrix: mat4, mouseX: number, mouseY: number) {
-    if (!this.isReady || !settingsManager.cruncherReady) {
+    if (!this.isReady || !settingsManager.cruncherReady || settingsManager.isDisableGpuPicking) {
       return;
     }
     const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();

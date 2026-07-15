@@ -147,7 +147,10 @@ export class SatCruncherThreadManager extends WebWorkerThreadManager {
       ServiceLocator.getCatalogManager().objectCache &&
       dotsManager.positionData &&
       dotsManager.velocityData &&
-      !SatCruncherThreadManager.isPositionDataAllZeros_(dotsManager.positionData)
+      // An empty boot (noCatalogOnLoad: reserved analyst slots + markers only)
+      // legitimately has all-zero positions until the first satellite is loaded
+      // or injected — requiring non-zero data would deadlock startup there.
+      (settingsManager.noCatalogOnLoad || !SatCruncherThreadManager.isPositionDataAllZeros_(dotsManager.positionData))
     ) {
       this.onCruncherReady_();
     }

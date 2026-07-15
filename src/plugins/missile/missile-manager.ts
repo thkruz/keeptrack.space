@@ -2,22 +2,45 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { fetchJson } from '@app/app/data/fetch-json';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { MissileParams, ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { jday } from '@app/engine/utils/transforms';
-import { DEG2RAD, Degrees, TemeVec3, Kilometers, KilometersPerSecond, MILLISECONDS_TO_DAYS, RAD2DEG, Sgp4, SpaceObjectType, ecefRad2rae, eci2ecef, eci2lla } from '@ootk/src/main';
-import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ScenarioManagementPlugin } from '@app/plugins/scenario-management/scenario-management';
 import { TimeSlider } from '@app/plugins/time-slider/time-slider';
+import { DEG2RAD, Degrees, Kilometers, KilometersPerSecond, MILLISECONDS_TO_DAYS, RAD2DEG, Sgp4, SpaceObjectType, TemeVec3, ecefRad2rae, eci2ecef, eci2lla } from '@ootk/src/main';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
-import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, globalBMTargets, ukSLBM } from './missile-data';
-import { ServiceLocator } from '@app/engine/core/service-locator';
-import { MissileSimulation } from './missile-simulation';
 import { generateBallisticTrajectory } from './ballistic-trajectory';
+import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, globalBMTargets, ukSLBM } from './missile-data';
+import { RvTarget, expandTrajectoryToMirv, expandTrajectoryToTargets, findSeparationIndex, generateFootprint, retargetDescent, warheadCountForDesc } from './missile-mirv';
+import { MissileSimulation } from './missile-simulation';
 import { MissileSpec, MissileTrajectory } from './missile-types';
-import { expandTrajectoryToMirv, expandTrajectoryToTargets, generateFootprint, findSeparationIndex, retargetDescent, warheadCountForDesc, RvTarget } from './missile-mirv';
-import { isSubmarineLaunch, planSubmarineBoats, SubLaunchEntry } from './sub-launch';
+import { SubLaunchEntry, isSubmarineLaunch, planSubmarineBoats } from './sub-launch';
+
+/**
+ * Raw shape of one entry in a mass-raid / simulation JSON file, as baked by the scenario generators
+ * and consumed by {@link MassRaidPre}. `ON`/`C` are the baked object-name and country codes copied
+ * onto `name`/`country`. Several fields are rewritten in place before the MissileObject is built
+ * (startTime, name, country, and the lat/lon/altLists when a submarine boat re-flies the bus), so
+ * they are mutable. `rvTargets` is absent on legacy files, which fall back to a designator footprint.
+ */
+interface RawMassRaidMissile {
+  ON: string;
+  C: string;
+  desc: string;
+  active: boolean;
+  type: SpaceObjectType;
+  latList: Degrees[];
+  lonList: Degrees[];
+  altList: Kilometers[];
+  startTime: number;
+  name: string;
+  country: string;
+  rvTargets?: RvTarget[];
+}
 
 const missileArray: MissileObject[] = [];
 
@@ -68,8 +91,16 @@ const boundScenarioToActiveMissiles_ = (): void => {
 export const MassRaidPre = async (time: number, simFile: string) => {
   missileManager.clearMissiles();
 
-  await fetch(simFile)
-    .then((response) => response.json())
+  // Preset scenario paths are app-relative (e.g. 'simulation/Exchange_...json'). Root them at the
+  // install directory so they resolve identically under '/', '/app/', and subpath deployments
+  // rather than against the current document URL. fetchJson then rejects with an actionable error
+  // (naming the file + status) instead of the opaque "Unexpected token '<'" that results when a
+  // missing file causes the SPA index.html to be served in its place.
+  const url = (/^(?:https?:)?\/\//u).test(simFile) || simFile.startsWith('/')
+    ? simFile
+    : `${settingsManager.installDirectory}${simFile}`;
+
+  await fetchJson<RawMassRaidMissile[]>(url)
     .then((newMissileArray) => {
       const catalogManagerInstance = ServiceLocator.getCatalogManager();
       const dotsManagerInstance = ServiceLocator.getDotsManager();
@@ -130,7 +161,7 @@ export const MassRaidPre = async (time: number, simFile: string) => {
         // rvTargets (legacy) fall back to a designator-based footprint. Clamp to the slots left.
         const launcher = String(raw.desc ?? '').split(' -> ')[0];
         const primaryLabel = String(raw.desc ?? '').split(' -> ').slice(1).join(' -> ');
-        const rvTargets = (raw.rvTargets as RvTarget[] | undefined) ?? [];
+        const rvTargets = (raw.rvTargets) ?? [];
         const tracks = rvTargets.length > 0
           ? expandTrajectoryToTargets(raw.latList, raw.lonList, raw.altList, rvTargets).map((r) => ({ ...r.track, name: r.name }))
           : expandTrajectoryToMirv(raw.latList, raw.lonList, raw.altList, warheadCountForDesc(raw.desc), MIRV_DEFAULT_SPREAD_KM).map((track) => ({ ...track, name: '' }));
@@ -142,7 +173,7 @@ export const MassRaidPre = async (time: number, simFile: string) => {
 
           // Each RV is labeled with its own distinct target ("launcher -> target"). The legacy
           // footprint path (no per-RV name) keeps the "(RV n/N)" suffix off the shared primary.
-          let desc = raw.desc as string;
+          let desc = raw.desc;
 
           if (track.name) {
             desc = `${launcher} -> ${track.name}`;
@@ -510,9 +541,7 @@ export const Missile = (
     return 0;
   }
 
-  if (typeof minAltitude === 'undefined') {
-    minAltitude = 0;
-  }
+  minAltitude ??= 0;
 
   const spec: MissileSpec = {
     launchLatitude: CurrentLatitude,
@@ -706,11 +735,11 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: DetailedSensor
   const gmst = Sgp4.gstime(j);
 
   // If no sensor passed to function then try to use the 'currentSensor'
-  if (typeof sensors === 'undefined') {
+  if (sensors === undefined) {
     const sensorManagerInstance = ServiceLocator.getSensorManager();
 
-    if (typeof sensorManagerInstance.currentSensors === 'undefined') {
-      throw new Error('getTEARR requires a sensor or for a sensor to be currently selected.');
+    if (sensorManagerInstance.currentSensors === undefined) {
+      throw new TypeError('getTEARR requires a sensor or for a sensor to be currently selected.');
     } else {
       sensors = sensorManagerInstance.currentSensors;
     }
@@ -731,7 +760,7 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: DetailedSensor
   // The missile is not in flight at the current sim time (pre-launch or post-impact):
   // there is no trajectory sample to read, so return the zeroed, not-in-view TEARR
   // rather than indexing the lists with `undefined` and producing NaN angles.
-  if (typeof curMissileTime === 'undefined') {
+  if (curMissileTime === undefined) {
     const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     if (sensorManagerInstance) {

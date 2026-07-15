@@ -1,0 +1,86 @@
+@import url('../../public/css/style.common.css');
+
+
+/* File-specific CSS rules */
+
+:root {
+  --bottom-menu-top: 0px;
+  --bottom-icon-height: 75px;
+  --bottom-icon-width: 115px;
+  --bottom-icon-img-size: 40px;
+  --bottom-filter-width: 265px;
+  --search-box-bottom: 0px;
+  --nav-bar-height: 0px !important;
+
+  --top-menu-height: calc(var(--nav-bar-height) + var(--classification-bar-height) + var(--time-slider-height));
+
+  --classification-bar-height: 0px;
+
+  --time-slider-height: 0px;
+}
+
+#search-results {
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: none;
+  position: absolute;
+  right: 0px;
+  max-width: 355px;
+  background: var(--color-dark-background) !important;
+  z-index: 1;
+  top: auto !important;
+  bottom: 0px;
+  max-height: calc(100% - var(--top-menu-height) - max(var(--bottom-menu-top), var(--search-box-bottom) + var(--bottom-menu-top)) + 3px);
+  border-width: 0px 0px 5px 5px;
+  border-style: solid;
+  border-color: var(--color-dark-border);
+  border-top: 5px solid var(--color-dark-border);
+  padding-top: 0px;
+}
+
+#layers-icon img,
+#tutorial-icon img,
+#fullscreen-icon img,
+#search-icon img,
+.top-menu-icons__blue-img,
+.bmenu-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help) .bmenu-item-inner *,
+.bmenu-filter-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help) .bmenu-filter-item-inner * {
+  filter: hue-rotate(163deg) brightness(0.7) saturate(4);
+}
+
+#layers-hover-menu li {
+  display: flex;
+  align-items: center;
+}
+
+#drawer-hamburger {
+  display: none !important;
+}
+
+#drawer-utility-footer {
+  display: none !important;
+}
+
+/* The companion embed is chrome-less: scene plugins (Aurora) would otherwise
+   materialize the plugin drawer rail — the app owns ALL UI. */
+#plugin-drawer,
+#drawer-rail-toggle {
+  display: none !important;
+}
+
+#map-menu {
+  display: none;
+  position: absolute;
+  width: 800px;
+  left: 0;
+  margin: 0;
+  border-top: 3px solid var(--color-primary);
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+
+  background: rgba(255, 255, 255, 0.85);
+  color: white;
+  z-index: 10;
+  padding: 0;
+}

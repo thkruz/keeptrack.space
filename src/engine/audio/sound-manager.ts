@@ -2,6 +2,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
+import { settingsManager } from '@app/settings/settings';
 import { SoundNames, sounds } from './sounds';
 
 interface PlayingSound {
@@ -72,6 +73,12 @@ export class SoundManager {
       return;
     }
 
+    // Deployments that ship no audio/ assets (e.g. the companion embed) set this so
+    // the SoundManager never opens an AudioContext or 404s ~40 clips at boot.
+    if (settingsManager.isDisableSounds) {
+      return;
+    }
+
     try {
       // Initialize Web Audio Context
       this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -89,8 +96,17 @@ export class SoundManager {
 
     // Voice initialization via EventBus
     EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
-      this.voices = speechSynthesis.getVoices();
+      this.voices = this.speech_?.getVoices() ?? [];
     });
+  }
+
+  /**
+   * speechSynthesis is OPTIONAL: Android WebViews (the Companion app) and some
+   * kiosk browsers don't implement it, and referencing the bare global there is a
+   * ReferenceError that kills engine init. Every use goes through this accessor.
+   */
+  private get speech_(): SpeechSynthesis | null {
+    return 'speechSynthesis' in window ? window.speechSynthesis : null;
   }
 
   private async preloadAllAudio(): Promise<void> {
@@ -240,7 +256,9 @@ export class SoundManager {
    * Create a new utterance for the specified text and add it to the queue.
    */
   speak(text: string) {
-    if (this.isMute || !speechSynthesis.getVoices) {
+    const speech = this.speech_;
+
+    if (this.isMute || !speech?.getVoices || typeof SpeechSynthesisUtterance === 'undefined') {
       return;
     }
 
@@ -252,12 +270,12 @@ export class SoundManager {
     msg.pitch = 1;
 
     if (this.voices.length === 0) {
-      this.voices = speechSynthesis.getVoices();
+      this.voices = speech.getVoices();
     }
 
     msg.voice = this.voices.find((voice) => voice.name === 'Google UK English Female') ?? null;
 
-    window.speechSynthesis.speak(msg);
+    speech.speak(msg);
   }
 
   stop(soundName: SoundNames, isFadeout = true) {
@@ -331,8 +349,8 @@ export class SoundManager {
     // Stop chatter loop
     clearTimeout(this.nextChatter);
 
-    // Cancel any speech synthesis
-    window.speechSynthesis.cancel();
+    // Cancel any speech synthesis (optional API — absent in Android WebViews)
+    this.speech_?.cancel();
   }
 
   private static fadeOut_(sound: HTMLAudioElement, duration = 1000) {

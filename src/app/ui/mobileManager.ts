@@ -171,8 +171,8 @@ export class MobileManager {
 
   static checkIfMobileDevice() {
     // Check if we are manually overriding this setting in the settingsOverride.js file
-    if (typeof settingsOverride?.isForceMobileMode === 'boolean') {
-      return settingsOverride.isForceMobileMode;
+    if (typeof window.settingsOverride?.isForceMobileMode === 'boolean') {
+      return window.settingsOverride.isForceMobileMode;
     }
 
     return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/iu).test(navigator.userAgent);

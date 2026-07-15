@@ -13,6 +13,12 @@ export function registerServiceWorker(): void {
     return;
   }
 
+  // Embedded deployments (companion WebView) opt out entirely — a service
+  // worker scoped inside the host app would cache-shadow its assets.
+  if (typeof settingsManager !== 'undefined' && settingsManager?.isDisableServiceWorker) {
+    return;
+  }
+
   if (window.location.protocol !== 'https:') {
     return;
   }

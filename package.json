@@ -41,6 +41,7 @@
     "build:coverage": "cross-env COVERAGE=1 npm run build:pro",
     "build:celestrak": "npx tsx ./scripts/plugin/index.ts sync --skip-locales && npx tsx ./build/generate-translation.ts && npx tsx ./build/build-manager.ts production --profile=celestrak --skip-locales",
     "build:embed": "npx tsx ./scripts/plugin/index.ts sync --skip-locales && npx tsx ./build/generate-translation.ts && npx tsx ./build/build-manager.ts production --profile=embed --skip-locales",
+    "build:companion": "npx tsx ./scripts/plugin/index.ts sync --skip-locales && npx tsx ./build/generate-translation.ts && npx tsx ./build/build-manager.ts production --profile=companion --skip-locales",
     "build:epfl": "npx tsx ./scripts/plugin/index.ts sync --skip-locales && npx tsx ./build/generate-translation.ts && npx tsx ./build/build-manager.ts production --profile=epfl --skip-locales",
     "build:offline": "npx tsx ./scripts/plugin/index.ts sync --skip-locales && npx tsx ./build/generate-translation.ts && npx tsx ./build/build-manager.ts production --profile=offline --skip-locales",
     "upload:sourcemaps": "npx tsx ./build/lib/sourcemap-uploader.ts",

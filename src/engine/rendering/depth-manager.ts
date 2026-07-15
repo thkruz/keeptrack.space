@@ -11,20 +11,38 @@ export class DepthManager {
   // to approach objects at true physical scale.
   private static readonly SATELLITE_NEAR = 1e-6;
   /**
-   * 1e12 km (~6700 AU). Must exceed STAR_DISTANCE (3e10 km) plus the largest camera-to-origin
-   * distance so background stars never clip. The heliocentric view alone pulls the camera up to
-   * 1.5e10 km from the origin, making a star on the far side ~4.5e10 km away - beyond the old 3e10
-   * far plane, which clipped a black hole in the star field. The logarithmic depth buffer makes a
-   * far plane this large essentially free in precision.
+   * Default far plane: 1e12 km (~6700 AU). Must exceed STAR_DISTANCE (3e10 km) plus the largest
+   * camera-to-origin distance so background stars never clip. The heliocentric view alone pulls
+   * the camera up to 1.5e10 km from the origin, making a star on the far side ~4.5e10 km away -
+   * beyond the old 3e10 far plane, which clipped a black hole in the star field. The logarithmic
+   * depth buffer makes a far plane this large essentially free in precision.
+   *
+   * Overridable via settingsManager.zFar: Earth-orbit-only deployments (companion embed) tighten
+   * it to ~2e5 km for extra depth precision on close geometry.
    */
   private static readonly SATELLITE_FAR = 1e12;
-  private static readonly LOG_DEPTH_FC = 2.0 / Math.log2(DepthManager.SATELLITE_FAR + 1.0);
+  private static cachedFar_ = DepthManager.SATELLITE_FAR;
+  private static cachedFc_ = 2.0 / Math.log2(DepthManager.SATELLITE_FAR + 1.0);
+
+  private static resolveFar_(): number {
+    const zFar = typeof settingsManager !== 'undefined' ? settingsManager?.zFar : undefined;
+    const far = typeof zFar === 'number' && zFar > 1 ? zFar : DepthManager.SATELLITE_FAR;
+
+    if (far !== this.cachedFar_) {
+      this.cachedFar_ = far;
+      this.cachedFc_ = 2.0 / Math.log2(far + 1.0);
+    }
+
+    return far;
+  }
 
   static getConfig(): DepthConfig {
+    const far = this.resolveFar_();
+
     return {
-      logDepthBufFC: this.LOG_DEPTH_FC,
+      logDepthBufFC: this.cachedFc_,
       near: this.SATELLITE_NEAR,
-      far: this.SATELLITE_FAR,
+      far,
       useLogDepth: true,
     };
   }
@@ -36,7 +54,9 @@ export class DepthManager {
    * fragment encoding matches the vertex encoding at shared vertices.
    */
   static encodeDepth(w: number): number {
-    return Math.log2(1.0 + w) * this.LOG_DEPTH_FC * 0.5;
+    this.resolveFar_();
+
+    return Math.log2(1.0 + w) * this.cachedFc_ * 0.5;
   }
 
   static setupDepthBuffer(gl: WebGL2RenderingContext): void {

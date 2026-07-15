@@ -22,6 +22,7 @@
 
 import { Planet } from '@app/app/objects/planet';
 import { SplashScreen } from '@app/app/ui/splash-screen';
+import { CameraType } from '@app/engine/camera/camera-type';
 import { SolarBody } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
@@ -30,14 +31,13 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { GlUtils } from '@app/engine/rendering/gl-utils';
 import { GLSL3 } from '@app/engine/rendering/material';
-import { ViewportManager } from '@app/engine/rendering/viewport-manager';
 import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
+import { ViewportManager } from '@app/engine/rendering/viewport-manager';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { FrameProfiler, GpuStage } from '@app/engine/utils/frame-profiler';
-import { CameraType } from '@app/engine/camera/camera-type';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, Sun, TEME, Vector3D } from '@ootk/src/main';
 import { BackdatePosition as backdatePosition, Body, KM_PER_AU } from 'astronomy-engine';
@@ -113,6 +113,12 @@ export class Earth {
   /** Keys of day textures whose load promise rejected — distinguishes failure from isBlackEarth. */
   private failedDayKeys_ = new Set<string>();
   private vaoOcclusion_: WebGLVertexArrayObject;
+  /**
+   * Output multiplier for the next atmosphere draw (shader uIntensity). Only
+   * {@link drawAtmospherePass} sets it above 1 — to 2.0 — so a single blended
+   * shell pass reproduces the additive brightness of the legacy double-draw.
+   */
+  private atmosphereIntensity_ = 1.0;
   /** Normalized vector pointing to the sun. */
   lightDirection = <vec3>[0, 0, 0];
   surfaceMesh: Mesh;
@@ -168,6 +174,40 @@ export class Earth {
     profiler.beginGpu(GpuStage.earth);
     this.drawBlackGpuPickingEarth_();
     profiler.endGpu(GpuStage.earth);
+  }
+
+  /**
+   * Background-pass half of the split earth draw: surface (writes the depth the
+   * moon/scenery/orbit layering depends on) + the picking-buffer earth. The
+   * atmosphere is deferred to {@link drawAtmospherePass} in the opaque pass so
+   * the shell is blended exactly once per frame instead of the historical
+   * surface+atmosphere double-draw in both passes.
+   */
+  drawSurfacePass(tgtBuffer: WebGLFramebuffer | null) {
+    const profiler = FrameProfiler.getInstance();
+
+    profiler.beginGpu(GpuStage.earth);
+    this.drawEarthSurface_(tgtBuffer);
+    this.drawBlackGpuPickingEarth_();
+    profiler.endGpu(GpuStage.earth);
+  }
+
+  /**
+   * Opaque-pass half of the split earth draw: the atmosphere shell only.
+   * `intensity` scales the shader output — the scene passes 2.0 to reproduce the
+   * exact additive brightness the old draw-it-twice pipeline produced (additive
+   * blending: dst + src + src === dst + 2·src), so the tuned look is unchanged.
+   */
+  drawAtmospherePass(tgtBuffer: WebGLFramebuffer | null, intensity = 1.0) {
+    if (settingsManager.isDrawAtmosphere === AtmosphereSettings.ON) {
+      const profiler = FrameProfiler.getInstance();
+
+      profiler.beginGpu(GpuStage.atmosphere);
+      this.atmosphereIntensity_ = intensity;
+      this.drawEarthAtmosphere_(tgtBuffer);
+      this.atmosphereIntensity_ = 1.0;
+      profiler.endGpu(GpuStage.atmosphere);
+    }
   }
 
   drawAtmosphereOnly(tgtBuffer: WebGLFramebuffer | null) {
@@ -286,6 +326,7 @@ export class Earth {
             uCoverageOpacity: <WebGLUniformLocation><unknown>null,
             uRawZoomLevel: <WebGLUniformLocation><unknown>null,
             uisDrawNightAsDay: <WebGLUniformLocation><unknown>null,
+            uNightBrightness: <WebGLUniformLocation><unknown>null,
           },
           vertexShader: this.shaders.surfaceVert,
           fragmentShader: this.shaders.surfaceFrag,
@@ -305,33 +346,6 @@ export class Earth {
         this.initVaoSurface_();
         this.initVaoOcclusion_();
 
-        if (this.shaders.atmosphereFrag !== '' && this.shaders.atmosphereVert !== '') {
-          const earthAtmosphereGeometry = new SphereGeometry(this.gl_, {
-            radius: RADIUS_OF_EARTH * 1.025, // Slightly larger than the earth
-            widthSegments: settingsManager.earthNumLatSegs,
-            heightSegments: settingsManager.earthNumLonSegs,
-          });
-          const earthAtmosphereMaterial = new ShaderMaterial(this.gl_, {
-            uniforms: {
-              uLightDirection: <WebGLUniformLocation><unknown>null,
-            },
-            vertexShader: this.shaders.atmosphereVert,
-            fragmentShader: this.shaders.atmosphereFrag,
-            glslVersion: GLSL3,
-          });
-
-          this.atmosphereMesh = new Mesh(this.gl_, earthAtmosphereGeometry, earthAtmosphereMaterial, {
-            name: 'earth-atmosphere',
-            precision: 'highp',
-            disabledUniforms: {
-              modelMatrix: true,
-              viewMatrix: true,
-            },
-          });
-
-          this.initVaoAtmosphere_();
-        }
-
         EventBus.getInstance().on(EventBusEvent.onLinesCleared, () => {
           this.isDrawOrbitPath = false;
           if (this.fullOrbitPath) {
@@ -341,9 +355,61 @@ export class Earth {
         });
 
       }
+
+      /*
+       * Build the atmosphere shell OUTSIDE the `if (!this.surfaceMesh)` guard above:
+       * its shaders are supplied by the EarthAtmosphere (Pro) plugin on the one-shot
+       * SceneReady event, which — with no EventBus replay — can land AFTER earth.init()
+       * has already run once. Re-checking on every init() (buildAtmosphereMesh no-ops
+       * until the shaders exist and only builds once) means a late shader install still
+       * produces an atmosphere instead of silently never creating the mesh.
+       */
+      this.buildAtmosphereMesh();
     } catch (error) {
       errorManagerInstance.warn(error);
     }
+  }
+
+  /**
+   * Build the atmosphere shell mesh from the shaders the EarthAtmosphere plugin
+   * installs onto `this.shaders`. Idempotent and order-independent: safe to call
+   * from earth.init() AND from the plugin the moment it installs the shaders. It
+   * no-ops until both the GL context and non-empty shaders are present, and only
+   * ever builds the mesh once.
+   */
+  buildAtmosphereMesh(): void {
+    if (this.atmosphereMesh || !this.gl_) {
+      return;
+    }
+    if (this.shaders.atmosphereFrag === '' || this.shaders.atmosphereVert === '') {
+      return;
+    }
+
+    const earthAtmosphereGeometry = new SphereGeometry(this.gl_, {
+      radius: RADIUS_OF_EARTH * 1.025, // Slightly larger than the earth
+      widthSegments: settingsManager.earthNumLatSegs,
+      heightSegments: settingsManager.earthNumLonSegs,
+    });
+    const earthAtmosphereMaterial = new ShaderMaterial(this.gl_, {
+      uniforms: {
+        uLightDirection: <WebGLUniformLocation><unknown>null,
+        uIntensity: <WebGLUniformLocation><unknown>null,
+      },
+      vertexShader: this.shaders.atmosphereVert,
+      fragmentShader: this.shaders.atmosphereFrag,
+      glslVersion: GLSL3,
+    });
+
+    this.atmosphereMesh = new Mesh(this.gl_, earthAtmosphereGeometry, earthAtmosphereMaterial, {
+      name: 'earth-atmosphere',
+      precision: 'highp',
+      disabledUniforms: {
+        modelMatrix: true,
+        viewMatrix: true,
+      },
+    });
+
+    this.initVaoAtmosphere_();
   }
 
   typeToString(): string {
@@ -459,6 +525,12 @@ export class Earth {
    * This is run once per frame to render a black earth in the GPU picking buffer.
    */
   private drawBlackGpuPickingEarth_() {
+    // No picking reads ever happen with GPU picking disabled — skip the full
+    // earth-sphere draw into the picking FBO (and its two framebuffer switches,
+    // which are expensive on tiled mobile GPUs).
+    if (settingsManager.isDisableGpuPicking) {
+      return;
+    }
     const gl = this.gl_;
     const dotsManagerInstance = ServiceLocator.getDotsManager();
 
@@ -577,6 +649,15 @@ export class Earth {
     gl.polygonOffset(0.0, -RADIUS_OF_EARTH * 50 * (1 - ServiceLocator.getMainCamera().zoomLevel()));
 
     gl.bindVertexArray(this.atmosphereMesh.geometry.vao);
+    /*
+     * Re-assert our own index buffer inside the VAO before drawing. On Android the atmosphere VAO's
+     * ELEMENT_ARRAY_BUFFER binding was observed clobbered by another mesh's index buffer (the sun's
+     * 32x32 sphere, ~12 KB), which desynced the bound index buffer from this geometry's indexLength
+     * (393216 UINT32 = 1.5 MB) and made every atmosphere draw fail with
+     * "glDrawElements: range out of bounds for buffer". Binding it here (VAO-captured state) makes
+     * the draw immune to whoever dirtied the VAO between frames.
+     */
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.atmosphereMesh.geometry.getIndex());
     gl.drawElements(gl.TRIANGLES, this.atmosphereMesh.geometry.indexLength, this.atmosphereMesh.geometry.indexType, 0);
     gl.bindVertexArray(null);
 
@@ -610,6 +691,7 @@ export class Earth {
     gl.uniform1f(this.surfaceMesh.material.uniforms.uCloudPosition, this.cloudPosition_);
     gl.uniform3fv(this.surfaceMesh.material.uniforms.uLightDirection, this.lightDirection);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uisDrawNightAsDay, settingsManager.isDrawNightAsDay ? 1.0 : 0.0);
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uNightBrightness, settingsManager.earthNightBrightness ?? 1.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uIsDrawAurora, settingsManager.isDrawAurora ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uShowGraticule, settingsManager.isDrawGraticule ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uCoverageEnabled, this.isDrawCoverageOverlay ? 1.0 : 0.0);
@@ -628,6 +710,7 @@ export class Earth {
     gl.uniform1f(this.atmosphereMesh.material.uniforms.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
 
     gl.uniform3fv(this.atmosphereMesh.material.uniforms.uLightDirection, this.lightDirection);
+    gl.uniform1f(this.atmosphereMesh.material.uniforms.uIntensity, this.atmosphereIntensity_);
   }
 
   private initPlaceholderTexture_(): void {
@@ -881,6 +964,7 @@ export class Earth {
     uniform float uRawZoomLevel;
     uniform float uisGrayScale;
     uniform float uisDrawNightAsDay;
+    uniform float uNightBrightness;
 
     in vec2 vUv;
     in vec3 vNormal;
@@ -965,7 +1049,9 @@ export class Earth {
       vec3 nightColor = vec3(0.0);
 
       if (uisDrawNightAsDay < 0.5) {
-        nightColor = smoothstep(0.0, 2.0, (1.0 - uZoomLevel)) * textureLod(uNightMap, vUv, -1.0).rgb * pow(1.0 - diffuse, 2.0);
+        // uNightBrightness gains up the night (city-lights) texture on the unlit side
+        // so the dark limb is readable on dim mobile screens (1.0 = stock brightness).
+        nightColor = smoothstep(0.0, 2.0, (1.0 - uZoomLevel)) * textureLod(uNightMap, vUv, -1.0).rgb * pow(1.0 - diffuse, 2.0) * uNightBrightness;
       } else {
         // If day night toggle is on, the nightColor should be bright like the day texture
         nightColor = textureLod(uDayMap, vUv, -1.0).rgb * pow(1.0 - diffuse, 2.0);

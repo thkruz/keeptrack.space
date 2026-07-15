@@ -183,7 +183,10 @@ export class PostProcessingManager {
 
     frameBufferInfo.renderBuffer = gl.createRenderbuffer(); // create RB to store the depth buffer
     gl.bindRenderbuffer(gl.RENDERBUFFER, frameBufferInfo.renderBuffer);
-    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
+    // DEPTH_COMPONENT24 (guaranteed in WebGL2): 16-bit quantizes the logarithmic
+    // depth so coarsely that orbit lines z-fight through the Earth — most visible
+    // on mobile GPUs when the scene routes through these FBOs (godrays enabled).
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT24, width, height);
 
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, frameBufferInfo.texture, 0);
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, frameBufferInfo.renderBuffer);

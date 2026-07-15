@@ -2,7 +2,36 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v13.4.0](https://github.com/thkruz/keeptrack.space/compare/v13.3.0...v13.4.0)
+
+- Fix fullscreen godrays on canvas resize and improve error handling [`#1409`](https://github.com/thkruz/keeptrack.space/pull/1409)
+- Update Supabase URL and subproject commit reference [`#1407`](https://github.com/thkruz/keeptrack.space/pull/1407)
+- feat(rendering): :sparkles: split earth surface/atmosphere passes, add world markers, harden godrays [`8da56a2`](https://github.com/thkruz/keeptrack.space/commit/8da56a2e332d337d5c2a131754705eb5bbf66f15)
+- chore(companion): :wrench: add companion build profile and config overrides [`bd7c611`](https://github.com/thkruz/keeptrack.space/commit/bd7c61143707f836c673a252459c2df0bd8bfadc)
+- feat(fetch-json): :sparkles: add fetchJson helper that rejects non-JSON responses [`eeefb7f`](https://github.com/thkruz/keeptrack.space/commit/eeefb7f1f4b471614e38b301e24086c00a240ad8)
+- fix(missile): :bug: load scenarios via fetchJson with actionable error handling [`b8e3e40`](https://github.com/thkruz/keeptrack.space/commit/b8e3e40e1ac65f2f2dc789790c9b9ff3d7f63a32)
+- feat(settings): :sparkles: add embed profile knobs for telemetry, sounds, picking, canvas, and markers [`0212d20`](https://github.com/thkruz/keeptrack.space/commit/0212d20d7bf981fdc3fd1c79ac23292e57243c4b)
+- fix(godrays): :bug: keep sun/godrays full-screen after canvas resize [`b5a9f24`](https://github.com/thkruz/keeptrack.space/commit/b5a9f241620fb6f9d0f275cf6bf4a99e7e63d904)
+- i18n(locales): :globe_with_meridians: add companion profile name [`76cd4ab`](https://github.com/thkruz/keeptrack.space/commit/76cd4abb4cd0a0cc5a0f66e8e21c72cb20a0af61)
+- fix(sound-manager): :bug: guard optional speechSynthesis and honor isDisableSounds [`e2ff13f`](https://github.com/thkruz/keeptrack.space/commit/e2ff13f4f0ff6110118471d7a52891d247cde4bd)
+- chore(seo): :wrench: update canonical and og URLs to app.keeptrack.space [`ce71714`](https://github.com/thkruz/keeptrack.space/commit/ce71714cb55cd540cd3aad7f1cd109fbf73ebda8)
+- fix(mobile): :bug: add isForceMobileMode override and restore mobile sky visuals [`05f5767`](https://github.com/thkruz/keeptrack.space/commit/05f576708a9b74bc11c211c6afc1419fde50a811)
+- fix(select-sat-manager): :bug: preserve deployment maxZoomDistance on Earth-centered selection [`514d7c3`](https://github.com/thkruz/keeptrack.space/commit/514d7c3b31b1223dea7d547c4dee86a5bc6dba6e)
+- feat(camera): :sparkles: add per-mode maxDistanceFromTarget standoff cap [`24ca5d2`](https://github.com/thkruz/keeptrack.space/commit/24ca5d2da912ef869b4e8e08ff358c2d321b5aec)
+- chore(configs): :wrench: update Supabase URL to custom domain [`20e65c8`](https://github.com/thkruz/keeptrack.space/commit/20e65c8b64a990afc0eb1bef1631f3d3b119bf6b)
+- feat(pwa): :sparkles: let embeds opt out of the service worker [`8b7963d`](https://github.com/thkruz/keeptrack.space/commit/8b7963d43eccacfd060e836124c517c7cef728bf)
+- fix(input): :bug: skip picking readback when gpu picking is disabled [`415b0ea`](https://github.com/thkruz/keeptrack.space/commit/415b0ea1ee65d54b1f0662216702b81c19daee03)
+- fix(sat-cruncher): :bug: allow empty-catalog boot with all-zero positions [`13a1aa2`](https://github.com/thkruz/keeptrack.space/commit/13a1aa2a6b055b30a31dea2bcd12deaee2dac141)
+- fix(mobileManager): :bug: correct reference to settingsOverride [`f5d2bda`](https://github.com/thkruz/keeptrack.space/commit/f5d2bda32e33e09fced143c6fefd1a895aedd74e)
+- chore(plugins-pro): :wrench: update subproject commit reference [`f2a2f78`](https://github.com/thkruz/keeptrack.space/commit/f2a2f788fbdb0099b860411d1ef19e21ef77783d)
+- chore(plugins-pro): :wrench: update subproject commit reference [`b3b4b99`](https://github.com/thkruz/keeptrack.space/commit/b3b4b99c4695ecb178d4543d6983720d8e8f9aa5)
+- chore(plugins-pro): :wrench: update subproject commit reference [`5ea2e91`](https://github.com/thkruz/keeptrack.space/commit/5ea2e91678a20d620c0a798b6e092007df185b1b)
+- chore(scenario): :wrench: add scenario:validate npm script for maneuver-error validation [`c7ac368`](https://github.com/thkruz/keeptrack.space/commit/c7ac368567230c6f6f1189249c82f822f647ebc6)
+- chore(assets): :wrench: add earthbump 1k/2k textures and refresh pwa icons [`5552964`](https://github.com/thkruz/keeptrack.space/commit/55529644ec94479006c43f609ec0dc35b36c9656)
+
 #### [v13.3.0](https://github.com/thkruz/keeptrack.space/compare/v13.2.0...v13.3.0)
+
+>  
 
 - Add workload counters and instrument render pipeline for diagnostics [`#1405`](https://github.com/thkruz/keeptrack.space/pull/1405)
 - Add dedicated CodeQL workflow and remove redundant job [`#1404`](https://github.com/thkruz/keeptrack.space/pull/1404)
@@ -11,6 +40,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - feat(engine): :sparkles: instrument render pipeline for low-end bottleneck diagnosis [`6fd319a`](https://github.com/thkruz/keeptrack.space/commit/6fd319ae3d9b1a879f3e8e096652afd2c98b8379)
 - chore(codeql): :wrench: add dedicated CodeQL workflow for default-branch scans [`84fc699`](https://github.com/thkruz/keeptrack.space/commit/84fc69913e0f2ffb374d9c19f57aac92741d0fbc)
 - chore(build-pipeline): :wrench: remove redundant CodeQL job now in codeql.yml [`16b4302`](https://github.com/thkruz/keeptrack.space/commit/16b4302cfb5bea0de85e953f275e4a1b8b0f136b)
+- chore(release): :bookmark: 13.3.0 [skip ci] [`791b58d`](https://github.com/thkruz/keeptrack.space/commit/791b58d53ef8b1139d3c68cd07b1f81580e0dd02)
 - chore(plugins-pro): :wrench: update subproject commit reference [`9c01c85`](https://github.com/thkruz/keeptrack.space/commit/9c01c855da1832aeb11a3825243d81d389da84e1)
 
 #### [v13.2.0](https://github.com/thkruz/keeptrack.space/compare/v13.1.0...v13.2.0)

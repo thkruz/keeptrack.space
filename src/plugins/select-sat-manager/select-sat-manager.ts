@@ -338,6 +338,8 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       settingsManager.minZoomDistance = RADIUS_OF_EARTH + 50 as Kilometers;
     } else if (!(obj instanceof OemSatellite)) {
       // Currently Satellites and Missiles assume Earth center
+      const wasOffEarth = settingsManager.centerBody !== SolarBody.Earth;
+
       settingsManager.centerBody = SolarBody.Earth;
       // Missiles fly from the surface up, so drop the zoom-in floor to the surface
       // so the camera can close in on the mesh at ANY point in the flight, including
@@ -347,7 +349,13 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       // 50 km floor. Previously both used +50 km, which held the camera above a
       // boosting missile and blocked close inspection of the mesh early in flight.
       settingsManager.minZoomDistance = (obj?.isMissile() ? RADIUS_OF_EARTH : RADIUS_OF_EARTH + 50) as Kilometers;
-      settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
+      // Restore the Earth-orbit zoom ceiling ONLY when returning from a planet view
+      // (which shrinks/widens it per body). An Earth-centered selection must not
+      // stomp a deployment's configured maxZoomDistance (e.g. the companion embed
+      // caps it at the GEO belt).
+      if (wasOffEarth) {
+        settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
+      }
       PluginRegistry.getPlugin(PlanetsMenuPlugin)?.setAllPlanetsDotSize(0);
     }
   }

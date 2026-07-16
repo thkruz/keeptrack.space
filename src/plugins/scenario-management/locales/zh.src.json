@@ -4,6 +4,9 @@
       "title": "情景管理",
       "bottomIconLabel": "情景管理",
       "sideMenuTitle": "情景设置",
+      "sections": {
+        "actions": "操作"
+      },
       "labels": {
         "scenarioName": "情景名称",
         "description": "描述",

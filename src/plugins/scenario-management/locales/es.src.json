@@ -4,6 +4,9 @@
       "title": "Gestión de escenarios",
       "bottomIconLabel": "Gestión de escenarios",
       "sideMenuTitle": "Configuración del escenario",
+      "sections": {
+        "actions": "Acciones"
+      },
       "labels": {
         "scenarioName": "Nombre del escenario",
         "description": "Descripción",

@@ -4,6 +4,9 @@
       "title": "Správa scénářů",
       "bottomIconLabel": "Správa scénářů",
       "sideMenuTitle": "Nastavení scénáře",
+      "sections": {
+        "actions": "Akce"
+      },
       "labels": {
         "scenarioName": "Název scénáře",
         "description": "Popis",

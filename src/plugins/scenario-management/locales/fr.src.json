@@ -4,6 +4,9 @@
       "title": "Gestion des scénarios",
       "bottomIconLabel": "Gestion des scénarios",
       "sideMenuTitle": "Paramètres du scénario",
+      "sections": {
+        "actions": "Actions"
+      },
       "labels": {
         "scenarioName": "Nom du scénario",
         "description": "Descriptif",

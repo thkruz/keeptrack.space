@@ -4,6 +4,9 @@
       "title": "Gestione scenari",
       "bottomIconLabel": "Gestione scenari",
       "sideMenuTitle": "Impostazioni scenario",
+      "sections": {
+        "actions": "Azioni"
+      },
       "labels": {
         "scenarioName": "Nome scenario",
         "description": "Descrizione",

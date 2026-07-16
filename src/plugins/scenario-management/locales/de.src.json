@@ -4,6 +4,9 @@
       "title": "Szenarienverwaltung",
       "bottomIconLabel": "Szenarienverwaltung",
       "sideMenuTitle": "Szenario-Einstellungen",
+      "sections": {
+        "actions": "Aktionen"
+      },
       "labels": {
         "scenarioName": "Szenarioname",
         "description": "Beschreibung",

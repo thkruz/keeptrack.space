@@ -1,0 +1,30 @@
+/*
+ * Scenario Management (OSS) menu styles. The menu opts into the shared v13
+ * card system (.kt-ui-v13 + kt-section/kt-field-row/kt-action); see
+ * src/engine/ui/menu-v13.css. Only the dense-form fixes are needed. The Pro
+ * override authors its own body and carries its own CSS
+ * (scenario-management-pro.css), so these rules never double-load.
+ */
+
+/* 1. Stacked-field headroom: the settings card stacks four labelled rows, so
+ *    the floating "active" labels collide with the row above without extra top
+ *    margin. The first row only needs the section-label gap. */
+#scenario-management-menu .kt-field-row .input-field.col { margin-top: 20px; }
+#scenario-management-menu .kt-section-label + .kt-field-row .input-field.col { margin-top: 8px; }
+
+/* 2. Standalone primary action width: the Update submit is a direct child of
+ *    the form, so subtract the card side margins to line its edges up. */
+#scenario-management-form-form > .kt-action {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
+}
+
+/* 3. Focus indication: swap the app-wide :focus-visible outline (which overlaps
+ *    the floating label) for KeepTrack's underline. */
+#scenario-management-menu .input-field input:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#scenario-management-menu .input-field input:focus-visible { outline: none; }

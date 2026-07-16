@@ -4,6 +4,9 @@
       "title": "Управління сценаріями",
       "bottomIconLabel": "Управління сценаріями",
       "sideMenuTitle": "Налаштування сценарію",
+      "sections": {
+        "actions": "Дії"
+      },
       "labels": {
         "scenarioName": "Назва сценарію",
         "description": "Опис",

@@ -4,6 +4,9 @@
       "title": "Zarządzanie scenariuszami",
       "bottomIconLabel": "Zarządzanie scenariuszami",
       "sideMenuTitle": "Ustawienia scenariusza",
+      "sections": {
+        "actions": "Akcje"
+      },
       "labels": {
         "scenarioName": "Nazwa scenariusza",
         "description": "Opis",

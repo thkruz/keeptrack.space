@@ -36,6 +36,7 @@ import { t7e } from '@app/locales/keys';
 import landscape3Png from '@public/img/icons/landscape3.png';
 import { saveAs } from 'file-saver';
 import { syncFormFields, validateDateInput } from './scenario-form-utils';
+import './scenario-management.css';
 import { ScenarioData, ScenarioManagementPlugin } from './scenario-management';
 
 /** Shorthand for this plugin's locale keys. */
@@ -81,51 +82,60 @@ export class ScenarioManagementMenu extends KeepTrackPlugin {
   }
 
   sideMenuElementHtml: string = html`
-  <div id="scenario-management-menu" class="side-menu-parent start-hidden">
+  <div id="scenario-management-menu" class="side-menu-parent start-hidden kt-ui-v13">
     <div id="scenario-management-content" class="side-menu">
-      <div class="row">
-        <form id="${this.formPrefix_}-form">
+      <form id="${this.formPrefix_}-form">
+        <section class="kt-section">
+          <div class="kt-section-label">${l('sideMenuTitle')}</div>
           <div id="${this.formPrefix_}-general">
-            <div class="row center"></div>
-            </br>
-            <div class="row center">
-              <button id="${this.formPrefix_}-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">${l('buttons.updateScenario')} &#9658;</button>
-            </div>
-            <h5 class="center-align">${l('sideMenuTitle')}</h5>
             <!-- Scenario Name -->
-            <div class="input-field col s12">
-              <input required id="${this.formPrefix_}-name" type="text" kt-tooltip="${l('tooltips.name')}">
-              <label class="active" for="${this.formPrefix_}-name">${l('labels.scenarioName')}</label>
+            <div class="kt-field-row">
+              <div class="input-field col s12">
+                <input required id="${this.formPrefix_}-name" type="text" kt-tooltip="${l('tooltips.name')}">
+                <label class="active" for="${this.formPrefix_}-name">${l('labels.scenarioName')}</label>
+              </div>
             </div>
             <!-- Scenario Description -->
-            <div class="input-field col s12">
-              <input id="${this.formPrefix_}-description" type="text"
-              kt-tooltip="${l('tooltips.description')}" placeholder="${l('placeholders.description')}">
-              <label class="active" for="${this.formPrefix_}-description">${l('labels.description')}</label>
+            <div class="kt-field-row">
+              <div class="input-field col s12">
+                <input id="${this.formPrefix_}-description" type="text"
+                kt-tooltip="${l('tooltips.description')}" placeholder="${l('placeholders.description')}">
+                <label class="active" for="${this.formPrefix_}-description">${l('labels.description')}</label>
+              </div>
             </div>
             <!-- Scenario Start DateTime -->
-            <div class="input-field col s12">
-              <input id="${this.formPrefix_}-start-date" type="text"
-                kt-tooltip="${l('tooltips.startDate')}" placeholder="YYYY-MM-DD HH:MM:SS.sss"
-              >
-              <label class="active" for="${this.formPrefix_}-start-date">${l('labels.scenarioStart')}</label>
+            <div class="kt-field-row">
+              <div class="input-field col s12">
+                <input id="${this.formPrefix_}-start-date" type="text"
+                  kt-tooltip="${l('tooltips.startDate')}" placeholder="YYYY-MM-DD HH:MM:SS.sss"
+                >
+                <label class="active" for="${this.formPrefix_}-start-date">${l('labels.scenarioStart')}</label>
+              </div>
             </div>
             <!-- Scenario End DateTime -->
-            <div class="input-field col s12">
-              <input id="${this.formPrefix_}-end-date" type="text"
-                kt-tooltip="${l('tooltips.endDate')}" placeholder="YYYY-MM-DD HH:MM:SS.sss"
-              >
-              <label class="active" for="${this.formPrefix_}-end-date">${l('labels.scenarioEnd')}</label>
+            <div class="kt-field-row">
+              <div class="input-field col s12">
+                <input id="${this.formPrefix_}-end-date" type="text"
+                  kt-tooltip="${l('tooltips.endDate')}" placeholder="YYYY-MM-DD HH:MM:SS.sss"
+                >
+                <label class="active" for="${this.formPrefix_}-end-date">${l('labels.scenarioEnd')}</label>
+              </div>
             </div>
           </div>
-        </form>
-        <div class="row center">
-          <button id="${this.formPrefix_}-save" class="btn btn-ui waves-effect waves-light">${l('buttons.saveScenario')} &#9658;</button>
-        </div>
-        <div class="row center">
-          <button id="${this.formPrefix_}-load" class="btn btn-ui waves-effect waves-light">${l('buttons.loadScenario')} &#9658;</button>
-        </div>
-      </div>
+        </section>
+        <button id="${this.formPrefix_}-submit" class="kt-action waves-effect" type="submit" name="action">
+          <span class="kt-action-label">${l('buttons.updateScenario')}</span>
+        </button>
+      </form>
+      <section class="kt-section">
+        <div class="kt-section-label">${l('sections.actions')}</div>
+        <button id="${this.formPrefix_}-save" class="kt-action waves-effect" type="button">
+          <span class="kt-action-label">${l('buttons.saveScenario')}</span>
+        </button>
+        <button id="${this.formPrefix_}-load" class="kt-action waves-effect" type="button">
+          <span class="kt-action-label">${l('buttons.loadScenario')}</span>
+        </button>
+      </section>
     </div>
   </div>`;
 

@@ -4,6 +4,9 @@
       "title": "シナリオ管理",
       "bottomIconLabel": "シナリオ管理",
       "sideMenuTitle": "シナリオ設定",
+      "sections": {
+        "actions": "操作"
+      },
       "labels": {
         "scenarioName": "シナリオ名",
         "description": "説明",

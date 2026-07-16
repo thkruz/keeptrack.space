@@ -4,6 +4,9 @@
       "title": "Scenario Management",
       "bottomIconLabel": "Scenario Management",
       "sideMenuTitle": "Scenario Settings",
+      "sections": {
+        "actions": "Actions"
+      },
       "labels": {
         "scenarioName": "Scenario Name",
         "description": "Description",

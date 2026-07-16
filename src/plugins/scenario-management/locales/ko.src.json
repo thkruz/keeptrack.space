@@ -4,6 +4,9 @@
       "title": "시나리오 관리",
       "bottomIconLabel": "시나리오 관리",
       "sideMenuTitle": "시나리오 설정",
+      "sections": {
+        "actions": "작업"
+      },
       "labels": {
         "scenarioName": "시나리오 이름",
         "description": "설명",

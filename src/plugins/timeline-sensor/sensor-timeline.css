@@ -1,0 +1,78 @@
+/*
+ * Sensor Timeline menu styles. The settings secondary menu opts into the
+ * shared v13 card system (.kt-ui-v13 + kt-section/kt-field-row); see
+ * src/engine/ui/menu-v13.css. Only the dense-form fixes for the stacked
+ * settings fields and the green/red sensor toggle chips need plugin-specific
+ * styling (chips match Multi-Sensor Look Angles' .msla-sensor-toggle).
+ */
+
+.stl-switch-row {
+  margin: 12px 0 0;
+}
+
+/* 1. Stacked-field headroom: the settings card stacks four labelled fields, so
+ *    the floating "active" labels collide with the row above without extra top
+ *    margin. The first row only needs the section-label gap. */
+#sensor-timeline-menu-secondary .kt-field-row .input-field.col { margin-top: 20px; }
+#sensor-timeline-menu-secondary .kt-section-label + .kt-field-row .input-field.col { margin-top: 8px; }
+
+/* 3. Focus indication: swap the app-wide :focus-visible outline (which overlaps
+ *    the floating label) for KeepTrack's underline. */
+#sensor-timeline-menu-secondary .input-field input:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#sensor-timeline-menu-secondary .input-field input:focus-visible { outline: none; }
+
+/* ===== Sensor toggle chips (inside a v13 section card) ===== */
+.stl-sensor-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin: 4px 0 0;
+}
+
+.stl-sensor-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--color-dark-border);
+  border-radius: var(--kt-radius-md, 6px);
+  background: var(--color-dark-cell, rgba(255, 255, 255, 0.03));
+  color: var(--color-text-light, #f5f5f5);
+  font-size: 12px;
+  line-height: 1.2;
+  text-align: left;
+  text-transform: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+/* Status dot: green when included, red when excluded. */
+.stl-sensor-toggle::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-dark-text-muted);
+}
+
+.stl-sensor-toggle.is-on::before {
+  background: #2d7b31;
+}
+
+.stl-sensor-toggle.is-off::before {
+  background: #c62828;
+}
+
+.stl-sensor-toggle.is-off {
+  color: var(--color-dark-text-muted);
+}
+
+.stl-sensor-toggle:hover {
+  border-color: var(--color-primary-light, #e01a0e);
+}

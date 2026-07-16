@@ -30,6 +30,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { t7e } from '@app/locales/keys';
 import { fetchWeatherApi } from 'openmeteo';
+import './sensor-timeline.css';
 
 interface Pass {
   start: Date;
@@ -194,56 +195,60 @@ export class SensorTimeline extends KeepTrackPlugin {
       <canvas id="sensor-timeline-canvas-static" style="display: none;"></canvas>
     </div>`;
   sideMenuSecondaryHtml: string = html`
-    <div class="row">
-      <div class="input-field col s12">
-        <input id="sensor-timeline-setting-total-length" value="${this.lengthOfLookAngles_.toString()}" type="text"
-          style="text-align: center;"
-        />
-        <label for="sensor-timeline-setting-total-length" class="active">${t7e('plugins.SensorTimeline.labels.calculationLength')}</label>
+    <section class="kt-section">
+      <div class="kt-section-label">${t7e('plugins.SensorTimeline.sections.settings')}</div>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <input id="sensor-timeline-setting-total-length" value="${this.lengthOfLookAngles_.toString()}" type="text"
+            style="text-align: center;"
+          />
+          <label for="sensor-timeline-setting-total-length" class="active">${t7e('plugins.SensorTimeline.labels.calculationLength')}</label>
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="input-field col s12">
-        <input id="sensor-timeline-setting-interval" value="${this.angleCalculationInterval_.toString()}" type="text"
-          style="text-align: center;"
-        />
-        <label for="sensor-timeline-setting-interval" class="active">${t7e('plugins.SensorTimeline.labels.calculationInterval')}</label>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <input id="sensor-timeline-setting-interval" value="${this.angleCalculationInterval_.toString()}" type="text"
+            style="text-align: center;"
+          />
+          <label for="sensor-timeline-setting-interval" class="active">${t7e('plugins.SensorTimeline.labels.calculationInterval')}</label>
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="input-field col s12">
-        <input id="sensor-timeline-setting-bad-length" value="${this.lengthOfBadPass_.toString()}" type="text"
-          style="text-align: center;"
-        />
-        <label for="sensor-timeline-setting-bad-length" class="active">${t7e('plugins.SensorTimeline.labels.badPassLength')}</label>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <input id="sensor-timeline-setting-bad-length" value="${this.lengthOfBadPass_.toString()}" type="text"
+            style="text-align: center;"
+          />
+          <label for="sensor-timeline-setting-bad-length" class="active">${t7e('plugins.SensorTimeline.labels.badPassLength')}</label>
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="input-field col s12">
-        <input id="sensor-timeline-setting-avg-length" value="${this.lengthOfAvgPass_.toString()}" type="text"
-          style="text-align: center;"
-        />
-        <label for="sensor-timeline-setting-avg-length" class="active">${t7e('plugins.SensorTimeline.labels.avgPassLength')}</label>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <input id="sensor-timeline-setting-avg-length" value="${this.lengthOfAvgPass_.toString()}" type="text"
+            style="text-align: center;"
+          />
+          <label for="sensor-timeline-setting-avg-length" class="active">${t7e('plugins.SensorTimeline.labels.avgPassLength')}</label>
+        </div>
       </div>
-    </div>
-    <div class="switch row">
-            <label for="sensor-timeline-toggle" data-position="top" data-delay="50" data-tooltip="${t7e('plugins.SensorTimeline.labels.detailedPlot')}">
-              <input id="sensor-timeline-toggle" type="checkbox"/>
-              <span class="lever"></span>
-              ${t7e('plugins.SensorTimeline.labels.detailedPlot')}
-            </label>
-    </div>
-    <div class="switch row">
-            <label for="weather-toggle" data-position="top" data-delay="50" data-tooltip="${t7e('plugins.SensorTimeline.labels.useWeatherTooltip')}">
-              <input id="weather-toggle" type="checkbox" checked/>
-              <span class="lever"></span>
-              ${t7e('plugins.SensorTimeline.labels.useWeather')}
-            </label>
-    </div>
-    <div class="row" style="margin: 0 10px;">
-      <div id="sensor-timeline-sensor-list">
+      <div class="switch stl-switch-row">
+        <label for="sensor-timeline-toggle" data-position="top" data-delay="50" data-tooltip="${t7e('plugins.SensorTimeline.labels.detailedPlot')}">
+          <input id="sensor-timeline-toggle" type="checkbox"/>
+          <span class="lever"></span>
+          ${t7e('plugins.SensorTimeline.labels.detailedPlot')}
+        </label>
       </div>
-    </div>`;
+      <div class="switch stl-switch-row">
+        <label for="weather-toggle" data-position="top" data-delay="50" data-tooltip="${t7e('plugins.SensorTimeline.labels.useWeatherTooltip')}">
+          <input id="weather-toggle" type="checkbox" checked/>
+          <span class="lever"></span>
+          ${t7e('plugins.SensorTimeline.labels.useWeather')}
+        </label>
+      </div>
+    </section>
+    <section class="kt-section">
+      <div class="kt-section-label">${t7e('plugins.SensorTimeline.sections.sensors')}</div>
+      <div id="sensor-timeline-sensor-list" class="stl-sensor-list">
+      </div>
+    </section>`;
   sideMenuSecondaryOptions = {
     width: 350,
     leftOffset: 0,
@@ -304,6 +309,10 @@ export class SensorTimeline extends KeepTrackPlugin {
     EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
+        // v13 marker: the wrappers are generated, not authored
+        getEl('sensor-timeline-menu')?.classList.add('kt-ui-v13');
+        getEl('sensor-timeline-menu-secondary')?.classList.add('kt-ui-v13');
+
         this.canvas_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas');
         this.canvasStatic_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas-static');
         this.ctx_ = this.canvas_.getContext('2d') as CanvasRenderingContext2D;
@@ -316,7 +325,7 @@ export class SensorTimeline extends KeepTrackPlugin {
         });
 
         getEl('sensor-timeline-setting-interval')!.addEventListener('change', () => {
-          this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-bad-length')).value) as Seconds;
+          this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-interval')).value) as Seconds;
           this.ctxStatic_.reset();
           this.updateTimeline();
         });
@@ -440,20 +449,19 @@ export class SensorTimeline extends KeepTrackPlugin {
       }
 
       const sensorButton = document.createElement('button');
+      const isEnabled = this.enabledSensors_.includes(sensor);
 
-      sensorButton.classList.add('btn', 'btn-ui', 'waves-effect', 'waves-light');
-      if (!this.enabledSensors_.includes(sensor)) {
-        sensorButton.classList.add('btn-red');
-      }
+      sensorButton.type = 'button';
+      sensorButton.classList.add('stl-sensor-toggle', isEnabled ? 'is-on' : 'is-off');
 
       sensorButton.innerText = sensor.uiName ?? sensor.shortName ?? sensor.objName;
       sensorButton.addEventListener('click', () => {
-        if (sensorButton.classList.contains('btn-red')) {
-          sensorButton.classList.remove('btn-red');
+        if (sensorButton.classList.contains('is-off')) {
+          sensorButton.classList.replace('is-off', 'is-on');
           this.enabledSensors_.push(sensor);
           ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
         } else {
-          sensorButton.classList.add('btn-red');
+          sensorButton.classList.replace('is-on', 'is-off');
           this.enabledSensors_.splice(this.enabledSensors_.indexOf(sensor), 1);
           ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
         }
@@ -464,7 +472,6 @@ export class SensorTimeline extends KeepTrackPlugin {
         PersistenceManager.getInstance().saveItem(StorageKey.SENSOR_TIMELINE_ENABLED_SENSORS, JSON.stringify(this.enabledSensors_.map((s) => s.sensorId!)));
       });
       sensorListDom.appendChild(sensorButton);
-      sensorListDom.appendChild(document.createTextNode(' '));
     }
   }
 

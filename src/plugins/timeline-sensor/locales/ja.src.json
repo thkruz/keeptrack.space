@@ -3,6 +3,10 @@
     "SensorTimeline": {
       "bottomIconLabel": "センサータイムライン",
       "title": "センサータイムラインメニュー",
+      "sections": {
+        "settings": "設定",
+        "sensors": "センサー"
+      },
       "labels": {
         "calculationLength": "計算期間（時間）",
         "calculationInterval": "計算間隔（秒）",

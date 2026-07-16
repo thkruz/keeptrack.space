@@ -3,6 +3,10 @@
     "SensorTimeline": {
       "bottomIconLabel": "Sensor-Zeitachse",
       "title": "Sensor-Zeitachsen-Menü",
+      "sections": {
+        "settings": "Einstellungen",
+        "sensors": "Sensoren"
+      },
       "labels": {
         "calculationLength": "Berechnungsdauer (Stunden)",
         "calculationInterval": "Berechnungsintervall (Sekunden)",

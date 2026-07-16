@@ -3,6 +3,10 @@
     "SensorTimeline": {
       "bottomIconLabel": "Oś czasu czujnika",
       "title": "Menu osi czasu czujnika",
+      "sections": {
+        "settings": "Ustawienia",
+        "sensors": "Czujniki"
+      },
       "labels": {
         "calculationLength": "Długość obliczeń (godziny)",
         "calculationInterval": "Interwał obliczeń (sekundy)",

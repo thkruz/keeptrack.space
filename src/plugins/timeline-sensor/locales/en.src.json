@@ -3,6 +3,10 @@
     "SensorTimeline": {
       "bottomIconLabel": "Sensor Timeline",
       "title": "Sensor Timeline Menu",
+      "sections": {
+        "settings": "Settings",
+        "sensors": "Sensors"
+      },
       "labels": {
         "calculationLength": "Calculation Length (Hours)",
         "calculationInterval": "Calculation Interval (Seconds)",

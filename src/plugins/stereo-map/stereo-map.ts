@@ -252,6 +252,10 @@ export class StereoMap extends KeepTrackPlugin {
     EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
+        // v13 marker: the wrapper (and the Pro secondary menu) are generated, not authored
+        getEl('map-menu')?.classList.add('kt-ui-v13');
+        getEl('map-menu-secondary', true)?.classList.add('kt-ui-v13');
+
         // Remove side-menu padding/border that conflicts with full-width canvas
         const contentDiv = getEl('map-menu-content');
 

@@ -83,7 +83,7 @@ export class RicPlot extends KeepTrackPlugin {
 
   sideMenuElementName = 'ric-plots-menu';
   sideMenuElementHtml: string = html`
-  <div id="ric-plots-menu" class="side-menu-parent start-hidden plot-analysis-menu-normal">
+  <div id="ric-plots-menu" class="side-menu-parent start-hidden plot-analysis-menu-normal kt-ui-v13">
     <div id="plot-analysis-content" class="side-menu">
       <div class="ric-plots-controls">
         <div class="input-field ric-orbits-field">

@@ -60,7 +60,7 @@ export class EciPlot extends KeepTrackPlugin {
 
   sideMenuElementName = 'eci-plots-menu';
   sideMenuElementHtml: string = html`
-  <div id="eci-plots-menu" class="side-menu-parent start-hidden plot-analysis-menu-normal">
+  <div id="eci-plots-menu" class="side-menu-parent start-hidden plot-analysis-menu-normal kt-ui-v13">
     <div id="plot-analysis-content" class="side-menu">
       <div id="${this.plotCanvasId}" class="plot-analysis-chart plot-analysis-menu-maximized"></div>
     </div>

@@ -1,29 +1,90 @@
+/*
+ * OrbitGuard menu styles. The menu opts into the shared v13 card system
+ * (.kt-ui-v13 + kt-section); see src/engine/ui/menu-v13.css. Only the results
+ * table chrome, the pagination chips, and the red detection highlight need
+ * plugin-specific styling.
+ */
+
+/* ===== Results table (inside a v13 section card) ===== */
 #maneuver-detection-table {
-  line-height: 1; /* increase spacing between rows */
-  font-size: 14px; /* bigger font */
+  width: 100%;
+  margin: 4px 0 0;
+  border-collapse: collapse;
+  line-height: 1.4;
+  font-size: 13px;
 }
 
-#maneuver-detection-table td,
-#maneuver-detection-table th {
+#maneuver-detection-table td {
   text-align: center;
-  padding: 8px 12px; /* more horizontal and vertical padding */
+  padding: 5px 6px;
+  border-bottom: 1px solid var(--color-dark-border);
 }
 
-#maneuver-detection-table th {
-  font-weight: bold;
-  text-decoration: underline;
+/* Header row (v13 uppercase-muted look; replaces the old per-cell underline) */
+#maneuver-detection-table .ogm-table-header td {
+  padding: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-dark-text-muted);
+  border-bottom: 1px solid var(--color-dark-border);
 }
 
-#pagination-controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%; /* make it span the full width */
-  text-align: center; /* ensure text centering works */
-  margin-top: 10px;
+/* Clickable event rows */
+#maneuver-detection-table tr.link {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+#maneuver-detection-table tr.link:hover {
+  background-color: rgba(255, 255, 255, 0.07);
 }
 
 .highlight-red {
   background-color: #e51c23 !important;
   color: white !important;
+}
+
+/* ===== Pagination ===== */
+#pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.pagination-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--color-dark-border);
+  border-radius: var(--kt-radius-md, 6px);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-light, #f5f5f5);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: var(--color-primary-light, #e01a0e);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-text {
+  font-size: 12px;
+  color: var(--color-dark-text-muted);
+}
+
+.ogm-attribution {
+  display: block;
+  margin-top: 8px;
+  text-align: center;
+  color: var(--color-dark-text-muted);
 }

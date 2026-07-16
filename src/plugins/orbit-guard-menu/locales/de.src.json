@@ -3,6 +3,9 @@
     "OrbitGuardMenuPlugin": {
       "bottomIconLabel": "OrbitGuard",
       "title": "OrbitGuard",
+      "sections": {
+        "results": "Ergebnisse"
+      },
       "labels": {
         "dataCredit": "*OrbitGuard-Daten bereitgestellt von MSBAI.",
         "previous": "Zurück",

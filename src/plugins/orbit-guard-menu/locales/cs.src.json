@@ -3,6 +3,9 @@
     "OrbitGuardMenuPlugin": {
       "bottomIconLabel": "Strážce orbity",
       "title": "Strážce orbity",
+      "sections": {
+        "results": "Výsledky"
+      },
       "labels": {
         "dataCredit": "*Data Strážce orbity poskytuje MSBAI.",
         "previous": "Předchozí",

@@ -3,6 +3,9 @@
     "OrbitGuardMenuPlugin": {
       "bottomIconLabel": "OrbitGuard",
       "title": "OrbitGuard",
+      "sections": {
+        "results": "结果"
+      },
       "labels": {
         "dataCredit": "*OrbitGuard 数据由 MSBAI 提供。",
         "previous": "上一页",

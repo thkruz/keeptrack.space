@@ -3,6 +3,9 @@
     "OrbitGuardMenuPlugin": {
       "bottomIconLabel": "OrbitGuard",
       "title": "OrbitGuard",
+      "sections": {
+        "results": "結果"
+      },
       "labels": {
         "dataCredit": "*OrbitGuardのデータはMSBAIから提供されています。",
         "previous": "前へ",

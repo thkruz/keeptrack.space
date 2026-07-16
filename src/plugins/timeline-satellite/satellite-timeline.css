@@ -1,0 +1,21 @@
+/*
+ * Satellite Timeline menu styles. The settings secondary menu opts into the
+ * shared v13 card system (.kt-ui-v13 + kt-section/kt-field-row); see
+ * src/engine/ui/menu-v13.css. Only the dense-form fixes for the stacked
+ * settings fields need plugin-specific styling.
+ */
+
+/* 1. Stacked-field headroom: the settings card stacks four labelled fields, so
+ *    the floating "active" labels collide with the row above without extra top
+ *    margin. The first row only needs the section-label gap. */
+#satellite-timeline-menu-secondary .kt-field-row .input-field.col { margin-top: 20px; }
+#satellite-timeline-menu-secondary .kt-section-label + .kt-field-row .input-field.col { margin-top: 8px; }
+
+/* 3. Focus indication: swap the app-wide :focus-visible outline (which overlaps
+ *    the floating label) for KeepTrack's underline. */
+#satellite-timeline-menu-secondary .input-field input:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#satellite-timeline-menu-secondary .input-field input:focus-visible { outline: none; }

@@ -17,6 +17,7 @@ import { BaseObject, Degrees, Hours, Kilometers, MILLISECONDS_PER_SECOND, Satell
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '../watchlist/watchlist';
+import './satellite-timeline.css';
 
 interface Pass {
   start: Date;
@@ -107,38 +108,41 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       <canvas id="satellite-timeline-canvas-static" style="display: none;"></canvas>
     </div>`;
   sideMenuSecondaryHtml: string = html`
-    <div class="row">
-      <div class="input-field col s12">
-        <input id="satellite-timeline-setting-total-length" value="${this.lengthOfLookAngles_.toString()}" type="text"
-          style="text-align: center;"
-        />
-        <label for="satellite-timeline-setting-total-length" class="active">${t7e('plugins.SatelliteTimeline.labels.calculationLength')}</label>
+    <section class="kt-section">
+      <div class="kt-section-label">${t7e('plugins.SatelliteTimeline.sections.settings')}</div>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <input id="satellite-timeline-setting-total-length" value="${this.lengthOfLookAngles_.toString()}" type="text"
+            style="text-align: center;"
+          />
+          <label for="satellite-timeline-setting-total-length" class="active">${t7e('plugins.SatelliteTimeline.labels.calculationLength')}</label>
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="input-field col s12">
-        <input id="satellite-timeline-setting-interval" value="${this.angleCalculationInterval_.toString()}" type="text"
-          style="text-align: center;"
-        />
-        <label for="satellite-timeline-setting-interval" class="active">${t7e('plugins.SatelliteTimeline.labels.calculationInterval')}</label>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <input id="satellite-timeline-setting-interval" value="${this.angleCalculationInterval_.toString()}" type="text"
+            style="text-align: center;"
+          />
+          <label for="satellite-timeline-setting-interval" class="active">${t7e('plugins.SatelliteTimeline.labels.calculationInterval')}</label>
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="input-field col s12">
-        <input id="satellite-timeline-setting-bad-length" value="${this.lengthOfBadPass_.toString()}" type="text"
-          style="text-align: center;"
-        />
-        <label for="satellite-timeline-setting-bad-length" class="active">${t7e('plugins.SatelliteTimeline.labels.badPassLength')}</label>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <input id="satellite-timeline-setting-bad-length" value="${this.lengthOfBadPass_.toString()}" type="text"
+            style="text-align: center;"
+          />
+          <label for="satellite-timeline-setting-bad-length" class="active">${t7e('plugins.SatelliteTimeline.labels.badPassLength')}</label>
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="input-field col s12">
-        <input id="satellite-timeline-setting-avg-length" value="${this.lengthOfAvgPass_.toString()}" type="text"
-          style="text-align: center;"
-        />
-        <label for="satellite-timeline-setting-avg-length" class="active">${t7e('plugins.SatelliteTimeline.labels.avgPassLength')}</label>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <input id="satellite-timeline-setting-avg-length" value="${this.lengthOfAvgPass_.toString()}" type="text"
+            style="text-align: center;"
+          />
+          <label for="satellite-timeline-setting-avg-length" class="active">${t7e('plugins.SatelliteTimeline.labels.avgPassLength')}</label>
+        </div>
       </div>
-    </div>`;
+    </section>`;
   sideMenuSecondaryOptions = {
     width: 350,
     leftOffset: 0,
@@ -160,6 +164,10 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
+        // v13 marker: the wrappers are generated, not authored
+        getEl('satellite-timeline-menu')?.classList.add('kt-ui-v13');
+        getEl('satellite-timeline-menu-secondary')?.classList.add('kt-ui-v13');
+
         this.canvas_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas');
         this.canvasStatic_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas-static');
         this.ctx_ = this.canvas_.getContext('2d')!;

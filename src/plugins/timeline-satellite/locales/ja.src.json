@@ -3,6 +3,9 @@
     "SatelliteTimeline": {
       "bottomIconLabel": "衛星タイムライン",
       "title": "衛星タイムラインメニュー",
+      "sections": {
+        "settings": "設定"
+      },
       "labels": {
         "calculationLength": "計算期間（時間）",
         "calculationInterval": "計算間隔（秒）",

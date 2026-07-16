@@ -3,6 +3,9 @@
     "SatelliteTimeline": {
       "bottomIconLabel": "Oś czasu satelity",
       "title": "Menu osi czasu satelity",
+      "sections": {
+        "settings": "Ustawienia"
+      },
       "labels": {
         "calculationLength": "Długość obliczeń (godziny)",
         "calculationInterval": "Interwał obliczeń (sekundy)",

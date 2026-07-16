@@ -3,6 +3,9 @@
     "SatelliteTimeline": {
       "bottomIconLabel": "Satellite Timeline",
       "title": "Satellite Timeline Menu",
+      "sections": {
+        "settings": "Settings"
+      },
       "labels": {
         "calculationLength": "Calculation Length (Hours)",
         "calculationInterval": "Calculation Interval (Seconds)",

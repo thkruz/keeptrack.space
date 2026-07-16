@@ -3,6 +3,9 @@
     "SatelliteTimeline": {
       "bottomIconLabel": "위성 타임라인",
       "title": "위성 타임라인 메뉴",
+      "sections": {
+        "settings": "설정"
+      },
       "labels": {
         "calculationLength": "계산 기간 (시간)",
         "calculationInterval": "계산 간격 (초)",

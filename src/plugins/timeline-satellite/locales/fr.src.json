@@ -3,6 +3,9 @@
     "SatelliteTimeline": {
       "bottomIconLabel": "Chronologie Satellite",
       "title": "Menu Chronologie Satellite",
+      "sections": {
+        "settings": "Paramètres"
+      },
       "labels": {
         "calculationLength": "Durée de calcul (heures)",
         "calculationInterval": "Intervalle de calcul (secondes)",

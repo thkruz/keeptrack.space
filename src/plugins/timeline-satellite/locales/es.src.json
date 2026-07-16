@@ -3,6 +3,9 @@
     "SatelliteTimeline": {
       "bottomIconLabel": "Línea de Tiempo del Satélite",
       "title": "Menú de Línea de Tiempo del Satélite",
+      "sections": {
+        "settings": "Configuración"
+      },
       "labels": {
         "calculationLength": "Duración del Cálculo (Horas)",
         "calculationInterval": "Intervalo de Cálculo (Segundos)",

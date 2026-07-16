@@ -3,6 +3,9 @@
     "CloseObjectsPlugin": {
       "bottomIconLabel": "근접 물체",
       "title": "근접 물체 검색",
+      "sections": {
+        "search": "검색"
+      },
       "findBtn": "근접 물체 검색",
       "help": {
         "overview": "근접 물체 검색은 지금 이 순간 서로 50km 이내에서 비행 중인 물체 쌍을 전체 카탈로그에서 찾아냅니다. 완전한 근접 분석을 실행하지 않고도 동반 궤도 페이로드, 최근 분해 사건, 혼잡한 궤도 구역을 빠르게 발견할 수 있습니다.",

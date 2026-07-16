@@ -3,6 +3,9 @@
     "CloseObjectsPlugin": {
       "bottomIconLabel": "Nahe Objekte",
       "title": "Suche nach nahen Objekten",
+      "sections": {
+        "search": "Suche"
+      },
       "findBtn": "Nahe Objekte suchen",
       "help": {
         "overview": "Die Suche nach nahen Objekten durchsucht den gesamten Katalog nach Objektpaaren, die sich gerade jetzt innerhalb von 50 km zueinander befinden. So lassen sich gemeinsam fliegende Nutzlasten, kürzliche Zerlegungen und dicht belegte Bahnbereiche schnell erkennen, ohne ein vollständiges Konjunktions-Screening durchzuführen.",

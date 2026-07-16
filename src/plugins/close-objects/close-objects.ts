@@ -112,13 +112,12 @@ export class CloseObjectsPlugin extends KeepTrackPlugin {
 
   protected buildSideMenuHtml_(): string {
     const innerHtml = html`
-      <div class="row">
-        <center>
-          <button id="co-find-btn" class="btn btn-ui waves-effect waves-light">
-            ${t7e('plugins.CloseObjectsPlugin.findBtn' as Parameters<typeof t7e>[0])} &#9658;
-          </button>
-        </center>
-      </div>
+      <section class="kt-section">
+        <div class="kt-section-label">${t7e('plugins.CloseObjectsPlugin.sections.search' as Parameters<typeof t7e>[0])}</div>
+        <button id="co-find-btn" type="button" class="kt-action waves-effect">
+          <span class="kt-action-label">${t7e('plugins.CloseObjectsPlugin.findBtn' as Parameters<typeof t7e>[0])}</span>
+        </button>
+      </section>
     `;
 
     // Pro adds getSecondaryMenuConfig() - generateSideMenuHtml_() auto-wraps with title bar
@@ -126,17 +125,11 @@ export class CloseObjectsPlugin extends KeepTrackPlugin {
       return innerHtml;
     }
 
-    // OSS: must include full wrapper + title since addHtml() inserts as-is
-    const title = t7e('plugins.CloseObjectsPlugin.title' as Parameters<typeof t7e>[0]);
-
+    // OSS: must include full wrapper since addHtml() inserts as-is; the pipeline
+    // injects the title bar (title from the locale `title` key).
     return html`
-      <div id="close-objects-menu" class="side-menu-parent start-hidden">
+      <div id="close-objects-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div class="side-menu">
-          <div class="row" style="margin: 5px 1rem 0; display: flex; justify-content: center; align-items: center;">
-            <h5 class="center-align" style="margin: 0px auto">${title}</h5>
-          </div>
-          <li class="divider" style="padding: 2px !important;"></li>
-          <div class="row"></div>
           ${innerHtml}
         </div>
       </div>

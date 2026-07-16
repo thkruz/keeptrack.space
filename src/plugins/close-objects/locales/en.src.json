@@ -3,6 +3,9 @@
     "CloseObjectsPlugin": {
       "bottomIconLabel": "Close Objects",
       "title": "Close Objects Search",
+      "sections": {
+        "search": "Search"
+      },
       "findBtn": "Find Close Objects",
       "help": {
         "overview": "Close Objects Search sweeps the entire catalog for pairs of objects flying within 50 km of each other right now. It is a quick way to spot co-orbiting payloads, recent breakups, and crowded neighborhoods without running a full conjunction screening.",

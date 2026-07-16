@@ -135,6 +135,48 @@ describe('OrbitManager', () => {
     });
   });
 
+  describe('in-view orbit color overrides', () => {
+    beforeEach(() => {
+      initialized();
+      vi.spyOn(om, 'updateOrbitBuffer').mockImplementation(() => undefined);
+      vi.spyOn(om as never, 'writePathToGpu_' as never).mockImplementation(() => undefined);
+    });
+
+    it('draws overridden ids in their color and the rest in orbitInViewColor', () => {
+      om.addInViewOrbit(3);
+      om.addInViewOrbit(4);
+      om.setInViewOrbitColor(3, [0.2, 0.4, 0.6, 0.7]);
+
+      o().drawInViewObjectOrbit_({ cameraType: 0 });
+
+      expect(lineMgr.setColorUniforms).toHaveBeenNthCalledWith(1, [0.2, 0.4, 0.6, 0.7]);
+      expect(lineMgr.setColorUniforms).toHaveBeenNthCalledWith(2, settingsManager.orbitInViewColor);
+    });
+
+    it('setInViewOrbitColor(null) clears a single override', () => {
+      om.addInViewOrbit(3);
+      om.setInViewOrbitColor(3, [0.2, 0.4, 0.6, 0.7]);
+      om.setInViewOrbitColor(3, null);
+
+      o().drawInViewObjectOrbit_({ cameraType: 0 });
+
+      expect(lineMgr.setColorUniforms).toHaveBeenCalledWith(settingsManager.orbitInViewColor);
+    });
+
+    it('clearInViewOrbitColors removes every override', () => {
+      om.addInViewOrbit(3);
+      om.addInViewOrbit(4);
+      om.setInViewOrbitColor(3, [0.2, 0.4, 0.6, 0.7]);
+      om.setInViewOrbitColor(4, [0.6, 0.4, 0.2, 0.7]);
+
+      om.clearInViewOrbitColors();
+      o().drawInViewObjectOrbit_({ cameraType: 0 });
+
+      expect(lineMgr.setColorUniforms).toHaveBeenNthCalledWith(1, settingsManager.orbitInViewColor);
+      expect(lineMgr.setColorUniforms).toHaveBeenNthCalledWith(2, settingsManager.orbitInViewColor);
+    });
+  });
+
   describe('select / hover orbits', () => {
     beforeEach(() => initialized());
 

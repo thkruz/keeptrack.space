@@ -69,6 +69,27 @@ export class OrbitManager {
 
   private static readonly zeroAnchor_: [number, number, number] = [0, 0, 0];
 
+  /**
+   * Per-object overrides for the in-view orbit line color. Objects without an
+   * entry keep the global settingsManager.orbitInViewColor. Used by the pro
+   * watchlist to draw each list's in-view orbits in that list's color.
+   */
+  private readonly inViewOrbitColorOverrides_ = new Map<number, [number, number, number, number]>();
+
+  /** Sets (or clears, when null) the in-view orbit line color for one object. */
+  setInViewOrbitColor(satId: number, color: [number, number, number, number] | null): void {
+    if (color) {
+      this.inViewOrbitColorOverrides_.set(satId, color);
+    } else {
+      this.inViewOrbitColorOverrides_.delete(satId);
+    }
+  }
+
+  /** Removes every per-object in-view orbit color override. */
+  clearInViewOrbitColors(): void {
+    this.inViewOrbitColorOverrides_.clear();
+  }
+
   /** Stores the float64 anchor for an object's (anchor-relative) orbit buffer. */
   setOrbitAnchor(satId: number, anchor: [number, number, number]): void {
     this.orbitAnchors_.set(satId, anchor);
@@ -108,6 +129,7 @@ export class OrbitManager {
     this.bufferByteSizes_.clear();
     this.lastUploadedPath_.clear();
     this.orbitAnchors_.clear();
+    this.inViewOrbitColorOverrides_.clear();
     this.currentInView_ = [];
     this.currentSelectId_ = -1;
     this.secondarySelectId_ = -1;
@@ -589,17 +611,24 @@ export class OrbitManager {
   }
 
   private drawInViewObjectOrbit_(mainCameraInstance: Camera): void {
-    if (this.currentInView_.length >= 1) {
-      // There might be some z-fighting
-      if (mainCameraInstance.cameraType === CameraType.PLANETARIUM) {
-        this.lineManagerInstance_.setColorUniforms(settingsManager.orbitPlanetariumColor);
-      } else {
-        this.lineManagerInstance_.setColorUniforms(settingsManager.orbitInViewColor);
-      }
+    if (this.currentInView_.length === 0) {
+      return;
+    }
+
+    // There might be some z-fighting
+    if (mainCameraInstance.cameraType === CameraType.PLANETARIUM) {
+      this.lineManagerInstance_.setColorUniforms(settingsManager.orbitPlanetariumColor);
       this.currentInView_.forEach((id) => {
         this.writePathToGpu_(id);
       });
+
+      return;
     }
+
+    this.currentInView_.forEach((id) => {
+      this.lineManagerInstance_.setColorUniforms(this.inViewOrbitColorOverrides_.get(id) ?? settingsManager.orbitInViewColor);
+      this.writePathToGpu_(id);
+    });
   }
 
   private drawPrimaryObjectOrbit_() {

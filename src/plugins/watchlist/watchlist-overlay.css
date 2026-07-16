@@ -51,6 +51,15 @@
   min-width: 50px;
 }
 
+/* Per-list color dot (pro multi-list feature) */
+.wl-list-dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
 .wl-countdown {
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;

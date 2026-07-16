@@ -97,6 +97,30 @@ describe('WatchlistOverlay behavior', () => {
     });
   });
 
+  describe('per-list color dot', () => {
+    it('prefixes entries with a colored dot when the watchlist has a list color', () => {
+      vi.spyOn(p().watchlistPlugin_, 'getListColor').mockReturnValue('#2ecc71');
+      p().nextPassArray_ = [pass(defaultSat, 2 * MIN)];
+      p().isMenuButtonActive = true;
+
+      p().updateNextPassOverlay_(true);
+
+      const html = getEl('info-overlay-content')!.innerHTML;
+
+      expect(html).toContain('wl-list-dot');
+      expect(html).toContain('background:#2ecc71');
+    });
+
+    it('renders no dot when no list color is set (OSS default)', () => {
+      p().nextPassArray_ = [pass(defaultSat, 2 * MIN)];
+      p().isMenuButtonActive = true;
+
+      p().updateNextPassOverlay_(true);
+
+      expect(getEl('info-overlay-content')!.innerHTML).not.toContain('wl-list-dot');
+    });
+  });
+
   describe('updateNextPassOverlay_', () => {
     it('renders bucketed entries with group headers', () => {
       // Two different tiers so headers are shown.

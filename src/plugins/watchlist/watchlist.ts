@@ -711,6 +711,16 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     return this.watchlistList.some(({ id: id_ }) => id_ === id);
   }
 
+  /**
+   * The display color (#rrggbb) of the active watchlist, or null when the
+   * default styling should be used. The OSS plugin has a single, uncolored
+   * list; the pro plugin overrides this with the current list's color so the
+   * overlay rows and in-view orbit lines can reflect it.
+   */
+  getListColor(): string | null {
+    return null;
+  }
+
   getSatellites() {
     return this.watchlistList.map(({
       id,

@@ -526,7 +526,12 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       clockHtml = parts[1] || '';
     }
 
-    return `<div class="wl-entry ${tier}" data-sat-id="${pass.sat.id}"><span class="wl-name">${name}</span>${countdownHtml}<span class="wl-time">${clockHtml}</span></div>`;
+    // Per-list color dot (pro multi-list feature; OSS getListColor returns null).
+    // The color is validated hex (see isValidListColor) so it is safe to inline.
+    const listColor = this.watchlistPlugin_.getListColor();
+    const dotHtml = listColor ? `<span class="wl-list-dot" style="background:${listColor}"></span>` : '';
+
+    return `<div class="wl-entry ${tier}" data-sat-id="${pass.sat.id}">${dotHtml}<span class="wl-name">${name}</span>${countdownHtml}<span class="wl-time">${clockHtml}</span></div>`;
   }
 
   /** Rotate departed entries in place: show up to 5, advancing offset every 10 seconds. */

@@ -48,6 +48,8 @@ const waitForAppReady = async (page: Page, recipe: CaptureRecipe): Promise<void>
     isAutoStart: true,
     minLogLevel: 'WARN',
     isDisablePerformanceDowngrade: true,
+    // The onboarding tour shade intercepts clicks on fresh profiles
+    isDisableOnboarding: true,
     // Pro builds gate some plugins behind login; captures need the menus open
     isDisableLoginGate: true,
     plugins: recipe.plugins,
@@ -67,6 +69,8 @@ const waitForAppReady = async (page: Page, recipe: CaptureRecipe): Promise<void>
     () => (window as unknown as { keepTrack?: { isReady?: boolean } }).keepTrack?.isReady === true,
     { timeout: 20_000 },
   );
+  // The guest-mode sponsor banner overlaps tall side menus; ads never belong in help shots
+  await page.evaluate('document.getElementById(\'bottom-banner-sponsor\')?.style.setProperty(\'display\', \'none\')');
 };
 
 /**
@@ -729,11 +733,68 @@ const RECIPES: CaptureRecipe[] = [
     id: 'maneuver',
     plugins: { ManeuverPlugin: { enabled: true } },
     steps: async (page) => {
+      await selectSatellite(page, 'ISS (ZARYA)');
       await openPluginMenu(page, 'maneuver-bottom-icon');
       await page.locator('#maneuver-menu').waitFor({ state: 'visible', timeout: 10_000 });
-      await page.waitForTimeout(500);
+      await page.evaluate('document.getElementById(\'sat-infobox\')?.style.setProperty(\'display\', \'none\')');
+      await page.waitForTimeout(1_000);
     },
     shots: [{ name: 'maneuver-menu', selector: '#maneuver-menu' }],
+  },
+  {
+    id: 'maneuver-hohmann',
+    outDir: 'maneuver',
+    plugins: { ManeuverPlugin: { enabled: true } },
+    steps: async (page) => {
+      await selectSatellite(page, 'ISS (ZARYA)');
+      await openPluginMenu(page, 'maneuver-bottom-icon');
+      await page.locator('#maneuver-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.evaluate('document.getElementById(\'sat-infobox\')?.style.setProperty(\'display\', \'none\')');
+      /*
+       * Move the burn time to the next ascending-node crossing so the plane
+       * change is fully reachable (off-node burns clamp the rotation to the
+       * burn-point latitude, which would put a caution note in the shot).
+       */
+      await page.evaluate(`(() => {
+        const api = window.keepTrack.api;
+        // Use the SELECTED object: the catalog can hold a stale duplicate under the same sccNum
+        const sat = api.getPluginByName('SelectSatManager').primarySatObj;
+        const t0 = api.getTimeManager().simulationTimeObj.getTime();
+        let prevZ = sat.eci(new Date(t0)).position.z;
+        for (let m = 1; m <= 100; m++) {
+          const t = t0 + m * 60000;
+          const z = sat.eci(new Date(t)).position.z;
+          if (prevZ < 0 && z >= 0) {
+            let lo = t - 60000;
+            let hi = t;
+            for (let i = 0; i < 20; i++) {
+              const mid = (lo + hi) / 2;
+              if (sat.eci(new Date(mid)).position.z < 0) { lo = mid; } else { hi = mid; }
+            }
+            const input = document.getElementById('maneuver-sv-t1');
+            input.value = new Date(Math.floor(hi / 1000) * 1000).toISOString().slice(0, 19).replace('T', ' ');
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+            return;
+          }
+          prevZ = z;
+        }
+      })()`);
+      // Switch to the wizard tab and plan a GEO transfer with a plane change
+      await page.evaluate('document.querySelector(\'#maneuver-tabs a[href="#maneuver-hohmann-tab"]\')?.dispatchEvent(new MouseEvent(\'click\', { bubbles: true }))');
+      await page.evaluate(`(() => {
+        const alt = document.getElementById('maneuver-hohmann-alt');
+        alt.value = '35786';
+        alt.dispatchEvent(new Event('input', { bubbles: true }));
+        const plane = document.getElementById('maneuver-hohmann-plane');
+        plane.checked = true;
+        plane.dispatchEvent(new Event('change', { bubbles: true }));
+        const inc = document.getElementById('maneuver-hohmann-inc');
+        inc.value = '28.5';
+        inc.dispatchEvent(new Event('input', { bubbles: true }));
+      })()`);
+      await page.waitForTimeout(1_000);
+    },
+    shots: [{ name: 'hohmann-wizard', selector: '#maneuver-menu' }],
   },
   {
     id: 'link-budget',

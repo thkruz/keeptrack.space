@@ -104,6 +104,18 @@ function matchSatelliteOrMissile(
     return;
   }
 
+  /*
+   * Alpha-5 designation ("A0000" = 100000, "T0001" = 270001). sccNum is always
+   * the numeric form, so a letter-bearing NORAD query can only match here. No
+   * Notional guard is needed: notional IDs (400000+) exceed alpha-5 capacity,
+   * leaving sccNum5 null.
+   */
+  if (searchableFields.noradId && sat.sccNum5?.includes(searchStringIn)) {
+    addResult_({ strIndex: sat.sccNum5.indexOf(searchStringIn), searchType: SearchResultType.NORAD_ID_A5, patlen: len, id: sat.id });
+
+    return;
+  }
+
   if (searchableFields.intlDes && sat.intlDes?.includes(searchStringIn)) {
     // Ignore Notional Satellites
     if (sat.name.includes(' Notional)')) {

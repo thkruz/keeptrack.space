@@ -245,6 +245,74 @@ describe('SearchManager', () => {
     });
   });
 
+  // Alpha-5 designations ("A0000" = 100000, "T0001" = 270001) are matched via
+  // sccNum5 on the regular search path: sccNum is always the numeric form, and
+  // a letter-bearing query never enters the numeric-only path.
+  describe('alpha-5 designation search', () => {
+    let sats: Satellite[];
+
+    const buildCatalog = (testSats: Satellite[]) => ({
+      objectCache: testSats,
+      numSatellites: testSats.length,
+      getObject: (id: number) => testSats[id],
+    }) as unknown as CatalogManager;
+
+    const wireUpServiceLocator = (catalog: CatalogManager) => {
+      vi.spyOn(ServiceLocator, 'getCatalogManager').mockReturnValue(catalog);
+      vi.spyOn(ServiceLocator, 'getDotsManager').mockReturnValue({
+        updateSizeBuffer: vi.fn(),
+        getCurrentPosition: vi.fn().mockReturnValue({ x: 1, y: 1, z: 1 }),
+        positionData: new Float32Array((catalog.objectCache.length + 1) * 3),
+      } as unknown as DotsManager);
+      vi.spyOn(ServiceLocator, 'getGroupsManager').mockReturnValue({
+        createGroup: vi.fn().mockReturnValue({}),
+        selectGroup: vi.fn(),
+        clearSelect: vi.fn(),
+      } as unknown as GroupsManager);
+      vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ toast: vi.fn() } as never);
+    };
+
+    beforeEach(() => {
+      settingsManager.minimumSearchCharacters = 0;
+      settingsManager.searchLimit = 100;
+      settingsManager.isShowDecayedInSearch = true;
+      settingsManager.isShowVimpelInSearch = false;
+      settingsManager.lastSearch = [];
+      settingsManager.lastSearchResults = [];
+      settingsManager.searchableFields = { name: true, altName: true, bus: true, noradId: true, intlDes: true, launchVehicle: true };
+      settingsManager.searchableTypes = { satellite: true, missile: true, star: false, sensor: false, launchSite: false, planet: false };
+    });
+
+    it('finds a 6-digit sat by its alpha-5 designation', () => {
+      sats = [new Satellite({ ...defaultSat, id: 0, name: 'Unknown', sccNum: 'A0000' })];
+      wireUpServiceLocator(buildCatalog(sats));
+
+      searchManager.doSearch('A0000');
+      expect(settingsManager.lastSearchResults).toEqual([0]);
+    });
+
+    it('finds T-series analyst objects by a partial designation without touching numeric sats', () => {
+      sats = [
+        new Satellite({ ...defaultSat, id: 0, name: 'UNKNOWN', sccNum: 'T0001' }),
+        new Satellite({ ...defaultSat, id: 1, name: 'UNKNOWN', sccNum: 'T0002' }),
+        new Satellite({ ...defaultSat, id: 2, sccNum: '25544' }),
+      ];
+      wireUpServiceLocator(buildCatalog(sats));
+
+      searchManager.doSearch('T000');
+      expect(settingsManager.lastSearchResults.sort((a, b) => a - b)).toEqual([0, 1]);
+    });
+
+    it('respects the NORAD ID field toggle for alpha-5 searches', () => {
+      sats = [new Satellite({ ...defaultSat, id: 0, name: 'Unknown', sccNum: 'A0000' })];
+      wireUpServiceLocator(buildCatalog(sats));
+
+      settingsManager.searchableFields = { ...settingsManager.searchableFields, noradId: false };
+      searchManager.doSearch('A0000');
+      expect(settingsManager.lastSearchResults).toEqual([]);
+    });
+  });
+
   // #855: stars, sensors, launch sites, and planets are searchable by name,
   // gated by the per-type searchableTypes toggles (off by default).
   describe('searchable object types (#855)', () => {
@@ -421,6 +489,7 @@ describe('SearchManager interactions', () => {
     const results = [
       { id: 0, searchType: SearchResultType.OBJECT_NAME, strIndex: 0, patlen: 3 },
       { id: 0, searchType: SearchResultType.NORAD_ID, strIndex: 0, patlen: 5 },
+      { id: 0, searchType: SearchResultType.NORAD_ID_A5, strIndex: 0, patlen: 5 },
       { id: 0, searchType: SearchResultType.INTLDES, strIndex: 0, patlen: 4 },
       { id: 0, searchType: SearchResultType.ALT_NAME, strIndex: 0, patlen: 2 },
       { id: 0, searchType: SearchResultType.LAUNCH_VEHICLE, strIndex: 0, patlen: 6 },

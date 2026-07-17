@@ -40,6 +40,8 @@ export enum SearchResultType {
   SENSOR,
   LAUNCH_SITE,
   PLANET,
+  /** Matched the alpha-5 designation (sccNum5, e.g. "A0000" for 100000). */
+  NORAD_ID_A5,
 }
 
 /**
@@ -52,6 +54,7 @@ const SEARCH_TYPE_LABELS: Record<SearchResultType, string> = {
   [SearchResultType.OBJECT_NAME]: 'NAME',
   [SearchResultType.ALT_NAME]: 'ALT',
   [SearchResultType.NORAD_ID]: 'NORAD',
+  [SearchResultType.NORAD_ID_A5]: 'NORAD',
   [SearchResultType.INTLDES]: 'INTL',
   [SearchResultType.LAUNCH_VEHICLE]: 'LV',
   [SearchResultType.MISSILE]: 'MISSILE',
@@ -522,6 +525,22 @@ export class SearchManager {
             html += sat.sccNum.substring(result.strIndex, result.strIndex + result.patlen);
             html += '</span>';
             html += sat.sccNum.substring(result.strIndex + result.patlen);
+          }
+          break;
+        case SearchResultType.NORAD_ID_A5:
+          {
+            const sat = obj as Satellite;
+            // strIndex/patlen refer to sccNum5, so render the alpha-5 form the user typed
+            const a5 = sat.sccNum5 ?? sat.sccNum;
+
+            result.strIndex = result.strIndex || 0;
+            result.patlen = result.patlen || 5;
+
+            html += a5.substring(0, result.strIndex);
+            html += '<span class="search-hilight">';
+            html += a5.substring(result.strIndex, result.strIndex + result.patlen);
+            html += '</span>';
+            html += a5.substring(result.strIndex + result.patlen);
           }
           break;
         case SearchResultType.INTLDES:

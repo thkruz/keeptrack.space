@@ -6,6 +6,31 @@ import { MissileObject } from '../data/catalog-manager/MissileObject';
 import { SearchResult, SearchResultType } from './search-manager';
 
 /**
+ * The zero-padded canonical NORAD key used for numeric matching. sccNum6 is
+ * null for extended (7+ digit) IDs, so fall back to the canonical sccNum, then
+ * pad to the 6-digit width. Padding makes a leading-zero query width-specific:
+ * "070000" matches only 70000, while a shorter "70000" still substring-matches
+ * both 70000 and 270000.
+ */
+function paddedSccKey(sat: Satellite): string {
+  return (sat.sccNum6 ?? sat.sccNum ?? '').padStart(6, '0');
+}
+
+/**
+ * Highlight offsets for a numeric NORAD match, computed against the display
+ * sccNum (which carries no leading zeros). The query is aligned by its
+ * zero-stripped form so a leading zero the user typed for disambiguation is
+ * not counted into the highlighted span.
+ */
+function noradHighlight(sat: Satellite, term: string): { strIndex: number; patlen: number } {
+  const display = sat.sccNum ?? '';
+  const stripped = term.replace(/^0+/u, '') || term;
+  const idx = display.indexOf(stripped);
+
+  return idx < 0 ? { strIndex: 0, patlen: 0 } : { strIndex: idx, patlen: stripped.length };
+}
+
+/**
  * Run a regular (text) search over the catalog, returning at most
  * {@link settingsManager.searchLimit} results plus the total number found.
  */
@@ -93,15 +118,21 @@ function matchSatelliteOrMissile(
     return;
   }
 
-  if (searchableFields.noradId && sat.sccNum?.includes(searchStringIn)) {
-    // Ignore Notional Satellites unless all 6 characters are entered
-    if (sat.name.includes(' Notional)') && searchStringIn.length < 6) {
+  if (searchableFields.noradId) {
+    const rawKey = sat.sccNum6 ?? sat.sccNum;
+
+    if (rawKey && paddedSccKey(sat).includes(searchStringIn)) {
+      // Ignore Notional Satellites unless all 6 characters are entered
+      if (sat.name.includes(' Notional)') && searchStringIn.length < 6) {
+        return;
+      }
+
+      const { strIndex, patlen } = noradHighlight(sat, searchStringIn);
+
+      addResult_({ strIndex, searchType: SearchResultType.NORAD_ID, patlen, id: sat.id });
+
       return;
     }
-
-    addResult_({ strIndex: sat.sccNum.indexOf(searchStringIn), searchType: SearchResultType.NORAD_ID, patlen: len, id: sat.id });
-
-    return;
   }
 
   /*
@@ -250,18 +281,25 @@ export function runNumOnlySearch(searchString: string): { results: SearchResult[
         continue;
       }
 
-      // sccNum6 is null for extended (7+ digit) IDs — fall back to the
-      // canonical sccNum so CelesTrak supplemental IDs are searchable too.
-      const matchKey = sat.sccNum6 ?? sat.sccNum;
+      // Skip sats with no catalog number (briefly possible after a reload).
+      if (!(sat.sccNum6 ?? sat.sccNum)) {
+        continue;
+      }
 
-      if (matchKey && matchKey.indexOf(searchStringIn) !== -1) {
+      // Match against the zero-padded 6-digit key so a leading-zero query is
+      // width-specific ("070000" -> only 70000, not 270000).
+      const matchKey = paddedSccKey(sat);
+
+      if (matchKey.includes(searchStringIn)) {
         if (!seenIds.has(sat.id)) {
           seenIds.add(sat.id);
           totalFound++;
           if (results.length < limit) {
+            const { strIndex, patlen } = noradHighlight(sat, searchStringIn);
+
             results.push({
-              strIndex: sat.sccNum.indexOf(searchStringIn),
-              patlen: searchStringIn.length,
+              strIndex,
+              patlen,
               id: sat.id,
               searchType: SearchResultType.NORAD_ID,
             });
@@ -269,6 +307,8 @@ export function runNumOnlySearch(searchString: string): { results: SearchResult[
         }
         lastFoundI = i;
 
+        // A full-width query (matches the whole padded key) is unique; stop
+        // scanning. A shorter query keeps scanning for further substring hits.
         if (searchStringIn.length === matchKey.length) {
           break;
         }

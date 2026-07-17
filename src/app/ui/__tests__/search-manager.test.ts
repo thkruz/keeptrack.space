@@ -213,6 +213,43 @@ describe('SearchManager', () => {
       expect(settingsManager.lastSearchResults.sort((a, b) => a - b)).toEqual([0, 1, 2]);
     });
 
+    // 6+ digit catalog IDs made a plain "70000" query ambiguous: it substring-
+    // matched 270000 too. Typing a leading zero ("070000") pins the width so
+    // only the true 70000 matches.
+    it('disambiguates a leading-zero query to the exact-width object', () => {
+      sats = [
+        new Satellite({ ...defaultSat, id: 0, sccNum: '70000' }),
+        new Satellite({ ...defaultSat, id: 1, sccNum: '270000' }),
+      ];
+      wireUpServiceLocator(buildCatalog(sats));
+
+      searchManager.doSearch('070000');
+      expect(settingsManager.lastSearchResults).toEqual([0]);
+    });
+
+    it('still substring-matches both objects without the leading zero', () => {
+      sats = [
+        new Satellite({ ...defaultSat, id: 0, sccNum: '70000' }),
+        new Satellite({ ...defaultSat, id: 1, sccNum: '270000' }),
+      ];
+      wireUpServiceLocator(buildCatalog(sats));
+
+      searchManager.doSearch('70000');
+      expect(settingsManager.lastSearchResults.sort((a, b) => a - b)).toEqual([0, 1]);
+    });
+
+    it('disambiguates a leading-zero query for a shorter catalog number', () => {
+      sats = [
+        new Satellite({ ...defaultSat, id: 0, sccNum: '5544' }),
+        new Satellite({ ...defaultSat, id: 1, sccNum: '25544' }),
+      ];
+      wireUpServiceLocator(buildCatalog(sats));
+
+      // "005544" pins the 6-digit width, so only 5544 matches (not 25544).
+      searchManager.doSearch('005544');
+      expect(settingsManager.lastSearchResults).toEqual([0]);
+    });
+
     it('respects the NORAD ID field toggle for numeric searches', () => {
       sats = [new Satellite({ ...defaultSat, id: 0, sccNum: '25544' })];
       wireUpServiceLocator(buildCatalog(sats));

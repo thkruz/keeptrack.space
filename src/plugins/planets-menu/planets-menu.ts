@@ -186,6 +186,8 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
       {
         key: 'Home',
         shift: true,
+        // ctrl:false so Ctrl+Home stays exclusively Sensor List's snap shortcut.
+        ctrl: false,
         callback: () => {
           if (settingsManager.isDisablePlanets) {
             return;
@@ -196,6 +198,8 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
       {
         key: 'Home',
         shift: false,
+        // ctrl:false so Ctrl+Home stays exclusively Sensor List's snap shortcut.
+        ctrl: false,
         callback: () => {
           if (settingsManager.isDisablePlanets) {
             return;

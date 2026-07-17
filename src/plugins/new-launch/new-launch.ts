@@ -122,13 +122,15 @@ export class NewLaunch extends KeepTrackPlugin {
   }
 
   /**
-   * Shift+L for Launch - toggles the New Launch side menu open/closed. Plain 'L'
-   * is already taken by the orbit-line toggle, so this uses the Shift modifier.
+   * Ctrl+Shift+L for Launch - toggles the New Launch side menu open/closed.
+   * Shift+L is already taken by the orbit-line toggle (OrbitManager), so this
+   * uses the Ctrl+Shift modifiers.
    */
   getKeyboardShortcuts(): IKeyboardShortcut[] {
     return [
       {
         key: 'L',
+        ctrl: true,
         shift: true,
         callback: () => {
           this.bottomMenuClicked();

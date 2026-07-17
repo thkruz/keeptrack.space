@@ -11,20 +11,40 @@ import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities'
  * block stays within the max-lines-per-function budget.
  */
 const pluginShortcuts: { pluginId: string; shortcuts: Omit<IKeyboardShortcut, 'callback'>[] }[] = [
+  // --- Engine / core ---
+  // src/engine/camera/camera-input-handler.ts (WASD/QE are intentionally NOT registered)
+  { pluginId: 'CameraInputHandler', shortcuts: [{ key: 'ArrowUp' }, { key: 'ArrowDown' }, { key: 'ArrowLeft' }, { key: 'ArrowRight' }, { key: 'r' }, { key: 'v' }, { key: '`' }, { key: 'Shift' }] },
   // src/app/ui/search-manager.ts
-  { pluginId: 'SearchManager', shortcuts: [{ key: 'F', ctrl: false, shift: false }] },
+  { pluginId: 'SearchManager', shortcuts: [{ key: 'F', ctrl: false }] },
+  // src/app/ui/ui-manager.ts
+  { pluginId: 'UiManager', shortcuts: [{ key: 'F2', shift: true }] },
+  // src/app/rendering/orbit-manager.ts ('L' ctrl:false owns Shift+L / toggles orbit lines; lowercase 'e' toggles ECI/ECF)
+  { pluginId: 'OrbitManager', shortcuts: [{ key: 'L', ctrl: false }, { key: 'e' }] },
+  // src/engine/input/url-manager.ts (uppercase 'U' = Shift+U force-writes the URL bar)
+  { pluginId: 'UrlManager', shortcuts: [{ key: 'U' }] },
+  /*
+   * NOTE: TimeManager's shortcuts (t , . < > /) are intentionally omitted. They
+   * mix `key` and `code` matching across shift states (e.g. Shift+, yields key
+   * '<' but code 'Comma'), which the registry's key/code/modifier model cannot
+   * represent precisely, so including them produces false positives. Their
+   * overlaps are tracked separately (see docs) rather than in this audit.
+   */
+
+  // --- OSS plugins ---
   // src/plugins/select-sat-manager/select-sat-manager.ts
   { pluginId: 'SelectSatManager', shortcuts: [{ key: '[' }, { key: ']' }, { key: '{' }, { key: '}' }] },
   // src/plugins/watchlist/watchlist.ts
   { pluginId: 'WatchlistPlugin', shortcuts: [{ key: 'W' }] },
+  // src/plugins/watchlist-filter/watchlist-filter.ts (lowercase 'w', distinct from 'W')
+  { pluginId: 'WatchlistFilter', shortcuts: [{ key: 'w' }] },
   // src/plugins/find-sat/find-sat.ts
   { pluginId: 'FindSatPlugin', shortcuts: [{ key: 'F', ctrl: true }] },
-  // src/plugins/edit-sat/edit-sat.ts
-  { pluginId: 'EditSat', shortcuts: [{ key: 'E' }] },
+  // src/plugins/edit-sat/edit-sat.ts (ctrl:false; owns plain Shift+E)
+  { pluginId: 'EditSat', shortcuts: [{ key: 'E', ctrl: false }] },
   // src/plugins/dops/dops.ts
   { pluginId: 'DopsPlugin', shortcuts: [{ key: 'D' }] },
-  // src/plugins/colors-menu/colors-menu.ts
-  { pluginId: 'ColorsMenu', shortcuts: [{ key: 'A' }] },
+  // src/plugins/colors-menu/colors-menu.ts (ctrl:false; owns plain Shift+A)
+  { pluginId: 'ColorsMenu', shortcuts: [{ key: 'A', ctrl: false }] },
   // src/plugins/filter-menu/filter-menu.ts
   { pluginId: 'FilterMenuPlugin', shortcuts: [{ key: 'f' }] },
   // src/plugins/sound-toggle/sound-toggle.ts
@@ -39,13 +59,77 @@ const pluginShortcuts: { pluginId: string; shortcuts: Omit<IKeyboardShortcut, 'c
   { pluginId: 'Inc2AltPlots', shortcuts: [{ key: 'I' }] },
   // src/plugins/plot-analysis/inc2lon.ts
   { pluginId: 'Inc2LonPlots', shortcuts: [{ key: 'g' }] },
-  // src/plugins-pro/symbology/symbology-plugin.ts
-  { pluginId: 'SymbologyPlugin', shortcuts: [{ key: 'Y' }] },
   // src/plugins/sensor-list/sensor-list.ts (uppercase 'S' = Shift+S; case-exact matcher)
   { pluginId: 'SensorListPlugin', shortcuts: [{ key: 'S' }, { key: 'Home', ctrl: true }] },
+  // src/plugins/best-pass/best-pass.ts
+  { pluginId: 'BestPass', shortcuts: [{ key: 'b' }] },
+  // src/plugins/breakup/breakup.ts
+  { pluginId: 'Breakup', shortcuts: [{ key: 'B', shift: true }] },
+  // src/plugins/calculator/calculator.ts - keyboard shortcut removed (was a dead Shift+c spec)
+  // src/plugins/clouds-toggle/clouds-toggle.ts
+  { pluginId: 'CloudsToggle', shortcuts: [{ key: 'c' }] },
+  // src/plugins/countries/countries.ts
+  { pluginId: 'Countries', shortcuts: [{ key: 'O' }] },
+  // src/plugins/earth-centered-view/earth-centered-view.ts
+  { pluginId: 'EarthCenteredView', shortcuts: [{ key: '1' }] },
+  // src/plugins/fps-view/fps-view.ts
+  { pluginId: 'FpsView', shortcuts: [{ key: '8' }] },
+  // src/plugins/graticule-toggle/graticule-toggle.ts
+  { pluginId: 'GraticuleToggle', shortcuts: [{ key: 'G' }] },
+  // src/plugins/new-launch/new-launch.ts (Ctrl+Shift+L; plain Shift+L is OrbitManager)
+  { pluginId: 'NewLaunch', shortcuts: [{ key: 'L', ctrl: true, shift: true }] },
+  // src/plugins/planets-menu/planets-menu.ts (lowercase 'p'; Shift+Home / Home, both ctrl:false)
+  { pluginId: 'PlanetsMenuPlugin', shortcuts: [{ key: 'p' }, { key: 'Home', shift: true, ctrl: false }, { key: 'Home', shift: false, ctrl: false }] },
+  // src/plugins/polar-plot/polar-plot.ts
+  { pluginId: 'PolarPlot', shortcuts: [{ key: 'P' }] },
+  // src/plugins/political-map-toggle/political-map-toggle.ts
+  { pluginId: 'PoliticalMapToggle', shortcuts: [{ key: 'l' }] },
+  // src/plugins/proximity-ops/proximity-ops.ts
+  { pluginId: 'ProximityOps', shortcuts: [{ key: 'X' }] },
+  // src/plugins/reentries/reentries.ts
+  { pluginId: 'Reentries', shortcuts: [{ key: 'R', ctrl: false }] },
+  // src/plugins/sat-info-box/sat-info-box.ts
+  { pluginId: 'SatInfoBox', shortcuts: [{ key: 'i' }] },
+  // src/plugins/satellite-eci-view/satellite-eci-view.ts
+  { pluginId: 'SatelliteEciView', shortcuts: [{ key: '3' }] },
+  // src/plugins/satellite-fixed-view/satellite-fixed-view.ts
+  { pluginId: 'SatelliteFixedView', shortcuts: [{ key: '4' }] },
+  // src/plugins/satellite-fov/satellite-fov.ts (both ctrl:false)
+  { pluginId: 'SatelliteFov', shortcuts: [{ key: 'C', ctrl: false }, { key: 'V', ctrl: false }] },
+  // src/plugins/satellite-photos/satellite-photos.ts
+  { pluginId: 'SatellitePhotos', shortcuts: [{ key: 'H' }] },
+  // src/plugins/satellite-view/satellite-view.ts
+  { pluginId: 'SatelliteView', shortcuts: [{ key: '5' }] },
+  // src/plugins/settings-menu/settings-menu.ts
+  { pluginId: 'SettingsMenuPlugin', shortcuts: [{ key: ',', code: 'Comma', shift: true }] },
+  // src/plugins/transponder-channel-data/transponder-channel-data.ts
+  { pluginId: 'TransponderChannelData', shortcuts: [{ key: 'T' }] },
+  // src/plugins/video-director/video-director.ts
+  { pluginId: 'VideoDirector', shortcuts: [{ key: 'V', ctrl: true, shift: true }, { key: 'R', ctrl: true, shift: true }] },
+
+  // --- Pro plugins ---
+  // src/plugins-pro/alt-inc-heatmap/alt-inc-heatmap.ts
+  { pluginId: 'AltIncHeatmap', shortcuts: [{ key: 'J' }] },
+  // src/plugins-pro/aurora/aurora.ts (moved to Ctrl+Shift+A; plain Shift+A is ColorsMenu)
+  { pluginId: 'Aurora', shortcuts: [{ key: 'A', ctrl: true, shift: true }] },
+  // src/plugins-pro/debug/debug.ts
+  { pluginId: 'DebugPlugin', shortcuts: [{ key: 'F12', shift: true }, { key: 'd', ctrl: true }] },
+  // src/plugins-pro/eclipse-solar-analysis/eclipse-solar-analysis.ts (Ctrl+Shift+E; plain Shift+E is EditSat)
+  { pluginId: 'EclipseSolarAnalysis', shortcuts: [{ key: 'E', ctrl: true, shift: true }] },
+  // src/plugins-pro/flat-map-view/flat-map-view.ts
+  { pluginId: 'FlatMapView', shortcuts: [{ key: '2' }] },
+  // src/plugins-pro/fov-fade/fov-fade.ts - keyboard shortcut removed (Shift+F was owned by Search)
+  // src/plugins-pro/keyboard-shortcuts/keyboard-shortcuts.ts
+  { pluginId: 'KeyboardShortcutsPlugin', shortcuts: [{ key: '?' }] },
+  // src/plugins-pro/polar-view/polar-view.ts
+  { pluginId: 'PolarView', shortcuts: [{ key: '9' }] },
   // src/plugins-pro/scenario-management-pro/scenario-management-pro.ts (lowercase 's', distinct from 'S')
   { pluginId: 'ScenarioManagementMenu', shortcuts: [{ key: 's' }] },
-  // src/plugins-pro/user-account/user-account.ts ('u' opens login/profile; lowercase, distinct from UrlManager's 'U')
+  // src/plugins-pro/seismic-activity/seismic-activity.ts
+  { pluginId: 'SeismicActivity', shortcuts: [{ key: 'Q', shift: true }] },
+  // src/plugins-pro/symbology/symbology-plugin.ts
+  { pluginId: 'SymbologyPlugin', shortcuts: [{ key: 'Y' }] },
+  // src/plugins-pro/user-account/user-account.ts (lowercase 'u')
   { pluginId: 'UserAccountPlugin', shortcuts: [{ key: 'u' }] },
 ];
 
@@ -85,13 +169,26 @@ describe('KeyboardShortcutRegistry', () => {
       expect(warnSpy.mock.calls[0][0]).toContain('PluginB');
     });
 
-    it('should NOT conflict when one requires ctrl and the other does not', () => {
+    it('should conflict when one omits ctrl (wildcard) and the other requires it', () => {
+      vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
       const cb = vi.fn();
 
-      // FilterMenu-like: plain F (ctrl omitted = not required)
-      KeyboardShortcutRegistry.register('FilterMenu', [{ key: 'F', callback: cb }]);
-      // FindSat-like: Ctrl+F
-      const result = KeyboardShortcutRegistry.register('FindSat', [{ key: 'F', ctrl: true, callback: cb }]);
+      // ctrl omitted = wildcard: matches whether or not Ctrl is held, so it
+      // overlaps a shortcut that requires Ctrl (both fire on Ctrl+key). This
+      // mirrors the runtime matcher, which treats undefined as "don't care".
+      KeyboardShortcutRegistry.register('PlainKey', [{ key: 'F', callback: cb }]);
+      const result = KeyboardShortcutRegistry.register('CtrlKey', [{ key: 'F', ctrl: true, callback: cb }]);
+
+      expect(result).toHaveLength(0);
+      expect(KeyboardShortcutRegistry.getConflicts()).toHaveLength(1);
+    });
+
+    it('should NOT conflict when both specify the same modifier with opposite values', () => {
+      const cb = vi.fn();
+
+      // Both explicit and different (ctrl false vs ctrl true) => disjoint, no overlap.
+      KeyboardShortcutRegistry.register('NoCtrl', [{ key: 'F', ctrl: false, callback: cb }]);
+      const result = KeyboardShortcutRegistry.register('WithCtrl', [{ key: 'F', ctrl: true, callback: cb }]);
 
       expect(result).toHaveLength(1);
       expect(KeyboardShortcutRegistry.getConflicts()).toHaveLength(0);
@@ -145,12 +242,25 @@ describe('KeyboardShortcutRegistry', () => {
       expect(KeyboardShortcutRegistry.getConflicts()).toHaveLength(1);
     });
 
-    it('should NOT conflict when modifiers differ across dimensions', () => {
+    it('should conflict when a wildcard modifier overlaps an explicit one on another dimension', () => {
+      vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
       const cb = vi.fn();
 
-      // ctrl: true, shift: undefined (=false)
+      // ctrl: true, shift: undefined (wildcard) -> matches Ctrl+F and Ctrl+Shift+F
       KeyboardShortcutRegistry.register('PluginA', [{ key: 'F', ctrl: true, callback: cb }]);
-      // ctrl: true, shift: true
+      // ctrl: true, shift: true -> matches Ctrl+Shift+F, which PluginA also matches
+      const result = KeyboardShortcutRegistry.register('PluginB', [{ key: 'F', ctrl: true, shift: true, callback: cb }]);
+
+      expect(result).toHaveLength(0);
+      expect(KeyboardShortcutRegistry.getConflicts()).toHaveLength(1);
+    });
+
+    it('should NOT conflict when an explicit modifier differs across dimensions', () => {
+      const cb = vi.fn();
+
+      // ctrl: true, shift: false -> only Ctrl+F (no shift)
+      KeyboardShortcutRegistry.register('PluginA', [{ key: 'F', ctrl: true, shift: false, callback: cb }]);
+      // ctrl: true, shift: true -> only Ctrl+Shift+F; disjoint from PluginA
       const result = KeyboardShortcutRegistry.register('PluginB', [{ key: 'F', ctrl: true, shift: true, callback: cb }]);
 
       expect(result).toHaveLength(1);
@@ -206,11 +316,11 @@ describe('KeyboardShortcutRegistry', () => {
       expect(KeyboardShortcutRegistry.shortcutsConflict(make(), make())).toBe(true);
     });
 
-    it('should return false for undefined vs true (undefined treated as false)', () => {
-      expect(KeyboardShortcutRegistry.shortcutsConflict(make(), make({ ctrl: true }))).toBe(false);
+    it('should return true for undefined vs true (undefined is a wildcard)', () => {
+      expect(KeyboardShortcutRegistry.shortcutsConflict(make(), make({ ctrl: true }))).toBe(true);
     });
 
-    it('should return true for undefined vs false (both effectively false)', () => {
+    it('should return true for undefined vs false (undefined is a wildcard)', () => {
       expect(KeyboardShortcutRegistry.shortcutsConflict(make(), make({ ctrl: false }))).toBe(true);
     });
 
@@ -278,11 +388,14 @@ describe('KeyboardShortcutRegistry', () => {
   /**
    * Real-world shortcut audit.
    *
-   * This registers every keyboard shortcut from every plugin in the codebase
-   * (in approximate load order) and asserts zero conflicts. When a new plugin
-   * adds a shortcut, add it here so CI catches overlaps early.
+   * This registers every registry-based keyboard shortcut in the codebase (in
+   * approximate load order) and asserts zero conflicts. When a new plugin adds a
+   * shortcut, add it to `pluginShortcuts` so CI catches overlaps early.
    *
    * Keep this list in sync with the actual getKeyboardShortcuts() implementations.
+   * NOTE: uppercase letter shortcuts imply Shift (the key char only exists with
+   * Shift held), so a bare `{ key: 'A' }` is the same physical chord as
+   * `{ key: 'A', shift: true }` and the two WILL be flagged as conflicting.
    */
   describe('real-world shortcut audit', () => {
     // eslint-disable-next-line @typescript-eslint/no-empty-function

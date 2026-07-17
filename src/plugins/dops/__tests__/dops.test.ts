@@ -1,6 +1,5 @@
 import { vi } from 'vitest';
 /* eslint-disable dot-notation */
-import { CameraType } from '@app/engine/camera/camera-type';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { DopMath } from '@app/engine/math/dop-math';
 import { DopsPlugin } from '@app/plugins/dops/dops';
@@ -112,14 +111,11 @@ describe('DopsPlugin behavior', () => {
     vi.restoreAllMocks();
   });
 
-  it('D shortcut returns in FPS mode and opens the menu otherwise', () => {
+  // Camera-mode suppression is handled centrally by KeyboardComponent; the
+  // plugin callback simply toggles the menu.
+  it('D shortcut opens the menu', () => {
     const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
 
-    ServiceLocator.getMainCamera().cameraType = CameraType.FPS;
-    plugin.getKeyboardShortcuts()[0].callback();
-    expect(spy).not.toHaveBeenCalled();
-
-    ServiceLocator.getMainCamera().cameraType = CameraType.CURRENT;
     plugin.getKeyboardShortcuts()[0].callback();
     expect(spy).toHaveBeenCalled();
   });

@@ -144,11 +144,25 @@ export class KeyboardShortcutRegistry {
   }
 
   /**
-   * Check if two modifier values overlap.
-   * `undefined` is treated as `false` (modifier not required).
+   * Check if two modifier requirements can be satisfied by the same key event.
+   *
+   * This MUST mirror the runtime matcher in KeyboardComponent, which treats an
+   * `undefined` modifier as a wildcard ("don't care") that matches whether or
+   * not the modifier is held. So `undefined` overlaps BOTH `true` and `false`;
+   * two explicit values overlap only when equal.
+   *
+   * Consequence: a shortcut with `shift` undefined conflicts with one that
+   * requires `shift: true`, because both fire when Shift is held. (This is why
+   * a bare uppercase-letter shortcut such as `{ key: 'A' }` collides with
+   * `{ key: 'A', shift: true }` — the uppercase char is only produced with
+   * Shift, so they are the same physical chord.)
    */
   private static modifiersOverlap_(a: boolean | undefined, b: boolean | undefined): boolean {
-    return (a ?? false) === (b ?? false);
+    if (a === undefined || b === undefined) {
+      return true;
+    }
+
+    return a === b;
   }
 
   /**

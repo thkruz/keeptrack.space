@@ -1,7 +1,6 @@
 import { vi } from 'vitest';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
-import { CameraType } from '@app/engine/camera/camera-type';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -231,21 +230,11 @@ describe('ColorMenu_class', () => {
   });
 
   describe('keyboard shortcut and command palette', () => {
-    it('A shortcut returns early in FPS camera mode', () => {
+    // Camera-mode suppression is handled centrally by KeyboardComponent; the
+    // plugin callback simply toggles the menu.
+    it('A shortcut opens the menu', () => {
       const plugin = new ColorMenu();
 
-      ServiceLocator.getMainCamera().cameraType = CameraType.FPS;
-      const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
-
-      plugin.getKeyboardShortcuts()[0].callback();
-
-      expect(spy).not.toHaveBeenCalled();
-    });
-
-    it('A shortcut opens the menu when not in FPS mode', () => {
-      const plugin = new ColorMenu();
-
-      ServiceLocator.getMainCamera().cameraType = CameraType.CURRENT;
       const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
 
       plugin.getKeyboardShortcuts()[0].callback();

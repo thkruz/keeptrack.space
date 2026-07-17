@@ -295,6 +295,8 @@ export class OrbitManager {
     new KeyboardComponent('OrbitManager', [
       {
         key: 'L',
+        // ctrl:false so Ctrl+Shift+L stays free for New Launch; this owns plain Shift+L.
+        ctrl: false,
         callback: () => {
           this.toggleOrbitLines_();
           SettingsMenuPlugin.syncOnLoad();

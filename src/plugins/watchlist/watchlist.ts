@@ -22,7 +22,6 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { CameraType } from '@app/engine/camera/camera-type';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -133,9 +132,6 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
       {
         key: 'W',
         callback: () => {
-          if (ServiceLocator.getMainCamera().cameraType === CameraType.FPS) {
- return;
-}
           this.bottomMenuClicked();
         },
       },

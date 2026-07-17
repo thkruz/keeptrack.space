@@ -5,7 +5,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { StorageKey } from '@app/engine/persistence/storage-key';
-import { IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -126,18 +126,6 @@ export class Calculator extends KeepTrackPlugin {
       ],
       tips: [l('help.tip1'), l('help.tip2'), l('help.tip3')],
     };
-  }
-
-  getKeyboardShortcuts(): IKeyboardShortcut[] {
-    return [
-      {
-        key: 'c',
-        shift: true,
-        callback: () => {
-          this.bottomMenuClicked();
-        },
-      },
-    ];
   }
 
   private currentInputFrame_: CoordFrame = CoordFrame.J2000;

@@ -1,4 +1,3 @@
-import { CameraType } from '@app/engine/camera/camera-type';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -46,14 +45,11 @@ describe('WatchlistFilterPlugin methods', () => {
     expect(() => plugin.getCommandPaletteCommands()[0].callback()).not.toThrow();
   });
 
-  it('the "w" shortcut is a no-op in FPS mode and toggles otherwise', () => {
+  // Camera-mode suppression is handled centrally by KeyboardComponent; the
+  // plugin callback simply toggles the menu.
+  it('the "w" shortcut toggles the menu', () => {
     const clicked = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
 
-    ServiceLocator.getMainCamera().cameraType = CameraType.FPS;
-    plugin.getKeyboardShortcuts()[0].callback();
-    expect(clicked).not.toHaveBeenCalled();
-
-    ServiceLocator.getMainCamera().cameraType = CameraType.FIXED_TO_EARTH;
     plugin.getKeyboardShortcuts()[0].callback();
     expect(clicked).toHaveBeenCalled();
   });

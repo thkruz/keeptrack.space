@@ -72,22 +72,15 @@ describe('SensorListPlugin commands, shortcuts and content clicks', () => {
       sc.callback();
     };
 
-    it('S toggles the menu when not in FPS mode', () => {
+    // Camera-mode suppression is handled centrally by KeyboardComponent; the
+    // plugin callback simply toggles the menu.
+    it('S toggles the menu', () => {
       ServiceLocator.getMainCamera().cameraType = CameraType.FIXED_TO_EARTH;
       const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
 
       run('S');
 
       expect(spy).toHaveBeenCalled();
-    });
-
-    it('S does nothing in FPS mode', () => {
-      ServiceLocator.getMainCamera().cameraType = CameraType.FPS;
-      const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
-
-      run('S');
-
-      expect(spy).not.toHaveBeenCalled();
     });
 
     it('Ctrl+Home snaps the camera to the current sensor when earth-fixed', () => {

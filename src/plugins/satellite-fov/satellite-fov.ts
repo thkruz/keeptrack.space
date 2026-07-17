@@ -95,10 +95,14 @@ export class SatelliteFov extends KeepTrackPlugin {
     return [
       {
         key: 'C',
+        // ctrl:false so Ctrl+Shift+C stays free for other plugins.
+        ctrl: false,
         callback: () => this.toggleFovCone_(),
       },
       {
         key: 'V',
+        // ctrl:false so Ctrl+Shift+V belongs to Video Director, not this toggle.
+        ctrl: false,
         callback: () => this.toggleSatToSatCone_(),
       },
     ];

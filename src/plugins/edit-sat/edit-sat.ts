@@ -86,6 +86,8 @@ export class EditSat extends KeepTrackPlugin {
     return [
       {
         key: 'E',
+        // ctrl:false so Ctrl+Shift+E stays free for Eclipse Analysis; this owns plain Shift+E.
+        ctrl: false,
         callback: () => {
           const ct = ServiceLocator.getMainCamera().cameraType;
 

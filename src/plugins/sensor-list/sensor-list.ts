@@ -114,9 +114,6 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
       {
         key: 'S',
         callback: () => {
-          if (ServiceLocator.getMainCamera().cameraType === CameraType.FPS) {
-            return;
-          }
           this.bottomMenuClicked();
         },
       },

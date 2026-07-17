@@ -189,6 +189,8 @@ export class Reentries extends KeepTrackPlugin {
     return [
       {
         key: 'R',
+        // ctrl:false so Ctrl+Shift+R belongs to Video Director, not this toggle.
+        ctrl: false,
         callback: () => this.bottomMenuClicked(),
       },
     ];

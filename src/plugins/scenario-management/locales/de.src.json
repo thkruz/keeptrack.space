@@ -25,11 +25,13 @@
       "buttons": {
         "updateScenario": "Szenario aktualisieren",
         "saveScenario": "Szenario speichern",
-        "loadScenario": "Szenario laden"
+        "loadScenario": "Szenario laden",
+        "clearTimeBounds": "Zeitgrenzen löschen"
       },
       "msgs": {
         "settingsUpdated": "Szenario-Einstellungen erfolgreich aktualisiert!",
-        "scenarioLoaded": "Szenario erfolgreich geladen!"
+        "scenarioLoaded": "Szenario erfolgreich geladen!",
+        "boundsCleared": "Zeitgrenzen gelöscht. Szenario ist jetzt unbegrenzt."
       },
       "errorMsgs": {
         "nameRequired": "Der Szenarioname ist erforderlich.",

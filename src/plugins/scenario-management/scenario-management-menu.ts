@@ -126,6 +126,9 @@ export class ScenarioManagementMenu extends KeepTrackPlugin {
         <button id="${this.formPrefix_}-submit" class="kt-action waves-effect" type="submit" name="action">
           <span class="kt-action-label">${l('buttons.updateScenario')}</span>
         </button>
+        <button id="${this.formPrefix_}-clear-bounds" class="kt-action waves-effect" type="button">
+          <span class="kt-action-label">${l('buttons.clearTimeBounds')}</span>
+        </button>
       </form>
       <section class="kt-section">
         <div class="kt-section-label">${l('sections.actions')}</div>
@@ -160,6 +163,7 @@ export class ScenarioManagementMenu extends KeepTrackPlugin {
         getEl(`${this.formPrefix_}-start-date`)?.addEventListener('change', this.onDateChange_.bind(this));
         getEl(`${this.formPrefix_}-end-date`)?.addEventListener('change', this.onDateChange_.bind(this));
         getEl(`${this.formPrefix_}-form`)?.addEventListener('submit', this.onSubmit_.bind(this));
+        getEl(`${this.formPrefix_}-clear-bounds`)?.addEventListener('click', this.onClearBounds_.bind(this));
         getEl(`${this.formPrefix_}-save`)?.addEventListener('click', this.onSave_.bind(this));
         getEl(`${this.formPrefix_}-load`)?.addEventListener('click', this.onLoad_.bind(this));
       },
@@ -225,6 +229,27 @@ export class ScenarioManagementMenu extends KeepTrackPlugin {
     const input = e.target as HTMLInputElement;
 
     validateDateInput(input);
+  }
+
+  /**
+   * Clears the scenario time window, returning to endless mode. Empties both
+   * date fields and commits explicit nulls so the simulation clock is no longer
+   * clamped to a window.
+   */
+  protected onClearBounds_(): void {
+    for (const id of [`${this.formPrefix_}-start-date`, `${this.formPrefix_}-end-date`]) {
+      const input = getEl(id) as HTMLInputElement | null;
+
+      if (input) {
+        input.value = '';
+        input.classList.remove('invalid', 'valid');
+      }
+    }
+
+    if (this.corePlugin_.updateScenario({ startTime: null, endTime: null })) {
+      ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+      ServiceLocator.getUiManager().toast(l('msgs.boundsCleared'), ToastMsgType.normal);
+    }
   }
 
   protected async onSave_(evt: Event): Promise<void> {

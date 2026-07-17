@@ -25,11 +25,13 @@
       "buttons": {
         "updateScenario": "Aktualizuj scenariusz",
         "saveScenario": "Zapisz scenariusz",
-        "loadScenario": "Wczytaj scenariusz"
+        "loadScenario": "Wczytaj scenariusz",
+        "clearTimeBounds": "Wyczyść granice czasowe"
       },
       "msgs": {
         "settingsUpdated": "Ustawienia scenariusza zostały pomyślnie zaktualizowane!",
-        "scenarioLoaded": "Scenariusz został pomyślnie wczytany!"
+        "scenarioLoaded": "Scenariusz został pomyślnie wczytany!",
+        "boundsCleared": "Granice czasowe wyczyszczone. Scenariusz jest teraz nieograniczony."
       },
       "errorMsgs": {
         "nameRequired": "Nazwa scenariusza jest wymagana.",

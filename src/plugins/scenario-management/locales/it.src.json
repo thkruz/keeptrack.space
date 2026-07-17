@@ -25,11 +25,13 @@
       "buttons": {
         "updateScenario": "Aggiorna scenario",
         "saveScenario": "Salva scenario",
-        "loadScenario": "Carica scenario"
+        "loadScenario": "Carica scenario",
+        "clearTimeBounds": "Cancella limiti temporali"
       },
       "msgs": {
         "settingsUpdated": "Impostazioni dello scenario aggiornate con successo!",
-        "scenarioLoaded": "Scenario caricato con successo!"
+        "scenarioLoaded": "Scenario caricato con successo!",
+        "boundsCleared": "Limiti temporali cancellati. Lo scenario è ora illimitato."
       },
       "errorMsgs": {
         "nameRequired": "Il nome dello scenario è obbligatorio.",

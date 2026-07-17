@@ -15,17 +15,22 @@
       },
       "sections": {
         "template": "Plantilla",
+        "launchWindow": "Ventana de lanzamiento",
         "launchSite": "Sitio de lanzamiento"
       },
       "buttons": {
+        "matchTargetPlane": "Coincidir con el plano objetivo",
         "createLaunchNominal": "Crear Lanzamiento Nominal",
         "inclinationTooLow": "¡Inclinación demasiado baja!"
       },
       "msgs": {
+        "windowFound": "Lanzamiento a las {time} para coincidir con el plano objetivo (ΔRAAN {delta}°)",
         "launchNominalCreated": "¡Lanzamiento nominal creado!",
         "timeRelativeToLaunch": "El tiempo ahora es relativo a la hora de lanzamiento."
       },
       "errorMsgs": {
+        "windowNoTarget": "Seleccione primero un satélite objetivo.",
+        "windowGeometryImpossible": "Sin ventana de lanzamiento: la inclinación objetivo es menor que la latitud del sitio de lanzamiento.",
         "noMoreNominalSatellites": "¡No hay más satélites nominales disponibles!",
         "launchSiteNotFound": "¡Sitio de lanzamiento {launchSite} no encontrado!",
         "failedToCreateTle": "Error al crear el TLE: {error}",

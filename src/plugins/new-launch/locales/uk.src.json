@@ -15,17 +15,22 @@
       },
       "sections": {
         "template": "Шаблон",
+        "launchWindow": "Стартове вікно",
         "launchSite": "Космодром"
       },
       "buttons": {
+        "matchTargetPlane": "Узгодити з цільовою площиною",
         "createLaunchNominal": "Створити номінал запуску",
         "inclinationTooLow": "Нахил занадто малий!"
       },
       "msgs": {
+        "windowFound": "Старт о {time} для узгодження з цільовою площиною (ΔRAAN {delta}°)",
         "launchNominalCreated": "Номінал запуску створено!",
         "timeRelativeToLaunch": "Час тепер відраховується відносно часу запуску."
       },
       "errorMsgs": {
+        "windowNoTarget": "Спочатку виберіть цільовий супутник.",
+        "windowGeometryImpossible": "Немає стартового вікна: цільовий нахил менший за широту місця старту.",
         "noMoreNominalSatellites": "Більше немає доступних номінальних супутників!",
         "launchSiteNotFound": "Місце запуску {launchSite} не знайдено!",
         "failedToCreateTle": "Не вдалося створити TLE: {error}",

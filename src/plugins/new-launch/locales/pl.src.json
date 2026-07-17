@@ -15,17 +15,22 @@
       },
       "sections": {
         "template": "Szablon",
+        "launchWindow": "Okno startowe",
         "launchSite": "Miejsce startu"
       },
       "buttons": {
+        "matchTargetPlane": "Dopasuj do płaszczyzny celu",
         "createLaunchNominal": "Utwórz start nominalny",
         "inclinationTooLow": "Zbyt mała inklinacja!"
       },
       "msgs": {
+        "windowFound": "Start o {time}, aby dopasować się do płaszczyzny celu (ΔRAAN {delta}°)",
         "launchNominalCreated": "Utworzono start nominalny!",
         "timeRelativeToLaunch": "Czas jest teraz liczony względem startu."
       },
       "errorMsgs": {
+        "windowNoTarget": "Najpierw wybierz satelitę docelowego.",
+        "windowGeometryImpossible": "Brak okna startowego: docelowa inklinacja jest mniejsza niż szerokość geograficzna miejsca startu.",
         "noMoreNominalSatellites": "Brak dostępnych satelitów nominalnych!",
         "launchSiteNotFound": "Nie znaleziono miejsca startu {launchSite}!",
         "failedToCreateTle": "Nie udało się utworzyć TLE: {error}",

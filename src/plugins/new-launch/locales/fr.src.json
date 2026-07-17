@@ -15,17 +15,22 @@
       },
       "sections": {
         "template": "Modèle",
+        "launchWindow": "Fenêtre de lancement",
         "launchSite": "Site de lancement"
       },
       "buttons": {
+        "matchTargetPlane": "Aligner sur le plan cible",
         "createLaunchNominal": "Créer un lancement nominal",
         "inclinationTooLow": "Inclinaison trop faible !"
       },
       "msgs": {
+        "windowFound": "Lancement à {time} pour s'aligner sur le plan cible (ΔRAAN {delta}°)",
         "launchNominalCreated": "Lancement nominal créé !",
         "timeRelativeToLaunch": "Le temps est désormais relatif à l'heure de lancement."
       },
       "errorMsgs": {
+        "windowNoTarget": "Sélectionnez d'abord un satellite cible.",
+        "windowGeometryImpossible": "Pas de fenêtre de lancement : l'inclinaison cible est inférieure à la latitude du site de lancement.",
         "noMoreNominalSatellites": "Plus de satellites nominaux disponibles !",
         "launchSiteNotFound": "Site de lancement {launchSite} introuvable !",
         "failedToCreateTle": "Échec de la création du TLE : {error}",

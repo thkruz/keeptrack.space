@@ -15,17 +15,22 @@
       },
       "sections": {
         "template": "Šablona",
+        "launchWindow": "Startovní okno",
         "launchSite": "Startoviště"
       },
       "buttons": {
+        "matchTargetPlane": "Srovnat s cílovou rovinou",
         "createLaunchNominal": "Vytvořit nominální start",
         "inclinationTooLow": "Příliš nízká inklinace!"
       },
       "msgs": {
+        "windowFound": "Start v {time} pro srovnání s cílovou rovinou (ΔRAAN {delta}°)",
         "launchNominalCreated": "Nominální start vytvořen!",
         "timeRelativeToLaunch": "Čas je nyní relativní vůči času startu."
       },
       "errorMsgs": {
+        "windowNoTarget": "Nejprve vyberte cílový satelit.",
+        "windowGeometryImpossible": "Žádné startovní okno: cílová inklinace je nižší než zeměpisná šířka startoviště.",
         "noMoreNominalSatellites": "Nejsou k dispozici žádné další nominální satelity!",
         "launchSiteNotFound": "Místo startu {launchSite} nebylo nalezeno!",
         "failedToCreateTle": "Nepodařilo se vytvořit TLE: {error}",

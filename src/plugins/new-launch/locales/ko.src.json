@@ -15,17 +15,22 @@
       },
       "sections": {
         "template": "템플릿",
+        "launchWindow": "발사 윈도우",
         "launchSite": "발사장"
       },
       "buttons": {
+        "matchTargetPlane": "목표 궤도면 일치",
         "createLaunchNominal": "발사 노미널 생성",
         "inclinationTooLow": "경사각이 너무 낮습니다!"
       },
       "msgs": {
+        "windowFound": "{time}에 발사하면 목표 궤도면과 일치합니다 (ΔRAAN {delta}°)",
         "launchNominalCreated": "발사 노미널이 생성되었습니다!",
         "timeRelativeToLaunch": "이제 시간은 발사 시간 기준 상대 시간입니다."
       },
       "errorMsgs": {
+        "windowNoTarget": "먼저 목표 위성을 선택하세요.",
+        "windowGeometryImpossible": "발사 윈도우 없음: 목표 궤도 경사각이 발사장 위도보다 낮습니다.",
         "noMoreNominalSatellites": "사용 가능한 노미널 위성이 더 이상 없습니다!",
         "launchSiteNotFound": "발사 장소 {launchSite}을(를) 찾을 수 없습니다!",
         "failedToCreateTle": "TLE 생성 실패: {error}",

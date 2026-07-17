@@ -15,17 +15,22 @@
       },
       "sections": {
         "template": "テンプレート",
+        "launchWindow": "打ち上げウィンドウ",
         "launchSite": "発射場"
       },
       "buttons": {
+        "matchTargetPlane": "目標軌道面に合わせる",
         "createLaunchNominal": "打ち上げノミナルを作成",
         "inclinationTooLow": "傾斜角が低すぎます！"
       },
       "msgs": {
+        "windowFound": "{time} に打ち上げると目標軌道面に一致します（ΔRAAN {delta}°）",
         "launchNominalCreated": "打ち上げノミナルを作成しました！",
         "timeRelativeToLaunch": "時間は打ち上げ時刻からの相対時間になりました。"
       },
       "errorMsgs": {
+        "windowNoTarget": "まず目標衛星を選択してください。",
+        "windowGeometryImpossible": "打ち上げウィンドウがありません：目標の軌道傾斜角が発射場の緯度より小さいです。",
         "noMoreNominalSatellites": "利用可能なノミナル衛星がもうありません！",
         "launchSiteNotFound": "打ち上げ場所 {launchSite} が見つかりません！",
         "failedToCreateTle": "TLEの作成に失敗しました: {error}",

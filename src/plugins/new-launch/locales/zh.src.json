@@ -15,17 +15,22 @@
       },
       "sections": {
         "template": "模板",
+        "launchWindow": "发射窗口",
         "launchSite": "发射场"
       },
       "buttons": {
+        "matchTargetPlane": "匹配目标轨道面",
         "createLaunchNominal": "创建发射标称轨道",
         "inclinationTooLow": "倾角过低！"
       },
       "msgs": {
+        "windowFound": "在 {time} 发射以匹配目标轨道面（ΔRAAN {delta}°）",
         "launchNominalCreated": "发射标称轨道已创建！",
         "timeRelativeToLaunch": "时间现在以发射时间为基准。"
       },
       "errorMsgs": {
+        "windowNoTarget": "请先选择目标卫星。",
+        "windowGeometryImpossible": "无发射窗口：目标轨道倾角低于发射场纬度。",
         "noMoreNominalSatellites": "没有更多可用的标称卫星！",
         "launchSiteNotFound": "未找到发射场 {launchSite}！",
         "failedToCreateTle": "创建TLE失败：{error}",

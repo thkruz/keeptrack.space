@@ -15,17 +15,22 @@
       },
       "sections": {
         "template": "Vorlage",
+        "launchWindow": "Startfenster",
         "launchSite": "Startplatz"
       },
       "buttons": {
+        "matchTargetPlane": "Zielebene angleichen",
         "createLaunchNominal": "Startnominal erstellen",
         "inclinationTooLow": "Inklination zu niedrig!"
       },
       "msgs": {
+        "windowFound": "Start um {time} zur Angleichung an die Zielebene (ΔRAAN {delta}°)",
         "launchNominalCreated": "Startnominal erstellt!",
         "timeRelativeToLaunch": "Die Zeit ist jetzt relativ zur Startzeit."
       },
       "errorMsgs": {
+        "windowNoTarget": "Wählen Sie zuerst einen Zielsatelliten aus.",
+        "windowGeometryImpossible": "Kein Startfenster: Die Zielinklination liegt unter der Breite des Startplatzes.",
         "noMoreNominalSatellites": "Keine weiteren nominalen Satelliten verfügbar!",
         "launchSiteNotFound": "Startort {launchSite} nicht gefunden!",
         "failedToCreateTle": "TLE konnte nicht erstellt werden: {error}",

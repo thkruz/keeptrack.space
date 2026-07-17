@@ -19,9 +19,11 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { t7e } from '@app/locales/keys';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
+import { dateFormat } from '@app/engine/utils/dateFormat';
 import {
   BaseObject, Degrees,
   FormatTle, KilometersPerSecond,
+  LaunchWindowFinder, LaunchWindowResult,
   OrbitFinder,
   Satellite, SatelliteParams,
   SatelliteRecord, Sgp4, SpaceObjectType,
@@ -257,6 +259,12 @@ export class NewLaunch extends KeepTrackPlugin {
                 </div>
               </section>
 
+              <section class="kt-section">
+                <div class="kt-section-label">${s('launchWindow')}</div>
+                <div class="kt-note" id="nl-window-result" style="display: none;"></div>
+                ${NewLaunch.actionButton_('nl-match-plane', t7e('plugins.NewLaunch.buttons.matchTargetPlane' as T7eKey))}
+              </section>
+
               ${NewLaunch.actionButton_(`${this.sideMenuElementName}-submit`, t7e('plugins.NewLaunch.buttons.createLaunchNominal' as T7eKey), { submit: true })}
             </form>
           </div>
@@ -272,6 +280,120 @@ export class NewLaunch extends KeepTrackPlugin {
   };
 
   protected isDoingCalculations_ = false;
+
+  /**
+   * Launch time selected by "Match target plane". When set, the created
+   * nominal launches at this time instead of 0000z so its plane RAAN matches
+   * the target satellite's plane. Cleared whenever the target, facility, or
+   * direction changes.
+   */
+  protected matchedLaunchTime_: Date | null = null;
+
+  /**
+   * The satellite whose orbital plane the launch window should match. The OSS
+   * form always launches into the template satellite's orbit (nl-scc); pro
+   * overrides this for its mode-aware form.
+   */
+  protected resolveMatchTarget_(): Satellite | null {
+    const sccNum = (getEl('nl-scc') as HTMLInputElement | null)?.value.trim() ?? '';
+    const sat = sccNum ? ServiceLocator.getCatalogManager().sccNum2Sat(sccNum) : null;
+
+    if (!sat) {
+      ServiceLocator.getUiManager().toast(t7e('plugins.NewLaunch.errorMsgs.windowNoTarget' as T7eKey), ToastMsgType.caution);
+    }
+
+    return sat;
+  }
+
+  /** The launch site coordinates for the window search. Pro overrides for custom locations. */
+  protected resolveLaunchSiteLatLon_(): { lat: Degrees; lon: Degrees } | null {
+    const facility = (getEl('nl-facility') as HTMLInputElement | null)?.value ?? '';
+    const site = ServiceLocator.getCatalogManager().launchSites[facility];
+
+    if (!site) {
+      return null;
+    }
+
+    const lon = site.lon > 180 ? ((site.lon - 360) as Degrees) : site.lon;
+
+    return { lat: site.lat, lon };
+  }
+
+  /**
+   * Finds the launch time in the next 24 hours whose orbital plane best
+   * matches the target satellite's RAAN, iterating candidate times from the
+   * current simulation time.
+   */
+  protected onMatchTargetPlane_(): void {
+    const uiManagerInstance = ServiceLocator.getUiManager();
+    const targetSat = this.resolveMatchTarget_();
+
+    if (!targetSat) {
+      return;
+    }
+
+    const site = this.resolveLaunchSiteLatLon_();
+
+    if (!site) {
+      uiManagerInstance.toast(
+        t7e('plugins.NewLaunch.errorMsgs.launchSiteNotFound' as T7eKey).replace('{launchSite}', (getEl('nl-facility') as HTMLInputElement | null)?.value ?? ''),
+        ToastMsgType.caution,
+      );
+
+      return;
+    }
+
+    const direction = <'N' | 'S'>((getEl('nl-updown') as HTMLInputElement | null)?.value ?? 'N');
+    // Prefer the drift-aware target RAAN; fall back to the epoch value when
+    // the satellite record is not (yet) available.
+    const satrec = targetSat.satrec as SatelliteRecord | null;
+    const finder = new LaunchWindowFinder({
+      siteLat: site.lat,
+      siteLon: site.lon,
+      inclination: targetSat.inclination,
+      direction,
+      targetRaan: satrec ? (time: Date) => LaunchWindowFinder.meanRaanAt(satrec, time) : targetSat.rightAscension,
+      startTime: ServiceLocator.getTimeManager().simulationTimeObj,
+    });
+
+    const window = finder.findBestLaunchTime();
+
+    if (!window) {
+      uiManagerInstance.toast(t7e('plugins.NewLaunch.errorMsgs.windowGeometryImpossible' as T7eKey), ToastMsgType.caution);
+      this.clearMatchedWindow_();
+
+      return;
+    }
+
+    ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+    this.applyMatchedWindow_(window);
+  }
+
+  /** Stores the matched window and renders the result note. Pro extends this to jump the simulation time. */
+  protected applyMatchedWindow_(window: LaunchWindowResult): void {
+    this.matchedLaunchTime_ = window.time;
+
+    const note = getEl('nl-window-result', true);
+
+    if (note) {
+      note.textContent = t7e('plugins.NewLaunch.msgs.windowFound' as T7eKey)
+        .replace('{time}', `${dateFormat(window.time, 'isoDateTime', true)}z`)
+        .replace('{delta}', Math.abs(window.raanError).toFixed(2));
+      note.style.display = 'block';
+    }
+  }
+
+  /** Clears the matched launch window (target/site/direction changed). */
+  protected clearMatchedWindow_(): void {
+    this.matchedLaunchTime_ = null;
+
+    const note = getEl('nl-window-result', true);
+
+    if (note) {
+      note.textContent = '';
+      note.style.display = 'none';
+    }
+  }
   submitCallback: () => void = () => {
     const sccNum = (<HTMLInputElement>getEl('nl-scc')).value.trim();
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
@@ -371,9 +493,13 @@ export class NewLaunch extends KeepTrackPlugin {
     // Date object defaults to local time.
     quadZTime.setUTCHours(0); // Move to UTC Hour
 
+    // A matched launch window overrides the default 0000z launch time so the
+    // resulting plane's RAAN lines up with the target satellite's plane.
+    const launchTime = this.matchedLaunchTime_ ?? quadZTime;
+
     const cacheStaticOffset = timeManagerInstance.staticOffset; // Cache the current static offset
 
-    timeManagerInstance.changeStaticOffset(quadZTime.getTime() - today.getTime()); // Find the offset from today
+    timeManagerInstance.changeStaticOffset(launchTime.getTime() - today.getTime()); // Find the offset from today
 
     colorSchemeManagerInstance.calculateColorBuffers(true);
 
@@ -477,6 +603,19 @@ export class NewLaunch extends KeepTrackPlugin {
       if (menuRoot) {
         initMaterialSelects(menuRoot);
       }
+
+      // Launch-window matching. The matched time is only valid for the
+      // facility/direction/target it was computed with, so changing either
+      // input invalidates it.
+      getEl('nl-match-plane', true)?.addEventListener('click', () => {
+        this.onMatchTargetPlane_();
+      });
+      getEl('nl-facility', true)?.addEventListener('change', () => {
+        this.clearMatchedWindow_();
+      });
+      getEl('nl-updown', true)?.addEventListener('change', () => {
+        this.clearMatchedWindow_();
+      });
     });
   }
 
@@ -493,8 +632,10 @@ export class NewLaunch extends KeepTrackPlugin {
           const sat = obj as Satellite;
           const sccEl = getEl('nl-scc') as HTMLInputElement | null;
 
-          if (sccEl) {
+          if (sccEl && sccEl.value !== sat.sccNum) {
             sccEl.value = sat.sccNum;
+            // New target satellite invalidates a previously matched window
+            this.clearMatchedWindow_();
           }
           this.setBottomIconToEnabled();
         } else if (obj?.type === SpaceObjectType.LAUNCH_SITE) {

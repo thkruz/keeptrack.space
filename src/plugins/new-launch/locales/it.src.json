@@ -15,17 +15,22 @@
       },
       "sections": {
         "template": "Modello",
+        "launchWindow": "Finestra di lancio",
         "launchSite": "Sito di lancio"
       },
       "buttons": {
+        "matchTargetPlane": "Allinea al piano bersaglio",
         "createLaunchNominal": "Crea lancio nominale",
         "inclinationTooLow": "Inclinazione troppo bassa!"
       },
       "msgs": {
+        "windowFound": "Lancio alle {time} per allinearsi al piano bersaglio (ΔRAAN {delta}°)",
         "launchNominalCreated": "Lancio nominale creato!",
         "timeRelativeToLaunch": "Il tempo è ora relativo all'orario di lancio."
       },
       "errorMsgs": {
+        "windowNoTarget": "Seleziona prima un satellite bersaglio.",
+        "windowGeometryImpossible": "Nessuna finestra di lancio: l'inclinazione bersaglio è inferiore alla latitudine del sito di lancio.",
         "noMoreNominalSatellites": "Nessun altro satellite nominale disponibile!",
         "launchSiteNotFound": "Sito di lancio {launchSite} non trovato!",
         "failedToCreateTle": "Creazione del TLE non riuscita: {error}",

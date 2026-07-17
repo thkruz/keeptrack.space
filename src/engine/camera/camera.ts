@@ -488,13 +488,18 @@ export class Camera {
    * Touch pinch-zoom (mobile). `pinchRatio` is the finger-spread ratio: > 1 = fingers spreading
    * (zoom in / move closer), < 1 = fingers pinching (zoom out / move away).
    *
-   * When a satellite is focused, the zoom is applied in distance-from-satellite (standoff) space
-   * via camDistBuffer, so each pinch step changes the distance by a consistent percentage at any
-   * orbit altitude - the same smooth feel as the desktop mouse wheel. This avoids the hypersensitive
-   * response you get from scaling the normalized zoom level directly, whose exponential curve
-   * (distance = zoomLevel^ZOOM_EXP) makes a small pinch jump the camera kilometers near an object.
-   * The camDistBuffer setter clamps to the target's minimum standoff, so this also honors the
-   * minimum distance. Falls back to Earth-centered normalized zoom when no satellite is selected.
+   * When a satellite is focused and the camera is within the close-camera range (nearZoomLevel),
+   * the zoom is applied in distance-from-satellite (standoff) space via camDistBuffer, so each
+   * pinch step changes the distance by a consistent percentage - a precision dolly for inspecting
+   * the 3D model that avoids the hypersensitive response of scaling the normalized zoom level
+   * directly, whose exponential curve (distance = zoomLevel^ZOOM_EXP) makes a small pinch jump the
+   * camera kilometers near an object.
+   *
+   * Beyond the close range the gesture switches to Earth-centered normalized zoom, whose
+   * exponential curve covers orbit-to-whole-Earth in a couple of pinches - a proportional standoff
+   * zoom would take dozens of pinch strokes to pull back to a whole-Earth view. Deployments that
+   * cap the standoff (e.g. the companion ride-along sets maxDistanceFromTarget) never leave
+   * standoff space, keeping the camera glued to its target.
    */
   zoomTouchPinch(pinchRatio: number): void {
     if (!Number.isFinite(pinchRatio) || pinchRatio <= 0) {
@@ -520,22 +525,70 @@ export class Camera {
       this.cameraType === CameraType.FIXED_TO_SAT_LVLH ||
       this.state.camZoomSnappedOnSat
     );
+    const targetDist = isSatFocused && target!.position
+      ? Math.sqrt(target!.position.x ** 2 + target!.position.y ** 2 + target!.position.z ** 2)
+      : 0;
 
-    if (isSatFocused && target!.position) {
-      const targetDist = Math.sqrt(target!.position.x ** 2 + target!.position.y ** 2 + target!.position.z ** 2);
+    if (targetDist > 0) {
+      if (this.state.camZoomSnappedOnSat) {
+        // While zoom-snapped (desktop touchscreens), snapToSat() re-derives zoomTarget from
+        // camDistBuffer every frame, so standoff space is the only space that sticks.
+        this.applyStandoffZoom_(targetDist, <Kilometers>(this.state.camDistBuffer / dampenedRatio));
 
-      if (targetDist > 0) {
-        // Proportional zoom in standoff space. Dividing by the ratio (> 1 when zooming in) shrinks
-        // the standoff. camDistBuffer's setter clamps to [effectiveMinDistanceFromTarget, max].
-        this.state.camDistBuffer = <Kilometers>(this.state.camDistBuffer / dampenedRatio);
-        this.state.zoomTarget = this.getZoomFromDistance(<Kilometers>(targetDist + this.state.camDistBuffer));
+        return;
+      }
+
+      // Mobile clears camZoomSnappedOnSat right after the selection snap, so derive the standoff
+      // from the zoom target instead of camDistBuffer - after an Earth-centered pinch below, a
+      // stale camDistBuffer would teleport the camera on the next close-range pinch.
+      const currentStandoff = Math.max(
+        this.calcDistanceBasedOnZoom(this.state.zoomTarget) - targetDist,
+        this.state.effectiveMinDistanceFromTarget,
+      );
+      const newStandoff = <Kilometers>(currentStandoff / dampenedRatio);
+
+      if (newStandoff <= settingsManager.nearZoomLevel || this.state.maxDistanceFromTarget !== null) {
+        this.applyStandoffZoom_(targetDist, newStandoff);
 
         return;
       }
     }
 
-    // Earth-centered fallback: proportional in normalized zoom space.
+    // Earth-centered: proportional in normalized zoom space.
     this.state.zoomTarget /= dampenedRatio;
+
+    // An Earth-centered pinch toward a focused satellite must not dive past the close-range
+    // boundary in one step - land on it and let the standoff dolly take over from there.
+    if (targetDist > 0 && dampenedRatio > 1 && this.calcDistanceBasedOnZoom(this.state.zoomTarget) < targetDist + settingsManager.nearZoomLevel) {
+      this.applyStandoffZoom_(targetDist, settingsManager.nearZoomLevel);
+    }
+  }
+
+  /**
+   * Sets the camera standoff distance from the focused target and syncs the zoom target to it.
+   * The camDistBuffer setter clamps to [effectiveMinDistanceFromTarget, maxDistanceFromTarget].
+   */
+  private applyStandoffZoom_(targetDist: number, standoff: Kilometers): void {
+    this.state.camDistBuffer = standoff;
+    this.state.zoomTarget = this.getZoomFromDistance(<Kilometers>(targetDist + this.state.camDistBuffer));
+  }
+
+  /**
+   * Applies an incremental camera roll from a two-finger twist gesture. Touch input is already
+   * rAF-throttled, so the delta is written directly to the current/target roll (no easing) to keep
+   * the view glued to the fingers. The roll persists after the gesture ends, matching the desktop
+   * Shift+MMB roll behavior.
+   */
+  rollTouchTwist(deltaRoll: Radians): void {
+    if (!settingsManager.isLocalRotateEnabled || !Number.isFinite(deltaRoll)) {
+      return;
+    }
+
+    const roll = normalizeAngle(<Radians>(this.state.localRotateCurrent.roll + deltaRoll));
+
+    this.state.localRotateCurrent.roll = roll;
+    this.state.localRotateTarget.roll = roll;
+    this.state.localRotateSpeed.roll = <Radians>0;
   }
 
   changeZoom(zoom: ZoomValue | number): void {
@@ -2053,6 +2106,28 @@ export class Camera {
     }
   }
 
+  /**
+   * Rotates a screen-space drag delta into the camera's unrolled frame so pitch/yaw follow what
+   * the user sees when the view is rolled (e.g. after a two-finger twist). Positive roll rotates
+   * the rendered image counterclockwise, so drag input must be rotated the opposite way before it
+   * drives pitch/yaw.
+   */
+  private screenDragToCameraFrame_(dx: number, dy: number): { dx: number; dy: number } {
+    const roll = this.state.localRotateCurrent.roll;
+
+    if (roll === 0) {
+      return { dx, dy };
+    }
+
+    const cos = Math.cos(roll);
+    const sin = Math.sin(roll);
+
+    return {
+      dx: dx * cos - dy * sin,
+      dy: dx * sin + dy * cos,
+    };
+  }
+
   private updatePitchYawSpeeds_(dt: Milliseconds) {
     if (this.state.isDragging) {
 
@@ -2075,9 +2150,11 @@ export class Camera {
         this.cameraType === CameraType.PLANETARIUM ||
         settingsManager.isMobileModeEnabled
       ) {
-        // random screen drag
-        const xDif = this.state.screenDragPoint[0] - this.state.mouseX;
-        const yDif = this.state.screenDragPoint[1] - this.state.mouseY;
+        // random screen drag, expressed in the unrolled camera frame so it tracks the screen
+        const { dx: xDif, dy: yDif } = this.screenDragToCameraFrame_(
+          this.state.screenDragPoint[0] - this.state.mouseX,
+          this.state.screenDragPoint[1] - this.state.mouseY,
+        );
         const yawTarget = <Radians>(this.state.dragStartYaw + xDif * settingsManager.cameraMovementSpeed);
         const pitchTarget = <Radians>(this.state.dragStartPitch + yDif * -settingsManager.cameraMovementSpeed);
 
@@ -2129,8 +2206,12 @@ export class Camera {
       if (this.wasDragging_) {
         this.wasDragging_ = false;
         if (settingsManager.isMobileModeEnabled) {
-          this.state.camYawSpeed = this.state.dragVelocityX * settingsManager.cameraMovementSpeed;
-          this.state.camPitchSpeed = -this.state.dragVelocityY * settingsManager.cameraMovementSpeed;
+          // Momentum gets the same roll compensation as the drag itself, or a fling
+          // on a rolled view would coast off in the wrong direction
+          const { dx, dy } = this.screenDragToCameraFrame_(this.state.dragVelocityX, this.state.dragVelocityY);
+
+          this.state.camYawSpeed = dx * settingsManager.cameraMovementSpeed;
+          this.state.camPitchSpeed = -dy * settingsManager.cameraMovementSpeed;
         }
         this.state.hasPrevDragPos = false;
         this.state.dragVelocityX = 0;

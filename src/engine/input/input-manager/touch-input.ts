@@ -3,8 +3,10 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { normalizeAngle } from '@app/engine/utils/transforms';
 import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { Radians } from '@ootk/src/main';
 import { MouseInput } from './mouse-input';
 
 export interface TapTouchEvent {
@@ -22,6 +24,10 @@ export interface PinchTouchEvent {
    * The distance between the two fingers
    */
   pinchDistance: number;
+  /**
+   * The angle in radians of the line between the two fingers (screen coordinates, y down)
+   */
+  pinchAngle: number;
 }
 
 interface CachedTouch {
@@ -29,6 +35,7 @@ interface CachedTouch {
   clientY: number;
   pageX: number;
   pageY: number;
+  identifier: number;
 }
 
 export class TouchInput {
@@ -43,6 +50,20 @@ export class TouchInput {
    * The distance between the two fingers at the start of the pinch
    */
   startPinchDistance = 0;
+  /**
+   * The angle between the two fingers at the start of the pinch, then re-anchored as the
+   * twist gesture progresses (see pinchMove)
+   */
+  startPinchAngle = 0;
+  /**
+   * Has the current two-finger gesture crossed the twist activation threshold
+   */
+  isTwisting = false;
+  /**
+   * Radians of twist required before two-finger rotation engages.
+   * Keeps straight pinch-zooms from wobbling the camera roll.
+   */
+  twistActivationThreshold = 0.15;
   touchSat: number;
   mouseSat: number;
   touchStartTime: number;
@@ -155,6 +176,12 @@ export class TouchInput {
       }
     }
 
+    // A finger lifted but two or more remain: re-anchor the pinch to the surviving pair
+    // so zoom and roll don't jump when the pair geometry changes
+    if (evt.touches?.length >= 2) {
+      this.pinchStart(this.measurePinch_(Array.from(evt.touches)));
+    }
+
     // Transition from 2 fingers to 1: stop rotation to prevent jerk
     if (evt.touches?.length === 1) {
       this.isPinching = false;
@@ -194,6 +221,7 @@ export class TouchInput {
       clientY: t.clientY,
       pageX: t.pageX,
       pageY: t.pageY,
+      identifier: t.identifier,
     }));
 
     // Throttle processing to once per animation frame (matches mouse-input pattern)
@@ -209,14 +237,11 @@ export class TouchInput {
     const touches = this.cachedTouches_;
 
     if (this.isPinching && touches.length >= 2) {
-      // Pinch zoom only — no rotation during pinch to prevent jerk on finger release
-      const dist = Math.hypot(
-        touches[0].pageX - touches[1].pageX,
-        touches[0].pageY - touches[1].pageY,
-      );
+      // Two-finger gesture: pinch zoom + twist roll (no pitch/yaw to prevent jerk on finger release)
+      const pinch = this.measurePinch_(touches);
 
-      if (!isNaN(dist) && dist > this.tapMovementThreshold) {
-        this.pinchMove({ pinchDistance: dist });
+      if (!isNaN(pinch.pinchDistance) && pinch.pinchDistance > this.tapMovementThreshold) {
+        this.pinchMove(pinch);
       }
     } else if (!this.isPinching) {
       // Single-finger pan
@@ -230,15 +255,27 @@ export class TouchInput {
     }
   }
 
+  /**
+   * Measures the distance and angle between the two lowest-identifier touches. Sorting by
+   * identifier keeps the finger pairing stable across frames — TouchList order is not guaranteed,
+   * and an unstable pair would flip the measured angle by PI mid-gesture.
+   */
+  private measurePinch_(touches: readonly CachedTouch[]): PinchTouchEvent {
+    const [a, b] = [...touches].sort((t1, t2) => t1.identifier - t2.identifier);
+
+    return {
+      pinchDistance: Math.hypot(a.pageX - b.pageX, a.pageY - b.pageY),
+      pinchAngle: Math.atan2(a.pageY - b.pageY, a.pageX - b.pageX),
+    };
+  }
+
   public canvasTouchStart(evt: TouchEvent): void {
     this.touchStartTime = Date.now();
 
     if (evt.touches.length > 1) {
       this.isPinching = true;
       this.isPanning = false;
-      this.pinchStart({
-        pinchDistance: Math.hypot(evt.touches[0].pageX - evt.touches[1].pageX, evt.touches[0].pageY - evt.touches[1].pageY),
-      });
+      this.pinchStart(this.measurePinch_(Array.from(evt.touches)));
 
       // Stop rotation drag — pinch is zoom-only
       const cam = ServiceLocator.getMainCamera();
@@ -376,10 +413,14 @@ export class TouchInput {
 
   pinchStart(evt: PinchTouchEvent) {
     this.startPinchDistance = evt.pinchDistance;
+    this.startPinchAngle = evt.pinchAngle;
+    this.isTwisting = false;
   }
 
   pinchMove(evt: PinchTouchEvent) {
     this.lastEvent = evt;
+
+    const mainCameraInstance = ServiceLocator.getMainCamera();
 
     // Ratio-based zoom: spread fingers (ratio > 1) = zoom in, pinch (ratio < 1) = zoom out
     const pinchRatio = evt.pinchDistance / this.startPinchDistance;
@@ -389,7 +430,22 @@ export class TouchInput {
 
     // Zoom in distance-from-satellite space when a satellite is focused so the feel stays smooth
     // and consistent at any altitude, instead of scaling the exponential normalized zoom level.
-    ServiceLocator.getMainCamera().zoomTouchPinch(pinchRatio);
+    mainCameraInstance.zoomTouchPinch(pinchRatio);
+
+    // Twist-to-roll: angle is cumulative from the gesture start until the activation threshold is
+    // crossed, then re-anchored every frame so incremental deltas keep the view glued to the fingers.
+    const twistDelta = normalizeAngle(<Radians>(evt.pinchAngle - this.startPinchAngle));
+
+    if (this.isTwisting) {
+      this.startPinchAngle = evt.pinchAngle;
+      // Screen y points down, so a visually clockwise twist increases the touch angle, while a
+      // clockwise image rotation needs a negative camera roll — hence the sign flip.
+      mainCameraInstance.rollTouchTwist(<Radians>-twistDelta);
+    } else if (Math.abs(twistDelta) > this.twistActivationThreshold) {
+      // Latch rotation, discarding the pre-threshold twist so the view doesn't jump
+      this.isTwisting = true;
+      this.startPinchAngle = evt.pinchAngle;
+    }
   }
 
   rotate(evt: TouchEvent) {

@@ -19,9 +19,11 @@
         "launchSite": "Launch Site"
       },
       "buttons": {
-        "matchTargetPlane": "Match Target Plane",
+        "matchTargetPlane": "Find Launch Window",
         "createLaunchNominal": "Create Launch Nominal",
-        "inclinationTooLow": "Inclination Too Low!"
+        "inclinationTooLow": "Inclination Too Low!",
+        "clearWindow": "Clear launch window",
+        "createLaunchAtWindow": "Create Launch at Window"
       },
       "msgs": {
         "windowFound": "Launch at {time} to match the target plane (ΔRAAN {delta}°)",
@@ -59,7 +61,8 @@
         "tip1": "After creation the clock reads time since liftoff: \"00:45:00\" means 45 minutes after launch, perfect for sensor-coverage timelines.",
         "tip2": "If the creation fails its altitude check, try a different template satellite with a more conventional orbit.",
         "shortcutOpen": "Open the New Launch menu"
-      }
+      },
+      "launchWindowHelp": "Finds the next launch time whose orbital plane matches the target satellite. This only sets the launch time; nothing is created until you press Create Launch Nominal."
     }
   }
 }

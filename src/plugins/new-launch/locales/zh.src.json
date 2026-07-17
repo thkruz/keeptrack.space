@@ -19,9 +19,11 @@
         "launchSite": "发射场"
       },
       "buttons": {
-        "matchTargetPlane": "匹配目标轨道面",
+        "matchTargetPlane": "查找发射窗口",
         "createLaunchNominal": "创建发射标称轨道",
-        "inclinationTooLow": "倾角过低！"
+        "inclinationTooLow": "倾角过低！",
+        "clearWindow": "清除发射窗口",
+        "createLaunchAtWindow": "在窗口创建发射"
       },
       "msgs": {
         "windowFound": "在 {time} 发射以匹配目标轨道面（ΔRAAN {delta}°）",
@@ -59,7 +61,8 @@
         "tip1": "创建后时钟显示自起飞以来的时间：“00:45:00”表示发射后45分钟，非常适合传感器覆盖时间线。",
         "tip2": "如果创建未通过高度检查，请尝试轨道更常规的另一颗模板卫星。",
         "shortcutOpen": "打开新发射菜单"
-      }
+      },
+      "launchWindowHelp": "查找轨道平面与目标卫星匹配的下一个发射时间。这仅设置发射时间；在您按下“创建标称发射”之前不会创建任何内容。"
     }
   }
 }

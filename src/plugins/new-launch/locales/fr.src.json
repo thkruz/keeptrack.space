@@ -19,9 +19,11 @@
         "launchSite": "Site de lancement"
       },
       "buttons": {
-        "matchTargetPlane": "Aligner sur le plan cible",
+        "matchTargetPlane": "Trouver la fenêtre de lancement",
         "createLaunchNominal": "Créer un lancement nominal",
-        "inclinationTooLow": "Inclinaison trop faible !"
+        "inclinationTooLow": "Inclinaison trop faible !",
+        "clearWindow": "Effacer la fenêtre de lancement",
+        "createLaunchAtWindow": "Créer le lancement à la fenêtre"
       },
       "msgs": {
         "windowFound": "Lancement à {time} pour s'aligner sur le plan cible (ΔRAAN {delta}°)",
@@ -59,7 +61,8 @@
         "tip1": "Après la création, l’horloge indique le temps écoulé depuis le décollage : \"00:45:00\" signifie 45 minutes après le lancement, idéal pour les chronologies de couverture capteur.",
         "tip2": "Si la création échoue à son contrôle d’altitude, essayez un autre satellite modèle avec une orbite plus conventionnelle.",
         "shortcutOpen": "Ouvrir le menu Nouveau lancement"
-      }
+      },
+      "launchWindowHelp": "Trouve le prochain moment de lancement dont le plan orbital correspond au satellite cible. Cela définit uniquement l'heure de lancement ; rien n'est créé tant que vous n'appuyez pas sur « Créer le lancement nominal »."
     }
   }
 }

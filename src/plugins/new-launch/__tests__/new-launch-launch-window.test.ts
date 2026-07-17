@@ -53,8 +53,22 @@ describe('NewLaunch launch-window matching', () => {
 
     const note = getEl('nl-window-result')!;
 
-    expect(note.style.display).toBe('block');
+    expect(note.style.display).toBe('flex');
     expect(note.textContent).toContain('ΔRAAN');
+  });
+
+  it('arms the window without launching and can be cleared via the result note', () => {
+    p().onMatchTargetPlane_();
+    expect(p().matchedLaunchTime_).not.toBeNull();
+
+    // Finding a window only arms it; the clear affordance in the note disarms it.
+    const clearBtn = getEl('nl-window-clear', true);
+
+    expect(clearBtn).not.toBeNull();
+    clearBtn!.dispatchEvent(new Event('click'));
+
+    expect(p().matchedLaunchTime_).toBeNull();
+    expect(getEl('nl-window-result')!.style.display).toBe('none');
   });
 
   it('toasts when no target satellite resolves', () => {

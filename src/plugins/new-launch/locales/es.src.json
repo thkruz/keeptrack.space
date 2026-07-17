@@ -19,9 +19,11 @@
         "launchSite": "Sitio de lanzamiento"
       },
       "buttons": {
-        "matchTargetPlane": "Coincidir con el plano objetivo",
+        "matchTargetPlane": "Buscar ventana de lanzamiento",
         "createLaunchNominal": "Crear Lanzamiento Nominal",
-        "inclinationTooLow": "¡Inclinación demasiado baja!"
+        "inclinationTooLow": "¡Inclinación demasiado baja!",
+        "clearWindow": "Borrar ventana de lanzamiento",
+        "createLaunchAtWindow": "Crear lanzamiento en la ventana"
       },
       "msgs": {
         "windowFound": "Lanzamiento a las {time} para coincidir con el plano objetivo (ΔRAAN {delta}°)",
@@ -59,7 +61,8 @@
         "tip1": "Tras la creación, el reloj muestra el tiempo desde el despegue: \"00:45:00\" significa 45 minutos después del lanzamiento, perfecto para cronologías de cobertura de sensores.",
         "tip2": "Si la creación falla en su comprobación de altitud, prueba con otro satélite plantilla con una órbita más convencional.",
         "shortcutOpen": "Abrir el menú de Nuevo lanzamiento"
-      }
+      },
+      "launchWindowHelp": "Busca el próximo momento de lanzamiento cuyo plano orbital coincide con el satélite objetivo. Esto solo establece la hora de lanzamiento; no se crea nada hasta que pulses «Crear lanzamiento nominal»."
     }
   }
 }

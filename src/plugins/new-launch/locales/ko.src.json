@@ -19,9 +19,11 @@
         "launchSite": "발사장"
       },
       "buttons": {
-        "matchTargetPlane": "목표 궤도면 일치",
+        "matchTargetPlane": "발사 윈도우 찾기",
         "createLaunchNominal": "발사 노미널 생성",
-        "inclinationTooLow": "경사각이 너무 낮습니다!"
+        "inclinationTooLow": "경사각이 너무 낮습니다!",
+        "clearWindow": "발사 윈도우 지우기",
+        "createLaunchAtWindow": "윈도우에서 발사 생성"
       },
       "msgs": {
         "windowFound": "{time}에 발사하면 목표 궤도면과 일치합니다 (ΔRAAN {delta}°)",
@@ -59,7 +61,8 @@
         "tip1": "생성 후 시계는 이륙 이후 경과 시간을 표시합니다. \"00:45:00\"은 발사 후 45분을 의미하며 센서 커버리지 타임라인에 적합합니다.",
         "tip2": "생성이 고도 검사에서 실패하면 더 일반적인 궤도를 가진 다른 템플릿 위성을 시도해 보세요.",
         "shortcutOpen": "새 발사 메뉴 열기"
-      }
+      },
+      "launchWindowHelp": "궤도면이 목표 위성과 일치하는 다음 발사 시각을 찾습니다. 이것은 발사 시각만 설정하며, \"공칭 발사 생성\"을 누를 때까지 아무것도 생성되지 않습니다."
     }
   }
 }

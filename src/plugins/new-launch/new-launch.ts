@@ -261,7 +261,8 @@ export class NewLaunch extends KeepTrackPlugin {
 
               <section class="kt-section">
                 <div class="kt-section-label">${s('launchWindow')}</div>
-                <div class="kt-note" id="nl-window-result" style="display: none;"></div>
+                <p class="kt-note">${t7e('plugins.NewLaunch.launchWindowHelp' as T7eKey)}</p>
+                <div class="kt-note nl-window-result" id="nl-window-result" style="display: none;"></div>
                 ${NewLaunch.actionButton_('nl-match-plane', t7e('plugins.NewLaunch.buttons.matchTargetPlane' as T7eKey))}
               </section>
 
@@ -369,29 +370,62 @@ export class NewLaunch extends KeepTrackPlugin {
     this.applyMatchedWindow_(window);
   }
 
-  /** Stores the matched window and renders the result note. Pro extends this to jump the simulation time. */
+  /**
+   * Arms the matched launch window: stores the time, renders the result note
+   * with a Clear affordance, and updates the submit-button label so it is clear
+   * that the next "Create Launch" will use this window (nothing is launched yet).
+   */
   protected applyMatchedWindow_(window: LaunchWindowResult): void {
     this.matchedLaunchTime_ = window.time;
 
     const note = getEl('nl-window-result', true);
 
     if (note) {
-      note.textContent = t7e('plugins.NewLaunch.msgs.windowFound' as T7eKey)
+      const msg = t7e('plugins.NewLaunch.msgs.windowFound' as T7eKey)
         .replace('{time}', `${dateFormat(window.time, 'isoDateTime', true)}z`)
         .replace('{delta}', Math.abs(window.raanError).toFixed(2));
-      note.style.display = 'block';
+      const clearLabel = t7e('plugins.NewLaunch.buttons.clearWindow' as T7eKey);
+
+      note.innerHTML = html`
+        <span class="nl-window-found-text">${msg}</span>
+        <button type="button" id="nl-window-clear" class="nl-window-clear"
+          kt-tooltip="${clearLabel}" aria-label="${clearLabel}">&#10005;</button>
+      `;
+      note.style.display = 'flex';
+      getEl('nl-window-clear', true)?.addEventListener('click', () => this.clearMatchedWindow_());
     }
+
+    this.updateSubmitLabel_();
   }
 
-  /** Clears the matched launch window (target/site/direction changed). */
+  /** Clears the matched launch window (target/site/direction changed, or dismissed). */
   protected clearMatchedWindow_(): void {
     this.matchedLaunchTime_ = null;
 
     const note = getEl('nl-window-result', true);
 
     if (note) {
-      note.textContent = '';
+      note.innerHTML = '';
       note.style.display = 'none';
+    }
+
+    this.updateSubmitLabel_();
+  }
+
+  /** The submit-button label, reflecting an armed launch window when one is set. */
+  protected submitButtonLabel_(): string {
+    return this.matchedLaunchTime_
+      ? t7e('plugins.NewLaunch.buttons.createLaunchAtWindow' as T7eKey)
+      : t7e('plugins.NewLaunch.buttons.createLaunchNominal' as T7eKey);
+  }
+
+  /** Refreshes the submit-button label unless the inclination guard disabled it. */
+  protected updateSubmitLabel_(): void {
+    const submitButtonId = `${this.sideMenuElementName}-submit`;
+    const dom = getEl(submitButtonId) as HTMLButtonElement | null;
+
+    if (dom && !dom.disabled) {
+      this.setActionLabel_(submitButtonId, this.submitButtonLabel_());
     }
   }
   submitCallback: () => void = () => {
@@ -703,7 +737,7 @@ export class NewLaunch extends KeepTrackPlugin {
       this.setActionLabel_(submitButtonId, t7e('plugins.NewLaunch.buttons.inclinationTooLow' as T7eKey));
     } else {
       submitButtonDom.disabled = false;
-      this.setActionLabel_(submitButtonId, t7e('plugins.NewLaunch.buttons.createLaunchNominal' as T7eKey));
+      this.setActionLabel_(submitButtonId, this.submitButtonLabel_());
     }
   }
 

@@ -19,9 +19,11 @@
         "launchSite": "Sito di lancio"
       },
       "buttons": {
-        "matchTargetPlane": "Allinea al piano bersaglio",
+        "matchTargetPlane": "Trova finestra di lancio",
         "createLaunchNominal": "Crea lancio nominale",
-        "inclinationTooLow": "Inclinazione troppo bassa!"
+        "inclinationTooLow": "Inclinazione troppo bassa!",
+        "clearWindow": "Cancella finestra di lancio",
+        "createLaunchAtWindow": "Crea lancio nella finestra"
       },
       "msgs": {
         "windowFound": "Lancio alle {time} per allinearsi al piano bersaglio (ΔRAAN {delta}°)",
@@ -59,7 +61,8 @@
         "tip1": "Dopo la creazione l'orologio indica il tempo trascorso dal decollo: \"00:45:00\" significa 45 minuti dopo il lancio, perfetto per le cronologie di copertura dei sensori.",
         "tip2": "Se la creazione fallisce il controllo di quota, prova un altro satellite modello con un'orbita più convenzionale.",
         "shortcutOpen": "Apri il menu Nuovo lancio"
-      }
+      },
+      "launchWindowHelp": "Trova il prossimo orario di lancio il cui piano orbitale corrisponde al satellite bersaglio. Questo imposta solo l'orario di lancio; non viene creato nulla finché non premi «Crea lancio nominale»."
     }
   }
 }

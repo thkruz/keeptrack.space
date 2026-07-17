@@ -19,9 +19,11 @@
         "launchSite": "Startoviště"
       },
       "buttons": {
-        "matchTargetPlane": "Srovnat s cílovou rovinou",
+        "matchTargetPlane": "Najít startovní okno",
         "createLaunchNominal": "Vytvořit nominální start",
-        "inclinationTooLow": "Příliš nízká inklinace!"
+        "inclinationTooLow": "Příliš nízká inklinace!",
+        "clearWindow": "Vymazat startovní okno",
+        "createLaunchAtWindow": "Vytvořit start v okně"
       },
       "msgs": {
         "windowFound": "Start v {time} pro srovnání s cílovou rovinou (ΔRAAN {delta}°)",
@@ -59,7 +61,8 @@
         "tip1": "Po vytvoření hodiny ukazují čas od startu: \"00:45:00\" znamená 45 minut po startu, což je ideální pro časové osy pokrytí senzory.",
         "tip2": "Pokud vytvoření selže při kontrole výšky, zkuste jiný vzorový satelit s konvenčnější dráhou.",
         "shortcutOpen": "Otevřít nabídku Nový start"
-      }
+      },
+      "launchWindowHelp": "Najde nejbližší čas startu, jehož orbitální rovina odpovídá cílové družici. Tím se pouze nastaví čas startu; nic se nevytvoří, dokud nestisknete „Vytvořit nominální start“."
     }
   }
 }

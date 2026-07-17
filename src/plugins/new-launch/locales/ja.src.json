@@ -19,9 +19,11 @@
         "launchSite": "発射場"
       },
       "buttons": {
-        "matchTargetPlane": "目標軌道面に合わせる",
+        "matchTargetPlane": "打ち上げウィンドウを検索",
         "createLaunchNominal": "打ち上げノミナルを作成",
-        "inclinationTooLow": "傾斜角が低すぎます！"
+        "inclinationTooLow": "傾斜角が低すぎます！",
+        "clearWindow": "打ち上げウィンドウをクリア",
+        "createLaunchAtWindow": "ウィンドウで打ち上げを作成"
       },
       "msgs": {
         "windowFound": "{time} に打ち上げると目標軌道面に一致します（ΔRAAN {delta}°）",
@@ -59,7 +61,8 @@
         "tip1": "作成後、時計は打ち上げからの経過時間を表示します。「00:45:00」は打ち上げ後45分を意味し、センサーカバレッジのタイムラインに最適です。",
         "tip2": "作成が高度チェックで失敗した場合は、より一般的な軌道を持つ別のテンプレート衛星を試してください。",
         "shortcutOpen": "新規打ち上げメニューを開く"
-      }
+      },
+      "launchWindowHelp": "軌道面が目標衛星と一致する次の打ち上げ時刻を検索します。これは打ち上げ時刻を設定するだけで、「公称打ち上げを作成」を押すまで何も作成されません。"
     }
   }
 }

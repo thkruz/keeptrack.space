@@ -19,9 +19,11 @@
         "launchSite": "Startplatz"
       },
       "buttons": {
-        "matchTargetPlane": "Zielebene angleichen",
+        "matchTargetPlane": "Startfenster finden",
         "createLaunchNominal": "Startnominal erstellen",
-        "inclinationTooLow": "Inklination zu niedrig!"
+        "inclinationTooLow": "Inklination zu niedrig!",
+        "clearWindow": "Startfenster löschen",
+        "createLaunchAtWindow": "Start im Fenster erstellen"
       },
       "msgs": {
         "windowFound": "Start um {time} zur Angleichung an die Zielebene (ΔRAAN {delta}°)",
@@ -59,7 +61,8 @@
         "tip1": "Nach der Erstellung zeigt die Uhr die Zeit seit dem Abheben: \"00:45:00\" bedeutet 45 Minuten nach dem Start, ideal für Zeitachsen der Sensorabdeckung.",
         "tip2": "Wenn die Erstellung an der Höhenprüfung scheitert, versuchen Sie einen anderen Vorlagensatelliten mit einer konventionelleren Umlaufbahn.",
         "shortcutOpen": "Menü Neuer Start öffnen"
-      }
+      },
+      "launchWindowHelp": "Findet die nächste Startzeit, deren Bahnebene mit dem Zielsatelliten übereinstimmt. Dies legt nur die Startzeit fest; es wird nichts erstellt, bis Sie auf „Startnominal erstellen“ klicken."
     }
   }
 }

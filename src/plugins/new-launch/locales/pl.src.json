@@ -19,9 +19,11 @@
         "launchSite": "Miejsce startu"
       },
       "buttons": {
-        "matchTargetPlane": "Dopasuj do płaszczyzny celu",
+        "matchTargetPlane": "Znajdź okno startowe",
         "createLaunchNominal": "Utwórz start nominalny",
-        "inclinationTooLow": "Zbyt mała inklinacja!"
+        "inclinationTooLow": "Zbyt mała inklinacja!",
+        "clearWindow": "Wyczyść okno startowe",
+        "createLaunchAtWindow": "Utwórz start w oknie"
       },
       "msgs": {
         "windowFound": "Start o {time}, aby dopasować się do płaszczyzny celu (ΔRAAN {delta}°)",
@@ -59,7 +61,8 @@
         "tip1": "Po utworzeniu zegar pokazuje czas od startu: \"00:45:00\" oznacza 45 minut po starcie, co jest idealne do osi czasu zasięgu czujników.",
         "tip2": "Jeśli tworzenie nie przejdzie kontroli wysokości, wypróbuj innego satelitę wzorcowego o bardziej konwencjonalnej orbicie.",
         "shortcutOpen": "Otwórz menu Nowy start"
-      }
+      },
+      "launchWindowHelp": "Znajduje najbliższy czas startu, którego płaszczyzna orbity pokrywa się z satelitą docelowym. To tylko ustawia czas startu; nic nie jest tworzone, dopóki nie naciśniesz „Utwórz start nominalny”."
     }
   }
 }

@@ -390,11 +390,24 @@ export class Earth {
       widthSegments: settingsManager.earthNumLatSegs,
       heightSegments: settingsManager.earthNumLonSegs,
     });
+    const atmosphereUniforms: Record<string, WebGLUniformLocation> = {
+      uLightDirection: <WebGLUniformLocation><unknown>null,
+      uIntensity: <WebGLUniformLocation><unknown>null,
+    };
+
+    /*
+     * The EarthAtmosphere (Pro) plugin only emits `uCameraAltitude` when its
+     * isAltitudeAware setting is on. Declare the uniform ONLY when the installed
+     * shader actually references it: GlUtils.assignUniforms throws on localhost for
+     * any declared-but-inactive uniform, so an unconditional declaration would break
+     * the default (non-altitude-aware) atmosphere in dev/e2e.
+     */
+    if (this.shaders.atmosphereFrag.includes('uCameraAltitude')) {
+      atmosphereUniforms.uCameraAltitude = <WebGLUniformLocation><unknown>null;
+    }
+
     const earthAtmosphereMaterial = new ShaderMaterial(this.gl_, {
-      uniforms: {
-        uLightDirection: <WebGLUniformLocation><unknown>null,
-        uIntensity: <WebGLUniformLocation><unknown>null,
-      },
+      uniforms: atmosphereUniforms,
       vertexShader: this.shaders.atmosphereVert,
       fragmentShader: this.shaders.atmosphereFrag,
       glslVersion: GLSL3,
@@ -711,6 +724,19 @@ export class Earth {
 
     gl.uniform3fv(this.atmosphereMesh.material.uniforms.uLightDirection, this.lightDirection);
     gl.uniform1f(this.atmosphereMesh.material.uniforms.uIntensity, this.atmosphereIntensity_);
+
+    /*
+     * Altitude-aware scattering (EarthAtmosphere plugin, isAltitudeAware). The uniform
+     * only exists when that shader path is active, so guard on its resolved location —
+     * off-path atmosphere meshes never declare it and must not touch it.
+     */
+    const uCameraAltitude = this.atmosphereMesh.material.uniforms.uCameraAltitude;
+
+    if (uCameraAltitude) {
+      const altitudeAboveSurfaceKm = ServiceLocator.getMainCamera().getDistFromEarth() - RADIUS_OF_EARTH;
+
+      gl.uniform1f(uCameraAltitude, altitudeAboveSurfaceKm);
+    }
   }
 
   private initPlaceholderTexture_(): void {

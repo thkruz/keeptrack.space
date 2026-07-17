@@ -310,14 +310,19 @@ export class MouseInput {
       if (evt.button === 0) {
         const catalogManagerInstance = ServiceLocator.getCatalogManager();
         const inputCamera = ServiceLocator.getViewportManager()?.getInputCamera() ?? ServiceLocator.getMainCamera();
+        const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager);
 
-        // Left Mouse Button Clicked
-        if (inputCamera.cameraType === CameraType.SATELLITE_FIRST_PERSON) {
+        // Ctrl + Left Click assigns the clicked object as the secondary (reference)
+        // object - a fast alternative to the right-click "Set Secondary Object" menu.
+        if (this.keyboard_.getKey('Control') && this.clickedSat !== -1) {
+          selectSatManagerInstance?.setSecondarySat(this.clickedSat);
+        } else if (inputCamera.cameraType === CameraType.SATELLITE_FIRST_PERSON) {
+          // Left Mouse Button Clicked
           if (this.clickedSat !== -1 && !catalogManagerInstance.getObject(this.clickedSat, GetSatType.EXTRA_ONLY)?.isStatic()) {
-            PluginRegistry.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
+            selectSatManagerInstance?.selectSat(this.clickedSat);
           }
         } else {
-          PluginRegistry.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
+          selectSatManagerInstance?.selectSat(this.clickedSat);
         }
 
       }
@@ -423,6 +428,9 @@ export class MouseInput {
         // Revert any group color scheme back to a non group scheme
         colorSchemeManagerInstance.isUseGroupColorScheme = false;
 
+        // Clear Screen is a full reset, so drop the secondary (reference) object too -
+        // deselecting only the primary left the secondary object and its orbit on screen.
+        PluginRegistry.getPlugin(SelectSatManager)?.setSecondarySat(-1);
         PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
         break;
       default:

@@ -151,6 +151,32 @@ describe('MouseInput handlers', () => {
       expect(camera.state.isDragging).toBe(false);
     });
 
+    it('sets the clicked satellite as secondary on a ctrl + left click', () => {
+      keyboard.getKey.mockImplementation((key: string) => key === 'Control');
+      mouse.isStartedOnCanvas = true;
+      m().dragHasMoved = false;
+      mouse.mouseSat = 42;
+      vi.spyOn(UrlManager, 'updateURL').mockImplementation(() => undefined);
+
+      m().canvasMouseUp_({ button: 0, preventDefault: vi.fn() } as never);
+
+      expect(setSecondarySat).toHaveBeenCalledWith(42);
+      expect(selectSat).not.toHaveBeenCalled();
+    });
+
+    it('does not set a secondary on a ctrl + left click over empty space', () => {
+      keyboard.getKey.mockImplementation((key: string) => key === 'Control');
+      mouse.isStartedOnCanvas = true;
+      m().dragHasMoved = false;
+      mouse.mouseSat = -1;
+      vi.spyOn(UrlManager, 'updateURL').mockImplementation(() => undefined);
+
+      m().canvasMouseUp_({ button: 0, preventDefault: vi.fn() } as never);
+
+      expect(setSecondarySat).not.toHaveBeenCalled();
+      expect(selectSat).toHaveBeenCalledWith(-1);
+    });
+
     it('opens the right-click menu on a stationary right click', () => {
       mouse.isStartedOnCanvas = true;
       m().dragHasMoved = false;
@@ -210,13 +236,14 @@ describe('MouseInput handlers', () => {
       expect(setSecondarySat).toHaveBeenCalledWith(9);
     });
 
-    it('clears the screen and deselects', () => {
+    it('clears the screen and deselects both primary and secondary', () => {
       const ui = ServiceLocator.getUiManager();
 
       fire('clear-screen-rmb');
 
       expect(ui.doSearch).toHaveBeenCalledWith('');
       expect(selectSat).toHaveBeenCalledWith(-1);
+      expect(setSecondarySat).toHaveBeenCalledWith(-1);
     });
 
     it('emits a bus event for unknown menu items', () => {

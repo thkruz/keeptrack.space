@@ -121,13 +121,28 @@ describe('SelectSatManager_class', () => {
   });
 
   it('should switch primary and secondary satellites', () => {
-    selectSatManager.selectSat(1);
-    selectSatManager.setSecondarySat(2);
+    selectSatManager.selectSat(0);
+    selectSatManager.setSecondarySat(1);
 
     selectSatManager.switchPrimarySecondary();
 
-    expect(selectSatManager.selectedSat).toBe(2);
-    expect(selectSatManager.secondarySat).toBe(1);
+    expect(selectSatManager.selectedSat).toBe(1);
+    expect(selectSatManager.secondarySat).toBe(0);
+  });
+
+  it('should refocus the camera on the new primary when swapping', () => {
+    selectSatManager.selectSat(0);
+    selectSatManager.setSecondarySat(1);
+
+    // The camera refocus happens inside selectSat's full selection path, which the old
+    // id-only setSelectedSat_ shortcut skipped. Assert the new primary is routed through
+    // selectSat (the previous secondary), not just assigned.
+    const selectSatSpy = vi.spyOn(selectSatManager, 'selectSat');
+
+    selectSatManager.switchPrimarySecondary();
+
+    expect(selectSatSpy).toHaveBeenCalledWith(1);
+    expect(selectSatManager.selectedSat).toBe(1);
   });
 
   it('should select the previous satellite', () => {
@@ -297,6 +312,44 @@ describe('SelectSatManager_class', () => {
     selectSatManager.setSecondarySat(1);
 
     expect(selectSatManager.selectedSat).toBe(-1);
+  });
+
+  it('should clear the secondary orbit when the secondary is cleared', () => {
+    selectSatManager.selectSat(0);
+    selectSatManager.setSecondarySat(1);
+    expect(selectSatManager.secondarySat).toBe(1);
+
+    const clearSelectOrbit = vi.spyOn(ServiceLocator.getOrbitManager(), 'clearSelectOrbit');
+
+    selectSatManager.setSecondarySat(-1);
+
+    expect(selectSatManager.secondarySat).toBe(-1);
+    expect(selectSatManager.secondarySatObj).toBeNull();
+    expect(clearSelectOrbit).toHaveBeenCalledWith(true);
+  });
+
+  it('should toast a confirmation when a secondary satellite is set', () => {
+    selectSatManager.selectSat(0);
+
+    // toast is a shared mock in the test env, so clear accumulated calls first.
+    const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast');
+
+    toastSpy.mockClear();
+    selectSatManager.setSecondarySat(1);
+
+    expect(toastSpy).toHaveBeenCalledWith(expect.stringContaining(':'), expect.anything());
+  });
+
+  it('should not toast when the secondary is cleared', () => {
+    selectSatManager.selectSat(0);
+    selectSatManager.setSecondarySat(1);
+
+    const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast');
+
+    toastSpy.mockClear();
+    selectSatManager.setSecondarySat(-1);
+
+    expect(toastSpy).not.toHaveBeenCalled();
   });
 
   it('should handle getSelectedSat method', () => {

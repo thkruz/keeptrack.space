@@ -1,6 +1,7 @@
 {
   "SelectSatManager": {
-    "objectInsideEarth": "물체가 지구 내부에 있어 선택할 수 없습니다"
+    "objectInsideEarth": "물체가 지구 내부에 있어 선택할 수 없습니다",
+    "secondaryObjectSet": "보조 개체 설정됨: {name}"
   },
   "plugins": {
     "SelectSatManager": {

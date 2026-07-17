@@ -664,7 +664,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     return ServiceLocator.getCatalogManager().getObject(this.selectedSat, type) as Satellite | MissileObject;
   }
 
-  setSecondarySat(id: number): void {
+  setSecondarySat(id: number, isPreventToast = false): void {
     if (settingsManager.isDisableSelectSat) {
       return;
     }
@@ -686,7 +686,27 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
 
       if ((this.secondarySatObj?.id ?? -1) !== -1 && this.secondarySatObj instanceof Satellite) {
         this.updateSecondaryCovBubble_(this.secondarySatObj);
+
+        // Setting a secondary neither moves the camera nor shows a dominant orbit line
+        // (the hover line draws on top of the secondary orbit), so the action can look
+        // like nothing happened. Give the user an explicit cue - the toast provides the
+        // visual confirmation (naming the object) and plays a notification sound. A
+        // primary/secondary swap suppresses it (isPreventToast): the camera refocus
+        // already signals the change and [ / ] can be pressed in quick succession.
+        if (!isPreventToast) {
+          ServiceLocator.getUiManager().toast(
+            t7e('SelectSatManager.secondaryObjectSet').replace('{name}', this.secondarySatObj.name),
+            ToastMsgType.normal,
+          );
+        }
       }
+    }
+
+    // Clearing the secondary must also wipe its orbit line, mirroring how deselecting
+    // the primary clears the primary orbit. Without this the secondary orbit lingers
+    // on screen after a clear-screen / deselect even though the object is gone.
+    if (id === -1) {
+      ServiceLocator.getOrbitManager().clearSelectOrbit(true);
     }
 
     if (this.secondarySat === this.selectedSat) {
@@ -714,15 +734,14 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     const _primary = this.selectedSat;
     const _secondary = this.secondarySat;
 
-    this.setSecondarySat(_primary);
-    const orbitManagerInstance = ServiceLocator.getOrbitManager();
-
-    if (_primary !== -1) {
-      orbitManagerInstance.setSelectOrbit(_primary, true);
-    } else {
-      orbitManagerInstance.clearSelectOrbit(true);
-    }
-    this.setSelectedSat_(_secondary);
+    // Promote the old secondary to the primary through the full selection path so the
+    // camera refocuses on it and the info box, orbit, sound, and covariance bubble all
+    // update. The previous setSelectedSat_ shortcut only reassigned the id, leaving the
+    // camera fixed on the old primary. selectSat clears _secondary as the secondary once
+    // it becomes the primary, so reassign the old primary as the secondary afterward
+    // (toast suppressed - the camera move is the swap's feedback).
+    this.selectSat(_secondary);
+    this.setSecondarySat(_primary, true);
   }
 
 }

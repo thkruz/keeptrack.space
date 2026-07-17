@@ -205,6 +205,106 @@ describe('CameraTransition', () => {
     expect(midDist).toBeLessThan(dist * 1.1);
   });
 
+  // Build an app-convention view matrix (rows: right, forward, up) that looks from `eye` toward
+  // the shifted-frame origin — mirrors CameraTransition.writeViewMatrix_ so the tests can assert
+  // where a focused target (at the shifted origin) lands in camera space.
+  const norm = (v: number[]): number[] => {
+    const l = Math.hypot(v[0], v[1], v[2]);
+
+    return [v[0] / l, v[1] / l, v[2] / l];
+  };
+  const cross = (a: number[], b: number[]): number[] => [
+    a[1] * b[2] - a[2] * b[1],
+    a[2] * b[0] - a[0] * b[2],
+    a[0] * b[1] - a[1] * b[0],
+  ];
+  const lookAtOriginView = (eye: number[], upHint: number[]): mat4 => {
+    const f = norm([-eye[0], -eye[1], -eye[2]]);
+    const r = norm(cross(f, upHint));
+    const u = norm(cross(r, f));
+    const m = mat4.create();
+
+    m[0] = r[0];
+    m[1] = f[0];
+    m[2] = u[0];
+    m[3] = 0;
+    m[4] = r[1];
+    m[5] = f[1];
+    m[6] = u[1];
+    m[7] = 0;
+    m[8] = r[2];
+    m[9] = f[2];
+    m[10] = u[2];
+    m[11] = 0;
+    m[12] = -(r[0] * eye[0] + r[1] * eye[1] + r[2] * eye[2]);
+    m[13] = -(f[0] * eye[0] + f[1] * eye[1] + f[2] * eye[2]);
+    m[14] = -(u[0] * eye[0] + u[1] * eye[1] + u[2] * eye[2]);
+    m[15] = 1;
+
+    return m;
+  };
+
+  it('keeps a focused target centered through a large reorientation', () => {
+    // Target at 7000 km in ECI; worldShift places it at the shifted-frame origin. The camera views
+    // it from two very different directions (a 90-degree reorient, e.g. ECI <-> LVLH on one sat).
+    const ws = [-7000, 0, 0];
+    const anchor = { position: { x: 7000 as number, y: 0, z: 0 } };
+    const fromView = lookAtOriginView([0, 0, 0.05], [0, 1, 0]); // 50 m standoff, behind in +z
+    const toView = lookAtOriginView([0.05, 0, 0], [0, 1, 0]); // 50 m standoff, off to +x
+
+    transition.begin(fromView, ws, anchor);
+
+    // The effective view is in the shifted frame, so the target sits at the origin: its camera-
+    // space right (m[12]) and up (m[14]) components must stay ~0 (dead center) the whole blend.
+    for (const t of [1050, 1150, 1250, 1350, 1450]) {
+      fakeTime = t;
+      const V = transition.apply(toView, ws, anchor)!;
+
+      expect(V).not.toBeNull();
+      expect(Math.abs(V[12])).toBeLessThan(1e-4);
+      expect(Math.abs(V[14])).toBeLessThan(1e-4);
+    }
+  });
+
+  it('falls back to the rotation-slerp blend when no toAnchor is supplied', () => {
+    const ws = [-7000, 0, 0];
+    const anchor = { position: { x: 7000 as number, y: 0, z: 0 } };
+    const fromView = lookAtOriginView([0, 0, 0.05], [0, 1, 0]);
+    const toView = lookAtOriginView([0.05, 0, 0], [0, 1, 0]);
+
+    transition.begin(fromView, ws, anchor);
+
+    fakeTime = 1250;
+    // No toAnchor: the target-centered path is skipped, but the transition still produces a
+    // valid blended view (the historical behavior) rather than throwing.
+    const V = transition.apply(toView, ws);
+
+    expect(V).not.toBeNull();
+    expect(V!.length).toBe(16);
+  });
+
+  it('ignores an anchor whose position is the origin (decayed object)', () => {
+    const ws = [-7000, 0, 0];
+    const fromView = lookAtOriginView([0, 0, 0.05], [0, 1, 0]);
+    const toView = lookAtOriginView([0.05, 0, 0], [0, 1, 0]);
+
+    // A (0,0,0) anchor is rejected at begin(), so both transitions take the fallback path and
+    // must produce identical matrices.
+    transition.begin(fromView, ws);
+
+    const anchored = new CameraTransition();
+
+    anchored.begin(fromView, ws, { position: { x: 0, y: 0, z: 0 } });
+
+    fakeTime = 1250;
+    const baseResult = transition.apply(toView, ws, { position: { x: 0, y: 0, z: 0 } })!;
+    const anchoredResult = anchored.apply(toView, ws, { position: { x: 0, y: 0, z: 0 } })!;
+
+    for (let i = 0; i < 16; i++) {
+      expect(anchoredResult[i]).toBeCloseTo(baseResult[i], 5);
+    }
+  });
+
   it('should converge to target view at end of transition', () => {
     const fromView = mat4.create();
     const toView = mat4.create();

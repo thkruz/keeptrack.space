@@ -47,7 +47,7 @@ import { Earth } from '../rendering/draw-manager/earth';
 import { errorManagerInstance } from '../utils/errorManager';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../utils/transforms';
 import { CameraInputHandler } from './camera-input-handler';
-import { CameraTransition } from './camera-transition';
+import { CameraTransition, TransitionAnchor } from './camera-transition';
 import { CameraType } from './camera-type';
 import { CameraState } from './state/camera-state';
 
@@ -322,9 +322,11 @@ export class Camera {
     const sensorManagerInstance = ServiceLocator.getSensorManager();
     const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager);
 
-    // Snapshot current view for smooth camera transition before changing type
+    // Snapshot current view for smooth camera transition before changing type. Anchor the
+    // frozen "from" endpoint to the currently-followed object so it tracks the moving target
+    // through the blend (prevents the mode-switch shake on small/close debris).
     if (settingsManager.isSmoothCameraTransitions) {
-      this.transition.begin(this.matrixWorldInverse, Scene.getInstance().worldShift);
+      this.transition.begin(this.matrixWorldInverse, Scene.getInstance().worldShift, Camera.getTransitionAnchor_(selectSatManagerInstance?.primarySatObj));
     }
 
     if (this.cameraType === CameraType.PLANETARIUM) {
@@ -702,8 +704,10 @@ export class Camera {
         break;
     }
 
-    // Apply camera transition blending (smooth satellite selection changes)
-    const blendedView = this.transition.apply(this.matrixWorldInverse, Scene.getInstance().worldShift);
+    // Apply camera transition blending (smooth satellite selection changes). Pass the live
+    // focused object so the blend keeps it centered (see CameraTransition.apply); `target` is
+    // the id:-1 sentinel when nothing is focused, which resolves to no anchor.
+    const blendedView = this.transition.apply(this.matrixWorldInverse, Scene.getInstance().worldShift, Camera.getTransitionAnchor_(target));
 
     if (blendedView) {
       mat4.copy(this.matrixWorldInverse, blendedView);
@@ -1018,7 +1022,14 @@ export class Camera {
         this.state.camSnapToSat.altitude = SatMath.getAlt(relativePosition, gmst, centerBody.RADIUS as Kilometers);
       }
       if (this.state.camSnapToSat.altitude) {
-        this.state.camSnapToSat.camDistTarget = this.state.camSnapToSat.altitude + RADIUS_OF_EARTH + this.state.camDistBuffer;
+        // Back the camera off from the satellite's GEOCENTRIC distance (|position|) - exactly the
+        // targetDistance the draw subtracts - so the settled standoff equals camDistBuffer. Deriving
+        // it from geodetic altitude + a spherical Earth radius instead left an ellipsoid-shaped error
+        // (geodetic altitude != |position| - RADIUS_OF_EARTH away from the equator) that changed the
+        // apparent zoom from object to object as you stepped through them with [ / ].
+        const geocentricDist = Math.sqrt(sat.position.x ** 2 + sat.position.y ** 2 + sat.position.z ** 2);
+
+        this.state.camSnapToSat.camDistTarget = geocentricDist + this.state.camDistBuffer;
       } else {
         this.state.camSnapToSat.camDistTarget = RADIUS_OF_EARTH + this.state.camDistBuffer; // Stay out of the center of the earth. You will get stuck there.
         errorManagerInstance.info(`Zoom Calculation Error: ${this.state.camSnapToSat.altitude} -- ${this.state.camSnapToSat.camDistTarget}`);
@@ -2314,6 +2325,19 @@ export class Camera {
     } else {
       this.satShaderSizes.maxSize = settingsManager.satShader.maxAllowedSize;
     }
+  }
+
+  /**
+   * Resolves the object a camera transition should anchor its "from" endpoint to. Returns null
+   * for the no-sat sentinel or any object lacking a real position, so the transition falls back
+   * to a fixed ECI endpoint (the historical behavior) for Earth-centered starts.
+   */
+  private static getTransitionAnchor_(obj?: { id?: number; position?: { x: number; y: number; z: number } } | null): TransitionAnchor | null {
+    if (!obj || obj.id === -1 || !obj.position || typeof obj.position.x !== 'number') {
+      return null;
+    }
+
+    return obj as TransitionAnchor;
   }
 
   private isSatelliteFocusedMode_(type: CameraType): boolean {

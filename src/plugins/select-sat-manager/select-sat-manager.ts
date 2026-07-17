@@ -369,7 +369,12 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     const scene = Scene.getInstance();
 
     cam.transition.duration = settingsManager.cameraTransitionDuration;
-    cam.transition.begin(cam.matrixWorldInverse, scene.worldShift);
+    // primarySatObj is still the object being deselected at this point (it is reassigned to the
+    // new target later in selectSat), so anchor the frozen "from" endpoint to it: the endpoint
+    // then travels with the outgoing satellite through the blend instead of lagging behind it,
+    // which is what makes small/close debris shake on a mode/target switch. A no-sat sentinel or
+    // positionless object leaves the anchor unset (fixed-endpoint fallback).
+    cam.transition.begin(cam.matrixWorldInverse, scene.worldShift, this.primarySatObj);
   }
 
   private selectSatReset_() {
@@ -533,6 +538,15 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
 
     const cam = ServiceLocator.getMainCamera();
 
+    // When switching from one already-selected object to another (e.g. the [ / ] shortcuts),
+    // preserve the current standoff instead of snapping to the new object's default framing -
+    // otherwise a smaller target reframes closer and reads as an unwanted zoom-in even though the
+    // user never changed the zoom. primarySatObj is still the OUTGOING object at this point (it is
+    // reassigned to the new target later in selectSat), so a valid id means a switch, not a fresh
+    // selection. The framing distance still applies on the first selection from an unfocused view.
+    const wasFocusedOnObject = this.primarySatObj.id !== -1;
+    const prevStandoff = cam.state.camDistBuffer;
+
     if (cam.cameraType === CameraType.FIXED_TO_EARTH) {
       cam.state.earthCenteredLastZoom = cam.zoomLevel();
       cam.cameraType = this.lastSatCameraType;
@@ -547,7 +561,9 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
 
     if (radiusKm === null) {
       cam.state.minDistanceFromTarget = null;
-      cam.state.camDistBuffer = cam.state.effectiveMinDistanceFromTarget;
+      // The camDistBuffer setter clamps to the new object's min standoff, so a preserved standoff
+      // that is too close for the new target is pushed out rather than clipping into it.
+      cam.state.camDistBuffer = wasFocusedOnObject ? prevStandoff : cam.state.effectiveMinDistanceFromTarget;
     } else {
       let minStandoff = targetStandoffDistanceKm(radiusKm);
       let framing = initialFramingDistanceKm(radiusKm);
@@ -563,7 +579,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       }
 
       cam.state.minDistanceFromTarget = minStandoff;
-      cam.state.camDistBuffer = framing;
+      cam.state.camDistBuffer = wasFocusedOnObject ? prevStandoff : framing;
     }
 
     if (cam.cameraType === CameraType.FIXED_TO_SAT_LVLH || cam.cameraType === CameraType.FIXED_TO_SAT_ECI) {

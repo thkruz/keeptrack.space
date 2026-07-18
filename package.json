@@ -50,6 +50,7 @@
     "lcov": "npx tsx ./build/utils/open-lcov.ts",
     "lint": "biome check ./src",
     "lint:fix": "biome check --write ./src",
+    "lint:pro": "cd src/plugins-pro && biome check .",
     "format": "biome format --write ./src",
     "typecheck": "tsgo --noEmit -p tsconfig.build.json",
     "typecheck:tsc": "tsc --noEmit -p tsconfig.build.json",

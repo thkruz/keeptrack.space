@@ -89,6 +89,8 @@ jobs:
         run: |
           echo "Running Biome check..."
           pnpm run lint
+          echo "Running Biome check on plugins-pro..."
+          pnpm run lint:pro
           echo '### Biome Passed' >> $GITHUB_STEP_SUMMARY
 
       - name: Run Unit Tests

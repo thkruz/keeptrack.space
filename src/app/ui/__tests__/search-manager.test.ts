@@ -1,5 +1,6 @@
-import { vi } from 'vitest';
 import { CatalogManager } from '@app/app/data/catalog-manager';
+import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { GroupsManager } from '@app/app/data/groups-manager';
 import { SearchManager, SearchResultType } from '@app/app/ui/search-manager';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -9,11 +10,10 @@ import { DotsManager } from '@app/engine/rendering/dots-manager';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { settingsManager } from '@app/settings/settings';
-import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
-import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { BaseObject, Degrees, Radians, Satellite, Star } from '@ootk/src/main';
 import { defaultMisl, defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { vi } from 'vitest';
 
 describe('SearchManager', () => {
   let searchManager: SearchManager;
@@ -95,10 +95,7 @@ describe('SearchManager', () => {
 
   it('should perform a search and populate results', () => {
     const mockCatalogManager = {
-      objectCache: [
-        new Satellite({ ...defaultSat, id: 0, name: 'Satellite A' }),
-        new Satellite({ ...defaultSat, id: 1, name: 'Satellite B' }),
-      ],
+      objectCache: [new Satellite({ ...defaultSat, id: 0, name: 'Satellite A' }), new Satellite({ ...defaultSat, id: 1, name: 'Satellite B' })],
       getObject: vi.fn().mockReturnValue(new Satellite({ ...defaultSat, id: 0, name: 'Satellite A' })),
     } as unknown as CatalogManager;
     const mockDotsManager = {
@@ -135,11 +132,12 @@ describe('SearchManager', () => {
   describe('numeric-only search across all sccNum forms', () => {
     let sats: Satellite[];
 
-    const buildCatalog = (testSats: Satellite[]) => ({
-      objectCache: testSats,
-      numSatellites: testSats.length,
-      getObject: (id: number) => testSats[id],
-    }) as unknown as CatalogManager;
+    const buildCatalog = (testSats: Satellite[]) =>
+      ({
+        objectCache: testSats,
+        numSatellites: testSats.length,
+        getObject: (id: number) => testSats[id],
+      }) as unknown as CatalogManager;
 
     const wireUpServiceLocator = (catalog: CatalogManager) => {
       vi.spyOn(ServiceLocator, 'getCatalogManager').mockReturnValue(catalog);
@@ -217,10 +215,7 @@ describe('SearchManager', () => {
     // matched 270000 too. Typing a leading zero ("070000") pins the width so
     // only the true 70000 matches.
     it('disambiguates a leading-zero query to the exact-width object', () => {
-      sats = [
-        new Satellite({ ...defaultSat, id: 0, sccNum: '70000' }),
-        new Satellite({ ...defaultSat, id: 1, sccNum: '270000' }),
-      ];
+      sats = [new Satellite({ ...defaultSat, id: 0, sccNum: '70000' }), new Satellite({ ...defaultSat, id: 1, sccNum: '270000' })];
       wireUpServiceLocator(buildCatalog(sats));
 
       searchManager.doSearch('070000');
@@ -228,10 +223,7 @@ describe('SearchManager', () => {
     });
 
     it('still substring-matches both objects without the leading zero', () => {
-      sats = [
-        new Satellite({ ...defaultSat, id: 0, sccNum: '70000' }),
-        new Satellite({ ...defaultSat, id: 1, sccNum: '270000' }),
-      ];
+      sats = [new Satellite({ ...defaultSat, id: 0, sccNum: '70000' }), new Satellite({ ...defaultSat, id: 1, sccNum: '270000' })];
       wireUpServiceLocator(buildCatalog(sats));
 
       searchManager.doSearch('70000');
@@ -239,10 +231,7 @@ describe('SearchManager', () => {
     });
 
     it('disambiguates a leading-zero query for a shorter catalog number', () => {
-      sats = [
-        new Satellite({ ...defaultSat, id: 0, sccNum: '5544' }),
-        new Satellite({ ...defaultSat, id: 1, sccNum: '25544' }),
-      ];
+      sats = [new Satellite({ ...defaultSat, id: 0, sccNum: '5544' }), new Satellite({ ...defaultSat, id: 1, sccNum: '25544' })];
       wireUpServiceLocator(buildCatalog(sats));
 
       // "005544" pins the 6-digit width, so only 5544 matches (not 25544).
@@ -288,11 +277,12 @@ describe('SearchManager', () => {
   describe('alpha-5 designation search', () => {
     let sats: Satellite[];
 
-    const buildCatalog = (testSats: Satellite[]) => ({
-      objectCache: testSats,
-      numSatellites: testSats.length,
-      getObject: (id: number) => testSats[id],
-    }) as unknown as CatalogManager;
+    const buildCatalog = (testSats: Satellite[]) =>
+      ({
+        objectCache: testSats,
+        numSatellites: testSats.length,
+        getObject: (id: number) => testSats[id],
+      }) as unknown as CatalogManager;
 
     const wireUpServiceLocator = (catalog: CatalogManager) => {
       vi.spyOn(ServiceLocator, 'getCatalogManager').mockReturnValue(catalog);
@@ -355,11 +345,12 @@ describe('SearchManager', () => {
   describe('searchable object types (#855)', () => {
     let objects: BaseObject[];
 
-    const buildCatalog = (objs: BaseObject[]) => ({
-      objectCache: objs,
-      numSatellites: objs.length,
-      getObject: (id: number) => objs[id],
-    }) as unknown as CatalogManager;
+    const buildCatalog = (objs: BaseObject[]) =>
+      ({
+        objectCache: objs,
+        numSatellites: objs.length,
+        getObject: (id: number) => objs[id],
+      }) as unknown as CatalogManager;
 
     const wireUpServiceLocator = (catalog: CatalogManager) => {
       vi.spyOn(ServiceLocator, 'getCatalogManager').mockReturnValue(catalog);
@@ -433,9 +424,18 @@ describe('SearchManager', () => {
 
     it('hides a MIRV child until it separates, then includes it', () => {
       const rv = new MissileObject({
-        id: 4, name: 'RV_4', active: true, desc: 'Test (TST)',
-        latList: [0, 0], lonList: [0, 0], altList: [100, 200],
-        timeList: [0, 1000], startTime: 0, maxAlt: 200, country: 'USA', launchVehicle: 'TST',
+        id: 4,
+        name: 'RV_4',
+        active: true,
+        desc: 'Test (TST)',
+        latList: [0, 0],
+        lonList: [0, 0],
+        altList: [100, 200],
+        timeList: [0, 1000],
+        startTime: 0,
+        maxAlt: 200,
+        country: 'USA',
+        launchVehicle: 'TST',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
 
@@ -467,9 +467,10 @@ describe('SearchManager interactions', () => {
     for (const id of ['ui-wrapper', 'search-holder', 'search', 'search-results', 'search-icon']) {
       document.getElementById(id)?.remove();
     }
-    document.body.insertAdjacentHTML('beforeend',
-      '<div id="ui-wrapper"></div><div id="search-holder"></div><input id="search" />' +
-      '<div id="search-results"></div><div id="search-icon"></div>');
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      '<div id="ui-wrapper"></div><div id="search-holder"></div><input id="search" /><div id="search-results"></div><div id="search-icon"></div>'
+    );
     // jsdom does not implement scrollIntoView.
     Element.prototype.scrollIntoView = vi.fn();
     mgr = new SearchManager();
@@ -489,10 +490,7 @@ describe('SearchManager interactions', () => {
 
   it('doArraySearch builds a comma-separated list of sccNums', () => {
     const catalog = {
-      objectCache: [
-        new Satellite({ ...defaultSat, id: 0, sccNum: '00005' }),
-        new Satellite({ ...defaultSat, id: 1, sccNum: '25544' }),
-      ],
+      objectCache: [new Satellite({ ...defaultSat, id: 0, sccNum: '00005' }), new Satellite({ ...defaultSat, id: 1, sccNum: '25544' })],
     } as unknown as CatalogManager;
 
     // The Satellite constructor normalizes leading zeros: '00005' -> '5'.
@@ -599,8 +597,7 @@ describe('SearchManager interactions', () => {
   });
 
   it('keyboard ArrowDown selects the first result row', () => {
-    document.getElementById('search-results')!.innerHTML =
-      '<div class="search-result" data-obj-id="0"></div><div class="search-result" data-obj-id="1"></div>';
+    document.getElementById('search-results')!.innerHTML = '<div class="search-result" data-obj-id="0"></div><div class="search-result" data-obj-id="1"></div>';
     p().addListeners_();
 
     const evt = new KeyboardEvent('keydown', { key: 'ArrowDown' });
@@ -611,8 +608,7 @@ describe('SearchManager interactions', () => {
   });
 
   it('updateSelectedResult_ marks the selected row and updates hover', () => {
-    document.getElementById('search-results')!.innerHTML =
-      '<div class="search-result" data-obj-id="7"></div><div class="search-result" data-obj-id="9"></div>';
+    document.getElementById('search-results')!.innerHTML = '<div class="search-result" data-obj-id="7"></div><div class="search-result" data-obj-id="9"></div>';
     const rows = document.querySelectorAll('.search-result');
 
     rows.forEach((r) => {

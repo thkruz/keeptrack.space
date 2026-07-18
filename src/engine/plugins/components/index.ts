@@ -21,18 +21,13 @@
 
 // Bottom Icon Component
 export * from './bottom-icon';
-
-// Side Menu Component
-export * from './side-menu';
-
 // Context Menu Component
 export * from './context-menu';
-
-// Secondary Menu Component
-export * from './secondary-menu';
-
 // Help Component
 export * from './help';
-
 // Keyboard Component
 export * from './keyboard';
+// Secondary Menu Component
+export * from './secondary-menu';
+// Side Menu Component
+export * from './side-menu';

@@ -127,8 +127,4 @@ export interface PosCruncherOutBadObject {
   badObjectId: number;
 }
 
-export type PosCruncherOutMsg =
-  | PosCruncherOutPosition
-  | PosCruncherOutVelocity
-  | PosCruncherOutExtraData
-  | PosCruncherOutBadObject;
+export type PosCruncherOutMsg = PosCruncherOutPosition | PosCruncherOutVelocity | PosCruncherOutExtraData | PosCruncherOutBadObject;

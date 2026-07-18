@@ -1,4 +1,4 @@
-import { test, expect } from '@test/e2e/coverage';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('GithubLinkPlugin', () => {
@@ -48,14 +48,14 @@ test.describe('GithubLinkPlugin', () => {
         window.open = (u?: string | URL) => {
           capturedUrl = String(u ?? '');
 
-return null;
+          return null;
         };
         const btn = document.querySelector('[id^="GithubLinkPlugin"][id$="-btn"]') as HTMLElement;
 
         btn?.click();
         window.open = origOpen;
 
-return capturedUrl;
+        return capturedUrl;
       });
 
       expect(url).toContain('github.com/thkruz/keeptrack.space');

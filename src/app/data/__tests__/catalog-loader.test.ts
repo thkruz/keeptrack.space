@@ -1,11 +1,11 @@
-import { vi } from 'vitest';
 import { AsciiTleSat, CatalogLoader } from '@app/app/data/catalog-loader';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 import { Satellite } from '@app/engine/ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { readFileSync } from 'fs';
+import { vi } from 'vitest';
 
 describe('Catalog Loader', () => {
   beforeAll(() => {
@@ -23,7 +23,7 @@ describe('Catalog Loader', () => {
         text: () => Promise.resolve(''),
         ok: true,
         status: 200,
-      } as Response),
+      } as Response)
     );
   });
 
@@ -74,13 +74,13 @@ describe('Catalog Loader', () => {
       MEAN_MOTION_DDOT: 0,
     });
     const externalCatalog: AsciiTleSat[] = [
-{
-      SCC: sat.sccNum,
-      ON: 'STARLINK-37402',
-      TLE1: sat.tle1,
-      TLE2: sat.tle2,
-    },
-];
+      {
+        SCC: sat.sccNum,
+        ON: 'STARLINK-37402',
+        TLE1: sat.tle1,
+        TLE2: sat.tle2,
+      },
+    ];
 
     await CatalogLoader.parse({
       keepTrackTle: [],
@@ -126,10 +126,7 @@ describe('Catalog Loader', () => {
   // CelesTrak-formatted alpha-5 satnums appear directly in TLE cols 3-7.
   describe('parseTceContent across sccNum forms', () => {
     it('parses a 2-line numeric-only TLE pair (legacy 5-digit)', () => {
-      const content = [
-        '1 25544U 98067A   24001.00000000  .00000000  00000-0  00000-0 0  0000',
-        '2 25544  51.6400 000.0000 0000000   0.0000   0.0000 15.50000000000000',
-      ].join('\n');
+      const content = ['1 25544U 98067A   24001.00000000  .00000000  00000-0  00000-0 0  0000', '2 25544  51.6400 000.0000 0000000   0.0000   0.0000 15.50000000000000'].join('\n');
 
       const catalog = CatalogLoader.parseTceContent(content);
 
@@ -140,10 +137,7 @@ describe('Catalog Loader', () => {
 
     it('parses an alpha-5 2-line TLE pair preserving the alpha-5 satnum in SCC', () => {
       // CelesTrak emits alpha-5 satnums directly in TLE cols 3-7.
-      const content = [
-        '1 T0001U 98067A   24001.00000000  .00000000  00000-0  00000-0 0  0000',
-        '2 T0001  51.6400 000.0000 0000000   0.0000   0.0000 15.50000000000000',
-      ].join('\n');
+      const content = ['1 T0001U 98067A   24001.00000000  .00000000  00000-0  00000-0 0  0000', '2 T0001  51.6400 000.0000 0000000   0.0000   0.0000 15.50000000000000'].join('\n');
 
       const catalog = CatalogLoader.parseTceContent(content);
 
@@ -189,10 +183,7 @@ describe('Catalog Loader', () => {
     // like a valid TLE on the downstream side. This is a regression guard
     // for the StringPad.pad0 call inside parseAsciiTLE_.
     it('zero-pads a short numeric satnum to 5 chars in SCC', () => {
-      const content = [
-        '1     5U 58067A   24001.00000000  .00000000  00000-0  00000-0 0  0000',
-        '2     5  51.6400 000.0000 0000000   0.0000   0.0000 15.50000000000000',
-      ].join('\n');
+      const content = ['1     5U 58067A   24001.00000000  .00000000  00000-0  00000-0 0  0000', '2     5  51.6400 000.0000 0000000   0.0000   0.0000 15.50000000000000'].join('\n');
 
       const catalog = CatalogLoader.parseTceContent(content);
 

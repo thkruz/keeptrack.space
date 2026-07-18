@@ -13,8 +13,8 @@ export const DEEP_SPACE_SATELLITE_CONFIGS: DeepSpaceSatelliteConfig[] = [
   {
     name: 'Voyager 1',
     color: PlanetColors.VOYAGER1,
-    orbitalPeriod: 999 * 365.25 * 24 * 3600 as Seconds,
-    meanDistanceToSun: 163 * KM_PER_AU as Kilometers,
+    orbitalPeriod: (999 * 365.25 * 24 * 3600) as Seconds,
+    meanDistanceToSun: (163 * KM_PER_AU) as Kilometers,
     dataFile: 'voyager-1.json',
     model: 'sat2',
   },
@@ -44,6 +44,6 @@ export async function loadDeepSpaceSatelliteData(satellites: Record<string, Deep
         errorManagerInstance.log(`Failed to load ephemeris for ${config.name}, skipping`);
         delete satellites[config.name];
       }
-    }),
+    })
   );
 }

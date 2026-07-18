@@ -97,9 +97,7 @@ export const filterChannels = (data: ChannelInfo[], query: string): ChannelInfo[
     return data;
   }
 
-  return data.filter((entry) =>
-    CHANNEL_COLUMNS.some((col) => (entry[col.key] ?? '').toString().toLowerCase().includes(q)),
-  );
+  return data.filter((entry) => CHANNEL_COLUMNS.some((col) => (entry[col.key] ?? '').toString().toLowerCase().includes(q)));
 };
 
 /** Builds plain export rows (shallow copies) for CSV/XLSX serialization. */

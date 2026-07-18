@@ -2,8 +2,8 @@
 /* eslint-disable no-undefined */
 import { Pickable } from '@app/engine/core/interfaces';
 import { SpatialDensityColorScheme } from '@app/engine/rendering/color-schemes/spatial-density-color-scheme';
-import { vi } from 'vitest';
 import { ColorSchemeTestUtils } from '@test/engine/rendering/color-schemes/__helpers__/color-scheme-test-utils';
+import { vi } from 'vitest';
 
 // Mock dependencies
 vi.mock('@app/keepTrackApi', () => ({
@@ -127,11 +127,7 @@ describe('SpatialDensityColorScheme', () => {
       testSatellites.forEach((sat, i) => {
         (sat as any).mockDensity = (i % 10) / 10;
       });
-      ColorSchemeTestUtils.testColorSchemeWithSatellites(
-        colorScheme,
-        testSatellites,
-        (sat, scheme) => (scheme as SpatialDensityColorScheme).update(sat),
-      );
+      ColorSchemeTestUtils.testColorSchemeWithSatellites(colorScheme, testSatellites, (sat, scheme) => (scheme as SpatialDensityColorScheme).update(sat));
     });
   });
 

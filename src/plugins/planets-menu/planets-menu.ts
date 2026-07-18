@@ -22,16 +22,7 @@ import { settingsManager } from '@app/settings/settings';
 import { Kilometers, RADIUS_OF_EARTH } from '@ootk/src/main';
 import planetPng from '@public/img/icons/planet.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import {
-  ALL_BODIES,
-  BodyCategory,
-  DWARF_PLANETS,
-  isKnownBody,
-  isPlanned,
-  isSelectableBody,
-  OTHER_CELESTIAL_BODIES,
-  PLANETS,
-} from './planets-bodies';
+import { ALL_BODIES, BodyCategory, DWARF_PLANETS, isKnownBody, isPlanned, isSelectableBody, OTHER_CELESTIAL_BODIES, PLANETS } from './planets-bodies';
 import { getBodyViewConfig } from './planets-core';
 import './planets-menu.css';
 
@@ -170,7 +161,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
             return;
           }
           settingsManager.centerBody = SolarBody.Earth;
-          settingsManager.minZoomDistance = RADIUS_OF_EARTH + 50 as Kilometers;
+          settingsManager.minZoomDistance = (RADIUS_OF_EARTH + 50) as Kilometers;
           settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
         },
       },
@@ -206,10 +197,12 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
       const filterKey = name.toLowerCase();
 
       if (isPlanned(body)) {
-        rows += `<button type="button" class="kt-action planets-menu-disabled" kt-tooltip="${this.t_('tooltips.plannedFuture')}" ` +
+        rows +=
+          `<button type="button" class="kt-action planets-menu-disabled" kt-tooltip="${this.t_('tooltips.plannedFuture')}" ` +
           `data-planet-name="${filterKey}" aria-disabled="true" disabled><span class="kt-action-label">${name}</span></button>`;
       } else {
-        rows += `<button type="button" class="kt-action waves-effect planets-menu-item" kt-tooltip="${centerTooltip(name)}" ` +
+        rows +=
+          `<button type="button" class="kt-action waves-effect planets-menu-item" kt-tooltip="${centerTooltip(name)}" ` +
           `data-planet="${body}" data-planet-name="${filterKey}"><span class="kt-action-label">${name}</span></button>`;
       }
     }

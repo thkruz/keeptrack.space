@@ -181,6 +181,4 @@ export const saveOnboardingState = (state: OnboardingState): void => {
 
 /** True when a saved in-progress run is fresh enough to resume mid-tour. */
 export const isResumable = (state: OnboardingState, now = Date.now()): boolean =>
-  state.status === 'in-progress' &&
-  state.stage !== null &&
-  now - state.updatedAt <= RESUME_WINDOW_MS;
+  state.status === 'in-progress' && state.stage !== null && now - state.updatedAt <= RESUME_WINDOW_MS;

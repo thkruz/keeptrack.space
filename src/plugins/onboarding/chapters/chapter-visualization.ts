@@ -1,5 +1,5 @@
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { l } from '../onboarding-t7e';
 import type { TourStep } from '../tour-engine';
 import {
@@ -80,7 +80,7 @@ export const visualizationChapter: ChapterDefinition = {
         featureId: 'flatMap',
         title: l('teasers.flatMap.title'),
         body: l('teasers.flatMap.body'),
-      },
+      }
     ),
     gatedStep(
       POLAR_VIEW_IDS,
@@ -99,7 +99,7 @@ export const visualizationChapter: ChapterDefinition = {
         featureId: 'polarView',
         title: l('teasers.polarView.title'),
         body: l('teasers.polarView.body'),
-      },
+      }
     ),
     {
       id: 'v4-back-to-3d',

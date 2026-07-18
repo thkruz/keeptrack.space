@@ -10,13 +10,13 @@
 import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
 import type { ProximityOpsEvent, ProxSatData, RpoSearchMode, RpoSearchParams } from '@app/plugins/proximity-ops/proximity-ops-core';
 import {
-  RpoWorkerMsgType,
-  RpoWorkerOutMsgType,
   type RpoMsgStart,
   type RpoOutComplete,
   type RpoOutError,
   type RpoOutProgress,
+  RpoWorkerMsgType,
   type RpoWorkerOutMsg,
+  RpoWorkerOutMsgType,
 } from '@app/webworker/proximity-ops-messages';
 
 export interface ProximityOpsCallbacks {

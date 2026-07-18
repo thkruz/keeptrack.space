@@ -1,5 +1,5 @@
-import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SensorManager } from '@app/app/sensors/sensorManager';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { settingsManager } from '@app/settings/settings';
 import { defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';

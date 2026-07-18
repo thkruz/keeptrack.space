@@ -43,7 +43,8 @@ export class SourceColorScheme extends ColorScheme {
   constructor() {
     super(SourceColorScheme.uniqueColorTheme);
     this.objectTypeFlags = {
-      ...this.objectTypeFlags, ...SourceColorScheme.uniqueObjectTypeFlags,
+      ...this.objectTypeFlags,
+      ...SourceColorScheme.uniqueObjectTypeFlags,
     };
   }
 

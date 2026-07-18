@@ -49,10 +49,12 @@ export function refreshMaterialSelect(select: HTMLSelectElement): void {
  * instance's internal sync methods; falls back to a no-op if they disappear.
  */
 export function syncMaterialSelect(select: HTMLSelectElement): void {
-  const instance = FormSelect.getInstance(select) as unknown as {
-    _setSelectedStates?: () => void;
-    _setValueToInput?: () => void;
-  } | undefined;
+  const instance = FormSelect.getInstance(select) as unknown as
+    | {
+        _setSelectedStates?: () => void;
+        _setValueToInput?: () => void;
+      }
+    | undefined;
 
   instance?._setSelectedStates?.();
   instance?._setValueToInput?.();

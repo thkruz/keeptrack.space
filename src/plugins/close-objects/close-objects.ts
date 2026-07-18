@@ -28,11 +28,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import {
-  IBottomIconConfig,
-  IHelpConfig,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, IHelpConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { getUnique } from '@app/engine/utils/get-unique';
@@ -99,10 +95,7 @@ export class CloseObjectsPlugin extends KeepTrackPlugin {
           content: t7e('plugins.CloseObjectsPlugin.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.CloseObjectsPlugin.help.tip1'),
-        t7e('plugins.CloseObjectsPlugin.help.tip2'),
-      ],
+      tips: [t7e('plugins.CloseObjectsPlugin.help.tip1'), t7e('plugins.CloseObjectsPlugin.help.tip2')],
     };
   }
 
@@ -143,10 +136,7 @@ export class CloseObjectsPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      this.uiManagerFinal_.bind(this),
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   protected uiManagerFinal_() {

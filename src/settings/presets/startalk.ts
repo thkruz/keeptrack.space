@@ -1,13 +1,13 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
+import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Degrees, Kilometers, Milliseconds } from '@ootk/src/main';
 import { getEl, hideEl, setInnerHtml } from '../../engine/utils/get-el';
 import { lat2pitch, lon2yaw } from '../../engine/utils/transforms';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
 import { SettingsManager } from '../settings';
-import { KeepTrack } from '@app/keeptrack';
 
 export const starTalk = (settingsManager: SettingsManager) => {
   const DEFAULT_LATITUDE = <Degrees>5; // NOTE: 0 will make the geosynchronous satellites more apparent
@@ -137,7 +137,7 @@ export const starTalk = (settingsManager: SettingsManager) => {
     const startTimeMachine = () => {
       PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect Any Satellites
       setTimeout(() => {
-        (PluginRegistry.getPlugin(TimeMachine)!).historyOfSatellitesPlay(); // Start Time Machine
+        PluginRegistry.getPlugin(TimeMachine)!.historyOfSatellitesPlay(); // Start Time Machine
         ServiceLocator.getMainCamera().state.zoomTarget = 1; // Reset Zoom to Default
         ServiceLocator.getMainCamera().camSnap(lat2pitch(DEFAULT_LATITUDE), lon2yaw(DEFAULT_LONGITUDE, new Date())); // Reset Camera to Default
       }, 100);
@@ -162,16 +162,16 @@ export const starTalk = (settingsManager: SettingsManager) => {
       setInterval(() => {
         if (Date.now() - settingsManager.lastInteractionTime > RESTART_ROTATE_TIME * 1000) {
           // If Time Machine is Off
-          if (!(PluginRegistry.getPlugin(TimeMachine)!).isTimeMachineRunning) {
+          if (!PluginRegistry.getPlugin(TimeMachine)!.isTimeMachineRunning) {
             startTimeMachine();
-          } else if ((PluginRegistry.getPlugin(TimeMachine)!).historyOfSatellitesRunCount >= 67) {
+          } else if (PluginRegistry.getPlugin(TimeMachine)!.historyOfSatellitesRunCount >= 67) {
             setTimeout(() => {
               startTimeMachine();
             }, settingsManager.timeMachineDelay);
           }
           // If Time Machine is Running
-        } else if ((PluginRegistry.getPlugin(TimeMachine)!).isTimeMachineRunning) {
-          (PluginRegistry.getPlugin(TimeMachine)!).isTimeMachineRunning = false; // Stop Time Machine
+        } else if (PluginRegistry.getPlugin(TimeMachine)!.isTimeMachineRunning) {
+          PluginRegistry.getPlugin(TimeMachine)!.isTimeMachineRunning = false; // Stop Time Machine
 
           settingsManager.colors.transparent = ServiceLocator.getOrbitManager().tempTransColor;
 

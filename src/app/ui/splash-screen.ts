@@ -1,12 +1,11 @@
-import { t7e, TranslationKey } from '@app/locales/keys';
-import { getEl, hideEl, showEl } from '../../engine/utils/get-el';
-import { MobileManager } from './mobileManager';
-
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
+import { TranslationKey, t7e } from '@app/locales/keys';
 import logoPng from '@public/img/logo.png';
 import { wallpapers } from '@wallpapers';
+import { getEl, hideEl, showEl } from '../../engine/utils/get-el';
+import { MobileManager } from './mobileManager';
 
 export abstract class SplashScreen {
   /** Wallpaper images provided by the active build profile via @wallpapers alias */
@@ -164,12 +163,15 @@ export abstract class SplashScreen {
     }
 
     // Preload the rest of the images after 3 minutes
-    setTimeout(() => {
-      this.splashScreenImgList_.forEach((img) => {
-        const preloadImg = new Image();
+    setTimeout(
+      () => {
+        this.splashScreenImgList_.forEach((img) => {
+          const preloadImg = new Image();
 
-        preloadImg.src = img;
-      });
-    }, 3 * 60 * 1000);
+          preloadImg.src = img;
+        });
+      },
+      3 * 60 * 1000
+    );
   }
 }

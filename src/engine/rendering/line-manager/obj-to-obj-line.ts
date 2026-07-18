@@ -1,10 +1,10 @@
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EciArr3 } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { Satellite } from '@ootk/src/main';
 import { Line, LineColors, LineDescription } from './line';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class ObjToObjLine extends Line {
   obj: Satellite | MissileObject | OemSatellite;

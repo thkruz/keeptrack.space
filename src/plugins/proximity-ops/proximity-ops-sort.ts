@@ -11,9 +11,7 @@
 import { ProximityOpsEvent } from './proximity-ops-core';
 
 /** Stable per-column sort keys (decoupled from the localized header text). */
-export type RpoSortKey =
-  | 'target' | 'targetName' | 'chaser' | 'chaserName'
-  | 'dist' | 'radial' | 'intrack' | 'crosstrack' | 'vel' | 'pc' | 'date';
+export type RpoSortKey = 'target' | 'targetName' | 'chaser' | 'chaserName' | 'dist' | 'radial' | 'intrack' | 'crosstrack' | 'vel' | 'pc' | 'date';
 
 /** Default column the results table sorts by (chronological). */
 export const DEFAULT_SORT_KEY: RpoSortKey = 'date';
@@ -23,18 +21,30 @@ export const DEFAULT_SORT_ASC = true;
 /** The comparable value for a column; null when the column has no value for the row. */
 function sortValue_(event: ProximityOpsEvent, key: RpoSortKey): number | string | null {
   switch (key) {
-    case 'target': return event.sat1SccNum;
-    case 'targetName': return event.sat1Name ?? '';
-    case 'chaser': return event.sat2SccNum;
-    case 'chaserName': return event.sat2Name ?? '';
-    case 'dist': return event.dist;
-    case 'radial': return event.ric.position.x;
-    case 'intrack': return event.ric.position.y;
-    case 'crosstrack': return event.ric.position.z;
-    case 'vel': return event.vel;
-    case 'pc': return event.pc;
-    case 'date': return event.date.getTime();
-    default: return null;
+    case 'target':
+      return event.sat1SccNum;
+    case 'targetName':
+      return event.sat1Name ?? '';
+    case 'chaser':
+      return event.sat2SccNum;
+    case 'chaserName':
+      return event.sat2Name ?? '';
+    case 'dist':
+      return event.dist;
+    case 'radial':
+      return event.ric.position.x;
+    case 'intrack':
+      return event.ric.position.y;
+    case 'crosstrack':
+      return event.ric.position.z;
+    case 'vel':
+      return event.vel;
+    case 'pc':
+      return event.pc;
+    case 'date':
+      return event.date.getTime();
+    default:
+      return null;
   }
 }
 
@@ -43,7 +53,7 @@ function toNumber_(val: number | string): number | null {
   if (typeof val === 'number') {
     return val;
   }
-  if ((/^-?\d+(?:\.\d+)?$/u).test(val.trim())) {
+  if (/^-?\d+(?:\.\d+)?$/u.test(val.trim())) {
     return parseFloat(val);
   }
 

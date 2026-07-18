@@ -26,7 +26,9 @@ export function renderCustomSensorList(sensors: DetailedSensor[], l: SensorListL
   const attr = (key: string, value: string) => `
         <div class="cs-attr"><span class="cs-attr-k">${l(key)}</span><span class="cs-attr-v">${value}</span></div>`;
 
-  return sensors.map((sensor) => `
+  return sensors
+    .map(
+      (sensor) => `
       <div class="cs-sensor-card">
         <div class="cs-sensor-head">
           <span class="cs-sensor-name">${sensor.uiName}</span>
@@ -42,5 +44,7 @@ export function renderCustomSensorList(sensors: DetailedSensor[], l: SensorListL
           ${attr('elevationRange', `${sensor.minEl.toFixed(0)}° - ${sensor.maxEl.toFixed(0)}°`)}
           ${attr('range', `${sensor.minRng.toFixed(0)} - ${sensor.maxRng.toFixed(0)} km`)}
         </div>
-      </div>`).join('');
+      </div>`
+    )
+    .join('');
 }

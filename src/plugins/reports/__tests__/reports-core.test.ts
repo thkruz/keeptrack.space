@@ -20,8 +20,17 @@ const startTime = new Date('2022-01-01T00:00:00Z');
 const opts: ReportOptions = { startTime, windowSec: 6 * 60 * 60, stepSec: 60 };
 
 const fakeSensor = {
-  name: 'FAKE', getTypeString: () => 'Optical',
-  lat: 10, lon: 20, alt: 0, minAz: 0, maxAz: 360, minEl: 0, maxEl: 90, minRng: 0, maxRng: 100000,
+  name: 'FAKE',
+  getTypeString: () => 'Optical',
+  lat: 10,
+  lon: 20,
+  alt: 0,
+  minAz: 0,
+  maxAz: 360,
+  minEl: 0,
+  maxEl: 90,
+  minRng: 0,
+  maxRng: 100000,
   rae: () => ({ az: 123.456, el: 45.678, rng: 678.9 }),
 } as unknown as DetailedSensor;
 

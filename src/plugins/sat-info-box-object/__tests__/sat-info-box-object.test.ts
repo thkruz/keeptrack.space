@@ -1,12 +1,12 @@
-import { vi } from 'vitest';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SatInfoBoxObject } from '@app/plugins/sat-info-box-object/sat-info-box-object';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { defaultMisl, defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSuite, websiteInit } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('SatInfoBoxObject', () => {
   beforeEach(() => {

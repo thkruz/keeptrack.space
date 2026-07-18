@@ -12,18 +12,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { StringPad } from '@app/engine/utils/stringPad';
 import { t7e } from '@app/locales/keys';
-import {
-  Earth,
-  FormatTle,
-  Satellite,
-  SatelliteRecord,
-  Sgp4,
-  Tle,
-  TleLine1,
-  TleLine2,
-  ZoomValue,
-  rv2tle,
-} from '@ootk/src/main';
+import { Earth, FormatTle, rv2tle, Satellite, SatelliteRecord, Sgp4, Tle, TleLine1, TleLine2, ZoomValue } from '@ootk/src/main';
 
 /** Outcome of pushing a TLE onto a catalog satellite. */
 export type ApplyTleResult = 'applied' | 'satrec-error' | 'too-low';
@@ -127,9 +116,7 @@ export function buildEditedTle(sat: Satellite, v: EditFormValues): { tle1: TleLi
 }
 
 /** Result of re-timing a satellite's orbit to the current simulation time. */
-export type ReEpochResult =
-  | { ok: true; tle1: TleLine1; tle2: TleLine2 }
-  | { ok: false; error: string };
+export type ReEpochResult = { ok: true; tle1: TleLine1; tle2: TleLine2 } | { ok: false; error: string };
 
 /**
  * Re-epoch a satellite to the current simulation time, keeping it exactly where
@@ -190,9 +177,7 @@ export function parseLoadedTle(text: string): { sccNum: string; tle1: TleLine1; 
     return null;
   }
 
-  const sccNum = typeof object.sccNum === 'string' || typeof object.sccNum === 'number'
-    ? String(object.sccNum)
-    : StringPad.pad0(object.tle1.substr(2, 5).trim(), 5);
+  const sccNum = typeof object.sccNum === 'string' || typeof object.sccNum === 'number' ? String(object.sccNum) : StringPad.pad0(object.tle1.substr(2, 5).trim(), 5);
 
   return { sccNum, tle1: object.tle1 as TleLine1, tle2: object.tle2 as TleLine2 };
 }

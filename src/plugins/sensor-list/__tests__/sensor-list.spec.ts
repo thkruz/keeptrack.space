@@ -1,4 +1,4 @@
-import { test, expect } from '@test/e2e/coverage';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('SensorListPlugin', () => {
@@ -44,9 +44,7 @@ test.describe('SensorListPlugin', () => {
 
     // Close
     await page.evaluate(() => {
-      document.getElementById('sensor-list-menu-close-btn')?.dispatchEvent(
-        new MouseEvent('click', { bubbles: true }),
-      );
+      document.getElementById('sensor-list-menu-close-btn')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u, { timeout: 5_000 });
   });

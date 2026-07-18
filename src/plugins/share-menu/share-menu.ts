@@ -132,10 +132,7 @@ export class ShareMenuPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      this.uiManagerFinal_.bind(this),
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   protected uiManagerFinal_(): void {
@@ -164,11 +161,14 @@ export class ShareMenuPlugin extends KeepTrackPlugin {
     const uiManagerInstance = ServiceLocator.getUiManager();
     const url = this.getShareUrlValue_();
 
-    navigator.clipboard.writeText(url).then(() => {
-      uiManagerInstance.toast(l('toasts.copied'), ToastMsgType.normal);
-    }).catch(() => {
-      uiManagerInstance.toast(l('toasts.copyFailed'), ToastMsgType.caution);
-    });
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        uiManagerInstance.toast(l('toasts.copied'), ToastMsgType.normal);
+      })
+      .catch(() => {
+        uiManagerInstance.toast(l('toasts.copyFailed'), ToastMsgType.caution);
+      });
   }
 
   private shareNative_(): void {

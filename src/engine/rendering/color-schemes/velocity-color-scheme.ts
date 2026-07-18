@@ -1,10 +1,10 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Star } from '@ootk/src/main';
 import { ColorScheme } from './color-scheme';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class VelocityColorScheme extends ColorScheme {
   readonly label = t7e('colorSchemes.VelocityColorScheme.label' as Parameters<typeof t7e>[0]);
@@ -31,7 +31,8 @@ export class VelocityColorScheme extends ColorScheme {
   constructor() {
     super(VelocityColorScheme.uniqueColorTheme);
     this.objectTypeFlags = {
-      ...this.objectTypeFlags, ...VelocityColorScheme.uniqueObjectTypeFlags,
+      ...this.objectTypeFlags,
+      ...VelocityColorScheme.uniqueObjectTypeFlags,
     };
   }
 
@@ -68,7 +69,6 @@ export class VelocityColorScheme extends ColorScheme {
         color: this.colorTheme.inFOVAlt,
         pickable: Pickable.Yes,
       };
-
     }
     const totalVelocity = (obj as unknown as { totalVelocity: number }).totalVelocity;
 

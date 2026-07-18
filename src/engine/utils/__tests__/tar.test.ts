@@ -18,7 +18,7 @@ async function gzipBytes(data: Uint8Array): Promise<Uint8Array> {
   const reader = stream.getReader();
   const chunks: Uint8Array[] = [];
 
-  for (; ;) {
+  for (;;) {
     // eslint-disable-next-line no-await-in-loop
     const { done, value } = await reader.read();
 
@@ -96,10 +96,7 @@ describe('extractTarEntry', () => {
   it('extracts a matching entry from a multi-file archive', () => {
     const encoder = new TextEncoder();
     const payload = encoder.encode('{"hello":"world"}');
-    const tar = buildTar([
-      buildTarEntry('manifest.json', encoder.encode('{"version":1}')),
-      buildTarEntry('rso-archive-2026-06-01/catalog.json.gz', payload),
-    ]);
+    const tar = buildTar([buildTarEntry('manifest.json', encoder.encode('{"version":1}')), buildTarEntry('rso-archive-2026-06-01/catalog.json.gz', payload)]);
 
     const found = extractTarEntry(tar, (name) => name.endsWith('catalog.json.gz'));
 
@@ -151,10 +148,7 @@ describe('decompressGzipToBytes', () => {
 
   it('round-trips a gzipped tar back to an extractable entry (the RSO outer layer)', async () => {
     const encoder = new TextEncoder();
-    const tar = buildTar([
-      buildTarEntry('manifest.json', encoder.encode('{}')),
-      buildTarEntry('catalog.json.gz', encoder.encode('inner-bytes')),
-    ]);
+    const tar = buildTar([buildTarEntry('manifest.json', encoder.encode('{}')), buildTarEntry('catalog.json.gz', encoder.encode('inner-bytes'))]);
 
     const restored = await decompressGzipToBytes(await gzipBytes(tar));
     const found = extractTarEntry(restored, (name) => name.endsWith('catalog.json.gz'));

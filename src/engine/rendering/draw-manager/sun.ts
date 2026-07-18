@@ -30,7 +30,7 @@ import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { glsl } from '@app/engine/utils/development/formatter';
-import { DEG2RAD, TemeVec3, Kilometers } from '@ootk/src/main';
+import { DEG2RAD, Kilometers, TemeVec3 } from '@ootk/src/main';
 import { Body, RotationAxis as rotationAxis } from 'astronomy-engine';
 import { mat3, mat4, vec2, vec3 } from 'gl-matrix';
 import { DepthManager } from '../depth-manager';
@@ -72,7 +72,7 @@ export class Sun {
   /**
    * Keeps the last 1 sun direction calculations in memory to avoid unnecessary calculations.
    */
-  sunDirectionCache: { jd: number; sunDirection: EciArr3; } = { jd: 0, sunDirection: [0, 0, 0] };
+  sunDirectionCache: { jd: number; sunDirection: EciArr3 } = { jd: 0, sunDirection: [0, 0, 0] };
   textureDirection = [0, 0] as vec2;
   rotation: vec3 = [0, 0, 0];
   lastUpdateTime: number;
@@ -174,7 +174,6 @@ export class Sun {
      * TODO: We should be rotating the unvierse not just the sun
      */
     if (settingsManager.centerBody === SolarBody.Earth || settingsManager.centerBody === SolarBody.Moon) {
-
       const ros = rotationAxis(Body.Earth, ServiceLocator.getTimeManager().simulationTimeObj);
 
       mat4.rotateY(this.modelViewMatrix_, this.modelViewMatrix_, (ros.dec - 90) * DEG2RAD);

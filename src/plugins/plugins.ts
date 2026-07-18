@@ -22,7 +22,9 @@ export class PluginManager {
     if (__IS_PRO__ && descriptor.proImport) {
       try {
         return { mod: await descriptor.proImport(), usedPro: true };
-      } catch { /* fall through to OSS */ }
+      } catch {
+        /* fall through to OSS */
+      }
     }
 
     if (!descriptor.ossImport) {
@@ -36,9 +38,7 @@ export class PluginManager {
    * Instantiate and initialize a plugin from an already-resolved module.
    */
   private static initPlugin_(descriptor: PluginDescriptor, resolved: ResolvedPlugin): void {
-    const className = resolved.usedPro
-      ? (descriptor.proClassName ?? descriptor.ossClassName)
-      : descriptor.ossClassName;
+    const className = resolved.usedPro ? (descriptor.proClassName ?? descriptor.ossClassName) : descriptor.ossClassName;
 
     if (!className) {
       return;
@@ -66,9 +66,7 @@ export class PluginManager {
       const enabledDescriptors: PluginDescriptor[] = [];
 
       for (const descriptor of pluginManifest) {
-        const config = descriptor.alwaysEnabled
-          ? { enabled: true }
-          : (plugins as Record<string, { enabled: boolean } | undefined>)[descriptor.configKey];
+        const config = descriptor.alwaysEnabled ? { enabled: true } : (plugins as Record<string, { enabled: boolean } | undefined>)[descriptor.configKey];
 
         if (config?.enabled) {
           enabledDescriptors.push(descriptor);
@@ -82,8 +80,8 @@ export class PluginManager {
             errorManagerInstance.warn(`Error downloading plugin ${descriptor.configKey}: ${(e as Error).message}`);
 
             return null;
-          }),
-        ),
+          })
+        )
       );
 
       // Phase 2: Initialize sequentially in manifest order (preserves dependency checks)
@@ -109,13 +107,10 @@ export class PluginManager {
       // Load any settings from local storage after all plugins are loaded
       EventBus.getInstance().emit(EventBusEvent.loadSettings);
 
-      EventBus.getInstance().on(
-        EventBusEvent.uiManagerFinal,
-        () => {
-          this.uiManagerFinal_();
-          KeepTrackPlugin.hideUnusedMenuModes();
-        },
-      );
+      EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+        this.uiManagerFinal_();
+        KeepTrackPlugin.hideUnusedMenuModes();
+      });
     } catch (e) {
       errorManagerInstance.info(`Error loading core plugins: ${(e as Error).message}`);
     }

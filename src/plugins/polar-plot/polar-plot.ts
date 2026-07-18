@@ -1,10 +1,6 @@
-import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
-import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
-import polarPlotPng from '@public/img/icons/polar-plot.png';
-
-
 import { SatMath } from '@app/app/analysis/sat-math';
 import { SoundNames } from '@app/engine/audio/sounds';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -12,10 +8,12 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { BestPassDeps } from '@app/plugins/best-pass/best-pass-calculator';
 import { BaseObject, Kilometers, Satellite, SatelliteRecord } from '@ootk/src/main';
+import polarPlotPng from '@public/img/icons/polar-plot.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { findPolarPasses, PolarPass } from './polar-plot-pass';
@@ -29,7 +27,11 @@ const l = (key: string): string => t7e(`plugins.PolarPlotPlugin.${key}` as Param
 const CHART_BACKGROUND = '#101522';
 
 /** Image-size presets for export, biased toward common social aspect ratios. */
-interface SizePreset { id: string; w: number; h: number }
+interface SizePreset {
+  id: string;
+  w: number;
+  h: number;
+}
 const SIZE_PRESETS: SizePreset[] = [
   { id: 'square', w: 1080, h: 1080 },
   { id: 'wide', w: 1200, h: 675 },
@@ -148,54 +150,44 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        getEl('polar-plot-save')?.addEventListener('click', () => this.saveImage_());
-        getEl('polar-plot-copy')?.addEventListener('click', () => {
-          this.copyImage_();
-        });
-        getEl('polar-plot-prev')?.addEventListener('click', () => this.stepPass_(-1));
-        getEl('polar-plot-next')?.addEventListener('click', () => this.stepPass_(1));
-        getEl('polar-plot-size')?.addEventListener('change', (e) => {
-          this.selectedSizeId_ = (e.target as HTMLSelectElement).value;
-        });
-        // Render the export-size select as a themed Materialize dropdown (native
-        // <select> popups can't be themed and show an OS-blue hover).
-        initMaterialSelects(getEl('polar-plot-menu') ?? document.body);
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      getEl('polar-plot-save')?.addEventListener('click', () => this.saveImage_());
+      getEl('polar-plot-copy')?.addEventListener('click', () => {
+        this.copyImage_();
+      });
+      getEl('polar-plot-prev')?.addEventListener('click', () => this.stepPass_(-1));
+      getEl('polar-plot-next')?.addEventListener('click', () => this.stepPass_(1));
+      getEl('polar-plot-size')?.addEventListener('change', (e) => {
+        this.selectedSizeId_ = (e.target as HTMLSelectElement).value;
+      });
+      // Render the export-size select as a themed Materialize dropdown (native
+      // <select> popups can't be themed and show an OS-blue hover).
+      initMaterialSelects(getEl('polar-plot-menu') ?? document.body);
+    });
   }
 
   addJs(): void {
     super.addJs();
 
-    EventBus.getInstance().on(
-      EventBusEvent.staticOffsetChange,
-      () => {
+    EventBus.getInstance().on(EventBusEvent.staticOffsetChange, () => {
+      if (this.isMenuButtonActive) {
+        this.scheduleUpdate_();
+      }
+    });
+
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
+      if (obj?.isSatellite() && ServiceLocator.getSensorManager().isSensorSelected()) {
+        getEl(this.bottomIconElementName)?.classList.remove('bmenu-item-disabled');
+        this.isIconDisabled = false;
+        // If it is open then refresh the plot
         if (this.isMenuButtonActive) {
           this.scheduleUpdate_();
         }
-      },
-    );
-
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (obj: BaseObject) => {
-        if (obj?.isSatellite() && ServiceLocator.getSensorManager().isSensorSelected()) {
-          getEl(this.bottomIconElementName)?.classList.remove('bmenu-item-disabled');
-          this.isIconDisabled = false;
-          // If it is open then refresh the plot
-          if (this.isMenuButtonActive) {
-            this.scheduleUpdate_();
-          }
-        } else {
-          getEl(this.bottomIconElementName)?.classList.add('bmenu-item-disabled');
-          this.isIconDisabled = true;
-        }
-      },
-    );
-
+      } else {
+        getEl(this.bottomIconElementName)?.classList.add('bmenu-item-disabled');
+        this.isIconDisabled = true;
+      }
+    });
   }
 
   private togglePolarPlot_(): void {
@@ -336,9 +328,12 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     return {
       sensorName,
       satLabel: l('labels.satellite').replace('{sccNum}', sat?.sccNum ?? ''),
-      passLabel: passes.length > 1
-        ? l('labels.passLabel').replace('{n}', String(index + 1)).replace('{total}', String(passes.length))
-        : undefined,
+      passLabel:
+        passes.length > 1
+          ? l('labels.passLabel')
+              .replace('{n}', String(index + 1))
+              .replace('{total}', String(passes.length))
+          : undefined,
     };
   }
 
@@ -350,7 +345,9 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     }
 
     const durationMin = Math.round(pass.durationMs / 60000);
-    const passOf = l('labels.passLabel').replace('{n}', String(this.currentIndex_ + 1)).replace('{total}', String(this.passes_.length));
+    const passOf = l('labels.passLabel')
+      .replace('{n}', String(this.currentIndex_ + 1))
+      .replace('{total}', String(this.passes_.length));
 
     readout.textContent = `${passOf} • ${l('labels.maxEl').replace('{deg}', pass.maxEl.toFixed(0))} • ${durationMin} min`;
   }
@@ -444,7 +441,8 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
       if (!blob) {
         return;
       }
-      navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+      navigator.clipboard
+        .write([new ClipboardItem({ 'image/png': blob })])
         .then(() => keepTrackApi.toast(l('labels.copied'), ToastMsgType.normal))
         .catch(() => keepTrackApi.toast(l('errorMsgs.copyFailed'), ToastMsgType.caution));
     }, 'image/png');

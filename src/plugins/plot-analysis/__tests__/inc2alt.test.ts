@@ -1,9 +1,9 @@
-import { vi } from 'vitest';
 /* eslint-disable dot-notation */
 import { Inc2AltPlots } from '@app/plugins/plot-analysis/inc2alt';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('Inc2AltPlots_class', () => {
   beforeEach(() => {

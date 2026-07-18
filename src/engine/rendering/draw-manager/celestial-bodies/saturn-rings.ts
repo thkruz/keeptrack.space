@@ -23,7 +23,7 @@ import { SolarBody } from '@app/engine/core/interfaces';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { DEG2RAD, TemeVec3 } from '@ootk/src/main';
-import { BackdatePosition as backdatePosition, Body, KM_PER_AU, RotationAxis as rotationAxis } from 'astronomy-engine';
+import { Body, BackdatePosition as backdatePosition, KM_PER_AU, RotationAxis as rotationAxis } from 'astronomy-engine';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { DepthManager } from '../../depth-manager';
@@ -39,7 +39,7 @@ import { Saturn } from './saturn';
 
 export enum SaturnRingsTextureQuality {
   HIGH = '2k',
-  ULTRA = '1k'
+  ULTRA = '1k',
 }
 
 export class SaturnRings extends CelestialBody {

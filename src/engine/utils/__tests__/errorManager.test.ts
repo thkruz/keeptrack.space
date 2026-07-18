@@ -1,7 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ErrorManager, isOpaqueWindowError } from '@app/engine/utils/errorManager';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('isOpaqueWindowError (Global Error Trapper cross-origin gate)', () => {
   const makeEvent = (over: Partial<Pick<ErrorEvent, 'error' | 'message' | 'filename'>>) => ({
@@ -31,20 +31,24 @@ describe('isOpaqueWindowError (Global Error Trapper cross-origin gate)', () => {
 
   it('does NOT flag a genuine same-origin error (real Error object present)', () => {
     // A real uncaught error always carries the Error object, message, and filename — must surface.
-    expect(isOpaqueWindowError({
-      error: new Error('real bug'),
-      message: 'Uncaught Error: real bug',
-      filename: 'https://app.keeptrack.space/js/main.js',
-    })).toBe(false);
+    expect(
+      isOpaqueWindowError({
+        error: new Error('real bug'),
+        message: 'Uncaught Error: real bug',
+        filename: 'https://app.keeptrack.space/js/main.js',
+      })
+    ).toBe(false);
   });
 
   it('does NOT flag a null-error event that still has both a message and a source', () => {
     // Null error but full context (some legacy reporting paths): leave it actionable.
-    expect(isOpaqueWindowError({
-      error: null,
-      message: 'TypeError: undefined is not a function',
-      filename: 'https://app.keeptrack.space/js/main.js',
-    })).toBe(false);
+    expect(
+      isOpaqueWindowError({
+        error: null,
+        message: 'TypeError: undefined is not a function',
+        filename: 'https://app.keeptrack.space/js/main.js',
+      })
+    ).toBe(false);
   });
 });
 
@@ -59,8 +63,12 @@ describe('ErrorManager.error', () => {
     errorManager = new ErrorManager();
     captured = [];
     EventBus.getInstance().on(EventBusEvent.error, listener);
-    vi.spyOn(console, 'error').mockImplementation(() => { /* silence */ });
-    vi.spyOn(console, 'warn').mockImplementation(() => { /* silence */ });
+    vi.spyOn(console, 'error').mockImplementation(() => {
+      /* silence */
+    });
+    vi.spyOn(console, 'warn').mockImplementation(() => {
+      /* silence */
+    });
   });
 
   afterEach(() => {
@@ -137,8 +145,12 @@ describe('ErrorManager.reportEvent', () => {
     errorManager = new ErrorManager();
     captured = [];
     EventBus.getInstance().on(EventBusEvent.error, listener);
-    vi.spyOn(console, 'error').mockImplementation(() => { /* silence */ });
-    vi.spyOn(console, 'warn').mockImplementation(() => { /* silence */ });
+    vi.spyOn(console, 'error').mockImplementation(() => {
+      /* silence */
+    });
+    vi.spyOn(console, 'warn').mockImplementation(() => {
+      /* silence */
+    });
   });
 
   afterEach(() => {
@@ -147,12 +159,14 @@ describe('ErrorManager.reportEvent', () => {
   });
 
   it('suppresses cross-origin script errors (no throw, no toast, just warn)', () => {
-    expect(() => errorManager.reportEvent({
-      error: null,
-      funcName: 'Global Error Trapper',
-      message: 'Script error.',
-      isCrossOrigin: true,
-    })).not.toThrow();
+    expect(() =>
+      errorManager.reportEvent({
+        error: null,
+        funcName: 'Global Error Trapper',
+        message: 'Script error.',
+        isCrossOrigin: true,
+      })
+    ).not.toThrow();
 
     // Cross-origin still surfaces to EventBus for telemetry, but is not loud.
     expect(captured).toHaveLength(1);
@@ -165,13 +179,15 @@ describe('ErrorManager.reportEvent', () => {
     // colorCruncher worker onerror for an opaque/cross-origin worker: event.error is null and
     // message/filename are empty, so toError_ can only build a bare "Unknown error". Must not
     // throw or be loud, and must be tagged unactionable so telemetry skips the bug-filing POST.
-    expect(() => errorManager.reportEvent({
-      error: null,
-      funcName: 'Worker[js/colorCruncher.js]',
-      message: '',
-      source: '',
-      isOpaqueEvent: true,
-    })).not.toThrow();
+    expect(() =>
+      errorManager.reportEvent({
+        error: null,
+        funcName: 'Worker[js/colorCruncher.js]',
+        message: '',
+        source: '',
+        isOpaqueEvent: true,
+      })
+    ).not.toThrow();
 
     expect(captured).toHaveLength(1);
     expect((captured[0].err as { isUnactionable?: boolean }).isUnactionable).toBe(true);
@@ -188,11 +204,13 @@ describe('ErrorManager.reportEvent', () => {
 
     err.stack = 'Error: Unknown error\n    at c (https://app.keeptrack.space/cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js:1:9405)';
 
-    expect(() => errorManager.reportEvent({
-      error: err,
-      funcName: 'Unhandled Promise Rejection',
-      isUnhandledRejection: true,
-    })).not.toThrow();
+    expect(() =>
+      errorManager.reportEvent({
+        error: err,
+        funcName: 'Unhandled Promise Rejection',
+        isUnhandledRejection: true,
+      })
+    ).not.toThrow();
 
     // Still surfaces to EventBus for telemetry, but quietly (warn, not error).
     expect(captured).toHaveLength(1);
@@ -203,11 +221,13 @@ describe('ErrorManager.reportEvent', () => {
   });
 
   it('does not suppress a normal app rejection whose stack has no loader frame', () => {
-    expect(() => errorManager.reportEvent({
-      error: new Error('real bug'),
-      funcName: 'Unhandled Promise Rejection',
-      isUnhandledRejection: true,
-    })).toThrow('real bug');
+    expect(() =>
+      errorManager.reportEvent({
+        error: new Error('real bug'),
+        funcName: 'Unhandled Promise Rejection',
+        isUnhandledRejection: true,
+      })
+    ).toThrow('real bug');
 
     expect(captured).toHaveLength(1);
     // eslint-disable-next-line no-console
@@ -215,14 +235,16 @@ describe('ErrorManager.reportEvent', () => {
   });
 
   it('synthesizes a stack from ErrorEvent fields when raw error is null', () => {
-    expect(() => errorManager.reportEvent({
-      error: null,
-      funcName: 'Global Error Trapper',
-      message: 'ReferenceError: x is not defined',
-      source: 'https://example.com/app.js',
-      line: 42,
-      col: 17,
-    })).toThrow('ReferenceError: x is not defined');
+    expect(() =>
+      errorManager.reportEvent({
+        error: null,
+        funcName: 'Global Error Trapper',
+        message: 'ReferenceError: x is not defined',
+        source: 'https://example.com/app.js',
+        line: 42,
+        col: 17,
+      })
+    ).toThrow('ReferenceError: x is not defined');
 
     expect(captured).toHaveLength(1);
     const stack = captured[0].err.stack ?? '';
@@ -232,11 +254,13 @@ describe('ErrorManager.reportEvent', () => {
   });
 
   it('wraps an unhandled rejection of a string into Error(string)', () => {
-    expect(() => errorManager.reportEvent({
-      error: 'rejected!',
-      funcName: 'Unhandled Promise Rejection',
-      isUnhandledRejection: true,
-    })).toThrow('rejected!');
+    expect(() =>
+      errorManager.reportEvent({
+        error: 'rejected!',
+        funcName: 'Unhandled Promise Rejection',
+        isUnhandledRejection: true,
+      })
+    ).toThrow('rejected!');
 
     expect(captured[0].err).toBeInstanceOf(Error);
     expect(captured[0].err.message).toBe('rejected!');
@@ -262,14 +286,16 @@ describe('ErrorManager.reportEvent', () => {
   it('uses captured message as toast text when toastMsg is not provided', () => {
     // No direct toast assertion (UI manager isn't registered in this test), but
     // the call should not throw on the toastMsg fallback path.
-    expect(() => errorManager.reportEvent({
-      error: null,
-      funcName: 'fn',
-      message: 'real-world message',
-      source: 'x.js',
-      line: 1,
-      col: 1,
-    })).toThrow('real-world message');
+    expect(() =>
+      errorManager.reportEvent({
+        error: null,
+        funcName: 'fn',
+        message: 'real-world message',
+        source: 'x.js',
+        line: 1,
+        col: 1,
+      })
+    ).toThrow('real-world message');
   });
 });
 
@@ -279,7 +305,9 @@ describe('ErrorManager.isExternalFetchError_ (auto-file suppression)', () => {
 
   beforeEach(() => {
     errorManager = new ErrorManager();
-    vi.spyOn(console, 'error').mockImplementation(() => { /* silence */ });
+    vi.spyOn(console, 'error').mockImplementation(() => {
+      /* silence */
+    });
     openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
     // Force the real auto-file gate to be reachable (isThisNode would otherwise stub the URL to '').
     (errorManager as unknown as { newGithubIssueUrl_: () => string }).newGithubIssueUrl_ = () => 'https://github.com/issue';
@@ -325,7 +353,7 @@ describe('ErrorManager.isExternalFetchError_ (auto-file suppression)', () => {
   });
 
   it('still auto-files a real bug whose message merely contains "fetch"', () => {
-    reportInNode(new TypeError('Cannot read properties of undefined (reading \'fetchData\')'));
+    reportInNode(new TypeError("Cannot read properties of undefined (reading 'fetchData')"));
     expect(openSpy).toHaveBeenCalledTimes(1);
   });
 });

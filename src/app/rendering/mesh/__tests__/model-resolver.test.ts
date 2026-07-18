@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { ModelResolver, SatelliteModels } from '@app/app/rendering/mesh/model-resolver';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
+import { ModelResolver, SatelliteModels } from '@app/app/rendering/mesh/model-resolver';
 import { Satellite, SpaceObjectType, TleLine1, TleLine2 } from '@ootk/src/main';
 
 // Real Satellite construction requires valid TLEs; this test only exercises
@@ -36,12 +36,25 @@ describe('ModelResolver debris model selection across sccNum forms', () => {
   // form uniformly - no more parseInt collapsing alpha-5/extended ids into one
   // bucket.
   const DEBRIS_POOL: string[] = [
-    SatelliteModels['deb-panel-01'], SatelliteModels['deb-panel-02'], SatelliteModels['deb-panel-03'],
-    SatelliteModels['deb-bracket-01'], SatelliteModels['deb-bracket-02'], SatelliteModels['deb-bracket-03'],
-    SatelliteModels['deb-skin-01'], SatelliteModels['deb-skin-02'], SatelliteModels['deb-skin-03'],
-    SatelliteModels['deb-clampband-01'], SatelliteModels['deb-clampband-02'], SatelliteModels['deb-clampband-03'],
-    SatelliteModels['deb-mli-01'], SatelliteModels['deb-mli-02'], SatelliteModels['deb-mli-03'], SatelliteModels['deb-mli-04'],
-    SatelliteModels['deb-strut-01'], SatelliteModels['deb-strut-02'], SatelliteModels['deb-strut-03'],
+    SatelliteModels['deb-panel-01'],
+    SatelliteModels['deb-panel-02'],
+    SatelliteModels['deb-panel-03'],
+    SatelliteModels['deb-bracket-01'],
+    SatelliteModels['deb-bracket-02'],
+    SatelliteModels['deb-bracket-03'],
+    SatelliteModels['deb-skin-01'],
+    SatelliteModels['deb-skin-02'],
+    SatelliteModels['deb-skin-03'],
+    SatelliteModels['deb-clampband-01'],
+    SatelliteModels['deb-clampband-02'],
+    SatelliteModels['deb-clampband-03'],
+    SatelliteModels['deb-mli-01'],
+    SatelliteModels['deb-mli-02'],
+    SatelliteModels['deb-mli-03'],
+    SatelliteModels['deb-mli-04'],
+    SatelliteModels['deb-strut-01'],
+    SatelliteModels['deb-strut-02'],
+    SatelliteModels['deb-strut-03'],
   ];
   const CONE_POOL = [SatelliteModels['deb-cone-01'], SatelliteModels['deb-cone-02']];
   const CYL_POOL = [SatelliteModels['deb-cyl-01'], SatelliteModels['deb-cyl-02']];
@@ -168,19 +181,16 @@ describe('ModelResolver debris model selection across sccNum forms', () => {
   });
 
   it('opts hydrolox Delta IV out of the teal family into the size buckets', () => {
-    expect(resolver.resolve(makeSat('12345', SpaceObjectType.ROCKET_BODY, { launchVehicle: 'Delta IV Heavy', diameter: '5.1' })))
-      .toBe(SatelliteModels['rb-cyl-gray-l']);
+    expect(resolver.resolve(makeSat('12345', SpaceObjectType.ROCKET_BODY, { launchVehicle: 'Delta IV Heavy', diameter: '5.1' }))).toBe(SatelliteModels['rb-cyl-gray-l']);
   });
 
   it('prefers the shape silhouette over the launchVehicle family', () => {
     // A PAM-D kick stage deployed from a named vehicle is still a sphere+cone
-    expect(resolver.resolve(makeSat('12345', SpaceObjectType.ROCKET_BODY, { shape: 'Sphere + Cone', launchVehicle: 'Delta 7925' })))
-      .toBe(SatelliteModels['rb-sphercone-kick']);
+    expect(resolver.resolve(makeSat('12345', SpaceObjectType.ROCKET_BODY, { shape: 'Sphere + Cone', launchVehicle: 'Delta 7925' }))).toBe(SatelliteModels['rb-sphercone-kick']);
   });
 
   it('falls back to size buckets for unknown vehicles and plain cyl shapes', () => {
-    expect(resolver.resolve(makeSat('12345', SpaceObjectType.ROCKET_BODY, { shape: 'Cyl', launchVehicle: 'H-2A', diameter: '4.0' })))
-      .toBe(SatelliteModels['rb-cyl-gray-l']);
+    expect(resolver.resolve(makeSat('12345', SpaceObjectType.ROCKET_BODY, { shape: 'Cyl', launchVehicle: 'H-2A', diameter: '4.0' }))).toBe(SatelliteModels['rb-cyl-gray-l']);
   });
 
   it('does not crash on an OemSatellite and returns the aehf default', () => {

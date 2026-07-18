@@ -32,7 +32,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { rv2tle, RvVector, TleLine1, TleLine2 } from '@ootk/src/main';
+import { RvVector, rv2tle, TleLine1, TleLine2 } from '@ootk/src/main';
 
 /** Convert metres-per-second (UI units) to kilometres-per-second (ootk units). */
 export const MS_TO_KMS = 0.001;
@@ -208,10 +208,7 @@ function clamp(value: number, min: number, max: number): number {
  * @param raw - Raw string values read from the form.
  * @param defaultStartNum - Fallback start number when the field is not a number.
  */
-export function parseBreakupParams(
-  raw: BreakupRawForm,
-  defaultStartNum: number,
-): { params: BreakupVariationParams; startNumWasInvalid: boolean } {
+export function parseBreakupParams(raw: BreakupRawForm, defaultStartNum: number): { params: BreakupVariationParams; startNumWasInvalid: boolean } {
   const breakupCount = parseInt(raw.count);
   const radialDeltaV = parseFloat(raw.radialDv);
   const inTrackDeltaV = parseFloat(raw.inTrackDv);
@@ -321,14 +318,7 @@ export function applyDeltaV(velocity: Vec3, basis: RicBasis, dv: DeltaVComponent
  * @param a5Num - 5-char alpha-5 analyst satellite number to stamp.
  * @throws if SGP4 mean elements cannot be fit to the fragment state.
  */
-export function buildFragmentTle(
-  epoch: Date,
-  position: Vec3,
-  velocity: Vec3,
-  basis: RicBasis,
-  dv: DeltaVComponentsKms,
-  a5Num: string,
-): { tle1: TleLine1; tle2: TleLine2 } {
+export function buildFragmentTle(epoch: Date, position: Vec3, velocity: Vec3, basis: RicBasis, dv: DeltaVComponentsKms, a5Num: string): { tle1: TleLine1; tle2: TleLine2 } {
   const newVelocity = applyDeltaV(velocity, basis, dv);
   const fit = rv2tle(epoch, position, newVelocity, { maxIterations: 15, toleranceKm: 0.05 });
 
@@ -371,12 +361,7 @@ export function buildFragmentTle(
  * @param analystStart - First number of the analyst block (CatalogManager.ANALYST_START_ID).
  * @param analystCount - Size of the analyst block (settingsManager.maxAnalystSats).
  */
-export function isAnalystRangeValid(
-  startNum: number,
-  count: number,
-  analystStart: number,
-  analystCount: number,
-): boolean {
+export function isAnalystRangeValid(startNum: number, count: number, analystStart: number, analystCount: number): boolean {
   if (count <= 0) {
     return false;
   }

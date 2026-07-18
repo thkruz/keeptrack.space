@@ -37,11 +37,7 @@ export const KEYBOARD_DRIVEN_CAMERA_TYPES: ReadonlySet<CameraType> = new Set<Cam
  * modes listed in {@link KEYBOARD_DRIVEN_CAMERA_TYPES}. Both letter cases are
  * included because holding Shift maps `w` -> `W`, etc.
  */
-const CAMERA_MOVEMENT_KEYS: ReadonlySet<string> = new Set<string>([
-  'w', 'a', 's', 'd', 'q', 'e',
-  'W', 'A', 'S', 'D', 'Q', 'E',
-  'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
-]);
+const CAMERA_MOVEMENT_KEYS: ReadonlySet<string> = new Set<string>(['w', 'a', 's', 'd', 'q', 'e', 'W', 'A', 'S', 'D', 'Q', 'E', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
 
 /**
  * `KeyboardEvent.code` values the camera reserves for movement/rotation
@@ -53,5 +49,4 @@ const CAMERA_MOVEMENT_CODES: ReadonlySet<string> = new Set<string>(['Numpad8', '
  * True when the given key/code is one the camera consumes for movement or
  * rotation while a keyboard-driven camera mode is active.
  */
-export const isCameraMovementKey = (key: string, code: string): boolean =>
-  CAMERA_MOVEMENT_KEYS.has(key) || CAMERA_MOVEMENT_CODES.has(code);
+export const isCameraMovementKey = (key: string, code: string): boolean => CAMERA_MOVEMENT_KEYS.has(key) || CAMERA_MOVEMENT_CODES.has(code);

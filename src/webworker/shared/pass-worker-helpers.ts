@@ -7,18 +7,7 @@
 
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { PassRae } from '@app/plugins/best-pass/best-pass-calculator';
-import {
-  Degrees,
-  eci2ecef,
-  ecefRad2rae,
-  Kilometers,
-  MILLISECONDS_TO_DAYS,
-  MINUTES_PER_DAY,
-  RaeVec3,
-  SatelliteRecord,
-  Sgp4,
-  TemeVec3,
-} from '@ootk/src/main';
+import { Degrees, ecefRad2rae, eci2ecef, Kilometers, MILLISECONDS_TO_DAYS, MINUTES_PER_DAY, RaeVec3, SatelliteRecord, Sgp4, TemeVec3 } from '@ootk/src/main';
 import { jday } from '../../engine/utils/transforms';
 
 /**
@@ -58,18 +47,23 @@ export function workerCheckIsInView(sensor: DetailedSensor, rae: PassRae): boole
     return false;
   }
 
-  const inPrimary =
-    az >= sensor.minAz && az <= sensor.maxAz && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng;
+  const inPrimary = az >= sensor.minAz && az <= sensor.maxAz && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng;
   const inSecondary =
-    az >= (sensor.minAz2 as number) && az <= (sensor.maxAz2 as number) && el >= (sensor.minEl2 as number) &&
-    el <= (sensor.maxEl2 as number) && rng <= (sensor.maxRng2 as number) && rng >= (sensor.minRng2 as number);
+    az >= (sensor.minAz2 as number) &&
+    az <= (sensor.maxAz2 as number) &&
+    el >= (sensor.minEl2 as number) &&
+    el <= (sensor.maxEl2 as number) &&
+    rng <= (sensor.maxRng2 as number) &&
+    rng >= (sensor.minRng2 as number);
 
   if (sensor.minAz > sensor.maxAz) {
-    const inPrimaryWrap =
-      (az >= sensor.minAz || az <= sensor.maxAz) && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng;
+    const inPrimaryWrap = (az >= sensor.minAz || az <= sensor.maxAz) && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng;
     const inSecondaryWrap =
-      (az >= (sensor.minAz2 as number) || az <= (sensor.maxAz2 as number)) && el >= (sensor.minEl2 as number) &&
-      el <= (sensor.maxEl2 as number) && rng <= (sensor.maxRng2 as number) && rng >= (sensor.minRng2 as number);
+      (az >= (sensor.minAz2 as number) || az <= (sensor.maxAz2 as number)) &&
+      el >= (sensor.minEl2 as number) &&
+      el <= (sensor.maxEl2 as number) &&
+      rng <= (sensor.maxRng2 as number) &&
+      rng >= (sensor.minRng2 as number);
 
     return inPrimaryWrap || inSecondaryWrap;
   }

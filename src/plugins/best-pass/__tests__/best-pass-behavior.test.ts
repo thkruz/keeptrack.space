@@ -1,8 +1,8 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
-import { emptyPassRow } from '@app/plugins/best-pass/best-pass-calculator';
 import { BestPassPlugin } from '@app/plugins/best-pass/best-pass';
+import { emptyPassRow } from '@app/plugins/best-pass/best-pass-calculator';
 import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { websiteInit } from '@test/generic-tests';

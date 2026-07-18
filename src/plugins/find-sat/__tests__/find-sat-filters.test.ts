@@ -1,6 +1,4 @@
-import { Degrees, Hours, Minutes, Satellite } from '@ootk/src/main';
 import {
-  LookAngleResolver,
   filterByArgOfPerigee,
   filterByInclination,
   filterByLookAngle,
@@ -9,14 +7,17 @@ import {
   filterByRcs,
   filterByRightAscension,
   filterByTleAge,
+  LookAngleResolver,
 } from '@app/plugins/find-sat/find-sat-filters';
+import { Degrees, Hours, Minutes, Satellite } from '@ootk/src/main';
 
 /** Minimal satellite-like stub for the pure predicate tests. */
-const sat = (props: Partial<Satellite> & { id: number }): Satellite => ({
-  isSatellite: () => true,
-  isMissile: () => false,
-  ...props,
-} as unknown as Satellite);
+const sat = (props: Partial<Satellite> & { id: number }): Satellite =>
+  ({
+    isSatellite: () => true,
+    isMissile: () => false,
+    ...props,
+  }) as unknown as Satellite;
 
 describe('find-sat-filters', () => {
   describe('filterByObjType', () => {
@@ -64,11 +65,7 @@ describe('find-sat-filters', () => {
   describe('filterByTleAge', () => {
     it('keeps satellites within [min, max] hours and clamps a negative min to 0', () => {
       const now = new Date('2024-01-01T00:00:00Z');
-      const sats = [
-        sat({ id: 1, ageOfElset: () => 0.5 }),
-        sat({ id: 2, ageOfElset: () => 5 }),
-        sat({ id: 3, ageOfElset: () => 50 }),
-      ];
+      const sats = [sat({ id: 1, ageOfElset: () => 0.5 }), sat({ id: 2, ageOfElset: () => 5 }), sat({ id: 3, ageOfElset: () => 50 })];
 
       expect(filterByTleAge(sats, -10 as Hours, 10 as Hours, now).map((s) => s.id)).toEqual([1, 2]);
     });

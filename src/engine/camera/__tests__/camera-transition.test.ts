@@ -213,11 +213,7 @@ describe('CameraTransition', () => {
 
     return [v[0] / l, v[1] / l, v[2] / l];
   };
-  const cross = (a: number[], b: number[]): number[] => [
-    a[1] * b[2] - a[2] * b[1],
-    a[2] * b[0] - a[0] * b[2],
-    a[0] * b[1] - a[1] * b[0],
-  ];
+  const cross = (a: number[], b: number[]): number[] => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
   const lookAtOriginView = (eye: number[], upHint: number[]): mat4 => {
     const f = norm([-eye[0], -eye[1], -eye[2]]);
     const r = norm(cross(f, upHint));

@@ -145,19 +145,13 @@ export class Screenshot extends KeepTrackPlugin {
     super.addJs();
     // Re-assert after addHtml() resets it from isIconDisabledOnLoad
     this.isIconDisabled = true;
-    EventBus.getInstance().on(
-      EventBusEvent.altCanvasResize,
-      () => this.queuedScreenshot_,
-    );
+    EventBus.getInstance().on(EventBusEvent.altCanvasResize, () => this.queuedScreenshot_);
 
-    EventBus.getInstance().on(
-      EventBusEvent.endOfDraw,
-      () => {
-        if (this.queuedScreenshot_) {
-          this.takeScreenShot();
-        }
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.endOfDraw, () => {
+      if (this.queuedScreenshot_) {
+        this.takeScreenShot();
+      }
+    });
   }
 
   private queuedScreenshot_ = false;
@@ -223,7 +217,7 @@ export class Screenshot extends KeepTrackPlugin {
     const oh = outCanvas.height;
 
     // Stage 3: Draw logos onto the final output canvas
-    const logoHeight = 200 * (settingsManager.hiResWidth ?? 3840) / 3840;
+    const logoHeight = (200 * (settingsManager.hiResWidth ?? 3840)) / 3840;
     let logoWidth: number;
     const padding = shouldCrop ? 100 : 50;
 
@@ -271,7 +265,5 @@ export class Screenshot extends KeepTrackPlugin {
       classificationstr: settingsManager.classificationStr ?? '',
       classificationColor: Classification.getColors(settingsManager.classificationStr).backgroundColor,
     };
-
   }
 }
-

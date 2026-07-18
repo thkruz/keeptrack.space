@@ -1,17 +1,15 @@
-import { vi } from 'vitest';
+import { OemSatellite, ParsedOem } from '@app/app/objects/oem-satellite';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
-import {
-  CatalogSource, EpochUTC, J2000, Kilometers, KilometersPerSecond, Satellite, Seconds, SpaceObjectType, TleLine1, TleLine2, Vector3D,
-} from '@ootk/src/main';
-import { OemSatellite, ParsedOem } from '@app/app/objects/oem-satellite';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { EL } from '@app/plugins/sat-info-box/sat-info-box-html';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { CatalogSource, EpochUTC, J2000, Kilometers, KilometersPerSecond, Satellite, Seconds, SpaceObjectType, TleLine1, TleLine2, Vector3D } from '@ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { vi } from 'vitest';
 
 /*
  * The sat-info-box header displays Satellite.sccNum (the display-canonical
@@ -28,27 +26,29 @@ import { setupStandardEnvironment } from '@test/environment/standard-env';
 const TLE1 = '1 25544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991' as TleLine1;
 const TLE2 = '2 25544  51.6423 168.5744 0001475 184.3976 313.3642 15.48839820294053' as TleLine2;
 
-const makeSat = (sccNum: string): Satellite => new Satellite({
-  id: 0,
-  active: true,
-  sccNum,
-  intlDes: '1998-067A',
-  country: 'USA',
-  name: 'TEST SAT',
-  type: SpaceObjectType.PAYLOAD,
-  tle1: TLE1,
-  tle2: TLE2,
-  source: CatalogSource.CELESTRAK,
-});
+const makeSat = (sccNum: string): Satellite =>
+  new Satellite({
+    id: 0,
+    active: true,
+    sccNum,
+    intlDes: '1998-067A',
+    country: 'USA',
+    name: 'TEST SAT',
+    type: SpaceObjectType.PAYLOAD,
+    tle1: TLE1,
+    tle2: TLE2,
+    source: CatalogSource.CELESTRAK,
+  });
 
-const makeStateVector = (epochSec: number): J2000 => new J2000(
-  EpochUTC.fromDateTime(new Date(epochSec * 1000)),
-  new Vector3D(7000 as Kilometers, 0 as Kilometers, 0 as Kilometers),
-  new Vector3D(0 as KilometersPerSecond, 7.5 as KilometersPerSecond, 0 as KilometersPerSecond),
-);
+const makeStateVector = (epochSec: number): J2000 =>
+  new J2000(
+    EpochUTC.fromDateTime(new Date(epochSec * 1000)),
+    new Vector3D(7000 as Kilometers, 0 as Kilometers, 0 as Kilometers),
+    new Vector3D(0 as KilometersPerSecond, 7.5 as KilometersPerSecond, 0 as KilometersPerSecond)
+  );
 
 const makeOemSat = (noradId: string): OemSatellite => {
-  const startSec = Date.UTC(2026, 0, 1) / 1000 as Seconds;
+  const startSec = (Date.UTC(2026, 0, 1) / 1000) as Seconds;
   const oem: ParsedOem = {
     header: {
       START_TIME: new Date(2026, 0, 1),

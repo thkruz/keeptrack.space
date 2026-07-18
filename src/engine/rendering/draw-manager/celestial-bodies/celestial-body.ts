@@ -3,7 +3,7 @@
  */
 import { SatMath } from '@app/app/analysis/sat-math';
 import { Planet } from '@app/app/objects/planet';
-import { EciArr3, SolarBody, rgbaArray } from '@app/engine/core/interfaces';
+import { EciArr3, rgbaArray, SolarBody } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -17,7 +17,7 @@ import { glsl } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { DEG2RAD, EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, SpaceObjectType, TEME, TemeVec3, Vector3D } from '@ootk/src/main';
-import { Body, KM_PER_AU, BackdatePosition as backdatePosition, RotationAxis as rotationAxis } from 'astronomy-engine';
+import { Body, BackdatePosition as backdatePosition, KM_PER_AU, RotationAxis as rotationAxis } from 'astronomy-engine';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { DepthManager } from '../../depth-manager';
 import { GlUtils } from '../../gl-utils';
@@ -148,14 +148,16 @@ export abstract class CelestialBody {
   loadTexture(): void {
     const gl = this.gl_;
 
-    GlUtils.initTexture(gl, this.getTexturePath()).then((texture) => {
-      this.mesh.material.map = texture;
-    }).catch((e) => {
-      errorManagerInstance.warn(`Error updating texture for ${this.getName()}:`, e);
-    });
+    GlUtils.initTexture(gl, this.getTexturePath())
+      .then((texture) => {
+        this.mesh.material.map = texture;
+      })
+      .catch((e) => {
+        errorManagerInstance.warn(`Error updating texture for ${this.getName()}:`, e);
+      });
   }
 
-  abstract useHighestQualityTexture(): void
+  abstract useHighestQualityTexture(): void;
 
   lastJ2000: J2000 | null = null;
   lastCenterBody: SolarBody | null = null;
@@ -180,8 +182,7 @@ export abstract class CelestialBody {
   protected canReusePosition_(simTime: Date): boolean {
     const nowMs = simTime.getTime();
 
-    if (!Number.isNaN(this.lastPositionUpdateSimMs_) &&
-      Math.abs(nowMs - this.lastPositionUpdateSimMs_) < this.minimumPositionUpdateIntervalMs_) {
+    if (!Number.isNaN(this.lastPositionUpdateSimMs_) && Math.abs(nowMs - this.lastPositionUpdateSimMs_) < this.minimumPositionUpdateIntervalMs_) {
       return true;
     }
 
@@ -191,18 +192,15 @@ export abstract class CelestialBody {
   }
 
   getJ2000(simTime: Date, centerBody = SolarBody.Earth): J2000 {
-    if (
-      this.lastJ2000 && Math.abs(simTime.getTime() - this.lastJ2000.epoch.posix * 1000) < this.minimumUpdateIntervalSeconds * 1000 &&
-      this.lastCenterBody === centerBody
-    ) {
+    if (this.lastJ2000 && Math.abs(simTime.getTime() - this.lastJ2000.epoch.posix * 1000) < this.minimumUpdateIntervalSeconds * 1000 && this.lastCenterBody === centerBody) {
       return this.lastJ2000;
     }
 
     const pos = backdatePosition(simTime, centerBody as unknown as Body, this.getName() as unknown as Body, false);
     const j2000Data = new J2000(
       new EpochUTC((simTime.getTime() / 1000) as Seconds), // convert ms to s
-      new Vector3D(pos.x * KM_PER_AU as Kilometers, pos.y * KM_PER_AU as Kilometers, pos.z * KM_PER_AU as Kilometers),
-      new Vector3D(0 as KilometersPerSecond, 0 as KilometersPerSecond, 0 as KilometersPerSecond),
+      new Vector3D((pos.x * KM_PER_AU) as Kilometers, (pos.y * KM_PER_AU) as Kilometers, (pos.z * KM_PER_AU) as Kilometers),
+      new Vector3D(0 as KilometersPerSecond, 0 as KilometersPerSecond, 0 as KilometersPerSecond)
     );
 
     this.lastJ2000 = j2000Data;
@@ -229,9 +227,9 @@ export abstract class CelestialBody {
     sunEntity.updateEci();
     const sunPos = sunEntity.eci;
 
-    posTeme.x = posTeme.x + sunPos.x as Kilometers;
-    posTeme.y = posTeme.y + sunPos.y as Kilometers;
-    posTeme.z = posTeme.z + sunPos.z as Kilometers;
+    posTeme.x = (posTeme.x + sunPos.x) as Kilometers;
+    posTeme.y = (posTeme.y + sunPos.y) as Kilometers;
+    posTeme.z = (posTeme.z + sunPos.z) as Kilometers;
 
     this.position = [posTeme.x, posTeme.y, posTeme.z];
 
@@ -381,11 +379,10 @@ export abstract class CelestialBody {
       lineManager.add(this.fullOrbitPath);
 
       return;
-
     }
 
     const simulationTimeObj = ServiceLocator.getTimeManager().simulationTimeObj;
-    const now = simulationTimeObj.getTime() / 1000 as Seconds; // convert ms to s
+    const now = (simulationTimeObj.getTime() / 1000) as Seconds; // convert ms to s
     const timeslice = this.orbitalPeriod / this.orbitPathSegments_;
     const orbitPositions: [number, number, number][] = [];
 
@@ -403,9 +400,9 @@ export abstract class CelestialBody {
       } else if (settingsManager.centerBody !== SolarBody.Earth && settingsManager.centerBody !== SolarBody.Moon) {
         const centerBodyPlanet = ServiceLocator.getScene().getBodyById(settingsManager.centerBody);
 
-        x = x + (centerBodyPlanet?.position[0] ?? 0) as Kilometers;
-        y = y + (centerBodyPlanet?.position[1] ?? 0) as Kilometers;
-        z = z + (centerBodyPlanet?.position[2] ?? 0) as Kilometers;
+        x = (x + (centerBodyPlanet?.position[0] ?? 0)) as Kilometers;
+        y = (y + (centerBodyPlanet?.position[1] ?? 0)) as Kilometers;
+        z = (z + (centerBodyPlanet?.position[2] ?? 0)) as Kilometers;
       }
 
       orbitPositions.push([x, y, z]);
@@ -415,7 +412,7 @@ export abstract class CelestialBody {
   }
 
   drawFullOrbitPathRelativeToEarth(): void {
-    const now = ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000 as Seconds; // convert ms to s
+    const now = (ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000) as Seconds; // convert ms to s
     const lineManager = ServiceLocator.getLineManager();
     const timeslice = this.orbitalPeriod / this.orbitPathSegments_;
     const orbitPositions: [number, number, number][] = [];
@@ -427,15 +424,15 @@ export abstract class CelestialBody {
       if (settingsManager.centerBody === SolarBody.Sun) {
         const sunPos = ServiceLocator.getScene().sun.position;
 
-        sv.x = sv.x + sunPos[0] as Kilometers;
-        sv.y = sv.y + sunPos[1] as Kilometers;
-        sv.z = sv.z + sunPos[2] as Kilometers;
+        sv.x = (sv.x + sunPos[0]) as Kilometers;
+        sv.y = (sv.y + sunPos[1]) as Kilometers;
+        sv.z = (sv.z + sunPos[2]) as Kilometers;
       } else if (settingsManager.centerBody !== SolarBody.Earth) {
         const centerBodyPlanet = ServiceLocator.getScene().getBodyById(settingsManager.centerBody);
 
-        sv.x = sv.x + (centerBodyPlanet?.position[0] ?? 0) as Kilometers;
-        sv.y = sv.y + (centerBodyPlanet?.position[1] ?? 0) as Kilometers;
-        sv.z = sv.z + (centerBodyPlanet?.position[2] ?? 0) as Kilometers;
+        sv.x = (sv.x + (centerBodyPlanet?.position[0] ?? 0)) as Kilometers;
+        sv.y = (sv.y + (centerBodyPlanet?.position[1] ?? 0)) as Kilometers;
+        sv.z = (sv.z + (centerBodyPlanet?.position[2] ?? 0)) as Kilometers;
       }
 
       orbitPositions.push([sv.x as number, sv.y as number, sv.z as number]);

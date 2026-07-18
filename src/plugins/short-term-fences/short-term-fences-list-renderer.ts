@@ -33,7 +33,9 @@ export function renderStfList(fences: DetailedSensor[], l: FenceListLabel, remov
   const attr = (key: string, value: string) => `
         <div class="stf-attr"><span class="stf-attr-k">${l(key)}</span><span class="stf-attr-v">${value}</span></div>`;
 
-  return fences.map((fence) => `
+  return fences
+    .map(
+      (fence) => `
       <div class="stf-fence-card">
         <div class="stf-fence-head">
           <span class="stf-fence-name">${fence.uiName ?? fence.objName}</span>
@@ -46,5 +48,7 @@ export function renderStfList(fences: DetailedSensor[], l: FenceListLabel, remov
           ${attr('elevation', `${fence.minEl.toFixed(0)}° - ${fence.maxEl.toFixed(0)}°`)}
           ${attr('range', `${fence.minRng.toFixed(0)} - ${fence.maxRng.toFixed(0)} km`)}
         </div>
-      </div>`).join('');
+      </div>`
+    )
+    .join('');
 }

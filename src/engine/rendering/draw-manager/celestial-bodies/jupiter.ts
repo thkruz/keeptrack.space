@@ -20,7 +20,7 @@
  */
 
 import { SolarBody } from '@app/engine/core/interfaces';
-import { TemeVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
+import { Kilometers, Seconds, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
@@ -28,14 +28,14 @@ import { CelestialBody, PlanetColors } from './celestial-body';
 export enum JupiterTextureQuality {
   POTATO = '512',
   HIGH = '2k',
-  ULTRA = '4k'
+  ULTRA = '4k',
 }
 
 export class Jupiter extends CelestialBody {
   readonly RADIUS = 69911;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
-  orbitalPeriod = 11.862 * 365.25 * 24 * 3600 as Seconds;
+  orbitalPeriod = (11.862 * 365.25 * 24 * 3600) as Seconds;
   meanDistanceToSun = 778340821 as Kilometers;
   type: SpaceObjectType = SpaceObjectType.GAS_GIANT;
   eci: TemeVec3;

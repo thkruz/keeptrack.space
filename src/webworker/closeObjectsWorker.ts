@@ -8,16 +8,9 @@
  * for the closest pairs - all off the main thread so the UI never freezes.
  */
 
-import { RADIUS_OF_EARTH, Satellite, type TemeVec3 } from '@ootk/src/main';
 import { findTca } from '@app/engine/math/tca-search';
-import {
-  CoWorkerMsgType,
-  CoWorkerOutMsgType,
-  type CoMsgStartSearch,
-  type CoResultRow,
-  type CoSatelliteData,
-  type CoWorkerInMsg,
-} from './close-objects-messages';
+import { RADIUS_OF_EARTH, Satellite, type TemeVec3 } from '@ootk/src/main';
+import { type CoMsgStartSearch, type CoResultRow, type CoSatelliteData, type CoWorkerInMsg, CoWorkerMsgType, CoWorkerOutMsgType } from './close-objects-messages';
 import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
 // ─── Module-level state ─────────────────────────────────────────────────────
@@ -93,10 +86,7 @@ interface VerifiedPair {
  * @param msg The START_SEARCH message with candidate pairs and search params.
  */
 function handleStartSearch_(msg: CoMsgStartSearch): void {
-  const {
-    runId, sats, pairs, searchRadiusKm, minMissDistanceKm, simEpochMs, verifyOffsetMs,
-    tcaWindowMs, coarseStepMs, tolMs, maxTcaPairs,
-  } = msg;
+  const { runId, sats, pairs, searchRadiusKm, minMissDistanceKm, simEpochMs, verifyOffsetMs, tcaWindowMs, coarseStepMs, tolMs, maxTcaPairs } = msg;
 
   try {
     // Build each Satellite at most once, then reuse across every pair and every

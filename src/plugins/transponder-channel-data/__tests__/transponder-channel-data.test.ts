@@ -1,8 +1,8 @@
-import { vi } from 'vitest';
 /* eslint-disable dot-notation */
 import { TransponderChannelData } from '@app/plugins/transponder-channel-data/transponder-channel-data';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 const mockChannelData = [
   {
@@ -36,7 +36,7 @@ describe('TransponderChannelData_class', () => {
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve(mockChannelData),
-      }),
+      })
     ) as vi.Mock;
   });
 
@@ -197,17 +197,11 @@ describe('TransponderChannelData_class', () => {
         altName: 'ASTRA-1N',
       };
 
-      vi.spyOn(
-        (await import('@app/engine/core/plugin-registry')).PluginRegistry,
-        'getPlugin',
-      ).mockReturnValue({ primarySatObj: mockSat } as never);
+      vi.spyOn((await import('@app/engine/core/plugin-registry')).PluginRegistry, 'getPlugin').mockReturnValue({ primarySatObj: mockSat } as never);
 
       await plugin['loadChannelData_']();
 
-      expect(global.fetch).toHaveBeenCalledWith(
-        'https://api.keeptrack.space/v4/channels/ASTRA%201N',
-        expect.objectContaining({}),
-      );
+      expect(global.fetch).toHaveBeenCalledWith('https://api.keeptrack.space/v4/channels/ASTRA%201N', expect.objectContaining({}));
     });
 
     it('should not re-request the alternate name when it matches the primary name', async () => {
@@ -223,10 +217,7 @@ describe('TransponderChannelData_class', () => {
         altName: 'ASTRA 1N',
       };
 
-      vi.spyOn(
-        (await import('@app/engine/core/plugin-registry')).PluginRegistry,
-        'getPlugin',
-      ).mockReturnValue({ primarySatObj: mockSat } as never);
+      vi.spyOn((await import('@app/engine/core/plugin-registry')).PluginRegistry, 'getPlugin').mockReturnValue({ primarySatObj: mockSat } as never);
 
       await plugin['loadChannelData_']();
 

@@ -1,5 +1,5 @@
 import { settingsManager } from '@app/settings/settings';
-import { Sgp4WasmBackendMsgData, SGP4_WASM_BACKEND_MSG_TYPE } from '@app/webworker/shared/sgp4-wasm-backend-messages';
+import { SGP4_WASM_BACKEND_MSG_TYPE, Sgp4WasmBackendMsgData } from '@app/webworker/shared/sgp4-wasm-backend-messages';
 import { errorManagerInstance } from '../utils/errorManager';
 import { isThisNode } from '../utils/isThisNode';
 
@@ -17,7 +17,8 @@ export abstract class WebWorkerThreadManager {
   }
 
   init(workerStub?: Worker, workerScriptUrl: string = this.WEB_WORKER_CODE) {
-    if (isThisNode()) { // See if we are running jest right now for testing
+    if (isThisNode()) {
+      // See if we are running jest right now for testing
       this.initNodeConfig_(workerStub, workerScriptUrl);
 
       return; // Exit early in Node environment
@@ -59,7 +60,7 @@ export abstract class WebWorkerThreadManager {
       if (window.location.href.startsWith('file://')) {
         throw new Error(
           'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other' +
-          'copies of chrome are running when you start it.',
+            'copies of chrome are running when you start it.'
         );
       } else {
         throw new Error(error);
@@ -94,9 +95,11 @@ export abstract class WebWorkerThreadManager {
   }
 
   protected initNodeConfig_(workerStub: Worker | undefined, workerScriptUrl: string) {
-    if (workerStub) { // If we have a stub use it
+    if (workerStub) {
+      // If we have a stub use it
       this.worker_ = workerStub;
-    } else { // Otherwise create a mock worker for testing
+    } else {
+      // Otherwise create a mock worker for testing
       this.worker_ = {
         postMessage: () => {
           // Mock implementation for testing

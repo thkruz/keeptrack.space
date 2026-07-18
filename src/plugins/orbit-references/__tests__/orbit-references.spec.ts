@@ -1,4 +1,4 @@
-import { test, expect } from '@test/e2e/coverage';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('OrbitReferences Plugin', () => {
@@ -16,7 +16,7 @@ test.describe('OrbitReferences Plugin', () => {
     // Without a selected satellite, there is no visible UI to test.
 
     // Verify the app loaded without plugin-related errors
-    const pluginErrors = pageErrors.filter((e) => (/orbit.?ref/iu).test(e));
+    const pluginErrors = pageErrors.filter((e) => /orbit.?ref/iu.test(e));
 
     expect(pluginErrors).toHaveLength(0);
 

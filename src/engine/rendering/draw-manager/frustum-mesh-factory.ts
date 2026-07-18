@@ -27,7 +27,7 @@ export class FrustumMeshFactory extends CustomMeshFactory<FrustumMesh> {
   }
 
   generateMesh(obj: BaseObject, settings: FrustumSettings = this.defaultFrustumSettings_) {
-    const found = this.checkCacheForMesh_(obj, settings.targetObj, settings.azimuthOffset ?? 0 as Degrees, settings.elevationOffset ?? 0 as Degrees);
+    const found = this.checkCacheForMesh_(obj, settings.targetObj, settings.azimuthOffset ?? (0 as Degrees), settings.elevationOffset ?? (0 as Degrees));
 
     if (found) {
       return;
@@ -87,9 +87,7 @@ export class FrustumMeshFactory extends CustomMeshFactory<FrustumMesh> {
   }
 
   removeBySourceAndTarget(sourceId: number, targetId: number) {
-    const index = this.meshes.findIndex(
-      (mesh) => mesh.obj.id === sourceId && (mesh.targetObj?.id ?? -1) === targetId,
-    );
+    const index = this.meshes.findIndex((mesh) => mesh.obj.id === sourceId && (mesh.targetObj?.id ?? -1) === targetId);
 
     if (index !== -1) {
       this.remove(index);
@@ -105,10 +103,7 @@ export class FrustumMeshFactory extends CustomMeshFactory<FrustumMesh> {
    */
   removeByAttributes(sourceId: number, targetId: number, azimuthOffset: Degrees, elevationOffset: Degrees) {
     const index = this.meshes.findIndex(
-      (mesh) => mesh.obj.id === sourceId &&
-        (mesh.targetObj?.id ?? -1) === targetId &&
-        mesh.azimuthOffset === azimuthOffset &&
-        mesh.elevationOffset === elevationOffset,
+      (mesh) => mesh.obj.id === sourceId && (mesh.targetObj?.id ?? -1) === targetId && mesh.azimuthOffset === azimuthOffset && mesh.elevationOffset === elevationOffset
     );
 
     if (index !== -1) {

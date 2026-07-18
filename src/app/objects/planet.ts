@@ -2,7 +2,6 @@ import { rgbaArray } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { BaseObject } from '@ootk/src/main';
 
-
 export class Planet extends BaseObject {
   color: rgbaArray = [0.0, 1.0, 0.0, 1.0];
 

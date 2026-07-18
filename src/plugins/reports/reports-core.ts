@@ -109,7 +109,8 @@ type HeaderSat = Pick<Satellite, 'name' | 'sccNum' | 'altId' | 'intlDes'>;
  * the simulation time the report covers.
  */
 export const buildReportHeader = (title: string, sat: HeaderSat, sensor: DetailedSensor | null, generatedAt: Date): string => {
-  const satData = `${title}\n${HEADER_RULE}\n` +
+  const satData =
+    `${title}\n${HEADER_RULE}\n` +
     `Date: ${generatedAt.toISOString()}\n` +
     `Satellite: ${sat.name}\n` +
     `NORAD ID: ${sat.sccNum}\n` +
@@ -120,7 +121,8 @@ export const buildReportHeader = (title: string, sat: HeaderSat, sensor: Detaile
     return satData;
   }
 
-  const sensorData = `Sensor: ${sensor.name}\n` +
+  const sensorData =
+    `Sensor: ${sensor.name}\n` +
     `Type: ${sensor.getTypeString()}\n` +
     `Latitude: ${sensor.lat}\n` +
     `Longitude: ${sensor.lon}\n` +
@@ -210,8 +212,12 @@ export const generateEciReport = (sat: Satellite, opts: ReportOptions, generated
 
     rows.push([
       formatReportTime(time),
-      eci.position.x.toFixed(3), eci.position.y.toFixed(3), eci.position.z.toFixed(3),
-      eci.velocity.x.toFixed(3), eci.velocity.y.toFixed(3), eci.velocity.z.toFixed(3),
+      eci.position.x.toFixed(3),
+      eci.position.y.toFixed(3),
+      eci.position.z.toFixed(3),
+      eci.velocity.x.toFixed(3),
+      eci.velocity.y.toFixed(3),
+      eci.velocity.z.toFixed(3),
     ]);
   }
 
@@ -257,14 +263,7 @@ export const generateVisibilityWindowsReport = (sat: Satellite, sensor: Detailed
   const rows = passes.map((pass, idx) => {
     const durationMin = (pass.los.getTime() - pass.aos.getTime()) / (MILLISECONDS_PER_SECOND * 60);
 
-    return [
-      `${idx + 1}`,
-      formatReportTime(pass.aos),
-      formatReportTime(pass.los),
-      durationMin.toFixed(2),
-      pass.maxEl.toFixed(3),
-      formatReportTime(pass.maxElTime),
-    ];
+    return [`${idx + 1}`, formatReportTime(pass.aos), formatReportTime(pass.los), durationMin.toFixed(2), pass.maxEl.toFixed(3), formatReportTime(pass.maxElTime)];
   });
 
   return {
@@ -307,12 +306,7 @@ export const generateSunEclipseReport = (sat: Satellite, opts: ReportOptions, de
       continue;
     }
 
-    rows.push([
-      formatReportTime(time),
-      ILLUMINATION_LABEL[status.illumination],
-      ECLIPSE_LABEL[status.illumination],
-      status.sunAngleDeg.toFixed(3),
-    ]);
+    rows.push([formatReportTime(time), ILLUMINATION_LABEL[status.illumination], ECLIPSE_LABEL[status.illumination], status.sunAngleDeg.toFixed(3)]);
   }
 
   return {

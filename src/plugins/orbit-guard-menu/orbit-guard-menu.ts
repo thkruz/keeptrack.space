@@ -7,11 +7,11 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ClickDragOptions, KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
-import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -137,7 +137,7 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
       fetch(this.maneuverDataSrc, {
         method: 'GET',
         headers: {
-          'Authorization': this.bearerToken, // Add Bearer token from your script
+          Authorization: this.bearerToken, // Add Bearer token from your script
           'Content-Type': 'application/json',
         },
       })

@@ -26,15 +26,13 @@ const makeCtx = (width = 1000, height = 1000) => ({
 const sample = (tIso: string, az: number, el: number): PolarSample => ({
   t: new Date(tIso),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  az: az as any, el: el as any, rng: 800 as any,
+  az: az as any,
+  el: el as any,
+  rng: 800 as any,
 });
 
 const pass: PolarPass = {
-  samples: [
-    sample('2026-05-31T00:00:00Z', 100, 5),
-    sample('2026-05-31T00:01:00Z', 130, 40),
-    sample('2026-05-31T00:02:00Z', 160, 8),
-  ],
+  samples: [sample('2026-05-31T00:00:00Z', 100, 5), sample('2026-05-31T00:01:00Z', 130, 40), sample('2026-05-31T00:02:00Z', 160, 8)],
   aos: new Date('2026-05-31T00:00:00Z'),
   los: new Date('2026-05-31T00:02:00Z'),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

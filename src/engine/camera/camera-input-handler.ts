@@ -83,7 +83,9 @@ export class CameraInputHandler {
   registerKeyboardEvents() {
     // Register camera keys in the shortcut registry for conflict detection.
     // Camera inits before plugins, so these registrations win on conflict.
-    const noop = () => { /* handled via EventBus */ };
+    const noop = () => {
+      /* handled via EventBus */
+    };
     const cameraShortcuts: IKeyboardShortcut[] = [
       { key: 'ArrowUp', callback: noop },
       { key: 'ArrowDown', callback: noop },

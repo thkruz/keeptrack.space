@@ -95,12 +95,16 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       rows.splice(12, 3);
     }
 
-    return rows.map((row) => html`
+    return rows
+      .map(
+        (row) => html`
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key" kt-tooltip="${row.tooltip}">${row.key}</div>
           <div class="sat-info-value" id="${row.id}">${row.value}</div>
         </div>
-      `).join('');
+      `
+      )
+      .join('');
   }
 
   private updateOrbitData_(obj: BaseObject): void {
@@ -150,10 +154,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       periodDom.innerHTML = `${period.toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.min')}`;
       periodDom.dataset.position = 'top';
       periodDom.dataset.delay = '50';
-      periodDom.setAttribute(
-        'kt-tooltip',
-        `${t7e('SatInfoBoxOrbital.Period.meanMotion')}: ${(MINUTES_PER_DAY / period).toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.revPerDay')}`,
-      );
+      periodDom.setAttribute('kt-tooltip', `${t7e('SatInfoBoxOrbital.Period.meanMotion')}: ${(MINUTES_PER_DAY / period).toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.revPerDay')}`);
     }
   }
 
@@ -172,7 +173,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       elsetAgeDom.setAttribute(
         'kt-tooltip',
         `${t7e('SatInfoBoxOrbital.AgeOfGP.epochYear')}: ${obj.tle1.substring(18, 20)}<br/>
-           ${t7e('SatInfoBoxOrbital.AgeOfGP.epochDay')}: ${obj.tle1.substring(20, 28)}`,
+           ${t7e('SatInfoBoxOrbital.AgeOfGP.epochDay')}: ${obj.tle1.substring(20, 28)}`
       );
     }
   }
@@ -217,11 +218,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     return true;
   }
 
-  private updateSatelliteAltitudeAndVelocity_(
-    obj: Satellite | OemSatellite,
-    satAltitudeElement: HTMLElement,
-    satVelocityElement: HTMLElement,
-  ): boolean {
+  private updateSatelliteAltitudeAndVelocity_(obj: Satellite | OemSatellite, satAltitudeElement: HTMLElement, satVelocityElement: HTMLElement): boolean {
     const gmst = ServiceLocator.getTimeManager().gmst;
 
     if (((obj as OemSatellite).centerBody ?? SolarBody.Earth) !== SolarBody.Earth) {
@@ -233,16 +230,15 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
         return false;
       }
       const position = {
-        x: obj.position.x - centerBody.position[0] as Kilometers,
-        y: obj.position.y - centerBody.position[1] as Kilometers,
-        z: obj.position.z - centerBody.position[2] as Kilometers,
+        x: (obj.position.x - centerBody.position[0]) as Kilometers,
+        y: (obj.position.y - centerBody.position[1]) as Kilometers,
+        z: (obj.position.z - centerBody.position[2]) as Kilometers,
       };
 
       satAltitudeElement.innerHTML = `${SatMath.getAlt(position, gmst, centerBody.RADIUS as Kilometers).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
     } else {
       satAltitudeElement.innerHTML = `${SatMath.getAlt(obj.position, gmst).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
     }
-
 
     satVelocityElement.innerHTML = `${obj.totalVelocity.toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}/${t7e('SatInfoBoxOrbital.second')}`;
 
@@ -273,10 +269,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     let covCrossTrack = covMatrix[1];
     let covInTrack = covMatrix[2];
 
-    const useKm =
-      covRadial > 0.5 &&
-      covCrossTrack > 0.5 &&
-      covInTrack > 0.5;
+    const useKm = covRadial > 0.5 && covCrossTrack > 0.5 && covInTrack > 0.5;
 
     if (useKm) {
       setInnerHtml(EL.UNCERTAINTY_RADIAL, `${(covMatrix[0]).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
@@ -365,9 +358,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       const phase = obj.getActivePhase();
       const phaseName = phase ? phase.name : '';
 
-      headerSpan.textContent = phaseName
-        ? `${t7e('SatInfoBoxOrbital.title')} (${phaseName})`
-        : t7e('SatInfoBoxOrbital.title');
+      headerSpan.textContent = phaseName ? `${t7e('SatInfoBoxOrbital.title')} (${phaseName})` : t7e('SatInfoBoxOrbital.title');
     } else {
       headerSpan.textContent = t7e('SatInfoBoxOrbital.title');
     }

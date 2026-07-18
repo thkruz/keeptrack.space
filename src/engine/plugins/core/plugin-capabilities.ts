@@ -860,11 +860,7 @@ export interface ISettingButtonControl extends ISettingControlBase {
  * Discriminated union of every supported settings control. Renderers switch
  * on {@link SettingControlType} via the `type` field.
  */
-export type ISettingControl =
-  | ISettingToggleControl
-  | ISettingNumberControl
-  | ISettingSelectControl
-  | ISettingButtonControl;
+export type ISettingControl = ISettingToggleControl | ISettingNumberControl | ISettingSelectControl | ISettingButtonControl;
 
 /**
  * One settings section, contributed by a single plugin. Rendered as a labeled

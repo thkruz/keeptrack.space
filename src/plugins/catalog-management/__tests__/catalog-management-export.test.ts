@@ -1,13 +1,6 @@
 import { Satellite } from '@ootk/src/main';
 import { vi } from 'vitest';
-import {
-  DEFAULT_EPHEM_SPAN_HOURS,
-  DEFAULT_EPHEM_STEP_SEC,
-  MAX_EPHEM_POINTS,
-  downloadText,
-  exportFileName,
-  parseEphemerisParams,
-} from '../catalog-management-export';
+import { DEFAULT_EPHEM_SPAN_HOURS, DEFAULT_EPHEM_STEP_SEC, downloadText, exportFileName, MAX_EPHEM_POINTS, parseEphemerisParams } from '../catalog-management-export';
 
 // file-saver's ESM export can't be spied directly, so replace the module wholesale.
 vi.mock('file-saver', () => ({ saveAs: vi.fn() }));

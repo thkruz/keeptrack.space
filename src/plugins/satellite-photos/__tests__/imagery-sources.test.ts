@@ -1,11 +1,4 @@
-import {
-  computeElektroSlot,
-  computeHimawariSlot,
-  elektroUrl,
-  formatUtcTime,
-  himawariUrl,
-  IMAGERY_SOURCES,
-} from '@app/plugins/satellite-photos/imagery-sources';
+import { computeElektroSlot, computeHimawariSlot, elektroUrl, formatUtcTime, himawariUrl, IMAGERY_SOURCES } from '@app/plugins/satellite-photos/imagery-sources';
 
 describe('imagery-sources', () => {
   describe('formatUtcTime', () => {

@@ -8,9 +8,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { StorageKey } from '@app/engine/persistence/storage-key';
-import {
-  ICommandPaletteCapable, ICommandPaletteCommand, IContextMenuConfig, IHelpConfig, IKeyboardShortcut, RmbMenuContext,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { ICommandPaletteCapable, ICommandPaletteCommand, IContextMenuConfig, IHelpConfig, IKeyboardShortcut, RmbMenuContext } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getClass } from '@app/engine/utils/get-class';
@@ -20,10 +18,10 @@ import { BaseObject, Satellite, ZoomValue } from '@ootk/src/main';
 import sensorPng from '@public/img/icons/sensor.png';
 import { SensorGroup, sensorGroups } from '../../app/data/catalogs/sensor-groups';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { keepTrackApi } from './../../keepTrackApi';
 import { DateTimeManager } from '../date-time-manager/date-time-manager';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { keepTrackApi } from './../../keepTrackApi';
 import './sensor-list.css';
 
 // TODO: Add a search bar and filter for sensors
@@ -100,11 +98,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
           content: t7e('plugins.SensorListPlugin.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.SensorListPlugin.help.tip1'),
-        t7e('plugins.SensorListPlugin.help.tip2'),
-        t7e('plugins.SensorListPlugin.help.tip3'),
-      ],
+      tips: [t7e('plugins.SensorListPlugin.help.tip1'), t7e('plugins.SensorListPlugin.help.tip2'), t7e('plugins.SensorListPlugin.help.tip3')],
       shortcuts: [
         { keys: ['S'], description: t7e('plugins.SensorListPlugin.help.shortcutToggle') },
         { keys: ['Ctrl', 'Home'], description: t7e('plugins.SensorListPlugin.help.shortcutCamera') },
@@ -124,8 +118,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
         key: 'Home',
         ctrl: true,
         callback: () => {
-          if ((ServiceLocator.getSensorManager().currentSensors.length > 0) &&
-            (ServiceLocator.getMainCamera().cameraType === CameraType.FIXED_TO_EARTH)) {
+          if (ServiceLocator.getSensorManager().currentSensors.length > 0 && ServiceLocator.getMainCamera().cameraType === CameraType.FIXED_TO_EARTH) {
             const sensor = ServiceLocator.getSensorManager().currentSensors[0];
 
             ServiceLocator.getMainCamera().lookAtLatLon(sensor.lat, sensor.lon, sensor.zoom ?? ZoomValue.GEO, ServiceLocator.getTimeManager().selectedDate);
@@ -184,12 +177,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
           try {
             keepTrackApi
               .getMainCamera()
-              .lookAtLatLon(
-                sm.currentSensors[0].lat,
-                sm.currentSensors[0].lon,
-                sm.currentSensors[0].zoom ?? ZoomValue.GEO,
-                ServiceLocator.getTimeManager().selectedDate,
-              );
+              .lookAtLatLon(sm.currentSensors[0].lat, sm.currentSensors[0].lon, sm.currentSensors[0].zoom ?? ZoomValue.GEO, ServiceLocator.getTimeManager().selectedDate);
           } catch {
             // Multi-sensor groups may fail
           }
@@ -211,12 +199,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
           try {
             keepTrackApi
               .getMainCamera()
-              .lookAtLatLon(
-                sm.currentSensors[0].lat,
-                sm.currentSensors[0].lon,
-                sm.currentSensors[0].zoom ?? ZoomValue.GEO,
-                ServiceLocator.getTimeManager().selectedDate,
-              );
+              .lookAtLatLon(sm.currentSensors[0].lat, sm.currentSensors[0].lon, sm.currentSensors[0].zoom ?? ZoomValue.GEO, ServiceLocator.getTimeManager().selectedDate);
           } catch {
             // Multi-sensor groups may fail
           }
@@ -230,148 +213,133 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
   addHtml(): void {
     super.addHtml();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerInit,
-      () => {
-        getEl('nav-top-center')?.insertAdjacentHTML(
-          'beforeend',
-          html`
+    EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
+      getEl('nav-top-center')?.insertAdjacentHTML(
+        'beforeend',
+        html`
           <div id="sensor-selected-container" class="start-hidden">
             <div id="sensor-selected" class="waves-effect waves-light">
 
             </div>
           </div>
-          `,
-        );
-      },
-    );
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        getEl('sensor-selected-container')?.addEventListener('click', () => {
-          this.bottomMenuClicked();
-        });
+          `
+      );
+    });
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      getEl('sensor-selected-container')?.addEventListener('click', () => {
+        this.bottomMenuClicked();
+      });
 
-        getEl('sensor-list-content')?.addEventListener('click', (e: Event) => {
-          let realTarget = e.target as HTMLElement | null | undefined;
+      getEl('sensor-list-content')?.addEventListener('click', (e: Event) => {
+        let realTarget = e.target as HTMLElement | null | undefined;
 
+        if (!realTarget?.classList.contains('menu-selectable')) {
+          realTarget = realTarget?.closest('.menu-selectable');
           if (!realTarget?.classList.contains('menu-selectable')) {
-            realTarget = realTarget?.closest('.menu-selectable');
-            if (!realTarget?.classList.contains('menu-selectable')) {
-              return;
-            }
-          }
-
-          if (realTarget.id === 'reset-sensor-button') {
-            ServiceLocator.getSensorManager().resetSensorSelected();
-            ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
-
             return;
           }
+        }
 
-          ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
-
-          const markGroup = realTarget.dataset.markGroup;
-
-          if (markGroup) {
-            this.toggleSensorGroupMarkers_(markGroup);
-
-            return;
-          }
-
-          const sensorClick = realTarget.dataset.sensor;
-
-          this.sensorListContentClick(sensorClick ?? '');
-        });
-      },
-    );
-
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (obj: BaseObject) => {
-        // Skip this if there is no satellite object because the menu isn't open
-        if (!obj?.isSatellite()) {
-          hideEl('sensors-in-fov-link');
+        if (realTarget.id === 'reset-sensor-button') {
+          ServiceLocator.getSensorManager().resetSensorSelected();
+          ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
 
           return;
         }
 
-        showEl('sensors-in-fov-link');
+        ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
 
-        if (PluginRegistry.getPlugin(SatInfoBox) !== null && !this.isSensorLinksAdded) {
-          getEl('actions-section')?.insertAdjacentHTML(
-            'beforeend',
-            html`
+        const markGroup = realTarget.dataset.markGroup;
+
+        if (markGroup) {
+          this.toggleSensorGroupMarkers_(markGroup);
+
+          return;
+        }
+
+        const sensorClick = realTarget.dataset.sensor;
+
+        this.sensorListContentClick(sensorClick ?? '');
+      });
+    });
+
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
+      // Skip this if there is no satellite object because the menu isn't open
+      if (!obj?.isSatellite()) {
+        hideEl('sensors-in-fov-link');
+
+        return;
+      }
+
+      showEl('sensors-in-fov-link');
+
+      if (PluginRegistry.getPlugin(SatInfoBox) !== null && !this.isSensorLinksAdded) {
+        getEl('actions-section')?.insertAdjacentHTML(
+          'beforeend',
+          html`
                   <div id="sensors-in-fov-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
                         data-tooltip="${t7e('plugins.SensorListPlugin.labels.tooltipSensorsInFov' as Parameters<typeof t7e>[0])}">${t7e('plugins.SensorListPlugin.buttons.showSensorsWithFov' as Parameters<typeof t7e>[0])}</div>
-                `,
-          );
-          getEl('sensors-in-fov-link')?.addEventListener('click', () => {
-            ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+                `
+        );
+        getEl('sensors-in-fov-link')?.addEventListener('click', () => {
+          ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
 
-            const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager);
+          const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager);
 
-            if (!selectSatManagerInstance) {
-              return;
-            }
+          if (!selectSatManagerInstance) {
+            return;
+          }
 
-            const sat = selectSatManagerInstance.getSelectedSat();
+          const sat = selectSatManagerInstance.getSelectedSat();
 
-            if (!sat.isSatellite()) {
-              return;
-            }
+          if (!sat.isSatellite()) {
+            return;
+          }
 
-            ServiceLocator.getLineManager().createSensorsToSatFovOnly(sat as Satellite);
-          });
-          this.isSensorLinksAdded = true;
-        }
-      },
-    );
+          ServiceLocator.getLineManager().createSensorsToSatFovOnly(sat as Satellite);
+        });
+        this.isSensorLinksAdded = true;
+      }
+    });
   }
 
   addJs(): void {
     super.addJs();
 
-    EventBus.getInstance().on(
-      EventBusEvent.sensorDotSelected,
-      (obj: BaseObject) => {
-        if (settingsManager.isMobileModeEnabled) {
-          return;
-        }
-        if (!obj.isSensor()) {
-          return;
-        }
-        const sensor = obj as DetailedSensor;
+    EventBus.getInstance().on(EventBusEvent.sensorDotSelected, (obj: BaseObject) => {
+      if (settingsManager.isMobileModeEnabled) {
+        return;
+      }
+      if (!obj.isSensor()) {
+        return;
+      }
+      const sensor = obj as DetailedSensor;
 
-        const sensorManagerInstance = ServiceLocator.getSensorManager();
-        // No sensor manager on mobile
+      const sensorManagerInstance = ServiceLocator.getSensorManager();
+      // No sensor manager on mobile
 
-        sensorManagerInstance.setSensor(null, sensor.sensorId);
+      sensorManagerInstance.setSensor(null, sensor.sensorId);
 
-        if (sensorManagerInstance.currentSensors.length === 0) {
-          throw new Error('No sensors found');
-        }
-        const timeManagerInstance = ServiceLocator.getTimeManager();
+      if (sensorManagerInstance.currentSensors.length === 0) {
+        throw new Error('No sensors found');
+      }
+      const timeManagerInstance = ServiceLocator.getTimeManager();
 
-        keepTrackApi
-          .getMainCamera()
-          .lookAtLatLon(
-            sensorManagerInstance.currentSensors[0].lat,
-            sensorManagerInstance.currentSensors[0].lon,
-            sensorManagerInstance.currentSensors[0].zoom ?? ZoomValue.GEO,
-            timeManagerInstance.selectedDate,
-          );
-      },
-    );
+      keepTrackApi
+        .getMainCamera()
+        .lookAtLatLon(
+          sensorManagerInstance.currentSensors[0].lat,
+          sensorManagerInstance.currentSensors[0].lon,
+          sensorManagerInstance.currentSensors[0].zoom ?? ZoomValue.GEO,
+          timeManagerInstance.selectedDate
+        );
+    });
 
-    EventBus.getInstance().on(
-      EventBusEvent.onCruncherReady,
-      () => {
-        if (!settingsManager.disableUI && settingsManager.isLoadLastSensor) {
-          ServiceLocator.getSensorManager().loadSensorJson();
-        }
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.onCruncherReady, () => {
+      if (!settingsManager.disableUI && settingsManager.isLoadLastSensor) {
+        ServiceLocator.getSensorManager().loadSensorJson();
+      }
+    });
 
     // Account sync applied a cloud-newer sensor selection: re-apply it
     EventBus.getInstance().on(EventBusEvent.remoteSettingsApplied, (changedKeys) => {
@@ -379,7 +347,6 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
         ServiceLocator.getSensorManager().loadSensorJson();
       }
     });
-
   }
 
   sensorListContentClick(sensorClick: string) {
@@ -414,7 +381,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
             sensorManagerInstance.currentSensors[0].lat,
             sensorManagerInstance.currentSensors[0].lon,
             sensorManagerInstance.currentSensors[0].zoom ?? ZoomValue.GEO,
-            ServiceLocator.getTimeManager().selectedDate,
+            ServiceLocator.getTimeManager().selectedDate
           );
       } catch (e) {
         // TODO: More intentional conditional statement
@@ -454,9 +421,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
     if (wasMarked) {
       lineManager.removeLinesByKind('sensorMarker', sensorGroup.header);
     } else {
-      const groupSensors = sensorGroup.list
-        .map((sensorName) => sensors[sensorName])
-        .filter((sensor): sensor is DetailedSensor => Boolean(sensor));
+      const groupSensors = sensorGroup.list.map((sensorName) => sensors[sensorName]).filter((sensor): sensor is DetailedSensor => Boolean(sensor));
 
       lineManager.createSensorMarkers(groupSensors, sensorGroup.header);
     }
@@ -532,17 +497,19 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
       const params = {
         name,
         header: sensorGroup.header,
-        sensors: sensorGroup.list.map((sensorName) => {
-          const sensor = sensors[sensorName];
+        sensors: sensorGroup.list
+          .map((sensorName) => {
+            const sensor = sensors[sensorName];
 
-          if (!sensor) {
-            errorManagerInstance.warn(`Sensor ${sensorName} listed in sensorGroups was not found in sensors catalog!`);
+            if (!sensor) {
+              errorManagerInstance.warn(`Sensor ${sensorName} listed in sensorGroups was not found in sensors catalog!`);
 
-            return null;
-          }
+              return null;
+            }
 
-          return sensor;
-        }).filter((sensor) => sensor !== null),
+            return sensor;
+          })
+          .filter((sensor) => sensor !== null),
         topLinks: [
           {
             name: sensorGroup.topLink.name,
@@ -562,7 +529,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
           (link) => html`<button type="button" class="kt-action waves-effect menu-selectable sensor-top-link" data-sensor="${params.name}">
               <span class="kt-action-label">${link.name}</span>
               <span class="sensor-badge">${link.badge}</span>
-            </button>`,
+            </button>`
         )
         .join('');
 

@@ -69,7 +69,9 @@ describe('buildPolarPass', () => {
   const sample: PolarSample = {
     t: new Date('2026-05-31T00:00:00Z'),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    az: 100 as any, el: 30 as any, rng: 800 as any,
+    az: 100 as any,
+    el: 30 as any,
+    rng: 800 as any,
   };
 
   it('shapes a row plus samples into a PolarPass', () => {

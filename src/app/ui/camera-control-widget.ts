@@ -41,23 +41,27 @@ export class CameraControlWidget {
   private center_: { x: number; y: number };
 
   private readonly axes_: Record<string, vec3> = {
-    'X': vec3.fromValues(1, 0, 0),
+    X: vec3.fromValues(1, 0, 0),
     '-X': vec3.fromValues(-1, 0, 0),
-    'Y': vec3.fromValues(0, 1, 0),
+    Y: vec3.fromValues(0, 1, 0),
     '-Y': vec3.fromValues(0, -1, 0),
-    'Z': vec3.fromValues(0, 0, 1),
+    Z: vec3.fromValues(0, 0, 1),
     '-Z': vec3.fromValues(0, 0, -1),
   };
 
   private readonly colors_: Record<string, string> = {
-    'X': 'rgb(237, 56, 81)', 'Y': 'rgb(107, 154, 31)', 'Z': 'rgb(47, 132, 226)',
-    '-X': 'rgb(160, 37, 54)', '-Y': 'rgb(53, 77, 15)', '-Z': 'rgb(31, 87, 148)',
+    X: 'rgb(237, 56, 81)',
+    Y: 'rgb(107, 154, 31)',
+    Z: 'rgb(47, 132, 226)',
+    '-X': 'rgb(160, 37, 54)',
+    '-Y': 'rgb(53, 77, 15)',
+    '-Z': 'rgb(31, 87, 148)',
   };
 
   private readonly axisLineColors_: Record<string, string> = {
-    'X': 'rgba(237, 56, 81, 0.6)',
-    'Y': 'rgba(107, 154, 31, 0.6)',
-    'Z': 'rgba(47, 132, 226, 0.6)',
+    X: 'rgba(237, 56, 81, 0.6)',
+    Y: 'rgba(107, 154, 31, 0.6)',
+    Z: 'rgba(47, 132, 226, 0.6)',
   };
 
   private constructor() {
@@ -180,17 +184,17 @@ export class CameraControlWidget {
     if (axis) {
       const camera = ServiceLocator.getMainCamera();
 
-      if (axis === 'X' && camera.state.camYawTarget === Math.PI / 2 as Radians) {
+      if (axis === 'X' && camera.state.camYawTarget === ((Math.PI / 2) as Radians)) {
         return '-X';
-      } else if (axis === '-X' && camera.state.camYawTarget === -Math.PI / 2 as Radians) {
+      } else if (axis === '-X' && camera.state.camYawTarget === ((-Math.PI / 2) as Radians)) {
         return 'X';
-      } else if (axis === 'Y' && camera.state.camYawTarget === Math.PI as Radians) {
+      } else if (axis === 'Y' && camera.state.camYawTarget === (Math.PI as Radians)) {
         return '-Y';
-      } else if (axis === '-Y' && camera.state.camYawTarget === 0 as Radians) {
+      } else if (axis === '-Y' && camera.state.camYawTarget === (0 as Radians)) {
         return 'Y';
-      } else if (axis === 'Z' && camera.state.camPitchTarget === Math.PI / 2 as Radians) {
+      } else if (axis === 'Z' && camera.state.camPitchTarget === ((Math.PI / 2) as Radians)) {
         return '-Z';
-      } else if (axis === '-Z' && camera.state.camPitchTarget === -Math.PI / 2 as Radians) {
+      } else if (axis === '-Z' && camera.state.camPitchTarget === ((-Math.PI / 2) as Radians)) {
         return 'Z';
       }
     }
@@ -208,8 +212,8 @@ export class CameraControlWidget {
     const camera = ServiceLocator.getMainCamera();
     const rotationSpeed = 0.01;
 
-    camera.state.camYaw = camera.state.camYaw + dx * rotationSpeed as Radians;
-    camera.state.camPitch = camera.state.camPitch + dy * rotationSpeed as Radians;
+    camera.state.camYaw = (camera.state.camYaw + dx * rotationSpeed) as Radians;
+    camera.state.camPitch = (camera.state.camPitch + dy * rotationSpeed) as Radians;
   }
 
   private getClickedAxis_(x: number, y: number): string | null {
@@ -250,11 +254,11 @@ export class CameraControlWidget {
     camera.state.isAutoPitchYawToTarget = true;
     switch (axisName) {
       case 'X':
-        camera.state.camYawTarget = Math.PI / 2 as Radians;
+        camera.state.camYawTarget = (Math.PI / 2) as Radians;
         camera.state.camPitchTarget = 0 as Radians;
         break;
       case '-X':
-        camera.state.camYawTarget = -Math.PI / 2 as Radians;
+        camera.state.camYawTarget = (-Math.PI / 2) as Radians;
         camera.state.camPitchTarget = 0 as Radians;
         break;
       case 'Y':
@@ -266,10 +270,10 @@ export class CameraControlWidget {
         camera.state.camPitchTarget = 0 as Radians;
         break;
       case 'Z':
-        camera.state.camPitchTarget = Math.PI / 2 as Radians;
+        camera.state.camPitchTarget = (Math.PI / 2) as Radians;
         break;
       case '-Z':
-        camera.state.camPitchTarget = -Math.PI / 2 as Radians;
+        camera.state.camPitchTarget = (-Math.PI / 2) as Radians;
         break;
       default:
     }
@@ -411,10 +415,7 @@ export class CameraControlWidget {
     const highlightOffsetX = -radius * 0.3;
     const highlightOffsetY = -radius * 0.3;
 
-    const gradient = ctx.createRadialGradient(
-      x + highlightOffsetX, y + highlightOffsetY, radius * 0.1,
-      x, y, radius,
-    );
+    const gradient = ctx.createRadialGradient(x + highlightOffsetX, y + highlightOffsetY, radius * 0.1, x, y, radius);
 
     gradient.addColorStop(0, this.lightenColor_(color, 50));
     gradient.addColorStop(0.6, color);

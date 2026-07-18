@@ -23,9 +23,5 @@ export const buildCreateSatHelp = (): IHelpConfig => ({
       content: t7e('plugins.CreateSat.help.howToUse'),
     },
   ],
-  tips: [
-    t7e('plugins.CreateSat.help.tip1'),
-    t7e('plugins.CreateSat.help.tip2'),
-    t7e('plugins.CreateSat.help.tip3'),
-  ],
+  tips: [t7e('plugins.CreateSat.help.tip1'), t7e('plugins.CreateSat.help.tip2'), t7e('plugins.CreateSat.help.tip3')],
 });

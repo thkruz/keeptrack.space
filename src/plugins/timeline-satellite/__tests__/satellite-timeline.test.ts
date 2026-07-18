@@ -1,18 +1,22 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
-import { SatelliteTimeline } from '@app/plugins/timeline-satellite/satellite-timeline';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { SatelliteTimeline } from '@app/plugins/timeline-satellite/satellite-timeline';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSmokeSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
 
-const mockCtx = () => new Proxy({}, {
-  get: (_t, prop) => (prop === 'canvas' ? { width: 800, height: 400 } : vi.fn()),
-  set: () => true,
-});
+const mockCtx = () =>
+  new Proxy(
+    {},
+    {
+      get: (_t, prop) => (prop === 'canvas' ? { width: 800, height: 400 } : vi.fn()),
+      set: () => true,
+    }
+  );
 
 describe('SatelliteTimeline_class', () => {
   beforeEach(() => {

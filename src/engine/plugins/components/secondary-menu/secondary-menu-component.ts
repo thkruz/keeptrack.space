@@ -94,12 +94,7 @@ export class SecondaryMenuComponent {
    * @param config The configuration for the secondary menu.
    * @param callbacks Optional callbacks for menu events.
    */
-  constructor(
-    pluginId: string,
-    sideMenuElementName: string,
-    config: ISecondaryMenuConfig,
-    callbacks: SecondaryMenuCallbacks = {},
-  ) {
+  constructor(pluginId: string, sideMenuElementName: string, config: ISecondaryMenuConfig, callbacks: SecondaryMenuCallbacks = {}) {
     this.pluginId = pluginId;
     this.sideMenuElementName = sideMenuElementName;
     this.callbacks = callbacks;
@@ -369,9 +364,7 @@ export class SecondaryMenuComponent {
     const button = getEl(this.buttonElementName);
 
     if (button) {
-      button.style.color = isOpen
-        ? 'var(--statusDarkNormal)'
-        : 'var(--color-dark-text-accent)';
+      button.style.color = isOpen ? 'var(--statusDarkNormal)' : 'var(--color-dark-text-accent)';
     }
   }
 

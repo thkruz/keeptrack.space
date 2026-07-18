@@ -1,18 +1,11 @@
-import { CameraType } from '@app/engine/camera/camera-type';
 import { SoundNames } from '@app/engine/audio/sounds';
+import { CameraType } from '@app/engine/camera/camera-type';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import {
-  IBottomIconConfig,
-  IContextMenuConfig,
-  IHelpConfig,
-  IKeyboardShortcut,
-  ISideMenuConfig,
-  RmbMenuContext,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, IContextMenuConfig, IHelpConfig, IKeyboardShortcut, ISideMenuConfig, RmbMenuContext } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -26,16 +19,7 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { wireInlineValidation } from '../create-sat/create-sat-validation';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { OrbitPreview } from '../shared/orbit-preview';
-import {
-  applyTleToSat,
-  buildEditedTle,
-  buildPreviewTleFromForm,
-  buildSaveBlob,
-  calculateDerivedParams,
-  parseLoadedTle,
-  pickZoomForApogee,
-  reEpochToNow,
-} from './edit-sat-actions';
+import { applyTleToSat, buildEditedTle, buildPreviewTleFromForm, buildSaveBlob, calculateDerivedParams, parseLoadedTle, pickZoomForApogee, reEpochToNow } from './edit-sat-actions';
 import { buildEditSatHelp } from './edit-sat-help';
 import { buildEditSatMenuHtml } from './edit-sat-menu-html';
 import './edit-sat.css';
@@ -252,19 +236,16 @@ export class EditSat extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (obj: BaseObject) => {
-        if (!obj) {
-          if (this.isMenuButtonActive) {
-            this.closeSideMenu();
-          }
-          this.setBottomIconToDisabled();
-        } else if (this.isMenuButtonActive && obj.isSatellite() && (obj as Satellite).sccNum !== (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value) {
-          this.populateSideMenu_();
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
+      if (!obj) {
+        if (this.isMenuButtonActive) {
+          this.closeSideMenu();
         }
-      },
-    );
+        this.setBottomIconToDisabled();
+      } else if (this.isMenuButtonActive && obj.isSatellite() && (obj as Satellite).sccNum !== (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value) {
+        this.populateSideMenu_();
+      }
+    });
   }
 
   // =========================================================================
@@ -624,11 +605,7 @@ export class EditSat extends KeepTrackPlugin {
     const result = applyTleToSat(sat.id, parsed.tle1, parsed.tle2);
 
     if (result !== 'applied') {
-      uiManagerInstance.toast(
-        t7e('plugins.EditSat.errorMsgs.failedToPropagate' as T7eKey),
-        ToastMsgType.caution,
-        true,
-      );
+      uiManagerInstance.toast(t7e('plugins.EditSat.errorMsgs.failedToPropagate' as T7eKey), ToastMsgType.caution, true);
 
       return;
     }

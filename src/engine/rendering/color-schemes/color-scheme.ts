@@ -104,7 +104,8 @@ export abstract class ColorScheme {
     }
 
     this.colorTheme = {
-      ...this.colorTheme, ...uniqueColorTheme,
+      ...this.colorTheme,
+      ...uniqueColorTheme,
     };
 
     for (const color in settingsManager.colors) {
@@ -141,7 +142,7 @@ export abstract class ColorScheme {
 
   resetObjectTypeFlags() {
     for (const key in this.objectTypeFlags) {
-      if (Object.prototype.hasOwnProperty.call(this.objectTypeFlags, key)) {
+      if (Object.hasOwn(this.objectTypeFlags, key)) {
         this.objectTypeFlags[key] = true;
       }
     }
@@ -155,12 +156,12 @@ export abstract class ColorScheme {
   }
 
   calculateParams(): {
-    year?: number,
-    jday?: number,
-    orbitDensity?: DensityBin[],
-    orbitDensityMax?: number,
-    orbitalPlaneDensity?: number[][],
-    orbitalPlaneDensityMax?: number,
+    year?: number;
+    jday?: number;
+    orbitDensity?: DensityBin[];
+    orbitDensityMax?: number;
+    orbitalPlaneDensity?: number[][];
+    orbitalPlaneDensityMax?: number;
   } | null {
     return null;
   }
@@ -271,7 +272,10 @@ export abstract class ColorScheme {
   }
 
   checkSensorVisibility_(obj: BaseObject, sensorFlagKey: string, sensorColorKey: string): ColorInformation | null {
-    if (obj.isSensor() && (settingsManager.isDisableSensors || this.objectTypeFlags[sensorFlagKey] === false || ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM)) {
+    if (
+      obj.isSensor() &&
+      (settingsManager.isDisableSensors || this.objectTypeFlags[sensorFlagKey] === false || ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM)
+    ) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -336,9 +340,7 @@ export abstract class ColorScheme {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const sensorManagerInstance = ServiceLocator.getSensorManager();
 
-    if (catalogManagerInstance.isSensorManagerLoaded &&
-        sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
-        typeof sat.vmag === 'undefined') {
+    if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER && typeof sat.vmag === 'undefined') {
       return true;
     }
 
@@ -360,9 +362,7 @@ export abstract class ColorScheme {
       const catalogManagerInstance = ServiceLocator.getCatalogManager();
       const sensorManagerInstance = ServiceLocator.getSensorManager();
 
-      if (catalogManagerInstance.isSensorManagerLoaded &&
-          sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
-          typeof sat.vmag === 'undefined') {
+      if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER && typeof sat.vmag === 'undefined') {
         return null;
       }
 
@@ -399,7 +399,6 @@ export abstract class ColorScheme {
         color: this.colorTheme.missile,
         pickable: Pickable.Yes,
       };
-
     }
     if (this.objectTypeFlags.missileInview === false || !missile.active) {
       return {
@@ -476,13 +475,13 @@ export abstract class ColorScheme {
     if (temp <= 66) {
       r = 255;
     } else {
-      r = Math.max(0, Math.min(255, 329.698727446 * ((temp - 60) ** -0.1332047592)));
+      r = Math.max(0, Math.min(255, 329.698727446 * (temp - 60) ** -0.1332047592));
     }
 
     if (temp <= 66) {
       g = Math.max(0, Math.min(255, 99.4708025861 * Math.log(temp) - 161.1195681661));
     } else {
-      g = Math.max(0, Math.min(255, 288.1221695283 * ((temp - 60) ** -0.0755148492)));
+      g = Math.max(0, Math.min(255, 288.1221695283 * (temp - 60) ** -0.0755148492));
     }
 
     if (temp >= 66) {
@@ -497,11 +496,6 @@ export abstract class ColorScheme {
     const mag = typeof vmag === 'number' ? vmag : 3.0;
     const brightness = Math.max(0.08, Math.min(1.0, 0.65 ** Math.max(0, mag + 1.0)));
 
-    return [
-      r / 255,
-      g / 255,
-      b / 255,
-      brightness,
-    ];
+    return [r / 255, g / 255, b / 255, brightness];
   }
 }

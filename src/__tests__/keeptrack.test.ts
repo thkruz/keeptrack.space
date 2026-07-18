@@ -1,17 +1,17 @@
-import { vi } from 'vitest';
-import { CatalogManager } from '@app/app/data/catalog-manager';
-import { Container } from '@app/engine/core/container';
-import { ServiceLocator } from '@app/engine/core/service-locator';
-import { SettingsManagerOverride } from '@app/settings/settings';
-import { Satellite, Milliseconds } from '@ootk/src/main';
 import { CatalogLoader } from '@app/app/data/catalog-loader';
+import { CatalogManager } from '@app/app/data/catalog-manager';
 import { OrbitManager } from '@app/app/rendering/orbit-manager';
 import { UiManager } from '@app/app/ui/ui-manager';
+import { Container } from '@app/engine/core/container';
 import { SatCruncherMessageData, Singletons } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { WebGLRenderer } from '@app/engine/rendering/webgl-renderer';
 import { KeepTrack } from '@app/keeptrack';
+import { SettingsManagerOverride } from '@app/settings/settings';
+import { Milliseconds, Satellite } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
 import { mockCameraManager, setupDefaultHtml } from '@test/environment/standard-env';
+import { vi } from 'vitest';
 
 /*
  *Code Analysis
@@ -68,10 +68,7 @@ const setupStandardEnvironment = () => {
     // Setup a mock catalog
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
-    catalogManagerInstance.objectCache = [
-      new Satellite({ ...defaultSat, ...{ id: 0, type: 1 } }),
-      new Satellite({ ...defaultSat, ...{ id: 1, type: 2 } }),
-    ] as Satellite[];
+    catalogManagerInstance.objectCache = [new Satellite({ ...defaultSat, ...{ id: 0, type: 1 } }), new Satellite({ ...defaultSat, ...{ id: 1, type: 2 } })] as Satellite[];
     catalogManagerInstance.satCruncherThread = {
       postMessage: vi.fn(),
       worker: {

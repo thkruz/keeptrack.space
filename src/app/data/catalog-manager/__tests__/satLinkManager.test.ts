@@ -1,4 +1,4 @@
-import { SatLinkManager, SatConstellationString } from '@app/app/data/catalog-manager/satLinkManager';
+import { SatConstellationString, SatLinkManager } from '@app/app/data/catalog-manager/satLinkManager';
 import { TimeManager } from '@app/engine/core/time-manager';
 import { LineManager } from '@app/engine/rendering/line-manager';
 

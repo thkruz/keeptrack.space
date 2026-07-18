@@ -45,9 +45,7 @@ export interface EphemerisParams {
 }
 
 /** Discriminated result of {@link parseEphemerisParams}. */
-export type EphemerisParseResult =
-  | { ok: true; params: EphemerisParams }
-  | { ok: false; reason: 'tooManyPoints'; numPoints: number };
+export type EphemerisParseResult = { ok: true; params: EphemerisParams } | { ok: false; reason: 'tooManyPoints'; numPoints: number };
 
 /**
  * Parse and validate raw span/step strings from the ephemeris form.
@@ -57,10 +55,7 @@ export type EphemerisParseResult =
  * `{ ok: false }` only when the resulting sample count would exceed
  * {@link MAX_EPHEM_POINTS} (which would otherwise hang the UI).
  */
-export function parseEphemerisParams(
-  rawSpanHours: string | null | undefined,
-  rawStepSec: string | null | undefined,
-): EphemerisParseResult {
+export function parseEphemerisParams(rawSpanHours: string | null | undefined, rawStepSec: string | null | undefined): EphemerisParseResult {
   let spanHours = parseFloat(rawSpanHours ?? '');
   let stepSec = parseFloat(rawStepSec ?? '');
 
@@ -141,9 +136,10 @@ export function formatStkEpoch(date: Date): string {
 
 /** Build the full text of an STK .e (EphemerisTimePosVel, EpSec) file. */
 export function formatStkEphemeris(rows: StkEphemerisRow[], opts: StkEphemerisExportOptions): string {
-  const dataLines = rows.map((r) =>
-    `${r.offsetSec.toFixed(6)}  ${r.position.x.toFixed(6)}  ${r.position.y.toFixed(6)}  ${r.position.z.toFixed(6)}  ` +
-    `${r.velocity.x.toFixed(6)}  ${r.velocity.y.toFixed(6)}  ${r.velocity.z.toFixed(6)}`,
+  const dataLines = rows.map(
+    (r) =>
+      `${r.offsetSec.toFixed(6)}  ${r.position.x.toFixed(6)}  ${r.position.y.toFixed(6)}  ${r.position.z.toFixed(6)}  ` +
+      `${r.velocity.x.toFixed(6)}  ${r.velocity.y.toFixed(6)}  ${r.velocity.z.toFixed(6)}`
   );
 
   return [

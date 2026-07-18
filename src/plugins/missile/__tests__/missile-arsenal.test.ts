@@ -1,5 +1,19 @@
-import { ATTACKER_SITES, CHINA_CITY_TARGET_ID_BASE, CHINA_MILITARY_TARGET_ID_BASE, CITY_TARGET_ID_BASE, CUSTOM_TARGET_ID, MILITARY_TARGET_ID_BASE, RUSSIA_CITY_TARGET_ID_BASE, RUSSIA_MILITARY_TARGET_ID_BASE, TARGET_OPTIONS, attackerDesc, getAttackerSite, targetLat, targetLon } from '@app/plugins/missile/missile-arsenal';
 import { CHINA_LARGEST_CITIES, CHINA_MILITARY_BASES } from '@app/plugins/missile/china-targets';
+import {
+  ATTACKER_SITES,
+  attackerDesc,
+  CHINA_CITY_TARGET_ID_BASE,
+  CHINA_MILITARY_TARGET_ID_BASE,
+  CITY_TARGET_ID_BASE,
+  CUSTOM_TARGET_ID,
+  getAttackerSite,
+  MILITARY_TARGET_ID_BASE,
+  RUSSIA_CITY_TARGET_ID_BASE,
+  RUSSIA_MILITARY_TARGET_ID_BASE,
+  TARGET_OPTIONS,
+  targetLat,
+  targetLon,
+} from '@app/plugins/missile/missile-arsenal';
 import { RUSSIA_LARGEST_CITIES, RUSSIA_MILITARY_BASES } from '@app/plugins/missile/russia-targets';
 import { US_LARGEST_CITIES, US_MILITARY_BASES } from '@app/plugins/missile/us-targets';
 
@@ -21,7 +35,9 @@ describe('missile-arsenal registry', () => {
   });
 
   it('flags exactly the submarine / mobile launch sites', () => {
-    const subs = ATTACKER_SITES.filter((s) => s.isSub).map((s) => s.id).sort((a, b) => a - b);
+    const subs = ATTACKER_SITES.filter((s) => s.isSub)
+      .map((s) => s.id)
+      .sort((a, b) => a - b);
 
     expect(subs).toEqual([100, 213, 214, 215, 321, 400, 500, 600]);
   });

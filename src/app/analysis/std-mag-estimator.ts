@@ -213,9 +213,7 @@ export const estimateStdMagFromProperties = (areaM2: number, albedo: number = DE
   // Convert km → m so it shares units with area's m² inside the log term.
   const dRefMeters = STD_REFERENCE_DISTANCE_KM * 1000;
 
-  return SUN_APPARENT_MAGNITUDE +
-    5 * Math.log10(dRefMeters) -
-    2.5 * Math.log10(LAMBERT_SPHERE_FACTOR * albedo * areaM2);
+  return SUN_APPARENT_MAGNITUDE + 5 * Math.log10(dRefMeters) - 2.5 * Math.log10(LAMBERT_SPHERE_FACTOR * albedo * areaM2);
 };
 
 /**

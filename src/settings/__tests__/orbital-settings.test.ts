@@ -1,6 +1,6 @@
-import { settingsManager } from '@app/settings/settings';
-import { OrbitalSettings } from '@app/settings/orbital-settings';
 import { MobileManager } from '@app/app/ui/mobileManager';
+import { OrbitalSettings } from '@app/settings/orbital-settings';
+import { settingsManager } from '@app/settings/settings';
 
 describe('OrbitalSettings.maxOrbitsDisplayed', () => {
   it('defaults to 100000', () => {

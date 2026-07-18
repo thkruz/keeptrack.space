@@ -1,7 +1,7 @@
-import { vi } from 'vitest';
 import { BreakupAnalysis } from '@app/plugins/breakup-analysis/breakup-analysis';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
-import { standardPluginSuite, standardPluginMenuButtonTests, websiteInit } from '@test/generic-tests';
+import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('BreakupAnalysis_class', () => {
   beforeEach(() => {

@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 /* eslint-disable max-lines-per-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
@@ -9,16 +8,18 @@ import { Breakup } from '@app/plugins/breakup/breakup';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment, standardSelectSat } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 // A highly eccentric (Molniya-like) orbit - the regime the old algorithm refused.
-const ellipticalSat = () => new Satellite({
-  id: 0,
-  active: true,
-  sccNum: '00005',
-  name: 'Molniya',
-  tle1: '1 44444U 19999A   21203.40407588  .00000000  00000-0  00000-0 0  9991' as TleLine1,
-  tle2: '2 44444  63.4000 100.0000 7200000  270.0000  10.0000  2.00600000 00001' as TleLine2,
-});
+const ellipticalSat = () =>
+  new Satellite({
+    id: 0,
+    active: true,
+    sccNum: '00005',
+    name: 'Molniya',
+    tle1: '1 44444U 19999A   21203.40407588  .00000000  00000-0  00000-0 0  9991' as TleLine1,
+    tle2: '2 44444  63.4000 100.0000 7200000  270.0000  10.0000  2.00600000 00001' as TleLine2,
+  });
 
 describe('Breakup_class', () => {
   beforeEach(() => {

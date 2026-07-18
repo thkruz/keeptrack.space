@@ -1,6 +1,6 @@
 import { CameraType } from '@app/engine/camera/camera-type';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SolarBody } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { ReferenceFrame } from '@app/engine/math/reference-frames';
 import { LineManager } from '@app/engine/rendering/line-manager';
 import { LineColors } from '@app/engine/rendering/line-manager/line';
@@ -97,7 +97,14 @@ describe('LineManager', () => {
 
     it('createOrbitPath adds a path line, or returns null for an empty path', () => {
       expect(lm.createOrbitPath([], LineColors.BLUE)).toBeNull();
-      const line = lm.createOrbitPath([[0, 0, 0], [1, 1, 1]] as never, LineColors.BLUE, SolarBody.Earth);
+      const line = lm.createOrbitPath(
+        [
+          [0, 0, 0],
+          [1, 1, 1],
+        ] as never,
+        LineColors.BLUE,
+        SolarBody.Earth
+      );
 
       expect(line).not.toBeNull();
       expect(lm.lines).toHaveLength(1);

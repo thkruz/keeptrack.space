@@ -2,10 +2,18 @@ import { DEG2RAD, eci2ecef, GreenwichMeanSiderealTime, Kilometers, lla2eci, Radi
 import { rebaseToAnchor } from '../engine/math/orbit-anchor-math';
 import { jday } from '../engine/utils/transforms';
 import {
-  OrbitCruncherCachedObject, OrbitCruncherInMsgChangeOrbitType, OrbitCruncherInMsgInit, OrbitCruncherInMsgMissileUpdate,
-  OrbitCruncherInMsgs, OrbitCruncherInMsgSatelliteUpdate, OrbitCruncherInMsgSettingsUpdate,
+  OrbitCruncherCachedObject,
+  OrbitCruncherInMsgChangeOrbitType,
+  OrbitCruncherInMsgInit,
+  OrbitCruncherInMsgMissileUpdate,
+  OrbitCruncherInMsgSatelliteUpdate,
+  OrbitCruncherInMsgSettingsUpdate,
+  OrbitCruncherInMsgs,
   OrbitCruncherMissileObject,
-  OrbitCruncherMsgType, OrbitCruncherOtherObject, OrbitCruncherSatelliteObject, OrbitDrawTypes,
+  OrbitCruncherMsgType,
+  OrbitCruncherOtherObject,
+  OrbitCruncherSatelliteObject,
+  OrbitDrawTypes,
 } from './orbit-cruncher-messages';
 import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
@@ -22,9 +30,7 @@ let currentSeqNum = 0;
 
 const isStaleUpdate_ = (seqNum?: number): boolean => typeof seqNum === 'number' && seqNum < currentSeqNum;
 
-export const onMessage = (m: {
-  data: OrbitCruncherInMsgs;
-}) => {
+export const onMessage = (m: { data: OrbitCruncherInMsgs }) => {
   const msg = m.data;
 
   if (isSgp4WasmBackendMsg(msg)) {
@@ -64,9 +70,9 @@ export const onMessage = (m: {
 
 const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCruncherInMsgMissileUpdate) => {
   /*
-  * TODO: figure out how to calculate the orbit points on constant
-  * position slices, not timeslices (ugly perigees on HEOs)
-  */
+   * TODO: figure out how to calculate the orbit points on constant
+   * position slices, not timeslices (ugly perigees on HEOs)
+   */
 
   const nowDate = new Date(data.simulationTime);
   const id = data.id;
@@ -82,13 +88,16 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
   if (id >= objCache.length || !objCache[id]) {
     const pointsOut = new Float32Array((numberOfSegments + 1) * 4);
 
-    postMessage({
-      typ: OrbitCruncherMsgType.RESPONSE_DATA,
-      pointsOut,
-      anchor: [0, 0, 0],
-      satId: id,
-      seqNum: currentSeqNum,
-    }, { transfer: [pointsOut.buffer as ArrayBuffer] });
+    postMessage(
+      {
+        typ: OrbitCruncherMsgType.RESPONSE_DATA,
+        pointsOut,
+        anchor: [0, 0, 0],
+        satId: id,
+        seqNum: currentSeqNum,
+      },
+      { transfer: [pointsOut.buffer as ArrayBuffer] }
+    );
 
     return;
   }
@@ -105,13 +114,16 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
       // Nothing to draw until the missile trajectory is populated
       const pointsOut = new Float32Array((numberOfSegments + 1) * 4);
 
-      postMessage({
-        typ: OrbitCruncherMsgType.RESPONSE_DATA,
-        pointsOut,
-        anchor: [0, 0, 0],
-        satId: id,
-        seqNum: currentSeqNum,
-      }, { transfer: [pointsOut.buffer as ArrayBuffer] });
+      postMessage(
+        {
+          typ: OrbitCruncherMsgType.RESPONSE_DATA,
+          pointsOut,
+          anchor: [0, 0, 0],
+          satId: id,
+          seqNum: currentSeqNum,
+        },
+        { transfer: [pointsOut.buffer as ArrayBuffer] }
+      );
 
       return;
     }
@@ -126,8 +138,12 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
     const gmstAnchorDate = typeof startMs === 'number' ? new Date(startMs) : nowDate;
     const gmstAnchorJ =
       jday(
-        gmstAnchorDate.getUTCFullYear(), gmstAnchorDate.getUTCMonth() + 1, gmstAnchorDate.getUTCDate(),
-        gmstAnchorDate.getUTCHours(), gmstAnchorDate.getUTCMinutes(), gmstAnchorDate.getUTCSeconds(),
+        gmstAnchorDate.getUTCFullYear(),
+        gmstAnchorDate.getUTCMonth() + 1,
+        gmstAnchorDate.getUTCDate(),
+        gmstAnchorDate.getUTCHours(),
+        gmstAnchorDate.getUTCMinutes(),
+        gmstAnchorDate.getUTCSeconds()
       ) +
       gmstAnchorDate.getUTCMilliseconds() * 1.15741e-8;
     const gmstAnchor = Sgp4.gstime(gmstAnchorJ);
@@ -140,13 +156,16 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
     // Invalid objects or OemSatellite with no TLEs
     const pointsOut = new Float32Array((numberOfSegments + 1) * 4);
 
-    postMessage({
-      typ: OrbitCruncherMsgType.RESPONSE_DATA,
-      pointsOut,
-      anchor: [0, 0, 0],
-      satId: id,
-      seqNum: currentSeqNum,
-    }, { transfer: [pointsOut.buffer as ArrayBuffer] });
+    postMessage(
+      {
+        typ: OrbitCruncherMsgType.RESPONSE_DATA,
+        pointsOut,
+        anchor: [0, 0, 0],
+        satId: id,
+        seqNum: currentSeqNum,
+      },
+      { transfer: [pointsOut.buffer as ArrayBuffer] }
+    );
 
     return;
   } else {
@@ -199,19 +218,19 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
 
   const { pointsOut, anchor } = rebaseToAnchor(points);
 
-  postMessage({
-    typ: OrbitCruncherMsgType.RESPONSE_DATA,
-    pointsOut,
-    anchor,
-    satId: id,
-    seqNum: currentSeqNum,
-  }, { transfer: [pointsOut.buffer as ArrayBuffer] });
+  postMessage(
+    {
+      typ: OrbitCruncherMsgType.RESPONSE_DATA,
+      pointsOut,
+      anchor,
+      satId: id,
+      seqNum: currentSeqNum,
+    },
+    { transfer: [pointsOut.buffer as ArrayBuffer] }
+  );
 };
 
-const drawMissileSegment_ = (
-  missile: OrbitCruncherMissileObject, i: number, pointsOut: Float64Array, len: number,
-  gmstAnchor: number, usePerSampleGmst: boolean,
-) => {
+const drawMissileSegment_ = (missile: OrbitCruncherMissileObject, i: number, pointsOut: Float64Array, len: number, gmstAnchor: number, usePerSampleGmst: boolean) => {
   // Clamp so the final segment (i === numberOfSegments) does not read one past the
   // end of the lists (which produced a NaN vertex).
   const x = Math.min(missile.altList.length - 1, Math.round(missile.altList.length * (i / numberOfSegments)));
@@ -227,7 +246,7 @@ const drawMissileSegment_ = (
   // high latitude, putting the line off the dot/model near a polar apogee.
   const eci = lla2eci(
     { lat: (missile.latList[x] * DEG2RAD) as Radians, lon: (missile.lonList[x] * DEG2RAD) as Radians, alt: missile.altList[x] as Kilometers },
-    gmst as GreenwichMeanSiderealTime,
+    gmst as GreenwichMeanSiderealTime
   );
 
   pointsOut[i * 4] = eci.x;
@@ -237,9 +256,15 @@ const drawMissileSegment_ = (
 };
 
 const drawTleOrbitSegmentTrail_ = (
-  now: number, i: number, timeslice: number, id: number, isEcfOutput: boolean,
-  pointsOut: Float64Array, len: number,
-  isPolarViewEcf: boolean, jdsatepoch: number,
+  now: number,
+  i: number,
+  timeslice: number,
+  id: number,
+  isEcfOutput: boolean,
+  pointsOut: Float64Array,
+  len: number,
+  isPolarViewEcf: boolean,
+  jdsatepoch: number
 ) => {
   const t = now + i * timeslice;
   const sv = Sgp4.propagate((objCache[id] as OrbitCruncherSatelliteObject).satrec, t);
@@ -267,9 +292,15 @@ const drawTleOrbitSegmentTrail_ = (
 };
 
 const drawTleOrbitSegment_ = (
-  now: number, i: number, timeslice: number, id: number, isEcfOutput: boolean,
-  pointsOut: Float64Array, len: number,
-  isPolarViewEcf: boolean, jdsatepoch: number,
+  now: number,
+  i: number,
+  timeslice: number,
+  id: number,
+  isEcfOutput: boolean,
+  pointsOut: Float64Array,
+  len: number,
+  isPolarViewEcf: boolean,
+  jdsatepoch: number
 ) => {
   const t = now + i * timeslice;
   const sv = Sgp4.propagate((objCache[id] as OrbitCruncherSatelliteObject).satrec, t);

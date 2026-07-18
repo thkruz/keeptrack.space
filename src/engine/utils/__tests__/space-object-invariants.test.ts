@@ -1,9 +1,5 @@
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import {
-  _resetVelocityInvariantReportingForTests,
-  ensureVelocityVec3,
-  freshZeroVec3,
-} from '@app/engine/utils/space-object-invariants';
+import { _resetVelocityInvariantReportingForTests, ensureVelocityVec3, freshZeroVec3 } from '@app/engine/utils/space-object-invariants';
 import { KilometersPerSecond, TemeVec3 } from '@ootk/src/main';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -19,7 +15,9 @@ describe('ensureVelocityVec3', () => {
 
   beforeEach(() => {
     _resetVelocityInvariantReportingForTests();
-    debugSpy = vi.spyOn(errorManagerInstance, 'debug').mockImplementation(() => { /* silence */ });
+    debugSpy = vi.spyOn(errorManagerInstance, 'debug').mockImplementation(() => {
+      /* silence */
+    });
   });
 
   afterEach(() => {

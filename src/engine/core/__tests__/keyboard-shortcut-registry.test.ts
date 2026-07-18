@@ -1,7 +1,6 @@
-import { vi } from 'vitest';
-
 import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
 import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
+import { vi } from 'vitest';
 
 /**
  * Real-world plugin shortcuts extracted from each plugin's getKeyboardShortcuts(),
@@ -13,7 +12,10 @@ import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities'
 const pluginShortcuts: { pluginId: string; shortcuts: Omit<IKeyboardShortcut, 'callback'>[] }[] = [
   // --- Engine / core ---
   // src/engine/camera/camera-input-handler.ts (WASD/QE are intentionally NOT registered)
-  { pluginId: 'CameraInputHandler', shortcuts: [{ key: 'ArrowUp' }, { key: 'ArrowDown' }, { key: 'ArrowLeft' }, { key: 'ArrowRight' }, { key: 'r' }, { key: 'v' }, { key: '`' }, { key: 'Shift' }] },
+  {
+    pluginId: 'CameraInputHandler',
+    shortcuts: [{ key: 'ArrowUp' }, { key: 'ArrowDown' }, { key: 'ArrowLeft' }, { key: 'ArrowRight' }, { key: 'r' }, { key: 'v' }, { key: '`' }, { key: 'Shift' }],
+  },
   // src/app/ui/search-manager.ts
   { pluginId: 'SearchManager', shortcuts: [{ key: 'F', ctrl: false }] },
   // src/app/ui/ui-manager.ts
@@ -95,7 +97,13 @@ const pluginShortcuts: { pluginId: string; shortcuts: Omit<IKeyboardShortcut, 'c
   // src/plugins/satellite-fixed-view/satellite-fixed-view.ts
   { pluginId: 'SatelliteFixedView', shortcuts: [{ key: '4' }] },
   // src/plugins/satellite-fov/satellite-fov.ts (both ctrl:false)
-  { pluginId: 'SatelliteFov', shortcuts: [{ key: 'C', ctrl: false }, { key: 'V', ctrl: false }] },
+  {
+    pluginId: 'SatelliteFov',
+    shortcuts: [
+      { key: 'C', ctrl: false },
+      { key: 'V', ctrl: false },
+    ],
+  },
   // src/plugins/satellite-photos/satellite-photos.ts
   { pluginId: 'SatellitePhotos', shortcuts: [{ key: 'H' }] },
   // src/plugins/satellite-view/satellite-view.ts
@@ -105,7 +113,13 @@ const pluginShortcuts: { pluginId: string; shortcuts: Omit<IKeyboardShortcut, 'c
   // src/plugins/transponder-channel-data/transponder-channel-data.ts
   { pluginId: 'TransponderChannelData', shortcuts: [{ key: 'T' }] },
   // src/plugins/video-director/video-director.ts
-  { pluginId: 'VideoDirector', shortcuts: [{ key: 'V', ctrl: true, shift: true }, { key: 'R', ctrl: true, shift: true }] },
+  {
+    pluginId: 'VideoDirector',
+    shortcuts: [
+      { key: 'V', ctrl: true, shift: true },
+      { key: 'R', ctrl: true, shift: true },
+    ],
+  },
 
   // --- Pro plugins ---
   // src/plugins-pro/alt-inc-heatmap/alt-inc-heatmap.ts
@@ -113,7 +127,13 @@ const pluginShortcuts: { pluginId: string; shortcuts: Omit<IKeyboardShortcut, 'c
   // src/plugins-pro/aurora/aurora.ts (moved to Ctrl+Shift+A; plain Shift+A is ColorsMenu)
   { pluginId: 'Aurora', shortcuts: [{ key: 'A', ctrl: true, shift: true }] },
   // src/plugins-pro/debug/debug.ts
-  { pluginId: 'DebugPlugin', shortcuts: [{ key: 'F12', shift: true }, { key: 'd', ctrl: true }] },
+  {
+    pluginId: 'DebugPlugin',
+    shortcuts: [
+      { key: 'F12', shift: true },
+      { key: 'd', ctrl: true },
+    ],
+  },
   // src/plugins-pro/eclipse-solar-analysis/eclipse-solar-analysis.ts (Ctrl+Shift+E; plain Shift+E is EditSat)
   { pluginId: 'EclipseSolarAnalysis', shortcuts: [{ key: 'E', ctrl: true, shift: true }] },
   // src/plugins-pro/flat-map-view/flat-map-view.ts
@@ -155,7 +175,9 @@ describe('KeyboardShortcutRegistry', () => {
     });
 
     it('should reject a shortcut that conflicts with an existing registration', () => {
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {
+        /* noop */
+      });
       const cb = vi.fn();
 
       KeyboardShortcutRegistry.register('PluginA', [{ key: 'F', callback: cb }]);
@@ -170,7 +192,9 @@ describe('KeyboardShortcutRegistry', () => {
     });
 
     it('should conflict when one omits ctrl (wildcard) and the other requires it', () => {
-      vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
+      vi.spyOn(console, 'warn').mockImplementation(() => {
+        /* noop */
+      });
       const cb = vi.fn();
 
       // ctrl omitted = wildcard: matches whether or not Ctrl is held, so it
@@ -195,7 +219,9 @@ describe('KeyboardShortcutRegistry', () => {
     });
 
     it('should conflict when undefined modifier matches false (both mean not required)', () => {
-      vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
+      vi.spyOn(console, 'warn').mockImplementation(() => {
+        /* noop */
+      });
       const cb = vi.fn();
 
       KeyboardShortcutRegistry.register('PluginA', [{ key: 'F', callback: cb }]);
@@ -216,7 +242,9 @@ describe('KeyboardShortcutRegistry', () => {
     });
 
     it('should accept a partial list when some shortcuts conflict', () => {
-      vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
+      vi.spyOn(console, 'warn').mockImplementation(() => {
+        /* noop */
+      });
       const cb = vi.fn();
 
       KeyboardShortcutRegistry.register('PluginA', [{ key: 'F', callback: cb }]);
@@ -232,7 +260,9 @@ describe('KeyboardShortcutRegistry', () => {
     });
 
     it('should detect conflict via code field', () => {
-      vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
+      vi.spyOn(console, 'warn').mockImplementation(() => {
+        /* noop */
+      });
       const cb = vi.fn();
 
       KeyboardShortcutRegistry.register('PluginA', [{ key: 'F', code: 'KeyF', callback: cb }]);
@@ -243,7 +273,9 @@ describe('KeyboardShortcutRegistry', () => {
     });
 
     it('should conflict when a wildcard modifier overlaps an explicit one on another dimension', () => {
-      vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
+      vi.spyOn(console, 'warn').mockImplementation(() => {
+        /* noop */
+      });
       const cb = vi.fn();
 
       // ctrl: true, shift: undefined (wildcard) -> matches Ctrl+F and Ctrl+Shift+F
@@ -280,7 +312,9 @@ describe('KeyboardShortcutRegistry', () => {
 
   describe('clear', () => {
     it('should reset all state', () => {
-      vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
+      vi.spyOn(console, 'warn').mockImplementation(() => {
+        /* noop */
+      });
       const cb = vi.fn();
 
       KeyboardShortcutRegistry.register('PluginA', [{ key: 'F', callback: cb }]);
@@ -304,7 +338,9 @@ describe('KeyboardShortcutRegistry', () => {
   describe('shortcutsConflict', () => {
     const make = (overrides: Partial<IKeyboardShortcut> = {}): IKeyboardShortcut => ({
       key: 'F',
-      callback: () => { /* noop */ },
+      callback: () => {
+        /* noop */
+      },
       ...overrides,
     });
 
@@ -333,36 +369,45 @@ describe('KeyboardShortcutRegistry', () => {
     });
 
     it('should return false when any modifier dimension is exclusive', () => {
-      expect(KeyboardShortcutRegistry.shortcutsConflict(
-        make({ ctrl: true, shift: true }),
-        make({ ctrl: true, shift: false }),
-      )).toBe(false);
+      expect(KeyboardShortcutRegistry.shortcutsConflict(make({ ctrl: true, shift: true }), make({ ctrl: true, shift: false }))).toBe(false);
     });
 
     it('should return true only when all modifier dimensions overlap', () => {
-      expect(KeyboardShortcutRegistry.shortcutsConflict(
-        make({ ctrl: true, shift: true }),
-        make({ ctrl: true, shift: true }),
-      )).toBe(true);
+      expect(KeyboardShortcutRegistry.shortcutsConflict(make({ ctrl: true, shift: true }), make({ ctrl: true, shift: true }))).toBe(true);
     });
   });
 
   describe('formatShortcut', () => {
     it('should format a simple key without modifiers', () => {
-      const result = KeyboardShortcutRegistry.formatShortcut({ key: 'N', callback: () => { /* noop */ } });
+      const result = KeyboardShortcutRegistry.formatShortcut({
+        key: 'N',
+        callback: () => {
+          /* noop */
+        },
+      });
 
       expect(result).toBe('N');
     });
 
     it('should include required modifiers', () => {
-      const result = KeyboardShortcutRegistry.formatShortcut({ key: 'F', ctrl: true, shift: true, callback: () => { /* noop */ } });
+      const result = KeyboardShortcutRegistry.formatShortcut({
+        key: 'F',
+        ctrl: true,
+        shift: true,
+        callback: () => {
+          /* noop */
+        },
+      });
 
       expect(result).toBe('Ctrl+Shift+F');
     });
 
     it('should omit modifiers that are false or omitted', () => {
       const result = KeyboardShortcutRegistry.formatShortcut({
-        key: 'K', ctrl: true, shift: false, callback: vi.fn(),
+        key: 'K',
+        ctrl: true,
+        shift: false,
+        callback: vi.fn(),
       });
 
       expect(result).toBe('Ctrl+K');
@@ -371,7 +416,9 @@ describe('KeyboardShortcutRegistry', () => {
 
   describe('getConflicts', () => {
     it('should record both sides of the conflict', () => {
-      vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
+      vi.spyOn(console, 'warn').mockImplementation(() => {
+        /* noop */
+      });
       const cb = vi.fn();
 
       KeyboardShortcutRegistry.register('Winner', [{ key: 'X', callback: cb }]);
@@ -399,15 +446,19 @@ describe('KeyboardShortcutRegistry', () => {
    */
   describe('real-world shortcut audit', () => {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    const noop = () => { /* noop */ };
+    const noop = () => {
+      /* noop */
+    };
 
     it('should have no conflicts across all plugin shortcuts', () => {
-      vi.spyOn(console, 'warn').mockImplementation(() => { /* noop */ });
+      vi.spyOn(console, 'warn').mockImplementation(() => {
+        /* noop */
+      });
 
       for (const { pluginId, shortcuts } of pluginShortcuts) {
         KeyboardShortcutRegistry.register(
           pluginId,
-          shortcuts.map((s) => ({ ...s, callback: noop })),
+          shortcuts.map((s) => ({ ...s, callback: noop }))
         );
       }
 
@@ -415,9 +466,7 @@ describe('KeyboardShortcutRegistry', () => {
 
       if (conflicts.length > 0) {
         const details = conflicts.map(
-          (c) =>
-            `  "${KeyboardShortcutRegistry.formatShortcut(c.existing.shortcut)}" ` +
-            `registered by "${c.existing.pluginId}" conflicts with "${c.incoming.pluginId}"`,
+          (c) => `  "${KeyboardShortcutRegistry.formatShortcut(c.existing.shortcut)}" ` + `registered by "${c.existing.pluginId}" conflicts with "${c.incoming.pluginId}"`
         );
 
         throw new Error(`Found ${conflicts.length} keyboard shortcut conflict(s):\n${details.join('\n')}`);

@@ -82,14 +82,15 @@ export function computePresetElements(id: OrbitPresetId): AdvancedElementValues 
   }
 
   const { ecc, meanMotion } = altitudesToElements(def.perigeeAltKm, def.apogeeAltKm);
-  const incDeg = def.inclinationDeg === 'sso'
-    ? sunSyncInclinationDeg((def.perigeeAltKm + def.apogeeAltKm) / 2, ecc)
-    : def.inclinationDeg;
+  const incDeg = def.inclinationDeg === 'sso' ? sunSyncInclinationDeg((def.perigeeAltKm + def.apogeeAltKm) / 2, ecc) : def.inclinationDeg;
 
   return {
     inc: incDeg.toFixed(4).padStart(8, '0'),
     rasc: def.raanDeg.toFixed(4).padStart(8, '0'),
-    ecen: Math.round(ecc * 1e7).toString().padStart(7, '0').slice(0, 7),
+    ecen: Math.round(ecc * 1e7)
+      .toString()
+      .padStart(7, '0')
+      .slice(0, 7),
     argPe: def.argPeDeg.toFixed(4).padStart(8, '0'),
     meana: def.meanAnomalyDeg.toFixed(4).padStart(8, '0'),
     meanmo: meanMotion.toFixed(5).padStart(8, '0'),
@@ -137,7 +138,7 @@ export function cosparToRawIntlDes(objectId: string | undefined): string {
     return '';
   }
 
-  const match = (/^(?<year>\d{4})-(?<rest>\d{3}[A-Z]{0,3})$/u).exec(objectId.trim());
+  const match = /^(?<year>\d{4})-(?<rest>\d{3}[A-Z]{0,3})$/u.exec(objectId.trim());
 
   if (!match?.groups) {
     return '';

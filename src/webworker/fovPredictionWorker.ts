@@ -12,23 +12,9 @@
 /* eslint-disable no-unmodified-loop-condition, no-await-in-loop, no-promise-executor-return */
 
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import {
-  Degrees,
-  EcefVec3,
-  Kilometers,
-  MILLISECONDS_TO_DAYS,
-  RaeVec3,
-  Sgp4,
-  TemeVec3,
-  ecefRad2rae,
-  eci2ecef,
-} from '@ootk/src/main';
+import { Degrees, EcefVec3, ecefRad2rae, eci2ecef, Kilometers, MILLISECONDS_TO_DAYS, RaeVec3, Sgp4, TemeVec3 } from '@ootk/src/main';
 import { jday } from '../engine/utils/transforms';
-import {
-  FovPredMsgType,
-  FovPredOutMsgType,
-  type FovPredInMsg,
-} from './fov-prediction-messages';
+import { type FovPredInMsg, FovPredMsgType, FovPredOutMsgType } from './fov-prediction-messages';
 import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
 // ─── Worker State ────────────────────────────────────────────────────────────
@@ -63,16 +49,7 @@ const PRIORITY_STEP_MIN = 0.25;
 /** Convert a Date-like ms timestamp to julian day and GMST. */
 function timeToJdayGmst(timeMs: number): { j: number; gmst: number } {
   const d = new Date(timeMs);
-  const j =
-    jday(
-      d.getUTCFullYear(),
-      d.getUTCMonth() + 1,
-      d.getUTCDate(),
-      d.getUTCHours(),
-      d.getUTCMinutes(),
-      d.getUTCSeconds(),
-    ) +
-    d.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
+  const j = jday(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate(), d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds()) + d.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
 
   const gmst = Sgp4.gstime(j);
 
@@ -193,7 +170,7 @@ function prioritySweep(simTimeMs: number): void {
       typ: FovPredOutMsgType.PRIORITY_SWEEP_COMPLETE,
       minutesToEntry: result,
     },
-    { transfer: [result.buffer] },
+    { transfer: [result.buffer] }
   );
 }
 
@@ -266,7 +243,7 @@ async function fullSweep(simTimeMs: number): Promise<void> {
           typ: FovPredOutMsgType.INCREMENTAL_UPDATE,
           minutesToEntry: partial,
         },
-        { transfer: [partial.buffer] },
+        { transfer: [partial.buffer] }
       );
     }
 
@@ -286,7 +263,7 @@ async function fullSweep(simTimeMs: number): Promise<void> {
       typ: FovPredOutMsgType.FULL_SWEEP_COMPLETE,
       minutesToEntry: result,
     },
-    { transfer: [result.buffer] },
+    { transfer: [result.buffer] }
   );
 }
 
@@ -333,7 +310,7 @@ function incrementalUpdate(simTimeMs: number): void {
         typ: FovPredOutMsgType.INCREMENTAL_UPDATE,
         minutesToEntry: result,
       },
-      { transfer: [result.buffer as ArrayBuffer] },
+      { transfer: [result.buffer as ArrayBuffer] }
     );
   }
 }
@@ -382,9 +359,7 @@ onmessage = function onmessage(event: MessageEvent<FovPredInMsg>) {
       }
 
       // Create sensor instances
-      sensors = msg.sensors
-        .filter((s) => s)
-        .map((s) => new DetailedSensor(s as ConstructorParameters<typeof DetailedSensor>[0]));
+      sensors = msg.sensors.filter((s) => s).map((s) => new DetailedSensor(s as ConstructorParameters<typeof DetailedSensor>[0]));
 
       // Store priority indices
       priorityIndices = msg.priorityIndices ?? [];

@@ -5,12 +5,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import {
-  IBottomIconConfig,
-  IDragOptions,
-  IHelpConfig,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, IDragOptions, IHelpConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
@@ -101,8 +96,10 @@ export class Collisions extends KeepTrackPlugin {
   protected buildSideMenuHtml_(): string {
     const tb = (key: string) => t7e(`plugins.Collisions.toolbar.${key}` as Parameters<typeof t7e>[0]);
     const lbl = (key: string) => t7e(`plugins.Collisions.labels.${key}` as Parameters<typeof t7e>[0]);
-    const attribution = t7e('plugins.Collisions.dataSource' as Parameters<typeof t7e>[0])
-      .replace('{link}', '<a href="https://celestrak.org/SOCRATES/" target="_blank" rel="noreferrer">SOCRATES</a>');
+    const attribution = t7e('plugins.Collisions.dataSource' as Parameters<typeof t7e>[0]).replace(
+      '{link}',
+      '<a href="https://celestrak.org/SOCRATES/" target="_blank" rel="noreferrer">SOCRATES</a>'
+    );
 
     return html`
       <div id="Collisions-menu" class="side-menu-parent start-hidden kt-ui-v13">
@@ -160,11 +157,7 @@ export class Collisions extends KeepTrackPlugin {
           content: t7e('plugins.Collisions.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.Collisions.help.tip1'),
-        t7e('plugins.Collisions.help.tip2'),
-        t7e('plugins.Collisions.help.tip3'),
-      ],
+      tips: [t7e('plugins.Collisions.help.tip1'), t7e('plugins.Collisions.help.tip2'), t7e('plugins.Collisions.help.tip3')],
     };
   }
 

@@ -1,5 +1,3 @@
-import { t7e } from '@app/locales/keys';
-import Draggabilly from 'draggabilly';
 /* eslint-disable max-lines */
 import { country2flagIcon } from '@app/app/data/catalogs/countries';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
@@ -15,9 +13,11 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, setInnerHtml, showEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
+import { t7e } from '@app/locales/keys';
 import { BaseObject, CatalogSource, Satellite } from '@ootk/src/main';
 import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
+import Draggabilly from 'draggabilly';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { CONTAINER_ID, EL, SECTIONS } from './sat-info-box-html';
@@ -59,23 +59,20 @@ export class SatInfoBox extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    EventBus.getInstance().on(
-      EventBusEvent.onWatchlistUpdated,
-      (watchlistList: { id: number, inView: boolean }[]) => {
-        const isOnList = watchlistList.some(({ id }) => id === PluginRegistry.getPlugin(SelectSatManager)!.selectedSat);
-        const toggleEl = getEl('sat-watchlist-toggle', true) as HTMLImageElement | null;
+    EventBus.getInstance().on(EventBusEvent.onWatchlistUpdated, (watchlistList: { id: number; inView: boolean }[]) => {
+      const isOnList = watchlistList.some(({ id }) => id === PluginRegistry.getPlugin(SelectSatManager)!.selectedSat);
+      const toggleEl = getEl('sat-watchlist-toggle', true) as HTMLImageElement | null;
 
-        if (toggleEl) {
-          if (isOnList) {
-            toggleEl.src = bookmarkRemovePng;
-            toggleEl.classList.replace('off-watchlist', 'on-watchlist');
-          } else {
-            toggleEl.src = bookmarkAddPng;
-            toggleEl.classList.replace('on-watchlist', 'off-watchlist');
-          }
+      if (toggleEl) {
+        if (isOnList) {
+          toggleEl.src = bookmarkRemovePng;
+          toggleEl.classList.replace('off-watchlist', 'on-watchlist');
+        } else {
+          toggleEl.src = bookmarkAddPng;
+          toggleEl.classList.replace('on-watchlist', 'off-watchlist');
         }
-      },
-    );
+      }
+    });
 
     EventBus.getInstance().on(EventBusEvent.selectSatData, this.updateHeaderData_.bind(this));
 
@@ -191,7 +188,10 @@ export class SatInfoBox extends KeepTrackPlugin {
   /** Wires the click-to-copy behavior on the NORAD and COSPAR identifier values. */
   private addCopyListeners_(): void {
     [EL.OBJNUM, EL.INTL_DES].forEach((elementId) => {
-      getEl(elementId, true)?.addEventListener('click', this.withClickSound(() => this.copyIdentifier_(elementId)));
+      getEl(elementId, true)?.addEventListener(
+        'click',
+        this.withClickSound(() => this.copyIdentifier_(elementId))
+      );
     });
   }
 
@@ -213,13 +213,16 @@ export class SatInfoBox extends KeepTrackPlugin {
       return;
     }
 
-    navigator.clipboard.writeText(value).then(() => {
-      const message = t7e('satInfoBox.copy.copied' as Parameters<typeof t7e>[0]);
+    navigator.clipboard
+      .writeText(value)
+      .then(() => {
+        const message = t7e('satInfoBox.copy.copied' as Parameters<typeof t7e>[0]);
 
-      ServiceLocator.getUiManager().toast(message, ToastMsgType.normal);
-    }).catch(() => {
-      // Clipboard write was rejected (e.g. permissions); nothing to clean up
-    });
+        ServiceLocator.getUiManager().toast(message, ToastMsgType.normal);
+      })
+      .catch(() => {
+        // Clipboard write was rejected (e.g. permissions); nothing to clean up
+      });
   }
 
   private createContainer(): void {
@@ -237,11 +240,11 @@ export class SatInfoBox extends KeepTrackPlugin {
       html`
         <div id="${CONTAINER_ID}" class="text-select satinfo-fixed start-hidden">
           ${elements
-          .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-          .map((el) => el.html ?? '')
-          .join('')}
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            .map((el) => el.html ?? '')
+            .join('')}
         </div>
-      `,
+      `
     );
 
     EventBus.getInstance().emit(EventBusEvent.satInfoBoxFinal);
@@ -280,11 +283,15 @@ export class SatInfoBox extends KeepTrackPlugin {
           <div class="sat-info-value sat-info-copyable" id="${EL.OBJNUM}"
             kt-tooltip="${t7e('satInfoBox.copy.tooltip' as Parameters<typeof t7e>[0])}">99999</div>
         </div>
-        ${settingsManager.plugins.SatInfoBoxObject?.isShowAltName !== false ? html`
+        ${
+          settingsManager.plugins.SatInfoBoxObject?.isShowAltName !== false
+            ? html`
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key" kt-tooltip="${t7e('satInfoBox.AltName.tooltip')}">${t7e('satInfoBox.AltName.label')}</div>
           <div class="sat-info-value" id="${EL.ALT_NAME}">Alt Name</div>
-        </div>` : ''}
+        </div>`
+            : ''
+        }
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key" kt-tooltip="${t7e('satInfoBox.AltId.tooltip')}">${t7e('satInfoBox.AltId.label')}</div>
           <div class="sat-info-value" id="${EL.ALT_ID}">99999</div>
@@ -343,9 +350,11 @@ export class SatInfoBox extends KeepTrackPlugin {
     setInnerHtml(EL.NAME, obj.name);
 
     if (obj instanceof Satellite || obj instanceof OemSatellite) {
-      KeepTrack.getInstance().containerRoot.querySelectorAll('.sat-only-info')?.forEach((el) => {
-        (<HTMLElement>el).style.display = 'flex';
-      });
+      KeepTrack.getInstance()
+        .containerRoot.querySelectorAll('.sat-only-info')
+        ?.forEach((el) => {
+          (<HTMLElement>el).style.display = 'flex';
+        });
     }
 
     const flagEl = getEl(EL.FLAG, true);
@@ -498,7 +507,7 @@ export class SatInfoBox extends KeepTrackPlugin {
           return;
         }
         hideEl(el.parentElement);
-      },
+      }
     );
 
     const satMissionData = getEl('sat-mission-data', true);
@@ -524,7 +533,7 @@ export class SatInfoBox extends KeepTrackPlugin {
           return;
         }
         el.parentElement.style.display = 'flex';
-      },
+      }
     );
 
     const satIdentifierData = getEl('sat-identifier-data', true);

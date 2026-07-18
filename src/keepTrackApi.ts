@@ -1,13 +1,5 @@
-import type { SatMath } from './app/analysis/sat-math';
-import type { ToastMsgType } from './engine/core/interfaces';
-import type { SettingsManager } from './settings/settings';
-
-import { PluginRegistry } from './engine/core/plugin-registry';
-import { ServiceLocator } from './engine/core/service-locator';
-import { EventBus } from './engine/events/event-bus';
-import { copyTsvToClipboard, saveCsv, saveVariable, saveXlsx } from './engine/utils/saveVariable';
 import type { Sgp4Wasm, Sgp4XpWasm } from '@ootk/src/main';
-
+import type { SatMath } from './app/analysis/sat-math';
 import type { CatalogManager } from './app/data/catalog-manager';
 import type { GroupsManager } from './app/data/groups-manager';
 import type { OrbitManager } from './app/rendering/orbit-manager';
@@ -17,8 +9,12 @@ import type { HoverManager } from './app/ui/hover-manager';
 import type { UiManager } from './app/ui/ui-manager';
 import type { SoundManager } from './engine/audio/sound-manager';
 import type { Camera } from './engine/camera/camera';
+import type { ToastMsgType } from './engine/core/interfaces';
+import { PluginRegistry } from './engine/core/plugin-registry';
 import type { Scene } from './engine/core/scene';
+import { ServiceLocator } from './engine/core/service-locator';
 import type { TimeManager } from './engine/core/time-manager';
+import { EventBus } from './engine/events/event-bus';
 import type { InputManager } from './engine/input/input-manager';
 import { KeepTrackPlugin } from './engine/plugins/base-plugin';
 import type { ColorSchemeManager } from './engine/rendering/color-scheme-manager';
@@ -27,7 +23,8 @@ import type { LineManager } from './engine/rendering/line-manager';
 import type { MeshManager } from './engine/rendering/mesh-manager';
 import type { WebGLRenderer } from './engine/rendering/webgl-renderer';
 import { errorManagerInstance } from './engine/utils/errorManager';
-
+import { copyTsvToClipboard, saveCsv, saveVariable, saveXlsx } from './engine/utils/saveVariable';
+import type { SettingsManager } from './settings/settings';
 
 declare global {
   interface Window {
@@ -72,8 +69,8 @@ export class KeepTrackApi {
   methods = EventBus.getInstance().methods;
 
   // Plugin registry methods
-  getPlugin: <T extends KeepTrackPlugin>(pluginClass: new (...args: unknown[]) => T) => T | null =
-    <T extends KeepTrackPlugin>(pluginClass: new (...args: unknown[]) => T) => PluginRegistry.getPlugin(pluginClass);
+  getPlugin: <T extends KeepTrackPlugin>(pluginClass: new (...args: unknown[]) => T) => T | null = <T extends KeepTrackPlugin>(pluginClass: new (...args: unknown[]) => T) =>
+    PluginRegistry.getPlugin(pluginClass);
   checkIfLoaded = PluginRegistry.checkIfLoaded.bind(PluginRegistry);
   getPluginByName = PluginRegistry.getPluginByName.bind(PluginRegistry);
   /**

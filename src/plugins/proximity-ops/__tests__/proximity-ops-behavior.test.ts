@@ -1,9 +1,9 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
-import { findSatsAvAGeo, findSatsAvALeo } from '@app/plugins/proximity-ops/proximity-ops-core';
 import { ProximityOps } from '@app/plugins/proximity-ops/proximity-ops';
-import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
+import { findSatsAvAGeo, findSatsAvALeo } from '@app/plugins/proximity-ops/proximity-ops-core';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { websiteInit } from '@test/generic-tests';
@@ -122,20 +122,14 @@ describe('ProximityOps behavior', () => {
     });
 
     it('getFilteredSatellites drops non-payloads when payload-only is checked', () => {
-      vi.spyOn(ServiceLocator.getCatalogManager(), 'getSats').mockReturnValue([
-        fakeSat({ isPayload: () => true }),
-        fakeSat({ isPayload: () => false }),
-      ] as never);
+      vi.spyOn(ServiceLocator.getCatalogManager(), 'getSats').mockReturnValue([fakeSat({ isPayload: () => true }), fakeSat({ isPayload: () => false })] as never);
       setChecks(true, false);
 
       expect(p().getFilteredSatellites()).toHaveLength(1);
     });
 
     it('findSatsAvALeo matches LEO satellites near the target plane', () => {
-      const sats = [
-        fakeSat({ inclination: 51.6, rightAscension: 100, period: 95 }),
-        fakeSat({ inclination: 0, rightAscension: 300, period: 95 }),
-      ];
+      const sats = [fakeSat({ inclination: 51.6, rightAscension: 100, period: 95 }), fakeSat({ inclination: 0, rightAscension: 300, period: 95 })];
 
       const matches = findSatsAvALeo(sats as never, 51.6, 100);
 
@@ -143,10 +137,7 @@ describe('ProximityOps behavior', () => {
     });
 
     it('findSatsAvAGeo matches GEO satellites near the target longitude', () => {
-      const sats = [
-        fakeSat({ period: 24 * 60, lla: () => ({ lat: 0, lon: 10 }) }),
-        fakeSat({ period: 24 * 60, lla: () => ({ lat: 0, lon: 120 }) }),
-      ];
+      const sats = [fakeSat({ period: 24 * 60, lla: () => ({ lat: 0, lon: 10 }) }), fakeSat({ period: 24 * 60, lla: () => ({ lat: 0, lon: 120 }) })];
 
       const matches = findSatsAvAGeo(sats as never, 10, new Date('2026-05-31T00:00:00.000Z'));
 

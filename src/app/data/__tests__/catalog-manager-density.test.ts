@@ -14,9 +14,13 @@ describe('CatalogManager orbital-density math', () => {
     cm = new CatalogManager();
   });
 
-  const sat = (id: number, apogee: number, perigee: number): Satellite => ({
-    id, sccNum: id.toString(), apogee, perigee,
-  }) as unknown as Satellite;
+  const sat = (id: number, apogee: number, perigee: number): Satellite =>
+    ({
+      id,
+      sccNum: id.toString(),
+      apogee,
+      perigee,
+    }) as unknown as Satellite;
 
   describe('calculateEffectiveAltitude_', () => {
     it('returns the mean of apogee and perigee', () => {

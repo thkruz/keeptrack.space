@@ -1,6 +1,6 @@
-import { vi } from 'vitest';
 import { GamepadPlugin } from '@app/plugins/gamepad/gamepad';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { vi } from 'vitest';
 
 // GamepadPlugin is not a standard bottom-icon plugin (no addHtml/addJs), so the
 // generic suite does not apply. Cover construction + the no-gamepad update path.
@@ -24,13 +24,18 @@ describe('GamepadPlugin', () => {
   });
 });
 
-const fakeGamepad = (over: Partial<Gamepad> = {}): Gamepad => ({
-  id: 'Test Controller (STANDARD GAMEPAD)',
-  index: 0, connected: true, mapping: 'standard', timestamp: 0, vibrationActuator: null as never,
-  buttons: Array.from({ length: 17 }, () => ({ pressed: false, touched: false, value: 0 })) as never,
-  axes: [0, 0, 0, 0],
-  ...over,
-} as Gamepad);
+const fakeGamepad = (over: Partial<Gamepad> = {}): Gamepad =>
+  ({
+    id: 'Test Controller (STANDARD GAMEPAD)',
+    index: 0,
+    connected: true,
+    mapping: 'standard',
+    timestamp: 0,
+    vibrationActuator: null as never,
+    buttons: Array.from({ length: 17 }, () => ({ pressed: false, touched: false, value: 0 })) as never,
+    axes: [0, 0, 0, 0],
+    ...over,
+  }) as Gamepad;
 
 describe('GamepadPlugin input handling', () => {
   let plugin: GamepadPlugin;

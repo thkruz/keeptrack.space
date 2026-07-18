@@ -4,21 +4,15 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import {
-  hasSettingsContribution,
-  ICommandPaletteCommand,
-  IHelpConfig,
-  IKeyboardShortcut,
-  ISettingsContribution,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
+import { StorageKey } from '@app/engine/persistence/storage-key';
+import { hasSettingsContribution, ICommandPaletteCommand, IHelpConfig, IKeyboardShortcut, ISettingsContribution } from '@app/engine/plugins/core/plugin-capabilities';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
-import settingsPng from '@public/img/icons/settings.png';
-import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
-import { StorageKey } from '@app/engine/persistence/storage-key';
 import { applyPersistedSetting } from '@app/settings/persisted-settings-table';
+import settingsPng from '@public/img/icons/settings.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { attachSettingControlListeners, renderSettingsSection } from './settings-control-renderer';
 import './settings-menu.css';
@@ -79,7 +73,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     </div>
   </div>`;
 
-
   getHelpConfig(): IHelpConfig {
     return {
       title: l('title'),
@@ -136,15 +129,12 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        SettingsMenuPlugin.renderAllSections_();
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      SettingsMenuPlugin.renderAllSections_();
 
-        getEl('settings-reset')?.addEventListener('click', SettingsMenuPlugin.resetToDefaults);
-        getEl('settings-filter')?.addEventListener('input', SettingsMenuPlugin.onFilterInput_);
-      },
-    );
+      getEl('settings-reset')?.addEventListener('click', SettingsMenuPlugin.resetToDefaults);
+      getEl('settings-filter')?.addEventListener('input', SettingsMenuPlugin.onFilterInput_);
+    });
 
     EventBus.getInstance().on(EventBusEvent.settingsMenuRefresh, SettingsMenuPlugin.renderAllSections_);
 

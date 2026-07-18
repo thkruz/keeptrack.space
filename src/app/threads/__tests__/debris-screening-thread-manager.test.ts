@@ -5,7 +5,9 @@ const OUT = { CHUNK: 1, COMPLETE: 2, ERROR: 3, PROGRESS: 4 } as const;
 const IN_START = 0;
 const IN_CANCEL = 1;
 
-interface OnMessageable { onMessage(e: { data: unknown }): void }
+interface OnMessageable {
+  onMessage(e: { data: unknown }): void;
+}
 
 const makeManager = () => {
   const postMessage = vi.fn();

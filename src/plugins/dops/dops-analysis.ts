@@ -9,11 +9,7 @@ import { DopList } from '@app/engine/math/dop-math';
 
 /** Validates an observer location for a DOP query. */
 export function isValidLocation(lat: number, lon: number, alt: number): boolean {
-  return (
-    Number.isFinite(lat) && lat >= -90 && lat <= 90 &&
-    Number.isFinite(lon) && lon >= -180 && lon <= 180 &&
-    Number.isFinite(alt)
-  );
+  return Number.isFinite(lat) && lat >= -90 && lat <= 90 && Number.isFinite(lon) && lon >= -180 && lon <= 180 && Number.isFinite(alt);
 }
 
 export interface BestWorstHdop {

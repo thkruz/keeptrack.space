@@ -5,33 +5,17 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import {
-  IBottomIconConfig,
-  IDragOptions,
-  IHelpConfig,
-  ISecondaryMenuConfig,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, IDragOptions, IHelpConfig, ISecondaryMenuConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
-import {
-  cappedScreeningCovarianceFromTle,
-  CatalogObject,
-  CatalogScreener,
-  EpochUTC,
-  Hours,
-  Kilometers,
-  Satellite,
-  ScreeningResult,
-  Seconds,
-} from '@ootk/src/main';
+import type { DsResultRow } from '@app/webworker/debris-screening-messages';
+import { CatalogObject, CatalogScreener, cappedScreeningCovarianceFromTle, EpochUTC, Hours, Kilometers, Satellite, ScreeningResult, Seconds } from '@ootk/src/main';
 import frameInspectPng from '@public/img/icons/frame-inspect.png';
 import tableChartPng from '@public/img/icons/table-chart.png';
-import type { DsResultRow } from '@app/webworker/debris-screening-messages';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './debris-screening.css';
 
@@ -179,9 +163,7 @@ export class DebrisScreening extends KeepTrackPlugin {
 
   /** Build the shared U/V/W `<option>` list with `selectedKm` pre-selected. */
   private ricBoxOptions_(selectedKm: number): string {
-    return DebrisScreening.RIC_BOX_SIZES_KM
-      .map((km) => `<option value="${km}"${km === selectedKm ? ' selected' : ''}>${km} km</option>`)
-      .join('');
+    return DebrisScreening.RIC_BOX_SIZES_KM.map((km) => `<option value="${km}"${km === selectedKm ? ' selected' : ''}>${km} km</option>`).join('');
   }
 
   /** Wrap a section's controls in a titled v13 card (uppercase label + bordered surface). */
@@ -429,9 +411,7 @@ export class DebrisScreening extends KeepTrackPlugin {
 
       // Build screening options
       const startTime = EpochUTC.fromDateTime(timeManager.simulationTimeObj);
-      const endTime = EpochUTC.fromDateTime(
-        new Date(timeManager.simulationTimeObj.getTime() + timeVal * 3600 * 1000),
-      );
+      const endTime = EpochUTC.fromDateTime(new Date(timeManager.simulationTimeObj.getTime() + timeVal * 3600 * 1000));
 
       try {
         const allResults = CatalogScreener.screenOneToMany(primary, secondaries, {
@@ -442,11 +422,7 @@ export class DebrisScreening extends KeepTrackPlugin {
 
         // Filter by individual RIC components (box filter, not spherical)
         this.rows_ = allResults
-          .filter((result) =>
-            Math.abs(result.event.radialDistance) <= uVal &&
-            Math.abs(result.event.intrackDistance) <= vVal &&
-            Math.abs(result.event.crosstrackDistance) <= wVal,
-          )
+          .filter((result) => Math.abs(result.event.radialDistance) <= uVal && Math.abs(result.event.intrackDistance) <= vVal && Math.abs(result.event.crosstrackDistance) <= wVal)
           .sort((a, b) => b.event.probabilityOfCollision! - a.event.probabilityOfCollision!)
           .slice(0, 100)
           .map((result) => DebrisScreening.toRow_(result));

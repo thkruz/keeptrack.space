@@ -93,11 +93,7 @@ export class ContextMenuComponent {
    * @param config The configuration for the context menu.
    * @param callbacks Callbacks for menu events.
    */
-  constructor(
-    pluginId: string,
-    config: IContextMenuConfig,
-    callbacks: ContextMenuCallbacks,
-  ) {
+  constructor(pluginId: string, config: IContextMenuConfig, callbacks: ContextMenuCallbacks) {
     this.pluginId = pluginId;
     this.callbacks = callbacks;
 
@@ -232,12 +228,9 @@ export class ContextMenuComponent {
    * Register the action handler for menu item clicks.
    */
   private registerActionHandler(): void {
-    EventBus.getInstance().on(
-      EventBusEvent.rmbMenuActions,
-      (targetId: string, clickedSatId?: number) => {
-        this.callbacks.onAction(targetId, clickedSatId);
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.rmbMenuActions, (targetId: string, clickedSatId?: number) => {
+      this.callbacks.onAction(targetId, clickedSatId);
+    });
   }
 
   /**
@@ -247,12 +240,9 @@ export class ContextMenuComponent {
     if (!this.callbacks.onOpen) {
       return;
     }
-    EventBus.getInstance().on(
-      EventBusEvent.rightBtnMenuOpen,
-      (ctx: RmbMenuContext) => {
-        this.callbacks.onOpen!(ctx);
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.rightBtnMenuOpen, (ctx: RmbMenuContext) => {
+      this.callbacks.onOpen!(ctx);
+    });
   }
 
   /**

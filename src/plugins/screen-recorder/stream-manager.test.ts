@@ -1,7 +1,7 @@
-import { vi } from 'vitest';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { KeepTrack } from '@app/keeptrack';
+import { vi } from 'vitest';
 import { StreamManager } from './stream-manager';
 
 // Mock dependencies

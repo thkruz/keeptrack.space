@@ -3,12 +3,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SatCruncherThreadManager } from '../sat-cruncher-thread-manager';
 
 /** A Worker stub whose postMessage/terminate are spies, passed to init() as workerStub. */
-const makeWorkerStub = () => ({
-  postMessage: vi.fn(),
-  terminate: vi.fn(),
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
-} as unknown as Worker & { postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> });
+const makeWorkerStub = () =>
+  ({
+    postMessage: vi.fn(),
+    terminate: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  }) as unknown as Worker & { postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> };
 
 const makeMgr = () => {
   const worker = makeWorkerStub();
@@ -19,8 +20,7 @@ const makeMgr = () => {
   return { mgr, worker };
 };
 
-const lastMsg = (worker: { postMessage: ReturnType<typeof vi.fn> }): Record<string, unknown> =>
-  worker.postMessage.mock.calls.at(-1)![0] as Record<string, unknown>;
+const lastMsg = (worker: { postMessage: ReturnType<typeof vi.fn> }): Record<string, unknown> => worker.postMessage.mock.calls.at(-1)![0] as Record<string, unknown>;
 
 describe('SatCruncherThreadManager', () => {
   afterEach(() => {

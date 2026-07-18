@@ -1,4 +1,4 @@
-import { test, expect } from '@test/e2e/coverage';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('WatchlistPlugin', () => {
@@ -17,7 +17,7 @@ test.describe('WatchlistPlugin', () => {
     // Allow time for the plugin to initialize
     await page.waitForTimeout(2_000);
 
-    const fatalErrors = errors.filter((e) => (/watchlist|satellite.?list/iu).test(e));
+    const fatalErrors = errors.filter((e) => /watchlist|satellite.?list/iu.test(e));
 
     expect(fatalErrors).toHaveLength(0);
   });

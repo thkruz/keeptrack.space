@@ -1,12 +1,11 @@
-
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { ICommandPaletteCommand, IContextMenuConfig, RmbMenuContext } from '@app/engine/plugins/core/plugin-capabilities';
 import { AtmosphereSettings, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
-import { ICommandPaletteCommand, IContextMenuConfig, RmbMenuContext } from '@app/engine/plugins/core/plugin-capabilities';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { NightToggle } from '../night-toggle/night-toggle';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export type EarthPresetId = 'satellite' | 'nadir' | 'engineer' | 'opscenter' | '90sGraphics';
 
@@ -129,9 +128,7 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
   }
 
   getContextMenuConfig(): IContextMenuConfig {
-    const items = EarthPresetsPlugin.PRESETS
-      .map((preset) => html`<li id="earth-${preset.id}-rmb"><a href="#">${EarthPresetsPlugin.presetLabel(preset)}</a></li>`)
-      .join('');
+    const items = EarthPresetsPlugin.PRESETS.map((preset) => html`<li id="earth-${preset.id}-rmb"><a href="#">${EarthPresetsPlugin.presetLabel(preset)}</a></li>`).join('');
 
     return {
       level1ElementName: 'earth-rmb',

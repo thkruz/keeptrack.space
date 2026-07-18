@@ -41,12 +41,12 @@ import { lat2pitch, lon2yaw } from '@app/engine/utils/transforms';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { t7e } from '@app/locales/keys';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
-import { DEG2RAD, GreenwichMeanSiderealTime, Radians, SpaceObjectType, Sun, ZoomValue, calcGmst, lla2eci, spaceObjType2Str } from '@ootk/src/main';
+import { calcGmst, DEG2RAD, GreenwichMeanSiderealTime, lla2eci, Radians, SpaceObjectType, Sun, spaceObjType2Str, ZoomValue } from '@ootk/src/main';
 import { SelectSatManager } from '../../plugins/select-sat-manager/select-sat-manager';
-import { SensorFov } from '../../plugins/sensor-fov/sensor-fov';
-import { SensorSurvFence } from '../../plugins/sensor-surv/sensor-surv-fence';
 import { LookAnglesPlugin } from '../../plugins/sensor/look-angles-plugin';
 import { SensorInfoPlugin } from '../../plugins/sensor/sensor-info-plugin';
+import { SensorFov } from '../../plugins/sensor-fov/sensor-fov';
+import { SensorSurvFence } from '../../plugins/sensor-surv/sensor-surv-fence';
 import { sensorGroups } from '../data/catalogs/sensor-groups';
 
 export class SensorManager {
@@ -131,7 +131,7 @@ export class SensorManager {
         cb: () => {
           ServiceLocator.getColorSchemeManager().calculateColorBuffers(true);
         },
-        validationFunc: (m: PositionCruncherOutgoingMsg) => !!((m.satInView?.length && m.satInView.length > 0)),
+        validationFunc: (m: PositionCruncherOutgoingMsg) => !!(m.satInView?.length && m.satInView.length > 0),
         skipNumber: 2,
         isRunCbOnFailure: true,
         maxRetries: 5,
@@ -398,7 +398,6 @@ export class SensorManager {
           setInnerHtml('sensor-type', 'Unknown Sensor');
         }
 
-
         setInnerHtml('sensor-country', this.currentSensors[0]?.country ?? '');
       }
 
@@ -409,13 +408,15 @@ export class SensorManager {
       for (const sensorGroup of sensorGroups) {
         if (sensorGroup.name === selectedSensor) {
           this.sensorTitle = sensorGroup.header;
-          this.currentSensors = sensorGroup.list.map((sensor) => {
-            if (sensors[sensor] instanceof DetailedSensor) {
-              return sensors[sensor];
-            }
+          this.currentSensors = sensorGroup.list
+            .map((sensor) => {
+              if (sensors[sensor] instanceof DetailedSensor) {
+                return sensors[sensor];
+              }
 
-            return null;
-          }).filter((sensor) => sensor !== null) as DetailedSensor[];
+              return null;
+            })
+            .filter((sensor) => sensor !== null) as DetailedSensor[];
           isSensorFound = true;
           break;
         }
@@ -602,7 +603,6 @@ export class SensorManager {
     sensor.position = sensorPos;
     const sunStatus = SatMath.calculateIsInSun(sensor, sunPos);
 
-
     return {
       sunStatus,
     };
@@ -615,7 +615,7 @@ export class SensorManager {
 
     const status = this.sensorSunStatus_(now, sensor).sunStatus;
 
-    return ((status === SunStatus.UMBRAL) || (status === SunStatus.PENUMBRAL));
+    return status === SunStatus.UMBRAL || status === SunStatus.PENUMBRAL;
   }
 
   canStationsObserve(now: Date, sensors: DetailedSensor[]): boolean {

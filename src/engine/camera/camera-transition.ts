@@ -186,11 +186,7 @@ export class CameraTransition {
    * tiny standoff used for small/close debris. Falls back to the rotation-slerp blend when either
    * endpoint is not a focused target (e.g. Earth-centered starts/ends).
    */
-  apply(
-    currentViewMatrix: mat4,
-    currentWorldShift: number[],
-    toAnchor?: TransitionAnchor | null,
-  ): mat4 | null {
+  apply(currentViewMatrix: mat4, currentWorldShift: number[], toAnchor?: TransitionAnchor | null): mat4 | null {
     if (!this.isActive_) {
       return null;
     }

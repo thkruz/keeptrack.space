@@ -72,7 +72,7 @@ const EARTH_RADIUS_KM = 6371;
 const DEG2RAD = Math.PI / 180;
 
 /** True when a raid entry's description marks it as a submarine launch (e.g. "Ohio Sub (Trident II)"). */
-export const isSubmarineLaunch = (desc: string | undefined): boolean => (/\bsub\b/iu).test(desc ?? '');
+export const isSubmarineLaunch = (desc: string | undefined): boolean => /\bsub\b/iu.test(desc ?? '');
 
 /** A ballistic-missile submarine class: fleet size, tubes per boat, missile range, and patrol basins. */
 export interface SubFleet {
@@ -124,7 +124,10 @@ export interface SubLaunchEntry {
   targetLon: number;
 }
 
-interface LatLon { lat: number; lon: number }
+interface LatLon {
+  lat: number;
+  lon: number;
+}
 
 /** A random point uniformly inside an ocean region. */
 const randomPointInRegion = (region: OceanRegion, rng: () => number): LatLon => ({
@@ -160,10 +163,7 @@ const shuffled = <T>(items: readonly T[], rng: () => number): T[] => {
  * for deterministic tests. Targets are NOT modified here - each entry keeps the aimpoint
  * the generator baked, so RV labels stay correct.
  */
-export const planSubmarineBoats = (
-  entries: readonly SubLaunchEntry[],
-  rng: () => number = Math.random,
-): Map<number, { launchLat: number; launchLon: number }> => {
+export const planSubmarineBoats = (entries: readonly SubLaunchEntry[], rng: () => number = Math.random): Map<number, { launchLat: number; launchLon: number }> => {
   const byClass = new Map<string, SubLaunchEntry[]>();
 
   for (const entry of entries) {
@@ -184,8 +184,7 @@ export const planSubmarineBoats = (
     const basinRegions = OCEAN_PATROL_REGIONS.filter((r) => fleet.oceans.includes(r.ocean));
     const regions = basinRegions.length > 0 ? basinRegions : OCEAN_PATROL_REGIONS.slice();
     // Prefer patrol boxes within missile range of at least one target the group is striking.
-    const inRange = regions.filter((r) =>
-      group.some((e) => greatCircleKm(regionCenterLat(r), regionCenterLon(r), e.targetLat, e.targetLon) <= fleet.rangeKm));
+    const inRange = regions.filter((r) => group.some((e) => greatCircleKm(regionCenterLat(r), regionCenterLon(r), e.targetLat, e.targetLon) <= fleet.rangeKm));
     const useRegions = shuffled(inRange.length > 0 ? inRange : regions, rng);
 
     // Deploy the whole fleet (up to one boat per missile) so the hulls spread out.
@@ -260,11 +259,7 @@ const regionCenterLon = (r: OceanRegion): number => (r.lonMin + r.lonMax) / 2;
  * and a uniform random point inside it is returned. `rng` is injectable so tests are
  * deterministic. Used for one-off relocations; mass raids use {@link planSubmarineBoats}.
  */
-export const randomOceanLaunchPoint = (
-  targetLat: number,
-  targetLon: number,
-  rng: () => number = Math.random,
-): { lat: number; lon: number } => {
+export const randomOceanLaunchPoint = (targetLat: number, targetLon: number, rng: () => number = Math.random): { lat: number; lon: number } => {
   const distTo = (r: OceanRegion): number => greatCircleKm(regionCenterLat(r), regionCenterLon(r), targetLat, targetLon);
   let candidates = OCEAN_PATROL_REGIONS.filter((r) => distTo(r) <= MAX_SLBM_RANGE_KM);
 

@@ -35,7 +35,7 @@ export abstract class StringExtractor {
     return getCountryMapList()[countryCode] ?? t7e('countries.TBD');
   }
 
-  static extractLaunchSite(LS: string): { site: string; country: string, wikiUrl: string | null } {
+  static extractLaunchSite(LS: string): { site: string; country: string; wikiUrl: string | null } {
     if (!LS || LS === '') {
       return { site: t7e('Common.unknown'), country: t7e('Common.unknown'), wikiUrl: null };
     }
@@ -48,7 +48,6 @@ export abstract class StringExtractor {
     errorManagerInstance.debug(`Unknown launch site: ${LS}`);
 
     return { site: t7e('Common.unknown'), country: t7e('Common.unknown'), wikiUrl: null };
-
   }
 
   static extractLiftVehicle(LV?: string): string {
@@ -104,9 +103,7 @@ export abstract class StringExtractor {
     // Split composite codes and look up each part
     if (ownerCode.includes('/')) {
       const parts = ownerCode.split('/');
-      const expanded = parts.map((part) =>
-        orgDataService.resolveCode(part.trim(), ownerCodeMap) ?? part.trim(),
-      );
+      const expanded = parts.map((part) => orgDataService.resolveCode(part.trim(), ownerCodeMap) ?? part.trim());
 
       return expanded.join(' / ');
     }
@@ -139,9 +136,7 @@ export abstract class StringExtractor {
     // Split composite codes and look up each part
     if (manufacturerCode.includes('/')) {
       const parts = manufacturerCode.split('/');
-      const expanded = parts.map((part) =>
-        orgDataService.resolveCode(part.trim(), manufacturerCodeMap) ?? part.trim(),
-      );
+      const expanded = parts.map((part) => orgDataService.resolveCode(part.trim(), manufacturerCodeMap) ?? part.trim());
 
       return expanded.join(' / ');
     }
@@ -150,46 +145,46 @@ export abstract class StringExtractor {
   }
 
   private static readonly shapeAbbreviations_: Record<string, string> = {
-    'ann': 'Annulus',
-    'ant': 'Antenna',
-    'cone': 'Cone',
-    'cruci': 'Cruciform',
-    'cyl': 'Cylinder',
-    'dcone': 'Double Cone',
-    'dish': 'Dish',
-    'ell': 'Ellipsoid',
-    'frust': 'Frustum',
+    ann: 'Annulus',
+    ant: 'Antenna',
+    cone: 'Cone',
+    cruci: 'Cruciform',
+    cyl: 'Cylinder',
+    dcone: 'Double Cone',
+    dish: 'Dish',
+    ell: 'Ellipsoid',
+    frust: 'Frustum',
     'half cyl': 'Half Cylinder',
     'half hex prism': 'Half Hexagonal Prism',
-    'hept': 'Heptagonal',
+    hept: 'Heptagonal',
     'hept prism': 'Heptagonal Prism',
-    'hex': 'Hexagonal',
+    hex: 'Hexagonal',
     'hex cyl': 'Hexagonal Cylinder',
     'hex-cyl': 'Hexagonal Cylinder',
-    'hexadec': 'Hexadecagonal',
+    hexadec: 'Hexadecagonal',
     'hexadec cyl': 'Hexadecagonal Cylinder',
     'ico poly': 'Icosahedral Polyhedron',
-    'irr': 'Irregular',
-    'nonag': 'Nonagonal',
-    'oct': 'Octagonal',
+    irr: 'Irregular',
+    nonag: 'Nonagonal',
+    oct: 'Octagonal',
     'oct cyl': 'Octagonal Cylinder',
     'oct dcone': 'Octagonal Double Cone',
     'oct frust': 'Octagonal Frustum',
-    'pan': 'Panel',
+    pan: 'Panel',
     'part cyl': 'Partial Cylinder',
     'pent cyl': 'Pentagonal Cylinder',
-    'poly': 'Polyhedron',
+    poly: 'Polyhedron',
     'step cyl': 'Stepped Cylinder',
     'taper cyl': 'Tapered Cylinder',
-    'trap': 'Trapezoidal',
+    trap: 'Trapezoidal',
     'trap cyl': 'Trapezoidal Cylinder',
     'tri cyl': 'Triangular Cylinder',
-    'trunc': 'Truncated',
+    trunc: 'Truncated',
     'trunc cone': 'Truncated Cone',
     'trunc prism': 'Truncated Prism',
     'trunc pyramid': 'Truncated Pyramid',
     'trunc tetrahedron': 'Truncated Tetrahedron',
-    'trapezoid': 'Trapezoid',
+    trapezoid: 'Trapezoid',
     'flared cyl': 'Flared Cylinder',
     'domed cyl': 'Domed Cylinder',
   };
@@ -218,7 +213,7 @@ export abstract class StringExtractor {
       }
 
       // Extract leading number if present (e.g., "2 Pan" → number=2, rest="Pan")
-      const numMatch = (/^(?<num>\d+)\s+(?<rest>.+)$/u).exec(segment);
+      const numMatch = /^(?<num>\d+)\s+(?<rest>.+)$/u.exec(segment);
       let prefix = '';
       let token = segment;
 
@@ -252,6 +247,5 @@ export abstract class StringExtractor {
     }
 
     return countryCode;
-
   }
 }

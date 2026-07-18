@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 import { MenuMode, SolarBody } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -7,6 +6,7 @@ import { PlanetsMenuPlugin } from '@app/plugins/planets-menu/planets-menu';
 import { settingsManager } from '@app/settings/settings';
 import { setupDefaultHtml } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 // eslint-disable-next-line max-lines-per-function
 describe('PlanetsMenuPlugin', () => {

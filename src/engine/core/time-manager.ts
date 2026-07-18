@@ -1,7 +1,7 @@
 import { SatMath } from '@app/app/analysis/sat-math';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { t7e } from '@app/locales/keys';
-import { getDayOfYear, GreenwichMeanSiderealTime, Milliseconds } from '@ootk/src/main';
+import { GreenwichMeanSiderealTime, getDayOfYear, Milliseconds } from '@ootk/src/main';
 import { DateTimeManager } from '../../plugins/date-time-manager/date-time-manager';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
@@ -58,7 +58,6 @@ export class TimeManager {
     const epochDay = getDayOfYear(currentDateObj);
     const timeOfDay = (currentDateObj.getUTCHours() * 60 + currentDateObj.getUTCMinutes()) / 1440;
     const epochDayStr = (epochDay + timeOfDay).toFixed(8).padStart(12, '0');
-
 
     return [epochYear, epochDayStr];
   }
@@ -235,9 +234,9 @@ export class TimeManager {
             newPropRate = -1000;
           }
           if (newPropRate < 0) {
-            newPropRate = (this.propRate * 1.5);
+            newPropRate = this.propRate * 1.5;
           } else {
-            newPropRate = ((this.propRate * 2) / 3);
+            newPropRate = (this.propRate * 2) / 3;
           }
           this.applyPropRate_(newPropRate);
         },
@@ -258,9 +257,9 @@ export class TimeManager {
             newPropRate = 1000;
           }
           if (newPropRate > 0) {
-            newPropRate = (this.propRate * 1.5);
+            newPropRate = this.propRate * 1.5;
           } else {
-            newPropRate = ((this.propRate * 2) / 3);
+            newPropRate = (this.propRate * 2) / 3;
           }
           this.applyPropRate_(newPropRate);
         },

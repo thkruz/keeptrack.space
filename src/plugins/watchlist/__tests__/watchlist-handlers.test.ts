@@ -1,8 +1,8 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
-import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { settingsManager } from '@app/settings/settings';
 import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -34,8 +34,10 @@ describe('WatchlistPlugin handlers', () => {
   it('syncLabelRadios_ checks the radio matching the current label mode', () => {
     // Ensure the three label radios exist so the method has something to drive.
     if (!getEl('watchlist-label-always', true)) {
-      document.body.insertAdjacentHTML('beforeend',
-        '<input id="watchlist-label-always" type="radio" /><input id="watchlist-label-fov" type="radio" /><input id="watchlist-label-off" type="radio" />');
+      document.body.insertAdjacentHTML(
+        'beforeend',
+        '<input id="watchlist-label-always" type="radio" /><input id="watchlist-label-fov" type="radio" /><input id="watchlist-label-off" type="radio" />'
+      );
     }
 
     p().syncLabelRadios_();

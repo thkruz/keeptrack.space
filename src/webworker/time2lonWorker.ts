@@ -11,24 +11,11 @@
 
 /* eslint-disable no-await-in-loop, no-promise-executor-return */
 
-import {
-  eci2lla,
-  GreenwichMeanSiderealTime,
-  MILLISECONDS_TO_DAYS,
-  MINUTES_PER_DAY,
-  SatelliteRecord,
-  Sgp4,
-  TemeVec3,
-} from '@ootk/src/main';
 import { buildSatLine, computeOrbits, Time2LonLlaSample } from '@app/plugins/plot-analysis/time2lon-core';
+import { eci2lla, GreenwichMeanSiderealTime, MILLISECONDS_TO_DAYS, MINUTES_PER_DAY, SatelliteRecord, Sgp4, TemeVec3 } from '@ootk/src/main';
 import { jday } from '../engine/utils/transforms';
-import {
-  T2lSatData,
-  T2lWorkerMsgType,
-  T2lWorkerOutMsgType,
-  type T2lWorkerInMsg,
-} from './time2lon-messages';
 import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
+import { T2lSatData, type T2lWorkerInMsg, T2lWorkerMsgType, T2lWorkerOutMsgType } from './time2lon-messages';
 
 const MS_PER_MIN = 60_000;
 

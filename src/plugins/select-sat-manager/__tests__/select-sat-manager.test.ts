@@ -1,17 +1,14 @@
-import { vi } from 'vitest';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import {
-  hasSettingsContribution,
-  ISettingToggleControl,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { hasSettingsContribution, ISettingToggleControl } from '@app/engine/plugins/core/plugin-capabilities';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
-import { Satellite, Kilometers, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
-import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { Kilometers, Satellite, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
+import { vi } from 'vitest';
 import { defaultSat, defaultSensor } from '../../../../test/environment/apiMocks';
 import { setupStandardEnvironment } from '../../../../test/environment/standard-env';
 import { standardPluginSuite, websiteInit } from '../../../../test/generic-tests';
@@ -97,10 +94,7 @@ describe('SelectSatManager_class', () => {
     setupStandardEnvironment([TopMenu]);
     selectSatManager = new SelectSatManager();
 
-    ServiceLocator.getCatalogManager().objectCache = [
-      new Satellite(defaultSat),
-      new Satellite({ ...defaultSat, id: 1 }),
-    ];
+    ServiceLocator.getCatalogManager().objectCache = [new Satellite(defaultSat), new Satellite({ ...defaultSat, id: 1 })];
     // Set all satellites to active
     ServiceLocator.getCatalogManager().objectCache.forEach((sat) => {
       sat.active = true;

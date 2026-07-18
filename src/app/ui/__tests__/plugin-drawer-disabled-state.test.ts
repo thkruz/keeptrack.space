@@ -1,8 +1,8 @@
+import { collectDrawerItems } from '@app/app/ui/plugin-drawer-helpers';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { IconPlacement, UtilityGroup } from '@app/engine/plugins/core/plugin-capabilities';
-import { collectDrawerItems } from '@app/app/ui/plugin-drawer-helpers';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
-import { MenuMode } from '@app/engine/core/interfaces';
 
 /**
  * Regression guard for the Sensor FOV / Sensor Fence utility icons staying
@@ -44,8 +44,7 @@ describe('collectDrawerItems disabled state', () => {
   it('renders a utility icon as disabled when the plugin is currently disabled', () => {
     PluginRegistry.addPlugin(makeUtilityPlugin() as never);
 
-    const item = collectDrawerItems().utilityGroups['utility-layers'].items
-      .find((i) => i.pluginId === 'SensorFov');
+    const item = collectDrawerItems().utilityGroups['utility-layers'].items.find((i) => i.pluginId === 'SensorFov');
 
     expect(item).toBeDefined();
     expect(item?.isDisabled).toBe(true);
@@ -54,8 +53,7 @@ describe('collectDrawerItems disabled state', () => {
   it('renders a utility icon as enabled when a sensor is already selected (isIconDisabled=false) even though isIconDisabledOnLoad stays true', () => {
     PluginRegistry.addPlugin(makeUtilityPlugin({ isIconDisabled: false }) as never);
 
-    const item = collectDrawerItems().utilityGroups['utility-layers'].items
-      .find((i) => i.pluginId === 'SensorFov');
+    const item = collectDrawerItems().utilityGroups['utility-layers'].items.find((i) => i.pluginId === 'SensorFov');
 
     expect(item).toBeDefined();
     // Would be `true` (stuck disabled) if the footer rendered from isIconDisabledOnLoad.

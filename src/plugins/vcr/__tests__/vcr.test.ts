@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 /* eslint-disable max-lines-per-function */
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -8,6 +7,7 @@ import { getEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { VcrPlugin } from '@app/plugins/vcr/vcr';
+import { vi } from 'vitest';
 import { setupStandardEnvironment } from '../../../../test/environment/standard-env';
 import { standardPluginSuite } from '../../../../test/generic-tests';
 
@@ -167,11 +167,7 @@ describe('VcrPlugin', () => {
 
       plugin.handlePlayPause();
 
-      expect(toastSpy).toHaveBeenCalledWith(
-        'Cannot play: Simulation time is at the end of the scenario.',
-        ToastMsgType.caution,
-        true,
-      );
+      expect(toastSpy).toHaveBeenCalledWith('Cannot play: Simulation time is at the end of the scenario.', ToastMsgType.caution, true);
     });
   });
 

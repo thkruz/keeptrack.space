@@ -33,14 +33,14 @@ export enum MoonTextureQuality {
   LOW = '1k',
   MEDIUM = '2k',
   HIGH = '4k',
-  ULTRA = '8k'
+  ULTRA = '8k',
 }
 
 export class Moon extends CelestialBody {
   readonly RADIUS = 1737.4;
   protected readonly NUM_HEIGHT_SEGS = 128;
   protected readonly NUM_WIDTH_SEGS = 128;
-  orbitalPeriod = 27.321661 * 24 * 3600 as Seconds;
+  orbitalPeriod = (27.321661 * 24 * 3600) as Seconds;
   color = PlanetColors.MOON;
   rotation = [0, 0, Math.PI];
   textureQuality: MoonTextureQuality = MoonTextureQuality.POTATO;

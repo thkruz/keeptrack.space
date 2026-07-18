@@ -1,8 +1,8 @@
-import { vi } from 'vitest';
 import * as apiFetchMod from '@app/app/data/api-fetch';
 import { fetchSensorGroups, sensorGroups } from '@app/app/data/catalogs/sensor-groups';
 import { sensors } from '@app/app/data/catalogs/sensors';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { vi } from 'vitest';
 
 /*
  * fetchSensorGroups pulls the sensor-group definitions from the KeepTrack API and

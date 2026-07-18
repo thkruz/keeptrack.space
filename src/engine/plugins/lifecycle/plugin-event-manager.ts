@@ -73,10 +73,7 @@ export class PluginEventManager {
    * @param event The event to listen for.
    * @param callback The callback to invoke when the event is emitted.
    */
-  on<T extends EventBusEvent>(
-    event: T,
-    callback: (...args: EngineEventMap[T]) => void,
-  ): void {
+  on<T extends EventBusEvent>(event: T, callback: (...args: EngineEventMap[T]) => void): void {
     this.eventBus.on(event, callback);
     this.subscriptions.push({ event, callback: callback as (...args: EngineEventMap[EventBusEvent]) => void });
   }
@@ -88,10 +85,7 @@ export class PluginEventManager {
    * @param event The event to listen for.
    * @param callback The callback to invoke when the event is emitted.
    */
-  once<T extends EventBusEvent>(
-    event: T,
-    callback: (...args: EngineEventMap[T]) => void,
-  ): void {
+  once<T extends EventBusEvent>(event: T, callback: (...args: EngineEventMap[T]) => void): void {
     // Wrap the callback to remove it from our tracking after it's called
     const wrappedCallback = ((...args: EngineEventMap[T]) => {
       callback(...args);
@@ -108,10 +102,7 @@ export class PluginEventManager {
    * @param event The event to unsubscribe from.
    * @param callback The callback to remove.
    */
-  off<T extends EventBusEvent>(
-    event: T,
-    callback: (...args: EngineEventMap[T]) => void,
-  ): void {
+  off<T extends EventBusEvent>(event: T, callback: (...args: EngineEventMap[T]) => void): void {
     this.eventBus.unregister(event, callback);
     this.removeSubscription(event, callback as (...args: EngineEventMap[EventBusEvent]) => void);
   }
@@ -133,10 +124,7 @@ export class PluginEventManager {
   unsubscribeAll(): void {
     for (const subscription of this.subscriptions) {
       try {
-        this.eventBus.unregister(
-          subscription.event,
-          subscription.callback as (...args: EngineEventMap[typeof subscription.event]) => void,
-        );
+        this.eventBus.unregister(subscription.event, subscription.callback as (...args: EngineEventMap[typeof subscription.event]) => void);
       } catch {
         // Ignore errors during cleanup - the callback may have already been removed
       }
@@ -163,13 +151,8 @@ export class PluginEventManager {
   /**
    * Remove a subscription from the tracking list.
    */
-  private removeSubscription(
-    event: EventBusEvent,
-    callback: (...args: EngineEventMap[EventBusEvent]) => void,
-  ): void {
-    const index = this.subscriptions.findIndex(
-      (sub) => sub.event === event && sub.callback === callback,
-    );
+  private removeSubscription(event: EventBusEvent, callback: (...args: EngineEventMap[EventBusEvent]) => void): void {
+    const index = this.subscriptions.findIndex((sub) => sub.event === event && sub.callback === callback);
 
     if (index !== -1) {
       this.subscriptions.splice(index, 1);

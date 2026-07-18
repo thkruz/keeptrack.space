@@ -36,10 +36,10 @@ export abstract class CustomMesh {
     u_camMatrix: WebGLUniformLocation | null;
     u_mvMatrix: WebGLUniformLocation | null;
   } = {
-      u_pMatrix: null,
-      u_camMatrix: null,
-      u_mvMatrix: null,
-    };
+    u_pMatrix: null,
+    u_camMatrix: null,
+    u_mvMatrix: null,
+  };
 
   init(gl: WebGL2RenderingContext): void {
     this.gl_ = gl;
@@ -89,8 +89,7 @@ export abstract class CustomMesh {
    * - `frag`: A string representing the code for a fragment shader in GLSL (OpenGL Shading Language).
    */
   abstract shaders_: {
-    vert: string,
-    frag: string
+    vert: string;
+    frag: string;
   };
 }
-

@@ -1,6 +1,5 @@
 /* eslint-disable max-lines */
-import { EciArr3, SatCruncherMessageData, SolarBody } from '../core/interfaces';
-import { GlUtils } from './gl-utils';
+
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-escape */
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
@@ -10,6 +9,7 @@ import { BaseObject, DEG2RAD, GreenwichMeanSiderealTime, Kilometers, KilometersP
 import { mat4 } from 'gl-matrix';
 import { SettingsManager } from '../../settings/settings';
 import { CameraType } from '../camera/camera-type';
+import { EciArr3, SatCruncherMessageData, SolarBody } from '../core/interfaces';
 import { PluginRegistry } from '../core/plugin-registry';
 import { Scene } from '../core/scene';
 import { ServiceLocator } from '../core/service-locator';
@@ -21,9 +21,10 @@ import { CounterStage, CpuStage, FrameProfiler, GpuStage } from '../utils/frame-
 import { ensureVelocityVec3 } from '../utils/space-object-invariants';
 import { BufferAttribute } from './buffer-attribute';
 import { DepthManager } from './depth-manager';
-import { ViewportManager } from './viewport-manager';
 import { IDotsShaderProvider } from './dots-shader-provider';
 import { createBaseFragShader, createBaseVertShader } from './dots-shaders-base';
+import { GlUtils } from './gl-utils';
+import { ViewportManager } from './viewport-manager';
 import { WebGlProgramHelper } from './webgl-program';
 import { WebGLRenderer } from './webgl-renderer';
 
@@ -71,10 +72,10 @@ export class DotsManager {
   debugShowPicking = false;
 
   buffers = {
-    position: <WebGLBuffer><unknown>null,
-    size: <WebGLBuffer><unknown>null,
-    color: <WebGLBuffer><unknown>null,
-    pickability: <WebGLBuffer><unknown>null,
+    position: <WebGLBuffer>(<unknown>null),
+    size: <WebGLBuffer>(<unknown>null),
+    color: <WebGLBuffer>(<unknown>null),
+    pickability: <WebGLBuffer>(<unknown>null),
   };
 
   inSunData: Int8Array;
@@ -83,9 +84,9 @@ export class DotsManager {
   isReady: boolean;
   pickReadPixelBuffer: Uint8Array;
   pickingBuffers = {
-    position: <WebGLBuffer><unknown>null,
-    color: <WebGLBuffer><unknown>null,
-    pickability: <WebGLBuffer><unknown>null,
+    position: <WebGLBuffer>(<unknown>null),
+    color: <WebGLBuffer>(<unknown>null),
+    pickability: <WebGLBuffer>(<unknown>null),
   };
 
   pickingRenderBuffer: WebGLRenderbuffer;
@@ -94,7 +95,7 @@ export class DotsManager {
   positionData: Float32Array;
   programs = {
     dots: {
-      program: <WebGLProgram><unknown>null,
+      program: <WebGLProgram>(<unknown>null),
       attribs: {
         a_position: new BufferAttribute({
           location: 0,
@@ -118,28 +119,28 @@ export class DotsManager {
         }),
       },
       uniforms: {
-        u_pMvCamMatrix: <WebGLUniformLocation><unknown>null,
-        u_minSize: <WebGLUniformLocation><unknown>null,
-        u_maxSize: <WebGLUniformLocation><unknown>null,
-        u_starMinSize: <WebGLUniformLocation><unknown>null,
-        worldOffset: <WebGLUniformLocation><unknown>null,
-        logDepthBufFC: <WebGLUniformLocation><unknown>null,
-        u_flatMapMode: <WebGLUniformLocation><unknown>null,
-        u_gmst: <WebGLUniformLocation><unknown>null,
-        u_currentGmst: <WebGLUniformLocation><unknown>null,
-        u_earthRadius: <WebGLUniformLocation><unknown>null,
-        u_flatMapCenterX: <WebGLUniformLocation><unknown>null,
-        u_flatMapZoom: <WebGLUniformLocation><unknown>null,
-        u_polarViewMode: <WebGLUniformLocation><unknown>null,
-        u_sensorEcef: <WebGLUniformLocation><unknown>null,
-        u_ecefToEnu: <WebGLUniformLocation><unknown>null,
-        u_polarRadius: <WebGLUniformLocation><unknown>null,
-        u_polarZoom: <WebGLUniformLocation><unknown>null,
+        u_pMvCamMatrix: <WebGLUniformLocation>(<unknown>null),
+        u_minSize: <WebGLUniformLocation>(<unknown>null),
+        u_maxSize: <WebGLUniformLocation>(<unknown>null),
+        u_starMinSize: <WebGLUniformLocation>(<unknown>null),
+        worldOffset: <WebGLUniformLocation>(<unknown>null),
+        logDepthBufFC: <WebGLUniformLocation>(<unknown>null),
+        u_flatMapMode: <WebGLUniformLocation>(<unknown>null),
+        u_gmst: <WebGLUniformLocation>(<unknown>null),
+        u_currentGmst: <WebGLUniformLocation>(<unknown>null),
+        u_earthRadius: <WebGLUniformLocation>(<unknown>null),
+        u_flatMapCenterX: <WebGLUniformLocation>(<unknown>null),
+        u_flatMapZoom: <WebGLUniformLocation>(<unknown>null),
+        u_polarViewMode: <WebGLUniformLocation>(<unknown>null),
+        u_sensorEcef: <WebGLUniformLocation>(<unknown>null),
+        u_ecefToEnu: <WebGLUniformLocation>(<unknown>null),
+        u_polarRadius: <WebGLUniformLocation>(<unknown>null),
+        u_polarZoom: <WebGLUniformLocation>(<unknown>null),
       },
-      vao: <WebGLVertexArrayObject><unknown>null,
+      vao: <WebGLVertexArrayObject>(<unknown>null),
     },
     picking: {
-      program: <WebGLProgram><unknown>null,
+      program: <WebGLProgram>(<unknown>null),
       attribs: {
         a_position: new BufferAttribute({
           location: 0,
@@ -158,35 +159,35 @@ export class DotsManager {
         }),
       },
       uniforms: {
-        u_pMvCamMatrix: <WebGLUniformLocation><unknown>null,
-        u_minSize: <WebGLUniformLocation><unknown>null,
-        u_maxSize: <WebGLUniformLocation><unknown>null,
-        worldOffset: <WebGLUniformLocation><unknown>null,
-        logDepthBufFC: <WebGLUniformLocation><unknown>null,
-        u_flatMapMode: <WebGLUniformLocation><unknown>null,
-        u_gmst: <WebGLUniformLocation><unknown>null,
-        u_currentGmst: <WebGLUniformLocation><unknown>null,
-        u_earthRadius: <WebGLUniformLocation><unknown>null,
-        u_flatMapCenterX: <WebGLUniformLocation><unknown>null,
-        u_flatMapZoom: <WebGLUniformLocation><unknown>null,
-        u_polarViewMode: <WebGLUniformLocation><unknown>null,
-        u_sensorEcef: <WebGLUniformLocation><unknown>null,
-        u_ecefToEnu: <WebGLUniformLocation><unknown>null,
-        u_polarRadius: <WebGLUniformLocation><unknown>null,
-        u_polarZoom: <WebGLUniformLocation><unknown>null,
+        u_pMvCamMatrix: <WebGLUniformLocation>(<unknown>null),
+        u_minSize: <WebGLUniformLocation>(<unknown>null),
+        u_maxSize: <WebGLUniformLocation>(<unknown>null),
+        worldOffset: <WebGLUniformLocation>(<unknown>null),
+        logDepthBufFC: <WebGLUniformLocation>(<unknown>null),
+        u_flatMapMode: <WebGLUniformLocation>(<unknown>null),
+        u_gmst: <WebGLUniformLocation>(<unknown>null),
+        u_currentGmst: <WebGLUniformLocation>(<unknown>null),
+        u_earthRadius: <WebGLUniformLocation>(<unknown>null),
+        u_flatMapCenterX: <WebGLUniformLocation>(<unknown>null),
+        u_flatMapZoom: <WebGLUniformLocation>(<unknown>null),
+        u_polarViewMode: <WebGLUniformLocation>(<unknown>null),
+        u_sensorEcef: <WebGLUniformLocation>(<unknown>null),
+        u_ecefToEnu: <WebGLUniformLocation>(<unknown>null),
+        u_polarRadius: <WebGLUniformLocation>(<unknown>null),
+        u_polarZoom: <WebGLUniformLocation>(<unknown>null),
       },
-      vao: <WebGLVertexArrayObject><unknown>null,
+      vao: <WebGLVertexArrayObject>(<unknown>null),
     },
   };
 
   shaders_ = {
     dots: {
-      vert: <string><unknown>null,
-      frag: <string><unknown>null,
+      vert: <string>(<unknown>null),
+      frag: <string>(<unknown>null),
     },
     picking: {
-      vert: <string><unknown>null,
-      frag: <string><unknown>null,
+      vert: <string>(<unknown>null),
+      frag: <string>(<unknown>null),
     },
   };
 
@@ -244,7 +245,7 @@ export class DotsManager {
 
     // 2D projections reproject raw ECI in-shader; the world offset must be
     // zero for them even when the frame shift is satellite-centered
-    gl.uniform3fv(this.programs.dots.uniforms.worldOffset, isFlatMap || isPolarView ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0]);
+    gl.uniform3fv(this.programs.dots.uniforms.worldOffset, isFlatMap || isPolarView ? [0, 0, 0] : (Scene.getInstance().worldShift ?? [0, 0, 0]));
 
     gl.uniform1i(this.programs.dots.uniforms.u_flatMapMode, isFlatMap ? 1 : 0);
     gl.uniform1i(this.programs.dots.uniforms.u_polarViewMode, isPolarView ? 1 : 0);
@@ -371,7 +372,7 @@ export class DotsManager {
     const isPolarViewPick = mainCam.cameraType === CameraType.POLAR_VIEW;
 
     // 2D projections reproject raw ECI in-shader; zero the world offset for them
-    gl.uniform3fv(this.programs.picking.uniforms.worldOffset, isFlatMapPick || isPolarViewPick ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0]);
+    gl.uniform3fv(this.programs.picking.uniforms.worldOffset, isFlatMapPick || isPolarViewPick ? [0, 0, 0] : (Scene.getInstance().worldShift ?? [0, 0, 0]));
 
     gl.uniform1i(this.programs.picking.uniforms.u_flatMapMode, isFlatMapPick ? 1 : 0);
     gl.uniform1i(this.programs.picking.uniforms.u_polarViewMode, isPolarViewPick ? 1 : 0);
@@ -426,7 +427,7 @@ export class DotsManager {
     const isPolarView = mainCam.cameraType === CameraType.POLAR_VIEW;
 
     // 2D projections reproject raw ECI in-shader; zero the world offset for them
-    gl.uniform3fv(this.programs.picking.uniforms.worldOffset, isFlatMap || isPolarView ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0]);
+    gl.uniform3fv(this.programs.picking.uniforms.worldOffset, isFlatMap || isPolarView ? [0, 0, 0] : (Scene.getInstance().worldShift ?? [0, 0, 0]));
 
     gl.uniform1i(this.programs.picking.uniforms.u_flatMapMode, isFlatMap ? 1 : 0);
     gl.uniform1i(this.programs.picking.uniforms.u_polarViewMode, isPolarView ? 1 : 0);
@@ -505,11 +506,7 @@ export class DotsManager {
     const cosD = Math.cos(d);
     const sinD = Math.sin(d);
 
-    return [
-      pos[0] * cosD - pos[1] * sinD,
-      pos[0] * sinD + pos[1] * cosD,
-      pos[2],
-    ] as EciArr3;
+    return [pos[0] * cosD - pos[1] * sinD, pos[0] * sinD + pos[1] * cosD, pos[2]] as EciArr3;
   }
 
   /**
@@ -598,7 +595,7 @@ export class DotsManager {
       this.shaders_.dots.vert,
       this.shaders_.dots.frag,
       this.programs.dots.attribs,
-      this.programs.dots.uniforms,
+      this.programs.dots.uniforms
     ).program;
 
     // Make buffers for satellite positions and size -- color and pickability are created in ColorScheme class
@@ -629,7 +626,6 @@ export class DotsManager {
     this.initVao(); // Needs ColorBuffer first
   }
 
-
   /**
    * We need to share the color buffer between the color manager and the dots manager
    * TODO: colorManager should be part of dots manager
@@ -653,8 +649,17 @@ export class DotsManager {
     this.programs.picking.program = new WebGlProgramHelper(gl, this.shaders_.picking.vert, this.shaders_.picking.frag).program;
 
     GlUtils.assignAttributes(this.programs.picking.attribs, gl, this.programs.picking.program, ['a_position', 'a_color', 'a_pickable']);
-    GlUtils.assignUniforms(this.programs.picking.uniforms, gl, this.programs.picking.program,
-      ['u_pMvCamMatrix', 'worldOffset', 'logDepthBufFC', 'u_flatMapMode', 'u_gmst', 'u_currentGmst', 'u_earthRadius', 'u_flatMapCenterX', 'u_flatMapZoom']);
+    GlUtils.assignUniforms(this.programs.picking.uniforms, gl, this.programs.picking.program, [
+      'u_pMvCamMatrix',
+      'worldOffset',
+      'logDepthBufFC',
+      'u_flatMapMode',
+      'u_gmst',
+      'u_currentGmst',
+      'u_earthRadius',
+      'u_flatMapCenterX',
+      'u_flatMapZoom',
+    ]);
 
     // Assign polar view uniforms separately — some ANGLE backends strip these from conditional branches
     const polarPickUniforms = ['u_polarViewMode', 'u_sensorEcef', 'u_ecefToEnu', 'u_polarRadius', 'u_polarZoom'] as const;
@@ -958,8 +963,11 @@ export class DotsManager {
     }
 
     const spaceObject = object as unknown as {
-      id?: number; name?: string; type?: number;
-      velocity: TemeVec3<KilometersPerSecond>; position: TemeVec3;
+      id?: number;
+      name?: string;
+      type?: number;
+      velocity: TemeVec3<KilometersPerSecond>;
+      position: TemeVec3;
     };
 
     // Static objects (stars, ground objects, sensors) carry a cruncher-computed position but
@@ -969,9 +977,8 @@ export class DotsManager {
       // Guard for issue #834 — telemeters when prior velocity was structurally invalid.
       ensureVelocityVec3(spaceObject, 'DotsManager.updatePosVel');
 
-      const isChanged = spaceObject.velocity.x !== this.velocityData[i * 3] ||
-        spaceObject.velocity.y !== this.velocityData[i * 3 + 1] ||
-        spaceObject.velocity.z !== this.velocityData[i * 3 + 2];
+      const isChanged =
+        spaceObject.velocity.x !== this.velocityData[i * 3] || spaceObject.velocity.y !== this.velocityData[i * 3 + 1] || spaceObject.velocity.z !== this.velocityData[i * 3 + 2];
 
       spaceObject.velocity.x = (this.velocityData[i * 3] as KilometersPerSecond) || (0 as KilometersPerSecond);
       spaceObject.velocity.y = (this.velocityData[i * 3 + 1] as KilometersPerSecond) || (0 as KilometersPerSecond);
@@ -1033,7 +1040,7 @@ export class DotsManager {
           this.velocityData[Number(sat.id) * 3 + 2] = pv.velocity.z;
         } else if (obj instanceof OemSatellite) {
           const sat = obj as OemSatellite;
-          const now = ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000 as Seconds;
+          const now = (ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000) as Seconds;
           // WARN: Necessary for orbit history
           const pv = sat.updatePosAndVel(now);
 
@@ -1135,10 +1142,8 @@ export class DotsManager {
       const i1 = Math.min(i0 + 1, lastIdx);
       const frac = elapsedSec - i0;
 
-      const toEci = (idx: number, g: GreenwichMeanSiderealTime) => lla2eci(
-        { lat: (obj.latList[idx] * DEG2RAD) as Radians, lon: (obj.lonList[idx] * DEG2RAD) as Radians, alt: obj.altList[idx] },
-        g,
-      );
+      const toEci = (idx: number, g: GreenwichMeanSiderealTime) =>
+        lla2eci({ lat: (obj.latList[idx] * DEG2RAD) as Radians, lon: (obj.lonList[idx] * DEG2RAD) as Radians, alt: obj.altList[idx] }, g);
 
       // Current-frame position first; its magnitude (invariant under the Earth-rotation
       // choice) decides whether the shader will apply the ground rotation.
@@ -1173,9 +1178,12 @@ export class DotsManager {
     // Stars use distance-based sizing (size 0) — at 3e10 km they naturally get u_minSize
 
     // If a planet and we aren't centered on Earth or Moon
-    if ((i >= this.planetDot1 && i <= this.planetDot2) &&
+    if (
+      i >= this.planetDot1 &&
+      i <= this.planetDot2 &&
       // TODO: This is hacky. We need better logic for determining when to show planet dots
-      (settingsManager.maxZoomDistance > (2e6 as Kilometers) || (settingsManager.centerBody !== SolarBody.Earth && settingsManager.centerBody !== SolarBody.Moon))) {
+      (settingsManager.maxZoomDistance > (2e6 as Kilometers) || (settingsManager.centerBody !== SolarBody.Earth && settingsManager.centerBody !== SolarBody.Moon))
+    ) {
       return 1.0; // Return size for planets
     }
 
@@ -1243,7 +1251,7 @@ export class DotsManager {
 
       this.shaders_ = {
         dots: { frag: config.fragShader, vert: config.vertShader },
-        picking: <{ vert: string; frag: string }><unknown>null,
+        picking: <{ vert: string; frag: string }>(<unknown>null),
       };
       Object.assign(this.programs.dots.attribs, config.extraAttribs);
       for (const u of config.extraUniforms) {
@@ -1255,7 +1263,7 @@ export class DotsManager {
           frag: createBaseFragShader(this.settings_),
           vert: createBaseVertShader(this.settings_),
         },
-        picking: <{ vert: string; frag: string }><unknown>null,
+        picking: <{ vert: string; frag: string }>(<unknown>null),
       };
     }
 

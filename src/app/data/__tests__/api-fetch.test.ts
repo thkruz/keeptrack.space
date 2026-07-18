@@ -1,7 +1,7 @@
+import { apiFetch, resetApiKeyWarning } from '@app/app/data/api-fetch';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { settingsManager } from '@app/settings/settings';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { apiFetch, resetApiKeyWarning } from '@app/app/data/api-fetch';
 
 describe('apiFetch', () => {
   const mockFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
@@ -84,7 +84,9 @@ describe('apiFetch', () => {
 
   describe('401 warning toast', () => {
     beforeEach(() => {
-      vi.spyOn(errorManagerInstance, 'warnToast').mockImplementation(() => { /* noop */ });
+      vi.spyOn(errorManagerInstance, 'warnToast').mockImplementation(() => {
+        /* noop */
+      });
     });
 
     it('should show warnToast on first 401 from api.keeptrack.space', async () => {
@@ -92,9 +94,7 @@ describe('apiFetch', () => {
 
       await apiFetch('https://api.keeptrack.space/v4/sats/brief');
 
-      expect(errorManagerInstance.warnToast).toHaveBeenCalledWith(
-        'API key required. Get a free key at keeptrack.space and add it to settings/data-settings.ts',
-      );
+      expect(errorManagerInstance.warnToast).toHaveBeenCalledWith('API key required. Get a free key at keeptrack.space and add it to settings/data-settings.ts');
     });
 
     it('should not show toast on second 401', async () => {

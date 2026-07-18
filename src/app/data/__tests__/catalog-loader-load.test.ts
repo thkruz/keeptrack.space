@@ -15,7 +15,7 @@ const makeSettings = (over: Record<string, unknown> = {}) => ({
     externalTLEsOnly: false,
     isSupplementExternal: false,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ...(over.dataSources as any ?? {}),
+    ...((over.dataSources as any) ?? {}),
   },
   limitSats: '',
   isUseDebrisCatalog: false,
@@ -28,7 +28,8 @@ const makeSettings = (over: Record<string, unknown> = {}) => ({
 });
 
 const okResponse = (body: unknown = [], text = '') => ({
-  ok: true, status: 200,
+  ok: true,
+  status: 200,
   json: () => Promise.resolve(body),
   text: () => Promise.resolve(text),
 });
@@ -43,7 +44,10 @@ describe('CatalogLoader.load orchestration', () => {
     parseSpy = vi.spyOn(CatalogLoader, 'parse').mockResolvedValue(undefined as never);
     apiFetchSpy = vi.spyOn(apiFetchMod, 'apiFetch').mockResolvedValue(okResponse() as never);
     // Default fetch returns not-ok so the ascii/external getters short-circuit.
-    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(okResponse())));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve(okResponse()))
+    );
   });
 
   afterEach(() => {
@@ -65,7 +69,7 @@ describe('CatalogLoader.load orchestration', () => {
 
     expect(apiFetchSpy).toHaveBeenCalled();
     // The api.keeptrack.space URL gets the limitSats + ?format=keeptrack suffix.
-    expect((apiFetchSpy.mock.calls[0][0] as string)).toContain('format=keeptrack');
+    expect(apiFetchSpy.mock.calls[0][0] as string).toContain('format=keeptrack');
     expect(parseSpy).toHaveBeenCalled();
   });
 
@@ -93,7 +97,7 @@ describe('CatalogLoader.load orchestration', () => {
 
     await CatalogLoader.load();
 
-    expect((apiFetchSpy.mock.calls[0][0] as string)).toContain('debris');
+    expect(apiFetchSpy.mock.calls[0][0] as string).toContain('debris');
   });
 
   it('loads from the install directory in offline mode', async () => {
@@ -119,7 +123,10 @@ describe('CatalogLoader.load orchestration', () => {
 describe('CatalogLoader.getAdditionalCatalogs_', () => {
   beforeEach(() => {
     setupStandardEnvironment();
-    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(okResponse())));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve(okResponse()))
+    );
   });
 
   afterEach(() => {
@@ -166,7 +173,10 @@ describe('CatalogLoader fetch-based getters', () => {
     const tle1 = '1 25544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991';
     const tle2 = '2 25544  51.6423 168.5744 0001475 184.3976 313.3642 15.48839820294053';
 
-    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(okResponse([], `${tle1}\n${tle2}`))));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve(okResponse([], `${tle1}\n${tle2}`)))
+    );
 
     const out = await CL.getAsciiCatalog_(makeSettings());
 
@@ -177,7 +187,10 @@ describe('CatalogLoader fetch-based getters', () => {
   it('getExternalCatalog_ reverts to internal TLEs when the fetch is not ok', async () => {
     const settings = makeSettings({ dataSources: { externalTLEs: 'https://x/tle' } });
 
-    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: false })));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve({ ok: false }))
+    );
 
     const out = await CL.getExternalCatalog_(settings);
 
@@ -190,7 +203,10 @@ describe('CatalogLoader fetch-based getters', () => {
     const tle1 = '1 25544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991';
     const tle2 = '2 25544  51.6423 168.5744 0001475 184.3976 313.3642 15.48839820294053';
 
-    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(okResponse([], `${name}\n${tle1}\n${tle2}`))));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve(okResponse([], `${name}\n${tle1}\n${tle2}`)))
+    );
 
     const out = await CL.getExternalCatalog_(makeSettings({ dataSources: { externalTLEs: 'https://x/tle' } }));
 

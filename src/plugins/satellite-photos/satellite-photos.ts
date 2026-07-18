@@ -1,22 +1,15 @@
-import { openColorbox } from '@app/engine/utils/colorbox';
-import { getEl } from '@app/engine/utils/get-el';
-import { lat2pitch, lon2yaw } from '@app/engine/utils/transforms';
-
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import {
-  IBottomIconConfig,
-  IDragOptions,
-  IHelpConfig,
-  IKeyboardShortcut,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, IDragOptions, IHelpConfig, IKeyboardShortcut, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { openColorbox } from '@app/engine/utils/colorbox';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
+import { lat2pitch, lon2yaw } from '@app/engine/utils/transforms';
 import { t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
 import { Degrees } from '@ootk/src/main';
@@ -105,8 +98,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
   }
 
   private static actionRow_(id: string, label: string): string {
-    return `<button type="button" id="${id}-link" class="kt-action waves-effect sat-photo-link" data-source-id="${id}">` +
-      `<span class="kt-action-label">${label}</span></button>`;
+    return `<button type="button" id="${id}-link" class="kt-action waves-effect sat-photo-link" data-source-id="${id}">` + `<span class="kt-action-label">${label}</span></button>`;
   }
 
   getHelpConfig(): IHelpConfig {
@@ -127,10 +119,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
           content: t7e('plugins.SatellitePhotos.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.SatellitePhotos.help.tip1'),
-        t7e('plugins.SatellitePhotos.help.tip2'),
-      ],
+      tips: [t7e('plugins.SatellitePhotos.help.tip1'), t7e('plugins.SatellitePhotos.help.tip2')],
       shortcuts: [{ keys: ['H'], description: t7e('plugins.SatellitePhotos.help.shortcutToggle') }],
     };
   }
@@ -150,10 +139,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      this.uiManagerFinal_.bind(this),
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   private uiManagerFinal_(): void {
@@ -216,17 +202,10 @@ export class SatellitePhotos extends KeepTrackPlugin {
     camera.changeZoom(0.7);
 
     if (result.isFuture) {
-      uiManager.toast(
-        t7e('plugins.SatellitePhotos.errorMsgs.FuturePictures' as Parameters<typeof t7e>[0]),
-        ToastMsgType.caution,
-      );
+      uiManager.toast(t7e('plugins.SatellitePhotos.errorMsgs.FuturePictures' as Parameters<typeof t7e>[0]), ToastMsgType.caution);
     }
 
-    const title = result.timestampUtc
-      ? t7e('plugins.SatellitePhotos.labels.imageAtUtc')
-        .replace('{name}', source.label)
-        .replace('{time}', result.timestampUtc)
-      : source.label;
+    const title = result.timestampUtc ? t7e('plugins.SatellitePhotos.labels.imageAtUtc').replace('{name}', source.label).replace('{time}', result.timestampUtc) : source.label;
 
     let { url } = result;
 

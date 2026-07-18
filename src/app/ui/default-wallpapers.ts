@@ -17,8 +17,21 @@ import rocket4Jpg from '@public/img/wallpaper/rocket4.jpg';
 import thuleJpg from '@public/img/wallpaper/thule.jpg';
 
 export const wallpapers: string[] = [
-  cspocJpg, cspoc2Jpg,
-  blueMarbleJpg, moonJpg, thuleJpg, rocketJpg, rocket2Jpg, rocket3Jpg, rocket4Jpg,
-  epfl1Jpg, epfl2Jpg, opsJpg, ops2Jpg, ops3Jpg, ops4Jpg, ops5Jpg,
+  cspocJpg,
+  cspoc2Jpg,
+  blueMarbleJpg,
+  moonJpg,
+  thuleJpg,
+  rocketJpg,
+  rocket2Jpg,
+  rocket3Jpg,
+  rocket4Jpg,
+  epfl1Jpg,
+  epfl2Jpg,
+  opsJpg,
+  ops2Jpg,
+  ops3Jpg,
+  ops4Jpg,
+  ops5Jpg,
   marsJpg,
 ];

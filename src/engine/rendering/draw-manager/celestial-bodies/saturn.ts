@@ -20,7 +20,7 @@
  */
 
 import { SolarBody } from '@app/engine/core/interfaces';
-import { TemeVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
+import { Kilometers, Seconds, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
@@ -29,7 +29,7 @@ import { SaturnRings } from './saturn-rings';
 export enum SaturnTextureQuality {
   POTATO = '512',
   HIGH = '2k',
-  ULTRA = '4k'
+  ULTRA = '4k',
 }
 
 export class Saturn extends CelestialBody {
@@ -37,7 +37,7 @@ export class Saturn extends CelestialBody {
   readonly RADIUS = this.radius;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
-  orbitalPeriod = 29.4571 * 365.25 * 24 * 3600 as Seconds;
+  orbitalPeriod = (29.4571 * 365.25 * 24 * 3600) as Seconds;
   meanDistanceToSun = 1426666422 as Kilometers;
   eci: TemeVec3;
   type: SpaceObjectType = SpaceObjectType.GAS_GIANT;

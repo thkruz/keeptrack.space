@@ -2,8 +2,8 @@
 import { sensors } from '@app/app/data/catalogs/sensors';
 import { CameraType } from '@app/engine/camera/camera-type';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { SensorListPlugin } from '@app/plugins/sensor-list/sensor-list';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
+import { SensorListPlugin } from '@app/plugins/sensor-list/sensor-list';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';

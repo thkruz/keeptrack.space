@@ -11,12 +11,7 @@ import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import layersPng from '@public/img/icons/layers.png';
 import { getEl, hideEl, showEl } from '../../engine/utils/get-el';
 import { rgbCss } from '../../engine/utils/rgbCss';
-import {
-  astronomyDiv,
-  deepDiv,
-  nearDiv,
-  planetariumDiv,
-} from './layers-manager/layers-divs';
+import { astronomyDiv, deepDiv, nearDiv, planetariumDiv } from './layers-manager/layers-divs';
 import { LayersPopupBox } from './layers-popup-box';
 
 export class LayersManager {
@@ -131,7 +126,6 @@ export class LayersManager {
         }
       });
     });
-
   }
 
   layersHoverMenuClick(layersType: string) {
@@ -164,7 +158,6 @@ export class LayersManager {
     if (colorSchemeInstance) {
       colorSchemeInstance.objectTypeFlags[slug] = colorSchemeManagerInstance.objectTypeFlags[slug];
     }
-
 
     colorSchemeManagerInstance.calculateColorBuffers(true);
   }
@@ -225,4 +218,3 @@ export class LayersManager {
     });
   }
 }
-

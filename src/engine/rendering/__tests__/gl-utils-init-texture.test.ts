@@ -1,10 +1,11 @@
 /* eslint-disable require-jsdoc */
-import { describe, expect, it, beforeEach, vi } from 'vitest';
+
 import { GlUtils } from '@app/engine/rendering/gl-utils';
-import { resetTextureLoadRegistry, getTextureStatuses } from '@app/engine/rendering/texture-load-registry';
+import { getTextureStatuses, resetTextureLoadRegistry } from '@app/engine/rendering/texture-load-registry';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const fakeGl = {
-  createTexture: () => ({} as WebGLTexture),
+  createTexture: () => ({}) as WebGLTexture,
   bindTexture: vi.fn(),
   texImage2D: vi.fn(),
   pixelStorei: vi.fn(),
@@ -12,12 +13,12 @@ const fakeGl = {
   texParameterf: vi.fn(),
   generateMipmap: vi.fn(),
   getExtension: () => null,
-  TEXTURE_2D: 0x0DE1,
+  TEXTURE_2D: 0x0de1,
   RGBA: 0x1908,
   UNSIGNED_BYTE: 0x1401,
   UNPACK_PREMULTIPLY_ALPHA_WEBGL: 0x9241,
   UNPACK_FLIP_Y_WEBGL: 0x9240,
-  UNPACK_ALIGNMENT: 0x0CF5,
+  UNPACK_ALIGNMENT: 0x0cf5,
   LINEAR_MIPMAP_LINEAR: 0x2703,
   LINEAR: 0x2601,
   REPEAT: 0x2901,
@@ -25,7 +26,7 @@ const fakeGl = {
   TEXTURE_WRAP_T: 0x2803,
   TEXTURE_MIN_FILTER: 0x2801,
   TEXTURE_MAG_FILTER: 0x2800,
-  CLAMP_TO_EDGE: 0x812F,
+  CLAMP_TO_EDGE: 0x812f,
 } as unknown as WebGL2RenderingContext;
 
 function makeResponse(status: number, headers: Record<string, string> = {}): Response {
@@ -37,7 +38,6 @@ function makeOkResponse(): Response {
   // Bake a non-power-of-2 image so the simpler shader-param path runs
   // (avoids the mipmap/anisotropy branch in initTexture, which isn't what these retry tests care about).
 
-
   return new Response(blob, { status: 200, headers: { 'Content-Type': 'image/png' } });
 }
 
@@ -46,11 +46,18 @@ describe('GlUtils.initTexture retry policy', () => {
     resetTextureLoadRegistry();
     vi.useFakeTimers();
     // Override the global 1x1 createImageBitmap mock so initTexture takes the non-POT branch.
-    vi.stubGlobal('createImageBitmap', vi.fn(() => Promise.resolve({
-      width: 3,
-      height: 5,
-      close: () => { /* noop */ },
-    } as ImageBitmap)));
+    vi.stubGlobal(
+      'createImageBitmap',
+      vi.fn(() =>
+        Promise.resolve({
+          width: 3,
+          height: 5,
+          close: () => {
+            /* noop */
+          },
+        } as ImageBitmap)
+      )
+    );
   });
 
   it('resolves on first attempt when fetch is OK', async () => {
@@ -71,16 +78,15 @@ describe('GlUtils.initTexture retry policy', () => {
   });
 
   it('retries 5xx responses up to 2 times then fails', async () => {
-    const fetchMock = vi.fn<typeof fetch>()
-      .mockResolvedValueOnce(makeResponse(503))
-      .mockResolvedValueOnce(makeResponse(503))
-      .mockResolvedValueOnce(makeResponse(503));
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValueOnce(makeResponse(503)).mockResolvedValueOnce(makeResponse(503)).mockResolvedValueOnce(makeResponse(503));
 
     vi.stubGlobal('fetch', fetchMock);
 
     const promise = GlUtils.initTexture(fakeGl, 'http://example.test/textures/hard-503.png');
 
-    promise.catch(() => { /* expected */ });
+    promise.catch(() => {
+      /* expected */
+    });
     await vi.runAllTimersAsync();
     await expect(promise).rejects.toThrow(/Failed to load image.*503/u);
 
@@ -92,10 +98,7 @@ describe('GlUtils.initTexture retry policy', () => {
   });
 
   it('retries 5xx then succeeds on the third attempt', async () => {
-    const fetchMock = vi.fn<typeof fetch>()
-      .mockResolvedValueOnce(makeResponse(503))
-      .mockResolvedValueOnce(makeResponse(503))
-      .mockResolvedValueOnce(makeOkResponse());
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValueOnce(makeResponse(503)).mockResolvedValueOnce(makeResponse(503)).mockResolvedValueOnce(makeOkResponse());
 
     vi.stubGlobal('fetch', fetchMock);
 
@@ -118,7 +121,9 @@ describe('GlUtils.initTexture retry policy', () => {
 
     const promise = GlUtils.initTexture(fakeGl, 'http://example.test/textures/missing.png');
 
-    promise.catch(() => { /* expected */ });
+    promise.catch(() => {
+      /* expected */
+    });
     await vi.runAllTimersAsync();
     await expect(promise).rejects.toThrow(/Failed to load image.*404/u);
 
@@ -130,9 +135,7 @@ describe('GlUtils.initTexture retry policy', () => {
   });
 
   it('retries on network errors (TypeError from fetch)', async () => {
-    const fetchMock = vi.fn<typeof fetch>()
-      .mockRejectedValueOnce(new TypeError('Network request failed'))
-      .mockResolvedValueOnce(makeOkResponse());
+    const fetchMock = vi.fn<typeof fetch>().mockRejectedValueOnce(new TypeError('Network request failed')).mockResolvedValueOnce(makeOkResponse());
 
     vi.stubGlobal('fetch', fetchMock);
 
@@ -152,7 +155,9 @@ describe('GlUtils.initTexture retry policy', () => {
 
     const promise = GlUtils.initTexture(fakeGl, 'http://example.test/textures/aborted.png');
 
-    promise.catch(() => { /* expected */ });
+    promise.catch(() => {
+      /* expected */
+    });
     await vi.runAllTimersAsync();
     await expect(promise).rejects.toThrow();
 
@@ -160,7 +165,8 @@ describe('GlUtils.initTexture retry policy', () => {
   });
 
   it('honors Retry-After header when within 5s cap', async () => {
-    const fetchMock = vi.fn<typeof fetch>()
+    const fetchMock = vi
+      .fn<typeof fetch>()
       .mockResolvedValueOnce(makeResponse(503, { 'Retry-After': '2' }))
       .mockResolvedValueOnce(makeOkResponse());
 
@@ -180,7 +186,8 @@ describe('GlUtils.initTexture retry policy', () => {
   });
 
   it('caps long Retry-After at 5000ms', async () => {
-    const fetchMock = vi.fn<typeof fetch>()
+    const fetchMock = vi
+      .fn<typeof fetch>()
       .mockResolvedValueOnce(makeResponse(503, { 'Retry-After': '60' })) // 60s
       .mockResolvedValueOnce(makeOkResponse());
 

@@ -50,16 +50,7 @@ export async function loadChebyshevJson(dataFile: string): Promise<ChebyshevCoef
 
   const segments: ChebyshevJsonSegment[] = await resp.json();
 
-  return segments.map(
-    (seg) =>
-      new ChebyshevCoefficients(
-        seg.a as Seconds,
-        seg.b as Seconds,
-        new Float64Array(seg.cx),
-        new Float64Array(seg.cy),
-        new Float64Array(seg.cz),
-      ),
-  );
+  return segments.map((seg) => new ChebyshevCoefficients(seg.a as Seconds, seg.b as Seconds, new Float64Array(seg.cx), new Float64Array(seg.cy), new Float64Array(seg.cz)));
 }
 
 export class DeepSpaceSatellite extends ChebyshevBody {

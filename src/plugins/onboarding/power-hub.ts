@@ -11,14 +11,7 @@ import type { TourStep } from './tour-engine';
 import { isCatalogLoaded } from './tour-steps';
 
 /** All chapters in hub display order. */
-export const POWER_CHAPTERS: ChapterDefinition[] = [
-  essentialsChapter,
-  sensorsChapter,
-  watchlistChapter,
-  timeChapter,
-  analysisChapter,
-  visualizationChapter,
-];
+export const POWER_CHAPTERS: ChapterDefinition[] = [essentialsChapter, sensorsChapter, watchlistChapter, timeChapter, analysisChapter, visualizationChapter];
 
 /** Personas pick the recommended chapter badge (replaces the retired P2 branch). */
 const RECOMMENDED_CHAPTER: Record<OnboardingPersona, ChapterId> = {
@@ -28,16 +21,13 @@ const RECOMMENDED_CHAPTER: Record<OnboardingPersona, ChapterId> = {
   developer: 'analysis',
 };
 
-export const getRecommendedChapterId = (persona: OnboardingPersona | null): ChapterId =>
-  (persona ? RECOMMENDED_CHAPTER[persona] : 'essentials');
+export const getRecommendedChapterId = (persona: OnboardingPersona | null): ChapterId => (persona ? RECOMMENDED_CHAPTER[persona] : 'essentials');
 
 /** Chapters whose plugins are loaded in this build. */
-export const getAvailableChapters = (): ChapterDefinition[] =>
-  POWER_CHAPTERS.filter((chapter) => chapter.isAvailable?.() !== false);
+export const getAvailableChapters = (): ChapterDefinition[] => POWER_CHAPTERS.filter((chapter) => chapter.isAvailable?.() !== false);
 
 /** A chapter is runnable when its catalog requirement (if any) is met. */
-export const isChapterRunnable = (chapter: ChapterDefinition): boolean =>
-  !chapter.needsCatalog || isCatalogLoaded();
+export const isChapterRunnable = (chapter: ChapterDefinition): boolean => !chapter.needsCatalog || isCatalogLoaded();
 
 /** `tiers.power` is done only when every available chapter is done. */
 export const areAllAvailableChaptersDone = (state: OnboardingState): boolean => {
@@ -46,8 +36,7 @@ export const areAllAvailableChaptersDone = (state: OnboardingState): boolean => 
   return available.length > 0 && available.every((chapter) => state.powerChapters[chapter.id].status === 'done');
 };
 
-export const countDoneChapters = (state: OnboardingState): number =>
-  getAvailableChapters().filter((chapter) => state.powerChapters[chapter.id].status === 'done').length;
+export const countDoneChapters = (state: OnboardingState): number => getAvailableChapters().filter((chapter) => state.powerChapters[chapter.id].status === 'done').length;
 
 export interface PowerHubOptions {
   getState: () => OnboardingState;
@@ -71,9 +60,7 @@ const statusIconHtml = (state: OnboardingState, chapter: ChapterDefinition): str
 const chapterRowHtml = (state: OnboardingState, chapter: ChapterDefinition, persona: OnboardingPersona | null): string => {
   const isRunnable = isChapterRunnable(chapter);
   const stepCount = chapter.buildSteps(persona).filter((step) => step.isAvailable?.() !== false).length;
-  const recommendedHtml = getRecommendedChapterId(persona) === chapter.id
-    ? `<span class="kt-hub-badge">${l('hub.recommended')}</span>`
-    : '';
+  const recommendedHtml = getRecommendedChapterId(persona) === chapter.id ? `<span class="kt-hub-badge">${l('hub.recommended')}</span>` : '';
   const metaText = isRunnable
     ? `${l('hub.steps').replace('{count}', String(stepCount))} &middot; ${l('hub.minutes').replace('{minutes}', String(chapter.minutes))}`
     : l('hub.catalogMissing');
@@ -81,9 +68,7 @@ const chapterRowHtml = (state: OnboardingState, chapter: ChapterDefinition, pers
   const disabledAttr = isRunnable ? '' : ' disabled';
 
   return (
-    `<button type="button" class="kt-hub-row${disabledCls}" data-chapter-id="${chapter.id}"${disabledAttr}>${
-    statusIconHtml(state, chapter)
-    }<span class="kt-hub-row-text">` +
+    `<button type="button" class="kt-hub-row${disabledCls}" data-chapter-id="${chapter.id}"${disabledAttr}>${statusIconHtml(state, chapter)}<span class="kt-hub-row-text">` +
     `<span class="kt-hub-row-title">${chapter.title()}${recommendedHtml}</span>` +
     `<span class="kt-hub-row-meta">${metaText}</span>` +
     '</span>' +
@@ -101,9 +86,7 @@ export const buildHubStep = (options: PowerHubOptions): TourStep => {
   const state = options.getState();
   const available = getAvailableChapters();
   const doneCount = countDoneChapters(state);
-  const progressLabel = l('hub.progress')
-    .replace('{done}', String(doneCount))
-    .replace('{total}', String(available.length));
+  const progressLabel = l('hub.progress').replace('{done}', String(doneCount)).replace('{total}', String(available.length));
   const rows = available.map((chapter) => chapterRowHtml(state, chapter, state.persona)).join('');
   const isAllDone = areAllAvailableChaptersDone(state);
 
@@ -112,9 +95,7 @@ export const buildHubStep = (options: PowerHubOptions): TourStep => {
     kind: 'card',
     title: l('hub.title'),
     body: isAllDone ? l('hub.allDone') : l('hub.body'),
-    extraHtml:
-      `<div class="kt-hub-progress">${progressLabel}</div>` +
-      `<div class="kt-hub-rows">${rows}</div>`,
+    extraHtml: `<div class="kt-hub-progress">${progressLabel}</div>` + `<div class="kt-hub-rows">${rows}</div>`,
     buttons: [{ id: 'close', label: l('hub.close'), isPrimary: true }],
     escButtonId: 'close',
     onRender: (popoverEl: HTMLElement) => {

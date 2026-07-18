@@ -33,7 +33,8 @@ export class ConfidenceColorScheme extends ColorScheme {
   constructor() {
     super(ConfidenceColorScheme.uniqueColorTheme);
     this.objectTypeFlags = {
-      ...this.objectTypeFlags, ...ConfidenceColorScheme.uniqueObjectTypeFlags,
+      ...this.objectTypeFlags,
+      ...ConfidenceColorScheme.uniqueObjectTypeFlags,
     };
   }
 

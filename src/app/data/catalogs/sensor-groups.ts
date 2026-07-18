@@ -8,7 +8,7 @@ export interface SensorGroup {
   topLink: {
     name: string;
     badge: string;
-  }
+  };
   list: string[];
   /**
    * Distinguishes surveillance sensors (radars/telescopes that detect
@@ -41,11 +41,7 @@ export const sensorGroups: SensorGroup[] = [
       name: 'All Space Surveillance Network Sensors',
       badge: 'COALITION',
     },
-    list: [
-      'EGLAFB', 'KWAJSPF', 'GEODDSDGC', 'GEODDSMAU', 'GEODDSSOC',
-      'KWAJALT', 'KWAJMMW', 'KWAJALC', 'KWAJTDX', 'MITMIL', 'RAFASC',
-      'GLBII', 'HOLCBAND', 'HOLSST', 'HOLDARC',
-    ],
+    list: ['EGLAFB', 'KWAJSPF', 'GEODDSDGC', 'GEODDSMAU', 'GEODDSSOC', 'KWAJALT', 'KWAJMMW', 'KWAJALC', 'KWAJTDX', 'MITMIL', 'RAFASC', 'GLBII', 'HOLCBAND', 'HOLSST', 'HOLDARC'],
   },
   {
     name: 'mw',
@@ -90,10 +86,7 @@ export const sensorGroups: SensorGroup[] = [
       name: 'All ESOC Sensors',
       badge: 'ESA',
     },
-    list: [
-      'GRV', 'TIR', 'GES', 'NRC', 'PDM', 'TRO', 'SDT', 'ZimLAT',
-      'ZimSMART', 'Tromso', 'Kiruna', 'Sodankyla', 'Svalbard',
-    ],
+    list: ['GRV', 'TIR', 'GES', 'NRC', 'PDM', 'TRO', 'SDT', 'ZimLAT', 'ZimSMART', 'Tromso', 'Kiruna', 'Sodankyla', 'Svalbard'],
   },
   {
     name: 'rus',
@@ -102,10 +95,7 @@ export const sensorGroups: SensorGroup[] = [
       name: 'All Russian Sensors',
       badge: 'RUSSIA',
     },
-    list: [
-      'OLED', 'OLEV', 'PEC', 'MISD', 'MISV', 'LEKV', 'ARMV', 'KALV',
-      'BARV', 'YENV', 'ORSV', 'STO', 'NAK',
-    ],
+    list: ['OLED', 'OLEV', 'PEC', 'MISD', 'MISV', 'LEKV', 'ARMV', 'KALV', 'BARV', 'YENV', 'ORSV', 'STO', 'NAK'],
   },
   {
     name: 'prc',

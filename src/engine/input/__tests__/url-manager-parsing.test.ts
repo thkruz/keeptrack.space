@@ -1,10 +1,10 @@
-import { vi } from 'vitest';
-import { UrlManager } from '@app/engine/input/url-manager';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { UrlManager } from '@app/engine/input/url-manager';
 // Import the same settingsManager singleton the handlers mutate, rather than
 // relying on the ambient global (which another test file may stub, diverging
 // the two references under the full shared-worker suite).
 import { settingsManager } from '@app/settings/settings';
+import { vi } from 'vitest';
 
 /*
  * UrlManager query parsing + per-parameter validation handlers. The pure

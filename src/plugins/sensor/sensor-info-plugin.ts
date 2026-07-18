@@ -4,10 +4,10 @@ import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { LineManager } from '@app/engine/rendering/line-manager';
 import { SensorToMoonLine } from '@app/engine/rendering/line-manager/sensor-to-moon-line';
 import { SensorToSunLine } from '@app/engine/rendering/line-manager/sensor-to-sun-line';
-import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -133,30 +133,20 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
           content: t7e('plugins.SensorInfoPlugin.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.SensorInfoPlugin.help.tip1'),
-        t7e('plugins.SensorInfoPlugin.help.tip2'),
-        t7e('plugins.SensorInfoPlugin.help.tip3'),
-      ],
+      tips: [t7e('plugins.SensorInfoPlugin.help.tip1'), t7e('plugins.SensorInfoPlugin.help.tip2'), t7e('plugins.SensorInfoPlugin.help.tip3')],
     };
   }
 
   addHtml(): void {
     super.addHtml();
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        this.addSensorToSunBtnListener_();
-        this.addSensorToMoonBtnListener();
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      this.addSensorToSunBtnListener_();
+      this.addSensorToMoonBtnListener();
+    });
 
-    EventBus.getInstance().on(
-      EventBusEvent.onLineAdded,
-      (lineManager: LineManager) => {
-        this.checkIfLinesVisible_(lineManager);
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.onLineAdded, (lineManager: LineManager) => {
+      this.checkIfLinesVisible_(lineManager);
+    });
   }
 
   /**
@@ -231,7 +221,6 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
             this.isMonnLineVisible_ = false;
             ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
 
-
             return;
           }
         }
@@ -243,9 +232,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
           ServiceLocator.getUiManager().toast(t7e('plugins.SensorInfoPlugin.errorMsgs.selectOnlyOneSensor' as Parameters<typeof t7e>[0]), ToastMsgType.caution);
         }
 
-        keepTrackApi
-          .getLineManager()
-          .createSensorToMoon(ServiceLocator.getSensorManager().currentSensors[0]);
+        keepTrackApi.getLineManager().createSensorToMoon(ServiceLocator.getSensorManager().currentSensors[0]);
 
         // Change Button Text
         SensorInfoPlugin.setActionLabel_(sensorMoonBtnElement, b('removeLineToMoon'));
@@ -284,9 +271,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
           ServiceLocator.getUiManager().toast(t7e('plugins.SensorInfoPlugin.errorMsgs.selectOnlyOneSensor' as Parameters<typeof t7e>[0]), ToastMsgType.caution);
         }
 
-        keepTrackApi
-          .getLineManager()
-          .createSensorToSun(ServiceLocator.getSensorManager().currentSensors[0]);
+        keepTrackApi.getLineManager().createSensorToSun(ServiceLocator.getSensorManager().currentSensors[0]);
 
         // Change Button Text
         SensorInfoPlugin.setActionLabel_(sensorSunBtnElement, b('removeLineToSun'));
@@ -318,8 +303,18 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     const sensorBandElement = getEl('sensor-band');
     const beamwidthElement = getEl('sensor-beamwidth');
 
-    if (!sensorLatitudeElement || !sensorLongitudeElement || !sensorMinAzimuthElement || !sensorMaxAzimuthElement || !sensorMinElevationElement || !sensorMaxElevationElement ||
-      !sensorMinRangeElement || !sensorMaxRangeElement || !sensorBandElement || !beamwidthElement) {
+    if (
+      !sensorLatitudeElement ||
+      !sensorLongitudeElement ||
+      !sensorMinAzimuthElement ||
+      !sensorMaxAzimuthElement ||
+      !sensorMinElevationElement ||
+      !sensorMaxElevationElement ||
+      !sensorMinRangeElement ||
+      !sensorMaxRangeElement ||
+      !sensorBandElement ||
+      !beamwidthElement
+    ) {
       return;
     }
 

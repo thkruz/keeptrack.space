@@ -21,24 +21,24 @@
 
 import { SolarBody } from '@app/engine/core/interfaces';
 import { ChebyshevInterpolator } from '@ootk/src/interpolator/ChebyshevInterpolator';
-import { TemeVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
+import { Kilometers, Seconds, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
 import { KM_PER_AU } from 'astronomy-engine';
 import { PlanetColors } from './celestial-body';
-import { DwarfPlanet } from './dwarf-planet';
 import { charonChebyshevCoeffs } from './charon-chebyshev';
+import { DwarfPlanet } from './dwarf-planet';
 
 export enum CharonTextureQuality {
   POTATO = '512',
   MEDIUM = '2k',
-  HIGH = '4k'
+  HIGH = '4k',
 }
 
 export class Charon extends DwarfPlanet {
   readonly RADIUS = 606;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
-  orbitalPeriod = 247.94 * 365.25 * 24 * 3600 as Seconds;
-  meanDistanceToSun = 39.482 * KM_PER_AU as Kilometers;
+  orbitalPeriod = (247.94 * 365.25 * 24 * 3600) as Seconds;
+  meanDistanceToSun = (39.482 * KM_PER_AU) as Kilometers;
   type: SpaceObjectType = SpaceObjectType.DWARF_PLANET;
   eci: TemeVec3;
   rotation = [0, 0, 0];

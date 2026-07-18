@@ -37,7 +37,14 @@ describe('time2lon-chart computeLonRange', () => {
   });
 
   it('clamps the window to the ±180 belt', () => {
-    const range = computeLonRange([line({ points: [{ value: [-180, 0], satName: 'A', satId: 2 }, { value: [180, 0], satName: 'B', satId: 3 }] })])!;
+    const range = computeLonRange([
+      line({
+        points: [
+          { value: [-180, 0], satName: 'A', satId: 2 },
+          { value: [180, 0], satName: 'B', satId: 3 },
+        ],
+      }),
+    ])!;
 
     expect(range.min).toBeGreaterThanOrEqual(-180);
     expect(range.max).toBeLessThanOrEqual(180);

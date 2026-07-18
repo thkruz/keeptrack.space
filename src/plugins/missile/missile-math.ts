@@ -5,10 +5,10 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { Degrees, Kilometers, Meters, SpaceObjectType } from '@ootk/src/main';
 import { missileManager } from './missile-manager';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 /** Running integration variables mutated across the missile flight phases. */
 interface MissileFlightState {
@@ -94,7 +94,7 @@ export class Missile {
     CurrentLatitude: number,
     CurrentLongitude: number,
     TargetLatitude: number,
-    TargetLongitude: number,
+    TargetLongitude: number
   ): [number[], number[], number, number, number[], number] {
     const r = RADIUS_OF_EARTH * 1000; // (m)
     const Phi1 = (CurrentLatitude * Math.PI) / 180; // (Rad)
@@ -238,7 +238,7 @@ export class Missile {
     AngleCoefficient: number,
     FuelDensity,
     BurnRate,
-    WarheadMass,
+    WarheadMass
   ) {
     let NozzleAltitude2, NozzleAltitude3;
     let iterationFunOutput: any[] = [];
@@ -260,7 +260,7 @@ export class Missile {
         AngleCoefficient,
         FuelDensity,
         BurnRate,
-        WarheadMass,
+        WarheadMass
       );
       FuelMass = iterationFunOutput[0];
       drdt = iterationFunOutput[12];
@@ -287,7 +287,7 @@ export class Missile {
         AngleCoefficient,
         FuelDensity,
         BurnRate,
-        WarheadMass,
+        WarheadMass
       );
       FuelMass = iterationFunOutput[0];
       drdt = iterationFunOutput[12];
@@ -314,7 +314,7 @@ export class Missile {
         AngleCoefficient,
         FuelDensity,
         BurnRate,
-        WarheadMass,
+        WarheadMass
       );
       FuelMass = iterationFunOutput[0];
       drdt = iterationFunOutput[12];
@@ -341,7 +341,7 @@ export class Missile {
         AngleCoefficient,
         FuelDensity,
         BurnRate,
-        WarheadMass,
+        WarheadMass
       );
       FuelMass = iterationFunOutput[0];
       drdt = iterationFunOutput[12];
@@ -430,7 +430,7 @@ export class Missile {
     GoalDistance: number,
     FuelDensity,
     BurnRate,
-    WarheadMass,
+    WarheadMass
   ) {
     const DistanceSteps: number[] = [];
     let AngleCoefficient = 0;
@@ -461,8 +461,8 @@ export class Missile {
           AngleCoefficient,
           FuelDensity,
           BurnRate,
-          WarheadMass,
-        ),
+          WarheadMass
+        )
       );
     }
     let DistanceClosest = DistanceSteps[0];
@@ -507,7 +507,7 @@ export class Missile {
       ACNew,
       FuelDensity,
       BurnRate,
-      WarheadMass,
+      WarheadMass
     );
     let error = Math.abs((GoalDistance - qRunACNew) / GoalDistance) * 100;
 
@@ -535,9 +535,9 @@ export class Missile {
               ACNew,
               FuelDensity,
               BurnRate,
-              WarheadMass,
+              WarheadMass
             )) /
-          GoalDistance,
+            GoalDistance
         ) * 100;
       if (
         Missile.testTrajectory_(
@@ -559,7 +559,7 @@ export class Missile {
           ACNew,
           FuelDensity,
           BurnRate,
-          WarheadMass,
+          WarheadMass
         ) > GoalDistance
       ) {
         AC2 = ACNew;
@@ -590,7 +590,6 @@ export class Missile {
     const Tsea = 288; // (K)
     const _R = 8.31451; // (J / K mol)
     const g = 9.81; // (m/s^2)
-
 
     return Po * Math.exp((-mol * g * Altitude) / (_R * Tsea)); // (Pa)
   }
@@ -728,7 +727,6 @@ export class Missile {
     const VeSub = ((2 * k) / (k - 1)) * ((Ru * Tc) / Mw) * (1 - Pe / Pc) ** ((k - 1) / k);
     const Ve = Math.sqrt(VeSub); // Partical Exit Velocity (m/s)
 
-
     return q * Ve + (Pe - Pa) * Ae; // Thrust (N)
   }
 
@@ -789,7 +787,7 @@ export class Missile {
     AngleCoefficient: number,
     FuelDensity: number,
     BurnRate: number,
-    WarheadMass: number,
+    WarheadMass: number
   ) {
     let ThrustAngle;
 
@@ -797,11 +795,11 @@ export class Missile {
       ThrustAngle =
         (90 -
           AngleCoefficient *
-          (1.5336118956 +
-            0.00443173537387 * Altitude -
-            9.30373890848 * 10 ** -8 * Altitude ** 2 +
-            8.37838197732 * 10 ** -13 * Altitude ** 3 -
-            2.71228576626 * 10 ** -18 * Altitude ** 4)) *
+            (1.5336118956 +
+              0.00443173537387 * Altitude -
+              9.30373890848 * 10 ** -8 * Altitude ** 2 +
+              8.37838197732 * 10 ** -13 * Altitude ** 3 -
+              2.71228576626 * 10 ** -18 * Altitude ** 4)) *
         0.0174533;
       // (Degrees)
     } else {
@@ -874,13 +872,7 @@ export class Missile {
    * sets the relevant missileManager error message (matching the original inline
    * checks exactly) and returns `false`.
    */
-  private static validateCreateInputs_(
-    CurrentLatitude: number,
-    CurrentLongitude: number,
-    TargetLatitude: number,
-    TargetLongitude: number,
-    NumberWarheads: number,
-  ): boolean {
+  private static validateCreateInputs_(CurrentLatitude: number, CurrentLongitude: number, TargetLatitude: number, TargetLongitude: number, NumberWarheads: number): boolean {
     if (CurrentLatitude > 90 || CurrentLatitude < -90) {
       return false;
     }
@@ -934,7 +926,7 @@ export class Missile {
     LatList: number[],
     LongList: number[],
     Distance: number,
-    useStrictUpper: boolean,
+    useStrictUpper: boolean
   ): void {
     const distanceKm = Distance / 1000;
 
@@ -1007,7 +999,7 @@ export class Missile {
     FuelArea: number,
     RocketCasingMass: number,
     NozzleAltitude: number | undefined,
-    useStrictUpper: boolean,
+    useStrictUpper: boolean
   ): number {
     const iterationFunOutput = Missile.iterationFun_(
       FuelArea,
@@ -1024,7 +1016,7 @@ export class Missile {
       fixed.AngleCoefficient,
       fixed.FuelDensity,
       fixed.BurnRate,
-      fixed.WarheadMass,
+      fixed.WarheadMass
     );
 
     state.FuelMass = iterationFunOutput[0];
@@ -1266,7 +1258,7 @@ export class Missile {
       GoalDistance,
       FuelDensity,
       BurnRate,
-      WarheadMass,
+      WarheadMass
     );
 
     const flightState: MissileFlightState = { FuelMass, drdt, dthetadt, Altitude, Distance, ArcDistance };

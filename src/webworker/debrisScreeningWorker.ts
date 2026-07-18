@@ -7,24 +7,8 @@
  * and sends results back progressively as chunks.
  */
 
-import {
-  cappedScreeningCovarianceFromTle,
-  ConjunctionAssessment,
-  EpochUTC,
-  ScreeningFilter,
-  StateCovariance,
-  Tle,
-  type Kilometers,
-  type Seconds,
-} from '@ootk/src/main';
-import {
-  DsWorkerMsgType,
-  DsWorkerOutMsgType,
-  type DsMsgStartScreening,
-  type DsResultRow,
-  type DsSatelliteData,
-  type DsWorkerInMsg,
-} from './debris-screening-messages';
+import { ConjunctionAssessment, cappedScreeningCovarianceFromTle, EpochUTC, type Kilometers, ScreeningFilter, type Seconds, StateCovariance, Tle } from '@ootk/src/main';
+import { type DsMsgStartScreening, type DsResultRow, type DsSatelliteData, type DsWorkerInMsg, DsWorkerMsgType, DsWorkerOutMsgType } from './debris-screening-messages';
 import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
 // ─── Module-level state ─────────────────────────────────────────────────────
@@ -49,7 +33,7 @@ function assessCandidate_(
   searchStepSize: number,
   uVal: number,
   vVal: number,
-  wVal: number,
+  wVal: number
 ): DsResultRow | null {
   const secondaryTle = new Tle(secondary.tle1, secondary.tle2);
 
@@ -71,7 +55,7 @@ function assessCandidate_(
       name: secondary.name,
       radius: secondary.radius as Kilometers,
       covariance: secondaryCovariance,
-    },
+    }
   );
 
   const event = assessment.assess({
@@ -185,7 +169,7 @@ function handleStartScreening_(msg: DsMsgStartScreening): void {
             searchStepSize,
             uVal,
             vVal,
-            wVal,
+            wVal
           );
 
           if (result) {

@@ -24,23 +24,23 @@ import { UrlManager } from '@app/engine/input/url-manager';
 import { ColorSchemeColorMap } from '@app/engine/rendering/color-schemes/color-scheme';
 import { ObjectTypeColorSchemeColorMap } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
 import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
-import { LogLevel, errorManagerInstance } from '../engine/utils/errorManager';
+import { pluginManifest } from '@app/plugins/plugin-manifest';
+import { errorManagerInstance, LogLevel } from '../engine/utils/errorManager';
 import { isThisNode } from '../engine/utils/isThisNode';
 import { PersistenceManager, StorageKey } from '../engine/utils/persistence-manager';
 import { CameraSettings, defaultCameraSettings } from './camera-settings';
-import { pluginManifest } from '@app/plugins/plugin-manifest';
 import { ColorSettings, defaultColorSettings } from './color-settings';
 import { CoreSettings, defaultCoreSettings } from './core-settings';
 import { DataSettings, defaultDataSettings } from './data-settings';
 import { defaultColorSettings as importedDefaultColorSettings } from './default-color-settings';
-import { GraphicsSettings, defaultGraphicsSettings } from './graphics-settings';
-import { OrbitalSettings, defaultOrbitalSettings } from './orbital-settings';
+import { defaultGraphicsSettings, GraphicsSettings } from './graphics-settings';
+import { defaultOrbitalSettings, OrbitalSettings } from './orbital-settings';
 import { parseGetVariables } from './parse-get-variables';
+import { defaultPerformanceSettings, PerformanceSettings } from './performance-settings';
 import { applyPersistedSetting, PERSISTED_SETTINGS_TABLE } from './persisted-settings-table';
-import { PerformanceSettings, defaultPerformanceSettings } from './performance-settings';
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
-import { SatLabelMode, UiSettings, defaultUiSettings } from './ui-settings';
+import { defaultUiSettings, SatLabelMode, UiSettings } from './ui-settings';
 
 /* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 /* eslint-disable max-lines */
@@ -375,15 +375,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
  * Interface that declares all flattened properties for TypeScript type checking.
  * The actual values are delegated to category instances via getters/setters.
  */
-export interface SettingsManager extends
-  GraphicsSettings,
-  UiSettings,
-  CameraSettings,
-  OrbitalSettings,
-  DataSettings,
-  PerformanceSettings,
-  ColorSettings,
-  CoreSettings { }
+export interface SettingsManager extends GraphicsSettings, UiSettings, CameraSettings, OrbitalSettings, DataSettings, PerformanceSettings, ColorSettings, CoreSettings {}
 
 export class SettingsManager {
   /**
@@ -551,7 +543,9 @@ export class SettingsManager {
     }
 
     if (settingsManager.preset) {
-      switch (settingsManager.preset) { // NOSONAR
+      switch (
+        settingsManager.preset // NOSONAR
+      ) {
         case 'dark-clouds':
           darkClouds(settingsManager);
           break;
@@ -854,9 +848,7 @@ export class SettingsManager {
     // out if false, which would break every plugin that depends on them.
     if (this.isStrictPluginList && overrides.plugins) {
       const allowed = new Set(Object.keys(overrides.plugins));
-      const alwaysEnabled = new Set(
-        pluginManifest.filter((d) => d.alwaysEnabled).map((d) => d.configKey),
-      );
+      const alwaysEnabled = new Set(pluginManifest.filter((d) => d.alwaysEnabled).map((d) => d.configKey));
 
       for (const key of Object.keys(this.plugins)) {
         if (!allowed.has(key) && !alwaysEnabled.has(key)) {

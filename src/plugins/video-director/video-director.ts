@@ -1,15 +1,14 @@
+import { SoundNames } from '@app/engine/audio/sounds';
 import { CameraType } from '@app/engine/camera/camera-type';
 import { MenuMode } from '@app/engine/core/interfaces';
-import { getEl } from '@app/engine/utils/get-el';
-import videoSettingsPng from '@public/img/icons/video-settings.png';
-
-import { SoundNames } from '@app/engine/audio/sounds';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
+import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
+import videoSettingsPng from '@public/img/icons/video-settings.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import './video-director.css';
 import { DIRECTION_TOGGLES, getOppositeToDisable, parseSpeed, ROTATE_TOGGLE_IDS, SPEED_CONFIGS } from './video-director-core';
@@ -172,15 +171,12 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        getEl('video-director-form')!.addEventListener('change', this.onFormChange_);
-        // Prevent an accidental page reload if the user presses Enter in a speed field.
-        getEl('video-director-form')!.addEventListener('submit', (e) => e.preventDefault());
-        getEl('video-director-rotate')!.addEventListener('click', () => this.toggleAutoRotate_());
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      getEl('video-director-form')!.addEventListener('change', this.onFormChange_);
+      // Prevent an accidental page reload if the user presses Enter in a speed field.
+      getEl('video-director-form')!.addEventListener('submit', (e) => e.preventDefault());
+      getEl('video-director-rotate')!.addEventListener('click', () => this.toggleAutoRotate_());
+    });
   }
 
   /** Read the form into settings whenever any control changes (immediate-apply). */

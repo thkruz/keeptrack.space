@@ -22,6 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
 import { Earth } from '@app/engine/rendering/draw-manager/earth';
@@ -29,36 +30,35 @@ import {
   BaseObject,
   DEG2RAD,
   Degrees,
-  estimateRcs as ootkEstimateRcs,
-  GreenwichMeanSiderealTime,
-  Kilometers,
-  KilometersPerSecond,
-  linearDistance,
-  mag2db as ootkMag2db,
-  MILLISECONDS_TO_DAYS,
-  MINUTES_PER_DAY,
-  PosVel,
-  RAD2DEG,
-  relativeVelocity as ootkRelativeVelocity,
-  Radians,
-  Satellite,
-  SatelliteRecord,
-  Sgp4,
-  SpaceObjectType,
-  StateVectorSgp4,
-  Sun as OotkSun,
-  SunStatus,
-  TAU,
-  TemeVec3,
-  Vector3D,
   ecef2eci,
   ecefRad2rae,
   eci2ecef,
   eci2lla,
   eci2rae,
+  GreenwichMeanSiderealTime,
+  Kilometers,
+  KilometersPerSecond,
+  linearDistance,
+  MILLISECONDS_TO_DAYS,
+  MINUTES_PER_DAY,
+  Sun as OotkSun,
+  estimateRcs as ootkEstimateRcs,
+  mag2db as ootkMag2db,
+  relativeVelocity as ootkRelativeVelocity,
+  PosVel,
+  RAD2DEG,
+  Radians,
   RIC,
+  Satellite,
+  SatelliteRecord,
+  Sgp4,
+  SpaceObjectType,
+  StateVectorSgp4,
+  SunStatus,
+  TAU,
+  TemeVec3,
+  Vector3D,
 } from '@ootk/src/main';
-import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { vec3 } from 'gl-matrix';
 import numeric from 'numeric';
 import { EciArr3 } from '../../engine/core/interfaces';
@@ -218,7 +218,6 @@ export abstract class SatMath {
   static calculateNadirYaw(position: TemeVec3, selectedDate: Date): Radians {
     const gmst = SatMath.calculateTimeVariables(selectedDate).gmst;
 
-
     return <Radians>(lon2yaw(eci2lla(position, gmst).lon, selectedDate) + 180 * DEG2RAD);
   }
 
@@ -254,8 +253,8 @@ export abstract class SatMath {
 
     const phaseAngle = Math.acos(
       <number>numeric.dot([-sat.position.x, -sat.position.y, -sat.position.z], [sat.position.x + sun.eci.x, -sat.position.y + sun.eci.y, -sat.position.z + sun.eci.z]) /
-      (Math.sqrt((-sat.position.x) ** 2 + (-sat.position.y) ** 2 + (-sat.position.z) ** 2) *
-        Math.sqrt((-sat.position.x + sun.eci.x) ** 2 + (-sat.position.y + sun.eci.y) ** 2 + (-sat.position.z + sun.eci.z) ** 2)),
+        (Math.sqrt((-sat.position.x) ** 2 + (-sat.position.y) ** 2 + (-sat.position.z) ** 2) *
+          Math.sqrt((-sat.position.x + sun.eci.x) ** 2 + (-sat.position.y + sun.eci.y) ** 2 + (-sat.position.z + sun.eci.z) ** 2))
     );
 
     // The object is likely eclipsing the sun
@@ -268,9 +267,7 @@ export abstract class SatMath {
      *  DEBUG:
      *  if (!sat.vmag) console.debug('No standard magnitude in the database defaulting to 8');
      */
-    const intrinsicMagnitude = (typeof intrinsicMagOverride === 'number' && !Number.isNaN(intrinsicMagOverride))
-      ? intrinsicMagOverride
-      : (sat.vmag || 8);
+    const intrinsicMagnitude = typeof intrinsicMagOverride === 'number' && !Number.isNaN(intrinsicMagOverride) ? intrinsicMagOverride : sat.vmag || 8;
 
     const term2 = 5.0 * Math.log10(distanceToSatellite / 1000);
 
@@ -296,26 +293,30 @@ export abstract class SatMath {
     if (sensor.minAz > sensor.maxAz) {
       if (
         ((az >= sensor.minAz || az <= sensor.maxAz) && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng) ||
-        ((az >= (sensor.minAz2 as number) || az <= (sensor.maxAz2 as number)) && el >= (sensor.minEl2 as number) &&
-          el <= (sensor.maxEl2 as number) && rng <= (sensor.maxRng2 as number) && rng >= (sensor.minRng2 as number))
+        ((az >= (sensor.minAz2 as number) || az <= (sensor.maxAz2 as number)) &&
+          el >= (sensor.minEl2 as number) &&
+          el <= (sensor.maxEl2 as number) &&
+          rng <= (sensor.maxRng2 as number) &&
+          rng >= (sensor.minRng2 as number))
       ) {
         return true;
       }
 
       return false;
-
     }
     if (
       (az >= sensor.minAz && az <= sensor.maxAz && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng) ||
-      (az >= (sensor.minAz2 as number) && az <= (sensor.maxAz2 as number) && el >= (sensor.minEl2 as number) &&
-        el <= (sensor.maxEl2 as number) && rng <= (sensor.maxRng2 as number) && rng >= (sensor.minRng2 as number))
+      (az >= (sensor.minAz2 as number) &&
+        az <= (sensor.maxAz2 as number) &&
+        el >= (sensor.minEl2 as number) &&
+        el <= (sensor.maxEl2 as number) &&
+        rng <= (sensor.maxRng2 as number) &&
+        rng >= (sensor.minRng2 as number))
     ) {
       return true;
     }
 
     return false;
-
-
   }
 
   /**
@@ -343,7 +344,6 @@ export abstract class SatMath {
     return ootkRelativeVelocity(obj1, obj2);
   }
 
-
   /**
    * Finds the closest approach time between two satellites based on their positions and velocities.
    * @param sat1 The first satellite object.
@@ -358,7 +358,7 @@ export abstract class SatMath {
   static findClosestApproachTime(
     sat1: Satellite,
     sat2: Satellite,
-    propLength?: number,
+    propLength?: number
   ): {
     offset: number;
     dist: number;
@@ -412,9 +412,9 @@ export abstract class SatMath {
     const centerBodyPosition = centerBody.position;
 
     return {
-      x: position.x - centerBodyPosition[0] as Kilometers,
-      y: position.y - centerBodyPosition[1] as Kilometers,
-      z: position.z - centerBodyPosition[2] as Kilometers,
+      x: (position.x - centerBodyPosition[0]) as Kilometers,
+      y: (position.y - centerBodyPosition[1]) as Kilometers,
+      z: (position.z - centerBodyPosition[2]) as Kilometers,
     };
   }
 
@@ -582,20 +582,21 @@ export abstract class SatMath {
    * @param orbits The number of orbital periods to span (default 1). Increase to sample multiple days of history.
    * @returns An array of objects containing the latitude, longitude, altitude, and time for each point along the orbit.
    */
-  static getLlaOfCurrentOrbit(
-    sat: Satellite,
-    points: number,
-    getOffsetTimeObj: (offset: number) => Date,
-    orbits = 1,
-  ): { lat: number; lon: number; alt: number; time: number }[] {
-    return SatMath.getOrbitPoints(sat, points, getOffsetTimeObj, (params: { eciPts: TemeVec3; offset: number }) => {
-      const now = getOffsetTimeObj(params.offset);
-      const { gmst } = SatMath.calculateTimeVariables(now);
-      const lla = eci2lla(params.eciPts, gmst);
+  static getLlaOfCurrentOrbit(sat: Satellite, points: number, getOffsetTimeObj: (offset: number) => Date, orbits = 1): { lat: number; lon: number; alt: number; time: number }[] {
+    return SatMath.getOrbitPoints(
+      sat,
+      points,
+      getOffsetTimeObj,
+      (params: { eciPts: TemeVec3; offset: number }) => {
+        const now = getOffsetTimeObj(params.offset);
+        const { gmst } = SatMath.calculateTimeVariables(now);
+        const lla = eci2lla(params.eciPts, gmst);
 
-
-      return { ...lla, ...{ time: now.getTime() } };
-    }, undefined, orbits);
+        return { ...lla, ...{ time: now.getTime() } };
+      },
+      undefined,
+      orbits
+    );
   }
 
   /**
@@ -607,13 +608,7 @@ export abstract class SatMath {
    * @param orbits The number of orbits to calculate RIC coordinates for (default is 1)
    * @returns An array of RIC coordinates for the given satellite and reference satellite
    */
-  static getRicOfCurrentOrbit(
-    sat: Satellite,
-    sat2: Satellite,
-    points: number,
-    getOffsetTimeObj: (offset: number) => Date,
-    orbits?: number,
-  ): { x: number; y: number; z: number }[] {
+  static getRicOfCurrentOrbit(sat: Satellite, sat2: Satellite, points: number, getOffsetTimeObj: (offset: number) => Date, orbits?: number): { x: number; y: number; z: number }[] {
     return SatMath.getOrbitPoints(
       sat,
       points,
@@ -634,11 +629,10 @@ export abstract class SatMath {
         sat2.velocity = vel2;
         const ric = RIC.fromPosVel(sat, sat2).position;
 
-
         return { x: ric.x, y: ric.y, z: ric.z };
       },
       sat2,
-      orbits,
+      orbits
     );
   }
 
@@ -656,9 +650,16 @@ export abstract class SatMath {
     sat: Satellite,
     points: number,
     getOffsetTimeObj: (offset: number) => Date,
-    transformFunc: (params: { eciPts: TemeVec3; eciPts2: TemeVec3; velPts: TemeVec3<KilometersPerSecond>; velPts2: TemeVec3<KilometersPerSecond>; angle: number; offset: number }) => T,
+    transformFunc: (params: {
+      eciPts: TemeVec3;
+      eciPts2: TemeVec3;
+      velPts: TemeVec3<KilometersPerSecond>;
+      velPts2: TemeVec3<KilometersPerSecond>;
+      angle: number;
+      offset: number;
+    }) => T,
     sat2?: Satellite,
-    orbits = 1,
+    orbits = 1
   ): T[] {
     const orbitPoints: T[] = [];
 
@@ -724,7 +725,7 @@ export abstract class SatMath {
     now: Date,
     satrec: SatelliteRecord,
     sensor: DetailedSensor,
-    isHideToasts = false,
+    isHideToasts = false
   ): {
     az: Degrees | null;
     el: Degrees | null;
@@ -847,16 +848,16 @@ export abstract class SatMath {
     const sunEci = ServiceLocator.getScene().sun.eci;
     const angle = this.getAngleBetweenSatellitesAndSun(hoverSat as Satellite, secondaryObj as Satellite, sunEci);
 
-    return angle * RAD2DEG as Degrees;
+    return (angle * RAD2DEG) as Degrees;
   }
 
   /**
-     * Calculate the angle between Sun, Satellite, and Earth with vertex at the
-     * satellite: angle(Sun - Satellite - Earth).
-     *
-     * This computes the angle between the vector from the satellite to the Sun
-     * and the vector from the satellite to the Earth (Earth is at origin).
-     */
+   * Calculate the angle between Sun, Satellite, and Earth with vertex at the
+   * satellite: angle(Sun - Satellite - Earth).
+   *
+   * This computes the angle between the vector from the satellite to the Sun
+   * and the vector from the satellite to the Earth (Earth is at origin).
+   */
   static sunSatEarthAngle(satPos: TemeVec3<Kilometers>, sunPos: TemeVec3<Kilometers>): number {
     // Vector from satellite to Sun
     const s2sunX = sunPos.x - satPos.x;

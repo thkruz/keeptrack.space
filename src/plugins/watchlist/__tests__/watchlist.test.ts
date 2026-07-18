@@ -1,18 +1,15 @@
-import { KeepTrack } from '@app/keeptrack';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import {
-  hasSettingsContribution,
-  ISettingSelectControl,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { hasSettingsContribution, ISettingSelectControl } from '@app/engine/plugins/core/plugin-capabilities';
+import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
+import { KeepTrack } from '@app/keeptrack';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { SatLabelMode } from '@app/settings/ui-settings';
 import { defaultSat } from '@test/environment/apiMocks';
 import { disableConsoleErrors, enableConsoleErrors, setupDefaultHtml, setupStandardEnvironment } from '@test/environment/standard-env';
-import { getEl } from '@app/engine/utils/get-el';
 import { standardClickTests, standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
 
@@ -320,11 +317,7 @@ describe('WatchlistPlugin settings contribution', () => {
 
     expect(control.type).toBe('select');
     expect(control.id).toBe('satLabelMode');
-    expect(control.options.map((o) => o.value)).toEqual([
-      String(SatLabelMode.OFF),
-      String(SatLabelMode.FOV_ONLY),
-      String(SatLabelMode.ALL),
-    ]);
+    expect(control.options.map((o) => o.value)).toEqual([String(SatLabelMode.OFF), String(SatLabelMode.FOV_ONLY), String(SatLabelMode.ALL)]);
   });
 
   it('get() returns the current satLabelMode serialized to the matching option value', () => {

@@ -1,14 +1,14 @@
-import { vi } from 'vitest';
 import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import * as colorbox from '@app/engine/utils/colorbox';
-import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import { ViewInfoRmbPlugin } from '@app/plugins/view-info-rmb/view-info-rmb';
 import { SensorInfoPlugin } from '@app/plugins/sensor/sensor-info-plugin';
+import { ViewInfoRmbPlugin } from '@app/plugins/view-info-rmb/view-info-rmb';
 import { Satellite } from '@ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSuite } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('ViewInfoRmbPlugin', () => {
   beforeEach(() => {
@@ -121,12 +121,13 @@ describe('ViewInfoRmbPlugin onContextMenuOpen', () => {
     vi.restoreAllMocks();
   });
 
-  const open = (target: unknown, surface: 'earth' | 'space' = 'earth') => plugin.onContextMenuOpen({
-    surface,
-    targetId: target ? 1 : -1,
-    target: target as never,
-    hasPrimarySelection: false,
-  });
+  const open = (target: unknown, surface: 'earth' | 'space' = 'earth') =>
+    plugin.onContextMenuOpen({
+      surface,
+      targetId: target ? 1 : -1,
+      target: target as never,
+      hasPrimarySelection: false,
+    });
 
   it('handles a click with no target', () => {
     expect(() => open(null)).not.toThrow();

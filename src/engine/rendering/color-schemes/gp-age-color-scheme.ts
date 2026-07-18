@@ -1,10 +1,10 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
-import { BaseObject, Days, Satellite, getDayOfYear, Star } from '@ootk/src/main';
-import { getCatalogReferenceDate } from '../../utils/catalog-reference-time';
-import { errorManagerInstance } from '../../utils/errorManager';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
+import { BaseObject, Days, getDayOfYear, Satellite, Star } from '@ootk/src/main';
+import { getCatalogReferenceDate } from '../../utils/catalog-reference-time';
+import { errorManagerInstance } from '../../utils/errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
 
 export interface GpAgeColorSchemeColorMap extends ColorSchemeColorMap {
@@ -45,7 +45,8 @@ export class GpAgeColorScheme extends ColorScheme {
   constructor() {
     super(GpAgeColorScheme.uniqueColorTheme);
     this.objectTypeFlags = {
-      ...this.objectTypeFlags, ...GpAgeColorScheme.uniqueObjectTypeFlags,
+      ...this.objectTypeFlags,
+      ...GpAgeColorScheme.uniqueObjectTypeFlags,
     };
   }
 
@@ -53,7 +54,7 @@ export class GpAgeColorScheme extends ColorScheme {
     const now = getCatalogReferenceDate();
 
     return {
-      jday: getDayOfYear(now) + ((now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds()) / 86400),
+      jday: getDayOfYear(now) + (now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds()) / 86400,
       year: parseInt(now.getUTCFullYear().toString().substr(2, 2), 10),
     };
   }
@@ -63,7 +64,7 @@ export class GpAgeColorScheme extends ColorScheme {
     params?: {
       jday?: number;
       year?: number;
-    },
+    }
   ): ColorInformation {
     /*
      * Hover and Select code might not pass params, so we will handle that here
@@ -75,7 +76,7 @@ export class GpAgeColorScheme extends ColorScheme {
       const now = getCatalogReferenceDate();
 
       params = {
-        jday: getDayOfYear(now) + ((now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds()) / 86400),
+        jday: getDayOfYear(now) + (now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds()) / 86400,
         year: parseInt(now.getUTCFullYear().toString().substr(2, 2), 10),
       };
     }
@@ -128,9 +129,9 @@ export class GpAgeColorScheme extends ColorScheme {
     const epochYearFull = epochYearShort <= currentYearShort ? 2000 + epochYearShort : 1900 + epochYearShort;
     const currentYearFull = 2000 + currentYearShort;
 
-    const epochJday = epochDay + (epochYearFull * 365);
-    const currentJday = jday + (currentYearFull * 365);
-    const daysOld = (currentJday) - epochJday as Days;
+    const epochJday = epochDay + epochYearFull * 365;
+    const currentJday = jday + currentYearFull * 365;
+    const daysOld = (currentJday - epochJday) as Days;
 
     if (daysOld < 0.5 && this.objectTypeFlags.age1) {
       return {

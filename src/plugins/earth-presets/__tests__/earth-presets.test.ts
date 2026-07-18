@@ -1,8 +1,8 @@
-import { vi } from 'vitest';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EarthPresetsPlugin } from '@app/plugins/earth-presets/earth-presets';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSuite } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('EarthPresetsPlugin', () => {
   beforeEach(() => {
@@ -31,16 +31,12 @@ describe('EarthPresetsPlugin onContextMenuAction', () => {
     vi.restoreAllMocks();
   });
 
-  it.each([
-    'earth-satellite-rmb',
-    'earth-nadir-rmb',
-    'earth-engineer-rmb',
-    'earth-opscenter-rmb',
-    'earth-90sGraphics-rmb',
-    'unknown-rmb',
-  ])('applies the %s preset without throwing', (targetId) => {
-    expect(() => plugin.onContextMenuAction(targetId)).not.toThrow();
-  });
+  it.each(['earth-satellite-rmb', 'earth-nadir-rmb', 'earth-engineer-rmb', 'earth-opscenter-rmb', 'earth-90sGraphics-rmb', 'unknown-rmb'])(
+    'applies the %s preset without throwing',
+    (targetId) => {
+      expect(() => plugin.onContextMenuAction(targetId)).not.toThrow();
+    }
+  );
 
   it('changes the earth texture style for a known preset', () => {
     plugin.onContextMenuAction('earth-satellite-rmb');

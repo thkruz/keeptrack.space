@@ -18,20 +18,20 @@ export abstract class UrlManager {
   private static propRate_: number;
   private static readonly MAX_URL_LENGTH_ = 2000;
   private static readonly colorSchemeDefinitions_ = {
-    'type': 'ObjectTypeColorScheme',
-    'celestrak': 'CelestrakColorScheme',
-    'country': 'CountryColorScheme',
-    'rcs': 'RcsColorScheme',
-    'mission': 'MissionColorScheme',
-    'confidence': 'ConfidenceColorScheme',
-    'orbitalplane': 'OrbitalPlaneDensityColorScheme',
-    'spatial': 'SpatialDensityColorScheme',
-    'sunlight': 'SunlightColorScheme',
-    'gpage': 'GpAgeColorScheme',
-    'source': 'SourceColorScheme',
-    'velocity': 'VelocityColorScheme',
-    'starlink': 'StarlinkColorScheme',
-    'smallsat': 'SmallSatColorScheme',
+    type: 'ObjectTypeColorScheme',
+    celestrak: 'CelestrakColorScheme',
+    country: 'CountryColorScheme',
+    rcs: 'RcsColorScheme',
+    mission: 'MissionColorScheme',
+    confidence: 'ConfidenceColorScheme',
+    orbitalplane: 'OrbitalPlaneDensityColorScheme',
+    spatial: 'SpatialDensityColorScheme',
+    sunlight: 'SunlightColorScheme',
+    gpage: 'GpAgeColorScheme',
+    source: 'SourceColorScheme',
+    velocity: 'VelocityColorScheme',
+    starlink: 'StarlinkColorScheme',
+    smallsat: 'SmallSatColorScheme',
   };
   static lastUpdateTime_: number;
 
@@ -94,7 +94,6 @@ export abstract class UrlManager {
         }
 
         return encodeURIComponent(item);
-
       })
       .join('')
       .split('&');
@@ -137,7 +136,6 @@ export abstract class UrlManager {
 
     // Then Do Other Stuff
     Object.keys(kv).forEach((key) => {
-
       // Handle things that happen before loading (remember other components might not be ready yet)
       switch (key) {
         case 'date':
@@ -386,7 +384,7 @@ export abstract class UrlManager {
 
       if (ServiceLocator.getColorSchemeManager().currentColorScheme.id !== 'CelestrakColorScheme') {
         const shorthandFromDefinition = Object.keys(UrlManager.colorSchemeDefinitions_).find(
-          (key) => UrlManager.colorSchemeDefinitions_[key] === ServiceLocator.getColorSchemeManager().currentColorScheme.id,
+          (key) => UrlManager.colorSchemeDefinitions_[key] === ServiceLocator.getColorSchemeManager().currentColorScheme.id
         );
 
         paramSlices.push(`color=${shorthandFromDefinition}`);
@@ -608,12 +606,12 @@ export abstract class UrlManager {
     const mainCameraInstance = ServiceLocator.getMainCamera();
 
     mainCameraInstance.autoRotate(false);
-    mainCameraInstance.camSnap(pitchNum * DEG2RAD as Radians, yawNum * DEG2RAD as Radians);
+    mainCameraInstance.camSnap((pitchNum * DEG2RAD) as Radians, (yawNum * DEG2RAD) as Radians);
 
     if (kv.sat) {
       mainCameraInstance.state.camAngleSnappedOnSat = false;
-      mainCameraInstance.state.ftsPitch = pitchNum * DEG2RAD as Radians;
-      mainCameraInstance.state.ftsYaw = yawNum * DEG2RAD as Radians;
+      mainCameraInstance.state.ftsPitch = (pitchNum * DEG2RAD) as Radians;
+      mainCameraInstance.state.ftsYaw = (yawNum * DEG2RAD) as Radians;
     }
   }
 
@@ -621,7 +619,6 @@ export abstract class UrlManager {
     const latNum = parseFloat(lat) as Degrees;
     const lonNum = parseFloat(lon) as Degrees;
     const zoomNum = parseFloat(zoom);
-
 
     if (isNaN(zoomNum)) {
       ServiceLocator.getUiManager().toast(`Zoom value of "${zoom}" is not a valid float!`, ToastMsgType.caution, true);
@@ -748,7 +745,11 @@ export abstract class UrlManager {
   private static readonly VALID_REGIMES_ = ['vleo', 'leo', 'meo', 'geo', 'heo', 'xgeo'];
 
   private static handleRegimeParam_(val: string): void {
-    const regimes = val.toLowerCase().split(',').map((r) => r.trim()).filter((r) => r.length > 0);
+    const regimes = val
+      .toLowerCase()
+      .split(',')
+      .map((r) => r.trim())
+      .filter((r) => r.length > 0);
     const valid: string[] = [];
 
     for (const r of regimes) {

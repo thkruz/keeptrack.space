@@ -18,14 +18,20 @@ export class OBJLoader extends MeshLoader {
       mtl: url.replace('.obj', '.mtl'),
     };
 
-
     return OBJ.downloadModels([meshFile]).then((mesh: MeshMap) => this.parseOBJ(meshName, mesh, gl));
   }
 
   private parseOBJ(meshName: string, mesh: MeshMap, gl: WebGLRenderingContext): MeshModel | null {
     try {
-      const layout =
-        new OBJ.Layout(OBJ.Layout.POSITION, OBJ.Layout.NORMAL, OBJ.Layout.AMBIENT, OBJ.Layout.DIFFUSE, OBJ.Layout.UV, OBJ.Layout.SPECULAR, OBJ.Layout.SPECULAR_EXPONENT);
+      const layout = new OBJ.Layout(
+        OBJ.Layout.POSITION,
+        OBJ.Layout.NORMAL,
+        OBJ.Layout.AMBIENT,
+        OBJ.Layout.DIFFUSE,
+        OBJ.Layout.UV,
+        OBJ.Layout.SPECULAR,
+        OBJ.Layout.SPECULAR_EXPONENT
+      );
 
       // Create the vertex buffer for this mesh
       const vertexBuffer = gl.createBuffer();
@@ -75,9 +81,7 @@ export class OBJLoader extends MeshLoader {
       if (useUint32) {
         // Build Uint32Array directly from raw indices to avoid Uint16 truncation
         const materialIndicesValues = Object.values(mesh[meshName].materialIndices) as number[];
-        const rawIndices = ([] as number[]).concat(
-          ...materialIndicesValues.map((mtlIdx) => mesh[meshName].indicesPerMaterial[mtlIdx]),
-        );
+        const rawIndices = ([] as number[]).concat(...materialIndicesValues.map((mtlIdx) => mesh[meshName].indicesPerMaterial[mtlIdx]));
 
         const uint32Indices = new Uint32Array(rawIndices);
 

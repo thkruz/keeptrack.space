@@ -13,14 +13,24 @@ import leftPanelOpenPng from '@public/img/icons/left-panel-open.png';
 import searchPng from '@public/img/icons/search.png';
 import ktsOrangeLogoPng from '@public/img/kts-orange-logo.png';
 import {
-  type DrawerBadge, type DrawerGroup, type DrawerItemData, type RecentEntry,
-  buildRecentGroupFromCache, collectDrawerItems, loadRecents, recordRecent, renderBadge,
-  renderStatusFooter, renderUtilityFooter,
-  syncBadgesFromEvents, syncInitialUtilityState, syncUtilityFooterState,
-  updateConnectivityStatus, updatePhoneLinkState,
+  buildRecentGroupFromCache,
+  collectDrawerItems,
+  type DrawerBadge,
+  type DrawerGroup,
+  type DrawerItemData,
+  loadRecents,
+  type RecentEntry,
+  recordRecent,
+  renderBadge,
+  renderStatusFooter,
+  renderUtilityFooter,
+  syncBadgesFromEvents,
+  syncInitialUtilityState,
+  syncUtilityFooterState,
+  updateConnectivityStatus,
+  updatePhoneLinkState,
 } from './plugin-drawer-helpers';
 import './plugin-drawer.css';
-
 
 export class PluginDrawer {
   private isOpen_ = false;
@@ -90,10 +100,7 @@ export class PluginDrawer {
     });
 
     EventBus.getInstance().on(EventBusEvent.onWatchlistUpdated, (watchlist: { id: number; inView: boolean }[]) => {
-      this.updateBadge_(
-        'watchlist-overlay-menu',
-        watchlist.length > 0 ? { type: 'count', value: watchlist.length } : null,
-      );
+      this.updateBadge_('watchlist-overlay-menu', watchlist.length > 0 ? { type: 'count', value: watchlist.length } : null);
     });
 
     EventBus.getInstance().on(EventBusEvent.connectivityChange, (isOnline: boolean) => {
@@ -159,15 +166,9 @@ export class PluginDrawer {
     btn.className = 'drawer-hamburger';
     btn.setAttribute('role', 'button');
     btn.setAttribute('aria-label', 'Open plugin menu');
-    btn.innerHTML = [
-      '<span class="drawer-hamburger-bar"></span>',
-      '<span class="drawer-hamburger-bar"></span>',
-      '<span class="drawer-hamburger-bar"></span>',
-    ].join('');
+    btn.innerHTML = ['<span class="drawer-hamburger-bar"></span>', '<span class="drawer-hamburger-bar"></span>', '<span class="drawer-hamburger-bar"></span>'].join('');
 
-    const logoEl = settingsManager.navBarLogoUrl
-      ? document.createElement('a')
-      : document.createElement('div');
+    const logoEl = settingsManager.navBarLogoUrl ? document.createElement('a') : document.createElement('div');
 
     logoEl.id = 'nav-logo';
     logoEl.className = 'nav-logo';
@@ -214,11 +215,11 @@ export class PluginDrawer {
     const hasLauncher = !!PluginRegistry.getPluginByName('LaunchpadPlugin');
     const launcherHtml = hasLauncher
       ? [
-        '    <div class="drawer-app-launcher" id="drawer-app-launcher" role="button" tabindex="0"',
-        '      aria-label="Open app launcher" kt-tooltip="App Launcher (Shift+Z)">',
-        `      <img class="drawer-app-launcher-icon" src="${appsPng}" alt="App Launcher" />`,
-        '    </div>',
-      ].join('')
+          '    <div class="drawer-app-launcher" id="drawer-app-launcher" role="button" tabindex="0"',
+          '      aria-label="Open app launcher" kt-tooltip="App Launcher (Shift+Z)">',
+          `      <img class="drawer-app-launcher-icon" src="${appsPng}" alt="App Launcher" />`,
+          '    </div>',
+        ].join('')
       : '';
 
     // The search trigger only opens the command palette, so only show it when the
@@ -226,12 +227,12 @@ export class PluginDrawer {
     const hasCommandPalette = PluginRegistry.checkIfLoaded('CommandPalettePlugin');
     const searchHtml = hasCommandPalette
       ? [
-        '    <div class="drawer-search" id="drawer-search-trigger" role="button" tabindex="0">',
-        `      <img class="drawer-search-icon" src=${searchPng} alt="Search" />`,
-        '      <span class="drawer-search-label">Search…</span>',
-        '      <span class="drawer-search-shortcut">Ctrl+⇧+K</span>',
-        '    </div>',
-      ].join('')
+          '    <div class="drawer-search" id="drawer-search-trigger" role="button" tabindex="0">',
+          `      <img class="drawer-search-icon" src=${searchPng} alt="Search" />`,
+          '      <span class="drawer-search-label">Search…</span>',
+          '      <span class="drawer-search-shortcut">Ctrl+⇧+K</span>',
+          '    </div>',
+        ].join('')
       : '';
 
     drawer.id = 'plugin-drawer';
@@ -696,10 +697,7 @@ export class PluginDrawer {
 
   private saveGroupStates_(): void {
     try {
-      PersistenceManager.getInstance().saveItem(
-        StorageKey.DRAWER_GROUP_STATES,
-        JSON.stringify(this.groupStates_),
-      );
+      PersistenceManager.getInstance().saveItem(StorageKey.DRAWER_GROUP_STATES, JSON.stringify(this.groupStates_));
     } catch {
       // Ignore storage errors
     }
@@ -722,7 +720,7 @@ export class PluginDrawer {
       const dataAttr = item.isTopMenu ? `data-top-menu-id="${item.id}"` : `data-plugin-id="${item.id}"`;
       const disabledClass = item.isDisabled ? ' disabled' : '';
       const proAttr = item.isLoginRequired ? ' data-pro-gated' : '';
-      const proClass = (item.isLoginRequired && !settingsManager.isDisableLoginGate) ? ' bmenu-item-pro' : '';
+      const proClass = item.isLoginRequired && !settingsManager.isDisableLoginGate ? ' bmenu-item-pro' : '';
       const tabIdx = item.isDisabled ? '' : ' tabindex="0"';
       const shortcutBadge = item.shortcutHint ? `<span class="drawer-item-shortcut">${item.shortcutHint}</span>` : '';
 
@@ -744,25 +742,29 @@ export class PluginDrawer {
 
   private static openCommandPalette_(): void {
     // Dispatch the keyboard shortcut that the CommandPalettePlugin listens for
-    window.dispatchEvent(new KeyboardEvent('keydown', {
-      code: 'KeyK',
-      key: 'K',
-      ctrlKey: true,
-      shiftKey: true,
-      bubbles: true,
-    }));
+    window.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        code: 'KeyK',
+        key: 'K',
+        ctrlKey: true,
+        shiftKey: true,
+        bubbles: true,
+      })
+    );
   }
 
   // ---- App Launcher ----
 
   private static openAppLauncher_(): void {
     // Dispatch the keyboard shortcut that the LaunchpadPlugin listens for
-    window.dispatchEvent(new KeyboardEvent('keydown', {
-      code: 'KeyZ',
-      key: 'Z',
-      shiftKey: true,
-      bubbles: true,
-    }));
+    window.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        code: 'KeyZ',
+        key: 'Z',
+        shiftKey: true,
+        bubbles: true,
+      })
+    );
   }
 
   // ---- Recent Plugins ----
@@ -782,7 +784,10 @@ export class PluginDrawer {
       }
     }
 
-    return buildRecentGroupFromCache(loadRecents().map((entry) => entry.id), this.allDrawerItems_);
+    return buildRecentGroupFromCache(
+      loadRecents().map((entry) => entry.id),
+      this.allDrawerItems_
+    );
   }
 
   private refreshRecentGroup_(entries: RecentEntry[] = loadRecents()): void {
@@ -797,7 +802,10 @@ export class PluginDrawer {
 
     oldRecent?.remove();
 
-    const recentGroup = buildRecentGroupFromCache(entries.map((entry) => entry.id), this.allDrawerItems_);
+    const recentGroup = buildRecentGroupFromCache(
+      entries.map((entry) => entry.id),
+      this.allDrawerItems_
+    );
 
     if (recentGroup.items.length === 0) {
       return;

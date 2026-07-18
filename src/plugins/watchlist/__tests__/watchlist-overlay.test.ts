@@ -1,8 +1,8 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
-import { WatchlistOverlay } from '@app/plugins/watchlist/watchlist-overlay';
-import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
+import { WatchlistOverlay } from '@app/plugins/watchlist/watchlist-overlay';
 import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSmokeSuite, websiteInit } from '@test/generic-tests';
@@ -23,7 +23,11 @@ describe('WatchlistOverlay behavior', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const p = () => plugin as any;
   const T = WatchlistOverlay as unknown as {
-    IMMINENT_MS_: number; UPCOMING_MS_: number; AWARE_MS_: number; DISPLAY_CAP_MS_: number; DEPARTED_MS_: number;
+    IMMINENT_MS_: number;
+    UPCOMING_MS_: number;
+    AWARE_MS_: number;
+    DISPLAY_CAP_MS_: number;
+    DEPARTED_MS_: number;
   };
 
   const pass = (sat = defaultSat, offsetMs = 0) => ({ sat, time: new Date(Date.now() + offsetMs) });

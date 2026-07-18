@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CounterStage, CpuStage, FrameProfiler } from '@app/engine/utils/frame-profiler';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * The profiler is a singleton; each test resets it to a clean, disabled state.

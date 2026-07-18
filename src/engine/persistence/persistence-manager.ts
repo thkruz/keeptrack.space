@@ -208,11 +208,7 @@ export class PersistenceManager {
     const sm = getSettingsManager_();
     const currentVersion = this.cache_.get(StorageKey.VERSION) ?? null;
 
-    if (
-      typeof currentVersion === 'string' &&
-      typeof sm?.versionNumber === 'string' &&
-      this.compareSemver_(currentVersion, sm.versionNumber) < 0
-    ) {
+    if (typeof currentVersion === 'string' && typeof sm?.versionNumber === 'string' && this.compareSemver_(currentVersion, sm.versionNumber) < 0) {
       errorManagerInstance.warn(`Version mismatch: ${currentVersion} < ${sm.versionNumber}`);
       errorManagerInstance.warn('Clearing local storage...');
 
@@ -474,7 +470,7 @@ export class PersistenceManager {
     key: StorageKey,
     state: { localV: string | null; localT: number; remoteV: string | null; remoteT: number },
     changed: StorageKey[],
-    toPush: Map<StorageKey, AccountKvEntry>,
+    toPush: Map<StorageKey, AccountKvEntry>
   ): boolean {
     const mergedV = mergeHook(state.localV, state.remoteV);
     const mergedT = Math.max(state.localT, state.remoteT, 1);

@@ -194,7 +194,7 @@ export class OrbitManager {
     tgtBuffer: WebGLFramebuffer | null,
     hoverManagerInstance: HoverManager,
     colorSchemeManagerInstance: ColorSchemeManager,
-    mainCameraInstance: Camera,
+    mainCameraInstance: Camera
   ): void {
     if (!this.isInitialized_) {
       return;
@@ -432,9 +432,12 @@ export class OrbitManager {
 
   changeOrbitBufferData(id: number, tle1: string, tle2: string): void {
     this.orbitThreadMgr.sendSatelliteUpdate(
-      id, ServiceLocator.getTimeManager().simulationTimeObj.getTime(),
-      settingsManager.isOrbitCruncherInEcf, ServiceLocator.getMainCamera().cameraType === CameraType.POLAR_VIEW,
-      tle1, tle2,
+      id,
+      ServiceLocator.getTimeManager().simulationTimeObj.getTime(),
+      settingsManager.isOrbitCruncherInEcf,
+      ServiceLocator.getMainCamera().cameraType === CameraType.POLAR_VIEW,
+      tle1,
+      tle2
     );
   }
 
@@ -449,7 +452,7 @@ export class OrbitManager {
       latList: Degrees[];
       lonList: Degrees[];
       altList: Kilometers[];
-    },
+    }
   ) {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
@@ -478,10 +481,7 @@ export class OrbitManager {
         this.setVariableLengthOrbitBuffer_(id, obj.getOrbitPath(), obj.orbitPathAnchor_);
       } else {
         // Then it is a satellite
-        this.orbitThreadMgr.sendSatelliteUpdate(
-          Number(id), simTime,
-          settingsManager.isOrbitCruncherInEcf, isPolarView,
-        );
+        this.orbitThreadMgr.sendSatelliteUpdate(Number(id), simTime, settingsManager.isOrbitCruncherInEcf, isPolarView);
         this.inProgress_[id] = true;
       }
     }
@@ -504,7 +504,7 @@ export class OrbitManager {
           tle1: obj.tle1,
           tle2: obj.tle2,
         };
-      }),
+      })
     );
   }
 
@@ -766,16 +766,12 @@ export class OrbitManager {
 
     const worldShift = ServiceLocator.getScene().worldShift ?? [0, 0, 0];
 
-    this.lineManagerInstance_.setAnchorUniforms(
-      [anchorEciNow[0] + worldShift[0], anchorEciNow[1] + worldShift[1], anchorEciNow[2] + worldShift[2]],
-      anchor,
-      anchorEciNow,
-    );
+    this.lineManagerInstance_.setAnchorUniforms([anchorEciNow[0] + worldShift[0], anchorEciNow[1] + worldShift[1], anchorEciNow[2] + worldShift[2]], anchor, anchorEciNow);
 
     // OEM satellites and missiles carry a variable-length, high-resolution path
     // and are drawn with their own vertex count; everything else uses the fixed
     // orbitSegments buffer.
-    const variableLengthPath = (obj instanceof OemSatellite || obj instanceof MissileObject) ? obj.orbitPathCache_ : null;
+    const variableLengthPath = obj instanceof OemSatellite || obj instanceof MissileObject ? obj.orbitPathCache_ : null;
 
     // Patch the line's head (vertex 0) every frame with the object's OWN dot
     // position - the single source of truth shared with the camera follow, world
@@ -816,8 +812,6 @@ export class OrbitManager {
   }
 
   updateOrbitType() {
-    this.orbitThreadMgr.sendChangeOrbitType(
-      settingsManager.isDrawTrailingOrbits ? OrbitDrawTypes.TRAIL : OrbitDrawTypes.ORBIT,
-    );
+    this.orbitThreadMgr.sendChangeOrbitType(settingsManager.isDrawTrailingOrbits ? OrbitDrawTypes.TRAIL : OrbitDrawTypes.ORBIT);
   }
 }

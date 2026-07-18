@@ -1,5 +1,7 @@
 import { StringifiedNumber } from '@app/app/analysis/sat-math';
 import { CatalogManager } from '@app/app/data/catalog-manager';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
@@ -8,8 +10,6 @@ import { BaseObject, FormatTle, Satellite, Tle } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class OrbitReferences extends KeepTrackPlugin {
   readonly id = 'OrbitReferences';
@@ -27,37 +27,34 @@ export class OrbitReferences extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (obj?: BaseObject) => {
-        // instanceof Satellite excludes OemSatellite, which lacks the TLE-derived
-        // orbital elements (eccentricity, meanMotion, …) we read inside the click handler.
-        if (!(obj instanceof Satellite)) {
-          hideEl('orbit-references-link');
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj?: BaseObject) => {
+      // instanceof Satellite excludes OemSatellite, which lacks the TLE-derived
+      // orbital elements (eccentricity, meanMotion, …) we read inside the click handler.
+      if (!(obj instanceof Satellite)) {
+        hideEl('orbit-references-link');
 
+        return;
+      }
+      showEl('orbit-references-link');
+
+      if (!this.doOnce) {
+        const actionsSectionElement = getEl('actions-section');
+
+        if (!actionsSectionElement) {
           return;
         }
-        showEl('orbit-references-link');
 
-        if (!this.doOnce) {
-          const actionsSectionElement = getEl('actions-section');
-
-          if (!actionsSectionElement) {
-            return;
-          }
-
-          actionsSectionElement.insertAdjacentHTML(
-            'beforeend',
-            html`
+        actionsSectionElement.insertAdjacentHTML(
+          'beforeend',
+          html`
                 <div id="orbit-references-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
                       data-tooltip="Create Analyst Satellites in Orbit">Generate Orbit Reference Satellites...</div>
-              `,
-          );
-          getEl('orbit-references-link')!.addEventListener('click', this.orbitReferencesLinkClick.bind(this));
-          this.doOnce = true;
-        }
-      },
-    );
+              `
+        );
+        getEl('orbit-references-link')!.addEventListener('click', this.orbitReferencesLinkClick.bind(this));
+        this.doOnce = true;
+      }
+    });
   }
 
   orbitReferencesLinkClick() {

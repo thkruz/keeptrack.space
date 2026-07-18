@@ -1,6 +1,6 @@
+import { SoundNames } from '@app/engine/audio/sounds';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, showEl } from '@app/engine/utils/get-el';
-import { SoundNames } from '@app/engine/audio/sounds';
 import Draggabilly from 'draggabilly';
 import { html } from '../utils/development/formatter';
 import './engine-ui.css';
@@ -52,7 +52,9 @@ export abstract class DraggableBox {
 
   open(cb?: () => void) {
     if (!this.boxEl) {
-      getEl('canvas-holder')!.insertAdjacentHTML('beforeend', html`
+      getEl('canvas-holder')!.insertAdjacentHTML(
+        'beforeend',
+        html`
         <div id="${this.boxId}" class="draggable-box" style="pointer-events:auto;">
           <div class="draggable-box__title-bar">
             <div class="draggable-box__title">
@@ -67,7 +69,8 @@ export abstract class DraggableBox {
             ${this.getBoxContentHtml()}
           </div>
         </div>
-      `);
+      `
+      );
       this.boxEl = getEl(this.boxId) as HTMLElement;
       this.initDraggabilly_();
       this.onOpen();

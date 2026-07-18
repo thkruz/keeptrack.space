@@ -2,11 +2,11 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
+import { InputManager } from '@app/engine/input/input-manager';
+import { TouchInput } from '@app/engine/input/input-manager/touch-input';
 import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
-import { InputManager } from '@app/engine/input/input-manager';
-import { TouchInput } from '@app/engine/input/input-manager/touch-input';
 import { vi } from 'vitest';
 
 const makeCamera = () => ({
@@ -40,9 +40,10 @@ const makeCamera = () => ({
   },
 });
 
-const touchEvt = (touches: { clientX?: number; clientY?: number; pageX?: number; pageY?: number; identifier?: number }[]) => ({
-  touches: touches.map((t, i) => ({ clientX: t.clientX ?? 0, clientY: t.clientY ?? 0, pageX: t.pageX ?? 0, pageY: t.pageY ?? 0, identifier: t.identifier ?? i })),
-}) as unknown as TouchEvent;
+const touchEvt = (touches: { clientX?: number; clientY?: number; pageX?: number; pageY?: number; identifier?: number }[]) =>
+  ({
+    touches: touches.map((t, i) => ({ clientX: t.clientX ?? 0, clientY: t.clientY ?? 0, pageX: t.pageX ?? 0, pageY: t.pageY ?? 0, identifier: t.identifier ?? i })),
+  }) as unknown as TouchEvent;
 
 describe('TouchInput', () => {
   let touch: TouchInput;
@@ -79,7 +80,12 @@ describe('TouchInput', () => {
 
   describe('canvasTouchStart', () => {
     it('starts a pinch with two fingers and halts camera rotation', () => {
-      touch.canvasTouchStart(touchEvt([{ pageX: 0, pageY: 0 }, { pageX: 30, pageY: 40 }]));
+      touch.canvasTouchStart(
+        touchEvt([
+          { pageX: 0, pageY: 0 },
+          { pageX: 30, pageY: 40 },
+        ])
+      );
 
       expect(touch.isPinching).toBe(true);
       expect(touch.isPanning).toBe(false);
@@ -343,10 +349,13 @@ describe('TouchInput', () => {
       touch.isTwisting = true;
       touch.touchStartTime = Date.now();
 
-      touch.canvasTouchEnd(touchEvt([
-        { pageX: 0, pageY: 0, identifier: 1 },
-        { pageX: 0, pageY: 40, identifier: 2 },
-      ]), camera as never);
+      touch.canvasTouchEnd(
+        touchEvt([
+          { pageX: 0, pageY: 0, identifier: 1 },
+          { pageX: 0, pageY: 40, identifier: 2 },
+        ]),
+        camera as never
+      );
 
       expect(touch.startPinchDistance).toBeCloseTo(40);
       expect(touch.startPinchAngle).toBeCloseTo(Math.atan2(-40, 0));

@@ -1,5 +1,18 @@
 import {
-  Degrees, GreenwichMeanSiderealTime, GroundStation, Kilometers, LlaVec3, MILLISECONDS_TO_DAYS, PI, RAD2DEG, Radians, RaeVec3, Sensor, Sgp4, SpaceObjectType, rae2eci,
+  Degrees,
+  GreenwichMeanSiderealTime,
+  GroundStation,
+  Kilometers,
+  LlaVec3,
+  MILLISECONDS_TO_DAYS,
+  PI,
+  RAD2DEG,
+  Radians,
+  RaeVec3,
+  rae2eci,
+  Sensor,
+  Sgp4,
+  SpaceObjectType,
 } from '@ootk/src/main';
 import { A } from '../../engine/utils/external/meuusjs';
 import { jday } from '../../engine/utils/transforms';
@@ -18,7 +31,7 @@ export const checkSunExclusion = (
   sensor: GroundStation,
   j: number,
   gmst: GreenwichMeanSiderealTime,
-  now: Date,
+  now: Date
 ): [isSunExclusion: boolean, sunECI: { x: number; y: number; z: number }] => {
   const jdo = new A.JulianDay(j); // now
   // eslint-disable-next-line new-cap
@@ -44,7 +57,6 @@ export const checkSunExclusion = (
   // RAE to ECI
   const sunECI = rae2eci({ az: sunAz, el: sunEl, rng: sunRange }, { lat: <Degrees>0, lon: <Degrees>0, alt: <Kilometers>0 }, gmst);
 
-
   return sensor && (sensor.type === SpaceObjectType.OPTICAL || sensor.type === SpaceObjectType.OBSERVER) && sunElRel > -6 ? [true, sunECI] : [false, sunECI];
 };
 
@@ -58,7 +70,7 @@ export const setupTimeVariables = (dynamicOffsetEpoch: number, staticOffset: num
       now.getUTCDate(),
       now.getUTCHours(),
       now.getUTCMinutes(),
-      now.getUTCSeconds(),
+      now.getUTCSeconds()
     ) +
     now.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
 
@@ -79,7 +91,7 @@ export const setupTimeVariables = (dynamicOffsetEpoch: number, staticOffset: num
       now.getUTCDate(),
       now.getUTCHours(),
       now.getUTCMinutes(),
-      now.getUTCSeconds() + 1,
+      now.getUTCSeconds() + 1
     ) +
     now.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
 

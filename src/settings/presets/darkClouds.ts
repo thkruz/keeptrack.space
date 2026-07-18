@@ -5,7 +5,8 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import {
   EarthBumpTextureQuality,
   EarthCloudTextureQuality,
-  EarthDayTextureQuality, EarthNightTextureQuality,
+  EarthDayTextureQuality,
+  EarthNightTextureQuality,
   EarthPoliticalTextureQuality,
   EarthSpecTextureQuality,
 } from '@app/engine/rendering/draw-manager/earth-quality-enums';

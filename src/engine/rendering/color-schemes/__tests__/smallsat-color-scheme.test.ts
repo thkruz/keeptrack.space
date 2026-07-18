@@ -14,11 +14,12 @@ describe('SmallSatColorScheme', () => {
     scheme = new SmallSatColorScheme();
   });
 
-  const sat = (over: Record<string, unknown>) => ({
-    isSatellite: () => true,
-    type: SpaceObjectType.PAYLOAD,
-    ...over,
-  }) as unknown as Satellite;
+  const sat = (over: Record<string, unknown>) =>
+    ({
+      isSatellite: () => true,
+      type: SpaceObjectType.PAYLOAD,
+      ...over,
+    }) as unknown as Satellite;
 
   it('highlights a small payload (rcs < 0.5)', () => {
     const result = scheme.update(sat({ rcs: 0.3 }));

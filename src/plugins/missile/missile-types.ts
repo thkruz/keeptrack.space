@@ -62,20 +62,20 @@ export interface MissileTrajectory {
  */
 export type MissileSimulationResult =
   | {
-    kind: 'success';
-    trajectory: MissileTrajectory;
-  }
+      kind: 'success';
+      trajectory: MissileTrajectory;
+    }
   | {
-    kind: 'error';
-    errorMessage: string;
-    errorType: ToastMsgType;
-  }
+      kind: 'error';
+      errorMessage: string;
+      errorType: ToastMsgType;
+    }
   | {
-    kind: 'lowApogee';
-    burnMultiplier: number;
-  }
+      kind: 'lowApogee';
+      burnMultiplier: number;
+    }
   | {
-    kind: 'tooClose';
-    errorMessage: string;
-    errorType: ToastMsgType;
-  };
+      kind: 'tooClose';
+      errorMessage: string;
+      errorType: ToastMsgType;
+    };

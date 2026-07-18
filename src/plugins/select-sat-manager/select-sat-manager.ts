@@ -1,29 +1,24 @@
-import { CameraState } from '@app/engine/camera/state/camera-state';
-import { CameraType } from '@app/engine/camera/camera-type';
-import { GetSatType, SolarBody, ToastMsgType } from '@app/engine/core/interfaces';
-import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
-
-import { satDetailService } from '@app/app/data/catalogs/sat-detail-service';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { satDetailService } from '@app/app/data/catalogs/sat-detail-service';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { Planet } from '@app/app/objects/planet';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { SoundNames } from '@app/engine/audio/sounds';
+import { CameraType } from '@app/engine/camera/camera-type';
+import { CameraState } from '@app/engine/camera/state/camera-state';
+import { GetSatType, SolarBody, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import {
-  IKeyboardShortcut,
-  ISettingsContribution,
-  ISettingsContributor,
-} from '@app/engine/plugins/core/plugin-capabilities';
-import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { estimateObjectRadiusKm, initialFramingDistanceKm, targetStandoffDistanceKm } from '@app/engine/utils/transforms';
-import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
-import { t7e } from '@app/locales/keys';
+import { IKeyboardShortcut, ISettingsContribution, ISettingsContributor } from '@app/engine/plugins/core/plugin-capabilities';
 import { COVARIANCE_RADII_FALLBACK, covarianceDisplayRadii, ricSigmasFromCovarianceMatrix } from '@app/engine/rendering/draw-manager/covariance-radii';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
+import { estimateObjectRadiusKm, initialFramingDistanceKm, targetStandoffDistanceKm } from '@app/engine/utils/transforms';
+import { t7e } from '@app/locales/keys';
 import { createSampleCovarianceFromTle, Kilometers, RADIUS_OF_EARTH, Satellite, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -51,10 +46,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
           get: () => settingsManager.isFocusOnSatelliteWhenSelected,
           set: (next) => {
             settingsManager.isFocusOnSatelliteWhenSelected = next;
-            PersistenceManager.getInstance().saveItem(
-              StorageKey.SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED,
-              next.toString(),
-            );
+            PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED, next.toString());
           },
         },
       ],
@@ -125,8 +117,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
         const timeManagerInstance = ServiceLocator.getTimeManager();
 
         if (this.primarySatObj) {
-          ServiceLocator.getUiManager().
-            updateSelectBox(timeManagerInstance.realTime, timeManagerInstance.lastBoxUpdateTime, this.primarySatObj);
+          ServiceLocator.getUiManager().updateSelectBox(timeManagerInstance.realTime, timeManagerInstance.lastBoxUpdateTime, this.primarySatObj);
         }
       }
     });
@@ -255,11 +246,11 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
           hideEl('draw-line-links');
           this.selectSatObject_(obj as MissileObject);
           break;
-        case (SpaceObjectType.TERRESTRIAL_PLANET):
-        case (SpaceObjectType.GAS_GIANT):
-        case (SpaceObjectType.ICE_GIANT):
-        case (SpaceObjectType.DWARF_PLANET):
-        case (SpaceObjectType.MOON):
+        case SpaceObjectType.TERRESTRIAL_PLANET:
+        case SpaceObjectType.GAS_GIANT:
+        case SpaceObjectType.ICE_GIANT:
+        case SpaceObjectType.DWARF_PLANET:
+        case SpaceObjectType.MOON:
           PluginRegistry.getPlugin(PlanetsMenuPlugin)?.changePlanet(obj.name as SolarBody);
 
           return;
@@ -335,7 +326,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     if (id === -1 && this.lastSelectedSat_ !== -1) {
       ServiceLocator.getOrbitManager().clearSelectOrbit();
       // Restore the free-camera zoom floor (a selected missile drops it to the surface).
-      settingsManager.minZoomDistance = RADIUS_OF_EARTH + 50 as Kilometers;
+      settingsManager.minZoomDistance = (RADIUS_OF_EARTH + 50) as Kilometers;
     } else if (!(obj instanceof OemSatellite)) {
       // Currently Satellites and Missiles assume Earth center
       const wasOffEarth = settingsManager.centerBody !== SolarBody.Earth;
@@ -427,7 +418,6 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
         this.updatePrimaryCovBubble_(sat);
       }
     }
-
 
     // stop rotation if it is on
     ServiceLocator.getMainCamera().autoRotate(false);
@@ -620,8 +610,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
 
     if (lastSelectedObject !== -1) {
       colorSchemeManagerInstance.currentColorSchemeUpdate ??=
-        colorSchemeManagerInstance.colorSchemeInstances[settingsManager.defaultColorScheme]?.update ??
-        Object.values(colorSchemeManagerInstance.colorSchemeInstances)[0].update;
+        colorSchemeManagerInstance.colorSchemeInstances[settingsManager.defaultColorScheme]?.update ?? Object.values(colorSchemeManagerInstance.colorSchemeInstances)[0].update;
 
       const lastSat = ServiceLocator.getCatalogManager().getObject(lastSelectedObject);
       // Guard against a stale lastSelectedObject id that now exceeds the color buffer
@@ -694,10 +683,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
         // primary/secondary swap suppresses it (isPreventToast): the camera refocus
         // already signals the change and [ / ] can be pressed in quick succession.
         if (!isPreventToast) {
-          ServiceLocator.getUiManager().toast(
-            t7e('SelectSatManager.secondaryObjectSet').replace('{name}', this.secondarySatObj.name),
-            ToastMsgType.normal,
-          );
+          ServiceLocator.getUiManager().toast(t7e('SelectSatManager.secondaryObjectSet').replace('{name}', this.secondarySatObj.name), ToastMsgType.normal);
         }
       }
     }
@@ -743,5 +729,4 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     this.selectSat(_secondary);
     this.setSecondarySat(_primary, true);
   }
-
 }

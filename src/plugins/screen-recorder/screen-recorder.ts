@@ -69,25 +69,22 @@ export class ScreenRecorder extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerOnReady,
-      () => {
-        if (!window.isSecureContext && !settingsManager.offlineMode) {
-          this.isCompatibilityIssue_ = true;
-          this.setBottomIconToDisabled();
+    EventBus.getInstance().on(EventBusEvent.uiManagerOnReady, () => {
+      if (!window.isSecureContext && !settingsManager.offlineMode) {
+        this.isCompatibilityIssue_ = true;
+        this.setBottomIconToDisabled();
 
-          return;
-        }
+        return;
+      }
 
-        try {
-          this.streamManagerInstance_ = new StreamManager(settingsManager.videoBitsPerSecond, this.onStop_.bind(this), this.onMinorError_.bind(this), this.onError_.bind(this));
-        } catch (e) {
-          errorManagerInstance.warn(`Compatibility Error with Recording: ${e}`);
-          this.isCompatibilityIssue_ = true;
-          this.setBottomIconToDisabled();
-        }
-      },
-    );
+      try {
+        this.streamManagerInstance_ = new StreamManager(settingsManager.videoBitsPerSecond, this.onStop_.bind(this), this.onMinorError_.bind(this), this.onError_.bind(this));
+      } catch (e) {
+        errorManagerInstance.warn(`Compatibility Error with Recording: ${e}`);
+        this.isCompatibilityIssue_ = true;
+        this.setBottomIconToDisabled();
+      }
+    });
   }
 
   getRecorderObject(): StreamManager {
@@ -111,4 +108,3 @@ export class ScreenRecorder extends KeepTrackPlugin {
     this.setBottomIconToUnselected();
   }
 }
-

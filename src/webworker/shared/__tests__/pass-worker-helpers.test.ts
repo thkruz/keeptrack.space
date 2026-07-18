@@ -122,7 +122,7 @@ describe('workerGetRae', () => {
     expect(Number.isFinite(result.az as number)).toBe(true);
     expect(Number.isFinite(result.el as number)).toBe(true);
     expect(Number.isFinite(result.rng as number)).toBe(true);
-    expect((result.rng as number)).toBeGreaterThan(0);
+    expect(result.rng as number).toBeGreaterThan(0);
   });
 
   it('returns nulls when propagation fails', () => {

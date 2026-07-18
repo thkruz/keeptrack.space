@@ -55,14 +55,15 @@ describe('Screenshot_class', () => {
   });
 });
 
-const mockCtx = () => ({
-  drawImage: vi.fn(),
-  fillText: vi.fn(),
-  measureText: vi.fn(() => ({ width: 10 })),
-  font: '',
-  globalAlpha: 1,
-  fillStyle: '',
-}) as unknown as CanvasRenderingContext2D;
+const mockCtx = () =>
+  ({
+    drawImage: vi.fn(),
+    fillText: vi.fn(),
+    measureText: vi.fn(() => ({ width: 10 })),
+    font: '',
+    globalAlpha: 1,
+    fillStyle: '',
+  }) as unknown as CanvasRenderingContext2D;
 
 describe('Screenshot behavior', () => {
   let plugin: Screenshot;
@@ -146,7 +147,7 @@ describe('Screenshot behavior', () => {
       return c;
     };
 
-    vi.spyOn(document, 'createElement').mockImplementation(((tag: string) => (tag === 'canvas' ? fakeCanvas() : ({})))as unknown as typeof document.createElement);
+    vi.spyOn(document, 'createElement').mockImplementation(((tag: string) => (tag === 'canvas' ? fakeCanvas() : {})) as unknown as typeof document.createElement);
     KeepTrack.getInstance().containerRoot.appendChild = vi.fn();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ServiceLocator.getRenderer().domElement = { width: 3840, height: 2160 } as any;

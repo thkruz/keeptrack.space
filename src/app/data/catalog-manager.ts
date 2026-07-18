@@ -34,14 +34,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { KeepTrack } from '@app/keeptrack';
-import {
-  BaseObject, Degrees,
-  KilometersPerSecond, Radians,
-  Satellite,
-  SatelliteRecord, Sgp4, SpaceObjectType, Star,
-  TemeVec3,
-  Tle, TleLine1, TleLine2,
-} from '@ootk/src/main';
+import { BaseObject, Degrees, KilometersPerSecond, Radians, Satellite, SatelliteRecord, Sgp4, SpaceObjectType, Star, TemeVec3, Tle, TleLine1, TleLine2 } from '@ootk/src/main';
 import { SatMath } from '../analysis/sat-math';
 import { SatCruncherThreadManager } from '../threads/sat-cruncher-thread-manager';
 import { SplashScreen } from '../ui/splash-screen';
@@ -174,9 +167,7 @@ export class CatalogManager {
   satnums2ids(satnumArray: number[]): number[] {
     // sccNum2Id normalizes numeric input itself (strips leading zeros) so the
     // padStart that used to live here is no longer needed.
-    return satnumArray
-      .map((satnum) => this.sccNum2Id(satnum, false))
-      .filter((id): id is number => id !== null);
+    return satnumArray.map((satnum) => this.sccNum2Id(satnum, false)).filter((id): id is number => id !== null);
   }
 
   /**
@@ -207,7 +198,7 @@ export class CatalogManager {
     // have no leading zeros and pass through unchanged.
     let key = typeof a5Num === 'number' ? a5Num.toString() : a5Num;
 
-    if ((/^0+\d/u).test(key)) {
+    if (/^0+\d/u.test(key)) {
       key = key.replace(/^0+/u, '');
     }
 
@@ -316,7 +307,6 @@ export class CatalogManager {
    */
   starName2Id(starName: string, starIndex1: number, starIndex2: number): number | null {
     const i = this.objectCache.slice(starIndex1, starIndex2).findIndex((object) => object?.type === SpaceObjectType.STAR && object?.name === starName);
-
 
     return i === -1 ? null : i + starIndex1;
   }
@@ -436,7 +426,7 @@ export class CatalogManager {
           lonList: [],
           altList: [],
           timeList: [],
-        } as unknown as MissileParams),
+        } as unknown as MissileParams)
       );
     }
 
@@ -457,7 +447,7 @@ export class CatalogManager {
           intlDes: CatalogManager.TEMPLATE_INTLDES,
           type: SpaceObjectType.PAYLOAD,
           id: i,
-        }),
+        })
       );
     }
 
@@ -483,7 +473,7 @@ export class CatalogManager {
       let i = 0;
 
       for (const sensor in sensors) {
-        if (Object.prototype.hasOwnProperty.call(sensors, sensor)) {
+        if (Object.hasOwn(sensors, sensor)) {
           sensors[sensor].sensorId = i;
           this.staticSet.push(sensors[sensor]);
           i++;
@@ -601,7 +591,6 @@ export class CatalogManager {
     errorManagerInstance.debug(tle2);
     errorManagerInstance.warn('New Analyst Satellite is Invalid!');
 
-
     return null;
   }
 
@@ -695,13 +684,11 @@ export class CatalogManager {
   }
 
   private calculateOrbitalDensity_(satellites: Satellite[], binSize: number = 25): DensityBin[] {
-    const altitudes = satellites.map((satellite) => (
-      {
-        id: satellite.id,
-        sccNum: satellite.sccNum,
-        altitude: this.calculateEffectiveAltitude_(satellite),
-      }
-    ));
+    const altitudes = satellites.map((satellite) => ({
+      id: satellite.id,
+      sccNum: satellite.sccNum,
+      altitude: this.calculateEffectiveAltitude_(satellite),
+    }));
 
     // Sort satellites by altitude
     const sortedSatellites = [...altitudes].sort((a, b) => a.altitude - b.altitude);

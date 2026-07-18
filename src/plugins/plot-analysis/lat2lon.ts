@@ -76,7 +76,6 @@ export class Lat2LonPlots extends KeepTrackPlugin {
     super.addHtml();
   }
 
-
   createPlot(data: Record<string, SatPoint[]>, chartDom: HTMLElement) {
     // Dont Load Anything if the Chart is Closed
     if (!this.isMenuButtonActive) {

@@ -25,13 +25,7 @@ import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite } from '@ootk/src/main';
 import streamPng from '@public/img/icons/stream.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import {
-  BREAKUP_PRESETS,
-  BreakupRawForm,
-  DEFAULT_BREAKUP_PRESET,
-  getBreakupPreset,
-  parseBreakupParams,
-} from './breakup-core';
+import { BREAKUP_PRESETS, BreakupRawForm, DEFAULT_BREAKUP_PRESET, getBreakupPreset, parseBreakupParams } from './breakup-core';
 import { clearBreakupPieces, runBreakup } from './breakup-runner';
 import './breakup.css';
 
@@ -260,11 +254,7 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
           content: t7e('plugins.Breakup.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.Breakup.help.tip1'),
-        t7e('plugins.Breakup.help.tip2'),
-        t7e('plugins.Breakup.help.tip3'),
-      ],
+      tips: [t7e('plugins.Breakup.help.tip1'), t7e('plugins.Breakup.help.tip2'), t7e('plugins.Breakup.help.tip3')],
     };
   }
 
@@ -338,8 +328,7 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const { simulationTimeObj } = timeManager;
 
-    const { satId, breakupCount, radialDeltaV, inTrackDeltaV, crossTrackDeltaV, startNum, startNumWasInvalid } =
-      Breakup.getFormData_(catalogManagerInstance);
+    const { satId, breakupCount, radialDeltaV, inTrackDeltaV, crossTrackDeltaV, startNum, startNumWasInvalid } = Breakup.getFormData_(catalogManagerInstance);
 
     if (startNumWasInvalid) {
       errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.InvalidStartNum'));
@@ -369,7 +358,7 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
       errorManagerInstance.warn(
         t7e('plugins.Breakup.errorMsgs.InvalidSlotRange')
           .replace('{start}', CatalogManager.ANALYST_START_ID.toString())
-          .replace('{end}', (CatalogManager.ANALYST_START_ID + settingsManager.maxAnalystSats - 1).toString()),
+          .replace('{end}', (CatalogManager.ANALYST_START_ID + settingsManager.maxAnalystSats - 1).toString())
       );
 
       return;
@@ -385,7 +374,7 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     if (result.reenteredCount > 0) {
       ServiceLocator.getUiManager().toast(
         t7e('plugins.Breakup.toasts.fragmentsReentered' as Parameters<typeof t7e>[0]).replace('{count}', result.reenteredCount.toString()),
-        ToastMsgType.caution,
+        ToastMsgType.caution
       );
     }
 

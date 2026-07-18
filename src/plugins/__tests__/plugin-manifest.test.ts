@@ -69,7 +69,7 @@ describe('pluginManifest', () => {
         const mod = await d.ossImport!();
 
         return { name: d.ossClassName!, mod };
-      }),
+      })
     );
 
     // Each thunk should resolve; the named export should be a constructor.

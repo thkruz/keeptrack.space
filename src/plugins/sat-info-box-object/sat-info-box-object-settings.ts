@@ -1,7 +1,6 @@
 // Ensure imports are type only to avoid circular dependencies
 import type { PluginConfiguration } from '../keeptrack-plugins-configuration';
 
-
 export interface SatInfoBoxObjectConfiguration extends PluginConfiguration {
   isShowStdMag: boolean;
   isShowAppMag: boolean;

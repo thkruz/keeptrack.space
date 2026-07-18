@@ -3,17 +3,17 @@ import { MenuMode } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { hideAsyncIndicator, showAsyncIndicator } from '@app/engine/utils/asyncIndicator';
 import { openColorbox } from '@app/engine/utils/colorbox';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
-import { hideAsyncIndicator, showAsyncIndicator } from '@app/engine/utils/asyncIndicator';
 import { truncateString } from '@app/engine/utils/truncate-string';
-import calendar2Png from '@public/img/icons/calendar2.png';
-import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { t7e } from '@app/locales/keys';
+import calendar2Png from '@public/img/icons/calendar2.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import './thespacedev-launch-calendar.css';
 
@@ -50,7 +50,6 @@ interface LaunchInfoData {
       wiki_url: string;
     };
   };
-
 }
 
 export interface LaunchInfoObject {
@@ -164,29 +163,26 @@ export class TheSpaceDevLaunchCalendarPlugin extends KeepTrackPlugin {
     EventBus.getInstance().on(EventBusEvent.userLogin, this.onUserLogin_.bind(this));
     EventBus.getInstance().on(EventBusEvent.userLogout, this.onUserLogout_.bind(this));
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        getEl('launch-calendar-fetch-btn', true)?.addEventListener('click', () => {
-          this.fetchLaunchData_();
-        });
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      getEl('launch-calendar-fetch-btn', true)?.addEventListener('click', () => {
+        this.fetchLaunchData_();
+      });
 
-        getEl('launch-calendar-refresh-btn', true)?.addEventListener('click', () => {
-          this.launchList = [];
-          const tbl = getEl('launch-calendar-table') as HTMLTableElement | null;
+      getEl('launch-calendar-refresh-btn', true)?.addEventListener('click', () => {
+        this.launchList = [];
+        const tbl = getEl('launch-calendar-table') as HTMLTableElement | null;
 
-          if (tbl) {
-            tbl.innerHTML = '';
-          }
-          this.fetchLaunchData_();
-        });
+        if (tbl) {
+          tbl.innerHTML = '';
+        }
+        this.fetchLaunchData_();
+      });
 
-        getEl('export-launch-info')!.addEventListener('click', () => {
-          ServiceLocator.getSoundManager()?.play(SoundNames.EXPORT);
-          saveXlsx(this.launchList as unknown as Array<Record<string, unknown>>, 'launchList');
-        });
-      },
-    );
+      getEl('export-launch-info')!.addEventListener('click', () => {
+        ServiceLocator.getSoundManager()?.play(SoundNames.EXPORT);
+        saveXlsx(this.launchList as unknown as Array<Record<string, unknown>>, 'launchList');
+      });
+    });
   }
 
   private fetchLaunchData_(): void {

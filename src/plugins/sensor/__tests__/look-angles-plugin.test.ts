@@ -1,14 +1,14 @@
-import { vi } from 'vitest';
+import { type TearrData, TearrType } from '@app/app/sensors/sensor-math';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { LookAnglesPlugin } from '@app/plugins/sensor/look-angles-plugin';
-import { TearrType, type TearrData } from '@app/app/sensors/sensor-math';
 import { Degrees, Kilometers } from '@ootk/src/main';
 import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardChangeTests, standardClickTests, standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 vi.mock('@app/engine/utils/saveVariable', () => ({
   saveXlsx: vi.fn(),
@@ -68,8 +68,13 @@ describe('LookAnglesPlugin look-angle computation', () => {
 
   it('populateSideMenuTable_ renders a header plus rows for entries', () => {
     const entry = {
-      time: '2022-01-01T00:00:00.000Z', az: 100 as Degrees, el: 10 as Degrees,
-      rng: 500 as Kilometers, objName: 'COD', type: TearrType.RISE, canStationObserve: true,
+      time: '2022-01-01T00:00:00.000Z',
+      az: 100 as Degrees,
+      el: 10 as Degrees,
+      rng: 500 as Kilometers,
+      objName: 'COD',
+      type: TearrType.RISE,
+      canStationObserve: true,
     };
 
     p().populateSideMenuTable_([entry], ServiceLocator.getTimeManager());
@@ -114,7 +119,9 @@ describe('LookAnglesPlugin look-angle computation', () => {
   });
 
   it('downloadIconCb builds and exports the cached look angles', () => {
-    const looks: (TearrData & { type: TearrType })[] = [{ time: '2022-01-01T00:00:00.000Z', az: 100 as Degrees, el: 10 as Degrees, rng: 500 as Kilometers, objName: 'COD', type: TearrType.RISE }];
+    const looks: (TearrData & { type: TearrType })[] = [
+      { time: '2022-01-01T00:00:00.000Z', az: 100 as Degrees, el: 10 as Degrees, rng: 500 as Kilometers, objName: 'COD', type: TearrType.RISE },
+    ];
 
     p().lastlooksArray_ = looks;
     const getSelSpy = vi.spyOn(p().selectSatManager_, 'getSelectedSat').mockReturnValue(defaultSat);

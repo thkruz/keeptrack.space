@@ -6,7 +6,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { normalizeAngle } from '@app/engine/utils/transforms';
 import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { Radians, eci2lla } from '@ootk/src/main';
+import { eci2lla, Radians } from '@ootk/src/main';
 import { InputManager } from '../input-manager';
 import { MouseInput } from './mouse-input';
 
@@ -142,19 +142,31 @@ export class TouchInput {
       // Prevent browser gesture interpretation (scroll, bounce, back-swipe)
       canvasDOM.style.touchAction = 'none';
 
-      canvasDOM.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        this.canvasTouchStart(e);
-      }, { passive: false });
+      canvasDOM.addEventListener(
+        'touchstart',
+        (e) => {
+          e.preventDefault();
+          this.canvasTouchStart(e);
+        },
+        { passive: false }
+      );
 
-      canvasDOM.addEventListener('touchend', (e) => {
-        this.canvasTouchEnd(e, ServiceLocator.getMainCamera());
-      }, { passive: false });
+      canvasDOM.addEventListener(
+        'touchend',
+        (e) => {
+          this.canvasTouchEnd(e, ServiceLocator.getMainCamera());
+        },
+        { passive: false }
+      );
 
-      canvasDOM.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        this.canvasTouchMove(e);
-      }, { passive: false });
+      canvasDOM.addEventListener(
+        'touchmove',
+        (e) => {
+          e.preventDefault();
+          this.canvasTouchMove(e);
+        },
+        { passive: false }
+      );
 
       // Recalculate max pinch size on orientation change or resize
       window.addEventListener('resize', () => {
@@ -246,10 +258,7 @@ export class TouchInput {
       }
     } else if (!this.isPinching) {
       // Single-finger pan
-      if (
-        Math.abs(this.touchStartX - this.touchX) > this.tapMovementThreshold ||
-        Math.abs(this.touchStartY - this.touchY) > this.tapMovementThreshold
-      ) {
+      if (Math.abs(this.touchStartX - this.touchX) > this.tapMovementThreshold || Math.abs(this.touchStartY - this.touchY) > this.tapMovementThreshold) {
         this.isPanning = true;
         this.pan({ x: this.touchX, y: this.touchY });
       }
@@ -377,7 +386,7 @@ export class TouchInput {
       '---\n' +
       `21x21 scan (raw): nearest=${scan.id} offset=(${scan.offsetX},${scan.offsetY}) hits=${scan.hitCount}\n` +
       `21x21 scan (rect): nearest=${scanCorr.id} offset=(${scanCorr.offsetX},${scanCorr.offsetY}) hits=${scanCorr.hitCount}\n${
-      scan.hitCount > 0 ? `raw hits:\n${scan.patchData}\n` : ''
+        scan.hitCount > 0 ? `raw hits:\n${scan.patchData}\n` : ''
       }${scanCorr.hitCount > 0 && scanCorr.patchData !== scan.patchData ? `rect hits:\n${scanCorr.patchData}\n` : ''}`;
 
     // Show visual crosshairs
@@ -434,7 +443,7 @@ export class TouchInput {
         y: inputManager.mouse.dragPosition[1],
         z: inputManager.mouse.dragPosition[2],
       },
-      ServiceLocator.getTimeManager().gmst,
+      ServiceLocator.getTimeManager().gmst
     );
 
     inputManager.openRmbMenu(satId);

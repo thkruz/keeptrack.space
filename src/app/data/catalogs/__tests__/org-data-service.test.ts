@@ -1,6 +1,6 @@
-import { vi } from 'vitest';
 import { orgDataService } from '@app/app/data/catalogs/org-data-service';
 import { settingsManager } from '@app/settings/settings';
+import { vi } from 'vitest';
 
 /*
  * OrgDataService resolves organization codes to display names, falling back to
@@ -34,11 +34,14 @@ describe('OrgDataService (after remote load)', () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue({
       ok: true,
       status: 200,
-      json: () => Promise.resolve({
-        fetchedAt: '2026-01-01', source: 'test', count: 1,
-        ownerCodeMap: { US: 'United States of America' },
-        orgs: { NASA: { code: 'NASA', name: 'NASA', uName: 'NASA' } },
-      }),
+      json: () =>
+        Promise.resolve({
+          fetchedAt: '2026-01-01',
+          source: 'test',
+          count: 1,
+          ownerCodeMap: { US: 'United States of America' },
+          orgs: { NASA: { code: 'NASA', name: 'NASA', uName: 'NASA' } },
+        }),
     } as Response);
 
     orgDataService.init();

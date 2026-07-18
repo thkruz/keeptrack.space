@@ -2,12 +2,7 @@ import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import {
-  IBottomIconConfig,
-  IHelpConfig,
-  IKeyboardShortcut,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, IHelpConfig, IKeyboardShortcut, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
@@ -290,38 +285,39 @@ export class Inc2AltPlots extends KeepTrackPlugin {
     window.addEventListener('resize', this.resizeHandler_);
 
     // Setup Chart - use notMerge to ensure colors reset properly on reopen
-    this.chart.setOption({
-      title: {
-        text: 'Inclination vs Altitude Scatter Plot',
-        textStyle: {
-          fontSize: 16,
-          color: '#fff',
+    this.chart.setOption(
+      {
+        title: {
+          text: 'Inclination vs Altitude Scatter Plot',
+          textStyle: {
+            fontSize: 16,
+            color: '#fff',
+          },
         },
-      },
-      legend: {
-        show: true,
-        textStyle: {
-          color: '#fff',
+        legend: {
+          show: true,
+          textStyle: {
+            color: '#fff',
+          },
         },
-      },
-      tooltip: {
-        formatter: (params) => {
-          const d = params.data as {
-            name: string;
-            value: number[];
-            constellation: string;
-            country: string;
-            raan: number;
-            ecc: number;
-          };
+        tooltip: {
+          formatter: (params) => {
+            const d = params.data as {
+              name: string;
+              value: number[];
+              constellation: string;
+              country: string;
+              raan: number;
+              ecc: number;
+            };
 
-          if (!d?.value) {
-            return '';
-          }
+            if (!d?.value) {
+              return '';
+            }
 
-          const color = params.color;
+            const color = params.color;
 
-          return `
+            return `
             <div style="text-align: left;">
               <div style="display: flex; align-items: center; margin-bottom: 5px;">
                 <div style="width: 10px; height: 10px; background-color: ${color}; border-radius: 50%; margin-right: 5px;"></div>
@@ -336,109 +332,111 @@ export class Inc2AltPlots extends KeepTrackPlugin {
               <div><b>Eccentricity:</b> ${d.ecc?.toFixed(5) ?? 'N/A'}</div>
             </div>
           `;
-        },
-      },
-      xAxis: {
-        name: 'Altitude (km)',
-        type: 'value',
-        position: 'bottom',
-      },
-      yAxis: {
-        name: 'Inclination (°)',
-        type: 'value',
-        position: 'left',
-      },
-      zAxis: {
-        name: 'Period (min)',
-        type: 'value',
-      },
-      dataZoom: [
-        {
-          type: 'slider',
-          show: true,
-          xAxisIndex: [0],
-          start: -180,
-          end: 180,
-        },
-        {
-          type: 'slider',
-          show: true,
-          yAxisIndex: [0],
-          left: '93%',
-          start: 0,
-          end: 65,
-        },
-        {
-          type: 'inside',
-          xAxisIndex: [0],
-          start: -180,
-          end: 180,
-        },
-        {
-          type: 'inside',
-          yAxisIndex: [0],
-          start: 0,
-          end: 65,
-        },
-      ],
-      visualMap: [
-        {
-          left: 'left',
-          top: '10%',
-          dimension: 2,
-          min: 60,
-          max: 250,
-          itemWidth: 30,
-          itemHeight: 500,
-          calculable: true,
-          precision: 0.05,
-          text: ['Period (min)'],
-          textGap: 30,
-          textStyle: {
-            color: '#fff',
           },
-          inRange: {
-            // symbolSize: [10, 70],
+        },
+        xAxis: {
+          name: 'Altitude (km)',
+          type: 'value',
+          position: 'bottom',
+        },
+        yAxis: {
+          name: 'Inclination (°)',
+          type: 'value',
+          position: 'left',
+        },
+        zAxis: {
+          name: 'Period (min)',
+          type: 'value',
+        },
+        dataZoom: [
+          {
+            type: 'slider',
+            show: true,
+            xAxisIndex: [0],
+            start: -180,
+            end: 180,
           },
-          outOfRange: {
-            // symbolSize: [10, 70],
-            opacity: 0,
-            symbol: 'none',
+          {
+            type: 'slider',
+            show: true,
+            yAxisIndex: [0],
+            left: '93%',
+            start: 0,
+            end: 65,
           },
-          controller: {
+          {
+            type: 'inside',
+            xAxisIndex: [0],
+            start: -180,
+            end: 180,
+          },
+          {
+            type: 'inside',
+            yAxisIndex: [0],
+            start: 0,
+            end: 65,
+          },
+        ],
+        visualMap: [
+          {
+            left: 'left',
+            top: '10%',
+            dimension: 2,
+            min: 60,
+            max: 250,
+            itemWidth: 30,
+            itemHeight: 500,
+            calculable: true,
+            precision: 0.05,
+            text: ['Period (min)'],
+            textGap: 30,
+            textStyle: {
+              color: '#fff',
+            },
             inRange: {
-              color: ['#41577c'],
+              // symbolSize: [10, 70],
             },
             outOfRange: {
-              color: ['#999'],
+              // symbolSize: [10, 70],
+              opacity: 0,
+              symbol: 'none',
+            },
+            controller: {
+              inRange: {
+                color: ['#41577c'],
+              },
+              outOfRange: {
+                color: ['#999'],
+              },
             },
           },
-        },
-      ],
-      series: data.map((group) => ({
-        type: 'scatter',
-        name: group.name,
-        data: group.value?.map((item) => ({
-          name: item[3],
-          id: item[4],
-          value: [item[1], item[0], item[2]],
-          raan: item[5],
-          ecc: item[6],
-          country: item[7],
-          constellation: group.name,
-        })),
-        symbolSize: 12,
-        itemStyle: {
-          borderWidth: 1,
-          borderColor: 'rgba(255,255,255,0.8)',
-        },
-        emphasis: {
+        ],
+        series: data.map((group) => ({
+          type: 'scatter',
+          name: group.name,
+          data: group.value?.map((item) => ({
+            name: item[3],
+            id: item[4],
+            value: [item[1], item[0], item[2]],
+            raan: item[5],
+            ecc: item[6],
+            country: item[7],
+            constellation: group.name,
+          })),
+          symbolSize: 12,
           itemStyle: {
-            color: '#fff',
+            borderWidth: 1,
+            borderColor: 'rgba(255,255,255,0.8)',
           },
-        },
-      })),
-    }, true);
+          emphasis: {
+            itemStyle: {
+              color: '#fff',
+            },
+          },
+        })),
+      },
+      true
+    );
   }
 
   getPlotData(): Inc2AltConstellationData[] {
@@ -511,16 +509,7 @@ export class Inc2AltPlots extends KeepTrackPlugin {
       const constellation = detectConstellation(sat.name);
 
       // [inclination, altitude, period, name, id, raan, eccentricity, country]
-      constellations[constellation].push([
-        sat.inclination,
-        alt,
-        sat.period,
-        sat.name,
-        sat.id,
-        sat.rightAscension,
-        sat.eccentricity,
-        sat.country,
-      ]);
+      constellations[constellation].push([sat.inclination, alt, sat.period, sat.name, sat.id, sat.rightAscension, sat.eccentricity, sat.country]);
     });
 
     // Return constellations with satellites, putting "Other" last

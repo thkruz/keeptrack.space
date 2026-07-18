@@ -1,19 +1,18 @@
-import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
-import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl } from '@app/engine/utils/get-el';
-import viewTimelinePng from '@public/img/icons/view_timeline2.png';
-
 import { SatMath } from '@app/app/analysis/sat-math';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { shake } from '@app/engine/utils/shake';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Degrees, Hours, Kilometers, MILLISECONDS_PER_SECOND, Satellite, SatelliteRecord, Seconds } from '@ootk/src/main';
+import viewTimelinePng from '@public/img/icons/view_timeline2.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '../watchlist/watchlist';
@@ -74,10 +73,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
           content: t7e('plugins.SatelliteTimeline.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.SatelliteTimeline.help.tip1'),
-        t7e('plugins.SatelliteTimeline.help.tip2'),
-      ],
+      tips: [t7e('plugins.SatelliteTimeline.help.tip1'), t7e('plugins.SatelliteTimeline.help.tip2')],
     };
   }
 
@@ -161,66 +157,60 @@ export class SatelliteTimeline extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        // v13 marker: the wrappers are generated, not authored
-        getEl('satellite-timeline-menu')?.classList.add('kt-ui-v13');
-        getEl('satellite-timeline-menu-secondary')?.classList.add('kt-ui-v13');
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      // v13 marker: the wrappers are generated, not authored
+      getEl('satellite-timeline-menu')?.classList.add('kt-ui-v13');
+      getEl('satellite-timeline-menu-secondary')?.classList.add('kt-ui-v13');
 
-        this.canvas_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas');
-        this.canvasStatic_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas-static');
-        this.ctx_ = this.canvas_.getContext('2d')!;
-        this.ctxStatic_ = this.canvasStatic_.getContext('2d')!;
+      this.canvas_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas');
+      this.canvasStatic_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas-static');
+      this.ctx_ = this.canvas_.getContext('2d')!;
+      this.ctxStatic_ = this.canvasStatic_.getContext('2d')!;
 
-        getEl('satellite-timeline-setting-total-length')!.addEventListener('change', () => {
-          this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-total-length')).value) as Hours;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
+      getEl('satellite-timeline-setting-total-length')!.addEventListener('change', () => {
+        this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-total-length')).value) as Hours;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
 
-        getEl('satellite-timeline-setting-interval')!.addEventListener('change', () => {
-          this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-interval')).value) as Seconds;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
+      getEl('satellite-timeline-setting-interval')!.addEventListener('change', () => {
+        this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-interval')).value) as Seconds;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
 
-        getEl('satellite-timeline-setting-bad-length')!.addEventListener('change', () => {
-          this.lengthOfBadPass_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-bad-length')).value) as Seconds;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
+      getEl('satellite-timeline-setting-bad-length')!.addEventListener('change', () => {
+        this.lengthOfBadPass_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-bad-length')).value) as Seconds;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
 
-        getEl('satellite-timeline-setting-avg-length')!.addEventListener('change', () => {
-          this.lengthOfAvgPass_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-avg-length')).value) as Seconds;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
-      },
-    );
+      getEl('satellite-timeline-setting-avg-length')!.addEventListener('change', () => {
+        this.lengthOfAvgPass_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-avg-length')).value) as Seconds;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
+    });
   }
 
   addJs(): void {
     super.addJs();
 
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (sat: BaseObject) => {
-        if (!sat && PluginRegistry.getPlugin(WatchlistPlugin)?.watchlistList.length === 0) {
-          this.setBottomIconToDisabled();
-        } else if (this.verifySensorSelected(false)) {
-          this.setBottomIconToEnabled();
-        }
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (sat: BaseObject) => {
+      if (!sat && PluginRegistry.getPlugin(WatchlistPlugin)?.watchlistList.length === 0) {
+        this.setBottomIconToDisabled();
+      } else if (this.verifySensorSelected(false)) {
+        this.setBottomIconToEnabled();
+      }
 
-        if (this.isMenuButtonActive) {
-          if (sat) {
-            this.ctxStatic_.reset();
-            this.updateTimeline();
-            this.canvas_.style.display = 'block';
-          }
+      if (this.isMenuButtonActive) {
+        if (sat) {
+          this.ctxStatic_.reset();
+          this.updateTimeline();
+          this.canvas_.style.display = 'block';
         }
-      },
-    );
+      }
+    });
     EventBus.getInstance().on(EventBusEvent.onWatchlistUpdated, this.onWatchlistUpdated_.bind(this));
     EventBus.getInstance().on(EventBusEvent.resize, this.resizeCanvas_.bind(this));
   }
@@ -258,7 +248,11 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       return satellitePasses;
     }
 
-    const satellites = PluginRegistry.getPlugin(WatchlistPlugin)?.getSatellites().concat(PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1).filter((sat) => sat !== -1) ?? [];
+    const satellites =
+      PluginRegistry.getPlugin(WatchlistPlugin)
+        ?.getSatellites()
+        .concat(PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1)
+        .filter((sat) => sat !== -1) ?? [];
 
     for (const sat of satellites) {
       const satellite = ServiceLocator.getCatalogManager().getSat(sat);
@@ -285,7 +279,6 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       let isEnterView = false;
       let isExitView = false;
       let startTime: Date | null = null;
-
 
       for (let i = 0; i < durationInSeconds; i += this.angleCalculationInterval_) {
         // 5second Looks
@@ -344,7 +337,6 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       rng: <Kilometers>0,
       objName: null,
     };
-
   }
 
   private drawTimeline_(satellitePasses: SatellitePasses[]): void {
@@ -374,7 +366,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     this.ctx_.fillRect(leftOffset, topOffset, width, height - 15);
 
     const yStep = height / (satellitePasses.length + 1);
-    const xScale = (width) / (endTime - startTime);
+    const xScale = width / (endTime - startTime);
 
     // Draw time axis
     this.ctx_.strokeStyle = 'rgb(255, 255, 255)';
@@ -386,7 +378,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
 
     // Draw hour markers
     for (let i = 0; i <= this.lengthOfLookAngles_; i++) {
-      const x = leftOffset + ((i * 60 * 60 * 1000) * xScale);
+      const x = leftOffset + i * 60 * 60 * 1000 * xScale;
 
       this.ctx_.lineWidth = 5; // Increase line width to make it thicker
       this.ctx_.beginPath();
@@ -438,7 +430,6 @@ export class SatelliteTimeline extends KeepTrackPlugin {
         }
 
         this.ctx_.fillRect(x1, y - 10, x2 - x1, 20);
-
 
         const drawEvent = (mouseX: number, mouseY: number): boolean => {
           if (mouseX >= x1 - 10 && mouseX <= x2 + 10 && mouseY >= y - 10 && mouseY <= y + 10) {

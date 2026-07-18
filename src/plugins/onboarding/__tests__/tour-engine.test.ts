@@ -61,10 +61,7 @@ describe('TourEngine', () => {
 
   it('filters out unavailable steps at start', () => {
     const engine = new TourEngine({
-      steps: [
-        coachmark('one', { isAvailable: () => false }),
-        coachmark('two'),
-      ],
+      steps: [coachmark('one', { isAvailable: () => false }), coachmark('two')],
       texts: TEXTS,
       onFinish,
     });
@@ -173,7 +170,10 @@ describe('TourEngine', () => {
           kind: 'card',
           title: 't',
           body: 'b',
-          buttons: [{ id: 'go', label: 'Go' }, { id: 'close', label: 'Close' }],
+          buttons: [
+            { id: 'go', label: 'Go' },
+            { id: 'close', label: 'Close' },
+          ],
           escButtonId: 'close',
         },
       ],
@@ -192,10 +192,7 @@ describe('TourEngine', () => {
     vi.useFakeTimers();
 
     const engine = new TourEngine({
-      steps: [
-        coachmark('one', { advanceOn: { event: EventBusEvent.propRateChanged } }),
-        coachmark('two'),
-      ],
+      steps: [coachmark('one', { advanceOn: { event: EventBusEvent.propRateChanged } }), coachmark('two')],
       texts: TEXTS,
       onFinish,
     });

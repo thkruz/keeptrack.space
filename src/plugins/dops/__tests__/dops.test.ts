@@ -1,11 +1,11 @@
-import { vi } from 'vitest';
 /* eslint-disable dot-notation */
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { DopMath } from '@app/engine/math/dop-math';
-import { DopsPlugin } from '@app/plugins/dops/dops';
 import { getEl } from '@app/engine/utils/get-el';
+import { DopsPlugin } from '@app/plugins/dops/dops';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginRmbTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('DopsPlugin_class', () => {
   beforeEach(() => {

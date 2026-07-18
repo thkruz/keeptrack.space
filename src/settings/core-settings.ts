@@ -428,7 +428,7 @@ export class CoreSettings {
    * Callback function that is called when the settings are loaded.
    */
   // eslint-disable-next-line no-empty-function
-  onLoadCb = () => { };
+  onLoadCb = () => {};
 }
 
 export const defaultCoreSettings = new CoreSettings();

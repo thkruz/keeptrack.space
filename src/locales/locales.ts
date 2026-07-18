@@ -1,15 +1,15 @@
 import i18next, { InitOptions } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import cs from './cs.json';
 import de from './de.json';
 import en from './en.json';
 import es from './es.json';
 import fr from './fr.json';
-import ja from './ja.json';
 import it from './it.json';
+import ja from './ja.json';
 import { Keys, t7e } from './keys';
 import ko from './ko.json';
 import pl from './pl.json';
-import cs from './cs.json';
 import ru from './ru.json';
 import uk from './uk.json';
 import zh from './zh.json';

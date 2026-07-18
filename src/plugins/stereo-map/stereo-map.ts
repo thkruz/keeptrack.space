@@ -42,32 +42,25 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { Classification } from '@app/app/ui/classification';
 import { MenuMode } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { IBottomIconConfig, ICommandPaletteCommand, IHelpConfig, IKeyboardShortcut, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { dateFormat } from '@app/engine/utils/dateFormat';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { t7e } from '@app/locales/keys';
+import { BaseObject, calcGmst, Degrees, eci2lla, Kilometers, LlaVec3, Satellite, TemeVec3 } from '@ootk/src/main';
 import mapPng from '@public/img/icons/map.png';
 import radar1 from '@public/img/radar-1.png';
 import redSquare from '@public/img/red-square.png';
 import satellite2 from '@public/img/satellite-2.png';
 import yellowSquare from '@public/img/yellow-square.png';
-
-import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import { Classification } from '@app/app/ui/classification';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
-import { ServiceLocator } from '@app/engine/core/service-locator';
-import { EventBus } from '@app/engine/events/event-bus';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import {
-  IBottomIconConfig,
-  ICommandPaletteCommand,
-  IHelpConfig,
-  IKeyboardShortcut,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
-import { dateFormat } from '@app/engine/utils/dateFormat';
-import { html } from '@app/engine/utils/development/formatter';
-import { t7e } from '@app/locales/keys';
-import { BaseObject, calcGmst, Degrees, eci2lla, Kilometers, LlaVec3, Satellite, TemeVec3 } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './stereo-map.css';
@@ -201,11 +194,7 @@ export class StereoMap extends KeepTrackPlugin {
           content: t7e('plugins.StereoMap.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.StereoMap.help.tip1'),
-        t7e('plugins.StereoMap.help.tip2'),
-        t7e('plugins.StereoMap.help.tip3'),
-      ],
+      tips: [t7e('plugins.StereoMap.help.tip1'), t7e('plugins.StereoMap.help.tip2'), t7e('plugins.StereoMap.help.tip3')],
       shortcuts: [{ keys: ['M'], description: t7e('plugins.StereoMap.help.shortcutToggle') }],
     };
   }
@@ -254,89 +243,77 @@ export class StereoMap extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        // v13 marker: the wrapper (and the Pro secondary menu) are generated, not authored
-        getEl('map-menu')?.classList.add('kt-ui-v13');
-        getEl('map-menu-secondary', true)?.classList.add('kt-ui-v13');
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      // v13 marker: the wrapper (and the Pro secondary menu) are generated, not authored
+      getEl('map-menu')?.classList.add('kt-ui-v13');
+      getEl('map-menu-secondary', true)?.classList.add('kt-ui-v13');
 
-        // Remove side-menu padding/border that conflicts with full-width canvas
-        const contentDiv = getEl('map-menu-content');
+      // Remove side-menu padding/border that conflicts with full-width canvas
+      const contentDiv = getEl('map-menu-content');
 
-        if (contentDiv) {
-          contentDiv.style.padding = '0';
-          contentDiv.style.borderWidth = '0';
-        }
+      if (contentDiv) {
+        contentDiv.style.padding = '0';
+        contentDiv.style.borderWidth = '0';
+      }
 
-        this.canvas_ = <HTMLCanvasElement>getEl('map-2d');
+      this.canvas_ = <HTMLCanvasElement>getEl('map-2d');
 
-        this.resize2DMap_();
+      this.resize2DMap_();
 
-        window.addEventListener('resize', () => {
-          if (!settingsManager.disableUI) {
-            this.resize2DMap_();
-          }
-        });
-
-        getEl('fullscreen-btn', true)?.addEventListener('click', () => {
+      window.addEventListener('resize', () => {
+        if (!settingsManager.disableUI) {
           this.resize2DMap_();
-        });
+        }
+      });
 
-        getEl('map-menu')?.addEventListener('click', (evt: Event) => {
-          if (!(<HTMLElement>evt.target).classList.contains('map-look')) {
-            return;
-          }
-          this.mapMenuClick_(evt);
-        });
+      getEl('fullscreen-btn', true)?.addEventListener('click', () => {
+        this.resize2DMap_();
+      });
 
-        const settingsForm = getEl('stereo-map-settings-form', true);
+      getEl('map-menu')?.addEventListener('click', (evt: Event) => {
+        if (!(<HTMLElement>evt.target).classList.contains('map-look')) {
+          return;
+        }
+        this.mapMenuClick_(evt);
+      });
 
-        settingsForm?.addEventListener('submit', (e: Event) => {
-          e.preventDefault();
-        });
-        settingsForm?.addEventListener('change', () => {
-          this.applySettings_();
-        });
+      const settingsForm = getEl('stereo-map-settings-form', true);
 
-        getEl('stereo-map-orbit-mult', true)?.addEventListener('input', () => {
-          this.onOrbitInputChanged_();
-        });
-        getEl('stereo-map-minutes', true)?.addEventListener('input', () => {
-          this.onMinutesInputChanged_();
-        });
-      },
-    );
+      settingsForm?.addEventListener('submit', (e: Event) => {
+        e.preventDefault();
+      });
+      settingsForm?.addEventListener('change', () => {
+        this.applySettings_();
+      });
+
+      getEl('stereo-map-orbit-mult', true)?.addEventListener('input', () => {
+        this.onOrbitInputChanged_();
+      });
+      getEl('stereo-map-minutes', true)?.addEventListener('input', () => {
+        this.onMinutesInputChanged_();
+      });
+    });
   }
 
   addJs(): void {
     super.addJs();
-    EventBus.getInstance().on(
-      EventBusEvent.onCruncherMessage,
-      this.onCruncherMessage_.bind(this),
-    );
+    EventBus.getInstance().on(EventBusEvent.onCruncherMessage, this.onCruncherMessage_.bind(this));
 
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (sat: BaseObject) => {
-        if (!this.isMenuButtonActive) {
-          return;
-        }
-        if (sat) {
-          this.syncMinutesFromOrbits_();
-          this.updateMap();
-        }
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (sat: BaseObject) => {
+      if (!this.isMenuButtonActive) {
+        return;
+      }
+      if (sat) {
+        this.syncMinutesFromOrbits_();
+        this.updateMap();
+      }
+    });
 
-    EventBus.getInstance().on(
-      EventBusEvent.setSecondarySat,
-      () => {
-        if (this.isMenuButtonActive) {
-          this.updateMap();
-        }
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.setSecondarySat, () => {
+      if (this.isMenuButtonActive) {
+        this.updateMap();
+      }
+    });
   }
 
   updateMap(): void {
@@ -672,10 +649,7 @@ export class StereoMap extends KeepTrackPlugin {
     if (mapMenuDOM) {
       if (isForceWidescreen || window.innerWidth > window.innerHeight) {
         // If widescreen, leave room for the sat-info-box on the right
-        const availableWidth = Math.max(
-          StereoMap.MIN_MAP_DIMENSION_,
-          window.innerWidth - StereoMap.SAT_INFOBOX_WIDTH_,
-        );
+        const availableWidth = Math.max(StereoMap.MIN_MAP_DIMENSION_, window.innerWidth - StereoMap.SAT_INFOBOX_WIDTH_);
 
         settingsManager.mapWidth = availableWidth;
         settingsManager.mapHeight = settingsManager.mapWidth / 2;
@@ -683,7 +657,7 @@ export class StereoMap extends KeepTrackPlugin {
       } else {
         settingsManager.mapHeight = Math.max(
           StereoMap.MIN_MAP_DIMENSION_,
-          window.innerHeight - 100, // Subtract 100 portrait (mobile)
+          window.innerHeight - 100 // Subtract 100 portrait (mobile)
         );
         settingsManager.mapWidth = settingsManager.mapHeight * 2;
         mapMenuDOM.style.width = `${settingsManager.mapWidth}px`;
@@ -909,7 +883,7 @@ export class StereoMap extends KeepTrackPlugin {
       return;
     }
 
-    orbitInput.value = (this.orbitMultiplier_).toFixed(2);
+    orbitInput.value = this.orbitMultiplier_.toFixed(2);
   }
 
   protected onOrbitInputChanged_(): void {

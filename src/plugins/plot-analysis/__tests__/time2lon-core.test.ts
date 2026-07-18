@@ -1,11 +1,4 @@
-import {
-  buildAllowedTypes,
-  buildSatLine,
-  buildTopCountries,
-  computeOrbits,
-  isSatelliteAllowed,
-  Time2LonFilters,
-} from '@app/plugins/plot-analysis/time2lon-core';
+import { buildAllowedTypes, buildSatLine, buildTopCountries, computeOrbits, isSatelliteAllowed, Time2LonFilters } from '@app/plugins/plot-analysis/time2lon-core';
 import { CatalogSource, PayloadStatus, Satellite, SpaceObjectType } from '@ootk/src/main';
 
 const filters = (over: Partial<Time2LonFilters> = {}): Time2LonFilters => ({
@@ -25,15 +18,16 @@ const filters = (over: Partial<Time2LonFilters> = {}): Time2LonFilters => ({
   ...over,
 });
 
-const sat = (over: Record<string, unknown> = {}): Satellite => ({
-  type: SpaceObjectType.PAYLOAD,
-  status: PayloadStatus.OPERATIONAL,
-  eccentricity: 0.001,
-  period: 1436,
-  inclination: 5,
-  source: CatalogSource.CELESTRAK,
-  ...over,
-} as unknown as Satellite);
+const sat = (over: Record<string, unknown> = {}): Satellite =>
+  ({
+    type: SpaceObjectType.PAYLOAD,
+    status: PayloadStatus.OPERATIONAL,
+    eccentricity: 0.001,
+    period: 1436,
+    inclination: 5,
+    source: CatalogSource.CELESTRAK,
+    ...over,
+  }) as unknown as Satellite;
 
 describe('time2lon-core buildAllowedTypes', () => {
   it('includes PAYLOAD when either payload toggle is on', () => {
@@ -132,11 +126,16 @@ describe('time2lon-core buildSatLine', () => {
   const NOW = 1_000_000;
 
   it('keeps only points inside [0, maxTimeMin] and stamps metadata', () => {
-    const line = buildSatLine(meta, [
-      { lon: 100, time: NOW + 60_000 }, // +1 min, kept
-      { lon: 110, time: NOW - 60_000 }, // -1 min, dropped
-      { lon: 120, time: NOW + 5000 * 60_000 }, // beyond horizon, dropped
-    ], NOW, 1440);
+    const line = buildSatLine(
+      meta,
+      [
+        { lon: 100, time: NOW + 60_000 }, // +1 min, kept
+        { lon: 110, time: NOW - 60_000 }, // -1 min, dropped
+        { lon: 120, time: NOW + 5000 * 60_000 }, // beyond horizon, dropped
+      ],
+      NOW,
+      1440
+    );
 
     expect(line).not.toBeNull();
     expect(line!.points).toHaveLength(1);

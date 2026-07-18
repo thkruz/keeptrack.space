@@ -1,8 +1,8 @@
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
 import { BaseObject, Satellite, Tle } from '@ootk/src/main';
 import { saveAs } from 'file-saver';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 /**
  * Warns when extended (7+ digit / >339999 6-digit) sccNums are in the export
@@ -19,8 +19,8 @@ function warnIfExtendedInTleTextExport_(sats: Satellite[]): void {
   if (extendedCount > 0) {
     errorManagerInstance.warn(
       `${extendedCount} extended (7+ digit) sccNum satellite(s) in this export — ` +
-      'TLE-format cols 3-7 only fit 5 chars, so re-importing this file will ' +
-      'lose the canonical id. Use CSV/OMM export to preserve extended IDs.',
+        'TLE-format cols 3-7 only fit 5 chars, so re-importing this file will ' +
+        'lose the canonical id. Use CSV/OMM export to preserve extended IDs.'
     );
   }
 }
@@ -112,7 +112,6 @@ export class CatalogExporter {
       .filter((obj) => obj.isSatellite() && (obj as Satellite).tle1 && ServiceLocator.getDotsManager().inViewData?.[obj.id] === 1)
       .map((obj) => {
         const sat = obj as Satellite;
-
 
         return {
           satId: sat.sccNum,

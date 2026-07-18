@@ -41,7 +41,7 @@ export function renderProximityOpsTable(
   events: ProximityOpsEvent[],
   eventRowClass: string,
   labels: ProximityOpsTableLabels,
-  sort: { key: RpoSortKey; asc: boolean },
+  sort: { key: RpoSortKey; asc: boolean }
 ): void {
   const columns: ConjunctionColumn<ProximityOpsEvent>[] = [
     { header: labels.target, cell: (e) => e.sat1SccNum, sortKey: 'target' },

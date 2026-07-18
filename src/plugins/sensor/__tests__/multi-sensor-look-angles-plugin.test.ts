@@ -1,15 +1,15 @@
-import { vi } from 'vitest';
+import type { TearrData } from '@app/app/sensors/sensor-math';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { getEl } from '@app/engine/utils/get-el';
+import { saveXlsx } from '@app/engine/utils/saveVariable';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { MultiSensorLookAnglesPlugin } from '@app/plugins/sensor/multi-sensor-look-angles-plugin';
-import { saveXlsx } from '@app/engine/utils/saveVariable';
-import { getEl } from '@app/engine/utils/get-el';
-import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
-import type { TearrData } from '@app/app/sensors/sensor-math';
 import { Degrees, Kilometers } from '@ootk/src/main';
+import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardChangeTests, standardClickTests, standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 vi.mock('@app/engine/utils/saveVariable', () => ({
   saveXlsx: vi.fn(),

@@ -1,10 +1,11 @@
 /* eslint-disable dot-notation */
+
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
-import { ScenarioManagementMenu } from '@app/plugins/scenario-management/scenario-management-menu';
 import { ScenarioManagementPlugin } from '@app/plugins/scenario-management/scenario-management';
+import { ScenarioManagementMenu } from '@app/plugins/scenario-management/scenario-management-menu';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
 
@@ -29,12 +30,14 @@ describe('ScenarioManagementMenu', () => {
     plugin = new ScenarioManagementMenu();
     // Inject the side-menu form directly and drive the handlers - the plugin's own
     // addHtml() reads these inputs via getEl (which throws in node when missing).
-    document.body.insertAdjacentHTML('beforeend',
+    document.body.insertAdjacentHTML(
+      'beforeend',
       `<form id="${PREFIX}-form">` +
-      `<input id="${PREFIX}-name" /><input id="${PREFIX}-description" />` +
-      `<input id="${PREFIX}-start-date" /><input id="${PREFIX}-end-date" />` +
-      `<button id="${PREFIX}-save"></button><button id="${PREFIX}-load"></button>` +
-      '</form>');
+        `<input id="${PREFIX}-name" /><input id="${PREFIX}-description" />` +
+        `<input id="${PREFIX}-start-date" /><input id="${PREFIX}-end-date" />` +
+        `<button id="${PREFIX}-save"></button><button id="${PREFIX}-load"></button>` +
+        '</form>'
+    );
     // Control the core plugin the menu delegates to.
     p().corePlugin_ = {
       defaultScenarioName: 'Default',

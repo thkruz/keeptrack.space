@@ -17,8 +17,8 @@ import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { t7e } from '@app/locales/keys';
-import { externalPluginMeta } from '@app/plugins/plugin-manifest.external.generated';
 import { pluginManifest } from '@app/plugins/plugin-manifest';
+import { externalPluginMeta } from '@app/plugins/plugin-manifest.external.generated';
 import extensionPng from '@public/img/icons/extension.png';
 import './plugin-manager.css';
 
@@ -126,7 +126,10 @@ export class PluginManagerPlugin extends KeepTrackPlugin {
 
   /** "SelectSatManager" -> "Select Sat Manager". */
   private static humanize_(configKey: string): string {
-    return configKey.replace(/(?<=[a-z0-9])(?=[A-Z])/gu, ' ').replace(/Plugin$/u, '').trim();
+    return configKey
+      .replace(/(?<=[a-z0-9])(?=[A-Z])/gu, ' ')
+      .replace(/Plugin$/u, '')
+      .trim();
   }
 
   protected buildSideMenuHtml_(): string {
@@ -278,9 +281,7 @@ export class PluginManagerPlugin extends KeepTrackPlugin {
     const checked = this.isEnabled_(configKey) ? 'checked' : '';
     const badgeClass = meta.compatible ? 'pm-badge-ok' : 'pm-badge-warn';
     const badgeText = meta.compatible ? l('badge.compatible') : l('badge.incompatible');
-    const repoLink = meta.repoUrl
-      ? `<a class="pm-repo-link" href="${meta.repoUrl}" target="_blank" rel="noopener">${l('labels.source')}</a>`
-      : '';
+    const repoLink = meta.repoUrl ? `<a class="pm-repo-link" href="${meta.repoUrl}" target="_blank" rel="noopener">${l('labels.source')}</a>` : '';
 
     return html`
       <div class="pm-row pm-row-external" data-plugin-name="${configKey.toLowerCase()} ${meta.packageName.toLowerCase()}">
@@ -368,7 +369,7 @@ export class PluginManagerPlugin extends KeepTrackPlugin {
     try {
       const base = settingsManager.installDirectory || '/';
       const resp = await fetch(`${base}data/plugins-registry.json`);
-      const data = await resp.json() as { plugins?: RegistryEntry[] };
+      const data = (await resp.json()) as { plugins?: RegistryEntry[] };
       const plugins = data.plugins ?? [];
 
       if (plugins.length === 0) {
@@ -444,7 +445,7 @@ export class PluginManagerPlugin extends KeepTrackPlugin {
         body: JSON.stringify({ repository: repo }),
       });
 
-      return await resp.json() as { ok: boolean; message?: string };
+      return (await resp.json()) as { ok: boolean; message?: string };
     } catch {
       return { ok: false };
     }
@@ -483,7 +484,8 @@ export class PluginManagerPlugin extends KeepTrackPlugin {
 
     const uiManager = ServiceLocator.getUiManager();
 
-    navigator.clipboard.writeText(command)
+    navigator.clipboard
+      .writeText(command)
       .then(() => uiManager.toast(l('toasts.commandCopied'), ToastMsgType.normal))
       .catch(() => uiManager.toast(command, ToastMsgType.caution));
   }
@@ -501,8 +503,7 @@ export class PluginManagerPlugin extends KeepTrackPlugin {
 
     const overrides = PluginManagerPlugin.readOverrides_();
     // external plugins default enabled
-    const defaultEnabled = this.builtinRows_.find((r) => r.configKey === configKey)?.defaultEnabled ??
-      Boolean(externalPluginMeta[configKey]);
+    const defaultEnabled = this.builtinRows_.find((r) => r.configKey === configKey)?.defaultEnabled ?? Boolean(externalPluginMeta[configKey]);
 
     // Store only the diff from the manifest default; drop the key when they match.
     if (enabled === defaultEnabled) {
@@ -553,7 +554,8 @@ export class PluginManagerPlugin extends KeepTrackPlugin {
     const command = `npm run plugin -- add ${url}`;
     const uiManager = ServiceLocator.getUiManager();
 
-    navigator.clipboard.writeText(command)
+    navigator.clipboard
+      .writeText(command)
       .then(() => uiManager.toast(l('toasts.installCopied'), ToastMsgType.normal))
       .catch(() => uiManager.toast(command, ToastMsgType.caution));
   }

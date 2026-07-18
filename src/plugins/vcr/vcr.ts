@@ -45,19 +45,16 @@ export class VcrPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerInit,
-      () => {
-        const navWrapper = getEl(TopMenu.NAV_WRAPPER_ID);
-        const navRight = getEl(TopMenu.TOP_RIGHT_ID);
+    EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
+      const navWrapper = getEl(TopMenu.NAV_WRAPPER_ID);
+      const navRight = getEl(TopMenu.TOP_RIGHT_ID);
 
-        if (navWrapper) {
-          const vcrEl = document.createElement('div');
+      if (navWrapper) {
+        const vcrEl = document.createElement('div');
 
-          vcrEl.id = 'vcr-container';
-          vcrEl.className = 'vcr-container';
-          vcrEl.innerHTML =
-            html`
+        vcrEl.id = 'vcr-container';
+        vcrEl.className = 'vcr-container';
+        vcrEl.innerHTML = html`
               <div id="vcr-rewind-btn" class="vcr-btn top-menu-icons" kt-tooltip="Click to Rewind">
                 <img class="top-menu-icons__blue-img" src="${rewindPng}">
               </div>
@@ -69,23 +66,21 @@ export class VcrPlugin extends KeepTrackPlugin {
               </div>
           `;
 
-          // Insert before nav-top-right so VCR appears on the right side
-          if (navRight) {
-            navRight.before(vcrEl);
-          } else {
-            navWrapper.appendChild(vcrEl);
-          }
+        // Insert before nav-top-right so VCR appears on the right side
+        if (navRight) {
+          navRight.before(vcrEl);
+        } else {
+          navWrapper.appendChild(vcrEl);
         }
-      },
-    );
+      }
+    });
   }
 
   addJs(): void {
     super.addJs();
 
     this.scenario_ = PluginRegistry.getPlugin(ScenarioManagementPlugin)?.scenario ?? null;
-    this.forwardRewindSpeed =
-      (settingsManager.plugins?.[this.id] as { forwardRewindSpeed?: number })?.forwardRewindSpeed ?? VcrPlugin.DEFAULT_FORWARD_REWIND_SPEED_;
+    this.forwardRewindSpeed = (settingsManager.plugins?.[this.id] as { forwardRewindSpeed?: number })?.forwardRewindSpeed ?? VcrPlugin.DEFAULT_FORWARD_REWIND_SPEED_;
 
     EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
       this.rewindBtn_ = document.getElementById('vcr-rewind-btn');

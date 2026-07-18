@@ -10,15 +10,16 @@ import { vi } from 'vitest';
 const GL_WIDTH = 1920;
 const GL_HEIGHT = 1080;
 
-const fakeGl = () => ({
-  drawingBufferWidth: GL_WIDTH,
-  drawingBufferHeight: GL_HEIGHT,
-  viewport: vi.fn(),
-  scissor: vi.fn(),
-  enable: vi.fn(),
-  disable: vi.fn(),
-  SCISSOR_TEST: 0x0c11,
-}) as unknown as WebGL2RenderingContext;
+const fakeGl = () =>
+  ({
+    drawingBufferWidth: GL_WIDTH,
+    drawingBufferHeight: GL_HEIGHT,
+    viewport: vi.fn(),
+    scissor: vi.fn(),
+    enable: vi.fn(),
+    disable: vi.fn(),
+    SCISSOR_TEST: 0x0c11,
+  }) as unknown as WebGL2RenderingContext;
 
 describe('ViewportManager', () => {
   let manager: ViewportManager;

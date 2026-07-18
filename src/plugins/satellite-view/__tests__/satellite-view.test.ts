@@ -1,18 +1,18 @@
+import { UiManager } from '@app/app/ui/ui-manager';
 import { Camera } from '@app/engine/camera/camera';
 import { CameraType } from '@app/engine/camera/camera-type';
 import { Container } from '@app/engine/core/container';
+import { Singletons, ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { getEl } from '@app/engine/utils/get-el';
+import { t7e } from '@app/locales/keys';
 import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { ServiceLocator } from '@app/engine/core/service-locator';
-import { Singletons, ToastMsgType } from '@app/engine/core/interfaces';
-import { UiManager } from '@app/app/ui/ui-manager';
-import { getEl } from '@app/engine/utils/get-el';
 import { mockCameraManager, mockUiManager, setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSuite } from '@test/generic-tests';
-import { t7e } from '@app/locales/keys';
 import { vi } from 'vitest';
 
 describe('SatelliteViewPlugin', () => {

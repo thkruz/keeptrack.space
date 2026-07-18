@@ -97,8 +97,8 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
     const merged: ScenarioData = {
       name: partialScenario.name ?? this.scenario.name,
       description: partialScenario.description ?? this.scenario.description,
-      startTime: 'startTime' in partialScenario ? partialScenario.startTime ?? null : this.scenario.startTime,
-      endTime: 'endTime' in partialScenario ? partialScenario.endTime ?? null : this.scenario.endTime,
+      startTime: 'startTime' in partialScenario ? (partialScenario.startTime ?? null) : this.scenario.startTime,
+      endTime: 'endTime' in partialScenario ? (partialScenario.endTime ?? null) : this.scenario.endTime,
     };
 
     if (!this.validateScenario_(merged)) {
@@ -130,10 +130,7 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
     }
 
     // Must be valid dates or null
-    if (
-      (scenario.startTime && isNaN(scenario.startTime.getTime())) ||
-      (scenario.endTime && isNaN(scenario.endTime.getTime()))
-    ) {
+    if ((scenario.startTime && isNaN(scenario.startTime.getTime())) || (scenario.endTime && isNaN(scenario.endTime.getTime()))) {
       errorManagerInstance.warn('Scenario start time and end time must be valid dates.');
 
       return false;

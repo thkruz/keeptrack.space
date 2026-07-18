@@ -1,6 +1,6 @@
-import { vi } from 'vitest';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 import { GroupType, ObjectGroup } from '@app/app/data/object-group';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { vi } from 'vitest';
 
 /*
  * GroupData[GroupType.SCC_NUM] was widened from number[] to (number | string)[]

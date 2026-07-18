@@ -1,5 +1,5 @@
-import { MeshManager } from '@app/engine/rendering/mesh-manager';
 import { OcclusionProgram } from '@app/engine/rendering/draw-manager/post-processing';
+import { MeshManager } from '@app/engine/rendering/mesh-manager';
 import { mat4 } from 'gl-matrix';
 
 describe('MeshManager', () => {
@@ -20,10 +20,6 @@ describe('MeshManager', () => {
     const pMatrix = mat4.create();
     const camMatrix = mat4.create();
 
-    expect(() => meshManager.drawOcclusion(
-      pMatrix, camMatrix,
-      null as unknown as OcclusionProgram,
-      null as unknown as WebGLBuffer,
-    )).not.toThrow();
+    expect(() => meshManager.drawOcclusion(pMatrix, camMatrix, null as unknown as OcclusionProgram, null as unknown as WebGLBuffer)).not.toThrow();
   });
 });

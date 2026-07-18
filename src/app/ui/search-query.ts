@@ -89,7 +89,7 @@ function matchSatelliteOrMissile(
   searchStringIn: string,
   len: number,
   searchableFields: SearchableFields,
-  addResult_: (result: SearchResult) => void,
+  addResult_: (result: SearchResult) => void
 ): void {
   if (searchableFields.name && sat.name.toUpperCase().includes(searchStringIn)) {
     addResult_({ strIndex: sat.name.toUpperCase().indexOf(searchStringIn), searchType: SearchResultType.OBJECT_NAME, patlen: len, id: sat.id });
@@ -168,12 +168,7 @@ function matchSatelliteOrMissile(
  * name. These types are gated by {@link settingsManager.searchableTypes} and
  * already filtered upstream, so a match here just needs the right result type.
  */
-function matchOtherObject(
-  obj: BaseObject,
-  searchStringIn: string,
-  len: number,
-  addResult_: (result: SearchResult) => void,
-): void {
+function matchOtherObject(obj: BaseObject, searchStringIn: string, len: number, addResult_: (result: SearchResult) => void): void {
   const searchType = otherObjectSearchType(obj);
 
   if (searchType === null) {
@@ -207,11 +202,13 @@ function otherObjectSearchType(obj: BaseObject): SearchResultType | null {
 
 /** True for actual celestial bodies (planets/moons), excluding placeholder Planet slots (UNKNOWN type). */
 function isCelestialBody(obj: BaseObject): boolean {
-  return obj.type === SpaceObjectType.TERRESTRIAL_PLANET ||
+  return (
+    obj.type === SpaceObjectType.TERRESTRIAL_PLANET ||
     obj.type === SpaceObjectType.GAS_GIANT ||
     obj.type === SpaceObjectType.ICE_GIANT ||
     obj.type === SpaceObjectType.DWARF_PLANET ||
-    obj.type === SpaceObjectType.MOON;
+    obj.type === SpaceObjectType.MOON
+  );
 }
 
 /** True when the object's kind is enabled in the searchable-type toggles. */
@@ -256,8 +253,7 @@ export function runNumOnlySearch(searchString: string): { results: SearchResult[
   settingsManager.lastSearch = searchList;
 
   // Initialize search results
-  const satData = (getSearchableObjects(true) as Satellite[])
-    .sort((a, b) => (a.sccNum6 ?? a.sccNum ?? '').localeCompare(b.sccNum6 ?? b.sccNum ?? '', 'en', { numeric: true }));
+  const satData = (getSearchableObjects(true) as Satellite[]).sort((a, b) => (a.sccNum6 ?? a.sccNum ?? '').localeCompare(b.sccNum6 ?? b.sccNum ?? '', 'en', { numeric: true }));
 
   let i = 0;
   let lastFoundI = 0;
@@ -329,53 +325,55 @@ function getSearchableObjects(onlySatellites = false): BaseObject[] {
   const catalogManagerInstance = ServiceLocator.getCatalogManager();
   const dotsManagerInstance = ServiceLocator.getDotsManager();
 
-  return catalogManagerInstance.objectCache.filter((obj) => {
-    // Type allow-list. The numeric path is satellites-only; everything else
-    // respects the per-type toggles (satellites, missiles, stars, sensors,
-    // launch sites, and planets). Markers and unused OEM placeholder slots
-    // (UNKNOWN-type Planet instances) are never matched.
-    if (onlySatellites) {
-      if (!obj.isSatellite() || !settingsManager.searchableTypes.satellite) {
+  return catalogManagerInstance.objectCache
+    .filter((obj) => {
+      // Type allow-list. The numeric path is satellites-only; everything else
+      // respects the per-type toggles (satellites, missiles, stars, sensors,
+      // launch sites, and planets). Markers and unused OEM placeholder slots
+      // (UNKNOWN-type Planet instances) are never matched.
+      if (onlySatellites) {
+        if (!obj.isSatellite() || !settingsManager.searchableTypes.satellite) {
+          return false;
+        }
+      } else if (!isSearchableType(obj)) {
         return false;
       }
-    } else if (!isSearchableType(obj)) {
-      return false;
-    }
 
-    if (!obj.active) {
-      return false;
-    } // Skip inactive objects (decayed missiles, fake analyst sats, etc.)
+      if (!obj.active) {
+        return false;
+      } // Skip inactive objects (decayed missiles, fake analyst sats, etc.)
 
-    // MIRV children ride on top of the bus during ascent and are hidden until the
-    // reentry vehicles separate at apogee; keep them out of results until then. The
-    // missile plugin re-runs this search at separation, so they appear in the menu
-    // in step with their dots (and rewinding past separation removes them again).
-    if (obj instanceof MissileObject && !obj.isVisibleNow()) {
-      return false;
-    }
-
-    if (!obj.name) {
-      return false;
-    } // Everything has a name. If it doesn't then assume it isn't what we are searching for.
-
-    // Skip decayed satellites (position 0,0,0) if setting is disabled. Static
-    // objects (stars, sensors, launch sites, planets) hold fixed positions that
-    // are not in the dots position buffer, so never treat them as decayed.
-    if (!obj.isStatic() && !settingsManager.isShowDecayedInSearch && dotsManagerInstance.positionData) {
-      const pos = dotsManagerInstance.getCurrentPosition(Number(obj.id));
-
-      if (pos?.x === 0 && pos?.y === 0 && pos?.z === 0) {
+      // MIRV children ride on top of the bus during ascent and are hidden until the
+      // reentry vehicles separate at apogee; keep them out of results until then. The
+      // missile plugin re-runs this search at separation, so they appear in the menu
+      // in step with their dots (and rewinding past separation removes them again).
+      if (obj instanceof MissileObject && !obj.isVisibleNow()) {
         return false;
       }
-    }
 
-    return true;
-  }).sort((a, b) => {
-    // Sort by sccNum
-    if ((a as Satellite).sccNum && (b as Satellite).sccNum) {
-      return Number.parseInt((a as Satellite).sccNum) - Number.parseInt((b as Satellite).sccNum);
-    }
+      if (!obj.name) {
+        return false;
+      } // Everything has a name. If it doesn't then assume it isn't what we are searching for.
 
-    return 0;
-  });
+      // Skip decayed satellites (position 0,0,0) if setting is disabled. Static
+      // objects (stars, sensors, launch sites, planets) hold fixed positions that
+      // are not in the dots position buffer, so never treat them as decayed.
+      if (!obj.isStatic() && !settingsManager.isShowDecayedInSearch && dotsManagerInstance.positionData) {
+        const pos = dotsManagerInstance.getCurrentPosition(Number(obj.id));
+
+        if (pos?.x === 0 && pos?.y === 0 && pos?.z === 0) {
+          return false;
+        }
+      }
+
+      return true;
+    })
+    .sort((a, b) => {
+      // Sort by sccNum
+      if ((a as Satellite).sccNum && (b as Satellite).sccNum) {
+        return Number.parseInt((a as Satellite).sccNum) - Number.parseInt((b as Satellite).sccNum);
+      }
+
+      return 0;
+    });
 }

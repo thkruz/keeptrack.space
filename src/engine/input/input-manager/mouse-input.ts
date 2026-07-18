@@ -10,7 +10,7 @@ import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
-import { Kilometers, eci2lla } from '@ootk/src/main';
+import { eci2lla, Kilometers } from '@ootk/src/main';
 import { closeColorbox } from '../../utils/colorbox';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { getEl } from '../../utils/get-el';
@@ -80,8 +80,8 @@ export class MouseInput {
 
       // Create Event Listeners for Right Menu Buttons.
       // Single-action items (no submenu) are clicked directly on their L1 element.
-      ServiceLocator.getInputManager().rmbMenuItems
-        .map(({ elementIdL1, elementIdL2 }) => (elementIdL2 ? getEl(elementIdL2, true) : getEl(elementIdL1, true)))
+      ServiceLocator.getInputManager()
+        .rmbMenuItems.map(({ elementIdL1, elementIdL2 }) => (elementIdL2 ? getEl(elementIdL2, true) : getEl(elementIdL1, true)))
         .concat([toggleTimeDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
         .forEach((el) => {
           el?.addEventListener('click', (e: MouseEvent) => {
@@ -227,9 +227,7 @@ export class MouseInput {
     state.mouseY = y;
 
     // Check for drag movement
-    if (state.isDragging &&
-      (state.screenDragPoint[0] !== state.mouseX ||
-        state.screenDragPoint[1] !== state.mouseY)) {
+    if (state.isDragging && (state.screenDragPoint[0] !== state.mouseX || state.screenDragPoint[1] !== state.mouseY)) {
       this.dragHasMoved = true;
       state.camAngleSnappedOnSat = false;
     }
@@ -327,7 +325,6 @@ export class MouseInput {
         } else {
           selectSatManagerInstance?.selectSat(this.clickedSat);
         }
-
       }
       if (evt.button === 2) {
         // Right Mouse Button Clicked

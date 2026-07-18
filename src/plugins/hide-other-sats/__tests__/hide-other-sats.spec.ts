@@ -14,18 +14,14 @@ test.describe('HideOtherSatellitesPlugin', () => {
     await expect(utilityIcon).toHaveAttribute('data-plugin-id', 'hide-other-sats-bottom-icon');
 
     // Read initial transparent alpha - default is 0.1 (visible)
-    const initialAlpha = await page.evaluate(
-      () => (window as any).settingsManager?.colors?.transparent?.[3],
-    );
+    const initialAlpha = await page.evaluate(() => (window as any).settingsManager?.colors?.transparent?.[3]);
 
     // Click to toggle (hide other sats - sets alpha to 0)
     await utilityIcon.dispatchEvent('click');
 
     // Verify transparent alpha changed
     await expect(async () => {
-      const alpha = await page.evaluate(
-        () => (window as any).settingsManager?.colors?.transparent?.[3],
-      );
+      const alpha = await page.evaluate(() => (window as any).settingsManager?.colors?.transparent?.[3]);
 
       expect(alpha).not.toBe(initialAlpha);
     }).toPass({ timeout: 5_000 });
@@ -38,9 +34,7 @@ test.describe('HideOtherSatellitesPlugin', () => {
 
     // Verify transparent alpha returned to initial
     await expect(async () => {
-      const alpha = await page.evaluate(
-        () => (window as any).settingsManager?.colors?.transparent?.[3],
-      );
+      const alpha = await page.evaluate(() => (window as any).settingsManager?.colors?.transparent?.[3]);
 
       expect(alpha).toBe(initialAlpha);
     }).toPass({ timeout: 5_000 });

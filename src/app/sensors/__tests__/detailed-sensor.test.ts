@@ -1,6 +1,6 @@
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { Degrees, Kilometers, SpaceObjectType } from '@ootk/src/main';
-import { defaultSensor, defaultSat } from '@test/environment/apiMocks';
+import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
 
 /*
  * DetailedSensor's field-of-view geometry is pure (no DOM/ServiceLocator): RAE
@@ -17,12 +17,17 @@ const sensorWith = (over: Partial<DetailedSensor>): DetailedSensor => {
 };
 
 describe('DetailedSensor.isRaeInFov (azimuth-sector FOV)', () => {
-  const simple = () => sensorWith({
-    minAz: 0 as Degrees, maxAz: 180 as Degrees,
-    minEl: 10 as Degrees, maxEl: 80 as Degrees,
-    minRng: 200 as Kilometers, maxRng: 5000 as Kilometers,
-    minAz2: undefined, maxAz2: undefined,
-  });
+  const simple = () =>
+    sensorWith({
+      minAz: 0 as Degrees,
+      maxAz: 180 as Degrees,
+      minEl: 10 as Degrees,
+      maxEl: 80 as Degrees,
+      minRng: 200 as Kilometers,
+      maxRng: 5000 as Kilometers,
+      minAz2: undefined,
+      maxAz2: undefined,
+    });
 
   it('accepts a target inside all bounds', () => {
     expect(simple().isRaeInFov(90 as Degrees, 45 as Degrees, 1000 as Kilometers)).toBe(true);
@@ -39,10 +44,14 @@ describe('DetailedSensor.isRaeInFov (azimuth-sector FOV)', () => {
 
   it('handles azimuth wraparound (minAz > maxAz)', () => {
     const wrap = sensorWith({
-      minAz: 350 as Degrees, maxAz: 10 as Degrees,
-      minEl: 0 as Degrees, maxEl: 90 as Degrees,
-      minRng: 0 as Kilometers, maxRng: 10000 as Kilometers,
-      minAz2: undefined, maxAz2: undefined,
+      minAz: 350 as Degrees,
+      maxAz: 10 as Degrees,
+      minEl: 0 as Degrees,
+      maxEl: 90 as Degrees,
+      minRng: 0 as Kilometers,
+      maxRng: 10000 as Kilometers,
+      minAz2: undefined,
+      maxAz2: undefined,
     });
 
     expect(wrap.isRaeInFov(355 as Degrees, 45 as Degrees, 1000 as Kilometers)).toBe(true);
@@ -51,10 +60,14 @@ describe('DetailedSensor.isRaeInFov (azimuth-sector FOV)', () => {
 
   it('checks the secondary FOV lobe when the primary misses', () => {
     const dual = sensorWith({
-      minAz: 0 as Degrees, maxAz: 10 as Degrees,
-      minEl: 0 as Degrees, maxEl: 90 as Degrees,
-      minRng: 0 as Kilometers, maxRng: 10000 as Kilometers,
-      minAz2: 100 as Degrees, maxAz2: 120 as Degrees,
+      minAz: 0 as Degrees,
+      maxAz: 10 as Degrees,
+      minEl: 0 as Degrees,
+      maxEl: 90 as Degrees,
+      minRng: 0 as Kilometers,
+      maxRng: 10000 as Kilometers,
+      minAz2: 100 as Degrees,
+      maxAz2: 120 as Degrees,
     });
 
     // 110 misses the primary [0,10] but hits the secondary [100,120].
@@ -69,29 +82,30 @@ describe('DetailedSensor.isRaeInFov (explicit boresight-centric fovParams)', () 
    * The legacy az/el box cannot represent this - the east half was never
    * flagged in-FOV before fovParams existed.
    */
-  const fence = () => new DetailedSensor({
-    objName: 'TESTFENCE',
-    lat: 8.723 as Degrees,
-    lon: 167.719 as Degrees,
-    alt: 0.007 as Kilometers,
-    type: SpaceObjectType.PHASED_ARRAY_RADAR,
-    minAz: 268 as Degrees,
-    maxAz: 272 as Degrees,
-    minEl: 10 as Degrees,
-    maxEl: 170 as Degrees,
-    minRng: 50 as Kilometers,
-    maxRng: 3057 as Kilometers,
-    fovParams: {
-      boresightAz: 270 as Degrees,
-      boresightEl: 90 as Degrees,
-      halfAngle: 80 as Degrees,
-      minorHalfAngle: 1 as Degrees,
-      rollAngle: 90 as Degrees,
-      minRange: 50 as Kilometers,
-      maxRange: 3057 as Kilometers,
-      minElevation: 10 as Degrees,
-    },
-  });
+  const fence = () =>
+    new DetailedSensor({
+      objName: 'TESTFENCE',
+      lat: 8.723 as Degrees,
+      lon: 167.719 as Degrees,
+      alt: 0.007 as Kilometers,
+      type: SpaceObjectType.PHASED_ARRAY_RADAR,
+      minAz: 268 as Degrees,
+      maxAz: 272 as Degrees,
+      minEl: 10 as Degrees,
+      maxEl: 170 as Degrees,
+      minRng: 50 as Kilometers,
+      maxRng: 3057 as Kilometers,
+      fovParams: {
+        boresightAz: 270 as Degrees,
+        boresightEl: 90 as Degrees,
+        halfAngle: 80 as Degrees,
+        minorHalfAngle: 1 as Degrees,
+        rollAngle: 90 as Degrees,
+        minRange: 50 as Kilometers,
+        maxRange: 3057 as Kilometers,
+        minElevation: 10 as Degrees,
+      },
+    });
 
   it.each([
     ['west half of the fan', 270, 45],
@@ -126,25 +140,26 @@ describe('DetailedSensor.isRaeInFov (multi-face crossed fences)', () => {
    * 20° elevation (az 210 / az 120) through zenith to the horizon on the
    * opposite side (az 30 / az 300). Boresights tilt 10° past zenith.
    */
-  const crossedFence = () => new DetailedSensor({
-    objName: 'TESTCROSS',
-    lat: 10.6 as Degrees,
-    lon: -85.5 as Degrees,
-    alt: 0 as Kilometers,
-    type: SpaceObjectType.PHASED_ARRAY_RADAR,
-    minRng: 100 as Kilometers,
-    maxRng: 3000 as Kilometers,
-    boresightAz: [30, 300] as Degrees[],
-    boresightEl: [80, 80] as Degrees[],
-    fovParams: {
-      halfAngle: 80 as Degrees,
-      minorHalfAngle: 1 as Degrees,
-      rollAngle: 0 as Degrees,
-      minRange: 100 as Kilometers,
-      maxRange: 3000 as Kilometers,
-      minElevation: 0 as Degrees,
-    },
-  });
+  const crossedFence = () =>
+    new DetailedSensor({
+      objName: 'TESTCROSS',
+      lat: 10.6 as Degrees,
+      lon: -85.5 as Degrees,
+      alt: 0 as Kilometers,
+      type: SpaceObjectType.PHASED_ARRAY_RADAR,
+      minRng: 100 as Kilometers,
+      maxRng: 3000 as Kilometers,
+      boresightAz: [30, 300] as Degrees[],
+      boresightEl: [80, 80] as Degrees[],
+      fovParams: {
+        halfAngle: 80 as Degrees,
+        minorHalfAngle: 1 as Degrees,
+        rollAngle: 0 as Degrees,
+        minRange: 100 as Kilometers,
+        maxRange: 3000 as Kilometers,
+        minElevation: 0 as Degrees,
+      },
+    });
 
   it.each([
     ['face 1 high side (az 210)', 210, 25],

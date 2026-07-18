@@ -1,7 +1,7 @@
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { ModelResolver } from '@app/app/rendering/mesh/model-resolver';
 import { EciArr3, GetSatType } from '@app/engine/core/interfaces';
-import { BaseObject, DEG2RAD, Degrees, Satellite, TemeVec3, Kilometers, PayloadStatus, Radians, SpaceObjectType, Sun, Vec3, Vector3D } from '@ootk/src/main';
+import { BaseObject, DEG2RAD, Degrees, Kilometers, PayloadStatus, Radians, Satellite, SpaceObjectType, Sun, TemeVec3, Vec3, Vector3D } from '@ootk/src/main';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { Layout, Mesh } from 'webgl-obj-loader';
 import { MissileObject } from '../../app/data/catalog-manager/MissileObject';
@@ -122,7 +122,6 @@ export class MeshManager {
       SplashScreen.loadStr(SplashScreen.msg.models);
 
       this.isReady = true;
-
     } catch {
       errorManagerInstance.warn('Meshes failed to load!');
     }
@@ -137,10 +136,9 @@ export class MeshManager {
    * rejection. Because the dispatch happens once, this also logs once.
    */
   private loadMesh_(meshName: string): void {
-    this.meshRegistry_.load(meshName, `${settingsManager.installDirectory}meshes/${meshName}.obj`, this.gl_)
-      .catch(() => {
-        errorManagerInstance.debug(`Failed to load mesh model: ${meshName}`);
-      });
+    this.meshRegistry_.load(meshName, `${settingsManager.installDirectory}meshes/${meshName}.obj`, this.gl_).catch(() => {
+      errorManagerInstance.debug(`Failed to load mesh model: ${meshName}`);
+    });
   }
 
   setCurrentModel(model: MeshModel) {
@@ -177,11 +175,7 @@ export class MeshManager {
     const worldShift = Scene.getInstance().worldShift;
 
     this.mvMatrix_ = mat4.create();
-    mat4.translate(this.mvMatrix_, this.mvMatrix_, [
-      position[0] + worldShift[0],
-      position[1] + worldShift[1],
-      position[2] + worldShift[2],
-    ]);
+    mat4.translate(this.mvMatrix_, this.mvMatrix_, [position[0] + worldShift[0], position[1] + worldShift[1], position[2] + worldShift[2]]);
 
     // Apply manual rotation
     mat4.rotateX(this.mvMatrix_, this.mvMatrix_, settingsManager.meshRotation.x * DEG2RAD);
@@ -229,11 +223,7 @@ export class MeshManager {
     const worldShift = Scene.getInstance().worldShift;
 
     this.mvMatrix_ = mat4.create();
-    mat4.translate(this.mvMatrix_, this.mvMatrix_, [
-      position.x + worldShift[0],
-      position.y + worldShift[1],
-      position.z + worldShift[2],
-    ]);
+    mat4.translate(this.mvMatrix_, this.mvMatrix_, [position.x + worldShift[0], position.y + worldShift[1], position.z + worldShift[2]]);
 
     if (sat.isMissile()) {
       // A missile is not tumbling debris: point the model's nose along its
@@ -250,7 +240,7 @@ export class MeshManager {
       // If unstable then add some tumbling rotation
       const dt = ServiceLocator.getRenderer().dtAdjusted;
 
-      this.currentMeshObject.rotation.z = (this.currentMeshObject.rotation.z + (dt * 10)) % 360 as Degrees;
+      this.currentMeshObject.rotation.z = ((this.currentMeshObject.rotation.z + dt * 10) % 360) as Degrees;
       this.currentMeshObject.rotation.y = (sat as Satellite).inclination;
     }
 
@@ -386,6 +376,5 @@ export class MeshManager {
     this.currentMeshObject.position.x = targetPosition.x;
     this.currentMeshObject.position.y = targetPosition.y;
     this.currentMeshObject.position.z = targetPosition.z;
-
   }
 }

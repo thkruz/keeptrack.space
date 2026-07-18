@@ -92,9 +92,7 @@ export const estimateObjectRadiusKm = (dims: {
   isRocketBody?: boolean;
   isPayload?: boolean;
 }): Kilometers => {
-  const meters = [dims.span, dims.length, dims.diameter]
-    .map((v) => (typeof v === 'string' ? Number.parseFloat(v) : Number.NaN))
-    .filter((v) => Number.isFinite(v) && v > 0);
+  const meters = [dims.span, dims.length, dims.diameter].map((v) => (typeof v === 'string' ? Number.parseFloat(v) : Number.NaN)).filter((v) => Number.isFinite(v) && v > 0);
 
   let radiusM: number;
 
@@ -119,8 +117,7 @@ export const estimateObjectRadiusKm = (dims: {
  * point-like target. This is the zoom-in floor (closest the camera may get), not the initial
  * framing distance - see initialFramingDistanceKm.
  */
-export const targetStandoffDistanceKm = (radiusKm: Kilometers): Kilometers =>
-  Math.max(3 * radiusKm, 0.002) as Kilometers;
+export const targetStandoffDistanceKm = (radiusKm: Kilometers): Kilometers => Math.max(3 * radiusKm, 0.002) as Kilometers;
 
 /**
  * Initial camera framing distance (km) when a satellite is selected: six times the radius so the
@@ -129,8 +126,7 @@ export const targetStandoffDistanceKm = (radiusKm: Kilometers): Kilometers =>
  * objects scale with 6x radius; small objects are lifted off by the floor. Always at least the
  * standoff minimum, so the camDistBuffer clamp never has to raise it.
  */
-export const initialFramingDistanceKm = (radiusKm: Kilometers): Kilometers =>
-  Math.max(6 * radiusKm, 0.03) as Kilometers;
+export const initialFramingDistanceKm = (radiusKm: Kilometers): Kilometers => Math.max(6 * radiusKm, 0.03) as Kilometers;
 
 const isLeapYear_ = (dateIn: Date) => {
   const year = dateIn.getUTCFullYear();
@@ -214,7 +210,7 @@ export const dateFromJday = (year: number, day: number): Date => {
 export const wrapLon = (lon: number): number => {
   const TWO_PI = 2 * Math.PI;
   // JS % can return negative values, so add TWO_PI to ensure positive modulus
-  const result = ((lon + Math.PI) % TWO_PI + TWO_PI) % TWO_PI - Math.PI;
+  const result = ((((lon + Math.PI) % TWO_PI) + TWO_PI) % TWO_PI) - Math.PI;
 
   return result;
 };
@@ -230,18 +226,12 @@ export const wrapLon = (lon: number): number => {
  * @param flatMapCenterX - Camera pan center X (km)
  * @returns The wrapped flat-map X coordinate (km)
  */
-export const eciToFlatMapX = (
-  eciX: number,
-  eciY: number,
-  gmst: number,
-  earthRadius: number,
-  flatMapCenterX: number,
-): number => {
+export const eciToFlatMapX = (eciX: number, eciY: number, gmst: number, earthRadius: number, flatMapCenterX: number): number => {
   const lon = wrapLon(Math.atan2(eciY, eciX) - gmst);
   const mapW = 2 * Math.PI * earthRadius;
   const rawX = lon * earthRadius;
 
-  return flatMapCenterX + (((rawX - flatMapCenterX + mapW * 0.5) % mapW) + mapW) % mapW - mapW * 0.5;
+  return flatMapCenterX + ((((rawX - flatMapCenterX + mapW * 0.5) % mapW) + mapW) % mapW) - mapW * 0.5;
 };
 
 /**
@@ -256,13 +246,7 @@ export const eciToFlatMapX = (
  * @param flatMapCenterX - Camera pan center X (km)
  * @returns true if the fragment should be discarded (antimeridian crossing artifact)
  */
-export const shouldDiscardFlatMapFragment = (
-  interpolatedFlatX: number,
-  interpolatedEci: [number, number],
-  gmst: number,
-  earthRadius: number,
-  flatMapCenterX: number,
-): boolean => {
+export const shouldDiscardFlatMapFragment = (interpolatedFlatX: number, interpolatedEci: [number, number], gmst: number, earthRadius: number, flatMapCenterX: number): boolean => {
   const mapW = 2 * Math.PI * earthRadius;
   const recomputedFlatX = eciToFlatMapX(interpolatedEci[0], interpolatedEci[1], gmst, earthRadius, flatMapCenterX);
 
@@ -278,7 +262,6 @@ export const dateToLocalInIso = (date: Date): string => {
   const offsetMs = -date.getTimezoneOffset() * 60 * 1000;
   const localDate = new Date(date.getTime() + offsetMs);
   const iso = localDate.toISOString().replace('T', ' ');
-
 
   return `${iso.slice(0, 19)} ${iso.slice(25, 31)}`;
 };

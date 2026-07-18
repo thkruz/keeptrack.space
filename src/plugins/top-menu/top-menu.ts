@@ -24,23 +24,21 @@ export class TopMenu extends KeepTrackPlugin {
     classInner?: string;
     tooltip: string;
   }[] = [
-      {
-        id: 'fullscreen-btn',
-        order: 4,
-        class: 'top-menu-icons__blue-img',
-        icon: fullscreenPng,
-        tooltip: t7e('TopMenu.toggleFullscreen'),
-      },
-    ];
+    {
+      id: 'fullscreen-btn',
+      order: 4,
+      class: 'top-menu-icons__blue-img',
+      icon: fullscreenPng,
+      tooltip: t7e('TopMenu.toggleFullscreen'),
+    },
+  ];
 
   addHtml() {
     super.addHtml();
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerInit,
-      () => {
-        getEl('keeptrack-header')?.insertAdjacentHTML(
-          'beforeend',
-          html`
+    EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
+      getEl('keeptrack-header')?.insertAdjacentHTML(
+        'beforeend',
+        html`
             <nav>
               <div id="${TopMenu.NAV_WRAPPER_ID}" class="nav-wrapper" style="display: flex; justify-content: flex-end;">
           <ul id="nav-top-right" class="right">
@@ -60,7 +58,8 @@ export class TopMenu extends KeepTrackPlugin {
                       </div>
                     </a>
                   </li>
-                `)
+                `
+              )
               .join('')}
             <div id="search-holder" class="menu-item search-slide-up">
               <input id="search" type="search" name="search" placeholder="${t7e('TopMenu.searchPlaceholder')}" required />
@@ -68,12 +67,11 @@ export class TopMenu extends KeepTrackPlugin {
           </ul>
               </div>
             </nav>
-          `,
-        );
+          `
+      );
 
-        adviceManagerInstance.init();
-      },
-    );
+      adviceManagerInstance.init();
+    });
   }
 
   addJs() {

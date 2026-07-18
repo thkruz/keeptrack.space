@@ -1,13 +1,13 @@
-import { EventBus } from '@app/engine/events/event-bus';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { KeepTrack } from '@app/keeptrack';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import * as colorbox from '@app/engine/utils/colorbox';
+import { getEl } from '@app/engine/utils/get-el';
+import { KeepTrack } from '@app/keeptrack';
 import { SatellitePhotos } from '@app/plugins/satellite-photos/satellite-photos';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { getEl } from '@app/engine/utils/get-el';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -110,7 +110,9 @@ describe('SatellitePhotos', () => {
       const plugin = new SatellitePhotos();
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      vi.spyOn(plugin as any, 'uiManagerFinal_').mockImplementation(() => { /* Intentional no-op */ });
+      vi.spyOn(plugin as any, 'uiManagerFinal_').mockImplementation(() => {
+        /* Intentional no-op */
+      });
       const onSpy = vi.spyOn(EventBus.getInstance(), 'on');
 
       plugin.addJs();
@@ -134,9 +136,7 @@ describe('SatellitePhotos_test_links', () => {
   const tempSatellitePhotosPlugin = new SatellitePhotos();
 
   websiteInit(tempSatellitePhotosPlugin);
-  const links = Array.from(
-    getEl('sat-photo-menu-content')!.querySelectorAll('.sat-photo-link'),
-  ).map((el) => el.id);
+  const links = Array.from(getEl('sat-photo-menu-content')!.querySelectorAll('.sat-photo-link')).map((el) => el.id);
 
   let satellitePhotosPlugin: SatellitePhotos;
 
@@ -246,12 +246,14 @@ describe('SatellitePhotos behavior', () => {
   });
 
   it('opening the side menu fetches DSCOVR and adds image links that snap the camera', async () => {
-    global.fetch = vi.fn(() => Promise.resolve({
-      ok: true,
-      // eslint-disable-next-line camelcase
-      json: () => Promise.resolve([{ image: 'img', identifier: '20220101', centroid_coordinates: { lat: 0, lon: 0 } }]),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    })) as any;
+    global.fetch = vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        // eslint-disable-next-line camelcase
+        json: () => Promise.resolve([{ image: 'img', identifier: '20220101', centroid_coordinates: { lat: 0, lon: 0 } }]),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      })
+    ) as any;
 
     plugin.onSideMenuOpen();
     await flushAsync();

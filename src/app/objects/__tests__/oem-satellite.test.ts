@@ -1,18 +1,19 @@
-import { ServiceLocator } from '@app/engine/core/service-locator';
 import { OemSatellite, ParsedOem } from '@app/app/objects/oem-satellite';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, SpaceObjectType, Vector3D } from '@ootk/src/main';
 import { defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
 
-const makeStateVector = (epochSec: number): J2000 => new J2000(
-  EpochUTC.fromDateTime(new Date(epochSec * 1000)),
-  new Vector3D(7000 as Kilometers, 0 as Kilometers, 0 as Kilometers),
-  new Vector3D(0 as KilometersPerSecond, 7.5 as KilometersPerSecond, 0 as KilometersPerSecond),
-);
+const makeStateVector = (epochSec: number): J2000 =>
+  new J2000(
+    EpochUTC.fromDateTime(new Date(epochSec * 1000)),
+    new Vector3D(7000 as Kilometers, 0 as Kilometers, 0 as Kilometers),
+    new Vector3D(0 as KilometersPerSecond, 7.5 as KilometersPerSecond, 0 as KilometersPerSecond)
+  );
 
 const makeOem = (commentLines: string[] = []): ParsedOem => {
-  const startSec = Date.UTC(2026, 0, 1) / 1000 as Seconds;
+  const startSec = (Date.UTC(2026, 0, 1) / 1000) as Seconds;
 
   return {
     header: {
@@ -34,10 +35,7 @@ const makeOem = (commentLines: string[] = []): ParsedOem => {
           START_TIME: '2026-01-01T00:00:00',
           STOP_TIME: '2026-01-02T00:00:00',
         },
-        ephemeris: [
-          makeStateVector(startSec),
-          makeStateVector(startSec + 60),
-        ],
+        ephemeris: [makeStateVector(startSec), makeStateVector(startSec + 60)],
       },
     ],
   };
@@ -112,20 +110,24 @@ describe('OemSatellite NORAD_ID extraction from COMMENT lines', () => {
   // alpha-5 format), Tle.classifySatNum returns 'invalid' and the field is
   // skipped rather than corrupting sccNum.
   it('skips a malformed NORAD_ID and continues searching subsequent COMMENT lines', () => {
-    const sat = new OemSatellite(makeOem([
-      'NORAD_ID = 12A45', // invalid by classifySatNum
-      'NORAD_ID = 25544', // good fallback
-    ]));
+    const sat = new OemSatellite(
+      makeOem([
+        'NORAD_ID = 12A45', // invalid by classifySatNum
+        'NORAD_ID = 25544', // good fallback
+      ])
+    );
 
     expect(sat.sccNum).toBe('25544');
     expect(sat.type).toBe(SpaceObjectType.PAYLOAD);
   });
 
   it('takes the first valid NORAD_ID when multiple COMMENT lines have one', () => {
-    const sat = new OemSatellite(makeOem([
-      'NORAD_ID = 25544',
-      'NORAD_ID = 99999', // ignored — first match wins
-    ]));
+    const sat = new OemSatellite(
+      makeOem([
+        'NORAD_ID = 25544',
+        'NORAD_ID = 99999', // ignored — first match wins
+      ])
+    );
 
     expect(sat.sccNum).toBe('25544');
   });
@@ -235,7 +237,7 @@ describe('OemSatellite.toJ2000', () => {
 
 describe('OemSatellite.computeGlobalIndex_', () => {
   const makeMultiBlockOem = (): ParsedOem => {
-    const startSec = Date.UTC(2026, 0, 1) / 1000 as Seconds;
+    const startSec = (Date.UTC(2026, 0, 1) / 1000) as Seconds;
     const base = makeOem();
     const block0 = base.dataBlocks[0]; // 2 ephemeris points
 
@@ -245,11 +247,7 @@ describe('OemSatellite.computeGlobalIndex_', () => {
         block0,
         {
           metadata: { ...block0.metadata, OBJECT_NAME: 'BLOCK 2' },
-          ephemeris: [
-            makeStateVector(startSec + 120),
-            makeStateVector(startSec + 180),
-            makeStateVector(startSec + 240),
-          ],
+          ephemeris: [makeStateVector(startSec + 120), makeStateVector(startSec + 180), makeStateVector(startSec + 240)],
         },
       ],
     };
@@ -332,12 +330,12 @@ describe('OemSatellite.findStateVectorTime_ (binary search over ephemeris)', () 
     return {
       header: base.header,
       dataBlocks: [
-{
-        metadata: base.dataBlocks[0].metadata,
-        // Vectors at +0, +60, +120, +180, +240 seconds.
-        ephemeris: [0, 60, 120, 180, 240].map((dt) => makeStateVector(startSec + dt)),
-      },
-],
+        {
+          metadata: base.dataBlocks[0].metadata,
+          // Vectors at +0, +60, +120, +180, +240 seconds.
+          ephemeris: [0, 60, 120, 180, 240].map((dt) => makeStateVector(startSec + dt)),
+        },
+      ],
     };
   };
 
@@ -451,14 +449,14 @@ describe('OemSatellite ephemeris math', () => {
 
   it('stateVectorIdx and dataBlockIdx setters refresh the orbit cache', () => {
     expect(() => {
- sat.stateVectorIdx = 1;
-}).not.toThrow();
+      sat.stateVectorIdx = 1;
+    }).not.toThrow();
     expect(() => {
- sat.stateVectorIdx = 1;
-}).not.toThrow();
+      sat.stateVectorIdx = 1;
+    }).not.toThrow();
     expect(() => {
- sat.dataBlockIdx = 0;
-}).not.toThrow();
+      sat.dataBlockIdx = 0;
+    }).not.toThrow();
     expect(sat.stateVectorIdx).toBe(1);
     expect(sat.dataBlockIdx).toBe(0);
   });

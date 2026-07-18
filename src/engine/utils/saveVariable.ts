@@ -55,7 +55,6 @@ export const saveVariable = <T>(variable: T, filename?: string): void => {
 export const getCircularReplacer = () => {
   const seen = new WeakSet();
 
-
   return (_key: string, value: object) => {
     if (typeof value === 'object' && value !== null) {
       if (seen.has(value)) {

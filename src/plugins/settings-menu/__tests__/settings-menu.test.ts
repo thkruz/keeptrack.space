@@ -1,10 +1,10 @@
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { getEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { SatLabelMode } from '@app/settings/ui-settings';
-import { getEl } from '@app/engine/utils/get-el';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardChangeTests, standardClickTests, standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';

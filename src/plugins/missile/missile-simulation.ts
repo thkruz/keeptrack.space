@@ -65,7 +65,7 @@ export class MissileSimulation {
       spec.launchLatitude,
       spec.launchLongitude,
       spec.targetLatitude,
-      spec.targetLongitude,
+      spec.targetLongitude
     );
 
     if (ArcLength < 320_000) {
@@ -133,7 +133,7 @@ export class MissileSimulation {
       ArcDistance,
       MassIn,
       ArcLength,
-      GoalDistance,
+      GoalDistance
     );
 
     while (FuelMass / this.fuelDensity_ / FuelVolume > 0.4 && Altitude >= 0) {
@@ -149,7 +149,7 @@ export class MissileSimulation {
         Distance,
         ArcDistance,
         MassIn,
-        AngleCoefficient,
+        AngleCoefficient
       );
 
       FuelMass = out[0];
@@ -160,7 +160,7 @@ export class MissileSimulation {
       dthetadt = out[18];
       NozzleAltitude2 = Altitude;
 
-      AltitudeList.push(Altitude / 1000 as Kilometers);
+      AltitudeList.push((Altitude / 1000) as Kilometers);
       this.pushCoordsAtDistance_(LatList, LongList, EstLatList, EstLongList, EstDistanceList, Distance);
 
       let hListSum = 0;
@@ -184,7 +184,7 @@ export class MissileSimulation {
         Distance,
         ArcDistance,
         MassIn,
-        AngleCoefficient,
+        AngleCoefficient
       );
 
       FuelMass = out[0];
@@ -195,7 +195,7 @@ export class MissileSimulation {
       dthetadt = out[18];
       NozzleAltitude3 = Altitude;
 
-      AltitudeList.push(Altitude / 1000 as Kilometers);
+      AltitudeList.push((Altitude / 1000) as Kilometers);
       this.pushCoordsAtDistance_(LatList, LongList, EstLatList, EstLongList, EstDistanceList, Distance);
 
       let hListSum = 0;
@@ -219,7 +219,7 @@ export class MissileSimulation {
         Distance,
         ArcDistance,
         MassIn,
-        AngleCoefficient,
+        AngleCoefficient
       );
 
       FuelMass = out[0];
@@ -229,7 +229,7 @@ export class MissileSimulation {
       ArcDistance = out[16];
       dthetadt = out[18];
 
-      AltitudeList.push(Altitude / 1000 as Kilometers);
+      AltitudeList.push((Altitude / 1000) as Kilometers);
       this.pushCoordsAtDistance_(LatList, LongList, EstLatList, EstLongList, EstDistanceList, Distance);
 
       let hListSum = 0;
@@ -256,7 +256,7 @@ export class MissileSimulation {
         Distance,
         ArcDistance,
         MassIn,
-        AngleCoefficient,
+        AngleCoefficient
       );
 
       FuelMass = out[0];
@@ -266,7 +266,7 @@ export class MissileSimulation {
       ArcDistance = out[16];
       dthetadt = out[18];
 
-      AltitudeList.push(Altitude / 1000 as Kilometers);
+      AltitudeList.push((Altitude / 1000) as Kilometers);
       this.pushCoordsAtDistance_(LatList, LongList, EstLatList, EstLongList, EstDistanceList, Distance);
     }
 
@@ -348,14 +348,7 @@ export class MissileSimulation {
    * full precision yields the smooth arc (the interceptor/launch trajectories never
    * quantize their coordinates, which is why only this solver looked jagged).
    */
-  private pushCoordsAtDistance_(
-    LatList: Degrees[],
-    LongList: Degrees[],
-    EstLatList: number[],
-    EstLongList: number[],
-    EstDistanceList: number[],
-    Distance: number,
-  ): void {
+  private pushCoordsAtDistance_(LatList: Degrees[], LongList: Degrees[], EstLatList: number[], EstLongList: number[], EstDistanceList: number[], Distance: number): void {
     const distanceKm = Distance / 1000;
 
     for (let i = 0; i < EstDistanceList.length; i++) {
@@ -377,8 +370,8 @@ export class MissileSimulation {
           lonStep += 360;
         }
 
-        LatList.push(lat0 + (lat1 - lat0) * frac as Degrees);
-        LongList.push(lon0 + lonStep * frac as Degrees);
+        LatList.push((lat0 + (lat1 - lat0) * frac) as Degrees);
+        LongList.push((lon0 + lonStep * frac) as Degrees);
         break;
       }
     }
@@ -388,7 +381,7 @@ export class MissileSimulation {
     CurrentLatitude: number,
     CurrentLongitude: number,
     TargetLatitude: number,
-    TargetLongitude: number,
+    TargetLongitude: number
   ): [number[], number[], number, number, number[], number] {
     const r = this.earthRadius_;
     const Phi1 = (CurrentLatitude * Math.PI) / 180;
@@ -481,7 +474,7 @@ export class MissileSimulation {
     Distance: number,
     ArcDistance: number,
     MassIn: number,
-    AngleCoefficient: number,
+    AngleCoefficient: number
   ): number[] {
     let ThrustAngle: number;
 
@@ -489,11 +482,11 @@ export class MissileSimulation {
       ThrustAngle =
         (90 -
           AngleCoefficient *
-          (1.5336118956 +
-            0.00443173537387 * Altitude -
-            9.30373890848 * 10 ** -8 * Altitude ** 2 +
-            8.37838197732 * 10 ** -13 * Altitude ** 3 -
-            2.71228576626 * 10 ** -18 * Altitude ** 4)) *
+            (1.5336118956 +
+              0.00443173537387 * Altitude -
+              9.30373890848 * 10 ** -8 * Altitude ** 2 +
+              8.37838197732 * 10 ** -13 * Altitude ** 3 -
+              2.71228576626 * 10 ** -18 * Altitude ** 4)) *
         0.0174533;
     } else {
       ThrustAngle = 30;
@@ -565,7 +558,7 @@ export class MissileSimulation {
     ArcDistance: number,
     MassIn: number,
     _ArcLength: number,
-    GoalDistance: number,
+    GoalDistance: number
   ): number {
     const DistanceSteps: number[] = [];
     let AngleCoefficient = 0;
@@ -593,8 +586,8 @@ export class MissileSimulation {
           Distance,
           ArcDistance,
           MassIn,
-          AngleCoefficient,
-        ),
+          AngleCoefficient
+        )
       );
     }
 
@@ -636,7 +629,7 @@ export class MissileSimulation {
       Distance,
       ArcDistance,
       MassIn,
-      ACNew,
+      ACNew
     );
     let error = Math.abs((GoalDistance - qRunACNew) / GoalDistance) * 100;
 
@@ -661,9 +654,9 @@ export class MissileSimulation {
               Distance,
               ArcDistance,
               MassIn,
-              ACNew,
+              ACNew
             )) /
-          GoalDistance,
+            GoalDistance
         ) * 100;
       if (
         this.launchSimple_(
@@ -682,7 +675,7 @@ export class MissileSimulation {
           Distance,
           ArcDistance,
           MassIn,
-          ACNew,
+          ACNew
         ) > GoalDistance
       ) {
         AC2 = ACNew;
@@ -711,7 +704,7 @@ export class MissileSimulation {
     Distance: number,
     ArcDistance: number,
     MassIn: number,
-    AngleCoefficient: number,
+    AngleCoefficient: number
   ): number {
     let NozzleAltitude2: number | undefined;
     let NozzleAltitude3: number | undefined;
@@ -772,7 +765,6 @@ export class MissileSimulation {
     const _R = 8.31451;
     const g = 9.81;
 
-
     return Po * Math.exp((-mol * g * Altitude) / (_R * Tsea));
   }
 
@@ -806,7 +798,6 @@ export class MissileSimulation {
       return -894.0 + 10.6 * 120;
     }
 
-
     return -894.0 + 10.6 * 120;
   }
 
@@ -826,7 +817,6 @@ export class MissileSimulation {
     if (M > 3.625) {
       return 0.25;
     }
-
 
     return 0.25;
   }
@@ -851,7 +841,6 @@ export class MissileSimulation {
     }
     const VeSub = ((2 * k) / (k - 1)) * ((Ru * Tc) / Mw) * (1 - Pe / Pc) ** ((k - 1) / k);
     const Ve = Math.sqrt(VeSub);
-
 
     return q * Ve + (Pe - Pa) * Ae;
   }

@@ -1,9 +1,9 @@
-import { vi } from 'vitest';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { CatalogBrowserPlugin } from '@app/plugins/catalog-browser/catalog-browser';
 import { CatalogBrowserData } from '@app/plugins/catalog-browser/catalog-browser-data';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('CatalogBrowserPlugin_class', () => {
   beforeEach(() => {

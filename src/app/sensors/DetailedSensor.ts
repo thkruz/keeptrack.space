@@ -399,7 +399,7 @@ export class DetailedSensor extends GroundStation {
   private calculateBoresightAz_(): Degrees {
     if (this.minAz > this.maxAz) {
       // Wraparound case (e.g., 347° to 227°)
-      const span = (360 - this.minAz) + this.maxAz;
+      const span = 360 - this.minAz + this.maxAz;
 
       return ((this.minAz + span / 2) % 360) as Degrees;
     }
@@ -427,7 +427,7 @@ export class DetailedSensor extends GroundStation {
   private getAzimuthSpan_(): number {
     if (this.minAz > this.maxAz) {
       // Wraparound case
-      return (360 - this.minAz) + this.maxAz;
+      return 360 - this.minAz + this.maxAz;
     }
 
     return this.maxAz - this.minAz;
@@ -493,12 +493,7 @@ export class DetailedSensor extends GroundStation {
    */
   private checkFovBoundsLegacy_(az: Degrees, el: Degrees, rng: Kilometers): boolean {
     // Primary FOV check
-    const inPrimaryFov = this.checkFovBounds_(
-      az, el, rng,
-      this.minAz, this.maxAz,
-      this.minEl, this.maxEl,
-      this.minRng, this.maxRng,
-    );
+    const inPrimaryFov = this.checkFovBounds_(az, el, rng, this.minAz, this.maxAz, this.minEl, this.maxEl, this.minRng, this.maxRng);
 
     if (inPrimaryFov) {
       return true;
@@ -507,10 +502,15 @@ export class DetailedSensor extends GroundStation {
     // Secondary FOV check if defined
     if (this.minAz2 !== undefined && this.maxAz2 !== undefined) {
       return this.checkFovBounds_(
-        az, el, rng,
-        this.minAz2, this.maxAz2,
-        this.minEl2 ?? this.minEl, this.maxEl2 ?? this.maxEl,
-        this.minRng2 ?? this.minRng, this.maxRng2 ?? this.maxRng,
+        az,
+        el,
+        rng,
+        this.minAz2,
+        this.maxAz2,
+        this.minEl2 ?? this.minEl,
+        this.maxEl2 ?? this.maxEl,
+        this.minRng2 ?? this.minRng,
+        this.maxRng2 ?? this.maxRng
       );
     }
 
@@ -523,10 +523,15 @@ export class DetailedSensor extends GroundStation {
    */
   // eslint-disable-next-line max-params -- 9 cohesive frustum bounds (az/el/rng + min/max each); bundling would allocate per call on a hot path
   private checkFovBounds_(
-    az: Degrees, el: Degrees, rng: Kilometers,
-    minAz: Degrees, maxAz: Degrees,
-    minEl: Degrees, maxEl: Degrees,
-    minRng: Kilometers, maxRng: Kilometers,
+    az: Degrees,
+    el: Degrees,
+    rng: Kilometers,
+    minAz: Degrees,
+    maxAz: Degrees,
+    minEl: Degrees,
+    maxEl: Degrees,
+    minRng: Kilometers,
+    maxRng: Kilometers
   ): boolean {
     // Range check
     if (rng < minRng || rng > maxRng) {
@@ -546,7 +551,6 @@ export class DetailedSensor extends GroundStation {
 
     // Normal case
     return az >= minAz && az <= maxAz;
-
   }
 
   /**
@@ -616,7 +620,9 @@ export class DetailedSensor extends GroundStation {
       `  Elevation: ${this.minEl}° - ${this.maxEl}°`,
       `  Range: ${this.minRng} - ${this.maxRng} km`,
       this.system ? `  System: ${this.system}` : '',
-    ].filter(Boolean).join('\n');
+    ]
+      .filter(Boolean)
+      .join('\n');
   }
 }
 

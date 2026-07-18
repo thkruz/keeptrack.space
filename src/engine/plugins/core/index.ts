@@ -19,8 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-// Core plugin interface
-export * from './plugin-interface';
-
 // Plugin capabilities
 export * from './plugin-capabilities';
+// Core plugin interface
+export * from './plugin-interface';

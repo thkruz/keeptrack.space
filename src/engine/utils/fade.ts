@@ -1,4 +1,3 @@
-
 export const fadeIn = (el: HTMLElement, type?: string, duration?: number, callback?: () => void): void => {
   // Avoid errors for now TODO: Throw an error here
   if (!el) {

@@ -11,10 +11,10 @@
  * runs identically on the main thread, in unit tests, and inside a web worker.
  */
 
-import { findTca, goldenSectionMin, type DistanceFn, type TcaResult } from '@app/engine/math/tca-search';
+import { type DistanceFn, findTca, goldenSectionMin, type TcaResult } from '@app/engine/math/tca-search';
 
-export { findTca, goldenSectionMin };
 export type { DistanceFn, TcaResult };
+export { findTca, goldenSectionMin };
 
 /** A refined local minimum of a separation function within the search window. */
 export interface ApproachMinimum {
@@ -34,12 +34,7 @@ export interface ApproachMinimum {
  * pass at the end) are not reported by design. Use this when you want the list of
  * upcoming approaches; use `findTca` when you want only the single closest.
  */
-export const findApproachMinima = (
-  distFn: DistanceFn,
-  windowMs: number,
-  stepMs: number,
-  tolMs = 500,
-): ApproachMinimum[] => {
+export const findApproachMinima = (distFn: DistanceFn, windowMs: number, stepMs: number, tolMs = 500): ApproachMinimum[] => {
   const minima: ApproachMinimum[] = [];
   let previousDistance = Infinity;
   let isDescending = false;

@@ -33,11 +33,7 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import {
-  ISettingSelectControl,
-  ISettingToggleControl,
-  ISettingsContribution,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { ISettingSelectControl, ISettingsContribution, ISettingToggleControl } from '@app/engine/plugins/core/plugin-capabilities';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { t7e } from '@app/locales/keys';
 import { SettingsManager } from '@app/settings/settings';
@@ -96,12 +92,7 @@ interface BoolToggleOpts {
 }
 
 /** Build a boolean toggle bound directly to a `settingsManager` flag. */
-const boolToggle_ = (
-  id: string,
-  settingKey: string,
-  defaultValue: boolean,
-  opts: BoolToggleOpts = {},
-): OwnSettingDescriptor => ({
+const boolToggle_ = (id: string, settingKey: string, defaultValue: boolean, opts: BoolToggleOpts = {}): OwnSettingDescriptor => ({
   control: {
     type: 'toggle',
     id,

@@ -1,11 +1,11 @@
 /* eslint-disable complexity */
 import { DensityBin } from '@app/app/data/catalog-manager';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite, Star } from '@ootk/src/main';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
   spatialDensityLow: rgbaArray;
@@ -42,7 +42,8 @@ export class SpatialDensityColorScheme extends ColorScheme {
   constructor() {
     super(SpatialDensityColorScheme.uniqueColorTheme);
     this.objectTypeFlags = {
-      ...this.objectTypeFlags, ...SpatialDensityColorScheme.uniqueObjectTypeFlags,
+      ...this.objectTypeFlags,
+      ...SpatialDensityColorScheme.uniqueObjectTypeFlags,
     };
   }
 
@@ -55,10 +56,13 @@ export class SpatialDensityColorScheme extends ColorScheme {
     };
   }
 
-  update(obj: BaseObject, params?: {
-    orbitDensity: DensityBin[];
-    orbitDensityMax: number;
-  }): ColorInformation {
+  update(
+    obj: BaseObject,
+    params?: {
+      orbitDensity: DensityBin[];
+      orbitDensityMax: number;
+    }
+  ): ColorInformation {
     /*
      * NOSONAR
      * Hover and Select code might not pass params, so we will handle that here

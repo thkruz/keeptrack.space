@@ -44,9 +44,7 @@ export class PhasedOrbitSatellite extends OemSatellite {
     const validIndices = indices.filter((i) => i >= 0 && i < allStates.length - 1);
 
     if (validIndices.length > 0) {
-      this.lagrangeInterpolator = SegmentedLagrangeInterpolator.fromMultipleBoundaries(
-        allStates, validIndices,
-      );
+      this.lagrangeInterpolator = SegmentedLagrangeInterpolator.fromMultipleBoundaries(allStates, validIndices);
     }
   }
 

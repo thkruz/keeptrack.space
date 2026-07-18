@@ -1,6 +1,6 @@
 /* eslint-disable prefer-const */
 /* eslint-disable complexity */
-import { initMaterialSelects, refreshMaterialSelect, syncMaterialSelect } from '@app/engine/ui/material-select';
+
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
 import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
 import { CameraType } from '@app/engine/camera/camera-type';
@@ -9,24 +9,18 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import {
-  IBottomIconConfig,
-  IDragOptions,
-  IHelpConfig,
-  IKeyboardShortcut,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, IDragOptions, IHelpConfig, IKeyboardShortcut, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { initMaterialSelects, refreshMaterialSelect, syncMaterialSelect } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { getUnique } from '@app/engine/utils/get-unique';
 import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, Degrees, Hours, Kilometers, Minutes, Satellite, eci2rae } from '@ootk/src/main';
+import { BaseObject, Degrees, eci2rae, Hours, Kilometers, Minutes, Satellite } from '@ootk/src/main';
 import findSatPng from '@public/img/icons/database-search.png';
 import './find-sat.css';
 import {
-  LookAngleResolver,
   filterByArgOfPerigee,
   filterByInclination,
   filterByLookAngle,
@@ -35,6 +29,7 @@ import {
   filterByRcs,
   filterByRightAscension,
   filterByTleAge,
+  LookAngleResolver,
 } from './find-sat-filters';
 
 export interface SearchSatParams {
@@ -120,7 +115,6 @@ export class FindSatPlugin extends KeepTrackPlugin {
     };
   }
 
-
   getSideMenuConfig(): ISideMenuConfig {
     return {
       elementName: 'findByLooks-menu',
@@ -160,12 +154,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
           content: t7e('plugins.FindSatPlugin.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.FindSatPlugin.help.tip1'),
-        t7e('plugins.FindSatPlugin.help.tip2'),
-        t7e('plugins.FindSatPlugin.help.tip3'),
-        t7e('plugins.FindSatPlugin.help.tip4'),
-      ],
+      tips: [t7e('plugins.FindSatPlugin.help.tip1'), t7e('plugins.FindSatPlugin.help.tip2'), t7e('plugins.FindSatPlugin.help.tip3'), t7e('plugins.FindSatPlugin.help.tip4')],
       shortcuts: [{ keys: ['Ctrl', 'F'], description: t7e('plugins.FindSatPlugin.help.shortcutToggle') }],
     };
   }
@@ -239,7 +228,9 @@ export class FindSatPlugin extends KeepTrackPlugin {
   protected classificationBody_(): string {
     const l = (key: string) => t7e(`plugins.FindSatPlugin.labels.${key}` as Parameters<typeof t7e>[0]);
 
-    return this.wrapSection_(l('sectionClassification'), html`
+    return this.wrapSection_(
+      l('sectionClassification'),
+      html`
       <div class="kt-field-row">
         <div class="input-field col s12">
           <select id="fbl-type" multiple>
@@ -303,14 +294,17 @@ export class FindSatPlugin extends KeepTrackPlugin {
           <label for="fbl-source">${l('source')}</label>
         </div>
       </div>
-    `);
+    `
+    );
   }
 
   /** Sensor-relative look-angle filters (azimuth, elevation, range). */
   protected lookAnglesBody_(): string {
     const l = (key: string) => t7e(`plugins.FindSatPlugin.labels.${key}` as Parameters<typeof t7e>[0]);
 
-    return this.wrapSection_(l('sectionLookAngles'), html`
+    return this.wrapSection_(
+      l('sectionLookAngles'),
+      html`
       <div class="kt-note">${l('sensorNote')}</div>
       <div class="kt-field-row">
         <div class="input-field col s6">
@@ -342,14 +336,17 @@ export class FindSatPlugin extends KeepTrackPlugin {
           <label for="fbl-range-margin" class="active">${l('rangeMargin')}</label>
         </div>
       </div>
-    `);
+    `
+    );
   }
 
   /** Orbital-element filters (inclination, period, RAAN, argument of perigee). */
   protected orbitalElementsBody_(): string {
     const l = (key: string) => t7e(`plugins.FindSatPlugin.labels.${key}` as Parameters<typeof t7e>[0]);
 
-    return this.wrapSection_(l('sectionOrbital'), html`
+    return this.wrapSection_(
+      l('sectionOrbital'),
+      html`
       <div class="kt-field-row">
         <div class="input-field col s6">
           <input placeholder="XX.X" id="fbl-inc" type="text">
@@ -390,14 +387,17 @@ export class FindSatPlugin extends KeepTrackPlugin {
           <label for="fbl-argPe-margin" class="active">${l('argOfPerigeeMargin')}</label>
         </div>
       </div>
-    `);
+    `
+    );
   }
 
   /** Physical and data-quality filters (TLE age, RCS). */
   protected physicalBody_(): string {
     const l = (key: string) => t7e(`plugins.FindSatPlugin.labels.${key}` as Parameters<typeof t7e>[0]);
 
-    return this.wrapSection_(l('sectionPhysical'), html`
+    return this.wrapSection_(
+      l('sectionPhysical'),
+      html`
       <div class="kt-field-row">
         <div class="input-field col s6">
           <input placeholder="XX.X" id="fbl-tleAge" type="text">
@@ -418,7 +418,8 @@ export class FindSatPlugin extends KeepTrackPlugin {
           <label for="fbl-rcs-margin" class="active">${l('rcsMargin')}</label>
         </div>
       </div>
-    `);
+    `
+    );
   }
 
   // =========================================================================
@@ -453,7 +454,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
     getUnique(satData.filter((obj: BaseObject) => (obj as Satellite)?.bus).map((obj) => (obj as Satellite).bus))
       // Sort using lower case
-      .sort((a, b) => (a).toLowerCase().localeCompare((b).toLowerCase()))
+      .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
       .forEach((bus) => {
         getEl('fbl-bus')!.insertAdjacentHTML('beforeend', `<option value="${bus}">${bus}</option>`);
       });
@@ -468,14 +469,14 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
     getUnique(satData.filter((obj: BaseObject) => (obj as Satellite)?.shape).map((obj) => (obj as Satellite).shape))
       // Sort using lower case
-      .sort((a, b) => (a).toLowerCase().localeCompare((b).toLowerCase()))
+      .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
       .forEach((shape) => {
         getEl('fbl-shape')!.insertAdjacentHTML('beforeend', `<option value="${shape}">${shape}</option>`);
       });
 
     getUnique(satData.filter((obj: BaseObject) => (obj as Satellite)?.source).map((obj) => (obj as Satellite).source))
       // Sort using lower case
-      .sort((a, b) => (a).toLowerCase().localeCompare((b).toLowerCase()))
+      .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
       .forEach((source) => {
         getEl('fbl-source')!.insertAdjacentHTML('beforeend', `<option value="${source}">${source}</option>`);
       });
@@ -485,12 +486,12 @@ export class FindSatPlugin extends KeepTrackPlugin {
         (obj as Satellite).payload
           .split(' ')[0]
           .split('-')[0]
-          .replace(/[^a-zA-Z]/gu, ''),
+          .replace(/[^a-zA-Z]/gu, '')
       )
       .filter((obj) => obj.length >= 3);
 
     getUnique(payloadPartials)
-      .sort((a, b) => (a).toLowerCase().localeCompare((b).toLowerCase()))
+      .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
       .forEach((payload) => {
         if (payload === '') {
           return;
@@ -610,7 +611,9 @@ export class FindSatPlugin extends KeepTrackPlugin {
     const periodMarg = parseFloat((<HTMLInputElement>getEl('fbl-period-margin')).value);
     const tleAgeMarg = parseFloat((<HTMLInputElement>getEl('fbl-tleAge-margin')).value);
     const rcsMarg = parseFloat((<HTMLInputElement>getEl('fbl-rcs-margin')).value);
-    const typeValues = FindSatPlugin.readMultiSelect_('fbl-type').map(Number).filter((n) => !isNaN(n));
+    const typeValues = FindSatPlugin.readMultiSelect_('fbl-type')
+      .map(Number)
+      .filter((n) => !isNaN(n));
     const objType = typeValues.length === 0 || typeValues.includes(0) ? 0 : typeValues;
     const raan = parseFloat((<HTMLInputElement>getEl('fbl-raan')).value);
     const raanMarg = parseFloat((<HTMLInputElement>getEl('fbl-raan-margin')).value);
@@ -720,17 +723,13 @@ export class FindSatPlugin extends KeepTrackPlugin {
     if (message === 'No Search Criteria Entered') {
       uiManagerInstance.toast(t7e('plugins.FindSatPlugin.errorMsgs.NoSearchCriteriaEntered'), ToastMsgType.critical);
     } else {
-      uiManagerInstance.toast(
-        t7e('plugins.FindSatPlugin.errorMsgs.SearchFailed' as Parameters<typeof t7e>[0]).replace('{error}', message),
-        ToastMsgType.critical,
-      );
+      uiManagerInstance.toast(t7e('plugins.FindSatPlugin.errorMsgs.SearchFailed' as Parameters<typeof t7e>[0]).replace('{error}', message), ToastMsgType.critical);
       errorManagerInstance.debug(`FindSatPlugin search failed: ${message}`);
     }
   }
 
   protected static checkInview_(posAll: Satellite[]) {
     const dotsManagerInstance = ServiceLocator.getDotsManager();
-
 
     return posAll.filter((pos) => dotsManagerInstance.inViewData[pos.id] === 1);
   }
@@ -944,9 +943,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
     let res = ServiceLocator.getCatalogManager().getSats();
 
-    res = !flags.isValidInc && !flags.isValidPeriod && !flags.isValidTleAge && (flags.isValidAz || flags.isValidEl || flags.isValidRange)
-      ? FindSatPlugin.checkInview_(res)
-      : res;
+    res = !flags.isValidInc && !flags.isValidPeriod && !flags.isValidTleAge && (flags.isValidAz || flags.isValidEl || flags.isValidRange) ? FindSatPlugin.checkInview_(res) : res;
 
     const objTypes = (Array.isArray(searchParams.objType) ? searchParams.objType : [searchParams.objType]).filter((type) => type !== 0);
 

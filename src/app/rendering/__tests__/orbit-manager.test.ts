@@ -1,7 +1,8 @@
 /* eslint-disable dot-notation */
 /* eslint-disable max-lines-per-function */
-import { ServiceLocator } from '@app/engine/core/service-locator';
+
 import { OrbitManager } from '@app/app/rendering/orbit-manager';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -348,13 +349,7 @@ describe('OrbitManager', () => {
       settingsManager.enableConstantSelectedSatRedraw = false;
       const useProgram = vi.spyOn(gl, 'useProgram');
 
-      om.draw(
-        [] as never,
-        null,
-        { getHoverId: () => -1 } as never,
-        { colorData: new Float32Array(40) } as never,
-        { cameraType: 0 } as never,
-      );
+      om.draw([] as never, null, { getHoverId: () => -1 } as never, { colorData: new Float32Array(40) } as never, { cameraType: 0 } as never);
 
       expect(useProgram).toHaveBeenCalledWith(lineMgr.program);
       expect(lineMgr.setWorldUniforms).toHaveBeenCalled();

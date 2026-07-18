@@ -1,16 +1,15 @@
-
 import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { GetSatType, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { IContextMenuCapable, IContextMenuConfig, RmbMenuContext } from '@app/engine/plugins/core/plugin-capabilities';
 import { openColorbox } from '@app/engine/utils/colorbox';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { hideEl, showEl } from '@app/engine/utils/get-el';
-import { IContextMenuCapable, IContextMenuConfig, RmbMenuContext } from '@app/engine/plugins/core/plugin-capabilities';
 import { t7e } from '@app/locales/keys';
-import { Satellite, eci2lla } from '@ootk/src/main';
-import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { eci2lla, Satellite } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SensorInfoPlugin } from '../sensor/sensor-info-plugin';
@@ -45,10 +44,7 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin implements IContextMenuCa
 
   /** At least one submenu row applies to this click. */
   private static hasAnyInfo_(ctx: RmbMenuContext): boolean {
-    return ctx.surface === 'earth' ||
-      ctx.target instanceof Satellite ||
-      ctx.target instanceof DetailedSensor ||
-      ctx.target instanceof LaunchSite;
+    return ctx.surface === 'earth' || ctx.target instanceof Satellite || ctx.target instanceof DetailedSensor || ctx.target instanceof LaunchSite;
   }
 
   onContextMenuOpen(ctx: RmbMenuContext): void {

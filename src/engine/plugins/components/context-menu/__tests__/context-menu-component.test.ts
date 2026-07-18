@@ -1,13 +1,14 @@
 import { vi } from 'vitest';
+
 /**
  * @jest-environment jsdom
  */
 
-import { ContextMenuComponent, ContextMenuCallbacks } from '@app/engine/plugins/components/context-menu/context-menu-component';
-import { IContextMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { ServiceLocator } from '@app/engine/core/service-locator';
+import { ContextMenuCallbacks, ContextMenuComponent } from '@app/engine/plugins/components/context-menu/context-menu-component';
+import { IContextMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 
 // Mock ServiceLocator
 vi.mock('@app/engine/core/service-locator', () => ({
@@ -70,12 +71,16 @@ describe('ContextMenuComponent', () => {
 
     it('should apply custom visibility options', () => {
       const callbacks = createCallbacks();
-      const component = new ContextMenuComponent('test-plugin', createConfig({
-        isVisibleOnEarth: true,
-        isVisibleOffEarth: true,
-        isVisibleOnSatellite: true,
-        order: 50,
-      }), callbacks);
+      const component = new ContextMenuComponent(
+        'test-plugin',
+        createConfig({
+          isVisibleOnEarth: true,
+          isVisibleOffEarth: true,
+          isVisibleOnSatellite: true,
+          order: 50,
+        }),
+        callbacks
+      );
 
       const menuInfo = component.getMenuItemInfo();
 
@@ -130,9 +135,13 @@ describe('ContextMenuComponent', () => {
 
       (ServiceLocator.getInputManager as vi.Mock).mockReturnValue(mockInputManager);
 
-      const component = new ContextMenuComponent('test-plugin', createConfig({
-        isVisibleOnSatellite: true,
-      }), callbacks);
+      const component = new ContextMenuComponent(
+        'test-plugin',
+        createConfig({
+          isVisibleOnSatellite: true,
+        }),
+        callbacks
+      );
 
       component.init();
 
@@ -188,12 +197,16 @@ describe('ContextMenuComponent', () => {
   describe('getMenuItemInfo', () => {
     it('should return correct menu item info', () => {
       const callbacks = createCallbacks();
-      const component = new ContextMenuComponent('test-plugin', createConfig({
-        order: 75,
-        isVisibleOnEarth: true,
-        isVisibleOffEarth: false,
-        isVisibleOnSatellite: true,
-      }), callbacks);
+      const component = new ContextMenuComponent(
+        'test-plugin',
+        createConfig({
+          order: 75,
+          isVisibleOnEarth: true,
+          isVisibleOffEarth: false,
+          isVisibleOnSatellite: true,
+        }),
+        callbacks
+      );
 
       const info = component.getMenuItemInfo();
 
@@ -257,11 +270,15 @@ describe('ContextMenuComponent', () => {
   describe('level 1 HTML processing', () => {
     it('should trim empty text nodes from HTML', () => {
       const callbacks = createCallbacks();
-      const component = new ContextMenuComponent('test-plugin', createConfig({
-        level1Html: `
+      const component = new ContextMenuComponent(
+        'test-plugin',
+        createConfig({
+          level1Html: `
           <li id="test-rmb-l1" class="rmb-item">Test Action</li>
         `,
-      }), callbacks);
+        }),
+        callbacks
+      );
 
       component.init();
       eventBus.emit(EventBusEvent.rightBtnMenuAdd);

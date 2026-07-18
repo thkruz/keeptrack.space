@@ -42,10 +42,7 @@ export abstract class TopMenuPlugin extends KeepTrackPlugin {
 
   addHtml() {
     super.addHtml();
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      this.uiManagerFinal_.bind(this),
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   protected onClick_(): void {

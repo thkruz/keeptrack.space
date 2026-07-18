@@ -18,8 +18,14 @@
  */
 
 import type {
-  AtmosphereSettings, EarthBumpTextureQuality, EarthCloudTextureQuality, EarthDayTextureQuality, EarthNightTextureQuality,
-  EarthPoliticalTextureQuality, EarthSpecTextureQuality, EarthTextureStyle,
+  AtmosphereSettings,
+  EarthBumpTextureQuality,
+  EarthCloudTextureQuality,
+  EarthDayTextureQuality,
+  EarthNightTextureQuality,
+  EarthPoliticalTextureQuality,
+  EarthSpecTextureQuality,
+  EarthTextureStyle,
 } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import type { MilkyWayTextureQuality } from '@app/engine/rendering/draw-manager/skybox-sphere';
 import type { SunTextureQuality } from '@app/engine/rendering/draw-manager/sun';

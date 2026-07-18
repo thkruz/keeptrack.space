@@ -1,9 +1,9 @@
-import { expect, test } from '@test/e2e/coverage';
-import { expectCleanBoot, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
-import { Sgp4, Sgp4OpsMode } from '@ootk/src/main';
-import { Sgp4GravConstants } from '@ootk/src/sgp4/sgp4';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { Sgp4, Sgp4OpsMode } from '@ootk/src/main';
+import { Sgp4GravConstants } from '@ootk/src/sgp4/sgp4';
+import { expect, test } from '@test/e2e/coverage';
+import { expectCleanBoot, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 /*
  * End-to-end proof that the license-restricted USSF Astro Standards SGP4
@@ -12,8 +12,9 @@ import { join } from 'node:path';
  * so this spec skips when they were not deployed into dist/.
  */
 
-const ARTIFACTS_DEPLOYED = ['Sgp4Prop.js', 'Sgp4Prop.wasm', 'Sgp4Prop.xp.js', 'Sgp4Prop.xp.wasm']
-  .every((file) => existsSync(join(process.cwd(), 'dist', 'wasm', 'sgp4prop', file)));
+const ARTIFACTS_DEPLOYED = ['Sgp4Prop.js', 'Sgp4Prop.wasm', 'Sgp4Prop.xp.js', 'Sgp4Prop.xp.wasm'].every((file) =>
+  existsSync(join(process.cwd(), 'dist', 'wasm', 'sgp4prop', file))
+);
 
 /** ISS TLE (epoch: 2024-001 12:00:00 UTC). */
 const ISS_LINE1 = '1 25544U 98067A   24001.50000000  .00016717  00000-0  10270-3 0  9002';
@@ -26,24 +27,27 @@ test.describe('Sgp4Wasm in-app', () => {
   test('loads the wasm propagator and matches the pure-TS Sgp4 class', async ({ page }) => {
     await waitForAppReady(page);
 
-    const wasmResult = await page.evaluate(async ({ line1, line2, tsince }) => {
-      const api = (window as any).keepTrack.api;
-      const sgp4Wasm = await api.loadSgp4Wasm();
+    const wasmResult = await page.evaluate(
+      async ({ line1, line2, tsince }) => {
+        const api = (window as any).keepTrack.api;
+        const sgp4Wasm = await api.loadSgp4Wasm();
 
-      const satKey = sgp4Wasm.addSat(line1, line2);
+        const satKey = sgp4Wasm.addSat(line1, line2);
 
-      sgp4Wasm.initSats([satKey]);
+        sgp4Wasm.initSats([satKey]);
 
-      const state = sgp4Wasm.propagateOne(satKey, tsince);
+        const state = sgp4Wasm.propagateOne(satKey, tsince);
 
-      // satKeys are BigInt and cannot cross the evaluate boundary; return plain numbers
-      return {
-        err: state.err,
-        pos: [state.position.x, state.position.y, state.position.z],
-        vel: [state.velocity.x, state.velocity.y, state.velocity.z],
-        height: state.llh.height,
-      };
-    }, { line1: ISS_LINE1, line2: ISS_LINE2, tsince: TSINCE_MIN });
+        // satKeys are BigInt and cannot cross the evaluate boundary; return plain numbers
+        return {
+          err: state.err,
+          pos: [state.position.x, state.position.y, state.position.z],
+          vel: [state.velocity.x, state.velocity.y, state.velocity.z],
+          height: state.llh.height,
+        };
+      },
+      { line1: ISS_LINE1, line2: ISS_LINE2, tsince: TSINCE_MIN }
+    );
 
     expect(wasmResult.err).toBe(0);
     expect(wasmResult.height).toBeGreaterThan(100);
@@ -73,9 +77,7 @@ test.describe('Sgp4Wasm in-app', () => {
     await waitForAppReady(page, { settings: { propagatorBackend: 'sgp4-wasm', noCatalogOnLoad: false } });
 
     // Activation is fire-and-forget at boot; poll until the backend lands
-    await expect
-      .poll(() => page.evaluate(() => (window as any).keepTrack.api.isWasmPropagatorActive()), { timeout: 20_000 })
-      .toBe(true);
+    await expect.poll(() => page.evaluate(() => (window as any).keepTrack.api.isWasmPropagatorActive()), { timeout: 20_000 }).toBe(true);
 
     const probe = await page.evaluate(() => {
       const now = new Date();
@@ -139,28 +141,31 @@ test.describe('Sgp4Wasm in-app', () => {
   test('loads the SGP4-XP variant alongside the classic build', async ({ page }) => {
     await waitForAppReady(page);
 
-    const result = await page.evaluate(async ({ line1, line2, tsince }) => {
-      const api = (window as any).keepTrack.api;
-      const [classic, xp] = await Promise.all([api.loadSgp4Wasm(), api.loadSgp4XpWasm()]);
+    const result = await page.evaluate(
+      async ({ line1, line2, tsince }) => {
+        const api = (window as any).keepTrack.api;
+        const [classic, xp] = await Promise.all([api.loadSgp4Wasm(), api.loadSgp4XpWasm()]);
 
-      const classicKey = classic.addSat(line1, line2);
+        const classicKey = classic.addSat(line1, line2);
 
-      classic.initSats([classicKey]);
-      const classicState = classic.propagateOne(classicKey, tsince);
+        classic.initSats([classicKey]);
+        const classicState = classic.propagateOne(classicKey, tsince);
 
-      const xpKey = xp.addSat(line1, line2);
+        const xpKey = xp.addSat(line1, line2);
 
-      xp.initSats([xpKey]);
-      const xpState = xp.propagateOne(xpKey, tsince);
+        xp.initSats([xpKey]);
+        const xpState = xp.propagateOne(xpKey, tsince);
 
-      return {
-        classicErr: classicState.err,
-        xpErr: xpState.err,
-        deltaX: Math.abs(classicState.position.x - xpState.position.x),
-        deltaY: Math.abs(classicState.position.y - xpState.position.y),
-        deltaZ: Math.abs(classicState.position.z - xpState.position.z),
-      };
-    }, { line1: ISS_LINE1, line2: ISS_LINE2, tsince: TSINCE_MIN });
+        return {
+          classicErr: classicState.err,
+          xpErr: xpState.err,
+          deltaX: Math.abs(classicState.position.x - xpState.position.x),
+          deltaY: Math.abs(classicState.position.y - xpState.position.y),
+          deltaZ: Math.abs(classicState.position.z - xpState.position.z),
+        };
+      },
+      { line1: ISS_LINE1, line2: ISS_LINE2, tsince: TSINCE_MIN }
+    );
 
     expect(result.classicErr).toBe(0);
     expect(result.xpErr).toBe(0);

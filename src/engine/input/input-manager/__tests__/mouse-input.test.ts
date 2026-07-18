@@ -3,8 +3,8 @@ import { CameraType } from '@app/engine/camera/camera-type';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
-import { MouseInput } from '@app/engine/input/input-manager/mouse-input';
 import { InputManager } from '@app/engine/input/input-manager';
+import { MouseInput } from '@app/engine/input/input-manager/mouse-input';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -59,7 +59,9 @@ describe('MouseInput handlers', () => {
     vi.spyOn(ServiceLocator, 'getTimeManager').mockReturnValue(timeManager as never);
     vi.spyOn(ServiceLocator, 'getCatalogManager').mockReturnValue({ getObject: vi.fn(() => ({ isStatic: () => false })) } as never);
     vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({
-      doSearch: vi.fn(), searchManager: { closeSearch: vi.fn() }, hideSideMenus: vi.fn(),
+      doSearch: vi.fn(),
+      searchManager: { closeSearch: vi.fn() },
+      hideSideMenus: vi.fn(),
     } as never);
     vi.spyOn(ServiceLocator, 'getColorSchemeManager').mockReturnValue({ isUseGroupColorScheme: true } as never);
     vi.spyOn(ServiceLocator, 'getSoundManager').mockReturnValue({ play: vi.fn() } as never);

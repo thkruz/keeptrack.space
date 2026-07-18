@@ -1,7 +1,8 @@
 /* eslint-disable max-classes-per-file */
+
+import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import * as isThisNodeMod from '@app/engine/utils/isThisNode';
-import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
 import { vi } from 'vitest';
 
 class TestThread extends WebWorkerThreadManager {

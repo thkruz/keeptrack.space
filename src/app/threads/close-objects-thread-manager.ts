@@ -6,8 +6,6 @@
 
 import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
 import {
-  CoWorkerMsgType,
-  CoWorkerOutMsgType,
   type CoMsgStartSearch,
   type CoOutComplete,
   type CoOutError,
@@ -16,7 +14,9 @@ import {
   type CoResultRow,
   type CoSatelliteData,
   type CoTcaUpdate,
+  CoWorkerMsgType,
   type CoWorkerOutMsg,
+  CoWorkerOutMsgType,
 } from '@app/webworker/close-objects-messages';
 
 export interface CoSearchCallbacks {
@@ -72,11 +72,7 @@ export class CloseObjectsThreadManager extends WebWorkerThreadManager {
         this.callbacks_.onVerified((data as CoOutVerified).results);
         break;
       case CoWorkerOutMsgType.TCA_CHUNK:
-        this.callbacks_.onTcaChunk(
-          (data as CoOutTcaChunk).updates,
-          (data as CoOutTcaChunk).processed,
-          (data as CoOutTcaChunk).total,
-        );
+        this.callbacks_.onTcaChunk((data as CoOutTcaChunk).updates, (data as CoOutTcaChunk).processed, (data as CoOutTcaChunk).total);
         break;
       case CoWorkerOutMsgType.COMPLETE:
         this.callbacks_.onComplete((data as CoOutComplete).tcaCount);

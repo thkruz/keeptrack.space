@@ -3,15 +3,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { l } from '../onboarding-t7e';
 import type { TourStep } from '../tour-engine';
-import {
-  advanceWhenMenuOpens,
-  DO_IT_FOR_ME_HINT_MS,
-  drawerItemTarget,
-  isPluginUsable,
-  isVisible,
-  openDrawerAt,
-  TASK_RESULT_DWELL_MS,
-} from '../tour-steps';
+import { advanceWhenMenuOpens, DO_IT_FOR_ME_HINT_MS, drawerItemTarget, isPluginUsable, isVisible, openDrawerAt, TASK_RESULT_DWELL_MS } from '../tour-steps';
 import type { ChapterDefinition } from './chapter-types';
 
 const SCENARIO_MENU_IDS = ['ScenarioManagementMenu'];

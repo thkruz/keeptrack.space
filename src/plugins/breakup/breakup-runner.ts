@@ -34,16 +34,16 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { Satellite, SpaceObjectType, Tle, TleLine1, TleLine2 } from '@ootk/src/main';
 import {
   BreakupVariationParams,
-  DeltaVComponentsKms,
-  DeltaVSpreadMps,
-  RicBasis,
-  Vec3,
   buildFragmentTle,
   computeImpactBias,
   computeRicBasis,
+  DeltaVComponentsKms,
+  DeltaVSpreadMps,
   isAnalystRangeValid,
   makeRng,
+  RicBasis,
   sampleDeltaV,
+  Vec3,
 } from './breakup-core';
 
 /**
@@ -112,14 +112,14 @@ export function runBreakup(sat: Satellite, params: BreakupVariationParams, epoch
   // to the target (projected into RIC); an isotropic breakup has no bias.
   const bias = impact
     ? computeImpactBias(
-      {
-        x: impact.velocityTeme.x - parentState.velocity.x,
-        y: impact.velocityTeme.y - parentState.velocity.y,
-        z: impact.velocityTeme.z - parentState.velocity.z,
-      },
-      basis,
-      impact.transferFraction,
-    )
+        {
+          x: impact.velocityTeme.x - parentState.velocity.x,
+          y: impact.velocityTeme.y - parentState.velocity.y,
+          z: impact.velocityTeme.z - parentState.velocity.z,
+        },
+        basis,
+        impact.transferFraction
+      )
     : undefined;
   // Seed from the parameters so a given configuration produces a reproducible cloud.
   const rng = makeRng((startNum ^ breakupCount ^ Math.round((inTrackDeltaV + radialDeltaV + crossTrackDeltaV) * 1000)) >>> 0);

@@ -1,13 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  buildRpoCsvRow, computeEventPc, dataToSat, findClosestApproach, findSatsAvAGeo, findSatsAvALeo, ProximityOpsEvent,
-  RPO_CSV_HEADERS, satToData, sortByDistance,
+  buildRpoCsvRow,
+  computeEventPc,
+  dataToSat,
+  findClosestApproach,
+  findSatsAvAGeo,
+  findSatsAvALeo,
+  ProximityOpsEvent,
+  RPO_CSV_HEADERS,
+  satToData,
+  sortByDistance,
 } from '@app/plugins/proximity-ops/proximity-ops-core';
 import { Satellite } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
 
-const cloneSat = (over: Record<string, unknown> = {}) =>
-  Object.assign(Object.create(Object.getPrototypeOf(defaultSat)), defaultSat, { id: 2, ...over });
+const cloneSat = (over: Record<string, unknown> = {}) => Object.assign(Object.create(Object.getPrototypeOf(defaultSat)), defaultSat, { id: 2, ...over });
 
 const fakeBinSat = (over: Record<string, unknown> = {}) => ({
   tle1: '1 ...',
@@ -101,19 +108,13 @@ describe('proximity-ops-core', () => {
 
   describe('pure bin filters', () => {
     it('findSatsAvALeo keeps only the plane-matched LEO satellites', () => {
-      const sats = [
-        fakeBinSat({ inclination: 51.6, rightAscension: 100 }),
-        fakeBinSat({ inclination: 0, rightAscension: 300 }),
-      ];
+      const sats = [fakeBinSat({ inclination: 51.6, rightAscension: 100 }), fakeBinSat({ inclination: 0, rightAscension: 300 })];
 
       expect(findSatsAvALeo(sats as any, 51.6, 100)).toHaveLength(1);
     });
 
     it('findSatsAvAGeo keeps only satellites near the target longitude', () => {
-      const sats = [
-        fakeBinSat({ period: 24 * 60, lla: () => ({ lat: 0, lon: 10 }) }),
-        fakeBinSat({ period: 24 * 60, lla: () => ({ lat: 0, lon: 120 }) }),
-      ];
+      const sats = [fakeBinSat({ period: 24 * 60, lla: () => ({ lat: 0, lon: 10 }) }), fakeBinSat({ period: 24 * 60, lla: () => ({ lat: 0, lon: 120 }) })];
 
       expect(findSatsAvAGeo(sats as any, 10, new Date('2026-05-31T00:00:00.000Z'))).toHaveLength(1);
     });

@@ -134,14 +134,31 @@ enum SatelliteNumber {
 
 export class ModelResolver {
   /** One slot per registered model; existence of a key gates meshOverride. */
-  modelMap: Record<string, MeshModel | null> = Object.fromEntries(
-    Object.values(SatelliteModels).map((name) => [name, null]),
-  );
+  modelMap: Record<string, MeshModel | null> = Object.fromEntries(Object.values(SatelliteModels).map((name) => [name, null]));
 
   private readonly sccNumAehf_ = ['36868', '38254', '39256', '43651', '44481', '45465'];
   private readonly sccNumDsp_ = [
-    '04630', '05204', '05851', '06691', '08482', '08916', '09803', '11397', '12339', '13086', '14930',
-    '15453', '18583', '20066', '20929', '21805', '23435', '24737', '26356', '26880', '28158',
+    '04630',
+    '05204',
+    '05851',
+    '06691',
+    '08482',
+    '08916',
+    '09803',
+    '11397',
+    '12339',
+    '13086',
+    '14930',
+    '15453',
+    '18583',
+    '20066',
+    '20929',
+    '21805',
+    '23435',
+    '24737',
+    '26356',
+    '26880',
+    '28158',
   ];
 
   resolve(obj: BaseObject): string {
@@ -182,9 +199,9 @@ export class ModelResolver {
    */
   private static readonly rbSilhouettes_: Record<string, string> = {
     'sphere+cone': SatelliteModels['rb-sphercone-kick'],
-    'trunccone': SatelliteModels['rb-trunccone-gray'],
-    'truncatedcone': SatelliteModels['rb-trunccone-gray'],
-    'stepcyl': SatelliteModels['rb-stepcyl-soviet'],
+    trunccone: SatelliteModels['rb-trunccone-gray'],
+    truncatedcone: SatelliteModels['rb-trunccone-gray'],
+    stepcyl: SatelliteModels['rb-stepcyl-soviet'],
     'cyl+cyl': SatelliteModels['rb-stepcyl-soviet'],
     'cyl+cone': SatelliteModels['rb-cylcone-soviet'],
     'cyl+2nozzle': SatelliteModels['rb-cyl2n-legacy'],
@@ -207,8 +224,7 @@ export class ModelResolver {
     { match: /proton|briz|fregat/u, model: SatelliteModels['rb-cyl-proton'] },
   ];
 
-  private static readonly rbSovietVehicles_ =
-    /kosmos|cosmos|tsiklon|tsyklon|cyclone|vostok|voskhod|molniya|soyuz|rokot|dnepr|zenit|shtil|angara|sputnik/u;
+  private static readonly rbSovietVehicles_ = /kosmos|cosmos|tsiklon|tsyklon|cyclone|vostok|voskhod|molniya|soyuz|rokot|dnepr|zenit|shtil|angara|sputnik/u;
 
   /**
    * Rocket bodies, most-specific signal first: catalog `shape` picks the
@@ -290,12 +306,25 @@ export class ModelResolver {
    * their sccNum.
    */
   private static readonly debrisGenericPool_ = [
-    SatelliteModels['deb-panel-01'], SatelliteModels['deb-panel-02'], SatelliteModels['deb-panel-03'],
-    SatelliteModels['deb-bracket-01'], SatelliteModels['deb-bracket-02'], SatelliteModels['deb-bracket-03'],
-    SatelliteModels['deb-skin-01'], SatelliteModels['deb-skin-02'], SatelliteModels['deb-skin-03'],
-    SatelliteModels['deb-clampband-01'], SatelliteModels['deb-clampband-02'], SatelliteModels['deb-clampband-03'],
-    SatelliteModels['deb-mli-01'], SatelliteModels['deb-mli-02'], SatelliteModels['deb-mli-03'], SatelliteModels['deb-mli-04'],
-    SatelliteModels['deb-strut-01'], SatelliteModels['deb-strut-02'], SatelliteModels['deb-strut-03'],
+    SatelliteModels['deb-panel-01'],
+    SatelliteModels['deb-panel-02'],
+    SatelliteModels['deb-panel-03'],
+    SatelliteModels['deb-bracket-01'],
+    SatelliteModels['deb-bracket-02'],
+    SatelliteModels['deb-bracket-03'],
+    SatelliteModels['deb-skin-01'],
+    SatelliteModels['deb-skin-02'],
+    SatelliteModels['deb-skin-03'],
+    SatelliteModels['deb-clampband-01'],
+    SatelliteModels['deb-clampband-02'],
+    SatelliteModels['deb-clampband-03'],
+    SatelliteModels['deb-mli-01'],
+    SatelliteModels['deb-mli-02'],
+    SatelliteModels['deb-mli-03'],
+    SatelliteModels['deb-mli-04'],
+    SatelliteModels['deb-strut-01'],
+    SatelliteModels['deb-strut-02'],
+    SatelliteModels['deb-strut-03'],
   ];
 
   /**
@@ -521,7 +550,7 @@ export class ModelResolver {
     const hasAnt = s.includes('ant');
     let panels = 0;
 
-    if ((/[234]pan/u).test(s)) {
+    if (/[234]pan/u.test(s)) {
       panels = 2;
     } else if (s.includes('pan')) {
       panels = 1;

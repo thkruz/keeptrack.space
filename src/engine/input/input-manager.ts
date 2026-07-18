@@ -1,6 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
+import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Degrees, Kilometers, Milliseconds } from '@ootk/src/main';
 import { mat4, vec3, vec4 } from 'gl-matrix';
@@ -8,14 +9,13 @@ import { PluginRegistry } from '../core/plugin-registry';
 import { ServiceLocator } from '../core/service-locator';
 import { Engine } from '../engine';
 import { EventBus } from '../events/event-bus';
+import { RmbMenuContext } from '../plugins/core/plugin-capabilities';
 import { lineManagerInstance } from '../rendering/line-manager';
-import { t7e } from '@app/locales/keys';
 import { html } from '../utils/development/formatter';
-import { getEl, hideEl } from '../utils/get-el';
 import { errorManagerInstance } from '../utils/errorManager';
 import { CpuStage, FrameProfiler } from '../utils/frame-profiler';
+import { getEl, hideEl } from '../utils/get-el';
 import { isThisNode } from '../utils/isThisNode';
-import { RmbMenuContext } from '../plugins/core/plugin-capabilities';
 import { KeyboardInput } from './input-manager/keyboard-input';
 import { MouseInput } from './input-manager/mouse-input';
 import { TouchInput } from './input-manager/touch-input';
@@ -117,7 +117,7 @@ export class InputManager {
     srcByteOffset: number,
     outputArray: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array | Float32Array | Float64Array,
     dstOffset?: number,
-    length?: number,
+    length?: number
   ) {
     // eslint-disable-next-line no-sync
     const sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
@@ -198,7 +198,6 @@ export class InputManager {
 
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const dotsManagerInstance = ServiceLocator.getDotsManager();
-
 
     return dotsManagerInstance.getIdFromEci(eciArray, catalogManagerInstance.orbitalSats);
   }
@@ -412,7 +411,7 @@ export class InputManager {
       <div id="right-btn-menu" class="right-btn-menu">
         <ul id="right-btn-menu-ul" class='dropdown-contents'></ul>
       </div>
-      `,
+      `
       );
       // Append any other menus before putting the reset/clear options
       EventBus.getInstance().emit(EventBusEvent.rightBtnMenuAdd);
@@ -428,7 +427,7 @@ export class InputManager {
           <li id="reset-camera-rmb"><a href="#">${t7e('rightClickMenu.resetCamera')}</a></li>
           ${settingsManager.isDisableClearLinesRmb ? '' : html`<li id="clear-lines-rmb"><a href="#">${t7e('rightClickMenu.clearLines')}</a></li>`}
           <li id="clear-screen-rmb"><a href="#">${t7e('rightClickMenu.clearScreen')}</a></li>
-          `,
+          `
         );
 
         // sort getEl('rmb-wrapper').children by order in rmbMenuItems
@@ -459,7 +458,7 @@ export class InputManager {
         (event) => {
           event.preventDefault();
         },
-        { passive: false },
+        { passive: false }
       );
     }
 
@@ -568,9 +567,7 @@ export class InputManager {
 
     // Count every visible row (plugin items AND built-ins) to estimate menu height
     const menuUl = getEl('right-btn-menu-ul', true);
-    const numMenuItems = menuUl
-      ? Array.from(menuUl.children).filter((child) => (<HTMLElement>child).style.display !== 'none').length
-      : this.rmbMenuItems.length;
+    const numMenuItems = menuUl ? Array.from(menuUl.children).filter((child) => (<HTMLElement>child).style.display !== 'none').length : this.rmbMenuItems.length;
 
     /*
      * Offset size is based on size in style.css

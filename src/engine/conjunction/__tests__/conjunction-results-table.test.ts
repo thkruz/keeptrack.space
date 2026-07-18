@@ -5,7 +5,10 @@ interface Row {
   b: number;
 }
 
-const rows: Row[] = [{ a: 'x', b: 1 }, { a: 'y', b: 2 }];
+const rows: Row[] = [
+  { a: 'x', b: 1 },
+  { a: 'y', b: 2 },
+];
 
 describe('conjunction-results-table', () => {
   it('renders a header row plus one body row per item, with hooks', () => {
@@ -18,7 +21,7 @@ describe('conjunction-results-table', () => {
         { header: 'A', cell: (r) => r.a },
         { header: 'B', cell: (r) => r.b.toFixed(1), className: 'b-cell' },
       ],
-      { rowClass: 'evt link', rowData: (r) => ({ scc: r.a }) },
+      { rowClass: 'evt link', rowData: (r) => ({ scc: r.a }) }
     );
 
     expect(tbl.querySelectorAll('thead th')).toHaveLength(2);

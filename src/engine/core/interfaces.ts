@@ -311,5 +311,5 @@ export enum SolarBody {
   Iapetus = 'Iapetus',
   Dione = 'Dione',
   Tethys = 'Tethys',
-  Enceladus = 'Enceladus'
+  Enceladus = 'Enceladus',
 }

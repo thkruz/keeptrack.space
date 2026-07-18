@@ -1,4 +1,4 @@
-import { t7e, type TranslationKey } from '@app/locales/keys';
+import { type TranslationKey, t7e } from '@app/locales/keys';
 
 /**
  * Shorthand for this plugin's locale keys. All onboarding strings live under

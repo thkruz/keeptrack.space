@@ -1,4 +1,3 @@
-import { TleLine1, TleLine2 } from '@ootk/src/main';
 import {
   computePresetElements,
   cosparToRawIntlDes,
@@ -7,6 +6,7 @@ import {
   sunSyncInclinationDeg,
   tleToElementFields,
 } from '@app/plugins/create-sat/create-sat-orbits';
+import { TleLine1, TleLine2 } from '@ootk/src/main';
 
 describe('create-sat-orbits', () => {
   it('computePresetElements(geo) yields a ~1 rev/day equatorial circular orbit', () => {

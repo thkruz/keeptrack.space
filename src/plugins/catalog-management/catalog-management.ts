@@ -31,12 +31,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import {
-  IBottomIconConfig,
-  IDragOptions,
-  IHelpConfig,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, IDragOptions, IHelpConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { buildSideMenuTabsHtml, initSideMenuTabs, updateSideMenuTabIndicator } from '@app/engine/ui/side-menu-tabs';
 import { html } from '@app/engine/utils/development/formatter';
@@ -290,10 +285,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      this.uiManagerFinal_.bind(this),
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
 
     EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
       this.updateEphemerisButton_(obj);
@@ -410,15 +402,10 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
         return;
       }
 
-      const validFile = Array.from(files).find(
-        (f) => f.name.endsWith('.tce') || f.name.endsWith('.txt') || f.name.endsWith('.tle'),
-      );
+      const validFile = Array.from(files).find((f) => f.name.endsWith('.tce') || f.name.endsWith('.txt') || f.name.endsWith('.tle'));
 
       if (!validFile) {
-        ServiceLocator.getUiManager().toast(
-          l('toasts.noValidFileInDrop'),
-          ToastMsgType.caution,
-        );
+        ServiceLocator.getUiManager().toast(l('toasts.noValidFileInDrop'), ToastMsgType.caution);
 
         return;
       }
@@ -561,10 +548,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
     const validExts = ['.tce', '.tle', '.txt'];
 
     if (!validExts.some((ext) => file.name.endsWith(ext))) {
-      ServiceLocator.getUiManager().toast(
-        l('toasts.unsupportedFileType'),
-        ToastMsgType.caution,
-      );
+      ServiceLocator.getUiManager().toast(l('toasts.unsupportedFileType'), ToastMsgType.caution);
 
       return;
     }
@@ -587,35 +571,20 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
           const addedCount = await this.importNewSatsOnly_(content);
 
           if (addedCount === 0) {
-            ServiceLocator.getUiManager().toast(
-              l('toasts.noNewSats'),
-              ToastMsgType.caution,
-            );
+            ServiceLocator.getUiManager().toast(l('toasts.noNewSats'), ToastMsgType.caution);
           } else {
-            ServiceLocator.getUiManager().toast(
-              l('toasts.addedNewSats').replace('{count}', addedCount.toString()).replace('{file}', file.name),
-              ToastMsgType.normal,
-            );
+            ServiceLocator.getUiManager().toast(l('toasts.addedNewSats').replace('{count}', addedCount.toString()).replace('{file}', file.name), ToastMsgType.normal);
           }
         } else if (this.keepSatInfo_) {
           await CatalogLoader.mergeAndReloadCatalog(content);
-          ServiceLocator.getUiManager().toast(
-            l('toasts.loadedCatalog').replace('{file}', file.name),
-            ToastMsgType.normal,
-          );
+          ServiceLocator.getUiManager().toast(l('toasts.loadedCatalog').replace('{file}', file.name), ToastMsgType.normal);
         } else {
           await CatalogLoader.reloadCatalog(content);
-          ServiceLocator.getUiManager().toast(
-            l('toasts.loadedCatalog').replace('{file}', file.name),
-            ToastMsgType.normal,
-          );
+          ServiceLocator.getUiManager().toast(l('toasts.loadedCatalog').replace('{file}', file.name), ToastMsgType.normal);
         }
       } catch (error) {
         errorManagerInstance.error(error, 'CatalogManagementPlugin');
-        ServiceLocator.getUiManager().toast(
-          l('toasts.failedToLoad').replace('{file}', file.name),
-          ToastMsgType.critical,
-        );
+        ServiceLocator.getUiManager().toast(l('toasts.failedToLoad').replace('{file}', file.name), ToastMsgType.critical);
       } finally {
         this.isLoading_ = false;
       }
@@ -683,10 +652,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
     const parsed = parseEphemerisParams(spanEl?.value, stepEl?.value);
 
     if (!parsed.ok) {
-      ServiceLocator.getUiManager().toast(
-        l('toasts.exportTooLarge'),
-        ToastMsgType.critical,
-      );
+      ServiceLocator.getUiManager().toast(l('toasts.exportTooLarge'), ToastMsgType.critical);
 
       return;
     }

@@ -1,7 +1,8 @@
 /* eslint-disable max-lines-per-function */
-import { ServiceLocator } from '@app/engine/core/service-locator';
-import { Scene } from '@app/engine/core/scene';
+
 import { SolarBody } from '@app/engine/core/interfaces';
+import { Scene } from '@app/engine/core/scene';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -9,11 +10,11 @@ import { LineManager } from '../../line-manager';
 import { Line, LineColors } from '../line';
 import { Path } from '../path';
 import { SatRicLine } from '../sat-ric-line';
-import { SensorMarkerLine } from '../sensor-marker-line';
 import { SatScanEarthLine } from '../sat-scan-earth-line';
 import { SatToCelestialBodyLine } from '../sat-to-celestial-body';
 import { SatToRefLine } from '../sat-to-ref-line';
 import { SatToSunLine } from '../sat-to-sun-line';
+import { SensorMarkerLine } from '../sensor-marker-line';
 import { SensorToMoonLine } from '../sensor-to-moon-line';
 import { SensorToRaeLine } from '../sensor-to-rae-line';
 import { SensorToSatLine } from '../sensor-to-sat-line';
@@ -34,9 +35,9 @@ const capture = (line: Line): number[][][] => {
 };
 
 /** A satellite/OEM whose eci(date) returns { position: {x,y,z} }. */
-const satWithEci = (x: number, y: number, z: number) => ({ eci: () => ({ position: { x, y, z } }) } as never);
+const satWithEci = (x: number, y: number, z: number) => ({ eci: () => ({ position: { x, y, z } }) }) as never;
 /** A sensor whose eci(date) returns {x,y,z}. */
-const sensorWithEci = (x: number, y: number, z: number) => ({ eci: () => ({ x, y, z }) } as never);
+const sensorWithEci = (x: number, y: number, z: number) => ({ eci: () => ({ x, y, z }) }) as never;
 
 describe('line-manager subclasses', () => {
   beforeEach(() => {
@@ -55,7 +56,12 @@ describe('line-manager subclasses', () => {
 
       line.update();
 
-      expect(calls).toEqual([[[1, 2, 3], [7, 8, 9]]]);
+      expect(calls).toEqual([
+        [
+          [1, 2, 3],
+          [7, 8, 9],
+        ],
+      ]);
     });
 
     it('marks itself garbage and does not draw when the satellite has no eci', () => {
@@ -77,7 +83,12 @@ describe('line-manager subclasses', () => {
 
       line.update();
 
-      expect(calls).toEqual([[[1, 2, 3], [7, 8, 9]]]);
+      expect(calls).toEqual([
+        [
+          [1, 2, 3],
+          [7, 8, 9],
+        ],
+      ]);
     });
   });
 
@@ -88,7 +99,12 @@ describe('line-manager subclasses', () => {
 
       line.update();
 
-      expect(calls).toEqual([[[6371, 0, 0], [6471, 0, 0]]]);
+      expect(calls).toEqual([
+        [
+          [6371, 0, 0],
+          [6471, 0, 0],
+        ],
+      ]);
     });
 
     it('describes itself with the sensorMarker kind and the group detail', () => {
@@ -121,7 +137,12 @@ describe('line-manager subclasses', () => {
 
       line.update();
 
-      expect(calls).toEqual([[[1, 2, 3], [10, 11, 12]]]);
+      expect(calls).toEqual([
+        [
+          [1, 2, 3],
+          [10, 11, 12],
+        ],
+      ]);
     });
 
     it('defaults to a white line color', () => {
@@ -139,7 +160,12 @@ describe('line-manager subclasses', () => {
 
       line.update();
 
-      expect(calls).toEqual([[[1, 2, 3], [4, 5, 6]]]);
+      expect(calls).toEqual([
+        [
+          [1, 2, 3],
+          [4, 5, 6],
+        ],
+      ]);
     });
 
     it('marks itself garbage when the satellite has no eci', () => {
@@ -166,7 +192,12 @@ describe('line-manager subclasses', () => {
 
       line.update();
 
-      expect(calls).toEqual([[[100, 200, 300], [4, 5, 6]]]);
+      expect(calls).toEqual([
+        [
+          [100, 200, 300],
+          [4, 5, 6],
+        ],
+      ]);
     });
 
     it('throws for an out-of-range color in the constructor', () => {
@@ -338,7 +369,12 @@ describe('line-manager subclasses', () => {
 
       line.update();
 
-      expect(calls).toEqual([[[100, 200, 300], [4, 5, 6]]]);
+      expect(calls).toEqual([
+        [
+          [100, 200, 300],
+          [4, 5, 6],
+        ],
+      ]);
     });
 
     it('defaults to a green line color', () => {
@@ -456,7 +492,11 @@ describe('line-manager subclasses', () => {
     it('updateVertBuf records the path length from vec3 points', () => {
       const path = new TestPath();
 
-      path.updateVertBuf([[1, 2, 3], [4, 5, 6], [7, 8, 9]] as never);
+      path.updateVertBuf([
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+      ] as never);
 
       expect((path as unknown as { pathLength_: number }).pathLength_).toBe(3);
     });
@@ -464,7 +504,10 @@ describe('line-manager subclasses', () => {
     it('updateVertBuf accepts pre-built vec4 points', () => {
       const path = new TestPath();
 
-      path.updateVertBuf([[1, 2, 3, 1], [4, 5, 6, 1]] as never);
+      path.updateVertBuf([
+        [1, 2, 3, 1],
+        [4, 5, 6, 1],
+      ] as never);
 
       expect((path as unknown as { pathLength_: number }).pathLength_).toBe(2);
     });
@@ -501,7 +544,10 @@ describe('line-manager subclasses', () => {
       vi.spyOn(Scene.getInstance(), 'getBodyById').mockReturnValue({ position: [1, 2, 3] } as never);
       const path = new TestPath();
 
-      path.updateVertBuf([[1, 2, 3], [4, 5, 6]] as never);
+      path.updateVertBuf([
+        [1, 2, 3],
+        [4, 5, 6],
+      ] as never);
       path.draw(gl, lineManager());
 
       expect(gl.drawArrays).toHaveBeenCalledWith(gl.LINE_STRIP, 0, 2);
@@ -513,7 +559,10 @@ describe('line-manager subclasses', () => {
       vi.spyOn(Scene.getInstance(), 'getBodyById').mockReturnValue({ position: [10, 20, 30] } as never);
       const path = new TestPath(2, SolarBody.Moon);
 
-      path.updateVertBuf([[1, 2, 3], [4, 5, 6]] as never);
+      path.updateVertBuf([
+        [1, 2, 3],
+        [4, 5, 6],
+      ] as never);
       path.draw(gl, lineManager());
 
       expect(gl.uniform3fv).toHaveBeenCalledWith(expect.anything(), [10, 20, 30]);
@@ -525,7 +574,10 @@ describe('line-manager subclasses', () => {
       const path = new TestPath();
 
       path.isFollowCenterBody = false;
-      path.updateVertBuf([[1, 2, 3], [4, 5, 6]] as never);
+      path.updateVertBuf([
+        [1, 2, 3],
+        [4, 5, 6],
+      ] as never);
       path.draw(gl, lineManager());
 
       expect(gl.uniform3fv).toHaveBeenCalledWith(expect.anything(), [0, 0, 0]);

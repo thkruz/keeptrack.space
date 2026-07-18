@@ -1,7 +1,7 @@
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { StorageKey } from '@app/engine/persistence/storage-key';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { IBottomIconConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
@@ -23,10 +23,10 @@ import {
   parseSearchableFields,
   parseSearchableTypes,
   SEARCH_LIMIT_DEFAULT,
-  serializeSearchableFields,
-  serializeSearchableTypes,
   SHOW_DECAYED_DEFAULT,
   SHOW_VIMPEL_DEFAULT,
+  serializeSearchableFields,
+  serializeSearchableTypes,
 } from './search-settings-core';
 
 type T7eKey = Parameters<typeof t7e>[0];
@@ -105,7 +105,8 @@ export class SearchSettingsPlugin extends KeepTrackPlugin {
   }
 
   private searchFieldsBody_(): string {
-    return SEARCHABLE_FIELD_KEYS.map((key) => html`
+    return SEARCHABLE_FIELD_KEYS.map(
+      (key) => html`
       <div class="switch row">
         <label>
           <input id="search-settings-field-${key}" type="checkbox" ${settingsManager.searchableFields[key] ? 'checked' : ''}/>
@@ -113,11 +114,13 @@ export class SearchSettingsPlugin extends KeepTrackPlugin {
           ${l(`labels.fields.${key}`)}
         </label>
       </div>
-    `).join('');
+    `
+    ).join('');
   }
 
   private searchTypesBody_(): string {
-    return SEARCHABLE_TYPE_KEYS.map((key) => html`
+    return SEARCHABLE_TYPE_KEYS.map(
+      (key) => html`
       <div class="switch row">
         <label>
           <input id="search-settings-type-${key}" type="checkbox" ${settingsManager.searchableTypes[key] ? 'checked' : ''}/>
@@ -125,7 +128,8 @@ export class SearchSettingsPlugin extends KeepTrackPlugin {
           ${l(`labels.types.${key}`)}
         </label>
       </div>
-    `).join('');
+    `
+    ).join('');
   }
 
   private filtersBody_(): string {
@@ -343,14 +347,8 @@ export class SearchSettingsPlugin extends KeepTrackPlugin {
       }
     }
 
-    settingsManager.isShowDecayedInSearch = parseBool(
-      persistenceManagerInstance.getItem(StorageKey.SETTINGS_SHOW_DECAYED_IN_SEARCH),
-      settingsManager.isShowDecayedInSearch,
-    );
-    settingsManager.isShowVimpelInSearch = parseBool(
-      persistenceManagerInstance.getItem(StorageKey.SETTINGS_SHOW_VIMPEL_IN_SEARCH),
-      settingsManager.isShowVimpelInSearch,
-    );
+    settingsManager.isShowDecayedInSearch = parseBool(persistenceManagerInstance.getItem(StorageKey.SETTINGS_SHOW_DECAYED_IN_SEARCH), settingsManager.isShowDecayedInSearch);
+    settingsManager.isShowVimpelInSearch = parseBool(persistenceManagerInstance.getItem(StorageKey.SETTINGS_SHOW_VIMPEL_IN_SEARCH), settingsManager.isShowVimpelInSearch);
     settingsManager.searchableFields = parseSearchableFields(persistenceManagerInstance.getItem(StorageKey.SETTINGS_SEARCHABLE_FIELDS));
     settingsManager.searchableTypes = parseSearchableTypes(persistenceManagerInstance.getItem(StorageKey.SETTINGS_SEARCHABLE_TYPES));
   }

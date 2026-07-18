@@ -5,13 +5,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { fileExcelPng, KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import {
-  IBottomIconConfig,
-  IDragOptions,
-  IHelpConfig,
-  IKeyboardShortcut,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, IDragOptions, IHelpConfig, IKeyboardShortcut, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -21,16 +15,7 @@ import { BaseObject, Satellite } from '@ootk/src/main';
 import transponderChannelDataPng from '@public/img/icons/sat-channel-freq.png';
 import { SatConstellations } from '../sat-constellations/sat-constellations';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import {
-  buildExportRows,
-  ChannelColumnKey,
-  ChannelInfo,
-  CHANNEL_COLUMNS,
-  dedupeChannels,
-  filterChannels,
-  SortDirection,
-  sortChannels,
-} from './transponder-channel-data-core';
+import { buildExportRows, CHANNEL_COLUMNS, ChannelColumnKey, ChannelInfo, dedupeChannels, filterChannels, SortDirection, sortChannels } from './transponder-channel-data-core';
 import './transponder-channel-data.css';
 import { TV_SATELLITE_SCC_NUMS } from './tv-satellites';
 
@@ -83,12 +68,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
   onBottomIconClick(): void {
     const selectedSat = PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj;
 
-    if (
-      !selectedSat ||
-      selectedSat.id === -1 ||
-      !selectedSat.isSatellite() ||
-      !this.satsWithChannels_.includes((selectedSat as Satellite).sccNum)
-    ) {
+    if (!selectedSat || selectedSat.id === -1 || !selectedSat.isSatellite() || !this.satsWithChannels_.includes((selectedSat as Satellite).sccNum)) {
       errorManagerInstance.warn(t7e('plugins.TransponderChannelData.errorMsgs.NoChannelInfo' as Parameters<typeof t7e>[0]));
 
       return;
@@ -178,10 +158,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
           content: t7e('plugins.TransponderChannelData.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.TransponderChannelData.help.tip1'),
-        t7e('plugins.TransponderChannelData.help.tip2'),
-      ],
+      tips: [t7e('plugins.TransponderChannelData.help.tip1'), t7e('plugins.TransponderChannelData.help.tip2')],
       shortcuts: [{ keys: ['T'], description: t7e('plugins.TransponderChannelData.help.shortcutToggle') }],
     };
   }
@@ -206,19 +183,12 @@ export class TransponderChannelData extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerInit,
-      () => {
-        // addConstellation now accepts (number | string)[] for SCC_NUM groups,
-        // so we can pass the raw sccNum strings - alpha-5 / extended IDs in
-        // the list would resolve correctly via sccNum2Id.
-        PluginRegistry.getPlugin(SatConstellations)?.addConstellation(
-          t7e('plugins.TransponderChannelData.constellationName'),
-          GroupType.SCC_NUM,
-          [...this.satsWithChannels_],
-        );
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
+      // addConstellation now accepts (number | string)[] for SCC_NUM groups,
+      // so we can pass the raw sccNum strings - alpha-5 / extended IDs in
+      // the list would resolve correctly via sccNum2Id.
+      PluginRegistry.getPlugin(SatConstellations)?.addConstellation(t7e('plugins.TransponderChannelData.constellationName'), GroupType.SCC_NUM, [...this.satsWithChannels_]);
+    });
   }
 
   addJs(): void {
@@ -226,28 +196,20 @@ export class TransponderChannelData extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
 
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (obj: BaseObject) => {
-        if (
-          !obj ||
-          obj.id === -1 ||
-          !obj.isSatellite() ||
-          !this.satsWithChannels_.includes((obj as Satellite).sccNum)
-        ) {
-          if (this.isMenuButtonActive) {
-            this.closeSideMenu();
-          }
-          this.setBottomIconToDisabled();
-        } else {
-          this.setBottomIconToEnabled();
-
-          if (this.isMenuButtonActive && this.lastLoadedSat_ !== obj.id) {
-            this.loadChannelData_();
-          }
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
+      if (!obj || obj.id === -1 || !obj.isSatellite() || !this.satsWithChannels_.includes((obj as Satellite).sccNum)) {
+        if (this.isMenuButtonActive) {
+          this.closeSideMenu();
         }
-      },
-    );
+        this.setBottomIconToDisabled();
+      } else {
+        this.setBottomIconToEnabled();
+
+        if (this.isMenuButtonActive && this.lastLoadedSat_ !== obj.id) {
+          this.loadChannelData_();
+        }
+      }
+    });
   }
 
   private uiManagerFinal_(): void {
@@ -324,7 +286,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
       errorManagerInstance.warn(
         (t7e('plugins.TransponderChannelData.errorMsgs.FetchFailed' as Parameters<typeof t7e>[0]) as string)
           .replace('{name}', selectedSat.name)
-          .replace('{altName}', selectedSat.altName),
+          .replace('{altName}', selectedSat.altName)
       );
 
       // Leave lastLoadedSat_ unset so re-selecting the satellite retries.
@@ -362,7 +324,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
         throw new Error(`HTTP ${resp.status}`);
       }
 
-      return await resp.json() as ChannelInfo[];
+      return (await resp.json()) as ChannelInfo[];
     } catch {
       return null;
     }
@@ -469,9 +431,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
     if (format === 'csv') {
       saveCsv(rows, 'channel-info');
     } else {
-      saveXlsx(rows, 'channel-info').catch((e) =>
-        errorManagerInstance.error(e, 'TransponderChannelData', 'Error saving xlsx!'),
-      );
+      saveXlsx(rows, 'channel-info').catch((e) => errorManagerInstance.error(e, 'TransponderChannelData', 'Error saving xlsx!'));
     }
   }
 }

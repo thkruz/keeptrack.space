@@ -14,11 +14,18 @@ import { dateFormat } from '@app/engine/utils/dateFormat';
 import { t7e } from '@app/locales/keys';
 import {
   calcGmst,
-  Degrees, EcefVec3,
-  eci2ecef, eci2lla, eci2rae,
+  Degrees,
+  EcefVec3,
   EpochUTC,
-  J2000, Kilometers, KilometersPerSecond,
-  LlaVec3, PosVel, RaeVec3,
+  eci2ecef,
+  eci2lla,
+  eci2rae,
+  J2000,
+  Kilometers,
+  KilometersPerSecond,
+  LlaVec3,
+  PosVel,
+  RaeVec3,
   Seconds,
   SpaceObject,
   SpaceObjectType,
@@ -76,7 +83,6 @@ export interface ParsedOem {
   header: OemHeader;
   dataBlocks: OemDataBlock[];
 }
-
 
 export class OemSatellite extends SpaceObject {
   private static hasShownOutOfRangeWarning_ = false;
@@ -150,17 +156,13 @@ export class OemSatellite extends SpaceObject {
     if (effectiveDate < this.header.START_TIME || effectiveDate > this.header.STOP_TIME) {
       if (!OemSatellite.hasShownOutOfRangeWarning_) {
         OemSatellite.hasShownOutOfRangeWarning_ = true;
-        ServiceLocator.getUiManager().toast(
-          t7e('plugins.OemReaderPlugin.outOfRangeWarning' as Parameters<typeof t7e>[0]),
-          ToastMsgType.caution,
-          true,
-        );
+        ServiceLocator.getUiManager().toast(t7e('plugins.OemReaderPlugin.outOfRangeWarning' as Parameters<typeof t7e>[0]), ToastMsgType.caution, true);
       }
     } else {
       OemSatellite.hasShownOutOfRangeWarning_ = false;
     }
 
-    const posAndVel = this.updatePosAndVel(effectiveDate.getTime() / 1000 as Seconds);
+    const posAndVel = this.updatePosAndVel((effectiveDate.getTime() / 1000) as Seconds);
 
     if (!posAndVel) {
       return null;
@@ -250,15 +252,15 @@ export class OemSatellite extends SpaceObject {
     }
 
     this.OemDataBlocks = oem.dataBlocks;
-    this.lagrangeInterpolator = LagrangeInterpolator.fromEphemeris(this.OemDataBlocks.flatMap((block) => block.ephemeris), this.OemDataBlocks[0].metadata.INTERPOLATION_DEGREE);
+    this.lagrangeInterpolator = LagrangeInterpolator.fromEphemeris(
+      this.OemDataBlocks.flatMap((block) => block.ephemeris),
+      this.OemDataBlocks[0].metadata.INTERPOLATION_DEGREE
+    );
     this.source = 'OEM File';
     this.header = oem.header;
 
     // Extract NORAD_ID from COMMENT lines if present (search all data blocks)
-    const allComments = [
-      ...(oem.header.COMMENT ?? []),
-      ...oem.dataBlocks.flatMap((block) => block.metadata.COMMENT ?? []),
-    ];
+    const allComments = [...(oem.header.COMMENT ?? []), ...oem.dataBlocks.flatMap((block) => block.metadata.COMMENT ?? [])];
 
     for (const comment of allComments) {
       // Match any non-whitespace token after NORAD_ID = so alpha-5 ("T0001")
@@ -521,8 +523,7 @@ export class OemSatellite extends SpaceObject {
     }
 
     if (this.isDrawOrbitHistory) {
-      const stateChanged = this.stateVectorIdx_ !== this.lastHistoryStateVectorIdx_ ||
-        this.dataBlockIdx_ !== this.lastHistoryDataBlockIdx_;
+      const stateChanged = this.stateVectorIdx_ !== this.lastHistoryStateVectorIdx_ || this.dataBlockIdx_ !== this.lastHistoryDataBlockIdx_;
 
       if (stateChanged) {
         this.lastHistoryStateVectorIdx_ = this.stateVectorIdx_;
@@ -626,8 +627,7 @@ export class OemSatellite extends SpaceObject {
       }
 
       // Skip this block if simTime is after it ends (unless it's the last block)
-      if (i < this.OemDataBlocks.length - 1 &&
-        simTime >= vectors[vectors.length - 1].epoch.posix) {
+      if (i < this.OemDataBlocks.length - 1 && simTime >= vectors[vectors.length - 1].epoch.posix) {
         continue;
       }
 
@@ -659,8 +659,7 @@ export class OemSatellite extends SpaceObject {
       }
 
       // Handle last vector in last block
-      if (i === this.OemDataBlocks.length - 1 &&
-        simTime >= vectors[vectors.length - 1].epoch.posix) {
+      if (i === this.OemDataBlocks.length - 1 && simTime >= vectors[vectors.length - 1].epoch.posix) {
         this.dataBlockIdx = i;
         this.stateVectorIdx = vectors.length - 1;
 
@@ -675,7 +674,7 @@ export class OemSatellite extends SpaceObject {
     }
 
     if (this.orbitFullPathCache_) {
-      this.updatePosAndVel(ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000 as Seconds); // Ensure current indices are up to date
+      this.updatePosAndVel((ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000) as Seconds); // Ensure current indices are up to date
 
       return this.getSegmentsFromCache_();
     }
@@ -744,7 +743,9 @@ export class OemSatellite extends SpaceObject {
         }
         spanCount = Math.min(remainingCount, Math.max(1, left - currentIndex));
       }
-    } catch { /* Classical elements unavailable */ }
+    } catch {
+      /* Classical elements unavailable */
+    }
 
     return spanCount;
   }
@@ -793,9 +794,9 @@ export class OemSatellite extends SpaceObject {
     let pz: number = this.position.z;
 
     if (settingsManager.centerBody !== SolarBody.Earth) {
-      px = px - offsetOrigin.position.x as Kilometers;
-      py = py - offsetOrigin.position.y as Kilometers;
-      pz = pz - offsetOrigin.position.z as Kilometers;
+      px = (px - offsetOrigin.position.x) as Kilometers;
+      py = (py - offsetOrigin.position.y) as Kilometers;
+      pz = (pz - offsetOrigin.position.z) as Kilometers;
     }
 
     if (isEcf) {
@@ -962,10 +963,7 @@ export class OemSatellite extends SpaceObject {
     const lastPointOffset = (this.historyPointCount_ - 1) * 4;
 
     this.writeCurrentPositionToBuffer_(lastPointOffset, isEcf);
-    this.orbitHistoryLine.updateData(
-      this.historyBuffer_.subarray(0, this.historyPointCount_ * 4),
-      this.historyPointCount_,
-    );
+    this.orbitHistoryLine.updateData(this.historyBuffer_.subarray(0, this.historyPointCount_ * 4), this.historyPointCount_);
   }
 
   private computeGlobalIndex_(): number {

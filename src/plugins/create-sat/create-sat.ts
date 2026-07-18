@@ -1,44 +1,24 @@
-import {
-  IBottomIconConfig,
-  IHelpConfig,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
-import {
-  FormatTle,
-  KilometersPerSecond,
-  Satellite,
-  SatelliteParams,
-  SatelliteRecord,
-  Sgp4,
-  TemeVec3,
-  Tle,
-} from '@ootk/src/main';
-import addSatellitePnng from '@public/img/icons/add-satellite.png';
-import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-
 import { SatMath } from '@app/app/analysis/sat-math';
 import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { IBottomIconConfig, IHelpConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { buildSideMenuTabsHtml, initSideMenuTabs, SideMenuTabDef, updateSideMenuTabIndicator } from '@app/engine/ui/side-menu-tabs';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
+import { FormatTle, KilometersPerSecond, Satellite, SatelliteParams, SatelliteRecord, Sgp4, TemeVec3, Tle } from '@ootk/src/main';
+import addSatellitePnng from '@public/img/icons/add-satellite.png';
 import { saveAs } from 'file-saver';
-import {
-  applyOrbitPreset,
-  applySunSyncInclination,
-  buildPreviewTleFromForm,
-  cloneSelectedSatellite,
-  getFreeAnalystScc,
-} from './create-sat-actions';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { OrbitPreview } from '../shared/orbit-preview';
+import { applyOrbitPreset, applySunSyncInclination, buildPreviewTleFromForm, cloneSelectedSatellite, getFreeAnalystScc } from './create-sat-actions';
 import { buildCreateSatHelp } from './create-sat-help';
 import { buildAdvancedTabHtml, buildBasicTabHtml, createSatActionButton } from './create-sat-menu-html';
-import { OrbitPreview } from '../shared/orbit-preview';
 import { OrbitPresetId } from './create-sat-orbits';
 import { wireInlineValidation } from './create-sat-validation';
 import './create-sat.css';
@@ -100,7 +80,10 @@ export class CreateSat extends KeepTrackPlugin {
   /**
    * Calculate orbital elements from apogee/perigee altitudes
    */
-  static calculateFromAltitudes(apogeeAlt: number, perigeeAlt: number): {
+  static calculateFromAltitudes(
+    apogeeAlt: number,
+    perigeeAlt: number
+  ): {
     eccentricity: number;
     semimajorAxis: number;
     meanMotion: number;
@@ -111,7 +94,7 @@ export class CreateSat extends KeepTrackPlugin {
     const e = (Ra - Rp) / (Ra + Rp); // Eccentricity
 
     // Mean motion in rev/day
-    const n = Math.sqrt(CreateSat.EARTH_MU_ / (a * a * a)) * 86400 / (2 * Math.PI);
+    const n = (Math.sqrt(CreateSat.EARTH_MU_ / (a * a * a)) * 86400) / (2 * Math.PI);
 
     return { eccentricity: e, semimajorAxis: a, meanMotion: n };
   }
@@ -119,14 +102,17 @@ export class CreateSat extends KeepTrackPlugin {
   /**
    * Calculate derived parameters from mean motion and eccentricity
    */
-  static calculateDerivedParams(meanMotion: number, eccentricity: number): {
+  static calculateDerivedParams(
+    meanMotion: number,
+    eccentricity: number
+  ): {
     apogee: number;
     perigee: number;
     semimajorAxis: number;
     velocity: number;
   } {
     // Mean motion (rev/day) to semi-major axis
-    const n = meanMotion * 2 * Math.PI / 86400; // rad/s
+    const n = (meanMotion * 2 * Math.PI) / 86400; // rad/s
     const a = (CreateSat.EARTH_MU_ / (n * n)) ** (1 / 3); // km
 
     const apogee = a * (1 + eccentricity) - CreateSat.EARTH_RADIUS_KM_;
@@ -566,7 +552,6 @@ export class CreateSat extends KeepTrackPlugin {
     const currentTime = (date.getUTCHours() * 3600 + date.getUTCMinutes() * 60 + date.getUTCSeconds()) / 86400;
     const day = (currentJday + currentTime).toFixed(8).padStart(12, '0');
 
-
     (getEl(`${CreateSat.elementPrefix}-year`) as HTMLInputElement).value = year;
     (getEl(`${CreateSat.elementPrefix}-day`) as HTMLInputElement).value = day;
 
@@ -587,7 +572,7 @@ export class CreateSat extends KeepTrackPlugin {
     const e = (key: string) => t7e(`plugins.CreateSat.errorMsgs.${key}` as T7eKey);
 
     // Validate NORAD ID
-    if (!(/^\d{5}$/u).test(inputParams.scc) || parseInt(inputParams.scc, 10) < 90000 || parseInt(inputParams.scc, 10) > 99999) {
+    if (!/^\d{5}$/u.test(inputParams.scc) || parseInt(inputParams.scc, 10) < 90000 || parseInt(inputParams.scc, 10) > 99999) {
       return e('invalidNoradId');
     }
     // Validate type
@@ -599,39 +584,39 @@ export class CreateSat extends KeepTrackPlugin {
       return e('invalidCountry');
     }
     // Validate epoch year
-    if (!(/^\d{2}$/u).test(inputParams.epochyr)) {
+    if (!/^\d{2}$/u.test(inputParams.epochyr)) {
       return e('invalidEpochYear');
     }
     // Validate epoch day
-    if (!(/^\d{3}\.\d{8}$/u).test(inputParams.epochday)) {
+    if (!/^\d{3}\.\d{8}$/u.test(inputParams.epochday)) {
       return e('invalidEpochDay');
     }
     // Validate inclination
-    if (!(/^\d{3}\.\d{4}$/u).test(inputParams.inc)) {
+    if (!/^\d{3}\.\d{4}$/u.test(inputParams.inc)) {
       return e('invalidInclination');
     }
     // Validate right ascension
-    if (!(/^\d{3}\.\d{4}$/u).test(inputParams.rasc)) {
+    if (!/^\d{3}\.\d{4}$/u.test(inputParams.rasc)) {
       return e('invalidRasc');
     }
     // Validate eccentricity
-    if (!(/^\d{7}$/u).test(inputParams.ecen)) {
+    if (!/^\d{7}$/u.test(inputParams.ecen)) {
       return e('invalidEccentricity');
     }
     // Validate argument of perigee
-    if (!(/^\d{3}\.\d{4}$/u).test(inputParams.argPe)) {
+    if (!/^\d{3}\.\d{4}$/u.test(inputParams.argPe)) {
       return e('invalidArgPe');
     }
     // Validate mean anomaly
-    if (!(/^\d{3}\.\d{4}$/u).test(inputParams.meana)) {
+    if (!/^\d{3}\.\d{4}$/u.test(inputParams.meana)) {
       return e('invalidMeanAnomaly');
     }
     // Validate mean motion
-    if (!(/^\d{2}\.\d{5}$/u).test(inputParams.meanmo)) {
+    if (!/^\d{2}\.\d{5}$/u.test(inputParams.meanmo)) {
       return e('invalidMeanMotion');
     }
     // Validate period
-    if (!(/^\d{2,4}\.\d{4}$/u).test(inputParams.period)) {
+    if (!/^\d{2,4}\.\d{4}$/u.test(inputParams.period)) {
       return e('invalidPeriod');
     }
     // Validate source
@@ -823,11 +808,7 @@ export class CreateSat extends KeepTrackPlugin {
       const obj = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY);
 
       if (!obj?.isSatellite()) {
-        ServiceLocator.getUiManager().toast(
-          t7e('plugins.CreateSat.errorMsgs.invalidSatObject' as T7eKey),
-          ToastMsgType.error,
-          true,
-        );
+        ServiceLocator.getUiManager().toast(t7e('plugins.CreateSat.errorMsgs.invalidSatObject' as T7eKey), ToastMsgType.error, true);
 
         return;
       }
@@ -843,7 +824,7 @@ export class CreateSat extends KeepTrackPlugin {
             .replace('{name}', sat.name ?? '')
             .replace('{scc}', inputParams.scc),
           ToastMsgType.caution,
-          true,
+          true
         );
       }
 
@@ -891,11 +872,7 @@ export class CreateSat extends KeepTrackPlugin {
 
       // Validate altitude is reasonable
       if (SatMath.altitudeCheck(satrec, ServiceLocator.getTimeManager().simulationTimeObj) <= 1) {
-        ServiceLocator.getUiManager().toast(
-          t7e('plugins.CreateSat.errorMsgs.propagationFailed' as T7eKey),
-          ToastMsgType.caution,
-          true,
-        );
+        ServiceLocator.getUiManager().toast(t7e('plugins.CreateSat.errorMsgs.propagationFailed' as T7eKey), ToastMsgType.caution, true);
 
         return;
       }
@@ -954,9 +931,8 @@ export class CreateSat extends KeepTrackPlugin {
           .replace('{name}', inputParams.name)
           .replace('{scc}', inputParams.scc),
         ToastMsgType.normal,
-        true,
+        true
       );
-
     } catch (error) {
       errorManagerInstance.warn(`Failed to create satellite: ${error}`);
     }

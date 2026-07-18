@@ -6,20 +6,7 @@ import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodi
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { StringPad } from '@app/engine/utils/stringPad';
 import { CruncherSat } from '@app/webworker/positionCruncher';
-import {
-  BaseObject,
-  CatalogSource,
-  LandObject,
-  Marker,
-  OmmDataFormat,
-  PayloadStatus,
-  Satellite,
-  SpaceObjectType,
-  Star,
-  Tle,
-  TleLine1,
-  TleLine2,
-} from '@ootk/src/main';
+import { BaseObject, CatalogSource, LandObject, Marker, OmmDataFormat, PayloadStatus, Satellite, SpaceObjectType, Star, Tle, TleLine1, TleLine2 } from '@ootk/src/main';
 import Papa from 'papaparse';
 import { EventBus } from '../../engine/events/event-bus';
 import { EventBusEvent } from '../../engine/events/event-bus-events';
@@ -210,31 +197,25 @@ export class CatalogLoader {
 
     try {
       // TODO: Which sources can use this should be definied in the settings (Celestrak Rebase)
-      if (
-        (/^https?:\/\/(?:api\.keeptrack\.space|localhost:8787)\/v4\/sats(?:\/celestrak)?$/u).test(settingsManager.dataSources.tle)
-      ) {
+      if (/^https?:\/\/(?:api\.keeptrack\.space|localhost:8787)\/v4\/sats(?:\/celestrak)?$/u.test(settingsManager.dataSources.tle)) {
         const limitSegment = settingsManager.limitSats ? `/${settingsManager.limitSats}` : '';
 
         settingsManager.dataSources.tle = `${settingsManager.dataSources.tle}${limitSegment}?format=keeptrack`;
       }
 
-      const {
-        extraSats,
-        asciiCatalog,
-        jsCatalog,
-        externalCatalog,
-      } =
-        CatalogLoader.getAdditionalCatalogs_(settingsManager);
+      const { extraSats, asciiCatalog, jsCatalog, externalCatalog } = CatalogLoader.getAdditionalCatalogs_(settingsManager);
 
       if (settingsManager.dataSources.externalTLEsOnly) {
         if (settingsManager.dataSources.isSupplementExternal) {
           // Load our database for the extra information - the satellites will be filtered out
           await apiFetch(settingsManager.dataSources.tle)
             .then((response) => response.json())
-            .then((data) => CatalogLoader.parse({
-              keepTrackTle: data,
-              externalCatalog,
-            }))
+            .then((data) =>
+              CatalogLoader.parse({
+                keepTrackTle: data,
+                externalCatalog,
+              })
+            )
             .catch((error) => {
               errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
             });
@@ -248,25 +229,29 @@ export class CatalogLoader {
         // Load the debris catalog
         await apiFetch(settingsManager.dataSources.tleDebris)
           .then((response) => response.json())
-          .then((data) => CatalogLoader.parse({
-            keepTrackTle: data,
-            keepTrackExtra: extraSats,
-            keepTrackAscii: asciiCatalog,
-            vimpelCatalog: jsCatalog,
-          }))
+          .then((data) =>
+            CatalogLoader.parse({
+              keepTrackTle: data,
+              keepTrackExtra: extraSats,
+              keepTrackAscii: asciiCatalog,
+              vimpelCatalog: jsCatalog,
+            })
+          )
           .catch((error) => {
             errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
           });
       } else if (settingsManager.offlineMode) {
         await fetch(`${settingsManager.installDirectory}tle/tle.json`)
           .then((response) => response.json())
-          .then((data) => CatalogLoader.parse({
-            keepTrackTle: data,
-            keepTrackExtra: extraSats,
-            keepTrackAscii: asciiCatalog,
-            externalCatalog,
-            vimpelCatalog: jsCatalog,
-          }));
+          .then((data) =>
+            CatalogLoader.parse({
+              keepTrackTle: data,
+              keepTrackExtra: extraSats,
+              keepTrackAscii: asciiCatalog,
+              externalCatalog,
+              vimpelCatalog: jsCatalog,
+            })
+          );
       } else {
         // Load the primary catalog
         await apiFetch(settingsManager.dataSources.tle)
@@ -277,25 +262,29 @@ export class CatalogLoader {
 
             return response.json();
           })
-          .then((data) => CatalogLoader.parse({
-            keepTrackTle: data,
-            keepTrackExtra: extraSats,
-            keepTrackAscii: asciiCatalog,
-            externalCatalog,
-            vimpelCatalog: jsCatalog,
-          }))
+          .then((data) =>
+            CatalogLoader.parse({
+              keepTrackTle: data,
+              keepTrackExtra: extraSats,
+              keepTrackAscii: asciiCatalog,
+              externalCatalog,
+              vimpelCatalog: jsCatalog,
+            })
+          )
           .catch(async (error) => {
             if (error.message === 'Failed to fetch') {
               errorManagerInstance.warn('Failed to download latest catalog! Using offline catalog which may be out of date!');
               await fetch(`${settingsManager.installDirectory}tle/tle.json`)
                 .then((response) => response.json())
-                .then((data) => CatalogLoader.parse({
-                  keepTrackTle: data,
-                  keepTrackExtra: extraSats,
-                  keepTrackAscii: asciiCatalog,
-                  externalCatalog,
-                  vimpelCatalog: jsCatalog,
-                }));
+                .then((data) =>
+                  CatalogLoader.parse({
+                    keepTrackTle: data,
+                    keepTrackExtra: extraSats,
+                    keepTrackAscii: asciiCatalog,
+                    externalCatalog,
+                    vimpelCatalog: jsCatalog,
+                  })
+                );
             } else {
               errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
             }
@@ -360,11 +349,7 @@ export class CatalogLoader {
       const satDataString = CatalogLoader.getSatDataString_(catalogManagerInstance.objectCache);
 
       /** Send satDataString to satCruncher to begin propagation loop */
-      catalogManagerInstance.satCruncherThread.sendCatalogData(
-        satDataString,
-        catalogManagerInstance.fieldOfViewSet.length,
-        settingsManager.lowPerf,
-      );
+      catalogManagerInstance.satCruncherThread.sendCatalogData(satDataString, catalogManagerInstance.fieldOfViewSet.length, settingsManager.lowPerf);
     });
   }
 
@@ -816,10 +801,12 @@ export class CatalogLoader {
     catalogManagerInstance.oemSatelliteIds.clear();
 
     for (let i = 0; i < settingsManager.maxOemSatellites; i++) {
-      tempObjData.push(new Planet({
-        id: tempObjData.length,
-        name: `OEM Satellite ${i + 1}`,
-      }));
+      tempObjData.push(
+        new Planet({
+          id: tempObjData.length,
+          name: `OEM Satellite ${i + 1}`,
+        })
+      );
     }
 
     dotsManagerInstance.planetDot1 = tempObjData.length;
@@ -835,7 +822,7 @@ export class CatalogLoader {
           type: planetList[planet]?.type ?? SpaceObjectType.UNKNOWN,
         });
 
-        planetDot.color = planetList[planet]?.color ?? [1.0, 1.0, 1.0, 1.0] as rgbaArray;
+        planetDot.color = planetList[planet]?.color ?? ([1.0, 1.0, 1.0, 1.0] as rgbaArray);
         if (planetList[planet]) {
           (planetList[planet] as CelestialBody).planetObject = planetDot;
         }
@@ -873,7 +860,7 @@ export class CatalogLoader {
           type: dwarfPlanetList[dwarfPlanet]?.type ?? SpaceObjectType.UNKNOWN,
         });
 
-        dwarfPlanetDot.color = dwarfPlanetList[dwarfPlanet]?.color ?? [1.0, 1.0, 1.0, 1.0] as rgbaArray;
+        dwarfPlanetDot.color = dwarfPlanetList[dwarfPlanet]?.color ?? ([1.0, 1.0, 1.0, 1.0] as rgbaArray);
         if (dwarfPlanetList[dwarfPlanet]) {
           (dwarfPlanetList[dwarfPlanet] as CelestialBody).planetObject = dwarfPlanetDot;
         }
@@ -893,7 +880,7 @@ export class CatalogLoader {
           type: sat?.type ?? SpaceObjectType.NOTIONAL,
         });
 
-        satDot.color = sat?.color ?? [1.0, 1.0, 1.0, 1.0] as rgbaArray;
+        satDot.color = sat?.color ?? ([1.0, 1.0, 1.0, 1.0] as rgbaArray);
         if (sat) {
           sat.planetObject = satDot;
         }
@@ -1080,7 +1067,7 @@ export class CatalogLoader {
    * @throws An error if the fallback `vimpel.json` cannot be loaded.
    */
   private static async getJscCatalog_(settingsManager: SettingsManager): Promise<JsSat[]> {
-    const vimpelJson = await apiFetch(settingsManager.dataSources.vimpel)
+    const vimpelJson = (await apiFetch(settingsManager.dataSources.vimpel)
       .then((response) => {
         if (response.ok) {
           return response.json();
@@ -1093,20 +1080,21 @@ export class CatalogLoader {
       .catch(async () => {
         errorManagerInstance.warn('Failed to download latest vimpel.json ! Using offline vimpel.json which may be out of date!');
 
-        const vimpelJson = await fetch(`${settingsManager.installDirectory}tle/vimpel.json`)
+        const vimpelJson = (await fetch(`${settingsManager.installDirectory}tle/vimpel.json`)
           .then((response) => {
             if (response.ok) {
               return response.json();
             }
             throw new Error('Error loading fallback vimpel.json');
-          }).catch(() => {
+          })
+          .catch(() => {
             errorManagerInstance.warn('Error loading fallback vimpel.json');
 
             return [];
-          }) as JsSat[];
+          })) as JsSat[];
 
         return vimpelJson;
-      }) as JsSat[];
+      })) as JsSat[];
 
     return vimpelJson;
   }
@@ -1152,7 +1140,7 @@ export class CatalogLoader {
         }
 
         return data;
-      }),
+      })
     );
   }
 
@@ -1184,12 +1172,11 @@ export class CatalogLoader {
       meanAnom += 360;
     }
 
-    debris.tle2 =
-      debris.tle2.substr(0, 17) + // Columns 1-18
+    debris.tle2 = (debris.tle2.substr(0, 17) + // Columns 1-18
       StringPad.pad0((Math.random() * 360).toFixed(4), 8) + // New RAAN
       debris.tle2.substr(25, 18) + // Columns 25-44
       StringPad.pad0(meanAnom.toFixed(4), 8) + // New Mean Anomaly
-      debris.tle2.substr(51) as TleLine2; // Columns 51-69
+      debris.tle2.substr(51)) as TleLine2; // Columns 51-69
 
     const debrisObj = new Satellite(debris);
 
@@ -1237,9 +1224,7 @@ export class CatalogLoader {
       const firstError = result.errors[0];
       const rowInfo = typeof firstError.row === 'number' ? ` at row ${firstError.row}` : '';
 
-      errorManagerInstance.info(
-        `External CSV parse reported ${result.errors.length} error(s); first error${rowInfo}: ${firstError.code} - ${firstError.message}`,
-      );
+      errorManagerInstance.info(`External CSV parse reported ${result.errors.length} error(s); first error${rowInfo}: ${firstError.code} - ${firstError.message}`);
     }
 
     for (const row of result.data) {
@@ -1279,7 +1264,6 @@ export class CatalogLoader {
 
     year = prefix + year;
     const rest = TLE1.substring(9, 17).trim().substring(2);
-
 
     return `${year}-${rest}`;
   }
@@ -1466,8 +1450,7 @@ export class CatalogLoader {
     // If the canonical key is already claimed (e.g. by an earlier load path
     // that wrote the same satellite under either its alpha-5 or numeric form),
     // route through Known_ to update in place instead of orphaning the prior slot.
-    if (typeof catalogManagerInstance.sccIndex[sccNum] !== 'undefined' &&
-        tempSatData[catalogManagerInstance.sccIndex[sccNum]]) {
+    if (typeof catalogManagerInstance.sccIndex[sccNum] !== 'undefined' && tempSatData[catalogManagerInstance.sccIndex[sccNum]]) {
       CatalogLoader.processAsciiCatalogKnown_(catalogManagerInstance, element, tempSatData as Satellite[]);
 
       return;
@@ -1715,7 +1698,7 @@ export class CatalogLoader {
       return 'unknown';
     }
 
-    const sma = CatalogLoader.EARTH_GM_ ** (1 / 3) / ((CatalogLoader.TAU_ * n / CatalogLoader.SECONDS_PER_DAY_) ** (2 / 3));
+    const sma = CatalogLoader.EARTH_GM_ ** (1 / 3) / ((CatalogLoader.TAU_ * n) / CatalogLoader.SECONDS_PER_DAY_) ** (2 / 3);
     const apogee = sma * (1 + ecc) - CatalogLoader.EARTH_RADIUS_;
 
     if (apogee < 400) {
@@ -1797,7 +1780,7 @@ export class CatalogLoader {
       // null so callers can skip it.
       const trimmed = raw.trim();
 
-      return (/^\d+$/u).test(trimmed) ? trimmed.replace(/^0+(?=\d)/u, '') : null;
+      return /^\d+$/u.test(trimmed) ? trimmed.replace(/^0+(?=\d)/u, '') : null;
     }
   }
 }

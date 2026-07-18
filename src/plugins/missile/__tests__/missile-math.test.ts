@@ -13,12 +13,20 @@ import { vi } from 'vitest';
 const M = Missile as any;
 
 const baseCreateArgs = () => ({
-  CurrentLatitude: 0, CurrentLongitude: 0,
-  TargetLatitude: 10, TargetLongitude: 10,
-  NumberWarheads: 1, MissileObjectNum: 500,
-  CurrentTime: new Date(), MissileDesc: 'Test',
-  Length: 17, Diameter: 3.1, NewBurnRate: 0.042,
-  MaxMissileRange: 3000, country: 'US', minAltitude: 100,
+  CurrentLatitude: 0,
+  CurrentLongitude: 0,
+  TargetLatitude: 10,
+  TargetLongitude: 10,
+  NumberWarheads: 1,
+  MissileObjectNum: 500,
+  CurrentTime: new Date(),
+  MissileDesc: 'Test',
+  Length: 17,
+  Diameter: 3.1,
+  NewBurnRate: 0.042,
+  MaxMissileRange: 3000,
+  country: 'US',
+  minAltitude: 100,
 });
 
 describe('Missile.calcPressure_', () => {
@@ -173,9 +181,13 @@ describe('Missile.create full ballistic simulation', () => {
     ['south-west bound', { CurrentLatitude: 40, CurrentLongitude: 40, TargetLatitude: 20, TargetLongitude: 20 }],
     ['north-west bound', { CurrentLatitude: 10, CurrentLongitude: 40, TargetLatitude: 25, TargetLongitude: 20 }],
     ['south-east bound', { CurrentLatitude: 40, CurrentLongitude: 10, TargetLatitude: 20, TargetLongitude: 30 }],
-  ])('simulates a %s trajectory', (_label, override) => {
-    const result = Missile.create({ ...baseCreateArgs(), ...override });
+  ])(
+    'simulates a %s trajectory',
+    (_label, override) => {
+      const result = Missile.create({ ...baseCreateArgs(), ...override });
 
-    expect(result === null || typeof result === 'object').toBe(true);
-  }, 30000);
+      expect(result === null || typeof result === 'object').toBe(true);
+    },
+    30000
+  );
 });

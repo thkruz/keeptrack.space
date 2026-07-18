@@ -7,8 +7,8 @@ import { galileoSensors } from './sensors/galileo';
 import { scnSensors } from './sensors/scn';
 import { Operators, SensorList } from './sensors/types';
 
-export { Operators } from './sensors/types';
 export type { SensorList } from './sensors/types';
+export { Operators } from './sensors/types';
 
 // TODO: Add the aperture size of telescopes as an optional parameter
 
@@ -547,7 +547,7 @@ export const sensors = <SensorList>{
     freqBand: 'C-Band',
     type: SpaceObjectType.MECHANICAL,
     lat: <Degrees>-21.885698,
-    lon: <Degrees>114.129610,
+    lon: <Degrees>114.12961,
     alt: <Kilometers>0.0,
     minAz: <Degrees>0,
     maxAz: <Degrees>360,
@@ -1392,7 +1392,7 @@ export const sensors = <SensorList>{
     id: 0,
     name: 'Pechora, Russia',
     uiName: 'Pechora',
-    system: 'Dar\'yal',
+    system: "Dar'yal",
     freqBand: 'UHF',
     type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: <Degrees>65.21,
@@ -1754,8 +1754,8 @@ export const sensors = <SensorList>{
   ZHE: new DetailedSensor({
     objName: 'ZHE',
     id: 0,
-    name: 'Lin\'an Zhejiang, China',
-    uiName: 'Lin\'an',
+    name: "Lin'an Zhejiang, China",
+    uiName: "Lin'an",
     system: 'LPAR',
     freqBand: 'X-Band',
     type: SpaceObjectType.PHASED_ARRAY_RADAR,

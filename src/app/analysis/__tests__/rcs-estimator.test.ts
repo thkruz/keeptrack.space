@@ -13,19 +13,20 @@ import {
 import { Satellite, SpaceObjectType } from '@ootk/src/main';
 import { describe, expect, it } from 'vitest';
 
-const makeSat = (overrides: Partial<Satellite>): Satellite => ({
-  id: 0,
-  name: '',
-  type: SpaceObjectType.PAYLOAD,
-  bus: '',
-  length: '',
-  diameter: '',
-  span: '',
-  shape: '',
-  rcs: null,
-  vmag: null,
-  ...overrides,
-} as unknown as Satellite);
+const makeSat = (overrides: Partial<Satellite>): Satellite =>
+  ({
+    id: 0,
+    name: '',
+    type: SpaceObjectType.PAYLOAD,
+    bus: '',
+    length: '',
+    diameter: '',
+    span: '',
+    shape: '',
+    rcs: null,
+    vmag: null,
+    ...overrides,
+  }) as unknown as Satellite;
 
 describe('lookupKnownRcs', () => {
   it('matches a Starlink name prefix (hyphenated form) to the curated entry', () => {
@@ -162,10 +163,7 @@ describe('estimateRcsWithSource cascade', () => {
   });
 
   it('falls back to catalog-mined when no preset matches but bus is in stats', () => {
-    const stats = buildCatalogRcsStats([
-      makeSat({ id: 1, name: 'OBSCURE-1', bus: 'OBSCURE BUS', rcs: 33 }),
-      makeSat({ id: 2, name: 'OBSCURE-2', bus: 'OBSCURE BUS', rcs: 27 }),
-    ]);
+    const stats = buildCatalogRcsStats([makeSat({ id: 1, name: 'OBSCURE-1', bus: 'OBSCURE BUS', rcs: 33 }), makeSat({ id: 2, name: 'OBSCURE-2', bus: 'OBSCURE BUS', rcs: 27 })]);
     const sat = makeSat({ name: 'OBSCURE-NEW', bus: 'OBSCURE BUS' });
     const result = estimateRcsWithSource(sat, stats);
 
@@ -254,14 +252,11 @@ describe('estimateRcs (numeric convenience)', () => {
 });
 
 describe('KNOWN_OBJECT_RCS calibration', () => {
-  it.each(KNOWN_OBJECT_RCS.map((entry) => [entry.id, entry.rcs]))(
-    '%s rcs is finite and within a plausible physical range',
-    (_id, rcs) => {
-      expect(isFinite(rcs as number)).toBe(true);
-      // CubeSat (3U) is the smallest at ~0.03 m²; ISS is the largest at ~400 m².
-      // Anything outside [0.001, 5000] m² is almost certainly a typo.
-      expect(rcs as number).toBeGreaterThan(0.001);
-      expect(rcs as number).toBeLessThan(5000);
-    },
-  );
+  it.each(KNOWN_OBJECT_RCS.map((entry) => [entry.id, entry.rcs]))('%s rcs is finite and within a plausible physical range', (_id, rcs) => {
+    expect(isFinite(rcs as number)).toBe(true);
+    // CubeSat (3U) is the smallest at ~0.03 m²; ISS is the largest at ~400 m².
+    // Anything outside [0.001, 5000] m² is almost certainly a typo.
+    expect(rcs as number).toBeGreaterThan(0.001);
+    expect(rcs as number).toBeLessThan(5000);
+  });
 });

@@ -1,7 +1,7 @@
 import { SoundNames } from '@app/engine/audio/sounds';
+import { ServiceLocator } from '../core/service-locator';
 import { html } from '../utils/development/formatter';
 import { DraggableModal } from './draggable-modal';
-import { ServiceLocator } from '../core/service-locator';
 
 interface InputModalOptions {
   title?: string;
@@ -37,13 +37,7 @@ export class ModalInput extends DraggableModal {
   }
 
   protected getModalContentHtml(): string {
-    const {
-      label = '',
-      placeholder = '',
-      defaultValue = '',
-      submitText = 'OK',
-      cancelText = 'Cancel',
-    } = this.options_;
+    const { label = '', placeholder = '', defaultValue = '', submitText = 'OK', cancelText = 'Cancel' } = this.options_;
 
     return html`
       <div class="input-modal">

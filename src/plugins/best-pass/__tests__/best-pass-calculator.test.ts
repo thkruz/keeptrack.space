@@ -1,19 +1,12 @@
 import { lookanglesRow } from '@app/engine/core/interfaces';
-import {
-  BestPassDeps,
-  emptyPassRow,
-  findPassesForSat,
-  normalizePassRows,
-  PassRae,
-  scorePass,
-} from '@app/plugins/best-pass/best-pass-calculator';
-import { defaultSensor } from '@test/environment/apiMocks';
+import { BestPassDeps, emptyPassRow, findPassesForSat, normalizePassRows, PassRae, scorePass } from '@app/plugins/best-pass/best-pass-calculator';
 import { SatelliteRecord } from '@ootk/src/main';
+import { defaultSensor } from '@test/environment/apiMocks';
 
 const BASE_MS = Date.UTC(2025, 0, 1, 0, 0, 0);
 
 /** Fake satrec: only `no` (mean motion, rad/min) is read, to size the post-pass skip. */
-const fakeSatrec = (no: number): SatelliteRecord => ({ no } as unknown as SatelliteRecord);
+const fakeSatrec = (no: number): SatelliteRecord => ({ no }) as unknown as SatelliteRecord;
 
 /**
  * Builds deps whose getRae reports a satellite in view (el 45 deg) inside the
@@ -27,12 +20,10 @@ const buildDeps = (windows: Array<[number, number]>): BestPassDeps => {
     getRae: (date): PassRae => {
       const offsetMs = date.getTime() - BASE_MS;
 
-      return inView(offsetMs)
-        ? { az: 180, el: 45, rng: 1000 }
-        : { az: 180, el: -10, rng: 2000 };
+      return inView(offsetMs) ? { az: 180, el: 45, rng: 1000 } : { az: 180, el: -10, rng: 2000 };
     },
     checkIsInView: (_sensor, rae) => (rae.el ?? -90) >= 0,
-    sunEciKm: () => ({ x: 1.4e8, y: 0, z: 0 } as ReturnType<BestPassDeps['sunEciKm']>),
+    sunEciKm: () => ({ x: 1.4e8, y: 0, z: 0 }) as ReturnType<BestPassDeps['sunEciKm']>,
   };
 };
 
@@ -74,7 +65,7 @@ describe('best-pass-calculator', () => {
         defaultSensor,
         { lengthDays: 0.01, intervalSec: 5 },
         buildDeps([[100_000, 200_000]]),
-        'TestSensor',
+        'TestSensor'
       );
 
       expect(truncated).toBe(false);
@@ -92,13 +83,7 @@ describe('best-pass-calculator', () => {
     });
 
     it('returns no passes when the satellite is never in view', () => {
-      const { passes, truncated } = findPassesForSat(
-        '25544',
-        fakeSatrec(0.0011),
-        defaultSensor,
-        { lengthDays: 0.01, intervalSec: 5 },
-        buildDeps([]),
-      );
+      const { passes, truncated } = findPassesForSat('25544', fakeSatrec(0.0011), defaultSensor, { lengthDays: 0.01, intervalSec: 5 }, buildDeps([]));
 
       expect(passes).toHaveLength(0);
       expect(truncated).toBe(false);
@@ -112,7 +97,10 @@ describe('best-pass-calculator', () => {
         fakeSatrec(4.19),
         defaultSensor,
         { lengthDays: 0.01, intervalSec: 5, maxResults: 1 },
-        buildDeps([[100_000, 200_000], [300_000, 400_000]]),
+        buildDeps([
+          [100_000, 200_000],
+          [300_000, 400_000],
+        ])
       );
 
       expect(passes).toHaveLength(1);

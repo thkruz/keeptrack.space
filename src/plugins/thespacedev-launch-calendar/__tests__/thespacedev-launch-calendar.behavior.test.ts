@@ -45,26 +45,27 @@ const launchResult = (over: Record<string, unknown> = {}) => ({
 });
 
 /** A FUTURE launch so initTable renders a formatted date rather than the TBD string. */
-const futureLaunch = (over: Record<string, unknown> = {}): LaunchInfoObject => ({
-  name: 'Future Launch',
-  updated: new Date('2099-01-01T00:00:00Z'),
-  windowStart: new Date('2099-06-01T12:00:00Z'),
-  windowEnd: new Date('2099-06-01T12:30:00Z'),
-  location: 'Cape Canaveral',
-  locationURL: 'https://example.com/loc',
-  agency: 'SpaceX',
-  agencyURL: 'https://example.com/agency',
-  country: 'USA,FRA',
-  mission: 'Mission description',
-  missionName: 'A Very Long Mission Name That Truncates',
-  missionType: 'Test',
-  missionURL: 'https://example.com/mission',
-  rocket: 'Falcon 9',
-  rocketConfig: 'Block 5',
-  rocketFamily: 'Falcon',
-  rocketURL: 'https://example.com/rocket',
-  ...over,
-} as LaunchInfoObject);
+const futureLaunch = (over: Record<string, unknown> = {}): LaunchInfoObject =>
+  ({
+    name: 'Future Launch',
+    updated: new Date('2099-01-01T00:00:00Z'),
+    windowStart: new Date('2099-06-01T12:00:00Z'),
+    windowEnd: new Date('2099-06-01T12:30:00Z'),
+    location: 'Cape Canaveral',
+    locationURL: 'https://example.com/loc',
+    agency: 'SpaceX',
+    agencyURL: 'https://example.com/agency',
+    country: 'USA,FRA',
+    mission: 'Mission description',
+    missionName: 'A Very Long Mission Name That Truncates',
+    missionType: 'Test',
+    missionURL: 'https://example.com/mission',
+    rocket: 'Falcon 9',
+    rocketConfig: 'Block 5',
+    rocketFamily: 'Falcon',
+    rocketURL: 'https://example.com/rocket',
+    ...over,
+  }) as LaunchInfoObject;
 
 describe('TheSpaceDevLaunchCalendarPlugin behavior', () => {
   let plugin: TheSpaceDevLaunchCalendarPlugin;

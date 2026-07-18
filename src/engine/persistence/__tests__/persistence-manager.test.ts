@@ -183,7 +183,7 @@ describe('PersistenceManager', () => {
           [StorageKey.WATCHLIST_LIST]: 123,
           [StorageKey.CALCULATOR_SETTINGS]: 456,
           'v2-removed-key': 789,
-        }),
+        })
       );
 
       PersistenceManager.resetInstance();

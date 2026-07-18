@@ -1,7 +1,7 @@
-import { vi } from 'vitest';
-import { CatalogSearch } from '@app/app/data/catalog-search';
 import { SatMath } from '@app/app/analysis/sat-math';
+import { CatalogSearch } from '@app/app/data/catalog-search';
 import { CatalogSource, Satellite, SpaceObjectType } from '@ootk/src/main';
+import { vi } from 'vitest';
 
 /*
  * Branch coverage for CatalogSearch paths the existing suite never reaches:
@@ -11,14 +11,15 @@ import { CatalogSource, Satellite, SpaceObjectType } from '@ootk/src/main';
  */
 describe('CatalogSearch.findObjsByOrbit', () => {
   // Lightweight stubs — findObjsByOrbit only reads isStatic/inclination/period/id.
-  const stub = (id: number, raan: number, over: Partial<Satellite> = {}) => ({
-    id,
-    inclination: 51,
-    period: 90,
-    isStatic: () => false,
-    testRaan: raan,
-    ...over,
-  }) as unknown as Satellite;
+  const stub = (id: number, raan: number, over: Partial<Satellite> = {}) =>
+    ({
+      id,
+      inclination: 51,
+      period: 90,
+      isStatic: () => false,
+      testRaan: raan,
+      ...over,
+    }) as unknown as Satellite;
 
   beforeEach(() => {
     // Return the per-stub RAAN we tagged on each object.
@@ -53,9 +54,12 @@ describe('CatalogSearch.findObjsByOrbit', () => {
 });
 
 describe('CatalogSearch.findReentry', () => {
-  const sat = (sccNum: string, perigee: number, type = SpaceObjectType.PAYLOAD) => ({
-    sccNum, perigee, type,
-  }) as unknown as Satellite;
+  const sat = (sccNum: string, perigee: number, type = SpaceObjectType.PAYLOAD) =>
+    ({
+      sccNum,
+      perigee,
+      type,
+    }) as unknown as Satellite;
 
   it('returns the lowest-perigee objects sorted ascending', () => {
     const data = [sat('300', 500), sat('100', 100), sat('200', 250)];
@@ -81,12 +85,13 @@ describe('CatalogSearch.findReentry', () => {
 });
 
 describe('CatalogSearch.yearOrLess special-event debris', () => {
-  const debris = (intlDes: string) => ({
-    intlDes,
-    source: CatalogSource.CELESTRAK,
-    launchDate: '',
-    tle1: '1 25544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991',
-  }) as unknown as Satellite;
+  const debris = (intlDes: string) =>
+    ({
+      intlDes,
+      source: CatalogSource.CELESTRAK,
+      launchDate: '',
+      tle1: '1 25544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991',
+    }) as unknown as Satellite;
 
   it('includes Fengyun-1C (1999-025) debris within the event year window', () => {
     expect(CatalogSearch.yearOrLess([debris('1999-025DA')], 10)).toHaveLength(1);

@@ -9,8 +9,8 @@ import {
   DEFAULT_BREAKUP_PRESET,
   getBreakupPreset,
   isAnalystRangeValid,
-  makeRng,
   MS_TO_KMS,
+  makeRng,
   nextGaussian,
   parseBreakupParams,
   sampleDeltaV,
@@ -259,14 +259,12 @@ describe('breakup-core', () => {
       const { position, velocity } = stateOf(ISS_TLE1, ISS_TLE2);
       const basis = computeRicBasis(position, velocity);
 
-      expect(() => buildFragmentTle(BREAKUP_DATE, position, velocity, basis, { r: 0, i: -0.6, c: 0 }, '90000'))
-        .toThrow(/sub-orbital|reenter|mean motion/u);
+      expect(() => buildFragmentTle(BREAKUP_DATE, position, velocity, basis, { r: 0, i: -0.6, c: 0 }, '90000')).toThrow(/sub-orbital|reenter|mean motion/u);
     });
   });
 
   describe('breakup presets', () => {
-    const rms = (p: { radial: number; inTrack: number; crossTrack: number }) =>
-      Math.sqrt(p.radial ** 2 + p.inTrack ** 2 + p.crossTrack ** 2);
+    const rms = (p: { radial: number; inTrack: number; crossTrack: number }) => Math.sqrt(p.radial ** 2 + p.inTrack ** 2 + p.crossTrack ** 2);
 
     it('defines the five event-type presets in increasing energy by type', () => {
       const ids = BREAKUP_PRESETS.map((p) => p.id);

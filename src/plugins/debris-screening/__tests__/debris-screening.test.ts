@@ -1,10 +1,10 @@
-import { vi } from 'vitest';
-import { getEl } from '@app/engine/utils/get-el';
 import { hasBottomIcon, hasHelp, hasSecondaryMenu, hasSideMenu } from '@app/engine/plugins/core/plugin-capabilities';
+import { getEl } from '@app/engine/utils/get-el';
 import { DebrisScreening } from '@app/plugins/debris-screening/debris-screening';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('DebrisScreening_class', () => {
   beforeEach(() => {

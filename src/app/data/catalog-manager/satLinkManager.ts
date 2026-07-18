@@ -1,4 +1,6 @@
 /* eslint-disable max-depth */
+
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { SensorMath } from '@app/app/sensors/sensor-math';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { TimeManager } from '@app/engine/core/time-manager';
@@ -6,8 +8,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { LineManager } from '@app/engine/rendering/line-manager';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { Satellite, RAD2DEG } from '@ootk/src/main';
-import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { RAD2DEG, Satellite } from '@ootk/src/main';
 import numeric from 'numeric';
 import type { ControlSite } from './ControlSite';
 
@@ -47,7 +48,9 @@ export class SatLinkManager {
     43567,
   ];
   private readonly sbirsSatnums_: number[] = [37481, 39120, 43162, 41937, 48618, 53355];
-  private readonly dspSatnums_: number[] = [4630, 5204, 5851, 6691, 8482, 8916, 9803, 11397, 12339, 13086, 14930, 15453, 18583, 20066, 20929, 21805, 23435, 24737, 26356, 26880, 28158];
+  private readonly dspSatnums_: number[] = [
+    4630, 5204, 5851, 6691, 8482, 8916, 9803, 11397, 12339, 13086, 14930, 15453, 18583, 20066, 20929, 21805, 23435, 24737, 26356, 26880, 28158,
+  ];
   private readonly starlinkSatnums_: number[] = [
     44235, 44236, 44237, 44238, 44239, 44240, 44241, 44242, 44243, 44244, 44245, 44247, 44248, 44249, 44250, 44251, 44252, 44253, 44254, 44255, 44256, 44257, 44258, 44259, 44260,
     44261, 44262, 44263, 44264, 44265, 44266, 44267, 44268, 44269, 44270, 44271, 44272, 44273, 44274, 44275, 44276, 44277, 44278, 44279, 44280, 44281, 44282, 44283, 44284, 44285,
@@ -91,10 +94,7 @@ export class SatLinkManager {
   }
 
   init(controlSiteList: ControlSite[]) {
-    EventBus.getInstance().on(
-      EventBusEvent.onCruncherReady,
-      () => this.onCruncher_(controlSiteList),
-    );
+    EventBus.getInstance().on(EventBusEvent.onCruncherReady, () => this.onCruncher_(controlSiteList));
   }
 
   private onCruncher_(controlSiteList: ControlSite[]) {
@@ -102,7 +102,7 @@ export class SatLinkManager {
       this.idToSatnum_();
 
       for (const controlSite in controlSiteList) {
-        if (!Object.prototype.hasOwnProperty.call(controlSiteList, controlSite)) {
+        if (!Object.hasOwn(controlSiteList, controlSite)) {
           continue;
         }
 
@@ -129,7 +129,7 @@ export class SatLinkManager {
     const staticSet = ServiceLocator.getCatalogManager().staticSet;
 
     for (const sensor in staticSet) {
-      if (!Object.prototype.hasOwnProperty.call(staticSet, sensor)) {
+      if (!Object.hasOwn(staticSet, sensor)) {
         continue;
       }
       if (staticSet[sensor].linkAehf) {
@@ -238,13 +238,11 @@ export class SatLinkManager {
                   <number>(
                     numeric.dot(
                       [-sat1.position.x, -sat1.position.y, -sat1.position.z],
-                      [-sat1.position.x + sat2.position.x, -sat1.position.y + sat2.position.y, -sat1.position.z + sat2.position.z],
+                      [-sat1.position.x + sat2.position.x, -sat1.position.y + sat2.position.y, -sat1.position.z + sat2.position.z]
                     )
                   ) /
-                  (Math.sqrt((-sat1.position.x) ** 2 + (-sat1.position.y) ** 2 + (-sat1.position.z) ** 2) *
-                    Math.sqrt(
-                      (-sat1.position.x + sat2.position.x) ** 2 + (-sat1.position.y + sat2.position.y) ** 2 + (-sat1.position.z + sat2.position.z) ** 2,
-                    )),
+                    (Math.sqrt((-sat1.position.x) ** 2 + (-sat1.position.y) ** 2 + (-sat1.position.z) ** 2) *
+                      Math.sqrt((-sat1.position.x + sat2.position.x) ** 2 + (-sat1.position.y + sat2.position.y) ** 2 + (-sat1.position.z + sat2.position.z) ** 2))
                 ) * RAD2DEG;
 
               if (theta < minTheta) {

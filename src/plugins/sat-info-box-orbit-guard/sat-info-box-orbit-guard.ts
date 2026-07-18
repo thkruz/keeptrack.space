@@ -1,7 +1,8 @@
 /* eslint-disable camelcase */
-import * as echarts from 'echarts';
+
 /* eslint-disable max-lines */
 import { EChartsData } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
@@ -9,11 +10,10 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, setInnerHtml, showEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, RADIUS_OF_EARTH, Satellite } from '@ootk/src/main';
+import * as echarts from 'echarts';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { EL, SECTIONS } from './sat-info-box-orbit-guard-html';
-
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import './sat-info-box-orbit-guard.css';
 
 export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
@@ -71,7 +71,7 @@ export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': this.bearerToken,
+          Authorization: this.bearerToken,
         },
         body: JSON.stringify({
           satNo: [sccNum],
@@ -84,7 +84,7 @@ export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
       }
 
       const data = await response.json();
-      const elsets = (data[sccNum]?.elset ?? []).map(((entry) => ({
+      const elsets = (data[sccNum]?.elset ?? []).map((entry) => ({
         epoch: entry.epoch,
         raan: entry.raan,
         inclination: entry.inclination,
@@ -94,7 +94,7 @@ export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
         eccentricity: entry.eccentricity,
         meanMotion: entry.meanMotion,
         period: 1440 / entry.period,
-      })));
+      }));
       const eoData = data[sccNum]?.eo ?? [];
       const detection = data[sccNum]?.detection ?? {};
 
@@ -344,7 +344,6 @@ export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
         if (av > 0 && av < 1) {
           const fixed = av.toFixed(4).substring(1); // remove leading "0"
 
-
           return (v < 0 ? '-' : '') + fixed; // keep sign
         }
 
@@ -418,7 +417,6 @@ export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
               } else {
                 valueStr = 'N/A';
               }
-
 
               return `
               <div>

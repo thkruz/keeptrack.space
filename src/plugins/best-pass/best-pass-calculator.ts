@@ -147,7 +147,7 @@ export const findPassesForSat = (
   sensor: DetailedSensor,
   options: BestPassOptions,
   deps: BestPassDeps,
-  sensorName: string | null = null,
+  sensorName: string | null = null
 ): BestPassResult => {
   const { baseTimeMs, getRae, checkIsInView, sunEciKm } = deps;
   const looksInterval = options.intervalSec;

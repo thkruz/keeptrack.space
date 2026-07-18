@@ -59,7 +59,7 @@ export class BufferGeometry {
     this.id = BufferGeometry.id++;
     this.uuid = uuidv4();
     this.type = type;
-    this.attributes = attributes ?? {} as Record<string, BufferAttribute>;
+    this.attributes = attributes ?? ({} as Record<string, BufferAttribute>);
     this.setAttributes(this.attributes);
   }
 
@@ -77,7 +77,7 @@ export class BufferGeometry {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.combinedBuffer);
 
     for (const key in this.attributes) {
-      if (!Object.prototype.hasOwnProperty.call(this.attributes, key)) {
+      if (!Object.hasOwn(this.attributes, key)) {
         continue;
       }
       const attribute = this.attributes[key];

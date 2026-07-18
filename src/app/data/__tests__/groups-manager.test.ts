@@ -1,9 +1,9 @@
-import { vi } from 'vitest';
 import { GroupsManager } from '@app/app/data/groups-manager';
 import { GroupType, ObjectGroup } from '@app/app/data/object-group';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { vi } from 'vitest';
 
 /*
  * GroupsManager owns the lifecycle of satellite groups: caching named groups,

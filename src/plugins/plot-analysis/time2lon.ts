@@ -15,17 +15,9 @@ import { Satellite, SpaceObjectType } from '@ootk/src/main';
 import waterfallPng from '@public/img/icons/waterfall.png';
 import * as echarts from 'echarts';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { buildChartOption, Time2LonChartLabels } from './time2lon-chart';
-import {
-  buildAllowedTypes,
-  buildSatLine,
-  buildTopCountries,
-  computeOrbits,
-  isSatelliteAllowed,
-  Time2LonFilters,
-  Time2LonSatLine,
-} from './time2lon-core';
 import { PlotWatermark } from './plot-download';
+import { buildChartOption, Time2LonChartLabels } from './time2lon-chart';
+import { buildAllowedTypes, buildSatLine, buildTopCountries, computeOrbits, isSatelliteAllowed, Time2LonFilters, Time2LonSatLine } from './time2lon-core';
 import './time2lon.css';
 
 type T7eKey = Parameters<typeof t7e>[0];
@@ -302,7 +294,7 @@ export class Time2LonPlots extends KeepTrackPlugin {
           this.chart?.hideLoading();
           errorManagerInstance.warn(`${t7e('plugins.Time2LonPlots.title' as T7eKey)}: ${message}`);
         },
-      },
+      }
     );
   }
 
@@ -439,12 +431,7 @@ export class Time2LonPlots extends KeepTrackPlugin {
           const orbits = computeOrbits(filters.maxTimeMin, sat.period);
           const totalPoints = filters.samplePoints * orbits;
           const llaPoints = SatMathApi.getLlaOfCurrentOrbit(sat, totalPoints, orbits);
-          const line = buildSatLine(
-            { satId: sat.id, satName: sat.name, country: candidate.country },
-            llaPoints,
-            nowMs,
-            filters.maxTimeMin,
-          );
+          const line = buildSatLine({ satId: sat.id, satName: sat.name, country: candidate.country }, llaPoints, nowMs, filters.maxTimeMin);
 
           if (line) {
             satLines.push(line);

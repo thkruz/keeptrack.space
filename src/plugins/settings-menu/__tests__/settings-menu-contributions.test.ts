@@ -3,10 +3,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import {
-  ISettingsContribution,
-  ISettingsContributor,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { ISettingsContribution, ISettingsContributor } from '@app/engine/plugins/core/plugin-capabilities';
 import { KeepTrack } from '@app/keeptrack';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -116,9 +113,11 @@ describe('SettingsMenuPlugin.collectPluginContributions_', () => {
     PluginRegistry.unregisterAllPlugins();
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
-    PluginRegistry.addPlugin(new TestPlugin('broken', () => {
-      throw new Error('boom');
-    }));
+    PluginRegistry.addPlugin(
+      new TestPlugin('broken', () => {
+        throw new Error('boom');
+      })
+    );
     PluginRegistry.addPlugin(new TestPlugin('ok', () => makeToggleContribution('ok', 'O')));
 
     const result = collectStatic.collectPluginContributions_();
@@ -156,11 +155,13 @@ describe('SettingsMenuPlugin.renderPluginContributions_', () => {
     const plugin = new SettingsMenuPlugin();
     const set = vi.fn();
 
-    PluginRegistry.addPlugin(new TestPlugin('Wire', () => ({
-      sectionId: 'Wire',
-      sectionLabel: 'Wire',
-      controls: [{ type: 'toggle', id: 'flag', label: 'Flag', get: () => false, set }],
-    })));
+    PluginRegistry.addPlugin(
+      new TestPlugin('Wire', () => ({
+        sectionId: 'Wire',
+        sectionLabel: 'Wire',
+        controls: [{ type: 'toggle', id: 'flag', label: 'Flag', get: () => false, set }],
+      }))
+    );
     websiteInit(plugin);
 
     const input = document.getElementById('setting-Wire-flag') as HTMLInputElement | null;
@@ -176,20 +177,22 @@ describe('SettingsMenuPlugin.renderPluginContributions_', () => {
     const plugin = new SettingsMenuPlugin();
     let visible = false;
 
-    PluginRegistry.addPlugin(new TestPlugin('Reveal', () => ({
-      sectionId: 'Reveal',
-      sectionLabel: 'Reveal',
-      controls: [
-        {
-          type: 'toggle',
-          id: 'flag',
-          label: 'Flag',
-          isAvailable: () => visible,
-          get: () => false,
-          set: vi.fn(),
-        },
-      ],
-    })));
+    PluginRegistry.addPlugin(
+      new TestPlugin('Reveal', () => ({
+        sectionId: 'Reveal',
+        sectionLabel: 'Reveal',
+        controls: [
+          {
+            type: 'toggle',
+            id: 'flag',
+            label: 'Flag',
+            isAvailable: () => visible,
+            get: () => false,
+            set: vi.fn(),
+          },
+        ],
+      }))
+    );
     websiteInit(plugin);
 
     // First render: control hidden → section also hidden because every control was hidden.

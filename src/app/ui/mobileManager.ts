@@ -2,7 +2,13 @@ import { ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { AtmosphereSettings, EarthCloudTextureQuality, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
+import {
+  AtmosphereSettings,
+  EarthCloudTextureQuality,
+  EarthDayTextureQuality,
+  EarthNightTextureQuality,
+  EarthTextureStyle,
+} from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { KeepTrack } from '@app/keeptrack';
 import { Kilometers, Radians } from '@ootk/src/main';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
@@ -79,8 +85,10 @@ export class MobileManager {
             settingsManager.isShowPrimaryLogo = false;
             settingsManager.isShowSecondaryLogo = false;
           } else if (!settingsManager.isMobileModeEnabled) {
-            ServiceLocator.getUiManager().toast('Full Version of KeepTrack is not available on mobile devices. Please use a desktop browser to access the full version.',
-              ToastMsgType.normal);
+            ServiceLocator.getUiManager().toast(
+              'Full Version of KeepTrack is not available on mobile devices. Please use a desktop browser to access the full version.',
+              ToastMsgType.normal
+            );
           }
 
           Object.assign(settingsManager, {
@@ -129,13 +137,10 @@ export class MobileManager {
             maxSize: 70,
           });
 
-          EventBus.getInstance().on(
-            EventBusEvent.selectSatData,
-            () => {
-              ServiceLocator.getUiManager().searchManager.closeSearch();
-              hideEl('actions-section');
-            },
-          );
+          EventBus.getInstance().on(EventBusEvent.selectSatData, () => {
+            ServiceLocator.getUiManager().searchManager.closeSearch();
+            hideEl('actions-section');
+          });
 
           settingsManager.maxAnalystSats = 1;
           settingsManager.maxFieldOfViewMarkers = 1;
@@ -175,7 +180,7 @@ export class MobileManager {
       return window.settingsOverride.isForceMobileMode;
     }
 
-    return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/iu).test(navigator.userAgent);
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/iu.test(navigator.userAgent);
   }
 }
 

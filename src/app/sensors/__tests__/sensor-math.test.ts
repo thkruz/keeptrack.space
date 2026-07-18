@@ -1,10 +1,10 @@
-import { vi } from 'vitest';
 import { SatMath } from '@app/app/analysis/sat-math';
 import { SensorMath } from '@app/app/sensors/sensor-math';
 import { Container } from '@app/engine/core/container';
 import { Singletons } from '@app/engine/core/interfaces';
 import { SatelliteRecord } from '@ootk/src/main';
 import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
+import { vi } from 'vitest';
 
 describe('sensor-math', () => {
   // Should be able to process getTearData

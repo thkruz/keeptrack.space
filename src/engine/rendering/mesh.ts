@@ -72,7 +72,6 @@ export class Mesh {
     const vertexShaderHeader = this.createShaderHeadersVert_(params);
     const fragmentShaderHeader = this.createShaderHeadersFrag_(params);
 
-
     return { vertexShaderHeader, fragmentShaderHeader };
   }
 

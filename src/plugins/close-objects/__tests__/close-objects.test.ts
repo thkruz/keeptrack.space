@@ -1,7 +1,7 @@
 import { SatMath } from '@app/app/analysis/sat-math';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { getEl } from '@app/engine/utils/get-el';
 import { hasBottomIcon, hasHelp, hasSecondaryMenu, hasSideMenu } from '@app/engine/plugins/core/plugin-capabilities';
+import { getEl } from '@app/engine/utils/get-el';
 import { CloseObjectsPlugin } from '@app/plugins/close-objects/close-objects';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
@@ -109,15 +109,14 @@ describe('CloseObjectsPlugin search algorithm', () => {
   });
 
   it('getActualCSOs_ leaves the second satellite un-repropagated when it returns to the origin', () => {
-    vi.spyOn(SatMath, 'getEci').mockImplementation(((s: { sccNum: string; position: unknown }) => (
-      s.sccNum === '2' ? { position: { x: 0, y: 0, z: 0 } } : { position: s.position })) as never);
+    vi.spyOn(SatMath, 'getEci').mockImplementation(((s: { sccNum: string; position: unknown }) =>
+      s.sccNum === '2' ? { position: { x: 0, y: 0, z: 0 } } : { position: s.position }) as never);
 
     expect(() => statics.getActualCSOs_([{ sat1: sat(100, '1'), sat2: sat(120, '2') }], 50)).not.toThrow();
   });
 
   it('getActualCSOs_ skips pairs with undefined positions after re-propagation', () => {
-    vi.spyOn(SatMath, 'getEci').mockImplementation(((s: { sccNum: string }) => (
-      s.sccNum === '2' ? { position: undefined } : { position: { x: 100, y: 0, z: 0 } })) as never);
+    vi.spyOn(SatMath, 'getEci').mockImplementation(((s: { sccNum: string }) => (s.sccNum === '2' ? { position: undefined } : { position: { x: 100, y: 0, z: 0 } })) as never);
 
     // sat1 has a position, sat2's is undefined -> the pos2 guard skips the pair.
     expect(statics.getActualCSOs_([{ sat1: sat(100, '1'), sat2: sat(120, '2') }], 50)).toHaveLength(0);

@@ -27,9 +27,11 @@ describe('StringExtractor_class', () => {
 
   // Tests that extractLaunchSite returns correct launch site for known site
   it('test_extract_launch_site_known_site', () => {
-    expect(StringExtractor.extractLaunchSite('AFETR')).toEqual(
-      { site: 'Cape Canaveral SFS', country: 'United States', wikiUrl: 'https://en.wikipedia.org/wiki/Cape_Canaveral_Space_Force_Station' },
-    );
+    expect(StringExtractor.extractLaunchSite('AFETR')).toEqual({
+      site: 'Cape Canaveral SFS',
+      country: 'United States',
+      wikiUrl: 'https://en.wikipedia.org/wiki/Cape_Canaveral_Space_Force_Station',
+    });
   });
 
   // Tests that extractLaunchSite returns 'Unknown' for unknown site

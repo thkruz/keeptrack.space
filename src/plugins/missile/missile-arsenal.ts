@@ -1,7 +1,7 @@
-import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, UsaICBM, globalBMTargets, ukSLBM } from './missile-data';
 import { CHINA_LARGEST_CITIES, CHINA_MILITARY_BASES } from './china-targets';
+import { ChinaICBM, FraSLBM, globalBMTargets, NorthKoreanBM, RussianICBM, UsaICBM, ukSLBM } from './missile-data';
 import { RUSSIA_LARGEST_CITIES, RUSSIA_MILITARY_BASES } from './russia-targets';
-import { US_LARGEST_CITIES, US_MILITARY_BASES, type GeoTarget } from './us-targets';
+import { type GeoTarget, US_LARGEST_CITIES, US_MILITARY_BASES } from './us-targets';
 
 /**
  * A single selectable launch site in the Missile Simulator menu.
@@ -104,7 +104,7 @@ const extendedTargetFor = (id: number): GeoTarget | undefined => {
 
 /** Generated `<option>` entries for every extended catalog (literal place-name labels). */
 const extendedTargetOptions: readonly TargetOption[] = EXTENDED_TARGET_RANGES.flatMap((range) =>
-  range.list.map((place, i) => ({ id: range.base + i, label: place.name, groupKey: range.groupKey })),
+  range.list.map((place, i) => ({ id: range.base + i, label: place.name, groupKey: range.groupKey }))
 );
 
 /** Per-nation min apogee (km). USA silos differ from the Ohio sub, so USA is set per-entry below. */

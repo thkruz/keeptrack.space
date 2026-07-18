@@ -59,22 +59,25 @@ export class MeshRegistry {
       throw new Error(`No loader for ${extension}`);
     }
 
-    const promise = loader.load(meshName, url, gl).then((mesh) => {
-      if (!mesh) {
-        throw new Error(`Failed to load mesh from ${url}`);
-      }
+    const promise = loader
+      .load(meshName, url, gl)
+      .then((mesh) => {
+        if (!mesh) {
+          throw new Error(`Failed to load mesh from ${url}`);
+        }
 
-      this.meshes.set(meshName, mesh);
-      this.loadingPromises.delete(meshName);
+        this.meshes.set(meshName, mesh);
+        this.loadingPromises.delete(meshName);
 
-      return mesh;
-    }).catch((error: unknown) => {
-      // Drop the in-flight entry and remember the failure so we don't refetch every frame.
-      this.loadingPromises.delete(meshName);
-      this.failed.add(meshName);
+        return mesh;
+      })
+      .catch((error: unknown) => {
+        // Drop the in-flight entry and remember the failure so we don't refetch every frame.
+        this.loadingPromises.delete(meshName);
+        this.failed.add(meshName);
 
-      throw error;
-    });
+        throw error;
+      });
 
     this.loadingPromises.set(meshName, promise);
 

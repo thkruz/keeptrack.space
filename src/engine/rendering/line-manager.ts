@@ -424,8 +424,8 @@ export class LineManager {
         // Add concentric circles
         for (let r = circleInterval; r <= gridRadius; r += circleInterval) {
           for (let i = 0; i < circleSegments; i++) {
-            const angle1 = (i * 360 / circleSegments) * Math.PI / 180;
-            const angle2 = ((i + 1) * 360 / circleSegments) * Math.PI / 180;
+            const angle1 = (((i * 360) / circleSegments) * Math.PI) / 180;
+            const angle2 = ((((i + 1) * 360) / circleSegments) * Math.PI) / 180;
 
             const y1 = r * Math.cos(angle1);
             const z1 = r * Math.sin(angle1);
@@ -462,8 +462,8 @@ export class LineManager {
         // Add concentric circles
         for (let r = circleInterval; r <= gridRadius; r += circleInterval) {
           for (let i = 0; i < circleSegments; i++) {
-            const angle1 = (i * 360 / circleSegments) * Math.PI / 180;
-            const angle2 = ((i + 1) * 360 / circleSegments) * Math.PI / 180;
+            const angle1 = (((i * 360) / circleSegments) * Math.PI) / 180;
+            const angle2 = ((((i + 1) * 360) / circleSegments) * Math.PI) / 180;
 
             const x1 = r * Math.cos(angle1);
             const z1 = r * Math.sin(angle1);
@@ -500,8 +500,8 @@ export class LineManager {
         // Add concentric circles
         for (let r = circleInterval; r <= gridRadius; r += circleInterval) {
           for (let i = 0; i < circleSegments; i++) {
-            const angle1 = (i * 360 / circleSegments) * Math.PI / 180;
-            const angle2 = ((i + 1) * 360 / circleSegments) * Math.PI / 180;
+            const angle1 = (((i * 360) / circleSegments) * Math.PI) / 180;
+            const angle2 = ((((i + 1) * 360) / circleSegments) * Math.PI) / 180;
 
             const x1 = r * Math.cos(angle1);
             const y1 = r * Math.sin(angle1);
@@ -547,7 +547,6 @@ export class LineManager {
     for (const line of temeLines) {
       line.draw(gl, this);
     }
-
 
     // Apply ecliptic rotation to modelMatrix
     // TEME to J2000 transformation
@@ -600,18 +599,15 @@ export class LineManager {
       this.polarUniforms_[name] = gl.getUniformLocation(this.program, name);
     }
 
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (sat: BaseObject) => {
-        const camType = ServiceLocator.getMainCamera().cameraType;
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (sat: BaseObject) => {
+      const camType = ServiceLocator.getMainCamera().cameraType;
 
-        if (sat && camType !== CameraType.POLAR_VIEW && camType !== CameraType.PLANETARIUM && camType !== CameraType.ASTRONOMY) {
-          const sensor = ServiceLocator.getSensorManager().getSensor();
+      if (sat && camType !== CameraType.POLAR_VIEW && camType !== CameraType.PLANETARIUM && camType !== CameraType.ASTRONOMY) {
+        const sensor = ServiceLocator.getSensorManager().getSensor();
 
-          this.createSensorToSatFovAndSelectedOnly(sensor, sat as Satellite);
-        }
-      },
-    );
+        this.createSensorToSatFovAndSelectedOnly(sensor, sat as Satellite);
+      }
+    });
   }
 
   setAttribsAndDrawLineStrip(buffer: WebGLBuffer, segments: number) {
@@ -683,7 +679,7 @@ export class LineManager {
     const isPolarView = mainCamera.cameraType === CameraType.POLAR_VIEW;
 
     // 2D projections reproject raw ECI in-shader; zero the world offset for them
-    const worldShift = isFlatMap || isPolarView ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0];
+    const worldShift = isFlatMap || isPolarView ? [0, 0, 0] : (Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     gl.uniform3fv(this.uniforms_.worldOffset, worldShift);
 

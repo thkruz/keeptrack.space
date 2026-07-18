@@ -1,5 +1,5 @@
-import { vi } from 'vitest';
 import { NewTabUtils } from '@app/engine/utils/new-tab-utils';
+import { vi } from 'vitest';
 
 describe('NewTabUtils.varToNewTab', () => {
   afterEach(() => {

@@ -15,9 +15,7 @@ describe('KeyboardComponent', () => {
   beforeEach(() => {
     EventBus.getInstance().unregisterAllEvents();
     // Return whatever shortcuts are passed so registry conflicts don't drop them.
-    vi.spyOn(KeyboardShortcutRegistry, 'register').mockImplementation(
-      (_id: string, shortcuts: IKeyboardShortcut[]) => shortcuts,
-    );
+    vi.spyOn(KeyboardShortcutRegistry, 'register').mockImplementation((_id: string, shortcuts: IKeyboardShortcut[]) => shortcuts);
   });
 
   afterEach(() => {

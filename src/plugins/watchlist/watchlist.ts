@@ -35,22 +35,15 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
+import { t7e } from '@app/locales/keys';
 import { SatLabelMode } from '@app/settings/ui-settings';
 import { BaseObject, CatalogSource, Satellite } from '@ootk/src/main';
 import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import bookmarksPng from '@public/img/icons/bookmarks.png';
 import saveAs from 'file-saver';
-import { t7e } from '@app/locales/keys';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import {
-  IContextMenuConfig,
-  IHelpConfig,
-  IKeyboardShortcut,
-  ISettingsContribution,
-  ISettingsContributor,
-  RmbMenuContext,
-} from '../../engine/plugins/core/plugin-capabilities';
+import { IContextMenuConfig, IHelpConfig, IKeyboardShortcut, ISettingsContribution, ISettingsContributor, RmbMenuContext } from '../../engine/plugins/core/plugin-capabilities';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { EL as SAT_INFO_EL } from '../sat-info-box/sat-info-box-html';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -58,7 +51,7 @@ import { TopMenu } from '../top-menu/top-menu';
 import './watchlist.css';
 
 export interface UpdateWatchlistParams {
-  updateWatchlistList?: { id: number, inView: boolean }[];
+  updateWatchlistList?: { id: number; inView: boolean }[];
   isSkipSearch?: boolean;
 }
 
@@ -123,11 +116,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
           content: t7e('plugins.WatchlistPlugin.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.WatchlistPlugin.help.tip1'),
-        t7e('plugins.WatchlistPlugin.help.tip2'),
-        t7e('plugins.WatchlistPlugin.help.tip3'),
-      ],
+      tips: [t7e('plugins.WatchlistPlugin.help.tip1'), t7e('plugins.WatchlistPlugin.help.tip2'), t7e('plugins.WatchlistPlugin.help.tip3')],
       shortcuts: [{ keys: ['W'], description: t7e('plugins.WatchlistPlugin.help.shortcutToggle') }],
     };
   }
@@ -154,10 +143,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
             const parsed = parseInt(next, 10) as SatLabelMode;
 
             settingsManager.satLabelMode = parsed;
-            PersistenceManager.getInstance().saveItem(
-              StorageKey.SETTINGS_SAT_LABEL_MODE_V2,
-              parsed.toString(),
-            );
+            PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SAT_LABEL_MODE_V2, parsed.toString());
           },
         },
       ],
@@ -270,7 +256,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
   };
 
   isFilterActive = false;
-  watchlistList: { id: number, inView: boolean }[] = [];
+  watchlistList: { id: number; inView: boolean }[] = [];
 
   /**
    * Centralized filter state management. Syncs the secondary menu checkbox,
@@ -313,17 +299,15 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     EventBus.getInstance().on(EventBusEvent.onCruncherReady, this.onCruncherReady_.bind(this));
     EventBus.getInstance().on(EventBusEvent.satInfoBoxFinal, this.satInfoBoxFinal_.bind(this));
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerInit,
-      () => {
-        if (!settingsManager.isWatchlistTopMenuNotification) {
-          return;
-        }
+    EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
+      if (!settingsManager.isWatchlistTopMenuNotification) {
+        return;
+      }
 
-        // Optional if top-menu is enabled
-        getEl(TopMenu.TOP_RIGHT_ID, true)?.insertAdjacentHTML(
-          'afterbegin',
-          html`
+      // Optional if top-menu is enabled
+      getEl(TopMenu.TOP_RIGHT_ID, true)?.insertAdjacentHTML(
+        'afterbegin',
+        html`
                 <li id="top-menu-watchlist-li" class="hidden">
                   <a id="top-menu-watchlist-btn" class="top-menu-icons">
                     <div class="top-menu-icons bmenu-item-selected">
@@ -332,33 +316,29 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
                     </div>
                   </a>
                 </li>
-              `,
-        );
-      },
-    );
+              `
+      );
+    });
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        if (!settingsManager.isWatchlistTopMenuNotification) {
-          return;
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      if (!settingsManager.isWatchlistTopMenuNotification) {
+        return;
+      }
+
+      // Optional if top-menu is enabled
+      getEl('top-menu-watchlist-btn', true)?.addEventListener('click', () => {
+        ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+
+        if (!this.isMenuButtonActive) {
+          this.openSideMenu();
+          this.setBottomIconToSelected();
+          this.bottomIconCallback();
+        } else {
+          this.setBottomIconToUnselected();
+          this.closeSideMenu();
         }
-
-        // Optional if top-menu is enabled
-        getEl('top-menu-watchlist-btn', true)?.addEventListener('click', () => {
-          ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
-
-          if (!this.isMenuButtonActive) {
-            this.openSideMenu();
-            this.setBottomIconToSelected();
-            this.bottomIconCallback();
-          } else {
-            this.setBottomIconToUnselected();
-            this.closeSideMenu();
-          }
-        });
-      },
-    );
+      });
+    });
   }
 
   addJs(): void {
@@ -389,9 +369,12 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
   }
 
   protected satInfoBoxFinal_() {
-    getEl(SAT_INFO_EL.NAME)?.insertAdjacentHTML('beforebegin', html`
+    getEl(SAT_INFO_EL.NAME)?.insertAdjacentHTML(
+      'beforebegin',
+      html`
       <img id="${this.EL.WATCHLIST_TOGGLE}" src="${bookmarkAddPng}" class="sat-watchlist-icon off-watchlist"/>
-    `);
+    `
+    );
   }
 
   protected selectSatData_(obj?: BaseObject) {
@@ -448,8 +431,8 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     }
   }
 
-  createNewWatchlist(watchlistString: string): { id: number, inView: boolean }[] {
-    let newWatchlist: { id: number, inView: boolean }[];
+  createNewWatchlist(watchlistString: string): { id: number; inView: boolean }[] {
+    let newWatchlist: { id: number; inView: boolean }[];
     // We save it as an array of sccNums
     const savedSatList: string[] = this.unserialize(watchlistString);
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
@@ -477,7 +460,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     if (newWatchlist.length > 0) {
       ServiceLocator.getUiManager().toast(
         t7e('plugins.WatchlistPlugin.msgs.watchlistLoaded' as Parameters<typeof t7e>[0]).replace('{count}', newWatchlist.length.toString()),
-        ToastMsgType.normal,
+        ToastMsgType.normal
       );
     }
 
@@ -621,9 +604,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     // Drop entries whose satellite is no longer in the catalog. Filtering up
     // front avoids splicing the array during the render loop, which skipped the
     // entry immediately after every removed one.
-    this.watchlistList = this.watchlistList.filter(
-      ({ id }) => catalogManagerInstance.getSat(id, GetSatType.EXTRA_ONLY) !== null,
-    );
+    this.watchlistList = this.watchlistList.filter(({ id }) => catalogManagerInstance.getSat(id, GetSatType.EXTRA_ONLY) !== null);
 
     let watchlistListHTML = '';
 
@@ -652,9 +633,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
 
     EventBus.getInstance().emit(EventBusEvent.onWatchlistUpdated, this.watchlistList);
 
-    const watchlistString = this.watchlistList
-      .map(({ id }) => catalogManagerInstance.getSat(id, GetSatType.EXTRA_ONLY)?.sccNum ?? '')
-      .join(',');
+    const watchlistString = this.watchlistList.map(({ id }) => catalogManagerInstance.getSat(id, GetSatType.EXTRA_ONLY)?.sccNum ?? '').join(',');
 
     if (this.watchlistList.length > 0) {
       showEl('top-menu-watchlist-li');
@@ -765,9 +744,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
   }
 
   getSatellites() {
-    return this.watchlistList.map(({
-      id,
-    }) => id);
+    return this.watchlistList.map(({ id }) => id);
   }
 
   hasAnyInView() {
@@ -907,7 +884,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
       return;
     }
 
-    let newWatchlist: { id: string, inView: boolean }[];
+    let newWatchlist: { id: string; inView: boolean }[];
 
     try {
       // We save it as an array of sccNums
@@ -974,9 +951,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     const catalogManager = ServiceLocator.getCatalogManager();
 
     // Build from a filtered copy - serialize must not mutate watchlistList.
-    const satIds = this.watchlistList
-      .map(({ id }) => catalogManager.getSat(id, GetSatType.EXTRA_ONLY)?.sccNum)
-      .filter((sccNum): sccNum is string => typeof sccNum === 'string');
+    const satIds = this.watchlistList.map(({ id }) => catalogManager.getSat(id, GetSatType.EXTRA_ONLY)?.sccNum).filter((sccNum): sccNum is string => typeof sccNum === 'string');
 
     return JSON.stringify(satIds);
   }
@@ -984,7 +959,6 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
   unserialize(watchlistString: string): string[] {
     try {
       const savedSatList: string[] = JSON.parse(watchlistString);
-
 
       return savedSatList;
     } catch {

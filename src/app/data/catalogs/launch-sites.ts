@@ -1,7 +1,7 @@
 import { Degrees } from '@ootk/src/main';
+import { LaunchSite } from '../catalog-manager/LaunchFacility';
 import { AFETRList } from './launch-sites/afetr-list';
 import { AFWTRList } from './launch-sites/afwtr-list';
-import { LaunchSite } from '../catalog-manager/LaunchFacility';
 
 export const launchSites = {
   ...AFETRList,
@@ -76,7 +76,8 @@ export const launchSites = {
     wikiUrl: 'https://en.wikipedia.org/wiki/Jiuquan_Satellite_Launch_Center',
     defaultDir: 'S',
   },
-  PSCA: { // KODAK
+  PSCA: {
+    // KODAK
     name: 'Launch Pad 3C',
     lat: 57.435278,
     lon: -152.34,
@@ -101,7 +102,8 @@ export const launchSites = {
     country: 'Marshall Islands',
     wikiUrl: 'https://en.wikipedia.org/wiki/US_Army_Kwajalein_Atoll',
   },
-  KYMTR: { // Larger facility looks largely unused
+  KYMTR: {
+    // Larger facility looks largely unused
     name: 'Burya Launch Complex',
     lat: 48.47,
     lon: 46.32,
@@ -118,7 +120,8 @@ export const launchSites = {
     wikiUrl: 'https://en.wikipedia.org/wiki/Naro_Space_Center',
     defaultDir: 'S',
   },
-  'PKMTR-S35': { // PLMSC
+  'PKMTR-S35': {
+    // PLMSC
     name: 'Site 35', // Angara
     lat: 62.927319,
     lon: 40.574897,
@@ -127,7 +130,8 @@ export const launchSites = {
     wikiUrl: 'https://en.wikipedia.org/wiki/Plesetsk_Cosmodrome_Site_35',
     defaultDir: 'N',
   },
-  'PKMTR-S43': { // PLMSC
+  'PKMTR-S43': {
+    // PLMSC
     name: 'Site 43', // Soyuz
     lat: 62.92,
     lon: 40.466944,
@@ -144,7 +148,8 @@ export const launchSites = {
     country: 'United States',
     wikiUrl: 'https://en.wikipedia.org/wiki/Pacific_Missile_Range_Facility',
   },
-  'RLLC-1': { // RLLB
+  'RLLC-1': {
+    // RLLB
     name: 'Pad A/B',
     lat: -39.26,
     lon: 177.86,
@@ -161,7 +166,8 @@ export const launchSites = {
     country: 'China',
     wikiUrl: 'https://en.wikipedia.org/wiki/South_China_Sea',
   },
-  SEM: { // SEMLS
+  SEM: {
+    // SEMLS
     name: 'Main Launch Pad',
     lat: 35.237222,
     lon: 53.95,
@@ -179,7 +185,8 @@ export const launchSites = {
     wikiUrl: 'https://en.wikipedia.org/wiki/Shahroud_Space_Center',
     defaultDir: 'S',
   },
-  SNMLP: { // San Marco - this is no longer used
+  SNMLP: {
+    // San Marco - this is no longer used
     name: 'San Marco Launch Platform',
     lat: -2.9408,
     lon: 40.2134,
@@ -187,7 +194,8 @@ export const launchSites = {
     country: 'Kenya',
     wikiUrl: 'https://en.wikipedia.org/wiki/Broglio_Space_Centre',
   },
-  SPKII: { // Space Port Kii
+  SPKII: {
+    // Space Port Kii
     name: 'Launch Pad', // TODO: Not sure what the real name is?
     lat: 33.5443,
     lon: 135.8895,
@@ -195,7 +203,8 @@ export const launchSites = {
     country: 'Japan',
     wikiUrl: 'https://en.wikipedia.org/wiki/Space_Port_Kii',
   },
-  SRI: { // Sriharikota Range
+  SRI: {
+    // Sriharikota Range
     name: 'First/Second Launch Pad',
     lat: 13.72,
     lon: 80.23,
@@ -222,24 +231,26 @@ export const launchSites = {
     wikiUrl: 'https://en.wikipedia.org/wiki/Taiyuan_Satellite_Launch_Center',
     defaultDir: 'S',
   },
-  'TTMTR-1': { // TYMSC or Baikonur
-    name: 'Gagarin\'s Start',
+  'TTMTR-1': {
+    // TYMSC or Baikonur
+    name: "Gagarin's Start",
     lat: 45.920278,
     lon: 63.342222,
     site: 'Baikonur Cosmodrome',
     country: 'Kazakhstan',
     wikiUrl: 'https://en.wikipedia.org/wiki/Gagarin%27s_Start',
   },
-  'TTMTR-45': { // TYMSC or Baikonur
+  'TTMTR-45': {
+    // TYMSC or Baikonur
     name: 'Site 45',
     lat: 46.070833,
     lon: 62.984722,
     site: 'Baikonur Cosmodrome',
     country: 'Kazakhstan',
     wikiUrl: 'https://en.wikipedia.org/wiki/Baikonur_Cosmodrome_Site_45',
-
   },
-  'TTMTR-81': { // TYMSC or Baikonur
+  'TTMTR-81': {
+    // TYMSC or Baikonur
     name: 'Site 81',
     lat: 45.943,
     lon: 63.653,
@@ -247,7 +258,8 @@ export const launchSites = {
     country: 'Kazakhstan',
     wikiUrl: 'https://en.wikipedia.org/wiki/Baikonur_Cosmodrome_Site_81',
   },
-  'TTMTR-109': { // TYMSC or Baikonur
+  'TTMTR-109': {
+    // TYMSC or Baikonur
     name: 'Site 109',
     lat: 45.951,
     lon: 63.497,
@@ -255,7 +267,8 @@ export const launchSites = {
     country: 'Kazakhstan',
     wikiUrl: 'https://en.wikipedia.org/wiki/Baikonur_Cosmodrome_Site_109',
   },
-  SOHAE: { // YUN
+  SOHAE: {
+    // YUN
     name: 'Yunsong Launch Site',
     lat: 39.66,
     lon: 124.705,
@@ -280,7 +293,8 @@ export const launchSites = {
     wikiUrl: 'https://en.wikipedia.org/wiki/Vostochny_Cosmodrome',
     defaultDir: 'S',
   },
-  MARS: { // Wallops Flight Facility | WLPIS
+  MARS: {
+    // Wallops Flight Facility | WLPIS
     name: 'Pad 0B/0C', // Minotaur and Electron
     lat: 37.85,
     lon: -75.466667,
@@ -445,24 +459,24 @@ export const launchSites = {
   [key: string]: {
     name: string;
     lat: Degrees;
-    lon: Degrees
+    lon: Degrees;
     site: string;
     country: string;
     wikiUrl: null;
     defaultDir?: string; // Optional default direction
-  }
+  };
 };
-
 
 export const launchSiteObjects = Object.entries(launchSites).map(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ([_key, value]) => new LaunchSite({
-    name: value.name,
-    lat: value.lat,
-    lon: value.lon,
-    alt: 0, // Altitude is not provided in the original data
-    country: value.country ?? 'Unknown Country', // Default to 'Unknown Country' if country is not provided
-    site: value.site ?? 'Unknown Site', // Default to 'Unknown Site' if site is not provided
-    wikiUrl: value.wikiUrl ?? null, // Default to null if wikiUrl is not provided
-  }),
+  ([_key, value]) =>
+    new LaunchSite({
+      name: value.name,
+      lat: value.lat,
+      lon: value.lon,
+      alt: 0, // Altitude is not provided in the original data
+      country: value.country ?? 'Unknown Country', // Default to 'Unknown Country' if country is not provided
+      site: value.site ?? 'Unknown Site', // Default to 'Unknown Site' if site is not provided
+      wikiUrl: value.wikiUrl ?? null, // Default to null if wikiUrl is not provided
+    })
 );

@@ -13,8 +13,8 @@
  * mocks — so the assertions reflect production runtime behavior.
  */
 
-import { ColorScheme } from '@app/engine/rendering/color-schemes/color-scheme';
 import { CelestrakColorScheme } from '@app/engine/rendering/color-schemes/celestrak-color-scheme';
+import { ColorScheme } from '@app/engine/rendering/color-schemes/color-scheme';
 import { ConfidenceColorScheme } from '@app/engine/rendering/color-schemes/confidence-color-scheme';
 import { CountryColorScheme } from '@app/engine/rendering/color-schemes/country-color-scheme';
 import { GpAgeColorScheme } from '@app/engine/rendering/color-schemes/gp-age-color-scheme';

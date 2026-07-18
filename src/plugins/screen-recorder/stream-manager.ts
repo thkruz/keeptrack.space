@@ -53,9 +53,9 @@ export class StreamManager {
     };
 
     if (window.isSecureContext || settingsManager.offlineMode) {
-      const enhancedNavigator = navigator as Navigator &
-      { getDisplayMedia: (options: MediaRecorderOptions) => Promise<MediaStream>; } &
-      { mediaDevices: { getDisplayMedia: (options: MediaRecorderOptions) => Promise<MediaStream>; }; };
+      const enhancedNavigator = navigator as Navigator & { getDisplayMedia: (options: MediaRecorderOptions) => Promise<MediaStream> } & {
+        mediaDevices: { getDisplayMedia: (options: MediaRecorderOptions) => Promise<MediaStream> };
+      };
 
       if ('getDisplayMedia' in navigator) {
         return enhancedNavigator.getDisplayMedia(displayMediaOptions).catch((err: Error) => {
@@ -74,13 +74,11 @@ export class StreamManager {
       this.onError_();
 
       return false;
-
     }
     errorManagerInstance.warn('Recording requires a secure context (HTTPS or localhost)');
     this.onError_();
 
     return false;
-
   }
 
   handleDataAvailable(event: BlobEvent): void {

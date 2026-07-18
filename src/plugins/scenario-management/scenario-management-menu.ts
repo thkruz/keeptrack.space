@@ -26,12 +26,12 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { compressToGzip, decompressFromGzip } from '@app/engine/utils/compression';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
-import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { t7e } from '@app/locales/keys';
 import landscape3Png from '@public/img/icons/landscape3.png';
 import { saveAs } from 'file-saver';
@@ -157,17 +157,14 @@ export class ScenarioManagementMenu extends KeepTrackPlugin {
       descriptionInput.value = this.corePlugin_.defaultScenarioDescription;
     }
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        getEl(`${this.formPrefix_}-start-date`)?.addEventListener('change', this.onDateChange_.bind(this));
-        getEl(`${this.formPrefix_}-end-date`)?.addEventListener('change', this.onDateChange_.bind(this));
-        getEl(`${this.formPrefix_}-form`)?.addEventListener('submit', this.onSubmit_.bind(this));
-        getEl(`${this.formPrefix_}-clear-bounds`)?.addEventListener('click', this.onClearBounds_.bind(this));
-        getEl(`${this.formPrefix_}-save`)?.addEventListener('click', this.onSave_.bind(this));
-        getEl(`${this.formPrefix_}-load`)?.addEventListener('click', this.onLoad_.bind(this));
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      getEl(`${this.formPrefix_}-start-date`)?.addEventListener('change', this.onDateChange_.bind(this));
+      getEl(`${this.formPrefix_}-end-date`)?.addEventListener('change', this.onDateChange_.bind(this));
+      getEl(`${this.formPrefix_}-form`)?.addEventListener('submit', this.onSubmit_.bind(this));
+      getEl(`${this.formPrefix_}-clear-bounds`)?.addEventListener('click', this.onClearBounds_.bind(this));
+      getEl(`${this.formPrefix_}-save`)?.addEventListener('click', this.onSave_.bind(this));
+      getEl(`${this.formPrefix_}-load`)?.addEventListener('click', this.onLoad_.bind(this));
+    });
   }
 
   addJs(): void {
@@ -295,26 +292,28 @@ export class ScenarioManagementMenu extends KeepTrackPlugin {
 
         reader.onload = (event: ProgressEvent<FileReader>) => {
           if (event.target?.result instanceof ArrayBuffer) {
-            decompressFromGzip(new Uint8Array(event.target.result)).then((json) => {
-              try {
-                const parsed = JSON.parse(json);
-                const scenario = parsed.scenario;
-                const scenarioData: Partial<ScenarioData> = {
-                  name: scenario.name,
-                  description: scenario.description || '',
-                  startTime: scenario.startTime ? new Date(scenario.startTime) : null,
-                  endTime: scenario.endTime ? new Date(scenario.endTime) : null,
-                };
+            decompressFromGzip(new Uint8Array(event.target.result))
+              .then((json) => {
+                try {
+                  const parsed = JSON.parse(json);
+                  const scenario = parsed.scenario;
+                  const scenarioData: Partial<ScenarioData> = {
+                    name: scenario.name,
+                    description: scenario.description || '',
+                    startTime: scenario.startTime ? new Date(scenario.startTime) : null,
+                    endTime: scenario.endTime ? new Date(scenario.endTime) : null,
+                  };
 
-                if (this.corePlugin_.updateScenario(scenarioData)) {
-                  ServiceLocator.getUiManager().toast(l('msgs.scenarioLoaded'), ToastMsgType.normal);
+                  if (this.corePlugin_.updateScenario(scenarioData)) {
+                    ServiceLocator.getUiManager().toast(l('msgs.scenarioLoaded'), ToastMsgType.normal);
+                  }
+                } catch (error) {
+                  errorManagerInstance.error(error, 'scenario-management-menu.ts', l('errorMsgs.loadingScenarioFile'));
                 }
-              } catch (error) {
-                errorManagerInstance.error(error, 'scenario-management-menu.ts', l('errorMsgs.loadingScenarioFile'));
-              }
-            }).catch((error: Error) => {
-              errorManagerInstance.error(error, 'scenario-management-menu.ts', l('errorMsgs.decompressingScenarioFile'));
-            });
+              })
+              .catch((error: Error) => {
+                errorManagerInstance.error(error, 'scenario-management-menu.ts', l('errorMsgs.decompressingScenarioFile'));
+              });
           }
         };
         reader.readAsArrayBuffer(target.files[0]);

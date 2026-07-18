@@ -1,15 +1,15 @@
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
 import { SpaceObjectType } from '@ootk/src/main';
-import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { mat4 } from 'gl-matrix';
 import { CustomMeshFactory } from './custom-mesh-factory';
 import { FieldOfViewMesh } from './field-of-view-mesh';
 import { SensorFovMesh } from './sensor-fov-mesh';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 // TODO: Sensors should be indpeneent of the object they are attached to. This will remove minAz2 and maxAz2 type of properties
 
@@ -50,7 +50,7 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
       const sensorFovPlugin = PluginRegistry.getPlugin(SensorFov);
 
       if (sensorFovPlugin && sensorFovPlugin.isMenuButtonActive) {
-        ServiceLocator.getUiManager().toast('No valid FOV to draw! We can\'t draw multiple Deep Space sensors at once.', ToastMsgType.caution);
+        ServiceLocator.getUiManager().toast("No valid FOV to draw! We can't draw multiple Deep Space sensors at once.", ToastMsgType.caution);
         sensorFovPlugin.disableFovView();
       }
     }
@@ -71,20 +71,20 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
    */
   private checkIfNeeded_(activeSensors: DetailedSensor[], mesh: SensorFovMesh): boolean {
     // There needs to be a reason to draw the radar dome.
-    if (mesh.sensor.type === SpaceObjectType.SHORT_TERM_FENCE &&
-      ServiceLocator.getSensorManager().stfSensors.length === 0
-    ) {
+    if (mesh.sensor.type === SpaceObjectType.SHORT_TERM_FENCE && ServiceLocator.getSensorManager().stfSensors.length === 0) {
       // STFs are not reused, so remove them when they are not needed.
       this.remove(mesh.id);
 
       return false;
     }
 
-    if (mesh.sensor.type !== SpaceObjectType.SHORT_TERM_FENCE && (!PluginRegistry.getPlugin(SensorFov)?.isMenuButtonActive &&
-      !PluginRegistry.getPlugin(SensorSurvFence)?.isMenuButtonActive)) {
+    if (
+      mesh.sensor.type !== SpaceObjectType.SHORT_TERM_FENCE &&
+      !PluginRegistry.getPlugin(SensorFov)?.isMenuButtonActive &&
+      !PluginRegistry.getPlugin(SensorSurvFence)?.isMenuButtonActive
+    ) {
       return false;
     }
-
 
     // Ignore deep space when there are multiple sensors active
     if (activeSensors.length > 1 && mesh.sensor.maxRng > 40000) {

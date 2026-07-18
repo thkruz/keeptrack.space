@@ -28,16 +28,7 @@ export class RingGeometry extends BufferGeometry {
 
   constructor(
     gl: WebGL2RenderingContext,
-    {
-      innerRadius,
-      outerRadius,
-      thetaSegments,
-      phiSegments,
-      attributes = {},
-      isSkipTexture = false,
-      thetaStart = 0,
-      thetaLength = Math.PI * 2,
-    }: RingGeometryParams,
+    { innerRadius, outerRadius, thetaSegments, phiSegments, attributes = {}, isSkipTexture = false, thetaStart = 0, thetaLength = Math.PI * 2 }: RingGeometryParams
   ) {
     super({
       type: 'RingGeometry',
@@ -158,7 +149,9 @@ export class RingGeometry extends BufferGeometry {
 
   // --- Sorting and other methods remain unchanged ---
   sortFacesByDistance(camPos: vec3, modelMatrix?: Float32Array): void {
-    const buckets: number[][] = Array(this.NUM_BUCKETS).fill(null).map(() => []);
+    const buckets: number[][] = Array(this.NUM_BUCKETS)
+      .fill(null)
+      .map(() => []);
     const faceCenters: vec3[] = [];
 
     for (let i = 0; i < this.indices_.length; i += 3) {
@@ -205,11 +198,7 @@ export class RingGeometry extends BufferGeometry {
       const dist = vec3.squaredDistance(faceCenters[i / 3], camPos);
       const bucketIndex = Math.min(Math.floor((dist - minDist) / bucketSize), this.NUM_BUCKETS - 1);
 
-      buckets[bucketIndex].push(
-        this.indices_[i],
-        this.indices_[i + 1],
-        this.indices_[i + 2],
-      );
+      buckets[bucketIndex].push(this.indices_[i], this.indices_[i + 1], this.indices_[i + 2]);
     }
 
     this.sortedIndices = buckets.reduceRight((acc, bucket) => acc.concat(bucket), []);

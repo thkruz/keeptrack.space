@@ -1,12 +1,9 @@
-import { t7e, TranslationKey } from '@app/locales/keys';
 import { SoundNames } from '@app/engine/audio/sounds';
-import { fadeIn, fadeOut } from './fade';
+import { TranslationKey, t7e } from '@app/locales/keys';
 import { ServiceLocator } from '../core/service-locator';
+import { fadeIn, fadeOut } from './fade';
 
-const messages_ = [
-  'cunningPlan', 'satIntel', 'science', 'science2', 'math',
-  'dots', 'painting', 'coloring', 'elsets', 'models',
-];
+const messages_ = ['cunningPlan', 'satIntel', 'science', 'science2', 'math', 'dots', 'painting', 'coloring', 'elsets', 'models'];
 
 let overlayEl_: HTMLElement | null = null;
 let textEl_: HTMLElement | null = null;

@@ -35,7 +35,8 @@ export class NewTabUtils {
         .join('\n');
 
       // Create a download button at the top so you can download the settings as a .txt file
-      const downloadLink = `<a href="data:text/plain;charset=utf-8,${encodeURIComponent(formattedSettings)}" ` +
+      const downloadLink =
+        `<a href="data:text/plain;charset=utf-8,${encodeURIComponent(formattedSettings)}" ` +
         `download="${name.toLowerCase().replace(/\s+/gu, '-')}.txt">Download ${name}</a><br><br>`;
 
       win.document.write(downloadLink);

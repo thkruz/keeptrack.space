@@ -1,4 +1,4 @@
-import { test, expect } from '@test/e2e/coverage';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('GunterLaunchCalendar Plugin', () => {
@@ -29,16 +29,11 @@ test.describe('GunterLaunchCalendar Plugin', () => {
     // Iframe should point to the current year's launch calendar
     const currentYear = new Date().getFullYear();
 
-    await expect(page.locator('#colorbox-iframe')).toHaveAttribute(
-      'src',
-      `https://space.skyrocket.de/doc_chr/lau${currentYear}.htm`,
-    );
+    await expect(page.locator('#colorbox-iframe')).toHaveAttribute('src', `https://space.skyrocket.de/doc_chr/lau${currentYear}.htm`);
 
     // Close the colorbox via DOM click (header/iframe cover the overlay visually)
     await page.evaluate(() => {
-      document.getElementById('colorbox-div')?.dispatchEvent(
-        new MouseEvent('click', { bubbles: true }),
-      );
+      document.getElementById('colorbox-div')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
 
     // Colorbox should hide and icon should deselect

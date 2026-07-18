@@ -4,6 +4,7 @@ import {
   DEG2RAD,
   Degrees,
   EpochUTC,
+  eci2rae,
   Geodetic,
   ITRF,
   J2000,
@@ -12,10 +13,9 @@ import {
   RadecGeocentric,
   Radians,
   RaeVec3,
+  rae2eci,
   TEME,
   Vector3D,
-  eci2rae,
-  rae2eci,
 } from '@ootk/src/main';
 
 /** Coordinate frames the calculator can convert between. */
@@ -56,8 +56,12 @@ export interface ConversionContext {
 
 /** A position/velocity readout in a cartesian frame. */
 export interface CartesianOutput {
-  x: number; y: number; z: number;
-  vx: number; vy: number; vz: number;
+  x: number;
+  y: number;
+  z: number;
+  vx: number;
+  vy: number;
+  vz: number;
 }
 
 /** Structured numeric result of a conversion, one entry per output frame. */
@@ -70,10 +74,19 @@ export interface FrameOutputs {
   rae?: { range: number; az: number; el: number; sensorName: string } | null;
   radec?: { ra: number; dec: number; range: number };
   /** 'needsVelocity' when the state has no usable velocity. */
-  classical?: 'needsVelocity' | {
-    sma: number; ecc: number; inc: number; raan: number; argpe: number;
-    nu: number; period: number; apogee: number; perigee: number;
-  };
+  classical?:
+    | 'needsVelocity'
+    | {
+        sma: number;
+        ecc: number;
+        inc: number;
+        raan: number;
+        argpe: number;
+        nu: number;
+        period: number;
+        apogee: number;
+        perigee: number;
+      };
 }
 
 const ZERO_VEL = Vector3D.origin as Vector3D<KilometersPerSecond>;
@@ -82,7 +95,12 @@ const ZERO_VEL = Vector3D.origin as Vector3D<KilometersPerSecond>;
 const MIN_ORBITAL_VELOCITY = 0.001;
 
 const toCartesian = (pos: Vector3D<Kilometers>, vel: Vector3D<KilometersPerSecond>): CartesianOutput => ({
-  x: pos.x, y: pos.y, z: pos.z, vx: vel.x, vy: vel.y, vz: vel.z,
+  x: pos.x,
+  y: pos.y,
+  z: pos.z,
+  vx: vel.x,
+  vy: vel.y,
+  vz: vel.z,
 });
 
 const vec = (v: FrameInputValues, kx: string, ky: string, kz: string): Vector3D<Kilometers> =>
@@ -115,9 +133,9 @@ export function validateFrameInput(frame: CoordFrame, values: FrameInputValues):
 export function frameInputToJ2000(frame: CoordFrame, values: FrameInputValues, ctx: ConversionContext): J2000 {
   const { epoch } = ctx;
   const cartesianVel = (): Vector3D<KilometersPerSecond> =>
-    (CARTESIAN_FRAMES.includes(frame) && ('vx' in values)
+    CARTESIAN_FRAMES.includes(frame) && 'vx' in values
       ? new Vector3D<KilometersPerSecond>(values.vx as KilometersPerSecond, values.vy as KilometersPerSecond, values.vz as KilometersPerSecond)
-      : ZERO_VEL);
+      : ZERO_VEL;
 
   switch (frame) {
     case CoordFrame.J2000:
@@ -127,7 +145,9 @@ export function frameInputToJ2000(frame: CoordFrame, values: FrameInputValues, c
     case CoordFrame.TEME:
       return new TEME(epoch, vec(values, 'x', 'y', 'z'), cartesianVel()).toJ2000();
     case CoordFrame.LLA:
-      return Geodetic.fromDegrees(values.lat as Degrees, values.lon as Degrees, values.alt as Kilometers).toITRF(epoch).toJ2000();
+      return Geodetic.fromDegrees(values.lat as Degrees, values.lon as Degrees, values.alt as Kilometers)
+        .toITRF(epoch)
+        .toJ2000();
     case CoordFrame.RAE: {
       if (!ctx.sensor) {
         throw new Error('noSensorForRae');

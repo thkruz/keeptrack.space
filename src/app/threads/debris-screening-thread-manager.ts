@@ -6,8 +6,6 @@
 
 import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
 import {
-  DsWorkerMsgType,
-  DsWorkerOutMsgType,
   type DsMsgStartScreening,
   type DsOutChunk,
   type DsOutComplete,
@@ -15,7 +13,9 @@ import {
   type DsOutProgress,
   type DsResultRow,
   type DsSatelliteData,
+  DsWorkerMsgType,
   type DsWorkerOutMsg,
+  DsWorkerOutMsgType,
 } from '@app/webworker/debris-screening-messages';
 
 export interface DsScreeningCallbacks {
@@ -65,17 +65,10 @@ export class DebrisScreeningThreadManager extends WebWorkerThreadManager {
 
     switch (data.typ) {
       case DsWorkerOutMsgType.CHUNK:
-        this.callbacks_.onChunk(
-          (data as DsOutChunk).results,
-          (data as DsOutChunk).processedCount,
-          (data as DsOutChunk).totalCandidates,
-        );
+        this.callbacks_.onChunk((data as DsOutChunk).results, (data as DsOutChunk).processedCount, (data as DsOutChunk).totalCandidates);
         break;
       case DsWorkerOutMsgType.COMPLETE:
-        this.callbacks_.onComplete(
-          (data as DsOutComplete).totalResults,
-          (data as DsOutComplete).totalCandidates,
-        );
+        this.callbacks_.onComplete((data as DsOutComplete).totalResults, (data as DsOutComplete).totalCandidates);
         this.callbacks_ = null;
         break;
       case DsWorkerOutMsgType.ERROR:
@@ -83,10 +76,7 @@ export class DebrisScreeningThreadManager extends WebWorkerThreadManager {
         this.callbacks_ = null;
         break;
       case DsWorkerOutMsgType.PROGRESS:
-        this.callbacks_.onProgress(
-          (data as DsOutProgress).phase,
-          (data as DsOutProgress).candidateCount,
-        );
+        this.callbacks_.onProgress((data as DsOutProgress).phase, (data as DsOutProgress).candidateCount);
         break;
       default:
         break;

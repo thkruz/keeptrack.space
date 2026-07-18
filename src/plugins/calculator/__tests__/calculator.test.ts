@@ -1,14 +1,14 @@
-import { vi } from 'vitest';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
+import { KeepTrack } from '@app/keeptrack';
 import { Calculator } from '@app/plugins/calculator/calculator';
 import { toDms } from '@app/plugins/calculator/calculator-core';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
-import { KeepTrack } from '@app/keeptrack';
+import { vi } from 'vitest';
 
 describe('Calculator_class', () => {
   beforeEach(() => {

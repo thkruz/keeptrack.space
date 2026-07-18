@@ -1,9 +1,9 @@
-import { vi } from 'vitest';
-import { GroupType, ObjectGroup } from '@app/app/data/object-group';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { GroupType, ObjectGroup } from '@app/app/data/object-group';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { Satellite, SpaceObjectType, TleLine1 } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
+import { vi } from 'vitest';
 
 /*
  * ObjectGroup turns a query (year, name regex, country, shape, …) into a list

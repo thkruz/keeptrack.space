@@ -57,10 +57,7 @@ export class GunterLaunchCalendar extends KeepTrackPlugin {
           content: t7e('plugins.GunterLaunchCalendar.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.GunterLaunchCalendar.help.tip1'),
-        t7e('plugins.GunterLaunchCalendar.help.tip2'),
-      ],
+      tips: [t7e('plugins.GunterLaunchCalendar.help.tip1'), t7e('plugins.GunterLaunchCalendar.help.tip2')],
     };
   }
 
@@ -101,4 +98,3 @@ export class GunterLaunchCalendar extends KeepTrackPlugin {
     }
   }
 }
-

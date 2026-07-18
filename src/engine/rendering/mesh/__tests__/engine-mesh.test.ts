@@ -3,15 +3,13 @@ import { MeshRegistry } from '@app/engine/rendering/mesh/mesh-registry';
 import { MeshRenderer } from '@app/engine/rendering/mesh/mesh-renderer';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { mat3, mat4 } from 'gl-matrix';
-import { OBJ } from 'webgl-obj-loader';
 import { vi } from 'vitest';
+import { OBJ } from 'webgl-obj-loader';
 
 // A real OBJ vertex layout so MeshRenderer.applyAttributePointers_ runs the genuine
 // attribute-binding path (it reads layout.attributeMap[key].{size,type,...}).
-const realLayout = () => new OBJ.Layout(
-  OBJ.Layout.POSITION, OBJ.Layout.NORMAL, OBJ.Layout.UV,
-  OBJ.Layout.AMBIENT, OBJ.Layout.DIFFUSE, OBJ.Layout.SPECULAR, OBJ.Layout.SPECULAR_EXPONENT,
-);
+const realLayout = () =>
+  new OBJ.Layout(OBJ.Layout.POSITION, OBJ.Layout.NORMAL, OBJ.Layout.UV, OBJ.Layout.AMBIENT, OBJ.Layout.DIFFUSE, OBJ.Layout.SPECULAR, OBJ.Layout.SPECULAR_EXPONENT);
 
 describe('MeshRegistry', () => {
   let registry: MeshRegistry;

@@ -1,19 +1,14 @@
-import { EditSat } from '@app/plugins/edit-sat/edit-sat';
-import { KeepTrack } from '@app/keeptrack';
 import { MenuMode } from '@app/engine/core/interfaces';
-import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { defaultSat } from '@test/environment/apiMocks';
+import { hasBottomIcon, hasHelp, hasSideMenu } from '@app/engine/plugins/core/plugin-capabilities';
 import { getEl } from '@app/engine/utils/get-el';
+import { KeepTrack } from '@app/keeptrack';
+import { EditSat } from '@app/plugins/edit-sat/edit-sat';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment, standardSelectSat } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
-
-import {
-  hasBottomIcon,
-  hasHelp,
-  hasSideMenu,
-} from '@app/engine/plugins/core/plugin-capabilities';
 
 describe('EditSat_class', () => {
   beforeEach(() => {

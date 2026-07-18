@@ -145,11 +145,11 @@ describe('CatalogLoader.sortByScc_', () => {
 describe('CatalogLoader.addSccNum_', () => {
   it('zero-pads a short SCC and rewrites both TLE lines', () => {
     const resp = [
-{
-      tle1: '1   544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991',
-      tle2: '2   544  51.6423 168.5744 0001475 184.3976 313.3642 15.48839820294053',
-    },
-];
+      {
+        tle1: '1   544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991',
+        tle2: '2   544  51.6423 168.5744 0001475 184.3976 313.3642 15.48839820294053',
+      },
+    ];
 
     Loader.addSccNum_(resp, 0);
     expect(resp[0].sccNum).toBe('00544');
@@ -178,14 +178,15 @@ describe('CatalogLoader.getSatDataString_', () => {
   // The branches below dispatch on isSatellite() FIRST, then isMissile(),
   // isStar(), etc. Cover each with an explicit predicate stub so the test is
   // isolated from concrete object types and their inheritance.
-  const predicateStub = (overrides: Record<string, unknown>): BaseObject => ({
-    isSatellite: () => false,
-    isMissile: () => false,
-    isStar: () => false,
-    isMarker: () => false,
-    isStatic: () => false,
-    ...overrides,
-  } as unknown as BaseObject);
+  const predicateStub = (overrides: Record<string, unknown>): BaseObject =>
+    ({
+      isSatellite: () => false,
+      isMissile: () => false,
+      isStar: () => false,
+      isMarker: () => false,
+      isStatic: () => false,
+      ...overrides,
+    }) as unknown as BaseObject;
 
   it('serializes a missile to its lat/lon/alt lists', () => {
     const missile = predicateStub({ isMissile: () => true, latList: [1, 2], lonList: [3, 4], altList: [5, 6] });

@@ -25,15 +25,15 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
 import { ConeMesh } from '@app/engine/rendering/draw-manager/cone-mesh';
 import { buildSideMenuTabsHtml, initSideMenuTabs, updateSideMenuTabIndicator } from '@app/engine/ui/side-menu-tabs';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
+import { t7e } from '@app/locales/keys';
 import { BaseObject, Degrees } from '@ootk/src/main';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import satelliteFovPng from '@public/img/icons/satellite-fov.png';
-import { IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
-import { t7e } from '@app/locales/keys';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 
 /** Shorthand for this plugin's locale keys. */
@@ -297,10 +297,7 @@ export class SatelliteFov extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => this.uiManagerFinal_(),
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => this.uiManagerFinal_());
   }
 
   protected uiManagerFinal_(): void {
@@ -353,23 +350,19 @@ export class SatelliteFov extends KeepTrackPlugin {
    * without bypassing the KeepTrackPlugin lifecycle.
    */
   protected addMeshEventListeners_(): void {
-    EventBus.getInstance().on(
-      EventBusEvent.ConeMeshUpdate, this.updateListOfFovMeshes_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.ConeMeshUpdate, this.updateListOfFovMeshes_.bind(this));
 
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (sat: BaseObject) => {
-        if (this.isMenuButtonActive) {
-          this.updateListOfFovMeshes_();
-        }
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (sat: BaseObject) => {
+      if (this.isMenuButtonActive) {
+        this.updateListOfFovMeshes_();
+      }
 
-        if (sat?.isSatellite()) {
-          this.isSettingsMenuEnabled_ = true;
-        } else {
-          this.isSettingsMenuEnabled_ = false;
-        }
-      },
-    );
+      if (sat?.isSatellite()) {
+        this.isSettingsMenuEnabled_ = true;
+      } else {
+        this.isSettingsMenuEnabled_ = false;
+      }
+    });
   }
 
   private toggleFovCone_() {
@@ -596,17 +589,20 @@ export class SatelliteFov extends KeepTrackPlugin {
       getEl('reset-sat-fov-cones-button')!.removeAttribute('disabled');
     }
 
-    setInnerHtml('sat-fov-active-cones', meshes
-      .sort((a, b) => a.obj.id - b.obj.id)
-      .map((mesh) => SatelliteFov.renderEarthCenterConeRow_(mesh))
-      .join(''));
+    setInnerHtml(
+      'sat-fov-active-cones',
+      meshes
+        .sort((a, b) => a.obj.id - b.obj.id)
+        .map((mesh) => SatelliteFov.renderEarthCenterConeRow_(mesh))
+        .join('')
+    );
 
     SatelliteFov.bindConeListEvents_(
       '#sat-fov-earth-center-tab .remove-sensor',
       '#sat-fov-earth-center-tab .active-cone-sensor',
       // A targetId of -1 matches the earth-center cone exactly, so a satellite with
       // both an earth-center and a sat-to-sat cone never loses the wrong one
-      (id) => coneFactory.removeBySourceAndTarget(id, -1),
+      (id) => coneFactory.removeBySourceAndTarget(id, -1)
     );
   }
 
@@ -620,24 +616,23 @@ export class SatelliteFov extends KeepTrackPlugin {
       getEl('reset-sat-fov-s2s-cones-button')!.removeAttribute('disabled');
     }
 
-    setInnerHtml('sat-fov-s2s-active-cones', meshes
-      .sort((a, b) => a.obj.id - b.obj.id)
-      .map((mesh) => SatelliteFov.renderSatToSatConeRow_(mesh))
-      .join(''));
+    setInnerHtml(
+      'sat-fov-s2s-active-cones',
+      meshes
+        .sort((a, b) => a.obj.id - b.obj.id)
+        .map((mesh) => SatelliteFov.renderSatToSatConeRow_(mesh))
+        .join('')
+    );
 
-    SatelliteFov.bindConeListEvents_(
-      '#sat-fov-s2s-tab .remove-s2s-sensor',
-      '#sat-fov-s2s-tab .active-s2s-cone-sensor',
-      (id, targetId) => coneFactory.removeBySourceAndTarget(id, targetId),
+    SatelliteFov.bindConeListEvents_('#sat-fov-s2s-tab .remove-s2s-sensor', '#sat-fov-s2s-tab .active-s2s-cone-sensor', (id, targetId) =>
+      coneFactory.removeBySourceAndTarget(id, targetId)
     );
   }
 
   private static renderEarthCenterConeRow_(mesh: ConeMesh): string {
     const currentSat = PluginRegistry.getPlugin(SelectSatManager)?.getSelectedSat();
     const isSelected = currentSat && mesh.obj.id === currentSat.id;
-    const nameSpan = isSelected
-      ? html`<span style="color: var(--color-dark-text-accent);">${mesh.obj.name}</span>`
-      : html`<span>${mesh.obj.name}</span>`;
+    const nameSpan = isSelected ? html`<span style="color: var(--color-dark-text-accent);">${mesh.obj.name}</span>` : html`<span>${mesh.obj.name}</span>`;
 
     return html`
     <div class="link" style="display: flex; align-items: center;margin: 0rem 1rem;justify-content: space-around;">
@@ -657,9 +652,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     const sourceName = mesh.obj.name;
     const targetName = mesh.targetObj?.name ?? t7e('Common.unknown');
     const label = `${sourceName} → ${targetName}`;
-    const nameSpan = isSelected
-      ? html`<span style="color: var(--color-dark-text-accent);">${label}</span>`
-      : html`<span>${label}</span>`;
+    const nameSpan = isSelected ? html`<span style="color: var(--color-dark-text-accent);">${label}</span>` : html`<span>${label}</span>`;
 
     return html`
     <div class="link" style="display: flex; align-items: center;margin: 0rem 1rem;justify-content: space-around;">
@@ -677,11 +670,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     `;
   }
 
-  private static bindConeListEvents_(
-    removeSelector: string,
-    coneSelector: string,
-    removeFn: (id: number, targetId: number) => void,
-  ) {
+  private static bindConeListEvents_(removeSelector: string, coneSelector: string, removeFn: (id: number, targetId: number) => void) {
     document.querySelectorAll(removeSelector).forEach((icon) => {
       icon.addEventListener('click', (e) => {
         const el = e.target as HTMLElement;

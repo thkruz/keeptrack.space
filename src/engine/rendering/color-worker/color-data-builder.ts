@@ -9,13 +9,7 @@ import { Planet } from '@app/app/objects/planet';
 import { CatalogSource, Satellite, SpaceObjectType, Star } from '@ootk/src/main';
 import { BaseObject } from '../../ootk/src/objects';
 import { MissionColorScheme } from '../color-schemes/mission-color-scheme';
-import {
-  ColorDataArrays,
-  CountryCode,
-  MissionCategory,
-  ObjFlags,
-  SourceCode,
-} from './color-data-arrays';
+import { ColorDataArrays, CountryCode, MissionCategory, ObjFlags, SourceCode } from './color-data-arrays';
 
 const COUNTRY_MAP: Record<string, CountryCode> = {
   US: CountryCode.US,

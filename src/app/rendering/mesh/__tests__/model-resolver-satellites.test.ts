@@ -1,5 +1,5 @@
-import { ModelResolver, SatelliteModels } from '@app/app/rendering/mesh/model-resolver';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
+import { ModelResolver, SatelliteModels } from '@app/app/rendering/mesh/model-resolver';
 import { Satellite, SpaceObjectType, TleLine1, TleLine2 } from '@ootk/src/main';
 
 // Real Satellite construction needs valid TLEs; these tests only exercise the
@@ -160,8 +160,7 @@ describe('ModelResolver satellite model selection', () => {
 
     it('keeps the SPACEBEE and 2018 0.25U specials ahead of the generic pool', () => {
       expect(resolver.resolve(makeSat({ bus: 'Cubesat 1U', name: 'SPACEBEE-7' }))).toBe(SatelliteModels.spacebee2gen);
-      expect(resolver.resolve(makeSat({ bus: 'Cubesat 0.25U', intlDes: '2018-099A', name: 'GENERIC' })))
-        .toBe(SatelliteModels.spacebee1gen);
+      expect(resolver.resolve(makeSat({ bus: 'Cubesat 0.25U', intlDes: '2018-099A', name: 'GENERIC' }))).toBe(SatelliteModels.spacebee1gen);
     });
   });
 
@@ -169,8 +168,7 @@ describe('ModelResolver satellite model selection', () => {
     it('buckets generic payloads by radar cross section into the cubesat pools', () => {
       expect([SatelliteModels.s1u, SatelliteModels['s1u-b']]).toContain(resolver.resolve(makeSat({ rcs: 0.05 })));
       expect(resolver.resolve(makeSat({ rcs: 0.15 }))).toBe(SatelliteModels.s2u);
-      expect([SatelliteModels.s3u, SatelliteModels['s3u-b'], SatelliteModels['s3u-w']])
-        .toContain(resolver.resolve(makeSat({ rcs: 0.25 })));
+      expect([SatelliteModels.s3u, SatelliteModels['s3u-b'], SatelliteModels['s3u-w']]).toContain(resolver.resolve(makeSat({ rcs: 0.25 })));
     });
 
     it('falls back to the generic sat2 model when the shape is empty', () => {
@@ -220,7 +218,10 @@ describe('ModelResolver satellite model selection', () => {
   describe('OemSatellite with an explicit model', () => {
     it('returns the satellite-provided model name', () => {
       const oem = Object.assign(Object.create(OemSatellite.prototype) as OemSatellite, {
-        id: 1, sccNum: '', type: SpaceObjectType.PAYLOAD, model: 'starlink',
+        id: 1,
+        sccNum: '',
+        type: SpaceObjectType.PAYLOAD,
+        model: 'starlink',
       });
 
       expect(resolver.resolve(oem)).toBe('starlink');
@@ -254,14 +255,15 @@ describe('ModelResolver satellite model selection', () => {
       return m;
     };
 
-    const mislAt = (t: number, maxAlt = 1200, warheadCount = 4, altList = buildAltList(maxAlt)) => ({
-      altList,
-      maxAlt,
-      warheadCount,
-      getTimeInTrajectory: () => t,
-      getApogeeIndex: () => apogeeIndexOf(altList),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as any;
+    const mislAt = (t: number, maxAlt = 1200, warheadCount = 4, altList = buildAltList(maxAlt)) =>
+      ({
+        altList,
+        maxAlt,
+        warheadCount,
+        getTimeInTrajectory: () => t,
+        getApogeeIndex: () => apogeeIndexOf(altList),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      }) as any;
 
     // With apogee at index 100 the deploy window spans max(2, round(100*0.05)) = 5
     // samples: misl3 at [95,97), misl4 at [97,100), then rv from apogee down.

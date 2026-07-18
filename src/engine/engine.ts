@@ -14,10 +14,9 @@ import { EventBusEvent } from './events/event-bus-events';
 import { InputManager } from './input/input-manager';
 import { ViewportManager } from './rendering/viewport-manager';
 import { WebGLRenderer } from './rendering/webgl-renderer';
-import { CpuStage, FrameProfiler } from './utils/frame-profiler';
 import { errorManagerInstance, isOpaqueWindowError } from './utils/errorManager';
+import { CpuStage, FrameProfiler } from './utils/frame-profiler';
 import { isThisNode } from './utils/isThisNode';
-
 
 export interface Application {
   isReady: boolean;

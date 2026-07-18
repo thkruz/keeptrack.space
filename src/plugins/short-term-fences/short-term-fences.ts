@@ -1,21 +1,20 @@
-import { MenuMode } from '@app/engine/core/interfaces';
-import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
-import { slideInRight, slideOutLeft } from '@app/engine/utils/slide';
-import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
-import viewListPng from '@public/img/icons/view-list.png';
-import wifiFindPng from '@public/img/icons/wifi-find.png';
-
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { SoundNames } from '@app/engine/audio/sounds';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { slideInRight, slideOutLeft } from '@app/engine/utils/slide';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, Degrees, EpochUTC, Kilometers, eci2rae } from '@ootk/src/main';
+import { BaseObject, Degrees, EpochUTC, eci2rae, Kilometers } from '@ootk/src/main';
+import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
+import viewListPng from '@public/img/icons/view-list.png';
+import wifiFindPng from '@public/img/icons/wifi-find.png';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -171,101 +170,92 @@ export class ShortTermFences extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (obj: BaseObject) => {
-        // Skip this if there is no satellite object because the menu isn't open
-        if (!obj?.isSatellite()) {
-          hideEl('stf-on-object-link');
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
+      // Skip this if there is no satellite object because the menu isn't open
+      if (!obj?.isSatellite()) {
+        hideEl('stf-on-object-link');
 
-          return;
-        }
+        return;
+      }
 
-        // Guard on element presence (not a once-only boolean) so the link is
-        // re-created if the sat-info-box DOM is rebuilt under it.
-        if (PluginRegistry.getPlugin(SatInfoBox) && !getEl('stf-on-object-link', true)) {
-          getEl('actions-section')?.insertAdjacentHTML(
-            'beforeend',
-            html`
+      // Guard on element presence (not a once-only boolean) so the link is
+      // re-created if the sat-info-box DOM is rebuilt under it.
+      if (PluginRegistry.getPlugin(SatInfoBox) && !getEl('stf-on-object-link', true)) {
+        getEl('actions-section')?.insertAdjacentHTML(
+          'beforeend',
+          html`
             <div id="stf-on-object-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
                   data-tooltip="${l('tooltips.buildOnObject')}">${l('links.buildOnObject')}</div>
-            `,
-          );
-          getEl('stf-on-object-link')?.addEventListener('click', this.stfOnObjectLinkClick_.bind(this));
-        }
+            `
+        );
+        getEl('stf-on-object-link')?.addEventListener('click', this.stfOnObjectLinkClick_.bind(this));
+      }
 
-        showEl('stf-on-object-link');
-      },
-    );
+      showEl('stf-on-object-link');
+    });
   }
 
   addJs(): void {
     super.addJs();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        getEl(`${this.sideMenuElementName}-secondary`, true)?.classList.add('kt-ui-v13');
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      getEl(`${this.sideMenuElementName}-secondary`, true)?.classList.add('kt-ui-v13');
 
-        getEl('stf-menu-form')?.addEventListener('submit', (e: Event) => {
-          e.preventDefault();
-          ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
-          this.onSubmit_();
-        });
-        getEl('stf-remove-last')?.addEventListener('click', () => {
-          ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
-          ServiceLocator.getSensorManager().removeStf();
-          this.refreshActiveFences_();
-        });
-        getEl('stf-clear-all')?.addEventListener('click', () => {
-          ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
-          ServiceLocator.getSensorManager().clearStf();
-          this.refreshActiveFences_();
-        });
-
-        // Per-row remove inside the Active Fences list (one delegated listener
-        // against the stable container; rows are rebuilt on every change).
-        getEl('stf-active-list', true)?.addEventListener('click', (e: Event) => {
-          const removeBtn = (e.target as HTMLElement)?.closest('.remove-fence') as HTMLElement | null;
-
-          if (!removeBtn) {
-            return;
-          }
-          const sensorManager = ServiceLocator.getSensorManager();
-          const fence = sensorManager.stfSensors.find((s) => s.objName === removeBtn.dataset.id);
-
-          if (fence) {
-            ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
-            sensorManager.removeStf(fence);
-            this.refreshActiveFences_();
-          }
-        });
-
-        // Recompute the km extents whenever any input the formula depends on
-        // changes (not just the extent fields), and clamp over-wide extents.
-        for (const id of ['stf-az', 'stf-el', 'stf-rng', 'stf-azExt', 'stf-elExt']) {
-          getEl(id)?.addEventListener('change', () => this.updateExtentKmFields_());
-          getEl(id)?.addEventListener('blur', () => this.updateExtentKmFields_());
-        }
-
-        // Render the (likely empty-state) list once so the panel is never blank.
+      getEl('stf-menu-form')?.addEventListener('submit', (e: Event) => {
+        e.preventDefault();
+        ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+        this.onSubmit_();
+      });
+      getEl('stf-remove-last')?.addEventListener('click', () => {
+        ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+        ServiceLocator.getSensorManager().removeStf();
         this.refreshActiveFences_();
-      },
-    );
+      });
+      getEl('stf-clear-all')?.addEventListener('click', () => {
+        ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+        ServiceLocator.getSensorManager().clearStf();
+        this.refreshActiveFences_();
+      });
+
+      // Per-row remove inside the Active Fences list (one delegated listener
+      // against the stable container; rows are rebuilt on every change).
+      getEl('stf-active-list', true)?.addEventListener('click', (e: Event) => {
+        const removeBtn = (e.target as HTMLElement)?.closest('.remove-fence') as HTMLElement | null;
+
+        if (!removeBtn) {
+          return;
+        }
+        const sensorManager = ServiceLocator.getSensorManager();
+        const fence = sensorManager.stfSensors.find((s) => s.objName === removeBtn.dataset.id);
+
+        if (fence) {
+          ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+          sensorManager.removeStf(fence);
+          this.refreshActiveFences_();
+        }
+      });
+
+      // Recompute the km extents whenever any input the formula depends on
+      // changes (not just the extent fields), and clamp over-wide extents.
+      for (const id of ['stf-az', 'stf-el', 'stf-rng', 'stf-azExt', 'stf-elExt']) {
+        getEl(id)?.addEventListener('change', () => this.updateExtentKmFields_());
+        getEl(id)?.addEventListener('blur', () => this.updateExtentKmFields_());
+      }
+
+      // Render the (likely empty-state) list once so the panel is never blank.
+      this.refreshActiveFences_();
+    });
 
     EventBus.getInstance().on(EventBusEvent.resetSensor, this.closeAndDisable_.bind(this));
 
-    EventBus.getInstance().on(
-      EventBusEvent.setSensor,
-      (sensor, id): void => {
-        if (sensor === null && id === null) {
-          this.closeAndDisable_();
-          slideOutLeft(getEl(this.sideMenuElementName), 300);
-        } else {
-          this.setBottomIconToEnabled();
-        }
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.setSensor, (sensor, id): void => {
+      if (sensor === null && id === null) {
+        this.closeAndDisable_();
+        slideOutLeft(getEl(this.sideMenuElementName), 300);
+      } else {
+        this.setBottomIconToEnabled();
+      }
+    });
   }
 
   private closeAndDisable_(): void {

@@ -31,7 +31,7 @@ const loadWorker = async () => {
 };
 
 const dispatch = (data: Record<string, unknown>) => {
-  (globalThis.onmessage as ((m: { data: unknown }) => void))({ data });
+  (globalThis.onmessage as (m: { data: unknown }) => void)({ data });
 };
 
 const startMsg = (overrides: Record<string, unknown> = {}) => ({

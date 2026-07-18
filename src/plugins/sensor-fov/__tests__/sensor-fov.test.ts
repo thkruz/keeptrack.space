@@ -1,11 +1,11 @@
+import { SensorManager } from '@app/app/sensors/sensorManager';
 import { Container } from '@app/engine/core/container';
-import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
+import { Singletons } from '@app/engine/core/interfaces';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
 import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { SensorListPlugin } from '@app/plugins/sensor-list/sensor-list';
-import { SensorManager } from '@app/app/sensors/sensorManager';
-import { Singletons } from '@app/engine/core/interfaces';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -71,9 +71,7 @@ describe('SensorFov methods', () => {
     plugin = new SensorFov();
     plugin.init();
     // sensor-fov registers its sensorDotSelected handler last (after dependency inits)
-    const handlers = onSpy.mock.calls
-      .filter((c) => c[0] === EventBusEvent.sensorDotSelected)
-      .map((c) => c[1] as (sensor?: unknown) => void);
+    const handlers = onSpy.mock.calls.filter((c) => c[0] === EventBusEvent.sensorDotSelected).map((c) => c[1] as (sensor?: unknown) => void);
 
     fovHandler = handlers[handlers.length - 1];
   });

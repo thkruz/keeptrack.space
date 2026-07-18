@@ -1,6 +1,6 @@
-import { setupStandardEnvironment } from '@test/environment/standard-env';
-import { ScenarioData } from '@app/plugins/scenario-management/scenario-management';
 import { syncFormFields, validateDateInput } from '@app/plugins/scenario-management/scenario-form-utils';
+import { ScenarioData } from '@app/plugins/scenario-management/scenario-management';
+import { setupStandardEnvironment } from '@test/environment/standard-env';
 
 describe('scenario-form-utils', () => {
   beforeEach(() => {

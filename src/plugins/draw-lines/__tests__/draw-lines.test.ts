@@ -20,8 +20,15 @@ describe('DrawLinesPlugin', () => {
 });
 
 const LINE_METHODS = [
-  'createRef2Ref', 'createGrid', 'createGridRadial', 'createSatToRef', 'createSatRicFrame',
-  'createSensorToSat', 'createObjToObj', 'createSat2Sun', 'createSat2CelestialBody',
+  'createRef2Ref',
+  'createGrid',
+  'createGridRadial',
+  'createSatToRef',
+  'createSatRicFrame',
+  'createSensorToSat',
+  'createObjToObj',
+  'createSat2Sun',
+  'createSat2CelestialBody',
 ] as const;
 
 describe('DrawLinesPlugin onContextMenuAction', () => {
@@ -100,12 +107,13 @@ describe('DrawLinesPlugin onContextMenuOpen visibility', () => {
     return els;
   };
 
-  const openCtx = (surface: 'earth' | 'space', target: unknown, hasPrimarySelection = false) => plugin.onContextMenuOpen({
-    surface,
-    targetId: target ? 25544 : -1,
-    target: target as never,
-    hasPrimarySelection,
-  });
+  const openCtx = (surface: 'earth' | 'space', target: unknown, hasPrimarySelection = false) =>
+    plugin.onContextMenuOpen({
+      surface,
+      targetId: target ? 25544 : -1,
+      target: target as never,
+      hasPrimarySelection,
+    });
 
   beforeEach(() => {
     setupStandardEnvironment();
@@ -129,10 +137,7 @@ describe('DrawLinesPlugin onContextMenuOpen visibility', () => {
   });
 
   it('hides every per-satellite line (including sat-to-moon) when there is no clicked sat', () => {
-    const els = seedRmbElements(
-      'line-earth-sat-rmb', 'line-sensor-sat-rmb', 'line-sat-sun-rmb',
-      'line-sat-moon-rmb', 'line-sat-ric-rmb', 'line-moon-orbit-rmb',
-    );
+    const els = seedRmbElements('line-earth-sat-rmb', 'line-sensor-sat-rmb', 'line-sat-sun-rmb', 'line-sat-moon-rmb', 'line-sat-ric-rmb', 'line-moon-orbit-rmb');
 
     openCtx('earth', null);
 

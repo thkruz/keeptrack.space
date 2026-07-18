@@ -1,7 +1,7 @@
-import { vi } from 'vitest';
 import { ScenarioManagementPlugin } from '@app/plugins/scenario-management/scenario-management';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSuite } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('ScenarioManagementPlugin', () => {
   beforeEach(() => {

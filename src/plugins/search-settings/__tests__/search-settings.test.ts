@@ -1,17 +1,14 @@
-import { vi } from 'vitest';
 /* eslint-disable dot-notation */
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { StorageKey } from '@app/engine/persistence/storage-key';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager } from '@app/engine/utils/persistence-manager';
 import { SearchSettingsPlugin } from '@app/plugins/search-settings/search-settings';
-import {
-  MIN_SEARCH_CHARS_DEFAULT,
-  SEARCH_LIMIT_DEFAULT,
-} from '@app/plugins/search-settings/search-settings-core';
+import { MIN_SEARCH_CHARS_DEFAULT, SEARCH_LIMIT_DEFAULT } from '@app/plugins/search-settings/search-settings-core';
 import { SettingsManager } from '@app/settings/settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
-import { standardPluginSuite, standardPluginMenuButtonTests } from '@test/generic-tests';
+import { standardPluginMenuButtonTests, standardPluginSuite } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('SearchSettingsPlugin', () => {
   beforeEach(() => {

@@ -37,7 +37,8 @@ export class CountryColorScheme extends ColorScheme {
   constructor() {
     super(CountryColorScheme.uniqueColorTheme);
     this.objectTypeFlags = {
-      ...this.objectTypeFlags, ...CountryColorScheme.uniqueObjectTypeFlags,
+      ...this.objectTypeFlags,
+      ...CountryColorScheme.uniqueObjectTypeFlags,
     };
   }
 
@@ -148,7 +149,7 @@ export class CountryColorScheme extends ColorScheme {
         };
 
       case 'China':
-      case 'China, People\'s Reof':
+      case "China, People's Reof":
       case 'Hong Kong Special Administrative Region, China':
       case 'China (Republic)':
       case 'PRC':
@@ -177,7 +178,6 @@ export class CountryColorScheme extends ColorScheme {
           color: this.colorTheme.countryOther,
           pickable: Pickable.Yes,
         };
-
     }
   }
 

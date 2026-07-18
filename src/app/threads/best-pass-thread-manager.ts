@@ -5,18 +5,18 @@
  * thread manager's request/response pattern.
  */
 
-import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
 import type { lookanglesRow, SensorObjectCruncher } from '@app/engine/core/interfaces';
+import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
 import {
-  BpWorkerMsgType,
-  BpWorkerOutMsgType,
   type BpMsgStart,
   type BpOutChunk,
   type BpOutComplete,
   type BpOutError,
   type BpOutProgress,
   type BpSatData,
+  BpWorkerMsgType,
   type BpWorkerOutMsg,
+  BpWorkerOutMsgType,
 } from '@app/webworker/best-pass-messages';
 
 export interface BestPassCallbacks {

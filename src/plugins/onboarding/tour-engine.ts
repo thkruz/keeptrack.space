@@ -431,9 +431,7 @@ export class TourEngine {
       return `<span class="${cls}"></span>`;
     }).join('');
 
-    const stepLabel = this.options_.texts.stepLabel
-      .replace('{current}', String(this.index_ + 1))
-      .replace('{total}', String(total));
+    const stepLabel = this.options_.texts.stepLabel.replace('{current}', String(this.index_ + 1)).replace('{total}', String(total));
 
     // A hint-deferred action button starts hidden; scheduleHintReveal_ shows it
     const actionHiddenCls = step.advanceOn?.timeoutHintMs ? ' start-hidden' : '';
@@ -452,27 +450,17 @@ export class TourEngine {
         })
         .join('');
     } else {
-      const backHtml = this.index_ > 0
-        ? `<button type="button" class="kt-tour-btn" data-tour-action="back">${this.options_.texts.back}</button>`
-        : '';
+      const backHtml = this.index_ > 0 ? `<button type="button" class="kt-tour-btn" data-tour-action="back">${this.options_.texts.back}</button>` : '';
 
-      buttonsHtml =
-        `${backHtml}${actionHtml}` +
-        `<button type="button" class="kt-tour-btn kt-tour-btn-primary" data-tour-action="next">${this.options_.texts.next}</button>`;
+      buttonsHtml = `${backHtml}${actionHtml}` + `<button type="button" class="kt-tour-btn kt-tour-btn-primary" data-tour-action="next">${this.options_.texts.next}</button>`;
     }
 
-    const skipHtml = step.buttons
-      ? ''
-      : `<button type="button" class="kt-tour-skip-link" data-tour-action="skip">${this.options_.texts.skip}</button>`;
+    const skipHtml = step.buttons ? '' : `<button type="button" class="kt-tour-skip-link" data-tour-action="skip">${this.options_.texts.skip}</button>`;
 
     this.popoverEl_.innerHTML =
       '<div class="kt-tour-popover-header">' +
-      `<span class="kt-tour-popover-title" id="kt-tour-title">${step.title}</span>${
-      step.buttons ? '' : `<span class="kt-tour-step-label">${stepLabel}</span>`
-      }</div>` +
-      `<div class="kt-tour-popover-body" id="kt-tour-body">${step.body}</div>${
-      step.extraHtml ?? ''
-      }<div class="kt-tour-confirm-skip start-hidden">` +
+      `<span class="kt-tour-popover-title" id="kt-tour-title">${step.title}</span>${step.buttons ? '' : `<span class="kt-tour-step-label">${stepLabel}</span>`}</div>` +
+      `<div class="kt-tour-popover-body" id="kt-tour-body">${step.body}</div>${step.extraHtml ?? ''}<div class="kt-tour-confirm-skip start-hidden">` +
       `<span>${this.options_.texts.skipConfirm}</span>` +
       `<button type="button" class="kt-tour-btn" data-tour-action="confirm-skip">${this.options_.texts.skipYes}</button>` +
       `<button type="button" class="kt-tour-btn" data-tour-action="cancel-skip">${this.options_.texts.skipNo}</button>` +

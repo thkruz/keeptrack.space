@@ -1,11 +1,11 @@
 import type { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import type { OemSatellite } from '@app/app/objects/oem-satellite';
-import type { User } from '@supabase/supabase-js';
-import type { BaseObject, Satellite, Milliseconds } from '@ootk/src/main';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import type { BaseObject, Milliseconds, Satellite } from '@ootk/src/main';
+import type { User } from '@supabase/supabase-js';
+import type { PanTouchEvent, TapTouchEvent } from '../input/input-manager/touch-input';
 import type { StorageKey } from '../persistence/storage-key';
 import type { RmbMenuContext } from '../plugins/core/plugin-capabilities';
-import type { PanTouchEvent, TapTouchEvent } from '../input/input-manager/touch-input';
 import type { LineManager } from '../rendering/line-manager';
 import type { TextureStatus } from '../rendering/texture-load-registry';
 import { errorManagerInstance } from '../utils/errorManager';
@@ -36,9 +36,9 @@ export interface EngineEventMap {
   [EventBusEvent.endOfDraw]: [Milliseconds];
   [EventBusEvent.captureStart]: [];
   [EventBusEvent.captureEnd]: [];
-  [EventBusEvent.onWatchlistUpdated]: [{ id: number, inView: boolean }[]];
-  [EventBusEvent.onWatchlistAdd]: [{ id: number, inView: boolean }[]];
-  [EventBusEvent.onWatchlistRemove]: [{ id: number, inView: boolean }[]];
+  [EventBusEvent.onWatchlistUpdated]: [{ id: number; inView: boolean }[]];
+  [EventBusEvent.onWatchlistAdd]: [{ id: number; inView: boolean }[]];
+  [EventBusEvent.onWatchlistRemove]: [{ id: number; inView: boolean }[]];
   [EventBusEvent.staticOffsetChange]: [number];
   [EventBusEvent.onLineAdded]: [LineManager];
   [EventBusEvent.onLinesCleared]: [LineManager];
@@ -120,8 +120,8 @@ export class EventBus {
   events = {
     altCanvasResize: [] as EventBusRegisterParams<EventBusEvent.altCanvasResize>[],
   } as {
-      [K in EventBusEvent]: EventBusRegisterParams<K>[];
-    };
+    [K in EventBusEvent]: EventBusRegisterParams<K>[];
+  };
 
   methods = {
     altCanvasResize: (): boolean => this.events.altCanvasResize.some((cb) => cb.cb()),
@@ -168,11 +168,7 @@ export class EventBus {
     // the .map() before the remaining listeners are scheduled. Fail-fast still
     // applies: the first rejection rejects emitAsync, but every listener gets
     // a chance to run.
-    await Promise.all(
-      (<EventBusRegisterParams<T>[]>this.events[event]).map(
-        (cb: EventBusRegisterParams<T>) => Promise.resolve().then(() => cb.cb(...args)),
-      ),
-    );
+    await Promise.all((<EventBusRegisterParams<T>[]>this.events[event]).map((cb: EventBusRegisterParams<T>) => Promise.resolve().then(() => cb.cb(...args))));
   }
 
   /**
@@ -188,7 +184,7 @@ export class EventBus {
     // Add the callback
     this.events[event].push({
       cb,
-      event: <T><unknown>null,
+      event: <T>(<unknown>null),
     });
   }
 
@@ -219,7 +215,7 @@ export class EventBus {
           errorManagerInstance.log(`Callback for event ${event} was not found in unregister.`);
         }
       },
-      event: <T><unknown>null,
+      event: <T>(<unknown>null),
     });
   }
 

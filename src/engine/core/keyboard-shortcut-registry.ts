@@ -68,8 +68,8 @@ export class KeyboardShortcutRegistry {
         // eslint-disable-next-line no-console
         console.warn(
           `[KeyboardShortcutRegistry] Shortcut conflict: "${KeyboardShortcutRegistry.formatShortcut(shortcut)}" ` +
-          `registered by "${conflict.existing.pluginId}" overlaps with "${pluginId}". ` +
-          'The first registration wins.',
+            `registered by "${conflict.existing.pluginId}" overlaps with "${pluginId}". ` +
+            'The first registration wins.'
         );
       } else {
         const entry: RegisteredShortcut = { pluginId, shortcut };

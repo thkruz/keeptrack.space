@@ -110,16 +110,19 @@ export const FILTER_STORAGE_MAP: Record<string, StorageKey> = {
 
 /** Object-type filters (payloads, debris, ground sites, ...). */
 export const OBJECT_TYPE_FILTERS = [
-  'operationalPayloads', 'nonOperationalPayloads', 'rocketBodies', 'debris',
-  'unknownType', 'notionalSatellites', 'groundSensors', 'launchFacilities',
+  'operationalPayloads',
+  'nonOperationalPayloads',
+  'rocketBodies',
+  'debris',
+  'unknownType',
+  'notionalSatellites',
+  'groundSensors',
+  'launchFacilities',
 ];
 /** Orbital-regime filters (vLEO through xGEO). */
 export const ORBITAL_REGIME_FILTERS = ['vLEOSatellites', 'lEOSatellites', 'mEOSatellites', 'gEOSatellites', 'hEOSatellites', 'xGEOSatellites'];
 /** Country / nation-of-origin filters. */
-export const COUNTRY_FILTERS = [
-  'unitedStates', 'unitedKingdom', 'france', 'germany', 'japan',
-  'china', 'india', 'russia', 'uSSR', 'southKorea', 'australia', 'otherCountries',
-];
+export const COUNTRY_FILTERS = ['unitedStates', 'unitedKingdom', 'france', 'germany', 'japan', 'china', 'india', 'russia', 'uSSR', 'southKorea', 'australia', 'otherCountries'];
 /** Data-source filters (Vimpel is only present when the JSC catalog is enabled). */
 export const SOURCE_FILTERS = ['vimpelSatellites', 'celestrakSatellites', 'celestrakSupSatellites', 'satnogsSatellites'];
 
@@ -127,8 +130,7 @@ export const SOURCE_FILTERS = ['vimpelSatellites', 'celestrakSatellites', 'celes
  * Derives a stable filter id from a display name (camelCase, whitespace
  * stripped). Only used as a fallback for filters without an explicit id.
  */
-export const generateFilterId = (name: string): string =>
-  `${name.charAt(0).toLowerCase()}${name.slice(1).replace(/\s+/gu, '')}`;
+export const generateFilterId = (name: string): string => `${name.charAt(0).toLowerCase()}${name.slice(1).replace(/\s+/gu, '')}`;
 
 /** The default checked state for a filter: respect an explicit `checked`, otherwise on unless disabled. */
 export const defaultFilterValue = (filter: Filters): boolean => filter.checked ?? !filter.disabled;
@@ -223,14 +225,16 @@ export const getFilters = (): Filters[] => [
     category: t7e('filterMenu.xgeoSatellites.category'),
     tooltip: t7e('filterMenu.xgeoSatellites.tooltip'),
   },
-  ...(settingsManager.isEnableJscCatalog ? [
-    {
-      id: 'vimpelSatellites',
-      name: t7e('filterMenu.vimpelSatellites.name'),
-      category: t7e('filterMenu.source.category'),
-      tooltip: t7e('filterMenu.vimpelSatellites.tooltip'),
-    },
-  ] : []),
+  ...(settingsManager.isEnableJscCatalog
+    ? [
+        {
+          id: 'vimpelSatellites',
+          name: t7e('filterMenu.vimpelSatellites.name'),
+          category: t7e('filterMenu.source.category'),
+          tooltip: t7e('filterMenu.vimpelSatellites.tooltip'),
+        },
+      ]
+    : []),
   {
     id: 'celestrakSatellites',
     name: t7e('filterMenu.celestrakSatellites.name'),
@@ -344,12 +348,10 @@ export const isDefaultState = (getValue: (id: string) => boolean | undefined): b
   });
 
 /** Build a state patch enabling only `targetId` within `groupIds` (all others off). */
-export const showOnlyInGroup = (targetId: string, groupIds: string[]): Record<string, boolean> =>
-  Object.fromEntries(groupIds.map((id) => [id, id === targetId]));
+export const showOnlyInGroup = (targetId: string, groupIds: string[]): Record<string, boolean> => Object.fromEntries(groupIds.map((id) => [id, id === targetId]));
 
 /** Build a state patch setting every filter in `groupIds` to `enabled`. */
-export const enableGroup = (groupIds: string[], enabled: boolean): Record<string, boolean> =>
-  Object.fromEntries(groupIds.map((id) => [id, enabled]));
+export const enableGroup = (groupIds: string[], enabled: boolean): Record<string, boolean> => Object.fromEntries(groupIds.map((id) => [id, enabled]));
 
 /** Build a state patch that, among object-type filters, shows only payloads. */
 export const showOnlyPayloads = (): Record<string, boolean> =>

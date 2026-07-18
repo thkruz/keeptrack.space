@@ -527,9 +527,7 @@ export class FrameProfiler {
     const gpu = this.collectStats_(this.gpuRings_);
     const counters = this.collectStats_(this.counterRings_);
     const gpuTotalAvgMs = gpu.reduce((sum, s) => sum + s.avg, 0);
-    const cpuTopAvgMs = cpu
-      .filter((s) => TOP_LEVEL_CPU_STAGES.has(s.id))
-      .reduce((sum, s) => sum + s.avg, 0);
+    const cpuTopAvgMs = cpu.filter((s) => TOP_LEVEL_CPU_STAGES.has(s.id)).reduce((sum, s) => sum + s.avg, 0);
 
     return {
       enabled: this.enabled_,

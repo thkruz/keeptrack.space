@@ -1,17 +1,7 @@
 import { getEl } from '@app/engine/utils/get-el';
 import { l } from '../onboarding-t7e';
 import type { TourStep } from '../tour-engine';
-import {
-  collapseUtilityFooter,
-  drawerItemTarget,
-  expandUtilityFooter,
-  findPlugin,
-  isPluginUsable,
-  isVisible,
-  openCommandPalette,
-  openDrawer,
-  openDrawerAt,
-} from '../tour-steps';
+import { collapseUtilityFooter, drawerItemTarget, expandUtilityFooter, findPlugin, isPluginUsable, isVisible, openCommandPalette, openDrawer, openDrawerAt } from '../tour-steps';
 import type { ChapterDefinition } from './chapter-types';
 
 /**

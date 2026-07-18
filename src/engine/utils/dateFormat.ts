@@ -96,8 +96,8 @@ const formats = {
     longTime: 'h:MM:ss TT Z',
     isoDate: 'yyyy-mm-dd',
     isoTime: 'HH:MM:ss',
-    isoDateTime: 'yyyy-mm-dd\' \'HH:MM:ss',
-    isoUtcDateTime: 'UTC:yyyy-mm-dd\'T\'HH:MM:ss\'Z\'',
+    isoDateTime: "yyyy-mm-dd' 'HH:MM:ss",
+    isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'",
   },
   i18n: {
     // Internationalization strings
@@ -210,7 +210,7 @@ const pad = (num: number, length: number): string => String(num).padStart(length
  * @throws SyntaxError if the provided date is invalid.
  */
 export const dateFormat = (date: string | Date, mask: string, utc = false) => {
-  if (typeof date === 'string' && !(/\d/u).test(date)) {
+  if (typeof date === 'string' && !/\d/u.test(date)) {
     mask = date;
     date = undefined as unknown as string | Date;
   }

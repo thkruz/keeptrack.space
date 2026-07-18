@@ -20,13 +20,7 @@
  * float32 uniform quantizes it to ~4.8e-7 rad - about one frame of Earth
  * rotation at 1x - jittering the rotation of full-magnitude vectors.
  */
-export const rotateEcefToEciZ = (
-  x: number,
-  y: number,
-  z: number,
-  cosGmst: number,
-  sinGmst: number,
-): [number, number, number] => [
+export const rotateEcefToEciZ = (x: number, y: number, z: number, cosGmst: number, sinGmst: number): [number, number, number] => [
   x * cosGmst - y * sinGmst,
   x * sinGmst + y * cosGmst,
   z,

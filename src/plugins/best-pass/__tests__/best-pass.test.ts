@@ -1,11 +1,5 @@
 import { MenuMode } from '@app/engine/core/interfaces';
-import {
-  hasBottomIcon,
-  hasHelp,
-  hasKeyboardShortcuts,
-  hasSecondaryMenu,
-  hasSideMenu,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { hasBottomIcon, hasHelp, hasKeyboardShortcuts, hasSecondaryMenu, hasSideMenu } from '@app/engine/plugins/core/plugin-capabilities';
 import { BestPassPlugin } from '@app/plugins/best-pass/best-pass';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';

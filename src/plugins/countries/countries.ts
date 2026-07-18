@@ -155,10 +155,7 @@ export class CountriesMenu extends KeepTrackPlugin implements ICommandPaletteCap
           content: t7e('plugins.CountriesMenu.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.CountriesMenu.help.tip1'),
-        t7e('plugins.CountriesMenu.help.tip2'),
-      ],
+      tips: [t7e('plugins.CountriesMenu.help.tip1'), t7e('plugins.CountriesMenu.help.tip2')],
       shortcuts: [{ keys: ['O'], description: t7e('plugins.CountriesMenu.help.shortcutToggle') }],
     };
   }
@@ -170,10 +167,7 @@ export class CountriesMenu extends KeepTrackPlugin implements ICommandPaletteCap
   addHtml(): void {
     super.addHtml();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      this.uiManagerFinal_.bind(this),
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   private uiManagerFinal_(): void {
@@ -208,11 +202,13 @@ export class CountriesMenu extends KeepTrackPlugin implements ICommandPaletteCap
       }
     });
 
-    const countries = uniqueCodes.map((countryCode) => {
-      const country = StringExtractor.extractCountry(countryCode);
+    const countries = uniqueCodes
+      .map((countryCode) => {
+        const country = StringExtractor.extractCountry(countryCode);
 
-      return { country, countryCode };
-    }).sort((a, b) => a.country.localeCompare(b.country));
+        return { country, countryCode };
+      })
+      .sort((a, b) => a.country.localeCompare(b.country));
 
     // Group countries by their display name
     const countryGroups: Record<string, string[]> = {};
@@ -236,13 +232,15 @@ export class CountriesMenu extends KeepTrackPlugin implements ICommandPaletteCap
       const flagClass = `fi fi-${flagCode.toLowerCase()}`;
       const satCount = codes.reduce((sum, code) => sum + (countByCode[code] ?? 0), 0);
 
-      return `${acc}<button type="button" class="kt-action waves-effect country-option" data-group="${dataGroup}">` +
+      return (
+        `${acc}<button type="button" class="kt-action waves-effect country-option" data-group="${dataGroup}">` +
         '<span class="kt-action-label">' +
         `<span class="${flagClass} country-flag"></span>` +
         `<span class="country-name">${country}</span>` +
         '</span>' +
         `<span class="country-count">${satCount.toLocaleString()}</span>` +
-        '</button>';
+        '</button>'
+      );
     }, '');
 
     return mergedList;
@@ -280,7 +278,7 @@ export class CountriesMenu extends KeepTrackPlugin implements ICommandPaletteCap
     searchDOM.value = groupManagerInstance.groupList[groupName].ids.reduce((acc: string, id: number) => `${acc}${catalogManagerInstance.getSat(id)?.sccNum},`, '').slice(0, -1);
     uiManagerInstance.searchManager.fillResultBox(
       groupManagerInstance.groupList[groupName].ids.map((id: number) => ({ id, searchType: SearchResultType.NORAD_ID, strIndex: 0, patlen: 0 }) as SearchResult),
-      catalogManagerInstance,
+      catalogManagerInstance
     );
 
     // If a selectSat plugin exists, deselect the selected satellite

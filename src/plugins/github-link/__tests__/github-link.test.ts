@@ -3,7 +3,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { GithubLinkPlugin } from '@app/plugins/github-link/github-link';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
-import { vi, type MockInstance } from 'vitest';
+import { type MockInstance, vi } from 'vitest';
 
 describe('GithubLinkPlugin', () => {
   let githubLinkPlugin: GithubLinkPlugin;
@@ -62,11 +62,7 @@ describe('GithubLinkPlugin', () => {
       // Simulate click
       githubLinkPlugin.onClick_();
 
-      expect(windowOpenSpy).toHaveBeenCalledWith(
-        'https://github.com/thkruz/keeptrack.space/',
-        '_blank',
-        'noopener,noreferrer',
-      );
+      expect(windowOpenSpy).toHaveBeenCalledWith('https://github.com/thkruz/keeptrack.space/', '_blank', 'noopener,noreferrer');
     });
   });
 

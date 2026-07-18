@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-undefined */
 import { Pickable } from '@app/engine/core/interfaces';
@@ -6,6 +5,7 @@ import { CelestrakColorScheme } from '@app/engine/rendering/color-schemes/celest
 import { PayloadStatus, SpaceObjectType } from '@ootk/src/main';
 import { mockSatellites } from '@test/engine/rendering/color-schemes/__fixtures__/mock-satellites';
 import { ColorSchemeTestUtils } from '@test/engine/rendering/color-schemes/__helpers__/color-scheme-test-utils';
+import { vi } from 'vitest';
 
 // Mock dependencies
 vi.mock('@app/keepTrackApi', () => ({
@@ -67,10 +67,7 @@ describe('CelestrakColorScheme', () => {
         const result = colorScheme.update(mockSatellites.activePayload);
 
         ColorSchemeTestUtils.assertValidColorInformation(result);
-        expect(ColorSchemeTestUtils.colorsEqual(
-          result.color,
-          colorScheme.colorTheme.celestrakDefaultActivePayload,
-        )).toBe(true);
+        expect(ColorSchemeTestUtils.colorsEqual(result.color, colorScheme.colorTheme.celestrakDefaultActivePayload)).toBe(true);
         expect(result.pickable).toBe(Pickable.Yes);
       });
     });
@@ -80,10 +77,7 @@ describe('CelestrakColorScheme', () => {
         const result = colorScheme.update(mockSatellites.inactivePayload);
 
         ColorSchemeTestUtils.assertValidColorInformation(result);
-        expect(ColorSchemeTestUtils.colorsEqual(
-          result.color,
-          colorScheme.colorTheme.celestrakDefaultInactivePayload,
-        )).toBe(true);
+        expect(ColorSchemeTestUtils.colorsEqual(result.color, colorScheme.colorTheme.celestrakDefaultInactivePayload)).toBe(true);
         expect(result.pickable).toBe(Pickable.Yes);
       });
 
@@ -95,10 +89,7 @@ describe('CelestrakColorScheme', () => {
 
         const result = colorScheme.update(unknownPayload);
 
-        expect(ColorSchemeTestUtils.colorsEqual(
-          result.color,
-          colorScheme.colorTheme.celestrakDefaultInactivePayload,
-        )).toBe(true);
+        expect(ColorSchemeTestUtils.colorsEqual(result.color, colorScheme.colorTheme.celestrakDefaultInactivePayload)).toBe(true);
       });
     });
 
@@ -107,10 +98,7 @@ describe('CelestrakColorScheme', () => {
         const result = colorScheme.update(mockSatellites.rocketBody);
 
         ColorSchemeTestUtils.assertValidColorInformation(result);
-        expect(ColorSchemeTestUtils.colorsEqual(
-          result.color,
-          colorScheme.colorTheme.celestrakDefaultRocketBody,
-        )).toBe(true);
+        expect(ColorSchemeTestUtils.colorsEqual(result.color, colorScheme.colorTheme.celestrakDefaultRocketBody)).toBe(true);
         expect(result.pickable).toBe(Pickable.Yes);
       });
     });
@@ -120,10 +108,7 @@ describe('CelestrakColorScheme', () => {
         const result = colorScheme.update(mockSatellites.debris);
 
         ColorSchemeTestUtils.assertValidColorInformation(result);
-        expect(ColorSchemeTestUtils.colorsEqual(
-          result.color,
-          colorScheme.colorTheme.celestrakDefaultDebris,
-        )).toBe(true);
+        expect(ColorSchemeTestUtils.colorsEqual(result.color, colorScheme.colorTheme.celestrakDefaultDebris)).toBe(true);
         expect(result.pickable).toBe(Pickable.Yes);
       });
     });
@@ -151,10 +136,7 @@ describe('CelestrakColorScheme', () => {
 
       const result = colorScheme.update(mockSatellites.activePayload);
 
-      expect(ColorSchemeTestUtils.colorsEqual(
-        result.color,
-        colorScheme.colorTheme.deselected,
-      )).toBe(true);
+      expect(ColorSchemeTestUtils.colorsEqual(result.color, colorScheme.colorTheme.deselected)).toBe(true);
       expect(result.pickable).toBe(Pickable.No);
     });
 
@@ -188,10 +170,7 @@ describe('CelestrakColorScheme', () => {
 
       const result = colorScheme.update(nonSatellite);
 
-      expect(ColorSchemeTestUtils.colorsEqual(
-        result.color,
-        colorScheme.colorTheme.transparent,
-      )).toBe(true);
+      expect(ColorSchemeTestUtils.colorsEqual(result.color, colorScheme.colorTheme.transparent)).toBe(true);
       expect(result.pickable).toBe(Pickable.No);
     });
   });
@@ -265,12 +244,9 @@ describe('CelestrakColorScheme', () => {
         (sat, result) => {
           // Additional assertions specific to Celestrak color scheme
           if (sat.type === SpaceObjectType.PAYLOAD && sat.status === PayloadStatus.OPERATIONAL) {
-            expect(ColorSchemeTestUtils.colorsEqual(
-              result.color,
-              colorScheme.colorTheme.celestrakDefaultActivePayload,
-            )).toBe(true);
+            expect(ColorSchemeTestUtils.colorsEqual(result.color, colorScheme.colorTheme.celestrakDefaultActivePayload)).toBe(true);
           }
-        },
+        }
       );
     });
   });
@@ -281,7 +257,7 @@ describe('CelestrakColorScheme', () => {
         ColorSchemeTestUtils.createMockSatellite({
           id: i,
           type: [SpaceObjectType.PAYLOAD, SpaceObjectType.ROCKET_BODY, SpaceObjectType.DEBRIS][i % 3],
-        }),
+        })
       );
 
       const startTime = performance.now();

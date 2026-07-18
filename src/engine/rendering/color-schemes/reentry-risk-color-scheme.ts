@@ -37,7 +37,8 @@ export class ReentryRiskColorScheme extends ColorScheme {
   constructor() {
     super(ReentryRiskColorScheme.uniqueColorTheme);
     this.objectTypeFlags = {
-      ...this.objectTypeFlags, ...ReentryRiskColorScheme.uniqueObjectTypeFlags,
+      ...this.objectTypeFlags,
+      ...ReentryRiskColorScheme.uniqueObjectTypeFlags,
     };
   }
 

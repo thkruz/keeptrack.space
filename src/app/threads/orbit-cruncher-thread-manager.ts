@@ -1,11 +1,6 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
-import {
-  OrbitCruncherInMsgs,
-  OrbitCruncherMsgType,
-  OrbitCruncherOutMsgPoints,
-  OrbitDrawTypes,
-} from '@app/webworker/orbit-cruncher-messages';
+import { OrbitCruncherInMsgs, OrbitCruncherMsgType, OrbitCruncherOutMsgPoints, OrbitDrawTypes } from '@app/webworker/orbit-cruncher-messages';
 import { Degrees, Kilometers } from '@ootk/src/main';
 
 export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
@@ -27,10 +22,7 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
     });
   }
 
-  sendSatelliteUpdate(
-    id: number, simulationTime: number,
-    isEcfOutput: boolean, isPolarViewEcf?: boolean, tle1?: string, tle2?: string,
-  ): void {
+  sendSatelliteUpdate(id: number, simulationTime: number, isEcfOutput: boolean, isPolarViewEcf?: boolean, tle1?: string, tle2?: string): void {
     this.postMessage({
       typ: OrbitCruncherMsgType.SATELLITE_UPDATE,
       id,
@@ -44,9 +36,11 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
   }
 
   sendMissileUpdate(
-    id: number, simulationTime: number,
-    isEcfOutput: boolean, isPolarViewEcf?: boolean,
-    trajectory?: { latList?: Degrees[]; lonList?: Degrees[]; altList?: Kilometers[]; startTime?: number },
+    id: number,
+    simulationTime: number,
+    isEcfOutput: boolean,
+    isPolarViewEcf?: boolean,
+    trajectory?: { latList?: Degrees[]; lonList?: Degrees[]; altList?: Kilometers[]; startTime?: number }
   ): void {
     this.postMessage({
       typ: OrbitCruncherMsgType.MISSILE_UPDATE,

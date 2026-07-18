@@ -1,36 +1,45 @@
-import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
-import { getEl } from '@app/engine/utils/get-el';
-import { hideLoading, showLoadingSticky } from '@app/engine/utils/showLoading';
-import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
-import rocketLaunchPng from '@public/img/icons/rocket-launch.png';
-
 import { SatMath } from '@app/app/analysis/sat-math';
-
 import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
 import { launchSites } from '@app/app/data/catalogs/launch-sites';
 import { SoundNames } from '@app/engine/audio/sounds';
+import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { TimeManager } from '@app/engine/core/time-manager';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
+import { dateFormat } from '@app/engine/utils/dateFormat';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
+import { hideLoading, showLoadingSticky } from '@app/engine/utils/showLoading';
+import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { t7e } from '@app/locales/keys';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
-import { dateFormat } from '@app/engine/utils/dateFormat';
 import {
-  BaseObject, Degrees,
-  FormatTle, GreenwichMeanSiderealTime, KilometersPerSecond,
-  LaunchWindowFinder, LaunchWindowResult,
+  BaseObject,
+  calcGmst,
+  Degrees,
+  FormatTle,
+  GreenwichMeanSiderealTime,
+  groundTrackStateVector,
+  KilometersPerSecond,
+  LaunchWindowFinder,
+  LaunchWindowResult,
   Radians,
-  Satellite, SatelliteParams,
-  SatelliteRecord, Sgp4, SpaceObjectType,
+  rv2tle,
+  Satellite,
+  SatelliteParams,
+  SatelliteRecord,
+  Sgp4,
+  SpaceObjectType,
+  semimajorAxisFromMeanMotion,
   TemeVec3,
-  TleLine1, TleLine2,
-  calcGmst, groundTrackStateVector, rv2tle, semimajorAxisFromMeanMotion,
+  TleLine1,
+  TleLine2,
 } from '@ootk/src/main';
+import rocketLaunchPng from '@public/img/icons/rocket-launch.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { IHelpConfig, IKeyboardShortcut } from '../../engine/plugins/core/plugin-capabilities';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -114,10 +123,7 @@ export class NewLaunch extends KeepTrackPlugin {
           content: t7e('plugins.NewLaunch.help.limits'),
         },
       ],
-      tips: [
-        t7e('plugins.NewLaunch.help.tip1'),
-        t7e('plugins.NewLaunch.help.tip2'),
-      ],
+      tips: [t7e('plugins.NewLaunch.help.tip1'), t7e('plugins.NewLaunch.help.tip2')],
       shortcuts: [{ keys: ['Shift', 'L'], description: t7e('plugins.NewLaunch.help.shortcutOpen' as T7eKey) }],
     };
   }
@@ -172,11 +178,13 @@ export class NewLaunch extends KeepTrackPlugin {
       });
     }
 
-    return countryKeys.map((country) =>
-      `<optgroup label="${country}"> ${grouped[country]
-        .map((site) => `<option value="${site.key}">${site.name}<br/> - ${site.site}</option>`).join('\n')}
-      </optgroup>`,
-    ).join('\n');
+    return countryKeys
+      .map(
+        (country) =>
+          `<optgroup label="${country}"> ${grouped[country].map((site) => `<option value="${site.key}">${site.name}<br/> - ${site.site}</option>`).join('\n')}
+      </optgroup>`
+      )
+      .join('\n');
   }
 
   /**
@@ -341,7 +349,7 @@ export class NewLaunch extends KeepTrackPlugin {
     if (!site) {
       uiManagerInstance.toast(
         t7e('plugins.NewLaunch.errorMsgs.launchSiteNotFound' as T7eKey).replace('{launchSite}', (getEl('nl-facility') as HTMLInputElement | null)?.value ?? ''),
-        ToastMsgType.caution,
+        ToastMsgType.caution
       );
 
       return;
@@ -417,9 +425,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
   /** The submit-button label, reflecting an armed launch window when one is set. */
   protected submitButtonLabel_(): string {
-    return this.matchedLaunchTime_
-      ? t7e('plugins.NewLaunch.buttons.createLaunchAtWindow' as T7eKey)
-      : t7e('plugins.NewLaunch.buttons.createLaunchNominal' as T7eKey);
+    return this.matchedLaunchTime_ ? t7e('plugins.NewLaunch.buttons.createLaunchAtWindow' as T7eKey) : t7e('plugins.NewLaunch.buttons.createLaunchNominal' as T7eKey);
   }
 
   /** Refreshes the submit-button label unless the inclination guard disabled it. */
@@ -644,13 +650,7 @@ export class NewLaunch extends KeepTrackPlugin {
    * inclination, or the fit did not converge) to match the caller's existing
    * error/length handling.
    */
-  protected buildLaunchTle_(
-    sat: Satellite,
-    launchLat: Degrees,
-    launchLon: Degrees,
-    upOrDown: 'N' | 'S',
-    launchTime: Date,
-  ): [TleLine1, TleLine2] | ['Error', string] {
+  protected buildLaunchTle_(sat: Satellite, launchLat: Degrees, launchLon: Degrees, upOrDown: 'N' | 'S', launchTime: Date): [TleLine1, TleLine2] | ['Error', string] {
     const eMsg = (key: string) => t7e(`plugins.NewLaunch.errorMsgs.${key}` as T7eKey);
     const deg2rad = Math.PI / 180;
 
@@ -717,26 +717,23 @@ export class NewLaunch extends KeepTrackPlugin {
    * form HTML can override it (e.g. as a no-op) while still calling `super.addJs()`.
    */
   protected registerSelectSatListener_(): void {
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (obj: BaseObject) => {
-        if (obj?.isSatellite()) {
-          const sat = obj as Satellite;
-          const sccEl = getEl('nl-scc') as HTMLInputElement | null;
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
+      if (obj?.isSatellite()) {
+        const sat = obj as Satellite;
+        const sccEl = getEl('nl-scc') as HTMLInputElement | null;
 
-          if (sccEl && sccEl.value !== sat.sccNum) {
-            sccEl.value = sat.sccNum;
-            // New target satellite invalidates a previously matched window
-            this.clearMatchedWindow_();
-          }
-          this.setBottomIconToEnabled();
-        } else if (obj?.type === SpaceObjectType.LAUNCH_SITE) {
-          this.selectLaunchSite(obj as LaunchSite);
-        } else {
-          this.setBottomIconToDisabled();
+        if (sccEl && sccEl.value !== sat.sccNum) {
+          sccEl.value = sat.sccNum;
+          // New target satellite invalidates a previously matched window
+          this.clearMatchedWindow_();
         }
-      },
-    );
+        this.setBottomIconToEnabled();
+      } else if (obj?.type === SpaceObjectType.LAUNCH_SITE) {
+        this.selectLaunchSite(obj as LaunchSite);
+      } else {
+        this.setBottomIconToDisabled();
+      }
+    });
   }
 
   selectLaunchSite(launchSite: LaunchSite): void {
@@ -808,17 +805,17 @@ export class NewLaunch extends KeepTrackPlugin {
     // Verify ecen, epochyr, epochday formats
     const eccFrac = inputParams.eccentricity.toString().split('.')[1] ?? '0';
 
-    if (!(/^\d{7}$/u).test(eccFrac.padStart(7, '0'))) {
+    if (!/^\d{7}$/u.test(eccFrac.padStart(7, '0'))) {
       ServiceLocator.getUiManager().toast(eMsg('invalidEccentricityFormat'), ToastMsgType.critical, true);
       errorManagerInstance.warn(eMsg('eccentricityFormatIssue'));
     }
 
-    if (!(/^\d{2}$/u).test(inputParams.epochYear.toString()?.padStart(2, '0'))) {
+    if (!/^\d{2}$/u.test(inputParams.epochYear.toString()?.padStart(2, '0'))) {
       ServiceLocator.getUiManager().toast(eMsg('invalidEpochYearFormat'), ToastMsgType.critical, true);
       errorManagerInstance.warn(eMsg('epochYearFormatIssue'));
     }
 
-    if (!(/^(?:\d{3}\.\d{8})$/u).test(inputParams.epochDay.toFixed(8).padStart(12, '0'))) {
+    if (!/^(?:\d{3}\.\d{8})$/u.test(inputParams.epochDay.toFixed(8).padStart(12, '0'))) {
       ServiceLocator.getUiManager().toast(eMsg('invalidEpochDayFormat'), ToastMsgType.critical, true);
       errorManagerInstance.warn(eMsg('epochDayFormatIssue'));
     }
@@ -840,11 +837,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     // Check if TLE generation failed
     if (tle1_ === 'Error') {
-      errorManagerInstance.error(
-        new Error(tle2),
-        'create-sat.ts',
-        t7e('plugins.CreateSat.errorMsgs.errorCreatingSat'),
-      );
+      errorManagerInstance.error(new Error(tle2), 'create-sat.ts', t7e('plugins.CreateSat.errorMsgs.errorCreatingSat'));
 
       return null;
     }
@@ -866,11 +859,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     // Validate altitude is reasonable
     if (SatMath.altitudeCheck(satrec, ServiceLocator.getTimeManager().simulationTimeObj) <= 1) {
-      ServiceLocator.getUiManager().toast(
-        eMsg('failedToPropagate'),
-        ToastMsgType.caution,
-        true,
-      );
+      ServiceLocator.getUiManager().toast(eMsg('failedToPropagate'), ToastMsgType.caution, true);
 
       return null;
     }

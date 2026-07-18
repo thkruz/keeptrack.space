@@ -46,11 +46,7 @@ describe('OnboardingPlugin behavior', () => {
   it('exposes commands, settings contribution, and help', () => {
     const commands = plugin.getCommandPaletteCommands();
 
-    expect(commands.map((c) => c.id)).toEqual([
-      'OnboardingPlugin.startTour',
-      'OnboardingPlugin.startPowerTour',
-      'OnboardingPlugin.openChecklist',
-    ]);
+    expect(commands.map((c) => c.id)).toEqual(['OnboardingPlugin.startTour', 'OnboardingPlugin.startPowerTour', 'OnboardingPlugin.openChecklist']);
 
     const contribution = plugin.getSettingsContribution();
 

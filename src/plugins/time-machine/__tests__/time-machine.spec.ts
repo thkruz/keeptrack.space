@@ -1,4 +1,4 @@
-import { test, expect } from '@test/e2e/coverage';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('TimeMachine', () => {
@@ -11,7 +11,7 @@ test.describe('TimeMachine', () => {
       plugins: { TimeMachine: { enabled: true } },
     });
 
-    const pluginErrors = errors.filter((e) => (/time.?machine/iu).test(e));
+    const pluginErrors = errors.filter((e) => /time.?machine/iu.test(e));
 
     expect(pluginErrors).toHaveLength(0);
   });

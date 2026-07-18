@@ -1,5 +1,5 @@
-import { settingsManager } from '@app/settings/settings';
 import { SkipInterpolationToggle } from '@app/plugins/skip-interpolation-toggle/skip-interpolation-toggle';
+import { settingsManager } from '@app/settings/settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSuite } from '@test/generic-tests';
 import { vi } from 'vitest';

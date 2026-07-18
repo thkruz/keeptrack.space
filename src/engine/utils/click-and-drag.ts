@@ -1,8 +1,11 @@
 import { ClickDragOptions } from '@app/engine/plugins/base-plugin';
 
-export const clickAndDragWidth = (el: HTMLElement | null, options: ClickDragOptions = {
-  isDraggable: true,
-}): HTMLDivElement | null => {
+export const clickAndDragWidth = (
+  el: HTMLElement | null,
+  options: ClickDragOptions = {
+    isDraggable: true,
+  }
+): HTMLDivElement | null => {
   if (!el) {
     return null;
   }

@@ -3,12 +3,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import {
-  IBottomIconConfig,
-  ICommandPaletteCommand,
-  IHelpConfig,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, ICommandPaletteCommand, IHelpConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -19,13 +14,13 @@ import rocketPng from '@public/img/icons/rocket.png';
 import {
   ATTACKER_SITES,
   AttackerSite,
-  CUSTOM_TARGET_ID,
-  TARGET_OPTIONS,
   attackerDesc,
   attackerLat,
   attackerLon,
   attackerRangeKm,
+  CUSTOM_TARGET_ID,
   getAttackerSite,
+  TARGET_OPTIONS,
   targetLat,
   targetLon,
 } from './missile-arsenal';
@@ -339,12 +334,7 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
           // and a telemetry error with a real funcName, instead of an unhandled "Unexpected token
           // '<'" promise rejection with no context (the SPA index.html fallback parsed as JSON).
           missileManager.massRaidPre(launchTime, sim).catch((err: unknown) => {
-            errorManagerInstance.error(
-              err as Error,
-              'MissileSimulatorPlugin.massRaidPre',
-              l('msgs.simLoadFailed').replace('{sim}', sim),
-              { skipAutoFile: true },
-            );
+            errorManagerInstance.error(err as Error, 'MissileSimulatorPlugin.massRaidPre', l('msgs.simLoadFailed').replace('{sim}', sim), { skipAutoFile: true });
           });
         }
         hideLoading();
@@ -421,7 +411,7 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
           0.07,
           attackerRangeKm(site),
           site.country,
-          site.minAltKm,
+          site.minAltKm
         );
       }
 
@@ -559,9 +549,7 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
     const statusEl = getEl('ms-status');
 
     if (statusEl) {
-      statusEl.textContent = l('msgs.missilesActive')
-        .replace('{n}', missileManager.missilesInUse.toString())
-        .replace('{max}', settingsManager.maxMissiles.toString());
+      statusEl.textContent = l('msgs.missilesActive').replace('{n}', missileManager.missilesInUse.toString()).replace('{max}', settingsManager.maxMissiles.toString());
     }
 
     const clearBtn = getEl('clearMissilesBtn') as HTMLButtonElement | null;

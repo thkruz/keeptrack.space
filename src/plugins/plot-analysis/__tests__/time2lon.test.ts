@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 /* eslint-disable dot-notation */
 import { KeepTrack } from '@app/keeptrack';
 import { Time2LonPlots } from '@app/plugins/plot-analysis/time2lon';
@@ -6,6 +5,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { SpaceObjectType } from '@ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('Time2LonPlots_class', () => {
   beforeEach(() => {
@@ -276,5 +276,4 @@ describe('Time2LonPlots_class', () => {
       expect(types.size).toBe(0);
     });
   });
-
 });

@@ -80,11 +80,7 @@ export class SideMenuComponent {
    * @param config The configuration for the side menu.
    * @param callbacks Optional callbacks for menu events.
    */
-  constructor(
-    pluginId: string,
-    config: ISideMenuConfig,
-    callbacks: SideMenuCallbacks = {},
-  ) {
+  constructor(pluginId: string, config: ISideMenuConfig, callbacks: SideMenuCallbacks = {}) {
     this.pluginId = pluginId;
     this.callbacks = callbacks;
 

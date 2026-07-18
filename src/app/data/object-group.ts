@@ -1,8 +1,8 @@
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { BaseObject, Satellite } from '@ootk/src/main';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { CatalogSearch } from './catalog-search';
 import { getCountryMapList } from './catalogs/countries';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export enum GroupType {
   ALL = 0,
@@ -24,7 +24,7 @@ export type GroupData = {
   [GroupType.YEAR]: number;
   [GroupType.YEAR_OR_LESS]: number;
   [GroupType.INTLDES]: string[];
-  [GroupType.NAME_REGEX]: RegExp
+  [GroupType.NAME_REGEX]: RegExp;
   [GroupType.COUNTRY]: string;
   [GroupType.COUNTRY_REGEX]: RegExp;
   [GroupType.SHAPE_STRING]: string;
@@ -148,8 +148,6 @@ export class ObjectGroup<T extends GroupType> {
       .filter((sat: Satellite) => data.split('|').includes(sat.country) && sat.country !== 'ANALSAT')
       // .slice(0, settingsManager.maxOrbitsDisplayed)
       // eslint-disable-next-line arrow-body-style
-      .map((sat: Satellite) => {
-        return sat.id;
-      });
+      .map((sat: Satellite) => sat.id);
   }
 }

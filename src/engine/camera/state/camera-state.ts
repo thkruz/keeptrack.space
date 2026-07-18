@@ -190,10 +190,7 @@ export class CameraState {
   }
 
   set camDistBuffer(val: Kilometers) {
-    this.camDistBuffer_ = Math.min(
-      Math.max(val, this.effectiveMinDistanceFromTarget),
-      this.maxDistanceFromTarget ?? settingsManager.maxZoomDistance,
-    ) as Kilometers;
+    this.camDistBuffer_ = Math.min(Math.max(val, this.effectiveMinDistanceFromTarget), this.maxDistanceFromTarget ?? settingsManager.maxZoomDistance) as Kilometers;
   }
 
   get earthCenteredPitch(): Radians {

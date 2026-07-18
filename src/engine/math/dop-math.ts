@@ -1,6 +1,6 @@
-import numeric from 'numeric';
-import { AzEl, DEG2RAD, Degrees, Satellite, Kilometers, MILLISECONDS_PER_SECOND, ecef2rae, eci2ecef } from '@ootk/src/main';
 import { t7e } from '@app/locales/keys';
+import { AzEl, DEG2RAD, Degrees, ecef2rae, eci2ecef, Kilometers, MILLISECONDS_PER_SECOND, Satellite } from '@ootk/src/main';
+import numeric from 'numeric';
 import { SatMath } from '../../app/analysis/sat-math';
 import { dateFormat } from '../utils/dateFormat';
 import { getEl } from '../utils/get-el';
@@ -113,7 +113,7 @@ export abstract class DopMath {
     lon: Degrees,
     alt?: Kilometers,
     gpsElevationMask: Degrees | ElevationMaskFn = <Degrees>10,
-    includeAllSatPositions = false,
+    includeAllSatPositions = false
   ): DopResult {
     if (typeof lat === 'undefined' || typeof lon === 'undefined') {
       return { pdop: 'N/A', hdop: 'N/A', gdop: 'N/A', vdop: 'N/A', tdop: 'N/A', visibleSats: 0 };
@@ -204,27 +204,18 @@ export abstract class DopMath {
       return '';
     }
 
-    const prnMatch = (/PRN\s*(?<prn>\d+)/iu).exec(name);
+    const prnMatch = /PRN\s*(?<prn>\d+)/iu.exec(name);
 
     if (prnMatch) {
       return `PRN ${prnMatch.groups?.prn}`;
     }
 
-    const shortened = name
-      .replace(/\s*[([].*$/u, '')
-      .trim();
+    const shortened = name.replace(/\s*[([].*$/u, '').trim();
 
     return shortened.length > 12 ? `${shortened.slice(0, 11)}…` : shortened;
   }
 
-  public static getDopsList(
-    getOffsetTimeObj: (offset: number) => Date,
-    gpsSats: Satellite[],
-    lat: Degrees,
-    lon: Degrees,
-    alt: Kilometers,
-    el: Degrees | ElevationMaskFn,
-  ): DopList {
+  public static getDopsList(getOffsetTimeObj: (offset: number) => Date, gpsSats: Satellite[], lat: Degrees, lon: Degrees, alt: Kilometers, el: Degrees | ElevationMaskFn): DopList {
     const dopsResults = [] as DopList;
 
     for (let t = 0; t < 1440; t++) {

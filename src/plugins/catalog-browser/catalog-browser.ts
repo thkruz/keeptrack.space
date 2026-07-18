@@ -3,23 +3,16 @@ import { CatalogLoader, JsSat, KeepTrackTLEFile } from '@app/app/data/catalog-lo
 import { SoundNames } from '@app/engine/audio/sounds';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { settingsManager } from '@app/settings/settings';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import {
-  IBottomIconConfig,
-  ICommandPaletteCapable,
-  ICommandPaletteCommand,
-  IDragOptions,
-  IHelpConfig,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, ICommandPaletteCapable, ICommandPaletteCommand, IDragOptions, IHelpConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { hideAsyncIndicator, showAsyncIndicator } from '@app/engine/utils/asyncIndicator';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
+import { settingsManager } from '@app/settings/settings';
 import { Satellite } from '@ootk/src/main';
 import satelliteAltPng from '@public/img/icons/satellite-alt.png';
 import { CatalogBrowserData } from './catalog-browser-data';
@@ -127,7 +120,7 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
           label: `Load Catalog: ${t7e('plugins.CatalogBrowserPlugin.entries.vimpelOnly' as T7eKey)}`,
           category,
           callback: () => this.loadKeepTrackCatalog_('VIMPEL_ONLY'),
-        },
+        }
       );
     }
 
@@ -154,10 +147,7 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
   addJs(): void {
     super.addJs();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      this.uiManagerFinal_.bind(this),
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   private uiManagerFinal_(): void {
@@ -227,7 +217,7 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
         if (!resp.ok) {
           throw new Error(`Vimpel fetch returned HTTP ${resp.status}`);
         }
-        const vimpelData = await resp.json() as JsSat[];
+        const vimpelData = (await resp.json()) as JsSat[];
 
         // Route through the JSC Vimpel pipeline (not raw-TLE reload) so altIds,
         // labels, and object types match the initial-boot processing.
@@ -246,16 +236,10 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
         toastSuffix = 'vimpelLoaded';
       }
 
-      uiManager.toast(
-        t7e(`plugins.CatalogBrowserPlugin.toasts.${toastSuffix}` as T7eKey),
-        ToastMsgType.normal,
-      );
+      uiManager.toast(t7e(`plugins.CatalogBrowserPlugin.toasts.${toastSuffix}` as T7eKey), ToastMsgType.normal);
     } catch (error) {
       errorManagerInstance.error(error, 'CatalogBrowserPlugin');
-      uiManager.toast(
-        t7e('plugins.CatalogBrowserPlugin.errorMsgs.DefaultFailed' as T7eKey),
-        ToastMsgType.critical,
-      );
+      uiManager.toast(t7e('plugins.CatalogBrowserPlugin.errorMsgs.DefaultFailed' as T7eKey), ToastMsgType.critical);
     } finally {
       this.isLoading_ = false;
       hideAsyncIndicator();
@@ -298,11 +282,7 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
         await CatalogLoader.reloadCatalog(tleContent);
       }
 
-      uiManager.toast(
-        t7e('plugins.CatalogBrowserPlugin.toasts.loaded' as T7eKey)
-          .replace('{catalog}', queryParam.split('=')[1]),
-        ToastMsgType.normal,
-      );
+      uiManager.toast(t7e('plugins.CatalogBrowserPlugin.toasts.loaded' as T7eKey).replace('{catalog}', queryParam.split('=')[1]), ToastMsgType.normal);
     } catch (error) {
       const { messageKey, toastType, isTransient } = this.classifyFetchError_(error);
 
@@ -310,10 +290,7 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
         errorManagerInstance.error(error as Error, 'CatalogBrowserPlugin', undefined, { skipToast: true });
       }
 
-      uiManager.toast(
-        t7e(messageKey),
-        toastType,
-      );
+      uiManager.toast(t7e(messageKey), toastType);
     } finally {
       this.isLoading_ = false;
       hideAsyncIndicator();
@@ -473,9 +450,7 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
   }
 
   private buildCelesTrackUrl_(queryParam: string): string {
-    const baseUrl = queryParam.startsWith('FILE=')
-      ? CELESTRAK_SUP_GP_URL
-      : CELESTRAK_GP_URL;
+    const baseUrl = queryParam.startsWith('FILE=') ? CELESTRAK_SUP_GP_URL : CELESTRAK_GP_URL;
 
     return `${baseUrl}?${queryParam}&FORMAT=3LE`;
   }
@@ -510,31 +485,34 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
 
   private buildCatalogListHtml_(): string {
     const categories = CatalogBrowserData.categories;
-    const catLabel = (key: string) =>
-      t7e(`plugins.CatalogBrowserPlugin.categories.${key}` as T7eKey);
-    const entryLabel = (key: string) =>
-      t7e(`plugins.CatalogBrowserPlugin.entries.${key}` as T7eKey);
+    const catLabel = (key: string) => t7e(`plugins.CatalogBrowserPlugin.categories.${key}` as T7eKey);
+    const entryLabel = (key: string) => t7e(`plugins.CatalogBrowserPlugin.entries.${key}` as T7eKey);
 
     let listHtml = '';
 
     // KeepTrack catalogs at the top (hidden when hideKeepTrackCatalogs is set)
     if (!this.hideKeepTrackCatalogs_) {
-      listHtml += this.buildCategoryCard_(catLabel('keeptrack'), [
-        this.buildCatalogRow_('DEFAULT', 'default', entryLabel('defaultCatalog')),
-        this.buildCatalogRow_('CELESTRAK_ONLY', 'celestrak-only', entryLabel('celestrakOnly')),
-        this.buildCatalogRow_('VIMPEL_ONLY', 'vimpel-only', entryLabel('vimpelOnly')),
-      ].join(''));
+      listHtml += this.buildCategoryCard_(
+        catLabel('keeptrack'),
+        [
+          this.buildCatalogRow_('DEFAULT', 'default', entryLabel('defaultCatalog')),
+          this.buildCatalogRow_('CELESTRAK_ONLY', 'celestrak-only', entryLabel('celestrakOnly')),
+          this.buildCatalogRow_('VIMPEL_ONLY', 'vimpel-only', entryLabel('vimpelOnly')),
+        ].join('')
+      );
     }
 
     for (const cat of categories) {
-      const rows = cat.entries.map((entry) => {
-        const isSupGp = entry.queryParam.startsWith('FILE=');
-        const chipClass = isSupGp ? 'cb-chip cb-chip-supgp' : 'cb-chip cb-chip-gp';
-        const chipText = isSupGp ? 'SupGP' : 'GP';
-        const chip = `<span class="${chipClass}">${chipText}</span>`;
+      const rows = cat.entries
+        .map((entry) => {
+          const isSupGp = entry.queryParam.startsWith('FILE=');
+          const chipClass = isSupGp ? 'cb-chip cb-chip-supgp' : 'cb-chip cb-chip-gp';
+          const chipText = isSupGp ? 'SupGP' : 'GP';
+          const chip = `<span class="${chipClass}">${chipText}</span>`;
 
-        return this.buildCatalogRow_(entry.queryParam, entry.id, entryLabel(entry.nameKey), chip);
-      }).join('');
+          return this.buildCatalogRow_(entry.queryParam, entry.id, entryLabel(entry.nameKey), chip);
+        })
+        .join('');
 
       listHtml += this.buildCategoryCard_(catLabel(cat.nameKey), rows);
     }
@@ -554,9 +532,11 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
 
   /** A single full-width v13 action row for one catalog (label + optional chip + chevron). */
   private buildCatalogRow_(query: string, id: string, label: string, chip = ''): string {
-    return '<button type="button" class="kt-action waves-effect cb-catalog-item" ' +
+    return (
+      '<button type="button" class="kt-action waves-effect cb-catalog-item" ' +
       `data-query="${query}" data-id="${id}">` +
       `<span class="kt-action-label">${label}</span>${chip}` +
-      '</button>';
+      '</button>'
+    );
   }
 }

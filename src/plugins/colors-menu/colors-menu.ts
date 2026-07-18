@@ -80,7 +80,8 @@ export class ColorMenu extends KeepTrackPlugin implements ICommandPaletteCapable
         continue;
       }
 
-      result += '<button type="button" class="kt-action waves-effect colors-menu-item" ' +
+      result +=
+        '<button type="button" class="kt-action waves-effect colors-menu-item" ' +
         `data-color="${colorSchemes[colorScheme].id}">` +
         `<span class="kt-action-label">${colorSchemes[colorScheme].label}</span>` +
         '</button>';
@@ -179,10 +180,7 @@ export class ColorMenu extends KeepTrackPlugin implements ICommandPaletteCapable
           content: t7e('plugins.ColorMenu.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.ColorMenu.help.tip1'),
-        t7e('plugins.ColorMenu.help.tip2'),
-      ],
+      tips: [t7e('plugins.ColorMenu.help.tip1'), t7e('plugins.ColorMenu.help.tip2')],
       shortcuts: [{ keys: ['A'], description: t7e('plugins.ColorMenu.help.shortcutToggle') }],
     };
   }
@@ -194,10 +192,7 @@ export class ColorMenu extends KeepTrackPlugin implements ICommandPaletteCapable
   addHtml(): void {
     super.addHtml();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      this.uiManagerFinal_.bind(this),
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   private uiManagerFinal_(): void {
@@ -244,4 +239,3 @@ export class ColorMenu extends KeepTrackPlugin implements ICommandPaletteCapable
     errorManagerInstance.warn(`Color scheme not found: ${colorName}`);
   };
 }
-

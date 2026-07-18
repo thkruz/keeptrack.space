@@ -1,10 +1,10 @@
 import { OemSatellite } from '@app/app/objects/oem-satellite';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { Satellite, eci2rae } from '@ootk/src/main';
-import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { eci2rae, Satellite } from '@ootk/src/main';
 import { vec4 } from 'gl-matrix';
 import { Line, LineColors, LineDescription } from './line';
 

@@ -38,7 +38,6 @@
       {
         "assets": [
           "package.json",
-          "package-lock.json",
           "docs/CHANGELOG.md",
           "README.md",
           "CITATION.cff"

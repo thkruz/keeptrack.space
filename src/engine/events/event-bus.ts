@@ -101,7 +101,7 @@ export interface EngineEventMap {
   [EventBusEvent.splashScreenHidden]: [];
 }
 
-interface EventBusRegisterParams<T extends EventBusEvent> {
+export interface EventBusRegisterParams<T extends EventBusEvent> {
   event: T;
   cb: (...args: EngineEventMap[T]) => void;
 }

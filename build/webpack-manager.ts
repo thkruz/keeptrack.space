@@ -210,13 +210,13 @@ export class WebpackManager {
             },
           },
           {
+            // JS is transpiled by rspack's builtin SWC (no babel-loader). This
+            // rule only relaxes fully-specified ESM resolution so extensionless
+            // imports inside some dependencies keep resolving.
             test: /\.m?js$/u,
             include: [/src/u, /node_modules/u],
             resolve: {
               fullySpecified: false,
-            },
-            use: {
-              loader: 'babel-loader',
             },
           },
           {

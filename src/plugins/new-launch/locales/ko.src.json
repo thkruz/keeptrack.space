@@ -49,7 +49,9 @@
         "invalidEpochDayFormat": "잘못된 에포크 일 형식입니다! 3자리 숫자, 소수점, 소수점 뒤 8자리 숫자여야 합니다.",
         "epochDayFormatIssue": "이 위성의 에포크 일 형식에 문제가 있습니다. 다른 위성을 시도해 보세요.",
         "failedToPropagate": "위성 전파에 실패했습니다. 다른 매개변수를 시도하거나 매개변수가 올바르다면 이 문제를 보고해 주세요.",
-        "changingOrbitBufferFailed": "궤도 버퍼 데이터 변경 실패"
+        "changingOrbitBufferFailed": "궤도 버퍼 데이터 변경 실패",
+        "launchLatExceedsInclination": "발사 위도가 궤도 경사각을 초과합니다.",
+        "failedToFitOrbit": "발사 지점에 맞는 궤도를 맞출 수 없습니다."
       },
       "help": {
         "overview": "새 발사 메뉴는 개념적 발사를 생성합니다. 실제 위성의 궤도를 복사하고, 선택한 발사 장소에서 이륙하도록 회전시킨 다음, 시계를 T+0으로 재설정합니다. \"이 장소에서 이런 궤도로 무언가 발사되면 내 센서가 언제 그것을 볼 수 있을까?\"라는 질문에 답하는 데 사용하세요.",

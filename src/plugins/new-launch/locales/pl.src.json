@@ -49,7 +49,9 @@
         "invalidEpochDayFormat": "Nieprawidłowy format dnia epoki! Wymagane 3 cyfry, separator dziesiętny i 8 cyfr po przecinku.",
         "epochDayFormatIssue": "Wystąpił problem z formatem dnia epoki tego satelity. Wypróbuj innego satelitę.",
         "failedToPropagate": "Nie udało się propagować satelity. Wypróbuj inne parametry lub zgłoś problem, jeśli parametry są poprawne.",
-        "changingOrbitBufferFailed": "Zmiana danych bufora orbity nie powiodła się"
+        "changingOrbitBufferFailed": "Zmiana danych bufora orbity nie powiodła się",
+        "launchLatExceedsInclination": "Szerokość geograficzna startu przekracza nachylenie orbity.",
+        "failedToFitOrbit": "Nie udało się dopasować orbity do miejsca startu."
       },
       "help": {
         "overview": "Menu nowego startu tworzy hipotetyczny start: kopiuje orbitę rzeczywistego satelity, obraca ją tak, aby start odbywał się z wybranego miejsca startu, i resetuje zegar do T+0. Użyj go, aby odpowiedzieć na pytanie \"jeśli coś wystartuje z tego miejsca na tego rodzaju orbitę, kiedy moje czujniki to zobaczą?\"",

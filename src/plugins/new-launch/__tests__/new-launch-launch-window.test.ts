@@ -3,7 +3,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
 import { NewLaunch } from '@app/plugins/new-launch/new-launch';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { Degrees, OrbitFinder, Satellite, TleLine1, TleLine2 } from '@ootk/src/main';
+import { Degrees, Satellite, TleLine1, TleLine2 } from '@ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -114,9 +114,9 @@ describe('NewLaunch launch-window matching', () => {
 
     p().matchedLaunchTime_ = matched;
 
-    // Short-circuit the launch after the time change: an OrbitFinder error path
+    // Short-circuit the launch after the time change: an orbit-fit error path
     // reverts the offset, so only the FIRST changeStaticOffset call matters.
-    vi.spyOn(OrbitFinder.prototype, 'rotateOrbitToLatLon').mockReturnValue(['Error', 'stop'] as never);
+    vi.spyOn(p(), 'buildLaunchTle_').mockReturnValue(['Error', 'stop']);
     vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (ServiceLocator.getColorSchemeManager() as any).calculateColorBuffers = vi.fn();

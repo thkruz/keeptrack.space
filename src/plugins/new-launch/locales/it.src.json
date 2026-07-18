@@ -49,7 +49,9 @@
         "invalidEpochDayFormat": "Formato del giorno di epoca non valido! Deve essere composto da 3 cifre, un separatore decimale e 8 cifre dopo il decimale.",
         "epochDayFormatIssue": "Si è verificato un problema con il formato del giorno di epoca di questo satellite. Prova un satellite diverso.",
         "failedToPropagate": "Impossibile propagare il satellite. Prova parametri diversi o segnala il problema se i parametri sono corretti.",
-        "changingOrbitBufferFailed": "Modifica dei dati del buffer dell'orbita non riuscita"
+        "changingOrbitBufferFailed": "Modifica dei dati del buffer dell'orbita non riuscita",
+        "launchLatExceedsInclination": "La latitudine di lancio supera l’inclinazione dell’orbita.",
+        "failedToFitOrbit": "Impossibile adattare un’orbita al sito di lancio."
       },
       "help": {
         "overview": "Il menu Nuovo lancio crea un lancio ipotetico: copia l'orbita di un satellite reale, la ruota in modo che decolli da un sito di lancio a tua scelta e azzera l'orologio a T+0. Usalo per rispondere alla domanda \"se qualcosa viene lanciato da questo sito verso questo tipo di orbita, quando lo vedranno i miei sensori?\"",

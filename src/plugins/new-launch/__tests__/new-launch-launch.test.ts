@@ -4,7 +4,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { NewLaunch } from '@app/plugins/new-launch/new-launch';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { FormatTle, OrbitFinder } from '@ootk/src/main';
+import { FormatTle } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { websiteInit } from '@test/generic-tests';
@@ -39,8 +39,8 @@ describe('NewLaunch launch flow', () => {
   afterEach(() => vi.restoreAllMocks());
 
   describe('launchFromSite_', () => {
-    it('toasts and reverts the time offset when the orbit finder fails', () => {
-      vi.spyOn(OrbitFinder.prototype, 'rotateOrbitToLatLon').mockReturnValue(['Error', 'boom'] as never);
+    it('toasts and reverts the time offset when the orbit fit fails', () => {
+      vi.spyOn(p(), 'buildLaunchTle_').mockReturnValue(['Error', 'boom']);
       const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
 
       p().launchFromSite_(defaultSat, 5);
@@ -50,7 +50,7 @@ describe('NewLaunch launch flow', () => {
     });
 
     it('toasts when the generated TLE1 is not 69 characters', () => {
-      vi.spyOn(OrbitFinder.prototype, 'rotateOrbitToLatLon').mockReturnValue(['short', 'y'.repeat(69)] as never);
+      vi.spyOn(p(), 'buildLaunchTle_').mockReturnValue(['short' as never, 'y'.repeat(69) as never]);
       const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
 
       p().launchFromSite_(defaultSat, 5);

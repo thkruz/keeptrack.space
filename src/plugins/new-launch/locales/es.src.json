@@ -49,7 +49,9 @@
         "invalidEpochDayFormat": "¡Formato de día de época no válido! Debe tener 3 dígitos, un punto decimal y 8 dígitos después del punto.",
         "epochDayFormatIssue": "Hubo un problema con el formato de día de época de este satélite. Pruebe con otro satélite.",
         "failedToPropagate": "No se pudo propagar el satélite. Pruebe otros parámetros o informe de este problema si los parámetros son correctos.",
-        "changingOrbitBufferFailed": "Error al cambiar los datos del búfer de órbita"
+        "changingOrbitBufferFailed": "Error al cambiar los datos del búfer de órbita",
+        "launchLatExceedsInclination": "La latitud de lanzamiento supera la inclinación de la órbita.",
+        "failedToFitOrbit": "No se pudo ajustar una órbita al sitio de lanzamiento."
       },
       "help": {
         "overview": "El Menú de Nuevo Lanzamiento crea un lanzamiento nocional: copia la órbita de un satélite real, la rota para que despegue desde el sitio de lanzamiento que elijas y reinicia el reloj a T+0. Úsalo para responder \"si algo se lanza desde este sitio hacia este tipo de órbita, ¿cuándo lo verán mis sensores?\"",

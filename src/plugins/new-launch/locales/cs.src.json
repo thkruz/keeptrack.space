@@ -49,7 +49,9 @@
         "invalidEpochDayFormat": "Neplatný formát dne epochy! Musí mít 3 číslice, desetinnou tečku a 8 číslic za ní.",
         "epochDayFormatIssue": "U formátu dne epochy tohoto satelitu nastal problém. Zkuste jiný satelit.",
         "failedToPropagate": "Propagace satelitu se nezdařila. Zkuste jiné parametry, nebo pokud jsou parametry správné, nahlaste tento problém.",
-        "changingOrbitBufferFailed": "Změna dat orbitálního bufferu se nezdařila"
+        "changingOrbitBufferFailed": "Změna dat orbitálního bufferu se nezdařila",
+        "launchLatExceedsInclination": "Zeměpisná šířka startu překračuje sklon dráhy.",
+        "failedToFitOrbit": "Nepodařilo se přizpůsobit dráhu místu startu."
       },
       "help": {
         "overview": "Menu nového startu vytváří hypotetický start: zkopíruje dráhu skutečného satelitu, natočí ji tak, aby start probíhal ze zvoleného místa startu, a vynuluje hodiny na T+0. Použijte jej k zodpovězení otázky \"pokud něco odstartuje z tohoto místa na tento typ dráhy, kdy to mé senzory uvidí?\"",

@@ -22,13 +22,14 @@ import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import {
   BaseObject, Degrees,
-  FormatTle, KilometersPerSecond,
+  FormatTle, GreenwichMeanSiderealTime, KilometersPerSecond,
   LaunchWindowFinder, LaunchWindowResult,
-  OrbitFinder,
+  Radians,
   Satellite, SatelliteParams,
   SatelliteRecord, Sgp4, SpaceObjectType,
   TemeVec3,
   TleLine1, TleLine2,
+  calcGmst, groundTrackStateVector, rv2tle, semimajorAxisFromMeanMotion,
 } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { IHelpConfig, IKeyboardShortcut } from '../../engine/plugins/core/plugin-capabilities';
@@ -482,8 +483,9 @@ export class NewLaunch extends KeepTrackPlugin {
   }
 
   /**
-   * Rotate the satellite's orbit over the selected launch site using OrbitFinder,
-   * then update the cruncher and wait for propagation results.
+   * Place the satellite's orbit over the selected launch site (see
+   * {@link buildLaunchTle_}), then update the cruncher and wait for propagation
+   * results.
    *
    * This is the second half of the launch flow - call it directly when the
    * nominal satellite is already created (e.g. custom orbit mode).
@@ -543,7 +545,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     const simulationTimeObj = timeManagerInstance.simulationTimeObj;
 
-    const TLEs = new OrbitFinder(sat, launchLat, launchLon, upOrDown, simulationTimeObj).rotateOrbitToLatLon();
+    const TLEs = this.buildLaunchTle_(sat, launchLat, launchLon, upOrDown, simulationTimeObj);
 
     const tle1 = TLEs[0];
     const tle2 = TLEs[1];
@@ -626,6 +628,60 @@ export class NewLaunch extends KeepTrackPlugin {
       skipNumber: 2,
       maxRetries: 50,
     });
+  }
+
+  /**
+   * Builds the launch TLE by placing the template orbit's shape (inclination,
+   * eccentricity, mean motion) over the launch site at the launch time, then
+   * fitting SGP4 mean elements to that state with `rv2tle`.
+   *
+   * This replaces the old {@link OrbitFinder} ground-track search (which
+   * synthesized candidate TLEs and iterated SGP4 to a ~2.8 km sub-point
+   * tolerance). {@link groundTrackStateVector} constructs the exact state
+   * analytically - the fitted ground track passes within ~100 m of the site.
+   *
+   * Returns `['Error', message]` on failure (target latitude unreachable for the
+   * inclination, or the fit did not converge) to match the caller's existing
+   * error/length handling.
+   */
+  protected buildLaunchTle_(
+    sat: Satellite,
+    launchLat: Degrees,
+    launchLon: Degrees,
+    upOrDown: 'N' | 'S',
+    launchTime: Date,
+  ): [TleLine1, TleLine2] | ['Error', string] {
+    const eMsg = (key: string) => t7e(`plugins.NewLaunch.errorMsgs.${key}` as T7eKey);
+    const deg2rad = Math.PI / 180;
+
+    const state = groundTrackStateVector({
+      semimajorAxisKm: semimajorAxisFromMeanMotion(sat.meanMotion),
+      eccentricity: sat.eccentricity,
+      inclinationRad: (sat.inclination * deg2rad) as Radians,
+      latRad: (launchLat * deg2rad) as Radians,
+      lonRad: (launchLon * deg2rad) as Radians,
+      gmstRad: calcGmst(launchTime).gmst as GreenwichMeanSiderealTime,
+      direction: upOrDown,
+    });
+
+    if (!state) {
+      // The launch latitude exceeds what this inclination can reach.
+      return ['Error', eMsg('launchLatExceedsInclination')];
+    }
+
+    const fit = rv2tle(launchTime, state.position, state.velocity, { maxIterations: 30, toleranceKm: 1e-4 });
+
+    if (!fit) {
+      return ['Error', eMsg('failedToFitOrbit')];
+    }
+
+    // rv2tle stamps a fixed 5-char satnum ("00001"); restore the nominal sat's
+    // satnum (cols 3-7 of its TLE) so the created object keeps its catalog identity.
+    const satNum = sat.tle1.substring(2, 7);
+    const tle1 = `1 ${satNum}${fit.tle1.substring(7)}` as TleLine1;
+    const tle2 = `2 ${satNum}${fit.tle2.substring(7)}` as TleLine2;
+
+    return [tle1, tle2];
   }
 
   addJs(): void {

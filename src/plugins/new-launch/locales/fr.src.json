@@ -49,7 +49,9 @@
         "invalidEpochDayFormat": "Format de jour d'époque invalide ! Il doit comporter 3 chiffres, une décimale et 8 chiffres après la décimale.",
         "epochDayFormatIssue": "Un problème est survenu avec le format de jour d'époque de ce satellite. Essayez un autre satellite.",
         "failedToPropagate": "Échec de la propagation du satellite. Essayez d'autres paramètres ou signalez ce problème si les paramètres sont corrects.",
-        "changingOrbitBufferFailed": "Échec de la modification des données du tampon d'orbite"
+        "changingOrbitBufferFailed": "Échec de la modification des données du tampon d'orbite",
+        "launchLatExceedsInclination": "La latitude de lancement dépasse l’inclinaison de l’orbite.",
+        "failedToFitOrbit": "Impossible d’ajuster une orbite au site de lancement."
       },
       "help": {
         "overview": "Le menu Nouveau lancement crée un lancement notionnel : il copie l’orbite d’un satellite réel, la fait pivoter pour qu’elle décolle depuis un site de lancement de votre choix et remet l’horloge à T+0. Utilisez-le pour répondre à la question \"si quelque chose est lancé depuis ce site vers ce type d’orbite, quand mes capteurs le verront-ils ?\"",

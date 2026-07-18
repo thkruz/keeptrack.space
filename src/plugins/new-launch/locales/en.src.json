@@ -49,7 +49,9 @@
         "invalidEpochDayFormat": "Invalid epoch day format! Must be 3 digits, a decimal, and 8 digits after the decimal.",
         "epochDayFormatIssue": "There was an issue with this satellite's epoch day format. Try a different satellite.",
         "failedToPropagate": "Failed to propagate satellite. Try different parameters or report this issue if parameters are correct.",
-        "changingOrbitBufferFailed": "Changing orbit buffer data failed"
+        "changingOrbitBufferFailed": "Changing orbit buffer data failed",
+        "launchLatExceedsInclination": "Launch latitude exceeds the orbit’s inclination.",
+        "failedToFitOrbit": "Could not fit an orbit to the launch site."
       },
       "help": {
         "overview": "The New Launch menu creates a notional launch: it copies a real satellite's orbit, rotates it so it lifts off from a launch site you choose, and resets the clock to T+0. Use it to answer \"if something launches from this site into this kind of orbit, when will my sensors see it?\"",

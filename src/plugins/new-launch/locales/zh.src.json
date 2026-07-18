@@ -49,7 +49,9 @@
         "invalidEpochDayFormat": "历元日格式无效！必须为3位数字、一个小数点和小数点后8位数字。",
         "epochDayFormatIssue": "该卫星的历元日格式存在问题。请尝试另一颗卫星。",
         "failedToPropagate": "卫星传播失败。请尝试不同的参数，如果参数确实正确，请报告此问题。",
-        "changingOrbitBufferFailed": "更改轨道缓冲区数据失败"
+        "changingOrbitBufferFailed": "更改轨道缓冲区数据失败",
+        "launchLatExceedsInclination": "发射纬度超过轨道倾角。",
+        "failedToFitOrbit": "无法为发射场拟合轨道。"
       },
       "help": {
         "overview": "新发射菜单用于创建假想发射：它会复制一颗真实卫星的轨道，将其旋转为从您选择的发射场起飞，并把时钟重置为T+0。用它来回答“如果有物体从该发射场进入这类轨道，我的传感器何时能看到它？”",

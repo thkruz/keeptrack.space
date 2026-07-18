@@ -49,7 +49,9 @@
         "invalidEpochDayFormat": "Ungültiges Epochentag-Format! Es müssen 3 Ziffern, ein Dezimalpunkt und 8 Nachkommastellen sein.",
         "epochDayFormatIssue": "Es gab ein Problem mit dem Epochentag-Format dieses Satelliten. Versuchen Sie einen anderen Satelliten.",
         "failedToPropagate": "Satellit konnte nicht propagiert werden. Versuchen Sie andere Parameter oder melden Sie dieses Problem, wenn die Parameter korrekt sind.",
-        "changingOrbitBufferFailed": "Ändern der Orbit-Puffer-Daten fehlgeschlagen"
+        "changingOrbitBufferFailed": "Ändern der Orbit-Puffer-Daten fehlgeschlagen",
+        "launchLatExceedsInclination": "Die Startbreite überschreitet die Bahnneigung.",
+        "failedToFitOrbit": "Es konnte keine Umlaufbahn an den Startort angepasst werden."
       },
       "help": {
         "overview": "Das Menü 'Neuer Start' erstellt einen fiktiven Start: Es kopiert die Umlaufbahn eines realen Satelliten, dreht sie so, dass der Start von einem von Ihnen gewählten Startort erfolgt, und setzt die Uhr auf T+0 zurück. Verwenden Sie es, um die Frage zu beantworten: \"Wenn etwas von diesem Standort in diese Art von Umlaufbahn startet, wann werden meine Sensoren es sehen?\"",

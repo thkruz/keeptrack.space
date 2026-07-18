@@ -309,7 +309,7 @@ We welcome contributions! Whether you're fixing bugs, adding features, improving
 ## Code Standards
 
 - **TypeScript strict mode** - All code must type-check without errors
-- **ESLint compliant** - Run `pnpm run lint` before committing
+- **Biome clean** - Run `pnpm run lint` (Biome check) before committing
 - **No console.log** - Use the error manager for logging
 - **Commented code** - Explain "why" not "what" for complex logic
 - **Test your changes** - Use `pnpm test` and refer to the [Regression Testing Documentation](docs/regression-testing.md)

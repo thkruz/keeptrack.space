@@ -5,7 +5,6 @@ export enum StorageKey {
   SATELLITE_LISTS = 'v2-keepTrack-satelliteLists',
 
   // Others
-  SETTINGS_MANAGER_COLORS = 'v2-settingsManager-colors',
   SETTINGS_DOT_COLORS = 'v2-keepTrack-settings-dotColors',
   IS_ADVICE_ENABLED = 'v2-isAdviceEnabled',
   LAST_MAP = 'v2-keepTrack-earthTexture',
@@ -177,4 +176,9 @@ export enum StorageKey {
   // Plugin Manager (per-plugin enable/disable overrides, diffed from manifest
   // defaults; survives version wipes via the preservation allowlist)
   PLUGIN_ENABLE_OVERRIDES = 'v2-keepTrack-pluginEnableOverrides',
+
+  // Per-key sync timestamps for account-scoped keys: JSON Record<StorageKey, epochMs>.
+  // Maintained by PersistenceManager; wiped on version bumps so a post-wipe login
+  // lets the cloud copy win. Never syncs itself.
+  SYNC_META = 'v2-keepTrack-syncMeta',
 }

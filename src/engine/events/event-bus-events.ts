@@ -84,6 +84,12 @@ export enum EventBusEvent {
   bottomMenuModeChange = 'bottomMenuModeChange',
   saveSettings = 'saveSettings',
   /**
+   * Emitted after an account sync applied cloud-newer values to local
+   * persistence. Payload: the StorageKeys whose local value changed. Plugins
+   * that hold live copies of synced state re-read those keys.
+   */
+  remoteSettingsApplied = 'remoteSettingsApplied',
+  /**
    * Emitted when filter menu toggles change. ColorSchemeManager listens to
    * forward the updated filter state to the color worker.
    */

@@ -1,5 +1,6 @@
 import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
 import { StorageKey } from '@app/engine/persistence/storage-key';
+import { vi } from 'vitest';
 
 /*
  * PersistenceManager is the cache-backed front door to storage. It validates
@@ -121,6 +122,76 @@ describe('PersistenceManager', () => {
       pm = PersistenceManager.getInstance();
 
       expect(pm.getItem(StorageKey.COLOR_SCHEME)).toBe('kept');
+    });
+  });
+
+  describe('sync timestamps (SYNC_META)', () => {
+    it('stamps account-scoped keys on save', () => {
+      const before = Date.now();
+
+      pm.saveItem(StorageKey.WATCHLIST_LIST, '["25544"]');
+      expect(pm.getSyncTimestamp(StorageKey.WATCHLIST_LIST)).toBeGreaterThanOrEqual(before);
+    });
+
+    it('does not stamp device-scoped keys', () => {
+      pm.saveItem(StorageKey.CALCULATOR_SETTINGS, '{"frame":"eci"}');
+      expect(pm.getSyncTimestamp(StorageKey.CALCULATOR_SETTINGS)).toBe(0);
+    });
+
+    it('does not re-stamp when saving an identical value', () => {
+      pm.saveItem(StorageKey.WATCHLIST_LIST, '["25544"]');
+      const first = pm.getSyncTimestamp(StorageKey.WATCHLIST_LIST);
+
+      const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(first + 60_000);
+
+      try {
+        pm.saveItem(StorageKey.WATCHLIST_LIST, '["25544"]');
+        expect(pm.getSyncTimestamp(StorageKey.WATCHLIST_LIST)).toBe(first);
+      } finally {
+        nowSpy.mockRestore();
+      }
+    });
+
+    it('keeps a tombstone stamp on remove', () => {
+      pm.saveItem(StorageKey.WATCHLIST_LIST, '["25544"]');
+      pm.removeItem(StorageKey.WATCHLIST_LIST);
+
+      expect(pm.getItem(StorageKey.WATCHLIST_LIST)).toBeNull();
+      expect(pm.getSyncTimestamp(StorageKey.WATCHLIST_LIST)).toBeGreaterThan(0);
+    });
+
+    it('persists stamps across instances', () => {
+      pm.saveItem(StorageKey.WATCHLIST_LIST, '["25544"]');
+      const stamp = pm.getSyncTimestamp(StorageKey.WATCHLIST_LIST);
+
+      PersistenceManager.resetInstance();
+      pm = PersistenceManager.getInstance();
+
+      expect(pm.getSyncTimestamp(StorageKey.WATCHLIST_LIST)).toBe(stamp);
+    });
+
+    it('clears stamps on clear()', () => {
+      pm.saveItem(StorageKey.WATCHLIST_LIST, '["25544"]');
+      pm.clear();
+      expect(pm.getSyncTimestamp(StorageKey.WATCHLIST_LIST)).toBe(0);
+    });
+
+    it('prunes stamps for keys that are no longer valid or account-scoped', () => {
+      localStorage.setItem(
+        StorageKey.SYNC_META,
+        JSON.stringify({
+          [StorageKey.WATCHLIST_LIST]: 123,
+          [StorageKey.CALCULATOR_SETTINGS]: 456,
+          'v2-removed-key': 789,
+        }),
+      );
+
+      PersistenceManager.resetInstance();
+      pm = PersistenceManager.getInstance();
+
+      expect(pm.getSyncTimestamp(StorageKey.WATCHLIST_LIST)).toBe(123);
+      expect(pm.getSyncTimestamp(StorageKey.CALCULATOR_SETTINGS)).toBe(0);
+      expect(JSON.parse(pm.getItem(StorageKey.SYNC_META))).toEqual({ [StorageKey.WATCHLIST_LIST]: 123 });
     });
   });
 

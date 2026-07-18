@@ -3,6 +3,7 @@ import type { OemSatellite } from '@app/app/objects/oem-satellite';
 import type { User } from '@supabase/supabase-js';
 import type { BaseObject, Satellite, Milliseconds } from '@ootk/src/main';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import type { StorageKey } from '../persistence/storage-key';
 import type { PanTouchEvent, TapTouchEvent } from '../input/input-manager/touch-input';
 import type { LineManager } from '../rendering/line-manager';
 import type { TextureStatus } from '../rendering/texture-load-registry';
@@ -57,6 +58,7 @@ export interface EngineEventMap {
   [EventBusEvent.FrustumMeshUpdate]: [];
   [EventBusEvent.bottomMenuModeChange]: [];
   [EventBusEvent.saveSettings]: [];
+  [EventBusEvent.remoteSettingsApplied]: [StorageKey[]]; // locally-changed keys from an account sync
   [EventBusEvent.filterChanged]: [];
   [EventBusEvent.loadSettings]: [];
   [EventBusEvent.KeyDown]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey

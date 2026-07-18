@@ -55,7 +55,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        task: [eslint, unit-test, typecheck]
+        task: [lint, unit-test, typecheck]
     steps:
       - uses: actions/checkout@v6
 
@@ -84,12 +84,12 @@ jobs:
         with:
           timezoneLinux: 'America/New_York'
 
-      - name: Run ESLint
-        if: matrix.task == 'eslint'
+      - name: Run Biome
+        if: matrix.task == 'lint'
         run: |
-          echo "Running ESLint..."
+          echo "Running Biome check..."
           pnpm run lint
-          echo '### ESLint Passed' >> $GITHUB_STEP_SUMMARY
+          echo '### Biome Passed' >> $GITHUB_STEP_SUMMARY
 
       - name: Run Unit Tests
         if: matrix.task == 'unit-test'
@@ -125,7 +125,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        task: [eslint, unit-test, typecheck]
+        task: [lint, unit-test, typecheck]
     steps:
       - uses: actions/checkout@v6
 
@@ -161,12 +161,12 @@ jobs:
         with:
           timezoneLinux: 'America/New_York'
 
-      - name: Run ESLint
-        if: matrix.task == 'eslint'
+      - name: Run Biome
+        if: matrix.task == 'lint'
         run: |
-          echo "Running ESLint (OSS)..."
+          echo "Running Biome check (OSS)..."
           pnpm run lint
-          echo '### ESLint (OSS) Passed' >> $GITHUB_STEP_SUMMARY
+          echo '### Biome (OSS) Passed' >> $GITHUB_STEP_SUMMARY
 
       - name: Run Unit Tests
         if: matrix.task == 'unit-test'

@@ -212,8 +212,7 @@
   ],
   "extensions": {
     "recommendations": [
-      "prettier.prettier-vscode",
-      "dbaeumer.vscode-eslint",
+      "biomejs.biome",
       "steoates.autoimport",
       "vivaxy.vscode-conventional-commits",
       "usernamehw.errorlens",

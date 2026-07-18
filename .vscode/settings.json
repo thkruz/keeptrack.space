@@ -7,9 +7,6 @@
     "**/src/admin",
     "**/src/admin/*"
   ],
-  "eslint.workingDirectories": [
-    "./"
-  ],
   "typescript.tsdk": "./node_modules/typescript/lib",
   "git.enableCommitSigning": true,
   "files.exclude": {
@@ -36,20 +33,17 @@
   "editor.renderWhitespace": "trailing",
   "editor.trimAutoWhitespace": true,
   "[yaml]": {
-    "editor.autoIndent": "advanced",
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.autoIndent": "advanced"
   },
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact"
-  ],
+  "[javascript]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[javascriptreact]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[typescript]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[typescriptreact]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[json]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[jsonc]": { "editor.defaultFormatter": "biomejs.biome" },
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit",
-    "source.organizeImports": "always",
-    "source.addMissingImports": "explicit",
-    "source.removeUnusedImports": "explicit"
+    "source.fixAll.biome": "explicit",
+    "source.organizeImports.biome": "explicit"
   },
   "files.eol": "\n",
   "terminal.integrated.profiles.windows": {

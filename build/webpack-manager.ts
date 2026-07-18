@@ -193,12 +193,20 @@ export class WebpackManager {
             },
           },
           {
+            // Rust/SWC transpile (no type-check — `pnpm run typecheck` (tsgo) owns
+            // types). Replaces ts-loader (JS tsc, transpileOnly:false), which
+            // re-type-checked the whole program on every build child.
             test: /\.tsx?$/u,
-            loader: 'ts-loader',
+            loader: 'builtin:swc-loader',
             exclude: [/node_modules/u, /\test/u, /\dist/u, /\coverage/u, /\.test\.tsx?$/u, /\src\/admin/u],
             options: {
-              transpileOnly: false,
-              configFile: 'tsconfig.build.json',
+              jsc: {
+                parser: {
+                  syntax: 'typescript',
+                  tsx: true,
+                },
+                target: 'es2022',
+              },
             },
           },
           {

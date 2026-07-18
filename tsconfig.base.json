@@ -29,7 +29,7 @@
     // "removeComments": true,                /* Do not emit comments to output. */
     // "noEmit": true,                        /* Do not emit outputs. */
     // "importHelpers": true,                 /* Import emit helpers from 'tslib'. */
-    // "isolatedModules": true,               /* Transpile each file as a separate module (similar to 'ts.transpileModule'). */
+    "isolatedModules": true /* Each file transpiles independently (SWC/rspack + tsgo). Catches ambiguous type re-exports before they break the SWC build. */,
     /* Strict Type-Checking Options */
     "strict": false /* Enable all strict type-checking options. */,
     "noImplicitAny": false /* Raise error on expressions and declarations with an implied 'any' type. */,

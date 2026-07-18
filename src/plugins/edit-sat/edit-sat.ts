@@ -440,10 +440,6 @@ export class EditSat extends KeepTrackPlugin {
         return;
       }
 
-      if (result.directionUnknown) {
-        uiManagerInstance.toast(t7e('plugins.EditSat.errorMsgs.cannotCalculateDirection' as T7eKey), ToastMsgType.caution);
-      }
-
       const country = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-country`)).value;
       const applied = applyTleToSat(id, result.tle1, result.tle2, country);
 

@@ -9,13 +9,12 @@
 import { SatMath } from '@app/app/analysis/sat-math';
 import { GetSatType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { TimeManager } from '@app/engine/core/time-manager';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { StringPad } from '@app/engine/utils/stringPad';
+import { t7e } from '@app/locales/keys';
 import {
   Earth,
   FormatTle,
-  OrbitFinder,
   Satellite,
   SatelliteRecord,
   Sgp4,
@@ -23,7 +22,7 @@ import {
   TleLine1,
   TleLine2,
   ZoomValue,
-  eci2lla,
+  rv2tle,
 } from '@ootk/src/main';
 
 /** Outcome of pushing a TLE onto a catalog satellite. */
@@ -129,41 +128,42 @@ export function buildEditedTle(sat: Satellite, v: EditFormValues): { tle1: TleLi
 
 /** Result of re-timing a satellite's orbit to the current simulation time. */
 export type ReEpochResult =
-  | { ok: true; tle1: TleLine1; tle2: TleLine2; directionUnknown: boolean }
+  | { ok: true; tle1: TleLine1; tle2: TleLine2 }
   | { ok: false; error: string };
 
 /**
- * Re-epoch a satellite to the current simulation time, rotating its orbit so it
- * stays over its present sub-point. Mutates the satellite's epoch on tle1 (the
- * OrbitFinder reads it back) and returns the rotated TLE pair, or an error string
- * when the search fails to converge.
+ * Re-epoch a satellite to the current simulation time, keeping it exactly where
+ * it is right now.
+ *
+ * The satellite is already at its current state, so this simply fits SGP4 mean
+ * elements to that TEME state vector at the new epoch with `rv2tle` (accurate to
+ * meters). This replaces the old {@link OrbitFinder} approach, which threw the
+ * known state away and re-searched the ground track to a ~2.8 km tolerance -
+ * strictly worse here, with a direction-ambiguity failure mode the state vector
+ * doesn't have. The object's identity (satnum, classification, international
+ * designator) and drag terms (B*, n-dot, n-ddot) are preserved; only the epoch
+ * and the orbital elements come from the fit.
  */
 export function reEpochToNow(sat: Satellite): ReEpochResult {
-  const timeManagerInstance = ServiceLocator.getTimeManager();
-  const gmst = timeManagerInstance.gmst;
-  const lla = eci2lla(sat.position, gmst);
-  const launchLon = lla.lon;
-  const launchLat = lla.lat;
-  const alt = lla.alt;
+  const simulationTimeObj = ServiceLocator.getTimeManager().simulationTimeObj;
+  const state = sat.eci(simulationTimeObj);
 
-  const upOrDown = SatMath.getDirection(sat, timeManagerInstance.simulationTimeObj);
-  const directionUnknown = upOrDown === 'Error';
-
-  const simulationTimeObj = timeManagerInstance.simulationTimeObj;
-  const currentEpoch = TimeManager.currentEpoch(simulationTimeObj);
-
-  sat.tle1 = (sat.tle1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + sat.tle1.substr(32)) as TleLine1;
-
-  const finder = sat.apogee - sat.perigee < 300
-    ? new OrbitFinder(sat, launchLat, launchLon, upOrDown as 'N' | 'S', simulationTimeObj)
-    : new OrbitFinder(sat, launchLat, launchLon, upOrDown as 'N' | 'S', simulationTimeObj, alt);
-  const tles = finder.rotateOrbitToLatLon();
-
-  if (tles[0] === 'Error') {
-    return { ok: false, error: `${tles[1]}` };
+  if (!state) {
+    return { ok: false, error: t7e('plugins.EditSat.errorMsgs.failedToPropagate') };
   }
 
-  return { ok: true, tle1: tles[0] as TleLine1, tle2: tles[1] as TleLine2, directionUnknown };
+  const fit = rv2tle(simulationTimeObj, state.position, state.velocity, { maxIterations: 30, toleranceKm: 1e-4 });
+
+  if (!fit) {
+    return { ok: false, error: t7e('plugins.EditSat.errorMsgs.failedToPropagate') };
+  }
+
+  // Keep cols 3-18 (satnum, classification, intl designator) and cols 33-69 (drag
+  // terms + checksum) from the object; take the epoch and fitted elements from the fit.
+  const tle1 = `1 ${sat.tle1.substring(2, 18)}${fit.tle1.substring(18, 32)}${sat.tle1.substring(32)}` as TleLine1;
+  const tle2 = `2 ${sat.tle1.substring(2, 7)}${fit.tle2.substring(7)}` as TleLine2;
+
+  return { ok: true, tle1, tle2 };
 }
 
 /** Serialize a satellite to the save-file payload (canonical sccNum included). */

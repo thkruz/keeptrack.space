@@ -1,33 +1,16 @@
 /* eslint-disable max-lines */
 import { DetailedSensor, RfSensor } from '@app/app/sensors/DetailedSensor';
 import { CommLink, Degrees, Kilometers, Milliseconds, SpaceObjectType, ZoomValue } from '@ootk/src/main';
+import { dsnSensors } from './sensors/dsn';
+import { estrackSensors } from './sensors/estrack';
+import { galileoSensors } from './sensors/galileo';
+import { scnSensors } from './sensors/scn';
+import { Operators, SensorList } from './sensors/types';
 
-export interface SensorList {
-  [key: string]: DetailedSensor;
-}
+export { Operators } from './sensors/types';
+export type { SensorList } from './sensors/types';
 
 // TODO: Add the aperture size of telescopes as an optional parameter
-
-export enum Operators {
-  USSF = 'USSF',
-  USA = 'US ARMY',
-  RAF = 'RAF',
-  UKSA = 'UKSA',
-  RAAF = 'RAAF',
-  ESA = 'ESA',
-  ROC = 'ROC',
-  EISCAT = 'EISCAT',
-  RUSSF = 'RUS SF', // Russian Space Forces
-  MIT = 'MIT',
-  NOR = 'NOR',
-  PLA = 'PLA',
-  CAS = 'CAS',
-  LEOLABS = 'LEOLABS',
-  CALTECH = 'CALTECH',
-  COMMERCIAL = 'COMMERCIAL',
-  ITAF = 'ITAF', // Italian Air Force
-  OWLNET = 'OWL-Net',
-}
 
 export const sensors = <SensorList>{
   CODSFS: new RfSensor({
@@ -1973,4 +1956,9 @@ export const sensors = <SensorList>{
     country: 'Republic of Korea',
     operator: Operators.OWLNET,
   }),
+  // TT&C tracking networks (cooperative dishes, not surveillance sensors)
+  ...dsnSensors,
+  ...scnSensors,
+  ...estrackSensors,
+  ...galileoSensors,
 };

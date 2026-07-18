@@ -4,10 +4,13 @@
       "bottomIconLabel": "Sensors",
       "title": "Sensor List Menu",
       "labels": {
+        "categorySurveillance": "Space Surveillance",
+        "categoryTtc": "Satellite Control & Communications",
         "missingData": "Missing Data",
         "tooltipSensorsInFov": "Visualize Sensor Coverage"
       },
       "buttons": {
+        "markAll": "Mark {name}",
         "resetSensor": "Reset Sensor",
         "showSensorsWithFov": "Show All Sensors with FOV..."
       },
@@ -21,13 +24,16 @@
         "imgAlt": "The Sensors menu showing grouped sensor networks",
         "imgCaption": "Sensors are grouped by network. Click a group header to select the whole network at once.",
         "sensorTypesHeading": "Sensor Types",
-        "sensorTypes": "<ul><li><strong>Phased-array radars</strong>: wide, fast scanning; typically limited to Low Earth Orbit (LEO).</li><li><strong>Mechanical radars</strong>: steerable dishes usable against both LEO and Geostationary Orbit (GEO).</li><li><strong>Optical telescopes</strong>: primarily used for GEO and deep space; they only work at night in clear skies, while radars work day and night.</li></ul>",
+        "sensorTypes": "<ul><li><strong>Phased-array radars</strong>: wide, fast scanning; typically limited to Low Earth Orbit (LEO).</li><li><strong>Mechanical radars</strong>: steerable dishes usable against both LEO and Geostationary Orbit (GEO).</li><li><strong>Optical telescopes</strong>: primarily used for GEO and deep space; they only work at night in clear skies, while radars work day and night.</li><li><strong>TT&C antennas</strong>: steerable communication dishes (DSN, ESTRACK, SCN, Galileo) that track cooperative satellites via their radio downlink; they cannot detect uncooperative objects or debris.</li></ul>",
         "howToUse": "<ol><li>Open the menu from the bottom bar or press S.</li><li>Click an individual sensor to select it. The camera flies to its location.</li><li>Or click a group header (e.g. \"All Space Surveillance Network Sensors\") to select the entire network, which is great for visualizing coverage.</li><li>Use <strong>Reset Sensor</strong> to clear the selection.</li></ol>",
         "tip1": "Many calculations (like Look Angles) need a single sensor. If you selected a whole network, use the Multi-Site Looks menu instead or pick one sensor at a time.",
         "tip2": "Every sensor is also available from the command palette: type the sensor's name to switch without opening this menu.",
         "tip3": "Sensor parameters come from publicly available data; you can review them in the Sensor Info menu. Corrections are welcome at admin@keeptrack.space.",
         "shortcutToggle": "Toggle the Sensors menu",
         "shortcutCamera": "Snap the camera to the current sensor"
+      },
+      "rmbMenu": {
+        "useThisSensor": "Use This Sensor"
       }
     }
   }

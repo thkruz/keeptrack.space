@@ -8,7 +8,9 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { StorageKey } from '@app/engine/persistence/storage-key';
-import { ICommandPaletteCapable, ICommandPaletteCommand, IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
+import {
+  ICommandPaletteCapable, ICommandPaletteCommand, IContextMenuConfig, IHelpConfig, IKeyboardShortcut, RmbMenuContext,
+} from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getClass } from '@app/engine/utils/get-class';
@@ -67,7 +69,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
             </button>
           </section>
           <div id="list-of-sensors">` +
-    this.sensorGroups_.map((sensorGroup) => this.genericSensors_(sensorGroup.name)).join('') +
+    this.renderSensorCategories_() +
     html`
           </div>
         </div>
@@ -132,6 +134,37 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
         },
       },
     ];
+  }
+
+  /**
+   * Right-clicking a sensor dot activates that sensor - the map equivalent of
+   * picking it from the sensor list menu.
+   */
+  getContextMenuConfig(): IContextMenuConfig {
+    return {
+      level1ElementName: 'use-sensor-rmb',
+      level1Html: html`<li class="rmb-menu-item" id="use-sensor-rmb"><a href="#">${t7e('plugins.SensorListPlugin.rmbMenu.useThisSensor' as Parameters<typeof t7e>[0])}</a></li>`,
+      order: 3,
+      isVisible: (ctx: RmbMenuContext) => ctx.target instanceof DetailedSensor,
+    };
+  }
+
+  onContextMenuAction(targetId: string, clickedSatId?: number): void {
+    if (targetId !== 'use-sensor-rmb') {
+      return;
+    }
+
+    const obj = ServiceLocator.getCatalogManager().getObject(clickedSatId ?? -1);
+
+    if (!(obj instanceof DetailedSensor)) {
+      return;
+    }
+
+    const sm = ServiceLocator.getSensorManager();
+
+    sm.clearSecondarySensors();
+    sm.setSensor(obj, obj.sensorId ?? null);
+    ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
   }
 
   getCommandPaletteCommands(): ICommandPaletteCommand[] {
@@ -237,6 +270,15 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
           }
 
           ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+
+          const markGroup = realTarget.dataset.markGroup;
+
+          if (markGroup) {
+            this.toggleSensorGroupMarkers_(markGroup);
+
+            return;
+          }
+
           const sensorClick = realTarget.dataset.sensor;
 
           this.sensorListContentClick(sensorClick ?? '');
@@ -382,6 +424,58 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
     }
   }
 
+  /**
+   * Toggle short vertical marker lines above every sensor in a group so their
+   * locations stand out on the globe. Does NOT select the sensors; the lines
+   * are ordinary LineManager lines, so Clear Lines (or clicking again) removes
+   * them.
+   */
+  private toggleSensorGroupMarkers_(groupName: string): void {
+    const sensorGroup = this.sensorGroups_.find((group) => group.name === groupName);
+
+    if (!sensorGroup) {
+      errorManagerInstance.debug(`No sensor group found with name: ${groupName}`);
+
+      return;
+    }
+
+    const lineManager = ServiceLocator.getLineManager();
+    const wasMarked = lineManager.hasSensorMarkers(sensorGroup.header);
+
+    // Markers are exclusive: only one group is marked at a time. Clear every other
+    // group's markers (and reset their toggles) before drawing this one.
+    this.sensorGroups_.forEach((group) => {
+      if (group.name !== groupName && lineManager.hasSensorMarkers(group.header)) {
+        lineManager.removeLinesByKind('sensorMarker', group.header);
+        this.updateMarkToggleState_(group.name, false);
+      }
+    });
+
+    if (wasMarked) {
+      lineManager.removeLinesByKind('sensorMarker', sensorGroup.header);
+    } else {
+      const groupSensors = sensorGroup.list
+        .map((sensorName) => sensors[sensorName])
+        .filter((sensor): sensor is DetailedSensor => Boolean(sensor));
+
+      lineManager.createSensorMarkers(groupSensors, sensorGroup.header);
+    }
+
+    this.updateMarkToggleState_(groupName, !wasMarked);
+  }
+
+  /** Reflect the marker on/off state on the group's header toggle (red = off, green = on). */
+  private updateMarkToggleState_(groupName: string, isMarked: boolean): void {
+    const toggle = getEl('sensor-list-content')?.querySelector<HTMLElement>(`.sensor-mark-toggle[data-mark-group="${groupName}"]`);
+
+    if (!toggle) {
+      return;
+    }
+
+    toggle.classList.toggle('is-marked', isMarked);
+    toggle.setAttribute('aria-pressed', isMarked ? 'true' : 'false');
+  }
+
   private static createSensorRow_(sensor: DetailedSensor) {
     const missingData = t7e('plugins.SensorListPlugin.labels.missingData' as Parameters<typeof t7e>[0]);
 
@@ -393,6 +487,29 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
         </span>
         <span class="sensor-badge">${sensor.operator ?? missingData}</span>
       </button>
+    `;
+  }
+
+  /**
+   * Renders all sensor groups, split into labeled categories: surveillance
+   * sensors (radars/telescopes) first, then TT&C tracking networks
+   * (cooperative dishes like DSN, SCN, ESTRACK). Groups without a category
+   * are treated as surveillance for backwards compatibility.
+   */
+  private renderSensorCategories_(): string {
+    const surveillanceGroups = this.sensorGroups_.filter((group) => group.category !== 'ttc');
+    const ttcGroups = this.sensorGroups_.filter((group) => group.category === 'ttc');
+    const renderGroups = (groups: SensorGroup[]) => groups.map((group) => this.genericSensors_(group.name)).join('');
+
+    if (ttcGroups.length === 0 || surveillanceGroups.length === 0) {
+      return renderGroups(this.sensorGroups_);
+    }
+
+    return html`
+      <div class="sensor-category-label">${t7e('plugins.SensorListPlugin.labels.categorySurveillance' as Parameters<typeof t7e>[0])}</div>
+      ${renderGroups(surveillanceGroups)}
+      <div class="sensor-category-label">${t7e('plugins.SensorListPlugin.labels.categoryTtc' as Parameters<typeof t7e>[0])}</div>
+      ${renderGroups(ttcGroups)}
     `;
   }
 
@@ -438,6 +555,8 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
         throw new Error(`No sensors found for group: ${name}`);
       }
 
+      const markLabel = t7e('plugins.SensorListPlugin.buttons.markAll' as Parameters<typeof t7e>[0]).replace('{name}', sensorGroup.topLink.name);
+      const isMarked = ServiceLocator.getLineManager().hasSensorMarkers(sensorGroup.header);
       const renderedTopLink = params.topLinks
         .map(
           (link) => html`<button type="button" class="kt-action waves-effect menu-selectable sensor-top-link" data-sensor="${params.name}">
@@ -447,9 +566,22 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
         )
         .join('');
 
+      /* Compact marker toggle pinned to the right of the group header. It draws (or
+       * removes) the group's 100 km location-marker lines without touching the sensor
+       * selection. Following the app status palette it reads red when off / green when
+       * enabled. This is the only marker control for the SSN group, whose select-all
+       * link is intentionally hidden. */
+      const markToggle = html`<button type="button" class="sensor-mark-toggle menu-selectable${isMarked ? ' is-marked' : ''}"
+          data-mark-group="${params.name}" kt-tooltip="${markLabel}" aria-label="${markLabel}" aria-pressed="${isMarked ? 'true' : 'false'}">
+          <span class="material-icons">place</span>
+        </button>`;
+
       return html`
-        <section class="kt-section sensor-group-section">
-          <div class="kt-section-label">${params.header}</div>
+        <section class="kt-section sensor-group-section" data-sensor-group="${params.name}">
+          <div class="kt-section-label sensor-group-header">
+            <span class="sensor-group-header-text">${params.header}</span>
+            ${markToggle}
+          </div>
           ${renderedTopLink}
           ${params.sensors.map((sensor) => SensorListPlugin.createSensorRow_(sensor)).join('')}
         </section>

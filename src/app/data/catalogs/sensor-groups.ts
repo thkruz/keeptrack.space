@@ -10,6 +10,13 @@ export interface SensorGroup {
     badge: string;
   }
   list: string[];
+  /**
+   * Distinguishes surveillance sensors (radars/telescopes that detect
+   * non-cooperative objects) from TT&C tracking networks (dishes that only
+   * track cooperative spacecraft). Undefined is treated as 'surveillance'
+   * for backwards compatibility with the sensor-groups API.
+   */
+  category?: 'surveillance' | 'ttc';
 }
 
 export const fetchSensorGroups = async (): Promise<SensorGroup[]> => {
@@ -117,6 +124,46 @@ export const sensorGroups: SensorGroup[] = [
       badge: 'OTHER',
     },
     list: ['ROC', 'MLS', 'PO', 'LSO', 'MAY'],
+  },
+  {
+    name: 'dsn',
+    header: 'NASA Deep Space Network',
+    topLink: {
+      name: 'All Deep Space Network Complexes',
+      badge: 'NASA',
+    },
+    list: ['DSNGDSCC', 'DSNMDSCC', 'DSNCDSCC'],
+    category: 'ttc',
+  },
+  {
+    name: 'scn',
+    header: 'Satellite Control Network (AFSCN)',
+    topLink: {
+      name: 'All Remote Tracking Stations',
+      badge: 'USSF',
+    },
+    list: ['SCNNBS', 'SCNVTS', 'SCNHTS', 'SCNGTS', 'SCNDGS', 'SCNTTS', 'SCNOTS', 'SCNCTS'],
+    category: 'ttc',
+  },
+  {
+    name: 'estrack',
+    header: 'ESA Tracking Network (ESTRACK)',
+    topLink: {
+      name: 'All ESTRACK Stations',
+      badge: 'ESA',
+    },
+    list: ['ESTKIR', 'ESTRED', 'ESTSMA', 'ESTKRU', 'ESTNNO', 'ESTCEB', 'ESTMLG'],
+    category: 'ttc',
+  },
+  {
+    name: 'galileo',
+    header: 'Galileo Ground Segment',
+    topLink: {
+      name: 'All Galileo Ground Stations',
+      badge: 'EUSPA',
+    },
+    list: ['GALKIR', 'GALKRU', 'GALNOU', 'GALPAP', 'GALREU', 'GALRED'],
+    category: 'ttc',
   },
   /*
    * {

@@ -9,6 +9,7 @@ import { LineManager } from '../../line-manager';
 import { Line, LineColors } from '../line';
 import { Path } from '../path';
 import { SatRicLine } from '../sat-ric-line';
+import { SensorMarkerLine } from '../sensor-marker-line';
 import { SatScanEarthLine } from '../sat-scan-earth-line';
 import { SatToCelestialBodyLine } from '../sat-to-celestial-body';
 import { SatToRefLine } from '../sat-to-ref-line';
@@ -77,6 +78,38 @@ describe('line-manager subclasses', () => {
       line.update();
 
       expect(calls).toEqual([[[1, 2, 3], [7, 8, 9]]]);
+    });
+  });
+
+  describe('SensorMarkerLine', () => {
+    it('extends 100 km radially outward from the sensor position', () => {
+      const line = new SensorMarkerLine(sensorWithEci(6371, 0, 0));
+      const calls = capture(line);
+
+      line.update();
+
+      expect(calls).toEqual([[[6371, 0, 0], [6471, 0, 0]]]);
+    });
+
+    it('describes itself with the sensorMarker kind and the group detail', () => {
+      const line = new SensorMarkerLine(sensorWithEci(1, 2, 3), 'NASA Deep Space Network');
+
+      expect(line.getDescription()).toEqual({ kind: 'sensorMarker', detail: 'NASA Deep Space Network' });
+    });
+
+    it('is found and removed by kind+detail through the LineManager', () => {
+      const lineManager = new LineManager();
+
+      lineManager.createSensorMarkers([sensorWithEci(6371, 0, 0), sensorWithEci(0, 6371, 0)], 'GroupA');
+
+      expect(lineManager.hasSensorMarkers('GroupA')).toBe(true);
+      expect(lineManager.hasSensorMarkers('GroupB')).toBe(false);
+      expect(lineManager.lines).toHaveLength(2);
+
+      lineManager.removeLinesByKind('sensorMarker', 'GroupA');
+
+      expect(lineManager.hasSensorMarkers('GroupA')).toBe(false);
+      expect(lineManager.lines).toHaveLength(0);
     });
   });
 

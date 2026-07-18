@@ -4,10 +4,13 @@
       "bottomIconLabel": "Senzory",
       "title": "Menu seznamu senzorů",
       "labels": {
+        "categorySurveillance": "Sledování vesmíru",
+        "categoryTtc": "Řízení satelitů a komunikace",
         "missingData": "Chybějící data",
         "tooltipSensorsInFov": "Vizualizovat pokrytí senzorů"
       },
       "buttons": {
+        "markAll": "Označit {name}",
         "resetSensor": "Resetovat senzor",
         "showSensorsWithFov": "Zobrazit všechny senzory se zorným polem..."
       },
@@ -21,13 +24,16 @@
         "imgAlt": "Menu senzorů zobrazující senzory seskupené podle sítí",
         "imgCaption": "Senzory jsou seskupeny podle sítě. Kliknutím na záhlaví skupiny vyberete celou síť najednou.",
         "sensorTypesHeading": "Typy senzorů",
-        "sensorTypes": "<ul><li><strong>Fázované radarové soustavy</strong>: široké a rychlé skenování; obvykle omezené na nízkou oběžnou dráhu (LEO).</li><li><strong>Mechanické radary</strong>: otočné antény použitelné jak pro LEO, tak pro geostacionární oběžnou dráhu (GEO).</li><li><strong>Optické teleskopy</strong>: používají se především pro GEO a hluboký vesmír; fungují pouze v noci za jasného nebe, zatímco radary fungují ve dne i v noci.</li></ul>",
+        "sensorTypes": "<ul><li><strong>Fázované radarové soustavy</strong>: široké a rychlé skenování; obvykle omezené na nízkou oběžnou dráhu (LEO).</li><li><strong>Mechanické radary</strong>: otočné antény použitelné jak pro LEO, tak pro geostacionární oběžnou dráhu (GEO).</li><li><strong>Optické teleskopy</strong>: používají se především pro GEO a hluboký vesmír; fungují pouze v noci za jasného nebe, zatímco radary fungují ve dne i v noci.</li><li><strong>Antény TT&C</strong>: řiditelné komunikační antény (DSN, ESTRACK, SCN, Galileo), které sledují spolupracující družice pomocí jejich rádiového downlinku; nedokážou detekovat nespolupracující objekty ani trosky.</li></ul>",
         "howToUse": "<ol><li>Otevřete menu ze spodní lišty nebo stiskněte S.</li><li>Kliknutím na jednotlivý senzor jej vyberete; kamera přeletí na jeho polohu.</li><li>Nebo klikněte na záhlaví skupiny (např. \"All Space Surveillance Network Sensors\") a vyberte celou síť, což je skvělé pro vizualizaci pokrytí.</li><li>Pomocí <strong>Resetovat senzor</strong> výběr zrušíte.</li></ol>",
         "tip1": "Mnoho výpočtů (například úhly pohledu) vyžaduje jediný senzor. Pokud jste vybrali celou síť, použijte místo toho menu úhlů pohledu z více míst, nebo vybírejte senzory po jednom.",
         "tip2": "Každý senzor je dostupný také z palety příkazů: napište název senzoru a přepněte se bez otevírání tohoto menu.",
         "tip3": "Parametry senzorů pocházejí z veřejně dostupných dat; můžete si je prohlédnout v menu Info o senzoru. Opravy jsou vítány na admin@keeptrack.space.",
         "shortcutToggle": "Přepnout menu senzorů",
         "shortcutCamera": "Přesunout kameru na aktuální senzor"
+      },
+      "rmbMenu": {
+        "useThisSensor": "Použít tento senzor"
       }
     }
   }

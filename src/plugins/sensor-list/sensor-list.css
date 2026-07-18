@@ -2,11 +2,76 @@
  * a kt-section card holding a "select all" top-link plus one action row per
  * sensor. */
 
-/* The first group's (SSN) "select all" top-link is intentionally hidden — the
- * group is too large to select at once. The bottom-icon callback only clears the
- * inline display, which reverts to this rule, so it stays hidden. */
-#list-of-sensors .sensor-group-section:first-child .sensor-top-link {
+/* The SSN group's "select all" top-link is intentionally hidden — the group is
+ * too large to select at once. The bottom-icon callback only clears the inline
+ * display, which reverts to this rule, so it stays hidden. */
+#list-of-sensors .sensor-group-section[data-sensor-group="ssn"] .sensor-top-link {
   display: none;
+}
+
+/* Category divider separating surveillance sensors from TT&C tracking
+ * networks. */
+#list-of-sensors .sensor-category-label {
+  margin: 14px 6px 6px;
+  font-size: 0.72em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-dark-text-muted);
+}
+
+#list-of-sensors .sensor-category-label:first-child {
+  margin-top: 4px;
+}
+
+/* Group header row: title on the left, a compact marker toggle pinned right. The
+ * toggle draws/removes the group's 100 km sensor-location marker lines. */
+#sensor-list-content .sensor-group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#sensor-list-content .sensor-group-header-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Marker toggle. Following the app status palette it reads red when off (markers
+ * available) and green when enabled. */
+#sensor-list-content .sensor-mark-toggle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--colorCritical, rgb(255, 42, 4));
+  cursor: pointer;
+  opacity: 0.85;
+  transition: color 0.15s ease, background-color 0.15s ease, opacity 0.15s ease;
+}
+
+#sensor-list-content .sensor-mark-toggle:hover {
+  opacity: 1;
+  background: var(--color-dark-border);
+}
+
+#sensor-list-content .sensor-mark-toggle.is-marked {
+  color: var(--colorNormal, rgb(0, 226, 0));
+  opacity: 1;
+}
+
+#sensor-list-content .sensor-mark-toggle .material-icons {
+  font-size: 16px;
+  line-height: 1;
 }
 
 /* Sensor row label: name grows to fill the row, the muted system tag sits beside

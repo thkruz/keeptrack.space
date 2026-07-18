@@ -30,6 +30,7 @@ import { SatScanEarthLine } from './line-manager/sat-scan-earth-line';
 import { SatToCelestialBodyLine } from './line-manager/sat-to-celestial-body';
 import { SatToRefLine } from './line-manager/sat-to-ref-line';
 import { SatToSunLine } from './line-manager/sat-to-sun-line';
+import { SensorMarkerLine } from './line-manager/sensor-marker-line';
 import { SensorScanHorizonLine } from './line-manager/sensor-scan-horizon-line';
 import { SensorToMoonLine } from './line-manager/sensor-to-moon-line';
 import { SensorToRaeLine } from './line-manager/sensor-to-rae-line';
@@ -196,6 +197,26 @@ export class LineManager {
       return;
     }
     this.add(new SatScanEarthLine(sat, color));
+  }
+
+  /**
+   * Draw a short vertical marker above each sensor so the whole group can be
+   * located on the globe without selecting it. `detail` groups the markers in
+   * the line-management UI (and lets {@link removeLinesByKind} drop them together).
+   */
+  createSensorMarkers(sensors: DetailedSensor[], detail?: string, color = LineColors.RED): void {
+    for (const sensor of sensors) {
+      this.add(new SensorMarkerLine(sensor, detail, color));
+    }
+  }
+
+  /** True when any sensor marker with this `detail` is currently drawn. */
+  hasSensorMarkers(detail?: string): boolean {
+    return this.lines.some((line) => {
+      const desc = line.getDescription();
+
+      return desc.kind === 'sensorMarker' && (typeof detail !== 'string' || desc.detail === detail);
+    });
   }
 
   createSensorScanHorizon(sensor: DetailedSensor | null, face = 1, faces = 2, color = LineColors.CYAN): void {

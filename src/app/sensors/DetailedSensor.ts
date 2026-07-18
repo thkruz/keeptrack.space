@@ -25,6 +25,7 @@ import {
   Sensor,
   SensorType,
   SpaceObjectType,
+  TtcAntenna,
   ZoomValue,
 } from '@ootk/src/main';
 
@@ -300,8 +301,24 @@ export class DetailedSensor extends GroundStation {
         });
         break;
 
+      case SpaceObjectType.GROUND_SENSOR_STATION:
+        // TT&C tracking stations (DSN, SCN, ESTRACK, Galileo, etc.) - cooperative dishes
+        this.sensor_ = new TtcAntenna({
+          id: this.id,
+          name: this.name,
+          sensorType: SensorType.TT_C_ANTENNA,
+          fieldOfView: fovParams,
+          shortName: this.shortName,
+          system: this.system,
+          country: this.country,
+          operator: this.operator,
+          freqBand: this.freqBand,
+          url: this.url,
+        });
+        break;
+
       default:
-        // For other types (GROUND_SENSOR_STATION, etc.), create a basic optical sensor
+        // For other unhandled types, create a basic optical sensor
         // to ensure FOV checking works
         this.sensor_ = new OpticalSensor({
           id: this.id,

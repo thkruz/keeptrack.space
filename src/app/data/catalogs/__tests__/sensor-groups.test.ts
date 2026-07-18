@@ -1,6 +1,7 @@
 import { vi } from 'vitest';
 import * as apiFetchMod from '@app/app/data/api-fetch';
 import { fetchSensorGroups, sensorGroups } from '@app/app/data/catalogs/sensor-groups';
+import { sensors } from '@app/app/data/catalogs/sensors';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 
 /*
@@ -26,5 +27,27 @@ describe('fetchSensorGroups', () => {
 
     expect(await fetchSensorGroups()).toBe(sensorGroups);
     expect(warn).toHaveBeenCalled();
+  });
+});
+
+describe('sensorGroups catalog integrity', () => {
+  it('every sensor listed in a group exists in the sensors catalog', () => {
+    for (const group of sensorGroups) {
+      for (const key of group.list) {
+        expect(sensors[key], `Sensor ${key} in group ${group.name} is missing from the sensors catalog`).toBeDefined();
+      }
+    }
+  });
+
+  it('every catalog sensor objName matches its catalog key', () => {
+    for (const [key, sensor] of Object.entries(sensors)) {
+      expect(sensor.objName, `Sensor ${key} has mismatched objName ${sensor.objName}`).toBe(key);
+    }
+  });
+
+  it('group names are unique', () => {
+    const names = sensorGroups.map((group) => group.name);
+
+    expect(new Set(names).size).toBe(names.length);
   });
 });

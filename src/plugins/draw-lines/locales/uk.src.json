@@ -43,7 +43,8 @@
         "satScanEarth": "Сканування Землі",
         "sensorScanHorizon": "Сканування горизонту",
         "sensorToRae": "Датчик до точки",
-        "generic": "Лінія"
+        "generic": "Лінія",
+        "sensorMarker": "Маркер розташування датчика"
       },
       "errorMsgs": {
         "noPrimarySat": "Не вибрано основний супутник для лінії між супутниками.",

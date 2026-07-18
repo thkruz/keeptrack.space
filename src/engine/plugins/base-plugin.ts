@@ -593,8 +593,8 @@ export abstract class KeepTrackPlugin {
       // Sync with legacy properties for backwards compatibility
       this.rmbL1Html = config.level1Html;
       this.rmbL1ElementName = config.level1ElementName;
-      this.rmbL2Html = config.level2Html;
-      this.rmbL2ElementName = config.level2ElementName;
+      this.rmbL2Html = config.level2Html ?? '';
+      this.rmbL2ElementName = config.level2ElementName ?? '';
       this.rmbMenuOrder = config.order ?? 100;
       this.isRmbOnEarth = config.isVisibleOnEarth ?? false;
       this.isRmbOffEarth = config.isVisibleOffEarth ?? false;
@@ -607,8 +607,12 @@ export abstract class KeepTrackPlugin {
           onAction: (targetId: string, clickedSatId?: number) => {
             this.onContextMenuAction(targetId, clickedSatId);
           },
+          onOpen: typeof this.onContextMenuOpen === 'function'
+            ? (ctx) => this.onContextMenuOpen!(ctx)
+            : undefined,
         },
       );
+      this.contextMenuComponent_.init();
     }
 
     // Initialize keyboard component if config method exists
@@ -837,23 +841,26 @@ export abstract class KeepTrackPlugin {
       this.registerClickAndDragOptionsSecondary(this.dragOptionsSecondary);
     }
 
-    if ((this.rmbL1Html || this.rmbL2Html) && !this.rmbCallback) {
-      throw new Error(`${this.id} right mouse button callback must be defined if right mouse button html is defined.`);
-    }
+    // Capability-based context menus register themselves via ContextMenuComponent.init()
+    if (!this.contextMenuComponent_) {
+      if ((this.rmbL1Html || this.rmbL2Html) && !this.rmbCallback) {
+        throw new Error(`${this.id} right mouse button callback must be defined if right mouse button html is defined.`);
+      }
 
-    if (this.rmbL1Html && this.rmbL1ElementName && this.rmbL2Html && this.rmbL2ElementName) {
-      ServiceLocator.getInputManager().rmbMenuItems.push({
-        elementIdL1: this.rmbL1ElementName,
-        elementIdL2: this.rmbL2ElementName,
-        order: this.rmbMenuOrder,
-        isRmbOnEarth: this.isRmbOnEarth,
-        isRmbOffEarth: this.isRmbOffEarth,
-        isRmbOnSat: this.isRmbOnSat,
-      });
-      this.addContextMenuLevel1Item(this.rmbL1Html);
-      this.addContextMenuLevel2Item(this.rmbL2ElementName, this.rmbL2Html);
-    } else if (this.rmbL1Html || this.rmbL1ElementName || this.rmbL2Html || this.rmbL2ElementName) {
-      throw new Error(`${this.id} right mouse button level 1 html, element name, level 2 html, and element name must all be defined.`);
+      if (this.rmbL1Html && this.rmbL1ElementName && this.rmbL2Html && this.rmbL2ElementName) {
+        ServiceLocator.getInputManager().rmbMenuItems.push({
+          elementIdL1: this.rmbL1ElementName,
+          elementIdL2: this.rmbL2ElementName,
+          order: this.rmbMenuOrder,
+          isRmbOnEarth: this.isRmbOnEarth,
+          isRmbOffEarth: this.isRmbOffEarth,
+          isRmbOnSat: this.isRmbOnSat,
+        });
+        this.addContextMenuLevel1Item(this.rmbL1Html);
+        this.addContextMenuLevel2Item(this.rmbL2ElementName, this.rmbL2Html);
+      } else if (this.rmbL1Html || this.rmbL1ElementName || this.rmbL2Html || this.rmbL2ElementName) {
+        throw new Error(`${this.id} right mouse button level 1 html, element name, level 2 html, and element name must all be defined.`);
+      }
     }
 
     this.isHtmlAdded = true;

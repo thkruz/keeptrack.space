@@ -43,7 +43,8 @@
         "satScanEarth": "地球扫描",
         "sensorScanHorizon": "地平线扫描",
         "sensorToRae": "传感器到点",
-        "generic": "线条"
+        "generic": "线条",
+        "sensorMarker": "传感器位置标记"
       },
       "errorMsgs": {
         "noPrimarySat": "未选择主卫星用于卫星到卫星连线。",

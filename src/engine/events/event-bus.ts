@@ -4,6 +4,7 @@ import type { User } from '@supabase/supabase-js';
 import type { BaseObject, Satellite, Milliseconds } from '@ootk/src/main';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import type { StorageKey } from '../persistence/storage-key';
+import type { RmbMenuContext } from '../plugins/core/plugin-capabilities';
 import type { PanTouchEvent, TapTouchEvent } from '../input/input-manager/touch-input';
 import type { LineManager } from '../rendering/line-manager';
 import type { TextureStatus } from '../rendering/texture-load-registry';
@@ -20,7 +21,7 @@ export interface EngineEventMap {
   [EventBusEvent.drawOverlay]: [];
   [EventBusEvent.updateLoop]: [];
   [EventBusEvent.rmbMenuActions]: [string, number];
-  [EventBusEvent.rightBtnMenuOpen]: [boolean, number];
+  [EventBusEvent.rightBtnMenuOpen]: [RmbMenuContext];
   [EventBusEvent.rightBtnMenuAdd]: [];
   [EventBusEvent.updateDateTime]: [Date];
   [EventBusEvent.calculateSimulationTime]: [Date];

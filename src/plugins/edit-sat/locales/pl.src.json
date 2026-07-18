@@ -48,7 +48,6 @@
       },
       "contextMenu": {
         "editSat": "Edytuj sat.",
-        "setPrimarySat": "Ustaw jako główny satelitę",
         "setSecondarySat": "Ustaw jako drugorzędny satelitę",
         "editSatellite": "Edytuj satelitę"
       },

@@ -119,26 +119,6 @@ describe('ColorMenu_class', () => {
     });
   });
 
-  describe('rmbCallback bridge', () => {
-    it('should call onContextMenuAction when rmbCallback is invoked', () => {
-      const plugin = new ColorMenu();
-      const onContextMenuActionSpy = vi.spyOn(plugin, 'onContextMenuAction');
-
-      plugin.rmbCallback('colors-test-rmb');
-
-      expect(onContextMenuActionSpy).toHaveBeenCalledWith('colors-test-rmb');
-    });
-
-    it('should not call onContextMenuAction for null targetId', () => {
-      const plugin = new ColorMenu();
-      const onContextMenuActionSpy = vi.spyOn(plugin, 'onContextMenuAction');
-
-      plugin.rmbCallback(null);
-
-      expect(onContextMenuActionSpy).not.toHaveBeenCalled();
-    });
-  });
-
   describe('colorsMenuClick', () => {
     it('should clear selected satellite when color scheme is clicked', () => {
       const selectSatManager = new SelectSatManager();

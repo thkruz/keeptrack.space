@@ -16,10 +16,12 @@ import { DopMath, ElevationMaskFn, GNSS_CONSTELLATION_PATTERNS, GnssConstellatio
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import {
   IBottomIconConfig,
+  IContextMenuConfig,
   IDragOptions,
   IHelpConfig,
   IKeyboardShortcut,
   ISideMenuConfig,
+  RmbMenuContext,
 } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -200,24 +202,24 @@ export class DopsPlugin extends KeepTrackPlugin {
   // Context menu
   // =========================================================================
 
-  rmbL1ElementName = 'dops-rmb';
-  rmbL1Html = html`
-  <li class="rmb-menu-item" id=${this.rmbL1ElementName}><a href="#">${t7e('plugins.DopsPlugin.rmb.dops')} &#x27A4;</a></li>
-`;
+  getContextMenuConfig(): IContextMenuConfig {
+    return {
+      level1ElementName: 'dops-rmb',
+      level1Html: html`
+        <li class="rmb-menu-item" id="dops-rmb"><a href="#">${t7e('plugins.DopsPlugin.rmb.dops')} &#x27A4;</a></li>`,
+      level2ElementName: 'dops-rmb-menu',
+      level2Html: html`
+        <ul class='dropdown-contents'>
+          <li id="dops-curdops-rmb"><a href="#">${t7e('plugins.DopsPlugin.rmb.currentGpsDops')}</a></li>
+          <li id="dops-24dops-rmb"><a href="#">${t7e('plugins.DopsPlugin.rmb.twentyFourHourGpsDops')}</a></li>
+        </ul>`,
+      order: 100,
+      // DOP values are computed for the ground location under the cursor
+      isVisible: (ctx: RmbMenuContext) => ctx.surface === 'earth',
+    };
+  }
 
-  isRmbOnEarth = true;
-  isRmbOffEarth = false;
-  isRmbOnSat = false;
-
-  rmbL2ElementName = 'dops-rmb-menu';
-  rmbL2Html = html`
-  <ul class='dropdown-contents'>
-    <li id="dops-curdops-rmb"><a href="#">${t7e('plugins.DopsPlugin.rmb.currentGpsDops')}</a></li>
-    <li id="dops-24dops-rmb"><a href="#">${t7e('plugins.DopsPlugin.rmb.twentyFourHourGpsDops')}</a></li>
-  </ul>
-`;
-
-  rmbCallback = (targetId: string): void => {
+  onContextMenuAction(targetId: string): void {
     switch (targetId) {
       case 'dops-curdops-rmb': {
         {
@@ -281,7 +283,7 @@ export class DopsPlugin extends KeepTrackPlugin {
       default:
         break;
     }
-  };
+  }
 
   // =========================================================================
   // Lifecycle

@@ -1,5 +1,5 @@
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { IContextMenuConfig, IHelpConfig, RmbMenuContext } from '@app/engine/plugins/core/plugin-capabilities';
 import { UiGeolocation } from '@app/app/ui/ui-manager-geolocation';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { MenuMode } from '@app/engine/core/interfaces';
@@ -69,16 +69,17 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     zIndex: 3,
   };
 
-  rmbL1ElementName = 'create-rmb';
-  rmbL1Html = CustomSensorPlugin.buildRmbL1Html_();
-
-  isRmbOnEarth = true;
-  isRmbOffEarth = false;
-  isRmbOnSat = false;
-  rmbMenuOrder = 10;
-
-  rmbL2ElementName = 'create-rmb-menu';
-  rmbL2Html = CustomSensorPlugin.buildRmbL2Html_();
+  getContextMenuConfig(): IContextMenuConfig {
+    return {
+      level1ElementName: 'create-rmb',
+      level1Html: CustomSensorPlugin.buildRmbL1Html_(),
+      level2ElementName: 'create-rmb-menu',
+      level2Html: CustomSensorPlugin.buildRmbL2Html_(),
+      order: 10,
+      // Creating a sensor requires a ground location under the cursor
+      isVisible: (ctx: RmbMenuContext) => ctx.surface === 'earth',
+    };
+  }
 
   private static buildSideMenuHtml_(): string {
     const l = (key: string) => CustomSensorPlugin.t_(`labels.${key}`);
@@ -199,7 +200,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     </ul>`;
   }
 
-  rmbCallback: (targetId: string, clickedSat?: number) => void = (targetId: string) => {
+  onContextMenuAction(targetId: string): void {
     const sensorManagerInstance = ServiceLocator.getSensorManager();
     const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
@@ -259,20 +260,10 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
           catalogManagerInstance.satCruncherThread.sendSunlightViewToggle(false);
         }
         break;
-      case 'colors-confidence-rmb':
-      case 'colors-rcs-rmb':
-      case 'colors-density-rmb':
-      case 'colors-starlink-rmb':
-      case 'colors-sunlight-rmb':
-      case 'colors-country-rmb':
-      case 'colors-velocity-rmb':
-      case 'colors-default-rmb':
-        break;
       default:
-        // errorManagerInstance.info(`Unknown RMB target: ${targetId}`);
         break;
     }
-  };
+  }
 
   dragOptions: ClickDragOptions = {
     minWidth: 350,

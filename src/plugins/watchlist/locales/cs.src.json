@@ -47,6 +47,10 @@
             "all": "Celý seznam sledovaných"
           }
         }
+      },
+      "rmbMenu": {
+        "addToWatchlist": "Přidat do seznamu sledovaných",
+        "removeFromWatchlist": "Odebrat ze seznamu sledovaných"
       }
     },
     "WatchlistOverlay": {

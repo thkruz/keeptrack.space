@@ -87,13 +87,13 @@ describe('DopsPlugin_class', () => {
     });
   });
 
-  describe('rmbCallback', () => {
+  describe('onContextMenuAction', () => {
     it('should handle unknown targetId gracefully', () => {
       const plugin = new DopsPlugin();
 
       websiteInit(plugin);
 
-      expect(() => plugin.rmbCallback('unknown-id')).not.toThrow();
+      expect(() => plugin.onContextMenuAction('unknown-id')).not.toThrow();
     });
   });
 });
@@ -120,30 +120,30 @@ describe('DopsPlugin behavior', () => {
     expect(spy).toHaveBeenCalled();
   });
 
-  it('rmbCallback warns when the clicked location is invalid', () => {
+  it('onContextMenuAction warns when the clicked location is invalid', () => {
     ServiceLocator.getInputManager().mouse = { latLon: undefined } as never;
 
-    expect(() => plugin.rmbCallback('dops-24dops-rmb')).not.toThrow();
+    expect(() => plugin.onContextMenuAction('dops-24dops-rmb')).not.toThrow();
   });
 
-  it('rmbCallback fills the form and opens the menu when inactive', () => {
+  it('onContextMenuAction fills the form and opens the menu when inactive', () => {
     ServiceLocator.getInputManager().mouse = { latLon: { lat: 10, lon: 20 } } as never;
     plugin.isMenuButtonActive = false;
     const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
 
-    plugin.rmbCallback('dops-24dops-rmb');
+    plugin.onContextMenuAction('dops-24dops-rmb');
 
     expect((getEl('dops-lat') as HTMLInputElement).value).toBe('10.000');
     expect(spy).toHaveBeenCalled();
   });
 
-  it('rmbCallback refreshes the side menu when already active', () => {
+  it('onContextMenuAction refreshes the side menu when already active', () => {
     ServiceLocator.getInputManager().mouse = { latLon: { lat: 10, lon: 20 } } as never;
     plugin.isMenuButtonActive = true;
     vi.spyOn(plugin as unknown as { updateSideMenu(): void }, 'updateSideMenu').mockImplementation(() => undefined);
     vi.spyOn(plugin, 'setBottomIconToEnabled').mockImplementation(() => undefined);
 
-    expect(() => plugin.rmbCallback('dops-24dops-rmb')).not.toThrow();
+    expect(() => plugin.onContextMenuAction('dops-24dops-rmb')).not.toThrow();
   });
 
   it('getGpsSats collects catalog satellites for the GPS group', () => {

@@ -6,7 +6,8 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { normalizeAngle } from '@app/engine/utils/transforms';
 import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { Radians } from '@ootk/src/main';
+import { Radians, eci2lla } from '@ootk/src/main';
+import { InputManager } from '../input-manager';
 import { MouseInput } from './mouse-input';
 
 export interface TapTouchEvent {
@@ -408,7 +409,35 @@ export class TouchInput {
     ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
     ServiceLocator.getMainCamera().autoRotate(false);
 
-    ServiceLocator.getInputManager().openRmbMenu();
+    const inputManager = ServiceLocator.getInputManager();
+
+    /*
+     * Long-press is the touch equivalent of a right-click. Resolve the pressed
+     * object and the surface location before opening the menu - otherwise the
+     * context (earth/space/target) is whatever the last mouse click left behind.
+     */
+    const x = this.touchStartX;
+    const y = this.touchStartY;
+
+    if (typeof x !== 'number' || typeof y !== 'number' || Number.isNaN(x) || Number.isNaN(y)) {
+      inputManager.openRmbMenu();
+
+      return;
+    }
+
+    const satId = inputManager.getSatIdFromCoord(x, y);
+
+    inputManager.mouse.dragPosition = InputManager.getEarthScreenPoint(x, y);
+    inputManager.mouse.latLon = eci2lla(
+      {
+        x: inputManager.mouse.dragPosition[0],
+        y: inputManager.mouse.dragPosition[1],
+        z: inputManager.mouse.dragPosition[2],
+      },
+      ServiceLocator.getTimeManager().gmst,
+    );
+
+    inputManager.openRmbMenu(satId);
   }
 
   pinchStart(evt: PinchTouchEvent) {

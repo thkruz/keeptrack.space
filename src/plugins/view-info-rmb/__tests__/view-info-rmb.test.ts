@@ -2,8 +2,6 @@ import { vi } from 'vitest';
 import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { EventBus } from '@app/engine/events/event-bus';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import * as colorbox from '@app/engine/utils/colorbox';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { ViewInfoRmbPlugin } from '@app/plugins/view-info-rmb/view-info-rmb';
@@ -24,7 +22,7 @@ describe('ViewInfoRmbPlugin', () => {
   standardPluginSuite(ViewInfoRmbPlugin, 'ViewInfoRmbPlugin');
 });
 
-describe('ViewInfoRmbPlugin rmbCallback', () => {
+describe('ViewInfoRmbPlugin onContextMenuAction', () => {
   let plugin: ViewInfoRmbPlugin;
 
   beforeEach(() => {
@@ -42,7 +40,7 @@ describe('ViewInfoRmbPlugin rmbCallback', () => {
     ServiceLocator.getUiManager().toast = toast;
     ServiceLocator.getInputManager().mouse = { latLon: { lat: 10, lon: 20 }, dragPosition: [1, 2, 3] } as never;
 
-    plugin.rmbCallback('view-info-rmb');
+    plugin.onContextMenuAction('view-info-rmb');
 
     expect(toast).toHaveBeenCalled();
   });
@@ -53,18 +51,14 @@ describe('ViewInfoRmbPlugin rmbCallback', () => {
     ServiceLocator.getUiManager().toast = toast;
     ServiceLocator.getInputManager().mouse = { latLon: undefined, dragPosition: [4000, 0, 5000] } as never;
 
-    expect(() => plugin.rmbCallback('view-info-rmb')).not.toThrow();
+    expect(() => plugin.onContextMenuAction('view-info-rmb')).not.toThrow();
     expect(toast).toHaveBeenCalled();
-  });
-
-  it('selects the satellite for view-sat-info-rmb', () => {
-    expect(() => plugin.rmbCallback('view-sat-info-rmb', 25544)).not.toThrow();
   });
 
   it('delegates view-sensor-info-rmb to viewSensorInfoRmb', () => {
     const spy = vi.spyOn(plugin, 'viewSensorInfoRmb').mockImplementation(() => undefined);
 
-    plugin.rmbCallback('view-sensor-info-rmb', 5);
+    plugin.onContextMenuAction('view-sensor-info-rmb', 5);
 
     expect(spy).toHaveBeenCalledWith(5);
   });
@@ -72,7 +66,7 @@ describe('ViewInfoRmbPlugin rmbCallback', () => {
   it('warns when a launch site is not found', () => {
     vi.spyOn(ServiceLocator.getCatalogManager(), 'getObject').mockReturnValue(undefined as never);
 
-    expect(() => plugin.rmbCallback('view-launchsite-info-rmb', 10)).not.toThrow();
+    expect(() => plugin.onContextMenuAction('view-launchsite-info-rmb', 10)).not.toThrow();
   });
 
   it('opens the wiki colorbox for a launch site', () => {
@@ -80,7 +74,7 @@ describe('ViewInfoRmbPlugin rmbCallback', () => {
 
     vi.spyOn(ServiceLocator.getCatalogManager(), 'getObject').mockReturnValue({ wikiUrl: 'https://example.com' } as never);
 
-    plugin.rmbCallback('view-launchsite-info-rmb', 10);
+    plugin.onContextMenuAction('view-launchsite-info-rmb', 10);
 
     expect(openSpy).toHaveBeenCalledWith('https://example.com');
   });
@@ -91,7 +85,7 @@ describe('ViewInfoRmbPlugin rmbCallback', () => {
     ServiceLocator.getUiManager().doSearch = doSearch;
     vi.spyOn(ServiceLocator.getCatalogManager(), 'getSat').mockReturnValue({ intlDes: '2000-001A' } as never);
 
-    plugin.rmbCallback('view-related-sats-rmb', 5);
+    plugin.onContextMenuAction('view-related-sats-rmb', 5);
 
     expect(doSearch).toHaveBeenCalledWith('2000-001');
   });
@@ -104,52 +98,57 @@ describe('ViewInfoRmbPlugin rmbCallback', () => {
     ServiceLocator.getUiManager().doSearch = doSearch;
     vi.spyOn(ServiceLocator.getCatalogManager(), 'getSat').mockReturnValue(undefined as never);
 
-    plugin.rmbCallback('view-related-sats-rmb', 5);
+    plugin.onContextMenuAction('view-related-sats-rmb', 5);
 
     expect(toast).toHaveBeenCalled();
     expect(doSearch).toHaveBeenCalledWith('');
   });
 
   it('does nothing for an unknown target', () => {
-    expect(() => plugin.rmbCallback('something-else')).not.toThrow();
+    expect(() => plugin.onContextMenuAction('something-else')).not.toThrow();
   });
 });
 
-describe('ViewInfoRmbPlugin rightBtnMenuOpen handler', () => {
+describe('ViewInfoRmbPlugin onContextMenuOpen', () => {
   let plugin: ViewInfoRmbPlugin;
 
   beforeEach(() => {
     setupStandardEnvironment();
     plugin = new ViewInfoRmbPlugin();
-    plugin.addJs();
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  const emit = (clickedSatId?: number) => EventBus.getInstance().emit(EventBusEvent.rightBtnMenuOpen, true, clickedSatId);
+  const open = (target: unknown, surface: 'earth' | 'space' = 'earth') => plugin.onContextMenuOpen({
+    surface,
+    targetId: target ? 1 : -1,
+    target: target as never,
+    hasPrimarySelection: false,
+  });
 
-  it('returns early when no satellite id is supplied', () => {
-    expect(() => emit(undefined)).not.toThrow();
+  it('handles a click with no target', () => {
+    expect(() => open(null)).not.toThrow();
   });
 
   it('shows satellite menu items for a Satellite', () => {
-    vi.spyOn(ServiceLocator.getCatalogManager(), 'getObject').mockReturnValue(Object.create(Satellite.prototype));
-
-    expect(() => emit(1)).not.toThrow();
+    expect(() => open(Object.create(Satellite.prototype))).not.toThrow();
   });
 
   it('shows the sensor menu item for a DetailedSensor', () => {
-    vi.spyOn(ServiceLocator.getCatalogManager(), 'getObject').mockReturnValue(Object.create(DetailedSensor.prototype));
-
-    expect(() => emit(2)).not.toThrow();
+    expect(() => open(Object.create(DetailedSensor.prototype))).not.toThrow();
   });
 
   it('shows the launch-site menu item for a LaunchSite', () => {
-    vi.spyOn(ServiceLocator.getCatalogManager(), 'getObject').mockReturnValue(Object.create(LaunchSite.prototype));
+    expect(() => open(Object.create(LaunchSite.prototype))).not.toThrow();
+  });
 
-    expect(() => emit(3)).not.toThrow();
+  it('is hidden entirely for a space click with no recognizable target', () => {
+    const config = plugin.getContextMenuConfig();
+
+    expect(config.isVisible!({ surface: 'space', targetId: -1, target: null, hasPrimarySelection: false })).toBe(false);
+    expect(config.isVisible!({ surface: 'earth', targetId: -1, target: null, hasPrimarySelection: false })).toBe(true);
   });
 });
 

@@ -2,49 +2,41 @@
 import { AtmosphereSettings, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
+import { ICommandPaletteCommand, IContextMenuConfig, RmbMenuContext } from '@app/engine/plugins/core/plugin-capabilities';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { NightToggle } from '../night-toggle/night-toggle';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 
+export type EarthPresetId = 'satellite' | 'nadir' | 'engineer' | 'opscenter' | '90sGraphics';
+
+interface EarthPresetDef {
+  id: EarthPresetId;
+  /** Key under plugins.EarthPresetsPlugin.rmbMenu.* */
+  labelKey: string;
+  apply: () => void;
+}
+
 export class EarthPresetsPlugin extends KeepTrackPlugin {
   readonly id = 'EarthPresetsPlugin';
   dependencies_ = [];
 
-  private t_(key: string): string {
+  private static t_(key: string): string {
     return t7e(`plugins.EarthPresetsPlugin.${key}` as Parameters<typeof t7e>[0]);
   }
 
-  rmbL1ElementName = 'earth-rmb';
-  rmbL1Html = this.buildRmbL1Html_();
-  rmbL2ElementName = 'earth-rmb-menu';
-  rmbL2Html = this.buildRmbL2Html_();
+  /** The last preset applied this session, or null when none/custom. */
+  static lastAppliedPresetId: EarthPresetId | null = null;
 
-  private buildRmbL1Html_(): string {
-    return html`<li class="rmb-menu-item" id="${this.rmbL1ElementName}"><a href="#">${this.t_('rmbMenu.title')} &#x27A4;</a></li>`;
-  }
-
-  private buildRmbL2Html_(): string {
-    const m = (key: string) => this.t_(`rmbMenu.${key}`);
-
-    return html`
-    <ul class='dropdown-contents'>
-      <li id="earth-satellite-rmb"><a href="#">${m('satelliteImages')}</a></li>
-      <li id="earth-nadir-rmb"><a href="#">${m('alternateSatelliteImages')}</a></li>
-      <li id="earth-engineer-rmb"><a href="#">${m('engineeringTool')}</a></li>
-      <li id="earth-opscenter-rmb"><a href="#">${m('operationsCenter')}</a></li>
-      <li id="earth-90sGraphics-rmb"><a href="#">${m('nineties')}</a></li>
-    </ul>
-    `;
-  }
-  rmbMenuOrder = 15;
-  isRmbOnEarth = true;
-  isRmbOffEarth = false;
-  isRmbOnSat = false;
-
-  rmbCallback = (targetId: string): void => {
-    switch (targetId) {
-      case 'earth-satellite-rmb':
+  /**
+   * Single source of truth for the earth style presets. The right-click menu,
+   * the command palette, and the graphics menu dropdown all derive from this.
+   */
+  static readonly PRESETS: EarthPresetDef[] = [
+    {
+      id: 'satellite',
+      labelKey: 'satelliteImages',
+      apply: () => {
         ServiceLocator.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.BLUE_MARBLE);
         settingsManager.isDrawCloudsMap = true;
         settingsManager.isDrawBumpMap = true;
@@ -55,8 +47,12 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
         settingsManager.isEarthAmbientLighting = true;
         PluginRegistry.getPlugin(NightToggle)?.setBottomIconToUnselected();
         PluginRegistry.getPlugin(NightToggle)?.off();
-        break;
-      case 'earth-nadir-rmb':
+      },
+    },
+    {
+      id: 'nadir',
+      labelKey: 'alternateSatelliteImages',
+      apply: () => {
         ServiceLocator.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.NADIR);
         settingsManager.isDrawCloudsMap = false;
         settingsManager.isDrawBumpMap = false;
@@ -67,8 +63,12 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
         settingsManager.isEarthAmbientLighting = true;
         PluginRegistry.getPlugin(NightToggle)?.setBottomIconToUnselected();
         PluginRegistry.getPlugin(NightToggle)?.off();
-        break;
-      case 'earth-engineer-rmb':
+      },
+    },
+    {
+      id: 'engineer',
+      labelKey: 'engineeringTool',
+      apply: () => {
         ServiceLocator.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.BLUE_MARBLE);
         settingsManager.isDrawCloudsMap = false;
         settingsManager.isDrawBumpMap = false;
@@ -78,8 +78,12 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
         settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
         settingsManager.isEarthAmbientLighting = false;
         PluginRegistry.getPlugin(NightToggle)?.on();
-        break;
-      case 'earth-opscenter-rmb':
+      },
+    },
+    {
+      id: 'opscenter',
+      labelKey: 'operationsCenter',
+      apply: () => {
         ServiceLocator.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.FLAT);
         settingsManager.isDrawCloudsMap = false;
         settingsManager.isDrawBumpMap = false;
@@ -89,8 +93,12 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
         settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
         settingsManager.isEarthAmbientLighting = false;
         PluginRegistry.getPlugin(NightToggle)?.on();
-        break;
-      case 'earth-90sGraphics-rmb':
+      },
+    },
+    {
+      id: '90sGraphics',
+      labelKey: 'nineties',
+      apply: () => {
         ServiceLocator.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.FLAT);
         settingsManager.isDrawCloudsMap = false;
         settingsManager.isDrawBumpMap = false;
@@ -100,9 +108,57 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
         settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
         settingsManager.isEarthAmbientLighting = false;
         PluginRegistry.getPlugin(NightToggle)?.on();
-        break;
-      default:
-        break;
+      },
+    },
+  ];
+
+  /** Translated display label for a preset. */
+  static presetLabel(preset: EarthPresetDef): string {
+    return EarthPresetsPlugin.t_(`rmbMenu.${preset.labelKey}`);
+  }
+
+  /** Applies a preset by id. Shared by the RMB menu, palette, and graphics menu. */
+  static applyPreset(presetId: EarthPresetId): void {
+    const preset = EarthPresetsPlugin.PRESETS.find((p) => p.id === presetId);
+
+    if (!preset) {
+      return;
     }
-  };
+    preset.apply();
+    EarthPresetsPlugin.lastAppliedPresetId = preset.id;
+  }
+
+  getContextMenuConfig(): IContextMenuConfig {
+    const items = EarthPresetsPlugin.PRESETS
+      .map((preset) => html`<li id="earth-${preset.id}-rmb"><a href="#">${EarthPresetsPlugin.presetLabel(preset)}</a></li>`)
+      .join('');
+
+    return {
+      level1ElementName: 'earth-rmb',
+      level1Html: html`<li class="rmb-menu-item" id="earth-rmb"><a href="#">${EarthPresetsPlugin.t_('rmbMenu.title')} &#x27A4;</a></li>`,
+      level2ElementName: 'earth-rmb-menu',
+      level2Html: html`<ul class='dropdown-contents'>${items}</ul>`,
+      order: 15,
+      isVisible: (ctx: RmbMenuContext) => ctx.surface === 'earth',
+    };
+  }
+
+  onContextMenuAction(targetId: string): void {
+    const preset = EarthPresetsPlugin.PRESETS.find((p) => `earth-${p.id}-rmb` === targetId);
+
+    if (preset) {
+      EarthPresetsPlugin.applyPreset(preset.id);
+    }
+  }
+
+  getCommandPaletteCommands(): ICommandPaletteCommand[] {
+    const category = EarthPresetsPlugin.t_('rmbMenu.title');
+
+    return EarthPresetsPlugin.PRESETS.map((preset) => ({
+      id: `EarthPresetsPlugin.preset.${preset.id}`,
+      label: EarthPresetsPlugin.presetLabel(preset),
+      category,
+      callback: () => EarthPresetsPlugin.applyPreset(preset.id),
+    }));
+  }
 }

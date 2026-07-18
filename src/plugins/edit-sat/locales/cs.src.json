@@ -48,7 +48,6 @@
       },
       "contextMenu": {
         "editSat": "Upravit sat.",
-        "setPrimarySat": "Nastavit jako primární sat.",
         "setSecondarySat": "Nastavit jako sekundární sat.",
         "editSatellite": "Upravit satelit"
       },

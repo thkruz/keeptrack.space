@@ -36,7 +36,7 @@ import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { SatLabelMode } from '@app/settings/ui-settings';
-import { BaseObject, CatalogSource } from '@ootk/src/main';
+import { BaseObject, CatalogSource, Satellite } from '@ootk/src/main';
 import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import bookmarksPng from '@public/img/icons/bookmarks.png';
@@ -44,10 +44,12 @@ import saveAs from 'file-saver';
 import { t7e } from '@app/locales/keys';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import {
+  IContextMenuConfig,
   IHelpConfig,
   IKeyboardShortcut,
   ISettingsContribution,
   ISettingsContributor,
+  RmbMenuContext,
 } from '../../engine/plugins/core/plugin-capabilities';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { EL as SAT_INFO_EL } from '../sat-info-box/sat-info-box-html';
@@ -63,6 +65,41 @@ export interface UpdateWatchlistParams {
 export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContributor {
   readonly id = 'WatchlistPlugin';
   dependencies_ = [];
+
+  private static tRmb_(key: string): string {
+    return t7e(`plugins.WatchlistPlugin.rmbMenu.${key}` as Parameters<typeof t7e>[0]);
+  }
+
+  getContextMenuConfig(): IContextMenuConfig {
+    return {
+      level1ElementName: 'watchlist-rmb',
+      level1Html: html`<li class="rmb-menu-item" id="watchlist-rmb"><a href="#">${WatchlistPlugin.tRmb_('addToWatchlist')}</a></li>`,
+      order: 4,
+      isVisible: (ctx: RmbMenuContext) => ctx.target instanceof Satellite,
+    };
+  }
+
+  /** Relabel the entry to add/remove depending on the clicked satellite. */
+  onContextMenuOpen(ctx: RmbMenuContext): void {
+    const label = ctx.target instanceof Satellite ? getEl('watchlist-rmb', true)?.querySelector('a') : null;
+
+    if (label) {
+      label.textContent = WatchlistPlugin.tRmb_(this.isOnWatchlist(ctx.targetId) ? 'removeFromWatchlist' : 'addToWatchlist');
+    }
+  }
+
+  onContextMenuAction(targetId: string, clickedSatId?: number): void {
+    if (targetId !== 'watchlist-rmb' || clickedSatId === undefined || clickedSatId < 0) {
+      return;
+    }
+
+    ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+    if (this.isOnWatchlist(clickedSatId)) {
+      this.removeSat(clickedSatId);
+    } else {
+      this.addSat(clickedSatId);
+    }
+  }
 
   getHelpConfig(): IHelpConfig {
     return {

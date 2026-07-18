@@ -48,7 +48,6 @@
       },
       "contextMenu": {
         "editSat": "위성 편집",
-        "setPrimarySat": "기본 위성으로 설정",
         "setSecondarySat": "보조 위성으로 설정",
         "editSatellite": "위성 편집"
       },

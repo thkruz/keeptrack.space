@@ -48,7 +48,6 @@
       },
       "contextMenu": {
         "editSat": "衛星を編集",
-        "setPrimarySat": "プライマリ衛星に設定",
         "setSecondarySat": "セカンダリ衛星に設定",
         "editSatellite": "衛星を編集"
       },

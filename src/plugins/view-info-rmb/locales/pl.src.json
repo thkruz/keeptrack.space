@@ -6,7 +6,6 @@
         "earthInfo": "Informacje o Ziemi",
         "sensorInfo": "Informacje o czujniku",
         "launchSiteInfo": "Informacje o miejscu startu",
-        "satelliteInfo": "Informacje o satelicie",
         "relatedSatellites": "Powiązane satelity"
       },
       "errorMsgs": {

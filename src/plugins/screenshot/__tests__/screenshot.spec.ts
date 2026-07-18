@@ -7,10 +7,8 @@ test.describe('Screenshot', () => {
       plugins: { Screenshot: { enabled: true } },
     });
 
-    // Screenshot has RMB menu items for different resolutions
+    // Screenshot exposes a single Save Image action (resolutions live in the command palette)
     await expect(page.locator('#save-rmb')).toBeAttached();
-    await expect(page.locator('#save-hd-rmb')).toBeAttached();
-    await expect(page.locator('#save-4k-rmb')).toBeAttached();
-    await expect(page.locator('#save-8k-rmb')).toBeAttached();
+    await expect(page.locator('#save-rmb-menu')).not.toBeAttached();
   });
 });

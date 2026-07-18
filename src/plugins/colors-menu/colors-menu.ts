@@ -134,13 +134,6 @@ export class ColorMenu extends KeepTrackPlugin implements ICommandPaletteCapable
     }
   }
 
-  // Bridge for legacy event system (per CLAUDE.md)
-  rmbCallback: (targetId: string | null, clickedSat?: number) => void = (targetId: string | null) => {
-    if (targetId) {
-      this.onContextMenuAction(targetId);
-    }
-  };
-
   getKeyboardShortcuts(): IKeyboardShortcut[] {
     return [
       {

@@ -5,6 +5,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { InputManager } from '@app/engine/input/input-manager';
 import { TouchInput } from '@app/engine/input/input-manager/touch-input';
 import { vi } from 'vitest';
 
@@ -64,6 +65,7 @@ describe('TouchInput', () => {
       openRmbMenu: vi.fn(),
       getSatIdFromCoord: vi.fn(() => 5),
       getSatIdFromCoordNeighborhood: vi.fn(() => ({ id: 5, offsetX: 0, offsetY: 0, hitCount: 1, patchData: 'x' })),
+      mouse: {},
     };
     vi.spyOn(ServiceLocator, 'getInputManager').mockReturnValue(inputManager as never);
 
@@ -245,6 +247,20 @@ describe('TouchInput', () => {
 
       expect(camera.autoRotate).toHaveBeenCalledWith(false);
       expect(inputManager.openRmbMenu).toHaveBeenCalled();
+    });
+
+    it('resolves the pressed object and surface location before opening the menu', () => {
+      const earthPointSpy = vi.spyOn(InputManager, 'getEarthScreenPoint').mockReturnValue([1000, 2000, 3000] as never);
+
+      touch.touchStartX = 15;
+      touch.touchStartY = 25;
+
+      touch.press(touchEvt([]));
+
+      expect(inputManager.getSatIdFromCoord).toHaveBeenCalledWith(15, 25);
+      expect(earthPointSpy).toHaveBeenCalledWith(15, 25);
+      expect(inputManager.mouse.latLon).toBeDefined();
+      expect(inputManager.openRmbMenu).toHaveBeenCalledWith(5);
     });
   });
 

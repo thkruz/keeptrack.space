@@ -53,19 +53,22 @@ describe('EditSat behavior', () => {
     expect(fillSpy).not.toHaveBeenCalled();
   });
 
-  it('onContextMenuAction_ throws without a clicked satellite id', () => {
-    expect(() => p().onContextMenuAction_('set-pri-sat-rmb')).toThrow();
+  it('onContextMenuAction ignores actions without a clicked satellite id', () => {
+    const secondarySpy = vi.spyOn(p().selectSatManager_, 'setSecondarySat').mockImplementation(() => undefined);
+
+    expect(() => p().onContextMenuAction('set-sec-sat-rmb')).not.toThrow();
+    expect(secondarySpy).not.toHaveBeenCalled();
   });
 
-  it('onContextMenuAction_ selects the primary and secondary satellites', () => {
+  it('onContextMenuAction sets the secondary satellite and opens the editor', () => {
     const selectSpy = vi.spyOn(p().selectSatManager_, 'selectSat').mockImplementation(() => undefined);
     const secondarySpy = vi.spyOn(p().selectSatManager_, 'setSecondarySat').mockImplementation(() => undefined);
 
-    p().onContextMenuAction_('set-pri-sat-rmb', 5);
-    expect(selectSpy).toHaveBeenCalledWith(5);
-
-    p().onContextMenuAction_('set-sec-sat-rmb', 9);
+    p().onContextMenuAction('set-sec-sat-rmb', 9);
     expect(secondarySpy).toHaveBeenCalledWith(9);
+
+    p().onContextMenuAction('edit-sat-rmb', 5);
+    expect(selectSpy).toHaveBeenCalledWith(5);
   });
 
   it('editSatSubmit_ info-toasts when the SCC is not a real satellite', () => {

@@ -1,10 +1,7 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { EventBus } from '@app/engine/events/event-bus';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { DrawLinesPlugin } from '@app/plugins/draw-lines/draw-lines';
-import { settingsManager } from '@app/settings/settings';
 import { Satellite } from '@ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSuite } from '@test/generic-tests';
@@ -27,14 +24,14 @@ const LINE_METHODS = [
   'createSensorToSat', 'createObjToObj', 'createSat2Sun', 'createSat2CelestialBody',
 ] as const;
 
-describe('DrawLinesPlugin rmbCallback', () => {
+describe('DrawLinesPlugin onContextMenuAction', () => {
   let plugin: DrawLinesPlugin;
 
   beforeEach(() => {
     setupStandardEnvironment();
     plugin = new DrawLinesPlugin();
     LINE_METHODS.forEach((m) => vi.spyOn(lineManagerInstance, m).mockImplementation(() => undefined as never));
-    // A satellite-typed object exercises the instanceof guard at the top of rmbCallback.
+    // A satellite-typed object exercises the instanceof guard when building the action context.
     vi.spyOn(ServiceLocator.getCatalogManager(), 'getObject').mockReturnValue(Object.create(Satellite.prototype));
     (ServiceLocator.getScene() as unknown as { moons: unknown }).moons = { Moon: { drawFullOrbitPathRelativeToEarth: vi.fn() } };
   });
@@ -59,11 +56,11 @@ describe('DrawLinesPlugin rmbCallback', () => {
     'line-moon-orbit-rmb',
     'unknown-rmb',
   ])('draws %s without throwing', (targetId) => {
-    expect(() => plugin.rmbCallback(targetId, 25544)).not.toThrow();
+    expect(() => plugin.onContextMenuAction(targetId, 25544)).not.toThrow();
   });
 
   it('routes the RIC axes item to createSatRicFrame', () => {
-    plugin.rmbCallback('line-sat-ric-rmb', 25544);
+    plugin.onContextMenuAction('line-sat-ric-rmb', 25544);
 
     expect(lineManagerInstance.createSatRicFrame).toHaveBeenCalled();
   });
@@ -71,7 +68,7 @@ describe('DrawLinesPlugin rmbCallback', () => {
   it('warns and returns for sat-to-sat with no primary satellite', () => {
     vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue(undefined as never);
 
-    plugin.rmbCallback('line-sat-sat-rmb', 25544);
+    plugin.onContextMenuAction('line-sat-sat-rmb', 25544);
 
     expect(lineManagerInstance.createObjToObj).not.toHaveBeenCalled();
   });
@@ -79,13 +76,13 @@ describe('DrawLinesPlugin rmbCallback', () => {
   it('draws a sat-to-sat line when a primary satellite exists', () => {
     vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue({ primarySatObj: Object.create(Satellite.prototype) } as never);
 
-    plugin.rmbCallback('line-sat-sat-rmb', 25544);
+    plugin.onContextMenuAction('line-sat-sat-rmb', 25544);
 
     expect(lineManagerInstance.createObjToObj).toHaveBeenCalled();
   });
 });
 
-describe('DrawLinesPlugin rightBtnMenuOpen visibility', () => {
+describe('DrawLinesPlugin onContextMenuOpen visibility', () => {
   let plugin: DrawLinesPlugin;
 
   /** Create the RMB <li> elements the handler may hide, so display changes are observable. */
@@ -103,12 +100,17 @@ describe('DrawLinesPlugin rightBtnMenuOpen visibility', () => {
     return els;
   };
 
+  const openCtx = (surface: 'earth' | 'space', target: unknown, hasPrimarySelection = false) => plugin.onContextMenuOpen({
+    surface,
+    targetId: target ? 25544 : -1,
+    target: target as never,
+    hasPrimarySelection,
+  });
+
   beforeEach(() => {
     setupStandardEnvironment();
     document.body.innerHTML = '';
-    settingsManager.isMobileModeEnabled = false;
     plugin = new DrawLinesPlugin();
-    plugin.addJs();
   });
 
   afterEach(() => {
@@ -116,13 +118,10 @@ describe('DrawLinesPlugin rightBtnMenuOpen visibility', () => {
     vi.restoreAllMocks();
   });
 
-  it('hides sat-to-sat when no primary satellite is selected (numeric -1 guard)', () => {
+  it('hides sat-to-sat when no primary satellite is selected', () => {
     const els = seedRmbElements('line-sat-sat-rmb', 'line-moon-orbit-rmb');
 
-    // selectedSat is the number -1; the old string comparison ('-1') never matched.
-    vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue({ selectedSat: -1 } as never);
-
-    EventBus.getInstance().emit(EventBusEvent.rightBtnMenuOpen, true, 25544);
+    openCtx('earth', Object.create(Satellite.prototype), false);
 
     expect(els['line-sat-sat-rmb'].style.display).toBe('none');
     // Frame-independent geometry stays visible.
@@ -135,7 +134,7 @@ describe('DrawLinesPlugin rightBtnMenuOpen visibility', () => {
       'line-sat-moon-rmb', 'line-sat-ric-rmb', 'line-moon-orbit-rmb',
     );
 
-    EventBus.getInstance().emit(EventBusEvent.rightBtnMenuOpen, true, -1);
+    openCtx('earth', null);
 
     for (const id of ['line-earth-sat-rmb', 'line-sensor-sat-rmb', 'line-sat-sun-rmb', 'line-sat-moon-rmb', 'line-sat-ric-rmb']) {
       expect(els[id].style.display).toBe('none');
@@ -146,12 +145,22 @@ describe('DrawLinesPlugin rightBtnMenuOpen visibility', () => {
   it('hides the ECI axes when the click is off-earth', () => {
     const els = seedRmbElements('line-eci-axis-rmb');
 
-    EventBus.getInstance().emit(EventBusEvent.rightBtnMenuOpen, false, 25544);
+    openCtx('space', Object.create(Satellite.prototype));
 
     expect(els['line-eci-axis-rmb'].style.display).toBe('none');
   });
 
+  it('re-shows a previously hidden item when its requirements are met again', () => {
+    const els = seedRmbElements('line-earth-sat-rmb');
+
+    openCtx('earth', null);
+    expect(els['line-earth-sat-rmb'].style.display).toBe('none');
+
+    openCtx('earth', Object.create(Satellite.prototype));
+    expect(els['line-earth-sat-rmb'].style.display).not.toBe('none');
+  });
+
   it('does not throw when elements are absent', () => {
-    expect(() => EventBus.getInstance().emit(EventBusEvent.rightBtnMenuOpen, false, -1)).not.toThrow();
+    expect(() => openCtx('space', null)).not.toThrow();
   });
 });

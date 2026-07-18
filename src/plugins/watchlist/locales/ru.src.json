@@ -47,6 +47,10 @@
             "all": "Весь список наблюдения"
           }
         }
+      },
+      "rmbMenu": {
+        "addToWatchlist": "Добавить в список наблюдения",
+        "removeFromWatchlist": "Удалить из списка наблюдения"
       }
     },
     "WatchlistOverlay": {

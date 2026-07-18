@@ -43,7 +43,8 @@
         "satScanEarth": "Scansione Terra",
         "sensorScanHorizon": "Scansione orizzonte",
         "sensorToRae": "Sensore-Punto",
-        "generic": "Linea"
+        "generic": "Linea",
+        "sensorMarker": "Indicatore posizione sensore"
       },
       "errorMsgs": {
         "noPrimarySat": "Nessun satellite primario selezionato per la linea satellite-satellite.",

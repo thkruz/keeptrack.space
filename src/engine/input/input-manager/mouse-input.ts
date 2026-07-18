@@ -78,9 +78,10 @@ export class MouseInput {
         });
       }
 
-      // Create Event Listeners for Right Menu Buttons
+      // Create Event Listeners for Right Menu Buttons.
+      // Single-action items (no submenu) are clicked directly on their L1 element.
       ServiceLocator.getInputManager().rmbMenuItems
-        .map(({ elementIdL2 }) => getEl(elementIdL2))
+        .map(({ elementIdL1, elementIdL2 }) => (elementIdL2 ? getEl(elementIdL2, true) : getEl(elementIdL1, true)))
         .concat([toggleTimeDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
         .forEach((el) => {
           el?.addEventListener('click', (e: MouseEvent) => {
@@ -93,18 +94,20 @@ export class MouseInput {
         });
 
       ServiceLocator.getInputManager().rmbMenuItems.forEach(({ elementIdL1, elementIdL2 }) => {
-        const el1 = getEl(elementIdL1);
-        const el2 = getEl(elementIdL2);
+        const el1 = getEl(elementIdL1, true);
+        const el2 = elementIdL2 ? getEl(elementIdL2, true) : null;
 
-        if (!el1 || !el2) {
+        if (!el1 || (elementIdL2 && !el2)) {
           errorManagerInstance.warn(`Missing elements for RMB menu: ${elementIdL1}, ${elementIdL2}`);
 
           return;
         }
 
-        el1?.addEventListener('mouseenter', () => {
+        el1.addEventListener('mouseenter', () => {
           ServiceLocator.getInputManager().clearRMBSubMenu();
-          InputManager.showDropdownSubMenu(rightBtnMenuDOM, el2, canvasDOM, el1);
+          if (el2) {
+            InputManager.showDropdownSubMenu(rightBtnMenuDOM, el2, canvasDOM, el1);
+          }
         });
         el2?.addEventListener('mouseleave', () => {
           el2.style.display = 'none';
@@ -401,9 +404,6 @@ export class MouseInput {
     }
 
     switch (targetId) {
-      case 'set-sec-sat-rmb':
-        PluginRegistry.getPlugin(SelectSatManager)?.setSecondarySat(this.clickedSat);
-        break;
       case 'reset-camera-rmb':
         if (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat !== -1) {
           ServiceLocator.getMainCamera().resetRotation();

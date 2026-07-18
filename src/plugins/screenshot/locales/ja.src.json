@@ -3,10 +3,7 @@
     "Screenshot": {
       "bottomIconLabel": "写真を撮る",
       "rmbMenu": {
-        "title": "画像を保存",
-        "hd": "HD (1920 x 1080)",
-        "fourK": "4K (3840 x 2160)",
-        "eightK": "8K (7680 x 4320)"
+        "title": "画像を保存"
       },
       "commands": {
         "take4k": "スクリーンショット (4K)",

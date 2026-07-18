@@ -48,7 +48,6 @@
       },
       "contextMenu": {
         "editSat": "Edit Sat",
-        "setPrimarySat": "Set as Primary Sat",
         "setSecondarySat": "Set as Secondary Sat",
         "editSatellite": "Edit Satellite"
       },

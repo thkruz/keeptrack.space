@@ -88,12 +88,13 @@ describe('Screenshot behavior', () => {
     expect(() => withSecondary.secondaryLogo.onerror?.(new Event('error'))).not.toThrow();
   });
 
-  it('rmbCallback maps each resolution and ignores unknown ids', () => {
+  it('onContextMenuAction takes a 4k shot for the single Save Image item and ignores others', () => {
     const spy = vi.spyOn(plugin, 'saveHiResPhoto').mockImplementation(() => undefined);
 
-    ['save-hd-rmb', 'save-4k-rmb', 'save-8k-rmb', 'unknown-rmb'].forEach((id) => plugin.rmbCallback(id));
+    ['save-rmb', 'unknown-rmb'].forEach((id) => plugin.onContextMenuAction(id));
 
-    expect(spy).toHaveBeenCalledTimes(3);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledWith('4k');
   });
 
   it('command palette commands trigger hi-res capture', () => {

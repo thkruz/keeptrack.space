@@ -47,6 +47,10 @@
             "all": "ウォッチリスト全体"
           }
         }
+      },
+      "rmbMenu": {
+        "addToWatchlist": "ウォッチリストに追加",
+        "removeFromWatchlist": "ウォッチリストから削除"
       }
     },
     "WatchlistOverlay": {

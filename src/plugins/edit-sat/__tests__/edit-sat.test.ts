@@ -83,10 +83,13 @@ describe('EditSat_capabilities', () => {
   });
 
   it('should have context menu properties', () => {
-    expect(plugin.isRmbOnSat).toBe(true);
-    expect(plugin.rmbMenuOrder).toBe(2);
-    expect(plugin.rmbL1ElementName).toBe('edit-rmb');
-    expect(plugin.rmbL2ElementName).toBe('edit-rmb-menu');
+    const config = plugin.getContextMenuConfig();
+
+    expect(config.order).toBe(2);
+    expect(config.level1ElementName).toBe('edit-rmb');
+    expect(config.level2ElementName).toBe('edit-rmb-menu');
+    // Only visible when the clicked target is an actual satellite
+    expect(config.isVisible!({ surface: 'space', targetId: -1, target: null, hasPrimarySelection: false })).toBe(false);
   });
 });
 

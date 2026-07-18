@@ -43,7 +43,8 @@
         "satScanEarth": "地球スキャン",
         "sensorScanHorizon": "地平線スキャン",
         "sensorToRae": "センサーから点",
-        "generic": "ライン"
+        "generic": "ライン",
+        "sensorMarker": "センサー位置マーカー"
       },
       "errorMsgs": {
         "noPrimarySat": "衛星間ラインの主衛星が選択されていません。",

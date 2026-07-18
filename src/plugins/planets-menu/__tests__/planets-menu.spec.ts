@@ -68,9 +68,9 @@ test.describe('PlanetsMenuPlugin', () => {
 
     expect(await disabledMoons.count()).toBeGreaterThan(0);
 
-    // Verify RMB context menu elements are in DOM
-    await expect(page.locator('#planets-rmb')).toBeAttached();
-    await expect(page.locator('#planets-rmb-menu')).toBeAttached();
+    // The planets RMB entry was removed (redundant with side menu, 'P' key, palette)
+    await expect(page.locator('#planets-rmb')).not.toBeAttached();
+    await expect(page.locator('#planets-rmb-menu')).not.toBeAttached();
 
     // Close side menu via close button
     await page.locator('#planets-menu-close-btn').click();

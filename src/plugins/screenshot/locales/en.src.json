@@ -3,10 +3,7 @@
     "Screenshot": {
       "bottomIconLabel": "Take Photo",
       "rmbMenu": {
-        "title": "Save Image",
-        "hd": "HD (1920 x 1080)",
-        "fourK": "4K (3840 x 2160)",
-        "eightK": "8K (7680 x 4320)"
+        "title": "Save Image"
       },
       "commands": {
         "take4k": "Take Screenshot (4K)",

@@ -16,7 +16,7 @@ describe('EarthPresetsPlugin', () => {
   standardPluginSuite(EarthPresetsPlugin, 'EarthPresetsPlugin');
 });
 
-describe('EarthPresetsPlugin rmbCallback', () => {
+describe('EarthPresetsPlugin onContextMenuAction', () => {
   let plugin: EarthPresetsPlugin;
   let changeEarthTextureStyle: ReturnType<typeof vi.fn>;
 
@@ -39,13 +39,29 @@ describe('EarthPresetsPlugin rmbCallback', () => {
     'earth-90sGraphics-rmb',
     'unknown-rmb',
   ])('applies the %s preset without throwing', (targetId) => {
-    expect(() => plugin.rmbCallback(targetId)).not.toThrow();
+    expect(() => plugin.onContextMenuAction(targetId)).not.toThrow();
   });
 
   it('changes the earth texture style for a known preset', () => {
-    plugin.rmbCallback('earth-satellite-rmb');
+    plugin.onContextMenuAction('earth-satellite-rmb');
 
     expect(changeEarthTextureStyle).toHaveBeenCalled();
     expect(settingsManager.isDrawPoliticalMap).toBe(true);
+    expect(EarthPresetsPlugin.lastAppliedPresetId).toBe('satellite');
+  });
+
+  it('exposes one command palette entry per preset', () => {
+    const commands = plugin.getCommandPaletteCommands();
+
+    expect(commands).toHaveLength(EarthPresetsPlugin.PRESETS.length);
+    commands[0].callback();
+    expect(changeEarthTextureStyle).toHaveBeenCalled();
+  });
+
+  it('is only visible when right-clicking the earth', () => {
+    const config = plugin.getContextMenuConfig();
+
+    expect(config.isVisible!({ surface: 'earth', targetId: -1, target: null, hasPrimarySelection: false })).toBe(true);
+    expect(config.isVisible!({ surface: 'space', targetId: -1, target: null, hasPrimarySelection: false })).toBe(false);
   });
 });

@@ -228,12 +228,15 @@ describe('MouseInput handlers', () => {
       expect(timeManager.toggleTime).toHaveBeenCalled();
     });
 
-    it('sets the secondary satellite', () => {
+    it('routes set-secondary to the plugin layer via the event bus', () => {
+      const emit = vi.spyOn(EventBus.getInstance(), 'emit');
+
       m().clickedSat = 9;
 
       fire('set-sec-sat-rmb');
 
-      expect(setSecondarySat).toHaveBeenCalledWith(9);
+      // Handled by EditSat.onContextMenuAction, not by MouseInput directly
+      expect(emit).toHaveBeenCalledWith(expect.anything(), 'set-sec-sat-rmb', 9);
     });
 
     it('clears the screen and deselects both primary and secondary', () => {

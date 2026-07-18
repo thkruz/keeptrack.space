@@ -7,9 +7,11 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import {
   IBottomIconConfig,
+  IContextMenuConfig,
   IHelpConfig,
   IKeyboardShortcut,
   ISideMenuConfig,
+  RmbMenuContext,
 } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -129,28 +131,33 @@ export class EditSat extends KeepTrackPlugin {
   }
 
   // =========================================================================
-  // Context menu (legacy properties + bridge)
+  // Context menu
   // =========================================================================
 
-  isRmbOnSat = true;
-  rmbMenuOrder = 2;
-  rmbL1ElementName = 'edit-rmb';
-  rmbL1Html = html`
-  <li class="rmb-menu-item" id=${this.rmbL1ElementName}><a href="#">${t7e('plugins.EditSat.contextMenu.editSat' as T7eKey)} &#x27A4;</a></li>`;
+  getContextMenuConfig(): IContextMenuConfig {
+    return {
+      level1ElementName: 'edit-rmb',
+      level1Html: html`
+        <li class="rmb-menu-item" id="edit-rmb"><a href="#">${t7e('plugins.EditSat.contextMenu.editSat' as T7eKey)} &#x27A4;</a></li>`,
+      level2ElementName: 'edit-rmb-menu',
+      // Set Primary is intentionally absent: left-click already does that.
+      level2Html: html`
+        <ul class='dropdown-contents'>
+          <li id="set-sec-sat-rmb"><a href="#">${t7e('plugins.EditSat.contextMenu.setSecondarySat' as T7eKey)} (Ctrl+Click)</a></li>
+          <li id="edit-sat-rmb"><a href="#">${t7e('plugins.EditSat.contextMenu.editSatellite' as T7eKey)}</a></li>
+        </ul>`,
+      order: 2,
+      // Editing element sets only makes sense for actual satellites
+      isVisible: (ctx: RmbMenuContext) => ctx.target instanceof Satellite,
+    };
+  }
 
-  rmbCallback = (targetId: string, clickedSat?: number): void => {
-    this.onContextMenuAction_(targetId, clickedSat);
-  };
-
-  protected onContextMenuAction_(targetId: string, clickedSatId?: number): void {
-    if (typeof clickedSatId === 'undefined' || clickedSatId === null) {
-      throw new Error('clickedSat is undefined');
+  onContextMenuAction(targetId: string, clickedSatId?: number): void {
+    if (clickedSatId === undefined || clickedSatId === null || clickedSatId === -1) {
+      return;
     }
 
     switch (targetId) {
-      case 'set-pri-sat-rmb':
-        this.selectSatManager_.selectSat(clickedSatId);
-        break;
       case 'set-sec-sat-rmb':
         this.selectSatManager_.setSecondarySat(clickedSatId);
         break;
@@ -164,14 +171,6 @@ export class EditSat extends KeepTrackPlugin {
         break;
     }
   }
-
-  rmbL2ElementName = 'edit-rmb-menu';
-  rmbL2Html = html`
-    <ul class='dropdown-contents'>
-      <li id="set-pri-sat-rmb"><a href="#">${t7e('plugins.EditSat.contextMenu.setPrimarySat' as T7eKey)}</a></li>
-      <li id="set-sec-sat-rmb"><a href="#">${t7e('plugins.EditSat.contextMenu.setSecondarySat' as T7eKey)}</a></li>
-      <li id="edit-sat-rmb"><a href="#">${t7e('plugins.EditSat.contextMenu.editSatellite' as T7eKey)}</a></li>
-    </ul>`;
 
   // =========================================================================
   // Lifecycle

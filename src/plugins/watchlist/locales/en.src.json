@@ -47,6 +47,10 @@
             "all": "All Watchlist"
           }
         }
+      },
+      "rmbMenu": {
+        "addToWatchlist": "Add to Watchlist",
+        "removeFromWatchlist": "Remove from Watchlist"
       }
     },
     "WatchlistOverlay": {

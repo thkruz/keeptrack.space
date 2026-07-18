@@ -27,7 +27,7 @@ import { MenuMode } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { ICommandPaletteCommand } from '@app/engine/plugins/core/plugin-capabilities';
+import { ICommandPaletteCommand, IContextMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { KeepTrack } from '@app/keeptrack';
@@ -77,47 +77,24 @@ export class Screenshot extends KeepTrackPlugin {
   menuMode: MenuMode[] = [MenuMode.TOOLS, MenuMode.ALL];
 
   bottomIconImg = cameraPng;
-  rmbCallback = (targetId: string): void => {
-    switch (targetId) {
-      case 'save-hd-rmb':
-        this.saveHiResPhoto('hd');
-        break;
-      case 'save-4k-rmb':
-        this.saveHiResPhoto('4k');
-        break;
-      case 'save-8k-rmb':
-        this.saveHiResPhoto('8k');
-        break;
-      default:
-        break;
-    }
-  };
 
-  rmbL1ElementName = 'save-rmb';
-  rmbL1Html = this.buildRmbL1Html_();
-
-  isRmbOnEarth = true;
-  isRmbOffEarth = true;
-  isRmbOnSat = true;
-  rmbMenuOrder = 20;
-
-  rmbL2ElementName = 'save-rmb-menu';
-  rmbL2Html = this.buildRmbL2Html_();
-
-  private buildRmbL1Html_(): string {
-    return html`<li class="rmb-menu-item" id="${this.rmbL1ElementName}"><a href="#">${this.t_('rmbMenu.title')} &#x27A4;</a></li>`;
+  /**
+   * Single-action entry: the resolution submenu is redundant with the command
+   * palette (HD/4K/8K commands), so right-click just takes the standard shot.
+   */
+  getContextMenuConfig(): IContextMenuConfig {
+    return {
+      level1ElementName: 'save-rmb',
+      level1Html: html`<li class="rmb-menu-item" id="save-rmb"><a href="#">${this.t_('rmbMenu.title')}</a></li>`,
+      order: 20,
+      isVisible: () => true,
+    };
   }
 
-  private buildRmbL2Html_(): string {
-    const m = (key: string) => this.t_(`rmbMenu.${key}`);
-
-    return html`
-    <ul class='dropdown-contents'>
-      <li id="save-hd-rmb"><a href="#">${m('hd')}</a></li>
-      <li id="save-4k-rmb"><a href="#">${m('fourK')}</a></li>
-      <li id="save-8k-rmb"><a href="#">${m('eightK')}</a></li>
-    </ul>
-    `;
+  onContextMenuAction(targetId: string): void {
+    if (targetId === 'save-rmb') {
+      this.saveHiResPhoto('4k');
+    }
   }
 
   getCommandPaletteCommands(): ICommandPaletteCommand[] {

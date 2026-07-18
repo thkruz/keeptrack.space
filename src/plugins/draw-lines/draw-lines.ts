@@ -8,13 +8,13 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ReferenceFrame } from '@app/engine/math/reference-frames';
-import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
+import { IContextMenuConfig, IKeyboardShortcut, RmbMenuContext } from '@app/engine/plugins/core/plugin-capabilities';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { LineColors } from '@app/engine/rendering/line-manager/line';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl, hideEl } from '@app/engine/utils/get-el';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { Kilometers, Satellite } from '@ootk/src/main';
 import { vec4 } from 'gl-matrix';
@@ -152,14 +152,17 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
   // Right-click menu
   // ===========================================================================
 
-  rmbL1ElementName = 'draw-rmb';
-  rmbL1Html = html`<li class="rmb-menu-item" id="draw-rmb"><a href="#">${this.t_('rmbMenu.title')} &#x27A4;</a></li>`;
-  rmbL2ElementName = 'draw-rmb-menu';
-  rmbL2Html = this.buildRmbL2Html_();
-  rmbMenuOrder = 5;
-  isRmbOnEarth = true;
-  isRmbOffEarth = true;
-  isRmbOnSat = true;
+  getContextMenuConfig(): IContextMenuConfig {
+    return {
+      level1ElementName: 'draw-rmb',
+      level1Html: html`<li class="rmb-menu-item" id="draw-rmb"><a href="#">${this.t_('rmbMenu.title')} &#x27A4;</a></li>`,
+      level2ElementName: 'draw-rmb-menu',
+      level2Html: this.buildRmbL2Html_(),
+      order: 5,
+      // The axis/grid actions have no requirements, so the entry is always relevant
+      isVisible: () => true,
+    };
+  }
 
   private buildRmbL2Html_(): string {
     const items = DrawLinesPlugin.DRAW_ACTIONS
@@ -169,7 +172,28 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
     return html`<ul class='dropdown-contents'>${items}</ul>`;
   }
 
-  rmbCallback = (targetId: string, clickedSat?: number): void => {
+  onContextMenuOpen(ctx: RmbMenuContext): void {
+    const sensorManager = ServiceLocator.getSensorManager();
+
+    const flags: Record<DrawRequirement, boolean> = {
+      earth: ctx.surface === 'earth',
+      clickedSat: ctx.target instanceof Satellite || ctx.target instanceof OemSatellite || ctx.target instanceof MissileObject,
+      primarySat: ctx.hasPrimarySelection,
+      sensor: sensorManager.isSensorSelected() && sensorManager.whichRadar !== 'CUSTOM',
+    };
+
+    for (const action of DrawLinesPlugin.DRAW_ACTIONS) {
+      const isAvailable = action.requires.every((requirement) => flags[requirement]);
+
+      if (isAvailable) {
+        showEl(`${action.id}-rmb`);
+      } else {
+        hideEl(`${action.id}-rmb`);
+      }
+    }
+  }
+
+  onContextMenuAction(targetId: string, clickedSat?: number): void {
     const action = DrawLinesPlugin.DRAW_ACTIONS.find((a) => `${a.id}-rmb` === targetId);
 
     if (!action) {
@@ -177,7 +201,7 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
     }
 
     action.run(this.buildRmbContext_(clickedSat));
-  };
+  }
 
   // ===========================================================================
   // Side menu (v13)
@@ -249,30 +273,6 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.onLineAdded, () => {
       this.scheduleListRefresh_();
-    });
-  }
-
-  addJs(): void {
-    super.addJs();
-
-    EventBus.getInstance().on(EventBusEvent.rightBtnMenuOpen, (isEarth: boolean, clickedSatId: number) => {
-      const sensorManager = ServiceLocator.getSensorManager();
-      const selectManager = PluginRegistry.getPlugin(SelectSatManager);
-      const isMobile = settingsManager.isMobileModeEnabled;
-
-      const flags: Record<DrawRequirement, boolean> = {
-        earth: isEarth,
-        // The legacy behavior hides per-satellite lines on mobile, where there is no clicked target.
-        clickedSat: clickedSatId !== -1 && !isMobile,
-        primarySat: (selectManager?.selectedSat ?? -1) !== -1,
-        sensor: sensorManager.isSensorSelected() && sensorManager.whichRadar !== 'CUSTOM',
-      };
-
-      for (const action of DrawLinesPlugin.DRAW_ACTIONS) {
-        if (!action.requires.every((requirement) => flags[requirement])) {
-          hideEl(`${action.id}-rmb`);
-        }
-      }
     });
   }
 
@@ -369,7 +369,7 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
 
     for (const line of lineManagerInstance.lines) {
       const { kind, detail } = line.getDescription();
-      const key = `${kind} ${detail ?? ''}`;
+      const key = `${kind}|${detail ?? ''}`;
       const existing = groups.get(key);
 
       if (existing) {

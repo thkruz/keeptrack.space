@@ -47,6 +47,10 @@
             "all": "Tutta la lista di osservazione"
           }
         }
+      },
+      "rmbMenu": {
+        "addToWatchlist": "Aggiungi alla lista di osservazione",
+        "removeFromWatchlist": "Rimuovi dalla lista di osservazione"
       }
     },
     "WatchlistOverlay": {

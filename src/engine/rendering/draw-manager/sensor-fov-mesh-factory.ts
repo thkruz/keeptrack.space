@@ -122,6 +122,12 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
 
     this.create_(sensor);
 
+    // Explicit fovParams render all faces in one FieldOfViewMesh - the legacy
+    // minAz2 fields on those sensors are display-only
+    if (sensor.fovParams) {
+      return;
+    }
+
     // Create a second sensor if it exists
     if (sensor.minAz2) {
       const sensor2 = new DetailedSensor({

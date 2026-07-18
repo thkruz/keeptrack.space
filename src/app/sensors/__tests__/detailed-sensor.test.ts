@@ -120,6 +120,60 @@ describe('DetailedSensor.isRaeInFov (explicit boresight-centric fovParams)', () 
   });
 });
 
+describe('DetailedSensor.isRaeInFov (multi-face crossed fences)', () => {
+  /**
+   * LeoLabs CRSR-style crossed dual fences: each 2° wide with a 160° arc from
+   * 20° elevation (az 210 / az 120) through zenith to the horizon on the
+   * opposite side (az 30 / az 300). Boresights tilt 10° past zenith.
+   */
+  const crossedFence = () => new DetailedSensor({
+    objName: 'TESTCROSS',
+    lat: 10.6 as Degrees,
+    lon: -85.5 as Degrees,
+    alt: 0 as Kilometers,
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
+    minRng: 100 as Kilometers,
+    maxRng: 3000 as Kilometers,
+    boresightAz: [30, 300] as Degrees[],
+    boresightEl: [80, 80] as Degrees[],
+    fovParams: {
+      halfAngle: 80 as Degrees,
+      minorHalfAngle: 1 as Degrees,
+      rollAngle: 0 as Degrees,
+      minRange: 100 as Kilometers,
+      maxRange: 3000 as Kilometers,
+      minElevation: 0 as Degrees,
+    },
+  });
+
+  it.each([
+    ['face 1 high side (az 210)', 210, 25],
+    ['face 1 low side (az 30, near horizon)', 30, 5],
+    ['face 2 high side (az 120)', 120, 25],
+    ['face 2 low side (az 300, near horizon)', 300, 5],
+    ['zenith (both faces)', 0, 90],
+  ])('accepts a target in %s', (_label, az, el) => {
+    expect(crossedFence().isRaeInFov(az as Degrees, el as Degrees, 1000 as Kilometers)).toBe(true);
+  });
+
+  it.each([
+    ['between the fence planes', 75, 45],
+    ['below the 20° tip on the high side', 210, 15],
+    ['opposite the low side but out of plane', 255, 45],
+  ])('rejects a target %s', (_label, az, el) => {
+    expect(crossedFence().isRaeInFov(az as Degrees, el as Degrees, 1000 as Kilometers)).toBe(false);
+  });
+
+  it('exposes both faces via getFaceFovs for mesh generation', () => {
+    const fovs = crossedFence().getFaceFovs();
+
+    expect(fovs).toHaveLength(2);
+    expect(fovs![0].boresightAz).toBe(30);
+    expect(fovs![1].boresightAz).toBe(300);
+    expect(fovs![0].boresightEl).toBe(80);
+  });
+});
+
 describe('DetailedSensor boresight / span math', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const priv = (s: DetailedSensor) => s as any;

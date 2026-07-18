@@ -33,23 +33,26 @@ export class FieldOfViewMesh extends SensorFovMesh {
   private readonly rangeSegments_ = 8;
 
   override initGeometry_(): void {
-    const fov = this.sensor.getFieldOfView();
+    // Multi-face sensors (crossed fences like LeoLabs CRSR) render every face
+    const fovs = this.sensor.getFaceFovs() ?? [];
 
-    if (!fov) {
+    if (fovs.length === 0) {
       // No explicit FOV available - fall back to the legacy box geometry
       super.initGeometry_();
 
       return;
     }
 
-    // 1. Outer spherical cap at maxRange
-    this.addCapSurface_(fov, fov.maxRange, false);
+    for (const fov of fovs) {
+      // 1. Outer spherical cap at maxRange
+      this.addCapSurface_(fov, fov.maxRange, false);
 
-    // 2. Inner spherical cap at minRange
-    this.addCapSurface_(fov, fov.minRange, true);
+      // 2. Inner spherical cap at minRange
+      this.addCapSurface_(fov, fov.minRange, true);
 
-    // 3. Side wall along the cone boundary
-    this.addWallSurface_(fov);
+      // 3. Side wall along the cone boundary
+      this.addWallSurface_(fov);
+    }
 
     this.vertices_ = new Float32Array(this.verticesTmp_);
     this.indices_ = new Uint16Array(this.indicesTmp_);

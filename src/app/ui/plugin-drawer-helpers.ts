@@ -170,7 +170,12 @@ export function collectDrawerItems(): CollectedDrawerItems {
         label: plugin.bottomIconLabel,
         imgSrc,
         isTopMenu: false,
-        isDisabled: plugin.isIconDisabledOnLoad,
+        // Use the live disabled state, not the load-time default: a sensor/satellite
+        // selection (e.g. restored from persistence or account sync) can flip this
+        // before the footer renders. Rendering from isIconDisabledOnLoad here would
+        // desync the DOM from the plugin's guarded setBottomIconToEnabled(), leaving
+        // the icon permanently grayed and unclickable.
+        isDisabled: plugin.isIconDisabled,
         isLoginRequired: plugin.isLoginRequired,
         order,
       });
@@ -189,7 +194,7 @@ export function collectDrawerItems(): CollectedDrawerItems {
         label: plugin.bottomIconLabel,
         imgSrc,
         isTopMenu: false,
-        isDisabled: plugin.isIconDisabledOnLoad,
+        isDisabled: plugin.isIconDisabled,
         isLoginRequired: plugin.isLoginRequired,
         order,
         shortcutHint: getShortcutHint(plugin.id),

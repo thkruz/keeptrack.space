@@ -192,8 +192,19 @@
     "uuid": "^11.1.0",
     "webgl-obj-loader": "^2.0.8"
   },
-  "overrides": {
-    "esbuild": "0.28.1"
+  "pnpm": {
+    "overrides": {
+      "esbuild": "0.28.1"
+    },
+    "ignoredBuiltDependencies": [
+      "core-js",
+      "esbuild"
+    ]
+  },
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=24",
+    "pnpm": ">=10"
   },
   "volta": {
     "node": "24.14.0"

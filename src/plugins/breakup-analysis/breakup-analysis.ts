@@ -21,7 +21,8 @@ import { BREAKUP_EVENTS, BreakupEvent } from './breakup-events';
 import { buildGabbardOption } from './breakup-gabbard-chart';
 
 // Re-export so existing importers keep a single entry point.
-export { BREAKUP_EVENTS, BreakupEvent };
+export { BREAKUP_EVENTS };
+export type { BreakupEvent };
 
 export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteCapable {
   readonly id = 'BreakupAnalysis';

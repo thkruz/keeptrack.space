@@ -80,6 +80,15 @@ export interface DetailedSensorParams extends Omit<GroundStationParams, 'id'> {
   /** Beamwidth in degrees */
   beamwidth?: Degrees;
 
+  /**
+   * Explicit boresight-centric FOV (ootk elliptical cone). When provided, it
+   * replaces the lossy min/max az/el derivation for the internal sensor, FOV
+   * containment checks, and volume rendering. Required for FOVs that cross
+   * zenith (e.g., Space Fence's fan), which the legacy az/el box cannot
+   * represent.
+   */
+  fovParams?: FieldOfViewParams;
+
   // Additional metadata
   /** Sensor ID for identification */
   sensorId?: number;
@@ -166,6 +175,13 @@ export class DetailedSensor extends GroundStation {
   boresightEl?: Degrees[];
   beamwidth?: Degrees;
 
+  /**
+   * Explicit boresight-centric FOV parameters. Public (not accessor-based) so
+   * they survive structured clone into the position cruncher worker, which
+   * rehydrates sensors with `new DetailedSensor(serialized)`.
+   */
+  fovParams?: FieldOfViewParams;
+
   // Additional metadata
   sensorId?: number;
   changeObjectInterval?: Milliseconds;
@@ -226,6 +242,7 @@ export class DetailedSensor extends GroundStation {
     this.boresightAz = params.boresightAz;
     this.boresightEl = params.boresightEl;
     this.beamwidth = params.beamwidth;
+    this.fovParams = params.fovParams;
 
     // Additional metadata
     this.sensorId = params.sensorId ?? params.id;
@@ -257,8 +274,8 @@ export class DetailedSensor extends GroundStation {
           sensorType: SensorType.PHASED_ARRAY_RADAR,
           fieldOfView: fovParams,
           beamwidth: this.beamwidth ?? (2 as Degrees),
-          boresightAz: this.boresightAz ?? [this.calculateBoresightAz_()],
-          boresightEl: this.boresightEl ?? [this.calculateBoresightEl_()],
+          boresightAz: this.boresightAz ?? [fovParams.boresightAz ?? (0 as Degrees)],
+          boresightEl: this.boresightEl ?? [fovParams.boresightEl ?? (90 as Degrees)],
           shortName: this.shortName,
           system: this.system,
           country: this.country,
@@ -341,6 +358,11 @@ export class DetailedSensor extends GroundStation {
    * Converts legacy azimuth-sector FOV to ootk boresight-centric cone.
    */
   private buildFieldOfViewParams_(): FieldOfViewParams {
+    // Explicit boresight-centric FOV takes priority over the legacy derivation
+    if (this.fovParams) {
+      return { ...this.fovParams };
+    }
+
     // Calculate boresight from center of azimuth sector
     const boresightAz = this.calculateBoresightAz_();
     const boresightEl = this.calculateBoresightEl_();
@@ -450,13 +472,18 @@ export class DetailedSensor extends GroundStation {
 
   /**
    * Check if RAE coordinates are within sensor FOV.
-   * Uses legacy azimuth-sector bounds checking because the ootk FieldOfView
-   * uses a boresight-centric cone model which is geometrically incompatible
-   * with the azimuth-sector FOV used in the sensor catalog.
+   *
+   * Sensors with explicit boresight-centric fovParams use the ootk cone model
+   * (which handles zenith-crossing fans correctly). All other sensors use
+   * legacy azimuth-sector bounds checking, because the cone derived from their
+   * min/max az/el values is geometrically incompatible with the sector FOV
+   * used in the sensor catalog.
    */
   isRaeInFov(az: Degrees, el: Degrees, rng: Kilometers): boolean {
-    // Always use legacy bounds checking - ootk cone model is geometrically
-    // incompatible with azimuth-sector FOV used in sensor catalog
+    if (this.fovParams && this.sensor_) {
+      return this.sensor_.isInFov({ rng, az, el });
+    }
+
     return this.checkFovBoundsLegacy_(az, el, rng);
   }
 
@@ -565,6 +592,7 @@ export class DetailedSensor extends GroundStation {
       boresightAz: this.boresightAz ? [...this.boresightAz] : undefined,
       boresightEl: this.boresightEl ? [...this.boresightEl] : undefined,
       beamwidth: this.beamwidth,
+      fovParams: this.fovParams ? { ...this.fovParams } : undefined,
       sensorId: this.sensorId,
       changeObjectInterval: this.changeObjectInterval,
       commLinks: this.commLinks ? [...this.commLinks] : undefined,

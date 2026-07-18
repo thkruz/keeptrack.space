@@ -378,12 +378,24 @@ export const sensors = <SensorList>{
     lat: <Degrees>8.723, // SDC7-paper1014.pdf
     lon: <Degrees>167.719,
     alt: <Kilometers>0.007,
-    minAz: <Degrees>268, // TODO This needs a better system (same as LEO Labs)
+    // Legacy az/el box kept for UI display only - fovParams below drives FOV checks and rendering
+    minAz: <Degrees>268,
     maxAz: <Degrees>272,
-    minEl: <Degrees>5, // ??
-    maxEl: <Degrees>175, // ??
+    minEl: <Degrees>10,
+    maxEl: <Degrees>170,
     minRng: <Kilometers>50,
     maxRng: <Kilometers>3057.754, // https://www.spaceforce.mil/News/Article/2142648/swinging-for-the-space-fence/
+    // 2°-wide fan from 10° elevation in the west, through zenith, to 10° elevation in the east
+    fovParams: {
+      boresightAz: <Degrees>270,
+      boresightEl: <Degrees>90,
+      halfAngle: <Degrees>80,
+      minorHalfAngle: <Degrees>1,
+      rollAngle: <Degrees>90, // Major axis east-west (roll 0 = north at zenith)
+      minRange: <Kilometers>50,
+      maxRange: <Kilometers>3057.754,
+      minElevation: <Degrees>10,
+    },
     zoom: ZoomValue.LEO,
     volume: true,
     changeObjectInterval: <Milliseconds>2000,

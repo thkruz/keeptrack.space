@@ -1,5 +1,5 @@
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import { Degrees, Kilometers } from '@ootk/src/main';
+import { Degrees, Kilometers, SpaceObjectType } from '@ootk/src/main';
 import { defaultSensor, defaultSat } from '@test/environment/apiMocks';
 
 /*
@@ -59,6 +59,64 @@ describe('DetailedSensor.isRaeInFov (azimuth-sector FOV)', () => {
 
     // 110 misses the primary [0,10] but hits the secondary [100,120].
     expect(dual.isRaeInFov(110 as Degrees, 45 as Degrees, 1000 as Kilometers)).toBe(true);
+  });
+});
+
+describe('DetailedSensor.isRaeInFov (explicit boresight-centric fovParams)', () => {
+  /**
+   * Space Fence style zenith-crossing fan: 2° wide, running from 10° elevation
+   * in the west (az 270), through zenith, to 10° elevation in the east (az 90).
+   * The legacy az/el box cannot represent this - the east half was never
+   * flagged in-FOV before fovParams existed.
+   */
+  const fence = () => new DetailedSensor({
+    objName: 'TESTFENCE',
+    lat: 8.723 as Degrees,
+    lon: 167.719 as Degrees,
+    alt: 0.007 as Kilometers,
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
+    minAz: 268 as Degrees,
+    maxAz: 272 as Degrees,
+    minEl: 10 as Degrees,
+    maxEl: 170 as Degrees,
+    minRng: 50 as Kilometers,
+    maxRng: 3057 as Kilometers,
+    fovParams: {
+      boresightAz: 270 as Degrees,
+      boresightEl: 90 as Degrees,
+      halfAngle: 80 as Degrees,
+      minorHalfAngle: 1 as Degrees,
+      rollAngle: 90 as Degrees,
+      minRange: 50 as Kilometers,
+      maxRange: 3057 as Kilometers,
+      minElevation: 10 as Degrees,
+    },
+  });
+
+  it.each([
+    ['west half of the fan', 270, 45],
+    ['east half of the fan (dead zone under legacy bounds)', 90, 45],
+    ['zenith', 0, 90],
+    ['near the west tip', 270, 12],
+  ])('accepts a target in the %s', (_label, az, el) => {
+    expect(fence().isRaeInFov(az as Degrees, el as Degrees, 1000 as Kilometers)).toBe(true);
+  });
+
+  it.each([
+    ['north (across the thin axis)', 0, 45, 1000],
+    ['south (across the thin axis)', 180, 45, 1000],
+    ['below the minimum elevation', 270, 5, 1000],
+    ['inside the minimum range', 270, 45, 20],
+    ['beyond the maximum range', 270, 45, 4000],
+  ])('rejects a target %s', (_label, az, el, rng) => {
+    expect(fence().isRaeInFov(az as Degrees, el as Degrees, rng as Kilometers)).toBe(false);
+  });
+
+  it('survives a structured-clone round trip (position cruncher rehydration)', () => {
+    const rehydrated = new DetailedSensor(structuredClone(fence()));
+
+    expect(rehydrated.isRaeInFov(90 as Degrees, 45 as Degrees, 1000 as Kilometers)).toBe(true);
+    expect(rehydrated.isRaeInFov(0 as Degrees, 45 as Degrees, 1000 as Kilometers)).toBe(false);
   });
 });
 

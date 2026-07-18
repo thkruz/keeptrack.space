@@ -46,7 +46,7 @@ export class SensorFovMesh extends CustomMesh {
    * A typed array that stores the indices for the bottom part of the sensor field of view mesh.
    * This is used when wanting to display on the bottom of the sensor.
    */
-  private indiciesBottom_: Uint16Array;
+  protected indiciesBottom_: Uint16Array;
 
 
   constructor(sensor: DetailedSensor) {
@@ -131,9 +131,9 @@ export class SensorFovMesh extends CustomMesh {
     gl.disable(gl.BLEND);
   }
 
-  private verticesTmp_: number[] = [];
-  private indicesTmp_: number[] = [];
-  private vertexCount_ = 0;
+  protected verticesTmp_: number[] = [];
+  protected indicesTmp_: number[] = [];
+  protected vertexCount_ = 0;
 
   private createHorzGeometry(
     { azStart, azEnd, elStart, elEnd, rngStart, rngEnd, azSegments, elSegments, reverse = false }: SurfaceMeshParams,

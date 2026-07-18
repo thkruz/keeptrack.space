@@ -6,6 +6,7 @@ import { SpaceObjectType } from '@ootk/src/main';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { mat4 } from 'gl-matrix';
 import { CustomMeshFactory } from './custom-mesh-factory';
+import { FieldOfViewMesh } from './field-of-view-mesh';
 import { SensorFovMesh } from './sensor-fov-mesh';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -149,7 +150,8 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
   }
 
   create_(sensor: DetailedSensor) {
-    const sensorFovMesh = new SensorFovMesh(sensor);
+    // Explicit boresight-centric FOVs render via the cone mesh (handles zenith-crossing fans)
+    const sensorFovMesh = sensor.fovParams ? new FieldOfViewMesh(sensor) : new SensorFovMesh(sensor);
 
     this.add(sensorFovMesh);
 

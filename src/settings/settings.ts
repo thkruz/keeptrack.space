@@ -23,7 +23,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { ColorSchemeColorMap } from '@app/engine/rendering/color-schemes/color-scheme';
 import { ObjectTypeColorSchemeColorMap } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
-import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
+import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { LogLevel, errorManagerInstance } from '../engine/utils/errorManager';
 import { isThisNode } from '../engine/utils/isThisNode';
 import { PersistenceManager, StorageKey } from '../engine/utils/persistence-manager';
@@ -36,6 +36,7 @@ import { defaultColorSettings as importedDefaultColorSettings } from './default-
 import { GraphicsSettings, defaultGraphicsSettings } from './graphics-settings';
 import { OrbitalSettings, defaultOrbitalSettings } from './orbital-settings';
 import { parseGetVariables } from './parse-get-variables';
+import { applyPersistedSetting, PERSISTED_SETTINGS_TABLE } from './persisted-settings-table';
 import { PerformanceSettings, defaultPerformanceSettings } from './performance-settings';
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
@@ -385,6 +386,13 @@ export interface SettingsManager extends
   CoreSettings { }
 
 export class SettingsManager {
+  /**
+   * Persisted-table keys explicitly forced via URL params, presets, or embed
+   * overrides this session. These skip the localStorage restore (and any
+   * post-login remote apply) so explicit boot-time overrides always win.
+   */
+  readonly urlOverriddenSettingKeys = new Set<StorageKey>();
+
   // Category instances - these hold the actual settings
   core: CoreSettings;
   data: DataSettings;
@@ -439,110 +447,68 @@ export class SettingsManager {
     }
   }
 
+  /**
+   * True once the app finished booting (onKeepTrackReady). preserveSettings
+   * writes are dropped before then: plugin init paths (e.g. GraphicsMenu's
+   * syncOnLoad -> updateGodrays_) call preserveSettings while replaying
+   * *loaded* state, and persisting that boot replay would stamp default values
+   * as fresh user intent (clobbering stored/cloud data under LWW).
+   */
+  private static isPersistenceArmed_ = false;
+
+  static armPersistence() {
+    SettingsManager.isPersistenceArmed_ = true;
+  }
+
+  /**
+   * Persist the settings-menu-owned subset to local storage (always, for every
+   * user; a logged-in account layers cloud sync on top of this base layer).
+   * PersistenceManager's equality short-circuit makes redundant writes free.
+   *
+   * Keys explicitly forced via URL params this session are skipped so a forced
+   * value never overwrites the user's stored choice.
+   */
   static preserveSettings() {
-    if (settingsManager.offlineMode) {
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_CAMERA_WIDGET, settingsManager.drawCameraWidget.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ORBITS, settingsManager.isDrawOrbits.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_TRAILING_ORBITS, settingsManager.isDrawTrailingOrbits.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ECF, settingsManager.isOrbitCruncherInEcf.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_IN_COVERAGE_LINES, settingsManager.isDrawInCoverageLines.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_SUN, settingsManager.isDrawSun.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_COVARIANCE_ELLIPSOID, settingsManager.isDrawCovarianceEllipsoid.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_COVARIANCE_CONFIDENCE_LEVEL, settingsManager.covarianceConfidenceLevel.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_BLACK_EARTH, settingsManager.isBlackEarth.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE, settingsManager.isDrawAtmosphere.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_AURORA, settingsManager.isDrawAurora.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_GRATICULE, settingsManager.isDrawGraticule.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_FLAT_MAP_TERMINATOR, settingsManager.isDrawFlatMapTerminator.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_MILKY_WAY, settingsManager.isDrawMilkyWay.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_GRAY_SKYBOX, settingsManager.isGraySkybox.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_ECI_ON_HOVER, settingsManager.isEciOnHover.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_HOS, settingsManager.colors.transparent[3] === 0 ? 'true' : 'false');
-      if (settingsManager.isShowConfidenceLevels) {
-        PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_CONFIDENCE_LEVELS, settingsManager.isShowConfidenceLevels.toString());
-      } else {
-        PersistenceManager.getInstance().removeItem(StorageKey.SETTINGS_CONFIDENCE_LEVELS);
+    if (SettingsManager.isPersistenceArmed_) {
+      const persistence = PersistenceManager.getInstance();
+
+      for (const entry of PERSISTED_SETTINGS_TABLE) {
+        if (settingsManager.urlOverriddenSettingKeys.has(entry.key)) {
+          continue;
+        }
+
+        const value = entry.serialize(settingsManager);
+
+        if (value === null) {
+          persistence.removeItem(entry.key);
+        } else {
+          persistence.saveItem(entry.key, value);
+        }
       }
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DEMO_MODE, settingsManager.isDemoModeOn.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SAT_LABEL_MODE_V2, settingsManager.satLabelMode.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG, settingsManager.isFreezePropRateOnDrag.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS, settingsManager.isDisableTimeMachineToasts.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED, settingsManager.isFocusOnSatelliteWhenSelected.toString());
-      // Search settings (searchLimit, decayed/Vimpel toggles, searchable fields) are owned by SearchSettingsPlugin.
-      PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_SAMPLES, settingsManager.godraysSamples.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DECAY, settingsManager.godraysDecay.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_EXPOSURE, settingsManager.godraysExposure.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DENSITY, settingsManager.godraysDensity.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_WEIGHT, settingsManager.godraysWeight.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY, settingsManager.godraysIlluminationDecay.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION, settingsManager.earthDayTextureQuality?.toString());
-      PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION, settingsManager.earthNightTextureQuality?.toString());
     }
 
     EventBus.getInstance().emit(EventBusEvent.saveSettings);
   }
 
+  /**
+   * Restore the settings-menu-owned subset from local storage. Keys the user
+   * explicitly forced via URL params / presets / embed overrides this session
+   * are skipped so the documented "URL Params > Local Storage > Default"
+   * precedence actually holds.
+   *
+   * Search settings (searchLimit, decayed/Vimpel toggles, searchable fields)
+   * are owned and loaded by SearchSettingsPlugin.
+   */
   loadPersistedSettings() {
-    // Offline Mode only
-    if (!this.offlineMode) {
-      return;
+    const persistence = PersistenceManager.getInstance();
+
+    for (const entry of PERSISTED_SETTINGS_TABLE) {
+      if (this.urlOverriddenSettingKeys.has(entry.key)) {
+        continue;
+      }
+
+      applyPersistedSetting(this, entry.key, persistence.getItem(entry.key));
     }
-
-    this.isDrawOrbits = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_ORBITS, this.isDrawOrbits) as boolean;
-    this.drawCameraWidget = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_CAMERA_WIDGET, this.drawCameraWidget) as boolean;
-    this.isDrawTrailingOrbits = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_TRAILING_ORBITS, this.isDrawTrailingOrbits) as boolean;
-    this.isOrbitCruncherInEcf = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_ECF, this.isOrbitCruncherInEcf) as boolean;
-    this.isDrawInCoverageLines = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_IN_COVERAGE_LINES, this.isDrawInCoverageLines) as boolean;
-    this.isDrawSun = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_SUN, this.isDrawSun) as boolean;
-    this.isDrawCovarianceEllipsoid = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_COVARIANCE_ELLIPSOID, this.isDrawCovarianceEllipsoid) as boolean;
-
-    const storedConfidence = parseInt(PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_COVARIANCE_CONFIDENCE_LEVEL) ?? '', 10);
-
-    if (storedConfidence >= 1 && storedConfidence <= 3) {
-      this.covarianceConfidenceLevel = storedConfidence;
-    }
-    this.isBlackEarth = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_BLACK_EARTH, this.isBlackEarth) as boolean;
-    this.isDrawAtmosphere = parseInt(PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE) ?? '1') as AtmosphereSettings;
-    this.isDrawAurora = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_AURORA, this.isDrawAurora) as boolean;
-    this.isDrawGraticule = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_GRATICULE, this.isDrawGraticule) as boolean;
-    this.isDrawFlatMapTerminator =
-      PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_FLAT_MAP_TERMINATOR, this.isDrawFlatMapTerminator) as boolean;
-    this.isDrawMilkyWay = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_MILKY_WAY, this.isDrawMilkyWay) as boolean;
-    this.isGraySkybox = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_GRAY_SKYBOX, this.isGraySkybox) as boolean;
-    this.isEciOnHover = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_ECI_ON_HOVER, this.isEciOnHover) as boolean;
-    if (settingsManager.isShowConfidenceLevels) {
-      this.isShowConfidenceLevels = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_CONFIDENCE_LEVELS, this.isShowConfidenceLevels) as boolean;
-    } else {
-      this.isShowConfidenceLevels = false;
-    }
-    this.isDemoModeOn = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DEMO_MODE, this.isDemoModeOn) as boolean;
-    const satLabelModeV2String = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_SAT_LABEL_MODE_V2);
-
-    if (satLabelModeV2String !== null) {
-      this.satLabelMode = parseInt(satLabelModeV2String) as SatLabelMode;
-    } else {
-      // Migrate from old boolean key
-      const oldLabelMode = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_SAT_LABEL_MODE, true) as boolean;
-
-      this.satLabelMode = oldLabelMode ? SatLabelMode.FOV_ONLY : SatLabelMode.OFF;
-    }
-    this.isFreezePropRateOnDrag = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG, this.isFreezePropRateOnDrag) as boolean;
-    this.isDisableTimeMachineToasts = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS, this.isDisableTimeMachineToasts) as boolean;
-    this.isFocusOnSatelliteWhenSelected = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED, this.isFocusOnSatelliteWhenSelected) as boolean;
-
-    const earthDayTextureQaulityString = PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION);
-
-    if (earthDayTextureQaulityString !== null) {
-      this.earthDayTextureQuality = earthDayTextureQaulityString as EarthDayTextureQuality;
-    }
-
-    const earthNightTextureQaulityString = PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION);
-
-    if (earthNightTextureQaulityString !== null) {
-      this.earthNightTextureQuality = earthNightTextureQaulityString as EarthNightTextureQuality;
-    }
-
-    // Search settings (searchLimit, decayed/Vimpel toggles, searchable fields) are loaded by SearchSettingsPlugin.
   }
 
   init(settingsOverride?: SettingsManagerOverride) {
@@ -561,6 +527,15 @@ export class SettingsManager {
     this.checkIfIframe_();
     this.setInstallDirectory_();
     MobileManager.checkMobileMode();
+
+    /*
+     * Baseline snapshot of every persisted setting BEFORE embed/URL/preset
+     * overrides run. Diffed afterwards to detect which settings were explicitly
+     * forced this session (recordUrlOverriddenSettings_), so localStorage never
+     * silently beats an explicit boot-time override.
+     */
+    const preOverrideSnapshot = this.snapshotPersistedSettings_();
+
     this.setEmbedOverrides_();
     this.setColorSettings_();
 
@@ -587,6 +562,9 @@ export class SettingsManager {
       parseGetVariables(params, this);
     }
     settingsManager.isBlockPersistence = UrlManager.parseGetVariables(this) || settingsManager.isBlockPersistence;
+
+    // Any persisted setting the overrides changed is treated as explicitly set
+    this.recordUrlOverriddenSettings_(preOverrideSnapshot);
 
     if (!settingsManager.isBlockPersistence) {
       /**
@@ -619,12 +597,53 @@ export class SettingsManager {
     }
 
     this.loadLastMapTexture_();
+
+    /*
+     * Arm persistence only once the app is fully booted: plugin init paths
+     * replay loaded state through preserveSettings, and persisting that replay
+     * would stamp boot values as fresh user intent.
+     */
+    EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
+      SettingsManager.armPersistence();
+    });
   }
 
   private checkIfIframe_() {
     if (window.self !== window.top) {
       this.isInIframe = true;
       this.isShowPrimaryLogo = true;
+    }
+  }
+
+  /** Serialized view of every persisted-table setting, used to diff override effects. */
+  private snapshotPersistedSettings_(): Map<StorageKey, string | null> {
+    const snapshot = new Map<StorageKey, string | null>();
+
+    for (const entry of PERSISTED_SETTINGS_TABLE) {
+      try {
+        snapshot.set(entry.key, entry.serialize(this));
+      } catch {
+        snapshot.set(entry.key, null);
+      }
+    }
+
+    return snapshot;
+  }
+
+  /** Mark every persisted setting whose value changed during override parsing as explicitly set. */
+  private recordUrlOverriddenSettings_(preOverrideSnapshot: Map<StorageKey, string | null>): void {
+    for (const entry of PERSISTED_SETTINGS_TABLE) {
+      let current: string | null = null;
+
+      try {
+        current = entry.serialize(this);
+      } catch {
+        continue;
+      }
+
+      if (preOverrideSnapshot.get(entry.key) !== current) {
+        this.urlOverriddenSettingKeys.add(entry.key);
+      }
     }
   }
 

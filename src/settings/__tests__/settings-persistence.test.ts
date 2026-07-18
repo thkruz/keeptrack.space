@@ -11,6 +11,8 @@ describe('SettingsManager persistence', () => {
 
   beforeEach(() => {
     originalOffline = sm().offlineMode;
+    // preserveSettings drops writes until the app signals boot completion
+    SettingsManager.armPersistence();
   });
 
   afterEach(() => {
@@ -35,8 +37,8 @@ describe('SettingsManager persistence', () => {
   });
 
   describe('preserveSettings (static)', () => {
-    it('persists draw settings when offline mode is on', () => {
-      sm().offlineMode = true;
+    it('persists draw settings regardless of offline mode', () => {
+      sm().offlineMode = false;
       sm().isDrawOrbits = true;
       const saveSpy = vi.spyOn(PersistenceManager.getInstance(), 'saveItem');
 
@@ -45,16 +47,21 @@ describe('SettingsManager persistence', () => {
       expect(saveSpy).toHaveBeenCalledWith(StorageKey.SETTINGS_DRAW_ORBITS, 'true');
     });
 
-    it('does not write items when offline mode is off but still emits saveSettings', () => {
-      sm().offlineMode = false;
+    it('never writes keys the URL explicitly overrode this session', () => {
+      sm().urlOverriddenSettingKeys.add(StorageKey.SETTINGS_DRAW_ORBITS);
       const saveSpy = vi.spyOn(PersistenceManager.getInstance(), 'saveItem');
 
-      expect(() => SettingsManager.preserveSettings()).not.toThrow();
-      expect(saveSpy).not.toHaveBeenCalled();
+      try {
+        SettingsManager.preserveSettings();
+
+        expect(saveSpy).not.toHaveBeenCalledWith(StorageKey.SETTINGS_DRAW_ORBITS, expect.anything());
+        expect(saveSpy).toHaveBeenCalledWith(StorageKey.SETTINGS_DRAW_SUN, expect.anything());
+      } finally {
+        sm().urlOverriddenSettingKeys.delete(StorageKey.SETTINGS_DRAW_ORBITS);
+      }
     });
 
     it('removes the confidence-levels key when the setting is off', () => {
-      sm().offlineMode = true;
       sm().isShowConfidenceLevels = false;
       const removeSpy = vi.spyOn(PersistenceManager.getInstance(), 'removeItem');
 
@@ -65,22 +72,10 @@ describe('SettingsManager persistence', () => {
   });
 
   describe('loadPersistedSettings', () => {
-    it('returns early without mutating when not in offline mode', () => {
+    it('loads boolean draw settings from storage regardless of offline mode', () => {
       const settings = new SettingsManager();
 
       settings.offlineMode = false;
-      settings.isDrawOrbits = false;
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ORBITS, 'true');
-
-      settings.loadPersistedSettings();
-
-      expect(settings.isDrawOrbits).toBe(false);
-    });
-
-    it('loads boolean draw settings from storage in offline mode', () => {
-      const settings = new SettingsManager();
-
-      settings.offlineMode = true;
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ORBITS, 'true');
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_SUN, 'false');
 
@@ -90,17 +85,45 @@ describe('SettingsManager persistence', () => {
       expect(settings.isDrawSun).toBe(false);
     });
 
+    it('skips keys the URL explicitly overrode this session', () => {
+      const settings = new SettingsManager();
+
+      settings.isDrawOrbits = false;
+      settings.urlOverriddenSettingKeys.add(StorageKey.SETTINGS_DRAW_ORBITS);
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ORBITS, 'true');
+
+      settings.loadPersistedSettings();
+
+      expect(settings.isDrawOrbits).toBe(false);
+    });
+
     // Search-setting persistence (searchLimit, decayed/Vimpel toggles, searchable fields)
     // is owned by SearchSettingsPlugin and covered by its own tests.
 
     it('migrates the legacy boolean sat-label key when the v2 key is absent', () => {
       const settings = new SettingsManager();
 
-      settings.offlineMode = true;
       PersistenceManager.getInstance().removeItem(StorageKey.SETTINGS_SAT_LABEL_MODE_V2);
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SAT_LABEL_MODE, 'true');
 
       expect(() => settings.loadPersistedSettings()).not.toThrow();
+    });
+  });
+
+  describe('URL override precedence', () => {
+    it('marks settings changed during override parsing as explicitly set', () => {
+      const settings = new SettingsManager();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const snapshot = (settings as any).snapshotPersistedSettings_();
+
+      // Simulate a URL param flipping a draw setting during override parsing
+      settings.isDrawOrbits = !settings.isDrawOrbits;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (settings as any).recordUrlOverriddenSettings_(snapshot);
+
+      expect(settings.urlOverriddenSettingKeys.has(StorageKey.SETTINGS_DRAW_ORBITS)).toBe(true);
+      expect(settings.urlOverriddenSettingKeys.has(StorageKey.SETTINGS_DRAW_SUN)).toBe(false);
     });
   });
 

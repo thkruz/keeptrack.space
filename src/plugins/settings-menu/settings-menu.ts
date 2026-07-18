@@ -16,6 +16,9 @@ import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import settingsPng from '@public/img/icons/settings.png';
+import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
+import { StorageKey } from '@app/engine/persistence/storage-key';
+import { applyPersistedSetting } from '@app/settings/persisted-settings-table';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { attachSettingControlListeners, renderSettingsSection } from './settings-control-renderer';
 import './settings-menu.css';
@@ -144,6 +147,48 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     );
 
     EventBus.getInstance().on(EventBusEvent.settingsMenuRefresh, SettingsMenuPlugin.renderAllSections_);
+
+    // Account sync applied cloud-newer values to persistence: reflect them live
+    EventBus.getInstance().on(EventBusEvent.remoteSettingsApplied, SettingsMenuPlugin.onRemoteSettingsApplied_);
+  }
+
+  /**
+   * Apply cloud-synced values from PersistenceManager onto settingsManager and
+   * run the runtime side effects a settings-menu toggle would have triggered.
+   * Keys the URL explicitly overrode this session keep their forced value.
+   */
+  private static onRemoteSettingsApplied_(changedKeys: StorageKey[]): void {
+    const persistence = PersistenceManager.getInstance();
+    let anyApplied = false;
+    let needsOrbitRedraw = false;
+    let needsOrbitTypeUpdate = false;
+
+    for (const key of changedKeys) {
+      if (settingsManager.urlOverriddenSettingKeys.has(key)) {
+        continue;
+      }
+
+      if (!applyPersistedSetting(settingsManager, key, persistence.getItem(key))) {
+        continue;
+      }
+
+      anyApplied = true;
+      if (key === StorageKey.SETTINGS_DRAW_ORBITS) {
+        needsOrbitRedraw = true;
+      } else if (key === StorageKey.SETTINGS_DRAW_TRAILING_ORBITS) {
+        needsOrbitTypeUpdate = true;
+      }
+    }
+
+    if (needsOrbitRedraw) {
+      ServiceLocator.getOrbitManager().drawOrbitsSettingChanged();
+    }
+    if (needsOrbitTypeUpdate) {
+      ServiceLocator.getOrbitManager().updateOrbitType();
+    }
+    if (anyApplied) {
+      SettingsMenuPlugin.renderAllSections_();
+    }
   }
 
   private static collectPluginContributions_(): ISettingsContribution[] {

@@ -334,6 +334,21 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     });
 
     EventBus.getInstance().on(EventBusEvent.selectSatData, this.selectSatData_.bind(this));
+
+    // Account sync applied a cloud-newer watchlist: reload it from persistence
+    EventBus.getInstance().on(EventBusEvent.remoteSettingsApplied, (changedKeys) => {
+      if (changedKeys.includes(StorageKey.WATCHLIST_LIST)) {
+        this.reloadFromPersistence_();
+      }
+    });
+  }
+
+  /** Re-apply the persisted watchlist (used when cloud sync updates it post-boot). */
+  protected reloadFromPersistence_(): void {
+    const watchlistString = PersistenceManager.getInstance().getItem(StorageKey.WATCHLIST_LIST) ?? '[]';
+    const newWatchlist = this.createNewWatchlist(watchlistString);
+
+    this.updateWatchlist({ updateWatchlistList: newWatchlist, isSkipSearch: true });
   }
 
   protected satInfoBoxFinal_() {
@@ -378,13 +393,10 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
    * @returns A promise that resolves to void.
    */
   protected async onCruncherReady_(): Promise<void> {
-    if (!settingsManager.offlineMode) {
-      return;
-    }
-
     let watchlistString = PersistenceManager.getInstance().getItem(StorageKey.WATCHLIST_LIST);
 
-    if (!watchlistString || watchlistString === '[]') {
+    // Offline builds bootstrap a default watchlist from disk; web builds start empty
+    if ((!watchlistString || watchlistString === '[]') && settingsManager.offlineMode) {
       try {
         watchlistString = await fetch(`${settingsManager.installDirectory}tle/watchlist.json`).then((response) => response.text());
       } catch {
@@ -620,9 +632,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
 
     colorSchemeManager.calculateColorBuffers(true); // force color recalc
 
-    if (settingsManager.offlineMode) {
-      PersistenceManager.getInstance().saveItem(StorageKey.WATCHLIST_LIST, this.serialize());
-    }
+    PersistenceManager.getInstance().saveItem(StorageKey.WATCHLIST_LIST, this.serialize());
   }
 
   selectSat(id: number) {

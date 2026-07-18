@@ -465,18 +465,16 @@ export class SensorManager {
       }
     }
 
-    // Run any callbacks
-    if (settingsManager.offlineMode) {
-      let sensorData: string | { objName: string } | null = null;
+    let sensorData: string | { objName: string } | null = null;
 
-      if (typeof selectedSensor === 'string') {
-        sensorData = selectedSensor;
-      } else if (selectedSensor) {
-        sensorData = { objName: selectedSensor.objName };
-      }
-
-      PersistenceManager.getInstance().saveItem(StorageKey.CURRENT_SENSOR, JSON.stringify([sensorData, sensorId]));
+    if (typeof selectedSensor === 'string') {
+      sensorData = selectedSensor;
+    } else if (selectedSensor) {
+      sensorData = { objName: selectedSensor.objName };
     }
+
+    PersistenceManager.getInstance().saveItem(StorageKey.CURRENT_SENSOR, JSON.stringify([sensorData, sensorId]));
+
     EventBus.getInstance().emit(EventBusEvent.setSensor, selectedSensor, sensorId ?? null);
 
     // Re-fire satellite selection so plugins that need both sensor + satellite can reevaluate
@@ -559,13 +557,9 @@ export class SensorManager {
   }
 
   /**
-   * Load JSON either by input or through PersistenceManager - Offline Mode only
+   * Load JSON either by input or through PersistenceManager
    */
   loadSensorJson(json?: string | null): void {
-    if (!settingsManager.offlineMode) {
-      return;
-    }
-
     json ??= PersistenceManager.getInstance().getItem(StorageKey.CURRENT_SENSOR);
 
     if (!json) {

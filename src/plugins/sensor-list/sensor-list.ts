@@ -7,6 +7,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { StorageKey } from '@app/engine/persistence/storage-key';
 import { ICommandPaletteCapable, ICommandPaletteCommand, IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -324,11 +325,18 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
     EventBus.getInstance().on(
       EventBusEvent.onCruncherReady,
       () => {
-        if (!settingsManager.disableUI && settingsManager.isLoadLastSensor && settingsManager.offlineMode) {
+        if (!settingsManager.disableUI && settingsManager.isLoadLastSensor) {
           ServiceLocator.getSensorManager().loadSensorJson();
         }
       },
     );
+
+    // Account sync applied a cloud-newer sensor selection: re-apply it
+    EventBus.getInstance().on(EventBusEvent.remoteSettingsApplied, (changedKeys) => {
+      if (changedKeys.includes(StorageKey.CURRENT_SENSOR)) {
+        ServiceLocator.getSensorManager().loadSensorJson();
+      }
+    });
 
   }
 

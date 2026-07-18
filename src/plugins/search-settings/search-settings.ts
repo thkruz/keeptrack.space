@@ -170,6 +170,23 @@ export class SearchSettingsPlugin extends KeepTrackPlugin {
     EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
       this.wireListeners_();
     });
+
+    // Account sync applied cloud-newer search settings: re-read and re-render
+    EventBus.getInstance().on(EventBusEvent.remoteSettingsApplied, (changedKeys) => {
+      const searchKeys = new Set<StorageKey>([
+        StorageKey.SETTINGS_SEARCH_LIMIT,
+        StorageKey.SETTINGS_SHOW_DECAYED_IN_SEARCH,
+        StorageKey.SETTINGS_MINIMUM_SEARCH_CHARACTERS,
+        StorageKey.SETTINGS_SHOW_VIMPEL_IN_SEARCH,
+        StorageKey.SETTINGS_SEARCHABLE_FIELDS,
+        StorageKey.SETTINGS_SEARCHABLE_TYPES,
+      ]);
+
+      if (changedKeys.some((key) => searchKeys.has(key))) {
+        this.loadPersistedSettings_();
+        this.syncUi_();
+      }
+    });
   }
 
   private wireListeners_() {

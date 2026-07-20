@@ -14,7 +14,7 @@
       "!src/tle/**",
       "!src/tools/**",
       "!src/engine/ootk/**",
-      "!src/plugins-pro/**",
+      "!!src/plugins-pro/**",
       "!src/locales/keys.ts",
       "!src/locales/*.json",
       "!src/plugins/plugin-manifest.external.generated.ts",

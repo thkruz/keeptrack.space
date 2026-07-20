@@ -18,16 +18,16 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { settingsManager } from '@app/settings/settings';
 import checkCirclePng from '@public/img/icons/check-circle.png';
 import type { User } from '@supabase/supabase-js';
-import { buildMissions, MISSION_POWER_TOUR, sortMissionsForPersona, wireMissionAutoChecks, type ChecklistMission } from './checklist';
+import { buildMissions, type ChecklistMission, MISSION_POWER_TOUR, sortMissionsForPersona, wireMissionAutoChecks } from './checklist';
 import { GetStartedCard } from './get-started-card';
 import {
+  type ChapterId,
   createDefaultOnboardingState,
   isResumable,
   loadOnboardingState,
-  saveOnboardingState,
-  type ChapterId,
   type OnboardingPersona,
   type OnboardingState,
+  saveOnboardingState,
 } from './onboarding-state';
 import { l } from './onboarding-t7e';
 import { areAllAvailableChaptersDone, buildHubStep, POWER_CHAPTERS } from './power-hub';
@@ -315,9 +315,7 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
       kind: 'card',
       title: l('welcome.title'),
       body: l('welcome.body'),
-      extraHtml:
-        `<div class="kt-tour-persona"><div class="kt-tour-persona-label">${l('welcome.personaQuestion')}</div>` +
-        `<div class="kt-tour-chips">${personaChips}</div></div>`,
+      extraHtml: `<div class="kt-tour-persona"><div class="kt-tour-persona-label">${l('welcome.personaQuestion')}</div>` + `<div class="kt-tour-chips">${personaChips}</div></div>`,
       buttons: [
         { id: 'start', label: l('buttons.startTour'), isPrimary: true },
         { id: 'explore', label: l('buttons.exploreOnMyOwn') },
@@ -415,12 +413,7 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
       kind: 'card',
       title: l('bridge.title'),
       body: l('bridge.body'),
-      extraHtml:
-        '<ul class="kt-tour-recap">' +
-        `<li>${l('bridge.recap1')}</li>` +
-        `<li>${l('bridge.recap2')}</li>` +
-        `<li>${l('bridge.recap3')}</li>` +
-        '</ul>',
+      extraHtml: '<ul class="kt-tour-recap">' + `<li>${l('bridge.recap1')}</li>` + `<li>${l('bridge.recap2')}</li>` + `<li>${l('bridge.recap3')}</li>` + '</ul>',
       buttons: [
         { id: 'power', label: l('buttons.keepGoing'), isPrimary: isPowerPrimary },
         { id: 'finish', label: l('buttons.finishUp'), isPrimary: !isPowerPrimary },
@@ -491,7 +484,7 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
     this.teardownEngine_();
 
     const progress = this.state_.powerChapters[chapterId];
-    const resumeStepId = progress.status === 'done' ? undefined : progress.stepId ?? undefined;
+    const resumeStepId = progress.status === 'done' ? undefined : (progress.stepId ?? undefined);
 
     progress.status = 'in-progress';
     this.state_.tiers.power = 'in-progress';
@@ -554,10 +547,7 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
   // =========================================================================
 
   private isAccountStepAvailable_(): boolean {
-    return (
-      typeof KeepTrackPlugin.loginGateOpenModal === 'function' &&
-      !document.body.classList.contains('user-logged-in')
-    );
+    return typeof KeepTrackPlugin.loginGateOpenModal === 'function' && !document.body.classList.contains('user-logged-in');
   }
 
   private showAccount_(): void {
@@ -578,12 +568,7 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
       kind: 'card',
       title: l('account.title'),
       body: isPowerDone ? l('account.bodyPower') : l('account.body'),
-      extraHtml:
-        '<ul class="kt-tour-recap">' +
-        `<li>${l('account.benefit1')}</li>` +
-        `<li>${l('account.benefit2')}</li>` +
-        `<li>${l('account.benefit3')}</li>` +
-        '</ul>',
+      extraHtml: '<ul class="kt-tour-recap">' + `<li>${l('account.benefit1')}</li>` + `<li>${l('account.benefit2')}</li>` + `<li>${l('account.benefit3')}</li>` + '</ul>',
       buttons: [
         { id: 'create', label: l('buttons.createAccount'), isPrimary: true },
         { id: 'later', label: l('buttons.maybeLater') },
@@ -600,15 +585,19 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
     };
     EventBus.getInstance().on(EventBusEvent.userLogin, this.accountLoginCb_);
 
-    this.runCardStage_(accountStep, (buttonId: string) => {
-      if (buttonId === 'create') {
-        this.track_('onboarding_account_cta_clicked');
-        KeepTrackPlugin.loginGateOpenModal?.();
-      } else {
-        this.clearAccountLoginCb_();
-        this.finishTour_(true);
-      }
-    }, { isKeepOpenOn: ['create'] });
+    this.runCardStage_(
+      accountStep,
+      (buttonId: string) => {
+        if (buttonId === 'create') {
+          this.track_('onboarding_account_cta_clicked');
+          KeepTrackPlugin.loginGateOpenModal?.();
+        } else {
+          this.clearAccountLoginCb_();
+          this.finishTour_(true);
+        }
+      },
+      { isKeepOpenOn: ['create'] }
+    );
   }
 
   private clearAccountLoginCb_(): void {
@@ -664,11 +653,7 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
    * the next stage; buttons listed in isKeepOpenOn leave the card up (e.g. the
    * account CTA opens the login modal on top of the card).
    */
-  private runCardStage_(
-    step: TourStep,
-    onButton: (buttonId: string) => void,
-    options: { isKeepOpenOn?: string[] } = {},
-  ): void {
+  private runCardStage_(step: TourStep, onButton: (buttonId: string) => void, options: { isKeepOpenOn?: string[] } = {}): void {
     this.teardownEngine_();
 
     this.engine_ = new TourEngine({
@@ -714,8 +699,7 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
   // =========================================================================
 
   private visibleMissions_(): ChecklistMission[] {
-    return sortMissionsForPersona(this.missions_, this.state_.persona)
-      .filter((mission) => mission.isVisible?.(this.state_) !== false);
+    return sortMissionsForPersona(this.missions_, this.state_.persona).filter((mission) => mission.isVisible?.(this.state_) !== false);
   }
 
   private checklistPercent_(): number {

@@ -1,6 +1,6 @@
-import { vi } from 'vitest';
 import { OrbitGuardMenuPlugin } from '@app/plugins/orbit-guard-menu/orbit-guard-menu';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { vi } from 'vitest';
 
 // OrbitGuardMenuPlugin's init wires to DOM elements created by other plugins,
 // so the standard init suite does not apply. Cover construction instead.

@@ -1,10 +1,4 @@
-import {
-  CountryCode,
-  MissionCategory,
-  ObjFlags,
-  SourceCode,
-  type ColorDataArrays,
-} from '@app/engine/rendering/color-worker/color-data-arrays';
+import { type ColorDataArrays, CountryCode, MissionCategory, ObjFlags, SourceCode } from '@app/engine/rendering/color-worker/color-data-arrays';
 import { vi } from 'vitest';
 
 // ColorWorkerMsgType const-enum values (erased at compile time).
@@ -69,24 +63,60 @@ const buildCatalog = (): ColorDataArrays => {
 
   return {
     type: i8([
-      SOT.PAYLOAD, SOT.ROCKET_BODY, SOT.DEBRIS, SOT.PAYLOAD, SOT.UNKNOWN,
-      SOT.PAYLOAD, SOT.UNKNOWN, SOT.CONTROL_FACILITY, SOT.UNKNOWN, SOT.UNKNOWN,
-      SOT.UNKNOWN, SOT.NOTIONAL,
+      SOT.PAYLOAD,
+      SOT.ROCKET_BODY,
+      SOT.DEBRIS,
+      SOT.PAYLOAD,
+      SOT.UNKNOWN,
+      SOT.PAYLOAD,
+      SOT.UNKNOWN,
+      SOT.CONTROL_FACILITY,
+      SOT.UNKNOWN,
+      SOT.UNKNOWN,
+      SOT.UNKNOWN,
+      SOT.NOTIONAL,
     ]),
     objFlags: u8([
-      ObjFlags.NONE, ObjFlags.NONE, ObjFlags.NONE, ObjFlags.NONE, ObjFlags.NONE,
-      ObjFlags.IS_STARLINK, ObjFlags.IS_STAR, ObjFlags.IS_SENSOR, ObjFlags.IS_MARKER, ObjFlags.IS_PLANET,
-      ObjFlags.IS_MISSILE, ObjFlags.NONE,
+      ObjFlags.NONE,
+      ObjFlags.NONE,
+      ObjFlags.NONE,
+      ObjFlags.NONE,
+      ObjFlags.NONE,
+      ObjFlags.IS_STARLINK,
+      ObjFlags.IS_STAR,
+      ObjFlags.IS_SENSOR,
+      ObjFlags.IS_MARKER,
+      ObjFlags.IS_PLANET,
+      ObjFlags.IS_MISSILE,
+      ObjFlags.NONE,
     ]),
     country: u8([
-      CountryCode.US, CountryCode.RU, CountryCode.CN, CountryCode.F, CountryCode.OTHER,
-      CountryCode.US, CountryCode.OTHER, CountryCode.OTHER, CountryCode.OTHER, CountryCode.OTHER,
-      CountryCode.J, CountryCode.OTHER,
+      CountryCode.US,
+      CountryCode.RU,
+      CountryCode.CN,
+      CountryCode.F,
+      CountryCode.OTHER,
+      CountryCode.US,
+      CountryCode.OTHER,
+      CountryCode.OTHER,
+      CountryCode.OTHER,
+      CountryCode.OTHER,
+      CountryCode.J,
+      CountryCode.OTHER,
     ]),
     source: u8([
-      SourceCode.CELESTRAK, SourceCode.USSF, SourceCode.VIMPEL, SourceCode.CELESTRAK, SourceCode.SATNOGS,
-      SourceCode.CELESTRAK, SourceCode.OTHER, SourceCode.OTHER, SourceCode.OTHER, SourceCode.OTHER,
-      SourceCode.KEEPTRACK, SourceCode.CELESTRAK_SUP,
+      SourceCode.CELESTRAK,
+      SourceCode.USSF,
+      SourceCode.VIMPEL,
+      SourceCode.CELESTRAK,
+      SourceCode.SATNOGS,
+      SourceCode.CELESTRAK,
+      SourceCode.OTHER,
+      SourceCode.OTHER,
+      SourceCode.OTHER,
+      SourceCode.OTHER,
+      SourceCode.KEEPTRACK,
+      SourceCode.CELESTRAK_SUP,
     ]),
     apogee: f32([550, 800, 700, 35800, 1200, 560, 0, 0, 0, 0, 500, 600]),
     perigee: f32([540, 780, 690, 35780, 1100, 550, 0, 0, 0, 0, 480, 590]),
@@ -96,17 +126,24 @@ const buildCatalog = (): ColorDataArrays => {
     status: u8([PS_OPERATIONAL, 0, 0, PS_OPERATIONAL, 0, PS_OPERATIONAL, 0, 0, 0, 0, 0, 0]),
     vmag: f32([5, 6, NaN, 4, NaN, 7, 3, NaN, NaN, NaN, NaN, NaN]),
     mission: u8([
-      MissionCategory.COMMUNICATION, MissionCategory.UNKNOWN, MissionCategory.UNKNOWN, MissionCategory.NAVIGATION, MissionCategory.UNKNOWN,
-      MissionCategory.COMMUNICATION, MissionCategory.UNKNOWN, MissionCategory.UNKNOWN, MissionCategory.UNKNOWN, MissionCategory.UNKNOWN,
-      MissionCategory.MILITARY, MissionCategory.UNKNOWN,
+      MissionCategory.COMMUNICATION,
+      MissionCategory.UNKNOWN,
+      MissionCategory.UNKNOWN,
+      MissionCategory.NAVIGATION,
+      MissionCategory.UNKNOWN,
+      MissionCategory.COMMUNICATION,
+      MissionCategory.UNKNOWN,
+      MissionCategory.UNKNOWN,
+      MissionCategory.UNKNOWN,
+      MissionCategory.UNKNOWN,
+      MissionCategory.MILITARY,
+      MissionCategory.UNKNOWN,
     ]),
     tle1EpochYear: u8([24, 23, 22, 24, 20, 24, 0, 0, 0, 0, 24, 24]),
     tle1EpochDay: f32([1, 100, 200, 50, 10, 5, 0, 0, 0, 0, 1, 1]),
     tle1Confidence: u8([5, 3, 1, 5, 2, 5, 0, 0, 0, 0, 0, 0]),
     starColorTemp: f32([0, 0, 0, 0, 0, 0, 5800, 0, 0, 0, 0, 0]),
-    specialColor: Float32Array.from(
-      Array.from({ length: n * 4 }, (_, k) => (Math.floor(k / 4) === 9 ? 0.5 : 0)),
-    ),
+    specialColor: Float32Array.from(Array.from({ length: n * 4 }, (_, k) => (Math.floor(k / 4) === 9 ? 0.5 : 0))),
     active: u8([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]),
     numObjects: n,
   };
@@ -119,13 +156,16 @@ const loadWorker = async () => {
 };
 
 const dispatch = (data: Record<string, unknown>) => {
-  (globalThis.onmessage as ((m: { data: unknown }) => void))({ data });
+  (globalThis.onmessage as (m: { data: unknown }) => void)({ data });
 };
 
-interface ColorResult { colorData?: Float32Array; pickableData?: Int8Array; seqNum?: number }
+interface ColorResult {
+  colorData?: Float32Array;
+  pickableData?: Int8Array;
+  seqNum?: number;
+}
 
-const lastColorResult = (): ColorResult | undefined =>
-  posted.filter((p): p is ColorResult => typeof p === 'object' && p !== null && 'colorData' in p).at(-1);
+const lastColorResult = (): ColorResult | undefined => posted.filter((p): p is ColorResult => typeof p === 'object' && p !== null && 'colorData' in p).at(-1);
 
 describe('colorCruncher', () => {
   beforeEach(() => {
@@ -232,13 +272,36 @@ describe('colorCruncher', () => {
     dispatch({ typ: MSG.UPDATE_SCHEME, schemeId: 'ObjectTypeColorScheme' });
 
     const allOff = (over: Record<string, boolean>) => ({
-      debris: false, operationalPayloads: false, nonOperationalPayloads: false, rocketBodies: false,
-      unknownType: false, notionalSatellites: false, vLEOSatellites: true, lEOSatellites: true,
-      mEOSatellites: true, hEOSatellites: true, gEOSatellites: true, xGEOSatellites: true,
-      unitedStates: true, unitedKingdom: true, france: true, germany: true, japan: true, china: true,
-      india: true, russia: true, uSSR: true, southKorea: true, australia: true, otherCountries: true,
-      vimpelSatellites: true, celestrakSatellites: true, celestrakSupSatellites: true,
-      satnogsSatellites: true, starlinkSatellites: true, ...over,
+      debris: false,
+      operationalPayloads: false,
+      nonOperationalPayloads: false,
+      rocketBodies: false,
+      unknownType: false,
+      notionalSatellites: false,
+      vLEOSatellites: true,
+      lEOSatellites: true,
+      mEOSatellites: true,
+      hEOSatellites: true,
+      gEOSatellites: true,
+      xGEOSatellites: true,
+      unitedStates: true,
+      unitedKingdom: true,
+      france: true,
+      germany: true,
+      japan: true,
+      china: true,
+      india: true,
+      russia: true,
+      uSSR: true,
+      southKorea: true,
+      australia: true,
+      otherCountries: true,
+      vimpelSatellites: true,
+      celestrakSatellites: true,
+      celestrakSupSatellites: true,
+      satnogsSatellites: true,
+      starlinkSatellites: true,
+      ...over,
     });
 
     posted = [];
@@ -258,11 +321,21 @@ describe('colorCruncher', () => {
     posted = [];
 
     // Three rapid updates collapse to a single debounced recolor.
-    dispatch({ typ: MSG.UPDATE_SETTINGS, settingsFlags: {
-      cameraType: 0, isShowPayloads: true, isShowRocketBodies: true, isShowDebris: true,
-      isDisableLaunchSites: false, isDisableSensors: false,
-      isSensorManagerLoaded: false, sensorType: 0, maxZoomDistance: 100000, isMissileSimulatorEnabled: true,
-    } });
+    dispatch({
+      typ: MSG.UPDATE_SETTINGS,
+      settingsFlags: {
+        cameraType: 0,
+        isShowPayloads: true,
+        isShowRocketBodies: true,
+        isShowDebris: true,
+        isDisableLaunchSites: false,
+        isDisableSensors: false,
+        isSensorManagerLoaded: false,
+        sensorType: 0,
+        maxZoomDistance: 100000,
+        isMissileSimulatorEnabled: true,
+      },
+    });
     dispatch({ typ: MSG.UPDATE_OBJ_TYPE_FLAGS, objectTypeFlags: { sensor: true, payload: true } });
     dispatch({ typ: MSG.UPDATE_COLOR_THEME, colorTheme: { sensor: [0, 0, 1, 1] } });
 

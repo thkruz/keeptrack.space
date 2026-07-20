@@ -54,7 +54,6 @@ export class WebpackManager {
       baseConfig = {
         ...baseConfig,
         ...{
-          cache: true,
           devtool: 'source-map',
           // devtool: 'eval-source-map',
           optimization: {
@@ -193,27 +192,38 @@ export class WebpackManager {
             },
           },
           {
+            // Rust/SWC transpile (no type-check — `pnpm run typecheck` (tsgo) owns
+            // types). Replaces ts-loader (JS tsc, transpileOnly:false), which
+            // re-type-checked the whole program on every build child.
             test: /\.tsx?$/u,
-            loader: 'ts-loader',
+            loader: 'builtin:swc-loader',
             exclude: [/node_modules/u, /\test/u, /\dist/u, /\coverage/u, /\.test\.tsx?$/u, /\src\/admin/u],
             options: {
-              transpileOnly: false,
-              configFile: 'tsconfig.build.json',
+              jsc: {
+                parser: {
+                  syntax: 'typescript',
+                  tsx: true,
+                },
+                target: 'es2022',
+              },
             },
           },
           {
+            // JS is transpiled by rspack's builtin SWC (no babel-loader). This
+            // rule only relaxes fully-specified ESM resolution so extensionless
+            // imports inside some dependencies keep resolving.
             test: /\.m?js$/u,
             include: [/src/u, /node_modules/u],
             resolve: {
               fullySpecified: false,
             },
-            use: {
-              loader: 'babel-loader',
-            },
           },
           {
+            // Only consume upstream source maps from our own code — not the
+            // thousands of files in node_modules (expensive and noisy).
             test: /\.m?js$/u,
             enforce: 'pre',
+            include: [/src/u],
             use: ['source-map-loader'],
           },
         ],
@@ -232,6 +242,27 @@ export class WebpackManager {
     baseConfig.experiments = {
       topLevelAwait: true,
     };
+
+    // Persistent filesystem cache: compiled modules are cached across builds, so
+    // local iterative (re)builds are near-instant. A cold CI build simply writes
+    // a fresh cache (no benefit, negligible cost). Invalidated when the build
+    // config or the dependency manifest changes.
+    const buildRoot = dirname(fileURLToPath(import.meta.url));
+
+    // Skip the cache in CI: a cold runner would write ~300 MB it never reuses.
+    baseConfig.cache = process.env.CI
+      ? false
+      : {
+        type: 'persistent',
+        // `version` namespaces the cache by mode so a dev build and a prod build
+        // never read each other's (differently minified) cached modules.
+        version: mode,
+        buildDependencies: [resolve(buildRoot, 'webpack-manager.ts'), resolve(buildRoot, '../package.json')],
+        storage: {
+          type: 'filesystem',
+          directory: 'node_modules/.cache/rspack',
+        },
+      };
     baseConfig.module!.rules!.push({
       test: /\.(?:woff|woff2|eot|ttf|otf)$/iu,
       include: [/src/u],

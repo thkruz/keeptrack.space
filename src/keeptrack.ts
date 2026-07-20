@@ -29,9 +29,8 @@ import './engine/ui/menu-v13.css'; // v13+ menu UI standard (opt-in via .kt-ui-v
 import './engine/ui/theme-form-controls.css'; // global brand theming for native form controls
 import 'requestidlecallback-polyfill';
 
-import { Localization } from './locales/locales'; // Ensure localization is imported first
-
-import { initMaterialSelects } from './engine/ui/material-select';
+import logoPrimaryPng from '@public/img/logo-primary.png';
+import logoSecondaryPng from '@public/img/logo-secondary.png';
 
 import { CatalogLoader } from './app/data/catalog-loader';
 import { CatalogManager } from './app/data/catalog-manager';
@@ -55,16 +54,15 @@ import { DotsManager } from './engine/rendering/dots-manager';
 import { lineManagerInstance } from './engine/rendering/line-manager';
 import { SatLabelManager } from './engine/rendering/sat-label-manager';
 import { WebWorkerThreadManager } from './engine/threads/web-worker-thread';
+import { initMaterialSelects } from './engine/ui/material-select';
 import { DemoManager } from './engine/utils/demo-mode';
 import { html } from './engine/utils/development/formatter';
+import { errorManagerInstance } from './engine/utils/errorManager';
 import { getEl } from './engine/utils/get-el';
 import { isThisNode } from './engine/utils/isThisNode';
 import { keepTrackApi } from './keepTrackApi';
-import { settingsManager, SettingsManagerOverride } from './settings/settings';
-
-import logoPrimaryPng from '@public/img/logo-primary.png';
-import logoSecondaryPng from '@public/img/logo-secondary.png';
-import { errorManagerInstance } from './engine/utils/errorManager';
+import { Localization } from './locales/locales'; // Ensure localization is imported first
+import { SettingsManagerOverride, settingsManager } from './settings/settings';
 
 export class KeepTrack {
   private static instance: KeepTrack;
@@ -93,10 +91,12 @@ export class KeepTrack {
     KeepTrack.instance = new KeepTrack();
   }
 
-  init(settingsOverride: SettingsManagerOverride = {
-    isPreventDefaultHtml: false,
-    isShowSplashScreen: true,
-  }) {
+  init(
+    settingsOverride: SettingsManagerOverride = {
+      isPreventDefaultHtml: false,
+      isShowSplashScreen: true,
+    }
+  ) {
     if (this.isInitialized) {
       throw new Error('KeepTrack is already started');
     }
@@ -159,9 +159,11 @@ export class KeepTrack {
     // Initialize enhanced persistence features (cross-tab sync, provider subscriptions).
     // The PersistenceManager already works synchronously from its constructor;
     // this adds the async enhancements without blocking boot.
-    PersistenceManager.getInstance().initialize().catch((e) => {
-      errorManagerInstance.warn(`Failed to initialize enhanced persistence: ${e.message}`);
-    });
+    PersistenceManager.getInstance()
+      .initialize()
+      .catch((e) => {
+        errorManagerInstance.warn(`Failed to initialize enhanced persistence: ${e.message}`);
+      });
   }
 
   static getDefaultBodyHtml(): void {
@@ -222,7 +224,7 @@ export class KeepTrack {
 
   private static setContainerElement() {
     // User provides the container using the settingsManager
-    const containerDom = settingsManager.containerRoot ?? document.getElementById('keeptrack-root') as HTMLDivElement;
+    const containerDom = settingsManager.containerRoot ?? (document.getElementById('keeptrack-root') as HTMLDivElement);
 
     if (!containerDom) {
       throw new Error('Failed to find container');
@@ -257,7 +259,7 @@ export class KeepTrack {
           .then(
             await import(/* webpackMode: "eager" */ '@css/responsive-sm.css').catch(() => {
               // This is intentional
-            }),
+            })
           )
           .catch(() => {
             // This is intentional
@@ -265,7 +267,7 @@ export class KeepTrack {
           .then(
             await import(/* webpackMode: "eager" */ '@css/responsive-md.css').catch(() => {
               // This is intentional
-            }),
+            })
           )
           .catch(() => {
             // This is intentional
@@ -273,7 +275,7 @@ export class KeepTrack {
           .then(
             await import(/* webpackMode: "eager" */ '@css/responsive-lg.css').catch(() => {
               // This is intentional
-            }),
+            })
           )
           .catch(() => {
             // This is intentional
@@ -281,7 +283,7 @@ export class KeepTrack {
           .then(
             await import(/* webpackMode: "eager" */ '@css/responsive-xl.css').catch(() => {
               // This is intentional
-            }),
+            })
           )
           .catch(() => {
             // This is intentional
@@ -289,7 +291,7 @@ export class KeepTrack {
           .then(
             await import(/* webpackMode: "eager" */ '@css/responsive-2xl.css').catch(() => {
               // This is intentional
-            }),
+            })
           )
           .catch(() => {
             // This is intentional
@@ -476,7 +478,9 @@ theodore.kruczek at gmail dot com.
       if (this.postStartElapsed_ >= KeepTrack.POST_START_TIMEOUT_MS_) {
         const notReady = this.threads.filter((t) => !t.isReady).map((t) => t.WEB_WORKER_CODE);
 
-        errorManagerInstance.warn(`[KeepTrack] Web workers failed to initialize after ${KeepTrack.POST_START_TIMEOUT_MS_ / 1000}s. Stalled workers: ${notReady.join(', ')}. Try a hard refresh (Ctrl+Shift+R).`);
+        errorManagerInstance.warn(
+          `[KeepTrack] Web workers failed to initialize after ${KeepTrack.POST_START_TIMEOUT_MS_ / 1000}s. Stalled workers: ${notReady.join(', ')}. Try a hard refresh (Ctrl+Shift+R).`
+        );
         SplashScreen.loadStr('Loading failed — try Ctrl+Shift+R to hard refresh.');
 
         return;
@@ -488,4 +492,3 @@ theodore.kruczek at gmail dot com.
     }
   }
 }
-

@@ -1,5 +1,6 @@
 import { GroupType, ObjectGroup } from '@app/app/data/object-group';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -8,10 +9,9 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeyboardComponent } from '@app/engine/plugins/components/keyboard/keyboard-component';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { settingsManager } from '@app/settings/settings';
 import { BaseObject, Satellite, SpaceObjectType, Star, ZoomValue } from '@ootk/src/main';
 import searchPng from '@public/img/icons/search.png';
-import { settingsManager } from '@app/settings/settings';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
 import { slideInDown, slideOutUp } from '../../engine/utils/slide';
@@ -40,6 +40,8 @@ export enum SearchResultType {
   SENSOR,
   LAUNCH_SITE,
   PLANET,
+  /** Matched the alpha-5 designation (sccNum5, e.g. "A0000" for 100000). */
+  NORAD_ID_A5,
 }
 
 /**
@@ -52,6 +54,7 @@ const SEARCH_TYPE_LABELS: Record<SearchResultType, string> = {
   [SearchResultType.OBJECT_NAME]: 'NAME',
   [SearchResultType.ALT_NAME]: 'ALT',
   [SearchResultType.NORAD_ID]: 'NORAD',
+  [SearchResultType.NORAD_ID_A5]: 'NORAD',
   [SearchResultType.INTLDES]: 'INTL',
   [SearchResultType.LAUNCH_VEHICLE]: 'LV',
   [SearchResultType.MISSILE]: 'MISSILE',
@@ -337,12 +340,14 @@ export class SearchManager {
   }
 
   static doArraySearch(catalogManagerInstance: CatalogManager, array: number[]) {
-    return array.reduce((searchStr, i) => {
-      const detailedSatellite = catalogManagerInstance.objectCache[i] as Satellite;
+    return array
+      .reduce((searchStr, i) => {
+        const detailedSatellite = catalogManagerInstance.objectCache[i] as Satellite;
 
-      // Use the sccNum unless it is missing (Vimpel), then use name
-      return detailedSatellite?.sccNum.length > 0 ? `${searchStr}${detailedSatellite.sccNum},` : `${searchStr}${detailedSatellite.name},`;
-    }, '').slice(0, -1);
+        // Use the sccNum unless it is missing (Vimpel), then use name
+        return detailedSatellite?.sccNum.length > 0 ? `${searchStr}${detailedSatellite.sccNum},` : `${searchStr}${detailedSatellite.name},`;
+      }, '')
+      .slice(0, -1);
   }
 
   doSearch(searchString: string, isPreventDropDown?: boolean): void {
@@ -411,7 +416,7 @@ export class SearchManager {
      * the toggle actually takes effect (other fields like the intl. designator can
      * still match the digits).
      */
-    if ((/^[0-9,]+$/u).test(searchString) && settingsManager.searchableFields.noradId) {
+    if (/^[0-9,]+$/u.test(searchString) && settingsManager.searchableFields.noradId) {
       searchResult = runNumOnlySearch(searchString);
     } else {
       // If not, then do a regular search
@@ -451,11 +456,13 @@ export class SearchManager {
 
   /** Result types whose match landed on the object's name, so the name should be highlighted. */
   private static isNameHighlightType_(searchType: SearchResultType): boolean {
-    return searchType === SearchResultType.OBJECT_NAME ||
+    return (
+      searchType === SearchResultType.OBJECT_NAME ||
       searchType === SearchResultType.STAR ||
       searchType === SearchResultType.SENSOR ||
       searchType === SearchResultType.LAUNCH_SITE ||
-      searchType === SearchResultType.PLANET;
+      searchType === SearchResultType.PLANET
+    );
   }
 
   fillResultBox(results: SearchResult[], catalogManagerInstance: CatalogManager, totalFound?: number) {
@@ -522,6 +529,22 @@ export class SearchManager {
             html += sat.sccNum.substring(result.strIndex, result.strIndex + result.patlen);
             html += '</span>';
             html += sat.sccNum.substring(result.strIndex + result.patlen);
+          }
+          break;
+        case SearchResultType.NORAD_ID_A5:
+          {
+            const sat = obj as Satellite;
+            // strIndex/patlen refer to sccNum5, so render the alpha-5 form the user typed
+            const a5 = sat.sccNum5 ?? sat.sccNum;
+
+            result.strIndex = result.strIndex || 0;
+            result.patlen = result.patlen || 5;
+
+            html += a5.substring(0, result.strIndex);
+            html += '<span class="search-hilight">';
+            html += a5.substring(result.strIndex, result.strIndex + result.patlen);
+            html += '</span>';
+            html += a5.substring(result.strIndex + result.patlen);
           }
           break;
         case SearchResultType.INTLDES:

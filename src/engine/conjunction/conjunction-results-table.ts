@@ -44,12 +44,7 @@ export interface ConjunctionTableOptions<T> {
 }
 
 /** Render `rows` into `tbl` using `columns`. Clears the table first. */
-export const renderConjunctionTable = <T>(
-  tbl: HTMLTableElement,
-  rows: readonly T[],
-  columns: ReadonlyArray<ConjunctionColumn<T>>,
-  options: ConjunctionTableOptions<T>,
-): void => {
+export const renderConjunctionTable = <T>(tbl: HTMLTableElement, rows: readonly T[], columns: ReadonlyArray<ConjunctionColumn<T>>, options: ConjunctionTableOptions<T>): void => {
   tbl.innerHTML = '';
 
   const headerRow = tbl.createTHead().insertRow();

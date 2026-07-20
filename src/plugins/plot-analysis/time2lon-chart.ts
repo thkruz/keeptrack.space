@@ -84,17 +84,17 @@ export const buildChartOption = (data: Time2LonSatLine[], labels: Time2LonChartL
     },
     graphic: isEmpty
       ? [
-        {
-          type: 'text',
-          left: 'center',
-          top: 'middle',
-          style: {
-            text: labels.empty,
-            fill: '#bbb',
-            fontSize: 16,
+          {
+            type: 'text',
+            left: 'center',
+            top: 'middle',
+            style: {
+              text: labels.empty,
+              fill: '#bbb',
+              fontSize: 16,
+            },
           },
-        },
-      ]
+        ]
       : [],
     tooltip: {
       trigger: 'item',

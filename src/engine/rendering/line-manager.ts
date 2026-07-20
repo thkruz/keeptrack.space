@@ -30,6 +30,7 @@ import { SatScanEarthLine } from './line-manager/sat-scan-earth-line';
 import { SatToCelestialBodyLine } from './line-manager/sat-to-celestial-body';
 import { SatToRefLine } from './line-manager/sat-to-ref-line';
 import { SatToSunLine } from './line-manager/sat-to-sun-line';
+import { SensorMarkerLine } from './line-manager/sensor-marker-line';
 import { SensorScanHorizonLine } from './line-manager/sensor-scan-horizon-line';
 import { SensorToMoonLine } from './line-manager/sensor-to-moon-line';
 import { SensorToRaeLine } from './line-manager/sensor-to-rae-line';
@@ -196,6 +197,26 @@ export class LineManager {
       return;
     }
     this.add(new SatScanEarthLine(sat, color));
+  }
+
+  /**
+   * Draw a short vertical marker above each sensor so the whole group can be
+   * located on the globe without selecting it. `detail` groups the markers in
+   * the line-management UI (and lets {@link removeLinesByKind} drop them together).
+   */
+  createSensorMarkers(sensors: DetailedSensor[], detail?: string, color = LineColors.RED): void {
+    for (const sensor of sensors) {
+      this.add(new SensorMarkerLine(sensor, detail, color));
+    }
+  }
+
+  /** True when any sensor marker with this `detail` is currently drawn. */
+  hasSensorMarkers(detail?: string): boolean {
+    return this.lines.some((line) => {
+      const desc = line.getDescription();
+
+      return desc.kind === 'sensorMarker' && (typeof detail !== 'string' || desc.detail === detail);
+    });
   }
 
   createSensorScanHorizon(sensor: DetailedSensor | null, face = 1, faces = 2, color = LineColors.CYAN): void {
@@ -403,8 +424,8 @@ export class LineManager {
         // Add concentric circles
         for (let r = circleInterval; r <= gridRadius; r += circleInterval) {
           for (let i = 0; i < circleSegments; i++) {
-            const angle1 = (i * 360 / circleSegments) * Math.PI / 180;
-            const angle2 = ((i + 1) * 360 / circleSegments) * Math.PI / 180;
+            const angle1 = (((i * 360) / circleSegments) * Math.PI) / 180;
+            const angle2 = ((((i + 1) * 360) / circleSegments) * Math.PI) / 180;
 
             const y1 = r * Math.cos(angle1);
             const z1 = r * Math.sin(angle1);
@@ -441,8 +462,8 @@ export class LineManager {
         // Add concentric circles
         for (let r = circleInterval; r <= gridRadius; r += circleInterval) {
           for (let i = 0; i < circleSegments; i++) {
-            const angle1 = (i * 360 / circleSegments) * Math.PI / 180;
-            const angle2 = ((i + 1) * 360 / circleSegments) * Math.PI / 180;
+            const angle1 = (((i * 360) / circleSegments) * Math.PI) / 180;
+            const angle2 = ((((i + 1) * 360) / circleSegments) * Math.PI) / 180;
 
             const x1 = r * Math.cos(angle1);
             const z1 = r * Math.sin(angle1);
@@ -479,8 +500,8 @@ export class LineManager {
         // Add concentric circles
         for (let r = circleInterval; r <= gridRadius; r += circleInterval) {
           for (let i = 0; i < circleSegments; i++) {
-            const angle1 = (i * 360 / circleSegments) * Math.PI / 180;
-            const angle2 = ((i + 1) * 360 / circleSegments) * Math.PI / 180;
+            const angle1 = (((i * 360) / circleSegments) * Math.PI) / 180;
+            const angle2 = ((((i + 1) * 360) / circleSegments) * Math.PI) / 180;
 
             const x1 = r * Math.cos(angle1);
             const y1 = r * Math.sin(angle1);
@@ -526,7 +547,6 @@ export class LineManager {
     for (const line of temeLines) {
       line.draw(gl, this);
     }
-
 
     // Apply ecliptic rotation to modelMatrix
     // TEME to J2000 transformation
@@ -579,18 +599,15 @@ export class LineManager {
       this.polarUniforms_[name] = gl.getUniformLocation(this.program, name);
     }
 
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (sat: BaseObject) => {
-        const camType = ServiceLocator.getMainCamera().cameraType;
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (sat: BaseObject) => {
+      const camType = ServiceLocator.getMainCamera().cameraType;
 
-        if (sat && camType !== CameraType.POLAR_VIEW && camType !== CameraType.PLANETARIUM && camType !== CameraType.ASTRONOMY) {
-          const sensor = ServiceLocator.getSensorManager().getSensor();
+      if (sat && camType !== CameraType.POLAR_VIEW && camType !== CameraType.PLANETARIUM && camType !== CameraType.ASTRONOMY) {
+        const sensor = ServiceLocator.getSensorManager().getSensor();
 
-          this.createSensorToSatFovAndSelectedOnly(sensor, sat as Satellite);
-        }
-      },
-    );
+        this.createSensorToSatFovAndSelectedOnly(sensor, sat as Satellite);
+      }
+    });
   }
 
   setAttribsAndDrawLineStrip(buffer: WebGLBuffer, segments: number) {
@@ -662,7 +679,7 @@ export class LineManager {
     const isPolarView = mainCamera.cameraType === CameraType.POLAR_VIEW;
 
     // 2D projections reproject raw ECI in-shader; zero the world offset for them
-    const worldShift = isFlatMap || isPolarView ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0];
+    const worldShift = isFlatMap || isPolarView ? [0, 0, 0] : (Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     gl.uniform3fv(this.uniforms_.worldOffset, worldShift);
 

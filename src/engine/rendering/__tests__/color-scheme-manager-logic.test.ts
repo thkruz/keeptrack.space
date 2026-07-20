@@ -1,7 +1,7 @@
-import { vi } from 'vitest';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { vi } from 'vitest';
 
 // color-scheme-manager.ts reads the ambient global settingsManager (which
 // setupStandardEnvironment swaps in), so the test must drive that same global

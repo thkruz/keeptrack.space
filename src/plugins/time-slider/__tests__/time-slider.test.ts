@@ -1,14 +1,14 @@
-import { vi } from 'vitest';
 /* eslint-disable dot-notation */
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { TimeSlider } from '@app/plugins/time-slider/time-slider';
 import { ScenarioManagementPlugin } from '@app/plugins/scenario-management/scenario-management';
+import { TimeSlider } from '@app/plugins/time-slider/time-slider';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSuite } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('TimeSlider', () => {
   beforeEach(() => {
@@ -44,7 +44,7 @@ describe('TimeSlider behavior', () => {
 
     const noon = new Date(Date.UTC(2022, 0, 1, 12, 0, 0));
 
-    expect(plugin.getSliderValue(noon)).toBeCloseTo((12 * 60 / 1439) * 100, 1);
+    expect(plugin.getSliderValue(noon)).toBeCloseTo(((12 * 60) / 1439) * 100, 1);
   });
 
   it('getSliderValue interpolates within scenario bounds', () => {
@@ -74,8 +74,7 @@ describe('TimeSlider behavior', () => {
 
   it('updateSliderPosition moves the handle when the slider exists', () => {
     setScenario(null);
-    document.body.insertAdjacentHTML('beforeend',
-      '<div id="time-slider-container-slider"><span class="ui-slider-handle"></span></div>');
+    document.body.insertAdjacentHTML('beforeend', '<div id="time-slider-container-slider"><span class="ui-slider-handle"></span></div>');
 
     expect(() => plugin.updateSliderPosition()).not.toThrow();
     const handle = document.querySelector('#time-slider-container-slider .ui-slider-handle') as HTMLElement;
@@ -85,8 +84,10 @@ describe('TimeSlider behavior', () => {
 
   it('attaches pointer/touch slider events that drive the update function', () => {
     setScenario(null);
-    document.body.insertAdjacentHTML('beforeend',
-      '<div id="time-slider-container-slider" data-min="0" data-max="100" data-step="0.1"><span class="ui-slider-handle"></span></div>');
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      '<div id="time-slider-container-slider" data-min="0" data-max="100" data-step="0.1"><span class="ui-slider-handle"></span></div>'
+    );
 
     const updateFn = vi.fn();
 
@@ -109,16 +110,23 @@ describe('TimeSlider behavior', () => {
 
   it('wires uiManagerFinal and date-change handlers in addJs', () => {
     setScenario({ startTime: undefined, endTime: undefined });
-    document.body.insertAdjacentHTML('beforeend',
-      '<div id="time-slider-container-slider" data-min="0" data-max="100" data-step="0.1"><span class="ui-slider-handle"></span></div>');
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      '<div id="time-slider-container-slider" data-min="0" data-max="100" data-step="0.1"><span class="ui-slider-handle"></span></div>'
+    );
 
     const onSpy = vi.spyOn(EventBus.getInstance(), 'on');
 
     plugin.addJs();
-    const handlers = onSpy.mock.calls.filter(([evt]) => evt === EventBusEvent.uiManagerFinal ||
-      evt === EventBusEvent.selectedDateChange ||
-      evt === EventBusEvent.staticOffsetChange ||
-      evt === EventBusEvent.scenarioBoundsChanged).map((c) => c[1] as () => void);
+    const handlers = onSpy.mock.calls
+      .filter(
+        ([evt]) =>
+          evt === EventBusEvent.uiManagerFinal ||
+          evt === EventBusEvent.selectedDateChange ||
+          evt === EventBusEvent.staticOffsetChange ||
+          evt === EventBusEvent.scenarioBoundsChanged
+      )
+      .map((c) => c[1] as () => void);
 
     expect(() => handlers.forEach((h) => h())).not.toThrow();
 

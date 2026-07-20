@@ -4,46 +4,25 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import {
-  IBottomIconConfig,
-  ICommandPaletteCapable,
-  ICommandPaletteCommand,
-  IDragOptions,
-  IHelpConfig,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, ICommandPaletteCapable, ICommandPaletteCommand, IDragOptions, IHelpConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveCsv } from '@app/engine/utils/saveVariable';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
 import { Satellite } from '@ootk/src/main';
-import * as echarts from 'echarts';
 import scatterPlotPng from '@public/img/icons/scatter-plot.png';
+import * as echarts from 'echarts';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import {
-  buildCsvRows,
-  buildGabbardData,
-  calcYearsBetween,
-  FragmentSortKey,
-  sortFragments,
-  SortDir,
-  summarizeEvent,
-} from './breakup-analysis-core';
-import {
-  buildEventInfoCard,
-  buildEventListTable,
-  buildFragmentTable,
-  buildStatsCard,
-  BreakupLabels,
-  FRAGMENT_DEFAULT_MAX_ROWS,
-} from './breakup-analysis-table';
+import { buildCsvRows, buildGabbardData, calcYearsBetween, FragmentSortKey, SortDir, sortFragments, summarizeEvent } from './breakup-analysis-core';
+import { BreakupLabels, buildEventInfoCard, buildEventListTable, buildFragmentTable, buildStatsCard, FRAGMENT_DEFAULT_MAX_ROWS } from './breakup-analysis-table';
 import './breakup-analysis.css';
 import { BREAKUP_EVENTS, BreakupEvent } from './breakup-events';
 import { buildGabbardOption } from './breakup-gabbard-chart';
 
+export type { BreakupEvent };
 // Re-export so existing importers keep a single entry point.
-export { BREAKUP_EVENTS, BreakupEvent };
+export { BREAKUP_EVENTS };
 
 export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteCapable {
   readonly id = 'BreakupAnalysis';
@@ -447,7 +426,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
         showAll: this.showAllFragments_,
         maxRows: FRAGMENT_DEFAULT_MAX_ROWS,
       },
-      this.getLabels_(),
+      this.getLabels_()
     );
   }
 
@@ -586,19 +565,13 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
     if (satId !== null) {
       PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satId);
     } else {
-      ServiceLocator.getUiManager().toast(
-        t7e('plugins.BreakupAnalysis.errorMsgs.parentNotFound' as Parameters<typeof t7e>[0]),
-        ToastMsgType.caution,
-      );
+      ServiceLocator.getUiManager().toast(t7e('plugins.BreakupAnalysis.errorMsgs.parentNotFound' as Parameters<typeof t7e>[0]), ToastMsgType.caution);
     }
   }
 
   private exportCsv_(): void {
     if (this.debrisResults_.length === 0) {
-      ServiceLocator.getUiManager().toast(
-        t7e('plugins.BreakupAnalysis.errorMsgs.noDataToExport' as Parameters<typeof t7e>[0]),
-        ToastMsgType.caution,
-      );
+      ServiceLocator.getUiManager().toast(t7e('plugins.BreakupAnalysis.errorMsgs.noDataToExport' as Parameters<typeof t7e>[0]), ToastMsgType.caution);
 
       return;
     }

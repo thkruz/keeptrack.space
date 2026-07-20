@@ -1,32 +1,32 @@
 import { errorManagerInstance } from '../utils/errorManager';
+import type { AccountKvEntry, AccountSyncProvider } from './account-sync-provider';
 import { LocalStorageProvider } from './providers/local-storage-provider';
 import { NullStorageProvider } from './providers/null-storage-provider';
 import { StorageKey } from './storage-key';
-import type { StorageProvider, StorageProviderConfig } from './storage-provider';
-import { StorageProviderFactory } from './storage-provider-factory';
+import type { StorageProvider } from './storage-provider';
+import { ACCOUNT_STORAGE_KEYS, getAccountMergeHook, isAccountKey } from './storage-scope';
 
 // Access settingsManager via global to avoid circular dependency with settings.ts
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- intentionally untyped to break the settings.ts circular import
 const getSettingsManager_ = (): any => (globalThis as any).settingsManager;
 
-interface SyncProviderEntry_ {
-  type: string;
-  provider: StorageProvider;
-  unsubscribe: (() => void) | null;
-}
-
 export class PersistenceManager {
   private static instance_: PersistenceManager;
 
   private cache_: Map<StorageKey, string> = new Map();
+  /** Per-key last-modified stamps (epoch ms) for account-scoped keys, persisted as SYNC_META. */
+  private syncMeta_: Record<string, number> = {};
   private primary_: StorageProvider;
-  private factory_: StorageProviderFactory;
-  private syncProviders_: Map<string, SyncProviderEntry_> = new Map();
-  private pendingWrites_: Map<StorageKey, string | null> = new Map();
-  private flushTimeout_: ReturnType<typeof setTimeout> | null = null;
+  private accountProvider_: AccountSyncProvider | null = null;
+  private pendingAccountWrites_: Set<StorageKey> = new Set();
+  private accountFlushTimeout_: ReturnType<typeof setTimeout> | null = null;
   private isInitialized_: boolean = false;
 
-  private static readonly FLUSH_DEBOUNCE_MS_ = 500;
+  /**
+   * Outbound cloud pushes debounce longer than local writes: settings churn in
+   * bursts (sliders, rapid toggles) and each push is a network PUT.
+   */
+  private static readonly ACCOUNT_FLUSH_DEBOUNCE_MS_ = 3000;
 
   /**
    * Constructor synchronously hydrates the cache from localStorage.
@@ -34,7 +34,6 @@ export class PersistenceManager {
    * fully-populated manager that settingsManager.init() can read from immediately.
    */
   private constructor() {
-    this.factory_ = new StorageProviderFactory();
     this.primary_ = new LocalStorageProvider();
 
     // Synchronous hydration from localStorage (fast path — preserves original boot order)
@@ -52,6 +51,7 @@ export class PersistenceManager {
 
     // Version validation and stray key cleanup (same as original constructor)
     this.validateStorage();
+    this.loadSyncMeta_();
     this.verifyStorage();
   }
 
@@ -148,38 +148,50 @@ export class PersistenceManager {
 
     PersistenceManager.verifyKey_(key);
 
+    /*
+     * Equality short-circuit: identical writes must not stamp SYNC_META or
+     * re-trigger cloud pushes. This is also the echo-suppression that keeps a
+     * remotely-applied value from bouncing back to the cloud when a plugin
+     * listener re-saves the same value.
+     */
+    if (this.cache_.get(key as StorageKey) === value) {
+      return;
+    }
+
     // Update cache immediately
     this.cache_.set(key as StorageKey, value);
+    this.stampSyncMeta_(key as StorageKey);
 
     // Write-through to primary (localStorage) immediately
     this.primary_.write(key, value).catch((e) => {
       errorManagerInstance.debug(`Failed to write to primary storage: ${key}=${value}, error: ${e}`);
     });
 
-    // Schedule debounced flush to sync providers
-    this.scheduleSyncFlush_(key as StorageKey, value);
+    // Schedule debounced cloud push when an account provider is attached
+    this.scheduleAccountFlush_(key as StorageKey);
   }
 
   removeItem(key: string): void {
     PersistenceManager.verifyKey_(key);
 
+    if (!this.cache_.has(key as StorageKey)) {
+      return;
+    }
+
     this.cache_.delete(key as StorageKey);
+    // Removals keep a stamp: they act as local tombstones so a deletion on this
+    // device can win LWW against an older value on another device.
+    this.stampSyncMeta_(key as StorageKey);
     this.primary_.remove(key);
-    this.scheduleSyncFlush_(key as StorageKey, null);
+    this.scheduleAccountFlush_(key as StorageKey);
   }
 
   clear(): void {
     for (const key of Object.values(StorageKey)) {
       this.cache_.delete(key);
     }
+    this.syncMeta_ = {};
     this.primary_.clear();
-
-    // Flush clear to all sync providers
-    for (const entry of this.syncProviders_.values()) {
-      entry.provider.clear().catch((e) => {
-        errorManagerInstance.debug(`Failed to clear sync provider ${entry.type}: ${e}`);
-      });
-    }
   }
 
   // ---------------------------------------------------------------------------
@@ -196,11 +208,7 @@ export class PersistenceManager {
     const sm = getSettingsManager_();
     const currentVersion = this.cache_.get(StorageKey.VERSION) ?? null;
 
-    if (
-      typeof currentVersion === 'string' &&
-      typeof sm?.versionNumber === 'string' &&
-      this.compareSemver_(currentVersion, sm.versionNumber) < 0
-    ) {
+    if (typeof currentVersion === 'string' && typeof sm?.versionNumber === 'string' && this.compareSemver_(currentVersion, sm.versionNumber) < 0) {
       errorManagerInstance.warn(`Version mismatch: ${currentVersion} < ${sm.versionNumber}`);
       errorManagerInstance.warn('Clearing local storage...');
 
@@ -237,98 +245,152 @@ export class PersistenceManager {
         this.cache_.delete(key);
       }
     }
+
+    // Prune SYNC_META entries whose key left the enum or is no longer account-scoped
+    let metaChanged = false;
+
+    for (const key of Object.keys(this.syncMeta_)) {
+      if (!validKeys.has(key as StorageKey) || !isAccountKey(key as StorageKey)) {
+        delete this.syncMeta_[key];
+        metaChanged = true;
+      }
+    }
+
+    if (metaChanged) {
+      this.persistSyncMeta_();
+    }
   }
 
   // ---------------------------------------------------------------------------
-  // Sync provider management — new API for Pro plugins
+  // Per-key sync timestamps (SYNC_META)
   // ---------------------------------------------------------------------------
 
-  /** Register a new provider type. Pro plugins use this to add D1, WebSocket, etc. */
-  registerProviderType(type: string, factory: (config?: StorageProviderConfig) => StorageProvider): void {
-    this.factory_.register(type, factory);
+  /** Epoch-ms stamp of the last local change to an account-scoped key (0 = never stamped). */
+  getSyncTimestamp(key: StorageKey): number {
+    return this.syncMeta_[key] ?? 0;
   }
 
-  /**
-   * Add a sync provider that mirrors persistence to a remote backend.
-   * On connect, remote data is merged in (cloud wins), then local-only keys are pushed.
-   */
-  async addSyncProvider(type: string, config?: StorageProviderConfig): Promise<void> {
-    if (this.syncProviders_.has(type)) {
-      await this.removeSyncProvider(type);
-    }
+  private loadSyncMeta_(): void {
+    this.syncMeta_ = {};
 
-    const provider = this.factory_.create(type, config);
+    const raw = this.cache_.get(StorageKey.SYNC_META);
 
-    await provider.initialize();
-
-    // Pull remote data — cloud wins on conflicts
-    const remoteData = await provider.readAll();
-
-    for (const [key, value] of remoteData) {
-      if (Object.values(StorageKey).includes(key as StorageKey)) {
-        this.cache_.set(key as StorageKey, value);
-        // Write merged value back to primary so local reflects cloud
-        this.primary_.write(key, value);
-      }
-    }
-
-    // Push local-only keys to the sync provider
-    const localOnly = new Map<string, string>();
-
-    for (const [key, value] of this.cache_) {
-      if (!remoteData.has(key)) {
-        localOnly.set(key, value);
-      }
-    }
-
-    if (localOnly.size > 0) {
-      await provider.writeBatch(localOnly);
-    }
-
-    // Subscribe to remote changes — cloud wins
-    const unsubscribe = provider.subscribe((key, value) => {
-      if (!Object.values(StorageKey).includes(key as StorageKey)) {
-        return;
-      }
-      if (value === null) {
-        this.cache_.delete(key as StorageKey);
-        this.primary_.remove(key);
-      } else {
-        this.cache_.set(key as StorageKey, value);
-        this.primary_.write(key, value);
-      }
-    });
-
-    this.syncProviders_.set(type, { type, provider, unsubscribe });
-  }
-
-  /** Remove a sync provider (e.g., on logout). Local data remains intact. */
-  async removeSyncProvider(type: string): Promise<void> {
-    const entry = this.syncProviders_.get(type);
-
-    if (!entry) {
+    if (!raw) {
       return;
     }
 
-    // Flush any pending writes
-    await this.flushPendingWrites_();
+    let parsed: unknown = null;
 
-    if (entry.unsubscribe) {
-      entry.unsubscribe();
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      // Corrupt meta must never break boot; stamps rebuild as keys are touched
+      return;
     }
-    await entry.provider.dispose();
 
-    this.syncProviders_.delete(type);
+    if (!parsed || typeof parsed !== 'object') {
+      return;
+    }
+
+    for (const [key, value] of Object.entries(parsed)) {
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        this.syncMeta_[key] = value;
+      }
+    }
   }
 
-  /** Check if a specific sync provider is currently active. */
-  hasSyncProvider(type: string): boolean {
-    return this.syncProviders_.has(type);
+  private stampSyncMeta_(key: StorageKey): void {
+    if (key === StorageKey.SYNC_META || !isAccountKey(key)) {
+      return;
+    }
+
+    this.syncMeta_[key] = Date.now();
+    this.persistSyncMeta_();
   }
 
-  /** Get the factory for provider type registration. */
-  get factory(): StorageProviderFactory {
-    return this.factory_;
+  private persistSyncMeta_(): void {
+    const raw = JSON.stringify(this.syncMeta_);
+
+    // Written directly (not via saveItem) to avoid recursive stamping/flushing
+    this.cache_.set(StorageKey.SYNC_META, raw);
+    this.primary_.write(StorageKey.SYNC_META, raw).catch((e) => {
+      errorManagerInstance.debug(`Failed to persist sync meta: ${e}`);
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Account sync (per-key last-write-wins against a cloud kv store)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Attach the logged-in user's cloud transport and run a full merge cycle.
+   *
+   * Per account-scoped key, the side with the newer timestamp wins: cloud-newer
+   * values (including tombstones) are applied locally, local-newer values are
+   * pushed in a single batch. Keys with a registered merge hook (e.g. monotonic
+   * achievement counters) merge by value instead of by timestamp.
+   *
+   * Returns the keys whose LOCAL value changed, so the caller can notify
+   * plugins (e.g. emit remoteSettingsApplied). Local data is never wiped.
+   */
+  async attachAccountSyncProvider(provider: AccountSyncProvider): Promise<StorageKey[]> {
+    const sm = getSettingsManager_();
+
+    if (sm?.isBlockPersistence) {
+      return [];
+    }
+
+    if (this.accountProvider_) {
+      await this.detachAccountSyncProvider({ flushPending: true });
+    }
+
+    this.accountProvider_ = provider;
+    this.seedLocalStamps_();
+
+    return this.mergeRemote_();
+  }
+
+  /**
+   * Detach the cloud transport (logout). Local data remains intact; pending
+   * outbound writes are flushed first unless flushPending is false.
+   */
+  async detachAccountSyncProvider(options?: { flushPending?: boolean }): Promise<void> {
+    const provider = this.accountProvider_;
+
+    if (!provider) {
+      return;
+    }
+
+    if (options?.flushPending === false) {
+      this.cancelAccountFlush_();
+      this.pendingAccountWrites_.clear();
+    } else {
+      await this.flushAccountWrites_();
+    }
+
+    this.accountProvider_ = null;
+    await provider.dispose?.();
+  }
+
+  /** Whether a cloud transport is currently attached. */
+  hasAccountSyncProvider(): boolean {
+    return this.accountProvider_ !== null;
+  }
+
+  /**
+   * Run a full pull-merge-push cycle immediately ("Sync now"). Returns the
+   * locally-changed keys, or null when no provider is attached.
+   */
+  syncAccountNow(): Promise<StorageKey[] | null> {
+    if (!this.accountProvider_) {
+      return Promise.resolve(null);
+    }
+
+    // The full merge covers every account key, superseding any pending batch
+    this.cancelAccountFlush_();
+    this.pendingAccountWrites_.clear();
+
+    return this.mergeRemote_();
   }
 
   // ---------------------------------------------------------------------------
@@ -343,55 +405,167 @@ export class PersistenceManager {
   // Private helpers
   // ---------------------------------------------------------------------------
 
-  private scheduleSyncFlush_(key: StorageKey, value: string | null): void {
-    if (this.syncProviders_.size === 0) {
-      return;
+  /**
+   * Full pull-merge-push cycle against the attached provider. Returns the keys
+   * whose local value changed (for plugin notification).
+   */
+  private async mergeRemote_(): Promise<StorageKey[]> {
+    const provider = this.accountProvider_;
+
+    if (!provider) {
+      return [];
     }
 
-    this.pendingWrites_.set(key, value);
+    const remote = await provider.pull();
+    const changed: StorageKey[] = [];
+    const toPush = new Map<StorageKey, AccountKvEntry>();
+    let metaDirty = false;
 
-    if (this.flushTimeout_) {
-      clearTimeout(this.flushTimeout_);
+    for (const key of ACCOUNT_STORAGE_KEYS) {
+      const localT = this.getSyncTimestamp(key);
+      const localV = this.cache_.get(key) ?? null;
+      const remoteEntry = remote.get(key);
+      const remoteT = remoteEntry?.t ?? 0;
+      const remoteV = remoteEntry?.v ?? null;
+      const mergeHook = getAccountMergeHook(key);
+
+      if (mergeHook) {
+        metaDirty = this.mergeKeyWithHook_(mergeHook, key, { localV, localT, remoteV, remoteT }, changed, toPush) || metaDirty;
+        continue;
+      }
+
+      if (remoteT > localT) {
+        // Cloud newer: apply value or tombstone locally
+        this.applyRemote_(key, remoteV);
+        this.syncMeta_[key] = remoteT;
+        metaDirty = true;
+        if (remoteV !== localV) {
+          changed.push(key);
+        }
+      } else if (localT > remoteT && localV !== remoteV) {
+        // Local newer: push value or tombstone
+        toPush.set(key, { v: localV, t: localT });
+      }
+      // Equal timestamps (including 0/0): deterministic no-op
     }
-    this.flushTimeout_ = setTimeout(() => this.flushPendingWrites_(), PersistenceManager.FLUSH_DEBOUNCE_MS_);
+
+    if (metaDirty) {
+      this.persistSyncMeta_();
+    }
+
+    if (toPush.size > 0) {
+      await provider.push(toPush);
+    }
+
+    return changed;
   }
 
-  private async flushPendingWrites_(): Promise<void> {
-    if (this.pendingWrites_.size === 0) {
+  /**
+   * Value-based merge for keys with a registered hook (commutative +
+   * idempotent, e.g. counter union): timestamps only seed the merged stamp,
+   * they never discard a side. Returns true when SYNC_META changed.
+   */
+  private mergeKeyWithHook_(
+    mergeHook: (localV: string | null, remoteV: string | null) => string | null,
+    key: StorageKey,
+    state: { localV: string | null; localT: number; remoteV: string | null; remoteT: number },
+    changed: StorageKey[],
+    toPush: Map<StorageKey, AccountKvEntry>
+  ): boolean {
+    const mergedV = mergeHook(state.localV, state.remoteV);
+    const mergedT = Math.max(state.localT, state.remoteT, 1);
+    let metaDirty = false;
+
+    if (mergedV !== state.localV) {
+      this.applyRemote_(key, mergedV);
+      this.syncMeta_[key] = mergedT;
+      metaDirty = true;
+      changed.push(key);
+    }
+    if (mergedV !== state.remoteV) {
+      toPush.set(key, { v: mergedV, t: mergedT });
+    }
+
+    return metaDirty;
+  }
+
+  /**
+   * Apply a remotely-won value to cache + localStorage WITHOUT stamping or
+   * scheduling a push: remote applies must never echo back to the cloud.
+   */
+  private applyRemote_(key: StorageKey, value: string | null): void {
+    if (value === null) {
+      this.cache_.delete(key);
+      this.primary_.remove(key);
+    } else {
+      this.cache_.set(key, value);
+      this.primary_.write(key, value).catch((e) => {
+        errorManagerInstance.debug(`Failed to write remote value to primary storage: ${key}, error: ${e}`);
+      });
+    }
+  }
+
+  /**
+   * One-time upgrade seeding: an account key that already has a local value but
+   * no stamp predates per-key timestamps. Stamp it with t=1 ("exists, but old")
+   * so a first login pushes it to an empty cloud yet loses to any real cloud
+   * write, and fresh-install defaults (no value, no stamp) never stomp cloud.
+   */
+  private seedLocalStamps_(): void {
+    let metaDirty = false;
+
+    for (const key of ACCOUNT_STORAGE_KEYS) {
+      if (this.cache_.has(key) && !(key in this.syncMeta_)) {
+        this.syncMeta_[key] = 1;
+        metaDirty = true;
+      }
+    }
+
+    if (metaDirty) {
+      this.persistSyncMeta_();
+    }
+  }
+
+  private scheduleAccountFlush_(key: StorageKey): void {
+    if (!this.accountProvider_ || !isAccountKey(key)) {
       return;
     }
 
-    const batch = new Map(this.pendingWrites_);
+    this.pendingAccountWrites_.add(key);
+    this.cancelAccountFlush_();
+    this.accountFlushTimeout_ = setTimeout(() => this.flushAccountWrites_(), PersistenceManager.ACCOUNT_FLUSH_DEBOUNCE_MS_);
+  }
 
-    this.pendingWrites_.clear();
-    this.flushTimeout_ = null;
+  private cancelAccountFlush_(): void {
+    if (this.accountFlushTimeout_) {
+      clearTimeout(this.accountFlushTimeout_);
+      this.accountFlushTimeout_ = null;
+    }
+  }
 
-    for (const entry of this.syncProviders_.values()) {
-      try {
-        // Separate writes and removes
-        const writes = new Map<string, string>();
+  private async flushAccountWrites_(): Promise<void> {
+    this.cancelAccountFlush_();
 
-        for (const [key, value] of batch) {
-          if (value === null) {
-            // eslint-disable-next-line no-await-in-loop
-            await entry.provider.remove(key);
-          } else {
-            writes.set(key, value);
-          }
-        }
+    const provider = this.accountProvider_;
 
-        if (writes.size > 0) {
-          // eslint-disable-next-line no-await-in-loop
-          await entry.provider.writeBatch(writes);
-        }
-      } catch (e) {
-        errorManagerInstance.debug(`Failed to flush writes to sync provider ${entry.type}: ${e}`);
-        // Re-queue failed writes for retry
-        for (const [k, v] of batch) {
-          if (!this.pendingWrites_.has(k)) {
-            this.pendingWrites_.set(k, v);
-          }
-        }
+    if (!provider || this.pendingAccountWrites_.size === 0) {
+      return;
+    }
+
+    const batch = new Map<StorageKey, AccountKvEntry>();
+
+    for (const key of this.pendingAccountWrites_) {
+      batch.set(key, { v: this.cache_.get(key) ?? null, t: this.getSyncTimestamp(key) });
+    }
+    this.pendingAccountWrites_.clear();
+
+    try {
+      await provider.push(batch);
+    } catch (e) {
+      errorManagerInstance.debug(`Failed to push account settings batch: ${e}`);
+      // Re-queue failed keys for the next flush
+      for (const key of batch.keys()) {
+        this.pendingAccountWrites_.add(key);
       }
     }
   }

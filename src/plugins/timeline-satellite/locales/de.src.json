@@ -3,6 +3,9 @@
     "SatelliteTimeline": {
       "bottomIconLabel": "Satelliten-Zeitachse",
       "title": "Satelliten-Zeitachsen-Menü",
+      "sections": {
+        "settings": "Einstellungen"
+      },
       "labels": {
         "calculationLength": "Berechnungsdauer (Stunden)",
         "calculationInterval": "Berechnungsintervall (Sekunden)",

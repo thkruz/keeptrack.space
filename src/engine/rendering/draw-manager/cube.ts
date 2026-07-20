@@ -64,17 +64,17 @@ export class Box {
   }
 
   private textureMap_ = {
-    src: <string><unknown>null,
-    texture: <WebGLTexture><unknown>null,
+    src: <string>(<unknown>null),
+    texture: <WebGLTexture>(<unknown>null),
   };
 
   private uniforms_ = {
-    u_pMatrix: <WebGLUniformLocation><unknown>null,
-    u_camMatrix: <WebGLUniformLocation><unknown>null,
-    u_mvMatrix: <WebGLUniformLocation><unknown>null,
-    u_color: <WebGLUniformLocation><unknown>null,
-    logDepthBufFC: <WebGLUniformLocation><unknown>null,
-    worldOffset: <WebGLUniformLocation><unknown>null,
+    u_pMatrix: <WebGLUniformLocation>(<unknown>null),
+    u_camMatrix: <WebGLUniformLocation>(<unknown>null),
+    u_mvMatrix: <WebGLUniformLocation>(<unknown>null),
+    u_color: <WebGLUniformLocation>(<unknown>null),
+    logDepthBufFC: <WebGLUniformLocation>(<unknown>null),
+    worldOffset: <WebGLUniformLocation>(<unknown>null),
   };
 
   private color_ = [0.5, 0.5, 0.5, 0.5]; // Set color to gray with alpha

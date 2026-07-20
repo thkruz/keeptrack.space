@@ -2,8 +2,7 @@ import { SettingsManager } from '../../settings/settings';
 import { glsl } from '../utils/development/formatter';
 import { DepthManager } from './depth-manager';
 
-export const createBaseFragShader = (settings: SettingsManager): string => (
-    glsl`#version 300 es
+export const createBaseFragShader = (settings: SettingsManager): string => glsl`#version 300 es
     precision highp float;
 
     in vec4 vColor;
@@ -23,11 +22,9 @@ export const createBaseFragShader = (settings: SettingsManager): string => (
 
       fragColor = vec4(vColor.rgb, vColor.a * alpha);
     }
-    `
-);
+    `;
 
-export const createBaseVertShader = (settings: SettingsManager): string => (
-    glsl`#version 300 es
+export const createBaseVertShader = (settings: SettingsManager): string => glsl`#version 300 es
     precision highp float;
     in vec3 a_position;
     in vec4 a_color;
@@ -231,5 +228,4 @@ export const createBaseVertShader = (settings: SettingsManager): string => (
         vSize = a_size * 1.0;
         vDist = dist;
     }
-    `
-);
+    `;

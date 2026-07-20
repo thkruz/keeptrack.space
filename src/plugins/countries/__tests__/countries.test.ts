@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { GroupsManager } from '@app/app/data/groups-manager';
@@ -11,12 +10,13 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { CountriesMenu } from '@app/plugins/countries/countries';
-import { settingsManager as settingsManagerSingleton } from '@app/settings/settings';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
+import { settingsManager as settingsManagerSingleton } from '@app/settings/settings';
 import { defaultSat } from '@test/environment/apiMocks';
 import { mockUiManager, setupDefaultHtml } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 const setupCountriesMenuTestEnvironment = () => {
   setupDefaultHtml();
@@ -127,14 +127,8 @@ describe('CountriesMenu', () => {
     it('should merge country codes by display name and skip ANALSAT', () => {
       const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
-      catalogManagerInstance.getSats = vi.fn().mockReturnValue([
-        { country: 'US' },
-        { country: 'USA' },
-        { country: 'ANALSAT' },
-      ]);
-      vi
-        .spyOn(StringExtractor, 'extractCountry')
-        .mockImplementation((code: string) => (code === 'US' || code === 'USA' ? 'United States' : code));
+      catalogManagerInstance.getSats = vi.fn().mockReturnValue([{ country: 'US' }, { country: 'USA' }, { country: 'ANALSAT' }]);
+      vi.spyOn(StringExtractor, 'extractCountry').mockImplementation((code: string) => (code === 'US' || code === 'USA' ? 'United States' : code));
 
       const plugin = new CountriesMenu();
       const html = plugin['generateCountryList_']();
@@ -226,9 +220,7 @@ describe('CountriesMenu', () => {
         // eslint-disable-next-line
         .mockImplementation(() => undefined);
 
-      vi
-        .spyOn(plugin as any, 'generateCountryList_')
-        .mockReturnValue('<li class="menu-selectable country-option" data-group="US">United States</li>');
+      vi.spyOn(plugin as any, 'generateCountryList_').mockReturnValue('<li class="menu-selectable country-option" data-group="US">United States</li>');
       document.body.innerHTML = `
               <div id="country-menu">
                 <ul id="country-list"></ul>
@@ -292,7 +284,13 @@ describe('CountriesMenu behavior', () => {
   });
 
   it('builds command-palette commands grouped by country and invokes one', () => {
-    vi.spyOn(ServiceLocator.getCatalogManager(), 'getSats').mockReturnValue([{ country: 'US' }, { country: 'US' }, { country: 'CA' }, { country: 'ANALSAT' }, { country: '' }] as never);
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'getSats').mockReturnValue([
+      { country: 'US' },
+      { country: 'US' },
+      { country: 'CA' },
+      { country: 'ANALSAT' },
+      { country: '' },
+    ] as never);
     // Two distinct display names so the alphabetical sort comparator actually runs.
     vi.spyOn(StringExtractor, 'extractCountry').mockImplementation((code: string) => (code === 'CA' ? 'Canada' : 'United States'));
 

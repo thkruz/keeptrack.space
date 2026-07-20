@@ -13,15 +13,9 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
-import { KeepTrack } from '@app/keeptrack';
 import { keepTrackApi } from '@app/keepTrackApi';
-import {
-  BaseObject, cKmPerMs, DEG2RAD,
-  eci2lla,
-  RadecTopocentric,
-  Satellite,
-  SpaceObjectType, Sun, SunTime,
-} from '@ootk/src/main';
+import { KeepTrack } from '@app/keeptrack';
+import { BaseObject, cKmPerMs, DEG2RAD, eci2lla, RadecTopocentric, Satellite, SpaceObjectType, Sun, SunTime } from '@ootk/src/main';
 import type { SensorManager } from '../../app/sensors/sensorManager';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { missileManager } from '../missile/missile-manager';
@@ -88,7 +82,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       { key: 'Elevation', id: EL.ELEVATION, tooltip: 'Angle (Up/Down) from the Sensor', value: 'XX deg' },
       { key: 'RA', id: EL.RA, tooltip: 'Right Ascension', value: 'XX deg' },
       { key: 'Dec', id: EL.DEC, tooltip: 'Declination', value: 'XX deg' },
-      { key: 'Beam Width', id: EL.BEAMWIDTH, tooltip: 'Linear Width at Target\'s Range', value: 'xxxx km' },
+      { key: 'Beam Width', id: EL.BEAMWIDTH, tooltip: "Linear Width at Target's Range", value: 'xxxx km' },
       { key: 'Max Tmx Time', id: EL.MAX_TMX, tooltip: 'Time for RF/Light to Reach Target and Back', value: 'xxxx ms' },
       { key: 'Sun', id: EL.SUN, tooltip: 'Does the Sun Impact the Sensor', value: '-' },
       { key: 'Vis Mag', id: EL.VMAG, tooltip: 'Visual Magnitude (Lower numbers are brighter)', value: 'xx.x' },
@@ -101,7 +95,9 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
         Sensor Data
         <span id="${SECTIONS.SENSOR}-collapse" class="section-collapse material-icons">expand_less</span>
       </div>
-      ${rows.map((row) => html`
+      ${rows
+        .map(
+          (row) => html`
         <div
           class="sat-info-row${row.id === EL.SUN || row.id === EL.VMAG || row.id === EL.NEXT_PASS ? ' sat-only-info' : ''}"
         >
@@ -112,7 +108,9 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
         </div>
         <div class="sat-info-value" id="${row.id}">${row.value}</div>
         </div>
-      `).join('')}
+      `
+        )
+        .join('')}
       </div>
     `;
   }
@@ -198,7 +196,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       }
 
       // If we are in the sun exclusion zone, then say so
-      if (sunTime?.sunriseStart.getTime() - now.getTime() < 0 && (sunTime?.sunsetEnd.getTime() - now.getTime() > 0)) {
+      if (sunTime?.sunriseStart.getTime() - now.getTime() < 0 && sunTime?.sunsetEnd.getTime() - now.getTime() > 0) {
         // Unless you are in sun exclusion
         satSunDom.innerHTML = 'Sun Exclusion';
         satSunDom.style.color = 'red';
@@ -259,7 +257,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
               .toast(
                 `Satellite ${obj.sccNum} is not in orbit!<br>Sim time is ${timeManagerInstance.simulationTimeObj.toUTCString()}.<br>Be sure to check you have the right TLE.`,
                 ToastMsgType.error,
-                true,
+                true
               );
             PluginRegistry.getPlugin(SelectSatManager)!.selectSat(-1);
 
@@ -424,10 +422,19 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     }
   }
 
-  private updateSatTearrOutFov_(elements: {
-    az: HTMLElement | null; el: HTMLElement | null; rng: HTMLElement | null; vmag: HTMLElement | null; beamwidth: HTMLElement | null;
-    maxTmx: HTMLElement | null; ra: HTMLElement | null; dec: HTMLElement | null;
-  }, sensorManagerInstance: SensorManager) {
+  private updateSatTearrOutFov_(
+    elements: {
+      az: HTMLElement | null;
+      el: HTMLElement | null;
+      rng: HTMLElement | null;
+      vmag: HTMLElement | null;
+      beamwidth: HTMLElement | null;
+      maxTmx: HTMLElement | null;
+      ra: HTMLElement | null;
+      dec: HTMLElement | null;
+    },
+    sensorManagerInstance: SensorManager
+  ) {
     if (elements.vmag) {
       elements.vmag.innerHTML = 'Out of FOV';
     }
@@ -487,10 +494,21 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     }
   }
 
-  private updateSatTearrInFov_(elements: {
-    az: HTMLElement | null; el: HTMLElement | null; rng: HTMLElement | null; vmag: HTMLElement | null; beamwidth: HTMLElement | null;
-    maxTmx: HTMLElement | null; ra: HTMLElement | null; dec: HTMLElement | null;
-  }, obj: BaseObject, sensorManagerInstance: SensorManager, timeManagerInstance: TimeManager) {
+  private updateSatTearrInFov_(
+    elements: {
+      az: HTMLElement | null;
+      el: HTMLElement | null;
+      rng: HTMLElement | null;
+      vmag: HTMLElement | null;
+      beamwidth: HTMLElement | null;
+      maxTmx: HTMLElement | null;
+      ra: HTMLElement | null;
+      dec: HTMLElement | null;
+    },
+    obj: BaseObject,
+    sensorManagerInstance: SensorManager,
+    timeManagerInstance: TimeManager
+  ) {
     if (elements.az) {
       const az = ServiceLocator.getSensorManager().currentTEARR.az;
 
@@ -552,9 +570,10 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     if (sensorManagerInstance.currentSensors[0] instanceof RfSensor) {
       const currentRange = ServiceLocator.getSensorManager().currentTEARR.rng;
 
-      beamwidthString = sensorManagerInstance.currentSensors[0].beamwidth && currentRange
-        ? `${(currentRange * Math.sin(DEG2RAD * sensorManagerInstance.currentSensors[0].beamwidth)).toFixed(2)} km`
-        : 'Unknown';
+      beamwidthString =
+        sensorManagerInstance.currentSensors[0].beamwidth && currentRange
+          ? `${(currentRange * Math.sin(DEG2RAD * sensorManagerInstance.currentSensors[0].beamwidth)).toFixed(2)} km`
+          : 'Unknown';
     }
     if (elements.beamwidth) {
       elements.beamwidth.innerHTML = beamwidthString;

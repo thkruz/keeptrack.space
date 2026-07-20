@@ -1,9 +1,9 @@
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { BaseObject, Degrees } from '@ootk/src/main';
 import { mat4 } from 'gl-matrix';
 import { ConeMesh, ConeSettings } from './cone-mesh';
 import { CustomMeshFactory } from './custom-mesh-factory';
-import { EventBus } from '@app/engine/events/event-bus';
 
 export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
   private defaultConeSettings_: ConeSettings = {
@@ -77,9 +77,7 @@ export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
   }
 
   removeBySourceAndTarget(sourceId: number, targetId: number) {
-    const index = this.meshes.findIndex(
-      (mesh) => mesh.obj.id === sourceId && (mesh.targetObj?.id ?? -1) === targetId,
-    );
+    const index = this.meshes.findIndex((mesh) => mesh.obj.id === sourceId && (mesh.targetObj?.id ?? -1) === targetId);
 
     if (index !== -1) {
       this.remove(index);

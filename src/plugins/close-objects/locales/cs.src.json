@@ -3,6 +3,9 @@
     "CloseObjectsPlugin": {
       "bottomIconLabel": "Blízké objekty",
       "title": "Hledání blízkých objektů",
+      "sections": {
+        "search": "Hledání"
+      },
       "findBtn": "Najít blízké objekty",
       "help": {
         "overview": "Hledání blízkých objektů prochází celý katalog a hledá dvojice objektů, které se právě teď nacházejí do 50 km od sebe. Je to rychlý způsob, jak odhalit společně obíhající družice, nedávné rozpady a přeplněné oblasti bez nutnosti spouštět úplnou analýzu konjunkcí.",

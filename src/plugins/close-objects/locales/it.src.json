@@ -3,6 +3,9 @@
     "CloseObjectsPlugin": {
       "bottomIconLabel": "Oggetti vicini",
       "title": "Ricerca oggetti vicini",
+      "sections": {
+        "search": "Ricerca"
+      },
       "findBtn": "Trova oggetti vicini",
       "help": {
         "overview": "La ricerca oggetti vicini analizza l'intero catalogo alla ricerca di coppie di oggetti che in questo momento volano a meno di 50 km l'uno dall'altro. È un modo rapido per individuare carichi utili in co-orbita, frammentazioni recenti e zone affollate senza eseguire uno screening completo delle congiunzioni.",

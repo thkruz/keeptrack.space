@@ -1,14 +1,11 @@
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { KeepTrack } from '@app/keeptrack';
-import { Milliseconds } from '@ootk/src/main';
-import { ServiceLocator } from '@app/engine/core/service-locator';
-import {
-  hasSettingsContribution,
-  ISettingToggleControl,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { hasSettingsContribution, ISettingToggleControl } from '@app/engine/plugins/core/plugin-capabilities';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
+import { KeepTrack } from '@app/keeptrack';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
+import { Milliseconds } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
 import { setupDefaultHtml, setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';

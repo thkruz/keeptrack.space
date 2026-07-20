@@ -47,9 +47,7 @@ export const handleSgp4WasmBackendMsg = (data: Sgp4WasmBackendMsgData): void => 
           const stats = Sgp4.wasmBackendStats;
 
           // eslint-disable-next-line no-console
-          console.debug(
-            `[sgp4-wasm] ${self.location?.pathname ?? 'worker'} t+${delayMs / 1000}s: ${stats.attached} TLEs on wasm, ${stats.fallback} on TypeScript fallback`,
-          );
+          console.debug(`[sgp4-wasm] ${self.location?.pathname ?? 'worker'} t+${delayMs / 1000}s: ${stats.attached} TLEs on wasm, ${stats.fallback} on TypeScript fallback`);
         }, delayMs);
       }
     })

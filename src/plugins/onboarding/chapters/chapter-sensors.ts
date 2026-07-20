@@ -48,7 +48,7 @@ const placeDemoCustomSensor = (): void => {
       minRng: 0,
       maxRng: 5500,
     },
-    'onboarding-demo',
+    'onboarding-demo'
   );
 
   ServiceLocator.getSensorManager().addSecondarySensor(new DetailedSensor(params), true);

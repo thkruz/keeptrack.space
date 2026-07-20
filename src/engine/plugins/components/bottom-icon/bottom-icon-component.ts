@@ -96,11 +96,7 @@ export class BottomIconComponent {
    * @param config The configuration for the bottom icon.
    * @param callbacks Optional callbacks for icon events.
    */
-  constructor(
-    pluginId: string,
-    config: IBottomIconConfig,
-    callbacks: BottomIconCallbacks = {},
-  ) {
+  constructor(pluginId: string, config: IBottomIconConfig, callbacks: BottomIconCallbacks = {}) {
     this.pluginId = pluginId;
     this.callbacks = callbacks;
 

@@ -1,29 +1,24 @@
-import { CameraState } from '@app/engine/camera/state/camera-state';
-import { CameraType } from '@app/engine/camera/camera-type';
-import { GetSatType, SolarBody, ToastMsgType } from '@app/engine/core/interfaces';
-import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
-
-import { satDetailService } from '@app/app/data/catalogs/sat-detail-service';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { satDetailService } from '@app/app/data/catalogs/sat-detail-service';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { Planet } from '@app/app/objects/planet';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { SoundNames } from '@app/engine/audio/sounds';
+import { CameraType } from '@app/engine/camera/camera-type';
+import { CameraState } from '@app/engine/camera/state/camera-state';
+import { GetSatType, SolarBody, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import {
-  IKeyboardShortcut,
-  ISettingsContribution,
-  ISettingsContributor,
-} from '@app/engine/plugins/core/plugin-capabilities';
-import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { estimateObjectRadiusKm, initialFramingDistanceKm, targetStandoffDistanceKm } from '@app/engine/utils/transforms';
-import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
-import { t7e } from '@app/locales/keys';
+import { IKeyboardShortcut, ISettingsContribution, ISettingsContributor } from '@app/engine/plugins/core/plugin-capabilities';
 import { COVARIANCE_RADII_FALLBACK, covarianceDisplayRadii, ricSigmasFromCovarianceMatrix } from '@app/engine/rendering/draw-manager/covariance-radii';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
+import { estimateObjectRadiusKm, initialFramingDistanceKm, targetStandoffDistanceKm } from '@app/engine/utils/transforms';
+import { t7e } from '@app/locales/keys';
 import { createSampleCovarianceFromTle, Kilometers, RADIUS_OF_EARTH, Satellite, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -51,10 +46,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
           get: () => settingsManager.isFocusOnSatelliteWhenSelected,
           set: (next) => {
             settingsManager.isFocusOnSatelliteWhenSelected = next;
-            PersistenceManager.getInstance().saveItem(
-              StorageKey.SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED,
-              next.toString(),
-            );
+            PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED, next.toString());
           },
         },
       ],
@@ -125,8 +117,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
         const timeManagerInstance = ServiceLocator.getTimeManager();
 
         if (this.primarySatObj) {
-          ServiceLocator.getUiManager().
-            updateSelectBox(timeManagerInstance.realTime, timeManagerInstance.lastBoxUpdateTime, this.primarySatObj);
+          ServiceLocator.getUiManager().updateSelectBox(timeManagerInstance.realTime, timeManagerInstance.lastBoxUpdateTime, this.primarySatObj);
         }
       }
     });
@@ -255,11 +246,11 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
           hideEl('draw-line-links');
           this.selectSatObject_(obj as MissileObject);
           break;
-        case (SpaceObjectType.TERRESTRIAL_PLANET):
-        case (SpaceObjectType.GAS_GIANT):
-        case (SpaceObjectType.ICE_GIANT):
-        case (SpaceObjectType.DWARF_PLANET):
-        case (SpaceObjectType.MOON):
+        case SpaceObjectType.TERRESTRIAL_PLANET:
+        case SpaceObjectType.GAS_GIANT:
+        case SpaceObjectType.ICE_GIANT:
+        case SpaceObjectType.DWARF_PLANET:
+        case SpaceObjectType.MOON:
           PluginRegistry.getPlugin(PlanetsMenuPlugin)?.changePlanet(obj.name as SolarBody);
 
           return;
@@ -335,7 +326,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     if (id === -1 && this.lastSelectedSat_ !== -1) {
       ServiceLocator.getOrbitManager().clearSelectOrbit();
       // Restore the free-camera zoom floor (a selected missile drops it to the surface).
-      settingsManager.minZoomDistance = RADIUS_OF_EARTH + 50 as Kilometers;
+      settingsManager.minZoomDistance = (RADIUS_OF_EARTH + 50) as Kilometers;
     } else if (!(obj instanceof OemSatellite)) {
       // Currently Satellites and Missiles assume Earth center
       const wasOffEarth = settingsManager.centerBody !== SolarBody.Earth;
@@ -369,7 +360,12 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     const scene = Scene.getInstance();
 
     cam.transition.duration = settingsManager.cameraTransitionDuration;
-    cam.transition.begin(cam.matrixWorldInverse, scene.worldShift);
+    // primarySatObj is still the object being deselected at this point (it is reassigned to the
+    // new target later in selectSat), so anchor the frozen "from" endpoint to it: the endpoint
+    // then travels with the outgoing satellite through the blend instead of lagging behind it,
+    // which is what makes small/close debris shake on a mode/target switch. A no-sat sentinel or
+    // positionless object leaves the anchor unset (fixed-endpoint fallback).
+    cam.transition.begin(cam.matrixWorldInverse, scene.worldShift, this.primarySatObj);
   }
 
   private selectSatReset_() {
@@ -422,7 +418,6 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
         this.updatePrimaryCovBubble_(sat);
       }
     }
-
 
     // stop rotation if it is on
     ServiceLocator.getMainCamera().autoRotate(false);
@@ -533,6 +528,15 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
 
     const cam = ServiceLocator.getMainCamera();
 
+    // When switching from one already-selected object to another (e.g. the [ / ] shortcuts),
+    // preserve the current standoff instead of snapping to the new object's default framing -
+    // otherwise a smaller target reframes closer and reads as an unwanted zoom-in even though the
+    // user never changed the zoom. primarySatObj is still the OUTGOING object at this point (it is
+    // reassigned to the new target later in selectSat), so a valid id means a switch, not a fresh
+    // selection. The framing distance still applies on the first selection from an unfocused view.
+    const wasFocusedOnObject = this.primarySatObj.id !== -1;
+    const prevStandoff = cam.state.camDistBuffer;
+
     if (cam.cameraType === CameraType.FIXED_TO_EARTH) {
       cam.state.earthCenteredLastZoom = cam.zoomLevel();
       cam.cameraType = this.lastSatCameraType;
@@ -547,7 +551,9 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
 
     if (radiusKm === null) {
       cam.state.minDistanceFromTarget = null;
-      cam.state.camDistBuffer = cam.state.effectiveMinDistanceFromTarget;
+      // The camDistBuffer setter clamps to the new object's min standoff, so a preserved standoff
+      // that is too close for the new target is pushed out rather than clipping into it.
+      cam.state.camDistBuffer = wasFocusedOnObject ? prevStandoff : cam.state.effectiveMinDistanceFromTarget;
     } else {
       let minStandoff = targetStandoffDistanceKm(radiusKm);
       let framing = initialFramingDistanceKm(radiusKm);
@@ -563,7 +569,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       }
 
       cam.state.minDistanceFromTarget = minStandoff;
-      cam.state.camDistBuffer = framing;
+      cam.state.camDistBuffer = wasFocusedOnObject ? prevStandoff : framing;
     }
 
     if (cam.cameraType === CameraType.FIXED_TO_SAT_LVLH || cam.cameraType === CameraType.FIXED_TO_SAT_ECI) {
@@ -604,8 +610,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
 
     if (lastSelectedObject !== -1) {
       colorSchemeManagerInstance.currentColorSchemeUpdate ??=
-        colorSchemeManagerInstance.colorSchemeInstances[settingsManager.defaultColorScheme]?.update ??
-        Object.values(colorSchemeManagerInstance.colorSchemeInstances)[0].update;
+        colorSchemeManagerInstance.colorSchemeInstances[settingsManager.defaultColorScheme]?.update ?? Object.values(colorSchemeManagerInstance.colorSchemeInstances)[0].update;
 
       const lastSat = ServiceLocator.getCatalogManager().getObject(lastSelectedObject);
       // Guard against a stale lastSelectedObject id that now exceeds the color buffer
@@ -648,7 +653,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     return ServiceLocator.getCatalogManager().getObject(this.selectedSat, type) as Satellite | MissileObject;
   }
 
-  setSecondarySat(id: number): void {
+  setSecondarySat(id: number, isPreventToast = false): void {
     if (settingsManager.isDisableSelectSat) {
       return;
     }
@@ -670,7 +675,24 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
 
       if ((this.secondarySatObj?.id ?? -1) !== -1 && this.secondarySatObj instanceof Satellite) {
         this.updateSecondaryCovBubble_(this.secondarySatObj);
+
+        // Setting a secondary neither moves the camera nor shows a dominant orbit line
+        // (the hover line draws on top of the secondary orbit), so the action can look
+        // like nothing happened. Give the user an explicit cue - the toast provides the
+        // visual confirmation (naming the object) and plays a notification sound. A
+        // primary/secondary swap suppresses it (isPreventToast): the camera refocus
+        // already signals the change and [ / ] can be pressed in quick succession.
+        if (!isPreventToast) {
+          ServiceLocator.getUiManager().toast(t7e('SelectSatManager.secondaryObjectSet').replace('{name}', this.secondarySatObj.name), ToastMsgType.normal);
+        }
       }
+    }
+
+    // Clearing the secondary must also wipe its orbit line, mirroring how deselecting
+    // the primary clears the primary orbit. Without this the secondary orbit lingers
+    // on screen after a clear-screen / deselect even though the object is gone.
+    if (id === -1) {
+      ServiceLocator.getOrbitManager().clearSelectOrbit(true);
     }
 
     if (this.secondarySat === this.selectedSat) {
@@ -698,15 +720,13 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     const _primary = this.selectedSat;
     const _secondary = this.secondarySat;
 
-    this.setSecondarySat(_primary);
-    const orbitManagerInstance = ServiceLocator.getOrbitManager();
-
-    if (_primary !== -1) {
-      orbitManagerInstance.setSelectOrbit(_primary, true);
-    } else {
-      orbitManagerInstance.clearSelectOrbit(true);
-    }
-    this.setSelectedSat_(_secondary);
+    // Promote the old secondary to the primary through the full selection path so the
+    // camera refocuses on it and the info box, orbit, sound, and covariance bubble all
+    // update. The previous setSelectedSat_ shortcut only reassigned the id, leaving the
+    // camera fixed on the old primary. selectSat clears _secondary as the secondary once
+    // it becomes the primary, so reassign the old primary as the secondary afterward
+    // (toast suppressed - the camera move is the swap's feedback).
+    this.selectSat(_secondary);
+    this.setSecondarySat(_primary, true);
   }
-
 }

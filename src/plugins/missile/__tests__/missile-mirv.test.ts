@@ -1,4 +1,13 @@
-import { expandTrajectoryToMirv, expandTrajectoryToTargets, findSeparationIndex, generateFootprint, MAX_WARHEADS_PER_MISSILE, retargetDescent, RvTarget, warheadCountForDesc } from '@app/plugins/missile/missile-mirv';
+import {
+  expandTrajectoryToMirv,
+  expandTrajectoryToTargets,
+  findSeparationIndex,
+  generateFootprint,
+  MAX_WARHEADS_PER_MISSILE,
+  RvTarget,
+  retargetDescent,
+  warheadCountForDesc,
+} from '@app/plugins/missile/missile-mirv';
 
 describe('missile-mirv geometry', () => {
   describe('generateFootprint', () => {

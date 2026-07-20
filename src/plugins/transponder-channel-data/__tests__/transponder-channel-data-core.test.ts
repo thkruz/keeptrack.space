@@ -1,11 +1,4 @@
-import {
-  buildExportRows,
-  CHANNEL_COLUMNS,
-  ChannelInfo,
-  dedupeChannels,
-  filterChannels,
-  sortChannels,
-} from '@app/plugins/transponder-channel-data/transponder-channel-data-core';
+import { buildExportRows, CHANNEL_COLUMNS, ChannelInfo, dedupeChannels, filterChannels, sortChannels } from '@app/plugins/transponder-channel-data/transponder-channel-data-core';
 
 const makeEntry = (over: Partial<ChannelInfo> = {}): ChannelInfo => ({
   satellite: 'ASTRA 1N',
@@ -38,11 +31,7 @@ describe('transponder-channel-data-core', () => {
     });
 
     it('keeps entries that differ in freq or beam', () => {
-      const data = [
-        makeEntry(),
-        makeEntry({ freq: '11000 V' }),
-        makeEntry({ beam: 'Spotbeam' }),
-      ];
+      const data = [makeEntry(), makeEntry({ freq: '11000 V' }), makeEntry({ beam: 'Spotbeam' })];
 
       expect(dedupeChannels(data)).toHaveLength(3);
     });
@@ -53,10 +42,7 @@ describe('transponder-channel-data-core', () => {
   });
 
   describe('filterChannels', () => {
-    const data = [
-      makeEntry({ tvchannel: 'BBC One', lang: 'English' }),
-      makeEntry({ tvchannel: 'ZDF', lang: 'German' }),
-    ];
+    const data = [makeEntry({ tvchannel: 'BBC One', lang: 'English' }), makeEntry({ tvchannel: 'ZDF', lang: 'German' })];
 
     it('returns all rows for an empty query', () => {
       expect(filterChannels(data, '   ')).toHaveLength(2);
@@ -73,11 +59,7 @@ describe('transponder-channel-data-core', () => {
   });
 
   describe('sortChannels', () => {
-    const data = [
-      makeEntry({ tvchannel: 'Charlie' }),
-      makeEntry({ tvchannel: 'alpha' }),
-      makeEntry({ tvchannel: 'Bravo' }),
-    ];
+    const data = [makeEntry({ tvchannel: 'Charlie' }), makeEntry({ tvchannel: 'alpha' }), makeEntry({ tvchannel: 'Bravo' })];
 
     it('sorts ascending case-insensitively without mutating input', () => {
       const result = sortChannels(data, 'tvchannel', 'asc');
@@ -93,11 +75,7 @@ describe('transponder-channel-data-core', () => {
     });
 
     it('sorts frequency numerically', () => {
-      const freqs = [
-        makeEntry({ freq: '10773 H' }),
-        makeEntry({ freq: '9750 V' }),
-        makeEntry({ freq: '11000 H' }),
-      ];
+      const freqs = [makeEntry({ freq: '10773 H' }), makeEntry({ freq: '9750 V' }), makeEntry({ freq: '11000 H' })];
       const result = sortChannels(freqs, 'freq', 'asc');
 
       expect(result.map((r) => r.freq)).toEqual(['9750 V', '10773 H', '11000 H']);

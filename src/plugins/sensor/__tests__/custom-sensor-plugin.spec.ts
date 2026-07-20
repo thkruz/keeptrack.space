@@ -40,9 +40,7 @@ test.describe('CustomSensorPlugin', () => {
 
     // Close
     await page.evaluate(() => {
-      document.getElementById('custom-sensor-menu-close-btn')?.dispatchEvent(
-        new MouseEvent('click', { bubbles: true }),
-      );
+      document.getElementById('custom-sensor-menu-close-btn')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u, { timeout: 5_000 });
   });

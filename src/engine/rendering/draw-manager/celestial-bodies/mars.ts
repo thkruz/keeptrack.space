@@ -20,7 +20,7 @@
  */
 
 import { SolarBody } from '@app/engine/core/interfaces';
-import { TemeVec3, Kilometers, Seconds } from '@ootk/src/main';
+import { Kilometers, Seconds, TemeVec3 } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
@@ -29,17 +29,17 @@ export enum MarsTextureQuality {
   POTATO = '512',
   LOW = '1k',
   HIGH = '4k',
-  ULTRA = '8k'
+  ULTRA = '8k',
 }
 
 export class Mars extends CelestialBody {
   readonly RADIUS = 3389.5;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
-  orbitalPeriod = 1.8808 * 365.25 * 24 * 3600 as Seconds;
+  orbitalPeriod = (1.8808 * 365.25 * 24 * 3600) as Seconds;
   meanDistanceToSun = 227943824 as Kilometers;
   eci: TemeVec3;
-  rotation = [0, 0, Math.PI * 7 / 10];
+  rotation = [0, 0, (Math.PI * 7) / 10];
   color = PlanetColors.MARS;
   textureQuality = MarsTextureQuality.POTATO;
 

@@ -1,14 +1,12 @@
-import { vi } from 'vitest';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import * as dragUtils from '@app/engine/utils/click-and-drag';
 import { getEl } from '@app/engine/utils/get-el';
 import * as slideUtils from '@app/engine/utils/slide';
-import {
-  bottomMenuClick, getSatChngJson, hideSideMenus, init, satChng, uiManagerInit,
-} from '@app/plugins/sat-changes/sat-changes';
+import { bottomMenuClick, getSatChngJson, hideSideMenus, init, satChng, uiManagerInit } from '@app/plugins/sat-changes/sat-changes';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { vi } from 'vitest';
 
 const sampleJson = () => [{ year: 21, day: 100.5, SCC: 25544, inc: 51.6, meanmo: 0.001 }];
 

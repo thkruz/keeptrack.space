@@ -38,9 +38,9 @@ export abstract class ChebyshevBody extends CelestialBody {
     sunEntity.updateEci();
     const sunPos = sunEntity.eci;
 
-    posTeme.x = posTeme.x + sunPos.x as Kilometers;
-    posTeme.y = posTeme.y + sunPos.y as Kilometers;
-    posTeme.z = posTeme.z + sunPos.z as Kilometers;
+    posTeme.x = (posTeme.x + sunPos.x) as Kilometers;
+    posTeme.y = (posTeme.y + sunPos.y) as Kilometers;
+    posTeme.z = (posTeme.z + sunPos.z) as Kilometers;
 
     this.position = [posTeme.x, posTeme.y, posTeme.z];
 
@@ -70,16 +70,8 @@ export abstract class ChebyshevBody extends CelestialBody {
 
       return new J2000(
         epoch,
-        new Vector3D(
-          j2000.position.x + sunEci[0] as Kilometers,
-          j2000.position.y + sunEci[1] as Kilometers,
-          j2000.position.z + sunEci[2] as Kilometers,
-        ),
-        new Vector3D(
-          j2000.velocity.x as KilometersPerSecond,
-          j2000.velocity.y as KilometersPerSecond,
-          j2000.velocity.z as KilometersPerSecond,
-        ),
+        new Vector3D((j2000.position.x + sunEci[0]) as Kilometers, (j2000.position.y + sunEci[1]) as Kilometers, (j2000.position.z + sunEci[2]) as Kilometers),
+        new Vector3D(j2000.velocity.x as KilometersPerSecond, j2000.velocity.y as KilometersPerSecond, j2000.velocity.z as KilometersPerSecond)
       );
     }
 
@@ -93,15 +85,11 @@ export abstract class ChebyshevBody extends CelestialBody {
       return new J2000(
         epoch,
         new Vector3D(
-          j2000.position.x + sunEci[0] - centerBodyTeme.position.x as Kilometers,
-          j2000.position.y + sunEci[1] - centerBodyTeme.position.y as Kilometers,
-          j2000.position.z + sunEci[2] - centerBodyTeme.position.z as Kilometers,
+          (j2000.position.x + sunEci[0] - centerBodyTeme.position.x) as Kilometers,
+          (j2000.position.y + sunEci[1] - centerBodyTeme.position.y) as Kilometers,
+          (j2000.position.z + sunEci[2] - centerBodyTeme.position.z) as Kilometers
         ),
-        new Vector3D(
-          j2000.velocity.x as KilometersPerSecond,
-          j2000.velocity.y as KilometersPerSecond,
-          j2000.velocity.z as KilometersPerSecond,
-        ),
+        new Vector3D(j2000.velocity.x as KilometersPerSecond, j2000.velocity.y as KilometersPerSecond, j2000.velocity.z as KilometersPerSecond)
       );
     }
 
@@ -129,7 +117,7 @@ export abstract class ChebyshevBody extends CelestialBody {
     }
 
     // If orbital period is less than 20 years, use the parent class method
-    if (this.orbitalPeriod < (20 * 365.25 * 24 * 3600 as Seconds)) {
+    if (this.orbitalPeriod < ((20 * 365.25 * 24 * 3600) as Seconds)) {
       super.drawFullOrbitPath();
 
       return;
@@ -188,7 +176,6 @@ export abstract class ChebyshevBody extends CelestialBody {
       // Loop through lineManager.lines to find this.fullOrbitPath. Replace the entry.
       for (let i = 0; i < lineManager.lines.length; i++) {
         if (lineManager.lines[i] === this.fullOrbitPath) {
-
           // If new positions were calculated, update the vertex buffer
           if (orbitPositions.length !== 0) {
             this.fullOrbitPath.updateVertBuf(orbitPositions);

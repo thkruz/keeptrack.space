@@ -15,17 +15,24 @@
       },
       "sections": {
         "template": "Template",
+        "launchWindow": "Launch Window",
         "launchSite": "Launch Site"
       },
       "buttons": {
+        "matchTargetPlane": "Find Launch Window",
         "createLaunchNominal": "Create Launch Nominal",
-        "inclinationTooLow": "Inclination Too Low!"
+        "inclinationTooLow": "Inclination Too Low!",
+        "clearWindow": "Clear launch window",
+        "createLaunchAtWindow": "Create Launch at Window"
       },
       "msgs": {
+        "windowFound": "Launch at {time} to match the target plane (ΔRAAN {delta}°)",
         "launchNominalCreated": "Launch Nominal Created!",
         "timeRelativeToLaunch": "Time is now relative to launch time."
       },
       "errorMsgs": {
+        "windowNoTarget": "Select a target satellite first.",
+        "windowGeometryImpossible": "No launch window: the target inclination is below the launch site latitude.",
         "noMoreNominalSatellites": "No more nominal satellites available!",
         "launchSiteNotFound": "Launch Site {launchSite} not found!",
         "failedToCreateTle": "Failed to Create TLE: {error}",
@@ -42,7 +49,9 @@
         "invalidEpochDayFormat": "Invalid epoch day format! Must be 3 digits, a decimal, and 8 digits after the decimal.",
         "epochDayFormatIssue": "There was an issue with this satellite's epoch day format. Try a different satellite.",
         "failedToPropagate": "Failed to propagate satellite. Try different parameters or report this issue if parameters are correct.",
-        "changingOrbitBufferFailed": "Changing orbit buffer data failed"
+        "changingOrbitBufferFailed": "Changing orbit buffer data failed",
+        "launchLatExceedsInclination": "Launch latitude exceeds the orbit’s inclination.",
+        "failedToFitOrbit": "Could not fit an orbit to the launch site."
       },
       "help": {
         "overview": "The New Launch menu creates a notional launch: it copies a real satellite's orbit, rotates it so it lifts off from a launch site you choose, and resets the clock to T+0. Use it to answer \"if something launches from this site into this kind of orbit, when will my sensors see it?\"",
@@ -54,7 +63,8 @@
         "tip1": "After creation the clock reads time since liftoff: \"00:45:00\" means 45 minutes after launch, perfect for sensor-coverage timelines.",
         "tip2": "If the creation fails its altitude check, try a different template satellite with a more conventional orbit.",
         "shortcutOpen": "Open the New Launch menu"
-      }
+      },
+      "launchWindowHelp": "Finds the next launch time whose orbital plane matches the target satellite. This only sets the launch time; nothing is created until you press Create Launch Nominal."
     }
   }
 }

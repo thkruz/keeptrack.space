@@ -23,11 +23,10 @@ export abstract class RadarMath {
      */
     const minSW = 10 ** ((minSdB - 30) / 10);
     // let frequencyMhz = 435;
-    const fHz = (fMhz * 10 ** 6);
+    const fHz = fMhz * 10 ** 6;
     const numer = pW * aG ** 2 * rcs * (3 * 10 ** 8) ** 2;
     const denom = minSW * (4 * Math.PI) ** 3 * fHz ** 2;
     const rng = Math.sqrt(Math.sqrt(numer / denom));
-
 
     return rng;
   }
@@ -48,12 +47,11 @@ export abstract class RadarMath {
      * let minimumDetectableSignaldB;
      * let frequencyMhz = 435;
      */
-    const fHz = (fMhz * 10 ** 6);
+    const fHz = fMhz * 10 ** 6;
     const numer = pW * aG ** 2 * rcs * (3 * 10 ** 8) ** 2;
     const denom = rng ** 4 * (4 * Math.PI) ** 3 * fHz ** 2;
     const minSW = numer / denom;
     const minSdB = Math.log10(minSW);
-
 
     return minSdB;
   }

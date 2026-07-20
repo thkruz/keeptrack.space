@@ -1,11 +1,7 @@
 import { GroupType } from '@app/app/data/object-group';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import {
-  ICommandPaletteCommand,
-  ISettingsContribution,
-  ISettingsContributor,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { ICommandPaletteCommand, ISettingsContribution, ISettingsContributor } from '@app/engine/plugins/core/plugin-capabilities';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { t7e } from '@app/locales/keys';
 import historyPng from '@public/img/icons/history.png';
@@ -34,7 +30,6 @@ export class TimeMachine extends KeepTrackPlugin implements ISettingsContributor
     }
   };
 
-
   bottomIconImg = historyPng;
   bottomIconLabel = 'Time Machine';
 
@@ -62,10 +57,7 @@ export class TimeMachine extends KeepTrackPlugin implements ISettingsContributor
           get: () => settingsManager.isDisableTimeMachineToasts,
           set: (next) => {
             settingsManager.isDisableTimeMachineToasts = next;
-            PersistenceManager.getInstance().saveItem(
-              StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS,
-              next.toString(),
-            );
+            PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS, next.toString());
           },
         },
       ],
@@ -92,7 +84,7 @@ export class TimeMachine extends KeepTrackPlugin implements ISettingsContributor
           this.playNextSatellite(runCount, year);
         },
         settingsManager.timeMachineDelay * yy,
-        this.historyOfSatellitesRunCount,
+        this.historyOfSatellitesRunCount
       );
 
       const currentYear = parseInt(new Date().getUTCFullYear().toString().slice(2, 4));
@@ -169,4 +161,3 @@ export class TimeMachine extends KeepTrackPlugin implements ISettingsContributor
     colorSchemeManagerInstance.calculateColorBuffers(true);
   }
 }
-

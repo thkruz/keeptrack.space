@@ -1,25 +1,26 @@
-import { vi } from 'vitest';
-import { BufferGeometry } from '@app/engine/rendering/buffer-geometry';
 import { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
-import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
+import { BufferGeometry } from '@app/engine/rendering/buffer-geometry';
 import { RingGeometry } from '@app/engine/rendering/ring-geometry';
+import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { vec3 } from 'gl-matrix';
+import { vi } from 'vitest';
 
 /*
  * The geometry classes generate vertex/index data (pure math) and manage a
  * local model matrix. A WebGL context is only needed to upload buffers, so a
  * minimal mock context satisfies the index/buffer paths.
  */
-const makeGl = () => ({
-  createBuffer: vi.fn(() => ({}) as WebGLBuffer),
-  bindBuffer: vi.fn(),
-  bufferData: vi.fn(),
-  ARRAY_BUFFER: 0x8892,
-  ELEMENT_ARRAY_BUFFER: 0x8893,
-  STATIC_DRAW: 0x88E4,
-  UNSIGNED_SHORT: 0x1403,
-  UNSIGNED_INT: 0x1405,
-}) as unknown as WebGL2RenderingContext;
+const makeGl = () =>
+  ({
+    createBuffer: vi.fn(() => ({}) as WebGLBuffer),
+    bindBuffer: vi.fn(),
+    bufferData: vi.fn(),
+    ARRAY_BUFFER: 0x8892,
+    ELEMENT_ARRAY_BUFFER: 0x8893,
+    STATIC_DRAW: 0x88e4,
+    UNSIGNED_SHORT: 0x1403,
+    UNSIGNED_INT: 0x1405,
+  }) as unknown as WebGL2RenderingContext;
 
 describe('BufferGeometry', () => {
   it('constructs with a default type and identity model matrix', () => {

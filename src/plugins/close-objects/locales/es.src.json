@@ -3,6 +3,9 @@
     "CloseObjectsPlugin": {
       "bottomIconLabel": "Objetos cercanos",
       "title": "Búsqueda de objetos cercanos",
+      "sections": {
+        "search": "Búsqueda"
+      },
       "findBtn": "Buscar objetos cercanos",
       "help": {
         "overview": "La búsqueda de objetos cercanos recorre todo el catálogo en busca de pares de objetos que vuelan a menos de 50 km entre sí en este momento. Es una forma rápida de detectar cargas útiles coorbitantes, fragmentaciones recientes y zonas congestionadas sin ejecutar un análisis de conjunciones completo.",

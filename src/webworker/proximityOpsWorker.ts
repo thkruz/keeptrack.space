@@ -11,22 +11,9 @@
 
 /* eslint-disable no-await-in-loop, no-promise-executor-return */
 
-import {
-  dataToSat,
-  findRpoPairs,
-  findSatsAvAGeo,
-  findSatsAvALeo,
-  ProximityOpsEvent,
-  ProxSatData,
-  RpoSearchParams,
-} from '../plugins/proximity-ops/proximity-ops-core';
 import { Satellite } from '@ootk/src/main';
-import {
-  RpoWorkerMsgType,
-  RpoWorkerOutMsgType,
-  type RpoMsgStart,
-  type RpoWorkerInMsg,
-} from './proximity-ops-messages';
+import { dataToSat, findRpoPairs, findSatsAvAGeo, findSatsAvALeo, ProximityOpsEvent, ProxSatData, RpoSearchParams } from '../plugins/proximity-ops/proximity-ops-core';
+import { type RpoMsgStart, type RpoWorkerInMsg, RpoWorkerMsgType, RpoWorkerOutMsgType } from './proximity-ops-messages';
 import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
 let cancelledRunId = -1;

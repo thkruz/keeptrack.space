@@ -1,33 +1,45 @@
-import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
-import { getEl } from '@app/engine/utils/get-el';
-import { hideLoading, showLoadingSticky } from '@app/engine/utils/showLoading';
-import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
-import rocketLaunchPng from '@public/img/icons/rocket-launch.png';
-
 import { SatMath } from '@app/app/analysis/sat-math';
-
 import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
 import { launchSites } from '@app/app/data/catalogs/launch-sites';
 import { SoundNames } from '@app/engine/audio/sounds';
+import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { TimeManager } from '@app/engine/core/time-manager';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
+import { dateFormat } from '@app/engine/utils/dateFormat';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
+import { hideLoading, showLoadingSticky } from '@app/engine/utils/showLoading';
+import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { t7e } from '@app/locales/keys';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import {
-  BaseObject, Degrees,
-  FormatTle, KilometersPerSecond,
-  OrbitFinder,
-  Satellite, SatelliteParams,
-  SatelliteRecord, Sgp4, SpaceObjectType,
+  BaseObject,
+  calcGmst,
+  Degrees,
+  FormatTle,
+  GreenwichMeanSiderealTime,
+  groundTrackStateVector,
+  KilometersPerSecond,
+  LaunchWindowFinder,
+  LaunchWindowResult,
+  Radians,
+  rv2tle,
+  Satellite,
+  SatelliteParams,
+  SatelliteRecord,
+  Sgp4,
+  SpaceObjectType,
+  semimajorAxisFromMeanMotion,
   TemeVec3,
-  TleLine1, TleLine2,
+  TleLine1,
+  TleLine2,
 } from '@ootk/src/main';
+import rocketLaunchPng from '@public/img/icons/rocket-launch.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { IHelpConfig, IKeyboardShortcut } from '../../engine/plugins/core/plugin-capabilities';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -111,22 +123,21 @@ export class NewLaunch extends KeepTrackPlugin {
           content: t7e('plugins.NewLaunch.help.limits'),
         },
       ],
-      tips: [
-        t7e('plugins.NewLaunch.help.tip1'),
-        t7e('plugins.NewLaunch.help.tip2'),
-      ],
+      tips: [t7e('plugins.NewLaunch.help.tip1'), t7e('plugins.NewLaunch.help.tip2')],
       shortcuts: [{ keys: ['Shift', 'L'], description: t7e('plugins.NewLaunch.help.shortcutOpen' as T7eKey) }],
     };
   }
 
   /**
-   * Shift+L for Launch - toggles the New Launch side menu open/closed. Plain 'L'
-   * is already taken by the orbit-line toggle, so this uses the Shift modifier.
+   * Ctrl+Shift+L for Launch - toggles the New Launch side menu open/closed.
+   * Shift+L is already taken by the orbit-line toggle (OrbitManager), so this
+   * uses the Ctrl+Shift modifiers.
    */
   getKeyboardShortcuts(): IKeyboardShortcut[] {
     return [
       {
         key: 'L',
+        ctrl: true,
         shift: true,
         callback: () => {
           this.bottomMenuClicked();
@@ -167,11 +178,13 @@ export class NewLaunch extends KeepTrackPlugin {
       });
     }
 
-    return countryKeys.map((country) =>
-      `<optgroup label="${country}"> ${grouped[country]
-        .map((site) => `<option value="${site.key}">${site.name}<br/> - ${site.site}</option>`).join('\n')}
-      </optgroup>`,
-    ).join('\n');
+    return countryKeys
+      .map(
+        (country) =>
+          `<optgroup label="${country}"> ${grouped[country].map((site) => `<option value="${site.key}">${site.name}<br/> - ${site.site}</option>`).join('\n')}
+      </optgroup>`
+      )
+      .join('\n');
   }
 
   /**
@@ -257,6 +270,13 @@ export class NewLaunch extends KeepTrackPlugin {
                 </div>
               </section>
 
+              <section class="kt-section">
+                <div class="kt-section-label">${s('launchWindow')}</div>
+                <p class="kt-note">${t7e('plugins.NewLaunch.launchWindowHelp' as T7eKey)}</p>
+                <div class="kt-note nl-window-result" id="nl-window-result" style="display: none;"></div>
+                ${NewLaunch.actionButton_('nl-match-plane', t7e('plugins.NewLaunch.buttons.matchTargetPlane' as T7eKey))}
+              </section>
+
               ${NewLaunch.actionButton_(`${this.sideMenuElementName}-submit`, t7e('plugins.NewLaunch.buttons.createLaunchNominal' as T7eKey), { submit: true })}
             </form>
           </div>
@@ -272,6 +292,151 @@ export class NewLaunch extends KeepTrackPlugin {
   };
 
   protected isDoingCalculations_ = false;
+
+  /**
+   * Launch time selected by "Match target plane". When set, the created
+   * nominal launches at this time instead of 0000z so its plane RAAN matches
+   * the target satellite's plane. Cleared whenever the target, facility, or
+   * direction changes.
+   */
+  protected matchedLaunchTime_: Date | null = null;
+
+  /**
+   * The satellite whose orbital plane the launch window should match. The OSS
+   * form always launches into the template satellite's orbit (nl-scc); pro
+   * overrides this for its mode-aware form.
+   */
+  protected resolveMatchTarget_(): Satellite | null {
+    const sccNum = (getEl('nl-scc') as HTMLInputElement | null)?.value.trim() ?? '';
+    const sat = sccNum ? ServiceLocator.getCatalogManager().sccNum2Sat(sccNum) : null;
+
+    if (!sat) {
+      ServiceLocator.getUiManager().toast(t7e('plugins.NewLaunch.errorMsgs.windowNoTarget' as T7eKey), ToastMsgType.caution);
+    }
+
+    return sat;
+  }
+
+  /** The launch site coordinates for the window search. Pro overrides for custom locations. */
+  protected resolveLaunchSiteLatLon_(): { lat: Degrees; lon: Degrees } | null {
+    const facility = (getEl('nl-facility') as HTMLInputElement | null)?.value ?? '';
+    const site = ServiceLocator.getCatalogManager().launchSites[facility];
+
+    if (!site) {
+      return null;
+    }
+
+    const lon = site.lon > 180 ? ((site.lon - 360) as Degrees) : site.lon;
+
+    return { lat: site.lat, lon };
+  }
+
+  /**
+   * Finds the launch time in the next 24 hours whose orbital plane best
+   * matches the target satellite's RAAN, iterating candidate times from the
+   * current simulation time.
+   */
+  protected onMatchTargetPlane_(): void {
+    const uiManagerInstance = ServiceLocator.getUiManager();
+    const targetSat = this.resolveMatchTarget_();
+
+    if (!targetSat) {
+      return;
+    }
+
+    const site = this.resolveLaunchSiteLatLon_();
+
+    if (!site) {
+      uiManagerInstance.toast(
+        t7e('plugins.NewLaunch.errorMsgs.launchSiteNotFound' as T7eKey).replace('{launchSite}', (getEl('nl-facility') as HTMLInputElement | null)?.value ?? ''),
+        ToastMsgType.caution
+      );
+
+      return;
+    }
+
+    const direction = <'N' | 'S'>((getEl('nl-updown') as HTMLInputElement | null)?.value ?? 'N');
+    // Prefer the drift-aware target RAAN; fall back to the epoch value when
+    // the satellite record is not (yet) available.
+    const satrec = targetSat.satrec as SatelliteRecord | null;
+    const finder = new LaunchWindowFinder({
+      siteLat: site.lat,
+      siteLon: site.lon,
+      inclination: targetSat.inclination,
+      direction,
+      targetRaan: satrec ? (time: Date) => LaunchWindowFinder.meanRaanAt(satrec, time) : targetSat.rightAscension,
+      startTime: ServiceLocator.getTimeManager().simulationTimeObj,
+    });
+
+    const window = finder.findBestLaunchTime();
+
+    if (!window) {
+      uiManagerInstance.toast(t7e('plugins.NewLaunch.errorMsgs.windowGeometryImpossible' as T7eKey), ToastMsgType.caution);
+      this.clearMatchedWindow_();
+
+      return;
+    }
+
+    ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+    this.applyMatchedWindow_(window);
+  }
+
+  /**
+   * Arms the matched launch window: stores the time, renders the result note
+   * with a Clear affordance, and updates the submit-button label so it is clear
+   * that the next "Create Launch" will use this window (nothing is launched yet).
+   */
+  protected applyMatchedWindow_(window: LaunchWindowResult): void {
+    this.matchedLaunchTime_ = window.time;
+
+    const note = getEl('nl-window-result', true);
+
+    if (note) {
+      const msg = t7e('plugins.NewLaunch.msgs.windowFound' as T7eKey)
+        .replace('{time}', `${dateFormat(window.time, 'isoDateTime', true)}z`)
+        .replace('{delta}', Math.abs(window.raanError).toFixed(2));
+      const clearLabel = t7e('plugins.NewLaunch.buttons.clearWindow' as T7eKey);
+
+      note.innerHTML = html`
+        <span class="nl-window-found-text">${msg}</span>
+        <button type="button" id="nl-window-clear" class="nl-window-clear"
+          kt-tooltip="${clearLabel}" aria-label="${clearLabel}">&#10005;</button>
+      `;
+      note.style.display = 'flex';
+      getEl('nl-window-clear', true)?.addEventListener('click', () => this.clearMatchedWindow_());
+    }
+
+    this.updateSubmitLabel_();
+  }
+
+  /** Clears the matched launch window (target/site/direction changed, or dismissed). */
+  protected clearMatchedWindow_(): void {
+    this.matchedLaunchTime_ = null;
+
+    const note = getEl('nl-window-result', true);
+
+    if (note) {
+      note.innerHTML = '';
+      note.style.display = 'none';
+    }
+
+    this.updateSubmitLabel_();
+  }
+
+  /** The submit-button label, reflecting an armed launch window when one is set. */
+  protected submitButtonLabel_(): string {
+    return this.matchedLaunchTime_ ? t7e('plugins.NewLaunch.buttons.createLaunchAtWindow' as T7eKey) : t7e('plugins.NewLaunch.buttons.createLaunchNominal' as T7eKey);
+  }
+
+  /** Refreshes the submit-button label unless the inclination guard disabled it. */
+  protected updateSubmitLabel_(): void {
+    const submitButtonId = `${this.sideMenuElementName}-submit`;
+    const dom = getEl(submitButtonId) as HTMLButtonElement | null;
+
+    if (dom && !dom.disabled) {
+      this.setActionLabel_(submitButtonId, this.submitButtonLabel_());
+    }
+  }
   submitCallback: () => void = () => {
     const sccNum = (<HTMLInputElement>getEl('nl-scc')).value.trim();
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
@@ -324,8 +489,9 @@ export class NewLaunch extends KeepTrackPlugin {
   }
 
   /**
-   * Rotate the satellite's orbit over the selected launch site using OrbitFinder,
-   * then update the cruncher and wait for propagation results.
+   * Place the satellite's orbit over the selected launch site (see
+   * {@link buildLaunchTle_}), then update the cruncher and wait for propagation
+   * results.
    *
    * This is the second half of the launch flow - call it directly when the
    * nominal satellite is already created (e.g. custom orbit mode).
@@ -371,9 +537,13 @@ export class NewLaunch extends KeepTrackPlugin {
     // Date object defaults to local time.
     quadZTime.setUTCHours(0); // Move to UTC Hour
 
+    // A matched launch window overrides the default 0000z launch time so the
+    // resulting plane's RAAN lines up with the target satellite's plane.
+    const launchTime = this.matchedLaunchTime_ ?? quadZTime;
+
     const cacheStaticOffset = timeManagerInstance.staticOffset; // Cache the current static offset
 
-    timeManagerInstance.changeStaticOffset(quadZTime.getTime() - today.getTime()); // Find the offset from today
+    timeManagerInstance.changeStaticOffset(launchTime.getTime() - today.getTime()); // Find the offset from today
 
     colorSchemeManagerInstance.calculateColorBuffers(true);
 
@@ -381,7 +551,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     const simulationTimeObj = timeManagerInstance.simulationTimeObj;
 
-    const TLEs = new OrbitFinder(sat, launchLat, launchLon, upOrDown, simulationTimeObj).rotateOrbitToLatLon();
+    const TLEs = this.buildLaunchTle_(sat, launchLat, launchLon, upOrDown, simulationTimeObj);
 
     const tle1 = TLEs[0];
     const tle2 = TLEs[1];
@@ -466,6 +636,54 @@ export class NewLaunch extends KeepTrackPlugin {
     });
   }
 
+  /**
+   * Builds the launch TLE by placing the template orbit's shape (inclination,
+   * eccentricity, mean motion) over the launch site at the launch time, then
+   * fitting SGP4 mean elements to that state with `rv2tle`.
+   *
+   * This replaces the old {@link OrbitFinder} ground-track search (which
+   * synthesized candidate TLEs and iterated SGP4 to a ~2.8 km sub-point
+   * tolerance). {@link groundTrackStateVector} constructs the exact state
+   * analytically - the fitted ground track passes within ~100 m of the site.
+   *
+   * Returns `['Error', message]` on failure (target latitude unreachable for the
+   * inclination, or the fit did not converge) to match the caller's existing
+   * error/length handling.
+   */
+  protected buildLaunchTle_(sat: Satellite, launchLat: Degrees, launchLon: Degrees, upOrDown: 'N' | 'S', launchTime: Date): [TleLine1, TleLine2] | ['Error', string] {
+    const eMsg = (key: string) => t7e(`plugins.NewLaunch.errorMsgs.${key}` as T7eKey);
+    const deg2rad = Math.PI / 180;
+
+    const state = groundTrackStateVector({
+      semimajorAxisKm: semimajorAxisFromMeanMotion(sat.meanMotion),
+      eccentricity: sat.eccentricity,
+      inclinationRad: (sat.inclination * deg2rad) as Radians,
+      latRad: (launchLat * deg2rad) as Radians,
+      lonRad: (launchLon * deg2rad) as Radians,
+      gmstRad: calcGmst(launchTime).gmst as GreenwichMeanSiderealTime,
+      direction: upOrDown,
+    });
+
+    if (!state) {
+      // The launch latitude exceeds what this inclination can reach.
+      return ['Error', eMsg('launchLatExceedsInclination')];
+    }
+
+    const fit = rv2tle(launchTime, state.position, state.velocity, { maxIterations: 30, toleranceKm: 1e-4 });
+
+    if (!fit) {
+      return ['Error', eMsg('failedToFitOrbit')];
+    }
+
+    // rv2tle stamps a fixed 5-char satnum ("00001"); restore the nominal sat's
+    // satnum (cols 3-7 of its TLE) so the created object keeps its catalog identity.
+    const satNum = sat.tle1.substring(2, 7);
+    const tle1 = `1 ${satNum}${fit.tle1.substring(7)}` as TleLine1;
+    const tle2 = `2 ${satNum}${fit.tle2.substring(7)}` as TleLine2;
+
+    return [tle1, tle2];
+  }
+
   addJs(): void {
     super.addJs();
     this.registerSelectSatListener_();
@@ -477,6 +695,19 @@ export class NewLaunch extends KeepTrackPlugin {
       if (menuRoot) {
         initMaterialSelects(menuRoot);
       }
+
+      // Launch-window matching. The matched time is only valid for the
+      // facility/direction/target it was computed with, so changing either
+      // input invalidates it.
+      getEl('nl-match-plane', true)?.addEventListener('click', () => {
+        this.onMatchTargetPlane_();
+      });
+      getEl('nl-facility', true)?.addEventListener('change', () => {
+        this.clearMatchedWindow_();
+      });
+      getEl('nl-updown', true)?.addEventListener('change', () => {
+        this.clearMatchedWindow_();
+      });
     });
   }
 
@@ -486,24 +717,23 @@ export class NewLaunch extends KeepTrackPlugin {
    * form HTML can override it (e.g. as a no-op) while still calling `super.addJs()`.
    */
   protected registerSelectSatListener_(): void {
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (obj: BaseObject) => {
-        if (obj?.isSatellite()) {
-          const sat = obj as Satellite;
-          const sccEl = getEl('nl-scc') as HTMLInputElement | null;
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
+      if (obj?.isSatellite()) {
+        const sat = obj as Satellite;
+        const sccEl = getEl('nl-scc') as HTMLInputElement | null;
 
-          if (sccEl) {
-            sccEl.value = sat.sccNum;
-          }
-          this.setBottomIconToEnabled();
-        } else if (obj?.type === SpaceObjectType.LAUNCH_SITE) {
-          this.selectLaunchSite(obj as LaunchSite);
-        } else {
-          this.setBottomIconToDisabled();
+        if (sccEl && sccEl.value !== sat.sccNum) {
+          sccEl.value = sat.sccNum;
+          // New target satellite invalidates a previously matched window
+          this.clearMatchedWindow_();
         }
-      },
-    );
+        this.setBottomIconToEnabled();
+      } else if (obj?.type === SpaceObjectType.LAUNCH_SITE) {
+        this.selectLaunchSite(obj as LaunchSite);
+      } else {
+        this.setBottomIconToDisabled();
+      }
+    });
   }
 
   selectLaunchSite(launchSite: LaunchSite): void {
@@ -562,7 +792,7 @@ export class NewLaunch extends KeepTrackPlugin {
       this.setActionLabel_(submitButtonId, t7e('plugins.NewLaunch.buttons.inclinationTooLow' as T7eKey));
     } else {
       submitButtonDom.disabled = false;
-      this.setActionLabel_(submitButtonId, t7e('plugins.NewLaunch.buttons.createLaunchNominal' as T7eKey));
+      this.setActionLabel_(submitButtonId, this.submitButtonLabel_());
     }
   }
 
@@ -575,17 +805,17 @@ export class NewLaunch extends KeepTrackPlugin {
     // Verify ecen, epochyr, epochday formats
     const eccFrac = inputParams.eccentricity.toString().split('.')[1] ?? '0';
 
-    if (!(/^\d{7}$/u).test(eccFrac.padStart(7, '0'))) {
+    if (!/^\d{7}$/u.test(eccFrac.padStart(7, '0'))) {
       ServiceLocator.getUiManager().toast(eMsg('invalidEccentricityFormat'), ToastMsgType.critical, true);
       errorManagerInstance.warn(eMsg('eccentricityFormatIssue'));
     }
 
-    if (!(/^\d{2}$/u).test(inputParams.epochYear.toString()?.padStart(2, '0'))) {
+    if (!/^\d{2}$/u.test(inputParams.epochYear.toString()?.padStart(2, '0'))) {
       ServiceLocator.getUiManager().toast(eMsg('invalidEpochYearFormat'), ToastMsgType.critical, true);
       errorManagerInstance.warn(eMsg('epochYearFormatIssue'));
     }
 
-    if (!(/^(?:\d{3}\.\d{8})$/u).test(inputParams.epochDay.toFixed(8).padStart(12, '0'))) {
+    if (!/^(?:\d{3}\.\d{8})$/u.test(inputParams.epochDay.toFixed(8).padStart(12, '0'))) {
       ServiceLocator.getUiManager().toast(eMsg('invalidEpochDayFormat'), ToastMsgType.critical, true);
       errorManagerInstance.warn(eMsg('epochDayFormatIssue'));
     }
@@ -607,11 +837,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     // Check if TLE generation failed
     if (tle1_ === 'Error') {
-      errorManagerInstance.error(
-        new Error(tle2),
-        'create-sat.ts',
-        t7e('plugins.CreateSat.errorMsgs.errorCreatingSat'),
-      );
+      errorManagerInstance.error(new Error(tle2), 'create-sat.ts', t7e('plugins.CreateSat.errorMsgs.errorCreatingSat'));
 
       return null;
     }
@@ -633,11 +859,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     // Validate altitude is reasonable
     if (SatMath.altitudeCheck(satrec, ServiceLocator.getTimeManager().simulationTimeObj) <= 1) {
-      ServiceLocator.getUiManager().toast(
-        eMsg('failedToPropagate'),
-        ToastMsgType.caution,
-        true,
-      );
+      ServiceLocator.getUiManager().toast(eMsg('failedToPropagate'), ToastMsgType.caution, true);
 
       return null;
     }

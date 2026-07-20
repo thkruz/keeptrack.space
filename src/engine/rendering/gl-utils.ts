@@ -21,11 +21,11 @@ export abstract class GlUtils {
   }
 
   static readonly PLANE_DIRECTIONS = {
-    'z': [0, 1, 2, 1, -1, 1],
+    z: [0, 1, 2, 1, -1, 1],
     '-z': [0, 1, 2, -1, -1, -1],
     '-x': [2, 1, 0, 1, -1, -1],
-    'x': [2, 1, 0, -1, -1, 1],
-    'y': [0, 2, 1, 1, 1, 1],
+    x: [2, 1, 0, -1, -1, 1],
+    y: [0, 2, 1, 1, 1, 1],
     '-y': [0, 2, 1, 1, -1, -1],
   };
 
@@ -143,9 +143,10 @@ export abstract class GlUtils {
 
         if (attempts < TEXTURE_RETRY_MAX_ATTEMPTS) {
           const retryAfterMs = GlUtils.parseRetryAfterMs_(resp);
-          const delayMs = retryAfterMs !== null
-            ? Math.min(retryAfterMs, TEXTURE_RETRY_AFTER_CAP_MS)
-            : TEXTURE_RETRY_BACKOFFS_MS[attempts - 1] ?? TEXTURE_RETRY_BACKOFFS_MS[TEXTURE_RETRY_BACKOFFS_MS.length - 1];
+          const delayMs =
+            retryAfterMs !== null
+              ? Math.min(retryAfterMs, TEXTURE_RETRY_AFTER_CAP_MS)
+              : (TEXTURE_RETRY_BACKOFFS_MS[attempts - 1] ?? TEXTURE_RETRY_BACKOFFS_MS[TEXTURE_RETRY_BACKOFFS_MS.length - 1]);
 
           errorManagerInstance.debug(`initTexture retry ${attempts}/${TEXTURE_RETRY_MAX_ATTEMPTS - 1} for ${url} in ${delayMs}ms (${lastErr?.message ?? 'unknown'})`);
           updateTextureStatus(url, { state: 'retrying', attempts, lastError: lastErr?.message });
@@ -219,10 +220,8 @@ export abstract class GlUtils {
         return Promise.reject(new TypeError(`Synthetic network failure for ${url}`));
       }
 
-
       return Promise.resolve(new Response(`Synthetic failure for ${url}`, { status: injected.status, statusText: 'Synthetic Failure' }));
     }
-
 
     return fetch(url);
   }
@@ -247,23 +246,14 @@ export abstract class GlUtils {
     if (!Number.isNaN(date)) {
       const delta = date - Date.now();
 
-
       return delta > 0 ? delta : 0;
     }
-
 
     return null;
   }
 
   static getBestTexture(textureMap: Record<string, WebGLTexture>): WebGLTexture {
-    const qualityOrder = [
-      '16k',
-      '8k',
-      '4k',
-      '2k',
-      '1k',
-      '512',
-    ];
+    const qualityOrder = ['16k', '8k', '4k', '2k', '1k', '512'];
 
     for (const quality of qualityOrder) {
       const texture = textureMap[quality];
@@ -597,79 +587,102 @@ export abstract class GlUtils {
        * x,    y,    z
        * front face (z: +1)
        */
-      1.0, 1.0, 1.0, // top right
-      -1.0, 1.0, 1.0, // top left
-      -1.0, -1.0, 1.0, // bottom left
-      1.0, -1.0, 1.0, // bottom right
+      1.0,
+      1.0,
+      1.0, // top right
+      -1.0,
+      1.0,
+      1.0, // top left
+      -1.0,
+      -1.0,
+      1.0, // bottom left
+      1.0,
+      -1.0,
+      1.0, // bottom right
       // right face (x: +1)
-      1.0, 1.0, -1.0, // top right
-      1.0, 1.0, 1.0, // top left
-      1.0, -1.0, 1.0, // bottom left
-      1.0, -1.0, -1.0, // bottom right
+      1.0,
+      1.0,
+      -1.0, // top right
+      1.0,
+      1.0,
+      1.0, // top left
+      1.0,
+      -1.0,
+      1.0, // bottom left
+      1.0,
+      -1.0,
+      -1.0, // bottom right
       // top face (y: +1)
-      1.0, 1.0, -1.0, // top right
-      -1.0, 1.0, -1.0, // top left
-      -1.0, 1.0, 1.0, // bottom left
-      1.0, 1.0, 1.0, // bottom right
+      1.0,
+      1.0,
+      -1.0, // top right
+      -1.0,
+      1.0,
+      -1.0, // top left
+      -1.0,
+      1.0,
+      1.0, // bottom left
+      1.0,
+      1.0,
+      1.0, // bottom right
       // left face (x: -1)
-      -1.0, 1.0, 1.0, // top right
-      -1.0, 1.0, -1.0, // top left
-      -1.0, -1.0, -1.0, // bottom left
-      -1.0, -1.0, 1.0, // bottom right
+      -1.0,
+      1.0,
+      1.0, // top right
+      -1.0,
+      1.0,
+      -1.0, // top left
+      -1.0,
+      -1.0,
+      -1.0, // bottom left
+      -1.0,
+      -1.0,
+      1.0, // bottom right
       // bottom face (y: -1)
-      1.0, -1.0, 1.0, // top right
-      -1.0, -1.0, 1.0, // top left
-      -1.0, -1.0, -1.0, // bottom left
-      1.0, -1.0, -1.0, // bottom right
+      1.0,
+      -1.0,
+      1.0, // top right
+      -1.0,
+      -1.0,
+      1.0, // top left
+      -1.0,
+      -1.0,
+      -1.0, // bottom left
+      1.0,
+      -1.0,
+      -1.0, // bottom right
       // back face (z: -1)
-      -1.0, 1.0, -1.0, // top right
-      1.0, 1.0, -1.0, // top left
-      1.0, -1.0, -1.0, // bottom left
-      -1.0, -1.0, -1.0, // bottom right
+      -1.0,
+      1.0,
+      -1.0, // top right
+      1.0,
+      1.0,
+      -1.0, // top left
+      1.0,
+      -1.0,
+      -1.0, // bottom left
+      -1.0,
+      -1.0,
+      -1.0, // bottom right
     ];
 
     // prettier-ignore
     const normals = [
-      0.0, 0.0, 1.0,
-      0.0, 0.0, 1.0,
-      0.0, 0.0, 1.0,
-      0.0, 0.0, 1.0,
+      0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
 
-      1.0, 0.0, 0.0,
-      1.0, 0.0, 0.0,
-      1.0, 0.0, 0.0,
-      1.0, 0.0, 0.0,
+      1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0,
 
-      0.0, 1.0, 0.0,
-      0.0, 1.0, 0.0,
-      0.0, 1.0, 0.0,
-      0.0, 1.0, 0.0,
+      0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
 
-      -1.0, 0.0, 0.0,
-      -1.0, 0.0, 0.0,
-      -1.0, 0.0, 0.0,
-      -1.0, 0.0, 0.0,
+      -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0,
 
-      0.0, -1.0, 0.0,
-      0.0, -1.0, 0.0,
-      0.0, -1.0, 0.0,
-      0.0, -1.0, 0.0,
+      0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0,
 
-      0.0, 0.0, -1.0,
-      0.0, 0.0, -1.0,
-      0.0, 0.0, -1.0,
-      0.0, 0.0, -1.0,
+      0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0,
     ];
 
     // prettier-ignore
-    const indices = [
-      0, 1, 2, 0, 2, 3,
-      4, 5, 6, 4, 6, 7,
-      8, 9, 10, 8, 10, 11,
-      12, 13, 14, 12, 14, 15,
-      16, 17, 18, 16, 18, 19,
-      20, 21, 22, 20, 22, 23,
-    ];
+    const indices = [0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23];
 
     const combinedArray = [] as number[];
 

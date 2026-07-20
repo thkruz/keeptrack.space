@@ -16,10 +16,7 @@ test.describe('Onboarding Power Tour Hub', () => {
     // stage). The settingsOverride route from waitForAppReady stays active.
     await page.goto('/?tour=power');
     await page.waitForSelector('#loading-screen', { state: 'hidden', timeout: 45_000 });
-    await page.waitForFunction(
-      () => (globalThis as unknown as { keepTrack?: { isReady?: boolean } }).keepTrack?.isReady === true,
-      { timeout: 15_000 },
-    );
+    await page.waitForFunction(() => (globalThis as unknown as { keepTrack?: { isReady?: boolean } }).keepTrack?.isReady === true, { timeout: 15_000 });
 
     // The hub auto-opens shortly after the splash screen clears
     const popover = page.locator('.kt-tour-popover');

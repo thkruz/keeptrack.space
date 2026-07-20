@@ -2,8 +2,8 @@
 import { sensors } from '@app/app/data/catalogs/sensors';
 import { CameraType } from '@app/engine/camera/camera-type';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { SensorListPlugin } from '@app/plugins/sensor-list/sensor-list';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
+import { SensorListPlugin } from '@app/plugins/sensor-list/sensor-list';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
@@ -72,22 +72,15 @@ describe('SensorListPlugin commands, shortcuts and content clicks', () => {
       sc.callback();
     };
 
-    it('S toggles the menu when not in FPS mode', () => {
+    // Camera-mode suppression is handled centrally by KeyboardComponent; the
+    // plugin callback simply toggles the menu.
+    it('S toggles the menu', () => {
       ServiceLocator.getMainCamera().cameraType = CameraType.FIXED_TO_EARTH;
       const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
 
       run('S');
 
       expect(spy).toHaveBeenCalled();
-    });
-
-    it('S does nothing in FPS mode', () => {
-      ServiceLocator.getMainCamera().cameraType = CameraType.FPS;
-      const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
-
-      run('S');
-
-      expect(spy).not.toHaveBeenCalled();
     });
 
     it('Ctrl+Home snaps the camera to the current sensor when earth-fixed', () => {

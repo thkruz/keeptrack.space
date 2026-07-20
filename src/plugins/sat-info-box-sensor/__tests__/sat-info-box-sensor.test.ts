@@ -1,6 +1,6 @@
-import { vi } from 'vitest';
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { RfSensor } from '@app/app/sensors/DetailedSensor';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -10,11 +10,11 @@ import { KeepTrack } from '@app/keeptrack';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SatInfoBoxSensor } from '@app/plugins/sat-info-box-sensor/sat-info-box-sensor';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { Degrees, Kilometers, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
 import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment, standardSelectSat } from '@test/environment/standard-env';
 import { websiteInit } from '@test/generic-tests';
-import { Degrees, Kilometers, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
+import { vi } from 'vitest';
 
 /**
  * Helper to set up the test environment with a sensor and satellite selected,

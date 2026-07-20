@@ -37,10 +37,10 @@ import { AtmosphereSettings } from '../rendering/draw-manager/earth-quality-enum
 import { Ellipsoid } from '../rendering/draw-manager/ellipsoid';
 import { FrustumMeshFactory } from '../rendering/draw-manager/frustum-mesh-factory';
 import { Godrays } from '../rendering/draw-manager/godrays';
-import { WorldMarkers } from '../rendering/draw-manager/world-markers';
 import { SensorFovMeshFactory } from '../rendering/draw-manager/sensor-fov-mesh-factory';
 import { SkyBoxSphere } from '../rendering/draw-manager/skybox-sphere';
 import { Sun } from '../rendering/draw-manager/sun';
+import { WorldMarkers } from '../rendering/draw-manager/world-markers';
 import { WebGLRenderer } from '../rendering/webgl-renderer';
 import { errorManagerInstance } from '../utils/errorManager';
 import { FrameProfiler, GpuStage } from '../utils/frame-profiler';
@@ -173,8 +173,8 @@ export class Scene {
     this.worldMarkers = new WorldMarkers();
     this.searchBox = new Box();
     this.searchBox.setColor([1, 0, 0, 0.3]);
-    this.primaryCovBubble = new Ellipsoid(([0, 0, 0]));
-    this.secondaryCovBubble = new Ellipsoid(([0, 0, 0]));
+    this.primaryCovBubble = new Ellipsoid([0, 0, 0]);
+    this.secondaryCovBubble = new Ellipsoid([0, 0, 0]);
     this.sensorFovFactory = new SensorFovMeshFactory();
     this.coneFactory = new ConeMeshFactory();
     this.frustumFactory = new FrustumMeshFactory();
@@ -287,7 +287,9 @@ export class Scene {
       // missile climbed past the ground-rotation radius. No-op above that radius, so
       // satellites are unaffected. This runs per frame and is the authoritative
       // world-shift for the selected object.
-      const satelliteOffset = ServiceLocator.getDotsManager().getRenderedPositionArray(selectSatManager.primarySatObj.id).map((coord) => -coord);
+      const satelliteOffset = ServiceLocator.getDotsManager()
+        .getRenderedPositionArray(selectSatManager.primarySatObj.id)
+        .map((coord) => -coord);
 
       this.worldShiftBase_ = satelliteOffset as [number, number, number];
     }
@@ -374,21 +376,17 @@ export class Scene {
           // Draw a black earth mesh on top of the sun in the godrays frame buffer
           // Skip in astronomy mode since Earth is hidden
           if (centerBodyEntity?.drawOcclusion && camera.cameraType !== CameraType.ASTRONOMY && camera.cameraType !== CameraType.PLANETARIUM) {
-            centerBodyEntity?.drawOcclusion(
-              camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
-            );
+            centerBodyEntity?.drawOcclusion(camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays);
           }
 
           if (settingsManager.centerBody === SolarBody.Earth) {
-            sceneManager.getBodyById(SolarBody.Moon)?.drawOcclusion(
-              camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
-            );
+            sceneManager
+              .getBodyById(SolarBody.Moon)
+              ?.drawOcclusion(camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays);
           }
 
           if (settingsManager.centerBody === SolarBody.Moon) {
-            this.earth.drawOcclusion(
-              camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
-            );
+            this.earth.drawOcclusion(camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays);
           }
 
           // Draw a black object mesh on top of the sun in the godrays frame buffer
@@ -421,7 +419,6 @@ export class Scene {
           this.getBodyById(settingsManager.centerBody)?.draw(this.sun.position, renderer.postProcessingManager.curBuffer);
           profiler.endGpu(GpuStage.planets);
         }
-
       }
       if (settingsManager.centerBody === SolarBody.Earth || settingsManager.centerBody === SolarBody.Moon) {
         if (settingsManager.isDrawEarth !== false && camera.cameraType !== CameraType.ASTRONOMY && camera.cameraType !== CameraType.PLANETARIUM) {
@@ -454,13 +451,11 @@ export class Scene {
     if (settingsManager.isDisablePerformanceDowngrade) {
       return;
     }
-    if ((!settingsManager.isDisablePlanets ||
-      !settingsManager.isDisableGodrays ||
-      settingsManager.isDrawSun ||
-      settingsManager.isDrawAurora ||
-      settingsManager.isDrawMilkyWay) &&
+    if (
+      (!settingsManager.isDisablePlanets || !settingsManager.isDisableGodrays || settingsManager.isDrawSun || settingsManager.isDrawAurora || settingsManager.isDrawMilkyWay) &&
       Date.now() - this.updateVisualsBasedOnPerformanceTime_ > 10000 && // Only check every 10 seconds
-      !Engine.isFpsAboveLimit(this.averageDrawTime as Milliseconds, 30)) {
+      !Engine.isFpsAboveLimit(this.averageDrawTime as Milliseconds, 30)
+    ) {
       let isSettingsLeftToDisable = true;
 
       while (isSettingsLeftToDisable) {

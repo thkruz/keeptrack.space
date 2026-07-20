@@ -45,15 +45,7 @@ export class SatCruncherThreadManager extends WebWorkerThreadManager {
     });
   }
 
-  sendNewMissile(data: {
-    id: number;
-    active: boolean;
-    type?: number;
-    latList: Degrees[];
-    lonList: Degrees[];
-    altList: Kilometers[];
-    startTime: number;
-  }): void {
+  sendNewMissile(data: { id: number; active: boolean; type?: number; latList: Degrees[]; lonList: Degrees[]; altList: Kilometers[]; startTime: number }): void {
     this.postMessage({
       typ: PosCruncherMsgType.NEW_MISSILE,
       ...data,

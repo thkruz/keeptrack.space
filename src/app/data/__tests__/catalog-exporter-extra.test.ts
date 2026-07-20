@@ -1,9 +1,9 @@
-import { vi } from 'vitest';
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
 import { BaseObject, Satellite, TleLine1 } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
+import { vi } from 'vitest';
 
 vi.mock('@app/engine/utils/saveVariable', () => ({
   saveXlsx: vi.fn(),
@@ -45,10 +45,7 @@ describe('CatalogExporter (extra paths)', () => {
 
   describe('exportTce', () => {
     it('writes the TLE pairs of every satellite, sorted by sccNum', async () => {
-      const objData = [
-        makeSat({ id: 0, sccNum: '25544' }),
-        makeSat({ id: 1, sccNum: '00005' }),
-      ] as BaseObject[];
+      const objData = [makeSat({ id: 0, sccNum: '25544' }), makeSat({ id: 1, sccNum: '00005' })] as BaseObject[];
 
       CatalogExporter.exportTce(objData);
 
@@ -60,10 +57,7 @@ describe('CatalogExporter (extra paths)', () => {
     });
 
     it('excludes analyst satellites by default', async () => {
-      const objData = [
-        makeSat({ id: 0, sccNum: '25544', country: 'USA' }),
-        makeSat({ id: 1, sccNum: '90001', country: 'ANALSAT' }),
-      ] as BaseObject[];
+      const objData = [makeSat({ id: 0, sccNum: '25544', country: 'USA' }), makeSat({ id: 1, sccNum: '90001', country: 'ANALSAT' })] as BaseObject[];
 
       CatalogExporter.exportTce(objData);
       const text = await lastSavedBlob!.text();
@@ -73,10 +67,7 @@ describe('CatalogExporter (extra paths)', () => {
     });
 
     it('skips satellites whose TLE is a "NO TLE" placeholder', async () => {
-      const objData = [
-        makeSat({ id: 0, sccNum: '25544' }),
-        makeSat({ id: 1, sccNum: '30000', tle1: 'NO TLE AVAILABLE' as TleLine1 }),
-      ] as BaseObject[];
+      const objData = [makeSat({ id: 0, sccNum: '25544' }), makeSat({ id: 1, sccNum: '30000', tle1: 'NO TLE AVAILABLE' as TleLine1 })] as BaseObject[];
 
       CatalogExporter.exportTce(objData);
       const text = await lastSavedBlob!.text();

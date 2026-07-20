@@ -2,10 +2,10 @@ import { Scene } from '@app/engine/core/scene';
 import { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { DepthManager } from '@app/engine/rendering/depth-manager';
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
-import { mat4, vec3, vec4 } from 'gl-matrix';
-import { BaseObject, TemeVec3 } from '@ootk/src/main';
-import { GlUtils } from '../gl-utils';
 import { glsl } from '@app/engine/utils/development/formatter';
+import { BaseObject, TemeVec3 } from '@ootk/src/main';
+import { mat4, vec3, vec4 } from 'gl-matrix';
+import { GlUtils } from '../gl-utils';
 
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
@@ -42,12 +42,12 @@ export class Ellipsoid {
   }
 
   private readonly uniforms_ = {
-    u_pMatrix: <WebGLUniformLocation><unknown>null,
-    u_camMatrix: <WebGLUniformLocation><unknown>null,
-    u_mvMatrix: <WebGLUniformLocation><unknown>null,
-    u_color: <WebGLUniformLocation><unknown>null,
-    logDepthBufFC: <WebGLUniformLocation><unknown>null,
-    worldShift: <WebGLUniformLocation><unknown>null,
+    u_pMatrix: <WebGLUniformLocation>(<unknown>null),
+    u_camMatrix: <WebGLUniformLocation>(<unknown>null),
+    u_mvMatrix: <WebGLUniformLocation>(<unknown>null),
+    u_color: <WebGLUniformLocation>(<unknown>null),
+    logDepthBufFC: <WebGLUniformLocation>(<unknown>null),
+    worldShift: <WebGLUniformLocation>(<unknown>null),
   };
 
   private radii_: vec3;
@@ -149,7 +149,11 @@ export class Ellipsoid {
     mat4.identity(this.mvMatrix_);
     mat4.translate(this.mvMatrix_, this.mvMatrix_, this.drawPosition);
 
-    const lookAtPos = [objWithPos.position.x + (objWithPos.velocity?.x ?? 0), objWithPos.position.y + (objWithPos.velocity?.y ?? 0), objWithPos.position.z + (objWithPos.velocity?.z ?? 0)];
+    const lookAtPos = [
+      objWithPos.position.x + (objWithPos.velocity?.x ?? 0),
+      objWithPos.position.y + (objWithPos.velocity?.y ?? 0),
+      objWithPos.position.z + (objWithPos.velocity?.z ?? 0),
+    ];
     const up = vec3.normalize(vec3.create(), this.drawPosition);
 
     mat4.targetTo(this.mvMatrix_, this.drawPosition, lookAtPos, up);

@@ -26,16 +26,17 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { compressToGzip, decompressFromGzip } from '@app/engine/utils/compression';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
-import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { t7e } from '@app/locales/keys';
 import landscape3Png from '@public/img/icons/landscape3.png';
 import { saveAs } from 'file-saver';
 import { syncFormFields, validateDateInput } from './scenario-form-utils';
+import './scenario-management.css';
 import { ScenarioData, ScenarioManagementPlugin } from './scenario-management';
 
 /** Shorthand for this plugin's locale keys. */
@@ -81,51 +82,63 @@ export class ScenarioManagementMenu extends KeepTrackPlugin {
   }
 
   sideMenuElementHtml: string = html`
-  <div id="scenario-management-menu" class="side-menu-parent start-hidden">
+  <div id="scenario-management-menu" class="side-menu-parent start-hidden kt-ui-v13">
     <div id="scenario-management-content" class="side-menu">
-      <div class="row">
-        <form id="${this.formPrefix_}-form">
+      <form id="${this.formPrefix_}-form">
+        <section class="kt-section">
+          <div class="kt-section-label">${l('sideMenuTitle')}</div>
           <div id="${this.formPrefix_}-general">
-            <div class="row center"></div>
-            </br>
-            <div class="row center">
-              <button id="${this.formPrefix_}-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">${l('buttons.updateScenario')} &#9658;</button>
-            </div>
-            <h5 class="center-align">${l('sideMenuTitle')}</h5>
             <!-- Scenario Name -->
-            <div class="input-field col s12">
-              <input required id="${this.formPrefix_}-name" type="text" kt-tooltip="${l('tooltips.name')}">
-              <label class="active" for="${this.formPrefix_}-name">${l('labels.scenarioName')}</label>
+            <div class="kt-field-row">
+              <div class="input-field col s12">
+                <input required id="${this.formPrefix_}-name" type="text" kt-tooltip="${l('tooltips.name')}">
+                <label class="active" for="${this.formPrefix_}-name">${l('labels.scenarioName')}</label>
+              </div>
             </div>
             <!-- Scenario Description -->
-            <div class="input-field col s12">
-              <input id="${this.formPrefix_}-description" type="text"
-              kt-tooltip="${l('tooltips.description')}" placeholder="${l('placeholders.description')}">
-              <label class="active" for="${this.formPrefix_}-description">${l('labels.description')}</label>
+            <div class="kt-field-row">
+              <div class="input-field col s12">
+                <input id="${this.formPrefix_}-description" type="text"
+                kt-tooltip="${l('tooltips.description')}" placeholder="${l('placeholders.description')}">
+                <label class="active" for="${this.formPrefix_}-description">${l('labels.description')}</label>
+              </div>
             </div>
             <!-- Scenario Start DateTime -->
-            <div class="input-field col s12">
-              <input id="${this.formPrefix_}-start-date" type="text"
-                kt-tooltip="${l('tooltips.startDate')}" placeholder="YYYY-MM-DD HH:MM:SS.sss"
-              >
-              <label class="active" for="${this.formPrefix_}-start-date">${l('labels.scenarioStart')}</label>
+            <div class="kt-field-row">
+              <div class="input-field col s12">
+                <input id="${this.formPrefix_}-start-date" type="text"
+                  kt-tooltip="${l('tooltips.startDate')}" placeholder="YYYY-MM-DD HH:MM:SS.sss"
+                >
+                <label class="active" for="${this.formPrefix_}-start-date">${l('labels.scenarioStart')}</label>
+              </div>
             </div>
             <!-- Scenario End DateTime -->
-            <div class="input-field col s12">
-              <input id="${this.formPrefix_}-end-date" type="text"
-                kt-tooltip="${l('tooltips.endDate')}" placeholder="YYYY-MM-DD HH:MM:SS.sss"
-              >
-              <label class="active" for="${this.formPrefix_}-end-date">${l('labels.scenarioEnd')}</label>
+            <div class="kt-field-row">
+              <div class="input-field col s12">
+                <input id="${this.formPrefix_}-end-date" type="text"
+                  kt-tooltip="${l('tooltips.endDate')}" placeholder="YYYY-MM-DD HH:MM:SS.sss"
+                >
+                <label class="active" for="${this.formPrefix_}-end-date">${l('labels.scenarioEnd')}</label>
+              </div>
             </div>
           </div>
-        </form>
-        <div class="row center">
-          <button id="${this.formPrefix_}-save" class="btn btn-ui waves-effect waves-light">${l('buttons.saveScenario')} &#9658;</button>
-        </div>
-        <div class="row center">
-          <button id="${this.formPrefix_}-load" class="btn btn-ui waves-effect waves-light">${l('buttons.loadScenario')} &#9658;</button>
-        </div>
-      </div>
+        </section>
+        <button id="${this.formPrefix_}-submit" class="kt-action waves-effect" type="submit" name="action">
+          <span class="kt-action-label">${l('buttons.updateScenario')}</span>
+        </button>
+        <button id="${this.formPrefix_}-clear-bounds" class="kt-action waves-effect" type="button">
+          <span class="kt-action-label">${l('buttons.clearTimeBounds')}</span>
+        </button>
+      </form>
+      <section class="kt-section">
+        <div class="kt-section-label">${l('sections.actions')}</div>
+        <button id="${this.formPrefix_}-save" class="kt-action waves-effect" type="button">
+          <span class="kt-action-label">${l('buttons.saveScenario')}</span>
+        </button>
+        <button id="${this.formPrefix_}-load" class="kt-action waves-effect" type="button">
+          <span class="kt-action-label">${l('buttons.loadScenario')}</span>
+        </button>
+      </section>
     </div>
   </div>`;
 
@@ -144,16 +157,14 @@ export class ScenarioManagementMenu extends KeepTrackPlugin {
       descriptionInput.value = this.corePlugin_.defaultScenarioDescription;
     }
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        getEl(`${this.formPrefix_}-start-date`)?.addEventListener('change', this.onDateChange_.bind(this));
-        getEl(`${this.formPrefix_}-end-date`)?.addEventListener('change', this.onDateChange_.bind(this));
-        getEl(`${this.formPrefix_}-form`)?.addEventListener('submit', this.onSubmit_.bind(this));
-        getEl(`${this.formPrefix_}-save`)?.addEventListener('click', this.onSave_.bind(this));
-        getEl(`${this.formPrefix_}-load`)?.addEventListener('click', this.onLoad_.bind(this));
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      getEl(`${this.formPrefix_}-start-date`)?.addEventListener('change', this.onDateChange_.bind(this));
+      getEl(`${this.formPrefix_}-end-date`)?.addEventListener('change', this.onDateChange_.bind(this));
+      getEl(`${this.formPrefix_}-form`)?.addEventListener('submit', this.onSubmit_.bind(this));
+      getEl(`${this.formPrefix_}-clear-bounds`)?.addEventListener('click', this.onClearBounds_.bind(this));
+      getEl(`${this.formPrefix_}-save`)?.addEventListener('click', this.onSave_.bind(this));
+      getEl(`${this.formPrefix_}-load`)?.addEventListener('click', this.onLoad_.bind(this));
+    });
   }
 
   addJs(): void {
@@ -217,6 +228,27 @@ export class ScenarioManagementMenu extends KeepTrackPlugin {
     validateDateInput(input);
   }
 
+  /**
+   * Clears the scenario time window, returning to endless mode. Empties both
+   * date fields and commits explicit nulls so the simulation clock is no longer
+   * clamped to a window.
+   */
+  protected onClearBounds_(): void {
+    for (const id of [`${this.formPrefix_}-start-date`, `${this.formPrefix_}-end-date`]) {
+      const input = getEl(id) as HTMLInputElement | null;
+
+      if (input) {
+        input.value = '';
+        input.classList.remove('invalid', 'valid');
+      }
+    }
+
+    if (this.corePlugin_.updateScenario({ startTime: null, endTime: null })) {
+      ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+      ServiceLocator.getUiManager().toast(l('msgs.boundsCleared'), ToastMsgType.normal);
+    }
+  }
+
   protected async onSave_(evt: Event): Promise<void> {
     evt.preventDefault();
     this.onSubmit_();
@@ -260,26 +292,28 @@ export class ScenarioManagementMenu extends KeepTrackPlugin {
 
         reader.onload = (event: ProgressEvent<FileReader>) => {
           if (event.target?.result instanceof ArrayBuffer) {
-            decompressFromGzip(new Uint8Array(event.target.result)).then((json) => {
-              try {
-                const parsed = JSON.parse(json);
-                const scenario = parsed.scenario;
-                const scenarioData: Partial<ScenarioData> = {
-                  name: scenario.name,
-                  description: scenario.description || '',
-                  startTime: scenario.startTime ? new Date(scenario.startTime) : null,
-                  endTime: scenario.endTime ? new Date(scenario.endTime) : null,
-                };
+            decompressFromGzip(new Uint8Array(event.target.result))
+              .then((json) => {
+                try {
+                  const parsed = JSON.parse(json);
+                  const scenario = parsed.scenario;
+                  const scenarioData: Partial<ScenarioData> = {
+                    name: scenario.name,
+                    description: scenario.description || '',
+                    startTime: scenario.startTime ? new Date(scenario.startTime) : null,
+                    endTime: scenario.endTime ? new Date(scenario.endTime) : null,
+                  };
 
-                if (this.corePlugin_.updateScenario(scenarioData)) {
-                  ServiceLocator.getUiManager().toast(l('msgs.scenarioLoaded'), ToastMsgType.normal);
+                  if (this.corePlugin_.updateScenario(scenarioData)) {
+                    ServiceLocator.getUiManager().toast(l('msgs.scenarioLoaded'), ToastMsgType.normal);
+                  }
+                } catch (error) {
+                  errorManagerInstance.error(error, 'scenario-management-menu.ts', l('errorMsgs.loadingScenarioFile'));
                 }
-              } catch (error) {
-                errorManagerInstance.error(error, 'scenario-management-menu.ts', l('errorMsgs.loadingScenarioFile'));
-              }
-            }).catch((error: Error) => {
-              errorManagerInstance.error(error, 'scenario-management-menu.ts', l('errorMsgs.decompressingScenarioFile'));
-            });
+              })
+              .catch((error: Error) => {
+                errorManagerInstance.error(error, 'scenario-management-menu.ts', l('errorMsgs.decompressingScenarioFile'));
+              });
           }
         };
         reader.readAsArrayBuffer(target.files[0]);

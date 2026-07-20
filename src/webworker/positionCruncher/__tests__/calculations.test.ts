@@ -1,11 +1,5 @@
+import { createLatLonAlt, createLatLonAltRad, isInValidElevation, propTime, setupTimeVariables } from '@app/webworker/positionCruncher/calculations';
 import { Degrees, GroundStation, Kilometers, Radians, RaeVec3, SpaceObjectType } from '@ootk/src/main';
-import {
-  createLatLonAlt,
-  createLatLonAltRad,
-  isInValidElevation,
-  propTime,
-  setupTimeVariables,
-} from '@app/webworker/positionCruncher/calculations';
 
 const RAD2DEG = 180 / Math.PI;
 
@@ -46,8 +40,7 @@ describe('positionCruncher calculations', () => {
   });
 
   describe('isInValidElevation', () => {
-    const rae = (el: number): RaeVec3<Kilometers, Degrees> =>
-      ({ az: 0 as Degrees, el: el as Degrees, rng: 0 as Kilometers });
+    const rae = (el: number): RaeVec3<Kilometers, Degrees> => ({ az: 0 as Degrees, el: el as Degrees, rng: 0 as Kilometers });
 
     it('is true when elevation exceeds 90 - fov', () => {
       expect(isInValidElevation(rae(85), 10)).toBe(true);

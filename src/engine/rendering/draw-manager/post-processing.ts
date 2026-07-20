@@ -40,17 +40,17 @@ export class PostProcessingManager {
   private isReady_ = false;
   public programs = {
     occlusion: <OcclusionProgram>{
-      program: <WebGLProgram><unknown>null,
+      program: <WebGLProgram>(<unknown>null),
       type: ProgramType.OCCLUSION,
       attr: {
-        position: <number><unknown>null,
+        position: <number>(<unknown>null),
       },
       uniform: {
-        uPMatrix: <WebGLUniformLocation><unknown>null,
-        uMvMatrix: <WebGLUniformLocation><unknown>null,
-        uCamMatrix: <WebGLUniformLocation><unknown>null,
-        uWorldOffset: <WebGLUniformLocation><unknown>null,
-        logDepthBufFC: <WebGLUniformLocation><unknown>null,
+        uPMatrix: <WebGLUniformLocation>(<unknown>null),
+        uMvMatrix: <WebGLUniformLocation>(<unknown>null),
+        uCamMatrix: <WebGLUniformLocation>(<unknown>null),
+        uWorldOffset: <WebGLUniformLocation>(<unknown>null),
+        logDepthBufFC: <WebGLUniformLocation>(<unknown>null),
       },
       attrSetup: null as unknown as (combinedBuf: WebGLBuffer, stride: number) => void,
       attrOff: null as unknown as () => void,
@@ -60,14 +60,14 @@ export class PostProcessingManager {
 
   private frameBufferInfos = {
     one: {
-      frameBuffer: <WebGLFramebuffer><unknown>null,
-      texture: <WebGLTexture><unknown>null,
-      depthBuffer: <WebGLRenderbuffer><unknown>null,
+      frameBuffer: <WebGLFramebuffer>(<unknown>null),
+      texture: <WebGLTexture>(<unknown>null),
+      depthBuffer: <WebGLRenderbuffer>(<unknown>null),
     },
     two: {
-      frameBuffer: <WebGLFramebuffer><unknown>null,
-      texture: <WebGLTexture><unknown>null,
-      depthBuffer: <WebGLRenderbuffer><unknown>null,
+      frameBuffer: <WebGLFramebuffer>(<unknown>null),
+      texture: <WebGLTexture>(<unknown>null),
+      depthBuffer: <WebGLRenderbuffer>(<unknown>null),
     },
   };
 
@@ -148,12 +148,12 @@ export class PostProcessingManager {
       width,
       height,
       buffers: {
-        position: <WebGLBuffer><unknown>null,
-        texCoord: <WebGLBuffer><unknown>null,
+        position: <WebGLBuffer>(<unknown>null),
+        texCoord: <WebGLBuffer>(<unknown>null),
       },
-      texture: <WebGLTexture><unknown>null,
-      frameBuffer: <WebGLFramebuffer><unknown>null,
-      renderBuffer: <WebGLRenderbuffer><unknown>null,
+      texture: <WebGLTexture>(<unknown>null),
+      frameBuffer: <WebGLFramebuffer>(<unknown>null),
+      renderBuffer: <WebGLRenderbuffer>(<unknown>null),
     };
 
     frameBufferInfo.buffers.position = gl.createBuffer();

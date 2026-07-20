@@ -1,18 +1,30 @@
 /* eslint-disable dot-notation */
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
-import { StereoMap } from '@app/plugins/stereo-map/stereo-map';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { StereoMap } from '@app/plugins/stereo-map/stereo-map';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
 
 // jsdom has no canvas 2D context - stub the calls the plugin makes on init.
 HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
-  drawImage: vi.fn(), clearRect: vi.fn(), fillRect: vi.fn(), fillText: vi.fn(),
-  measureText: vi.fn(() => ({ width: 0 })), beginPath: vi.fn(), moveTo: vi.fn(),
-  lineTo: vi.fn(), stroke: vi.fn(), arc: vi.fn(), fill: vi.fn(), save: vi.fn(),
-  restore: vi.fn(), translate: vi.fn(), scale: vi.fn(), rotate: vi.fn(),
+  drawImage: vi.fn(),
+  clearRect: vi.fn(),
+  fillRect: vi.fn(),
+  fillText: vi.fn(),
+  measureText: vi.fn(() => ({ width: 0 })),
+  beginPath: vi.fn(),
+  moveTo: vi.fn(),
+  lineTo: vi.fn(),
+  stroke: vi.fn(),
+  arc: vi.fn(),
+  fill: vi.fn(),
+  save: vi.fn(),
+  restore: vi.fn(),
+  translate: vi.fn(),
+  scale: vi.fn(),
+  rotate: vi.fn(),
 })) as never;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -61,8 +73,7 @@ describe('StereoMap input synchronization', () => {
     websiteInit(plugin);
     // These inputs live in the secondary menu, which websiteInit does not inject.
     if (!getEl('stereo-map-minutes', true)) {
-      document.body.insertAdjacentHTML('beforeend',
-        '<input id="stereo-map-minutes" /><input id="stereo-map-orbit-mult" />');
+      document.body.insertAdjacentHTML('beforeend', '<input id="stereo-map-minutes" /><input id="stereo-map-orbit-mult" />');
     }
   });
 

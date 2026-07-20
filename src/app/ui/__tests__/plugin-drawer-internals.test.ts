@@ -1,9 +1,9 @@
+import { PluginDrawer } from '@app/app/ui/plugin-drawer';
+import { getShortcutHint, loadRecents, recordRecent } from '@app/app/ui/plugin-drawer-helpers';
 import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
-import { PluginDrawer } from '@app/app/ui/plugin-drawer';
-import { getShortcutHint, loadRecents, recordRecent } from '@app/app/ui/plugin-drawer-helpers';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
 
@@ -128,7 +128,12 @@ describe('PluginDrawer internals', () => {
     p().createDrawerDom_();
     // The cached item data holds the stale load-time state (disabled) …
     p().allDrawerItems_.set('recent-sync-icon', {
-      id: 'recent-sync-icon', label: 'Recent Sync', imgSrc: 'a.png', isTopMenu: false, isDisabled: true, order: 0,
+      id: 'recent-sync-icon',
+      label: 'Recent Sync',
+      imgSrc: 'a.png',
+      isTopMenu: false,
+      isDisabled: true,
+      order: 0,
     });
     // … while the live bottom icon says the plugin is now enabled and active.
     document.body.insertAdjacentHTML('beforeend', '<div id="recent-sync-icon" class="bmenu-item bmenu-item-selected"></div>');
@@ -193,6 +198,9 @@ describe('shared recents store', () => {
   it('loadRecents migrates the legacy plain-string-array format', () => {
     PersistenceManager.getInstance().saveItem(StorageKey.DRAWER_RECENT_PLUGINS, JSON.stringify(['menu-apple', 'menu-banana']));
 
-    expect(loadRecents()).toEqual([{ id: 'menu-apple', t: 0 }, { id: 'menu-banana', t: 0 }]);
+    expect(loadRecents()).toEqual([
+      { id: 'menu-apple', t: 0 },
+      { id: 'menu-banana', t: 0 },
+    ]);
   });
 });

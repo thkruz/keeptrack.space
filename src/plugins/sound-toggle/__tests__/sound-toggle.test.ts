@@ -52,7 +52,6 @@ describe('SoundToggle_class', () => {
       });
     });
   });
-
 });
 
 describe('SoundToggle methods', () => {

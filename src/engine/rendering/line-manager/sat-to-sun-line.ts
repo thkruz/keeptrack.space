@@ -1,8 +1,8 @@
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EciArr3 } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { Satellite } from '@ootk/src/main';
 import { Line, LineColors, LineDescription } from './line';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SatToSunLine extends Line {
   private sat: Satellite | OemSatellite;

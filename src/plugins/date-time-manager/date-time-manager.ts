@@ -172,7 +172,7 @@ export class DateTimeManager extends KeepTrackPlugin {
               </form>
             </div>
           </div>
-        </div>`,
+        </div>`
     );
   }
 

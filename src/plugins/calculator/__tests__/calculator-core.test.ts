@@ -1,12 +1,5 @@
+import { ConversionContext, CoordFrame, frameInputToJ2000, j2000ToAllFrames, j2000ToFrameValues, validateFrameInput } from '@app/plugins/calculator/calculator-core';
 import { EpochUTC, Kilometers } from '@ootk/src/main';
-import {
-  ConversionContext,
-  CoordFrame,
-  frameInputToJ2000,
-  j2000ToAllFrames,
-  j2000ToFrameValues,
-  validateFrameInput,
-} from '@app/plugins/calculator/calculator-core';
 
 /** A fixed, sensor-free context. RAE paths are exercised separately. */
 const ctx = (): ConversionContext => {
@@ -66,11 +59,7 @@ describe('frameInputToJ2000 + j2000ToAllFrames', () => {
   });
 
   it('converts Classical input into a usable J2000 state', () => {
-    const j2000 = frameInputToJ2000(
-      CoordFrame.CLASSICAL,
-      { sma: 6778 as Kilometers, ecc: 0.001, inc: 51.6, raan: 10, argpe: 20, nu: 30 },
-      ctx(),
-    );
+    const j2000 = frameInputToJ2000(CoordFrame.CLASSICAL, { sma: 6778 as Kilometers, ecc: 0.001, inc: 51.6, raan: 10, argpe: 20, nu: 30 }, ctx());
 
     expect(Number.isFinite(j2000.position.x)).toBe(true);
     expect(j2000.position.magnitude()).toBeGreaterThan(6000);

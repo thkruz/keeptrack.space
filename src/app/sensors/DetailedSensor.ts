@@ -25,6 +25,7 @@ import {
   Sensor,
   SensorType,
   SpaceObjectType,
+  TtcAntenna,
   ZoomValue,
 } from '@ootk/src/main';
 
@@ -78,6 +79,15 @@ export interface DetailedSensorParams extends Omit<GroundStationParams, 'id'> {
   boresightEl?: Degrees[];
   /** Beamwidth in degrees */
   beamwidth?: Degrees;
+
+  /**
+   * Explicit boresight-centric FOV (ootk elliptical cone). When provided, it
+   * replaces the lossy min/max az/el derivation for the internal sensor, FOV
+   * containment checks, and volume rendering. Required for FOVs that cross
+   * zenith (e.g., Space Fence's fan), which the legacy az/el box cannot
+   * represent.
+   */
+  fovParams?: FieldOfViewParams;
 
   // Additional metadata
   /** Sensor ID for identification */
@@ -165,6 +175,13 @@ export class DetailedSensor extends GroundStation {
   boresightEl?: Degrees[];
   beamwidth?: Degrees;
 
+  /**
+   * Explicit boresight-centric FOV parameters. Public (not accessor-based) so
+   * they survive structured clone into the position cruncher worker, which
+   * rehydrates sensors with `new DetailedSensor(serialized)`.
+   */
+  fovParams?: FieldOfViewParams;
+
   // Additional metadata
   sensorId?: number;
   changeObjectInterval?: Milliseconds;
@@ -225,6 +242,7 @@ export class DetailedSensor extends GroundStation {
     this.boresightAz = params.boresightAz;
     this.boresightEl = params.boresightEl;
     this.beamwidth = params.beamwidth;
+    this.fovParams = params.fovParams;
 
     // Additional metadata
     this.sensorId = params.sensorId ?? params.id;
@@ -256,8 +274,8 @@ export class DetailedSensor extends GroundStation {
           sensorType: SensorType.PHASED_ARRAY_RADAR,
           fieldOfView: fovParams,
           beamwidth: this.beamwidth ?? (2 as Degrees),
-          boresightAz: this.boresightAz ?? [this.calculateBoresightAz_()],
-          boresightEl: this.boresightEl ?? [this.calculateBoresightEl_()],
+          boresightAz: this.boresightAz ?? [fovParams.boresightAz ?? (0 as Degrees)],
+          boresightEl: this.boresightEl ?? [fovParams.boresightEl ?? (90 as Degrees)],
           shortName: this.shortName,
           system: this.system,
           country: this.country,
@@ -300,8 +318,24 @@ export class DetailedSensor extends GroundStation {
         });
         break;
 
+      case SpaceObjectType.GROUND_SENSOR_STATION:
+        // TT&C tracking stations (DSN, SCN, ESTRACK, Galileo, etc.) - cooperative dishes
+        this.sensor_ = new TtcAntenna({
+          id: this.id,
+          name: this.name,
+          sensorType: SensorType.TT_C_ANTENNA,
+          fieldOfView: fovParams,
+          shortName: this.shortName,
+          system: this.system,
+          country: this.country,
+          operator: this.operator,
+          freqBand: this.freqBand,
+          url: this.url,
+        });
+        break;
+
       default:
-        // For other types (GROUND_SENSOR_STATION, etc.), create a basic optical sensor
+        // For other unhandled types, create a basic optical sensor
         // to ensure FOV checking works
         this.sensor_ = new OpticalSensor({
           id: this.id,
@@ -324,6 +358,11 @@ export class DetailedSensor extends GroundStation {
    * Converts legacy azimuth-sector FOV to ootk boresight-centric cone.
    */
   private buildFieldOfViewParams_(): FieldOfViewParams {
+    // Explicit boresight-centric FOV takes priority over the legacy derivation
+    if (this.fovParams) {
+      return { ...this.fovParams };
+    }
+
     // Calculate boresight from center of azimuth sector
     const boresightAz = this.calculateBoresightAz_();
     const boresightEl = this.calculateBoresightEl_();
@@ -360,7 +399,7 @@ export class DetailedSensor extends GroundStation {
   private calculateBoresightAz_(): Degrees {
     if (this.minAz > this.maxAz) {
       // Wraparound case (e.g., 347° to 227°)
-      const span = (360 - this.minAz) + this.maxAz;
+      const span = 360 - this.minAz + this.maxAz;
 
       return ((this.minAz + span / 2) % 360) as Degrees;
     }
@@ -388,7 +427,7 @@ export class DetailedSensor extends GroundStation {
   private getAzimuthSpan_(): number {
     if (this.minAz > this.maxAz) {
       // Wraparound case
-      return (360 - this.minAz) + this.maxAz;
+      return 360 - this.minAz + this.maxAz;
     }
 
     return this.maxAz - this.minAz;
@@ -433,13 +472,18 @@ export class DetailedSensor extends GroundStation {
 
   /**
    * Check if RAE coordinates are within sensor FOV.
-   * Uses legacy azimuth-sector bounds checking because the ootk FieldOfView
-   * uses a boresight-centric cone model which is geometrically incompatible
-   * with the azimuth-sector FOV used in the sensor catalog.
+   *
+   * Sensors with explicit boresight-centric fovParams use the ootk cone model
+   * (which handles zenith-crossing fans correctly). All other sensors use
+   * legacy azimuth-sector bounds checking, because the cone derived from their
+   * min/max az/el values is geometrically incompatible with the sector FOV
+   * used in the sensor catalog.
    */
   isRaeInFov(az: Degrees, el: Degrees, rng: Kilometers): boolean {
-    // Always use legacy bounds checking - ootk cone model is geometrically
-    // incompatible with azimuth-sector FOV used in sensor catalog
+    if (this.fovParams && this.sensor_) {
+      return this.sensor_.isInFov({ rng, az, el });
+    }
+
     return this.checkFovBoundsLegacy_(az, el, rng);
   }
 
@@ -449,12 +493,7 @@ export class DetailedSensor extends GroundStation {
    */
   private checkFovBoundsLegacy_(az: Degrees, el: Degrees, rng: Kilometers): boolean {
     // Primary FOV check
-    const inPrimaryFov = this.checkFovBounds_(
-      az, el, rng,
-      this.minAz, this.maxAz,
-      this.minEl, this.maxEl,
-      this.minRng, this.maxRng,
-    );
+    const inPrimaryFov = this.checkFovBounds_(az, el, rng, this.minAz, this.maxAz, this.minEl, this.maxEl, this.minRng, this.maxRng);
 
     if (inPrimaryFov) {
       return true;
@@ -463,10 +502,15 @@ export class DetailedSensor extends GroundStation {
     // Secondary FOV check if defined
     if (this.minAz2 !== undefined && this.maxAz2 !== undefined) {
       return this.checkFovBounds_(
-        az, el, rng,
-        this.minAz2, this.maxAz2,
-        this.minEl2 ?? this.minEl, this.maxEl2 ?? this.maxEl,
-        this.minRng2 ?? this.minRng, this.maxRng2 ?? this.maxRng,
+        az,
+        el,
+        rng,
+        this.minAz2,
+        this.maxAz2,
+        this.minEl2 ?? this.minEl,
+        this.maxEl2 ?? this.maxEl,
+        this.minRng2 ?? this.minRng,
+        this.maxRng2 ?? this.maxRng
       );
     }
 
@@ -479,10 +523,15 @@ export class DetailedSensor extends GroundStation {
    */
   // eslint-disable-next-line max-params -- 9 cohesive frustum bounds (az/el/rng + min/max each); bundling would allocate per call on a hot path
   private checkFovBounds_(
-    az: Degrees, el: Degrees, rng: Kilometers,
-    minAz: Degrees, maxAz: Degrees,
-    minEl: Degrees, maxEl: Degrees,
-    minRng: Kilometers, maxRng: Kilometers,
+    az: Degrees,
+    el: Degrees,
+    rng: Kilometers,
+    minAz: Degrees,
+    maxAz: Degrees,
+    minEl: Degrees,
+    maxEl: Degrees,
+    minRng: Kilometers,
+    maxRng: Kilometers
   ): boolean {
     // Range check
     if (rng < minRng || rng > maxRng) {
@@ -502,7 +551,6 @@ export class DetailedSensor extends GroundStation {
 
     // Normal case
     return az >= minAz && az <= maxAz;
-
   }
 
   /**
@@ -548,6 +596,7 @@ export class DetailedSensor extends GroundStation {
       boresightAz: this.boresightAz ? [...this.boresightAz] : undefined,
       boresightEl: this.boresightEl ? [...this.boresightEl] : undefined,
       beamwidth: this.beamwidth,
+      fovParams: this.fovParams ? { ...this.fovParams } : undefined,
       sensorId: this.sensorId,
       changeObjectInterval: this.changeObjectInterval,
       commLinks: this.commLinks ? [...this.commLinks] : undefined,
@@ -571,7 +620,9 @@ export class DetailedSensor extends GroundStation {
       `  Elevation: ${this.minEl}° - ${this.maxEl}°`,
       `  Range: ${this.minRng} - ${this.maxRng} km`,
       this.system ? `  System: ${this.system}` : '',
-    ].filter(Boolean).join('\n');
+    ]
+      .filter(Boolean)
+      .join('\n');
   }
 }
 

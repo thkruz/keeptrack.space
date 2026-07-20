@@ -47,6 +47,10 @@
             "all": "전체 워치리스트"
           }
         }
+      },
+      "rmbMenu": {
+        "addToWatchlist": "워치리스트에 추가",
+        "removeFromWatchlist": "워치리스트에서 제거"
       }
     },
     "WatchlistOverlay": {

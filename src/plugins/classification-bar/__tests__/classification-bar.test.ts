@@ -1,10 +1,10 @@
-import { ClassificationBar } from '@app/plugins/classification-bar/classification-bar';
 import { ClassificationString } from '@app/app/ui/classification';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import * as isThisNodeMod from '@app/engine/utils/isThisNode';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { ClassificationBar } from '@app/plugins/classification-bar/classification-bar';
 import { setupMinimumHtml, setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginInit, standardPluginSuite } from '@test/generic-tests';
 import { vi } from 'vitest';

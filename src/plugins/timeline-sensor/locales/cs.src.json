@@ -3,6 +3,10 @@
     "SensorTimeline": {
       "bottomIconLabel": "Časová osa senzoru",
       "title": "Menu časové osy senzoru",
+      "sections": {
+        "settings": "Nastavení",
+        "sensors": "Senzory"
+      },
       "labels": {
         "calculationLength": "Délka výpočtu (hodiny)",
         "calculationInterval": "Interval výpočtu (sekundy)",

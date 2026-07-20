@@ -28,13 +28,7 @@ export interface InterpolatedSample {
  * @param startTimeMs Launch time (ms since epoch); sample 0 is at this instant.
  * @param nowMs Current time (ms since epoch).
  */
-export const interpolateMissileSample = (
-  latList: number[],
-  lonList: number[],
-  altList: number[],
-  startTimeMs: number,
-  nowMs: number,
-): InterpolatedSample => {
+export const interpolateMissileSample = (latList: number[], lonList: number[], altList: number[], startTimeMs: number, nowMs: number): InterpolatedSample => {
   const lastIdx = altList.length - 1;
   const elapsedSec = Math.max(0, Math.min((nowMs - startTimeMs) / 1000, lastIdx));
   const i0 = Math.floor(elapsedSec);

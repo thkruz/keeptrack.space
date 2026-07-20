@@ -125,7 +125,10 @@ describe('OrbitGuardMenuPlugin behavior', () => {
   it('parseManeuverData_ fetches, populates and renders the table', async () => {
     const list = manyEvents(2);
 
-    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve(list) })));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve(list) }))
+    );
 
     p().parseManeuverData_();
 
@@ -134,11 +137,14 @@ describe('OrbitGuardMenuPlugin behavior', () => {
   });
 
   it('parseManeuverData_ warns on a non-ok response', async () => {
-    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: false, status: 500, json: () => Promise.resolve([]) })));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve({ ok: false, status: 500, json: () => Promise.resolve([]) }))
+    );
 
     p().parseManeuverData_();
 
     // Should not throw; the catch handler logs a warning.
-    await vi.waitFor(() => expect((globalThis.fetch as ReturnType<typeof vi.fn>)).toHaveBeenCalled());
+    await vi.waitFor(() => expect(globalThis.fetch as ReturnType<typeof vi.fn>).toHaveBeenCalled());
   });
 });

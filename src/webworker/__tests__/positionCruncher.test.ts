@@ -1,9 +1,4 @@
-import {
-  isCanSkipMarkers,
-  onmessageProcessing,
-  PositionCruncherIncomingMsg,
-  sendDataToSatSet,
-} from '@app/webworker/positionCruncher';
+import { isCanSkipMarkers, onmessageProcessing, PositionCruncherIncomingMsg, sendDataToSatSet } from '@app/webworker/positionCruncher';
 import { vi } from 'vitest';
 
 // PosCruncherMsgType is a const enum (erased); use literal values.
@@ -22,8 +17,7 @@ const MSG = {
 const TLE1 = '1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927';
 const TLE2 = '2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537';
 
-const send = (data: Record<string, unknown>) =>
-  onmessageProcessing({ data } as unknown as PositionCruncherIncomingMsg);
+const send = (data: Record<string, unknown>) => onmessageProcessing({ data } as unknown as PositionCruncherIncomingMsg);
 
 let posted: unknown[] = [];
 
@@ -65,12 +59,14 @@ describe('positionCruncher worker', () => {
     expect(() => send({ typ: MSG.SUNLIGHT_VIEW, isSunlightView: true })).not.toThrow();
     expect(() => send({ typ: MSG.SATELLITE_SELECTED, satelliteSelected: [0] })).not.toThrow();
     expect(() => send({ typ: MSG.UPDATE_MARKERS, markerMode: 0 })).not.toThrow();
-    expect(() => send({
-      typ: MSG.CAMERA_DATA,
-      vpMatrix: new Float32Array(16),
-      camPosEci: new Float32Array(3),
-      isFrustumCullingEnabled: true,
-    })).not.toThrow();
+    expect(() =>
+      send({
+        typ: MSG.CAMERA_DATA,
+        vpMatrix: new Float32Array(16),
+        camPosEci: new Float32Array(3),
+        isFrustumCullingEnabled: true,
+      })
+    ).not.toThrow();
   });
 
   it('exposes isCanSkipMarkers returning a boolean', () => {

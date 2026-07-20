@@ -3,10 +3,7 @@
     "Screenshot": {
       "bottomIconLabel": "拍照",
       "rmbMenu": {
-        "title": "保存图片",
-        "hd": "HD (1920 x 1080)",
-        "fourK": "4K (3840 x 2160)",
-        "eightK": "8K (7680 x 4320)"
+        "title": "保存图片"
       },
       "commands": {
         "take4k": "截图 (4K)",

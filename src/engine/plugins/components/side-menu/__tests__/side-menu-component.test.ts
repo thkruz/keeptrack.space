@@ -53,8 +53,8 @@ describe('SideMenuComponent', () => {
     vi.clearAllMocks();
 
     // Setup spies for slide utilities
-    mockSlideInRight = vi.spyOn(slideUtils, 'slideInRight').mockImplementation(() => { });
-    mockSlideOutLeft = vi.spyOn(slideUtils, 'slideOutLeft').mockImplementation(() => { });
+    mockSlideInRight = vi.spyOn(slideUtils, 'slideInRight').mockImplementation(() => {});
+    mockSlideOutLeft = vi.spyOn(slideUtils, 'slideOutLeft').mockImplementation(() => {});
     mockClickAndDragWidth = vi.spyOn(dragUtils, 'clickAndDragWidth').mockImplementation(() => null);
   });
 
@@ -80,10 +80,13 @@ describe('SideMenuComponent', () => {
     });
 
     it('should apply custom zIndex and width', () => {
-      const component = new SideMenuComponent('test-plugin', createConfig({
-        zIndex: 10,
-        width: 500,
-      }));
+      const component = new SideMenuComponent(
+        'test-plugin',
+        createConfig({
+          zIndex: 10,
+          width: 500,
+        })
+      );
 
       expect(component.elementName).toBe('test-menu');
     });
@@ -391,13 +394,16 @@ describe('SideMenuComponent', () => {
 
   describe('drag options', () => {
     it('should register drag handler when dragOptions provided', () => {
-      const component = new SideMenuComponent('test-plugin', createConfig({
-        dragOptions: {
-          isDraggable: true,
-          minWidth: 200,
-          maxWidth: 600,
-        },
-      }));
+      const component = new SideMenuComponent(
+        'test-plugin',
+        createConfig({
+          dragOptions: {
+            isDraggable: true,
+            minWidth: 200,
+            maxWidth: 600,
+          },
+        })
+      );
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);

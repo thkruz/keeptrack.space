@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { EventBus } from '../event-bus';
 import { EventBusEvent } from '../event-bus-events';
 

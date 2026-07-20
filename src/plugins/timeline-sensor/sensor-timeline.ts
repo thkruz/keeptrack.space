@@ -2,34 +2,43 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-lines */
 
-import { MenuMode } from '@app/engine/core/interfaces';
-import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl } from '@app/engine/utils/get-el';
-import viewTimelinePng from '@public/img/icons/view_timeline.png';
-
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { SoundNames } from '@app/engine/audio/sounds';
-import {
-  BaseObject, calcGmst, DEG2RAD, Degrees,
-  Hours, Kilometers, lla2eci, Milliseconds, MILLISECONDS_PER_SECOND, Radians,
-  Satellite,
-  SatelliteRecord,
-  Seconds, SpaceObjectType, Sun,
-} from '@ootk/src/main';
-import { SensorManager } from '../../app/sensors/sensorManager';
-import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-
+import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { t7e } from '@app/locales/keys';
+import {
+  BaseObject,
+  calcGmst,
+  DEG2RAD,
+  Degrees,
+  Hours,
+  Kilometers,
+  lla2eci,
+  MILLISECONDS_PER_SECOND,
+  Milliseconds,
+  Radians,
+  Satellite,
+  SatelliteRecord,
+  Seconds,
+  SpaceObjectType,
+  Sun,
+} from '@ootk/src/main';
+import viewTimelinePng from '@public/img/icons/view_timeline.png';
 import { fetchWeatherApi } from 'openmeteo';
+import { SensorManager } from '../../app/sensors/sensorManager';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import './sensor-timeline.css';
 
 interface Pass {
   start: Date;
@@ -115,25 +124,23 @@ export class SensorTimeline extends KeepTrackPlugin {
   constructor() {
     super();
 
-    this.allSensorLists_ = ServiceLocator.getSensorManager().getSensorList('ssn').concat(
-      ServiceLocator.getSensorManager().getSensorList('mw'),
-      ServiceLocator.getSensorManager().getSensorList('md'),
-      ServiceLocator.getSensorManager().getSensorList('OWL-Net'),
-      ServiceLocator.getSensorManager().getSensorList('leolabs'),
-      ServiceLocator.getSensorManager().getSensorList('esoc'),
-      ServiceLocator.getSensorManager().getSensorList('rus'),
-      ServiceLocator.getSensorManager().getSensorList('prc'),
-      ServiceLocator.getSensorManager().getSensorList('other'),
-    );
+    this.allSensorLists_ = ServiceLocator.getSensorManager()
+      .getSensorList('ssn')
+      .concat(
+        ServiceLocator.getSensorManager().getSensorList('mw'),
+        ServiceLocator.getSensorManager().getSensorList('md'),
+        ServiceLocator.getSensorManager().getSensorList('OWL-Net'),
+        ServiceLocator.getSensorManager().getSensorList('leolabs'),
+        ServiceLocator.getSensorManager().getSensorList('esoc'),
+        ServiceLocator.getSensorManager().getSensorList('rus'),
+        ServiceLocator.getSensorManager().getSensorList('prc'),
+        ServiceLocator.getSensorManager().getSensorList('other')
+      );
 
     // remove duplicates in sensorList
-    this.allSensorLists_ = this.allSensorLists_.filter(
-      (sensor, index, self) => index === self.findIndex((t) => t.uiName === sensor.uiName),
-    );
+    this.allSensorLists_ = this.allSensorLists_.filter((sensor, index, self) => index === self.findIndex((t) => t.uiName === sensor.uiName));
 
-    this.enabledSensors_ = this.allSensorLists_.filter((s) =>
-      ServiceLocator.getSensorManager().getSensorList('mw').includes(s),
-    );
+    this.enabledSensors_ = this.allSensorLists_.filter((s) => ServiceLocator.getSensorManager().getSensorList('mw').includes(s));
   }
 
   menuMode: MenuMode[] = [MenuMode.DISPLAY, MenuMode.ALL];
@@ -164,18 +171,13 @@ export class SensorTimeline extends KeepTrackPlugin {
           content: t7e('plugins.SensorTimeline.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.SensorTimeline.help.tip1'),
-        t7e('plugins.SensorTimeline.help.tip2'),
-        t7e('plugins.SensorTimeline.help.tip3'),
-      ],
+      tips: [t7e('plugins.SensorTimeline.help.tip1'), t7e('plugins.SensorTimeline.help.tip2'), t7e('plugins.SensorTimeline.help.tip3')],
     };
   }
 
   isRequireSatelliteSelected = true;
   isIconDisabled = true;
   isIconDisabledOnLoad = true;
-
 
   bottomIconImg = viewTimelinePng;
   bottomIconCallback: () => void = () => {
@@ -194,56 +196,60 @@ export class SensorTimeline extends KeepTrackPlugin {
       <canvas id="sensor-timeline-canvas-static" style="display: none;"></canvas>
     </div>`;
   sideMenuSecondaryHtml: string = html`
-    <div class="row">
-      <div class="input-field col s12">
-        <input id="sensor-timeline-setting-total-length" value="${this.lengthOfLookAngles_.toString()}" type="text"
-          style="text-align: center;"
-        />
-        <label for="sensor-timeline-setting-total-length" class="active">${t7e('plugins.SensorTimeline.labels.calculationLength')}</label>
+    <section class="kt-section">
+      <div class="kt-section-label">${t7e('plugins.SensorTimeline.sections.settings')}</div>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <input id="sensor-timeline-setting-total-length" value="${this.lengthOfLookAngles_.toString()}" type="text"
+            style="text-align: center;"
+          />
+          <label for="sensor-timeline-setting-total-length" class="active">${t7e('plugins.SensorTimeline.labels.calculationLength')}</label>
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="input-field col s12">
-        <input id="sensor-timeline-setting-interval" value="${this.angleCalculationInterval_.toString()}" type="text"
-          style="text-align: center;"
-        />
-        <label for="sensor-timeline-setting-interval" class="active">${t7e('plugins.SensorTimeline.labels.calculationInterval')}</label>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <input id="sensor-timeline-setting-interval" value="${this.angleCalculationInterval_.toString()}" type="text"
+            style="text-align: center;"
+          />
+          <label for="sensor-timeline-setting-interval" class="active">${t7e('plugins.SensorTimeline.labels.calculationInterval')}</label>
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="input-field col s12">
-        <input id="sensor-timeline-setting-bad-length" value="${this.lengthOfBadPass_.toString()}" type="text"
-          style="text-align: center;"
-        />
-        <label for="sensor-timeline-setting-bad-length" class="active">${t7e('plugins.SensorTimeline.labels.badPassLength')}</label>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <input id="sensor-timeline-setting-bad-length" value="${this.lengthOfBadPass_.toString()}" type="text"
+            style="text-align: center;"
+          />
+          <label for="sensor-timeline-setting-bad-length" class="active">${t7e('plugins.SensorTimeline.labels.badPassLength')}</label>
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="input-field col s12">
-        <input id="sensor-timeline-setting-avg-length" value="${this.lengthOfAvgPass_.toString()}" type="text"
-          style="text-align: center;"
-        />
-        <label for="sensor-timeline-setting-avg-length" class="active">${t7e('plugins.SensorTimeline.labels.avgPassLength')}</label>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <input id="sensor-timeline-setting-avg-length" value="${this.lengthOfAvgPass_.toString()}" type="text"
+            style="text-align: center;"
+          />
+          <label for="sensor-timeline-setting-avg-length" class="active">${t7e('plugins.SensorTimeline.labels.avgPassLength')}</label>
+        </div>
       </div>
-    </div>
-    <div class="switch row">
-            <label for="sensor-timeline-toggle" data-position="top" data-delay="50" data-tooltip="${t7e('plugins.SensorTimeline.labels.detailedPlot')}">
-              <input id="sensor-timeline-toggle" type="checkbox"/>
-              <span class="lever"></span>
-              ${t7e('plugins.SensorTimeline.labels.detailedPlot')}
-            </label>
-    </div>
-    <div class="switch row">
-            <label for="weather-toggle" data-position="top" data-delay="50" data-tooltip="${t7e('plugins.SensorTimeline.labels.useWeatherTooltip')}">
-              <input id="weather-toggle" type="checkbox" checked/>
-              <span class="lever"></span>
-              ${t7e('plugins.SensorTimeline.labels.useWeather')}
-            </label>
-    </div>
-    <div class="row" style="margin: 0 10px;">
-      <div id="sensor-timeline-sensor-list">
+      <div class="switch stl-switch-row">
+        <label for="sensor-timeline-toggle" data-position="top" data-delay="50" data-tooltip="${t7e('plugins.SensorTimeline.labels.detailedPlot')}">
+          <input id="sensor-timeline-toggle" type="checkbox"/>
+          <span class="lever"></span>
+          ${t7e('plugins.SensorTimeline.labels.detailedPlot')}
+        </label>
       </div>
-    </div>`;
+      <div class="switch stl-switch-row">
+        <label for="weather-toggle" data-position="top" data-delay="50" data-tooltip="${t7e('plugins.SensorTimeline.labels.useWeatherTooltip')}">
+          <input id="weather-toggle" type="checkbox" checked/>
+          <span class="lever"></span>
+          ${t7e('plugins.SensorTimeline.labels.useWeather')}
+        </label>
+      </div>
+    </section>
+    <section class="kt-section">
+      <div class="kt-section-label">${t7e('plugins.SensorTimeline.sections.sensors')}</div>
+      <div id="sensor-timeline-sensor-list" class="stl-sensor-list">
+      </div>
+    </section>`;
   sideMenuSecondaryOptions = {
     width: 350,
     leftOffset: 0,
@@ -276,20 +282,22 @@ export class SensorTimeline extends KeepTrackPlugin {
     link.click();
   };
 
-
   // Function to convert SensorPasses array to CSV
   convertSensorPassesToCSV = (sensorPassesArray: Passes[]) => {
     // Start the CSV with a   header
     const header = 'sensorId,sensorName,startTime,endTime';
 
     // Flatten the sensorPasses array into rows for the CSV
-    const rows = sensorPassesArray.flatMap((sensorPass) => sensorPass.passes.map((pass) => {
-      const formattedStart = pass.start.toISOString(); // Convert Date to ISO string
-      const formattedEnd = pass.end.toISOString(); // Convert Date to ISO string
+    const rows = sensorPassesArray
+      .flatMap((sensorPass) =>
+        sensorPass.passes.map((pass) => {
+          const formattedStart = pass.start.toISOString(); // Convert Date to ISO string
+          const formattedEnd = pass.end.toISOString(); // Convert Date to ISO string
 
-
-      return `${sensorPass.sensor.sensorId},${sensorPass.sensor.objName},${formattedStart},${formattedEnd}`;
-    })).join('\n');
+          return `${sensorPass.sensor.sensorId},${sensorPass.sensor.objName},${formattedStart},${formattedEnd}`;
+        })
+      )
+      .join('\n');
 
     // Combine header and rows
     const csvData = `${header}\n${rows}`;
@@ -297,98 +305,89 @@ export class SensorTimeline extends KeepTrackPlugin {
     return csvData;
   };
 
-
   addHtml(): void {
     super.addHtml();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        this.canvas_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas');
-        this.canvasStatic_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas-static');
-        this.ctx_ = this.canvas_.getContext('2d') as CanvasRenderingContext2D;
-        this.ctxStatic_ = this.canvasStatic_!.getContext('2d') as CanvasRenderingContext2D;
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      // v13 marker: the wrappers are generated, not authored
+      getEl('sensor-timeline-menu')?.classList.add('kt-ui-v13');
+      getEl('sensor-timeline-menu-secondary')?.classList.add('kt-ui-v13');
 
-        getEl('sensor-timeline-setting-total-length')!.addEventListener('change', () => {
-          this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-total-length')).value) as Hours;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
+      this.canvas_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas');
+      this.canvasStatic_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas-static');
+      this.ctx_ = this.canvas_.getContext('2d') as CanvasRenderingContext2D;
+      this.ctxStatic_ = this.canvasStatic_!.getContext('2d') as CanvasRenderingContext2D;
 
-        getEl('sensor-timeline-setting-interval')!.addEventListener('change', () => {
-          this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-bad-length')).value) as Seconds;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
+      getEl('sensor-timeline-setting-total-length')!.addEventListener('change', () => {
+        this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-total-length')).value) as Hours;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
 
-        getEl('sensor-timeline-setting-bad-length')!.addEventListener('change', () => {
-          this.lengthOfBadPass_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-bad-length')).value) as Seconds;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
+      getEl('sensor-timeline-setting-interval')!.addEventListener('change', () => {
+        this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-interval')).value) as Seconds;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
 
-        getEl('sensor-timeline-setting-avg-length')!.addEventListener('change', () => {
-          this.lengthOfAvgPass_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-avg-length')).value) as Seconds;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
+      getEl('sensor-timeline-setting-bad-length')!.addEventListener('change', () => {
+        this.lengthOfBadPass_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-bad-length')).value) as Seconds;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
 
-        getEl('sensor-timeline-toggle')!.addEventListener('change', () => {
-          this.detailedPlot = (<HTMLInputElement>getEl('sensor-timeline-toggle')).checked;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
+      getEl('sensor-timeline-setting-avg-length')!.addEventListener('change', () => {
+        this.lengthOfAvgPass_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-avg-length')).value) as Seconds;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
 
-        getEl('weather-toggle')!.addEventListener('change', () => {
-          this.useWeather = (<HTMLInputElement>getEl('weather-toggle')).checked;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
-      },
-    );
+      getEl('sensor-timeline-toggle')!.addEventListener('change', () => {
+        this.detailedPlot = (<HTMLInputElement>getEl('sensor-timeline-toggle')).checked;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
 
+      getEl('weather-toggle')!.addEventListener('change', () => {
+        this.useWeather = (<HTMLInputElement>getEl('weather-toggle')).checked;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
+    });
   }
 
   addJs(): void {
     super.addJs();
 
     // We need to wait for the sensorIds to be assigned before we can use them. Once they are ready we will reload the users last selected sensors
-    EventBus.getInstance().on(
-      EventBusEvent.onCruncherReady,
-      () => {
-        const cachedEnabledSensors = PersistenceManager.getInstance().getItem(StorageKey.SENSOR_TIMELINE_ENABLED_SENSORS);
-        let enabledSensors = [] as number[];
+    EventBus.getInstance().on(EventBusEvent.onCruncherReady, () => {
+      const cachedEnabledSensors = PersistenceManager.getInstance().getItem(StorageKey.SENSOR_TIMELINE_ENABLED_SENSORS);
+      let enabledSensors = [] as number[];
 
-        if (cachedEnabledSensors) {
-          enabledSensors = JSON.parse(cachedEnabledSensors) as number[];
+      if (cachedEnabledSensors) {
+        enabledSensors = JSON.parse(cachedEnabledSensors) as number[];
+      }
+
+      if (enabledSensors.length > 0) {
+        this.enabledSensors_ = this.allSensorLists_.filter((s: DetailedSensor) => enabledSensors.includes(s.sensorId!));
+
+        if (this.enabledSensors_.length === 0) {
+          this.enabledSensors_ = this.allSensorLists_;
         }
+      }
+    });
 
-        if (enabledSensors.length > 0) {
-          this.enabledSensors_ = this.allSensorLists_.filter((s: DetailedSensor) => enabledSensors.includes(s.sensorId!));
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (sat: BaseObject) => {
+      if (!this.isMenuButtonActive) {
+        return;
+      }
 
-          if (this.enabledSensors_.length === 0) {
-            this.enabledSensors_ = this.allSensorLists_;
-          }
-
-
-        }
-      },
-    );
-
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (sat: BaseObject) => {
-        if (!this.isMenuButtonActive) {
-          return;
-        }
-
-        if (sat) {
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-          this.canvas_.style.display = 'block';
-        }
-      },
-    );
+      if (sat) {
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+        this.canvas_.style.display = 'block';
+      }
+    });
   }
 
   async updateTimeline(): Promise<void> {
@@ -440,20 +439,19 @@ export class SensorTimeline extends KeepTrackPlugin {
       }
 
       const sensorButton = document.createElement('button');
+      const isEnabled = this.enabledSensors_.includes(sensor);
 
-      sensorButton.classList.add('btn', 'btn-ui', 'waves-effect', 'waves-light');
-      if (!this.enabledSensors_.includes(sensor)) {
-        sensorButton.classList.add('btn-red');
-      }
+      sensorButton.type = 'button';
+      sensorButton.classList.add('stl-sensor-toggle', isEnabled ? 'is-on' : 'is-off');
 
       sensorButton.innerText = sensor.uiName ?? sensor.shortName ?? sensor.objName;
       sensorButton.addEventListener('click', () => {
-        if (sensorButton.classList.contains('btn-red')) {
-          sensorButton.classList.remove('btn-red');
+        if (sensorButton.classList.contains('is-off')) {
+          sensorButton.classList.replace('is-off', 'is-on');
           this.enabledSensors_.push(sensor);
           ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
         } else {
-          sensorButton.classList.add('btn-red');
+          sensorButton.classList.replace('is-on', 'is-off');
           this.enabledSensors_.splice(this.enabledSensors_.indexOf(sensor), 1);
           ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
         }
@@ -464,7 +462,6 @@ export class SensorTimeline extends KeepTrackPlugin {
         PersistenceManager.getInstance().saveItem(StorageKey.SENSOR_TIMELINE_ENABLED_SENSORS, JSON.stringify(this.enabledSensors_.map((s) => s.sensorId!)));
       });
       sensorListDom.appendChild(sensorButton);
-      sensorListDom.appendChild(document.createTextNode(' '));
     }
   }
 
@@ -492,7 +489,6 @@ export class SensorTimeline extends KeepTrackPlugin {
      * console.log('end date', endDate);
      * console.log('utc', endDate.getUTCHours(), endDate.getUTCMinutes());
      */
-
 
     let weatherDataForAllSensors = [] as weatherReport[] | null;
 
@@ -562,7 +558,7 @@ export class SensorTimeline extends KeepTrackPlugin {
       let offset = 0;
 
       // const durationInSeconds = this.lengthOfLookAngles_ * 60 * 60;
-      const durationInSeconds = (endDate.getTime() - startDate.getTime()) / 1000 as Seconds;
+      const durationInSeconds = ((endDate.getTime() - startDate.getTime()) / 1000) as Seconds;
 
       let isObservable = false;
       let isBecomeObservable = false;
@@ -592,7 +588,6 @@ export class SensorTimeline extends KeepTrackPlugin {
       let isWeatherBecomeBad = false;
       let startGoodWeatherTime = null as unknown as Date;
 
-
       // ---------------
 
       if (sensor.type !== SpaceObjectType.OPTICAL) {
@@ -612,7 +607,7 @@ export class SensorTimeline extends KeepTrackPlugin {
       for (let i = 0; i < durationInSeconds; i += this.angleCalculationInterval_) {
         let weatherStatusThisIter = WeatherStatus.UNKOWN;
 
-        offset = i * 1000 as Milliseconds;
+        offset = (i * 1000) as Milliseconds;
         // const now = ServiceLocator.getTimeManager().getOffsetTimeObj(offset);
         const now = new Date(startDate.getTime() + offset);
 
@@ -754,9 +749,7 @@ export class SensorTimeline extends KeepTrackPlugin {
               isWeatherBecomeGood = false;
               isWeatherBecomeBad = false;
             }
-
           }
-
         }
       }
       AllPasses.push(Passes);
@@ -770,20 +763,16 @@ export class SensorTimeline extends KeepTrackPlugin {
   }
 
   static checkSatInFOV(now: Date, satrec: SatelliteRecord, sensor: DetailedSensor): boolean {
-
-    const rae = SatMath.getRae(now, satrec, sensor) as { rng: Kilometers, el: Degrees, az: Degrees };
+    const rae = SatMath.getRae(now, satrec, sensor) as { rng: Kilometers; el: Degrees; az: Degrees };
 
     if (!rae.az || !rae.el || !rae.rng) {
       return false;
     }
 
     return SatMath.checkIsInView(sensor, rae);
-
   }
 
   static checkObservable(now: Date, satellite: Satellite, sensor: DetailedSensor) {
-
-
     if (sensor.type !== SpaceObjectType.OPTICAL) {
       return true;
     }
@@ -804,12 +793,11 @@ export class SensorTimeline extends KeepTrackPlugin {
     const satInSun = SatMath.calculateIsInSun(satPos, sunPos);
     // / Station is at night or penumbra
 
-    if (((stationInSun === SunStatus.UMBRAL) || (stationInSun === SunStatus.PENUMBRAL)) && (satInSun === SunStatus.SUN)) {
+    if ((stationInSun === SunStatus.UMBRAL || stationInSun === SunStatus.PENUMBRAL) && satInSun === SunStatus.SUN) {
       return true;
     }
 
     return false;
-
   }
 
   static checkStationInNight(now: Date, sensor: DetailedSensor) {
@@ -831,8 +819,6 @@ export class SensorTimeline extends KeepTrackPlugin {
     }
 
     return false;
-
-
   }
 
   static checkSatinSun(now: Date, satellite: Satellite) {
@@ -845,11 +831,9 @@ export class SensorTimeline extends KeepTrackPlugin {
     }
 
     return false;
-
   }
 
   static checkWeatherIsGood(weatherReport: weatherReport, now: Date): boolean {
-
     const diffs = weatherReport.hourly.map((date) => Math.abs(date.getTime() - now.getTime()));
     const minDiff = Math.min(...diffs);
     const idx = diffs.indexOf(minDiff);
@@ -859,11 +843,9 @@ export class SensorTimeline extends KeepTrackPlugin {
     }
 
     return false;
-
   }
 
   private drawTimeline_(Passes: Passes[], SatinFoVs: Passes[], SatinSuns: Passes[], StationInNights: Passes[], clearSkies: Passes[]): void {
-
     const startDate = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
 
     startDate.setMinutes(0, 0, 0);
@@ -1050,7 +1032,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     this.ctx_.fillStyle = 'rgb(58, 58, 58)'; // #3a3a3a
     this.ctx_.fillRect(this.leftOffset, this.topOffset, this.width, this.height - 15);
 
-    this.xScale = (this.width) / (endTime - startTime);
+    this.xScale = this.width / (endTime - startTime);
 
     // Draw time axis
     this.ctx_.strokeStyle = 'rgb(255, 255, 255)';
@@ -1065,7 +1047,7 @@ export class SensorTimeline extends KeepTrackPlugin {
 
     // Draw hour markers
     for (let i = 0; i <= this.lengthOfLookAngles_ + 1; i++) {
-      const x = this.leftOffset + ((i * 60 * 60 * 1000) * this.xScale);
+      const x = this.leftOffset + i * 60 * 60 * 1000 * this.xScale;
 
       this.ctx_.lineWidth = 5; // Increase line width to make it thicker
       this.ctx_.beginPath();
@@ -1089,9 +1071,15 @@ export class SensorTimeline extends KeepTrackPlugin {
     }
   }
 
-  private drawPasses_(sensorPass: Passes, index: number, startHourOffset: Milliseconds, startTime: Milliseconds, yPos: number = 0, height: number = 20,
-    nameOffset: number = 200): void {
-
+  private drawPasses_(
+    sensorPass: Passes,
+    index: number,
+    startHourOffset: Milliseconds,
+    startTime: Milliseconds,
+    yPos: number = 0,
+    height: number = 20,
+    nameOffset: number = 200
+  ): void {
     // Draw sensor name
     this.ctx_.fillStyle = 'rgb(255, 255, 255)';
     this.ctx_.font = '14px Consolas';
@@ -1100,17 +1088,15 @@ export class SensorTimeline extends KeepTrackPlugin {
       if (sensorPass.type === PassTypes.SAT_IN_SUN) {
         this.ctx_.fillText(SensorTimeline.passTypeLabel_(PassTypes.SAT_IN_SUN), this.leftOffset - nameOffset, yPos + 5);
       } else if (sensorPass.type === PassTypes.CAN_OBSERVE) {
-        this.ctx_.fillText((sensorPass.sensor.uiName ?? 'Missing uiName'), this.leftOffset - nameOffset, yPos + 5);
+        this.ctx_.fillText(sensorPass.sensor.uiName ?? 'Missing uiName', this.leftOffset - nameOffset, yPos + 5);
       } else {
         this.ctx_.fillText(SensorTimeline.passTypeLabel_(sensorPass.type as PassTypes), this.leftOffset - nameOffset, yPos + 5);
       }
     } else {
-      this.ctx_.fillText((sensorPass.sensor.uiName ?? 'Missing uiName'), this.leftOffset - nameOffset, yPos + 5);
+      this.ctx_.fillText(sensorPass.sensor.uiName ?? 'Missing uiName', this.leftOffset - nameOffset, yPos + 5);
     }
 
-
     sensorPass.passes.forEach((pass) => {
-
       const passStart = pass.start.getTime() + startHourOffset;
       const passEnd = pass.end.getTime() + startHourOffset;
       const x1 = this.leftOffset + (passStart - startTime) * this.xScale;
@@ -1137,7 +1123,6 @@ export class SensorTimeline extends KeepTrackPlugin {
       }
 
       this.ctx_.fillRect(x1, yPos - height / 2, x2 - x1, height);
-
 
       const drawEvent = (mouseX: number, mouseY: number): boolean => {
         if (mouseX >= x1 - 10 && mouseX <= x2 + 10 && mouseY >= yPos - 10 && mouseY <= yPos + 10) {
@@ -1195,7 +1180,6 @@ export class SensorTimeline extends KeepTrackPlugin {
           selectSatManagerInstance.selectSat(currentSatId);
         }
       });
-
     });
 
     // If no passes draw a light gray bar to indicate no passes
@@ -1217,29 +1201,25 @@ export class SensorTimeline extends KeepTrackPlugin {
 
       this.drawEvents_[`${index} - ${sensorPass.sensor.id} - no - passes`] = drawEvent;
     }
-
   }
 
-  private async getWeather_(weatherDataInput:
-    WeatherDataInput, startDate: Date, endDate: Date): Promise<weatherReport[] | null> {
-
+  private async getWeather_(weatherDataInput: WeatherDataInput, startDate: Date, endDate: Date): Promise<weatherReport[] | null> {
     const lats = weatherDataInput.map((sensor) => sensor.lat);
     const lons = weatherDataInput.map((sensor) => sensor.lon);
 
     const params = {
-      'latitude': lats,
-      'longitude': lons,
-      'start_date': startDate.toISOString().slice(0, 10),
-      'end_date': endDate.toISOString().slice(0, 10),
-      'hourly': 'cloud_cover',
+      latitude: lats,
+      longitude: lons,
+      start_date: startDate.toISOString().slice(0, 10),
+      end_date: endDate.toISOString().slice(0, 10),
+      hourly: 'cloud_cover',
     };
 
     // console.log(params);
 
     const url = 'https://api.open-meteo.com/v1/forecast';
     // Try max 3 times, backoff rate on failure of 0.2, max backoff of 2 sec (These are their recommended defaults)
-    const responses = await fetchWeatherApi(url, params, 3, 0.2, 2)
-      .catch(() => null);
+    const responses = await fetchWeatherApi(url, params, 3, 0.2, 2).catch(() => null);
 
     // On failure, return null and let the caller handle it
     if (responses === null) {
@@ -1247,8 +1227,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     }
 
     // Helper function to form time ranges
-    const range = (start: number, stop: number, step: number) =>
-      Array.from({ length: (stop - start) / step }, (_, i) => start + i * step);
+    const range = (start: number, stop: number, step: number) => Array.from({ length: (stop - start) / step }, (_, i) => start + i * step);
 
     // Process locations using map.
     const allWeatherData: weatherReport[] = responses.map((response) => {
@@ -1260,9 +1239,7 @@ export class SensorTimeline extends KeepTrackPlugin {
       return {
         latitude: response.latitude(),
         longitude: response.longitude(),
-        hourly: range(Number(hourly.time()), Number(hourly.timeEnd()), hourly.interval()).map(
-          (t) => new Date((t + utcOffsetSeconds) * 1000),
-        ),
+        hourly: range(Number(hourly.time()), Number(hourly.timeEnd()), hourly.interval()).map((t) => new Date((t + utcOffsetSeconds) * 1000)),
         cloudCover: hourly.variables(0)!.valuesArray()!,
       } as weatherReport;
     });

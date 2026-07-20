@@ -3,6 +3,9 @@
     "SatelliteTimeline": {
       "bottomIconLabel": "Временная шкала спутника",
       "title": "Меню временной шкалы спутника",
+      "sections": {
+        "settings": "Настройки"
+      },
       "labels": {
         "calculationLength": "Длительность расчёта (часы)",
         "calculationInterval": "Интервал расчёта (секунды)",

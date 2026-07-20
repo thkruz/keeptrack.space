@@ -30,8 +30,14 @@ export class WebGlProgramHelper {
   fragmentShaderCode: string;
   program: WebGLProgram;
 
-  constructor(gl: WebGL2RenderingContext, vertexShaderCode: string, fragmentShaderCode: string, attribs?: Record<string, BufferAttribute> | undefined,
-    uniforms?: Record<string, WebGLUniformLocation | null> | undefined, params?: ProgramParams) {
+  constructor(
+    gl: WebGL2RenderingContext,
+    vertexShaderCode: string,
+    fragmentShaderCode: string,
+    attribs?: Record<string, BufferAttribute> | undefined,
+    uniforms?: Record<string, WebGLUniformLocation | null> | undefined,
+    params?: ProgramParams
+  ) {
     this.gl_ = gl;
     this.name = params?.name ?? 'WebGLProgram';
     this.vertexShaderCode = vertexShaderCode;
@@ -64,8 +70,13 @@ export class WebGlProgramHelper {
   /**
    * Creates a WebGL program from a vertex and fragment shader.
    */
-  createProgram(gl: WebGL2RenderingContext, vertShader: WebGLShader, fragShader: WebGLShader, attribs?: Record<string, BufferAttribute> | undefined,
-    uniforms?: Record<string, WebGLUniformLocation | null> | undefined): WebGLProgram {
+  createProgram(
+    gl: WebGL2RenderingContext,
+    vertShader: WebGLShader,
+    fragShader: WebGLShader,
+    attribs?: Record<string, BufferAttribute> | undefined,
+    uniforms?: Record<string, WebGLUniformLocation | null> | undefined
+  ): WebGLProgram {
     const program = gl.createProgram();
 
     gl.attachShader(program, vertShader);

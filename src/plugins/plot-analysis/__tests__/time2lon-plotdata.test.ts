@@ -93,12 +93,7 @@ describe('Time2LonPlots getPlotDataAsync_', () => {
   });
 
   it('drops non-satellites, high-eccentricity, off-period and out-of-inclination objects', async () => {
-    stubCatalog([
-      { isSatellite: () => false },
-      geoSat({ eccentricity: 0.5 }),
-      geoSat({ period: 95 }),
-      geoSat({ inclination: 60 }),
-    ]);
+    stubCatalog([{ isSatellite: () => false }, geoSat({ eccentricity: 0.5 }), geoSat({ period: 95 }), geoSat({ inclination: 60 })]);
 
     const data = await p().getPlotDataAsync_(baseFilters());
 

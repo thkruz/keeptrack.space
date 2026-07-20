@@ -1,18 +1,17 @@
-import { vi } from 'vitest';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
-import { CameraType } from '@app/engine/camera/camera-type';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { settingsManager } from '@app/settings/settings';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrack } from '@app/keeptrack';
 import { ColorMenu } from '@app/plugins/colors-menu/colors-menu';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { settingsManager } from '@app/settings/settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginRmbTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('ColorMenu_class', () => {
   beforeEach(() => {
@@ -120,26 +119,6 @@ describe('ColorMenu_class', () => {
     });
   });
 
-  describe('rmbCallback bridge', () => {
-    it('should call onContextMenuAction when rmbCallback is invoked', () => {
-      const plugin = new ColorMenu();
-      const onContextMenuActionSpy = vi.spyOn(plugin, 'onContextMenuAction');
-
-      plugin.rmbCallback('colors-test-rmb');
-
-      expect(onContextMenuActionSpy).toHaveBeenCalledWith('colors-test-rmb');
-    });
-
-    it('should not call onContextMenuAction for null targetId', () => {
-      const plugin = new ColorMenu();
-      const onContextMenuActionSpy = vi.spyOn(plugin, 'onContextMenuAction');
-
-      plugin.rmbCallback(null);
-
-      expect(onContextMenuActionSpy).not.toHaveBeenCalled();
-    });
-  });
-
   describe('colorsMenuClick', () => {
     it('should clear selected satellite when color scheme is clicked', () => {
       const selectSatManager = new SelectSatManager();
@@ -231,21 +210,11 @@ describe('ColorMenu_class', () => {
   });
 
   describe('keyboard shortcut and command palette', () => {
-    it('A shortcut returns early in FPS camera mode', () => {
+    // Camera-mode suppression is handled centrally by KeyboardComponent; the
+    // plugin callback simply toggles the menu.
+    it('A shortcut opens the menu', () => {
       const plugin = new ColorMenu();
 
-      ServiceLocator.getMainCamera().cameraType = CameraType.FPS;
-      const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
-
-      plugin.getKeyboardShortcuts()[0].callback();
-
-      expect(spy).not.toHaveBeenCalled();
-    });
-
-    it('A shortcut opens the menu when not in FPS mode', () => {
-      const plugin = new ColorMenu();
-
-      ServiceLocator.getMainCamera().cameraType = CameraType.CURRENT;
       const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
 
       plugin.getKeyboardShortcuts()[0].callback();

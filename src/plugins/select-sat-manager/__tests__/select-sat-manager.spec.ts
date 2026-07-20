@@ -1,4 +1,4 @@
-import { test, expect } from '@test/e2e/coverage';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('SelectSatManager', () => {
@@ -11,7 +11,7 @@ test.describe('SelectSatManager', () => {
       plugins: { SelectSatManager: { enabled: true } },
     });
 
-    const pluginErrors = errors.filter((e) => (/select.?sat/iu).test(e));
+    const pluginErrors = errors.filter((e) => /select.?sat/iu.test(e));
 
     expect(pluginErrors).toHaveLength(0);
   });

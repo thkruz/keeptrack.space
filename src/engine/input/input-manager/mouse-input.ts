@@ -10,7 +10,7 @@ import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
-import { Kilometers, eci2lla } from '@ootk/src/main';
+import { eci2lla, Kilometers } from '@ootk/src/main';
 import { closeColorbox } from '../../utils/colorbox';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { getEl } from '../../utils/get-el';
@@ -78,9 +78,10 @@ export class MouseInput {
         });
       }
 
-      // Create Event Listeners for Right Menu Buttons
-      ServiceLocator.getInputManager().rmbMenuItems
-        .map(({ elementIdL2 }) => getEl(elementIdL2))
+      // Create Event Listeners for Right Menu Buttons.
+      // Single-action items (no submenu) are clicked directly on their L1 element.
+      ServiceLocator.getInputManager()
+        .rmbMenuItems.map(({ elementIdL1, elementIdL2 }) => (elementIdL2 ? getEl(elementIdL2, true) : getEl(elementIdL1, true)))
         .concat([toggleTimeDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
         .forEach((el) => {
           el?.addEventListener('click', (e: MouseEvent) => {
@@ -93,18 +94,20 @@ export class MouseInput {
         });
 
       ServiceLocator.getInputManager().rmbMenuItems.forEach(({ elementIdL1, elementIdL2 }) => {
-        const el1 = getEl(elementIdL1);
-        const el2 = getEl(elementIdL2);
+        const el1 = getEl(elementIdL1, true);
+        const el2 = elementIdL2 ? getEl(elementIdL2, true) : null;
 
-        if (!el1 || !el2) {
+        if (!el1 || (elementIdL2 && !el2)) {
           errorManagerInstance.warn(`Missing elements for RMB menu: ${elementIdL1}, ${elementIdL2}`);
 
           return;
         }
 
-        el1?.addEventListener('mouseenter', () => {
+        el1.addEventListener('mouseenter', () => {
           ServiceLocator.getInputManager().clearRMBSubMenu();
-          InputManager.showDropdownSubMenu(rightBtnMenuDOM, el2, canvasDOM, el1);
+          if (el2) {
+            InputManager.showDropdownSubMenu(rightBtnMenuDOM, el2, canvasDOM, el1);
+          }
         });
         el2?.addEventListener('mouseleave', () => {
           el2.style.display = 'none';
@@ -224,9 +227,7 @@ export class MouseInput {
     state.mouseY = y;
 
     // Check for drag movement
-    if (state.isDragging &&
-      (state.screenDragPoint[0] !== state.mouseX ||
-        state.screenDragPoint[1] !== state.mouseY)) {
+    if (state.isDragging && (state.screenDragPoint[0] !== state.mouseX || state.screenDragPoint[1] !== state.mouseY)) {
       this.dragHasMoved = true;
       state.camAngleSnappedOnSat = false;
     }
@@ -310,16 +311,20 @@ export class MouseInput {
       if (evt.button === 0) {
         const catalogManagerInstance = ServiceLocator.getCatalogManager();
         const inputCamera = ServiceLocator.getViewportManager()?.getInputCamera() ?? ServiceLocator.getMainCamera();
+        const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager);
 
-        // Left Mouse Button Clicked
-        if (inputCamera.cameraType === CameraType.SATELLITE_FIRST_PERSON) {
+        // Ctrl + Left Click assigns the clicked object as the secondary (reference)
+        // object - a fast alternative to the right-click "Set Secondary Object" menu.
+        if (this.keyboard_.getKey('Control') && this.clickedSat !== -1) {
+          selectSatManagerInstance?.setSecondarySat(this.clickedSat);
+        } else if (inputCamera.cameraType === CameraType.SATELLITE_FIRST_PERSON) {
+          // Left Mouse Button Clicked
           if (this.clickedSat !== -1 && !catalogManagerInstance.getObject(this.clickedSat, GetSatType.EXTRA_ONLY)?.isStatic()) {
-            PluginRegistry.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
+            selectSatManagerInstance?.selectSat(this.clickedSat);
           }
         } else {
-          PluginRegistry.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
+          selectSatManagerInstance?.selectSat(this.clickedSat);
         }
-
       }
       if (evt.button === 2) {
         // Right Mouse Button Clicked
@@ -396,9 +401,6 @@ export class MouseInput {
     }
 
     switch (targetId) {
-      case 'set-sec-sat-rmb':
-        PluginRegistry.getPlugin(SelectSatManager)?.setSecondarySat(this.clickedSat);
-        break;
       case 'reset-camera-rmb':
         if (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat !== -1) {
           ServiceLocator.getMainCamera().resetRotation();
@@ -423,6 +425,9 @@ export class MouseInput {
         // Revert any group color scheme back to a non group scheme
         colorSchemeManagerInstance.isUseGroupColorScheme = false;
 
+        // Clear Screen is a full reset, so drop the secondary (reference) object too -
+        // deselecting only the primary left the secondary object and its orbit on screen.
+        PluginRegistry.getPlugin(SelectSatManager)?.setSecondarySat(-1);
         PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
         break;
       default:

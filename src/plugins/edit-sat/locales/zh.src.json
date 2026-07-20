@@ -48,7 +48,6 @@
       },
       "contextMenu": {
         "editSat": "编辑卫星",
-        "setPrimarySat": "设为主卫星",
         "setSecondarySat": "设为副卫星",
         "editSatellite": "编辑卫星"
       },

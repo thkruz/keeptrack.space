@@ -1,11 +1,4 @@
-import {
-  buildDownloadPayload,
-  buildPreviewText,
-  formatFixedWidth,
-  resolveReportTable,
-  tableToCsv,
-  tableToJson,
-} from '@app/plugins/reports/report-formatter';
+import { buildDownloadPayload, buildPreviewText, formatFixedWidth, resolveReportTable, tableToCsv, tableToJson } from '@app/plugins/reports/report-formatter';
 import { ReportData, ReportTable } from '@app/plugins/reports/reports-core';
 
 describe('report-formatter', () => {
@@ -75,7 +68,10 @@ describe('report-formatter', () => {
       const resolved = resolveReportTable(data);
 
       expect(resolved.headers).toEqual(['A', 'B']);
-      expect(resolved.rows).toEqual([['1', '2'], ['3', '4']]);
+      expect(resolved.rows).toEqual([
+        ['1', '2'],
+        ['3', '4'],
+      ]);
     });
 
     it('treats every legacy line as data when isHeaders is false', () => {
@@ -83,7 +79,10 @@ describe('report-formatter', () => {
       const resolved = resolveReportTable(data);
 
       expect(resolved.headers).toEqual([]);
-      expect(resolved.rows).toEqual([['a', '1'], ['b', '2']]);
+      expect(resolved.rows).toEqual([
+        ['a', '1'],
+        ['b', '2'],
+      ]);
     });
   });
 

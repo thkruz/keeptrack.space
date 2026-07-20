@@ -22,7 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { Degrees, Satellite, Kilometers } from '@ootk/src/main';
+import { Degrees, Kilometers, Satellite } from '@ootk/src/main';
 import { SatMath } from '../../app/analysis/sat-math';
 import { ServiceLocator } from '../core/service-locator';
 
@@ -37,13 +37,11 @@ export class SatMathApi {
   static getEcfOfCurrentOrbit(sat: Satellite, points: number) {
     const cb = (offset: number) => ServiceLocator.getTimeManager().getOffsetTimeObj(offset);
 
-
     return SatMath.getEcfOfCurrentOrbit(sat, points, cb);
   }
 
   static getEciOfCurrentOrbit(sat: Satellite, points: number) {
     const cb = (offset: number) => ServiceLocator.getTimeManager().getOffsetTimeObj(offset);
-
 
     return SatMath.getEciOfCurrentOrbit(sat, points, cb);
   }
@@ -58,13 +56,11 @@ export class SatMathApi {
   static getLlaOfCurrentOrbit(sat: Satellite, points: number, orbits = 1) {
     const cb = (offset: number) => ServiceLocator.getTimeManager().getOffsetTimeObj(offset);
 
-
     return SatMath.getLlaOfCurrentOrbit(sat, points, cb, orbits) as { lat: Degrees; lon: Degrees; alt: Kilometers; time: number }[];
   }
 
   static getRicOfCurrentOrbit(sat: Satellite, sat2: Satellite, points: number, orbits = 1) {
     const cb = (offset: number) => ServiceLocator.getTimeManager().getOffsetTimeObj(offset);
-
 
     return SatMath.getRicOfCurrentOrbit(sat, sat2, points, cb, orbits);
   }

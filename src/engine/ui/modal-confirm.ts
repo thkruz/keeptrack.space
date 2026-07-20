@@ -1,7 +1,7 @@
 import { SoundNames } from '@app/engine/audio/sounds';
+import { ServiceLocator } from '../core/service-locator';
 import { html } from '../utils/development/formatter';
 import { DraggableModal } from './draggable-modal';
-import { ServiceLocator } from '../core/service-locator';
 
 interface ConfirmModalOptions {
   title?: string;
@@ -37,12 +37,7 @@ export class ModalConfirm extends DraggableModal {
   }
 
   protected getModalContentHtml(): string {
-    const {
-      message = 'Do you really want to proceed with this action?',
-      confirmText = 'Yes',
-      cancelText = 'No',
-      isDestructive = false,
-    } = this.options;
+    const { message = 'Do you really want to proceed with this action?', confirmText = 'Yes', cancelText = 'No', isDestructive = false } = this.options;
 
     return html`
       <div class="confirm-modal">

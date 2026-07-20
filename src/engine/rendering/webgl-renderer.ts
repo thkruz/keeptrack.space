@@ -159,11 +159,7 @@ export class WebGLRenderer {
         // Emit the error event directly so telemetry's sendErrorData_ fires (warn() only toasts).
         // We avoid errorManagerInstance.error() because it auto-opens a GitHub issue URL, which is
         // too invasive for a "please refresh" prompt triggered by a GPU/driver event.
-        EventBus.getInstance().emit(
-          EventBusEvent.error,
-          new Error('WebGL context lost — refresh the page to recover.'),
-          'WebGLRenderer.onContextLost_',
-        );
+        EventBus.getInstance().emit(EventBusEvent.error, new Error('WebGL context lost — refresh the page to recover.'), 'WebGLRenderer.onContextLost_');
         errorManagerInstance.warn('WebGL context lost — refresh the page to recover.');
       }
     }, WebGLRenderer.CONTEXT_LOST_RECOVERY_TIMEOUT_MS);
@@ -204,22 +200,19 @@ export class WebGLRenderer {
       });
     }
 
-    EventBus.getInstance().on(
-      EventBusEvent.resize,
-      () => {
-        // Clear any existing resize timer
-        clearTimeout(this.lastResizeTime);
+    EventBus.getInstance().on(EventBusEvent.resize, () => {
+      // Clear any existing resize timer
+      clearTimeout(this.lastResizeTime);
 
-        /*
-         * Set a new timer to resize the canvas after 100 ms
-         * This is to prevent multiple resize events from firing in quick succession
-         * and causing performance issues
-         */
-        this.lastResizeTime = window.setTimeout(() => {
-          this.resizeCanvas();
-        }, 100);
-      },
-    );
+      /*
+       * Set a new timer to resize the canvas after 100 ms
+       * This is to prevent multiple resize events from firing in quick succession
+       * and causing performance issues
+       */
+      this.lastResizeTime = window.setTimeout(() => {
+        this.resizeCanvas();
+      }, 100);
+    });
 
     // Try to prevent crashes
     if (this.domElement?.addEventListener) {
@@ -230,23 +223,22 @@ export class WebGLRenderer {
     const gl: WebGL2RenderingContext = isThisNode()
       ? global.mocks.glMock
       : this.domElement.getContext('webgl2', {
-        alpha: false,
-        premultipliedAlpha: false,
-        desynchronized: false, // Setting to true causes flickering on mobile devices
-        antialias: true,
-        powerPreference: 'high-performance',
-        // Screenshot/ScreenRecorder need post-frame canvas reads; profiles without
-        // them (e.g. the companion embed) set false to skip the per-frame copy.
-        preserveDrawingBuffer: settingsManager.isPreserveDrawingBuffer ?? true,
-        stencil: false,
-      });
+          alpha: false,
+          premultipliedAlpha: false,
+          desynchronized: false, // Setting to true causes flickering on mobile devices
+          antialias: true,
+          powerPreference: 'high-performance',
+          // Screenshot/ScreenRecorder need post-frame canvas reads; profiles without
+          // them (e.g. the companion embed) set false to skip the per-frame copy.
+          preserveDrawingBuffer: settingsManager.isPreserveDrawingBuffer ?? true,
+          stencil: false,
+        });
 
     // Check for WebGL Issues
     if (gl === null) {
       showFatalError({
         title: 'WebGL 2 Not Available',
-        description:
-          'KeepTrack requires WebGL 2 to render the 3D scene. Your browser or device does not support it, or it has been disabled.',
+        description: 'KeepTrack requires WebGL 2 to render the 3D scene. Your browser or device does not support it, or it has been disabled.',
         recommendations: [
           'Update your browser to the latest version.',
           'Enable hardware acceleration in your browser settings.',
@@ -398,10 +390,7 @@ export class WebGLRenderer {
     const colorData = ServiceLocator.getColorSchemeManager().colorData;
 
     // Skip FOV check for PLANETARIUM, FLAT_MAP, or ALL label mode
-    const skipFovCheck =
-      cameraType === CameraType.PLANETARIUM ||
-      cameraType === CameraType.FLAT_MAP ||
-      labelMode === SatLabelMode.ALL;
+    const skipFovCheck = cameraType === CameraType.PLANETARIUM || cameraType === CameraType.FLAT_MAP || labelMode === SatLabelMode.ALL;
 
     if (skipFovCheck) {
       watchlistPluginInstance?.watchlistList.forEach(({ id }) => {
@@ -489,9 +478,9 @@ export class WebGLRenderer {
       }
 
       // We need to account for Scene.getInstance().worldShift and modify x, y, z accordingly
-      pos.x = pos.x + Scene.getInstance().worldShift[0] as Kilometers;
-      pos.y = pos.y + Scene.getInstance().worldShift[1] as Kilometers;
-      pos.z = pos.z + Scene.getInstance().worldShift[2] as Kilometers;
+      pos.x = (pos.x + Scene.getInstance().worldShift[0]) as Kilometers;
+      pos.y = (pos.y + Scene.getInstance().worldShift[1]) as Kilometers;
+      pos.z = (pos.z + Scene.getInstance().worldShift[2]) as Kilometers;
 
       let px = pos.x as number;
       let py = pos.y as number;
@@ -509,7 +498,7 @@ export class WebGLRenderer {
         const gmst = ServiceLocator.getTimeManager().gmst;
         let lon = Math.atan2(py, px) - gmst;
 
-        lon = ((lon + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+        lon = ((((lon + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) - Math.PI;
         const lat = Math.atan2(pz, Math.sqrt(px * px + py * py));
         const alt = eciDist - RADIUS_OF_EARTH;
 
@@ -520,7 +509,7 @@ export class WebGLRenderer {
         // Wrap X to nearest copy of camera center (matches shader logic)
         const mapW = 2 * Math.PI * RADIUS_OF_EARTH;
 
-        px = mainCamera.flatMapPanX + ((px - mainCamera.flatMapPanX + mapW * 0.5) % mapW + mapW) % mapW - mapW * 0.5;
+        px = mainCamera.flatMapPanX + ((((px - mainCamera.flatMapPanX + mapW * 0.5) % mapW) + mapW) % mapW) - mapW * 0.5;
       }
 
       const posVec4 = <[number, number, number, number]>vec4.fromValues(px, py, pz, 1);
@@ -628,9 +617,7 @@ export class WebGLRenderer {
       try {
         dotsManagerInstance.resizePickingFramebuffer();
       } catch (error) {
-        errorManagerInstance.warn(
-          `Picking framebuffer resize failed during resizeCanvas; deferring until context restore. ${error instanceof Error ? error.message : error}`,
-        );
+        errorManagerInstance.warn(`Picking framebuffer resize failed during resizeCanvas; deferring until context restore. ${error instanceof Error ? error.message : error}`);
         this.isResizePendingAfterContextRestore_ = true;
       }
     }
@@ -836,7 +823,6 @@ export class WebGLRenderer {
     const activeTexture = gl.getParameter(gl.TEXTURE_BINDING_2D);
     const activeTextureLevel = gl.getTexParameter(activeTexture, gl.TEXTURE_MAX_LEVEL);
 
-
     return activeTextureLevel;
   }
 
@@ -869,7 +855,9 @@ export class WebGLRenderer {
 
         errorManagerInstance.log(
           `projectionMatrix[${i}] is NaN - fov=${fov}, aspect=${aspect}, cameraType=${cameraType}, ` +
-          `matrix=[${Array.from(projectionMatrix).map((v) => (isNaN(v) ? 'NaN' : v.toFixed(4))).join(', ')}]`,
+            `matrix=[${Array.from(projectionMatrix)
+              .map((v) => (isNaN(v) ? 'NaN' : v.toFixed(4)))
+              .join(', ')}]`
         );
         this.updatePMatrix();
 

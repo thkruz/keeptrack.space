@@ -7,11 +7,11 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ClickDragOptions, KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
-import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -47,18 +47,18 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
   bottomIconImg = orbitguardPng;
   sideMenuElementName: string = 'maneuver-detection-menu';
   sideMenuElementHtml = html`
-    <div id="maneuver-detection-menu" class="side-menu-parent start-hidden">
+    <div id="maneuver-detection-menu" class="side-menu-parent start-hidden kt-ui-v13">
       <div id="maneuver-detection-content" class="side-menu">
-        <div class="row">
-          <h1 class="center-align">${l('title')}</h1>
-          <table id="maneuver-detection-table" class="center-align"></table>
-          <sub class="center-align">${l('labels.dataCredit')}</sub>
+        <section class="kt-section">
+          <div class="kt-section-label">${l('sections.results')}</div>
+          <table id="maneuver-detection-table"></table>
           <div id="pagination-controls" class="pagination">
-            <button id="prev-page" class="pagination-btn">${l('labels.previous')}</button>
+            <button id="prev-page" class="pagination-btn" type="button">${l('labels.previous')}</button>
             <span id="current-page" class="pagination-text">Page 1</span>
-            <button id="next-page" class="pagination-btn">${l('labels.next')}</button>
+            <button id="next-page" class="pagination-btn" type="button">${l('labels.next')}</button>
           </div>
-        </div>
+          <sub class="ogm-attribution">${l('labels.dataCredit')}</sub>
+        </section>
       </div>
     </div>`;
 
@@ -137,7 +137,7 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
       fetch(this.maneuverDataSrc, {
         method: 'GET',
         headers: {
-          'Authorization': this.bearerToken, // Add Bearer token from your script
+          Authorization: this.bearerToken, // Add Bearer token from your script
           'Content-Type': 'application/json',
         },
       })
@@ -252,6 +252,8 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
 
   private createHeaders_(tbl: HTMLTableElement) {
     const tr = tbl.insertRow();
+
+    tr.classList.add('ogm-table-header');
     const names = [
       l('table.norad'),
       l('table.eventStartTime'),
@@ -267,8 +269,6 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
       const column = tr.insertCell();
 
       column.appendChild(document.createTextNode(name));
-      column.setAttribute('style', 'text-decoration: underline');
-      column.setAttribute('class', 'center');
     }
   }
 

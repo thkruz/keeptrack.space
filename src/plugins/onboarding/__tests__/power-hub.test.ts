@@ -1,14 +1,7 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { createDefaultOnboardingState, type OnboardingState } from '@app/plugins/onboarding/onboarding-state';
-import {
-  areAllAvailableChaptersDone,
-  buildHubStep,
-  countDoneChapters,
-  getAvailableChapters,
-  getRecommendedChapterId,
-  POWER_CHAPTERS,
-} from '@app/plugins/onboarding/power-hub';
+import { areAllAvailableChaptersDone, buildHubStep, countDoneChapters, getAvailableChapters, getRecommendedChapterId, POWER_CHAPTERS } from '@app/plugins/onboarding/power-hub';
 import { isCatalogLoaded } from '@app/plugins/onboarding/tour-steps';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';

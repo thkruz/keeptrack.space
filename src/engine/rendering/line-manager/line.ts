@@ -1,10 +1,11 @@
 /* eslint-disable camelcase */
+
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { vec3, vec4 } from 'gl-matrix';
 import { GlUtils } from '../gl-utils';
 import { LineManager } from '../line-manager';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
-export type LineColor = typeof LineColors[keyof typeof LineColors] | vec4;
+export type LineColor = (typeof LineColors)[keyof typeof LineColors] | vec4;
 
 /**
  * A UI-facing summary of a line. The engine stays locale-free: `kind` is a stable

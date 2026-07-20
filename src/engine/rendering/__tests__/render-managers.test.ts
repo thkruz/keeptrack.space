@@ -1,9 +1,9 @@
-import { vi } from 'vitest';
-import { MeshManager } from '@app/engine/rendering/mesh-manager';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { MeshManager } from '@app/engine/rendering/mesh-manager';
 import { Degrees, Kilometers } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
+import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { vi } from 'vitest';
 
 /*
  * Small pure pieces of the GL managers: MeshManager's model/position state and

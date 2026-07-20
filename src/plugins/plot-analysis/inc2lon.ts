@@ -3,13 +3,7 @@ import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import {
-  IBottomIconConfig,
-  IDragOptions,
-  IHelpConfig,
-  IKeyboardShortcut,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, IDragOptions, IHelpConfig, IKeyboardShortcut, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
@@ -247,36 +241,37 @@ export class Inc2LonPlots extends KeepTrackPlugin {
       return;
     }
 
-    this.chart.setOption({
-      animation: false,
-      title: {
-        text: 'GEO Inclination vs Longitude Scatter Plot',
-        textStyle: {
-          fontSize: 16,
-          color: '#fff',
+    this.chart.setOption(
+      {
+        animation: false,
+        title: {
+          text: 'GEO Inclination vs Longitude Scatter Plot',
+          textStyle: {
+            fontSize: 16,
+            color: '#fff',
+          },
         },
-      },
-      legend: {
-        show: true,
-        top: 30,
-        textStyle: {
-          color: '#fff',
+        legend: {
+          show: true,
+          top: 30,
+          textStyle: {
+            color: '#fff',
+          },
         },
-      },
-      tooltip: {
-        formatter: (params) => {
-          const d = params.data as {
-            name: string;
-            value: number[];
-          };
+        tooltip: {
+          formatter: (params) => {
+            const d = params.data as {
+              name: string;
+              value: number[];
+            };
 
-          if (!d?.value) {
-            return '';
-          }
+            if (!d?.value) {
+              return '';
+            }
 
-          const color = params.color;
+            const color = params.color;
 
-          return `
+            return `
             <div style="text-align: left;">
               <div style="display: flex; align-items: center; margin-bottom: 5px;">
                 <div style="width: 10px; height: 10px; background-color: ${color}; border-radius: 50%; margin-right: 5px;"></div>
@@ -287,109 +282,111 @@ export class Inc2LonPlots extends KeepTrackPlugin {
               <div><b>Period:</b> ${d.value[2].toFixed(2)} min</div>
             </div>
           `;
-        },
-      },
-      xAxis: {
-        name: 'Longitude (\u00B0)',
-        type: 'value' as const,
-        position: 'bottom',
-        nameLocation: 'middle',
-        nameGap: 35,
-        axisLabel: { color: '#999' },
-        nameTextStyle: { color: '#fff', fontSize: 14 },
-      },
-      yAxis: {
-        name: 'Inclination (\u00B0)',
-        type: 'value' as const,
-        position: 'left',
-        nameLocation: 'middle',
-        nameGap: 50,
-        axisLabel: { color: '#999' },
-        nameTextStyle: { color: '#fff', fontSize: 14 },
-      },
-      dataZoom: [
-        {
-          type: 'slider' as const,
-          show: true,
-          xAxisIndex: [0],
-          start: -180,
-          end: 180,
-        },
-        {
-          type: 'slider' as const,
-          show: true,
-          yAxisIndex: [0],
-          left: '93%',
-          start: 0,
-          end: 65,
-        },
-        {
-          type: 'inside' as const,
-          xAxisIndex: [0],
-          start: -180,
-          end: 180,
-        },
-        {
-          type: 'inside' as const,
-          yAxisIndex: [0],
-          start: 0,
-          end: 65,
-        },
-      ],
-      visualMap: [
-        {
-          left: 'left',
-          top: '10%',
-          dimension: 2,
-          min: this.currentFilters_.minPeriod,
-          max: this.currentFilters_.maxPeriod,
-          itemWidth: 30,
-          itemHeight: 500,
-          calculable: true,
-          precision: 0.05,
-          text: ['Period (minutes)'],
-          textGap: 30,
-          textStyle: {
-            color: '#fff',
           },
-          inRange: {
-            // symbolSize: [10, 70],
+        },
+        xAxis: {
+          name: 'Longitude (\u00B0)',
+          type: 'value' as const,
+          position: 'bottom',
+          nameLocation: 'middle',
+          nameGap: 35,
+          axisLabel: { color: '#999' },
+          nameTextStyle: { color: '#fff', fontSize: 14 },
+        },
+        yAxis: {
+          name: 'Inclination (\u00B0)',
+          type: 'value' as const,
+          position: 'left',
+          nameLocation: 'middle',
+          nameGap: 50,
+          axisLabel: { color: '#999' },
+          nameTextStyle: { color: '#fff', fontSize: 14 },
+        },
+        dataZoom: [
+          {
+            type: 'slider' as const,
+            show: true,
+            xAxisIndex: [0],
+            start: -180,
+            end: 180,
           },
-          outOfRange: {
-            // symbolSize: [10, 70],
-            opacity: 0,
-            symbol: 'none',
+          {
+            type: 'slider' as const,
+            show: true,
+            yAxisIndex: [0],
+            left: '93%',
+            start: 0,
+            end: 65,
           },
-          controller: {
+          {
+            type: 'inside' as const,
+            xAxisIndex: [0],
+            start: -180,
+            end: 180,
+          },
+          {
+            type: 'inside' as const,
+            yAxisIndex: [0],
+            start: 0,
+            end: 65,
+          },
+        ],
+        visualMap: [
+          {
+            left: 'left',
+            top: '10%',
+            dimension: 2,
+            min: this.currentFilters_.minPeriod,
+            max: this.currentFilters_.maxPeriod,
+            itemWidth: 30,
+            itemHeight: 500,
+            calculable: true,
+            precision: 0.05,
+            text: ['Period (minutes)'],
+            textGap: 30,
+            textStyle: {
+              color: '#fff',
+            },
             inRange: {
-              color: ['#41577c'],
+              // symbolSize: [10, 70],
             },
             outOfRange: {
-              color: ['#999'],
+              // symbolSize: [10, 70],
+              opacity: 0,
+              symbol: 'none',
+            },
+            controller: {
+              inRange: {
+                color: ['#41577c'],
+              },
+              outOfRange: {
+                color: ['#999'],
+              },
             },
           },
-        },
-      ],
-      series: data.map((country) => ({
-        type: 'scatter',
-        name: country.name,
-        data: country.value?.map((item) => ({
-          name: item[3],
-          id: item[4],
-          value: [item[1], item[0], item[2]],
-        })),
-        symbolSize: 12,
-        itemStyle: {
-          borderWidth: 1,
-          borderColor: 'rgba(255,255,255,0.8)',
-        },
-        emphasis: {
+        ],
+        series: data.map((country) => ({
+          type: 'scatter',
+          name: country.name,
+          data: country.value?.map((item) => ({
+            name: item[3],
+            id: item[4],
+            value: [item[1], item[0], item[2]],
+          })),
+          symbolSize: 12,
           itemStyle: {
-            color: '#fff',
+            borderWidth: 1,
+            borderColor: 'rgba(255,255,255,0.8)',
           },
-        },
-      })),
-    }, true);
+          emphasis: {
+            itemStyle: {
+              color: '#fff',
+            },
+          },
+        })),
+      },
+      true
+    );
   }
 
   private onDownload_(): void {
@@ -533,8 +530,7 @@ export class Inc2LonPlots extends KeepTrackPlugin {
    * Codes outside the top N map to 'Other'.
    */
   static buildTopCountries_(countryCounts: Record<string, number>): Map<string, string> {
-    const sorted = Object.entries(countryCounts)
-      .sort(([, a], [, b]) => b - a);
+    const sorted = Object.entries(countryCounts).sort(([, a], [, b]) => b - a);
 
     const countryMap = getCountryMapList() as Record<string, string>;
     const topCodes = sorted.slice(0, Inc2LonPlots.topCountryCount_).map(([code]) => code);
@@ -553,5 +549,4 @@ export class Inc2LonPlots extends KeepTrackPlugin {
 
     return lookup;
   }
-
 }

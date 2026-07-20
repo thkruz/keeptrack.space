@@ -1,7 +1,7 @@
-import { vi } from 'vitest';
 import { SensorManager } from '@app/app/sensors/sensorManager';
 import { Container } from '@app/engine/core/container';
 import { Singletons } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
 import { SensorListPlugin } from '@app/plugins/sensor-list/sensor-list';
@@ -10,7 +10,7 @@ import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
-import { EventBus } from '@app/engine/events/event-bus';
+import { vi } from 'vitest';
 
 describe('SensorSurvFence_class', () => {
   let sensorSurvFencePlugin: SensorSurvFence;

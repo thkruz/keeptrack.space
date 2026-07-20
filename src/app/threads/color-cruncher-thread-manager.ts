@@ -4,16 +4,11 @@
  * for each message type.
  */
 
-import { ColorDataArrays } from '@app/engine/rendering/color-worker/color-data-arrays';
-import {
-  ColorWorkerMsgType,
-  ColorWorkerOutMsg,
-  FilterState,
-  SettingsFlags,
-} from '@app/engine/rendering/color-worker/color-worker-messages';
-import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { ColorDataArrays } from '@app/engine/rendering/color-worker/color-data-arrays';
+import { ColorWorkerMsgType, ColorWorkerOutMsg, FilterState, SettingsFlags } from '@app/engine/rendering/color-worker/color-worker-messages';
+import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 
 export class ColorCruncherThreadManager extends WebWorkerThreadManager {
@@ -91,12 +86,7 @@ export class ColorCruncherThreadManager extends WebWorkerThreadManager {
     });
   }
 
-  sendDynamicUpdate(
-    inView: Int8Array | null,
-    inSun: Int8Array | null,
-    vel: Float32Array | null,
-    dotsOnScreenVal?: number,
-  ): void {
+  sendDynamicUpdate(inView: Int8Array | null, inSun: Int8Array | null, vel: Float32Array | null, dotsOnScreenVal?: number): void {
     const inViewSnap = inView ? new Int8Array(inView) : null;
     const inSunSnap = inSun ? new Int8Array(inSun) : null;
     const velSnap = vel ? new Float32Array(vel) : null;
@@ -114,17 +104,18 @@ export class ColorCruncherThreadManager extends WebWorkerThreadManager {
     }
 
     try {
-      this.postMessage({
-        typ: ColorWorkerMsgType.UPDATE_DYNAMIC,
-        inViewData: inViewSnap,
-        inSunData: inSunSnap,
-        satVel: velSnap,
-        dotsOnScreen: dotsOnScreenVal,
-      }, transfer);
-    } catch (error) {
-      errorManagerInstance.warn(
-        `ColorCruncher dynamic update dropped: ${error instanceof Error ? error.message : String(error)}`,
+      this.postMessage(
+        {
+          typ: ColorWorkerMsgType.UPDATE_DYNAMIC,
+          inViewData: inViewSnap,
+          inSunData: inSunSnap,
+          satVel: velSnap,
+          dotsOnScreen: dotsOnScreenVal,
+        },
+        transfer
       );
+    } catch (error) {
+      errorManagerInstance.warn(`ColorCruncher dynamic update dropped: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 

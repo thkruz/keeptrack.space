@@ -20,28 +20,22 @@ export interface LookAngle {
 export type LookAngleResolver = (sat: Satellite) => LookAngle | null;
 
 /** Keep only objects whose numeric type is in the requested list. */
-export const filterByObjType = (sats: Satellite[], objTypes: number[]): Satellite[] =>
-  sats.filter((sat) => objTypes.includes(sat.type));
+export const filterByObjType = (sats: Satellite[], objTypes: number[]): Satellite[] => sats.filter((sat) => objTypes.includes(sat.type));
 
 /** Keep satellites whose inclination falls strictly inside (min, max). */
-export const filterByInclination = (sats: Satellite[], min: Degrees, max: Degrees): Satellite[] =>
-  sats.filter((sat) => sat.inclination < max && sat.inclination > min);
+export const filterByInclination = (sats: Satellite[], min: Degrees, max: Degrees): Satellite[] => sats.filter((sat) => sat.inclination < max && sat.inclination > min);
 
 /** Keep satellites whose right ascension falls strictly inside (min, max). */
-export const filterByRightAscension = (sats: Satellite[], min: Degrees, max: Degrees): Satellite[] =>
-  sats.filter((sat) => sat.rightAscension < max && sat.rightAscension > min);
+export const filterByRightAscension = (sats: Satellite[], min: Degrees, max: Degrees): Satellite[] => sats.filter((sat) => sat.rightAscension < max && sat.rightAscension > min);
 
 /** Keep satellites whose argument of perigee falls strictly inside (min, max). */
-export const filterByArgOfPerigee = (sats: Satellite[], min: Degrees, max: Degrees): Satellite[] =>
-  sats.filter((sat) => sat.argOfPerigee < max && sat.argOfPerigee > min);
+export const filterByArgOfPerigee = (sats: Satellite[], min: Degrees, max: Degrees): Satellite[] => sats.filter((sat) => sat.argOfPerigee < max && sat.argOfPerigee > min);
 
 /** Keep satellites whose period falls strictly inside (min, max). */
-export const filterByPeriod = (sats: Satellite[], min: Minutes, max: Minutes): Satellite[] =>
-  sats.filter((sat) => sat.period > min && sat.period < max);
+export const filterByPeriod = (sats: Satellite[], min: Minutes, max: Minutes): Satellite[] => sats.filter((sat) => sat.period > min && sat.period < max);
 
 /** Keep satellites whose RCS falls strictly inside (min, max); missing RCS is excluded. */
-export const filterByRcs = (sats: Satellite[], min: number, max: number): Satellite[] =>
-  sats.filter((sat) => (sat?.rcs ?? -Infinity) > min && (sat?.rcs ?? Infinity) < max);
+export const filterByRcs = (sats: Satellite[], min: number, max: number): Satellite[] => sats.filter((sat) => (sat?.rcs ?? -Infinity) > min && (sat?.rcs ?? Infinity) < max);
 
 /**
  * Keep satellites whose TLE age (in hours, relative to `now`) is within
@@ -62,13 +56,7 @@ export const filterByTleAge = (sats: Satellite[], min: Hours, max: Hours, now: D
  * Non-satellite/non-missile objects and those the resolver cannot place are
  * dropped.
  */
-export const filterByLookAngle = (
-  sats: Satellite[],
-  resolver: LookAngleResolver,
-  axis: keyof LookAngle,
-  min: number,
-  max: number,
-): Satellite[] =>
+export const filterByLookAngle = (sats: Satellite[], resolver: LookAngleResolver, axis: keyof LookAngle, min: number, max: number): Satellite[] =>
   sats.filter((sat) => {
     if (!sat.isSatellite() && !sat.isMissile()) {
       return false;

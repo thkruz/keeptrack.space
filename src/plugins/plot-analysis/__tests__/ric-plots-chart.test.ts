@@ -36,9 +36,18 @@ describe('buildRicChartOption', () => {
     const series = opt.series as { name: string; data: number[][] }[];
 
     expect(series[0].name).toBe('Radial');
-    expect(series[0].data).toEqual([[0, 1], [0.9, 4]]);
-    expect(series[1].data).toEqual([[0, 2], [0.9, 5]]);
-    expect(series[2].data).toEqual([[0, 3], [0.9, 6]]);
+    expect(series[0].data).toEqual([
+      [0, 1],
+      [0.9, 4],
+    ]);
+    expect(series[1].data).toEqual([
+      [0, 2],
+      [0.9, 5],
+    ]);
+    expect(series[2].data).toEqual([
+      [0, 3],
+      [0.9, 6],
+    ]);
     expect(series[3].data[0][1]).toBeCloseTo(Math.sqrt(14));
   });
 

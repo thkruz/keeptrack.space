@@ -10,12 +10,12 @@ describe('Locales', () => {
      * this needs to be deep nested so the function might be plugins.SensorListPlugin.bottomIconLabel for example
      */
 
-    const flatMap = (obj: LocaleInformation, prefix: string = ''): string[] => Object.keys(obj).flatMap((key) => {
-      const newPrefix = prefix ? `${prefix}.${key}` : key;
+    const flatMap = (obj: LocaleInformation, prefix: string = ''): string[] =>
+      Object.keys(obj).flatMap((key) => {
+        const newPrefix = prefix ? `${prefix}.${key}` : key;
 
-
-      return typeof obj[key] === 'object' ? flatMap(obj[key], newPrefix) : newPrefix;
-    });
+        return typeof obj[key] === 'object' ? flatMap(obj[key], newPrefix) : newPrefix;
+      });
 
     flatMapOfAllKeys.push(...flatMap(Localization));
   };
@@ -84,4 +84,3 @@ const validateLocalizationKeys = (localization: LocaleInformation, flatMapOfAllK
     }
   });
 };
-

@@ -15,17 +15,24 @@
       },
       "sections": {
         "template": "Vorlage",
+        "launchWindow": "Startfenster",
         "launchSite": "Startplatz"
       },
       "buttons": {
+        "matchTargetPlane": "Startfenster finden",
         "createLaunchNominal": "Startnominal erstellen",
-        "inclinationTooLow": "Inklination zu niedrig!"
+        "inclinationTooLow": "Inklination zu niedrig!",
+        "clearWindow": "Startfenster löschen",
+        "createLaunchAtWindow": "Start im Fenster erstellen"
       },
       "msgs": {
+        "windowFound": "Start um {time} zur Angleichung an die Zielebene (ΔRAAN {delta}°)",
         "launchNominalCreated": "Startnominal erstellt!",
         "timeRelativeToLaunch": "Die Zeit ist jetzt relativ zur Startzeit."
       },
       "errorMsgs": {
+        "windowNoTarget": "Wählen Sie zuerst einen Zielsatelliten aus.",
+        "windowGeometryImpossible": "Kein Startfenster: Die Zielinklination liegt unter der Breite des Startplatzes.",
         "noMoreNominalSatellites": "Keine weiteren nominalen Satelliten verfügbar!",
         "launchSiteNotFound": "Startort {launchSite} nicht gefunden!",
         "failedToCreateTle": "TLE konnte nicht erstellt werden: {error}",
@@ -42,7 +49,9 @@
         "invalidEpochDayFormat": "Ungültiges Epochentag-Format! Es müssen 3 Ziffern, ein Dezimalpunkt und 8 Nachkommastellen sein.",
         "epochDayFormatIssue": "Es gab ein Problem mit dem Epochentag-Format dieses Satelliten. Versuchen Sie einen anderen Satelliten.",
         "failedToPropagate": "Satellit konnte nicht propagiert werden. Versuchen Sie andere Parameter oder melden Sie dieses Problem, wenn die Parameter korrekt sind.",
-        "changingOrbitBufferFailed": "Ändern der Orbit-Puffer-Daten fehlgeschlagen"
+        "changingOrbitBufferFailed": "Ändern der Orbit-Puffer-Daten fehlgeschlagen",
+        "launchLatExceedsInclination": "Die Startbreite überschreitet die Bahnneigung.",
+        "failedToFitOrbit": "Es konnte keine Umlaufbahn an den Startort angepasst werden."
       },
       "help": {
         "overview": "Das Menü 'Neuer Start' erstellt einen fiktiven Start: Es kopiert die Umlaufbahn eines realen Satelliten, dreht sie so, dass der Start von einem von Ihnen gewählten Startort erfolgt, und setzt die Uhr auf T+0 zurück. Verwenden Sie es, um die Frage zu beantworten: \"Wenn etwas von diesem Standort in diese Art von Umlaufbahn startet, wann werden meine Sensoren es sehen?\"",
@@ -54,7 +63,8 @@
         "tip1": "Nach der Erstellung zeigt die Uhr die Zeit seit dem Abheben: \"00:45:00\" bedeutet 45 Minuten nach dem Start, ideal für Zeitachsen der Sensorabdeckung.",
         "tip2": "Wenn die Erstellung an der Höhenprüfung scheitert, versuchen Sie einen anderen Vorlagensatelliten mit einer konventionelleren Umlaufbahn.",
         "shortcutOpen": "Menü Neuer Start öffnen"
-      }
+      },
+      "launchWindowHelp": "Findet die nächste Startzeit, deren Bahnebene mit dem Zielsatelliten übereinstimmt. Dies legt nur die Startzeit fest; es wird nichts erstellt, bis Sie auf „Startnominal erstellen“ klicken."
     }
   }
 }

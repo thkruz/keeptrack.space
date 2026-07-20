@@ -98,7 +98,11 @@ describe('PolarPlotPlugin togglePolarPlot_ (P shortcut)', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const p = () => plugin as any;
 
-  const toggle = () => plugin.getKeyboardShortcuts().find((s) => s.key === 'P')!.callback();
+  const toggle = () =>
+    plugin
+      .getKeyboardShortcuts()
+      .find((s) => s.key === 'P')!
+      .callback();
 
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);

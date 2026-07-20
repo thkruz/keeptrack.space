@@ -31,7 +31,4 @@ import { settingsManager } from '@app/settings/settings';
  *
  * The engine depends only on this global setting — never on the plugin that writes it.
  */
-export const getCatalogReferenceDate = (): Date =>
-  (typeof settingsManager.catalogReferenceTime === 'number'
-    ? new Date(settingsManager.catalogReferenceTime)
-    : new Date());
+export const getCatalogReferenceDate = (): Date => (typeof settingsManager.catalogReferenceTime === 'number' ? new Date(settingsManager.catalogReferenceTime) : new Date());

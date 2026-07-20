@@ -1,17 +1,14 @@
-import { vi } from 'vitest';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import {
-  hasSettingsContribution,
-  ISettingToggleControl,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { hasSettingsContribution, ISettingToggleControl } from '@app/engine/plugins/core/plugin-capabilities';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
-import { Satellite, Kilometers, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
-import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { Kilometers, Satellite, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
+import { vi } from 'vitest';
 import { defaultSat, defaultSensor } from '../../../../test/environment/apiMocks';
 import { setupStandardEnvironment } from '../../../../test/environment/standard-env';
 import { standardPluginSuite, websiteInit } from '../../../../test/generic-tests';
@@ -97,10 +94,7 @@ describe('SelectSatManager_class', () => {
     setupStandardEnvironment([TopMenu]);
     selectSatManager = new SelectSatManager();
 
-    ServiceLocator.getCatalogManager().objectCache = [
-      new Satellite(defaultSat),
-      new Satellite({ ...defaultSat, id: 1 }),
-    ];
+    ServiceLocator.getCatalogManager().objectCache = [new Satellite(defaultSat), new Satellite({ ...defaultSat, id: 1 })];
     // Set all satellites to active
     ServiceLocator.getCatalogManager().objectCache.forEach((sat) => {
       sat.active = true;
@@ -121,13 +115,28 @@ describe('SelectSatManager_class', () => {
   });
 
   it('should switch primary and secondary satellites', () => {
-    selectSatManager.selectSat(1);
-    selectSatManager.setSecondarySat(2);
+    selectSatManager.selectSat(0);
+    selectSatManager.setSecondarySat(1);
 
     selectSatManager.switchPrimarySecondary();
 
-    expect(selectSatManager.selectedSat).toBe(2);
-    expect(selectSatManager.secondarySat).toBe(1);
+    expect(selectSatManager.selectedSat).toBe(1);
+    expect(selectSatManager.secondarySat).toBe(0);
+  });
+
+  it('should refocus the camera on the new primary when swapping', () => {
+    selectSatManager.selectSat(0);
+    selectSatManager.setSecondarySat(1);
+
+    // The camera refocus happens inside selectSat's full selection path, which the old
+    // id-only setSelectedSat_ shortcut skipped. Assert the new primary is routed through
+    // selectSat (the previous secondary), not just assigned.
+    const selectSatSpy = vi.spyOn(selectSatManager, 'selectSat');
+
+    selectSatManager.switchPrimarySecondary();
+
+    expect(selectSatSpy).toHaveBeenCalledWith(1);
+    expect(selectSatManager.selectedSat).toBe(1);
   });
 
   it('should select the previous satellite', () => {
@@ -297,6 +306,44 @@ describe('SelectSatManager_class', () => {
     selectSatManager.setSecondarySat(1);
 
     expect(selectSatManager.selectedSat).toBe(-1);
+  });
+
+  it('should clear the secondary orbit when the secondary is cleared', () => {
+    selectSatManager.selectSat(0);
+    selectSatManager.setSecondarySat(1);
+    expect(selectSatManager.secondarySat).toBe(1);
+
+    const clearSelectOrbit = vi.spyOn(ServiceLocator.getOrbitManager(), 'clearSelectOrbit');
+
+    selectSatManager.setSecondarySat(-1);
+
+    expect(selectSatManager.secondarySat).toBe(-1);
+    expect(selectSatManager.secondarySatObj).toBeNull();
+    expect(clearSelectOrbit).toHaveBeenCalledWith(true);
+  });
+
+  it('should toast a confirmation when a secondary satellite is set', () => {
+    selectSatManager.selectSat(0);
+
+    // toast is a shared mock in the test env, so clear accumulated calls first.
+    const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast');
+
+    toastSpy.mockClear();
+    selectSatManager.setSecondarySat(1);
+
+    expect(toastSpy).toHaveBeenCalledWith(expect.stringContaining(':'), expect.anything());
+  });
+
+  it('should not toast when the secondary is cleared', () => {
+    selectSatManager.selectSat(0);
+    selectSatManager.setSecondarySat(1);
+
+    const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast');
+
+    toastSpy.mockClear();
+    selectSatManager.setSecondarySat(-1);
+
+    expect(toastSpy).not.toHaveBeenCalled();
   });
 
   it('should handle getSelectedSat method', () => {

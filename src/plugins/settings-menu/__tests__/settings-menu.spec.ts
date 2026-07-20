@@ -1,4 +1,4 @@
-import { test, expect } from '@test/e2e/coverage';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('SettingsMenuPlugin', () => {
@@ -55,15 +55,11 @@ test.describe('SettingsMenuPlugin', () => {
     await expect
       .poll(() => page.evaluate(() => (window as unknown as { settingsManager?: { isDemoModeOn?: boolean } }).settingsManager?.isDemoModeOn), { timeout: 5_000 })
       .toBe(false);
-    await expect
-      .poll(() => page.evaluate(() => (window as unknown as { settingsManager?: { isDrawTrailingOrbits?: boolean } }).settingsManager?.isDrawTrailingOrbits))
-      .toBe(false);
+    await expect.poll(() => page.evaluate(() => (window as unknown as { settingsManager?: { isDrawTrailingOrbits?: boolean } }).settingsManager?.isDrawTrailingOrbits)).toBe(false);
 
     // Close
     await page.evaluate(() => {
-      document.getElementById('settings-menu-close-btn')?.dispatchEvent(
-        new MouseEvent('click', { bubbles: true }),
-      );
+      document.getElementById('settings-menu-close-btn')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u, { timeout: 5_000 });
   });

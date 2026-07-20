@@ -316,10 +316,15 @@ export const standardPluginRmbTests = (Plugin: Constructor<KeepTrackPlugin>, plu
     websiteInit(plugin);
 
     // Create a list from li ids in rmbL2Html
-    const rmbOptions = plugin.rmbL2Html
+    const rmbOptions = (plugin.rmbL2Html ?? '')
       .split('<li id="')
       .slice(1)
       .map((s) => s.split('"')[0]);
+
+    // Single-action items have no submenu; the level 1 element is the action itself
+    if (rmbOptions.length === 0 && plugin.rmbL1ElementName) {
+      rmbOptions.push(plugin.rmbL1ElementName);
+    }
 
     rmbOptions.forEach((rmbOption) => {
       test(`${pluginName}_rmb_clicked_${rmbOption}`, () => {

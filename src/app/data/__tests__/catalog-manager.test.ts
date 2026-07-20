@@ -1,14 +1,14 @@
-import { vi } from 'vitest';
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
 import { CatalogManager } from '@app/app/data/catalog-manager';
 import { CatalogSearch } from '@app/app/data/catalog-search';
-import { GetSatType } from '@app/engine/core/interfaces';
-import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
-import { BaseObject, Degrees, Satellite, Kilometers, Minutes, SpaceObjectType } from '@ootk/src/main';
-import { defaultSat } from '@test/environment/apiMocks';
+import { GetSatType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { BaseObject, Degrees, Kilometers, Minutes, Satellite, SpaceObjectType } from '@ootk/src/main';
+import { defaultSat } from '@test/environment/apiMocks';
+import { vi } from 'vitest';
 
 vi.mock('@app/engine/utils/saveVariable', () => ({
   saveXlsx: vi.fn(),

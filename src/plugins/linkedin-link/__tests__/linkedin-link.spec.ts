@@ -1,4 +1,4 @@
-import { test, expect } from '@test/e2e/coverage';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('LinkedInLinkPlugin', () => {
@@ -49,14 +49,14 @@ test.describe('LinkedInLinkPlugin', () => {
         window.open = (u?: string | URL) => {
           capturedUrl = String(u ?? '');
 
-return null;
+          return null;
         };
         const btn = document.querySelector('[id^="LinkedInLinkPlugin"][id$="-btn"]') as HTMLElement;
 
         btn?.click();
         window.open = origOpen;
 
-return capturedUrl;
+        return capturedUrl;
       });
 
       expect(url).toContain('linkedin.com/company/keeptrackspace');

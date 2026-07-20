@@ -1,16 +1,17 @@
 import { Material } from '@app/engine/rendering/material';
 import { OBJLoader } from '@app/engine/rendering/mesh/loaders/webgl-obj-loader';
-import { OBJ } from 'webgl-obj-loader';
 import { vi } from 'vitest';
+import { OBJ } from 'webgl-obj-loader';
 
-const glMock = () => ({
-  createBuffer: vi.fn(() => ({})),
-  bindBuffer: vi.fn(),
-  bufferData: vi.fn(),
-  ARRAY_BUFFER: 0,
-  ELEMENT_ARRAY_BUFFER: 1,
-  STATIC_DRAW: 2,
-}) as unknown as WebGLRenderingContext;
+const glMock = () =>
+  ({
+    createBuffer: vi.fn(() => ({})),
+    bindBuffer: vi.fn(),
+    bufferData: vi.fn(),
+    ARRAY_BUFFER: 0,
+    ELEMENT_ARRAY_BUFFER: 1,
+    STATIC_DRAW: 2,
+  }) as unknown as WebGLRenderingContext;
 
 /** Build a minimal webgl-obj-loader Mesh-like object keyed by name. */
 const buildMesh = (name: string, numItems: number) => {

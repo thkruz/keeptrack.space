@@ -4,10 +4,13 @@
       "bottomIconLabel": "Sensores",
       "title": "Menú de Lista de Sensores",
       "labels": {
+        "categorySurveillance": "Vigilancia espacial",
+        "categoryTtc": "Control de satélites y comunicaciones",
         "missingData": "Datos faltantes",
         "tooltipSensorsInFov": "Visualizar cobertura de sensores"
       },
       "buttons": {
+        "markAll": "Marcar {name}",
         "resetSensor": "Restablecer sensor",
         "showSensorsWithFov": "Mostrar todos los sensores con campo de visión..."
       },
@@ -21,13 +24,16 @@
         "imgAlt": "El menú de Sensores mostrando redes de sensores agrupadas",
         "imgCaption": "Los sensores están agrupados por red. Haz clic en el encabezado de un grupo para seleccionar toda la red de una vez.",
         "sensorTypesHeading": "Tipos de Sensores",
-        "sensorTypes": "<ul><li><strong>Radares de array en fase</strong>: escaneo amplio y rápido; típicamente limitados a la Órbita Terrestre Baja (LEO).</li><li><strong>Radares mecánicos</strong>: antenas orientables utilizables tanto contra LEO como contra la Órbita Geoestacionaria (GEO).</li><li><strong>Telescopios ópticos</strong>: usados principalmente para GEO y el espacio profundo; solo funcionan de noche con cielos despejados, mientras que los radares funcionan de día y de noche.</li></ul>",
+        "sensorTypes": "<ul><li><strong>Radares de array en fase</strong>: escaneo amplio y rápido; típicamente limitados a la Órbita Terrestre Baja (LEO).</li><li><strong>Radares mecánicos</strong>: antenas orientables utilizables tanto contra LEO como contra la Órbita Geoestacionaria (GEO).</li><li><strong>Telescopios ópticos</strong>: usados principalmente para GEO y el espacio profundo; solo funcionan de noche con cielos despejados, mientras que los radares funcionan de día y de noche.</li><li><strong>Antenas TT&C</strong>: antenas de comunicación orientables (DSN, ESTRACK, SCN, Galileo) que siguen satélites cooperativos mediante su enlace descendente de radio; no pueden detectar objetos no cooperativos ni basura espacial.</li></ul>",
         "howToUse": "<ol><li>Abre el menú desde la barra inferior o presiona S.</li><li>Haz clic en un sensor individual para seleccionarlo; la cámara vuela a su ubicación.</li><li>O haz clic en el encabezado de un grupo (p. ej. \"All Space Surveillance Network Sensors\") para seleccionar toda la red, lo cual es ideal para visualizar la cobertura.</li><li>Usa <strong>Restablecer sensor</strong> para borrar la selección.</li></ol>",
         "tip1": "Muchos cálculos (como los ángulos de visión) necesitan un solo sensor. Si seleccionaste una red completa, usa el menú de ángulos de visión multi-sitio en su lugar o elige un sensor a la vez.",
         "tip2": "Cada sensor también está disponible desde la paleta de comandos: escribe el nombre del sensor para cambiar sin abrir este menú.",
         "tip3": "Los parámetros de los sensores provienen de datos públicamente disponibles; puedes revisarlos en el menú de Información del Sensor. Las correcciones son bienvenidas en admin@keeptrack.space.",
         "shortcutToggle": "Alternar el menú de Sensores",
         "shortcutCamera": "Ajustar la cámara al sensor actual"
+      },
+      "rmbMenu": {
+        "useThisSensor": "Usar este sensor"
       }
     }
   }

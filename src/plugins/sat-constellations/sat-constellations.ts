@@ -6,13 +6,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import {
-  IBottomIconConfig,
-  ICommandPaletteCommand,
-  IHelpConfig,
-  ISecondaryMenuConfig,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, ICommandPaletteCommand, IHelpConfig, ISecondaryMenuConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
@@ -133,11 +127,7 @@ export class SatConstellations extends KeepTrackPlugin {
           content: t7e('plugins.SatConstellations.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.SatConstellations.help.tip1'),
-        t7e('plugins.SatConstellations.help.tip2'),
-        t7e('plugins.SatConstellations.help.tip3'),
-      ],
+      tips: [t7e('plugins.SatConstellations.help.tip1'), t7e('plugins.SatConstellations.help.tip2'), t7e('plugins.SatConstellations.help.tip3')],
     };
   }
 
@@ -175,9 +165,7 @@ export class SatConstellations extends KeepTrackPlugin {
       return;
     }
 
-    const sats = group.ids
-      .map((id: number) => catalogManagerInstance.getSat(id))
-      .filter(Boolean) as Satellite[];
+    const sats = group.ids.map((id: number) => catalogManagerInstance.getSat(id)).filter(Boolean) as Satellite[];
 
     CatalogExporter.exportTle2Csv(sats);
   }
@@ -198,12 +186,7 @@ export class SatConstellations extends KeepTrackPlugin {
 
       if (ulEl) {
         // Add additional constellations
-        ulEl.insertAdjacentHTML(
-          'beforeend',
-          this.additionalConstellations_
-            .map((c) => `<li class="menu-selectable" data-group="${c.groupSlug}">${c.groupName}</li>`)
-            .join(''),
-        );
+        ulEl.insertAdjacentHTML('beforeend', this.additionalConstellations_.map((c) => `<li class="menu-selectable" data-group="${c.groupSlug}">${c.groupName}</li>`).join(''));
       }
 
       // Wire click handlers on all list items
@@ -455,15 +438,10 @@ export class SatConstellations extends KeepTrackPlugin {
 
     PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
 
-    const sats = groupManagerInstance.groupList[groupName].ids
-      .map((id: number) => catalogManagerInstance.getSat(id))
-      .filter(Boolean) as Satellite[];
+    const sats = groupManagerInstance.groupList[groupName].ids.map((id: number) => catalogManagerInstance.getSat(id)).filter(Boolean) as Satellite[];
 
     if (sats.length === 0) {
-      ServiceLocator.getUiManager().toast(
-        t7e('plugins.SatConstellations.errorMsgs.ConstellationEmpty' as Parameters<typeof t7e>[0]),
-        ToastMsgType.caution,
-      );
+      ServiceLocator.getUiManager().toast(t7e('plugins.SatConstellations.errorMsgs.ConstellationEmpty' as Parameters<typeof t7e>[0]), ToastMsgType.caution);
     }
 
     this.updateSearchBar_(sats);
@@ -495,9 +473,7 @@ export class SatConstellations extends KeepTrackPlugin {
       return;
     }
 
-    const sats = group.ids
-      .map((id: number) => catalogManagerInstance.getSat(id))
-      .filter(Boolean) as Satellite[];
+    const sats = group.ids.map((id: number) => catalogManagerInstance.getSat(id)).filter(Boolean) as Satellite[];
 
     this.updateStats_(sats);
     this.buildTable_(sats);
@@ -611,10 +587,10 @@ export class SatConstellations extends KeepTrackPlugin {
   private static readonly SCC_GROUP_DEFS_: Record<string, number[]> = {
     SpaceStations: [25544, 48274],
     AmateurRadio: [
-      7530, 14781, 20442, 22826, 24278, 25338, 25397, 25544, 26931, 27607, 27844, 27848, 28895, 32785, 32788, 32789, 32791, 33493, 33498, 33499, 35932, 35933, 35935, 37224,
-      37839, 37841, 37855, 38760, 39090, 39134, 39136, 39161, 39417, 39430, 39436, 39439, 39440, 39444, 39469, 39770, 40014, 40021, 40024, 40025, 40030, 40032, 40042,
-      40043, 40057, 40071, 40074, 40377, 40378, 40379, 40380, 40654, 40719, 40900, 40903, 40906, 40907, 40908, 40910, 40911, 40912, 40926, 40927, 40928, 40931, 40967,
-      40968, 41168, 41171, 41340, 41459, 41460, 41465, 41474, 41600, 41619, 41789, 41932, 41935, 42017,
+      7530, 14781, 20442, 22826, 24278, 25338, 25397, 25544, 26931, 27607, 27844, 27848, 28895, 32785, 32788, 32789, 32791, 33493, 33498, 33499, 35932, 35933, 35935, 37224, 37839,
+      37841, 37855, 38760, 39090, 39134, 39136, 39161, 39417, 39430, 39436, 39439, 39440, 39444, 39469, 39770, 40014, 40021, 40024, 40025, 40030, 40032, 40042, 40043, 40057, 40071,
+      40074, 40377, 40378, 40379, 40380, 40654, 40719, 40900, 40903, 40906, 40907, 40908, 40910, 40911, 40912, 40926, 40927, 40928, 40931, 40967, 40968, 41168, 41171, 41340, 41459,
+      41460, 41465, 41474, 41600, 41619, 41789, 41932, 41935, 42017,
     ],
   };
 
@@ -727,9 +703,7 @@ export class SatConstellations extends KeepTrackPlugin {
     });
 
     // Create a temporary filtered group and display it
-    const filteredSats = filteredIds
-      .map((id: number) => catalogManagerInstance.getSat(id))
-      .filter(Boolean) as Satellite[];
+    const filteredSats = filteredIds.map((id: number) => catalogManagerInstance.getSat(id)).filter(Boolean) as Satellite[];
 
     if (filteredIds.length > 0) {
       const tempGroup = groupManagerInstance.createGroup(GroupType.ID_LIST, filteredIds);

@@ -81,7 +81,7 @@ export class SphereGeometry extends BufferGeometry {
       phiLength = Math.PI * 2,
       thetaStart = 0,
       thetaLength = Math.PI,
-    }: SphereGeometryParams,
+    }: SphereGeometryParams
   ) {
     super({
       type: 'SphereGeometry',
@@ -218,7 +218,9 @@ export class SphereGeometry extends BufferGeometry {
    * @param modelMatrix Optional model matrix for transformed spheres
    */
   sortFacesByDistance(camPos: vec3, modelMatrix?: Float32Array): void {
-    const buckets: number[][] = Array(this.NUM_BUCKETS).fill(null).map(() => []);
+    const buckets: number[][] = Array(this.NUM_BUCKETS)
+      .fill(null)
+      .map(() => []);
     const faceCenters: vec3[] = [];
 
     // Pre-compute face centers
@@ -270,11 +272,7 @@ export class SphereGeometry extends BufferGeometry {
       const dist = vec3.squaredDistance(faceCenters[i / 3], camPos);
       const bucketIndex = Math.min(Math.floor((dist - minDist) / bucketSize), this.NUM_BUCKETS - 1);
 
-      buckets[bucketIndex].push(
-        this.indices_[i],
-        this.indices_[i + 1],
-        this.indices_[i + 2],
-      );
+      buckets[bucketIndex].push(this.indices_[i], this.indices_[i + 1], this.indices_[i + 2]);
     }
 
     // Concatenate buckets from far to near for back-to-front rendering

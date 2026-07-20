@@ -28,8 +28,7 @@ const MENU_RESULT_DWELL_MS = 5_000;
 // Target helpers
 // ---------------------------------------------------------------------------
 
-export const isVisible = (el: HTMLElement | null): el is HTMLElement =>
-  !!el && el.isConnected && globalThis.getComputedStyle(el).display !== 'none';
+export const isVisible = (el: HTMLElement | null): el is HTMLElement => !!el && el.isConnected && globalThis.getComputedStyle(el).display !== 'none';
 
 /**
  * Finds a loaded plugin by any of its known ids. Several plugins have a
@@ -46,11 +45,7 @@ export const findPlugin = (pluginIds: string | string[]) => {
 export const isPluginLocked = (pluginIds: string | string[]): boolean => {
   const plugin = findPlugin(pluginIds);
 
-  return (
-    !!plugin?.isLoginRequired &&
-    !settingsManager.isDisableLoginGate &&
-    !document.body.classList.contains('user-logged-in')
-  );
+  return !!plugin?.isLoginRequired && !settingsManager.isDisableLoginGate && !document.body.classList.contains('user-logged-in');
 };
 
 export const isPluginUsable = (pluginIds: string | string[]): boolean => {
@@ -106,8 +101,7 @@ export const collapseUtilityFooter = (): void => {
 };
 
 /** Finds the plugin's icon wherever it renders (drawer list or utility footer). */
-export const pluginAnchorTarget = (pluginIds: string | string[]): HTMLElement | null =>
-  drawerItemTarget(pluginIds) ?? utilityIconTarget(pluginIds);
+export const pluginAnchorTarget = (pluginIds: string | string[]): HTMLElement | null => drawerItemTarget(pluginIds) ?? utilityIconTarget(pluginIds);
 
 /** Opens/expands whichever container holds the plugin's icon. */
 export const revealPluginAnchor = (pluginIds: string | string[]): void => {
@@ -183,13 +177,15 @@ export const selectIssForUser = (): void => {
 };
 
 export const openCommandPalette = (): void => {
-  globalThis.dispatchEvent(new KeyboardEvent('keydown', {
-    code: 'KeyK',
-    key: 'K',
-    ctrlKey: true,
-    shiftKey: true,
-    bubbles: true,
-  }));
+  globalThis.dispatchEvent(
+    new KeyboardEvent('keydown', {
+      code: 'KeyK',
+      key: 'K',
+      ctrlKey: true,
+      shiftKey: true,
+      bubbles: true,
+    })
+  );
 };
 
 // ---------------------------------------------------------------------------
@@ -255,11 +251,7 @@ export const buildTeaserStep = (pluginIds: string | string[], copy: TeaserCopy):
     kind: 'coachmark',
     title: copy.title,
     body: copy.body,
-    isAvailable: () =>
-      typeof KeepTrackPlugin.loginGateOpenModal === 'function' &&
-      !!findPlugin(pluginIds) &&
-      isPluginLocked(pluginIds) &&
-      pluginAnchorTarget(pluginIds) !== null,
+    isAvailable: () => typeof KeepTrackPlugin.loginGateOpenModal === 'function' && !!findPlugin(pluginIds) && isPluginLocked(pluginIds) && pluginAnchorTarget(pluginIds) !== null,
     beforeEnter: () => revealPluginAnchor(pluginIds),
     afterExit: collapseUtilityFooter,
     target: () => pluginAnchorTarget(pluginIds),
@@ -289,7 +281,7 @@ export const buildTeaserStep = (pluginIds: string | string[], copy: TeaserCopy):
  * steps re-evaluate availability on entry.
  */
 export const gatedStep = (pluginIds: string | string[], realStep: TourStep, teaser: TeaserCopy): TourStep =>
-  (isPluginLocked(pluginIds) ? buildTeaserStep(pluginIds, teaser) : realStep);
+  isPluginLocked(pluginIds) ? buildTeaserStep(pluginIds, teaser) : realStep;
 
 // ---------------------------------------------------------------------------
 // Tier 1: Basics (B1-B7)

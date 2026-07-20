@@ -3,8 +3,8 @@ import { CameraType } from '@app/engine/camera/camera-type';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
-import { MouseInput } from '@app/engine/input/input-manager/mouse-input';
 import { InputManager } from '@app/engine/input/input-manager';
+import { MouseInput } from '@app/engine/input/input-manager/mouse-input';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -59,7 +59,9 @@ describe('MouseInput handlers', () => {
     vi.spyOn(ServiceLocator, 'getTimeManager').mockReturnValue(timeManager as never);
     vi.spyOn(ServiceLocator, 'getCatalogManager').mockReturnValue({ getObject: vi.fn(() => ({ isStatic: () => false })) } as never);
     vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({
-      doSearch: vi.fn(), searchManager: { closeSearch: vi.fn() }, hideSideMenus: vi.fn(),
+      doSearch: vi.fn(),
+      searchManager: { closeSearch: vi.fn() },
+      hideSideMenus: vi.fn(),
     } as never);
     vi.spyOn(ServiceLocator, 'getColorSchemeManager').mockReturnValue({ isUseGroupColorScheme: true } as never);
     vi.spyOn(ServiceLocator, 'getSoundManager').mockReturnValue({ play: vi.fn() } as never);
@@ -151,6 +153,32 @@ describe('MouseInput handlers', () => {
       expect(camera.state.isDragging).toBe(false);
     });
 
+    it('sets the clicked satellite as secondary on a ctrl + left click', () => {
+      keyboard.getKey.mockImplementation((key: string) => key === 'Control');
+      mouse.isStartedOnCanvas = true;
+      m().dragHasMoved = false;
+      mouse.mouseSat = 42;
+      vi.spyOn(UrlManager, 'updateURL').mockImplementation(() => undefined);
+
+      m().canvasMouseUp_({ button: 0, preventDefault: vi.fn() } as never);
+
+      expect(setSecondarySat).toHaveBeenCalledWith(42);
+      expect(selectSat).not.toHaveBeenCalled();
+    });
+
+    it('does not set a secondary on a ctrl + left click over empty space', () => {
+      keyboard.getKey.mockImplementation((key: string) => key === 'Control');
+      mouse.isStartedOnCanvas = true;
+      m().dragHasMoved = false;
+      mouse.mouseSat = -1;
+      vi.spyOn(UrlManager, 'updateURL').mockImplementation(() => undefined);
+
+      m().canvasMouseUp_({ button: 0, preventDefault: vi.fn() } as never);
+
+      expect(setSecondarySat).not.toHaveBeenCalled();
+      expect(selectSat).toHaveBeenCalledWith(-1);
+    });
+
     it('opens the right-click menu on a stationary right click', () => {
       mouse.isStartedOnCanvas = true;
       m().dragHasMoved = false;
@@ -202,21 +230,25 @@ describe('MouseInput handlers', () => {
       expect(timeManager.toggleTime).toHaveBeenCalled();
     });
 
-    it('sets the secondary satellite', () => {
+    it('routes set-secondary to the plugin layer via the event bus', () => {
+      const emit = vi.spyOn(EventBus.getInstance(), 'emit');
+
       m().clickedSat = 9;
 
       fire('set-sec-sat-rmb');
 
-      expect(setSecondarySat).toHaveBeenCalledWith(9);
+      // Handled by EditSat.onContextMenuAction, not by MouseInput directly
+      expect(emit).toHaveBeenCalledWith(expect.anything(), 'set-sec-sat-rmb', 9);
     });
 
-    it('clears the screen and deselects', () => {
+    it('clears the screen and deselects both primary and secondary', () => {
       const ui = ServiceLocator.getUiManager();
 
       fire('clear-screen-rmb');
 
       expect(ui.doSearch).toHaveBeenCalledWith('');
       expect(selectSat).toHaveBeenCalledWith(-1);
+      expect(setSecondarySat).toHaveBeenCalledWith(-1);
     });
 
     it('emits a bus event for unknown menu items', () => {

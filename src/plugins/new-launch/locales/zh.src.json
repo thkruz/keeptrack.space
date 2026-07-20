@@ -15,17 +15,24 @@
       },
       "sections": {
         "template": "模板",
+        "launchWindow": "发射窗口",
         "launchSite": "发射场"
       },
       "buttons": {
+        "matchTargetPlane": "查找发射窗口",
         "createLaunchNominal": "创建发射标称轨道",
-        "inclinationTooLow": "倾角过低！"
+        "inclinationTooLow": "倾角过低！",
+        "clearWindow": "清除发射窗口",
+        "createLaunchAtWindow": "在窗口创建发射"
       },
       "msgs": {
+        "windowFound": "在 {time} 发射以匹配目标轨道面（ΔRAAN {delta}°）",
         "launchNominalCreated": "发射标称轨道已创建！",
         "timeRelativeToLaunch": "时间现在以发射时间为基准。"
       },
       "errorMsgs": {
+        "windowNoTarget": "请先选择目标卫星。",
+        "windowGeometryImpossible": "无发射窗口：目标轨道倾角低于发射场纬度。",
         "noMoreNominalSatellites": "没有更多可用的标称卫星！",
         "launchSiteNotFound": "未找到发射场 {launchSite}！",
         "failedToCreateTle": "创建TLE失败：{error}",
@@ -42,7 +49,9 @@
         "invalidEpochDayFormat": "历元日格式无效！必须为3位数字、一个小数点和小数点后8位数字。",
         "epochDayFormatIssue": "该卫星的历元日格式存在问题。请尝试另一颗卫星。",
         "failedToPropagate": "卫星传播失败。请尝试不同的参数，如果参数确实正确，请报告此问题。",
-        "changingOrbitBufferFailed": "更改轨道缓冲区数据失败"
+        "changingOrbitBufferFailed": "更改轨道缓冲区数据失败",
+        "launchLatExceedsInclination": "发射纬度超过轨道倾角。",
+        "failedToFitOrbit": "无法为发射场拟合轨道。"
       },
       "help": {
         "overview": "新发射菜单用于创建假想发射：它会复制一颗真实卫星的轨道，将其旋转为从您选择的发射场起飞，并把时钟重置为T+0。用它来回答“如果有物体从该发射场进入这类轨道，我的传感器何时能看到它？”",
@@ -54,7 +63,8 @@
         "tip1": "创建后时钟显示自起飞以来的时间：“00:45:00”表示发射后45分钟，非常适合传感器覆盖时间线。",
         "tip2": "如果创建未通过高度检查，请尝试轨道更常规的另一颗模板卫星。",
         "shortcutOpen": "打开新发射菜单"
-      }
+      },
+      "launchWindowHelp": "查找轨道平面与目标卫星匹配的下一个发射时间。这仅设置发射时间；在您按下“创建标称发射”之前不会创建任何内容。"
     }
   }
 }

@@ -3,13 +3,7 @@ import { MenuMode } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import {
-  IBottomIconConfig,
-  ICommandPaletteCommand,
-  IHelpConfig,
-  IKeyboardShortcut,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, ICommandPaletteCommand, IHelpConfig, IKeyboardShortcut, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { PersistenceManager } from '@app/engine/utils/persistence-manager';
@@ -22,15 +16,15 @@ import {
   defaultFilterValue,
   enableGroup,
   FILTER_STORAGE_MAP,
-  Filters,
   FilterPluginSettings,
+  Filters,
   getFilters,
   isDefaultState,
   OBJECT_TYPE_FILTERS,
   ORBITAL_REGIME_FILTERS,
+  SOURCE_FILTERS,
   showOnlyInGroup,
   showOnlyPayloads,
-  SOURCE_FILTERS,
 } from './filter-menu-core';
 import './filter-menu.css';
 
@@ -111,10 +105,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
           content: t7e('plugins.FilterMenuPlugin.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.FilterMenuPlugin.help.tip1'),
-        t7e('plugins.FilterMenuPlugin.help.tip2'),
-      ],
+      tips: [t7e('plugins.FilterMenuPlugin.help.tip1'), t7e('plugins.FilterMenuPlugin.help.tip2')],
       shortcuts: [{ keys: ['F'], description: t7e('plugins.FilterMenuPlugin.help.shortcutToggle') }],
     };
   }

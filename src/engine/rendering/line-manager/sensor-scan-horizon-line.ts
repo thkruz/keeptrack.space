@@ -1,9 +1,9 @@
-import { EciArr3 } from '@app/engine/core/interfaces';
-import { Degrees, ecef2eci, rae2ecef } from '@ootk/src/main';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { EciArr3 } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { Degrees, ecef2eci, rae2ecef } from '@ootk/src/main';
 import { vec4 } from 'gl-matrix';
 import { Line, LineColors, LineDescription } from './line';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SensorScanHorizonLine extends Line {
   private sensor: DetailedSensor;
@@ -20,8 +20,8 @@ export class SensorScanHorizonLine extends Line {
     const minAz = sensor.minAz;
     const azRange = maxAz - minAz;
 
-    this.minAz_ = minAz + (azRange / faces) * (face - 1) as Degrees;
-    this.maxAz_ = minAz + (azRange / faces) * (face) as Degrees;
+    this.minAz_ = (minAz + (azRange / faces) * (face - 1)) as Degrees;
+    this.maxAz_ = (minAz + (azRange / faces) * face) as Degrees;
 
     this.validateColor(color);
     this.color_ = color;
@@ -44,12 +44,7 @@ export class SensorScanHorizonLine extends Line {
       this.az_ = <Degrees>0;
     }
     // Is azimuth outside of FOV?
-    if (
-      (this.maxAz_ > this.minAz_ && this.az_ > this.maxAz_) ||
-      (this.maxAz_ < this.minAz_ &&
-        this.az_ > this.maxAz_ &&
-        this.az_ < this.minAz_)
-    ) {
+    if ((this.maxAz_ > this.minAz_ && this.az_ > this.maxAz_) || (this.maxAz_ < this.minAz_ && this.az_ > this.maxAz_ && this.az_ < this.minAz_)) {
       // Reset it
       this.az_ = this.minAz_;
     }
@@ -57,7 +52,6 @@ export class SensorScanHorizonLine extends Line {
 
   private calculateEciPosition_(): EciArr3 {
     const lla = this.sensor.lla();
-
 
     const eci = ecef2eci(
       rae2ecef(
@@ -70,9 +64,9 @@ export class SensorScanHorizonLine extends Line {
           lat: lla.lat,
           lon: lla.lon,
           alt: lla.alt + 30,
-        },
+        }
       ),
-      ServiceLocator.getTimeManager().gmst,
+      ServiceLocator.getTimeManager().gmst
     );
 
     return [eci.x, eci.y, eci.z] as EciArr3;

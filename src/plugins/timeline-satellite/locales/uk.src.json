@@ -3,6 +3,9 @@
     "SatelliteTimeline": {
       "bottomIconLabel": "Таймлайн супутника",
       "title": "Меню таймлайну супутника",
+      "sections": {
+        "settings": "Налаштування"
+      },
       "labels": {
         "calculationLength": "Тривалість розрахунку (години)",
         "calculationInterval": "Інтервал розрахунку (секунди)",

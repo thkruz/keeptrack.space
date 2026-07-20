@@ -43,7 +43,8 @@
         "satScanEarth": "Balayage de la Terre",
         "sensorScanHorizon": "Balayage de l'horizon",
         "sensorToRae": "Capteur vers point",
-        "generic": "Ligne"
+        "generic": "Ligne",
+        "sensorMarker": "Marqueur de position du capteur"
       },
       "errorMsgs": {
         "noPrimarySat": "Aucun satellite principal sélectionné pour la ligne satellite vers satellite.",

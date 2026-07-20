@@ -1,5 +1,5 @@
-import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SensorManager } from '@app/app/sensors/sensorManager';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { settingsManager } from '@app/settings/settings';
 import { defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -59,27 +59,25 @@ describe('SensorManager position + observation', () => {
     expect(() => p().sensorSunStatus_(new Date('2022-01-01T00:00:00Z'), undefined)).toThrow();
   });
 
-  it('loadSensorJson is a no-op outside offline mode', () => {
-    settingsManager.offlineMode = false;
+  it('loadSensorJson is a no-op when nothing is persisted', () => {
     const setSpy = vi.spyOn(mgr, 'setSensor');
 
-    mgr.loadSensorJson('[null, 1]');
+    mgr.loadSensorJson(null);
 
     expect(setSpy).not.toHaveBeenCalled();
   });
 
-  it('loadSensorJson applies a persisted sensorId in offline mode', () => {
+  it('loadSensorJson applies a persisted sensorId regardless of offline mode', () => {
     // sensorManager reads the GLOBAL settingsManager, not the module import.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const globalSettings = (globalThis as any).settingsManager;
 
-    globalSettings.offlineMode = true;
+    globalSettings.offlineMode = false;
     const setSpy = vi.spyOn(mgr, 'setSensor').mockImplementation(() => undefined);
 
     mgr.loadSensorJson('[null, 5]');
 
     expect(setSpy).toHaveBeenCalledWith(null, 5);
-    globalSettings.offlineMode = false;
   });
 
   it('cameraToCurrentSensor_ zooms GEO for a long-range sensor and snaps the camera', () => {

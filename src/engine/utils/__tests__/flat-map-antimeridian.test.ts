@@ -14,7 +14,7 @@ function simulateLineFragment(
   eciB: [number, number, number],
   t: number,
   gmst: number,
-  centerX: number,
+  centerX: number
 ): { interpolatedFlatX: number; interpolatedEci: [number, number] } {
   // Vertex shader: compute flatX for each endpoint
   const flatXA = eciToFlatMapX(eciA[0], eciA[1], gmst, RE, centerX);
@@ -22,10 +22,7 @@ function simulateLineFragment(
 
   // GPU linearly interpolates both flatX and ECI position
   const interpolatedFlatX = (1 - t) * flatXA + t * flatXB;
-  const interpolatedEci: [number, number] = [
-    (1 - t) * eciA[0] + t * eciB[0],
-    (1 - t) * eciA[1] + t * eciB[1],
-  ];
+  const interpolatedEci: [number, number] = [(1 - t) * eciA[0] + t * eciB[0], (1 - t) * eciA[1] + t * eciB[1]];
 
   return { interpolatedFlatX, interpolatedEci };
 }
@@ -238,10 +235,7 @@ describe('antimeridian crossing detection', () => {
       const crossF2 = simulateLineFragment(crossA, crossB, 0.5 + dt, gmstVal, center);
 
       const crossFlatXRate = Math.abs(crossF2.interpolatedFlatX - crossF1.interpolatedFlatX);
-      const crossEciRate = Math.hypot(
-        crossF2.interpolatedEci[0] - crossF1.interpolatedEci[0],
-        crossF2.interpolatedEci[1] - crossF1.interpolatedEci[1],
-      );
+      const crossEciRate = Math.hypot(crossF2.interpolatedEci[0] - crossF1.interpolatedEci[0], crossF2.interpolatedEci[1] - crossF1.interpolatedEci[1]);
 
       // Non-crossing segment
       const normalA = eciAtLonDeg(30);
@@ -251,10 +245,7 @@ describe('antimeridian crossing detection', () => {
       const normF2 = simulateLineFragment(normalA, normalB, 0.5 + dt, gmstVal, center);
 
       const normFlatXRate = Math.abs(normF2.interpolatedFlatX - normF1.interpolatedFlatX);
-      const normEciRate = Math.hypot(
-        normF2.interpolatedEci[0] - normF1.interpolatedEci[0],
-        normF2.interpolatedEci[1] - normF1.interpolatedEci[1],
-      );
+      const normEciRate = Math.hypot(normF2.interpolatedEci[0] - normF1.interpolatedEci[0], normF2.interpolatedEci[1] - normF1.interpolatedEci[1]);
 
       // For crossing: flatX rate / ECI rate should be enormous (>10x)
       const crossingRatio = crossFlatXRate / crossEciRate;

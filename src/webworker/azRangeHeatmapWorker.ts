@@ -14,23 +14,9 @@
 
 /* eslint-disable no-await-in-loop, no-promise-executor-return */
 
-import {
-  EcefVec3,
-  Kilometers,
-  MILLISECONDS_TO_DAYS,
-  MINUTES_PER_DAY,
-  Radians,
-  Sgp4,
-  TemeVec3,
-  ecefRad2rae,
-  eci2ecef,
-} from '@ootk/src/main';
+import { EcefVec3, ecefRad2rae, eci2ecef, Kilometers, MILLISECONDS_TO_DAYS, MINUTES_PER_DAY, Radians, Sgp4, TemeVec3 } from '@ootk/src/main';
 import { jday } from '../engine/utils/transforms';
-import {
-  AzRangeMsgType,
-  AzRangeOutMsgType,
-  type AzRangeWorkerInMsg,
-} from './az-range-heatmap-messages';
+import { AzRangeMsgType, AzRangeOutMsgType, type AzRangeWorkerInMsg } from './az-range-heatmap-messages';
 import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
 const DEG2RAD = Math.PI / 180;
@@ -59,16 +45,7 @@ let cancelled = false;
  */
 function timeToJdayGmst(timeMs: number): { j: number; gmst: number } {
   const d = new Date(timeMs);
-  const j =
-    jday(
-      d.getUTCFullYear(),
-      d.getUTCMonth() + 1,
-      d.getUTCDate(),
-      d.getUTCHours(),
-      d.getUTCMinutes(),
-      d.getUTCSeconds(),
-    ) +
-    d.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
+  const j = jday(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate(), d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds()) + d.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
 
   return { j, gmst: Sgp4.gstime(j) };
 }
@@ -154,9 +131,7 @@ onmessage = async function onmessage(event: MessageEvent<AzRangeWorkerInMsg>) {
     // Raw cumulative counts; never divided in place — snapshot() does that.
     const bins: number[][] = Array.from({ length: numAzBins }, () => new Array(numRngBins).fill(0));
     // Per-bin sets of catalog numbers — populated on every hit, flushed to RESULT only.
-    const binSatSets: Set<string>[][] = Array.from({ length: numAzBins }, () =>
-      Array.from({ length: numRngBins }, () => new Set<string>()),
-    );
+    const binSatSets: Set<string>[][] = Array.from({ length: numAzBins }, () => Array.from({ length: numRngBins }, () => new Set<string>()));
 
     // Cooldown: each (satellite, bin) pair may be counted at most once per cooldown
     // window. This prevents the same satellite accumulating counts every timestep
@@ -204,9 +179,7 @@ onmessage = async function onmessage(event: MessageEvent<AzRangeWorkerInMsg>) {
           continue;
         }
 
-        const inFov =
-          azInFov(rae.az, fovMinAz, fovMaxAz) ||
-          (fovMinAz2 !== undefined && fovMaxAz2 !== undefined && azInFov(rae.az, fovMinAz2, fovMaxAz2));
+        const inFov = azInFov(rae.az, fovMinAz, fovMaxAz) || (fovMinAz2 !== undefined && fovMaxAz2 !== undefined && azInFov(rae.az, fovMinAz2, fovMaxAz2));
 
         if (!inFov) {
           continue;

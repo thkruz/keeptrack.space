@@ -1,4 +1,3 @@
-
 type rgbaType = [string | number, string | number, string | number, string | number];
 
 /**
@@ -8,7 +7,7 @@ type rgbaType = [string | number, string | number, string | number, string | num
  * @throws An error if the input is not a valid hexadecimal color code.
  */
 export const hex2rgba = (hex: string): rgbaType => {
-  if (!(/^#(?:[A-Fa-f0-9]{3,6})$/u).test(hex)) {
+  if (!/^#(?:[A-Fa-f0-9]{3,6})$/u.test(hex)) {
     throw new Error('Invalid hex input');
   }
   let c: string[] | string = hex.substring(1).split('');
@@ -23,7 +22,6 @@ export const hex2rgba = (hex: string): rgbaType => {
   const r = ((parsedC >> 16) & 255) / 255;
   const g = ((parsedC >> 8) & 255) / 255;
   const b = (parsedC & 255) / 255;
-
 
   return [r, g, b, 1];
 };

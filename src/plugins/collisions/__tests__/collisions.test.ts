@@ -1,13 +1,13 @@
-import { CollisionEvent, Collisions } from '@app/plugins/collisions/collisions';
 import { MenuMode } from '@app/engine/core/interfaces';
-import { Mock, vi } from 'vitest';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import { readFileSync } from 'fs';
+import { CollisionEvent, Collisions } from '@app/plugins/collisions/collisions';
 import { setupDefaultHtml, setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
+import { readFileSync } from 'fs';
+import { Mock, vi } from 'vitest';
 
 const flush = async () => {
   for (let i = 0; i < 6; i++) {
@@ -63,7 +63,7 @@ describe('Collisions_class', () => {
     global.fetch = vi.fn(() =>
       Promise.resolve({
         json: () => Promise.resolve(mockCollisionData),
-      }),
+      })
     ) as Mock;
   });
 

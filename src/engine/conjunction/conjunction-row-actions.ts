@@ -36,12 +36,7 @@ export const jumpToTca = (tcaMs: number, leadMs = 0): void => {
  * returns null when either object is missing. Best-effort: callers should not
  * let a rendering failure break the time jump / selection.
  */
-export const drawPairLine = (
-  previous: RemovableLine | null,
-  objA: LineObject,
-  objB: LineObject,
-  color = LineColors.YELLOW,
-): RemovableLine | null => {
+export const drawPairLine = (previous: RemovableLine | null, objA: LineObject, objB: LineObject, color = LineColors.YELLOW): RemovableLine | null => {
   if (previous) {
     previous.isGarbage = true;
   }

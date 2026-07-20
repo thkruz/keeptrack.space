@@ -1,13 +1,13 @@
-import { vi } from 'vitest';
 import { UiManager } from '@app/app/ui/ui-manager';
 import { UiGeolocation } from '@app/app/ui/ui-manager-geolocation';
 import { GeolocationPosition } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { getEl } from '@app/engine/utils/get-el';
+import { KeepTrack } from '@app/keeptrack';
 import { defaultSensor } from '@test/environment/apiMocks';
 import { disableConsoleErrors, enableConsoleErrors, setupMinimumHtml, setupStandardEnvironment } from '@test/environment/standard-env';
-import { ServiceLocator } from '@app/engine/core/service-locator';
-import { KeepTrack } from '@app/keeptrack';
+import { vi } from 'vitest';
 
 describe('uiManager', () => {
   // Should process fullscreenToggle
@@ -71,7 +71,7 @@ describe('uiManager', () => {
           longitude: 22,
           altitude: 22,
         },
-      }),
+      })
     ).not.toThrow();
     expect((<HTMLInputElement>getEl('cs-lat')).value).toBe('22');
     expect((<HTMLInputElement>getEl('cs-lon')).value).toBe('22');
@@ -86,7 +86,7 @@ describe('uiManager', () => {
           longitude: 22,
           altitude: 22,
         },
-      }),
+      })
     ).not.toThrow();
     enableConsoleErrors();
   });

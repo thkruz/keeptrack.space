@@ -44,10 +44,7 @@ describe('Mass-raid scenario file integrity', () => {
 
       it('every coordinate and altitude is finite (no NaN / null)', () => {
         const bad = entries.filter(
-          (e) =>
-            !e.latList.every((v) => Number.isFinite(v)) ||
-            !e.lonList.every((v) => Number.isFinite(v)) ||
-            !e.altList.every((v) => Number.isFinite(v)),
+          (e) => !e.latList.every((v) => Number.isFinite(v)) || !e.lonList.every((v) => Number.isFinite(v)) || !e.altList.every((v) => Number.isFinite(v))
         );
 
         expect(bad.map((e) => e.ON)).toEqual([]);

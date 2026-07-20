@@ -1,8 +1,38 @@
-#satellite-fov-menu .row {
-  margin-bottom: 0.25rem;
+/*
+ * Satellite FOV (OSS) menu styles. The menu (and its per-satellite settings
+ * secondary menu) opt into the shared v13 card system (.kt-ui-v13 +
+ * kt-section/kt-field-row/kt-action); see src/engine/ui/menu-v13.css. The Pro
+ * override authors its own layout and carries its own CSS with matching rules,
+ * so any overlap on the shared #satellite-fov-menu root id is value-identical.
+ */
+
+/* 1. Stacked-field headroom: the color cards stack an RGB row plus an opacity
+ *    row, so the floating "active" labels collide without extra top margin. */
+#satellite-fov-menu .kt-field-row .input-field.col,
+#satellite-fov-menu-secondary .kt-field-row .input-field.col {
+  margin-top: 20px;
 }
 
-#satellite-fov-menu h5.side-menu-row-header {
-  margin: 0.3rem 0;
-  font-size: 1.1rem;
+#satellite-fov-menu .kt-section-label + .kt-field-row .input-field.col,
+#satellite-fov-menu-secondary .kt-section-label + .kt-field-row .input-field.col {
+  margin-top: 8px;
+}
+
+/* 3. Focus indication: swap the app-wide :focus-visible outline (which overlaps
+ *    the floating label) for KeepTrack's underline. */
+#satellite-fov-menu .input-field input:focus,
+#satellite-fov-menu-secondary .input-field input:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#satellite-fov-menu .input-field input:focus-visible,
+#satellite-fov-menu-secondary .input-field input:focus-visible {
+  outline: none;
+}
+
+/* Active-cone list rows sit inside a card below the reset/create actions. */
+#sat-fov-active-cones,
+#sat-fov-s2s-active-cones {
+  margin-top: 8px;
 }

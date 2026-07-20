@@ -1,6 +1,6 @@
-import { vi } from 'vitest';
 import { GlUtils } from '@app/engine/rendering/gl-utils';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { vi } from 'vitest';
 
 /*
  * GlUtils mixes pure vertex/vector math (geometry generators, cross/subtract,
@@ -11,8 +11,13 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 describe('GlUtils pure helpers', () => {
   describe('isPowerOf2', () => {
     it.each([
-      [1, true], [2, true], [1024, true], [65536, true],
-      [3, false], [1000, false], [1023, false],
+      [1, true],
+      [2, true],
+      [1024, true],
+      [65536, true],
+      [3, false],
+      [1000, false],
+      [1023, false],
     ])('isPowerOf2(%i) === %s', (value, expected) => {
       expect(GlUtils.isPowerOf2(value)).toBe(expected);
     });
@@ -54,7 +59,12 @@ describe('GlUtils pure helpers', () => {
     });
 
     it('flattenVec3 flattens {x,y,z} objects into a number array', () => {
-      expect(GlUtils.flattenVec3([{ x: 1, y: 2, z: 3 }, { x: 4, y: 5, z: 6 }])).toStrictEqual([1, 2, 3, 4, 5, 6]);
+      expect(
+        GlUtils.flattenVec3([
+          { x: 1, y: 2, z: 3 },
+          { x: 4, y: 5, z: 6 },
+        ])
+      ).toStrictEqual([1, 2, 3, 4, 5, 6]);
     });
   });
 
@@ -139,8 +149,8 @@ describe('GlUtils WebGL helpers (mock context)', () => {
     createBuffer: vi.fn(() => ({}) as WebGLBuffer),
     ARRAY_BUFFER: 0x8892,
     ELEMENT_ARRAY_BUFFER: 0x8893,
-    STATIC_DRAW: 0x88E4,
-    DYNAMIC_DRAW: 0x88E8,
+    STATIC_DRAW: 0x88e4,
+    DYNAMIC_DRAW: 0x88e8,
   });
 
   afterEach(() => vi.restoreAllMocks());

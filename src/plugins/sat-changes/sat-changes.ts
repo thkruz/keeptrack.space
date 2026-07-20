@@ -45,7 +45,7 @@ export const uiManagerInit = () => {
             </div>
           </div>
         </div>
-      `,
+      `
   );
 
   // Bottom Icon
@@ -58,7 +58,7 @@ export const uiManagerInit = () => {
           </div>
           <span class="bmenu-title">${sc('bottomIconLabel')}</span>
         </div>
-        `,
+        `
   );
 };
 
@@ -140,7 +140,6 @@ export const bottomMenuClick = (iconName: string): void => {
     if (issatChngMenuOpen) {
       issatChngMenuOpen = false;
       uiManagerInstance.hideSideMenus();
-
     } else {
       if (settingsManager.isMobileModeEnabled) {
         uiManagerInstance.searchManager.closeSearch();
@@ -150,7 +149,6 @@ export const bottomMenuClick = (iconName: string): void => {
       issatChngMenuOpen = true;
       satChng(-1);
       getEl('menu-satChng')?.classList.add('bmenu-item-selected');
-
     }
   }
 };

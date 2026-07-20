@@ -20,6 +20,7 @@
  */
 
 import { MenuMode } from '@app/engine/core/interfaces';
+import type { BaseObject } from '@ootk/src/main';
 
 // ============================================================================
 // Icon Placement
@@ -287,6 +288,34 @@ export interface ISecondaryMenuCapable {
 // ============================================================================
 
 /**
+ * Everything known about a right-click at the moment the context menu opens.
+ * Built once per open by the InputManager and shared with every menu item.
+ */
+export interface RmbMenuContext {
+  /**
+   * Whether the click ray hit the globe ('earth') or empty space ('space').
+   */
+  surface: 'earth' | 'space';
+
+  /**
+   * Catalog id of the object under the cursor, or -1 when none.
+   */
+  targetId: number;
+
+  /**
+   * The clicked catalog object, if any. Narrow with instanceof
+   * (Satellite, DetailedSensor, LaunchSite, MissileObject, ...).
+   */
+  target: BaseObject | null;
+
+  /**
+   * True when a primary object is currently selected, enabling
+   * "relative to selected" actions.
+   */
+  hasPrimarySelection: boolean;
+}
+
+/**
  * Configuration for a plugin's context menu entry.
  */
 export interface IContextMenuConfig {
@@ -303,13 +332,16 @@ export interface IContextMenuConfig {
 
   /**
    * HTML for the level 2 (submenu) content.
+   * Omit for a single-action item: clicking the level 1 item then fires
+   * onContextMenuAction with the level 1 element id.
    */
-  level2Html: string;
+  level2Html?: string;
 
   /**
    * The DOM element ID for the level 2 submenu container.
+   * Required when level2Html is provided.
    */
-  level2ElementName: string;
+  level2ElementName?: string;
 
   /**
    * Display order in the context menu.
@@ -319,19 +351,28 @@ export interface IContextMenuConfig {
   order?: number;
 
   /**
+   * Fine-grained visibility predicate evaluated every time the menu opens.
+   * When provided it takes precedence over the isVisibleOn* flags.
+   */
+  isVisible?: (ctx: RmbMenuContext) => boolean;
+
+  /**
    * Show this menu item when clicking on Earth.
+   * Ignored when {@link isVisible} is provided.
    * @default false
    */
   isVisibleOnEarth?: boolean;
 
   /**
    * Show this menu item when clicking off Earth (in space).
+   * Ignored when {@link isVisible} is provided.
    * @default false
    */
   isVisibleOffEarth?: boolean;
 
   /**
    * Show this menu item when clicking on a satellite.
+   * Ignored when {@link isVisible} is provided.
    * @default false
    */
   isVisibleOnSatellite?: boolean;
@@ -352,6 +393,12 @@ export interface IContextMenuCapable {
    * @param clickedSatId The ID of the satellite that was right-clicked, if any.
    */
   onContextMenuAction(targetId: string, clickedSatId?: number): void;
+
+  /**
+   * Called each time the context menu opens and this item is visible.
+   * Use to show/hide or relabel level 2 items based on the click context.
+   */
+  onContextMenuOpen?(ctx: RmbMenuContext): void;
 }
 
 // ============================================================================
@@ -813,11 +860,7 @@ export interface ISettingButtonControl extends ISettingControlBase {
  * Discriminated union of every supported settings control. Renderers switch
  * on {@link SettingControlType} via the `type` field.
  */
-export type ISettingControl =
-  | ISettingToggleControl
-  | ISettingNumberControl
-  | ISettingSelectControl
-  | ISettingButtonControl;
+export type ISettingControl = ISettingToggleControl | ISettingNumberControl | ISettingSelectControl | ISettingButtonControl;
 
 /**
  * One settings section, contributed by a single plugin. Rendered as a labeled

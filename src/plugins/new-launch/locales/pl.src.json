@@ -15,17 +15,24 @@
       },
       "sections": {
         "template": "Szablon",
+        "launchWindow": "Okno startowe",
         "launchSite": "Miejsce startu"
       },
       "buttons": {
+        "matchTargetPlane": "Znajdź okno startowe",
         "createLaunchNominal": "Utwórz start nominalny",
-        "inclinationTooLow": "Zbyt mała inklinacja!"
+        "inclinationTooLow": "Zbyt mała inklinacja!",
+        "clearWindow": "Wyczyść okno startowe",
+        "createLaunchAtWindow": "Utwórz start w oknie"
       },
       "msgs": {
+        "windowFound": "Start o {time}, aby dopasować się do płaszczyzny celu (ΔRAAN {delta}°)",
         "launchNominalCreated": "Utworzono start nominalny!",
         "timeRelativeToLaunch": "Czas jest teraz liczony względem startu."
       },
       "errorMsgs": {
+        "windowNoTarget": "Najpierw wybierz satelitę docelowego.",
+        "windowGeometryImpossible": "Brak okna startowego: docelowa inklinacja jest mniejsza niż szerokość geograficzna miejsca startu.",
         "noMoreNominalSatellites": "Brak dostępnych satelitów nominalnych!",
         "launchSiteNotFound": "Nie znaleziono miejsca startu {launchSite}!",
         "failedToCreateTle": "Nie udało się utworzyć TLE: {error}",
@@ -42,7 +49,9 @@
         "invalidEpochDayFormat": "Nieprawidłowy format dnia epoki! Wymagane 3 cyfry, separator dziesiętny i 8 cyfr po przecinku.",
         "epochDayFormatIssue": "Wystąpił problem z formatem dnia epoki tego satelity. Wypróbuj innego satelitę.",
         "failedToPropagate": "Nie udało się propagować satelity. Wypróbuj inne parametry lub zgłoś problem, jeśli parametry są poprawne.",
-        "changingOrbitBufferFailed": "Zmiana danych bufora orbity nie powiodła się"
+        "changingOrbitBufferFailed": "Zmiana danych bufora orbity nie powiodła się",
+        "launchLatExceedsInclination": "Szerokość geograficzna startu przekracza nachylenie orbity.",
+        "failedToFitOrbit": "Nie udało się dopasować orbity do miejsca startu."
       },
       "help": {
         "overview": "Menu nowego startu tworzy hipotetyczny start: kopiuje orbitę rzeczywistego satelity, obraca ją tak, aby start odbywał się z wybranego miejsca startu, i resetuje zegar do T+0. Użyj go, aby odpowiedzieć na pytanie \"jeśli coś wystartuje z tego miejsca na tego rodzaju orbitę, kiedy moje czujniki to zobaczą?\"",
@@ -54,7 +63,8 @@
         "tip1": "Po utworzeniu zegar pokazuje czas od startu: \"00:45:00\" oznacza 45 minut po starcie, co jest idealne do osi czasu zasięgu czujników.",
         "tip2": "Jeśli tworzenie nie przejdzie kontroli wysokości, wypróbuj innego satelitę wzorcowego o bardziej konwencjonalnej orbicie.",
         "shortcutOpen": "Otwórz menu Nowy start"
-      }
+      },
+      "launchWindowHelp": "Znajduje najbliższy czas startu, którego płaszczyzna orbity pokrywa się z satelitą docelowym. To tylko ustawia czas startu; nic nie jest tworzone, dopóki nie naciśniesz „Utwórz start nominalny”."
     }
   }
 }

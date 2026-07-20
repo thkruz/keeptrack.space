@@ -234,8 +234,8 @@ export class FrustumMesh extends CustomMesh {
     const nz = ex * nadirY - ey * nadirX;
 
     // Apply azimuth and elevation offsets
-    const azRad = this.azimuthOffset * Math.PI / 180;
-    const elRad = this.elevationOffset * Math.PI / 180;
+    const azRad = (this.azimuthOffset * Math.PI) / 180;
+    const elRad = (this.elevationOffset * Math.PI) / 180;
 
     // Azimuth selects a horizontal direction in the north/east plane
     const cosAz = Math.cos(azRad);
@@ -258,11 +258,7 @@ export class FrustumMesh extends CustomMesh {
     this.computeFrustumCorners_(bx, by, bz, ox, oy, oz, this.nearDistance, this.farDistance);
   }
 
-  private computeFrustumCorners_(
-    dx: number, dy: number, dz: number,
-    originX: number, originY: number, originZ: number,
-    nearDist: number, farDist: number,
-  ) {
+  private computeFrustumCorners_(dx: number, dy: number, dz: number, originX: number, originY: number, originZ: number, nearDist: number, farDist: number) {
     // Build orthonormal basis perpendicular to the boresight direction.
     // Use the satellite velocity vector so that 0° roll aligns the frustum's
     // "up" with the velocity direction (direction of travel).
@@ -326,7 +322,7 @@ export class FrustumMesh extends CustomMesh {
 
     // Apply roll rotation about boresight
     if (this.rollAngle !== 0) {
-      const rollRad = this.rollAngle * Math.PI / 180;
+      const rollRad = (this.rollAngle * Math.PI) / 180;
       const cosR = Math.cos(rollRad);
       const sinR = Math.sin(rollRad);
 
@@ -344,8 +340,8 @@ export class FrustumMesh extends CustomMesh {
     }
 
     // Compute half-extents
-    const hFovRad = this.horizontalFov * Math.PI / 180;
-    const vFovRad = this.verticalFov * Math.PI / 180;
+    const hFovRad = (this.horizontalFov * Math.PI) / 180;
+    const vFovRad = (this.verticalFov * Math.PI) / 180;
     const nearHalfW = nearDist * Math.tan(hFovRad);
     const nearHalfH = nearDist * Math.tan(vFovRad);
     const farHalfW = farDist * Math.tan(hFovRad);
@@ -407,7 +403,7 @@ export class FrustumMesh extends CustomMesh {
       const mapW = 2 * Math.PI * RADIUS_OF_EARTH;
       const camCenterX = ServiceLocator.getMainCamera().flatMapPanX;
       const d = meshLon * RADIUS_OF_EARTH - camCenterX + mapW / 2;
-      const meshRefFlatX = camCenterX + ((d % mapW) + mapW) % mapW - mapW / 2;
+      const meshRefFlatX = camCenterX + (((d % mapW) + mapW) % mapW) - mapW / 2;
 
       gl.uniform1f(this.uniforms_.u_meshRefFlatX, meshRefFlatX);
       gl.uniform1f(this.uniforms_.u_gmst, gmst);

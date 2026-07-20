@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
-import { SatMath } from '@app/app/analysis/sat-math';
+
 import { buildCatalogRcsStats, estimateRcsWithSource } from '@app/app/analysis/rcs-estimator';
+import { SatMath } from '@app/app/analysis/sat-math';
 import { estimateStdMagWithSource, StdMagWithSource } from '@app/app/analysis/std-mag-estimator';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { StringExtractor } from '@app/app/ui/string-extractor';
@@ -85,40 +86,56 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
             <div id="${EL.LAUNCH_PAD}">LAUNCH PAD</div>
           </div>
         </div>
-        ${settingsManager.plugins.SatInfoBoxObject?.isShowLaunchVehicle !== false ? html`
+        ${
+          settingsManager.plugins.SatInfoBoxObject?.isShowLaunchVehicle !== false
+            ? html`
         <div class="sat-info-row">
           <div class="sat-info-key"
             kt-tooltip="${t7e('SatInfoBoxObject.LaunchVehicle.tooltip')}">${t7e('SatInfoBoxObject.LaunchVehicle.label')}
           </div>
           <div class="sat-info-value pointable" id="${EL.VEHICLE}">VEHICLE</div>
-        </div>` : ''}
-        ${settingsManager.plugins.SatInfoBoxObject?.isShowConfiguration !== false ? html`
+        </div>`
+            : ''
+        }
+        ${
+          settingsManager.plugins.SatInfoBoxObject?.isShowConfiguration !== false
+            ? html`
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key"
             kt-tooltip="${t7e('SatInfoBoxObject.Configuration.tooltip')}">${t7e('SatInfoBoxObject.Configuration.label')}
           </div>
           <div class="sat-info-value" id="${EL.CONFIGURATION}">NO DATA</div>
-        </div>` : ''}
+        </div>`
+            : ''
+        }
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key"
             kt-tooltip="${t7e('SatInfoBoxObject.RCS.tooltip')}">${t7e('SatInfoBoxObject.RCS.label')}
           </div>
           <div class="sat-info-value" id="${EL.RCS}">NO DATA</div>
         </div>
-        ${settingsManager.plugins.SatInfoBoxObject?.isShowStdMag !== false ? html`
+        ${
+          settingsManager.plugins.SatInfoBoxObject?.isShowStdMag !== false
+            ? html`
         <div class="sat-info-row sat-only-info" id="${EL.STDMAG_ROW}">
           <div class="sat-info-key"
             kt-tooltip="${t7e('SatInfoBoxObject.StdMag.tooltip')}">${t7e('SatInfoBoxObject.StdMag.label')}
           </div>
           <div class="sat-info-value" id="${EL.STDMAG}">NO DATA</div>
-        </div>` : ''}
-        ${settingsManager.plugins.SatInfoBoxObject?.isShowAppMag !== false ? html`
+        </div>`
+            : ''
+        }
+        ${
+          settingsManager.plugins.SatInfoBoxObject?.isShowAppMag !== false
+            ? html`
         <div class="sat-info-row sat-only-info" id="${EL.APPMAG_ROW}" style="display: none;">
           <div class="sat-info-key"
             kt-tooltip="${t7e('SatInfoBoxObject.AppMag.tooltip')}">${t7e('SatInfoBoxObject.AppMag.label')}
           </div>
           <div class="sat-info-value" id="${EL.APPMAG}">NO DATA</div>
-        </div>` : ''}
+        </div>`
+            : ''
+        }
       </div>
     `;
   }
@@ -239,9 +256,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
 
     const formatted = result.vmag.toFixed(2);
 
-    stdMagElement.innerHTML = result.source === 'catalog'
-      ? formatted
-      : `${formatted} ${t7e('SatInfoBoxObject.estimatedSuffix')}`;
+    stdMagElement.innerHTML = result.source === 'catalog' ? formatted : `${formatted} ${t7e('SatInfoBoxObject.estimatedSuffix')}`;
   }
 
   private updateApparentMag_(sat: Satellite) {
@@ -406,7 +421,6 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
       launchSiteElement.innerHTML = site.site;
       launchSiteElement.classList.remove('pointable');
     }
-
   }
 
   private updateCountryCorrelationTable_(obj: Satellite | MissileObject) {

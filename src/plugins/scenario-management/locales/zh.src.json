@@ -4,6 +4,9 @@
       "title": "情景管理",
       "bottomIconLabel": "情景管理",
       "sideMenuTitle": "情景设置",
+      "sections": {
+        "actions": "操作"
+      },
       "labels": {
         "scenarioName": "情景名称",
         "description": "描述",
@@ -22,11 +25,13 @@
       "buttons": {
         "updateScenario": "更新情景",
         "saveScenario": "保存情景",
-        "loadScenario": "加载情景"
+        "loadScenario": "加载情景",
+        "clearTimeBounds": "清除时间范围"
       },
       "msgs": {
         "settingsUpdated": "情景设置更新成功！",
-        "scenarioLoaded": "情景加载成功！"
+        "scenarioLoaded": "情景加载成功！",
+        "boundsCleared": "已清除时间范围。情景现在无限制。"
       },
       "errorMsgs": {
         "nameRequired": "情景名称为必填项。",

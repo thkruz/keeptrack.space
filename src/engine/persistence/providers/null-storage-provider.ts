@@ -38,7 +38,9 @@ export class NullStorageProvider implements StorageProvider {
   }
 
   subscribe(): () => void {
-    return () => { /* No-op */ };
+    return () => {
+      /* No-op */
+    };
   }
 
   isConnected(): boolean {

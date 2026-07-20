@@ -7,18 +7,15 @@ runs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '24'
-
-    - name: Cache node modules
-      uses: actions/cache@v4.2.3
-      with:
-        path: ~/.npm
-        key: ${{ runner.os }}-build-node-modules-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: ${{ runner.os }}-build-node-modules-${{ runner.os }}-
+        cache: 'pnpm'
 
     - name: Install Dependencies
-      run: npm ci --ignore-scripts
+      run: pnpm install --frozen-lockfile
       shell: bash

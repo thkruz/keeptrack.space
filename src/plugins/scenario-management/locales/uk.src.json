@@ -4,6 +4,9 @@
       "title": "Управління сценаріями",
       "bottomIconLabel": "Управління сценаріями",
       "sideMenuTitle": "Налаштування сценарію",
+      "sections": {
+        "actions": "Дії"
+      },
       "labels": {
         "scenarioName": "Назва сценарію",
         "description": "Опис",
@@ -22,11 +25,13 @@
       "buttons": {
         "updateScenario": "Оновити сценарій",
         "saveScenario": "Зберегти сценарій",
-        "loadScenario": "Завантажити сценарій"
+        "loadScenario": "Завантажити сценарій",
+        "clearTimeBounds": "Очистити часові межі"
       },
       "msgs": {
         "settingsUpdated": "Налаштування сценарію успішно оновлено!",
-        "scenarioLoaded": "Сценарій успішно завантажено!"
+        "scenarioLoaded": "Сценарій успішно завантажено!",
+        "boundsCleared": "Часові межі очищено. Сценарій тепер безмежний."
       },
       "errorMsgs": {
         "nameRequired": "Назва сценарію є обов'язковою.",

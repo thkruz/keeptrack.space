@@ -21,7 +21,7 @@
 
 import { SolarBody } from '@app/engine/core/interfaces';
 import { ChebyshevInterpolator } from '@ootk/src/interpolator/ChebyshevInterpolator';
-import { TemeVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
+import { Kilometers, Seconds, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
 import { KM_PER_AU } from 'astronomy-engine';
 import { PlanetColors } from './celestial-body';
 import { DwarfPlanet } from './dwarf-planet';
@@ -30,18 +30,18 @@ import { makemakeChebyshevCoeffs } from './makemake-chebyshev';
 export enum MakemakeTextureQuality {
   POTATO = '512',
   MEDIUM = '2k',
-  HIGH = '4k'
+  HIGH = '4k',
 }
 
 export class Makemake extends DwarfPlanet {
   readonly RADIUS = 717;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
-  orbitalPeriod = 306.70 * 365.25 * 24 * 3600 as Seconds;
-  meanDistanceToSun = 45.499 * KM_PER_AU as Kilometers;
+  orbitalPeriod = (306.7 * 365.25 * 24 * 3600) as Seconds;
+  meanDistanceToSun = (45.499 * KM_PER_AU) as Kilometers;
   type: SpaceObjectType = SpaceObjectType.DWARF_PLANET;
   eci: TemeVec3;
-  rotation = [0, 0, Math.PI * 7 / 10];
+  rotation = [0, 0, (Math.PI * 7) / 10];
   color = PlanetColors.MAKEMAKE;
   textureQuality: MakemakeTextureQuality = MakemakeTextureQuality.POTATO;
   protected interpolator_ = new ChebyshevInterpolator(makemakeChebyshevCoeffs);

@@ -23,7 +23,7 @@ export class JsonFetchError extends Error {
 }
 
 /** A valid JSON document never starts with `<`; HTML (and our SPA fallback) always does. */
-const HTML_LEADING_ANGLE_BRACKET = (/^\s*</u);
+const HTML_LEADING_ANGLE_BRACKET = /^\s*</u;
 
 const snippetOf = (text: string): string => text.slice(0, 80).replace(/\s+/gu, ' ').trim();
 
@@ -75,7 +75,7 @@ export async function fetchJson<T = unknown>(input: RequestInfo | URL, init?: Re
     throw new JsonFetchError(
       `Expected JSON from ${url} but received ${contentType ?? 'non-JSON'} (HTTP ${response.status}). ` +
         `This usually means the file was missing and the SPA index.html was served instead. First bytes: "${snippet}"`,
-      { url, status: response.status, contentType, bodySnippet: snippet },
+      { url, status: response.status, contentType, bodySnippet: snippet }
     );
   }
 
@@ -84,9 +84,11 @@ export async function fetchJson<T = unknown>(input: RequestInfo | URL, init?: Re
   } catch (e) {
     const snippet = snippetOf(text);
 
-    throw new JsonFetchError(
-      `Malformed JSON from ${url} (HTTP ${response.status}): ${(e as Error).message}. First bytes: "${snippet}"`,
-      { url, status: response.status, contentType, bodySnippet: snippet },
-    );
+    throw new JsonFetchError(`Malformed JSON from ${url} (HTTP ${response.status}): ${(e as Error).message}. First bytes: "${snippet}"`, {
+      url,
+      status: response.status,
+      contentType,
+      bodySnippet: snippet,
+    });
   }
 }

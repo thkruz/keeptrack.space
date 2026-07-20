@@ -1,4 +1,4 @@
-import { test, expect } from '@test/e2e/coverage';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('TooltipsPlugin', () => {
@@ -11,7 +11,7 @@ test.describe('TooltipsPlugin', () => {
       plugins: { TooltipsPlugin: { enabled: true } },
     });
 
-    const tooltipErrors = errors.filter((e) => (/tooltip/iu).test(e));
+    const tooltipErrors = errors.filter((e) => /tooltip/iu.test(e));
 
     expect(tooltipErrors).toHaveLength(0);
   });

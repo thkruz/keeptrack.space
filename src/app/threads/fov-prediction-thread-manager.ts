@@ -7,11 +7,7 @@ import type { SensorObjectCruncher } from '@app/engine/core/interfaces';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
-import {
-  FovPredMsgType,
-  FovPredOutMsgType,
-  type FovPredOutMsg,
-} from '@app/webworker/fov-prediction-messages';
+import { FovPredMsgType, type FovPredOutMsg, FovPredOutMsgType } from '@app/webworker/fov-prediction-messages';
 
 export class FovPredictionThreadManager extends WebWorkerThreadManager {
   readonly WEB_WORKER_CODE: string = 'js/fovPredictionWorker.js';
@@ -52,14 +48,7 @@ export class FovPredictionThreadManager extends WebWorkerThreadManager {
   /**
    * Start a full sweep with the given catalog and sensor configuration.
    */
-  sendInit(
-    catalogJson: string,
-    sensors: SensorObjectCruncher[],
-    simTimeMs: number,
-    priorityIndices?: number[],
-    maxLookaheadMin = 120,
-    sweepStepMin = 1,
-  ): void {
+  sendInit(catalogJson: string, sensors: SensorObjectCruncher[], simTimeMs: number, priorityIndices?: number[], maxLookaheadMin = 120, sweepStepMin = 1): void {
     this.minutesToEntry_ = null;
     this.postMessage({
       typ: FovPredMsgType.INIT,

@@ -46,7 +46,8 @@ export class CelestrakColorScheme extends ColorScheme {
   constructor() {
     super(CelestrakColorScheme.uniqueColorTheme);
     this.objectTypeFlags = {
-      ...this.objectTypeFlags, ...CelestrakColorScheme.uniqueObjectTypeFlags,
+      ...this.objectTypeFlags,
+      ...CelestrakColorScheme.uniqueObjectTypeFlags,
     };
 
     EventBus.getInstance().on(EventBusEvent.layerUpdated, () => {
@@ -105,11 +106,13 @@ export class CelestrakColorScheme extends ColorScheme {
 
     if (
       this.isTypeFlagFiltered_(sat, {
-        types: SpaceObjectType.PAYLOAD, flagKey: 'celestrakDefaultActivePayload',
+        types: SpaceObjectType.PAYLOAD,
+        flagKey: 'celestrakDefaultActivePayload',
         extraCondition: isActive,
       }) ||
       this.isTypeFlagFiltered_(sat, {
-        types: SpaceObjectType.PAYLOAD, flagKey: 'celestrakDefaultInactivePayload',
+        types: SpaceObjectType.PAYLOAD,
+        flagKey: 'celestrakDefaultInactivePayload',
         extraCondition: isInactive,
       }) ||
       this.isTypeFlagFiltered_(sat, { types: SpaceObjectType.UNKNOWN, flagKey: 'celestrakDefaultUnknown' }) ||

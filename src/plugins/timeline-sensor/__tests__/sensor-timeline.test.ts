@@ -1,24 +1,28 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
-import { SensorTimeline } from '@app/plugins/timeline-sensor/sensor-timeline';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { SensorTimeline } from '@app/plugins/timeline-sensor/sensor-timeline';
 import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
 
 // A canvas 2d context is null under jsdom, so inject a permissive stub.
-const mockCtx = () => new Proxy({}, {
-  get: (_t, prop) => {
-    if (prop === 'canvas') {
-      return { width: 800, height: 400 };
-    }
+const mockCtx = () =>
+  new Proxy(
+    {},
+    {
+      get: (_t, prop) => {
+        if (prop === 'canvas') {
+          return { width: 800, height: 400 };
+        }
 
-    return vi.fn();
-  },
-  set: () => true,
-});
+        return vi.fn();
+      },
+      set: () => true,
+    }
+  );
 
 describe('SensorTimeline behavior', () => {
   let plugin: SensorTimeline;
@@ -28,9 +32,7 @@ describe('SensorTimeline behavior', () => {
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
     // The constructor builds allSensorLists_ from getSensorList; provide one sensor.
-    ServiceLocator.getSensorManager().getSensorList = vi.fn(
-      (name: string) => (name === 'mw' || name === 'ssn' ? [defaultSensor] : []),
-    ) as never;
+    ServiceLocator.getSensorManager().getSensorList = vi.fn((name: string) => (name === 'mw' || name === 'ssn' ? [defaultSensor] : [])) as never;
     plugin = new SensorTimeline();
     websiteInit(plugin);
     // Replace the (null) canvas contexts with stubs.

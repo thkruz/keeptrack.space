@@ -1,7 +1,7 @@
+import { PluginDrawer } from '@app/app/ui/plugin-drawer';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
-import { PluginDrawer } from '@app/app/ui/plugin-drawer';
 import { settingsManager } from '@app/settings/settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
@@ -74,7 +74,7 @@ describe('PluginDrawer', () => {
 
     content.insertAdjacentHTML(
       'beforeend',
-      '<div class="drawer-item disabled" data-plugin-id="overflight-icon" role="button"><span class="drawer-item-label">Overflight</span></div>',
+      '<div class="drawer-item disabled" data-plugin-id="overflight-icon" role="button"><span class="drawer-item-label">Overflight</span></div>'
     );
     const item = content.querySelector('.drawer-item[data-plugin-id="overflight-icon"]') as HTMLElement;
     const emitSpy = vi.spyOn(EventBus.getInstance(), 'emit');
@@ -174,8 +174,7 @@ describe('PluginDrawer', () => {
       // Same plugin listed twice: once in the Recent group, once in its category group.
       content.insertAdjacentHTML(
         'beforeend',
-        '<div class="drawer-item" data-plugin-id="custom-sensor-icon"></div>' +
-        '<div class="drawer-item" data-plugin-id="custom-sensor-icon"></div>',
+        '<div class="drawer-item" data-plugin-id="custom-sensor-icon"></div><div class="drawer-item" data-plugin-id="custom-sensor-icon"></div>'
       );
       const rows = [...content.querySelectorAll('.drawer-item[data-plugin-id="custom-sensor-icon"]')];
 
@@ -192,10 +191,7 @@ describe('PluginDrawer', () => {
       buildDrawer();
       const content = getEl('drawer-content', true)!;
 
-      content.insertAdjacentHTML(
-        'beforeend',
-        '<div class="drawer-item" data-plugin-id="custom-sensor-icon"></div>',
-      );
+      content.insertAdjacentHTML('beforeend', '<div class="drawer-item" data-plugin-id="custom-sensor-icon"></div>');
       const row = content.querySelector('.drawer-item[data-plugin-id="custom-sensor-icon"]')!;
 
       getEl('custom-sensor-icon')!.classList.add('bmenu-item-disabled');

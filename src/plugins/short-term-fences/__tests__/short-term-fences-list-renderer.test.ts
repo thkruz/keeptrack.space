@@ -1,6 +1,6 @@
+import type { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { renderStfList } from '@app/plugins/short-term-fences/short-term-fences-list-renderer';
 import { Degrees, Kilometers } from '@ootk/src/main';
-import type { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 
 const l = (key: string): string => `[${key}]`;
 
@@ -38,7 +38,7 @@ describe('renderStfList', () => {
     expect(html).toContain('remove-fence');
     // The remove icon is a CSS-masked glyph (theme-tinted), not a raw <img>.
     expect(html).toContain('stf-remove-glyph');
-    expect(html).toContain('--stf-remove-icon: url(\'remove.png\')');
+    expect(html).toContain("--stf-remove-icon: url('remove.png')");
     expect(html).not.toContain('<img');
     // Attribute grid shows az/el/range.
     expect(html).toContain('48° - 52°');

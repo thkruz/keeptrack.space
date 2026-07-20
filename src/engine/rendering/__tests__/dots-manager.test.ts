@@ -5,9 +5,9 @@ import { DotsManager } from '@app/engine/rendering/dots-manager';
 import { WebGLRenderer } from '@app/engine/rendering/webgl-renderer';
 import { SettingsManager } from '@app/settings/settings';
 import { BaseObject, Milliseconds } from '@ootk/src/main';
+import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { mat4 } from 'gl-matrix';
 import { vi } from 'vitest';
-import { setupStandardEnvironment } from '@test/environment/standard-env';
 
 describe('drawManager', () => {
   let dotsManagerInstance: DotsManager;
@@ -19,9 +19,9 @@ describe('drawManager', () => {
   });
   // Should process getScreenCoords
   it('process_get_screen_coords', () => {
-    expect(() => dotsManagerInstance.draw(mat4.create(), <WebGLFramebuffer><unknown>null)).not.toThrow();
+    expect(() => dotsManagerInstance.draw(mat4.create(), <WebGLFramebuffer>(<unknown>null))).not.toThrow();
     dotsManagerInstance.isReady = true;
-    expect(() => dotsManagerInstance.draw(mat4.create(), <WebGLFramebuffer><unknown>null)).not.toThrow();
+    expect(() => dotsManagerInstance.draw(mat4.create(), <WebGLFramebuffer>(<unknown>null))).not.toThrow();
     settingsManager.cruncherReady = true;
     const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
@@ -33,7 +33,7 @@ describe('drawManager', () => {
         maxSize: 1,
       } as unknown as WebGLProgram,
     };
-    expect(() => dotsManagerInstance.draw(mat4.create(), <WebGLFramebuffer><unknown>null)).not.toThrow();
+    expect(() => dotsManagerInstance.draw(mat4.create(), <WebGLFramebuffer>(<unknown>null))).not.toThrow();
   });
 
   // Should process updatePositionBuffer
@@ -139,9 +139,9 @@ describe('DotsManager picking program lifecycle', () => {
     let texCounter = 0;
     let rbCounter = 0;
 
-    renderer.gl.createFramebuffer = vi.fn(() => ({ id: `fb-${++fbCounter}` } as unknown as WebGLFramebuffer));
-    renderer.gl.createTexture = vi.fn(() => ({ id: `tex-${++texCounter}` } as unknown as WebGLTexture));
-    renderer.gl.createRenderbuffer = vi.fn(() => ({ id: `rb-${++rbCounter}` } as unknown as WebGLRenderbuffer));
+    renderer.gl.createFramebuffer = vi.fn(() => ({ id: `fb-${++fbCounter}` }) as unknown as WebGLFramebuffer);
+    renderer.gl.createTexture = vi.fn(() => ({ id: `tex-${++texCounter}` }) as unknown as WebGLTexture);
+    renderer.gl.createRenderbuffer = vi.fn(() => ({ id: `rb-${++rbCounter}` }) as unknown as WebGLRenderbuffer);
     renderer.gl.deleteFramebuffer = vi.fn();
     renderer.gl.deleteTexture = vi.fn();
     renderer.gl.deleteRenderbuffer = vi.fn();

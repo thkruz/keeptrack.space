@@ -1,8 +1,8 @@
 import { EciArr3 } from '@app/engine/core/interfaces';
-import { Degrees, Satellite, ecef2rae, eci2ecef, Kilometers, lla2ecef } from '@ootk/src/main';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { Degrees, ecef2rae, eci2ecef, Kilometers, lla2ecef, Satellite } from '@ootk/src/main';
 import { vec4 } from 'gl-matrix';
 import { Line, LineColors, LineDescription } from './line';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SatScanEarthLine extends Line {
   private sat: Satellite;

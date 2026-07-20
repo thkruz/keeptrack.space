@@ -38,12 +38,9 @@ describe('custom-sensor-core validateCustomSensor', () => {
     expect(validateCustomSensor(withValues({ [field]: value }))).toBe(expectedKey);
   });
 
-  it.each(['lat', 'lon', 'alt', 'minAz', 'maxAz', 'minEl', 'maxEl', 'minRng', 'maxRng'])(
-    'rejects NaN %s as invalidNumber',
-    (field) => {
-      expect(validateCustomSensor(withValues({ [field]: NaN }))).toBe('invalidNumber');
-    },
-  );
+  it.each(['lat', 'lon', 'alt', 'minAz', 'maxAz', 'minEl', 'maxEl', 'minRng', 'maxRng'])('rejects NaN %s as invalidNumber', (field) => {
+    expect(validateCustomSensor(withValues({ [field]: NaN }))).toBe('invalidNumber');
+  });
 
   it('rejects minEl greater than maxEl', () => {
     expect(validateCustomSensor(withValues({ minEl: 80, maxEl: 10 }))).toBe('elOrder');

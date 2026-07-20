@@ -56,7 +56,8 @@ export class ObjectTypeColorScheme extends ColorScheme {
   constructor() {
     super(ObjectTypeColorScheme.uniqueColorTheme);
     this.objectTypeFlags = {
-      ...this.objectTypeFlags, ...ObjectTypeColorScheme.uniqueObjectTypeFlags,
+      ...this.objectTypeFlags,
+      ...ObjectTypeColorScheme.uniqueObjectTypeFlags,
     };
 
     EventBus.getInstance().on(EventBusEvent.layerUpdated, () => {

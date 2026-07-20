@@ -11,6 +11,5 @@ export function parseLocalizedNumber(value: string): number {
   // Normalize: replace comma with period for parsing
   const normalized = value.replace(',', '.');
 
-
   return parseFloat(normalized);
 }

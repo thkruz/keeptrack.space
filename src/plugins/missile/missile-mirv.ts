@@ -96,14 +96,7 @@ export const findSeparationIndex = (altList: number[]): number => {
  * footprint shares the bus's apogee and reentry timing), which is a reasonable
  * approximation for a compact footprint.
  */
-export const retargetDescent = (
-  busLatList: number[],
-  busLonList: number[],
-  busAltList: number[],
-  sepIdx: number,
-  dLat: number,
-  dLon: number,
-): GroundTrack => {
+export const retargetDescent = (busLatList: number[], busLonList: number[], busAltList: number[], sepIdx: number, dLat: number, dLon: number): GroundTrack => {
   const latList = busLatList.slice();
   const lonList = busLonList.slice();
   const altList = busAltList.slice();
@@ -151,7 +144,7 @@ export const MISSILE_WARHEAD_COUNTS: Readonly<Record<string, number>> = {
   'Trident II': 8, // UGM-133A (SLBM)
   'Minuteman III': 3, // LGM-30G design capacity
   // UK / France (SLBM)
-  'M51': 6, // M51 (Triomphant class)
+  M51: 6, // M51 (Triomphant class)
 };
 
 /** Upper bound on warheads per missile (matches the interactive MIRV launcher). */
@@ -168,8 +161,8 @@ export const warheadCountForDesc = (desc: string | undefined): number => {
     return 1;
   }
 
-  const designator = (/\((?<designator>[^)]+)\)/u).exec(desc)?.groups?.designator?.trim();
-  const count = designator ? MISSILE_WARHEAD_COUNTS[designator] ?? 1 : 1;
+  const designator = /\((?<designator>[^)]+)\)/u.exec(desc)?.groups?.designator?.trim();
+  const count = designator ? (MISSILE_WARHEAD_COUNTS[designator] ?? 1) : 1;
 
   return Math.max(1, Math.min(count, MAX_WARHEADS_PER_MISSILE));
 };
@@ -181,13 +174,7 @@ export const warheadCountForDesc = (desc: string | undefined): number => {
  * tracks coincide on the way up and spread on the way down - a MIRV footprint. RV 0
  * keeps the bus's exact impact; `count <= 1` returns a single copy of the bus.
  */
-export const expandTrajectoryToMirv = (
-  busLatList: number[],
-  busLonList: number[],
-  busAltList: number[],
-  count: number,
-  spreadKm: number,
-): GroundTrack[] => {
+export const expandTrajectoryToMirv = (busLatList: number[], busLonList: number[], busAltList: number[], count: number, spreadKm: number): GroundTrack[] => {
   if (count <= 1 || busAltList.length === 0) {
     return [{ latList: busLatList.slice(), lonList: busLonList.slice(), altList: busAltList.slice() }];
   }
@@ -216,7 +203,7 @@ export const expandTrajectoryToTargets = (
   busLatList: number[],
   busLonList: number[],
   busAltList: number[],
-  rvTargets: readonly RvTarget[],
+  rvTargets: readonly RvTarget[]
 ): { track: GroundTrack; name: string }[] => {
   const busTrack: GroundTrack = { latList: busLatList.slice(), lonList: busLonList.slice(), altList: busAltList.slice() };
 

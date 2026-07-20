@@ -6,25 +6,17 @@
  * to the main-thread color scheme logic for all supported color schemes.
  */
 
-import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
-import { buildColorDataArrays, TRACKED_COUNTRIES } from '@app/engine/rendering/color-worker/color-data-builder';
-import {
-  CountryCode,
-  ObjFlags,
-  SourceCode,
-} from '@app/engine/rendering/color-worker/color-data-arrays';
-import { ColorWorkerMsgType, FilterState, SettingsFlags } from '@app/engine/rendering/color-worker/color-worker-messages';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { settingsManager } from '@app/settings/settings';
-import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
-import { WebGLRenderer } from '@app/engine/rendering/webgl-renderer';
-import { defaultSat } from '@test/environment/apiMocks';
-import {
-  Satellite,
-  SpaceObjectType,
-  Star,
-} from '@ootk/src/main';
 import { BaseObject } from '@app/engine/ootk/src/objects';
+import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
+import { CountryCode, ObjFlags, SourceCode } from '@app/engine/rendering/color-worker/color-data-arrays';
+import { buildColorDataArrays, TRACKED_COUNTRIES } from '@app/engine/rendering/color-worker/color-data-builder';
+import { ColorWorkerMsgType, FilterState, SettingsFlags } from '@app/engine/rendering/color-worker/color-worker-messages';
+import { WebGLRenderer } from '@app/engine/rendering/webgl-renderer';
+import { settingsManager } from '@app/settings/settings';
+import { Satellite, SpaceObjectType, Star } from '@ootk/src/main';
+import { defaultSat } from '@test/environment/apiMocks';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // ─── Worker environment mock ────────────────────────────────────────────────
 // Must happen before dynamic import of colorCruncher
@@ -190,7 +182,7 @@ describe('buildColorDataArrays', () => {
     const data = buildColorDataArrays(catalog);
 
     expect(data.tle1EpochYear[0]).toBe(21);
-    expect(data.tle1EpochDay[0]).toBeCloseTo(203.40, 0);
+    expect(data.tle1EpochDay[0]).toBeCloseTo(203.4, 0);
   });
 
   it('should handle RCS values', () => {
@@ -335,12 +327,7 @@ describe('Color Worker Parity', () => {
   /**
    * Helper: initialize the worker with the test catalog and common settings
    */
-  function initWorker(
-    schemeId: string,
-    inViewData?: Int8Array,
-    inSunData?: Int8Array,
-    objectTypeFlags?: Record<string, boolean>,
-  ): void {
+  function initWorker(schemeId: string, inViewData?: Int8Array, inSunData?: Int8Array, objectTypeFlags?: Record<string, boolean>): void {
     // Send catalog
     sendToWorker({
       typ: ColorWorkerMsgType.INIT_CATALOG,
@@ -435,12 +422,7 @@ describe('Color Worker Parity', () => {
   }
 
   function getWorkerColor(output: { colorData: Float32Array }, i: number): [number, number, number, number] {
-    return [
-      output.colorData[i * 4],
-      output.colorData[i * 4 + 1],
-      output.colorData[i * 4 + 2],
-      output.colorData[i * 4 + 3],
-    ];
+    return [output.colorData[i * 4], output.colorData[i * 4 + 1], output.colorData[i * 4 + 2], output.colorData[i * 4 + 3]];
   }
 
   // ─── FOV Parity ─────────────────────────────────────────────────────────

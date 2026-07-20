@@ -1,10 +1,10 @@
-import { vi } from 'vitest';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { LinkedInLinkPlugin } from '@app/plugins/linkedin-link/linkedin-link';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { settingsManager } from '@app/settings/settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { vi } from 'vitest';
 
 describe('LinkedInLinkPlugin', () => {
   let linkedInLinkPlugin: LinkedInLinkPlugin;
@@ -64,11 +64,7 @@ describe('LinkedInLinkPlugin', () => {
       // Simulate click
       linkedInLinkPlugin.onClick_();
 
-      expect(windowOpenSpy).toHaveBeenCalledWith(
-        'https://www.linkedin.com/company/keeptrackspace/',
-        '_blank',
-        'noopener,noreferrer',
-      );
+      expect(windowOpenSpy).toHaveBeenCalledWith('https://www.linkedin.com/company/keeptrackspace/', '_blank', 'noopener,noreferrer');
     });
   });
 

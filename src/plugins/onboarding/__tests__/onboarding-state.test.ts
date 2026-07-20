@@ -1,13 +1,6 @@
 import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
 import { StorageKey } from '@app/engine/persistence/storage-key';
-import {
-  CHAPTER_IDS,
-  createDefaultOnboardingState,
-  isResumable,
-  loadOnboardingState,
-  RESUME_WINDOW_MS,
-  saveOnboardingState,
-} from '@app/plugins/onboarding/onboarding-state';
+import { CHAPTER_IDS, createDefaultOnboardingState, isResumable, loadOnboardingState, RESUME_WINDOW_MS, saveOnboardingState } from '@app/plugins/onboarding/onboarding-state';
 
 describe('onboarding-state', () => {
   beforeEach(() => {
@@ -61,25 +54,23 @@ describe('onboarding-state', () => {
   });
 
   describe('v1 -> v2 migration', () => {
-    const v1Blob = (overrides: Record<string, unknown> = {}) => JSON.stringify({
-      schemaVersion: 1,
-      status: 'done',
-      stage: null,
-      stepId: null,
-      persona: 'operator',
-      tiers: { basics: 'done', power: 'not-started' },
-      checklist: { watchlist3: true },
-      isCardDismissed: false,
-      updatedAt: 1_000_000,
-      completedAt: 2_000_000,
-      ...overrides,
-    });
+    const v1Blob = (overrides: Record<string, unknown> = {}) =>
+      JSON.stringify({
+        schemaVersion: 1,
+        status: 'done',
+        stage: null,
+        stepId: null,
+        persona: 'operator',
+        tiers: { basics: 'done', power: 'not-started' },
+        checklist: { watchlist3: true },
+        isCardDismissed: false,
+        updatedAt: 1_000_000,
+        completedAt: 2_000_000,
+        ...overrides,
+      });
 
     it('marks Drawer Essentials done when the v1 power tour was done', () => {
-      PersistenceManager.getInstance().saveItem(
-        StorageKey.ONBOARDING_STATE,
-        v1Blob({ tiers: { basics: 'done', power: 'done' } }),
-      );
+      PersistenceManager.getInstance().saveItem(StorageKey.ONBOARDING_STATE, v1Blob({ tiers: { basics: 'done', power: 'done' } }));
 
       const state = loadOnboardingState();
 
@@ -108,7 +99,7 @@ describe('onboarding-state', () => {
     it('drops a mid-power-tour v1 step id (linear ids no longer exist)', () => {
       PersistenceManager.getInstance().saveItem(
         StorageKey.ONBOARDING_STATE,
-        v1Blob({ status: 'in-progress', stage: 'power', stepId: 'p3-sensors', tiers: { basics: 'done', power: 'in-progress' } }),
+        v1Blob({ status: 'in-progress', stage: 'power', stepId: 'p3-sensors', tiers: { basics: 'done', power: 'in-progress' } })
       );
 
       const state = loadOnboardingState();

@@ -12,19 +12,8 @@
 /* eslint-disable max-lines */
 
 import { CameraType } from '../engine/camera/camera-type';
-import {
-  ColorDataArrays,
-  CountryCode,
-  MissionCategory,
-  ObjFlags,
-  SourceCode,
-} from '../engine/rendering/color-worker/color-data-arrays';
-import {
-  ColorWorkerInMsg,
-  ColorWorkerMsgType,
-  FilterState,
-  SettingsFlags,
-} from '../engine/rendering/color-worker/color-worker-messages';
+import { ColorDataArrays, CountryCode, MissionCategory, ObjFlags, SourceCode } from '../engine/rendering/color-worker/color-data-arrays';
+import { ColorWorkerInMsg, ColorWorkerMsgType, FilterState, SettingsFlags } from '../engine/rendering/color-worker/color-worker-messages';
 
 // ─── Worker State ────────────────────────────────────────────────────────────
 
@@ -182,20 +171,20 @@ function writeDeselected(colorData: Float32Array, pickableData: Int8Array, i: nu
 
 /** Returns true if the object type represents a facility (agency, operator, etc.). */
 function isFacilityType(type: number): boolean {
-  return type === SOT_INTERGOVERNMENTAL_ORGANIZATION ||
+  return (
+    type === SOT_INTERGOVERNMENTAL_ORGANIZATION ||
     type === SOT_SUBORBITAL_PAYLOAD_OPERATOR ||
     type === SOT_PAYLOAD_OWNER ||
     type === SOT_METEOROLOGICAL ||
     type === SOT_PAYLOAD_MANUFACTURER ||
     type === SOT_LAUNCH_AGENCY ||
-    type === SOT_CONTROL_FACILITY;
+    type === SOT_CONTROL_FACILITY
+  );
 }
 
 /** Returns true if the object type represents a launch site or launch facility. */
 function isLaunchSiteType(type: number): boolean {
-  return type === SOT_LAUNCH_SITE ||
-    type === SOT_LAUNCH_POSITION ||
-    type === SOT_LAUNCH_FACILITY;
+  return type === SOT_LAUNCH_SITE || type === SOT_LAUNCH_POSITION || type === SOT_LAUNCH_FACILITY;
 }
 
 /**
@@ -287,13 +276,13 @@ function colorTempToRgba(kelvin: number, vmag: number): [number, number, number,
   if (temp <= 66) {
     r = 255;
   } else {
-    r = Math.max(0, Math.min(255, 329.698727446 * ((temp - 60) ** -0.1332047592)));
+    r = Math.max(0, Math.min(255, 329.698727446 * (temp - 60) ** -0.1332047592));
   }
 
   if (temp <= 66) {
     g = Math.max(0, Math.min(255, 99.4708025861 * Math.log(temp) - 161.1195681661));
   } else {
-    g = Math.max(0, Math.min(255, 288.1221695283 * ((temp - 60) ** -0.0755148492)));
+    g = Math.max(0, Math.min(255, 288.1221695283 * (temp - 60) ** -0.0755148492));
   }
 
   if (temp >= 66) {
@@ -358,7 +347,7 @@ function isFilteredBySource_(cd: ColorDataArrays, i: number, type: number, flags
   if (!filterState.vimpelSatellites && cd.source[i] === SourceCode.VIMPEL) {
     return true;
   }
-  if (!filterState.starlinkSatellites && (flags & ObjFlags.IS_STARLINK)) {
+  if (!filterState.starlinkSatellites && flags & ObjFlags.IS_STARLINK) {
     return true;
   }
   if (!filterState.celestrakSatellites && cd.source[i] === SourceCode.CELESTRAK) {
@@ -433,12 +422,10 @@ function isFilteredByRegime_(cd: ColorDataArrays, i: number, type: number): bool
 
   const status = cd.status[i];
 
-  if (!filterState.operationalPayloads && type === SOT_PAYLOAD &&
-    status !== PS_NONOPERATIONAL && status !== PS_UNKNOWN) {
+  if (!filterState.operationalPayloads && type === SOT_PAYLOAD && status !== PS_NONOPERATIONAL && status !== PS_UNKNOWN) {
     return true;
   }
-  if (!filterState.nonOperationalPayloads && type === SOT_PAYLOAD &&
-    (status === PS_NONOPERATIONAL || status === PS_UNKNOWN)) {
+  if (!filterState.nonOperationalPayloads && type === SOT_PAYLOAD && (status === PS_NONOPERATIONAL || status === PS_UNKNOWN)) {
     return true;
   }
   if (!filterState.rocketBodies && type === SOT_ROCKET_BODY) {
@@ -481,9 +468,7 @@ function isFilteredOut(i: number): boolean {
     return false;
   }
 
-  return isFilteredBySource_(cd, i, type, flags) ||
-    isFilteredByCountry_(cd.country[i]) ||
-    isFilteredByRegime_(cd, i, type);
+  return isFilteredBySource_(cd, i, type, flags) || isFilteredByCountry_(cd.country[i]) || isFilteredByRegime_(cd, i, type);
 }
 
 // ─── Color Scheme Update Functions ───────────────────────────────────────────
@@ -499,21 +484,22 @@ type SchemeUpdateFn = (cd: Float32Array, pd: Int8Array, i: number) => void;
  * @param sensorFlagKey objectTypeFlags key gating sensor visibility
  * @param sensorThemeKey colorTheme key for the sensor color
  */
-function objectTypePrologue_(
-  cd: Float32Array, pd: Int8Array, i: number, flags: number, type: number,
-  sensor: { flagKey: string; themeKey: string; fallback: number[] },
-): boolean {
+function objectTypePrologue_(cd: Float32Array, pd: Int8Array, i: number, flags: number, type: number, sensor: { flagKey: string; themeKey: string; fallback: number[] }): boolean {
   if (!catalogData) {
     return true;
   }
 
   if (flags & (ObjFlags.IS_PLANET | ObjFlags.IS_OEM)) {
-    writeColor(cd, pd, i,
+    writeColor(
+      cd,
+      pd,
+      i,
       catalogData.specialColor[i * 4],
       catalogData.specialColor[i * 4 + 1],
       catalogData.specialColor[i * 4 + 2],
       catalogData.specialColor[i * 4 + 3],
-      PICKABLE_YES);
+      PICKABLE_YES
+    );
 
     return true;
   }
@@ -807,8 +793,7 @@ function celestrakScheme(cd: Float32Array, pd: Int8Array, i: number): void {
   const flags = catalogData.objFlags[i];
   const type = catalogData.type[i];
 
-  if (objectTypePrologue_(cd, pd, i, flags, type,
-    { flagKey: 'celestrakDefaultSensor', themeKey: 'celestrakDefaultSensor', fallback: [0, 0, 1, 0.85] })) {
+  if (objectTypePrologue_(cd, pd, i, flags, type, { flagKey: 'celestrakDefaultSensor', themeKey: 'celestrakDefaultSensor', fallback: [0, 0, 1, 0.85] })) {
     return;
   }
 
@@ -1565,7 +1550,7 @@ function orbitalPlaneDensityScheme(cd: Float32Array, pd: Int8Array, i: number): 
     } else {
       writeDeselected(cd, pd, i);
     }
-  } else if (normalized > 0.10) {
+  } else if (normalized > 0.1) {
     if (objectTypeFlags.orbitalPlaneDensityLow !== false) {
       writeColorArr(cd, pd, i, colorTheme.orbitalPlaneDensityLow ?? [1, 1, 0, 1], PICKABLE_YES);
     } else {
@@ -1726,7 +1711,7 @@ function starlinkScheme(cd: Float32Array, pd: Int8Array, i: number): void {
   }
 
   // Starlink check
-  if ((flags & ObjFlags.IS_STARLINK) && type === SOT_PAYLOAD) {
+  if (flags & ObjFlags.IS_STARLINK && type === SOT_PAYLOAD) {
     const status = catalogData.status[i];
 
     if (status === PS_OPERATIONAL) {

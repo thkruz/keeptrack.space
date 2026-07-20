@@ -20,10 +20,10 @@ const greatCircleKm = (lat1: number, lon1: number, lat2: number, lon2: number): 
  * tails). Every one of these must now be a clean, on-target ballistic arc.
  */
 const SHOTS = [
-  { name: 'SRBM ~430km (Belgorod->Kyiv)', lat: 50.60, lon: 36.59, tLat: 50.45, tLon: 30.523 },
-  { name: 'SRBM ~570km (Sumy->Moscow)', lat: 50.91, lon: 34.80, tLat: 55.751, tLon: 37.618 },
+  { name: 'SRBM ~430km (Belgorod->Kyiv)', lat: 50.6, lon: 36.59, tLat: 50.45, tLon: 30.523 },
+  { name: 'SRBM ~570km (Sumy->Moscow)', lat: 50.91, lon: 34.8, tLat: 55.751, tLon: 37.618 },
   { name: 'MRBM ~1240km (Tabriz->Tel Aviv)', lat: 38.08, lon: 46.29, tLat: 32.085, tLon: 34.781 },
-  { name: 'IRBM ~1585km (Sdot Micha->Tehran)', lat: 31.70, lon: 34.92, tLat: 35.689, tLon: 51.389 },
+  { name: 'IRBM ~1585km (Sdot Micha->Tehran)', lat: 31.7, lon: 34.92, tLat: 35.689, tLon: 51.389 },
   { name: 'ICBM ~9400km (Aleysk->NYC)', lat: 52.5, lon: 82.75, tLat: 40.713, tLon: -74.006 },
   { name: 'Antimeridian (Pyongyang->LA)', lat: 39.02, lon: 125.74, tLat: 34.05, tLon: -118.24 },
 ];

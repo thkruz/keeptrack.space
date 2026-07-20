@@ -14,10 +14,10 @@
 import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import {
-  AzRangeMsgType,
-  AzRangeOutMsgType,
   type AzRangeMsgStart,
+  AzRangeMsgType,
   type AzRangeOutError,
+  AzRangeOutMsgType,
   type AzRangeOutPartial,
   type AzRangeOutResult,
   type AzRangeTleEntry,
@@ -198,9 +198,7 @@ export class AzRangeHeatmapThreadManager extends WebWorkerThreadManager {
   // ── Helpers ────────────────────────────────────────────────────────────────
 
   private sumBinArrays_(partials: (number[][] | null)[]): number[][] {
-    const result: number[][] = Array.from({ length: this.curNumAzBins_ }, () =>
-      new Array(this.curNumRngBins_).fill(0),
-    );
+    const result: number[][] = Array.from({ length: this.curNumAzBins_ }, () => new Array(this.curNumRngBins_).fill(0));
 
     for (const bins of partials) {
       if (!bins) {
@@ -220,9 +218,7 @@ export class AzRangeHeatmapThreadManager extends WebWorkerThreadManager {
   private splitArray_<T>(arr: T[], n: number): T[][] {
     const size = Math.ceil(arr.length / n);
 
-    return Array.from({ length: n }, (_, i) => arr.slice(i * size, (i + 1) * size)).filter(
-      (chunk) => chunk.length > 0,
-    );
+    return Array.from({ length: n }, (_, i) => arr.slice(i * size, (i + 1) * size)).filter((chunk) => chunk.length > 0);
   }
 
   // ── Public API ─────────────────────────────────────────────────────────────
@@ -248,12 +244,8 @@ export class AzRangeHeatmapThreadManager extends WebWorkerThreadManager {
     const chunks = this.splitArray_(params.tleData, activeWorkers.length);
 
     this.pendingWorkers_ = chunks.length;
-    this.aggregateBins_ = Array.from({ length: params.numAzBins }, () =>
-      new Array(params.numRngBins).fill(0),
-    );
-    this.aggregateSatNums_ = Array.from({ length: params.numAzBins }, () =>
-      Array.from({ length: params.numRngBins }, (): string[] => []),
-    );
+    this.aggregateBins_ = Array.from({ length: params.numAzBins }, () => new Array(params.numRngBins).fill(0));
+    this.aggregateSatNums_ = Array.from({ length: params.numAzBins }, () => Array.from({ length: params.numRngBins }, (): string[] => []));
     this.latestPartialBins_ = new Array(chunks.length).fill(null);
     this.workerStepsProcessed_ = new Array(chunks.length).fill(0);
 

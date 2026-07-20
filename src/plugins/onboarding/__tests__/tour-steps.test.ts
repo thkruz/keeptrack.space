@@ -1,27 +1,20 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import { settingsManager } from '@app/settings/settings';
-import {
-  advanceOnIconClick,
-  advanceWhenMenuOpens,
-  buildTeaserStep,
-  gatedStep,
-  isPluginLocked,
-  isPluginUsable,
-  utilityIconTarget,
-} from '@app/plugins/onboarding/tour-steps';
 import type { TourStep } from '@app/plugins/onboarding/tour-engine';
+import { advanceOnIconClick, advanceWhenMenuOpens, buildTeaserStep, gatedStep, isPluginLocked, isPluginUsable, utilityIconTarget } from '@app/plugins/onboarding/tour-steps';
+import { settingsManager } from '@app/settings/settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
 
-const stubPlugin = (overrides: Partial<KeepTrackPlugin> = {}): KeepTrackPlugin => ({
-  id: 'StubPlugin',
-  bottomIconElementName: 'stub-menu-icon',
-  isMenuButtonActive: false,
-  isLoginRequired: false,
-  ...overrides,
-} as unknown as KeepTrackPlugin);
+const stubPlugin = (overrides: Partial<KeepTrackPlugin> = {}): KeepTrackPlugin =>
+  ({
+    id: 'StubPlugin',
+    bottomIconElementName: 'stub-menu-icon',
+    isMenuButtonActive: false,
+    isLoginRequired: false,
+    ...overrides,
+  }) as unknown as KeepTrackPlugin;
 
 const TEASER_COPY = { featureId: 'stubFeature', title: 'Teaser title', body: 'Teaser body' };
 

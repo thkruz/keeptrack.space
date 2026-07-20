@@ -3,6 +3,9 @@
     "OrbitGuardMenuPlugin": {
       "bottomIconLabel": "OrbitGuard",
       "title": "OrbitGuard",
+      "sections": {
+        "results": "결과"
+      },
       "labels": {
         "dataCredit": "*OrbitGuard 데이터는 MSBAI에서 제공합니다.",
         "previous": "이전",

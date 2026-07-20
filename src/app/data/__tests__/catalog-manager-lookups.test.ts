@@ -1,10 +1,10 @@
-import { vi } from 'vitest';
 import { CatalogManager } from '@app/app/data/catalog-manager';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { GetSatType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { BaseObject, SpaceObjectType, Satellite } from '@ootk/src/main';
+import { BaseObject, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
+import { vi } from 'vitest';
 
 /*
  * Direct coverage for the CatalogManager resolution layer — the functions

@@ -4,6 +4,9 @@
       "title": "Gestión de escenarios",
       "bottomIconLabel": "Gestión de escenarios",
       "sideMenuTitle": "Configuración del escenario",
+      "sections": {
+        "actions": "Acciones"
+      },
       "labels": {
         "scenarioName": "Nombre del escenario",
         "description": "Descripción",
@@ -22,11 +25,13 @@
       "buttons": {
         "updateScenario": "Actualizar escenario",
         "saveScenario": "Guardar escenario",
-        "loadScenario": "Cargar escenario"
+        "loadScenario": "Cargar escenario",
+        "clearTimeBounds": "Borrar límites de tiempo"
       },
       "msgs": {
         "settingsUpdated": "¡Configuración del escenario actualizada correctamente!",
-        "scenarioLoaded": "¡Escenario cargado correctamente!"
+        "scenarioLoaded": "¡Escenario cargado correctamente!",
+        "boundsCleared": "Límites de tiempo borrados. El escenario ahora es ilimitado."
       },
       "errorMsgs": {
         "nameRequired": "El nombre del escenario es obligatorio.",

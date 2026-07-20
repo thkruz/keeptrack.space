@@ -1,10 +1,10 @@
-import { vi } from 'vitest';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-undefined */
 import { Pickable } from '@app/engine/core/interfaces';
 import { SourceColorScheme } from '@app/engine/rendering/color-schemes/source-color-scheme';
 import { CatalogSource } from '@ootk/src/main';
 import { ColorSchemeTestUtils } from '@test/engine/rendering/color-schemes/__helpers__/color-scheme-test-utils';
+import { vi } from 'vitest';
 
 // Mock dependencies
 vi.mock('@app/keepTrackApi', () => ({
@@ -118,7 +118,7 @@ describe('SourceColorScheme', () => {
 
           return sat;
         }),
-        (sat, scheme) => (scheme as SourceColorScheme).update(sat),
+        (sat, scheme) => (scheme as SourceColorScheme).update(sat)
       );
     });
   });

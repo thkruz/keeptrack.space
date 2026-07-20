@@ -32,9 +32,7 @@ export interface DirectionToggle {
   /** Full DOM id of the checkbox. */
   id: string;
   /** Boolean `settingsManager` flag this toggle writes. */
-  flag: 'isAutoRotateL' | 'isAutoRotateR' | 'isAutoRotateU' | 'isAutoRotateD'
-  | 'isAutoPanL' | 'isAutoPanR' | 'isAutoPanU' | 'isAutoPanD'
-  | 'isAutoZoomIn' | 'isAutoZoomOut';
+  flag: 'isAutoRotateL' | 'isAutoRotateR' | 'isAutoRotateU' | 'isAutoRotateD' | 'isAutoPanL' | 'isAutoPanR' | 'isAutoPanU' | 'isAutoPanD' | 'isAutoZoomIn' | 'isAutoZoomOut';
   /** DOM id of the opposite-direction toggle that must turn off when this one turns on. */
   opposite: string;
   /** Whether enabling this toggle should play the toggle-on/off sound. */

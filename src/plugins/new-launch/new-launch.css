@@ -64,3 +64,36 @@
 #newLaunch-menu.kt-ui-v13 #nl-inc:disabled {
   color: var(--color-dark-text-muted);
 }
+
+/*
+ * Launch-window result note. When a window is found it becomes a row with the
+ * matched-time text on the left and a Clear (dismiss) button on the right, so
+ * the armed state reads clearly and can be undone without launching anything.
+ * `display` is toggled inline (none <-> flex) by applyMatchedWindow_/clearMatchedWindow_.
+ */
+#newLaunch-menu .nl-window-result {
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+#newLaunch-menu .nl-window-result .nl-window-found-text {
+  flex: 1 1 auto;
+}
+
+#newLaunch-menu .nl-window-clear {
+  flex: 0 0 auto;
+  background: transparent;
+  border: none;
+  color: var(--color-dark-text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+#newLaunch-menu .nl-window-clear:hover {
+  color: var(--color-dark-text);
+  background: rgb(255 255 255 / 8%);
+}

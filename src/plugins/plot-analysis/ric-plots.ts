@@ -4,15 +4,15 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { SatMathApi } from '@app/engine/math/sat-math-api';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite } from '@ootk/src/main';
 import scatterPlot3Png from '@public/img/icons/scatter-plot3.png';
 import * as echarts from 'echarts';
-import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { assessRelationship, RicAssessment, RicRelationship } from './ric-plots-assessment';
@@ -83,17 +83,14 @@ export class RicPlot extends KeepTrackPlugin {
 
   sideMenuElementName = 'ric-plots-menu';
   sideMenuElementHtml: string = html`
-  <div id="ric-plots-menu" class="side-menu-parent start-hidden plot-analysis-menu-normal">
+  <div id="ric-plots-menu" class="side-menu-parent start-hidden plot-analysis-menu-normal kt-ui-v13">
     <div id="plot-analysis-content" class="side-menu">
       <div class="ric-plots-controls">
         <div class="input-field ric-orbits-field">
           <select id="${this.orbitsSelectId}">
-            ${Array.from(
-    { length: RicPlot.MAX_ORBITS - RicPlot.MIN_ORBITS + 1 },
-    (_, i) => RicPlot.MIN_ORBITS + i,
-  )
-    .map((n) => `<option value="${n}"${n === RicPlot.DEFAULT_ORBITS ? ' selected' : ''}>${n}</option>`)
-    .join('')}
+            ${Array.from({ length: RicPlot.MAX_ORBITS - RicPlot.MIN_ORBITS + 1 }, (_, i) => RicPlot.MIN_ORBITS + i)
+              .map((n) => `<option value="${n}"${n === RicPlot.DEFAULT_ORBITS ? ' selected' : ''}>${n}</option>`)
+              .join('')}
           </select>
           <label>${t7e('plugins.RicPlot.orbitsLabel')}</label>
         </div>
@@ -114,33 +111,27 @@ export class RicPlot extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => this.uiManagerFinal_());
 
-    EventBus.getInstance().on(
-      EventBusEvent.setSecondarySat,
-      (obj: BaseObject | null) => {
-        if (!obj || this.selectSatManager_.selectedSat === -1) {
-          if (this.isMenuButtonActive) {
-            this.hideSideMenus();
-          }
-          this.setBottomIconToDisabled();
-        } else {
-          this.setBottomIconToEnabled();
+    EventBus.getInstance().on(EventBusEvent.setSecondarySat, (obj: BaseObject | null) => {
+      if (!obj || this.selectSatManager_.selectedSat === -1) {
+        if (this.isMenuButtonActive) {
+          this.hideSideMenus();
         }
-      },
-    );
+        this.setBottomIconToDisabled();
+      } else {
+        this.setBottomIconToEnabled();
+      }
+    });
 
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (obj: BaseObject) => {
-        if (!obj || this.selectSatManager_.secondarySat === -1) {
-          if (this.isMenuButtonActive) {
-            this.hideSideMenus();
-          }
-          this.setBottomIconToDisabled();
-        } else {
-          this.setBottomIconToEnabled();
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
+      if (!obj || this.selectSatManager_.secondarySat === -1) {
+        if (this.isMenuButtonActive) {
+          this.hideSideMenus();
         }
-      },
-    );
+        this.setBottomIconToDisabled();
+      } else {
+        this.setBottomIconToEnabled();
+      }
+    });
   }
 
   private uiManagerFinal_(): void {
@@ -287,10 +278,10 @@ export class RicPlot extends KeepTrackPlugin {
     const now = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
     const ricPoints = SatMathApi.getRicOfCurrentOrbit(satS, satP, NUMBER_OF_POINTS, NUMBER_OF_ORBITS);
 
-    return ricPoints.map((point: { x: number, y: number, z: number }, idx: number) => {
+    return ricPoints.map((point: { x: number; y: number; z: number }, idx: number) => {
       // Mirror the time offset used inside getRicOfCurrentOrbit (idx * period * orbits / points)
       // so the time axis matches the propagated samples and spans the full 5-orbit window.
-      const offsetMin = idx * satS.period * NUMBER_OF_ORBITS / NUMBER_OF_POINTS;
+      const offsetMin = (idx * satS.period * NUMBER_OF_ORBITS) / NUMBER_OF_POINTS;
       const range = Math.hypot(point.x, point.y, point.z);
 
       return {

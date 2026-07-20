@@ -30,10 +30,14 @@ import {
   DEG2RAD,
   Degrees,
   EcefVec3,
+  ecefRad2rae,
+  eci2ecef,
+  eci2lla,
   GreenwichMeanSiderealTime,
   Kilometers,
   KilometersPerSecond,
   LandObject,
+  lla2eci,
   Milliseconds,
   Minutes,
   Radians,
@@ -45,17 +49,13 @@ import {
   TAU,
   TemeVec3,
   Vector3D,
-  ecefRad2rae,
-  eci2ecef,
-  eci2lla,
-  lla2eci,
 } from '@ootk/src/main';
 import { GROUND_BUFFER_DISTANCE, RADIUS_OF_EARTH, STAR_DISTANCE } from '../engine/utils/constants';
 import { PosCruncherCachedObject, PositionCruncherIncomingMsg, PositionCruncherOutgoingMsg } from './constants';
 import { MarkerMode, PosCruncherMsgType } from './position-cruncher-messages';
-import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 import { setupTimeVariables } from './positionCruncher/calculations';
 import { resetPosition, resetVelocity } from './positionCruncher/satCache';
+import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
 export interface CruncherSat {
   // Satellites
@@ -97,7 +97,6 @@ export enum CruncerMessageTypes {
   CAMERA_DATA = 'CAMERA_DATA',
 }
 
-
 const EMPTY_FLOAT32_ARRAY = new Float32Array(0);
 const EMPTY_INT8_ARRAY = new Int8Array(0);
 
@@ -109,7 +108,6 @@ let satVel = EMPTY_FLOAT32_ARRAY; // Array of current Satellite and Static Veloc
 let satInView = EMPTY_INT8_ARRAY; // Array of booleans showing if current Satellite is in view of Sensor
 let satInSun = EMPTY_INT8_ARRAY; // Array of booleans showing if current Satellite is in sunlight
 const sensorMarkerArray = [0]; // Array of Markers used to show sensor fence and FOV
-
 
 let isInterrupted = false; // Boolean used to determine if the worker is interupted
 
@@ -398,7 +396,7 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
         isFrustumCullingEnabled_ = m.data.isFrustumCullingEnabled;
       }
 
-return;
+      return;
     default:
       // NOTE: For debugging turn this on
 
@@ -444,10 +442,7 @@ const isInFrustum_ = (x: number, y: number, z: number, vp: Float32Array): boolea
  * Uses closest-point-on-segment test: project Earth center (origin) onto
  * the camera→satellite segment and check distance to Earth surface.
  */
-const isOccludedByEarth_ = (
-  satX: number, satY: number, satZ: number,
-  camX: number, camY: number, camZ: number,
-): boolean => {
+const isOccludedByEarth_ = (satX: number, satY: number, satZ: number, camX: number, camY: number, camZ: number): boolean => {
   const dx = satX - camX;
   const dy = satY - camY;
   const dz = satZ - camZ;
@@ -585,7 +580,7 @@ export const propagationLoop = (mockSatCache?: PosCruncherCachedObject[]) => {
     () => {
       propagationLoop();
     },
-    (PROPAGATION_INTERVAL * delay) / divisor,
+    (PROPAGATION_INTERVAL * delay) / divisor
   );
 };
 
@@ -617,7 +612,7 @@ export const updateSatCache = (now: Date, j: number, gmst: GreenwichMeanSidereal
     if (objCache[i].satrec) {
       // Off-screen satellites: skip SGP4 most cycles, extrapolate with velocity instead
       // Stagger by satellite index so SGP4 corrections are spread across cycles
-      if (isOnScreen_.length > i && !isOnScreen_[i] && ((tierCycleCounter_ + i) % OFF_SCREEN_UPDATE_INTERVAL_) !== 0) {
+      if (isOnScreen_.length > i && !isOnScreen_[i] && (tierCycleCounter_ + i) % OFF_SCREEN_UPDATE_INTERVAL_ !== 0) {
         if (cycleDtSec > 0) {
           const i3 = i * 3;
 
@@ -724,10 +719,7 @@ export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: Gree
   // a spherical approximation. (The rendered dot is recomputed on the main thread every frame; this
   // worker value feeds the 1 Hz sensor in-view check below.)
   const sample = interpolateMissileSample(missile.latList, missile.lonList, missile.altList, missile.startTime, now.getTime());
-  const missileEci = lla2eci(
-    { lat: (sample.lat * DEG2RAD) as Radians, lon: (sample.lon * DEG2RAD) as Radians, alt: sample.alt as Kilometers },
-    gmst,
-  );
+  const missileEci = lla2eci({ lat: (sample.lat * DEG2RAD) as Radians, lon: (sample.lon * DEG2RAD) as Radians, alt: sample.alt as Kilometers }, gmst);
 
   satPos[i * 3] = missileEci.x;
   satPos[i * 3 + 1] = missileEci.y;

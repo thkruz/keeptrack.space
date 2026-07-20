@@ -1,6 +1,6 @@
 /**
  * @jest-environment jsdom
-*/
+ */
 
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -85,18 +85,19 @@ describe('HelpComponent', () => {
       const callCountBefore = showAdviceMock.mock.calls.length;
 
       const isActive = vi.fn().mockReturnValue(true);
-      const component = new HelpComponent('test-plugin', createConfig({
-        title: 'My Feature Help',
-        body: 'Click the button to activate the feature.',
-      }), isActive);
+      const component = new HelpComponent(
+        'test-plugin',
+        createConfig({
+          title: 'My Feature Help',
+          body: 'Click the button to activate the feature.',
+        }),
+        isActive
+      );
 
       component.init();
       eventBus.emit(EventBusEvent.onHelpMenuClick);
 
-      expect(showAdviceMock).toHaveBeenLastCalledWith(
-        'My Feature Help',
-        'Click the button to activate the feature.',
-      );
+      expect(showAdviceMock).toHaveBeenLastCalledWith('My Feature Help', 'Click the button to activate the feature.');
       expect(showAdviceMock.mock.calls.length).toBeGreaterThan(callCountBefore);
     });
 
@@ -104,18 +105,20 @@ describe('HelpComponent', () => {
       const showAdviceMock = adviceManagerInstance.showAdvice as Mock;
 
       const isActive = vi.fn().mockReturnValue(false);
-      const component = new HelpComponent('test-plugin', createConfig({
-        title: 'Unique Inactive Title',
-        body: 'Unique inactive body',
-      }), isActive);
+      const component = new HelpComponent(
+        'test-plugin',
+        createConfig({
+          title: 'Unique Inactive Title',
+          body: 'Unique inactive body',
+        }),
+        isActive
+      );
 
       component.init();
       eventBus.emit(EventBusEvent.onHelpMenuClick);
 
       // Verify our specific handler wasn't called by checking the mock wasn't called with our specific arguments
-      const callsWithOurArgs = showAdviceMock.mock.calls.filter(
-        (call) => (call as [string, string])[0] === 'Unique Inactive Title',
-      );
+      const callsWithOurArgs = showAdviceMock.mock.calls.filter((call) => (call as [string, string])[0] === 'Unique Inactive Title');
 
       expect(callsWithOurArgs.length).toBe(0);
     });
@@ -143,17 +146,18 @@ describe('HelpComponent', () => {
   describe('showHelp', () => {
     it.skip('should show help using advice manager', () => {
       const isActive = vi.fn().mockReturnValue(true);
-      const component = new HelpComponent('test-plugin', createConfig({
-        title: 'Direct Show Title',
-        body: 'Direct show body.',
-      }), isActive);
+      const component = new HelpComponent(
+        'test-plugin',
+        createConfig({
+          title: 'Direct Show Title',
+          body: 'Direct show body.',
+        }),
+        isActive
+      );
 
       component.showHelp();
 
-      expect(adviceManagerInstance.showAdvice).toHaveBeenCalledWith(
-        'Direct Show Title',
-        'Direct show body.',
-      );
+      expect(adviceManagerInstance.showAdvice).toHaveBeenCalledWith('Direct Show Title', 'Direct show body.');
     });
 
     it.skip('should be callable without initialization', () => {
@@ -169,18 +173,26 @@ describe('HelpComponent', () => {
   describe('getters', () => {
     it('should return title from config', () => {
       const isActive = vi.fn();
-      const component = new HelpComponent('test-plugin', createConfig({
-        title: 'Custom Title',
-      }), isActive);
+      const component = new HelpComponent(
+        'test-plugin',
+        createConfig({
+          title: 'Custom Title',
+        }),
+        isActive
+      );
 
       expect(component.title).toBe('Custom Title');
     });
 
     it('should return body from config', () => {
       const isActive = vi.fn();
-      const component = new HelpComponent('test-plugin', createConfig({
-        body: 'Custom body content with <strong>HTML</strong>.',
-      }), isActive);
+      const component = new HelpComponent(
+        'test-plugin',
+        createConfig({
+          body: 'Custom body content with <strong>HTML</strong>.',
+        }),
+        isActive
+      );
 
       expect(component.body).toBe('Custom body content with <strong>HTML</strong>.');
     });
@@ -206,10 +218,14 @@ describe('HelpComponent', () => {
 
       let isActiveState = false;
       const isActive = vi.fn(() => isActiveState);
-      const component = new HelpComponent('test-plugin', createConfig({
-        title: uniqueTitle,
-        body: 'Changing state test body',
-      }), isActive);
+      const component = new HelpComponent(
+        'test-plugin',
+        createConfig({
+          title: uniqueTitle,
+          body: 'Changing state test body',
+        }),
+        isActive
+      );
 
       component.init();
 
@@ -217,9 +233,7 @@ describe('HelpComponent', () => {
       eventBus.emit(EventBusEvent.onHelpMenuClick);
 
       // Verify our specific help was not shown
-      let callsWithOurTitle = showAdviceMock.mock.calls.filter(
-        (call) => (call as [string, string])[0] === uniqueTitle,
-      );
+      let callsWithOurTitle = showAdviceMock.mock.calls.filter((call) => (call as [string, string])[0] === uniqueTitle);
 
       expect(callsWithOurTitle.length).toBe(0);
 
@@ -229,9 +243,7 @@ describe('HelpComponent', () => {
       // Second call - active
       eventBus.emit(EventBusEvent.onHelpMenuClick);
 
-      callsWithOurTitle = showAdviceMock.mock.calls.filter(
-        (call) => (call as [string, string])[0] === uniqueTitle,
-      );
+      callsWithOurTitle = showAdviceMock.mock.calls.filter((call) => (call as [string, string])[0] === uniqueTitle);
       expect(callsWithOurTitle.length).toBe(1);
 
       // Change state back to inactive
@@ -240,9 +252,7 @@ describe('HelpComponent', () => {
       // Third call - not active again
       eventBus.emit(EventBusEvent.onHelpMenuClick);
 
-      callsWithOurTitle = showAdviceMock.mock.calls.filter(
-        (call) => (call as [string, string])[0] === uniqueTitle,
-      );
+      callsWithOurTitle = showAdviceMock.mock.calls.filter((call) => (call as [string, string])[0] === uniqueTitle);
       expect(callsWithOurTitle.length).toBe(1); // Still only 1 call with our title
     });
   });

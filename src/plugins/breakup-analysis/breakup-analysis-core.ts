@@ -100,8 +100,12 @@ export const calcAltitudeStats = (sats: Satellite[]): AltitudeStats => {
   const apogee = calcFieldStats(sats, (s) => s.apogee);
 
   return {
-    minPerigee: perigee.min, maxPerigee: perigee.max, meanPerigee: perigee.mean,
-    minApogee: apogee.min, maxApogee: apogee.max, meanApogee: apogee.mean,
+    minPerigee: perigee.min,
+    maxPerigee: perigee.max,
+    meanPerigee: perigee.mean,
+    minApogee: apogee.min,
+    maxApogee: apogee.max,
+    meanApogee: apogee.mean,
   };
 };
 

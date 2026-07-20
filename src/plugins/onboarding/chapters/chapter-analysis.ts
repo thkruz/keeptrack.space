@@ -92,7 +92,7 @@ export const analysisChapter: ChapterDefinition = {
         featureId: 'dops',
         title: l('teasers.dops.title'),
         body: l('teasers.dops.body'),
-      },
+      }
     ),
     {
       id: 'a5-what-if',

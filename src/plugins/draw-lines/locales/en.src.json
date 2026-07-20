@@ -43,7 +43,8 @@
         "satScanEarth": "Earth Scan",
         "sensorScanHorizon": "Horizon Scan",
         "sensorToRae": "Sensor to Point",
-        "generic": "Line"
+        "generic": "Line",
+        "sensorMarker": "Sensor Location Marker"
       },
       "errorMsgs": {
         "noPrimarySat": "No primary satellite selected for Satellite to Satellite line.",

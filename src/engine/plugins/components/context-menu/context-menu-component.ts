@@ -23,7 +23,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
-import { IContextMenuConfig } from '../../core/plugin-capabilities';
+import { IContextMenuConfig, RmbMenuContext } from '../../core/plugin-capabilities';
 
 /**
  * Default values for context menu configuration.
@@ -39,11 +39,18 @@ const DEFAULTS = {
  */
 export interface ContextMenuItemInfo {
   elementIdL1: string;
+  /**
+   * Empty string for single-action items (no submenu).
+   */
   elementIdL2: string;
   order: number;
   isRmbOnEarth: boolean;
   isRmbOffEarth: boolean;
   isRmbOnSat: boolean;
+  /**
+   * Overrides the boolean flags when provided.
+   */
+  isVisible?: (ctx: RmbMenuContext) => boolean;
 }
 
 /**
@@ -56,6 +63,11 @@ export interface ContextMenuCallbacks {
    * @param clickedSatId The ID of the satellite that was right-clicked, if any.
    */
   onAction: (targetId: string, clickedSatId?: number) => void;
+
+  /**
+   * Called each time the context menu opens, before it is displayed.
+   */
+  onOpen?: (ctx: RmbMenuContext) => void;
 }
 
 /**
@@ -67,7 +79,7 @@ export interface ContextMenuCallbacks {
  * - Handling menu item actions
  */
 export class ContextMenuComponent {
-  private readonly config: Required<IContextMenuConfig>;
+  private readonly config: Required<Omit<IContextMenuConfig, 'isVisible'>> & Pick<IContextMenuConfig, 'isVisible'>;
   private readonly pluginId: string;
   private readonly callbacks: ContextMenuCallbacks;
 
@@ -81,11 +93,7 @@ export class ContextMenuComponent {
    * @param config The configuration for the context menu.
    * @param callbacks Callbacks for menu events.
    */
-  constructor(
-    pluginId: string,
-    config: IContextMenuConfig,
-    callbacks: ContextMenuCallbacks,
-  ) {
+  constructor(pluginId: string, config: IContextMenuConfig, callbacks: ContextMenuCallbacks) {
     this.pluginId = pluginId;
     this.callbacks = callbacks;
 
@@ -93,9 +101,10 @@ export class ContextMenuComponent {
     this.config = {
       level1Html: config.level1Html,
       level1ElementName: config.level1ElementName,
-      level2Html: config.level2Html,
-      level2ElementName: config.level2ElementName,
+      level2Html: config.level2Html ?? '',
+      level2ElementName: config.level2ElementName ?? '',
       order: config.order ?? DEFAULTS.ORDER,
+      isVisible: config.isVisible,
       isVisibleOnEarth: config.isVisibleOnEarth ?? false,
       isVisibleOffEarth: config.isVisibleOffEarth ?? false,
       isVisibleOnSatellite: config.isVisibleOnSatellite ?? false,
@@ -113,6 +122,7 @@ export class ContextMenuComponent {
       isRmbOnEarth: this.config.isVisibleOnEarth,
       isRmbOffEarth: this.config.isVisibleOffEarth,
       isRmbOnSat: this.config.isVisibleOnSatellite,
+      isVisible: this.config.isVisible,
     };
   }
 
@@ -127,6 +137,7 @@ export class ContextMenuComponent {
     this.registerLevel1Creation();
     this.registerLevel2Creation();
     this.registerActionHandler();
+    this.registerOpenHandler();
     this.registerWithInputManager();
 
     this.isInitialized = true;
@@ -184,9 +195,12 @@ export class ContextMenuComponent {
   }
 
   /**
-   * Register the level 2 submenu creation.
+   * Register the level 2 submenu creation. Single-action items have no submenu.
    */
   private registerLevel2Creation(): void {
+    if (!this.config.level2Html || !this.config.level2ElementName) {
+      return;
+    }
     EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
       this.createLevel2Element();
     });
@@ -214,12 +228,21 @@ export class ContextMenuComponent {
    * Register the action handler for menu item clicks.
    */
   private registerActionHandler(): void {
-    EventBus.getInstance().on(
-      EventBusEvent.rmbMenuActions,
-      (targetId: string, clickedSatId?: number) => {
-        this.callbacks.onAction(targetId, clickedSatId);
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.rmbMenuActions, (targetId: string, clickedSatId?: number) => {
+      this.callbacks.onAction(targetId, clickedSatId);
+    });
+  }
+
+  /**
+   * Register the menu-open handler so the plugin can adjust its items per context.
+   */
+  private registerOpenHandler(): void {
+    if (!this.callbacks.onOpen) {
+      return;
+    }
+    EventBus.getInstance().on(EventBusEvent.rightBtnMenuOpen, (ctx: RmbMenuContext) => {
+      this.callbacks.onOpen!(ctx);
+    });
   }
 
   /**
@@ -244,6 +267,10 @@ export class ContextMenuComponent {
    * Get the level 2 DOM element.
    */
   getLevel2Element(): HTMLElement | null {
+    if (!this.config.level2ElementName) {
+      return null;
+    }
+
     return this.level2Element ?? getEl(this.config.level2ElementName);
   }
 }

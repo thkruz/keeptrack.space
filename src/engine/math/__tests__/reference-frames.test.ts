@@ -1,5 +1,5 @@
-import { mat4 } from 'gl-matrix';
 import { getJ200ToTemeMatrix, getTemeToJ2000Matrix } from '@app/engine/math/reference-frames';
+import { mat4 } from 'gl-matrix';
 
 /*
  * J2000<->TEME rotation matrices built from precession + nutation. These are

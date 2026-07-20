@@ -1,8 +1,8 @@
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { KeepTrack } from '@app/keeptrack';
 import { getEl } from './get-el';
 import { hideLoading, showLoading } from './showLoading';
 import { slideInRight, slideOutLeft } from './slide';
-import { KeepTrack } from '@app/keeptrack';
 
 interface ColorboxOptions {
   title?: string;
@@ -74,7 +74,7 @@ export const closeColorbox = (): void => {
     () => {
       colorboxDom.style.display = 'none';
     },
-    -200,
+    -200
   );
 
   clearColorboxTitle();

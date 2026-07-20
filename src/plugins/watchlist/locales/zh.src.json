@@ -47,6 +47,10 @@
             "all": "全部监视列表"
           }
         }
+      },
+      "rmbMenu": {
+        "addToWatchlist": "添加到监视列表",
+        "removeFromWatchlist": "从监视列表中移除"
       }
     },
     "WatchlistOverlay": {

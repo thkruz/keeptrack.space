@@ -43,7 +43,8 @@
         "satScanEarth": "Sken Země",
         "sensorScanHorizon": "Sken horizontu",
         "sensorToRae": "Senzor k bodu",
-        "generic": "Čára"
+        "generic": "Čára",
+        "sensorMarker": "Značka polohy senzoru"
       },
       "errorMsgs": {
         "noPrimarySat": "Nebyl vybrán primární satelit pro linii satelit–satelit.",

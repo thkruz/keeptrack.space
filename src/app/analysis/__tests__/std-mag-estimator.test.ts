@@ -9,18 +9,19 @@ import {
 import { Satellite, SpaceObjectType } from '@ootk/src/main';
 import { describe, expect, it } from 'vitest';
 
-const makeSat = (overrides: Partial<Satellite>): Satellite => ({
-  id: 0,
-  name: '',
-  type: SpaceObjectType.PAYLOAD,
-  bus: '',
-  length: '',
-  diameter: '',
-  span: '',
-  rcs: null,
-  vmag: null,
-  ...overrides,
-} as unknown as Satellite);
+const makeSat = (overrides: Partial<Satellite>): Satellite =>
+  ({
+    id: 0,
+    name: '',
+    type: SpaceObjectType.PAYLOAD,
+    bus: '',
+    length: '',
+    diameter: '',
+    span: '',
+    rcs: null,
+    vmag: null,
+    ...overrides,
+  }) as unknown as Satellite;
 
 describe('lookupKnownVmag', () => {
   it('matches a Starlink name prefix to the curated v1.5 entry', () => {
@@ -205,16 +206,13 @@ describe('estimateStdMag (numeric convenience)', () => {
 });
 
 describe('KNOWN_OBJECT_MAGNITUDES calibration', () => {
-  it.each(KNOWN_OBJECT_MAGNITUDES.map((entry) => [entry.id, entry.vmag]))(
-    '%s vmag is finite and within a plausible observation range',
-    (_id, vmag) => {
-      expect(isFinite(vmag as number)).toBe(true);
-      // Brightest object catalogued is the ISS (~-1.3); faintest GEO comsats
-      // sit near +12. Anything outside that range is almost certainly a typo.
-      expect(vmag as number).toBeGreaterThan(-5);
-      expect(vmag as number).toBeLessThan(15);
-    },
-  );
+  it.each(KNOWN_OBJECT_MAGNITUDES.map((entry) => [entry.id, entry.vmag]))('%s vmag is finite and within a plausible observation range', (_id, vmag) => {
+    expect(isFinite(vmag as number)).toBe(true);
+    // Brightest object catalogued is the ISS (~-1.3); faintest GEO comsats
+    // sit near +12. Anything outside that range is almost certainly a typo.
+    expect(vmag as number).toBeGreaterThan(-5);
+    expect(vmag as number).toBeLessThan(15);
+  });
 
   it('contains an ISS entry (sanity check for headline-known object)', () => {
     const iss = KNOWN_OBJECT_MAGNITUDES.find((entry) => entry.id === 'iss');

@@ -55,25 +55,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        task: [eslint, unit-test, typecheck]
+        task: [lint, unit-test, typecheck]
     steps:
       - uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24'
-
-      - name: Cache node modules
-        uses: actions/cache@v5
-        with:
-          path: ~/.npm
-          key: >-
-            ${{ runner.os }}-build-node-modules-${{
-            hashFiles('**/package-lock.json') }}
-          restore-keys: >-
-            ${{ runner.os }}-build-node-modules-${{
-            runner.os }}-
+          cache: 'pnpm'
 
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.9.0
@@ -83,7 +76,7 @@ jobs:
         run: git submodule update --init --recursive
 
       - name: Install Dependencies
-        run: npm ci --ignore-scripts
+        run: pnpm install --frozen-lockfile
 
       - name: Set Timezone (only for tests)
         if: matrix.task == 'unit-test'
@@ -91,20 +84,22 @@ jobs:
         with:
           timezoneLinux: 'America/New_York'
 
-      - name: Run ESLint
-        if: matrix.task == 'eslint'
+      - name: Run Biome
+        if: matrix.task == 'lint'
         run: |
-          echo "Running ESLint..."
-          npm run lint
-          echo '### ESLint Passed' >> $GITHUB_STEP_SUMMARY
+          echo "Running Biome check..."
+          pnpm run lint
+          echo "Running Biome check on plugins-pro..."
+          pnpm run lint:pro
+          echo '### Biome Passed' >> $GITHUB_STEP_SUMMARY
 
       - name: Run Unit Tests
         if: matrix.task == 'unit-test'
         run: |
           echo "Creating tranlation files..."
-          npm run generate-t7e
+          pnpm run generate-t7e
           echo "Running Unit Tests (with coverage gate)..."
-          npm run test:coverage
+          pnpm run test:coverage
           echo '### Unit Tests Passed' >> $GITHUB_STEP_SUMMARY
 
       - name: Upload coverage report
@@ -119,9 +114,9 @@ jobs:
         if: matrix.task == 'typecheck'
         run: |
           echo "Creating translation files..."
-          npm run generate-t7e
+          pnpm run generate-t7e
           echo "Running Type Check..."
-          npm run typecheck
+          pnpm run typecheck
           echo '### Type Check Passed' >> $GITHUB_STEP_SUMMARY
   lint-and-test-oss:
     needs: compliance
@@ -132,25 +127,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        task: [eslint, unit-test, typecheck]
+        task: [lint, unit-test, typecheck]
     steps:
       - uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24'
-
-      - name: Cache node modules
-        uses: actions/cache@v5
-        with:
-          path: ~/.npm
-          key: >-
-            ${{ runner.os }}-build-node-modules-${{
-            hashFiles('**/package-lock.json') }}
-          restore-keys: >-
-            ${{ runner.os }}-build-node-modules-${{
-            runner.os }}-
+          cache: 'pnpm'
 
       # No "Set up SSH" — OSS contributors do not have SSH access.
       # Initialize ONLY the public ootk submodule (HTTPS, required for builds).
@@ -167,7 +155,7 @@ jobs:
           echo "Confirmed src/plugins-pro is empty"
 
       - name: Install Dependencies
-        run: npm ci --ignore-scripts
+        run: pnpm install --frozen-lockfile
 
       - name: Set Timezone (only for tests)
         if: matrix.task == 'unit-test'
@@ -175,29 +163,29 @@ jobs:
         with:
           timezoneLinux: 'America/New_York'
 
-      - name: Run ESLint
-        if: matrix.task == 'eslint'
+      - name: Run Biome
+        if: matrix.task == 'lint'
         run: |
-          echo "Running ESLint (OSS)..."
-          npm run lint
-          echo '### ESLint (OSS) Passed' >> $GITHUB_STEP_SUMMARY
+          echo "Running Biome check (OSS)..."
+          pnpm run lint
+          echo '### Biome (OSS) Passed' >> $GITHUB_STEP_SUMMARY
 
       - name: Run Unit Tests
         if: matrix.task == 'unit-test'
         run: |
           echo "Creating translation files..."
-          npm run generate-t7e
+          pnpm run generate-t7e
           echo "Running Unit Tests (OSS)..."
-          npm test
+          pnpm test
           echo '### Unit Tests (OSS) Passed' >> $GITHUB_STEP_SUMMARY
 
       - name: Run Type Check
         if: matrix.task == 'typecheck'
         run: |
           echo "Creating translation files..."
-          npm run generate-t7e
+          pnpm run generate-t7e
           echo "Running Type Check (OSS)..."
-          npm run typecheck
+          pnpm run typecheck
           echo '### Type Check (OSS) Passed' >> $GITHUB_STEP_SUMMARY
   build:
     needs: [lint-and-test, lint-and-test-oss]
@@ -214,21 +202,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v6
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24'
-
-      - name: Cache node modules
-        uses: actions/cache@v5
-        with:
-          path: ~/.npm
-          key: >-
-            ${{ runner.os }}-build-node-modules-${{
-            hashFiles('**/package-lock.json') }}
-          restore-keys: >-
-            ${{ runner.os }}-build-node-modules-${{
-            runner.os }}-
+          cache: 'pnpm'
 
       # OSS profile: no SSH, only the public ootk submodule.
       - name: Update public submodules only (OSS)
@@ -253,13 +234,13 @@ jobs:
         run: git submodule update --init --recursive
 
       - name: Install Dependencies
-        run: npm ci --ignore-scripts
+        run: pnpm install --frozen-lockfile
 
       - name: Build
         run: |
-          npx tsx ./build/generate-translation.ts
+          pnpm exec tsx ./build/generate-translation.ts
           PROFILE=${{ matrix.profile }}
-          npx tsx ./build/build-manager.ts production \
+          pnpm exec tsx ./build/build-manager.ts production \
             --profile="$PROFILE" --skip-locales
 
       - name: Verify output
@@ -280,28 +261,21 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v6
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24'
-
-      - name: Cache node modules
-        uses: actions/cache@v5
-        with:
-          path: ~/.npm
-          key: >-
-            ${{ runner.os }}-build-node-modules-${{
-            hashFiles('**/package-lock.json') }}
-          restore-keys: >-
-            ${{ runner.os }}-build-node-modules-${{
-            runner.os }}-
+          cache: 'pnpm'
 
       # boot-smoke only ever builds the oss profile, so skip SSH entirely.
       - name: Update public submodules only
         run: git submodule update --init --recursive -- src/engine/ootk
 
       - name: Install Dependencies
-        run: npm ci --ignore-scripts
+        run: pnpm install --frozen-lockfile
 
       - name: Cache Playwright browsers
         uses: actions/cache@v5
@@ -309,22 +283,22 @@ jobs:
           path: ~/.cache/ms-playwright
           key: >-
             ${{ runner.os }}-playwright-${{
-            hashFiles('**/package-lock.json') }}
+            hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: >-
             ${{ runner.os }}-playwright-
 
       - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Build (oss)
         run: |
-          npx tsx ./build/generate-translation.ts
-          npx tsx ./build/build-manager.ts production --profile=oss --skip-locales
+          pnpm exec tsx ./build/generate-translation.ts
+          pnpm exec tsx ./build/build-manager.ts production --profile=oss --skip-locales
 
       - name: Run Boot Smoke Test
         run: |
           echo "Running app boot smoke tests..."
-          npm run test:e2e:smoke
+          pnpm run test:e2e:smoke
           echo '### Boot Smoke Test Passed' >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Playwright report on failure

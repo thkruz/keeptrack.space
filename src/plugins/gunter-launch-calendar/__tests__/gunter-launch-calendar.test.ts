@@ -1,8 +1,8 @@
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { createColorbox } from '@app/engine/utils/colorbox';
 import { GunterLaunchCalendar } from '@app/plugins/gunter-launch-calendar/gunter-launch-calendar';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { createColorbox } from '@app/engine/utils/colorbox';
 import { settingsManager } from '@app/settings/settings';
 import { setupDefaultHtml, setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';

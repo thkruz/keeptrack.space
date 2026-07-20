@@ -4,10 +4,13 @@
       "bottomIconLabel": "Sensori",
       "title": "Menu elenco sensori",
       "labels": {
+        "categorySurveillance": "Sorveglianza spaziale",
+        "categoryTtc": "Controllo satelliti e comunicazioni",
         "missingData": "Dati mancanti",
         "tooltipSensorsInFov": "Visualizza la copertura dei sensori"
       },
       "buttons": {
+        "markAll": "Contrassegna {name}",
         "resetSensor": "Reimposta sensore",
         "showSensorsWithFov": "Mostra tutti i sensori con campo visivo..."
       },
@@ -21,13 +24,16 @@
         "imgAlt": "Il menu Sensori che mostra reti di sensori raggruppate",
         "imgCaption": "I sensori sono raggruppati per rete. Fai clic sull'intestazione di un gruppo per selezionare l'intera rete in una volta.",
         "sensorTypesHeading": "Tipi di sensori",
-        "sensorTypes": "<ul><li><strong>Radar a scansione elettronica</strong>: scansione ampia e veloce; generalmente limitati all'orbita terrestre bassa (LEO).</li><li><strong>Radar meccanici</strong>: antenne orientabili utilizzabili sia contro LEO che contro l'orbita geostazionaria (GEO).</li><li><strong>Telescopi ottici</strong>: usati principalmente per GEO e lo spazio profondo; funzionano solo di notte con cieli sereni, mentre i radar funzionano giorno e notte.</li></ul>",
+        "sensorTypes": "<ul><li><strong>Radar a scansione elettronica</strong>: scansione ampia e veloce; generalmente limitati all'orbita terrestre bassa (LEO).</li><li><strong>Radar meccanici</strong>: antenne orientabili utilizzabili sia contro LEO che contro l'orbita geostazionaria (GEO).</li><li><strong>Telescopi ottici</strong>: usati principalmente per GEO e lo spazio profondo; funzionano solo di notte con cieli sereni, mentre i radar funzionano giorno e notte.</li><li><strong>Antenne TT&C</strong>: antenne di comunicazione orientabili (DSN, ESTRACK, SCN, Galileo) che inseguono i satelliti cooperativi tramite il loro downlink radio; non possono rilevare oggetti non cooperativi o detriti.</li></ul>",
         "howToUse": "<ol><li>Apri il menu dalla barra inferiore o premi S.</li><li>Fai clic su un singolo sensore per selezionarlo. La telecamera vola fino alla sua posizione.</li><li>Oppure fai clic sull'intestazione di un gruppo (es. \"All Space Surveillance Network Sensors\") per selezionare l'intera rete, ottimo per visualizzare la copertura.</li><li>Usa <strong>Reimposta sensore</strong> per annullare la selezione.</li></ol>",
         "tip1": "Molti calcoli (come gli angoli di osservazione) richiedono un singolo sensore. Se hai selezionato un'intera rete, usa invece il menu degli angoli di osservazione multi-sito oppure scegli un sensore alla volta.",
         "tip2": "Ogni sensore è disponibile anche dalla palette dei comandi: digita il nome del sensore per passare senza aprire questo menu.",
         "tip3": "I parametri dei sensori provengono da dati pubblicamente disponibili; puoi esaminarli nel menu Info sensore. Le correzioni sono benvenute all'indirizzo admin@keeptrack.space.",
         "shortcutToggle": "Attiva/disattiva il menu Sensori",
         "shortcutCamera": "Punta la telecamera sul sensore corrente"
+      },
+      "rmbMenu": {
+        "useThisSensor": "Usa questo sensore"
       }
     }
   }

@@ -1,9 +1,9 @@
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { GeolocationPosition, SensorGeolocation } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Degrees, Kilometers, ZoomValue } from '@ootk/src/main';
-import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl, setInnerHtml } from '../../engine/utils/get-el';
 import { lat2pitch, lon2yaw } from '../../engine/utils/transforms';

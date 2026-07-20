@@ -1,8 +1,10 @@
 import { vi } from 'vitest';
+
 /**
  * @jest-environment jsdom
  */
 
+import { MenuMode } from '@app/engine/core/interfaces';
 import {
   hasBottomIcon,
   hasContextMenu,
@@ -23,18 +25,17 @@ import {
   IHelpConfig,
   IKeyboardShortcut,
   IKeyboardShortcutCapable,
+  IRequiresSatellite,
+  IRequiresSensor,
   ISecondaryMenuCapable,
   ISecondaryMenuConfig,
   ISettingsContribution,
   ISettingsContributor,
   ISideMenuCapable,
   ISideMenuConfig,
-  IRequiresSatellite,
-  IRequiresSensor,
   requiresSatellite,
   requiresSensor,
 } from '@app/engine/plugins/core/plugin-capabilities';
-import { MenuMode } from '@app/engine/core/interfaces';
 
 describe('Plugin Capabilities Type Guards', () => {
   describe('hasBottomIcon', () => {
@@ -297,7 +298,9 @@ describe('Plugin Capability Interfaces', () => {
         ctrl: false,
         shift: false,
         alt: false,
-        callback: () => { /* toggle something */ },
+        callback: () => {
+          /* toggle something */
+        },
       };
 
       expect(shortcut.key).toBe('N');
@@ -307,7 +310,9 @@ describe('Plugin Capability Interfaces', () => {
     it('should accept minimal configuration', () => {
       const shortcut: IKeyboardShortcut = {
         key: 'Escape',
-        callback: () => { /* close menu */ },
+        callback: () => {
+          /* close menu */
+        },
       };
 
       expect(shortcut.key).toBe('Escape');

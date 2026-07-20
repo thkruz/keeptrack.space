@@ -3,8 +3,8 @@ import { Pickable } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { VisualMagnitudeColorScheme } from '@app/engine/rendering/color-schemes/visual-magnitude-color-scheme';
 import { SpaceObjectType } from '@ootk/src/main';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ColorSchemeTestUtils } from '@test/engine/rendering/color-schemes/__helpers__/color-scheme-test-utils';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockSats: any[] = [];
 
@@ -279,9 +279,7 @@ describe('VisualMagnitudeColorScheme', () => {
     it('exposes a non-empty layersHtml with the eight expected swatches', () => {
       const slugs = ColorSchemeTestUtils.extractLegendSlugs(VisualMagnitudeColorScheme.layersHtml);
 
-      expect(slugs.sort((a, b) => a.localeCompare(b))).toEqual(
-        ['vmagBright', 'vmagBright2', 'vmagDim1', 'vmagDim2', 'vmagFaint', 'vmagMed1', 'vmagMed2', 'vmagUnknown'],
-      );
+      expect(slugs.sort((a, b) => a.localeCompare(b))).toEqual(['vmagBright', 'vmagBright2', 'vmagDim1', 'vmagDim2', 'vmagFaint', 'vmagMed1', 'vmagMed2', 'vmagUnknown']);
     });
   });
 });

@@ -6,7 +6,6 @@
         "earthInfo": "地球情報",
         "sensorInfo": "センサー情報",
         "launchSiteInfo": "打上げサイト情報",
-        "satelliteInfo": "衛星情報",
         "relatedSatellites": "関連衛星"
       },
       "errorMsgs": {

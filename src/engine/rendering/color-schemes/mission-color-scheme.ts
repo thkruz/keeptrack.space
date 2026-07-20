@@ -47,7 +47,8 @@ export class MissionColorScheme extends ColorScheme {
   constructor() {
     super(MissionColorScheme.uniqueColorTheme);
     this.objectTypeFlags = {
-      ...this.objectTypeFlags, ...MissionColorScheme.uniqueObjectTypeFlags,
+      ...this.objectTypeFlags,
+      ...MissionColorScheme.uniqueObjectTypeFlags,
     };
   }
 
@@ -135,7 +136,6 @@ export class MissionColorScheme extends ColorScheme {
       color: this.colorTheme.deselected,
       pickable: Pickable.No,
     };
-
   }
 
   /**
@@ -155,57 +155,165 @@ export class MissionColorScheme extends ColorScheme {
 
     // Define mapping of keywords to categories
     const categoryKeywords: Record<string, string[]> = {
-      'Military': [
-        'military', 'defense', 'reconnaissance', 'intelligence', 'surveillance',
-        'spy', 'military communications', 'milcom', 'military satellite',
-        'reconnaissance satellite', 'military observation', 'military reconnaissance',
-        'military technology', 'military mission', 'military application',
-        'early warning', 'missile warning', 'strategic warning', 'threat detection',
-        'ballistic missile warning', 'nuclear warning',
+      Military: [
+        'military',
+        'defense',
+        'reconnaissance',
+        'intelligence',
+        'surveillance',
+        'spy',
+        'military communications',
+        'milcom',
+        'military satellite',
+        'reconnaissance satellite',
+        'military observation',
+        'military reconnaissance',
+        'military technology',
+        'military mission',
+        'military application',
+        'early warning',
+        'missile warning',
+        'strategic warning',
+        'threat detection',
+        'ballistic missile warning',
+        'nuclear warning',
       ],
-      'Communication': [
-        'communication', 'communications', 'comsat', 'amateur radio', 'radio communication',
-        'broadcasting', 'comms', 'relay', 'store dump', 'direct broadcasting', 'data relay',
-        'm2m', 'iot', 'radio amateur', 'store-dump', 'store and forward',
+      Communication: [
+        'communication',
+        'communications',
+        'comsat',
+        'amateur radio',
+        'radio communication',
+        'broadcasting',
+        'comms',
+        'relay',
+        'store dump',
+        'direct broadcasting',
+        'data relay',
+        'm2m',
+        'iot',
+        'radio amateur',
+        'store-dump',
+        'store and forward',
       ],
-      'Technology': [
-        'technology', 'experimental', 'evaluation', 'tech', 'demonstration', 'test',
-        'vehicle evaluation', 'dummy', 'calibration', 'technological', 'testing',
-        'inspection', 'servicing', 'fluids', 'mass model', 'docking', 'satellite deployment',
-        'tether', 'inflatable', 'thermospheric',
+      Technology: [
+        'technology',
+        'experimental',
+        'evaluation',
+        'tech',
+        'demonstration',
+        'test',
+        'vehicle evaluation',
+        'dummy',
+        'calibration',
+        'technological',
+        'testing',
+        'inspection',
+        'servicing',
+        'fluids',
+        'mass model',
+        'docking',
+        'satellite deployment',
+        'tether',
+        'inflatable',
+        'thermospheric',
       ],
       'Earth Observation': [
-        'earth observation', 'observation', 'remote sensing', 'imaging', 'radar',
-        'environmental', 'ocean surveillance', 'ocean observation', 'meteorology',
-        'weather', 'altimetry', 'oceanography', 'land', 'sar', 'resource', 'environment',
-        'lidar', 'traffic monitoring', 'mapping', 'geodesy', 'ecology', 'geospatial',
+        'earth observation',
+        'observation',
+        'remote sensing',
+        'imaging',
+        'radar',
+        'environmental',
+        'ocean surveillance',
+        'ocean observation',
+        'meteorology',
+        'weather',
+        'altimetry',
+        'oceanography',
+        'land',
+        'sar',
+        'resource',
+        'environment',
+        'lidar',
+        'traffic monitoring',
+        'mapping',
+        'geodesy',
+        'ecology',
+        'geospatial',
       ],
-      'Science': [
-        'science', 'research', 'scientific', 'study', 'exploration', 'aeronomy',
-        'particle', 'magnetic field', 'plasma', 'atmospheric', 'density', 'cosmic rays',
-        'ionosphere', 'magnetosphere', 'geodesy', 'air density', 'cosmology', 'atmospheric',
-        'physics', 'fundamental', 'life science', 'gravitational', 'space science',
+      Science: [
+        'science',
+        'research',
+        'scientific',
+        'study',
+        'exploration',
+        'aeronomy',
+        'particle',
+        'magnetic field',
+        'plasma',
+        'atmospheric',
+        'density',
+        'cosmic rays',
+        'ionosphere',
+        'magnetosphere',
+        'geodesy',
+        'air density',
+        'cosmology',
+        'atmospheric',
+        'physics',
+        'fundamental',
+        'life science',
+        'gravitational',
+        'space science',
       ],
-      'Astronomy': [
-        'astronomy', 'gamma ray', 'uv', 'ir', 'x-ray', 'infrared', 'ultraviolet',
-        'telescope', 'cosmic', 'solar', 'sun', 'stars', 'gamma', 'astrometry',
-        'observatory', 'spectroscopy', 'multi-wavelength', 'radio astronomy', 'solar observatory',
+      Astronomy: [
+        'astronomy',
+        'gamma ray',
+        'uv',
+        'ir',
+        'x-ray',
+        'infrared',
+        'ultraviolet',
+        'telescope',
+        'cosmic',
+        'solar',
+        'sun',
+        'stars',
+        'gamma',
+        'astrometry',
+        'observatory',
+        'spectroscopy',
+        'multi-wavelength',
+        'radio astronomy',
+        'solar observatory',
       ],
-      'Navigation': [
-        'global positioning', 'navigation', 'positioning', 'gps', 'timing', 'nav', 'tracking', 'position',
-        'navigational', 'sar transponder', 'search and rescue', 'transponder', 'cospas-sarsat',
+      Navigation: [
+        'global positioning',
+        'navigation',
+        'positioning',
+        'gps',
+        'timing',
+        'nav',
+        'tracking',
+        'position',
+        'navigational',
+        'sar transponder',
+        'search and rescue',
+        'transponder',
+        'cospas-sarsat',
       ],
     };
 
     // Score system for matching
     const scores: Record<string, number> = {
-      'Military': 0,
-      'Communication': 0,
-      'Technology': 0,
+      Military: 0,
+      Communication: 0,
+      Technology: 0,
       'Earth Observation': 0,
-      'Science': 0,
-      'Astronomy': 0,
-      'Navigation': 0,
+      Science: 0,
+      Astronomy: 0,
+      Navigation: 0,
     };
 
     // Calculate scores
@@ -232,25 +340,25 @@ export class MissionColorScheme extends ColorScheme {
     });
 
     // Special case handling for common abbreviations and specialized terms
-    if ((/\belint\b|\bsigint\b|\bcomint\b/iu).test(normalizedDesc)) {
+    if (/\belint\b|\bsigint\b|\bcomint\b/iu.test(normalizedDesc)) {
       scores.Communication += 2; // Intelligence gathering is often communication-related
     }
 
-    if ((/\bearth science\b|\bclimate\b|\bdisaster\b|\bforest\b|\burban\b/iu).test(normalizedDesc)) {
+    if (/\bearth science\b|\bclimate\b|\bdisaster\b|\bforest\b|\burban\b/iu.test(normalizedDesc)) {
       scores['Earth Observation'] += 2;
     }
 
-    if ((/\breconnaissance\b|\bmilitary\b|\bsurveillance\b|\bdefense\b/iu).test(normalizedDesc)) {
+    if (/\breconnaissance\b|\bmilitary\b|\bsurveillance\b|\bdefense\b/iu.test(normalizedDesc)) {
       // These could be Earth observation or communication, split the score
       scores['Earth Observation'] += 1;
       scores.Communication += 1;
     }
 
-    if ((/\borbiter\b|\bflyby\b|\blander\b|\bcosmic\b|\bsolar\b/iu).test(normalizedDesc)) {
+    if (/\borbiter\b|\bflyby\b|\blander\b|\bcosmic\b|\bsolar\b/iu.test(normalizedDesc)) {
       scores.Science += 1;
     }
 
-    if ((/\basat\b|\bnuclear\b|\bearly warning\b/iu).test(normalizedDesc)) {
+    if (/\basat\b|\bnuclear\b|\bearly warning\b/iu.test(normalizedDesc)) {
       scores.Technology += 1;
     }
 

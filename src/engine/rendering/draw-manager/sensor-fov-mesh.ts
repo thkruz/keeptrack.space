@@ -46,8 +46,7 @@ export class SensorFovMesh extends CustomMesh {
    * A typed array that stores the indices for the bottom part of the sensor field of view mesh.
    * This is used when wanting to display on the bottom of the sensor.
    */
-  private indiciesBottom_: Uint16Array;
-
+  protected indiciesBottom_: Uint16Array;
 
   constructor(sensor: DetailedSensor) {
     super();
@@ -100,7 +99,7 @@ export class SensorFovMesh extends CustomMesh {
       const mapW = 2 * Math.PI * RADIUS_OF_EARTH;
       const camCenterX = ServiceLocator.getMainCamera().flatMapPanX;
       const d = sensorLonRad * RADIUS_OF_EARTH - camCenterX + mapW / 2;
-      const meshRefFlatX = camCenterX + ((d % mapW) + mapW) % mapW - mapW / 2;
+      const meshRefFlatX = camCenterX + (((d % mapW) + mapW) % mapW) - mapW / 2;
 
       gl.uniform1f(this.uniforms_.u_meshRefFlatX, meshRefFlatX);
       gl.uniform1f(this.uniforms_.u_gmst, ServiceLocator.getTimeManager().gmst);
@@ -131,13 +130,11 @@ export class SensorFovMesh extends CustomMesh {
     gl.disable(gl.BLEND);
   }
 
-  private verticesTmp_: number[] = [];
-  private indicesTmp_: number[] = [];
-  private vertexCount_ = 0;
+  protected verticesTmp_: number[] = [];
+  protected indicesTmp_: number[] = [];
+  protected vertexCount_ = 0;
 
-  private createHorzGeometry(
-    { azStart, azEnd, elStart, elEnd, rngStart, rngEnd, azSegments, elSegments, reverse = false }: SurfaceMeshParams,
-  ) {
+  private createHorzGeometry({ azStart, azEnd, elStart, elEnd, rngStart, rngEnd, azSegments, elSegments, reverse = false }: SurfaceMeshParams) {
     const startIndex = this.vertexCount_;
 
     this.createHorzVertices_({ azSegments, azStart, azEnd, elSegments, elStart, elEnd, rngStart, rngEnd, startIndex });
@@ -168,16 +165,14 @@ export class SensorFovMesh extends CustomMesh {
       // Counter-clockwise when viewed from below (outside the FOV)
       this.indicesTmp_.push(
         // center → ringB → ringA
-        centerIndex, ringB, ringA,
+        centerIndex,
+        ringB,
+        ringA
       );
     }
 
     // Close the fan (last vertex back to first)
-    this.indicesTmp_.push(
-      centerIndex,
-      innerRingStartIndex,
-      innerRingStartIndex + innerRingCount - 1,
-    );
+    this.indicesTmp_.push(centerIndex, innerRingStartIndex, innerRingStartIndex + innerRingCount - 1);
   }
 
   private createHorzIndices_(azSegments: number, elSegments: number, startIndex: number, reverse: boolean) {
@@ -201,18 +196,18 @@ export class SensorFovMesh extends CustomMesh {
 
   private createHorzVertices_({ azSegments, azStart, azEnd, elSegments, elStart, elEnd, rngStart, rngEnd, startIndex }) {
     for (let i = 0; i <= azSegments; i++) {
-      let az = azStart + (i / azSegments) * (azEnd - azStart) as Degrees;
+      let az = (azStart + (i / azSegments) * (azEnd - azStart)) as Degrees;
 
       for (let j = 0; j <= elSegments; j++) {
-        let el = elStart + (j / elSegments) * (elEnd - elStart) as Degrees;
+        let el = (elStart + (j / elSegments) * (elEnd - elStart)) as Degrees;
         const rng = rngStart + (j / elSegments) * (rngEnd - rngStart);
 
         // Handle elevations above 90 degrees
         if (el > 90) {
-          el = 180 - el as Degrees;
-          az = az + 180 as Degrees;
+          el = (180 - el) as Degrees;
+          az = (az + 180) as Degrees;
           if (az > 360) {
-            az = az - 360 as Degrees;
+            az = (az - 360) as Degrees;
           }
         }
 
@@ -239,15 +234,7 @@ export class SensorFovMesh extends CustomMesh {
    * It then continues climbing in elevation until it reaches the maximum elevation
    * The last vertex is at maximum range, maximum elevation, and a fixed azimuth
    */
-  private createVertGeometry_(
-    az: Degrees,
-    elStart: Degrees,
-    elEnd: Degrees,
-    rngStart: Kilometers,
-    rngEnd: Kilometers,
-    elSegments: number,
-    reverse = false,
-  ) {
+  private createVertGeometry_(az: Degrees, elStart: Degrees, elEnd: Degrees, rngStart: Kilometers, rngEnd: Kilometers, elSegments: number, reverse = false) {
     const startIndex = this.vertexCount_;
 
     this.createVertVertices_(elSegments, elStart, elEnd, az, rngEnd, rngStart, startIndex);
@@ -275,15 +262,15 @@ export class SensorFovMesh extends CustomMesh {
 
   private createVertVertices_(elSegments: number, elStart: Degrees, elEnd: Degrees, az: Degrees, rngEnd: Kilometers, rngStart: Kilometers, startIndex: number) {
     for (let i = 0; i <= elSegments; i++) {
-      let el = elStart + (i / elSegments) * (elEnd - elStart) as Degrees;
+      let el = (elStart + (i / elSegments) * (elEnd - elStart)) as Degrees;
       let localAz = az;
 
       // Handle elevations above 90 degrees
       if (el > 90) {
-        el = 180 - el as Degrees;
-        localAz = localAz + 180 as Degrees;
+        el = (180 - el) as Degrees;
+        localAz = (localAz + 180) as Degrees;
         if (localAz > 360) {
-          localAz = localAz - 360 as Degrees;
+          localAz = (localAz - 360) as Degrees;
         }
       }
 
@@ -309,12 +296,18 @@ export class SensorFovMesh extends CustomMesh {
   initGeometry_() {
     const { maxEl, minAz, maxAz, azRange, minEl, minRange, maxRange } = this.getSensorFovParams_();
 
-
     if (maxEl <= 90) {
       // 1. Bottom surface
-      this.createHorzGeometry(
-        { azStart: minAz, azEnd: maxAz, elStart: minEl, elEnd: minEl, rngStart: minRange, rngEnd: maxRange, azSegments: this.azimuthSegments, elSegments: this.rangeSegments },
-      );
+      this.createHorzGeometry({
+        azStart: minAz,
+        azEnd: maxAz,
+        elStart: minEl,
+        elEnd: minEl,
+        rngStart: minRange,
+        rngEnd: maxRange,
+        azSegments: this.azimuthSegments,
+        elSegments: this.rangeSegments,
+      });
 
       this.indiciesBottom_ = new Uint16Array(this.indicesTmp_);
 
@@ -325,26 +318,19 @@ export class SensorFovMesh extends CustomMesh {
         // Inner ring is the first column in the bottom surface grid (j=0)
         this.addBottomCone_(
           0, // inner ring starts at vertex 0 (first column of step 1 grid)
-          this.azimuthSegments + 1,
+          this.azimuthSegments + 1
         );
       }
     }
 
     // 2. Left side (if not 360 degrees)
     if (azRange < 360) {
-      this.createVertGeometry_(
-        minAz, minEl, maxEl, minRange, maxRange,
-        this.elevationSegments,
-        true,
-      );
+      this.createVertGeometry_(minAz, minEl, maxEl, minRange, maxRange, this.elevationSegments, true);
     }
 
     // 3. Right side (if not 360 degrees)
     if (azRange < 360) {
-      this.createVertGeometry_(
-        maxAz, minEl, maxEl, minRange, maxRange,
-        this.elevationSegments,
-      );
+      this.createVertGeometry_(maxAz, minEl, maxEl, minRange, maxRange, this.elevationSegments);
     }
 
     /*
@@ -391,13 +377,14 @@ export class SensorFovMesh extends CustomMesh {
       });
     }
 
-
     this.vertices_ = new Float32Array(this.verticesTmp_);
     this.indices_ = new Uint16Array(this.indicesTmp_);
   }
 
   sortFacesByDistance(camPos: vec3): void {
-    const buckets: number[][] = Array(this.NUM_BUCKETS).fill(null).map(() => []);
+    const buckets: number[][] = Array(this.NUM_BUCKETS)
+      .fill(null)
+      .map(() => []);
     const faceCenters: vec3[] = [];
 
     // Pre-compute face centers
@@ -442,7 +429,7 @@ export class SensorFovMesh extends CustomMesh {
     let minAz = this.sensor.minAz;
 
     if (this.sensor.minAz > this.sensor.maxAz) {
-      minAz = this.sensor.minAz - 360 as Degrees;
+      minAz = (this.sensor.minAz - 360) as Degrees;
     }
     const maxAz = this.sensor.maxAz;
 

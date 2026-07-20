@@ -29,7 +29,8 @@ export class StarlinkColorScheme extends ColorScheme {
   constructor() {
     super(StarlinkColorScheme.uniqueColorTheme);
     this.objectTypeFlags = {
-      ...this.objectTypeFlags, ...StarlinkColorScheme.uniqueObjectTypeFlags,
+      ...this.objectTypeFlags,
+      ...StarlinkColorScheme.uniqueObjectTypeFlags,
     };
   }
 
@@ -112,7 +113,6 @@ export class StarlinkColorScheme extends ColorScheme {
           pickable: Pickable.Yes,
         };
       }
-
     }
 
     if (this.objectTypeFlags.starlinkNot === false) {

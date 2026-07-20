@@ -68,10 +68,10 @@ export const defaultColorSettings = {
   confidenceLow: [1.0, 0.0, 0.0, 0.65] as rgbaArray,
   // Plasma palette, sampled at 7 evenly-spaced points (smallest → largest RCS).
   // Distinct hue family from vmag's viridis so the active scheme reads at a glance.
-  rcsXXXSmall: [0.051, 0.031, 0.530, 0.9] as rgbaArray,
-  rcsXXSmall: [0.380, 0.000, 0.659, 0.9] as rgbaArray,
-  rcsXSmall: [0.620, 0.060, 0.624, 0.9] as rgbaArray,
-  rcsSmall: [0.798, 0.280, 0.470, 0.9] as rgbaArray,
+  rcsXXXSmall: [0.051, 0.031, 0.53, 0.9] as rgbaArray,
+  rcsXXSmall: [0.38, 0.0, 0.659, 0.9] as rgbaArray,
+  rcsXSmall: [0.62, 0.06, 0.624, 0.9] as rgbaArray,
+  rcsSmall: [0.798, 0.28, 0.47, 0.9] as rgbaArray,
   rcsMed: [0.929, 0.473, 0.327, 0.9] as rgbaArray,
   rcsLarge: [0.987, 0.682, 0.219, 0.9] as rgbaArray,
   rcsXLarge: [0.941, 0.976, 0.129, 0.9] as rgbaArray,
@@ -91,7 +91,7 @@ export const defaultColorSettings = {
   starlink: [0.0, 0.8, 0.0, 0.8] as rgbaArray,
   starlinkNot: [0.8, 0.0, 0.0, 0.8] as rgbaArray,
   vmagBright: [0.992, 0.906, 0.145, 0.9] as rgbaArray,
-  vmagBright2: [0.369, 0.788, 0.380, 0.9] as rgbaArray,
+  vmagBright2: [0.369, 0.788, 0.38, 0.9] as rgbaArray,
   vmagMed1: [0.125, 0.569, 0.549, 0.9] as rgbaArray,
   vmagMed2: [0.192, 0.408, 0.557, 0.9] as rgbaArray,
   vmagDim1: [0.243, 0.286, 0.537, 0.9] as rgbaArray,

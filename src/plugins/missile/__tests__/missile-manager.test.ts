@@ -3,8 +3,8 @@ import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { missileManager } from '@app/plugins/missile/missile-manager';
-import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { Degrees, Kilometers, SpaceObjectType } from '@ootk/src/main';
+import { setupStandardEnvironment } from '@test/environment/standard-env';
 
 type TestMissileSpec = {
   launchLatitude: number;
@@ -52,7 +52,7 @@ const launch = (spec: TestMissileSpec): TestResult => {
     spec.burnRate ?? 0.042,
     spec.maxRangeKm,
     spec.country ?? '',
-    spec.minAltitudeKm ?? 0,
+    spec.minAltitudeKm ?? 0
   );
 
   return {
@@ -82,7 +82,7 @@ const seedMissileSlots = () => {
         maxAlt: 0,
         country: '',
         launchVehicle: '',
-      }),
+      })
     );
   }
   catalog.objectCache = slots;

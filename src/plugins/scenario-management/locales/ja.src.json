@@ -4,6 +4,9 @@
       "title": "シナリオ管理",
       "bottomIconLabel": "シナリオ管理",
       "sideMenuTitle": "シナリオ設定",
+      "sections": {
+        "actions": "操作"
+      },
       "labels": {
         "scenarioName": "シナリオ名",
         "description": "説明",
@@ -22,11 +25,13 @@
       "buttons": {
         "updateScenario": "シナリオを更新",
         "saveScenario": "シナリオを保存",
-        "loadScenario": "シナリオを読み込む"
+        "loadScenario": "シナリオを読み込む",
+        "clearTimeBounds": "時間範囲をクリア"
       },
       "msgs": {
         "settingsUpdated": "シナリオ設定が正常に更新されました！",
-        "scenarioLoaded": "シナリオが正常に読み込まれました！"
+        "scenarioLoaded": "シナリオが正常に読み込まれました！",
+        "boundsCleared": "時間範囲をクリアしました。シナリオは無制限になりました。"
       },
       "errorMsgs": {
         "nameRequired": "シナリオ名は必須です。",

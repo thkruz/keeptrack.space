@@ -3,10 +3,16 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import {
   BaseObject,
+  calcGmst,
   DEG2RAD,
   Degrees,
+  ecefRad2rae,
+  eci2ecef,
+  eci2lla,
   Kilometers,
   KilometersPerSecond,
+  linearDistance,
+  lla2eci,
   MINUTES_PER_DAY,
   Satellite,
   SatelliteRecord,
@@ -16,12 +22,6 @@ import {
   Sun,
   TAU,
   TemeVec3,
-  calcGmst,
-  ecefRad2rae,
-  eci2ecef,
-  eci2lla,
-  linearDistance,
-  lla2eci,
 } from '@ootk/src/main';
 import { dateFormat } from '../../engine/utils/dateFormat';
 import { SatMath, SunStatus } from '../analysis/sat-math';
@@ -115,7 +115,6 @@ export class SensorMath {
             objName: sensor.objName,
           };
         }
-
 
         return {
           time: '',
@@ -250,7 +249,11 @@ export class SensorMath {
 
         const firstSensor = sensorManagerInstance.currentSensors[0];
 
-        if (firstSensor instanceof Sensor && firstSensor.beamwidth && Number.parseFloat(distanceApart) < sensorManagerInstance.currentTEARR.rng! * Math.sin(DEG2RAD * firstSensor.beamwidth)) {
+        if (
+          firstSensor instanceof Sensor &&
+          firstSensor.beamwidth &&
+          Number.parseFloat(distanceApart) < sensorManagerInstance.currentTEARR.rng! * Math.sin(DEG2RAD * firstSensor.beamwidth)
+        ) {
           if (sensorManagerInstance.currentTEARR.rng! < sensorManagerInstance.currentSensors[0].maxRng && sensorManagerInstance.currentTEARR.rng! > 0) {
             sameBeamStr = ' (Within One Beam)';
           }
@@ -431,7 +434,6 @@ export class SensorMath {
     }
 
     return `No Passes in ${searchLength} Days`;
-
   }
 
   static nextpassList(satArray: Satellite[], sensorArray: DetailedSensor[], interval?: number, days = 7): SatPassTimes[] {

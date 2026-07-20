@@ -86,17 +86,17 @@ export const buildRicChartOption = (points: RicPoint[], labels: RicChartLabels):
     })),
     graphic: isEmpty
       ? [
-        {
-          type: 'text',
-          left: 'center',
-          top: 'middle',
-          style: {
-            text: labels.empty,
-            fill: '#bbb',
-            fontSize: 16,
+          {
+            type: 'text',
+            left: 'center',
+            top: 'middle',
+            style: {
+              text: labels.empty,
+              fill: '#bbb',
+              fontSize: 16,
+            },
           },
-        },
-      ]
+        ]
       : [],
     axisPointer: {
       link: [{ xAxisIndex: 'all' }],

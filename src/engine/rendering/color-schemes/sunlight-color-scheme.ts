@@ -37,19 +37,17 @@ export class SunlightColorScheme extends ColorScheme {
   constructor() {
     super(SunlightColorScheme.uniqueColorTheme);
     this.objectTypeFlags = {
-      ...this.objectTypeFlags, ...SunlightColorScheme.uniqueObjectTypeFlags,
+      ...this.objectTypeFlags,
+      ...SunlightColorScheme.uniqueObjectTypeFlags,
     };
-    EventBus.getInstance().on(
-      EventBusEvent.onKeepTrackReady,
-      (): void => {
-        const catalogManagerInstance = ServiceLocator.getCatalogManager();
-        const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
+    EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, (): void => {
+      const catalogManagerInstance = ServiceLocator.getCatalogManager();
+      const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
-        if (colorSchemeManagerInstance.currentColorScheme === this) {
-          catalogManagerInstance.satCruncherThread.sendSunlightViewToggle(true);
-        }
-      },
-    );
+      if (colorSchemeManagerInstance.currentColorScheme === this) {
+        catalogManagerInstance.satCruncherThread.sendSunlightViewToggle(true);
+      }
+    });
 
     EventBus.getInstance().on(EventBusEvent.layerUpdated, () => {
       if (settingsManager.isDisableSensors) {
@@ -112,7 +110,6 @@ export class SunlightColorScheme extends ColorScheme {
         color: this.colorTheme.sensor,
         pickable: Pickable.Yes,
       };
-
     }
 
     if (obj.isMissile()) {

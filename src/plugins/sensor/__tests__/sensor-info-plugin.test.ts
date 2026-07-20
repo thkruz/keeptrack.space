@@ -1,7 +1,7 @@
-import { vi } from 'vitest';
 import { SensorInfoPlugin } from '@app/plugins/sensor/sensor-info-plugin';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardClickTests, standardPluginMenuButtonTests, standardPluginSuite } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('SensorInfoPlugin_class', () => {
   beforeEach(() => {

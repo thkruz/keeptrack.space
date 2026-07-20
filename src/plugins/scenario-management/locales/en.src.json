@@ -4,6 +4,9 @@
       "title": "Scenario Management",
       "bottomIconLabel": "Scenario Management",
       "sideMenuTitle": "Scenario Settings",
+      "sections": {
+        "actions": "Actions"
+      },
       "labels": {
         "scenarioName": "Scenario Name",
         "description": "Description",
@@ -22,11 +25,13 @@
       "buttons": {
         "updateScenario": "Update Scenario",
         "saveScenario": "Save Scenario",
-        "loadScenario": "Load Scenario"
+        "loadScenario": "Load Scenario",
+        "clearTimeBounds": "Clear Time Bounds"
       },
       "msgs": {
         "settingsUpdated": "Scenario settings updated successfully!",
-        "scenarioLoaded": "Scenario loaded successfully!"
+        "scenarioLoaded": "Scenario loaded successfully!",
+        "boundsCleared": "Time bounds cleared. Scenario is now endless."
       },
       "errorMsgs": {
         "nameRequired": "Scenario Name is required.",

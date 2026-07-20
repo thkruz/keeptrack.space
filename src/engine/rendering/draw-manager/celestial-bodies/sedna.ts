@@ -21,7 +21,7 @@
 
 import { SolarBody } from '@app/engine/core/interfaces';
 import { ChebyshevInterpolator } from '@ootk/src/interpolator/ChebyshevInterpolator';
-import { TemeVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
+import { Kilometers, Seconds, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
 import { KM_PER_AU } from 'astronomy-engine';
 import { PlanetColors } from './celestial-body';
 import { DwarfPlanet } from './dwarf-planet';
@@ -30,15 +30,15 @@ import { sednaChebyshevCoeffs } from './sedna-chebyshev';
 export enum SednaTextureQuality {
   POTATO = '512',
   MEDIUM = '2k',
-  HIGH = '4k'
+  HIGH = '4k',
 }
 
 export class Sedna extends DwarfPlanet {
   readonly RADIUS = 995;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
-  orbitalPeriod = 11400 * 365.25 * 24 * 3600 as Seconds;
-  meanDistanceToSun = 506 * KM_PER_AU as Kilometers;
+  orbitalPeriod = (11400 * 365.25 * 24 * 3600) as Seconds;
+  meanDistanceToSun = (506 * KM_PER_AU) as Kilometers;
   type: SpaceObjectType = SpaceObjectType.DWARF_PLANET;
   eci: TemeVec3;
   rotation = [0, 0, 0];

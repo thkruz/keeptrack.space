@@ -22,7 +22,8 @@ export class SmallSatColorScheme extends ColorScheme {
   constructor() {
     super(SmallSatColorScheme.uniqueColorTheme);
     this.objectTypeFlags = {
-      ...this.objectTypeFlags, ...SmallSatColorScheme.uniqueObjectTypeFlags,
+      ...this.objectTypeFlags,
+      ...SmallSatColorScheme.uniqueObjectTypeFlags,
     };
   }
 
@@ -52,7 +53,6 @@ export class SmallSatColorScheme extends ColorScheme {
       color: this.colorTheme.transparent,
       pickable: Pickable.No,
     };
-
   }
 
   static readonly layersHtml = html`

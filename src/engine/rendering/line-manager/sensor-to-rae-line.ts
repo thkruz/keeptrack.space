@@ -1,9 +1,9 @@
-import { EciArr3 } from '@app/engine/core/interfaces';
-import { rae2eci, RaeVec3 } from '@ootk/src/main';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { EciArr3 } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { RaeVec3, rae2eci } from '@ootk/src/main';
 import { vec4 } from 'gl-matrix';
 import { Line, LineColors, LineDescription } from './line';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SensorToRaeLine extends Line {
   sensor: DetailedSensor;

@@ -3,6 +3,9 @@
     "CloseObjectsPlugin": {
       "bottomIconLabel": "Objets proches",
       "title": "Recherche d'objets proches",
+      "sections": {
+        "search": "Recherche"
+      },
       "findBtn": "Rechercher des objets proches",
       "help": {
         "overview": "La recherche d'objets proches balaie l'ensemble du catalogue à la recherche de paires d'objets volant à moins de 50 km l'un de l'autre en ce moment même. C'est un moyen rapide de repérer les charges utiles co-orbitales, les fragmentations récentes et les zones encombrées sans lancer un filtrage complet des conjonctions.",

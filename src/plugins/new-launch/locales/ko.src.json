@@ -15,17 +15,24 @@
       },
       "sections": {
         "template": "템플릿",
+        "launchWindow": "발사 윈도우",
         "launchSite": "발사장"
       },
       "buttons": {
+        "matchTargetPlane": "발사 윈도우 찾기",
         "createLaunchNominal": "발사 노미널 생성",
-        "inclinationTooLow": "경사각이 너무 낮습니다!"
+        "inclinationTooLow": "경사각이 너무 낮습니다!",
+        "clearWindow": "발사 윈도우 지우기",
+        "createLaunchAtWindow": "윈도우에서 발사 생성"
       },
       "msgs": {
+        "windowFound": "{time}에 발사하면 목표 궤도면과 일치합니다 (ΔRAAN {delta}°)",
         "launchNominalCreated": "발사 노미널이 생성되었습니다!",
         "timeRelativeToLaunch": "이제 시간은 발사 시간 기준 상대 시간입니다."
       },
       "errorMsgs": {
+        "windowNoTarget": "먼저 목표 위성을 선택하세요.",
+        "windowGeometryImpossible": "발사 윈도우 없음: 목표 궤도 경사각이 발사장 위도보다 낮습니다.",
         "noMoreNominalSatellites": "사용 가능한 노미널 위성이 더 이상 없습니다!",
         "launchSiteNotFound": "발사 장소 {launchSite}을(를) 찾을 수 없습니다!",
         "failedToCreateTle": "TLE 생성 실패: {error}",
@@ -42,7 +49,9 @@
         "invalidEpochDayFormat": "잘못된 에포크 일 형식입니다! 3자리 숫자, 소수점, 소수점 뒤 8자리 숫자여야 합니다.",
         "epochDayFormatIssue": "이 위성의 에포크 일 형식에 문제가 있습니다. 다른 위성을 시도해 보세요.",
         "failedToPropagate": "위성 전파에 실패했습니다. 다른 매개변수를 시도하거나 매개변수가 올바르다면 이 문제를 보고해 주세요.",
-        "changingOrbitBufferFailed": "궤도 버퍼 데이터 변경 실패"
+        "changingOrbitBufferFailed": "궤도 버퍼 데이터 변경 실패",
+        "launchLatExceedsInclination": "발사 위도가 궤도 경사각을 초과합니다.",
+        "failedToFitOrbit": "발사 지점에 맞는 궤도를 맞출 수 없습니다."
       },
       "help": {
         "overview": "새 발사 메뉴는 개념적 발사를 생성합니다. 실제 위성의 궤도를 복사하고, 선택한 발사 장소에서 이륙하도록 회전시킨 다음, 시계를 T+0으로 재설정합니다. \"이 장소에서 이런 궤도로 무언가 발사되면 내 센서가 언제 그것을 볼 수 있을까?\"라는 질문에 답하는 데 사용하세요.",
@@ -54,7 +63,8 @@
         "tip1": "생성 후 시계는 이륙 이후 경과 시간을 표시합니다. \"00:45:00\"은 발사 후 45분을 의미하며 센서 커버리지 타임라인에 적합합니다.",
         "tip2": "생성이 고도 검사에서 실패하면 더 일반적인 궤도를 가진 다른 템플릿 위성을 시도해 보세요.",
         "shortcutOpen": "새 발사 메뉴 열기"
-      }
+      },
+      "launchWindowHelp": "궤도면이 목표 위성과 일치하는 다음 발사 시각을 찾습니다. 이것은 발사 시각만 설정하며, \"공칭 발사 생성\"을 누를 때까지 아무것도 생성되지 않습니다."
     }
   }
 }

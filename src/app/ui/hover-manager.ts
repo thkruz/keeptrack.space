@@ -10,7 +10,7 @@ import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { CatalogSource, KM_PER_AU, LandObject, Satellite, SpaceObjectType, spaceObjType2Str, Star } from '@ootk/src/main';
+import { CatalogSource, KM_PER_AU, LandObject, Satellite, SpaceObjectType, Star, spaceObjType2Str } from '@ootk/src/main';
 import i18next from 'i18next';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
@@ -80,8 +80,7 @@ export class HoverManager {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     this.satHoverBoxNode1.textContent = obj.name;
-    this.satHoverBoxNode2.innerHTML =
-      `${obj.country + SensorMath.distanceString(obj, catalogManagerInstance.getObject(ServiceLocator.getSensorManager().currentSensors[0]?.id) as DetailedSensor)}`;
+    this.satHoverBoxNode2.innerHTML = `${obj.country + SensorMath.distanceString(obj, catalogManagerInstance.getObject(ServiceLocator.getSensorManager().currentSensors[0]?.id) as DetailedSensor)}`;
     this.satHoverBoxNode3.textContent = '';
     this.satHoverBoxNode3.style.display = 'none';
   }
@@ -108,17 +107,15 @@ export class HoverManager {
   }
 
   private star_(star: Star): void {
-    const name = star.pname ||
+    const name =
+      star.pname ||
       (star.bayer && star.constellation ? `${star.bayer} ${star.constellation}` : '') ||
       (star.flamsteed && star.constellation ? `${star.flamsteed} ${star.constellation}` : '') ||
       (star.hr ? `HR ${star.hr}` : star.name);
 
     this.satHoverBoxNode1.textContent = name;
-    this.satHoverBoxNode2.textContent = star.constellation
-      ? `${star.constellation} · Mag ${star.vmag?.toFixed(2) ?? '?'}`
-      : `Mag ${star.vmag?.toFixed(2) ?? '?'}`;
-    this.satHoverBoxNode3.textContent = star.colorTemp
-      ? `${star.colorTemp.toLocaleString()}K` : '';
+    this.satHoverBoxNode2.textContent = star.constellation ? `${star.constellation} · Mag ${star.vmag?.toFixed(2) ?? '?'}` : `Mag ${star.vmag?.toFixed(2) ?? '?'}`;
+    this.satHoverBoxNode3.textContent = star.colorTemp ? `${star.colorTemp.toLocaleString()}K` : '';
   }
 
   private hoverOverNothing_() {
@@ -211,10 +208,10 @@ export class HoverManager {
     const launchSite = StringExtractor.extractLaunchSite(landObj.name);
 
     this.satHoverBoxNode1.textContent = `${launchSite.site}, ${launchSite.country}`;
-    this.satHoverBoxNode2.innerHTML =
-      `${spaceObjType2Str(landObj.type) +
+    this.satHoverBoxNode2.innerHTML = `${
+      spaceObjType2Str(landObj.type) +
       SensorMath.distanceString(landObj, catalogManagerInstance.getObject(ServiceLocator.getSensorManager().currentSensors[0]?.id) as DetailedSensor)
-      }`;
+    }`;
     this.satHoverBoxNode3.textContent = '';
     this.satHoverBoxNode3.style.display = 'none';
   }
@@ -226,7 +223,6 @@ export class HoverManager {
     this.satHoverBoxNode3.textContent = '';
     this.satHoverBoxNode3.style.display = 'none';
   }
-
 
   private satObj_(sat: Satellite) {
     if (!settingsManager.enableHoverOverlay) {
@@ -319,18 +315,15 @@ export class HoverManager {
       }
 
       return `${t7e('hoverManager.launched')}: 20${launchYear.toString().padStart(2, '0')}`;
-
     } else if (launchYear >= 57 && launchYear < 100) {
       if (i18next.language === 'zh') {
         return `${t7e('hoverManager.launched')}19${launchYear.toString().padStart(2, '0')}`;
       }
 
       return `${t7e('hoverManager.launched')}: 19${launchYear.toString().padStart(2, '0')}`;
-
     }
 
     return t7e('hoverManager.launchedUnknown');
-
   }
 
   private showEciVel_(sat: Satellite) {
@@ -393,7 +386,7 @@ export class HoverManager {
       const isTelescope = sensor.type === SpaceObjectType.OPTICAL;
 
       this.satHoverBoxNode2.textContent = sensor.country ?? 'Unknown';
-      this.satHoverBoxNode3.innerHTML = (!isTelescope && sensor.freqBand) ? `${sensor.system} (${sensor.freqBand})` : sensor.system ?? 'Unknown';
+      this.satHoverBoxNode3.innerHTML = !isTelescope && sensor.freqBand ? `${sensor.system} (${sensor.freqBand})` : (sensor.system ?? 'Unknown');
     }
   }
 
@@ -453,8 +446,8 @@ export class HoverManager {
 
       if (hoveredSatellite) {
         // Todo what if this is a group color scheme?
-        const newColor = colorSchemeManagerInstance.currentColorScheme?.update(hoveredSatellite).color ??
-          colorSchemeManagerInstance.currentColorSchemeUpdate(hoveredSatellite).color;
+        const newColor =
+          colorSchemeManagerInstance.currentColorScheme?.update(hoveredSatellite).color ?? colorSchemeManagerInstance.currentColorSchemeUpdate(hoveredSatellite).color;
 
         colorSchemeManagerInstance.colorData[this.lasthoveringSat * 4] = newColor[0]; // R
         colorSchemeManagerInstance.colorData[this.lasthoveringSat * 4 + 1] = newColor[1]; // G

@@ -1,4 +1,3 @@
-
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
@@ -8,17 +7,17 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ReferenceFrame } from '@app/engine/math/reference-frames';
-import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
+import { IContextMenuConfig, IKeyboardShortcut, RmbMenuContext } from '@app/engine/plugins/core/plugin-capabilities';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { LineColors } from '@app/engine/rendering/line-manager/line';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl, hideEl } from '@app/engine/utils/get-el';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { Kilometers, Satellite } from '@ootk/src/main';
-import { vec4 } from 'gl-matrix';
 import drawLinesPng from '@public/img/icons/background-grid-small.png';
+import { vec4 } from 'gl-matrix';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './draw-lines.css';
@@ -73,7 +72,11 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
    */
   static readonly DRAW_ACTIONS: DrawAction[] = [
     {
-      id: 'line-eci-axis', labelKey: 'eciAxes', section: 'axes', inSideMenu: true, requires: ['earth'],
+      id: 'line-eci-axis',
+      labelKey: 'eciAxes',
+      section: 'axes',
+      inSideMenu: true,
+      requires: ['earth'],
       run: (ctx) => {
         lineManagerInstance.createRef2Ref([0, 0, 0], [25000, 0, 0], rgba(LineColors.RED), ctx.referenceFrame);
         lineManagerInstance.createRef2Ref([0, 0, 0], [0, 25000, 0], rgba(LineColors.GREEN), ctx.referenceFrame);
@@ -81,58 +84,121 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
       },
     },
     {
-      id: 'line-eci-xgrid', labelKey: 'xAxesGrid', section: 'axes', inSideMenu: true, requires: [],
+      id: 'line-eci-xgrid',
+      labelKey: 'xAxesGrid',
+      section: 'axes',
+      inSideMenu: true,
+      requires: [],
       run: (ctx) => lineManagerInstance.createGrid('x', [0.6, 0.2, 0.2, 0.3], 1, ctx.referenceFrame),
     },
     {
-      id: 'line-eci-ygrid', labelKey: 'yAxesGrid', section: 'axes', inSideMenu: true, requires: [],
+      id: 'line-eci-ygrid',
+      labelKey: 'yAxesGrid',
+      section: 'axes',
+      inSideMenu: true,
+      requires: [],
       run: (ctx) => lineManagerInstance.createGrid('y', [0.2, 0.6, 0.2, 0.3], 1, ctx.referenceFrame),
     },
     {
-      id: 'line-eci-zgrid', labelKey: 'zAxesGrid', section: 'axes', inSideMenu: true, requires: [],
+      id: 'line-eci-zgrid',
+      labelKey: 'zAxesGrid',
+      section: 'axes',
+      inSideMenu: true,
+      requires: [],
       run: (ctx) => lineManagerInstance.createGrid('z', [0.2, 0.2, 0.6, 0.3], 1, ctx.referenceFrame),
     },
     {
-      id: 'line-eci-radial-xgrid', labelKey: 'xAxesRadialGrid', section: 'axes', inSideMenu: true, requires: [],
-      run: (ctx) => lineManagerInstance.createGridRadial({
-        axis: 'x', color: rgba(LineColors.RED), opacity: 0.3, circleInterval: 50000 as Kilometers, referenceFrame: ctx.referenceFrame,
-      }),
+      id: 'line-eci-radial-xgrid',
+      labelKey: 'xAxesRadialGrid',
+      section: 'axes',
+      inSideMenu: true,
+      requires: [],
+      run: (ctx) =>
+        lineManagerInstance.createGridRadial({
+          axis: 'x',
+          color: rgba(LineColors.RED),
+          opacity: 0.3,
+          circleInterval: 50000 as Kilometers,
+          referenceFrame: ctx.referenceFrame,
+        }),
     },
     {
-      id: 'line-eci-radial-ygrid', labelKey: 'yAxesRadialGrid', section: 'axes', inSideMenu: true, requires: [],
-      run: (ctx) => lineManagerInstance.createGridRadial({
-        axis: 'y', color: rgba(LineColors.GREEN), opacity: 0.3, circleInterval: 50000 as Kilometers, referenceFrame: ctx.referenceFrame,
-      }),
+      id: 'line-eci-radial-ygrid',
+      labelKey: 'yAxesRadialGrid',
+      section: 'axes',
+      inSideMenu: true,
+      requires: [],
+      run: (ctx) =>
+        lineManagerInstance.createGridRadial({
+          axis: 'y',
+          color: rgba(LineColors.GREEN),
+          opacity: 0.3,
+          circleInterval: 50000 as Kilometers,
+          referenceFrame: ctx.referenceFrame,
+        }),
     },
     {
-      id: 'line-eci-radial-zgrid', labelKey: 'zAxesRadialGrid', section: 'axes', inSideMenu: true, requires: [],
-      run: (ctx) => lineManagerInstance.createGridRadial({
-        axis: 'z', color: rgba(LineColors.BLUE), opacity: 0.3, circleInterval: 50000 as Kilometers, referenceFrame: ctx.referenceFrame,
-      }),
+      id: 'line-eci-radial-zgrid',
+      labelKey: 'zAxesRadialGrid',
+      section: 'axes',
+      inSideMenu: true,
+      requires: [],
+      run: (ctx) =>
+        lineManagerInstance.createGridRadial({
+          axis: 'z',
+          color: rgba(LineColors.BLUE),
+          opacity: 0.3,
+          circleInterval: 50000 as Kilometers,
+          referenceFrame: ctx.referenceFrame,
+        }),
     },
     {
-      id: 'line-earth-sat', labelKey: 'earthToSatellite', section: 'object', inSideMenu: true, requires: ['clickedSat'],
+      id: 'line-earth-sat',
+      labelKey: 'earthToSatellite',
+      section: 'object',
+      inSideMenu: true,
+      requires: ['clickedSat'],
       run: (ctx) => lineManagerInstance.createSatToRef(ctx.clickSatObj, [0, 0, 0], rgba(LineColors.PURPLE)),
     },
     {
-      id: 'line-sensor-sat', labelKey: 'sensorToSatellite', section: 'object', inSideMenu: true, requires: ['clickedSat', 'sensor'],
+      id: 'line-sensor-sat',
+      labelKey: 'sensorToSatellite',
+      section: 'object',
+      inSideMenu: true,
+      requires: ['clickedSat', 'sensor'],
       run: (ctx) => lineManagerInstance.createSensorToSat(ctx.sensor, ctx.clickSatObj, rgba(LineColors.GREEN)),
     },
     {
-      id: 'line-sat-ric', labelKey: 'satelliteRicAxes', section: 'object', inSideMenu: true, requires: ['clickedSat'],
+      id: 'line-sat-ric',
+      labelKey: 'satelliteRicAxes',
+      section: 'object',
+      inSideMenu: true,
+      requires: ['clickedSat'],
       run: (ctx) => lineManagerInstance.createSatRicFrame(ctx.clickSatObj),
     },
     {
-      id: 'line-sat-sun', labelKey: 'satelliteToSun', section: 'object', inSideMenu: true, requires: ['clickedSat'],
+      id: 'line-sat-sun',
+      labelKey: 'satelliteToSun',
+      section: 'object',
+      inSideMenu: true,
+      requires: ['clickedSat'],
       run: (ctx) => lineManagerInstance.createSat2Sun(ctx.clickSatObj),
     },
     {
-      id: 'line-sat-moon', labelKey: 'satelliteToMoon', section: 'object', inSideMenu: true, requires: ['clickedSat'],
+      id: 'line-sat-moon',
+      labelKey: 'satelliteToMoon',
+      section: 'object',
+      inSideMenu: true,
+      requires: ['clickedSat'],
       run: (ctx) => lineManagerInstance.createSat2CelestialBody(ctx.clickSatObj, SolarBody.Moon),
     },
     {
       // Two-object line: needs a clicked sat AND a previously selected primary sat, so it is right-click only.
-      id: 'line-sat-sat', labelKey: 'satelliteToSatellite', section: 'object', inSideMenu: false, requires: ['clickedSat', 'primarySat'],
+      id: 'line-sat-sat',
+      labelKey: 'satelliteToSatellite',
+      section: 'object',
+      inSideMenu: false,
+      requires: ['clickedSat', 'primarySat'],
       run: (ctx) => {
         if (!ctx.primarySatObj) {
           errorManagerInstance.warn(tDraw('errorMsgs.noPrimarySat'));
@@ -143,7 +209,11 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
       },
     },
     {
-      id: 'line-moon-orbit', labelKey: 'moonOrbit', section: 'object', inSideMenu: true, requires: [],
+      id: 'line-moon-orbit',
+      labelKey: 'moonOrbit',
+      section: 'object',
+      inSideMenu: true,
+      requires: [],
       run: () => ServiceLocator.getScene().moons?.Moon?.drawFullOrbitPathRelativeToEarth(),
     },
   ];
@@ -152,24 +222,46 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
   // Right-click menu
   // ===========================================================================
 
-  rmbL1ElementName = 'draw-rmb';
-  rmbL1Html = html`<li class="rmb-menu-item" id="draw-rmb"><a href="#">${this.t_('rmbMenu.title')} &#x27A4;</a></li>`;
-  rmbL2ElementName = 'draw-rmb-menu';
-  rmbL2Html = this.buildRmbL2Html_();
-  rmbMenuOrder = 5;
-  isRmbOnEarth = true;
-  isRmbOffEarth = true;
-  isRmbOnSat = true;
+  getContextMenuConfig(): IContextMenuConfig {
+    return {
+      level1ElementName: 'draw-rmb',
+      level1Html: html`<li class="rmb-menu-item" id="draw-rmb"><a href="#">${this.t_('rmbMenu.title')} &#x27A4;</a></li>`,
+      level2ElementName: 'draw-rmb-menu',
+      level2Html: this.buildRmbL2Html_(),
+      order: 5,
+      // The axis/grid actions have no requirements, so the entry is always relevant
+      isVisible: () => true,
+    };
+  }
 
   private buildRmbL2Html_(): string {
-    const items = DrawLinesPlugin.DRAW_ACTIONS
-      .map((a) => html`<li id="${a.id}-rmb"><a href="#">${this.t_(`rmbMenu.${a.labelKey}`)}</a></li>`)
-      .join('');
+    const items = DrawLinesPlugin.DRAW_ACTIONS.map((a) => html`<li id="${a.id}-rmb"><a href="#">${this.t_(`rmbMenu.${a.labelKey}`)}</a></li>`).join('');
 
     return html`<ul class='dropdown-contents'>${items}</ul>`;
   }
 
-  rmbCallback = (targetId: string, clickedSat?: number): void => {
+  onContextMenuOpen(ctx: RmbMenuContext): void {
+    const sensorManager = ServiceLocator.getSensorManager();
+
+    const flags: Record<DrawRequirement, boolean> = {
+      earth: ctx.surface === 'earth',
+      clickedSat: ctx.target instanceof Satellite || ctx.target instanceof OemSatellite || ctx.target instanceof MissileObject,
+      primarySat: ctx.hasPrimarySelection,
+      sensor: sensorManager.isSensorSelected() && sensorManager.whichRadar !== 'CUSTOM',
+    };
+
+    for (const action of DrawLinesPlugin.DRAW_ACTIONS) {
+      const isAvailable = action.requires.every((requirement) => flags[requirement]);
+
+      if (isAvailable) {
+        showEl(`${action.id}-rmb`);
+      } else {
+        hideEl(`${action.id}-rmb`);
+      }
+    }
+  }
+
+  onContextMenuAction(targetId: string, clickedSat?: number): void {
     const action = DrawLinesPlugin.DRAW_ACTIONS.find((a) => `${a.id}-rmb` === targetId);
 
     if (!action) {
@@ -177,7 +269,7 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
     }
 
     action.run(this.buildRmbContext_(clickedSat));
-  };
+  }
 
   // ===========================================================================
   // Side menu (v13)
@@ -217,12 +309,13 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
   };
 
   private buildActionRows_(section: 'axes' | 'object'): string {
-    return DrawLinesPlugin.DRAW_ACTIONS
-      .filter((a) => a.section === section && a.inSideMenu)
-      .map((a) => html`
+    return DrawLinesPlugin.DRAW_ACTIONS.filter((a) => a.section === section && a.inSideMenu)
+      .map(
+        (a) => html`
         <button id="${a.id}-btn" class="kt-action waves-effect waves-light" type="button">
           <span class="kt-action-label">${this.t_(`rmbMenu.${a.labelKey}`)}</span>
-        </button>`)
+        </button>`
+      )
       .join('');
   }
 
@@ -252,30 +345,6 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
     });
   }
 
-  addJs(): void {
-    super.addJs();
-
-    EventBus.getInstance().on(EventBusEvent.rightBtnMenuOpen, (isEarth: boolean, clickedSatId: number) => {
-      const sensorManager = ServiceLocator.getSensorManager();
-      const selectManager = PluginRegistry.getPlugin(SelectSatManager);
-      const isMobile = settingsManager.isMobileModeEnabled;
-
-      const flags: Record<DrawRequirement, boolean> = {
-        earth: isEarth,
-        // The legacy behavior hides per-satellite lines on mobile, where there is no clicked target.
-        clickedSat: clickedSatId !== -1 && !isMobile,
-        primarySat: (selectManager?.selectedSat ?? -1) !== -1,
-        sensor: sensorManager.isSensorSelected() && sensorManager.whichRadar !== 'CUSTOM',
-      };
-
-      for (const action of DrawLinesPlugin.DRAW_ACTIONS) {
-        if (!action.requires.every((requirement) => flags[requirement])) {
-          hideEl(`${action.id}-rmb`);
-        }
-      }
-    });
-  }
-
   // ===========================================================================
   // Context builders
   // ===========================================================================
@@ -288,7 +357,7 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
 
   private buildRmbContext_(clickedSat?: number): DrawActionContext {
     const obj = ServiceLocator.getCatalogManager().getObject(clickedSat);
-    const clickSatObj = (obj instanceof Satellite || obj instanceof OemSatellite || obj instanceof MissileObject) ? obj : null;
+    const clickSatObj = obj instanceof Satellite || obj instanceof OemSatellite || obj instanceof MissileObject ? obj : null;
 
     return {
       clickSatObj,
@@ -369,7 +438,7 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
 
     for (const line of lineManagerInstance.lines) {
       const { kind, detail } = line.getDescription();
-      const key = `${kind} ${detail ?? ''}`;
+      const key = `${kind}|${detail ?? ''}`;
       const existing = groups.get(key);
 
       if (existing) {

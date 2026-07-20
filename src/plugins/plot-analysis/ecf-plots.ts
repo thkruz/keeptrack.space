@@ -62,7 +62,7 @@ export class EcfPlot extends KeepTrackPlugin {
 
   sideMenuElementName = 'ecf-plots-menu';
   sideMenuElementHtml: string = html`
-  <div id="ecf-plots-menu" class="side-menu-parent start-hidden plot-analysis-menu-normal">
+  <div id="ecf-plots-menu" class="side-menu-parent start-hidden plot-analysis-menu-normal kt-ui-v13">
     <div id="plot-analysis-content" class="side-menu">
       <div id="${this.plotCanvasId}" class="plot-analysis-chart plot-analysis-menu-maximized"></div>
     </div>
@@ -231,13 +231,18 @@ export class EcfPlot extends KeepTrackPlugin {
     const timeData: Date[] = [];
 
     for (let i = 0; i < NUMBER_OF_POINTS; i++) {
-      const date = new Date(now + curSatObj.period * 60 * i / (NUMBER_OF_POINTS) * 1000);
+      const date = new Date(now + ((curSatObj.period * 60 * i) / NUMBER_OF_POINTS) * 1000);
 
       timeData.push(date);
     }
     data.push({
-      name: curSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(curSatObj, NUMBER_OF_POINTS)
-        .map((point: { x: number, y: number, z: number }, idx: number) => [point.x, point.y, point.z, timeData[idx].toISOString()]),
+      name: curSatObj.name,
+      value: SatMathApi.getEcfOfCurrentOrbit(curSatObj, NUMBER_OF_POINTS).map((point: { x: number; y: number; z: number }, idx: number) => [
+        point.x,
+        point.y,
+        point.z,
+        timeData[idx].toISOString(),
+      ]),
     });
 
     const secSatObj = this.selectSatManager_.secondarySatObj;
@@ -246,13 +251,18 @@ export class EcfPlot extends KeepTrackPlugin {
       const timeData: Date[] = [];
 
       for (let i = 0; i < NUMBER_OF_POINTS; i++) {
-        const date = new Date(now + secSatObj.period * 60 * i / (NUMBER_OF_POINTS) * 1000);
+        const date = new Date(now + ((secSatObj.period * 60 * i) / NUMBER_OF_POINTS) * 1000);
 
         timeData.push(date);
       }
       data.push({
-        name: secSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(secSatObj, NUMBER_OF_POINTS)
-          .map((point: { x: number, y: number, z: number }, idx: number) => [point.x, point.y, point.z, timeData[idx].toISOString()]),
+        name: secSatObj.name,
+        value: SatMathApi.getEcfOfCurrentOrbit(secSatObj, NUMBER_OF_POINTS).map((point: { x: number; y: number; z: number }, idx: number) => [
+          point.x,
+          point.y,
+          point.z,
+          timeData[idx].toISOString(),
+        ]),
       });
     }
 
@@ -262,13 +272,18 @@ export class EcfPlot extends KeepTrackPlugin {
       const lastSatObj = catalogManagerInstance.getObject(lastSatId) as Satellite;
 
       for (let i = 0; i < NUMBER_OF_POINTS; i++) {
-        const date = new Date(now + lastSatObj.period * 60 * i / (NUMBER_OF_POINTS) * 1000);
+        const date = new Date(now + ((lastSatObj.period * 60 * i) / NUMBER_OF_POINTS) * 1000);
 
         timeData.push(date);
       }
       data.push({
-        name: lastSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(lastSatObj, NUMBER_OF_POINTS)
-          .map((point: { x: number, y: number, z: number }, idx: number) => [point.x, point.y, point.z, timeData[idx].toISOString()]),
+        name: lastSatObj.name,
+        value: SatMathApi.getEcfOfCurrentOrbit(lastSatObj, NUMBER_OF_POINTS).map((point: { x: number; y: number; z: number }, idx: number) => [
+          point.x,
+          point.y,
+          point.z,
+          timeData[idx].toISOString(),
+        ]),
       });
     }
 

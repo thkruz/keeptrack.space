@@ -1,4 +1,4 @@
-import { test, expect } from '@test/e2e/coverage';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('Calculator', () => {
@@ -67,9 +67,7 @@ test.describe('Calculator', () => {
 
     // Close
     await page.evaluate(() => {
-      document.getElementById('calculator-menu-close-btn')?.dispatchEvent(
-        new MouseEvent('click', { bubbles: true }),
-      );
+      document.getElementById('calculator-menu-close-btn')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u, { timeout: 5_000 });
   });

@@ -3,6 +3,9 @@
     "SatelliteTimeline": {
       "bottomIconLabel": "卫星时间线",
       "title": "卫星时间线菜单",
+      "sections": {
+        "settings": "设置"
+      },
       "labels": {
         "calculationLength": "计算时长（小时）",
         "calculationInterval": "计算间隔（秒）",

@@ -16,9 +16,7 @@ interface FatalErrorConfig {
  * prevent the application from rendering anything.
  */
 export function showFatalError(config: FatalErrorConfig): never {
-  const recItems = config.recommendations
-    .map((r) => `<li>${r}</li>`)
-    .join('');
+  const recItems = config.recommendations.map((r) => `<li>${r}</li>`).join('');
 
   const detailHtml = config.technicalDetail
     ? `<div class="a11y-error__detail">

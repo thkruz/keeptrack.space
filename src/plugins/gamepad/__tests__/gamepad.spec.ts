@@ -1,4 +1,4 @@
-import { test, expect } from '@test/e2e/coverage';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('GamepadPlugin', () => {
@@ -15,7 +15,7 @@ test.describe('GamepadPlugin', () => {
     });
 
     // No uncaught errors related to gamepad should appear during initialization
-    const gamepadErrors = pageErrors.filter((e) => (/gamepad/iu).test(e));
+    const gamepadErrors = pageErrors.filter((e) => /gamepad/iu.test(e));
 
     expect(gamepadErrors).toHaveLength(0);
 
@@ -28,7 +28,7 @@ test.describe('GamepadPlugin', () => {
         // which is handled gracefully
         window.dispatchEvent(new Event('gamepaddisconnected'));
 
-return true;
+        return true;
       } catch {
         return false;
       }
@@ -37,7 +37,7 @@ return true;
     expect(noError).toBe(true);
 
     // Verify no new errors after dispatching the event
-    const postEventErrors = pageErrors.filter((e) => (/gamepad/iu).test(e));
+    const postEventErrors = pageErrors.filter((e) => /gamepad/iu.test(e));
 
     expect(postEventErrors).toHaveLength(0);
   });

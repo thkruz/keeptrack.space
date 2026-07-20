@@ -1,6 +1,7 @@
 {
   "SelectSatManager": {
-    "objectInsideEarth": "Объект находится внутри Земли, выбор невозможен"
+    "objectInsideEarth": "Объект находится внутри Земли, выбор невозможен",
+    "secondaryObjectSet": "Вторичный объект установлен: {name}"
   },
   "plugins": {
     "SelectSatManager": {

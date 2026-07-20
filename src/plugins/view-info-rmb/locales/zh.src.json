@@ -6,7 +6,6 @@
         "earthInfo": "地球信息",
         "sensorInfo": "传感器信息",
         "launchSiteInfo": "发射场信息",
-        "satelliteInfo": "卫星信息",
         "relatedSatellites": "相关卫星"
       },
       "errorMsgs": {

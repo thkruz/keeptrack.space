@@ -59,7 +59,7 @@ export class AdviceManager {
             </div>
           </div>
         </div>
-      `,
+      `
     );
 
     this.helpOuterDOM = getEl('help-outer-container')!;

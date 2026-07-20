@@ -4,7 +4,8 @@ name: Release
 # semantic-release owns versioning, git tags, and GitHub releases. It runs on
 # every push to main (i.e. after a release-worthy PR is merged) and:
 #   1. reads Conventional Commits since the last v* tag to pick the next version,
-#   2. bumps package.json / package-lock.json (npmPublish is disabled),
+#   2. bumps package.json (npmPublish is disabled; pnpm-lock.yaml carries no
+#      root version, so no lockfile bump is needed),
 #   3. regenerates docs/CHANGELOG.md from git tags via auto-changelog
 #      (the single source of truth) and syncs README / CITATION version refs,
 #   4. commits + tags on main and cuts the GitHub release.
@@ -49,34 +50,27 @@ jobs:
           persist-credentials: true
           token: ${{ secrets.RELEASE_TOKEN }}
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24'
-
-      - name: Cache node modules
-        uses: actions/cache@v5
-        with:
-          path: ~/.npm
-          key: >-
-            ${{ runner.os }}-build-node-modules-${{
-            hashFiles('**/package-lock.json') }}
-          restore-keys: >-
-            ${{ runner.os }}-build-node-modules-${{
-            runner.os }}-
+          cache: 'pnpm'
 
       # semantic-release only needs the source tree + git history: it bumps
       # package.json, regenerates the changelog from tags, and cuts the release.
       # It does not build the app, so submodules are not required here.
       - name: Install Dependencies
-        run: npm ci --ignore-scripts
+        run: pnpm install --frozen-lockfile
 
       - name: Run semantic-release
         env:
           # Same PAT: authenticates the GitHub Release API call and matches the
           # bypass identity used for the push.
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        run: npx semantic-release
+        run: pnpm exec semantic-release
 
   back-merge:
     name: Back-merge main into develop

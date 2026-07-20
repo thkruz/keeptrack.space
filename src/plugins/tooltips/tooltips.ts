@@ -41,23 +41,17 @@ export class TooltipsPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerInit,
-      () => {
-        const tooltipDiv = document.createElement('div');
+    EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
+      const tooltipDiv = document.createElement('div');
 
-        tooltipDiv.id = 'tooltip';
-        tooltipDiv.className = 'kt-tooltip-popup';
-        document.body.appendChild(tooltipDiv);
-      },
-    );
+      tooltipDiv.id = 'tooltip';
+      tooltipDiv.className = 'kt-tooltip-popup';
+      document.body.appendChild(tooltipDiv);
+    });
 
-    EventBus.getInstance().on(
-      EventBusEvent.onKeepTrackReady,
-      () => {
-        this.initTooltips();
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
+      this.initTooltips();
+    });
   }
 
   initTooltips(): void {
@@ -176,7 +170,7 @@ export class TooltipsPlugin extends KeepTrackPlugin {
 
     // Default: position above the element, centered horizontally
     let top = targetRect.top + window.scrollY - tooltipRect.height - 8;
-    let left = targetRect.left + window.scrollX + (targetRect.width / 2) - (tooltipRect.width / 2);
+    let left = targetRect.left + window.scrollX + targetRect.width / 2 - tooltipRect.width / 2;
 
     // If not enough space above, position below
     if (targetRect.top < tooltipRect.height + 16) {

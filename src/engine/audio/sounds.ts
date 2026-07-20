@@ -9,6 +9,11 @@ import chatter5Mp3 from '@public/audio/chatter5.mp3';
 import chatter6Mp3 from '@public/audio/chatter6.mp3';
 import chatter7Mp3 from '@public/audio/chatter7.mp3';
 import chatter8Mp3 from '@public/audio/chatter8.mp3';
+import click2Mp3 from '@public/audio/click2.mp3';
+import click3Mp3 from '@public/audio/click3.mp3';
+import click4Mp3 from '@public/audio/click4.mp3';
+import click7Mp3 from '@public/audio/click7.mp3';
+import click8Mp3 from '@public/audio/click8.mp3';
 import click10Mp3 from '@public/audio/click10.mp3';
 import click11Mp3 from '@public/audio/click11.mp3';
 import click12Mp3 from '@public/audio/click12.mp3';
@@ -19,7 +24,6 @@ import click16Mp3 from '@public/audio/click16.mp3';
 import click17Mp3 from '@public/audio/click17.mp3';
 import click18Mp3 from '@public/audio/click18.mp3';
 import click19Mp3 from '@public/audio/click19.mp3';
-import click2Mp3 from '@public/audio/click2.mp3';
 import click20Mp3 from '@public/audio/click20.mp3';
 import click21Mp3 from '@public/audio/click21.mp3';
 import click22Mp3 from '@public/audio/click22.mp3';
@@ -30,11 +34,7 @@ import click26Mp3 from '@public/audio/click26.mp3';
 import click27Mp3 from '@public/audio/click27.mp3';
 import click28Mp3 from '@public/audio/click28.mp3';
 import click29Mp3 from '@public/audio/click29.mp3';
-import click3Mp3 from '@public/audio/click3.mp3';
 import click30Mp3 from '@public/audio/click30.mp3';
-import click4Mp3 from '@public/audio/click4.mp3';
-import click7Mp3 from '@public/audio/click7.mp3';
-import click8Mp3 from '@public/audio/click8.mp3';
 import error1Mp3 from '@public/audio/error.mp3';
 import error2Mp3 from '@public/audio/error2.mp3';
 import exportMp3 from '@public/audio/export.wav';
@@ -56,7 +56,6 @@ import whoosh6Mp3 from '@public/audio/whoosh6.mp3';
 import whoosh7Mp3 from '@public/audio/whoosh7.mp3';
 import whoosh8Mp3 from '@public/audio/whoosh8.mp3';
 
-
 export enum SoundNames {
   BEEP = 'beep',
   WHOOSH = 'whoosh',
@@ -70,7 +69,7 @@ export enum SoundNames {
   WARNING = 'standby',
   MENU_BUTTON = 'menuButton',
   LOADING = 'loading',
-  EXPORT = 'export'
+  EXPORT = 'export',
 }
 
 export const sounds = {

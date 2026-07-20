@@ -1,11 +1,11 @@
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { UiGeolocation } from '@app/app/ui/ui-manager-geolocation';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { IContextMenuConfig, IHelpConfig, RmbMenuContext } from '@app/engine/plugins/core/plugin-capabilities';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -69,16 +69,17 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     zIndex: 3,
   };
 
-  rmbL1ElementName = 'create-rmb';
-  rmbL1Html = CustomSensorPlugin.buildRmbL1Html_();
-
-  isRmbOnEarth = true;
-  isRmbOffEarth = false;
-  isRmbOnSat = false;
-  rmbMenuOrder = 10;
-
-  rmbL2ElementName = 'create-rmb-menu';
-  rmbL2Html = CustomSensorPlugin.buildRmbL2Html_();
+  getContextMenuConfig(): IContextMenuConfig {
+    return {
+      level1ElementName: 'create-rmb',
+      level1Html: CustomSensorPlugin.buildRmbL1Html_(),
+      level2ElementName: 'create-rmb-menu',
+      level2Html: CustomSensorPlugin.buildRmbL2Html_(),
+      order: 10,
+      // Creating a sensor requires a ground location under the cursor
+      isVisible: (ctx: RmbMenuContext) => ctx.surface === 'earth',
+    };
+  }
 
   private static buildSideMenuHtml_(): string {
     const l = (key: string) => CustomSensorPlugin.t_(`labels.${key}`);
@@ -199,7 +200,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     </ul>`;
   }
 
-  rmbCallback: (targetId: string, clickedSat?: number) => void = (targetId: string) => {
+  onContextMenuAction(targetId: string): void {
     const sensorManagerInstance = ServiceLocator.getSensorManager();
     const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
@@ -252,33 +253,22 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
             'cs-maxrange': '5556',
           });
           triggerSubmit(<HTMLFormElement>getEl('custom-sensor-menu-form'));
-          const defaultColorScheme = colorSchemeManagerInstance.colorSchemeInstances[settingsManager.defaultColorScheme] ??
-            Object.values(colorSchemeManagerInstance.colorSchemeInstances)[0];
+          const defaultColorScheme =
+            colorSchemeManagerInstance.colorSchemeInstances[settingsManager.defaultColorScheme] ?? Object.values(colorSchemeManagerInstance.colorSchemeInstances)[0];
 
           colorSchemeManagerInstance.setColorScheme(defaultColorScheme, true);
           catalogManagerInstance.satCruncherThread.sendSunlightViewToggle(false);
         }
         break;
-      case 'colors-confidence-rmb':
-      case 'colors-rcs-rmb':
-      case 'colors-density-rmb':
-      case 'colors-starlink-rmb':
-      case 'colors-sunlight-rmb':
-      case 'colors-country-rmb':
-      case 'colors-velocity-rmb':
-      case 'colors-default-rmb':
-        break;
       default:
-        // errorManagerInstance.info(`Unknown RMB target: ${targetId}`);
         break;
     }
-  };
+  }
 
   dragOptions: ClickDragOptions = {
     minWidth: 350,
     isDraggable: true,
   };
-
 
   getHelpConfig(): IHelpConfig {
     const t = (key: string): string => CustomSensorPlugin.t_(key);
@@ -322,12 +312,9 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        CustomSensorPlugin.uiManagerFinal_();
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      CustomSensorPlugin.uiManagerFinal_();
+    });
   }
 
   private static uiManagerFinal_(): void {
@@ -458,9 +445,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   private static updateCustomSensorListDom() {
     const l = (key: string) => CustomSensorPlugin.t_(`sensorList.${key}`);
     const sensorManagerInstance = ServiceLocator.getSensorManager();
-    const primarySensor = sensorManagerInstance.currentSensors[0]?.objName?.startsWith('Custom Sensor')
-      ? [sensorManagerInstance.currentSensors[0]]
-      : [] as DetailedSensor[];
+    const primarySensor = sensorManagerInstance.currentSensors[0]?.objName?.startsWith('Custom Sensor') ? [sensorManagerInstance.currentSensors[0]] : ([] as DetailedSensor[]);
     const sensors = primarySensor.concat(sensorManagerInstance.secondarySensors);
 
     setInnerHtml('custom-sensors-sensor-list', renderCustomSensorList(sensors, l, bookmarkRemovePng));

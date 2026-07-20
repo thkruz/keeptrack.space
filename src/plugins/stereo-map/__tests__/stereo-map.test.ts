@@ -1,13 +1,13 @@
-import { vi } from 'vitest';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { MenuMode } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { StereoMap } from '@app/plugins/stereo-map/stereo-map';
 import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
-import { ServiceLocator } from '@app/engine/core/service-locator';
-import { KeepTrack } from '@app/keeptrack';
+import { vi } from 'vitest';
 
 // Mock canvas getContext for jsdom (not implemented in jsdom)
 HTMLCanvasElement.prototype.getContext = vi.fn(() => ({

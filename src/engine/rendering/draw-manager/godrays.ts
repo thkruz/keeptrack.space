@@ -62,7 +62,7 @@ export class Godrays {
 
     // sunRadius is 0.02 at 62e6 km and 1.0 at 10000 km - scale it accordingly
     // with 0.02 being the max size
-    let sunRadius = RADIUS_OF_SUN / distanceFromSun * 6250;
+    let sunRadius = (RADIUS_OF_SUN / distanceFromSun) * 6250;
 
     sunRadius = Math.min(Math.max(sunRadius, 0.02), 1.0);
 
@@ -108,10 +108,10 @@ export class Godrays {
     });
     const material = new ShaderMaterial(this.gl_, {
       uniforms: {
-        u_sunPosition: <WebGLUniformLocation><unknown>null,
-        u_sampler: <WebGLUniformLocation><unknown>null,
-        u_resolution: <WebGLUniformLocation><unknown>null,
-        u_sunRadius: <WebGLUniformLocation><unknown>null,
+        u_sunPosition: <WebGLUniformLocation>(<unknown>null),
+        u_sampler: <WebGLUniformLocation>(<unknown>null),
+        u_resolution: <WebGLUniformLocation>(<unknown>null),
+        u_sunRadius: <WebGLUniformLocation>(<unknown>null),
       },
       map: gl.createTexture(),
       textureType: 'flat',

@@ -1,13 +1,13 @@
-import { Degrees } from '@ootk/src/main';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { getEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
 import { NewLaunch } from '@app/plugins/new-launch/new-launch';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { ServiceLocator } from '@app/engine/core/service-locator';
+import { Degrees } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
-import { getEl } from '@app/engine/utils/get-el';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';

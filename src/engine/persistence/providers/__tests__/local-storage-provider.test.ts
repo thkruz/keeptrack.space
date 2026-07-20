@@ -30,10 +30,12 @@ describe('LocalStorageProvider', () => {
   });
 
   it('writes a batch and reads them back', async () => {
-    await provider.writeBatch(new Map([
-      [StorageKey.COLOR_SCHEME, 'a'],
-      [StorageKey.IS_ADVICE_ENABLED, 'true'],
-    ]));
+    await provider.writeBatch(
+      new Map([
+        [StorageKey.COLOR_SCHEME, 'a'],
+        [StorageKey.IS_ADVICE_ENABLED, 'true'],
+      ])
+    );
 
     expect(await provider.read(StorageKey.COLOR_SCHEME)).toBe('a');
     expect(await provider.read(StorageKey.IS_ADVICE_ENABLED)).toBe('true');
@@ -61,7 +63,9 @@ describe('LocalStorageProvider', () => {
   });
 
   it('subscribe returns a callable unsubscribe', () => {
-    const unsub = provider.subscribe(() => { /* noop */ });
+    const unsub = provider.subscribe(() => {
+      /* noop */
+    });
 
     expect(typeof unsub).toBe('function');
     expect(() => unsub()).not.toThrow();

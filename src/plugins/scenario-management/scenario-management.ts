@@ -87,22 +87,28 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
   }
 
   updateScenario(partialScenario: Partial<ScenarioData>): boolean {
-    if (!this.validateScenario_({
+    /*
+     * Distinguish an absent key (keep the current value) from an explicit null
+     * (clear the value). `??` collapses both, so an explicit null (e.g. "clear
+     * time bounds") would validate against the OLD bounds and then be applied
+     * anyway, leaving a half-cleared scenario. Merge on key presence instead,
+     * validate the merged result, and commit that same object.
+     */
+    const merged: ScenarioData = {
       name: partialScenario.name ?? this.scenario.name,
       description: partialScenario.description ?? this.scenario.description,
-      startTime: partialScenario.startTime ?? this.scenario.startTime,
-      endTime: partialScenario.endTime ?? this.scenario.endTime,
-    })) {
+      startTime: 'startTime' in partialScenario ? (partialScenario.startTime ?? null) : this.scenario.startTime,
+      endTime: 'endTime' in partialScenario ? (partialScenario.endTime ?? null) : this.scenario.endTime,
+    };
+
+    if (!this.validateScenario_(merged)) {
       return false;
     }
 
     const oldStart = this.scenario.startTime?.getTime() ?? null;
     const oldEnd = this.scenario.endTime?.getTime() ?? null;
 
-    this.scenario = {
-      ...this.scenario,
-      ...partialScenario,
-    };
+    this.scenario = merged;
 
     const newStart = this.scenario.startTime?.getTime() ?? null;
     const newEnd = this.scenario.endTime?.getTime() ?? null;
@@ -124,10 +130,7 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
     }
 
     // Must be valid dates or null
-    if (
-      (scenario.startTime && isNaN(scenario.startTime.getTime())) ||
-      (scenario.endTime && isNaN(scenario.endTime.getTime()))
-    ) {
+    if ((scenario.startTime && isNaN(scenario.startTime.getTime())) || (scenario.endTime && isNaN(scenario.endTime.getTime()))) {
       errorManagerInstance.warn('Scenario start time and end time must be valid dates.');
 
       return false;

@@ -42,7 +42,7 @@ export const ownerCodeMap: Record<string, string> = {
   'COPERN/ESA': 'Copernicus / ESA',
   GSAEU: 'EU Agency for the Space Programme',
   EUMET: 'EUMETSAT',
-  CNES: 'Centre National d\'Etudes Spatiales',
+  CNES: "Centre National d'Etudes Spatiales",
   DLR: 'German Aerospace Center',
   ASI: 'Italian Space Agency',
   UKSA: 'UK Space Agency',

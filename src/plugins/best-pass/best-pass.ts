@@ -26,12 +26,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import {
-  IBottomIconConfig,
-  IHelpConfig,
-  IKeyboardShortcut,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, IHelpConfig, IKeyboardShortcut, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -103,11 +98,7 @@ export class BestPassPlugin extends KeepTrackPlugin {
           content: t7e('plugins.BestPassPlugin.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.BestPassPlugin.help.tip1'),
-        t7e('plugins.BestPassPlugin.help.tip2'),
-        t7e('plugins.BestPassPlugin.help.tip3'),
-      ],
+      tips: [t7e('plugins.BestPassPlugin.help.tip1'), t7e('plugins.BestPassPlugin.help.tip2'), t7e('plugins.BestPassPlugin.help.tip3')],
       shortcuts: [{ keys: ['b'], description: t7e('plugins.BestPassPlugin.help.shortcutToggle') }],
     };
   }
@@ -163,10 +154,7 @@ export class BestPassPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      this.uiManagerFinal_.bind(this),
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
 
     // Sensor-gated enable/disable only applies when a sensor is actually required.
     // Subclasses that pick sensors in-menu (e.g. via chips) set isRequireSensorSelected
@@ -239,7 +227,7 @@ export class BestPassPlugin extends KeepTrackPlugin {
 
     ServiceLocator.getUiManager().toast(
       t7e('plugins.BestPassPlugin.errorMsgs.ResultsTruncated' as Parameters<typeof t7e>[0]).replace('{limit}', DEFAULT_MAX_RESULTS.toString()),
-      ToastMsgType.caution,
+      ToastMsgType.caution
     );
   }
 

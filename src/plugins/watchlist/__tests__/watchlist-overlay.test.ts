@@ -1,8 +1,8 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
-import { WatchlistOverlay } from '@app/plugins/watchlist/watchlist-overlay';
-import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
+import { WatchlistOverlay } from '@app/plugins/watchlist/watchlist-overlay';
 import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSmokeSuite, websiteInit } from '@test/generic-tests';
@@ -23,7 +23,11 @@ describe('WatchlistOverlay behavior', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const p = () => plugin as any;
   const T = WatchlistOverlay as unknown as {
-    IMMINENT_MS_: number; UPCOMING_MS_: number; AWARE_MS_: number; DISPLAY_CAP_MS_: number; DEPARTED_MS_: number;
+    IMMINENT_MS_: number;
+    UPCOMING_MS_: number;
+    AWARE_MS_: number;
+    DISPLAY_CAP_MS_: number;
+    DEPARTED_MS_: number;
   };
 
   const pass = (sat = defaultSat, offsetMs = 0) => ({ sat, time: new Date(Date.now() + offsetMs) });
@@ -94,6 +98,30 @@ describe('WatchlistOverlay behavior', () => {
       const out = p().formatPassTime_(new Date(now + 20 * MIN), now, 'wl-tier-upcoming');
 
       expect(out).toMatch(/\d{1,2}:\d{2}/u);
+    });
+  });
+
+  describe('per-list color dot', () => {
+    it('prefixes entries with a colored dot when the watchlist has a list color', () => {
+      vi.spyOn(p().watchlistPlugin_, 'getListColor').mockReturnValue('#2ecc71');
+      p().nextPassArray_ = [pass(defaultSat, 2 * MIN)];
+      p().isMenuButtonActive = true;
+
+      p().updateNextPassOverlay_(true);
+
+      const html = getEl('info-overlay-content')!.innerHTML;
+
+      expect(html).toContain('wl-list-dot');
+      expect(html).toContain('background:#2ecc71');
+    });
+
+    it('renders no dot when no list color is set (OSS default)', () => {
+      p().nextPassArray_ = [pass(defaultSat, 2 * MIN)];
+      p().isMenuButtonActive = true;
+
+      p().updateNextPassOverlay_(true);
+
+      expect(getEl('info-overlay-content')!.innerHTML).not.toContain('wl-list-dot');
     });
   });
 

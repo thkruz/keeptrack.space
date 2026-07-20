@@ -1,12 +1,6 @@
-import { Degrees } from '@ootk/src/main';
 import { ElevationMask } from '@app/engine/ootk/src/sensor/FieldOfView';
-import {
-  createDefaultProfile,
-  createDefaultStore,
-  createElevationMaskFn,
-  getEffectiveElevation,
-  TerrainMaskProfile,
-} from '../terrain-mask-profile';
+import { Degrees } from '@ootk/src/main';
+import { createDefaultProfile, createDefaultStore, createElevationMaskFn, getEffectiveElevation, TerrainMaskProfile } from '../terrain-mask-profile';
 
 const profileWith = (masks: ElevationMask[], base = 10): TerrainMaskProfile => ({
   id: 'p1',

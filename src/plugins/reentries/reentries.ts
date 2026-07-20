@@ -6,13 +6,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import {
-  IBottomIconConfig,
-  IDragOptions,
-  IHelpConfig,
-  IKeyboardShortcut,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, IDragOptions, IHelpConfig, IKeyboardShortcut, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { buildSideMenuTabsHtml, initSideMenuTabs, updateSideMenuTabIndicator } from '@app/engine/ui/side-menu-tabs';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -176,11 +170,7 @@ export class Reentries extends KeepTrackPlugin {
           content: t7e('plugins.Reentries.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.Reentries.help.tip1'),
-        t7e('plugins.Reentries.help.tip2'),
-        t7e('plugins.Reentries.help.tip3'),
-      ],
+      tips: [t7e('plugins.Reentries.help.tip1'), t7e('plugins.Reentries.help.tip2'), t7e('plugins.Reentries.help.tip3')],
       shortcuts: [{ keys: ['R'], description: t7e('plugins.Reentries.help.shortcutToggle') }],
     };
   }
@@ -189,6 +179,8 @@ export class Reentries extends KeepTrackPlugin {
     return [
       {
         key: 'R',
+        // ctrl:false so Ctrl+Shift+R belongs to Video Director, not this toggle.
+        ctrl: false,
         callback: () => this.bottomMenuClicked(),
       },
     ];
@@ -205,16 +197,13 @@ export class Reentries extends KeepTrackPlugin {
     EventBus.getInstance().on(EventBusEvent.userLogin, this.onUserLogin_.bind(this));
     EventBus.getInstance().on(EventBusEvent.userLogout, this.onUserLogout_.bind(this));
 
-    EventBus.getInstance().on(
-      EventBusEvent.onCruncherMessage,
-      () => {
-        if (this.selectSatIdOnCruncher_ !== null) {
-          PluginRegistry.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
+    EventBus.getInstance().on(EventBusEvent.onCruncherMessage, () => {
+      if (this.selectSatIdOnCruncher_ !== null) {
+        PluginRegistry.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
 
-          this.selectSatIdOnCruncher_ = null;
-        }
-      },
-    );
+        this.selectSatIdOnCruncher_ = null;
+      }
+    });
   }
 
   private uiManagerFinal_() {
@@ -395,8 +384,8 @@ export class Reentries extends KeepTrackPlugin {
         parseInt(this.tipList_[row].DECAY_EPOCH.substring(8, 10)),
         parseInt(this.tipList_[row].DECAY_EPOCH.substring(11, 13)),
         parseInt(this.tipList_[row].DECAY_EPOCH.substring(14, 16)),
-        parseInt(this.tipList_[row].DECAY_EPOCH.substring(17, 19)),
-      ),
+        parseInt(this.tipList_[row].DECAY_EPOCH.substring(17, 19))
+      )
     );
 
     ServiceLocator.getTimeManager().changeStaticOffset(decayEpoch.getTime() - now.getTime());
@@ -554,9 +543,7 @@ export class Reentries extends KeepTrackPlugin {
         const objectCache = ServiceLocator.getCatalogManager().objectCache;
         const sccNums = CatalogSearch.findReentry(<Satellite[]>objectCache, 200);
 
-        this.reentryList_ = sccNums
-          .map((scc) => ServiceLocator.getCatalogManager().sccNum2Sat(scc))
-          .filter((sat): sat is Satellite => sat !== null);
+        this.reentryList_ = sccNums.map((scc) => ServiceLocator.getCatalogManager().sccNum2Sat(scc)).filter((sat): sat is Satellite => sat !== null);
 
         this.createReentryTable_();
       } catch {
@@ -583,16 +570,7 @@ export class Reentries extends KeepTrackPlugin {
   private static createReentryHeaders_(tbl: HTMLTableElement) {
     const th = (key: string) => t7e(`plugins.Reentries.table.${key}` as Parameters<typeof t7e>[0]);
     const tr = tbl.insertRow();
-    const names = [
-      th('norad'),
-      th('name'),
-      th('type'),
-      th('perigee'),
-      th('apogee'),
-      th('meanAlt'),
-      th('incl'),
-      th('rcsSup'),
-    ];
+    const names = [th('norad'), th('name'), th('type'), th('perigee'), th('apogee'), th('meanAlt'), th('incl'), th('rcsSup')];
 
     for (const name of names) {
       const column = tr.insertCell();
@@ -646,9 +624,7 @@ export class Reentries extends KeepTrackPlugin {
       rcsStr = rcsEst ? `${rcsEst.toFixed(2)}` : unknown;
     }
 
-    const meanAltStr = hasReentered
-      ? l('reentered')
-      : ((sat.apogee + sat.perigee) / 2).toFixed(1);
+    const meanAltStr = hasReentered ? l('reentered') : ((sat.apogee + sat.perigee) / 2).toFixed(1);
 
     Reentries.createCell_(tr, sat.sccNum);
     Reentries.createCell_(tr, sat.name || unknown);

@@ -1,18 +1,15 @@
 import { AzRangeMsgType, AzRangeOutMsgType } from '@app/webworker/az-range-heatmap-messages';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  AzRangeCallbacks,
-  AzRangeHeatmapThreadManager,
-  AzRangeParams,
-} from '../az-range-heatmap-thread-manager';
+import { AzRangeCallbacks, AzRangeHeatmapThreadManager, AzRangeParams } from '../az-range-heatmap-thread-manager';
 
 /** A Worker stub whose postMessage/terminate are spies, passed to init() as workerStub. */
-const makeWorkerStub = () => ({
-  postMessage: vi.fn(),
-  terminate: vi.fn(),
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
-} as unknown as Worker & { postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> });
+const makeWorkerStub = () =>
+  ({
+    postMessage: vi.fn(),
+    terminate: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  }) as unknown as Worker & { postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> };
 
 /** Builds an initialized manager backed by a spy worker (Node single-worker path). */
 const makeMgr = () => {
@@ -47,9 +44,14 @@ const callbacks = (): AzRangeCallbacks => ({
   onError: vi.fn(),
 });
 
-const emptyBins = () => [[0, 0], [0, 0]];
+const emptyBins = () => [
+  [0, 0],
+  [0, 0],
+];
 
-interface OnMessageable { onMessage(e: { data: unknown }): void }
+interface OnMessageable {
+  onMessage(e: { data: unknown }): void;
+}
 
 describe('AzRangeHeatmapThreadManager', () => {
   describe('lifecycle', () => {
@@ -122,7 +124,10 @@ describe('AzRangeHeatmapThreadManager', () => {
         data: {
           typ: AzRangeOutMsgType.PARTIAL,
           runId,
-          bins: [[1, 2], [3, 4]],
+          bins: [
+            [1, 2],
+            [3, 4],
+          ],
           numAzBins: 2,
           numRngBins: 2,
           maxRng: 1000,
@@ -134,7 +139,10 @@ describe('AzRangeHeatmapThreadManager', () => {
       expect(cbs.onPartial).toHaveBeenCalledTimes(1);
       const arg = (cbs.onPartial as ReturnType<typeof vi.fn>).mock.calls[0][0] as { bins: number[][]; stepsProcessed: number };
 
-      expect(arg.bins).toEqual([[1, 2], [3, 4]]);
+      expect(arg.bins).toEqual([
+        [1, 2],
+        [3, 4],
+      ]);
       expect(arg.stepsProcessed).toBe(5);
     });
 
@@ -148,18 +156,27 @@ describe('AzRangeHeatmapThreadManager', () => {
         data: {
           typ: AzRangeOutMsgType.RESULT,
           runId,
-          bins: [[5, 0], [0, 7]],
+          bins: [
+            [5, 0],
+            [0, 7],
+          ],
           numAzBins: 2,
           numRngBins: 2,
           maxRng: 1000,
-          binSatNums: [[['25544'], []], [[], ['25544']]],
+          binSatNums: [
+            [['25544'], []],
+            [[], ['25544']],
+          ],
         },
       });
 
       expect(cbs.onResult).toHaveBeenCalledTimes(1);
       const arg = (cbs.onResult as ReturnType<typeof vi.fn>).mock.calls[0][0] as { bins: number[][]; binSatNums: string[][][] };
 
-      expect(arg.bins).toEqual([[5, 0], [0, 7]]);
+      expect(arg.bins).toEqual([
+        [5, 0],
+        [0, 7],
+      ]);
       expect(arg.binSatNums[0][0]).toEqual(['25544']);
     });
 
@@ -181,7 +198,10 @@ describe('AzRangeHeatmapThreadManager', () => {
           numAzBins: 2,
           numRngBins: 2,
           maxRng: 1000,
-          binSatNums: [[[], []], [[], []]],
+          binSatNums: [
+            [[], []],
+            [[], []],
+          ],
         },
       });
       expect(cbs.onResult).not.toHaveBeenCalled();
@@ -214,13 +234,15 @@ describe('AzRangeHeatmapThreadManager', () => {
       const { mgr } = makeMgr();
       const handler = mgr as unknown as OnMessageable;
 
-      expect(() => handler.onMessage({
-        data: {
-          typ: AzRangeOutMsgType.ERROR,
-          runId: 0,
-          message: 'noop',
-        },
-      })).not.toThrow();
+      expect(() =>
+        handler.onMessage({
+          data: {
+            typ: AzRangeOutMsgType.ERROR,
+            runId: 0,
+            message: 'noop',
+          },
+        })
+      ).not.toThrow();
     });
   });
 });

@@ -8,9 +8,9 @@ import {
   isDefaultState,
   OBJECT_TYPE_FILTERS,
   ORBITAL_REGIME_FILTERS,
+  SOURCE_FILTERS,
   showOnlyInGroup,
   showOnlyPayloads,
-  SOURCE_FILTERS,
 } from '@app/plugins/filter-menu/filter-menu-core';
 
 describe('filter-menu-core', () => {
@@ -61,8 +61,7 @@ describe('filter-menu-core', () => {
     it('every grouped id and every storage-map id exists in the catalog', () => {
       const ids = new Set(getFilters().map((f) => f.id));
       // Vimpel only appears when the JSC catalog is enabled, so exclude it from the existence check.
-      const groupIds = [...OBJECT_TYPE_FILTERS, ...ORBITAL_REGIME_FILTERS, ...COUNTRY_FILTERS, ...SOURCE_FILTERS]
-        .filter((id) => id !== 'vimpelSatellites');
+      const groupIds = [...OBJECT_TYPE_FILTERS, ...ORBITAL_REGIME_FILTERS, ...COUNTRY_FILTERS, ...SOURCE_FILTERS].filter((id) => id !== 'vimpelSatellites');
 
       groupIds.forEach((id) => expect(ids.has(id)).toBe(true));
       Object.keys(FILTER_STORAGE_MAP)
@@ -78,8 +77,9 @@ describe('filter-menu-core', () => {
     });
 
     it('covers exactly the group ids', () => {
-      expect(Object.keys(showOnlyInGroup('lEOSatellites', ORBITAL_REGIME_FILTERS)).sort((a, b) => a.localeCompare(b)))
-        .toEqual([...ORBITAL_REGIME_FILTERS].sort((a, b) => a.localeCompare(b)));
+      expect(Object.keys(showOnlyInGroup('lEOSatellites', ORBITAL_REGIME_FILTERS)).sort((a, b) => a.localeCompare(b))).toEqual(
+        [...ORBITAL_REGIME_FILTERS].sort((a, b) => a.localeCompare(b))
+      );
     });
   });
 

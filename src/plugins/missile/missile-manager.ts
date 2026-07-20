@@ -11,14 +11,14 @@ import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { jday } from '@app/engine/utils/transforms';
 import { ScenarioManagementPlugin } from '@app/plugins/scenario-management/scenario-management';
 import { TimeSlider } from '@app/plugins/time-slider/time-slider';
-import { DEG2RAD, Degrees, Kilometers, KilometersPerSecond, MILLISECONDS_TO_DAYS, RAD2DEG, Sgp4, SpaceObjectType, TemeVec3, ecefRad2rae, eci2ecef, eci2lla } from '@ootk/src/main';
+import { DEG2RAD, Degrees, ecefRad2rae, eci2ecef, eci2lla, Kilometers, KilometersPerSecond, MILLISECONDS_TO_DAYS, RAD2DEG, Sgp4, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
 import { generateBallisticTrajectory } from './ballistic-trajectory';
-import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, globalBMTargets, ukSLBM } from './missile-data';
-import { RvTarget, expandTrajectoryToMirv, expandTrajectoryToTargets, findSeparationIndex, generateFootprint, retargetDescent, warheadCountForDesc } from './missile-mirv';
+import { ChinaICBM, FraSLBM, globalBMTargets, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, ukSLBM } from './missile-data';
+import { expandTrajectoryToMirv, expandTrajectoryToTargets, findSeparationIndex, generateFootprint, RvTarget, retargetDescent, warheadCountForDesc } from './missile-mirv';
 import { MissileSimulation } from './missile-simulation';
 import { MissileSpec, MissileTrajectory } from './missile-types';
-import { SubLaunchEntry, isSubmarineLaunch, planSubmarineBoats } from './sub-launch';
+import { isSubmarineLaunch, planSubmarineBoats, SubLaunchEntry } from './sub-launch';
 
 /**
  * Raw shape of one entry in a mass-raid / simulation JSON file, as baked by the scenario generators
@@ -96,148 +96,149 @@ export const MassRaidPre = async (time: number, simFile: string) => {
   // rather than against the current document URL. fetchJson then rejects with an actionable error
   // (naming the file + status) instead of the opaque "Unexpected token '<'" that results when a
   // missing file causes the SPA index.html to be served in its place.
-  const url = (/^(?:https?:)?\/\//u).test(simFile) || simFile.startsWith('/')
-    ? simFile
-    : `${settingsManager.installDirectory}${simFile}`;
+  const url = /^(?:https?:)?\/\//u.test(simFile) || simFile.startsWith('/') ? simFile : `${settingsManager.installDirectory}${simFile}`;
 
-  await fetchJson<RawMassRaidMissile[]>(url)
-    .then((newMissileArray) => {
-      const catalogManagerInstance = ServiceLocator.getCatalogManager();
-      const dotsManagerInstance = ServiceLocator.getDotsManager();
-      const orbitManagerInstance = ServiceLocator.getOrbitManager();
-      const satSetLen = catalogManagerInstance.missileSats;
+  await fetchJson<RawMassRaidMissile[]>(url).then((newMissileArray) => {
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
+    const orbitManagerInstance = ServiceLocator.getOrbitManager();
+    const satSetLen = catalogManagerInstance.missileSats;
 
-      // Collect the real MissileObjects we build below (not the raw JSON) so the
-      // per-frame orbit redraw in the plugin's updateLoop_ reads a correct catalog
-      // id off each entry. The raw JSON carries no id, and even the legacy files'
-      // baked ids were stale relative to the runtime catalog slot.
-      const builtMissiles: MissileObject[] = [];
-      const maxMissiles = settingsManager.maxMissiles;
-      const firstSlot = satSetLen - maxMissiles;
-      let slotOffset = 0; // running index into the missile reservation
+    // Collect the real MissileObjects we build below (not the raw JSON) so the
+    // per-frame orbit redraw in the plugin's updateLoop_ reads a correct catalog
+    // id off each entry. The raw JSON carries no id, and even the legacy files'
+    // baked ids were stale relative to the runtime catalog slot.
+    const builtMissiles: MissileObject[] = [];
+    const maxMissiles = settingsManager.maxMissiles;
+    const firstSlot = satSetLen - maxMissiles;
+    let slotOffset = 0; // running index into the missile reservation
 
-      // Submarine launchers are baked from a homeport placeholder over land. Plan all of them up
-      // front: gather each nation's SLBM buses onto a realistic number of hulls (never more than the
-      // real class fleet) placed at distinct open-ocean patrol points spread across the class's
-      // basins, so the raid shows a plausible handful of well-separated boats rather than one
-      // submarine per missile. Each bus then re-flies from its assigned hull to its own baked target.
-      const subEntries: SubLaunchEntry[] = [];
+    // Submarine launchers are baked from a homeport placeholder over land. Plan all of them up
+    // front: gather each nation's SLBM buses onto a realistic number of hulls (never more than the
+    // real class fleet) placed at distinct open-ocean patrol points spread across the class's
+    // basins, so the raid shows a plausible handful of well-separated boats rather than one
+    // submarine per missile. Each bus then re-flies from its assigned hull to its own baked target.
+    const subEntries: SubLaunchEntry[] = [];
 
-      for (let i = 0; i < newMissileArray.length; i++) {
-        const raw = newMissileArray[i];
+    for (let i = 0; i < newMissileArray.length; i++) {
+      const raw = newMissileArray[i];
 
-        if (isSubmarineLaunch(raw.desc) && raw.altList?.length >= 2) {
-          const li = raw.altList.length - 1;
+      if (isSubmarineLaunch(raw.desc) && raw.altList?.length >= 2) {
+        const li = raw.altList.length - 1;
 
-          subEntries.push({ index: i, desc: String(raw.desc), targetLat: raw.latList[li], targetLon: raw.lonList[li] });
-        }
+        subEntries.push({ index: i, desc: String(raw.desc), targetLat: raw.latList[li], targetLon: raw.lonList[li] });
       }
-      const boatPositions = planSubmarineBoats(subEntries);
+    }
+    const boatPositions = planSubmarineBoats(subEntries);
 
-      for (let i = 0; i < newMissileArray.length && slotOffset < maxMissiles; i++) {
-        const raw = newMissileArray[i];
+    for (let i = 0; i < newMissileArray.length && slotOffset < maxMissiles; i++) {
+      const raw = newMissileArray[i];
 
-        raw.startTime = time;
-        raw.name = raw.ON;
-        raw.country = raw.C;
+      raw.startTime = time;
+      raw.name = raw.ON;
+      raw.country = raw.C;
 
-        // Re-fly this SLBM from its assigned hull to its baked primary aimpoint (the bus's last
-        // sample). The primary target - and every reentry vehicle's baked target below - is
-        // preserved, so each warhead's label keeps matching where it actually lands.
-        const boat = boatPositions.get(i);
+      // Re-fly this SLBM from its assigned hull to its baked primary aimpoint (the bus's last
+      // sample). The primary target - and every reentry vehicle's baked target below - is
+      // preserved, so each warhead's label keeps matching where it actually lands.
+      const boat = boatPositions.get(i);
 
-        if (boat && raw.altList?.length >= 2) {
-          const li = raw.altList.length - 1;
-          const traj = generateBallisticTrajectory(boat.launchLat, boat.launchLon, raw.latList[li], raw.lonList[li]);
+      if (boat && raw.altList?.length >= 2) {
+        const li = raw.altList.length - 1;
+        const traj = generateBallisticTrajectory(boat.launchLat, boat.launchLon, raw.latList[li], raw.lonList[li]);
 
-          raw.latList = traj.latList;
-          raw.lonList = traj.lonList;
-          raw.altList = traj.altList;
-        }
+        raw.latList = traj.latList;
+        raw.lonList = traj.lonList;
+        raw.altList = traj.altList;
+      }
 
-        // Fan the bus into one reentry vehicle per baked target: every RV shares the bus track to
-        // apogee, then bends to its own distinct real aimpoint and carries that target's name, so
-        // the warheads spread across separate targets instead of clustering on one. Files without
-        // rvTargets (legacy) fall back to a designator-based footprint. Clamp to the slots left.
-        const launcher = String(raw.desc ?? '').split(' -> ')[0];
-        const primaryLabel = String(raw.desc ?? '').split(' -> ').slice(1).join(' -> ');
-        const rvTargets = (raw.rvTargets) ?? [];
-        const tracks = rvTargets.length > 0
+      // Fan the bus into one reentry vehicle per baked target: every RV shares the bus track to
+      // apogee, then bends to its own distinct real aimpoint and carries that target's name, so
+      // the warheads spread across separate targets instead of clustering on one. Files without
+      // rvTargets (legacy) fall back to a designator-based footprint. Clamp to the slots left.
+      const launcher = String(raw.desc ?? '').split(' -> ')[0];
+      const primaryLabel = String(raw.desc ?? '')
+        .split(' -> ')
+        .slice(1)
+        .join(' -> ');
+      const rvTargets = raw.rvTargets ?? [];
+      const tracks =
+        rvTargets.length > 0
           ? expandTrajectoryToTargets(raw.latList, raw.lonList, raw.altList, rvTargets).map((r) => ({ ...r.track, name: r.name }))
           : expandTrajectoryToMirv(raw.latList, raw.lonList, raw.altList, warheadCountForDesc(raw.desc), MIRV_DEFAULT_SPREAD_KM).map((track) => ({ ...track, name: '' }));
-        const count = Math.min(tracks.length, maxMissiles - slotOffset);
+      const count = Math.min(tracks.length, maxMissiles - slotOffset);
 
-        for (let w = 0; w < count; w++) {
-          const x = firstSlot + slotOffset;
-          const track = tracks[w];
+      for (let w = 0; w < count; w++) {
+        const x = firstSlot + slotOffset;
+        const track = tracks[w];
 
-          // Each RV is labeled with its own distinct target ("launcher -> target"). The legacy
-          // footprint path (no per-RV name) keeps the "(RV n/N)" suffix off the shared primary.
-          let desc = raw.desc;
+        // Each RV is labeled with its own distinct target ("launcher -> target"). The legacy
+        // footprint path (no per-RV name) keeps the "(RV n/N)" suffix off the shared primary.
+        let desc = raw.desc;
 
-          if (track.name) {
-            desc = `${launcher} -> ${track.name}`;
-          } else if (count > 1) {
-            desc = `${launcher} -> ${primaryLabel} (RV ${w + 1}/${count})`;
-          }
-
-          // Build the real MissileObject directly from the sim data and store that in the
-          // catalog. Never stage raw JSON in the cache: a plain object has no class methods, so any
-          // catalog read that runs updatePosVel() would call isStatic() on it and throw. The
-          // MissileObject constructor already defaults velocity/totalVelocity to zero. (issue #1373)
-          const missileObj = new MissileObject({
-            id: x,
-            name: `RV_${x}`,
-            country: raw.country,
-            desc,
-            active: raw.active,
-            type: raw.type,
-            latList: track.latList,
-            lonList: track.lonList,
-            altList: track.altList,
-            startTime: raw.startTime,
-          } as unknown as MissileParams);
-
-          // Children ride on top of the bus during ascent; hide them until separation.
-          missileObj.hideUntilSeparation = w > 0;
-          // The whole load flies as one bus until apogee, so tag every RV with the full
-          // count: the visible ascent object (w === 0) then resolves to the deploy mesh
-          // that shows this many reentry vehicles.
-          missileObj.warheadCount = count;
-
-          catalogManagerInstance.objectCache[x] = missileObj;
-          builtMissiles.push(missileObj);
-
-          // Seed the missile's initial position on the main thread. The position-cruncher worker
-          // fills positionData asynchronously on its next cycle, but the doSearch('RV_') below runs
-          // synchronously - without this seed every missile reads position {0,0,0} and is flagged as
-          // "decayed" until the user searches a second time. The cruncher overwrites these with
-          // matching values once it runs, so this only bridges the startup gap.
-          const pv = missileObj.eci();
-
-          if (pv && dotsManagerInstance.positionData) {
-            dotsManagerInstance.positionData[x * 3] = pv.position.x;
-            dotsManagerInstance.positionData[x * 3 + 1] = pv.position.y;
-            dotsManagerInstance.positionData[x * 3 + 2] = pv.position.z;
-          }
-
-          catalogManagerInstance.satCruncherThread.sendNewMissile({
-            id: missileObj.id,
-            active: missileObj.active,
-            type: missileObj.type,
-            latList: missileObj.latList,
-            lonList: missileObj.lonList,
-            altList: missileObj.altList,
-            startTime: missileObj.startTime,
-          });
-
-          orbitManagerInstance.updateOrbitBuffer(missileObj.id, missileObj);
-          slotOffset++;
+        if (track.name) {
+          desc = `${launcher} -> ${track.name}`;
+        } else if (count > 1) {
+          desc = `${launcher} -> ${primaryLabel} (RV ${w + 1}/${count})`;
         }
+
+        // Build the real MissileObject directly from the sim data and store that in the
+        // catalog. Never stage raw JSON in the cache: a plain object has no class methods, so any
+        // catalog read that runs updatePosVel() would call isStatic() on it and throw. The
+        // MissileObject constructor already defaults velocity/totalVelocity to zero. (issue #1373)
+        const missileObj = new MissileObject({
+          id: x,
+          name: `RV_${x}`,
+          country: raw.country,
+          desc,
+          active: raw.active,
+          type: raw.type,
+          latList: track.latList,
+          lonList: track.lonList,
+          altList: track.altList,
+          startTime: raw.startTime,
+        } as unknown as MissileParams);
+
+        // Children ride on top of the bus during ascent; hide them until separation.
+        missileObj.hideUntilSeparation = w > 0;
+        // The whole load flies as one bus until apogee, so tag every RV with the full
+        // count: the visible ascent object (w === 0) then resolves to the deploy mesh
+        // that shows this many reentry vehicles.
+        missileObj.warheadCount = count;
+
+        catalogManagerInstance.objectCache[x] = missileObj;
+        builtMissiles.push(missileObj);
+
+        // Seed the missile's initial position on the main thread. The position-cruncher worker
+        // fills positionData asynchronously on its next cycle, but the doSearch('RV_') below runs
+        // synchronously - without this seed every missile reads position {0,0,0} and is flagged as
+        // "decayed" until the user searches a second time. The cruncher overwrites these with
+        // matching values once it runs, so this only bridges the startup gap.
+        const pv = missileObj.eci();
+
+        if (pv && dotsManagerInstance.positionData) {
+          dotsManagerInstance.positionData[x * 3] = pv.position.x;
+          dotsManagerInstance.positionData[x * 3 + 1] = pv.position.y;
+          dotsManagerInstance.positionData[x * 3 + 2] = pv.position.z;
+        }
+
+        catalogManagerInstance.satCruncherThread.sendNewMissile({
+          id: missileObj.id,
+          active: missileObj.active,
+          type: missileObj.type,
+          latList: missileObj.latList,
+          lonList: missileObj.lonList,
+          altList: missileObj.altList,
+          startTime: missileObj.startTime,
+        });
+
+        orbitManagerInstance.updateOrbitBuffer(missileObj.id, missileObj);
+        slotOffset++;
       }
-      missileManager.missilesInUse = slotOffset;
-      missileManager.missileArray = builtMissiles;
-    });
+    }
+    missileManager.missilesInUse = slotOffset;
+    missileManager.missileArray = builtMissiles;
+  });
 
   ServiceLocator.getUiManager().toast('Missile Mass Raid Loaded Successfully', ToastMsgType.normal);
   settingsManager.searchLimit = Math.max(settingsManager.searchLimit, settingsManager.maxMissiles);
@@ -422,7 +423,7 @@ const writeMissileToSlot_ = (
   maxAltitudeKm: number,
   startTime: number,
   desc: string,
-  country?: string,
+  country?: string
 ): MissileObject | null => {
   const catalogManagerInstance = ServiceLocator.getCatalogManager();
   const missileObj = catalogManagerInstance.getObject(slot) as MissileObject | null;
@@ -506,7 +507,7 @@ export const Missile = (
   NewBurnRate: number,
   MaxMissileRange: number,
   country: string,
-  minAltitude: number,
+  minAltitude: number
 ) => {
   if (isMassRaidLoaded) {
     clearMissiles();
@@ -570,16 +571,7 @@ export const Missile = (
   }
 
   const { trajectory } = solved;
-  const written = writeMissileToSlot_(
-    MissileObjectNum,
-    trajectory.latList,
-    trajectory.lonList,
-    trajectory.altList,
-    trajectory.maxAltitudeKm,
-    CurrentTime,
-    MissileDesc,
-    country,
-  );
+  const written = writeMissileToSlot_(MissileObjectNum, trajectory.latList, trajectory.lonList, trajectory.altList, trajectory.maxAltitudeKm, CurrentTime, MissileDesc, country);
 
   if (written) {
     missileManager.missileArray = missileArray;
@@ -674,7 +666,7 @@ export const MirvAttack = (params: MirvLaunchParams): number => {
       bus.maxAltitudeKm,
       params.startTime,
       desc,
-      params.country,
+      params.country
     );
 
     if (written) {
@@ -728,7 +720,7 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: DetailedSensor
     now.getUTCDate(),
     now.getUTCHours(),
     now.getUTCMinutes(),
-    now.getUTCSeconds(),
+    now.getUTCSeconds()
   ); // Converts time to jday (TLEs use epoch year/day)
 
   j += now.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
@@ -789,8 +781,8 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: DetailedSensor
     currentTEARR.lat = gpos.lat;
     positionEcf = eci2ecef({ x, y, z }, gmst);
     lookAngles = ecefRad2rae(sensor.llaRad(), positionEcf);
-    currentTEARR.az = lookAngles.az * RAD2DEG as Degrees;
-    currentTEARR.el = lookAngles.el * RAD2DEG as Degrees;
+    currentTEARR.az = (lookAngles.az * RAD2DEG) as Degrees;
+    currentTEARR.el = (lookAngles.el * RAD2DEG) as Degrees;
     currentTEARR.rng = lookAngles.rng;
   } catch {
     currentTEARR.alt = 0 as Kilometers;
@@ -802,18 +794,24 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: DetailedSensor
   }
 
   // Check if satellite is in field of view of a sensor.
-  const hasSecondaryFov = sensor.minAz2 !== undefined && sensor.maxAz2 !== undefined &&
-    sensor.minEl2 !== undefined && sensor.maxEl2 !== undefined &&
-    sensor.minRng2 !== undefined && sensor.maxRng2 !== undefined;
+  const hasSecondaryFov =
+    sensor.minAz2 !== undefined &&
+    sensor.maxAz2 !== undefined &&
+    sensor.minEl2 !== undefined &&
+    sensor.maxEl2 !== undefined &&
+    sensor.minRng2 !== undefined &&
+    sensor.maxRng2 !== undefined;
 
   if (sensor.minAz > sensor.maxAz) {
-    const inPrimaryFov = (currentTEARR.az >= sensor.minAz || currentTEARR.az <= sensor.maxAz) &&
+    const inPrimaryFov =
+      (currentTEARR.az >= sensor.minAz || currentTEARR.az <= sensor.maxAz) &&
       currentTEARR.el >= sensor.minEl &&
       currentTEARR.el <= sensor.maxEl &&
       currentTEARR.rng <= sensor.maxRng &&
       currentTEARR.rng >= sensor.minRng;
 
-    const inSecondaryFov = hasSecondaryFov &&
+    const inSecondaryFov =
+      hasSecondaryFov &&
       (currentTEARR.az >= sensor.minAz2! || currentTEARR.az <= sensor.maxAz2!) &&
       currentTEARR.el >= sensor.minEl2! &&
       currentTEARR.el <= sensor.maxEl2! &&
@@ -822,14 +820,16 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: DetailedSensor
 
     currentTEARR.inView = inPrimaryFov || inSecondaryFov;
   } else {
-    const inPrimaryFov = currentTEARR.az >= sensor.minAz &&
+    const inPrimaryFov =
+      currentTEARR.az >= sensor.minAz &&
       currentTEARR.az <= sensor.maxAz &&
       currentTEARR.el >= sensor.minEl &&
       currentTEARR.el <= sensor.maxEl &&
       currentTEARR.rng <= sensor.maxRng &&
       currentTEARR.rng >= sensor.minRng;
 
-    const inSecondaryFov = hasSecondaryFov &&
+    const inSecondaryFov =
+      hasSecondaryFov &&
       currentTEARR.az >= sensor.minAz2! &&
       currentTEARR.az <= sensor.maxAz2! &&
       currentTEARR.el >= sensor.minEl2! &&

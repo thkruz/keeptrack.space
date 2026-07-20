@@ -1,9 +1,11 @@
 import { SatMath } from '@app/app/analysis/sat-math';
 import { Camera } from '@app/engine/camera/camera';
 import { CameraType } from '@app/engine/camera/camera-type';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { DEG2RAD, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, Satellite } from '@ootk/src/main';
 import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
+import { vi } from 'vitest';
 
 const testFuncWithAllCameraTypes = (testFunc: () => void, cameraInstance: Camera) => {
   cameraInstance.cameraType = CameraType.FIXED_TO_EARTH;
@@ -71,6 +73,211 @@ describe('Camera.setFieldOfView', () => {
     cameraInstance.setFieldOfView(0.5 as Radians);
     settingsManager.fieldOfView = 1.0 as Radians;
     expect(cameraInstance.fov).toBeCloseTo(0.5, 6);
+  });
+});
+
+describe('Camera.rollTouchTwist', () => {
+  let cameraInstance: Camera;
+
+  beforeEach(() => {
+    cameraInstance = new Camera();
+    settingsManager.isLocalRotateEnabled = true;
+  });
+
+  it('accumulates roll into both current and target and zeroes the roll speed', () => {
+    cameraInstance.state.localRotateSpeed.roll = 0.5 as Radians;
+
+    cameraInstance.rollTouchTwist(0.2 as Radians);
+    cameraInstance.rollTouchTwist(0.1 as Radians);
+
+    expect(cameraInstance.state.localRotateCurrent.roll).toBeCloseTo(0.3);
+    expect(cameraInstance.state.localRotateTarget.roll).toBeCloseTo(0.3);
+    expect(cameraInstance.state.localRotateSpeed.roll).toBe(0);
+  });
+
+  it('normalizes the accumulated roll to [-PI, PI]', () => {
+    cameraInstance.state.localRotateCurrent.roll = 3.1 as Radians;
+
+    cameraInstance.rollTouchTwist(0.2 as Radians);
+
+    expect(cameraInstance.state.localRotateCurrent.roll).toBeCloseTo(3.3 - 2 * Math.PI);
+  });
+
+  it('ignores twists when local rotation is disabled or the delta is not finite', () => {
+    settingsManager.isLocalRotateEnabled = false;
+    cameraInstance.rollTouchTwist(0.2 as Radians);
+    expect(cameraInstance.state.localRotateCurrent.roll).toBe(0);
+
+    settingsManager.isLocalRotateEnabled = true;
+    cameraInstance.rollTouchTwist(NaN as Radians);
+    expect(cameraInstance.state.localRotateCurrent.roll).toBe(0);
+  });
+});
+
+describe('Camera.zoomTouchPinch', () => {
+  let cameraInstance: Camera;
+  // Satellite at 7000 km from Earth center (~629 km altitude)
+  const targetDist = 7000;
+  const zoomAt = (dist: number) => cameraInstance.getZoomFromDistance(dist as Kilometers);
+
+  beforeEach(() => {
+    cameraInstance = new Camera();
+    cameraInstance.cameraType = CameraType.FIXED_TO_SAT_ECI;
+    // Mobile clears camZoomSnappedOnSat right after the selection snap
+    cameraInstance.state.camZoomSnappedOnSat = false;
+    cameraInstance.state.minDistanceFromTarget = 0.15 as Kilometers;
+    settingsManager.touchPinchSensitivity = 0.5;
+    settingsManager.nearZoomLevel = 25 as Kilometers;
+    settingsManager.minZoomDistance = (RADIUS_OF_EARTH + 50) as Kilometers;
+    settingsManager.maxZoomDistance = 1.2e6 as Kilometers;
+    settingsManager.isZoomStopsSnappedOnSat = false;
+    vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue({
+      selectedSat: 42,
+      primarySatObj: { id: 42, position: { x: targetDist, y: 0, z: 0 } },
+    } as never);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('dollies proportionally in standoff space within the close-camera range', () => {
+    cameraInstance.state.zoomTarget = zoomAt(targetDist + 10);
+
+    cameraInstance.zoomTouchPinch(1.2); // dampened ratio 1.1
+
+    expect(cameraInstance.state.isZoomIn).toBe(true);
+    expect(cameraInstance.state.camDistBuffer).toBeCloseTo(10 / 1.1, 4);
+    expect(cameraInstance.state.zoomTarget).toBeCloseTo(zoomAt(targetDist + 10 / 1.1), 6);
+  });
+
+  it('clamps the standoff at the per-target minimum distance', () => {
+    cameraInstance.state.zoomTarget = zoomAt(targetDist + 0.2);
+
+    cameraInstance.zoomTouchPinch(3); // dampened ratio 2 -> 0.1 km, below the 0.15 km floor
+
+    expect(cameraInstance.state.camDistBuffer).toBeCloseTo(0.15, 6);
+  });
+
+  it('escapes to Earth-centered zoom when pinching out past the close-camera range', () => {
+    cameraInstance.state.zoomTarget = zoomAt(targetDist + 20);
+    const zoomBefore = cameraInstance.state.zoomTarget;
+
+    cameraInstance.zoomTouchPinch(0.5); // dampened ratio 0.75 -> 26.7 km standoff, past 25 km
+
+    expect(cameraInstance.state.isZoomIn).toBe(false);
+    expect(cameraInstance.state.zoomTarget).toBeCloseTo(zoomBefore / 0.75, 6);
+  });
+
+  it('reaches a whole-Earth view in a bounded number of pinch-out strokes', () => {
+    cameraInstance.state.zoomTarget = zoomAt(targetDist + 0.15);
+
+    // Fourteen full pinch-out strokes of 60 incremental events each (~2% finger travel per event).
+    // Pure proportional standoff zoom would still be under 1000 km after this much input.
+    for (let stroke = 0; stroke < 14; stroke++) {
+      for (let i = 0; i < 60; i++) {
+        cameraInstance.zoomTouchPinch(0.98);
+      }
+    }
+
+    expect(cameraInstance.calcDistanceBasedOnZoom(cameraInstance.state.zoomTarget)).toBeGreaterThan(40000);
+  });
+
+  it('never leaves standoff space when a per-mode standoff cap is set (companion ride-along)', () => {
+    cameraInstance.state.maxDistanceFromTarget = 10 as Kilometers;
+    cameraInstance.state.zoomTarget = zoomAt(targetDist + 8);
+
+    for (let i = 0; i < 3; i++) {
+      cameraInstance.zoomTouchPinch(0.5);
+    }
+
+    expect(cameraInstance.state.camDistBuffer).toBeCloseTo(10, 6);
+    expect(cameraInstance.state.zoomTarget).toBeCloseTo(zoomAt(targetDist + 10), 6);
+  });
+
+  it('lands an Earth-centered pinch-in on the close-range boundary instead of diving past it', () => {
+    cameraInstance.state.zoomTarget = zoomAt(targetDist + 5000);
+
+    cameraInstance.zoomTouchPinch(3); // dampened ratio 2 halves zoomTarget, diving below the satellite
+
+    expect(cameraInstance.state.camDistBuffer).toBeCloseTo(25, 4);
+    expect(cameraInstance.state.zoomTarget).toBeCloseTo(zoomAt(targetDist + 25), 6);
+  });
+
+  it('stays in camDistBuffer space while zoom-snapped (desktop touchscreens)', () => {
+    cameraInstance.state.camZoomSnappedOnSat = true;
+    cameraInstance.state.camDistBuffer = 100 as Kilometers;
+
+    cameraInstance.zoomTouchPinch(0.5); // dampened ratio 0.75, beyond nearZoomLevel but snapped
+
+    expect(cameraInstance.state.camZoomSnappedOnSat).toBe(true);
+    expect(cameraInstance.state.camDistBuffer).toBeCloseTo(100 / 0.75, 3);
+    expect(cameraInstance.state.zoomTarget).toBeCloseTo(zoomAt(targetDist + 100 / 0.75), 6);
+  });
+
+  it('falls back to Earth-centered zoom when no satellite is focused', () => {
+    vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue({
+      selectedSat: -1,
+      primarySatObj: { id: -1 },
+    } as never);
+    cameraInstance.cameraType = CameraType.FIXED_TO_EARTH;
+    cameraInstance.state.zoomTarget = 0.5;
+
+    cameraInstance.zoomTouchPinch(0.8); // dampened ratio 0.9
+
+    expect(cameraInstance.state.zoomTarget).toBeCloseTo(0.5 / 0.9, 6);
+  });
+});
+
+describe('Camera roll-compensated drag', () => {
+  let cameraInstance: Camera;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const priv = () => cameraInstance as any;
+  let wasMobile: boolean;
+
+  beforeEach(() => {
+    cameraInstance = new Camera();
+    wasMobile = settingsManager.isMobileModeEnabled;
+    // Forces the screen-drag branch of updatePitchYawSpeeds_ (no earth raycasting)
+    settingsManager.isMobileModeEnabled = true;
+    cameraInstance.state.isDragging = true;
+    cameraInstance.state.screenDragPoint = [100, 100];
+    cameraInstance.state.mouseX = 200; // dragged right by 100px
+    cameraInstance.state.mouseY = 100;
+  });
+
+  afterEach(() => {
+    settingsManager.isMobileModeEnabled = wasMobile;
+  });
+
+  it('maps a horizontal drag to yaw only when the view is not rolled', () => {
+    priv().updatePitchYawSpeeds_(16 as Milliseconds);
+
+    expect(cameraInstance.state.camYawSpeed).not.toBe(0);
+    expect(cameraInstance.state.camPitchSpeed).toBeCloseTo(0, 10);
+  });
+
+  it('maps a horizontal drag to pitch when the view is rolled 90 degrees', () => {
+    cameraInstance.state.localRotateCurrent.roll = (Math.PI / 2) as Radians;
+
+    priv().updatePitchYawSpeeds_(16 as Milliseconds);
+
+    expect(cameraInstance.state.camPitchSpeed).not.toBe(0);
+    expect(cameraInstance.state.camYawSpeed).toBeCloseTo(0, 10);
+  });
+
+  it('rotates release momentum by the current roll', () => {
+    cameraInstance.state.isDragging = false;
+    priv().wasDragging_ = true;
+    cameraInstance.state.dragVelocityX = 10;
+    cameraInstance.state.dragVelocityY = 0;
+    cameraInstance.state.localRotateCurrent.roll = (Math.PI / 2) as Radians;
+
+    priv().updatePitchYawSpeeds_(16 as Milliseconds);
+
+    // Screen-horizontal fling on a 90-degree-rolled view coasts in pitch, not yaw
+    expect(cameraInstance.state.camPitchSpeed).not.toBe(0);
+    expect(cameraInstance.state.camYawSpeed).toBeCloseTo(0, 10);
   });
 });
 

@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 /* eslint-disable max-lines-per-function */
 /* eslint-disable dot-notation */
 /* eslint-disable no-new */
@@ -10,6 +9,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('ReportsPlugin_class', () => {
   beforeEach(() => {
@@ -175,8 +175,17 @@ describe('ReportsPlugin report generation', () => {
 
   // A lightweight sensor stub: AER samples sensor.rae() inside each injected pass window.
   const makeFakeSensor = () => ({
-    name: 'FAKE', getTypeString: () => 'Optical',
-    lat: 0, lon: 0, alt: 0, minAz: 0, maxAz: 360, minEl: 0, maxEl: 90, minRng: 0, maxRng: 100000,
+    name: 'FAKE',
+    getTypeString: () => 'Optical',
+    lat: 0,
+    lon: 0,
+    alt: 0,
+    minAz: 0,
+    maxAz: 360,
+    minEl: 0,
+    maxEl: 90,
+    minRng: 0,
+    maxRng: 100000,
     rae: () => ({ az: 100, el: 15, rng: 500 }),
   });
 
@@ -263,7 +272,9 @@ describe('ReportsPlugin report generation', () => {
     const fakeWindow = () => {
       const real = document.implementation.createHTMLDocument('rep');
       const doc = {
-        open: vi.fn(), close: vi.fn(), title: '',
+        open: vi.fn(),
+        close: vi.fn(),
+        title: '',
         createElement: (t: string) => real.createElement(t),
         body: real.body,
       };

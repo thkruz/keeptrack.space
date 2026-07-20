@@ -47,7 +47,7 @@ const loadWorker = async () => {
 };
 
 const dispatch = (data: Record<string, unknown>) => {
-  (globalThis.onmessage as ((m: { data: unknown }) => void))({ data });
+  (globalThis.onmessage as (m: { data: unknown }) => void)({ data });
 };
 
 describe('proximityOpsWorker', () => {
@@ -150,7 +150,7 @@ describe('proximityOpsWorker', () => {
     await loadWorker();
     posted = [];
 
-    const run = (globalThis.onmessage as ((m: { data: unknown }) => Promise<void>))({
+    const run = (globalThis.onmessage as (m: { data: unknown }) => Promise<void>)({
       data: {
         typ: IN.START,
         runId: 9,

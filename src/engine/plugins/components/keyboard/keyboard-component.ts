@@ -19,7 +19,9 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { isCameraMovementKey, KEYBOARD_DRIVEN_CAMERA_TYPES } from '@app/engine/camera/camera-type';
 import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { IKeyboardShortcut } from '../../core/plugin-capabilities';
@@ -46,12 +48,7 @@ export class KeyboardComponent {
    * @param loginGateCheck Optional callback that returns true if the login gate allows activation.
    * @param onLoginGateRejected Optional callback invoked when the login gate rejects activation.
    */
-  constructor(
-    pluginId: string,
-    shortcuts: IKeyboardShortcut[],
-    loginGateCheck?: () => boolean,
-    onLoginGateRejected?: () => void,
-  ) {
+  constructor(pluginId: string, shortcuts: IKeyboardShortcut[], loginGateCheck?: () => boolean, onLoginGateRejected?: () => void) {
     this.pluginId_ = pluginId;
     this.shortcuts_ = shortcuts;
     this.loginGateCheck_ = loginGateCheck;
@@ -82,27 +79,47 @@ export class KeyboardComponent {
 
     const validShortcuts = KeyboardShortcutRegistry.register(this.pluginId_, this.shortcuts_);
 
-    EventBus.getInstance().on(
-      EventBusEvent.KeyDown,
-      (key: string, code: string, isRepeat: boolean, isShift: boolean, isCtrl: boolean) => {
-        if (isRepeat) {
-          return;
-        }
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, code: string, isRepeat: boolean, isShift: boolean, isCtrl: boolean) => {
+      if (isRepeat) {
+        return;
+      }
 
-        for (const shortcut of validShortcuts) {
-          if (this.matchesShortcut_(shortcut, key, code, isShift, isCtrl)) {
-            if (this.loginGateCheck_ && !this.loginGateCheck_()) {
-              this.onLoginGateRejected_?.();
-              break;
-            }
-            shortcut.callback();
+      /*
+       * A keyboard-driven camera mode (FPS / Satellite First Person / Astronomy /
+       * Planetarium) owns the WASD/QE/arrow/numpad keys for movement. Suppress
+       * plugin shortcuts bound to those keys while such a mode is active, so
+       * flying the camera doesn't also open and close menus. Other keys
+       * (M, N, Space, Ctrl-combos, etc.) are unaffected.
+       */
+      if (isCameraMovementKey(key, code) && KeyboardComponent.isCameraKeyboardModeActive_()) {
+        return;
+      }
+
+      for (const shortcut of validShortcuts) {
+        if (this.matchesShortcut_(shortcut, key, code, isShift, isCtrl)) {
+          if (this.loginGateCheck_ && !this.loginGateCheck_()) {
+            this.onLoginGateRejected_?.();
             break;
           }
+          shortcut.callback();
+          break;
         }
-      },
-    );
+      }
+    });
 
     this.isInitialized_ = true;
+  }
+
+  /**
+   * True when the main camera is in a mode that drives itself from the keyboard
+   * (see {@link KEYBOARD_DRIVEN_CAMERA_TYPES}). Resolved lazily so it reflects
+   * the camera state at the moment the key is pressed. Returns false when no
+   * camera is registered (e.g. during isolated unit tests).
+   */
+  private static isCameraKeyboardModeActive_(): boolean {
+    const cameraType = ServiceLocator.getMainCamera()?.cameraType;
+
+    return cameraType !== undefined && KEYBOARD_DRIVEN_CAMERA_TYPES.has(cameraType);
   }
 
   /**
@@ -113,13 +130,7 @@ export class KeyboardComponent {
    * - `true` → modifier must be pressed
    * - `false` → modifier must NOT be pressed
    */
-  private matchesShortcut_(
-    shortcut: IKeyboardShortcut,
-    key: string,
-    code: string,
-    isShift: boolean,
-    isCtrl: boolean,
-  ): boolean {
+  private matchesShortcut_(shortcut: IKeyboardShortcut, key: string, code: string, isShift: boolean, isCtrl: boolean): boolean {
     // Match by key or code
     const keyMatch = shortcut.key === key || shortcut.code === code;
 

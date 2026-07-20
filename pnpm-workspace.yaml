@@ -1,0 +1,12 @@
+# pnpm settings. These live here (not in .npmrc) so that plain `npm`/`npx`
+# invocations don't warn "Unknown config" about pnpm-only keys. pnpm 10 reads
+# settings from this file; npm ignores it cleanly.
+#
+# Flat, npm-like node_modules layout. Chosen for the migration off npm so that
+# rspack loaders and webgl mocks that assume a hoisted tree keep resolving.
+nodeLinker: hoisted
+
+# Match npm's lenient peer-dependency behavior so installs don't hard-fail on
+# peer mismatches that npm previously tolerated.
+strictPeerDependencies: false
+autoInstallPeers: true

@@ -109,7 +109,8 @@ export const BREAKUP_EVENTS: BreakupEvent[] = [
     altitudeKm: 282,
     cause: 'Intentional ASAT Test',
     estimatedDebrisCount: 400,
-    description: 'Indian direct-ascent ASAT test (Mission Shakti) against the Microsat-R satellite. The low intercept altitude limited the long-lived debris population, though some fragments were lofted above the ISS.',
+    description:
+      'Indian direct-ascent ASAT test (Mission Shakti) against the Microsat-R satellite. The low intercept altitude limited the long-lived debris population, though some fragments were lofted above the ISS.',
   },
   {
     id: 'breezem',
@@ -139,7 +140,8 @@ export const BREAKUP_EVENTS: BreakupEvent[] = [
     altitudeKm: 800,
     cause: 'Accidental Explosion',
     estimatedDebrisCount: 533,
-    description: 'A Chinese Long March 6A second stage fragmented shortly after deploying Yunhai-3, scattering hundreds of fragments through heavily used sun-synchronous altitudes.',
+    description:
+      'A Chinese Long March 6A second stage fragmented shortly after deploying Yunhai-3, scattering hundreds of fragments through heavily used sun-synchronous altitudes.',
   },
   {
     id: 'noaa16',
@@ -154,7 +156,8 @@ export const BREAKUP_EVENTS: BreakupEvent[] = [
     altitudeKm: 860,
     cause: 'Battery / Thermal Failure',
     estimatedDebrisCount: 458,
-    description: 'The decommissioned NOAA-16 weather satellite fragmented on orbit, attributed to a battery or thermal failure, adding long-lived debris to a congested polar altitude.',
+    description:
+      'The decommissioned NOAA-16 weather satellite fragmented on orbit, attributed to a battery or thermal failure, adding long-lived debris to a congested polar altitude.',
   },
   {
     id: 'dmspf13',
@@ -169,7 +172,8 @@ export const BREAKUP_EVENTS: BreakupEvent[] = [
     altitudeKm: 840,
     cause: 'Battery Explosion',
     estimatedDebrisCount: 149,
-    description: 'A US Defense Meteorological Satellite Program spacecraft ruptured after a battery overcharge and overheating, a failure mode later traced across several DMSP and NOAA satellites of the same design.',
+    description:
+      'A US Defense Meteorological Satellite Program spacecraft ruptured after a battery overcharge and overheating, a failure mode later traced across several DMSP and NOAA satellites of the same design.',
   },
   {
     id: 'usa193',

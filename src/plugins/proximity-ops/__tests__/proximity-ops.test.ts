@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
-import { vi } from 'vitest';
+
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
 import { ProximityOps } from '@app/plugins/proximity-ops/proximity-ops';
@@ -10,6 +10,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('ProximityOps_class', () => {
   beforeEach(() => {
@@ -206,8 +207,7 @@ describe('ProximityOps_class', () => {
     let plugin: ProximityOps;
     const p = () => plugin as any;
 
-    const cloneSat = (over: Record<string, unknown> = {}) =>
-      Object.assign(Object.create(Object.getPrototypeOf(defaultSat)), defaultSat, { id: 1, ...over });
+    const cloneSat = (over: Record<string, unknown> = {}) => Object.assign(Object.create(Object.getPrototypeOf(defaultSat)), defaultSat, { id: 1, ...over });
 
     beforeEach(() => {
       plugin = new ProximityOps();

@@ -40,7 +40,7 @@ import { glsl } from '@app/engine/utils/development/formatter';
 import { FrameProfiler, GpuStage } from '@app/engine/utils/frame-profiler';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, Sun, TEME, Vector3D } from '@ootk/src/main';
-import { BackdatePosition as backdatePosition, Body, KM_PER_AU } from 'astronomy-engine';
+import { Body, BackdatePosition as backdatePosition, KM_PER_AU } from 'astronomy-engine';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { PersistenceManager, StorageKey } from '../../utils/persistence-manager';
@@ -48,8 +48,14 @@ import { DepthManager } from '../depth-manager';
 import { OrbitPathLine } from '../line-manager/orbit-path';
 import { PlanetColors } from './celestial-bodies/celestial-body';
 import {
-  AtmosphereSettings, EarthBumpTextureQuality, EarthCloudTextureQuality, EarthDayTextureQuality, EarthNightTextureQuality, EarthPoliticalTextureQuality,
-  EarthSpecTextureQuality, EarthTextureStyle,
+  AtmosphereSettings,
+  EarthBumpTextureQuality,
+  EarthCloudTextureQuality,
+  EarthDayTextureQuality,
+  EarthNightTextureQuality,
+  EarthPoliticalTextureQuality,
+  EarthSpecTextureQuality,
+  EarthTextureStyle,
 } from './earth-quality-enums';
 import { OcclusionProgram } from './post-processing';
 
@@ -60,56 +66,64 @@ export class Earth {
   private modelViewMatrix_: mat4;
   private readonly normalMatrix_: mat3 = mat3.create();
   textureDay: Record<string, WebGLTexture> = {
-    [settingsManager.earthTextureStyle + EarthDayTextureQuality.POTATO]: <WebGLTexture><unknown>null,
-    [settingsManager.earthTextureStyle + EarthDayTextureQuality.LOW]: <WebGLTexture><unknown>null,
-    [settingsManager.earthTextureStyle + EarthDayTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
-    [settingsManager.earthTextureStyle + EarthDayTextureQuality.HIGH]: <WebGLTexture><unknown>null,
-    [settingsManager.earthTextureStyle + EarthDayTextureQuality.ULTRA]: <WebGLTexture><unknown>null,
+    [settingsManager.earthTextureStyle + EarthDayTextureQuality.POTATO]: <WebGLTexture>(<unknown>null),
+    [settingsManager.earthTextureStyle + EarthDayTextureQuality.LOW]: <WebGLTexture>(<unknown>null),
+    [settingsManager.earthTextureStyle + EarthDayTextureQuality.MEDIUM]: <WebGLTexture>(<unknown>null),
+    [settingsManager.earthTextureStyle + EarthDayTextureQuality.HIGH]: <WebGLTexture>(<unknown>null),
+    [settingsManager.earthTextureStyle + EarthDayTextureQuality.ULTRA]: <WebGLTexture>(<unknown>null),
   };
   textureNight: Record<string, WebGLTexture> = {
-    [settingsManager.earthTextureStyle + EarthNightTextureQuality.POTATO]: <WebGLTexture><unknown>null,
-    [settingsManager.earthTextureStyle + EarthNightTextureQuality.LOW]: <WebGLTexture><unknown>null,
-    [settingsManager.earthTextureStyle + EarthNightTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
-    [settingsManager.earthTextureStyle + EarthNightTextureQuality.HIGH]: <WebGLTexture><unknown>null,
-    [settingsManager.earthTextureStyle + EarthNightTextureQuality.ULTRA]: <WebGLTexture><unknown>null,
+    [settingsManager.earthTextureStyle + EarthNightTextureQuality.POTATO]: <WebGLTexture>(<unknown>null),
+    [settingsManager.earthTextureStyle + EarthNightTextureQuality.LOW]: <WebGLTexture>(<unknown>null),
+    [settingsManager.earthTextureStyle + EarthNightTextureQuality.MEDIUM]: <WebGLTexture>(<unknown>null),
+    [settingsManager.earthTextureStyle + EarthNightTextureQuality.HIGH]: <WebGLTexture>(<unknown>null),
+    [settingsManager.earthTextureStyle + EarthNightTextureQuality.ULTRA]: <WebGLTexture>(<unknown>null),
   };
   textureSpec: Record<EarthSpecTextureQuality, WebGLTexture> = {
-    [EarthSpecTextureQuality.OFF]: <WebGLTexture><unknown>null,
-    [EarthSpecTextureQuality.POTATO]: <WebGLTexture><unknown>null,
-    [EarthSpecTextureQuality.LOW]: <WebGLTexture><unknown>null,
-    [EarthSpecTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
-    [EarthSpecTextureQuality.HIGH]: <WebGLTexture><unknown>null,
-    [EarthSpecTextureQuality.ULTRA]: <WebGLTexture><unknown>null,
+    [EarthSpecTextureQuality.OFF]: <WebGLTexture>(<unknown>null),
+    [EarthSpecTextureQuality.POTATO]: <WebGLTexture>(<unknown>null),
+    [EarthSpecTextureQuality.LOW]: <WebGLTexture>(<unknown>null),
+    [EarthSpecTextureQuality.MEDIUM]: <WebGLTexture>(<unknown>null),
+    [EarthSpecTextureQuality.HIGH]: <WebGLTexture>(<unknown>null),
+    [EarthSpecTextureQuality.ULTRA]: <WebGLTexture>(<unknown>null),
   };
   textureBump: Record<EarthBumpTextureQuality, WebGLTexture> = {
-    [EarthBumpTextureQuality.OFF]: <WebGLTexture><unknown>null,
-    [EarthBumpTextureQuality.LOW]: <WebGLTexture><unknown>null,
-    [EarthBumpTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
-    [EarthBumpTextureQuality.HIGH]: <WebGLTexture><unknown>null,
+    [EarthBumpTextureQuality.OFF]: <WebGLTexture>(<unknown>null),
+    [EarthBumpTextureQuality.LOW]: <WebGLTexture>(<unknown>null),
+    [EarthBumpTextureQuality.MEDIUM]: <WebGLTexture>(<unknown>null),
+    [EarthBumpTextureQuality.HIGH]: <WebGLTexture>(<unknown>null),
   };
   texturePolitical: Record<EarthPoliticalTextureQuality, WebGLTexture> = {
-    [EarthPoliticalTextureQuality.OFF]: <WebGLTexture><unknown>null,
-    [EarthPoliticalTextureQuality.POTATO]: <WebGLTexture><unknown>null,
-    [EarthPoliticalTextureQuality.LOW]: <WebGLTexture><unknown>null,
-    [EarthPoliticalTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
-    [EarthPoliticalTextureQuality.HIGH]: <WebGLTexture><unknown>null,
-    [EarthPoliticalTextureQuality.ULTRA]: <WebGLTexture><unknown>null,
+    [EarthPoliticalTextureQuality.OFF]: <WebGLTexture>(<unknown>null),
+    [EarthPoliticalTextureQuality.POTATO]: <WebGLTexture>(<unknown>null),
+    [EarthPoliticalTextureQuality.LOW]: <WebGLTexture>(<unknown>null),
+    [EarthPoliticalTextureQuality.MEDIUM]: <WebGLTexture>(<unknown>null),
+    [EarthPoliticalTextureQuality.HIGH]: <WebGLTexture>(<unknown>null),
+    [EarthPoliticalTextureQuality.ULTRA]: <WebGLTexture>(<unknown>null),
   };
   textureClouds: Record<EarthCloudTextureQuality, WebGLTexture> = {
-    [EarthCloudTextureQuality.OFF]: <WebGLTexture><unknown>null,
-    [EarthCloudTextureQuality.POTATO]: <WebGLTexture><unknown>null,
-    [EarthCloudTextureQuality.LOW]: <WebGLTexture><unknown>null,
-    [EarthCloudTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
-    [EarthCloudTextureQuality.HIGH]: <WebGLTexture><unknown>null,
-    [EarthCloudTextureQuality.ULTRA]: <WebGLTexture><unknown>null,
+    [EarthCloudTextureQuality.OFF]: <WebGLTexture>(<unknown>null),
+    [EarthCloudTextureQuality.POTATO]: <WebGLTexture>(<unknown>null),
+    [EarthCloudTextureQuality.LOW]: <WebGLTexture>(<unknown>null),
+    [EarthCloudTextureQuality.MEDIUM]: <WebGLTexture>(<unknown>null),
+    [EarthCloudTextureQuality.HIGH]: <WebGLTexture>(<unknown>null),
+    [EarthCloudTextureQuality.ULTRA]: <WebGLTexture>(<unknown>null),
   };
   /**
    * 1x1 placeholder textures, one per surface-shader sampler. Bound when the real texture
    * is missing (feature disabled or load failed). Day uses gray so failure is visible;
    * other channels use transparent so the shader produces a shader-correct "no effect".
    */
-  private placeholders_: Record<'day' | 'dayBlack' | 'night' | 'bump' | 'spec' | 'political' | 'clouds' | 'coverage', WebGLTexture | null> =
-    { day: null, dayBlack: null, night: null, bump: null, spec: null, political: null, clouds: null, coverage: null };
+  private placeholders_: Record<'day' | 'dayBlack' | 'night' | 'bump' | 'spec' | 'political' | 'clouds' | 'coverage', WebGLTexture | null> = {
+    day: null,
+    dayBlack: null,
+    night: null,
+    bump: null,
+    spec: null,
+    political: null,
+    clouds: null,
+    coverage: null,
+  };
   /** Keys of day textures whose load promise rejected — distinguishes failure from isBlackEarth. */
   private failedDayKeys_ = new Set<string>();
   private vaoOcclusion_: WebGLVertexArrayObject;
@@ -143,7 +157,7 @@ export class Earth {
   private readonly POLITICAL_SRC_BASE = 'boundaries';
   private readonly CLOUDS_SRC_BASE = 'clouds';
   private readonly DEFAULT_RESOLUTION = '1k';
-  orbitalPeriod: Seconds = 365.25 * 24 * 3600 as Seconds;
+  orbitalPeriod: Seconds = (365.25 * 24 * 3600) as Seconds;
   meanDistanceToSun: Kilometers = 149597870.7 as Kilometers;
   orbitPathSegments_ = 8192;
   svCache: { x: Kilometers; y: Kilometers; z: Kilometers }[] = [];
@@ -307,26 +321,26 @@ export class Earth {
         });
         const earthSurfaceMaterial = new ShaderMaterial(this.gl_, {
           uniforms: {
-            uIsAmbientLighting: <WebGLUniformLocation><unknown>null,
-            uGlow: <WebGLUniformLocation><unknown>null,
-            uZoomLevel: <WebGLUniformLocation><unknown>null,
-            uisGrayScale: <WebGLUniformLocation><unknown>null,
-            uCloudPosition: <WebGLUniformLocation><unknown>null,
-            uIsDrawAurora: <WebGLUniformLocation><unknown>null,
-            uShowGraticule: <WebGLUniformLocation><unknown>null,
-            uLightDirection: <WebGLUniformLocation><unknown>null,
-            uDayMap: <WebGLUniformLocation><unknown>null,
-            uNightMap: <WebGLUniformLocation><unknown>null,
-            uBumpMap: <WebGLUniformLocation><unknown>null,
-            uSpecMap: <WebGLUniformLocation><unknown>null,
-            uPoliticalMap: <WebGLUniformLocation><unknown>null,
-            uCloudsMap: <WebGLUniformLocation><unknown>null,
-            uCoverageMap: <WebGLUniformLocation><unknown>null,
-            uCoverageEnabled: <WebGLUniformLocation><unknown>null,
-            uCoverageOpacity: <WebGLUniformLocation><unknown>null,
-            uRawZoomLevel: <WebGLUniformLocation><unknown>null,
-            uisDrawNightAsDay: <WebGLUniformLocation><unknown>null,
-            uNightBrightness: <WebGLUniformLocation><unknown>null,
+            uIsAmbientLighting: <WebGLUniformLocation>(<unknown>null),
+            uGlow: <WebGLUniformLocation>(<unknown>null),
+            uZoomLevel: <WebGLUniformLocation>(<unknown>null),
+            uisGrayScale: <WebGLUniformLocation>(<unknown>null),
+            uCloudPosition: <WebGLUniformLocation>(<unknown>null),
+            uIsDrawAurora: <WebGLUniformLocation>(<unknown>null),
+            uShowGraticule: <WebGLUniformLocation>(<unknown>null),
+            uLightDirection: <WebGLUniformLocation>(<unknown>null),
+            uDayMap: <WebGLUniformLocation>(<unknown>null),
+            uNightMap: <WebGLUniformLocation>(<unknown>null),
+            uBumpMap: <WebGLUniformLocation>(<unknown>null),
+            uSpecMap: <WebGLUniformLocation>(<unknown>null),
+            uPoliticalMap: <WebGLUniformLocation>(<unknown>null),
+            uCloudsMap: <WebGLUniformLocation>(<unknown>null),
+            uCoverageMap: <WebGLUniformLocation>(<unknown>null),
+            uCoverageEnabled: <WebGLUniformLocation>(<unknown>null),
+            uCoverageOpacity: <WebGLUniformLocation>(<unknown>null),
+            uRawZoomLevel: <WebGLUniformLocation>(<unknown>null),
+            uisDrawNightAsDay: <WebGLUniformLocation>(<unknown>null),
+            uNightBrightness: <WebGLUniformLocation>(<unknown>null),
           },
           vertexShader: this.shaders.surfaceVert,
           fragmentShader: this.shaders.surfaceFrag,
@@ -353,7 +367,6 @@ export class Earth {
             this.fullOrbitPath = null;
           }
         });
-
       }
 
       /*
@@ -390,11 +403,24 @@ export class Earth {
       widthSegments: settingsManager.earthNumLatSegs,
       heightSegments: settingsManager.earthNumLonSegs,
     });
+    const atmosphereUniforms: Record<string, WebGLUniformLocation> = {
+      uLightDirection: <WebGLUniformLocation>(<unknown>null),
+      uIntensity: <WebGLUniformLocation>(<unknown>null),
+    };
+
+    /*
+     * The EarthAtmosphere (Pro) plugin only emits `uCameraAltitude` when its
+     * isAltitudeAware setting is on. Declare the uniform ONLY when the installed
+     * shader actually references it: GlUtils.assignUniforms throws on localhost for
+     * any declared-but-inactive uniform, so an unconditional declaration would break
+     * the default (non-altitude-aware) atmosphere in dev/e2e.
+     */
+    if (this.shaders.atmosphereFrag.includes('uCameraAltitude')) {
+      atmosphereUniforms.uCameraAltitude = <WebGLUniformLocation>(<unknown>null);
+    }
+
     const earthAtmosphereMaterial = new ShaderMaterial(this.gl_, {
-      uniforms: {
-        uLightDirection: <WebGLUniformLocation><unknown>null,
-        uIntensity: <WebGLUniformLocation><unknown>null,
-      },
+      uniforms: atmosphereUniforms,
       vertexShader: this.shaders.atmosphereVert,
       fragmentShader: this.shaders.atmosphereFrag,
       glslVersion: GLSL3,
@@ -423,7 +449,7 @@ export class Earth {
     const gmst = ServiceLocator.getTimeManager().gmst;
     const sunPos = Sun.eci(ServiceLocator.getTimeManager().simulationTimeObj);
 
-    if (this.isDrawOrbitPath && (settingsManager.centerBody !== SolarBody.Earth && settingsManager.centerBody !== SolarBody.Moon)) {
+    if (this.isDrawOrbitPath && settingsManager.centerBody !== SolarBody.Earth && settingsManager.centerBody !== SolarBody.Moon) {
       this.drawFullOrbitPath();
     }
 
@@ -466,8 +492,8 @@ export class Earth {
 
     return new J2000(
       new EpochUTC((simTime.getTime() / 1000) as Seconds), // convert ms to s
-      new Vector3D(pos.x * KM_PER_AU as Kilometers, pos.y * KM_PER_AU as Kilometers, pos.z * KM_PER_AU as Kilometers),
-      new Vector3D(0 as KilometersPerSecond, 0 as KilometersPerSecond, 0 as KilometersPerSecond),
+      new Vector3D((pos.x * KM_PER_AU) as Kilometers, (pos.y * KM_PER_AU) as Kilometers, (pos.z * KM_PER_AU) as Kilometers),
+      new Vector3D(0 as KilometersPerSecond, 0 as KilometersPerSecond, 0 as KilometersPerSecond)
     );
   }
 
@@ -478,7 +504,7 @@ export class Earth {
       return new TEME(
         new EpochUTC((simTime.getTime() / 1000) as Seconds), // convert ms to s
         new Vector3D(0 as Kilometers, 0 as Kilometers, 0 as Kilometers),
-        new Vector3D(0 as KilometersPerSecond, 0 as KilometersPerSecond, 0 as KilometersPerSecond),
+        new Vector3D(0 as KilometersPerSecond, 0 as KilometersPerSecond, 0 as KilometersPerSecond)
       );
     }
 
@@ -491,7 +517,7 @@ export class Earth {
     }
 
     const simulationTimeObj = ServiceLocator.getTimeManager().simulationTimeObj;
-    const now = simulationTimeObj.getTime() / 1000 as Seconds; // convert ms to s
+    const now = (simulationTimeObj.getTime() / 1000) as Seconds; // convert ms to s
     const lineManager = ServiceLocator.getLineManager();
     const timeslice = this.orbitalPeriod / this.orbitPathSegments_;
     const orbitPositions: [number, number, number][] = [];
@@ -510,9 +536,9 @@ export class Earth {
       } else if (settingsManager.centerBody !== SolarBody.Earth && settingsManager.centerBody !== SolarBody.Moon) {
         const centerBodyPlanet = ServiceLocator.getScene().getBodyById(settingsManager.centerBody);
 
-        x = x + (centerBodyPlanet?.position[0] ?? 0) as Kilometers;
-        y = y + (centerBodyPlanet?.position[1] ?? 0) as Kilometers;
-        z = z + (centerBodyPlanet?.position[2] ?? 0) as Kilometers;
+        x = (x + (centerBodyPlanet?.position[0] ?? 0)) as Kilometers;
+        y = (y + (centerBodyPlanet?.position[1] ?? 0)) as Kilometers;
+        z = (z + (centerBodyPlanet?.position[2] ?? 0)) as Kilometers;
       }
 
       orbitPositions.push([x, y, z]);
@@ -552,7 +578,7 @@ export class Earth {
     const isPolarView = mainCam.cameraType === CameraType.POLAR_VIEW;
 
     // 2D projections reproject raw ECI in-shader; zero the world offset for them
-    gl.uniform3fv(uniforms.worldOffset, isFlatMap || isPolarView ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0]);
+    gl.uniform3fv(uniforms.worldOffset, isFlatMap || isPolarView ? [0, 0, 0] : (Scene.getInstance().worldShift ?? [0, 0, 0]));
 
     gl.uniform1i(uniforms.u_flatMapMode, isFlatMap ? 1 : 0);
     gl.uniform1i(uniforms.u_polarViewMode, isPolarView ? 1 : 0);
@@ -584,7 +610,7 @@ export class Earth {
         mainCam.state.mouseX,
         gl.drawingBufferHeight - mainCam.state.mouseY,
         ServiceLocator.getDotsManager().PICKING_READ_PIXEL_BUFFER_SIZE,
-        ServiceLocator.getDotsManager().PICKING_READ_PIXEL_BUFFER_SIZE,
+        ServiceLocator.getDotsManager().PICKING_READ_PIXEL_BUFFER_SIZE
       );
     }
 
@@ -711,6 +737,19 @@ export class Earth {
 
     gl.uniform3fv(this.atmosphereMesh.material.uniforms.uLightDirection, this.lightDirection);
     gl.uniform1f(this.atmosphereMesh.material.uniforms.uIntensity, this.atmosphereIntensity_);
+
+    /*
+     * Altitude-aware scattering (EarthAtmosphere plugin, isAltitudeAware). The uniform
+     * only exists when that shader path is active, so guard on its resolved location —
+     * off-path atmosphere meshes never declare it and must not touch it.
+     */
+    const uCameraAltitude = this.atmosphereMesh.material.uniforms.uCameraAltitude;
+
+    if (uCameraAltitude) {
+      const altitudeAboveSurfaceKm = ServiceLocator.getMainCamera().getDistFromEarth() - RADIUS_OF_EARTH;
+
+      gl.uniform1f(uCameraAltitude, altitudeAboveSurfaceKm);
+    }
   }
 
   private initPlaceholderTexture_(): void {
@@ -743,14 +782,16 @@ export class Earth {
 
   private loadChannel_(label: string, store: Record<string, WebGLTexture>, key: string, url: string, onSuccess?: () => void, onFail?: () => void): void {
     store[key] = this.gl_.createTexture();
-    GlUtils.initTexture(this.gl_, url).then((texture) => {
-      store[key] = texture;
-      onSuccess?.();
-    }).catch((err: unknown) => {
-      delete store[key];
-      onFail?.();
-      errorManagerInstance.warn(`Failed to load earth ${label} texture: ${url}`, err);
-    });
+    GlUtils.initTexture(this.gl_, url)
+      .then((texture) => {
+        store[key] = texture;
+        onSuccess?.();
+      })
+      .catch((err: unknown) => {
+        delete store[key];
+        onFail?.();
+        errorManagerInstance.warn(`Failed to load earth ${label} texture: ${url}`, err);
+      });
   }
 
   private initTextures_(): void {
@@ -762,9 +803,14 @@ export class Earth {
 
     if (!this.textureDay[dayKey]) {
       SplashScreen.loadStr(SplashScreen.msg.painting);
-      this.loadChannel_('day', this.textureDay, dayKey, `${this.getSrc_(sm.earthTextureStyle, sm.earthDayTextureQuality)}`,
+      this.loadChannel_(
+        'day',
+        this.textureDay,
+        dayKey,
+        `${this.getSrc_(sm.earthTextureStyle, sm.earthDayTextureQuality)}`,
         () => this.failedDayKeys_.delete(dayKey),
-        () => this.failedDayKeys_.add(dayKey));
+        () => this.failedDayKeys_.add(dayKey)
+      );
     }
 
     const nightKey = sm.earthTextureStyle + sm.earthNightTextureQuality;

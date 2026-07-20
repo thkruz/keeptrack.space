@@ -1,8 +1,8 @@
-import { vi } from 'vitest';
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
 import { BaseObject, Satellite, TleLine1, TleLine2 } from '@ootk/src/main';
+import { vi } from 'vitest';
 
 vi.mock('@app/engine/utils/saveVariable', () => ({
   saveXlsx: vi.fn(),
@@ -98,10 +98,7 @@ describe('CatalogExporter sccNum behavior across forms', () => {
 
   describe('exportTle2Txt preserves TLE col 3-7 satnum verbatim', () => {
     it('writes the TLE lines with their original satnum (truncated last-5 for extended)', async () => {
-      const sats: BaseObject[] = [
-        buildSat(0, '25544'),
-        buildSat(1, '99999', '799500766'),
-      ];
+      const sats: BaseObject[] = [buildSat(0, '25544'), buildSat(1, '99999', '799500766')];
 
       CatalogExporter.exportTle2Txt(sats);
 
@@ -126,10 +123,7 @@ describe('CatalogExporter sccNum behavior across forms', () => {
     // re-import. The exporter still proceeds — the warning is informational.
     it('exportTle2Txt warns when any sat has an extended sccNum', () => {
       const warnSpy = vi.spyOn(errorManagerInstance, 'warn');
-      const sats: BaseObject[] = [
-        buildSat(0, '25544'),
-        buildSat(1, '99999', '799500766'),
-      ];
+      const sats: BaseObject[] = [buildSat(0, '25544'), buildSat(1, '99999', '799500766')];
 
       CatalogExporter.exportTle2Txt(sats);
 
@@ -154,10 +148,7 @@ describe('CatalogExporter sccNum behavior across forms', () => {
 
     it('exportTle2Csv does NOT warn — CSV preserves extended IDs in the satId column', () => {
       const warnSpy = vi.spyOn(errorManagerInstance, 'warn');
-      const sats: BaseObject[] = [
-        buildSat(0, '25544'),
-        buildSat(1, '99999', '799500766'),
-      ];
+      const sats: BaseObject[] = [buildSat(0, '25544'), buildSat(1, '99999', '799500766')];
 
       CatalogExporter.exportTle2Csv(sats);
 

@@ -1,12 +1,11 @@
-import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
 import { SensorListPlugin } from '@app/plugins/sensor-list/sensor-list';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardChangeTests, standardClickTests, standardPluginMenuButtonTests, standardPluginSuite } from '@test/generic-tests';
 import { vi } from 'vitest';
-
-import { setupStandardEnvironment } from '@test/environment/standard-env';
 
 describe('SensorListPlugin', () => {
   beforeEach(() => {

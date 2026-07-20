@@ -1,8 +1,8 @@
 import { KeepTrack } from '@app/keeptrack';
 import { TheSpaceDevLaunchCalendarPlugin } from '@app/plugins/thespacedev-launch-calendar/thespacedev-launch-calendar';
-import { readFileSync } from 'fs';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardChangeTests, standardClickTests, standardPluginMenuButtonTests, standardPluginSuite } from '@test/generic-tests';
+import { readFileSync } from 'fs';
 import { vi } from 'vitest';
 
 describe('TheSpaceDevLaunchCalendarPlugin', () => {

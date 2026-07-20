@@ -32,7 +32,12 @@ describe('SatMath.sunSatEarthAngle', () => {
 describe('SatMath.checkIsInView', () => {
   // Simple sensor: az 0-180, el 10-80, rng 200-5000, no secondary FOV.
   const sensor = {
-    minAz: 0, maxAz: 180, minEl: 10, maxEl: 80, minRng: 200, maxRng: 5000,
+    minAz: 0,
+    maxAz: 180,
+    minEl: 10,
+    maxEl: 80,
+    minRng: 200,
+    maxRng: 5000,
   } as DetailedSensor;
 
   it('returns false when any RAE component is null', () => {
@@ -53,7 +58,12 @@ describe('SatMath.checkIsInView', () => {
 
   it('handles a sensor whose azimuth wraps past north (minAz > maxAz)', () => {
     const wrap = {
-      minAz: 350, maxAz: 10, minEl: 10, maxEl: 80, minRng: 200, maxRng: 5000,
+      minAz: 350,
+      maxAz: 10,
+      minEl: 10,
+      maxEl: 80,
+      minRng: 200,
+      maxRng: 5000,
     } as DetailedSensor;
 
     // 355 is inside the wrapped arc [350..360]∪[0..10]; 180 is outside.

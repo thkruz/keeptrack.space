@@ -54,9 +54,7 @@ export interface StfFormValues {
 }
 
 /** Result of validating the raw form. Either clamped values or a locale error key. */
-export type StfValidationResult =
-  | { ok: true; values: StfFormValues }
-  | { ok: false; errorKey: string };
+export type StfValidationResult = { ok: true; values: StfFormValues } | { ok: false; errorKey: string };
 
 /** The minimal sensor location the DetailedSensor factory needs. */
 export interface StfSiteLocation {
@@ -79,15 +77,7 @@ export interface StfSiteLocation {
  * @param axis - Whether the extent spreads the azimuth or the elevation.
  * @returns Straight-line distance (km) between the two extent edges.
  */
-export const computeExtentKm = (
-  epoch: EpochUTC,
-  siteJ2000: J2000,
-  centerAz: number,
-  centerEl: number,
-  rng: number,
-  extentDeg: number,
-  axis: StfExtentAxis,
-): number => {
+export const computeExtentKm = (epoch: EpochUTC, siteJ2000: J2000, centerAz: number, centerEl: number, rng: number, extentDeg: number, axis: StfExtentAxis): number => {
   const half = extentDeg / 2;
   const az1 = axis === 'az' ? centerAz - half : centerAz;
   const az2 = axis === 'az' ? centerAz + half : centerAz;

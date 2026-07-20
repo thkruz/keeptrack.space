@@ -6,7 +6,6 @@
         "earthInfo": "Информация о Земле",
         "sensorInfo": "Информация о датчике",
         "launchSiteInfo": "Информация о стартовой площадке",
-        "satelliteInfo": "Информация о спутнике",
         "relatedSatellites": "Связанные спутники"
       },
       "errorMsgs": {

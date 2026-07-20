@@ -33,7 +33,7 @@ import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { KeyboardComponent } from '@app/engine/plugins/components/keyboard/keyboard-component';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { Dropdown, Toast } from '@materializecss/materialize';
-import { BaseObject, Milliseconds, MILLISECONDS_PER_SECOND } from '@ootk/src/main';
+import { BaseObject, MILLISECONDS_PER_SECOND, Milliseconds } from '@ootk/src/main';
 import cancelPng from '@public/img/icons/cancel.png';
 import checkCirclePng from '@public/img/icons/check-circle.png';
 import infoPng from '@public/img/icons/info.png';
@@ -506,36 +506,33 @@ export class UiManager {
     // Run any plugins code
     EventBus.getInstance().emit(EventBusEvent.uiManagerOnReady);
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        const BottomIcons = getEl('bottom-icons');
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      const BottomIcons = getEl('bottom-icons');
 
-        BottomIcons?.addEventListener('click', (evt: Event) => {
-          const bottomIcons = getEl('bottom-icons');
-          let targetElement = <HTMLElement | null>evt.target;
+      BottomIcons?.addEventListener('click', (evt: Event) => {
+        const bottomIcons = getEl('bottom-icons');
+        let targetElement = <HTMLElement | null>evt.target;
 
-          while (targetElement && targetElement !== bottomIcons) {
-            if (targetElement.parentElement === bottomIcons) {
-              this.bottomIconPress(targetElement);
+        while (targetElement && targetElement !== bottomIcons) {
+          if (targetElement.parentElement === bottomIcons) {
+            this.bottomIconPress(targetElement);
 
-              return;
-            }
-            targetElement = targetElement.parentElement;
-          }
-
-          if (targetElement === bottomIcons) {
             return;
           }
+          targetElement = targetElement.parentElement;
+        }
 
-          if (!targetElement) {
-            errorManagerInstance.debug('targetElement is null');
-          } else {
-            this.bottomIconPress(targetElement);
-          }
-        });
-      },
-    );
+        if (targetElement === bottomIcons) {
+          return;
+        }
+
+        if (!targetElement) {
+          errorManagerInstance.debug('targetElement is null');
+        } else {
+          this.bottomIconPress(targetElement);
+        }
+      });
+    });
   }
 
   toast(toastText: string, type: ToastMsgType, isLong = false) {

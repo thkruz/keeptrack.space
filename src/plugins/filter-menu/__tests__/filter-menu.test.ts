@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-undefined */
 /* eslint-disable max-lines-per-function */
@@ -12,18 +11,11 @@ import { getEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
 import { FilterMenuPlugin, FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
-import {
-  COUNTRY_FILTERS,
-  enableGroup,
-  FILTER_STORAGE_MAP,
-  getFilters,
-  ORBITAL_REGIME_FILTERS,
-  showOnlyInGroup,
-  showOnlyPayloads,
-} from '@app/plugins/filter-menu/filter-menu-core';
+import { COUNTRY_FILTERS, enableGroup, FILTER_STORAGE_MAP, getFilters, ORBITAL_REGIME_FILTERS, showOnlyInGroup, showOnlyPayloads } from '@app/plugins/filter-menu/filter-menu-core';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('FilterMenuPlugin_class', () => {
   beforeEach(() => {
@@ -605,17 +597,17 @@ describe('FilterMenuPlugin_class', () => {
       websiteInit(plugin);
       EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
 
-      const checkboxes = Array.from(
-        KeepTrack.getInstance().containerRoot.querySelectorAll<HTMLInputElement>('#filter-form input[type="checkbox"]'),
-      );
+      const checkboxes = Array.from(KeepTrack.getInstance().containerRoot.querySelectorAll<HTMLInputElement>('#filter-form input[type="checkbox"]'));
 
       // Click each non-disabled checkbox
-      checkboxes.filter((cb) => !cb.disabled).forEach((checkbox) => {
-        expect(() => {
-          checkbox.click();
-          vi.advanceTimersByTime(100);
-        }).not.toThrow();
-      });
+      checkboxes
+        .filter((cb) => !cb.disabled)
+        .forEach((checkbox) => {
+          expect(() => {
+            checkbox.click();
+            vi.advanceTimersByTime(100);
+          }).not.toThrow();
+        });
       // Restore fake timers to avoid leaking real timers to other test files
       vi.useFakeTimers();
     }, 30000);

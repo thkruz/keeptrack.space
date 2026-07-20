@@ -1,5 +1,5 @@
-import { onMessage } from '@app/webworker/orbitCruncher';
 import { OrbitDrawTypes } from '@app/webworker/orbit-cruncher-messages';
+import { onMessage } from '@app/webworker/orbitCruncher';
 import { vi } from 'vitest';
 
 // OrbitCruncherMsgType is a const enum (erased); use literal values.
@@ -94,13 +94,17 @@ describe('orbitCruncher worker', () => {
   it('handles SETTINGS_UPDATE and CHANGE_ORBIT_TYPE without throwing', () => {
     initSat(1);
 
-    expect(() => onMessage({
-      data: { typ: MSG.SETTINGS_UPDATE, numberOfOrbitsToDraw: 3 },
-    } as unknown as Parameters<typeof onMessage>[0])).not.toThrow();
+    expect(() =>
+      onMessage({
+        data: { typ: MSG.SETTINGS_UPDATE, numberOfOrbitsToDraw: 3 },
+      } as unknown as Parameters<typeof onMessage>[0])
+    ).not.toThrow();
 
-    expect(() => onMessage({
-      data: { typ: MSG.CHANGE_ORBIT_TYPE, orbitType: OrbitDrawTypes.TRAIL },
-    } as unknown as Parameters<typeof onMessage>[0])).not.toThrow();
+    expect(() =>
+      onMessage({
+        data: { typ: MSG.CHANGE_ORBIT_TYPE, orbitType: OrbitDrawTypes.TRAIL },
+      } as unknown as Parameters<typeof onMessage>[0])
+    ).not.toThrow();
   });
 
   it('draws a missile trajectory on MISSILE_UPDATE', () => {
@@ -109,13 +113,13 @@ describe('orbitCruncher worker', () => {
         typ: MSG.INIT,
         numSegs: NUM_SEGS,
         objData: JSON.stringify([
-{
-          missile: true,
-          latList: [0, 1, 2, 3],
-          lonList: [0, 1, 2, 3],
-          altList: [100, 200, 300, 400],
-        },
-]),
+          {
+            missile: true,
+            latList: [0, 1, 2, 3],
+            lonList: [0, 1, 2, 3],
+            altList: [100, 200, 300, 400],
+          },
+        ]),
         seqNum: 10,
       },
     } as unknown as Parameters<typeof onMessage>[0]);
@@ -163,8 +167,14 @@ describe('orbitCruncher worker', () => {
       posted = [];
       onMessage({
         data: {
-          typ: MSG.MISSILE_UPDATE, id: 0, simulationTime: Date.UTC(2022, 0, 1), seqNum: 20,
-          latList: lat, lonList: lon, altList: alt, startTime,
+          typ: MSG.MISSILE_UPDATE,
+          id: 0,
+          simulationTime: Date.UTC(2022, 0, 1),
+          seqNum: 20,
+          latList: lat,
+          lonList: lon,
+          altList: alt,
+          startTime,
         },
       } as unknown as Parameters<typeof onMessage>[0]);
       const { pointsOut } = posted.at(-1)!.payload as { pointsOut: Float32Array };

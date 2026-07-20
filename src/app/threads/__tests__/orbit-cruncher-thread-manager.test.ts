@@ -26,12 +26,13 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-const makeWorkerStub = () => ({
-  postMessage: vi.fn(),
-  terminate: vi.fn(),
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
-} as unknown as Worker & { postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> });
+const makeWorkerStub = () =>
+  ({
+    postMessage: vi.fn(),
+    terminate: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  }) as unknown as Worker & { postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> };
 
 const makeMgr = () => {
   const worker = makeWorkerStub();
@@ -42,10 +43,11 @@ const makeMgr = () => {
   return { mgr, worker };
 };
 
-const lastMsg = (worker: { postMessage: ReturnType<typeof vi.fn> }): Record<string, unknown> =>
-  worker.postMessage.mock.calls.at(-1)![0] as Record<string, unknown>;
+const lastMsg = (worker: { postMessage: ReturnType<typeof vi.fn> }): Record<string, unknown> => worker.postMessage.mock.calls.at(-1)![0] as Record<string, unknown>;
 
-interface OnMessageable { onMessage(e: { data: unknown }): void }
+interface OnMessageable {
+  onMessage(e: { data: unknown }): void;
+}
 
 describe('OrbitCruncherThreadManager', () => {
   describe('lifecycle', () => {
@@ -100,7 +102,10 @@ describe('OrbitCruncherThreadManager', () => {
       const { mgr, worker } = makeMgr();
 
       mgr.sendMissileUpdate(9, 2000, false, true, {
-        latList: [1, 2] as never, lonList: [3, 4] as never, altList: [5, 6] as never, startTime: 1000,
+        latList: [1, 2] as never,
+        lonList: [3, 4] as never,
+        altList: [5, 6] as never,
+        startTime: 1000,
       });
 
       expect(lastMsg(worker)).toMatchObject({

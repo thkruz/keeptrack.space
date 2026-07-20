@@ -66,7 +66,7 @@ export class Lat2LonPlots extends KeepTrackPlugin {
 
   sideMenuElementName = 'lat2lon-plots-menu';
   sideMenuElementHtml: string = html`
-  <div id="lat2lon-plots-menu" class="side-menu-parent start-hidden">
+  <div id="lat2lon-plots-menu" class="side-menu-parent start-hidden kt-ui-v13">
     <div id="plot-analysis-content" class="side-menu">
       <div id="${this.plotCanvasId}" class="plot-analysis-chart plot-analysis-menu-maximized"></div>
     </div>
@@ -75,7 +75,6 @@ export class Lat2LonPlots extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
   }
-
 
   createPlot(data: Record<string, SatPoint[]>, chartDom: HTMLElement) {
     // Dont Load Anything if the Chart is Closed

@@ -11,16 +11,9 @@
 /* eslint-disable no-await-in-loop, no-promise-executor-return */
 
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import {
-  BestPassDeps,
-  findPassesForSat,
-} from '@app/plugins/best-pass/best-pass-calculator';
+import { BestPassDeps, findPassesForSat } from '@app/plugins/best-pass/best-pass-calculator';
 import { Kilometers, Sgp4 } from '@ootk/src/main';
-import {
-  BpWorkerMsgType,
-  BpWorkerOutMsgType,
-  type BpWorkerInMsg,
-} from './best-pass-messages';
+import { type BpWorkerInMsg, BpWorkerMsgType, BpWorkerOutMsgType } from './best-pass-messages';
 import { workerCheckIsInView, workerGetRae } from './shared/pass-worker-helpers';
 import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
@@ -49,9 +42,7 @@ onmessage = async function onmessage(event: MessageEvent<BpWorkerInMsg>) {
   const { runId } = msg;
 
   try {
-    const sensors = msg.sensors
-      .filter((s) => s)
-      .map((s) => new DetailedSensor(s as ConstructorParameters<typeof DetailedSensor>[0]));
+    const sensors = msg.sensors.filter((s) => s).map((s) => new DetailedSensor(s as ConstructorParameters<typeof DetailedSensor>[0]));
 
     const deps: BestPassDeps = {
       baseTimeMs: msg.baseTimeMs,

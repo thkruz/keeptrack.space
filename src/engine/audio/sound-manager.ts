@@ -442,11 +442,15 @@ export class SoundManager {
         if (this.playWithHtmlAudio(soundKey)) {
           const audio = this.htmlAudioElements.get(soundKey)!;
 
-          audio.addEventListener('ended', () => {
-            this.nextChatter = setTimeout(() => {
-              this.play(SoundNames.CHATTER);
-            }, this.CHATTER_REPEAT_DELAY_MS);
-          }, { once: true });
+          audio.addEventListener(
+            'ended',
+            () => {
+              this.nextChatter = setTimeout(() => {
+                this.play(SoundNames.CHATTER);
+              }, this.CHATTER_REPEAT_DELAY_MS);
+            },
+            { once: true }
+          );
         }
 
         return;

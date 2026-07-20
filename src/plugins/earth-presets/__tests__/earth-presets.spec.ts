@@ -1,4 +1,4 @@
-import { test, expect } from '@test/e2e/coverage';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('EarthPresetsPlugin', () => {
@@ -18,13 +18,7 @@ test.describe('EarthPresetsPlugin', () => {
     await expect(rmbL2).toBeAttached();
 
     // All five preset menu items should exist
-    const presetIds = [
-      'earth-satellite-rmb',
-      'earth-nadir-rmb',
-      'earth-engineer-rmb',
-      'earth-opscenter-rmb',
-      'earth-90sGraphics-rmb',
-    ];
+    const presetIds = ['earth-satellite-rmb', 'earth-nadir-rmb', 'earth-engineer-rmb', 'earth-opscenter-rmb', 'earth-90sGraphics-rmb'];
 
     for (const id of presetIds) {
       // eslint-disable-next-line no-await-in-loop

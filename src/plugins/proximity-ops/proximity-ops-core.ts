@@ -19,10 +19,7 @@
  */
 
 import { findTca } from '@app/engine/conjunction/conjunction-tca';
-import {
-  cappedScreeningCovarianceFromTle, CatalogSource, ConjunctionAssessment, EpochUTC, Kilometers, RIC, Satellite,
-  Seconds, Tle, TleLine1, TleLine2,
-} from '@ootk/src/main';
+import { CatalogSource, ConjunctionAssessment, cappedScreeningCovarianceFromTle, EpochUTC, Kilometers, RIC, Satellite, Seconds, Tle, TleLine1, TleLine2 } from '@ootk/src/main';
 
 /** Covariance confidence level accepted by ootk's TLE-derived covariance helper. */
 export type CovarianceConfidence = Parameters<typeof cappedScreeningCovarianceFromTle>[2];
@@ -147,7 +144,7 @@ export function findClosestApproach(
   start: Date,
   durationSec: number,
   stepSeconds: number = DEFAULT_STEP_SECONDS,
-  tolMs: number = DEFAULT_REFINE_TOLERANCE_MS,
+  tolMs: number = DEFAULT_REFINE_TOLERANCE_MS
 ): ProximityOpsEvent {
   const baseMs = start.getTime();
   const tca = findTca((tMs) => separationRange_(sat1, sat2, new Date(baseMs + tMs)), 0, durationSec * 1000, stepSeconds * 1000, tolMs);
@@ -214,7 +211,7 @@ export function computeEventPc(sat1: Satellite, sat2: Satellite, eventDate: Date
         name: sat2.sccNum,
         radius: 0.01 as Kilometers,
         covariance: cappedScreeningCovarianceFromTle(sat2.tle1, sat2.tle2, confidenceLevel),
-      },
+      }
     );
 
     const result = assessment.assess({
@@ -238,14 +235,7 @@ export function computeEventPc(sat1: Satellite, sat2: Satellite, eventDate: Date
  * search, and de-duplicated across bins via the shared `satPairs` accumulator.
  * Otherwise the first satellite is the primary and is screened against the rest.
  */
-export function findRpoPairs(
-  sats: Satellite[],
-  params: RpoSearchParams,
-  baseDate: Date,
-  isAva: boolean,
-  satPairs?: number[][],
-  onProgress?: RpoProgressFn,
-): ProximityOpsEvent[] {
+export function findRpoPairs(sats: Satellite[], params: RpoSearchParams, baseDate: Date, isAva: boolean, satPairs?: number[][], onProgress?: RpoProgressFn): ProximityOpsEvent[] {
   const { maxDis, maxVel, durationSec, stepSeconds, refineToleranceMs, confidenceLevel } = params;
   const RPOs: ProximityOpsEvent[] = [];
   const search = (a: Satellite, b: Satellite) => findClosestApproach(a, b, baseDate, durationSec, stepSeconds, refineToleranceMs);
@@ -261,10 +251,7 @@ export function findRpoPairs(
   if (isAva && satPairs) {
     sats.forEach((primarySat, i) => {
       sats.slice(i + 1).forEach((secondarySat) => {
-        const pairExists = satPairs.some((pair) =>
-          (pair[0] === primarySat.id && pair[1] === secondarySat.id) ||
-          (pair[0] === secondarySat.id && pair[1] === primarySat.id),
-        );
+        const pairExists = satPairs.some((pair) => (pair[0] === primarySat.id && pair[1] === secondarySat.id) || (pair[0] === secondarySat.id && pair[1] === primarySat.id));
 
         if (pairExists) {
           return;
@@ -274,7 +261,7 @@ export function findRpoPairs(
         satPairs.push([primarySat.id, secondarySat.id]);
 
         // Cheap orbital pre-filters before the expensive per-pair TCA search.
-        if ((secondarySat.perigee - primarySat.apogee) > maxDis || (primarySat.perigee - secondarySat.apogee) > maxDis) {
+        if (secondarySat.perigee - primarySat.apogee > maxDis || primarySat.perigee - secondarySat.apogee > maxDis) {
           return;
         }
         if (!(Math.abs(primarySat.inclination - secondarySat.inclination) < 1)) {
@@ -312,19 +299,14 @@ export function findSatsAvAGeo(allSats: Satellite[], lon: number, baseDate: Date
       return false;
     }
 
-    return Boolean(sat.tle1) &&
-      sat.period > 23 * 60 &&
-      (180 - Math.abs(Math.abs(lon - lla.lon) - 180)) < 1;
+    return Boolean(sat.tle1) && sat.period > 23 * 60 && 180 - Math.abs(Math.abs(lon - lla.lon) - 180) < 1;
   });
 }
 
 /** Low Earth orbit satellites within ~5 deg of the target inclination and RAAN. */
 export function findSatsAvALeo(allSats: Satellite[], inc: number, raan: number): Satellite[] {
-  return allSats.filter((sat) =>
-    Boolean(sat.tle1) &&
-    sat.period < 3 * 60 &&
-    (180 - Math.abs(Math.abs(inc - sat.inclination) - 180)) < 5 &&
-    (360 - Math.abs(Math.abs(raan - sat.rightAscension) - 360)) < 5,
+  return allSats.filter(
+    (sat) => Boolean(sat.tle1) && sat.period < 3 * 60 && 180 - Math.abs(Math.abs(inc - sat.inclination) - 180) < 5 && 360 - Math.abs(Math.abs(raan - sat.rightAscension) - 360) < 5
   );
 }
 
@@ -421,10 +403,21 @@ export function sortByDistance(events: ProximityOpsEvent[]): ProximityOpsEvent[]
 
 /** CSV column headers for an exported RPO list (matches {@link buildRpoCsvRow}). */
 export const RPO_CSV_HEADERS = [
-  't_id', 't_sccnum', 't_name', 'c_id', 'c_sccnum', 'c_name', 'date',
-  'dr(km)', 'dt(km)', 'dn(km)',
-  'dvr(km/s)', 'dvt(km/s)', 'dvn(km/s)',
-  'rel_dist(km)', 'rel_vel(km/s)',
+  't_id',
+  't_sccnum',
+  't_name',
+  'c_id',
+  'c_sccnum',
+  'c_name',
+  'date',
+  'dr(km)',
+  'dt(km)',
+  'dn(km)',
+  'dvr(km/s)',
+  'dvt(km/s)',
+  'dvn(km/s)',
+  'rel_dist(km)',
+  'rel_vel(km/s)',
 ] as const;
 
 /** One ordered CSV value row for an event (aligns with {@link RPO_CSV_HEADERS}). */

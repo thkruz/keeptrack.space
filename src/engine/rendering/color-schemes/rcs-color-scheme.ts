@@ -48,10 +48,10 @@ export class RcsColorScheme extends ColorScheme {
    * on screen. Dark indigo at the small-RCS end fades into the background.
    */
   static readonly uniqueColorTheme = {
-    rcsXXXSmall: [0.051, 0.031, 0.530, 0.9] as rgbaArray,
-    rcsXXSmall: [0.380, 0.000, 0.659, 0.9] as rgbaArray,
-    rcsXSmall: [0.620, 0.060, 0.624, 0.9] as rgbaArray,
-    rcsSmall: [0.798, 0.280, 0.470, 0.9] as rgbaArray,
+    rcsXXXSmall: [0.051, 0.031, 0.53, 0.9] as rgbaArray,
+    rcsXXSmall: [0.38, 0.0, 0.659, 0.9] as rgbaArray,
+    rcsXSmall: [0.62, 0.06, 0.624, 0.9] as rgbaArray,
+    rcsSmall: [0.798, 0.28, 0.47, 0.9] as rgbaArray,
     rcsMed: [0.929, 0.473, 0.327, 0.9] as rgbaArray,
     rcsLarge: [0.987, 0.682, 0.219, 0.9] as rgbaArray,
     rcsXLarge: [0.941, 0.976, 0.129, 0.9] as rgbaArray,
@@ -62,15 +62,7 @@ export class RcsColorScheme extends ColorScheme {
    * Ordered smallest → largest. The bucketIndex computation maps
    * `rcs < thresholds[i]` to slug at index i.
    */
-  private static readonly BUCKET_SLUGS = [
-    'rcsXXXSmall',
-    'rcsXXSmall',
-    'rcsXSmall',
-    'rcsSmall',
-    'rcsMed',
-    'rcsLarge',
-    'rcsXLarge',
-  ] as const;
+  private static readonly BUCKET_SLUGS = ['rcsXXXSmall', 'rcsXXSmall', 'rcsXSmall', 'rcsSmall', 'rcsMed', 'rcsLarge', 'rcsXLarge'] as const;
 
   /**
    * Used until `calculateParams` has scanned the catalog at least once.
@@ -91,11 +83,13 @@ export class RcsColorScheme extends ColorScheme {
   constructor() {
     super(RcsColorScheme.uniqueColorTheme);
     this.objectTypeFlags = {
-      ...this.objectTypeFlags, ...RcsColorScheme.uniqueObjectTypeFlags,
+      ...this.objectTypeFlags,
+      ...RcsColorScheme.uniqueObjectTypeFlags,
     };
   }
 
-  override calculateParams() { // NOSONAR: S3516 - returns null by design; results are stored in this.thresholds_ and the manager treats null as "no params"
+  override calculateParams() {
+    // NOSONAR: S3516 - returns null by design; results are stored in this.thresholds_ and the manager treats null as "no params"
     const catalog = ServiceLocator.getCatalogManager();
     const sats = catalog?.getSats() ?? [];
 

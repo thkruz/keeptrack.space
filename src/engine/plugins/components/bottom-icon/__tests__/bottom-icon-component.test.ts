@@ -1,14 +1,15 @@
 /* eslint-disable max-lines-per-function */
 import { vi } from 'vitest';
+
 /**
  * @jest-environment jsdom
  */
 
-import { BottomIconComponent } from '@app/engine/plugins/components/bottom-icon/bottom-icon-component';
-import { IBottomIconConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { BottomIconComponent } from '@app/engine/plugins/components/bottom-icon/bottom-icon-component';
+import { IBottomIconConfig } from '@app/engine/plugins/core/plugin-capabilities';
 
 // Mock settingsManager
 (global as any).settingsManager = {
@@ -48,18 +49,24 @@ describe('BottomIconComponent', () => {
     });
 
     it('should apply custom menuMode', () => {
-      const component = new BottomIconComponent('test-plugin', createConfig({
-        menuMode: [MenuMode.CATALOG, MenuMode.SENSORS],
-      }));
+      const component = new BottomIconComponent(
+        'test-plugin',
+        createConfig({
+          menuMode: [MenuMode.CATALOG, MenuMode.SENSORS],
+        })
+      );
 
       expect(component.menuModes).toContain(MenuMode.CATALOG);
       expect(component.menuModes).toContain(MenuMode.SENSORS);
     });
 
     it('should apply isDisabledOnLoad', () => {
-      const component = new BottomIconComponent('test-plugin', createConfig({
-        isDisabledOnLoad: true,
-      }));
+      const component = new BottomIconComponent(
+        'test-plugin',
+        createConfig({
+          isDisabledOnLoad: true,
+        })
+      );
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -90,9 +97,12 @@ describe('BottomIconComponent', () => {
     });
 
     it('should add disabled class when isDisabledOnLoad is true', () => {
-      const component = new BottomIconComponent('test-plugin', createConfig({
-        isDisabledOnLoad: true,
-      }));
+      const component = new BottomIconComponent(
+        'test-plugin',
+        createConfig({
+          isDisabledOnLoad: true,
+        })
+      );
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -215,9 +225,12 @@ describe('BottomIconComponent', () => {
 
   describe('enable/disable', () => {
     it('should enable the icon', () => {
-      const component = new BottomIconComponent('test-plugin', createConfig({
-        isDisabledOnLoad: true,
-      }));
+      const component = new BottomIconComponent(
+        'test-plugin',
+        createConfig({
+          isDisabledOnLoad: true,
+        })
+      );
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);

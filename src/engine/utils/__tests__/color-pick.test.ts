@@ -1,6 +1,6 @@
-import { vi } from 'vitest';
 import { ColorPick } from '@app/engine/utils/color-pick';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { vi } from 'vitest';
 
 describe('ColorPick', () => {
   beforeEach(() => {

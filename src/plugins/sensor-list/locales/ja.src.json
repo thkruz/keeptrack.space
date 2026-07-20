@@ -4,10 +4,13 @@
       "bottomIconLabel": "センサー",
       "title": "センサーリストメニュー",
       "labels": {
+        "categorySurveillance": "宇宙監視",
+        "categoryTtc": "衛星管制・通信",
         "missingData": "データ不足",
         "tooltipSensorsInFov": "センサーカバレッジを可視化"
       },
       "buttons": {
+        "markAll": "{name}をマーク",
         "resetSensor": "センサーをリセット",
         "showSensorsWithFov": "すべてのセンサーを視野付きで表示..."
       },
@@ -21,13 +24,16 @@
         "imgAlt": "ネットワークごとにグループ化されたセンサーを表示するセンサーメニュー",
         "imgCaption": "センサーはネットワークごとにグループ化されています。グループ見出しをクリックすると、ネットワーク全体を一度に選択できます。",
         "sensorTypesHeading": "センサーの種類",
-        "sensorTypes": "<ul><li><strong>フェーズドアレイレーダー</strong>：広範囲を高速にスキャンします。通常は低軌道（LEO）に限定されます。</li><li><strong>機械式レーダー</strong>：可動式アンテナで、LEOと静止軌道（GEO）の両方に使用できます。</li><li><strong>光学望遠鏡</strong>：主にGEOや深宇宙に使用されます。晴れた夜間のみ機能しますが、レーダーは昼夜問わず機能します。</li></ul>",
+        "sensorTypes": "<ul><li><strong>フェーズドアレイレーダー</strong>：広範囲を高速にスキャンします。通常は低軌道（LEO）に限定されます。</li><li><strong>機械式レーダー</strong>：可動式アンテナで、LEOと静止軌道（GEO）の両方に使用できます。</li><li><strong>光学望遠鏡</strong>：主にGEOや深宇宙に使用されます。晴れた夜間のみ機能しますが、レーダーは昼夜問わず機能します。</li><li><strong>TT&Cアンテナ</strong>:協力衛星の電波ダウンリンクを利用して追尾する可動式通信アンテナ(DSN、ESTRACK、SCN、Galileo)。非協力物体やデブリは検出できません。</li></ul>",
         "howToUse": "<ol><li>下部バーからメニューを開くか、Sキーを押します。</li><li>個々のセンサーをクリックして選択すると、カメラがその位置に移動します。</li><li>またはグループ見出し（例：\"All Space Surveillance Network Sensors\"）をクリックしてネットワーク全体を選択します。カバレッジの視覚化に最適です。</li><li><strong>センサーをリセット</strong>で選択を解除します。</li></ol>",
         "tip1": "多くの計算（視線角度など）には単一のセンサーが必要です。ネットワーク全体を選択した場合は、代わりにマルチサイト視線角度メニューを使用するか、センサーを1つずつ選択してください。",
         "tip2": "すべてのセンサーはコマンドパレットからも利用できます。センサー名を入力すると、このメニューを開かずに切り替えられます。",
         "tip3": "センサーのパラメータは公開データに基づいています。センサー情報メニューで確認できます。修正は admin@keeptrack.space までお寄せください。",
         "shortcutToggle": "センサーメニューの表示を切り替える",
         "shortcutCamera": "カメラを現在のセンサーに合わせる"
+      },
+      "rmbMenu": {
+        "useThisSensor": "このセンサーを使用"
       }
     }
   }

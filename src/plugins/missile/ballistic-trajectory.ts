@@ -52,12 +52,7 @@ const toLatLon = (v: [number, number, number]): [number, number] => {
 };
 
 /** Spherical linear interpolation between two unit vectors by fraction f, given their angle. */
-const slerp = (
-  a: [number, number, number],
-  b: [number, number, number],
-  f: number,
-  omega: number,
-): [number, number, number] => {
+const slerp = (a: [number, number, number], b: [number, number, number], f: number, omega: number): [number, number, number] => {
   if (omega < 1e-9) {
     return a;
   }
@@ -74,8 +69,7 @@ const slerp = (
  * orbit equation r = a(1-e^2)/(1 + e*cos(nu)) evaluated at the surface true anomaly
  * nu = 180deg - beta (where beta is the half-range central angle).
  */
-const semiMajorForEccentricity = (e: number, cosBeta: number): number =>
-  (EARTH_RADIUS_KM * (1 - e * cosBeta)) / (1 - e * e);
+const semiMajorForEccentricity = (e: number, cosBeta: number): number => (EARTH_RADIUS_KM * (1 - e * cosBeta)) / (1 - e * e);
 
 /**
  * Find the minimum-energy eccentricity for a given half-range angle. Minimum launch
@@ -130,12 +124,10 @@ const solveEccentricAnomaly = (M: number, e: number): number => {
 };
 
 /** True anomaly (radians) from eccentric anomaly. */
-const trueAnomalyFromE = (E: number, e: number): number =>
-  2 * Math.atan2(Math.sqrt(1 + e) * Math.sin(E / 2), Math.sqrt(1 - e) * Math.cos(E / 2));
+const trueAnomalyFromE = (E: number, e: number): number => 2 * Math.atan2(Math.sqrt(1 + e) * Math.sin(E / 2), Math.sqrt(1 - e) * Math.cos(E / 2));
 
 /** Eccentric anomaly (radians) from true anomaly. */
-const eccentricAnomalyFromNu = (nu: number, e: number): number =>
-  2 * Math.atan2(Math.sqrt(1 - e) * Math.sin(nu / 2), Math.sqrt(1 + e) * Math.cos(nu / 2));
+const eccentricAnomalyFromNu = (nu: number, e: number): number => 2 * Math.atan2(Math.sqrt(1 - e) * Math.sin(nu / 2), Math.sqrt(1 + e) * Math.cos(nu / 2));
 
 /**
  * Generate a minimum-energy ballistic trajectory between two surface points.
@@ -146,13 +138,7 @@ const eccentricAnomalyFromNu = (nu: number, e: number): number =>
  *
  * Throws when the two points are closer than ~1 km apart (degenerate, no arc to fly).
  */
-export const generateBallisticTrajectory = (
-  launchLat: number,
-  launchLon: number,
-  targetLat: number,
-  targetLon: number,
-  opts: BallisticOptions = {},
-): MissileTrajectory => {
+export const generateBallisticTrajectory = (launchLat: number, launchLon: number, targetLat: number, targetLon: number, opts: BallisticOptions = {}): MissileTrajectory => {
   const a3 = toUnitVec(launchLat, launchLon);
   const b3 = toUnitVec(targetLat, targetLon);
   const dot = Math.max(-1, Math.min(1, a3[0] * b3[0] + a3[1] * b3[1] + a3[2] * b3[2]));

@@ -128,8 +128,9 @@ export const buildStatsCard = (summary: EventSummary, labels: BreakupLabels): st
   const { tracked, estimated, trackingRatio, counts, altStats, eccStats, incStats } = summary;
   const typeValue = `${counts.payloads.toString()} / ${counts.rocketBodies.toString()} / ${counts.debris.toString()}`;
 
-  const dispersion = tracked > 0
-    ? html`
+  const dispersion =
+    tracked > 0
+      ? html`
       <div class="kt-section-label" style="margin-top:12px;">${labels.fragmentDispersion}</div>
       <table class="breakup-dispersion-table center-align">
         <thead>
@@ -173,7 +174,7 @@ export const buildStatsCard = (summary: EventSummary, labels: BreakupLabels): st
         </tbody>
       </table>
     `
-    : html`<p class="ba-empty-state">${labels.noTrackedDebris}</p>`;
+      : html`<p class="ba-empty-state">${labels.noTrackedDebris}</p>`;
 
   return html`
     <section class="kt-section breakup-stats-card">
@@ -234,9 +235,7 @@ export const buildFragmentTable = (sats: Satellite[], opts: FragmentTableOptions
     `;
   }
 
-  const countNote = isTruncated
-    ? ` ${labels.showingOf.replace('{shown}', displayResults.length.toString()).replace('{total}', total.toString())}`
-    : '';
+  const countNote = isTruncated ? ` ${labels.showingOf.replace('{shown}', displayResults.length.toString()).replace('{total}', total.toString())}` : '';
 
   return html`
     <div class="kt-section-label">${labels.trackedFragments}${countNote}</div>

@@ -1,8 +1,9 @@
 /* eslint-disable dot-notation */
-import { vi } from 'vitest';
+
 import { DotsManager } from '@app/engine/rendering/dots-manager';
-import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { BaseObject, KilometersPerSecond, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
+import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { vi } from 'vitest';
 
 /*
  * Pure accessor / bookkeeping logic in DotsManager: position lookups, the

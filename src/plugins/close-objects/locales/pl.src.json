@@ -3,6 +3,9 @@
     "CloseObjectsPlugin": {
       "bottomIconLabel": "Bliskie obiekty",
       "title": "Wyszukiwanie bliskich obiektów",
+      "sections": {
+        "search": "Wyszukiwanie"
+      },
       "findBtn": "Znajdź bliskie obiekty",
       "help": {
         "overview": "Wyszukiwanie bliskich obiektów przeszukuje cały katalog w poszukiwaniu par obiektów lecących w tej chwili w odległości mniejszej niż 50 km od siebie. To szybki sposób na wykrycie współorbitujących ładunków, niedawnych rozpadów i zatłoczonych rejonów bez uruchamiania pełnej analizy koniunkcji.",

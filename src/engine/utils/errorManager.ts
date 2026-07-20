@@ -168,10 +168,12 @@ export class ErrorManager {
       (err as { isUnactionable?: boolean }).isUnactionable = true;
       EventBus.getInstance().emit(EventBusEvent.error, err, ctx.funcName);
       // eslint-disable-next-line no-console
-      console.warn(
-        this.formatMsg_(LogLevel.WARN, `${ctx.funcName}: suppressed cross-origin script error`),
-        { message: ctx.message, source: ctx.source, line: ctx.line, col: ctx.col },
-      );
+      console.warn(this.formatMsg_(LogLevel.WARN, `${ctx.funcName}: suppressed cross-origin script error`), {
+        message: ctx.message,
+        source: ctx.source,
+        line: ctx.line,
+        col: ctx.col,
+      });
 
       return;
     }
@@ -215,10 +217,11 @@ export class ErrorManager {
   }
 
   private getSignature_(err: Error): string {
-    const firstFrame = (err.stack ?? '')
-      .split('\n')
-      .map((line) => line.trim())
-      .find((line) => line.startsWith('at ')) ?? '';
+    const firstFrame =
+      (err.stack ?? '')
+        .split('\n')
+        .map((line) => line.trim())
+        .find((line) => line.startsWith('at ')) ?? '';
 
     return `${err.name}::${err.message}::${firstFrame}`;
   }
@@ -266,7 +269,7 @@ export class ErrorManager {
       return true;
     }
 
-    return (/cdn-cgi|rocket-loader/iu).test(`${ctx.source ?? ''}\n${err.stack ?? ''}`);
+    return /cdn-cgi|rocket-loader/iu.test(`${ctx.source ?? ''}\n${err.stack ?? ''}`);
   }
 
   private isExternalFetchError_(err: Error): boolean {
@@ -284,7 +287,7 @@ export class ErrorManager {
      * get auto-filed as a spurious GitHub issue. The phrases are specific enough that a real app
      * bug is unlikely to collide; a bare 'fetch' is deliberately NOT matched (too broad).
      */
-    return (/failed to fetch|networkerror|load failed/iu).test(err.message);
+    return /failed to fetch|networkerror|load failed/iu.test(err.message);
   }
 
   warn(msg: string, ...optionalParams: unknown[]): void {
@@ -344,12 +347,8 @@ export class ErrorManager {
   }
 
   private getErrorUrl_(e: Error, ctx: ErrorContext): string {
-    const sourceLocation = ctx.source
-      ? `\n#### Source\n${ctx.source}:${ctx.line ?? '?'}:${ctx.col ?? '?'}`
-      : '';
-    const rejectionFlag = ctx.isUnhandledRejection
-      ? '\n#### Type\nUnhandled Promise Rejection'
-      : '';
+    const sourceLocation = ctx.source ? `\n#### Source\n${ctx.source}:${ctx.line ?? '?'}:${ctx.col ?? '?'}` : '';
+    const rejectionFlag = ctx.isUnhandledRejection ? '\n#### Type\nUnhandled Promise Rejection' : '';
 
     return this.newGithubIssueUrl_({
       user: 'thkruz',

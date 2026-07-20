@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 import { MenuMode, SolarBody } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -7,6 +6,7 @@ import { PlanetsMenuPlugin } from '@app/plugins/planets-menu/planets-menu';
 import { settingsManager } from '@app/settings/settings';
 import { setupDefaultHtml } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 // eslint-disable-next-line max-lines-per-function
 describe('PlanetsMenuPlugin', () => {
@@ -64,17 +64,6 @@ describe('PlanetsMenuPlugin', () => {
       expect(helpConfig.sections!.length).toBeGreaterThan(0);
     });
 
-    it('should return correct context menu config', () => {
-      const plugin = new PlanetsMenuPlugin();
-      const config = plugin.getContextMenuConfig();
-
-      expect(config.level1ElementName).toBe('planets-rmb');
-      expect(config.level2ElementName).toBe('planets-rmb-menu');
-      expect(config.order).toBe(70);
-      expect(config.isVisibleOnEarth).toBe(true);
-      expect(config.isVisibleOffEarth).toBe(true);
-    });
-
     it('should return keyboard shortcuts with p and Home keys', () => {
       const plugin = new PlanetsMenuPlugin();
       const shortcuts = plugin.getKeyboardShortcuts();
@@ -127,55 +116,6 @@ describe('PlanetsMenuPlugin', () => {
     });
   });
 
-  describe('Context menu HTML', () => {
-    it('should build level 2 HTML with planet entries', () => {
-      const plugin = new PlanetsMenuPlugin();
-      const rmbHtml = plugin.buildRmbL2Html_();
-
-      expect(rmbHtml).toContain('planets-Mercury-rmb');
-      expect(rmbHtml).toContain('planets-Earth-rmb');
-      expect(rmbHtml).toContain('planets-Moon-rmb');
-    });
-  });
-
-  describe('onContextMenuAction', () => {
-    it('should extract planet name from rmb ID format', () => {
-      const plugin = new PlanetsMenuPlugin();
-
-      plugin.changePlanet = vi.fn();
-
-      plugin.onContextMenuAction('planets-Mercury-rmb');
-      expect(plugin.changePlanet).toHaveBeenCalledWith(SolarBody.Mercury);
-    });
-
-    it('should pass raw planet name through when not in rmb format', () => {
-      const plugin = new PlanetsMenuPlugin();
-
-      plugin.changePlanet = vi.fn();
-
-      plugin.onContextMenuAction('Mercury');
-      expect(plugin.changePlanet).toHaveBeenCalledWith(SolarBody.Mercury);
-    });
-
-    it('should be called by rmbCallback legacy bridge', () => {
-      const plugin = new PlanetsMenuPlugin();
-
-      plugin.onContextMenuAction = vi.fn();
-
-      plugin.rmbCallback('planets-Mars-rmb');
-      expect(plugin.onContextMenuAction).toHaveBeenCalledWith('planets-Mars-rmb');
-    });
-
-    it('should not call onContextMenuAction when targetId is null', () => {
-      const plugin = new PlanetsMenuPlugin();
-
-      plugin.onContextMenuAction = vi.fn();
-
-      plugin.rmbCallback(null);
-      expect(plugin.onContextMenuAction).not.toHaveBeenCalled();
-    });
-  });
-
   describe('changePlanet', () => {
     it('should reject invalid planet names', () => {
       const plugin = new PlanetsMenuPlugin();
@@ -221,13 +161,24 @@ describe('PlanetsMenuPlugin', () => {
   });
 
   describe('planetsMenuClick', () => {
-    it('should delegate to onContextMenuAction', () => {
+    it('should delegate to changePlanet', () => {
       const plugin = new PlanetsMenuPlugin();
 
-      plugin.onContextMenuAction = vi.fn();
+      plugin.changePlanet = vi.fn();
 
       plugin.planetsMenuClick('Jupiter');
-      expect(plugin.onContextMenuAction).toHaveBeenCalledWith('Jupiter');
+      expect(plugin.changePlanet).toHaveBeenCalledWith(SolarBody.Jupiter);
+    });
+
+    it('should do nothing when planets are disabled', () => {
+      settingsManager.isDisablePlanets = true;
+      const plugin = new PlanetsMenuPlugin();
+
+      plugin.changePlanet = vi.fn();
+
+      plugin.planetsMenuClick('Jupiter');
+      expect(plugin.changePlanet).not.toHaveBeenCalled();
+      settingsManager.isDisablePlanets = false;
     });
   });
 
@@ -267,24 +218,6 @@ describe('PlanetsMenuPlugin', () => {
     });
 
     describe('Init-time disable', () => {
-      it('should return context menu config with visibility false when planets disabled', () => {
-        settingsManager.isDisablePlanets = true;
-        const plugin = new PlanetsMenuPlugin();
-        const config = plugin.getContextMenuConfig();
-
-        expect(config.isVisibleOnEarth).toBe(false);
-        expect(config.isVisibleOffEarth).toBe(false);
-      });
-
-      it('should return context menu config with visibility true when planets enabled', () => {
-        settingsManager.isDisablePlanets = false;
-        const plugin = new PlanetsMenuPlugin();
-        const config = plugin.getContextMenuConfig();
-
-        expect(config.isVisibleOnEarth).toBe(true);
-        expect(config.isVisibleOffEarth).toBe(true);
-      });
-
       it('should disable and hide bottom icon in uiManagerFinal when planets disabled at init', () => {
         settingsManager.isDisablePlanets = true;
         const plugin = new PlanetsMenuPlugin();
@@ -333,26 +266,6 @@ describe('PlanetsMenuPlugin', () => {
         expect(enableSpy).toHaveBeenCalled();
       });
 
-      it('should mutate rmbMenuItem visibility on runtime disable', () => {
-        settingsManager.isDisablePlanets = false;
-        const plugin = new PlanetsMenuPlugin();
-
-        plugin.addHtml();
-
-        vi.spyOn(plugin, 'setBottomIconToDisabled').mockImplementation(() => undefined);
-
-        const rmbMenuItems = [{ elementIdL1: 'planets-rmb', isRmbOnEarth: true, isRmbOffEarth: true }];
-
-        vi.spyOn(ServiceLocator, 'getInputManager').mockReturnValue({ rmbMenuItems } as ReturnType<typeof ServiceLocator.getInputManager>);
-
-        settingsManager.isDisablePlanets = true;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (plugin as any).checkPlanetsDisabledState_();
-
-        expect(rmbMenuItems[0].isRmbOnEarth).toBe(false);
-        expect(rmbMenuItems[0].isRmbOffEarth).toBe(false);
-      });
-
       it('should not toggle state when isDisablePlanets has not changed', () => {
         settingsManager.isDisablePlanets = false;
         const plugin = new PlanetsMenuPlugin();
@@ -376,16 +289,6 @@ describe('PlanetsMenuPlugin', () => {
         const plugin = new PlanetsMenuPlugin();
 
         expect(() => plugin.bottomIconCallback()).not.toThrow();
-      });
-
-      it('should not call changePlanet when planets disabled via onContextMenuAction', () => {
-        settingsManager.isDisablePlanets = true;
-        const plugin = new PlanetsMenuPlugin();
-
-        plugin.changePlanet = vi.fn();
-
-        plugin.onContextMenuAction('planets-Mercury-rmb');
-        expect(plugin.changePlanet).not.toHaveBeenCalled();
       });
 
       it('should not execute keyboard shortcut when planets disabled', () => {

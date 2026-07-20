@@ -15,17 +15,24 @@
       },
       "sections": {
         "template": "Modèle",
+        "launchWindow": "Fenêtre de lancement",
         "launchSite": "Site de lancement"
       },
       "buttons": {
+        "matchTargetPlane": "Trouver la fenêtre de lancement",
         "createLaunchNominal": "Créer un lancement nominal",
-        "inclinationTooLow": "Inclinaison trop faible !"
+        "inclinationTooLow": "Inclinaison trop faible !",
+        "clearWindow": "Effacer la fenêtre de lancement",
+        "createLaunchAtWindow": "Créer le lancement à la fenêtre"
       },
       "msgs": {
+        "windowFound": "Lancement à {time} pour s'aligner sur le plan cible (ΔRAAN {delta}°)",
         "launchNominalCreated": "Lancement nominal créé !",
         "timeRelativeToLaunch": "Le temps est désormais relatif à l'heure de lancement."
       },
       "errorMsgs": {
+        "windowNoTarget": "Sélectionnez d'abord un satellite cible.",
+        "windowGeometryImpossible": "Pas de fenêtre de lancement : l'inclinaison cible est inférieure à la latitude du site de lancement.",
         "noMoreNominalSatellites": "Plus de satellites nominaux disponibles !",
         "launchSiteNotFound": "Site de lancement {launchSite} introuvable !",
         "failedToCreateTle": "Échec de la création du TLE : {error}",
@@ -42,7 +49,9 @@
         "invalidEpochDayFormat": "Format de jour d'époque invalide ! Il doit comporter 3 chiffres, une décimale et 8 chiffres après la décimale.",
         "epochDayFormatIssue": "Un problème est survenu avec le format de jour d'époque de ce satellite. Essayez un autre satellite.",
         "failedToPropagate": "Échec de la propagation du satellite. Essayez d'autres paramètres ou signalez ce problème si les paramètres sont corrects.",
-        "changingOrbitBufferFailed": "Échec de la modification des données du tampon d'orbite"
+        "changingOrbitBufferFailed": "Échec de la modification des données du tampon d'orbite",
+        "launchLatExceedsInclination": "La latitude de lancement dépasse l’inclinaison de l’orbite.",
+        "failedToFitOrbit": "Impossible d’ajuster une orbite au site de lancement."
       },
       "help": {
         "overview": "Le menu Nouveau lancement crée un lancement notionnel : il copie l’orbite d’un satellite réel, la fait pivoter pour qu’elle décolle depuis un site de lancement de votre choix et remet l’horloge à T+0. Utilisez-le pour répondre à la question \"si quelque chose est lancé depuis ce site vers ce type d’orbite, quand mes capteurs le verront-ils ?\"",
@@ -54,7 +63,8 @@
         "tip1": "Après la création, l’horloge indique le temps écoulé depuis le décollage : \"00:45:00\" signifie 45 minutes après le lancement, idéal pour les chronologies de couverture capteur.",
         "tip2": "Si la création échoue à son contrôle d’altitude, essayez un autre satellite modèle avec une orbite plus conventionnelle.",
         "shortcutOpen": "Ouvrir le menu Nouveau lancement"
-      }
+      },
+      "launchWindowHelp": "Trouve le prochain moment de lancement dont le plan orbital correspond au satellite cible. Cela définit uniquement l'heure de lancement ; rien n'est créé tant que vous n'appuyez pas sur « Créer le lancement nominal »."
     }
   }
 }

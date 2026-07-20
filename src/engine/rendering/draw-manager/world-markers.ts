@@ -41,9 +41,14 @@ const SELECTION_RGB: [number, number, number] = [1.0, 0.0, 0.0];
 const OBSERVER_RGB: [number, number, number] = [47 / 255, 214 / 255, 162 / 255];
 
 interface MarkerSpec {
-  x: number; y: number; z: number; // ECI km
+  x: number;
+  y: number;
+  z: number; // ECI km
   size: number; // point size (device px)
-  r: number; g: number; b: number; a: number;
+  r: number;
+  g: number;
+  b: number;
+  a: number;
   shape: number; // SHAPE_GLOW | SHAPE_PIN
 }
 
@@ -217,23 +222,25 @@ export class WorldMarkers {
   private collectMarkers_(): MarkerSpec[] {
     const markers: MarkerSpec[] = [];
     // Smooth 0..1 sine pulse (matches the 2D map's smoothed marker pulse).
-    const pulse = 0.5 + 0.5 * Math.sin((performance.now() % PULSE_PERIOD_MS) / PULSE_PERIOD_MS * Math.PI * 2.0);
+    const pulse = 0.5 + 0.5 * Math.sin(((performance.now() % PULSE_PERIOD_MS) / PULSE_PERIOD_MS) * Math.PI * 2.0);
 
     // --- Selected-satellite glow (non-ride-along views only) --------------------
     if (settingsManager.isDrawSelectionGlow) {
       const camType = ServiceLocator.getMainCamera()?.cameraType;
-      const isRideAlong = camType === CameraType.FIXED_TO_SAT_LVLH ||
-        camType === CameraType.FIXED_TO_SAT_ECI ||
-        camType === CameraType.SATELLITE_FIRST_PERSON;
+      const isRideAlong = camType === CameraType.FIXED_TO_SAT_LVLH || camType === CameraType.FIXED_TO_SAT_ECI || camType === CameraType.SATELLITE_FIRST_PERSON;
 
       if (!isRideAlong) {
         const sel = PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj;
 
         if (sel && Number(sel.id) > -1 && sel.position) {
           markers.push({
-            x: sel.position.x, y: sel.position.y, z: sel.position.z,
+            x: sel.position.x,
+            y: sel.position.y,
+            z: sel.position.z,
             size: 26 + 20 * pulse,
-            r: SELECTION_RGB[0], g: SELECTION_RGB[1], b: SELECTION_RGB[2],
+            r: SELECTION_RGB[0],
+            g: SELECTION_RGB[1],
+            b: SELECTION_RGB[2],
             a: 0.35 + 0.35 * pulse,
             shape: SHAPE_GLOW,
           });
@@ -249,9 +256,13 @@ export class WorldMarkers {
       const eci = lla2eci({ lat: (lla.lat * DEG2RAD) as Radians, lon: (lla.lon * DEG2RAD) as Radians, alt: OBSERVER_ALT_KM }, gmst);
 
       markers.push({
-        x: eci.x, y: eci.y, z: eci.z,
+        x: eci.x,
+        y: eci.y,
+        z: eci.z,
         size: 52, // larger: the pin glyph only uses the sprite's top half (tip at centre)
-        r: OBSERVER_RGB[0], g: OBSERVER_RGB[1], b: OBSERVER_RGB[2],
+        r: OBSERVER_RGB[0],
+        g: OBSERVER_RGB[1],
+        b: OBSERVER_RGB[2],
         a: 0.95,
         shape: SHAPE_PIN,
       });

@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -6,6 +5,7 @@ import * as isThisNodeMod from '@app/engine/utils/isThisNode';
 import { TooltipsPlugin } from '@app/plugins/tooltips/tooltips';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSuite } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('TooltipsPlugin', () => {
   beforeEach(() => {

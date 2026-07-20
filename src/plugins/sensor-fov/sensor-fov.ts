@@ -56,17 +56,14 @@ export class SensorFov extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    EventBus.getInstance().on(
-      EventBusEvent.sensorDotSelected,
-      (sensor): void => {
-        if (sensor) {
-          this.setBottomIconToEnabled();
-        } else {
-          this.setBottomIconToDisabled();
-          this.setBottomIconToUnselected();
-        }
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.sensorDotSelected, (sensor): void => {
+      if (sensor) {
+        this.setBottomIconToEnabled();
+      } else {
+        this.setBottomIconToDisabled();
+        this.setBottomIconToUnselected();
+      }
+    });
   }
 
   onBottomIconClick(): void {

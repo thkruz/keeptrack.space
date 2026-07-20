@@ -121,13 +121,8 @@ export const isSatelliteAllowed = (sat: Satellite, filters: Time2LonFilters, all
  * 'Other'. The country map is injected so this stays free of the DOM/CSS-coupled
  * country-data module and remains worker-safe.
  */
-export const buildTopCountries = (
-  countryCounts: Record<string, number>,
-  countryMap: Record<string, string>,
-  topCount: number,
-): Map<string, string> => {
-  const sorted = Object.entries(countryCounts)
-    .sort(([, a], [, b]) => b - a);
+export const buildTopCountries = (countryCounts: Record<string, number>, countryMap: Record<string, string>, topCount: number): Map<string, string> => {
+  const sorted = Object.entries(countryCounts).sort(([, a], [, b]) => b - a);
 
   const topCodes = sorted.slice(0, topCount).map(([code]) => code);
   const lookup = new Map<string, string>();
@@ -165,12 +160,7 @@ export const computeOrbits = (maxTimeMin: number, periodMin: number): number => 
  * points whose offset falls inside [0, maxTimeMin]. Returns null when no point
  * survives, so empty lines never reach the chart.
  */
-export const buildSatLine = (
-  meta: Time2LonLineMeta,
-  samples: Time2LonLlaSample[],
-  nowMs: number,
-  maxTimeMin: number,
-): Time2LonSatLine | null => {
+export const buildSatLine = (meta: Time2LonLineMeta, samples: Time2LonLlaSample[], nowMs: number, maxTimeMin: number): Time2LonSatLine | null => {
   const points: Time2LonDataPoint[] = [];
 
   for (const sample of samples) {

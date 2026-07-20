@@ -4,8 +4,26 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import type { ClassicalElements } from '@app/engine/ootk/src/coordinate/ClassicalElements';
 import type { ITRF } from '@app/engine/ootk/src/coordinate/ITRF';
 import type { J2000 } from '@app/engine/ootk/src/coordinate/J2000';
-import { calcGmst, DEG2RAD, Degrees, EcefVec3, eci2ecef, eci2lla, GreenwichMeanSiderealTime, Kilometers, lla2eci, LlaVec3, PosVel, Radians, SpaceObject, SpaceObjectParams, SpaceObjectType, TemeVec3, Vector3D } from '@ootk/src/main';
 import { interpolateMissileSample } from '@app/plugins/missile/missile-interpolation';
+import {
+  calcGmst,
+  DEG2RAD,
+  Degrees,
+  EcefVec3,
+  eci2ecef,
+  eci2lla,
+  GreenwichMeanSiderealTime,
+  Kilometers,
+  LlaVec3,
+  lla2eci,
+  PosVel,
+  Radians,
+  SpaceObject,
+  SpaceObjectParams,
+  SpaceObjectType,
+  TemeVec3,
+  Vector3D,
+} from '@ootk/src/main';
 
 export class MissileObject extends SpaceObject {
   type = SpaceObjectType.BALLISTIC_MISSILE;
@@ -180,7 +198,6 @@ export class MissileObject extends SpaceObject {
     }
 
     return false;
-
   }
 
   /**
@@ -262,10 +279,7 @@ export class MissileObject extends SpaceObject {
     const i0 = Math.min(Math.floor(elapsedSec), lastIdx - 1);
     const i1 = i0 + 1;
 
-    const toEci = (idx: number) => lla2eci(
-      { lat: (this.latList[idx] * DEG2RAD) as Radians, lon: (this.lonList[idx] * DEG2RAD) as Radians, alt: this.altList[idx] },
-      gmst,
-    );
+    const toEci = (idx: number) => lla2eci({ lat: (this.latList[idx] * DEG2RAD) as Radians, lon: (this.lonList[idx] * DEG2RAD) as Radians, alt: this.altList[idx] }, gmst);
     const p0 = toEci(i0);
     const p1 = toEci(i1);
     const dir = new Vector3D(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z);
@@ -317,10 +331,8 @@ export class MissileObject extends SpaceObject {
       return this.orbitPathCache_;
     }
 
-    const toEcef = (lat: number, lon: number, alt: number) => lla2eci(
-      { lat: (lat * DEG2RAD) as Radians, lon: (lon * DEG2RAD) as Radians, alt: alt as Kilometers },
-      0 as GreenwichMeanSiderealTime,
-    );
+    const toEcef = (lat: number, lon: number, alt: number) =>
+      lla2eci({ lat: (lat * DEG2RAD) as Radians, lon: (lon * DEG2RAD) as Radians, alt: alt as Kilometers }, 0 as GreenwichMeanSiderealTime);
 
     const remaining = len - startIdx;
     const out = new Float32Array((remaining + 1) * 4);

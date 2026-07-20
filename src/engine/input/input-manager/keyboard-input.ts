@@ -117,7 +117,7 @@ export class KeyboardInput {
      * Don't prevent default for function keys (F1-F12)
      * when Shift is pressed
      */
-    if (!(/^f\d{1,2}$/iu).test(key) && !evt.shiftKey) {
+    if (!/^f\d{1,2}$/iu.test(key) && !evt.shiftKey) {
       evt.preventDefault();
     }
 
@@ -157,7 +157,7 @@ export class KeyboardInput {
      * Don't prevent default for function keys (F1-F12)
      * when Shift is pressed
      */
-    if (!(/^f\d{1,2}$/iu).test(key) && !evt.shiftKey) {
+    if (!/^f\d{1,2}$/iu.test(key) && !evt.shiftKey) {
       evt.preventDefault();
     }
 

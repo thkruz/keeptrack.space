@@ -1,11 +1,12 @@
 /* eslint-disable max-lines-per-function */
-import { vi } from 'vitest';
-import { readFileSync } from 'fs';
-import { CatalogLoader, AsciiTleSat } from '@app/app/data/catalog-loader';
-import { EventBus } from '@app/engine/events/event-bus';
+
+import { AsciiTleSat, CatalogLoader } from '@app/app/data/catalog-loader';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 import { Satellite } from '@app/engine/ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { readFileSync } from 'fs';
+import { vi } from 'vitest';
 
 interface ExtendedRow {
   OBJECT_NAME: string;
@@ -76,7 +77,7 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
         text: () => Promise.resolve(''),
         ok: true,
         status: 200,
-      } as Response),
+      } as Response)
     );
   });
 
@@ -184,10 +185,12 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
 
     const externalCatalog: AsciiTleSat[] = [...goodSats, badEntry];
 
-    await expect(CatalogLoader.parse({
-      keepTrackTle: [],
-      externalCatalog: Promise.resolve(externalCatalog),
-    })).resolves.not.toThrow();
+    await expect(
+      CatalogLoader.parse({
+        keepTrackTle: [],
+        externalCatalog: Promise.resolve(externalCatalog),
+      })
+    ).resolves.not.toThrow();
 
     const catalogManager = ServiceLocator.getCatalogManager();
 
@@ -236,10 +239,12 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
       },
     ];
 
-    await expect(CatalogLoader.parse({
-      keepTrackTle: [],
-      externalCatalog: Promise.resolve(externalCatalog),
-    })).resolves.not.toThrow();
+    await expect(
+      CatalogLoader.parse({
+        keepTrackTle: [],
+        externalCatalog: Promise.resolve(externalCatalog),
+      })
+    ).resolves.not.toThrow();
 
     // Good entry still indexed.
     const catalogManager = ServiceLocator.getCatalogManager();
@@ -412,11 +417,20 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
       OBJECT_NAME: 'TEST-ALPHA5',
       OBJECT_ID: '2024-001A',
       EPOCH: '2024-01-01T00:00:00.000000',
-      MEAN_MOTION: 15.5, ECCENTRICITY: 0.0001137, INCLINATION: 51.6415,
-      RA_OF_ASC_NODE: 100, ARG_OF_PERICENTER: 0, MEAN_ANOMALY: 0,
-      EPHEMERIS_TYPE: 0, CLASSIFICATION_TYPE: 'U', NORAD_CAT_ID: 'T0001',
-      ELEMENT_SET_NO: 999, REV_AT_EPOCH: 1, BSTAR: 0,
-      MEAN_MOTION_DOT: 0, MEAN_MOTION_DDOT: 0,
+      MEAN_MOTION: 15.5,
+      ECCENTRICITY: 0.0001137,
+      INCLINATION: 51.6415,
+      RA_OF_ASC_NODE: 100,
+      ARG_OF_PERICENTER: 0,
+      MEAN_ANOMALY: 0,
+      EPHEMERIS_TYPE: 0,
+      CLASSIFICATION_TYPE: 'U',
+      NORAD_CAT_ID: 'T0001',
+      ELEMENT_SET_NO: 999,
+      REV_AT_EPOCH: 1,
+      BSTAR: 0,
+      MEAN_MOTION_DOT: 0,
+      MEAN_MOTION_DDOT: 0,
     });
 
     // First load — fills the catalog with one alpha-5 satellite.
@@ -438,11 +452,20 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
       OBJECT_NAME: 'TEST-ALPHA5-UPDATED',
       OBJECT_ID: '2024-001A',
       EPOCH: '2024-06-01T00:00:00.000000',
-      MEAN_MOTION: 15.5, ECCENTRICITY: 0.0001137, INCLINATION: 51.6415,
-      RA_OF_ASC_NODE: 100, ARG_OF_PERICENTER: 0, MEAN_ANOMALY: 0,
-      EPHEMERIS_TYPE: 0, CLASSIFICATION_TYPE: 'U', NORAD_CAT_ID: 'T0001',
-      ELEMENT_SET_NO: 999, REV_AT_EPOCH: 1, BSTAR: 0,
-      MEAN_MOTION_DOT: 0, MEAN_MOTION_DDOT: 0,
+      MEAN_MOTION: 15.5,
+      ECCENTRICITY: 0.0001137,
+      INCLINATION: 51.6415,
+      RA_OF_ASC_NODE: 100,
+      ARG_OF_PERICENTER: 0,
+      MEAN_ANOMALY: 0,
+      EPHEMERIS_TYPE: 0,
+      CLASSIFICATION_TYPE: 'U',
+      NORAD_CAT_ID: 'T0001',
+      ELEMENT_SET_NO: 999,
+      REV_AT_EPOCH: 1,
+      BSTAR: 0,
+      MEAN_MOTION_DOT: 0,
+      MEAN_MOTION_DDOT: 0,
     });
 
     await CatalogLoader.parse({

@@ -1,7 +1,7 @@
+import { CameraControlWidget } from '@app/app/ui/camera-control-widget';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { CameraControlWidget } from '@app/app/ui/camera-control-widget';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
 
@@ -11,12 +11,33 @@ const mockCtx = () => {
 
   return {
     canvas: { width: 100, height: 100 },
-    fillStyle: '', strokeStyle: '', lineWidth: 1, font: '', textAlign: '', textBaseline: '', globalAlpha: 1, lineCap: '',
-    save: vi.fn(), restore: vi.fn(), beginPath: vi.fn(), closePath: vi.fn(),
-    arc: vi.fn(), moveTo: vi.fn(), lineTo: vi.fn(), fill: vi.fn(), stroke: vi.fn(),
-    fillRect: vi.fn(), clearRect: vi.fn(), fillText: vi.fn(), strokeText: vi.fn(),
-    setLineDash: vi.fn(), translate: vi.fn(), rotate: vi.fn(), scale: vi.fn(),
-    createRadialGradient: vi.fn(() => gradient), createLinearGradient: vi.fn(() => gradient),
+    fillStyle: '',
+    strokeStyle: '',
+    lineWidth: 1,
+    font: '',
+    textAlign: '',
+    textBaseline: '',
+    globalAlpha: 1,
+    lineCap: '',
+    save: vi.fn(),
+    restore: vi.fn(),
+    beginPath: vi.fn(),
+    closePath: vi.fn(),
+    arc: vi.fn(),
+    moveTo: vi.fn(),
+    lineTo: vi.fn(),
+    fill: vi.fn(),
+    stroke: vi.fn(),
+    fillRect: vi.fn(),
+    clearRect: vi.fn(),
+    fillText: vi.fn(),
+    strokeText: vi.fn(),
+    setLineDash: vi.fn(),
+    translate: vi.fn(),
+    rotate: vi.fn(),
+    scale: vi.fn(),
+    createRadialGradient: vi.fn(() => gradient),
+    createLinearGradient: vi.fn(() => gradient),
     measureText: vi.fn(() => ({ width: 10 })),
   };
 };

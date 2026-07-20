@@ -3,8 +3,8 @@ import { Pickable } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { RcsColorScheme } from '@app/engine/rendering/color-schemes/rcs-color-scheme';
 import { SpaceObjectType } from '@ootk/src/main';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ColorSchemeTestUtils } from '@test/engine/rendering/color-schemes/__helpers__/color-scheme-test-utils';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockSats: any[] = [];
 
@@ -261,9 +261,7 @@ describe('RcsColorScheme', () => {
     it('exposes layersHtml with the eight expected swatches', () => {
       const slugs = ColorSchemeTestUtils.extractLegendSlugs(RcsColorScheme.layersHtml);
 
-      expect(slugs.sort((a, b) => a.localeCompare(b))).toEqual(
-        ['rcsLarge', 'rcsMed', 'rcsSmall', 'rcsUnknown', 'rcsXLarge', 'rcsXSmall', 'rcsXXSmall', 'rcsXXXSmall'],
-      );
+      expect(slugs.sort((a, b) => a.localeCompare(b))).toEqual(['rcsLarge', 'rcsMed', 'rcsSmall', 'rcsUnknown', 'rcsXLarge', 'rcsXSmall', 'rcsXXSmall', 'rcsXXXSmall']);
     });
   });
 });

@@ -3,6 +3,10 @@
     "SensorTimeline": {
       "bottomIconLabel": "Временная шкала датчика",
       "title": "Меню временной шкалы датчика",
+      "sections": {
+        "settings": "Настройки",
+        "sensors": "Датчики"
+      },
       "labels": {
         "calculationLength": "Длительность расчёта (часы)",
         "calculationInterval": "Интервал расчёта (секунды)",

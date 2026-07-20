@@ -34,9 +34,7 @@ const addSelectedSatToWatchlist = (): void => {
   }
 
   const id = selectSatManager?.selectedSat ?? -1;
-  const watchlist = PluginRegistry.plugins.find((plugin) => WATCHLIST_IDS.includes(plugin.id)) as
-    | { addSat?: (id: number) => void }
-    | undefined;
+  const watchlist = PluginRegistry.plugins.find((plugin) => WATCHLIST_IDS.includes(plugin.id)) as { addSat?: (id: number) => void } | undefined;
 
   if (id >= 0) {
     watchlist?.addSat?.(id);
@@ -148,7 +146,7 @@ export const watchlistChapter: ChapterDefinition = {
         featureId: 'bestPass',
         title: l('teasers.bestPass.title'),
         body: l('teasers.bestPass.body'),
-      },
+      }
     ),
     {
       id: 'w6-timelines',

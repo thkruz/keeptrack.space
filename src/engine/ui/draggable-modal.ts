@@ -1,11 +1,9 @@
-
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import Draggabilly from 'draggabilly';
 import { html } from '../utils/development/formatter';
 import { showEl } from '../utils/get-el';
 import { DraggableBox } from './draggable-box';
-
 
 export abstract class DraggableModal extends DraggableBox {
   protected abstract getModalContentHtml(): string;
@@ -26,7 +24,9 @@ export abstract class DraggableModal extends DraggableBox {
   override open(cb?: () => void) {
     if (!this.boxEl) {
       // Should it be KeepTrack.getInstance().containerRoot instead of document.body?
-      document.body.insertAdjacentHTML('beforeend', html`
+      document.body.insertAdjacentHTML(
+        'beforeend',
+        html`
         <div id="${this.boxId}-container" class="draggable-modal-overlay" style="display:none;">
           <div id="${this.boxId}" class="draggable-box" style="pointer-events:auto;">
             <div class="draggable-box__title-bar">
@@ -40,7 +40,8 @@ export abstract class DraggableModal extends DraggableBox {
             </div>
           </div>
         </div>
-      `);
+      `
+      );
       this.boxEl = getEl(`${this.boxId}-container`) as HTMLElement;
       this.initDraggabilly_();
       this.onOpen();

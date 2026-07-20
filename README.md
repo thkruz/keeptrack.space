@@ -125,14 +125,14 @@ To build KeepTrack locally, you need:
 git clone https://github.com/thkruz/keeptrack.space
 cd keeptrack.space
 
-# Install dependencies
-npm install
+# Install dependencies (this repo uses pnpm; `corepack enable` will provide it)
+pnpm install
 
 # Build the project
-npm run build
+pnpm run build
 
 # Start development server
-npm start
+pnpm start
 ```
 
 **Then open:** `http://localhost:5544` in your browser.
@@ -143,24 +143,24 @@ npm start
 
 | Command | Description |
 |---------|-------------|
-| `npm start` | Start dev server at `localhost:5544` |
-| `npm run build` | Production build to `/dist` |
-| `npm run lint` | Check code style |
-| `npm run lint:fix` | Auto-fix linting issues |
-| `npm test` | Run test suite |
-| `npm run sonar:up` | Start a local offline SonarQube server (Docker) |
-| `npm run sonar` | Run tests with coverage, then analyze against local SonarQube |
-| `npm run sonar:down` | Stop the local SonarQube server |
+| `pnpm start` | Start dev server at `localhost:5544` |
+| `pnpm run build` | Production build to `/dist` |
+| `pnpm run lint` | Check code style |
+| `pnpm run lint:fix` | Auto-fix linting issues |
+| `pnpm test` | Run test suite |
+| `pnpm run sonar:up` | Start a local offline SonarQube server (Docker) |
+| `pnpm run sonar` | Run tests with coverage, then analyze against local SonarQube |
+| `pnpm run sonar:down` | Stop the local SonarQube server |
 
 ### Offline Code Quality Analysis (SonarQube)
 
 Run the same static analysis we use, fully offline and self-hosted, with only **Docker** installed. No account setup, token juggling, or cloud service. See [docs-local/sonarqube.md](docs-local/sonarqube.md) for details. The whole thing is one command:
 
 ```bash
-npm run sonar     # starts SonarQube, runs tests + coverage, scans, opens the dashboard
+pnpm run sonar     # starts SonarQube, runs tests + coverage, scans, opens the dashboard
 ```
 
-It auto-starts a local SonarQube server, mints an analysis token for you, enables anonymous access so the dashboard needs **no login**, runs the scan, and opens `http://localhost:9000/dashboard?id=keeptrack`. Run `npm run sonar:down` to stop the server when you're done.
+It auto-starts a local SonarQube server, mints an analysis token for you, enables anonymous access so the dashboard needs **no login**, runs the scan, and opens `http://localhost:9000/dashboard?id=keeptrack`. Run `pnpm run sonar:down` to stop the server when you're done.
 
 ### Troubleshooting
 
@@ -170,9 +170,9 @@ The development server will automatically select an alternative port and display
 
 **Build errors?**
 
-- Ensure Node.js 18+ is installed: `node --version`
-- Clear npm cache: `npm cache clean --force`
-- Delete `node_modules` and reinstall: `rm -rf node_modules && npm install`
+- Ensure Node.js 24+ is installed: `node --version`
+- Clear the pnpm store cache: `pnpm store prune`
+- Delete `node_modules` and reinstall: `rm -rf node_modules && pnpm install`
 - Still having problems? Open an issue and I will address it as soon as possible.
 
 **Blank screen or WebGL errors?**
@@ -299,7 +299,7 @@ We welcome contributions! Whether you're fixing bugs, adding features, improving
 2. **Clone** your fork: `git clone https://github.com/YOUR-USERNAME/keeptrack.space`
 3. **Create a branch**: `git checkout -b feature/my-awesome-feature`
 4. **Make changes** and test thoroughly
-5. **Run linting**: `npm run lint` (auto-fix with `npm run lint:fix`)
+5. **Run linting**: `pnpm run lint` (auto-fix with `pnpm run lint:fix`)
 6. **Commit**: Use clear, descriptive commit messages
 7. **Push**: `git push origin feature/my-awesome-feature`
 8. **Submit a PR** to the `develop` branch (not `main`)
@@ -309,10 +309,10 @@ We welcome contributions! Whether you're fixing bugs, adding features, improving
 ## Code Standards
 
 - **TypeScript strict mode** - All code must type-check without errors
-- **ESLint compliant** - Run `npm run lint` before committing
+- **Biome clean** - Run `pnpm run lint` (Biome check) before committing
 - **No console.log** - Use the error manager for logging
 - **Commented code** - Explain "why" not "what" for complex logic
-- **Test your changes** - Use `npm run test` and refer to the [Regression Testing Documentation](docs/regression-testing.md)
+- **Test your changes** - Use `pnpm test` and refer to the [Regression Testing Documentation](docs/regression-testing.md)
 
 ## Adding Features
 

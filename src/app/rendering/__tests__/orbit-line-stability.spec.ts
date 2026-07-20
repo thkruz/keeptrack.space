@@ -14,11 +14,7 @@ import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
  */
 
 // Mirror of rotateEcefToEciZ / the vertex shader's ecefToEciCS.
-const rotateEcefToEciZ = (x: number, y: number, z: number, c: number, s: number): [number, number, number] => [
-  x * c - y * s,
-  x * s + y * c,
-  z,
-];
+const rotateEcefToEciZ = (x: number, y: number, z: number, c: number, s: number): [number, number, number] => [x * c - y * s, x * s + y * c, z];
 
 interface EvalApi {
   getCatalogManager(): { objectCache: ({ id?: number; isSatellite?: () => boolean } | null)[] };
@@ -44,17 +40,14 @@ test.describe('Orbit-line ECF stability', () => {
     });
 
     // Wait for the catalog and the position cruncher to populate.
-    await page.waitForFunction(
-      () => (window as unknown as EvalWindow).keepTrack.api.getCatalogManager().objectCache.length > 1000,
-      { timeout: 40_000 },
-    );
+    await page.waitForFunction(() => (window as unknown as EvalWindow).keepTrack.api.getCatalogManager().objectCache.length > 1000, { timeout: 40_000 });
     await page.waitForFunction(
       () => {
         const pd = (window as unknown as EvalWindow).keepTrack.api.getDotsManager().positionData;
 
         return !!pd && pd.length > 3;
       },
-      { timeout: 20_000 },
+      { timeout: 20_000 }
     );
     await page.waitForTimeout(4_000);
 
@@ -95,38 +88,42 @@ test.describe('Orbit-line ECF stability', () => {
 
     // Sample a handful of frames, reading buffer + anchor + gmst + dot atomically
     // per frame so they are mutually consistent.
-    const samples = await page.evaluate((id): Promise<FrameSample[]> => new Promise((resolve) => {
-      const api = (window as unknown as EvalWindow).keepTrack.api;
-      const om = api.getOrbitManager();
-      const dm = api.getDotsManager();
-      const tm = api.getTimeManager();
-      const out: FrameSample[] = [];
-      const wanted = 10;
-      const tick = (): void => {
-        const buf = om.getBufferData(id);
-        const anchor = om.orbitAnchors_.get(id) ?? [0, 0, 0];
-        const dot = dm.getRenderedPositionArray(id);
+    const samples = await page.evaluate(
+      (id): Promise<FrameSample[]> =>
+        new Promise((resolve) => {
+          const api = (window as unknown as EvalWindow).keepTrack.api;
+          const om = api.getOrbitManager();
+          const dm = api.getDotsManager();
+          const tm = api.getTimeManager();
+          const out: FrameSample[] = [];
+          const wanted = 10;
+          const tick = (): void => {
+            const buf = om.getBufferData(id);
+            const anchor = om.orbitAnchors_.get(id) ?? [0, 0, 0];
+            const dot = dm.getRenderedPositionArray(id);
 
-        if (buf && buf.length >= 8) {
-          const m = 4 * Math.floor(buf.length / 8);
+            if (buf && buf.length >= 8) {
+              const m = 4 * Math.floor(buf.length / 8);
 
-          out.push({
-            gmst: tm.gmst,
-            anchor: [anchor[0], anchor[1], anchor[2]],
-            head: [buf[0], buf[1], buf[2], buf[3]],
-            mid: [buf[m], buf[m + 1], buf[m + 2]],
-            dot: [dot[0], dot[1], dot[2]],
-          });
-        }
-        if (out.length < wanted) {
+              out.push({
+                gmst: tm.gmst,
+                anchor: [anchor[0], anchor[1], anchor[2]],
+                head: [buf[0], buf[1], buf[2], buf[3]],
+                mid: [buf[m], buf[m + 1], buf[m + 2]],
+                dot: [dot[0], dot[1], dot[2]],
+              });
+            }
+            if (out.length < wanted) {
+              requestAnimationFrame(tick);
+            } else {
+              resolve(out);
+            }
+          };
+
           requestAnimationFrame(tick);
-        } else {
-          resolve(out);
-        }
-      };
-
-      requestAnimationFrame(tick);
-    }), geoId);
+        }),
+      geoId
+    );
 
     expect(samples.length, 'orbit buffer should have populated for the selected sat').toBeGreaterThan(2);
 
@@ -152,11 +149,7 @@ test.describe('Orbit-line ECF stability', () => {
       // now) reconstructs the dot position. This is what the old per-frame
       // whole-buffer align hack approximated; the anchored head makes it exact.
       const anchorEciNow = rotateEcefToEciZ(s.anchor[0], s.anchor[1], s.anchor[2], Math.cos(s.gmst), Math.sin(s.gmst));
-      const gap = Math.hypot(
-        s.head[0] + anchorEciNow[0] - s.dot[0],
-        s.head[1] + anchorEciNow[1] - s.dot[1],
-        s.head[2] + anchorEciNow[2] - s.dot[2],
-      );
+      const gap = Math.hypot(s.head[0] + anchorEciNow[0] - s.dot[0], s.head[1] + anchorEciNow[1] - s.dot[1], s.head[2] + anchorEciNow[2] - s.dot[2]);
 
       maxGapKm = Math.max(maxGapKm, gap);
     }

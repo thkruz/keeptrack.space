@@ -1,6 +1,6 @@
-import { Degrees } from '@ootk/src/main';
-import { ElevationMask } from '@app/engine/ootk/src/sensor/FieldOfView';
 import { ElevationMaskFn } from '@app/engine/math/dop-math';
+import { ElevationMask } from '@app/engine/ootk/src/sensor/FieldOfView';
+import { Degrees } from '@ootk/src/main';
 
 export interface TerrainMaskProfile {
   id: string;

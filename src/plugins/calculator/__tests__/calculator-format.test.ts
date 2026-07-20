@@ -1,4 +1,4 @@
-import { OutputFormat, formatValue, toDms } from '@app/plugins/calculator/calculator-core';
+import { formatValue, OutputFormat, toDms } from '@app/plugins/calculator/calculator-core';
 
 /*
  * Calculator's value formatting is pure and lives in calculator-core: toDms

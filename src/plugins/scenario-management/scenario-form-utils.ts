@@ -41,16 +41,12 @@ export function syncFormFields(formPrefix: string, scenario: ScenarioData): void
   const startEl = getEl(`${formPrefix}-start-date`, true) as HTMLInputElement | null;
 
   if (startEl) {
-    startEl.value = scenario.startTime
-      ? scenario.startTime.toISOString().replace('T', ' ').replace('Z', '')
-      : '';
+    startEl.value = scenario.startTime ? scenario.startTime.toISOString().replace('T', ' ').replace('Z', '') : '';
   }
 
   const endEl = getEl(`${formPrefix}-end-date`, true) as HTMLInputElement | null;
 
   if (endEl) {
-    endEl.value = scenario.endTime
-      ? scenario.endTime.toISOString().replace('T', ' ').replace('Z', '')
-      : '';
+    endEl.value = scenario.endTime ? scenario.endTime.toISOString().replace('T', ' ').replace('Z', '') : '';
   }
 }

@@ -4,9 +4,4 @@
  * or file-imported string (list names, satellite names, categories, etc.)
  * before it is concatenated into an innerHTML/insertAdjacentHTML payload.
  */
-export const escapeHtml = (text: string): string => text
-  .replace(/&/gu, '&amp;')
-  .replace(/</gu, '&lt;')
-  .replace(/>/gu, '&gt;')
-  .replace(/"/gu, '&quot;')
-  .replace(/'/gu, '&#39;');
+export const escapeHtml = (text: string): string => text.replace(/&/gu, '&amp;').replace(/</gu, '&lt;').replace(/>/gu, '&gt;').replace(/"/gu, '&quot;').replace(/'/gu, '&#39;');

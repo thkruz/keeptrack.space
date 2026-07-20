@@ -32,11 +32,9 @@ const markReported = (key: string): boolean => {
   return true;
 };
 
-export const freshZeroVec3 = (): TemeVec3<KilometersPerSecond> =>
-  ({ x: 0, y: 0, z: 0 }) as TemeVec3<KilometersPerSecond>;
+export const freshZeroVec3 = (): TemeVec3<KilometersPerSecond> => ({ x: 0, y: 0, z: 0 }) as TemeVec3<KilometersPerSecond>;
 
-const isVec3Like = (value: unknown): value is { x: unknown; y: unknown; z: unknown } =>
-  typeof value === 'object' && value !== null;
+const isVec3Like = (value: unknown): value is { x: unknown; y: unknown; z: unknown } => typeof value === 'object' && value !== null;
 
 const summarize = (value: unknown): string => {
   if (value === null) {
@@ -62,7 +60,7 @@ const summarize = (value: unknown): string => {
  */
 export const ensureVelocityVec3 = (
   target: { id?: number | string; name?: string; type?: number; velocity: TemeVec3<KilometersPerSecond> },
-  callsite: string,
+  callsite: string
 ): TemeVec3<KilometersPerSecond> => {
   const prior = target.velocity as unknown;
 
@@ -72,7 +70,7 @@ export const ensureVelocityVec3 = (
 
     if (markReported(dedupKey)) {
       errorManagerInstance.debug(
-        `Non-object velocity detected (issue #834). callsite=${callsite} id=${id} name=${target.name ?? '?'} type=${target.type ?? '?'} priorType=${typeof prior} priorValue=${summarize(prior)} version=${__VERSION__} buildDate=${__VERSION_DATE__}`,
+        `Non-object velocity detected (issue #834). callsite=${callsite} id=${id} name=${target.name ?? '?'} type=${target.type ?? '?'} priorType=${typeof prior} priorValue=${summarize(prior)} version=${__VERSION__} buildDate=${__VERSION_DATE__}`
       );
     }
 

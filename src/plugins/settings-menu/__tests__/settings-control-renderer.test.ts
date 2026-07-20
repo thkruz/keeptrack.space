@@ -1,19 +1,8 @@
 import { SoundNames } from '@app/engine/audio/sounds';
 import { Container } from '@app/engine/core/container';
 import { Singletons } from '@app/engine/core/interfaces';
-import {
-  ISettingButtonControl,
-  ISettingNumberControl,
-  ISettingSelectControl,
-  ISettingToggleControl,
-  ISettingsContribution,
-} from '@app/engine/plugins/core/plugin-capabilities';
-import {
-  attachSettingControlListeners,
-  domIdForControl,
-  renderSettingControl,
-  renderSettingsSection,
-} from '@app/plugins/settings-menu/settings-control-renderer';
+import { ISettingButtonControl, ISettingNumberControl, ISettingSelectControl, ISettingsContribution, ISettingToggleControl } from '@app/engine/plugins/core/plugin-capabilities';
+import { attachSettingControlListeners, domIdForControl, renderSettingControl, renderSettingsSection } from '@app/plugins/settings-menu/settings-control-renderer';
 import { vi } from 'vitest';
 
 type SoundManagerStub = { play: (name: string) => void };
@@ -76,7 +65,11 @@ describe('renderSettingControl - toggle', () => {
 
   it('escapes HTML in the label so plugin-supplied translations cannot inject markup', () => {
     const ctrl: ISettingToggleControl = {
-      type: 'toggle', id: 'x', label: '<script>alert(1)</script>', get: () => false, set: vi.fn(),
+      type: 'toggle',
+      id: 'x',
+      label: '<script>alert(1)</script>',
+      get: () => false,
+      set: vi.fn(),
     };
 
     const html = renderSettingControl(ctrl, 'sec');
@@ -87,7 +80,12 @@ describe('renderSettingControl - toggle', () => {
 
   it('escapes help text when used in a tooltip attribute', () => {
     const ctrl: ISettingToggleControl = {
-      type: 'toggle', id: 'x', label: 'X', helpText: '"breakout" & <bad>', get: () => false, set: vi.fn(),
+      type: 'toggle',
+      id: 'x',
+      label: 'X',
+      helpText: '"breakout" & <bad>',
+      get: () => false,
+      set: vi.fn(),
     };
 
     const html = renderSettingControl(ctrl, 'sec');
@@ -103,7 +101,12 @@ describe('renderSettingControl - toggle', () => {
 
   it('returns an empty string when isAvailable() is false', () => {
     const ctrl: ISettingToggleControl = {
-      type: 'toggle', id: 'x', label: 'X', isAvailable: () => false, get: () => false, set: vi.fn(),
+      type: 'toggle',
+      id: 'x',
+      label: 'X',
+      isAvailable: () => false,
+      get: () => false,
+      set: vi.fn(),
     };
 
     expect(renderSettingControl(ctrl, 'sec')).toBe('');
@@ -111,7 +114,12 @@ describe('renderSettingControl - toggle', () => {
 
   it('adds the disabled attribute when isDisabled() is true', () => {
     const ctrl: ISettingToggleControl = {
-      type: 'toggle', id: 'x', label: 'X', isDisabled: () => true, get: () => false, set: vi.fn(),
+      type: 'toggle',
+      id: 'x',
+      label: 'X',
+      isDisabled: () => true,
+      get: () => false,
+      set: vi.fn(),
     };
 
     expect(renderSettingControl(ctrl, 'sec')).toContain(' disabled');
@@ -121,9 +129,15 @@ describe('renderSettingControl - toggle', () => {
 describe('renderSettingControl - number', () => {
   it('renders the current value, min/max/step, and a unit-suffixed label', () => {
     const ctrl: ISettingNumberControl = {
-      type: 'number', id: 'fov', label: 'Field of View', unit: 'deg',
-      min: 1, max: 180, step: 0.5,
-      get: () => 30, set: vi.fn(),
+      type: 'number',
+      id: 'fov',
+      label: 'Field of View',
+      unit: 'deg',
+      min: 1,
+      max: 180,
+      step: 0.5,
+      get: () => 30,
+      set: vi.fn(),
     };
 
     const host = mountHtml(renderSettingControl(ctrl, 'sec'));
@@ -148,9 +162,15 @@ describe('renderSettingControl - number', () => {
 describe('renderSettingControl - select', () => {
   it('renders all options and marks the current one selected', () => {
     const ctrl: ISettingSelectControl = {
-      type: 'select', id: 'mode', label: 'Mode',
-      options: [{ value: 'a', label: 'Alpha' }, { value: 'b', label: 'Beta' }],
-      get: () => 'b', set: vi.fn(),
+      type: 'select',
+      id: 'mode',
+      label: 'Mode',
+      options: [
+        { value: 'a', label: 'Alpha' },
+        { value: 'b', label: 'Beta' },
+      ],
+      get: () => 'b',
+      set: vi.fn(),
     };
 
     const host = mountHtml(renderSettingControl(ctrl, 'sec'));
@@ -166,9 +186,12 @@ describe('renderSettingControl - select', () => {
 
   it('escapes both option values and option labels', () => {
     const ctrl: ISettingSelectControl = {
-      type: 'select', id: 'm', label: 'M',
+      type: 'select',
+      id: 'm',
+      label: 'M',
       options: [{ value: '"x"', label: '<b>bold</b>' }],
-      get: () => '"x"', set: vi.fn(),
+      get: () => '"x"',
+      set: vi.fn(),
     };
 
     const html = renderSettingControl(ctrl, 'sec');
@@ -182,7 +205,11 @@ describe('renderSettingControl - select', () => {
 describe('renderSettingControl - button', () => {
   it('renders a v13 kt-action button labeled with the control label', () => {
     const ctrl: ISettingButtonControl = {
-      type: 'button', id: 'reset', label: 'Reset to defaults', buttonLabel: 'Reset', onClick: vi.fn(),
+      type: 'button',
+      id: 'reset',
+      label: 'Reset to defaults',
+      buttonLabel: 'Reset',
+      onClick: vi.fn(),
     };
 
     const host = mountHtml(renderSettingControl(ctrl, 'sec'));
@@ -196,12 +223,18 @@ describe('renderSettingControl - button', () => {
 
 describe('renderSettingsSection', () => {
   const baseToggle = (overrides: Partial<ISettingToggleControl> = {}): ISettingToggleControl => ({
-    type: 'toggle', id: 't', label: 'T', get: () => false, set: vi.fn(), ...overrides,
+    type: 'toggle',
+    id: 't',
+    label: 'T',
+    get: () => false,
+    set: vi.fn(),
+    ...overrides,
   });
 
   it('renders a header followed by each visible control', () => {
     const contribution: ISettingsContribution = {
-      sectionId: 'TestPlugin', sectionLabel: 'Test Plugin',
+      sectionId: 'TestPlugin',
+      sectionLabel: 'Test Plugin',
       controls: [baseToggle({ id: 'a', label: 'A' }), baseToggle({ id: 'b', label: 'B' })],
     };
 
@@ -215,7 +248,8 @@ describe('renderSettingsSection', () => {
 
   it('returns an empty string when every control is hidden by isAvailable', () => {
     const contribution: ISettingsContribution = {
-      sectionId: 'P', sectionLabel: 'P',
+      sectionId: 'P',
+      sectionLabel: 'P',
       controls: [baseToggle({ isAvailable: () => false }), baseToggle({ id: 'b', isAvailable: () => false })],
     };
 
@@ -224,11 +258,9 @@ describe('renderSettingsSection', () => {
 
   it('skips hidden controls but still renders the rest of the section', () => {
     const contribution: ISettingsContribution = {
-      sectionId: 'P', sectionLabel: 'P',
-      controls: [
-        baseToggle({ id: 'shown', label: 'Shown' }),
-        baseToggle({ id: 'hidden', label: 'Hidden', isAvailable: () => false }),
-      ],
+      sectionId: 'P',
+      sectionLabel: 'P',
+      controls: [baseToggle({ id: 'shown', label: 'Shown' }), baseToggle({ id: 'hidden', label: 'Hidden', isAvailable: () => false })],
     };
 
     const host = mountHtml(renderSettingsSection(contribution));
@@ -239,7 +271,8 @@ describe('renderSettingsSection', () => {
 
   it('escapes the section label', () => {
     const contribution: ISettingsContribution = {
-      sectionId: 'P', sectionLabel: '<img src=x onerror=alert(1)>',
+      sectionId: 'P',
+      sectionLabel: '<img src=x onerror=alert(1)>',
       controls: [baseToggle()],
     };
 
@@ -251,7 +284,8 @@ describe('renderSettingsSection', () => {
 
   it('slugs unsafe characters out of the section wrapper id', () => {
     const contribution: ISettingsContribution = {
-      sectionId: 'My.Plugin', sectionLabel: 'X',
+      sectionId: 'My.Plugin',
+      sectionLabel: 'X',
       controls: [baseToggle()],
     };
 
@@ -313,7 +347,12 @@ describe('attachSettingControlListeners - toggle', () => {
   it('skips attachment when isAvailable() is false', () => {
     const set = vi.fn();
     const ctrl: ISettingToggleControl = {
-      type: 'toggle', id: 't', label: 'T', isAvailable: () => false, get: () => false, set,
+      type: 'toggle',
+      id: 't',
+      label: 'T',
+      isAvailable: () => false,
+      get: () => false,
+      set,
     };
 
     // The renderer returns '', so simulate that no DOM exists, then call attach - should be a no-op.
@@ -371,9 +410,15 @@ describe('attachSettingControlListeners - select', () => {
   it('calls set(value) with the chosen option and plays a click sound', () => {
     const set = vi.fn();
     const ctrl: ISettingSelectControl = {
-      type: 'select', id: 'm', label: 'M',
-      options: [{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }],
-      get: () => 'a', set,
+      type: 'select',
+      id: 'm',
+      label: 'M',
+      options: [
+        { value: 'a', label: 'A' },
+        { value: 'b', label: 'B' },
+      ],
+      get: () => 'a',
+      set,
     };
 
     mountHtml(renderSettingControl(ctrl, 's'));
@@ -400,7 +445,11 @@ describe('attachSettingControlListeners - button', () => {
   it('calls onClick() and plays a button-click sound when clicked', () => {
     const onClick = vi.fn();
     const ctrl: ISettingButtonControl = {
-      type: 'button', id: 'r', label: 'R', buttonLabel: 'R', onClick,
+      type: 'button',
+      id: 'r',
+      label: 'R',
+      buttonLabel: 'R',
+      onClick,
     };
 
     mountHtml(renderSettingControl(ctrl, 's'));

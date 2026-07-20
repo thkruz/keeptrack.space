@@ -37,9 +37,7 @@ test.describe('SatellitePhotos', () => {
 
     // Close
     await page.evaluate(() => {
-      document.getElementById('sat-photo-menu-close-btn')?.dispatchEvent(
-        new MouseEvent('click', { bubbles: true }),
-      );
+      document.getElementById('sat-photo-menu-close-btn')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u, { timeout: 5_000 });
   });

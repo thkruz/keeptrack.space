@@ -41,7 +41,6 @@ export class BottomMenu {
       EventBus.getInstance().on(EventBusEvent.uiManagerFinal, BottomMenu.addBottomMenuFilterButtons);
     }
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, BottomMenu.updateBottomMenuVisibility_);
-
   }
   static createBottomMenu(): void {
     const bottomMenuNode = document.createElement('div');
@@ -157,11 +156,7 @@ export class BottomMenu {
    * Each section consists of a header, an icons container, and an optional trailing divider.
    */
   private static updateUtilitySectionVisibility_() {
-    const containerIds = [
-      BottomMenu.utilityCameraContainerId,
-      BottomMenu.utilityLayerContainerId,
-      BottomMenu.utilitySettingsContainerId,
-    ];
+    const containerIds = [BottomMenu.utilityCameraContainerId, BottomMenu.utilityLayerContainerId, BottomMenu.utilitySettingsContainerId];
 
     let anyVisible = false;
 
@@ -198,9 +193,16 @@ export class BottomMenu {
 
   private static deselectAllBottomMenuFilterButtons_() {
     const menuIds = [
-      BottomMenu.catalogMenuId, BottomMenu.sensorsMenuId, BottomMenu.eventsMenuId, BottomMenu.createMenuId,
-      BottomMenu.analysisMenuId, BottomMenu.displayMenuId, BottomMenu.toolsMenuId,
-      BottomMenu.settingsMenuId, BottomMenu.experimentalMenuId, BottomMenu.allMenuId,
+      BottomMenu.catalogMenuId,
+      BottomMenu.sensorsMenuId,
+      BottomMenu.eventsMenuId,
+      BottomMenu.createMenuId,
+      BottomMenu.analysisMenuId,
+      BottomMenu.displayMenuId,
+      BottomMenu.toolsMenuId,
+      BottomMenu.settingsMenuId,
+      BottomMenu.experimentalMenuId,
+      BottomMenu.allMenuId,
     ];
 
     const menuElements = menuIds.map((id) => getEl(id));
@@ -238,8 +240,19 @@ export class BottomMenu {
     const menuExperimentalDom = getEl(BottomMenu.experimentalMenuId);
     const menuAllDom = getEl(BottomMenu.allMenuId);
 
-    if (menuCatalogDom && menuSensorsDom && menuEventsDom && menuCreateDom && menuAnalysisDom && menuConjunctionsDom &&
-        menuDisplayDom && menuToolsDom && menuSettingsDom && menuExperimentalDom && menuAllDom) {
+    if (
+      menuCatalogDom &&
+      menuSensorsDom &&
+      menuEventsDom &&
+      menuCreateDom &&
+      menuAnalysisDom &&
+      menuConjunctionsDom &&
+      menuDisplayDom &&
+      menuToolsDom &&
+      menuSettingsDom &&
+      menuExperimentalDom &&
+      menuAllDom
+    ) {
       menuCatalogDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuCatalogDom, MenuMode.CATALOG));
       menuSensorsDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuSensorsDom, MenuMode.SENSORS));
       menuEventsDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuEventsDom, MenuMode.EVENTS));
@@ -267,7 +280,6 @@ export class BottomMenu {
     };
 
     ['bottom-icons', 'bottom-icons-filter', BottomMenu.utilityPanelId].forEach((divIdWithScroll) => {
-
       getEl(divIdWithScroll)!.addEventListener(
         'wheel',
         (event: WheelEvent) => {
@@ -276,7 +288,7 @@ export class BottomMenu {
             wheel(event.currentTarget, event.deltaY);
           }
         },
-        { passive: false }, // Must be false to allow preventDefault()
+        { passive: false } // Must be false to allow preventDefault()
       );
     });
   }

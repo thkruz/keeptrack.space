@@ -210,15 +210,19 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     EventBus.getInstance().on(EventBusEvent.onWatchlistUpdated, this.onWatchlistUpdated_.bind(this));
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, WatchlistOverlay.uiManagerFinal.bind(this));
 
-    window.addEventListener('keydown', (evt: KeyboardEvent) => {
-      if (evt.key === 'F2' && evt.shiftKey) {
-        const overlay = getEl('info-overlay-menu');
+    window.addEventListener(
+      'keydown',
+      (evt: KeyboardEvent) => {
+        if (evt.key === 'F2' && evt.shiftKey) {
+          const overlay = getEl('info-overlay-menu');
 
-        if (overlay) {
-          overlay.classList.toggle('ui-hidden');
+          if (overlay) {
+            overlay.classList.toggle('ui-hidden');
+          }
         }
-      }
-    }, true);
+      },
+      true
+    );
   }
 
   updateLoop() {
@@ -413,9 +417,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       const absDelta = Math.abs(deltaMs);
       const mins = Math.floor(absDelta / 60000);
       const secs = Math.floor((absDelta % 60000) / 1000);
-      const countdown = deltaMs >= 0
-        ? `T-${mins}:${String(secs).padStart(2, '0')}`
-        : `T+${mins}:${String(secs).padStart(2, '0')}`;
+      const countdown = deltaMs >= 0 ? `T-${mins}:${String(secs).padStart(2, '0')}` : `T+${mins}:${String(secs).padStart(2, '0')}`;
       const timeStr = dateFormat(passTime, 'isoTime', true);
 
       return `${countdown} ${timeStr}`;
@@ -526,7 +528,12 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       clockHtml = parts[1] || '';
     }
 
-    return `<div class="wl-entry ${tier}" data-sat-id="${pass.sat.id}"><span class="wl-name">${name}</span>${countdownHtml}<span class="wl-time">${clockHtml}</span></div>`;
+    // Per-list color dot (pro multi-list feature; OSS getListColor returns null).
+    // The color is validated hex (see isValidListColor) so it is safe to inline.
+    const listColor = this.watchlistPlugin_.getListColor();
+    const dotHtml = listColor ? `<span class="wl-list-dot" style="background:${listColor}"></span>` : '';
+
+    return `<div class="wl-entry ${tier}" data-sat-id="${pass.sat.id}">${dotHtml}<span class="wl-name">${name}</span>${countdownHtml}<span class="wl-time">${clockHtml}</span></div>`;
   }
 
   /** Rotate departed entries in place: show up to 5, advancing offset every 10 seconds. */
@@ -567,9 +574,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
     for (const tier of tiersWithEntries) {
       if (showHeaders) {
-        const countSuffix = tier === 'wl-tier-departed' && departedTotal > DEPARTED_MAX_VISIBLE_
-          ? ` (${departedTotal})`
-          : '';
+        const countSuffix = tier === 'wl-tier-departed' && departedTotal > DEPARTED_MAX_VISIBLE_ ? ` (${departedTotal})` : '';
 
         htmlParts.push(`<div class="wl-group-header">${tierLabel(tier)}${countSuffix}</div>`);
       }

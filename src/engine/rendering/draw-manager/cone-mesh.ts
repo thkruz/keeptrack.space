@@ -47,7 +47,6 @@ export class ConeMesh extends CustomMesh {
   obj: BaseObject;
   targetObj: BaseObject | null = null;
 
-
   constructor(obj: BaseObject, settings: ConeSettings) {
     super();
     this.obj = obj;
@@ -137,9 +136,9 @@ export class ConeMesh extends CustomMesh {
       // The angular radius rho is set directly so the footprint scales
       // linearly with satDistance * tan(FOV), avoiding arctan compression
       // that makes GEO cones appear too small for larger FOV angles.
-      const fovRad = this.fieldOfView * Math.PI / 180;
-      const maxAngle = 80 * Math.PI / 180;
-      const rho = Math.min(satDistance * Math.tan(fovRad) / RADIUS_OF_EARTH, maxAngle);
+      const fovRad = (this.fieldOfView * Math.PI) / 180;
+      const maxAngle = (80 * Math.PI) / 180;
+      const rho = Math.min((satDistance * Math.tan(fovRad)) / RADIUS_OF_EARTH, maxAngle);
 
       const cosRho = Math.cos(rho);
       const sinRho = Math.sin(rho);
@@ -282,7 +281,7 @@ export class ConeMesh extends CustomMesh {
       const mapW = 2 * Math.PI * RADIUS_OF_EARTH;
       const camCenterX = ServiceLocator.getMainCamera().flatMapPanX;
       const d = meshLon * RADIUS_OF_EARTH - camCenterX + mapW / 2;
-      const meshRefFlatX = camCenterX + ((d % mapW) + mapW) % mapW - mapW / 2;
+      const meshRefFlatX = camCenterX + (((d % mapW) + mapW) % mapW) - mapW / 2;
 
       gl.uniform1f(this.uniforms_.u_meshRefFlatX, meshRefFlatX);
       gl.uniform1f(this.uniforms_.u_gmst, gmst);

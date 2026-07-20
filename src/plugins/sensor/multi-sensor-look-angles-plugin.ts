@@ -1,5 +1,3 @@
-import { t7e } from '@app/locales/keys';
-import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { SatMath } from '@app/app/analysis/sat-math';
 import { sensors } from '@app/app/data/catalogs/sensors';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
@@ -11,28 +9,22 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
 import { showLoading } from '@app/engine/utils/showLoading';
-import {
-  BaseObject,
-  Degrees,
-  Kilometers,
-  MINUTES_PER_DAY,
-  Satellite,
-  SatelliteRecord, Seconds,
-  SpaceObjectType,
-  TAU,
-} from '@ootk/src/main';
+import { t7e } from '@app/locales/keys';
+import { BaseObject, Degrees, Kilometers, MINUTES_PER_DAY, Satellite, SatelliteRecord, Seconds, SpaceObjectType, TAU } from '@ootk/src/main';
 import tableRowsPng from '@public/img/icons/table-rows.png';
 import { sensorGroups } from '../../app/data/catalogs/sensor-groups';
 import { SensorManager } from '../../app/sensors/sensorManager';
 import { ClickDragOptions, fileExcelPng, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './multi-sensor-look-angles.css';
+
 /** Shorthand for this plugin's locale keys. */
 const l = (key: string): string => t7e(`plugins.MultiSensorLookAnglesPlugin.${key}` as Parameters<typeof t7e>[0]);
 
@@ -55,26 +47,25 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
   constructor() {
     super();
     this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
-    this.sensorList_ = sensorGroups.map((group) => group.list).flat().map((sensor) => {
-      if (sensors[sensor] instanceof DetailedSensor) {
-        return sensors[sensor];
-      }
-      errorManagerInstance.debug(`Sensor ${sensor} not found in sensor catalog`);
+    this.sensorList_ = sensorGroups
+      .map((group) => group.list)
+      .flat()
+      .map((sensor) => {
+        if (sensors[sensor] instanceof DetailedSensor) {
+          return sensors[sensor];
+        }
+        errorManagerInstance.debug(`Sensor ${sensor} not found in sensor catalog`);
 
-      return null;
-    }).filter((sensor) => sensor !== null);
+        return null;
+      })
+      .filter((sensor) => sensor !== null);
 
     // remove duplicates in sensorList
-    this.sensorList_ = this.sensorList_.filter((sensor, index, self) =>
-      index === self.findIndex((s) => s.objName === sensor.objName),
-    );
+    this.sensorList_ = this.sensorList_.filter((sensor, index, self) => index === self.findIndex((s) => s.objName === sensor.objName));
 
     // Default to only the MW sensors being enabled
-    this.disabledSensors_ = this.sensorList_.filter((sensor) =>
-      !sensorGroups.find((group) => group.name === 'mw')?.list.includes(sensor.objName ?? ''),
-    );
+    this.disabledSensors_ = this.sensorList_.filter((sensor) => !sensorGroups.find((group) => group.name === 'mw')?.list.includes(sensor.objName ?? ''));
   }
-
 
   bottomIconCallback: () => void = () => {
     const sat = this.selectSatManager_?.getSelectedSat();
@@ -84,7 +75,6 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
     }
     this.refreshSideMenuData(sat as Satellite);
   };
-
 
   bottomIconImg = tableRowsPng;
   isIconDisabledOnLoad = true;
@@ -136,7 +126,6 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
     zIndex: 3,
   };
 
-
   getHelpConfig(): IHelpConfig {
     return {
       title: l('title'),
@@ -166,21 +155,15 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        // Opt this menu (and its sensor-toggle secondary menu) into the v13+ card UI.
-        getEl('multi-sensor-look-angles-menu')?.classList.add('kt-ui-v13');
-        getEl('multi-sensor-look-angles-menu-secondary')?.classList.add('kt-ui-v13');
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      // Opt this menu (and its sensor-toggle secondary menu) into the v13+ card UI.
+      getEl('multi-sensor-look-angles-menu')?.classList.add('kt-ui-v13');
+      getEl('multi-sensor-look-angles-menu-secondary')?.classList.add('kt-ui-v13');
+    });
 
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (obj: BaseObject) => {
-        this.checkIfCanBeEnabled_(obj);
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
+      this.checkIfCanBeEnabled_(obj);
+    });
   }
 
   private checkIfCanBeEnabled_(obj: BaseObject) {
@@ -199,17 +182,14 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    EventBus.getInstance().on(
-      EventBusEvent.staticOffsetChange,
-      () => {
-        const sat = this.selectSatManager_?.getSelectedSat();
+    EventBus.getInstance().on(EventBusEvent.staticOffsetChange, () => {
+      const sat = this.selectSatManager_?.getSelectedSat();
 
-        if (!sat?.isSatellite()) {
-          return;
-        }
-        this.refreshSideMenuData(sat as Satellite);
-      },
-    );
+      if (!sat?.isSatellite()) {
+        return;
+      }
+      this.refreshSideMenuData(sat as Satellite);
+    });
   }
 
   private refreshSideMenuData(sat: Satellite) {
@@ -258,7 +238,7 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
 
               this.getlookanglesMultiSite_(
                 sat,
-                allSensors.filter((s) => !this.disabledSensors_.includes(s)),
+                allSensors.filter((s) => !this.disabledSensors_.includes(s))
               );
             });
             sensorListDom.appendChild(sensorButton);
@@ -267,7 +247,7 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
 
           this.getlookanglesMultiSite_(
             sat,
-            allSensors.filter((s) => !this.disabledSensors_.includes(s)),
+            allSensors.filter((s) => !this.disabledSensors_.includes(s))
           );
         });
       }
@@ -308,7 +288,7 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
       const pos = (sat as unknown as OemSatellite).position;
       const r = Math.sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z);
 
-      orbitalPeriod = (TAU * Math.sqrt(r * r * r / 398600.4418)) / 60; // minutes
+      orbitalPeriod = (TAU * Math.sqrt((r * r * r) / 398600.4418)) / 60; // minutes
       isHighOrbit = r > 30000;
     }
 
@@ -426,7 +406,6 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
       rng: <Kilometers>0,
       objName: '',
     };
-
   }
 
   private populateMultiSiteTable_(multiSiteArray: TearrData[], sensors: DetailedSensor[]) {

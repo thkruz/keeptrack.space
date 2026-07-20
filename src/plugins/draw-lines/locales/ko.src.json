@@ -43,7 +43,8 @@
         "satScanEarth": "지구 스캔",
         "sensorScanHorizon": "수평선 스캔",
         "sensorToRae": "센서에서 점으로",
-        "generic": "선"
+        "generic": "선",
+        "sensorMarker": "센서 위치 마커"
       },
       "errorMsgs": {
         "noPrimarySat": "위성 간 연결선을 위한 주 위성이 선택되지 않았습니다.",

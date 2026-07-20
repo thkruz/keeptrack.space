@@ -1,16 +1,11 @@
-import { CameraType } from '@app/engine/camera/camera-type';
 import { SoundNames } from '@app/engine/audio/sounds';
+import { CameraType } from '@app/engine/camera/camera-type';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import {
-  IBottomIconConfig,
-  IHelpConfig,
-  IKeyboardShortcut,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, IContextMenuConfig, IHelpConfig, IKeyboardShortcut, ISideMenuConfig, RmbMenuContext } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -24,16 +19,7 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { wireInlineValidation } from '../create-sat/create-sat-validation';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { OrbitPreview } from '../shared/orbit-preview';
-import {
-  applyTleToSat,
-  buildEditedTle,
-  buildPreviewTleFromForm,
-  buildSaveBlob,
-  calculateDerivedParams,
-  parseLoadedTle,
-  pickZoomForApogee,
-  reEpochToNow,
-} from './edit-sat-actions';
+import { applyTleToSat, buildEditedTle, buildPreviewTleFromForm, buildSaveBlob, calculateDerivedParams, parseLoadedTle, pickZoomForApogee, reEpochToNow } from './edit-sat-actions';
 import { buildEditSatHelp } from './edit-sat-help';
 import { buildEditSatMenuHtml } from './edit-sat-menu-html';
 import './edit-sat.css';
@@ -86,6 +72,8 @@ export class EditSat extends KeepTrackPlugin {
     return [
       {
         key: 'E',
+        // ctrl:false so Ctrl+Shift+E stays free for Eclipse Analysis; this owns plain Shift+E.
+        ctrl: false,
         callback: () => {
           const ct = ServiceLocator.getMainCamera().cameraType;
 
@@ -127,28 +115,33 @@ export class EditSat extends KeepTrackPlugin {
   }
 
   // =========================================================================
-  // Context menu (legacy properties + bridge)
+  // Context menu
   // =========================================================================
 
-  isRmbOnSat = true;
-  rmbMenuOrder = 2;
-  rmbL1ElementName = 'edit-rmb';
-  rmbL1Html = html`
-  <li class="rmb-menu-item" id=${this.rmbL1ElementName}><a href="#">${t7e('plugins.EditSat.contextMenu.editSat' as T7eKey)} &#x27A4;</a></li>`;
+  getContextMenuConfig(): IContextMenuConfig {
+    return {
+      level1ElementName: 'edit-rmb',
+      level1Html: html`
+        <li class="rmb-menu-item" id="edit-rmb"><a href="#">${t7e('plugins.EditSat.contextMenu.editSat' as T7eKey)} &#x27A4;</a></li>`,
+      level2ElementName: 'edit-rmb-menu',
+      // Set Primary is intentionally absent: left-click already does that.
+      level2Html: html`
+        <ul class='dropdown-contents'>
+          <li id="set-sec-sat-rmb"><a href="#">${t7e('plugins.EditSat.contextMenu.setSecondarySat' as T7eKey)} (Ctrl+Click)</a></li>
+          <li id="edit-sat-rmb"><a href="#">${t7e('plugins.EditSat.contextMenu.editSatellite' as T7eKey)}</a></li>
+        </ul>`,
+      order: 2,
+      // Editing element sets only makes sense for actual satellites
+      isVisible: (ctx: RmbMenuContext) => ctx.target instanceof Satellite,
+    };
+  }
 
-  rmbCallback = (targetId: string, clickedSat?: number): void => {
-    this.onContextMenuAction_(targetId, clickedSat);
-  };
-
-  protected onContextMenuAction_(targetId: string, clickedSatId?: number): void {
-    if (typeof clickedSatId === 'undefined' || clickedSatId === null) {
-      throw new Error('clickedSat is undefined');
+  onContextMenuAction(targetId: string, clickedSatId?: number): void {
+    if (clickedSatId === undefined || clickedSatId === null || clickedSatId === -1) {
+      return;
     }
 
     switch (targetId) {
-      case 'set-pri-sat-rmb':
-        this.selectSatManager_.selectSat(clickedSatId);
-        break;
       case 'set-sec-sat-rmb':
         this.selectSatManager_.setSecondarySat(clickedSatId);
         break;
@@ -162,14 +155,6 @@ export class EditSat extends KeepTrackPlugin {
         break;
     }
   }
-
-  rmbL2ElementName = 'edit-rmb-menu';
-  rmbL2Html = html`
-    <ul class='dropdown-contents'>
-      <li id="set-pri-sat-rmb"><a href="#">${t7e('plugins.EditSat.contextMenu.setPrimarySat' as T7eKey)}</a></li>
-      <li id="set-sec-sat-rmb"><a href="#">${t7e('plugins.EditSat.contextMenu.setSecondarySat' as T7eKey)}</a></li>
-      <li id="edit-sat-rmb"><a href="#">${t7e('plugins.EditSat.contextMenu.editSatellite' as T7eKey)}</a></li>
-    </ul>`;
 
   // =========================================================================
   // Lifecycle
@@ -251,19 +236,16 @@ export class EditSat extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (obj: BaseObject) => {
-        if (!obj) {
-          if (this.isMenuButtonActive) {
-            this.closeSideMenu();
-          }
-          this.setBottomIconToDisabled();
-        } else if (this.isMenuButtonActive && obj.isSatellite() && (obj as Satellite).sccNum !== (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value) {
-          this.populateSideMenu_();
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
+      if (!obj) {
+        if (this.isMenuButtonActive) {
+          this.closeSideMenu();
         }
-      },
-    );
+        this.setBottomIconToDisabled();
+      } else if (this.isMenuButtonActive && obj.isSatellite() && (obj as Satellite).sccNum !== (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value) {
+        this.populateSideMenu_();
+      }
+    });
   }
 
   // =========================================================================
@@ -436,10 +418,6 @@ export class EditSat extends KeepTrackPlugin {
         uiManagerInstance.toast(result.error, ToastMsgType.critical, true);
 
         return;
-      }
-
-      if (result.directionUnknown) {
-        uiManagerInstance.toast(t7e('plugins.EditSat.errorMsgs.cannotCalculateDirection' as T7eKey), ToastMsgType.caution);
       }
 
       const country = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-country`)).value;
@@ -627,11 +605,7 @@ export class EditSat extends KeepTrackPlugin {
     const result = applyTleToSat(sat.id, parsed.tle1, parsed.tle2);
 
     if (result !== 'applied') {
-      uiManagerInstance.toast(
-        t7e('plugins.EditSat.errorMsgs.failedToPropagate' as T7eKey),
-        ToastMsgType.caution,
-        true,
-      );
+      uiManagerInstance.toast(t7e('plugins.EditSat.errorMsgs.failedToPropagate' as T7eKey), ToastMsgType.caution, true);
 
       return;
     }

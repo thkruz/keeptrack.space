@@ -18,15 +18,13 @@ export class TimeSlider extends KeepTrackPlugin {
 
   addHtml() {
     super.addHtml();
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerInit,
-      () => {
-        const navWrapperElement = getEl(TopMenu.NAV_WRAPPER_ID);
+    EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
+      const navWrapperElement = getEl(TopMenu.NAV_WRAPPER_ID);
 
-        if (navWrapperElement) {
-          navWrapperElement.parentElement!.insertAdjacentHTML(
-            'beforeend',
-            html`
+      if (navWrapperElement) {
+        navWrapperElement.parentElement!.insertAdjacentHTML(
+          'beforeend',
+          html`
             <div id="time-slider-container" class="time-slider-container">
               <div id="time-slider-container-slider" class="ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
                  style="display: inline-block;" data-min="0" data-max="100" data-step="0.1"
@@ -38,11 +36,10 @@ export class TimeSlider extends KeepTrackPlugin {
                 </span>
               </div>
             </div>
-          `,
-          );
-        }
-      },
-    );
+          `
+        );
+      }
+    });
   }
 
   getSliderValue(date: Date): number {
@@ -126,7 +123,7 @@ export class TimeSlider extends KeepTrackPlugin {
     const minPosition = this.scenario!.startTime as Date;
     const maxPosition = this.scenario!.endTime as Date;
     const differenceInMs = maxPosition.getTime() - minPosition.getTime();
-    const newTimeInMs = minPosition.getTime() + (differenceInMs * (value / 100));
+    const newTimeInMs = minPosition.getTime() + differenceInMs * (value / 100);
 
     const newDate = new Date(newTimeInMs);
 
@@ -196,12 +193,16 @@ export class TimeSlider extends KeepTrackPlugin {
         document.removeEventListener('touchend', onTouchEnd);
       };
 
-      slider.addEventListener('touchstart', (e: TouchEvent) => {
-        e.preventDefault();
-        updateSliderPosition(e.touches[0].clientX);
-        document.addEventListener('touchmove', onTouchMove, { passive: false });
-        document.addEventListener('touchend', onTouchEnd);
-      }, { passive: false });
+      slider.addEventListener(
+        'touchstart',
+        (e: TouchEvent) => {
+          e.preventDefault();
+          updateSliderPosition(e.touches[0].clientX);
+          document.addEventListener('touchmove', onTouchMove, { passive: false });
+          document.addEventListener('touchend', onTouchEnd);
+        },
+        { passive: false }
+      );
     }
   }
 }

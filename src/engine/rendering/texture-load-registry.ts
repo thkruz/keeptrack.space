@@ -31,7 +31,6 @@ function isDevHost_(): boolean {
   }
   const host = location.hostname;
 
-
   return host === 'localhost' || host === '127.0.0.1' || host === '::1' || host === '[::1]' || host === '';
 }
 
@@ -54,8 +53,10 @@ function readInjectionRules_(): FailureInjectionRule[] {
     return [];
   }
   const countRemaining = countParam ? Math.max(0, Number.parseInt(countParam, 10)) : -1;
-  const patterns = patternsParam.split(',').map((s) => s.trim()).filter((s) => s.length > 0);
-
+  const patterns = patternsParam
+    .split(',')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
 
   return patterns.map((pattern) => ({ pattern, status, countRemaining }));
 }
@@ -79,11 +80,9 @@ export function getInjectedFailure(url: string): { status: number | 'network' } 
         rule.countRemaining -= 1;
       }
 
-
       return { status: rule.status };
     }
   }
-
 
   return null;
 }

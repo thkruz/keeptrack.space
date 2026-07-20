@@ -3,7 +3,12 @@ import { MenuMode } from '@app/engine/core/interfaces';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import {
-  EarthBumpTextureQuality, EarthCloudTextureQuality, EarthDayTextureQuality, EarthNightTextureQuality, EarthPoliticalTextureQuality, EarthSpecTextureQuality,
+  EarthBumpTextureQuality,
+  EarthCloudTextureQuality,
+  EarthDayTextureQuality,
+  EarthNightTextureQuality,
+  EarthPoliticalTextureQuality,
+  EarthSpecTextureQuality,
 } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { getEl } from '@app/engine/utils/get-el';
 import { SettingsManager } from '../settings';
@@ -36,7 +41,6 @@ export const stemEnvironment = (settingsManager: SettingsManager) => {
   settingsManager.plugins.TimeMachine = { enabled: true };
   settingsManager.plugins.StereoMap = { enabled: true };
   settingsManager.isShowSplashScreen = true;
-
 
   settingsManager.simulationTime = new Date('2025-04-01T00:00:00Z'); // Set to April 1, 2025
 

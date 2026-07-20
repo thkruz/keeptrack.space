@@ -164,14 +164,14 @@ A.Coord = {
     var c = Math.floor(a / 3600) % 24,
       d = Math.floor(a / 60) % 60;
     a = Math.floor(a % 60);
-    return (0 !== b ? b + 'd ' : '') + (10 > c ? '0' : '') + c + ':' + (10 > d ? '0' : '') + d + ':' + (10 > a ? '0' : '') + a;
+    return (b !== 0 ? b + 'd ' : '') + (c < 10 ? '0' : '') + c + ':' + (d < 10 ? '0' : '') + d + ':' + (a < 10 ? '0' : '') + a;
   },
   secondsToHMStr: function (a: string | number) {
     var b = Math.floor(a / 86400);
     a = A.Math.pMod(a, 86400);
     var c = Math.floor(a / 3600) % 24;
     a = Math.floor(a / 60) % 60;
-    return (0 !== b ? b + 'd ' : '') + (10 > c ? '0' : '') + c + ':' + (10 > a ? '0' : '') + a;
+    return (b !== 0 ? b + 'd ' : '') + (c < 10 ? '0' : '') + c + ':' + (a < 10 ? '0' : '') + a;
   },
   eqToEcl: function (a: { ra: number; dec: number }, b: number) {
     var c = Math.sin(a.ra),
@@ -188,7 +188,7 @@ A.Coord = {
       f = Math.sin(b);
     b = Math.cos(b);
     let a2 = Math.atan2(c * b - (d / e) * f, Math.cos(a.lat));
-    0 > a2 && (a2 += 2 * Math.PI);
+    a2 < 0 && (a2 += 2 * Math.PI);
     return new A.EqCoord(a2, Math.asin(d * b + e * f * c));
   },
   eqToHz: function (a: number, b: number, c: number) {
@@ -217,33 +217,34 @@ A.DeltaT = {
   estimate: function (a: { (arg0: number, arg1: number): number; (x: number, y: number): number }) {
     var b = A.DeltaT.decimalYear(a);
     a = Math.pow;
-    return -500 > b
+    return b < -500
       ? -20 + 32 * a((b - 1820) / 100, 2)
-      : 500 > b
+      : b < 500
         ? ((b /= 100), 10583.6 - 1014.41 * b + 33.78311 * a(b, 2) - 5.952053 * a(b, 3) - 0.1798452 * a(b, 4) + 0.022174192 * a(b, 5) + 0.0090316521 * a(b, 6))
-        : 1600 > b
+        : b < 1600
           ? ((b = (b - 1e3) / 100), 1574.2 - 556.01 * b + 71.23472 * a(b, 2) + 0.319781 * a(b, 3) - 0.8503463 * a(b, 4) - 0.005050998 * a(b, 5) + 0.0083572073 * a(b, 6))
-          : 1700 > b
+          : b < 1700
             ? ((b -= 1600), 120 - 0.9808 * b - 0.01532 * a(b, 2) + a(b, 3) / 7129)
-            : 1800 > b
+            : b < 1800
               ? ((b -= 1700), 8.83 + 0.1603 * b - 0.0059285 * a(b, 2) + 1.3336e-4 * a(b, 3) - a(b, 4) / 1174e3)
-              : 1860 > b
-                ? ((b -= 1800), 13.72 - 0.332447 * b + 0.0068612 * a(b, 2) + 0.0041116 * a(b, 3) - 3.7436e-4 * a(b, 4) + 1.21272e-5 * a(b, 5) - 1.699e-7 * a(b, 6) + 8.75e-10 * a(b, 7))
-                : 1900 > b
+              : b < 1860
+                ? ((b -= 1800),
+                  13.72 - 0.332447 * b + 0.0068612 * a(b, 2) + 0.0041116 * a(b, 3) - 3.7436e-4 * a(b, 4) + 1.21272e-5 * a(b, 5) - 1.699e-7 * a(b, 6) + 8.75e-10 * a(b, 7))
+                : b < 1900
                   ? ((b -= 1860), 7.62 + 0.5737 * b - 0.251754 * a(b, 2) + 0.01680668 * a(b, 3) - 4.473624e-4 * a(b, 4) + a(b, 5) / 233174)
-                  : 1920 > b
+                  : b < 1920
                     ? ((b -= 1900), -2.79 + 1.494119 * b - 0.0598939 * a(b, 2) + 0.0061966 * a(b, 3) - 1.97e-4 * a(b, 4))
-                    : 1941 > b
+                    : b < 1941
                       ? ((b -= 1920), 21.2 + 0.84493 * b - 0.0761 * a(b, 2) + 0.0020936 * a(b, 3))
-                      : 1961 > b
+                      : b < 1961
                         ? ((b -= 1950), 29.07 + 0.407 * b - a(b, 2) / 233 + a(b, 3) / 2547)
-                        : 1986 > b
+                        : b < 1986
                           ? ((b -= 1975), 45.45 + 1.067 * b - a(b, 2) / 260 - a(b, 3) / 718)
-                          : 2005 > b
+                          : b < 2005
                             ? ((b -= 2e3), 63.86 + 0.3345 * b - 0.060374 * a(b, 2) + 0.0017275 * a(b, 3) + 6.51814e-4 * a(b, 4) + 2.373599e-5 * a(b, 5))
-                            : 2050 > b
+                            : b < 2050
                               ? ((b -= 2e3), 62.92 + 0.32217 * b + 0.005589 * a(b, 2))
-                              : 2150 > b
+                              : b < 2150
                                 ? -20 + 32 * a((b - 1820) / 100, 2) - 0.5628 * (2150 - b)
                                 : -20 + 32 * a((b - 1820) / 100, 2);
   },
@@ -260,7 +261,7 @@ A.Globe = {
 };
 A.Interp = {
   newLen3: function (a: number, b: number, c: string | any[]) {
-    if (3 != c.length) throw 'Error not 3';
+    if (c.length != 3) throw 'Error not 3';
     if (b === a) throw 'Error no x range';
     var d = c[1] - c[0],
       e = c[2] - c[1];
@@ -323,12 +324,12 @@ A.JulianDay.dateToJD = function (a: {
     : A.JulianDay.calendarGregorianToJD(a.getUTCFullYear(), a.getUTCMonth() + 1, b);
 };
 A.JulianDay.calendarGregorianToJD = function (a: number, b: number, c: number) {
-  if (1 === b || 2 === b) a--, (b += 12);
+  if (b === 1 || b === 2) a--, (b += 12);
   var d = Math.floor(a / 100);
   return Math.floor((36525 * (a + 4716)) / 100) + Math.floor((306 * (b + 1)) / 10) + (2 - d + Math.floor(d / 4)) + c - 1524.5;
 };
 A.JulianDay.calendarJulianToJD = function (a: number, b: number, c: number) {
-  if (1 === b || 2 === b) a--, (b += 12);
+  if (b === 1 || b === 2) a--, (b += 12);
   return Math.floor((36525 * (a + 4716)) / 100) + Math.floor((306 * (b + 1)) / 10) + c - 1524.5;
 };
 A.JulianDay.secondsFromHMS = function (a: number, b: number, c: number) {
@@ -344,17 +345,17 @@ A.JulianDay.jdToCalendar = function (a: number | number[]) {
   a = A.Math.modF(a + 0.5);
   var b = a[0],
     c = b;
-  2299151 <= b && ((c = Math.floor((100 * b - 186721625) / 3652425)), (c = b + 1 + c - Math.floor(c / 4)));
+  b >= 2299151 && ((c = Math.floor((100 * b - 186721625) / 3652425)), (c = b + 1 + c - Math.floor(c / 4)));
   var d = c + 1524;
   b = Math.floor((100 * d - 12210) / 36525);
   var e = Math.floor((36525 * b) / 100);
   c = Math.floor((1e4 * (d - e)) / 306001);
   a = d - e - Math.floor((306001 * c) / 1e4) + a[1];
-  c = 14 === c || 15 === c ? c - 13 : c - 1;
-  return { y: 1 === c || 2 === c ? Math.floor(b) - 4715 : Math.floor(b) - 4716, m: c, d: a };
+  c = c === 14 || c === 15 ? c - 13 : c - 1;
+  return { y: c === 1 || c === 2 ? Math.floor(b) - 4715 : Math.floor(b) - 4716, m: c, d: a };
 };
 A.JulianDay.leapYearGregorian = function (a: number) {
-  return (0 === a % 4 && 0 !== a % 100) || 0 === a % 400;
+  return (a % 4 === 0 && a % 100 !== 0) || a % 400 === 0;
 };
 A.JulianDay.dayOfYear = function (a: number, b: any, c: any, d: any) {
   a = 2;
@@ -367,20 +368,20 @@ A.JulianDay._wholeMonths = function (a: number, b: number) {
 A.Math = {
   pMod: function (a: number, b: number) {
     a %= b;
-    0 > a && (a += b);
+    a < 0 && (a += b);
     return a;
   },
   modF: function (a: number) {
-    return 0 > a ? ((a = -a), [-Math.floor(a), -(a % 1)]) : [Math.floor(a), a % 1];
+    return a < 0 ? ((a = -a), [-Math.floor(a), -(a % 1)]) : [Math.floor(a), a % 1];
   },
   horner: function (a: number, b: string | any[]) {
     var c = b.length - 1;
-    if (0 >= c) throw 'empty array not supported';
-    for (var d = b[c]; 0 < c;) c--, (d = d * a + b[c]);
+    if (c <= 0) throw 'empty array not supported';
+    for (var d = b[c]; c > 0; ) c--, (d = d * a + b[c]);
     return d;
   },
   formatNum: function (a: number, b: number) {
-    b = Math.pow(10, b | 4);
+    b = 10 ** (b | 4);
     return Math.round(a * b) / b;
   },
 };
@@ -641,14 +642,14 @@ A.Nutation = {
     a = a.jdeJ2000Century();
     for (
       var b = (A.Math.horner(a, [297.85036, 445267.11148, -0.0019142, 1 / 189474]) * Math.PI) / 180,
-      c = (A.Math.horner(a, [357.52772, 35999.05034, -1.603e-4, -1 / 3e5]) * Math.PI) / 180,
-      d = (A.Math.horner(a, [134.96298, 477198.867398, 0.0086972, 1 / 5620]) * Math.PI) / 180,
-      e = (A.Math.horner(a, [93.27191, 483202.017538, -0.0036825, 1 / 327270]) * Math.PI) / 180,
-      f = (A.Math.horner(a, [125.04452, -1934.136261, 0.0020708, 1 / 45e4]) * Math.PI) / 180,
-      g = 0,
-      l = 0,
-      m = A.Nutation.table22A.length - 1;
-      0 <= m;
+        c = (A.Math.horner(a, [357.52772, 35999.05034, -1.603e-4, -1 / 3e5]) * Math.PI) / 180,
+        d = (A.Math.horner(a, [134.96298, 477198.867398, 0.0086972, 1 / 5620]) * Math.PI) / 180,
+        e = (A.Math.horner(a, [93.27191, 483202.017538, -0.0036825, 1 / 327270]) * Math.PI) / 180,
+        f = (A.Math.horner(a, [125.04452, -1934.136261, 0.0020708, 1 / 45e4]) * Math.PI) / 180,
+        g = 0,
+        l = 0,
+        m = A.Nutation.table22A.length - 1;
+      m >= 0;
       m--
     ) {
       var h = A.Nutation.table22A[m],
@@ -779,7 +780,7 @@ A.Parallax = {
 };
 A.Refraction = {
   bennett: function (a: number) {
-    0 > a && (a = 0);
+    a < 0 && (a = 0);
     var b = Math.PI / 180;
     return b / 60 / Math.tan(a + (7.31 * b * b) / (a + 4.4 * b));
   },
@@ -807,7 +808,7 @@ A.Rise = {
   },
   circumpolar: function (a: number, b: number, c: number) {
     a = (Math.sin(b) - Math.sin(a) * Math.sin(c)) / (Math.cos(a) * Math.cos(c));
-    return -1 > a || 1 < a ? null : a;
+    return a < -1 || a > 1 ? null : a;
   },
   approxTransit: function (a: { lng: any }, b: number, c: { ra: any }) {
     return (43200 * (c.ra + a.lng)) / Math.PI - b;
@@ -959,23 +960,23 @@ A.Solar = {
 };
 A.Solistice = {
   march: function (a: number) {
-    return 1e3 > a ? A.Solistice._eq(a, A.Solistice.mc0) : A.Solistice._eq(a - 2e3, A.Solistice.mc2);
+    return a < 1e3 ? A.Solistice._eq(a, A.Solistice.mc0) : A.Solistice._eq(a - 2e3, A.Solistice.mc2);
   },
   june: function (a: number) {
-    return 1e3 > a ? A.Solistice._eq(a, A.Solistice.jc0) : A.Solistice._eq(a - 2e3, A.Solistice.jc2);
+    return a < 1e3 ? A.Solistice._eq(a, A.Solistice.jc0) : A.Solistice._eq(a - 2e3, A.Solistice.jc2);
   },
   september: function (a: number) {
-    return 1e3 > a ? A.Solistice._eq(a, A.Solistice.sc0) : A.Solistice._eq(a - 2e3, A.Solistice.sc2);
+    return a < 1e3 ? A.Solistice._eq(a, A.Solistice.sc0) : A.Solistice._eq(a - 2e3, A.Solistice.sc2);
   },
   december: function (a: number) {
-    return 1e3 > a ? A.Solistice._eq(a, A.Solistice.dc0) : A.Solistice._eq(a - 2e3, A.Solistice.dc2);
+    return a < 1e3 ? A.Solistice._eq(a, A.Solistice.dc0) : A.Solistice._eq(a - 2e3, A.Solistice.dc2);
   },
   _eq: function (a: number, b: number) {
     a = A.Math.horner(0.001 * a, b);
     b = (a - A.J2000) / A.JulianCentury;
     var c = ((35999.373 * Math.PI) / 180) * b - (2.47 * Math.PI) / 180;
     c = 1 + 0.0334 * Math.cos(c) + 7e-4 * Math.cos(2 * c);
-    for (var d = 0, e = this.terms.length - 1; 0 <= e; e--) {
+    for (var d = 0, e = this.terms.length - 1; e >= 0; e--) {
       var f = this.terms[e];
       d += f[0] * Math.cos(((f[1] + f[2] * b) * Math.PI) / 180);
     }

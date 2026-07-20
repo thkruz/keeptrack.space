@@ -85,7 +85,6 @@ export class GamepadPlugin {
     return true;
   }
 
-
   private updateButtons_(): void {
     if (!this.currentController) {
       return;
@@ -425,4 +424,3 @@ export class GamepadPlugin {
     return null;
   }
 }
-

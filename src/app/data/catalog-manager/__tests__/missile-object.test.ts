@@ -1,7 +1,7 @@
-import { vi } from 'vitest';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { Degrees, Kilometers, Vector3D } from '@ootk/src/main';
+import { vi } from 'vitest';
 
 /*
  * MissileObject models a ballistic trajectory as discrete lat/lon/alt samples
@@ -283,13 +283,14 @@ describe('MissileObject', () => {
 
   describe('getOrbitPath', () => {
     const start = simTime.getTime();
-    const ascendingMissile = () => makeMissile({
-      startTime: start,
-      latList: [0, 0, 0, 0, 0] as Degrees[],
-      lonList: [0, 0, 0, 0, 0] as Degrees[],
-      altList: [0, 100, 200, 100, 0] as Kilometers[],
-      timeList: [0, 1000, 2000, 3000, 4000],
-    });
+    const ascendingMissile = () =>
+      makeMissile({
+        startTime: start,
+        latList: [0, 0, 0, 0, 0] as Degrees[],
+        lonList: [0, 0, 0, 0, 0] as Degrees[],
+        altList: [0, 100, 200, 100, 0] as Kilometers[],
+        timeList: [0, 1000, 2000, 3000, 4000],
+      });
 
     it('omits already-flown history: the vertex count shrinks as time advances', () => {
       const m = ascendingMissile();

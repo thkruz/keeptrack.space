@@ -1,11 +1,12 @@
 /* eslint-disable camelcase */ // OrbitGuard API payload fields are snake_case
-import { vi } from 'vitest';
+
 import { getEl } from '@app/engine/utils/get-el';
+import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SatInfoBoxOrbitGuard } from '@app/plugins/sat-info-box-orbit-guard/sat-info-box-orbit-guard';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSuite } from '@test/generic-tests';
+import { vi } from 'vitest';
 
 describe('SatInfoBoxOrbitGuard', () => {
   beforeEach(() => {
@@ -63,10 +64,16 @@ describe('SatInfoBoxOrbitGuard behavior', () => {
 
   describe('fetchHistoricalPlotData_', () => {
     it('parses the API response into elset/eo/event series', async () => {
-      vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({
-        ok: true, status: 200,
-        json: () => Promise.resolve(apiPayload('25544')),
-      })));
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(() =>
+          Promise.resolve({
+            ok: true,
+            status: 200,
+            json: () => Promise.resolve(apiPayload('25544')),
+          })
+        )
+      );
 
       const out = await p().fetchHistoricalPlotData_('25544');
 
@@ -77,13 +84,19 @@ describe('SatInfoBoxOrbitGuard behavior', () => {
     });
 
     it('returns an empty array on a non-ok response', async () => {
-      vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: false, status: 500, statusText: 'err' })));
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(() => Promise.resolve({ ok: false, status: 500, statusText: 'err' }))
+      );
 
       expect(await p().fetchHistoricalPlotData_('25544')).toEqual([]);
     });
 
     it('returns an empty array when fetch rejects', async () => {
-      vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('network'))));
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(() => Promise.reject(new Error('network')))
+      );
 
       expect(await p().fetchHistoricalPlotData_('25544')).toEqual([]);
     });

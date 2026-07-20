@@ -27,8 +27,7 @@ export interface TcaResult {
  * Returns the abscissa of the minimum to within tolMs. Thin domain wrapper over
  * ootk's GoldenSection so there is one optimizer across the codebase.
  */
-export const goldenSectionMin = (fn: DistanceFn, a: number, b: number, tolMs = 50): number =>
-  GoldenSection.searchMin(fn, Math.min(a, b), Math.max(a, b), tolMs);
+export const goldenSectionMin = (fn: DistanceFn, a: number, b: number, tolMs = 50): number => GoldenSection.searchMin(fn, Math.min(a, b), Math.max(a, b), tolMs);
 
 /**
  * Finds the time of closest approach inside [startMs, endMs].
@@ -40,13 +39,7 @@ export const goldenSectionMin = (fn: DistanceFn, a: number, b: number, tolMs = 5
  *
  * Returns null when every sample is non-finite.
  */
-export const findTca = (
-  distFn: DistanceFn,
-  startMs: number,
-  endMs: number,
-  coarseStepMs: number,
-  tolMs = 50,
-): TcaResult | null => {
+export const findTca = (distFn: DistanceFn, startMs: number, endMs: number, coarseStepMs: number, tolMs = 50): TcaResult | null => {
   if (endMs <= startMs || coarseStepMs <= 0) {
     return null;
   }

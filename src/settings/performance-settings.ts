@@ -19,7 +19,6 @@
 
 import { Milliseconds } from '@app/engine/ootk/src/main';
 
-
 /**
  * Performance optimization and resource limit settings
  */

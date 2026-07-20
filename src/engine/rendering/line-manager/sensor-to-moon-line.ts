@@ -1,7 +1,7 @@
-import { EciArr3 } from '@app/engine/core/interfaces';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import { Line, LineColors, LineDescription } from './line';
+import { EciArr3 } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { Line, LineColors, LineDescription } from './line';
 
 export class SensorToMoonLine extends Line {
   private sensor_: DetailedSensor;

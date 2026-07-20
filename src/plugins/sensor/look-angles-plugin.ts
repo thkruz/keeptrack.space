@@ -1,5 +1,3 @@
-import { t7e } from '@app/locales/keys';
-import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { SensorMath, TearrData, TearrType } from '@app/app/sensors/sensor-math';
@@ -9,12 +7,14 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { TimeManager } from '@app/engine/core/time-manager';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
 import { showLoading } from '@app/engine/utils/showLoading';
+import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite, SpaceObjectType } from '@ootk/src/main';
 import tableChartPng from '@public/img/icons/table-chart.png';
 import { ClickDragOptions, fileExcelPng, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -58,7 +58,6 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
   isRequireSatelliteSelected = true;
   isRequireSensorSelected = true;
-
 
   bottomIconImg = tableChartPng;
   bottomIconCallback: () => void = () => {
@@ -148,7 +147,6 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     zIndex: 3,
   };
 
-
   getHelpConfig(): IHelpConfig {
     return {
       title: l('title'),
@@ -177,29 +175,26 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        getEl('look-angles-menu')?.classList.add('kt-ui-v13');
-        getEl('look-angles-menu-secondary')?.classList.add('kt-ui-v13');
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      getEl('look-angles-menu')?.classList.add('kt-ui-v13');
+      getEl('look-angles-menu-secondary')?.classList.add('kt-ui-v13');
 
-        getEl('look-angles-length')!.addEventListener('change', () => {
-          this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('look-angles-length')).value);
-          this.refreshSideMenuData_();
-        });
+      getEl('look-angles-length')!.addEventListener('change', () => {
+        this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('look-angles-length')).value);
+        this.refreshSideMenuData_();
+      });
 
-        getEl('look-angles-interval')!.addEventListener('change', () => {
-          this.angleCalculationInterval_ = parseInt((<HTMLInputElement>getEl('look-angles-interval')).value);
-          this.refreshSideMenuData_();
-        });
+      getEl('look-angles-interval')!.addEventListener('change', () => {
+        this.angleCalculationInterval_ = parseInt((<HTMLInputElement>getEl('look-angles-interval')).value);
+        this.refreshSideMenuData_();
+      });
 
-        getEl('settings-riseset')!.addEventListener('change', this.settingsRisesetChange_.bind(this));
+      getEl('settings-riseset')!.addEventListener('change', this.settingsRisesetChange_.bind(this));
 
-        const sat = this.selectSatManager_.getSelectedSat();
+      const sat = this.selectSatManager_.getSelectedSat();
 
-        this.checkIfCanBeEnabled_(sat);
-      },
-    );
+      this.checkIfCanBeEnabled_(sat);
+    });
 
     EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
       this.checkIfCanBeEnabled_(obj);
@@ -344,7 +339,6 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     const tdType: HTMLTableCellElement = tr.insertCell();
 
     if (lookAngleData.length > 0 && typeof lookAngleData[0].type !== 'undefined') {
-
       tdType.appendChild(document.createTextNode(l('table.type')));
     }
 
@@ -375,20 +369,27 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     }
   }
 
-  private static populateSideMenuRow_(
-    { tbl, tdT, entry, timeManagerInstance, tdE, tdA, tdR, tdType, tdV }:
-      {
-        tbl: HTMLTableElement;
-        tdT: HTMLTableCellElement;
-        entry: LookAngleData;
-        timeManagerInstance: TimeManager;
-        tdE: HTMLTableCellElement;
-        tdA: HTMLTableCellElement;
-        tdR: HTMLTableCellElement;
-        tdType: HTMLTableCellElement;
-        tdV: HTMLTableCellElement;
-      },
-  ) {
+  private static populateSideMenuRow_({
+    tbl,
+    tdT,
+    entry,
+    timeManagerInstance,
+    tdE,
+    tdA,
+    tdR,
+    tdType,
+    tdV,
+  }: {
+    tbl: HTMLTableElement;
+    tdT: HTMLTableCellElement;
+    entry: LookAngleData;
+    timeManagerInstance: TimeManager;
+    tdE: HTMLTableCellElement;
+    tdA: HTMLTableCellElement;
+    tdR: HTMLTableCellElement;
+    tdType: HTMLTableCellElement;
+    tdV: HTMLTableCellElement;
+  }) {
     if (tbl.rows.length > 0) {
       const tr = tbl.insertRow();
 
@@ -436,7 +437,6 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
         return l('msgs.unknown');
     }
   }
-
 
   private settingsRisesetChange_(e: Event, isRiseSetChecked?: boolean): void {
     if (typeof e === 'undefined' || e === null) {

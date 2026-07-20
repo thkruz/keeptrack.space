@@ -87,13 +87,7 @@ export class CatalogSearch {
    *
    * @returns {number[]} - An array of satellite IDs that are in a similar orbit to the given satellite.
    */
-  static findObjsByOrbit(
-    satData: Satellite[],
-    sat: Satellite,
-    incMargin: Degrees = <Degrees>2,
-    raanMargin: Degrees = <Degrees>5,
-    periodMargin: Minutes = <Minutes>0,
-  ): number[] {
+  static findObjsByOrbit(satData: Satellite[], sat: Satellite, incMargin: Degrees = <Degrees>2, raanMargin: Degrees = <Degrees>5, periodMargin: Minutes = <Minutes>0): number[] {
     const INC_MARGIN = incMargin;
     const RAAN_MARGIN = raanMargin;
 
@@ -114,7 +108,6 @@ export class CatalogSearch {
     if (normalizedSatRaan <= RAAN_MARGIN) {
       minRaan += 360;
     }
-
 
     return satData
       .filter((s) => {
@@ -145,7 +138,6 @@ export class CatalogSearch {
       })
       .map((s) => s.id);
   }
-
 
   /**
    * This method is used to find the reentry objects from the given satellite data.
@@ -243,7 +235,6 @@ export class CatalogSearch {
           }
 
           return false;
-
         }
       }
 
@@ -255,7 +246,6 @@ export class CatalogSearch {
           }
 
           return false;
-
         }
       }
 
@@ -267,7 +257,6 @@ export class CatalogSearch {
           }
 
           return false;
-
         }
       }
 
@@ -279,7 +268,6 @@ export class CatalogSearch {
       }
 
       return Number.parseInt(launchYear) <= yr || Number.parseInt(launchYear) >= 57;
-
     });
   }
 

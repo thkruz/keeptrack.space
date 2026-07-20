@@ -1,11 +1,4 @@
-import {
-  buildStfSensorParams,
-  clampExtent,
-  computeExtentKm,
-  STF_MAX_EXTENT_DEG,
-  validateStfForm,
-  wrapAz,
-} from '@app/plugins/short-term-fences/short-term-fences-core';
+import { buildStfSensorParams, clampExtent, computeExtentKm, STF_MAX_EXTENT_DEG, validateStfForm, wrapAz } from '@app/plugins/short-term-fences/short-term-fences-core';
 import { Degrees, EpochUTC, Geodetic, Kilometers } from '@ootk/src/main';
 
 const SITE_LAT = 41.75 as Degrees;

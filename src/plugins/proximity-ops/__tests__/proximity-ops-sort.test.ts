@@ -23,18 +23,10 @@ describe('proximity-ops-sort', () => {
   });
 
   it('sorts by date chronologically and does not mutate the input', () => {
-    const input = [
-      event({ date: new Date('2026-03-01T00:00:00Z') }),
-      event({ date: new Date('2026-01-01T00:00:00Z') }),
-      event({ date: new Date('2026-02-01T00:00:00Z') }),
-    ];
+    const input = [event({ date: new Date('2026-03-01T00:00:00Z') }), event({ date: new Date('2026-01-01T00:00:00Z') }), event({ date: new Date('2026-02-01T00:00:00Z') })];
     const sorted = sortEvents(input, 'date', true);
 
-    expect(sorted.map((e) => e.date.toISOString())).toEqual([
-      '2026-01-01T00:00:00.000Z',
-      '2026-02-01T00:00:00.000Z',
-      '2026-03-01T00:00:00.000Z',
-    ]);
+    expect(sorted.map((e) => e.date.toISOString())).toEqual(['2026-01-01T00:00:00.000Z', '2026-02-01T00:00:00.000Z', '2026-03-01T00:00:00.000Z']);
     // Original order preserved (non-mutating).
     expect(input[0].date.toISOString()).toBe('2026-03-01T00:00:00.000Z');
   });

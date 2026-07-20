@@ -1,17 +1,20 @@
 /* eslint-disable max-classes-per-file */
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
+import { t7e } from '@app/locales/keys';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Degrees, Kilometers, Milliseconds } from '@ootk/src/main';
 import { mat4, vec3, vec4 } from 'gl-matrix';
+import { PluginRegistry } from '../core/plugin-registry';
 import { ServiceLocator } from '../core/service-locator';
 import { Engine } from '../engine';
 import { EventBus } from '../events/event-bus';
+import { RmbMenuContext } from '../plugins/core/plugin-capabilities';
 import { lineManagerInstance } from '../rendering/line-manager';
-import { t7e } from '@app/locales/keys';
 import { html } from '../utils/development/formatter';
-import { getEl, hideEl } from '../utils/get-el';
 import { errorManagerInstance } from '../utils/errorManager';
 import { CpuStage, FrameProfiler } from '../utils/frame-profiler';
+import { getEl, hideEl } from '../utils/get-el';
 import { isThisNode } from '../utils/isThisNode';
 import { KeyboardInput } from './input-manager/keyboard-input';
 import { MouseInput } from './input-manager/mouse-input';
@@ -34,7 +37,7 @@ type rmbMenuItem = {
    */
   elementIdL1: string;
   /**
-   * Element ID of the sub menu container
+   * Element ID of the sub menu container. Empty string for single-action items.
    */
   elementIdL2: string;
   /**
@@ -53,6 +56,10 @@ type rmbMenuItem = {
    * Determines if the menu item is visible when right clicking on a satellite
    */
   isRmbOnSat: boolean;
+  /**
+   * Fine-grained visibility predicate. Overrides the boolean flags when provided.
+   */
+  isVisible?: (ctx: RmbMenuContext) => boolean;
 };
 
 export class InputManager {
@@ -110,7 +117,7 @@ export class InputManager {
     srcByteOffset: number,
     outputArray: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array | Float32Array | Float64Array,
     dstOffset?: number,
-    length?: number,
+    length?: number
   ) {
     // eslint-disable-next-line no-sync
     const sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
@@ -192,7 +199,6 @@ export class InputManager {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const dotsManagerInstance = ServiceLocator.getDotsManager();
 
-
     return dotsManagerInstance.getIdFromEci(eciArray, catalogManagerInstance.orbitalSats);
   }
 
@@ -207,9 +213,10 @@ export class InputManager {
 
   clearRMBSubMenu = () => {
     this.rmbMenuItems.forEach((item) => {
-      hideEl(item.elementIdL2);
+      if (item.elementIdL2) {
+        hideEl(item.elementIdL2);
+      }
     });
-    hideEl('colors-rmb-menu');
   };
 
   static showDropdownSubMenu(rightBtnMenuDOM: HTMLElement, rightBtnDOM: HTMLElement, canvasDOM: HTMLCanvasElement, element1?: HTMLElement) {
@@ -238,7 +245,24 @@ export class InputManager {
     const invMat = mat4.create();
 
     mat4.mul(comboPMat, camera.projectionMatrix, camera.matrixWorldInverse);
-    mat4.invert(invMat, comboPMat);
+    if (!mat4.invert(invMat, comboPMat)) {
+      /*
+       * The render projection is deliberately depth-degenerate: per-fragment log
+       * depth writes gl_FragDepth, so the matrix maps every vertex to a constant
+       * NDC z and P*V is singular (mat4.invert fails, leaving invMat identity,
+       * which collapses every click ray onto the camera boresight). Rebuild the
+       * depth row as z_clip = w_clip - 2 (a finite ~1 km near plane) purely for
+       * ray reconstruction - it does not affect rendering.
+       */
+      const proj = mat4.clone(camera.projectionMatrix);
+
+      proj[2] = proj[3];
+      proj[6] = proj[7];
+      proj[10] = proj[11];
+      proj[14] = proj[15] - 2;
+      mat4.mul(comboPMat, proj, camera.matrixWorldInverse);
+      mat4.invert(invMat, comboPMat);
+    }
     const worldVec = <[number, number, number, number]>(<unknown>vec4.create());
 
     vec4.transformMat4(worldVec, screenVec, invMat);
@@ -387,7 +411,7 @@ export class InputManager {
       <div id="right-btn-menu" class="right-btn-menu">
         <ul id="right-btn-menu-ul" class='dropdown-contents'></ul>
       </div>
-      `,
+      `
       );
       // Append any other menus before putting the reset/clear options
       EventBus.getInstance().emit(EventBusEvent.rightBtnMenuAdd);
@@ -403,7 +427,7 @@ export class InputManager {
           <li id="reset-camera-rmb"><a href="#">${t7e('rightClickMenu.resetCamera')}</a></li>
           ${settingsManager.isDisableClearLinesRmb ? '' : html`<li id="clear-lines-rmb"><a href="#">${t7e('rightClickMenu.clearLines')}</a></li>`}
           <li id="clear-screen-rmb"><a href="#">${t7e('rightClickMenu.clearScreen')}</a></li>
-          `,
+          `
         );
 
         // sort getEl('rmb-wrapper').children by order in rmbMenuItems
@@ -434,7 +458,7 @@ export class InputManager {
         (event) => {
           event.preventDefault();
         },
-        { passive: false },
+        { passive: false }
       );
     }
 
@@ -465,6 +489,36 @@ export class InputManager {
     });
   }
 
+  /**
+   * Builds the context object describing what was right-clicked. Shared with
+   * every menu item's visibility predicate and the rightBtnMenuOpen event.
+   */
+  buildRmbContext(clickedSatId: number = -1): RmbMenuContext {
+    const latLon = this.mouse.latLon;
+    const isEarth = latLon !== undefined && !Number.isNaN(latLon.lat) && !Number.isNaN(latLon.lon);
+    const target = clickedSatId !== -1 ? (ServiceLocator.getCatalogManager().getObject(clickedSatId) ?? null) : null;
+    const hasPrimarySelection = (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) !== -1;
+
+    return {
+      surface: isEarth ? 'earth' : 'space',
+      targetId: target ? clickedSatId : -1,
+      target,
+      hasPrimarySelection,
+    };
+  }
+
+  /**
+   * Legacy flag-based visibility: earth/space flags, plus the on-satellite flag
+   * whenever an object was clicked regardless of surface.
+   */
+  private static isItemVisibleLegacy_(item: rmbMenuItem, ctx: RmbMenuContext): boolean {
+    if (item.isRmbOnSat && ctx.target) {
+      return true;
+    }
+
+    return ctx.surface === 'earth' ? item.isRmbOnEarth : item.isRmbOffEarth;
+  }
+
   public openRmbMenu(clickedSatId: number = -1) {
     if (!settingsManager.isAllowRightClick) {
       return;
@@ -480,6 +534,8 @@ export class InputManager {
       return;
     }
 
+    const ctx = this.buildRmbContext(clickedSatId);
+
     this.rmbMenuItems.forEach((item) => {
       hideEl(item.elementIdL1);
     });
@@ -494,67 +550,8 @@ export class InputManager {
       }
     }
 
-    if (this.mouse.mouseSat !== -1 || clickedSatId !== -1) {
-      // Empty on purpose
-    } else {
-      // Intentional
-    }
-    let isEarth = false;
-
-    if (typeof this.mouse.latLon === 'undefined' || isNaN(this.mouse.latLon.lat) || isNaN(this.mouse.latLon.lon)) {
-      // Not Earth
-      this.rmbMenuItems
-        .filter((item) => item.isRmbOffEarth || (item.isRmbOnSat && clickedSatId !== -1))
-        .forEach((item) => {
-          const dom = getEl(item.elementIdL1);
-
-          if (dom) {
-            dom.style.display = 'block';
-          }
-        });
-    } else {
-      // This is the Earth
-      isEarth = true;
-      this.earthClicked({
-        clickedSatId,
-      });
-    }
-
-    rightBtnMenuDOM!.style.display = 'block';
-    satHoverBoxDOM!.style.display = 'none';
-
-    EventBus.getInstance().emit(EventBusEvent.rightBtnMenuOpen, isEarth, clickedSatId);
-
-    // Loop through all the menu items and determine how many are visible
-    let numMenuItems = 0;
-
-    this.rmbMenuItems.forEach((item) => {
-      const dom = getEl(item.elementIdL1);
-
-      if (dom && dom.style.display !== 'none') {
-        numMenuItems++;
-      }
-    });
-
-    /*
-     * Offset size is based on size in style.css
-     * TODO: Make this dynamic
-     */
-    const inputCamera = ServiceLocator.getViewportManager()?.getInputCamera() ?? ServiceLocator.getMainCamera();
-    const offsetX = inputCamera.state.mouseX < canvasDOM!.clientWidth / 2 ? 0 : -1 * 180;
-    const offsetY = inputCamera.state.mouseY < canvasDOM!.clientHeight / 2 ? 0 : numMenuItems * -25;
-
-    rightBtnMenuDOM!.style.display = 'block';
-    rightBtnMenuDOM!.style.textAlign = 'center';
-    rightBtnMenuDOM!.style.position = 'absolute';
-    rightBtnMenuDOM!.style.left = `${inputCamera.state.mouseX + offsetX}px`;
-    rightBtnMenuDOM!.style.top = `${inputCamera.state.mouseY + offsetY}px`;
-  }
-
-  earthClicked({ clickedSatId }: { clickedSatId: number }) {
     this.rmbMenuItems
-      .filter((item) => item.isRmbOnEarth || (item.isRmbOnSat && clickedSatId !== -1))
-      .sort((a, b) => a.order - b.order)
+      .filter((item) => (item.isVisible ? item.isVisible(ctx) : InputManager.isItemVisibleLegacy_(item, ctx)))
       .forEach((item) => {
         const dom = getEl(item.elementIdL1);
 
@@ -562,6 +559,28 @@ export class InputManager {
           dom.style.display = 'block';
         }
       });
+
+    rightBtnMenuDOM.style.display = 'block';
+    satHoverBoxDOM.style.display = 'none';
+
+    EventBus.getInstance().emit(EventBusEvent.rightBtnMenuOpen, ctx);
+
+    // Count every visible row (plugin items AND built-ins) to estimate menu height
+    const menuUl = getEl('right-btn-menu-ul', true);
+    const numMenuItems = menuUl ? Array.from(menuUl.children).filter((child) => (<HTMLElement>child).style.display !== 'none').length : this.rmbMenuItems.length;
+
+    /*
+     * Offset size is based on size in style.css
+     * TODO: Make this dynamic
+     */
+    const inputCamera = ServiceLocator.getViewportManager()?.getInputCamera() ?? ServiceLocator.getMainCamera();
+    const offsetX = inputCamera.state.mouseX < canvasDOM.clientWidth / 2 ? 0 : -1 * 180;
+    const offsetY = inputCamera.state.mouseY < canvasDOM.clientHeight / 2 ? 0 : numMenuItems * -25;
+
+    rightBtnMenuDOM.style.textAlign = 'center';
+    rightBtnMenuDOM.style.position = 'absolute';
+    rightBtnMenuDOM.style.left = `${inputCamera.state.mouseX + offsetX}px`;
+    rightBtnMenuDOM.style.top = `${inputCamera.state.mouseY + offsetY}px`;
   }
 
   /* istanbul ignore next */

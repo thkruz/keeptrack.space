@@ -1,10 +1,10 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite, Star } from '@ootk/src/main';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
   sourceUssf: rgbaArray;
@@ -36,7 +36,8 @@ export class OrbitalPlaneDensityColorScheme extends ColorScheme {
   constructor() {
     super(OrbitalPlaneDensityColorScheme.uniqueColorTheme);
     this.objectTypeFlags = {
-      ...this.objectTypeFlags, ...OrbitalPlaneDensityColorScheme.uniqueObjectTypeFlags,
+      ...this.objectTypeFlags,
+      ...OrbitalPlaneDensityColorScheme.uniqueObjectTypeFlags,
     };
   }
 
@@ -49,10 +50,13 @@ export class OrbitalPlaneDensityColorScheme extends ColorScheme {
     };
   }
 
-  update(obj: BaseObject, params?: {
-    orbitalPlaneDensity: number[][];
-    orbitalPlaneDensityMax: number;
-  }): ColorInformation {
+  update(
+    obj: BaseObject,
+    params?: {
+      orbitalPlaneDensity: number[][];
+      orbitalPlaneDensityMax: number;
+    }
+  ): ColorInformation {
     /*
      * NOSONAR
      * Hover and Select code might not pass params, so we will handle that here
@@ -92,7 +96,7 @@ export class OrbitalPlaneDensityColorScheme extends ColorScheme {
 
     const sat = obj as Satellite;
     const inc = Math.floor(sat.inclination / 2) * 2;
-    const alt = Math.floor(((sat.apogee + sat.perigee) / 2) / 25) * 25;
+    const alt = Math.floor((sat.apogee + sat.perigee) / 2 / 25) * 25;
     const orbitDensity = params.orbitalPlaneDensity[inc][alt];
     const density = orbitDensity / params.orbitalPlaneDensityMax;
 
@@ -106,7 +110,7 @@ export class OrbitalPlaneDensityColorScheme extends ColorScheme {
         color: settingsManager.colors.orbitalPlaneDensityMed ?? this.colorTheme.orbitalPlaneDensityMed,
         pickable: Pickable.Yes,
       };
-    } else if (this.objectTypeFlags.orbitalPlaneDensityLow && density > 0.10) {
+    } else if (this.objectTypeFlags.orbitalPlaneDensityLow && density > 0.1) {
       return {
         color: settingsManager.colors.orbitalPlaneDensityLow ?? this.colorTheme.orbitalPlaneDensityLow,
         pickable: Pickable.Yes,

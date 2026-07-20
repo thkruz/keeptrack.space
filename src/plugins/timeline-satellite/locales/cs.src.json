@@ -3,6 +3,9 @@
     "SatelliteTimeline": {
       "bottomIconLabel": "Časová osa satelitu",
       "title": "Menu časové osy satelitu",
+      "sections": {
+        "settings": "Nastavení"
+      },
       "labels": {
         "calculationLength": "Délka výpočtu (hodiny)",
         "calculationInterval": "Interval výpočtu (sekundy)",

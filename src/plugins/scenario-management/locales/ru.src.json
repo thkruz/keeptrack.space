@@ -4,6 +4,9 @@
       "title": "Управление сценариями",
       "bottomIconLabel": "Управление сценариями",
       "sideMenuTitle": "Настройки сценария",
+      "sections": {
+        "actions": "Действия"
+      },
       "labels": {
         "scenarioName": "Название сценария",
         "description": "Описание",
@@ -22,11 +25,13 @@
       "buttons": {
         "updateScenario": "Обновить сценарий",
         "saveScenario": "Сохранить сценарий",
-        "loadScenario": "Загрузить сценарий"
+        "loadScenario": "Загрузить сценарий",
+        "clearTimeBounds": "Очистить временные границы"
       },
       "msgs": {
         "settingsUpdated": "Настройки сценария успешно обновлены!",
-        "scenarioLoaded": "Сценарий успешно загружен!"
+        "scenarioLoaded": "Сценарий успешно загружен!",
+        "boundsCleared": "Временные границы очищены. Сценарий теперь бесконечный."
       },
       "errorMsgs": {
         "nameRequired": "Название сценария обязательно.",

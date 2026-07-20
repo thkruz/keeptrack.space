@@ -1,9 +1,8 @@
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { DraggableBox } from '@app/engine/ui/draggable-box';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, showEl } from '@app/engine/utils/get-el';
 import { LayersManager } from './layers-manager';
-import { ServiceLocator } from '@app/engine/core/service-locator';
-
 
 export class LayersPopupBox extends DraggableBox {
   constructor() {

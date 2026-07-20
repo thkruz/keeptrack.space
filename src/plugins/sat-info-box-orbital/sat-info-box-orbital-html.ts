@@ -20,4 +20,3 @@ export const EL = {
   UNCERTAINTY_INTRACK: 'sat-uncertainty-intrack',
   UNCERTAINTY_CROSSTRACK: 'sat-uncertainty-crosstrack',
 };
-

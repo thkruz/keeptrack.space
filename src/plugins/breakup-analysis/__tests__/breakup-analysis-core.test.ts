@@ -1,4 +1,3 @@
-import { Satellite, SpaceObjectType } from '@ootk/src/main';
 import {
   buildCsvRows,
   buildGabbardData,
@@ -10,19 +9,21 @@ import {
   summarizeEvent,
 } from '@app/plugins/breakup-analysis/breakup-analysis-core';
 import { BREAKUP_EVENTS } from '@app/plugins/breakup-analysis/breakup-events';
+import { Satellite, SpaceObjectType } from '@ootk/src/main';
 
-const fakeSat = (over: Record<string, unknown> = {}): Satellite => ({
-  type: SpaceObjectType.DEBRIS,
-  sccNum: '25730',
-  name: 'FENGYUN 1C DEB',
-  perigee: 800,
-  apogee: 900,
-  inclination: 98.5,
-  eccentricity: 0.005,
-  period: 101.3,
-  getTypeString: () => 'Debris',
-  ...over,
-}) as unknown as Satellite;
+const fakeSat = (over: Record<string, unknown> = {}): Satellite =>
+  ({
+    type: SpaceObjectType.DEBRIS,
+    sccNum: '25730',
+    name: 'FENGYUN 1C DEB',
+    perigee: 800,
+    apogee: 900,
+    inclination: 98.5,
+    eccentricity: 0.005,
+    period: 101.3,
+    getTypeString: () => 'Debris',
+    ...over,
+  }) as unknown as Satellite;
 
 describe('breakup-analysis-core', () => {
   describe('calcYearsBetween', () => {
@@ -101,12 +102,7 @@ describe('breakup-analysis-core', () => {
     });
 
     it('drops fragments with non-finite or non-positive period', () => {
-      const data = buildGabbardData([
-        fakeSat({ period: NaN }),
-        fakeSat({ period: 0 }),
-        fakeSat({ period: -5 }),
-        fakeSat({ period: 95 }),
-      ]);
+      const data = buildGabbardData([fakeSat({ period: NaN }), fakeSat({ period: 0 }), fakeSat({ period: -5 }), fakeSat({ period: 95 })]);
 
       expect(data.apogee).toHaveLength(1);
     });

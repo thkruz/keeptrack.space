@@ -15,11 +15,7 @@ export const COVARIANCE_RADII_CAPS: RicSigmas = {
  * Fallback ellipsoid radii (km) in the renderer's [radial, cross-track,
  * in-track] order, used when a usable covariance cannot be derived.
  */
-export const COVARIANCE_RADII_FALLBACK: vec3 = [
-  COVARIANCE_RADII_CAPS.radial,
-  COVARIANCE_RADII_CAPS.crossTrack,
-  COVARIANCE_RADII_CAPS.inTrack,
-];
+export const COVARIANCE_RADII_FALLBACK: vec3 = [COVARIANCE_RADII_CAPS.radial, COVARIANCE_RADII_CAPS.crossTrack, COVARIANCE_RADII_CAPS.inTrack];
 
 /**
  * Convert RIC 1-sigma position uncertainties into capped, confidence-scaled

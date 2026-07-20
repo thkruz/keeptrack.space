@@ -1,0 +1,16 @@
+// Custom Biome lint plugin: enforce the `u` (unicode) flag on every regex literal.
+//
+// Replaces ESLint's `require-unicode-regexp`, which Biome has no built-in
+// equivalent for. The project mandates the `u` flag on all regexes (see
+// CLAUDE.md). The `v` flag (unicodeSets) also enables unicode mode, so it is
+// accepted too.
+//
+// Referenced from biome.json via the `plugins` array.
+`/$pattern/$flags` as $regex where {
+    not $flags <: r".*[uv].*",
+    register_diagnostic(
+        span = $regex,
+        message = "Regex literal is missing the 'u' (unicode) flag (project mandate; 'v' also accepted).",
+        severity = "warn"
+    )
+}

@@ -50,11 +50,7 @@ export class HelpComponent {
    * @param config The configuration for the help content.
    * @param isActiveCallback Callback to check if the plugin's menu is currently active.
    */
-  constructor(
-    pluginId: string,
-    config: IHelpConfig,
-    isActiveCallback: IsActiveCallback,
-  ) {
+  constructor(pluginId: string, config: IHelpConfig, isActiveCallback: IsActiveCallback) {
     this.pluginId = pluginId;
     this.config = config;
     this.isActiveCallback = isActiveCallback;

@@ -1,8 +1,8 @@
 import { Container } from '@app/engine/core/container';
+import { Singletons } from '@app/engine/core/interfaces';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeyboardInput } from '@app/engine/input/input-manager/keyboard-input';
-import { Singletons } from '@app/engine/core/interfaces';
 
 describe('KeyboardInput_class', () => {
   // Tests that keyHandler does not execute if uiManagerInstance.isCurrentlyTyping is true

@@ -1,17 +1,14 @@
 import { RpoWorkerMsgType, RpoWorkerOutMsgType } from '@app/webworker/proximity-ops-messages';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  ProximityOpsCallbacks,
-  ProximityOpsThreadManager,
-  ProximityOpsThreadParams,
-} from '../proximity-ops-thread-manager';
+import { ProximityOpsCallbacks, ProximityOpsThreadManager, ProximityOpsThreadParams } from '../proximity-ops-thread-manager';
 
-const makeWorkerStub = () => ({
-  postMessage: vi.fn(),
-  terminate: vi.fn(),
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
-} as unknown as Worker & { postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> });
+const makeWorkerStub = () =>
+  ({
+    postMessage: vi.fn(),
+    terminate: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  }) as unknown as Worker & { postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> };
 
 const makeMgr = () => {
   const worker = makeWorkerStub();
@@ -34,7 +31,9 @@ const callbacks = (): ProximityOpsCallbacks => ({
   onError: vi.fn(),
 });
 
-interface OnMessageable { onMessage(e: { data: unknown }): void }
+interface OnMessageable {
+  onMessage(e: { data: unknown }): void;
+}
 
 describe('ProximityOpsThreadManager', () => {
   describe('lifecycle', () => {

@@ -1,11 +1,3 @@
-import { CameraType } from '@app/engine/camera/camera-type';
-import { getEl } from '@app/engine/utils/get-el';
-import { showLoading } from '@app/engine/utils/showLoading';
-import { keepTrackApi } from '@app/keepTrackApi';
-import { t7e } from '@app/locales/keys';
-import { settingsManager } from '@app/settings/settings';
-import gpsPng from '@public/img/icons/gps.png';
-
 import { CatalogManager } from '@app/app/data/catalog-manager';
 import type { GroupsManager } from '@app/app/data/groups-manager';
 import { GroupType } from '@app/app/data/object-group';
@@ -15,16 +7,16 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { DopMath, ElevationMaskFn, GNSS_CONSTELLATION_PATTERNS, GnssConstellation } from '@app/engine/math/dop-math';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import {
-  IBottomIconConfig,
-  IDragOptions,
-  IHelpConfig,
-  IKeyboardShortcut,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, IContextMenuConfig, IDragOptions, IHelpConfig, IKeyboardShortcut, ISideMenuConfig, RmbMenuContext } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { Degrees, Kilometers, Satellite, TemeVec3, eci2lla } from '@ootk/src/main';
+import { getEl } from '@app/engine/utils/get-el';
+import { showLoading } from '@app/engine/utils/showLoading';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { t7e } from '@app/locales/keys';
+import { settingsManager } from '@app/settings/settings';
+import { Degrees, eci2lla, Kilometers, Satellite, TemeVec3 } from '@ootk/src/main';
+import gpsPng from '@public/img/icons/gps.png';
 import { isValidLocation } from './dops-analysis';
 import './dops.css';
 
@@ -89,11 +81,7 @@ export class DopsPlugin extends KeepTrackPlugin {
           content: t7e('plugins.DopsPlugin.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.DopsPlugin.help.tip1'),
-        t7e('plugins.DopsPlugin.help.tip2'),
-        t7e('plugins.DopsPlugin.help.tip3'),
-      ],
+      tips: [t7e('plugins.DopsPlugin.help.tip1'), t7e('plugins.DopsPlugin.help.tip2'), t7e('plugins.DopsPlugin.help.tip3')],
       shortcuts: [{ keys: ['D'], description: t7e('plugins.DopsPlugin.help.shortcutToggle') }],
     };
   }
@@ -103,9 +91,6 @@ export class DopsPlugin extends KeepTrackPlugin {
       {
         key: 'D',
         callback: () => {
-          if (ServiceLocator.getMainCamera().cameraType === CameraType.FPS) {
- return;
-}
           this.bottomMenuClicked();
         },
       },
@@ -121,10 +106,13 @@ export class DopsPlugin extends KeepTrackPlugin {
     <div id="dops-menu" class="side-menu-parent start-hidden kt-ui-v13">
       <div id="dops-content" class="side-menu">
         <form id="dops-form">
-          ${this.wrapSection_(l('labels.location'), html`
+          ${this.wrapSection_(
+            l('labels.location'),
+            html`
             ${this.locationBody_()}
             ${DopsPlugin.actionButton_('dops-submit', l('labels.updateDopData'), { submit: true })}
-          `)}
+          `
+          )}
         </form>
         ${this.buildResultsHtml_()}
       </div>
@@ -185,9 +173,12 @@ export class DopsPlugin extends KeepTrackPlugin {
    * overrides this with the Sky View / 24hr Analysis tabbed layout.
    */
   protected buildResultsHtml_(): string {
-    return this.wrapSection_(l('labels.results'), html`
+    return this.wrapSection_(
+      l('labels.results'),
+      html`
       <table id="dops" class="center-align striped-light centered"></table>
-    `);
+    `
+    );
   }
 
   // =========================================================================
@@ -204,24 +195,24 @@ export class DopsPlugin extends KeepTrackPlugin {
   // Context menu
   // =========================================================================
 
-  rmbL1ElementName = 'dops-rmb';
-  rmbL1Html = html`
-  <li class="rmb-menu-item" id=${this.rmbL1ElementName}><a href="#">${t7e('plugins.DopsPlugin.rmb.dops')} &#x27A4;</a></li>
-`;
+  getContextMenuConfig(): IContextMenuConfig {
+    return {
+      level1ElementName: 'dops-rmb',
+      level1Html: html`
+        <li class="rmb-menu-item" id="dops-rmb"><a href="#">${t7e('plugins.DopsPlugin.rmb.dops')} &#x27A4;</a></li>`,
+      level2ElementName: 'dops-rmb-menu',
+      level2Html: html`
+        <ul class='dropdown-contents'>
+          <li id="dops-curdops-rmb"><a href="#">${t7e('plugins.DopsPlugin.rmb.currentGpsDops')}</a></li>
+          <li id="dops-24dops-rmb"><a href="#">${t7e('plugins.DopsPlugin.rmb.twentyFourHourGpsDops')}</a></li>
+        </ul>`,
+      order: 100,
+      // DOP values are computed for the ground location under the cursor
+      isVisible: (ctx: RmbMenuContext) => ctx.surface === 'earth',
+    };
+  }
 
-  isRmbOnEarth = true;
-  isRmbOffEarth = false;
-  isRmbOnSat = false;
-
-  rmbL2ElementName = 'dops-rmb-menu';
-  rmbL2Html = html`
-  <ul class='dropdown-contents'>
-    <li id="dops-curdops-rmb"><a href="#">${t7e('plugins.DopsPlugin.rmb.currentGpsDops')}</a></li>
-    <li id="dops-24dops-rmb"><a href="#">${t7e('plugins.DopsPlugin.rmb.twentyFourHourGpsDops')}</a></li>
-  </ul>
-`;
-
-  rmbCallback = (targetId: string): void => {
+  onContextMenuAction(targetId: string): void {
     switch (targetId) {
       case 'dops-curdops-rmb': {
         {
@@ -239,7 +230,7 @@ export class DopsPlugin extends KeepTrackPlugin {
                 y: dragPosition[1],
                 z: dragPosition[2],
               } as TemeVec3,
-              gmst,
+              gmst
             );
           }
           const gpsSatObjects = DopsPlugin.getGpsSats(ServiceLocator.getCatalogManager(), ServiceLocator.getGroupsManager());
@@ -255,37 +246,38 @@ export class DopsPlugin extends KeepTrackPlugin {
                 .replace('{gdop}', gpsDOP.gdop)
                 .replace('{tdop}', gpsDOP.tdop),
               ToastMsgType.normal,
-              true,
+              true
             );
         }
         break;
       }
-      case 'dops-24dops-rmb': {
-        const latLon = ServiceLocator.getInputManager().mouse.latLon;
+      case 'dops-24dops-rmb':
+        {
+          const latLon = ServiceLocator.getInputManager().mouse.latLon;
 
-        if (typeof latLon === 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
-          errorManagerInstance.warn(t7e('plugins.DopsPlugin.errorMsgs.invalidLocation'));
+          if (typeof latLon === 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
+            errorManagerInstance.warn(t7e('plugins.DopsPlugin.errorMsgs.invalidLocation'));
 
-          return;
+            return;
+          }
+
+          if (!this.isMenuButtonActive) {
+            (<HTMLInputElement>getEl('dops-lat')).value = latLon.lat.toFixed(3);
+            (<HTMLInputElement>getEl('dops-lon')).value = latLon.lon.toFixed(3);
+            (<HTMLInputElement>getEl('dops-alt')).value = '0';
+            (<HTMLInputElement>getEl('dops-el')).value = settingsManager.gpsElevationMask.toString();
+            this.bottomMenuClicked();
+          } else {
+            showLoading(() => this.updateSideMenu());
+            this.setBottomIconToEnabled();
+            break;
+          }
         }
-
-        if (!this.isMenuButtonActive) {
-          (<HTMLInputElement>getEl('dops-lat')).value = latLon.lat.toFixed(3);
-          (<HTMLInputElement>getEl('dops-lon')).value = latLon.lon.toFixed(3);
-          (<HTMLInputElement>getEl('dops-alt')).value = '0';
-          (<HTMLInputElement>getEl('dops-el')).value = settingsManager.gpsElevationMask.toString();
-          this.bottomMenuClicked();
-        } else {
-          showLoading(() => this.updateSideMenu());
-          this.setBottomIconToEnabled();
-          break;
-        }
-      }
         break;
       default:
         break;
     }
-  };
+  }
 
   // =========================================================================
   // Lifecycle
@@ -294,15 +286,12 @@ export class DopsPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        getEl('dops-form')!.addEventListener('submit', (e: Event) => {
-          e.preventDefault();
-          this.updateSideMenu();
-        });
-      },
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      getEl('dops-form')!.addEventListener('submit', (e: Event) => {
+        e.preventDefault();
+        this.updateSideMenu();
+      });
+    });
   }
 
   /**
@@ -348,20 +337,12 @@ export class DopsPlugin extends KeepTrackPlugin {
    * Returns the satellites of the requested GNSS constellation (GPS, Galileo,
    * GLONASS, BeiDou, or all of them) by matching catalog names.
    */
-  static getGnssSats(
-    catalogManagerInstance: CatalogManager,
-    groupManagerInstance: GroupsManager,
-    constellation: GnssConstellation = 'gps',
-  ): Satellite[] {
+  static getGnssSats(catalogManagerInstance: CatalogManager, groupManagerInstance: GroupsManager, constellation: GnssConstellation = 'gps'): Satellite[] {
     // Keep the historical group name for GPS so existing groups are reused
     const groupName = constellation === 'gps' ? 'GPSGroup' : `GnssGroup_${constellation}`;
 
     if (!groupManagerInstance.groupList[groupName]) {
-      groupManagerInstance.groupList[groupName] = groupManagerInstance.createGroup(
-        GroupType.NAME_REGEX,
-        GNSS_CONSTELLATION_PATTERNS[constellation],
-        groupName,
-      );
+      groupManagerInstance.groupList[groupName] = groupManagerInstance.createGroup(GroupType.NAME_REGEX, GNSS_CONSTELLATION_PATTERNS[constellation], groupName);
     }
     const gnssSats = groupManagerInstance.groupList[groupName];
     const gnssSatObjects = [] as Satellite[];

@@ -1,19 +1,14 @@
-import { EditSat } from '@app/plugins/edit-sat/edit-sat';
-import { KeepTrack } from '@app/keeptrack';
 import { MenuMode } from '@app/engine/core/interfaces';
-import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { defaultSat } from '@test/environment/apiMocks';
+import { hasBottomIcon, hasHelp, hasSideMenu } from '@app/engine/plugins/core/plugin-capabilities';
 import { getEl } from '@app/engine/utils/get-el';
+import { KeepTrack } from '@app/keeptrack';
+import { EditSat } from '@app/plugins/edit-sat/edit-sat';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment, standardSelectSat } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
-
-import {
-  hasBottomIcon,
-  hasHelp,
-  hasSideMenu,
-} from '@app/engine/plugins/core/plugin-capabilities';
 
 describe('EditSat_class', () => {
   beforeEach(() => {
@@ -83,10 +78,13 @@ describe('EditSat_capabilities', () => {
   });
 
   it('should have context menu properties', () => {
-    expect(plugin.isRmbOnSat).toBe(true);
-    expect(plugin.rmbMenuOrder).toBe(2);
-    expect(plugin.rmbL1ElementName).toBe('edit-rmb');
-    expect(plugin.rmbL2ElementName).toBe('edit-rmb-menu');
+    const config = plugin.getContextMenuConfig();
+
+    expect(config.order).toBe(2);
+    expect(config.level1ElementName).toBe('edit-rmb');
+    expect(config.level2ElementName).toBe('edit-rmb-menu');
+    // Only visible when the clicked target is an actual satellite
+    expect(config.isVisible!({ surface: 'space', targetId: -1, target: null, hasPrimarySelection: false })).toBe(false);
   });
 });
 

@@ -1,3 +1,4 @@
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { mat4 } from 'gl-matrix';
@@ -5,7 +6,6 @@ import { OBJ } from 'webgl-obj-loader';
 import { DepthManager } from '../depth-manager';
 import { OcclusionProgram } from '../draw-manager/post-processing';
 import type { MeshManager, MeshModel } from '../mesh-manager';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class MeshRenderer {
   private readonly gl_: WebGL2RenderingContext;
@@ -26,13 +26,13 @@ export class MeshRenderer {
   private numOfWarnings_: number;
 
   private readonly uniforms_ = {
-    uPMatrix: <WebGLUniformLocation><unknown>null,
-    uCamMatrix: <WebGLUniformLocation><unknown>null,
-    uMvMatrix: <WebGLUniformLocation><unknown>null,
-    uNormalMatrix: <WebGLUniformLocation><unknown>null,
-    uLightDirection: <WebGLUniformLocation><unknown>null,
-    uInSun: <WebGLUniformLocation><unknown>null,
-    logDepthBufFC: <WebGLUniformLocation><unknown>null,
+    uPMatrix: <WebGLUniformLocation>(<unknown>null),
+    uCamMatrix: <WebGLUniformLocation>(<unknown>null),
+    uMvMatrix: <WebGLUniformLocation>(<unknown>null),
+    uNormalMatrix: <WebGLUniformLocation>(<unknown>null),
+    uLightDirection: <WebGLUniformLocation>(<unknown>null),
+    uInSun: <WebGLUniformLocation>(<unknown>null),
+    logDepthBufFC: <WebGLUniformLocation>(<unknown>null),
   };
 
   constructor(meshManager: MeshManager, gl: WebGL2RenderingContext) {
@@ -61,8 +61,10 @@ export class MeshRenderer {
       return;
     }
     if (
-      typeof this.meshManager_.currentMeshObject.id === 'undefined' || typeof this.meshManager_.currentMeshObject.model === 'undefined' ||
-      this.meshManager_.currentMeshObject.id === -1) {
+      typeof this.meshManager_.currentMeshObject.id === 'undefined' ||
+      typeof this.meshManager_.currentMeshObject.model === 'undefined' ||
+      this.meshManager_.currentMeshObject.id === -1
+    ) {
       return;
     }
 

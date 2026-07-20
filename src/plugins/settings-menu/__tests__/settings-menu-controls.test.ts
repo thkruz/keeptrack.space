@@ -1,11 +1,6 @@
 import { ISettingSelectControl, ISettingToggleControl } from '@app/engine/plugins/core/plugin-capabilities';
 import { KeepTrack } from '@app/keeptrack';
-import {
-  SETTINGS_OWN_FAST_CPU_SECTION,
-  SETTINGS_OWN_GENERAL_SECTION,
-  getOwnSettingsSections,
-  resetOwnSettings,
-} from '@app/plugins/settings-menu/settings-menu-controls';
+import { getOwnSettingsSections, resetOwnSettings, SETTINGS_OWN_FAST_CPU_SECTION, SETTINGS_OWN_GENERAL_SECTION } from '@app/plugins/settings-menu/settings-menu-controls';
 import { SettingsManager } from '@app/settings/settings';
 import { SatLabelMode } from '@app/settings/ui-settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';

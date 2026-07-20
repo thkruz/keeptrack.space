@@ -64,7 +64,10 @@ describe('ChipList', () => {
   it('setItems replaces the contents and getItems/getIds reflect order', () => {
     const list = new ChipList(host);
 
-    list.setItems([{ id: 'x', label: 'X' }, { id: 'y', label: 'Y' }]);
+    list.setItems([
+      { id: 'x', label: 'X' },
+      { id: 'y', label: 'Y' },
+    ]);
 
     expect(list.getIds()).toEqual(['x', 'y']);
     expect(list.has('y')).toBe(true);

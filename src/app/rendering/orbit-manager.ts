@@ -69,6 +69,27 @@ export class OrbitManager {
 
   private static readonly zeroAnchor_: [number, number, number] = [0, 0, 0];
 
+  /**
+   * Per-object overrides for the in-view orbit line color. Objects without an
+   * entry keep the global settingsManager.orbitInViewColor. Used by the pro
+   * watchlist to draw each list's in-view orbits in that list's color.
+   */
+  private readonly inViewOrbitColorOverrides_ = new Map<number, [number, number, number, number]>();
+
+  /** Sets (or clears, when null) the in-view orbit line color for one object. */
+  setInViewOrbitColor(satId: number, color: [number, number, number, number] | null): void {
+    if (color) {
+      this.inViewOrbitColorOverrides_.set(satId, color);
+    } else {
+      this.inViewOrbitColorOverrides_.delete(satId);
+    }
+  }
+
+  /** Removes every per-object in-view orbit color override. */
+  clearInViewOrbitColors(): void {
+    this.inViewOrbitColorOverrides_.clear();
+  }
+
   /** Stores the float64 anchor for an object's (anchor-relative) orbit buffer. */
   setOrbitAnchor(satId: number, anchor: [number, number, number]): void {
     this.orbitAnchors_.set(satId, anchor);
@@ -108,6 +129,7 @@ export class OrbitManager {
     this.bufferByteSizes_.clear();
     this.lastUploadedPath_.clear();
     this.orbitAnchors_.clear();
+    this.inViewOrbitColorOverrides_.clear();
     this.currentInView_ = [];
     this.currentSelectId_ = -1;
     this.secondarySelectId_ = -1;
@@ -172,7 +194,7 @@ export class OrbitManager {
     tgtBuffer: WebGLFramebuffer | null,
     hoverManagerInstance: HoverManager,
     colorSchemeManagerInstance: ColorSchemeManager,
-    mainCameraInstance: Camera,
+    mainCameraInstance: Camera
   ): void {
     if (!this.isInitialized_) {
       return;
@@ -273,6 +295,8 @@ export class OrbitManager {
     new KeyboardComponent('OrbitManager', [
       {
         key: 'L',
+        // ctrl:false so Ctrl+Shift+L stays free for New Launch; this owns plain Shift+L.
+        ctrl: false,
         callback: () => {
           this.toggleOrbitLines_();
           SettingsMenuPlugin.syncOnLoad();
@@ -408,9 +432,12 @@ export class OrbitManager {
 
   changeOrbitBufferData(id: number, tle1: string, tle2: string): void {
     this.orbitThreadMgr.sendSatelliteUpdate(
-      id, ServiceLocator.getTimeManager().simulationTimeObj.getTime(),
-      settingsManager.isOrbitCruncherInEcf, ServiceLocator.getMainCamera().cameraType === CameraType.POLAR_VIEW,
-      tle1, tle2,
+      id,
+      ServiceLocator.getTimeManager().simulationTimeObj.getTime(),
+      settingsManager.isOrbitCruncherInEcf,
+      ServiceLocator.getMainCamera().cameraType === CameraType.POLAR_VIEW,
+      tle1,
+      tle2
     );
   }
 
@@ -425,7 +452,7 @@ export class OrbitManager {
       latList: Degrees[];
       lonList: Degrees[];
       altList: Kilometers[];
-    },
+    }
   ) {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
@@ -454,10 +481,7 @@ export class OrbitManager {
         this.setVariableLengthOrbitBuffer_(id, obj.getOrbitPath(), obj.orbitPathAnchor_);
       } else {
         // Then it is a satellite
-        this.orbitThreadMgr.sendSatelliteUpdate(
-          Number(id), simTime,
-          settingsManager.isOrbitCruncherInEcf, isPolarView,
-        );
+        this.orbitThreadMgr.sendSatelliteUpdate(Number(id), simTime, settingsManager.isOrbitCruncherInEcf, isPolarView);
         this.inProgress_[id] = true;
       }
     }
@@ -480,7 +504,7 @@ export class OrbitManager {
           tle1: obj.tle1,
           tle2: obj.tle2,
         };
-      }),
+      })
     );
   }
 
@@ -589,17 +613,24 @@ export class OrbitManager {
   }
 
   private drawInViewObjectOrbit_(mainCameraInstance: Camera): void {
-    if (this.currentInView_.length >= 1) {
-      // There might be some z-fighting
-      if (mainCameraInstance.cameraType === CameraType.PLANETARIUM) {
-        this.lineManagerInstance_.setColorUniforms(settingsManager.orbitPlanetariumColor);
-      } else {
-        this.lineManagerInstance_.setColorUniforms(settingsManager.orbitInViewColor);
-      }
+    if (this.currentInView_.length === 0) {
+      return;
+    }
+
+    // There might be some z-fighting
+    if (mainCameraInstance.cameraType === CameraType.PLANETARIUM) {
+      this.lineManagerInstance_.setColorUniforms(settingsManager.orbitPlanetariumColor);
       this.currentInView_.forEach((id) => {
         this.writePathToGpu_(id);
       });
+
+      return;
     }
+
+    this.currentInView_.forEach((id) => {
+      this.lineManagerInstance_.setColorUniforms(this.inViewOrbitColorOverrides_.get(id) ?? settingsManager.orbitInViewColor);
+      this.writePathToGpu_(id);
+    });
   }
 
   private drawPrimaryObjectOrbit_() {
@@ -735,16 +766,12 @@ export class OrbitManager {
 
     const worldShift = ServiceLocator.getScene().worldShift ?? [0, 0, 0];
 
-    this.lineManagerInstance_.setAnchorUniforms(
-      [anchorEciNow[0] + worldShift[0], anchorEciNow[1] + worldShift[1], anchorEciNow[2] + worldShift[2]],
-      anchor,
-      anchorEciNow,
-    );
+    this.lineManagerInstance_.setAnchorUniforms([anchorEciNow[0] + worldShift[0], anchorEciNow[1] + worldShift[1], anchorEciNow[2] + worldShift[2]], anchor, anchorEciNow);
 
     // OEM satellites and missiles carry a variable-length, high-resolution path
     // and are drawn with their own vertex count; everything else uses the fixed
     // orbitSegments buffer.
-    const variableLengthPath = (obj instanceof OemSatellite || obj instanceof MissileObject) ? obj.orbitPathCache_ : null;
+    const variableLengthPath = obj instanceof OemSatellite || obj instanceof MissileObject ? obj.orbitPathCache_ : null;
 
     // Patch the line's head (vertex 0) every frame with the object's OWN dot
     // position - the single source of truth shared with the camera follow, world
@@ -785,8 +812,6 @@ export class OrbitManager {
   }
 
   updateOrbitType() {
-    this.orbitThreadMgr.sendChangeOrbitType(
-      settingsManager.isDrawTrailingOrbits ? OrbitDrawTypes.TRAIL : OrbitDrawTypes.ORBIT,
-    );
+    this.orbitThreadMgr.sendChangeOrbitType(settingsManager.isDrawTrailingOrbits ? OrbitDrawTypes.TRAIL : OrbitDrawTypes.ORBIT);
   }
 }

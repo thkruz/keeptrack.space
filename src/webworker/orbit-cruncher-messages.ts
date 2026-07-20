@@ -132,7 +132,4 @@ export interface OrbitCruncherMissileObject {
   startTime?: number;
 }
 
-export type OrbitCruncherCachedObject =
-  | OrbitCruncherOtherObject
-  | OrbitCruncherSatelliteObject
-  | OrbitCruncherMissileObject;
+export type OrbitCruncherCachedObject = OrbitCruncherOtherObject | OrbitCruncherSatelliteObject | OrbitCruncherMissileObject;

@@ -4,6 +4,9 @@
       "title": "시나리오 관리",
       "bottomIconLabel": "시나리오 관리",
       "sideMenuTitle": "시나리오 설정",
+      "sections": {
+        "actions": "작업"
+      },
       "labels": {
         "scenarioName": "시나리오 이름",
         "description": "설명",
@@ -22,11 +25,13 @@
       "buttons": {
         "updateScenario": "시나리오 업데이트",
         "saveScenario": "시나리오 저장",
-        "loadScenario": "시나리오 불러오기"
+        "loadScenario": "시나리오 불러오기",
+        "clearTimeBounds": "시간 범위 지우기"
       },
       "msgs": {
         "settingsUpdated": "시나리오 설정이 성공적으로 업데이트되었습니다!",
-        "scenarioLoaded": "시나리오를 성공적으로 불러왔습니다!"
+        "scenarioLoaded": "시나리오를 성공적으로 불러왔습니다!",
+        "boundsCleared": "시간 범위를 지웠습니다. 시나리오가 이제 무제한입니다."
       },
       "errorMsgs": {
         "nameRequired": "시나리오 이름은 필수입니다.",

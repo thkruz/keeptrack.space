@@ -15,17 +15,24 @@
       },
       "sections": {
         "template": "Modello",
+        "launchWindow": "Finestra di lancio",
         "launchSite": "Sito di lancio"
       },
       "buttons": {
+        "matchTargetPlane": "Trova finestra di lancio",
         "createLaunchNominal": "Crea lancio nominale",
-        "inclinationTooLow": "Inclinazione troppo bassa!"
+        "inclinationTooLow": "Inclinazione troppo bassa!",
+        "clearWindow": "Cancella finestra di lancio",
+        "createLaunchAtWindow": "Crea lancio nella finestra"
       },
       "msgs": {
+        "windowFound": "Lancio alle {time} per allinearsi al piano bersaglio (ΔRAAN {delta}°)",
         "launchNominalCreated": "Lancio nominale creato!",
         "timeRelativeToLaunch": "Il tempo è ora relativo all'orario di lancio."
       },
       "errorMsgs": {
+        "windowNoTarget": "Seleziona prima un satellite bersaglio.",
+        "windowGeometryImpossible": "Nessuna finestra di lancio: l'inclinazione bersaglio è inferiore alla latitudine del sito di lancio.",
         "noMoreNominalSatellites": "Nessun altro satellite nominale disponibile!",
         "launchSiteNotFound": "Sito di lancio {launchSite} non trovato!",
         "failedToCreateTle": "Creazione del TLE non riuscita: {error}",
@@ -42,7 +49,9 @@
         "invalidEpochDayFormat": "Formato del giorno di epoca non valido! Deve essere composto da 3 cifre, un separatore decimale e 8 cifre dopo il decimale.",
         "epochDayFormatIssue": "Si è verificato un problema con il formato del giorno di epoca di questo satellite. Prova un satellite diverso.",
         "failedToPropagate": "Impossibile propagare il satellite. Prova parametri diversi o segnala il problema se i parametri sono corretti.",
-        "changingOrbitBufferFailed": "Modifica dei dati del buffer dell'orbita non riuscita"
+        "changingOrbitBufferFailed": "Modifica dei dati del buffer dell'orbita non riuscita",
+        "launchLatExceedsInclination": "La latitudine di lancio supera l’inclinazione dell’orbita.",
+        "failedToFitOrbit": "Impossibile adattare un’orbita al sito di lancio."
       },
       "help": {
         "overview": "Il menu Nuovo lancio crea un lancio ipotetico: copia l'orbita di un satellite reale, la ruota in modo che decolli da un sito di lancio a tua scelta e azzera l'orologio a T+0. Usalo per rispondere alla domanda \"se qualcosa viene lanciato da questo sito verso questo tipo di orbita, quando lo vedranno i miei sensori?\"",
@@ -54,7 +63,8 @@
         "tip1": "Dopo la creazione l'orologio indica il tempo trascorso dal decollo: \"00:45:00\" significa 45 minuti dopo il lancio, perfetto per le cronologie di copertura dei sensori.",
         "tip2": "Se la creazione fallisce il controllo di quota, prova un altro satellite modello con un'orbita più convenzionale.",
         "shortcutOpen": "Apri il menu Nuovo lancio"
-      }
+      },
+      "launchWindowHelp": "Trova il prossimo orario di lancio il cui piano orbitale corrisponde al satellite bersaglio. Questo imposta solo l'orario di lancio; non viene creato nulla finché non premi «Crea lancio nominale»."
     }
   }
 }

@@ -1,9 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { getEl } from '@app/engine/utils/get-el';
-
 import { MobileManager } from '@app/app/ui/mobileManager';
 import { SplashScreen } from '@app/app/ui/splash-screen';
+import { getEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('SplashScreen_class', () => {
   let previousContainerRoot: HTMLDivElement;

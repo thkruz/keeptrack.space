@@ -1,7 +1,7 @@
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { getEl } from '@app/engine/utils/get-el';
+import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { PluginManagerPlugin } from '@app/plugins/plugin-manager/plugin-manager';
 import { settingsManager } from '@app/settings/settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';

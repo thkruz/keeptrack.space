@@ -1,33 +1,16 @@
 /* eslint-disable max-lines */
 import { DetailedSensor, RfSensor } from '@app/app/sensors/DetailedSensor';
 import { CommLink, Degrees, Kilometers, Milliseconds, SpaceObjectType, ZoomValue } from '@ootk/src/main';
+import { dsnSensors } from './sensors/dsn';
+import { estrackSensors } from './sensors/estrack';
+import { galileoSensors } from './sensors/galileo';
+import { scnSensors } from './sensors/scn';
+import { Operators, SensorList } from './sensors/types';
 
-export interface SensorList {
-  [key: string]: DetailedSensor;
-}
+export type { SensorList } from './sensors/types';
+export { Operators } from './sensors/types';
 
 // TODO: Add the aperture size of telescopes as an optional parameter
-
-export enum Operators {
-  USSF = 'USSF',
-  USA = 'US ARMY',
-  RAF = 'RAF',
-  UKSA = 'UKSA',
-  RAAF = 'RAAF',
-  ESA = 'ESA',
-  ROC = 'ROC',
-  EISCAT = 'EISCAT',
-  RUSSF = 'RUS SF', // Russian Space Forces
-  MIT = 'MIT',
-  NOR = 'NOR',
-  PLA = 'PLA',
-  CAS = 'CAS',
-  LEOLABS = 'LEOLABS',
-  CALTECH = 'CALTECH',
-  COMMERCIAL = 'COMMERCIAL',
-  ITAF = 'ITAF', // Italian Air Force
-  OWLNET = 'OWL-Net',
-}
 
 export const sensors = <SensorList>{
   CODSFS: new RfSensor({
@@ -395,12 +378,24 @@ export const sensors = <SensorList>{
     lat: <Degrees>8.723, // SDC7-paper1014.pdf
     lon: <Degrees>167.719,
     alt: <Kilometers>0.007,
-    minAz: <Degrees>268, // TODO This needs a better system (same as LEO Labs)
+    // Legacy az/el box kept for UI display only - fovParams below drives FOV checks and rendering
+    minAz: <Degrees>268,
     maxAz: <Degrees>272,
-    minEl: <Degrees>5, // ??
-    maxEl: <Degrees>175, // ??
+    minEl: <Degrees>10,
+    maxEl: <Degrees>170,
     minRng: <Kilometers>50,
     maxRng: <Kilometers>3057.754, // https://www.spaceforce.mil/News/Article/2142648/swinging-for-the-space-fence/
+    // 2°-wide fan from 10° elevation in the west, through zenith, to 10° elevation in the east
+    fovParams: {
+      boresightAz: <Degrees>270,
+      boresightEl: <Degrees>90,
+      halfAngle: <Degrees>80,
+      minorHalfAngle: <Degrees>1,
+      rollAngle: <Degrees>90, // Major axis east-west (roll 0 = north at zenith)
+      minRange: <Kilometers>50,
+      maxRange: <Kilometers>3057.754,
+      minElevation: <Degrees>10,
+    },
     zoom: ZoomValue.LEO,
     volume: true,
     changeObjectInterval: <Milliseconds>2000,
@@ -552,7 +547,7 @@ export const sensors = <SensorList>{
     freqBand: 'C-Band',
     type: SpaceObjectType.MECHANICAL,
     lat: <Degrees>-21.885698,
-    lon: <Degrees>114.129610,
+    lon: <Degrees>114.12961,
     alt: <Kilometers>0.0,
     minAz: <Degrees>0,
     maxAz: <Degrees>360,
@@ -794,18 +789,30 @@ export const sensors = <SensorList>{
     lat: <Degrees>31.9643,
     lon: <Degrees>-103.233245,
     alt: <Kilometers>0.855,
+    // Legacy az/el boxes kept for UI display only - fovParams below drives FOV checks and rendering
     minAz: <Degrees>70,
     maxAz: <Degrees>72,
     minEl: <Degrees>30,
-    maxEl: <Degrees>91, // 91 to ensure visual overlap
+    maxEl: <Degrees>91,
     minRng: <Kilometers>100,
     maxRng: <Kilometers>1800,
     minAz2: <Degrees>250,
     maxAz2: <Degrees>252,
     minEl2: <Degrees>30,
-    maxEl2: <Degrees>91, // 91 to ensure visual overlap
+    maxEl2: <Degrees>91,
     minRng2: <Kilometers>100,
     maxRng2: <Kilometers>1800,
+    // Single through-zenith fence: 2° wide, from 30° elevation at az 71, through zenith, to 30° at az 251
+    fovParams: {
+      boresightAz: <Degrees>71,
+      boresightEl: <Degrees>90,
+      halfAngle: <Degrees>60,
+      minorHalfAngle: <Degrees>1,
+      rollAngle: <Degrees>71, // Major axis toward az 71/251 (roll 0 = north at zenith)
+      minRange: <Kilometers>100,
+      maxRange: <Kilometers>1800,
+      minElevation: <Degrees>30,
+    },
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     url: 'https://platform.leolabs.space/sites/msr',
@@ -825,12 +832,22 @@ export const sensors = <SensorList>{
     lat: <Degrees>65.12992,
     lon: <Degrees>-147.47104,
     alt: <Kilometers>0.23,
+    // Legacy az/el box kept for UI display only - fovParams below drives FOV checks and rendering
     minAz: <Degrees>0,
     maxAz: <Degrees>360,
     minEl: <Degrees>45,
-    maxEl: <Degrees>90, // 91 to ensure visual overlap
+    maxEl: <Degrees>90,
     minRng: <Kilometers>100,
     maxRng: <Kilometers>1800,
+    // 45°-half-angle circular cone about zenith (el 45 to 90 in every azimuth)
+    fovParams: {
+      boresightAz: <Degrees>0,
+      boresightEl: <Degrees>90,
+      halfAngle: <Degrees>45,
+      minRange: <Kilometers>100,
+      maxRange: <Kilometers>1800,
+      minElevation: <Degrees>45,
+    },
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     url: 'https://platform.leolabs.space/sites/pfisr',
@@ -844,10 +861,6 @@ export const sensors = <SensorList>{
     operator: Operators.LEOLABS,
   }),
 
-  /*
-   * TODO: There needs to be a new method for doing FOV when
-   * the radar is a fence but not aiming at 90 elevation
-   */
   LEOKSR: new DetailedSensor({
     objName: 'LEOKSR',
     id: 0,
@@ -873,12 +886,24 @@ export const sensors = <SensorList>{
      * minRng2: <Kilometers>100,
      * maxRng2: <Kilometers>1800,
      */
+    // Legacy az/el box kept for UI display only - fovParams below drives FOV checks and rendering
     minAz: <Degrees>269,
     maxAz: <Degrees>271,
     minEl: <Degrees>10,
     maxEl: <Degrees>170,
     minRng: <Kilometers>100,
     maxRng: <Kilometers>3000,
+    // Through-zenith fence: 2° wide, from 10° elevation in the west, through zenith, to 10° in the east
+    fovParams: {
+      boresightAz: <Degrees>270,
+      boresightEl: <Degrees>90,
+      halfAngle: <Degrees>80,
+      minorHalfAngle: <Degrees>1,
+      rollAngle: <Degrees>90, // Major axis east-west (roll 0 = north at zenith)
+      minRange: <Kilometers>100,
+      maxRange: <Kilometers>3000,
+      minElevation: <Degrees>10,
+    },
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     url: 'https://platform.leolabs.space/sites/ksr',
@@ -897,18 +922,36 @@ export const sensors = <SensorList>{
     lat: <Degrees>10.611782670733335, // https://www.radartutorial.eu/19.kartei/02.surv/karte087.en.html
     lon: <Degrees>-85.52869380341954,
     alt: <Kilometers>0.0,
+    // Legacy az/el boxes kept for UI display only - fovParams + boresight arrays drive FOV checks and rendering
     minAz: <Degrees>209,
     maxAz: <Degrees>211,
     minEl: <Degrees>20,
-    maxEl: <Degrees>180, // NOTE: Not sure why this looks correct, but 200 goes into the earth
+    maxEl: <Degrees>180,
     minRng: <Kilometers>100,
     maxRng: <Kilometers>3000,
     minAz2: <Degrees>119,
     maxAz2: <Degrees>121,
     minEl2: <Degrees>20,
-    maxEl2: <Degrees>180, // NOTE: Not sure why this looks correct, but 200 goes into the earth
+    maxEl2: <Degrees>180,
     minRng2: <Kilometers>100,
     maxRng2: <Kilometers>3000,
+    /*
+     * Crossed dual fences, each 2° wide with a 160° arc: from 20° elevation
+     * (az 210 / az 120), through zenith, to the horizon on the opposite side
+     * (az 30 / az 300). Each fan's arc midpoint is 10° past zenith, so the
+     * boresights tilt to el 80 toward az 30 and az 300. Roll 0 keeps each
+     * face's major axis in its own vertical (fence) plane.
+     */
+    boresightAz: [<Degrees>30, <Degrees>300],
+    boresightEl: [<Degrees>80, <Degrees>80],
+    fovParams: {
+      halfAngle: <Degrees>80,
+      minorHalfAngle: <Degrees>1,
+      rollAngle: <Degrees>0,
+      minRange: <Kilometers>100,
+      maxRange: <Kilometers>3000,
+      minElevation: <Degrees>0,
+    },
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     url: 'https://platform.leolabs.space/sites/crsr',
@@ -927,18 +970,30 @@ export const sensors = <SensorList>{
     lat: <Degrees>36.9975,
     lon: <Degrees>-25.1384933,
     alt: <Kilometers>0.198,
+    // Legacy az/el boxes kept for UI display only - fovParams + boresight arrays drive FOV checks and rendering
     minAz: <Degrees>209,
     maxAz: <Degrees>211,
     minEl: <Degrees>20,
-    maxEl: <Degrees>180, // NOTE: Not sure why this looks correct, but 200 goes into the earth
+    maxEl: <Degrees>180,
     minRng: <Kilometers>100,
     maxRng: <Kilometers>3000,
     minAz2: <Degrees>119,
     maxAz2: <Degrees>121,
     minEl2: <Degrees>20,
-    maxEl2: <Degrees>180, // NOTE: Not sure why this looks correct, but 200 goes into the earth
+    maxEl2: <Degrees>180,
     minRng2: <Kilometers>100,
     maxRng2: <Kilometers>3000,
+    // Crossed dual fences - same geometry as LEOCRSR (see comment there)
+    boresightAz: [<Degrees>30, <Degrees>300],
+    boresightEl: [<Degrees>80, <Degrees>80],
+    fovParams: {
+      halfAngle: <Degrees>80,
+      minorHalfAngle: <Degrees>1,
+      rollAngle: <Degrees>0,
+      minRange: <Kilometers>100,
+      maxRange: <Kilometers>3000,
+      minElevation: <Degrees>0,
+    },
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     url: 'https://platform.leolabs.space/sites/crsr',
@@ -957,12 +1012,24 @@ export const sensors = <SensorList>{
     lat: <Degrees>-33.308487,
     lon: <Degrees>116.030608,
     alt: <Kilometers>0.241,
+    // Legacy az/el box kept for UI display only - fovParams below drives FOV checks and rendering
     minAz: <Degrees>119,
     maxAz: <Degrees>121,
     minEl: <Degrees>10,
-    maxEl: <Degrees>170, // NOTE: Not sure why this looks correct, but 200 goes into the earth
+    maxEl: <Degrees>170,
     minRng: <Kilometers>100,
     maxRng: <Kilometers>3000,
+    // Through-zenith fence: 2° wide, from 10° elevation at az 120, through zenith, to 10° at az 300
+    fovParams: {
+      boresightAz: <Degrees>120,
+      boresightEl: <Degrees>90,
+      halfAngle: <Degrees>80,
+      minorHalfAngle: <Degrees>1,
+      rollAngle: <Degrees>120, // Major axis toward az 120/300 (roll 0 = north at zenith)
+      minRange: <Kilometers>100,
+      maxRange: <Kilometers>3000,
+      minElevation: <Degrees>10,
+    },
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     url: 'https://platform.leolabs.space/sites/crsr',
@@ -1325,7 +1392,7 @@ export const sensors = <SensorList>{
     id: 0,
     name: 'Pechora, Russia',
     uiName: 'Pechora',
-    system: 'Dar\'yal',
+    system: "Dar'yal",
     freqBand: 'UHF',
     type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: <Degrees>65.21,
@@ -1687,8 +1754,8 @@ export const sensors = <SensorList>{
   ZHE: new DetailedSensor({
     objName: 'ZHE',
     id: 0,
-    name: 'Lin\'an Zhejiang, China',
-    uiName: 'Lin\'an',
+    name: "Lin'an Zhejiang, China",
+    uiName: "Lin'an",
     system: 'LPAR',
     freqBand: 'X-Band',
     type: SpaceObjectType.PHASED_ARRAY_RADAR,
@@ -1973,4 +2040,9 @@ export const sensors = <SensorList>{
     country: 'Republic of Korea',
     operator: Operators.OWLNET,
   }),
+  // TT&C tracking networks (cooperative dishes, not surveillance sensors)
+  ...dsnSensors,
+  ...scnSensors,
+  ...estrackSensors,
+  ...galileoSensors,
 };

@@ -58,17 +58,17 @@ export class SatLabelManager {
   };
 
   private uniforms_ = {
-    u_pMvCamMatrix: <WebGLUniformLocation><unknown>null,
-    u_screenSize: <WebGLUniformLocation><unknown>null,
-    u_glyphSize: <WebGLUniformLocation><unknown>null,
-    u_glyphAtlas: <WebGLUniformLocation><unknown>null,
-    worldOffset: <WebGLUniformLocation><unknown>null,
-    u_flatMapMode: <WebGLUniformLocation><unknown>null,
-    u_gmst: <WebGLUniformLocation><unknown>null,
-    u_currentGmst: <WebGLUniformLocation><unknown>null,
-    u_earthRadius: <WebGLUniformLocation><unknown>null,
-    u_flatMapCenterX: <WebGLUniformLocation><unknown>null,
-    u_logDepthBufFC: <WebGLUniformLocation><unknown>null,
+    u_pMvCamMatrix: <WebGLUniformLocation>(<unknown>null),
+    u_screenSize: <WebGLUniformLocation>(<unknown>null),
+    u_glyphSize: <WebGLUniformLocation>(<unknown>null),
+    u_glyphAtlas: <WebGLUniformLocation>(<unknown>null),
+    worldOffset: <WebGLUniformLocation>(<unknown>null),
+    u_flatMapMode: <WebGLUniformLocation>(<unknown>null),
+    u_gmst: <WebGLUniformLocation>(<unknown>null),
+    u_currentGmst: <WebGLUniformLocation>(<unknown>null),
+    u_earthRadius: <WebGLUniformLocation>(<unknown>null),
+    u_flatMapCenterX: <WebGLUniformLocation>(<unknown>null),
+    u_logDepthBufFC: <WebGLUniformLocation>(<unknown>null),
   };
 
   init(gl: WebGL2RenderingContext, maxLabels: number): void {
@@ -215,7 +215,7 @@ export class SatLabelManager {
     const isFlatMapLabel = ServiceLocator.getMainCamera().cameraType === CameraType.FLAT_MAP;
 
     // 2D projections reproject raw ECI in-shader; zero the world offset for them
-    gl.uniform3fv(this.uniforms_.worldOffset, isFlatMapLabel ? [0, 0, 0] : Scene.getInstance().worldShift ?? [0, 0, 0]);
+    gl.uniform3fv(this.uniforms_.worldOffset, isFlatMapLabel ? [0, 0, 0] : (Scene.getInstance().worldShift ?? [0, 0, 0]));
 
     gl.uniform1i(this.uniforms_.u_flatMapMode, isFlatMapLabel ? 1 : 0);
     gl.uniform1f(this.uniforms_.u_gmst, ServiceLocator.getDotsManager().cruncherGmst);
@@ -442,14 +442,7 @@ export class SatLabelManager {
       }
     `;
 
-    const programHelper = new WebGlProgramHelper(
-      gl,
-      vertShader,
-      fragShader,
-      this.attribs_,
-      this.uniforms_,
-      { name: 'SatLabels' },
-    );
+    const programHelper = new WebGlProgramHelper(gl, vertShader, fragShader, this.attribs_, this.uniforms_, { name: 'SatLabels' });
 
     this.program_ = programHelper.program;
   }
@@ -459,10 +452,7 @@ export class SatLabelManager {
 
     // Unit quad: two triangles forming a [0,0]-[1,1] square
     // prettier-ignore
-    const quadVertices = new Float32Array([
-      0, 0, 1, 0, 0, 1,
-      0, 1, 1, 0, 1, 1,
-    ]);
+    const quadVertices = new Float32Array([0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1]);
 
     this.quadBuffer_ = gl.createBuffer()!;
     gl.bindBuffer(gl.ARRAY_BUFFER, this.quadBuffer_);

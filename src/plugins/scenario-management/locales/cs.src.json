@@ -4,6 +4,9 @@
       "title": "Správa scénářů",
       "bottomIconLabel": "Správa scénářů",
       "sideMenuTitle": "Nastavení scénáře",
+      "sections": {
+        "actions": "Akce"
+      },
       "labels": {
         "scenarioName": "Název scénáře",
         "description": "Popis",
@@ -22,11 +25,13 @@
       "buttons": {
         "updateScenario": "Aktualizovat scénář",
         "saveScenario": "Uložit scénář",
-        "loadScenario": "Načíst scénář"
+        "loadScenario": "Načíst scénář",
+        "clearTimeBounds": "Vymazat časové hranice"
       },
       "msgs": {
         "settingsUpdated": "Nastavení scénáře bylo úspěšně aktualizováno!",
-        "scenarioLoaded": "Scénář byl úspěšně načten!"
+        "scenarioLoaded": "Scénář byl úspěšně načten!",
+        "boundsCleared": "Časové hranice vymazány. Scénář je nyní neomezený."
       },
       "errorMsgs": {
         "nameRequired": "Název scénáře je povinný.",

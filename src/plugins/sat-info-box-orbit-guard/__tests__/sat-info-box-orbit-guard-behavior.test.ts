@@ -1,6 +1,6 @@
+import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SatInfoBoxOrbitGuard } from '@app/plugins/sat-info-box-orbit-guard/sat-info-box-orbit-guard';
 import { EL, SECTIONS } from '@app/plugins/sat-info-box-orbit-guard/sat-info-box-orbit-guard-html';
-import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -19,10 +19,10 @@ describe('SatInfoBoxOrbitGuard behavior', () => {
     // Replace any section websiteInit created with a fresh one so listener
     // wiring in these tests is the only handler attached.
     document.getElementById(SECTIONS.MANEUVER)?.remove();
-    document.body.insertAdjacentHTML('beforeend',
-      `<div id="${SECTIONS.MANEUVER}" style="display:none;">` +
-      `<span id="${EL.COLLAPSE}">expand_less</span>` +
-      `<div id="${EL.DATA}"></div></div>`);
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      `<div id="${SECTIONS.MANEUVER}" style="display:none;">` + `<span id="${EL.COLLAPSE}">expand_less</span>` + `<div id="${EL.DATA}"></div></div>`
+    );
     // createHistorical2dPlot_ builds echarts; isolate it.
     vi.spyOn(p(), 'createHistorical2dPlot_').mockImplementation(() => undefined);
   });
@@ -60,7 +60,10 @@ describe('SatInfoBoxOrbitGuard behavior', () => {
   });
 
   it('processHistoricalData_ hides the section when there is no data', () => {
-    p().processHistoricalData_([{ name: 'Elset', value: [] }, { name: 'EO Data', value: [] }]);
+    p().processHistoricalData_([
+      { name: 'Elset', value: [] },
+      { name: 'EO Data', value: [] },
+    ]);
 
     expect(document.getElementById(SECTIONS.MANEUVER)!.style.display).toBe('none');
   });

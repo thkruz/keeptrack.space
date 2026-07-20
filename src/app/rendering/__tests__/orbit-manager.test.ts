@@ -1,7 +1,8 @@
 /* eslint-disable dot-notation */
 /* eslint-disable max-lines-per-function */
-import { ServiceLocator } from '@app/engine/core/service-locator';
+
 import { OrbitManager } from '@app/app/rendering/orbit-manager';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -132,6 +133,48 @@ describe('OrbitManager', () => {
       om.clearInViewOrbit();
 
       expect(o().currentInView_).toEqual([]);
+    });
+  });
+
+  describe('in-view orbit color overrides', () => {
+    beforeEach(() => {
+      initialized();
+      vi.spyOn(om, 'updateOrbitBuffer').mockImplementation(() => undefined);
+      vi.spyOn(om as never, 'writePathToGpu_' as never).mockImplementation(() => undefined);
+    });
+
+    it('draws overridden ids in their color and the rest in orbitInViewColor', () => {
+      om.addInViewOrbit(3);
+      om.addInViewOrbit(4);
+      om.setInViewOrbitColor(3, [0.2, 0.4, 0.6, 0.7]);
+
+      o().drawInViewObjectOrbit_({ cameraType: 0 });
+
+      expect(lineMgr.setColorUniforms).toHaveBeenNthCalledWith(1, [0.2, 0.4, 0.6, 0.7]);
+      expect(lineMgr.setColorUniforms).toHaveBeenNthCalledWith(2, settingsManager.orbitInViewColor);
+    });
+
+    it('setInViewOrbitColor(null) clears a single override', () => {
+      om.addInViewOrbit(3);
+      om.setInViewOrbitColor(3, [0.2, 0.4, 0.6, 0.7]);
+      om.setInViewOrbitColor(3, null);
+
+      o().drawInViewObjectOrbit_({ cameraType: 0 });
+
+      expect(lineMgr.setColorUniforms).toHaveBeenCalledWith(settingsManager.orbitInViewColor);
+    });
+
+    it('clearInViewOrbitColors removes every override', () => {
+      om.addInViewOrbit(3);
+      om.addInViewOrbit(4);
+      om.setInViewOrbitColor(3, [0.2, 0.4, 0.6, 0.7]);
+      om.setInViewOrbitColor(4, [0.6, 0.4, 0.2, 0.7]);
+
+      om.clearInViewOrbitColors();
+      o().drawInViewObjectOrbit_({ cameraType: 0 });
+
+      expect(lineMgr.setColorUniforms).toHaveBeenNthCalledWith(1, settingsManager.orbitInViewColor);
+      expect(lineMgr.setColorUniforms).toHaveBeenNthCalledWith(2, settingsManager.orbitInViewColor);
     });
   });
 
@@ -306,13 +349,7 @@ describe('OrbitManager', () => {
       settingsManager.enableConstantSelectedSatRedraw = false;
       const useProgram = vi.spyOn(gl, 'useProgram');
 
-      om.draw(
-        [] as never,
-        null,
-        { getHoverId: () => -1 } as never,
-        { colorData: new Float32Array(40) } as never,
-        { cameraType: 0 } as never,
-      );
+      om.draw([] as never, null, { getHoverId: () => -1 } as never, { colorData: new Float32Array(40) } as never, { cameraType: 0 } as never);
 
       expect(useProgram).toHaveBeenCalledWith(lineMgr.program);
       expect(lineMgr.setWorldUniforms).toHaveBeenCalled();

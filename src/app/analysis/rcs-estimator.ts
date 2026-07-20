@@ -242,7 +242,7 @@ export const estimateRcsFromGeometry = (sat: Satellite): number | null => {
 
   // SatMath.estimateRcs defaults to a box when shape is unknown, so an empty
   // shape string is safe — but we still need to pass *something*.
-  const shape = (sat.shape && sat.shape.length > 0) ? sat.shape : 'box';
+  const shape = sat.shape && sat.shape.length > 0 ? sat.shape : 'box';
 
   return SatMath.estimateRcs(length, diameter, span, shape);
 };
@@ -279,7 +279,7 @@ export const estimateRcsFromVmag = (sat: Satellite): number | null => {
   // Solving for A:
   //   A = 10^((M_sun + 5·log10(d_ref_m) - vmag) / 2.5) / ((2/3π)·albedo)
   const logExp = (SUN_APPARENT_MAGNITUDE + 5 * Math.log10(STD_REFERENCE_DISTANCE_M) - vmag) / 2.5;
-  const area = (10 ** logExp) / (LAMBERT_SPHERE_FACTOR * DEFAULT_ALBEDO);
+  const area = 10 ** logExp / (LAMBERT_SPHERE_FACTOR * DEFAULT_ALBEDO);
 
   if (!Number.isFinite(area) || area <= 0) {
     return null;
@@ -302,10 +302,7 @@ export const estimateRcsFromVmag = (sat: Satellite): number | null => {
  * The stats parameter is optional: pass `null`/`undefined` to skip the
  * catalog-mining layer (e.g. unit tests that don't construct a catalog).
  */
-export const estimateRcsWithSource = (
-  sat: Satellite,
-  stats?: CatalogRcsStats | null,
-): RcsWithSource | null => {
+export const estimateRcsWithSource = (sat: Satellite, stats?: CatalogRcsStats | null): RcsWithSource | null => {
   if (isUsableRcs(sat.rcs)) {
     return { rcs: sat.rcs, source: 'catalog' };
   }
@@ -339,5 +336,4 @@ export const estimateRcsWithSource = (
   return null;
 };
 
-export const estimateRcs = (sat: Satellite, stats?: CatalogRcsStats | null): number | null =>
-  estimateRcsWithSource(sat, stats)?.rcs ?? null;
+export const estimateRcs = (sat: Satellite, stats?: CatalogRcsStats | null): number | null => estimateRcsWithSource(sat, stats)?.rcs ?? null;

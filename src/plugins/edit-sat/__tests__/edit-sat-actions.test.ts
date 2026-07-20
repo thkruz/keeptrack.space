@@ -1,9 +1,4 @@
-import {
-  buildSaveBlob,
-  calculateDerivedParams,
-  parseLoadedTle,
-  pickZoomForApogee,
-} from '@app/plugins/edit-sat/edit-sat-actions';
+import { buildSaveBlob, calculateDerivedParams, parseLoadedTle, pickZoomForApogee } from '@app/plugins/edit-sat/edit-sat-actions';
 import { Satellite, TleLine1, TleLine2, ZoomValue } from '@ootk/src/main';
 
 const TLE1 = '1 25544U 98067A   24001.50000000  .00016717  00000-0  10270-3 0  9005' as TleLine1;

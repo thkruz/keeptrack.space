@@ -15,17 +15,24 @@
       },
       "sections": {
         "template": "テンプレート",
+        "launchWindow": "打ち上げウィンドウ",
         "launchSite": "発射場"
       },
       "buttons": {
+        "matchTargetPlane": "打ち上げウィンドウを検索",
         "createLaunchNominal": "打ち上げノミナルを作成",
-        "inclinationTooLow": "傾斜角が低すぎます！"
+        "inclinationTooLow": "傾斜角が低すぎます！",
+        "clearWindow": "打ち上げウィンドウをクリア",
+        "createLaunchAtWindow": "ウィンドウで打ち上げを作成"
       },
       "msgs": {
+        "windowFound": "{time} に打ち上げると目標軌道面に一致します（ΔRAAN {delta}°）",
         "launchNominalCreated": "打ち上げノミナルを作成しました！",
         "timeRelativeToLaunch": "時間は打ち上げ時刻からの相対時間になりました。"
       },
       "errorMsgs": {
+        "windowNoTarget": "まず目標衛星を選択してください。",
+        "windowGeometryImpossible": "打ち上げウィンドウがありません：目標の軌道傾斜角が発射場の緯度より小さいです。",
         "noMoreNominalSatellites": "利用可能なノミナル衛星がもうありません！",
         "launchSiteNotFound": "打ち上げ場所 {launchSite} が見つかりません！",
         "failedToCreateTle": "TLEの作成に失敗しました: {error}",
@@ -42,7 +49,9 @@
         "invalidEpochDayFormat": "エポック日の形式が無効です！3桁の数字、小数点、その後に8桁の数字でなければなりません。",
         "epochDayFormatIssue": "この衛星のエポック日の形式に問題がありました。別の衛星を試してください。",
         "failedToPropagate": "衛星の伝播に失敗しました。別のパラメータを試すか、パラメータが正しい場合はこの問題を報告してください。",
-        "changingOrbitBufferFailed": "軌道バッファデータの変更に失敗しました"
+        "changingOrbitBufferFailed": "軌道バッファデータの変更に失敗しました",
+        "launchLatExceedsInclination": "打ち上げ緯度が軌道傾斜角を超えています。",
+        "failedToFitOrbit": "打ち上げ地点に合う軌道を計算できませんでした。"
       },
       "help": {
         "overview": "新規打ち上げメニューは仮想的な打ち上げを作成します。実在する衛星の軌道をコピーし、選択した打ち上げ場所から打ち上がるように回転させ、時計をT+0にリセットします。「この場所からこの種の軌道に何かが打ち上げられた場合、自分のセンサーはいつそれを捉えられるか？」という問いに答えるために使用します。",
@@ -54,7 +63,8 @@
         "tip1": "作成後、時計は打ち上げからの経過時間を表示します。「00:45:00」は打ち上げ後45分を意味し、センサーカバレッジのタイムラインに最適です。",
         "tip2": "作成が高度チェックで失敗した場合は、より一般的な軌道を持つ別のテンプレート衛星を試してください。",
         "shortcutOpen": "新規打ち上げメニューを開く"
-      }
+      },
+      "launchWindowHelp": "軌道面が目標衛星と一致する次の打ち上げ時刻を検索します。これは打ち上げ時刻を設定するだけで、「公称打ち上げを作成」を押すまで何も作成されません。"
     }
   }
 }

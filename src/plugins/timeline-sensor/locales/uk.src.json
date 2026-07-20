@@ -3,6 +3,10 @@
     "SensorTimeline": {
       "bottomIconLabel": "Таймлайн сенсора",
       "title": "Меню таймлайну сенсора",
+      "sections": {
+        "settings": "Налаштування",
+        "sensors": "Сенсори"
+      },
       "labels": {
         "calculationLength": "Тривалість розрахунку (години)",
         "calculationInterval": "Інтервал розрахунку (секунди)",

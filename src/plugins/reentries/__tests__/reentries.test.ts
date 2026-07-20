@@ -1,13 +1,13 @@
-import { vi } from 'vitest';
 /* eslint-disable max-lines-per-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { MenuMode } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { TipMsg, Reentries } from '@app/plugins/reentries/reentries';
+import { Reentries, TipMsg } from '@app/plugins/reentries/reentries';
+import { SpaceObjectType } from '@ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
-import { SpaceObjectType } from '@ootk/src/main';
+import { vi } from 'vitest';
 
 // Mock TIP data
 const mockTipData: TipMsg[] = [
@@ -54,7 +54,7 @@ describe('Reentries_class', () => {
         ok: true,
         status: 200,
         json: () => Promise.resolve(mockTipData),
-      }),
+      })
     ) as vi.Mock;
   });
 
@@ -361,8 +361,8 @@ describe('Reentries_class', () => {
         inclination: 45.0,
         rcs: 2.0,
         toClassicalElements: () => {
- throw new Error('Propagation failed');
-},
+          throw new Error('Propagation failed');
+        },
       } as any;
 
       Reentries['createReentryRow_'](table, mockSat);

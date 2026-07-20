@@ -55,14 +55,15 @@ describe('Screenshot_class', () => {
   });
 });
 
-const mockCtx = () => ({
-  drawImage: vi.fn(),
-  fillText: vi.fn(),
-  measureText: vi.fn(() => ({ width: 10 })),
-  font: '',
-  globalAlpha: 1,
-  fillStyle: '',
-}) as unknown as CanvasRenderingContext2D;
+const mockCtx = () =>
+  ({
+    drawImage: vi.fn(),
+    fillText: vi.fn(),
+    measureText: vi.fn(() => ({ width: 10 })),
+    font: '',
+    globalAlpha: 1,
+    fillStyle: '',
+  }) as unknown as CanvasRenderingContext2D;
 
 describe('Screenshot behavior', () => {
   let plugin: Screenshot;
@@ -88,12 +89,13 @@ describe('Screenshot behavior', () => {
     expect(() => withSecondary.secondaryLogo.onerror?.(new Event('error'))).not.toThrow();
   });
 
-  it('rmbCallback maps each resolution and ignores unknown ids', () => {
+  it('onContextMenuAction takes a 4k shot for the single Save Image item and ignores others', () => {
     const spy = vi.spyOn(plugin, 'saveHiResPhoto').mockImplementation(() => undefined);
 
-    ['save-hd-rmb', 'save-4k-rmb', 'save-8k-rmb', 'unknown-rmb'].forEach((id) => plugin.rmbCallback(id));
+    ['save-rmb', 'unknown-rmb'].forEach((id) => plugin.onContextMenuAction(id));
 
-    expect(spy).toHaveBeenCalledTimes(3);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledWith('4k');
   });
 
   it('command palette commands trigger hi-res capture', () => {
@@ -145,7 +147,7 @@ describe('Screenshot behavior', () => {
       return c;
     };
 
-    vi.spyOn(document, 'createElement').mockImplementation(((tag: string) => (tag === 'canvas' ? fakeCanvas() : ({})))as unknown as typeof document.createElement);
+    vi.spyOn(document, 'createElement').mockImplementation(((tag: string) => (tag === 'canvas' ? fakeCanvas() : {})) as unknown as typeof document.createElement);
     KeepTrack.getInstance().containerRoot.appendChild = vi.fn();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ServiceLocator.getRenderer().domElement = { width: 3840, height: 2160 } as any;

@@ -1,9 +1,9 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { getEl } from '@app/engine/utils/get-el';
 import { SatelliteFov } from '@app/plugins/satellite-fov/satellite-fov';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 import { defaultSat } from '@test/environment/apiMocks';
-import { getEl } from '@app/engine/utils/get-el';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardChangeTests, standardClickTests, standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';

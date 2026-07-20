@@ -49,9 +49,11 @@ describe('UrlManager.parseGetVariables', () => {
   });
 
   it('dispatches the full set of pre-load parameters', () => {
-    setLocation('?date=2023-10-05T14:48:00.000Z&rate=2&plugins=Foo,Bar&bottomMenu=false&canvas=false' +
-      '&planets=false&vimpel=true&external-only&gp=a&tle=b&limitSats=25544&regime=geo&earth=satellite' +
-      '&sun=high&sensors=false&launchSites=false&dots=1&ecf=2&color=velocity&msbai&unknownKey=1');
+    setLocation(
+      '?date=2023-10-05T14:48:00.000Z&rate=2&plugins=Foo,Bar&bottomMenu=false&canvas=false' +
+        '&planets=false&vimpel=true&external-only&gp=a&tle=b&limitSats=25544&regime=geo&earth=satellite' +
+        '&sun=high&sensors=false&launchSites=false&dots=1&ecf=2&color=velocity&msbai&unknownKey=1'
+    );
 
     const result = UrlManager.parseGetVariables(settingsManager);
 

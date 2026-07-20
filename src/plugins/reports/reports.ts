@@ -1,4 +1,3 @@
-
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
@@ -23,29 +22,23 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { MenuMode } from '@app/engine/core/interfaces';
-import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl } from '@app/engine/utils/get-el';
-import analysisPng from '@public/img/icons/reports.png';
-
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
 import { StorageKey } from '@app/engine/persistence/storage-key';
-import {
-  IBottomIconConfig,
-  ICommandPaletteCommand,
-  IHelpConfig,
-  ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, ICommandPaletteCommand, IHelpConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { Kilometers, Satellite, TemeVec3 } from '@ootk/src/main';
+import analysisPng from '@public/img/icons/reports.png';
 
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { BestPassDeps, findPassesForSat } from '../best-pass/best-pass-calculator';
@@ -310,36 +303,34 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
   private static buildActionRows_(reports: ReportGenerator[]): string {
     return reports
-      .map((report) => html`
+      .map(
+        (report) => html`
         <button id="${report.id}-btn" type="button" class="kt-action waves-effect" title="${report.description || report.name}">
           <span class="kt-action-label">${report.name}</span>
         </button>
-      `)
+      `
+      )
       .join('');
   }
 
   private buildWindowOptions_(): string {
-    return WINDOW_OPTIONS_SEC
-      .map((sec) => {
-        const days = sec / (24 * 60 * 60);
+    return WINDOW_OPTIONS_SEC.map((sec) => {
+      const days = sec / (24 * 60 * 60);
 
-        return `<option value="${sec}" ${sec === this.windowSec_ ? 'selected' : ''}>${l('options.days').replace('{days}', days.toString())}</option>`;
-      })
-      .join('');
+      return `<option value="${sec}" ${sec === this.windowSec_ ? 'selected' : ''}>${l('options.days').replace('{days}', days.toString())}</option>`;
+    }).join('');
   }
 
   private buildStepOptions_(): string {
-    return STEP_OPTIONS_SEC
-      .map((sec) => `<option value="${sec}" ${sec === this.stepSec_ ? 'selected' : ''}>${l('options.seconds').replace('{seconds}', sec.toString())}</option>`)
-      .join('');
+    return STEP_OPTIONS_SEC.map(
+      (sec) => `<option value="${sec}" ${sec === this.stepSec_ ? 'selected' : ''}>${l('options.seconds').replace('{seconds}', sec.toString())}</option>`
+    ).join('');
   }
 
   private buildFormatOptions_(): string {
     const formats: ReportFormat[] = ['text', 'csv', 'json'];
 
-    return formats
-      .map((fmt) => `<option value="${fmt}" ${fmt === this.format_ ? 'selected' : ''}>${l(`options.format_${fmt}`)}</option>`)
-      .join('');
+    return formats.map((fmt) => `<option value="${fmt}" ${fmt === this.format_ ? 'selected' : ''}>${l(`options.format_${fmt}`)}</option>`).join('');
   }
 
   // =========================================================================
@@ -528,11 +519,17 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
     // Detect passes with a coarse step (short LEO passes are minutes long); the
     // finer per-sample resolution for AER is applied separately via opts.stepSec.
-    const { passes } = findPassesForSat(sat.sccNum, satrec, sensor, {
-      lengthDays: opts.windowSec / (24 * 60 * 60),
-      intervalSec: Math.min(opts.stepSec, 30),
-      maxResults: 1000,
-    }, deps);
+    const { passes } = findPassesForSat(
+      sat.sccNum,
+      satrec,
+      sensor,
+      {
+        lengthDays: opts.windowSec / (24 * 60 * 60),
+        intervalSec: Math.min(opts.stepSec, 30),
+        maxResults: 1000,
+      },
+      deps
+    );
 
     return passes.map((row) => ({
       aos: row.START_DATE as Date,

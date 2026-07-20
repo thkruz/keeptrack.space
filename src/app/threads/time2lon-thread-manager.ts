@@ -9,14 +9,14 @@
 import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
 import type { Time2LonSatLine } from '@app/plugins/plot-analysis/time2lon-core';
 import {
-  T2lWorkerMsgType,
-  T2lWorkerOutMsgType,
   type T2lMsgStart,
   type T2lOutChunk,
   type T2lOutError,
   type T2lOutProgress,
   type T2lSatData,
+  T2lWorkerMsgType,
   type T2lWorkerOutMsg,
+  T2lWorkerOutMsgType,
 } from '@app/webworker/time2lon-messages';
 
 export interface Time2LonCallbacks {

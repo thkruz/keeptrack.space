@@ -106,8 +106,19 @@ describe('SatConstellations_composition', () => {
 
 describe('SatConstellations_constellation_click', () => {
   const constellationSlugs = [
-    'SpaceStations', 'AmateurRadio', 'GPSGroup', 'GalileoGroup', 'GlonassGroup',
-    'iridium', 'orbcomm', 'globalstar', 'ses', 'aehf', 'wgs', 'starlink', 'sbirs',
+    'SpaceStations',
+    'AmateurRadio',
+    'GPSGroup',
+    'GalileoGroup',
+    'GlonassGroup',
+    'iridium',
+    'orbcomm',
+    'globalstar',
+    'ses',
+    'aehf',
+    'wgs',
+    'starlink',
+    'sbirs',
   ];
 
   beforeEach(() => {
@@ -116,20 +127,18 @@ describe('SatConstellations_constellation_click', () => {
 
     const groupList: Record<string, unknown> = {};
 
-    vi.spyOn(ServiceLocator, 'getGroupsManager').mockReturnValue(
-      ({
-        createGroup: (_type: GroupType, _listOfSats: number[] | RegExp, name: string) => {
-          groupList[name] = {
-            objects: [0],
-            ids: [0],
-          };
-        },
-        selectGroup: () => {
-          // Do nothing
-        },
-        groupList,
-      }) as unknown as GroupsManager,
-    );
+    vi.spyOn(ServiceLocator, 'getGroupsManager').mockReturnValue({
+      createGroup: (_type: GroupType, _listOfSats: number[] | RegExp, name: string) => {
+        groupList[name] = {
+          objects: [0],
+          ids: [0],
+        };
+      },
+      selectGroup: () => {
+        // Do nothing
+      },
+      groupList,
+    } as unknown as GroupsManager);
 
     vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({
       searchManager: {

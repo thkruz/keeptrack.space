@@ -1,7 +1,7 @@
-import { vi } from 'vitest';
 import { satDetailService } from '@app/app/data/catalogs/sat-detail-service';
 import { Satellite } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
+import { vi } from 'vitest';
 
 /*
  * SatDetailDataService lazily fetches per-satellite detail and merges the
@@ -9,11 +9,12 @@ import { defaultSat } from '@test/environment/apiMocks';
  * (which apiFetch delegates to) is stubbed so the merge + guard logic is tested
  * without network.
  */
-const respond = (body: unknown, ok = true, status = 200) => ({
-  ok,
-  status,
-  json: () => Promise.resolve(body),
-} as Response);
+const respond = (body: unknown, ok = true, status = 200) =>
+  ({
+    ok,
+    status,
+    json: () => Promise.resolve(body),
+  }) as Response;
 
 const satWith = (sccNum: string): Satellite => {
   const s = defaultSat.clone() as Satellite;

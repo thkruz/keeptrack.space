@@ -11,6 +11,7 @@ import { KeyboardComponent } from '../plugins/components/keyboard/keyboard-compo
 import { AtmosphereSettings, EarthTextureStyle } from '../rendering/draw-manager/earth-quality-enums';
 import { errorManagerInstance } from '../utils/errorManager';
 import { getEl } from '../utils/get-el';
+import { waitForCruncher } from '../utils/waitForCruncher';
 
 export abstract class UrlManager {
   private static selectedSat_: Satellite | null = null;
@@ -18,20 +19,20 @@ export abstract class UrlManager {
   private static propRate_: number;
   private static readonly MAX_URL_LENGTH_ = 2000;
   private static readonly colorSchemeDefinitions_ = {
-    'type': 'ObjectTypeColorScheme',
-    'celestrak': 'CelestrakColorScheme',
-    'country': 'CountryColorScheme',
-    'rcs': 'RcsColorScheme',
-    'mission': 'MissionColorScheme',
-    'confidence': 'ConfidenceColorScheme',
-    'orbitalplane': 'OrbitalPlaneDensityColorScheme',
-    'spatial': 'SpatialDensityColorScheme',
-    'sunlight': 'SunlightColorScheme',
-    'gpage': 'GpAgeColorScheme',
-    'source': 'SourceColorScheme',
-    'velocity': 'VelocityColorScheme',
-    'starlink': 'StarlinkColorScheme',
-    'smallsat': 'SmallSatColorScheme',
+    type: 'ObjectTypeColorScheme',
+    celestrak: 'CelestrakColorScheme',
+    country: 'CountryColorScheme',
+    rcs: 'RcsColorScheme',
+    mission: 'MissionColorScheme',
+    confidence: 'ConfidenceColorScheme',
+    orbitalplane: 'OrbitalPlaneDensityColorScheme',
+    spatial: 'SpatialDensityColorScheme',
+    sunlight: 'SunlightColorScheme',
+    gpage: 'GpAgeColorScheme',
+    source: 'SourceColorScheme',
+    velocity: 'VelocityColorScheme',
+    starlink: 'StarlinkColorScheme',
+    smallsat: 'SmallSatColorScheme',
   };
   static lastUpdateTime_: number;
 
@@ -94,7 +95,6 @@ export abstract class UrlManager {
         }
 
         return encodeURIComponent(item);
-
       })
       .join('')
       .split('&');
@@ -137,7 +137,6 @@ export abstract class UrlManager {
 
     // Then Do Other Stuff
     Object.keys(kv).forEach((key) => {
-
       // Handle things that happen before loading (remember other components might not be ready yet)
       switch (key) {
         case 'date':
@@ -239,15 +238,7 @@ export abstract class UrlManager {
       EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
         switch (key) {
           case 'search':
-            if (!settingsManager.disableUI) {
-              const uiManagerInstance = ServiceLocator.getUiManager();
-
-              uiManagerInstance.doSearch(kv.search);
-              if (settingsManager.lastSearchResults.length === 0) {
-                uiManagerInstance.toast(`Search for "${kv.search}" found nothing!`, ToastMsgType.caution, true);
-                uiManagerInstance.searchManager.hideResults();
-              }
-            }
+            this.handleSearchParam_(kv.search);
             break;
           case 'intldes':
             this.handleIntldesParam_(kv[key]);
@@ -386,7 +377,7 @@ export abstract class UrlManager {
 
       if (ServiceLocator.getColorSchemeManager().currentColorScheme.id !== 'CelestrakColorScheme') {
         const shorthandFromDefinition = Object.keys(UrlManager.colorSchemeDefinitions_).find(
-          (key) => UrlManager.colorSchemeDefinitions_[key] === ServiceLocator.getColorSchemeManager().currentColorScheme.id,
+          (key) => UrlManager.colorSchemeDefinitions_[key] === ServiceLocator.getColorSchemeManager().currentColorScheme.id
         );
 
         paramSlices.push(`color=${shorthandFromDefinition}`);
@@ -476,6 +467,54 @@ export abstract class UrlManager {
         window.history.replaceState(null, '', url);
       }, 100);
     }
+  }
+
+  /**
+   * Runs the URL-driven search, but only once the position cruncher has delivered
+   * a synced snapshot.
+   *
+   * Firing the search synchronously on `onKeepTrackReady` loses a race: the dots
+   * position/color pipeline is not warm yet, so `doSearch` fills the search box and
+   * builds the result group, but the group-color highlight silently no-ops against a
+   * cruncher that has not sent its first frame. The user sees a filled search box with
+   * nothing selected, and only a manual retype (which re-runs the search after the
+   * pipeline is live) fixes it. Waiting for the cruncher makes the on-load search
+   * behave like a manual one. Mirrors ColorSchemeManager.calcColorBufsNextCruncher().
+   */
+  private static handleSearchParam_(searchString: string) {
+    if (settingsManager.disableUI) {
+      return;
+    }
+
+    const runSearch = () => {
+      const uiManagerInstance = ServiceLocator.getUiManager();
+
+      uiManagerInstance.doSearch(searchString);
+      if (settingsManager.lastSearchResults.length === 0) {
+        uiManagerInstance.toast(`Search for "${searchString}" found nothing!`, ToastMsgType.caution, true);
+        uiManagerInstance.searchManager.hideResults();
+      }
+    };
+
+    const satCruncher = ServiceLocator.getCatalogManager()?.satCruncherThread?.worker;
+
+    // No cruncher (e.g. disabled catalog, test env) — nothing to sync with, so run now.
+    if (!satCruncher) {
+      runSearch();
+
+      return;
+    }
+
+    waitForCruncher({
+      cruncher: satCruncher,
+      cb: runSearch,
+      // Every propagation message carries satPos; skip a couple so the main-thread
+      // position/color buffers are in sync before the group highlight is applied.
+      validationFunc: (m) => Boolean(m.satPos),
+      skipNumber: 2,
+      isRunCbOnFailure: true,
+      maxRetries: 5,
+    });
   }
 
   private static handleIntldesParam_(val: string) {
@@ -608,12 +647,12 @@ export abstract class UrlManager {
     const mainCameraInstance = ServiceLocator.getMainCamera();
 
     mainCameraInstance.autoRotate(false);
-    mainCameraInstance.camSnap(pitchNum * DEG2RAD as Radians, yawNum * DEG2RAD as Radians);
+    mainCameraInstance.camSnap((pitchNum * DEG2RAD) as Radians, (yawNum * DEG2RAD) as Radians);
 
     if (kv.sat) {
       mainCameraInstance.state.camAngleSnappedOnSat = false;
-      mainCameraInstance.state.ftsPitch = pitchNum * DEG2RAD as Radians;
-      mainCameraInstance.state.ftsYaw = yawNum * DEG2RAD as Radians;
+      mainCameraInstance.state.ftsPitch = (pitchNum * DEG2RAD) as Radians;
+      mainCameraInstance.state.ftsYaw = (yawNum * DEG2RAD) as Radians;
     }
   }
 
@@ -621,7 +660,6 @@ export abstract class UrlManager {
     const latNum = parseFloat(lat) as Degrees;
     const lonNum = parseFloat(lon) as Degrees;
     const zoomNum = parseFloat(zoom);
-
 
     if (isNaN(zoomNum)) {
       ServiceLocator.getUiManager().toast(`Zoom value of "${zoom}" is not a valid float!`, ToastMsgType.caution, true);
@@ -748,7 +786,11 @@ export abstract class UrlManager {
   private static readonly VALID_REGIMES_ = ['vleo', 'leo', 'meo', 'geo', 'heo', 'xgeo'];
 
   private static handleRegimeParam_(val: string): void {
-    const regimes = val.toLowerCase().split(',').map((r) => r.trim()).filter((r) => r.length > 0);
+    const regimes = val
+      .toLowerCase()
+      .split(',')
+      .map((r) => r.trim())
+      .filter((r) => r.length > 0);
     const valid: string[] = [];
 
     for (const r of regimes) {

@@ -6,6 +6,31 @@ import { MissileObject } from '../data/catalog-manager/MissileObject';
 import { SearchResult, SearchResultType } from './search-manager';
 
 /**
+ * The zero-padded canonical NORAD key used for numeric matching. sccNum6 is
+ * null for extended (7+ digit) IDs, so fall back to the canonical sccNum, then
+ * pad to the 6-digit width. Padding makes a leading-zero query width-specific:
+ * "070000" matches only 70000, while a shorter "70000" still substring-matches
+ * both 70000 and 270000.
+ */
+function paddedSccKey(sat: Satellite): string {
+  return (sat.sccNum6 ?? sat.sccNum ?? '').padStart(6, '0');
+}
+
+/**
+ * Highlight offsets for a numeric NORAD match, computed against the display
+ * sccNum (which carries no leading zeros). The query is aligned by its
+ * zero-stripped form so a leading zero the user typed for disambiguation is
+ * not counted into the highlighted span.
+ */
+function noradHighlight(sat: Satellite, term: string): { strIndex: number; patlen: number } {
+  const display = sat.sccNum ?? '';
+  const stripped = term.replace(/^0+/u, '') || term;
+  const idx = display.indexOf(stripped);
+
+  return idx < 0 ? { strIndex: 0, patlen: 0 } : { strIndex: idx, patlen: stripped.length };
+}
+
+/**
  * Run a regular (text) search over the catalog, returning at most
  * {@link settingsManager.searchLimit} results plus the total number found.
  */
@@ -64,7 +89,7 @@ function matchSatelliteOrMissile(
   searchStringIn: string,
   len: number,
   searchableFields: SearchableFields,
-  addResult_: (result: SearchResult) => void,
+  addResult_: (result: SearchResult) => void
 ): void {
   if (searchableFields.name && sat.name.toUpperCase().includes(searchStringIn)) {
     addResult_({ strIndex: sat.name.toUpperCase().indexOf(searchStringIn), searchType: SearchResultType.OBJECT_NAME, patlen: len, id: sat.id });
@@ -93,13 +118,31 @@ function matchSatelliteOrMissile(
     return;
   }
 
-  if (searchableFields.noradId && sat.sccNum?.includes(searchStringIn)) {
-    // Ignore Notional Satellites unless all 6 characters are entered
-    if (sat.name.includes(' Notional)') && searchStringIn.length < 6) {
+  if (searchableFields.noradId) {
+    const rawKey = sat.sccNum6 ?? sat.sccNum;
+
+    if (rawKey && paddedSccKey(sat).includes(searchStringIn)) {
+      // Ignore Notional Satellites unless all 6 characters are entered
+      if (sat.name.includes(' Notional)') && searchStringIn.length < 6) {
+        return;
+      }
+
+      const { strIndex, patlen } = noradHighlight(sat, searchStringIn);
+
+      addResult_({ strIndex, searchType: SearchResultType.NORAD_ID, patlen, id: sat.id });
+
       return;
     }
+  }
 
-    addResult_({ strIndex: sat.sccNum.indexOf(searchStringIn), searchType: SearchResultType.NORAD_ID, patlen: len, id: sat.id });
+  /*
+   * Alpha-5 designation ("A0000" = 100000, "T0001" = 270001). sccNum is always
+   * the numeric form, so a letter-bearing NORAD query can only match here. No
+   * Notional guard is needed: notional IDs (400000+) exceed alpha-5 capacity,
+   * leaving sccNum5 null.
+   */
+  if (searchableFields.noradId && sat.sccNum5?.includes(searchStringIn)) {
+    addResult_({ strIndex: sat.sccNum5.indexOf(searchStringIn), searchType: SearchResultType.NORAD_ID_A5, patlen: len, id: sat.id });
 
     return;
   }
@@ -125,12 +168,7 @@ function matchSatelliteOrMissile(
  * name. These types are gated by {@link settingsManager.searchableTypes} and
  * already filtered upstream, so a match here just needs the right result type.
  */
-function matchOtherObject(
-  obj: BaseObject,
-  searchStringIn: string,
-  len: number,
-  addResult_: (result: SearchResult) => void,
-): void {
+function matchOtherObject(obj: BaseObject, searchStringIn: string, len: number, addResult_: (result: SearchResult) => void): void {
   const searchType = otherObjectSearchType(obj);
 
   if (searchType === null) {
@@ -164,11 +202,13 @@ function otherObjectSearchType(obj: BaseObject): SearchResultType | null {
 
 /** True for actual celestial bodies (planets/moons), excluding placeholder Planet slots (UNKNOWN type). */
 function isCelestialBody(obj: BaseObject): boolean {
-  return obj.type === SpaceObjectType.TERRESTRIAL_PLANET ||
+  return (
+    obj.type === SpaceObjectType.TERRESTRIAL_PLANET ||
     obj.type === SpaceObjectType.GAS_GIANT ||
     obj.type === SpaceObjectType.ICE_GIANT ||
     obj.type === SpaceObjectType.DWARF_PLANET ||
-    obj.type === SpaceObjectType.MOON;
+    obj.type === SpaceObjectType.MOON
+  );
 }
 
 /** True when the object's kind is enabled in the searchable-type toggles. */
@@ -213,8 +253,7 @@ export function runNumOnlySearch(searchString: string): { results: SearchResult[
   settingsManager.lastSearch = searchList;
 
   // Initialize search results
-  const satData = (getSearchableObjects(true) as Satellite[])
-    .sort((a, b) => (a.sccNum6 ?? a.sccNum ?? '').localeCompare(b.sccNum6 ?? b.sccNum ?? '', 'en', { numeric: true }));
+  const satData = (getSearchableObjects(true) as Satellite[]).sort((a, b) => (a.sccNum6 ?? a.sccNum ?? '').localeCompare(b.sccNum6 ?? b.sccNum ?? '', 'en', { numeric: true }));
 
   let i = 0;
   let lastFoundI = 0;
@@ -238,18 +277,25 @@ export function runNumOnlySearch(searchString: string): { results: SearchResult[
         continue;
       }
 
-      // sccNum6 is null for extended (7+ digit) IDs — fall back to the
-      // canonical sccNum so CelesTrak supplemental IDs are searchable too.
-      const matchKey = sat.sccNum6 ?? sat.sccNum;
+      // Skip sats with no catalog number (briefly possible after a reload).
+      if (!(sat.sccNum6 ?? sat.sccNum)) {
+        continue;
+      }
 
-      if (matchKey && matchKey.indexOf(searchStringIn) !== -1) {
+      // Match against the zero-padded 6-digit key so a leading-zero query is
+      // width-specific ("070000" -> only 70000, not 270000).
+      const matchKey = paddedSccKey(sat);
+
+      if (matchKey.includes(searchStringIn)) {
         if (!seenIds.has(sat.id)) {
           seenIds.add(sat.id);
           totalFound++;
           if (results.length < limit) {
+            const { strIndex, patlen } = noradHighlight(sat, searchStringIn);
+
             results.push({
-              strIndex: sat.sccNum.indexOf(searchStringIn),
-              patlen: searchStringIn.length,
+              strIndex,
+              patlen,
               id: sat.id,
               searchType: SearchResultType.NORAD_ID,
             });
@@ -257,6 +303,8 @@ export function runNumOnlySearch(searchString: string): { results: SearchResult[
         }
         lastFoundI = i;
 
+        // A full-width query (matches the whole padded key) is unique; stop
+        // scanning. A shorter query keeps scanning for further substring hits.
         if (searchStringIn.length === matchKey.length) {
           break;
         }
@@ -277,53 +325,55 @@ function getSearchableObjects(onlySatellites = false): BaseObject[] {
   const catalogManagerInstance = ServiceLocator.getCatalogManager();
   const dotsManagerInstance = ServiceLocator.getDotsManager();
 
-  return catalogManagerInstance.objectCache.filter((obj) => {
-    // Type allow-list. The numeric path is satellites-only; everything else
-    // respects the per-type toggles (satellites, missiles, stars, sensors,
-    // launch sites, and planets). Markers and unused OEM placeholder slots
-    // (UNKNOWN-type Planet instances) are never matched.
-    if (onlySatellites) {
-      if (!obj.isSatellite() || !settingsManager.searchableTypes.satellite) {
+  return catalogManagerInstance.objectCache
+    .filter((obj) => {
+      // Type allow-list. The numeric path is satellites-only; everything else
+      // respects the per-type toggles (satellites, missiles, stars, sensors,
+      // launch sites, and planets). Markers and unused OEM placeholder slots
+      // (UNKNOWN-type Planet instances) are never matched.
+      if (onlySatellites) {
+        if (!obj.isSatellite() || !settingsManager.searchableTypes.satellite) {
+          return false;
+        }
+      } else if (!isSearchableType(obj)) {
         return false;
       }
-    } else if (!isSearchableType(obj)) {
-      return false;
-    }
 
-    if (!obj.active) {
-      return false;
-    } // Skip inactive objects (decayed missiles, fake analyst sats, etc.)
+      if (!obj.active) {
+        return false;
+      } // Skip inactive objects (decayed missiles, fake analyst sats, etc.)
 
-    // MIRV children ride on top of the bus during ascent and are hidden until the
-    // reentry vehicles separate at apogee; keep them out of results until then. The
-    // missile plugin re-runs this search at separation, so they appear in the menu
-    // in step with their dots (and rewinding past separation removes them again).
-    if (obj instanceof MissileObject && !obj.isVisibleNow()) {
-      return false;
-    }
-
-    if (!obj.name) {
-      return false;
-    } // Everything has a name. If it doesn't then assume it isn't what we are searching for.
-
-    // Skip decayed satellites (position 0,0,0) if setting is disabled. Static
-    // objects (stars, sensors, launch sites, planets) hold fixed positions that
-    // are not in the dots position buffer, so never treat them as decayed.
-    if (!obj.isStatic() && !settingsManager.isShowDecayedInSearch && dotsManagerInstance.positionData) {
-      const pos = dotsManagerInstance.getCurrentPosition(Number(obj.id));
-
-      if (pos?.x === 0 && pos?.y === 0 && pos?.z === 0) {
+      // MIRV children ride on top of the bus during ascent and are hidden until the
+      // reentry vehicles separate at apogee; keep them out of results until then. The
+      // missile plugin re-runs this search at separation, so they appear in the menu
+      // in step with their dots (and rewinding past separation removes them again).
+      if (obj instanceof MissileObject && !obj.isVisibleNow()) {
         return false;
       }
-    }
 
-    return true;
-  }).sort((a, b) => {
-    // Sort by sccNum
-    if ((a as Satellite).sccNum && (b as Satellite).sccNum) {
-      return Number.parseInt((a as Satellite).sccNum) - Number.parseInt((b as Satellite).sccNum);
-    }
+      if (!obj.name) {
+        return false;
+      } // Everything has a name. If it doesn't then assume it isn't what we are searching for.
 
-    return 0;
-  });
+      // Skip decayed satellites (position 0,0,0) if setting is disabled. Static
+      // objects (stars, sensors, launch sites, planets) hold fixed positions that
+      // are not in the dots position buffer, so never treat them as decayed.
+      if (!obj.isStatic() && !settingsManager.isShowDecayedInSearch && dotsManagerInstance.positionData) {
+        const pos = dotsManagerInstance.getCurrentPosition(Number(obj.id));
+
+        if (pos?.x === 0 && pos?.y === 0 && pos?.z === 0) {
+          return false;
+        }
+      }
+
+      return true;
+    })
+    .sort((a, b) => {
+      // Sort by sccNum
+      if ((a as Satellite).sccNum && (b as Satellite).sccNum) {
+        return Number.parseInt((a as Satellite).sccNum) - Number.parseInt((b as Satellite).sccNum);
+      }
+
+      return 0;
+    });
 }

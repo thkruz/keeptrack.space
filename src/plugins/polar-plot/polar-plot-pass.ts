@@ -88,7 +88,7 @@ export const samplePassTrack = (
   deps: Pick<BestPassDeps, 'getRae' | 'checkIsInView'>,
   aosMs: number,
   losMs: number,
-  stepSec: number = POLAR_PASS_DEFAULTS.trackStepSec,
+  stepSec: number = POLAR_PASS_DEFAULTS.trackStepSec
 ): PolarSample[] => {
   const samples: PolarSample[] = [];
   const stepMs = Math.max(1, stepSec) * 1000;
@@ -150,13 +150,7 @@ export const buildPolarPass = (row: lookanglesRow, samples: PolarSample[]): Pola
  * ended (LOS before the simulation epoch) are dropped, so the first entry is the
  * pass in progress or the next one to come.
  */
-export const findPolarPasses = (
-  satId: string,
-  satrec: SatelliteRecord,
-  sensor: DetailedSensor,
-  deps: BestPassDeps,
-  options: PolarPassOptions,
-): PolarPass[] => {
+export const findPolarPasses = (satId: string, satrec: SatelliteRecord, sensor: DetailedSensor, deps: BestPassDeps, options: PolarPassOptions): PolarPass[] => {
   const coarseStepSec = options.coarseStepSec ?? POLAR_PASS_DEFAULTS.coarseStepSec;
   const trackStepSec = options.trackStepSec ?? POLAR_PASS_DEFAULTS.trackStepSec;
   const lookbackMs = options.lookbackMs ?? POLAR_PASS_DEFAULTS.lookbackMs;
@@ -164,12 +158,18 @@ export const findPolarPasses = (
 
   // Search starting in the past so an in-progress pass keeps its true AOS.
   const searchDeps: BestPassDeps = { ...deps, baseTimeMs: nowMs - lookbackMs };
-  const { passes } = findPassesForSat(satId, satrec, sensor, {
-    lengthDays: options.windowDays + lookbackMs / MS_PER_DAY,
-    intervalSec: coarseStepSec,
-    // Over-request: some early rows are dropped for having already ended.
-    maxResults: options.maxPasses + 2,
-  }, searchDeps);
+  const { passes } = findPassesForSat(
+    satId,
+    satrec,
+    sensor,
+    {
+      lengthDays: options.windowDays + lookbackMs / MS_PER_DAY,
+      intervalSec: coarseStepSec,
+      // Over-request: some early rows are dropped for having already ended.
+      maxResults: options.maxPasses + 2,
+    },
+    searchDeps
+  );
 
   const result: PolarPass[] = [];
 

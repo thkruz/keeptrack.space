@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-undefined */
 import { Pickable } from '@app/engine/core/interfaces';
@@ -6,6 +5,7 @@ import { ObjectTypeColorScheme } from '@app/engine/rendering/color-schemes/objec
 import { SpaceObjectType } from '@ootk/src/main';
 import { mockSatellites } from '@test/engine/rendering/color-schemes/__fixtures__/mock-satellites';
 import { ColorSchemeTestUtils } from '@test/engine/rendering/color-schemes/__helpers__/color-scheme-test-utils';
+import { vi } from 'vitest';
 
 // Mock dependencies
 vi.mock('@app/keepTrackApi', () => ({
@@ -189,11 +189,7 @@ describe('ObjectTypeColorScheme', () => {
     it('should handle all test satellites without errors', () => {
       const testSatellites = ColorSchemeTestUtils.createTestSatelliteCollection();
 
-      ColorSchemeTestUtils.testColorSchemeWithSatellites(
-        colorScheme,
-        testSatellites,
-        (sat, scheme) => (scheme as ObjectTypeColorScheme).update(sat),
-      );
+      ColorSchemeTestUtils.testColorSchemeWithSatellites(colorScheme, testSatellites, (sat, scheme) => (scheme as ObjectTypeColorScheme).update(sat));
     });
   });
 
@@ -203,7 +199,7 @@ describe('ObjectTypeColorScheme', () => {
         ColorSchemeTestUtils.createMockSatellite({
           id: i,
           type: [SpaceObjectType.PAYLOAD, SpaceObjectType.ROCKET_BODY, SpaceObjectType.DEBRIS][i % 3],
-        }),
+        })
       );
       const startTime = performance.now();
 

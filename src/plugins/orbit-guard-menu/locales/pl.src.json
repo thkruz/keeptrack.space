@@ -3,6 +3,9 @@
     "OrbitGuardMenuPlugin": {
       "bottomIconLabel": "Strażnik orbity",
       "title": "Strażnik orbity",
+      "sections": {
+        "results": "Wyniki"
+      },
       "labels": {
         "dataCredit": "*Dane Strażnika orbity dostarcza MSBAI.",
         "previous": "Poprzednia",

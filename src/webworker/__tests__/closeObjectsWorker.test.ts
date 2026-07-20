@@ -38,16 +38,13 @@ const loadWorker = async () => {
 };
 
 const dispatch = (data: Record<string, unknown>) => {
-  (globalThis.onmessage as ((m: { data: unknown }) => void))({ data });
+  (globalThis.onmessage as (m: { data: unknown }) => void)({ data });
 };
 
 const startMsg = (overrides: Record<string, unknown> = {}) => ({
   typ: IN.START_SEARCH,
   runId: 1,
-  sats: [
-    coSat('25544', 'ISS-A', TLE1_A, TLE2_A),
-    coSat('25545', 'ISS-B', TLE1_B, TLE2_B),
-  ],
+  sats: [coSat('25544', 'ISS-A', TLE1_A, TLE2_A), coSat('25545', 'ISS-B', TLE1_B, TLE2_B)],
   pairs: [[0, 1]],
   searchRadiusKm: 1e9,
   minMissDistanceKm: 0,
@@ -110,10 +107,12 @@ describe('closeObjectsWorker', () => {
     posted = [];
 
     // Same element set twice => near-zero miss => dropped by the minMissDistance gate.
-    dispatch(startMsg({
-      sats: [coSat('25544', 'A', TLE1_A, TLE2_A), coSat('25545', 'B', TLE1_A, TLE2_A)],
-      minMissDistanceKm: 1,
-    }));
+    dispatch(
+      startMsg({
+        sats: [coSat('25544', 'A', TLE1_A, TLE2_A), coSat('25545', 'B', TLE1_A, TLE2_A)],
+        minMissDistanceKm: 1,
+      })
+    );
 
     const verified = posted.find((p) => p.typ === OUT.VERIFIED);
 
@@ -135,9 +134,11 @@ describe('closeObjectsWorker', () => {
     await loadWorker();
     posted = [];
 
-    dispatch(startMsg({
-      sats: [coSat('25544', 'A', TLE1_A, TLE2_A), coSat('25544', 'B', TLE1_B, TLE2_B)],
-    }));
+    dispatch(
+      startMsg({
+        sats: [coSat('25544', 'A', TLE1_A, TLE2_A), coSat('25544', 'B', TLE1_B, TLE2_B)],
+      })
+    );
 
     const verified = posted.find((p) => p.typ === OUT.VERIFIED);
 
@@ -148,9 +149,11 @@ describe('closeObjectsWorker', () => {
     await loadWorker();
     posted = [];
 
-    dispatch(startMsg({
-      sats: [coSat('25544', 'A', TLE1_A, TLE2_A), coSat('00000', 'BAD', 'garbage', 'garbage')],
-    }));
+    dispatch(
+      startMsg({
+        sats: [coSat('25544', 'A', TLE1_A, TLE2_A), coSat('00000', 'BAD', 'garbage', 'garbage')],
+      })
+    );
 
     expect(posted.find((p) => p.typ === OUT.VERIFIED)!.results!.length).toBe(0);
     expect(posted.find((p) => p.typ === OUT.COMPLETE)).toBeDefined();

@@ -1,6 +1,6 @@
 import { estimateStdMag } from '@app/app/analysis/std-mag-estimator';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite } from '@ootk/src/main';
@@ -46,7 +46,7 @@ export class VisualMagnitudeColorScheme extends ColorScheme {
    */
   static readonly uniqueColorTheme = {
     vmagBright: [0.992, 0.906, 0.145, 0.9] as rgbaArray,
-    vmagBright2: [0.369, 0.788, 0.380, 0.9] as rgbaArray,
+    vmagBright2: [0.369, 0.788, 0.38, 0.9] as rgbaArray,
     vmagMed1: [0.125, 0.569, 0.549, 0.9] as rgbaArray,
     vmagMed2: [0.192, 0.408, 0.557, 0.9] as rgbaArray,
     vmagDim1: [0.243, 0.286, 0.537, 0.9] as rgbaArray,
@@ -58,15 +58,7 @@ export class VisualMagnitudeColorScheme extends ColorScheme {
     vmagUnknown: [0.5, 0.5, 0.5, 0.4] as rgbaArray,
   };
 
-  private static readonly BUCKET_SLUGS = [
-    'vmagBright',
-    'vmagBright2',
-    'vmagMed1',
-    'vmagMed2',
-    'vmagDim1',
-    'vmagDim2',
-    'vmagFaint',
-  ] as const;
+  private static readonly BUCKET_SLUGS = ['vmagBright', 'vmagBright2', 'vmagMed1', 'vmagMed2', 'vmagDim1', 'vmagDim2', 'vmagFaint'] as const;
 
   /**
    * Used until `calculateParams` has scanned the catalog at least once.
@@ -81,11 +73,13 @@ export class VisualMagnitudeColorScheme extends ColorScheme {
   constructor() {
     super(VisualMagnitudeColorScheme.uniqueColorTheme);
     this.objectTypeFlags = {
-      ...this.objectTypeFlags, ...VisualMagnitudeColorScheme.uniqueObjectTypeFlags,
+      ...this.objectTypeFlags,
+      ...VisualMagnitudeColorScheme.uniqueObjectTypeFlags,
     };
   }
 
-  override calculateParams() { // NOSONAR: S3516 - returns null by design; results are stored in this.thresholds_ and the manager treats null as "no params"
+  override calculateParams() {
+    // NOSONAR: S3516 - returns null by design; results are stored in this.thresholds_ and the manager treats null as "no params"
     const catalog = ServiceLocator.getCatalogManager();
     const sats = catalog?.getSats() ?? [];
     const mags: number[] = [];

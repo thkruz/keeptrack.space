@@ -18,7 +18,7 @@ export enum MilkyWayTextureQuality {
   LOW = '1k',
   MEDIUM = '4k',
   HIGH = '8k',
-  ULTRA = '16k'
+  ULTRA = '16k',
 }
 
 export class SkyBoxSphere {
@@ -38,11 +38,11 @@ export class SkyBoxSphere {
   DEFAULT_RESOLUTION = MilkyWayTextureQuality.MEDIUM;
   MILKYWAY_SRC_BASE = 'skybox';
   textureMilkyWay: Record<MilkyWayTextureQuality, WebGLTexture> = {
-    [MilkyWayTextureQuality.OFF]: <WebGLTexture><unknown>null,
-    [MilkyWayTextureQuality.LOW]: <WebGLTexture><unknown>null,
-    [MilkyWayTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
-    [MilkyWayTextureQuality.HIGH]: <WebGLTexture><unknown>null,
-    [MilkyWayTextureQuality.ULTRA]: <WebGLTexture><unknown>null,
+    [MilkyWayTextureQuality.OFF]: <WebGLTexture>(<unknown>null),
+    [MilkyWayTextureQuality.LOW]: <WebGLTexture>(<unknown>null),
+    [MilkyWayTextureQuality.MEDIUM]: <WebGLTexture>(<unknown>null),
+    [MilkyWayTextureQuality.HIGH]: <WebGLTexture>(<unknown>null),
+    [MilkyWayTextureQuality.ULTRA]: <WebGLTexture>(<unknown>null),
   };
 
   static getSrcGraySkybox(settings: SettingsManager): string {
@@ -116,7 +116,6 @@ export class SkyBoxSphere {
         gl.bindTexture(gl.TEXTURE_2D, this.textureMilkyWay[settingsManager.milkyWayTextureQuality]);
       }
 
-
       gl.uniform1i(this.mesh.material.uniforms.u_texMilkyWay, 1);
       gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, this.textureMilkyWay[settingsManager.milkyWayTextureQuality]);
@@ -187,23 +186,27 @@ export class SkyBoxSphere {
     if (sm.isDrawMilkyWay && !this.textureMilkyWay[sm.milkyWayTextureQuality] && sm.milkyWayTextureQuality !== MilkyWayTextureQuality.OFF) {
       const milkyWayUrl = `${this.getSrc_(this.MILKYWAY_SRC_BASE, sm.milkyWayTextureQuality, 'jpg')}`;
 
-      GlUtils.initTexture(this.gl_, milkyWayUrl).then((texture) => {
-        this.textureMilkyWay[sm.milkyWayTextureQuality] = texture;
-        this.isTexturesReady_ = true;
-      }).catch((err) => {
-        errorManagerInstance.warn(`Failed to load milkyway texture: ${milkyWayUrl}`, err);
-      });
+      GlUtils.initTexture(this.gl_, milkyWayUrl)
+        .then((texture) => {
+          this.textureMilkyWay[sm.milkyWayTextureQuality] = texture;
+          this.isTexturesReady_ = true;
+        })
+        .catch((err) => {
+          errorManagerInstance.warn(`Failed to load milkyway texture: ${milkyWayUrl}`, err);
+        });
     }
     if (sm.isGraySkybox && !this.isReadyGraySkybox_) {
       const graySkyboxUrl = SkyBoxSphere.getSrcGraySkybox(sm);
 
-      GlUtils.initTexture(this.gl_, graySkyboxUrl).then((texture) => {
-        this.textureGraySkybox_ = texture;
-        this.isReadyGraySkybox_ = true;
-        this.isTexturesReady_ = true;
-      }).catch((err) => {
-        errorManagerInstance.warn(`Failed to load gray skybox texture: ${graySkyboxUrl}`, err);
-      });
+      GlUtils.initTexture(this.gl_, graySkyboxUrl)
+        .then((texture) => {
+          this.textureGraySkybox_ = texture;
+          this.isReadyGraySkybox_ = true;
+          this.isTexturesReady_ = true;
+        })
+        .catch((err) => {
+          errorManagerInstance.warn(`Failed to load gray skybox texture: ${graySkyboxUrl}`, err);
+        });
     }
   }
 

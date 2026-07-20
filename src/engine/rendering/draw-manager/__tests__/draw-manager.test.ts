@@ -31,7 +31,7 @@ describe('drawManager', () => {
     expect(() => drawManagerInstance.orbitsAbove()).not.toThrow();
   });
 
-  it('should calculate the moon\'s position', () => {
+  it("should calculate the moon's position", () => {
     const moon = new Moon();
     const date = new Date(2023, 1, 1);
     const updateResults = () => moon.updatePosition(date);

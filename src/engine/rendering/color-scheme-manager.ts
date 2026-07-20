@@ -22,14 +22,10 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { ColorRuleSet } from '@app/engine/core/interfaces';
-import { ColorInformation, Pickable, rgbaArray } from '../core/interfaces';
-import { errorManagerInstance } from '../utils/errorManager';
-import { getEl, hideEl } from '../utils/get-el';
-
 import { DensityBin } from '@app/app/data/catalog-manager';
 import { ColorCruncherThreadManager } from '@app/app/threads/color-cruncher-thread-manager';
 import { LayersManager } from '@app/app/ui/layers-manager';
+import { ColorRuleSet } from '@app/engine/core/interfaces';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
@@ -37,12 +33,15 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CatalogSource, PayloadStatus, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
+import { ColorInformation, Pickable, rgbaArray } from '../core/interfaces';
 import { PluginRegistry } from '../core/plugin-registry';
 import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { BaseObject } from '../ootk/src/objects';
+import { errorManagerInstance } from '../utils/errorManager';
 import { CpuStage, FrameProfiler } from '../utils/frame-profiler';
+import { getEl, hideEl } from '../utils/get-el';
 import { PersistenceManager, StorageKey } from '../utils/persistence-manager';
 import { CelestrakColorScheme } from './color-schemes/celestrak-color-scheme';
 import { ColorScheme, ColorSchemeColorMap, ColorSchemeParams } from './color-schemes/color-scheme';
@@ -173,7 +172,7 @@ export class ColorSchemeManager {
       cb: () => {
         ServiceLocator.getColorSchemeManager().calculateColorBuffers();
       },
-      validationFunc: (m: PositionCruncherOutgoingMsg) => (!!((m.satInView?.length && m.satInView?.length > 0))),
+      validationFunc: (m: PositionCruncherOutgoingMsg) => !!(m.satInView?.length && m.satInView?.length > 0),
       skipNumber: 2,
       isRunCbOnFailure: true,
       maxRetries: 5,
@@ -217,8 +216,11 @@ export class ColorSchemeManager {
 
       if (this.isUseGroupColorScheme) {
         // current.updateGroup -> current.update -> settings.default.updateGroupupdateGroup -> default.updateGroup
-        this.currentColorSchemeUpdate = this.currentColorScheme.updateGroup ?? this.currentColorScheme.update ??
-          this.colorSchemeInstances[settingsManager.defaultColorScheme].updateGroup ?? Object.values(this.colorSchemeInstances)[0].updateGroup;
+        this.currentColorSchemeUpdate =
+          this.currentColorScheme.updateGroup ??
+          this.currentColorScheme.update ??
+          this.colorSchemeInstances[settingsManager.defaultColorScheme].updateGroup ??
+          Object.values(this.colorSchemeInstances)[0].updateGroup;
 
         // If the group color scheme is the same as the current color scheme, then we don't need to use the group color scheme
         if (this.currentColorSchemeUpdate === this.currentColorScheme.update) {
@@ -226,13 +228,12 @@ export class ColorSchemeManager {
         }
       } else {
         // current.update -> settings.default.update -> default.update
-        this.currentColorSchemeUpdate = this.currentColorScheme.update ?? this.colorSchemeInstances[settingsManager.defaultColorScheme].update ??
-          Object.values(this.colorSchemeInstances)[0].update;
+        this.currentColorSchemeUpdate =
+          this.currentColorScheme.update ?? this.colorSchemeInstances[settingsManager.defaultColorScheme].update ?? Object.values(this.colorSchemeInstances)[0].update;
       }
 
       // Figure out if we are coloring all of the dots - assume yes initially
       const { firstDotToColor, lastDotToColor } = this.calcFirstAndLastDot_(isForceRecolor);
-
 
       // Reset Which Sensor we are coloring before the loop begins
       if (firstDotToColor === 0) {
@@ -284,24 +285,26 @@ export class ColorSchemeManager {
 
   init(renderer: WebGLRenderer, threadsRegistry?: WebWorkerThreadManager[]): void {
     this.gl_ = renderer.gl;
-    this.colorTheme = settingsManager.colors ?? <ColorSchemeColorMap & ObjectTypeColorSchemeColorMap>{
-      transparent: [0, 0, 0, 0] as rgbaArray,
-      deselected: [0.0, 0.0, 0.0, 0.0] as rgbaArray,
-      starLow: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
-      starMed: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
-      starHi: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
-      analyst: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
-      facility: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
-      missile: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
-      missileInview: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
-      gradientAmt: 0.0,
-      inFOVAlt: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
-      inGroup: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
-      length: 0,
-      marker: [[0.0, 0.0, 0.0, 1.0]] as rgbaArray[],
-      version: '0',
-      notional: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
-    };
+    this.colorTheme =
+      settingsManager.colors ??
+      <ColorSchemeColorMap & ObjectTypeColorSchemeColorMap>{
+        transparent: [0, 0, 0, 0] as rgbaArray,
+        deselected: [0.0, 0.0, 0.0, 0.0] as rgbaArray,
+        starLow: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
+        starMed: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
+        starHi: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
+        analyst: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
+        facility: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
+        missile: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
+        missileInview: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
+        gradientAmt: 0.0,
+        inFOVAlt: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
+        inGroup: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
+        length: 0,
+        marker: [[0.0, 0.0, 0.0, 1.0]] as rgbaArray[],
+        version: '0',
+        notional: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
+      };
 
     this.resetObjectTypeFlags();
     this.colorBuffer = renderer.gl.createBuffer();
@@ -313,55 +316,51 @@ export class ColorSchemeManager {
     }
 
     // Create the color buffers as soon as the position cruncher is ready
-    EventBus.getInstance().on(
-      EventBusEvent.onCruncherReady,
-      (): void => {
-        const catalogManagerInstance = ServiceLocator.getCatalogManager();
-        const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);
-        let possibleColorScheme: ColorScheme | null = null;
+    EventBus.getInstance().on(EventBusEvent.onCruncherReady, (): void => {
+      const catalogManagerInstance = ServiceLocator.getCatalogManager();
+      const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);
+      let possibleColorScheme: ColorScheme | null = null;
 
-        /*
-         * We don't want to reload a cached group color scheme because we might not have a search
-         * this can result in all dots turning black
-         */
-        if (cachedColorScheme) {
-          LayersManager.change(cachedColorScheme);
-          possibleColorScheme = this.colorSchemeInstances[cachedColorScheme] as ColorScheme;
-        }
-        this.currentColorScheme = possibleColorScheme ?? this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? Object.values(this.colorSchemeInstances)[0];
-        this.lastColorScheme = this.currentColorScheme;
+      /*
+       * We don't want to reload a cached group color scheme because we might not have a search
+       * this can result in all dots turning black
+       */
+      if (cachedColorScheme) {
+        LayersManager.change(cachedColorScheme);
+        possibleColorScheme = this.colorSchemeInstances[cachedColorScheme] as ColorScheme;
+      }
+      this.currentColorScheme = possibleColorScheme ?? this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? Object.values(this.colorSchemeInstances)[0];
+      this.lastColorScheme = this.currentColorScheme;
 
-        // Generate some buffers
-        this.colorData = new Float32Array(catalogManagerInstance.numObjects * 4);
-        this.pickableData = new Int8Array(catalogManagerInstance.numObjects);
+      // Generate some buffers
+      this.colorData = new Float32Array(catalogManagerInstance.numObjects * 4);
+      this.pickableData = new Int8Array(catalogManagerInstance.numObjects);
 
-        // Send catalog data to color worker
-        if (this.colorCruncher_?.isReady) {
-          this.sendCatalogToWorker_();
-          this.sendAllStateToWorker_();
-          this.workerReady_ = true;
-          this.useWorkerMode_ = ColorSchemeManager.WORKER_SUPPORTED_SCHEMES_.has(this.currentColorScheme?.id);
-        }
+      // Send catalog data to color worker
+      if (this.colorCruncher_?.isReady) {
+        this.sendCatalogToWorker_();
+        this.sendAllStateToWorker_();
+        this.workerReady_ = true;
+        this.useWorkerMode_ = ColorSchemeManager.WORKER_SUPPORTED_SCHEMES_.has(this.currentColorScheme?.id);
+      }
 
-        this.calculateColorBuffers(true);
-        this.isReady = true;
+      this.calculateColorBuffers(true);
+      this.isReady = true;
 
-        // This helps keep the inview colors up to date
-        if (!this.hasRegisteredOffsetListener_) {
-          this.hasRegisteredOffsetListener_ = true;
-          EventBus.getInstance().on(EventBusEvent.staticOffsetChange, () => {
-            setTimeout(() => {
-              if (this.useWorkerMode_) {
-                this.colorCruncher_?.sendForceRecolor();
-              } else {
-                this.calcColorBufsNextCruncher();
-              }
-            }, 1000);
-          });
-        }
-
-      },
-    );
+      // This helps keep the inview colors up to date
+      if (!this.hasRegisteredOffsetListener_) {
+        this.hasRegisteredOffsetListener_ = true;
+        EventBus.getInstance().on(EventBusEvent.staticOffsetChange, () => {
+          setTimeout(() => {
+            if (this.useWorkerMode_) {
+              this.colorCruncher_?.sendForceRecolor();
+            } else {
+              this.calcColorBufsNextCruncher();
+            }
+          }, 1000);
+        });
+      }
+    });
 
     // Handle color buffer results from worker
     EventBus.getInstance().on(EventBusEvent.onColorBufferReady, () => {
@@ -400,12 +399,7 @@ export class ColorSchemeManager {
       }
       const dotsManager = ServiceLocator.getDotsManager();
 
-      this.colorCruncher_.sendDynamicUpdate(
-        dotsManager.inViewData,
-        dotsManager.inSunData,
-        dotsManager.getSatVel(),
-        settingsManager.dotsOnScreen,
-      );
+      this.colorCruncher_.sendDynamicUpdate(dotsManager.inViewData, dotsManager.inSunData, dotsManager.getSatVel(), settingsManager.dotsOnScreen);
     });
 
     EventBus.getInstance().on(EventBusEvent.layerUpdated, () => {
@@ -484,12 +478,19 @@ export class ColorSchemeManager {
     return ServiceLocator.getDotsManager().inViewData?.[Number(obj.id)] === 1 && !this.currentColorScheme?.objectTypeFlags.inFOV;
   }
   isOperationalPayloadOff(obj: BaseObject) {
-    return settingsManager.filter?.operationalPayloads === false && obj.type === SpaceObjectType.PAYLOAD &&
-      (obj as Satellite).status !== PayloadStatus.NONOPERATIONAL && (obj as Satellite).status !== PayloadStatus.UNKNOWN;
+    return (
+      settingsManager.filter?.operationalPayloads === false &&
+      obj.type === SpaceObjectType.PAYLOAD &&
+      (obj as Satellite).status !== PayloadStatus.NONOPERATIONAL &&
+      (obj as Satellite).status !== PayloadStatus.UNKNOWN
+    );
   }
   isNonOperationalPayloadOff(obj: BaseObject) {
-    return settingsManager.filter?.nonOperationalPayloads === false && obj.type === SpaceObjectType.PAYLOAD &&
-      ((obj as Satellite).status === PayloadStatus.NONOPERATIONAL || (obj as Satellite).status === PayloadStatus.UNKNOWN);
+    return (
+      settingsManager.filter?.nonOperationalPayloads === false &&
+      obj.type === SpaceObjectType.PAYLOAD &&
+      ((obj as Satellite).status === PayloadStatus.NONOPERATIONAL || (obj as Satellite).status === PayloadStatus.UNKNOWN)
+    );
   }
   isRocketBodyOff(obj: BaseObject) {
     return settingsManager.filter?.rocketBodies === false && obj.type === SpaceObjectType.ROCKET_BODY;
@@ -512,20 +513,16 @@ export class ColorSchemeManager {
     return settingsManager.filter?.lEOSatellites === false && obj instanceof Satellite && obj.apogee < 6000 && obj.apogee >= 400;
   }
   isMeoSatOff(obj: BaseObject) {
-    return settingsManager.filter?.mEOSatellites === false && obj instanceof Satellite && obj.eccentricity < 0.1 &&
-      obj.apogee >= 6000 && obj.apogee < 34786;
+    return settingsManager.filter?.mEOSatellites === false && obj instanceof Satellite && obj.eccentricity < 0.1 && obj.apogee >= 6000 && obj.apogee < 34786;
   }
   isHeoSatOff(obj: BaseObject) {
-    return settingsManager.filter?.hEOSatellites === false && obj instanceof Satellite &&
-      obj.eccentricity >= 0.1 && obj.apogee <= 39786;
+    return settingsManager.filter?.hEOSatellites === false && obj instanceof Satellite && obj.eccentricity >= 0.1 && obj.apogee <= 39786;
   }
   isGeoSatOff(obj: BaseObject) {
-    return settingsManager.filter?.gEOSatellites === false && obj instanceof Satellite && obj.eccentricity < 0.1 &&
-      obj.apogee >= 34786 && obj.apogee < 36786;
+    return settingsManager.filter?.gEOSatellites === false && obj instanceof Satellite && obj.eccentricity < 0.1 && obj.apogee >= 34786 && obj.apogee < 36786;
   }
   isXGeoSatOff(obj: BaseObject) {
-    return settingsManager.filter?.xGEOSatellites === false && obj instanceof Satellite &&
-      ((obj.eccentricity < 0.1 && obj.apogee > 36786) || obj.apogee > 39786);
+    return settingsManager.filter?.xGEOSatellites === false && obj instanceof Satellite && ((obj.eccentricity < 0.1 && obj.apogee > 36786) || obj.apogee > 39786);
   }
   isUnitedStatesOff(obj: BaseObject) {
     return settingsManager.filter?.unitedStates === false && (obj as Satellite)?.country === 'US';
@@ -561,8 +558,7 @@ export class ColorSchemeManager {
     return settingsManager.filter?.australia === false && (obj as Satellite)?.country === 'AU';
   }
   isOtherCountriesOff(obj: BaseObject) {
-    return settingsManager.filter?.otherCountries === false &&
-      !['US', 'UK', 'F', 'D', 'J', 'CN', 'IN', 'RU', 'SU', 'KR', 'AU'].includes((obj as Satellite)?.country);
+    return settingsManager.filter?.otherCountries === false && !['US', 'UK', 'F', 'D', 'J', 'CN', 'IN', 'RU', 'SU', 'KR', 'AU'].includes((obj as Satellite)?.country);
   }
   isJscVimpelSatOff(obj: BaseObject) {
     return settingsManager.filter?.vimpelSatellites === false && (obj as Satellite)?.source === CatalogSource.VIMPEL;
@@ -590,7 +586,7 @@ export class ColorSchemeManager {
     this.objectTypeFlags.starHi = true;
 
     for (const colorScheme in this.colorSchemeInstances) {
-      if (Object.prototype.hasOwnProperty.call(this.colorSchemeInstances, colorScheme)) {
+      if (Object.hasOwn(this.colorSchemeInstances, colorScheme)) {
         this.colorSchemeInstances[colorScheme].resetObjectTypeFlags();
       }
     }
@@ -868,34 +864,22 @@ export class ColorSchemeManager {
     return { firstDotToColor, lastDotToColor };
   }
 
-  private calculateBufferDataVelocity_(
-    firstDotToColor: number,
-    lastDotToColor: number,
-    satData: BaseObject[],
-    satVel: Float32Array,
-    params: ColorSchemeParams,
-  ) {
+  private calculateBufferDataVelocity_(firstDotToColor: number, lastDotToColor: number, satData: BaseObject[], satVel: Float32Array, params: ColorSchemeParams) {
     for (let i = firstDotToColor; i < lastDotToColor; i++) {
       (satData[i] as unknown as { totalVelocity: number }).totalVelocity = Math.sqrt(
-        satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2],
+        satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]
       );
       this.calculateBufferData_(i, satData, params);
     }
   }
 
-  private calculateBufferDataLoop_(
-    firstDotToColor: number,
-    lastDotToColor: number,
-    satData: BaseObject[],
-    params: ColorSchemeParams,
-  ) {
+  private calculateBufferDataLoop_(firstDotToColor: number, lastDotToColor: number, satData: BaseObject[], params: ColorSchemeParams) {
     for (let i = firstDotToColor; i < lastDotToColor; i++) {
       this.calculateBufferData_(i, satData, params);
     }
   }
 
-  private calculateBufferData_(i: number, satData: BaseObject[],
-    params: ColorSchemeParams) {
+  private calculateBufferData_(i: number, satData: BaseObject[], params: ColorSchemeParams) {
     let colors = this.getColorIfDisabledSat_(satData, i);
 
     if (this.isUseGroupColorScheme) {
@@ -1160,12 +1144,7 @@ export class ColorSchemeManager {
     // Dynamic data (inView, inSun, velocity)
     const dotsManager = ServiceLocator.getDotsManager();
 
-    this.colorCruncher_.sendDynamicUpdate(
-      dotsManager.inViewData,
-      dotsManager.inSunData,
-      dotsManager.getSatVel(),
-      settingsManager.dotsOnScreen,
-    );
+    this.colorCruncher_.sendDynamicUpdate(dotsManager.inViewData, dotsManager.inSunData, dotsManager.getSatVel(), settingsManager.dotsOnScreen);
   }
 
   private forwardFiltersToWorker_(): void {

@@ -25,15 +25,15 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
 import { ConeMesh } from '@app/engine/rendering/draw-manager/cone-mesh';
 import { buildSideMenuTabsHtml, initSideMenuTabs, updateSideMenuTabIndicator } from '@app/engine/ui/side-menu-tabs';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
+import { t7e } from '@app/locales/keys';
 import { BaseObject, Degrees } from '@ootk/src/main';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import satelliteFovPng from '@public/img/icons/satellite-fov.png';
-import { IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
-import { t7e } from '@app/locales/keys';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 
 /** Shorthand for this plugin's locale keys. */
@@ -95,10 +95,14 @@ export class SatelliteFov extends KeepTrackPlugin {
     return [
       {
         key: 'C',
+        // ctrl:false so Ctrl+Shift+C stays free for other plugins.
+        ctrl: false,
         callback: () => this.toggleFovCone_(),
       },
       {
         key: 'V',
+        // ctrl:false so Ctrl+Shift+V belongs to Video Director, not this toggle.
+        ctrl: false,
         callback: () => this.toggleSatToSatCone_(),
       },
     ];
@@ -106,123 +110,125 @@ export class SatelliteFov extends KeepTrackPlugin {
 
   sideMenuSecondaryHtml = html`
   <form id="sat-fov-settings-form">
-    <div class="row">
-      <div class="col s12">
-        <h3>${l('labels.sensorDesign')}</h3>
+    <section class="kt-section">
+      <div class="kt-section-label">${l('labels.sensorDesign')}</div>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+            <input id="sat-fov-fov-angle" value="3" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.fovOfSensor')}"
+              style="text-align: center;"
+            />
+            <label for="sat-fov-fov-angle" class="active">${l('labels.fovDegrees')}</label>
+        </div>
       </div>
-      <div class="input-field col s12">
-          <input id="sat-fov-fov-angle" value="3" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.fovOfSensor')}"
+    </section>
+    <section class="kt-section">
+      <div class="kt-section-label">${l('labels.colorSettings')}</div>
+      <div class="kt-field-row">
+        <div class="input-field col s4">
+          <input id="sat-fov-red" value="0.2" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.red')}"
             style="text-align: center;"
           />
-          <label for="sat-fov-fov-angle" class="active">${l('labels.fovDegrees')}</label>
+          <label for="sat-fov-red" class="active">R</label>
+        </div>
+        <div class="input-field col s4">
+          <input id="sat-fov-green" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.green')}"
+            style="text-align: center;"
+          />
+          <label for="sat-fov-green" class="active">G</label>
+        </div>
+        <div class="input-field col s4">
+          <input id="sat-fov-blue" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.blue')}"
+            style="text-align: center;"
+          />
+          <label for="sat-fov-blue" class="active">B</label>
+        </div>
       </div>
-    </div>
-    <div class="divider"></div>
-    <div class="row">
-      <div class="col s12">
-        <h3>${l('labels.colorSettings')}</h3>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <input id="sat-fov-opacity" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.opacity')}"
+            style="text-align: center;"
+          />
+          <label for="sat-fov-opacity" class="active">${l('labels.opacity')}</label>
+        </div>
       </div>
-      <div class="input-field col s4">
-        <input id="sat-fov-red" value="0.2" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.red')}"
-          style="text-align: center;"
-        />
-        <label for="sat-fov-red" class="active">R</label>
-      </div>
-      <div class="input-field col s4">
-        <input id="sat-fov-green" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.green')}"
-          style="text-align: center;"
-        />
-        <label for="sat-fov-green" class="active">G</label>
-      </div>
-      <div class="input-field col s4">
-        <input id="sat-fov-blue" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.blue')}"
-          style="text-align: center;"
-        />
-        <label for="sat-fov-blue" class="active">B</label>
-      </div>
-      <div class="input-field col s12">
-        <input id="sat-fov-opacity" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.opacity')}"
-          style="text-align: center;"
-        />
-        <label for="sat-fov-opacity" class="active">${l('labels.opacity')}</label>
-      </div>
-    </div>
+    </section>
   </form>
   `;
 
   protected static buildSideMenuHtml_(): string {
     const earthCenterContent = html`
-    <div>
-      <div class="center">
-        <button id="reset-sat-fov-cones-button" class="center-align btn btn-ui waves-effect waves-light menu-selectable" type="button"
-        style="margin: -10px 0px 10px 0px;">
-          ${l('buttons.resetAllFovCones')} &#9658;
-        </button>
-      </div>
     <form id="sat-fov-settings-default-form">
-      <div class="row">
-        ${SatelliteFov.genH5Title_(l('labels.defaultSensorDesign'))}
-        <div class="input-field col s12">
-            <input id="sat-fov-default-fov-angle" value="3" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.fovOfSensor')}"
+      <section class="kt-section">
+        <div class="kt-section-label">${l('labels.defaultSensorDesign')}</div>
+        <div class="kt-field-row">
+          <div class="input-field col s12">
+              <input id="sat-fov-default-fov-angle" value="3" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.fovOfSensor')}"
+                style="text-align: center;"
+              />
+              <label for="sat-fov-default-fov-angle" class="active">${l('labels.fovDegrees')}</label>
+          </div>
+        </div>
+      </section>
+      <section class="kt-section">
+        <div class="kt-section-label">${l('labels.defaultColorSettings')}</div>
+        <div class="kt-field-row">
+          <div class="input-field col s4">
+            <input id="sat-fov-default-red" value="0.2" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.red')}"
               style="text-align: center;"
             />
-            <label for="sat-fov-default-fov-angle" class="active">${l('labels.fovDegrees')}</label>
+            <label for="sat-fov-default-red" class="active">R</label>
+          </div>
+          <div class="input-field col s4">
+            <input id="sat-fov-default-green" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.green')}"
+              style="text-align: center;"
+            />
+            <label for="sat-fov-default-green" class="active">G</label>
+          </div>
+          <div class="input-field col s4">
+            <input id="sat-fov-default-blue" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.blue')}"
+              style="text-align: center;"
+            />
+            <label for="sat-fov-default-blue" class="active">B</label>
+          </div>
         </div>
-      </div>
-      <div class="row">
-        ${SatelliteFov.genH5Title_(l('labels.defaultColorSettings'))}
-        <div class="input-field col s4">
-          <input id="sat-fov-default-red" value="0.2" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.red')}"
-            style="text-align: center;"
-          />
-          <label for="sat-fov-default-red" class="active">R</label>
+        <div class="kt-field-row">
+          <div class="input-field col s12">
+            <input id="sat-fov-default-opacity" value="0.15" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.opacity')}"
+              style="text-align: center;"
+            />
+            <label for="sat-fov-default-opacity" class="active">${l('labels.opacity')}</label>
+          </div>
         </div>
-        <div class="input-field col s4">
-          <input id="sat-fov-default-green" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.green')}"
-            style="text-align: center;"
-          />
-          <label for="sat-fov-default-green" class="active">G</label>
-        </div>
-        <div class="input-field col s4">
-          <input id="sat-fov-default-blue" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.blue')}"
-            style="text-align: center;"
-          />
-          <label for="sat-fov-default-blue" class="active">B</label>
-        </div>
-        <div class="input-field col s12">
-          <input id="sat-fov-default-opacity" value="0.15" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.opacity')}"
-            style="text-align: center;"
-          />
-          <label for="sat-fov-default-opacity" class="active">${l('labels.opacity')}</label>
-        </div>
-      </div>
+      </section>
     </form>
-    </div>
-    <div class="row">
-      ${SatelliteFov.genH5Title_(l('labels.activeSensors'))}
-      <div id="sat-fov-active-cones" class="col s12">
+    <section class="kt-section">
+      <div class="kt-section-label">${l('labels.activeSensors')}</div>
+      <button id="reset-sat-fov-cones-button" class="kt-action waves-effect" type="button">
+        <span class="kt-action-label">${l('buttons.resetAllFovCones')}</span>
+      </button>
+      <div id="sat-fov-active-cones">
       </div>
-    </div>`;
+    </section>`;
 
     const satToSatContent = html`
-    <div>
-      <div class="row">
-        ${SatelliteFov.genH5Title_(l('labels.targetSatellite'))}
+    <section class="kt-section">
+      <div class="kt-section-label">${l('labels.targetSatellite')}</div>
+      <div class="kt-field-row">
         <div class="input-field col s12">
           <input id="sat-fov-s2s-target-scc" type="text" placeholder="e.g. 25544"
             style="text-align: center;"
           />
           <label for="sat-fov-s2s-target-scc" class="active">${l('labels.targetCatalogNumber')}</label>
         </div>
-        <div class="center" style="margin-bottom: 10px;">
-          <button id="sat-fov-s2s-use-secondary-btn" class="btn btn-ui waves-effect waves-light btn-small menu-selectable" type="button">
-            ${l('buttons.useSecondarySat')} &#9658;
-          </button>
-        </div>
       </div>
-      <form id="sat-fov-s2s-settings-form">
-        <div class="row">
-          ${SatelliteFov.genH5Title_(l('labels.fovSettings'))}
+      <button id="sat-fov-s2s-use-secondary-btn" class="kt-action waves-effect" type="button">
+        <span class="kt-action-label">${l('buttons.useSecondarySat')}</span>
+      </button>
+    </section>
+    <form id="sat-fov-s2s-settings-form">
+      <section class="kt-section">
+        <div class="kt-section-label">${l('labels.fovSettings')}</div>
+        <div class="kt-field-row">
           <div class="input-field col s12">
             <input id="sat-fov-s2s-fov-angle" value="3" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.fovOfSensor')}"
               style="text-align: center;"
@@ -230,8 +236,10 @@ export class SatelliteFov extends KeepTrackPlugin {
             <label for="sat-fov-s2s-fov-angle" class="active">${l('labels.fovDegrees')}</label>
           </div>
         </div>
-        <div class="row">
-          ${SatelliteFov.genH5Title_(l('labels.colorSettings'))}
+      </section>
+      <section class="kt-section">
+        <div class="kt-section-label">${l('labels.colorSettings')}</div>
+        <div class="kt-field-row">
           <div class="input-field col s4">
             <input id="sat-fov-s2s-red" value="1.0" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.red')}"
               style="text-align: center;"
@@ -250,6 +258,8 @@ export class SatelliteFov extends KeepTrackPlugin {
             />
             <label for="sat-fov-s2s-blue" class="active">B</label>
           </div>
+        </div>
+        <div class="kt-field-row">
           <div class="input-field col s12">
             <input id="sat-fov-s2s-opacity" value="0.3" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('tooltips.opacity')}"
               style="text-align: center;"
@@ -257,24 +267,19 @@ export class SatelliteFov extends KeepTrackPlugin {
             <label for="sat-fov-s2s-opacity" class="active">${l('labels.opacity')}</label>
           </div>
         </div>
-      </form>
-      <div class="center" style="margin-bottom: 10px;">
-        <button id="sat-fov-s2s-create-btn" class="btn btn-ui waves-effect waves-light menu-selectable" type="button">
-          ${l('buttons.createS2sCone')} &#9658;
-        </button>
+      </section>
+    </form>
+    <section class="kt-section">
+      <div class="kt-section-label">${l('labels.activeS2sCones')}</div>
+      <button id="sat-fov-s2s-create-btn" class="kt-action waves-effect" type="button">
+        <span class="kt-action-label">${l('buttons.createS2sCone')}</span>
+      </button>
+      <button id="reset-sat-fov-s2s-cones-button" class="kt-action waves-effect" type="button">
+        <span class="kt-action-label">${l('buttons.resetS2sCones')}</span>
+      </button>
+      <div id="sat-fov-s2s-active-cones">
       </div>
-      <div class="center">
-        <button id="reset-sat-fov-s2s-cones-button" class="center-align btn btn-ui waves-effect waves-light menu-selectable" type="button"
-        style="margin: -10px 0px 10px 0px;">
-          ${l('buttons.resetS2sCones')} &#9658;
-        </button>
-      </div>
-      <div class="row">
-        ${SatelliteFov.genH5Title_(l('labels.activeS2sCones'))}
-        <div id="sat-fov-s2s-active-cones" class="col s12">
-        </div>
-      </div>
-    </div>`;
+    </section>`;
 
     return buildSideMenuTabsHtml(SAT_FOV_TABS_ID, [
       { id: 'sat-fov-earth-center-tab', label: l('tabs.earthCenter'), content: earthCenterContent },
@@ -292,13 +297,15 @@ export class SatelliteFov extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => this.uiManagerFinal_(),
-    );
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => this.uiManagerFinal_());
   }
 
   protected uiManagerFinal_(): void {
+    // v13 marker: the wrappers are generated, not authored. (The Pro subclass
+    // authors its own root with the marker and overrides this method.)
+    getEl('satellite-fov-menu')?.classList.add('kt-ui-v13');
+    getEl('satellite-fov-menu-secondary', true)?.classList.add('kt-ui-v13');
+
     initSideMenuTabs(SAT_FOV_TABS_ID);
 
     // Earth Center tab listeners
@@ -343,23 +350,19 @@ export class SatelliteFov extends KeepTrackPlugin {
    * without bypassing the KeepTrackPlugin lifecycle.
    */
   protected addMeshEventListeners_(): void {
-    EventBus.getInstance().on(
-      EventBusEvent.ConeMeshUpdate, this.updateListOfFovMeshes_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.ConeMeshUpdate, this.updateListOfFovMeshes_.bind(this));
 
-    EventBus.getInstance().on(
-      EventBusEvent.selectSatData,
-      (sat: BaseObject) => {
-        if (this.isMenuButtonActive) {
-          this.updateListOfFovMeshes_();
-        }
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (sat: BaseObject) => {
+      if (this.isMenuButtonActive) {
+        this.updateListOfFovMeshes_();
+      }
 
-        if (sat?.isSatellite()) {
-          this.isSettingsMenuEnabled_ = true;
-        } else {
-          this.isSettingsMenuEnabled_ = false;
-        }
-      },
-    );
+      if (sat?.isSatellite()) {
+        this.isSettingsMenuEnabled_ = true;
+      } else {
+        this.isSettingsMenuEnabled_ = false;
+      }
+    });
   }
 
   private toggleFovCone_() {
@@ -586,17 +589,20 @@ export class SatelliteFov extends KeepTrackPlugin {
       getEl('reset-sat-fov-cones-button')!.removeAttribute('disabled');
     }
 
-    setInnerHtml('sat-fov-active-cones', meshes
-      .sort((a, b) => a.obj.id - b.obj.id)
-      .map((mesh) => SatelliteFov.renderEarthCenterConeRow_(mesh))
-      .join(''));
+    setInnerHtml(
+      'sat-fov-active-cones',
+      meshes
+        .sort((a, b) => a.obj.id - b.obj.id)
+        .map((mesh) => SatelliteFov.renderEarthCenterConeRow_(mesh))
+        .join('')
+    );
 
     SatelliteFov.bindConeListEvents_(
       '#sat-fov-earth-center-tab .remove-sensor',
       '#sat-fov-earth-center-tab .active-cone-sensor',
       // A targetId of -1 matches the earth-center cone exactly, so a satellite with
       // both an earth-center and a sat-to-sat cone never loses the wrong one
-      (id) => coneFactory.removeBySourceAndTarget(id, -1),
+      (id) => coneFactory.removeBySourceAndTarget(id, -1)
     );
   }
 
@@ -610,24 +616,23 @@ export class SatelliteFov extends KeepTrackPlugin {
       getEl('reset-sat-fov-s2s-cones-button')!.removeAttribute('disabled');
     }
 
-    setInnerHtml('sat-fov-s2s-active-cones', meshes
-      .sort((a, b) => a.obj.id - b.obj.id)
-      .map((mesh) => SatelliteFov.renderSatToSatConeRow_(mesh))
-      .join(''));
+    setInnerHtml(
+      'sat-fov-s2s-active-cones',
+      meshes
+        .sort((a, b) => a.obj.id - b.obj.id)
+        .map((mesh) => SatelliteFov.renderSatToSatConeRow_(mesh))
+        .join('')
+    );
 
-    SatelliteFov.bindConeListEvents_(
-      '#sat-fov-s2s-tab .remove-s2s-sensor',
-      '#sat-fov-s2s-tab .active-s2s-cone-sensor',
-      (id, targetId) => coneFactory.removeBySourceAndTarget(id, targetId),
+    SatelliteFov.bindConeListEvents_('#sat-fov-s2s-tab .remove-s2s-sensor', '#sat-fov-s2s-tab .active-s2s-cone-sensor', (id, targetId) =>
+      coneFactory.removeBySourceAndTarget(id, targetId)
     );
   }
 
   private static renderEarthCenterConeRow_(mesh: ConeMesh): string {
     const currentSat = PluginRegistry.getPlugin(SelectSatManager)?.getSelectedSat();
     const isSelected = currentSat && mesh.obj.id === currentSat.id;
-    const nameSpan = isSelected
-      ? html`<span style="color: var(--color-dark-text-accent);">${mesh.obj.name}</span>`
-      : html`<span>${mesh.obj.name}</span>`;
+    const nameSpan = isSelected ? html`<span style="color: var(--color-dark-text-accent);">${mesh.obj.name}</span>` : html`<span>${mesh.obj.name}</span>`;
 
     return html`
     <div class="link" style="display: flex; align-items: center;margin: 0rem 1rem;justify-content: space-around;">
@@ -647,9 +652,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     const sourceName = mesh.obj.name;
     const targetName = mesh.targetObj?.name ?? t7e('Common.unknown');
     const label = `${sourceName} → ${targetName}`;
-    const nameSpan = isSelected
-      ? html`<span style="color: var(--color-dark-text-accent);">${label}</span>`
-      : html`<span>${label}</span>`;
+    const nameSpan = isSelected ? html`<span style="color: var(--color-dark-text-accent);">${label}</span>` : html`<span>${label}</span>`;
 
     return html`
     <div class="link" style="display: flex; align-items: center;margin: 0rem 1rem;justify-content: space-around;">
@@ -667,11 +670,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     `;
   }
 
-  private static bindConeListEvents_(
-    removeSelector: string,
-    coneSelector: string,
-    removeFn: (id: number, targetId: number) => void,
-  ) {
+  private static bindConeListEvents_(removeSelector: string, coneSelector: string, removeFn: (id: number, targetId: number) => void) {
     document.querySelectorAll(removeSelector).forEach((icon) => {
       icon.addEventListener('click', (e) => {
         const el = e.target as HTMLElement;

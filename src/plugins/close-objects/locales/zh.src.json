@@ -3,6 +3,9 @@
     "CloseObjectsPlugin": {
       "bottomIconLabel": "邻近对象",
       "title": "邻近对象搜索",
+      "sections": {
+        "search": "搜索"
+      },
       "findBtn": "查找邻近对象",
       "help": {
         "overview": "邻近对象搜索会扫描整个目录，查找此刻相距 50 公里以内的对象对。无需运行完整的交会筛查，即可快速发现共轨载荷、近期解体事件和拥挤的轨道区域。",

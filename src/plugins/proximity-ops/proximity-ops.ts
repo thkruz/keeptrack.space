@@ -1,9 +1,7 @@
-import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
-import { getEl } from '@app/engine/utils/get-el';
-
 import { SatMath, StringifiedNumber } from '@app/app/analysis/sat-math';
 import { ProximityOpsThreadManager } from '@app/app/threads/proximity-ops-thread-manager';
 import { drawPairLine, jumpToTca, RemovableLine } from '@app/engine/conjunction/conjunction-row-actions';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -14,6 +12,7 @@ import { IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-
 import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
@@ -24,9 +23,19 @@ import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../.
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
 import {
-  buildRpoCsvRow, DEFAULT_REFINE_TOLERANCE_MS, DEFAULT_STEP_SECONDS, findClosestApproach as findClosestApproachCore,
-  findRpoPairs, ProximityOpsEvent, RPO_CSV_HEADERS, RpoSearchMode, RPOType, RpoSearchParams,
-  runAllVsAllGeo, runAllVsAllLeo, satToData,
+  buildRpoCsvRow,
+  DEFAULT_REFINE_TOLERANCE_MS,
+  DEFAULT_STEP_SECONDS,
+  findClosestApproach as findClosestApproachCore,
+  findRpoPairs,
+  ProximityOpsEvent,
+  RPO_CSV_HEADERS,
+  RPOType,
+  RpoSearchMode,
+  RpoSearchParams,
+  runAllVsAllGeo,
+  runAllVsAllLeo,
+  satToData,
 } from './proximity-ops-core';
 import { DEFAULT_SORT_ASC, DEFAULT_SORT_KEY, RpoSortKey, sortEvents } from './proximity-ops-sort';
 import { ProximityOpsTableLabels, renderProximityOpsTable } from './proximity-ops-table';
@@ -112,11 +121,7 @@ export class ProximityOps extends KeepTrackPlugin {
           content: t7e('plugins.ProximityOps.help.howToUse'),
         },
       ],
-      tips: [
-        t7e('plugins.ProximityOps.help.tip1'),
-        t7e('plugins.ProximityOps.help.tip2'),
-        t7e('plugins.ProximityOps.help.tip3'),
-      ],
+      tips: [t7e('plugins.ProximityOps.help.tip1'), t7e('plugins.ProximityOps.help.tip2'), t7e('plugins.ProximityOps.help.tip3')],
       shortcuts: [{ keys: ['X'], description: t7e('plugins.ProximityOps.help.shortcutToggle') }],
     };
   }
@@ -329,7 +334,6 @@ export class ProximityOps extends KeepTrackPlugin {
   };
 
   downloadIconCb = () => {
-
     if (this.RPOs.length === 0) {
       ServiceLocator.getUiManager().toast(t7e('plugins.ProximityOps.noRposToDownload'), ToastMsgType.caution, true);
 
@@ -361,7 +365,11 @@ export class ProximityOps extends KeepTrackPlugin {
     const csvRows: string[] = [RPO_CSV_HEADERS.join(',')];
 
     rpoArray.forEach((rpo) => {
-      csvRows.push(buildRpoCsvRow(rpo).map((v) => `"${v}"`).join(','));
+      csvRows.push(
+        buildRpoCsvRow(rpo)
+          .map((v) => `"${v}"`)
+          .join(',')
+      );
     });
 
     return csvRows.join('\n');
@@ -441,10 +449,7 @@ export class ProximityOps extends KeepTrackPlugin {
     const satelliteId = this.catalogManagerInstance.sccNum2Id(primarySatSccNum);
 
     if (!satelliteId) {
-      ServiceLocator.getUiManager().toast(
-        t7e('plugins.ProximityOps.satNotFound').replace('{sccNum}', primarySatSccNum),
-        ToastMsgType.caution, true,
-      );
+      ServiceLocator.getUiManager().toast(t7e('plugins.ProximityOps.satNotFound').replace('{sccNum}', primarySatSccNum), ToastMsgType.caution, true);
 
       return null;
     }
@@ -489,7 +494,7 @@ export class ProximityOps extends KeepTrackPlugin {
           this.setSearchingState_(false);
           errorManagerInstance.warn(t7e('plugins.ProximityOps.surveyError').replace('{error}', message));
         },
-      },
+      }
     );
   }
 
@@ -597,9 +602,7 @@ export class ProximityOps extends KeepTrackPlugin {
     // Closest is the minimum miss distance regardless of the active sort column.
     const closest = this.RPOs.reduce((min, rpo) => Math.min(min, rpo.dist), Infinity);
 
-    el.textContent = t7e('plugins.ProximityOps.resultCount')
-      .replace('{count}', count.toString())
-      .replace('{closest}', closest.toFixed(2));
+    el.textContent = t7e('plugins.ProximityOps.resultCount').replace('{count}', count.toString()).replace('{closest}', closest.toFixed(2));
   }
 
   /** Persist the current search inputs so they are restored next session. */
@@ -688,37 +691,36 @@ export class ProximityOps extends KeepTrackPlugin {
         return [];
       }
 
-      sats = allSats
-        .filter((sat) => {
-          const lla2 = sat.lla();
+      sats = allSats.filter((sat) => {
+        const lla2 = sat.lla();
 
-          if (!lla2) {
-            return false;
-          }
+        if (!lla2) {
+          return false;
+        }
 
-          return sat.tle1 &&
-            sat.period > 23 * 60 &&
-            /*
-             * assuming max drift rate to be 3deg longitude/day then take large enough lon. window to capture
-             * all possible "fly-by" RPOs depends on length of search
-             */
-            (180 - Math.abs(Math.abs(lla.lon - lla2.lon) - 180)) < 3 * duration / (24 * 60 ** 2) &&
-            sat.id !== primarySatID;
-        });
+        return (
+          sat.tle1 &&
+          sat.period > 23 * 60 &&
+          /*
+           * assuming max drift rate to be 3deg longitude/day then take large enough lon. window to capture
+           * all possible "fly-by" RPOs depends on length of search
+           */
+          180 - Math.abs(Math.abs(lla.lon - lla2.lon) - 180) < (3 * duration) / (24 * 60 ** 2) &&
+          sat.id !== primarySatID
+        );
+      });
     } else if (type === RPOType.LEO) {
       const nowDate = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
 
       const raan1 = SatMath.normalizeRaan(primarySat, nowDate);
 
-      sats = allSats
-        .filter((sat) => {
-          const raan2 = SatMath.normalizeRaan(sat, nowDate);
+      sats = allSats.filter((sat) => {
+        const raan2 = SatMath.normalizeRaan(sat, nowDate);
 
-          return sat.tle1 &&
-            (180 - Math.abs(Math.abs(primarySat.inclination - sat.inclination) - 180)) < 5 &&
-            (360 - Math.abs(Math.abs(raan1 - raan2) - 360)) < 5 &&
-            sat.id !== primarySatID;
-        });
+        return (
+          sat.tle1 && 180 - Math.abs(Math.abs(primarySat.inclination - sat.inclination) - 180) < 5 && 360 - Math.abs(Math.abs(raan1 - raan2) - 360) < 5 && sat.id !== primarySatID
+        );
+      });
     } else {
       errorManagerInstance.error(new Error('Unknown orbit type!'), 'ProximityOps');
     }

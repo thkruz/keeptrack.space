@@ -1,8 +1,8 @@
-import { vi } from 'vitest';
-import { SensorManager } from '@app/app/sensors/sensorManager';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { SensorManager } from '@app/app/sensors/sensorManager';
 import { defaultSensor } from '@test/environment/apiMocks';
+import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { vi } from 'vitest';
 
 /*
  * SensorManager's lookup/selection layer is pure array bookkeeping over

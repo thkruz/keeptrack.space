@@ -10,13 +10,7 @@ import { selectSideMenuTab } from '@app/engine/ui/side-menu-tabs';
 import { getEl } from '@app/engine/utils/get-el';
 import { Earth, FormatTle, Satellite, SpaceObjectType, TleLine1, TleLine2 } from '@ootk/src/main';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import {
-  computePresetElements,
-  OrbitPresetId,
-  rawIntlDesFromTle,
-  sunSyncInclinationDeg,
-  tleToElementFields,
-} from './create-sat-orbits';
+import { computePresetElements, OrbitPresetId, rawIntlDesFromTle, sunSyncInclinationDeg, tleToElementFields } from './create-sat-orbits';
 
 /** Advanced-tab element-id suffixes that the write helper accepts. */
 export interface AdvancedFieldWrite {

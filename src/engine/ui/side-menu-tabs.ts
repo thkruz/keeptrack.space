@@ -34,11 +34,13 @@ export function buildSideMenuTabsHtml(tabsId: string, tabs: SideMenuTabDef[]): s
     .join('\n                ');
 
   const tabPanels = tabs
-    .map((tab) => html`
+    .map(
+      (tab) => html`
       <div id="${tab.id}" class="col s12">
         ${tab.content}
       </div>
-    `)
+    `
+    )
     .join('\n');
 
   return html`
@@ -84,11 +86,15 @@ export function initSideMenuTabs(tabsId: string): void {
      * on the tab bar's whitespace (outside any li) throws. Swallow those clicks in
      * the capture phase on the parent before they reach the Tabs listener.
      */
-    tabsEl.parentElement?.addEventListener('click', (e) => {
-      if (e.target instanceof Element && e.target.closest('ul.tabs') && !e.target.closest('li.tab')) {
-        e.stopPropagation();
-      }
-    }, true);
+    tabsEl.parentElement?.addEventListener(
+      'click',
+      (e) => {
+        if (e.target instanceof Element && e.target.closest('ul.tabs') && !e.target.closest('li.tab')) {
+          e.stopPropagation();
+        }
+      },
+      true
+    );
   }
 }
 

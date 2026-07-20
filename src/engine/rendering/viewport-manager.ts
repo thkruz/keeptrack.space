@@ -12,8 +12,8 @@ import { CounterStage, FrameProfiler } from '../utils/frame-profiler';
 import { LayoutInsets, Viewport, ViewportLayout } from './viewport';
 import type { WebGLRenderer } from './webgl-renderer';
 
-export { Viewport, ViewportLayout } from './viewport';
 export type { LayoutInsets } from './viewport';
+export { Viewport, ViewportLayout } from './viewport';
 
 /**
  * Owns the list of simultaneously rendered cameras and runs the per-viewport

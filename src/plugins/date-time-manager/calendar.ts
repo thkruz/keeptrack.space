@@ -276,22 +276,14 @@ export class Calendar {
   }
 
   private renderDayHeaders(): string {
-    const daysOfWeek = [
-      dt('days-short.1'),
-      dt('days-short.2'),
-      dt('days-short.3'),
-      dt('days-short.4'),
-      dt('days-short.5'),
-      dt('days-short.6'),
-      dt('days-short.0'),
-    ];
+    const daysOfWeek = [dt('days-short.1'), dt('days-short.2'), dt('days-short.3'), dt('days-short.4'), dt('days-short.5'), dt('days-short.6'), dt('days-short.0')];
 
     return daysOfWeek
       .map(
         (day, index) =>
           `<th scope="col" class="${index === 0 || index === 6 ? 'ui-datepicker-week-end' : ''}">
         <span title="${this.getUTCDayFullName(index)}">${day}</span>
-      </th>`,
+      </th>`
       )
       .join('');
   }
@@ -659,11 +651,7 @@ export class Calendar {
     const timeInput = document.getElementById('calendar-time-input') as HTMLInputElement;
 
     if (timeInput) {
-      timeInput.value = `${this.formatTime(
-        this.simulationDate.getUTCHours(),
-        this.simulationDate.getUTCMinutes(),
-        this.simulationDate.getUTCSeconds(),
-      )}`;
+      timeInput.value = `${this.formatTime(this.simulationDate.getUTCHours(), this.simulationDate.getUTCMinutes(), this.simulationDate.getUTCSeconds())}`;
     }
   }
 

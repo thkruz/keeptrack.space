@@ -1,9 +1,9 @@
-import { vi } from 'vitest';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-undefined */
 import { Pickable } from '@app/engine/core/interfaces';
 import { MissionColorScheme } from '@app/engine/rendering/color-schemes/mission-color-scheme';
 import { ColorSchemeTestUtils } from '@test/engine/rendering/color-schemes/__helpers__/color-scheme-test-utils';
+import { vi } from 'vitest';
 
 // Mock dependencies
 vi.mock('@app/keepTrackApi', () => ({
@@ -183,11 +183,7 @@ describe('MissionColorScheme', () => {
     it('should handle all test satellites without errors', () => {
       const testSatellites = ColorSchemeTestUtils.createTestSatelliteCollection();
 
-      ColorSchemeTestUtils.testColorSchemeWithSatellites(
-        colorScheme,
-        testSatellites,
-        (sat, scheme) => (scheme as MissionColorScheme).update(sat),
-      );
+      ColorSchemeTestUtils.testColorSchemeWithSatellites(colorScheme, testSatellites, (sat, scheme) => (scheme as MissionColorScheme).update(sat));
     });
   });
 
@@ -197,7 +193,7 @@ describe('MissionColorScheme', () => {
         ColorSchemeTestUtils.createMockSatellite({
           id: i,
           mission: ['military', 'communications', 'technology', 'earth observation', 'science', 'astronomy', 'navigation', 'other'][i % 8],
-        }),
+        })
       );
       const startTime = performance.now();
 

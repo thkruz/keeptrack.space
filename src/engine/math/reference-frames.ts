@@ -1,5 +1,5 @@
-import { mat4 } from 'gl-matrix';
 import { Earth as EarthOotk, EpochUTC, Seconds } from '@ootk/src/main';
+import { mat4 } from 'gl-matrix';
 
 export enum ReferenceFrame {
   J2000 = 'J2000',
@@ -7,7 +7,7 @@ export enum ReferenceFrame {
 }
 
 export const getJ200ToTemeMatrix = (date: Date): mat4 => {
-  const epoch = new EpochUTC(date.getTime() / 1000 as Seconds);
+  const epoch = new EpochUTC((date.getTime() / 1000) as Seconds);
   const p = EarthOotk.precession(epoch);
   const n = EarthOotk.nutation(epoch);
   const eps = n.mEps + n.dEps;
@@ -21,10 +21,22 @@ export const getJ200ToTemeMatrix = (date: Date): mat4 => {
   const sZ = Math.sin(p.zed);
 
   const precessionMatrix = mat4.fromValues(
-    cz * ct * cZ - sz * sZ, cz * ct * sZ + sz * cZ, cz * st, 0,
-    -sz * ct * cZ - cz * sZ, -sz * ct * sZ + cz * cZ, -sz * st, 0,
-    -st * cZ, -st * sZ, ct, 0,
-    0, 0, 0, 1,
+    cz * ct * cZ - sz * sZ,
+    cz * ct * sZ + sz * cZ,
+    cz * st,
+    0,
+    -sz * ct * cZ - cz * sZ,
+    -sz * ct * sZ + cz * cZ,
+    -sz * st,
+    0,
+    -st * cZ,
+    -st * sZ,
+    ct,
+    0,
+    0,
+    0,
+    0,
+    1
   );
 
   // Nutation rotation matrix
@@ -36,10 +48,22 @@ export const getJ200ToTemeMatrix = (date: Date): mat4 => {
   const sdp = Math.sin(n.dPsi);
 
   const nutationMatrix = mat4.fromValues(
-    cdp, -sdp * cme, -sdp * sme, 0,
-    sdp * ce, cdp * cme * ce + sme * se, cdp * sme * ce - cme * se, 0,
-    sdp * se, cdp * cme * se - sme * ce, cdp * sme * se + cme * ce, 0,
-    0, 0, 0, 1,
+    cdp,
+    -sdp * cme,
+    -sdp * sme,
+    0,
+    sdp * ce,
+    cdp * cme * ce + sme * se,
+    cdp * sme * ce - cme * se,
+    0,
+    sdp * se,
+    cdp * cme * se - sme * ce,
+    cdp * sme * se + cme * ce,
+    0,
+    0,
+    0,
+    0,
+    1
   );
 
   // Multiply to get J2000 to TEME, then invert for TEME to J2000

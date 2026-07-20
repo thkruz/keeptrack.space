@@ -1,4 +1,4 @@
-import { TemeVec3, FormatTle, Kilometers, MINUTES_PER_DAY, Meters, RAD2DEG, TAU } from '@ootk/src/main';
+import { FormatTle, Kilometers, Meters, MINUTES_PER_DAY, RAD2DEG, TAU, TemeVec3 } from '@ootk/src/main';
 import { StringifiedNumber } from '../../app/analysis/sat-math';
 import { TimeManager } from '../core/time-manager';
 import { EARTHS_GRAV_CONST, MASS_OF_EARTH } from '../utils/constants';
@@ -94,7 +94,6 @@ export abstract class OrbitMath {
     const ey = q / Math.sqrt(semiMajorAxis * mu);
     const u = OrbitMath.arctan2(ey, ex);
 
-
     return ((u - eccentricity * Math.sin(u)) * RAD2DEG) % 360;
   }
 
@@ -138,7 +137,6 @@ export abstract class OrbitMath {
     const period = TAU * Math.sqrt((semiMajorAxis * semiMajorAxis * semiMajorAxis) / (EARTHS_GRAV_CONST * (WeightOfSatellite + MASS_OF_EARTH)));
     const periodInMinutes = period / 60;
 
-
     return MINUTES_PER_DAY / periodInMinutes;
   }
 
@@ -151,7 +149,6 @@ export abstract class OrbitMath {
     const vz = <Meters>(velocity[2] * 1000);
 
     const angMomentum = OrbitMath.cross([rx, ry, rz], [vx, vy, vz]);
-
 
     return Math.atan2(angMomentum[0], -angMomentum[1]) * RAD2DEG;
   }
@@ -215,7 +212,6 @@ export abstract class OrbitMath {
 
   public static magnitude(vector: number[]): number {
     const squaredSum = vector.reduce((sum, component) => sum + component * component, 0);
-
 
     return Math.sqrt(squaredSum);
   }

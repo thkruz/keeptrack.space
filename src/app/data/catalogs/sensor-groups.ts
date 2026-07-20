@@ -8,8 +8,15 @@ export interface SensorGroup {
   topLink: {
     name: string;
     badge: string;
-  }
+  };
   list: string[];
+  /**
+   * Distinguishes surveillance sensors (radars/telescopes that detect
+   * non-cooperative objects) from TT&C tracking networks (dishes that only
+   * track cooperative spacecraft). Undefined is treated as 'surveillance'
+   * for backwards compatibility with the sensor-groups API.
+   */
+  category?: 'surveillance' | 'ttc';
 }
 
 export const fetchSensorGroups = async (): Promise<SensorGroup[]> => {
@@ -34,11 +41,7 @@ export const sensorGroups: SensorGroup[] = [
       name: 'All Space Surveillance Network Sensors',
       badge: 'COALITION',
     },
-    list: [
-      'EGLAFB', 'KWAJSPF', 'GEODDSDGC', 'GEODDSMAU', 'GEODDSSOC',
-      'KWAJALT', 'KWAJMMW', 'KWAJALC', 'KWAJTDX', 'MITMIL', 'RAFASC',
-      'GLBII', 'HOLCBAND', 'HOLSST', 'HOLDARC',
-    ],
+    list: ['EGLAFB', 'KWAJSPF', 'GEODDSDGC', 'GEODDSMAU', 'GEODDSSOC', 'KWAJALT', 'KWAJMMW', 'KWAJALC', 'KWAJTDX', 'MITMIL', 'RAFASC', 'GLBII', 'HOLCBAND', 'HOLSST', 'HOLDARC'],
   },
   {
     name: 'mw',
@@ -83,10 +86,7 @@ export const sensorGroups: SensorGroup[] = [
       name: 'All ESOC Sensors',
       badge: 'ESA',
     },
-    list: [
-      'GRV', 'TIR', 'GES', 'NRC', 'PDM', 'TRO', 'SDT', 'ZimLAT',
-      'ZimSMART', 'Tromso', 'Kiruna', 'Sodankyla', 'Svalbard',
-    ],
+    list: ['GRV', 'TIR', 'GES', 'NRC', 'PDM', 'TRO', 'SDT', 'ZimLAT', 'ZimSMART', 'Tromso', 'Kiruna', 'Sodankyla', 'Svalbard'],
   },
   {
     name: 'rus',
@@ -95,10 +95,7 @@ export const sensorGroups: SensorGroup[] = [
       name: 'All Russian Sensors',
       badge: 'RUSSIA',
     },
-    list: [
-      'OLED', 'OLEV', 'PEC', 'MISD', 'MISV', 'LEKV', 'ARMV', 'KALV',
-      'BARV', 'YENV', 'ORSV', 'STO', 'NAK',
-    ],
+    list: ['OLED', 'OLEV', 'PEC', 'MISD', 'MISV', 'LEKV', 'ARMV', 'KALV', 'BARV', 'YENV', 'ORSV', 'STO', 'NAK'],
   },
   {
     name: 'prc',
@@ -117,6 +114,46 @@ export const sensorGroups: SensorGroup[] = [
       badge: 'OTHER',
     },
     list: ['ROC', 'MLS', 'PO', 'LSO', 'MAY'],
+  },
+  {
+    name: 'dsn',
+    header: 'NASA Deep Space Network',
+    topLink: {
+      name: 'All Deep Space Network Complexes',
+      badge: 'NASA',
+    },
+    list: ['DSNGDSCC', 'DSNMDSCC', 'DSNCDSCC'],
+    category: 'ttc',
+  },
+  {
+    name: 'scn',
+    header: 'Satellite Control Network (AFSCN)',
+    topLink: {
+      name: 'All Remote Tracking Stations',
+      badge: 'USSF',
+    },
+    list: ['SCNNBS', 'SCNVTS', 'SCNHTS', 'SCNGTS', 'SCNDGS', 'SCNTTS', 'SCNOTS', 'SCNCTS'],
+    category: 'ttc',
+  },
+  {
+    name: 'estrack',
+    header: 'ESA Tracking Network (ESTRACK)',
+    topLink: {
+      name: 'All ESTRACK Stations',
+      badge: 'ESA',
+    },
+    list: ['ESTKIR', 'ESTRED', 'ESTSMA', 'ESTKRU', 'ESTNNO', 'ESTCEB', 'ESTMLG'],
+    category: 'ttc',
+  },
+  {
+    name: 'galileo',
+    header: 'Galileo Ground Segment',
+    topLink: {
+      name: 'All Galileo Ground Stations',
+      badge: 'EUSPA',
+    },
+    list: ['GALKIR', 'GALKRU', 'GALNOU', 'GALPAP', 'GALREU', 'GALRED'],
+    category: 'ttc',
   },
   /*
    * {

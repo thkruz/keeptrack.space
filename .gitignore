@@ -38,8 +38,10 @@ jspm_packages
 # Optional npm cache directory
 .npm
 
-# Package Lock
-# package-lock.json
+# Package Lock — repo uses pnpm; ignore npm/yarn lockfiles so a stray
+# `npm install` can't silently reintroduce one alongside pnpm-lock.yaml.
+package-lock.json
+yarn.lock
 
 # Optional eslint cache
 .eslintcache

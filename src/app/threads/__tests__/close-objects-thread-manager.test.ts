@@ -1,17 +1,14 @@
 import { CoWorkerMsgType, CoWorkerOutMsgType } from '@app/webworker/close-objects-messages';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  CloseObjectsThreadManager,
-  CoSearchCallbacks,
-  CoSearchParams,
-} from '../close-objects-thread-manager';
+import { CloseObjectsThreadManager, CoSearchCallbacks, CoSearchParams } from '../close-objects-thread-manager';
 
-const makeWorkerStub = () => ({
-  postMessage: vi.fn(),
-  terminate: vi.fn(),
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
-} as unknown as Worker & { postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> });
+const makeWorkerStub = () =>
+  ({
+    postMessage: vi.fn(),
+    terminate: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  }) as unknown as Worker & { postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> };
 
 const makeMgr = () => {
   const worker = makeWorkerStub();
@@ -42,7 +39,9 @@ const callbacks = (): CoSearchCallbacks => ({
   onError: vi.fn(),
 });
 
-interface OnMessageable { onMessage(e: { data: unknown }): void }
+interface OnMessageable {
+  onMessage(e: { data: unknown }): void;
+}
 
 describe('CloseObjectsThreadManager', () => {
   describe('lifecycle', () => {

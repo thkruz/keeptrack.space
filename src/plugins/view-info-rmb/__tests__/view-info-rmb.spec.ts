@@ -1,4 +1,4 @@
-import { test, expect } from '@test/e2e/coverage';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('ViewInfoRmbPlugin', () => {
@@ -12,6 +12,7 @@ test.describe('ViewInfoRmbPlugin', () => {
     await expect(page.locator('#view-rmb-menu')).toBeAttached();
     await expect(page.locator('#view-info-rmb')).toBeAttached();
     await expect(page.locator('#view-sensor-info-rmb')).toBeAttached();
-    await expect(page.locator('#view-sat-info-rmb')).toBeAttached();
+    // Satellite Info was removed - left-click already selects the satellite
+    await expect(page.locator('#view-sat-info-rmb')).not.toBeAttached();
   });
 });

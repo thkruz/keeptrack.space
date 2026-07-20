@@ -26,8 +26,8 @@ import {
   ISettingControl,
   ISettingNumberControl,
   ISettingSelectControl,
-  ISettingToggleControl,
   ISettingsContribution,
+  ISettingToggleControl,
 } from '@app/engine/plugins/core/plugin-capabilities';
 
 /**
@@ -36,20 +36,13 @@ import {
  * (non-[A-Za-z0-9_-] → `_`) so plugin authors can use natural ids without
  * worrying about CSS-selector safety.
  */
-export const domIdForControl = (sectionId: string, controlId: string): string =>
-  `setting-${slugify_(sectionId)}-${slugify_(controlId)}`;
+export const domIdForControl = (sectionId: string, controlId: string): string => `setting-${slugify_(sectionId)}-${slugify_(controlId)}`;
 
 const slugify_ = (s: string): string => s.replace(/[^A-Za-z0-9_-]/gu, '_');
 
-const escapeAttr_ = (s: string): string =>
-  s.replace(/&/gu, '&amp;')
-    .replace(/"/gu, '&quot;')
-    .replace(/'/gu, '&#39;')
-    .replace(/</gu, '&lt;')
-    .replace(/>/gu, '&gt;');
+const escapeAttr_ = (s: string): string => s.replace(/&/gu, '&amp;').replace(/"/gu, '&quot;').replace(/'/gu, '&#39;').replace(/</gu, '&lt;').replace(/>/gu, '&gt;');
 
-const escapeText_ = (s: string): string =>
-  s.replace(/&/gu, '&amp;').replace(/</gu, '&lt;').replace(/>/gu, '&gt;');
+const escapeText_ = (s: string): string => s.replace(/&/gu, '&amp;').replace(/</gu, '&lt;').replace(/>/gu, '&gt;');
 
 const tooltipAttrs_ = (helpText?: string): string => {
   if (typeof helpText !== 'string' || helpText.length === 0) {
@@ -85,9 +78,7 @@ const renderNumber_ = (c: ISettingNumberControl, domId: string): string => {
 
 const renderSelect_ = (c: ISettingSelectControl, domId: string): string => {
   const current = c.get();
-  const options = c.options
-    .map((opt) => `<option value="${escapeAttr_(opt.value)}"${opt.value === current ? ' selected' : ''}>${escapeText_(opt.label)}</option>`)
-    .join('');
+  const options = c.options.map((opt) => `<option value="${escapeAttr_(opt.value)}"${opt.value === current ? ' selected' : ''}>${escapeText_(opt.label)}</option>`).join('');
 
   return `
         <div class="input-field col s12"${tooltipAttrs_(c.helpText)}>
@@ -113,10 +104,14 @@ export const renderSettingControl = (control: ISettingControl, sectionId: string
   const domId = domIdForControl(sectionId, control.id);
 
   switch (control.type) {
-    case 'toggle': return renderToggle_(control, domId);
-    case 'number': return renderNumber_(control, domId);
-    case 'select': return renderSelect_(control, domId);
-    case 'button': return renderButton_(control, domId);
+    case 'toggle':
+      return renderToggle_(control, domId);
+    case 'number':
+      return renderNumber_(control, domId);
+    case 'select':
+      return renderSelect_(control, domId);
+    case 'button':
+      return renderButton_(control, domId);
     default: {
       control satisfies never;
 

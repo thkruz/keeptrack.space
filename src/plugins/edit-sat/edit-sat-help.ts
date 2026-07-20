@@ -23,10 +23,6 @@ export const buildEditSatHelp = (): IHelpConfig => ({
       content: t7e('plugins.EditSat.help.howToUse'),
     },
   ],
-  tips: [
-    t7e('plugins.EditSat.help.tip1'),
-    t7e('plugins.EditSat.help.tip2'),
-    t7e('plugins.EditSat.help.tip3'),
-  ],
+  tips: [t7e('plugins.EditSat.help.tip1'), t7e('plugins.EditSat.help.tip2'), t7e('plugins.EditSat.help.tip3')],
   shortcuts: [{ keys: ['E'], description: t7e('plugins.EditSat.help.shortcutToggle') }],
 });

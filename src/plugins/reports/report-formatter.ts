@@ -51,9 +51,7 @@ export const resolveReportTable = (data: ReportData): ReportTable => {
     return data.table;
   }
 
-  const cells = (data.body ?? '')
-    .split('\n')
-    .map((line) => line.split(',').map((cell) => cell.trim()));
+  const cells = (data.body ?? '').split('\n').map((line) => line.split(',').map((cell) => cell.trim()));
 
   // Legacy reports defaulted isHeaders to true; a false flag means no header row.
   if (data.isHeaders === false) {
@@ -80,7 +78,11 @@ export const formatFixedWidth = (table: ReportTable, emptyMessage?: string): str
     });
   }
 
-  const renderRow = (row: string[]): string => row.map((cell, i) => (cell ?? '').padEnd(widths[i])).join(COLUMN_GAP).trimEnd();
+  const renderRow = (row: string[]): string =>
+    row
+      .map((cell, i) => (cell ?? '').padEnd(widths[i]))
+      .join(COLUMN_GAP)
+      .trimEnd();
 
   const lines: string[] = [];
 
@@ -102,12 +104,10 @@ export const formatFixedWidth = (table: ReportTable, emptyMessage?: string): str
 };
 
 /** Escapes a single CSV cell per RFC 4180 (quote if it holds a comma, quote, or newline). */
-const csvCell = (cell: string): string => ((/[",\n]/u).test(cell) ? `"${cell.replace(/"/gu, '""')}"` : cell);
+const csvCell = (cell: string): string => (/[",\n]/u.test(cell) ? `"${cell.replace(/"/gu, '""')}"` : cell);
 
 /** Serializes the table as comma-separated values (data only, no metadata header). */
-export const tableToCsv = (table: ReportTable): string => [table.headers, ...table.rows]
-  .map((row) => row.map(csvCell).join(','))
-  .join('\n');
+export const tableToCsv = (table: ReportTable): string => [table.headers, ...table.rows].map((row) => row.map(csvCell).join(',')).join('\n');
 
 /** Serializes the data rows as an array of header-keyed JSON objects. */
 export const tableToJson = (table: ReportTable): string => {

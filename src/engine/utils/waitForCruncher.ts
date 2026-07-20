@@ -31,17 +31,7 @@ interface WaitForCruncherParams {
  * @param params The parameters to wait for the cruncher.
  */
 export const waitForCruncher = (params: WaitForCruncherParams): void => {
-  const {
-    cruncher,
-    cb,
-    validationFunc,
-    error = DEFAULT_ERROR,
-    retryCount = 0,
-    skipNumber = 0,
-    passCount = 0,
-    isRunCbOnFailure = false,
-    maxRetries = 5,
-  } = params;
+  const { cruncher, cb, validationFunc, error = DEFAULT_ERROR, retryCount = 0, skipNumber = 0, passCount = 0, isRunCbOnFailure = false, maxRetries = 5 } = params;
 
   cruncher.addEventListener(
     'message',
@@ -70,6 +60,6 @@ export const waitForCruncher = (params: WaitForCruncherParams): void => {
         error();
       }
     },
-    { once: true },
+    { once: true }
   );
 };

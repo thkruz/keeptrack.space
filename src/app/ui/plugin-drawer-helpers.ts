@@ -170,7 +170,12 @@ export function collectDrawerItems(): CollectedDrawerItems {
         label: plugin.bottomIconLabel,
         imgSrc,
         isTopMenu: false,
-        isDisabled: plugin.isIconDisabledOnLoad,
+        // Use the live disabled state, not the load-time default: a sensor/satellite
+        // selection (e.g. restored from persistence or account sync) can flip this
+        // before the footer renders. Rendering from isIconDisabledOnLoad here would
+        // desync the DOM from the plugin's guarded setBottomIconToEnabled(), leaving
+        // the icon permanently grayed and unclickable.
+        isDisabled: plugin.isIconDisabled,
         isLoginRequired: plugin.isLoginRequired,
         order,
       });
@@ -180,16 +185,14 @@ export function collectDrawerItems(): CollectedDrawerItems {
     // A plugin can override its group via drawerGroupKey (e.g. 'about').
     if (plugin.iconPlacement === IconPlacement.BOTTOM_ONLY) {
       const primaryMode = plugin.menuMode.find((m) => m !== MenuMode.ALL) ?? MenuMode.CATALOG;
-      const groupKey = plugin.drawerGroupKey && menuGroups[plugin.drawerGroupKey]
-        ? plugin.drawerGroupKey
-        : `mode-${primaryMode}`;
+      const groupKey = plugin.drawerGroupKey && menuGroups[plugin.drawerGroupKey] ? plugin.drawerGroupKey : `mode-${primaryMode}`;
 
       menuGroups[groupKey]?.items.push({
         id: plugin.bottomIconElementName,
         label: plugin.bottomIconLabel,
         imgSrc,
         isTopMenu: false,
-        isDisabled: plugin.isIconDisabledOnLoad,
+        isDisabled: plugin.isIconDisabled,
         isLoginRequired: plugin.isLoginRequired,
         order,
         shortcutHint: getShortcutHint(plugin.id),
@@ -252,7 +255,7 @@ export function renderUtilityFooter(groups: Record<string, DrawerGroup>): void {
     for (const item of group.items) {
       const disabledClass = item.isDisabled ? ' bmenu-item-disabled' : '';
       const proAttr = item.isLoginRequired ? ' data-pro-gated' : '';
-      const proClass = (item.isLoginRequired && !settingsManager.isDisableLoginGate) ? ' bmenu-item-pro' : '';
+      const proClass = item.isLoginRequired && !settingsManager.isDisableLoginGate ? ' bmenu-item-pro' : '';
       const dataAttr = item.isTopMenu ? `data-top-menu-id="${item.id}"` : `data-plugin-id="${item.id}"`;
       const idAttr = item.pluginId ? ` id="${item.pluginId}-utility-icon"` : '';
 
@@ -272,8 +275,7 @@ export function renderUtilityFooter(groups: Record<string, DrawerGroup>): void {
 
 /** Whether the user is signed in (required before the phone link is usable). */
 function isCompanionSignedIn_(): boolean {
-  const userPlugin = PluginRegistry.getPluginByName('UserAccountPlugin') as
-    (KeepTrackPlugin & { cachedUser?: { id?: string } | null }) | null;
+  const userPlugin = PluginRegistry.getPluginByName('UserAccountPlugin') as (KeepTrackPlugin & { cachedUser?: { id?: string } | null }) | null;
 
   return Boolean(userPlugin?.cachedUser?.id);
 }
@@ -309,14 +311,14 @@ export function renderStatusFooter(): void {
   const signedIn = isCompanionSignedIn_();
   const phoneLinkIcon = hasCompanionLink
     ? [
-      `    <div class="drawer-phone-link${signedIn ? '' : ' drawer-phone-link--disabled'}" id="drawer-phone-link"`,
-      `      role="button" tabindex="0" aria-disabled="${String(!signedIn)}"`,
-      `      kt-tooltip="${signedIn ? 'Phone Link' : 'Sign in to link your phone'}">`,
-      '      <svg class="drawer-phone-link-icon" viewBox="0 0 24 24" aria-hidden="true">',
-      '        <path fill="currentColor" d="M7 18v-8H3v8zm-4.5 2q-.625 0-1.062-.437T1 18.5v-9q0-.625.438-1.062T2.5 8h5q.625 0 1.063.438T9 9.5v9q0 .625-.437 1.063T7.5 20zM5 12.5q.325 0 .538-.225t.212-.525q0-.325-.213-.537T5 11q-.3 0-.525.213t-.225.537q0 .3.225.525T5 12.5M15.75 22v-5q-.225-.2-.363-.462T15.25 16q0-.525.375-.888t.875-.362q.525 0 .888.363t.362.887q0 .275-.112.55t-.388.45v5zm-2.075-3.175q-.55-.575-.862-1.3T12.5 16q0-1.675 1.175-2.838T16.5 12q1.675 0 2.838 1.163T20.5 16q0 .775-.288 1.5t-.862 1.3l-1.075-1.05q.35-.35.538-.8T19 16q0-1.05-.725-1.775T16.5 13.5t-1.775.725T14 16q0 .5.2.95t.55.8zM11.9 20.6q-.875-.95-1.388-2.138T10 16q0-2.725 1.9-4.612T16.5 9.5q2.725 0 4.613 1.888T23 16q0 1.275-.475 2.463t-1.4 2.112L20.05 19.5q.725-.725 1.088-1.625T21.5 16q0-2.1-1.45-3.55T16.5 11q-2.075 0-3.537 1.45T11.5 16q0 .975.388 1.888t1.087 1.637zM2 6q0-.825.588-1.412T4 4h15q.825 0 1.413.588T21 6v2.8q-.475-.275-.975-.513T19 7.876V6zm3 8"></path>',
-      '      </svg>',
-      '    </div>',
-    ].join('')
+        `    <div class="drawer-phone-link${signedIn ? '' : ' drawer-phone-link--disabled'}" id="drawer-phone-link"`,
+        `      role="button" tabindex="0" aria-disabled="${String(!signedIn)}"`,
+        `      kt-tooltip="${signedIn ? 'Phone Link' : 'Sign in to link your phone'}">`,
+        '      <svg class="drawer-phone-link-icon" viewBox="0 0 24 24" aria-hidden="true">',
+        '        <path fill="currentColor" d="M7 18v-8H3v8zm-4.5 2q-.625 0-1.062-.437T1 18.5v-9q0-.625.438-1.062T2.5 8h5q.625 0 1.063.438T9 9.5v9q0 .625-.437 1.063T7.5 20zM5 12.5q.325 0 .538-.225t.212-.525q0-.325-.213-.537T5 11q-.3 0-.525.213t-.225.537q0 .3.225.525T5 12.5M15.75 22v-5q-.225-.2-.363-.462T15.25 16q0-.525.375-.888t.875-.362q.525 0 .888.363t.362.887q0 .275-.112.55t-.388.45v5zm-2.075-3.175q-.55-.575-.862-1.3T12.5 16q0-1.675 1.175-2.838T16.5 12q1.675 0 2.838 1.163T20.5 16q0 .775-.288 1.5t-.862 1.3l-1.075-1.05q.35-.35.538-.8T19 16q0-1.05-.725-1.775T16.5 13.5t-1.775.725T14 16q0 .5.2.95t.55.8zM11.9 20.6q-.875-.95-1.388-2.138T10 16q0-2.725 1.9-4.612T16.5 9.5q2.725 0 4.613 1.888T23 16q0 1.275-.475 2.463t-1.4 2.112L20.05 19.5q.725-.725 1.088-1.625T21.5 16q0-2.1-1.45-3.55T16.5 11q-2.075 0-3.537 1.45T11.5 16q0 .975.388 1.888t1.087 1.637zM2 6q0-.825.588-1.412T4 4h15q.825 0 1.413.588T21 6v2.8q-.475-.275-.975-.513T19 7.876V6zm3 8"></path>',
+        '      </svg>',
+        '    </div>',
+      ].join('')
     : '';
 
   footerEl.innerHTML = [
@@ -441,8 +443,7 @@ export function syncInitialUtilityState(): void {
   footerEl?.querySelectorAll('.drawer-utility-icon[data-top-menu-id]').forEach((el) => {
     const topMenuId = (el as HTMLElement).dataset.topMenuId;
     const navBtn = topMenuId ? getEl(topMenuId, true) : null;
-    const isSelected = navBtn?.classList.contains('bmenu-item-selected') ||
-      !!navBtn?.querySelector('.bmenu-item-selected');
+    const isSelected = navBtn?.classList.contains('bmenu-item-selected') || !!navBtn?.querySelector('.bmenu-item-selected');
 
     el.classList.toggle('bmenu-item-selected', !!isSelected);
   });
@@ -485,11 +486,7 @@ export function loadRecents(): RecentEntry[] {
         if (typeof entry === 'string') {
           return { id: entry, t: 0 };
         }
-        if (
-          typeof entry === 'object' && entry !== null &&
-          typeof (entry as RecentEntry).id === 'string' &&
-          typeof (entry as RecentEntry).t === 'number'
-        ) {
+        if (typeof entry === 'object' && entry !== null && typeof (entry as RecentEntry).id === 'string' && typeof (entry as RecentEntry).t === 'number') {
           return { id: (entry as RecentEntry).id, t: (entry as RecentEntry).t };
         }
 
@@ -524,11 +521,7 @@ export function recordRecent(id: string): RecentEntry[] {
  * Build a DrawerGroup from recent item IDs, resolving only ids present in the
  * supplied cache and capping the resolved result to {@link maxItems}.
  */
-export function buildRecentGroupFromCache(
-  recentIds: string[],
-  allItems: Map<string, DrawerItemData>,
-  maxItems = MAX_RECENT_PLUGINS_,
-): DrawerGroup {
+export function buildRecentGroupFromCache(recentIds: string[], allItems: Map<string, DrawerItemData>, maxItems = MAX_RECENT_PLUGINS_): DrawerGroup {
   const recentItems: DrawerItemData[] = [];
 
   for (const pluginId of recentIds) {

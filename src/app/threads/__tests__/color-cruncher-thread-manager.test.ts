@@ -1,16 +1,17 @@
-import { ColorWorkerMsgType } from '@app/engine/rendering/color-worker/color-worker-messages';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { ColorWorkerMsgType } from '@app/engine/rendering/color-worker/color-worker-messages';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ColorCruncherThreadManager } from '../color-cruncher-thread-manager';
 
 /** A Worker stub whose postMessage/terminate are spies, passed to init() as workerStub. */
-const makeWorkerStub = () => ({
-  postMessage: vi.fn(),
-  terminate: vi.fn(),
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
-} as unknown as Worker & { postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> });
+const makeWorkerStub = () =>
+  ({
+    postMessage: vi.fn(),
+    terminate: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  }) as unknown as Worker & { postMessage: ReturnType<typeof vi.fn>; terminate: ReturnType<typeof vi.fn> };
 
 /** Builds an initialized manager backed by a spy worker. */
 const makeMgr = () => {
@@ -22,8 +23,7 @@ const makeMgr = () => {
   return { mgr, worker };
 };
 
-const lastMsg = (worker: { postMessage: ReturnType<typeof vi.fn> }): Record<string, unknown> =>
-  worker.postMessage.mock.calls.at(-1)![0] as Record<string, unknown>;
+const lastMsg = (worker: { postMessage: ReturnType<typeof vi.fn> }): Record<string, unknown> => worker.postMessage.mock.calls.at(-1)![0] as Record<string, unknown>;
 
 describe('ColorCruncherThreadManager', () => {
   afterEach(() => {

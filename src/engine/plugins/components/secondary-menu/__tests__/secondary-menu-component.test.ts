@@ -1,16 +1,17 @@
 /* eslint-disable max-lines-per-function */
 import { vi } from 'vitest';
+
 /**
  * @jest-environment jsdom
  */
 
-import { SecondaryMenuComponent } from '@app/engine/plugins/components/secondary-menu/secondary-menu-component';
-import { ISecondaryMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { ServiceLocator } from '@app/engine/core/service-locator';
-import * as slideUtils from '@app/engine/utils/slide';
+import { SecondaryMenuComponent } from '@app/engine/plugins/components/secondary-menu/secondary-menu-component';
+import { ISecondaryMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import * as dragUtils from '@app/engine/utils/click-and-drag';
+import * as slideUtils from '@app/engine/utils/slide';
 
 // Mock ServiceLocator
 vi.mock('@app/engine/core/service-locator', () => ({
@@ -46,8 +47,12 @@ describe('SecondaryMenuComponent', () => {
     vi.clearAllMocks();
 
     // Setup spies for slide utilities
-    mockSlideInRight = vi.spyOn(slideUtils, 'slideInRight').mockImplementation(() => { /* noop */ });
-    mockSlideOutLeft = vi.spyOn(slideUtils, 'slideOutLeft').mockImplementation(() => { /* noop */ });
+    mockSlideInRight = vi.spyOn(slideUtils, 'slideInRight').mockImplementation(() => {
+      /* noop */
+    });
+    mockSlideOutLeft = vi.spyOn(slideUtils, 'slideOutLeft').mockImplementation(() => {
+      /* noop */
+    });
     mockClickAndDragWidth = vi.spyOn(dragUtils, 'clickAndDragWidth').mockImplementation(() => ({ style: { top: '', position: '' } }) as HTMLElement);
   });
 
@@ -64,11 +69,7 @@ describe('SecondaryMenuComponent', () => {
 
   describe('constructor', () => {
     it('should create component with default values', () => {
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig());
 
       expect(component.elementName).toBe('test-side-menu-secondary');
       expect(component.buttonElementName).toBe('test-side-menu-secondary-btn');
@@ -83,7 +84,7 @@ describe('SecondaryMenuComponent', () => {
         createConfig({
           width: 400,
           zIndex: 10,
-        }),
+        })
       );
 
       component.init();
@@ -98,11 +99,7 @@ describe('SecondaryMenuComponent', () => {
 
   describe('init', () => {
     it('should throw if already initialized', () => {
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig());
 
       component.init();
 
@@ -110,11 +107,7 @@ describe('SecondaryMenuComponent', () => {
     });
 
     it('should create DOM element on uiManagerInit event', () => {
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig());
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -128,11 +121,7 @@ describe('SecondaryMenuComponent', () => {
 
   describe('destroy', () => {
     it('should reset component state', () => {
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig());
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -149,11 +138,7 @@ describe('SecondaryMenuComponent', () => {
     });
 
     it('should reset state', () => {
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig());
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -166,11 +151,7 @@ describe('SecondaryMenuComponent', () => {
 
   describe('open/close', () => {
     it('should open the menu', () => {
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig());
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -181,11 +162,7 @@ describe('SecondaryMenuComponent', () => {
     });
 
     it('should not open if already open', () => {
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig());
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -196,11 +173,7 @@ describe('SecondaryMenuComponent', () => {
     });
 
     it('should not open if disabled', () => {
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig());
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -212,11 +185,7 @@ describe('SecondaryMenuComponent', () => {
     });
 
     it('should close the menu', () => {
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig());
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -228,11 +197,7 @@ describe('SecondaryMenuComponent', () => {
     });
 
     it('should not close if already closed', () => {
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig());
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -243,12 +208,7 @@ describe('SecondaryMenuComponent', () => {
 
     it('should call onOpen callback', () => {
       const onOpen = vi.fn();
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-        { onOpen },
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig(), { onOpen });
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -259,12 +219,7 @@ describe('SecondaryMenuComponent', () => {
 
     it('should call onClose callback', () => {
       const onClose = vi.fn();
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-        { onClose },
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig(), { onClose });
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -275,11 +230,7 @@ describe('SecondaryMenuComponent', () => {
     });
 
     it('should position menu using leftOffset when provided', () => {
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig({ leftOffset: 350 }),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig({ leftOffset: 350 }));
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -293,11 +244,7 @@ describe('SecondaryMenuComponent', () => {
 
   describe('toggle', () => {
     it('should toggle from closed to open', () => {
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig());
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -308,11 +255,7 @@ describe('SecondaryMenuComponent', () => {
     });
 
     it('should toggle from open to closed', () => {
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig());
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -326,11 +269,7 @@ describe('SecondaryMenuComponent', () => {
 
   describe('button handling', () => {
     it('should toggle on button click', () => {
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig());
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -348,11 +287,7 @@ describe('SecondaryMenuComponent', () => {
     });
 
     it('should not toggle if disabled', () => {
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig());
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -373,11 +308,7 @@ describe('SecondaryMenuComponent', () => {
         play: mockPlay,
       } as any);
 
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig());
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -393,12 +324,7 @@ describe('SecondaryMenuComponent', () => {
     it('should track open/close state via programmatic open/close', () => {
       const onOpen = vi.fn();
       const onClose = vi.fn();
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-        { onOpen, onClose },
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig(), { onOpen, onClose });
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -424,12 +350,7 @@ describe('SecondaryMenuComponent', () => {
   describe('download button', () => {
     it('should call onDownload callback on download button click', () => {
       const onDownload = vi.fn();
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-        { onDownload },
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig(), { onDownload });
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -450,12 +371,7 @@ describe('SecondaryMenuComponent', () => {
       } as any);
 
       const onDownload = vi.fn();
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-        { onDownload },
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig(), { onDownload });
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -471,11 +387,7 @@ describe('SecondaryMenuComponent', () => {
 
   describe('hideSideMenus event', () => {
     it('should close when hideSideMenus event is emitted', () => {
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig());
 
       component.init();
       eventBus.emit(EventBusEvent.uiManagerInit);
@@ -488,11 +400,7 @@ describe('SecondaryMenuComponent', () => {
 
   describe('generateHtml', () => {
     it('should generate valid HTML structure', () => {
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig({ html: '<input type="text" />' }),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig({ html: '<input type="text" />' }));
 
       const html = component.generateHtml();
 
@@ -513,7 +421,7 @@ describe('SecondaryMenuComponent', () => {
             minWidth: 200,
             maxWidth: 500,
           },
-        }),
+        })
       );
 
       component.init();
@@ -526,11 +434,7 @@ describe('SecondaryMenuComponent', () => {
 
   describe('enabled property', () => {
     it('should get and set enabled state', () => {
-      const component = new SecondaryMenuComponent(
-        'test-plugin',
-        'test-side-menu',
-        createConfig(),
-      );
+      const component = new SecondaryMenuComponent('test-plugin', 'test-side-menu', createConfig());
 
       expect(component.enabled).toBe(true);
 

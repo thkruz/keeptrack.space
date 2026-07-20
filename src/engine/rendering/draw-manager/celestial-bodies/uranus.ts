@@ -20,7 +20,7 @@
  */
 
 import { SolarBody } from '@app/engine/core/interfaces';
-import { TemeVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
+import { Kilometers, Seconds, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
@@ -28,7 +28,7 @@ import { UranusRings } from './uranus-rings';
 
 export enum UranusTextureQuality {
   POTATO = '512',
-  ULTRA = '2k'
+  ULTRA = '2k',
 }
 
 export class Uranus extends CelestialBody {
@@ -36,7 +36,7 @@ export class Uranus extends CelestialBody {
   readonly RADIUS = this.radius;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
-  orbitalPeriod = 84 * 365.25 * 24 * 3600 as Seconds;
+  orbitalPeriod = (84 * 365.25 * 24 * 3600) as Seconds;
   meanDistanceToSun = 2870658186 as Kilometers;
   eci: TemeVec3;
   type: SpaceObjectType = SpaceObjectType.ICE_GIANT;

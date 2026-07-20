@@ -1,8 +1,8 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import { CustomSensorPlugin } from '@app/plugins/sensor/custom-sensor-plugin';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
+import { CustomSensorPlugin } from '@app/plugins/sensor/custom-sensor-plugin';
 import { SensorInfoPlugin } from '@app/plugins/sensor/sensor-info-plugin';
 import { SensorListPlugin } from '@app/plugins/sensor-list/sensor-list';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';

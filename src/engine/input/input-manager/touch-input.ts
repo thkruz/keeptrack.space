@@ -3,8 +3,11 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { normalizeAngle } from '@app/engine/utils/transforms';
 import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { eci2lla, Radians } from '@ootk/src/main';
+import { InputManager } from '../input-manager';
 import { MouseInput } from './mouse-input';
 
 export interface TapTouchEvent {
@@ -22,6 +25,10 @@ export interface PinchTouchEvent {
    * The distance between the two fingers
    */
   pinchDistance: number;
+  /**
+   * The angle in radians of the line between the two fingers (screen coordinates, y down)
+   */
+  pinchAngle: number;
 }
 
 interface CachedTouch {
@@ -29,6 +36,7 @@ interface CachedTouch {
   clientY: number;
   pageX: number;
   pageY: number;
+  identifier: number;
 }
 
 export class TouchInput {
@@ -43,6 +51,20 @@ export class TouchInput {
    * The distance between the two fingers at the start of the pinch
    */
   startPinchDistance = 0;
+  /**
+   * The angle between the two fingers at the start of the pinch, then re-anchored as the
+   * twist gesture progresses (see pinchMove)
+   */
+  startPinchAngle = 0;
+  /**
+   * Has the current two-finger gesture crossed the twist activation threshold
+   */
+  isTwisting = false;
+  /**
+   * Radians of twist required before two-finger rotation engages.
+   * Keeps straight pinch-zooms from wobbling the camera roll.
+   */
+  twistActivationThreshold = 0.15;
   touchSat: number;
   mouseSat: number;
   touchStartTime: number;
@@ -120,19 +142,31 @@ export class TouchInput {
       // Prevent browser gesture interpretation (scroll, bounce, back-swipe)
       canvasDOM.style.touchAction = 'none';
 
-      canvasDOM.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        this.canvasTouchStart(e);
-      }, { passive: false });
+      canvasDOM.addEventListener(
+        'touchstart',
+        (e) => {
+          e.preventDefault();
+          this.canvasTouchStart(e);
+        },
+        { passive: false }
+      );
 
-      canvasDOM.addEventListener('touchend', (e) => {
-        this.canvasTouchEnd(e, ServiceLocator.getMainCamera());
-      }, { passive: false });
+      canvasDOM.addEventListener(
+        'touchend',
+        (e) => {
+          this.canvasTouchEnd(e, ServiceLocator.getMainCamera());
+        },
+        { passive: false }
+      );
 
-      canvasDOM.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        this.canvasTouchMove(e);
-      }, { passive: false });
+      canvasDOM.addEventListener(
+        'touchmove',
+        (e) => {
+          e.preventDefault();
+          this.canvasTouchMove(e);
+        },
+        { passive: false }
+      );
 
       // Recalculate max pinch size on orientation change or resize
       window.addEventListener('resize', () => {
@@ -153,6 +187,12 @@ export class TouchInput {
           y: this.touchStartY,
         });
       }
+    }
+
+    // A finger lifted but two or more remain: re-anchor the pinch to the surviving pair
+    // so zoom and roll don't jump when the pair geometry changes
+    if (evt.touches?.length >= 2) {
+      this.pinchStart(this.measurePinch_(Array.from(evt.touches)));
     }
 
     // Transition from 2 fingers to 1: stop rotation to prevent jerk
@@ -194,6 +234,7 @@ export class TouchInput {
       clientY: t.clientY,
       pageX: t.pageX,
       pageY: t.pageY,
+      identifier: t.identifier,
     }));
 
     // Throttle processing to once per animation frame (matches mouse-input pattern)
@@ -209,25 +250,33 @@ export class TouchInput {
     const touches = this.cachedTouches_;
 
     if (this.isPinching && touches.length >= 2) {
-      // Pinch zoom only — no rotation during pinch to prevent jerk on finger release
-      const dist = Math.hypot(
-        touches[0].pageX - touches[1].pageX,
-        touches[0].pageY - touches[1].pageY,
-      );
+      // Two-finger gesture: pinch zoom + twist roll (no pitch/yaw to prevent jerk on finger release)
+      const pinch = this.measurePinch_(touches);
 
-      if (!isNaN(dist) && dist > this.tapMovementThreshold) {
-        this.pinchMove({ pinchDistance: dist });
+      if (!isNaN(pinch.pinchDistance) && pinch.pinchDistance > this.tapMovementThreshold) {
+        this.pinchMove(pinch);
       }
     } else if (!this.isPinching) {
       // Single-finger pan
-      if (
-        Math.abs(this.touchStartX - this.touchX) > this.tapMovementThreshold ||
-        Math.abs(this.touchStartY - this.touchY) > this.tapMovementThreshold
-      ) {
+      if (Math.abs(this.touchStartX - this.touchX) > this.tapMovementThreshold || Math.abs(this.touchStartY - this.touchY) > this.tapMovementThreshold) {
         this.isPanning = true;
         this.pan({ x: this.touchX, y: this.touchY });
       }
     }
+  }
+
+  /**
+   * Measures the distance and angle between the two lowest-identifier touches. Sorting by
+   * identifier keeps the finger pairing stable across frames — TouchList order is not guaranteed,
+   * and an unstable pair would flip the measured angle by PI mid-gesture.
+   */
+  private measurePinch_(touches: readonly CachedTouch[]): PinchTouchEvent {
+    const [a, b] = [...touches].sort((t1, t2) => t1.identifier - t2.identifier);
+
+    return {
+      pinchDistance: Math.hypot(a.pageX - b.pageX, a.pageY - b.pageY),
+      pinchAngle: Math.atan2(a.pageY - b.pageY, a.pageX - b.pageX),
+    };
   }
 
   public canvasTouchStart(evt: TouchEvent): void {
@@ -236,9 +285,7 @@ export class TouchInput {
     if (evt.touches.length > 1) {
       this.isPinching = true;
       this.isPanning = false;
-      this.pinchStart({
-        pinchDistance: Math.hypot(evt.touches[0].pageX - evt.touches[1].pageX, evt.touches[0].pageY - evt.touches[1].pageY),
-      });
+      this.pinchStart(this.measurePinch_(Array.from(evt.touches)));
 
       // Stop rotation drag — pinch is zoom-only
       const cam = ServiceLocator.getMainCamera();
@@ -339,7 +386,7 @@ export class TouchInput {
       '---\n' +
       `21x21 scan (raw): nearest=${scan.id} offset=(${scan.offsetX},${scan.offsetY}) hits=${scan.hitCount}\n` +
       `21x21 scan (rect): nearest=${scanCorr.id} offset=(${scanCorr.offsetX},${scanCorr.offsetY}) hits=${scanCorr.hitCount}\n${
-      scan.hitCount > 0 ? `raw hits:\n${scan.patchData}\n` : ''
+        scan.hitCount > 0 ? `raw hits:\n${scan.patchData}\n` : ''
       }${scanCorr.hitCount > 0 && scanCorr.patchData !== scan.patchData ? `rect hits:\n${scanCorr.patchData}\n` : ''}`;
 
     // Show visual crosshairs
@@ -371,15 +418,47 @@ export class TouchInput {
     ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
     ServiceLocator.getMainCamera().autoRotate(false);
 
-    ServiceLocator.getInputManager().openRmbMenu();
+    const inputManager = ServiceLocator.getInputManager();
+
+    /*
+     * Long-press is the touch equivalent of a right-click. Resolve the pressed
+     * object and the surface location before opening the menu - otherwise the
+     * context (earth/space/target) is whatever the last mouse click left behind.
+     */
+    const x = this.touchStartX;
+    const y = this.touchStartY;
+
+    if (typeof x !== 'number' || typeof y !== 'number' || Number.isNaN(x) || Number.isNaN(y)) {
+      inputManager.openRmbMenu();
+
+      return;
+    }
+
+    const satId = inputManager.getSatIdFromCoord(x, y);
+
+    inputManager.mouse.dragPosition = InputManager.getEarthScreenPoint(x, y);
+    inputManager.mouse.latLon = eci2lla(
+      {
+        x: inputManager.mouse.dragPosition[0],
+        y: inputManager.mouse.dragPosition[1],
+        z: inputManager.mouse.dragPosition[2],
+      },
+      ServiceLocator.getTimeManager().gmst
+    );
+
+    inputManager.openRmbMenu(satId);
   }
 
   pinchStart(evt: PinchTouchEvent) {
     this.startPinchDistance = evt.pinchDistance;
+    this.startPinchAngle = evt.pinchAngle;
+    this.isTwisting = false;
   }
 
   pinchMove(evt: PinchTouchEvent) {
     this.lastEvent = evt;
+
+    const mainCameraInstance = ServiceLocator.getMainCamera();
 
     // Ratio-based zoom: spread fingers (ratio > 1) = zoom in, pinch (ratio < 1) = zoom out
     const pinchRatio = evt.pinchDistance / this.startPinchDistance;
@@ -389,7 +468,22 @@ export class TouchInput {
 
     // Zoom in distance-from-satellite space when a satellite is focused so the feel stays smooth
     // and consistent at any altitude, instead of scaling the exponential normalized zoom level.
-    ServiceLocator.getMainCamera().zoomTouchPinch(pinchRatio);
+    mainCameraInstance.zoomTouchPinch(pinchRatio);
+
+    // Twist-to-roll: angle is cumulative from the gesture start until the activation threshold is
+    // crossed, then re-anchored every frame so incremental deltas keep the view glued to the fingers.
+    const twistDelta = normalizeAngle(<Radians>(evt.pinchAngle - this.startPinchAngle));
+
+    if (this.isTwisting) {
+      this.startPinchAngle = evt.pinchAngle;
+      // Screen y points down, so a visually clockwise twist increases the touch angle, while a
+      // clockwise image rotation needs a negative camera roll — hence the sign flip.
+      mainCameraInstance.rollTouchTwist(<Radians>-twistDelta);
+    } else if (Math.abs(twistDelta) > this.twistActivationThreshold) {
+      // Latch rotation, discarding the pre-threshold twist so the view doesn't jump
+      this.isTwisting = true;
+      this.startPinchAngle = evt.pinchAngle;
+    }
   }
 
   rotate(evt: TouchEvent) {

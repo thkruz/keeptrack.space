@@ -1,8 +1,10 @@
 /* eslint-disable dot-notation */
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
-import { StereoMap } from '@app/plugins/stereo-map/stereo-map';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { StereoMap } from '@app/plugins/stereo-map/stereo-map';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -56,10 +58,12 @@ describe('StereoMap draw chain and interactions', () => {
 
     // Secondary-menu inputs are not injected by websiteInit.
     if (!getEl('stereo-map-minutes', true)) {
-      document.body.insertAdjacentHTML('beforeend',
+      document.body.insertAdjacentHTML(
+        'beforeend',
         '<input id="stereo-map-minutes" /><input id="stereo-map-orbit-mult" value="1.15" />' +
-        '<input id="stereo-map-graticule" type="checkbox" />' +
-        '<form id="stereo-map-settings-form"></form>');
+          '<input id="stereo-map-graticule" type="checkbox" />' +
+          '<form id="stereo-map-settings-form"></form>'
+      );
     }
 
     // Shared 2D context on the canvas INSTANCE (other suites reassign the prototype).
@@ -240,7 +244,10 @@ describe('StereoMap draw chain and interactions', () => {
     it('binds "m" to the bottom-menu toggle', () => {
       const toggle = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
 
-      plugin.getKeyboardShortcuts().find((s) => s.key === 'm')!.callback();
+      plugin
+        .getKeyboardShortcuts()
+        .find((s) => s.key === 'm')!
+        .callback();
 
       expect(toggle).toHaveBeenCalled();
     });
@@ -252,6 +259,58 @@ describe('StereoMap draw chain and interactions', () => {
 
       expect(settingsManager.mapWidth).toBeGreaterThan(0);
       expect(settingsManager.mapHeight).toBe(settingsManager.mapWidth / 2);
+    });
+  });
+
+  describe('secondary ground trace', () => {
+    it('draws the secondary trace beneath the primary in the blue color family', () => {
+      p().selectSatManager_.secondarySatObj = fakeSat({ id: 5 });
+      const strokeSpy = vi.spyOn(plugin as never, 'strokeGroundTrace_' as never);
+
+      plugin.updateMap();
+
+      expect(strokeSpy).toHaveBeenCalledTimes(2);
+      // Secondary is stroked first (drawn beneath), primary second (on top)
+      expect(strokeSpy.mock.calls[0][2]).toBe('#00ffff');
+      expect(strokeSpy.mock.calls[0][3]).toBe('#0066ff');
+      expect(strokeSpy.mock.calls[1][2]).toBe('#ffff00');
+      expect(strokeSpy.mock.calls[1][3]).toBe('#ff0000');
+    });
+
+    it('skips the secondary trace when no secondary satellite is selected', () => {
+      p().selectSatManager_.secondarySatObj = null;
+      const strokeSpy = vi.spyOn(plugin as never, 'strokeGroundTrace_' as never);
+
+      plugin.updateMap();
+
+      expect(strokeSpy).toHaveBeenCalledTimes(1);
+      expect(strokeSpy.mock.calls[0][2]).toBe('#ffff00');
+    });
+
+    it('skips the secondary trace when it is the same satellite as the primary', () => {
+      p().selectSatManager_.secondarySatObj = fakeSat({ id: 0 });
+      const strokeSpy = vi.spyOn(plugin as never, 'strokeGroundTrace_' as never);
+
+      plugin.updateMap();
+
+      expect(strokeSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('redraws when the secondary satellite changes while the menu is open', () => {
+      const updateSpy = vi.spyOn(plugin, 'updateMap').mockImplementation(() => undefined);
+
+      EventBus.getInstance().emit(EventBusEvent.setSecondarySat, null, -1);
+
+      expect(updateSpy).toHaveBeenCalled();
+    });
+
+    it('does not redraw on secondary changes while the menu is closed', () => {
+      p().isMenuButtonActive = false;
+      const updateSpy = vi.spyOn(plugin, 'updateMap').mockImplementation(() => undefined);
+
+      EventBus.getInstance().emit(EventBusEvent.setSecondarySat, null, -1);
+
+      expect(updateSpy).not.toHaveBeenCalled();
     });
   });
 });

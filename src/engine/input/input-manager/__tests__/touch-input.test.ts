@@ -2,10 +2,11 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
+import { InputManager } from '@app/engine/input/input-manager';
+import { TouchInput } from '@app/engine/input/input-manager/touch-input';
 import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
-import { TouchInput } from '@app/engine/input/input-manager/touch-input';
 import { vi } from 'vitest';
 
 const makeCamera = () => ({
@@ -19,6 +20,9 @@ const makeCamera = () => ({
     zoomTarget: 0.5,
     isZoomIn: false,
     camAngleSnappedOnSat: true,
+    localRotateCurrent: { pitch: 0, roll: 0, yaw: 0 },
+    localRotateTarget: { pitch: 0, roll: 0, yaw: 0 },
+    localRotateSpeed: { pitch: 0, roll: 0, yaw: 0 },
   },
   autoRotate: vi.fn(),
   // Mirror the Camera.zoomTouchPinch Earth-centered fallback (no satellite focused here).
@@ -28,11 +32,18 @@ const makeCamera = () => ({
     this.state.isZoomIn = pinchRatio > 1;
     this.state.zoomTarget /= dampenedRatio;
   },
+  // Mirror Camera.rollTouchTwist: write the delta straight into current/target roll.
+  rollTouchTwist(deltaRoll: number) {
+    this.state.localRotateCurrent.roll += deltaRoll;
+    this.state.localRotateTarget.roll = this.state.localRotateCurrent.roll;
+    this.state.localRotateSpeed.roll = 0;
+  },
 });
 
-const touchEvt = (touches: { clientX?: number; clientY?: number; pageX?: number; pageY?: number }[]) => ({
-  touches: touches.map((t) => ({ clientX: t.clientX ?? 0, clientY: t.clientY ?? 0, pageX: t.pageX ?? 0, pageY: t.pageY ?? 0 })),
-}) as unknown as TouchEvent;
+const touchEvt = (touches: { clientX?: number; clientY?: number; pageX?: number; pageY?: number; identifier?: number }[]) =>
+  ({
+    touches: touches.map((t, i) => ({ clientX: t.clientX ?? 0, clientY: t.clientY ?? 0, pageX: t.pageX ?? 0, pageY: t.pageY ?? 0, identifier: t.identifier ?? i })),
+  }) as unknown as TouchEvent;
 
 describe('TouchInput', () => {
   let touch: TouchInput;
@@ -55,6 +66,7 @@ describe('TouchInput', () => {
       openRmbMenu: vi.fn(),
       getSatIdFromCoord: vi.fn(() => 5),
       getSatIdFromCoordNeighborhood: vi.fn(() => ({ id: 5, offsetX: 0, offsetY: 0, hitCount: 1, patchData: 'x' })),
+      mouse: {},
     };
     vi.spyOn(ServiceLocator, 'getInputManager').mockReturnValue(inputManager as never);
 
@@ -68,7 +80,12 @@ describe('TouchInput', () => {
 
   describe('canvasTouchStart', () => {
     it('starts a pinch with two fingers and halts camera rotation', () => {
-      touch.canvasTouchStart(touchEvt([{ pageX: 0, pageY: 0 }, { pageX: 30, pageY: 40 }]));
+      touch.canvasTouchStart(
+        touchEvt([
+          { pageX: 0, pageY: 0 },
+          { pageX: 30, pageY: 40 },
+        ])
+      );
 
       expect(touch.isPinching).toBe(true);
       expect(touch.isPanning).toBe(false);
@@ -167,13 +184,34 @@ describe('TouchInput', () => {
       touch.isPinching = true;
       touch.startPinchDistance = 50;
       t().cachedTouches_ = [
-        { clientX: 0, clientY: 0, pageX: 0, pageY: 0 },
-        { clientX: 0, clientY: 0, pageX: 60, pageY: 80 }, // hypot = 100
+        { clientX: 0, clientY: 0, pageX: 0, pageY: 0, identifier: 0 },
+        { clientX: 0, clientY: 0, pageX: 60, pageY: 80, identifier: 1 }, // hypot = 100
       ];
 
       t().processTouchMove_();
 
       expect(camera.state.isZoomIn).toBe(true);
+    });
+
+    it('measures the same pinch angle regardless of touch list order', () => {
+      touch.isPinching = true;
+      touch.startPinchDistance = 100;
+      const pinchMoveSpy = vi.spyOn(touch, 'pinchMove');
+
+      t().cachedTouches_ = [
+        { clientX: 0, clientY: 0, pageX: 0, pageY: 0, identifier: 0 },
+        { clientX: 0, clientY: 0, pageX: 60, pageY: 80, identifier: 1 },
+      ];
+      t().processTouchMove_();
+
+      // Same fingers, but the browser reports them in the opposite order
+      t().cachedTouches_ = [
+        { clientX: 0, clientY: 0, pageX: 60, pageY: 80, identifier: 1 },
+        { clientX: 0, clientY: 0, pageX: 0, pageY: 0, identifier: 0 },
+      ];
+      t().processTouchMove_();
+
+      expect(pinchMoveSpy.mock.calls[0][0].pinchAngle).toBeCloseTo(pinchMoveSpy.mock.calls[1][0].pinchAngle);
     });
   });
 
@@ -216,25 +254,113 @@ describe('TouchInput', () => {
       expect(camera.autoRotate).toHaveBeenCalledWith(false);
       expect(inputManager.openRmbMenu).toHaveBeenCalled();
     });
+
+    it('resolves the pressed object and surface location before opening the menu', () => {
+      const earthPointSpy = vi.spyOn(InputManager, 'getEarthScreenPoint').mockReturnValue([1000, 2000, 3000] as never);
+
+      touch.touchStartX = 15;
+      touch.touchStartY = 25;
+
+      touch.press(touchEvt([]));
+
+      expect(inputManager.getSatIdFromCoord).toHaveBeenCalledWith(15, 25);
+      expect(earthPointSpy).toHaveBeenCalledWith(15, 25);
+      expect(inputManager.mouse.latLon).toBeDefined();
+      expect(inputManager.openRmbMenu).toHaveBeenCalledWith(5);
+    });
   });
 
   describe('pinch', () => {
-    it('records the starting distance on pinchStart', () => {
-      touch.pinchStart({ pinchDistance: 123 });
+    it('records the starting distance and angle on pinchStart and clears the twist latch', () => {
+      touch.isTwisting = true;
+
+      touch.pinchStart({ pinchDistance: 123, pinchAngle: 1 });
 
       expect(touch.startPinchDistance).toBe(123);
+      expect(touch.startPinchAngle).toBe(1);
+      expect(touch.isTwisting).toBe(false);
     });
 
     it('zooms in when the fingers spread apart', () => {
       touch.startPinchDistance = 100;
       camera.state.zoomTarget = 0.5;
 
-      touch.pinchMove({ pinchDistance: 200 });
+      touch.pinchMove({ pinchDistance: 200, pinchAngle: 0 });
 
       expect(camera.state.isZoomIn).toBe(true);
       expect(camera.state.zoomTarget).toBeLessThan(0.5);
       // startPinchDistance resets to the latest distance for the next frame.
       expect(touch.startPinchDistance).toBe(200);
+    });
+  });
+
+  describe('twist', () => {
+    beforeEach(() => {
+      touch.pinchStart({ pinchDistance: 100, pinchAngle: 0 });
+    });
+
+    it('does not roll while the twist is below the activation threshold', () => {
+      touch.pinchMove({ pinchDistance: 100, pinchAngle: 0.05 });
+
+      expect(touch.isTwisting).toBe(false);
+      expect(camera.state.localRotateCurrent.roll).toBe(0);
+    });
+
+    it('latches past the threshold without a jump, discarding the pre-threshold twist', () => {
+      touch.pinchMove({ pinchDistance: 100, pinchAngle: 0.3 });
+
+      expect(touch.isTwisting).toBe(true);
+      expect(touch.startPinchAngle).toBe(0.3);
+      expect(camera.state.localRotateCurrent.roll).toBe(0);
+    });
+
+    it('applies incremental roll with the sign flipped once latched', () => {
+      touch.pinchMove({ pinchDistance: 100, pinchAngle: 0.3 }); // latch
+
+      touch.pinchMove({ pinchDistance: 100, pinchAngle: 0.4 });
+
+      // Finger angle +0.1 (visually clockwise) -> camera roll -0.1 (image rotates clockwise)
+      expect(camera.state.localRotateCurrent.roll).toBeCloseTo(-0.1);
+      expect(touch.startPinchAngle).toBe(0.4);
+    });
+
+    it('normalizes the twist delta across the +/-PI atan2 wrap', () => {
+      touch.pinchStart({ pinchDistance: 100, pinchAngle: 3.1 });
+      touch.isTwisting = true;
+
+      // 3.1 -> -3.1 crosses the atan2 branch cut: real motion is +0.083 rad, not -6.2
+      touch.pinchMove({ pinchDistance: 100, pinchAngle: -3.1 });
+
+      expect(camera.state.localRotateCurrent.roll).toBeCloseTo(-(2 * Math.PI - 6.2));
+    });
+
+    it('zooms and rolls simultaneously in one gesture', () => {
+      touch.isTwisting = true;
+      camera.state.zoomTarget = 0.5;
+
+      touch.pinchMove({ pinchDistance: 200, pinchAngle: -0.2 });
+
+      expect(camera.state.zoomTarget).toBeLessThan(0.5);
+      expect(camera.state.localRotateCurrent.roll).toBeCloseTo(0.2);
+    });
+
+    it('re-anchors the pinch when a finger lifts but two or more remain', () => {
+      touch.isPinching = true;
+      touch.isTwisting = true;
+      touch.touchStartTime = Date.now();
+
+      touch.canvasTouchEnd(
+        touchEvt([
+          { pageX: 0, pageY: 0, identifier: 1 },
+          { pageX: 0, pageY: 40, identifier: 2 },
+        ]),
+        camera as never
+      );
+
+      expect(touch.startPinchDistance).toBeCloseTo(40);
+      expect(touch.startPinchAngle).toBeCloseTo(Math.atan2(-40, 0));
+      expect(touch.isTwisting).toBe(false);
+      expect(touch.isPinching).toBe(true);
     });
   });
 

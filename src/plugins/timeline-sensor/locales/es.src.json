@@ -3,6 +3,10 @@
     "SensorTimeline": {
       "bottomIconLabel": "Línea de Tiempo del Sensor",
       "title": "Menú de Línea de Tiempo del Sensor",
+      "sections": {
+        "settings": "Configuración",
+        "sensors": "Sensores"
+      },
       "labels": {
         "calculationLength": "Duración del Cálculo (Horas)",
         "calculationInterval": "Intervalo de Cálculo (Segundos)",

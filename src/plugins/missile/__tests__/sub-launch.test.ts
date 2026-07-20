@@ -1,8 +1,7 @@
-import { OCEAN_PATROL_REGIONS, SUBMARINE_FLEETS, SubLaunchEntry, isSubmarineLaunch, planSubmarineBoats, randomOceanLaunchPoint, subClassOf } from '@app/plugins/missile/sub-launch';
+import { isSubmarineLaunch, OCEAN_PATROL_REGIONS, planSubmarineBoats, randomOceanLaunchPoint, SUBMARINE_FLEETS, SubLaunchEntry, subClassOf } from '@app/plugins/missile/sub-launch';
 
 /** True when a point falls inside any curated open-ocean region. */
-const inSomeRegion = (lat: number, lon: number): boolean =>
-  OCEAN_PATROL_REGIONS.some((r) => lat >= r.latMin && lat <= r.latMax && lon >= r.lonMin && lon <= r.lonMax);
+const inSomeRegion = (lat: number, lon: number): boolean => OCEAN_PATROL_REGIONS.some((r) => lat >= r.latMin && lat <= r.latMax && lon >= r.lonMin && lon <= r.lonMax);
 
 const EARTH_RADIUS_KM = 6371;
 const DEG2RAD = Math.PI / 180;
@@ -115,7 +114,10 @@ describe('sub-launch', () => {
 
     it('keeps Chinese submarines in the Pacific', () => {
       const entries: SubLaunchEntry[] = Array.from({ length: 9 }, (_unused, i) => ({
-        index: i, desc: 'Type 092 Sub (JL-2) -> Honolulu', targetLat: 21.4, targetLon: -157.9,
+        index: i,
+        desc: 'Type 092 Sub (JL-2) -> Honolulu',
+        targetLat: 21.4,
+        targetLon: -157.9,
       }));
       const launches = planSubmarineBoats(entries, halfRng);
 
@@ -129,7 +131,10 @@ describe('sub-launch', () => {
       const mixed: SubLaunchEntry[] = [
         ...ohioEntries(400),
         ...Array.from({ length: 400 }, (_unused, i) => ({
-          index: 1000 + i, desc: 'Borei Sub (Bulava) -> Washington DC', targetLat: 38.9, targetLon: -77,
+          index: 1000 + i,
+          desc: 'Borei Sub (Bulava) -> Washington DC',
+          targetLat: 38.9,
+          targetLon: -77,
         })),
       ];
       const launches = planSubmarineBoats(mixed, halfRng);

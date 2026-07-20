@@ -1,12 +1,14 @@
 /**
- * This is the tsconfig extension that only applies to webpack.
+ * Library build: emits JS + .d.ts declarations to ./lib (via `pnpm run build:lib`,
+ * which runs tsgo). Mirrors tsconfig.build.json's include/exclude so declaration
+ * emit type-checks the same clean set (no test files / vitest globals).
  */
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./lib", /* Redirect output structure to the directory. */
+    "outDir": "./lib" /* Redirect output structure to the directory. */,
     "declaration": true,
-    "declarationMap": true,
+    "declarationMap": true
   },
   "include": [
     "src/**/*.ts",
@@ -16,13 +18,7 @@
     "src/**/*.png",
     "src/**/*.mp3",
     "src/**/*.jpg",
-    "test/**/*.ts",
-    "test/**/*.tsx",
-    "test/**/*.js",
-    "test/**/*.jsx",
-    "test/**/*.png",
-    "test/**/*.mp3",
-    "test/**/*.jpg",
+    "public/analysis/js/analysis-tools.js"
   ],
   "exclude": [
     "node_modules/**/*",
@@ -34,12 +30,12 @@
     "tsconfig.json",
     "src/tools/**/*",
     "test/**/*",
-  ],
-  "filesGlob": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.png",
-    "src/**/*.jpg",
-    "!**/node_modules/**"
+    "src/engine/ootk/dist/**/*",
+    "src/engine/ootk/examples/**/*",
+    "src/engine/ootk/test/**/*",
+    "src/engine/ootk/**/__tests__/**/*",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/plugins-external/**/__tests__/**/*"
   ]
 }

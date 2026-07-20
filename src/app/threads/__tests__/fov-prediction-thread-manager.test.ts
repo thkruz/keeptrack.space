@@ -4,7 +4,9 @@ import { vi } from 'vitest';
 const IN = { INIT: 0, UPDATE_TIME: 1, CANCEL: 2 } as const;
 const OUT = { FULL_SWEEP_COMPLETE: 0, PROGRESS: 2 } as const;
 
-interface OnMessageable { onMessage(e: { data: unknown }): void }
+interface OnMessageable {
+  onMessage(e: { data: unknown }): void;
+}
 
 const makeManager = () => {
   const postMessage = vi.fn();

@@ -1,9 +1,9 @@
-import { vi } from 'vitest';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { SoundManager } from '@app/engine/audio/sound-manager';
 import { SoundNames, sounds } from '@app/engine/audio/sounds';
-import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { setupStandardEnvironment } from '@test/environment/standard-env';
+import { vi } from 'vitest';
 
 describe('Sound Manager', () => {
   let soundManagerPlugin: SoundManager;

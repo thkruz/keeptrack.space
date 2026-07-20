@@ -1,8 +1,8 @@
-import { vi } from 'vitest';
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { SensorMath } from '@app/app/sensors/sensor-math';
 import { Kilometers, KilometersPerSecond, Satellite, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
 import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
+import { vi } from 'vitest';
 
 /*
  * Pure-ish SensorMath helpers: the optical-visibility predicate (mocked sun
@@ -14,25 +14,19 @@ describe('SensorMath.checkIfVisibleForOptical', () => {
 
   it('is visible when the ground station is in shadow and the satellite is sunlit', () => {
     // First call = station status, second = satellite status.
-    vi.spyOn(SatMath, 'calculateIsInSun')
-      .mockReturnValueOnce(SunStatus.UMBRAL)
-      .mockReturnValueOnce(SunStatus.SUN);
+    vi.spyOn(SatMath, 'calculateIsInSun').mockReturnValueOnce(SunStatus.UMBRAL).mockReturnValueOnce(SunStatus.SUN);
 
     expect(SensorMath.checkIfVisibleForOptical(defaultSat, defaultSensor, new Date('2022-01-01T00:00:00Z'))).toBe(true);
   });
 
   it('is NOT visible when the station is also sunlit', () => {
-    vi.spyOn(SatMath, 'calculateIsInSun')
-      .mockReturnValueOnce(SunStatus.SUN)
-      .mockReturnValueOnce(SunStatus.SUN);
+    vi.spyOn(SatMath, 'calculateIsInSun').mockReturnValueOnce(SunStatus.SUN).mockReturnValueOnce(SunStatus.SUN);
 
     expect(SensorMath.checkIfVisibleForOptical(defaultSat, defaultSensor, new Date('2022-01-01T00:00:00Z'))).toBe(false);
   });
 
   it('is NOT visible when the satellite is itself in shadow', () => {
-    vi.spyOn(SatMath, 'calculateIsInSun')
-      .mockReturnValueOnce(SunStatus.PENUMBRAL)
-      .mockReturnValueOnce(SunStatus.UMBRAL);
+    vi.spyOn(SatMath, 'calculateIsInSun').mockReturnValueOnce(SunStatus.PENUMBRAL).mockReturnValueOnce(SunStatus.UMBRAL);
 
     expect(SensorMath.checkIfVisibleForOptical(defaultSat, defaultSensor, new Date('2022-01-01T00:00:00Z'))).toBe(false);
   });

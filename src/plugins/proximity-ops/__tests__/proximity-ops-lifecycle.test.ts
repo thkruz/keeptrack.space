@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
 import { StorageKey } from '@app/engine/persistence/storage-key';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { ProximityOps, ProximityOpsEvent } from '@app/plugins/proximity-ops/proximity-ops';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -30,8 +30,7 @@ const rpoEvent = (over: Partial<ProximityOpsEvent> = {}): ProximityOpsEvent => (
   ...over,
 });
 
-const cloneSat = (over: Record<string, unknown> = {}) =>
-  Object.assign(Object.create(Object.getPrototypeOf(defaultSat)), defaultSat, { id: 2, ...over });
+const cloneSat = (over: Record<string, unknown> = {}) => Object.assign(Object.create(Object.getPrototypeOf(defaultSat)), defaultSat, { id: 2, ...over });
 
 describe('ProximityOps lifecycle / search orchestration', () => {
   let plugin: ProximityOps;
@@ -49,7 +48,7 @@ describe('ProximityOps lifecycle / search orchestration', () => {
   });
 
   describe('getKeyboardShortcuts callback', () => {
-    it('the \'X\' shortcut callback invokes bottomMenuClicked without throwing', () => {
+    it("the 'X' shortcut callback invokes bottomMenuClicked without throwing", () => {
       const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
       const shortcut = plugin.getKeyboardShortcuts()[0];
 
@@ -126,8 +125,12 @@ describe('ProximityOps lifecycle / search orchestration', () => {
 
   describe('runSearch_ mode dispatch', () => {
     const params = {
-      maxDis: 1e9, maxVel: 1e9, durationSec: 600, baseTimeMs: Date.parse('2022-01-01T00:00:00Z'),
-      stepSeconds: 60, refineToleranceMs: 500,
+      maxDis: 1e9,
+      maxVel: 1e9,
+      durationSec: 600,
+      baseTimeMs: Date.parse('2022-01-01T00:00:00Z'),
+      stepSeconds: 60,
+      refineToleranceMs: 500,
     };
 
     it('dispatches the GEO all-vs-all survey', () => {

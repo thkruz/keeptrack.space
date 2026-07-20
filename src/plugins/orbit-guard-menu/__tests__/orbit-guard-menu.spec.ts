@@ -1,4 +1,4 @@
-import { test, expect } from '@test/e2e/coverage';
+import { expect, test } from '@test/e2e/coverage';
 import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('OrbitGuardMenuPlugin', () => {
@@ -15,7 +15,7 @@ test.describe('OrbitGuardMenuPlugin', () => {
     await expect(page.locator('#maneuver-detection-menu')).toBeAttached({ timeout: 10_000 });
     await expect(page.locator('#maneuver-detection-table')).toBeAttached();
 
-    const fatalErrors = errors.filter((e) => (/orbit.?guard|maneuver/iu).test(e));
+    const fatalErrors = errors.filter((e) => /orbit.?guard|maneuver/iu.test(e));
 
     expect(fatalErrors).toHaveLength(0);
   });

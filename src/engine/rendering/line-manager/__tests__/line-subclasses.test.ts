@@ -93,7 +93,7 @@ describe('line-manager subclasses', () => {
   });
 
   describe('SensorMarkerLine', () => {
-    it('extends 100 km radially outward from the sensor position', () => {
+    it('extends 750 km radially outward from the sensor position', () => {
       const line = new SensorMarkerLine(sensorWithEci(6371, 0, 0));
       const calls = capture(line);
 
@@ -102,7 +102,7 @@ describe('line-manager subclasses', () => {
       expect(calls).toEqual([
         [
           [6371, 0, 0],
-          [6471, 0, 0],
+          [7121, 0, 0],
         ],
       ]);
     });

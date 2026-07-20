@@ -176,6 +176,21 @@ function watchConfigDir(profileName: string) {
   });
 }
 
+/**
+ * Spawn a shell command supplied as a single string.
+ *
+ * Passing an args array together with `shell: true` is deprecated (Node DEP0190):
+ * the args are concatenated onto the command, not escaped, so Node now warns.
+ * Building the full command string ourselves is the documented replacement — safe
+ * here because every command below is static and trusted (no external input).
+ *
+ * We invoke `pnpm exec` (not `npx`) so no npm process runs: npm would otherwise print
+ * "Unknown config" warnings for this repo's pnpm-only settings on every child spawn.
+ */
+function spawnShell(command: string, cwd: string) {
+  return spawn(command, { stdio: 'inherit', shell: true, cwd });
+}
+
 function runBuildWatch(args: string[]): void {
   const buildArgs = args.length > 0 ? args : ['development'];
 
@@ -194,19 +209,11 @@ function runBuildWatch(args: string[]): void {
   // Reconcile external plugins first (restore clones a fork committed + regenerate
   // the manifest), then translations, then start the watch build. --skip-locales on
   // sync avoids a redundant t7e run since we run generate-translation right after.
-  const sync = spawn('npx', ['tsx', './scripts/plugin/index.ts', 'sync', '--skip-locales'], {
-    stdio: 'inherit',
-    shell: true,
-    cwd,
-  });
+  const sync = spawnShell('pnpm exec tsx ./scripts/plugin/index.ts sync --skip-locales', cwd);
 
   sync.on('close', () => {
     // Run translations, then start build in watch mode
-    const t7e = spawn('npx', ['tsx', './build/generate-translation.ts'], {
-      stdio: 'inherit',
-      shell: true,
-      cwd,
-    });
+    const t7e = spawnShell('pnpm exec tsx ./build/generate-translation.ts', cwd);
 
     t7e.on('close', (code) => {
       if (code !== 0) {
@@ -216,11 +223,7 @@ function runBuildWatch(args: string[]): void {
       }
 
       // Start build in watch mode (runs indefinitely)
-      spawn('npx', ['tsx', './build/build-manager.ts', ...buildArgs], {
-        stdio: 'inherit',
-        shell: true,
-        cwd,
-      });
+      spawnShell(`pnpm exec tsx ./build/build-manager.ts ${buildArgs.join(' ')}`, cwd);
     });
   });
 }

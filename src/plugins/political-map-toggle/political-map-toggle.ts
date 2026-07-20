@@ -39,6 +39,7 @@ export class PoliticalMapToggle extends KeepTrackPlugin {
     return [
       {
         key: 'l',
+        shift: false,
         callback: () => this.bottomMenuClicked(),
       },
     ];

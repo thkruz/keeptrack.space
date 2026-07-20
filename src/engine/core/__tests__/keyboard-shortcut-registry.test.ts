@@ -84,8 +84,10 @@ const pluginShortcuts: { pluginId: string; shortcuts: Omit<IKeyboardShortcut, 'c
   { pluginId: 'PlanetsMenuPlugin', shortcuts: [{ key: 'p' }, { key: 'Home', shift: true, ctrl: false }, { key: 'Home', shift: false, ctrl: false }] },
   // src/plugins/polar-plot/polar-plot.ts
   { pluginId: 'PolarPlot', shortcuts: [{ key: 'P' }] },
-  // src/plugins/political-map-toggle/political-map-toggle.ts
-  { pluginId: 'PoliticalMapToggle', shortcuts: [{ key: 'l' }] },
+  // src/plugins/political-map-toggle/political-map-toggle.ts (shift:false; owns plain 'l', Shift+l is DrawLines)
+  { pluginId: 'PoliticalMapToggle', shortcuts: [{ key: 'l', shift: false }] },
+  // src/plugins/draw-lines/draw-lines.ts
+  { pluginId: 'DrawLinesPlugin', shortcuts: [{ key: 'l', shift: true }] },
   // src/plugins/proximity-ops/proximity-ops.ts
   { pluginId: 'ProximityOps', shortcuts: [{ key: 'X' }] },
   // src/plugins/reentries/reentries.ts

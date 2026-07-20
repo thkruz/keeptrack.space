@@ -220,6 +220,7 @@ export class TimeManager {
       },
       {
         key: ',',
+        shift: false,
         callback: () => {
           if (!this.guardTimeChange_()) {
             return;

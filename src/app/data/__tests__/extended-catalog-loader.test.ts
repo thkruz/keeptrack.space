@@ -233,7 +233,11 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
       [ussfRow, satnogsRow],
       [satnogsRow, ussfRow],
     ]) {
-      await expect(CatalogLoader.parse({ keepTrackTle: rows })).resolves.not.toThrow();
+      // parse() mutates rows in-place (adds sccNum, intlDes, active, ...), so
+      // clone per iteration to guarantee each call starts from a clean payload.
+      const clonedRows = rows.map((r) => ({ ...r })) as never;
+
+      await expect(CatalogLoader.parse({ keepTrackTle: clonedRows })).resolves.not.toThrow();
 
       const catalogManager = ServiceLocator.getCatalogManager();
       const matches = catalogManager.objectCache.filter((o) => o.isSatellite() && (o as Satellite).sccNum === '25544') as Satellite[];

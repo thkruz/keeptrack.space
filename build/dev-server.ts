@@ -34,6 +34,7 @@ const mimeTypes: Record<string, string> = {
   '.webmanifest': 'application/manifest+json',
   '.mp3': 'audio/mpeg',
   '.wav': 'audio/wav',
+  '.m4a': 'audio/mp4',
   '.woff2': 'font/woff2',
   '.woff': 'font/woff',
   '.ttf': 'font/ttf',

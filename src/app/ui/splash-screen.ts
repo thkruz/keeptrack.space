@@ -11,19 +11,27 @@ export abstract class SplashScreen {
   /** Wallpaper images provided by the active build profile via @wallpapers alias */
   private static splashScreenImgList_ = [...wallpapers];
 
-  static readonly msg = {
-    math: t7e('loadingScreenMsgs.math'),
-    science: t7e('loadingScreenMsgs.science'),
-    science2: t7e('loadingScreenMsgs.science2'),
-    dots: t7e('loadingScreenMsgs.dots'),
-    satIntel: t7e('loadingScreenMsgs.satIntel'),
-    painting: t7e('loadingScreenMsgs.painting'),
-    coloring: t7e('loadingScreenMsgs.coloring'),
-    elsets: t7e('loadingScreenMsgs.elsets'),
-    models: t7e('loadingScreenMsgs.models'),
+  /**
+   * Lazy getter so `t7e()` is resolved on first access (after i18next has
+   * initialized) instead of at class-parse time. A `static readonly` object
+   * evaluated these before localization loaded, so `t7e()` returned - and then
+   * permanently cached - empty strings, leaving the loading messages blank.
+   */
+  static get msg() {
+    return {
+      math: t7e('loadingScreenMsgs.math'),
+      science: t7e('loadingScreenMsgs.science'),
+      science2: t7e('loadingScreenMsgs.science2'),
+      dots: t7e('loadingScreenMsgs.dots'),
+      satIntel: t7e('loadingScreenMsgs.satIntel'),
+      painting: t7e('loadingScreenMsgs.painting'),
+      coloring: t7e('loadingScreenMsgs.coloring'),
+      elsets: t7e('loadingScreenMsgs.elsets'),
+      models: t7e('loadingScreenMsgs.models'),
 
-    cunningPlan: t7e('loadingScreenMsgs.cunningPlan'),
-  };
+      cunningPlan: t7e('loadingScreenMsgs.cunningPlan'),
+    };
+  }
 
   static readonly textElId = 'loader-text';
 

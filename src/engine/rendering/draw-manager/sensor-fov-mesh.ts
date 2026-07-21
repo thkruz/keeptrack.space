@@ -382,9 +382,7 @@ export class SensorFovMesh extends CustomMesh {
   }
 
   sortFacesByDistance(camPos: vec3): void {
-    const buckets: number[][] = Array(this.NUM_BUCKETS)
-      .fill(null)
-      .map(() => []);
+    const buckets: number[][] = new Array(this.NUM_BUCKETS).fill(null).map(() => []);
     const faceCenters: vec3[] = [];
 
     // Pre-compute face centers

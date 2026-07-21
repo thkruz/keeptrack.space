@@ -199,6 +199,54 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
     expect(catalogManager.sccIndex['799500766']).toBeDefined();
   });
 
+  it('collapses a duplicate NORAD id in the primary payload, keeping the higher-priority source', async () => {
+    // Regression: a stale cached /v4/sats/brief blob (predating the API's
+    // source-dedup) delivered 25544 twice — once from the catalog (USSF) and
+    // once from the tle_sources fallback (SatNOGS) — and the loader rendered
+    // both as separate objects. The load must yield exactly one 25544, and it
+    // must be the USSF copy regardless of the order the rows arrive in.
+    const issSat = Satellite.fromOmm({
+      OBJECT_NAME: 'ISS (ZARYA)',
+      OBJECT_ID: '1998-067A',
+      EPOCH: '2026-07-05T02:54:29.072000',
+      MEAN_MOTION: 15.5,
+      ECCENTRICITY: 0.0006703,
+      INCLINATION: 51.64,
+      RA_OF_ASC_NODE: 208.0,
+      ARG_OF_PERICENTER: 130.0,
+      MEAN_ANOMALY: 325.0,
+      EPHEMERIS_TYPE: 0,
+      CLASSIFICATION_TYPE: 'U',
+      NORAD_CAT_ID: '25544',
+      ELEMENT_SET_NO: 999,
+      REV_AT_EPOCH: 10000,
+      BSTAR: 0.0001027,
+      MEAN_MOTION_DOT: 0.00016717,
+      MEAN_MOTION_DDOT: 0,
+    });
+
+    const ussfRow = { tle1: issSat.tle1, tle2: issSat.tle2, name: 'ISS (ZARYA)', source: 'spacetrack' } as never;
+    // Mirrors the tle_sources branch: NULL name → loader fills "Unknown 25544".
+    const satnogsRow = { tle1: issSat.tle1, tle2: issSat.tle2, source: 'satnogs' } as never;
+
+    for (const rows of [
+      [ussfRow, satnogsRow],
+      [satnogsRow, ussfRow],
+    ]) {
+      // parse() mutates rows in-place (adds sccNum, intlDes, active, ...), so
+      // clone per iteration to guarantee each call starts from a clean payload.
+      const clonedRows = rows.map((r) => ({ ...r })) as never;
+
+      await expect(CatalogLoader.parse({ keepTrackTle: clonedRows })).resolves.not.toThrow();
+
+      const catalogManager = ServiceLocator.getCatalogManager();
+      const matches = catalogManager.objectCache.filter((o) => o.isSatellite() && (o as Satellite).sccNum === '25544') as Satellite[];
+
+      expect(matches).toHaveLength(1);
+      expect(matches[0].source).toBe('spacetrack');
+    }
+  });
+
   it('does not crash when an externalCatalog entry has a malformed (non-ASCII) SCC', async () => {
     // Real-world: corrupt upstream TLE with a Cyrillic / fullwidth lookalike
     // in cols 3-7. `Tle.convertA5to6Digit` throws ValidationError for these.

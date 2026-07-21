@@ -114,37 +114,43 @@ const A = <Meuusjs>(<unknown>{
   AU: 149597870,
 });
 A.EclCoord = function (a: number, b: number, c: number): void {
-  if (isNaN(a) || isNaN(b)) throw Error('Invalid EclCoord object: (' + a + ', ' + b + ')');
+  if (isNaN(a) || isNaN(b)) {
+    throw new Error(`Invalid EclCoord object: (${a}, ${b})`);
+  }
   this.lat = a;
   this.lng = b;
   void 0 !== c && (this.h = c);
 };
 A.EclCoord.prototype = {
   toWgs84String: function () {
-    return A.Math.formatNum((180 * this.lat) / Math.PI) + ', ' + A.Math.formatNum((180 * -this.lng) / Math.PI);
+    return `${A.Math.formatNum((180 * this.lat) / Math.PI)}, ${A.Math.formatNum((180 * -this.lng) / Math.PI)}`;
   },
 };
 A.EclCoordfromWgs84 = function (a: number, b: number, c: number): void {
   return new A.EclCoord((a * Math.PI) / 180, (-b * Math.PI) / 180, c);
 };
 A.EqCoord = function (a: number, b: number) {
-  if (isNaN(a) || isNaN(b)) throw Error('Invalid EqCoord object: (' + a + ', ' + b + ')');
+  if (isNaN(a) || isNaN(b)) {
+    throw new Error(`Invalid EqCoord object: (${a}, ${b})`);
+  }
   this.ra = a;
   this.dec = b;
 };
 A.EqCoord.prototype = {
   toString: function () {
-    return 'ra:' + A.Math.formatNum((180 * this.ra) / Math.PI) + ', dec:' + A.Math.formatNum((180 * this.dec) / Math.PI);
+    return `ra:${A.Math.formatNum((180 * this.ra) / Math.PI)}, dec:${A.Math.formatNum((180 * this.dec) / Math.PI)}`;
   },
 };
 A.HzCoord = function (a: string | number, b: string | number) {
-  if (isNaN(a) || isNaN(b)) throw Error('Invalid HzCoord object: (' + a + ', ' + b + ')');
+  if (isNaN(a) || isNaN(b)) {
+    throw new Error(`Invalid HzCoord object: (${a}, ${b})`);
+  }
   this.az = a;
   this.alt = b;
 };
 A.HzCoord.prototype = {
   toString: function () {
-    return 'azi:' + A.Math.formatNum((180 * this.az) / Math.PI) + ', alt:' + A.Math.formatNum((180 * this.alt) / Math.PI);
+    return `azi:${A.Math.formatNum((180 * this.az) / Math.PI)}, alt:${A.Math.formatNum((180 * this.alt) / Math.PI)}`;
   },
 };
 A.Coord = {
@@ -164,14 +170,14 @@ A.Coord = {
     var c = Math.floor(a / 3600) % 24,
       d = Math.floor(a / 60) % 60;
     a = Math.floor(a % 60);
-    return (b !== 0 ? b + 'd ' : '') + (c < 10 ? '0' : '') + c + ':' + (d < 10 ? '0' : '') + d + ':' + (a < 10 ? '0' : '') + a;
+    return `${(b !== 0 ? `${b}d ` : '') + (c < 10 ? '0' : '') + c}:${d < 10 ? '0' : ''}${d}:${a < 10 ? '0' : ''}${a}`;
   },
   secondsToHMStr: function (a: string | number) {
     var b = Math.floor(a / 86400);
     a = A.Math.pMod(a, 86400);
     var c = Math.floor(a / 3600) % 24;
     a = Math.floor(a / 60) % 60;
-    return (b !== 0 ? b + 'd ' : '') + (c < 10 ? '0' : '') + c + ':' + (a < 10 ? '0' : '') + a;
+    return `${(b !== 0 ? `${b}d ` : '') + (c < 10 ? '0' : '') + c}:${a < 10 ? '0' : ''}${a}`;
   },
   eqToEcl: function (a: { ra: number; dec: number }, b: number) {
     var c = Math.sin(a.ra),
@@ -261,8 +267,12 @@ A.Globe = {
 };
 A.Interp = {
   newLen3: function (a: number, b: number, c: string | any[]) {
-    if (c.length != 3) throw 'Error not 3';
-    if (b === a) throw 'Error no x range';
+    if (c.length != 3) {
+      throw 'Error not 3';
+    }
+    if (b === a) {
+      throw 'Error no x range';
+    }
     var d = c[1] - c[0],
       e = c[2] - c[1];
     return { x1: a, x3: b, y: c, a: d, b: e, c: e - d, abSum: d + e, xSum: b + a, xDiff: b - a };
@@ -324,12 +334,16 @@ A.JulianDay.dateToJD = function (a: {
     : A.JulianDay.calendarGregorianToJD(a.getUTCFullYear(), a.getUTCMonth() + 1, b);
 };
 A.JulianDay.calendarGregorianToJD = function (a: number, b: number, c: number) {
-  if (b === 1 || b === 2) a--, (b += 12);
+  if (b === 1 || b === 2) {
+    a--, (b += 12);
+  }
   var d = Math.floor(a / 100);
   return Math.floor((36525 * (a + 4716)) / 100) + Math.floor((306 * (b + 1)) / 10) + (2 - d + Math.floor(d / 4)) + c - 1524.5;
 };
 A.JulianDay.calendarJulianToJD = function (a: number, b: number, c: number) {
-  if (b === 1 || b === 2) a--, (b += 12);
+  if (b === 1 || b === 2) {
+    a--, (b += 12);
+  }
   return Math.floor((36525 * (a + 4716)) / 100) + Math.floor((306 * (b + 1)) / 10) + c - 1524.5;
 };
 A.JulianDay.secondsFromHMS = function (a: number, b: number, c: number) {
@@ -376,8 +390,12 @@ A.Math = {
   },
   horner: function (a: number, b: string | any[]) {
     var c = b.length - 1;
-    if (c <= 0) throw 'empty array not supported';
-    for (var d = b[c]; c > 0; ) c--, (d = d * a + b[c]);
+    if (c <= 0) {
+      throw 'empty array not supported';
+    }
+    for (var d = b[c]; c > 0; ) {
+      c--, (d = d * a + b[c]);
+    }
     return d;
   },
   formatNum: function (a: number, b: number) {
@@ -475,7 +493,7 @@ A.Moon = {
           throw 'error';
       }
     }
-    for (h = 0; h < A.Moon.tb.length; h++)
+    for (h = 0; h < A.Moon.tb.length; h++) {
       switch (((k = A.Moon.tb[h]), (q = Math.sin(d * k[0] + e * k[1] + f * k[2] + g * k[3])), k[1])) {
         case 0:
           l += k[4] * q;
@@ -491,6 +509,7 @@ A.Moon = {
         default:
           throw 'error';
       }
+    }
     return { lng: A.Math.pMod(a, 2 * Math.PI) + 1e-6 * m * b, lat: 1e-6 * l * b, delta: 385000.56 + 0.001 * n };
   },
   ta: [
@@ -815,7 +834,9 @@ A.Rise = {
   },
   approxTimes: function (a: number, b: number, c: number, d: { dec: any; ra: any }) {
     b = A.Rise.circumpolar(a.lat, b, d.dec);
-    if (!b) return null;
+    if (!b) {
+      return null;
+    }
     b = (43200 * Math.acos(b)) / Math.PI;
     a = (43200 * (d.ra + a.lng)) / Math.PI - c;
     return {
@@ -838,7 +859,9 @@ A.Rise = {
       return A.Math.pMod(e + (((p * Math.sin(g) + n * h * Math.cos(f) - c) / (h * n * Math.sin(f))) * 43200) / Math.PI, 86400);
     }
     var g = A.Rise.approxTimes(a, c, d, e[1]);
-    if (!g) return null;
+    if (!g) {
+      return null;
+    }
     var l = A.Interp.newLen3(-86400, 86400, [e[0].ra, e[1].ra, e[2].ra]),
       m = A.Interp.newLen3(-86400, 86400, [e[0].dec, e[1].dec, e[2].dec]);
     e = d + (360.985647 * g.transit) / 360;

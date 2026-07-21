@@ -1256,10 +1256,6 @@ export class CatalogLoader {
 
       return 'None';
     }
-    if (Number.isNaN(Number.parseInt(year))) {
-      // eslint-disable-next-line no-debugger
-      debugger;
-    }
     const prefix = Number.parseInt(year) > 50 ? '19' : '20';
 
     year = prefix + year;
@@ -1315,6 +1311,41 @@ export class CatalogLoader {
       // Never fail just because of one bad satellite
       let isAddedToCatalog = false;
 
+      // Canonicalize so the keepTrack-bundled TLE catalog and external
+      // CelesTrak updates share a single sccIndex entry per satellite.
+      const key = CatalogLoader.canonicalSccKey(resp[i].sccNum) ?? resp[i].sccNum;
+
+      // Enforce one object per NORAD id within a single payload. The API already
+      // dedupes by source priority, but a stale cached response (browser/service
+      // worker holding a pre-dedup blob) can still deliver the same NORAD twice —
+      // once from the primary catalog (e.g. USSF) and once from the tle_sources
+      // fallback (e.g. SatNOGS). Without this guard both rows are pushed and render
+      // as two dots for one satellite. Collapse into the existing slot, keeping the
+      // higher-priority source (USSF > CelesTrak > CelesTrak-Sup > Vimpel > SatNOGS).
+      const existingIdx = catalogManagerInstance.sccIndex[key];
+      const existingSat = typeof existingIdx === 'number' ? tempObjData[existingIdx] : undefined;
+
+      if (existingSat?.isSatellite()) {
+        if (CatalogLoader.sourcePriority_(resp[i].source) < CatalogLoader.sourcePriority_((existingSat as Satellite).source)) {
+          // Incoming source outranks the stored one: overwrite in place so the id
+          // and array position stay stable instead of appending a second object.
+          try {
+            tempObjData[existingIdx] = new Satellite({
+              ...resp[i],
+              id: existingIdx,
+              tle1: resp[i].tle1,
+              tle2: resp[i].tle2,
+              rcs,
+            });
+          } catch (e) {
+            errorManagerInstance.log(e);
+          }
+        }
+
+        // Lower or equal priority: drop the duplicate row entirely.
+        return;
+      }
+
       try {
         const satellite = new Satellite({
           ...resp[i],
@@ -1331,10 +1362,6 @@ export class CatalogLoader {
       }
 
       if (isAddedToCatalog) {
-        // Canonicalize so the keepTrack-bundled TLE catalog and external
-        // CelesTrak updates share a single sccIndex entry per satellite.
-        const key = CatalogLoader.canonicalSccKey(resp[i].sccNum) ?? resp[i].sccNum;
-
         catalogManagerInstance.sccIndex[key] = tempObjData.length - 1;
         catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = tempObjData.length - 1;
       }
@@ -1748,6 +1775,25 @@ export class CatalogLoader {
 
       return 0;
     });
+  }
+
+  /**
+   * Canonical source ranking used to break duplicate-NORAD ties during catalog
+   * load. Lower number wins. Mirrors the API's tle_sources priority
+   * (USSF/spacetrack > CelesTrak > CelesTrak Supplemental > Vimpel > SatNOGS) so
+   * the client resolves a stale/duplicated payload to the same source the
+   * backend would have picked. Unknown/other sources rank last.
+   */
+  private static readonly SOURCE_PRIORITY_: Readonly<Record<string, number>> = {
+    [CatalogSource.USSF]: 1,
+    [CatalogSource.CELESTRAK]: 2,
+    [CatalogSource.CELESTRAK_SUP]: 3,
+    [CatalogSource.VIMPEL]: 4,
+    [CatalogSource.SATNOGS]: 5,
+  };
+
+  private static sourcePriority_(source?: string): number {
+    return CatalogLoader.SOURCE_PRIORITY_[source ?? ''] ?? 6;
   }
 
   /**

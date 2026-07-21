@@ -24,6 +24,7 @@ declare global {
   declare module '*.mp3';
   declare module '*.wav';
   declare module '*.flac';
+  declare module '*.m4a';
   declare module '*.txt' {
     const content: string;
 

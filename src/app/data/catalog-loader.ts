@@ -1778,20 +1778,6 @@ export class CatalogLoader {
   }
 
   /**
-   * Returns the canonical sccIndex key for a satellite identifier, or null
-   * if the input is malformed. All sccIndex reads and writes inside the
-   * loader must go through this helper so alpha-5 ("T0001") and its 6-digit
-   * numeric equivalent ("270001") collapse to the same key — otherwise
-   * different ingestion paths would assign the same satellite to different
-   * keys and silently insert duplicates.
-   *
-   * Canonicalization rules:
-   * 1. Alpha-5 → its 6-digit numeric form via Tle.convertA5to6Digit.
-   * 2. Numerics → leading zeros stripped, so "00005" and "5" share a key.
-   *    Matches Satellite.sccNum's display-canonical form so plugins can
-   *    use either sat.sccNum or canonicalSccKey(...) interchangeably.
-   */
-  /**
    * Canonical source ranking used to break duplicate-NORAD ties during catalog
    * load. Lower number wins. Mirrors the API's tle_sources priority
    * (USSF/spacetrack > CelesTrak > CelesTrak Supplemental > Vimpel > SatNOGS) so
@@ -1810,6 +1796,20 @@ export class CatalogLoader {
     return CatalogLoader.SOURCE_PRIORITY_[source ?? ''] ?? 6;
   }
 
+  /**
+   * Returns the canonical sccIndex key for a satellite identifier, or null
+   * if the input is malformed. All sccIndex reads and writes inside the
+   * loader must go through this helper so alpha-5 ("T0001") and its 6-digit
+   * numeric equivalent ("270001") collapse to the same key — otherwise
+   * different ingestion paths would assign the same satellite to different
+   * keys and silently insert duplicates.
+   *
+   * Canonicalization rules:
+   * 1. Alpha-5 → its 6-digit numeric form via Tle.convertA5to6Digit.
+   * 2. Numerics → leading zeros stripped, so "00005" and "5" share a key.
+   *    Matches Satellite.sccNum's display-canonical form so plugins can
+   *    use either sat.sccNum or canonicalSccKey(...) interchangeably.
+   */
   static canonicalSccKey(scc: string | number): string | null {
     const raw = scc.toString();
 

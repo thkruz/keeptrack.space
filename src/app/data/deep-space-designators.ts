@@ -51,7 +51,10 @@ export abstract class DeepSpaceDesignators {
   /**
    * Registers a designator entry. Plugins (e.g. pro deep-space missions) call
    * this at init for objects they can load on demand. Duplicate designators
-   * are rejected so a bad config cannot shadow an existing object.
+   * are rejected so a bad config cannot shadow an existing object - with one
+   * exception: informational `knownObject` entries yield to functional
+   * (`probe`/`deferred`) registrations, so an object listed as "no ephemeris
+   * yet" is upgraded in place once something can actually load it.
    */
   static register(entry: DeepSpaceDesignatorEntry): void {
     const scc = entry.sccNum ? this.normalizeSccNum_(entry.sccNum) : null;
@@ -63,10 +66,16 @@ export abstract class DeepSpaceDesignators {
       return;
     }
 
-    if ((scc && this.bySccNum_.has(scc)) || (intlDes && this.byIntlDes_.has(intlDes))) {
-      errorManagerInstance.log(`DeepSpaceDesignators: duplicate designator for "${entry.displayName}", ignoring`);
+    const existing = (scc ? this.bySccNum_.get(scc) : null) ?? (intlDes ? this.byIntlDes_.get(intlDes) : null) ?? null;
 
-      return;
+    if (existing) {
+      if (existing.kind === 'knownObject' && entry.kind !== 'knownObject') {
+        this.remove_(existing);
+      } else {
+        errorManagerInstance.log(`DeepSpaceDesignators: duplicate designator for "${entry.displayName}", ignoring`);
+
+        return;
+      }
     }
 
     if (scc) {
@@ -74,6 +83,16 @@ export abstract class DeepSpaceDesignators {
     }
     if (intlDes) {
       this.byIntlDes_.set(intlDes, entry);
+    }
+  }
+
+  /** Removes an entry from both indexes (used when upgrading a knownObject). */
+  private static remove_(entry: DeepSpaceDesignatorEntry): void {
+    if (entry.sccNum) {
+      this.bySccNum_.delete(this.normalizeSccNum_(entry.sccNum));
+    }
+    if (entry.intlDes) {
+      this.byIntlDes_.delete(entry.intlDes.trim().toUpperCase());
     }
   }
 
@@ -119,4 +138,25 @@ export abstract class DeepSpaceDesignators {
 
     return /^\d+$/u.test(trimmed) ? String(parseInt(trimmed, 10)) : trimmed.toUpperCase();
   }
+}
+
+/**
+ * Popular deep-space objects external sites link to that have no KeepTrack
+ * ephemeris yet. A URL hit resolves to a toast naming the object instead of a
+ * generic "not found". Once ephemeris exists (Chebyshev probe or a plugin
+ * loader), the functional registration upgrades these in place.
+ *
+ * Designators verified against the CelesTrak SATCAT mirror
+ * (api.keeptrack.space/v4/satcat/latest) on 2026-07-21.
+ */
+const KNOWN_DEEP_SPACE_OBJECTS: DeepSpaceDesignatorEntry[] = [
+  { kind: 'knownObject', displayName: 'Pioneer 10', sccNum: '5860', intlDes: '1972-012A' },
+  { kind: 'knownObject', displayName: 'Pioneer 11', sccNum: '6421', intlDes: '1973-019A' },
+  { kind: 'knownObject', displayName: 'New Horizons', sccNum: '28928', intlDes: '2006-001A' },
+  { kind: 'knownObject', displayName: 'Parker Solar Probe', sccNum: '43592', intlDes: '2018-065A' },
+  { kind: 'knownObject', displayName: 'JWST', sccNum: '50463', intlDes: '2021-130A' },
+];
+
+for (const entry of KNOWN_DEEP_SPACE_OBJECTS) {
+  DeepSpaceDesignators.registerSeed(entry);
 }

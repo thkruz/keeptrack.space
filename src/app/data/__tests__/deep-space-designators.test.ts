@@ -14,6 +14,35 @@ describe('DeepSpaceDesignators', () => {
     expect(entry?.bodyName).toBe('Voyager 1');
   });
 
+  it('seeds Voyager 2 from the probe configs', () => {
+    const entry = DeepSpaceDesignators.lookupSccNum('10271');
+
+    expect(entry?.kind).toBe('probe');
+    expect(entry?.bodyName).toBe('Voyager 2');
+  });
+
+  it('seeds known objects without ephemeris (SATCAT-verified designators)', () => {
+    expect(DeepSpaceDesignators.lookupSccNum('5860')?.displayName).toBe('Pioneer 10');
+    expect(DeepSpaceDesignators.lookupSccNum('6421')?.displayName).toBe('Pioneer 11');
+    expect(DeepSpaceDesignators.lookupSccNum('28928')?.displayName).toBe('New Horizons');
+    expect(DeepSpaceDesignators.lookupSccNum('43592')?.displayName).toBe('Parker Solar Probe');
+    expect(DeepSpaceDesignators.lookupSccNum('50463')?.displayName).toBe('JWST');
+    expect(DeepSpaceDesignators.lookupSccNum('5860')?.kind).toBe('knownObject');
+  });
+
+  it('upgrades a knownObject in place when a functional entry registers', () => {
+    const focus = () => Promise.resolve(true);
+
+    DeepSpaceDesignators.register({ kind: 'deferred', displayName: 'New Horizons OEM', sccNum: '28928', intlDes: '2006-001A', focus });
+
+    expect(DeepSpaceDesignators.lookupSccNum('28928')?.kind).toBe('deferred');
+    expect(DeepSpaceDesignators.lookupIntlDes('2006-001A')?.kind).toBe('deferred');
+
+    // reset drops the runtime upgrade and restores the knownObject seed
+    DeepSpaceDesignators.reset();
+    expect(DeepSpaceDesignators.lookupSccNum('28928')?.kind).toBe('knownObject');
+  });
+
   it('tolerates zero-padded catalog numbers', () => {
     expect(DeepSpaceDesignators.lookupSccNum('010321')?.bodyName).toBe('Voyager 1');
     expect(DeepSpaceDesignators.lookupSccNum(' 10321 ')?.bodyName).toBe('Voyager 1');
@@ -30,11 +59,11 @@ describe('DeepSpaceDesignators', () => {
   });
 
   it('registers runtime entries and clears them on reset', () => {
-    DeepSpaceDesignators.register({ kind: 'knownObject', displayName: 'Voyager 2', sccNum: '10271' });
-    expect(DeepSpaceDesignators.lookupSccNum('10271')?.displayName).toBe('Voyager 2');
+    DeepSpaceDesignators.register({ kind: 'knownObject', displayName: 'Some Probe', sccNum: '99001' });
+    expect(DeepSpaceDesignators.lookupSccNum('99001')?.displayName).toBe('Some Probe');
 
     DeepSpaceDesignators.reset();
-    expect(DeepSpaceDesignators.lookupSccNum('10271')).toBeNull();
+    expect(DeepSpaceDesignators.lookupSccNum('99001')).toBeNull();
     // Seeds survive the reset
     expect(DeepSpaceDesignators.lookupSccNum('10321')).not.toBeNull();
   });

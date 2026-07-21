@@ -108,12 +108,10 @@ describe('UrlManager deep-space designator fallback', () => {
     expect(toastSpy).toHaveBeenCalledWith(expect.stringContaining(VOYAGER_1), expect.anything(), true);
   });
 
-  it('toasts a named message for known objects without ephemeris', () => {
-    DeepSpaceDesignators.register({ kind: 'knownObject', displayName: 'Voyager 2', sccNum: '10271' });
+  it('toasts a named message for known objects without ephemeris (seeded Pioneer 10)', () => {
+    Url.handleSatParam_('5860');
 
-    Url.handleSatParam_('10271');
-
-    expect(toastSpy).toHaveBeenCalledWith(expect.stringContaining('Voyager 2'), expect.anything(), true);
+    expect(toastSpy).toHaveBeenCalledWith(expect.stringContaining('Pioneer 10'), expect.anything(), true);
   });
 
   it('delegates to a deferred loader and stays quiet on success', async () => {

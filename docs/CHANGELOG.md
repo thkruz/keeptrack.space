@@ -2,7 +2,22 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v13.6.0](https://github.com/thkruz/keeptrack.space/compare/v13.5.0...v13.6.0)
+
+- Fix keyboard shortcut conflicts and refactor splash screen [`#1413`](https://github.com/thkruz/keeptrack.space/pull/1413)
+- feat(catalog-loader): :sparkles: collapse duplicate NORAD IDs [`c4bff20`](https://github.com/thkruz/keeptrack.space/commit/c4bff207c29cb84b6b75b9c68ffdd5fc5e043853)
+- style(lint): :art: apply Biome autofixes [`e0f40a2`](https://github.com/thkruz/keeptrack.space/commit/e0f40a29bddff9870ad80538f2d4b13ca767b3c8)
+- refactor(splash-screen): :recycle: convert msg to lazy getter [`05d657e`](https://github.com/thkruz/keeptrack.space/commit/05d657ea44cff7673037cf1b978e0666d8543f18)
+- docs(catalog-loader): :memo: keep canonicalSccKey JSDoc adjacent to its declaration [`3140124`](https://github.com/thkruz/keeptrack.space/commit/3140124e1a99507276c001577175a13f5714f38c)
+- fix(keyboard-shortcuts): :bug: resolve Shift+, and Shift+l registry conflicts [`b5843d8`](https://github.com/thkruz/keeptrack.space/commit/b5843d802c43820ba6351cb74ee3262bd553883c)
+- @ [`525f6fa`](https://github.com/thkruz/keeptrack.space/commit/525f6fa1b50f58959b45b51db4c3212f0b1cd2ea)
+- test(catalog-loader): :white_check_mark: clone rows per iteration to avoid in-place mutation carryover [`d519028`](https://github.com/thkruz/keeptrack.space/commit/d51902874f8cf9985c22c8485712eb524cadd97d)
+- fix(catalog-loader): :bug: remove stray debugger statement [`b0ca857`](https://github.com/thkruz/keeptrack.space/commit/b0ca857432a183c200c5141c43b6fee38ee121b5)
+- chore(biome): :wrench: disable useLiteralKeys in test files [`36bab5f`](https://github.com/thkruz/keeptrack.space/commit/36bab5f2e2bcc486ac839f2e405220165516fb24)
+
 #### [v13.5.0](https://github.com/thkruz/keeptrack.space/compare/v13.4.0...v13.5.0)
+
+>  
 
 - Enhance UI components and fix camera transitions in v13 [`#1411`](https://github.com/thkruz/keeptrack.space/pull/1411)
 - style(biome): :art: format and auto-fix src with Biome [`1322821`](https://github.com/thkruz/keeptrack.space/commit/132282138d588c8cc4415bca0032601a1f0d31c7)
@@ -35,6 +50,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - feat(timeline-satellite): :sparkles: v13 settings card in the secondary menu [`45bc6b4`](https://github.com/thkruz/keeptrack.space/commit/45bc6b47c779b3d06596025e4af8008cf0436f3b)
 - fix(search): :bug: disambiguate leading-zero NORAD queries [`8762815`](https://github.com/thkruz/keeptrack.space/commit/87628157df3a360bc6437fd5ad3c291a3d18743c)
 - fix(search): :bug: match alpha-5 NORAD ID designations [`e600aed`](https://github.com/thkruz/keeptrack.space/commit/e600aed3ad18d926a4f451c3e0d0dee5fdfb63e7)
+- chore(release): :bookmark: 13.5.0 [skip ci] [`d8872db`](https://github.com/thkruz/keeptrack.space/commit/d8872db7224580fb96cfa2ea7d8ab8cec7f3f857)
 - fix(plugin-drawer): :bug: render footer icons from live disabled state [`55394f2`](https://github.com/thkruz/keeptrack.space/commit/55394f2b8dcfefeb47ded27f064abc51a6c3e83c)
 - docs(maneuver): :memo: add Hohmann wizard help screenshot and refresh maneuver menu shot [`2c147ea`](https://github.com/thkruz/keeptrack.space/commit/2c147ea435bc8f74e9afdb55f7f7ad449c3cdd81)
 - feat(close-objects): :sparkles: v13 search card for the OSS fallback menu [`1c0effc`](https://github.com/thkruz/keeptrack.space/commit/1c0effcf22a9350217cdc2c562bdcda1a0271127)

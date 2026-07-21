@@ -5,8 +5,8 @@ authors:
   given-names: "Theodore"
   orcid: "https://orcid.org/0009-0001-8541-9323"
 title: "KeepTrack: Open-Source Satellite Tracking and Orbital Visualization Platform"
-version: 13.5.0
+version: 13.6.0
 url: "https://keeptrack.space"
 license: "AGPL-3.0"
 # doi: 10.5281/zenodo.1234
-date-released: 2026-07-20
+date-released: 2026-07-21

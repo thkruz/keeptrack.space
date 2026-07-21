@@ -149,5 +149,10 @@
     "resetCamera": "カメラをリセット",
     "clearLines": "ラインを消去",
     "clearScreen": "画面を消去"
+  },
+  "urlManager": {
+    "satNotFound": "衛星「{val}」が見つかりませんでした!",
+    "intldesNotFound": "国際識別符号「{val}」が見つかりませんでした!",
+    "deepSpaceNoEphemeris": "{name}は深宇宙の物体です。その軌道暦はまだKeepTrackでは利用できません。"
   }
 }

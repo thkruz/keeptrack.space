@@ -113,5 +113,10 @@
     "resetCamera": "Reset Camera",
     "clearLines": "Clear Lines",
     "clearScreen": "Clear Screen"
+  },
+  "urlManager": {
+    "satNotFound": "Satellite \"{val}\" was not found!",
+    "intldesNotFound": "International Designator \"{val}\" was not found!",
+    "deepSpaceNoEphemeris": "{name} is a deep-space object. Its ephemeris is not available in KeepTrack yet."
   }
 }

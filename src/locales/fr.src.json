@@ -118,5 +118,10 @@
     "resetCamera": "Réinitialiser la caméra",
     "clearLines": "Effacer les lignes",
     "clearScreen": "Effacer l'écran"
+  },
+  "urlManager": {
+    "satNotFound": "Le satellite \"{val}\" est introuvable !",
+    "intldesNotFound": "Le désignateur international \"{val}\" est introuvable !",
+    "deepSpaceNoEphemeris": "{name} est un objet de l'espace lointain. Ses éphémérides ne sont pas encore disponibles dans KeepTrack."
   }
 }

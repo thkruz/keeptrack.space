@@ -118,5 +118,10 @@
     "resetCamera": "Сбросить камеру",
     "clearLines": "Очистить линии",
     "clearScreen": "Очистить экран"
+  },
+  "urlManager": {
+    "satNotFound": "Спутник \"{val}\" не найден!",
+    "intldesNotFound": "Международное обозначение \"{val}\" не найдено!",
+    "deepSpaceNoEphemeris": "{name} находится в дальнем космосе. Его эфемериды пока недоступны в KeepTrack."
   }
 }

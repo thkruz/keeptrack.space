@@ -118,5 +118,10 @@
     "resetCamera": "Obnovit kameru",
     "clearLines": "Vymazat čáry",
     "clearScreen": "Vymazat obrazovku"
+  },
+  "urlManager": {
+    "satNotFound": "Družice \"{val}\" nebyla nalezena!",
+    "intldesNotFound": "Mezinárodní označení \"{val}\" nebylo nalezeno!",
+    "deepSpaceNoEphemeris": "{name} je objekt v hlubokém vesmíru. Jeho efemeridy zatím nejsou v KeepTrack k dispozici."
   }
 }

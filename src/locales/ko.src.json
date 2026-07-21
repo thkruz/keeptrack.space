@@ -118,5 +118,10 @@
     "resetCamera": "카메라 초기화",
     "clearLines": "선 지우기",
     "clearScreen": "화면 지우기"
+  },
+  "urlManager": {
+    "satNotFound": "위성 \"{val}\"을(를) 찾을 수 없습니다!",
+    "intldesNotFound": "국제 식별 부호 \"{val}\"을(를) 찾을 수 없습니다!",
+    "deepSpaceNoEphemeris": "{name}은(는) 심우주 물체입니다. 해당 궤도력은 아직 KeepTrack에서 제공되지 않습니다."
   }
 }

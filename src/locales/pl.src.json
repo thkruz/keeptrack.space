@@ -118,5 +118,10 @@
     "resetCamera": "Zresetuj kamerę",
     "clearLines": "Wyczyść linie",
     "clearScreen": "Wyczyść ekran"
+  },
+  "urlManager": {
+    "satNotFound": "Satelita \"{val}\" nie został znaleziony!",
+    "intldesNotFound": "Międzynarodowy identyfikator \"{val}\" nie został znaleziony!",
+    "deepSpaceNoEphemeris": "{name} to obiekt w dalekiej przestrzeni kosmicznej. Jego efemerydy nie są jeszcze dostępne w KeepTrack."
   }
 }

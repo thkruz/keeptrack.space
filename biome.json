@@ -203,7 +203,8 @@
             "noUnusedVariables": "off"
           },
           "complexity": {
-            "useMaxParams": "off"
+            "useMaxParams": "off",
+            "useLiteralKeys": "off"
           }
         }
       }

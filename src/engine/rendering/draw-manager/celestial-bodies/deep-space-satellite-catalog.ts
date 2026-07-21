@@ -3,6 +3,7 @@
  * Add new entries here to register additional deep-space probes.
  * Coefficients are loaded at runtime from JSON files in public/data/ephemeris/.
  */
+import { DeepSpaceDesignators } from '@app/app/data/deep-space-designators';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { Kilometers, Seconds } from '@ootk/src/main';
 import { KM_PER_AU } from 'astronomy-engine';
@@ -17,9 +18,25 @@ export const DEEP_SPACE_SATELLITE_CONFIGS: DeepSpaceSatelliteConfig[] = [
     meanDistanceToSun: (163 * KM_PER_AU) as Kilometers,
     dataFile: 'voyager-1.json',
     model: 'sat2',
+    sccNum: '10321',
+    intlDes: '1977-084A',
   },
   // Future: Voyager 2, Pioneer 10, Pioneer 11, New Horizons, etc.
 ];
+
+// Make every probe with a designator reachable from ?sat=/?intldes= URLs.
+// (The registry cannot import this module - see DeepSpaceDesignators.registerSeed.)
+for (const config of DEEP_SPACE_SATELLITE_CONFIGS) {
+  if (config.sccNum || config.intlDes) {
+    DeepSpaceDesignators.registerSeed({
+      kind: 'probe',
+      displayName: config.name,
+      bodyName: config.name,
+      sccNum: config.sccNum,
+      intlDes: config.intlDes,
+    });
+  }
+}
 
 /** Synchronously creates satellite objects (without coefficient data). */
 export function createDeepSpaceSatellites(): Record<string, DeepSpaceSatellite> {

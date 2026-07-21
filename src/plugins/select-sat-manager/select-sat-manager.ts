@@ -3,6 +3,7 @@ import { satDetailService } from '@app/app/data/catalogs/sat-detail-service';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { Planet } from '@app/app/objects/planet';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { focusDeepSpaceSatellite } from '@app/app/ui/deep-space-focus';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { CameraType } from '@app/engine/camera/camera-type';
 import { CameraState } from '@app/engine/camera/state/camera-state';
@@ -200,9 +201,15 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
         return;
       }
 
-      // Planet dots (celestial bodies, deep-space satellites) route to changePlanet
+      // Planet dots: deep-space satellites (Voyager 1, etc.) are not known to the
+      // planets menu, so route them to the shared focus helper; celestial bodies
+      // route to changePlanet as before.
       if (obj instanceof Planet) {
-        PluginRegistry.getPlugin(PlanetsMenuPlugin)?.changePlanet(obj.name as SolarBody);
+        if (ServiceLocator.getScene()?.deepSpaceSatellites?.[obj.name]) {
+          focusDeepSpaceSatellite(obj.name);
+        } else {
+          PluginRegistry.getPlugin(PlanetsMenuPlugin)?.changePlanet(obj.name as SolarBody);
+        }
 
         return;
       }

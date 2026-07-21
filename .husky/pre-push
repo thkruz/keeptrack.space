@@ -1,3 +1,25 @@
 #!/bin/sh
 command -v git-lfs >/dev/null 2>&1 || { printf >&2 "\n%s\n\n" "This repository is configured for Git LFS but 'git-lfs' was not found on your path. If you no longer wish to use Git LFS, remove this hook by deleting the 'pre-push' file in the hooks directory (set by 'core.hookspath'; usually '.git/hooks')."; exit 2; }
 git lfs pre-push "$@"
+
+# Full local gate before anything reaches GitHub: lint + typecheck are seconds,
+# the unit-test suite is the expensive part but far cheaper than a CI round-trip
+# and a fixup commit. Bypass in an emergency with: git push --no-verify
+
+onError() {
+  echo "" >&2
+  echo "pre-push: $1 Push aborted." >&2
+  echo "Fix the errors above (or bypass once with: git push --no-verify)." >&2
+  exit 1
+}
+
+echo "pre-push: running lint..." >&2
+pnpm run lint || onError "linting failed."
+
+echo "pre-push: running typecheck..." >&2
+pnpm run typecheck || onError "type checking failed."
+
+echo "pre-push: running unit tests (this takes a few minutes)..." >&2
+pnpm run test || onError "unit tests failed."
+
+exit 0

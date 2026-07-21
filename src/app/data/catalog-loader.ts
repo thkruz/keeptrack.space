@@ -1256,10 +1256,6 @@ export class CatalogLoader {
 
       return 'None';
     }
-    if (Number.isNaN(Number.parseInt(year))) {
-      // eslint-disable-next-line no-debugger
-      debugger;
-    }
     const prefix = Number.parseInt(year) > 50 ? '19' : '20';
 
     year = prefix + year;

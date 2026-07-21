@@ -317,7 +317,7 @@ export class Scene {
   }
 
   averageDrawTime = 0;
-  drawTimeArray: number[] = Array(150).fill(16);
+  drawTimeArray: number[] = new Array(150).fill(16);
 
   /**
    * Set when renderBackground rendered the earth surface for the current pass, so

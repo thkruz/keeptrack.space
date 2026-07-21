@@ -218,9 +218,7 @@ export class SphereGeometry extends BufferGeometry {
    * @param modelMatrix Optional model matrix for transformed spheres
    */
   sortFacesByDistance(camPos: vec3, modelMatrix?: Float32Array): void {
-    const buckets: number[][] = Array(this.NUM_BUCKETS)
-      .fill(null)
-      .map(() => []);
+    const buckets: number[][] = new Array(this.NUM_BUCKETS).fill(null).map(() => []);
     const faceCenters: vec3[] = [];
 
     // Pre-compute face centers

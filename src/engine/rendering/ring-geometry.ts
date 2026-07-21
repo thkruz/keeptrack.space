@@ -149,9 +149,7 @@ export class RingGeometry extends BufferGeometry {
 
   // --- Sorting and other methods remain unchanged ---
   sortFacesByDistance(camPos: vec3, modelMatrix?: Float32Array): void {
-    const buckets: number[][] = Array(this.NUM_BUCKETS)
-      .fill(null)
-      .map(() => []);
+    const buckets: number[][] = new Array(this.NUM_BUCKETS).fill(null).map(() => []);
     const faceCenters: vec3[] = [];
 
     for (let i = 0; i < this.indices_.length; i += 3) {

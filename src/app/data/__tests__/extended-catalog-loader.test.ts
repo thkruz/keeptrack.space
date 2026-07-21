@@ -229,13 +229,14 @@ describe('Extended catalog loader (mixed-width NORAD IDs)', () => {
     // Mirrors the tle_sources branch: NULL name → loader fills "Unknown 25544".
     const satnogsRow = { tle1: issSat.tle1, tle2: issSat.tle2, source: 'satnogs' } as never;
 
-    for (const rows of [[ussfRow, satnogsRow], [satnogsRow, ussfRow]]) {
+    for (const rows of [
+      [ussfRow, satnogsRow],
+      [satnogsRow, ussfRow],
+    ]) {
       await expect(CatalogLoader.parse({ keepTrackTle: rows })).resolves.not.toThrow();
 
       const catalogManager = ServiceLocator.getCatalogManager();
-      const matches = catalogManager.objectCache.filter(
-        (o) => o.isSatellite() && (o as Satellite).sccNum === '25544'
-      ) as Satellite[];
+      const matches = catalogManager.objectCache.filter((o) => o.isSatellite() && (o as Satellite).sccNum === '25544') as Satellite[];
 
       expect(matches).toHaveLength(1);
       expect(matches[0].source).toBe('spacetrack');

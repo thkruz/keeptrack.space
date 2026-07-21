@@ -413,7 +413,7 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
       kind: 'card',
       title: l('bridge.title'),
       body: l('bridge.body'),
-      extraHtml: '<ul class="kt-tour-recap">' + `<li>${l('bridge.recap1')}</li>` + `<li>${l('bridge.recap2')}</li>` + `<li>${l('bridge.recap3')}</li>` + '</ul>',
+      extraHtml: `<ul class="kt-tour-recap"><li>${l('bridge.recap1')}</li><li>${l('bridge.recap2')}</li><li>${l('bridge.recap3')}</li></ul>`,
       buttons: [
         { id: 'power', label: l('buttons.keepGoing'), isPrimary: isPowerPrimary },
         { id: 'finish', label: l('buttons.finishUp'), isPrimary: !isPowerPrimary },
@@ -568,7 +568,7 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
       kind: 'card',
       title: l('account.title'),
       body: isPowerDone ? l('account.bodyPower') : l('account.body'),
-      extraHtml: '<ul class="kt-tour-recap">' + `<li>${l('account.benefit1')}</li>` + `<li>${l('account.benefit2')}</li>` + `<li>${l('account.benefit3')}</li>` + '</ul>',
+      extraHtml: `<ul class="kt-tour-recap"><li>${l('account.benefit1')}</li><li>${l('account.benefit2')}</li><li>${l('account.benefit3')}</li></ul>`,
       buttons: [
         { id: 'create', label: l('buttons.createAccount'), isPrimary: true },
         { id: 'later', label: l('buttons.maybeLater') },

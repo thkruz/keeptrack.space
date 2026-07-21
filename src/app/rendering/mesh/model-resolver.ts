@@ -628,7 +628,7 @@ export class ModelResolver {
     if (name.startsWith('ORBCOMM')) {
       return SatelliteModels.orbcomm;
     }
-    if (RegExp(/SES\s\d+/u, 'u').exec(name)) {
+    if (new RegExp(/SES\s\d+/u, 'u').exec(name)) {
       return SatelliteModels.ses;
     }
     if (name.startsWith('O3B')) {

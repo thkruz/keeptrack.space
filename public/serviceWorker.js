@@ -219,6 +219,6 @@ function isStaticAsset(url) {
     path.startsWith('/img/') ||
     path.startsWith('/res/') ||
     path.startsWith('/simulation/') ||
-    /\.(?:png|jpg|jpeg|gif|svg|webp|ico|woff2?|ttf|eot|otf|mp3|wav|flac|obj|mtl|wasm)$/i.test(path)
+    /\.(?:png|jpg|jpeg|gif|svg|webp|ico|woff2?|ttf|eot|otf|mp3|wav|flac|m4a|obj|mtl|wasm)$/iu.test(path)
   );
 }

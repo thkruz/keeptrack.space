@@ -394,6 +394,9 @@ async function main() {
     { name: 'Charon', file: 'dwarf-planets/charon.txt', exportName: 'charonChebyshevCoeffs', outFile: 'charon-chebyshev.ts', lagrangeOrder: 10, segmentYears: 5 },
     // Deep-space satellites — JSON output, fetched at runtime from public/data/ephemeris/
     { name: 'Voyager 1', file: 'satellites/voyager-1.txt', exportName: 'voyager1ChebyshevCoeffs', outFile: 'voyager-1.json', lagrangeOrder: 10, segmentYears: 5, outputFormat: 'json' },
+    // Voyager 2: the post-Neptune-flyby (Aug 1989) trajectory still bends through the
+    // early 1990s, so 5-year segments under-fit; shorter segments keep the error down.
+    { name: 'Voyager 2', file: 'satellites/voyager-2.txt', exportName: 'voyager2ChebyshevCoeffs', outFile: 'voyager-2.json', lagrangeOrder: 10, segmentYears: 1, outputFormat: 'json' },
   ];
 
   // Configuration — with heliocentric data, fewer coefficients give ultra-smooth orbits
@@ -452,8 +455,9 @@ async function main() {
 
     const accuracy = validateAccuracy(helioData, segments, body.name);
 
-    if (accuracy.maxError > maxAcceptableError) {
-      console.error(`  WARNING: Max error exceeds ${maxAcceptableError} km!`);
+    // NaN must fail too (NaN > threshold is false) - a parse problem otherwise slips through
+    if (!Number.isFinite(accuracy.maxError) || accuracy.maxError > maxAcceptableError) {
+      console.error(`  WARNING: Max error is ${accuracy.maxError} km (threshold ${maxAcceptableError} km)!`);
       anyExceeded = true;
     }
 

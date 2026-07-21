@@ -21,7 +21,17 @@ export const DEEP_SPACE_SATELLITE_CONFIGS: DeepSpaceSatelliteConfig[] = [
     sccNum: '10321',
     intlDes: '1977-084A',
   },
-  // Future: Voyager 2, Pioneer 10, Pioneer 11, New Horizons, etc.
+  {
+    name: 'Voyager 2',
+    color: PlanetColors.VOYAGER2,
+    orbitalPeriod: (999 * 365.25 * 24 * 3600) as Seconds,
+    meanDistanceToSun: (137 * KM_PER_AU) as Kilometers,
+    dataFile: 'voyager-2.json',
+    model: 'sat2',
+    sccNum: '10271',
+    intlDes: '1977-076A',
+  },
+  // Future: Pioneer 10, Pioneer 11, New Horizons, etc.
 ];
 
 // Make every probe with a designator reachable from ?sat=/?intldes= URLs.

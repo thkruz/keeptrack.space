@@ -7,6 +7,7 @@ import { CameraType } from '@app/engine/camera/camera-type';
 import { SolarBody } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { PlanetsMenuPlugin } from '@app/plugins/planets-menu/planets-menu';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { settingsManager } from '@app/settings/settings';
 import { Kilometers } from '@ootk/src/main';
@@ -34,6 +35,12 @@ export function focusDeepSpaceSatellite(name: string): boolean {
   settingsManager.minZoomDistance = INTERPLANETARY_MIN_ZOOM;
   settingsManager.maxZoomDistance = INTERPLANETARY_MAX_ZOOM;
   ServiceLocator.getMainCamera().cameraType = CameraType.FIXED_TO_EARTH;
+
+  // Interplanetary framing without the planet orbit ellipses is unreadable -
+  // draw the same heliocentric context the planets menu draws (Moon, planets
+  // including Earth, dwarf planets), restoring centerBody to the probe.
+  PluginRegistry.getPlugin(PlanetsMenuPlugin)?.drawHeliocentricOrbits(name as SolarBody);
+
   ServiceLocator.getUiManager().hideSideMenus();
 
   return true;

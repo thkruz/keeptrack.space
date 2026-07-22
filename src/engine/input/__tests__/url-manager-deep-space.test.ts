@@ -108,10 +108,12 @@ describe('UrlManager deep-space designator fallback', () => {
     expect(toastSpy).toHaveBeenCalledWith(expect.stringContaining(VOYAGER_1), expect.anything(), true);
   });
 
-  it('toasts a named message for known objects without ephemeris (seeded Pioneer 10)', () => {
-    Url.handleSatParam_('5860');
+  it('toasts a named message for known objects without ephemeris (seeded JWST)', () => {
+    // JWST is still a knownObject here: its deferred loader only registers
+    // when the pro missions plugin initializes, which this suite does not.
+    Url.handleSatParam_('50463');
 
-    expect(toastSpy).toHaveBeenCalledWith(expect.stringContaining('Pioneer 10'), expect.anything(), true);
+    expect(toastSpy).toHaveBeenCalledWith(expect.stringContaining('JWST'), expect.anything(), true);
   });
 
   it('delegates to a deferred loader and stays quiet on success', async () => {

@@ -31,7 +31,36 @@ export const DEEP_SPACE_SATELLITE_CONFIGS: DeepSpaceSatelliteConfig[] = [
     sccNum: '10271',
     intlDes: '1977-076A',
   },
-  // Future: Pioneer 10, Pioneer 11, New Horizons, etc.
+  {
+    name: 'Pioneer 10',
+    color: PlanetColors.PIONEER10,
+    orbitalPeriod: (999 * 365.25 * 24 * 3600) as Seconds,
+    meanDistanceToSun: (140 * KM_PER_AU) as Kilometers,
+    dataFile: 'pioneer-10.json',
+    model: 'sat2',
+    sccNum: '5860',
+    intlDes: '1972-012A',
+  },
+  {
+    name: 'Pioneer 11',
+    color: PlanetColors.PIONEER11,
+    orbitalPeriod: (999 * 365.25 * 24 * 3600) as Seconds,
+    meanDistanceToSun: (117 * KM_PER_AU) as Kilometers,
+    dataFile: 'pioneer-11.json',
+    model: 'sat2',
+    sccNum: '6421',
+    intlDes: '1973-019A',
+  },
+  {
+    name: 'New Horizons',
+    color: PlanetColors.NEWHORIZONS,
+    orbitalPeriod: (999 * 365.25 * 24 * 3600) as Seconds,
+    meanDistanceToSun: (65 * KM_PER_AU) as Kilometers,
+    dataFile: 'new-horizons.json',
+    model: 'sat2',
+    sccNum: '28928',
+    intlDes: '2006-001A',
+  },
 ];
 
 // Make every probe with a designator reachable from ?sat=/?intldes= URLs.

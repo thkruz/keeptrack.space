@@ -22,25 +22,33 @@ describe('DeepSpaceDesignators', () => {
   });
 
   it('seeds known objects without ephemeris (SATCAT-verified designators)', () => {
-    expect(DeepSpaceDesignators.lookupSccNum('5860')?.displayName).toBe('Pioneer 10');
-    expect(DeepSpaceDesignators.lookupSccNum('6421')?.displayName).toBe('Pioneer 11');
-    expect(DeepSpaceDesignators.lookupSccNum('28928')?.displayName).toBe('New Horizons');
+    // Parker and JWST stay knownObject until the pro missions plugin registers
+    // its deferred loaders for them.
     expect(DeepSpaceDesignators.lookupSccNum('43592')?.displayName).toBe('Parker Solar Probe');
     expect(DeepSpaceDesignators.lookupSccNum('50463')?.displayName).toBe('JWST');
-    expect(DeepSpaceDesignators.lookupSccNum('5860')?.kind).toBe('knownObject');
+    expect(DeepSpaceDesignators.lookupSccNum('50463')?.kind).toBe('knownObject');
+  });
+
+  it('upgrades the Pioneer/New Horizons knownObject seeds to probe seeds', () => {
+    expect(DeepSpaceDesignators.lookupSccNum('5860')?.kind).toBe('probe');
+    expect(DeepSpaceDesignators.lookupSccNum('5860')?.bodyName).toBe('Pioneer 10');
+    expect(DeepSpaceDesignators.lookupSccNum('6421')?.kind).toBe('probe');
+    expect(DeepSpaceDesignators.lookupSccNum('6421')?.bodyName).toBe('Pioneer 11');
+    expect(DeepSpaceDesignators.lookupSccNum('28928')?.kind).toBe('probe');
+    expect(DeepSpaceDesignators.lookupSccNum('28928')?.bodyName).toBe('New Horizons');
   });
 
   it('upgrades a knownObject in place when a functional entry registers', () => {
     const focus = () => Promise.resolve(true);
 
-    DeepSpaceDesignators.register({ kind: 'deferred', displayName: 'New Horizons OEM', sccNum: '28928', intlDes: '2006-001A', focus });
+    DeepSpaceDesignators.register({ kind: 'deferred', displayName: 'JWST OEM', sccNum: '50463', intlDes: '2021-130A', focus });
 
-    expect(DeepSpaceDesignators.lookupSccNum('28928')?.kind).toBe('deferred');
-    expect(DeepSpaceDesignators.lookupIntlDes('2006-001A')?.kind).toBe('deferred');
+    expect(DeepSpaceDesignators.lookupSccNum('50463')?.kind).toBe('deferred');
+    expect(DeepSpaceDesignators.lookupIntlDes('2021-130A')?.kind).toBe('deferred');
 
     // reset drops the runtime upgrade and restores the knownObject seed
     DeepSpaceDesignators.reset();
-    expect(DeepSpaceDesignators.lookupSccNum('28928')?.kind).toBe('knownObject');
+    expect(DeepSpaceDesignators.lookupSccNum('50463')?.kind).toBe('knownObject');
   });
 
   it('tolerates zero-padded catalog numbers', () => {

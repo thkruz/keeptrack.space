@@ -177,7 +177,10 @@ export class Engine {
     const profiler = FrameProfiler.getInstance();
 
     profiler.beginCpu(CpuStage.drawSubmit);
+    // Whole-frame GPU busy monitor (always on; feeds the performance-downgrade gate)
+    profiler.monitorFrameGpuBegin();
     ViewportManager.getInstance().renderAll(this.renderer, this.scene, this.camera);
+    profiler.monitorFrameGpuEnd();
     profiler.endCpu(CpuStage.drawSubmit);
 
     this.sendCameraDataToWorker_();

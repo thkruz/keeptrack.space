@@ -2,13 +2,43 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v13.7.0](https://github.com/thkruz/keeptrack.space/compare/v13.6.0...v13.7.0)
+
+- Enhance URL manager and deep-space features with localization [`#1414`](https://github.com/thkruz/keeptrack.space/pull/1414)
+- feat(model-resolver): :sparkles: add JWST mesh and route sccNum 50463 to it [`38e5b0e`](https://github.com/thkruz/keeptrack.space/commit/38e5b0e015eb4252341f5d21a69b8d1e4ca9788e)
+- fix(boot): :bug: self-heal worker boot stalls instead of hanging [`8b92d98`](https://github.com/thkruz/keeptrack.space/commit/8b92d98311f958ded352a0382136971141e7fdec)
+- feat(url-manager): :sparkles: resolve deep-space objects from sat/intldes URL params [`147421c`](https://github.com/thkruz/keeptrack.space/commit/147421c858e5978337e946a2175a6305e906003e)
+- perf(sound-manager): :zap: lazy-load chatter clips and import m4a audio [`b9e8a36`](https://github.com/thkruz/keeptrack.space/commit/b9e8a367182a6f0e6cfa32e39813849944b4b1d1)
+- fix(scene): :bug: gate performance downgrade on measured GPU load [`f7a07ea`](https://github.com/thkruz/keeptrack.space/commit/f7a07ea01f06c08ff6b6f75d09b79be5180a2d9b)
+- chore(husky): :wrench: enforce lint, typecheck, and unit tests in git hooks [`565b581`](https://github.com/thkruz/keeptrack.space/commit/565b5819a17b5be39573a806126ca4b2dd1a1a0a)
+- feat(url-manager): :sparkles: seed known deep-space designators with upgrade precedence [`a46606b`](https://github.com/thkruz/keeptrack.space/commit/a46606ba83fe64be17e9e9bcf86695b792fe4221)
+- feat(celestial-bodies): :sparkles: add Pioneer and New Horizons configs [`46f7434`](https://github.com/thkruz/keeptrack.space/commit/46f7434edab70d295f5694c35922d96a53e69f5b)
+- i18n(url-manager): :globe_with_meridians: localize not-found and deep-space toasts [`22a6b63`](https://github.com/thkruz/keeptrack.space/commit/22a6b639ebaa8f04698ac6c5c7ac4453cb937fdf)
+- i18n(loading-screen): :globe_with_meridians: translate loadFailed and resetAndReload keys [`a4af07e`](https://github.com/thkruz/keeptrack.space/commit/a4af07e1982338cd62afac0255edfc0cd02a28be)
+- feat(deep-space): :sparkles: promote Voyager 2 to a Chebyshev probe [`ca8ab06`](https://github.com/thkruz/keeptrack.space/commit/ca8ab06c32bad381853d694f5e8771999015cf12)
+- feat(deep-space): :sparkles: draw heliocentric orbit context when focusing a probe [`6a2d7fc`](https://github.com/thkruz/keeptrack.space/commit/6a2d7fcf854fa81c2c8fea8a0d4cee0a023e3b88)
+- fix(select-sat-manager): :bug: focus deep-space satellites on dot click [`da2a3ad`](https://github.com/thkruz/keeptrack.space/commit/da2a3ad1a0fa93436a85170b1fd3bf39ed89f47f)
+- chore(build): :wrench: bundle and serve .m4a audio assets [`101f046`](https://github.com/thkruz/keeptrack.space/commit/101f046fb98156b6fdc9c85779e07f60bd0ae5ca)
+- chore(plugins-pro): :wrench: update subproject commit reference [`c7e6274`](https://github.com/thkruz/keeptrack.space/commit/c7e6274c8cd305efb66dc3e83b0adb95e7a5e38c)
+- chore(plugins-pro): :wrench: update subproject commit reference [`e8da236`](https://github.com/thkruz/keeptrack.space/commit/e8da236bf5eaeb69cdd33980a4f09840d4345b47)
+- chore(plugins-pro): :wrench: update subproject commit reference [`a9d547e`](https://github.com/thkruz/keeptrack.space/commit/a9d547e777bdc75b560c1264127e9b460cee6706)
+- chore(plugins-pro): :wrench: update subproject commit reference [`8ab8f33`](https://github.com/thkruz/keeptrack.space/commit/8ab8f334d0a0282eb8a312a6de7d6ec962a3b6d7)
+- chore(ootk): :wrench: update subproject commit reference [`279d64b`](https://github.com/thkruz/keeptrack.space/commit/279d64b041f368fa1dbf1d9394132a04f219cdf1)
+- chore(service-worker): :wrench: cache .m4a audio cache-first [`88b8095`](https://github.com/thkruz/keeptrack.space/commit/88b809583711f6d631bbe09821bafeb8e792f1ab)
+- chore(plugins-pro): :wrench: update subproject commit reference [`41d9ef1`](https://github.com/thkruz/keeptrack.space/commit/41d9ef152856794ff05d3d8ef45d642f6c1db7da)
+- chore(plugins-pro): :wrench: update subproject commit reference [`ba176b1`](https://github.com/thkruz/keeptrack.space/commit/ba176b1926b9c431e1a52440f20d3d876af9515f)
+- perf(sound-manager): :zap: lazy-load chatter and re-encode audio to AAC [`9f66fbc`](https://github.com/thkruz/keeptrack.space/commit/9f66fbc9332915abc4ca749d1b6fa4ec1474d840)
+
 #### [v13.6.0](https://github.com/thkruz/keeptrack.space/compare/v13.5.0...v13.6.0)
+
+>  
 
 - Fix keyboard shortcut conflicts and refactor splash screen [`#1413`](https://github.com/thkruz/keeptrack.space/pull/1413)
 - feat(catalog-loader): :sparkles: collapse duplicate NORAD IDs [`c4bff20`](https://github.com/thkruz/keeptrack.space/commit/c4bff207c29cb84b6b75b9c68ffdd5fc5e043853)
 - style(lint): :art: apply Biome autofixes [`e0f40a2`](https://github.com/thkruz/keeptrack.space/commit/e0f40a29bddff9870ad80538f2d4b13ca767b3c8)
 - refactor(splash-screen): :recycle: convert msg to lazy getter [`05d657e`](https://github.com/thkruz/keeptrack.space/commit/05d657ea44cff7673037cf1b978e0666d8543f18)
 - docs(catalog-loader): :memo: keep canonicalSccKey JSDoc adjacent to its declaration [`3140124`](https://github.com/thkruz/keeptrack.space/commit/3140124e1a99507276c001577175a13f5714f38c)
+- chore(release): :bookmark: 13.6.0 [skip ci] [`f5b9057`](https://github.com/thkruz/keeptrack.space/commit/f5b90575a23ef8aa225cea1691051b07512a0656)
 - fix(keyboard-shortcuts): :bug: resolve Shift+, and Shift+l registry conflicts [`b5843d8`](https://github.com/thkruz/keeptrack.space/commit/b5843d802c43820ba6351cb74ee3262bd553883c)
 - @ [`525f6fa`](https://github.com/thkruz/keeptrack.space/commit/525f6fa1b50f58959b45b51db4c3212f0b1cd2ea)
 - test(catalog-loader): :white_check_mark: clone rows per iteration to avoid in-place mutation carryover [`d519028`](https://github.com/thkruz/keeptrack.space/commit/d51902874f8cf9985c22c8485712eb524cadd97d)

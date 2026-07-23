@@ -3,13 +3,67 @@ import { SGP4_WASM_BACKEND_MSG_TYPE, Sgp4WasmBackendMsgData } from '@app/webwork
 import { errorManagerInstance } from '../utils/errorManager';
 import { isThisNode } from '../utils/isThisNode';
 
+/**
+ * sessionStorage key for a one-shot worker cache-bust token. Set by the boot
+ * self-heal (`KeepTrack.postStart_`) when workers stall, and appended to worker
+ * URLs here so a stale cached worker script is force-refetched on reload.
+ */
+export const WORKER_CACHE_BUST_KEY = 'kt-worker-cache-bust';
+
 export abstract class WebWorkerThreadManager {
   abstract readonly WEB_WORKER_CODE: string;
   protected worker_: Worker | null = null;
   protected isReady_ = false;
+  protected isDisabled_ = false;
 
   get worker(): Worker | null {
     return this.worker_;
+  }
+
+  /**
+   * Whether boot must WAIT for this worker before the app becomes interactive.
+   *
+   * Essential workers (position/color crunchers — there are no dots without them)
+   * gate boot: if one never signals ready, boot self-heals with a cache-bust
+   * reload and, failing that, shows the boot-failure screen.
+   *
+   * OPTIONAL workers render a non-critical feature (e.g. the orbit-line cruncher).
+   * If one stalls, the boot watchdog drops it and boots DEGRADED rather than
+   * hanging the whole app forever - the app is fully usable without orbit lines.
+   * Subclasses override this to opt out of the boot gate.
+   */
+  get isEssential(): boolean {
+    return true;
+  }
+
+  /** True once the boot watchdog has given up on this (optional) worker and dropped its feature. */
+  get isDisabled(): boolean {
+    return this.isDisabled_;
+  }
+
+  /**
+   * Permanently drop a stalled OPTIONAL worker so the app can boot degraded.
+   * Terminates the (hung) worker to free its resources and, because every
+   * postMessage() is guarded on `worker_`, turns all subsequent sends into
+   * silent no-ops. Called by the boot watchdog (`KeepTrack.postStart_`) when an
+   * optional worker never signals ready within its grace window.
+   */
+  disableDueToStall(): void {
+    this.isDisabled_ = true;
+    this.terminate();
+  }
+
+  /**
+   * Exclude this OPTIONAL worker from the boot gate because the app DELIBERATELY
+   * did not start it yet (e.g. orbit lines are turned off, so the orbit cruncher
+   * stays deferred until the user enables them). Without this, a registered-but-
+   * never-`init()`-ed worker would hang the boot gate forever - the exact cause of
+   * the `drawOrbits:false` boot hang. Unlike disableDueToStall() it terminates
+   * nothing (there is no worker yet); `init()` clears the flag when the worker is
+   * later started on demand.
+   */
+  skipBootGate(): void {
+    this.isDisabled_ = true;
   }
 
   constructor(threadsRegistry: WebWorkerThreadManager[]) {
@@ -17,6 +71,11 @@ export abstract class WebWorkerThreadManager {
   }
 
   init(workerStub?: Worker, workerScriptUrl: string = this.WEB_WORKER_CODE) {
+    // Starting the worker re-arms it for the boot gate: clear any prior
+    // skipBootGate() marker set while it was deliberately deferred (e.g. orbit
+    // lines were off and the user just turned them on).
+    this.isDisabled_ = false;
+
     if (isThisNode()) {
       // See if we are running jest right now for testing
       this.initNodeConfig_(workerStub, workerScriptUrl);
@@ -26,7 +85,7 @@ export abstract class WebWorkerThreadManager {
     // Verify browser supports workers
     this.checkWebWorkerSupport_();
 
-    workerScriptUrl = `./${this.WEB_WORKER_CODE}`;
+    workerScriptUrl = WebWorkerThreadManager.buildWorkerUrl_(this.WEB_WORKER_CODE);
 
     try {
       this.worker_ = workerStub ?? new Worker(workerScriptUrl);
@@ -124,6 +183,32 @@ export abstract class WebWorkerThreadManager {
     if (typeof Worker === 'undefined') {
       throw new Error('Your browser does not support web workers.');
     }
+  }
+
+  /**
+   * Build the worker script URL with cache-busting. Worker scripts load by a
+   * STABLE name (e.g. js/orbitCruncher.js), so without a version token a browser
+   * (or the prod service worker) can keep serving a stale/broken cached copy
+   * across builds - the worker then never posts 'ready' and the app hangs at
+   * "Building 3D Models…". `__VERSION_DATE__` (a per-build timestamp) makes every
+   * build's worker a distinct URL, so a rebuild/deploy always refetches fresh; an
+   * optional runtime token (set by the boot self-heal in KeepTrack.postStart_)
+   * forces a fresh fetch even within the same build.
+   */
+  private static buildWorkerUrl_(code: string): string {
+    let url = `./${code}?v=${encodeURIComponent(__VERSION_DATE__)}`;
+
+    try {
+      const bust = globalThis.sessionStorage?.getItem(WORKER_CACHE_BUST_KEY);
+
+      if (bust) {
+        url += `&cb=${encodeURIComponent(bust)}`;
+      }
+    } catch {
+      // sessionStorage can throw in locked-down/private contexts; the version token alone is enough.
+    }
+
+    return url;
   }
 
   protected onMessage(event: MessageEvent) {

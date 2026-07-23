@@ -346,11 +346,22 @@ const handleMsgInit_ = (data: OrbitCruncherInMsgInit) => {
     } else if ((objData[i] as OrbitCruncherOtherObject).ignore) {
       objCache[i] = { ignore: true };
     } else if ((objData[i] as OrbitCruncherSatelliteObject).tle1 && (objData[i] as OrbitCruncherSatelliteObject).tle2) {
-      objCache[i] = {
-        satrec: Sgp4.createSatrec((objData[i] as OrbitCruncherSatelliteObject).tle1, (objData[i] as OrbitCruncherSatelliteObject).tle2),
-      } as OrbitCruncherSatelliteObject;
+      try {
+        objCache[i] = {
+          satrec: Sgp4.createSatrec((objData[i] as OrbitCruncherSatelliteObject).tle1, (objData[i] as OrbitCruncherSatelliteObject).tle2),
+        } as OrbitCruncherSatelliteObject;
+      } catch {
+        // A single malformed TLE must never abort the whole catalog init - that
+        // leaves the worker without ever calling postMessage('ready'), so boot
+        // hangs at "Building 3D Models…". Skip it; the object just gets no orbit
+        // line, exactly like an `ignore` entry (handled below at draw time).
+        objCache[i] = { ignore: true };
+      }
     } else {
-      throw new Error('Invalid Object Data');
+      // No usable TLE (e.g. a Satellite whose TLE failed to parse ends up with
+      // empty tle1/tle2). Previously `throw new Error('Invalid Object Data')`,
+      // which stalled the entire cruncher on one bad object; ignore it instead.
+      objCache[i] = { ignore: true };
     }
   }
 

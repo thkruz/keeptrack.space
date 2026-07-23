@@ -6,6 +6,16 @@ import { Degrees, Kilometers } from '@ootk/src/main';
 export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
   readonly WEB_WORKER_CODE: string = 'js/orbitCruncher.js';
 
+  /**
+   * Orbit lines are a non-critical overlay, so this worker must never gate boot.
+   * If it stalls (a wedged worker fetch, a browser extension hooking Worker, a
+   * stale cache the reload couldn't clear), the boot watchdog drops it and the
+   * app boots without orbit lines instead of hanging at "Building 3D Models…".
+   */
+  override get isEssential(): boolean {
+    return false;
+  }
+
   private currentSeqNum_ = 0;
 
   // ─── Typed Send Methods ─────────────────────────────────────────────

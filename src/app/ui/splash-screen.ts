@@ -1,6 +1,8 @@
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { WORKER_CACHE_BUST_KEY } from '@app/engine/threads/web-worker-thread';
 import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { TranslationKey, t7e } from '@app/locales/keys';
 import logoPng from '@public/img/logo.png';
 import { wallpapers } from '@wallpapers';
@@ -138,6 +140,127 @@ export abstract class SplashScreen {
       return;
     } // If the element is not found, do nothing
     LoaderText.textContent = str;
+  }
+
+  /**
+   * Boot failed even after the one-shot worker self-heal reload (see
+   * KeepTrack.postStart_). Replace the dead-end "hard refresh" hint - which does
+   * NOT refetch cached worker scripts - with a one-click recovery any user can
+   * act on: bust the worker cache, drop cached assets + unregister the service
+   * worker, then reload. `stalled` is the stalled-worker list (logged only, not
+   * shown, to avoid jargon on the splash).
+   */
+  static showBootFailure(stalled: string) {
+    errorManagerInstance.warn(`[KeepTrack] Boot recovery UI shown (stalled workers: ${stalled}).`);
+    SplashScreen.loadStr(t7e('loadingScreen.loadFailed' as TranslationKey));
+
+    const container = getEl('logo-inner-container');
+
+    if (!container || getEl('kt-recovery-btn')) {
+      return;
+    }
+
+    const wrapper = document.createElement('div');
+
+    wrapper.style.cssText = 'margin-top: 12px; display: flex; justify-content: center;';
+    wrapper.innerHTML = html`
+      <button id="kt-recovery-btn" class="btn btn-large btn-ui waves-effect waves-light">${t7e('loadingScreen.resetAndReload' as TranslationKey)}</button>`;
+    container.appendChild(wrapper);
+    getEl('kt-recovery-btn')?.addEventListener('click', () => {
+      SplashScreen.recoverAndReload_();
+    });
+  }
+
+  /**
+   * Persisted display/settings key prefixes cleared by the last-resort recovery.
+   * A perfectly VALID saved value in one of these groups can wedge a worker on
+   * boot - `drawOrbits:false` deferred the orbit cruncher and hung the old boot
+   * gate, and a bad `colorScheme`/override could wedge the (essential) color
+   * cruncher. `applyPersistedSetting`'s try/catch only guards against values that
+   * THROW on deserialize, not valid-but-harmful ones, so a settings reset is the
+   * real escape hatch here. User DATA (watchlists, favorites, scenarios, saved
+   * searches, symbology, lists) is intentionally NOT matched, so recovery keeps
+   * the user's content and drops only render/settings state.
+   */
+  private static readonly RECOVERY_CLEAR_PREFIXES_ = [
+    'v2-keepTrack-settings-',
+    'v2-filter-settings-',
+    'v2-keepTrack-graphicsSettings-',
+    'v2-keepTrack-colorScheme', // colorScheme + colorSchemeOverrides
+  ];
+
+  /**
+   * One-click recovery for a wedged boot: bust the worker cache, reset persisted
+   * display/settings state (see RECOVERY_CLEAR_PREFIXES_ - a valid saved setting
+   * can wedge a worker), clear cached assets (Cache API), unregister the service
+   * worker, then reload. Best-effort - every step is optional and the reload
+   * always happens. User data (watchlists, favorites, scenarios) is preserved.
+   */
+  private static recoverAndReload_() {
+    try {
+      globalThis.sessionStorage?.setItem(WORKER_CACHE_BUST_KEY, String(Date.now()));
+    } catch {
+      // sessionStorage unavailable; clearing caches below still helps.
+    }
+
+    SplashScreen.resetDisplaySettings_();
+
+    const reload = () => {
+      try {
+        globalThis.location.reload();
+      } catch {
+        // nothing else to do
+      }
+    };
+
+    const jobs: Promise<unknown>[] = [];
+    const cachesApi = globalThis.caches;
+
+    if (cachesApi) {
+      jobs.push(cachesApi.keys().then((keys) => Promise.all(keys.map((k) => cachesApi.delete(k)))));
+    }
+
+    const sw = globalThis.navigator?.serviceWorker;
+
+    if (sw) {
+      jobs.push(sw.getRegistrations().then((regs) => Promise.all(regs.map((r) => r.unregister()))));
+    }
+
+    Promise.all(jobs)
+      .catch(() => undefined)
+      .finally(reload);
+  }
+
+  /**
+   * Remove persisted display/settings keys (see RECOVERY_CLEAR_PREFIXES_) from
+   * localStorage so a valid-but-boot-wedging saved value (e.g. drawOrbits:false)
+   * can't re-hang the reload. Best-effort; never throws. User data is preserved
+   * because only the settings-family prefixes are matched.
+   */
+  private static resetDisplaySettings_(): void {
+    try {
+      const ls = globalThis.localStorage;
+
+      if (!ls) {
+        return;
+      }
+
+      const toRemove: string[] = [];
+
+      for (let i = 0; i < ls.length; i++) {
+        const key = ls.key(i);
+
+        if (key !== null && SplashScreen.RECOVERY_CLEAR_PREFIXES_.some((prefix) => key.startsWith(prefix))) {
+          toRemove.push(key);
+        }
+      }
+
+      for (const key of toRemove) {
+        ls.removeItem(key);
+      }
+    } catch {
+      // localStorage unavailable/locked-down; the cache clear + reload still helps.
+    }
   }
 
   static loadImages() {

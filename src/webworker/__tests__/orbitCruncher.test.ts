@@ -47,6 +47,69 @@ describe('orbitCruncher worker', () => {
     expect(posted.at(-1)?.payload).toBe('ready');
   });
 
+  // Regression: a single bad object in the catalog used to throw 'Invalid Object
+  // Data' mid-init, so postMessage('ready') never ran and boot hung forever at
+  // "Building 3D Models…" (stalled worker: orbitCruncher.js). One bad object must
+  // never take down the whole cruncher.
+  it('still posts "ready" when an object has no usable TLE (does not throw)', () => {
+    expect(() =>
+      onMessage({
+        data: {
+          typ: MSG.INIT,
+          numSegs: NUM_SEGS,
+          // A Satellite whose TLE failed to parse arrives with empty tle1/tle2.
+          objData: JSON.stringify([{ tle1: TLE1, tle2: TLE2 }, { tle1: '', tle2: '' }, {}]),
+          seqNum: 1,
+        },
+      } as unknown as Parameters<typeof onMessage>[0])
+    ).not.toThrow();
+
+    expect(posted.at(-1)?.payload).toBe('ready');
+  });
+
+  it('still posts "ready" when a TLE is malformed and createSatrec would throw', () => {
+    expect(() =>
+      onMessage({
+        data: {
+          typ: MSG.INIT,
+          numSegs: NUM_SEGS,
+          objData: JSON.stringify([
+            { tle1: TLE1, tle2: TLE2 },
+            { tle1: 'not a tle', tle2: 'garbage line 2' },
+          ]),
+          seqNum: 1,
+        },
+      } as unknown as Parameters<typeof onMessage>[0])
+    ).not.toThrow();
+
+    expect(posted.at(-1)?.payload).toBe('ready');
+  });
+
+  it('draws an empty orbit (all zeros) for a skipped no-TLE object rather than crashing', () => {
+    onMessage({
+      data: {
+        typ: MSG.INIT,
+        numSegs: NUM_SEGS,
+        objData: JSON.stringify([
+          { tle1: TLE1, tle2: TLE2 },
+          { tle1: '', tle2: '' },
+        ]),
+        seqNum: 1,
+      },
+    } as unknown as Parameters<typeof onMessage>[0]);
+    posted = [];
+
+    onMessage({
+      data: { typ: MSG.SATELLITE_UPDATE, id: 1, simulationTime: Date.UTC(2022, 0, 1), seqNum: 1 },
+    } as unknown as Parameters<typeof onMessage>[0]);
+
+    const last = posted.at(-1)!.payload as { typ: number; pointsOut: Float32Array; satId: number };
+
+    expect(last.typ).toBe(MSG.RESPONSE_DATA);
+    expect(last.satId).toBe(1);
+    expect(last.pointsOut.every((v) => v === 0)).toBe(true);
+  });
+
   it('propagates a satellite orbit and posts RESPONSE_DATA with a points buffer', () => {
     initSat(1);
     posted = [];

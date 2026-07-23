@@ -92,7 +92,18 @@ function startServer() {
         data = Buffer.from(html);
       }
 
-      res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' });
+      // Never let the browser heuristically cache CODE in dev. Without this the
+      // dev server sends no Cache-Control, so a stale index.html (pointing at old
+      // chunks) or a stale worker script (workers don't reliably refetch on
+      // reload) silently wedges boot at "Building 3D Models…". HTML + JS are
+      // always refetched; large static assets (textures/meshes/wasm) stay cacheable.
+      const headers: Record<string, string> = { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' };
+
+      if (ext === '.html' || ext === '.js' || ext === '.mjs') {
+        headers['Cache-Control'] = 'no-store, must-revalidate';
+      }
+
+      res.writeHead(200, headers);
       res.end(data);
     } catch {
       // Guard against "headers already sent" when the response was partially

@@ -2,6 +2,7 @@ import { PersistenceManager } from '@app/engine/persistence/persistence-manager'
 import { StorageKey } from '@app/engine/persistence/storage-key';
 import { applyPersistedSetting, PERSISTED_SETTINGS_TABLE, SETTINGS_MENU_OWNED_KEYS } from '@app/settings/persisted-settings-table';
 import { SettingsManager } from '@app/settings/settings';
+import { vi } from 'vitest';
 
 /*
  * The persisted-settings table is the shared source for preserveSettings (write
@@ -74,5 +75,40 @@ describe('persisted-settings-table', () => {
     const settings = new SettingsManager();
 
     expect(applyPersistedSetting(settings, StorageKey.WATCHLIST_LIST, '[]')).toBe(false);
+  });
+
+  // Resilience: a corrupt/incompatible saved value whose deserialize throws must
+  // NOT propagate - one bad key would otherwise abort loadPersistedSettings and
+  // wedge boot. It should be swallowed so the rest of the settings still apply.
+  it('swallows a throwing deserialize instead of breaking the settings load', () => {
+    const settings = new SettingsManager();
+    const entry = PERSISTED_SETTINGS_TABLE.find((e) => e.key === StorageKey.SETTINGS_DRAW_ORBITS)!;
+    const spy = vi.spyOn(entry, 'deserialize').mockImplementation(() => {
+      throw new Error('corrupt persisted value');
+    });
+
+    expect(() => applyPersistedSetting(settings, StorageKey.SETTINGS_DRAW_ORBITS, 'garbage')).not.toThrow();
+    expect(applyPersistedSetting(settings, StorageKey.SETTINGS_DRAW_ORBITS, 'garbage')).toBe(true);
+    expect(spy).toHaveBeenCalled();
+
+    spy.mockRestore();
+  });
+
+  it('still applies later settings after an earlier one throws', () => {
+    const settings = new SettingsManager();
+    const sunEntry = PERSISTED_SETTINGS_TABLE.find((e) => e.key === StorageKey.SETTINGS_DRAW_SUN)!;
+    const spy = vi.spyOn(sunEntry, 'deserialize').mockImplementation(() => {
+      throw new Error('boom');
+    });
+
+    // The bad key is isolated...
+    applyPersistedSetting(settings, StorageKey.SETTINGS_DRAW_SUN, 'true');
+    // ...and a subsequent good key still applies normally.
+    settings.isDrawOrbits = false;
+    applyPersistedSetting(settings, StorageKey.SETTINGS_DRAW_ORBITS, 'true');
+
+    expect(settings.isDrawOrbits).toBe(true);
+
+    spy.mockRestore();
   });
 });

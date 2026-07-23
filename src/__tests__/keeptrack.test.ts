@@ -6,6 +6,7 @@ import { Container } from '@app/engine/core/container';
 import { SatCruncherMessageData, Singletons } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { WebGLRenderer } from '@app/engine/rendering/webgl-renderer';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { KeepTrack } from '@app/keeptrack';
 import { SettingsManagerOverride } from '@app/settings/settings';
 import { Milliseconds, Satellite } from '@ootk/src/main';
@@ -186,5 +187,29 @@ describe('code_snippet', () => {
     };
 
     expect(initializationTest).not.toThrow();
+  });
+});
+
+describe('reportWorkerBootFailure_ (boot telemetry)', () => {
+  it('routes a worker boot failure to telemetry with the outcome + worker data, and no toast/auto-file', () => {
+    const spy = vi.spyOn(errorManagerInstance, 'reportEvent').mockImplementation(() => undefined);
+
+    // @ts-expect-error private static under test
+    KeepTrack.reportWorkerBootFailure_('degraded', [{ WEB_WORKER_CODE: 'js/orbitCruncher.js', isEssential: false }], 12000);
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    const ctx = spy.mock.calls[0][0];
+
+    // User-facing effects suppressed - the failure is already surfaced elsewhere.
+    expect(ctx.opts).toEqual({ skipToast: true, skipAutoFile: true });
+    expect(ctx.funcName).toBe('KeepTrack.postStart_');
+
+    const err = ctx.error as Error;
+
+    expect(err.name).toBe('WorkerBootFailure');
+    expect(err.message).toContain('degraded');
+    expect(err.message).toContain('js/orbitCruncher.js');
+    expect(err.message).toContain('"essential":false');
+    expect(err.message).toContain('"elapsedMs":12000');
   });
 });

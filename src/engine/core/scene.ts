@@ -447,6 +447,13 @@ export class Scene {
     renderer.postProcessingManager.curBuffer = null;
   }
 
+  /**
+   * Minimum measured GPU busy time (ms/frame) before the downgrade cascade may
+   * fire. Below this the GPU is essentially idle, so a sub-30fps frame delta is
+   * a presentation cap, not load, and disabling visuals cannot raise it.
+   */
+  private static readonly GPU_BUSY_DOWNGRADE_THRESHOLD_MS_ = 16;
+
   private updateVisualsBasedOnPerformance_() {
     if (settingsManager.isDisablePerformanceDowngrade) {
       return;
@@ -456,6 +463,21 @@ export class Scene {
       Date.now() - this.updateVisualsBasedOnPerformanceTime_ > 10000 && // Only check every 10 seconds
       !Engine.isFpsAboveLimit(this.averageDrawTime as Milliseconds, 30)
     ) {
+      /*
+       * A slow frame delta alone is not evidence of GPU load: remote-desktop
+       * sessions and OS-level frame caps present at ~30 Hz with an idle GPU
+       * (observed: 33.3 ms frames, 2.7 ms GPU busy on an RTX 4090 over RDP),
+       * and sacrificing visuals cannot raise a present-capped frame rate.
+       * Require measured GPU busy time near the 60 fps budget before
+       * downgrading; when timer queries are unsupported (null) keep the
+       * legacy frame-delta heuristic.
+       */
+      const gpuBusyMs = FrameProfiler.getInstance().gpuBusyAvgMs();
+
+      if (gpuBusyMs !== null && gpuBusyMs < Scene.GPU_BUSY_DOWNGRADE_THRESHOLD_MS_) {
+        return;
+      }
+
       let isSettingsLeftToDisable = true;
 
       while (isSettingsLeftToDisable) {

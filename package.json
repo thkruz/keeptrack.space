@@ -98,7 +98,8 @@
     "release": "semantic-release",
     "release:dry": "semantic-release --dry-run --no-ci",
     "docs": "typedoc",
-    "husky": "husky install"
+    "husky": "husky install",
+    "prepare": "husky install"
   },
   "chromium-args": "--enable-threaded-compositing",
   "directories": {

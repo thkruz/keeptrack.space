@@ -1,4 +1,5 @@
 import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality } from '@app/engine/rendering/draw-manager/earth-quality-enums';
+import { errorManagerInstance } from '../engine/utils/errorManager';
 import { PersistenceManager, StorageKey } from '../engine/utils/persistence-manager';
 import type { SettingsManager } from './settings';
 import { SatLabelMode } from './ui-settings';
@@ -280,10 +281,18 @@ export const applyPersistedSetting = (sm: SettingsManager, key: StorageKey, raw:
     return false;
   }
 
-  if (raw !== null) {
-    entry.deserialize(sm, raw);
-  } else {
-    entry.deserializeMissing?.(sm);
+  // A corrupt or version-incompatible persisted value must NEVER throw and wedge
+  // the whole boot (one bad key would otherwise abort loadPersistedSettings and
+  // every later setting). Isolate each key: log and skip on failure so the rest
+  // still apply and the app boots with sane defaults for the bad one.
+  try {
+    if (raw !== null) {
+      entry.deserialize(sm, raw);
+    } else {
+      entry.deserializeMissing?.(sm);
+    }
+  } catch (err) {
+    errorManagerInstance.warn(`Skipping corrupt saved setting "${key}": ${err instanceof Error ? err.message : String(err)}`);
   }
 
   return true;

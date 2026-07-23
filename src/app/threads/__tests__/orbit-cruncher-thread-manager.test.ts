@@ -62,6 +62,12 @@ describe('OrbitCruncherThreadManager', () => {
 
       expect(() => mgr.postMessage({ typ: OrbitCruncherMsgType.SETTINGS_UPDATE, numberOfOrbitsToDraw: 1 })).not.toThrow();
     });
+
+    it('is non-essential so a stall never gates boot', () => {
+      const mgr = new OrbitCruncherThreadManager([]);
+
+      expect(mgr.isEssential).toBe(false);
+    });
   });
 
   describe('typed send methods', () => {

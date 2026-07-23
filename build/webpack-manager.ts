@@ -156,7 +156,7 @@ export class WebpackManager {
             },
           },
           {
-            test: /\.(?:mp3|wav|flac)$/iu,
+            test: /\.(?:mp3|wav|flac|m4a)$/iu,
             include: [/src/u, /public/u],
             type: 'asset/resource',
             generator: {

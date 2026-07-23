@@ -14,6 +14,8 @@
     "startButton": "Kliknij, aby rozpocząć",
     "hint": "Wskazówka:",
     "downloadingScience": "Pobieranie danych naukowych...",
+    "loadFailed": "Nie udało się załadować niektórych komponentów.",
+    "resetAndReload": "Zresetuj i załaduj ponownie",
     "edition": {
       "pro": "Pro",
       "oss": "Otwarte Oprogramowanie",
@@ -118,5 +120,10 @@
     "resetCamera": "Zresetuj kamerę",
     "clearLines": "Wyczyść linie",
     "clearScreen": "Wyczyść ekran"
+  },
+  "urlManager": {
+    "satNotFound": "Satelita \"{val}\" nie został znaleziony!",
+    "intldesNotFound": "Międzynarodowy identyfikator \"{val}\" nie został znaleziony!",
+    "deepSpaceNoEphemeris": "{name} to obiekt w dalekiej przestrzeni kosmicznej. Jego efemerydy nie są jeszcze dostępne w KeepTrack."
   }
 }

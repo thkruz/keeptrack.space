@@ -1,60 +1,60 @@
-import beep1Mp3 from '@public/audio/beep1.mp3';
-import buttonMp3 from '@public/audio/button.mp3';
-import button2Mp3 from '@public/audio/button2.mp3';
-import chatter1Mp3 from '@public/audio/chatter1.mp3';
-import chatter2Mp3 from '@public/audio/chatter2.mp3';
-import chatter3Mp3 from '@public/audio/chatter3.mp3';
-import chatter4Mp3 from '@public/audio/chatter4.mp3';
-import chatter5Mp3 from '@public/audio/chatter5.mp3';
-import chatter6Mp3 from '@public/audio/chatter6.mp3';
-import chatter7Mp3 from '@public/audio/chatter7.mp3';
-import chatter8Mp3 from '@public/audio/chatter8.mp3';
-import click2Mp3 from '@public/audio/click2.mp3';
-import click3Mp3 from '@public/audio/click3.mp3';
-import click4Mp3 from '@public/audio/click4.mp3';
-import click7Mp3 from '@public/audio/click7.mp3';
-import click8Mp3 from '@public/audio/click8.mp3';
-import click10Mp3 from '@public/audio/click10.mp3';
-import click11Mp3 from '@public/audio/click11.mp3';
-import click12Mp3 from '@public/audio/click12.mp3';
-import click13Mp3 from '@public/audio/click13.mp3';
-import click14Mp3 from '@public/audio/click14.mp3';
-import click15Mp3 from '@public/audio/click15.mp3';
-import click16Mp3 from '@public/audio/click16.mp3';
-import click17Mp3 from '@public/audio/click17.mp3';
-import click18Mp3 from '@public/audio/click18.mp3';
-import click19Mp3 from '@public/audio/click19.mp3';
-import click20Mp3 from '@public/audio/click20.mp3';
-import click21Mp3 from '@public/audio/click21.mp3';
-import click22Mp3 from '@public/audio/click22.mp3';
-import click23Mp3 from '@public/audio/click23.mp3';
-import click24Mp3 from '@public/audio/click24.mp3';
-import click25Mp3 from '@public/audio/click25.mp3';
-import click26Mp3 from '@public/audio/click26.mp3';
-import click27Mp3 from '@public/audio/click27.mp3';
-import click28Mp3 from '@public/audio/click28.mp3';
-import click29Mp3 from '@public/audio/click29.mp3';
-import click30Mp3 from '@public/audio/click30.mp3';
-import error1Mp3 from '@public/audio/error.mp3';
-import error2Mp3 from '@public/audio/error2.mp3';
-import exportMp3 from '@public/audio/export.wav';
-import genericBeep1Mp3 from '@public/audio/genericBeep1.mp3';
-import genericBeep2Mp3 from '@public/audio/genericBeep2.mp3';
-import genericBeep3Mp3 from '@public/audio/genericBeep3.mp3';
-import liftoffMp3 from '@public/audio/liftoff.mp3';
-import loadingMp3 from '@public/audio/loading.wav';
-import popMp3 from '@public/audio/pop.mp3';
-import switchMp3 from '@public/audio/switch.mp3';
-import toggleOffMp3 from '@public/audio/toggle-off.mp3';
-import toggleOnMp3 from '@public/audio/toggle-on.mp3';
-import whoosh1Mp3 from '@public/audio/whoosh1.mp3';
-import whoosh2Mp3 from '@public/audio/whoosh2.mp3';
-import whoosh3Mp3 from '@public/audio/whoosh3.mp3';
-import whoosh4Mp3 from '@public/audio/whoosh4.mp3';
-import whoosh5Mp3 from '@public/audio/whoosh5.mp3';
-import whoosh6Mp3 from '@public/audio/whoosh6.mp3';
-import whoosh7Mp3 from '@public/audio/whoosh7.mp3';
-import whoosh8Mp3 from '@public/audio/whoosh8.mp3';
+import beep1M4a from '@public/audio/beep1.m4a';
+import buttonM4a from '@public/audio/button.m4a';
+import button2M4a from '@public/audio/button2.m4a';
+import chatter1M4a from '@public/audio/chatter1.m4a';
+import chatter2M4a from '@public/audio/chatter2.m4a';
+import chatter3M4a from '@public/audio/chatter3.m4a';
+import chatter4M4a from '@public/audio/chatter4.m4a';
+import chatter5M4a from '@public/audio/chatter5.m4a';
+import chatter6M4a from '@public/audio/chatter6.m4a';
+import chatter7M4a from '@public/audio/chatter7.m4a';
+import chatter8M4a from '@public/audio/chatter8.m4a';
+import click2M4a from '@public/audio/click2.m4a';
+import click3M4a from '@public/audio/click3.m4a';
+import click4M4a from '@public/audio/click4.m4a';
+import click7M4a from '@public/audio/click7.m4a';
+import click8M4a from '@public/audio/click8.m4a';
+import click10M4a from '@public/audio/click10.m4a';
+import click11M4a from '@public/audio/click11.m4a';
+import click12M4a from '@public/audio/click12.m4a';
+import click13M4a from '@public/audio/click13.m4a';
+import click14M4a from '@public/audio/click14.m4a';
+import click15M4a from '@public/audio/click15.m4a';
+import click16M4a from '@public/audio/click16.m4a';
+import click17M4a from '@public/audio/click17.m4a';
+import click18M4a from '@public/audio/click18.m4a';
+import click19M4a from '@public/audio/click19.m4a';
+import click20M4a from '@public/audio/click20.m4a';
+import click21M4a from '@public/audio/click21.m4a';
+import click22M4a from '@public/audio/click22.m4a';
+import click23M4a from '@public/audio/click23.m4a';
+import click24M4a from '@public/audio/click24.m4a';
+import click25M4a from '@public/audio/click25.m4a';
+import click26M4a from '@public/audio/click26.m4a';
+import click27M4a from '@public/audio/click27.m4a';
+import click28M4a from '@public/audio/click28.m4a';
+import click29M4a from '@public/audio/click29.m4a';
+import click30M4a from '@public/audio/click30.m4a';
+import error1M4a from '@public/audio/error.m4a';
+import error2M4a from '@public/audio/error2.m4a';
+import exportM4a from '@public/audio/export.m4a';
+import genericBeep1M4a from '@public/audio/genericBeep1.m4a';
+import genericBeep2M4a from '@public/audio/genericBeep2.m4a';
+import genericBeep3M4a from '@public/audio/genericBeep3.m4a';
+import liftoffM4a from '@public/audio/liftoff.m4a';
+import loadingM4a from '@public/audio/loading.m4a';
+import popM4a from '@public/audio/pop.m4a';
+import switchM4a from '@public/audio/switch.m4a';
+import toggleOffM4a from '@public/audio/toggle-off.m4a';
+import toggleOnM4a from '@public/audio/toggle-on.m4a';
+import whoosh1M4a from '@public/audio/whoosh1.m4a';
+import whoosh2M4a from '@public/audio/whoosh2.m4a';
+import whoosh3M4a from '@public/audio/whoosh3.m4a';
+import whoosh4M4a from '@public/audio/whoosh4.m4a';
+import whoosh5M4a from '@public/audio/whoosh5.m4a';
+import whoosh6M4a from '@public/audio/whoosh6.m4a';
+import whoosh7M4a from '@public/audio/whoosh7.m4a';
+import whoosh8M4a from '@public/audio/whoosh8.m4a';
 
 export enum SoundNames {
   BEEP = 'beep',
@@ -73,61 +73,61 @@ export enum SoundNames {
 }
 
 export const sounds = {
-  standby: popMp3,
-  error1: error1Mp3,
-  error2: error2Mp3,
-  export: exportMp3,
-  click: switchMp3,
-  beep1: beep1Mp3,
-  genericBeep1: genericBeep1Mp3,
-  genericBeep2: genericBeep2Mp3,
-  genericBeep3: genericBeep3Mp3,
-  whoosh1: whoosh1Mp3,
-  whoosh2: whoosh2Mp3,
-  whoosh3: whoosh3Mp3,
-  whoosh4: whoosh4Mp3,
-  whoosh5: whoosh5Mp3,
-  whoosh6: whoosh6Mp3,
-  whoosh7: whoosh7Mp3,
-  whoosh8: whoosh8Mp3,
-  click1: click30Mp3,
-  click2: click2Mp3,
-  click3: click3Mp3,
-  click4: click4Mp3,
-  click5: click29Mp3,
-  click6: click27Mp3,
-  click7: click7Mp3,
-  click8: click8Mp3,
-  click9: click28Mp3,
-  click10: click10Mp3,
-  click11: click11Mp3,
-  click12: click12Mp3,
-  click13: click13Mp3,
-  click14: click14Mp3,
-  click15: click15Mp3,
-  click16: click16Mp3,
-  click17: click17Mp3,
-  click18: click18Mp3,
-  click19: click19Mp3,
-  click20: click20Mp3,
-  click21: click21Mp3,
-  click22: click22Mp3,
-  click23: click23Mp3,
-  click24: click24Mp3,
-  click25: click25Mp3,
-  click26: click26Mp3,
-  chatter1: chatter1Mp3,
-  chatter2: chatter2Mp3,
-  chatter3: chatter3Mp3,
-  chatter4: chatter4Mp3,
-  chatter5: chatter5Mp3,
-  chatter6: chatter6Mp3,
-  chatter7: chatter7Mp3,
-  chatter8: chatter8Mp3,
-  loading: loadingMp3,
-  button: buttonMp3,
-  menuButton: button2Mp3,
-  toggleOn: toggleOnMp3,
-  toggleOff: toggleOffMp3,
-  liftoff: liftoffMp3,
+  standby: popM4a,
+  error1: error1M4a,
+  error2: error2M4a,
+  export: exportM4a,
+  click: switchM4a,
+  beep1: beep1M4a,
+  genericBeep1: genericBeep1M4a,
+  genericBeep2: genericBeep2M4a,
+  genericBeep3: genericBeep3M4a,
+  whoosh1: whoosh1M4a,
+  whoosh2: whoosh2M4a,
+  whoosh3: whoosh3M4a,
+  whoosh4: whoosh4M4a,
+  whoosh5: whoosh5M4a,
+  whoosh6: whoosh6M4a,
+  whoosh7: whoosh7M4a,
+  whoosh8: whoosh8M4a,
+  click1: click30M4a,
+  click2: click2M4a,
+  click3: click3M4a,
+  click4: click4M4a,
+  click5: click29M4a,
+  click6: click27M4a,
+  click7: click7M4a,
+  click8: click8M4a,
+  click9: click28M4a,
+  click10: click10M4a,
+  click11: click11M4a,
+  click12: click12M4a,
+  click13: click13M4a,
+  click14: click14M4a,
+  click15: click15M4a,
+  click16: click16M4a,
+  click17: click17M4a,
+  click18: click18M4a,
+  click19: click19M4a,
+  click20: click20M4a,
+  click21: click21M4a,
+  click22: click22M4a,
+  click23: click23M4a,
+  click24: click24M4a,
+  click25: click25M4a,
+  click26: click26M4a,
+  chatter1: chatter1M4a,
+  chatter2: chatter2M4a,
+  chatter3: chatter3M4a,
+  chatter4: chatter4M4a,
+  chatter5: chatter5M4a,
+  chatter6: chatter6M4a,
+  chatter7: chatter7M4a,
+  chatter8: chatter8M4a,
+  loading: loadingM4a,
+  button: buttonM4a,
+  menuButton: button2M4a,
+  toggleOn: toggleOnM4a,
+  toggleOff: toggleOffM4a,
+  liftoff: liftoffM4a,
 } as Record<string, string>;

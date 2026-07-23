@@ -382,6 +382,8 @@ async function main() {
     lagrangeOrder: number;
     segmentYears: number;
     outputFormat?: 'ts' | 'json';
+    /** Per-body fit-range start (ISO date), for probes whose early trajectory bends too hard to fit */
+    rangeStart?: string;
   }[] = [
     // Ceres: short orbital period (4.6 yr) needs shorter segments for accurate Chebyshev fitting
     { name: 'Ceres', file: 'dwarf-planets/ceres.txt', exportName: 'ceresChebyshevCoeffs', outFile: 'ceres-chebyshev.ts', lagrangeOrder: 10, segmentYears: 1 },
@@ -394,6 +396,17 @@ async function main() {
     { name: 'Charon', file: 'dwarf-planets/charon.txt', exportName: 'charonChebyshevCoeffs', outFile: 'charon-chebyshev.ts', lagrangeOrder: 10, segmentYears: 5 },
     // Deep-space satellites — JSON output, fetched at runtime from public/data/ephemeris/
     { name: 'Voyager 1', file: 'satellites/voyager-1.txt', exportName: 'voyager1ChebyshevCoeffs', outFile: 'voyager-1.json', lagrangeOrder: 10, segmentYears: 5, outputFormat: 'json' },
+    // Voyager 2: the post-Neptune-flyby (Aug 1989) trajectory still bends through the
+    // early 1990s, so 5-year segments under-fit; shorter segments keep the error down.
+    { name: 'Voyager 2', file: 'satellites/voyager-2.txt', exportName: 'voyager2ChebyshevCoeffs', outFile: 'voyager-2.json', lagrangeOrder: 10, segmentYears: 1, outputFormat: 'json' },
+    // Pioneers: data starts 1990, well past their last flybys (Saturn 1979), so the
+    // heliocentric escape is already smooth enough for 5-year segments.
+    { name: 'Pioneer 10', file: 'satellites/pioneer-10.txt', exportName: 'pioneer10ChebyshevCoeffs', outFile: 'pioneer-10.json', lagrangeOrder: 10, segmentYears: 5, outputFormat: 'json' },
+    { name: 'Pioneer 11', file: 'satellites/pioneer-11.txt', exportName: 'pioneer11ChebyshevCoeffs', outFile: 'pioneer-11.json', lagrangeOrder: 10, segmentYears: 5, outputFormat: 'json' },
+    // New Horizons: the launch arc (2006) and Jupiter flyby (Feb 2007) bend the early
+    // trajectory far too hard to fit (>1M km error), so fitting starts in 2008 once the
+    // post-flyby escape is ballistic; short segments then absorb the Pluto-era bending.
+    { name: 'New Horizons', file: 'satellites/new-horizons.txt', exportName: 'newHorizonsChebyshevCoeffs', outFile: 'new-horizons.json', lagrangeOrder: 10, segmentYears: 1, outputFormat: 'json', rangeStart: '2008-01-01' },
   ];
 
   // Configuration — with heliocentric data, fewer coefficients give ultra-smooth orbits
@@ -436,7 +449,8 @@ async function main() {
     // Clamp fitting range to the intersection of [desired range] and [data range]
     const dataStartSec = helioData[0][0] / 1000;
     const dataEndSec = helioData[helioData.length - 1][0] / 1000;
-    const effectiveStart = Math.max(rangeStartSeconds, dataStartSec);
+    const bodyRangeStartSeconds = body.rangeStart ? Date.parse(`${body.rangeStart}T00:00:00Z`) / 1000 : rangeStartSeconds;
+    const effectiveStart = Math.max(bodyRangeStartSeconds, dataStartSec);
     const effectiveEnd = Math.min(rangeEndSeconds, dataEndSec);
 
     if (effectiveStart !== rangeStartSeconds || effectiveEnd !== rangeEndSeconds) {
@@ -452,8 +466,9 @@ async function main() {
 
     const accuracy = validateAccuracy(helioData, segments, body.name);
 
-    if (accuracy.maxError > maxAcceptableError) {
-      console.error(`  WARNING: Max error exceeds ${maxAcceptableError} km!`);
+    // NaN must fail too (NaN > threshold is false) - a parse problem otherwise slips through
+    if (!Number.isFinite(accuracy.maxError) || accuracy.maxError > maxAcceptableError) {
+      console.error(`  WARNING: Max error is ${accuracy.maxError} km (threshold ${maxAcceptableError} km)!`);
       anyExceeded = true;
     }
 

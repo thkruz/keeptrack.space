@@ -373,6 +373,15 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
     }
   }
 
+  /**
+   * Draws the full heliocentric orbit paths of the Moon, planets, and dwarf
+   * planets, then restores `centerBody` to `restoreCenterBody`. Public because
+   * deep-space focusing (focusDeepSpaceSatellite) draws the same context.
+   */
+  drawHeliocentricOrbits(restoreCenterBody: SolarBody) {
+    this.drawOrbits_(restoreCenterBody);
+  }
+
   private drawOrbits_(planetName: SolarBody) {
     // NOTE: Don't use changePlanet() here to avoid infinite loop
     settingsManager.centerBody = SolarBody.Sun; // Temporarily set to Sun to draw orbits relative to Sun

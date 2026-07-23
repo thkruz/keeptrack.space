@@ -14,6 +14,8 @@
     "startButton": "Click to Begin",
     "hint": "Hint:",
     "downloadingScience": "Downloading Science...",
+    "loadFailed": "Some components failed to load.",
+    "resetAndReload": "Reset & Reload",
     "edition": {
       "pro": "Pro",
       "oss": "OSS",
@@ -113,5 +115,10 @@
     "resetCamera": "Reset Camera",
     "clearLines": "Clear Lines",
     "clearScreen": "Clear Screen"
+  },
+  "urlManager": {
+    "satNotFound": "Satellite \"{val}\" was not found!",
+    "intldesNotFound": "International Designator \"{val}\" was not found!",
+    "deepSpaceNoEphemeris": "{name} is a deep-space object. Its ephemeris is not available in KeepTrack yet."
   }
 }

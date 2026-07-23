@@ -81,6 +81,50 @@ describe('WebWorkerThreadManager', () => {
       expect(mgr.isReady).toBe(true);
     });
 
+    it('is essential and not disabled by default', () => {
+      const mgr = new TestThread([]);
+
+      expect(mgr.isEssential).toBe(true);
+      expect(mgr.isDisabled).toBe(false);
+    });
+
+    it('disableDueToStall terminates the worker, flags disabled, and makes postMessage a no-op', () => {
+      const mgr = new TestThread([]);
+      const stub = stubWorker();
+
+      mgr.init(stub);
+      mgr.disableDueToStall();
+
+      expect(mgr.isDisabled).toBe(true);
+      expect(stub.terminate).toHaveBeenCalled();
+      expect(mgr.worker).toBeNull();
+
+      // With the worker torn down, further sends are silently dropped (no throw).
+      expect(() => mgr.postMessage({ hi: 1 })).not.toThrow();
+      expect(stub.postMessage).not.toHaveBeenCalled();
+    });
+
+    it('skipBootGate excludes a deferred worker from the boot gate without terminating', () => {
+      const mgr = new TestThread([]);
+
+      // No worker started yet (deliberately deferred, e.g. orbit lines are off).
+      mgr.skipBootGate();
+
+      expect(mgr.isDisabled).toBe(true);
+      expect(mgr.worker).toBeNull();
+    });
+
+    it('init() re-arms a skipped worker for the boot gate', () => {
+      const mgr = new TestThread([]);
+
+      mgr.skipBootGate();
+      expect(mgr.isDisabled).toBe(true);
+
+      // Starting the worker on demand clears the skip marker.
+      mgr.init(stubWorker());
+      expect(mgr.isDisabled).toBe(false);
+    });
+
     it('exposes a no-op mock worker whose methods can be called', () => {
       const mgr = new TestThread([]);
 
@@ -110,7 +154,9 @@ describe('WebWorkerThreadManager', () => {
       const worker = mgr.worker as unknown as MockWorker;
 
       expect(worker).toBeInstanceOf(MockWorker);
-      expect(worker.url).toBe('./js/test-worker.js');
+      // Worker URLs are cache-busted with the per-build version so a stale/broken
+      // cached worker script can't be served across builds (which silently hangs boot).
+      expect(worker.url).toMatch(/^\.\/js\/test-worker\.js\?v=./u);
       expect(typeof worker.onmessage).toBe('function');
 
       // onmessage -> base handler -> ready

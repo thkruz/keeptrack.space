@@ -14,6 +14,8 @@
     "startButton": "クリックで開始",
     "hint": "ヒント：",
     "downloadingScience": "科学データをダウンロード中...",
+    "loadFailed": "一部のコンポーネントの読み込みに失敗しました。",
+    "resetAndReload": "リセットして再読み込み",
     "edition": {
       "pro": "プロ",
       "oss": "オープンソース",
@@ -149,5 +151,10 @@
     "resetCamera": "カメラをリセット",
     "clearLines": "ラインを消去",
     "clearScreen": "画面を消去"
+  },
+  "urlManager": {
+    "satNotFound": "衛星「{val}」が見つかりませんでした!",
+    "intldesNotFound": "国際識別符号「{val}」が見つかりませんでした!",
+    "deepSpaceNoEphemeris": "{name}は深宇宙の物体です。その軌道暦はまだKeepTrackでは利用できません。"
   }
 }

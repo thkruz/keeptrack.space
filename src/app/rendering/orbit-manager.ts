@@ -255,9 +255,17 @@ export class OrbitManager {
       return;
     } // Only initialize once
     if (!settingsManager.isDrawOrbits) {
+      // Orbit lines are off, so the orbit cruncher is intentionally deferred
+      // (drawOrbitsSettingChanged() will start it if the user turns orbits on).
+      // Tell the boot gate to skip it - otherwise a registered-but-unstarted
+      // worker hangs boot forever (the drawOrbits:false boot-hang bug).
+      this.orbitThreadMgr.skipBootGate();
+
       return;
     }
     if (!settingsManager.colors) {
+      this.orbitThreadMgr.skipBootGate();
+
       return;
     }
 
@@ -494,9 +502,12 @@ export class OrbitManager {
         if (obj.isMissile()) {
           return { missile: true };
         }
-        // OemSatellite passes isSatellite() but has no tle1/tle2 — the orbit
-        // cruncher would otherwise receive `undefined` TLEs and break SGP4.
-        if (!(obj instanceof Satellite)) {
+        // OemSatellite passes isSatellite() but has no tle1/tle2, and a Satellite
+        // whose TLE failed to parse ends up with empty tle1/tle2 (the boot-time
+        // "Invalid ephemeris type: NaN" ParseError). Either way the orbit cruncher
+        // must not receive unusable TLEs — flag it `ignore` so it draws no orbit
+        // instead of throwing 'Invalid Object Data' and stalling the whole worker.
+        if (!(obj instanceof Satellite) || !obj.tle1 || !obj.tle2) {
           return { ignore: true };
         }
 

@@ -1,31 +1,71 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# Guard against corrupt commit subjects that poison the generated changelog.
+# Validate commit subjects so bad lines never poison the generated changelog.
 #
 # docs/CHANGELOG.md is fully regenerated from git history by `npm run changelog`
 # on every version bump, so a bad subject line is baked in permanently and
 # reappears on every release (manual edits to the changelog never hold).
 #
-# The classic offender is a PowerShell here-string leak (`@'...'@`) where the
-# `@` delimiters bleed into `git commit -m`, leaving the subject as a bare `@`.
-# Reject those (and empty subjects) here so the changelog stays clean.
+# Rules enforced (see CLAUDE.md "Git Commits"):
+#   <type>(<scope>): :<emoji>: <message>   (emoji optional)
+# When an emoji is present it must match the type. Merge/Revert/fixup!/squash!
+# subjects are exempt. Bypass in an emergency with: git commit --no-verify
 
 msg_file="$1"
 
 # First non-comment, non-blank line = the subject git uses for the changelog.
 subject=$(grep -vE '^\s*#' "$msg_file" | grep -vE '^\s*$' | head -n1)
 
+fail() {
+  echo "commit-msg: $1" >&2
+  echo "  Subject: \"$subject\"" >&2
+  echo "  Expected: type(scope): :emoji: message (emoji optional)" >&2
+  echo "  types/emoji: feat=:sparkles: fix=:bug: refactor=:recycle: test=:white_check_mark:" >&2
+  echo "               chore=:wrench: docs=:memo: i18n=:globe_with_meridians: perf=:zap: style=:art:" >&2
+  echo "  Example: feat(filter-menu): :sparkles: add command palette commands" >&2
+  exit 1
+}
+
+# The classic offender is a PowerShell here-string leak (`@'...'@`) where the
+# `@` delimiters bleed into `git commit -m`, leaving the subject as a bare `@`.
 case "$subject" in
   '@'*)
     echo "commit-msg: subject line starts with '@': \"$subject\"" >&2
     echo "  This is almost always a PowerShell here-string (@'...'@) leak." >&2
-    echo "  Fix the message so the first line is the real conventional-commit" >&2
-    echo "  summary, e.g. feat(scope): :sparkles: message" >&2
-    exit 1
+    fail "fix the message so the first line is the real conventional-commit summary."
     ;;
   '')
-    echo "commit-msg: empty subject line. Provide a conventional-commit summary." >&2
-    exit 1
+    fail "empty subject line."
+    ;;
+  'Merge '*|'Revert '*|'fixup! '*|'squash! '*)
+    # Git-generated / rework subjects are exempt from the conventional format.
+    exit 0
     ;;
 esac
+
+# Shape: type(scope): :emoji: message — the emoji is optional.
+if ! echo "$subject" | grep -qE '^(feat|fix|refactor|test|chore|docs|style|perf|i18n)\([A-Za-z0-9][A-Za-z0-9 .,/_-]*\): (:[a-z0-9_]+: )?.+'; then
+  fail "subject does not match the conventional-commit format."
+fi
+
+# No emoji: nothing further to pair-check.
+if ! echo "$subject" | grep -qE '^[^:]+: :[a-z0-9_]+: '; then
+  exit 0
+fi
+
+type=$(echo "$subject" | sed -E 's/^([a-z0-9]+)\(.*/\1/')
+emoji=$(echo "$subject" | sed -E 's/^[^:]+: :([a-z0-9_]+):.*/\1/')
+
+case "$type:$emoji" in
+  feat:sparkles|fix:bug|refactor:recycle|test:white_check_mark|chore:wrench|docs:memo|style:art|perf:zap|i18n:globe_with_meridians)
+    ;;
+  chore:bookmark)
+    # semantic-release version bumps: chore(release): :bookmark: x.y.z [skip ci]
+    ;;
+  *)
+    fail "emoji :$emoji: does not match type '$type'."
+    ;;
+esac
+
+exit 0

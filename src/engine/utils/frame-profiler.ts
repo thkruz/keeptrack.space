@@ -382,6 +382,14 @@ export class FrameProfiler {
 
   private enabled_ = false;
   private readonly gpu_ = new GpuTimer();
+  /**
+   * Always-on whole-frame GPU timer for the busy monitor (see
+   * {@link gpuBusyAvgMs}). Separate from gpu_ because TIME_ELAPSED queries
+   * cannot overlap: this one runs only while the full profiler is OFF.
+   */
+  private readonly frameGpu_ = new GpuTimer();
+  /** ~2 s of whole-frame GPU samples at 30 fps. */
+  private readonly frameGpuRing_ = new Ring(60);
   private readonly frameTime_ = new Ring(RING_CAPACITY);
   private readonly cpuRings_ = new Map<string, Ring>();
   private readonly gpuRings_ = new Map<string, Ring>();
@@ -407,12 +415,64 @@ export class FrameProfiler {
       return;
     }
     this.enabled_ = on;
+    // The busy monitor hands the (single) timer-query slot over to the
+    // per-stage profiler and back; drop its samples across the transition.
+    this.frameGpuRing_.clear();
     if (on) {
       this.reset();
       this.gpu_.init();
     } else {
       this.gpu_.dispose();
     }
+  }
+
+  /**
+   * Starts the always-on whole-frame GPU query (busy monitor). Call at draw
+   * submission start; no-op while the full profiler owns the query slot.
+   */
+  monitorFrameGpuBegin(): void {
+    if (this.enabled_) {
+      return;
+    }
+    this.frameGpu_.init();
+    this.frameGpu_.begin('frame');
+  }
+
+  /** Ends the whole-frame query and drains any resolved samples. */
+  monitorFrameGpuEnd(): void {
+    if (this.enabled_) {
+      return;
+    }
+    this.frameGpu_.end('frame');
+    this.frameGpu_.poll((_stage, ms) => this.frameGpuRing_.push(ms));
+  }
+
+  /**
+   * Average measured GPU busy time per frame (ms), or null when timer queries
+   * are unsupported or no samples exist yet. This is the signal that separates
+   * "frames are slow because the GPU is loaded" from "frames are slow because
+   * the environment presents slowly" (remote desktop, OS frame caps): the
+   * latter shows a long frame delta with an idle GPU.
+   */
+  gpuBusyAvgMs(): number | null {
+    if (this.enabled_) {
+      // Per-stage queries cover the frame; their averages sum to frame busy.
+      let sum = 0;
+      let any = false;
+
+      for (const ring of this.gpuRings_.values()) {
+        sum += ring.avg();
+        any = true;
+      }
+
+      return any ? sum : null;
+    }
+
+    if (!this.frameGpu_.supported || this.frameGpuRing_.size < 30) {
+      return null;
+    }
+
+    return this.frameGpuRing_.avg();
   }
 
   reset(): void {

@@ -14,6 +14,8 @@
     "startButton": "클릭하여 시작",
     "hint": "힌트:",
     "downloadingScience": "과학 데이터 다운로드 중...",
+    "loadFailed": "일부 구성 요소를 불러오지 못했습니다.",
+    "resetAndReload": "초기화 후 새로고침",
     "edition": {
       "pro": "프로",
       "oss": "오픈 소스",
@@ -118,5 +120,10 @@
     "resetCamera": "카메라 초기화",
     "clearLines": "선 지우기",
     "clearScreen": "화면 지우기"
+  },
+  "urlManager": {
+    "satNotFound": "위성 \"{val}\"을(를) 찾을 수 없습니다!",
+    "intldesNotFound": "국제 식별 부호 \"{val}\"을(를) 찾을 수 없습니다!",
+    "deepSpaceNoEphemeris": "{name}은(는) 심우주 물체입니다. 해당 궤도력은 아직 KeepTrack에서 제공되지 않습니다."
   }
 }

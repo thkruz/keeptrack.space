@@ -14,6 +14,8 @@
     "startButton": "点击开始",
     "hint": "提示：",
     "downloadingScience": "正在下载科学数据...",
+    "loadFailed": "部分组件加载失败。",
+    "resetAndReload": "重置并重新加载",
     "edition": {
       "pro": "专业版",
       "oss": "开源软件",
@@ -149,5 +151,10 @@
     "resetCamera": "重置相机",
     "clearLines": "清除线条",
     "clearScreen": "清除屏幕"
+  },
+  "urlManager": {
+    "satNotFound": "未找到卫星\"{val}\"!",
+    "intldesNotFound": "未找到国际编号\"{val}\"!",
+    "deepSpaceNoEphemeris": "{name}是深空物体,其星历尚未在 KeepTrack 中提供。"
   }
 }

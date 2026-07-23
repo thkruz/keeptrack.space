@@ -82,10 +82,11 @@ describe('ModelResolver satellite model selection', () => {
   });
 
   describe('special sccNum lookups', () => {
-    it('maps the ISS, Hubble and Tiangong catalog numbers', () => {
+    it('maps the ISS, Hubble, Tiangong and JWST catalog numbers', () => {
       expect(resolver.resolve(makeSat({ sccNum: '25544' }))).toBe(SatelliteModels.iss);
       expect(resolver.resolve(makeSat({ sccNum: '20580' }))).toBe(SatelliteModels.hubble);
       expect(resolver.resolve(makeSat({ sccNum: '48274' }))).toBe(SatelliteModels.tiangong);
+      expect(resolver.resolve(makeSat({ sccNum: '50463' }))).toBe(SatelliteModels.jwst);
     });
 
     it('maps known AEHF and DSP catalog numbers', () => {

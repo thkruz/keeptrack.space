@@ -14,6 +14,8 @@
     "startButton": "Clicca per iniziare",
     "hint": "Suggerimento:",
     "downloadingScience": "Download dei dati scientifici...",
+    "loadFailed": "Impossibile caricare alcuni componenti.",
+    "resetAndReload": "Reimposta e ricarica",
     "edition": {
       "pro": "Pro",
       "oss": "Open Source",
@@ -118,5 +120,10 @@
     "resetCamera": "Reimposta la fotocamera",
     "clearLines": "Cancella le linee",
     "clearScreen": "Cancella lo schermo"
+  },
+  "urlManager": {
+    "satNotFound": "Satellite \"{val}\" non trovato!",
+    "intldesNotFound": "Designatore internazionale \"{val}\" non trovato!",
+    "deepSpaceNoEphemeris": "{name} è un oggetto dello spazio profondo. Le sue effemeridi non sono ancora disponibili in KeepTrack."
   }
 }

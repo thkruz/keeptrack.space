@@ -1,4 +1,7 @@
+import { DeepSpaceDesignatorEntry, DeepSpaceDesignators } from '@app/app/data/deep-space-designators';
+import { focusDeepSpaceSatellite } from '@app/app/ui/deep-space-focus';
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { t7e } from '@app/locales/keys';
 import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager, settingsManager } from '@app/settings/settings';
@@ -333,6 +336,14 @@ export abstract class UrlManager {
       if (scc !== '') {
         paramSlices.push(`sat=${scc}`);
       }
+    } else {
+      // Deep-space probes (Voyager 1, etc.) are focused via centerBody rather than
+      // selection; emit their NORAD ID so the shared URL reproduces the view.
+      const deepSpaceScc = DeepSpaceDesignators.sccNumForBody(settingsManager.centerBody);
+
+      if (deepSpaceScc) {
+        paramSlices.push(`sat=${deepSpaceScc}`);
+      }
     }
 
     if (this.searchString_ !== '') {
@@ -523,9 +534,15 @@ export abstract class UrlManager {
 
     if (urlSatId !== null && catalogManagerInstance.getObject(urlSatId)?.active) {
       PluginRegistry.getPlugin(SelectSatManager)?.selectSat(urlSatId);
-    } else {
-      ServiceLocator.getUiManager().toast(`International Designator "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
+
+      return;
     }
+
+    if (this.tryDeepSpaceDesignator_(DeepSpaceDesignators.lookupIntlDes(val))) {
+      return;
+    }
+
+    ServiceLocator.getUiManager().toast(t7e('urlManager.intldesNotFound').replace('{val}', val.toUpperCase()), ToastMsgType.caution, true);
   }
 
   private static handleSatParam_(val: string) {
@@ -536,9 +553,82 @@ export abstract class UrlManager {
 
     if (urlSatId !== null) {
       PluginRegistry.getPlugin(SelectSatManager)?.selectSat(urlSatId);
-    } else {
-      ServiceLocator.getUiManager().toast(`Satellite "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
+
+      return;
     }
+
+    if (this.tryDeepSpaceDesignator_(DeepSpaceDesignators.lookupSccNum(val))) {
+      return;
+    }
+
+    ServiceLocator.getUiManager().toast(t7e('urlManager.satNotFound').replace('{val}', val.toUpperCase()), ToastMsgType.caution, true);
+  }
+
+  /**
+   * Deep-space objects (Voyager 1, OEM missions) have no TLE, so external links
+   * like ?sat=10321 miss the catalog. When the designator registry knows the
+   * object, resolve it here instead of toasting "not found".
+   * @returns true when the designator was recognized (even if the object's
+   * ephemeris turns out to be unavailable, in which case a specific toast names it).
+   */
+  private static tryDeepSpaceDesignator_(entry: DeepSpaceDesignatorEntry | null): boolean {
+    if (!entry) {
+      return false;
+    }
+
+    if (entry.kind === 'probe' && entry.bodyName) {
+      this.focusProbeWhenReady_(entry);
+
+      return true;
+    }
+
+    if (entry.kind === 'deferred' && entry.focus) {
+      entry.focus().then((isFocused) => {
+        if (!isFocused) {
+          this.toastDeepSpaceUnavailable_(entry);
+        }
+      });
+
+      return true;
+    }
+
+    // kind 'knownObject' (recognized, but no ephemeris available yet)
+    this.toastDeepSpaceUnavailable_(entry);
+
+    return true;
+  }
+
+  private static readonly DEEP_SPACE_RETRY_INTERVAL_MS_ = 500;
+  /** ~15 s at 500 ms per attempt, enough for a slow ephemeris fetch. */
+  private static readonly DEEP_SPACE_MAX_RETRIES_ = 30;
+
+  /**
+   * Chebyshev ephemeris loads asynchronously in Scene.loadScene(), which is not
+   * awaited before onKeepTrackReady fires. Poll until the probe reports ready;
+   * a probe deleted from the scene (failed fetch) or a timeout degrades to the
+   * "ephemeris unavailable" toast.
+   */
+  private static focusProbeWhenReady_(entry: DeepSpaceDesignatorEntry, attempt = 0): void {
+    const bodyName = entry.bodyName ?? '';
+    const probe = ServiceLocator.getScene()?.deepSpaceSatellites?.[bodyName];
+
+    if (probe?.isEphemerisReady) {
+      focusDeepSpaceSatellite(bodyName);
+
+      return;
+    }
+
+    if (!probe || attempt >= UrlManager.DEEP_SPACE_MAX_RETRIES_) {
+      this.toastDeepSpaceUnavailable_(entry);
+
+      return;
+    }
+
+    setTimeout(() => this.focusProbeWhenReady_(entry, attempt + 1), UrlManager.DEEP_SPACE_RETRY_INTERVAL_MS_);
+  }
+
+  private static toastDeepSpaceUnavailable_(entry: DeepSpaceDesignatorEntry): void {
+    ServiceLocator.getUiManager().toast(t7e('urlManager.deepSpaceNoEphemeris').replace('{name}', entry.displayName), ToastMsgType.caution, true);
   }
 
   private static handleMislParam_(val: string) {

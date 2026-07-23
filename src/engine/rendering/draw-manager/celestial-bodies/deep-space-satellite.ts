@@ -21,6 +21,10 @@ export interface DeepSpaceSatelliteConfig {
   meanDistanceToSun: Kilometers;
   dataFile: string;
   model?: string;
+  /** NORAD catalog number, when assigned (resolves ?sat= URLs to this probe) */
+  sccNum?: string;
+  /** International designator (COSPAR), when assigned (resolves ?intldes= URLs to this probe) */
+  intlDes?: string;
 }
 
 interface ChebyshevJsonSegment {
@@ -71,6 +75,19 @@ export class DeepSpaceSatellite extends ChebyshevBody {
     this.meanDistanceToSun = config.meanDistanceToSun;
     // Interpolator is set later via setCoefficients() after async data load
     this.interpolator_ = null as unknown as ChebyshevInterpolator;
+  }
+
+  /**
+   * True once init() has run and the Chebyshev coefficients are loaded, i.e.
+   * position updates are live. False while the async ephemeris fetch is still
+   * in flight, which callers (e.g. URL-driven focusing) must wait out.
+   */
+  get isEphemerisReady(): boolean {
+    return this.isLoaded_;
+  }
+
+  get config(): DeepSpaceSatelliteConfig {
+    return this.config_;
   }
 
   /** Set the Chebyshev coefficients after async loading. Marks the satellite as ready. */

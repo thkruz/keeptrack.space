@@ -14,6 +14,8 @@
     "startButton": "Klikněte pro zahájení",
     "hint": "Tip:",
     "downloadingScience": "Stahování vědeckých dat...",
+    "loadFailed": "Některé komponenty se nepodařilo načíst.",
+    "resetAndReload": "Obnovit a načíst znovu",
     "edition": {
       "pro": "Profi",
       "oss": "Otevřený software",
@@ -118,5 +120,10 @@
     "resetCamera": "Obnovit kameru",
     "clearLines": "Vymazat čáry",
     "clearScreen": "Vymazat obrazovku"
+  },
+  "urlManager": {
+    "satNotFound": "Družice \"{val}\" nebyla nalezena!",
+    "intldesNotFound": "Mezinárodní označení \"{val}\" nebylo nalezeno!",
+    "deepSpaceNoEphemeris": "{name} je objekt v hlubokém vesmíru. Jeho efemeridy zatím nejsou v KeepTrack k dispozici."
   }
 }

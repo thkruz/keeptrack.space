@@ -115,27 +115,22 @@ export class SoundManager {
     }
 
     const loadPromises = Object.entries(sounds).map(async ([key, path]) => {
+      // HTML5 Audio sounds (chatter) are ~1.8 MB that most sessions never play,
+      // so they are created lazily on first play instead of downloaded at boot.
+      if (this.useHtmlAudioFor.has(key)) {
+        return;
+      }
+
       try {
-        if (this.useHtmlAudioFor.has(key)) {
-          // Use HTML5 Audio for complex sounds like chatter
-          const audio = new Audio(path);
+        const response = await fetch(path);
+        const arrayBuffer = await response.arrayBuffer();
+        const audioBuffer = await this.audioContext?.decodeAudioData(arrayBuffer);
 
-          audio.preload = 'auto';
-          audio.volume = this.getVolumeForSound(key);
-          audio.load();
-          this.htmlAudioElements.set(key, audio);
-        } else {
-          // Use Web Audio API for simple sounds
-          const response = await fetch(path);
-          const arrayBuffer = await response.arrayBuffer();
-          const audioBuffer = await this.audioContext?.decodeAudioData(arrayBuffer);
-
-          if (!audioBuffer) {
-            throw new Error(`Failed to decode audio data: ${key}`);
-          }
-
-          this.audioBuffers.set(key, audioBuffer);
+        if (!audioBuffer) {
+          throw new Error(`Failed to decode audio data: ${key}`);
         }
+
+        this.audioBuffers.set(key, audioBuffer);
       } catch (error) {
         errorManagerInstance.warn(`Failed to load audio: ${key}`, error);
       }
@@ -145,8 +140,12 @@ export class SoundManager {
   }
 
   private preloadHtmlAudio() {
-    // Fallback to HTML5 Audio for all sounds
+    // Fallback to HTML5 Audio for all sounds (chatter stays lazy here too)
     Object.entries(sounds).forEach(([key, path]) => {
+      if (this.useHtmlAudioFor.has(key)) {
+        return;
+      }
+
       const audio = new Audio(path);
 
       audio.preload = 'auto';
@@ -154,6 +153,30 @@ export class SoundManager {
       audio.load();
       this.htmlAudioElements.set(key, audio);
     });
+  }
+
+  /**
+   * Chatter clips are never downloaded at boot; the element (and its network
+   * fetch) is created on first play and cached for the rest of the session.
+   */
+  private getOrCreateHtmlAudio_(soundKey: string): HTMLAudioElement | null {
+    const existing = this.htmlAudioElements.get(soundKey);
+
+    if (existing) {
+      return existing;
+    }
+
+    if (!this.useHtmlAudioFor.has(soundKey) || !sounds[soundKey]) {
+      return null;
+    }
+
+    const audio = new Audio(sounds[soundKey]);
+
+    audio.preload = 'auto';
+    audio.volume = this.getVolumeForSound(soundKey);
+    this.htmlAudioElements.set(soundKey, audio);
+
+    return audio;
   }
 
   private getVolumeForSound(soundKey: string): number {
@@ -222,7 +245,7 @@ export class SoundManager {
   }
 
   private playWithHtmlAudio(soundKey: string): boolean {
-    const audio = this.htmlAudioElements.get(soundKey);
+    const audio = this.htmlAudioElements.get(soundKey) ?? this.getOrCreateHtmlAudio_(soundKey);
 
     if (!audio) {
       return false;

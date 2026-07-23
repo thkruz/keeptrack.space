@@ -14,6 +14,8 @@
     "startButton": "Klicken Sie, um zu Beginnen",
     "hint": "Tipp:",
     "downloadingScience": "Wissenschaft wird heruntergeladen...",
+    "loadFailed": "Einige Komponenten konnten nicht geladen werden.",
+    "resetAndReload": "Zurücksetzen & Neu laden",
     "edition": {
       "pro": "Profi",
       "oss": "Open Source",
@@ -401,5 +403,10 @@
     "resetCamera": "Kamera zurücksetzen",
     "clearLines": "Linien löschen",
     "clearScreen": "Bildschirm löschen"
+  },
+  "urlManager": {
+    "satNotFound": "Satellit \"{val}\" wurde nicht gefunden!",
+    "intldesNotFound": "Internationale Kennung \"{val}\" wurde nicht gefunden!",
+    "deepSpaceNoEphemeris": "{name} ist ein Objekt im tiefen Weltraum. Seine Ephemeriden sind in KeepTrack noch nicht verfügbar."
   }
 }

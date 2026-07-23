@@ -44,4 +44,46 @@ describe('SplashScreen_class', () => {
     SplashScreen.loadStr('test');
     expect(getEl('loader-text')?.textContent).toBe('test');
   });
+
+  describe('resetDisplaySettings_ (boot recovery)', () => {
+    const resetDisplaySettings = () => (SplashScreen as unknown as { resetDisplaySettings_(): void }).resetDisplaySettings_();
+
+    afterEach(() => {
+      localStorage.clear();
+    });
+
+    it('clears settings/filter/graphics/colorScheme keys but preserves user data', () => {
+      // Settings-family keys (should be cleared) - incl. the drawOrbits value that wedged boot.
+      localStorage.setItem('v2-keepTrack-settings-drawOrbits', 'false');
+      localStorage.setItem('v2-keepTrack-graphicsSettings-godraysDecay', '0.9');
+      localStorage.setItem('v2-filter-settings-debris', 'true');
+      localStorage.setItem('v2-keepTrack-colorScheme', 'CountryColorScheme');
+      localStorage.setItem('v2-keepTrack-colorSchemeOverrides', '{}');
+      // User DATA (must survive).
+      localStorage.setItem('v2-keepTrack-watchlistList', '[25544]');
+      localStorage.setItem('v2-keepTrack-favoritesList', '[25544]');
+      localStorage.setItem('v2-keepTrack-scenarioLibrary', '{}');
+      localStorage.setItem('i18nextLng', 'en');
+
+      resetDisplaySettings();
+
+      expect(localStorage.getItem('v2-keepTrack-settings-drawOrbits')).toBeNull();
+      expect(localStorage.getItem('v2-keepTrack-graphicsSettings-godraysDecay')).toBeNull();
+      expect(localStorage.getItem('v2-filter-settings-debris')).toBeNull();
+      expect(localStorage.getItem('v2-keepTrack-colorScheme')).toBeNull();
+      expect(localStorage.getItem('v2-keepTrack-colorSchemeOverrides')).toBeNull();
+
+      expect(localStorage.getItem('v2-keepTrack-watchlistList')).toBe('[25544]');
+      expect(localStorage.getItem('v2-keepTrack-favoritesList')).toBe('[25544]');
+      expect(localStorage.getItem('v2-keepTrack-scenarioLibrary')).toBe('{}');
+      expect(localStorage.getItem('i18nextLng')).toBe('en');
+    });
+
+    it('is a no-op that never throws when there are no settings keys', () => {
+      localStorage.setItem('v2-keepTrack-watchlistList', '[1]');
+
+      expect(() => resetDisplaySettings()).not.toThrow();
+      expect(localStorage.getItem('v2-keepTrack-watchlistList')).toBe('[1]');
+    });
+  });
 });

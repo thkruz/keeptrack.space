@@ -429,9 +429,7 @@ export class ModelResolver {
       return SatelliteModels.tiangong;
     }
 
-    // JWST not ready yet.
-    // eslint-disable-next-line no-constant-condition
-    if (false && sat.sccNum === SatelliteNumber.jwst) {
+    if (sat.sccNum === SatelliteNumber.jwst) {
       return SatelliteModels.jwst;
     }
 

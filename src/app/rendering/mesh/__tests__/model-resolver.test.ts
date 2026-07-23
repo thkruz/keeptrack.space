@@ -207,11 +207,11 @@ describe('ModelResolver debris model selection across sccNum forms', () => {
 });
 
 describe('ModelResolver mesh registry disk consistency', () => {
-  // Registered names that intentionally ship no mesh: jwst is gated off ("not
-  // ready") and issmodel is an aspirational alias. The resolver never returns
-  // either, so neither can 404 at runtime. Every other registered name MUST
-  // have a matching OBJ+MTL so any resolved (or meshOverride) name loads.
-  const KNOWN_UNBACKED = new Set<string>(['jwst', 'issmodel']);
+  // Registered names that intentionally ship no mesh: issmodel is an aspirational
+  // alias the resolver never returns, so it can't 404 at runtime. Every other
+  // registered name MUST have a matching OBJ+MTL so any resolved (or
+  // meshOverride) name loads.
+  const KNOWN_UNBACKED = new Set<string>(['issmodel']);
 
   it('has a matching OBJ and MTL in public/meshes for every registered model', () => {
     const meshDir = path.join(process.cwd(), 'public', 'meshes');

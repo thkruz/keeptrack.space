@@ -14,6 +14,8 @@
     "startButton": "クリックで開始",
     "hint": "ヒント：",
     "downloadingScience": "科学データをダウンロード中...",
+    "loadFailed": "一部のコンポーネントの読み込みに失敗しました。",
+    "resetAndReload": "リセットして再読み込み",
     "edition": {
       "pro": "プロ",
       "oss": "オープンソース",

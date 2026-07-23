@@ -14,6 +14,8 @@
     "startButton": "Haga Clic para Comenzar",
     "hint": "Consejo:",
     "downloadingScience": "Descargando ciencia...",
+    "loadFailed": "No se pudieron cargar algunos componentes.",
+    "resetAndReload": "Restablecer y recargar",
     "edition": {
       "pro": "Profesional",
       "oss": "Código Abierto",

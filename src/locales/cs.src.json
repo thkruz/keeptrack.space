@@ -14,6 +14,8 @@
     "startButton": "Klikněte pro zahájení",
     "hint": "Tip:",
     "downloadingScience": "Stahování vědeckých dat...",
+    "loadFailed": "Některé komponenty se nepodařilo načíst.",
+    "resetAndReload": "Obnovit a načíst znovu",
     "edition": {
       "pro": "Profi",
       "oss": "Otevřený software",

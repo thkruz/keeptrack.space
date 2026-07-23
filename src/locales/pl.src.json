@@ -14,6 +14,8 @@
     "startButton": "Kliknij, aby rozpocząć",
     "hint": "Wskazówka:",
     "downloadingScience": "Pobieranie danych naukowych...",
+    "loadFailed": "Nie udało się załadować niektórych komponentów.",
+    "resetAndReload": "Zresetuj i załaduj ponownie",
     "edition": {
       "pro": "Pro",
       "oss": "Otwarte Oprogramowanie",

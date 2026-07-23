@@ -14,6 +14,8 @@
     "startButton": "클릭하여 시작",
     "hint": "힌트:",
     "downloadingScience": "과학 데이터 다운로드 중...",
+    "loadFailed": "일부 구성 요소를 불러오지 못했습니다.",
+    "resetAndReload": "초기화 후 새로고침",
     "edition": {
       "pro": "프로",
       "oss": "오픈 소스",

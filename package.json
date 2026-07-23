@@ -132,7 +132,7 @@
     "@types/opener": "^1.4.3",
     "@types/papaparse": "^5.3.14",
     "@types/semver": "^7.5.0",
-    "@types/webgl2": "^0.0.11",
+    "@types/webgl2": "^0.0.12",
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
     "@vitest/coverage-v8": "^4.0.18",
     "auto-changelog-thkruz": "^1.0.0",

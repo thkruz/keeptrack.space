@@ -1376,16 +1376,7 @@ export class CatalogLoader {
     resp[i].intlDes = intlDes;
     resp[i].active = true;
     if (!settingsManager.isDebrisOnly || (settingsManager.isDebrisOnly && (resp[i].type === SpaceObjectType.ROCKET_BODY || resp[i].type === SpaceObjectType.DEBRIS))) {
-      /*
-       * Embed a confidence level into the 64th character of the TLE1
-       * All 9s is the default value
-       * TODO: Generate a better confidence level system
-       */
-      if (resp[i].source === CatalogSource.CELESTRAK) {
-        resp[i].tle1 = `${resp[i].tle1.substring(0, 64)}9${resp[i].tle1.substring(65)}` as TleLine1;
-      } else {
-        resp[i].tle1 = `${resp[i].tle1.substring(0, 64)}5${resp[i].tle1.substring(65)}` as TleLine1;
-      }
+      resp[i].tle1 = CatalogLoader.applyConfidence_(resp[i].tle1, resp[i].source);
 
       let rcs: number | null = null;
 
@@ -1520,13 +1511,15 @@ export class CatalogLoader {
       return;
     }
 
-    tempSatData[i].tle1 = element.TLE1;
     tempSatData[i].tle2 = element.TLE2;
     tempSatData[i].name = element.ON || tempSatData[i].name || 'Unknown';
     tempSatData[i].source = settingsManager.dataSources.externalTLEs ? settingsManager.dataSources.externalTLEs.split('/')[2] : CatalogSource.TLE_TXT;
     if (settingsManager.dataSources.externalTLEs === 'https://storage.keeptrack.space/data/celestrak.txt') {
       tempSatData[i].source = CatalogSource.CELESTRAK;
     }
+    // Stamp confidence after source is resolved, otherwise column 65 keeps the
+    // incoming element-set-number digit and reads back as a random confidence.
+    tempSatData[i].tle1 = CatalogLoader.applyConfidence_(element.TLE1, tempSatData[i].source);
     tempSatData[i].altId = 'EXTERNAL_SAT'; // TODO: This is a hack to make sure the satellite is not removed by the filter
 
     try {
@@ -1595,6 +1588,8 @@ export class CatalogLoader {
     if (settingsManager.dataSources.externalTLEs === 'https://storage.keeptrack.space/data/celestrak.txt') {
       asciiSatInfo.source = CatalogSource.CELESTRAK;
     }
+
+    asciiSatInfo.tle1 = CatalogLoader.applyConfidence_(asciiSatInfo.tle1, asciiSatInfo.source);
 
     catalogManagerInstance.sccIndex[sccNum] = tempSatData.length;
     catalogManagerInstance.cosparIndex[`${intlDes}`] = tempSatData.length;
@@ -1679,7 +1674,7 @@ export class CatalogLoader {
         if (typeof tempSatData[i] === 'undefined') {
           continue;
         }
-        tempSatData[i].tle1 = element.TLE1 as TleLine1;
+        tempSatData[i].tle1 = CatalogLoader.applyConfidence_(element.TLE1, CatalogSource.EXTRA_JSON);
         tempSatData[i].tle2 = element.TLE2 as TleLine2;
         tempSatData[i].source = CatalogSource.EXTRA_JSON;
       } else {
@@ -1698,7 +1693,7 @@ export class CatalogLoader {
           rocket: 'Unknown',
           site: 'Unknown',
           sccNum: element.SCC.toString(),
-          tle1: element.TLE1 as TleLine1,
+          tle1: CatalogLoader.applyConfidence_(element.TLE1, CatalogSource.EXTRA_JSON),
           tle2: element.TLE2 as TleLine2,
           source: 'extra.json',
           intlDes,
@@ -1777,7 +1772,7 @@ export class CatalogLoader {
 
           try {
             const satellite = new Satellite({
-              tle1: jsSatInfo.TLE1 as TleLine1,
+              tle1: CatalogLoader.applyConfidence_(jsSatInfo.TLE1, CatalogSource.VIMPEL),
               tle2: jsSatInfo.TLE2 as TleLine2,
               ...jsSatInfo,
             });
@@ -1881,6 +1876,53 @@ export class CatalogLoader {
 
   private static sourcePriority_(source?: string): number {
     return CatalogLoader.SOURCE_PRIORITY_[source ?? ''] ?? 6;
+  }
+
+  /**
+   * Per-source confidence baseline (0-9) written into column 65 of TLE line 1.
+   *
+   * USSF (Space-Track) owns the GP catalog and CelesTrak republishes that same
+   * data, so the two rank equally at the top — a USSF elset is never less
+   * trustworthy than the CelesTrak copy of it. Supplemental GP is operator
+   * ephemeris (usually better than GP for the objects it covers, but uneven in
+   * coverage and sometimes predicted rather than observed). Everything below is
+   * ranked by how much independent verification the elset has had.
+   *
+   * TODO: This is provenance, not accuracy. It says nothing about elset age,
+   * orbit regime, drag, or how far the object has actually drifted since epoch.
+   * Replace with a computed score carried as a first-class field instead of
+   * packed into the TLE string.
+   */
+  private static readonly SOURCE_CONFIDENCE_: Readonly<Record<string, number>> = {
+    [CatalogSource.USSF]: 9,
+    [CatalogSource.CELESTRAK]: 9,
+    [CatalogSource.CELESTRAK_SUP]: 8,
+    [CatalogSource.SATNOGS]: 5,
+    [CatalogSource.TLE_TXT]: 5,
+    [CatalogSource.EXTRA_JSON]: 5,
+    [CatalogSource.VIMPEL]: 4,
+  };
+
+  /** Confidence for a source with no entry in the table (unknown provenance). */
+  private static readonly DEFAULT_CONFIDENCE_ = 5;
+
+  /**
+   * Overwrite column 65 of TLE line 1 with the confidence digit for `source`.
+   *
+   * Column 65 is the leading digit of the element set number, so writing here
+   * clobbers `Tle.elsetNum()` and invalidates the line checksum. Every confidence
+   * consumer in the app reads that column, so the encoding stays until confidence
+   * becomes a real field — but a line too short to have a column 65 is returned
+   * untouched rather than being padded into a malformed elset.
+   */
+  private static applyConfidence_(tle1: string, source?: string): TleLine1 {
+    if (tle1.length < 65) {
+      return tle1 as TleLine1;
+    }
+
+    const score = CatalogLoader.SOURCE_CONFIDENCE_[source ?? ''] ?? CatalogLoader.DEFAULT_CONFIDENCE_;
+
+    return `${tle1.substring(0, 64)}${score}${tle1.substring(65)}` as TleLine1;
   }
 
   /**

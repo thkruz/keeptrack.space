@@ -36,6 +36,7 @@ import { isThisNode } from '@app/engine/utils/isThisNode';
 import { KeepTrack } from '@app/keeptrack';
 import {
   BaseObject,
+  CatalogSource,
   Degrees,
   Kilometers,
   KilometersPerSecond,
@@ -307,6 +308,31 @@ export class CatalogManager {
     }
 
     return sat as Satellite;
+  }
+
+  /**
+   * Resolves a JSC Vimpel identifier to its objectCache id.
+   *
+   * Vimpel objects carry no NORAD sccNum (the catalog loader stores them with
+   * `sccNum: ''`); their stable identity is the Vimpel altId parsed from
+   * vimpel.json. There is no index for altIds, so this is a linear scan.
+   * @param vimpelId The Vimpel altId (e.g. "12345").
+   * @returns The corresponding objectCache id, or null when not found.
+   */
+  vimpelId2Id(vimpelId: string): number | null {
+    if (!vimpelId) {
+      return null;
+    }
+
+    for (let i = 0; i < this.objectCache.length; i++) {
+      const obj = this.objectCache[i];
+
+      if (obj instanceof Satellite && obj.source === CatalogSource.VIMPEL && obj.altId === vimpelId) {
+        return i;
+      }
+    }
+
+    return null;
   }
 
   /**

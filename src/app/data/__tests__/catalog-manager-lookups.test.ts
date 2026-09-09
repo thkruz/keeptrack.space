@@ -2,7 +2,7 @@ import { CatalogManager } from '@app/app/data/catalog-manager';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { GetSatType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { BaseObject, Satellite, SpaceObjectType } from '@ootk/src/main';
+import { BaseObject, CatalogSource, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
 import { vi } from 'vitest';
 
@@ -129,6 +129,50 @@ describe('CatalogManager lookups', () => {
 
     it('returns null when nothing resolves', () => {
       expect(catalog.sccNum2Sat('99999')).toBeNull();
+    });
+  });
+
+  describe('vimpelId2Id', () => {
+    /** Build a JSC Vimpel Satellite: no sccNum, identity carried by altId. */
+    const makeVimpelSat = (id: number, altId: string): Satellite => {
+      const sat = defaultSat.clone() as Satellite;
+
+      sat.id = id;
+      sat.sccNum = '';
+      sat.sccNum5 = null;
+      sat.sccNum6 = null;
+      sat.source = CatalogSource.VIMPEL;
+      sat.altId = altId;
+
+      return sat;
+    };
+
+    it('resolves a Vimpel altId to its objectCache index', () => {
+      catalog.objectCache = [makeSat(0, { sccNum: '25544' }), makeVimpelSat(1, '12345')];
+
+      expect(catalog.vimpelId2Id('12345')).toBe(1);
+    });
+
+    it('ignores satellites whose source is not Vimpel even when the altId matches', () => {
+      const externalSat = makeSat(0, { sccNum: '25544' });
+
+      externalSat.altId = '12345';
+      externalSat.source = CatalogSource.CELESTRAK;
+      catalog.objectCache = [externalSat];
+
+      expect(catalog.vimpelId2Id('12345')).toBeNull();
+    });
+
+    it('returns null for empty input', () => {
+      catalog.objectCache = [makeVimpelSat(0, '12345')];
+
+      expect(catalog.vimpelId2Id('')).toBeNull();
+    });
+
+    it('returns null when no Vimpel object matches', () => {
+      catalog.objectCache = [makeVimpelSat(0, '12345')];
+
+      expect(catalog.vimpelId2Id('99999')).toBeNull();
     });
   });
 

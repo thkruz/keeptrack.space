@@ -126,6 +126,7 @@ export const pluginManifest: PluginDescriptor[] = [
     ossClassName: 'SatInfoBoxOrbital',
     defaultConfig: satInfoBoxOrbitalConfigurationDefaults,
   },
+  // Off by design: OrbitGuard partner demo; fetches maneuver history from an external API at a hardcoded IP with a shared bearer token, so it is opt-in only (disabled since 241631cb).
   {
     configKey: 'SatInfoBoxManeuver',
     ossImport: () => import('./sat-info-box-orbit-guard/sat-info-box-orbit-guard'),
@@ -150,6 +151,7 @@ export const pluginManifest: PluginDescriptor[] = [
     proClassName: 'SatInfoBoxSponsor',
     defaultConfig: { enabled: true },
   },
+  // Off by design: monetization opt-in; the leaderboard ad banner is deliberately not shown by default (disabled in 7593131b).
   {
     configKey: 'BottomBannerSponsor',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/bottom-banner-sponsor/bottom-banner-sponsor') : undefined,
@@ -182,6 +184,7 @@ export const pluginManifest: PluginDescriptor[] = [
     ossClassName: 'GithubLinkPlugin',
     defaultConfig: { enabled: true },
   },
+  // Off by design: example TopMenuPlugin social link; plugin doc says it exists as a sample and its icon still needs restyling to match the GitHub icon (disabled since 241631cb).
   {
     configKey: 'LinkedInLinkPlugin',
     ossImport: () => import('./linkedin-link/linkedin-link'),
@@ -252,6 +255,7 @@ export const pluginManifest: PluginDescriptor[] = [
     ossClassName: 'LookAnglesPlugin',
     defaultConfig: { enabled: true, order: 20 },
   },
+  // Off because not ready: self-described @experimental and NOT PRODUCTION READY; RF model is first-order and unvalidated, surfaced only in the EXPERIMENTAL menu mode (disabled in cd3af70c).
   {
     configKey: 'LinkBudgetPlugin',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/link-budget/link-budget') : undefined,
@@ -379,6 +383,7 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 83 },
     isLoginRequired: true,
   },
+  // Off by design: OrbitGuard partner demo; queries the external OrbitGuard maneuver API at a hardcoded IP with a shared bearer token, so it is opt-in only (disabled since 241631cb).
   {
     configKey: 'OrbitGuardMenuPlugin',
     ossImport: () => import('./orbit-guard-menu/orbit-guard-menu'),
@@ -669,6 +674,7 @@ export const pluginManifest: PluginDescriptor[] = [
     ossClassName: 'Screenshot',
     defaultConfig: { enabled: true, order: 450 },
   },
+  // Off by design: superseded by TheSpaceDevLaunchCalendarPlugin as the default launch calendar; 54cbbbc6 states "The Gunter calendar now defaults to disabled".
   {
     configKey: 'GunterLaunchCalendar',
     ossImport: () => import('./gunter-launch-calendar/gunter-launch-calendar'),
@@ -799,6 +805,7 @@ export const pluginManifest: PluginDescriptor[] = [
     proClassName: 'ManeuverPlugin',
     defaultConfig: { enabled: true, order: 409 },
   },
+  // Off because not ready: plugin doc marks it LEGACY, needing modernization; uses the legacy property pattern and its math lives in @ts-nocheck om-manager.ts pending a TypeScript rewrite.
   {
     configKey: 'InitialOrbitDeterminationPlugin',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/initial-orbit/initial-orbit') : undefined,
@@ -937,6 +944,7 @@ export const pluginManifest: PluginDescriptor[] = [
     ossClassName: 'VideoDirectorPlugin',
     defaultConfig: { enabled: true, order: 510 },
   },
+  // Off by design: class is @deprecated; the main website now covers all of this functionality (disabled since 241631cb).
   {
     configKey: 'AboutMenuPlugin',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/about-menu/about-menu') : undefined,
@@ -985,6 +993,7 @@ export const pluginManifest: PluginDescriptor[] = [
     proClassName: 'FavoritesMenuPlugin',
     defaultConfig: { enabled: true },
   },
+  // Off: registered disabled from day one (df4cc8c5) but the reason was not recorded; needs Ted's call.
   {
     configKey: 'CompanionLinkPlugin',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/companion-link/companion-link') : undefined,
@@ -993,6 +1002,7 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
 
+  // Off: shipped enabled in b3031739, then deliberately disabled in 46a74dd4 without a recorded reason; needs Ted's call.
   {
     configKey: 'PluginManagerPlugin',
     ossImport: () => import('./plugin-manager/plugin-manager'),

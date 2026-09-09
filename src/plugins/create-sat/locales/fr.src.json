@@ -76,7 +76,8 @@
         "invalidName": "Nom invalide. Ne doit pas être vide.",
         "slotOccupied": "Remplacement du satellite existant {name} dans l'emplacement {scc}.",
         "noFreeSlots": "Plus d'emplacements analystes libres (90000-99999 sont tous utilisés).",
-        "noSatSelected": "Sélectionnez d'abord un satellite à cloner."
+        "noSatSelected": "Sélectionnez d'abord un satellite à cloner.",
+        "tleChecksumMismatch": "La somme de contrôle de la ligne {line} du TLE est {actual} au lieu de {expected}. Cela peut indiquer une faute de frappe. L'opération continue malgré tout."
       },
       "successMsgs": {
         "satCreated": "Satellite {name} ({scc}) créé avec succès",

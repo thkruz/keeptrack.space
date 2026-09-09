@@ -76,7 +76,8 @@
         "invalidName": "Nome non valido. Non deve essere vuoto.",
         "slotOccupied": "Sovrascrittura del satellite esistente {name} nello slot {scc}.",
         "noFreeSlots": "Nessuno slot analista libero (90000-99999 sono tutti in uso).",
-        "noSatSelected": "Seleziona prima un satellite da clonare."
+        "noSatSelected": "Seleziona prima un satellite da clonare.",
+        "tleChecksumMismatch": "Il checksum della riga {line} del TLE è {actual} ma dovrebbe essere {expected}. Potrebbe trattarsi di un errore di battitura. Si continua comunque."
       },
       "successMsgs": {
         "satCreated": "Satellite {name} ({scc}) creato con successo",

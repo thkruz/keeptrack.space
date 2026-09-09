@@ -76,7 +76,8 @@
         "invalidName": "名称无效。不能为空。",
         "slotOccupied": "正在覆盖槽位 {scc} 中的现有卫星 {name}。",
         "noFreeSlots": "没有可用的分析槽位（90000-99999 已全部占用）。",
-        "noSatSelected": "请先选择要克隆的卫星。"
+        "noSatSelected": "请先选择要克隆的卫星。",
+        "tleChecksumMismatch": "TLE 第 {line} 行的校验和为 {actual}，应为 {expected}。这可能表示存在输入错误。仍将继续。"
       },
       "successMsgs": {
         "satCreated": "卫星 {name}（{scc}）创建成功",

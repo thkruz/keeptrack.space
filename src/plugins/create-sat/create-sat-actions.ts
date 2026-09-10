@@ -10,7 +10,6 @@ import { selectSideMenuTab } from '@app/engine/ui/side-menu-tabs';
 import { getEl } from '@app/engine/utils/get-el';
 import { Earth, FormatTle, Satellite, SpaceObjectType, TleLine1, TleLine2 } from '@ootk/src/main';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { warnOnTleChecksumMismatch } from './create-sat-checksum';
 import { computePresetElements, OrbitPresetId, rawIntlDesFromTle, sunSyncInclinationDeg, tleToElementFields } from './create-sat-orbits';
 
 /** Advanced-tab element-id suffixes that the write helper accepts. */
@@ -152,9 +151,12 @@ export function cloneSelectedSatellite(prefix: string): boolean {
 
   const s = sat as Satellite;
 
-  // Caution (non-blocking) if the source TLE carries a stale mod-10 checksum.
-  warnOnTleChecksumMismatch(s.tle1, s.tle2);
-
+  /*
+   * No checksum caution here: CatalogLoader.applyConfidence_ rewrites column 65
+   * of every loaded TLE1 without recomputing the trailing digit, so catalog
+   * satellites carry stale checksums by design. The caution stays on the
+   * manual-entry and paste paths, where typos actually enter the app.
+   */
   const fields = tleToElementFields(s.tle1, s.tle2);
   const free = getFreeAnalystScc();
 

@@ -76,7 +76,8 @@
         "invalidName": "Neplatný název. Nesmí být prázdný.",
         "slotOccupied": "Přepisuje se stávající satelit {name} ve slotu {scc}.",
         "noFreeSlots": "Nezbývají žádné volné analytické sloty (90000-99999 jsou všechny obsazené).",
-        "noSatSelected": "Nejprve vyberte satelit ke klonování."
+        "noSatSelected": "Nejprve vyberte satelit ke klonování.",
+        "tleChecksumMismatch": "Kontrolní součet řádku {line} TLE je {actual}, ale měl by být {expected}. Může jít o překlep. Pokračuje se i přesto."
       },
       "successMsgs": {
         "satCreated": "Satelit {name} ({scc}) byl úspěšně vytvořen",

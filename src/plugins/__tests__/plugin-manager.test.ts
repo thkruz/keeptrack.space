@@ -17,6 +17,7 @@ import { PluginManager } from '@app/plugins/plugins';
 type PrivateStatics = {
   resolveModule_(descriptor: PluginDescriptor): Promise<{ mod: Record<string, unknown>; usedPro: boolean } | null>;
   initPlugin_(descriptor: PluginDescriptor, resolved: { mod: Record<string, unknown>; usedPro: boolean }): void;
+  explainSkippedProPlugins_(descriptors: PluginDescriptor[], resolvedModules: ({ mod: Record<string, unknown>; usedPro: boolean } | null)[]): void;
 };
 const PM = PluginManager as unknown as PrivateStatics;
 
@@ -58,6 +59,55 @@ describe('PluginManager.resolveModule_', () => {
     });
 
     await expect(PM.resolveModule_(descriptor)).rejects.toThrow('download-failed');
+  });
+});
+
+describe('PluginManager.explainSkippedProPlugins_', () => {
+  it('logs one consolidated info message naming each skipped Pro-only plugin (issue #1206)', () => {
+    const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => undefined);
+    const telemetry = makeDescriptor({ configKey: 'Telemetry', proClassName: 'Telemetry' });
+    const stars = makeDescriptor({ configKey: 'StarsPlugin', proClassName: 'StarsPlugin' });
+    const oss = makeDescriptor({ configKey: 'TopMenu', ossImport: () => Promise.resolve({}), ossClassName: 'TopMenu' });
+
+    PM.explainSkippedProPlugins_([telemetry, stars, oss], [null, null, { mod: {}, usedPro: false }]);
+
+    expect(infoSpy).toHaveBeenCalledTimes(1);
+    const msg = infoSpy.mock.calls[0][0] as string;
+
+    // Actionable: names the features, says why they are unavailable, and where to learn more.
+    expect(msg).toContain('Telemetry');
+    expect(msg).toContain('StarsPlugin');
+    expect(msg).toContain('KeepTrack Pro');
+    expect(msg).toContain('open-source build');
+    expect(msg).toContain('https://keeptrack.space');
+    expect(msg).not.toContain('TopMenu');
+    infoSpy.mockRestore();
+  });
+
+  it('stays silent when every enabled plugin resolved', () => {
+    const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => undefined);
+    const oss = makeDescriptor({ configKey: 'TopMenu', ossImport: () => Promise.resolve({}), ossClassName: 'TopMenu' });
+
+    PM.explainSkippedProPlugins_([oss], [{ mod: {}, usedPro: false }]);
+
+    expect(infoSpy).not.toHaveBeenCalled();
+    infoSpy.mockRestore();
+  });
+
+  it('leaves failed Pro imports to the resolver warning (proImport still defined)', () => {
+    // In a Pro build a failed proImport is warned about inside resolveModule_'s
+    // catch; the consolidated message must not repeat it.
+    const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => undefined);
+    const failedPro = makeDescriptor({
+      configKey: 'Telemetry',
+      proImport: () => Promise.reject(new Error('missing files')),
+      proClassName: 'Telemetry',
+    });
+
+    PM.explainSkippedProPlugins_([failedPro], [null]);
+
+    expect(infoSpy).not.toHaveBeenCalled();
+    infoSpy.mockRestore();
   });
 });
 

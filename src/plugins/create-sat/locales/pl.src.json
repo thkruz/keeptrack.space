@@ -76,7 +76,8 @@
         "invalidName": "Nieprawidłowa nazwa. Nie może być pusta.",
         "slotOccupied": "Nadpisywanie istniejącego satelity {name} w slocie {scc}.",
         "noFreeSlots": "Brak wolnych slotów analitycznych (90000-99999 są zajęte).",
-        "noSatSelected": "Najpierw wybierz satelitę do sklonowania."
+        "noSatSelected": "Najpierw wybierz satelitę do sklonowania.",
+        "tleChecksumMismatch": "Suma kontrolna wiersza {line} TLE wynosi {actual}, a powinna wynosić {expected}. Może to wskazywać na literówkę. Kontynuowanie mimo to."
       },
       "successMsgs": {
         "satCreated": "Satelita {name} ({scc}) utworzony pomyślnie",

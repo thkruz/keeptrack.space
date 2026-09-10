@@ -17,6 +17,7 @@ import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plu
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { OrbitPreview } from '../shared/orbit-preview';
 import { applyOrbitPreset, applySunSyncInclination, buildPreviewTleFromForm, cloneSelectedSatellite, getFreeAnalystScc } from './create-sat-actions';
+import { warnOnTleChecksumMismatch } from './create-sat-checksum';
 import { buildCreateSatHelp } from './create-sat-help';
 import { buildAdvancedTabHtml, buildBasicTabHtml, createSatActionButton } from './create-sat-menu-html';
 import { OrbitPresetId } from './create-sat-orbits';
@@ -858,6 +859,14 @@ export class CreateSat extends KeepTrackPlugin {
 
         return;
       }
+
+      /*
+       * Caution (non-blocking) if either submitted line's trailing mod-10
+       * checksum digit does not match the computed value. FormatTle.createTle
+       * stamps fresh checksums today, so this guards the import flows and any
+       * future composer change rather than normal manual entry.
+       */
+      warnOnTleChecksumMismatch(tle1, tle2);
 
       // Create satellite record from TLE
       let satrec: SatelliteRecord;

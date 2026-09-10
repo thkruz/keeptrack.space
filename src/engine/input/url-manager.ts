@@ -5,7 +5,7 @@ import { t7e } from '@app/locales/keys';
 import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager, settingsManager } from '@app/settings/settings';
-import { DEG2RAD, Degrees, RAD2DEG, Radians, Satellite } from '@ootk/src/main';
+import { CatalogSource, DEG2RAD, Degrees, RAD2DEG, Radians, Satellite } from '@ootk/src/main';
 import { PluginRegistry } from '../core/plugin-registry';
 import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
@@ -329,13 +329,10 @@ export abstract class UrlManager {
       paramSlices.push(`rate=${this.propRate_}`);
     }
 
-    if (this.selectedSat_?.sccNum) {
-      // TODO: This doesn't work for VIMPEL objects
-      const scc = this.selectedSat_.sccNum;
+    const satParamValue = UrlManager.buildSatParamValue(this.selectedSat_);
 
-      if (scc !== '') {
-        paramSlices.push(`sat=${scc}`);
-      }
+    if (satParamValue) {
+      paramSlices.push(`sat=${satParamValue}`);
     } else {
       // Deep-space probes (Voyager 1, etc.) are focused via centerBody rather than
       // selection; emit their NORAD ID so the shared URL reproduces the view.
@@ -358,7 +355,7 @@ export abstract class UrlManager {
       paramSlices.push(`regime=${settingsManager.core.regimeFilter.join(',')}`);
     }
 
-    if (this.selectedSat_?.sccNum && !(mainCamera.state.ftsPitch > -0.1 && mainCamera.state.ftsPitch < 0.1 && mainCamera.state.ftsYaw > -0.1 && mainCamera.state.ftsYaw < 0.1)) {
+    if (satParamValue && !(mainCamera.state.ftsPitch > -0.1 && mainCamera.state.ftsPitch < 0.1 && mainCamera.state.ftsYaw > -0.1 && mainCamera.state.ftsYaw < 0.1)) {
       paramSlices.push(`pitch=${(mainCamera.state.ftsPitch * RAD2DEG).toFixed(3)}`);
       paramSlices.push(`yaw=${(mainCamera.state.ftsYaw * RAD2DEG).toFixed(3)}`);
     } else if (mainCamera.state.camPitch > -0.01 && mainCamera.state.camPitch < 0.01 && mainCamera.state.camYaw > -0.01 && mainCamera.state.camYaw < 0.01) {
@@ -545,8 +542,69 @@ export abstract class UrlManager {
     ServiceLocator.getUiManager().toast(t7e('urlManager.intldesNotFound').replace('{val}', val.toUpperCase()), ToastMsgType.caution, true);
   }
 
+  /** Prefix marking a `sat=` value as a JSC Vimpel altId rather than a NORAD sccNum. */
+  private static readonly VIMPEL_SAT_PREFIX_ = 'JV';
+
+  /**
+   * Builds the value for the `sat=` URL parameter from the selected satellite.
+   *
+   * NORAD-cataloged objects use their sccNum. JSC Vimpel objects have no sccNum
+   * (the catalog loader stores them with `sccNum: ''`), so they are encoded as
+   * `JV<altId>` (e.g. `JV12345`), which {@link UrlManager.parseVimpelSatParam}
+   * decodes on load. The prefix cannot collide with real catalog numbers:
+   * alpha-5 ids are one letter plus four digits, never two letters.
+   * @param sat The selected satellite (or null).
+   * @returns The parameter value, or null when the object has no shareable id.
+   */
+  static buildSatParamValue(sat: Pick<Satellite, 'sccNum' | 'altId' | 'source'> | null): string | null {
+    if (!sat) {
+      return null;
+    }
+
+    if (sat.sccNum) {
+      return sat.sccNum;
+    }
+
+    if (sat.source === CatalogSource.VIMPEL && sat.altId) {
+      return `${UrlManager.VIMPEL_SAT_PREFIX_}${sat.altId}`;
+    }
+
+    return null;
+  }
+
+  /**
+   * Extracts the Vimpel altId from a `sat=` parameter value of the form
+   * `JV<altId>` (case-insensitive).
+   * @param val The raw `sat=` parameter value.
+   * @returns The altId, or null when the value is not in the Vimpel form.
+   */
+  static parseVimpelSatParam(val: string): string | null {
+    const match = /^JV(.+)$/iu.exec(val.trim());
+    const altId = match ? match[1].trim() : '';
+
+    return altId !== '' ? altId : null;
+  }
+
   private static handleSatParam_(val: string) {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
+
+    // JSC Vimpel objects deep-link as JV<altId> because they have no sccNum.
+    const vimpelId = UrlManager.parseVimpelSatParam(val);
+
+    if (vimpelId !== null) {
+      const vimpelSatId = catalogManagerInstance.vimpelId2Id(vimpelId);
+
+      if (vimpelSatId !== null) {
+        PluginRegistry.getPlugin(SelectSatManager)?.selectSat(vimpelSatId);
+
+        return;
+      }
+
+      ServiceLocator.getUiManager().toast(t7e('urlManager.satNotFound').replace('{val}', val.toUpperCase()), ToastMsgType.caution, true);
+
+      return;
+    }
+
     // Pass the raw string — sccNum2Id handles numeric, alpha-5, and extended
     // forms. parseInt would turn alpha-5 ("T0001") into NaN.
     const urlSatId = catalogManagerInstance.sccNum2Id(val);

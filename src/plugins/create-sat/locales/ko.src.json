@@ -76,7 +76,8 @@
         "invalidName": "잘못된 이름입니다. 비워둘 수 없습니다.",
         "slotOccupied": "슬롯 {scc}의 기존 위성 {name}을(를) 덮어씁니다.",
         "noFreeSlots": "사용 가능한 분석 슬롯이 없습니다(90000-99999가 모두 사용 중입니다).",
-        "noSatSelected": "먼저 복제할 위성을 선택하세요."
+        "noSatSelected": "먼저 복제할 위성을 선택하세요.",
+        "tleChecksumMismatch": "TLE {line}행의 체크섬이 {actual}이지만 {expected}이어야 합니다. 오타일 수 있습니다. 그대로 계속 진행합니다."
       },
       "successMsgs": {
         "satCreated": "위성 {name} ({scc})이(가) 성공적으로 생성되었습니다",

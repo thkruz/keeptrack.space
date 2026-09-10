@@ -7,7 +7,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { BaseObject } from '@ootk/src/main';
+import { BaseObject, CatalogSource } from '@ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 
 /**
@@ -278,4 +278,122 @@ describe('UrlManager_class', () => {
 
   // Test missile params are parsed correctly
   it.todo('test_parse_missile_params');
+});
+
+/*
+ * Pure-logic coverage for the JSC Vimpel deep-link paths. These deliberately
+ * avoid window.location (non-configurable under JSDOM/Vitest) by exercising
+ * the extracted helpers and the sat-param handler directly.
+ */
+describe('UrlManager Vimpel sat param', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  describe('buildSatParamValue', () => {
+    it('returns the sccNum for a NORAD-cataloged satellite', () => {
+      expect(UrlManager.buildSatParamValue({ sccNum: '25544', altId: '', source: CatalogSource.CELESTRAK })).toBe('25544');
+    });
+
+    it('returns JV<altId> for a Vimpel satellite without a sccNum', () => {
+      expect(UrlManager.buildSatParamValue({ sccNum: '', altId: '12345', source: CatalogSource.VIMPEL })).toBe('JV12345');
+    });
+
+    it('prefers the sccNum even when an altId is present', () => {
+      expect(UrlManager.buildSatParamValue({ sccNum: '25544', altId: '12345', source: CatalogSource.VIMPEL })).toBe('25544');
+    });
+
+    it('does not use the altId when the source is not Vimpel', () => {
+      expect(UrlManager.buildSatParamValue({ sccNum: '', altId: 'EXTERNAL_SAT', source: CatalogSource.CELESTRAK })).toBeNull();
+    });
+
+    it('returns null for null input or a satellite with no shareable id', () => {
+      expect(UrlManager.buildSatParamValue(null)).toBeNull();
+      expect(UrlManager.buildSatParamValue({ sccNum: '', altId: '', source: CatalogSource.VIMPEL })).toBeNull();
+    });
+  });
+
+  describe('parseVimpelSatParam', () => {
+    it('extracts the altId from a JV-prefixed value', () => {
+      expect(UrlManager.parseVimpelSatParam('JV12345')).toBe('12345');
+    });
+
+    it('is case-insensitive and tolerates surrounding whitespace', () => {
+      expect(UrlManager.parseVimpelSatParam(' jv12345 ')).toBe('12345');
+    });
+
+    it('returns null for a plain NORAD sccNum', () => {
+      expect(UrlManager.parseVimpelSatParam('25544')).toBeNull();
+    });
+
+    it('returns null for an alpha-5 id (one letter + four digits)', () => {
+      expect(UrlManager.parseVimpelSatParam('T0001')).toBeNull();
+    });
+
+    it('returns null for a bare or empty JV prefix', () => {
+      expect(UrlManager.parseVimpelSatParam('JV')).toBeNull();
+      expect(UrlManager.parseVimpelSatParam('JV  ')).toBeNull();
+      expect(UrlManager.parseVimpelSatParam('')).toBeNull();
+    });
+  });
+
+  it('round-trips: a generated Vimpel sat param parses back to the same altId', () => {
+    const value = UrlManager.buildSatParamValue({ sccNum: '', altId: '9906205', source: CatalogSource.VIMPEL });
+
+    expect(value).toBe('JV9906205');
+    expect(UrlManager.parseVimpelSatParam(value!)).toBe('9906205');
+  });
+
+  describe('handleSatParam_ Vimpel routing', () => {
+    // Access the private handler without going through parseGetVariables
+    // (which reads window.location).
+    const callHandleSatParam = (val: string) => {
+      (UrlManager as unknown as { handleSatParam_(v: string): void }).handleSatParam_(val);
+    };
+
+    it('selects the Vimpel object resolved from a JV-prefixed sat param', () => {
+      setupStandardEnvironment([SelectSatManager]);
+
+      const catalogManagerInstance = ServiceLocator.getCatalogManager();
+      const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);
+
+      expect(selectSatManager).not.toBeNull();
+      if (!selectSatManager) {
+        throw new Error('SelectSatManager is null');
+      }
+
+      selectSatManager.selectSat = vi.fn();
+      catalogManagerInstance.vimpelId2Id = vi.fn((altId: string) => (altId === '12345' ? 42 : null));
+      catalogManagerInstance.sccNum2Id = vi.fn(() => null);
+
+      callHandleSatParam('JV12345');
+
+      expect(catalogManagerInstance.vimpelId2Id).toHaveBeenCalledWith('12345');
+      expect(selectSatManager.selectSat).toHaveBeenCalledWith(42);
+      // The sccNum path must not run for a JV-prefixed value.
+      expect(catalogManagerInstance.sccNum2Id).not.toHaveBeenCalled();
+    });
+
+    it('toasts when a JV-prefixed sat param does not resolve', () => {
+      setupStandardEnvironment([SelectSatManager]);
+
+      const catalogManagerInstance = ServiceLocator.getCatalogManager();
+      const uiManagerInstance = ServiceLocator.getUiManager();
+      const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);
+
+      expect(selectSatManager).not.toBeNull();
+      if (!selectSatManager) {
+        throw new Error('SelectSatManager is null');
+      }
+
+      selectSatManager.selectSat = vi.fn();
+      uiManagerInstance.toast = vi.fn();
+      catalogManagerInstance.vimpelId2Id = vi.fn(() => null);
+
+      callHandleSatParam('JV99999');
+
+      expect(uiManagerInstance.toast).toHaveBeenCalled();
+      expect(selectSatManager.selectSat).not.toHaveBeenCalled();
+    });
+  });
 });

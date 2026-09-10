@@ -76,7 +76,8 @@
         "invalidName": "無効な名前です。空にすることはできません。",
         "slotOccupied": "スロット {scc} の既存衛星 {name} を上書きします。",
         "noFreeSlots": "空きのアナリストスロットがありません（90000～99999 はすべて使用中です）。",
-        "noSatSelected": "先に複製する衛星を選択してください。"
+        "noSatSelected": "先に複製する衛星を選択してください。",
+        "tleChecksumMismatch": "TLEの{line}行目のチェックサムは{actual}ですが、正しくは{expected}です。入力ミスの可能性があります。処理はそのまま続行します。"
       },
       "successMsgs": {
         "satCreated": "衛星 {name} ({scc}) が正常に作成されました",

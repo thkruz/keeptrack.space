@@ -150,6 +150,13 @@ export function cloneSelectedSatellite(prefix: string): boolean {
   }
 
   const s = sat as Satellite;
+
+  /*
+   * No checksum caution here: CatalogLoader.applyConfidence_ rewrites column 65
+   * of every loaded TLE1 without recomputing the trailing digit, so catalog
+   * satellites carry stale checksums by design. The caution stays on the
+   * manual-entry and paste paths, where typos actually enter the app.
+   */
   const fields = tleToElementFields(s.tle1, s.tle2);
   const free = getFreeAnalystScc();
 

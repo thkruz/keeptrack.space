@@ -76,7 +76,8 @@
         "invalidName": "Nombre no válido. No debe estar vacío.",
         "slotOccupied": "Sobrescribiendo el satélite existente {name} en la ranura {scc}.",
         "noFreeSlots": "No quedan ranuras de analista libres (90000-99999 están todas en uso).",
-        "noSatSelected": "Seleccione primero un satélite para clonar."
+        "noSatSelected": "Seleccione primero un satélite para clonar.",
+        "tleChecksumMismatch": "La suma de verificación de la línea {line} del TLE es {actual}, pero debería ser {expected}. Esto puede indicar un error tipográfico. Se continúa de todos modos."
       },
       "successMsgs": {
         "satCreated": "Satélite {name} ({scc}) creado exitosamente",

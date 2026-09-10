@@ -76,7 +76,8 @@
         "invalidName": "Invalid name. Must not be empty.",
         "slotOccupied": "Overwriting existing satellite {name} in slot {scc}.",
         "noFreeSlots": "No free analyst slots remain (90000-99999 are all in use).",
-        "noSatSelected": "Select a satellite to clone first."
+        "noSatSelected": "Select a satellite to clone first.",
+        "tleChecksumMismatch": "TLE line {line} checksum is {actual} but should be {expected}. This may indicate a typo. Continuing anyway."
       },
       "successMsgs": {
         "satCreated": "Satellite {name} ({scc}) created successfully",

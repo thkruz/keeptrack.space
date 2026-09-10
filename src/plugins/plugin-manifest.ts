@@ -993,7 +993,7 @@ export const pluginManifest: PluginDescriptor[] = [
     proClassName: 'FavoritesMenuPlugin',
     defaultConfig: { enabled: true },
   },
-  // Off: registered disabled from day one (df4cc8c5) but the reason was not recorded; needs Ted's call.
+  // Off: registered disabled from day one (df4cc8c5) but the reason was not recorded; needs a maintainer decision.
   {
     configKey: 'CompanionLinkPlugin',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/companion-link/companion-link') : undefined,
@@ -1002,7 +1002,7 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
 
-  // Off: shipped enabled in b3031739, then deliberately disabled in 46a74dd4 without a recorded reason; needs Ted's call.
+  // Off: shipped enabled in b3031739, then deliberately disabled in 46a74dd4 without a recorded reason; needs a maintainer decision.
   {
     configKey: 'PluginManagerPlugin',
     ossImport: () => import('./plugin-manager/plugin-manager'),

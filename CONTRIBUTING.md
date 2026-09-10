@@ -93,8 +93,8 @@ docs: clarify dev setup
 Most features are plugins. Each plugin is a self-contained folder under
 `src/plugins/<plugin-name>/` containing the plugin class, its own CSS file, its
 tests in `__tests__/`, and its translations in `locales/`. Locale source files
-are named `<lang>.src.json` (nine languages: en, de, es, fr, zh, ja, ko, ru, uk)
-and are compiled into the app's translation tables with `pnpm run generate-t7e`.
+are named `<lang>.src.json`, one per entry in `SUPPORTED_LOCALES` in
+`src/locales/locales.ts`, and are compiled into the app's translation tables with `pnpm run generate-t7e`.
 Do not reference translation keys that do not exist in the generated
 `src/locales/keys.ts`. New plugins are registered in `src/plugins/plugins.ts`.
 Adding a plugin is the recommended way to add a feature; for changes to the

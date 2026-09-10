@@ -2,7 +2,24 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v13.11.0](https://github.com/thkruz/keeptrack.space/compare/v13.10.0...v13.11.0)
+
+- Enhance TLE confidence handling and clarify plugin management [`#1444`](https://github.com/thkruz/keeptrack.space/pull/1444)
+- feat(url-manager): :sparkles: deep-link JSC Vimpel objects as JV&lt;altId&gt; [`cdb6065`](https://github.com/thkruz/keeptrack.space/commit/cdb606562f01c07c696dc09724ac973c2776153b)
+- feat(create-sat): :sparkles: caution when a TLE line checksum does not match [`25cd22e`](https://github.com/thkruz/keeptrack.space/commit/25cd22ee3ce9767ecb8cbf63235eebbae55dee41)
+- docs: :memo: add code of conduct and contributing guide [`fe6a26a`](https://github.com/thkruz/keeptrack.space/commit/fe6a26a4f811a543fdbd55f0a9f33c27e86560b9)
+- chore(math): :wrench: remove stale maneuver-math scratch file [`d7875bd`](https://github.com/thkruz/keeptrack.space/commit/d7875bdc2b9a92aa25115d062b61a866f47c56d1)
+- feat(plugin-manager): :sparkles: explain skipped Pro plugins and clarify load failures [`0efc377`](https://github.com/thkruz/keeptrack.space/commit/0efc37791135dc9483d4231a6180dfab40862945)
+- feat(catalog-loader): :sparkles: stamp per-source TLE confidence across all load paths [`388481e`](https://github.com/thkruz/keeptrack.space/commit/388481e4df223f9eaaa11a1b323d8e586ccc414d)
+- fix(create-sat): :bug: drop checksum caution from clone flow [`7e5cbc5`](https://github.com/thkruz/keeptrack.space/commit/7e5cbc5e333ff378e4fc5e3c9588545cd10366ef)
+- docs(plugin-manifest): :memo: record why each disabled plugin is off [`0f56573`](https://github.com/thkruz/keeptrack.space/commit/0f565732d955828708da7a68a873c40e676d61c9)
+- docs: :memo: address review nits in contributing guide and plugin manifest [`573959c`](https://github.com/thkruz/keeptrack.space/commit/573959ce81d729e6d78397ecb99f57849475bd42)
+- chore(plugins-pro): :wrench: update subproject commit reference [`5220b43`](https://github.com/thkruz/keeptrack.space/commit/5220b43a834855c74a3858b7b75778f3c434ed03)
+- chore(plugins-pro): :wrench: update subproject commit reference [`b2e0d00`](https://github.com/thkruz/keeptrack.space/commit/b2e0d00de4a85ade0aa5ea27ea6ebf1370b21207)
+
 #### [v13.10.0](https://github.com/thkruz/keeptrack.space/compare/v13.9.0...v13.10.0)
+
+>  
 
 - Refactor and fix biome warnings, enhance missile reports and routing [`#1424`](https://github.com/thkruz/keeptrack.space/pull/1424)
 - fix(catalogs): :bug: add the country codes missing from the app vocabulary [`41ddef1`](https://github.com/thkruz/keeptrack.space/commit/41ddef1f4c20559c7c1d0e7869f4429981525cef)
@@ -14,6 +31,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - fix(missile): :bug: honor the date argument in MissileObject.eci [`339e891`](https://github.com/thkruz/keeptrack.space/commit/339e891e9a059a5e1fa03cb91ef238ce73a4abed)
 - refactor(app): :recycle: clear the biome warnings in the catalog, sensor and ui layers [`0a83ccf`](https://github.com/thkruz/keeptrack.space/commit/0a83ccfa52344c62042cb7edfe4ca974f58e53e6)
 - refactor(webworker): :recycle: clear the biome warnings in the worker entries [`e8a27ca`](https://github.com/thkruz/keeptrack.space/commit/e8a27caad473938e13728e273a720ea86d526c02)
+- chore(release): :bookmark: 13.10.0 [skip ci] [`15a14f1`](https://github.com/thkruz/keeptrack.space/commit/15a14f180eb5b1989744e05db44319dac9006c96)
 - fix(catalogs): :bug: add Montenegro and the Balearic regional code [`74d4a30`](https://github.com/thkruz/keeptrack.space/commit/74d4a30702cc0e3121ad57b6b36bd16e19b4e070)
 - test: :white_check_mark: clear the biome warnings in the app-level suites [`0b38edb`](https://github.com/thkruz/keeptrack.space/commit/0b38edbd47888494e06fa4275729feec0856a56d)
 - refactor(settings): :recycle: clear the biome warnings in the settings classes [`838c81d`](https://github.com/thkruz/keeptrack.space/commit/838c81da7393e8a1a911d4971f92accaca353a22)

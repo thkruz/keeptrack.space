@@ -357,3 +357,169 @@ describe('ErrorManager.isExternalFetchError_ (auto-file suppression)', () => {
     expect(openSpy).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('ErrorManager service-worker fetch aborts (#1434)', () => {
+  let errorManager: ErrorManager;
+  let openSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    errorManager = new ErrorManager();
+    vi.spyOn(console, 'error').mockImplementation(() => {
+      /* silence */
+    });
+    openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    (errorManager as unknown as { newGithubIssueUrl_: () => string }).newGithubIssueUrl_ = () => 'https://github.com/issue';
+    (errorManager as unknown as { minLevel_: number }).minLevel_ = 0;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const reportInNode = (err: Error): void => {
+    try {
+      errorManager.reportEvent({ error: err, funcName: 'tleManagerInstance.loadCatalog' });
+    } catch {
+      /* expected node rethrow */
+    }
+  };
+
+  it('suppresses the service-worker "Fetch is aborted" report (user navigated mid-load)', () => {
+    reportInNode(new TypeError('FetchEvent.respondWith received an error: AbortError: Fetch is aborted'));
+    expect(openSpy).not.toHaveBeenCalled();
+  });
+
+  it('suppresses the same report after a structured-clone downgrade to plain Error', () => {
+    reportInNode(new Error('FetchEvent.respondWith received an error: AbortError: Fetch is aborted'));
+    expect(openSpy).not.toHaveBeenCalled();
+  });
+
+  it('still auto-files an app error that merely mentions an abort', () => {
+    // A bare 'abort' must not be matched: AbortController is used deliberately in app code.
+    reportInNode(new TypeError("Cannot read properties of undefined (reading 'abortController')"));
+    expect(openSpy).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('ErrorManager skipAutoFile reaches the EventBus (#1429)', () => {
+  let errorManager: ErrorManager;
+  let captured: Error[];
+  const listener = (err: Error): void => {
+    captured.push(err);
+  };
+  const flagOf = (err: Error): boolean | undefined => (err as { skipAutoFile?: boolean }).skipAutoFile;
+
+  beforeEach(() => {
+    errorManager = new ErrorManager();
+    captured = [];
+    EventBus.getInstance().on(EventBusEvent.error, listener);
+    vi.spyOn(console, 'error').mockImplementation(() => {
+      /* silence */
+    });
+    vi.spyOn(console, 'warn').mockImplementation(() => {
+      /* silence */
+    });
+    vi.spyOn(window, 'open').mockImplementation(() => null);
+    (errorManager as unknown as { minLevel_: number }).minLevel_ = 0;
+  });
+
+  afterEach(() => {
+    EventBus.getInstance().unregister(EventBusEvent.error, listener);
+    vi.restoreAllMocks();
+  });
+
+  const report = (ctx: Parameters<ErrorManager['reportEvent']>[0]): void => {
+    try {
+      errorManager.reportEvent(ctx);
+    } catch {
+      /* expected node rethrow */
+    }
+  };
+
+  it('stamps skipAutoFile on the emitted error when the caller opted out of auto-filing', () => {
+    // Mirrors KeepTrack.reportWorkerBootFailure_ for a degraded (non-essential worker) boot.
+    const err = new Error('Worker boot failure [degraded]: {"outcome":"degraded"}');
+
+    err.name = 'WorkerBootFailure';
+    report({ error: err, funcName: 'KeepTrack.postStart_', opts: { skipToast: true, skipAutoFile: true } });
+
+    expect(captured).toHaveLength(1);
+    expect(captured[0]).toBe(err);
+    expect(flagOf(captured[0])).toBe(true);
+  });
+
+  it('stamps skipAutoFile on transient network errors', () => {
+    report({ error: new Error('Failed to fetch'), funcName: 'loadCatalog' });
+
+    expect(flagOf(captured[0])).toBe(true);
+  });
+
+  it('does not stamp a genuine app error', () => {
+    report({ error: new TypeError("Cannot read properties of null (reading 'interpolate')"), funcName: 'Global Error Trapper' });
+
+    expect(flagOf(captured[0])).toBeUndefined();
+  });
+
+  it('does not stamp a within-window duplicate (telemetry keeps its own rate limit)', () => {
+    const make = () => {
+      const err = new Error('same bug');
+
+      err.stack = 'Error: same bug\n    at someModule (https://app.keeptrack.space/main.js:10:5)';
+
+      return err;
+    };
+
+    report({ error: make(), funcName: 'fn' });
+    report({ error: make(), funcName: 'fn' });
+
+    expect(captured).toHaveLength(2);
+    expect(flagOf(captured[1])).toBeUndefined();
+  });
+});
+
+describe('ErrorManager translation-proxy SecurityError (#1437)', () => {
+  let errorManager: ErrorManager;
+  let captured: Error[];
+  const listener = (err: Error): void => {
+    captured.push(err);
+  };
+
+  beforeEach(() => {
+    errorManager = new ErrorManager();
+    captured = [];
+    EventBus.getInstance().on(EventBusEvent.error, listener);
+    vi.spyOn(console, 'warn').mockImplementation(() => {
+      /* silence */
+    });
+    vi.spyOn(console, 'error').mockImplementation(() => {
+      /* silence */
+    });
+    (errorManager as unknown as { minLevel_: number }).minLevel_ = 0;
+  });
+
+  afterEach(() => {
+    EventBus.getInstance().unregister(EventBusEvent.error, listener);
+    vi.restoreAllMocks();
+  });
+
+  it('tags the getRegistration origin mismatch as unactionable and does not rethrow', () => {
+    const err = new Error(
+      "Failed to get a ServiceWorkerRegistration: The origin of the provided documentURL ('https://app.keeptrack.space') does not match the current origin ('https://app-keeptrack-space.translate.goog')."
+    );
+
+    err.name = 'SecurityError';
+
+    expect(() => errorManager.reportEvent({ error: err, funcName: 'Unhandled Promise Rejection', isUnhandledRejection: true })).not.toThrow();
+    expect(captured).toHaveLength(1);
+    expect((captured[0] as { isUnactionable?: boolean }).isUnactionable).toBe(true);
+  });
+
+  it('leaves an unrelated SecurityError actionable', () => {
+    const err = new Error('Blocked a frame with origin from accessing a cross-origin frame.');
+
+    err.name = 'SecurityError';
+
+    expect(() => errorManager.reportEvent({ error: err, funcName: 'fn' })).toThrow();
+    expect((captured[0] as { isUnactionable?: boolean }).isUnactionable).toBeUndefined();
+  });
+});

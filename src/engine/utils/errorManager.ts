@@ -178,6 +178,21 @@ export class ErrorManager {
       return;
     }
 
+    /*
+     * Two auto-file channels listen to this one report: the client-side GitHub prefill below,
+     * and the Telemetry plugin's bug-filing POST (via EventBusEvent.error). `skipAutoFile` used
+     * to gate only the first, so a caller asking for "diagnostic signal, no issue" (e.g. a
+     * degraded worker boot, #1429) or a transient network abort (#1434) still got filed by the
+     * second. Stamp the decision on the error BEFORE emitting so both channels read it.
+     * Dedup is deliberately not stamped: telemetry keeps its own rate limit and must still see
+     * repeats.
+     */
+    const isSuppressedReport = ctx.opts?.skipAutoFile === true || this.isExternalFetchError_(err);
+
+    if (isSuppressedReport) {
+      (err as { skipAutoFile?: boolean }).skipAutoFile = true;
+    }
+
     EventBus.getInstance().emit(EventBusEvent.error, err, ctx.funcName);
 
     // eslint-disable-next-line no-console
@@ -189,7 +204,7 @@ export class ErrorManager {
 
     const toastMsg = ctx.toastMsg ?? err.message ?? 'Unknown error';
     const isDup = this.isDuplicateSuppressed_(this.getSignature_(err));
-    const skipAutoFile = ctx.opts?.skipAutoFile === true || this.isExternalFetchError_(err) || isDup;
+    const skipAutoFile = isSuppressedReport || isDup;
 
     if (!skipAutoFile) {
       const url = this.getErrorUrl_(err, ctx);
@@ -269,6 +284,15 @@ export class ErrorManager {
       return true;
     }
 
+    /*
+     * Translation proxies (Google Translate serves the app from *.translate.goog) rewrite the
+     * document origin, so any service-worker registration lookup rejects with a SecurityError
+     * about the documentURL origin not matching. Nothing on our side can fix a proxy (#1437).
+     */
+    if (err.name === 'SecurityError' && /ServiceWorkerRegistration|translate\.goog/iu.test(err.message)) {
+      return true;
+    }
+
     return /cdn-cgi|rocket-loader/iu.test(`${ctx.source ?? ''}\n${err.stack ?? ''}`);
   }
 
@@ -285,9 +309,14 @@ export class ErrorManager {
      * prototype — an error that crosses a Web Worker / structured-clone boundary, or is rebuilt by
      * toError_, arrives as a plain Error and would slip past an `instanceof TypeError` check and
      * get auto-filed as a spurious GitHub issue. The phrases are specific enough that a real app
-     * bug is unlikely to collide; a bare 'fetch' is deliberately NOT matched (too broad).
+     * bug is unlikely to collide; a bare 'fetch' or 'abort' is deliberately NOT matched (too
+     * broad; app code uses AbortController on purpose).
+     *
+     * The service worker adds a fourth family: when the user navigates away or reloads while a
+     * catalog fetch is in flight, the browser cancels it and the SW reports
+     * 'FetchEvent.respondWith received an error: AbortError: Fetch is aborted' (#1434).
      */
-    return /failed to fetch|networkerror|load failed/iu.test(err.message);
+    return /failed to fetch|networkerror|load failed|fetch is aborted|respondwith received an error/iu.test(err.message);
   }
 
   warn(msg: string, ...optionalParams: unknown[]): void {

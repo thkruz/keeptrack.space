@@ -68,11 +68,18 @@
             }
           });
 
-          navigator.serviceWorker.getRegistration().then(function (reg) {
-            if (reg && reg.waiting) {
-              reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-            }
-          });
+          navigator.serviceWorker
+            .getRegistration()
+            .then(function (reg) {
+              if (reg && reg.waiting) {
+                reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+              }
+            })
+            .catch(function () {
+              // Translation proxies (*.translate.goog) rewrite the document origin and the
+              // lookup rejects with a SecurityError. Not actionable; never let it surface as
+              // an unhandled rejection that the error trapper would auto-file (#1437).
+            });
         })();
       }
     </script>

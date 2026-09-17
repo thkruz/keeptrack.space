@@ -20,6 +20,16 @@ export abstract class ChebyshevBody extends CelestialBody {
   }
 
   updatePosition(simTime: Date): void {
+    /*
+     * Deep-space satellites start with a null interpolator until their ephemeris fetch
+     * resolves. update() guards on isLoaded_, but Scene.updateWorldShift calls
+     * updatePosition() on the center body directly, so centering on a probe from a URL or
+     * saved state before its coefficients arrive used to crash the game loop (#1426).
+     */
+    if (!this.interpolator_) {
+      return;
+    }
+
     if (this.canReusePosition_(simTime)) {
       return;
     }

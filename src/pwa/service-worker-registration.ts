@@ -3,6 +3,15 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000; // 60 minutes
 
 /**
+ * True when the page is being served through Google Translate's proxy
+ * (`app-keeptrack-space.translate.goog`). Service worker APIs reject there with a
+ * SecurityError because the document origin no longer matches the registration scope.
+ */
+export function isTranslationProxyHost(hostname: string): boolean {
+  return hostname.endsWith('.translate.goog');
+}
+
+/**
  * Registers the service worker and sets up periodic update checks.
  * The early inline script in index.html handles the initial update check
  * and controllerchange reload — this function handles registration and
@@ -20,6 +29,13 @@ export function registerServiceWorker(): void {
   }
 
   if (window.location.protocol !== 'https:') {
+    return;
+  }
+
+  // Translation proxies (Google Translate serves the app from *.translate.goog) rewrite
+  // the document origin, so registration rejects with a SecurityError and would only
+  // toast a warning at the user. Nothing to do on a proxy; skip silently (#1437).
+  if (isTranslationProxyHost(window.location.hostname)) {
     return;
   }
 

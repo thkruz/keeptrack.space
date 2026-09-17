@@ -1,5 +1,5 @@
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { registerServiceWorker } from '@app/pwa/service-worker-registration';
+import { isTranslationProxyHost, registerServiceWorker } from '@app/pwa/service-worker-registration';
 import { vi } from 'vitest';
 
 const flush = async () => {
@@ -29,6 +29,25 @@ describe('registerServiceWorker', () => {
     registerServiceWorker();
 
     expect(register).not.toHaveBeenCalled();
+  });
+
+  it('returns early on a Google Translate proxy host (#1437)', () => {
+    const register = vi.fn();
+    const warn = vi.spyOn(errorManagerInstance, 'warn').mockImplementation(() => undefined);
+
+    vi.stubGlobal('navigator', { serviceWorker: { register } });
+    vi.stubGlobal('window', { location: { protocol: 'https:', hostname: 'app-keeptrack-space.translate.goog' } });
+
+    registerServiceWorker();
+
+    expect(register).not.toHaveBeenCalled();
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it('recognises only *.translate.goog as a translation proxy', () => {
+    expect(isTranslationProxyHost('app-keeptrack-space.translate.goog')).toBe(true);
+    expect(isTranslationProxyHost('app.keeptrack.space')).toBe(false);
+    expect(isTranslationProxyHost('translate.goog.example.com')).toBe(false);
   });
 
   it('registers the worker and wires update detection on https', async () => {

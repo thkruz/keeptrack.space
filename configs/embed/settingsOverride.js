@@ -264,10 +264,6 @@ const settingsOverride = {
       enabled: false,
       order: 500,
     },
-    SatChangesPlugin: {
-      enabled: false, // Backend no longer supports this
-      order: 501, // TODO: Update when backend is ready
-    },
     VideoDirectorPlugin: {
       enabled: false,
       order: 510,

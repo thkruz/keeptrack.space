@@ -155,7 +155,13 @@ export class UiManager {
       return;
     }
     this.dismissedToasts_.add(toast);
-    toast.dismiss();
+    try {
+      toast.dismiss();
+    } catch {
+      // Materialize's teardown is not idempotent (see class comment). Every dismiss is
+      // routed through this guard, so this only fires if the library changes; a stale
+      // toast must never reach the global error trapper (#1425, #1433).
+    }
     this.activeToastList_ = this.activeToastList_.filter((t) => t !== toast);
   }
 
@@ -222,7 +228,13 @@ export class UiManager {
      * stay empty — Toast renders it via innerText, which would wipe the children.
      */
     UiManager.ensureToastTemplate_();
-    const toastMsg = new Toast({ text: '', toastId: UiManager.TOAST_TEMPLATE_ID });
+    /*
+     * displayLength: Infinity disables Materialize's own 20 ms auto-dismiss interval. The
+     * library's dismiss() is not idempotent, and its timer never consulted dismissedToasts_,
+     * so a tap on a toast that was already fading tore the container down twice (#1425,
+     * #1433). KeepTrack owns the auto-dismiss below and routes it through dismissToast_.
+     */
+    const toastMsg = new Toast({ text: '', toastId: UiManager.TOAST_TEMPLATE_ID, displayLength: Infinity });
     const toastEl = toastMsg.el;
 
     const icon = toastEl.querySelector<HTMLImageElement>('.kt-toast-icon');
@@ -262,8 +274,10 @@ export class UiManager {
       progressBar.style.animationDuration = `${toastMsg.timeRemaining}ms`;
     }
 
+    // Auto-dismiss goes through the same guarded path as click / contextmenu, so a toast
+    // can only ever be torn down once no matter which trigger fires first.
     setTimeout(() => {
-      this.activeToastList_ = this.activeToastList_.filter((t) => t !== toastMsg);
+      this.dismissToast_(toastMsg);
     }, toastMsg.timeRemaining);
 
     switch (type) {

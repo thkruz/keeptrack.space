@@ -204,9 +204,6 @@ const settingsOverride = {
     DopsPlugin: {
       enabled: false,
     },
-    SatChangesPlugin: {
-      enabled: false,
-    },
     VideoDirectorPlugin: {
       enabled: false,
     },

@@ -2,7 +2,19 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v13.11.1](https://github.com/thkruz/keeptrack.space/compare/v13.11.0...v13.11.1)
+
+- fix: stop auto-filing transient errors and close three crash reports [`#1445`](https://github.com/thkruz/keeptrack.space/pull/1445)
+- chore(sat-changes): :wrench: retire the Sat Changes plugin [`#675`](https://github.com/thkruz/keeptrack.space/issues/675)
+- fix(celestial-bodies): :bug: guard updatePosition until Chebyshev coefficients load [`#1426`](https://github.com/thkruz/keeptrack.space/issues/1426)
+- fix(ui): :bug: own toast auto-dismiss so Materialize never tears a toast down twice [`#1425`](https://github.com/thkruz/keeptrack.space/issues/1425) [`#1433`](https://github.com/thkruz/keeptrack.space/issues/1433)
+- fix(error-manager): :bug: keep network aborts, proxy errors and opt-outs out of auto-filed issues [`#1434`](https://github.com/thkruz/keeptrack.space/issues/1434) [`#1435`](https://github.com/thkruz/keeptrack.space/issues/1435) [`#1437`](https://github.com/thkruz/keeptrack.space/issues/1437) [`#1429`](https://github.com/thkruz/keeptrack.space/issues/1429)
+- fix(css): update pro-locked icon tint logic for better user experience [`b7c1a05`](https://github.com/thkruz/keeptrack.space/commit/b7c1a05bd8df54f1c2679deff5ad22276b637db0)
+- chore(plugins-pro): :wrench: update subproject commit reference [`72325c4`](https://github.com/thkruz/keeptrack.space/commit/72325c4639790fbcea9fca39ed21efd510c45aac)
+
 #### [v13.11.0](https://github.com/thkruz/keeptrack.space/compare/v13.10.0...v13.11.0)
+
+>  
 
 - Enhance TLE confidence handling and clarify plugin management [`#1444`](https://github.com/thkruz/keeptrack.space/pull/1444)
 - feat(url-manager): :sparkles: deep-link JSC Vimpel objects as JV&lt;altId&gt; [`cdb6065`](https://github.com/thkruz/keeptrack.space/commit/cdb606562f01c07c696dc09724ac973c2776153b)
@@ -11,6 +23,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - chore(math): :wrench: remove stale maneuver-math scratch file [`d7875bd`](https://github.com/thkruz/keeptrack.space/commit/d7875bdc2b9a92aa25115d062b61a866f47c56d1)
 - feat(plugin-manager): :sparkles: explain skipped Pro plugins and clarify load failures [`0efc377`](https://github.com/thkruz/keeptrack.space/commit/0efc37791135dc9483d4231a6180dfab40862945)
 - feat(catalog-loader): :sparkles: stamp per-source TLE confidence across all load paths [`388481e`](https://github.com/thkruz/keeptrack.space/commit/388481e4df223f9eaaa11a1b323d8e586ccc414d)
+- chore(release): :bookmark: 13.11.0 [skip ci] [`cb89548`](https://github.com/thkruz/keeptrack.space/commit/cb8954873f5ecd0e2c42df0ba01f22e66e3423e6)
 - fix(create-sat): :bug: drop checksum caution from clone flow [`7e5cbc5`](https://github.com/thkruz/keeptrack.space/commit/7e5cbc5e333ff378e4fc5e3c9588545cd10366ef)
 - docs(plugin-manifest): :memo: record why each disabled plugin is off [`0f56573`](https://github.com/thkruz/keeptrack.space/commit/0f565732d955828708da7a68a873c40e676d61c9)
 - docs: :memo: address review nits in contributing guide and plugin manifest [`573959c`](https://github.com/thkruz/keeptrack.space/commit/573959ce81d729e6d78397ecb99f57849475bd42)

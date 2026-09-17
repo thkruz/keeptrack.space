@@ -94,7 +94,6 @@ const settingsOverride = {
     nightToggle: false,
     photoManager: false,
     screenRecorder: false,
-    satChanges: false,
     stereoMap: false,
     timeMachine: false,
     initialOrbit: false,

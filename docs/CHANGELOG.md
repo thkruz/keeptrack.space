@@ -2,13 +2,30 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v13.12.0](https://github.com/thkruz/keeptrack.space/compare/v13.11.1...v13.12.0)
+
+- Address User Feedback [`#1446`](https://github.com/thkruz/keeptrack.space/pull/1446)
+- feat(keyboard): :sparkles: derive shortcut guides from the registry [`62f797f`](https://github.com/thkruz/keeptrack.space/commit/62f797f6308d5016002ac0d115952330729c81b7)
+- feat(sat-info-box-sensor): :sparkles: say why an object is not in view [`e55ba58`](https://github.com/thkruz/keeptrack.space/commit/e55ba589cefc95143fcc4576dee30c974e94b1a0)
+- fix(search): :bug: find every term of a comma-delimited NORAD list [`42f8977`](https://github.com/thkruz/keeptrack.space/commit/42f8977c100c7bdf9fc5673942101db1b91ca62d)
+- fix(sensor): :bug: clear FOV meshes and sensor lines when the sensor is reset [`fba00bd`](https://github.com/thkruz/keeptrack.space/commit/fba00bd705aa1dadf615a0766b29e2b897b8582e)
+- feat(settings-menu): :sparkles: add a Disable Pop-up Notifications toggle [`16cc143`](https://github.com/thkruz/keeptrack.space/commit/16cc143eaa28f5af26986016fd608cb7c3f6f6ad)
+- fix(sat-constellations): :bug: forget the last constellation when the search is cleared [`ea05384`](https://github.com/thkruz/keeptrack.space/commit/ea0538492631fce1b8284c49a12d47056bc4d788)
+- fix(keyboard): :bug: stop TimeManager ',' from claiming Ctrl+, [`c39752b`](https://github.com/thkruz/keeptrack.space/commit/c39752b05ea238794be37363a3f5522d64a80428)
+- chore(ootk): :wrench: bump to v7.1.0 (b408441) [`fc85520`](https://github.com/thkruz/keeptrack.space/commit/fc85520267d579a974c3cefb6b9edc085bf5003c)
+- chore(ootk): :wrench: bump to ee33d84 (WGS84/J2000 ground sites, toRae rates, Sun/Kepler/TLE/Horizons fixes) [`9d993b1`](https://github.com/thkruz/keeptrack.space/commit/9d993b13d3795c6e9f0abdab770a6e88c882ace5)
+- chore(ootk): :wrench: bump to cedcb60 (observer on WGS84 in eci(), dopplerFactor matches rae()) [`58a886e`](https://github.com/thkruz/keeptrack.space/commit/58a886e5bcc5ac1bc75f981bf6ab7e07819c2b4e)
+
 #### [v13.11.1](https://github.com/thkruz/keeptrack.space/compare/v13.11.0...v13.11.1)
+
+>  
 
 - fix: stop auto-filing transient errors and close three crash reports [`#1445`](https://github.com/thkruz/keeptrack.space/pull/1445)
 - chore(sat-changes): :wrench: retire the Sat Changes plugin [`#675`](https://github.com/thkruz/keeptrack.space/issues/675)
 - fix(celestial-bodies): :bug: guard updatePosition until Chebyshev coefficients load [`#1426`](https://github.com/thkruz/keeptrack.space/issues/1426)
 - fix(ui): :bug: own toast auto-dismiss so Materialize never tears a toast down twice [`#1425`](https://github.com/thkruz/keeptrack.space/issues/1425) [`#1433`](https://github.com/thkruz/keeptrack.space/issues/1433)
 - fix(error-manager): :bug: keep network aborts, proxy errors and opt-outs out of auto-filed issues [`#1434`](https://github.com/thkruz/keeptrack.space/issues/1434) [`#1435`](https://github.com/thkruz/keeptrack.space/issues/1435) [`#1437`](https://github.com/thkruz/keeptrack.space/issues/1437) [`#1429`](https://github.com/thkruz/keeptrack.space/issues/1429)
+- chore(release): :bookmark: 13.11.1 [skip ci] [`cf6af48`](https://github.com/thkruz/keeptrack.space/commit/cf6af482b77e0e38650b26515428b89c54291e51)
 - fix(css): update pro-locked icon tint logic for better user experience [`b7c1a05`](https://github.com/thkruz/keeptrack.space/commit/b7c1a05bd8df54f1c2679deff5ad22276b637db0)
 - chore(plugins-pro): :wrench: update subproject commit reference [`72325c4`](https://github.com/thkruz/keeptrack.space/commit/72325c4639790fbcea9fca39ed21efd510c45aac)
 

@@ -223,6 +223,8 @@ export class TimeManager {
       },
       {
         key: ',',
+        // Ctrl+, is SettingsMenuPlugin's "preferences" shortcut
+        ctrl: false,
         shift: false,
         description: d('slowDown'),
         callback: () => {

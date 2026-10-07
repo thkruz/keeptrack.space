@@ -685,6 +685,9 @@ export class SearchManager {
     if (searchDom) {
       searchDom.value = '';
     }
+
+    // Tell listeners (URL bar, constellation restore) the search is gone.
+    EventBus.getInstance().emit(EventBusEvent.searchUpdated, '', 0, settingsManager.searchLimit);
   }
 
   openSearch(isForce = false) {

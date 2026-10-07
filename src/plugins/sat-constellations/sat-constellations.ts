@@ -216,6 +216,23 @@ export class SatConstellations extends KeepTrackPlugin {
         }
       }
     });
+
+    // Clearing the search box or searching for something else drops the
+    // constellation, so it must not come back on the next launch.
+    EventBus.getInstance().on(EventBusEvent.searchUpdated, (searchString) => {
+      if (this.selectedGroupName_ && searchString !== this.lastSearchString_) {
+        this.forgetSelectedConstellation_();
+      }
+    });
+  }
+
+  /** The exact string this plugin last pushed into the search bar. */
+  private lastSearchString_: string | null = null;
+
+  private forgetSelectedConstellation_(): void {
+    this.selectedGroupName_ = null;
+    this.lastSearchString_ = null;
+    PersistenceManager.getInstance().removeItem(StorageKey.LAST_CONSTELLATION);
   }
 
   // ── Public API ──────────────────────────────────────────────────────
@@ -756,10 +773,12 @@ export class SatConstellations extends KeepTrackPlugin {
 
     const sccNums = sats.map((sat) => sat.sccNum).join(',');
 
-    searchDOM.innerHTML = sccNums;
-
     const uiManagerInstance = ServiceLocator.getUiManager();
 
+    // doSearch sets the input's value itself and emits searchUpdated with
+    // this exact string, which the listener above uses to tell our own
+    // search apart from the user's.
+    this.lastSearchString_ = sccNums;
     uiManagerInstance.searchManager.doSearch(sccNums);
   }
 

@@ -235,3 +235,42 @@ describe('DetailedSensor misc', () => {
     expect(copy.maxRng).toBe(defaultSensor.maxRng);
   });
 });
+
+describe('DetailedSensor.getFovRejectReason', () => {
+  const simple = () =>
+    sensorWith({
+      minAz: 0 as Degrees,
+      maxAz: 180 as Degrees,
+      minEl: 10 as Degrees,
+      maxEl: 80 as Degrees,
+      minRng: 200 as Kilometers,
+      maxRng: 5000 as Kilometers,
+      minAz2: undefined,
+      maxAz2: undefined,
+    });
+
+  it('returns null for a target inside all bounds', () => {
+    expect(simple().getFovRejectReason(90 as Degrees, 45 as Degrees, 1000 as Kilometers)).toBeNull();
+  });
+
+  it.each([
+    ['minRange', 90, 45, 100, 200],
+    ['maxRange', 90, 45, 9000, 5000],
+    ['minEl', 90, 5, 1000, 10],
+    ['maxEl', 90, 85, 1000, 80],
+  ])('names the first broken bound: %s', (kind, az, el, rng, limit) => {
+    const reason = simple().getFovRejectReason(az as Degrees, el as Degrees, rng as Kilometers);
+
+    expect(reason?.kind).toBe(kind);
+    expect(reason?.limit).toBe(limit);
+  });
+
+  it('reports azimuth with both sector limits once range and elevation pass', () => {
+    expect(simple().getFovRejectReason(270 as Degrees, 45 as Degrees, 1000 as Kilometers)).toEqual({ kind: 'azimuth', value: 270, limit: 0, limit2: 180 });
+  });
+
+  it('checks range before elevation, matching isRaeInFov', () => {
+    // Both out of bounds: range is reported, as it is tested first.
+    expect(simple().getFovRejectReason(90 as Degrees, 5 as Degrees, 9000 as Kilometers)?.kind).toBe('maxRange');
+  });
+});

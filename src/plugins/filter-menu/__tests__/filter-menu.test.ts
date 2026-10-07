@@ -851,7 +851,8 @@ describe('FilterMenuPlugin_class', () => {
       const commands = plugin.getCommandPaletteCommands();
       const openCmd = commands.find((c) => c.id === 'FilterMenuPlugin.open');
 
-      expect(openCmd?.shortcutHint).toBe('F');
+      // Lowercase: Shift+F is the search-bar toggle.
+      expect(openCmd?.shortcutHint).toBe('f');
     });
 
     it('should have labels for all commands', () => {

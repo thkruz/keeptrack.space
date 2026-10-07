@@ -32,6 +32,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { KeyboardComponent } from '@app/engine/plugins/components/keyboard/keyboard-component';
 import { isThisNode } from '@app/engine/utils/isThisNode';
+import { TranslationKey, t7e } from '@app/locales/keys';
 import { Dropdown, Toast } from '@materializecss/materialize';
 import { BaseObject, MILLISECONDS_PER_SECOND, Milliseconds } from '@ootk/src/main';
 import cancelPng from '@public/img/icons/cancel.png';
@@ -406,6 +407,7 @@ export class UiManager {
       {
         key: 'F2',
         shift: true,
+        description: t7e('keyboard.descriptions.hideUi' as TranslationKey),
         callback: () => this.hideUi(),
       },
     ]).init();

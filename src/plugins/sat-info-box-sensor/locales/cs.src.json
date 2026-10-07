@@ -12,7 +12,8 @@
         "maxTmxTime": "Max. čas Tmx",
         "sun": "Slunce",
         "visMag": "Viz. mag.",
-        "nextPass": "Další přelet"
+        "nextPass": "Další přelet",
+        "reason": "Mimo dohled"
       },
       "tooltips": {
         "range": "Vzdálenost od senzoru",
@@ -24,7 +25,8 @@
         "maxTmxTime": "Čas potřebný pro RF/světlo k dosažení cíle a zpět",
         "sun": "Ovlivňuje Slunce senzor",
         "visMag": "Vizuální magnituda (nižší čísla znamenají vyšší jas)",
-        "nextPass": "Příští průchod v pokrytí"
+        "nextPass": "Příští průchod v pokrytí",
+        "reason": "Proč je objekt mimo zorné pole senzoru"
       },
       "values": {
         "noEffect": "Bez vlivu",
@@ -35,7 +37,13 @@
         "unableToCalculate": "Nelze vypočítat",
         "outOfFov": "Mimo zorné pole",
         "unavailable": "Nedostupné",
-        "beyondMaxRange": "Za maximálním dosahem"
+        "beyondMaxRange": "Za maximálním dosahem",
+        "reasonMinRange": "Vzdálenost {{value}} pod min. {{limit}}",
+        "reasonMaxRange": "Vzdálenost {{value}} nad max. {{limit}}",
+        "reasonMinEl": "Elevace {{value}} pod min. {{limit}}",
+        "reasonMaxEl": "Elevace {{value}} nad max. {{limit}}",
+        "reasonAzimuth": "Azimut {{value}} mimo {{min}} až {{max}}",
+        "reasonCone": "Mimo kužel osy senzoru"
       }
     }
   }

@@ -64,6 +64,11 @@ export class SensorFov extends KeepTrackPlugin {
         this.setBottomIconToUnselected();
       }
     });
+
+    EventBus.getInstance().on(EventBusEvent.resetSensor, (): void => {
+      this.disableFovView();
+      this.setBottomIconToDisabled();
+    });
   }
 
   onBottomIconClick(): void {

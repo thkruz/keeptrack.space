@@ -106,7 +106,6 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
         },
       ],
       tips: [t7e('plugins.FilterMenuPlugin.help.tip1'), t7e('plugins.FilterMenuPlugin.help.tip2')],
-      shortcuts: [{ keys: ['F'], description: t7e('plugins.FilterMenuPlugin.help.shortcutToggle') }],
     };
   }
 
@@ -129,7 +128,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
         id: 'FilterMenuPlugin.open',
         label: cmd('open'),
         category,
-        shortcutHint: 'F',
+        shortcutHint: 'f',
         callback: () => this.bottomMenuClicked(),
       },
       {

@@ -44,6 +44,8 @@ export type TearrData = {
   time: string;
   type?: TearrType;
   inView?: boolean;
+  /** Translated explanation when `inView` is false (geometry only). */
+  fovReason?: string;
   alt?: Kilometers;
   lat?: Degrees;
   lon?: Degrees;

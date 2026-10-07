@@ -86,18 +86,22 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     return [
       {
         key: '[',
+        description: t7e('keyboard.descriptions.swapPrimarySecondary' as Parameters<typeof t7e>[0]),
         callback: () => this.switchPrimarySecondary(),
       },
       {
         key: ']',
+        description: t7e('keyboard.descriptions.swapPrimarySecondary' as Parameters<typeof t7e>[0]),
         callback: () => this.switchPrimarySecondary(),
       },
       {
         key: '{',
+        description: t7e('keyboard.descriptions.prevSat' as Parameters<typeof t7e>[0]),
         callback: () => this.selectPrevSat(),
       },
       {
         key: '}',
+        description: t7e('keyboard.descriptions.nextSat' as Parameters<typeof t7e>[0]),
         callback: () => this.selectNextSat(),
       },
     ];

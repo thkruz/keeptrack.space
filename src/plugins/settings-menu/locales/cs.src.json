@@ -28,6 +28,7 @@
         "enableDemoMode": "Povolit demo režim",
         "enableFreezeTime": "Zastavit čas při kliknutí",
         "compensateEarthRotation": "Kompenzovat rotaci Země",
+        "disableToasts": "Vypnout vyskakovací oznámení",
         "showNextPassOnHover": "Zobrazit další přelet při najetí myší"
       },
       "tooltips": {
@@ -42,6 +43,7 @@
         "enableDemoMode": "Každé 3 sekundy bude vybrán nový satelit z FOV",
         "enableFreezeTime": "Čas se zastaví, když otáčíte kamerou.",
         "compensateEarthRotation": "Kompenzuje natočení kamery podle rotace Země, takže pohled zůstává pevně vůči zeměpisným souřadnicím.",
+        "disableToasts": "Skryje zprávy, které se zobrazují v rohu. Chyby se stále zapisují do konzole prohlížeče.",
         "showNextPassOnHover": "Zobrazí čas dalšího přeletu při najetí myší na satelit v zorném poli vybraného senzoru."
       },
       "help": {

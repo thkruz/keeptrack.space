@@ -12,7 +12,8 @@
         "maxTmxTime": "Temps Tmx Max.",
         "sun": "Soleil",
         "visMag": "Mag. Vis.",
-        "nextPass": "Prochain Passage"
+        "nextPass": "Prochain Passage",
+        "reason": "Hors de vue"
       },
       "tooltips": {
         "range": "Distance depuis le capteur",
@@ -24,7 +25,8 @@
         "maxTmxTime": "Temps pour que RF/Lumière atteigne la cible et revienne",
         "sun": "Le Soleil impacte-t-il le capteur",
         "visMag": "Magnitude visuelle (Les nombres plus bas sont plus brillants)",
-        "nextPass": "Prochaine fois en couverture"
+        "nextPass": "Prochaine fois en couverture",
+        "reason": "Pourquoi l'objet est hors du champ de vision du capteur"
       },
       "values": {
         "noEffect": "Aucun effet",
@@ -35,7 +37,13 @@
         "unableToCalculate": "Impossible de calculer",
         "outOfFov": "Hors du FOV",
         "unavailable": "Indisponible",
-        "beyondMaxRange": "Au-delà de la portée maximale"
+        "beyondMaxRange": "Au-delà de la portée maximale",
+        "reasonMinRange": "Distance {{value}} sous le min. {{limit}}",
+        "reasonMaxRange": "Distance {{value}} au-delà du max. {{limit}}",
+        "reasonMinEl": "Élévation {{value}} sous le min. {{limit}}",
+        "reasonMaxEl": "Élévation {{value}} au-delà du max. {{limit}}",
+        "reasonAzimuth": "Azimut {{value}} hors de {{min}} à {{max}}",
+        "reasonCone": "Hors du cône de visée du capteur"
       }
     }
   }

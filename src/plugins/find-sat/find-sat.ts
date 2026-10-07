@@ -155,7 +155,6 @@ export class FindSatPlugin extends KeepTrackPlugin {
         },
       ],
       tips: [t7e('plugins.FindSatPlugin.help.tip1'), t7e('plugins.FindSatPlugin.help.tip2'), t7e('plugins.FindSatPlugin.help.tip3'), t7e('plugins.FindSatPlugin.help.tip4')],
-      shortcuts: [{ keys: ['Ctrl', 'F'], description: t7e('plugins.FindSatPlugin.help.shortcutToggle') }],
     };
   }
 

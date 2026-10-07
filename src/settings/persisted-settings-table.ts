@@ -201,6 +201,13 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
     },
   },
   {
+    key: StorageKey.SETTINGS_DISABLE_TOASTS,
+    serialize: (sm) => String(sm.isDisableToasts),
+    deserialize: (sm, raw) => {
+      sm.isDisableToasts = bool(raw);
+    },
+  },
+  {
     key: StorageKey.SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED,
     serialize: (sm) => String(sm.isFocusOnSatelliteWhenSelected),
     deserialize: (sm, raw) => {

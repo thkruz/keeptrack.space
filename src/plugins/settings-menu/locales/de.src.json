@@ -28,6 +28,7 @@
         "enableDemoMode": "Demomodus aktivieren",
         "enableFreezeTime": "Zeit beim Klicken einfrieren",
         "compensateEarthRotation": "Erdrotation kompensieren",
+        "disableToasts": "Pop-up-Benachrichtigungen deaktivieren",
         "showNextPassOnHover": "Nächsten Überflug beim Überfahren anzeigen"
       },
       "tooltips": {
@@ -42,6 +43,7 @@
         "enableDemoMode": "Alle 3 Sekunden wird ein neuer Satellit aus dem FOV ausgewählt",
         "enableFreezeTime": "Die Zeit friert ein, während Sie die Kamera drehen.",
         "compensateEarthRotation": "Kompensiert den Kamera-Gierwinkel für die Erdrotation, sodass die Ansicht auf geografische Koordinaten fixiert bleibt.",
+        "disableToasts": "Blendet die Meldungen aus, die in der Ecke erscheinen. Fehler werden weiterhin in die Browserkonsole geschrieben.",
         "showNextPassOnHover": "Zeigt die Zeit des nächsten Überflugs, wenn Sie über einen Satelliten im Sichtfeld des ausgewählten Sensors fahren."
       },
       "help": {

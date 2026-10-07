@@ -79,7 +79,7 @@ export class KeyboardComponent {
 
     const validShortcuts = KeyboardShortcutRegistry.register(this.pluginId_, this.shortcuts_);
 
-    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, code: string, isRepeat: boolean, isShift: boolean, isCtrl: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, code: string, isRepeat: boolean, isShift: boolean, isCtrl: boolean, isAlt = false) => {
       if (isRepeat) {
         return;
       }
@@ -96,7 +96,7 @@ export class KeyboardComponent {
       }
 
       for (const shortcut of validShortcuts) {
-        if (this.matchesShortcut_(shortcut, key, code, isShift, isCtrl)) {
+        if (this.matchesShortcut_(shortcut, key, code, isShift, isCtrl, isAlt)) {
           if (this.loginGateCheck_ && !this.loginGateCheck_()) {
             this.onLoginGateRejected_?.();
             break;
@@ -133,7 +133,7 @@ export class KeyboardComponent {
    * - `true` → modifier must be pressed
    * - `false` → modifier must NOT be pressed
    */
-  private matchesShortcut_(shortcut: IKeyboardShortcut, key: string, code: string, isShift: boolean, isCtrl: boolean): boolean {
+  private matchesShortcut_(shortcut: IKeyboardShortcut, key: string, code: string, isShift: boolean, isCtrl: boolean, isAlt: boolean): boolean {
     // Match by key or code
     const keyMatch = shortcut.key === key || shortcut.code === code;
 
@@ -144,8 +144,9 @@ export class KeyboardComponent {
     // Match modifiers (undefined = don't care)
     const shiftMatch = shortcut.shift === undefined || shortcut.shift === isShift;
     const ctrlMatch = shortcut.ctrl === undefined || shortcut.ctrl === isCtrl;
+    const altMatch = shortcut.alt === undefined || shortcut.alt === isAlt;
 
-    return shiftMatch && ctrlMatch;
+    return shiftMatch && ctrlMatch && altMatch;
   }
 
   /**

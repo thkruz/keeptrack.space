@@ -28,6 +28,7 @@
         "enableDemoMode": "启用演示模式",
         "enableFreezeTime": "点击时冻结时间",
         "compensateEarthRotation": "补偿地球自转",
+        "disableToasts": "禁用弹出通知",
         "showNextPassOnHover": "悬停时显示下次过境"
       },
       "tooltips": {
@@ -42,6 +43,7 @@
         "enableDemoMode": "每 3 秒会从 FOV 中选择一颗新卫星",
         "enableFreezeTime": "旋转相机时时间将被冻结。",
         "compensateEarthRotation": "根据地球自转补偿相机偏航，使视图保持固定于地理坐标。",
+        "disableToasts": "隐藏出现在角落的提示消息。错误仍会写入浏览器控制台。",
         "showNextPassOnHover": "当鼠标悬停在所选传感器视场内的卫星上时，显示下次过境的时间。"
       },
       "help": {

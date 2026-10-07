@@ -12,7 +12,8 @@
         "maxTmxTime": "최대 Tmx 시간",
         "sun": "태양",
         "visMag": "겉보기 등급",
-        "nextPass": "다음 패스"
+        "nextPass": "다음 패스",
+        "reason": "비가시 사유"
       },
       "tooltips": {
         "range": "센서로부터의 거리",
@@ -24,7 +25,8 @@
         "maxTmxTime": "RF/빛이 목표에 도달하고 돌아오는 시간",
         "sun": "태양이 센서에 영향을 주는지 여부",
         "visMag": "겉보기 등급 (낮은 숫자가 더 밝음)",
-        "nextPass": "다음 커버리지 진입 시간"
+        "nextPass": "다음 커버리지 진입 시간",
+        "reason": "객체가 센서 시야 밖에 있는 이유"
       },
       "values": {
         "noEffect": "영향 없음",
@@ -35,7 +37,13 @@
         "unableToCalculate": "계산 불가",
         "outOfFov": "FOV 밖",
         "unavailable": "사용 불가",
-        "beyondMaxRange": "최대 거리 초과"
+        "beyondMaxRange": "최대 거리 초과",
+        "reasonMinRange": "거리 {{value}}가 최소 {{limit}} 미만",
+        "reasonMaxRange": "거리 {{value}}가 최대 {{limit}} 초과",
+        "reasonMinEl": "고각 {{value}}가 최소 {{limit}} 미만",
+        "reasonMaxEl": "고각 {{value}}가 최대 {{limit}} 초과",
+        "reasonAzimuth": "방위각 {{value}}가 {{min}}~{{max}} 범위 밖",
+        "reasonCone": "센서 조준 원뿔 밖"
       }
     }
   }

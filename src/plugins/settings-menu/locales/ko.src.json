@@ -28,6 +28,7 @@
         "enableDemoMode": "데모 모드 활성화",
         "enableFreezeTime": "클릭 시 시간 정지",
         "compensateEarthRotation": "지구 자전 보정",
+        "disableToasts": "팝업 알림 끄기",
         "showNextPassOnHover": "마우스 오버 시 다음 통과 표시"
       },
       "tooltips": {
@@ -42,6 +43,7 @@
         "enableDemoMode": "3초마다 FOV에서 새 위성이 선택됩니다",
         "enableFreezeTime": "카메라를 회전하는 동안 시간이 정지됩니다.",
         "compensateEarthRotation": "지구 자전에 맞춰 카메라 요(yaw)를 보정하여 시점이 지리 좌표에 고정되도록 합니다.",
+        "disableToasts": "화면 모서리에 나타나는 메시지를 숨깁니다. 오류는 계속 브라우저 콘솔에 기록됩니다.",
         "showNextPassOnHover": "선택한 센서의 시야 안에 있는 위성 위에 마우스를 올리면 다음 통과 시간을 표시합니다."
       },
       "help": {

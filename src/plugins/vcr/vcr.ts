@@ -38,6 +38,7 @@ export class VcrPlugin extends KeepTrackPlugin {
     return [
       {
         key: ' ',
+        description: t7e('keyboard.descriptions.playPause' as Parameters<typeof t7e>[0]),
         callback: () => this.handlePlayPause(),
       },
     ];

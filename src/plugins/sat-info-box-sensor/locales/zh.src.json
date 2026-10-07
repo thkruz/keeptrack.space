@@ -12,7 +12,8 @@
         "maxTmxTime": "最大 Tmx 时间",
         "sun": "太阳",
         "visMag": "视星等",
-        "nextPass": "下次过境"
+        "nextPass": "下次过境",
+        "reason": "不可见原因"
       },
       "tooltips": {
         "range": "距传感器的距离",
@@ -24,7 +25,8 @@
         "maxTmxTime": "RF/光到达目标并返回的时间",
         "sun": "太阳是否影响传感器",
         "visMag": "视星等（数值越低越亮）",
-        "nextPass": "下次进入覆盖范围的时间"
+        "nextPass": "下次进入覆盖范围的时间",
+        "reason": "目标位于传感器视场之外的原因"
       },
       "values": {
         "noEffect": "无影响",
@@ -35,7 +37,13 @@
         "unableToCalculate": "无法计算",
         "outOfFov": "超出 FOV",
         "unavailable": "不可用",
-        "beyondMaxRange": "超出最大距离"
+        "beyondMaxRange": "超出最大距离",
+        "reasonMinRange": "距离 {{value}} 低于最小值 {{limit}}",
+        "reasonMaxRange": "距离 {{value}} 超过最大值 {{limit}}",
+        "reasonMinEl": "仰角 {{value}} 低于最小值 {{limit}}",
+        "reasonMaxEl": "仰角 {{value}} 超过最大值 {{limit}}",
+        "reasonAzimuth": "方位角 {{value}} 超出 {{min}} 至 {{max}} 范围",
+        "reasonCone": "位于传感器视轴锥体之外"
       }
     }
   }

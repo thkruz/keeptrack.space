@@ -64,7 +64,8 @@ describe('FindSatPlugin_class', () => {
       expect(config.sections!.length).toBeGreaterThanOrEqual(3);
       expect(config.sections![0].image?.src).toContain('img/help/find-sat/');
       expect(config.tips!.length).toBeGreaterThan(0);
-      expect(config.shortcuts).toEqual([expect.objectContaining({ keys: ['Ctrl', 'F'] })]);
+      // The shortcut row is derived from the registry at render time, not hand-written here.
+      expect(config.shortcuts).toBeUndefined();
     });
   });
 

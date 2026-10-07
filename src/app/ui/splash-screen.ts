@@ -1,3 +1,4 @@
+import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { WORKER_CACHE_BUST_KEY } from '@app/engine/threads/web-worker-thread';
@@ -63,7 +64,7 @@ export abstract class SplashScreen {
             </button>
           </div>
         </div>
-        <div id="loading-hint">${t7e('loadingScreen.hint' as TranslationKey)} ${this.showHint()}</div>
+        <div id="loading-hint">${t7e('loadingScreen.hint' as TranslationKey)} <span id="loading-hint-text"></span></div>
         <div id="version-text">v${__VERSION__}-${__COMMIT_HASH__}</div>
         <div id="copyright-notice">
         ${settingsManager.isMobileModeEnabled ? t7e('copyright.noticeMobile') : t7e('copyright.notice')}
@@ -78,14 +79,41 @@ export abstract class SplashScreen {
       getEl('start-app-btn')?.addEventListener('click', () => {
         SplashScreen.handleStartAppButton();
       });
+
+      // Shortcut tips come from the registry, which plugins fill during init,
+      // so the hint is only picked once the UI is up.
+      const hintText = getEl('loading-hint-text', true);
+
+      if (hintText) {
+        hintText.textContent = SplashScreen.showHint();
+      }
     });
   }
 
+  /**
+   * A random tip: either a static one from the locale or a "Press X: action"
+   * line built from a registered shortcut, so the tips can never name a key
+   * the app does not actually bind.
+   */
   static showHint(): string {
-    const messageCount = Object.keys(t7e('splashScreens' as TranslationKey, { returnObjects: true })).length;
-    const randomIndex = Math.floor(Math.random() * messageCount) + 1;
+    const hints = SplashScreen.collectHints();
 
-    return t7e(`splashScreens.${randomIndex}` as TranslationKey);
+    return hints[Math.floor(Math.random() * hints.length)] ?? '';
+  }
+
+  static collectHints(): string[] {
+    const staticTips = Object.values(t7e('splashScreens' as TranslationKey, { returnObjects: true }) as unknown as Record<string, string>);
+    const shortcutTips = KeyboardShortcutRegistry.getAllForDisplay()
+      .filter((entry) => entry.shortcut.description)
+      .map((entry) =>
+        t7e('loadingScreen.shortcutTip' as TranslationKey, {
+          keys: KeyboardShortcutRegistry.formatShortcut(entry.shortcut),
+          action: entry.shortcut.description,
+        })
+      );
+
+    // The four arrow keys share one description; show that tip once.
+    return [...new Set([...staticTips, ...shortcutTips])];
   }
 
   static hideSplashScreen() {

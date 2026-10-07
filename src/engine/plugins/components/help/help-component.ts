@@ -67,7 +67,7 @@ export class HelpComponent {
    * Gets the help body rendered as HTML.
    */
   get body(): string {
-    return buildHelpHtml(this.config);
+    return buildHelpHtml(this.config, this.pluginId);
   }
 
   /**
@@ -111,7 +111,7 @@ export class HelpComponent {
    * Show the help content using the advice manager.
    */
   showHelp(): void {
-    adviceManagerInstance.showAdvice(this.config.title, buildHelpHtml(this.config));
+    adviceManagerInstance.showAdvice(this.config.title, buildHelpHtml(this.config, this.pluginId));
     EventBus.getInstance().emit(EventBusEvent.helpMenuShown, this.pluginId);
   }
 }

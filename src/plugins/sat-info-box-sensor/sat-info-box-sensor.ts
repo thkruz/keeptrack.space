@@ -1,8 +1,9 @@
 /* eslint-disable max-lines */
+
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
-import { RfSensor } from '@app/app/sensors/DetailedSensor';
+import { DetailedSensor, RfSensor } from '@app/app/sensors/DetailedSensor';
 import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -15,7 +16,8 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrack } from '@app/keeptrack';
-import { BaseObject, cKmPerMs, DEG2RAD, eci2lla, RadecTopocentric, Satellite, SpaceObjectType, Sun, SunTime } from '@ootk/src/main';
+import { t7e } from '@app/locales/keys';
+import { BaseObject, cKmPerMs, DEG2RAD, Degrees, eci2lla, Kilometers, RadecTopocentric, Satellite, SpaceObjectType, Sun, SunTime } from '@ootk/src/main';
 import type { SensorManager } from '../../app/sensors/sensorManager';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { missileManager } from '../missile/missile-manager';
@@ -38,7 +40,10 @@ const EL = {
   SUN: 'sat-sun',
   VMAG: 'sat-vmag',
   NEXT_PASS: 'sat-nextpass',
+  REASON: 'sat-fov-reason',
 };
+
+const l = (key: string): string => t7e(`plugins.SatInfoBoxSensor.${key}` as Parameters<typeof t7e>[0]);
 
 export class SatInfoBoxSensor extends KeepTrackPlugin {
   readonly id = 'SatInfoBoxSensor';
@@ -80,6 +85,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       { key: 'Range', id: EL.RANGE, tooltip: 'Distance from the Sensor', value: 'xxxx km' },
       { key: 'Azimuth', id: EL.AZIMUTH, tooltip: 'Angle (Left/Right) from the Sensor', value: 'XX deg' },
       { key: 'Elevation', id: EL.ELEVATION, tooltip: 'Angle (Up/Down) from the Sensor', value: 'XX deg' },
+      { key: l('labels.reason'), id: EL.REASON, tooltip: l('tooltips.reason'), value: '-' },
       { key: 'RA', id: EL.RA, tooltip: 'Right Ascension', value: 'XX deg' },
       { key: 'Dec', id: EL.DEC, tooltip: 'Declination', value: 'XX deg' },
       { key: 'Beam Width', id: EL.BEAMWIDTH, tooltip: "Linear Width at Target's Range", value: 'xxxx km' },
@@ -266,12 +272,14 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
         }
 
         let isInView, rae;
+        let fovReason: string | undefined;
 
         if (ServiceLocator.getSensorManager().isSensorSelected()) {
           const sensor = ServiceLocator.getSensorManager().currentSensors[0];
 
           rae = sensor.rae(obj, timeManagerInstance.simulationTimeObj);
           isInView = sensor.isRaeInFov(rae.az, rae.el, rae.rng);
+          fovReason = isInView ? undefined : SatInfoBoxSensor.describeFovReason_(sensor, rae);
         } else {
           rae = {
             az: 0,
@@ -292,11 +300,13 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
           lon: lla.lon,
           alt: lla.alt,
           inView: isInView,
+          fovReason,
         };
 
         ServiceLocator.getSensorManager().currentTEARR = currentTearr;
       } else if (obj instanceof OemSatellite) {
         let isInView, rae;
+        let fovReason: string | undefined;
 
         if (ServiceLocator.getSensorManager().isSensorSelected()) {
           const sensor = ServiceLocator.getSensorManager().currentSensors[0];
@@ -307,6 +317,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
           if (raeResult) {
             rae = raeResult;
             isInView = sensor.isRaeInFov(rae.az, rae.el, rae.rng);
+            fovReason = isInView ? undefined : SatInfoBoxSensor.describeFovReason_(sensor, rae);
           } else {
             rae = { az: 0, el: 0, rng: 0 };
             isInView = false;
@@ -331,6 +342,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
           lon: lla.lon,
           alt: lla.alt,
           inView: isInView,
+          fovReason,
         };
 
         ServiceLocator.getSensorManager().currentTEARR = currentTearr;
@@ -403,6 +415,50 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     return SensorMath.nextpass(sat, sensorManagerInstance.currentSensors, 2, 5);
   }
 
+  /** Fills the Reason row, or hides it when the object is in view. */
+  private static setReasonRow_(text: string | null): void {
+    const reasonEl = getEl(EL.REASON, true);
+
+    if (!reasonEl?.parentElement) {
+      return;
+    }
+
+    reasonEl.parentElement.style.display = text ? 'flex' : 'none';
+    reasonEl.innerHTML = text ?? '-';
+  }
+
+  /** Human-readable version of the first FOV bound the look angle breaks. */
+  static describeFovReason_(sensor: DetailedSensor, rae: { az: number; el: number; rng: number }): string {
+    const reason = sensor.getFovRejectReason(rae.az as Degrees, rae.el as Degrees, rae.rng as Kilometers);
+
+    if (!reason) {
+      return l('values.outOfFov');
+    }
+
+    const deg = (v: number) => `${v.toFixed(1)}°`;
+    const km = (v: number) => `${v.toFixed(0)} km`;
+
+    switch (reason.kind) {
+      case 'minRange':
+        return t7e('plugins.SatInfoBoxSensor.values.reasonMinRange' as Parameters<typeof t7e>[0], { value: km(reason.value), limit: km(reason.limit) });
+      case 'maxRange':
+        return t7e('plugins.SatInfoBoxSensor.values.reasonMaxRange' as Parameters<typeof t7e>[0], { value: km(reason.value), limit: km(reason.limit) });
+      case 'minEl':
+        return t7e('plugins.SatInfoBoxSensor.values.reasonMinEl' as Parameters<typeof t7e>[0], { value: deg(reason.value), limit: deg(reason.limit) });
+      case 'maxEl':
+        return t7e('plugins.SatInfoBoxSensor.values.reasonMaxEl' as Parameters<typeof t7e>[0], { value: deg(reason.value), limit: deg(reason.limit) });
+      case 'azimuth':
+        return t7e('plugins.SatInfoBoxSensor.values.reasonAzimuth' as Parameters<typeof t7e>[0], {
+          value: deg(reason.value),
+          min: deg(reason.limit),
+          max: deg(reason.limit2 ?? reason.limit),
+        });
+      case 'cone':
+      default:
+        return l('values.reasonCone');
+    }
+  }
+
   private updateSatelliteTearrData_(obj: BaseObject, sensorManagerInstance: SensorManager, timeManagerInstance: TimeManager) {
     const elements = {
       az: getEl('sat-azimuth'),
@@ -435,41 +491,31 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     },
     sensorManagerInstance: SensorManager
   ) {
+    const tearr = ServiceLocator.getSensorManager().currentTEARR;
+
     if (elements.vmag) {
       elements.vmag.innerHTML = 'Out of FOV';
     }
+
+    /*
+     * The look angles are still meaningful outside the FOV (they are what the
+     * reason row compares against the sensor limits), so show them instead of
+     * hiding them behind a tooltip.
+     */
     if (elements.az) {
-      elements.az.innerHTML = 'Out of FOV';
-      const az = ServiceLocator.getSensorManager().currentTEARR.az;
-
-      if (az) {
-        elements.az.title = `Azimuth: ${az.toFixed(0)}°`;
-      } else {
-        elements.az.title = 'Unknown';
-      }
+      elements.az.innerHTML = tearr.az ? `${tearr.az.toFixed(0)}°` : 'Unknown';
+      elements.az.title = '';
     }
-
     if (elements.el) {
-      elements.el.innerHTML = 'Out of FOV';
-      const el = ServiceLocator.getSensorManager().currentTEARR.el;
-
-      if (el) {
-        elements.el.title = `Elevation: ${el.toFixed(1)}°`;
-      } else {
-        elements.el.title = 'Unknown';
-      }
+      elements.el.innerHTML = tearr.el ? `${tearr.el.toFixed(1)}°` : 'Unknown';
+      elements.el.title = '';
     }
-
     if (elements.rng) {
-      elements.rng.innerHTML = 'Out of FOV';
-      const rng = ServiceLocator.getSensorManager().currentTEARR.rng;
-
-      if (rng) {
-        elements.rng.title = `Range: ${rng.toFixed(2)} km`;
-      } else {
-        elements.rng.title = 'Unknown';
-      }
+      elements.rng.innerHTML = tearr.rng ? `${tearr.rng.toFixed(2)} km` : 'Unknown';
+      elements.rng.title = '';
     }
+
+    SatInfoBoxSensor.setReasonRow_(tearr.fovReason ?? l('values.outOfFov'));
 
     if (elements.ra) {
       elements.ra.innerHTML = 'Out of FOV';
@@ -509,6 +555,8 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     sensorManagerInstance: SensorManager,
     timeManagerInstance: TimeManager
   ) {
+    SatInfoBoxSensor.setReasonRow_(null);
+
     if (elements.az) {
       const az = ServiceLocator.getSensorManager().currentTEARR.az;
 

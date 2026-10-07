@@ -4,6 +4,7 @@ import { OrbitCruncherThreadManager } from '@app/app/threads/orbit-cruncher-thre
 import { CameraType } from '@app/engine/camera/camera-type';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { KeepTrack } from '@app/keeptrack';
+import { TranslationKey, t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { SettingsManager } from '@app/settings/settings';
@@ -305,6 +306,7 @@ export class OrbitManager {
         key: 'L',
         // ctrl:false so Ctrl+Shift+L stays free for New Launch; this owns plain Shift+L.
         ctrl: false,
+        description: t7e('keyboard.descriptions.toggleOrbits' as TranslationKey),
         callback: () => {
           this.toggleOrbitLines_();
           SettingsMenuPlugin.syncOnLoad();
@@ -313,6 +315,7 @@ export class OrbitManager {
       },
       {
         key: 'e',
+        description: t7e('keyboard.descriptions.toggleEcf' as TranslationKey),
         callback: () => {
           if (ServiceLocator.getMainCamera().cameraType === CameraType.FPS) {
             return;

@@ -27,6 +27,12 @@ import { IKeyboardShortcut } from '../plugins/core/plugin-capabilities';
 export interface RegisteredShortcut {
   pluginId: string;
   shortcut: IKeyboardShortcut;
+  /**
+   * True for bindings that are documented here but dispatched elsewhere (raw
+   * window listeners, the camera's EventBus handlers). They appear in the
+   * overlay, help and splash tips but take no part in conflict detection.
+   */
+  isInfoOnly?: boolean;
 }
 
 /**
@@ -38,6 +44,16 @@ export interface ShortcutConflict {
   /** The shortcut that was rejected (loser). */
   incoming: RegisteredShortcut;
 }
+
+/** Display names for keys whose `event.key` value is not readable on its own. */
+const KEY_DISPLAY_NAMES: Record<string, string> = {
+  ' ': 'Space',
+  ArrowUp: '↑',
+  ArrowDown: '↓',
+  ArrowLeft: '←',
+  ArrowRight: '→',
+  Escape: 'Esc',
+};
 
 /**
  * Central registry for keyboard shortcuts across all plugins.
@@ -51,6 +67,7 @@ export interface ShortcutConflict {
 export class KeyboardShortcutRegistry {
   private static readonly instance_ = new KeyboardShortcutRegistry();
   private registeredShortcuts_: RegisteredShortcut[] = [];
+  private infoShortcuts_: RegisteredShortcut[] = [];
   private conflicts_: ShortcutConflict[] = [];
 
   /**
@@ -83,6 +100,17 @@ export class KeyboardShortcutRegistry {
   }
 
   /**
+   * Document shortcuts that are dispatched outside the registry (raw window
+   * listeners, camera movement keys). They never conflict with, or suppress,
+   * a registered shortcut; they only show up in {@link getAllForDisplay}.
+   */
+  static registerInfo(pluginId: string, shortcuts: IKeyboardShortcut[]): void {
+    for (const shortcut of shortcuts) {
+      KeyboardShortcutRegistry.instance_.infoShortcuts_.push({ pluginId, shortcut, isInfoOnly: true });
+    }
+  }
+
+  /**
    * Check if two shortcuts conflict (their key/code and modifier patterns overlap).
    */
   static shortcutsConflict(a: IKeyboardShortcut, b: IKeyboardShortcut): boolean {
@@ -101,10 +129,24 @@ export class KeyboardShortcutRegistry {
   }
 
   /**
-   * Get all registered shortcuts.
+   * Get all registered (dispatching) shortcuts.
    */
   static getAll(): readonly RegisteredShortcut[] {
     return KeyboardShortcutRegistry.instance_.registeredShortcuts_;
+  }
+
+  /**
+   * Registered shortcuts plus the info-only ones, for guides and tips.
+   */
+  static getAllForDisplay(): readonly RegisteredShortcut[] {
+    return [...KeyboardShortcutRegistry.instance_.registeredShortcuts_, ...KeyboardShortcutRegistry.instance_.infoShortcuts_];
+  }
+
+  /**
+   * Every displayable shortcut owned by one plugin, in registration order.
+   */
+  static getForPlugin(pluginId: string): RegisteredShortcut[] {
+    return KeyboardShortcutRegistry.getAllForDisplay().filter((entry) => entry.pluginId === pluginId);
   }
 
   /**
@@ -119,14 +161,15 @@ export class KeyboardShortcutRegistry {
    */
   static clear(): void {
     KeyboardShortcutRegistry.instance_.registeredShortcuts_ = [];
+    KeyboardShortcutRegistry.instance_.infoShortcuts_ = [];
     KeyboardShortcutRegistry.instance_.conflicts_ = [];
   }
 
   /**
-   * Format a shortcut as a human-readable string (e.g. "Ctrl+Shift+F").
-   * Omitted modifiers are treated as not required and are not shown.
+   * The key chips for a shortcut, modifiers first (e.g. ["Ctrl", "Shift", "F"]).
+   * Omitted modifiers are not required and are not shown.
    */
-  static formatShortcut(shortcut: IKeyboardShortcut): string {
+  static formatShortcutKeys(shortcut: IKeyboardShortcut): string[] {
     const parts: string[] = [];
 
     if (shortcut.ctrl === true) {
@@ -138,9 +181,17 @@ export class KeyboardShortcutRegistry {
     if (shortcut.alt === true) {
       parts.push('Alt');
     }
-    parts.push(shortcut.key);
+    parts.push(KEY_DISPLAY_NAMES[shortcut.key] ?? shortcut.key);
 
-    return parts.join('+');
+    return parts;
+  }
+
+  /**
+   * Format a shortcut as a human-readable string (e.g. "Ctrl+Shift+F").
+   * Omitted modifiers are treated as not required and are not shown.
+   */
+  static formatShortcut(shortcut: IKeyboardShortcut): string {
+    return KeyboardShortcutRegistry.formatShortcutKeys(shortcut).join('+');
   }
 
   /**

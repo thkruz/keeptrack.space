@@ -362,9 +362,16 @@ describe('line-manager subclasses', () => {
       posData[idx * 3 + 2] = z;
     };
 
+    /** The line only draws while its sensor is still one of the active sensors. */
+    const activate = (line: SensorToSatLine) => {
+      vi.spyOn(ServiceLocator.getSensorManager(), 'getAllActiveSensors').mockReturnValue([line.sensor]);
+    };
+
     it('connects the satellite catalog position to the sensor eci position', () => {
       seedPos(0, 100, 200, 300);
       const line = new SensorToSatLine(sensorWithEci(4, 5, 6), { id: 0 } as never);
+
+      activate(line);
       const calls = capture(line);
 
       line.update();
@@ -408,6 +415,7 @@ describe('line-manager subclasses', () => {
       const sensor = { eci: () => ({ x: 4, y: 5, z: 6 }), isSatInFov: () => true } as never;
       const line = new SensorToSatLine(sensor, defaultSat);
 
+      activate(line);
       line.setDrawFovOnly(true);
       const calls = capture(line);
 
@@ -417,10 +425,24 @@ describe('line-manager subclasses', () => {
       expect((line as unknown as { isGarbage: boolean }).isGarbage).toBe(false);
     });
 
+    it('marks itself garbage once its sensor is no longer active (sensor reset)', () => {
+      seedPos(0, 100, 200, 300);
+      const line = new SensorToSatLine(sensorWithEci(4, 5, 6), { id: 0 } as never);
+
+      vi.spyOn(ServiceLocator.getSensorManager(), 'getAllActiveSensors').mockReturnValue([]);
+      const calls = capture(line);
+
+      line.update();
+
+      expect(calls).toHaveLength(0);
+      expect((line as unknown as { isGarbage: boolean }).isGarbage).toBe(true);
+    });
+
     it('marks itself garbage in FOV-only mode when the object is not a known satellite type', () => {
       seedPos(0, 100, 200, 300);
       const line = new SensorToSatLine(sensorWithEci(4, 5, 6), { id: 0 } as never);
 
+      activate(line);
       line.setDrawFovOnly(true);
       capture(line);
 
@@ -434,6 +456,7 @@ describe('line-manager subclasses', () => {
       // SelectSatManager is not registered, so selectedSat is undefined and any id mismatches.
       const line = new SensorToSatLine(sensorWithEci(4, 5, 6), { id: 0 } as never);
 
+      activate(line);
       line.setDrawSelectedOnly(true);
       capture(line);
 

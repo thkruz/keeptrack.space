@@ -2,8 +2,41 @@
  * @jest-environment jsdom
  */
 
-import { buildHelpHtml } from '@app/engine/plugins/components/help/help-html';
+import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
+import { buildHelpHtml, resolveHelpShortcuts } from '@app/engine/plugins/components/help/help-html';
 import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
+
+describe('resolveHelpShortcuts', () => {
+  beforeEach(() => {
+    KeyboardShortcutRegistry.clear();
+  });
+
+  it("lists the plugin's registered bindings first and drops hand-written duplicates", () => {
+    KeyboardShortcutRegistry.register('FilterMenuPlugin', [{ key: 'f', description: 'Toggle the Filter menu', callback: () => undefined }]);
+    const config: IHelpConfig = {
+      title: 'Filter',
+      // The hand-written 'f' is stale; the registry entry wins and it is not duplicated.
+      shortcuts: [
+        { keys: ['f'], description: 'stale copy' },
+        { keys: ['Esc'], description: 'Close' },
+      ],
+    };
+
+    expect(resolveHelpShortcuts(config, 'FilterMenuPlugin')).toEqual([
+      { keys: ['f'], description: 'Toggle the Filter menu' },
+      { keys: ['Esc'], description: 'Close' },
+    ]);
+  });
+
+  it('skips registered bindings that have no description and ignores other plugins', () => {
+    KeyboardShortcutRegistry.register('PluginA', [{ key: 'a', callback: () => undefined }]);
+    KeyboardShortcutRegistry.register('PluginB', [{ key: 'b', description: 'B thing', callback: () => undefined }]);
+
+    expect(resolveHelpShortcuts({ title: 'A' }, 'PluginA')).toEqual([]);
+    expect(buildHelpHtml({ title: 'B', body: 'legacy' }, 'PluginB')).toContain('<kbd>b</kbd>');
+    expect(buildHelpHtml({ title: 'A', body: 'legacy' }, 'PluginA')).toBe('legacy');
+  });
+});
 
 describe('buildHelpHtml', () => {
   it('passes legacy body-only configs through unchanged', () => {

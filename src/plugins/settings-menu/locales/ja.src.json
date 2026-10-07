@@ -28,6 +28,7 @@
         "enableDemoMode": "デモモードを有効化",
         "enableFreezeTime": "クリック時に時間を停止",
         "compensateEarthRotation": "地球の自転を補正",
+        "disableToasts": "ポップアップ通知を無効にする",
         "showNextPassOnHover": "ホバー時に次のパスを表示"
       },
       "tooltips": {
@@ -42,6 +43,7 @@
         "enableDemoMode": "3秒ごとにFOVから新しい衛星が選択されます",
         "enableFreezeTime": "カメラを回転している間、時間が停止します。",
         "compensateEarthRotation": "地球の自転に合わせてカメラのヨーを補正し、視点を地理座標に固定したままにします。",
+        "disableToasts": "画面の隅に表示されるメッセージを非表示にします。エラーは引き続きブラウザのコンソールに出力されます。",
         "showNextPassOnHover": "選択したセンサーの視野内にある衛星にマウスを合わせると、次のパスの時刻を表示します。"
       },
       "help": {

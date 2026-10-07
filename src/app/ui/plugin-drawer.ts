@@ -1,4 +1,5 @@
 import { SoundNames } from '@app/engine/audio/sounds';
+import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -6,6 +7,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { shake } from '@app/engine/utils/shake';
+import { TranslationKey, t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
 import appsPng from '@public/img/icons/apps.png';
 import leftPanelClosePng from '@public/img/icons/left-panel-close.png';
@@ -564,6 +566,12 @@ export class PluginDrawer {
     this.overlayEl_?.addEventListener('click', () => {
       this.close();
     });
+
+    // Documented only: Tab is handled below on the raw event so it can
+    // preventDefault before the browser moves focus.
+    KeyboardShortcutRegistry.registerInfo('PluginDrawer', [
+      { key: 'Tab', description: t7e('keyboard.descriptions.toggleDrawer' as TranslationKey), callback: () => this.toggle() },
+    ]);
 
     // Escape key closes drawer, Tab key toggles drawer
     window.addEventListener('keydown', (evt: KeyboardEvent) => {

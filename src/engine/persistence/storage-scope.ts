@@ -52,6 +52,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.SETTINGS_SAT_LABEL_MODE_V2]: StorageScope.Account,
   [StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG]: StorageScope.Account,
   [StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS]: StorageScope.Account,
+  [StorageKey.SETTINGS_DISABLE_TOASTS]: StorageScope.Account,
   [StorageKey.SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED]: StorageScope.Account,
   [StorageKey.SETTINGS_DRAW_AURORA]: StorageScope.Account,
   [StorageKey.SETTINGS_DRAW_GRATICULE]: StorageScope.Account,

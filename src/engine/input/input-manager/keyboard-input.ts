@@ -105,6 +105,7 @@ export class KeyboardInput {
     const code = evt.code;
     const isShiftPressed = this.keyStates.get('Shift') ?? false;
     const isCtrlPressed = this.keyStates.get('Control') ?? false;
+    const isAltPressed = evt.altKey;
 
     this.keyStates.set(key, false);
 
@@ -121,7 +122,7 @@ export class KeyboardInput {
       evt.preventDefault();
     }
 
-    EventBus.getInstance().emit(EventBusEvent.KeyUp, key, code, false, isShiftPressed, isCtrlPressed);
+    EventBus.getInstance().emit(EventBusEvent.KeyUp, key, code, false, isShiftPressed, isCtrlPressed, isAltPressed);
 
     if (key === 'Shift') {
       // Loop through all uppercase letters and change them to lowercase when the shift key is released
@@ -132,8 +133,8 @@ export class KeyboardInput {
         if (this.keyStates.get(upper)) {
           this.keyStates.set(upper, false);
           this.keyStates.set(lower, true);
-          EventBus.getInstance().emit(EventBusEvent.KeyUp, upper, code, false, isShiftPressed, isCtrlPressed);
-          EventBus.getInstance().emit(EventBusEvent.KeyDown, lower, code, false, isShiftPressed, isCtrlPressed);
+          EventBus.getInstance().emit(EventBusEvent.KeyUp, upper, code, false, isShiftPressed, isCtrlPressed, isAltPressed);
+          EventBus.getInstance().emit(EventBusEvent.KeyDown, lower, code, false, isShiftPressed, isCtrlPressed, isAltPressed);
         }
       }
     }
@@ -145,6 +146,7 @@ export class KeyboardInput {
     const code = evt.code;
     const isShiftPressed = this.keyStates.get('Shift') ?? false;
     const isCtrlPressed = this.keyStates.get('Control') ?? false;
+    const isAltPressed = evt.altKey;
 
     this.keyStates.set(key, true);
 
@@ -161,7 +163,7 @@ export class KeyboardInput {
       evt.preventDefault();
     }
 
-    EventBus.getInstance().emit(EventBusEvent.KeyDown, key, code, isRepeat, isShiftPressed, isCtrlPressed);
+    EventBus.getInstance().emit(EventBusEvent.KeyDown, key, code, isRepeat, isShiftPressed, isCtrlPressed, isAltPressed);
 
     if (key === 'Shift') {
       // Loop through all uppercase letters and change them to lowercase when the shift key is released
@@ -172,8 +174,8 @@ export class KeyboardInput {
         if (this.keyStates.get(lower)) {
           this.keyStates.set(lower, false);
           this.keyStates.set(upper, true);
-          EventBus.getInstance().emit(EventBusEvent.KeyUp, lower, code, isRepeat, isShiftPressed, isCtrlPressed);
-          EventBus.getInstance().emit(EventBusEvent.KeyDown, upper, code, isRepeat, isShiftPressed, isCtrlPressed);
+          EventBus.getInstance().emit(EventBusEvent.KeyUp, lower, code, isRepeat, isShiftPressed, isCtrlPressed, isAltPressed);
+          EventBus.getInstance().emit(EventBusEvent.KeyDown, upper, code, isRepeat, isShiftPressed, isCtrlPressed, isAltPressed);
         }
       }
     }

@@ -924,7 +924,11 @@ export const updateSatellite = (now: Date, i: number, gmst: GreenwichMeanSiderea
     updateSatelliteSunStatus_(i, now, pv.position);
   }
 
-  if (isSensor && !isSunExclusion) {
+  if (isSensor && isSunExclusion) {
+    // Daylight at an optical site: nothing is in view, and the flags from the
+    // last dark pass must not linger on the dots.
+    satInView[i] = 0;
+  } else if (isSensor) {
     satInView[i] = 0; // 0 = FALSE - Default in case no sensor selected
     if (isSensors) {
       updateSatelliteInViewMulti_(i, pv.position, gmst);

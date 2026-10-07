@@ -12,7 +12,8 @@
         "maxTmxTime": "Max Tmx Time",
         "sun": "Sun",
         "visMag": "Vis Mag",
-        "nextPass": "Next Pass"
+        "nextPass": "Next Pass",
+        "reason": "Not in View"
       },
       "tooltips": {
         "range": "Distance from the Sensor",
@@ -24,7 +25,8 @@
         "maxTmxTime": "Time for RF/Light to Reach Target and Back",
         "sun": "Does the Sun Impact the Sensor",
         "visMag": "Visual Magnitude (Lower numbers are brighter)",
-        "nextPass": "Next Time in Coverage"
+        "nextPass": "Next Time in Coverage",
+        "reason": "Why the object is outside the sensor field of view"
       },
       "values": {
         "noEffect": "No Effect",
@@ -35,7 +37,13 @@
         "unableToCalculate": "Unable to Calculate",
         "outOfFov": "Out of FOV",
         "unavailable": "Unavailable",
-        "beyondMaxRange": "Beyond Max Range"
+        "beyondMaxRange": "Beyond Max Range",
+        "reasonMinRange": "Range {{value}} below min {{limit}}",
+        "reasonMaxRange": "Range {{value}} beyond max {{limit}}",
+        "reasonMinEl": "Elevation {{value}} below min {{limit}}",
+        "reasonMaxEl": "Elevation {{value}} above max {{limit}}",
+        "reasonAzimuth": "Azimuth {{value}} outside {{min}} to {{max}}",
+        "reasonCone": "Outside the sensor boresight cone"
       }
     }
   }

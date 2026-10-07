@@ -7,6 +7,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeyboardComponent } from '@app/engine/plugins/components/keyboard/keyboard-component';
+import { TranslationKey, t7e } from '@app/locales/keys';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { settingsManager } from '@app/settings/settings';
@@ -88,6 +89,7 @@ export class SearchManager {
       {
         key: 'F',
         ctrl: false,
+        description: t7e('keyboard.descriptions.toggleSearch' as TranslationKey),
         callback: () => {
           this.toggleSearch();
           if (this.isSearchOpen) {
@@ -447,7 +449,8 @@ export class SearchManager {
     }
 
     if (idList.length === 0) {
-      if (settingsManager.lastSearch?.length > settingsManager.minimumSearchCharacters) {
+      // lastSearch is the term list, so test the typed string's length instead.
+      if (searchString_.length > settingsManager.minimumSearchCharacters) {
         uiManagerInstance.toast('No Results Found', ToastMsgType.serious, false);
       }
       this.hideResults();
@@ -684,6 +687,9 @@ export class SearchManager {
     if (searchDom) {
       searchDom.value = '';
     }
+
+    // Tell listeners (URL bar, constellation restore) the search is gone.
+    EventBus.getInstance().emit(EventBusEvent.searchUpdated, '', 0, settingsManager.searchLimit);
   }
 
   openSearch(isForce = false) {

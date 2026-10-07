@@ -110,6 +110,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
     return [
       {
         key: 'S',
+        description: t7e('plugins.SensorListPlugin.help.shortcutToggle'),
         callback: () => {
           this.bottomMenuClicked();
         },
@@ -117,6 +118,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
       {
         key: 'Home',
         ctrl: true,
+        description: t7e('plugins.SensorListPlugin.help.shortcutCamera'),
         callback: () => {
           if (ServiceLocator.getSensorManager().currentSensors.length > 0 && ServiceLocator.getMainCamera().cameraType === CameraType.FIXED_TO_EARTH) {
             const sensor = ServiceLocator.getSensorManager().currentSensors[0];

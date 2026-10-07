@@ -71,6 +71,26 @@ describe('KeyboardComponent', () => {
     expect(callback).toHaveBeenCalled();
   });
 
+  it('respects the alt modifier and treats a missing alt flag as not held', () => {
+    const altOnly = vi.fn();
+    const noAlt = vi.fn();
+    const comp = new KeyboardComponent('PluginA', [
+      { key: 'z', alt: true, callback: altOnly },
+      { key: 'z', alt: false, callback: noAlt },
+    ]);
+
+    comp.init();
+
+    // Legacy five-argument emit: alt is undefined -> treated as not held.
+    emitKey('z', 'KeyZ');
+    expect(altOnly).not.toHaveBeenCalled();
+    expect(noAlt).toHaveBeenCalledTimes(1);
+
+    EventBus.getInstance().emit(EventBusEvent.KeyDown, 'z', 'KeyZ', false, false, false, true);
+    expect(altOnly).toHaveBeenCalledTimes(1);
+    expect(noAlt).toHaveBeenCalledTimes(1);
+  });
+
   it('does nothing when no shortcut matches the key', () => {
     const callback = vi.fn();
     const comp = new KeyboardComponent('PluginA', [{ key: 'a', callback }]);

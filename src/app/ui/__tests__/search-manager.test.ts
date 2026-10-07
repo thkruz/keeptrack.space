@@ -211,6 +211,34 @@ describe('SearchManager', () => {
       expect(settingsManager.lastSearchResults.sort((a, b) => a - b)).toEqual([0, 1, 2]);
     });
 
+    // Regression: a shared scan cursor let a higher-numbered substring hit for
+    // the first term (125544 contains "25544") skip past the second term, so
+    // "25544,43013" only ever showed 25544.
+    it('finds every term of a comma list despite substring decoys', () => {
+      sats = [
+        new Satellite({ ...defaultSat, id: 0, sccNum: '25544' }),
+        new Satellite({ ...defaultSat, id: 1, sccNum: '43013' }),
+        new Satellite({ ...defaultSat, id: 2, sccNum: '125544' }),
+        new Satellite({ ...defaultSat, id: 3, sccNum: '143013' }),
+      ];
+      wireUpServiceLocator(buildCatalog(sats));
+
+      searchManager.doSearch('25544,43013');
+      expect(settingsManager.lastSearchResults.sort((a, b) => a - b)).toEqual([0, 1]);
+    });
+
+    it('treats each term of a comma list as an exact catalog number', () => {
+      sats = [
+        new Satellite({ ...defaultSat, id: 0, sccNum: '70000' }),
+        new Satellite({ ...defaultSat, id: 1, sccNum: '270000' }),
+        new Satellite({ ...defaultSat, id: 2, sccNum: '25544' }),
+      ];
+      wireUpServiceLocator(buildCatalog(sats));
+
+      searchManager.doSearch('70000,25544');
+      expect(settingsManager.lastSearchResults.sort((a, b) => a - b)).toEqual([0, 2]);
+    });
+
     // 6+ digit catalog IDs made a plain "70000" query ambiguous: it substring-
     // matched 270000 too. Typing a leading zero ("070000") pins the width so
     // only the true 70000 matches.

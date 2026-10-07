@@ -253,65 +253,81 @@ export function runNumOnlySearch(searchString: string): { results: SearchResult[
   // Update last search with the most recent search results
   settingsManager.lastSearch = searchList;
 
-  // Initialize search results
-  const satData = (getSearchableObjects(true) as Satellite[]).sort((a, b) => (a.sccNum6 ?? a.sccNum ?? '').localeCompare(b.sccNum6 ?? b.sccNum ?? '', 'en', { numeric: true }));
+  // Skip sats with no catalog number (briefly possible after a reload).
+  const satData = (getSearchableObjects(true) as Satellite[])
+    .filter((sat) => Boolean(sat.sccNum6 ?? sat.sccNum))
+    .sort((a, b) => (a.sccNum6 ?? a.sccNum ?? '').localeCompare(b.sccNum6 ?? b.sccNum ?? '', 'en', { numeric: true }));
 
-  let i = 0;
-  let lastFoundI = 0;
+  // Zero-padded 6-digit key -> sats, so each term resolves to its exact object
+  // without a catalog scan. Matching on the padded key keeps a leading-zero
+  // query width-specific ("070000" -> only 70000, not 270000).
+  const satsByKey = new Map<string, Satellite[]>();
+
+  for (const sat of satData) {
+    const key = paddedSccKey(sat);
+    const bucket = satsByKey.get(key);
+
+    if (bucket) {
+      bucket.push(sat);
+    } else {
+      satsByKey.set(key, [sat]);
+    }
+  }
+
   const seenIds = new Set<number>();
-
-  searchList.forEach((searchStringIn) => {
-    // Don't search for things until at least the minimum characters
-    if (searchStringIn.length <= settingsManager.minimumSearchCharacters) {
+  const addResult = (sat: Satellite, term: string) => {
+    // Ignore Notional Satellites unless all 6 characters are entered
+    if (sat.type === SpaceObjectType.NOTIONAL && term.length < 6) {
       return;
     }
-    // Last one never got found
-    if (i >= satData.length) {
-      i = lastFoundI;
+    if (seenIds.has(sat.id)) {
+      return;
+    }
+    seenIds.add(sat.id);
+    totalFound++;
+    if (results.length < limit) {
+      const { strIndex, patlen } = noradHighlight(sat, term);
+
+      results.push({
+        strIndex,
+        patlen,
+        id: sat.id,
+        searchType: SearchResultType.NORAD_ID,
+      });
+    }
+  };
+
+  /*
+   * A comma list is a list of catalog numbers, so each term only resolves to
+   * its exact object. A lone term is someone typing, so it also collects
+   * substring hits ("70000" -> 70000 and 270000).
+   */
+  const isSingleTerm = searchList.length === 1;
+
+  for (const term of searchList) {
+    // Don't search for things until at least the minimum characters
+    if (term.length <= settingsManager.minimumSearchCharacters) {
+      continue;
     }
 
-    for (; i < satData.length; i++) {
-      const sat = satData[i];
+    const exactKey = term.padStart(6, '0');
 
-      // Ignore Notional Satellites unless all 6 characters are entered
-      if (sat.type === SpaceObjectType.NOTIONAL && searchStringIn.length < 6) {
-        continue;
-      }
+    for (const sat of satsByKey.get(exactKey) ?? []) {
+      addResult(sat, term);
+    }
 
-      // Skip sats with no catalog number (briefly possible after a reload).
-      if (!(sat.sccNum6 ?? sat.sccNum)) {
-        continue;
-      }
+    if (!isSingleTerm) {
+      continue;
+    }
 
-      // Match against the zero-padded 6-digit key so a leading-zero query is
-      // width-specific ("070000" -> only 70000, not 270000).
+    for (const sat of satData) {
       const matchKey = paddedSccKey(sat);
 
-      if (matchKey.includes(searchStringIn)) {
-        if (!seenIds.has(sat.id)) {
-          seenIds.add(sat.id);
-          totalFound++;
-          if (results.length < limit) {
-            const { strIndex, patlen } = noradHighlight(sat, searchStringIn);
-
-            results.push({
-              strIndex,
-              patlen,
-              id: sat.id,
-              searchType: SearchResultType.NORAD_ID,
-            });
-          }
-        }
-        lastFoundI = i;
-
-        // A full-width query (matches the whole padded key) is unique; stop
-        // scanning. A shorter query keeps scanning for further substring hits.
-        if (searchStringIn.length === matchKey.length) {
-          break;
-        }
+      if (matchKey !== exactKey && matchKey.includes(term)) {
+        addResult(sat, term);
       }
     }
-  });
+  }
 
   return { results, totalFound };
 }

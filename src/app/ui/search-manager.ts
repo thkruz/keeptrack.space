@@ -447,7 +447,8 @@ export class SearchManager {
     }
 
     if (idList.length === 0) {
-      if (settingsManager.lastSearch?.length > settingsManager.minimumSearchCharacters) {
+      // lastSearch is the term list, so test the typed string's length instead.
+      if (searchString_.length > settingsManager.minimumSearchCharacters) {
         uiManagerInstance.toast('No Results Found', ToastMsgType.serious, false);
       }
       this.hideResults();

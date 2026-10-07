@@ -298,9 +298,16 @@ export class SensorManager {
     // Return to default settings with nothing 'inview'
     SensorManager.updateSensorUiStyling(null);
     this.setSensor(null); // Pass sensorId to identify which sensor the user clicked
+    // Secondary and STF sensors keep their FOV meshes drawing otherwise.
+    this.secondarySensors = [];
+    this.stfSensors = [];
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     catalogManagerInstance.satCruncherThread.sendSensorUpdate([]);
+
+    // Lines anchored to the old sensor outlive it unless dropped here.
+    lineManagerInstance.removeLinesByKind('sensorToSat');
+    lineManagerInstance.removeLinesByKind('sensorScanHorizon');
 
     PluginRegistry.getPlugin(SensorFov)?.disableFovView();
     PluginRegistry.getPlugin(SensorSurvFence)?.disableSurvView();

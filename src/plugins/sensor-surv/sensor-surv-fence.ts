@@ -58,6 +58,11 @@ export class SensorSurvFence extends KeepTrackPlugin {
     super.addJs();
 
     EventBus.getInstance().on(EventBusEvent.sensorDotSelected, this.enableIfSensorSelected.bind(this));
+
+    EventBus.getInstance().on(EventBusEvent.resetSensor, (): void => {
+      this.disableSurvView();
+      this.setBottomIconToDisabled();
+    });
   }
 
   enableIfSensorSelected(sensor?: DetailedSensor): void {

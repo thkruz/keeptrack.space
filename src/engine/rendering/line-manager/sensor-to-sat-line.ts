@@ -40,6 +40,14 @@ export class SensorToSatLine extends Line {
 
     const eciArr = [posData[idx], posData[idx + 1], posData[idx + 2]] as EciArr3;
 
+    // The sensor was reset or swapped out from under this line.
+    if (!ServiceLocator.getSensorManager().getAllActiveSensors().includes(this.sensor)) {
+      this.isDraw_ = false;
+      this.isGarbage = true;
+
+      return;
+    }
+
     const sensorEci = this.sensor.eci(ServiceLocator.getTimeManager().simulationTimeObj);
     const sensorEciArr = [sensorEci.x, sensorEci.y, sensorEci.z] as EciArr3;
 

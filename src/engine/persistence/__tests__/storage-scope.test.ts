@@ -76,6 +76,7 @@ describe('storage-scope registry', () => {
         StorageKey.SETTINGS_SAT_LABEL_MODE_V2,
         StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG,
         StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS,
+        StorageKey.SETTINGS_DISABLE_TOASTS,
         StorageKey.SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED,
         StorageKey.SETTINGS_DRAW_AURORA,
         StorageKey.SETTINGS_DRAW_GRATICULE,

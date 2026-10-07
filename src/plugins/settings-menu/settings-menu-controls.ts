@@ -200,6 +200,7 @@ const ownDescriptors_ = (): { general: OwnSettingDescriptor[]; fastCpu: OwnSetti
     demoModeToggle_(),
     boolToggle_('enableFreezeTime', 'isFreezePropRateOnDrag', false),
     boolToggle_('compensateEarthRotation', 'isCompensateForEarthRotation', true),
+    boolToggle_('disableToasts', 'isDisableToasts', false),
   ],
   fastCpu: [boolToggle_('showNextPassOnHover', 'isShowNextPass', false)],
 });

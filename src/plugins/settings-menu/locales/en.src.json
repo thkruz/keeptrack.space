@@ -28,6 +28,7 @@
         "enableDemoMode": "Enable Demo Mode",
         "enableFreezeTime": "Enable Freeze Time on Click",
         "compensateEarthRotation": "Compensate for Earth Rotation",
+        "disableToasts": "Disable Pop-up Notifications",
         "showNextPassOnHover": "Show Next Pass on Hover"
       },
       "tooltips": {
@@ -42,6 +43,7 @@
         "enableDemoMode": "Every 3 seconds a new satellite will be selected from FOV",
         "enableFreezeTime": "Time will freeze as you rotate the camera.",
         "compensateEarthRotation": "Compensate camera yaw for Earth rotation so the view stays fixed to geographic coordinates.",
+        "disableToasts": "Hide the toast messages that appear in the corner. Errors are still written to the browser console.",
         "showNextPassOnHover": "Show the next pass time when hovering over a satellite in the selected sensor's field of view."
       },
       "help": {

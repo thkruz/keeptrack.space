@@ -28,6 +28,7 @@
         "enableDemoMode": "Activer le mode démo",
         "enableFreezeTime": "Figer le temps au clic",
         "compensateEarthRotation": "Compenser la rotation de la Terre",
+        "disableToasts": "Désactiver les notifications contextuelles",
         "showNextPassOnHover": "Afficher le prochain passage au survol"
       },
       "tooltips": {
@@ -42,6 +43,7 @@
         "enableDemoMode": "Toutes les 3 secondes, un nouveau satellite sera sélectionné dans le FOV",
         "enableFreezeTime": "Le temps se figera pendant que vous faites pivoter la caméra.",
         "compensateEarthRotation": "Compense le lacet de la caméra selon la rotation de la Terre afin que la vue reste fixée aux coordonnées géographiques.",
+        "disableToasts": "Masque les messages qui apparaissent dans le coin. Les erreurs sont toujours écrites dans la console du navigateur.",
         "showNextPassOnHover": "Affiche l'heure du prochain passage au survol d'un satellite situé dans le champ de vision du capteur sélectionné."
       },
       "help": {

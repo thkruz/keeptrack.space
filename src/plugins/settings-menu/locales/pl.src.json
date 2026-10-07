@@ -28,6 +28,7 @@
         "enableDemoMode": "Włącz tryb demo",
         "enableFreezeTime": "Zatrzymaj czas po kliknięciu",
         "compensateEarthRotation": "Kompensuj obrót Ziemi",
+        "disableToasts": "Wyłącz powiadomienia wyskakujące",
         "showNextPassOnHover": "Pokaż następny przelot po najechaniu"
       },
       "tooltips": {
@@ -42,6 +43,7 @@
         "enableDemoMode": "Co 3 sekundy z FOV będzie wybierany nowy satelita",
         "enableFreezeTime": "Czas zatrzyma się podczas obracania kamery.",
         "compensateEarthRotation": "Kompensuje odchylenie kamery względem obrotu Ziemi, dzięki czemu widok pozostaje przypięty do współrzędnych geograficznych.",
+        "disableToasts": "Ukrywa komunikaty pojawiające się w rogu. Błędy nadal są zapisywane w konsoli przeglądarki.",
         "showNextPassOnHover": "Pokazuje czas następnego przelotu po najechaniu kursorem na satelitę w polu widzenia wybranego czujnika."
       },
       "help": {

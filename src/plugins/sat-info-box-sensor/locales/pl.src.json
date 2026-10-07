@@ -12,7 +12,8 @@
         "maxTmxTime": "Maks. czas Tmx",
         "sun": "Słońce",
         "visMag": "Jasność wiz.",
-        "nextPass": "Następny przelot"
+        "nextPass": "Następny przelot",
+        "reason": "Poza zasięgiem"
       },
       "tooltips": {
         "range": "Odległość od czujnika",
@@ -24,7 +25,8 @@
         "maxTmxTime": "Czas potrzebny sygnałowi RF/światłu na dotarcie do celu i powrót",
         "sun": "Czy Słońce wpływa na czujnik",
         "visMag": "Jasność wizualna (niższe wartości oznaczają jaśniejsze obiekty)",
-        "nextPass": "Następny czas w zasięgu"
+        "nextPass": "Następny czas w zasięgu",
+        "reason": "Dlaczego obiekt jest poza polem widzenia sensora"
       },
       "values": {
         "noEffect": "Brak wpływu",
@@ -35,7 +37,13 @@
         "unableToCalculate": "Nie można obliczyć",
         "outOfFov": "Poza polem widzenia",
         "unavailable": "Niedostępne",
-        "beyondMaxRange": "Poza maksymalnym zasięgiem"
+        "beyondMaxRange": "Poza maksymalnym zasięgiem",
+        "reasonMinRange": "Odległość {{value}} poniżej min. {{limit}}",
+        "reasonMaxRange": "Odległość {{value}} powyżej maks. {{limit}}",
+        "reasonMinEl": "Elewacja {{value}} poniżej min. {{limit}}",
+        "reasonMaxEl": "Elewacja {{value}} powyżej maks. {{limit}}",
+        "reasonAzimuth": "Azymut {{value}} poza zakresem {{min}} do {{max}}",
+        "reasonCone": "Poza stożkiem osi celowania sensora"
       }
     }
   }

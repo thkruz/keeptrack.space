@@ -1,5 +1,5 @@
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
-import { RfSensor } from '@app/app/sensors/DetailedSensor';
+import { DetailedSensor, RfSensor } from '@app/app/sensors/DetailedSensor';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -171,6 +171,39 @@ describe('SatInfoBoxSensor', () => {
       expect(sunEl).toBeDefined();
       // For optical sensors during nighttime, should show the computed sun status
       expect(sunEl!.innerHTML).not.toBe('-');
+    });
+  });
+
+  describe('Not in View reason row', () => {
+    it('shows the broken bound with the real look angles when the object is out of FOV', () => {
+      const plugin = new SatInfoBoxSensor();
+
+      websiteInit(plugin);
+      vi.spyOn(DetailedSensor.prototype, 'isRaeInFov').mockReturnValue(false);
+      vi.spyOn(DetailedSensor.prototype, 'getFovRejectReason').mockReturnValue({ kind: 'minEl', value: 1.24, limit: 3 });
+
+      setupSensorAndSat(defaultSensor);
+      triggerFrameUpdate();
+
+      const reasonEl = getEl('sat-fov-reason')!;
+
+      expect(reasonEl.innerHTML).toBe('Elevation 1.2° below min 3.0°');
+      expect(reasonEl.parentElement!.style.display).toBe('flex');
+      // Look angles stay visible instead of the old "Out of FOV" placeholder.
+      expect(getEl('sat-elevation')!.innerHTML).not.toBe('Out of FOV');
+      expect(getEl('sat-range')!.innerHTML).toMatch(/km$/u);
+    });
+
+    it('hides the row while the object is in view', () => {
+      const plugin = new SatInfoBoxSensor();
+
+      websiteInit(plugin);
+      vi.spyOn(DetailedSensor.prototype, 'isRaeInFov').mockReturnValue(true);
+
+      setupSensorAndSat(defaultSensor);
+      triggerFrameUpdate();
+
+      expect(getEl('sat-fov-reason')!.parentElement!.style.display).toBe('none');
     });
   });
 });

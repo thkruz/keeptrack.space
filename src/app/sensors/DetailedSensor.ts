@@ -134,6 +134,15 @@ export interface DetailedSensorParams extends Omit<GroundStationParams, 'id'> {
  * });
  * ```
  */
+/** A single failed field-of-view bound, with the offending value and the limit it broke. */
+export interface FovRejectReason {
+  kind: 'minRange' | 'maxRange' | 'minEl' | 'maxEl' | 'azimuth' | 'cone';
+  value: number;
+  limit: number;
+  /** Upper azimuth bound, only for `azimuth`. */
+  limit2?: number;
+}
+
 export class DetailedSensor extends GroundStation {
   // Legacy identifiers
   objName: string;
@@ -485,6 +494,37 @@ export class DetailedSensor extends GroundStation {
     }
 
     return this.checkFovBoundsLegacy_(az, el, rng);
+  }
+
+  /**
+   * Why a look angle is outside the field of view, or null when it is inside.
+   * Mirrors the order of {@link checkFovBounds_} (range, then elevation, then
+   * azimuth) against the primary face; a secondary face that also fails is
+   * not reported separately. Cone-model sensors can only say "outside cone".
+   */
+  getFovRejectReason(az: Degrees, el: Degrees, rng: Kilometers): FovRejectReason | null {
+    if (this.isRaeInFov(az, el, rng)) {
+      return null;
+    }
+
+    if (this.fovParams && this.sensor_) {
+      return { kind: 'cone', value: el, limit: el };
+    }
+
+    if (rng < this.minRng) {
+      return { kind: 'minRange', value: rng, limit: this.minRng };
+    }
+    if (rng > this.maxRng) {
+      return { kind: 'maxRange', value: rng, limit: this.maxRng };
+    }
+    if (el < this.minEl) {
+      return { kind: 'minEl', value: el, limit: this.minEl };
+    }
+    if (el > this.maxEl) {
+      return { kind: 'maxEl', value: el, limit: this.maxEl };
+    }
+
+    return { kind: 'azimuth', value: az, limit: this.minAz, limit2: this.maxAz };
   }
 
   /**

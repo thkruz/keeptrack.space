@@ -12,7 +12,8 @@
         "maxTmxTime": "最大 Tmx 時間",
         "sun": "太陽",
         "visMag": "視等級",
-        "nextPass": "次のパス"
+        "nextPass": "次のパス",
+        "reason": "非可視の理由"
       },
       "tooltips": {
         "range": "センサーからの距離",
@@ -24,7 +25,8 @@
         "maxTmxTime": "RF/光がターゲットに到達して戻るまでの時間",
         "sun": "太陽がセンサーに影響するか",
         "visMag": "視等級（数値が低いほど明るい）",
-        "nextPass": "次にカバレッジに入る時間"
+        "nextPass": "次にカバレッジに入る時間",
+        "reason": "対象がセンサーの視野外にある理由"
       },
       "values": {
         "noEffect": "影響なし",
@@ -35,7 +37,13 @@
         "unableToCalculate": "計算不能",
         "outOfFov": "FOV 外",
         "unavailable": "利用不可",
-        "beyondMaxRange": "最大距離超過"
+        "beyondMaxRange": "最大距離超過",
+        "reasonMinRange": "距離 {{value}} が最小 {{limit}} 未満",
+        "reasonMaxRange": "距離 {{value}} が最大 {{limit}} 超過",
+        "reasonMinEl": "仰角 {{value}} が最小 {{limit}} 未満",
+        "reasonMaxEl": "仰角 {{value}} が最大 {{limit}} 超過",
+        "reasonAzimuth": "方位角 {{value}} が {{min}}〜{{max}} の範囲外",
+        "reasonCone": "センサーの視軸コーンの外"
       }
     }
   }

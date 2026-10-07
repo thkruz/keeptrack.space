@@ -12,7 +12,8 @@
         "maxTmxTime": "Max. Tmx-Zeit",
         "sun": "Sonne",
         "visMag": "Vis. Mag.",
-        "nextPass": "Nächster Überflug"
+        "nextPass": "Nächster Überflug",
+        "reason": "Nicht sichtbar"
       },
       "tooltips": {
         "range": "Entfernung vom Sensor",
@@ -24,7 +25,8 @@
         "maxTmxTime": "Zeit für RF/Licht zum Ziel und zurück",
         "sun": "Beeinflusst die Sonne den Sensor",
         "visMag": "Visuelle Magnitude (Niedrigere Zahlen sind heller)",
-        "nextPass": "Nächste Zeit in Abdeckung"
+        "nextPass": "Nächste Zeit in Abdeckung",
+        "reason": "Warum das Objekt außerhalb des Sensor-Sichtfelds liegt"
       },
       "values": {
         "noEffect": "Keine Auswirkung",
@@ -35,7 +37,13 @@
         "unableToCalculate": "Berechnung nicht möglich",
         "outOfFov": "Außerhalb des FOV",
         "unavailable": "Nicht verfügbar",
-        "beyondMaxRange": "Jenseits der maximalen Reichweite"
+        "beyondMaxRange": "Jenseits der maximalen Reichweite",
+        "reasonMinRange": "Entfernung {{value}} unter Min. {{limit}}",
+        "reasonMaxRange": "Entfernung {{value}} über Max. {{limit}}",
+        "reasonMinEl": "Elevation {{value}} unter Min. {{limit}}",
+        "reasonMaxEl": "Elevation {{value}} über Max. {{limit}}",
+        "reasonAzimuth": "Azimut {{value}} außerhalb {{min}} bis {{max}}",
+        "reasonCone": "Außerhalb des Sensor-Blickkegels"
       }
     }
   }

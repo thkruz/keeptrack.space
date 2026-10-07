@@ -86,7 +86,8 @@ describe('StereoMapPlugin_class', () => {
       expect(helpConfig.sections!.length).toBeGreaterThanOrEqual(3);
       expect(helpConfig.sections![0].image?.src).toContain('img/help/stereo-map/');
       expect(helpConfig.tips!.length).toBeGreaterThan(0);
-      expect(helpConfig.shortcuts).toEqual([expect.objectContaining({ keys: ['M'] })]);
+      // The shortcut row is derived from the registry at render time, not hand-written here.
+      expect(helpConfig.shortcuts).toBeUndefined();
     });
 
     it('should return correct keyboard shortcuts', () => {

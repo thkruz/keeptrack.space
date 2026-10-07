@@ -322,8 +322,11 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
   getKeyboardShortcuts(): IKeyboardShortcut[] {
     return [
       {
-        key: 'l',
+        // Shift+Backspace: Shift+L is the orbit-lines toggle, so a lowercase 'l'
+        // with shift held could never fire.
+        key: 'Backspace',
         shift: true,
+        description: t7e('keyboard.descriptions.clearLines' as Parameters<typeof t7e>[0]),
         callback: () => {
           lineManagerInstance.clear();
         },

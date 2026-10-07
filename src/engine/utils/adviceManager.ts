@@ -19,7 +19,9 @@
  */
 
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { KeyboardComponent } from '@app/engine/plugins/components/keyboard/keyboard-component';
 import { KeepTrack } from '@app/keeptrack';
+import { TranslationKey, t7e } from '@app/locales/keys';
 import { EventBus } from '../events/event-bus';
 import { html } from './development/formatter';
 import { getEl } from './get-el';
@@ -66,18 +68,22 @@ export class AdviceManager {
     this.helpHeaderDOM = getEl('help-header')!;
     this.helpTextDOM = getEl('help-text')!;
 
-    // TODO: This should be registered with the keyboard class
-    window.onkeydown = (e: KeyboardEvent) => {
-      // If Shift + F1
-      if (e.shiftKey && e.code === 'F1') {
-        if (this.isAdviceOpen) {
-          this.isAdviceOpen = false;
-          this.helpOuterDOM.style.display = 'none';
-        } else {
-          EventBus.getInstance().emit(EventBusEvent.onHelpMenuClick);
-        }
-      }
-    };
+    new KeyboardComponent('AdviceManager', [
+      {
+        key: 'F1',
+        code: 'F1',
+        shift: true,
+        description: t7e('keyboard.descriptions.openHelp' as TranslationKey),
+        callback: () => {
+          if (this.isAdviceOpen) {
+            this.isAdviceOpen = false;
+            this.helpOuterDOM.style.display = 'none';
+          } else {
+            EventBus.getInstance().emit(EventBusEvent.onHelpMenuClick);
+          }
+        },
+      },
+    ]).init();
   }
 
   public isEnabled(): boolean {

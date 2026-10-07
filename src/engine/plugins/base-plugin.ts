@@ -597,6 +597,12 @@ export abstract class KeepTrackPlugin {
     if (hasKeyboardShortcuts(this)) {
       const shortcuts = this.getKeyboardShortcuts();
 
+      // A lone shortcut on a plugin with a bottom icon is, by convention, its
+      // menu toggle; give it a description so guides never fall back to the id.
+      if (shortcuts.length === 1 && !shortcuts[0].description && this.bottomIconLabel) {
+        shortcuts[0].description = t7e('keyboard.toggleMenu' as TranslationKey, { name: this.bottomIconLabel });
+      }
+
       this.keyboardComponent_ = new KeyboardComponent(
         this.id,
         shortcuts,

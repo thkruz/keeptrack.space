@@ -152,6 +152,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
         key: 'V',
         ctrl: true,
         shift: true,
+        description: t7e('keyboard.toggleMenu' as Parameters<typeof t7e>[0], { name: this.bottomIconLabel }),
         callback: () => {
           if (ServiceLocator.getMainCamera().cameraType === CameraType.FPS) {
             return;
@@ -164,6 +165,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
         key: 'R',
         ctrl: true,
         shift: true,
+        description: t7e('keyboard.descriptions.autoRotate' as Parameters<typeof t7e>[0]),
         callback: () => this.toggleAutoRotate_(),
       },
     ];

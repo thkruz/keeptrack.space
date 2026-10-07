@@ -124,7 +124,6 @@ export class NewLaunch extends KeepTrackPlugin {
         },
       ],
       tips: [t7e('plugins.NewLaunch.help.tip1'), t7e('plugins.NewLaunch.help.tip2')],
-      shortcuts: [{ keys: ['Shift', 'L'], description: t7e('plugins.NewLaunch.help.shortcutOpen' as T7eKey) }],
     };
   }
 

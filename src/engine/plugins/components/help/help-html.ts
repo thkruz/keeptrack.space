@@ -19,6 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
 import { t7e } from '@app/locales/keys';
 import { IHelpConfig, IHelpImage, IHelpSection, IHelpShortcut } from '../../core/plugin-capabilities';
 
@@ -69,19 +70,49 @@ const buildShortcutsHtml_ = (shortcuts: IHelpShortcut[]): string => {
 };
 
 /**
+ * The shortcuts to show for a plugin: every binding it actually registered
+ * (so the help can never name a key the plugin does not own), followed by any
+ * hand-written entries for keys the registry does not know about, such as
+ * Esc or Enter inside a modal. A hand-written entry whose chord matches a
+ * registered one is dropped as a duplicate.
+ */
+export const resolveHelpShortcuts = (config: IHelpConfig, pluginId?: string): IHelpShortcut[] => {
+  const registered = pluginId ? KeyboardShortcutRegistry.getForPlugin(pluginId) : [];
+  const resolved: IHelpShortcut[] = registered
+    .filter((entry) => entry.shortcut.description)
+    .map((entry) => ({ keys: KeyboardShortcutRegistry.formatShortcutKeys(entry.shortcut), description: entry.shortcut.description! }));
+  const seen = new Set(resolved.map((shortcut) => shortcut.keys.join('+').toLowerCase()));
+
+  for (const shortcut of config.shortcuts ?? []) {
+    const chord = shortcut.keys.join('+').toLowerCase();
+
+    if (!seen.has(chord)) {
+      seen.add(chord);
+      resolved.push(shortcut);
+    }
+  }
+
+  return resolved;
+};
+
+/**
  * Build the HTML for a help dialog from a structured help config.
  *
  * Legacy configs that only define `body` are passed through unchanged so
- * existing plugins keep rendering exactly as before.
+ * existing plugins keep rendering exactly as before. When `pluginId` is given,
+ * the shortcuts section is derived from the registry (see
+ * {@link resolveHelpShortcuts}).
  */
-export const buildHelpHtml = (config: IHelpConfig): string => {
-  if (!config.sections && !config.tips && !config.shortcuts) {
+export const buildHelpHtml = (config: IHelpConfig, pluginId?: string): string => {
+  const shortcutList = resolveHelpShortcuts(config, pluginId);
+
+  if (!config.sections && !config.tips && !config.shortcuts && shortcutList.length === 0) {
     return config.body ?? '';
   }
 
   const sections = (config.sections ?? []).map(buildSectionHtml_).join('');
   const tips = config.tips && config.tips.length > 0 ? buildTipsHtml_(config.tips) : '';
-  const shortcuts = config.shortcuts && config.shortcuts.length > 0 ? buildShortcutsHtml_(config.shortcuts) : '';
+  const shortcuts = shortcutList.length > 0 ? buildShortcutsHtml_(shortcutList) : '';
 
   return `<div class="help-rich">${sections}${tips}${shortcuts}</div>`;
 };

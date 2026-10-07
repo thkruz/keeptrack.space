@@ -67,6 +67,7 @@ export abstract class UrlManager {
       {
         key: 'U',
         // Force-write the full state to the URL bar even when live updates are disabled.
+        description: t7e('keyboard.descriptions.updateUrl' as Parameters<typeof t7e>[0]),
         callback: () => this.updateURL(true, true),
       },
     ]).init();

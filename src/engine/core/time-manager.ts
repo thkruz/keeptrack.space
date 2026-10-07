@@ -207,9 +207,12 @@ export class TimeManager {
       return;
     }
 
+    const d = (key: string) => t7e(`keyboard.descriptions.${key}` as Parameters<typeof t7e>[0]);
+
     new KeyboardComponent('TimeManager', [
       {
         key: 't',
+        description: d('realTime'),
         callback: () => {
           if (!this.guardTimeChange_()) {
             return;
@@ -221,6 +224,7 @@ export class TimeManager {
       {
         key: ',',
         shift: false,
+        description: d('slowDown'),
         callback: () => {
           if (!this.guardTimeChange_()) {
             return;
@@ -244,6 +248,7 @@ export class TimeManager {
       },
       {
         key: '.',
+        description: d('speedUp'),
         callback: () => {
           if (!this.guardTimeChange_()) {
             return;
@@ -267,6 +272,7 @@ export class TimeManager {
       },
       {
         key: '<',
+        description: d('jumpBack'),
         callback: () => {
           if (!this.guardTimeChange_()) {
             return;
@@ -277,6 +283,7 @@ export class TimeManager {
       },
       {
         key: '>',
+        description: d('jumpForward'),
         callback: () => {
           if (!this.guardTimeChange_()) {
             return;
@@ -287,6 +294,7 @@ export class TimeManager {
       },
       {
         key: '/',
+        description: d('togglePause'),
         callback: () => {
           if (!this.guardTimeChange_()) {
             return;
@@ -300,6 +308,7 @@ export class TimeManager {
       {
         key: '=',
         code: 'Equal',
+        description: d('stepForward'),
         callback: () => {
           if (!this.guardTimeChange_()) {
             return;
@@ -311,6 +320,7 @@ export class TimeManager {
       {
         key: '-',
         code: 'Minus',
+        description: d('stepBack'),
         callback: () => {
           if (!this.guardTimeChange_()) {
             return;

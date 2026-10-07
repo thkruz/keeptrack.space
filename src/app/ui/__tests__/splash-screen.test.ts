@@ -1,5 +1,8 @@
 import { MobileManager } from '@app/app/ui/mobileManager';
 import { SplashScreen } from '@app/app/ui/splash-screen';
+import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -43,6 +46,40 @@ describe('SplashScreen_class', () => {
     KeepTrack.getInstance().containerRoot.innerHTML = '<div id="loader-text"></div>';
     SplashScreen.loadStr('test');
     expect(getEl('loader-text')?.textContent).toBe('test');
+  });
+
+  describe('hints', () => {
+    afterEach(() => {
+      KeyboardShortcutRegistry.clear();
+    });
+
+    it('builds shortcut tips from described registry entries and skips undocumented ones', () => {
+      KeyboardShortcutRegistry.clear();
+      KeyboardShortcutRegistry.register('CameraInputHandler', [
+        { key: 'ArrowUp', description: 'Pan the camera', callback: () => undefined },
+        { key: 'ArrowDown', description: 'Pan the camera', callback: () => undefined },
+        { key: 'x', callback: () => undefined },
+      ]);
+      KeyboardShortcutRegistry.registerInfo('PluginDrawer', [{ key: 'Tab', description: 'Toggle the plugin drawer', callback: () => undefined }]);
+
+      const hints = SplashScreen.collectHints();
+      const shortcutHints = hints.filter((h) => h.startsWith('Press '));
+
+      expect(shortcutHints).toEqual(['Press ↑: Pan the camera', 'Press ↓: Pan the camera', 'Press Tab: Toggle the plugin drawer']);
+      // The static tips that named keys are gone; only key-free ones remain.
+      expect(hints.some((h) => /Press the '[A-Z]' key/u.test(h))).toBe(false);
+      expect(hints.length).toBeGreaterThan(shortcutHints.length);
+    });
+
+    it('fills the hint element once the UI is up', () => {
+      KeyboardShortcutRegistry.clear();
+      KeyboardShortcutRegistry.register('OrbitManager', [{ key: 'L', description: 'Toggle orbit lines', callback: () => undefined }]);
+      vi.spyOn(Math, 'random').mockReturnValue(0.999999);
+
+      expect(getEl('loading-hint-text')?.textContent).toBe('');
+      EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+      expect(getEl('loading-hint-text')?.textContent).toBe('Press L: Toggle orbit lines');
+    });
   });
 
   describe('resetDisplaySettings_ (boot recovery)', () => {

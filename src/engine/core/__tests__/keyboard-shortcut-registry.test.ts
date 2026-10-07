@@ -86,8 +86,8 @@ const pluginShortcuts: { pluginId: string; shortcuts: Omit<IKeyboardShortcut, 'c
   { pluginId: 'PolarPlot', shortcuts: [{ key: 'P' }] },
   // src/plugins/political-map-toggle/political-map-toggle.ts (shift:false; owns plain 'l', Shift+l is DrawLines)
   { pluginId: 'PoliticalMapToggle', shortcuts: [{ key: 'l', shift: false }] },
-  // src/plugins/draw-lines/draw-lines.ts
-  { pluginId: 'DrawLinesPlugin', shortcuts: [{ key: 'l', shift: true }] },
+  // src/plugins/draw-lines/draw-lines.ts (Shift+Backspace clears drawn lines; Shift+L is OrbitManager's)
+  { pluginId: 'DrawLinesPlugin', shortcuts: [{ key: 'Backspace', shift: true }] },
   // src/plugins/proximity-ops/proximity-ops.ts
   { pluginId: 'ProximityOps', shortcuts: [{ key: 'X' }] },
   // src/plugins/reentries/reentries.ts
@@ -110,8 +110,8 @@ const pluginShortcuts: { pluginId: string; shortcuts: Omit<IKeyboardShortcut, 'c
   { pluginId: 'SatellitePhotos', shortcuts: [{ key: 'H' }] },
   // src/plugins/satellite-view/satellite-view.ts
   { pluginId: 'SatelliteView', shortcuts: [{ key: '5' }] },
-  // src/plugins/settings-menu/settings-menu.ts
-  { pluginId: 'SettingsMenuPlugin', shortcuts: [{ key: ',', code: 'Comma', shift: true }] },
+  // src/plugins/settings-menu/settings-menu.ts (Ctrl+Comma; Shift+Comma is TimeManager's '<')
+  { pluginId: 'SettingsMenuPlugin', shortcuts: [{ key: ',', code: 'Comma', ctrl: true, shift: false }] },
   // src/plugins/transponder-channel-data/transponder-channel-data.ts
   { pluginId: 'TransponderChannelData', shortcuts: [{ key: 'T' }] },
   // src/plugins/video-director/video-director.ts
@@ -309,6 +309,49 @@ describe('KeyboardShortcutRegistry', () => {
 
       expect(result).toHaveLength(1);
       expect(KeyboardShortcutRegistry.getConflicts()).toHaveLength(0);
+    });
+  });
+
+  describe('registerInfo / getAllForDisplay / getForPlugin', () => {
+    it('keeps info-only bindings out of conflict detection but in the display list', () => {
+      const cb = vi.fn();
+
+      KeyboardShortcutRegistry.registerInfo('CameraInputHandler', [{ key: 'W', description: 'Move', callback: cb }]);
+      // A plugin may still claim W as a real shortcut.
+      const accepted = KeyboardShortcutRegistry.register('WatchlistPlugin', [{ key: 'W', callback: cb }]);
+
+      expect(accepted).toHaveLength(1);
+      expect(KeyboardShortcutRegistry.getConflicts()).toHaveLength(0);
+      expect(KeyboardShortcutRegistry.getAll()).toHaveLength(1);
+      expect(KeyboardShortcutRegistry.getAllForDisplay()).toHaveLength(2);
+      expect(KeyboardShortcutRegistry.getAllForDisplay().find((e) => e.pluginId === 'CameraInputHandler')?.isInfoOnly).toBe(true);
+    });
+
+    it('getForPlugin returns registered and info-only entries for one owner, in order', () => {
+      const cb = vi.fn();
+
+      KeyboardShortcutRegistry.register('PluginA', [{ key: 'a', callback: cb }]);
+      KeyboardShortcutRegistry.register('PluginB', [{ key: 'b', callback: cb }]);
+      KeyboardShortcutRegistry.registerInfo('PluginA', [{ key: 'Tab', callback: cb }]);
+
+      expect(KeyboardShortcutRegistry.getForPlugin('PluginA').map((e) => e.shortcut.key)).toEqual(['a', 'Tab']);
+      expect(KeyboardShortcutRegistry.getForPlugin('Nobody')).toEqual([]);
+    });
+
+    it('clear() also drops info-only entries', () => {
+      KeyboardShortcutRegistry.registerInfo('PluginA', [{ key: 'Tab', callback: vi.fn() }]);
+      KeyboardShortcutRegistry.clear();
+
+      expect(KeyboardShortcutRegistry.getAllForDisplay()).toHaveLength(0);
+    });
+  });
+
+  describe('formatShortcutKeys', () => {
+    it('returns modifier chips first and names unreadable keys', () => {
+      expect(KeyboardShortcutRegistry.formatShortcutKeys({ key: ' ', callback: vi.fn() })).toEqual(['Space']);
+      expect(KeyboardShortcutRegistry.formatShortcutKeys({ key: 'ArrowUp', callback: vi.fn() })).toEqual(['↑']);
+      expect(KeyboardShortcutRegistry.formatShortcutKeys({ key: 'F', ctrl: true, shift: true, callback: vi.fn() })).toEqual(['Ctrl', 'Shift', 'F']);
+      expect(KeyboardShortcutRegistry.formatShortcut({ key: 'Escape', shift: true, callback: vi.fn() })).toBe('Shift+Esc');
     });
   });
 

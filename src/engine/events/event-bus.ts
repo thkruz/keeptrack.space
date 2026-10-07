@@ -62,8 +62,8 @@ export interface EngineEventMap {
   [EventBusEvent.remoteSettingsApplied]: [StorageKey[]]; // locally-changed keys from an account sync
   [EventBusEvent.filterChanged]: [];
   [EventBusEvent.loadSettings]: [];
-  [EventBusEvent.KeyDown]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
-  [EventBusEvent.KeyUp]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
+  [EventBusEvent.KeyDown]: [string, string, boolean, boolean, boolean, boolean?]; // key, code, isRepeat, isShiftKey, isCtrlKey, isAltKey
+  [EventBusEvent.KeyUp]: [string, string, boolean, boolean, boolean, boolean?]; // key, code, isRepeat, isShiftKey, isCtrlKey, isAltKey
   [EventBusEvent.KeyPress]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
   [EventBusEvent.parseGetVariables]: [string[]]; // params
   [EventBusEvent.searchUpdated]: [string, number, number]; // search term, result count, search limit

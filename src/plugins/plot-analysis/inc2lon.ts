@@ -116,7 +116,6 @@ export class Inc2LonPlots extends KeepTrackPlugin {
         },
       ],
       tips: [t7e('plugins.Inc2LonPlots.help.tip1'), t7e('plugins.Inc2LonPlots.help.tip2')],
-      shortcuts: [{ keys: ['G'], description: t7e('plugins.Inc2LonPlots.help.shortcutToggle') }],
     };
   }
 

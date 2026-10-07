@@ -106,11 +106,6 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
         },
       ],
       tips: [this.t_('help.tip1'), this.t_('help.tip2')],
-      shortcuts: [
-        { keys: ['P'], description: this.t_('help.shortcutToggle') },
-        { keys: ['Home'], description: this.t_('help.shortcutHome') },
-        { keys: ['Shift', 'Home'], description: this.t_('help.shortcutCenterEarth') },
-      ],
     };
   }
 
@@ -159,6 +154,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
     return [
       {
         key: 'p',
+        description: this.t_('help.shortcutToggle'),
         callback: () => {
           if (ServiceLocator.getMainCamera().cameraType === CameraType.FPS) {
             return;
@@ -171,6 +167,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
         shift: true,
         // ctrl:false so Ctrl+Home stays exclusively Sensor List's snap shortcut.
         ctrl: false,
+        description: this.t_('help.shortcutCenterEarth'),
         callback: () => {
           if (settingsManager.isDisablePlanets) {
             return;
@@ -183,6 +180,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
         shift: false,
         // ctrl:false so Ctrl+Home stays exclusively Sensor List's snap shortcut.
         ctrl: false,
+        description: this.t_('help.shortcutHome'),
         callback: () => {
           if (settingsManager.isDisablePlanets) {
             return;

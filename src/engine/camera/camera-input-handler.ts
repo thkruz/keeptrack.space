@@ -1,6 +1,7 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
 import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
+import { TranslationKey, t7e } from '@app/locales/keys';
 import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
@@ -86,21 +87,37 @@ export class CameraInputHandler {
     const noop = () => {
       /* handled via EventBus */
     };
+    const d = (key: string) => t7e(`keyboard.descriptions.${key}` as TranslationKey);
     const cameraShortcuts: IKeyboardShortcut[] = [
-      { key: 'ArrowUp', callback: noop },
-      { key: 'ArrowDown', callback: noop },
-      { key: 'ArrowLeft', callback: noop },
-      { key: 'ArrowRight', callback: noop },
-      // WASD+QE omitted — camera handles them via EventBus and they are
-      // only active in FPS / special camera modes.  Keeping them out of the
-      // registry lets plugins claim those keys for menu toggles.
-      { key: 'r', callback: noop },
-      { key: 'v', callback: noop },
-      { key: '`', callback: noop },
-      { key: 'Shift', callback: noop },
+      { key: 'ArrowUp', description: d('panCamera'), callback: noop },
+      { key: 'ArrowDown', description: d('panCamera'), callback: noop },
+      { key: 'ArrowLeft', description: d('panCamera'), callback: noop },
+      { key: 'ArrowRight', description: d('panCamera'), callback: noop },
+      { key: 'r', description: d('autoRotate'), callback: noop },
+      { key: 'v', description: d('cycleCameraMode'), callback: noop },
+      { key: '`', description: d('resetCamera'), callback: noop },
+      { key: 'Shift', description: d('precisionMode'), callback: noop },
     ];
 
     KeyboardShortcutRegistry.register('CameraInputHandler', cameraShortcuts);
+
+    /*
+     * WASD+QE and the numpad are handled via EventBus below and only act in
+     * FPS / special camera modes. They stay out of conflict detection so
+     * plugins can claim those keys for menu toggles, but the guides list them.
+     */
+    KeyboardShortcutRegistry.registerInfo('CameraInputHandler', [
+      { key: 'W', description: d('moveCamera'), callback: noop },
+      { key: 'A', description: d('moveCamera'), callback: noop },
+      { key: 'S', description: d('moveCamera'), callback: noop },
+      { key: 'D', description: d('moveCamera'), callback: noop },
+      { key: 'Q', description: d('rollCamera'), callback: noop },
+      { key: 'E', description: d('rollCamera'), callback: noop },
+      { key: 'Numpad 8/2/4/6', description: d('numpadRotate'), callback: noop },
+      { key: 'Numpad +', description: d('zoomIn'), callback: noop },
+      { key: 'Numpad -', description: d('zoomOut'), callback: noop },
+      { key: 'Right Shift', description: d('run'), callback: noop },
+    ]);
 
     const keysDown = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'r', 'v', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
     const keysUp = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];

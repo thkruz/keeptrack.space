@@ -116,13 +116,18 @@ export type TranslationKey = typeof Keys[number];
  * or another localization library implementation.
  */
 export function t7e(key: TranslationKey, options?: Record<string, any>): string {
+  // Interpolated strings depend on their options, so only plain lookups are cached.
+  if (options) {
+    return i18next.t(key, options) as string;
+  }
+
   // Check if the translation is already cached
   if (translationCache.has(key)) {
     return translationCache.get(key)!;
   }
 
   // Perform the translation using i18next
-  const translatedString = i18next.t(key, options) as string;
+  const translatedString = i18next.t(key) as string;
 
   // Cache the translation
   translationCache.set(key, translatedString);

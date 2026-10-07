@@ -195,7 +195,6 @@ export class StereoMap extends KeepTrackPlugin {
         },
       ],
       tips: [t7e('plugins.StereoMap.help.tip1'), t7e('plugins.StereoMap.help.tip2'), t7e('plugins.StereoMap.help.tip3')],
-      shortcuts: [{ keys: ['M'], description: t7e('plugins.StereoMap.help.shortcutToggle') }],
     };
   }
 
@@ -214,7 +213,7 @@ export class StereoMap extends KeepTrackPlugin {
         id: 'StereoMap.toggle',
         label: t7e('plugins.StereoMap.commands.toggle' as Parameters<typeof t7e>[0]),
         category: 'Display',
-        shortcutHint: 'M',
+        shortcutHint: 'm',
         callback: () => this.bottomMenuClicked(),
       },
       {

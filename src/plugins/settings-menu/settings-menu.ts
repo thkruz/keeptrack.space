@@ -96,13 +96,15 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   }
 
   getKeyboardShortcuts(): IKeyboardShortcut[] {
-    // Shift+Comma mirrors the conventional "preferences" shortcut; bound by
-    // physical key (Comma) so it works regardless of keyboard layout.
+    // Ctrl+Comma mirrors the conventional "preferences" shortcut (VS Code,
+    // macOS); bound by physical key (Comma) so it works regardless of keyboard
+    // layout. Shift+Comma is TimeManager's '<' (jump time back).
     return [
       {
         key: ',',
         code: 'Comma',
-        shift: true,
+        ctrl: true,
+        shift: false,
         callback: () => this.bottomMenuClicked(),
       },
     ];

@@ -572,6 +572,14 @@ export interface IKeyboardShortcut {
   alt?: boolean;
 
   /**
+   * What the shortcut does, already translated (e.g. "Toggle orbit lines").
+   * Shown in the shortcuts overlay, the plugin help modal and the splash-screen
+   * tips. A plugin with a bottom icon and a single shortcut gets a default of
+   * "Toggle <label>" when this is omitted.
+   */
+  description?: string;
+
+  /**
    * Callback when the shortcut is triggered.
    */
   callback: () => void;

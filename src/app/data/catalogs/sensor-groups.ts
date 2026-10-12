@@ -1,6 +1,7 @@
 import { apiFetch } from '@app/app/data/api-fetch';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { t7e } from '@app/locales/keys';
+import { GROUND_STATION_GROUP_LIST } from './sensors/ground-stations';
 
 export interface SensorGroup {
   name: string;
@@ -153,6 +154,21 @@ export const sensorGroups: SensorGroup[] = [
       badge: 'EUSPA',
     },
     list: ['GALKIR', 'GALKRU', 'GALNOU', 'GALPAP', 'GALREU', 'GALRED'],
+    category: 'ttc',
+  },
+  {
+    name: 'groundStations',
+    // Getters: this array is built at import time, before localization loads
+    get header(): string {
+      return t7e('plugins.SensorListPlugin.labels.groundStationsHeader' as Parameters<typeof t7e>[0]);
+    },
+    topLink: {
+      get name(): string {
+        return t7e('plugins.SensorListPlugin.labels.groundStationsAll' as Parameters<typeof t7e>[0]);
+      },
+      badge: 'CITED',
+    },
+    list: GROUND_STATION_GROUP_LIST,
     category: 'ttc',
   },
   /*

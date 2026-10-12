@@ -6,6 +6,8 @@
       "labels": {
         "categorySurveillance": "太空监视",
         "categoryTtc": "卫星测控与通信",
+        "groundStationsHeader": "地面站",
+        "groundStationsAll": "所有地面站",
         "missingData": "缺失数据",
         "tooltipSensorsInFov": "可视化传感器覆盖范围"
       },
@@ -29,6 +31,7 @@
         "tip1": "许多计算（如观测角）需要单个传感器。如果您选择了整个网络，请改用多站观测角菜单，或一次选择一个传感器。",
         "tip2": "每个传感器也可以从命令面板访问：输入传感器名称即可切换，无需打开此菜单。",
         "tip3": "传感器参数来自公开数据；您可以在传感器信息菜单中查看。欢迎将修正建议发送至admin@keeptrack.space。",
+        "tipGroundStations": "地面站是带出处的预设（来源链接和获取日期见传感器信息）。其坐标是站址参考点而非天线相位中心，最小仰角是网络惯例：深空站为 10°，近地轨道站为 5°。",
         "shortcutToggle": "切换传感器菜单",
         "shortcutCamera": "将相机对准当前传感器"
       },

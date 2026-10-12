@@ -6,6 +6,8 @@
       "labels": {
         "categorySurveillance": "Weltraumüberwachung",
         "categoryTtc": "Satellitensteuerung & Kommunikation",
+        "groundStationsHeader": "Bodenstationen",
+        "groundStationsAll": "Alle Bodenstationen",
         "missingData": "Fehlende Daten",
         "tooltipSensorsInFov": "Sensorabdeckung visualisieren"
       },
@@ -29,6 +31,7 @@
         "tip1": "Viele Berechnungen (wie Blickwinkel) benötigen einen einzelnen Sensor. Wenn Sie ein ganzes Netzwerk ausgewählt haben, verwenden Sie stattdessen das Multi-Standort-Blickwinkel-Menü oder wählen Sie die Sensoren einzeln aus.",
         "tip2": "Jeder Sensor ist auch über die Befehlspalette verfügbar: Geben Sie den Namen des Sensors ein, um zu wechseln, ohne dieses Menü zu öffnen.",
         "tip3": "Die Sensorparameter stammen aus öffentlich zugänglichen Daten; Sie können sie im Sensorinfo-Menü überprüfen. Korrekturen sind unter admin@keeptrack.space willkommen.",
+        "tipGroundStations": "Bodenstationen sind belegte Voreinstellungen (Quellenlink und Abrufdatum in der Sensorinfo). Ihre Koordinaten sind Standortbezugspunkte, keine Antennenphasenzentren, und die Mindestelevation ist eine Netzkonvention: 10° für Deep-Space-Komplexe, 5° für LEO-Stationen.",
         "shortcutToggle": "Sensorenmenü umschalten",
         "shortcutCamera": "Kamera auf den aktuellen Sensor ausrichten"
       },

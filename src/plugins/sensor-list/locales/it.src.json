@@ -6,6 +6,8 @@
       "labels": {
         "categorySurveillance": "Sorveglianza spaziale",
         "categoryTtc": "Controllo satelliti e comunicazioni",
+        "groundStationsHeader": "Stazioni di terra",
+        "groundStationsAll": "Tutte le stazioni di terra",
         "missingData": "Dati mancanti",
         "tooltipSensorsInFov": "Visualizza la copertura dei sensori"
       },
@@ -29,6 +31,7 @@
         "tip1": "Molti calcoli (come gli angoli di osservazione) richiedono un singolo sensore. Se hai selezionato un'intera rete, usa invece il menu degli angoli di osservazione multi-sito oppure scegli un sensore alla volta.",
         "tip2": "Ogni sensore è disponibile anche dalla palette dei comandi: digita il nome del sensore per passare senza aprire questo menu.",
         "tip3": "I parametri dei sensori provengono da dati pubblicamente disponibili; puoi esaminarli nel menu Info sensore. Le correzioni sono benvenute all'indirizzo admin@keeptrack.space.",
+        "tipGroundStations": "Le stazioni di terra sono preimpostazioni citate (link alla fonte e data di consultazione in Info sensore). Le coordinate sono punti di riferimento del sito, non centri di fase dell'antenna, e l'elevazione minima è una convenzione di rete: 10° per i complessi di spazio profondo, 5° per le stazioni LEO.",
         "shortcutToggle": "Attiva/disattiva il menu Sensori",
         "shortcutCamera": "Punta la telecamera sul sensore corrente"
       },

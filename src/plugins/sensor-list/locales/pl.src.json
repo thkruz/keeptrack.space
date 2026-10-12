@@ -6,6 +6,8 @@
       "labels": {
         "categorySurveillance": "Nadzór przestrzeni kosmicznej",
         "categoryTtc": "Kontrola satelitów i łączność",
+        "groundStationsHeader": "Stacje naziemne",
+        "groundStationsAll": "Wszystkie stacje naziemne",
         "missingData": "Brak danych",
         "tooltipSensorsInFov": "Wizualizuj zasięg czujników"
       },
@@ -29,6 +31,7 @@
         "tip1": "Wiele obliczeń (np. kąty obserwacji) wymaga pojedynczego czujnika. Jeśli wybrano całą sieć, użyj zamiast tego menu wielostanowiskowych kątów obserwacji lub wybieraj czujniki pojedynczo.",
         "tip2": "Każdy czujnik jest też dostępny z palety poleceń: wpisz nazwę czujnika, aby przełączyć się bez otwierania tego menu.",
         "tip3": "Parametry czujników pochodzą z publicznie dostępnych danych; możesz je przejrzeć w menu informacji o czujniku. Poprawki są mile widziane pod adresem admin@keeptrack.space.",
+        "tipGroundStations": "Stacje naziemne to ustawienia z podanym źródłem (link i data pobrania w Informacjach o sensorze). Współrzędne to punkty odniesienia lokalizacji, a nie centra fazowe anten, a minimalna elewacja to konwencja sieci: 10° dla kompleksów dalekiego kosmosu, 5° dla stacji LEO.",
         "shortcutToggle": "Przełącz menu czujników",
         "shortcutCamera": "Skieruj kamerę na bieżący czujnik"
       },

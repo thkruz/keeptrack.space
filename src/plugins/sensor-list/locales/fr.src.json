@@ -6,6 +6,8 @@
       "labels": {
         "categorySurveillance": "Surveillance de l'espace",
         "categoryTtc": "Contrôle des satellites et communications",
+        "groundStationsHeader": "Stations sol",
+        "groundStationsAll": "Toutes les stations sol",
         "missingData": "Données manquantes",
         "tooltipSensorsInFov": "Visualiser la couverture des capteurs"
       },
@@ -29,6 +31,7 @@
         "tip1": "De nombreux calculs (comme les angles de visée) nécessitent un seul capteur. Si vous avez sélectionné un réseau entier, utilisez plutôt le menu des angles de visée multi-sites ou choisissez un capteur à la fois.",
         "tip2": "Chaque capteur est également disponible depuis la palette de commandes : tapez le nom du capteur pour changer sans ouvrir ce menu.",
         "tip3": "Les paramètres des capteurs proviennent de données publiques ; vous pouvez les consulter dans le menu Info Capteur. Les corrections sont les bienvenues à admin@keeptrack.space.",
+        "tipGroundStations": "Les stations sol sont des préréglages sourcés (lien et date de consultation dans Infos capteur). Leurs coordonnées sont des points de référence du site, pas des centres de phase d'antenne, et l'élévation minimale est une convention du réseau : 10° pour les complexes d'espace lointain, 5° pour les stations LEO.",
         "shortcutToggle": "Basculer le menu Capteurs",
         "shortcutCamera": "Pointer la caméra sur le capteur actuel"
       },

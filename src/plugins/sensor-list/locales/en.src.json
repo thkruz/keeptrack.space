@@ -6,6 +6,8 @@
       "labels": {
         "categorySurveillance": "Space Surveillance",
         "categoryTtc": "Satellite Control & Communications",
+        "groundStationsHeader": "Ground Stations",
+        "groundStationsAll": "All Ground Stations",
         "missingData": "Missing Data",
         "tooltipSensorsInFov": "Visualize Sensor Coverage"
       },
@@ -29,6 +31,7 @@
         "tip1": "Many calculations (like Look Angles) need a single sensor. If you selected a whole network, use the Multi-Site Looks menu instead or pick one sensor at a time.",
         "tip2": "Every sensor is also available from the command palette: type the sensor's name to switch without opening this menu.",
         "tip3": "Sensor parameters come from publicly available data; you can review them in the Sensor Info menu. Corrections are welcome at admin@keeptrack.space.",
+        "tipGroundStations": "Ground Stations are cited presets (source link and retrieval date in Sensor Info). Their coordinates are site reference points, not antenna phase centres, and the minimum elevation is a network convention: 10° for deep-space complexes, 5° for LEO stations.",
         "shortcutToggle": "Toggle the Sensors menu",
         "shortcutCamera": "Snap the camera to the current sensor"
       },

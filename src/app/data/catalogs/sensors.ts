@@ -4,6 +4,7 @@ import { CommLink, Degrees, Kilometers, Milliseconds, SpaceObjectType, ZoomValue
 import { dsnSensors } from './sensors/dsn';
 import { estrackSensors } from './sensors/estrack';
 import { galileoSensors } from './sensors/galileo';
+import { groundStationSensors } from './sensors/ground-stations';
 import { scnSensors } from './sensors/scn';
 import { Operators, SensorList } from './sensors/types';
 
@@ -2045,4 +2046,6 @@ export const sensors = <SensorList>{
   ...scnSensors,
   ...estrackSensors,
   ...galileoSensors,
+  // Cited ground stations (SODA catalog, MIT); rows already above are merged, not duplicated
+  ...groundStationSensors,
 };

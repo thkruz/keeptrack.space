@@ -6,6 +6,8 @@
       "labels": {
         "categorySurveillance": "Sledování vesmíru",
         "categoryTtc": "Řízení satelitů a komunikace",
+        "groundStationsHeader": "Pozemní stanice",
+        "groundStationsAll": "Všechny pozemní stanice",
         "missingData": "Chybějící data",
         "tooltipSensorsInFov": "Vizualizovat pokrytí senzorů"
       },
@@ -29,6 +31,7 @@
         "tip1": "Mnoho výpočtů (například úhly pohledu) vyžaduje jediný senzor. Pokud jste vybrali celou síť, použijte místo toho menu úhlů pohledu z více míst, nebo vybírejte senzory po jednom.",
         "tip2": "Každý senzor je dostupný také z palety příkazů: napište název senzoru a přepněte se bez otevírání tohoto menu.",
         "tip3": "Parametry senzorů pocházejí z veřejně dostupných dat; můžete si je prohlédnout v menu Info o senzoru. Opravy jsou vítány na admin@keeptrack.space.",
+        "tipGroundStations": "Pozemní stanice jsou citované předvolby (odkaz na zdroj a datum načtení najdete v Informacích o senzoru). Souřadnice jsou referenční body lokality, nikoli fázová centra antén, a minimální elevace je konvence sítě: 10° pro komplexy hlubokého vesmíru, 5° pro stanice LEO.",
         "shortcutToggle": "Přepnout menu senzorů",
         "shortcutCamera": "Přesunout kameru na aktuální senzor"
       },

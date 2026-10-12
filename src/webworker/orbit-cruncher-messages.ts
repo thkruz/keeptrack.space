@@ -122,6 +122,12 @@ export interface OrbitCruncherOutMsgPoints {
   satId: number;
   /** Echoes the seqNum the worker was on when it produced these points. Main thread drops stale responses. */
   seqNum?: number;
+  /** Julian date of sample 0. Set for TLE satellites only (missile and empty responses omit it). */
+  sampleJd0?: number;
+  /** Minutes between consecutive samples. Set together with {@link sampleJd0}. */
+  sampleStepMin?: number;
+  /** True when the points are Earth-fixed (ECF output or polar view), false for TEME. */
+  isEcf?: boolean;
 }
 
 // ─── Object Cache Types (used inside the worker) ───────────────────────────

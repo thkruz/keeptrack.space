@@ -1,4 +1,6 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
 import { OrbitCruncherInMsgs, OrbitCruncherMsgType, OrbitCruncherOutMsgPoints, OrbitDrawTypes } from '@app/webworker/orbit-cruncher-messages';
 import { Degrees, Kilometers } from '@ootk/src/main';
@@ -146,5 +148,7 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
     gl.bufferData(gl.ARRAY_BUFFER, pointsOut, gl.DYNAMIC_DRAW);
 
     orbitManager.inProgress_[satId] = false;
+
+    EventBus.getInstance().emit(EventBusEvent.orbitPathUpdated, satId, pointsOut, data.anchor ?? [0, 0, 0], data.sampleJd0, data.sampleStepMin, data.isEcf === true);
   }
 }

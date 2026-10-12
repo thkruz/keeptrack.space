@@ -16,6 +16,7 @@ export interface EngineEventMap {
   [EventBusEvent.bottomMenuClick]: [string];
   [EventBusEvent.hideSideMenus]: [];
   [EventBusEvent.orbitManagerInit]: [];
+  [EventBusEvent.orbitPathUpdated]: [number, Float32Array, [number, number, number], number | undefined, number | undefined, boolean];
   [EventBusEvent.drawManagerLoadScene]: [];
   [EventBusEvent.drawOptionalScenery]: [];
   [EventBusEvent.drawOverlay]: [];

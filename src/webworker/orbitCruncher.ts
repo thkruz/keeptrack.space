@@ -131,6 +131,9 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
 
   const len = numberOfSegments + 1;
   let i = 0;
+  // Sample timing for TLE satellites, echoed so the main thread can recover each vertex's time.
+  let sampleJd0: number | undefined;
+  let sampleStepMin: number | undefined;
   // Calculate Missile Orbits
 
   if ((objCache[id] as OrbitCruncherMissileObject).missile) {
@@ -230,6 +233,9 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
     // For polar view, center the orbit on the current position (±half period)
     const orbitStart = isPolarViewEcf ? quantizedNow - period / 2 : quantizedNow;
 
+    sampleJd0 = satrec.jdsatepoch + orbitStart / 1440.0;
+    sampleStepMin = timeslice;
+
     if (orbitType === OrbitDrawTypes.ORBIT) {
       while (i < len) {
         drawTleOrbitSegment_(orbitStart, i, timeslice, id, isEcfOutput, points, len, isPolarViewEcf, satrec.jdsatepoch);
@@ -252,6 +258,9 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
       anchor,
       satId: id,
       seqNum: currentSeqNum,
+      sampleJd0,
+      sampleStepMin,
+      isEcf: isEcfOutput || isPolarViewEcf,
     },
     { transfer: [pointsOut.buffer as ArrayBuffer] }
   );

@@ -141,6 +141,20 @@ export class OrbitalSettings {
    */
   coneDistanceFromEarth = 15 as Kilometers;
 
+  // Ground swath (SatelliteSwath plugin)
+  /**
+   * Draw the ground swath ribbon for the selected satellite. Off until the user turns it on;
+   * deliberately not persisted so the layer is never shown automatically on load.
+   */
+  isDrawSwath = false;
+  /**
+   * Draw the translucent field-of-regard fill beside the nadir swath. Driven by the Graphics
+   * menu's overall quality (Medium and above).
+   */
+  isDrawSwathFieldOfRegard = true;
+  /** Height (km) the swath ribbon is lifted above the WGS84 ellipsoid to avoid z-fighting. */
+  swathLiftKm = 2 as Kilometers;
+
   // Line Scan
   /**
    * Minimum elevation to draw a line scan

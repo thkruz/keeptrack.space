@@ -42,6 +42,7 @@
         "reasonMaxRange": "Odległość {{value}} powyżej maks. {{limit}}",
         "reasonMinEl": "Elewacja {{value}} poniżej min. {{limit}}",
         "reasonMaxEl": "Elewacja {{value}} powyżej maks. {{limit}}",
+        "reasonMask": "Elewacja {{value}} poniżej maski horyzontu {{limit}}",
         "reasonAzimuth": "Azymut {{value}} poza zakresem {{min}} do {{max}}",
         "reasonCone": "Poza stożkiem osi celowania sensora"
       }

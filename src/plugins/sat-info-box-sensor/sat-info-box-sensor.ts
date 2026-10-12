@@ -447,6 +447,8 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
         return t7e('plugins.SatInfoBoxSensor.values.reasonMinEl' as Parameters<typeof t7e>[0], { value: deg(reason.value), limit: deg(reason.limit) });
       case 'maxEl':
         return t7e('plugins.SatInfoBoxSensor.values.reasonMaxEl' as Parameters<typeof t7e>[0], { value: deg(reason.value), limit: deg(reason.limit) });
+      case 'mask':
+        return t7e('plugins.SatInfoBoxSensor.values.reasonMask' as Parameters<typeof t7e>[0], { value: deg(reason.value), limit: deg(reason.limit) });
       case 'azimuth':
         return t7e('plugins.SatInfoBoxSensor.values.reasonAzimuth' as Parameters<typeof t7e>[0], {
           value: deg(reason.value),

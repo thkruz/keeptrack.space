@@ -194,6 +194,19 @@ describe('SatInfoBoxSensor', () => {
       expect(getEl('sat-range')!.innerHTML).toMatch(/km$/u);
     });
 
+    it('names the horizon mask when the mask is the broken bound', () => {
+      const plugin = new SatInfoBoxSensor();
+
+      websiteInit(plugin);
+      vi.spyOn(DetailedSensor.prototype, 'isRaeInFov').mockReturnValue(false);
+      vi.spyOn(DetailedSensor.prototype, 'getFovRejectReason').mockReturnValue({ kind: 'mask', value: 14, limit: 15 });
+
+      setupSensorAndSat(defaultSensor);
+      triggerFrameUpdate();
+
+      expect(getEl('sat-fov-reason')!.innerHTML).toBe('Elevation 14.0° below horizon mask 15.0°');
+    });
+
     it('hides the row while the object is in view', () => {
       const plugin = new SatInfoBoxSensor();
 

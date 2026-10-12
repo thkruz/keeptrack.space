@@ -42,6 +42,7 @@
         "reasonMaxRange": "Дальность {{value}} больше макс. {{limit}}",
         "reasonMinEl": "Угол места {{value}} меньше мин. {{limit}}",
         "reasonMaxEl": "Угол места {{value}} больше макс. {{limit}}",
+        "reasonMask": "Угол места {{value}} ниже маски горизонта {{limit}}",
         "reasonAzimuth": "Азимут {{value}} вне диапазона {{min}}–{{max}}",
         "reasonCone": "Вне конуса визирования датчика"
       }

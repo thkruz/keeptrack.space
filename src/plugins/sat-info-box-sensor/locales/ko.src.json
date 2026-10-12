@@ -42,6 +42,7 @@
         "reasonMaxRange": "거리 {{value}}가 최대 {{limit}} 초과",
         "reasonMinEl": "고각 {{value}}가 최소 {{limit}} 미만",
         "reasonMaxEl": "고각 {{value}}가 최대 {{limit}} 초과",
+        "reasonMask": "고각 {{value}}가 지평선 마스크 {{limit}} 미만",
         "reasonAzimuth": "방위각 {{value}}가 {{min}}~{{max}} 범위 밖",
         "reasonCone": "센서 조준 원뿔 밖"
       }

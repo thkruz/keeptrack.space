@@ -42,6 +42,7 @@
         "reasonMaxRange": "Entfernung {{value}} über Max. {{limit}}",
         "reasonMinEl": "Elevation {{value}} unter Min. {{limit}}",
         "reasonMaxEl": "Elevation {{value}} über Max. {{limit}}",
+        "reasonMask": "Elevation {{value}} unter der Horizontmaske {{limit}}",
         "reasonAzimuth": "Azimut {{value}} außerhalb {{min}} bis {{max}}",
         "reasonCone": "Außerhalb des Sensor-Blickkegels"
       }

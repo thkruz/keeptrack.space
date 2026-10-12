@@ -42,6 +42,7 @@
         "reasonMaxRange": "Дальність {{value}} більша за макс. {{limit}}",
         "reasonMinEl": "Кут місця {{value}} менший за мін. {{limit}}",
         "reasonMaxEl": "Кут місця {{value}} більший за макс. {{limit}}",
+        "reasonMask": "Кут місця {{value}} нижче маски горизонту {{limit}}",
         "reasonAzimuth": "Азимут {{value}} поза діапазоном {{min}}–{{max}}",
         "reasonCone": "Поза конусом візування сенсора"
       }

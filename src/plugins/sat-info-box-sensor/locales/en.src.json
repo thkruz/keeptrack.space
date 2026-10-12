@@ -42,6 +42,7 @@
         "reasonMaxRange": "Range {{value}} beyond max {{limit}}",
         "reasonMinEl": "Elevation {{value}} below min {{limit}}",
         "reasonMaxEl": "Elevation {{value}} above max {{limit}}",
+        "reasonMask": "Elevation {{value}} below horizon mask {{limit}}",
         "reasonAzimuth": "Azimuth {{value}} outside {{min}} to {{max}}",
         "reasonCone": "Outside the sensor boresight cone"
       }

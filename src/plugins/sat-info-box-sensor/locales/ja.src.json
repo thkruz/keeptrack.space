@@ -42,6 +42,7 @@
         "reasonMaxRange": "距離 {{value}} が最大 {{limit}} 超過",
         "reasonMinEl": "仰角 {{value}} が最小 {{limit}} 未満",
         "reasonMaxEl": "仰角 {{value}} が最大 {{limit}} 超過",
+        "reasonMask": "仰角 {{value}} が地平線マスク {{limit}} 未満",
         "reasonAzimuth": "方位角 {{value}} が {{min}}〜{{max}} の範囲外",
         "reasonCone": "センサーの視軸コーンの外"
       }

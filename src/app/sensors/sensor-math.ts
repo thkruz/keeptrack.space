@@ -46,6 +46,8 @@ export type TearrData = {
   inView?: boolean;
   /** Translated explanation when `inView` is false (geometry only). */
   fovReason?: string;
+  /** Rise/set rows only: true when the horizon mask, not minEl, produced this edge. */
+  maskLimited?: boolean;
   alt?: Kilometers;
   lat?: Degrees;
   lon?: Degrees;
@@ -53,6 +55,15 @@ export type TearrData = {
 };
 
 export class SensorMath {
+  /** True when the out-of-view sample next to a pass edge is hidden by the horizon mask rather than minEl. */
+  private static isMaskEdge_(sensor: DetailedSensor, rae: { az: Degrees | null; el: Degrees | null }): boolean {
+    if (rae.az === null || rae.el === null || typeof sensor.isMaskBlocked !== 'function') {
+      return false;
+    }
+
+    return sensor.isMaskBlocked(rae.az, rae.el);
+  }
+
   /**
    * @deprecated - Use ootk instead
    */
@@ -72,10 +83,12 @@ export class SensorMath {
         const aerPrevious = SatMath.getRae(now1, satrec, sensor);
         const isInFOVPrevious = SatMath.checkIsInView(sensor, aerPrevious);
         let isRise = false;
+        let isRiseMasked = false;
 
         // Is in FOV and Wasn't Last Time so First Line of Coverage
         if (!isInFOVPrevious) {
           isRise = true;
+          isRiseMasked = SensorMath.isMaskEdge_(sensor, aerPrevious);
         }
         // Next Pass to Calculate Last line of coverage
         now1.setTime(Number(now) + 1000);
@@ -92,6 +105,7 @@ export class SensorMath {
             type: isRise ? TearrType.RISE_AND_MAX_EL : TearrType.MAX_EL,
             inView: isInFOV,
             objName: sensor.objName,
+            maskLimited: isRiseMasked,
           };
         } else if (isRise) {
           return {
@@ -102,6 +116,7 @@ export class SensorMath {
             type: TearrType.RISE,
             inView: isInFOV,
             objName: sensor.objName,
+            maskLimited: isRiseMasked,
           };
         }
 
@@ -115,6 +130,7 @@ export class SensorMath {
             type: !isMaxElFound ? TearrType.MAX_EL_AND_SET : TearrType.SET,
             inView: isInFOV,
             objName: sensor.objName,
+            maskLimited: SensorMath.isMaskEdge_(sensor, aerNext),
           };
         }
 

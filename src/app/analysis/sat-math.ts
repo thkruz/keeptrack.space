@@ -290,6 +290,24 @@ export abstract class SatMath {
       return false;
     }
 
+    if (!SatMath.isInSectorBox_(sensor, az, el, rng)) {
+      return false;
+    }
+
+    // Horizon mask: the effective floor is max(minEl, mask(az)); the box above already enforced minEl.
+    if (typeof sensor.getMaskElevationAt === 'function') {
+      const maskEl = sensor.getMaskElevationAt(az);
+
+      if (maskEl !== null && el < maskEl) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /** Legacy az/el/range box test (primary and secondary face), without the horizon mask. */
+  private static isInSectorBox_(sensor: DetailedSensor, az: Degrees, el: Degrees, rng: Kilometers): boolean {
     if (sensor.minAz > sensor.maxAz) {
       if (
         ((az >= sensor.minAz || az <= sensor.maxAz) && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng) ||

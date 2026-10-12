@@ -297,11 +297,12 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
           case TearrType.RISE_AND_MAX_EL:
             isMaxElFound = true;
             looksArray.push({ ...looksPass, type: TearrType.RISE });
-            looksArray.push({ ...looksPass, type: TearrType.MAX_EL });
+            // The mask flag belongs to the rise edge only
+            looksArray.push({ ...looksPass, type: TearrType.MAX_EL, maskLimited: false });
             break;
           case TearrType.MAX_EL_AND_SET:
             isMaxElFound = false;
-            looksArray.push({ ...looksPass, type: TearrType.MAX_EL });
+            looksArray.push({ ...looksPass, type: TearrType.MAX_EL, maskLimited: false });
             looksArray.push({ ...looksPass, type: TearrType.SET });
             break;
           default:
@@ -406,6 +407,9 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       if (tdType) {
         tdType = tr.insertCell();
         tdType.appendChild(document.createTextNode(this.tearrTypeToString_(entry.type ?? TearrType.UNKNOWN)));
+        if (entry.maskLimited) {
+          tdType.appendChild(LookAnglesPlugin.createMaskMarker_());
+        }
       }
 
       tdE = tr.insertCell();
@@ -422,6 +426,17 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
         tdV.setAttribute('style', 'color: #c62828');
       }
     }
+  }
+
+  /** Small "mask" tag on a rise/set row whose edge was set by the horizon mask. */
+  private static createMaskMarker_(): HTMLSpanElement {
+    const marker = document.createElement('span');
+
+    marker.className = 'la-mask-limited';
+    marker.title = l('maskLimitedTitle');
+    marker.textContent = l('maskLimited');
+
+    return marker;
   }
 
   private static tearrTypeToString_(type: TearrType): string {

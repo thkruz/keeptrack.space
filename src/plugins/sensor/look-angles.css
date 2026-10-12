@@ -60,3 +60,15 @@
 }
 
 #look-angles-menu-secondary .input-field input:focus-visible { outline: none; }
+
+/* Rise/set edge produced by the sensor's horizon mask */
+.la-table .la-mask-limited {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 4px;
+  font-size: 10px;
+  line-height: 1.4;
+  border-radius: 3px;
+  color: var(--color-dark-text-muted);
+  border: 1px solid var(--color-dark-border);
+}

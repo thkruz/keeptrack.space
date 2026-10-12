@@ -458,6 +458,20 @@ export class DetailedSensor extends GroundStation {
     return maskMinElevation(this.maskSorted_, az, this.interpolateMask ?? false, floorEl) as Degrees;
   }
 
+  /**
+   * True when a look angle clears the sensor's flat minEl but sits under the horizon mask,
+   * i.e. the mask (not minEl) is what hides it. Pass tools use this on the out-of-view
+   * sample next to a pass edge to flag the pass as mask-limited.
+   */
+  isMaskBlocked(az: Degrees, el: Degrees): boolean {
+    if (el < this.minEl) {
+      return false;
+    }
+    const maskEl = this.getMaskElevationAt(az);
+
+    return maskEl !== null && el < maskEl;
+  }
+
   /** True when this sensor carries a horizon mask (sensor-level or inside fovParams). */
   hasElevationMask(): boolean {
     return this.getMaskVertexCount() > 0;

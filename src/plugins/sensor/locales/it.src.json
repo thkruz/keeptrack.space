@@ -158,6 +158,8 @@
         "maxEl": "El. max",
         "unknown": "Sconosciuto"
       },
+      "maskLimited": "maschera",
+      "maskLimitedTitle": "Questo bordo è fissato dalla maschera d'orizzonte del sensore, non dalla sua elevazione minima",
       "help": {
         "overview": "Angoli di osservazione calcola i dati di puntamento di cui un sensore ha bisogno per inseguire il satellite selezionato: l'ora, l'azimut, l'elevazione e la distanza di ogni prossima opportunità di osservazione. È il ponte tra vedere un passaggio in 3D e puntare davvero un'antenna o un telescopio verso di esso.",
         "imgAlt": "La tabella degli angoli di osservazione con orari, azimut, elevazioni e distanze",

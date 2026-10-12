@@ -158,6 +158,8 @@
         "maxEl": "Max. El.",
         "unknown": "Neznámé"
       },
+      "maskLimited": "maska",
+      "maskLimitedTitle": "Tuto hranu určuje maska horizontu senzoru, ne jeho minimální elevace",
       "help": {
         "overview": "Úhly pohledu počítají naváděcí data, která senzor potřebuje ke sledování vybraného satelitu: čas, azimut, elevaci a vzdálenost každé nadcházející příležitosti k pozorování. Je to most mezi sledováním přeletu ve 3D a skutečným namířením antény nebo teleskopu.",
         "imgAlt": "Tabulka úhlů pohledu s časy, azimuty, elevacemi a vzdálenostmi",

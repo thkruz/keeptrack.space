@@ -158,6 +158,8 @@
         "maxEl": "Max El",
         "unknown": "Unknown"
       },
+      "maskLimited": "mask",
+      "maskLimitedTitle": "This edge is set by the sensor's horizon mask, not its minimum elevation",
       "help": {
         "overview": "Look Angles computes the pointing data a sensor needs to track the selected satellite: the time, azimuth, elevation, and range of every upcoming observation opportunity. It is the bridge between seeing a pass in 3D and actually pointing an antenna or telescope at it.",
         "imgAlt": "The Look Angles table of times, azimuths, elevations, and ranges",

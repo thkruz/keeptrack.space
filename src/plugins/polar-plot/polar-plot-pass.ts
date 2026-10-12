@@ -65,6 +65,8 @@ export interface PolarPass {
   /** Time of maximum elevation (culmination). */
   culmination: Date;
   durationMs: number;
+  /** True when AOS or LOS was set by the sensor's horizon mask (the pass is one half of a split overflight). */
+  maskLimited: boolean;
 }
 
 export interface PolarPassOptions {
@@ -141,6 +143,7 @@ export const buildPolarPass = (row: lookanglesRow, samples: PolarSample[]): Pola
     maxEl: parseFloat(row.MAXIMUM_ELEVATION ?? '0') as Degrees,
     culmination,
     durationMs: los.getTime() - aos.getTime(),
+    maskLimited: row.MASK_LIMITED === true,
   };
 };
 

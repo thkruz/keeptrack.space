@@ -82,6 +82,23 @@ describe('LookAnglesPlugin look-angle computation', () => {
     expect(getEl('looks')!.querySelectorAll('tr').length).toBeGreaterThan(1);
   });
 
+  it('populateSideMenuTable_ tags a mask-limited rise row with the mask marker', () => {
+    const base = { time: '2022-01-01T00:00:00.000Z', az: 100 as Degrees, el: 10 as Degrees, rng: 500 as Kilometers, objName: 'COD', canStationObserve: true };
+
+    p().populateSideMenuTable_(
+      [
+        { ...base, type: TearrType.RISE, maskLimited: true },
+        { ...base, type: TearrType.SET, maskLimited: false },
+      ],
+      ServiceLocator.getTimeManager()
+    );
+
+    const markers = getEl('looks')!.querySelectorAll('.la-mask-limited');
+
+    expect(markers).toHaveLength(1);
+    expect(markers[0].textContent).toBe('mask');
+  });
+
   it('populateSideMenuTable_ shows a not-visible message for an empty set', () => {
     p().lengthOfLookAngles_ = 1;
     p().populateSideMenuTable_([], ServiceLocator.getTimeManager());

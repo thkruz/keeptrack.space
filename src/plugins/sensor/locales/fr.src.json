@@ -158,6 +158,8 @@
         "maxEl": "Élév. max.",
         "unknown": "Inconnu"
       },
+      "maskLimited": "masque",
+      "maskLimitedTitle": "Ce bord est fixé par le masque d'horizon du capteur, pas par son élévation minimale",
       "help": {
         "overview": "Angles de visée calcule les données de pointage dont un capteur a besoin pour suivre le satellite sélectionné : l'heure, l'azimut, l'élévation et la distance de chaque prochaine opportunité d'observation. C'est le pont entre voir un passage en 3D et pointer réellement une antenne ou un télescope vers lui.",
         "imgAlt": "Le tableau des angles de visée avec heures, azimuts, élévations et distances",

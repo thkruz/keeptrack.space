@@ -1,6 +1,6 @@
 import { SatMath } from '@app/app/analysis/sat-math';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import { Degrees, GreenwichMeanSiderealTime, Kilometers, TemeVec3 } from '@ootk/src/main';
+import { Degrees, GreenwichMeanSiderealTime, Kilometers, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
 
 /*
  * Pure numeric helpers in SatMath that had no direct coverage. These take
@@ -69,6 +69,30 @@ describe('SatMath.checkIsInView', () => {
     // 355 is inside the wrapped arc [350..360]∪[0..10]; 180 is outside.
     expect(SatMath.checkIsInView(wrap, { az: 355 as Degrees, el: 45 as Degrees, rng: 1000 as Kilometers })).toBe(true);
     expect(SatMath.checkIsInView(wrap, { az: 180 as Degrees, el: 45 as Degrees, rng: 1000 as Kilometers })).toBe(false);
+  });
+});
+
+describe('SatMath.checkIsInView with a horizon mask', () => {
+  // Interpolated vertices (0,5) (90,25) (180,5) (270,25); floor at az 45 = 5 + 20 * 45/90 = 15.
+  const masked = new DetailedSensor({
+    objName: 'MASKED',
+    lat: 0 as Degrees,
+    lon: 0 as Degrees,
+    alt: 0 as Kilometers,
+    type: SpaceObjectType.OPTICAL,
+    minAz: 0 as Degrees,
+    maxAz: 360 as Degrees,
+    minEl: 0 as Degrees,
+    maxEl: 90 as Degrees,
+    minRng: 0 as Kilometers,
+    maxRng: 50000 as Kilometers,
+    interpolateMask: true,
+    elevationMasks: [0, 90, 180, 270].map((az) => ({ startAz: az as Degrees, stopAz: az as Degrees, minEl: (az % 180 === 0 ? 5 : 25) as Degrees })),
+  });
+
+  it('rejects el 14 and accepts el 16 at az 45', () => {
+    expect(SatMath.checkIsInView(masked, { az: 45 as Degrees, el: 14 as Degrees, rng: 1000 as Kilometers })).toBe(false);
+    expect(SatMath.checkIsInView(masked, { az: 45 as Degrees, el: 16 as Degrees, rng: 1000 as Kilometers })).toBe(true);
   });
 });
 

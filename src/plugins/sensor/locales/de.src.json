@@ -158,6 +158,8 @@
         "maxEl": "Max. El.",
         "unknown": "Unbekannt"
       },
+      "maskLimited": "Maske",
+      "maskLimitedTitle": "Diese Kante wird durch die Horizontmaske des Sensors bestimmt, nicht durch seine Mindestelevation",
       "help": {
         "overview": "Blickwinkel berechnet die Zielführungsdaten, die ein Sensor zum Verfolgen des ausgewählten Satelliten benötigt: Zeit, Azimut, Elevation und Entfernung jeder bevorstehenden Beobachtungsgelegenheit. Es ist die Brücke zwischen dem Betrachten eines Überflugs in 3D und dem tatsächlichen Ausrichten einer Antenne oder eines Teleskops.",
         "imgAlt": "Die Blickwinkel-Tabelle mit Zeiten, Azimuten, Elevationen und Entfernungen",

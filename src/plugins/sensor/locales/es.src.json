@@ -158,6 +158,8 @@
         "maxEl": "El. máx.",
         "unknown": "Desconocido"
       },
+      "maskLimited": "máscara",
+      "maskLimitedTitle": "Este borde lo define la máscara de horizonte del sensor, no su elevación mínima",
       "help": {
         "overview": "Ángulos de Visión calcula los datos de apuntamiento que un sensor necesita para rastrear el satélite seleccionado: la hora, el azimut, la elevación y la distancia de cada próxima oportunidad de observación. Es el puente entre ver un pase en 3D y apuntar realmente una antena o un telescopio hacia él.",
         "imgAlt": "La tabla de Ángulos de Visión con horas, azimuts, elevaciones y distancias",

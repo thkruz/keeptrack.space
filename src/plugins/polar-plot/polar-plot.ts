@@ -12,7 +12,7 @@ import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { BestPassDeps } from '@app/plugins/best-pass/best-pass-calculator';
-import { BaseObject, Kilometers, Satellite, SatelliteRecord } from '@ootk/src/main';
+import { BaseObject, Degrees, Kilometers, Satellite, SatelliteRecord } from '@ootk/src/main';
 import polarPlotPng from '@public/img/icons/polar-plot.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -300,6 +300,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     drawPolarChart(ctx, pass, {
       labels: this.buildLabels_(sat, this.passes_, this.currentIndex_),
       backgroundColor: CHART_BACKGROUND,
+      mask: PolarPlotPlugin.maskOption_(),
     });
 
     hideEl('polar-plot-warning');
@@ -308,6 +309,17 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     showEl('polar-plot-export-section');
     this.updateReadout_(pass);
     this.updateNavButtons_();
+  }
+
+  /** The current sensor's horizon mask as an az -> el function for the chart, or undefined when unmasked. */
+  private static maskOption_(): ((azDeg: number) => number) | undefined {
+    const sensor = ServiceLocator.getSensorManager().getSensor();
+
+    if (!sensor?.isSensor() || typeof sensor.hasElevationMask !== 'function' || !sensor.hasElevationMask()) {
+      return undefined;
+    }
+
+    return (azDeg: number) => sensor.getMaskElevationAt(azDeg as Degrees) ?? 0;
   }
 
   private showWarning_(): void {
@@ -410,6 +422,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
       labels,
       backgroundColor: CHART_BACKGROUND,
       watermark: settingsManager.copyrightOveride ? undefined : 'keeptrack.space',
+      mask: PolarPlotPlugin.maskOption_(),
     });
 
     return canvas;

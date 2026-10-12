@@ -29,6 +29,10 @@
 import { PolarPass, PolarSample } from './polar-plot-pass';
 
 const DEG2RAD = Math.PI / 180;
+/** One mask sample per degree of azimuth. */
+const MASK_STEPS = 360;
+/** Fill for the masked (blocked) band between the horizon rim and the mask line. */
+const MASK_FILL = 'rgba(140, 140, 140, 0.45)';
 /** Elevation rings (degrees above the horizon) drawn behind the track. */
 const ELEVATION_RINGS = [0, 15, 30, 45, 60, 75] as const;
 
@@ -51,6 +55,11 @@ export interface PolarChartOptions {
   showCulmination?: boolean;
   /** Optional branding text stamped in the lower-right corner (e.g. for social export). */
   watermark?: string;
+  /**
+   * Horizon mask elevation (deg) as a function of azimuth (deg). When given, the band from
+   * the horizon rim inward to mask(az) is shaded grey, sampled every degree.
+   */
+  mask?: (azDeg: number) => number;
 }
 
 interface Geometry {
@@ -86,6 +95,32 @@ const computeGeometry = (ctx: CanvasRenderingContext2D): Geometry => {
     // 90 deg of elevation span maps to 0.9 of the half-size, leaving a label margin.
     distanceUnit: (size / (2.5 * 90)) * 0.9,
   };
+};
+
+/**
+ * Shades the masked band: one path made of the 360-point mask line (az 0..359) and the
+ * horizon rim traced the opposite way, filled with the even-odd rule so only the band
+ * between them is painted.
+ */
+const drawMask = (ctx: CanvasRenderingContext2D, geom: Geometry, mask: (azDeg: number) => number): void => {
+  ctx.beginPath();
+
+  for (let az = 0; az < MASK_STEPS; az++) {
+    const el = Math.min(90, Math.max(0, mask(az)));
+    const { x, y } = project(geom, az, el);
+
+    if (az === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  }
+  ctx.closePath();
+  // Horizon rim, counter-clockwise, as the outer edge of the band
+  ctx.moveTo(geom.centerX + 90 * geom.distanceUnit, geom.centerY);
+  ctx.arc(geom.centerX, geom.centerY, 90 * geom.distanceUnit, 0, 2 * Math.PI, true);
+  ctx.fillStyle = MASK_FILL;
+  ctx.fill('evenodd');
 };
 
 const drawElevationRings = (ctx: CanvasRenderingContext2D, geom: Geometry): void => {
@@ -280,6 +315,10 @@ export const drawPolarChart = (ctx: CanvasRenderingContext2D, pass: PolarPass, o
   if (options.backgroundColor && options.backgroundColor !== 'transparent') {
     ctx.fillStyle = options.backgroundColor;
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  }
+
+  if (options.mask) {
+    drawMask(ctx, geom, options.mask);
   }
 
   drawElevationRings(ctx, geom);

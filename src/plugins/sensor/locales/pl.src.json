@@ -158,6 +158,8 @@
         "maxEl": "Maks. El.",
         "unknown": "Nieznany"
       },
+      "maskLimited": "maska",
+      "maskLimitedTitle": "Tę krawędź wyznacza maska horyzontu sensora, a nie jego minimalna elewacja",
       "help": {
         "overview": "Kąty obserwacji obliczają dane naprowadzania, których czujnik potrzebuje do śledzenia wybranego satelity: czas, azymut, elewację i odległość każdej nadchodzącej okazji obserwacyjnej. To pomost między oglądaniem przelotu w 3D a faktycznym skierowaniem anteny lub teleskopu na satelitę.",
         "imgAlt": "Tabela kątów obserwacji z czasami, azymutami, elewacjami i odległościami",

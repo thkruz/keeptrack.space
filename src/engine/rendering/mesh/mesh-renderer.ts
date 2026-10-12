@@ -33,7 +33,24 @@ export class MeshRenderer {
     uLightDirection: <WebGLUniformLocation>(<unknown>null),
     uInSun: <WebGLUniformLocation>(<unknown>null),
     logDepthBufFC: <WebGLUniformLocation>(<unknown>null),
+    uFlagEnabled: <WebGLUniformLocation>(<unknown>null),
+    uFlagAtlas: <WebGLUniformLocation>(<unknown>null),
+    uFlagCell: <WebGLUniformLocation>(<unknown>null),
+    uDecalCenter: <WebGLUniformLocation>(<unknown>null),
+    uDecalDir: <WebGLUniformLocation>(<unknown>null),
+    uDecalU: <WebGLUniformLocation>(<unknown>null),
+    uDecalV: <WebGLUniformLocation>(<unknown>null),
+    uDecalHalfSize: <WebGLUniformLocation>(<unknown>null),
+    uFlagAlpha: <WebGLUniformLocation>(<unknown>null),
   };
+
+  /** Texture unit the flag atlas sampler reads (unit 0 is left to the rest of the engine). */
+  static readonly FLAG_ATLAS_UNIT = 1;
+  /**
+   * 1x1 texture kept on the atlas unit while the flag is off, so the sampler never points at
+   * whatever another pass left there (which could be the framebuffer being drawn into).
+   */
+  private flagPlaceholder_: WebGLTexture | null = null;
 
   constructor(meshManager: MeshManager, gl: WebGL2RenderingContext) {
     this.gl_ = gl;
@@ -94,6 +111,7 @@ export class MeshRenderer {
     gl.uniformMatrix4fv(this.uniforms_.uCamMatrix, false, camMatrix);
     gl.uniform1f(this.uniforms_.uInSun, this.meshManager_.currentMeshObject.inSun);
     gl.uniform1f(this.uniforms_.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
+    this.setFlagUniforms_(camMatrix);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.meshManager_.currentMeshObject.model.buffers.vertexBuffer);
     this.changeVertexAttribArrays(true);
@@ -106,6 +124,38 @@ export class MeshRenderer {
 
     this.changeVertexAttribArrays(false);
     gl.disable(gl.BLEND);
+  }
+
+  /**
+   * Flag decal uniforms. When the decal is off only uFlagEnabled = 0 is written (plus the
+   * placeholder bind); the shader's single `uFlagEnabled > 0.5` branch then skips all decal work.
+   */
+  private setFlagUniforms_(camMatrix: mat4): void {
+    const gl = this.gl_;
+    const atlas = this.meshManager_.prepareFlagDecal(camMatrix);
+
+    gl.activeTexture(gl.TEXTURE0 + MeshRenderer.FLAG_ATLAS_UNIT);
+    gl.bindTexture(gl.TEXTURE_2D, atlas ?? this.flagPlaceholder_);
+    gl.activeTexture(gl.TEXTURE0);
+
+    if (!atlas) {
+      gl.uniform1f(this.uniforms_.uFlagEnabled, 0);
+
+      return;
+    }
+
+    const meshObject = this.meshManager_.currentMeshObject;
+    const bounds = meshObject.model.bounds!;
+    const basis = this.meshManager_.decalBasis;
+
+    gl.uniform1f(this.uniforms_.uFlagEnabled, 1);
+    gl.uniform4fv(this.uniforms_.uFlagCell, meshObject.flag!.cell);
+    gl.uniform3fv(this.uniforms_.uDecalCenter, bounds.center);
+    gl.uniform3fv(this.uniforms_.uDecalDir, basis.dir);
+    gl.uniform3fv(this.uniforms_.uDecalU, basis.u);
+    gl.uniform3fv(this.uniforms_.uDecalV, basis.v);
+    gl.uniform1f(this.uniforms_.uDecalHalfSize, bounds.radius * settingsManager.flagDecalScale);
+    gl.uniform1f(this.uniforms_.uFlagAlpha, settingsManager.flagDecalAlpha);
   }
 
   drawOcclusion(pMatrix: mat4, camMatrix: mat4, occlusionPrgm: OcclusionProgram, tgtBuffer: WebGLBuffer) {
@@ -195,6 +245,22 @@ export class MeshRenderer {
     this.uniforms_.uLightDirection = gl.getUniformLocation(this.program_, 'uLightDirection') as WebGLUniformLocation;
     this.uniforms_.uInSun = gl.getUniformLocation(this.program_, 'uInSun') as WebGLUniformLocation;
     this.uniforms_.logDepthBufFC = gl.getUniformLocation(this.program_, 'logDepthBufFC') as WebGLUniformLocation;
+    this.uniforms_.uFlagEnabled = gl.getUniformLocation(this.program_, 'uFlagEnabled') as WebGLUniformLocation;
+    this.uniforms_.uFlagAtlas = gl.getUniformLocation(this.program_, 'uFlagAtlas') as WebGLUniformLocation;
+    this.uniforms_.uFlagCell = gl.getUniformLocation(this.program_, 'uFlagCell') as WebGLUniformLocation;
+    this.uniforms_.uDecalCenter = gl.getUniformLocation(this.program_, 'uDecalCenter') as WebGLUniformLocation;
+    this.uniforms_.uDecalDir = gl.getUniformLocation(this.program_, 'uDecalDir') as WebGLUniformLocation;
+    this.uniforms_.uDecalU = gl.getUniformLocation(this.program_, 'uDecalU') as WebGLUniformLocation;
+    this.uniforms_.uDecalV = gl.getUniformLocation(this.program_, 'uDecalV') as WebGLUniformLocation;
+    this.uniforms_.uDecalHalfSize = gl.getUniformLocation(this.program_, 'uDecalHalfSize') as WebGLUniformLocation;
+    this.uniforms_.uFlagAlpha = gl.getUniformLocation(this.program_, 'uFlagAlpha') as WebGLUniformLocation;
+    // The sampler unit never changes, so set it once here.
+    gl.uniform1i(this.uniforms_.uFlagAtlas, MeshRenderer.FLAG_ATLAS_UNIT);
+
+    this.flagPlaceholder_ = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, this.flagPlaceholder_);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([128, 128, 128, 255]));
+    gl.bindTexture(gl.TEXTURE_2D, null);
   }
 
   private applyAttributePointers_(model: MeshModel) {
@@ -254,16 +320,48 @@ export class MeshRenderer {
     in vec3 vDiffuse;
     in vec3 vSpecular;
     in float vSpecularExponent;
+    in vec3 vModelPos;
+    in vec3 vModelNormal;
 
     uniform float logDepthBufFC;
+
+    // Flag decal, projected along uDecalDir (model space) onto the camera-facing side.
+    uniform float uFlagEnabled;
+    uniform sampler2D uFlagAtlas;
+    uniform vec4 uFlagCell;
+    uniform vec3 uDecalCenter;
+    uniform vec3 uDecalDir;
+    uniform vec3 uDecalU;
+    uniform vec3 uDecalV;
+    uniform float uDecalHalfSize;
+    uniform float uFlagAlpha;
 
     out vec4 fragColor;
 
     void main(void) {
       float lightAmt = max(dot(vTransformedNormal, vLightDirection), 0.0);
 
-      vec3 ambientColor = vDiffuse * 0.1;
-      vec3 dirColor = vDiffuse * vAmbient * lightAmt * (min(vInSun,1.0) * 0.65);
+      vec3 baseColor = vDiffuse;
+      vec3 ambientTint = vAmbient;
+
+      if (uFlagEnabled > 0.5) {
+        vec3 p = vModelPos - uDecalCenter;
+        float du = dot(p, uDecalU) / uDecalHalfSize;
+        // Flags are 3:2, so the decal is 2/3 as tall as it is wide.
+        float dv = 1.5 * dot(p, uDecalV) / uDecalHalfSize;
+        vec2 flagUv = uFlagCell.xy + clamp(vec2(du, -dv) * 0.5 + 0.5, 0.0, 1.0) * uFlagCell.zw;
+        // Sampled before the per-fragment test so the lookup stays in uniform control flow.
+        vec3 flagColor = texture(uFlagAtlas, flagUv).rgb;
+        float inside = step(abs(du), 1.0) * step(abs(dv), 1.0) * step(0.25, dot(normalize(vModelNormal), uDecalDir));
+        float a = uFlagAlpha * inside;
+
+        // Mixed in before lighting so the flag shades with the model.
+        baseColor = mix(baseColor, flagColor, a);
+        ambientTint = mix(ambientTint, vec3(1.0), a);
+      }
+
+      vec3 ambientColor = baseColor * 0.1;
+      vec3 dirColor = baseColor * ambientTint * lightAmt * (min(vInSun,1.0) * 0.65);
       vec3 specColor = vSpecular * lightAmt * (min(vInSun,1.0) * 0.65);
 
       vec3 color = ambientColor + dirColor + specColor;
@@ -300,8 +398,12 @@ export class MeshRenderer {
     out vec3 vDiffuse;
     out vec3 vSpecular;
     out float vSpecularExponent;
+    out vec3 vModelPos;
+    out vec3 vModelNormal;
 
     void main(void) {
+      vModelPos = aVertexPosition;
+      vModelNormal = aVertexNormal;
       vLightDirection = uLightDirection;
       vAmbient = aAmbient;
       vDiffuse = aDiffuse;

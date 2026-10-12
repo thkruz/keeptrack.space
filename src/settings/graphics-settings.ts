@@ -427,6 +427,12 @@ export class GraphicsSettings {
    */
   modelsOnSatelliteViewOverride = false;
   noMeshManager = false;
+  /** Project the owner country's flag onto the selected satellite's 3D model. */
+  isDrawFlagDecals = true;
+  /** Flag decal half-width as a fraction of the model's bounding radius (0.2 to 0.6). */
+  flagDecalScale = 0.35;
+  /** Opacity of the flag decal over the model's base colour (0 to 1). */
+  flagDecalAlpha = 0.9;
 
   // Advanced Graphics
   isDisableAsyncReadPixels = false;

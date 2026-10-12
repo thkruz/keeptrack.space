@@ -108,6 +108,7 @@ describe('MeshRenderer', () => {
         buffers: { vertexBuffer: {}, indexBuffer: {}, indexCount: 3, useUint32Indices: false },
       },
     },
+    prepareFlagDecal: () => null,
     ...over,
   });
 
@@ -134,6 +135,72 @@ describe('MeshRenderer', () => {
   afterEach(() => {
     Object.assign(settingsManager, savedFlags);
     vi.restoreAllMocks();
+  });
+
+  describe('flag decal', () => {
+    const named = () => vi.spyOn(gl(), 'getUniformLocation').mockImplementation((_p: unknown, name: string) => ({ name }) as never);
+    const flagEnabledWrites = (spy: { mock: { calls: unknown[][] } }) =>
+      spy.mock.calls.filter(([loc]) => (loc as { name?: string } | null)?.name === 'uFlagEnabled').map(([, v]) => v);
+
+    it('declares the decal uniforms in the fragment shader', () => {
+      const sourceSpy = vi.spyOn(gl(), 'shaderSource');
+
+      const renderer = new MeshRenderer(fakeMeshManager() as never, gl());
+
+      expect(renderer).toBeDefined();
+      const sources = sourceSpy.mock.calls.map(([, src]) => src as string);
+
+      expect(sources.some((src) => src.includes('uniform float uFlagEnabled') && src.includes('uFlagEnabled > 0.5'))).toBe(true);
+      expect(sources.some((src) => src.includes('out vec3 vModelPos'))).toBe(true);
+    });
+
+    it('fetches uniform locations once at init, never per draw', () => {
+      const locSpy = named();
+      const renderer = new MeshRenderer(fakeMeshManager() as never, gl());
+      const afterInit = locSpy.mock.calls.length;
+
+      expect(locSpy.mock.calls.map(([, n]) => n)).toEqual(expect.arrayContaining(['uFlagEnabled', 'uFlagAtlas', 'uFlagCell', 'uDecalDir', 'uDecalHalfSize', 'uFlagAlpha']));
+      renderer.draw(mat4.create(), mat4.create());
+      renderer.draw(mat4.create(), mat4.create());
+      expect(locSpy.mock.calls.length).toBe(afterInit);
+    });
+
+    it('writes uFlagEnabled = 0 when the decal is off', () => {
+      named();
+      const renderer = new MeshRenderer(fakeMeshManager() as never, gl());
+      const f1Spy = vi.spyOn(gl(), 'uniform1f');
+
+      renderer.draw(mat4.create(), mat4.create());
+
+      expect(flagEnabledWrites(f1Spy)).toEqual([0]);
+    });
+
+    it('writes uFlagEnabled = 1 and the decal uniforms when the manager supplies an atlas', () => {
+      named();
+      const base = fakeMeshManager();
+      const mm = fakeMeshManager({
+        prepareFlagDecal: () => ({ atlas: true }),
+        decalBasis: { dir: new Float32Array([0, 0, 1]), u: new Float32Array([1, 0, 0]), v: new Float32Array([0, 1, 0]) },
+        currentMeshObject: {
+          ...base.currentMeshObject,
+          model: { ...base.currentMeshObject.model, bounds: { center: new Float32Array([0, 0, 0]), radius: 2 } },
+          flag: { objectId: 1, enabled: true, cell: new Float32Array([0, 0, 0.1, 0.1]) },
+        },
+      });
+      const renderer = new MeshRenderer(mm as never, gl());
+      const f1Spy = vi.spyOn(gl(), 'uniform1f');
+      const v3Spy = vi.spyOn(gl(), 'uniform3fv');
+
+      settingsManager.flagDecalScale = 0.35;
+      renderer.draw(mat4.create(), mat4.create());
+
+      expect(flagEnabledWrites(f1Spy)).toEqual([1]);
+      // Half size = radius 2 * scale 0.35 = 0.7.
+      const half = f1Spy.mock.calls.find(([loc]) => (loc as { name?: string }).name === 'uDecalHalfSize')?.[1] as number;
+
+      expect(half).toBeCloseTo(0.7, 9);
+      expect(v3Spy.mock.calls.some(([loc]) => (loc as { name?: string }).name === 'uDecalDir')).toBe(true);
+    });
   });
 
   it('compiles shaders on construction', () => {

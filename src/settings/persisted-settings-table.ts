@@ -104,6 +104,24 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
     },
   },
   {
+    key: StorageKey.SETTINGS_DRAW_FLAG_DECALS,
+    serialize: (sm) => String(sm.isDrawFlagDecals),
+    deserialize: (sm, raw) => {
+      sm.isDrawFlagDecals = bool(raw);
+    },
+  },
+  {
+    key: StorageKey.SETTINGS_FLAG_DECAL_SCALE,
+    serialize: (sm) => String(sm.flagDecalScale),
+    deserialize: (sm, raw) => {
+      const value = Number.parseFloat(raw);
+
+      if (Number.isFinite(value) && value >= 0.2 && value <= 0.6) {
+        sm.flagDecalScale = value;
+      }
+    },
+  },
+  {
     key: StorageKey.SETTINGS_SHOW_EPOCH_AGE,
     serialize: (sm) => String(sm.isShowEpochAge),
     deserialize: (sm, raw) => {

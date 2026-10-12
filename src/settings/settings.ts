@@ -107,6 +107,9 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   meshListOverride: 'graphics',
   modelsOnSatelliteViewOverride: 'graphics',
   noMeshManager: 'graphics',
+  isDrawFlagDecals: 'graphics',
+  flagDecalScale: 'graphics',
+  flagDecalAlpha: 'graphics',
   isDisableAsyncReadPixels: 'graphics',
   debugMobilePicking: 'graphics',
 

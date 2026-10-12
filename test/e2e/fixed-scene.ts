@@ -25,18 +25,22 @@ const FIXED_TLE_URL = 'http://localhost:5544/e2e-fixed/iss.txt';
 export interface FixedSceneOptions extends AppReadyOptions {
   /** Sim time to boot at. */
   date: Date;
+  /** More three-line element sets served after the ISS (name, line 1, line 2 joined by newlines). */
+  extraTle?: string;
 }
 
 /** Boot the app on the pinned ISS-only catalog at a fixed, frozen sim time. */
 export async function loadFixedIssScene(page: Page, options: FixedSceneOptions): Promise<void> {
-  await page.route('**/e2e-fixed/iss.txt', (route) => route.fulfill({ contentType: 'text/plain', body: `${FIXED_ISS_TLE}\n` }));
+  await page.route('**/e2e-fixed/iss.txt', (route) => route.fulfill({ contentType: 'text/plain', body: `${FIXED_ISS_TLE}\n${options.extraTle ? `${options.extraTle}\n` : ''}` }));
   // The supplement fetch only adds metadata; keep the spec offline and deterministic.
   await page.route('**/v4/sats/**', (route) => route.fulfill({ contentType: 'application/json', body: '[]' }));
 
   const query = [`date=${options.date.toISOString()}`, 'rate=0', 'external-only', `tle=${encodeURIComponent(FIXED_TLE_URL)}`].join('&');
 
+  const { extraTle: _extraTle, ...appOptions } = options;
+
   await waitForAppReady(page, {
-    ...options,
+    ...appOptions,
     query,
     // Keep the default whole-Earth camera when selecting so the full orbit is in frame.
     settings: {

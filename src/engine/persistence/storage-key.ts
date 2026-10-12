@@ -40,6 +40,8 @@ export enum StorageKey {
   SETTINGS_DRAW_SUN = 'v2-keepTrack-settings-drawSun',
   SETTINGS_DRAW_ORBIT_ECLIPSE = 'v2-keepTrack-settings-drawOrbitEclipse',
   SETTINGS_DRAW_SWATH_FIELD_OF_REGARD = 'v2-keepTrack-settings-drawSwathFieldOfRegard',
+  SETTINGS_DRAW_FLAG_DECALS = 'v2-keepTrack-settings-drawFlagDecals',
+  SETTINGS_FLAG_DECAL_SCALE = 'v2-keepTrack-settings-flagDecalScale',
   SETTINGS_SHOW_EPOCH_AGE = 'v2-keepTrack-settings-showEpochAge',
   SETTINGS_CONFIDENCE_LEVELS = 'v2-keepTrack-settings-confidenceLevels',
   SETTINGS_DRAW_COVARIANCE_ELLIPSOID = 'v2-keepTrack-settings-drawCovarianceEllipsoid',

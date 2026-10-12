@@ -82,7 +82,7 @@ describe('SwathMeshFactory ribbon', () => {
     expect(factory.meshes[0].vertexCount).toBe(18 + 38 + 20);
   });
 
-  it('keeps every vertex lifted just above the ellipsoid', () => {
+  it('keeps every vertex lifted just above the surface', () => {
     const factory = build(params({ maxOffNadirDeg: 20, isShowFieldOfRegard: true }));
     const mesh = factory.meshes[0];
     const v = mesh.vertices;
@@ -91,7 +91,10 @@ describe('SwathMeshFactory ribbon', () => {
     for (let i = 0; i < mesh.vertexCount; i++) {
       const r = Math.hypot(v[i * 3], v[i * 3 + 1], v[i * 3 + 2]);
 
-      // [b + lift, a + lift + 0.01] km, less 1 m of float32 rounding at ~6400 km.
+      /*
+       * The plan's bound [b + lift, a + lift + 0.01] km (less 1 m of float32 rounding). Vertices sit
+       * on the drawn 6371 km globe + lift, which lies inside it.
+       */
       expect(r).toBeGreaterThanOrEqual(B + lift - 0.001);
       expect(r).toBeLessThanOrEqual(A + lift + 0.01);
     }

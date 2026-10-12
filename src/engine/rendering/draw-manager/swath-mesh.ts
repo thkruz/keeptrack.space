@@ -2,8 +2,8 @@
 import { CameraType } from '@app/engine/camera/camera-type';
 import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { glsl } from '@app/engine/utils/development/formatter';
-import { WGS84_A_KM, WGS84_B_KM } from '@ootk/src/main';
 import { mat4 } from 'gl-matrix';
 import { DepthManager } from '../depth-manager';
 import { CustomMesh } from './custom-mesh';
@@ -32,22 +32,19 @@ export interface SwathColors {
 /** Alpha multiplier for strips whose sub-point is in darkness. */
 export const SWATH_UNLIT_ALPHA_SCALE = 0.4;
 
-const A2_ = WGS84_A_KM * WGS84_A_KM;
-const B2_ = WGS84_B_KM * WGS84_B_KM;
-
 /**
- * Lifts a WGS84 surface point `liftKm` along its geodetic normal, writing into `out` at `o`.
- * The normal of the ellipsoid at (x, y, z) is (x/a^2, y/a^2, z/b^2) normalised.
+ * Moves a WGS84 surface point onto the rendered globe, `liftKm` above it, writing into `out` at
+ * `o`. The geometry is computed on the ellipsoid (true widths), but KeepTrack draws Earth as a
+ * sphere of RADIUS_OF_EARTH, which sits up to 14 km above the ellipsoid at high latitude; a point
+ * left on the ellipsoid would vanish under the textured globe there. The point keeps its
+ * geocentric direction, so its latitude/longitude on the drawn globe are unchanged.
  */
 export const liftSurfacePoint = (x: number, y: number, z: number, liftKm: number, out: Float32Array | Float64Array, o: number): void => {
-  const nx = x / A2_;
-  const ny = y / A2_;
-  const nz = z / B2_;
-  const inv = liftKm / Math.sqrt(nx * nx + ny * ny + nz * nz);
+  const scale = (RADIUS_OF_EARTH + liftKm) / Math.sqrt(x * x + y * y + z * z);
 
-  out[o] = x + nx * inv;
-  out[o + 1] = y + ny * inv;
-  out[o + 2] = z + nz * inv;
+  out[o] = x * scale;
+  out[o + 1] = y * scale;
+  out[o + 2] = z * scale;
 };
 
 /**

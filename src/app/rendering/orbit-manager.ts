@@ -107,13 +107,22 @@ export class OrbitManager {
   private static readonly SUN_REFRESH_MS_ = 5 * 60 * 1000;
 
   private getEclipseParams_(simTimeMs: number): OrbitEclipseParams | undefined {
-    if (!settingsManager.isDrawOrbitEclipse) {
+    // A non-finite sim time (mocked clocks, a bad URL date) must never take orbit
+    // lines down with it: astronomy-engine throws on an invalid Date. Draw undimmed.
+    if (!settingsManager.isDrawOrbitEclipse || !Number.isFinite(simTimeMs)) {
       return undefined;
     }
     const params = this.eclipseParams_;
 
     if (!(Math.abs(simTimeMs - this.sunEciTimeMs_) <= OrbitManager.SUN_REFRESH_MS_)) {
-      const sun = Sun.eci(new Date(simTimeMs));
+      let sun: { x: number; y: number; z: number };
+
+      try {
+        sun = Sun.eci(new Date(simTimeMs));
+      } catch {
+        // The dimmed arc is a cue; an orbit request must never fail because of it.
+        return undefined;
+      }
 
       params.sunEci[0] = sun.x;
       params.sunEci[1] = sun.y;

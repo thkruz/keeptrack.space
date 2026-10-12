@@ -1,0 +1,22 @@
+{
+  "plugins": {
+    "EpochAge": {
+      "badge": {
+        "caution": "Âge de l'époque : moyen, {days}",
+        "low": "Âge de l'époque : faible, {days}",
+        "poor": "Âge de l'époque : très faible, {days}"
+      },
+      "tooltip": "Écart entre la simulation et l'époque du jeu d'éléments. Moyen au-delà de 3 jours, faible au-delà de 7, très faible au-delà de 14 : plus les éléments sont anciens, plus les positions s'écartent de la réalité.",
+      "toast": {
+        "poor": "Les éléments ont plus de 14 jours à cet instant. Les positions peuvent être fausses de plusieurs dizaines de kilomètres ou plus."
+      },
+      "settings": {
+        "sectionLabel": "Âge de l'époque",
+        "showEpochAge": {
+          "label": "Afficher le badge d'âge de l'époque",
+          "helpText": "Avertir lorsque l'heure de simulation est à plus de 3 jours de l'époque des éléments du satellite sélectionné."
+        }
+      }
+    }
+  }
+}

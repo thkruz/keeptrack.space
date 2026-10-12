@@ -1,0 +1,22 @@
+{
+  "plugins": {
+    "EpochAge": {
+      "badge": {
+        "caution": "Età dell'epoca: discreta, {days}",
+        "low": "Età dell'epoca: bassa, {days}",
+        "poor": "Età dell'epoca: molto bassa, {days}"
+      },
+      "tooltip": "Tempo tra la simulazione e l'epoca del set di elementi. Discreta oltre 3 giorni, bassa oltre 7, molto bassa oltre 14: più gli elementi sono vecchi, più le posizioni si allontanano dalla realtà.",
+      "toast": {
+        "poor": "In questo momento gli elementi hanno più di 14 giorni. Le posizioni possono essere sbagliate di decine di chilometri o più."
+      },
+      "settings": {
+        "sectionLabel": "Età dell'epoca",
+        "showEpochAge": {
+          "label": "Mostra badge età dell'epoca",
+          "helpText": "Avvisa quando il tempo di simulazione dista più di 3 giorni dall'epoca degli elementi del satellite selezionato."
+        }
+      }
+    }
+  }
+}

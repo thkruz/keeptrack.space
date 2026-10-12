@@ -94,6 +94,13 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
     },
   },
   {
+    key: StorageKey.SETTINGS_SHOW_EPOCH_AGE,
+    serialize: (sm) => String(sm.isShowEpochAge),
+    deserialize: (sm, raw) => {
+      sm.isShowEpochAge = bool(raw);
+    },
+  },
+  {
     key: StorageKey.SETTINGS_DRAW_BLACK_EARTH,
     serialize: (sm) => String(sm.isBlackEarth),
     deserialize: (sm, raw) => {

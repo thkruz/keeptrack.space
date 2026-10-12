@@ -157,6 +157,11 @@ export class UiSettings {
    */
   isShowNextPass = false;
   /**
+   * Show the Epoch Age badge (and the one-time 14 day toast) when the simulation
+   * time is far from the selected satellite's element-set epoch.
+   */
+  isShowEpochAge = true;
+  /**
    * Display ECI coordinates on object hover
    */
   isEciOnHover = false;

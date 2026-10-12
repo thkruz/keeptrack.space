@@ -1,0 +1,22 @@
+{
+  "plugins": {
+    "EpochAge": {
+      "badge": {
+        "caution": "Stáří epochy: přijatelné, {days}",
+        "low": "Stáří epochy: nízké, {days}",
+        "poor": "Stáří epochy: velmi nízké, {days}"
+      },
+      "tooltip": "Čas mezi simulací a epochou sady elementů. Přijatelné po 3 dnech, nízké po 7, velmi nízké po 14: čím starší elementy, tím více se polohy odchylují od skutečnosti.",
+      "toast": {
+        "poor": "Elementy jsou v tomto čase starší než 14 dní. Polohy se mohou lišit o desítky kilometrů i více."
+      },
+      "settings": {
+        "sectionLabel": "Stáří epochy",
+        "showEpochAge": {
+          "label": "Zobrazit odznak stáří epochy",
+          "helpText": "Upozornit, když je čas simulace vzdálen více než 3 dny od epochy elementů vybraného satelitu."
+        }
+      }
+    }
+  }
+}

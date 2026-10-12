@@ -198,6 +198,12 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true },
   },
   {
+    configKey: 'EpochAge',
+    ossImport: () => import('./epoch-age/epoch-age'),
+    ossClassName: 'EpochAge',
+    defaultConfig: { enabled: true, hideBottomIcon: true },
+  },
+  {
     configKey: 'SoundToggle',
     ossImport: () => import('./sound-toggle/sound-toggle'),
     ossClassName: 'SoundToggle',

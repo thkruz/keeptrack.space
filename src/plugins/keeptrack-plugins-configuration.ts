@@ -42,6 +42,7 @@ export type KeepTrackPluginsConfiguration = {
   GithubLinkPlugin?: PluginConfiguration;
   LinkedInLinkPlugin?: PluginConfiguration;
   ClassificationBar?: PluginConfiguration;
+  EpochAge?: PluginConfiguration;
   SoundManager?: PluginConfiguration;
   SoundToggle?: PluginConfiguration;
   EarthAtmosphere?: PluginConfiguration;

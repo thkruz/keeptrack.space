@@ -143,6 +143,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   updateHoverDelayLimitBig: 'ui',
   updateHoverDelayLimitSmall: 'ui',
   isShowNextPass: 'ui',
+  isShowEpochAge: 'ui',
   isEciOnHover: 'ui',
   isSatLabelModeOn: 'ui',
   satLabelMode: 'ui',

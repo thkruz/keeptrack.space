@@ -1,0 +1,40 @@
+/*
+ * Epoch-age badge: a small pill centred under the top bar (the same strip the
+ * classification bar uses), tinted by level. Pointer events stay on so the
+ * kt-tooltip works.
+ */
+:root {
+  --epoch-age-caution-rgb: 255, 170, 40;
+  --epoch-age-low-rgb: 255, 120, 30;
+  --epoch-age-poor-rgb: 230, 60, 50;
+}
+
+.epoch-age-badge {
+  position: fixed;
+  top: calc(var(--top-menu-height, 50px) + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+  color: var(--color-text, #fff);
+  background: var(--color-dark-background, #1e1e1e);
+  border: 1px solid rgb(var(--epoch-age-caution-rgb));
+}
+
+.epoch-age-badge[data-level='low'] {
+  border-color: rgb(var(--epoch-age-low-rgb));
+  background: rgba(var(--epoch-age-low-rgb), 0.2);
+}
+
+.epoch-age-badge[data-level='poor'] {
+  border-color: rgb(var(--epoch-age-poor-rgb));
+  background: rgba(var(--epoch-age-poor-rgb), 0.3);
+}
+
+.epoch-age-badge[data-level='caution'] {
+  background: rgba(var(--epoch-age-caution-rgb), 0.15);
+}

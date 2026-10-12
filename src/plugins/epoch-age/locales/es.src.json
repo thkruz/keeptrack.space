@@ -1,0 +1,22 @@
+{
+  "plugins": {
+    "EpochAge": {
+      "badge": {
+        "caution": "Antigüedad de época: aceptable, {days}",
+        "low": "Antigüedad de época: baja, {days}",
+        "poor": "Antigüedad de época: muy baja, {days}"
+      },
+      "tooltip": "Tiempo entre la simulación y la época del conjunto de elementos. Aceptable a partir de 3 días, baja a partir de 7, muy baja a partir de 14: cuanto más antiguos son los elementos, más se alejan las posiciones de la realidad.",
+      "toast": {
+        "poor": "Los elementos tienen más de 14 días en este momento. Las posiciones pueden desviarse decenas de kilómetros o más."
+      },
+      "settings": {
+        "sectionLabel": "Antigüedad de época",
+        "showEpochAge": {
+          "label": "Mostrar indicador de antigüedad de época",
+          "helpText": "Avisar cuando el tiempo de simulación esté a más de 3 días de la época de los elementos del satélite seleccionado."
+        }
+      }
+    }
+  }
+}

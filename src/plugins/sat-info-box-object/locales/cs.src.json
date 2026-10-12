@@ -26,6 +26,10 @@
       "label": "Země",
       "tooltip": "Země původu"
     },
+    "ModelFlag": {
+      "label": "Vlajka modelu",
+      "tooltip": "Vlajka vykreslená na 3D modelu: přepsání z katalogu, jinak země původu"
+    },
     "LaunchSite": {
       "label": "Místo startu",
       "tooltip": "Místo, odkud byl objekt vypuštěn"
@@ -51,6 +55,17 @@
       "tooltip": "Zdánlivá vizuální magnituda pozorovaná z vybraného senzoru v aktuálním simulačním čase"
     },
     "estimatedSuffix": "(odh.)",
-    "unknown": "Neznámý"
+    "unknown": "Neznámý",
+    "graphics": {
+      "sectionLabel": "Modely satelitů",
+      "flagDecals": {
+        "label": "Vlajka země na modelu",
+        "helpText": "Promítne vlajku země vlastníka na 3D model vybraného satelitu, na stranu otočenou k vám"
+      },
+      "flagDecalScale": {
+        "label": "Velikost vlajky",
+        "helpText": "Šířka vlajky jako podíl velikosti modelu (0,2 až 0,6)"
+      }
+    }
   }
 }

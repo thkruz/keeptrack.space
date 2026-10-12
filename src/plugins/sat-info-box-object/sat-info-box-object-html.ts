@@ -6,6 +6,7 @@ export const EL = {
   TYPE: 'sat-type',
   STATUS: 'sat-status',
   COUNTRY: 'sat-country',
+  MODEL_FLAG: 'sat-model-flag',
   SITE_ROW: 'sat-site-row',
   LAUNCH_SITE: 'sat-launchSite',
   LAUNCH_PAD: 'sat-launchPad',

@@ -4,28 +4,74 @@ import { buildCatalogRcsStats, estimateRcsWithSource } from '@app/app/analysis/r
 import { SatMath } from '@app/app/analysis/sat-math';
 import { estimateStdMagWithSource, StdMagWithSource } from '@app/app/analysis/std-mag-estimator';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { type FlagSource, resolveFlagKey } from '@app/app/data/catalogs/flag-resolver';
 import { StringExtractor } from '@app/app/ui/string-extractor';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import type { ISettingsContribution, ISettingsContributor } from '@app/engine/plugins/core/plugin-capabilities';
 import { openColorbox } from '@app/engine/utils/colorbox';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
+import { SettingsManager } from '@app/settings/settings';
 import { BaseObject, PayloadStatus, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { EL, SECTIONS } from './sat-info-box-object-html';
 
-export class SatInfoBoxObject extends KeepTrackPlugin {
+export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsContributor {
   readonly id = 'SatInfoBoxObject';
   dependencies_: string[] = [SatInfoBox.name];
 
   private readonly isObjectDataSectionCollapsed_ = false;
   private readonly isSecondaryDataSectionCollapsed_ = false;
+  /** Range of the flag size control, as a fraction of the model's bounding radius. */
+  private static readonly FLAG_SCALE_MIN_ = 0.2;
+  private static readonly FLAG_SCALE_MAX_ = 0.6;
+
+  /** Graphics menu card for the flag decal on the selected satellite's model. */
+  getSettingsContribution(): ISettingsContribution {
+    return {
+      sectionId: this.id,
+      sectionLabel: t7e('SatInfoBoxObject.graphics.sectionLabel'),
+      target: 'graphics',
+      controls: [
+        {
+          type: 'toggle',
+          id: 'flagDecals',
+          label: t7e('SatInfoBoxObject.graphics.flagDecals.label'),
+          helpText: t7e('SatInfoBoxObject.graphics.flagDecals.helpText'),
+          quality: { minLevel: 'medium' },
+          get: () => settingsManager.isDrawFlagDecals,
+          set: (next) => {
+            settingsManager.isDrawFlagDecals = next;
+            SettingsManager.preserveSettings();
+          },
+        },
+        {
+          type: 'number',
+          id: 'flagDecalScale',
+          label: t7e('SatInfoBoxObject.graphics.flagDecalScale.label'),
+          helpText: t7e('SatInfoBoxObject.graphics.flagDecalScale.helpText'),
+          min: SatInfoBoxObject.FLAG_SCALE_MIN_,
+          max: SatInfoBoxObject.FLAG_SCALE_MAX_,
+          step: 0.05,
+          get: () => settingsManager.flagDecalScale,
+          set: (next) => {
+            if (!Number.isFinite(next)) {
+              return;
+            }
+            settingsManager.flagDecalScale = Math.min(Math.max(next, SatInfoBoxObject.FLAG_SCALE_MIN_), SatInfoBoxObject.FLAG_SCALE_MAX_);
+            SettingsManager.preserveSettings();
+          },
+        },
+      ],
+    };
+  }
 
   addHtml(): void {
     super.addHtml();
@@ -76,6 +122,12 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
             kt-tooltip="${t7e('SatInfoBoxObject.Country.tooltip')}">${t7e('SatInfoBoxObject.Country.label')}
           </div>
           <div class="sat-info-value" id="${EL.COUNTRY}">COUNTRY</div>
+        </div>
+        <div class="sat-info-row sat-only-info">
+          <div class="sat-info-key"
+            kt-tooltip="${t7e('SatInfoBoxObject.ModelFlag.tooltip')}">${t7e('SatInfoBoxObject.ModelFlag.label')}
+          </div>
+          <div class="sat-info-value" id="${EL.MODEL_FLAG}">FLAG</div>
         </div>
         <div class="sat-info-row" id="${EL.SITE_ROW}">
           <div class="sat-info-key"
@@ -200,6 +252,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
     const satMisl = obj as Satellite | MissileObject;
 
     this.updateCountryCorrelationTable_(satMisl);
+    this.updateModelFlag_(satMisl);
     this.updateLaunchSiteCorrelationTable_(satMisl);
 
     if (settingsManager.plugins.SatInfoBoxObject?.isShowLaunchVehicle !== false) {
@@ -440,6 +493,24 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
       satCountryElement.innerHTML = country;
     }
   }
+  /** The flag the 3D model shows: catalog override, then country, else unknown. */
+  private updateModelFlag_(obj: Satellite | MissileObject) {
+    const el = getEl(EL.MODEL_FLAG, true);
+
+    if (!el) {
+      return;
+    }
+
+    const key = resolveFlagKey(obj as unknown as FlagSource);
+
+    // The key can come from catalog data, so only a plain flag code reaches innerHTML.
+    if (key && /^[a-z0-9/-]{1,16}$/u.test(key)) {
+      el.innerHTML = `<span class="fi fi-${key}"></span> ${key.toUpperCase()}`;
+    } else {
+      el.textContent = t7e('SatInfoBoxObject.unknown');
+    }
+  }
+
   private updateSatType_(obj: BaseObject) {
     const satTypeElement = getEl(EL.TYPE);
 

@@ -26,6 +26,10 @@
       "label": "Country",
       "tooltip": "Country of Origin"
     },
+    "ModelFlag": {
+      "label": "Model Flag",
+      "tooltip": "Flag drawn on the 3D model: the catalog override if any, otherwise the country of origin"
+    },
     "LaunchSite": {
       "label": "Launch Site",
       "tooltip": "Location from which the object was launched"
@@ -51,6 +55,17 @@
       "tooltip": "Apparent visual magnitude observed from the selected sensor at the current simulation time"
     },
     "estimatedSuffix": "(est.)",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "graphics": {
+      "sectionLabel": "Satellite Models",
+      "flagDecals": {
+        "label": "Country flag on model",
+        "helpText": "Projects the owner country's flag onto the selected satellite's 3D model, on the side facing you"
+      },
+      "flagDecalScale": {
+        "label": "Flag size",
+        "helpText": "Flag width as a fraction of the model's size (0.2 to 0.6)"
+      }
+    }
   }
 }

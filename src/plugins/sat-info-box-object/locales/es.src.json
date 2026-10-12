@@ -26,6 +26,10 @@
       "label": "País",
       "tooltip": "País de Origen"
     },
+    "ModelFlag": {
+      "label": "Bandera del modelo",
+      "tooltip": "Bandera dibujada en el modelo 3D: la indicada por el catálogo o, si no, el país de origen"
+    },
     "LaunchSite": {
       "label": "Sitio de Lanzamiento",
       "tooltip": "Lugar desde el que se lanzó el objeto"
@@ -51,6 +55,17 @@
       "tooltip": "Magnitud visual aparente observada desde el sensor seleccionado en el tiempo de simulación actual"
     },
     "estimatedSuffix": "(est.)",
-    "unknown": "Desconocido"
+    "unknown": "Desconocido",
+    "graphics": {
+      "sectionLabel": "Modelos de satélites",
+      "flagDecals": {
+        "label": "Bandera del país en el modelo",
+        "helpText": "Proyecta la bandera del país propietario sobre el modelo 3D del satélite seleccionado, en el lado que mira hacia usted"
+      },
+      "flagDecalScale": {
+        "label": "Tamaño de la bandera",
+        "helpText": "Ancho de la bandera como fracción del tamaño del modelo (0,2 a 0,6)"
+      }
+    }
   }
 }

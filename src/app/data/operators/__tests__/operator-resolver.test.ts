@@ -1,3 +1,4 @@
+import flagAtlas from '../../../../../public/img/flag-atlas/atlas.json';
 import { operatorKey } from '../operator-resolver';
 import { OPERATOR_RULES } from '../operator-rules';
 
@@ -75,7 +76,9 @@ describe('OPERATOR_RULES', () => {
     }
   });
 
-  it.skip('every slug country has a flag atlas cell (enabled once the atlas exists, T2)', () => {
-    // Filled in by T2.
+  it('every slug country has a flag atlas cell', () => {
+    for (const rule of OPERATOR_RULES) {
+      expect(flagAtlas.cells[rule.country as keyof typeof flagAtlas.cells], rule.slug).toBeDefined();
+    }
   });
 });

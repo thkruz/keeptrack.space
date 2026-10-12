@@ -13,6 +13,7 @@ import { BufferAttribute } from './buffer-attribute';
 import { OcclusionProgram } from './draw-manager/post-processing';
 import { Material } from './material';
 import { OBJLoader } from './mesh/loaders/webgl-obj-loader';
+import type { MeshBounds } from './mesh/mesh-bounds';
 import { MeshRegistry } from './mesh/mesh-registry';
 import { MeshRenderer } from './mesh/mesh-renderer';
 
@@ -59,6 +60,8 @@ export type MeshModel = {
   geometry?: Geometry;
   material?: Material;
   layout?: Layout;
+  /** Model-space bounds (km) computed once at load; drives the flag decal size and centre. */
+  bounds?: MeshBounds;
 };
 
 export interface MeshObject {

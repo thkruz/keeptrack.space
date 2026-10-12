@@ -52,6 +52,12 @@ without booting the app or shipping the mesh first.
 Chromium must launch with `--disable-gpu` (swiftshader) for headless capture, or the first composited
 WebGL context is lost and every frame comes out black.
 
+## Flag atlas
+
+| Tool | Run with | What it does |
+| --- | --- | --- |
+| `flag-atlas/build-flag-atlas.ts` | `npx tsx scripts/flag-atlas/build-flag-atlas.ts` | Rasterise the flag-icons SVGs (and the custom PNGs in `public/flags/`) for every country code in `countries.ts` into `public/img/flag-atlas/atlas.png` + `atlas.json`, the decal the mesh shader projects onto the selected model. Deterministic (sorted keys, CPU Chromium, own PNG writer); fails over 512 KB. Rerun after editing the country tables. |
+
 ## External plugins
 
 | Tool | Run with | What it does |

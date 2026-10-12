@@ -1,0 +1,61 @@
+{
+  "plugins": {
+    "SatelliteSwath": {
+      "bottomIconLabel": "Pozemní pás",
+      "title": "Pozemní pás",
+      "sections": {
+        "sensor": "Senzor",
+        "display": "Zobrazení"
+      },
+      "labels": {
+        "preset": "Předvolba",
+        "inputMode": "Zadání stopy",
+        "modeWidth": "Šířka pásu (km)",
+        "modeFov": "Zorné pole (°)",
+        "swathWidthKm": "Šířka pásu (km)",
+        "fovDeg": "Zorné pole (°)",
+        "maxOffNadirDeg": "Max. vychýlení od nadiru (°)",
+        "minSunElevDeg": "Min. výška Slunce (°)",
+        "showFieldOfRegard": "Zobrazit pole dosahu",
+        "daylightOnly": "Jen za denního světla",
+        "nadirReadout": "Šířka v nadiru asi {km} km (FOV {fov}°)",
+        "nadirReadoutUnknown": "Šířka v nadiru pro tuto dráhu neznámá",
+        "presetsIllustrative": "Předvolby jsou ilustrativní, nejde o zveřejněné specifikace."
+      },
+      "presets": {
+        "hrEo": "Optický, vysoké rozlišení",
+        "mrEo": "Optický, střední rozlišení",
+        "wide": "Širokoúhlý snímač",
+        "custom": "Vlastní"
+      },
+      "commands": {
+        "toggle": "Přepnout pozemní pás",
+        "openSettings": "Otevřít nastavení pozemního pásu"
+      },
+      "shortcuts": {
+        "toggle": "Přepnout pozemní pás"
+      },
+      "graphics": {
+        "sectionLabel": "Pozemní pás",
+        "drawSwath": {
+          "label": "Kreslit pozemní pás",
+          "helpText": "Zobrazí snímací pás vybrané družice podél její vykreslené dráhy."
+        },
+        "fieldOfRegardFill": {
+          "label": "Výplň pole dosahu",
+          "helpText": "Vedle pásu v nadiru vykreslí průsvitný pás, kam senzor dosáhne naklopením."
+        }
+      },
+      "errorMsgs": {
+        "outOfRange": "Zadejte číslo mezi {min} a {max}."
+      },
+      "help": {
+        "overview": "Ukazuje, kde může senzor vybrané družice snímat podél vykreslené dráhy: neprůhledný pás v nadiru a průsvitné pole dosahu až po mez naklopení. Úseky, kde je Slunce v podružicovém bodě pod minimální výškou, jsou ztlumené, nebo skryté volbou Jen za denního světla. Vějíř sleduje družici od její polohy k okrajům pásu.",
+        "howToUse": "Vyberte družici a zapněte vrstvu Pozemní pás. Zvolte předvolbu nebo zadejte šířku pásu či zorné pole, maximální vychýlení od nadiru a minimální výšku Slunce. Nastavení se pamatuje pro každou družici.",
+        "tip1": "Předvolby jsou ilustrativní, nejsou to zveřejněné specifikace žádného skutečného senzoru.",
+        "tip2": "Výplň pole dosahu se řídí i úrovní kvality v nabídce Grafika (od Střední výše).",
+        "flatMap": "V režimu ploché mapy je pás skrytý."
+      }
+    }
+  }
+}

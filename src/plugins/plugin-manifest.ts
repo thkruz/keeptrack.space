@@ -560,6 +560,12 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
   {
+    configKey: 'SatelliteSwath',
+    ossImport: () => import('./satellite-swath/satellite-swath'),
+    ossClassName: 'SatelliteSwath',
+    defaultConfig: { enabled: true, order: 76 },
+  },
+  {
     configKey: 'StereoMap',
     ossImport: () => import('./stereo-map/stereo-map'),
     ossClassName: 'StereoMap',

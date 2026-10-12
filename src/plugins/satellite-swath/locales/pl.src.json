@@ -1,0 +1,61 @@
+{
+  "plugins": {
+    "SatelliteSwath": {
+      "bottomIconLabel": "Pas naziemny",
+      "title": "Pas naziemny",
+      "sections": {
+        "sensor": "Sensor",
+        "display": "Wyświetlanie"
+      },
+      "labels": {
+        "preset": "Ustawienie wstępne",
+        "inputMode": "Sposób podania śladu",
+        "modeWidth": "Szerokość pasa (km)",
+        "modeFov": "Pole widzenia (°)",
+        "swathWidthKm": "Szerokość pasa (km)",
+        "fovDeg": "Pole widzenia (°)",
+        "maxOffNadirDeg": "Maks. odchylenie od nadiru (°)",
+        "minSunElevDeg": "Min. wysokość Słońca (°)",
+        "showFieldOfRegard": "Pokaż pole dostępności",
+        "daylightOnly": "Tylko w świetle dziennym",
+        "nadirReadout": "Szerokość w nadirze ok. {km} km (FOV {fov}°)",
+        "nadirReadoutUnknown": "Szerokość w nadirze nieznana dla tej orbity",
+        "presetsIllustrative": "Ustawienia wstępne są poglądowe, nie są opublikowanymi specyfikacjami."
+      },
+      "presets": {
+        "hrEo": "Optyczny, wysoka rozdzielczość",
+        "mrEo": "Optyczny, średnia rozdzielczość",
+        "wide": "Kamera szerokokątna",
+        "custom": "Własne"
+      },
+      "commands": {
+        "toggle": "Przełącz pas naziemny",
+        "openSettings": "Otwórz ustawienia pasa naziemnego"
+      },
+      "shortcuts": {
+        "toggle": "Przełącz pas naziemny"
+      },
+      "graphics": {
+        "sectionLabel": "Pas naziemny",
+        "drawSwath": {
+          "label": "Rysuj pas naziemny",
+          "helpText": "Pokazuje pas obrazowania wybranego satelity wzdłuż narysowanej orbity."
+        },
+        "fieldOfRegardFill": {
+          "label": "Wypełnienie pola dostępności",
+          "helpText": "Rysuje obok pasa w nadirze półprzezroczysty pas, który sensor osiąga przez pochylenie."
+        }
+      },
+      "errorMsgs": {
+        "outOfRange": "Wpisz liczbę od {min} do {max}."
+      },
+      "help": {
+        "overview": "Pokazuje, gdzie sensor wybranego satelity może obrazować wzdłuż narysowanej orbity: nieprzezroczysty pas w nadirze i półprzezroczyste pole dostępności do granicy pochylenia. Odcinki, w których Słońce w punkcie podsatelitarnym jest poniżej minimalnej wysokości, są przyciemnione lub ukryte opcją Tylko w świetle dziennym. Wachlarz biegnie od satelity do krawędzi pasa.",
+        "howToUse": "Wybierz satelitę i włącz warstwę Pas naziemny. Wybierz ustawienie wstępne lub podaj szerokość pasa albo pole widzenia, maksymalne odchylenie od nadiru i minimalną wysokość Słońca. Ustawienia są zapamiętywane dla każdego satelity.",
+        "tip1": "Ustawienia wstępne są poglądowe, nie są opublikowanymi specyfikacjami żadnego rzeczywistego sensora.",
+        "tip2": "Wypełnienie pola dostępności podąża też za poziomem jakości w menu Grafika (od Średniej).",
+        "flatMap": "W trybie płaskiej mapy pas jest ukryty."
+      }
+    }
+  }
+}

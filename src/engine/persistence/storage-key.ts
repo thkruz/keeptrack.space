@@ -39,6 +39,7 @@ export enum StorageKey {
   SETTINGS_DRAW_FLAT_MAP_TERMINATOR = 'v2-keepTrack-settings-drawFlatMapTerminator',
   SETTINGS_DRAW_SUN = 'v2-keepTrack-settings-drawSun',
   SETTINGS_DRAW_ORBIT_ECLIPSE = 'v2-keepTrack-settings-drawOrbitEclipse',
+  SETTINGS_DRAW_SWATH_FIELD_OF_REGARD = 'v2-keepTrack-settings-drawSwathFieldOfRegard',
   SETTINGS_SHOW_EPOCH_AGE = 'v2-keepTrack-settings-showEpochAge',
   SETTINGS_CONFIDENCE_LEVELS = 'v2-keepTrack-settings-confidenceLevels',
   SETTINGS_DRAW_COVARIANCE_ELLIPSOID = 'v2-keepTrack-settings-drawCovarianceEllipsoid',
@@ -161,6 +162,7 @@ export enum StorageKey {
 
   // Breakup (last-used variation inputs: inc/period/RAAN/ecc spread, count, start number)
   BREAKUP_SETTINGS = 'v2-keepTrack-breakupSettings',
+  SATELLITE_SWATH_SETTINGS = 'v2-keepTrack-satelliteSwathSettings',
 
   // Reports (last-used output options: time window, sampling step, export format)
   REPORTS_SETTINGS = 'v2-keepTrack-reportsSettings',

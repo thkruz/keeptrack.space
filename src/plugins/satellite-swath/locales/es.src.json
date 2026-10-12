@@ -1,0 +1,61 @@
+{
+  "plugins": {
+    "SatelliteSwath": {
+      "bottomIconLabel": "Franja en tierra",
+      "title": "Franja en tierra",
+      "sections": {
+        "sensor": "Sensor",
+        "display": "Visualización"
+      },
+      "labels": {
+        "preset": "Preajuste",
+        "inputMode": "Entrada de la huella",
+        "modeWidth": "Ancho de franja (km)",
+        "modeFov": "Campo de visión (grados)",
+        "swathWidthKm": "Ancho de franja (km)",
+        "fovDeg": "Campo de visión (grados)",
+        "maxOffNadirDeg": "Inclinación máx. fuera del nadir (grados)",
+        "minSunElevDeg": "Elevación solar mín. (grados)",
+        "showFieldOfRegard": "Mostrar campo de alcance",
+        "daylightOnly": "Solo luz diurna",
+        "nadirReadout": "Ancho en nadir aprox. {km} km (FOV {fov}°)",
+        "nadirReadoutUnknown": "Ancho en nadir desconocido para esta órbita",
+        "presetsIllustrative": "Los preajustes son ilustrativos, no especificaciones publicadas."
+      },
+      "presets": {
+        "hrEo": "Óptico de alta resolución",
+        "mrEo": "Óptico de resolución media",
+        "wide": "Generador de imágenes de campo amplio",
+        "custom": "Personalizado"
+      },
+      "commands": {
+        "toggle": "Alternar franja en tierra",
+        "openSettings": "Abrir ajustes de franja en tierra"
+      },
+      "shortcuts": {
+        "toggle": "Alternar la franja en tierra"
+      },
+      "graphics": {
+        "sectionLabel": "Franja en tierra",
+        "drawSwath": {
+          "label": "Dibujar franja en tierra",
+          "helpText": "Muestra la franja de captura del satélite seleccionado a lo largo de su órbita dibujada."
+        },
+        "fieldOfRegardFill": {
+          "label": "Relleno del campo de alcance",
+          "helpText": "Dibuja junto a la franja nadir la banda translúcida que el sensor alcanza al inclinarse."
+        }
+      },
+      "errorMsgs": {
+        "outOfRange": "Introduzca un número entre {min} y {max}."
+      },
+      "help": {
+        "overview": "Muestra dónde puede tomar imágenes el sensor del satélite seleccionado a lo largo de la órbita dibujada: una franja nadir opaca y un campo de alcance translúcido hasta el límite de inclinación. Los tramos en los que el Sol está por debajo de la elevación mínima en el punto subsatelital se atenúan, o se ocultan con Solo luz diurna. Un abanico sigue al satélite desde su posición hasta los bordes de la franja.",
+        "howToUse": "Seleccione un satélite y active la capa Franja en tierra. Elija un preajuste o introduzca un ancho de franja o un campo de visión, la inclinación máxima fuera del nadir y la elevación solar mínima. Los ajustes se recuerdan por satélite.",
+        "tip1": "Los preajustes son ilustrativos, no especificaciones publicadas de ningún sensor real.",
+        "tip2": "El relleno del campo de alcance también sigue el nivel de calidad del menú Gráficos (Medio o superior).",
+        "flatMap": "La franja se oculta en el modo de mapa plano."
+      }
+    }
+  }
+}

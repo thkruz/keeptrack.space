@@ -97,6 +97,13 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
     },
   },
   {
+    key: StorageKey.SETTINGS_DRAW_SWATH_FIELD_OF_REGARD,
+    serialize: (sm) => String(sm.isDrawSwathFieldOfRegard),
+    deserialize: (sm, raw) => {
+      sm.isDrawSwathFieldOfRegard = bool(raw);
+    },
+  },
+  {
     key: StorageKey.SETTINGS_SHOW_EPOCH_AGE,
     serialize: (sm) => String(sm.isShowEpochAge),
     deserialize: (sm, raw) => {

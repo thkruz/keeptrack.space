@@ -95,6 +95,7 @@ export type KeepTrackPluginsConfiguration = {
   PolarView?: PluginConfiguration;
   MultiView?: PluginConfiguration;
   SatelliteFov?: PluginConfiguration;
+  SatelliteSwath?: PluginConfiguration;
   StereoMap?: PluginConfiguration;
   Planetarium?: PluginConfiguration;
   Astronomy?: PluginConfiguration;

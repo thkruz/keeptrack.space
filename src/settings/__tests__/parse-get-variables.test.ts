@@ -157,11 +157,21 @@ describe('parseGetVariables', () => {
   });
 
   it('should set godraysSamples', () => {
-    const godraysMock = vi.spyOn(GetVariables, 'godrays').mockReturnValue(16);
+    const godraysMock = vi.spyOn(GetVariables, 'godrays').mockReturnValue(24);
 
     parseGetVariables(['godrays=abc'], settingsManager);
-    expect(settingsManager.godraysSamples).toBe(16);
+    expect(settingsManager.godraysSamples).toBe(24);
     godraysMock.mockRestore();
+  });
+
+  it('maps godrays URL values onto GodraySamples members', () => {
+    // Legacy count 32 snaps to MEDIUM (36); an unknown value falls back to MEDIUM.
+    parseGetVariables(['godrays=32'], settingsManager);
+    expect(settingsManager.godraysSamples).toBe(36);
+    parseGetVariables(['godrays=hi'], settingsManager);
+    expect(settingsManager.godraysSamples).toBe(52);
+    parseGetVariables(['godrays=abc'], settingsManager);
+    expect(settingsManager.godraysSamples).toBe(36);
   });
 
   it('should set lowperf options', () => {

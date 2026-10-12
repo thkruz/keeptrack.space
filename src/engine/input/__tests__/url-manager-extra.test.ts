@@ -83,6 +83,51 @@ describe('UrlManager.parseGetVariables', () => {
   });
 });
 
+describe('UrlManager sun parameter', () => {
+  beforeEach(() => {
+    setupStandardEnvironment();
+  });
+
+  // Legacy counts snap to the nearest GodraySamples member (-1, 24, 36, 52, 80).
+  const CASES: [string, number][] = [
+    ['16', 24],
+    ['32', 36],
+    ['64', 52],
+    ['128', 80],
+    ['36', 36],
+    ['low', 24],
+    ['ultra', 80],
+  ];
+
+  for (const [raw, expected] of CASES) {
+    it(`sun=${raw} sets ${expected} godray samples`, () => {
+      setLocation(`?sun=${raw}`);
+      UrlManager.parseGetVariables(settingsManager);
+
+      expect(settingsManager.godraysSamples).toBe(expected);
+      expect(settingsManager.isDrawSun).toBe(true);
+      expect(settingsManager.isDisableGodrays).toBe(false);
+    });
+  }
+
+  it('sun=potato uses the sun texture with godrays off', () => {
+    setLocation('?sun=potato');
+    UrlManager.parseGetVariables(settingsManager);
+
+    expect(settingsManager.godraysSamples).toBe(-1);
+    expect(settingsManager.isUseSunTexture).toBe(true);
+    expect(settingsManager.isDisableGodrays).toBe(true);
+  });
+
+  it('sun=off hides the sun', () => {
+    setLocation('?sun=off');
+    UrlManager.parseGetVariables(settingsManager);
+
+    expect(settingsManager.isDrawSun).toBe(false);
+    expect(settingsManager.isDisableGodrays).toBe(true);
+  });
+});
+
 describe('UrlManager.getKeyValuePairs', () => {
   it('keeps a wrapped external URL intact, including its own query string', () => {
     setLocation('/?tle=%22https://celestrak.org/NORAD/elements/supplemental/sup-gp.php?INTDES=2026-123&FORMAT=csv%22&external-only=true');

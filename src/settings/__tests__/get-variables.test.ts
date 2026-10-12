@@ -1,35 +1,27 @@
 import { GetVariables } from '@app/settings/getVariables';
 
+// GodraySamples members: OFF -1, LOW 24, MEDIUM 36, HIGH 52, ULTRA 80.
 describe('GetVariables.godrays', () => {
-  it('returns 16 for "low"', () => {
-    expect(GetVariables.godrays('low')).toBe(16);
-  });
+  const CASES: [string, number][] = [
+    ['low', 24],
+    ['med', 36],
+    ['medium', 36],
+    ['hi', 52],
+    ['high', 52],
+    ['u', 80],
+    ['ultra', 80],
+    // Legacy sample counts snap to the nearest member.
+    ['16', 24],
+    ['128', 80],
+  ];
 
-  it('returns 32 for "med"', () => {
-    expect(GetVariables.godrays('med')).toBe(32);
-  });
+  for (const [raw, expected] of CASES) {
+    it(`returns ${expected} for "${raw}"`, () => {
+      expect(GetVariables.godrays(raw)).toBe(expected);
+    });
+  }
 
-  it('returns 32 for "medium"', () => {
-    expect(GetVariables.godrays('medium')).toBe(32);
-  });
-
-  it('returns 64 for "hi"', () => {
-    expect(GetVariables.godrays('hi')).toBe(64);
-  });
-
-  it('returns 64 for "high"', () => {
-    expect(GetVariables.godrays('high')).toBe(64);
-  });
-
-  it('returns 128 for "u"', () => {
-    expect(GetVariables.godrays('u')).toBe(128);
-  });
-
-  it('returns 128 for "ultra"', () => {
-    expect(GetVariables.godrays('ultra')).toBe(128);
-  });
-
-  it('returns 32 for unknown value', () => {
-    expect(GetVariables.godrays('unknown')).toBe(32);
+  it('returns 36 (MEDIUM) for an unknown value', () => {
+    expect(GetVariables.godrays('unknown')).toBe(36);
   });
 });

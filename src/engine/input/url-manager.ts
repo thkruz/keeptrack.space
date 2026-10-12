@@ -12,6 +12,7 @@ import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { KeyboardComponent } from '../plugins/components/keyboard/keyboard-component';
 import { AtmosphereSettings, EarthTextureStyle } from '../rendering/draw-manager/earth-quality-enums';
+import { GodraySamples, parseGodraySamplesParam } from '../rendering/draw-manager/godray-samples';
 import { errorManagerInstance } from '../utils/errorManager';
 import { getEl } from '../utils/get-el';
 import { waitForCruncher } from '../utils/waitForCruncher';
@@ -904,31 +905,26 @@ export abstract class UrlManager {
     settingsManager.isUseSunTexture = false;
     settingsManager.isDisableGodrays = false;
 
-    switch (val) {
-      case 'off':
-        settingsManager.isDrawSun = false;
-        settingsManager.isUseSunTexture = false;
-        settingsManager.isDisableGodrays = true;
-        break;
-      case 'potato':
-        settingsManager.godraysSamples = -1; // GodraySamples.OFF
-        settingsManager.isUseSunTexture = true;
-        settingsManager.isDisableGodrays = true;
-        break;
-      case 'low':
-        settingsManager.godraysSamples = 16; // GodraySamples.LOW
-        break;
-      case 'medium':
-        settingsManager.godraysSamples = 32; // GodraySamples.MEDIUM
-        break;
-      case 'high':
-        settingsManager.godraysSamples = 64; // GodraySamples.HIGH
-        break;
-      case 'ultra':
-        settingsManager.godraysSamples = 128; // GodraySamples.ULTRA
-        break;
-      default:
-        errorManagerInstance.warn(`Unknown sun parameter: ${val}`);
+    if (val === 'off') {
+      settingsManager.isDrawSun = false;
+      settingsManager.isDisableGodrays = true;
+
+      return;
+    }
+
+    // 'potato' is the sun texture without godrays; anything else names a level or a sample count.
+    const samples = val === 'potato' ? GodraySamples.OFF : parseGodraySamplesParam(val);
+
+    if (samples === null) {
+      errorManagerInstance.warn(`Unknown sun parameter: ${val}`);
+
+      return;
+    }
+
+    settingsManager.godraysSamples = samples;
+    if (samples === GodraySamples.OFF) {
+      settingsManager.isUseSunTexture = true;
+      settingsManager.isDisableGodrays = true;
     }
   }
 

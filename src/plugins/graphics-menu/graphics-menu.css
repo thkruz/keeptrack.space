@@ -97,12 +97,12 @@
 /* ===== Dense-form fixes (see docs-local/ui/v13-menu-style.md) ===== */
 
 /* 1. Stacked select/number fields: keep the floating "active" label from
-   striking through the row above. The first field after a section label only
-   needs the smaller gap. */
+   striking through the row above. A field that opens a card still needs room
+   for its floating label below the section label. */
 #graphics-menu .kt-field-row .input-field.col { margin-top: 20px; }
 #graphics-menu .kt-section-label + .kt-field-row .input-field.col { margin-top: 8px; }
 #graphics-menu .kt-section .input-field.col.s12 { margin-top: 18px; }
-#graphics-menu .kt-section-label + .input-field.col.s12 { margin-top: 6px; }
+#graphics-menu .kt-section-label + .input-field.col.s12 { margin-top: 24px; }
 
 /* Toggle rows: tighten the Materialize .row default and give the switches a
    consistent vertical rhythm inside the card. */

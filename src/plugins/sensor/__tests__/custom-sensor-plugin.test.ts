@@ -92,4 +92,12 @@ describe('CustomSensorPlugin horizon mask', () => {
     expect(addSpy).not.toHaveBeenCalled();
     expect(warnSpy.mock.calls[0][0]).toContain('"400,10"');
   });
+
+  it('documents the horizon mask field in the English help body', () => {
+    const plugin = new CustomSensorPlugin();
+    const fields = plugin.getHelpConfig().sections.find((s) => s.content.includes('<strong>Latitude</strong>'));
+
+    expect(fields?.content).toContain('Horizon mask');
+    expect(fields?.content).toContain('two contacts');
+  });
 });

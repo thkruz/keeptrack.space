@@ -451,6 +451,7 @@ export class WebpackManager {
       entry.coverageWorker = ['./src/plugins-pro/coverage-analysis/coverageWorker.ts'];
       entry.tocaPocaWorker = ['./src/plugins-pro/toca-poca-plugin/tocaPocaWorker.ts'];
       entry.overflightWorker = ['./src/plugins-pro/overflight/overflightWorker.ts'];
+      entry.imagingWorker = ['./src/plugins-pro/imaging-opportunities/imagingWorker.ts'];
       entry.neighborhoodHistoryWorker = ['./src/plugins-pro/neighborhood-history/neighborhoodHistoryWorker.ts'];
       entry.interceptorWorker = ['./src/plugins-pro/satellite-interceptor/interceptorWorker.ts'];
       entry.transitFinderWorker = ['./src/plugins-pro/transit-finder/transitFinderWorker.ts'];

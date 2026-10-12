@@ -566,6 +566,12 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 76 },
   },
   {
+    configKey: 'ImagingOpportunities',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/imaging-opportunities/imaging-opportunities') : undefined,
+    proClassName: 'ImagingOpportunities',
+    defaultConfig: { enabled: true, order: 77 },
+  },
+  {
     configKey: 'StereoMap',
     ossImport: () => import('./stereo-map/stereo-map'),
     ossClassName: 'StereoMap',

@@ -16,7 +16,6 @@
         "fovDeg": "Поле зору (°)",
         "maxOffNadirDeg": "Макс. відхилення від надиру (°)",
         "minSunElevDeg": "Мін. висота Сонця (°)",
-        "showFieldOfRegard": "Показати смугу доступу",
         "daylightOnly": "Лише вдень",
         "nadirReadout": "Ширина в надирі близько {km} км (FOV {fov}°)",
         "nadirReadoutUnknown": "Ширина в надирі для цієї орбіти невідома",

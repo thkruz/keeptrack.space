@@ -16,7 +16,6 @@
         "fovDeg": "视场角 (度)",
         "maxOffNadirDeg": "最大偏离星下点角 (度)",
         "minSunElevDeg": "最小太阳高度角 (度)",
-        "showFieldOfRegard": "显示可观测范围",
         "daylightOnly": "仅白天",
         "nadirReadout": "星下点幅宽约 {km} km (视场角 {fov}°)",
         "nadirReadoutUnknown": "无法计算此轨道的星下点幅宽",

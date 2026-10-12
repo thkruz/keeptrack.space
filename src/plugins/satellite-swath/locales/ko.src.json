@@ -16,7 +16,6 @@
         "fovDeg": "시야각 (도)",
         "maxOffNadirDeg": "최대 비천저각 (도)",
         "minSunElevDeg": "최소 태양 고도 (도)",
-        "showFieldOfRegard": "관측 가능 범위 표시",
         "daylightOnly": "주간만",
         "nadirReadout": "천저 관측 폭 약 {km} km (FOV {fov}°)",
         "nadirReadoutUnknown": "이 궤도의 천저 관측 폭을 알 수 없음",

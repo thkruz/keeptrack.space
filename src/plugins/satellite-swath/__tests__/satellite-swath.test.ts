@@ -49,10 +49,10 @@ describe('SatelliteSwath core', () => {
   });
 
   it('passes the toggles through to the mesh parameters', () => {
-    const p = toSwathParams({ ...defaultSwathSettings(), isDaylightOnly: true, isShowFieldOfRegard: false }, 500);
+    const p = toSwathParams({ ...defaultSwathSettings(), isDaylightOnly: true }, 500);
 
     expect(p.isDaylightOnly).toBe(true);
-    expect(p.isShowFieldOfRegard).toBe(false);
+    expect('isShowFieldOfRegard' in p).toBe(false);
     // mr-eo preset: 20 deg tilt, 10 deg Sun.
     expect(p.maxOffNadirDeg).toBe(20);
     expect(p.minSunElevDeg).toBe(10);
@@ -63,6 +63,34 @@ describe('SatelliteSwath core', () => {
     expect(sanitizeSwathSettings({ ...defaultSwathSettings(), presetId: 'nope' })).toBeNull();
     expect(sanitizeSwathSettings('x')).toBeNull();
     expect(sanitizeSwathSettings(defaultSwathSettings())).toEqual(defaultSwathSettings());
+  });
+
+  it('loads entries saved with the retired per-satellite field-of-regard key and drops it', () => {
+    // Shape stored before the global flag replaced the per-satellite switch.
+    const legacy = {
+      presetId: 'hr-eo',
+      mode: 'width',
+      swathKm: 12,
+      fovDeg: 1.4,
+      maxOffNadirDeg: 30,
+      minSunElevDeg: 10,
+      isShowFieldOfRegard: false,
+      isDaylightOnly: true,
+    };
+
+    expect(sanitizeSwathSettings(legacy)).toEqual({
+      presetId: 'hr-eo',
+      mode: 'width',
+      swathKm: 12,
+      fovDeg: 1.4,
+      maxOffNadirDeg: 30,
+      minSunElevDeg: 10,
+      isDaylightOnly: true,
+    });
+    const store = SwathSettingsStore.parse(JSON.stringify([['25544', legacy]]));
+
+    expect(store.size).toBe(1);
+    expect(store.get('25544')).not.toHaveProperty('isShowFieldOfRegard');
   });
 
   it('caps the store at 200 satellites, dropping the oldest', () => {

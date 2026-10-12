@@ -11,12 +11,10 @@ import { liftSurfacePoint, SwathColors, SwathDrawRange, SwathMesh, SwathStripKin
 export interface SwathParams {
   /** Full nadir field of view. */
   fovDeg: number;
-  /** Maximum off-nadir tilt; 0 disables the field of regard. */
+  /** Maximum off-nadir tilt; 0 disables the field of regard (also gated by settingsManager.isDrawSwathFieldOfRegard). */
   maxOffNadirDeg: number;
   /** Minimum Sun elevation at the sub-point for a sample to count as lit. */
   minSunElevDeg: number;
-  /** Draw the field-of-regard strip (also gated by settingsManager.isDrawSwathFieldOfRegard). */
-  isShowFieldOfRegard: boolean;
   /** Hide unlit runs instead of dimming them. */
   isDaylightOnly: boolean;
 }
@@ -276,7 +274,7 @@ export class SwathMeshFactory extends CustomMeshFactory<SwathMesh> {
 
     const strips: PendingStrip[] = [];
     const nadirHalf = (params.fovDeg / 2) * DEG2RAD;
-    const isShowRegard = params.isShowFieldOfRegard && params.maxOffNadirDeg > 0 && settingsManager.isDrawSwathFieldOfRegard;
+    const isShowRegard = params.maxOffNadirDeg > 0 && settingsManager.isDrawSwathFieldOfRegard;
 
     // Field of regard first so the nadir strip draws on top of it.
     if (isShowRegard) {

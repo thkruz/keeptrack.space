@@ -17,7 +17,6 @@ export interface SatelliteSwathSettings {
   fovDeg: number;
   maxOffNadirDeg: number;
   minSunElevDeg: number;
-  isShowFieldOfRegard: boolean;
   isDaylightOnly: boolean;
 }
 
@@ -42,7 +41,7 @@ export const SWATH_LIMITS = {
 export const SWATH_STORE_CAP = 200;
 
 export const defaultSwathSettings = (): SatelliteSwathSettings =>
-  applyPreset({ presetId: 'mr-eo', mode: 'width', swathKm: 120, fovDeg: 14, maxOffNadirDeg: 20, minSunElevDeg: 10, isShowFieldOfRegard: true, isDaylightOnly: false }, 'mr-eo');
+  applyPreset({ presetId: 'mr-eo', mode: 'width', swathKm: 120, fovDeg: 14, maxOffNadirDeg: 20, minSunElevDeg: 10, isDaylightOnly: false }, 'mr-eo');
 
 /** Copy of `settings` with a preset's geometry applied (custom leaves the numbers alone). */
 export function applyPreset(settings: SatelliteSwathSettings, presetId: SwathPresetId): SatelliteSwathSettings {
@@ -80,14 +79,17 @@ export function toSwathParams(settings: SatelliteSwathSettings, meanAltKm: numbe
     fovDeg: resolveFovDeg(settings, meanAltKm),
     maxOffNadirDeg: settings.maxOffNadirDeg,
     minSunElevDeg: settings.minSunElevDeg,
-    isShowFieldOfRegard: settings.isShowFieldOfRegard,
     isDaylightOnly: settings.isDaylightOnly,
   };
 }
 
 const isNum_ = (v: unknown, lo: number, hi: number): v is number => typeof v === 'number' && Number.isFinite(v) && v >= lo && v <= hi;
 
-/** Validates one stored entry; null when any field is missing or out of range. */
+/**
+ * Validates one stored entry; null when any field is missing or out of range. Unknown keys are
+ * dropped, including the retired per-satellite `isShowFieldOfRegard` (the global
+ * `settingsManager.isDrawSwathFieldOfRegard` flag replaced it).
+ */
 export function sanitizeSwathSettings(raw: unknown): SatelliteSwathSettings | null {
   if (!raw || typeof raw !== 'object') {
     return null;
@@ -101,7 +103,6 @@ export function sanitizeSwathSettings(raw: unknown): SatelliteSwathSettings | nu
     !isNum_(r.fovDeg, SWATH_LIMITS.fovDeg.min, SWATH_LIMITS.fovDeg.max) ||
     !isNum_(r.maxOffNadirDeg, SWATH_LIMITS.maxOffNadirDeg.min, SWATH_LIMITS.maxOffNadirDeg.max) ||
     !isNum_(r.minSunElevDeg, SWATH_LIMITS.minSunElevDeg.min, SWATH_LIMITS.minSunElevDeg.max) ||
-    typeof r.isShowFieldOfRegard !== 'boolean' ||
     typeof r.isDaylightOnly !== 'boolean'
   ) {
     return null;
@@ -114,7 +115,6 @@ export function sanitizeSwathSettings(raw: unknown): SatelliteSwathSettings | nu
     fovDeg: r.fovDeg,
     maxOffNadirDeg: r.maxOffNadirDeg,
     minSunElevDeg: r.minSunElevDeg,
-    isShowFieldOfRegard: r.isShowFieldOfRegard,
     isDaylightOnly: r.isDaylightOnly,
   };
 }

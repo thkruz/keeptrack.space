@@ -16,7 +16,6 @@
         "fovDeg": "Sichtfeld (Grad)",
         "maxOffNadirDeg": "Max. Neigung aus Nadir (Grad)",
         "minSunElevDeg": "Min. Sonnenhöhe (Grad)",
-        "showFieldOfRegard": "Field of Regard anzeigen",
         "daylightOnly": "Nur bei Tageslicht",
         "nadirReadout": "Nadirbreite etwa {km} km (FOV {fov}°)",
         "nadirReadoutUnknown": "Nadirbreite für diesen Orbit unbekannt",

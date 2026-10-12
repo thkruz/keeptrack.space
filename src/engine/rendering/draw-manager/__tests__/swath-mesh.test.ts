@@ -13,7 +13,6 @@ const params = (over: Partial<SwathParams> = {}): SwathParams => ({
   fovDeg: 14,
   maxOffNadirDeg: 0,
   minSunElevDeg: 0,
-  isShowFieldOfRegard: false,
   isDaylightOnly: false,
   ...over,
 });
@@ -83,7 +82,7 @@ describe('SwathMeshFactory ribbon', () => {
   });
 
   it('keeps every vertex lifted just above the surface', () => {
-    const factory = build(params({ maxOffNadirDeg: 20, isShowFieldOfRegard: true }));
+    const factory = build(params({ maxOffNadirDeg: 20 }));
     const mesh = factory.meshes[0];
     const v = mesh.vertices;
     const lift = 2;
@@ -101,7 +100,7 @@ describe('SwathMeshFactory ribbon', () => {
   });
 
   it('draws the field of regard first so the nadir strip sits on top', () => {
-    const factory = build(params({ maxOffNadirDeg: 20, isShowFieldOfRegard: true }));
+    const factory = build(params({ maxOffNadirDeg: 20 }));
     const kinds = factory.meshes[0].ranges.map((r) => r.kind);
 
     expect(kinds).toEqual(['regard', 'regard', 'regard', 'nadir', 'nadir', 'nadir']);
@@ -109,7 +108,7 @@ describe('SwathMeshFactory ribbon', () => {
 
   it('omits the field of regard when the graphics flag is off', () => {
     settingsManager.isDrawSwathFieldOfRegard = false;
-    const factory = build(params({ maxOffNadirDeg: 20, isShowFieldOfRegard: true }));
+    const factory = build(params({ maxOffNadirDeg: 20 }));
 
     expect(factory.meshes[0].ranges.every((r) => r.kind === 'nadir')).toBe(true);
   });

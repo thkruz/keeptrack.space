@@ -391,13 +391,6 @@ export class SatelliteSwath extends KeepTrackPlugin implements ISettingsContribu
             <section class="kt-section">
               <div class="kt-section-label">${l('sections.display')}</div>
               <div class="switch swath-switch">
-                <label for="swath-show-for">
-                  <input id="swath-show-for" type="checkbox" />
-                  <span class="lever"></span>
-                  <span>${l('labels.showFieldOfRegard')}</span>
-                </label>
-              </div>
-              <div class="switch swath-switch">
                 <label for="swath-daylight-only">
                   <input id="swath-daylight-only" type="checkbox" />
                   <span class="lever"></span>
@@ -453,7 +446,6 @@ export class SatelliteSwath extends KeepTrackPlugin implements ISettingsContribu
       fovDeg: read('swath-fov-deg', SWATH_LIMITS.fovDeg, prev.fovDeg),
       maxOffNadirDeg: read('swath-max-off-nadir', SWATH_LIMITS.maxOffNadirDeg, prev.maxOffNadirDeg),
       minSunElevDeg: read('swath-min-sun-elev', SWATH_LIMITS.minSunElevDeg, prev.minSunElevDeg),
-      isShowFieldOfRegard: (getEl('swath-show-for', true) as HTMLInputElement | null)?.checked ?? prev.isShowFieldOfRegard,
       isDaylightOnly: (getEl('swath-daylight-only', true) as HTMLInputElement | null)?.checked ?? prev.isDaylightOnly,
     };
     const isGeometryEdit =
@@ -493,7 +485,6 @@ export class SatelliteSwath extends KeepTrackPlugin implements ISettingsContribu
     setVal('swath-fov-deg', String(s.fovDeg));
     setVal('swath-max-off-nadir', String(s.maxOffNadirDeg));
     setVal('swath-min-sun-elev', String(s.minSunElevDeg));
-    setChecked('swath-show-for', s.isShowFieldOfRegard);
     setChecked('swath-daylight-only', s.isDaylightOnly);
     for (const id of ['swath-preset', 'swath-mode']) {
       const select = getEl(id, true) as HTMLSelectElement | null;

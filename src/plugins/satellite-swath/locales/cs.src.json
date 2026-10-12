@@ -16,7 +16,6 @@
         "fovDeg": "Zorné pole (°)",
         "maxOffNadirDeg": "Max. vychýlení od nadiru (°)",
         "minSunElevDeg": "Min. výška Slunce (°)",
-        "showFieldOfRegard": "Zobrazit pole dosahu",
         "daylightOnly": "Jen za denního světla",
         "nadirReadout": "Šířka v nadiru asi {km} km (FOV {fov}°)",
         "nadirReadoutUnknown": "Šířka v nadiru pro tuto dráhu neznámá",

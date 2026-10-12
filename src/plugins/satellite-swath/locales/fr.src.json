@@ -16,7 +16,6 @@
         "fovDeg": "Champ de vision (degrés)",
         "maxOffNadirDeg": "Dépointage max. (degrés)",
         "minSunElevDeg": "Élévation solaire min. (degrés)",
-        "showFieldOfRegard": "Afficher le champ accessible",
         "daylightOnly": "Jour uniquement",
         "nadirReadout": "Largeur au nadir env. {km} km (FOV {fov}°)",
         "nadirReadoutUnknown": "Largeur au nadir inconnue pour cette orbite",

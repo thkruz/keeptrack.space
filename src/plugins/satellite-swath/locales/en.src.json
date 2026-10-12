@@ -16,7 +16,6 @@
         "fovDeg": "Field of view (deg)",
         "maxOffNadirDeg": "Max off-nadir tilt (deg)",
         "minSunElevDeg": "Min Sun elevation (deg)",
-        "showFieldOfRegard": "Show field of regard",
         "daylightOnly": "Daylight only",
         "nadirReadout": "Nadir width about {km} km (FOV {fov}°)",
         "nadirReadoutUnknown": "Nadir width unknown for this orbit",

@@ -16,7 +16,6 @@
         "fovDeg": "Pole widzenia (°)",
         "maxOffNadirDeg": "Maks. odchylenie od nadiru (°)",
         "minSunElevDeg": "Min. wysokość Słońca (°)",
-        "showFieldOfRegard": "Pokaż pole dostępności",
         "daylightOnly": "Tylko w świetle dziennym",
         "nadirReadout": "Szerokość w nadirze ok. {km} km (FOV {fov}°)",
         "nadirReadoutUnknown": "Szerokość w nadirze nieznana dla tej orbity",

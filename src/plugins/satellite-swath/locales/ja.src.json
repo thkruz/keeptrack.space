@@ -16,7 +16,6 @@
         "fovDeg": "視野角 (度)",
         "maxOffNadirDeg": "最大オフナディア角 (度)",
         "minSunElevDeg": "最小太陽高度 (度)",
-        "showFieldOfRegard": "観測可能範囲を表示",
         "daylightOnly": "昼間のみ",
         "nadirReadout": "直下の観測幅 約 {km} km (FOV {fov}°)",
         "nadirReadoutUnknown": "この軌道では直下の観測幅を計算できません",

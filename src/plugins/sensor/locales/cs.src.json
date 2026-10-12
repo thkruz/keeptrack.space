@@ -17,6 +17,10 @@
         "maxRange": "Max. dosah",
         "band": "Pásmo",
         "beamWidth": "Šířka svazku",
+        "horizonMask": "Maska horizontu",
+        "horizonMaskPoints": "{{count}} bodů",
+        "source": "Zdroj",
+        "retrievedOn": ", načteno {{date}}",
         "unknown": "Neznámé",
         "details": "Podrobnosti",
         "visualizations": "Vizualizace"
@@ -89,7 +93,9 @@
         "tooltipMinEl": "Elevace ve stupních (např.: 10)",
         "tooltipMaxEl": "Elevace ve stupních (např.: 90)",
         "tooltipMinRange": "Dosah v kilometrech (např.: 500)",
-        "tooltipMaxRange": "Dosah v kilometrech (např.: 20000)"
+        "tooltipMaxRange": "Dosah v kilometrech (např.: 20000)",
+        "horizonMask": "Maska horizontu (az,el na řádek)",
+        "tooltipHorizonMask": "Volitelné. Body azimut,elevace ve stupních, jeden na řádek nebo oddělené středníky. Minimální elevace se mezi body interpoluje a přechází přes 360. 2 až 72 bodů, 0 <= az < 360, 0 <= el <= 89."
       },
       "rmbMenu": {
         "title": "Vytvořit",
@@ -121,7 +127,11 @@
         "maxRangeValue": "Maximální dosah vlastního senzoru musí být větší nebo roven 0 km.",
         "invalidNumber": "Hodnoty vlastního senzoru musí být platná čísla.",
         "elOrder": "Minimální elevace vlastního senzoru nesmí překročit maximální elevaci.",
-        "rangeOrder": "Minimální dosah vlastního senzoru nesmí překročit maximální dosah."
+        "rangeOrder": "Minimální dosah vlastního senzoru nesmí překročit maximální dosah.",
+        "maskBadPair": "Maska horizontu: nelze použít \"{{pair}}\". Zadejte az,el s 0 <= az < 360 a 0 <= el <= 89.",
+        "maskDuplicateAz": "Maska horizontu: azimut v \"{{pair}}\" se vyskytuje vícekrát.",
+        "maskTooFew": "Maska horizontu potřebuje alespoň 2 body.",
+        "maskTooMany": "Maska horizontu umožňuje nejvýše 72 bodů."
       },
       "sections": {
         "identity": "Identita",

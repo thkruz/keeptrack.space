@@ -17,6 +17,10 @@
         "maxRange": "Rango máx",
         "band": "Banda",
         "beamWidth": "Ancho de haz",
+        "horizonMask": "Máscara de horizonte",
+        "horizonMaskPoints": "{{count}} puntos",
+        "source": "Fuente",
+        "retrievedOn": ", consultado el {{date}}",
         "unknown": "Desconocido",
         "details": "Detalles",
         "visualizations": "Visualizaciones"
@@ -89,7 +93,9 @@
         "tooltipMinEl": "Elevación en grados (ej: 10)",
         "tooltipMaxEl": "Elevación en grados (ej: 90)",
         "tooltipMinRange": "Rango en kilómetros (ej: 500)",
-        "tooltipMaxRange": "Rango en kilómetros (ej: 20000)"
+        "tooltipMaxRange": "Rango en kilómetros (ej: 20000)",
+        "horizonMask": "Máscara de horizonte (az,el por línea)",
+        "tooltipHorizonMask": "Opcional. Puntos acimut,elevación en grados, uno por línea o separados por punto y coma. La elevación mínima se interpola entre puntos y continúa al pasar por 360. De 2 a 72 puntos, 0 <= az < 360, 0 <= el <= 89."
       },
       "rmbMenu": {
         "title": "Crear",
@@ -121,7 +127,11 @@
         "maxRangeValue": "El rango máximo del sensor personalizado debe ser mayor o igual a 0 km.",
         "invalidNumber": "Los valores del sensor personalizado deben ser números válidos.",
         "elOrder": "La elevación mínima del sensor personalizado no debe superar la elevación máxima.",
-        "rangeOrder": "El alcance mínimo del sensor personalizado no debe superar el alcance máximo."
+        "rangeOrder": "El alcance mínimo del sensor personalizado no debe superar el alcance máximo.",
+        "maskBadPair": "Máscara de horizonte: no se puede usar \"{{pair}}\". Escriba az,el con 0 <= az < 360 y 0 <= el <= 89.",
+        "maskDuplicateAz": "Máscara de horizonte: el acimut de \"{{pair}}\" aparece más de una vez.",
+        "maskTooFew": "La máscara de horizonte necesita al menos 2 puntos.",
+        "maskTooMany": "La máscara de horizonte admite como máximo 72 puntos."
       },
       "sections": {
         "identity": "Identidad",

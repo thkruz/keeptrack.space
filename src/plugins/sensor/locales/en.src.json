@@ -17,6 +17,10 @@
         "maxRange": "Max Range",
         "band": "Band",
         "beamWidth": "Beam Width",
+        "horizonMask": "Horizon Mask",
+        "horizonMaskPoints": "{{count}} points",
+        "source": "Source",
+        "retrievedOn": ", retrieved {{date}}",
         "unknown": "Unknown",
         "details": "Details",
         "visualizations": "Visualizations"
@@ -89,7 +93,9 @@
         "tooltipMinEl": "Elevation in degrees (ex: 10)",
         "tooltipMaxEl": "Elevation in degrees (ex: 90)",
         "tooltipMinRange": "Range in kilometers (ex: 500)",
-        "tooltipMaxRange": "Range in kilometers (ex: 20000)"
+        "tooltipMaxRange": "Range in kilometers (ex: 20000)",
+        "horizonMask": "Horizon mask (az,el per line)",
+        "tooltipHorizonMask": "Optional. Azimuth,elevation points in degrees, one per line or separated by semicolons. The minimum elevation is interpolated between points and wraps at 360. 2 to 72 points, 0 <= az < 360, 0 <= el <= 89."
       },
       "rmbMenu": {
         "title": "Create",
@@ -121,7 +127,11 @@
         "maxRangeValue": "Custom Sensor Maximum Range must be greater than or equal to 0 km.",
         "invalidNumber": "Custom Sensor values must be valid numbers.",
         "elOrder": "Custom Sensor Minimum Elevation must not exceed Maximum Elevation.",
-        "rangeOrder": "Custom Sensor Minimum Range must not exceed Maximum Range."
+        "rangeOrder": "Custom Sensor Minimum Range must not exceed Maximum Range.",
+        "maskBadPair": "Horizon mask: cannot use \"{{pair}}\". Write az,el with 0 <= az < 360 and 0 <= el <= 89.",
+        "maskDuplicateAz": "Horizon mask: the azimuth in \"{{pair}}\" appears more than once.",
+        "maskTooFew": "Horizon mask needs at least 2 points.",
+        "maskTooMany": "Horizon mask allows at most 72 points."
       },
       "sections": {
         "identity": "Identity",

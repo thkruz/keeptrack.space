@@ -17,6 +17,10 @@
         "maxRange": "Portée max",
         "band": "Bande",
         "beamWidth": "Largeur de faisceau",
+        "horizonMask": "Masque d'horizon",
+        "horizonMaskPoints": "{{count}} sommets",
+        "source": "Source",
+        "retrievedOn": ", consulté le {{date}}",
         "unknown": "Inconnu",
         "details": "Détails",
         "visualizations": "Visualisations"
@@ -89,7 +93,9 @@
         "tooltipMinEl": "Élévation en degrés (ex : 10)",
         "tooltipMaxEl": "Élévation en degrés (ex : 90)",
         "tooltipMinRange": "Portée en kilomètres (ex : 500)",
-        "tooltipMaxRange": "Portée en kilomètres (ex : 20000)"
+        "tooltipMaxRange": "Portée en kilomètres (ex : 20000)",
+        "horizonMask": "Masque d'horizon (az,él par ligne)",
+        "tooltipHorizonMask": "Facultatif. Points azimut,élévation en degrés, un par ligne ou séparés par des points-virgules. L'élévation minimale est interpolée entre les points et boucle à 360. De 2 à 72 points, 0 <= az < 360, 0 <= él <= 89."
       },
       "rmbMenu": {
         "title": "Créer",
@@ -121,7 +127,11 @@
         "maxRangeValue": "La portée maximum du capteur personnalisé doit être supérieure ou égale à 0 km.",
         "invalidNumber": "Les valeurs du capteur personnalisé doivent être des nombres valides.",
         "elOrder": "L'élévation minimale du capteur personnalisé ne doit pas dépasser l'élévation maximale.",
-        "rangeOrder": "La portée minimale du capteur personnalisé ne doit pas dépasser la portée maximale."
+        "rangeOrder": "La portée minimale du capteur personnalisé ne doit pas dépasser la portée maximale.",
+        "maskBadPair": "Masque d'horizon : impossible d'utiliser « {{pair}} ». Saisissez az,él avec 0 <= az < 360 et 0 <= él <= 89.",
+        "maskDuplicateAz": "Masque d'horizon : l'azimut de « {{pair}} » apparaît plusieurs fois.",
+        "maskTooFew": "Le masque d'horizon nécessite au moins 2 points.",
+        "maskTooMany": "Le masque d'horizon accepte au plus 72 points."
       },
       "sections": {
         "identity": "Identité",

@@ -17,6 +17,10 @@
         "maxRange": "Max. Reichweite",
         "band": "Band",
         "beamWidth": "Strahlbreite",
+        "horizonMask": "Horizontmaske",
+        "horizonMaskPoints": "{{count}} Punkte",
+        "source": "Quelle",
+        "retrievedOn": ", abgerufen am {{date}}",
         "unknown": "Unbekannt",
         "details": "Details",
         "visualizations": "Visualisierungen"
@@ -89,7 +93,9 @@
         "tooltipMinEl": "Elevation in Grad (z.B.: 10)",
         "tooltipMaxEl": "Elevation in Grad (z.B.: 90)",
         "tooltipMinRange": "Reichweite in Kilometern (z.B.: 500)",
-        "tooltipMaxRange": "Reichweite in Kilometern (z.B.: 20000)"
+        "tooltipMaxRange": "Reichweite in Kilometern (z.B.: 20000)",
+        "horizonMask": "Horizontmaske (Az,El pro Zeile)",
+        "tooltipHorizonMask": "Optional. Azimut-,Elevationspunkte in Grad, einer pro Zeile oder durch Semikolons getrennt. Die Mindestelevation wird zwischen den Punkten interpoliert und läuft über 360 hinweg. 2 bis 72 Punkte, 0 <= Az < 360, 0 <= El <= 89."
       },
       "rmbMenu": {
         "title": "Erstellen",
@@ -121,7 +127,11 @@
         "maxRangeValue": "Die maximale Reichweite des benutzerdefinierten Sensors muss größer oder gleich 0 km sein.",
         "invalidNumber": "Die Werte des benutzerdefinierten Sensors müssen gültige Zahlen sein.",
         "elOrder": "Die minimale Elevation des benutzerdefinierten Sensors darf die maximale Elevation nicht überschreiten.",
-        "rangeOrder": "Die minimale Reichweite des benutzerdefinierten Sensors darf die maximale Reichweite nicht überschreiten."
+        "rangeOrder": "Die minimale Reichweite des benutzerdefinierten Sensors darf die maximale Reichweite nicht überschreiten.",
+        "maskBadPair": "Horizontmaske: \"{{pair}}\" ist ungültig. Az,El mit 0 <= Az < 360 und 0 <= El <= 89 angeben.",
+        "maskDuplicateAz": "Horizontmaske: Der Azimut in \"{{pair}}\" kommt mehrfach vor.",
+        "maskTooFew": "Die Horizontmaske braucht mindestens 2 Punkte.",
+        "maskTooMany": "Die Horizontmaske erlaubt höchstens 72 Punkte."
       },
       "sections": {
         "identity": "Identität",

@@ -19,7 +19,7 @@ import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import sensorAddPng from '@public/img/icons/sensor-add.png';
 import viewListPng from '@public/img/icons/view-list.png';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
-import { buildCustomSensorParams, CustomSensorFormValues, validateCustomSensor } from './custom-sensor-core';
+import { buildCustomSensorParams, CustomSensorFormValues, parseMask, validateCustomSensor } from './custom-sensor-core';
 import { renderCustomSensorList } from './custom-sensor-list-renderer';
 import './custom-sensor.css';
 
@@ -165,6 +165,12 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
           <div id="cs-maxrange-div" class="start-hidden input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMaxRange')}">
             <input id="cs-maxrange" type="text" value="50000" />
             <label for="cs-maxrange" class="active">${l('maxRange')}</label>
+          </div>
+        </div>
+        <div class="kt-field-row">
+          <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="${l('tooltipHorizonMask')}">
+            <textarea id="cs-mask" class="materialize-textarea cs-mask" rows="3" spellcheck="false" placeholder="0,5&#10;90,25&#10;180,5&#10;270,25"></textarea>
+            <label for="cs-mask" class="active">${l('horizonMask')}</label>
           </div>
         </div>
       </section>
@@ -379,6 +385,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       maxEl: parseFloat(value('cs-maxel')),
       minRng: parseFloat(value('cs-minrange')),
       maxRng: parseFloat(value('cs-maxrange')),
+      mask: (getEl('cs-mask', true) as HTMLTextAreaElement | null)?.value ?? '',
     };
   }
 
@@ -399,7 +406,10 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     const errorKey = validateCustomSensor(values);
 
     if (errorKey) {
-      errorManagerInstance.warn(CustomSensorPlugin.t_(`errorMsgs.${errorKey}`));
+      // Mask errors name the offending pair; other messages have no placeholders
+      const pair = parseMask(values.mask).badPair ?? '';
+
+      errorManagerInstance.warn(t7e(`plugins.CustomSensorPlugin.errorMsgs.${errorKey}` as Parameters<typeof t7e>[0], { pair }));
 
       return;
     }

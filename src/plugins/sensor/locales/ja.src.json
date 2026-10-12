@@ -17,6 +17,10 @@
         "maxRange": "最大距離",
         "band": "周波数帯",
         "beamWidth": "ビーム幅",
+        "horizonMask": "地平線マスク",
+        "horizonMaskPoints": "{{count}} 点",
+        "source": "出典",
+        "retrievedOn": "（{{date}} 取得）",
         "unknown": "不明",
         "details": "詳細",
         "visualizations": "可視化"
@@ -89,7 +93,9 @@
         "tooltipMinEl": "度単位の仰角（例：10）",
         "tooltipMaxEl": "度単位の仰角（例：90）",
         "tooltipMinRange": "キロメートル単位の距離（例：500）",
-        "tooltipMaxRange": "キロメートル単位の距離（例：20000）"
+        "tooltipMaxRange": "キロメートル単位の距離（例：20000）",
+        "horizonMask": "地平線マスク (1行に az,el)",
+        "tooltipHorizonMask": "任意。方位角,仰角（度）の点を1行に1つ、またはセミコロン区切りで入力します。最小仰角は点の間で補間され、360で一周します。2〜72点、0 <= az < 360、0 <= el <= 89。"
       },
       "rmbMenu": {
         "title": "作成",
@@ -121,7 +127,11 @@
         "maxRangeValue": "カスタムセンサーの最大距離は0 km以上でなければなりません。",
         "invalidNumber": "カスタムセンサーの値は有効な数値である必要があります。",
         "elOrder": "カスタムセンサーの最小仰角は最大仰角を超えてはなりません。",
-        "rangeOrder": "カスタムセンサーの最小範囲は最大範囲を超えてはなりません。"
+        "rangeOrder": "カスタムセンサーの最小範囲は最大範囲を超えてはなりません。",
+        "maskBadPair": "地平線マスク: 「{{pair}}」は使用できません。0 <= az < 360、0 <= el <= 89 の az,el で入力してください。",
+        "maskDuplicateAz": "地平線マスク: 「{{pair}}」の方位角が重複しています。",
+        "maskTooFew": "地平線マスクには2点以上必要です。",
+        "maskTooMany": "地平線マスクは最大72点までです。"
       },
       "sections": {
         "identity": "識別情報",

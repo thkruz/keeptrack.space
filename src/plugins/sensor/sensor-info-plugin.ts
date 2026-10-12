@@ -91,6 +91,14 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
             <div class="sensor-info-key">${l('beamWidth')}</div>
             <div class="sensor-info-value" id="sensor-beamwidth">10 deg</div>
         </div>
+        <div class="sensor-info-row start-hidden" id="sensor-mask-row">
+            <div class="sensor-info-key">${l('horizonMask')}</div>
+            <div class="sensor-info-value" id="sensor-mask"></div>
+        </div>
+        <div class="sensor-info-row start-hidden" id="sensor-source-row">
+            <div class="sensor-info-key">${l('source')}</div>
+            <div class="sensor-info-value" id="sensor-source"></div>
+        </div>
         </section>
         <section class="kt-section">
         <div class="kt-section-label">${l('visualizations')}</div>
@@ -340,5 +348,58 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
         hideEl(beamwidthElement?.parentElement ?? '');
       }
     }
+
+    SensorInfoPlugin.updateMaskRow_(firstSensor);
+    SensorInfoPlugin.updateSourceRow_(firstSensor);
+  }
+
+  /** "Horizon Mask: N points", shown only when the sensor carries a mask. */
+  private static updateMaskRow_(sensor: DetailedSensor): void {
+    const valueEl = getEl('sensor-mask', true);
+    const count = typeof sensor.getMaskVertexCount === 'function' ? sensor.getMaskVertexCount() : 0;
+
+    if (!valueEl) {
+      return;
+    }
+
+    if (count > 0) {
+      valueEl.textContent = t7e('plugins.SensorInfoPlugin.labels.horizonMaskPoints' as Parameters<typeof t7e>[0], { count });
+      showEl('sensor-mask-row');
+    } else {
+      valueEl.textContent = '';
+      hideEl('sensor-mask-row');
+    }
+  }
+
+  /**
+   * "Source: <link>, retrieved <date>" for cited station presets. Built with DOM nodes, not
+   * innerHTML, and only for https links, so catalog text can never inject markup.
+   */
+  private static updateSourceRow_(sensor: DetailedSensor): void {
+    const valueEl = getEl('sensor-source', true);
+
+    if (!valueEl) {
+      return;
+    }
+    valueEl.replaceChildren();
+
+    if (!sensor.sourceUrl?.startsWith('https://')) {
+      hideEl('sensor-source-row');
+
+      return;
+    }
+
+    const link = document.createElement('a');
+
+    link.href = sensor.sourceUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = new URL(sensor.sourceUrl).hostname;
+    valueEl.appendChild(link);
+
+    if (sensor.sourceRetrieved) {
+      valueEl.appendChild(document.createTextNode(t7e('plugins.SensorInfoPlugin.labels.retrievedOn' as Parameters<typeof t7e>[0], { date: sensor.sourceRetrieved })));
+    }
+    showEl('sensor-source-row');
   }
 }

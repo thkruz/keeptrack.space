@@ -17,6 +17,10 @@
         "maxRange": "Portata max",
         "band": "Banda",
         "beamWidth": "Larghezza del fascio",
+        "horizonMask": "Maschera d'orizzonte",
+        "horizonMaskPoints": "{{count}} punti",
+        "source": "Fonte",
+        "retrievedOn": ", consultato il {{date}}",
         "unknown": "Sconosciuto",
         "details": "Dettagli",
         "visualizations": "Visualizzazioni"
@@ -89,7 +93,9 @@
         "tooltipMinEl": "Elevazione in gradi (es: 10)",
         "tooltipMaxEl": "Elevazione in gradi (es: 90)",
         "tooltipMinRange": "Portata in chilometri (es: 500)",
-        "tooltipMaxRange": "Portata in chilometri (es: 20000)"
+        "tooltipMaxRange": "Portata in chilometri (es: 20000)",
+        "horizonMask": "Maschera d'orizzonte (az,el per riga)",
+        "tooltipHorizonMask": "Facoltativo. Punti azimut,elevazione in gradi, uno per riga o separati da punto e virgola. L'elevazione minima viene interpolata tra i punti e prosegue oltre 360. Da 2 a 72 punti, 0 <= az < 360, 0 <= el <= 89."
       },
       "rmbMenu": {
         "title": "Crea",
@@ -121,7 +127,11 @@
         "maxRangeValue": "La portata massima del sensore personalizzato deve essere maggiore o uguale a 0 km.",
         "invalidNumber": "I valori del sensore personalizzato devono essere numeri validi.",
         "elOrder": "L'elevazione minima del sensore personalizzato non deve superare l'elevazione massima.",
-        "rangeOrder": "La portata minima del sensore personalizzato non deve superare la portata massima."
+        "rangeOrder": "La portata minima del sensore personalizzato non deve superare la portata massima.",
+        "maskBadPair": "Maschera d'orizzonte: impossibile usare \"{{pair}}\". Scrivi az,el con 0 <= az < 360 e 0 <= el <= 89.",
+        "maskDuplicateAz": "Maschera d'orizzonte: l'azimut in \"{{pair}}\" compare più di una volta.",
+        "maskTooFew": "La maschera d'orizzonte richiede almeno 2 punti.",
+        "maskTooMany": "La maschera d'orizzonte consente al massimo 72 punti."
       },
       "sections": {
         "identity": "Identità",

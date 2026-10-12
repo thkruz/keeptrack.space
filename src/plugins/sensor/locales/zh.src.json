@@ -17,6 +17,10 @@
         "maxRange": "最大距离",
         "band": "频段",
         "beamWidth": "波束宽度",
+        "horizonMask": "地平线遮罩",
+        "horizonMaskPoints": "{{count}} 个点",
+        "source": "来源",
+        "retrievedOn": "，{{date}} 获取",
         "unknown": "未知",
         "details": "详情",
         "visualizations": "可视化"
@@ -89,7 +93,9 @@
         "tooltipMinEl": "仰角，单位为度（例：10）",
         "tooltipMaxEl": "仰角，单位为度（例：90）",
         "tooltipMinRange": "距离，单位为公里（例：500）",
-        "tooltipMaxRange": "距离，单位为公里（例：20000）"
+        "tooltipMaxRange": "距离，单位为公里（例：20000）",
+        "horizonMask": "地平线遮罩（每行 az,el）",
+        "tooltipHorizonMask": "可选。以度为单位的方位角,仰角点，每行一个或用分号分隔。最小仰角在各点之间插值，并在 360 处回绕。2 至 72 个点，0 <= az < 360，0 <= el <= 89。"
       },
       "rmbMenu": {
         "title": "创建",
@@ -121,7 +127,11 @@
         "maxRangeValue": "自定义传感器最大距离必须大于或等于 0 公里。",
         "invalidNumber": "自定义传感器的值必须是有效数字。",
         "elOrder": "自定义传感器的最小仰角不得超过最大仰角。",
-        "rangeOrder": "自定义传感器的最小范围不得超过最大范围。"
+        "rangeOrder": "自定义传感器的最小范围不得超过最大范围。",
+        "maskBadPair": "地平线遮罩：无法使用“{{pair}}”。请按 az,el 填写，0 <= az < 360 且 0 <= el <= 89。",
+        "maskDuplicateAz": "地平线遮罩：“{{pair}}”中的方位角出现了不止一次。",
+        "maskTooFew": "地平线遮罩至少需要 2 个点。",
+        "maskTooMany": "地平线遮罩最多允许 72 个点。"
       },
       "sections": {
         "identity": "标识",

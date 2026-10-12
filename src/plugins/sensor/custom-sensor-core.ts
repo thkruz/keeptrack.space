@@ -11,7 +11,16 @@
  */
 
 import type { DetailedSensorParams } from '@app/app/sensors/DetailedSensor';
-import { Degrees, Kilometers, SpaceObjectType, ZoomValue } from '@ootk/src/main';
+import {
+  Degrees,
+  ElevationMask,
+  Kilometers,
+  MAX_INTERPOLATED_MASK_EL,
+  MAX_INTERPOLATED_MASK_VERTICES,
+  MIN_INTERPOLATED_MASK_VERTICES,
+  SpaceObjectType,
+  ZoomValue,
+} from '@ootk/src/main';
 
 /** The four sensor archetypes the menu offers. */
 export type CustomSensorType = 'Observer' | 'Optical' | 'Mechanical' | 'Phased Array Radar';
@@ -29,6 +38,71 @@ export interface CustomSensorFormValues {
   maxEl: number;
   minRng: number;
   maxRng: number;
+  /** Optional horizon mask text: `az,el` pairs, one per line or separated by semicolons. */
+  mask?: string;
+}
+
+/** Error keys {@link parseMask} can report (under `plugins.CustomSensorPlugin.errorMsgs`). */
+export type MaskErrorKey = 'maskBadPair' | 'maskTooFew' | 'maskTooMany' | 'maskDuplicateAz';
+
+/** Result of {@link parseMask}. `error` is null when the text is valid (or blank). */
+export interface ParsedMask {
+  /** Vertices in input order; empty when the text is blank. */
+  masks: ElevationMask[];
+  error: MaskErrorKey | null;
+  /** The offending pair text for `maskBadPair` / `maskDuplicateAz`, else null. */
+  badPair: string | null;
+}
+
+/** One `az,el` pair: two decimal numbers separated by a comma (spaces allowed). */
+const MASK_PAIR_RE = /^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/u;
+/** Pairs are separated by newlines or semicolons. */
+const MASK_SPLIT_RE = /[\r\n;]/u;
+
+/**
+ * Parse a pasted horizon mask into interpolated ootk {@link ElevationMask} vertices
+ * (`startAz` = `stopAz` = az, `minEl` = el). Blank lines are ignored and blank text means
+ * "no mask". Rules match ootk's interpolated-mask validation: 2 to 72 vertices,
+ * 0 <= az < 360, 0 <= el <= 89, unique azimuths. The first problem found is reported.
+ */
+export function parseMask(text: string | undefined): ParsedMask {
+  const masks: ElevationMask[] = [];
+
+  if (!text || text.trim() === '') {
+    return { masks, error: null, badPair: null };
+  }
+
+  const seen = new Set<number>();
+
+  for (const raw of text.split(MASK_SPLIT_RE)) {
+    const pair = raw.trim();
+
+    if (pair === '') {
+      continue;
+    }
+
+    const match = MASK_PAIR_RE.exec(pair);
+    const az = match ? parseFloat(match[1]) : NaN;
+    const el = match ? parseFloat(match[2]) : NaN;
+
+    if (!match || az < 0 || az >= 360 || el < 0 || el > MAX_INTERPOLATED_MASK_EL) {
+      return { masks: [], error: 'maskBadPair', badPair: pair };
+    }
+    if (seen.has(az)) {
+      return { masks: [], error: 'maskDuplicateAz', badPair: pair };
+    }
+    seen.add(az);
+    masks.push({ startAz: az as Degrees, stopAz: az as Degrees, minEl: el as Degrees });
+  }
+
+  if (masks.length > MAX_INTERPOLATED_MASK_VERTICES) {
+    return { masks: [], error: 'maskTooMany', badPair: null };
+  }
+  if (masks.length < MIN_INTERPOLATED_MASK_VERTICES) {
+    return { masks: [], error: 'maskTooFew', badPair: null };
+  }
+
+  return { masks, error: null, badPair: null };
 }
 
 /** Above this max range a sensor is treated as deep-space and framed at GEO zoom. */
@@ -106,7 +180,8 @@ export function validateCustomSensor(values: CustomSensorFormValues): string | n
     return 'rangeOrder';
   }
 
-  return null;
+  // Horizon mask last; the plugin fills the offending pair from parseMask(values.mask).badPair
+  return parseMask(values.mask).error;
 }
 
 /**
@@ -115,6 +190,7 @@ export function validateCustomSensor(values: CustomSensorFormValues): string | n
  * the caller (a random id) so this stays pure and deterministic for tests.
  */
 export function buildCustomSensorParams(values: CustomSensorFormValues, objNameSuffix: string): DetailedSensorParams {
+  const { masks } = parseMask(values.mask);
   const params: DetailedSensorParams = {
     lat: values.lat as Degrees,
     lon: values.lon as Degrees,
@@ -135,6 +211,12 @@ export function buildCustomSensorParams(values: CustomSensorFormValues, objNameS
     zoom: values.maxRng > GEO_ZOOM_THRESHOLD_KM ? ZoomValue.GEO : ZoomValue.LEO,
     volume: false,
   };
+
+  // Kept inside the params object so custom-sensor persistence can serialise it later
+  if (masks.length > 0) {
+    params.elevationMasks = masks;
+    params.interpolateMask = true;
+  }
 
   return params;
 }

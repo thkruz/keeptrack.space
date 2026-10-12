@@ -17,6 +17,10 @@
         "maxRange": "Maks. zasięg",
         "band": "Pasmo",
         "beamWidth": "Szerokość wiązki",
+        "horizonMask": "Maska horyzontu",
+        "horizonMaskPoints": "{{count}} pkt",
+        "source": "Źródło",
+        "retrievedOn": ", pobrano {{date}}",
         "unknown": "Nieznany",
         "details": "Szczegóły",
         "visualizations": "Wizualizacje"
@@ -89,7 +93,9 @@
         "tooltipMinEl": "Elewacja w stopniach (np.: 10)",
         "tooltipMaxEl": "Elewacja w stopniach (np.: 90)",
         "tooltipMinRange": "Zasięg w kilometrach (np.: 500)",
-        "tooltipMaxRange": "Zasięg w kilometrach (np.: 20000)"
+        "tooltipMaxRange": "Zasięg w kilometrach (np.: 20000)",
+        "horizonMask": "Maska horyzontu (az,el w wierszu)",
+        "tooltipHorizonMask": "Opcjonalne. Punkty azymut,elewacja w stopniach, jeden w wierszu lub oddzielone średnikami. Minimalna elewacja jest interpolowana między punktami i zawija się przy 360. Od 2 do 72 punktów, 0 <= az < 360, 0 <= el <= 89."
       },
       "rmbMenu": {
         "title": "Utwórz",
@@ -121,7 +127,11 @@
         "maxRangeValue": "Maksymalny zasięg własnego czujnika musi być większy lub równy 0 km.",
         "invalidNumber": "Wartości czujnika niestandardowego muszą być prawidłowymi liczbami.",
         "elOrder": "Minimalna elewacja czujnika niestandardowego nie może przekraczać maksymalnej elewacji.",
-        "rangeOrder": "Minimalny zasięg czujnika niestandardowego nie może przekraczać maksymalnego zasięgu."
+        "rangeOrder": "Minimalny zasięg czujnika niestandardowego nie może przekraczać maksymalnego zasięgu.",
+        "maskBadPair": "Maska horyzontu: nie można użyć \"{{pair}}\". Wpisz az,el przy 0 <= az < 360 i 0 <= el <= 89.",
+        "maskDuplicateAz": "Maska horyzontu: azymut w \"{{pair}}\" występuje więcej niż raz.",
+        "maskTooFew": "Maska horyzontu wymaga co najmniej 2 punktów.",
+        "maskTooMany": "Maska horyzontu dopuszcza najwyżej 72 punkty."
       },
       "sections": {
         "identity": "Tożsamość",

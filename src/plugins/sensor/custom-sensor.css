@@ -39,6 +39,18 @@
   outline: none;
 }
 
+/* Horizon mask textarea: monospace az,el pairs, a few rows tall, user-resizable. */
+#custom-sensor-menu textarea.cs-mask {
+  min-height: 4.5em;
+  max-height: 12em;
+  overflow-y: auto;
+  resize: vertical;
+  font-family: monospace;
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 4px 0;
+}
+
 /*
  * Secondary panel: the active-custom-sensor list. One v13 card per sensor (name
  * header + remove control + a two-column attribute grid) instead of the old raw

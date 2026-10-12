@@ -89,6 +89,8 @@ export interface OrbitCruncherInMsgChangeOrbitType {
 export interface OrbitCruncherInMsgSettingsUpdate {
   typ: OrbitCruncherMsgType.SETTINGS_UPDATE;
   numberOfOrbitsToDraw: number;
+  /** New orbit fade factor; omitted keeps the current one. */
+  orbitFadeFactor?: number;
 }
 
 export type OrbitCruncherInMsgs =

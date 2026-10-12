@@ -1,0 +1,55 @@
+{
+  "plugins": {
+    "GraphicsMenuPlugin": {
+      "title": "グラフィックメニュー",
+      "bottomIconLabel": "グラフィックメニュー",
+      "filterPlaceholder": "グラフィック設定をフィルター...",
+      "sections": {
+        "display": "表示",
+        "orbits": "軌道"
+      },
+      "labels": {
+        "overallQuality": "全体の品質",
+        "autoReduced": "パフォーマンスのため自動的に下げました",
+        "blackEarth": "黒い地球を描画",
+        "grayscaleEarth": "地球をグレースケールで描画",
+        "ambientLighting": "地球の環境光",
+        "nightAsDay": "夜を昼のように表示",
+        "graticule": "経緯線を表示",
+        "politicalMap": "国境を表示",
+        "dimOrbitInEclipse": "食中の軌道線を暗くする",
+        "orbitEclipseAlpha": "日食時の減光の強さ",
+        "orbitFadeFactor": "軌道線のフェード"
+      },
+      "tooltips": {
+        "blackEarth": "地球のテクスチャを非表示にします",
+        "grayscaleEarth": "地球をグレースケールに変更します",
+        "ambientLighting": "無効にすると環境光を非表示にします",
+        "nightAsDay": "地球の夜側を昼のように明るく表示します",
+        "graticule": "地球上に緯度線と経度線を表示します",
+        "politicalMap": "地球上に国境線を表示します",
+        "dimOrbitInEclipse": "衛星が地球の影に入っている区間の軌道線を暗く表示します",
+        "orbitEclipseAlpha": "地球の影にある軌道線の不透明度: 0.05 でほぼ見えなくなり、1 で減光なし",
+        "orbitFadeFactor": "軌道線がフェードするまで明るく保たれる長さ: 値が小さいほど早くフェードします"
+      },
+      "options": {
+        "low": "低",
+        "medium": "中",
+        "high": "高",
+        "ultra": "ウルトラ",
+        "custom": "カスタム"
+      },
+      "buttons": {
+        "resetToDefaults": "デフォルトにリセット"
+      },
+      "help": {
+        "overview": "グラフィックメニューはシーンの見た目を制御します。<strong>全体の品質</strong>のレベルを選ぶと、品質に関わる設定をまとめて変更できます。その後、下のカードで個々の設定を調整してください。変更はすぐに反映され、セッション間で保持されます。",
+        "imgAlt": "全体の品質セレクターと設定カードがあるグラフィックメニュー",
+        "imgCaption": "上部に全体の品質セレクター、その下に設定カード、最下部にデフォルトにリセットボタン。",
+        "howToUse": "<ol><li>下部メニューの設定グループから<strong>グラフィックメニュー</strong>を開きます。</li><li><strong>低</strong>、<strong>中</strong>、<strong>高</strong>、<strong>ウルトラ</strong>のいずれかをクリックすると、品質に関わる設定を一度に変更できます。</li><li>下の設定を変更して見た目を細かく調整すると、セレクターは<strong>カスタム</strong>になります。</li><li>フィルター欄に名前を入力すると設定を探せます。</li><li><strong>デフォルトにリセット</strong>をクリックすると、すべてのグラフィック設定が元に戻ります。</li></ol>",
+        "tip1": "設定がどのレベルとも完全に一致しないときは、セレクターにカスタムと表示されます。レベルを選び直すとそのレベルに戻ります。",
+        "tip2": "フレームレートが下がると、KeepTrack が負荷の高い効果を自動でオフにすることがあります。その場合、メニューに設定が自動的に下げられたことが表示されます。"
+      }
+    }
+  }
+}

@@ -447,6 +447,9 @@ const handleMsgMissileUpdate_ = (data: OrbitCruncherInMsgMissileUpdate) => {
 
 const handleMsgSettingsUpdate_ = (data: OrbitCruncherInMsgSettingsUpdate) => {
   numberOfOrbitsToDraw = data.numberOfOrbitsToDraw ?? numberOfOrbitsToDraw;
+  if (typeof data.orbitFadeFactor === 'number') {
+    orbitFadeFactor = data.orbitFadeFactor;
+  }
 };
 
 const handleMsgChangeOrbitType = (data: OrbitCruncherInMsgChangeOrbitType) => {

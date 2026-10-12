@@ -140,6 +140,12 @@ export class OrbitManager {
     this.reRequestActiveOrbits_();
   }
 
+  /** Push a changed orbitFadeFactor to the orbit cruncher and redraw the visible orbits. */
+  orbitFadeSettingChanged(): void {
+    this.orbitThreadMgr.sendSettingsUpdate(settingsManager.numberOfEcfOrbitsToDraw, settingsManager.orbitFadeFactor);
+    this.reRequestActiveOrbits_();
+  }
+
   orbitThreadMgr = new OrbitCruncherThreadManager(KeepTrack.getInstance().threads);
   playNextSatellite = null;
   tempTransColor: [number, number, number, number] = [0, 0, 0, 0];

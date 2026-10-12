@@ -1,0 +1,55 @@
+{
+  "plugins": {
+    "GraphicsMenuPlugin": {
+      "title": "Menu Graphismes",
+      "bottomIconLabel": "Menu Graphismes",
+      "filterPlaceholder": "Filtrer les paramètres graphiques...",
+      "sections": {
+        "display": "Affichage",
+        "orbits": "Orbites"
+      },
+      "labels": {
+        "overallQuality": "Qualité globale",
+        "autoReduced": "Réduit automatiquement pour les performances",
+        "blackEarth": "Dessiner la Terre en noir",
+        "grayscaleEarth": "Dessiner la Terre en niveaux de gris",
+        "ambientLighting": "Éclairage ambiant de la Terre",
+        "nightAsDay": "Afficher la nuit comme le jour",
+        "graticule": "Afficher le graticule",
+        "politicalMap": "Afficher les frontières",
+        "dimOrbitInEclipse": "Assombrir l'orbite en éclipse",
+        "orbitEclipseAlpha": "Intensité de l'assombrissement en éclipse",
+        "orbitFadeFactor": "Estompage de la ligne d'orbite"
+      },
+      "tooltips": {
+        "blackEarth": "Masque les textures de la Terre",
+        "grayscaleEarth": "Passe la Terre en niveaux de gris",
+        "ambientLighting": "Désactivez pour masquer l'éclairage ambiant",
+        "nightAsDay": "Éclaire la face nocturne de la Terre comme en plein jour",
+        "graticule": "Trace les lignes de latitude et de longitude sur la Terre",
+        "politicalMap": "Trace les frontières des pays sur la Terre",
+        "dimOrbitInEclipse": "Assombrit la partie de la ligne d'orbite où le satellite est dans l'ombre de la Terre",
+        "orbitEclipseAlpha": "Opacité de la ligne d'orbite dans l'ombre de la Terre : 0,05 la masque presque, 1 signifie aucun assombrissement",
+        "orbitFadeFactor": "Sur quelle longueur la ligne d'orbite reste lumineuse avant de s'estomper : les valeurs basses s'estompent plus tôt"
+      },
+      "options": {
+        "low": "Basse",
+        "medium": "Moyenne",
+        "high": "Haute",
+        "ultra": "Ultra",
+        "custom": "Personnalisée"
+      },
+      "buttons": {
+        "resetToDefaults": "Rétablir les valeurs par défaut"
+      },
+      "help": {
+        "overview": "Le menu Graphismes règle l'apparence de la scène. Choisissez un niveau de <strong>Qualité globale</strong> pour régler d'un coup tous les paramètres liés à la qualité, puis ajustez chaque paramètre dans les cartes ci-dessous. Les changements s'appliquent immédiatement et sont conservés d'une session à l'autre.",
+        "imgAlt": "Le menu Graphismes avec le sélecteur de qualité globale et les cartes de paramètres",
+        "imgCaption": "Le sélecteur de qualité globale en haut, les cartes de paramètres en dessous et Rétablir les valeurs par défaut tout en bas.",
+        "howToUse": "<ol><li>Ouvrez le <strong>Menu graphique</strong> depuis le menu du bas, dans le groupe Paramètres.</li><li>Cliquez sur <strong>Basse</strong>, <strong>Moyenne</strong>, <strong>Haute</strong> ou <strong>Ultra</strong> pour régler en une fois tous les paramètres liés à la qualité.</li><li>Modifiez un paramètre ci-dessous pour affiner l'apparence ; le sélecteur affiche alors <strong>Personnalisée</strong>.</li><li>Tapez dans le champ de filtre pour trouver un paramètre par son nom.</li><li>Cliquez sur <strong>Rétablir les valeurs par défaut</strong> pour restaurer tous les paramètres graphiques.</li></ol>",
+        "tip1": "Le sélecteur affiche Personnalisée dès que vos paramètres ne correspondent exactement à aucun niveau. Choisissez à nouveau un niveau pour y revenir.",
+        "tip2": "Si la fréquence d'images baisse, KeepTrack peut désactiver lui-même les effets coûteux. Le menu signale alors que les paramètres ont été réduits automatiquement."
+      }
+    }
+  }
+}

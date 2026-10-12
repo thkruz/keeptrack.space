@@ -934,6 +934,8 @@ export const pluginManifest: PluginDescriptor[] = [
   },
   {
     configKey: 'GraphicsMenuPlugin',
+    ossImport: () => import('./graphics-menu/graphics-menu'),
+    ossClassName: 'GraphicsMenuPlugin',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/graphics-menu/graphics-menu') : undefined,
     proClassName: 'GraphicsMenuPlugin',
     defaultConfig: { enabled: true, order: 591 },

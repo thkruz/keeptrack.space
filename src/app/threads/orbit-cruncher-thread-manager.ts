@@ -83,10 +83,11 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
     });
   }
 
-  sendSettingsUpdate(numberOfOrbitsToDraw: number): void {
+  sendSettingsUpdate(numberOfOrbitsToDraw: number, orbitFadeFactor?: number): void {
     this.postMessage({
       typ: OrbitCruncherMsgType.SETTINGS_UPDATE,
       numberOfOrbitsToDraw,
+      orbitFadeFactor,
     });
   }
 

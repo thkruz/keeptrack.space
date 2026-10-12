@@ -44,6 +44,8 @@ describe('SettingsMenuPlugin_class', () => {
     // No legacy submit button - settings apply immediately.
     expect(getEl('settings-submit', true)).toBeNull();
     expect(getEl('settings-reset')).not.toBeNull();
+    // Eclipse dimming moved to the Graphics menu's Orbits card (plan 05 T4).
+    expect(getEl('setting-general-dimOrbitInEclipse', true)).toBeNull();
   });
 });
 

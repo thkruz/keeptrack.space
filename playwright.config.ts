@@ -8,6 +8,9 @@ const chromiumArgs = process.env.CI
 export default defineConfig({
   testDir: './src',
   testMatch: '**/__tests__/*.spec.ts',
+  // Screenshot baselines and perf gates are tagged @local: they depend on this machine's GPU,
+  // so CI (SwiftShader) never runs them.
+  ...(process.env.CI ? { grepInvert: /@local/u } : {}),
   // No-op unless E2E_COVERAGE=1; clears/generates the monocart V8 coverage report.
   globalSetup: './test/e2e/coverage-setup.ts',
   globalTeardown: './test/e2e/coverage-teardown.ts',

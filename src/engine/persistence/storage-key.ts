@@ -38,6 +38,7 @@ export enum StorageKey {
   SETTINGS_DRAW_GRATICULE = 'v2-keepTrack-settings-drawGraticule',
   SETTINGS_DRAW_FLAT_MAP_TERMINATOR = 'v2-keepTrack-settings-drawFlatMapTerminator',
   SETTINGS_DRAW_SUN = 'v2-keepTrack-settings-drawSun',
+  SETTINGS_DRAW_ORBIT_ECLIPSE = 'v2-keepTrack-settings-drawOrbitEclipse',
   SETTINGS_CONFIDENCE_LEVELS = 'v2-keepTrack-settings-confidenceLevels',
   SETTINGS_DRAW_COVARIANCE_ELLIPSOID = 'v2-keepTrack-settings-drawCovarianceEllipsoid',
   SETTINGS_COVARIANCE_CONFIDENCE_LEVEL = 'v2-keepTrack-settings-covarianceConfidenceLevel',

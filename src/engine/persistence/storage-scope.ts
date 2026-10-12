@@ -85,6 +85,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.STEREO_MAP_SETTINGS]: StorageScope.Account,
 
   // --- Device: hardware/perf-dependent graphics --------------------------------
+  [StorageKey.SETTINGS_DRAW_ORBIT_ECLIPSE]: StorageScope.Device,
   [StorageKey.GRAPHICS_SETTINGS_GODRAYS_SAMPLES]: StorageScope.Device,
   [StorageKey.GRAPHICS_SETTINGS_GODRAYS_DECAY]: StorageScope.Device,
   [StorageKey.GRAPHICS_SETTINGS_GODRAYS_EXPOSURE]: StorageScope.Device,

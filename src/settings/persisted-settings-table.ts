@@ -87,6 +87,13 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
     },
   },
   {
+    key: StorageKey.SETTINGS_DRAW_ORBIT_ECLIPSE,
+    serialize: (sm) => String(sm.isDrawOrbitEclipse),
+    deserialize: (sm, raw) => {
+      sm.isDrawOrbitEclipse = bool(raw);
+    },
+  },
+  {
     key: StorageKey.SETTINGS_DRAW_BLACK_EARTH,
     serialize: (sm) => String(sm.isBlackEarth),
     deserialize: (sm, raw) => {

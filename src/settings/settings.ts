@@ -235,6 +235,8 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   maxOrbitsDisplayed: 'orbital',
   orbitGroupAlpha: 'orbital',
   orbitFadeFactor: 'orbital',
+  isDrawOrbitEclipse: 'orbital',
+  orbitEclipseAlpha: 'orbital',
   isOrbitCruncherInEcf: 'orbital',
   numberOfEcfOrbitsToDraw: 'orbital',
   covarianceConfidenceLevel: 'orbital',

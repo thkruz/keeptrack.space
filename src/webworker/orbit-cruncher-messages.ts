@@ -47,6 +47,17 @@ export interface OrbitCruncherInMsgSatelliteUpdate {
   isEcfOutput: boolean;
   isPolarViewEcf?: boolean;
   seqNum?: number;
+  /**
+   * Sun position in ECI (km) at `simulationTime`, computed on the main thread with
+   * `Sun.eci()`. One vector per request: the Sun moves under 0.05 deg per LEO
+   * period, and about 1 deg over a GEO/deep-space day, which is acceptable for
+   * a visual cue. Omitted (or `isDrawOrbitEclipse` false) disables dimming.
+   */
+  sunEci?: [number, number, number];
+  /** Dim the vertices that sit in Earth's shadow. */
+  isDrawOrbitEclipse?: boolean;
+  /** Multiplier applied to a shadowed vertex's alpha (0..1). */
+  orbitEclipseAlpha?: number;
 }
 
 export interface OrbitCruncherInMsgMissileUpdate {

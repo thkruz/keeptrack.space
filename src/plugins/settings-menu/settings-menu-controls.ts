@@ -188,6 +188,7 @@ const ownDescriptors_ = (): { general: OwnSettingDescriptor[]; fastCpu: OwnSetti
     boolToggle_('drawOrbits', 'isDrawOrbits', true, { apply: () => applyOrbitChange_(true) }),
     boolToggle_('drawTrailingOrbits', 'isDrawTrailingOrbits', false, { apply: () => applyOrbitChange_() }),
     boolToggle_('drawOrbitsInEcf', 'isOrbitCruncherInEcf', true, { apply: () => applyOrbitChange_() }),
+    boolToggle_('dimOrbitInEclipse', 'isDrawOrbitEclipse', true, { apply: () => ServiceLocator.getOrbitManager().orbitEclipseSettingChanged() }),
     ecfOrbitsSelect_(),
     boolToggle_('drawFovLines', 'isDrawInCoverageLines', true),
     boolToggle_('displayEciOnHover', 'isEciOnHover', false),

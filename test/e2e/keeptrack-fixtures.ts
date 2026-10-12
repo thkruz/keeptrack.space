@@ -14,6 +14,8 @@ export interface AppReadyOptions {
    * Use sparingly — prefer fixing the warning at the source.
    */
   consoleAllowlist?: AllowlistEntry[];
+  /** URL query string (without the leading `?`) to boot with, e.g. `date=...&rate=0`. */
+  query?: string;
 }
 
 const listenerByPage = new WeakMap<Page, ListenerHandle>();
@@ -66,7 +68,7 @@ export async function waitForAppReady(page: Page, options: AppReadyOptions = {})
     });
   });
 
-  await page.goto('/');
+  await page.goto(options.query ? `/?${options.query}` : '/');
   await page.waitForSelector('#loading-screen', { state: 'hidden', timeout: 45_000 });
 
   // Wait for the app to signal it is fully ready (all plugins, drawer, etc.)

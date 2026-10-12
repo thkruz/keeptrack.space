@@ -3,6 +3,13 @@ import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
 import { OrbitCruncherInMsgs, OrbitCruncherMsgType, OrbitCruncherOutMsgPoints, OrbitDrawTypes } from '@app/webworker/orbit-cruncher-messages';
 import { Degrees, Kilometers } from '@ootk/src/main';
 
+/** Eclipse-dimming inputs forwarded with a satellite orbit request. */
+export interface OrbitEclipseParams {
+  sunEci: [number, number, number];
+  isDrawOrbitEclipse: boolean;
+  orbitEclipseAlpha: number;
+}
+
 export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
   readonly WEB_WORKER_CODE: string = 'js/orbitCruncher.js';
 
@@ -32,7 +39,7 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
     });
   }
 
-  sendSatelliteUpdate(id: number, simulationTime: number, isEcfOutput: boolean, isPolarViewEcf?: boolean, tle1?: string, tle2?: string): void {
+  sendSatelliteUpdate(id: number, simulationTime: number, isEcfOutput: boolean, isPolarViewEcf?: boolean, tle1?: string, tle2?: string, eclipse?: OrbitEclipseParams): void {
     this.postMessage({
       typ: OrbitCruncherMsgType.SATELLITE_UPDATE,
       id,
@@ -42,6 +49,9 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
       tle1,
       tle2,
       seqNum: this.currentSeqNum_,
+      sunEci: eclipse?.sunEci,
+      isDrawOrbitEclipse: eclipse?.isDrawOrbitEclipse,
+      orbitEclipseAlpha: eclipse?.orbitEclipseAlpha,
     });
   }
 

@@ -91,6 +91,17 @@ export class OrbitalSettings {
    * 1.0 = No Fade
    */
   orbitFadeFactor = 0.6;
+  /**
+   * Dim the selected/hovered orbit line where the object is in Earth's shadow
+   * (cylindrical umbra test in the orbit cruncher).
+   */
+  isDrawOrbitEclipse = true;
+  /**
+   * Alpha multiplier for orbit-line vertices in Earth's shadow.
+   *
+   * 0.0 = shadowed arc hidden, 1.0 = no dimming
+   */
+  orbitEclipseAlpha = 0.35;
 
   /**
    * Show Orbits in ECF vs ECI

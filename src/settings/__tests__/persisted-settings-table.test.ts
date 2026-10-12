@@ -71,6 +71,19 @@ describe('persisted-settings-table', () => {
     expect(settings.isDrawOrbits).toBe(true);
   });
 
+  it('restores a saved graphics quality level and ignores an unknown one', () => {
+    const settings = new SettingsManager();
+
+    // Class default is 'medium'.
+    expect(settings.graphicsQuality).toBe('medium');
+
+    applyPersistedSetting(settings, StorageKey.GRAPHICS_SETTINGS_QUALITY_LEVEL, 'ultra');
+    expect(settings.graphicsQuality).toBe('ultra');
+
+    applyPersistedSetting(settings, StorageKey.GRAPHICS_SETTINGS_QUALITY_LEVEL, 'custom');
+    expect(settings.graphicsQuality).toBe('ultra');
+  });
+
   it('returns false for keys outside the table', () => {
     const settings = new SettingsManager();
 

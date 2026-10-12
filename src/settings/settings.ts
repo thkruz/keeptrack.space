@@ -50,6 +50,7 @@ import { defaultUiSettings, SatLabelMode, UiSettings } from './ui-settings';
  */
 const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   // Graphics
+  graphicsQuality: 'graphics',
   earthDayTextureQuality: 'graphics',
   earthNightTextureQuality: 'graphics',
   earthSpecTextureQuality: 'graphics',

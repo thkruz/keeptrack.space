@@ -1,3 +1,4 @@
+import type { GraphicsQualityLevel } from '@app/engine/plugins/core/plugin-capabilities';
 import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { errorManagerInstance } from '../engine/utils/errorManager';
 import { PersistenceManager, StorageKey } from '../engine/utils/persistence-manager';
@@ -24,6 +25,8 @@ export interface PersistedSettingEntry {
 }
 
 const bool = (raw: string): boolean => raw === 'true';
+
+const GRAPHICS_QUALITY_LEVELS_: readonly GraphicsQualityLevel[] = ['low', 'medium', 'high', 'ultra'];
 
 export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
   {
@@ -226,6 +229,15 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
     serialize: (sm) => String(sm.isFocusOnSatelliteWhenSelected),
     deserialize: (sm, raw) => {
       sm.isFocusOnSatelliteWhenSelected = bool(raw);
+    },
+  },
+  {
+    key: StorageKey.GRAPHICS_SETTINGS_QUALITY_LEVEL,
+    serialize: (sm) => sm.graphicsQuality ?? null,
+    deserialize: (sm, raw) => {
+      if (GRAPHICS_QUALITY_LEVELS_.includes(raw as GraphicsQualityLevel)) {
+        sm.graphicsQuality = raw as GraphicsQualityLevel;
+      }
     },
   },
   /*

@@ -17,6 +17,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import type { GraphicsQualityLevel } from '@app/engine/plugins/core/plugin-capabilities';
 import type {
   AtmosphereSettings,
   EarthBumpTextureQuality,
@@ -34,6 +35,13 @@ import type { SunTextureQuality } from '@app/engine/rendering/draw-manager/sun';
  * Graphics and rendering settings
  */
 export class GraphicsSettings {
+  /**
+   * The overall quality level last chosen in the Graphics menu. Informational:
+   * each control persists its own value, and the menu derives what it shows
+   * (a level or "Custom") from those values.
+   */
+  graphicsQuality: GraphicsQualityLevel = 'medium';
+
   // Earth Texture Quality Settings
   earthDayTextureQuality: EarthDayTextureQuality;
   earthNightTextureQuality: EarthNightTextureQuality;

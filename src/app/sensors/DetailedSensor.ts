@@ -647,29 +647,34 @@ export class DetailedSensor extends GroundStation {
    * @deprecated Use isRaeInFov() which delegates to ootk sensor.
    */
   private checkFovBoundsLegacy_(az: Degrees, el: Degrees, rng: Kilometers): boolean {
-    // Primary FOV check. The horizon mask raises the elevation floor on both faces.
-    const inPrimaryFov = this.checkFovBounds_(az, el, rng, this.minAz, this.maxAz, this.getMinElevationAt_(az), this.maxEl, this.minRng, this.maxRng);
-
-    if (inPrimaryFov) {
-      return true;
-    }
+    // Primary FOV check
+    let inBox = this.checkFovBounds_(az, el, rng, this.minAz, this.maxAz, this.minEl, this.maxEl, this.minRng, this.maxRng);
 
     // Secondary FOV check if defined
-    if (this.minAz2 !== undefined && this.maxAz2 !== undefined) {
-      return this.checkFovBounds_(
+    if (!inBox && this.minAz2 !== undefined && this.maxAz2 !== undefined) {
+      inBox = this.checkFovBounds_(
         az,
         el,
         rng,
         this.minAz2,
         this.maxAz2,
-        this.getMinElevationAt_(az, this.minEl2 ?? this.minEl),
+        this.minEl2 ?? this.minEl,
         this.maxEl2 ?? this.maxEl,
         this.minRng2 ?? this.minRng,
         this.maxRng2 ?? this.maxRng
       );
     }
 
-    return false;
+    /*
+     * The horizon mask is a site property, so it applies to both faces. It runs last, only for
+     * targets already inside a box (which enforced the flat minEl), keeping the common reject
+     * path (out of range / azimuth) as cheap as an unmasked sensor: max(minEl, mask) holds.
+     */
+    if (!inBox || this.maskSorted_.length === 0) {
+      return inBox;
+    }
+
+    return el >= maskMinElevation(this.maskSorted_, az, this.interpolateMask ?? false, -90);
   }
 
   /**

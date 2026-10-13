@@ -1408,7 +1408,7 @@ export class CatalogLoader {
           // Incoming source outranks the stored one: overwrite in place so the id
           // and array position stay stable instead of appending a second object.
           try {
-            tempObjData[existingIdx] = new Satellite({
+            tempObjData[existingIdx] = CatalogLoader.createSatellite_({
               ...resp[i],
               id: existingIdx,
               tle1: resp[i].tle1,
@@ -1425,7 +1425,7 @@ export class CatalogLoader {
       }
 
       try {
-        const satellite = new Satellite({
+        const satellite = CatalogLoader.createSatellite_({
           ...resp[i],
           id: tempObjData.length,
           tle1: resp[i].tle1,
@@ -1734,14 +1734,11 @@ export class CatalogLoader {
         continue;
       }
 
-      if (typeof catalogManagerInstance.sccIndex[`${scc}`] !== 'undefined') {
-        /*
-         * console.warn('Duplicate Satellite Found in jsCatalog');
-         * NOTE: We don't trust the jsCatalog, so we don't update the TLEs
-         * i = catalogManagerInstance.sccIndex[`${jsCatalog[s].SCC}`];
-         * tempSatData[i].TLE1 = jsCatalog[s].TLE1;
-         * tempSatData[i].TLE2 = jsCatalog[s].TLE2;
-         */
+      const existingIdx = catalogManagerInstance.sccIndex[`${scc}`];
+
+      if (typeof existingIdx !== 'undefined') {
+        // The catalog elset wins unless it is stale and Vimpel's is newer.
+        CatalogLoader.applyVimpelOverride_(tempObjData[existingIdx], element);
       } else {
         // Check if the 8th character is 'V' for Vimpel
         const isVimpel = element.TLE1[7] === 'V';
@@ -1787,6 +1784,65 @@ export class CatalogLoader {
           errorManagerInstance.debug('Skipping non-Vimpel satellite in JSC Vimpel catalog');
         }
       }
+    }
+  }
+
+  /** Same threshold as the API (serve-keeptrack-api utils/vimpelOverride). */
+  static readonly VIMPEL_OVERRIDE_MIN_CATALOG_AGE_DAYS = 30;
+
+  /** True for a real NORAD number; synthetic JSC Vimpel objects carry '' or '00000'. */
+  static hasRealSccNum(sccNum?: string | null): boolean {
+    return typeof sccNum === 'string' && sccNum.length > 0 && !/^0+$/u.test(sccNum);
+  }
+
+  /**
+   * ootk's Satellite zeroes the TLE catalog number of every VIMPEL-source object,
+   * which is right for synthetic JSC objects. A real NORAD object served from a
+   * newer Vimpel elset keeps its number: build it untagged, then set the source.
+   */
+  private static createSatellite_(params: ConstructorParameters<typeof Satellite>[0]): Satellite {
+    if (params.source === CatalogSource.VIMPEL && CatalogLoader.hasRealSccNum(params.sccNum)) {
+      const satellite = new Satellite({ ...params, source: '' });
+
+      satellite.source = CatalogSource.VIMPEL;
+
+      return satellite;
+    }
+
+    return new Satellite(params);
+  }
+
+  /**
+   * vimpel.json fallback for the API rule: replace a catalog elset older than
+   * VIMPEL_OVERRIDE_MIN_CATALOG_AGE_DAYS with a newer Vimpel elset for the same
+   * NORAD number. The API already serves the swap in /v4/sats/brief, so this
+   * only matters when the primary catalog came from an older or offline file.
+   */
+  private static applyVimpelOverride_(existing: BaseObject | undefined, element: JsSat): void {
+    if (!existing?.isSatellite()) {
+      return;
+    }
+    const sat = existing as Satellite;
+
+    if (sat.source === CatalogSource.VIMPEL || !CatalogLoader.hasRealSccNum(sat.sccNum)) {
+      return;
+    }
+
+    try {
+      const catalogAgeDays = Tle.calcElsetAge(sat.tle1, new Date(), 'days');
+      const vimpelAgeDays = Tle.calcElsetAge(element.TLE1 as TleLine1, new Date(), 'days');
+
+      if (catalogAgeDays <= CatalogLoader.VIMPEL_OVERRIDE_MIN_CATALOG_AGE_DAYS || vimpelAgeDays >= catalogAgeDays) {
+        return;
+      }
+      // Vimpel line 1 carries its own object number where the designator goes.
+      const intlDes = sat.intlDes;
+
+      sat.editTle(CatalogLoader.applyConfidence_(element.TLE1 as TleLine1, CatalogSource.VIMPEL), element.TLE2 as TleLine2, sat.sccNum);
+      sat.intlDes = intlDes;
+      sat.source = CatalogSource.VIMPEL;
+    } catch (err) {
+      errorManagerInstance.info(`Skipping Vimpel override for ${sat.sccNum}: ${(err as Error).message}`);
     }
   }
 

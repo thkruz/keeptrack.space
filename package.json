@@ -187,7 +187,7 @@
     "openmeteo": "^1.2.0",
     "requestidlecallback-polyfill": "^1.0.2",
     "resizable": "^2.0.0",
-    "uuid": "^11.1.0",
+    "uuid": "^14.0.2",
     "webgl-obj-loader": "^2.0.8"
   },
   "pnpm": {

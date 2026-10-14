@@ -1,0 +1,2030 @@
+{
+  "quantileThresholds": [
+    "0.0914915",
+    "0.403767",
+    "1.05627",
+    "3",
+    "7.43409",
+    "25.7173"
+  ],
+  "bySource": {
+    "catalog": 20,
+    "preset": 10,
+    "catalog-mined": 15,
+    "geometric": 140,
+    "vmag-derived": 10,
+    "none": 5
+  },
+  "byBand": {
+    "rcsXXXSmall": 27,
+    "rcsXXSmall": 28,
+    "rcsXSmall": 28,
+    "rcsXLarge": 28,
+    "rcsLarge": 28,
+    "rcsSmall": 28,
+    "rcsMed": 28,
+    "rcsUnknown": 5
+  },
+  "rows": [
+    {
+      "id": 0,
+      "name": "GCAT0",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.014",
+      "source": "catalog",
+      "fallbackBand": "rcsXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 1,
+      "name": "GCAT1",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.065",
+      "source": "catalog",
+      "fallbackBand": "rcsSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 2,
+      "name": "GCAT2",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.1",
+      "source": "catalog",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 3,
+      "name": "GCAT3",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.002",
+      "source": "catalog",
+      "fallbackBand": "rcsXXXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 4,
+      "name": "GCAT4",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.376",
+      "source": "catalog",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 5,
+      "name": "GCAT5",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.029",
+      "source": "catalog",
+      "fallbackBand": "rcsXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 6,
+      "name": "GCAT6",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.45",
+      "source": "catalog",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 7,
+      "name": "GCAT7",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "39.42",
+      "source": "catalog",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 8,
+      "name": "GCAT8",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "8.009",
+      "source": "catalog",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 9,
+      "name": "GCAT9",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "2.824",
+      "source": "catalog",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 10,
+      "name": "GCAT10",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "4.347",
+      "source": "catalog",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 11,
+      "name": "GCAT11",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.044",
+      "source": "catalog",
+      "fallbackBand": "rcsXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 12,
+      "name": "GCAT12",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.783",
+      "source": "catalog",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 13,
+      "name": "GCAT13",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "12.777",
+      "source": "catalog",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 14,
+      "name": "GCAT14",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "33.181",
+      "source": "catalog",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 15,
+      "name": "GCAT15",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.001",
+      "source": "catalog",
+      "fallbackBand": "rcsXXXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 16,
+      "name": "GCAT16",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.036",
+      "source": "catalog",
+      "fallbackBand": "rcsXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 17,
+      "name": "GCAT17",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "15.182",
+      "source": "catalog",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 18,
+      "name": "GCAT18",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.006",
+      "source": "catalog",
+      "fallbackBand": "rcsXXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 19,
+      "name": "GCAT19",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.004",
+      "source": "catalog",
+      "fallbackBand": "rcsXXXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 20,
+      "name": "STARLINK-1001",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "5",
+      "source": "preset",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 21,
+      "name": "ONEWEB-0101",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "3",
+      "source": "preset",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 22,
+      "name": "GLOBALSTAR M097",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "7",
+      "source": "preset",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 23,
+      "name": "IRIDIUM 180",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "14",
+      "source": "preset",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 24,
+      "name": "HST",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "14",
+      "source": "preset",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 25,
+      "name": "STARLINK-1001",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "5",
+      "source": "preset",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 26,
+      "name": "ONEWEB-0101",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "3",
+      "source": "preset",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 27,
+      "name": "GLOBALSTAR M097",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "7",
+      "source": "preset",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 28,
+      "name": "IRIDIUM 180",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "14",
+      "source": "preset",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 29,
+      "name": "HST",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "14",
+      "source": "preset",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 30,
+      "name": "GMINED30",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.948",
+      "source": "catalog-mined",
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 31,
+      "name": "GMINED31",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.3925",
+      "source": "catalog-mined",
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 32,
+      "name": "GMINED32",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.2255",
+      "source": "catalog-mined",
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 33,
+      "name": "GMINED33",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.948",
+      "source": "catalog-mined",
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 34,
+      "name": "GMINED34",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.3925",
+      "source": "catalog-mined",
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 35,
+      "name": "GMINED35",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.2255",
+      "source": "catalog-mined",
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 36,
+      "name": "GMINED36",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.948",
+      "source": "catalog-mined",
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 37,
+      "name": "GMINED37",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.3925",
+      "source": "catalog-mined",
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 38,
+      "name": "GMINED38",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.2255",
+      "source": "catalog-mined",
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 39,
+      "name": "GMINED39",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.948",
+      "source": "catalog-mined",
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 40,
+      "name": "GMINED40",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.3925",
+      "source": "catalog-mined",
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 41,
+      "name": "GMINED41",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.2255",
+      "source": "catalog-mined",
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 42,
+      "name": "GMINED42",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.948",
+      "source": "catalog-mined",
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 43,
+      "name": "GMINED43",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.3925",
+      "source": "catalog-mined",
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 44,
+      "name": "GMINED44",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.2255",
+      "source": "catalog-mined",
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 45,
+      "name": "GGEOM45",
+      "shape": "",
+      "dims": "13.760 x 0.114 x 0.195",
+      "rcs": "2.13704",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 46,
+      "name": "GGEOM46",
+      "shape": "sphere",
+      "dims": "1.307 x 0.716 x 1.615",
+      "rcs": "1.34166",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 47,
+      "name": "GGEOM47",
+      "shape": "cone",
+      "dims": "4.478 x 7.945 x 0.108",
+      "rcs": "31.0707",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 48,
+      "name": "GGEOM48",
+      "shape": "",
+      "dims": "1.053 x 0.070 x 1.503",
+      "rcs": "0.880789",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 49,
+      "name": "GGEOM49",
+      "shape": "cone",
+      "dims": "0.436 x 0.728 x 2.587",
+      "rcs": "0.266437",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 50,
+      "name": "GGEOM50",
+      "shape": "hexagon",
+      "dims": "2.316 x 4.291 x 0.865",
+      "rcs": "13.4332",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 51,
+      "name": "GGEOM51",
+      "shape": "cone",
+      "dims": "25.684 x 0.061 x 6.771",
+      "rcs": "0.615982",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 52,
+      "name": "GGEOM52",
+      "shape": "cylinder",
+      "dims": "0.103 x 8.174 x 13.035",
+      "rcs": "26.8991",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 53,
+      "name": "GGEOM53",
+      "shape": "",
+      "dims": "0.060 x 1.813 x 0.878",
+      "rcs": "0.876637",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 54,
+      "name": "GGEOM54",
+      "shape": "box",
+      "dims": "0.317 x 0.200 x 1.120",
+      "rcs": "0.32122",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 55,
+      "name": "GGEOM55",
+      "shape": "box",
+      "dims": "4.098 x 5.077 x 5.858",
+      "rcs": "37.2763",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 56,
+      "name": "GGEOM56",
+      "shape": "",
+      "dims": "0.132 x 0.942 x 3.782",
+      "rcs": "2.09311",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 57,
+      "name": "GGEOM57",
+      "shape": "box",
+      "dims": "0.172 x 0.060 x 1.181",
+      "rcs": "0.142156",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 58,
+      "name": "GGEOM58",
+      "shape": "box",
+      "dims": "2.557 x 3.206 x 0.085",
+      "rcs": "4.3438",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 59,
+      "name": "GGEOM59",
+      "shape": "cone",
+      "dims": "3.411 x 5.519 x 1.005",
+      "rcs": "15.4896",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 60,
+      "name": "GGEOM60",
+      "shape": "hexagon",
+      "dims": "0.725 x 1.070 x 26.507",
+      "rcs": "0.95363",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 61,
+      "name": "GGEOM61",
+      "shape": "cone",
+      "dims": "0.390 x 0.746 x 11.113",
+      "rcs": "0.267366",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 62,
+      "name": "GGEOM62",
+      "shape": "cone",
+      "dims": "11.207 x 0.198 x 0.443",
+      "rcs": "0.879125",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 63,
+      "name": "GGEOM63",
+      "shape": "cube",
+      "dims": "1.297 x 0.094 x 4.015",
+      "rcs": "2.85339",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 64,
+      "name": "GGEOM64",
+      "shape": "cube",
+      "dims": "2.969 x 8.074 x 5.329",
+      "rcs": "41.4099",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 65,
+      "name": "GGEOM65",
+      "shape": "box",
+      "dims": "1.765 x 0.276 x 0.369",
+      "rcs": "0.620135",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 66,
+      "name": "GGEOM66",
+      "shape": "cylinder",
+      "dims": "28.465 x 0.393 x 8.963",
+      "rcs": "8.8467",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 67,
+      "name": "GGEOM67",
+      "shape": "",
+      "dims": "0.159 x 0.059 x 3.192",
+      "rcs": "0.352619",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 68,
+      "name": "GGEOM68",
+      "shape": "",
+      "dims": "0.569 x 7.093 x 0.585",
+      "rcs": "4.25909",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 69,
+      "name": "GGEOM69",
+      "shape": "cylinder",
+      "dims": "0.075 x 3.474 x 6.584",
+      "rcs": "4.94399",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 70,
+      "name": "GGEOM70",
+      "shape": "sphere",
+      "dims": "2.247 x 0.343 x 0.929",
+      "rcs": "3.96548",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 71,
+      "name": "GGEOM71",
+      "shape": "cone",
+      "dims": "0.301 x 0.075 x 7.605",
+      "rcs": "0.0100382",
+      "source": "geometric",
+      "fallbackBand": "rcsXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 72,
+      "name": "GGEOM72",
+      "shape": "cube",
+      "dims": "0.235 x 2.433 x 17.755",
+      "rcs": "23.971",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 73,
+      "name": "GGEOM73",
+      "shape": "hexagon",
+      "dims": "0.228 x 2.208 x 1.056",
+      "rcs": "1.96086",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 74,
+      "name": "GGEOM74",
+      "shape": "",
+      "dims": "0.062 x 2.289 x 0.341",
+      "rcs": "0.471805",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 75,
+      "name": "GGEOM75",
+      "shape": "cube",
+      "dims": "14.767 x 4.609 x 1.222",
+      "rcs": "45.8693",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 76,
+      "name": "GGEOM76",
+      "shape": "cube",
+      "dims": "29.442 x 3.085 x 0.109",
+      "rcs": "47.187",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 77,
+      "name": "GGEOM77",
+      "shape": "cube",
+      "dims": "0.088 x 1.788 x 0.450",
+      "rcs": "0.500772",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 78,
+      "name": "GGEOM78",
+      "shape": "",
+      "dims": "2.855 x 0.064 x 17.558",
+      "rcs": "25.7173",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 79,
+      "name": "GGEOM79",
+      "shape": "box",
+      "dims": "4.142 x 4.104 x 26.156",
+      "rcs": "116.341",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 80,
+      "name": "GGEOM80",
+      "shape": "box",
+      "dims": "0.097 x 0.156 x 0.996",
+      "rcs": "0.13356",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 81,
+      "name": "GGEOM81",
+      "shape": "",
+      "dims": "0.053 x 0.077 x 5.451",
+      "rcs": "0.356355",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 82,
+      "name": "GGEOM82",
+      "shape": "box",
+      "dims": "0.176 x 0.914 x 12.802",
+      "rcs": "7.05752",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 83,
+      "name": "GGEOM83",
+      "shape": "hexagon",
+      "dims": "7.684 x 0.321 x 0.050",
+      "rcs": "1.88339",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 84,
+      "name": "GGEOM84",
+      "shape": "hexagon",
+      "dims": "4.878 x 1.502 x 0.112",
+      "rcs": "6.22773",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 85,
+      "name": "GGEOM85",
+      "shape": "cone",
+      "dims": "1.076 x 0.103 x 6.279",
+      "rcs": "0.0456549",
+      "source": "geometric",
+      "fallbackBand": "rcsXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 86,
+      "name": "GGEOM86",
+      "shape": "",
+      "dims": "0.390 x 4.202 x 0.080",
+      "rcs": "1.00307",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 87,
+      "name": "GGEOM87",
+      "shape": "box",
+      "dims": "0.395 x 0.052 x 6.941",
+      "rcs": "1.56158",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 88,
+      "name": "GGEOM88",
+      "shape": "hexagon",
+      "dims": "0.070 x 0.071 x 14.125",
+      "rcs": "0.00536461",
+      "source": "geometric",
+      "fallbackBand": "rcsXXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 89,
+      "name": "GGEOM89",
+      "shape": "hexagon",
+      "dims": "18.611 x 3.714 x 5.989",
+      "rcs": "56.3206",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 90,
+      "name": "GGEOM90",
+      "shape": "hexagon",
+      "dims": "0.120 x 3.014 x 0.402",
+      "rcs": "3.22144",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 91,
+      "name": "GGEOM91",
+      "shape": "cube",
+      "dims": "0.102 x 0.072 x 19.754",
+      "rcs": "1.72227",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 92,
+      "name": "GGEOM92",
+      "shape": "cylinder",
+      "dims": "23.568 x 0.101 x 5.357",
+      "rcs": "1.87354",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 93,
+      "name": "GGEOM93",
+      "shape": "box",
+      "dims": "5.847 x 5.088 x 9.465",
+      "rcs": "66.6247",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 94,
+      "name": "GGEOM94",
+      "shape": "box",
+      "dims": "0.097 x 0.227 x 3.513",
+      "rcs": "0.580116",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 95,
+      "name": "GGEOM95",
+      "shape": "sphere",
+      "dims": "18.921 x 0.056 x 0.186",
+      "rcs": "281.176",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 96,
+      "name": "GGEOM96",
+      "shape": "cylinder",
+      "dims": "0.193 x 5.233 x 0.059",
+      "rcs": "11.547",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 97,
+      "name": "GGEOM97",
+      "shape": "box",
+      "dims": "0.170 x 6.513 x 0.391",
+      "rcs": "1.86013",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 98,
+      "name": "GGEOM98",
+      "shape": "",
+      "dims": "0.974 x 0.398 x 0.240",
+      "rcs": "0.358466",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 99,
+      "name": "GGEOM99",
+      "shape": "hexagon",
+      "dims": "12.826 x 8.674 x 6.724",
+      "rcs": "107.874",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 100,
+      "name": "GGEOM100",
+      "shape": "cylinder",
+      "dims": "8.408 x 7.775 x 0.948",
+      "rcs": "75.0821",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 101,
+      "name": "GGEOM101",
+      "shape": "cone",
+      "dims": "0.075 x 6.781 x 2.410",
+      "rcs": "18.0593",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 102,
+      "name": "GGEOM102",
+      "shape": "cube",
+      "dims": "0.058 x 0.089 x 0.139",
+      "rcs": "0.0127975",
+      "source": "geometric",
+      "fallbackBand": "rcsXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 103,
+      "name": "GGEOM103",
+      "shape": "cube",
+      "dims": "0.848 x 0.277 x 1.403",
+      "rcs": "0.906635",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 104,
+      "name": "GGEOM104",
+      "shape": "cone",
+      "dims": "26.859 x 0.521 x 0.157",
+      "rcs": "5.54881",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 105,
+      "name": "GGEOM105",
+      "shape": "hexagon",
+      "dims": "6.780 x 7.583 x 0.437",
+      "rcs": "57.2338",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 106,
+      "name": "GGEOM106",
+      "shape": "cube",
+      "dims": "1.445 x 0.334 x 0.070",
+      "rcs": "0.30358",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 107,
+      "name": "GGEOM107",
+      "shape": "cone",
+      "dims": "4.687 x 2.136 x 0.765",
+      "rcs": "4.9281",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 108,
+      "name": "GGEOM108",
+      "shape": "cube",
+      "dims": "2.348 x 2.147 x 0.107",
+      "rcs": "2.76106",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 109,
+      "name": "GGEOM109",
+      "shape": "hexagon",
+      "dims": "4.591 x 5.689 x 3.734",
+      "rcs": "30.0994",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 110,
+      "name": "GGEOM110",
+      "shape": "sphere",
+      "dims": "21.286 x 0.479 x 21.176",
+      "rcs": "355.859",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 111,
+      "name": "GGEOM111",
+      "shape": "cone",
+      "dims": "0.263 x 0.063 x 20.573",
+      "rcs": "0.00733245",
+      "source": "geometric",
+      "fallbackBand": "rcsXXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 112,
+      "name": "GGEOM112",
+      "shape": "cylinder",
+      "dims": "16.168 x 0.991 x 3.114",
+      "rcs": "12.9697",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 113,
+      "name": "GGEOM113",
+      "shape": "box",
+      "dims": "0.065 x 1.568 x 1.426",
+      "rcs": "1.21529",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 114,
+      "name": "GGEOM114",
+      "shape": "cube",
+      "dims": "3.274 x 0.479 x 0.052",
+      "rcs": "0.881701",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 115,
+      "name": "GGEOM115",
+      "shape": "box",
+      "dims": "0.445 x 5.248 x 0.281",
+      "rcs": "1.96755",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 116,
+      "name": "GGEOM116",
+      "shape": "hexagon",
+      "dims": "0.415 x 1.233 x 0.147",
+      "rcs": "0.8775",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 117,
+      "name": "GGEOM117",
+      "shape": "",
+      "dims": "7.917 x 0.082 x 1.028",
+      "rcs": "4.43608",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 118,
+      "name": "GGEOM118",
+      "shape": "hexagon",
+      "dims": "15.328 x 3.098 x 1.539",
+      "rcs": "38.7315",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 119,
+      "name": "GGEOM119",
+      "shape": "",
+      "dims": "0.179 x 0.250 x 0.054",
+      "rcs": "0.033958",
+      "source": "geometric",
+      "fallbackBand": "rcsXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 120,
+      "name": "GGEOM120",
+      "shape": "sphere",
+      "dims": "1.646 x 0.241 x 0.602",
+      "rcs": "2.12789",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 121,
+      "name": "GGEOM121",
+      "shape": "box",
+      "dims": "9.163 x 0.276 x 1.007",
+      "rcs": "6.01703",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 122,
+      "name": "GGEOM122",
+      "shape": "sphere",
+      "dims": "5.344 x 0.448 x 9.201",
+      "rcs": "22.4297",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 123,
+      "name": "GGEOM123",
+      "shape": "cone",
+      "dims": "1.094 x 2.534 x 0.395",
+      "rcs": "2.92654",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 124,
+      "name": "GGEOM124",
+      "shape": "cylinder",
+      "dims": "0.334 x 2.196 x 6.250",
+      "rcs": "2.46982",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 125,
+      "name": "GGEOM125",
+      "shape": "cone",
+      "dims": "7.083 x 0.396 x 4.862",
+      "rcs": "1.13269",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 126,
+      "name": "GGEOM126",
+      "shape": "",
+      "dims": "14.374 x 0.226 x 0.090",
+      "rcs": "2.28126",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 127,
+      "name": "GGEOM127",
+      "shape": "box",
+      "dims": "0.294 x 1.689 x 5.264",
+      "rcs": "5.46754",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 128,
+      "name": "GGEOM128",
+      "shape": "cube",
+      "dims": "1.432 x 9.066 x 0.699",
+      "rcs": "10.1603",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 129,
+      "name": "GGEOM129",
+      "shape": "cylinder",
+      "dims": "15.109 x 1.515 x 16.691",
+      "rcs": "18.8792",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 130,
+      "name": "GGEOM130",
+      "shape": "cone",
+      "dims": "1.010 x 0.144 x 0.294",
+      "rcs": "0.0613306",
+      "source": "geometric",
+      "fallbackBand": "rcsSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 131,
+      "name": "GGEOM131",
+      "shape": "box",
+      "dims": "1.023 x 5.948 x 0.739",
+      "rcs": "5.61819",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 132,
+      "name": "GGEOM132",
+      "shape": "box",
+      "dims": "1.112 x 0.355 x 9.866",
+      "rcs": "7.43409",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 133,
+      "name": "GGEOM133",
+      "shape": "cone",
+      "dims": "0.079 x 5.503 x 12.362",
+      "rcs": "11.8946",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 134,
+      "name": "GGEOM134",
+      "shape": "cylinder",
+      "dims": "0.058 x 0.275 x 0.077",
+      "rcs": "0.042225",
+      "source": "geometric",
+      "fallbackBand": "rcsXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 135,
+      "name": "GGEOM135",
+      "shape": "cone",
+      "dims": "18.767 x 0.089 x 2.799",
+      "rcs": "0.657468",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 136,
+      "name": "GGEOM136",
+      "shape": "cube",
+      "dims": "0.068 x 0.132 x 11.273",
+      "rcs": "1.13179",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 137,
+      "name": "GGEOM137",
+      "shape": "",
+      "dims": "0.073 x 0.707 x 2.246",
+      "rcs": "0.901745",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 138,
+      "name": "GGEOM138",
+      "shape": "box",
+      "dims": "9.962 x 0.305 x 9.765",
+      "rcs": "51.6478",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 139,
+      "name": "GGEOM139",
+      "shape": "",
+      "dims": "9.044 x 7.253 x 11.177",
+      "rcs": "123.874",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 140,
+      "name": "GGEOM140",
+      "shape": "cylinder",
+      "dims": "0.530 x 2.383 x 1.983",
+      "rcs": "3.22197",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 141,
+      "name": "GGEOM141",
+      "shape": "",
+      "dims": "0.256 x 0.132 x 0.340",
+      "rcs": "0.082856",
+      "source": "geometric",
+      "fallbackBand": "rcsSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 142,
+      "name": "GGEOM142",
+      "shape": "cylinder",
+      "dims": "8.713 x 0.838 x 1.975",
+      "rcs": "6.01035",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 143,
+      "name": "GGEOM143",
+      "shape": "box",
+      "dims": "27.473 x 0.118 x 0.058",
+      "rcs": "2.42105",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 144,
+      "name": "GGEOM144",
+      "shape": "cube",
+      "dims": "12.832 x 0.339 x 1.085",
+      "rcs": "9.32029",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 145,
+      "name": "GGEOM145",
+      "shape": "sphere",
+      "dims": "14.144 x 2.202 x 3.593",
+      "rcs": "157.121",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 146,
+      "name": "GGEOM146",
+      "shape": "cylinder",
+      "dims": "3.684 x 0.137 x 0.520",
+      "rcs": "0.403767",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 147,
+      "name": "GGEOM147",
+      "shape": "cube",
+      "dims": "8.135 x 0.541 x 3.458",
+      "rcs": "17.2013",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 148,
+      "name": "GGEOM148",
+      "shape": "hexagon",
+      "dims": "2.217 x 0.321 x 2.155",
+      "rcs": "0.567206",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 149,
+      "name": "GGEOM149",
+      "shape": "box",
+      "dims": "4.728 x 0.065 x 8.682",
+      "rcs": "20.9601",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 150,
+      "name": "GGEOM150",
+      "shape": "",
+      "dims": "17.902 x 8.953 x 0.090",
+      "rcs": "81.3468",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 151,
+      "name": "GGEOM151",
+      "shape": "sphere",
+      "dims": "0.606 x 0.100 x 0.231",
+      "rcs": "0.288426",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 152,
+      "name": "GGEOM152",
+      "shape": "sphere",
+      "dims": "0.488 x 0.814 x 0.190",
+      "rcs": "0.187038",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 153,
+      "name": "GGEOM153",
+      "shape": "",
+      "dims": "7.112 x 0.137 x 18.106",
+      "rcs": "66.1124",
+      "source": "geometric",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 154,
+      "name": "GGEOM154",
+      "shape": "cube",
+      "dims": "1.303 x 5.158 x 0.685",
+      "rcs": "5.57333",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 155,
+      "name": "GGEOM155",
+      "shape": "box",
+      "dims": "0.648 x 0.212 x 0.244",
+      "rcs": "0.173608",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 156,
+      "name": "GGEOM156",
+      "shape": "cylinder",
+      "dims": "1.246 x 6.726 x 22.367",
+      "rcs": "24.3474",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 157,
+      "name": "GGEOM157",
+      "shape": "sphere",
+      "dims": "5.408 x 0.197 x 0.222",
+      "rcs": "22.9701",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 158,
+      "name": "GGEOM158",
+      "shape": "sphere",
+      "dims": "5.127 x 0.964 x 1.254",
+      "rcs": "20.6451",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 159,
+      "name": "GGEOM159",
+      "shape": "",
+      "dims": "0.077 x 2.607 x 20.083",
+      "rcs": "27.0518",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 160,
+      "name": "GGEOM160",
+      "shape": "cone",
+      "dims": "3.458 x 5.153 x 10.348",
+      "rcs": "13.9401",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 161,
+      "name": "GGEOM161",
+      "shape": "cylinder",
+      "dims": "9.830 x 0.093 x 4.221",
+      "rcs": "0.7214",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 162,
+      "name": "GGEOM162",
+      "shape": "hexagon",
+      "dims": "0.060 x 0.120 x 0.221",
+      "rcs": "0.0100765",
+      "source": "geometric",
+      "fallbackBand": "rcsXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 163,
+      "name": "GGEOM163",
+      "shape": "box",
+      "dims": "0.083 x 0.071 x 0.922",
+      "rcs": "0.0739405",
+      "source": "geometric",
+      "fallbackBand": "rcsSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 164,
+      "name": "GGEOM164",
+      "shape": "cone",
+      "dims": "0.109 x 0.548 x 0.835",
+      "rcs": "0.122423",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 165,
+      "name": "GGEOM165",
+      "shape": "cube",
+      "dims": "1.246 x 5.163 x 0.746",
+      "rcs": "5.60711",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 166,
+      "name": "GGEOM166",
+      "shape": "",
+      "dims": "0.869 x 0.448 x 5.478",
+      "rcs": "3.80192",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 167,
+      "name": "GGEOM167",
+      "shape": "",
+      "dims": "7.083 x 0.092 x 0.110",
+      "rcs": "0.720443",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 168,
+      "name": "GGEOM168",
+      "shape": "",
+      "dims": "0.765 x 0.094 x 2.576",
+      "rcs": "1.14235",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 169,
+      "name": "GGEOM169",
+      "shape": "hexagon",
+      "dims": "16.204 x 0.306 x 2.566",
+      "rcs": "3.74923",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 170,
+      "name": "GGEOM170",
+      "shape": "cone",
+      "dims": "1.799 x 1.423 x 0.261",
+      "rcs": "1.47866",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 171,
+      "name": "GGEOM171",
+      "shape": "cube",
+      "dims": "0.151 x 1.721 x 1.628",
+      "rcs": "1.65374",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 172,
+      "name": "GGEOM172",
+      "shape": "sphere",
+      "dims": "0.131 x 0.637 x 0.305",
+      "rcs": "0.0134782",
+      "source": "geometric",
+      "fallbackBand": "rcsXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 173,
+      "name": "GGEOM173",
+      "shape": "cone",
+      "dims": "0.842 x 1.459 x 0.540",
+      "rcs": "1.05627",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 174,
+      "name": "GGEOM174",
+      "shape": "cylinder",
+      "dims": "10.942 x 0.052 x 0.324",
+      "rcs": "0.447941",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 175,
+      "name": "GGEOM175",
+      "shape": "hexagon",
+      "dims": "0.352 x 0.768 x 21.003",
+      "rcs": "0.394303",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 176,
+      "name": "GGEOM176",
+      "shape": "cube",
+      "dims": "3.160 x 1.055 x 0.117",
+      "rcs": "1.91348",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 177,
+      "name": "GGEOM177",
+      "shape": "",
+      "dims": "0.499 x 0.285 x 0.052",
+      "rcs": "0.0914915",
+      "source": "geometric",
+      "fallbackBand": "rcsSmall",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 178,
+      "name": "GGEOM178",
+      "shape": "box",
+      "dims": "2.060 x 0.130 x 14.501",
+      "rcs": "16.0125",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 179,
+      "name": "GGEOM179",
+      "shape": "hexagon",
+      "dims": "22.167 x 0.330 x 6.981",
+      "rcs": "5.5217",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 180,
+      "name": "GGEOM180",
+      "shape": "cone",
+      "dims": "28.373 x 0.113 x 20.363",
+      "rcs": "1.26156",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 181,
+      "name": "GGEOM181",
+      "shape": "hexagon",
+      "dims": "0.149 x 1.133 x 28.031",
+      "rcs": "0.543503",
+      "source": "geometric",
+      "fallbackBand": "rcsMed",
+      "quantileBand": "rcsXSmall"
+    },
+    {
+      "id": 182,
+      "name": "GGEOM182",
+      "shape": "hexagon",
+      "dims": "0.823 x 0.109 x 8.266",
+      "rcs": "0.0711387",
+      "source": "geometric",
+      "fallbackBand": "rcsSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 183,
+      "name": "GGEOM183",
+      "shape": "cylinder",
+      "dims": "0.402 x 1.886 x 6.089",
+      "rcs": "1.9923",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsSmall"
+    },
+    {
+      "id": 184,
+      "name": "GGEOM184",
+      "shape": "sphere",
+      "dims": "5.210 x 3.734 x 12.376",
+      "rcs": "21.3189",
+      "source": "geometric",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsLarge"
+    },
+    {
+      "id": 185,
+      "name": "GVMAG185",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "50.7412",
+      "source": "vmag-derived",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 186,
+      "name": "GVMAG186",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.000914873",
+      "source": "vmag-derived",
+      "fallbackBand": "rcsXXXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 187,
+      "name": "GVMAG187",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.0164953",
+      "source": "vmag-derived",
+      "fallbackBand": "rcsXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 188,
+      "name": "GVMAG188",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "88.9941",
+      "source": "vmag-derived",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 189,
+      "name": "GVMAG189",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.00621385",
+      "source": "vmag-derived",
+      "fallbackBand": "rcsXXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 190,
+      "name": "GVMAG190",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "106.013",
+      "source": "vmag-derived",
+      "fallbackBand": "rcsXLarge",
+      "quantileBand": "rcsXLarge"
+    },
+    {
+      "id": 191,
+      "name": "GVMAG191",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.00123983",
+      "source": "vmag-derived",
+      "fallbackBand": "rcsXXXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 192,
+      "name": "GVMAG192",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.09758",
+      "source": "vmag-derived",
+      "fallbackBand": "rcsSmall",
+      "quantileBand": "rcsXXSmall"
+    },
+    {
+      "id": 193,
+      "name": "GVMAG193",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "4.03052",
+      "source": "vmag-derived",
+      "fallbackBand": "rcsLarge",
+      "quantileBand": "rcsMed"
+    },
+    {
+      "id": 194,
+      "name": "GVMAG194",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": "0.00305746",
+      "source": "vmag-derived",
+      "fallbackBand": "rcsXXXSmall",
+      "quantileBand": "rcsXXXSmall"
+    },
+    {
+      "id": 195,
+      "name": "GNONE195",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": null,
+      "source": null,
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsUnknown"
+    },
+    {
+      "id": 196,
+      "name": "GNONE196",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": null,
+      "source": null,
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsUnknown"
+    },
+    {
+      "id": 197,
+      "name": "GNONE197",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": null,
+      "source": null,
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsUnknown"
+    },
+    {
+      "id": 198,
+      "name": "GNONE198",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": null,
+      "source": null,
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsUnknown"
+    },
+    {
+      "id": 199,
+      "name": "GNONE199",
+      "shape": "",
+      "dims": " x  x ",
+      "rcs": null,
+      "source": null,
+      "fallbackBand": "rcsUnknown",
+      "quantileBand": "rcsUnknown"
+    }
+  ]
+}

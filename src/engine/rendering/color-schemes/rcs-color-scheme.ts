@@ -15,7 +15,7 @@ import { ColorScheme } from './color-scheme';
  * though RCS values cluster heavily (debris near 0.01 m², Starlink at ~14
  * m², etc.).
  *
- * Palette is matplotlib's `plasma` — perceptually uniform like vmag's
+ * Palette is matplotlib's `plasma`; perceptually uniform like vmag's
  * viridis, but a distinct hue family so users can tell at a glance which
  * scheme is active without reading the legend label.
  */
@@ -34,7 +34,7 @@ export class RcsColorScheme extends ColorScheme {
     rcsXLarge: true,
     // Default ON: objects with no estimable RCS render as a translucent grey
     // (colorTheme.rcsUnknown) so users can still see "we have no data for this
-    // one." Matches the std-mag scheme's runtime behavior — users can hide
+    // one." Matches the std-mag scheme's runtime behavior; users can hide
     // the no-data population via the legend toggle if they want a cleaner view.
     rcsUnknown: true,
   };
@@ -44,7 +44,7 @@ export class RcsColorScheme extends ColorScheme {
    * largest RCS, so bucket index lines up with the array index.
    *
    * Yellow at the large-RCS end follows the convention that "high salience
-   * = warm color" — large objects are the brighter, more noticeable points
+   * = warm color"; large objects are the brighter, more noticeable points
    * on screen. Dark indigo at the small-RCS end fades into the background.
    */
   static readonly uniqueColorTheme = {
@@ -66,10 +66,19 @@ export class RcsColorScheme extends ColorScheme {
 
   /**
    * Used until `calculateParams` has scanned the catalog at least once.
-   * Hand-tuned log-spaced boundaries that roughly match the historical
+   * Hand-tuned log-spaced boundaries (m²) that roughly match the historical
    * fixed-boundary RCS scheme so the very first recolor is still useful.
+   *
+   * The second-to-last boundary is 1.0 m², the Space-Track RCS size-bin edge
+   * (SMALL < 0.1 m² <= MEDIUM < 1.0 m² <= LARGE), so the Med/Large colour
+   * split matches the published size classes; 0.1 m² (Small/Med) is the other
+   * bin edge. The top boundary moved from 10 to 30 for ootk v8, whose geometric
+   * `estimateRcs` returns a real area in m² (v7 returned 1.5 * sqrt(area)).
+   * Agreement with the v7 fallback bands on the 200 rcs-band-golden objects:
+   * [1, 10] 137, [0.8, 30] 148, [1, 30] 145, so 30 is kept over 10. The lower
+   * four sit among catalog-published values, which did not change.
    */
-  private static readonly FALLBACK_THRESHOLDS: readonly number[] = [0.005, 0.01, 0.05, 0.1, 1, 10];
+  private static readonly FALLBACK_THRESHOLDS: readonly number[] = [0.005, 0.01, 0.05, 0.1, 1.0, 30];
 
   private thresholds_: readonly number[] = RcsColorScheme.FALLBACK_THRESHOLDS;
 
@@ -134,7 +143,7 @@ export class RcsColorScheme extends ColorScheme {
         idx++;
       }
       if (idx >= rcsValues.length) {
-        // No more distinct values available — fill the remaining slots with
+        // No more distinct values available; fill the remaining slots with
         // +Infinity and stop. Every subsequent iteration would re-hit this
         // case anyway, and continuing leaves prevValue stale which would
         // cause later iterations to mis-anchor their dedup search.
@@ -169,7 +178,7 @@ export class RcsColorScheme extends ColorScheme {
         };
       }
 
-      // `deselected` is zero-alpha — unknowns disappear without blocking
+      // `deselected` is zero-alpha; unknowns disappear without blocking
       // clicks on objects behind them.
       return {
         color: this.colorTheme.deselected,

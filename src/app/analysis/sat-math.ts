@@ -43,7 +43,7 @@ import {
   MINUTES_PER_DAY,
   Sun as OotkSun,
   estimateRcs as ootkEstimateRcs,
-  mag2db as ootkMag2db,
+  pow2db as ootkPow2db,
   relativeVelocity as ootkRelativeVelocity,
   PosVel,
   RAD2DEG,
@@ -78,16 +78,16 @@ export { SunStatus } from '@ootk/src/main';
 
 export abstract class SatMath {
   /**
-   * Converts magnitude to decibels.
-   * @param magnitude The magnitude to convert.
-   * @deprecated Use mag2db() from ootk instead.
+   * Converts a power-like ratio (e.g. RCS in m^2) to decibels (10 log10).
+   * @param power The power-like quantity to convert.
+   * @deprecated Use pow2db() from ootk instead.
    */
-  static mag2db(magnitude: number) {
-    if (magnitude <= 0) {
+  static pow2db(power: number) {
+    if (power <= 0) {
       return Number.NaN; // KeepTrack returns NaN instead of throwing
     }
 
-    return ootkMag2db(magnitude);
+    return ootkPow2db(power);
   }
 
   /**

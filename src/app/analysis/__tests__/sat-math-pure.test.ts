@@ -120,13 +120,13 @@ describe('SatMath.getAlt', () => {
   });
 });
 
-describe('SatMath.mag2db', () => {
+describe('SatMath.pow2db', () => {
   it('returns NaN for a non-positive magnitude', () => {
-    expect(SatMath.mag2db(0)).toBeNaN();
-    expect(SatMath.mag2db(-5)).toBeNaN();
+    expect(SatMath.pow2db(0)).toBeNaN();
+    expect(SatMath.pow2db(-5)).toBeNaN();
   });
 
   it('returns a finite value for a positive magnitude', () => {
-    expect(Number.isFinite(SatMath.mag2db(10))).toBe(true);
+    expect(Number.isFinite(SatMath.pow2db(10))).toBe(true);
   });
 });

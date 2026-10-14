@@ -699,13 +699,13 @@ describe('calculateVisMag_method', () => {
 
   // Tests that the method returns a valid decibal magnitude when given a rcs in square meters
   it('test_rcs_in_square_meters', () => {
-    expect(SatMath.mag2db(1)).toBe(0);
-    expect(SatMath.mag2db(0.1)).toBe(-10);
-    expect(SatMath.mag2db(0.01)).toBe(-20);
-    expect(SatMath.mag2db(10)).toBe(10);
-    expect(SatMath.mag2db(100)).toBe(20);
-    expect(SatMath.mag2db(2)).toBeCloseTo(3, 1);
-    expect(SatMath.mag2db(4)).toBeCloseTo(6, 1);
-    expect(SatMath.mag2db(8)).toBeCloseTo(9, 1);
+    expect(SatMath.pow2db(1)).toBe(0);
+    expect(SatMath.pow2db(0.1)).toBe(-10);
+    expect(SatMath.pow2db(0.01)).toBe(-20);
+    expect(SatMath.pow2db(10)).toBe(10);
+    expect(SatMath.pow2db(100)).toBe(20);
+    expect(SatMath.pow2db(2)).toBeCloseTo(3, 1);
+    expect(SatMath.pow2db(4)).toBeCloseTo(6, 1);
+    expect(SatMath.pow2db(8)).toBeCloseTo(9, 1);
   });
 });

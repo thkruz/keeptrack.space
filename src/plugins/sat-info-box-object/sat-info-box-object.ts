@@ -607,7 +607,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsContri
     if (settingsManager.plugins.SatInfoBoxObject?.isEstimateRcs === false) {
       if (typeof sat.rcs === 'number' && !isNaN(sat.rcs)) {
         satRcsEl.innerHTML = `${sat.rcs} m<sup>2</sup>`;
-        satRcsEl.setAttribute('kt-tooltip', `${SatMath.mag2db(sat.rcs).toFixed(2)} dBsm`);
+        satRcsEl.setAttribute('kt-tooltip', `${SatMath.pow2db(sat.rcs).toFixed(2)} dBsm`);
       } else {
         satRcsEl.innerHTML = t7e('Common.unknown');
         satRcsEl.setAttribute('kt-tooltip', t7e('Common.unknown'));
@@ -630,7 +630,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsContri
     }
 
     const formatted = `${result.rcs.toFixed(4)} m<sup>2</sup>`;
-    const dbsm = `${SatMath.mag2db(result.rcs).toFixed(2)} dBsm`;
+    const dbsm = `${SatMath.pow2db(result.rcs).toFixed(2)} dBsm`;
 
     if (result.source === 'catalog') {
       satRcsEl.innerHTML = formatted;

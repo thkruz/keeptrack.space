@@ -95,7 +95,7 @@ export class DebrisScreening extends KeepTrackPlugin {
   }
 
   /**
-   * Build the v13 side-menu form (inner content only — generateSideMenuHtml_()
+   * Build the v13 side-menu form (inner content only; generateSideMenuHtml_()
    * wraps it because this plugin has a secondary menu; the kt-ui-v13 marker is
    * applied to the generated root in the uiManagerFinal handler). Split into
    * section bodies so Pro subclasses can inject extra controls per card.
@@ -456,9 +456,10 @@ export class DebrisScreening extends KeepTrackPlugin {
         row.secondaryId,
         this.formatTcaMs_(row.tcaMs),
         row.missDistance.toFixed(6),
-        row.radialDistance.toFixed(6),
-        row.intrackDistance.toFixed(6),
-        row.crosstrackDistance.toFixed(6),
+        // ootk v8 stores signed RIC components; the columns show magnitudes as before
+        Math.abs(row.radialDistance).toFixed(6),
+        Math.abs(row.intrackDistance).toFixed(6),
+        Math.abs(row.crosstrackDistance).toFixed(6),
         row.relativeVelocity.toFixed(6),
         this.formatPc_(pc),
         this.getRiskLevel_(pc).label,
@@ -551,9 +552,9 @@ export class DebrisScreening extends KeepTrackPlugin {
       <td class="ds-secondary-link">${row.secondaryId}</td>
       <td>${this.formatTcaMs_(row.tcaMs)}</td>
       <td>${row.missDistance.toFixed(3)}</td>
-      <td>${row.radialDistance.toFixed(3)}</td>
-      <td>${row.intrackDistance.toFixed(3)}</td>
-      <td>${row.crosstrackDistance.toFixed(3)}</td>
+      <td>${Math.abs(row.radialDistance).toFixed(3)}</td>
+      <td>${Math.abs(row.intrackDistance).toFixed(3)}</td>
+      <td>${Math.abs(row.crosstrackDistance).toFixed(3)}</td>
       <td>${this.formatPc_(pc)}</td>
       <td><span class="ds-risk-badge ${risk.className}">${risk.label}</span></td>
     `;

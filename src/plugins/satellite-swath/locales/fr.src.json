@@ -46,7 +46,8 @@
         }
       },
       "errorMsgs": {
-        "outOfRange": "Saisissez un nombre entre {min} et {max}."
+        "outOfRange": "Saisissez un nombre entre {min} et {max}.",
+        "beyondHorizon": "Cette fauchée dépasse l'horizon depuis l'altitude de ce satellite. Saisissez au plus {max} km."
       },
       "help": {
         "overview": "Montre où le capteur du satellite sélectionné peut prendre des images le long de l'orbite tracée : une fauchée au nadir opaque et un champ accessible translucide jusqu'à la limite de dépointage. Les portions où le Soleil est sous l'élévation minimale au point subsatellite sont atténuées, ou masquées avec Jour uniquement. Un éventail suit le satellite de sa position aux bords de la fauchée.",

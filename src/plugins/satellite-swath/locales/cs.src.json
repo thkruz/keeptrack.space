@@ -46,7 +46,8 @@
         }
       },
       "errorMsgs": {
-        "outOfRange": "Zadejte číslo mezi {min} a {max}."
+        "outOfRange": "Zadejte číslo mezi {min} a {max}.",
+        "beyondHorizon": "Tento pás sahá za obzor z výšky této družice. Zadejte nejvýše {max} km."
       },
       "help": {
         "overview": "Ukazuje, kde může senzor vybrané družice snímat podél vykreslené dráhy: neprůhledný pás v nadiru a průsvitné pole dosahu až po mez naklopení. Úseky, kde je Slunce v podružicovém bodě pod minimální výškou, jsou ztlumené, nebo skryté volbou Jen za denního světla. Vějíř sleduje družici od její polohy k okrajům pásu.",

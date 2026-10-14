@@ -46,7 +46,8 @@
         }
       },
       "errorMsgs": {
-        "outOfRange": "Introduzca un número entre {min} y {max}."
+        "outOfRange": "Introduzca un número entre {min} y {max}.",
+        "beyondHorizon": "Esa franja llega más allá del horizonte desde la altitud de este satélite. Introduzca como máximo {max} km."
       },
       "help": {
         "overview": "Muestra dónde puede tomar imágenes el sensor del satélite seleccionado a lo largo de la órbita dibujada: una franja nadir opaca y un campo de alcance translúcido hasta el límite de inclinación. Los tramos en los que el Sol está por debajo de la elevación mínima en el punto subsatelital se atenúan, o se ocultan con Solo luz diurna. Un abanico sigue al satélite desde su posición hasta los bordes de la franja.",

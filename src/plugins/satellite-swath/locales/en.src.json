@@ -46,7 +46,8 @@
         }
       },
       "errorMsgs": {
-        "outOfRange": "Enter a number between {min} and {max}."
+        "outOfRange": "Enter a number between {min} and {max}.",
+        "beyondHorizon": "That swath reaches past the horizon from this satellite's altitude. Enter at most {max} km."
       },
       "help": {
         "overview": "Draws where the selected satellite's sensor can image along the drawn orbit: an opaque nadir swath and a translucent field of regard out to the tilt limit. Stretches where the Sun is below the minimum elevation at the sub-point are dimmed, or hidden with Daylight only. A fan follows the satellite from its position to the swath edges.",

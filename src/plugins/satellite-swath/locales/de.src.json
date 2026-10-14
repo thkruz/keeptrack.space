@@ -46,7 +46,8 @@
         }
       },
       "errorMsgs": {
-        "outOfRange": "Geben Sie eine Zahl zwischen {min} und {max} ein."
+        "outOfRange": "Geben Sie eine Zahl zwischen {min} und {max} ein.",
+        "beyondHorizon": "Dieser Streifen reicht von der Höhe dieses Satelliten über den Horizont hinaus. Geben Sie höchstens {max} km ein."
       },
       "help": {
         "overview": "Zeigt, wo der Sensor des ausgewählten Satelliten entlang der gezeichneten Bahn aufnehmen kann: einen deckenden Nadirstreifen und ein durchscheinendes Field of Regard bis zur Neigungsgrenze. Abschnitte, in denen die Sonne am Subsatellitenpunkt unter der Mindesthöhe steht, werden abgedunkelt oder mit „Nur bei Tageslicht“ ausgeblendet. Ein Fächer folgt dem Satelliten von seiner Position zu den Streifenrändern.",

@@ -46,7 +46,8 @@
         }
       },
       "errorMsgs": {
-        "outOfRange": "Wpisz liczbę od {min} do {max}."
+        "outOfRange": "Wpisz liczbę od {min} do {max}.",
+        "beyondHorizon": "Ten pas wykracza poza horyzont z wysokości tego satelity. Wpisz najwyżej {max} km."
       },
       "help": {
         "overview": "Pokazuje, gdzie sensor wybranego satelity może obrazować wzdłuż narysowanej orbity: nieprzezroczysty pas w nadirze i półprzezroczyste pole dostępności do granicy pochylenia. Odcinki, w których Słońce w punkcie podsatelitarnym jest poniżej minimalnej wysokości, są przyciemnione lub ukryte opcją Tylko w świetle dziennym. Wachlarz biegnie od satelity do krawędzi pasa.",

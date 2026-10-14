@@ -3,7 +3,7 @@
  * conversion to the mesh factory's parameters. No DOM or ServiceLocator imports.
  */
 import type { SwathParams } from '@app/engine/rendering/draw-manager/swath-mesh-factory';
-import { fovFromSwathWidth, RAD2DEG, swathWidthFromFov } from '@ootk/src/main';
+import { fovFromSwathWidth, RAD2DEG, SWATH_MEAN_EARTH_RADIUS_KM, swathWidthFromFov } from '@ootk/src/main';
 
 export type SwathPresetId = 'hr-eo' | 'mr-eo' | 'wide' | 'custom';
 /** Whether the nadir footprint is entered as a ground width (km) or a sensor FOV (deg). */
@@ -52,13 +52,43 @@ export function applyPreset(settings: SatelliteSwathSettings, presetId: SwathPre
   return { ...settings, ...SWATH_PRESETS[presetId], presetId };
 }
 
-/** Full nadir FOV (deg) for the settings at a mean altitude (km). */
+/**
+ * Widest ground swath (km) visible from a mean altitude (km): the arc between the two
+ * geometric horizons, 2 R acos(R / (R + h)) on ootk's swath sphere. NaN for a non-positive altitude.
+ */
+export function maxSwathWidthKm(meanAltKm: number): number {
+  if (!(meanAltKm > 0)) {
+    return Number.NaN;
+  }
+  const r = SWATH_MEAN_EARTH_RADIUS_KM;
+
+  return 2 * r * Math.acos(r / (r + meanAltKm));
+}
+
+/** True when a width-mode swath reaches past the horizon from this altitude (ootk returns NaN for it). */
+export function isSwathBeyondHorizon(settings: SatelliteSwathSettings, meanAltKm: number): boolean {
+  return settings.mode === 'width' && meanAltKm > 0 && settings.swathKm > maxSwathWidthKm(meanAltKm);
+}
+
+/**
+ * Full nadir FOV (deg) for the settings at a mean altitude (km). A width beyond the horizon
+ * (ootk's fovFromSwathWidth returns NaN for it) is clamped to the horizon-to-horizon FOV,
+ * 2 asin(R / (R + h)), so a stored setting reused on a lower satellite still draws.
+ */
 export function resolveFovDeg(settings: SatelliteSwathSettings, meanAltKm: number): number {
   if (settings.mode === 'fov' || !(meanAltKm > 0)) {
     return settings.fovDeg;
   }
 
-  return fovFromSwathWidth(settings.swathKm, meanAltKm) * RAD2DEG;
+  const fovRad = fovFromSwathWidth(settings.swathKm, meanAltKm);
+
+  if (Number.isNaN(fovRad)) {
+    const r = SWATH_MEAN_EARTH_RADIUS_KM;
+
+    return 2 * Math.asin(r / (r + meanAltKm)) * RAD2DEG;
+  }
+
+  return fovRad * RAD2DEG;
 }
 
 /** Nadir ground width (km) for the settings at a mean altitude, NaN when it cannot be computed. */

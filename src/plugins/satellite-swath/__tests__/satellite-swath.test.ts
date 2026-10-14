@@ -7,6 +7,8 @@ import { SatelliteSwath } from '@app/plugins/satellite-swath/satellite-swath';
 import {
   applyPreset,
   defaultSwathSettings,
+  isSwathBeyondHorizon,
+  maxSwathWidthKm,
   nadirWidthKm,
   resolveFovDeg,
   SwathSettingsStore,
@@ -37,6 +39,27 @@ describe('SatelliteSwath core', () => {
     const s = applyPreset(defaultSwathSettings(), 'hr-eo');
 
     expect(Math.abs(resolveFovDeg(s, 500) - 1.375)).toBeLessThan(0.01);
+  });
+
+  it('clamps a width beyond the horizon to the horizon FOV instead of returning NaN', () => {
+    // From 500 km on the 6371.0088 km swath sphere the widest visible swath is
+    // 2 R acos(R / (R + h)) = 4891.0 km and the horizon-to-horizon FOV is
+    // 2 asin(R / (R + h)) = 136.014 deg. ootk v8 fovFromSwathWidth returns NaN past that.
+    const s = { ...defaultSwathSettings(), mode: 'width' as const, swathKm: 5000 };
+
+    expect(maxSwathWidthKm(500)).toBeCloseTo(4891.0, 1);
+    expect(isSwathBeyondHorizon(s, 500)).toBe(true);
+    expect(resolveFovDeg(s, 500)).toBeCloseTo(136.014, 2);
+    expect(Number.isFinite(toSwathParams(s, 500).fovDeg)).toBe(true);
+    // Just inside the horizon the FOV approaches the clamp from below.
+    const inside = { ...s, swathKm: 4890 };
+
+    expect(isSwathBeyondHorizon(inside, 500)).toBe(false);
+    expect(resolveFovDeg(inside, 500)).toBeLessThan(resolveFovDeg(s, 500));
+    expect(resolveFovDeg(inside, 500)).toBeGreaterThan(130);
+    // FOV mode never trips the horizon check.
+    expect(isSwathBeyondHorizon({ ...s, mode: 'fov' }, 500)).toBe(false);
+    expect(maxSwathWidthKm(0)).toBeNaN();
   });
 
   it('reports the nadir width for a FOV entry', () => {
@@ -183,6 +206,22 @@ describe('SatelliteSwath behaviour', () => {
     const stored = SwathSettingsStore.parse(PersistenceManager.getInstance().getItem(StorageKey.SATELLITE_SWATH_SETTINGS));
 
     expect(stored.get(defaultSat.sccNum)?.presetId).toBe('wide');
+  });
+
+  it('rejects a swath width beyond the horizon with a message and keeps the previous width', () => {
+    turnOn();
+    const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast');
+    const before = plugin.settings.swathKm;
+    const meanAlt = (Number(defaultSat.apogee) + Number(defaultSat.perigee)) / 2;
+    const input = getEl('swath-width-km') as HTMLInputElement;
+
+    // 4999 km is inside SWATH_LIMITS but past the horizon from the ISS (about 4500 km wide).
+    expect(maxSwathWidthKm(meanAlt)).toBeLessThan(4999);
+    input.value = '4999';
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+
+    expect(toast).toHaveBeenCalledWith(expect.stringContaining(maxSwathWidthKm(meanAlt).toFixed(0)), expect.anything());
+    expect(plugin.settings.swathKm).toBe(before);
   });
 
   it('a manual geometry edit turns the preset into Custom', () => {

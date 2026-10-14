@@ -51,6 +51,8 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import {
   applyPreset,
   defaultSwathSettings,
+  isSwathBeyondHorizon,
+  maxSwathWidthKm,
   nadirWidthKm,
   resolveFovDeg,
   SatelliteSwathSettings,
@@ -448,6 +450,8 @@ export class SatelliteSwath extends KeepTrackPlugin implements ISettingsContribu
       minSunElevDeg: read('swath-min-sun-elev', SWATH_LIMITS.minSunElevDeg, prev.minSunElevDeg),
       isDaylightOnly: (getEl('swath-daylight-only', true) as HTMLInputElement | null)?.checked ?? prev.isDaylightOnly,
     };
+
+    this.rejectWidthBeyondHorizon_(next, prev);
     const isGeometryEdit =
       next.mode !== prev.mode ||
       next.swathKm !== prev.swathKm ||
@@ -459,6 +463,21 @@ export class SatelliteSwath extends KeepTrackPlugin implements ISettingsContribu
       next.presetId = 'custom';
     }
     this.updateSettings(next);
+  }
+
+  /**
+   * A width wider than the horizon-to-horizon arc has no line of sight (ootk's
+   * fovFromSwathWidth returns NaN for it): keep the previous width and say why.
+   */
+  private rejectWidthBeyondHorizon_(next: SatelliteSwathSettings, prev: SatelliteSwathSettings): void {
+    const sat = this.getSelectedSatellite_();
+    const alt = sat ? SatelliteSwath.meanAltKm_(sat) : Number.NaN;
+
+    if (next.swathKm === prev.swathKm || !isSwathBeyondHorizon(next, alt)) {
+      return;
+    }
+    ServiceLocator.getUiManager().toast(l('errorMsgs.beyondHorizon').replace('{max}', maxSwathWidthKm(alt).toFixed(0)), ToastMsgType.caution);
+    next.swathKm = prev.swathKm;
   }
 
   /** Pushes the current settings into the form (no change events fire). */

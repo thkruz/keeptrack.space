@@ -46,7 +46,8 @@
         }
       },
       "errorMsgs": {
-        "outOfRange": "Inserisci un numero tra {min} e {max}."
+        "outOfRange": "Inserisci un numero tra {min} e {max}.",
+        "beyondHorizon": "Questa fascia va oltre l'orizzonte dalla quota di questo satellite. Inserisci al massimo {max} km."
       },
       "help": {
         "overview": "Mostra dove il sensore del satellite selezionato può riprendere lungo l'orbita disegnata: una fascia al nadir opaca e un campo di puntamento traslucido fino al limite di inclinazione. I tratti in cui il Sole è sotto l'elevazione minima nel punto subsatellitare sono attenuati, o nascosti con Solo luce diurna. Un ventaglio segue il satellite dalla sua posizione ai bordi della fascia.",

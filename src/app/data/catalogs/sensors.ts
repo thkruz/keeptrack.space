@@ -392,7 +392,7 @@ export const sensors = <SensorList>{
       boresightEl: <Degrees>90,
       halfAngle: <Degrees>80,
       minorHalfAngle: <Degrees>1,
-      rollAngle: <Degrees>90, // Major axis east-west (roll 0 = north at zenith)
+      rollAngle: <Degrees>0, // Major axis 270/90, east-west (at zenith, roll 0 = major axis along the boresight azimuth)
       minRange: <Kilometers>50,
       maxRange: <Kilometers>3057.754,
       minElevation: <Degrees>10,
@@ -809,7 +809,7 @@ export const sensors = <SensorList>{
       boresightEl: <Degrees>90,
       halfAngle: <Degrees>60,
       minorHalfAngle: <Degrees>1,
-      rollAngle: <Degrees>71, // Major axis toward az 71/251 (roll 0 = north at zenith)
+      rollAngle: <Degrees>0, // Major axis 71/251 (at zenith, roll 0 = major axis along the boresight azimuth)
       minRange: <Kilometers>100,
       maxRange: <Kilometers>1800,
       minElevation: <Degrees>30,
@@ -900,7 +900,7 @@ export const sensors = <SensorList>{
       boresightEl: <Degrees>90,
       halfAngle: <Degrees>80,
       minorHalfAngle: <Degrees>1,
-      rollAngle: <Degrees>90, // Major axis east-west (roll 0 = north at zenith)
+      rollAngle: <Degrees>0, // Major axis 270/90, east-west (at zenith, roll 0 = major axis along the boresight azimuth)
       minRange: <Kilometers>100,
       maxRange: <Kilometers>3000,
       minElevation: <Degrees>10,
@@ -1026,7 +1026,7 @@ export const sensors = <SensorList>{
       boresightEl: <Degrees>90,
       halfAngle: <Degrees>80,
       minorHalfAngle: <Degrees>1,
-      rollAngle: <Degrees>120, // Major axis toward az 120/300 (roll 0 = north at zenith)
+      rollAngle: <Degrees>0, // Major axis 120/300 (at zenith, roll 0 = major axis along the boresight azimuth)
       minRange: <Kilometers>100,
       maxRange: <Kilometers>3000,
       minElevation: <Degrees>10,

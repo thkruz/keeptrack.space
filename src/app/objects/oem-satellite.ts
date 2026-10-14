@@ -297,8 +297,10 @@ export class OemSatellite extends SpaceObject {
         }
         this.sccNum = normalizedScc.replace(/^0+(?=\d)/u, '');
         if (kind === 'numeric5' || kind === 'alpha5' || kind === 'numeric6') {
-          this.sccNum5 = Tle.convert6DigitToA5(this.sccNum);
-          this.sccNum6 = this.sccNum;
+          // Fixed-width forms, matching ootk Satellite: 25544 gives sccNum5 "25544" and
+          // sccNum6 "025544"; catalog number 5 gives "00005" and "000005".
+          this.sccNum5 = Tle.convert6DigitToA5(this.sccNum.padStart(5, '0'));
+          this.sccNum6 = this.sccNum.padStart(6, '0');
         } else {
           this.sccNum5 = null;
           this.sccNum6 = null;

@@ -47,7 +47,7 @@ describe('OemSatellite NORAD_ID extraction from COMMENT lines', () => {
 
     expect(sat.sccNum).toBe('25544');
     expect(sat.sccNum5).toBe('25544');
-    expect(sat.sccNum6).toBe('25544');
+    expect(sat.sccNum6).toBe('025544');
     expect(sat.type).toBe(SpaceObjectType.PAYLOAD);
   });
 

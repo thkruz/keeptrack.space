@@ -3,11 +3,11 @@
     "title": "Dane orbitalne",
     "Apogee": {
       "label": "Apogeum",
-      "tooltip": "Najwyższy punkt orbity"
+      "tooltip": "Najwyższa wysokość orbity nad promieniem równikowym (6378,137 km)"
     },
     "Perigee": {
       "label": "Perygeum",
-      "tooltip": "Najniższy punkt orbity"
+      "tooltip": "Najniższa wysokość orbity nad promieniem równikowym (6378,137 km)"
     },
     "Inclination": {
       "label": "Inklinacja",

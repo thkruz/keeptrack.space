@@ -3,11 +3,11 @@
     "title": "궤도 데이터",
     "Apogee": {
       "label": "원지점",
-      "tooltip": "궤도에서 가장 높은 지점"
+      "tooltip": "궤도의 최고 고도 (적도 반지름 6378.137 km 기준)"
     },
     "Perigee": {
       "label": "근지점",
-      "tooltip": "궤도에서 가장 낮은 지점"
+      "tooltip": "궤도의 최저 고도 (적도 반지름 6378.137 km 기준)"
     },
     "Inclination": {
       "label": "경사각",

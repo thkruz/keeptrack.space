@@ -3,11 +3,11 @@
     "title": "Données Orbitales",
     "Apogee": {
       "label": "Apogée",
-      "tooltip": "Point le plus haut de l'orbite"
+      "tooltip": "Altitude maximale de l'orbite au-dessus du rayon équatorial (6378,137 km)"
     },
     "Perigee": {
       "label": "Périgée",
-      "tooltip": "Point le plus bas de l'orbite"
+      "tooltip": "Altitude minimale de l'orbite au-dessus du rayon équatorial (6378,137 km)"
     },
     "Inclination": {
       "label": "Inclinaison",

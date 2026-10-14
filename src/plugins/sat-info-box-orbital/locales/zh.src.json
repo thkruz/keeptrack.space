@@ -3,11 +3,11 @@
     "title": "轨道数据",
     "Apogee": {
       "label": "远地点",
-      "tooltip": "轨道上的最高点"
+      "tooltip": "轨道最高高度（相对赤道半径 6378.137 公里）"
     },
     "Perigee": {
       "label": "近地点",
-      "tooltip": "轨道上的最低点"
+      "tooltip": "轨道最低高度（相对赤道半径 6378.137 公里）"
     },
     "Inclination": {
       "label": "倾角",

@@ -3,11 +3,11 @@
     "title": "軌道データ",
     "Apogee": {
       "label": "遠地点",
-      "tooltip": "軌道上で最も高い点"
+      "tooltip": "軌道の最高高度（赤道半径 6378.137 km からの高さ）"
     },
     "Perigee": {
       "label": "近地点",
-      "tooltip": "軌道上で最も低い点"
+      "tooltip": "軌道の最低高度（赤道半径 6378.137 km からの高さ）"
     },
     "Inclination": {
       "label": "傾斜角",

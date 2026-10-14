@@ -3,11 +3,11 @@
     "title": "Orbitale Daten",
     "Apogee": {
       "label": "Apogäum",
-      "tooltip": "Höchster Punkt der Umlaufbahn"
+      "tooltip": "Höchste Höhe der Umlaufbahn über dem Äquatorradius (6378,137 km)"
     },
     "Perigee": {
       "label": "Perigäum",
-      "tooltip": "Tiefster Punkt der Umlaufbahn"
+      "tooltip": "Niedrigste Höhe der Umlaufbahn über dem Äquatorradius (6378,137 km)"
     },
     "Inclination": {
       "label": "Inklination",

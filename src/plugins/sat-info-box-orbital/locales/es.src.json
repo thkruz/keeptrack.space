@@ -3,11 +3,11 @@
     "title": "Datos Orbitales",
     "Apogee": {
       "label": "Apogeo",
-      "tooltip": "Punto más alto en la órbita"
+      "tooltip": "Altitud máxima de la órbita sobre el radio ecuatorial (6378,137 km)"
     },
     "Perigee": {
       "label": "Perigeo",
-      "tooltip": "Punto más bajo en la órbita"
+      "tooltip": "Altitud mínima de la órbita sobre el radio ecuatorial (6378,137 km)"
     },
     "Inclination": {
       "label": "Inclinación",

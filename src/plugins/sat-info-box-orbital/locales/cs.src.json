@@ -3,11 +3,11 @@
     "title": "Orbitální data",
     "Apogee": {
       "label": "Apogeum",
-      "tooltip": "Nejvyšší bod oběžné dráhy"
+      "tooltip": "Nejvyšší výška na oběžné dráze nad rovníkovým poloměrem (6378,137 km)"
     },
     "Perigee": {
       "label": "Perigeum",
-      "tooltip": "Nejnižší bod oběžné dráhy"
+      "tooltip": "Nejnižší výška na oběžné dráze nad rovníkovým poloměrem (6378,137 km)"
     },
     "Inclination": {
       "label": "Inklinace",

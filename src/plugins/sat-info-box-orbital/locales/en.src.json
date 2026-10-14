@@ -3,11 +3,11 @@
     "title": "Orbital Data",
     "Apogee": {
       "label": "Apogee",
-      "tooltip": "Highest Point in the Orbit"
+      "tooltip": "Highest altitude in the orbit, above the equatorial radius (6378.137 km)"
     },
     "Perigee": {
       "label": "Perigee",
-      "tooltip": "Lowest Point in the Orbit"
+      "tooltip": "Lowest altitude in the orbit, above the equatorial radius (6378.137 km)"
     },
     "Inclination": {
       "label": "Inclination",

@@ -267,7 +267,7 @@ export class ErrorManager {
    * loader noise. These get logged + counted but are never toasted, auto-filed, or POSTed to the
    * bug-filing telemetry endpoint (which would surface them as false-positive GitHub issues).
    *
-   * Three sources:
+   * Sources (translation-proxy SecurityErrors are described inline):
    * - Same-origin 'Script error.' from a cross-origin script, flagged upstream with `isCrossOrigin`.
    * - Opaque events (flagged upstream with `isOpaqueEvent`): the raw thrown value is null/undefined
    *   AND the event carried no message and no source. A Web Worker `onerror` for a cross-origin/opaque
@@ -278,6 +278,7 @@ export class ErrorManager {
    *   so we match their telltale frames (`cdn-cgi`, `rocket-loader`) in the stack or captured source.
    *   Matching the rebuilt synthetic stack works because `toError_` re-anchors a null-reason error to
    *   the synchronous caller, which is the loader itself (#1371).
+   * - Frameless unhandled rejections: a stack with no frames is third-party code (#1450).
    */
   private isUnactionableError_(err: Error, ctx: ErrorContext): boolean {
     if (ctx.isCrossOrigin || ctx.isOpaqueEvent) {
@@ -290,6 +291,16 @@ export class ErrorManager {
      * about the documentURL origin not matching. Nothing on our side can fix a proxy (#1437).
      */
     if (err.name === 'SecurityError' && /ServiceWorkerRegistration|translate\.goog/iu.test(err.message)) {
+      return true;
+    }
+
+    /*
+     * A rejection whose stack has no frames at all came from an extension or injected page script
+     * sharing the window (e.g. "reading 'M_ID'", #1450): KeepTrack's own errors carry frames, and
+     * toError_ captures a stack for non-Error reasons. Match both V8 ("    at fn (url:1:2)") and
+     * SpiderMonkey/JSC ("fn@url:1:2") frames so a Firefox/Safari stack is never mistaken for empty.
+     */
+    if (ctx.isUnhandledRejection && !/^\s*at |@\S*:\d+:\d+\s*$/mu.test(err.stack ?? '')) {
       return true;
     }
 

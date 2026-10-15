@@ -522,4 +522,44 @@ describe('ErrorManager translation-proxy SecurityError (#1437)', () => {
     expect(() => errorManager.reportEvent({ error: err, funcName: 'fn' })).toThrow();
     expect((captured[0] as { isUnactionable?: boolean }).isUnactionable).toBeUndefined();
   });
+
+  /** A rejection reason with the given stack, as a third-party script or KeepTrack would raise it. */
+  const rejectionWithStack = (stack: string) => {
+    const err = new TypeError("Cannot read properties of undefined (reading 'M_ID')");
+
+    err.stack = stack;
+
+    return err;
+  };
+
+  it('tags a frameless unhandled rejection as unactionable (#1450)', () => {
+    const err = rejectionWithStack("TypeError: Cannot read properties of undefined (reading 'M_ID')");
+
+    expect(() => errorManager.reportEvent({ error: err, funcName: 'Unhandled Promise Rejection', isUnhandledRejection: true })).not.toThrow();
+    expect((captured[0] as { isUnactionable?: boolean }).isUnactionable).toBe(true);
+  });
+
+  it('leaves a frameless error actionable when it is not an unhandled rejection', () => {
+    const err = rejectionWithStack("TypeError: Cannot read properties of undefined (reading 'M_ID')");
+
+    expect(() => errorManager.reportEvent({ error: err, funcName: 'fn' })).toThrow();
+    expect((captured[0] as { isUnactionable?: boolean }).isUnactionable).toBeUndefined();
+  });
+
+  it.each([
+    ['V8', 'TypeError: boom\n    at KeepTrack.postStart_ (https://app.keeptrack.space/js/main.885565ca1866a3f4.js:26230:3166)'],
+    ['V8 async', 'TypeError: boom\n    at async https://app.keeptrack.space/js/main.js:1:2'],
+    ['SpiderMonkey', 'postStart_@https://app.keeptrack.space/js/main.885565ca1866a3f4.js:26230:3166\n'],
+    ['JavaScriptCore', '@https://app.keeptrack.space/js/main.js:1:2'],
+  ])('leaves an unhandled rejection with %s frames actionable', (_engine, stack) => {
+    const err = rejectionWithStack(stack);
+
+    expect(() => errorManager.reportEvent({ error: err, funcName: 'Unhandled Promise Rejection', isUnhandledRejection: true })).toThrow();
+    expect((captured[0] as { isUnactionable?: boolean }).isUnactionable).toBeUndefined();
+  });
+
+  it('leaves a non-Error rejection reason actionable (toError_ captures frames for it)', () => {
+    expect(() => errorManager.reportEvent({ error: 'plain string reason', funcName: 'Unhandled Promise Rejection', isUnhandledRejection: true })).toThrow();
+    expect((captured[0] as { isUnactionable?: boolean }).isUnactionable).toBeUndefined();
+  });
 });

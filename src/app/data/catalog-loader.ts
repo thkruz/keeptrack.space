@@ -385,17 +385,30 @@ export class CatalogLoader {
       return catalog;
     }
 
+    if (!CatalogLoader.isTleContent(content)) {
+      throw new Error('Unrecognized TLE format: first data line must start with "1 "');
+    }
+
     if (lines[0].startsWith('1 ')) {
       CatalogLoader.parseAsciiTLE_(lines, catalog);
-    } else if (lines.length > 1 && lines[1].startsWith('1 ')) {
-      CatalogLoader.parseAscii3LE_(lines, catalog);
     } else {
-      throw new Error('Unrecognized TLE format: first data line must start with "1 "');
+      CatalogLoader.parseAscii3LE_(lines, catalog);
     }
 
     CatalogLoader.sortByScc_(catalog);
 
     return catalog;
+  }
+
+  /**
+   * True when the text starts like a .tce (2-line) or 3LE file: its first or second line is a
+   * TLE line 1. Lets fetch callers reject a non-TLE body (e.g. a plain-text notice from CelesTrak)
+   * before {@link parseTceContent} throws on it.
+   */
+  static isTleContent(content: string): boolean {
+    const [first, second] = content.split('\n', 2).map((line) => line.replace('\r', ''));
+
+    return first.startsWith('1 ') || (second?.startsWith('1 ') ?? false);
   }
 
   /**

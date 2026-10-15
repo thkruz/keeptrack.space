@@ -100,7 +100,8 @@
         "Forbidden": "CelesTrak이 요청을 거부했습니다(HTTP 403). 보통 Cloudflare 속도 제한 때문이니 1분 정도 기다린 후 다시 시도하세요.",
         "RateLimited": "카탈로그 요청이 너무 많습니다. 1분 정도 기다린 후 다시 시도해 주세요.",
         "ServerError": "CelesTrak을 일시적으로 사용할 수 없습니다. 몇 분 후에 다시 시도해 주세요.",
-        "NetworkError": "CelesTrak에 연결할 수 없습니다. 네트워크 연결을 확인하세요."
+        "NetworkError": "CelesTrak에 연결할 수 없습니다. 네트워크 연결을 확인하세요.",
+        "NoData": "현재 CelesTrak에 이 카탈로그의 데이터가 없습니다. 나중에 다시 시도해 주세요."
       },
       "help": {
         "overview": "카탈로그 브라우저는 현재 보고 있는 위성 카탈로그를 교체합니다. 선별된 목록(위성군, 잔해 구름, 임무 카테고리)이나 CelesTrak 및 JSC Vimpel의 전체 카탈로그 중에서 선택하면 장면이 해당 객체들로만 다시 로드됩니다.",

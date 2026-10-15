@@ -100,7 +100,8 @@
         "Forbidden": "CelesTrak rejected the request (HTTP 403). This is usually a Cloudflare rate limit; wait a minute and try again.",
         "RateLimited": "Too many catalog requests. Please wait a minute before trying again.",
         "ServerError": "CelesTrak is temporarily unavailable. Please try again in a few minutes.",
-        "NetworkError": "Could not reach CelesTrak. Check your network connection."
+        "NetworkError": "Could not reach CelesTrak. Check your network connection.",
+        "NoData": "CelesTrak has no data for this catalog right now. Please try again later."
       },
       "help": {
         "overview": "The Catalog Browser swaps the satellite catalog you are viewing. Pick from curated lists (a constellation, a debris cloud, a mission category) or full catalogs from CelesTrak and JSC Vimpel, and the scene reloads with exactly those objects.",

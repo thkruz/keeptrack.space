@@ -2,8 +2,10 @@
 import { CatalogLoader } from '@app/app/data/catalog-loader';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { CatalogBrowserPlugin } from '@app/plugins/catalog-browser/catalog-browser';
+import { CelesTrakNoDataError } from '@app/plugins/catalog-browser/celestrak-no-data-error';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -52,6 +54,14 @@ describe('CatalogBrowserPlugin behavior', () => {
       const generic = p().classifyFetchError_(new Error('weird'));
 
       expect(generic.isTransient).toBe(false);
+    });
+
+    it('maps a CelesTrak no-data body to a transient caution (#1447)', () => {
+      const noData = p().classifyFetchError_(new CelesTrakNoDataError('No GP data found'));
+
+      expect(noData.isTransient).toBe(true);
+      expect(noData.toastType).toBe(ToastMsgType.caution);
+      expect(noData.messageKey).toBe('plugins.CatalogBrowserPlugin.errorMsgs.NoData');
     });
   });
 
@@ -155,6 +165,28 @@ describe('CatalogBrowserPlugin behavior', () => {
 
     expect(vimpelSpy).toHaveBeenCalledWith(vimpelData);
     expect(asciiSpy).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['All Data', false],
+    ['Orbital Only', true],
+  ])('fetchAndLoadCatalog_ (%s) toasts a caution and reports nothing when CelesTrak returns 200 with a non-TLE body (#1447)', async (_label, orbitalDataOnly) => {
+    p().orbitalDataOnly_ = orbitalDataOnly;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve({ ok: true, status: 200, text: () => Promise.resolve('No GP data found\n') }))
+    );
+    const reloadSpy = vi.spyOn(CatalogLoader, 'reloadCatalog').mockResolvedValue(undefined as never);
+    const reloadFromDataSpy = vi.spyOn(CatalogLoader, 'reloadCatalogFromData').mockResolvedValue(undefined as never);
+    const errorSpy = vi.spyOn(errorManagerInstance, 'error').mockImplementation(() => undefined);
+    const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+    await p().fetchAndLoadCatalog_('GROUP=active');
+
+    expect(reloadSpy).not.toHaveBeenCalled();
+    expect(reloadFromDataSpy).not.toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
+    expect(toastSpy).toHaveBeenCalledWith(expect.anything(), ToastMsgType.caution);
   });
 
   it('fetchAndLoadCatalog_ surfaces a forbidden error as a caution toast', async () => {

@@ -100,7 +100,8 @@
         "Forbidden": "CelesTrak 拒绝了请求（HTTP 403）。这通常是 Cloudflare 的速率限制；请等待一分钟后重试。",
         "RateLimited": "目录请求过多。请等待一分钟后再试。",
         "ServerError": "CelesTrak 暂时不可用。请几分钟后重试。",
-        "NetworkError": "无法连接 CelesTrak。请检查您的网络连接。"
+        "NetworkError": "无法连接 CelesTrak。请检查您的网络连接。",
+        "NoData": "CelesTrak 目前没有此目录的数据。请稍后重试。"
       },
       "help": {
         "overview": "目录浏览器用于切换您正在查看的卫星目录。可从精选列表（某个星座、碎片云、任务类别）或 CelesTrak 和 JSC Vimpel 的完整目录中选择，场景会仅以这些对象重新加载。",

@@ -100,7 +100,8 @@
         "Forbidden": "CelesTrak odmítl požadavek (HTTP 403). Obvykle jde o limit požadavků Cloudflare; počkejte minutu a zkuste to znovu.",
         "RateLimited": "Příliš mnoho požadavků na katalog. Před dalším pokusem prosím počkejte minutu.",
         "ServerError": "CelesTrak je dočasně nedostupný. Zkuste to prosím znovu za několik minut.",
-        "NetworkError": "Nepodařilo se připojit ke službě CelesTrak. Zkontrolujte připojení k síti."
+        "NetworkError": "Nepodařilo se připojit ke službě CelesTrak. Zkontrolujte připojení k síti.",
+        "NoData": "CelesTrak pro tento katalog momentálně nemá žádná data. Zkuste to prosím znovu později."
       },
       "help": {
         "overview": "Prohlížeč katalogu mění katalog satelitů, který si právě prohlížíte. Vyberte si z připravených seznamů (konstelace, oblak trosek, kategorie misí) nebo úplných katalogů CelesTrak a JSC Vimpel a scéna se znovu načte přesně s těmito objekty.",

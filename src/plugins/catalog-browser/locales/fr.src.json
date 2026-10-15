@@ -100,7 +100,8 @@
         "Forbidden": "CelesTrak a rejeté la requête (HTTP 403). Il s'agit généralement d'une limitation de débit Cloudflare ; attendez une minute et réessayez.",
         "RateLimited": "Trop de requêtes de catalogue. Veuillez attendre une minute avant de réessayer.",
         "ServerError": "CelesTrak est temporairement indisponible. Veuillez réessayer dans quelques minutes.",
-        "NetworkError": "Impossible de joindre CelesTrak. Vérifiez votre connexion réseau."
+        "NetworkError": "Impossible de joindre CelesTrak. Vérifiez votre connexion réseau.",
+        "NoData": "CelesTrak n'a pas de données pour ce catalogue pour le moment. Veuillez réessayer plus tard."
       },
       "help": {
         "overview": "Le Navigateur de Catalogues remplace le catalogue de satellites que vous consultez. Choisissez parmi des listes sélectionnées (une constellation, un nuage de débris, une catégorie de mission) ou des catalogues complets de CelesTrak et JSC Vimpel, et la scène se recharge avec exactement ces objets.",

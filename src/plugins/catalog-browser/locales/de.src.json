@@ -100,7 +100,8 @@
         "Forbidden": "CelesTrak hat die Anfrage abgelehnt (HTTP 403). Dies ist in der Regel eine Cloudflare-Ratenbegrenzung; warten Sie eine Minute und versuchen Sie es erneut.",
         "RateLimited": "Zu viele Kataloganfragen. Bitte warten Sie eine Minute, bevor Sie es erneut versuchen.",
         "ServerError": "CelesTrak ist vorübergehend nicht verfügbar. Bitte versuchen Sie es in einigen Minuten erneut.",
-        "NetworkError": "CelesTrak konnte nicht erreicht werden. Überprüfen Sie Ihre Netzwerkverbindung."
+        "NetworkError": "CelesTrak konnte nicht erreicht werden. Überprüfen Sie Ihre Netzwerkverbindung.",
+        "NoData": "CelesTrak hat derzeit keine Daten für diesen Katalog. Bitte versuchen Sie es später erneut."
       },
       "help": {
         "overview": "Der Katalog-Browser tauscht den Satellitenkatalog aus, den Sie gerade betrachten. Wählen Sie aus kuratierten Listen (eine Konstellation, eine Trümmerwolke, eine Missionskategorie) oder vollständigen Katalogen von CelesTrak und JSC Vimpel, und die Szene wird genau mit diesen Objekten neu geladen.",

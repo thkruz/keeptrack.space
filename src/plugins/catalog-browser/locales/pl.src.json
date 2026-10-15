@@ -100,7 +100,8 @@
         "Forbidden": "CelesTrak odrzucił żądanie (HTTP 403). Zazwyczaj jest to limit żądań Cloudflare; odczekaj minutę i spróbuj ponownie.",
         "RateLimited": "Zbyt wiele żądań katalogu. Odczekaj minutę przed kolejną próbą.",
         "ServerError": "CelesTrak jest tymczasowo niedostępny. Spróbuj ponownie za kilka minut.",
-        "NetworkError": "Nie udało się połączyć z CelesTrak. Sprawdź połączenie sieciowe."
+        "NetworkError": "Nie udało się połączyć z CelesTrak. Sprawdź połączenie sieciowe.",
+        "NoData": "CelesTrak nie ma obecnie danych dla tego katalogu. Spróbuj ponownie później."
       },
       "help": {
         "overview": "Przeglądarka katalogu zmienia katalog satelitów, który właśnie przeglądasz. Wybierz spośród przygotowanych list (konstelacja, chmura szczątków, kategoria misji) lub pełnych katalogów CelesTrak i JSC Vimpel, a scena załaduje się ponownie dokładnie z tymi obiektami.",

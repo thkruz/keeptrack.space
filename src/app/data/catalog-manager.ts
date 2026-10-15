@@ -400,7 +400,12 @@ export class CatalogManager {
     }
 
     if (type === GetSatType.POSITION_ONLY) {
-      (this.objectCache[index] as Satellite).position = ServiceLocator.getDotsManager().getCurrentPosition(index);
+      const dotsManager = ServiceLocator.getDotsManager();
+
+      // positionData is nulled during catalog swap; keep the last known position (#1340)
+      if (dotsManager.positionData) {
+        (this.objectCache[index] as Satellite).position = dotsManager.getCurrentPosition(index);
+      }
 
       return this.objectCache[index];
     }

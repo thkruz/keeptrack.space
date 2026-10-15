@@ -38,6 +38,7 @@ describe('CatalogManager lookups', () => {
     updatePosVel = vi.fn();
     getCurrentPosition = vi.fn(() => ({ x: 0, y: 0, z: 0 }));
     vi.spyOn(ServiceLocator, 'getDotsManager').mockReturnValue({
+      positionData: new Float32Array(3),
       updatePosVel,
       getCurrentPosition,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -225,6 +226,27 @@ describe('CatalogManager lookups', () => {
     it('updates position only for POSITION_ONLY', () => {
       expect(catalog.getObject(0, GetSatType.POSITION_ONLY)).toBe(defaultSat);
       expect(getCurrentPosition).toHaveBeenCalledWith(0);
+    });
+
+    it('keeps the last known position for POSITION_ONLY while positionData is nulled by a catalog swap (#1340)', () => {
+      const sat = defaultSat.clone() as Satellite;
+      const lastKnown = { x: 1, y: 2, z: 3 };
+
+      sat.position = lastKnown as Satellite['position'];
+      catalog.objectCache = [sat];
+      getCurrentPosition.mockImplementation(() => {
+        throw new TypeError("Cannot read properties of null (reading '0')");
+      });
+      vi.spyOn(ServiceLocator, 'getDotsManager').mockReturnValue({
+        positionData: null,
+        updatePosVel,
+        getCurrentPosition,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
+
+      expect(catalog.getObject(0, GetSatType.POSITION_ONLY)).toBe(sat);
+      expect(getCurrentPosition).not.toHaveBeenCalled();
+      expect(sat.position).toBe(lastKnown);
     });
 
     it('updates pos/vel for the DEFAULT type', () => {

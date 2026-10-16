@@ -8,6 +8,9 @@ import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { PersistenceManager } from '@app/engine/utils/persistence-manager';
 import { t7e } from '@app/locales/keys';
+// Bundled (not a string path): the build does not copy public/img/help into dist, so a plain
+// 'img/help/...' path 404s in production and the help panel showed broken alt text.
+import filterMenuHelpPng from '@public/img/help/filter-menu/filter-menu.png';
 import filterPng from '@public/img/icons/filter.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { TopMenu } from '../top-menu/top-menu';
@@ -95,7 +98,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
           heading: t7e('help.overview'),
           content: t7e('plugins.FilterMenuPlugin.help.overview'),
           image: {
-            src: 'img/help/filter-menu/filter-menu.png',
+            src: filterMenuHelpPng,
             alt: t7e('plugins.FilterMenuPlugin.help.imgAlt'),
             caption: t7e('plugins.FilterMenuPlugin.help.imgCaption'),
           },

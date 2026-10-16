@@ -268,8 +268,12 @@ export class PluginDrawer {
       '  <div id="drawer-getting-started-slot" class="drawer-getting-started-slot"></div>',
       '  <div id="drawer-content" class="drawer-content"></div>',
       '</div>',
-      '<div id="drawer-user-account" class="drawer-user-account"></div>',
+      // The status footer sits ABOVE the account row so the account row is anchored directly on
+      // the rail toggle. In rail mode the status footer collapses to zero height and expands on
+      // rail hover; if it sat below the account row, that expansion would slide the login row out
+      // from under the cursor (and leave the rail toggle in its place).
       '<div id="drawer-status-footer" class="drawer-status-footer-container"></div>',
+      '<div id="drawer-user-account" class="drawer-user-account"></div>',
       '<div id="drawer-rail-toggle" class="drawer-rail-toggle" role="button" aria-label="Toggle rail mode">',
       `  <img class="drawer-rail-toggle-icon" src="${leftPanelClosePng}" alt="" />`,
       '  <span class="drawer-rail-toggle-label">Collapse</span>',
@@ -574,6 +578,11 @@ export class PluginDrawer {
             drawer.classList.add('rail-hover');
           }
         }, PluginDrawer.RAIL_HOVER_INTENT_MS);
+      });
+      // Any press inside the rail (drawer items, the account row, the status footer) cancels a
+      // pending hover-expansion so the row under the cursor cannot reflow before mouseup.
+      drawer.addEventListener('mousedown', () => {
+        this.cancelRailHoverTimer_();
       });
       drawer.addEventListener('mouseleave', () => {
         this.cancelRailHoverTimer_();

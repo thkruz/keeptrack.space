@@ -25,7 +25,14 @@ test.describe('Polar plot horizon mask @local', () => {
 
       sm.setSensor('NSN-WALLOPS');
       const base = sm.getSensor();
-      const vertices = [0, 45, 90, 135, 180, 270].map((az) => ({ startAz: az, stopAz: az, minEl: az === 90 ? 40 : az === 45 || az === 135 ? 15 : 5 }));
+      const minElForAz = (az: number): number => {
+        if (az === 90) {
+          return 40;
+        }
+
+        return az === 45 || az === 135 ? 15 : 5;
+      };
+      const vertices = [0, 45, 90, 135, 180, 270].map((az) => ({ startAz: az, stopAz: az, minEl: minElForAz(az) }));
       // Same path as the custom-sensor form: a 'Custom Sensor' replaces the primary sensor
       const masked = new base.constructor({ ...base, name: 'Custom Sensor', objName: 'Custom Sensor-mask', elevationMasks: vertices, interpolateMask: true });
 

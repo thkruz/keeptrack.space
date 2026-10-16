@@ -130,6 +130,30 @@ describe('PluginDrawer', () => {
       expect(drawerEl.classList.contains('rail-hover')).toBe(false);
     });
 
+    it('pressing the account row cancels a pending hover-expansion so the row cannot move', () => {
+      buildDrawer();
+      const drawerEl = getEl('plugin-drawer')!;
+      const account = getEl('drawer-user-account')!;
+
+      account.innerHTML = '<a id="user-account__login-btn" class="drawer-user-account__row">Login</a>';
+      drawerEl.classList.add('rail-mode');
+      drawerEl.dispatchEvent(new MouseEvent('mouseenter'));
+      account.firstElementChild!.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+      vi.advanceTimersByTime(500);
+
+      expect(drawerEl.classList.contains('rail-hover')).toBe(false);
+    });
+
+    it('anchors the account row directly above the rail toggle', () => {
+      buildDrawer();
+      const account = getEl('drawer-user-account')!;
+
+      // The status footer collapses in rail mode and expands on hover; it must sit ABOVE the account
+      // row so that expansion never slides the login row out from under the cursor.
+      expect(account.nextElementSibling?.id).toBe('drawer-rail-toggle');
+      expect(account.previousElementSibling?.id).toBe('drawer-status-footer');
+    });
+
     it('activates the pressed item when the layout shifted between mousedown and mouseup', () => {
       buildDrawer();
       const item = addItem('ric-plot-icon');

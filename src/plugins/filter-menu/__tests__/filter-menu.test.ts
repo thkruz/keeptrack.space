@@ -57,6 +57,21 @@ describe('FilterMenuPlugin_class', () => {
       expect(helpConfig.sections!.length).toBeGreaterThan(0);
     });
 
+    it('help illustration is a bundled asset, not an unshipped img/help string path', () => {
+      const image = new FilterMenuPlugin().getHelpConfig().sections![0].image!;
+
+      // public/img/help is not copied into dist, so a bare 'img/help/...' path rendered as broken alt text.
+      expect(image.src).toBeTruthy();
+      expect(image.src.startsWith('img/help/')).toBe(false);
+      expect(image.src).toContain('filter-menu');
+    });
+
+    it('help copy points at the drawer, not the retired bottom bar', () => {
+      const howTo = new FilterMenuPlugin().getHelpConfig().sections![1].content;
+
+      expect(howTo).not.toMatch(/bottom bar/u);
+    });
+
     it('should return correct keyboard shortcuts', () => {
       const plugin = new FilterMenuPlugin();
       const shortcuts = plugin.getKeyboardShortcuts();

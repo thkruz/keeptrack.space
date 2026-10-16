@@ -980,7 +980,25 @@ body.drawer-mode:not(.is-mobile-mode) {
     height: 6px;
   }
 
-  .plugin-drawer.rail-mode .drawer-user-account,
+  /* The account row stays visible in rail mode as an avatar-only row with the SAME vertical size
+     as the expanded row. Collapsing it to max-height 0 gave it a zero-height hit box sitting on
+     the rail toggle, so clicks aimed at "Login / Sign Up" landed on the toggle (or a drawer item)
+     and the row only became reachable after the hover expansion reflowed the column. Only the
+     horizontal padding and the name change between rail and rail-hover, so the row never moves
+     vertically under the cursor. */
+  .plugin-drawer.rail-mode .drawer-user-account {
+    padding: 16px 10px;
+    transition: padding var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+  }
+
+  .plugin-drawer.rail-mode .drawer-user-account__row {
+    justify-content: center;
+  }
+
+  .plugin-drawer.rail-mode .drawer-user-account__name {
+    display: none;
+  }
+
   .plugin-drawer.rail-mode .drawer-status-footer-container {
     opacity: 0;
     max-height: 0;
@@ -1097,10 +1115,15 @@ body.drawer-mode:not(.is-mobile-mode) {
   }
 
   .plugin-drawer.rail-mode.rail-hover .drawer-user-account {
-    opacity: 1;
-    max-height: 100px;
     padding: 16px;
-    border-top: 2px solid var(--color-dark-border);
+  }
+
+  .plugin-drawer.rail-mode.rail-hover .drawer-user-account__row {
+    justify-content: flex-start;
+  }
+
+  .plugin-drawer.rail-mode.rail-hover .drawer-user-account__name {
+    display: inline;
   }
 
   .plugin-drawer.rail-mode.rail-hover .drawer-status-footer-container {

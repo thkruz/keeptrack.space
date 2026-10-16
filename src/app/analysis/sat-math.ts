@@ -632,20 +632,14 @@ export abstract class SatMath {
       points,
       getOffsetTimeObj,
       (params: { eciPts: TemeVec3; eciPts2: TemeVec3; velPts: TemeVec3<KilometersPerSecond>; velPts2: TemeVec3<KilometersPerSecond>; offset: number }) => {
-        const vel1 = {
-          total: 0,
-          ...params.velPts,
-        };
-        const vel2 = {
-          total: 0,
-          ...params.velPts2,
-        };
-
-        sat.position = params.eciPts;
-        sat.velocity = vel1;
-        sat2.position = params.eciPts2;
-        sat2.velocity = vel2;
-        const ric = RIC.fromPosVel(sat, sat2).position;
+        /*
+         * Work on plain state copies. Writing the samples onto the live catalog objects left the primary's and
+         * secondary's .position several orbits ahead of the sim clock until the next cruncher update, which any
+         * readout of .position (the info box Linear range, the 3D line) would then show.
+         */
+        const state1 = { position: { ...params.eciPts }, velocity: { ...params.velPts } };
+        const state2 = { position: { ...params.eciPts2 }, velocity: { ...params.velPts2 } };
+        const ric = RIC.fromPosVel(state1, state2).position;
 
         return { x: ric.x, y: ric.y, z: ric.z };
       },

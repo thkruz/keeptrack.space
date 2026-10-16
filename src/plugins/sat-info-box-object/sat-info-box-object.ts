@@ -10,7 +10,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import type { ISettingsContribution, ISettingsContributor } from '@app/engine/plugins/core/plugin-capabilities';
+import type { ISettingsContribution, ISettingsMultiContributor } from '@app/engine/plugins/core/plugin-capabilities';
 import { openColorbox } from '@app/engine/utils/colorbox';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -24,7 +24,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { EL, SECTIONS } from './sat-info-box-object-html';
 import './sat-info-box-object.css';
 
-export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsContributor {
+export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiContributor {
   readonly id = 'SatInfoBoxObject';
   dependencies_: string[] = [SatInfoBox.name];
 
@@ -34,8 +34,13 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsContri
   private static readonly FLAG_SCALE_MIN_ = 0.2;
   private static readonly FLAG_SCALE_MAX_ = 0.6;
 
+  /** The flag decal card only while the feature switch is on (see GraphicsSettings.isFlagDecalsFeatureEnabled). */
+  getSettingsContributions(): ISettingsContribution[] {
+    return settingsManager.isFlagDecalsFeatureEnabled ? [this.flagDecalContribution_()] : [];
+  }
+
   /** Graphics menu card for the flag decal on the selected satellite's model. */
-  getSettingsContribution(): ISettingsContribution {
+  private flagDecalContribution_(): ISettingsContribution {
     return {
       sectionId: this.id,
       sectionLabel: t7e('SatInfoBoxObject.graphics.sectionLabel'),
@@ -503,6 +508,13 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsContri
 
     if (!el) {
       return;
+    }
+
+    // The row describes the decal, so it goes with the feature switch.
+    const row = el.parentElement;
+
+    if (row) {
+      row.style.display = settingsManager.isFlagDecalsFeatureEnabled ? '' : 'none';
     }
 
     const key = resolveFlagKey(obj as unknown as FlagSource);

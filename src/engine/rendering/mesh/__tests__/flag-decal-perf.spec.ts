@@ -46,7 +46,7 @@ test.describe('Plan 04 perf gate @local @perf', () => {
   test.setTimeout(150_000);
 
   test('flag decal stays within the frame budget @local @perf', async ({ page }) => {
-    await waitForAppReady(page, { settings: { noCatalogOnLoad: false, isDisableLoginGate: true, isFocusOnSatelliteWhenSelected: true } });
+    await waitForAppReady(page, { settings: { noCatalogOnLoad: false, isDisableLoginGate: true, isFocusOnSatelliteWhenSelected: true, isFlagDecalsFeatureEnabled: true } });
     await page.waitForFunction(() => (window as unknown as PerfWindow).keepTrack.api.getCatalogManager().objectCache.length > 1000, undefined, {
       timeout: 40_000,
     });

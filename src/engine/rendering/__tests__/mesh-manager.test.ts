@@ -36,16 +36,20 @@ describe('MeshManager', () => {
     const internals = () => meshManager as unknown as Internals;
     const usCell = (flagAtlas.cells as unknown as Record<string, number[]>).us;
     let saved: boolean;
+    let savedFeature: boolean;
 
     beforeEach(() => {
       saved = settingsManager.isDrawFlagDecals;
+      savedFeature = settingsManager.isFlagDecalsFeatureEnabled;
       settingsManager.isDrawFlagDecals = true;
+      settingsManager.isFlagDecalsFeatureEnabled = true;
       meshManager.mvMatrix_ = mat4.fromTranslation(mat4.create(), [0, 0, -10]);
       meshManager.currentMeshObject.model = { id: 1, name: 'x', bounds: { min: vec3.create(), max: vec3.create(), center: vec3.create(), radius: 1 } };
     });
 
     afterEach(() => {
       settingsManager.isDrawFlagDecals = saved;
+      settingsManager.isFlagDecalsFeatureEnabled = savedFeature;
       vi.restoreAllMocks();
     });
 

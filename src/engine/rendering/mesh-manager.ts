@@ -441,7 +441,7 @@ export class MeshManager {
     const flag = this.currentMeshObject.flag;
     const bounds = this.currentMeshObject.model?.bounds;
 
-    if (!settingsManager.isDrawFlagDecals || !flag?.enabled || !bounds || bounds.radius <= 0 || !this.mvMatrix_) {
+    if (!settingsManager.isFlagDecalsFeatureEnabled || !settingsManager.isDrawFlagDecals || !flag?.enabled || !bounds || bounds.radius <= 0 || !this.mvMatrix_) {
       return null;
     }
     if (this.flagAtlasState_ !== 'ready') {

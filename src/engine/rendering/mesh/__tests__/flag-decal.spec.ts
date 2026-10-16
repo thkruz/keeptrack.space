@@ -41,7 +41,7 @@ const STARLINK_DATE = new Date('2008-09-20T12:25:00.000Z');
 const ISS_DATE = new Date('2008-09-20T13:25:00.000Z');
 
 async function boot(page: Page, date: Date): Promise<void> {
-  await loadFixedIssScene(page, { date, extraTle: STARLINK_TLE, settings: { isFocusOnSatelliteWhenSelected: true } });
+  await loadFixedIssScene(page, { date, extraTle: STARLINK_TLE, settings: { isFocusOnSatelliteWhenSelected: true, isFlagDecalsFeatureEnabled: true } });
   await page.waitForFunction(() => (window as unknown as FlagWindow).keepTrack.api.getCatalogManager().sccNum2Id('44713') !== null, undefined, { timeout: 30_000 });
 }
 

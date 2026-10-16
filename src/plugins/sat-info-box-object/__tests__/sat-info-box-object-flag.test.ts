@@ -4,6 +4,7 @@ import { MeshRenderer } from '@app/engine/rendering/mesh/mesh-renderer';
 import { MeshManager } from '@app/engine/rendering/mesh-manager';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SatInfoBoxObject } from '@app/plugins/sat-info-box-object/sat-info-box-object';
+import { EL } from '@app/plugins/sat-info-box-object/sat-info-box-object-html';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager } from '@app/settings/settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -21,6 +22,7 @@ describe('SatInfoBoxObject flag decal settings', () => {
     plugin = new SatInfoBoxObject();
     websiteInit(plugin);
     saved = {
+      isFlagDecalsFeatureEnabled: settingsManager.isFlagDecalsFeatureEnabled,
       isDrawFlagDecals: settingsManager.isDrawFlagDecals,
       flagDecalScale: settingsManager.flagDecalScale,
       disableUI: settingsManager.disableUI,
@@ -36,12 +38,33 @@ describe('SatInfoBoxObject flag decal settings', () => {
     vi.restoreAllMocks();
   });
 
-  const controls = () => plugin.getSettingsContribution().controls;
+  const contributionOn = () => {
+    settingsManager.isFlagDecalsFeatureEnabled = true;
+
+    return plugin.getSettingsContributions()[0];
+  };
+  const controls = () => contributionOn().controls;
   const toggle = () => controls().find((c) => c.id === 'flagDecals') as ISettingToggleControl;
   const scale = () => controls().find((c) => c.id === 'flagDecalScale') as ISettingNumberControl;
 
+  it('contributes nothing and hides the Model flag row while the feature switch is off (the default)', () => {
+    settingsManager.isFlagDecalsFeatureEnabled = false;
+    expect(plugin.getSettingsContributions()).toEqual([]);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const update = (plugin as any).updateModelFlag_.bind(plugin) as (obj: unknown) => void;
+    const row = document.getElementById(EL.MODEL_FLAG)?.parentElement as HTMLElement;
+
+    update({ country: 'US' });
+    expect(row.style.display).toBe('none');
+
+    settingsManager.isFlagDecalsFeatureEnabled = true;
+    update({ country: 'US' });
+    expect(row.style.display).toBe('');
+  });
+
   it('contributes a graphics card with a medium-quality toggle and a 0.2..0.6 size control', () => {
-    const contribution = plugin.getSettingsContribution();
+    const contribution = contributionOn();
 
     expect(contribution.target).toBe('graphics');
     expect(toggle().quality).toEqual({ minLevel: 'medium' });

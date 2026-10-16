@@ -427,6 +427,13 @@ export class GraphicsSettings {
    */
   modelsOnSatelliteViewOverride = false;
   noMeshManager = false;
+  /**
+   * Master switch for the flag decal feature. Off until the projection is reworked: the decal is
+   * projected along the camera direction, so the flag stays locked to the camera instead of
+   * turning with the body. While off the renderer, the Graphics menu card and the info box row
+   * are all hidden; the user setting below is kept for when the feature returns.
+   */
+  isFlagDecalsFeatureEnabled = false;
   /** Project the owner country's flag onto the selected satellite's 3D model. */
   isDrawFlagDecals = true;
   /** Flag decal half-width as a fraction of the model's bounding radius (0.2 to 0.6). */

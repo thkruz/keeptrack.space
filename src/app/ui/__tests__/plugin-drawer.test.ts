@@ -86,6 +86,65 @@ describe('PluginDrawer', () => {
     expect(emitSpy).toHaveBeenCalledWith(EventBusEvent.bottomMenuClick, 'overflight-icon');
   });
 
+  describe('rail icon activation', () => {
+    const addItem = (pluginId: string): HTMLElement => {
+      const content = getEl('drawer-content', true)!;
+
+      content.insertAdjacentHTML('beforeend', `<div class="drawer-item" data-plugin-id="${pluginId}" role="button"><span class="drawer-item-label">${pluginId}</span></div>`);
+
+      return content.querySelector(`.drawer-item[data-plugin-id="${pluginId}"]`) as HTMLElement;
+    };
+
+    // The suite already runs on fake timers (standard environment).
+    it('a click that arrives with the pointer activates the plugin on the first click', () => {
+      buildDrawer();
+      const drawerEl = getEl('plugin-drawer')!;
+
+      drawerEl.classList.add('rail-mode');
+      const item = addItem('ric-plot-icon');
+      const emitSpy = vi.spyOn(EventBus.getInstance(), 'emit');
+
+      // Enter the rail and click in one motion (no hover dwell).
+      drawerEl.dispatchEvent(new MouseEvent('mouseenter'));
+      item.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+      item.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      vi.advanceTimersByTime(500);
+
+      expect(emitSpy).toHaveBeenCalledWith(EventBusEvent.bottomMenuClick, 'ric-plot-icon');
+      // The press cancelled the pending hover-expansion so the layout never moved under the cursor.
+      expect(drawerEl.classList.contains('rail-hover')).toBe(false);
+    });
+
+    it('resting on the rail still expands it after the hover-intent delay', () => {
+      buildDrawer();
+      const drawerEl = getEl('plugin-drawer')!;
+
+      drawerEl.classList.add('rail-mode');
+      drawerEl.dispatchEvent(new MouseEvent('mouseenter'));
+
+      expect(drawerEl.classList.contains('rail-hover')).toBe(false);
+      vi.advanceTimersByTime(300);
+      expect(drawerEl.classList.contains('rail-hover')).toBe(true);
+
+      drawerEl.dispatchEvent(new MouseEvent('mouseleave'));
+      expect(drawerEl.classList.contains('rail-hover')).toBe(false);
+    });
+
+    it('activates the pressed item when the layout shifted between mousedown and mouseup', () => {
+      buildDrawer();
+      const item = addItem('ric-plot-icon');
+      const content = getEl('drawer-content', true)!;
+      const emitSpy = vi.spyOn(EventBus.getInstance(), 'emit');
+
+      item.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+      // mouseup landed elsewhere, so the browser fires click on the common ancestor.
+      content.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      vi.advanceTimersByTime(500);
+
+      expect(emitSpy).toHaveBeenCalledWith(EventBusEvent.bottomMenuClick, 'ric-plot-icon');
+    });
+  });
+
   it('toggleRailMode is a no-op in mobile mode', () => {
     settingsManager.isMobileModeEnabled = true;
     const drawer = buildDrawer();

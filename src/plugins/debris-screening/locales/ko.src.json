@@ -72,7 +72,8 @@
       "pcInputs": "Pc 입력: 모든 쌍에 강체 반경 {hbr} m (주 객체 {primary} m + 보조 객체 {secondary} m). 공분산: 각 객체의 TLE로 추정 (정보 상자 시그마와 같은 모델, {sigma} 시그마), CDM 아님.",
       "parentTag": "이 분석 위성의 원본",
       "showParentRows": "원본 행 표시 ({count})",
-      "notInCatalog": "(불러온 카탈로그에 없음)"
+      "notInCatalog": "(불러온 카탈로그에 없음)",
+      "resultsCapped": "{total}건의 접근 중 상위 {limit}건 표시 (Pc 높은 순)"
     }
   }
 }

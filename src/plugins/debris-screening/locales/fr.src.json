@@ -72,7 +72,8 @@
       "pcInputs": "Entrées du Pc : rayon de corps dur {hbr} m ({primary} m primaire + {secondary} m secondaire) pour chaque paire. Covariance : estimée à partir du TLE de chaque objet (le modèle des sigmas de l'encadré d'informations, à {sigma} sigma), et non d'un CDM.",
       "parentTag": "parent de ce satellite d'analyste",
       "showParentRows": "Afficher la ligne parente ({count})",
-      "notInCatalog": "(absent du catalogue chargé)"
+      "notInCatalog": "(absent du catalogue chargé)",
+      "resultsCapped": "Affichage des {limit} premières conjonctions sur {total} (Pc la plus élevée d'abord)"
     }
   }
 }

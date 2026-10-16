@@ -72,7 +72,8 @@
       "pcInputs": "Pc-Eingaben: Hard-Body-Radius {hbr} m ({primary} m primär + {secondary} m sekundär) für jedes Paar. Kovarianz: aus dem TLE jedes Objekts geschätzt (dasselbe Modell wie die Sigmas der Infobox, {sigma} Sigma), nicht aus einer CDM.",
       "parentTag": "Ursprung dieses Analystensatelliten",
       "showParentRows": "Ursprungszeile anzeigen ({count})",
-      "notInCatalog": "(nicht im geladenen Katalog)"
+      "notInCatalog": "(nicht im geladenen Katalog)",
+      "resultsCapped": "Die {limit} höchsten von {total} Konjunktionen (nach Pc absteigend)"
     }
   }
 }

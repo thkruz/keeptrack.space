@@ -72,7 +72,8 @@
       "pcInputs": "Input del Pc: raggio del corpo rigido {hbr} m ({primary} m primario + {secondary} m secondario) per ogni coppia. Covarianza: stimata dal TLE di ciascun oggetto (il modello delle sigma del riquadro informazioni, a {sigma} sigma), non da un CDM.",
       "parentTag": "genitore di questo satellite dell'analista",
       "showParentRows": "Mostra riga genitore ({count})",
-      "notInCatalog": "(non nel catalogo caricato)"
+      "notInCatalog": "(non nel catalogo caricato)",
+      "resultsCapped": "Mostrate le prime {limit} di {total} congiunzioni (Pc più alta prima)"
     }
   }
 }

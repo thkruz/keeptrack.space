@@ -72,7 +72,8 @@
       "pcInputs": "Entradas de Pc: radio de cuerpo rígido {hbr} m ({primary} m primario + {secondary} m secundario) para cada par. Covarianza: estimada a partir del TLE de cada objeto (el modelo de las sigmas del cuadro de información, a {sigma} sigma), no de un CDM.",
       "parentTag": "origen de este satélite de analista",
       "showParentRows": "Mostrar fila de origen ({count})",
-      "notInCatalog": "(no está en el catálogo cargado)"
+      "notInCatalog": "(no está en el catálogo cargado)",
+      "resultsCapped": "Se muestran las {limit} primeras de {total} conjunciones (mayor Pc primero)"
     }
   }
 }

@@ -72,7 +72,8 @@
       "pcInputs": "Dane wejściowe Pc: promień bryły {hbr} m ({primary} m główny + {secondary} m wtórny) dla każdej pary. Kowariancja: szacowana z TLE każdego obiektu (model stojący za sigmami w panelu informacji, {sigma} sigma), nie z CDM.",
       "parentTag": "rodzic tego satelity analityka",
       "showParentRows": "Pokaż wiersz rodzica ({count})",
-      "notInCatalog": "(brak we wczytanym katalogu)"
+      "notInCatalog": "(brak we wczytanym katalogu)",
+      "resultsCapped": "Pokazano {limit} pierwszych z {total} koniunkcji (od najwyższego Pc)"
     }
   }
 }

@@ -72,7 +72,8 @@
       "pcInputs": "Pcの入力: 剛体半径 {hbr} m（主対象 {primary} m + 副対象 {secondary} m、全ペア共通）。共分散: 各物体のTLEから推定（情報ボックスのシグマと同じモデル、{sigma} シグマ）。CDMは使用していません。",
       "parentTag": "この解析用衛星の元の物体",
       "showParentRows": "元の物体の行を表示 ({count})",
-      "notInCatalog": "（読み込んだカタログにありません）"
+      "notInCatalog": "（読み込んだカタログにありません）",
+      "resultsCapped": "{total} 件の接近のうち上位 {limit} 件を表示 (Pc の高い順)"
     }
   }
 }

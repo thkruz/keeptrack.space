@@ -95,6 +95,9 @@ export class DebrisScreening extends KeepTrackPlugin {
    */
   private recentRuns_: DebrisScreeningRun[] = [];
 
+  /** Rows kept by the synchronous screen (highest Pc first). */
+  static readonly MAX_ROWS = 100;
+
   /** How many completed runs getRecentScreeningRuns() retains. */
   static readonly MAX_RETAINED_RUNS = 5;
 
@@ -719,15 +722,24 @@ export class DebrisScreening extends KeepTrackPlugin {
         });
 
         // Filter by individual RIC components (box filter, not spherical)
-        this.rows_ = allResults
-          .filter((result) => Math.abs(result.event.radialDistance) <= uVal && Math.abs(result.event.intrackDistance) <= vVal && Math.abs(result.event.crosstrackDistance) <= wVal)
+        const inBox = allResults.filter(
+          (result) => Math.abs(result.event.radialDistance) <= uVal && Math.abs(result.event.intrackDistance) <= vVal && Math.abs(result.event.crosstrackDistance) <= wVal
+        );
+
+        this.rows_ = inBox
           .sort((a, b) => b.event.probabilityOfCollision! - a.event.probabilityOfCollision!)
-          .slice(0, 100)
+          .slice(0, DebrisScreening.MAX_ROWS)
           .map((result) => DebrisScreening.toRow_(result));
 
         this.recordScreeningRun_(sat, startTimeMs, endTimeMs, this.rows_);
 
-        this.renderRows_(this.rows_);
+        // Say so when the row cap cut the list instead of reading as the whole result.
+        this.renderRows_(
+          this.rows_,
+          inBox.length > DebrisScreening.MAX_ROWS
+            ? l('resultsCapped').replace('{limit}', DebrisScreening.MAX_ROWS.toString()).replace('{total}', inBox.length.toString())
+            : undefined
+        );
         this.openSecondaryMenu();
       } catch (error) {
         errorManagerInstance.warn(`${l('errorMsgs.ScreeningFailed')}: ${error}`);

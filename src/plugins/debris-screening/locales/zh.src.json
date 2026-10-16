@@ -72,7 +72,8 @@
       "pcInputs": "Pc 输入：每对目标的硬体半径均为 {hbr} m（主目标 {primary} m + 次目标 {secondary} m）。协方差：根据每个目标的 TLE 估算（与信息框中 sigma 相同的模型，{sigma} sigma），而非来自 CDM。",
       "parentTag": "此分析卫星的母体",
       "showParentRows": "显示母体行 ({count})",
-      "notInCatalog": "（不在已加载目录中）"
+      "notInCatalog": "（不在已加载目录中）",
+      "resultsCapped": "显示 {total} 次交会中的前 {limit} 次 (按 Pc 从高到低)"
     }
   }
 }

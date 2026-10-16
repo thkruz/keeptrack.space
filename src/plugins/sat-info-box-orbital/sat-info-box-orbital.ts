@@ -4,7 +4,6 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { PhasedOrbitSatellite } from '@app/app/objects/phased-orbit-satellite';
-import { SensorMath } from '@app/app/sensors/sensor-math';
 import { SolarBody } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -294,7 +293,11 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
     const sat = obj as Satellite;
     const ric = secondarySatObj.toRIC(sat, ServiceLocator.getTimeManager().simulationTimeObj);
-    const dist = SensorMath.distanceString(sat, secondarySatObj).split(' ')[2];
+    /*
+     * Linear range comes from the same main-thread SGP4 states as R/I/C. The cruncher-buffer positions lag a
+     * time jump by up to two cruncher cycles, so mixing the two sources showed a stale range on first paint.
+     */
+    const dist = ric.range.toFixed(2);
 
     const satDistanceElement = getEl('sat-sec-dist');
     const satRadiusElement = getEl('sat-sec-rad');

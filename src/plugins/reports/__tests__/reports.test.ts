@@ -299,6 +299,30 @@ describe('ReportsPlugin report generation', () => {
       expect(real.querySelector('a')!.download).toBe(`coes-${defaultSat.sccNum}.txt`);
     });
 
+    it('shows the selected JSON format in the popup, not the text preview', () => {
+      const { win, real } = fakeWindow();
+
+      vi.spyOn(window, 'open').mockReturnValue(win);
+      p().selectSatManager_ = { primarySatObj: defaultSat };
+      const formatEl = document.getElementById('reports-format') as HTMLSelectElement | null;
+
+      p().format_ = 'json';
+      if (formatEl) {
+        formatEl.value = 'json';
+      }
+
+      p().generateReport_(getReport('coes-report'));
+
+      const shown = real.querySelector('pre')!.textContent!;
+
+      expect(() => JSON.parse(shown)).not.toThrow();
+      expect(real.querySelector('a')!.download).toBe(`coes-${defaultSat.sccNum}.json`);
+      p().format_ = 'text';
+      if (formatEl) {
+        formatEl.value = 'text';
+      }
+    });
+
     it('alerts when the popup is blocked', () => {
       vi.spyOn(window, 'open').mockReturnValue(null);
       const alertSpy = vi.fn();

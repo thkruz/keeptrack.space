@@ -1,4 +1,5 @@
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { buildDownloadPayload } from '@app/plugins/reports/report-formatter';
 import {
   buildReportHeader,
   formatReportTime,
@@ -12,6 +13,7 @@ import {
   ReportOptions,
   ReportPass,
 } from '@app/plugins/reports/reports-core';
+import { Satellite, TleLine1, TleLine2 } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
 
 const generatedAt = new Date('2022-01-01T00:00:00Z');
@@ -90,12 +92,53 @@ describe('reports-core', () => {
       expect(data.header).toContain('TEME');
     });
 
-    it('COES emits the eleven classical elements as Element/Value rows', () => {
+    it('COES emits the element set, both epochs and the classical elements as Element/Value rows', () => {
       const data = generateCoesReport(defaultSat, generatedAt);
 
       expect(data.table!.headers).toEqual(['Element', 'Value']);
-      expect(data.table!.rows).toHaveLength(11);
+      expect(data.table!.rows).toHaveLength(13);
       expect(data.table!.rows.map((r) => r[0])).toContain('Inclination');
+    });
+
+    describe('COES for LANDSAT 8 (39084)', () => {
+      const landsat8 = new Satellite({
+        name: 'LANDSAT 8',
+        tle1: '1 39084U 13008A   22221.78099992  .00000176  00000-0  49109-4 0  9999' as TleLine1,
+        tle2: '2 39084  98.2198 291.4222 0001287  95.0667 265.0678 14.57105218504766' as TleLine2,
+      });
+      const stateEpoch = new Date('2022-08-10T00:00:00Z');
+      const data = generateCoesReport(landsat8, stateEpoch);
+      const value = (element: string): string => data.table!.rows.find((r) => r[0] === element)![1];
+
+      it('prints inclination in degrees, not radians', () => {
+        expect(value('Inclination')).toMatch(/°$/u);
+        expect(parseFloat(value('Inclination'))).toBeCloseTo(98.2, 0);
+      });
+
+      it('prints mean motion in rev/day', () => {
+        expect(value('Mean Motion')).toMatch(/rev\/day$/u);
+        expect(Math.abs(parseFloat(value('Mean Motion')) - 14.57)).toBeLessThan(0.1);
+      });
+
+      it('keeps the near-circular eccentricity visible', () => {
+        expect(parseFloat(value('Eccentricity'))).toBeGreaterThan(0);
+        expect(parseFloat(value('Eccentricity'))).toBeLessThan(0.01);
+      });
+
+      it('lists the TLE epoch and the osculating state epoch as separate rows', () => {
+        expect(value('TLE Epoch (UTC)')).toBe('2022-08-09 18:44:38');
+        expect(value('State Epoch (osculating, UTC)')).toBe('2022-08-10 00:00:00');
+        expect(value('Element Set')).toContain('Osculating');
+        expect(data.header).toContain('osculating');
+      });
+
+      it('serializes to parseable JSON with the epoch rows', () => {
+        const payload = buildDownloadPayload(data, 'json');
+        const records = JSON.parse(payload.content) as { Element: string; Value: string }[];
+
+        expect(payload.ext).toBe('json');
+        expect(records.map((r) => r.Element)).toEqual(expect.arrayContaining(['TLE Epoch (UTC)', 'State Epoch (osculating, UTC)', 'Inclination', 'Mean Motion']));
+      });
     });
 
     it('Sun/Eclipse maps the injected illumination to display labels', () => {
@@ -133,7 +176,7 @@ describe('reports-core', () => {
       expect(data.table!.rows).toHaveLength(1);
       // duration = (240s - 60s) / 60 = 3.00 min
       expect(data.table!.rows[0][3]).toBe('3.00');
-      expect(data.table!.rows[0][4]).toBe('42.500');
+      expect(data.table!.rows[0][4]).toBe('42.5');
     });
   });
 

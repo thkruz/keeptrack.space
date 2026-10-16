@@ -27,7 +27,7 @@
  */
 
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import { Degrees, J2000, Kilometers, LlaVec3, MILLISECONDS_PER_SECOND, PosVel, Satellite } from '@ootk/src/main';
+import { Degrees, J2000, Kilometers, LlaVec3, MILLISECONDS_PER_SECOND, PosVel, Satellite, Tle, TleLine1 } from '@ootk/src/main';
 
 /** A structured report table: a header row plus pre-formatted string cells. */
 export interface ReportTable {
@@ -111,7 +111,28 @@ export interface ReportableObject {
 /** A report target that can additionally express itself as an orbit (COES). */
 export interface OrbitalReportableObject extends ReportableObject {
   toJ2000(date?: Date): J2000;
+  /** TLE line 1, present for TLE-backed satellites (ephemeris-only objects have none). */
+  tle1?: string;
 }
+
+const MS_PER_DAY = 24 * 60 * 60 * MILLISECONDS_PER_SECOND;
+
+/** The epoch encoded in a TLE's line 1, or null when the line is missing or unparseable. */
+export const tleEpochFromLine1 = (tle1: string | undefined): Date | null => {
+  if (!tle1 || tle1.length < 32) {
+    return null;
+  }
+
+  const year = Tle.epochYearFull(tle1 as TleLine1);
+  const dayOfYear = Tle.epochDay(tle1);
+
+  if (!Number.isFinite(year) || !Number.isFinite(dayOfYear)) {
+    return null;
+  }
+
+  // Day-of-year 1.0 is 00:00 UTC on 1 January.
+  return new Date(Date.UTC(year, 0, 1) + (dayOfYear - 1) * MS_PER_DAY);
+};
 
 /** File-safe id for report filenames: the SCC number when present, else the name. */
 const reportId = (sat: ReportableObject): string => sat.sccNum || (sat.name || 'object').replace(/[^\w.-]+/gu, '_');
@@ -254,22 +275,36 @@ export const generateEciReport = (sat: ReportableObject, opts: ReportOptions, ge
   };
 };
 
-/** Classical orbital elements at the satellite's current epoch (J2000). */
-export const generateCoesReport = (sat: OrbitalReportableObject, generatedAt: Date): ReportData => {
-  const header = buildReportHeader('Classic Orbit Elements Report', sat, null, generatedAt);
-  const el = sat.toJ2000().toClassicalElements();
+/**
+ * Classical orbital elements at the report epoch. The elements are OSCULATING:
+ * they come from the propagated J2000 state vector at the simulation time the
+ * report covers (`stateEpoch`), not from the TLE's mean elements, so apogee,
+ * perigee and mean motion differ slightly from the catalog (TLE mean) values.
+ * Both epochs are printed so the convention is explicit.
+ */
+export const generateCoesReport = (sat: OrbitalReportableObject, generatedAt: Date, stateEpoch: Date = generatedAt): ReportData => {
+  const header =
+    `${buildReportHeader('Classical Orbital Elements Report', sat, null, generatedAt)}` +
+    'Note: osculating elements (J2000) at the state epoch, derived from the propagated state vector.\n' +
+    'They differ from the TLE mean elements used for catalog apogee/perigee.\n\n';
+  const el = sat.toJ2000(stateEpoch).toClassicalElements();
+  const tleEpoch = tleEpochFromLine1(sat.tle1);
   const rows: string[][] = [
-    ['Epoch', formatReportTime(el.epoch.toDateTime())],
+    ['Element Set', 'Osculating (J2000)'],
+    ['TLE Epoch (UTC)', tleEpoch ? formatReportTime(tleEpoch) : 'N/A'],
+    ['State Epoch (osculating, UTC)', formatReportTime(el.epoch.toDateTime())],
     ['Apogee', `${el.apogee.toFixed(3)} km`],
     ['Perigee', `${el.perigee.toFixed(3)} km`],
-    ['Inclination', `${el.inclination.toFixed(3)}°`],
-    ['Right Ascension', `${el.rightAscensionDegrees.toFixed(3)}°`],
-    ['Argument of Perigee', `${el.argPerigeeDegrees.toFixed(3)}°`],
-    ['True Anomaly', `${el.trueAnomalyDegrees.toFixed(3)}°`],
-    ['Eccentricity', el.eccentricity.toFixed(3)],
+    ['Inclination', `${el.inclinationDegrees.toFixed(4)}°`],
+    ['Right Ascension', `${el.rightAscensionDegrees.toFixed(4)}°`],
+    ['Argument of Perigee', `${el.argPerigeeDegrees.toFixed(4)}°`],
+    ['True Anomaly', `${el.trueAnomalyDegrees.toFixed(4)}°`],
+    // Seven places like a TLE: near-circular LEO orbits (e ~ 1e-4) would print as 0.000 at three.
+    ['Eccentricity', el.eccentricity.toFixed(7)],
     ['Period', `${el.period.toFixed(3)} min`],
     ['Semi-Major Axis', `${el.semimajorAxis.toFixed(3)} km`],
-    ['Mean Motion', `${el.meanMotion.toFixed(3)} rev/day`],
+    // ClassicalElements.meanMotion is rad/s; revsPerDay is the rev/day value.
+    ['Mean Motion', `${el.revsPerDay.toFixed(8)} rev/day`],
   ];
 
   return {
@@ -286,7 +321,7 @@ export const generateVisibilityWindowsReport = (sat: Satellite, sensor: Detailed
   const rows = passes.map((pass, idx) => {
     const durationMin = (pass.los.getTime() - pass.aos.getTime()) / (MILLISECONDS_PER_SECOND * 60);
 
-    return [`${idx + 1}`, formatReportTime(pass.aos), formatReportTime(pass.los), durationMin.toFixed(2), pass.maxEl.toFixed(3), formatReportTime(pass.maxElTime)];
+    return [`${idx + 1}`, formatReportTime(pass.aos), formatReportTime(pass.los), durationMin.toFixed(2), pass.maxEl.toFixed(1), formatReportTime(pass.maxElTime)];
   });
 
   return {

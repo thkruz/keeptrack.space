@@ -74,6 +74,8 @@ const l = (key: string): string => t7e(`plugins.ReportsPlugin.${key}` as Paramet
 export type ReportTarget = Satellite | OemSatellite | MissileObject;
 
 /** Reports that only sample position/time (LLA, ECI, sun/eclipse) work on any target. */
+const REPORT_FORMATS: readonly ReportFormat[] = ['text', 'csv', 'json'];
+
 const supportsPositionSampling = (obj: ReportTarget): boolean => obj instanceof Satellite || obj instanceof OemSatellite || obj instanceof MissileObject;
 
 /** Reports that need an orbit (COES) exclude ballistic missiles. */
@@ -352,9 +354,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   }
 
   private buildFormatOptions_(): string {
-    const formats: ReportFormat[] = ['text', 'csv', 'json'];
-
-    return formats.map((fmt) => `<option value="${fmt}" ${fmt === this.format_ ? 'selected' : ''}>${l(`options.format_${fmt}`)}</option>`).join('');
+    return REPORT_FORMATS.map((fmt) => `<option value="${fmt}" ${fmt === this.format_ ? 'selected' : ''}>${l(`options.format_${fmt}`)}</option>`).join('');
   }
 
   // =========================================================================
@@ -437,7 +437,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     if (stepEl) {
       this.stepSec_ = parseInt(stepEl.value, 10) || REPORT_DEFAULTS.stepSec;
     }
-    if (formatEl) {
+    if (formatEl && REPORT_FORMATS.includes(formatEl.value as ReportFormat)) {
       this.format_ = formatEl.value as ReportFormat;
     }
 
@@ -505,6 +505,10 @@ export class ReportsPlugin extends KeepTrackPlugin {
    * Generic report generation method that works with any registered report
    */
   private generateReport_(report: ReportGenerator): void {
+    // Re-read the form so the report always uses the window/step/format the
+    // user currently sees, even if a styled-select change event was missed.
+    this.readOptionsFromForm_();
+
     const sat = this.getSat_();
 
     if (!sat) {
@@ -700,8 +704,10 @@ export class ReportsPlugin extends KeepTrackPlugin {
       return;
     }
 
-    const preview = buildPreviewText(data);
     const payload = buildDownloadPayload(data, this.format_);
+    // The window shows the chosen format: text keeps the metadata header and
+    // aligned table, CSV/JSON show exactly what the download and copy produce.
+    const preview = this.format_ === 'text' ? buildPreviewText(data) : payload.content;
     const blob = new Blob([payload.content], { type: payload.mime });
     const url = URL.createObjectURL(blob);
 

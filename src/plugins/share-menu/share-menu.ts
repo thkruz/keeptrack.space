@@ -50,6 +50,13 @@ export class ShareMenuPlugin extends KeepTrackPlugin {
   static readonly URL_INPUT_ID = 'share-url-input';
   static readonly COPY_BTN_ID = 'share-copy-btn';
   static readonly NATIVE_BTN_ID = 'share-native-btn';
+  static readonly INCLUDE_TIME_ID = 'share-include-time';
+
+  /**
+   * Whether the shared link pins the current simulation time (`date=`). Off by
+   * default so a recipient sees the same view at their own live time.
+   */
+  private isIncludeTime_ = false;
 
   // Bridge to onBottomIconClick until base class wires up component callbacks.
   bottomIconCallback = (): void => {
@@ -97,6 +104,13 @@ export class ShareMenuPlugin extends KeepTrackPlugin {
                   <label for="${ShareMenuPlugin.URL_INPUT_ID}" class="active">${l('labels.url')}</label>
                 </div>
               </div>
+              <div class="switch row share-toggle-row">
+                <label for="${ShareMenuPlugin.INCLUDE_TIME_ID}" kt-tooltip="${l('labels.includeTimeTooltip')}">
+                  <input id="${ShareMenuPlugin.INCLUDE_TIME_ID}" type="checkbox" />
+                  <span class="lever"></span>
+                  ${l('labels.includeTime')}
+                </label>
+              </div>
               <button id="${ShareMenuPlugin.COPY_BTN_ID}" type="button" class="kt-action waves-effect">
                 <span class="kt-action-label">${l('buttons.copyLink')}</span>
               </button>
@@ -125,7 +139,7 @@ export class ShareMenuPlugin extends KeepTrackPlugin {
     const urlInput = getEl(ShareMenuPlugin.URL_INPUT_ID) as HTMLInputElement | null;
 
     if (urlInput) {
-      urlInput.value = UrlManager.getShareUrl();
+      urlInput.value = UrlManager.getShareUrl(true, this.isIncludeTime_);
     }
   }
 
@@ -142,6 +156,11 @@ export class ShareMenuPlugin extends KeepTrackPlugin {
       getEl(ShareMenuPlugin.NATIVE_BTN_ID)?.classList.remove('start-hidden');
     }
 
+    getEl(ShareMenuPlugin.INCLUDE_TIME_ID)?.addEventListener('change', (evt: Event) => {
+      this.isIncludeTime_ = (evt.target as HTMLInputElement).checked;
+      this.refreshShareUrl_();
+    });
+
     getEl(ShareMenuPlugin.COPY_BTN_ID)?.addEventListener('click', () => {
       this.copyLink_();
     });
@@ -154,7 +173,7 @@ export class ShareMenuPlugin extends KeepTrackPlugin {
   private getShareUrlValue_(): string {
     const urlInput = getEl(ShareMenuPlugin.URL_INPUT_ID) as HTMLInputElement | null;
 
-    return urlInput?.value || UrlManager.getShareUrl();
+    return urlInput?.value || UrlManager.getShareUrl(true, this.isIncludeTime_);
   }
 
   private copyLink_(): void {

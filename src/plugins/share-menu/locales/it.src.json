@@ -9,7 +9,9 @@
       },
       "labels": {
         "shareLink": "Link di condivisione",
-        "url": "URL condivisibile"
+        "url": "URL condivisibile",
+        "includeTime": "Includi l'ora corrente",
+        "includeTimeTooltip": "Fissa l'ora di simulazione corrente nel link. Disattivato per impostazione predefinita, così i destinatari vedono la stessa vista alla propria ora in tempo reale."
       },
       "buttons": {
         "copyLink": "Copia link",

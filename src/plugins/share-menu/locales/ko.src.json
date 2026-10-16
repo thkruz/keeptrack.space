@@ -9,7 +9,9 @@
       },
       "labels": {
         "shareLink": "공유 링크",
-        "url": "공유 가능한 URL"
+        "url": "공유 가능한 URL",
+        "includeTime": "현재 시간 포함",
+        "includeTimeTooltip": "링크에 현재 시뮬레이션 시간을 고정합니다. 기본적으로 꺼져 있어 받는 사람이 자신의 실시간 시간으로 같은 화면을 봅니다."
       },
       "buttons": {
         "copyLink": "링크 복사",

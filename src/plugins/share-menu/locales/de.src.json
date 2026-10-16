@@ -9,7 +9,9 @@
       },
       "labels": {
         "shareLink": "Link teilen",
-        "url": "Teilbare URL"
+        "url": "Teilbare URL",
+        "includeTime": "Aktuelle Zeit einbeziehen",
+        "includeTimeTooltip": "Fixiert die aktuelle Simulationszeit im Link. Standardmäßig aus, damit Empfänger dieselbe Ansicht zu ihrer eigenen Live-Zeit sehen."
       },
       "buttons": {
         "copyLink": "Link kopieren",

@@ -20,3 +20,8 @@
 #share-menu .input-field input:focus-visible {
   outline: none;
 }
+
+/* "Include current time" toggle between the URL field and the action rows. */
+#share-menu .share-toggle-row {
+  margin: 8px 10px 4px;
+}

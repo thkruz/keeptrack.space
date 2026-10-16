@@ -306,11 +306,17 @@ export abstract class UrlManager {
    * This is a pure builder: it reads live state but performs no navigation and
    * ignores the live-update / disable settings (those are the writer's concern).
    * Heavy params are progressively dropped to keep the URL under MAX_URL_LENGTH_.
-   * @param isMaxData When true, include extended/heavy params (date, external TLEs, etc.).
+   *
+   * The simulation time (`date=`) is NOT pinned by default: a colleague opening the
+   * link should see the same objects, search and camera at their own live time rather
+   * than a frozen clock. Pass `isIncludeTime` (the Share menu's "Include current time"
+   * checkbox) to re-add it. Incoming `date=` params from older links still parse.
+   * @param isMaxData When true, include extended/heavy params (external TLEs, etc.).
+   * @param isIncludeTime When true, pin the current simulation time with `date=`.
    * @returns The full shareable URL string.
    */
   // eslint-disable-next-line complexity
-  static getShareUrl(isMaxData: boolean = true): string {
+  static getShareUrl(isMaxData: boolean = true, isIncludeTime: boolean = false): string {
     const timeManagerInstance = ServiceLocator.getTimeManager();
     const mainCamera = ServiceLocator.getMainCamera();
 
@@ -318,8 +324,8 @@ export abstract class UrlManager {
     let url = arr[0];
     const paramSlices = [] as string[];
 
-    // Handle Time First
-    if (isMaxData || timeManagerInstance.staticOffset < -1000 || timeManagerInstance.staticOffset > 1000) {
+    // Handle Time First (opt-in only, see doc comment)
+    if (isIncludeTime) {
       const epochMs = timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset;
 
       if (Number.isFinite(epochMs)) {

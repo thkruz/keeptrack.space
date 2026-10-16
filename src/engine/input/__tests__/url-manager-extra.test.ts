@@ -248,6 +248,22 @@ describe('UrlManager.getShareUrl', () => {
     expect(url).toContain('zoom=0.50');
   });
 
+  it('does not pin the simulation time by default, even when the clock is offset', () => {
+    ServiceLocator.getTimeManager().staticOffset = 86400e3;
+
+    expect(UrlManager.getShareUrl()).not.toContain('date=');
+    expect(UrlManager.getShareUrl(false)).not.toContain('date=');
+  });
+
+  it('pins the simulation time when isIncludeTime is set', () => {
+    const tm = ServiceLocator.getTimeManager();
+
+    tm.dynamicOffsetEpoch = Date.UTC(2024, 7, 15, 6, 30);
+    tm.staticOffset = 0;
+
+    expect(UrlManager.getShareUrl(true, true)).toContain('date=2024-08-15T06:30:00.000Z');
+  });
+
   it('does not navigate (leaves window.location unchanged)', () => {
     const before = window.location.href;
 

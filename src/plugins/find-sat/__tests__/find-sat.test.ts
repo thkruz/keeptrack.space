@@ -174,6 +174,18 @@ describe('FindSatPlugin_class', () => {
     return plugin;
   };
 
+  /**
+   * Gives every object a propagated position except the listed ids, which get
+   * the 0,0,0 the cruncher writes for a decayed object.
+   */
+  const setDecayedIds = (decayedIds: number[]): void => {
+    const dotsManager = ServiceLocator.getDotsManager();
+
+    dotsManager.positionData = new Float32Array(300).fill(1);
+    dotsManager.getCurrentPosition = (id: number) =>
+      (decayedIds.includes(id) ? { x: 0, y: 0, z: 0 } : { x: 7000, y: 0, z: 0 }) as ReturnType<typeof dotsManager.getCurrentPosition>;
+  };
+
   const getSelectValues = (selectId: string): string[] => Array.from((getEl(selectId) as HTMLSelectElement).options).map((option) => option.value);
 
   const defaultSearchParams = (): SearchSatParams =>
@@ -342,6 +354,8 @@ describe('FindSatPlugin_class', () => {
     active.status = PayloadStatus.OPERATIONAL;
     const plugin = initPluginWithCatalog([active, createFindSat(6, 'A', 'Imaging-1')]);
 
+    setDecayedIds([]);
+
     expect(plugin['searchSats_']({ ...defaultSearchParams(), opStatus: 'active' }).map((sat) => sat.id)).toContain(5);
   });
 
@@ -357,6 +371,37 @@ describe('FindSatPlugin_class', () => {
     expect(rows[0]).toHaveProperty('apogee', sat.apogee);
     expect(rows[0].operationalStatus).toBe('Active');
     expect(rows[0].status).toBe(t7e('SatInfoBoxObject.Status.operational'));
+  });
+
+  it('export rows report a decayed payload as Inactive / Decayed like the results list', () => {
+    const sat = createFindSat(5, 'A', 'Imaging-1');
+
+    sat.type = SpaceObjectType.PAYLOAD;
+    sat.status = PayloadStatus.OPERATIONAL;
+    const rows = buildFindSatExportRows([sat], () => true);
+
+    expect(rows[0].operationalStatus).toBe('Inactive');
+    expect(rows[0].status).toBe('Decayed');
+  });
+
+  it('active status filter drops an object whose propagated position is 0,0,0', () => {
+    const decayed = createFindSat(5, 'A', 'Imaging-1');
+    const live = createFindSat(6, 'A', 'Imaging-1');
+
+    for (const s of [decayed, live]) {
+      s.type = SpaceObjectType.PAYLOAD;
+      s.status = PayloadStatus.OPERATIONAL;
+    }
+    const plugin = initPluginWithCatalog([decayed, live]);
+
+    setDecayedIds([5]);
+
+    const activeIds = plugin['searchSats_']({ ...defaultSearchParams(), opStatus: 'active' }).map((s) => s.id);
+    const inactiveIds = plugin['searchSats_']({ ...defaultSearchParams(), opStatus: 'inactive' }).map((s) => s.id);
+
+    expect(activeIds).toContain(6);
+    expect(activeIds).not.toContain(5);
+    expect(inactiveIds).toContain(5);
   });
 
   it('should find satellites with all inputs set to 0', () => {

@@ -130,6 +130,20 @@ describe('find-sat-filters', () => {
       expect(getOperationalStatus(typed(SpaceObjectType.ROCKET_BODY, PayloadStatus.UNKNOWN))).toBe('inactive');
       expect(getOperationalStatus(typed(SpaceObjectType.DEBRIS))).toBe('inactive');
     });
+
+    it('treats an object that has decayed at the simulation time as inactive despite an operational code', () => {
+      const usa133 = typed(SpaceObjectType.PAYLOAD, PayloadStatus.OPERATIONAL);
+
+      expect(getOperationalStatus(usa133, () => true)).toBe('inactive');
+      expect(getOperationalStatus(usa133, () => false)).toBe('active');
+      expect(getOperationalStatus(usa133)).toBe('active');
+    });
+
+    it('keeps the status code of objects whose catalog type is not yet set', () => {
+      expect(getOperationalStatus(typed(SpaceObjectType.UNKNOWN, PayloadStatus.OPERATIONAL))).toBe('active');
+      expect(getOperationalStatus(typed(SpaceObjectType.UNKNOWN, PayloadStatus.NONOPERATIONAL))).toBe('inactive');
+      expect(getOperationalStatus(typed(SpaceObjectType.UNKNOWN))).toBe('unknown');
+    });
   });
 
   describe('filterByOperationalStatus', () => {
@@ -143,6 +157,17 @@ describe('find-sat-filters', () => {
 
       expect(filterByOperationalStatus(sats, ['inactive']).map((s) => s.id)).toEqual([2, 4]);
       expect(filterByOperationalStatus(sats, ['active', 'unknown']).map((s) => s.id)).toEqual([1, 3]);
+    });
+
+    it('moves decayed objects from the active bucket to the inactive bucket', () => {
+      const sats = [
+        sat({ id: 1, type: SpaceObjectType.PAYLOAD, status: PayloadStatus.OPERATIONAL } as Partial<Satellite> & { id: number }),
+        sat({ id: 2, type: SpaceObjectType.PAYLOAD, status: PayloadStatus.OPERATIONAL } as Partial<Satellite> & { id: number }),
+      ];
+      const isDecayed = (s: Satellite) => s.id === 2;
+
+      expect(filterByOperationalStatus(sats, ['active'], isDecayed).map((s) => s.id)).toEqual([1]);
+      expect(filterByOperationalStatus(sats, ['inactive'], isDecayed).map((s) => s.id)).toEqual([2]);
     });
   });
 });

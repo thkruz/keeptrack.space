@@ -21,6 +21,7 @@ import findSatPng from '@public/img/icons/database-search.png';
 import './find-sat.css';
 import { exportFindSatResults, operationalStatusLabel } from './find-sat-export';
 import {
+  DecayedPredicate,
   filterByApogee,
   filterByArgOfPerigee,
   filterByInclination,
@@ -206,7 +207,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     }
     // Export the full match list: the search-limit cap protects the GPU from
     // drawing too many orbits and does not apply to a spreadsheet.
-    exportFindSatResults(this.lastAllMatches_.length >= this.lastResults_.length ? this.lastAllMatches_ : this.lastResults_);
+    exportFindSatResults(this.lastAllMatches_.length >= this.lastResults_.length ? this.lastAllMatches_ : this.lastResults_, FindSatPlugin.buildDecayedPredicate_());
   }
 
   protected buildSideMenuHtml_(): string {
@@ -834,6 +835,31 @@ export class FindSatPlugin extends KeepTrackPlugin {
     };
   }
 
+  /**
+   * Builds a predicate that reports whether an object has decayed at the
+   * current simulation time. It reads the same propagated position buffer as
+   * the search results list, which labels a 0,0,0 position "Decayed", so the
+   * Operational Status filter and the export agree with what the list shows.
+   * Static objects never live in that buffer and are never treated as decayed.
+   */
+  protected static buildDecayedPredicate_(): DecayedPredicate {
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
+
+    if (!dotsManagerInstance?.positionData) {
+      return () => false;
+    }
+
+    return (sat: Satellite) => {
+      if (sat.isStatic?.()) {
+        return false;
+      }
+
+      const pos = dotsManagerInstance.getCurrentPosition(Number(sat.id));
+
+      return pos?.x === 0 && pos?.y === 0 && pos?.z === 0;
+    };
+  }
+
   protected static limitPossibles_(possibles: Satellite[], limit: number): Satellite[] {
     const uiManagerInstance = ServiceLocator.getUiManager();
 
@@ -969,7 +995,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     if (typeof params.opStatus === 'string' && params.opStatus !== '' && params.opStatus !== 'All') {
       const statuses = params.opStatus.split('|').filter((status): status is OperationalStatus => (OPERATIONAL_STATUSES as readonly string[]).includes(status));
 
-      filtered = filterByOperationalStatus(filtered, statuses);
+      filtered = filterByOperationalStatus(filtered, statuses, FindSatPlugin.buildDecayedPredicate_());
     }
 
     if (params.countryCode !== 'All') {

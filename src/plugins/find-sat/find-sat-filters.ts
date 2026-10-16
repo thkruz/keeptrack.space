@@ -86,16 +86,35 @@ export type OperationalStatus = 'active' | 'inactive' | 'unknown';
 export const OPERATIONAL_STATUSES: readonly OperationalStatus[] = ['active', 'inactive', 'unknown'];
 
 /**
+ * Reports whether an object has decayed at the current simulation time. The
+ * plugin supplies one backed by the propagated position buffer (a 0,0,0
+ * position is what the search results list labels "Decayed"), so the filter,
+ * the list and the export agree on the same object.
+ */
+export type DecayedPredicate = (sat: Satellite) => boolean;
+
+/**
  * Buckets a catalog object's operational status.
  *
- * Payloads use the catalog `status` field (the same field behind the info
+ * An object that has decayed at the current simulation time (per the optional
+ * `isDecayed` predicate) is always inactive, whatever its catalog code says: a
+ * stale "operational" code must not put a reentered object in the Active set.
+ *
+ * Otherwise the catalog `status` field decides (the same field behind the info
  * box's "Status" row): operational, partially operational, backup/standby,
  * spare and extended mission count as active; non-operational and decayed as
  * inactive; anything else as unknown. Rocket bodies and debris carry no status
- * code but can never be operational, so they are bucketed as inactive.
+ * code but can never be operational, so they are bucketed as inactive. Objects
+ * whose catalog type is not yet set (SpaceObjectType.UNKNOWN, typically recent
+ * launches still being classified) keep their status code, so they can count
+ * as active.
  */
-export const getOperationalStatus = (sat: Satellite): OperationalStatus => {
+export const getOperationalStatus = (sat: Satellite, isDecayed?: DecayedPredicate): OperationalStatus => {
   if (sat.type === SpaceObjectType.ROCKET_BODY || sat.type === SpaceObjectType.DEBRIS) {
+    return 'inactive';
+  }
+
+  if (isDecayed?.(sat)) {
     return 'inactive';
   }
 
@@ -115,4 +134,5 @@ export const getOperationalStatus = (sat: Satellite): OperationalStatus => {
 };
 
 /** Keep objects whose operational status bucket is in the requested list. */
-export const filterByOperationalStatus = (sats: Satellite[], statuses: OperationalStatus[]): Satellite[] => sats.filter((sat) => statuses.includes(getOperationalStatus(sat)));
+export const filterByOperationalStatus = (sats: Satellite[], statuses: OperationalStatus[], isDecayed?: DecayedPredicate): Satellite[] =>
+  sats.filter((sat) => statuses.includes(getOperationalStatus(sat, isDecayed)));

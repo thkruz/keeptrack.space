@@ -10,7 +10,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, PayloadStatus, Satellite, SpaceObjectType } from '@ootk/src/main';
-import { getOperationalStatus, OperationalStatus } from './find-sat-filters';
+import { DecayedPredicate, getOperationalStatus, OperationalStatus } from './find-sat-filters';
 
 /** One exported spreadsheet row. */
 export type FindSatExportRow = Record<string, unknown>;
@@ -27,13 +27,22 @@ export const operationalStatusLabel = (status: OperationalStatus): string => {
   }
 };
 
+/** Localized "Decayed" label for the detailed status column. */
+const decayedLabel = (): string => t7e('plugins.FindSatPlugin.labels.statusDecayed' as Parameters<typeof t7e>[0]);
+
 /**
  * The detailed status text the satellite info box shows on its "Status" row.
  * Only payloads carry a catalog status code, so other object types get ''.
+ * A payload that has decayed at the current simulation time reads "Decayed"
+ * whatever its catalog code says, matching the search results list.
  */
-const payloadStatusDetail = (sat: Satellite): string => {
+const payloadStatusDetail = (sat: Satellite, isDecayed?: DecayedPredicate): string => {
   if (sat.type !== SpaceObjectType.PAYLOAD) {
     return '';
+  }
+
+  if (isDecayed?.(sat)) {
+    return decayedLabel();
   }
 
   switch (sat.status) {
@@ -49,6 +58,8 @@ const payloadStatusDetail = (sat: Satellite): string => {
       return t7e('SatInfoBoxObject.Status.backupStandby');
     case PayloadStatus.SPARE:
       return t7e('SatInfoBoxObject.Status.spare');
+    case PayloadStatus.DECAYED:
+      return decayedLabel();
     default:
       return t7e('SatInfoBoxObject.Status.unknown');
   }
@@ -56,9 +67,10 @@ const payloadStatusDetail = (sat: Satellite): string => {
 
 /**
  * Builds the export rows: satellites with TLEs only, analyst objects dropped,
- * sorted by catalog number.
+ * sorted by catalog number. `isDecayed` marks objects that have decayed at the
+ * current simulation time so their status columns match the results list.
  */
-export const buildFindSatExportRows = (objs: BaseObject[]): FindSatExportRow[] => {
+export const buildFindSatExportRows = (objs: BaseObject[], isDecayed?: DecayedPredicate): FindSatExportRow[] => {
   const sats = objs.filter((obj) => obj.isSatellite() && (obj as Satellite).tle1 && (obj as Satellite).tle2 && (obj as Satellite).country !== 'ANALSAT') as Satellite[];
 
   return [...sats]
@@ -74,8 +86,8 @@ export const buildFindSatExportRows = (objs: BaseObject[]): FindSatExportRow[] =
       raan: sat.rightAscension,
       apogee: sat.apogee,
       perigee: sat.perigee,
-      operationalStatus: operationalStatusLabel(getOperationalStatus(sat)),
-      status: payloadStatusDetail(sat),
+      operationalStatus: operationalStatusLabel(getOperationalStatus(sat, isDecayed)),
+      status: payloadStatusDetail(sat, isDecayed),
       country: sat.country,
       site: sat.launchSite,
       rocket: sat.launchVehicle,
@@ -93,8 +105,8 @@ export const buildFindSatExportRows = (objs: BaseObject[]): FindSatExportRow[] =
 };
 
 /** Saves every supplied match to an .xlsx file. */
-export const exportFindSatResults = (objs: BaseObject[]): void => {
-  const rows = buildFindSatExportRows(objs);
+export const exportFindSatResults = (objs: BaseObject[], isDecayed?: DecayedPredicate): void => {
+  const rows = buildFindSatExportRows(objs, isDecayed);
 
   if (rows.length === 0) {
     errorManagerInstance.info(t7e('plugins.FindSatPlugin.errorMsgs.NothingToExport' as Parameters<typeof t7e>[0]));

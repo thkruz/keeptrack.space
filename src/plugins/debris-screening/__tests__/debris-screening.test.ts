@@ -1,7 +1,12 @@
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { hasBottomIcon, hasHelp, hasSecondaryMenu, hasSideMenu } from '@app/engine/plugins/core/plugin-capabilities';
 import { getEl } from '@app/engine/utils/get-el';
 import { DebrisScreening } from '@app/plugins/debris-screening/debris-screening';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import type { DsResultRow } from '@app/webworker/debris-screening-messages';
+import { Satellite } from '@ootk/src/main';
+import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -160,5 +165,73 @@ describe('DebrisScreening_formatting', () => {
     expect((plugin as any).formatPc_(1.23e-6)).toBe('1.23e-6');
     expect((plugin as any).formatPc_(1e-13)).toBe('<1e-12');
     expect((plugin as any).formatPc_()).toBe('N/A');
+  });
+});
+
+describe('DebrisScreening_follows_selection', () => {
+  let plugin: DebrisScreening;
+  const satA = new Satellite({ ...defaultSat, id: 0, sccNum: '25544' });
+  const satB = new Satellite({ ...defaultSat, id: 1, sccNum: '43013' });
+  const staleRow: DsResultRow = {
+    secondaryId: '11111',
+    tcaMs: Date.UTC(2022, 0, 1),
+    missDistance: 1,
+    radialDistance: 0.1,
+    intrackDistance: 0.5,
+    crosstrackDistance: 0.2,
+    relativeVelocity: 7,
+    probabilityOfCollision: 1e-5,
+    riskScore: 0.5,
+  };
+
+  type Internals = { rows_: DsResultRow[]; renderRows_: (rows: DsResultRow[]) => void };
+
+  const openWithResultsFor = (sat: Satellite) => {
+    plugin.isMenuButtonActive = true;
+    (getEl('ds-scc') as HTMLInputElement).value = sat.sccNum;
+    const internals = plugin as unknown as Internals;
+
+    internals.rows_ = [staleRow];
+    internals.renderRows_(internals.rows_);
+  };
+
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager]);
+    plugin = new DebrisScreening();
+    websiteInit(plugin);
+  });
+
+  it('updates the SCC# field and clears stale results when the selection changes while open', () => {
+    const onSelectSpy = vi.spyOn(plugin as unknown as { onSelectSatData_: (obj: unknown) => void }, 'onSelectSatData_');
+
+    openWithResultsFor(satA);
+    expect(getEl('ds-results-body')!.querySelectorAll('tr')).toHaveLength(1);
+
+    EventBus.getInstance().emit(EventBusEvent.selectSatData, satB, satB.id);
+
+    expect(onSelectSpy).toHaveBeenCalled();
+    expect((getEl('ds-scc') as HTMLInputElement).value).toBe('43013');
+    expect((plugin as unknown as Internals).rows_).toHaveLength(0);
+    expect(getEl('ds-results-body')!.querySelectorAll('tr')).toHaveLength(0);
+    expect(getEl('ds-results-count')!.textContent).toBe('0 conjunctions found');
+  });
+
+  it('keeps results when the same satellite is re-selected', () => {
+    openWithResultsFor(satA);
+
+    EventBus.getInstance().emit(EventBusEvent.selectSatData, satA, satA.id);
+
+    expect((getEl('ds-scc') as HTMLInputElement).value).toBe('25544');
+    expect((plugin as unknown as Internals).rows_).toHaveLength(1);
+  });
+
+  it('does nothing while the menu is closed', () => {
+    openWithResultsFor(satA);
+    plugin.isMenuButtonActive = false;
+
+    EventBus.getInstance().emit(EventBusEvent.selectSatData, satB, satB.id);
+
+    expect((getEl('ds-scc') as HTMLInputElement).value).toBe('25544');
+    expect((plugin as unknown as Internals).rows_).toHaveLength(1);
   });
 });

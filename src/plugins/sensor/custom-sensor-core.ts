@@ -10,6 +10,7 @@
  * @license AGPL-3.0-or-later
  */
 
+import { CUSTOM_SENSOR_DEFAULT_NAME, CUSTOM_SENSOR_OBJNAME_PREFIX, formatCustomSensorLocation, resolveCustomSensorName } from '@app/app/sensors/custom-sensor-identity';
 import type { DetailedSensorParams } from '@app/app/sensors/DetailedSensor';
 import {
   Degrees,
@@ -191,6 +192,7 @@ export function validateCustomSensor(values: CustomSensorFormValues): string | n
  */
 export function buildCustomSensorParams(values: CustomSensorFormValues, objNameSuffix: string): DetailedSensorParams {
   const { masks } = parseMask(values.mask);
+  const name = resolveCustomSensorName(values.uiName);
   const params: DetailedSensorParams = {
     lat: values.lat as Degrees,
     lon: values.lon as Degrees,
@@ -202,12 +204,13 @@ export function buildCustomSensorParams(values: CustomSensorFormValues, objNameS
     minRng: values.minRng as Kilometers,
     maxRng: values.maxRng as Kilometers,
     type: mapSensorType(values.type),
-    name: 'Custom Sensor',
-    uiName: values.uiName,
-    system: 'Custom Sensor',
-    country: 'Custom Sensor',
-    objName: `Custom Sensor-${objNameSuffix}`,
-    operator: 'Custom Sensor',
+    name,
+    uiName: name,
+    system: CUSTOM_SENSOR_DEFAULT_NAME,
+    country: formatCustomSensorLocation(values.lat, values.lon),
+    objName: `${CUSTOM_SENSOR_OBJNAME_PREFIX}-${objNameSuffix}`,
+    operator: CUSTOM_SENSOR_DEFAULT_NAME,
+    isCustomSensor: true,
     zoom: values.maxRng > GEO_ZOOM_THRESHOLD_KM ? ZoomValue.GEO : ZoomValue.LEO,
     volume: false,
   };

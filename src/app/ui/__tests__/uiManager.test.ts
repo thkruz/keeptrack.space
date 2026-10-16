@@ -42,6 +42,7 @@ describe('uiManager', () => {
   // Should process updateSensorPosition
   it('process_updateSensorPosition', () => {
     (KeepTrack.getInstance().containerRoot as HTMLDivElement).innerHTML = `
+      <input id="cs-uiName" value="Denver imaging" />
       <input id="cs-lat" />
       <input id="cs-lon" />
       <input id="cs-hei" />
@@ -59,8 +60,8 @@ describe('uiManager', () => {
       <div id="cs-minrange-div" style="display: none;"></div>
       <div id="cs-maxrange-div" style="display: none;"></div>
       <div id="sensor-type">Telescope</div>
-      <div id="sensor-info-title">Custom Sensor</div>
-      <div id="sensor-country">Custom Sensor</div>
+      <div id="sensor-info-title"></div>
+      <div id="sensor-country"></div>
       <div id="search"></div>
     `;
 
@@ -76,6 +77,7 @@ describe('uiManager', () => {
     expect((<HTMLInputElement>getEl('cs-lat')).value).toBe('22');
     expect((<HTMLInputElement>getEl('cs-lon')).value).toBe('22');
     expect((<HTMLInputElement>getEl('cs-hei')).value).toBe('0.022');
+    expect(getEl('sensor-info-title')!.textContent).toBe('Denver imaging');
 
     (KeepTrack.getInstance().containerRoot as HTMLDivElement).innerHTML = '<div id="search"></div>';
     disableConsoleErrors();

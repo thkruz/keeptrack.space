@@ -122,6 +122,8 @@ export interface DetailedSensorParams extends Omit<GroundStationParams, 'id'> {
   id?: number;
   /** Volume sensor flag */
   volume?: boolean;
+  /** True for user-created sensors; identity flag independent of the display name */
+  isCustomSensor?: boolean;
   /** Where the site coordinates were published (station presets) */
   sourceUrl?: string;
   /** ISO date (YYYY-MM-DD) the source was retrieved */
@@ -222,6 +224,8 @@ export class DetailedSensor extends GroundStation {
   operator?: string;
   isVolumetric?: boolean;
   volume?: boolean;
+  /** True for user-created sensors; identity flag independent of the display name */
+  isCustomSensor?: boolean;
   sourceUrl?: string;
   sourceRetrieved?: string;
 
@@ -293,6 +297,7 @@ export class DetailedSensor extends GroundStation {
     this.operator = params.operator;
     this.isVolumetric = params.isVolumetric;
     this.volume = params.volume;
+    this.isCustomSensor = params.isCustomSensor;
     this.sourceUrl = params.sourceUrl;
     this.sourceRetrieved = params.sourceRetrieved;
 
@@ -768,6 +773,7 @@ export class DetailedSensor extends GroundStation {
       operator: this.operator,
       isVolumetric: this.isVolumetric,
       volume: this.volume,
+      isCustomSensor: this.isCustomSensor,
       sourceUrl: this.sourceUrl,
       sourceRetrieved: this.sourceRetrieved,
       active: this.active,

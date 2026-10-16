@@ -321,6 +321,43 @@ export class DebrisScreening extends KeepTrackPlugin {
         }
       });
     });
+
+    // Keep the read-only SCC# field on the selected satellite while the menu
+    // is open, instead of only refreshing it when the menu is reopened.
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: unknown) => {
+      this.onSelectSatData_(obj);
+    });
+  }
+
+  /**
+   * Selection-changed handler. No-op while the menu is closed (the field is
+   * refreshed on open). When the primary changes to a different satellite, the
+   * SCC# field follows it and any results computed for the old target are
+   * cleared so a table for object A is never read as object B.
+   */
+  protected onSelectSatData_(obj: unknown): void {
+    if (!this.isMenuButtonActive || !(obj instanceof Satellite)) {
+      return;
+    }
+
+    const sccInput = getEl(`${this.formPrefix_}-scc`) as HTMLInputElement | null;
+
+    if (!sccInput || sccInput.value === obj.sccNum) {
+      return;
+    }
+
+    sccInput.value = obj.sccNum;
+    this.onTargetChanged_();
+  }
+
+  /**
+   * Called when the screening target changes while the menu is open. Drops the
+   * stale results (table, count, and CSV export source). Subclasses with
+   * in-flight screening runs override this to cancel them as well.
+   */
+  protected onTargetChanged_(): void {
+    this.rows_ = [];
+    this.renderRows_(this.rows_);
   }
 
   /**

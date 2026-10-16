@@ -1,3 +1,4 @@
+import { CUSTOM_SENSOR_DEFAULT_NAME, formatCustomSensorLocation, isCustomSensor, resolveCustomSensorName } from '@app/app/sensors/custom-sensor-identity';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { UiGeolocation } from '@app/app/ui/ui-manager-geolocation';
 import { SoundNames } from '@app/engine/audio/sounds';
@@ -246,7 +247,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
             getEl('cs-telescope')!.click();
           }
           CustomSensorPlugin.setFields_({
-            'cs-uiName': 'Custom Sensor',
+            'cs-uiName': CUSTOM_SENSOR_DEFAULT_NAME,
             'cs-lat': mouseInputInstance.latLon.lat.toString(),
             'cs-lon': mouseInputInstance.latLon.lon.toString(),
             'cs-hei': '0',
@@ -419,7 +420,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     // Only update the (SensorInfo) primary-sensor info DOM if this will become the
     // primary sensor. addSecondarySensor -> setSensor handles it for real primaries.
     if (!sensorManagerInstance.isSensorSelected() || isReplaceSensor) {
-      CustomSensorPlugin.updatePrimarySensorInfoDom_(values.uiName);
+      CustomSensorPlugin.updatePrimarySensorInfoDom_(resolveCustomSensorName(values.uiName), formatCustomSensorLocation(values.lat, values.lon));
     }
 
     sensorManagerInstance.addSecondarySensor(new DetailedSensor(buildCustomSensorParams(values, randomUUID)), isReplaceSensor);
@@ -432,7 +433,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
    * Those IDs belong to SensorInfoPlugin, which may not be loaded, so every write
    * is guarded (`getEl(id, true)`) instead of assuming the element exists.
    */
-  private static updatePrimarySensorInfoDom_(uiName: string) {
+  private static updatePrimarySensorInfoDom_(uiName: string, location: string) {
     const sensorTypeDom = getEl('sensor-type', true) as HTMLInputElement | null;
 
     if (sensorTypeDom) {
@@ -448,14 +449,14 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     const sensorCountryDom = getEl('sensor-country', true);
 
     if (sensorCountryDom) {
-      sensorCountryDom.textContent = 'Custom Sensor';
+      sensorCountryDom.textContent = location;
     }
   }
 
   private static updateCustomSensorListDom() {
     const l = (key: string) => CustomSensorPlugin.t_(`sensorList.${key}`);
     const sensorManagerInstance = ServiceLocator.getSensorManager();
-    const primarySensor = sensorManagerInstance.currentSensors[0]?.objName?.startsWith('Custom Sensor') ? [sensorManagerInstance.currentSensors[0]] : ([] as DetailedSensor[]);
+    const primarySensor = isCustomSensor(sensorManagerInstance.currentSensors[0]) ? [sensorManagerInstance.currentSensors[0]] : ([] as DetailedSensor[]);
     const sensors = primarySensor.concat(sensorManagerInstance.secondarySensors);
 
     setInnerHtml('custom-sensors-sensor-list', renderCustomSensorList(sensors, l, bookmarkRemovePng));

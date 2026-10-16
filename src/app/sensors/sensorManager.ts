@@ -25,6 +25,7 @@
 
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { sensors } from '@app/app/data/catalogs/sensors';
+import { isCustomSensor } from '@app/app/sensors/custom-sensor-identity';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import type { TearrData } from '@app/app/sensors/sensor-math';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -210,7 +211,7 @@ export class SensorManager {
 
   clearSecondarySensors() {
     this.secondarySensors = [];
-    if (this.currentSensors[0]?.name === 'Custom Sensor') {
+    if (isCustomSensor(this.currentSensors[0])) {
       this.resetSensorSelected();
     }
     this.updatePositionCruncher_();
@@ -383,14 +384,19 @@ export class SensorManager {
       // No sensor selected
       this.sensorTitle = '';
       this.currentSensors = [];
-    } else if ((<DetailedSensor>selectedSensor)?.name === 'Custom Sensor') {
+    } else if (typeof selectedSensor !== 'string' && isCustomSensor(selectedSensor)) {
       this.currentSensors = [<DetailedSensor>selectedSensor];
 
       // TODO: This should all be in the sensor plugin instead
       const sensorInfoTitleDom = getEl('sensor-info-title', true);
 
       if (sensorInfoTitleDom) {
-        sensorInfoTitleDom.innerHTML = `<a href=''>${this.currentSensors[0].name}</a>`;
+        // User-typed name: build the link with textContent so markup in the name is never parsed
+        const titleLink = document.createElement('a');
+
+        titleLink.href = '';
+        titleLink.textContent = this.currentSensors[0].name;
+        sensorInfoTitleDom.replaceChildren(titleLink);
         const url = this.currentSensors[0]?.url;
 
         if (url && url.length > 0) {

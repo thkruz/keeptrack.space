@@ -1,3 +1,5 @@
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { hasBottomIcon, hasHelp, hasSecondaryMenu, hasSideMenu } from '@app/engine/plugins/core/plugin-capabilities';
@@ -5,7 +7,7 @@ import { getEl } from '@app/engine/utils/get-el';
 import { DebrisScreening } from '@app/plugins/debris-screening/debris-screening';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import type { DsResultRow } from '@app/webworker/debris-screening-messages';
-import { Satellite } from '@ootk/src/main';
+import { CatalogScreener, EpochUTC, Satellite, ScreeningResult } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
@@ -233,5 +235,99 @@ describe('DebrisScreening_follows_selection', () => {
 
     expect((getEl('ds-scc') as HTMLInputElement).value).toBe('25544');
     expect((plugin as unknown as Internals).rows_).toHaveLength(1);
+  });
+});
+
+describe('DebrisScreening_recent_runs', () => {
+  let plugin: DebrisScreening;
+
+  /** A screener result shaped like ootk's (only the fields toRow_ reads). */
+  const fakeResult = (primaryId: string, secondaryId: string, pc: number): ScreeningResult =>
+    ({
+      primaryId,
+      secondaryId,
+      riskScore: 0.5,
+      event: {
+        tca: EpochUTC.fromDateTime(new Date(Date.UTC(2022, 0, 1, 1))),
+        missDistance: 0.5,
+        radialDistance: 0.1,
+        intrackDistance: 0.2,
+        crosstrackDistance: 0.1,
+        relativeVelocity: 7,
+        probabilityOfCollision: pc,
+      },
+    }) as unknown as ScreeningResult;
+
+  /** Run the synchronous screening path for one primary, with the screener stubbed. */
+  const runScreening = (sccNum: string, id: number, hours = 72): void => {
+    const sat = new Satellite({ ...defaultSat, id, sccNum });
+    const catalog = ServiceLocator.getCatalogManager();
+
+    vi.spyOn(catalog, 'sccNum2Id').mockReturnValue(id as never);
+    vi.spyOn(catalog, 'getObject').mockReturnValue(sat as never);
+    catalog.objectCache = [] as never;
+    vi.spyOn(CatalogScreener, 'screenOneToMany').mockReturnValue([fakeResult(sccNum, `S${sccNum}`, 1e-5)]);
+    (getEl('ds-scc') as HTMLInputElement).value = sccNum;
+    (getEl('ds-time') as HTMLInputElement).value = String(hours);
+
+    plugin.onFormSubmit();
+    vi.advanceTimersByTime(1000);
+  };
+
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager]);
+    plugin = new DebrisScreening();
+    websiteInit(plugin);
+    vi.spyOn(plugin as unknown as { calculateCovarianceFromSatellite: () => unknown }, 'calculateCovarianceFromSatellite').mockReturnValue(undefined);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('retains two runs newest first with their primary ids and windows', () => {
+    const startMs = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
+
+    runScreening('25544', 0, 24);
+    runScreening('43013', 1, 48);
+
+    const runs = plugin.getRecentScreeningRuns();
+
+    expect(runs.map((run) => run.primaryId)).toEqual(['43013', '25544']);
+    expect(runs[0].rows.map((row) => row.secondaryId)).toEqual(['S43013']);
+    expect(runs[1].rows.map((row) => row.secondaryId)).toEqual(['S25544']);
+    expect(runs[1].startTimeMs).toBe(startMs);
+    expect(runs[1].endTimeMs).toBe(startMs + 24 * 3600 * 1000);
+    expect(runs[0].endTimeMs! - runs[0].startTimeMs!).toBe(48 * 3600 * 1000);
+  });
+
+  it('evicts the oldest run once a sixth run completes', () => {
+    ['10001', '10002', '10003', '10004', '10005', '10006'].forEach((scc, i) => {
+      runScreening(scc, i + 10);
+    });
+
+    const runs = plugin.getRecentScreeningRuns();
+
+    expect(runs).toHaveLength(DebrisScreening.MAX_RETAINED_RUNS);
+    expect(runs.map((run) => run.primaryId)).toEqual(['10006', '10005', '10004', '10003', '10002']);
+  });
+
+  it('keeps the run history when the target change clears the results table', () => {
+    runScreening('25544', 0);
+
+    (plugin as unknown as { onTargetChanged_: () => void }).onTargetChanged_();
+
+    expect((plugin as unknown as { rows_: unknown[] }).rows_).toHaveLength(0);
+    expect(plugin.getRecentScreeningRuns()).toHaveLength(1);
+    expect(plugin.getRecentScreeningRuns()[0].rows).toHaveLength(1);
+  });
+
+  it('is reachable through PluginRegistry, the way the Reports plugin reads it', () => {
+    runScreening('25544', 0);
+
+    const registered = PluginRegistry.getPlugin(DebrisScreening);
+
+    expect(registered).toBe(plugin);
+    expect(registered!.getRecentScreeningRuns()[0].primaryId).toBe('25544');
   });
 });

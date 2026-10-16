@@ -41,6 +41,20 @@ interface AnalystLineage {
   derivedFrom?: unknown;
 }
 
+/**
+ * One completed screening run, as returned by
+ * `DebrisScreening.getRecentScreeningRuns()` (read duck-typed by the Reports plugin).
+ */
+export interface DebrisScreeningRun {
+  /** Screening key of the primary (its NORAD number when it has one). */
+  primaryId: string;
+  /** Screened window start, ms since the Unix epoch (null when unknown). */
+  startTimeMs: number | null;
+  /** Screened window end, ms since the Unix epoch (null when unknown). */
+  endTimeMs: number | null;
+  rows: DsResultRow[];
+}
+
 export class DebrisScreening extends KeepTrackPlugin {
   readonly id = 'DebrisScreening';
   dependencies_ = [SelectSatManager.name];
@@ -74,6 +88,15 @@ export class DebrisScreening extends KeepTrackPlugin {
   protected isParentRowShown_ = false;
   /** Last rows/count passed to renderRows_, so the parent toggle can re-render. */
   private lastRender_: { rows: DsResultRow[]; countText?: string } = { rows: [] };
+  /**
+   * Completed screening runs, newest first, capped at MAX_RETAINED_RUNS. Kept
+   * across target changes so the Reports plugin can diff a parent's run
+   * against its analyst clone's run.
+   */
+  private recentRuns_: DebrisScreeningRun[] = [];
+
+  /** How many completed runs getRecentScreeningRuns() retains. */
+  static readonly MAX_RETAINED_RUNS = 5;
 
   isRequireSatelliteSelected = true;
   isIconDisabledOnLoad = true;
@@ -421,6 +444,27 @@ export class DebrisScreening extends KeepTrackPlugin {
    * stale results (table, count, and CSV export source). Subclasses with
    * in-flight screening runs override this to cancel them as well.
    */
+  /**
+   * The last MAX_RETAINED_RUNS completed screening runs, newest first. Each
+   * entry holds its own copy of the rows, so later runs never mutate it.
+   */
+  getRecentScreeningRuns(): readonly DebrisScreeningRun[] {
+    return this.recentRuns_;
+  }
+
+  /** Retain a completed run for getRecentScreeningRuns(), evicting the oldest past the cap. */
+  protected recordScreeningRun_(primary: Satellite, startTimeMs: number | null, endTimeMs: number | null, rows: readonly DsResultRow[]): void {
+    this.recentRuns_ = [
+      {
+        primaryId: DebrisScreening.screeningKey(primary),
+        startTimeMs,
+        endTimeMs,
+        rows: rows.map((row) => ({ ...row })),
+      },
+      ...this.recentRuns_,
+    ].slice(0, DebrisScreening.MAX_RETAINED_RUNS);
+  }
+
   protected onTargetChanged_(): void {
     this.rows_ = [];
     this.renderRows_(this.rows_);
@@ -642,8 +686,10 @@ export class DebrisScreening extends KeepTrackPlugin {
       });
 
       // Build screening options
-      const startTime = EpochUTC.fromDateTime(timeManager.simulationTimeObj);
-      const endTime = EpochUTC.fromDateTime(new Date(timeManager.simulationTimeObj.getTime() + timeVal * 3600 * 1000));
+      const startTimeMs = timeManager.simulationTimeObj.getTime();
+      const endTimeMs = startTimeMs + timeVal * 3600 * 1000;
+      const startTime = EpochUTC.fromDateTime(new Date(startTimeMs));
+      const endTime = EpochUTC.fromDateTime(new Date(endTimeMs));
 
       try {
         const allResults = CatalogScreener.screenOneToMany(primary, secondaries, {
@@ -658,6 +704,8 @@ export class DebrisScreening extends KeepTrackPlugin {
           .sort((a, b) => b.event.probabilityOfCollision! - a.event.probabilityOfCollision!)
           .slice(0, 100)
           .map((result) => DebrisScreening.toRow_(result));
+
+        this.recordScreeningRun_(sat, startTimeMs, endTimeMs, this.rows_);
 
         this.renderRows_(this.rows_);
         this.openSecondaryMenu();

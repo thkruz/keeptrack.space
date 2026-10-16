@@ -137,6 +137,8 @@ export class ColorSchemeManager {
   /** Selected/hover sats reflected in the last upload, to detect per-frame changes. */
   private lastUploadedSelSat_ = -2;
   private lastUploadedHovSat_ = -2;
+  /** Secondary sat reflected in the last upload; its scheme color is restored when it changes. */
+  private lastUploadedSecSat_ = -2;
   private hasRegisteredOffsetListener_ = false;
 
   // ─── Worker Mode ───────────────────────────────────────────────────────
@@ -182,6 +184,7 @@ export class ColorSchemeManager {
     this.isColorBufferDirty_ = true;
     this.lastUploadedSelSat_ = -2;
     this.lastUploadedHovSat_ = -2;
+    this.lastUploadedSecSat_ = -2;
     this.isReady = false;
     this.lastDotColored = 0;
     // Worker will receive new catalog on next onCruncherReady
@@ -1129,9 +1132,24 @@ export class ColorSchemeManager {
   /** Plugin-provided override for selected satellite dot color (e.g. flat map uses red since mesh is hidden). */
   static selectedColorOverride: rgbaArray | null = null;
 
+  /**
+   * Dot color for the secondary object: the secondary orbit color
+   * (orbitSelectColor2) at full opacity, so the dot, its orbit line, and the
+   * primary-to-secondary line read as one object distinct from the red primary.
+   */
+  static getSecondarySelectedColor(): rgbaArray {
+    const orbitColor = settingsManager.orbitSelectColor2 ?? [0.0, 0.4, 1.0, 0.9];
+
+    return [orbitColor[0], orbitColor[1], orbitColor[2], 1.0];
+  }
+
   private setSelectedAndHoverBuffer_() {
-    const selSat = PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1;
+    const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);
+    const selSat = selectSatManager?.selectedSat ?? -1;
+    const secSat = selectSatManager?.secondarySat ?? -1;
     const hovSatForDirty = ServiceLocator.getHoverManager().hoveringSat;
+
+    this.setSecondaryBuffer_(secSat, selSat);
 
     // The selected/hover dots are re-written every frame with the same values
     // while the selection is static, so treat only a *change* as a reason to
@@ -1171,6 +1189,59 @@ export class ColorSchemeManager {
     this.colorData[hovSatNum * 4 + 1] = settingsManager.hoverColor[1]; // G
     this.colorData[hovSatNum * 4 + 2] = settingsManager.hoverColor[2]; // B
     this.colorData[hovSatNum * 4 + 3] = settingsManager.hoverColor[3];
+  }
+
+  /**
+   * Paint the secondary object's dot with the secondary color. When the
+   * secondary changes, the previous one gets its scheme color back right away
+   * instead of waiting for the next recolor pass. The primary and the hovered
+   * dot are written after this, so both still win over the secondary color.
+   */
+  private setSecondaryBuffer_(secSat: number, selSat: number): void {
+    const dotCount = this.colorData.length / 4;
+
+    if (secSat !== this.lastUploadedSecSat_) {
+      const previous = this.lastUploadedSecSat_;
+
+      this.isColorBufferDirty_ = true;
+      this.lastUploadedSecSat_ = secSat;
+
+      if (previous >= 0 && previous < dotCount && previous !== selSat) {
+        this.restoreSchemeColor_(previous);
+      }
+    }
+
+    if (secSat < 0 || secSat >= dotCount || secSat === selSat) {
+      return;
+    }
+
+    const color = ColorSchemeManager.getSecondarySelectedColor();
+
+    this.colorData[secSat * 4] = color[0]; // R
+    this.colorData[secSat * 4 + 1] = color[1]; // G
+    this.colorData[secSat * 4 + 2] = color[2]; // B
+    this.colorData[secSat * 4 + 3] = color[3]; // A
+  }
+
+  /** Re-apply the active scheme's color to one dot (used when it stops being the secondary). */
+  private restoreSchemeColor_(id: number): void {
+    const obj = ServiceLocator.getCatalogManager().getObject(id);
+
+    if (!obj || !this.currentColorScheme) {
+      return;
+    }
+
+    try {
+      const color = this.currentColorScheme.update(obj).color;
+
+      this.colorData[id * 4] = color[0];
+      this.colorData[id * 4 + 1] = color[1];
+      this.colorData[id * 4 + 2] = color[2];
+      this.colorData[id * 4 + 3] = color[3];
+    } catch (e) {
+      // A scheme that cannot color this object leaves it for the next recolor pass.
+      errorManagerInstance.debug(e);
+    }
   }
 
   // ─── Color Worker Integration ────────────────────────────────────────

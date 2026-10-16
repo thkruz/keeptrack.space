@@ -27,6 +27,18 @@
         "sunEclipse": {
           "name": "Analisi Sole/eclissi",
           "description": "Genera la visibilità del sole e gli orari di ingresso/uscita dall'eclissi per analisi di potenza e termiche"
+        },
+        "conjunction": {
+          "name": "Rapporto di congiunzione",
+          "description": "Massimo avvicinamento tra l'oggetto primario e il secondario: TCA, distanza minima, RIC, velocità relativa, Pc con i suoi input e la geometria relativa attorno al TCA"
+        },
+        "maneuver": {
+          "name": "Rapporto di manovra",
+          "description": "Confronta un satellite analista creato con lo strumento di manovra con l'oggetto padre: accensioni, elementi medi prima e dopo, e gli eventi di screening che la manovra introduce o rimuove"
+        },
+        "screeningCompare": {
+          "name": "Confronta le ultime due esecuzioni di screening",
+          "description": "Confronta le due esecuzioni più recenti di Debris Screening: eventi introdotti, rimossi e invariati"
         }
       },
       "commands": {
@@ -39,7 +51,8 @@
       "sections": {
         "orbitPosition": "Orbita e posizione",
         "sensor": "Sensore",
-        "options": "Opzioni di output"
+        "options": "Opzioni di output",
+        "conjunction": "Congiunzione e manovra"
       },
       "options": {
         "window": "Finestra temporale",
@@ -49,7 +62,9 @@
         "seconds": "{seconds} s",
         "format_text": "Testo (allineato)",
         "format_csv": "CSV",
-        "format_json": "JSON"
+        "format_json": "JSON",
+        "conjWindow": "Finestra di ricerca della congiunzione",
+        "plusMinusHours": "±{hours} h ({span} h in totale)"
       },
       "help": {
         "overview": "Il menu Rapporti genera rapporti testuali sul satellite selezionato: geometria dei passaggi, posizione nel tempo, elementi orbitali, finestre di visibilità e analisi delle eclissi. Ogni rapporto si apre in una finestra dedicata, formattato in modo ordinato con un pulsante di download, pronto da incollare in altri strumenti o da condividere.",
@@ -59,10 +74,20 @@
         "types": "<ul><li><strong>Azimut, elevazione, distanza</strong>: angoli di osservazione dal sensore selezionato durante i prossimi passaggi (richiede un sensore).</li><li><strong>Latitudine, longitudine, altitudine</strong>: la traccia al suolo nel tempo.</li><li><strong>Inerziale geocentrico (ECI)</strong>: vettori di posizione e velocità ECI nel tempo.</li><li><strong>Elementi orbitali classici</strong>: gli elementi kepleriani all'epoca corrente.</li><li><strong>Finestre di visibilità</strong>: orari di sorgere e tramonto con la durata dei passaggi (richiede un sensore).</li><li><strong>Analisi Sole/eclissi</strong>: orari di illuminazione solare e di ingresso e uscita dall'eclissi, utili per i lavori di potenza e termici.</li></ul>",
         "howToUse": "<ol><li>Seleziona un satellite; l'icona in basso è disabilitata finché non ne viene selezionato uno.</li><li>Per i rapporti basati sul sensore, seleziona anche un sensore.</li><li>Apri <strong>Rapporti</strong> dalla barra inferiore e fai clic sul pulsante di un rapporto. Il rapporto si apre in una finestra popup.</li><li>Usa il pulsante di download nella finestra del rapporto per salvarlo come file di testo.</li></ol>",
         "tip1": "I rapporti coprono diversi giorni di dati; la generazione può richiedere alcuni secondi per i rapporti basati sui passaggi.",
-        "tip2": "Se la finestra del rapporto non appare, il solito colpevole è il blocco popup del browser; consenti i popup per questo sito."
+        "tip2": "Se la finestra del rapporto non appare, il solito colpevole è il blocco popup del browser; consenti i popup per questo sito.",
+        "conjunctionHeading": "Rapporti di congiunzione e manovra",
+        "conjunction": "<ul><li><strong>Rapporto di congiunzione</strong>: richiede un oggetto primario e uno secondario. Trova il massimo avvicinamento nella finestra attorno all'ora corrente e riporta TCA, distanza minima, R/I/C con segno (secondario meno primario, nel sistema del primario), velocità relativa, Pc con raggio del corpo rigido e fonte della covarianza, e la geometria relativa da 5 minuti prima a 5 minuti dopo il TCA.</li><li><strong>Rapporto di manovra</strong>: seleziona un satellite analista creato con lo strumento di manovra. Riporta le accensioni, gli elementi medi prima e dopo e, dopo aver eseguito Debris Screening per il padre e per il satellite analista, gli eventi che la manovra introduce, rimuove o lascia invariati.</li><li><strong>Confronta le ultime due esecuzioni di screening</strong>: confronta le due esecuzioni più recenti di Debris Screening.</li></ul>L'output JSON di questi rapporti è lo stato di analisi completo leggibile da macchina."
       },
       "errorMsgs": {
-        "notSupportedForObject": "Questo report non è disponibile per l’oggetto selezionato."
+        "notSupportedForObject": "Questo report non è disponibile per l’oggetto selezionato.",
+        "generationFailed": "Generazione del rapporto non riuscita",
+        "parentNotFound": "L'oggetto padre {scc} non è nel catalogo"
+      },
+      "reasons": {
+        "selectSecondary": "Seleziona prima un oggetto secondario",
+        "selectAnalyst": "Seleziona un satellite analista creato con lo strumento di manovra",
+        "needTwoRuns": "Esegui prima Debris Screening almeno due volte",
+        "screeningRunsMissing": "Confronto di screening non disponibile: esegui Debris Screening per {parent} e per {analyst} sulla stessa finestra, poi genera di nuovo questo rapporto."
       }
     }
   }

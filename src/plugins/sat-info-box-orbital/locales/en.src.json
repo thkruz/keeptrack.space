@@ -52,6 +52,10 @@
       "label": "Velocity",
       "tooltip": "Current Velocity of the Satellite (Higher the Closer to Earth it Is)"
     },
+    "GPEpoch": {
+      "label": "GP Epoch",
+      "tooltip": "Epoch of the element set used for propagation"
+    },
     "AgeOfGP": {
       "label": "Age of GP",
       "tooltip": "Time Since Official Orbit Calculated (Older GP Data is Less Accurate Usually)",

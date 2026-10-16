@@ -52,6 +52,10 @@
       "label": "Rychlost",
       "tooltip": "Aktuální rychlost satelitu (čím blíže k Zemi, tím vyšší)"
     },
+    "GPEpoch": {
+      "label": "Epocha GP",
+      "tooltip": "Epocha sady elementů použité pro propagaci"
+    },
     "AgeOfGP": {
       "label": "Stáří GP",
       "tooltip": "Čas od výpočtu oficiální dráhy (starší data GP jsou obvykle méně přesná)",

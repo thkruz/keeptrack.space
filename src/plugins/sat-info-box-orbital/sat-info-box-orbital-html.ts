@@ -15,6 +15,7 @@ export const EL = {
   MEAN_ANOMALY: 'sat-meanAnomaly',
   APOGEE: 'sat-apogee',
   PERIGEE: 'sat-perigee',
+  GP_EPOCH: 'sat-gp-epoch',
   ELSET_AGE: 'sat-elset-age',
   UNCERTAINTY_RADIAL: 'sat-uncertainty-radial',
   UNCERTAINTY_INTRACK: 'sat-uncertainty-intrack',

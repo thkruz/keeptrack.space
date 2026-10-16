@@ -15,7 +15,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, eci2lla, Kilometers, MINUTES_PER_DAY, Satellite } from '@ootk/src/main';
+import { BaseObject, eci2lla, Kilometers, MINUTES_PER_DAY, Satellite, Tle, TleLine1 } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -80,21 +80,18 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       { key: t7e('SatInfoBoxOrbital.Altitude.label'), id: EL.ALTITUDE, tooltip: t7e('SatInfoBoxOrbital.Altitude.tooltip'), value: 'xxx km' },
       { key: t7e('SatInfoBoxOrbital.Period.label'), id: EL.PERIOD, tooltip: t7e('SatInfoBoxOrbital.Period.tooltip'), value: 'xxx min' },
       { key: t7e('SatInfoBoxOrbital.Velocity.label'), id: EL.VELOCITY, tooltip: t7e('SatInfoBoxOrbital.Velocity.tooltip'), value: 'xxx km/s' },
+      { key: t7e('SatInfoBoxOrbital.GPEpoch.label'), id: EL.GP_EPOCH, tooltip: t7e('SatInfoBoxOrbital.GPEpoch.tooltip'), value: 'xxxx-xx-xx xx:xx:xx UTC' },
       { key: t7e('SatInfoBoxOrbital.AgeOfGP.label'), id: EL.ELSET_AGE, tooltip: t7e('SatInfoBoxOrbital.AgeOfGP.tooltip'), value: 'xxx.xxxx' },
       { key: t7e('SatInfoBoxOrbital.RadialSigma.label'), id: EL.UNCERTAINTY_RADIAL, tooltip: t7e('SatInfoBoxOrbital.RadialSigma.tooltip'), value: 'xxx.xxxx' },
       { key: t7e('SatInfoBoxOrbital.InTrackSigma.label'), id: EL.UNCERTAINTY_INTRACK, tooltip: t7e('SatInfoBoxOrbital.InTrackSigma.tooltip'), value: 'xxx.xxxx' },
       { key: t7e('SatInfoBoxOrbital.CrossTrackSigma.label'), id: EL.UNCERTAINTY_CROSSTRACK, tooltip: t7e('SatInfoBoxOrbital.CrossTrackSigma.tooltip'), value: 'xxx.xxxx' },
     ];
 
-    if (!settingsManager.plugins.SatInfoBoxOrbital!.isShowCovariance) {
-      /*
-       * Remove the covariance rows (Radial Sigma, In Track Sigma, Cross Track Sigma) if the setting is disabled
-       * These rows are at indices 12, 13, and 14 in the 'rows' array
-       */
-      rows.splice(12, 3);
-    }
+    const covarianceIds: string[] = [EL.UNCERTAINTY_RADIAL, EL.UNCERTAINTY_INTRACK, EL.UNCERTAINTY_CROSSTRACK];
+    // Drop the covariance rows (Radial, In Track, Cross Track Sigma) when the setting is disabled
+    const visibleRows = settingsManager.plugins.SatInfoBoxOrbital!.isShowCovariance ? rows : rows.filter((row) => !covarianceIds.includes(row.id));
 
-    return rows
+    return visibleRows
       .map(
         (row) => html`
         <div class="sat-info-row sat-only-info">
@@ -122,6 +119,9 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     } else if (obj instanceof OemSatellite) {
       this.updateOemOrbitalElements_(obj);
     }
+
+    // Only objects propagated from a GP element set (TLE) have a GP epoch; OEM, missiles, etc. show N/A
+    setInnerHtml(EL.GP_EPOCH, obj instanceof Satellite ? SatInfoBoxOrbital.formatGpEpoch(obj.tle1) : 'N/A');
 
     if (this.updateAltitudeAndVelocity_(obj) === false) {
       return;
@@ -174,6 +174,31 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
         `${t7e('SatInfoBoxOrbital.AgeOfGP.epochYear')}: ${obj.tle1.substring(18, 20)}<br/>
            ${t7e('SatInfoBoxOrbital.AgeOfGP.epochDay')}: ${obj.tle1.substring(20, 28)}`
       );
+    }
+  }
+
+  /**
+   * Formats the epoch of a GP element set as `YYYY-MM-DD HH:MM:SS UTC`, or 'N/A' when the TLE has no parsable epoch.
+   * Uses the same 57 year pivot as {@link Tle.calcElsetAge}, which drives the Age of GP row.
+   */
+  static formatGpEpoch(tle1: TleLine1 | undefined | null): string {
+    if (typeof tle1 !== 'string' || tle1.length < 32) {
+      return 'N/A';
+    }
+
+    try {
+      const year = Tle.epochYearFull(tle1);
+      const dayOfYear = Tle.epochDay(tle1);
+      // Round to the millisecond so float noise cannot turn :38.000 into :37.999
+      const epochMs = Math.round(Date.UTC(year, 0, 1) + (dayOfYear - 1) * 86400000);
+
+      if (!Number.isFinite(epochMs)) {
+        return 'N/A';
+      }
+
+      return `${new Date(epochMs).toISOString().slice(0, 19).replace('T', ' ')} UTC`;
+    } catch {
+      return 'N/A';
     }
   }
 

@@ -52,6 +52,10 @@
       "label": "Velocità",
       "tooltip": "Velocità attuale del satellite (più alta quanto più è vicino alla Terra)"
     },
+    "GPEpoch": {
+      "label": "Epoca GP",
+      "tooltip": "Epoca del set di elementi usato per la propagazione"
+    },
     "AgeOfGP": {
       "label": "Età del GP",
       "tooltip": "Tempo trascorso dal calcolo ufficiale dell'orbita (dati GP più vecchi sono generalmente meno precisi)",

@@ -52,6 +52,10 @@
       "label": "Geschwindigkeit",
       "tooltip": "Aktuelle Geschwindigkeit des Satelliten (höher, je näher an der Erde)"
     },
+    "GPEpoch": {
+      "label": "GP-Epoche",
+      "tooltip": "Epoche des für die Propagation verwendeten Elementsatzes"
+    },
     "AgeOfGP": {
       "label": "Alter der GP",
       "tooltip": "Zeit seit offizieller Umlaufbahnberechnung (ältere GP-Daten sind meist weniger genau)",

@@ -52,6 +52,10 @@
       "label": "Prędkość",
       "tooltip": "Bieżąca prędkość satelity (większa im bliżej Ziemi)"
     },
+    "GPEpoch": {
+      "label": "Epoka GP",
+      "tooltip": "Epoka zestawu elementów użytego do propagacji"
+    },
     "AgeOfGP": {
       "label": "Wiek param. orb.",
       "tooltip": "Czas od oficjalnego obliczenia orbity (starsze dane są zwykle mniej dokładne)",

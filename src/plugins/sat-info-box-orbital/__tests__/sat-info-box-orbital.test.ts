@@ -201,3 +201,63 @@ describe('SatInfoBoxOrbital secondary range after a time change', () => {
     expect(shownKm).toBeCloseTo(secondary.toRIC(primary, t1).range, 2);
   });
 });
+
+/**
+ * Scenario 1 step 1: the info box showed Age of GP but not the epoch itself. The GP Epoch row shows the element
+ * set epoch in UTC for TLE-backed objects and N/A for everything else.
+ */
+describe('SatInfoBoxOrbital GP Epoch row', () => {
+  let plugin: SatInfoBoxOrbital;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const p = () => plugin as any;
+
+  // LANDSAT 8, epoch 22221.78099992 = 2022-08-09 18:44:38.39 UTC
+  const landsat8 = new Satellite({
+    ...defaultSat,
+    id: 0,
+    tle1: '1 39084U 13008A   22221.78099992  .00000176  00000-0  49109-4 0  9999' as TleLine1,
+    tle2: '2 39084  98.2218 291.8538 0001250  87.1898 272.9450 14.57107856500507' as TleLine2,
+  });
+
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager, SatInfoBox]);
+    ServiceLocator.getTimeManager().simulationTimeObj = new Date(Date.UTC(2022, 7, 10));
+    plugin = new SatInfoBoxOrbital();
+    websiteInit(plugin);
+    document.body.innerHTML = p().createOrbitalSection();
+    // setInnerHtml defers through requestIdleCallback; run it synchronously so the row text is observable
+    vi.stubGlobal('requestIdleCallback', (cb: IdleRequestCallback) => cb({ didTimeout: false, timeRemaining: () => 50 }));
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it('renders the GP Epoch row next to Age of GP', () => {
+    const rows = p().createOrbitalDataRows() as string;
+
+    expect(rows).toContain(`id="${EL.GP_EPOCH}"`);
+    expect(rows.indexOf(EL.GP_EPOCH)).toBeLessThan(rows.indexOf(EL.ELSET_AGE));
+  });
+
+  it('shows the TLE epoch in UTC for a TLE-backed satellite', () => {
+    p().updateOrbitData_(landsat8);
+
+    expect(getEl(EL.GP_EPOCH)!.textContent).toBe('2022-08-09 18:44:38 UTC');
+  });
+
+  it('shows N/A for an object without a TLE', () => {
+    const missile = { isSatellite: () => false, isMissile: () => true, totalVelocity: 7.5 };
+
+    p().updateOrbitData_(missile);
+
+    expect(getEl(EL.GP_EPOCH)!.textContent).toBe('N/A');
+  });
+
+  it('formatGpEpoch handles the 57 year pivot and bad input', () => {
+    expect(SatInfoBoxOrbital.formatGpEpoch('1 00005U 58002B   58001.50000000  .00000023  00000-0  28098-4 0  4753' as TleLine1)).toBe('1958-01-01 12:00:00 UTC');
+    expect(SatInfoBoxOrbital.formatGpEpoch(undefined)).toBe('N/A');
+    expect(SatInfoBoxOrbital.formatGpEpoch('1 garbage' as TleLine1)).toBe('N/A');
+  });
+});

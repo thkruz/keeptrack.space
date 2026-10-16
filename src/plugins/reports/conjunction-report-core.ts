@@ -48,6 +48,7 @@ import {
 } from '@app/engine/conjunction/analysis-state';
 import { findApproachMinima } from '@app/engine/conjunction/conjunction-tca';
 import { ConjunctionAssessment, cappedScreeningCovarianceFromTle, EpochUTC, Kilometers, RIC, Satellite, Seconds, StateCovariance } from '@ootk/src/main';
+import { screeningSigmasKm } from '../sat-info-box-orbital/screening-sigmas';
 import { formatReportTime, ReportData, ReportTable, tleEpochFromLine1 } from './reports-core';
 import { formatPc, riskLevelFromPc } from './screening-diff';
 
@@ -70,6 +71,12 @@ const PC_REFINE_HALF_WIDTH_SEC = 60;
 const SCREENING_SIGMA_CAPS_KM: [number, number, number] = [35, 71, 32];
 
 const MS_PER_HOUR = 3_600_000;
+
+/**
+ * Objects-table sigma row label. The sigmas are not aged to TCA: they are the TLE-epoch values of
+ * the model Pc uses, the same numbers the orbital info box shows.
+ */
+export const SIGMA_ROW_LABEL = '1-sigma R / I / C (km, own RIC frame, at TLE epoch)';
 
 /** App-side context every analysis needs. */
 export interface AnalysisEnv {
@@ -126,14 +133,15 @@ const screeningCovariance = (sat: Satellite, k: number): StateCovariance | null 
   }
 };
 
-/** 1-sigma R/I/C position uncertainty (km) from a covariance's diagonal. */
-const ricSigmas = (cov: StateCovariance | null): RicVector | null => {
-  if (!cov) {
-    return null;
-  }
-  const el = cov.matrix.elements;
+/**
+ * 1-sigma R/I/C position uncertainty (km, own RIC frame, at the TLE epoch). Same helper the
+ * orbital info box uses, so the two always print the same numbers. Always k = 1: the Pc
+ * computation applies the confidence level k separately (see the Pc inputs block).
+ */
+const ricSigmas = (sat: Satellite): RicVector | null => {
+  const s = screeningSigmasKm(sat.tle1, sat.tle2);
 
-  return { radial: Math.sqrt(el[0][0]), intrack: Math.sqrt(el[1][1]), crosstrack: Math.sqrt(el[2][2]) };
+  return s ? { radial: s.radial, intrack: s.inTrack, crosstrack: s.crossTrack } : null;
 };
 
 /** TLE (SGP4 mean) elements, read from the satellite the same way the info box does. */
@@ -192,7 +200,7 @@ export const buildObjectSummary = (sat: Satellite, role: AnalysisObjectRole, env
     cosparId: sat.intlDes || null,
     tleEpochIso: epoch ? epoch.toISOString() : null,
     gpAgeHours: epoch ? (env.analysisEpoch.getTime() - epoch.getTime()) / MS_PER_HOUR : null,
-    ricSigmasKm: ricSigmas(screeningCovariance(sat, env.covarianceConfidenceLevel)),
+    ricSigmasKm: ricSigmas(sat),
     meanElements: meanElementsOf(sat),
     isAnalystObject: parent !== null,
     derivedFromNoradId: parent,
@@ -391,7 +399,7 @@ const objectsTable = (objects: AnalysisObjectSummary[]): ReportTable => {
       ['COSPAR ID', ...cell((o) => o.cosparId ?? 'None')],
       ['TLE Epoch (UTC)', ...cell((o) => fmtIsoTime(o.tleEpochIso))],
       ['GP Age', ...cell((o) => fmtAge(o.gpAgeHours))],
-      ['1-sigma R / I / C (km)', ...cell((o) => fmtSigmas(o.ricSigmasKm))],
+      [SIGMA_ROW_LABEL, ...cell((o) => fmtSigmas(o.ricSigmasKm))],
       ['Derived From', ...cell((o) => o.derivedFromNoradId ?? '-')],
     ],
   };

@@ -184,6 +184,16 @@ describe('Maneuver Report', () => {
     expect(validateConjunctionAnalysisState(JSON.parse(JSON.stringify(state)))).toEqual([]);
   });
 
+  it('prints a 5 cm/s burn as 0.0500 m/s, the same string the Pro burn history shows', () => {
+    const burns = [
+      { epochIso: '2022-08-09T20:00:00.000Z', frame: 'ric' as const, inputDeltaVMs: [0, 0.05, 0] as [number, number, number], magnitudeMs: 0.05, source: 'manual', label: null },
+    ];
+    const text = buildDownloadPayload(generateManeuverReport({ parent: landsat8, analyst, env, burns, screeningDiff: null }), 'text').content;
+
+    expect(text).toContain('Burns (total 0.0500 m/s)');
+    expect(text).toContain('+0.0000, +0.0500, +0.0000   0.0500');
+  });
+
   it('says burn parameters are unavailable when no burn history is found', () => {
     const data = generateManeuverReport({ parent: landsat8, analyst, env, burns: null, screeningDiff: diff });
     const text = buildDownloadPayload(data, 'text').content;

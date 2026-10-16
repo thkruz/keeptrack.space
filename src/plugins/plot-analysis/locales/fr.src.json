@@ -113,7 +113,9 @@
         "distanceAxis": "Distance (km)",
         "empty": "Sélectionnez un satellite primaire et un secondaire",
         "unitKm": "km",
-        "unitMin": "min"
+        "unitMin": "min",
+        "relSpeed": "Vit. relative",
+        "unitKmS": "km/s"
       },
       "help": {
         "overview": "La trace RIC montre le mouvement relatif entre deux satellites dans le repère radial, le long de la trace et transverse (RIC), centré sur le satellite principal. C'est la vue standard pour les rendez-vous, le vol en formation et l'analyse des approches rapprochées : la trajectoire du satellite secondaire est dessinée telle qu'elle est vue depuis le principal.",

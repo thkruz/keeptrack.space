@@ -113,7 +113,9 @@
         "distanceAxis": "Odległość (km)",
         "empty": "Wybierz satelitę główną i drugorzędną",
         "unitKm": "km",
-        "unitMin": "min"
+        "unitMin": "min",
+        "relSpeed": "Prędk. względna",
+        "unitKmS": "km/s"
       },
       "help": {
         "overview": "Wykres RIC pokazuje ruch względny dwóch satelitów w układzie składowych promieniowej, wzdłuż toru i w poprzek toru (RIC), o środku w satelicie głównym. To standardowy widok dla spotkań orbitalnych, lotu w formacji i analizy bliskich zbliżeń: trasa satelity dodatkowego jest rysowana tak, jak widzi ją satelita główny.",

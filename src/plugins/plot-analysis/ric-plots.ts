@@ -1,3 +1,4 @@
+import { SatMath } from '@app/app/analysis/sat-math';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -22,7 +23,7 @@ import './ric-plots.css';
 export class RicPlot extends KeepTrackPlugin {
   readonly id = 'RicPlot';
   dependencies_: string[] = [SelectSatManager.name];
-  private readonly selectSatManager_: SelectSatManager;
+  protected readonly selectSatManager_: SelectSatManager;
 
   constructor() {
     super();
@@ -62,7 +63,7 @@ export class RicPlot extends KeepTrackPlugin {
   static readonly DEFAULT_ORBITS = 5;
   orbitsSelectId = 'ric-orbits-select';
   assessmentId = 'ric-assessment';
-  private orbits_ = RicPlot.DEFAULT_ORBITS;
+  protected orbits_ = RicPlot.DEFAULT_ORBITS;
 
   getHelpConfig(): IHelpConfig {
     return {
@@ -163,6 +164,8 @@ export class RicPlot extends KeepTrackPlugin {
       empty: t7e('plugins.RicPlot.chart.empty'),
       unitKm: t7e('plugins.RicPlot.chart.unitKm'),
       unitMin: t7e('plugins.RicPlot.chart.unitMin'),
+      relSpeed: t7e('plugins.RicPlot.chart.relSpeed'),
+      unitKmS: t7e('plugins.RicPlot.chart.unitKmS'),
     };
   }
 
@@ -190,7 +193,7 @@ export class RicPlot extends KeepTrackPlugin {
   }
 
   /** Fill the header with the two satellite numbers and the relationship badge. */
-  private updateInfo_(points: RicPoint[]): void {
+  protected updateInfo_(points: RicPoint[]): void {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const satP = catalogManagerInstance.getObject(this.selectSatManager_.selectedSat) as Satellite | null;
     const satS = this.selectSatManager_.secondarySatObj;
@@ -290,6 +293,7 @@ export class RicPlot extends KeepTrackPlugin {
       // so the time axis matches the propagated samples and spans the full 5-orbit window.
       const offsetMin = (idx * satS.period * NUMBER_OF_ORBITS) / NUMBER_OF_POINTS;
       const range = Math.hypot(point.x, point.y, point.z);
+      const sampleTime = new Date(now + offsetMin * 60 * 1000);
 
       return {
         t: offsetMin,
@@ -297,8 +301,27 @@ export class RicPlot extends KeepTrackPlugin {
         i: point.y,
         c: point.z,
         range,
-        iso: new Date(now + offsetMin * 60 * 1000).toISOString(),
+        iso: sampleTime.toISOString(),
+        relSpeed: RicPlot.relativeSpeedKmS(satP, satS, sampleTime),
       };
     });
+  }
+
+  /**
+   * Relative speed |v_secondary - v_primary| (km/s) at a time, from the same SGP4 state the RIC
+   * samples use. Undefined when either propagation fails (SatMath.getEci returns a zero state).
+   */
+  static relativeSpeedKmS(satP: Satellite, satS: Satellite, date: Date): number | undefined {
+    const p = SatMath.getEci(satP, date);
+    const s = SatMath.getEci(satS, date);
+    const isZero = (v: { x: number; y: number; z: number }) => v.x === 0 && v.y === 0 && v.z === 0;
+
+    if (!p?.velocity || !s?.velocity || isZero(p.position) || isZero(s.position)) {
+      return undefined;
+    }
+
+    const speed = Math.hypot(s.velocity.x - p.velocity.x, s.velocity.y - p.velocity.y, s.velocity.z - p.velocity.z);
+
+    return Number.isFinite(speed) ? speed : undefined;
   }
 }

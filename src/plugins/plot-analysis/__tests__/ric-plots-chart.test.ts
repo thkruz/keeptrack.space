@@ -70,6 +70,21 @@ describe('buildRicChartOption', () => {
     expect(tip).toContain('Radial');
   });
 
+  it('adds the relative speed of the hovered sample to the tooltip', () => {
+    const points = POINTS.map((pt, idx) => ({ ...pt, relSpeed: idx === 1 ? 4.2712 : 1 }));
+    const opt = buildRicChartOption(points, { ...LABELS, relSpeed: 'Rel. speed', unitKmS: 'km/s' });
+    const tip = (opt.tooltip as { formatter: (p: unknown) => string }).formatter([{ axisValue: 0.9, dataIndex: 1, value: [0.9, 4], color: '#ff5252', seriesName: 'Radial' }]);
+
+    expect(tip).toContain('Rel. speed: <b>4.271 km/s</b>');
+  });
+
+  it('omits the relative speed row when the sample has none', () => {
+    const opt = buildRicChartOption(POINTS, { ...LABELS, relSpeed: 'Rel. speed', unitKmS: 'km/s' });
+    const tip = (opt.tooltip as { formatter: (p: unknown) => string }).formatter([{ axisValue: 0.9, dataIndex: 1, value: [0.9, 4], color: '#ff5252', seriesName: 'Radial' }]);
+
+    expect(tip).not.toContain('Rel. speed');
+  });
+
   it('links the x-axes so zooming time stays in sync', () => {
     const opt = buildRicChartOption(POINTS, LABELS);
     const zoom = opt.dataZoom as { xAxisIndex: number[] }[];

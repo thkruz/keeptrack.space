@@ -113,7 +113,9 @@
         "distanceAxis": "Distancia (km)",
         "empty": "Seleccione un satélite primario y uno secundario",
         "unitKm": "km",
-        "unitMin": "min"
+        "unitMin": "min",
+        "relSpeed": "Vel. relativa",
+        "unitKmS": "km/s"
       },
       "help": {
         "overview": "El gráfico RIC muestra el movimiento relativo entre dos satélites en el marco Radial, A lo Largo de la Trayectoria y Transversal (RIC), centrado en el primario. Es la vista estándar para encuentros orbitales, vuelo en formación y análisis de aproximaciones cercanas: la trayectoria del satélite secundario se dibuja tal como se ve desde el primario.",

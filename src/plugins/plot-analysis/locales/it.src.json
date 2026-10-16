@@ -113,7 +113,9 @@
         "distanceAxis": "Distanza (km)",
         "empty": "Seleziona un satellite primario e uno secondario",
         "unitKm": "km",
-        "unitMin": "min"
+        "unitMin": "min",
+        "relSpeed": "Vel. relativa",
+        "unitKmS": "km/s"
       },
       "help": {
         "overview": "Il grafico RIC mostra il moto relativo tra due satelliti nel riferimento radiale, lungo traccia e fuori traccia (RIC), centrato sul satellite primario. È la vista standard per rendezvous, volo in formazione e analisi degli avvicinamenti ravvicinati: il percorso del satellite secondario è disegnato come visto dal primario.",

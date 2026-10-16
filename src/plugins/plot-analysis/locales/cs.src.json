@@ -113,7 +113,9 @@
         "distanceAxis": "Vzdálenost (km)",
         "empty": "Vyberte primární a sekundární satelit",
         "unitKm": "km",
-        "unitMin": "min"
+        "unitMin": "min",
+        "relSpeed": "Rel. rychlost",
+        "unitKmS": "km/s"
       },
       "help": {
         "overview": "Graf RIC zobrazuje relativní pohyb dvou satelitů v soustavě radiální, podélné a příčné složky (RIC) se středem v primárním satelitu. Je to standardní pohled pro sbližování, let ve formaci a analýzu blízkých přiblížení: dráha sekundárního satelitu je vykreslena tak, jak ji vidí primární.",

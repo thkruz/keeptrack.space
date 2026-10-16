@@ -113,7 +113,9 @@
         "distanceAxis": "Distance (km)",
         "empty": "Select a primary and a secondary satellite",
         "unitKm": "km",
-        "unitMin": "min"
+        "unitMin": "min",
+        "relSpeed": "Rel. speed",
+        "unitKmS": "km/s"
       },
       "help": {
         "overview": "The RIC plot shows the relative motion between two satellites in the Radial, In-Track, Cross-Track frame centered on the primary. It is the standard view for rendezvous, formation flying, and close approach analysis: the secondary satellite's offset from the primary is plotted over time.",

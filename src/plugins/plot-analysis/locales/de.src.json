@@ -113,7 +113,9 @@
         "distanceAxis": "Distanz (km)",
         "empty": "Wählen Sie einen Primär- und einen Sekundärsatelliten aus",
         "unitKm": "km",
-        "unitMin": "min"
+        "unitMin": "min",
+        "relSpeed": "Rel. Geschw.",
+        "unitKmS": "km/s"
       },
       "help": {
         "overview": "Das RIC-Diagramm zeigt die Relativbewegung zwischen zwei Satelliten im radial, entlang der Bahn und quer zur Bahn ausgerichteten Bezugssystem (RIC), zentriert auf den Primärsatelliten. Es ist die Standardansicht für Rendezvous, Formationsflug und Annäherungsanalysen: Die Bahn des Sekundärsatelliten wird so dargestellt, wie sie vom Primärsatelliten aus erscheint.",

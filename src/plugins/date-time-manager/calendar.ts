@@ -6,6 +6,8 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { setInnerHtml } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
+import './date-time-manager.css';
+import { formatUtcDateTime, parseUtcDateTime } from './parse-utc-date-time';
 
 const dt = (key: string) => t7e(`plugins.DateTimeManager.${key}` as Parameters<typeof t7e>[0]);
 
@@ -21,6 +23,11 @@ export class Calendar {
   // PropRate Slider limits
   private readonly propRateLimitMin = -20;
   private readonly propRateLimitMax = 20;
+
+  /** Year dropdown range (Sputnik onward); the typed-entry field reaches any other year. */
+  private static readonly YEAR_SELECT_MIN_ = 1957;
+  private static readonly YEAR_SELECT_FUTURE_SPAN_ = 30;
+  static readonly GOTO_INPUT_ID = 'calendar-datetime-input';
 
   constructor(containerId: string) {
     this.containerId = containerId;
@@ -61,9 +68,18 @@ export class Calendar {
           <span class="ui-icon ui-icon-circle-triangle-e">${dt('next')}</span>
         </a>
         <div class="ui-datepicker-title">
-          <span class="ui-datepicker-month">${this.getUTCMonthName(this.calendarDate.getUTCMonth())}</span>&nbsp;
-          <span class="ui-datepicker-year">${this.calendarDate.getUTCFullYear()}</span>
+          <select class="ui-datepicker-month browser-default" data-handler="selectMonth" data-event="change" aria-label="${dt('calendar.month')}">
+            ${this.renderMonthOptions_()}
+          </select>
+          <select class="ui-datepicker-year browser-default" data-handler="selectYear" data-event="change" aria-label="${dt('calendar.year')}">
+            ${this.renderYearOptions_()}
+          </select>
         </div>
+      </div>
+      <div class="ui-datepicker-goto">
+        <label for="${Calendar.GOTO_INPUT_ID}" class="ui-datepicker-goto-label">${dt('calendar.goTo')}</label>
+        <input id="${Calendar.GOTO_INPUT_ID}" type="text" class="ui-datepicker-goto-input browser-default keyboard-priority" spellcheck="false" autocomplete="off"
+          placeholder="YYYY-MM-DD HH:MM:SS" value="${formatUtcDateTime(this.simulationDate)}" kt-tooltip="${dt('calendar.goToTooltip')}" />
       </div>
       <table class="ui-datepicker-calendar">
         <thead>
@@ -110,6 +126,25 @@ export class Calendar {
     if (nextButton) {
       nextButton.addEventListener('click', this.goToNextMonth.bind(this));
     }
+
+    document.querySelector('#ui-datepicker-div select.ui-datepicker-month')?.addEventListener('change', (e) => {
+      this.jumpToMonthYear_(parseInt((e.target as HTMLSelectElement).value, 10), this.calendarDate.getUTCFullYear());
+    });
+    document.querySelector('#ui-datepicker-div select.ui-datepicker-year')?.addEventListener('change', (e) => {
+      this.jumpToMonthYear_(this.calendarDate.getUTCMonth(), parseInt((e.target as HTMLSelectElement).value, 10));
+    });
+
+    const gotoInput = document.getElementById(Calendar.GOTO_INPUT_ID) as HTMLInputElement | null;
+
+    gotoInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        this.applyTypedDateTime_(gotoInput);
+      } else if (e.key === 'Escape') {
+        gotoInput.value = formatUtcDateTime(this.simulationDate);
+        gotoInput.classList.remove('invalid');
+      }
+    });
 
     document.querySelectorAll('#ui-datepicker-div td[data-handler="selectDay"]').forEach((td) => {
       td.addEventListener('click', (event) => this.selectDay(event));
@@ -456,16 +491,79 @@ export class Calendar {
     return dayNames[dayIndex];
   }
 
-  private goToPreviousMonth(): void {
-    this.calendarDate.setMonth(this.calendarDate.getUTCMonth() - 1);
+  private renderMonthOptions_(): string {
+    const currentMonth = this.calendarDate.getUTCMonth();
+    let options = '';
+
+    for (let m = 0; m < 12; m++) {
+      options += `<option value="${m}"${m === currentMonth ? ' selected' : ''}>${this.getUTCMonthName(m)}</option>`;
+    }
+
+    return options;
+  }
+
+  private renderYearOptions_(): string {
+    const currentYear = this.calendarDate.getUTCFullYear();
+    const minYear = Math.min(Calendar.YEAR_SELECT_MIN_, currentYear);
+    const maxYear = Math.max(new Date().getUTCFullYear() + Calendar.YEAR_SELECT_FUTURE_SPAN_, currentYear);
+    let options = '';
+
+    for (let y = maxYear; y >= minYear; y--) {
+      options += `<option value="${y}"${y === currentYear ? ' selected' : ''}>${y}</option>`;
+    }
+
+    return options;
+  }
+
+  /**
+   * Moves the visible month without changing the simulation time (same as the
+   * prev/next arrows). Pins the day to the 1st so e.g. Jan 31 -> Feb does not
+   * roll over into March.
+   */
+  private jumpToMonthYear_(month: number, year: number): void {
+    if (!Number.isFinite(month) || !Number.isFinite(year)) {
+      return;
+    }
+
+    // Normalize month overflow (-1 -> previous December) against a fixed base year,
+    // then apply the real year so years 0-99 are not remapped to 1900-1999.
+    const target = new Date(Date.UTC(2000, month, 1));
+
+    target.setUTCFullYear(year + target.getUTCFullYear() - 2000);
+    this.calendarDate = target;
     this.render();
     this.attachEvents();
   }
 
-  private goToNextMonth(): void {
-    this.calendarDate.setMonth(this.calendarDate.getUTCMonth() + 1);
+  /**
+   * Applies the typed UTC date/time from the "Go to" field. Invalid text is
+   * flagged and left in place so the user can correct it.
+   */
+  private applyTypedDateTime_(input: HTMLInputElement): void {
+    const parsed = parseUtcDateTime(input.value);
+
+    if (!parsed) {
+      input.classList.add('invalid');
+      ServiceLocator.getUiManager().toast(dt('calendar.goToInvalid'), ToastMsgType.caution);
+
+      return;
+    }
+
+    input.classList.remove('invalid');
+    this.simulationDate = parsed;
+    this.calendarDate = new Date(parsed);
+    this.datetimeInputFormChange();
+    this.updateTimeInput();
     this.render();
     this.attachEvents();
+  }
+
+  private goToPreviousMonth(): void {
+    this.jumpToMonthYear_(this.calendarDate.getUTCMonth() - 1, this.calendarDate.getUTCFullYear());
+  }
+
+  private goToNextMonth(): void {
+    this.jumpToMonthYear_(this.calendarDate.getUTCMonth() + 1, this.calendarDate.getUTCFullYear());
   }
 
   private selectDay(event: Event): void {
@@ -649,6 +747,14 @@ export class Calendar {
     setInnerHtml('calendar-time-prop-rate', `(x${this.propagationRate.toString()})`);
 
     const timeInput = document.getElementById('calendar-time-input') as HTMLInputElement;
+
+    const gotoInput = document.getElementById(Calendar.GOTO_INPUT_ID) as HTMLInputElement | null;
+
+    // Do not clobber text the user is in the middle of typing.
+    if (gotoInput && document.activeElement !== gotoInput) {
+      gotoInput.value = formatUtcDateTime(this.simulationDate);
+      gotoInput.classList.remove('invalid');
+    }
 
     if (timeInput) {
       timeInput.value = `${this.formatTime(this.simulationDate.getUTCHours(), this.simulationDate.getUTCMinutes(), this.simulationDate.getUTCSeconds())}`;

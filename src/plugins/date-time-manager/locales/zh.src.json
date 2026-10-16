@@ -43,7 +43,12 @@
         "now": "现在",
         "done": "完成",
         "pause": "暂停",
-        "propagation": "传播"
+        "propagation": "传播",
+        "month": "月",
+        "year": "年",
+        "goTo": "跳转到 (UTC)",
+        "goToTooltip": "输入 UTC 日期和时间 (YYYY-MM-DD HH:MM:SS) 并按 Enter。秒和时间可省略。",
+        "goToInvalid": "日期无效。请使用 UTC 格式 YYYY-MM-DD HH:MM:SS。"
       }
     }
   }

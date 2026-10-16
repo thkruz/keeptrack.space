@@ -43,7 +43,12 @@
         "now": "Jetzt",
         "done": "Fertig",
         "pause": "Pause",
-        "propagation": "Ausbreitung"
+        "propagation": "Ausbreitung",
+        "month": "Monat",
+        "year": "Jahr",
+        "goTo": "Gehe zu (UTC)",
+        "goToTooltip": "UTC-Datum und -Uhrzeit eingeben (YYYY-MM-DD HH:MM:SS) und Enter drücken. Sekunden und Uhrzeit sind optional.",
+        "goToInvalid": "Ungültiges Datum. UTC-Format YYYY-MM-DD HH:MM:SS verwenden."
       }
     }
   }

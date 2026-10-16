@@ -1,0 +1,58 @@
+/* Clock date picker: month/year dropdowns in the header and a typed UTC "Go to" row. */
+#ui-datepicker-div .ui-datepicker-title {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+
+#ui-datepicker-div .ui-datepicker-title select.ui-datepicker-month,
+#ui-datepicker-div .ui-datepicker-title select.ui-datepicker-year {
+  width: auto;
+  height: 1.7em;
+  padding: 0 2px;
+  cursor: pointer;
+  color: inherit;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+#ui-datepicker-div .ui-datepicker-title select:hover,
+#ui-datepicker-div .ui-datepicker-title select:focus-visible {
+  border-color: currentColor;
+}
+
+#ui-datepicker-div .ui-datepicker-title select option {
+  color: #000;
+  background: #fff;
+}
+
+#ui-datepicker-div .ui-datepicker-goto {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 6px;
+}
+
+#ui-datepicker-div .ui-datepicker-goto-label {
+  flex: 0 0 auto;
+  color: inherit;
+  font-size: 0.85em;
+}
+
+#ui-datepicker-div .ui-datepicker-goto-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 1.8em;
+  padding: 0 4px;
+  font-family: 'Roboto Mono', monospace;
+  color: inherit;
+  background: transparent;
+  border: 1px solid #888;
+  border-radius: 3px;
+}
+
+#ui-datepicker-div .ui-datepicker-goto-input.invalid {
+  border-color: #f44336;
+}

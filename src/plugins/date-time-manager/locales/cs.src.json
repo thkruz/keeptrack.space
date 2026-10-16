@@ -43,7 +43,12 @@
         "now": "Nyní",
         "done": "Hotovo",
         "pause": "Pozastavit",
-        "propagation": "Propagace"
+        "propagation": "Propagace",
+        "month": "Měsíc",
+        "year": "Rok",
+        "goTo": "Přejít na (UTC)",
+        "goToTooltip": "Zadejte datum a čas UTC (YYYY-MM-DD HH:MM:SS) a stiskněte Enter. Sekundy a čas jsou volitelné.",
+        "goToInvalid": "Neplatné datum. Použijte formát UTC YYYY-MM-DD HH:MM:SS."
       }
     }
   }

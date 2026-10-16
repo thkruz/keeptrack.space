@@ -43,7 +43,12 @@
         "now": "Сейчас",
         "done": "Готово",
         "pause": "Пауза",
-        "propagation": "Пропагирование"
+        "propagation": "Пропагирование",
+        "month": "Месяц",
+        "year": "Год",
+        "goTo": "Перейти (UTC)",
+        "goToTooltip": "Введите дату и время UTC (YYYY-MM-DD HH:MM:SS) и нажмите Enter. Секунды и время необязательны.",
+        "goToInvalid": "Неверная дата. Используйте формат UTC YYYY-MM-DD HH:MM:SS."
       }
     }
   }

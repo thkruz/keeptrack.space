@@ -43,7 +43,12 @@
         "now": "Adesso",
         "done": "Fatto",
         "pause": "Pausa",
-        "propagation": "Propagazione"
+        "propagation": "Propagazione",
+        "month": "Mese",
+        "year": "Anno",
+        "goTo": "Vai a (UTC)",
+        "goToTooltip": "Digita una data e un'ora UTC (YYYY-MM-DD HH:MM:SS) e premi Invio. Secondi e ora sono facoltativi.",
+        "goToInvalid": "Data non valida. Usa il formato UTC YYYY-MM-DD HH:MM:SS."
       }
     }
   }

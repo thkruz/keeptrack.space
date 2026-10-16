@@ -43,7 +43,12 @@
         "now": "Maintenant",
         "done": "Terminé",
         "pause": "Pause",
-        "propagation": "Propagation orbitale"
+        "propagation": "Propagation orbitale",
+        "month": "Mois",
+        "year": "Année",
+        "goTo": "Aller à (UTC)",
+        "goToTooltip": "Saisissez une date et une heure UTC (YYYY-MM-DD HH:MM:SS) puis appuyez sur Entrée. Les secondes et l'heure sont facultatives.",
+        "goToInvalid": "Date invalide. Utilisez le format UTC YYYY-MM-DD HH:MM:SS."
       }
     }
   }

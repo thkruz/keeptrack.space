@@ -100,7 +100,8 @@ export const buildEventListTable = (events: BreakupEvent[], labels: BreakupLabel
   `;
 };
 
-const infoItem = (label: string, value: string): string => html`
+/** One label/value cell of the info grid (exported so Pro cards match the curated layout). */
+export const infoItem = (label: string, value: string): string => html`
   <div class="breakup-info-item">
     <span class="breakup-info-label">${label}</span>
     <span class="breakup-info-value">${value}</span>
@@ -124,13 +125,16 @@ export const buildEventInfoCard = (event: BreakupEvent, yearsToBreakup: string, 
   </section>
 `;
 
-export const buildStatsCard = (summary: EventSummary, labels: BreakupLabels): string => {
-  const { tracked, estimated, trackingRatio, counts, altStats, eccStats, incStats } = summary;
-  const typeValue = `${counts.payloads.toString()} / ${counts.rocketBodies.toString()} / ${counts.debris.toString()}`;
+/**
+ * The min/max/mean/spread dispersion table for a summary, or the empty-state
+ * note when nothing is tracked. Shared by the curated stats card and the Pro
+ * live-analysis card.
+ */
+export const buildDispersionTable = (summary: EventSummary, labels: BreakupLabels): string => {
+  const { tracked, altStats, eccStats, incStats } = summary;
 
-  const dispersion =
-    tracked > 0
-      ? html`
+  return tracked > 0
+    ? html`
       <div class="kt-section-label" style="margin-top:12px;">${labels.fragmentDispersion}</div>
       <table class="breakup-dispersion-table center-align">
         <thead>
@@ -174,7 +178,13 @@ export const buildStatsCard = (summary: EventSummary, labels: BreakupLabels): st
         </tbody>
       </table>
     `
-      : html`<p class="ba-empty-state">${labels.noTrackedDebris}</p>`;
+    : html`<p class="ba-empty-state">${labels.noTrackedDebris}</p>`;
+};
+
+export const buildStatsCard = (summary: EventSummary, labels: BreakupLabels): string => {
+  const { tracked, estimated, trackingRatio, counts } = summary;
+  const typeValue = `${counts.payloads.toString()} / ${counts.rocketBodies.toString()} / ${counts.debris.toString()}`;
+  const dispersion = buildDispersionTable(summary, labels);
 
   return html`
     <section class="kt-section breakup-stats-card">

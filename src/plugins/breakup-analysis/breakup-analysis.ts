@@ -12,9 +12,10 @@ import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
 import { Satellite } from '@ootk/src/main';
 import scatterPlotPng from '@public/img/icons/scatter-plot.png';
+import type { EChartsCoreOption } from 'echarts';
 import * as echarts from 'echarts';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { buildCsvRows, buildGabbardData, calcYearsBetween, FragmentSortKey, SortDir, sortFragments, summarizeEvent } from './breakup-analysis-core';
+import { buildCsvRows, buildGabbardData, calcYearsBetween, FragmentSortKey, GabbardData, SortDir, sortFragments, summarizeEvent } from './breakup-analysis-core';
 import { BreakupLabels, buildEventInfoCard, buildEventListTable, buildFragmentTable, buildStatsCard, FRAGMENT_DEFAULT_MAX_ROWS } from './breakup-analysis-table';
 import './breakup-analysis.css';
 import { BREAKUP_EVENTS, BreakupEvent } from './breakup-events';
@@ -28,11 +29,11 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
   readonly id = 'BreakupAnalysis';
   dependencies_ = [];
 
-  private selectedEventId_: string | null = null;
-  private debrisResults_: Satellite[] = [];
-  private sortKey_: FragmentSortKey = 'perigee';
-  private sortDir_: SortDir = 'asc';
-  private showAllFragments_ = false;
+  protected selectedEventId_: string | null = null;
+  protected debrisResults_: Satellite[] = [];
+  protected sortKey_: FragmentSortKey = 'perigee';
+  protected sortDir_: SortDir = 'asc';
+  protected showAllFragments_ = false;
   /** Search limit before this plugin bumped it, so it can be restored. null when not bumped. */
   private priorSearchLimit_: number | null = null;
   private gabbardChart_: echarts.ECharts | null = null;
@@ -119,7 +120,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
   // Localized labels
   // =========================================================================
 
-  private getLabels_(): BreakupLabels {
+  protected getLabels_(): BreakupLabels {
     const l = (key: string) => t7e(`plugins.BreakupAnalysis.${key}` as Parameters<typeof t7e>[0]);
 
     return {
@@ -228,6 +229,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
       <div id="breakup-analysis-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div id="breakup-analysis-content" class="side-menu">
           <div id="breakup-analysis-event-list">
+            ${this.buildEventListPrefixHtml_()}
             <section class="kt-section">
               <div class="kt-section-label">${s('events')}</div>
               ${buildEventListTable(BREAKUP_EVENTS, labels)}
@@ -265,6 +267,15 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
     `;
   }
 
+  /**
+   * Extra cards rendered above the curated event list (inside the list view,
+   * so they hide with it when a detail view opens). Empty in OSS; the Pro
+   * subclass injects its live-analysis entry points here.
+   */
+  protected buildEventListPrefixHtml_(): string {
+    return '';
+  }
+
   // =========================================================================
   // Event selection and analysis
   // =========================================================================
@@ -284,7 +295,11 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
 
     this.renderEventDetail_(event);
     this.filterDebrisOnGlobe_();
+    this.showDetailView_();
+  }
 
+  /** Swap the menu from the event list to the (already rendered) detail view. */
+  protected showDetailView_(): void {
     const listEl = getEl('breakup-analysis-event-list', true);
     const detailEl = getEl('breakup-analysis-detail', true);
 
@@ -296,7 +311,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
     }
   }
 
-  private showEventList_(): void {
+  protected showEventList_(): void {
     this.selectedEventId_ = null;
     this.debrisResults_ = [];
     this.disposeChart_();
@@ -312,6 +327,11 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
     }
 
     this.restoreSearchLimit_();
+    this.resetGlobeSearch_();
+  }
+
+  /** Clear the globe search when returning to the event list. */
+  protected resetGlobeSearch_(): void {
     ServiceLocator.getUiManager().doSearch('');
   }
 
@@ -341,7 +361,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
     return results;
   }
 
-  private filterDebrisOnGlobe_(): void {
+  protected filterDebrisOnGlobe_(): void {
     if (this.debrisResults_.length === 0) {
       return;
     }
@@ -403,7 +423,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
     statsEl.innerHTML = buildStatsCard(summarizeEvent(event, this.debrisResults_), labels);
   }
 
-  private renderDispersion_(): void {
+  protected renderDispersion_(): void {
     const dispEl = getEl('breakup-analysis-dispersion', true);
 
     if (!dispEl) {
@@ -430,7 +450,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
     );
   }
 
-  private renderGabbard_(): void {
+  protected renderGabbard_(): void {
     const section = getEl('breakup-analysis-gabbard-section', true);
     const chartDom = getEl('breakup-analysis-gabbard', true);
 
@@ -449,13 +469,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
 
     section.style.display = 'block';
 
-    const g = (key: string) => t7e(`plugins.BreakupAnalysis.gabbard.${key}` as Parameters<typeof t7e>[0]);
-    const option = buildGabbardOption(data, {
-      apogee: g('apogee'),
-      perigee: g('perigee'),
-      periodAxis: g('periodAxis'),
-      altitudeAxis: g('altitudeAxis'),
-    });
+    const option = this.buildGabbardOption_(data);
 
     // Defer init + setOption to the next frame: the card was switched to
     // display:block in this same tick, so measuring now gives a near-zero width
@@ -477,6 +491,18 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
 
       this.gabbardChart_.setOption(option, true);
       this.gabbardChart_.resize();
+    });
+  }
+
+  /** Build the Gabbard chart option for a data set (Pro overlays the parent marker). */
+  protected buildGabbardOption_(data: GabbardData): EChartsCoreOption {
+    const g = (key: string) => t7e(`plugins.BreakupAnalysis.gabbard.${key}` as Parameters<typeof t7e>[0]);
+
+    return buildGabbardOption(data, {
+      apogee: g('apogee'),
+      perigee: g('perigee'),
+      periodAxis: g('periodAxis'),
+      altitudeAxis: g('altitudeAxis'),
     });
   }
 
@@ -536,7 +562,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
   // =========================================================================
 
   /** Jump the simulation clock to the event's breakup date, preserving playback state. */
-  private jumpToBreakupDate_(): void {
+  protected jumpToBreakupDate_(): void {
     const event = BREAKUP_EVENTS.find((e) => e.id === this.selectedEventId_);
 
     if (!event) {
@@ -553,7 +579,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
   }
 
   /** Select the parent object on the globe if it is present in the catalog. */
-  private selectParent_(): void {
+  protected selectParent_(): void {
     const event = BREAKUP_EVENTS.find((e) => e.id === this.selectedEventId_);
 
     if (!event) {
@@ -569,7 +595,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
     }
   }
 
-  private exportCsv_(): void {
+  protected exportCsv_(): void {
     if (this.debrisResults_.length === 0) {
       ServiceLocator.getUiManager().toast(t7e('plugins.BreakupAnalysis.errorMsgs.noDataToExport' as Parameters<typeof t7e>[0]), ToastMsgType.caution);
 
@@ -582,7 +608,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
     saveCsv(buildCsvRows(this.debrisResults_), name);
   }
 
-  private updateShowAllButton_(): void {
+  protected updateShowAllButton_(): void {
     const btn = getEl('breakup-analysis-showall-btn', true);
     const labelEl = btn?.querySelector('.kt-action-label');
 

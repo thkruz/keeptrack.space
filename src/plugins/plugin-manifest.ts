@@ -414,6 +414,8 @@ export const pluginManifest: PluginDescriptor[] = [
     configKey: 'BreakupAnalysis',
     ossImport: () => import('./breakup-analysis/breakup-analysis'),
     ossClassName: 'BreakupAnalysis',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/breakup-analysis-pro/breakup-analysis-pro') : undefined,
+    proClassName: 'BreakupAnalysisPro',
     defaultConfig: { enabled: true, order: 74 },
   },
   {

@@ -129,9 +129,16 @@ export const countByType = (sats: Satellite[]): TypeCounts => {
 };
 
 /** Aggregate every statistic the detail panel needs for one event + its tracked fragments. */
-export const summarizeEvent = (event: BreakupEvent, sats: Satellite[]): EventSummary => {
+export const summarizeEvent = (event: BreakupEvent, sats: Satellite[]): EventSummary => summarizeFragments(sats, event.estimatedDebrisCount);
+
+/**
+ * Aggregate the detail-panel statistics for any fragment set. `estimated` is
+ * the expected total debris count (0 when unknown, which reports a 0 ratio).
+ * {@link summarizeEvent} is this with the curated event's estimate, so a live
+ * (uncurated) set gets exactly the same dispersion math.
+ */
+export const summarizeFragments = (sats: Satellite[], estimated = 0): EventSummary => {
   const tracked = sats.length;
-  const estimated = event.estimatedDebrisCount;
 
   return {
     tracked,

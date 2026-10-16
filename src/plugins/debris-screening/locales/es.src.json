@@ -31,18 +31,21 @@
       "clearBox": "Borrar Caja",
       "table": {
         "secondary": "Secundario",
+        "secondaryName": "Nombre secundario",
         "tca": "TCA",
         "missKm": "Distancia (km)",
         "rKm": "R (km)",
         "iKm": "I (km)",
         "cKm": "C (km)",
+        "relVelocity": "Vel. relativa (km/s)",
         "pc": "Pc",
         "risk": "Riesgo"
       },
       "errorMsgs": {
         "InvalidSatellite": "Satélite seleccionado no válido",
         "ScreeningFailed": "El análisis falló",
-        "NoResultsToExport": "Sin resultados para exportar"
+        "NoResultsToExport": "Sin resultados para exportar",
+        "SecondaryNotSelectable": "No se puede seleccionar {id}: no está en el catálogo cargado. El reloj salta igualmente a su TCA."
       },
       "help": {
         "overview": "La Detección de Escombros ejecuta una evaluación de conjunciones del satélite seleccionado contra el resto del catálogo. Encuentra cada objeto que entra en una caja de cribado definida alrededor del satélite durante la ventana de tiempo elegida y luego clasifica los encuentros por probabilidad de colisión.",
@@ -61,7 +64,13 @@
         "parameters": "Parámetros",
         "searchBox": "Cuadro de búsqueda RIC",
         "results": "Resultados"
-      }
+      },
+      "ricConvention": "RIC = secundario menos primario, en el marco RIC del primario.",
+      "ricMagnitudes": "Las columnas R/I/C muestran magnitudes; el cuadro de información muestra los valores con signo.",
+      "pcInputs": "Entradas de Pc: radio de cuerpo rígido {hbr} m ({primary} m primario + {secondary} m secundario) para cada par. Covarianza: estimada a partir del TLE de cada objeto (el modelo de las sigmas del cuadro de información, a {sigma} sigma), no de un CDM.",
+      "parentTag": "origen de este satélite de analista",
+      "showParentRows": "Mostrar fila de origen ({count})",
+      "notInCatalog": "(no está en el catálogo cargado)"
     }
   }
 }

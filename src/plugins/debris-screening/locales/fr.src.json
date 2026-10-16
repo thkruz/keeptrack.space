@@ -31,18 +31,21 @@
       "clearBox": "Effacer la boîte",
       "table": {
         "secondary": "Secondaire",
+        "secondaryName": "Nom secondaire",
         "tca": "TCA",
         "missKm": "Distance (km)",
         "rKm": "R (km)",
         "iKm": "I (km)",
         "cKm": "C (km)",
+        "relVelocity": "Vit. relative (km/s)",
         "pc": "Pc",
         "risk": "Risque"
       },
       "errorMsgs": {
         "InvalidSatellite": "Satellite sélectionné invalide",
         "ScreeningFailed": "Échec de l'analyse",
-        "NoResultsToExport": "Aucun résultat à exporter"
+        "NoResultsToExport": "Aucun résultat à exporter",
+        "SecondaryNotSelectable": "Impossible de sélectionner {id} : absent du catalogue chargé. L'horloge saute quand même à son TCA."
       },
       "help": {
         "overview": "La Détection de Débris exécute une évaluation de conjonctions du satellite sélectionné par rapport au reste du catalogue. Elle trouve chaque objet qui entre dans une boîte de criblage définie autour du satellite pendant la fenêtre temporelle choisie, puis classe les rencontres par probabilité de collision.",
@@ -61,7 +64,13 @@
         "parameters": "Paramètres",
         "searchBox": "Zone de recherche RIC",
         "results": "Résultats"
-      }
+      },
+      "ricConvention": "RIC = secondaire moins primaire, dans le repère RIC du primaire.",
+      "ricMagnitudes": "Les colonnes R/I/C affichent des valeurs absolues ; l'encadré d'informations affiche les valeurs signées.",
+      "pcInputs": "Entrées du Pc : rayon de corps dur {hbr} m ({primary} m primaire + {secondary} m secondaire) pour chaque paire. Covariance : estimée à partir du TLE de chaque objet (le modèle des sigmas de l'encadré d'informations, à {sigma} sigma), et non d'un CDM.",
+      "parentTag": "parent de ce satellite d'analyste",
+      "showParentRows": "Afficher la ligne parente ({count})",
+      "notInCatalog": "(absent du catalogue chargé)"
     }
   }
 }

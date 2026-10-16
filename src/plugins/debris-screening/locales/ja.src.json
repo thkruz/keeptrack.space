@@ -31,18 +31,21 @@
       "clearBox": "ボックス消去",
       "table": {
         "secondary": "セカンダリ",
+        "secondaryName": "副対象名",
         "tca": "TCA",
         "missKm": "ミス距離 (km)",
         "rKm": "R (km)",
         "iKm": "I (km)",
         "cKm": "C (km)",
+        "relVelocity": "相対速度 (km/s)",
         "pc": "Pc",
         "risk": "リスク"
       },
       "errorMsgs": {
         "InvalidSatellite": "無効な衛星が選択されました",
         "ScreeningFailed": "スクリーニング失敗",
-        "NoResultsToExport": "エクスポートする結果がありません"
+        "NoResultsToExport": "エクスポートする結果がありません",
+        "SecondaryNotSelectable": "{id} を選択できません: 読み込んだカタログにありません。時刻はTCAへ移動します。"
       },
       "help": {
         "overview": "デブリスクリーニングは、選択した衛星をカタログ内の他のすべての物体と照合してコンジャンクション評価を実行します。選択した時間ウィンドウの間に、衛星の周囲に定義したスクリーニングボックスに入るすべての物体を見つけ出し、接近イベントを衝突確率順に並べます。",
@@ -61,7 +64,13 @@
         "parameters": "パラメータ",
         "searchBox": "RIC検索ボックス",
         "results": "結果"
-      }
+      },
+      "ricConvention": "RIC = 副対象 − 主対象（主対象のRIC座標系）。",
+      "ricMagnitudes": "R/I/C列は絶対値を表示します。符号付きの値は情報ボックスに表示されます。",
+      "pcInputs": "Pcの入力: 剛体半径 {hbr} m（主対象 {primary} m + 副対象 {secondary} m、全ペア共通）。共分散: 各物体のTLEから推定（情報ボックスのシグマと同じモデル、{sigma} シグマ）。CDMは使用していません。",
+      "parentTag": "この解析用衛星の元の物体",
+      "showParentRows": "元の物体の行を表示 ({count})",
+      "notInCatalog": "（読み込んだカタログにありません）"
     }
   }
 }

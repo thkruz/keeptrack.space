@@ -31,18 +31,21 @@
       "clearBox": "Box löschen",
       "table": {
         "secondary": "Sekundärobjekt",
+        "secondaryName": "Name Sekundärobjekt",
         "tca": "TCA",
         "missKm": "Fehlabstand (km)",
         "rKm": "R (km)",
         "iKm": "I (km)",
         "cKm": "C (km)",
+        "relVelocity": "Rel. Geschw. (km/s)",
         "pc": "Pc",
         "risk": "Risiko"
       },
       "errorMsgs": {
         "InvalidSatellite": "Ungültiger Satellit ausgewählt",
         "ScreeningFailed": "Screening fehlgeschlagen",
-        "NoResultsToExport": "Keine Ergebnisse zum Exportieren"
+        "NoResultsToExport": "Keine Ergebnisse zum Exportieren",
+        "SecondaryNotSelectable": "{id} kann nicht ausgewählt werden: nicht im geladenen Katalog. Die Uhr springt trotzdem zur TCA."
       },
       "help": {
         "overview": "Das Trümmer-Screening führt eine Konjunktionsbewertung des ausgewählten Satelliten gegen den Rest des Katalogs durch. Es findet jedes Objekt, das während des gewählten Zeitfensters in eine um den Satelliten definierte Screening-Box eintritt, und ordnet die Begegnungen nach Kollisionswahrscheinlichkeit.",
@@ -61,7 +64,13 @@
         "parameters": "Parameter",
         "searchBox": "RIC-Suchbereich",
         "results": "Ergebnisse"
-      }
+      },
+      "ricConvention": "RIC = Sekundärobjekt minus Primärobjekt, im RIC-System des Primärobjekts.",
+      "ricMagnitudes": "Die Spalten R/I/C zeigen Beträge; die Infobox zeigt die vorzeichenbehafteten Werte.",
+      "pcInputs": "Pc-Eingaben: Hard-Body-Radius {hbr} m ({primary} m primär + {secondary} m sekundär) für jedes Paar. Kovarianz: aus dem TLE jedes Objekts geschätzt (dasselbe Modell wie die Sigmas der Infobox, {sigma} Sigma), nicht aus einer CDM.",
+      "parentTag": "Ursprung dieses Analystensatelliten",
+      "showParentRows": "Ursprungszeile anzeigen ({count})",
+      "notInCatalog": "(nicht im geladenen Katalog)"
     }
   }
 }

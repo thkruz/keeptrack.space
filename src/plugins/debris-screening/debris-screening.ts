@@ -27,6 +27,20 @@ interface RiskLevel {
 /** Shorthand for this plugin's locale keys. */
 const l = (key: string): string => t7e(`plugins.DebrisScreening.${key}` as Parameters<typeof t7e>[0]);
 
+/** Quote a CSV field when it contains a delimiter, quote, or newline. */
+const csvField = (value: string): string => (/[",\n]/u.test(value) ? `"${value.replace(/"/gu, '""')}"` : value);
+
+/**
+ * Fields an analyst satellite may carry to name the catalog object it was
+ * derived from. The maneuver plugin writes `derivedFromSccNum`; the other two
+ * are accepted aliases. Read duck-typed so this works with any producer.
+ */
+interface AnalystLineage {
+  derivedFromSccNum?: unknown;
+  parentSccNum?: unknown;
+  derivedFrom?: unknown;
+}
+
 export class DebrisScreening extends KeepTrackPlugin {
   readonly id = 'DebrisScreening';
   dependencies_ = [SelectSatManager.name];
@@ -35,10 +49,31 @@ export class DebrisScreening extends KeepTrackPlugin {
   protected readonly sideMenuName_ = 'debris-screening-menu';
   protected readonly secondaryMenuName_ = 'debris-screening-results';
 
+  /**
+   * Hard-body radii (km) used for every screened pair; no per-object size data
+   * is used. Both screening paths read these, and the results footnote prints
+   * them, so the on-screen Pc inputs can never drift from the computation.
+   */
+  static readonly PRIMARY_HARD_BODY_RADIUS_KM = 0.01;
+  static readonly SECONDARY_HARD_BODY_RADIUS_KM = 0.005;
+
   // Normalized screening results (top 100, sorted by Pc desc) - the single
   // source of truth for both the results table and the CSV export. The sync
   // and Pro worker paths both populate this same shape.
   protected rows_: DsResultRow[] = [];
+
+  /**
+   * Screening key (the row's `secondaryId`) to catalog id, recorded when the
+   * secondaries are gathered. Lets a row select objects that have no NORAD
+   * number (JSC Vimpel) and pins duplicate-sccNum entries to the screened one.
+   */
+  protected secondaryIdMap_ = new Map<string, number>();
+  /** Screening keys of the primary's parent objects (analyst satellite lineage). */
+  protected lineageKeys_ = new Set<string>();
+  /** Whether rows for the primary's parent object are shown (hidden by default). */
+  protected isParentRowShown_ = false;
+  /** Last rows/count passed to renderRows_, so the parent toggle can re-render. */
+  private lastRender_: { rows: DsResultRow[]; countText?: string } = { rows: [] };
 
   isRequireSatelliteSelected = true;
   isIconDisabledOnLoad = true;
@@ -212,8 +247,8 @@ export class DebrisScreening extends KeepTrackPlugin {
   private getSecondaryDragOptions_(): IDragOptions {
     return {
       isDraggable: true,
-      minWidth: 650,
-      maxWidth: 1000,
+      minWidth: 760,
+      maxWidth: 1100,
     };
   }
 
@@ -224,20 +259,30 @@ export class DebrisScreening extends KeepTrackPlugin {
           <div class="kt-section-label">${l('sections.results')}</div>
           <div class="ds-header-row">
             <span id="${this.formPrefix_}-results-count" class="ds-results-count">${l('resultsCount').replace('{count}', '0')}</span>
+            <label id="${this.formPrefix_}-parent-toggle" class="ds-parent-toggle" style="display: none;">
+              <input id="${this.formPrefix_}-show-parent" type="checkbox" class="filled-in" />
+              <span id="${this.formPrefix_}-show-parent-label">${l('showParentRows').replace('{count}', '0')}</span>
+            </label>
             <button id="${this.secondaryMenuName_}-export" class="btn btn-ui waves-effect waves-light btn-small">
               <i class="material-icons left">file_download</i>${l('exportCsv')}
             </button>
+          </div>
+          <div class="ds-notes">
+            <div id="${this.formPrefix_}-ric-convention" class="kt-note ds-note">${l('ricConvention')} ${l('ricMagnitudes')}</div>
+            <div id="${this.formPrefix_}-pc-inputs" class="kt-note ds-note">${this.pcInputsText_()}</div>
           </div>
           <div class="ds-table-container">
             <table id="${this.formPrefix_}-results-table" class="striped highlight">
               <thead>
                 <tr>
                   <th>${l('table.secondary')}</th>
+                  <th>${l('table.secondaryName')}</th>
                   <th>${l('table.tca')}</th>
                   <th>${l('table.missKm')}</th>
                   <th>${l('table.rKm')}</th>
                   <th>${l('table.iKm')}</th>
                   <th>${l('table.cKm')}</th>
+                  <th>${l('table.relVelocity')}</th>
                   <th>${l('table.pc')}</th>
                   <th>${l('table.risk')}</th>
                 </tr>
@@ -277,8 +322,24 @@ export class DebrisScreening extends KeepTrackPlugin {
           content: l('help.howToUse'),
         },
       ],
-      tips: [l('help.tip1'), l('help.tip2'), l('help.tip3')],
+      tips: [l('help.tip1'), l('help.tip2'), l('help.tip3'), l('ricConvention')],
     };
+  }
+
+  /**
+   * Footnote naming the Pc inputs, built from the same constants and setting
+   * the screening paths use (hard-body radii, covariance confidence level).
+   */
+  protected pcInputsText_(): string {
+    const primaryM = DebrisScreening.PRIMARY_HARD_BODY_RADIUS_KM * 1000;
+    const secondaryM = DebrisScreening.SECONDARY_HARD_BODY_RADIUS_KM * 1000;
+    const sigma = settingsManager.covarianceConfidenceLevel;
+
+    return l('pcInputs')
+      .replace('{hbr}', (primaryM + secondaryM).toString())
+      .replace('{primary}', primaryM.toString())
+      .replace('{secondary}', secondaryM.toString())
+      .replace('{sigma}', (typeof sigma === 'number' ? sigma : 1).toString());
   }
 
   // =========================================================================
@@ -319,6 +380,11 @@ export class DebrisScreening extends KeepTrackPlugin {
         if (row) {
           this.onResultsRowClick_(row);
         }
+      });
+
+      // "Show parent row" toggle for analyst-satellite screens
+      getEl(`${this.formPrefix_}-show-parent`)?.addEventListener('change', (e: Event) => {
+        this.setParentRowShown_((e.target as HTMLInputElement).checked);
       });
     });
 
@@ -369,16 +435,142 @@ export class DebrisScreening extends KeepTrackPlugin {
    * the base behavior instead of stacking a second listener.
    */
   protected onResultsRowClick_(row: HTMLTableRowElement): void {
-    const secondaryScc = row.dataset.secondaryScc;
     const tcaMs = row.dataset.tcaMs;
 
-    if (secondaryScc) {
-      this.selectSecondarySatelliteByScc_(secondaryScc);
-    }
+    this.selectSecondaryFromRow_(row);
 
     if (tcaMs) {
       jumpToTca(parseInt(tcaMs, 10));
     }
+  }
+
+  /** Show or hide the rows for the primary's parent object and re-render. */
+  protected setParentRowShown_(isShown: boolean): void {
+    this.isParentRowShown_ = isShown;
+    this.renderRows_(this.lastRender_.rows, this.lastRender_.countText);
+  }
+
+  /**
+   * Start a screening run for `primary`: forget the previous run's key map and
+   * record the primary's lineage so its parent's row can be tagged and hidden.
+   */
+  protected beginScreeningRun_(primary: Satellite): void {
+    this.secondaryIdMap_ = new Map();
+    this.lineageKeys_ = this.getLineageSccNums_(primary);
+    this.isParentRowShown_ = false;
+
+    const toggle = getEl(`${this.formPrefix_}-show-parent`, true) as HTMLInputElement | null;
+
+    if (toggle) {
+      toggle.checked = false;
+    }
+  }
+
+  /**
+   * NORAD numbers of the catalog objects the primary was derived from. An
+   * analyst satellite records its parent on the object as `derivedFromSccNum`
+   * (`parentSccNum` and `derivedFrom` are accepted aliases). Subclasses may
+   * add other lineage sources.
+   */
+  protected getLineageSccNums_(primary: Satellite): Set<string> {
+    const keys = new Set<string>();
+    const lineage = primary as unknown as AnalystLineage;
+
+    for (const value of [lineage.derivedFromSccNum, lineage.parentSccNum, lineage.derivedFrom]) {
+      if (typeof value === 'string' && value.length > 0 && value !== primary.sccNum) {
+        keys.add(value);
+      }
+    }
+
+    return keys;
+  }
+
+  /**
+   * Stable key used as the row's `secondaryId`: the NORAD number when the object
+   * has one, else `JSC <altId>` for JSC Vimpel objects, else `#<catalog id>`.
+   */
+  static screeningKey(sat: Satellite): string {
+    if (typeof sat.sccNum === 'string' && sat.sccNum.length > 0 && !/^0+$/u.test(sat.sccNum)) {
+      return sat.sccNum;
+    }
+
+    if (sat.altId) {
+      return `JSC ${sat.altId}`;
+    }
+
+    return `#${sat.id}`;
+  }
+
+  /** Record a secondary for this run and return its screening key. */
+  protected registerSecondary_(sat: Satellite): string {
+    const key = DebrisScreening.screeningKey(sat);
+
+    this.secondaryIdMap_.set(key, sat.id);
+
+    return key;
+  }
+
+  /**
+   * Resolve a row's screening key to a catalog id: first the id recorded at
+   * screening time (verified to still hold the same object), then a NORAD
+   * lookup for keys that are NORAD numbers. Returns null when neither works.
+   */
+  protected resolveSecondaryId_(key: string): number | null {
+    const catalogManager = ServiceLocator.getCatalogManager();
+    const mappedId = this.secondaryIdMap_.get(key);
+
+    if (typeof mappedId === 'number') {
+      const obj = catalogManager.getObject(mappedId, GetSatType.EXTRA_ONLY);
+
+      if (obj instanceof Satellite && DebrisScreening.screeningKey(obj) === key) {
+        return mappedId;
+      }
+    }
+
+    if (key.startsWith('JSC ') || key.startsWith('#')) {
+      return null;
+    }
+
+    // sccNum2Id handles numeric/alpha-5/extended directly.
+    const id = catalogManager.sccNum2Id(key);
+
+    return id !== null && id !== -1 ? id : null;
+  }
+
+  /** Catalog name for a row's secondary, or '' when it can no longer be resolved. */
+  protected secondaryName_(key: string): string {
+    const id = this.resolveSecondaryId_(key);
+
+    if (id === null) {
+      return '';
+    }
+
+    return ServiceLocator.getCatalogManager().getObject(id, GetSatType.EXTRA_ONLY)?.name ?? '';
+  }
+
+  /**
+   * Select the row's secondary object. Rows without a key (none rendered by
+   * this plugin) are ignored; a key that no longer resolves gets a toast that
+   * says why nothing was selected instead of failing silently.
+   */
+  protected selectSecondaryFromRow_(row: HTMLTableRowElement): boolean {
+    const key = row.dataset.secondaryKey ?? row.dataset.secondaryScc ?? '';
+
+    if (!key) {
+      return false;
+    }
+
+    const id = this.resolveSecondaryId_(key);
+
+    if (id === null) {
+      errorManagerInstance.warn(l('errorMsgs.SecondaryNotSelectable').replace('{id}', key));
+
+      return false;
+    }
+
+    PluginRegistry.getPlugin(SelectSatManager)?.setSecondarySat(id);
+
+    return true;
   }
 
   // =========================================================================
@@ -407,11 +599,13 @@ export class DebrisScreening extends KeepTrackPlugin {
 
       const covariance = this.calculateCovarianceFromSatellite(sat);
 
+      this.beginScreeningRun_(sat);
+
       // Build primary CatalogObject
       const primary: CatalogObject = {
         tle: sat.toTle(),
         name: sat.sccNum,
-        radius: 0.01 as Kilometers, // 10m default hard body radius
+        radius: DebrisScreening.PRIMARY_HARD_BODY_RADIUS_KM as Kilometers,
         covariance,
       };
 
@@ -437,8 +631,9 @@ export class DebrisScreening extends KeepTrackPlugin {
 
           secondaries.push({
             tle: secondarySatelliteTle,
-            name: sat2.sccNum,
-            radius: 0.005 as Kilometers, // 5m default
+            // NORAD number, or a display id for objects without one (JSC Vimpel)
+            name: this.registerSecondary_(sat2),
+            radius: DebrisScreening.SECONDARY_HARD_BODY_RADIUS_KM as Kilometers,
             covariance,
           });
         } catch {
@@ -485,12 +680,26 @@ export class DebrisScreening extends KeepTrackPlugin {
       return;
     }
 
-    const headers = ['Secondary', 'TCA (UTC)', 'Miss Distance (km)', 'Radial (km)', 'Intrack (km)', 'Crosstrack (km)', 'Rel Velocity (km/s)', 'Pc', 'Risk Level'];
+    const headers = [
+      'Secondary',
+      'Secondary Name',
+      'TCA (UTC)',
+      'Miss Distance (km)',
+      'Radial (km)',
+      'Intrack (km)',
+      'Crosstrack (km)',
+      'Rel Velocity (km/s)',
+      'Pc',
+      'Risk Level',
+      'Note',
+    ];
+    // Every row is exported, including a hidden parent row (tagged in the Note column).
     const rows = this.rows_.map((row) => {
       const pc = row.probabilityOfCollision ?? undefined;
 
       return [
-        row.secondaryId,
+        csvField(row.secondaryId),
+        csvField(this.secondaryName_(row.secondaryId)),
         this.formatTcaMs_(row.tcaMs),
         row.missDistance.toFixed(6),
         // ootk v8 stores signed RIC components; the columns show magnitudes as before
@@ -500,6 +709,7 @@ export class DebrisScreening extends KeepTrackPlugin {
         row.relativeVelocity.toFixed(6),
         this.formatPc_(pc),
         this.getRiskLevel_(pc).label,
+        this.isParentRow_(row) ? csvField(l('parentTag')) : '',
       ].join(',');
     });
 
@@ -556,6 +766,7 @@ export class DebrisScreening extends KeepTrackPlugin {
    * defaults to the standard "N conjunctions found" message.
    */
   protected renderRows_(rows: DsResultRow[], countText?: string): void {
+    this.lastRender_ = { rows, countText };
     const tbody = getEl(`${this.formPrefix_}-results-body`);
     const countEl = getEl(`${this.formPrefix_}-results-count`);
 
@@ -563,9 +774,11 @@ export class DebrisScreening extends KeepTrackPlugin {
       return;
     }
 
+    const parentRowCount = rows.filter((row) => this.isParentRow_(row)).length;
+    const visibleRows = this.isParentRowShown_ ? rows : rows.filter((row) => !this.isParentRow_(row));
     const fragment = document.createDocumentFragment();
 
-    for (const row of rows) {
+    for (const row of visibleRows) {
       fragment.appendChild(this.createResultRow_(row));
     }
 
@@ -573,7 +786,35 @@ export class DebrisScreening extends KeepTrackPlugin {
     tbody.appendChild(fragment);
 
     if (countEl) {
-      countEl.textContent = countText ?? l('resultsCount').replace('{count}', rows.length.toString());
+      countEl.textContent = countText ?? l('resultsCount').replace('{count}', visibleRows.length.toString());
+    }
+
+    this.updateParentToggle_(parentRowCount);
+
+    const pcInputsEl = getEl(`${this.formPrefix_}-pc-inputs`, true);
+
+    if (pcInputsEl) {
+      // The confidence level is a live setting; keep the footnote in step with it.
+      pcInputsEl.textContent = this.pcInputsText_();
+    }
+  }
+
+  /** True when the row's secondary is a parent of the screened analyst satellite. */
+  protected isParentRow_(row: DsResultRow): boolean {
+    return this.lineageKeys_.has(row.secondaryId);
+  }
+
+  /** Show the "Show parent row" toggle only while the results contain a parent row. */
+  private updateParentToggle_(parentRowCount: number): void {
+    const toggle = getEl(`${this.formPrefix_}-parent-toggle`, true);
+    const label = getEl(`${this.formPrefix_}-show-parent-label`, true);
+
+    if (toggle) {
+      toggle.style.display = parentRowCount > 0 ? '' : 'none';
+    }
+
+    if (label) {
+      label.textContent = l('showParentRows').replace('{count}', parentRowCount.toString());
     }
   }
 
@@ -582,19 +823,52 @@ export class DebrisScreening extends KeepTrackPlugin {
     const pc = row.probabilityOfCollision ?? undefined;
     const risk = this.getRiskLevel_(pc);
     const tr = document.createElement('tr');
+    const id = this.resolveSecondaryId_(row.secondaryId);
 
-    tr.dataset.secondaryScc = row.secondaryId;
+    tr.dataset.secondaryKey = row.secondaryId;
+    if (id !== null) {
+      tr.dataset.secondaryCatalogId = id.toString();
+    }
     tr.dataset.tcaMs = row.tcaMs.toString();
-    tr.innerHTML = `
-      <td class="ds-secondary-link">${row.secondaryId}</td>
-      <td>${this.formatTcaMs_(row.tcaMs)}</td>
-      <td>${row.missDistance.toFixed(3)}</td>
-      <td>${Math.abs(row.radialDistance).toFixed(3)}</td>
-      <td>${Math.abs(row.intrackDistance).toFixed(3)}</td>
-      <td>${Math.abs(row.crosstrackDistance).toFixed(3)}</td>
-      <td>${this.formatPc_(pc)}</td>
-      <td><span class="ds-risk-badge ${risk.className}">${risk.label}</span></td>
-    `;
+
+    const addCell = (text: string, className?: string): HTMLTableCellElement => {
+      const td = document.createElement('td');
+
+      td.textContent = text;
+      if (className) {
+        td.className = className;
+      }
+      tr.appendChild(td);
+
+      return td;
+    };
+
+    addCell(row.secondaryId, 'ds-secondary-link');
+    const nameCell = addCell(id === null ? l('notInCatalog') : this.secondaryName_(row.secondaryId), 'ds-secondary-name');
+
+    if (this.isParentRow_(row)) {
+      tr.classList.add('ds-parent-row');
+      const tag = document.createElement('span');
+
+      tag.className = 'ds-parent-tag';
+      tag.textContent = l('parentTag');
+      nameCell.appendChild(tag);
+    }
+
+    addCell(this.formatTcaMs_(row.tcaMs));
+    addCell(row.missDistance.toFixed(3));
+    addCell(Math.abs(row.radialDistance).toFixed(3));
+    addCell(Math.abs(row.intrackDistance).toFixed(3));
+    addCell(Math.abs(row.crosstrackDistance).toFixed(3));
+    addCell(row.relativeVelocity.toFixed(3));
+    addCell(this.formatPc_(pc));
+
+    const riskCell = addCell('');
+    const badge = document.createElement('span');
+
+    badge.className = `ds-risk-badge ${risk.className}`;
+    badge.textContent = risk.label;
+    riskCell.appendChild(badge);
 
     return tr;
   }
@@ -630,16 +904,6 @@ export class DebrisScreening extends KeepTrackPlugin {
     }
 
     return pc.toExponential(2);
-  }
-
-  protected selectSecondarySatelliteByScc_(sccNum: string): void {
-    const catalogManager = ServiceLocator.getCatalogManager();
-    // Pass the string straight through - sccNum2Id handles numeric/alpha-5/extended.
-    const id = catalogManager.sccNum2Id(sccNum);
-
-    if (id !== null && id !== -1) {
-      PluginRegistry.getPlugin(SelectSatManager)?.setSecondarySat(id);
-    }
   }
 
   private drawSearchBox_(): void {

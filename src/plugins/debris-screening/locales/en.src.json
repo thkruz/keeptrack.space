@@ -36,18 +36,21 @@
       "clearBox": "Clear Box",
       "table": {
         "secondary": "Secondary",
+        "secondaryName": "Secondary Name",
         "tca": "TCA",
         "missKm": "Miss (km)",
         "rKm": "R (km)",
         "iKm": "I (km)",
         "cKm": "C (km)",
+        "relVelocity": "Rel. Velocity (km/s)",
         "pc": "Pc",
         "risk": "Risk"
       },
       "errorMsgs": {
         "InvalidSatellite": "Invalid satellite selected",
         "ScreeningFailed": "Screening failed",
-        "NoResultsToExport": "No results to export"
+        "NoResultsToExport": "No results to export",
+        "SecondaryNotSelectable": "Cannot select {id}: it is not in the loaded catalog. The clock still jumps to its TCA."
       },
       "help": {
         "overview": "Debris Screening runs a conjunction assessment for the selected satellite against the rest of the catalog. It finds every object that comes within a screening box you define around the satellite during the chosen time window, then ranks the encounters by probability of collision.",
@@ -61,7 +64,13 @@
         "tip1": "Longer windows and bigger boxes find more encounters but take longer to compute; start with the defaults and widen only if you need more coverage.",
         "tip2": "Clicking a row preserves your playback state: if the clock was paused it stays paused at the TCA.",
         "tip3": "Risk levels are thresholds on Pc: above 1e-4 is Critical, above 1e-6 is High, and above 1e-8 is Medium."
-      }
+      },
+      "ricConvention": "RIC = secondary minus primary, in the primary's RIC frame.",
+      "ricMagnitudes": "R/I/C columns show magnitudes; the info box shows the signed values.",
+      "pcInputs": "Pc inputs: hard-body radius {hbr} m ({primary} m primary + {secondary} m secondary) for every pair. Covariance: estimated from each object's TLE (the model behind the info box sigmas, at {sigma} sigma), not from a CDM.",
+      "parentTag": "parent of this analyst satellite",
+      "showParentRows": "Show parent row ({count})",
+      "notInCatalog": "(not in loaded catalog)"
     }
   }
 }

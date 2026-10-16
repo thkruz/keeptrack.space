@@ -49,6 +49,23 @@
 
   & .ds-results-count {
     line-height: 36px;
+    flex: 1 1 auto;
+  }
+
+  /* "Show parent row" toggle (analyst-satellite screens only) */
+  & .ds-parent-toggle {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    font-size: 12px;
+  }
+
+  /* RIC sign convention and Pc inputs, read before the numbers */
+  & .ds-notes {
+    margin-bottom: 8px;
+  }
+
+  & .ds-note {
+    margin: 0 0 2px;
   }
 
   /* Table container */
@@ -80,6 +97,22 @@
   & .ds-secondary-link {
     color: var(--colorTertiary);
     text-decoration: underline;
+  }
+
+  & .ds-secondary-name {
+    max-width: 180px;
+  }
+
+  /* The primary's parent object (shown only via the toggle) */
+  & .ds-parent-row {
+    opacity: 0.7;
+  }
+
+  & .ds-parent-tag {
+    display: block;
+    font-size: 10px;
+    font-style: italic;
+    color: var(--color-dark-text-muted, #9e9e9e);
   }
 }
 

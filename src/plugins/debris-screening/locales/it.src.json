@@ -31,18 +31,21 @@
       "clearBox": "Cancella riquadro",
       "table": {
         "secondary": "Secondario",
+        "secondaryName": "Nome secondario",
         "tca": "TCA",
         "missKm": "Distanza (km)",
         "rKm": "R (km)",
         "iKm": "I (km)",
         "cKm": "C (km)",
+        "relVelocity": "Vel. relativa (km/s)",
         "pc": "Pc",
         "risk": "Rischio"
       },
       "errorMsgs": {
         "InvalidSatellite": "Satellite selezionato non valido",
         "ScreeningFailed": "Screening fallito",
-        "NoResultsToExport": "Nessun risultato da esportare"
+        "NoResultsToExport": "Nessun risultato da esportare",
+        "SecondaryNotSelectable": "Impossibile selezionare {id}: non è nel catalogo caricato. L'orologio salta comunque al suo TCA."
       },
       "help": {
         "overview": "Lo Screening detriti esegue una valutazione delle congiunzioni del satellite selezionato rispetto al resto del catalogo. Trova ogni oggetto che entra in un riquadro di screening definito attorno al satellite durante la finestra temporale scelta, quindi ordina gli incontri per probabilità di collisione.",
@@ -61,7 +64,13 @@
         "parameters": "Parametri",
         "searchBox": "Area di ricerca RIC",
         "results": "Risultati"
-      }
+      },
+      "ricConvention": "RIC = secondario meno primario, nel sistema RIC del primario.",
+      "ricMagnitudes": "Le colonne R/I/C mostrano i moduli; il riquadro informazioni mostra i valori con segno.",
+      "pcInputs": "Input del Pc: raggio del corpo rigido {hbr} m ({primary} m primario + {secondary} m secondario) per ogni coppia. Covarianza: stimata dal TLE di ciascun oggetto (il modello delle sigma del riquadro informazioni, a {sigma} sigma), non da un CDM.",
+      "parentTag": "genitore di questo satellite dell'analista",
+      "showParentRows": "Mostra riga genitore ({count})",
+      "notInCatalog": "(non nel catalogo caricato)"
     }
   }
 }

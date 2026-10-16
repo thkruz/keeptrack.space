@@ -31,18 +31,21 @@
       "clearBox": "清除框",
       "table": {
         "secondary": "次级目标",
+        "secondaryName": "次目标名称",
         "tca": "TCA",
         "missKm": "脱靶距离 (km)",
         "rKm": "R (km)",
         "iKm": "I (km)",
         "cKm": "C (km)",
+        "relVelocity": "相对速度 (km/s)",
         "pc": "Pc",
         "risk": "风险"
       },
       "errorMsgs": {
         "InvalidSatellite": "选择的卫星无效",
         "ScreeningFailed": "筛查失败",
-        "NoResultsToExport": "没有可导出的结果"
+        "NoResultsToExport": "没有可导出的结果",
+        "SecondaryNotSelectable": "无法选择 {id}：它不在已加载的目录中。时钟仍会跳转到其 TCA。"
       },
       "help": {
         "overview": "碎片筛查会针对所选卫星与目录中的其余物体执行交会评估。它会找出在所选时间窗口内进入您围绕卫星定义的筛查框的每个物体，然后按碰撞概率对交会事件进行排序。",
@@ -61,7 +64,13 @@
         "parameters": "参数",
         "searchBox": "RIC 搜索框",
         "results": "结果"
-      }
+      },
+      "ricConvention": "RIC = 次目标减主目标，位于主目标的 RIC 坐标系中。",
+      "ricMagnitudes": "R/I/C 列显示绝对值；带符号的数值见信息框。",
+      "pcInputs": "Pc 输入：每对目标的硬体半径均为 {hbr} m（主目标 {primary} m + 次目标 {secondary} m）。协方差：根据每个目标的 TLE 估算（与信息框中 sigma 相同的模型，{sigma} sigma），而非来自 CDM。",
+      "parentTag": "此分析卫星的母体",
+      "showParentRows": "显示母体行 ({count})",
+      "notInCatalog": "（不在已加载目录中）"
     }
   }
 }

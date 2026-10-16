@@ -31,18 +31,21 @@
       "clearBox": "Wyczyść ramkę",
       "table": {
         "secondary": "Obiekt wtórny",
+        "secondaryName": "Nazwa obiektu wtórnego",
         "tca": "TCA",
         "missKm": "Minięcie (km)",
         "rKm": "R (km)",
         "iKm": "I (km)",
         "cKm": "C (km)",
+        "relVelocity": "Prędk. wzgl. (km/s)",
         "pc": "Pc",
         "risk": "Ryzyko"
       },
       "errorMsgs": {
         "InvalidSatellite": "Nieprawidłowy satelita",
         "ScreeningFailed": "Przegląd nie powiódł się",
-        "NoResultsToExport": "Brak wyników do eksportu"
+        "NoResultsToExport": "Brak wyników do eksportu",
+        "SecondaryNotSelectable": "Nie można wybrać {id}: brak we wczytanym katalogu. Zegar i tak przeskakuje do TCA."
       },
       "help": {
         "overview": "Przegląd odłamków wykonuje ocenę zbliżeń wybranego satelity względem reszty katalogu. Znajduje każdy obiekt, który w wybranym oknie czasowym wejdzie w zdefiniowaną wokół satelity ramkę przeglądu, a następnie szereguje zbliżenia według prawdopodobieństwa kolizji.",
@@ -61,7 +64,13 @@
         "parameters": "Parametry",
         "searchBox": "Pole wyszukiwania RIC",
         "results": "Wyniki"
-      }
+      },
+      "ricConvention": "RIC = obiekt wtórny minus główny, w układzie RIC obiektu głównego.",
+      "ricMagnitudes": "Kolumny R/I/C pokazują wartości bezwzględne; panel informacji pokazuje wartości ze znakiem.",
+      "pcInputs": "Dane wejściowe Pc: promień bryły {hbr} m ({primary} m główny + {secondary} m wtórny) dla każdej pary. Kowariancja: szacowana z TLE każdego obiektu (model stojący za sigmami w panelu informacji, {sigma} sigma), nie z CDM.",
+      "parentTag": "rodzic tego satelity analityka",
+      "showParentRows": "Pokaż wiersz rodzica ({count})",
+      "notInCatalog": "(brak we wczytanym katalogu)"
     }
   }
 }

@@ -31,18 +31,21 @@
       "clearBox": "Vymazat rámeček",
       "table": {
         "secondary": "Sekundární",
+        "secondaryName": "Název sekundárního",
         "tca": "TCA",
         "missKm": "Minutí (km)",
         "rKm": "R (km)",
         "iKm": "I (km)",
         "cKm": "C (km)",
+        "relVelocity": "Rel. rychlost (km/s)",
         "pc": "Pc",
         "risk": "Riziko"
       },
       "errorMsgs": {
         "InvalidSatellite": "Vybrán neplatný satelit",
         "ScreeningFailed": "Screening selhal",
-        "NoResultsToExport": "Žádné výsledky k exportu"
+        "NoResultsToExport": "Žádné výsledky k exportu",
+        "SecondaryNotSelectable": "Nelze vybrat {id}: není v načteném katalogu. Čas přesto přeskočí na jeho TCA."
       },
       "help": {
         "overview": "Screening trosek provádí vyhodnocení konjunkcí vybraného satelitu vůči zbytku katalogu. Najde každý objekt, který se během zvoleného časového okna dostane do screeningového rámečku definovaného kolem satelitu, a setkání seřadí podle pravděpodobnosti kolize.",
@@ -61,7 +64,13 @@
         "parameters": "Parametry",
         "searchBox": "Vyhledávací pole RIC",
         "results": "Výsledky"
-      }
+      },
+      "ricConvention": "RIC = sekundární mínus primární, v RIC soustavě primárního objektu.",
+      "ricMagnitudes": "Sloupce R/I/C ukazují velikosti; informační panel ukazuje hodnoty se znaménkem.",
+      "pcInputs": "Vstupy Pc: poloměr tělesa {hbr} m ({primary} m primární + {secondary} m sekundární) pro každou dvojici. Kovariance: odhadnutá z TLE každého objektu (model za sigmami v informačním panelu, {sigma} sigma), ne z CDM.",
+      "parentTag": "rodič tohoto analytického satelitu",
+      "showParentRows": "Zobrazit řádek rodiče ({count})",
+      "notInCatalog": "(není v načteném katalogu)"
     }
   }
 }

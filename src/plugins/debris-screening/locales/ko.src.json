@@ -31,18 +31,21 @@
       "clearBox": "상자 지우기",
       "table": {
         "secondary": "2차 객체",
+        "secondaryName": "보조 객체 이름",
         "tca": "TCA",
         "missKm": "미스 거리 (km)",
         "rKm": "R (km)",
         "iKm": "I (km)",
         "cKm": "C (km)",
+        "relVelocity": "상대 속도 (km/s)",
         "pc": "Pc",
         "risk": "위험도"
       },
       "errorMsgs": {
         "InvalidSatellite": "잘못된 위성이 선택됨",
         "ScreeningFailed": "스크리닝 실패",
-        "NoResultsToExport": "내보낼 결과가 없습니다"
+        "NoResultsToExport": "내보낼 결과가 없습니다",
+        "SecondaryNotSelectable": "{id}을(를) 선택할 수 없습니다: 불러온 카탈로그에 없습니다. 시계는 TCA로 이동합니다."
       },
       "help": {
         "overview": "잔해물 스크리닝은 선택한 위성을 카탈로그의 나머지 물체와 대조하여 접근 평가를 실행합니다. 선택한 시간 창 동안 위성 주위에 정의한 스크리닝 상자 안에 들어오는 모든 물체를 찾아낸 뒤, 접근 이벤트를 충돌 확률 순으로 정렬합니다.",
@@ -61,7 +64,13 @@
         "parameters": "매개변수",
         "searchBox": "RIC 검색 상자",
         "results": "결과"
-      }
+      },
+      "ricConvention": "RIC = 보조 객체 빼기 주 객체, 주 객체의 RIC 좌표계 기준.",
+      "ricMagnitudes": "R/I/C 열은 크기를 표시하며, 부호가 있는 값은 정보 상자에 표시됩니다.",
+      "pcInputs": "Pc 입력: 모든 쌍에 강체 반경 {hbr} m (주 객체 {primary} m + 보조 객체 {secondary} m). 공분산: 각 객체의 TLE로 추정 (정보 상자 시그마와 같은 모델, {sigma} 시그마), CDM 아님.",
+      "parentTag": "이 분석 위성의 원본",
+      "showParentRows": "원본 행 표시 ({count})",
+      "notInCatalog": "(불러온 카탈로그에 없음)"
     }
   }
 }

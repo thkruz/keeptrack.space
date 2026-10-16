@@ -7,8 +7,9 @@
  * and sends results back progressively as chunks.
  */
 
+import type { DsSecondaryData } from '@app/app/threads/debris-screening-thread-manager';
 import { ConjunctionAssessment, cappedScreeningCovarianceFromTle, EpochUTC, type Kilometers, ScreeningFilter, type Seconds, StateCovariance, Tle } from '@ootk/src/main';
-import { type DsMsgStartScreening, type DsResultRow, type DsSatelliteData, type DsWorkerInMsg, DsWorkerMsgType, DsWorkerOutMsgType } from './debris-screening-messages';
+import { type DsMsgStartScreening, type DsResultRow, type DsWorkerInMsg, DsWorkerMsgType, DsWorkerOutMsgType } from './debris-screening-messages';
 import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
 // ─── Module-level state ─────────────────────────────────────────────────────
@@ -16,6 +17,36 @@ import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wa
 let cancelledRunId = -1;
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
+
+/**
+ * The window to assess one secondary over: its own [windowStartMs, windowEndMs]
+ * when the caller sent one (clamped to the run window), else the run window.
+ * Returns null for an own window that is empty after clamping.
+ */
+export function secondaryWindow(secondary: DsSecondaryData, startTime: EpochUTC, endTime: EpochUTC): { startTime: EpochUTC; endTime: EpochUTC } | null {
+  const { windowStartMs, windowEndMs } = secondary;
+
+  if (typeof windowStartMs !== 'number' || typeof windowEndMs !== 'number') {
+    return { startTime, endTime };
+  }
+
+  const startMs = Math.max(windowStartMs, startTime.toDateTime().getTime());
+  const endMs = Math.min(windowEndMs, endTime.toDateTime().getTime());
+
+  if (!(endMs > startMs)) {
+    return null;
+  }
+
+  return { startTime: EpochUTC.fromDateTime(new Date(startMs)), endTime: EpochUTC.fromDateTime(new Date(endMs)) };
+}
+
+/** Whether an event's signed RIC components all fall inside the U / V / W box (NaN never does). */
+function isInsideBox_(event: { radialDistance: number; intrackDistance: number; crosstrackDistance: number }, uVal: number, vVal: number, wVal: number): boolean {
+  return Math.abs(event.radialDistance) <= uVal && Math.abs(event.intrackDistance) <= vVal && Math.abs(event.crosstrackDistance) <= wVal;
+}
+
+/** Half-width (ms) of the window the Pc pass re-finds an in-box TCA in, for secondaries with their own window. */
+const PC_PASS_HALF_WINDOW_MS = 1000;
 
 /**
  * Assess a single candidate pair and return a serializable result row,
@@ -26,20 +57,48 @@ function assessCandidate_(
   primaryName: string,
   primaryRadius: number,
   primaryCovariance: StateCovariance,
-  secondary: DsSatelliteData,
+  secondary: DsSecondaryData,
   confidenceLevel: number,
-  startTime: EpochUTC,
-  endTime: EpochUTC,
+  runStartTime: EpochUTC,
+  runEndTime: EpochUTC,
   searchStepSize: number,
   uVal: number,
   vVal: number,
   wVal: number
 ): DsResultRow | null {
+  const window = secondaryWindow(secondary, runStartTime, runEndTime);
+
+  if (!window) {
+    return null;
+  }
+
+  let { startTime, endTime } = window;
   const secondaryTle = new Tle(secondary.tle1, secondary.tle2);
 
   // Quick propagation test — if the TLE can't propagate to the start time,
   // it's decayed/invalid and we skip it before doing expensive covariance + assessment work
   secondaryTle.propagate(startTime);
+
+  if (typeof secondary.windowStartMs === 'number' && typeof secondary.windowEndMs === 'number') {
+    /*
+     * Own window (set screening): most of these short windows end outside the RIC box, so find the
+     * geometry first without covariances and pay for the Pc integral only for an in-box event, on a
+     * short window around its TCA. The row is the same; out-of-box windows skip the Pc entirely.
+     */
+    const geometry = new ConjunctionAssessment({ tle: primaryTle, name: primaryName }, { tle: secondaryTle, name: secondary.name }).assess({
+      startTime,
+      endTime,
+      searchStepSize: searchStepSize as Seconds,
+    });
+
+    if (!isInsideBox_(geometry, uVal, vVal, wVal)) {
+      return null;
+    }
+    const tcaMs = geometry.tca.toDateTime().getTime();
+
+    startTime = EpochUTC.fromDateTime(new Date(Math.max(startTime.toDateTime().getTime(), tcaMs - PC_PASS_HALF_WINDOW_MS)));
+    endTime = EpochUTC.fromDateTime(new Date(Math.min(endTime.toDateTime().getTime(), tcaMs + PC_PASS_HALF_WINDOW_MS)));
+  }
 
   const secondaryCovariance = cappedScreeningCovarianceFromTle(secondary.tle1, secondary.tle2, confidenceLevel);
 
@@ -69,14 +128,7 @@ function assessCandidate_(
   }
 
   // RIC box filter
-  if (
-    isNaN(event.radialDistance) ||
-    isNaN(event.intrackDistance) ||
-    isNaN(event.crosstrackDistance) ||
-    Math.abs(event.radialDistance) > uVal ||
-    Math.abs(event.intrackDistance) > vVal ||
-    Math.abs(event.crosstrackDistance) > wVal
-  ) {
+  if (!isInsideBox_(event, uVal, vVal, wVal)) {
     return null;
   }
 

@@ -25,9 +25,22 @@ export interface DsScreeningCallbacks {
   onProgress: (phase: string, candidateCount: number) => void;
 }
 
+/**
+ * A secondary with an optional screening window of its own. When both bounds
+ * are set, the worker assesses this secondary over [windowStartMs, windowEndMs]
+ * (clamped to the run window) instead of the whole run window. A caller that
+ * has already located the approaches (a pre-filter) can send the same object
+ * several times with one short window per approach. Without the fields the
+ * run window applies, which is the single-primary behaviour.
+ */
+export interface DsSecondaryData extends DsSatelliteData {
+  windowStartMs?: number;
+  windowEndMs?: number;
+}
+
 export interface DsScreeningParams {
   primary: DsSatelliteData;
-  secondaries: DsSatelliteData[];
+  secondaries: DsSecondaryData[];
   startTimeMs: number;
   endTimeMs: number;
   searchStepSize: number;

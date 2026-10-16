@@ -277,7 +277,7 @@ export class DebrisScreening extends KeepTrackPlugin {
     };
   }
 
-  private buildSecondaryMenuHtml_(): string {
+  protected buildSecondaryMenuHtml_(): string {
     return html`
       <div class="debris-screening-results kt-menu-body">
         <section class="kt-section">

@@ -109,7 +109,8 @@ let satInView = EMPTY_INT8_ARRAY; // Array of booleans showing if current Satell
 let satInSun = EMPTY_INT8_ARRAY; // Array of booleans showing if current Satellite is in sunlight
 const sensorMarkerArray = [0]; // Array of Markers used to show sensor fence and FOV
 
-let isInterrupted = false; // Boolean used to determine if the worker is interupted
+/** Handle of the pending propagation cycle, so a time change can pull it forward instead of waiting it out. */
+let propagationTimer_: ReturnType<typeof setTimeout> | null = null;
 
 /** TIME VARIABLES */
 const PROPAGATION_INTERVAL = 1000 as Milliseconds; // Limits how often the propagation loop runs
@@ -166,7 +167,6 @@ const resetForCatalogSwap = (newLen: number, fovSetLength: number, seqNum: numbe
   satInSun = EMPTY_INT8_ARRAY;
   catalogSeqNum = seqNum;
   fieldOfViewSetLength = fovSetLength;
-  isInterrupted = false;
   isResetFOVBubble = false;
   isResetSatOverfly = false;
   // Reset tier state so all objects propagate on first cycle after swap
@@ -203,13 +203,42 @@ export interface ExtraDataMessage {
 }
 
 /**
- * Handles the OFFSET message: updates time variables and forces a full propagation on the next cycle.
+ * Schedules the next propagation cycle, replacing any cycle already pending so only one loop ever runs.
+ */
+const scheduleNextPropagation_ = (delayMs: number): void => {
+  if (propagationTimer_ !== null) {
+    clearTimeout(propagationTimer_);
+  }
+  propagationTimer_ = setTimeout(() => {
+    propagationTimer_ = null;
+    propagationLoop();
+  }, delayMs);
+};
+
+/**
+ * Pulls the next propagation cycle forward to run as soon as the current message queue drains.
+ *
+ * A worker is single-threaded and propagationLoop is synchronous, so a message can never interrupt a running
+ * cycle. The old interrupt flag was only read by the NEXT cycle, which then discarded its own results: after
+ * every time jump one full cycle (1 s at 1x) was wasted before positions for the new time were posted.
+ * Rescheduling the pending cycle to 0 ms makes the new time visible after a single propagation instead.
+ * A setTimeout(0) (rather than a direct call) lets a burst of OFFSET messages coalesce into one cycle.
+ */
+const requestImmediatePropagation_ = (): void => {
+  if (!propagationRunning) {
+    return;
+  }
+  scheduleNextPropagation_(0);
+};
+
+/**
+ * Handles the OFFSET message: updates time variables and forces a full propagation on the next cycle,
+ * which is pulled forward to run immediately.
  */
 const handleOffsetMsg_ = (m: PositionCruncherIncomingMsg): void => {
   staticOffset = m.data.staticOffset ?? 0;
   dynamicOffsetEpoch = m.data.dynamicOffsetEpoch ?? Date.now();
   propRate = m.data.propRate ?? 1;
-  isInterrupted = true;
 
   // Scale propagation frequency linearly with propRate
   divisor = Math.max(1, Math.abs(propRate));
@@ -220,6 +249,8 @@ const handleOffsetMsg_ = (m: PositionCruncherIncomingMsg): void => {
   }
   skipNextVisibilityUpdate_ = true;
   lastPropSimTime_ = 0;
+
+  requestImmediatePropagation_();
 };
 
 /**
@@ -329,7 +360,7 @@ const handleSatEditMsg_ = (m: PositionCruncherIncomingMsg): void => {
     extraData: JSON.stringify([extra]),
     satId: m.data.id,
   });
-  isInterrupted = true;
+  requestImmediatePropagation_();
 };
 
 export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
@@ -565,10 +596,7 @@ export const propagationLoop = (mockSatCache?: PosCruncherCachedObject[]) => {
 
   checkForNaN(satPos, satVel);
 
-  if (!isInterrupted) {
-    sendDataToSatSet();
-  }
-  isInterrupted = false;
+  sendDataToSatSet();
 
   tierCycleCounter_++;
 
@@ -576,12 +604,7 @@ export const propagationLoop = (mockSatCache?: PosCruncherCachedObject[]) => {
   const delay = isSensors ? 2 : 1;
 
   // The longer the delay the more jitter at higher speeds of propagation
-  setTimeout(
-    () => {
-      propagationLoop();
-    },
-    (PROPAGATION_INTERVAL * delay) / divisor
-  );
+  scheduleNextPropagation_((PROPAGATION_INTERVAL * delay) / divisor);
 };
 
 export const checkForNaN = (satPos: Float32Array, satVel: Float32Array): void => {
@@ -602,9 +625,6 @@ export const updateSatCache = (now: Date, j: number, gmst: GreenwichMeanSidereal
   // Using a while loop since some methods may update multiple cache objects
 
   while (i < len) {
-    if (isInterrupted) {
-      break;
-    }
     i++; // At the beginning so i starts at 0
     let isContinue = false;
 

@@ -67,15 +67,15 @@
     },
     "RadialSigma": {
       "label": "반경 시그마",
-      "tooltip": "반경 불확실성 (미터)"
+      "tooltip": "반경 방향 1시그마 위치 불확도(GP 에포크 기준 TLE 유도 공분산, RIC 좌표계). Pc 및 근접 보고서와 같은 값입니다."
     },
     "InTrackSigma": {
       "label": "궤도 내 시그마",
-      "tooltip": "궤도 내 불확실성 (미터)"
+      "tooltip": "궤도 방향 1시그마 위치 불확도(GP 에포크 기준 TLE 유도 공분산, RIC 좌표계). Pc 및 근접 보고서와 같은 값입니다."
     },
     "CrossTrackSigma": {
       "label": "횡단 시그마",
-      "tooltip": "횡단 불확실성 (미터)"
+      "tooltip": "횡방향 1시그마 위치 불확도(GP 에포크 기준 TLE 유도 공분산, RIC 좌표계). Pc 및 근접 보고서와 같은 값입니다."
     },
     "meter": "m",
     "kilometer": "km",

@@ -67,15 +67,15 @@
     },
     "RadialSigma": {
       "label": "Sigma Radial",
-      "tooltip": "Incertitude radiale (mètres)"
+      "tooltip": "Incertitude de position radiale à 1 sigma issue de la covariance dérivée du TLE à l'époque GP (repère RIC). Mêmes valeurs que celles utilisées pour la Pc et le rapport de conjonction."
     },
     "InTrackSigma": {
       "label": "Sigma Sur Piste",
-      "tooltip": "Incertitude sur piste (mètres)"
+      "tooltip": "Incertitude de position le long de la trace à 1 sigma issue de la covariance dérivée du TLE à l'époque GP (repère RIC). Mêmes valeurs que celles utilisées pour la Pc et le rapport de conjonction."
     },
     "CrossTrackSigma": {
       "label": "Sigma Hors Piste",
-      "tooltip": "Incertitude hors piste (mètres)"
+      "tooltip": "Incertitude de position transverse à 1 sigma issue de la covariance dérivée du TLE à l'époque GP (repère RIC). Mêmes valeurs que celles utilisées pour la Pc et le rapport de conjonction."
     },
     "meter": "m",
     "kilometer": "km",

@@ -67,15 +67,15 @@
     },
     "RadialSigma": {
       "label": "Radiale Sigma",
-      "tooltip": "Radiale Unsicherheit (Meter)"
+      "tooltip": "1-Sigma-Positionsunsicherheit radial aus der TLE-basierten Kovarianz zur GP-Epoche (RIC-System). Dieselben Werte nutzen Pc und der Konjunktionsbericht."
     },
     "InTrackSigma": {
       "label": "In-Track Sigma",
-      "tooltip": "Unsicherheit in Flugrichtung (Meter)"
+      "tooltip": "1-Sigma-Positionsunsicherheit in Flugrichtung aus der TLE-basierten Kovarianz zur GP-Epoche (RIC-System). Dieselben Werte nutzen Pc und der Konjunktionsbericht."
     },
     "CrossTrackSigma": {
       "label": "Cross-Track Sigma",
-      "tooltip": "Unsicherheit quer zur Flugrichtung (Meter)"
+      "tooltip": "1-Sigma-Positionsunsicherheit quer zur Flugrichtung aus der TLE-basierten Kovarianz zur GP-Epoche (RIC-System). Dieselben Werte nutzen Pc und der Konjunktionsbericht."
     },
     "meter": "m",
     "kilometer": "km",

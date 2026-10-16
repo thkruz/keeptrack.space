@@ -67,15 +67,15 @@
     },
     "RadialSigma": {
       "label": "Radiální sigma",
-      "tooltip": "Radiální nejistota (metry)"
+      "tooltip": "Radiální nejistota polohy 1 sigma z kovariance odvozené z TLE v epoše GP (soustava RIC). Stejné hodnoty používá Pc i zpráva o konjunkci."
     },
     "InTrackSigma": {
       "label": "Podélná sigma",
-      "tooltip": "Podélná nejistota (metry)"
+      "tooltip": "Nejistota polohy ve směru letu 1 sigma z kovariance odvozené z TLE v epoše GP (soustava RIC). Stejné hodnoty používá Pc i zpráva o konjunkci."
     },
     "CrossTrackSigma": {
       "label": "Příčná sigma",
-      "tooltip": "Příčná nejistota (metry)"
+      "tooltip": "Příčná nejistota polohy 1 sigma z kovariance odvozené z TLE v epoše GP (soustava RIC). Stejné hodnoty používá Pc i zpráva o konjunkci."
     },
     "meter": "m",
     "kilometer": "km",

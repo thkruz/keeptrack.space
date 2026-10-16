@@ -67,15 +67,15 @@
     },
     "RadialSigma": {
       "label": "Sigma radialna",
-      "tooltip": "Niepewność radialna (metry)"
+      "tooltip": "Radialna niepewność położenia 1 sigma z kowariancji wyznaczonej z TLE w epoce GP (układ RIC). Te same wartości wykorzystują Pc i raport koniunkcji."
     },
     "InTrackSigma": {
       "label": "Sigma wzdłuż toru",
-      "tooltip": "Niepewność wzdłuż toru (metry)"
+      "tooltip": "Niepewność położenia wzdłuż toru 1 sigma z kowariancji wyznaczonej z TLE w epoce GP (układ RIC). Te same wartości wykorzystują Pc i raport koniunkcji."
     },
     "CrossTrackSigma": {
       "label": "Sigma poprzeczna",
-      "tooltip": "Niepewność poprzeczna (metry)"
+      "tooltip": "Poprzeczna niepewność położenia 1 sigma z kowariancji wyznaczonej z TLE w epoce GP (układ RIC). Te same wartości wykorzystują Pc i raport koniunkcji."
     },
     "meter": "m",
     "kilometer": "km",

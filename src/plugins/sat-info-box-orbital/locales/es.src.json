@@ -67,15 +67,15 @@
     },
     "RadialSigma": {
       "label": "Sigma Radial",
-      "tooltip": "Incertidumbre radial (metros)"
+      "tooltip": "Incertidumbre de posición radial a 1 sigma según la covarianza derivada del TLE en la época GP (marco RIC). Son los mismos valores que usan la Pc y el informe de conjunción."
     },
     "InTrackSigma": {
       "label": "Sigma en Trayectoria",
-      "tooltip": "Incertidumbre en trayectoria (metros)"
+      "tooltip": "Incertidumbre de posición a lo largo de la trayectoria a 1 sigma según la covarianza derivada del TLE en la época GP (marco RIC). Son los mismos valores que usan la Pc y el informe de conjunción."
     },
     "CrossTrackSigma": {
       "label": "Sigma Cruzada",
-      "tooltip": "Incertidumbre cruzada (metros)"
+      "tooltip": "Incertidumbre de posición transversal a 1 sigma según la covarianza derivada del TLE en la época GP (marco RIC). Son los mismos valores que usan la Pc y el informe de conjunción."
     },
     "meter": "m",
     "kilometer": "km",

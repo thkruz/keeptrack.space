@@ -67,15 +67,15 @@
     },
     "RadialSigma": {
       "label": "半径方向シグマ",
-      "tooltip": "半径方向の不確かさ（メートル）"
+      "tooltip": "半径方向の1シグマ位置不確かさ（GPエポック時点のTLE由来共分散、RIC座標系）。Pcと接近レポートと同じ値です。"
     },
     "InTrackSigma": {
       "label": "軌道方向シグマ",
-      "tooltip": "軌道方向の不確かさ（メートル）"
+      "tooltip": "軌道方向の1シグマ位置不確かさ（GPエポック時点のTLE由来共分散、RIC座標系）。Pcと接近レポートと同じ値です。"
     },
     "CrossTrackSigma": {
       "label": "横方向シグマ",
-      "tooltip": "横方向の不確かさ（メートル）"
+      "tooltip": "横方向の1シグマ位置不確かさ（GPエポック時点のTLE由来共分散、RIC座標系）。Pcと接近レポートと同じ値です。"
     },
     "meter": "m",
     "kilometer": "km",

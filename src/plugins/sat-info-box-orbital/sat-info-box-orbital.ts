@@ -19,6 +19,7 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { EL, SECTIONS } from './sat-info-box-orbital-html';
+import { screeningSigmasKm } from './screening-sigmas';
 
 export class SatInfoBoxOrbital extends KeepTrackPlugin {
   readonly id = 'SatInfoBoxOrbital';
@@ -126,7 +127,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       return;
     }
 
-    this.updateCovariance_();
+    this.updateCovariance_(obj);
     this.updateSecondarySatellite_(obj);
   }
 
@@ -300,10 +301,16 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     }
   }
 
-  private updateCovariance_(): void {
-    const covMatrix = PluginRegistry.getPlugin(SelectSatManager)!.primarySatCovMatrix;
+  /**
+   * Sigma rows: 1-sigma R / I / C of the TLE-derived screening covariance at the GP epoch, the
+   * same numbers the Conjunction Report prints and the model Pc is computed from. Deliberately not
+   * SelectSatManager.primarySatCovMatrix: that holds ellipsoid display radii, which are scaled by
+   * the confidence level and replaced by the Pro Covariance plugin's measured covariance.
+   */
+  private updateCovariance_(obj: BaseObject): void {
+    const sigmas = obj instanceof Satellite ? screeningSigmasKm(obj.tle1, obj.tle2) : null;
 
-    if (!covMatrix) {
+    if (!sigmas) {
       setInnerHtml(EL.UNCERTAINTY_RADIAL, t7e('SatInfoBoxOrbital.unknown'));
       setInnerHtml(EL.UNCERTAINTY_CROSSTRACK, t7e('SatInfoBoxOrbital.unknown'));
       setInnerHtml(EL.UNCERTAINTY_INTRACK, t7e('SatInfoBoxOrbital.unknown'));
@@ -311,24 +318,18 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       return;
     }
 
-    let covRadial = covMatrix[0];
-    let covCrossTrack = covMatrix[1];
-    let covInTrack = covMatrix[2];
+    setInnerHtml(EL.UNCERTAINTY_RADIAL, SatInfoBoxOrbital.formatSigmaKm(sigmas.radial));
+    setInnerHtml(EL.UNCERTAINTY_INTRACK, SatInfoBoxOrbital.formatSigmaKm(sigmas.inTrack));
+    setInnerHtml(EL.UNCERTAINTY_CROSSTRACK, SatInfoBoxOrbital.formatSigmaKm(sigmas.crossTrack));
+  }
 
-    const useKm = covRadial > 0.5 && covCrossTrack > 0.5 && covInTrack > 0.5;
-
-    if (useKm) {
-      setInnerHtml(EL.UNCERTAINTY_RADIAL, `${(covMatrix[0]).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
-      setInnerHtml(EL.UNCERTAINTY_CROSSTRACK, `${(covMatrix[1]).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
-      setInnerHtml(EL.UNCERTAINTY_INTRACK, `${(covMatrix[2]).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
-    } else {
-      covRadial *= 1000;
-      covCrossTrack *= 1000;
-      covInTrack *= 1000;
-      setInnerHtml(EL.UNCERTAINTY_RADIAL, `${covRadial.toFixed(2)} ${t7e('SatInfoBoxOrbital.meter')}`);
-      setInnerHtml(EL.UNCERTAINTY_CROSSTRACK, `${covCrossTrack.toFixed(2)} ${t7e('SatInfoBoxOrbital.meter')}`);
-      setInnerHtml(EL.UNCERTAINTY_INTRACK, `${covInTrack.toFixed(2)} ${t7e('SatInfoBoxOrbital.meter')}`);
+  /** A 1-sigma value (km) with its unit: meters below 1 km, km (3 decimals, as in the reports) above. */
+  static formatSigmaKm(sigmaKm: number): string {
+    if (sigmaKm < 1) {
+      return `${(sigmaKm * 1000).toFixed(1)} ${t7e('SatInfoBoxOrbital.meter')}`;
     }
+
+    return `${sigmaKm.toFixed(3)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
   }
 
   private updateSecondarySatellite_(obj: BaseObject): void {

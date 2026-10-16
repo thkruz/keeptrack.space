@@ -89,7 +89,7 @@ export interface AnalysisObjectSummary {
   gpAgeHours: number | null;
   /**
    * 1-sigma position uncertainty (km) of the covariance the Pc uses for this
-   * object, in its own RIC frame, after confidence scaling and caps.
+   * object, in its own RIC frame, at the TLE epoch (1-sigma, before confidence scaling; capped).
    */
   ricSigmasKm: RicVector | null;
   meanElements: MeanElements | null;

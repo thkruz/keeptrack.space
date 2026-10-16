@@ -67,15 +67,15 @@
     },
     "RadialSigma": {
       "label": "径向不确定度",
-      "tooltip": "径向不确定度（米）"
+      "tooltip": "径向 1-sigma 位置不确定度（GP 历元时刻由 TLE 推导的协方差，RIC 坐标系）。与 Pc 和交会报告使用的数值相同。"
     },
     "InTrackSigma": {
       "label": "轨道内不确定度",
-      "tooltip": "轨道内不确定度（米）"
+      "tooltip": "沿迹 1-sigma 位置不确定度（GP 历元时刻由 TLE 推导的协方差，RIC 坐标系）。与 Pc 和交会报告使用的数值相同。"
     },
     "CrossTrackSigma": {
       "label": "轨道横向不确定度",
-      "tooltip": "轨道横向不确定度（米）"
+      "tooltip": "横向 1-sigma 位置不确定度（GP 历元时刻由 TLE 推导的协方差，RIC 坐标系）。与 Pc 和交会报告使用的数值相同。"
     },
     "meter": "米",
     "kilometer": "千米",

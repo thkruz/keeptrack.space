@@ -66,6 +66,9 @@
         "label": "Flaggengröße",
         "helpText": "Flaggenbreite als Anteil der Modellgröße (0,2 bis 0,6)"
       }
+    },
+    "Secondary": {
+      "ricConvention": "RIC = Sekundärobjekt minus Primärobjekt, im RIC-System des Primärobjekts."
     }
   }
 }

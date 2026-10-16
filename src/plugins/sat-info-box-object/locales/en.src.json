@@ -66,6 +66,9 @@
         "label": "Flag size",
         "helpText": "Flag width as a fraction of the model's size (0.2 to 0.6)"
       }
+    },
+    "Secondary": {
+      "ricConvention": "RIC = secondary minus primary, in the primary's RIC frame."
     }
   }
 }

@@ -66,6 +66,9 @@
         "label": "国旗のサイズ",
         "helpText": "モデルの大きさに対する国旗の幅（0.2〜0.6）"
       }
+    },
+    "Secondary": {
+      "ricConvention": "RIC = 副対象 − 主対象（主対象のRIC座標系）。"
     }
   }
 }

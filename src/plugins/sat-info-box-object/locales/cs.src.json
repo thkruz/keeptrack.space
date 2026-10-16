@@ -66,6 +66,9 @@
         "label": "Velikost vlajky",
         "helpText": "Šířka vlajky jako podíl velikosti modelu (0,2 až 0,6)"
       }
+    },
+    "Secondary": {
+      "ricConvention": "RIC = sekundární mínus primární, v RIC soustavě primárního objektu."
     }
   }
 }

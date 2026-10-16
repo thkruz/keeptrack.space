@@ -66,6 +66,9 @@
         "label": "Rozmiar flagi",
         "helpText": "Szerokość flagi jako ułamek rozmiaru modelu (0,2 do 0,6)"
       }
+    },
+    "Secondary": {
+      "ricConvention": "RIC = obiekt wtórny minus główny, w układzie RIC obiektu głównego."
     }
   }
 }

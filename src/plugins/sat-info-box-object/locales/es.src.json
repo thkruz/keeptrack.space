@@ -66,6 +66,9 @@
         "label": "Tamaño de la bandera",
         "helpText": "Ancho de la bandera como fracción del tamaño del modelo (0,2 a 0,6)"
       }
+    },
+    "Secondary": {
+      "ricConvention": "RIC = secundario menos primario, en el marco RIC del primario."
     }
   }
 }

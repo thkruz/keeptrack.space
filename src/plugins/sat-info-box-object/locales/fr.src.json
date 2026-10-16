@@ -66,6 +66,9 @@
         "label": "Taille du drapeau",
         "helpText": "Largeur du drapeau en fraction de la taille du modèle (0,2 à 0,6)"
       }
+    },
+    "Secondary": {
+      "ricConvention": "RIC = secondaire moins primaire, dans le repère RIC du primaire."
     }
   }
 }

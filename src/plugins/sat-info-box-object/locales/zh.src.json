@@ -66,6 +66,9 @@
         "label": "旗帜大小",
         "helpText": "旗帜宽度占模型尺寸的比例（0.2 至 0.6）"
       }
+    },
+    "Secondary": {
+      "ricConvention": "RIC = 次目标减主目标，位于主目标的 RIC 坐标系中。"
     }
   }
 }

@@ -23,4 +23,6 @@ export const EL = {
   RAD: 'sat-sec-rad',
   INTRACK: 'sat-sec-intrack',
   CROSSTRACK: 'sat-sec-crosstrack',
+  /** One-line RIC sign convention for the R/I/C values below it. */
+  RIC_CONVENTION: 'sat-sec-ric-convention',
 };

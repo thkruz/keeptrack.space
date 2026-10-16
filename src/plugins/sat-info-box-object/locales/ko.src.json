@@ -66,6 +66,9 @@
         "label": "국기 크기",
         "helpText": "모델 크기 대비 국기 너비 (0.2~0.6)"
       }
+    },
+    "Secondary": {
+      "ricConvention": "RIC = 보조 객체 빼기 주 객체, 주 객체의 RIC 좌표계 기준."
     }
   }
 }

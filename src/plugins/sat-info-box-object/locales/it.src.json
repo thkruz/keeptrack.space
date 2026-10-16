@@ -66,6 +66,9 @@
         "label": "Dimensione della bandiera",
         "helpText": "Larghezza della bandiera come frazione della dimensione del modello (da 0,2 a 0,6)"
       }
+    },
+    "Secondary": {
+      "ricConvention": "RIC = secondario meno primario, nel sistema RIC del primario."
     }
   }
 }

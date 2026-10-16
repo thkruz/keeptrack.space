@@ -22,6 +22,7 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { EL, SECTIONS } from './sat-info-box-object-html';
+import './sat-info-box-object.css';
 
 export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsContributor {
   readonly id = 'SatInfoBoxObject';
@@ -199,6 +200,9 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsContri
           <div class="sat-info-section-header">
             Secondary Satellite
             <span id="${SECTIONS.SECONDARY}-collapse" class="section-collapse material-icons">expand_less</span>
+          </div>
+          <div class="sat-info-row sat-sec-convention-row">
+            <div class="sat-sec-convention" id="${EL.RIC_CONVENTION}">${t7e('SatInfoBoxObject.Secondary.ricConvention')}</div>
           </div>
           <div class="sat-info-row">
             <div class="sat-info-key"

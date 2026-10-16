@@ -218,6 +218,30 @@ export class MouseInput {
     return { x: evt.clientX - offsetX, y: evt.clientY - offsetY };
   }
 
+  /** Canvas coords for an event, or null when the event carries no usable client position. */
+  private static getEventCanvasCoords_(evt: MouseEvent): { x: number; y: number } | null {
+    if (typeof evt.clientX !== 'number' || typeof evt.clientY !== 'number' || Number.isNaN(evt.clientX) || Number.isNaN(evt.clientY)) {
+      return null;
+    }
+
+    return MouseInput.getCanvasCoords(evt);
+  }
+
+  /**
+   * Writes the event position into the camera's mouse state. mousemove is throttled through
+   * requestAnimationFrame, so a press that arrives in the same frame as the move (or with no
+   * move at all since load, e.g. the very first right-click of a session) would otherwise see
+   * the stale initial mouseX/mouseY of 0,0. Button events always carry a fresh position.
+   */
+  private static syncPointerToCamera_(evt: MouseEvent, camera: { state: { mouseX: number; mouseY: number } }): void {
+    const coords = MouseInput.getEventCanvasCoords_(evt);
+
+    if (coords) {
+      camera.state.mouseX = coords.x;
+      camera.state.mouseY = coords.y;
+    }
+  }
+
   private canvasMouseMoveFire_(evt: MouseEvent) {
     const { x, y } = MouseInput.getCanvasCoords(evt);
 
@@ -268,6 +292,8 @@ export class MouseInput {
 
     ServiceLocator.getViewportManager()?.beginInputCapture(coords.x, coords.y);
     const camera = ServiceLocator.getViewportManager()?.getInputCamera() ?? ServiceLocator.getMainCamera();
+
+    MouseInput.syncPointerToCamera_(evt, camera);
 
     if (evt.button === 2) {
       this.dragPosition = InputManager.getEarthScreenPoint(camera.state.mouseX, camera.state.mouseY, camera);
@@ -331,7 +357,10 @@ export class MouseInput {
       if (evt.button === 2) {
         // Right Mouse Button Clicked
         if (!this.keyboard_.getKey('Control') && !this.keyboard_.getKey('Shift')) {
-          ServiceLocator.getInputManager().openRmbMenu(this.clickedSat);
+          const rmbCamera = ServiceLocator.getViewportManager()?.getInputCamera() ?? ServiceLocator.getMainCamera();
+
+          MouseInput.syncPointerToCamera_(evt, rmbCamera);
+          ServiceLocator.getInputManager().openRmbMenu(this.clickedSat, MouseInput.getEventCanvasCoords_(evt) ?? undefined);
         }
       }
     }

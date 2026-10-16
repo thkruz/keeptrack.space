@@ -187,7 +187,23 @@ describe('MouseInput handlers', () => {
 
       m().canvasMouseUp_({ button: 2, preventDefault: vi.fn() } as never);
 
-      expect(inputManager.openRmbMenu).toHaveBeenCalledWith(7);
+      expect(inputManager.openRmbMenu).toHaveBeenCalledWith(7, undefined);
+    });
+
+    it('opens the right-click menu at the click point even when no mousemove has fired yet', () => {
+      mouse.isStartedOnCanvas = true;
+      m().dragHasMoved = false;
+      mouse.mouseSat = -1;
+      camera.state.mouseX = 0;
+      camera.state.mouseY = 0;
+      vi.spyOn(UrlManager, 'updateURL').mockImplementation(() => undefined);
+      vi.spyOn(MouseInput, 'getCanvasCoords').mockImplementation((evt: MouseEvent) => ({ x: evt.clientX, y: evt.clientY }));
+
+      m().canvasMouseUp_({ button: 2, clientX: 420, clientY: 310, preventDefault: vi.fn() } as never);
+
+      expect(inputManager.openRmbMenu).toHaveBeenCalledWith(-1, { x: 420, y: 310 });
+      expect(camera.state.mouseX).toBe(420);
+      expect(camera.state.mouseY).toBe(310);
     });
   });
 

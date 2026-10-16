@@ -58,11 +58,12 @@
     },
     "AgeOfGP": {
       "label": "GPの経過時間",
-      "tooltip": "公式軌道計算からの経過時間（古いGPデータは通常精度が低い）",
+      "tooltip": "GPエポックから現在のシミュレーション時刻までの時間（古いGPデータは通常精度が低い。負の値はエポックがシミュレーション時刻より後であることを示す）",
       "days": "日",
       "hours": "時間",
       "epochYear": "エポック年",
-      "epochDay": "エポック日"
+      "epochDay": "エポック日",
+      "epochAfterSimTime": "GPエポックはシミュレーション時刻より後"
     },
     "RadialSigma": {
       "label": "半径方向シグマ",

@@ -58,11 +58,12 @@
     },
     "AgeOfGP": {
       "label": "Âge du GP",
-      "tooltip": "Temps depuis le calcul officiel de l'orbite (les données GP plus anciennes sont généralement moins précises)",
+      "tooltip": "Temps écoulé entre l'époque du GP et l'heure actuelle de la simulation (les données GP plus anciennes sont généralement moins précises ; une valeur négative signifie que l'époque est postérieure à l'heure de simulation)",
       "days": "Jours",
       "hours": "Heures",
       "epochYear": "Année d'époque",
-      "epochDay": "Jour d'époque"
+      "epochDay": "Jour d'époque",
+      "epochAfterSimTime": "l'époque du GP est postérieure à l'heure de simulation"
     },
     "RadialSigma": {
       "label": "Sigma Radial",

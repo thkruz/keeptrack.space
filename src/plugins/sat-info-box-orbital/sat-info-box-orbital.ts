@@ -10,7 +10,6 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
-import { getCatalogReferenceDate } from '@app/engine/utils/catalog-reference-time';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
@@ -158,15 +157,15 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
   }
 
   private updateElsetAgeElement_(obj: Satellite): void {
-    const now: Date | number | string = getCatalogReferenceDate();
-    const daysold = obj.ageOfElset(now);
-    const age = daysold >= 1 ? daysold : daysold * 24;
-    const units = daysold >= 1 ? t7e('SatInfoBoxOrbital.AgeOfGP.days') : t7e('SatInfoBoxOrbital.AgeOfGP.hours');
+    // Age of GP is measured against the SIMULATION clock, not the wall clock, so it follows time jumps and reads
+    // negative when the sim time is before the element set epoch.
+    const simTime = ServiceLocator.getTimeManager().simulationTimeObj;
+    const ageText = SatInfoBoxOrbital.formatElsetAge(obj.ageOfElset(simTime));
 
     const elsetAgeDom = getEl(EL.ELSET_AGE);
 
     if (elsetAgeDom) {
-      elsetAgeDom.innerHTML = `${age.toFixed(2)} ${units}`;
+      elsetAgeDom.innerHTML = ageText;
       elsetAgeDom.dataset.position = 'top';
       elsetAgeDom.dataset.delay = '50';
       elsetAgeDom.setAttribute(
@@ -175,6 +174,29 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
            ${t7e('SatInfoBoxOrbital.AgeOfGP.epochDay')}: ${obj.tle1.substring(20, 28)}`
       );
     }
+  }
+
+  /**
+   * Formats an element set age (in days, signed) for the Age of GP row. Ages under one day show in hours. A negative
+   * age means the GP epoch is after the simulation time; it keeps the minus sign and adds a short localized note.
+   */
+  static formatElsetAge(daysOld: number): string {
+    if (!Number.isFinite(daysOld)) {
+      return 'N/A';
+    }
+
+    const absDays = Math.abs(daysOld);
+    const isDays = absDays >= 1;
+    const magnitude = isDays ? absDays : absDays * 24;
+    const units = isDays ? t7e('SatInfoBoxOrbital.AgeOfGP.days') : t7e('SatInfoBoxOrbital.AgeOfGP.hours');
+    // Treat anything that rounds to 0.00 as zero so the row never shows "-0.00"
+    const isFuture = daysOld < 0 && magnitude.toFixed(2) !== '0.00';
+
+    if (!isFuture) {
+      return `${magnitude.toFixed(2)} ${units}`;
+    }
+
+    return `-${magnitude.toFixed(2)} ${units} (${t7e('SatInfoBoxOrbital.AgeOfGP.epochAfterSimTime')})`;
   }
 
   /**

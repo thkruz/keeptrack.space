@@ -58,11 +58,12 @@
     },
     "AgeOfGP": {
       "label": "轨道数据年龄",
-      "tooltip": "官方轨道计算以来的时间（数据越旧通常越不准确）",
+      "tooltip": "从轨道数据历元到当前仿真时间的时长（数据越旧通常越不准确；负值表示历元晚于仿真时间）",
       "days": "天",
       "hours": "小时",
       "epochYear": "历元年份",
-      "epochDay": "历元日"
+      "epochDay": "历元日",
+      "epochAfterSimTime": "历元晚于仿真时间"
     },
     "RadialSigma": {
       "label": "径向不确定度",

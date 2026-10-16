@@ -58,11 +58,12 @@
     },
     "AgeOfGP": {
       "label": "Wiek param. orb.",
-      "tooltip": "Czas od oficjalnego obliczenia orbity (starsze dane są zwykle mniej dokładne)",
+      "tooltip": "Czas od epoki danych do bieżącego czasu symulacji (starsze dane są zwykle mniej dokładne; wartość ujemna oznacza, że epoka jest późniejsza niż czas symulacji)",
       "days": "Dni",
       "hours": "Godziny",
       "epochYear": "Rok epoki",
-      "epochDay": "Dzień epoki"
+      "epochDay": "Dzień epoki",
+      "epochAfterSimTime": "epoka danych jest późniejsza niż czas symulacji"
     },
     "RadialSigma": {
       "label": "Sigma radialna",

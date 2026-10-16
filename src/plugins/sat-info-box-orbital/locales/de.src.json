@@ -58,11 +58,12 @@
     },
     "AgeOfGP": {
       "label": "Alter der GP",
-      "tooltip": "Zeit seit offizieller Umlaufbahnberechnung (ältere GP-Daten sind meist weniger genau)",
+      "tooltip": "Zeit von der GP-Epoche bis zur aktuellen Simulationszeit (ältere GP-Daten sind meist weniger genau; negativ bedeutet, dass die Epoche nach der Simulationszeit liegt)",
       "days": "Tage",
       "hours": "Stunden",
       "epochYear": "Epoche Jahr",
-      "epochDay": "Epoche Tag"
+      "epochDay": "Epoche Tag",
+      "epochAfterSimTime": "GP-Epoche liegt nach der Simulationszeit"
     },
     "RadialSigma": {
       "label": "Radiale Sigma",

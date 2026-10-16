@@ -58,11 +58,12 @@
     },
     "AgeOfGP": {
       "label": "Stáří GP",
-      "tooltip": "Čas od výpočtu oficiální dráhy (starší data GP jsou obvykle méně přesná)",
+      "tooltip": "Čas od epochy GP do aktuálního času simulace (starší data GP jsou obvykle méně přesná; záporná hodnota znamená, že epocha je po čase simulace)",
       "days": "Dny",
       "hours": "Hodiny",
       "epochYear": "Rok epochy",
-      "epochDay": "Den epochy"
+      "epochDay": "Den epochy",
+      "epochAfterSimTime": "epocha GP je po čase simulace"
     },
     "RadialSigma": {
       "label": "Radiální sigma",

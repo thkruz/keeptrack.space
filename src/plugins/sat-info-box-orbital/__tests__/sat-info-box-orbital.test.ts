@@ -4,6 +4,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import * as isThisNodeModule from '@app/engine/utils/isThisNode';
+import { t7e } from '@app/locales/keys';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SatInfoBoxOrbital } from '@app/plugins/sat-info-box-orbital/sat-info-box-orbital';
 import { EL } from '@app/plugins/sat-info-box-orbital/sat-info-box-orbital-html';
@@ -259,5 +260,73 @@ describe('SatInfoBoxOrbital GP Epoch row', () => {
     expect(SatInfoBoxOrbital.formatGpEpoch('1 00005U 58002B   58001.50000000  .00000023  00000-0  28098-4 0  4753' as TleLine1)).toBe('1958-01-01 12:00:00 UTC');
     expect(SatInfoBoxOrbital.formatGpEpoch(undefined)).toBe('N/A');
     expect(SatInfoBoxOrbital.formatGpEpoch('1 garbage' as TleLine1)).toBe('N/A');
+  });
+});
+
+/**
+ * Age of GP is measured against the SIMULATION clock (not the wall clock), so it follows time jumps and goes negative
+ * when the sim time is before the element set epoch.
+ */
+describe('SatInfoBoxOrbital Age of GP row', () => {
+  let plugin: SatInfoBoxOrbital;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const p = () => plugin as any;
+  const days = () => t7e('SatInfoBoxOrbital.AgeOfGP.days');
+  const hours = () => t7e('SatInfoBoxOrbital.AgeOfGP.hours');
+
+  // LANDSAT 8, epoch 22221.78099992 = 2022-08-09 18:44:38.39 UTC
+  const landsat8 = new Satellite({
+    ...defaultSat,
+    id: 0,
+    tle1: '1 39084U 13008A   22221.78099992  .00000176  00000-0  49109-4 0  9999' as TleLine1,
+    tle2: '2 39084  98.2218 291.8538 0001250  87.1898 272.9450 14.57107856500507' as TleLine2,
+  });
+
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager, SatInfoBox]);
+    plugin = new SatInfoBoxOrbital();
+    websiteInit(plugin);
+    document.body.innerHTML = p().createOrbitalSection();
+    vi.stubGlobal('requestIdleCallback', (cb: IdleRequestCallback) => cb({ didTimeout: false, timeRemaining: () => 50 }));
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it('shows hours since the epoch at the sim time, not the wall clock', () => {
+    ServiceLocator.getTimeManager().simulationTimeObj = new Date(Date.UTC(2022, 7, 10));
+    p().updateOrbitData_(landsat8);
+
+    expect(getEl(EL.ELSET_AGE)!.textContent).toBe(`5.26 ${hours()}`);
+  });
+
+  it('updates on the next refresh after a sim time jump', () => {
+    const timeManager = ServiceLocator.getTimeManager();
+
+    timeManager.simulationTimeObj = new Date(Date.UTC(2022, 7, 10));
+    p().updateOrbitData_(landsat8);
+    timeManager.simulationTimeObj = new Date(Date.UTC(2022, 7, 20));
+    p().updateOrbitData_(landsat8);
+
+    expect(getEl(EL.ELSET_AGE)!.textContent).toBe(`10.22 ${days()}`);
+  });
+
+  it('shows a negative age with a note when the sim time is before the GP epoch', () => {
+    // Two years before the epoch (2020-08-09 00:00 UTC): 730 days + 18.744 h
+    ServiceLocator.getTimeManager().simulationTimeObj = new Date(Date.UTC(2020, 7, 9));
+    p().updateOrbitData_(landsat8);
+
+    expect(getEl(EL.ELSET_AGE)!.textContent).toBe(`-730.78 ${days()} (${t7e('SatInfoBoxOrbital.AgeOfGP.epochAfterSimTime')})`);
+  });
+
+  it('formatElsetAge handles hours, days, the future case and bad input', () => {
+    expect(SatInfoBoxOrbital.formatElsetAge(0.5)).toBe(`12.00 ${hours()}`);
+    expect(SatInfoBoxOrbital.formatElsetAge(3.25)).toBe(`3.25 ${days()}`);
+    expect(SatInfoBoxOrbital.formatElsetAge(-0.25)).toBe(`-6.00 ${hours()} (${t7e('SatInfoBoxOrbital.AgeOfGP.epochAfterSimTime')})`);
+    // Rounds to zero, so no minus sign or note
+    expect(SatInfoBoxOrbital.formatElsetAge(-0.0000001)).toBe(`0.00 ${hours()}`);
+    expect(SatInfoBoxOrbital.formatElsetAge(Number.NaN)).toBe('N/A');
   });
 });

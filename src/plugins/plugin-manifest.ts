@@ -855,6 +855,8 @@ export const pluginManifest: PluginDescriptor[] = [
     configKey: 'RicPlot',
     ossImport: () => import('./plot-analysis/ric-plots'),
     ossClassName: 'RicPlot',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/plot-analysis/ric-plots-pro') : undefined,
+    proClassName: 'RicPlotPro',
     defaultConfig: { enabled: true, order: 262 },
   },
   {

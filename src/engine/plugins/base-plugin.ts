@@ -480,7 +480,7 @@ export abstract class KeepTrackPlugin {
     if (hasHelp(this)) {
       const helpConfig = this.getHelpConfig();
 
-      this.helpComponent_ = new HelpComponent(this.id, helpConfig, () => this.isMenuButtonActive);
+      this.helpComponent_ = new HelpComponent(this.id, helpConfig, () => this.isHelpTarget_());
       this.helpComponent_.init();
     } else if (this.helpTitle && this.helpBody) {
       this.registerHelp(this.helpTitle, this.helpBody);
@@ -1626,9 +1626,28 @@ export abstract class KeepTrackPlugin {
    * @param helpTitle The title of the help text to show.
    * @param helpText The help text to show.
    */
+  /**
+   * Whether this plugin should answer a help request (Shift+F1 or the help button).
+   *
+   * Plugins with a side menu answer whenever their menu is active. Toggle-only plugins (layer
+   * toggles such as Covariance Ellipsoids) stay "active" for as long as the toggle is on, so they
+   * would otherwise override the help of whichever side menu the user is actually looking at. They
+   * only answer when no side-menu plugin is active.
+   */
+  protected isHelpTarget_(): boolean {
+    if (!this.isMenuButtonActive) {
+      return false;
+    }
+    if (this.sideMenuElementName) {
+      return true;
+    }
+
+    return !PluginRegistry.plugins.some((plugin) => plugin !== this && plugin.isMenuButtonActive && Boolean(plugin.sideMenuElementName));
+  }
+
   registerHelp(helpTitle: string, helpText: string) {
     EventBus.getInstance().on(EventBusEvent.onHelpMenuClick, (): boolean => {
-      if (this.isMenuButtonActive) {
+      if (this.isHelpTarget_()) {
         adviceManagerInstance.showAdvice(helpTitle, helpText);
         EventBus.getInstance().emit(EventBusEvent.helpMenuShown, this.id);
 

@@ -212,7 +212,7 @@
             },
             "jumpToMoment": {
               "title": "Sauter à un instant",
-              "body": "Fixez une date et une heure exactes avec le calendrier pour voir le ciel à cet instant."
+              "body": "Fixez une date et une heure exactes avec le calendrier pour voir le ciel à cet instant. Après un saut, le satellite sélectionné se met à jour immédiatement ; les autres satellites mettent environ une seconde à se stabiliser."
             },
             "timeSlider": {
               "title": "Parcourir la chronologie",

@@ -212,7 +212,7 @@
             },
             "jumpToMoment": {
               "title": "Skočte na okamžik",
-              "body": "Nastavte v kalendáři přesné datum a čas a podívejte se na oblohu v tu chvíli."
+              "body": "Nastavte v kalendáři přesné datum a čas a podívejte se na oblohu v tu chvíli. Po skoku se vybraný satelit aktualizuje okamžitě; ostatním satelitům trvá asi sekundu, než se ustálí."
             },
             "timeSlider": {
               "title": "Projeďte časovou osu",

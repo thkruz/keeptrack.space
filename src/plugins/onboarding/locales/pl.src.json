@@ -212,7 +212,7 @@
             },
             "jumpToMoment": {
               "title": "Skocz do chwili",
-              "body": "Ustaw w kalendarzu dokładną datę i godzinę, aby zobaczyć niebo w tym momencie."
+              "body": "Ustaw w kalendarzu dokładną datę i godzinę, aby zobaczyć niebo w tym momencie. Po skoku wybrany satelita aktualizuje się natychmiast; pozostałe satelity potrzebują około sekundy, aby się ustabilizować."
             },
             "timeSlider": {
               "title": "Przewiń oś czasu",

@@ -212,7 +212,7 @@
             },
             "jumpToMoment": {
               "title": "Zu einem Zeitpunkt springen",
-              "body": "Stellen Sie mit dem Kalender ein genaues Datum und eine Uhrzeit ein, um den Himmel in diesem Moment zu sehen."
+              "body": "Stellen Sie mit dem Kalender ein genaues Datum und eine Uhrzeit ein, um den Himmel in diesem Moment zu sehen. Nach einem Sprung wird der ausgewählte Satellit sofort aktualisiert; die übrigen Satelliten brauchen etwa eine Sekunde, bis sie ihre Position erreicht haben."
             },
             "timeSlider": {
               "title": "Die Zeitleiste durchfahren",

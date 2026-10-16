@@ -212,7 +212,7 @@
             },
             "jumpToMoment": {
               "title": "Jump to a moment",
-              "body": "Set an exact date and time with the calendar to see the sky at that moment."
+              "body": "Set an exact date and time with the calendar to see the sky at that moment. After a jump the selected satellite updates immediately; the rest of the satellites take about a second to settle."
             },
             "timeSlider": {
               "title": "Scrub the timeline",

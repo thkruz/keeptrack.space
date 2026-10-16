@@ -12,11 +12,13 @@ import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
 
-const RIC_CONVENTION = "RIC = secondary minus primary, in the primary's RIC frame.";
+const RIC_CONVENTION =
+  "RIC sign convention: secondary minus primary, in the primary's RIC frame (+R radially outward, +I along the primary's velocity, +C = R x I, the orbit normal).";
 
 describe('DebrisScreening results table', () => {
   let plugin: DebrisScreening;
-  const named = new Satellite({ ...defaultSat, id: 0, sccNum: '38479', name: 'COSMOS 2251 DEB' });
+  // intlDes comes from the TLE parse, so it is set after construction.
+  const named = Object.assign(new Satellite({ ...defaultSat, id: 0, sccNum: '38479', name: 'COSMOS 2251 DEB' }), { intlDes: '1993-036PX' });
   // JSC Vimpel objects are created with an empty sccNum and an altId (catalog-loader).
   const vimpel = new Satellite({ ...defaultSat, id: 1, sccNum: '', altId: '90061', name: 'JSC Vimpel 90061' });
   const parent = new Satellite({ ...defaultSat, id: 2, sccNum: '39084', name: 'LANDSAT 8' });
@@ -27,7 +29,7 @@ describe('DebrisScreening results table', () => {
     tcaMs: Date.UTC(2026, 9, 16, 5, 38, 39),
     missDistance: 7.593,
     radialDistance: 6.267,
-    intrackDistance: 4.129,
+    intrackDistance: -4.129,
     crosstrackDistance: -1.151,
     relativeVelocity: 4.271,
     probabilityOfCollision: pc,
@@ -74,10 +76,10 @@ describe('DebrisScreening results table', () => {
   it('adds Secondary Name and Rel. Velocity columns to the table header', () => {
     const headers = Array.from(getEl('ds-results-table')!.querySelectorAll('th')).map((th) => th.textContent?.trim());
 
-    expect(headers).toEqual(['Secondary', 'Secondary Name', 'TCA', 'Miss (km)', 'R (km)', 'I (km)', 'C (km)', 'Rel. Velocity (km/s)', 'Pc', 'Risk']);
+    expect(headers).toEqual(['Secondary', 'Secondary Name', 'COSPAR ID', 'TCA', 'Miss (km)', 'R (km)', 'I (km)', 'C (km)', 'Rel. Velocity (km/s)', 'Pc', 'Risk']);
   });
 
-  it('renders the catalog name and the relative velocity for each row', () => {
+  it('renders the catalog name, COSPAR ID and relative velocity for each row', () => {
     internals().beginScreeningRun_(defaultSat);
     internals().registerSecondary_(named);
     internals().renderRows_([row('38479', 1e-6)]);
@@ -86,9 +88,33 @@ describe('DebrisScreening results table', () => {
 
     expect(values[0]).toBe('38479');
     expect(values[1]).toBe('COSMOS 2251 DEB');
-    expect(values[7]).toBe('4.271');
-    // R/I/C stay magnitudes (the header note says so).
-    expect(values[6]).toBe('1.151');
+    expect(values[2]).toBe('1993-036PX');
+    expect(values[8]).toBe('4.271');
+  });
+
+  it('renders signed R/I/C (secondary minus primary, primary RIC frame), not magnitudes', () => {
+    internals().beginScreeningRun_(defaultSat);
+    internals().registerSecondary_(named);
+    internals().renderRows_([row('38479', 1e-6)]);
+
+    const values = cells(bodyRows()[0]);
+
+    expect(values.slice(5, 8)).toEqual(['6.267', '-4.129', '-1.151']);
+  });
+
+  it('leaves the COSPAR cell blank when the catalog has no designator', () => {
+    const noDes = Object.assign(new Satellite({ ...defaultSat, id: 0, sccNum: '38479', name: 'COSMOS 2251 DEB' }), { intlDes: 'none' });
+
+    objects[0] = noDes;
+    try {
+      internals().beginScreeningRun_(defaultSat);
+      internals().registerSecondary_(noDes);
+      internals().renderRows_([row('38479', 1e-6)]);
+
+      expect(cells(bodyRows()[0])[2]).toBe('');
+    } finally {
+      objects[0] = named;
+    }
   });
 
   it('gives an object without a NORAD number a display id plus its name instead of a blank', () => {
@@ -192,12 +218,13 @@ describe('DebrisScreening results table', () => {
     expect(getEl('ds-parent-toggle')!.style.display).toBe('none');
   });
 
-  it('exports the name, relative velocity and parent note to CSV', async () => {
+  it('exports the name, COSPAR ID, signed RIC, relative velocity and parent note to CSV', async () => {
     let exported: Blob | null = null;
 
     internals().beginScreeningRun_(analystWith('derivedFrom', '39084'));
     internals().registerSecondary_(parent);
-    internals().rows_ = [row('39084', 4.88e-4)];
+    internals().registerSecondary_(named);
+    internals().rows_ = [row('39084', 4.88e-4), row('38479', 1e-6)];
     URL.createObjectURL = vi.fn((blob: Blob) => {
       exported = blob;
 
@@ -208,12 +235,14 @@ describe('DebrisScreening results table', () => {
     plugin.onDownload();
     const csv = await (exported as unknown as Blob).text();
 
-    const [header, first] = csv.split('\n');
+    const [header, first, second] = csv.split('\n');
 
-    expect(header).toBe('Secondary,Secondary Name,TCA (UTC),Miss Distance (km),Radial (km),Intrack (km),Crosstrack (km),Rel Velocity (km/s),Pc,Risk Level,Note');
-    expect(first.startsWith('39084,LANDSAT 8,')).toBe(true);
+    expect(header).toBe('Secondary,Secondary Name,Secondary COSPAR,TCA (UTC),Miss Distance (km),Radial (km),Intrack (km),Crosstrack (km),Rel Velocity (km/s),Pc,Risk Level,Note');
+    expect(first.startsWith(`39084,LANDSAT 8,${parent.intlDes},`)).toBe(true);
     expect(first.endsWith(',parent of this analyst satellite')).toBe(true);
     expect(first).toContain(',4.271000,');
+    expect(second.startsWith('38479,COSMOS 2251 DEB,1993-036PX,')).toBe(true);
+    expect(second).toContain(',6.267000,-4.129000,-1.151000,');
   });
 
   it('states the RIC sign convention and the Pc inputs in the results header and help', () => {

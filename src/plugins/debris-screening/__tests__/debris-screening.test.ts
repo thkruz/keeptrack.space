@@ -85,6 +85,22 @@ describe('DebrisScreening_form', () => {
     expect(getEl('ds-w')).toBeDefined();
   });
 
+  it('offers time windows up to 7 days (96 h and 168 h)', () => {
+    websiteInit(debrisScreeningPlugin);
+    const options = Array.from((getEl('ds-time') as HTMLSelectElement).options).map((o) => [o.value, o.textContent?.trim()]);
+
+    expect(options).toEqual([
+      ['1', '1 Hour'],
+      ['4', '4 Hours'],
+      ['8', '8 Hours'],
+      ['24', '24 Hours'],
+      ['48', '48 Hours'],
+      ['72', '72 Hours'],
+      ['96', '4 Days'],
+      ['168', '7 Days'],
+    ]);
+  });
+
   it('should have Draw Box and Clear Box buttons', () => {
     websiteInit(debrisScreeningPlugin);
     expect(getEl('ds-draw-box')).toBeDefined();

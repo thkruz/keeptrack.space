@@ -186,6 +186,8 @@ export class DebrisScreening extends KeepTrackPlugin {
             <option value="24">${l('timeOptions.h24')}</option>
             <option value="48">${l('timeOptions.h48')}</option>
             <option value="72">${l('timeOptions.h72')}</option>
+            <option value="96">${l('timeOptions.d4')}</option>
+            <option value="168">${l('timeOptions.d7')}</option>
           </select>
           <label>${l('timeWindowLabel')}</label>
         </div>
@@ -270,7 +272,7 @@ export class DebrisScreening extends KeepTrackPlugin {
   private getSecondaryDragOptions_(): IDragOptions {
     return {
       isDraggable: true,
-      minWidth: 760,
+      minWidth: 840,
       maxWidth: 1100,
     };
   }
@@ -291,7 +293,7 @@ export class DebrisScreening extends KeepTrackPlugin {
             </button>
           </div>
           <div class="ds-notes">
-            <div id="${this.formPrefix_}-ric-convention" class="kt-note ds-note">${l('ricConvention')} ${l('ricMagnitudes')}</div>
+            <div id="${this.formPrefix_}-ric-convention" class="kt-note ds-note">${l('ricConvention')}</div>
             <div id="${this.formPrefix_}-pc-inputs" class="kt-note ds-note">${this.pcInputsText_()}</div>
           </div>
           <div class="ds-table-container">
@@ -300,6 +302,7 @@ export class DebrisScreening extends KeepTrackPlugin {
                 <tr>
                   <th>${l('table.secondary')}</th>
                   <th>${l('table.secondaryName')}</th>
+                  <th>${l('table.secondaryCospar')}</th>
                   <th>${l('table.tca')}</th>
                   <th>${l('table.missKm')}</th>
                   <th>${l('table.rKm')}</th>
@@ -581,15 +584,32 @@ export class DebrisScreening extends KeepTrackPlugin {
     return id !== null && id !== -1 ? id : null;
   }
 
-  /** Catalog name for a row's secondary, or '' when it can no longer be resolved. */
-  protected secondaryName_(key: string): string {
+  /** Catalog object for a row's secondary, or null when it can no longer be resolved. */
+  protected secondaryObject_(key: string): Satellite | null {
     const id = this.resolveSecondaryId_(key);
 
     if (id === null) {
-      return '';
+      return null;
     }
 
-    return ServiceLocator.getCatalogManager().getObject(id, GetSatType.EXTRA_ONLY)?.name ?? '';
+    const obj = ServiceLocator.getCatalogManager().getObject(id, GetSatType.EXTRA_ONLY);
+
+    return obj instanceof Satellite ? obj : null;
+  }
+
+  /** Catalog name for a row's secondary, or '' when it can no longer be resolved. */
+  protected secondaryName_(key: string): string {
+    return this.secondaryObject_(key)?.name ?? '';
+  }
+
+  /**
+   * COSPAR / international designator for a row's secondary, or '' when the
+   * object cannot be resolved or has none (the catalog stores 'none' for those).
+   */
+  protected secondaryCospar_(key: string): string {
+    const intlDes = this.secondaryObject_(key)?.intlDes ?? '';
+
+    return intlDes === 'none' ? '' : intlDes;
   }
 
   /**
@@ -731,6 +751,7 @@ export class DebrisScreening extends KeepTrackPlugin {
     const headers = [
       'Secondary',
       'Secondary Name',
+      'Secondary COSPAR',
       'TCA (UTC)',
       'Miss Distance (km)',
       'Radial (km)',
@@ -748,12 +769,13 @@ export class DebrisScreening extends KeepTrackPlugin {
       return [
         csvField(row.secondaryId),
         csvField(this.secondaryName_(row.secondaryId)),
+        csvField(this.secondaryCospar_(row.secondaryId)),
         this.formatTcaMs_(row.tcaMs),
         row.missDistance.toFixed(6),
-        // ootk v8 stores signed RIC components; the columns show magnitudes as before
-        Math.abs(row.radialDistance).toFixed(6),
-        Math.abs(row.intrackDistance).toFixed(6),
-        Math.abs(row.crosstrackDistance).toFixed(6),
+        // Signed RIC (secondary minus primary, primary RIC frame), the CCSDS / CDM convention.
+        row.radialDistance.toFixed(6),
+        row.intrackDistance.toFixed(6),
+        row.crosstrackDistance.toFixed(6),
         row.relativeVelocity.toFixed(6),
         this.formatPc_(pc),
         this.getRiskLevel_(pc).label,
@@ -903,11 +925,13 @@ export class DebrisScreening extends KeepTrackPlugin {
       nameCell.appendChild(tag);
     }
 
+    addCell(id === null ? '' : this.secondaryCospar_(row.secondaryId), 'ds-secondary-cospar');
     addCell(this.formatTcaMs_(row.tcaMs));
     addCell(row.missDistance.toFixed(3));
-    addCell(Math.abs(row.radialDistance).toFixed(3));
-    addCell(Math.abs(row.intrackDistance).toFixed(3));
-    addCell(Math.abs(row.crosstrackDistance).toFixed(3));
+    // Signed RIC (secondary minus primary, primary RIC frame), matching Satellite Close Approaches.
+    addCell(row.radialDistance.toFixed(3));
+    addCell(row.intrackDistance.toFixed(3));
+    addCell(row.crosstrackDistance.toFixed(3));
     addCell(row.relativeVelocity.toFixed(3));
     addCell(this.formatPc_(pc));
 

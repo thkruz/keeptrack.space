@@ -124,10 +124,32 @@ export const tableToJson = (table: ReportTable): string => {
   return JSON.stringify(records, null, 2);
 };
 
-/** The human-readable preview shown in the report window: metadata block + aligned table. */
-export const buildPreviewText = (data: ReportData): string => `${data.header}${formatFixedWidth(resolveReportTable(data), data.emptyMessage)}`;
+/** Renders a section title with an underline of the same length. */
+const sectionTitle = (title: string): string => `${title}
+${'='.repeat(title.length)}
+`;
 
-/** Builds the download payload for the chosen format. Text keeps the metadata header; CSV/JSON are pure data. */
+/**
+ * The human-readable preview shown in the report window: metadata block, any
+ * titled sections, then the aligned main table.
+ */
+export const buildPreviewText = (data: ReportData): string => {
+  const sections = (data.sections ?? [])
+    .map(
+      (section) => `${sectionTitle(section.title)}${formatFixedWidth(section.table)}
+
+`
+    )
+    .join('');
+  const mainTitle = data.tableTitle ? sectionTitle(data.tableTitle) : '';
+
+  return `${data.header}${sections}${mainTitle}${formatFixedWidth(resolveReportTable(data), data.emptyMessage)}`;
+};
+
+/**
+ * Builds the download payload for the chosen format. Text keeps the metadata header;
+ * CSV is the main table only; JSON is {@link ReportData.json} when set, else the rows.
+ */
 export const buildDownloadPayload = (data: ReportData, format: ReportFormat): DownloadPayload => {
   const table = resolveReportTable(data);
 
@@ -135,7 +157,11 @@ export const buildDownloadPayload = (data: ReportData, format: ReportFormat): Do
     case 'csv':
       return { content: tableToCsv(table), ext: 'csv', mime: 'text/csv;charset=utf-8' };
     case 'json':
-      return { content: tableToJson(table), ext: 'json', mime: 'application/json;charset=utf-8' };
+      return {
+        content: data.json === undefined ? tableToJson(table) : JSON.stringify(data.json, null, 2),
+        ext: 'json',
+        mime: 'application/json;charset=utf-8',
+      };
     default:
       return { content: buildPreviewText(data), ext: 'txt', mime: 'text/plain;charset=utf-8' };
   }

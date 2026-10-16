@@ -26,7 +26,8 @@ import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import { MenuMode } from '@app/engine/core/interfaces';
+import type { BurnSummary, MissionImpact, ScreeningDiff } from '@app/engine/conjunction/analysis-state';
+import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -44,7 +45,17 @@ import analysisPng from '@public/img/icons/reports.png';
 
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { BestPassDeps, findPassesForSat } from '../best-pass/best-pass-calculator';
+import { DebrisScreening } from '../debris-screening/debris-screening';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import {
+  AnalysisEnv,
+  analystParentSccNum,
+  CONJUNCTION_DEFAULT_HALF_WIDTH_SEC,
+  CONJUNCTION_HALF_WIDTH_OPTIONS_SEC,
+  generateConjunctionReport,
+  generateManeuverReport,
+  generateScreeningCompareReport,
+} from './conjunction-report-core';
 import { buildDownloadPayload, buildPreviewText, ReportFormat } from './report-formatter';
 import {
   generateAerReport,
@@ -60,6 +71,7 @@ import {
   ReportPass,
   SunIllumination,
 } from './reports-core';
+import { diffScreeningRuns, ScreeningRunInput } from './screening-diff';
 import './reports.css';
 
 /** Shorthand for this plugin's locale keys. */
@@ -87,7 +99,40 @@ export interface ReportContext {
   deps: ReportCoreDeps;
   /** The simulation time the report is generated at (used in the metadata header). */
   generatedAt: Date;
+  /** The selected secondary object, when one is selected. */
+  secondary?: Satellite | null;
+  /** Half-width (s) of the closest-approach search window around the sim time. */
+  conjunctionHalfWidthSec?: number;
 }
+
+/** Menu card a report row is listed in. */
+export type ReportSection = 'orbit' | 'sensor' | 'conjunction';
+
+/**
+ * Duck-typed accessor the Reports plugin reads from the Debris Screening plugin
+ * for its retained runs, newest first. See README.md for the exact contract.
+ */
+interface RetainedScreeningRunsSource {
+  getRecentScreeningRuns?: () => readonly ScreeningRunInput[];
+}
+
+/** Duck-typed shape of one Maneuver tool burn record (src/plugins-pro/maneuver/burn-history.ts BurnRecord). */
+interface BurnRecordLike {
+  epochMs: number;
+  frame?: string;
+  inputDvMs?: { x: number; y: number; z: number };
+  magnitudeMs: number;
+  source?: string;
+  label?: string;
+}
+
+/** Duck-typed accessor the Reports plugin reads from the Maneuver plugin. See README.md. */
+interface BurnHistorySource {
+  getBurnChain?: (sccNum: string) => { records: readonly BurnRecordLike[] } | null;
+}
+
+/** Plugin id of the (Pro) Maneuver plugin that owns the burn history. */
+const MANEUVER_PLUGIN_ID = 'ManeuverPlugin';
 
 /**
  * Interface for a report generator that can be registered with the ReportsPlugin
@@ -101,6 +146,13 @@ export interface ReportGenerator {
   description?: string;
   /** Whether this report requires a sensor to be selected */
   requiresSensor?: boolean;
+  /** Menu card the row is listed in (default: 'sensor' when requiresSensor, else 'orbit'). */
+  section?: ReportSection;
+  /**
+   * Why the report cannot run right now (e.g. "Select a secondary object first"),
+   * or null when it can. Shown as the disabled row's tooltip and in the card note.
+   */
+  unavailableReason?: (obj: ReportTarget) => string | null;
   /**
    * Whether this report can run on the given selected object. Defaults to full
    * TLE-backed satellites only; position-sampling reports also accept ephemeris
@@ -122,6 +174,7 @@ interface ReportsSettings {
   windowSec?: number;
   stepSec?: number;
   format?: ReportFormat;
+  conjHalfWidthSec?: number;
 }
 
 /** Selectable look-ahead windows, in seconds. */
@@ -144,6 +197,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   private windowSec_: number = REPORT_DEFAULTS.windowSec;
   private stepSec_: number = REPORT_DEFAULTS.stepSec;
   private format_: ReportFormat = 'text';
+  private conjHalfWidthSec_: number = CONJUNCTION_DEFAULT_HALF_WIDTH_SEC;
 
   /**
    * Register a new report generator
@@ -203,7 +257,9 @@ export class ReportsPlugin extends KeepTrackPlugin {
   };
 
   onBottomIconClick(): void {
-    // Default toggle behavior handled by base class
+    // Default toggle behavior handled by base class. Screening runs and the
+    // secondary can change while the menu is closed, so refresh the rows.
+    this.updateReportAvailability_();
   }
 
   getSideMenuConfig(): ISideMenuConfig {
@@ -236,6 +292,10 @@ export class ReportsPlugin extends KeepTrackPlugin {
           content: l('help.types'),
         },
         {
+          heading: l('help.conjunctionHeading'),
+          content: l('help.conjunction'),
+        },
+        {
           heading: t7e('help.howToUse'),
           content: l('help.howToUse'),
         },
@@ -256,7 +316,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
         try {
           const target = ReportsPlugin.asReportTarget_(this.selectSatManager_?.primarySatObj);
 
-          if (!target || !ReportsPlugin.isReportSupported_(report, target)) {
+          if (!target || !ReportsPlugin.isReportSupported_(report, target) || ReportsPlugin.safeReason_(report, target) !== null) {
             return false;
           }
           if (report.requiresSensor && !ServiceLocator.getSensorManager().isSensorSelected()) {
@@ -288,8 +348,9 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
   private buildSideMenuHtml_(): string {
     const reports = ReportsPlugin.getRegisteredReports();
-    const orbitReports = reports.filter((r) => !r.requiresSensor);
-    const sensorReports = reports.filter((r) => r.requiresSensor);
+    const orbitReports = reports.filter((r) => ReportsPlugin.sectionOf_(r) === 'orbit');
+    const sensorReports = reports.filter((r) => ReportsPlugin.sectionOf_(r) === 'sensor');
+    const conjunctionReports = reports.filter((r) => ReportsPlugin.sectionOf_(r) === 'conjunction');
 
     return html`
       <div id="reports-menu" class="side-menu-parent start-hidden kt-ui-v13">
@@ -302,6 +363,11 @@ export class ReportsPlugin extends KeepTrackPlugin {
             <div class="kt-section-label">${l('sections.sensor')}</div>
             <div class="kt-note" id="reports-sensor-note">${l('sensorNote')}</div>
             ${ReportsPlugin.buildActionRows_(sensorReports)}
+          </section>
+          <section class="kt-section">
+            <div class="kt-section-label">${l('sections.conjunction')}</div>
+            ${ReportsPlugin.buildActionRows_(conjunctionReports)}
+            <div class="kt-note" id="reports-conj-note"></div>
           </section>
           <section class="kt-section">
             <div class="kt-section-label">${l('sections.options')}</div>
@@ -321,6 +387,12 @@ export class ReportsPlugin extends KeepTrackPlugin {
                 <label for="reports-format">${l('options.format')}</label>
               </div>
             </div>
+            <div class="kt-field-row">
+              <div class="input-field col s12">
+                <select id="reports-conj-window">${this.buildConjWindowOptions_()}</select>
+                <label for="reports-conj-window">${l('options.conjWindow')}</label>
+              </div>
+            </div>
           </section>
         </div>
       </div>
@@ -331,12 +403,28 @@ export class ReportsPlugin extends KeepTrackPlugin {
     return reports
       .map(
         (report) => html`
-        <button id="${report.id}-btn" type="button" class="kt-action waves-effect" title="${report.description || report.name}">
+        <button id="${report.id}-btn" type="button" class="kt-action waves-effect" kt-tooltip="${report.description || report.name}">
           <span class="kt-action-label">${report.name}</span>
         </button>
       `
       )
       .join('');
+  }
+
+  /** Menu card a report belongs in. */
+  private static sectionOf_(report: ReportGenerator): ReportSection {
+    return report.section ?? (report.requiresSensor ? 'sensor' : 'orbit');
+  }
+
+  private buildConjWindowOptions_(): string {
+    return CONJUNCTION_HALF_WIDTH_OPTIONS_SEC.map((sec) => {
+      const hours = sec / 3600;
+      const label = l('options.plusMinusHours')
+        .replace('{hours}', hours.toString())
+        .replace('{span}', (2 * hours).toString());
+
+      return `<option value="${sec}" ${sec === this.conjHalfWidthSec_ ? 'selected' : ''}>${label}</option>`;
+    }).join('');
   }
 
   private buildWindowOptions_(): string {
@@ -367,6 +455,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     EventBus.getInstance().on(EventBusEvent.setSensor, () => this.updateReportAvailability_());
     EventBus.getInstance().on(EventBusEvent.resetSensor, () => this.updateReportAvailability_());
     EventBus.getInstance().on(EventBusEvent.selectSatData, () => this.updateReportAvailability_());
+    EventBus.getInstance().on(EventBusEvent.setSecondarySat, () => this.updateReportAvailability_());
   }
 
   private uiManagerFinal_(): void {
@@ -381,6 +470,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     getEl('reports-window', true)?.addEventListener('change', () => this.readOptionsFromForm_());
     getEl('reports-step', true)?.addEventListener('change', () => this.readOptionsFromForm_());
     getEl('reports-format', true)?.addEventListener('change', () => this.readOptionsFromForm_());
+    getEl('reports-conj-window', true)?.addEventListener('change', () => this.readOptionsFromForm_());
 
     initMaterialSelects(getEl('reports-menu', true) ?? document.body);
     this.updateReportAvailability_();
@@ -402,6 +492,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
     })();
     const target = ReportsPlugin.asReportTarget_(this.selectSatManager_?.primarySatObj);
 
+    const conjReasons = new Set<string>();
+
     ReportsPlugin.getRegisteredReports().forEach((r) => {
       const btn = getEl(`${r.id}-btn`, true) as HTMLButtonElement | null;
 
@@ -410,8 +502,14 @@ export class ReportsPlugin extends KeepTrackPlugin {
         // With nothing selected the menu cannot be opened anyway, so leave the
         // rows enabled rather than flashing every button disabled.
         const unsupported = target !== null && !ReportsPlugin.isReportSupported_(r, target);
+        const reason = target !== null && !unsupported ? ReportsPlugin.safeReason_(r, target) : null;
 
-        btn.disabled = missingSensor || unsupported;
+        btn.disabled = missingSensor || unsupported || reason !== null;
+        // The tooltip says why a row is disabled, else what it does.
+        btn.setAttribute('kt-tooltip', reason ?? r.description ?? r.name);
+        if (reason && ReportsPlugin.sectionOf_(r) === 'conjunction') {
+          conjReasons.add(reason);
+        }
       }
     });
 
@@ -419,6 +517,31 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
     if (note) {
       note.style.display = hasSensor ? 'none' : 'block';
+    }
+
+    const conjNote = getEl('reports-conj-note', true);
+
+    if (conjNote) {
+      // One line per reason, so several missing prerequisites stay readable.
+      conjNote.replaceChildren(
+        ...[...conjReasons].map((reason) => {
+          const line = document.createElement('div');
+
+          line.textContent = reason;
+
+          return line;
+        })
+      );
+      conjNote.style.display = conjReasons.size > 0 ? 'block' : 'none';
+    }
+  }
+
+  /** A report's unavailable reason; a throwing predicate counts as available so one bad report cannot break the menu. */
+  private static safeReason_(report: ReportGenerator, target: ReportTarget): string | null {
+    try {
+      return report.unavailableReason?.(target) ?? null;
+    } catch {
+      return null;
     }
   }
 
@@ -430,9 +553,13 @@ export class ReportsPlugin extends KeepTrackPlugin {
     const windowEl = getEl('reports-window', true) as HTMLSelectElement | null;
     const stepEl = getEl('reports-step', true) as HTMLSelectElement | null;
     const formatEl = getEl('reports-format', true) as HTMLSelectElement | null;
+    const conjEl = getEl('reports-conj-window', true) as HTMLSelectElement | null;
 
     if (windowEl) {
       this.windowSec_ = parseInt(windowEl.value, 10) || REPORT_DEFAULTS.windowSec;
+    }
+    if (conjEl) {
+      this.conjHalfWidthSec_ = parseInt(conjEl.value, 10) || CONJUNCTION_DEFAULT_HALF_WIDTH_SEC;
     }
     if (stepEl) {
       this.stepSec_ = parseInt(stepEl.value, 10) || REPORT_DEFAULTS.stepSec;
@@ -445,7 +572,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   }
 
   private persistOptions_(): void {
-    const settings: ReportsSettings = { windowSec: this.windowSec_, stepSec: this.stepSec_, format: this.format_ };
+    const settings: ReportsSettings = { windowSec: this.windowSec_, stepSec: this.stepSec_, format: this.format_, conjHalfWidthSec: this.conjHalfWidthSec_ };
 
     PersistenceManager.getInstance().saveItem(StorageKey.REPORTS_SETTINGS, JSON.stringify(settings));
   }
@@ -466,6 +593,9 @@ export class ReportsPlugin extends KeepTrackPlugin {
         if (settings.format) {
           this.format_ = settings.format;
         }
+        if (typeof settings.conjHalfWidthSec === 'number' && (CONJUNCTION_HALF_WIDTH_OPTIONS_SEC as readonly number[]).includes(settings.conjHalfWidthSec)) {
+          this.conjHalfWidthSec_ = settings.conjHalfWidthSec;
+        }
       } catch {
         // Ignore corrupt settings and fall back to defaults.
       }
@@ -484,6 +614,12 @@ export class ReportsPlugin extends KeepTrackPlugin {
     }
     if (formatEl) {
       formatEl.value = this.format_;
+    }
+
+    const conjEl = getEl('reports-conj-window', true) as HTMLSelectElement | null;
+
+    if (conjEl) {
+      conjEl.value = this.conjHalfWidthSec_.toString();
     }
   }
 
@@ -521,6 +657,14 @@ export class ReportsPlugin extends KeepTrackPlugin {
       return;
     }
 
+    const reason = ReportsPlugin.safeReason_(report, sat);
+
+    if (reason) {
+      errorManagerInstance.warn(reason);
+
+      return;
+    }
+
     let sensor: DetailedSensor | null = null;
 
     if (report.requiresSensor) {
@@ -530,7 +674,15 @@ export class ReportsPlugin extends KeepTrackPlugin {
       }
     }
 
-    const reportData = report.generate(sat, sensor, this.buildContext_(sat));
+    let reportData: ReportData;
+
+    try {
+      reportData = report.generate(sat, sensor, this.buildContext_(sat));
+    } catch (error) {
+      errorManagerInstance.warn(`${l('errorMsgs.generationFailed')}: ${error instanceof Error ? error.message : String(error)}`);
+
+      return;
+    }
 
     this.writeReport_(reportData);
   }
@@ -540,7 +692,13 @@ export class ReportsPlugin extends KeepTrackPlugin {
     const startTime = this.getStartTime_();
     const options: ReportOptions = { startTime, windowSec: this.windowSec_, stepSec: this.stepSec_ };
 
-    return { options, deps: this.buildCoreDeps_(sat), generatedAt: startTime };
+    return {
+      options,
+      deps: this.buildCoreDeps_(sat),
+      generatedAt: startTime,
+      secondary: this.getSecondary_(),
+      conjunctionHalfWidthSec: this.conjHalfWidthSec_,
+    };
   }
 
   /**
@@ -688,6 +846,269 @@ export class ReportsPlugin extends KeepTrackPlugin {
       isSupported: supportsPositionSampling,
       generate: (sat, _sensor, ctx) => generateSunEclipseReport(sat, ctx.options, ctx.deps, ctx.generatedAt),
     });
+
+    this.registerConjunctionReports_();
+  }
+
+  // =========================================================================
+  // Conjunction and maneuver reports
+  // =========================================================================
+
+  /** Registers the Conjunction Report, the Maneuver Report and the screening comparison. */
+  private registerConjunctionReports_(): void {
+    ReportsPlugin.registerReport({
+      id: 'conjunction-report',
+      name: l('reports.conjunction.name'),
+      description: l('reports.conjunction.description'),
+      section: 'conjunction',
+      unavailableReason: (obj) => {
+        const secondary = this.getSecondary_();
+
+        return !secondary || (obj instanceof Satellite && secondary.id === obj.id) ? l('reasons.selectSecondary') : null;
+      },
+      generate: (sat, sensor, ctx) => {
+        const secondary = ctx.secondary;
+
+        if (!(sat instanceof Satellite) || !secondary) {
+          throw new Error(l('reasons.selectSecondary'));
+        }
+        const halfWidthSec = ctx.conjunctionHalfWidthSec ?? CONJUNCTION_DEFAULT_HALF_WIDTH_SEC;
+
+        return generateConjunctionReport({
+          primary: sat,
+          secondary,
+          env: this.buildAnalysisEnv_(ctx),
+          halfWidthSec,
+          missionImpact: this.buildMissionImpact_([sat], ctx.generatedAt, halfWidthSec, sensor),
+        });
+      },
+    });
+
+    ReportsPlugin.registerReport({
+      id: 'maneuver-report',
+      name: l('reports.maneuver.name'),
+      description: l('reports.maneuver.description'),
+      section: 'conjunction',
+      unavailableReason: (obj) => (obj instanceof Satellite && analystParentSccNum(obj) !== null ? null : l('reasons.selectAnalyst')),
+      generate: (sat, sensor, ctx) => this.generateManeuverReport_(sat, sensor, ctx),
+    });
+
+    ReportsPlugin.registerReport({
+      id: 'screening-compare-report',
+      name: l('reports.screeningCompare.name'),
+      description: l('reports.screeningCompare.description'),
+      section: 'conjunction',
+      // Compares two stored runs; it does not depend on the selected object.
+      isSupported: () => true,
+      unavailableReason: () => (this.getRetainedScreeningRuns_().length < 2 ? l('reasons.needTwoRuns') : null),
+      generate: (_sat, _sensor, ctx) => this.generateScreeningCompare_(ctx),
+    });
+  }
+
+  /** App-side inputs every analysis needs (epoch, version, Pc settings). */
+  private buildAnalysisEnv_(ctx: ReportContext): AnalysisEnv {
+    const k = settingsManager.covarianceConfidenceLevel;
+
+    return {
+      analysisEpoch: ctx.generatedAt,
+      wallClock: new Date(),
+      appVersion: __VERSION__,
+      covarianceConfidenceLevel: typeof k === 'number' ? k : 1,
+      primaryHardBodyRadiusKm: DebrisScreening.PRIMARY_HARD_BODY_RADIUS_KM,
+      secondaryHardBodyRadiusKm: DebrisScreening.SECONDARY_HARD_BODY_RADIUS_KM,
+    };
+  }
+
+  /**
+   * Mission-impact block: the selected sensor's passes for each object over the
+   * conjunction window. The rest of the block is a placeholder for the composed report.
+   */
+  private buildMissionImpact_(sats: Satellite[], epoch: Date, halfWidthSec: number, sensor: DetailedSensor | null): MissionImpact {
+    const activeSensor = sensor ?? this.getSelectedSensorQuiet_();
+
+    if (!activeSensor) {
+      return { sensorName: null, passWindows: null, notes: ['No sensor selected; select a sensor to list pass windows.'] };
+    }
+
+    const opts: ReportOptions = { startTime: new Date(epoch.getTime() - halfWidthSec * 1000), windowSec: 2 * halfWidthSec, stepSec: 30 };
+    const passWindows = sats.flatMap((sat) => {
+      try {
+        return this.findPasses_(sat, activeSensor, opts).map((p) => ({
+          noradId: sat.sccNum || null,
+          aosIso: p.aos.toISOString(),
+          losIso: p.los.toISOString(),
+          maxElevationDeg: p.maxEl,
+        }));
+      } catch {
+        return [];
+      }
+    });
+
+    return { sensorName: activeSensor.name, passWindows, notes: [] };
+  }
+
+  private generateManeuverReport_(sat: ReportTarget, sensor: DetailedSensor | null, ctx: ReportContext): ReportData {
+    const parentScc = analystParentSccNum(sat);
+
+    if (!(sat instanceof Satellite) || !parentScc) {
+      throw new Error(l('reasons.selectAnalyst'));
+    }
+
+    const parent = this.findSatellite_(parentScc);
+
+    if (!parent) {
+      throw new Error(l('errorMsgs.parentNotFound').replace('{scc}', parentScc));
+    }
+
+    const halfWidthSec = ctx.conjunctionHalfWidthSec ?? CONJUNCTION_DEFAULT_HALF_WIDTH_SEC;
+    // Newest first, so find() picks the latest run of each object.
+    const runs = this.getRetainedScreeningRuns_();
+    const preRun = runs.find((r) => r.primaryId === parent.sccNum) ?? null;
+    const postRun = runs.find((r) => r.primaryId === sat.sccNum) ?? null;
+    let screeningDiff: ScreeningDiff | null = null;
+    let reason: string | null = null;
+
+    if (preRun && postRun) {
+      screeningDiff = diffScreeningRuns(preRun, postRun, {
+        excludeSecondaryIds: this.lineageExclusions_(parent.sccNum, [sat.sccNum]),
+        nameOf: (id) => this.secondaryName_(id),
+        source: 'debris-screening-runs',
+      });
+    } else {
+      reason = l('reasons.screeningRunsMissing').replace('{parent}', parent.sccNum).replace('{analyst}', sat.sccNum);
+    }
+
+    const secondary = ctx.secondary && ctx.secondary.id !== sat.id && ctx.secondary.id !== parent.id ? ctx.secondary : null;
+
+    return generateManeuverReport({
+      parent,
+      analyst: sat,
+      env: this.buildAnalysisEnv_(ctx),
+      burns: this.readBurnHistory_(sat.sccNum),
+      secondary,
+      halfWidthSec,
+      screeningDiff,
+      screeningDiffUnavailableReason: reason,
+      missionImpact: this.buildMissionImpact_([parent, sat], ctx.generatedAt, halfWidthSec, sensor),
+    });
+  }
+
+  /** Diff of the two most recent Debris Screening runs (older = pre, newer = post). */
+  private generateScreeningCompare_(ctx: ReportContext): ReportData {
+    const [newer, older] = this.getRetainedScreeningRuns_();
+
+    if (!newer || !older) {
+      throw new Error(l('reasons.needTwoRuns'));
+    }
+
+    const pre = this.findSatellite_(older.primaryId);
+    const post = this.findSatellite_(newer.primaryId);
+    const preRoot = analystParentSccNum(pre) ?? older.primaryId;
+    const postRoot = analystParentSccNum(post) ?? newer.primaryId;
+    // Runs of one family (parent and its analyst clones): the mutual rows are a
+    // clone flying with its parent, not a conjunction, so leave them out.
+    const excludeSecondaryIds = preRoot === postRoot ? this.lineageExclusions_(preRoot, [older.primaryId, newer.primaryId]) : [];
+    const diff = diffScreeningRuns(older, newer, {
+      excludeSecondaryIds,
+      nameOf: (id) => this.secondaryName_(id),
+      source: 'debris-screening-runs',
+    });
+
+    return generateScreeningCompareReport({ diff, env: this.buildAnalysisEnv_(ctx), objects: { pre, post } });
+  }
+
+  /**
+   * Secondaries to leave out of a parent-vs-analyst diff: the parent, the given
+   * analyst ids, and every other analyst object derived from the same parent.
+   */
+  private lineageExclusions_(parentScc: string, analystSccs: string[]): string[] {
+    const ids = new Set<string>([parentScc, ...analystSccs]);
+
+    try {
+      for (const obj of ServiceLocator.getCatalogManager().objectCache) {
+        if (obj instanceof Satellite && obj.sccNum && analystParentSccNum(obj) === parentScc) {
+          ids.add(obj.sccNum);
+        }
+      }
+    } catch {
+      // No catalog (tests, early boot): the explicit ids are enough.
+    }
+
+    return [...ids];
+  }
+
+  /** The Debris Screening plugin's retained runs, newest first (empty when the accessor is missing). */
+  private getRetainedScreeningRuns_(): readonly ScreeningRunInput[] {
+    const source = PluginRegistry.getPlugin(DebrisScreening) as unknown as RetainedScreeningRunsSource | null;
+
+    try {
+      return source?.getRecentScreeningRuns?.() ?? [];
+    } catch {
+      return [];
+    }
+  }
+
+  /** Burns that produced an analyst object, from the Maneuver plugin, or null when unavailable. */
+  private readBurnHistory_(sccNum: string): BurnSummary[] | null {
+    const plugin = PluginRegistry.plugins.find((p) => p.id === MANEUVER_PLUGIN_ID) as unknown as BurnHistorySource | undefined;
+
+    try {
+      const chain = plugin?.getBurnChain?.(sccNum);
+
+      if (!chain || chain.records.length === 0) {
+        return null;
+      }
+
+      return chain.records.map((r) => ({
+        epochIso: new Date(r.epochMs).toISOString(),
+        frame: r.frame === 'eci' || r.frame === 'ric' ? r.frame : 'unknown',
+        inputDeltaVMs: r.inputDvMs ? [r.inputDvMs.x, r.inputDvMs.y, r.inputDvMs.z] : [0, 0, 0],
+        magnitudeMs: r.magnitudeMs,
+        source: r.source ?? 'unknown',
+        label: r.label ?? null,
+      }));
+    } catch {
+      return null;
+    }
+  }
+
+  /** Looks up a TLE-backed catalog object by NORAD number. */
+  private findSatellite_(scc: string): Satellite | null {
+    try {
+      const catalogManager = ServiceLocator.getCatalogManager();
+      const id = catalogManager.sccNum2Id(scc);
+
+      if (id === null || id === -1) {
+        return null;
+      }
+      const obj = catalogManager.getObject(id, GetSatType.EXTRA_ONLY);
+
+      return obj instanceof Satellite ? obj : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private secondaryName_(scc: string): string {
+    return scc ? (this.findSatellite_(scc)?.name ?? '') : '';
+  }
+
+  /** The selected secondary, when it is a TLE-backed satellite. */
+  private getSecondary_(): Satellite | null {
+    const secondary = this.selectSatManager_?.secondarySatObj;
+
+    return secondary instanceof Satellite ? secondary : null;
+  }
+
+  /** The selected sensor, without the "select a sensor" toast. */
+  private getSelectedSensorQuiet_(): DetailedSensor | null {
+    try {
+      const sensorManager = ServiceLocator.getSensorManager();
+
+      return sensorManager.isSensorSelected() ? (sensorManager.currentSensors[0] ?? null) : null;
+    } catch {
+      return null;
+    }
   }
 
   // =========================================================================

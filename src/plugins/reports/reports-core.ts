@@ -35,6 +35,12 @@ export interface ReportTable {
   rows: string[][];
 }
 
+/** A titled table printed in the text output above the main table. */
+export interface ReportSection {
+  title: string;
+  table: ReportTable;
+}
+
 /**
  * The output of a report generator. Built-in reports return a structured
  * {@link table}; the legacy `body`/`columns`/`isHeaders` fields are retained so
@@ -49,6 +55,16 @@ export interface ReportData {
   table?: ReportTable;
   /** Message shown in place of rows when the table is empty (e.g. "No passes found"). */
   emptyMessage?: string;
+  /** Extra titled tables shown in the text output before the main table (CSV carries only the main table). */
+  sections?: ReportSection[];
+  /** Title printed above the main table in the text output. */
+  tableTitle?: string;
+  /**
+   * Structured payload for the JSON output. When set, JSON downloads this value
+   * instead of the header-keyed rows of {@link table} (the conjunction reports put
+   * their ConjunctionAnalysisState here).
+   */
+  json?: unknown;
   /** @deprecated Legacy raw CSV-ish body. Prefer {@link table}. */
   body?: string;
   /** @deprecated Legacy fixed-width column count. */
@@ -96,7 +112,7 @@ const HEADER_RULE = '-'.repeat(31);
 /**
  * Minimal shape the position/time-series generators need from a report target.
  * Full TLE-backed satellites satisfy it, but so do ephemeris-driven objects
- * (OemSatellite) and ballistic missiles (MissileObject) — anything that can be
+ * (OemSatellite) and ballistic missiles (MissileObject): anything that can be
  * sampled for a position over time.
  */
 export interface ReportableObject {

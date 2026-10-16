@@ -48,11 +48,11 @@
         "date": "Data"
       },
       "help": {
-        "overview": "Operacje zbliżeniowe i spotkania (RPO) znajdują nadchodzące bliskie zbliżenia między satelitami: statek manewrujący w pobliżu innego, inspekcję współorbitalną lub po prostu dwa obiekty dryfujące blisko siebie. Wskaż satelitę (lub przeszukaj cały reżim orbitalny), a funkcja zwróci każde przewidywane spotkanie w ramach progów odległości i prędkości.",
+        "overview": "Rendezvous and Proximity Operations (RPO) znajduje powolne zbliżenia współorbitalne, takie jak satelita inspekcyjny lub serwisowy pracujący przy celu, sprawdzając tylko obiekty, które dzielą płaszczyznę orbity celu (inklinacja i RAAN w granicach {deg}° w LEO, pobliskie pozycje długości w GEO). Szybkie przecięcia między różnymi orbitami są celowo wyłączone; do nich użyj <strong>Debris Screening</strong>. Podaj satelitę (lub przeszukaj cały reżim orbitalny), a narzędzie zwróci spotkania współorbitalne mieszczące się w progach odległości i prędkości.",
         "imgAlt": "Menu RPO z parametrami wyszukiwania",
         "imgCaption": "Ustaw progi i typ orbity, a następnie przeszukaj jednego satelitę lub wszystkie ze wszystkimi.",
         "modesHeading": "Tryby wyszukiwania",
-        "modes": "Domyślnie wyszukiwanie pobiera wprowadzony <strong>NORAD ID</strong> i porównuje tego satelitę z resztą jego reżimu orbitalnego. Zaznaczenie <strong>Geostacjonarna wszystkie ze wszystkimi</strong> porównuje zamiast tego każdego satelitę GEO z każdym innym, co pozwala zbadać aktywność na całym pasie. <strong>Porównaj tylko ładunki</strong> pomija odłamki i człony rakiet, a <strong>Ignoruj RSO Vimpel</strong> wyklucza obiekty pochodzące z katalogu JSC Vimpel.",
+        "modes": "Domyślnie wyszukiwanie pobiera wprowadzony <strong>NORAD ID</strong> i porównuje tego satelitę z pobliskimi obiektami w tej samej płaszczyźnie orbity. Zaznaczenie <strong>Geostacjonarna wszystkie ze wszystkimi</strong> porównuje zamiast tego każdego satelitę GEO z każdym innym, co pozwala zbadać aktywność na całym pasie. <strong>Porównaj tylko ładunki</strong> pomija odłamki i człony rakiet, a <strong>Ignoruj RSO Vimpel</strong> wyklucza obiekty pochodzące z katalogu JSC Vimpel.",
         "resultsHeading": "Odczytywanie wyników",
         "results": "Każdy wiersz łączy <strong>Cel</strong> i <strong>Obiekt ścigający</strong> z ich najmniejszą wartością <strong>Odl. względna</strong>, <strong>Prędk. względna</strong> oraz <strong>Data</strong> spotkania. Kliknij wiersz, aby wybrać oba satelity i przenieść kamerę oraz zegar do momentu zbliżenia; wyniki GEO przełączają też wyświetlanie orbit na ECF, dzięki czemu ruch względny jest łatwy do odczytania. Przycisk pobierania eksportuje listę jako plik CSV.",
         "howToUse": "<ol><li>Otwórz menu z dolnego paska lub naciśnij <strong>X</strong>.</li><li>Wybierz <strong>Typ orbity</strong> (geostacjonarna lub niska orbita okołoziemska) i ustaw <strong>Próg maksymalnej odległości</strong>, <strong>Maksymalna prędkość względna</strong> oraz <strong>Czas wyszukiwania</strong>.</li><li>Wprowadź <strong>NORAD ID</strong> lub zaznacz <strong>Geostacjonarna wszystkie ze wszystkimi</strong>, aby zbadać cały pas.</li><li>Kliknij <strong>Znajdź RPO</strong>. Długie wyszukiwania pokazują postęp; wyniki otwierają się w panelu listy.</li><li>Kliknij dowolny wiersz, aby przelecieć do tego spotkania.</li></ol>",
@@ -60,7 +60,9 @@
         "tip2": "Wyszukiwania GEO wszystkich ze wszystkimi są kosztowne; najpierw zawęź czas trwania, a potem rozszerz go, gdy progi będą wyglądały dobrze.",
         "tip3": "Kliknięcie wyniku GEO przełącza orbity na widok związany z Ziemią (ECF); powiadomienie informuje, który tryb jest aktywny.",
         "shortcutToggle": "Przełącz menu RPO"
-      }
+      },
+      "scopeNote": "RPO szuka powolnych zbliżeń współorbitalnych: w LEO sprawdza tylko obiekty w granicach {deg}° od inklinacji i płaszczyzny orbity celu, a w GEO tylko pobliskie pozycje długości. Do szybkich przecięć z innych orbit użyj Debris Screening.",
+      "noRposFoundCoorbital": "Nie znaleziono RPO wśród {count} obiektów współorbitalnych. Ruch przecinający nie jest tu sprawdzany; spróbuj Debris Screening."
     }
   }
 }

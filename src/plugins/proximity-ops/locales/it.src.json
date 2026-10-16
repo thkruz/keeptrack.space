@@ -48,11 +48,11 @@
         "date": "Data"
       },
       "help": {
-        "overview": "Le operazioni di rendez-vous e prossimità (RPO) trovano i prossimi avvicinamenti tra satelliti: un veicolo che manovra vicino a un altro, un'ispezione co-orbitale o semplicemente due oggetti che derivano vicini. Indica un satellite (o cerca in un intero regime orbitale) e restituisce ogni incontro previsto entro le tue soglie di distanza e velocità.",
+        "overview": "Rendezvous and Proximity Operations (RPO) trova avvicinamenti lenti e co-orbitali, come un satellite di ispezione o di servizio che opera vicino a un bersaglio, esaminando solo gli oggetti che condividono il piano orbitale del bersaglio (inclinazione e RAAN entro {deg}° in LEO, posizioni in longitudine vicine in GEO). Gli incroci veloci tra orbite diverse sono esclusi per progetto; per quelli usa <strong>Debris Screening</strong>. Indica un satellite (o esamina un intero regime orbitale) e restituisce gli incontri co-orbitali entro le tue soglie di distanza e velocità.",
         "imgAlt": "Il menu RPO con i parametri di ricerca",
         "imgCaption": "Imposta le soglie e il tipo di orbita, poi cerca un satellite o tutti contro tutti.",
         "modesHeading": "Modalità di ricerca",
-        "modes": "Per impostazione predefinita la ricerca prende l'<strong>ID NORAD</strong> inserito e confronta quel satellite con il resto del suo regime orbitale. Selezionando <strong>Geostazionario tutti contro tutti</strong> viene invece confrontato ogni satellite GEO con tutti gli altri, che è il modo per esaminare l'attività dell'intera cintura. <strong>Confronta solo carichi utili</strong> salta detriti e corpi di razzo, e <strong>Ignora RSO Vimpel</strong> esclude gli oggetti provenienti dal catalogo JSC Vimpel.",
+        "modes": "Per impostazione predefinita la ricerca prende l'<strong>ID NORAD</strong> inserito e confronta quel satellite con gli oggetti vicini nello stesso piano orbitale. Selezionando <strong>Geostazionario tutti contro tutti</strong> viene invece confrontato ogni satellite GEO con tutti gli altri, che è il modo per esaminare l'attività dell'intera cintura. <strong>Confronta solo carichi utili</strong> salta detriti e corpi di razzo, e <strong>Ignora RSO Vimpel</strong> esclude gli oggetti provenienti dal catalogo JSC Vimpel.",
         "resultsHeading": "Leggere i risultati",
         "results": "Ogni riga abbina un <strong>Bersaglio</strong> e un <strong>Inseguitore</strong> con la loro minima <strong>Dist. relativa</strong>, la <strong>Vel. relativa</strong> e la <strong>Data</strong> dell'incontro. Fai clic su una riga per selezionare entrambi i satelliti e portare la camera e l'orologio all'avvicinamento; i risultati GEO commutano anche la visualizzazione delle orbite in ECF, così il moto relativo è facile da leggere. Il pulsante di scaricamento esporta l'elenco come file CSV.",
         "howToUse": "<ol><li>Apri il menu dalla barra inferiore o premi <strong>X</strong>.</li><li>Scegli il <strong>Tipo di orbita</strong> (geostazionario o orbita terrestre bassa) e imposta la <strong>Soglia distanza massima</strong>, la <strong>Velocità relativa massima</strong> e la <strong>Durata ricerca</strong>.</li><li>Inserisci un <strong>ID NORAD</strong>, oppure seleziona <strong>Geostazionario tutti contro tutti</strong> per un'indagine sull'intera cintura.</li><li>Fai clic su <strong>Trova RPO</strong>. Le ricerche lunghe mostrano l'avanzamento; i risultati si aprono nel pannello elenco.</li><li>Fai clic su una riga qualsiasi per volare a quell'incontro.</li></ol>",
@@ -60,7 +60,9 @@
         "tip2": "Le ricerche GEO tutti contro tutti sono onerose; riduci prima la durata, poi ampliala quando le soglie sembrano corrette.",
         "tip3": "Facendo clic su un risultato GEO le orbite passano alla visualizzazione fissa rispetto alla Terra (ECF); la notifica indica quale modalità è attiva.",
         "shortcutToggle": "Attiva/disattiva il menu RPO"
-      }
+      },
+      "scopeNote": "RPO cerca avvicinamenti lenti e co-orbitali: in LEO controlla solo gli oggetti entro {deg}° dall'inclinazione e dal piano orbitale del bersaglio, in GEO solo le posizioni in longitudine vicine. Per gli incroci veloci da altre orbite usa Debris Screening.",
+      "noRposFoundCoorbital": "Nessuna RPO trovata tra {count} oggetti co-orbitali. Il traffico in incrocio non viene esaminato qui; prova Debris Screening."
     }
   }
 }

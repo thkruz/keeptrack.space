@@ -6,8 +6,10 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
+import { t7e } from '@app/locales/keys';
 import { FindSatPlugin, SearchSatParams } from '@app/plugins/find-sat/find-sat';
-import { Satellite } from '@ootk/src/main';
+import { buildFindSatExportRows } from '@app/plugins/find-sat/find-sat-export';
+import { Kilometers, PayloadStatus, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
 import { mockUiManager, setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
@@ -258,6 +260,103 @@ describe('FindSatPlugin_class', () => {
     expect(results[0].bus).toBe('Starlink');
     expect(results[0].payload).toBe('Imaging-1');
     expect(mockUiManager.doSearch).toHaveBeenCalledWith('00005');
+  });
+
+  describe('search limit cap', () => {
+    let priorLimit: number;
+
+    beforeEach(() => {
+      priorLimit = settingsManager.searchLimit;
+    });
+
+    afterEach(() => {
+      settingsManager.searchLimit = priorLimit;
+    });
+
+    it('caps displayed results but keeps every match for export and reports the true count', () => {
+      const plugin = initPluginWithCatalog([createFindSat(5, 'Starlink', 'Imaging-1'), createFindSat(6, 'Starlink', 'Weather-1'), createFindSat(7, 'Starlink', 'Relay-1')]);
+      const toast = vi.spyOn(mockUiManager, 'toast');
+
+      toast.mockClear();
+
+      settingsManager.searchLimit = 2;
+      plugin['runSearch_']({ ...defaultSearchParams(), bus: 'Starlink' }, false);
+
+      expect(plugin['lastResults_']).toHaveLength(2);
+      expect(plugin['lastAllMatches_']).toHaveLength(3);
+      expect(getEl('fbl-result-count')!.textContent).toContain('Showing 2 of 3 matches');
+      expect(getEl('fbl-result-count')!.textContent).toContain('Maximum Results in Search');
+      expect(toast).toHaveBeenCalledWith(expect.stringContaining('Showing 2 of 3 matches'), expect.anything());
+      expect(mockUiManager.doSearch).toHaveBeenCalledWith('00005,00006');
+    });
+
+    it('shows the plain count and no cap toast when the limit is not exceeded', () => {
+      const plugin = initPluginWithCatalog([createFindSat(5, 'Starlink', 'Imaging-1'), createFindSat(6, 'Starlink', 'Weather-1')]);
+      const toast = vi.spyOn(mockUiManager, 'toast');
+
+      toast.mockClear();
+
+      settingsManager.searchLimit = 2;
+      plugin['runSearch_']({ ...defaultSearchParams(), bus: 'Starlink' }, false);
+
+      expect(getEl('fbl-result-count')!.textContent).toBe('2 result(s)');
+      expect(toast).not.toHaveBeenCalled();
+    });
+  });
+
+  it('should filter by perigee, apogee and operational status', () => {
+    const inBand = createFindSat(5, 'A', 'Imaging-1');
+    const tooHigh = createFindSat(6, 'A', 'Imaging-1');
+    const debris = createFindSat(7, 'A', 'Imaging-1');
+
+    inBand.perigee = 780 as Kilometers;
+    inBand.apogee = 800 as Kilometers;
+    inBand.type = SpaceObjectType.PAYLOAD;
+    inBand.status = PayloadStatus.NONOPERATIONAL;
+    tooHigh.perigee = 1200 as Kilometers;
+    tooHigh.apogee = 1210 as Kilometers;
+    debris.perigee = 790 as Kilometers;
+    debris.apogee = 810 as Kilometers;
+    debris.type = SpaceObjectType.DEBRIS;
+    const plugin = initPluginWithCatalog([inBand, tooHigh, debris]);
+
+    const band = plugin['searchSats_']({
+      ...defaultSearchParams(),
+      perigee: 790 as Kilometers,
+      perigeeMarg: 20 as Kilometers,
+      apogee: 805 as Kilometers,
+      apogeeMarg: 20 as Kilometers,
+    });
+
+    expect(band.map((sat) => sat.id)).toEqual([5, 7]);
+
+    const inactiveDebris = plugin['searchSats_']({ ...defaultSearchParams(), perigee: 790 as Kilometers, perigeeMarg: 20 as Kilometers, opStatus: 'inactive', objType: [3] });
+
+    expect(inactiveDebris.map((sat) => sat.id)).toEqual([7]);
+  });
+
+  it('should accept operational status as the only criterion', () => {
+    const active = createFindSat(5, 'A', 'Imaging-1');
+
+    active.type = SpaceObjectType.PAYLOAD;
+    active.status = PayloadStatus.OPERATIONAL;
+    const plugin = initPluginWithCatalog([active, createFindSat(6, 'A', 'Imaging-1')]);
+
+    expect(plugin['searchSats_']({ ...defaultSearchParams(), opStatus: 'active' }).map((sat) => sat.id)).toContain(5);
+  });
+
+  it('export rows include perigee, apogee and status columns', () => {
+    const sat = createFindSat(5, 'A', 'Imaging-1');
+
+    sat.type = SpaceObjectType.PAYLOAD;
+    sat.status = PayloadStatus.OPERATIONAL;
+    const rows = buildFindSatExportRows([sat]);
+
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toHaveProperty('perigee', sat.perigee);
+    expect(rows[0]).toHaveProperty('apogee', sat.apogee);
+    expect(rows[0].operationalStatus).toBe('Active');
+    expect(rows[0].status).toBe(t7e('SatInfoBoxObject.Status.operational'));
   });
 
   it('should find satellites with all inputs set to 0', () => {
@@ -837,6 +936,9 @@ describe('FindSatPlugin_class', () => {
       expect(html).toContain('fbl-rcs');
       expect(html).toContain('fbl-raan');
       expect(html).toContain('fbl-argPe');
+      expect(html).toContain('fbl-perigee');
+      expect(html).toContain('fbl-apogee');
+      expect(html).toContain('fbl-status');
       expect(html).toContain('findByLooks-submit');
       expect(html).toContain('findByLooks-export');
     });

@@ -7,7 +7,7 @@
  * caller-supplied resolver so the sensor/time/position lookup stays in the
  * plugin while the filtering logic lives here.
  */
-import { Degrees, Hours, Minutes, Satellite } from '@ootk/src/main';
+import { Degrees, Hours, Kilometers, Minutes, PayloadStatus, Satellite, SpaceObjectType } from '@ootk/src/main';
 
 /** Range-azimuth-elevation triple as produced by the plugin's resolver. */
 export interface LookAngle {
@@ -70,3 +70,49 @@ export const filterByLookAngle = (sats: Satellite[], resolver: LookAngleResolver
 
     return rae[axis] >= min && rae[axis] <= max;
   });
+
+/** Keep satellites whose perigee altitude (km) falls within [min, max]; missing perigee is excluded. */
+export const filterByPerigee = (sats: Satellite[], min: Kilometers, max: Kilometers): Satellite[] =>
+  sats.filter((sat) => typeof sat.perigee === 'number' && sat.perigee >= min && sat.perigee <= max);
+
+/** Keep satellites whose apogee altitude (km) falls within [min, max]; missing apogee is excluded. */
+export const filterByApogee = (sats: Satellite[], min: Kilometers, max: Kilometers): Satellite[] =>
+  sats.filter((sat) => typeof sat.apogee === 'number' && sat.apogee >= min && sat.apogee <= max);
+
+/** Coarse operational status buckets offered by the Operational Status filter. */
+export type OperationalStatus = 'active' | 'inactive' | 'unknown';
+
+/** Every bucket, in display order. */
+export const OPERATIONAL_STATUSES: readonly OperationalStatus[] = ['active', 'inactive', 'unknown'];
+
+/**
+ * Buckets a catalog object's operational status.
+ *
+ * Payloads use the catalog `status` field (the same field behind the info
+ * box's "Status" row): operational, partially operational, backup/standby,
+ * spare and extended mission count as active; non-operational and decayed as
+ * inactive; anything else as unknown. Rocket bodies and debris carry no status
+ * code but can never be operational, so they are bucketed as inactive.
+ */
+export const getOperationalStatus = (sat: Satellite): OperationalStatus => {
+  if (sat.type === SpaceObjectType.ROCKET_BODY || sat.type === SpaceObjectType.DEBRIS) {
+    return 'inactive';
+  }
+
+  switch (sat.status) {
+    case PayloadStatus.OPERATIONAL:
+    case PayloadStatus.PARTIALLY_OPERATIONAL:
+    case PayloadStatus.BACKUP_STANDBY:
+    case PayloadStatus.SPARE:
+    case PayloadStatus.EXTENDED_MISSION:
+      return 'active';
+    case PayloadStatus.NONOPERATIONAL:
+    case PayloadStatus.DECAYED:
+      return 'inactive';
+    default:
+      return 'unknown';
+  }
+};
+
+/** Keep objects whose operational status bucket is in the requested list. */
+export const filterByOperationalStatus = (sats: Satellite[], statuses: OperationalStatus[]): Satellite[] => sats.filter((sat) => statuses.includes(getOperationalStatus(sat)));

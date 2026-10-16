@@ -1,7 +1,6 @@
 /* eslint-disable prefer-const */
 /* eslint-disable complexity */
 
-import { CatalogExporter } from '@app/app/data/catalog-exporter';
 import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
 import { CameraType } from '@app/engine/camera/camera-type';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
@@ -20,16 +19,22 @@ import { t7e } from '@app/locales/keys';
 import { BaseObject, Degrees, eci2rae, Hours, Kilometers, Minutes, Satellite } from '@ootk/src/main';
 import findSatPng from '@public/img/icons/database-search.png';
 import './find-sat.css';
+import { exportFindSatResults, operationalStatusLabel } from './find-sat-export';
 import {
+  filterByApogee,
   filterByArgOfPerigee,
   filterByInclination,
   filterByLookAngle,
   filterByObjType,
+  filterByOperationalStatus,
+  filterByPerigee,
   filterByPeriod,
   filterByRcs,
   filterByRightAscension,
   filterByTleAge,
   LookAngleResolver,
+  OPERATIONAL_STATUSES,
+  OperationalStatus,
 } from './find-sat-filters';
 
 export interface SearchSatParams {
@@ -58,6 +63,14 @@ export interface SearchSatParams {
   rngMarg: Kilometers;
   shape: string;
   source: string;
+  /** Perigee altitude in km (optional; NaN or absent = not filtered) */
+  perigee?: Kilometers;
+  perigeeMarg?: Kilometers;
+  /** Apogee altitude in km (optional; NaN or absent = not filtered) */
+  apogee?: Kilometers;
+  apogeeMarg?: Kilometers;
+  /** 'All' or a pipe-joined list of operational status buckets (active|inactive|unknown) */
+  opStatus?: string;
 }
 
 /** Flags describing which search criteria were actually supplied by the user. */
@@ -71,6 +84,9 @@ interface SearchValidityFlags {
   isValidPeriod: boolean;
   isValidTleAge: boolean;
   isValidRcs: boolean;
+  isValidPerigee: boolean;
+  isValidApogee: boolean;
+  isSpecificOpStatus: boolean;
   isSpecificCountry: boolean;
   isSpecificBus: boolean;
   isSpecificShape: boolean;
@@ -89,12 +105,21 @@ interface SearchMargins {
   rcsMarg: number;
   raanMarg: Degrees;
   argPeMarg: Degrees;
+  perigeeMarg: Kilometers;
+  apogeeMarg: Kilometers;
 }
 
 export class FindSatPlugin extends KeepTrackPlugin {
   readonly id = 'FindSatPlugin';
   protected lastResults_ = <Satellite[]>[];
   protected hasSearchBeenRun_ = false;
+  /**
+   * Every object that matched the last search, before the display cap. The
+   * globe and search bar only get `lastResults_` (capped by the search-limit
+   * setting to keep the orbit-line count sane), but exports draw nothing and
+   * use this full list.
+   */
+  protected lastAllMatches_ = <Satellite[]>[];
 
   /** Filter type ids that can only be evaluated relative to a selected sensor. */
   protected static readonly SENSOR_REQUIRED_FILTER_IDS_ = ['az', 'el', 'rng'];
@@ -179,7 +204,9 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
       return;
     }
-    CatalogExporter.exportTle2Csv(this.lastResults_);
+    // Export the full match list: the search-limit cap protects the GPU from
+    // drawing too many orbits and does not apply to a spreadsheet.
+    exportFindSatResults(this.lastAllMatches_.length >= this.lastResults_.length ? this.lastAllMatches_ : this.lastResults_);
   }
 
   protected buildSideMenuHtml_(): string {
@@ -239,6 +266,15 @@ export class FindSatPlugin extends KeepTrackPlugin {
             <option value=3>${l('typeDebris')}</option>
           </select>
           <label for="fbl-type">${l('objectType')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+          <select id="fbl-status" multiple>
+            <option value='All' selected>${l('all')}</option>
+            ${OPERATIONAL_STATUSES.map((status) => `<option value='${status}'>${operationalStatusLabel(status)}</option>`).join('')}
+          </select>
+          <label for="fbl-status">${l('operationalStatus')}</label>
         </div>
       </div>
       <div class="kt-field-row">
@@ -339,7 +375,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     );
   }
 
-  /** Orbital-element filters (inclination, period, RAAN, argument of perigee). */
+  /** Orbital-element filters (inclination, period, RAAN, argument of perigee, perigee, apogee). */
   protected orbitalElementsBody_(): string {
     const l = (key: string) => t7e(`plugins.FindSatPlugin.labels.${key}` as Parameters<typeof t7e>[0]);
 
@@ -384,6 +420,26 @@ export class FindSatPlugin extends KeepTrackPlugin {
         <div class="input-field col s6">
           <input value="0.5" placeholder="0.5" id="fbl-argPe-margin" type="text">
           <label for="fbl-argPe-margin" class="active">${l('argOfPerigeeMargin')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s6">
+          <input placeholder="XXXX" id="fbl-perigee" type="text">
+          <label for="fbl-perigee" class="active">${l('perigee')}</label>
+        </div>
+        <div class="input-field col s6">
+          <input value="50" placeholder="50" id="fbl-perigee-margin" type="text">
+          <label for="fbl-perigee-margin" class="active">${l('perigeeMargin')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s6">
+          <input placeholder="XXXX" id="fbl-apogee" type="text">
+          <label for="fbl-apogee" class="active">${l('apogee')}</label>
+        </div>
+        <div class="input-field col s6">
+          <input value="50" placeholder="50" id="fbl-apogee-margin" type="text">
+          <label for="fbl-apogee-margin" class="active">${l('apogeeMargin')}</label>
         </div>
       </div>
     `
@@ -465,6 +521,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
     FindSatPlugin.wireAllOptionExclusivity_('fbl-type', '0');
     FindSatPlugin.wireAllOptionExclusivity_('fbl-country', 'All');
+    FindSatPlugin.wireAllOptionExclusivity_('fbl-status', 'All');
 
     getUnique(satData.filter((obj: BaseObject) => (obj as Satellite)?.shape).map((obj) => (obj as Satellite).shape))
       // Sort using lower case
@@ -625,6 +682,12 @@ export class FindSatPlugin extends KeepTrackPlugin {
     const payload = (<HTMLInputElement>getEl('fbl-payload')).value;
     const shape = (<HTMLInputElement>getEl('fbl-shape')).value;
     const source = (<HTMLInputElement>getEl('fbl-source')).value;
+    const perigee = parseFloat((<HTMLInputElement | null>getEl('fbl-perigee', true))?.value ?? '');
+    const perigeeMarg = parseFloat((<HTMLInputElement | null>getEl('fbl-perigee-margin', true))?.value ?? '');
+    const apogee = parseFloat((<HTMLInputElement | null>getEl('fbl-apogee', true))?.value ?? '');
+    const apogeeMarg = parseFloat((<HTMLInputElement | null>getEl('fbl-apogee-margin', true))?.value ?? '');
+    const statusValues = FindSatPlugin.readMultiSelect_('fbl-status');
+    const opStatus = statusValues.length === 0 || statusValues.includes('All') ? 'All' : statusValues.join('|');
 
     const searchParams = {
       az,
@@ -651,6 +714,11 @@ export class FindSatPlugin extends KeepTrackPlugin {
       payload,
       shape,
       source,
+      perigee,
+      perigeeMarg,
+      apogee,
+      apogeeMarg,
+      opStatus,
     } as SearchSatParams;
 
     // Az/el/range are computed relative to the selected sensor, so a search that
@@ -677,6 +745,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     }
 
     this.hasSearchBeenRun_ = true;
+    this.lastAllMatches_ = [];
 
     const searchInput = getEl('search', true) as HTMLInputElement | null;
 
@@ -699,16 +768,27 @@ export class FindSatPlugin extends KeepTrackPlugin {
     if (results.length === 0) {
       ServiceLocator.getUiManager().toast(t7e('plugins.FindSatPlugin.errorMsgs.NoSatellitesFound'), ToastMsgType.critical);
     }
-    this.updateResultCount_(results.length);
+    this.updateResultCount_(results.length, Math.max(this.lastAllMatches_.length, results.length));
   }
 
-  /** Updates the result-count readout in the side menu, when present. */
-  protected updateResultCount_(count: number): void {
+  /**
+   * Updates the result-count readout in the side menu, when present. When the
+   * search-limit setting truncated the displayed results, say so and point at
+   * the setting instead of passing the cap off as the true count.
+   */
+  protected updateResultCount_(shown: number, total = shown): void {
     const el = getEl(this.resultCountElId_, true);
 
-    if (el) {
-      el.textContent = t7e('plugins.FindSatPlugin.labels.resultCount' as Parameters<typeof t7e>[0]).replace('{count}', count.toString());
+    if (!el) {
+      return;
     }
+
+    el.textContent =
+      total > shown
+        ? t7e('plugins.FindSatPlugin.labels.resultCountCapped' as Parameters<typeof t7e>[0])
+            .replace('{shown}', shown.toString())
+            .replace(/\{total\}/gu, total.toString())
+        : t7e('plugins.FindSatPlugin.labels.resultCount' as Parameters<typeof t7e>[0]).replace('{count}', shown.toString());
   }
 
   /**
@@ -757,14 +837,13 @@ export class FindSatPlugin extends KeepTrackPlugin {
   protected static limitPossibles_(possibles: Satellite[], limit: number): Satellite[] {
     const uiManagerInstance = ServiceLocator.getUiManager();
 
-    if (possibles.length >= limit) {
-      const msg = t7e('plugins.FindSatPlugin.errorMsgs.TooManyResults').replace('{limit}', limit.toString());
+    if (possibles.length > limit) {
+      const msg = t7e('plugins.FindSatPlugin.errorMsgs.TooManyResults').replace('{limit}', limit.toString()).replace('{total}', possibles.length.toString());
 
       uiManagerInstance.toast(msg, ToastMsgType.serious);
     }
-    possibles = possibles.slice(0, limit);
 
-    return possibles;
+    return possibles.slice(0, limit);
   }
 
   /** True when a numeric parameter was actually supplied (not NaN / Infinity). */
@@ -791,6 +870,9 @@ export class FindSatPlugin extends KeepTrackPlugin {
       isValidPeriod: isNumeric(params.period),
       isValidTleAge: isNumeric(params.tleAge),
       isValidRcs: isNumeric(params.rcs),
+      isValidPerigee: isNumeric(params.perigee ?? NaN),
+      isValidApogee: isNumeric(params.apogee ?? NaN),
+      isSpecificOpStatus: typeof params.opStatus === 'string' && params.opStatus !== '' && params.opStatus !== 'All',
       isSpecificCountry: params.countryCode !== 'All',
       isSpecificBus: params.bus !== 'All',
       isSpecificShape: params.shape !== 'All',
@@ -811,6 +893,9 @@ export class FindSatPlugin extends KeepTrackPlugin {
       !flags.isValidRcs &&
       !flags.isValidArgPe &&
       !flags.isValidRaan &&
+      !flags.isValidPerigee &&
+      !flags.isValidApogee &&
+      !flags.isSpecificOpStatus &&
       !flags.isSpecificCountry &&
       !flags.isSpecificBus &&
       !flags.isSpecificShape &&
@@ -841,7 +926,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     return filtered;
   }
 
-  /** Applies the orbital-element (inc / raan / argPe / period / tleAge / rcs) filters. */
+  /** Applies the orbital-element (inc / raan / argPe / period / perigee / apogee / tleAge / rcs) filters. */
   private static applyOrbitalFilters_(res: Satellite[], params: SearchSatParams, margins: SearchMargins, flags: SearchValidityFlags): Satellite[] {
     let filtered = res;
 
@@ -857,6 +942,16 @@ export class FindSatPlugin extends KeepTrackPlugin {
     if (flags.isValidPeriod) {
       filtered = filterByPeriod(filtered, (params.period - margins.periodMarg) as Minutes, (params.period + margins.periodMarg) as Minutes);
     }
+    if (flags.isValidPerigee) {
+      const perigee = params.perigee as number;
+
+      filtered = filterByPerigee(filtered, (perigee - margins.perigeeMarg) as Kilometers, (perigee + margins.perigeeMarg) as Kilometers);
+    }
+    if (flags.isValidApogee) {
+      const apogee = params.apogee as number;
+
+      filtered = filterByApogee(filtered, (apogee - margins.apogeeMarg) as Kilometers, (apogee + margins.apogeeMarg) as Kilometers);
+    }
     if (flags.isValidTleAge) {
       filtered = filterByTleAge(filtered, (params.tleAge - margins.tleAgeMarg) as Hours, (params.tleAge + margins.tleAgeMarg) as Hours, new Date());
     }
@@ -867,9 +962,15 @@ export class FindSatPlugin extends KeepTrackPlugin {
     return filtered;
   }
 
-  /** Applies the categorical (country / bus / shape / source / payload) filters. */
+  /** Applies the categorical (operational status / country / bus / shape / source / payload) filters. */
   private static applyCategoricalFilters_(res: Satellite[], params: SearchSatParams): Satellite[] {
     let filtered = res;
+
+    if (typeof params.opStatus === 'string' && params.opStatus !== '' && params.opStatus !== 'All') {
+      const statuses = params.opStatus.split('|').filter((status): status is OperationalStatus => (OPERATIONAL_STATUSES as readonly string[]).includes(status));
+
+      filtered = filterByOperationalStatus(filtered, statuses);
+    }
 
     if (params.countryCode !== 'All') {
       let country = params.countryCode.split('|');
@@ -938,6 +1039,8 @@ export class FindSatPlugin extends KeepTrackPlugin {
       rcsMarg: FindSatPlugin.marginOrDefault_(searchParams.rcsMarg, searchParams.rcs / 10),
       raanMarg: FindSatPlugin.marginOrDefault_(searchParams.raanMarg, 1),
       argPeMarg: FindSatPlugin.marginOrDefault_(searchParams.argPeMarg, 1),
+      perigeeMarg: FindSatPlugin.marginOrDefault_(searchParams.perigeeMarg ?? NaN, 50),
+      apogeeMarg: FindSatPlugin.marginOrDefault_(searchParams.apogeeMarg ?? NaN, 50),
     };
 
     let res = ServiceLocator.getCatalogManager().getSats();
@@ -952,6 +1055,8 @@ export class FindSatPlugin extends KeepTrackPlugin {
     res = FindSatPlugin.applyOrbitalFilters_(res, searchParams, margins, flags);
     res = FindSatPlugin.applyCategoricalFilters_(res, searchParams);
 
+    // Keep every match for export; only the displayed set is capped.
+    this.lastAllMatches_ = res;
     res = FindSatPlugin.limitPossibles_(res, settingsManager.searchLimit);
 
     FindSatPlugin.commitSearchResults_(res);

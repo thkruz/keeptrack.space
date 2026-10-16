@@ -1,15 +1,19 @@
 import {
+  filterByApogee,
   filterByArgOfPerigee,
   filterByInclination,
   filterByLookAngle,
   filterByObjType,
+  filterByOperationalStatus,
+  filterByPerigee,
   filterByPeriod,
   filterByRcs,
   filterByRightAscension,
   filterByTleAge,
+  getOperationalStatus,
   LookAngleResolver,
 } from '@app/plugins/find-sat/find-sat-filters';
-import { Degrees, Hours, Minutes, Satellite } from '@ootk/src/main';
+import { Degrees, Hours, Kilometers, Minutes, PayloadStatus, Satellite, SpaceObjectType } from '@ootk/src/main';
 
 /** Minimal satellite-like stub for the pure predicate tests. */
 const sat = (props: Partial<Satellite> & { id: number }): Satellite =>
@@ -91,6 +95,54 @@ describe('find-sat-filters', () => {
       const debris = { id: 5, isSatellite: () => false, isMissile: () => false } as unknown as Satellite;
 
       expect(filterByLookAngle([debris], resolver, 'az', 0, 360)).toHaveLength(0);
+    });
+  });
+  describe('filterByPerigee / filterByApogee', () => {
+    const sats = [sat({ id: 1, perigee: 500 as Kilometers, apogee: 600 as Kilometers }), sat({ id: 2, perigee: 780 as Kilometers, apogee: 820 as Kilometers }), sat({ id: 3 })];
+
+    it('keeps perigees inside the inclusive band and drops missing values', () => {
+      expect(filterByPerigee(sats, 450 as Kilometers, 500 as Kilometers).map((s) => s.id)).toEqual([1]);
+      expect(filterByPerigee(sats, 0 as Kilometers, 10000 as Kilometers).map((s) => s.id)).toEqual([1, 2]);
+    });
+
+    it('keeps apogees inside the inclusive band and drops missing values', () => {
+      expect(filterByApogee(sats, 800 as Kilometers, 850 as Kilometers).map((s) => s.id)).toEqual([2]);
+      expect(filterByApogee(sats, 0 as Kilometers, 10000 as Kilometers).map((s) => s.id)).toEqual([1, 2]);
+    });
+  });
+
+  describe('getOperationalStatus', () => {
+    const typed = (type: SpaceObjectType, status?: PayloadStatus): Satellite => sat({ id: 1, type, status } as Partial<Satellite> & { id: number });
+
+    it('buckets payload status codes', () => {
+      expect(getOperationalStatus(typed(SpaceObjectType.PAYLOAD, PayloadStatus.OPERATIONAL))).toBe('active');
+      expect(getOperationalStatus(typed(SpaceObjectType.PAYLOAD, PayloadStatus.PARTIALLY_OPERATIONAL))).toBe('active');
+      expect(getOperationalStatus(typed(SpaceObjectType.PAYLOAD, PayloadStatus.BACKUP_STANDBY))).toBe('active');
+      expect(getOperationalStatus(typed(SpaceObjectType.PAYLOAD, PayloadStatus.SPARE))).toBe('active');
+      expect(getOperationalStatus(typed(SpaceObjectType.PAYLOAD, PayloadStatus.EXTENDED_MISSION))).toBe('active');
+      expect(getOperationalStatus(typed(SpaceObjectType.PAYLOAD, PayloadStatus.NONOPERATIONAL))).toBe('inactive');
+      expect(getOperationalStatus(typed(SpaceObjectType.PAYLOAD, PayloadStatus.DECAYED))).toBe('inactive');
+      expect(getOperationalStatus(typed(SpaceObjectType.PAYLOAD, PayloadStatus.UNKNOWN))).toBe('unknown');
+      expect(getOperationalStatus(typed(SpaceObjectType.PAYLOAD))).toBe('unknown');
+    });
+
+    it('treats rocket bodies and debris as inactive regardless of status code', () => {
+      expect(getOperationalStatus(typed(SpaceObjectType.ROCKET_BODY, PayloadStatus.UNKNOWN))).toBe('inactive');
+      expect(getOperationalStatus(typed(SpaceObjectType.DEBRIS))).toBe('inactive');
+    });
+  });
+
+  describe('filterByOperationalStatus', () => {
+    it('keeps only objects in the requested buckets', () => {
+      const sats = [
+        sat({ id: 1, type: SpaceObjectType.PAYLOAD, status: PayloadStatus.OPERATIONAL } as Partial<Satellite> & { id: number }),
+        sat({ id: 2, type: SpaceObjectType.PAYLOAD, status: PayloadStatus.NONOPERATIONAL } as Partial<Satellite> & { id: number }),
+        sat({ id: 3, type: SpaceObjectType.PAYLOAD, status: PayloadStatus.UNKNOWN } as Partial<Satellite> & { id: number }),
+        sat({ id: 4, type: SpaceObjectType.DEBRIS } as Partial<Satellite> & { id: number }),
+      ];
+
+      expect(filterByOperationalStatus(sats, ['inactive']).map((s) => s.id)).toEqual([2, 4]);
+      expect(filterByOperationalStatus(sats, ['active', 'unknown']).map((s) => s.id)).toEqual([1, 3]);
     });
   });
 });

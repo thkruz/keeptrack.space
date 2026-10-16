@@ -8,11 +8,11 @@
         "imgAlt": "The Find Satellite menu with object type, country, orbital, and sensor filters",
         "imgCaption": "The Find Satellite menu. Every filled-in field narrows the search further.",
         "filtersHeading": "Available Filters",
-        "filters": "<ul><li><strong>Object Type</strong>: payloads, rocket bodies, debris. Select multiple types at once; picking a specific type clears \"All\".</li><li><strong>Country</strong>: one or more launching countries.</li><li><strong>Satellite Bus / Payload / Shape / Source</strong>: physical and data-source characteristics.</li><li><strong>Azimuth / Elevation / Range</strong>: current look angles from the selected sensor. These require a sensor to be selected first.</li><li><strong>Orbital parameters</strong>: Inclination, Period, Right Ascension, and Argument of Perigee.</li><li><strong>TLE Age</strong>: how recently the orbit data was updated, in hours.</li><li><strong>RCS</strong>: radar cross section in m².</li></ul>Each numeric filter has a <strong>Margin</strong> field defining the accepted range around your value. Leave it blank to use a sensible default (for example ±5° for angles).",
-        "howToUse": "<ol><li>Open the menu from the bottom bar or press Ctrl+F.</li><li>Pick one or more Object Types and Countries from the dropdowns.</li><li>Enter numeric criteria and optionally tighten or widen their margins.</li><li>Click <strong>Find Satellite(s)</strong>. Matching objects are loaded into the search bar at the top and highlighted on the globe.</li><li>Click <strong>Export data</strong> to save the current results as a CSV file.</li></ol>",
+        "filters": "<ul><li><strong>Object Type</strong>: payloads, rocket bodies, debris. Select multiple types at once; picking a specific type clears \"All\".</li><li><strong>Country</strong>: one or more launching countries.</li><li><strong>Satellite Bus / Payload / Shape / Source</strong>: physical and data-source characteristics.</li><li><strong>Azimuth / Elevation / Range</strong>: current look angles from the selected sensor. These require a sensor to be selected first.</li><li><strong>Orbital parameters</strong>: Inclination, Period, Right Ascension, and Argument of Perigee.</li><li><strong>TLE Age</strong>: how recently the orbit data was updated, in hours.</li><li><strong>RCS</strong>: radar cross section in m².</li><li><strong>Perigee / Apogee</strong>: lowest and highest orbit altitude in km. Combine them to isolate an altitude band, for example a debris shell.</li><li><strong>Operational Status</strong>: Active, Inactive, or Unknown, from the same catalog status shown on the info box Status row. Rocket bodies and debris always count as Inactive.</li></ul>Each numeric filter has a <strong>Margin</strong> field defining the accepted range around your value. Leave it blank to use a sensible default (for example ±5° for angles).",
+        "howToUse": "<ol><li>Open the menu from the bottom bar or press Ctrl+F.</li><li>Pick one or more Object Types and Countries from the dropdowns.</li><li>Enter numeric criteria and optionally tighten or widen their margins.</li><li>Click <strong>Find Satellite(s)</strong>. Matching objects are loaded into the search bar at the top and highlighted on the globe.</li><li>Click <strong>Export data</strong> to save every match as a spreadsheet, including matches beyond the search limit, with perigee, apogee, and status columns.</li></ol>",
         "tip1": "Filters combine with AND logic: every criterion must match. If you get no results, remove the most restrictive filter first.",
         "tip2": "Azimuth, Elevation, and Range are measured from the currently selected sensor, so select a sensor before using them.",
-        "tip3": "Results are capped. If a warning says the limit was hit, narrow your criteria to make sure you are seeing everything.",
+        "tip3": "The globe shows at most the number of results set by \"Maximum Results in Search\" (Settings > Search Settings), which keeps the number of drawn orbits manageable. When a search hits that limit the count reads \"Showing X of Y matches\", and Export data still saves all Y.",
         "tip4": "Because results land in the search bar, you can hand them to any other menu that operates on the current search, or refine them by typing.",
         "shortcutToggle": "Toggle the Find Satellite menu"
       },
@@ -56,14 +56,24 @@
         "sectionOrbital": "Orbital Elements",
         "sectionPhysical": "Physical & Data",
         "sensorNote": "Look angles require a sensor to be selected.",
-        "resultCount": "{count} result(s)"
+        "resultCount": "{count} result(s)",
+        "operationalStatus": "Operational Status",
+        "statusActive": "Active",
+        "statusInactive": "Inactive",
+        "statusUnknown": "Unknown",
+        "perigee": "Perigee (km)",
+        "perigeeMargin": "Margin (km)",
+        "apogee": "Apogee (km)",
+        "apogeeMargin": "Margin (km)",
+        "resultCountCapped": "Showing {shown} of {total} matches (search limit setting: Settings > Search Settings > Maximum Results in Search). Export includes all {total}."
       },
       "errorMsgs": {
         "NoSatellitesFound": "No Satellites Found",
         "NoSearchCriteriaEntered": "No Search Criteria Entered",
-        "TooManyResults": "Too many results, limited to {limit}",
+        "TooManyResults": "Showing {limit} of {total} matches. Raise \"Maximum Results in Search\" in Search Settings to show more; Export still saves every match.",
         "TryFindingFirst": "Try finding satellites first!",
-        "SearchFailed": "Search failed: {error}"
+        "SearchFailed": "Search failed: {error}",
+        "NothingToExport": "No results with orbit data to export"
       }
     }
   }

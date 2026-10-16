@@ -14,7 +14,7 @@ import type { ISettingsContribution, ISettingsContributor } from '@app/engine/pl
 import { openColorbox } from '@app/engine/utils/colorbox';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { getEl, hideEl, requestIdleWrite, showEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { SettingsManager } from '@app/settings/settings';
 import { BaseObject, PayloadStatus, Satellite, SpaceObjectType } from '@ootk/src/main';
@@ -287,7 +287,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsContri
       }
     }
 
-    requestIdleCallback(this.updateRcsData_.bind(this, sat));
+    requestIdleWrite(this.updateRcsData_.bind(this, sat));
   }
 
   private updateStdMag_(sat: Satellite) {

@@ -100,7 +100,9 @@
         "coOrbital": "Co-orbital",
         "coPlanar": "Coplanaire",
         "unrelated": "Sans relation",
-        "unknown": "Inconnu"
+        "unknown": "Inconnu",
+        "maxRange": "Distance max. ({orbits} orbites)",
+        "rangeNow": "Distance actuelle"
       },
       "chart": {
         "radial": "Radial",

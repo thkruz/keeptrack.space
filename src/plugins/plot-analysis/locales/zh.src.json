@@ -100,7 +100,9 @@
         "coOrbital": "共轨道",
         "coPlanar": "共面",
         "unrelated": "无关",
-        "unknown": "未知"
+        "unknown": "未知",
+        "maxRange": "最大距离（{orbits} 圈）",
+        "rangeNow": "当前距离"
       },
       "chart": {
         "radial": "径向",

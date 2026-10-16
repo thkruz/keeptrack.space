@@ -100,7 +100,9 @@
         "coOrbital": "Koorbitální",
         "coPlanar": "Koplanární",
         "unrelated": "Nesouvisející",
-        "unknown": "Neznámé"
+        "unknown": "Neznámé",
+        "maxRange": "Max. vzdálenost ({orbits} oběhů)",
+        "rangeNow": "Aktuální vzdálenost"
       },
       "chart": {
         "radial": "Radiální",

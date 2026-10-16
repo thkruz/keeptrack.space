@@ -100,7 +100,9 @@
         "coOrbital": "同一軌道",
         "coPlanar": "同一面",
         "unrelated": "無関係",
-        "unknown": "不明"
+        "unknown": "不明",
+        "maxRange": "最大距離（{orbits} 周回）",
+        "rangeNow": "現在の距離"
       },
       "chart": {
         "radial": "ラジアル",

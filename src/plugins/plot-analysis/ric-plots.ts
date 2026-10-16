@@ -229,7 +229,10 @@ export class RicPlot extends KeepTrackPlugin {
     });
 
     assessmentEl.dataset.relationship = assessment.relationship;
-    assessmentEl.innerHTML = this.renderAssessment_(assessment);
+    // The first sample is the current simulation time, so it is the range "now".
+    const rangeNowKm = points.length > 0 ? points[0].range : NaN;
+
+    assessmentEl.innerHTML = this.renderAssessment_(assessment, rangeNowKm);
   }
 
   private static readonly RELATIONSHIP_LABEL_KEYS: Record<RicRelationship, string> = {
@@ -240,7 +243,7 @@ export class RicPlot extends KeepTrackPlugin {
     unknown: 'plugins.RicPlot.assessment.unknown',
   };
 
-  private renderAssessment_(assessment: RicAssessment): string {
+  private renderAssessment_(assessment: RicAssessment, rangeNowKm: number): string {
     const label = t7e(RicPlot.RELATIONSHIP_LABEL_KEYS[assessment.relationship] as Parameters<typeof t7e>[0]);
     const title = t7e('plugins.RicPlot.assessment.title');
 
@@ -250,11 +253,15 @@ export class RicPlot extends KeepTrackPlugin {
 
     const planeTxt = `Δ${t7e('plugins.RicPlot.assessment.plane')} ${assessment.planeAngleDeg.toFixed(1)}°`;
     const periodTxt = `ΔP ${assessment.periodDiffPct.toFixed(1)}%`;
-    const rangeTxt = `${t7e('plugins.RicPlot.chart.range')} ${assessment.maxRangeKm.toFixed(0)} ${t7e('plugins.RicPlot.chart.unitKm')}`;
+    const unitKm = t7e('plugins.RicPlot.chart.unitKm');
+    // The maximum is taken over the whole plotted window, so say so: it is not the current range.
+    const maxRangeLabel = t7e('plugins.RicPlot.assessment.maxRange').replace('{orbits}', this.orbits_.toString());
+    const maxRangeTxt = `${maxRangeLabel} ${assessment.maxRangeKm.toFixed(0)} ${unitKm}`;
+    const rangeNowTxt = Number.isFinite(rangeNowKm) ? ` · ${t7e('plugins.RicPlot.assessment.rangeNow')} ${rangeNowKm.toFixed(1)} ${unitKm}` : '';
 
     return `
       <span class="ric-assessment-label">${title}: ${label}</span>
-      <span class="ric-assessment-metrics">${planeTxt} · ${periodTxt} · ${rangeTxt}</span>`;
+      <span class="ric-assessment-metrics">${planeTxt} · ${periodTxt} · ${maxRangeTxt}${rangeNowTxt}</span>`;
   }
 
   getPlotData(): RicPoint[] {

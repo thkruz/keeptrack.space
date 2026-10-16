@@ -100,7 +100,9 @@
         "coOrbital": "Соорбітальні",
         "coPlanar": "Компланарні",
         "unrelated": "Не пов’язані",
-        "unknown": "Невідомо"
+        "unknown": "Невідомо",
+        "maxRange": "Макс. відстань ({orbits} витків)",
+        "rangeNow": "Поточна відстань"
       },
       "chart": {
         "radial": "Радіальна",

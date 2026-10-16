@@ -100,7 +100,9 @@
         "coOrbital": "동일 궤도",
         "coPlanar": "동일 평면",
         "unrelated": "무관함",
-        "unknown": "알 수 없음"
+        "unknown": "알 수 없음",
+        "maxRange": "최대 거리 ({orbits} 궤도)",
+        "rangeNow": "현재 거리"
       },
       "chart": {
         "radial": "반경 방향",

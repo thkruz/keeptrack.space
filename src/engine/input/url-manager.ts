@@ -17,6 +17,12 @@ import { errorManagerInstance } from '../utils/errorManager';
 import { getEl } from '../utils/get-el';
 import { waitForCruncher } from '../utils/waitForCruncher';
 
+/*
+ * Restore ordering rule: when a link carries both `search=` and `sat=`/`intldes=`, the search
+ * runs first (deferred behind the position cruncher) and the selection is re-applied after it
+ * completes. doSearch hides the info box, so selecting first left the object selected with the
+ * info box closed. Single-parameter links behave as before.
+ */
 export abstract class UrlManager {
   private static selectedSat_: Satellite | null = null;
   private static searchString_: string = '';
@@ -243,13 +249,17 @@ export abstract class UrlManager {
       EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
         switch (key) {
           case 'search':
-            this.handleSearchParam_(kv.search);
+            this.handleSearchParam_(kv.search, () => this.reapplySelectionParam_(kv));
             break;
           case 'intldes':
-            this.handleIntldesParam_(kv[key]);
+            if (!this.isSearchDeferred_(kv)) {
+              this.handleIntldesParam_(kv[key]);
+            }
             break;
           case 'sat':
-            this.handleSatParam_(kv[key]);
+            if (!this.isSearchDeferred_(kv)) {
+              this.handleSatParam_(kv[key]);
+            }
             break;
           case 'misl':
             this.handleMislParam_(kv[key]);
@@ -497,7 +507,7 @@ export abstract class UrlManager {
    * pipeline is live) fixes it. Waiting for the cruncher makes the on-load search
    * behave like a manual one. Mirrors ColorSchemeManager.calcColorBufsNextCruncher().
    */
-  private static handleSearchParam_(searchString: string) {
+  private static handleSearchParam_(searchString: string, onDone?: () => void) {
     if (settingsManager.disableUI) {
       return;
     }
@@ -510,6 +520,7 @@ export abstract class UrlManager {
         uiManagerInstance.toast(`Search for "${searchString}" found nothing!`, ToastMsgType.caution, true);
         uiManagerInstance.searchManager.hideResults();
       }
+      onDone?.();
     };
 
     const satCruncher = ServiceLocator.getCatalogManager()?.satCruncherThread?.worker;
@@ -531,6 +542,21 @@ export abstract class UrlManager {
       isRunCbOnFailure: true,
       maxRetries: 5,
     });
+  }
+
+  /** True when `search=` will run (deferred) and so owns applying `sat=` / `intldes=` afterwards. */
+  private static isSearchDeferred_(kv: Record<string, string>): boolean {
+    return typeof kv.search === 'string' && !settingsManager.disableUI;
+  }
+
+  /** Applies `intldes=` / `sat=` after the deferred search, so doSearch cannot hide the info box. */
+  private static reapplySelectionParam_(kv: Record<string, string>) {
+    if (typeof kv.intldes === 'string') {
+      this.handleIntldesParam_(kv.intldes);
+    }
+    if (typeof kv.sat === 'string') {
+      this.handleSatParam_(kv.sat);
+    }
   }
 
   private static handleIntldesParam_(val: string) {

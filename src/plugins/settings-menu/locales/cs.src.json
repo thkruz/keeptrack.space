@@ -50,7 +50,7 @@
         "overview": "Nabídka nastavení obsahuje volby zobrazení a interakce platné pro celou aplikaci: vykreslování orbit, chování při najetí myší, pomůcky kamery a výkonnostně náročné doplňky. Vlastní sekce sem přidávají i další pluginy, takže jde o jediné místo, kde ladíte chování KeepTracku.",
         "imgAlt": "Nabídka nastavení s přepínači obecných voleb",
         "imgCaption": "Přepnutím libovolné volby ji okamžitě použijete; pomocí filtru rychle najdete nastavení.",
-        "howToUse": "<ol><li>Otevřete <strong>Nastavení</strong> ze spodní lišty.</li><li>Přepnutím libovolného přepínače jej okamžitě použijete; najetím myší na řádek zobrazíte vysvětlující nápovědu.</li><li>Pomocí pole <strong>filtru</strong> nahoře rychle najdete nastavení podle názvu.</li><li><strong>Obnovit výchozí</strong> vrátí všechny volby, včetně sekcí přidaných pluginy, na tovární hodnoty.</li></ol>",
+        "howToUse": "<ol><li>Otevřete <strong>Nastavení</strong> z panelu.</li><li>Přepnutím libovolného přepínače jej okamžitě použijete; najetím myší na řádek zobrazíte vysvětlující nápovědu.</li><li>Pomocí pole <strong>filtru</strong> nahoře rychle najdete nastavení podle názvu.</li><li><strong>Obnovit výchozí</strong> vrátí všechny volby, včetně sekcí přidaných pluginy, na tovární hodnoty.</li></ol>",
         "tip1": "Volby v sekci Vyžadován rychlý procesor, například zobrazení dalšího přeletu při najetí myší, provádějí výpočty navíc v každém snímku; na pomalejších počítačích je nechte vypnuté.",
         "tip2": "Sekce pluginů dole pocházejí z jiných pluginů (Seznam sledovaných, Stroj času a další), takže nabídka roste s tím, jak se pluginy zapínají."
       }

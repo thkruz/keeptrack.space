@@ -1,12 +1,12 @@
 {
   "splashScreens": {
     "1": "I modelli dei satelliti appaiono più grandi di quanto siano in realtà. Tutto il resto è in scala.",
-    "2": "Il menu delle impostazioni nella barra degli strumenti inferiore contiene molte opzioni per personalizzare la tua esperienza.",
+    "2": "Il menu delle impostazioni nel pannello contiene molte opzioni per personalizzare la tua esperienza.",
     "3": "Molti menu hanno impostazioni aggiuntive accessibili cliccando sull'icona dell'ingranaggio.",
     "4": "Aggiungi satelliti alla lista di osservazione per ricevere notifiche quando sono sopra il sensore corrente.",
     "5": "Clicca con il tasto destro sul globo per aprire il menu contestuale con più opzioni.",
     "6": "Puoi cercare satelliti per nome o ID NORAD nella barra di ricerca in alto a destra.",
-    "7": "Un nuovo lancio nominale può essere creato selezionando un satellite e cliccando il pulsante 'Nuovo Lancio' nel menu in basso.",
+    "7": "Un nuovo lancio nominale può essere creato selezionando un satellite e cliccando il pulsante 'Nuovo Lancio' nel pannello.",
     "8": "Imposta un oggetto come Secondario per vederne la distanza relativa con l'oggetto principale."
   },
   "loadingScreenMsgs": {

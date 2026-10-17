@@ -1,12 +1,12 @@
 {
   "splashScreens": {
     "1": "Satellite models appear bigger than they really are. Everything else is to scale.",
-    "2": "The settings menu located in the bottom toolbar contains many options to customize your experience.",
+    "2": "The settings menu in the drawer contains many options to customize your experience.",
     "3": "Many of the menus have additional settings that can be accessed by clicking the gear icon.",
     "4": "Add satellites to the watchlist to get notifications when they are overhead of the current sensor.",
     "5": "Right click on the globe to open the context menu with more options.",
     "6": "You can search for satellites by name or NORAD ID in the search bar at the top right.",
-    "7": "A new launch nominal can be created by selecting a satellite and clicking the 'New Launch' button in the bottom menu.",
+    "7": "A new launch nominal can be created by selecting a satellite and clicking the 'New Launch' button in the drawer.",
     "8": "Set an object as Secondary to see its relative distance with primary object."
   },
   "loadingScreenMsgs": {

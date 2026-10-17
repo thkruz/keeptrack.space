@@ -74,7 +74,7 @@
         "imgCaption": "在一个参考系中输入状态，所有其他参考系一键计算完成。",
         "framesHeading": "支持的参考系",
         "frames": "<ul><li><strong>J2000 (ECI)</strong>、<strong>TEME</strong>：地心惯性参考系；TEME 是 TLE 发布所采用的参考系。</li><li><strong>ITRF (ECEF)</strong>：地心地固参考系，随地球一起旋转。</li><li><strong>大地坐标 (LLA)</strong>：纬度、经度和高度。</li><li><strong>RAE（站心）</strong>：从所选传感器看到的距离、方位角和仰角。</li><li><strong>RA/Dec（地心）</strong>：赤经和赤纬。</li><li><strong>经典轨道根数</strong>：开普勒轨道根数，输出中还包含周期、远地点和近地点。</li></ul>",
-        "howToUse": "<ol><li>从底部栏（工具模式）打开菜单。</li><li>选择一个<strong>输入参考系</strong>，输入字段会随之变化。</li><li>输入数值，或点击<strong>载入所选卫星</strong>以使用当前所选卫星的数据填充。</li><li>对于直角坐标系，勾选<strong>包含速度</strong>以同时转换速度矢量；经典轨道根数的输出需要速度。</li><li>点击<strong>转换</strong>。所有其他参考系的数值会显示在下方，并按照<strong>输出格式</strong>选择器进行格式化。</li><li>在已选择传感器且已计算出 RAE 结果时，<strong>绘制连线</strong>会在 3D 视图中绘制从传感器到该点的连线。</li></ol>",
+        "howToUse": "<ol><li>从抽屉（工具模式）打开菜单。</li><li>选择一个<strong>输入参考系</strong>，输入字段会随之变化。</li><li>输入数值，或点击<strong>载入所选卫星</strong>以使用当前所选卫星的数据填充。</li><li>对于直角坐标系，勾选<strong>包含速度</strong>以同时转换速度矢量；经典轨道根数的输出需要速度。</li><li>点击<strong>转换</strong>。所有其他参考系的数值会显示在下方，并按照<strong>输出格式</strong>选择器进行格式化。</li><li>在已选择传感器且已计算出 RAE 结果时，<strong>绘制连线</strong>会在 3D 视图中绘制从传感器到该点的连线。</li></ol>",
         "tip1": "RAE 的输入和输出需要先选择传感器；字段会显示正在使用的传感器，因此您始终知道参考站点。",
         "tip2": "DMS 输出格式将角度表示为度、分、秒，便于望远镜指向。",
         "tip3": "经典轨道根数转换需要速度：没有速度时，输出会提示需要速度，而不是猜测一条轨道。"

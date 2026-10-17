@@ -34,7 +34,7 @@
         "imgCaption": "Il passaggio inizia dal punto verde e termina al punto rosso; gli anelli indicano l'elevazione.",
         "readingHeading": "Come leggere il grafico",
         "reading": "La traccia inizia da un punto verde (sorgere) e termina con un punto rosso (tramonto). Anelli concentrici segnano l'elevazione ogni 15 gradi dall'orizzonte (bordo esterno) allo zenit (centro), e le direzioni della bussola corrono lungo il bordo. L'intestazione mostra il sensore, il numero del satellite e gli orari di inizio e fine del passaggio in UTC.",
-        "howToUse": "<ol><li>Seleziona un sensore e un satellite; l'icona in basso resta disabilitata finché entrambi non sono selezionati.</li><li>Apri il <strong>Grafico polare</strong> dalla barra inferiore. Il prossimo passaggio entro tre giorni viene calcolato e disegnato automaticamente.</li><li>Fai clic su <strong>Salva immagine</strong> per scaricare il grafico come file PNG.</li></ol>",
+        "howToUse": "<ol><li>Seleziona un sensore e un satellite; l'icona del plugin nel pannello resta disabilitata finché entrambi non sono selezionati.</li><li>Apri il <strong>Grafico polare</strong> dal pannello. Il prossimo passaggio entro tre giorni viene calcolato e disegnato automaticamente.</li><li>Fai clic su <strong>Salva immagine</strong> per scaricare il grafico come file PNG.</li></ol>",
         "tip1": "Se il satellite non sale mai sopra l'orizzonte nei prossimi tre giorni, il grafico viene sostituito da un avviso invece di una carta vuota.",
         "tip2": "Una traccia che passa vicino al centro è un passaggio ad alta elevazione: la geometria migliore per osservazione o comunicazione.",
         "shortcutToggle": "Attiva/Disattiva il menu Grafico polare"

@@ -1,12 +1,12 @@
 {
   "splashScreens": {
     "1": "Satellitenmodelle erscheinen größer als sie in Wirklichkeit sind. Alles andere ist maßstabsgetreu.",
-    "2": "Das Einstellungsmenü in der unteren Symbolleiste enthält viele Optionen zur Anpassung Ihrer Erfahrung.",
+    "2": "Das Einstellungsmenü in der Plugin-Leiste enthält viele Optionen zur Anpassung Ihrer Erfahrung.",
     "3": "Viele der Menüs haben zusätzliche Einstellungen, die durch Klicken auf das Zahnrad-Symbol aufgerufen werden können.",
     "4": "Fügen Sie Satelliten zur Beobachtungsliste hinzu, um Benachrichtigungen zu erhalten, wenn sie sich über dem aktuellen Sensor befinden.",
     "5": "Rechtsklicken Sie auf den Globus, um das Kontextmenü mit weiteren Optionen zu öffnen.",
     "6": "Sie können in der Suchleiste oben rechts nach Satelliten anhand von Namen oder NORAD ID suchen.",
-    "7": "Ein neuer nomineller Start kann erstellt werden, indem Sie einen Satelliten auswählen und auf die Schaltfläche 'Neuer Start' im unteren Menü klicken.",
+    "7": "Ein neuer nomineller Start kann erstellt werden, indem Sie einen Satelliten auswählen und auf die Schaltfläche 'Neuer Start' in der Plugin-Leiste klicken.",
     "8": "Setzen Sie ein Objekt als Sekundärobjekt, um dessen relativen Abstand zum Primärobjekt zu sehen."
   },
   "loadingScreenMsgs": {

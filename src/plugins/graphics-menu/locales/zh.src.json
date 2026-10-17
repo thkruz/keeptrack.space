@@ -46,7 +46,7 @@
         "overview": "图形菜单控制场景的外观。选择<strong>整体画质</strong>级别可一次性设置所有与画质相关的选项，然后在下方的卡片中调整单项设置。更改立即生效，并在会话之间保留。",
         "imgAlt": "带有整体画质选择器和设置卡片的图形菜单",
         "imgCaption": "顶部为整体画质选择器，下方为设置卡片，底部为重置为默认值按钮。",
-        "howToUse": "<ol><li>从底部菜单的设置分组中打开<strong>图形菜单</strong>。</li><li>点击<strong>低</strong>、<strong>中</strong>、<strong>高</strong>或<strong>超高</strong>，一步设置所有与画质相关的选项。</li><li>修改下方任一设置以微调外观；此时选择器显示<strong>自定义</strong>。</li><li>在筛选框中输入名称以查找设置。</li><li>点击<strong>重置为默认值</strong>可还原所有图形设置。</li></ol>",
+        "howToUse": "<ol><li>从抽屉的设置分组中打开<strong>图形菜单</strong>。</li><li>点击<strong>低</strong>、<strong>中</strong>、<strong>高</strong>或<strong>超高</strong>，一步设置所有与画质相关的选项。</li><li>修改下方任一设置以微调外观；此时选择器显示<strong>自定义</strong>。</li><li>在筛选框中输入名称以查找设置。</li><li>点击<strong>重置为默认值</strong>可还原所有图形设置。</li></ol>",
         "tip1": "当你的设置与任何级别都不完全一致时，选择器会显示自定义。再次选择某个级别即可回到该级别。",
         "tip2": "当帧率下降时，KeepTrack 可能会自动关闭开销较大的效果。此时菜单会提示设置已被自动降低。"
       }

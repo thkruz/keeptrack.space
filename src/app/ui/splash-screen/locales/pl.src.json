@@ -1,12 +1,12 @@
 {
   "splashScreens": {
     "1": "Modele satelitów wyglądają na większe niż w rzeczywistości. Wszystko inne jest w skali.",
-    "2": "Menu ustawień na dolnym pasku narzędzi zawiera wiele opcji dostosowania.",
+    "2": "Menu ustawień w panelu zawiera wiele opcji dostosowania.",
     "3": "Wiele menu ma dodatkowe ustawienia dostępne po kliknięciu ikony koła zębatego.",
     "4": "Dodaj satelity do listy obserwacyjnej, aby otrzymywać powiadomienia, gdy znajdą się nad bieżącym czujnikiem.",
     "5": "Kliknij prawym przyciskiem myszy na globus, aby otworzyć menu kontekstowe z dodatkowymi opcjami.",
     "6": "Możesz wyszukiwać satelity po nazwie lub numerze NORAD w pasku wyszukiwania w prawym górnym rogu.",
-    "7": "Nowy nominalny start można utworzyć, wybierając satelitę i klikając przycisk 'Nowy start' w dolnym menu.",
+    "7": "Nowy nominalny start można utworzyć, wybierając satelitę i klikając przycisk 'Nowy start' w panelu.",
     "8": "Ustaw obiekt jako drugorzędny, aby zobaczyć jego odległość względem obiektu głównego."
   },
   "loadingScreenMsgs": {

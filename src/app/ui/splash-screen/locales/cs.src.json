@@ -1,12 +1,12 @@
 {
   "splashScreens": {
     "1": "Modely satelitů se zobrazují větší, než ve skutečnosti jsou. Vše ostatní je v měřítku.",
-    "2": "Menu nastavení v dolní liště obsahuje mnoho možností pro přizpůsobení vašeho prostředí.",
+    "2": "Menu nastavení v panelu obsahuje mnoho možností pro přizpůsobení vašeho prostředí.",
     "3": "Mnoho menu má další nastavení, která lze otevřít kliknutím na ikonu ozubeného kola.",
     "4": "Přidejte satelity do seznamu sledovaných pro upozornění, když budou nad aktuálním senzorem.",
     "5": "Klikněte pravým tlačítkem na glóbus pro otevření kontextového menu s dalšími možnostmi.",
     "6": "Satelity můžete vyhledávat podle názvu nebo NORAD ID ve vyhledávacím poli vpravo nahoře.",
-    "7": "Nominál nového startu lze vytvořit výběrem satelitu a kliknutím na tlačítko 'Nový start' v dolním menu.",
+    "7": "Nominál nového startu lze vytvořit výběrem satelitu a kliknutím na tlačítko 'Nový start' v panelu.",
     "8": "Nastavte objekt jako sekundární pro zobrazení jeho relativní vzdálenosti od primárního objektu."
   },
   "loadingScreenMsgs": {

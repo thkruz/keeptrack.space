@@ -19,6 +19,8 @@ import { KeyboardInput } from './keyboard-input';
 
 export class MouseInput {
   private dragHasMoved = false;
+  /** True when the current left press only dismissed the right-click menu, so its release must not select or deselect. */
+  private isClickConsumedByRmbDismiss_ = false;
   private readonly keyboard_: KeyboardInput;
   private mouseTimeout = -1;
 
@@ -79,6 +81,9 @@ export class MouseInput {
           this.canvasMouseUp_(e);
         });
       }
+
+      // Escape dismisses the right-click menu
+      window.addEventListener('keydown', (e: KeyboardEvent) => this.dismissRmbMenuOnEscape_(e));
 
       // Create Event Listeners for Right Menu Buttons.
       // Single-action items (no submenu) are clicked directly on their L1 element.
@@ -271,6 +276,14 @@ export class MouseInput {
     this.mouseMoveTimeout = -1;
   }
 
+  private dismissRmbMenuOnEscape_(evt: KeyboardEvent): void {
+    const inputManager = ServiceLocator.getInputManager();
+
+    if (evt.key === 'Escape' && inputManager.isRmbMenuOpen) {
+      inputManager.hidePopUps();
+    }
+  }
+
   private canvasClick_(evt: MouseEvent) {
     if (settingsManager.disableNormalEvents) {
       evt.preventDefault();
@@ -311,7 +324,11 @@ export class MouseInput {
       }
     }
 
-    ServiceLocator.getInputManager().hidePopUps();
+    const inputManager = ServiceLocator.getInputManager();
+
+    // A left press while the right-click menu is open only dismisses the menu
+    this.isClickConsumedByRmbDismiss_ = evt.button === 0 && inputManager.isRmbMenuOpen === true;
+    inputManager.hidePopUps();
 
     EventBus.getInstance().emit(EventBusEvent.canvasMouseDown, evt);
   }
@@ -327,7 +344,11 @@ export class MouseInput {
     }
     this.isStartedOnCanvas = false;
 
-    if (!this.dragHasMoved) {
+    const isClickConsumed = this.isClickConsumedByRmbDismiss_;
+
+    this.isClickConsumedByRmbDismiss_ = false;
+
+    if (!this.dragHasMoved && !isClickConsumed) {
       /*
        * if (settingsManager.isMobileModeEnabled) {
        *   ServiceLocator.getMainCamera().mouseX = isNaN(ServiceLocator.getMainCamera().mouseX) ? 0 : ServiceLocator.getMainCamera().mouseX;
@@ -473,5 +494,6 @@ export class MouseInput {
       rightButtonMenuElement.style.display = 'none';
     }
     ServiceLocator.getInputManager().clearRMBSubMenu();
+    ServiceLocator.getInputManager().isRmbMenuOpen = false;
   }
 }

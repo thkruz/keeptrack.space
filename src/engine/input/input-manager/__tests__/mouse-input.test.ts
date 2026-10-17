@@ -131,6 +131,38 @@ describe('MouseInput handlers', () => {
     });
   });
 
+  describe('right-click menu dismissal', () => {
+    it('closes the menu on Escape only while it is open', () => {
+      inputManager.isRmbMenuOpen = false;
+      m().dismissRmbMenuOnEscape_({ key: 'Escape' } as never);
+      expect(inputManager.hidePopUps).not.toHaveBeenCalled();
+
+      inputManager.isRmbMenuOpen = true;
+      m().dismissRmbMenuOnEscape_({ key: 'a' } as never);
+      expect(inputManager.hidePopUps).not.toHaveBeenCalled();
+
+      m().dismissRmbMenuOnEscape_({ key: 'Escape' } as never);
+      expect(inputManager.hidePopUps).toHaveBeenCalledTimes(1);
+    });
+
+    it('consumes the left click that dismisses the menu so it does not select or deselect', () => {
+      vi.spyOn(UrlManager, 'updateURL').mockImplementation(() => undefined);
+      inputManager.isRmbMenuOpen = true;
+      mouse.mouseSat = -1;
+
+      m().canvasMouseDown_({ button: 0, preventDefault: vi.fn() } as never);
+      m().canvasMouseUp_({ button: 0, preventDefault: vi.fn() } as never);
+      expect(inputManager.hidePopUps).toHaveBeenCalled();
+      expect(selectSat).not.toHaveBeenCalled();
+
+      // The next click, with the menu closed, selects normally.
+      inputManager.isRmbMenuOpen = false;
+      m().canvasMouseDown_({ button: 0, preventDefault: vi.fn() } as never);
+      m().canvasMouseUp_({ button: 0, preventDefault: vi.fn() } as never);
+      expect(selectSat).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('canvasMouseUp_', () => {
     it('returns early when the gesture did not start on the canvas', () => {
       mouse.isStartedOnCanvas = false;

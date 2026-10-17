@@ -757,6 +757,8 @@ export class DebrisScreening extends KeepTrackPlugin {
           startTime,
           endTime,
           searchStepSize: 240 as Seconds,
+          // Coarse-to-fine keeps the synchronous fallback usable on multi-day windows
+          tcaSearchMode: 'coarse-to-fine',
         });
 
         // Filter by individual RIC components (box filter, not spherical)

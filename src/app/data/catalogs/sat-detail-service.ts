@@ -56,7 +56,8 @@ class SatDetailDataService {
    * Safe to call multiple times — skips if already fetched or in-flight.
    */
   async fetchSatDetail(sat: Satellite): Promise<void> {
-    if (this.hasDetail(sat) || this.inflight_.has(sat.sccNum)) {
+    // Analyst objects (maneuver clones, created satellites) have no catalog record
+    if (typeof sat.derivedFromSccNum === 'string' || this.hasDetail(sat) || this.inflight_.has(sat.sccNum)) {
       return;
     }
 

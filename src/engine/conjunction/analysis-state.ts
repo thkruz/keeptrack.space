@@ -52,6 +52,16 @@ export const SUPPORTED_CONJUNCTION_ANALYSIS_SCHEMA_VERSIONS: readonly number[] =
  */
 export const RIC_CONVENTION = 'Secondary minus primary, expressed in the primary RIC frame (R = radial/up, I = in-track/along velocity, C = cross-track/orbit normal).' as const;
 
+/**
+ * How every `pc` in the state is stored. The value is the computed probability,
+ * never rounded or floored; reports print anything below 1e-12 as "< 1e-12".
+ * An exact 0 means the analytic upper bound was already below 1e-30 (ootk
+ * `PC_NEGLIGIBLE`), so the integral was skipped: read it as "below 1e-30", not
+ * as an impossibility.
+ */
+export const PC_CONVENTION =
+  'Probability of collision as computed, not rounded or floored; reports print values below 1e-12 as "< 1e-12". An exact 0 means the analytic upper bound was below 1e-30, so the integral was skipped.' as const;
+
 /** Which report produced the state. */
 export type AnalysisKind = 'conjunction' | 'maneuver' | 'screening-compare';
 
@@ -279,8 +289,10 @@ export interface MissionEventOptionWindow {
 
 /** v2: a scheduled event (a pass of the primary over a sensor) and how each option changes it. */
 export interface MissionImpactEvent {
-  /** What the event is, e.g. "Pass". */
+  /** What the event is, e.g. "Pass" or the analyst's label for a scheduled event. */
   label: string;
+  /** v2: the time the analyst scheduled this event for (ISO 8601 UTC), absent or null for a plain pass row. */
+  scheduledTimeIso?: string | null;
   sensorName: string;
   /** Sensor site, degrees (north and east positive), null when unknown. */
   latDeg: number | null;
@@ -292,6 +304,25 @@ export interface MissionImpactEvent {
   options: MissionEventOptionWindow[];
 }
 
+/** v2: an event the analyst scheduled at a site (a downlink, an imaging pass), entered in the composed report card. */
+export interface ScheduledMissionEvent {
+  label: string;
+  /** Name of the site (a custom sensor) the event is at. */
+  sensorName: string;
+  /** Scheduled time, ISO 8601 UTC. */
+  timeIso: string;
+}
+
+/** What set the mission-impact pass window. */
+export type MissionWindowSource = 'simulation-time' | 'scheduled-events';
+
+/** v2: the window the mission-impact passes were searched in. */
+export interface MissionWindow {
+  startIso: string;
+  endIso: string;
+  source: MissionWindowSource;
+}
+
 /** Mission-impact block. Stage A fills the sensor passes; the composed report adds {@link MissionImpactEvent} rows. */
 export interface MissionImpact {
   sensorName: string | null;
@@ -300,6 +331,10 @@ export interface MissionImpact {
   notes: string[];
   /** v2: scheduled events (custom sensor passes) compared across the maneuver options. */
   events?: MissionImpactEvent[];
+  /** v2: the events the analyst scheduled (at most 4); when present, {@link events} has one row per scheduled event. */
+  scheduledEvents?: ScheduledMissionEvent[];
+  /** v2: the window the passes were searched in, null when no pass search ran. */
+  window?: MissionWindow | null;
 }
 
 /** Where an external conjunction message came from. */
@@ -367,6 +402,8 @@ export interface ConjunctionAnalysisState {
   /** Epoch the GP ages and search windows are measured from, ISO 8601 UTC. */
   analysisEpochIso: string;
   ricConvention: string;
+  /** v2: how the `pc` values are stored, see {@link PC_CONVENTION}. */
+  pcConvention?: string;
   objects: AnalysisObjectSummary[];
   encounter: ConjunctionEncounter | null;
   relativeGeometry: RelativeGeometrySample[];
@@ -397,6 +434,7 @@ const KINDS: readonly AnalysisKind[] = ['conjunction', 'maneuver', 'screening-co
 const ROLES: readonly AnalysisObjectRole[] = ['primary', 'secondary', 'parent', 'analyst'];
 const VERDICTS: readonly MissionEventVerdict[] = ['unchanged', 'shifted', 'lost', 'gained'];
 const MESSAGE_SOURCES: readonly ExternalMessageSource[] = ['manual', 'cdm-file'];
+const WINDOW_SOURCES: readonly MissionWindowSource[] = ['simulation-time', 'scheduled-events'];
 
 type Rec = Record<string, unknown>;
 
@@ -554,6 +592,9 @@ class Checker {
       return;
     }
     this.str(v, 'label', path);
+    if (v.scheduledTimeIso !== undefined) {
+      this.iso(v, 'scheduledTimeIso', path, true);
+    }
     this.str(v, 'sensorName', path);
     this.num(v, 'latDeg', path, true);
     this.num(v, 'lonDeg', path, true);
@@ -577,6 +618,41 @@ class Checker {
       this.num(o, 'shiftSec', p, true);
       this.oneOf(o, 'verdict', p, VERDICTS);
     });
+  }
+
+  /** v2 mission-impact additions: the scheduled events and the pass window, both optional. */
+  missionSchedule(mi: Rec, path: string): void {
+    const events = mi.scheduledEvents;
+
+    if (events !== undefined) {
+      if (Array.isArray(events)) {
+        events.forEach((e, i) => {
+          const p = `${path}.scheduledEvents[${i}]`;
+
+          if (isRec(e)) {
+            this.str(e, 'label', p);
+            this.str(e, 'sensorName', p);
+            this.iso(e, 'timeIso', p);
+          } else {
+            this.fail(p, 'expected scheduled event');
+          }
+        });
+      } else {
+        this.fail(`${path}.scheduledEvents`, 'expected array');
+      }
+    }
+    const win = mi.window;
+
+    if (win === undefined || win === null) {
+      return;
+    }
+    if (isRec(win)) {
+      this.iso(win, 'startIso', `${path}.window`);
+      this.iso(win, 'endIso', `${path}.window`);
+      this.oneOf(win, 'source', `${path}.window`, WINDOW_SOURCES);
+    } else {
+      this.fail(`${path}.window`, 'expected object or null');
+    }
   }
 
   externalMessage(v: unknown, path: string): void {
@@ -789,6 +865,9 @@ class Checker {
 const validateComposedBlocks_ = (c: Checker, value: Rec): void => {
   c.externalMessage(value.externalMessage, '$.externalMessage');
   c.optStr(value, 'recommendation', '$');
+  if (value.pcConvention !== undefined) {
+    c.str(value, 'pcConvention', '$');
+  }
   c.optStr(value, 'recommendedOptionId', '$');
 
   const analyst = value.analyst;
@@ -884,6 +963,7 @@ export const validateConjunctionAnalysisState = (value: unknown): string[] => {
         c.fail('$.missionImpact.events', 'expected array');
       }
     }
+    c.missionSchedule(mi, '$.missionImpact');
   } else {
     c.fail('$.missionImpact', 'expected object');
   }

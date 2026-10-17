@@ -2,6 +2,7 @@ import {
   CONJUNCTION_ANALYSIS_SCHEMA_VERSION,
   ConjunctionAnalysisState,
   isConjunctionAnalysisState,
+  PC_CONVENTION,
   RIC_CONVENTION,
   validateConjunctionAnalysisState,
 } from '@app/engine/conjunction/analysis-state';
@@ -193,5 +194,25 @@ describe('ConjunctionAnalysisState schema 2', () => {
     (state.objects[0] as unknown as Record<string, unknown>).confidenceScore = 'high';
 
     expect(validateConjunctionAnalysisState(state)).toContain('$.objects[0].confidenceScore: expected number or null');
+  });
+
+  it('accepts the scheduled events, the pass window and the Pc convention, and names malformed ones', () => {
+    const state = v2State();
+
+    state.pcConvention = PC_CONVENTION;
+    state.missionImpact.scheduledEvents = [{ label: 'Downlink', sensorName: 'Svalbard', timeIso: '2026-10-17T05:00:00.000Z' }];
+    state.missionImpact.window = { startIso: '2026-10-16T17:00:00.000Z', endIso: '2026-10-17T06:00:00.000Z', source: 'scheduled-events' };
+    expect(validateConjunctionAnalysisState(JSON.parse(JSON.stringify(state)))).toEqual([]);
+
+    const bad = JSON.parse(JSON.stringify(state));
+
+    bad.missionImpact.scheduledEvents[0].timeIso = 'soon';
+    bad.missionImpact.window.source = 'wall-clock';
+    bad.pcConvention = 0;
+    const errors = validateConjunctionAnalysisState(bad);
+
+    expect(errors).toContain('$.missionImpact.scheduledEvents[0].timeIso: expected ISO date string');
+    expect(errors).toContain('$.missionImpact.window.source: expected one of simulation-time, scheduled-events');
+    expect(errors).toContain('$.pcConvention: expected string');
   });
 });

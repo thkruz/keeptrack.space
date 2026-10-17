@@ -197,7 +197,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   private windowSec_: number = REPORT_DEFAULTS.windowSec;
   private stepSec_: number = REPORT_DEFAULTS.stepSec;
   private format_: ReportFormat = 'text';
-  private conjHalfWidthSec_: number = CONJUNCTION_DEFAULT_HALF_WIDTH_SEC;
+  protected conjHalfWidthSec_: number = CONJUNCTION_DEFAULT_HALF_WIDTH_SEC;
 
   /**
    * Register a new report generator

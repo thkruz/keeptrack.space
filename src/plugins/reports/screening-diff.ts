@@ -48,7 +48,16 @@ export interface ScreeningRunInput {
   startTimeMs: number | null;
   /** Screened window end, ms since the Unix epoch (null when unknown). */
   endTimeMs: number | null;
+  /** RIC search box half-widths (km), when the screen recorded them. */
+  boxKm?: ScreeningBoxKm | null;
   rows: readonly ScreeningEventInput[];
+}
+
+/** RIC search box half-widths of a screening run (km). */
+export interface ScreeningBoxKm {
+  radial: number;
+  intrack: number;
+  crosstrack: number;
 }
 
 export interface ScreeningDiffOptions {
@@ -168,12 +177,64 @@ const STATUS_ORDER: Record<ScreeningDiffStatus, number> = { introduced: 0, remov
 
 const entryTca = (e: ScreeningDiffEntry): number => (e.post ?? e.pre)?.tcaMs ?? 0;
 
-const windowsMatch = (a: ScreeningRunInput, b: ScreeningRunInput): boolean => {
-  if (a.startTimeMs === null || b.startTimeMs === null || a.endTimeMs === null || b.endTimeMs === null) {
+/** Boxes match when either is unknown or every half-width agrees to 1 m. */
+const boxesMatch = (a: ScreeningBoxKm | null | undefined, b: ScreeningBoxKm | null | undefined): boolean => {
+  if (!a || !b) {
     return true;
   }
 
-  return Math.abs(a.startTimeMs - b.startTimeMs) <= WINDOW_MATCH_TOLERANCE_MS && Math.abs(a.endTimeMs - b.endTimeMs) <= WINDOW_MATCH_TOLERANCE_MS;
+  return Math.abs(a.radial - b.radial) < 1e-3 && Math.abs(a.intrack - b.intrack) < 1e-3 && Math.abs(a.crosstrack - b.crosstrack) < 1e-3;
+};
+
+/**
+ * True when two runs screened the same window: same start, same length and
+ * same RIC box (unknown values match anything).
+ */
+export const isSameScreeningWindow = (a: ScreeningRunInput, b: ScreeningRunInput): boolean => {
+  if (a.startTimeMs !== null && b.startTimeMs !== null && Math.abs(a.startTimeMs - b.startTimeMs) > WINDOW_MATCH_TOLERANCE_MS) {
+    return false;
+  }
+  if (a.startTimeMs !== null && b.startTimeMs !== null && a.endTimeMs !== null && b.endTimeMs !== null) {
+    const lengthDelta = Math.abs(a.endTimeMs - a.startTimeMs - (b.endTimeMs - b.startTimeMs));
+
+    if (lengthDelta > WINDOW_MATCH_TOLERANCE_MS) {
+      return false;
+    }
+  }
+
+  return boxesMatch(a.boxKm, b.boxKm);
+};
+
+/**
+ * Picks the pre (parent) and post (analyst) runs for a maneuver diff from the
+ * retained runs (newest first). Runs are matched by object and window (start,
+ * length, box), never by storage order, so the parent and analyst may have
+ * been screened in either order and other runs may sit between them. When
+ * several pairs share a window, the most recent pair wins. When no pair shares
+ * a window, the newest run of each object is returned (the diff then flags the
+ * window mismatch). Null when either object has no run.
+ */
+export const pickScreeningRunPair = <T extends ScreeningRunInput>(runs: readonly T[], preId: string, postId: string): { pre: T; post: T } | null => {
+  const preRuns = runs.map((run, index) => ({ run, index })).filter(({ run }) => run.primaryId === preId);
+  const postRuns = runs.map((run, index) => ({ run, index })).filter(({ run }) => run.primaryId === postId);
+
+  if (preRuns.length === 0 || postRuns.length === 0) {
+    return null;
+  }
+
+  let best: { pre: T; post: T; age: number } | null = null;
+
+  for (const a of preRuns) {
+    for (const b of postRuns) {
+      const age = Math.max(a.index, b.index);
+
+      if (a.index !== b.index && isSameScreeningWindow(a.run, b.run) && (!best || age < best.age)) {
+        best = { pre: a.run, post: b.run, age };
+      }
+    }
+  }
+
+  return best ? { pre: best.pre, post: best.post } : { pre: preRuns[0].run, post: postRuns[0].run };
 };
 
 /**
@@ -274,7 +335,7 @@ export const diffScreeningRuns = (preRun: ScreeningRunInput, postRun: ScreeningR
     concernThreshold,
     tcaMatchToleranceMs,
     excludedSecondaryIds: [...excluded],
-    isWindowMismatch: !windowsMatch(preRun, postRun),
+    isWindowMismatch: !isSameScreeningWindow(preRun, postRun),
     counts,
     entries,
   };

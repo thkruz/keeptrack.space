@@ -1,7 +1,7 @@
 import { validateConjunctionAnalysisState } from '@app/engine/conjunction/analysis-state';
 import { generateScreeningCompareReport } from '@app/plugins/reports/conjunction-report-core';
 import { buildDownloadPayload } from '@app/plugins/reports/report-formatter';
-import { diffScreeningRuns, parseScreeningCsv, riskLevelFromPc, ScreeningRunInput } from '@app/plugins/reports/screening-diff';
+import { diffScreeningRuns, isSameScreeningWindow, parseScreeningCsv, pickScreeningRunPair, riskLevelFromPc, ScreeningRunInput } from '@app/plugins/reports/screening-diff';
 import { readFileSync } from 'fs';
 
 /*
@@ -152,6 +152,54 @@ describe('diffScreeningRuns on the scenario 1 fixtures', () => {
     expect(entry(diff, '22707')!.status).toBe('unchanged');
     // 59070 goes High -> Medium, so under a High threshold it is removed.
     expect(ids(diff, 'removed').sort()).toEqual(['27493', '59070']);
+  });
+});
+
+describe('pickScreeningRunPair (scenario 1 iteration 3: "diff unavailable" despite both runs)', () => {
+  const box = { radial: 25, intrack: 25, crosstrack: 25 };
+  const parent = { ...baseline, boxKm: box };
+  const analyst = { ...maneuverB, boxKm: box };
+  /** A parent re-run over a different window (48 h), stored between the two matching runs. */
+  const parent48h = { ...baseline, boxKm: box, endTimeMs: windowStart + 48 * 3600 * 1000 };
+
+  it('pairs runs stored parent-then-analyst (newest first: analyst, parent)', () => {
+    const pair = pickScreeningRunPair([analyst, parent], '39084', '90001');
+
+    expect(pair).toEqual({ pre: parent, post: analyst });
+  });
+
+  it('pairs runs stored analyst-then-parent (newest first: parent, analyst)', () => {
+    const pair = pickScreeningRunPair([parent, analyst], '39084', '90001');
+
+    expect(pair).toEqual({ pre: parent, post: analyst });
+  });
+
+  it('matches by window, not by the most recent run of each object', () => {
+    // Newest first: a 48 h parent run after the matching 72 h pair.
+    const pair = pickScreeningRunPair([parent48h, analyst, parent], '39084', '90001');
+
+    expect(pair!.pre).toBe(parent);
+    expect(pair!.post).toBe(analyst);
+    expect(diffScreeningRuns(pair!.pre, pair!.post).isWindowMismatch).toBe(false);
+  });
+
+  it('treats a different box as a different window', () => {
+    const otherBox = { ...analyst, boxKm: { radial: 10, intrack: 10, crosstrack: 10 } };
+
+    expect(isSameScreeningWindow(parent, otherBox)).toBe(false);
+    expect(isSameScreeningWindow(parent, analyst)).toBe(true);
+  });
+
+  it('falls back to the newest run of each object when no window matches', () => {
+    const pair = pickScreeningRunPair([parent48h, analyst], '39084', '90001');
+
+    expect(pair).toEqual({ pre: parent48h, post: analyst });
+    expect(diffScreeningRuns(pair!.pre, pair!.post).isWindowMismatch).toBe(true);
+  });
+
+  it('returns null when either object has no run', () => {
+    expect(pickScreeningRunPair([parent], '39084', '90001')).toBeNull();
+    expect(pickScreeningRunPair([analyst], '39084', '90001')).toBeNull();
   });
 });
 

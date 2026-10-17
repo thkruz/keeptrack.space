@@ -177,8 +177,10 @@ reports degrade instead of failing.
 
 - **Debris Screening** (`src/plugins/debris-screening/debris-screening.ts`):
   `getRecentScreeningRuns(): readonly ScreeningRunInput[]`, newest first, where each run
-  is `{ primaryId: string; startTimeMs: number | null; endTimeMs: number | null; rows: DsResultRow[] }`.
-  Without it the Maneuver Report states "Screening diff unavailable" and the comparison
+  is `{ primaryId: string; startTimeMs: number | null; endTimeMs: number | null; boxKm?: { radial; intrack; crosstrack } | null; rows: DsResultRow[] }`.
+  Debris Screening keeps one run per object and window (a re-run replaces the earlier one), and
+  the Maneuver Report pairs the parent and analyst runs by window (`pickScreeningRunPair`), so
+  the two may be screened in either order. Without it the Maneuver Report states "Screening diff unavailable" and the comparison
   row stays disabled.
 - **Maneuver** (Pro, plugin id `ManeuverPlugin`):
   `getBurnChain(sccNum: string): BurnChain | null` (the `burn-history.ts` chain). Without

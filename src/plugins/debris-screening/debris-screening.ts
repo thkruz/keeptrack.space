@@ -52,6 +52,8 @@ export interface DebrisScreeningRun {
   startTimeMs: number | null;
   /** Screened window end, ms since the Unix epoch (null when unknown). */
   endTimeMs: number | null;
+  /** RIC search box half-widths (km), null when the caller did not record them. */
+  boxKm?: { radial: number; intrack: number; crosstrack: number } | null;
   rows: DsResultRow[];
 }
 
@@ -479,17 +481,32 @@ export class DebrisScreening extends KeepTrackPlugin {
     return this.recentRuns_;
   }
 
-  /** Retain a completed run for getRecentScreeningRuns(), evicting the oldest past the cap. */
-  protected recordScreeningRun_(primary: Satellite, startTimeMs: number | null, endTimeMs: number | null, rows: readonly DsResultRow[]): void {
-    this.recentRuns_ = [
-      {
-        primaryId: DebrisScreening.screeningKey(primary),
-        startTimeMs,
-        endTimeMs,
-        rows: rows.map((row) => ({ ...row })),
-      },
-      ...this.recentRuns_,
-    ].slice(0, DebrisScreening.MAX_RETAINED_RUNS);
+  /**
+   * Retain a completed run for getRecentScreeningRuns(), evicting the oldest past the cap.
+   * Runs are keyed by object and window (start, end, box): a re-run of the same object over
+   * the same window replaces the earlier run instead of taking another slot, so repeated
+   * parent runs can no longer evict the analyst run a maneuver diff needs.
+   */
+  protected recordScreeningRun_(
+    primary: Satellite,
+    startTimeMs: number | null,
+    endTimeMs: number | null,
+    rows: readonly DsResultRow[],
+    boxKm: DebrisScreeningRun['boxKm'] = null
+  ): void {
+    const run: DebrisScreeningRun = {
+      primaryId: DebrisScreening.screeningKey(primary),
+      startTimeMs,
+      endTimeMs,
+      boxKm,
+      rows: rows.map((row) => ({ ...row })),
+    };
+    const sameBox = (a: DebrisScreeningRun['boxKm'], b: DebrisScreeningRun['boxKm']): boolean =>
+      !a || !b || (a.radial === b.radial && a.intrack === b.intrack && a.crosstrack === b.crosstrack);
+    const isSameKey = (other: DebrisScreeningRun): boolean =>
+      other.primaryId === run.primaryId && other.startTimeMs === run.startTimeMs && other.endTimeMs === run.endTimeMs && sameBox(other.boxKm, run.boxKm);
+
+    this.recentRuns_ = [run, ...this.recentRuns_.filter((other) => !isSameKey(other))].slice(0, DebrisScreening.MAX_RETAINED_RUNS);
   }
 
   protected onTargetChanged_(): void {
@@ -752,7 +769,7 @@ export class DebrisScreening extends KeepTrackPlugin {
           .slice(0, DebrisScreening.MAX_ROWS)
           .map((result) => DebrisScreening.toRow_(result));
 
-        this.recordScreeningRun_(sat, startTimeMs, endTimeMs, this.rows_);
+        this.recordScreeningRun_(sat, startTimeMs, endTimeMs, this.rows_, { radial: uVal, intrack: vVal, crosstrack: wVal });
 
         // Say so when the row cap cut the list instead of reading as the whole result.
         this.renderRows_(

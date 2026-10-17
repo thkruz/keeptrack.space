@@ -194,6 +194,18 @@ describe('Maneuver Report', () => {
     expect(text).toContain('+0.0000, +0.0500, +0.0000   0.0500');
   });
 
+  it('JSON carries the same screening diff as the text report, at the top level too (scenario 1 iteration 3)', () => {
+    const data = generateManeuverReport({ parent: landsat8, analyst, env, burns: null, screeningDiff: diff });
+    const text = buildDownloadPayload(data, 'text').content;
+    const json = JSON.parse(buildDownloadPayload(data, 'json').content);
+
+    expect(text).toContain('Screening Diff Summary');
+    expect(json.screeningDiff).not.toBeNull();
+    expect(json.screeningDiff).toEqual(json.maneuverOptions[0].screeningDiff);
+    expect(json.screeningDiff.counts).toEqual(diff.counts);
+    expect(validateConjunctionAnalysisState(json)).toEqual([]);
+  });
+
   it('says burn parameters are unavailable when no burn history is found', () => {
     const data = generateManeuverReport({ parent: landsat8, analyst, env, burns: null, screeningDiff: diff });
     const text = buildDownloadPayload(data, 'text').content;

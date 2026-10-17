@@ -611,6 +611,13 @@ export const buildManeuverState = (input: ManeuverReportInput): ConjunctionAnaly
     },
   ];
 
+  /*
+   * One option, one diff: mirror it at the top level so a JSON reader that
+   * looks for $.screeningDiff finds the same diff the text report prints
+   * (it was null there while $.maneuverOptions[0].screeningDiff held the diff).
+   */
+  state.screeningDiff = input.screeningDiff;
+
   if (input.screeningDiff?.isWindowMismatch) {
     state.notes.push('The pre and post screening runs cover different windows; events near the window edges may be classified wrongly.');
   }

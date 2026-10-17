@@ -71,7 +71,7 @@ import {
   ReportPass,
   SunIllumination,
 } from './reports-core';
-import { diffScreeningRuns, ScreeningRunInput } from './screening-diff';
+import { diffScreeningRuns, pickScreeningRunPair, ScreeningRunInput } from './screening-diff';
 import './reports.css';
 
 /** Shorthand for this plugin's locale keys. */
@@ -689,13 +689,17 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
   /** Assembles the report context: time window, injected dependencies, and report epoch. */
   protected buildContext_(sat: ReportTarget): ReportContext {
-    const startTime = this.getStartTime_();
+    // The report Date keeps seconds; the tables still start on the whole minute.
+    const generatedAt = this.getStartTime_();
+    const startTime = new Date(generatedAt.getTime());
+
+    startTime.setUTCSeconds(0);
     const options: ReportOptions = { startTime, windowSec: this.windowSec_, stepSec: this.stepSec_ };
 
     return {
       options,
       deps: this.buildCoreDeps_(sat),
-      generatedAt: startTime,
+      generatedAt,
       secondary: this.getSecondary_(),
       conjunctionHalfWidthSec: this.conjHalfWidthSec_,
     };
@@ -961,15 +965,13 @@ export class ReportsPlugin extends KeepTrackPlugin {
     }
 
     const halfWidthSec = ctx.conjunctionHalfWidthSec ?? CONJUNCTION_DEFAULT_HALF_WIDTH_SEC;
-    // Newest first, so find() picks the latest run of each object.
-    const runs = this.getRetainedScreeningRuns_();
-    const preRun = runs.find((r) => r.primaryId === parent.sccNum) ?? null;
-    const postRun = runs.find((r) => r.primaryId === sat.sccNum) ?? null;
+    // Matched by object and window, so the two runs may be in either order.
+    const pair = pickScreeningRunPair(this.getRetainedScreeningRuns_(), parent.sccNum, sat.sccNum);
     let screeningDiff: ScreeningDiff | null = null;
     let reason: string | null = null;
 
-    if (preRun && postRun) {
-      screeningDiff = diffScreeningRuns(preRun, postRun, {
+    if (pair) {
+      screeningDiff = diffScreeningRuns(pair.pre, pair.post, {
         excludeSecondaryIds: this.lineageExclusions_(parent.sccNum, [sat.sccNum]),
         nameOf: (id) => this.secondaryName_(id),
         source: 'debris-screening-runs',
@@ -1168,8 +1170,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
   private getStartTime_(): Date {
     const time = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
 
+    // Whole seconds: the report Date prints them (the tables round to the minute in buildContext_).
     time.setMilliseconds(0);
-    time.setSeconds(0);
 
     return time;
   }

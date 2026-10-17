@@ -120,7 +120,7 @@ describe('Conjunction Report (LANDSAT 8 vs constructed secondary)', () => {
     const json = JSON.parse(buildDownloadPayload(data, 'json').content);
 
     expect(validateConjunctionAnalysisState(json)).toEqual([]);
-    expect(json.schemaVersion).toBe(1);
+    expect(json.schemaVersion).toBe(2);
     expect(json.appVersion).toBe('13.0.0-test');
     expect(json.kind).toBe('conjunction');
   });
@@ -227,9 +227,9 @@ describe('Maneuver Report', () => {
 
 describe('validateConjunctionAnalysisState', () => {
   it('reports every violation with its path', () => {
-    const errors = validateConjunctionAnalysisState({ schemaVersion: 2, kind: 'nope', objects: 'x' });
+    const errors = validateConjunctionAnalysisState({ schemaVersion: 3, kind: 'nope', objects: 'x' });
 
-    expect(errors).toContain('$.schemaVersion: expected 1');
+    expect(errors).toContain('$.schemaVersion: expected one of 1, 2');
     expect(errors.some((e) => e.startsWith('$.kind'))).toBe(true);
     expect(errors).toContain('$.objects: expected array');
     expect(validateConjunctionAnalysisState(null)).toEqual(['$: expected object']);

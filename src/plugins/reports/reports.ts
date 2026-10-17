@@ -185,7 +185,7 @@ const STEP_OPTIONS_SEC = [10, 30, 60, 300];
 export class ReportsPlugin extends KeepTrackPlugin {
   readonly id = 'ReportsPlugin';
   dependencies_ = [SelectSatManager.name];
-  private readonly selectSatManager_: SelectSatManager;
+  protected readonly selectSatManager_: SelectSatManager;
 
   /**
    * Static registry of all available report generators
@@ -549,7 +549,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   // Options persistence
   // =========================================================================
 
-  private readOptionsFromForm_(): void {
+  protected readOptionsFromForm_(): void {
     const windowEl = getEl('reports-window', true) as HTMLSelectElement | null;
     const stepEl = getEl('reports-step', true) as HTMLSelectElement | null;
     const formatEl = getEl('reports-format', true) as HTMLSelectElement | null;
@@ -688,7 +688,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   }
 
   /** Assembles the report context: time window, injected dependencies, and report epoch. */
-  private buildContext_(sat: ReportTarget): ReportContext {
+  protected buildContext_(sat: ReportTarget): ReportContext {
     const startTime = this.getStartTime_();
     const options: ReportOptions = { startTime, windowSec: this.windowSec_, stepSec: this.stepSec_ };
 
@@ -716,7 +716,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   }
 
   /** Finds in-view passes via the shared best-pass finder, mapping rows to {@link ReportPass}. */
-  private findPasses_(sat: Satellite, sensor: DetailedSensor, opts: ReportOptions): ReportPass[] {
+  protected findPasses_(sat: Satellite, sensor: DetailedSensor, opts: ReportOptions): ReportPass[] {
     const catalogManager = ServiceLocator.getCatalogManager();
     const satrec = catalogManager.calcSatrec(sat);
     const scene = ServiceLocator.getScene();
@@ -906,7 +906,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   }
 
   /** App-side inputs every analysis needs (epoch, version, Pc settings). */
-  private buildAnalysisEnv_(ctx: ReportContext): AnalysisEnv {
+  protected buildAnalysisEnv_(ctx: ReportContext): AnalysisEnv {
     const k = settingsManager.covarianceConfidenceLevel;
 
     return {
@@ -1021,7 +1021,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
    * Secondaries to leave out of a parent-vs-analyst diff: the parent, the given
    * analyst ids, and every other analyst object derived from the same parent.
    */
-  private lineageExclusions_(parentScc: string, analystSccs: string[]): string[] {
+  protected lineageExclusions_(parentScc: string, analystSccs: string[]): string[] {
     const ids = new Set<string>([parentScc, ...analystSccs]);
 
     try {
@@ -1038,7 +1038,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   }
 
   /** The Debris Screening plugin's retained runs, newest first (empty when the accessor is missing). */
-  private getRetainedScreeningRuns_(): readonly ScreeningRunInput[] {
+  protected getRetainedScreeningRuns_(): readonly ScreeningRunInput[] {
     const source = PluginRegistry.getPlugin(DebrisScreening) as unknown as RetainedScreeningRunsSource | null;
 
     try {
@@ -1049,7 +1049,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   }
 
   /** Burns that produced an analyst object, from the Maneuver plugin, or null when unavailable. */
-  private readBurnHistory_(sccNum: string): BurnSummary[] | null {
+  protected readBurnHistory_(sccNum: string): BurnSummary[] | null {
     const plugin = PluginRegistry.plugins.find((p) => p.id === MANEUVER_PLUGIN_ID) as unknown as BurnHistorySource | undefined;
 
     try {
@@ -1073,7 +1073,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   }
 
   /** Looks up a TLE-backed catalog object by NORAD number. */
-  private findSatellite_(scc: string): Satellite | null {
+  protected findSatellite_(scc: string): Satellite | null {
     try {
       const catalogManager = ServiceLocator.getCatalogManager();
       const id = catalogManager.sccNum2Id(scc);
@@ -1089,12 +1089,12 @@ export class ReportsPlugin extends KeepTrackPlugin {
     }
   }
 
-  private secondaryName_(scc: string): string {
+  protected secondaryName_(scc: string): string {
     return scc ? (this.findSatellite_(scc)?.name ?? '') : '';
   }
 
   /** The selected secondary, when it is a TLE-backed satellite. */
-  private getSecondary_(): Satellite | null {
+  protected getSecondary_(): Satellite | null {
     const secondary = this.selectSatManager_?.secondarySatObj;
 
     return secondary instanceof Satellite ? secondary : null;

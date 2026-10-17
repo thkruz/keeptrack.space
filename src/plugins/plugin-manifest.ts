@@ -314,6 +314,8 @@ export const pluginManifest: PluginDescriptor[] = [
     configKey: 'ReportsPlugin',
     ossImport: () => import('./reports/reports'),
     ossClassName: 'ReportsPlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/reports-pro/reports-pro') : undefined,
+    proClassName: 'ReportsPro',
     defaultConfig: { enabled: true, order: 50 },
   },
   {

@@ -33,8 +33,18 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-/** Current schema version of {@link ConjunctionAnalysisState}. */
-export const CONJUNCTION_ANALYSIS_SCHEMA_VERSION = 1;
+/**
+ * Current schema version of {@link ConjunctionAnalysisState}.
+ *
+ * Version 2 adds the optional composed-report blocks ({@link ExternalMessageComparison},
+ * the recommendation, the analyst, the close-approach range profile, the object
+ * details and the mission-impact events). Every version-1 state is a valid
+ * version-2 state apart from the version number, so the validator accepts both.
+ */
+export const CONJUNCTION_ANALYSIS_SCHEMA_VERSION = 2;
+
+/** Every schema version {@link validateConjunctionAnalysisState} accepts. */
+export const SUPPORTED_CONJUNCTION_ANALYSIS_SCHEMA_VERSIONS: readonly number[] = [1, 2];
 
 /**
  * Sign convention every RIC vector in the state uses. Matches ootk
@@ -97,6 +107,16 @@ export interface AnalysisObjectSummary {
   isAnalystObject: boolean;
   /** NORAD number of the cataloged object this one was derived from, if any. */
   derivedFromNoradId: string | null;
+  /** v2: object type as the catalog names it (e.g. "Payload", "Debris"). */
+  objectType?: string | null;
+  /** v2: owner or operator code from the catalog (e.g. "USGS"). */
+  owner?: string | null;
+  /** v2: country code from the catalog (e.g. "US"). */
+  country?: string | null;
+  /** v2: where the GP data came from (e.g. "CelesTrak"), null when unknown. */
+  dataSource?: string | null;
+  /** v2: KeepTrack confidence score 0 to 9 (TLE line 1 column 65), null when unknown. */
+  confidenceScore?: number | null;
 }
 
 /** Everything the probability of collision was computed from. */
@@ -244,17 +264,99 @@ export interface PassWindow {
   maxElevationDeg: number;
 }
 
-/** Mission-impact block. Stage A fills the sensor passes; the rest is a placeholder for the composed report. */
+/** How a scheduled event (a sensor pass) changes under a maneuver option. */
+export type MissionEventVerdict = 'unchanged' | 'shifted' | 'lost' | 'gained';
+
+/** One option's version of a scheduled event. */
+export interface MissionEventOptionWindow {
+  optionId: string;
+  /** Matching pass of the option's object, null when it has none near the baseline pass. */
+  pass: PassWindow | null;
+  /** Largest AOS/LOS shift against the baseline (s), null when either pass is missing. */
+  shiftSec: number | null;
+  verdict: MissionEventVerdict;
+}
+
+/** v2: a scheduled event (a pass of the primary over a sensor) and how each option changes it. */
+export interface MissionImpactEvent {
+  /** What the event is, e.g. "Pass". */
+  label: string;
+  sensorName: string;
+  /** Sensor site, degrees (north and east positive), null when unknown. */
+  latDeg: number | null;
+  lonDeg: number | null;
+  /** Minimum elevation of the sensor (deg), null when unknown. */
+  minElevationDeg: number | null;
+  /** The primary's pass, null for an event only an option gains. */
+  baseline: PassWindow | null;
+  options: MissionEventOptionWindow[];
+}
+
+/** Mission-impact block. Stage A fills the sensor passes; the composed report adds {@link MissionImpactEvent} rows. */
 export interface MissionImpact {
   sensorName: string | null;
   /** Pass windows over the sensor in the analysis window, null when no sensor is selected. */
   passWindows: PassWindow[] | null;
   notes: string[];
+  /** v2: scheduled events (custom sensor passes) compared across the maneuver options. */
+  events?: MissionImpactEvent[];
+}
+
+/** Where an external conjunction message came from. */
+export type ExternalMessageSource = 'manual' | 'cdm-file';
+
+/** v2: the values an external message (a CDM) states for the event. */
+export interface ExternalMessageValues {
+  /** TCA the message states, ISO 8601 UTC. */
+  tcaIso: string;
+  tcaMs: number;
+  missDistanceKm: number;
+  /** Signed relative position (km) when the message gives all three components, see {@link RIC_CONVENTION}. */
+  ricKm: RicVector | null;
+  relativeSpeedKmS: number | null;
+  pc: number | null;
+  /** 1-sigma position uncertainty (km) the message gives for each object, in its own RTN frame. */
+  primarySigmasKm: RicVector | null;
+  secondarySigmasKm: RicVector | null;
+}
+
+/** v2: KeepTrack evaluated at the message's own TCA (not at KeepTrack's TCA). */
+export interface KeepTrackAtMessageTca {
+  /** Range at the message TCA (km). */
+  rangeKm: number;
+  ricKm: RicVector;
+  relativeSpeedKmS: number;
+  /** Pc of the relative state at the message TCA, same model as {@link ConjunctionEncounter.pc}. */
+  pc: number | null;
+  riskLevel: ScreeningRiskLevel;
+}
+
+/** v2: an external conjunction message compared with KeepTrack at the same instant. */
+export interface ExternalMessageComparison {
+  source: ExternalMessageSource;
+  originator: string | null;
+  messageId: string | null;
+  /** Message creation date, ISO 8601 UTC, null when unknown. */
+  creationDateIso: string | null;
+  /** Object designators the message names (NORAD numbers for SATCAT messages). */
+  primaryDesignator: string | null;
+  secondaryDesignator: string | null;
+  pcMethod: string | null;
+  message: ExternalMessageValues;
+  /** Null when KeepTrack could not propagate both objects to the message TCA. */
+  keepTrack: KeepTrackAtMessageTca | null;
+}
+
+/** v2: who prepared the analysis (from the signed-in account; null fields when unknown). */
+export interface AnalystInfo {
+  name: string | null;
+  organization: string | null;
 }
 
 /** The complete machine-readable analysis state. */
 export interface ConjunctionAnalysisState {
-  schemaVersion: typeof CONJUNCTION_ANALYSIS_SCHEMA_VERSION;
+  /** 2 for states written now; 1 for states written before the composed-report fields existed. */
+  schemaVersion: 1 | typeof CONJUNCTION_ANALYSIS_SCHEMA_VERSION;
   kind: AnalysisKind;
   /** Simulation time the analysis was generated at, ISO 8601 UTC. */
   generatedAtIso: string;
@@ -273,6 +375,16 @@ export interface ConjunctionAnalysisState {
   screeningDiff: ScreeningDiff | null;
   missionImpact: MissionImpact;
   notes: string[];
+  /** v2: the external message (CDM) compared with KeepTrack, null when none was entered. */
+  externalMessage?: ExternalMessageComparison | null;
+  /** v2: the analyst's recommendation text, null when none. */
+  recommendation?: string | null;
+  /** v2: id of the maneuver option the recommendation names, null when none. */
+  recommendedOptionId?: string | null;
+  /** v2: who prepared the analysis. */
+  analyst?: AnalystInfo | null;
+  /** v2: range around TCA at a fine step (the composed report's range chart), plus/minus a few seconds. */
+  closeApproachProfile?: RelativeGeometrySample[];
 }
 
 // =============================================================================
@@ -283,6 +395,8 @@ const RISK_LEVELS: readonly ScreeningRiskLevel[] = ['critical', 'high', 'medium'
 const DIFF_STATUSES: readonly ScreeningDiffStatus[] = ['introduced', 'removed', 'unchanged', 'appeared', 'dropped'];
 const KINDS: readonly AnalysisKind[] = ['conjunction', 'maneuver', 'screening-compare'];
 const ROLES: readonly AnalysisObjectRole[] = ['primary', 'secondary', 'parent', 'analyst'];
+const VERDICTS: readonly MissionEventVerdict[] = ['unchanged', 'shifted', 'lost', 'gained'];
+const MESSAGE_SOURCES: readonly ExternalMessageSource[] = ['manual', 'cdm-file'];
 
 type Rec = Record<string, unknown>;
 
@@ -390,6 +504,127 @@ class Checker {
       this.fail(`${path}.isAnalystObject`, 'expected boolean');
     }
     this.str(v, 'derivedFromNoradId', path, true);
+    for (const key of ['objectType', 'owner', 'country', 'dataSource']) {
+      this.optStr(v, key, path);
+    }
+    if (v.confidenceScore !== undefined) {
+      this.num(v, 'confidenceScore', path, true);
+    }
+  }
+
+  /** An optional (v2) string field: absent, null or a string. */
+  optStr(o: Rec, key: string, path: string): void {
+    if (o[key] !== undefined) {
+      this.str(o, key, path, true);
+    }
+  }
+
+  sample(s: unknown, p: string): void {
+    if (!isRec(s)) {
+      this.fail(p, 'expected sample');
+
+      return;
+    }
+    this.num(s, 'offsetSec', p);
+    this.iso(s, 'timeIso', p);
+    this.num(s, 'rangeKm', p);
+    this.ric(s.ricKm, `${p}.ricKm`);
+    this.num(s, 'relativeSpeedKmS', p);
+  }
+
+  passWindow(v: unknown, path: string): void {
+    if (v === null) {
+      return;
+    }
+    if (!isRec(v)) {
+      this.fail(path, 'expected pass window or null');
+
+      return;
+    }
+    this.str(v, 'noradId', path, true);
+    this.iso(v, 'aosIso', path);
+    this.iso(v, 'losIso', path);
+    this.num(v, 'maxElevationDeg', path);
+  }
+
+  missionEvent(v: unknown, path: string): void {
+    if (!isRec(v)) {
+      this.fail(path, 'expected mission event');
+
+      return;
+    }
+    this.str(v, 'label', path);
+    this.str(v, 'sensorName', path);
+    this.num(v, 'latDeg', path, true);
+    this.num(v, 'lonDeg', path, true);
+    this.num(v, 'minElevationDeg', path, true);
+    this.passWindow(v.baseline, `${path}.baseline`);
+    if (!Array.isArray(v.options)) {
+      this.fail(`${path}.options`, 'expected array');
+
+      return;
+    }
+    v.options.forEach((o, i) => {
+      const p = `${path}.options[${i}]`;
+
+      if (!isRec(o)) {
+        this.fail(p, 'expected option window');
+
+        return;
+      }
+      this.str(o, 'optionId', p);
+      this.passWindow(o.pass, `${p}.pass`);
+      this.num(o, 'shiftSec', p, true);
+      this.oneOf(o, 'verdict', p, VERDICTS);
+    });
+  }
+
+  externalMessage(v: unknown, path: string): void {
+    if (v === null || v === undefined) {
+      return;
+    }
+    if (!isRec(v)) {
+      this.fail(path, 'expected external message or null');
+
+      return;
+    }
+    this.oneOf(v, 'source', path, MESSAGE_SOURCES);
+    for (const key of ['originator', 'messageId', 'primaryDesignator', 'secondaryDesignator', 'pcMethod']) {
+      this.str(v, key, path, true);
+    }
+    this.iso(v, 'creationDateIso', path, true);
+    const m = v.message;
+
+    if (isRec(m)) {
+      const p = `${path}.message`;
+
+      this.iso(m, 'tcaIso', p);
+      this.num(m, 'tcaMs', p);
+      this.num(m, 'missDistanceKm', p);
+      this.ric(m.ricKm, `${p}.ricKm`, true);
+      this.num(m, 'relativeSpeedKmS', p, true);
+      this.num(m, 'pc', p, true);
+      this.ric(m.primarySigmasKm, `${p}.primarySigmasKm`, true);
+      this.ric(m.secondarySigmasKm, `${p}.secondarySigmasKm`, true);
+    } else {
+      this.fail(`${path}.message`, 'expected object');
+    }
+    const k = v.keepTrack;
+
+    if (k === null) {
+      return;
+    }
+    if (isRec(k)) {
+      const p = `${path}.keepTrack`;
+
+      this.num(k, 'rangeKm', p);
+      this.ric(k.ricKm, `${p}.ricKm`);
+      this.num(k, 'relativeSpeedKmS', p);
+      this.num(k, 'pc', p, true);
+      this.oneOf(k, 'riskLevel', p, RISK_LEVELS);
+    } else {
+      this.fail(`${path}.keepTrack`, 'expected object or null');
+    }
   }
 
   encounter(v: unknown, path: string): void {
@@ -550,6 +785,37 @@ class Checker {
   }
 }
 
+/** Version-2 composed-report blocks: all optional, checked when present. */
+const validateComposedBlocks_ = (c: Checker, value: Rec): void => {
+  c.externalMessage(value.externalMessage, '$.externalMessage');
+  c.optStr(value, 'recommendation', '$');
+  c.optStr(value, 'recommendedOptionId', '$');
+
+  const analyst = value.analyst;
+
+  if (analyst !== undefined && analyst !== null) {
+    if (isRec(analyst)) {
+      c.str(analyst, 'name', '$.analyst', true);
+      c.str(analyst, 'organization', '$.analyst', true);
+    } else {
+      c.fail('$.analyst', 'expected object or null');
+    }
+  }
+
+  const profile = value.closeApproachProfile;
+
+  if (profile === undefined) {
+    return;
+  }
+  if (Array.isArray(profile)) {
+    profile.forEach((s, i) => {
+      c.sample(s, `$.closeApproachProfile[${i}]`);
+    });
+  } else {
+    c.fail('$.closeApproachProfile', 'expected array');
+  }
+};
+
 /**
  * Structural check of a parsed {@link ConjunctionAnalysisState}. Returns every
  * violation as `path: message`; an empty array means the value is valid.
@@ -561,8 +827,8 @@ export const validateConjunctionAnalysisState = (value: unknown): string[] => {
     return ['$: expected object'];
   }
 
-  if (value.schemaVersion !== CONJUNCTION_ANALYSIS_SCHEMA_VERSION) {
-    c.fail('$.schemaVersion', `expected ${CONJUNCTION_ANALYSIS_SCHEMA_VERSION}`);
+  if (!SUPPORTED_CONJUNCTION_ANALYSIS_SCHEMA_VERSIONS.includes(value.schemaVersion as number)) {
+    c.fail('$.schemaVersion', `expected one of ${SUPPORTED_CONJUNCTION_ANALYSIS_SCHEMA_VERSIONS.join(', ')}`);
   }
   c.oneOf(value, 'kind', '$', KINDS);
   c.iso(value, 'generatedAtIso', '$');
@@ -583,18 +849,7 @@ export const validateConjunctionAnalysisState = (value: unknown): string[] => {
 
   if (Array.isArray(value.relativeGeometry)) {
     value.relativeGeometry.forEach((s, i) => {
-      const p = `$.relativeGeometry[${i}]`;
-
-      if (!isRec(s)) {
-        c.fail(p, 'expected sample');
-
-        return;
-      }
-      c.num(s, 'offsetSec', p);
-      c.iso(s, 'timeIso', p);
-      c.num(s, 'rangeKm', p);
-      c.ric(s.ricKm, `${p}.ricKm`);
-      c.num(s, 'relativeSpeedKmS', p);
+      c.sample(s, `$.relativeGeometry[${i}]`);
     });
   } else {
     c.fail('$.relativeGeometry', 'expected array');
@@ -620,6 +875,15 @@ export const validateConjunctionAnalysisState = (value: unknown): string[] => {
     if (!Array.isArray(mi.notes)) {
       c.fail('$.missionImpact.notes', 'expected array');
     }
+    if (mi.events !== undefined) {
+      if (Array.isArray(mi.events)) {
+        mi.events.forEach((e, i) => {
+          c.missionEvent(e, `$.missionImpact.events[${i}]`);
+        });
+      } else {
+        c.fail('$.missionImpact.events', 'expected array');
+      }
+    }
   } else {
     c.fail('$.missionImpact', 'expected object');
   }
@@ -627,6 +891,8 @@ export const validateConjunctionAnalysisState = (value: unknown): string[] => {
   if (!Array.isArray(value.notes)) {
     c.fail('$.notes', 'expected array');
   }
+
+  validateComposedBlocks_(c, value);
 
   return c.errors;
 };

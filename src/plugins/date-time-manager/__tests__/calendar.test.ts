@@ -128,7 +128,8 @@ describe('Calendar', () => {
     expect(toast).toHaveBeenCalled();
     expect(cal.getSelectedDate()?.toISOString()).toBe('2026-10-16T12:00:00.000Z');
 
-    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    cal.showDatePicker();
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     expect(input.value).toBe('2026-10-16 12:00:00');
     expect(input.classList.contains('invalid')).toBe(false);
   });
@@ -194,6 +195,41 @@ describe('Calendar', () => {
     // Too short -> rejected with a warning.
     input().value = '12';
     expect(() => c().onTextInputChange()).not.toThrow();
+  });
+
+  it('onTextInputChange accepts fractional seconds (HH:MM:SS.s)', () => {
+    cal.setDate(new Date(Date.UTC(2026, 0, 1)));
+    const input = () => document.getElementById('calendar-time-input') as HTMLInputElement;
+
+    input().value = '08:15:30.4';
+    c().onTextInputChange();
+
+    expect(c().simulationDate.getUTCSeconds()).toBe(30);
+    expect(c().simulationDate.getUTCMilliseconds()).toBe(400);
+    expect(input().value).toBe('08:15:30.4');
+  });
+
+  it('Escape closes the picker without applying a partially typed time', () => {
+    cal.setDate(new Date(Date.UTC(2026, 0, 1, 1, 2, 3)));
+    cal.showDatePicker();
+    const input = document.getElementById('calendar-time-input') as HTMLInputElement;
+
+    input.focus();
+    input.value = '23:59:59';
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+
+    expect(document.getElementById('ui-datepicker-div')!.style.display).toBe('none');
+    expect(c().simulationDate.getUTCHours()).toBe(1);
+    expect((document.getElementById('calendar-time-input') as HTMLInputElement).value).toBe('01:02:03');
+  });
+
+  it('Escape does nothing while the picker is closed', () => {
+    cal.setDate(new Date());
+    const hide = vi.spyOn(cal, 'hideDatePicker');
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+
+    expect(hide).not.toHaveBeenCalled();
   });
 
   it('onTextInputChange returns early when the input element is absent', () => {

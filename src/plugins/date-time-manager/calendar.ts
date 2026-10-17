@@ -17,6 +17,7 @@ export class Calendar {
   private simulationDate: Date;
   private propagationRate: number = 1;
   private isVisible: boolean = false;
+  private isEscapeCancel_ = false;
   /** attachEvents() runs after every render; the container persists, so only bind its click once */
   private isContainerClickBound_ = false;
 
@@ -140,10 +141,8 @@ export class Calendar {
       if (e.key === 'Enter') {
         e.preventDefault();
         this.applyTypedDateTime_(gotoInput);
-      } else if (e.key === 'Escape') {
-        gotoInput.value = formatUtcDateTime(this.simulationDate);
-        gotoInput.classList.remove('invalid');
       }
+      // Escape is handled by the picker-wide listener (see showDatePicker)
     });
 
     document.querySelectorAll('#ui-datepicker-div td[data-handler="selectDay"]').forEach((td) => {
@@ -185,6 +184,11 @@ export class Calendar {
         }
       });
       timeInput.addEventListener('blur', () => {
+        if (this.isEscapeCancel_) {
+          this.isEscapeCancel_ = false;
+
+          return;
+        }
         this.onTextInputChange();
       });
     }
@@ -386,7 +390,7 @@ export class Calendar {
         <dl>
           <dt class="ui_tpicker_time_label">${dt('calendar.time')}</dt>
           <dd class="ui_tpicker_time">
-            <input id="calendar-time-input" class="ui_tpicker_time_input keyboard-priority" value="${this.formatTime(hours, minutes, seconds)}">
+            <input id="calendar-time-input" class="ui_tpicker_time_input keyboard-priority" value="${this.formatTime(hours, minutes, seconds, this.simulationDate.getUTCMilliseconds())}">
             <span id="calendar-time-prop-rate">(x${propRate.toString()})</span>
           </dd>
           <dt class="ui_tpicker_hour_label">${dt('calendar.hour')}</dt>
@@ -628,11 +632,10 @@ export class Calendar {
       return;
     }
 
-    this.isVisible = !this.isVisible;
-    const datepicker = document.getElementById('ui-datepicker-div');
-
-    if (datepicker) {
-      datepicker.style.display = this.isVisible ? 'block' : 'none';
+    if (this.isVisible) {
+      this.hideDatePicker();
+    } else {
+      this.showDatePicker();
     }
   }
 
@@ -644,6 +647,8 @@ export class Calendar {
     }
 
     this.isVisible = true;
+    document.removeEventListener('keydown', this.onEscapeKeyDown_);
+    document.addEventListener('keydown', this.onEscapeKeyDown_);
     const datepicker = document.getElementById('ui-datepicker-div');
 
     if (datepicker) {
@@ -651,8 +656,27 @@ export class Calendar {
     }
   }
 
+  /**
+   * Escape closes the picker without applying any partially typed time or date.
+   * Enter still applies through the inputs' own handlers.
+   */
+  private readonly onEscapeKeyDown_ = (e: KeyboardEvent): void => {
+    if (e.key !== 'Escape' || !this.isVisible) {
+      return;
+    }
+
+    // Drop the typed text first so the blur that hiding triggers cannot apply it
+    this.isEscapeCancel_ = true;
+    this.updateTimeInput(true);
+    (document.activeElement as HTMLElement | null)?.blur?.();
+    this.hideDatePicker();
+    // Blur may not fire when nothing was focused; do not leave the cancel flag armed
+    this.isEscapeCancel_ = false;
+  };
+
   hideDatePicker(): void {
     this.isVisible = false;
+    document.removeEventListener('keydown', this.onEscapeKeyDown_);
     const datepicker = document.getElementById('ui-datepicker-div');
 
     if (datepicker) {
@@ -711,39 +735,32 @@ export class Calendar {
       return;
     }
 
-    // Expecting 6 or 8 characters (HHMMSS or HH:MM:SS)
-    if (timeInput.value.length < 6 || timeInput.value.length > 8) {
-      errorManagerInstance.warn('Invalid time format entered! Expected HH:MM:SS or HHMMSS');
+    // Accepts HH:MM:SS, HHMMSS, and either with a fractional second (.s up to .sss)
+    const match = /^(?<h>\d{2}):?(?<m>\d{2}):?(?<s>\d{2})(?:\.(?<f>\d{1,3}))?$/u.exec(timeInput.value.trim());
+
+    if (!match?.groups) {
+      errorManagerInstance.warn('Invalid time format entered! Expected HH:MM:SS, HH:MM:SS.s or HHMMSS');
 
       return;
     }
 
-    // Expecting format HH:MM:SS or HHMMSS
-    if (!timeInput.value.includes(':') && timeInput.value.length === 6) {
-      timeInput.value = `${timeInput.value.slice(0, 2)}:${timeInput.value.slice(2, 4)}:${timeInput.value.slice(4, 6)}`;
-    }
+    const hours = parseInt(match.groups.h, 10);
+    const minutes = parseInt(match.groups.m, 10);
+    const seconds = parseInt(match.groups.s, 10);
+    const milliseconds = match.groups.f ? parseInt(match.groups.f.padEnd(3, '0'), 10) : 0;
 
-    const timeParts = timeInput.value.split(':');
+    this.simulationDate.setUTCHours(Math.max(0, Math.min(23, hours)));
+    this.simulationDate.setUTCMinutes(Math.max(0, Math.min(59, minutes)));
+    this.simulationDate.setUTCSeconds(Math.max(0, Math.min(59, seconds)));
+    this.simulationDate.setUTCMilliseconds(milliseconds);
 
-    if (timeParts.length === 3) {
-      const hours = parseInt(timeParts[0], 10);
-      const minutes = parseInt(timeParts[1], 10);
-      const seconds = parseInt(timeParts[2], 10);
-
-      if (!isNaN(hours) && !isNaN(minutes) && !isNaN(seconds)) {
-        this.simulationDate.setUTCHours(Math.max(0, Math.min(23, hours)));
-        this.simulationDate.setUTCMinutes(Math.max(0, Math.min(59, minutes)));
-        this.simulationDate.setUTCSeconds(Math.max(0, Math.min(59, seconds)));
-
-        this.datetimeInputFormChange();
-        this.updateTimeInput();
-        this.render();
-        this.attachEvents();
-      }
-    }
+    this.datetimeInputFormChange();
+    this.updateTimeInput();
+    this.render();
+    this.attachEvents();
   }
 
-  private updateTimeInput(): void {
+  private updateTimeInput(force = false): void {
     setInnerHtml('calendar-time-prop-rate', `(x${this.propagationRate.toString()})`);
 
     const timeInput = document.getElementById('calendar-time-input') as HTMLInputElement;
@@ -751,18 +768,25 @@ export class Calendar {
     const gotoInput = document.getElementById(Calendar.GOTO_INPUT_ID) as HTMLInputElement | null;
 
     // Do not clobber text the user is in the middle of typing.
-    if (gotoInput && document.activeElement !== gotoInput) {
+    if (gotoInput && (force || document.activeElement !== gotoInput)) {
       gotoInput.value = formatUtcDateTime(this.simulationDate);
       gotoInput.classList.remove('invalid');
     }
 
     if (timeInput) {
-      timeInput.value = `${this.formatTime(this.simulationDate.getUTCHours(), this.simulationDate.getUTCMinutes(), this.simulationDate.getUTCSeconds())}`;
+      timeInput.value = this.formatTime(
+        this.simulationDate.getUTCHours(),
+        this.simulationDate.getUTCMinutes(),
+        this.simulationDate.getUTCSeconds(),
+        this.simulationDate.getUTCMilliseconds()
+      );
     }
   }
 
-  private formatTime(hours: number, minutes: number, seconds: number): string {
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  private formatTime(hours: number, minutes: number, seconds: number, milliseconds = 0): string {
+    const fraction = milliseconds > 0 ? `.${milliseconds.toString().padStart(3, '0').replace(/0+$/u, '')}` : '';
+
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}${fraction}`;
   }
 
   public getSelectedDate(): Date | null {

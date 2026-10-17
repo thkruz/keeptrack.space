@@ -347,3 +347,38 @@ describe('DebrisScreening_recent_runs', () => {
     expect(registered!.getRecentScreeningRuns()[0].primaryId).toBe('25544');
   });
 });
+
+describe('DebrisScreening_results_panel_z_order', () => {
+  let plugin: DebrisScreening;
+
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager]);
+    plugin = new DebrisScreening();
+    websiteInit(plugin);
+  });
+
+  it('closes the results panel when another plugin opens its side menu', () => {
+    const close = vi.spyOn(plugin, 'closeSecondaryMenu');
+    const other = { bottomIconElementName: 'other-menu-icon', sideMenuElementName: 'other-menu' };
+    const toggle = { bottomIconElementName: 'toggle-icon', sideMenuElementName: '' };
+
+    vi.spyOn(PluginRegistry, 'plugins', 'get').mockReturnValue([plugin, other, toggle] as never);
+    plugin.isSideMenuSettingsOpen = true;
+
+    // Its own icon and a plugin without a side menu leave the panel alone.
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, 'toggle-icon');
+    expect(close).not.toHaveBeenCalled();
+
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, 'other-menu-icon');
+    expect(close).toHaveBeenCalledTimes(1);
+  });
+
+  it('does nothing when the results panel is closed', () => {
+    const close = vi.spyOn(plugin, 'closeSecondaryMenu');
+
+    plugin.isSideMenuSettingsOpen = false;
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, 'other-menu-icon');
+    expect(close).not.toHaveBeenCalled();
+  });
+});

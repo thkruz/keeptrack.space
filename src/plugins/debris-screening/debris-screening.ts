@@ -422,6 +422,27 @@ export class DebrisScreening extends KeepTrackPlugin {
     EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: unknown) => {
       this.onSelectSatData_(obj);
     });
+
+    EventBus.getInstance().on(EventBusEvent.bottomMenuClick, (iconName: string) => {
+      this.onOtherMenuOpened_(iconName);
+    });
+  }
+
+  /**
+   * Z-order rule for the results panel: another plugin's side menu opened after
+   * it closes it. Side menus stack above secondary panels (engine CSS), so a
+   * results panel left open would otherwise sit half under the new menu. Plugins
+   * without a side menu (toggles) leave the panel alone.
+   */
+  protected onOtherMenuOpened_(iconName: string): void {
+    if (iconName === this.bottomIconElementName || !this.isSideMenuSettingsOpen) {
+      return;
+    }
+    const other = PluginRegistry.plugins.find((plugin) => plugin.bottomIconElementName === iconName);
+
+    if (other?.sideMenuElementName) {
+      this.closeSecondaryMenu();
+    }
   }
 
   /**

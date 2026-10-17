@@ -52,6 +52,8 @@ import { UiValidation } from './ui-validation';
 
 export class UiManager {
   private static readonly LONG_TIMER_DELAY = MILLISECONDS_PER_SECOND * 100;
+  /** Upper bound for an isLong toast that is not critical or an error. */
+  private static readonly LONG_NON_CRITICAL_MAX_MS = MILLISECONDS_PER_SECOND * 20;
   private static readonly TOAST_TEMPLATE_ID = 'kt-toast';
 
   private isFooterVisible_ = true;
@@ -205,6 +207,44 @@ export class UiManager {
     document.body.appendChild(template);
   }
 
+  /**
+   * How long a toast stays up. Every errorManager warn/info/log toast passes
+   * isLong, which used to mean 100 s for all of them: a "Max Results" caution
+   * sat over the search results for over a minute. Only critical and error
+   * toasts keep the long timer; everything else auto-dismisses within
+   * LONG_NON_CRITICAL_MAX_MS even when isLong is set.
+   */
+  private static toastDuration_(toastText: string, type: ToastMsgType, isLong: boolean): number {
+    // About 100 ms per character so longer messages stay readable.
+    const readingTime = toastText.length * 100;
+
+    if (!isLong) {
+      return Math.min(Math.max(readingTime, 4000), 12000);
+    }
+
+    if (type === ToastMsgType.critical || type === ToastMsgType.error) {
+      return UiManager.LONG_TIMER_DELAY;
+    }
+
+    return Math.min(Math.max(readingTime, 8000), UiManager.LONG_NON_CRITICAL_MAX_MS);
+  }
+
+  /**
+   * The toast container spans the full width of the page under the top menu
+   * (#toast-container min-width: 100%), so while any toast was up the whole
+   * band swallowed clicks meant for the search results and menus beneath it.
+   * The container lets clicks through; only the toast card itself takes them
+   * (click dismisses it).
+   */
+  private static makeToastClickThrough_(toastEl: HTMLElement): void {
+    const container = toastEl.parentElement;
+
+    if (container) {
+      container.style.pointerEvents = 'none';
+    }
+    toastEl.style.pointerEvents = 'auto';
+  }
+
   private makeToast_(toastText: string, type: ToastMsgType, isLong = false) {
     if (settingsManager.isDisableToasts) {
       return null;
@@ -274,14 +314,8 @@ export class UiManager {
       this.dismissAllToasts();
     });
 
-    if (isLong) {
-      toastMsg.timeRemaining = UiManager.LONG_TIMER_DELAY;
-    } else {
-      // timeRemaining should be based on the length of the toast text, with a minimum of 4 seconds and a maximum of 12 seconds
-      const calculatedTime = toastText.length * 100;
-
-      toastMsg.timeRemaining = Math.min(Math.max(calculatedTime, 4000), 12000);
-    }
+    toastMsg.timeRemaining = UiManager.toastDuration_(toastText, type, isLong);
+    UiManager.makeToastClickThrough_(toastEl);
 
     // Auto-dismiss progress bar (part of the template)
     const progressBar = toastEl.querySelector<HTMLElement>('.kt-toast-progress');

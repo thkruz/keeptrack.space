@@ -171,3 +171,40 @@ describe('UiManager toast teardown (#1425, #1433)', () => {
     expect(internals.activeToastList_).not.toContain(toast);
   });
 });
+
+describe('UiManager toast duration and click-through', () => {
+  const duration = (text: string, type: ToastMsgType, isLong: boolean): number =>
+    (UiManager as unknown as { toastDuration_: (t: string, ty: ToastMsgType, l: boolean) => number }).toastDuration_(text, type, isLong);
+
+  it('keeps the 100 s timer for long critical and error toasts', () => {
+    expect(duration('Something broke', ToastMsgType.critical, true)).toBe(100000);
+    expect(duration('Something broke', ToastMsgType.error, true)).toBe(100000);
+  });
+
+  it('auto-dismisses long caution, serious, standby and normal toasts within 20 s', () => {
+    const capMsg = 'Showing the top 100 of 101 conjunctions (highest Pc first); raise Max Results to see the rest';
+
+    for (const type of [ToastMsgType.caution, ToastMsgType.serious, ToastMsgType.standby, ToastMsgType.normal]) {
+      const ms = duration(capMsg, type, true);
+
+      expect(ms).toBeGreaterThanOrEqual(8000);
+      expect(ms).toBeLessThanOrEqual(20000);
+    }
+  });
+
+  it('keeps the 4 to 12 s window for short toasts', () => {
+    expect(duration('Hi', ToastMsgType.normal, false)).toBe(4000);
+    expect(duration('x'.repeat(500), ToastMsgType.caution, false)).toBe(12000);
+  });
+
+  it('lets clicks pass through the toast container but not the toast card', () => {
+    const container = document.createElement('div');
+    const toastEl = document.createElement('div');
+
+    container.appendChild(toastEl);
+    (UiManager as unknown as { makeToastClickThrough_: (el: HTMLElement) => void }).makeToastClickThrough_(toastEl);
+
+    expect(container.style.pointerEvents).toBe('none');
+    expect(toastEl.style.pointerEvents).toBe('auto');
+  });
+});

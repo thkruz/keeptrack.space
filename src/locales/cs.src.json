@@ -165,5 +165,10 @@
     "satNotFound": "Družice \"{val}\" nebyla nalezena!",
     "intldesNotFound": "Mezinárodní označení \"{val}\" nebylo nalezeno!",
     "deepSpaceNoEphemeris": "{name} je objekt v hlubokém vesmíru. Jeho efemeridy zatím nejsou v KeepTrack k dispozici."
+  },
+  "searchManager": {
+    "resultCountOne": "1 výsledek",
+    "resultCount": "Výsledků: {count}",
+    "resultCountLimited": "Zobrazeno {shown} z {total} výsledků"
   }
 }

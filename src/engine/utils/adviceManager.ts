@@ -34,6 +34,19 @@ export class AdviceManager {
   private isAdviceEnabled = true;
   private isAdviceOpen = false;
   private tutIconDOM: HTMLElement;
+  /** Element that had focus when the help opened, so closing hands focus back to it. */
+  private returnFocusEl_: HTMLElement | null = null;
+  private isEscapeBound_ = false;
+  private readonly onOuterClick_ = (): void => this.closeAdvice();
+  private readonly onKeyDown_ = (event: KeyboardEvent): void => {
+    if (event.key !== 'Escape' || !this.isAdviceOpen) {
+      return;
+    }
+    // The help overlay sits on top of everything, so Escape closes it before any menu underneath.
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    this.closeAdvice();
+  };
 
   public clearAdvice(): void {
     this.helpHeaderDOM?.classList.remove('help-header-sel');
@@ -76,8 +89,7 @@ export class AdviceManager {
         description: t7e('keyboard.descriptions.openHelp' as TranslationKey),
         callback: () => {
           if (this.isAdviceOpen) {
-            this.isAdviceOpen = false;
-            this.helpOuterDOM.style.display = 'none';
+            this.closeAdvice();
           } else {
             EventBus.getInstance().emit(EventBusEvent.onHelpMenuClick);
           }
@@ -118,13 +130,40 @@ export class AdviceManager {
       return;
     }
 
+    const active = document.activeElement;
+
+    this.returnFocusEl_ = active instanceof HTMLElement && !this.helpOuterDOM.contains(active) ? active : null;
+
     this.helpOuterDOM.style.display = 'block';
     this.helpHeaderDOM.innerHTML = header;
     this.helpTextDOM.innerHTML = text;
-    this.helpOuterDOM.addEventListener('click', () => {
-      this.isAdviceOpen = false;
+    // Same function reference every time, so repeated opens never stack listeners.
+    this.helpOuterDOM.addEventListener('click', this.onOuterClick_);
+
+    if (!this.isEscapeBound_) {
+      // Capture phase: Escape must reach the help before menus or the camera keys below it.
+      document.addEventListener('keydown', this.onKeyDown_, true);
+      this.isEscapeBound_ = true;
+    }
+  }
+
+  /** Hides the help overlay (click, Escape or Shift+F1) and returns focus to the page. */
+  public closeAdvice(): void {
+    this.isAdviceOpen = false;
+
+    if (this.helpOuterDOM) {
       this.helpOuterDOM.style.display = 'none';
-    });
+    }
+
+    const returnTo = this.returnFocusEl_;
+
+    this.returnFocusEl_ = null;
+
+    if (returnTo?.isConnected && returnTo !== document.body) {
+      returnTo.focus();
+    } else if (document.activeElement instanceof HTMLElement && this.helpOuterDOM?.contains(document.activeElement)) {
+      document.activeElement.blur();
+    }
   }
 }
 

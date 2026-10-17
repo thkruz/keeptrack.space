@@ -3,7 +3,7 @@
     "BreakupAnalysis": {
       "bottomIconLabel": "Analiza rozpadu",
       "title": "Analiza rozpadu",
-      "helpBody": "Wtyczka Analiza rozpadu udostępnia bazę danych głównych wydarzeń rozpadu satelitów w historii. Wybierz wydarzenie, aby wyświetlić szczegółowe informacje, w tym obiekt macierzysty, przyczynę rozpadu, oś czasu od startu do rozpadu oraz analizę rozproszenia fragmentów. Wtyczka przeszukuje bieżący katalog w poszukiwaniu śledzonych odłamków pasujących do każdego wydarzenia i wyświetla analizę statystyczną zakresów wysokości, mimośrodu oraz rozkładów inklinacji.",
+      "helpBody": "Wtyczka Analiza rozpadu udostępnia bazę danych głównych wydarzeń rozpadu satelitów w historii. Wybierz wydarzenie, aby wyświetlić szczegółowe informacje, w tym obiekt macierzysty, przyczynę rozpadu, oś czasu od startu do rozpadu oraz analizę rozproszenia fragmentów. Wtyczka przeszukuje bieżący katalog w poszukiwaniu śledzonych odłamków pasujących do każdego wydarzenia i wyświetla analizę statystyczną zakresów wysokości, mimośrodu oraz rozkładów inklinacji. Każde zdarzenie pokazuje międzynarodowe oznaczenie startu i numer NORAD obiektu macierzystego, aby nie pomylić dwóch zdarzeń tej samej rodziny rakiet (na przykład dwóch rozpadów górnych stopni CZ-6A).",
       "sections": {
         "events": "Wydarzenia",
         "debrisStatistics": "Statystyka odłamków",
@@ -66,7 +66,8 @@
         "perigee": "Perygeum",
         "apogee": "Apogeum",
         "incDeg": "Inkl. (°)",
-        "ecc": "Mim."
+        "ecc": "Mim.",
+        "intlDes": "Oznaczenie międzynarodowe"
       },
       "errorMsgs": {
         "parentNotFound": "Obiektu macierzystego nie ma w bieżącym katalogu.",

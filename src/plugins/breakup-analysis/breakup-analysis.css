@@ -127,3 +127,11 @@
   height: 250px;
   margin-top: 6px;
 }
+
+/* Designator and parent NORAD under each curated event name, so events of the
+ * same rocket family (for example two CZ-6A breakups) cannot be confused. */
+.ba-event-ids {
+  font-size: 11px;
+  opacity: 0.75;
+  white-space: nowrap;
+}

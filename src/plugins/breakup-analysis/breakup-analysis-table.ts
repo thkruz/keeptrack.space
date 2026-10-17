@@ -27,6 +27,8 @@ export interface BreakupLabels {
   estDebris: string;
   // Event info labels
   parentObject: string;
+  /** International designator (launch prefix) of the event's parent launch. */
+  intlDes: string;
   country: string;
   orbitType: string;
   breakupAltitude: string;
@@ -73,7 +75,10 @@ export const buildEventListTable = (events: BreakupEvent[], labels: BreakupLabel
   for (const evt of events) {
     rows += html`
       <tr class="breakup-analysis-event-row link" data-event-id="${evt.id}">
-        <td class="ba-cell-left">${evt.name}</td>
+        <td class="ba-cell-left">
+          ${evt.name}
+          <div class="ba-event-ids">${evt.intlDesPrefix} | ${labels.norad} ${evt.parentNoradId.toString()}</div>
+        </td>
         <td>${evt.breakupDate}</td>
         <td>${evt.cause}</td>
         <td>${evt.altitudeKm.toString()}</td>
@@ -114,6 +119,7 @@ export const buildEventInfoCard = (event: BreakupEvent, yearsToBreakup: string, 
     <p class="breakup-description">${event.description}</p>
     <div class="breakup-info-grid">
       ${infoItem(labels.parentObject, `${event.parentName} (${event.parentNoradId.toString()})`)}
+      ${infoItem(labels.intlDes, event.intlDesPrefix)}
       ${infoItem(labels.country, event.country)}
       ${infoItem(labels.orbitType, event.orbitType)}
       ${infoItem(labels.breakupAltitude, `${event.altitudeKm.toString()} ${labels.km}`)}

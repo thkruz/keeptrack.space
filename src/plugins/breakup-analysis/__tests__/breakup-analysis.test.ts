@@ -71,6 +71,13 @@ describe('BreakupAnalysis_class', () => {
       expect(config.html).toContain('2009-02-10');
       expect(config.html).toContain('2021-11-15');
     });
+
+    it('shows the designator and parent NORAD on every event row, so same-family events cannot be confused', () => {
+      const html = new BreakupAnalysis().getSideMenuConfig().html;
+
+      expect(html).toContain('2022-151 | NORAD 54173');
+      expect(html).toContain('1999-025 | NORAD 25730');
+    });
   });
 
   describe('onBottomIconClick', () => {

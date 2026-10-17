@@ -130,6 +130,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
       altKm: l('labels.altKm'),
       estDebris: l('labels.estDebris'),
       parentObject: l('labels.parentObject'),
+      intlDes: l('labels.intlDes'),
       country: l('labels.country'),
       orbitType: l('labels.orbitType'),
       breakupAltitude: l('labels.breakupAltitude'),

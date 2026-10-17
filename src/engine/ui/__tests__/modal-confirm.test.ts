@@ -127,3 +127,59 @@ describe('ModalConfirm', () => {
     });
   });
 });
+
+describe('ModalConfirm reuse across callers', () => {
+  beforeEach(() => {
+    resetSingleton();
+    setupStandardEnvironment();
+  });
+
+  it('shows the second caller wording, not the first, on a later open', () => {
+    const modal = ModalConfirm.getInstance();
+    const onOverwrite = vi.fn();
+    const onLogout = vi.fn();
+
+    modal.open(onOverwrite, { title: 'Overwrite saved search?', message: 'Replace it?', confirmText: 'Overwrite', cancelText: 'Cancel', isDestructive: true });
+    (query('#cancel-action-btn') as HTMLButtonElement).click();
+
+    modal.open(onLogout, { title: 'Confirm Logout', message: 'Log out now?', confirmText: 'Logout', cancelText: 'Stay', isDestructive: false });
+
+    expect(query('#modal-confirm .draggable-box__title h3')!.textContent).toBe('Confirm Logout');
+    expect(query('.confirm-modal__message')!.textContent).toBe('Log out now?');
+    expect(query('#confirm-action-btn')!.textContent).toBe('Logout');
+    expect(query('#cancel-action-btn')!.textContent).toBe('Stay');
+    expect(query('#confirm-action-btn')!.className).toContain('confirm-modal__btn--primary');
+    expect(query('#confirm-action-btn')!.className).not.toContain('confirm-modal__btn--destructive');
+
+    (query('#confirm-action-btn') as HTMLButtonElement).click();
+    expect(onLogout).toHaveBeenCalledTimes(1);
+    expect(onOverwrite).not.toHaveBeenCalled();
+  });
+
+  it('opens above another modal overlay that is already visible', () => {
+    const other = document.createElement('div');
+
+    other.className = 'draggable-modal-overlay';
+    other.style.zIndex = '1000';
+    document.body.appendChild(other);
+
+    ModalConfirm.getInstance().open(vi.fn());
+
+    expect(Number(query('#modal-confirm-container')!.style.zIndex)).toBeGreaterThan(1000);
+  });
+
+  it('closes on Escape after several opens, and Escape only cancels once per open', () => {
+    const modal = ModalConfirm.getInstance();
+    const first = vi.fn();
+    const second = vi.fn();
+
+    modal.open(first);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    modal.open(second);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+
+    expect(first).not.toHaveBeenCalled();
+    expect(second).not.toHaveBeenCalled();
+    expect((modal as unknown as { boxEl: HTMLElement }).boxEl.style.display).toBe('none');
+  });
+});

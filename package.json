@@ -170,7 +170,7 @@
     "@materializecss/materialize": "^2.3.3",
     "@supabase/supabase-js": "^2.55.0",
     "astronomy-engine": "^2.1.19",
-    "dotenv": "^16.5.0",
+    "dotenv": "^17.4.2",
     "draggabilly": "^3.0.0",
     "echarts": "^6.1.0",
     "echarts-gl": "^2.0.9",

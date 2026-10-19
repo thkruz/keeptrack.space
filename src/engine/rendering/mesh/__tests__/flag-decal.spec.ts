@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '@test/e2e/coverage';
 import { fixedSceneMasks, loadFixedIssScene } from '@test/e2e/fixed-scene';
-import { expectCleanBoot } from '@test/e2e/keeptrack-fixtures';
+import { expectCleanBoot, isProBuild, OSS_BASELINE_SKIP } from '@test/e2e/keeptrack-fixtures';
 
 /*
  * Visual baselines for plan 04 T3: the owner country's flag projected onto the selected
@@ -43,6 +43,7 @@ const ISS_DATE = new Date('2008-09-20T13:25:00.000Z');
 async function boot(page: Page, date: Date): Promise<void> {
   await loadFixedIssScene(page, { date, extraTle: STARLINK_TLE, settings: { isFocusOnSatelliteWhenSelected: true, isFlagDecalsFeatureEnabled: true } });
   await page.waitForFunction(() => (window as unknown as FlagWindow).keepTrack.api.getCatalogManager().sccNum2Id('44713') !== null, undefined, { timeout: 30_000 });
+  test.skip(await isProBuild(page), OSS_BASELINE_SKIP);
 }
 
 async function closeUp(page: Page, sccNum: string, country: string, model: string, distKm: number): Promise<void> {

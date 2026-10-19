@@ -1,6 +1,6 @@
 import { expect, test } from '@test/e2e/coverage';
 import { FIXED_ISS_EPOCH_MS, fixedSceneMasks, loadFixedIssScene, selectFixedIss } from '@test/e2e/fixed-scene';
-import { expectCleanBoot } from '@test/e2e/keeptrack-fixtures';
+import { expectCleanBoot, isProBuild, OSS_BASELINE_SKIP } from '@test/e2e/keeptrack-fixtures';
 
 /*
  * Visual baseline for plan 02 T3: with the pinned ISS selected 10 days after its
@@ -10,6 +10,7 @@ import { expectCleanBoot } from '@test/e2e/keeptrack-fixtures';
 test.describe('Epoch age badge @local', () => {
   test('badge shows low at epoch + 10 d @local', async ({ page }) => {
     await loadFixedIssScene(page, { date: new Date(FIXED_ISS_EPOCH_MS + 10 * 86400e3) });
+    test.skip(await isProBuild(page), OSS_BASELINE_SKIP);
     await selectFixedIss(page);
 
     const badge = page.locator('#epoch-age-badge');

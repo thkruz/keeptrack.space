@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { expectCleanBoot, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { expectCleanBoot, isProBuild, OSS_BASELINE_SKIP, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 /*
  * Visual baseline for plan 03 T5: the sensor list shows the cited "Ground Stations" group
@@ -11,6 +11,7 @@ test.describe('Sensor list Ground Stations group @local', () => {
       plugins: { SensorListPlugin: { enabled: true }, SensorInfoPlugin: { enabled: true } },
       settings: { isMobileModeEnabled: true },
     });
+    test.skip(await isProBuild(page), OSS_BASELINE_SKIP);
 
     await page.evaluate(() => {
       document.getElementById('sensors-bottom-icon')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));

@@ -1,6 +1,6 @@
 import { expect, test } from '@test/e2e/coverage';
 import { fixedSceneMasks, loadFixedIssScene, lookAtLatLon, selectFixedIss } from '@test/e2e/fixed-scene';
-import { expectCleanBoot } from '@test/e2e/keeptrack-fixtures';
+import { expectCleanBoot, isProBuild, OSS_BASELINE_SKIP } from '@test/e2e/keeptrack-fixtures';
 
 /*
  * Visual baseline for plan 01 T3: the ground swath of the pinned ISS with the mr-eo preset
@@ -23,6 +23,7 @@ type SwathWindow = {
 test.describe('Satellite swath @local', () => {
   test('ISS ground swath, then daylight only @local', async ({ page }) => {
     await loadFixedIssScene(page, { date: new Date('2008-09-20T12:30:00.000Z'), plugins: { SatelliteSwath: { enabled: true } } });
+    test.skip(await isProBuild(page), OSS_BASELINE_SKIP);
     await selectFixedIss(page);
 
     const icon = page.locator('#SatelliteSwath-utility-icon');

@@ -1,6 +1,6 @@
 import { expect, test } from '@test/e2e/coverage';
 import { loadFixedIssScene, selectFixedIss } from '@test/e2e/fixed-scene';
-import { expectCleanBoot } from '@test/e2e/keeptrack-fixtures';
+import { expectCleanBoot, isProBuild, OSS_BASELINE_SKIP } from '@test/e2e/keeptrack-fixtures';
 
 /*
  * Visual baseline for plan 02 T2: eclipse bands on the time slider with the pinned
@@ -10,6 +10,7 @@ import { expectCleanBoot } from '@test/e2e/keeptrack-fixtures';
 test.describe('Time slider eclipse bands @local', () => {
   test('ISS selected paints eclipse bands on the slider @local', async ({ page }) => {
     await loadFixedIssScene(page, { date: new Date('2008-09-20T12:30:00.000Z') });
+    test.skip(await isProBuild(page), OSS_BASELINE_SKIP);
     await selectFixedIss(page);
 
     const layer = page.locator('#time-slider-bands');

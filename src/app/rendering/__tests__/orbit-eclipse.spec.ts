@@ -1,6 +1,6 @@
 import { expect, test } from '@test/e2e/coverage';
 import { fixedSceneMasks, loadFixedIssScene, lookAtLatLon, selectFixedIss } from '@test/e2e/fixed-scene';
-import { expectCleanBoot } from '@test/e2e/keeptrack-fixtures';
+import { expectCleanBoot, isProBuild, OSS_BASELINE_SKIP } from '@test/e2e/keeptrack-fixtures';
 
 /*
  * Visual baseline for plan 02 T1: the selected ISS orbit line is dimmed along the
@@ -12,6 +12,7 @@ import { expectCleanBoot } from '@test/e2e/keeptrack-fixtures';
 test.describe('Orbit line eclipse dimming @local', () => {
   test('ISS orbit shows one dimmed arc @local', async ({ page }) => {
     await loadFixedIssScene(page, { date: new Date('2008-09-20T12:30:00.000Z') });
+    test.skip(await isProBuild(page), OSS_BASELINE_SKIP);
     await selectFixedIss(page);
     await lookAtLatLon(page, 20, -170, 0.4);
 

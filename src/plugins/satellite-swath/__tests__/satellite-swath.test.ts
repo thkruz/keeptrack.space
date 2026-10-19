@@ -192,6 +192,20 @@ describe('SatelliteSwath behaviour', () => {
     expect(plugin.isSettingsMenuOpen).toBe(false);
   });
 
+  it('the generic side-menu API opens and closes the settings menu without touching the layer', () => {
+    turnOn();
+    plugin.closeSideMenu();
+
+    expect(plugin.isSettingsMenuOpen).toBe(false);
+    expect(settingsManager.isDrawSwath).toBe(true);
+
+    plugin.openSideMenu();
+
+    expect(plugin.isSettingsMenuOpen).toBe(true);
+    expect(plugin.isMenuButtonActive).toBe(true);
+    expect(settingsManager.isDrawSwath).toBe(true);
+  });
+
   it('changing the preset persists it and triggers exactly one rebuild', () => {
     turnOn();
     const setParams = vi.spyOn(ServiceLocator.getScene().swathFactory, 'setParams');

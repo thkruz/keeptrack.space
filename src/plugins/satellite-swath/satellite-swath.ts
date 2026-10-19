@@ -254,6 +254,21 @@ export class SatelliteSwath extends KeepTrackPlugin implements ISettingsContribu
     slideOutLeft(getEl(MENU_ID, true), 300);
   }
 
+  /*
+   * This plugin builds its own side menu (no sideMenuElementName, so the base class never
+   * slides it or deselects the layer icon when another menu opens). Route the generic
+   * side-menu entry points to the settings menu so callers that only know the base API
+   * (command palette, tours, the locale-matrix tool) open and close the real menu instead
+   * of the base no-op, which also cleared isMenuButtonActive while the layer stayed drawn.
+   */
+  openSideMenu(): void {
+    this.openSettingsMenu();
+  }
+
+  closeSideMenu(): void {
+    this.closeSettingsMenu();
+  }
+
   get isSettingsMenuOpen(): boolean {
     return this.isSettingsMenuOpen_;
   }

@@ -107,6 +107,8 @@ export function nadirWidthKm(settings: SatelliteSwathSettings, meanAltKm: number
 export function toSwathParams(settings: SatelliteSwathSettings, meanAltKm: number): SwathParams {
   return {
     fovDeg: resolveFovDeg(settings, meanAltKm),
+    // A width-mode swath keeps its ground width at every latitude (the mesh re-solves the angle).
+    ...(settings.mode === 'width' ? { swathKm: settings.swathKm } : {}),
     maxOffNadirDeg: settings.maxOffNadirDeg,
     minSunElevDeg: settings.minSunElevDeg,
     isDaylightOnly: settings.isDaylightOnly,

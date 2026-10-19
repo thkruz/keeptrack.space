@@ -1,7 +1,7 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { crossTrackEdgesInto, DEG2RAD, geodeticLatitudeRad, Sgp4, Sun, splitRuns, WGS84_A_KM } from '@ootk/src/main';
+import { crossTrackEdgesInto, DEG2RAD, geodeticLatitudeRad, lookHalfAngleForSwathWidth, Sgp4, Sun, splitRuns, WGS84_A_KM } from '@ootk/src/main';
 import { mat4 } from 'gl-matrix';
 import { CustomMeshFactory } from './custom-mesh-factory';
 import { SwathFanMesh } from './swath-fan-mesh';
@@ -11,6 +11,13 @@ import { liftSurfacePoint, SwathColors, SwathDrawRange, SwathMesh, SwathStripKin
 export interface SwathParams {
   /** Full nadir field of view. */
   fovDeg: number;
+  /**
+   * Constant ground width (km) for a width-mode swath. When set, the nadir look angle is re-solved
+   * at every sample from its own height above the WGS84 surface, so the drawn width stays at this
+   * value at every latitude; `fovDeg` is then only the mean-altitude equivalent. Omit for a
+   * fixed-FOV sensor, whose ground width follows the height above the surface.
+   */
+  swathKm?: number;
   /** Maximum off-nadir tilt; 0 disables the field of regard (also gated by settingsManager.isDrawSwathFieldOfRegard). */
   maxOffNadirDeg: number;
   /** Minimum Sun elevation at the sub-point for a sample to count as lit. */
@@ -206,6 +213,7 @@ export class SwathMeshFactory extends CustomMeshFactory<SwathMesh> {
     }
     this.fan.objId = this.targetId;
     this.fan.halfAngleRad = half;
+    this.fan.swathKm = this.params.swathKm ?? Number.NaN;
     this.fan.liftKm = settingsManager.swathLiftKm;
   }
 
@@ -273,14 +281,18 @@ export class SwathMeshFactory extends CustomMeshFactory<SwathMesh> {
     this.meanAltKm = this.computeMeanAlt_();
 
     const strips: PendingStrip[] = [];
-    const nadirHalf = (params.fovDeg / 2) * DEG2RAD;
     const isShowRegard = params.maxOffNadirDeg > 0 && settingsManager.isDrawSwathFieldOfRegard;
+    const fixedNadirHalf = (params.fovDeg / 2) * DEG2RAD;
+    const widthKm = params.swathKm;
+    // Width mode re-solves the nadir half-angle per sample (see SwathParams.swathKm).
+    const nadirHalfAt = typeof widthKm === 'number' && widthKm > 0 ? (x: number, y: number, z: number) => lookHalfAngleForSwathWidth(x, y, z, widthKm) : () => fixedNadirHalf;
+    const tiltRad = params.maxOffNadirDeg * DEG2RAD;
 
     // Field of regard first so the nadir strip draws on top of it.
     if (isShowRegard) {
-      this.buildStrips_('regard', (params.maxOffNadirDeg + params.fovDeg / 2) * DEG2RAD, params, strips);
+      this.buildStrips_('regard', (x, y, z) => tiltRad + nadirHalfAt(x, y, z), params, strips);
     }
-    this.buildStrips_('nadir', nadirHalf, params, strips);
+    this.buildStrips_('nadir', nadirHalfAt, params, strips);
     this.pack_(strips);
   }
 
@@ -300,8 +312,8 @@ export class SwathMeshFactory extends CustomMeshFactory<SwathMesh> {
     return k > 0 ? sum / k : Number.NaN;
   }
 
-  /** Edge points for every sample at one half-angle, split into lit/unlit runs. */
-  private buildStrips_(kind: SwathStripKind, halfAngleRad: number, params: SwathParams, out: PendingStrip[]): void {
+  /** Edge points for every sample at its half-angle (from the sample's ECEF position), split into lit/unlit runs. */
+  private buildStrips_(kind: SwathStripKind, halfAngleAt: (x: number, y: number, z: number) => number, params: SwathParams, out: PendingStrip[]): void {
     const n = this.sampleCount_;
     const edges = new Float64Array(n * 6);
     const flags: (boolean | null)[] = new Array(n);
@@ -326,7 +338,9 @@ export class SwathMeshFactory extends CustomMeshFactory<SwathMesh> {
       const vy = r[next * 3 + 1] - r[prev * 3 + 1];
       const vz = r[next * 3 + 2] - r[prev * 3 + 2];
 
-      if (crossTrackEdgesInto(r[o], r[o + 1], r[o + 2], vx, vy, vz, halfAngleRad, scratch) === -1) {
+      const halfAngleRad = halfAngleAt(r[o], r[o + 1], r[o + 2]);
+
+      if (!Number.isFinite(halfAngleRad) || crossTrackEdgesInto(r[o], r[o + 1], r[o + 2], vx, vy, vz, halfAngleRad, scratch) === -1) {
         continue;
       }
       liftSurfacePoint(scratch[0], scratch[1], scratch[2], settingsManager.swathLiftKm, edges, i * 6);

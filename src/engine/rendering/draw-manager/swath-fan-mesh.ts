@@ -3,7 +3,7 @@ import { CameraType } from '@app/engine/camera/camera-type';
 import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { glsl } from '@app/engine/utils/development/formatter';
-import { crossTrackEdgesInto } from '@ootk/src/main';
+import { crossTrackEdgesInto, lookHalfAngleForSwathWidth } from '@ootk/src/main';
 import { mat4 } from 'gl-matrix';
 import { DepthManager } from '../depth-manager';
 import { CustomMesh } from './custom-mesh';
@@ -28,8 +28,10 @@ export class SwathFanMesh extends CustomMesh {
 
   /** Catalog id of the satellite the fan follows. */
   objId: number;
-  /** Nadir half-angle (rad). */
+  /** Nadir half-angle (rad) of a fixed-FOV sensor. */
   halfAngleRad: number;
+  /** Constant ground width (km) of a width-mode swath; NaN uses {@link halfAngleRad} (see SwathParams.swathKm). */
+  swathKm = Number.NaN;
   liftKm: number;
   color: [number, number, number, number];
   /** False until update() has produced a valid triangle. */
@@ -98,7 +100,9 @@ export class SwathFanMesh extends CustomMesh {
     const vz = vel[i3 + 2];
     const edges = this.edges_;
 
-    if (crossTrackEdgesInto(rx, ry, rz, vx, vy, vz, this.halfAngleRad, edges) === -1) {
+    const half = Number.isFinite(this.swathKm) ? lookHalfAngleForSwathWidth(rx, ry, rz, this.swathKm) : this.halfAngleRad;
+
+    if (!Number.isFinite(half) || crossTrackEdgesInto(rx, ry, rz, vx, vy, vz, half, edges) === -1) {
       return;
     }
     const shift = Scene.getInstance().worldShift;

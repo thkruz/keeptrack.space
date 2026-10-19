@@ -99,6 +99,28 @@ describe('SwathMeshFactory ribbon', () => {
     }
   });
 
+  it('keeps a width-mode swath at its ground width at every latitude', () => {
+    // 185 km from a polar orbit: samples run from 5 deg to 355 deg of argument of latitude.
+    const factory = build(params({ swathKm: 185 }));
+    const mesh = factory.meshes[0];
+    const v = mesh.vertices;
+    let worst = 0;
+
+    for (const range of mesh.ranges.filter((r) => r.kind === 'nadir')) {
+      for (let k = range.first; k < range.first + range.count; k += 2) {
+        const l = [v[k * 3], v[k * 3 + 1], v[k * 3 + 2]];
+        const r = [v[k * 3 + 3], v[k * 3 + 4], v[k * 3 + 5]];
+        const cos = (l[0] * r[0] + l[1] * r[1] + l[2] * r[2]) / (Math.hypot(l[0], l[1], l[2]) * Math.hypot(r[0], r[1], r[2]));
+        // Central angle on the 6371 km mean sphere, the convention the coverage grid uses.
+        const width = Math.acos(Math.min(1, cos)) * 6371.0088;
+
+        worst = Math.max(worst, Math.abs(width - 185) / 185);
+      }
+    }
+    // A fixed 14 deg FOV would vary by about 3% between the equator and the poles here.
+    expect(worst).toBeLessThan(0.005);
+  });
+
   it('draws the field of regard first so the nadir strip sits on top', () => {
     const factory = build(params({ maxOffNadirDeg: 20 }));
     const kinds = factory.meshes[0].ranges.map((r) => r.kind);

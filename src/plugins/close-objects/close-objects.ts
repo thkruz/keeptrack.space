@@ -177,18 +177,29 @@ export class CloseObjectsPlugin extends KeepTrackPlugin {
     return searchStr;
   }
 
+  /** Offset past the simulation time at which a candidate pair must still be within the radius (30 min). */
+  protected static readonly VERIFY_OFFSET_MS = 1000 * 60 * 30;
+
+  /** Straight-line (3D) distance in km between two TEME positions. */
+  static distanceKm(a: TemeVec3, b: TemeVec3): number {
+    return Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
+  }
+
   protected static getValidSats_(): Satellite[] {
+    const catalogManager = ServiceLocator.getCatalogManager();
+    // Positions come from the cruncher at simulation time; a back-filled position must use the same clock.
+    const simTime = ServiceLocator.getTimeManager().simulationTimeObj;
     const satList = <Satellite[]>[];
 
-    for (let i = 0; i < ServiceLocator.getCatalogManager().orbitalSats; i++) {
-      const sat = ServiceLocator.getCatalogManager().getSat(i);
+    for (let i = 0; i < catalogManager.orbitalSats; i++) {
+      const sat = catalogManager.getSat(i);
 
       if (!sat) {
         continue;
       }
 
       if (typeof sat.position === 'undefined') {
-        sat.position = <TemeVec3>SatMath.getEci(sat, new Date()).position || { x: <Kilometers>0, y: <Kilometers>0, z: <Kilometers>0 };
+        sat.position = <TemeVec3>SatMath.getEci(sat, simTime).position || { x: <Kilometers>0, y: <Kilometers>0, z: <Kilometers>0 };
       }
 
       if (isNaN(sat.position.x) || isNaN(sat.position.y) || isNaN(sat.position.z)) {
@@ -204,6 +215,11 @@ export class CloseObjectsPlugin extends KeepTrackPlugin {
     return satList;
   }
 
+  /**
+   * Pairs whose current positions are within `searchRadius` km (true 3D distance). The x-sorted
+   * sweep with a bounding cube only narrows the candidates: the cube's corners reach sqrt(3) times
+   * the radius, so every candidate is then checked against the sphere.
+   */
   protected static getPossibleCSOs_(satList: Satellite[], searchRadius: number): { sat1: Satellite; sat2: Satellite }[] {
     const csoList = [] as { sat1: Satellite; sat2: Satellite }[];
 
@@ -229,7 +245,15 @@ export class CloseObjectsPlugin extends KeepTrackPlugin {
         if (pos2.x > posXmax) {
           break;
         }
-        if (pos2.x < posXmax && pos2.x > posXmin && pos2.y < posYmax && pos2.y > posYmin && pos2.z < posZmax && pos2.z > posZmin) {
+        if (
+          pos2.x < posXmax &&
+          pos2.x > posXmin &&
+          pos2.y < posYmax &&
+          pos2.y > posYmin &&
+          pos2.z < posZmax &&
+          pos2.z > posZmin &&
+          CloseObjectsPlugin.distanceKm(pos1, pos2) <= searchRadius
+        ) {
           csoList.push({ sat1, sat2 });
         }
       }
@@ -238,53 +262,40 @@ export class CloseObjectsPlugin extends KeepTrackPlugin {
     return csoList;
   }
 
+  /**
+   * Keep the candidate pairs that are still within `searchRadius` km (3D) 30 minutes after the
+   * simulation time, and return their NORAD numbers. Pairs that cannot be re-propagated are dropped.
+   */
   protected static getActualCSOs_(csoListUnique: { sat1: Satellite; sat2: Satellite }[], searchRadius: number): string[] {
     const csoStrArr = [] as string[];
-
-    // Re-propagate to 30 minutes in the future for verification
-    for (const posCso of csoListUnique) {
-      let sat = posCso.sat1;
-      let eci = SatMath.getEci(sat, new Date(Date.now() + 1000 * 60 * 30));
-
-      if (eci.position && typeof eci.position !== 'boolean' && eci.position.x === 0 && eci.position.y === 0 && eci.position.z === 0) {
-        continue;
-      }
-      posCso.sat1.position = eci.position as TemeVec3;
-
-      sat = posCso.sat2;
-      eci = SatMath.getEci(sat, new Date(Date.now() + 1000 * 60 * 30));
-      if (eci.position && typeof eci.position !== 'boolean' && eci.position.x === 0 && eci.position.y === 0 && eci.position.z === 0) {
-        continue;
-      }
-      posCso.sat2.position = eci.position as TemeVec3;
-    }
+    // Phase-1 positions are at simulation time, so the verification epoch uses the simulation clock too.
+    const verifyTime = ServiceLocator.getTimeManager().getOffsetTimeObj(CloseObjectsPlugin.VERIFY_OFFSET_MS);
 
     for (const posCso of csoListUnique) {
-      const pos1 = posCso.sat1.position;
+      const pos1 = CloseObjectsPlugin.positionAt_(posCso.sat1, verifyTime);
+      const pos2 = CloseObjectsPlugin.positionAt_(posCso.sat2, verifyTime);
 
-      if (typeof pos1 === 'undefined') {
+      if (!pos1 || !pos2) {
         continue;
       }
 
-      const posXmin = pos1.x - searchRadius;
-      const posXmax = pos1.x + searchRadius;
-      const posYmin = pos1.y - searchRadius;
-      const posYmax = pos1.y + searchRadius;
-      const posZmin = pos1.z - searchRadius;
-      const posZmax = pos1.z + searchRadius;
-
-      const pos2 = posCso.sat2.position;
-
-      if (typeof pos2 === 'undefined') {
-        continue;
-      }
-
-      if (pos2.x < posXmax && pos2.x > posXmin && pos2.y < posYmax && pos2.y > posYmin && pos2.z < posZmax && pos2.z > posZmin) {
+      if (CloseObjectsPlugin.distanceKm(pos1, pos2) <= searchRadius) {
         csoStrArr.push(posCso.sat1.sccNum);
         csoStrArr.push(posCso.sat2.sccNum);
       }
     }
 
     return csoStrArr;
+  }
+
+  /** TEME position of `sat` at `time`, or null when propagation fails (no position or the origin sentinel). */
+  private static positionAt_(sat: Satellite, time: Date): TemeVec3 | null {
+    const pos = SatMath.getEci(sat, time).position;
+
+    if (!pos || typeof pos === 'boolean' || (pos.x === 0 && pos.y === 0 && pos.z === 0)) {
+      return null;
+    }
+
+    return pos as TemeVec3;
   }
 }

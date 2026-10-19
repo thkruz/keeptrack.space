@@ -7,6 +7,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { Reentries, TipMsg } from '@app/plugins/reentries/reentries';
+import { settingsManager } from '@app/settings/settings';
 import { SpaceObjectType } from '@ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
@@ -433,7 +434,34 @@ describe('Reentries_class', () => {
       expect(rafSpy).toHaveBeenCalled();
       // TIP[0] is LON 120.5 -> +120.5, LAT 45.5
       expect(lookAtSpy).toHaveBeenCalledWith(45.5, 120.5, 0, expect.any(Date));
-      expect(plugin['selectSatIdOnCruncher_']).toBeNull();
+      // Selected on the next cruncher update (no propagated position right after the time jump).
+      expect(plugin['selectSatIdOnCruncher_']).toBe(5);
+    });
+
+    it('keeps the object selected in fly-to mode, without recentring the camera on it', () => {
+      const plugin = new Reentries();
+
+      websiteInit(plugin);
+      plugin['tipList_'] = [{ ...mockTipData[0], NORAD_CAT_ID: '25544', LAT: '45.5', LON: '120.5' }];
+      plugin['isFlyToCorridor_'] = true;
+      settingsManager.isFocusOnSatelliteWhenSelected = true;
+
+      vi.spyOn(ServiceLocator.getCatalogManager(), 'sccNum2Sat').mockReturnValue({ id: 5, sccNum: '25544', sccNum5: '25544' } as any);
+      vi.spyOn(ServiceLocator.getMainCamera(), 'lookAtLatLon').mockImplementation(() => undefined);
+      vi.spyOn(global, 'requestAnimationFrame').mockImplementation(() => 0);
+      const focusAtSelect: boolean[] = [];
+      const selectSat = vi.fn(() => focusAtSelect.push(settingsManager.isFocusOnSatelliteWhenSelected));
+
+      vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue({ selectSat } as any);
+
+      plugin['tipEventClicked_'](0);
+      expect(selectSat).not.toHaveBeenCalled();
+      EventBus.getInstance().emit(EventBusEvent.onCruncherMessage);
+
+      // Selected (not deselected with -1), with camera focus off only for that call.
+      expect(selectSat).toHaveBeenCalledWith(5);
+      expect(focusAtSelect).toEqual([false]);
+      expect(settingsManager.isFocusOnSatelliteWhenSelected).toBe(true);
     });
 
     it('follows the object when the toggle is disabled', () => {

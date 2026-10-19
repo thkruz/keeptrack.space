@@ -57,6 +57,8 @@ export class Reentries extends KeepTrackPlugin {
   dependencies_ = [];
   private readonly tipDataSrc_ = 'https://r2.keeptrack.space/spacetrack-tip.json';
   protected selectSatIdOnCruncher_: number | null = null;
+  /** True when the deferred selection must not recentre the camera (fly-to-corridor mode). */
+  private isDeferredSelectWithoutRecenter_ = false;
   protected tipList_: TipMsg[] = [];
   protected reentryList_: Satellite[] = [];
   private isLoggedIn_ = false;
@@ -220,9 +222,14 @@ export class Reentries extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.onCruncherMessage, () => {
       if (this.selectSatIdOnCruncher_ !== null) {
-        PluginRegistry.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
+        if (this.isDeferredSelectWithoutRecenter_) {
+          Reentries.selectWithoutRecentering_(this.selectSatIdOnCruncher_);
+        } else {
+          PluginRegistry.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
+        }
 
         this.selectSatIdOnCruncher_ = null;
+        this.isDeferredSelectWithoutRecenter_ = false;
       }
     });
   }
@@ -414,7 +421,7 @@ export class Reentries extends KeepTrackPlugin {
     ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
 
     if (this.isFlyToCorridor_) {
-      this.flyToCorridor_(this.tipList_[row], decayEpoch);
+      this.flyToCorridor_(this.tipList_[row], decayEpoch, sat.id);
 
       return;
     }
@@ -422,19 +429,26 @@ export class Reentries extends KeepTrackPlugin {
     ServiceLocator.getUiManager().doSearch(`${sat.sccNum5 ?? sat.sccNum}`);
 
     this.selectSatIdOnCruncher_ = sat.id;
+    this.isDeferredSelectWithoutRecenter_ = false;
   }
 
   /**
    * Flies the camera to the predicted reentry corridor location for a TIP
-   * message. The object is deselected first so the camera looks at the ground
+   * message. The object is selected (so its info box, orbit and corridor show)
+   * without the camera recentring on it, so the camera looks at the ground
    * point on the globe rather than chasing the decaying satellite.
    */
-  private flyToCorridor_(tip: TipMsg, decayEpoch: Date): void {
+  private flyToCorridor_(tip: TipMsg, decayEpoch: Date, satId: number): void {
     const lat = <Degrees>Reentries.parseLat_(tip.LAT);
     const lon = <Degrees>Reentries.parseLon_(tip.LON);
     const camera = ServiceLocator.getMainCamera();
 
-    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
+    /*
+     * Select on the next cruncher update, like the follow path: right after the time jump the
+     * object has no propagated position yet and selectSat would refuse it.
+     */
+    this.selectSatIdOnCruncher_ = satId;
+    this.isDeferredSelectWithoutRecenter_ = true;
 
     /*
      * Defer one frame so the time jump propagates before lon2yaw resolves the
@@ -444,6 +458,22 @@ export class Reentries extends KeepTrackPlugin {
     requestAnimationFrame(() => {
       camera.lookAtLatLon(lat, lon, 0, decayEpoch);
     });
+  }
+
+  /**
+   * Select an object while keeping the camera where it is: selection normally
+   * switches to a satellite-centred camera (isFocusOnSatelliteWhenSelected), which
+   * would fight the corridor fly-to.
+   */
+  private static selectWithoutRecentering_(satId: number): void {
+    const isFocus = settingsManager.isFocusOnSatelliteWhenSelected;
+
+    settingsManager.isFocusOnSatelliteWhenSelected = false;
+    try {
+      PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satId);
+    } finally {
+      settingsManager.isFocusOnSatelliteWhenSelected = isFocus;
+    }
   }
 
   protected createTipTable_(): void {

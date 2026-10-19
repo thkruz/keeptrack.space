@@ -565,3 +565,29 @@
     transition: none;
   }
 }
+
+/* Translated action labels (de/es/fr/ru/uk/pl/it) run longer than the row, and the
+ * shared nowrap + ellipsis clips them. Let the label wrap to a second line and let
+ * the row grow to fit instead of the fixed 40px height. */
+#onboarding-menu .kt-action {
+  height: auto;
+  min-height: 40px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+#onboarding-menu .kt-action-label {
+  min-width: 0;
+  white-space: normal;
+  text-overflow: clip;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+/* Mission rows: keep the check column fixed so a wrapped second line aligns with
+ * the first instead of starting under the check mark. */
+#onboarding-menu .kt-action-label:has(> .kt-onboarding-mission-check) {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+}

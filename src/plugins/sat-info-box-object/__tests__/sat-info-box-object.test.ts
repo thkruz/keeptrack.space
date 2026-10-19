@@ -1,9 +1,13 @@
+import { SatMath } from '@app/app/analysis/sat-math';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { getEl } from '@app/engine/utils/get-el';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SatInfoBoxObject } from '@app/plugins/sat-info-box-object/sat-info-box-object';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { defaultMisl, defaultSat } from '@test/environment/apiMocks';
+import { defaultMisl, defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -63,6 +67,32 @@ describe('SatInfoBoxObject data population', () => {
     vi.spyOn(ServiceLocator.getSensorManager(), 'isSensorSelected').mockReturnValue(false);
 
     expect(() => p().updateApparentMag_(defaultSat)).not.toThrow();
+  });
+
+  it('refreshes Apparent Mag at the current sim time on every select-box update, not only at selection', () => {
+    const sensorManager = ServiceLocator.getSensorManager();
+
+    sensorManager.currentSensors = [defaultSensor];
+    vi.spyOn(sensorManager, 'isSensorSelected').mockReturnValue(true);
+    const visMagSpy = vi.spyOn(SatMath, 'calculateVisMag').mockReturnValueOnce(10.65).mockReturnValueOnce(12.34);
+    const timeManager = ServiceLocator.getTimeManager();
+
+    timeManager.simulationTimeObj = new Date(Date.UTC(2026, 9, 16, 10, 30));
+    EventBus.getInstance().emit(EventBusEvent.updateSelectBox, defaultSat);
+    expect(getEl('sat-appmag')!.innerHTML).toBe('10.65');
+    expect((visMagSpy.mock.calls[0][2] as Date).getTime()).toBe(Date.UTC(2026, 9, 16, 10, 30));
+
+    timeManager.simulationTimeObj = new Date(Date.UTC(2026, 9, 16, 12, 0));
+    EventBus.getInstance().emit(EventBusEvent.updateSelectBox, defaultSat);
+    expect(getEl('sat-appmag')!.innerHTML).toBe('12.34');
+    expect((visMagSpy.mock.calls[1][2] as Date).getTime()).toBe(Date.UTC(2026, 9, 16, 12, 0));
+  });
+
+  it('ignores select-box updates for missiles', () => {
+    const visMagSpy = vi.spyOn(SatMath, 'calculateVisMag');
+
+    EventBus.getInstance().emit(EventBusEvent.updateSelectBox, defaultMisl);
+    expect(visMagSpy).not.toHaveBeenCalled();
   });
 
   it('updateCountryCorrelationTable_ and updateLaunchSiteCorrelationTable_ fill their rows', () => {

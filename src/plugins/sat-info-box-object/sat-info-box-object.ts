@@ -94,6 +94,25 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
     EventBus.getInstance().on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
     EventBus.getInstance().on(EventBusEvent.selectSatData, this.updateObjectData_.bind(this));
     EventBus.getInstance().on(EventBusEvent.setSecondarySat, this.updateSecondaryVisibility_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.updateSelectBox, this.refreshApparentMag_.bind(this));
+  }
+
+  /**
+   * Apparent magnitude depends on the sim time (range and phase angle), so it is refreshed on the
+   * per-frame select-box update instead of only once at selection. Otherwise it freezes at the
+   * selection instant and disagrees with the Sensor Data card's live Vis Mag.
+   */
+  private refreshApparentMag_(obj: BaseObject): void {
+    if (!(obj instanceof Satellite) || settingsManager.plugins.SatInfoBoxObject?.isShowAppMag === false) {
+      return;
+    }
+
+    // The section may not be injected yet (updateSelectBox can fire before the info box is built).
+    if (!getEl(EL.APPMAG, true) || !getEl(EL.APPMAG_ROW, true)) {
+      return;
+    }
+
+    this.updateApparentMag_(obj);
   }
 
   private satInfoBoxAddListeners_() {

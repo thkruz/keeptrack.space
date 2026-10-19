@@ -6,9 +6,12 @@
 
 /* ===== Overall quality selector ===== */
 
-/* A recessed segmented control matching the v13 tab row. */
+/* A recessed segmented control matching the v13 tab row. Long translated
+ * level names ("Benutzerdefiniert", "Personnalisée") wrap the row onto a second
+ * line instead of clipping, so every label stays readable in full. */
 .kt-ui-v13 .gm-preset-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
   padding: 4px;
   background-color: rgba(0, 0, 0, 0.28);
@@ -17,11 +20,10 @@
 }
 
 .kt-ui-v13 .gm-preset-row .gm-preset-btn {
-  flex: 1 1 0;
-  min-width: 0;
+  flex: 1 0 auto;
   height: 32px;
   line-height: 32px;
-  padding: 0 4px;
+  padding: 0 8px;
   margin: 0;
   border: none;
   border-radius: var(--kt-radius-sm, 4px);
@@ -32,8 +34,6 @@
   text-align: center;
   text-transform: none;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease;
 }

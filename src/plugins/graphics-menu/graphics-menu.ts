@@ -126,7 +126,7 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
           heading: t7e('help.overview'),
           content: l('help.overview'),
           image: {
-            src: 'img/help/graphics-menu/graphics-menu-menu.png',
+            src: 'img/help/graphics-menu/graphics-menu.png',
             alt: l('help.imgAlt'),
             caption: l('help.imgCaption'),
           },

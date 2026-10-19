@@ -100,6 +100,9 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
     </section>`;
   sideMenuSettingsWidth: number = 350;
   downloadIconSrc = fileExcelPng;
+  /** Writes the export file; an instance field so tests can inject a spy without a module mock. */
+  exportXlsx_: (rows: Record<string, unknown>[], fileName: string) => void = saveXlsx;
+
   downloadIconCb = () => {
     const lastArray = ServiceLocator.getSensorManager().lastMultiSiteArray;
 
@@ -113,7 +116,7 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
     const sccNum6 = (this.selectSatManager_?.getSelectedSat() as Satellite | undefined)?.sccNum6 ?? '000000';
     const { rows, fileName } = MultiSensorLookAnglesPlugin.buildExport_(lastArray, sccNum6);
 
-    saveXlsx(rows, fileName);
+    this.exportXlsx_(rows, fileName);
   };
 
   /**

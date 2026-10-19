@@ -67,10 +67,19 @@ describe('MultiSensorLookAnglesPlugin_class', () => {
         visible: true,
       };
 
+      const exportSpy = vi.fn();
+
+      plugin.exportXlsx_ = exportSpy;
       ServiceLocator.getSensorManager().lastMultiSiteArray = [sample];
       plugin.downloadIconCb();
 
       expect(playSpy).toHaveBeenCalledWith(SoundNames.EXPORT);
+      // Injected exporter (not the vi.mock) proves the callback hands the builder's output to the file writer
+      expect(exportSpy).toHaveBeenCalledTimes(1);
+      expect(exportSpy).toHaveBeenCalledWith(
+        [{ time: sample.time, sensor: sample.objName, az: 12.35, el: 67.89, rng: 1234.57, visible: true }],
+        expect.stringMatching(/^multisite-.*-20260507T000000Z-look-angles$/u)
+      );
 
       // Asserted on the pure builder: vi.mock of saveVariable is flaky across worker realms
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

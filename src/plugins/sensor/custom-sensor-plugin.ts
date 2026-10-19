@@ -6,6 +6,8 @@ import { MenuMode } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
+import { StorageKey } from '@app/engine/persistence/storage-key';
 import { IContextMenuConfig, IHelpConfig, RmbMenuContext } from '@app/engine/plugins/core/plugin-capabilities';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
@@ -22,6 +24,7 @@ import viewListPng from '@public/img/icons/view-list.png';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { buildCustomSensorParams, CustomSensorFormValues, parseMask, validateCustomSensor } from './custom-sensor-core';
 import { renderCustomSensorList } from './custom-sensor-list-renderer';
+import { buildCustomSensorStore, customSensorParamsFromRecord, parseCustomSensorStore } from './custom-sensor-persistence';
 import './custom-sensor.css';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
@@ -324,6 +327,123 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     });
   }
 
+  addJs(): void {
+    super.addJs();
+
+    // Until the boot restore has run, sensor events come from the boot sequence itself
+    // (loadSensorJson clearing an unknown custom objName), and saving them would wipe the store.
+    CustomSensorPlugin.isStoreRestored_ = false;
+
+    const eventBus = EventBus.getInstance();
+
+    eventBus.on(EventBusEvent.onCruncherReady, () => {
+      /*
+       * SensorListPlugin restores StorageKey.CURRENT_SENSOR on this same event, and for a custom
+       * primary it resolves the unknown objName to "no sensor". Defer one task so the custom
+       * sensors are restored after it, whatever order the listeners were registered in.
+       */
+      setTimeout(() => CustomSensorPlugin.restoreCustomSensors(), 0);
+    });
+    eventBus.on(EventBusEvent.setSensor, () => CustomSensorPlugin.saveCustomSensors());
+    eventBus.on(EventBusEvent.resetSensor, () => CustomSensorPlugin.saveCustomSensors());
+  }
+
+  /** True once {@link restoreCustomSensors} has run; saves are skipped before that. */
+  private static isStoreRestored_ = false;
+
+  /**
+   * Persist every custom sensor currently in the sensor manager (primary and secondaries)
+   * under StorageKey.CUSTOM_SENSORS, or remove the key when there are none.
+   */
+  static saveCustomSensors(): void {
+    if (!CustomSensorPlugin.isStoreRestored_) {
+      return;
+    }
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
+    const persistence = PersistenceManager.getInstance();
+    const store = buildCustomSensorStore(sensorManagerInstance.currentSensors[0], sensorManagerInstance.secondarySensors);
+
+    if (store.sensors.length === 0) {
+      persistence.removeItem(StorageKey.CUSTOM_SENSORS);
+    } else {
+      persistence.saveItem(StorageKey.CUSTOM_SENSORS, JSON.stringify(store));
+    }
+  }
+
+  /**
+   * Rebuild the saved custom sensors on boot. The saved primary becomes the primary sensor again
+   * (when the last-sensor restore is enabled); the rest come back as secondary sensors. The camera
+   * is left where the boot put it, matching how a restored catalog sensor behaves.
+   */
+  static restoreCustomSensors(): void {
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
+    const store = parseCustomSensorStore(PersistenceManager.getInstance().getItem(StorageKey.CUSTOM_SENSORS));
+
+    CustomSensorPlugin.isStoreRestored_ = true;
+
+    if (!store || store.sensors.length === 0 || settingsManager.disableUI || !settingsManager.isLoadLastSensor) {
+      return;
+    }
+
+    const restored = store.sensors
+      .filter((record) => !sensorManagerInstance.getSensorByObjName(record.objName))
+      .map((record) => new DetailedSensor(customSensorParamsFromRecord(record)));
+    const primary = restored.find((sensor) => sensor.objName === store.primaryObjName) ?? null;
+    const secondaries = restored.filter((sensor) => sensor !== primary);
+
+    CustomSensorPlugin.withCameraPreserved_(() => {
+      if (primary) {
+        // Replaces whatever the boot restored: the saved primary was this custom sensor
+        sensorManagerInstance.addSecondarySensor(primary, true);
+      }
+      for (const sensor of secondaries) {
+        sensorManagerInstance.addSecondarySensor(sensor);
+      }
+    }, true);
+
+    CustomSensorPlugin.updateCustomSensorListDom();
+    CustomSensorPlugin.saveCustomSensors();
+  }
+
+  /**
+   * Run `fn` and then put the camera's zoom back (and, with `isKeepPan`, its pitch/yaw too).
+   * SensorManager.addSecondarySensor frames every new sensor at LEO or GEO zoom from its max
+   * range; a telescope's 1,000,000 km default (or the 50,000 km radar default) always picks GEO,
+   * which shrank the Earth to a small disc after Add Custom Sensor.
+   */
+  private static withCameraPreserved_(fn: () => void, isKeepPan = false): void {
+    const camera = ServiceLocator.getMainCamera();
+    const state = camera?.state;
+
+    if (!state) {
+      fn();
+
+      return;
+    }
+
+    const zoomTarget = state.zoomTarget;
+    const pan = {
+      camPitchTarget: state.camPitchTarget,
+      camYawTarget: state.camYawTarget,
+      earthCenteredPitch: state.earthCenteredPitch,
+      earthCenteredYaw: state.earthCenteredYaw,
+      isAutoPitchYawToTarget: state.isAutoPitchYawToTarget,
+    };
+
+    fn();
+
+    if (isKeepPan) {
+      state.camPitchTarget = pan.camPitchTarget;
+      state.camYawTarget = pan.camYawTarget;
+      state.earthCenteredPitch = pan.earthCenteredPitch;
+      state.earthCenteredYaw = pan.earthCenteredYaw;
+      state.isAutoPitchYawToTarget = pan.isAutoPitchYawToTarget;
+    }
+    if (zoomTarget >= 0 && zoomTarget <= 1) {
+      camera.changeZoom(zoomTarget);
+    }
+  }
+
   private static uiManagerFinal_(): void {
     const menuRoot = getEl('custom-sensor-menu');
 
@@ -360,6 +480,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       ServiceLocator.getSensorManager().clearSecondarySensors();
       ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
       CustomSensorPlugin.updateCustomSensorListDom();
+      CustomSensorPlugin.saveCustomSensors();
     });
   }
 
@@ -423,9 +544,13 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       CustomSensorPlugin.updatePrimarySensorInfoDom_(resolveCustomSensorName(values.uiName), formatCustomSensorLocation(values.lat, values.lon));
     }
 
-    sensorManagerInstance.addSecondarySensor(new DetailedSensor(buildCustomSensorParams(values, randomUUID)), isReplaceSensor);
+    const sensor = new DetailedSensor(buildCustomSensorParams(values, randomUUID));
+
+    // Pan to the new sensor like the sensor list does, but keep the user's zoom
+    CustomSensorPlugin.withCameraPreserved_(() => sensorManagerInstance.addSecondarySensor(sensor, isReplaceSensor));
 
     CustomSensorPlugin.updateCustomSensorListDom();
+    CustomSensorPlugin.saveCustomSensors();
   }
 
   /**
@@ -481,6 +606,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
       sensorManagerInstance.removeSensor(sensor);
       CustomSensorPlugin.updateCustomSensorListDom();
+      CustomSensorPlugin.saveCustomSensors();
     });
   }
 

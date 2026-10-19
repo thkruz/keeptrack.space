@@ -84,6 +84,9 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.STARS_SETTINGS]: StorageScope.Account,
   [StorageKey.STEREO_MAP_SETTINGS]: StorageScope.Account,
 
+  // --- Device: custom sensor definitions (per-browser, like the other tool inputs)
+  [StorageKey.CUSTOM_SENSORS]: StorageScope.Device,
+
   // --- Device: hardware/perf-dependent graphics --------------------------------
   [StorageKey.SETTINGS_DRAW_ORBIT_ECLIPSE]: StorageScope.Device,
   [StorageKey.SETTINGS_DRAW_SWATH_FIELD_OF_REGARD]: StorageScope.Device,

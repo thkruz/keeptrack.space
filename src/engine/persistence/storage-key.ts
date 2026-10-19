@@ -186,6 +186,10 @@ export enum StorageKey {
   // defaults; survives version wipes via the preservation allowlist)
   PLUGIN_ENABLE_OVERRIDES = 'v2-keepTrack-pluginEnableOverrides',
 
+  // Custom Sensor (user-built sensor definitions and which one was the primary,
+  // restored on boot so a custom station survives a reload)
+  CUSTOM_SENSORS = 'v2-keepTrack-customSensors',
+
   // Per-key sync timestamps for account-scoped keys: JSON Record<StorageKey, epochMs>.
   // Maintained by PersistenceManager; wiped on version bumps so a post-wipe login
   // lets the cloud copy win. Never syncs itself.

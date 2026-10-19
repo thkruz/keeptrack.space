@@ -148,19 +148,21 @@ export class DopsPlugin extends KeepTrackPlugin {
   protected locationBody_(): string {
     return html`
       <div class="kt-field-row">
-        <div class="input-field col s3" data-position="bottom" data-offset="60" data-tooltip="${t7e('plugins.DopsPlugin.tooltips.latitude')}">
+        <div class="input-field col s6" data-position="bottom" data-offset="60" data-tooltip="${t7e('plugins.DopsPlugin.tooltips.latitude')}">
           <input value="41" id="dops-lat" type="text">
           <label for="dops-lat" class="active">${t7e('plugins.DopsPlugin.labels.latitude')}</label>
         </div>
-        <div class="input-field col s3" data-position="bottom" data-offset="60" data-tooltip="${t7e('plugins.DopsPlugin.tooltips.longitude')}">
+        <div class="input-field col s6" data-position="bottom" data-offset="60" data-tooltip="${t7e('plugins.DopsPlugin.tooltips.longitude')}">
           <input value="-71" id="dops-lon" type="text">
           <label for="dops-lon" class="active">${t7e('plugins.DopsPlugin.labels.longitude')}</label>
         </div>
-        <div class="input-field col s3" data-position="bottom" data-offset="60" data-tooltip="${t7e('plugins.DopsPlugin.tooltips.altitude')}">
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s6" data-position="bottom" data-offset="60" data-tooltip="${t7e('plugins.DopsPlugin.tooltips.altitude')}">
           <input value="0" id="dops-alt" type="text">
           <label for="dops-alt" class="active">${t7e('plugins.DopsPlugin.labels.altitude')}</label>
         </div>
-        <div class="input-field col s3" data-position="bottom" data-offset="60" data-tooltip="${t7e('plugins.DopsPlugin.tooltips.mask')}">
+        <div class="input-field col s6" data-position="bottom" data-offset="60" data-tooltip="${t7e('plugins.DopsPlugin.tooltips.mask')}">
           <input value="15" id="dops-el" type="text">
           <label for="dops-el" class="active">${t7e('plugins.DopsPlugin.labels.mask')}</label>
         </div>

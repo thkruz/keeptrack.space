@@ -10,6 +10,17 @@ import { FormSelect } from '@materializecss/materialize';
  * the new state.
  */
 export function refreshMaterialSelect(select: HTMLSelectElement): void {
+  /*
+   * FormSelect moves a `<label for="<select id>">` INSIDE its wrapper on init, and destroy()
+   * removes that wrapper, so the label would be deleted on every re-init (a select initialised
+   * twice lost its label for good). Move it back out next to the wrapper first; init moves it in again.
+   */
+  const wrapper = select.closest('.select-wrapper');
+  const label = select.id && wrapper ? [...wrapper.querySelectorAll('label')].find((el) => el.htmlFor === select.id) : null;
+
+  if (wrapper && label) {
+    wrapper.after(label);
+  }
   FormSelect.getInstance(select)?.destroy();
   FormSelect.init(select, {
     dropdownOptions: {

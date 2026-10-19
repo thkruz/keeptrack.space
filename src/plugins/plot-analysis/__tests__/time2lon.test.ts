@@ -1,8 +1,11 @@
 /* eslint-disable dot-notation */
+
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { KeepTrack } from '@app/keeptrack';
 import { Time2LonPlots } from '@app/plugins/plot-analysis/time2lon';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { SpaceObjectType } from '@ootk/src/main';
+import { CatalogSource, PayloadStatus, SpaceObjectType } from '@ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -275,5 +278,58 @@ describe('Time2LonPlots_class', () => {
 
       expect(types.size).toBe(0);
     });
+  });
+});
+
+describe('Time2LonPlots selected object', () => {
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager]);
+    KeepTrack.getInstance().engine = {
+      pause: vi.fn(),
+      resume: vi.fn(),
+    } as unknown as typeof KeepTrack.prototype.engine;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  /** A non-operational, drifting GEO payload shaped like GALAXY 15. */
+  const drifter = {
+    id: 28884,
+    type: SpaceObjectType.PAYLOAD,
+    status: PayloadStatus.NONOPERATIONAL,
+    eccentricity: 0.0018,
+    period: 1455.43,
+    inclination: 3.85,
+    source: CatalogSource.CELESTRAK,
+    isSatellite: () => true,
+  };
+
+  it('enables Inactive Payloads when the selected object is a non-operational GEO drifter', () => {
+    const plugin = new Time2LonPlots();
+
+    websiteInit(plugin);
+    PluginRegistry.getPlugin(SelectSatManager)!.selectedSat = 28884;
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'getObject').mockReturnValue(drifter as never);
+
+    expect(plugin['currentFilters_'].inactivePayloads).toBe(false);
+    plugin['includeSelectedSatInFilters_']();
+
+    expect(plugin['currentFilters_'].inactivePayloads).toBe(true);
+    expect(plugin['getSelectedSatId_']()).toBe(28884);
+  });
+
+  it('keeps the default filters when nothing is selected', () => {
+    const plugin = new Time2LonPlots();
+
+    websiteInit(plugin);
+    PluginRegistry.getPlugin(SelectSatManager)!.selectedSat = -1;
+    const before = plugin['currentFilters_'];
+
+    plugin['includeSelectedSatInFilters_']();
+
+    expect(plugin['currentFilters_']).toBe(before);
+    expect(plugin['getSelectedSatId_']()).toBeNull();
   });
 });

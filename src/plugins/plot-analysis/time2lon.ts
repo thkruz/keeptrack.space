@@ -17,7 +17,7 @@ import * as echarts from 'echarts';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { PlotWatermark } from './plot-download';
 import { buildChartOption, Time2LonChartLabels } from './time2lon-chart';
-import { buildAllowedTypes, buildSatLine, buildTopCountries, computeOrbits, isSatelliteAllowed, Time2LonFilters, Time2LonSatLine } from './time2lon-core';
+import { buildAllowedTypes, buildSatLine, buildTopCountries, computeOrbits, isSatelliteAllowed, Time2LonFilters, Time2LonSatLine, widenFiltersForSelection } from './time2lon-core';
 import './time2lon.css';
 
 type T7eKey = Parameters<typeof t7e>[0];
@@ -194,7 +194,46 @@ export class Time2LonPlots extends KeepTrackPlugin {
     }
 
     this.initChart_(chartDom);
+    this.includeSelectedSatInFilters_();
     this.refreshPlot_();
+  }
+
+  /** Catalog id of the user's selected object, or null when nothing is selected. */
+  protected getSelectedSatId_(): number | null {
+    const selectedId = this.selectSatManager_?.selectedSat ?? -1;
+
+    return selectedId >= 0 ? selectedId : null;
+  }
+
+  /**
+   * Make sure the selected object is plotted: if it sits in the plot's orbital band but
+   * its type/status/source toggle is off (for example a non-operational drifting GEO
+   * payload under the default "Active Payloads" filter), switch that toggle on.
+   */
+  private includeSelectedSatInFilters_(): void {
+    const selectedId = this.getSelectedSatId_();
+
+    if (selectedId === null) {
+      return;
+    }
+
+    const obj = ServiceLocator.getCatalogManager().getObject(selectedId);
+
+    if (!obj?.isSatellite()) {
+      return;
+    }
+
+    const widened = widenFiltersForSelection(this.currentFilters_, obj as Satellite);
+
+    if (widened !== this.currentFilters_) {
+      this.currentFilters_ = widened;
+      this.onFiltersChangedProgrammatically_();
+    }
+  }
+
+  /** Hook for subclasses with a filter form (Pro) to resync their inputs after a programmatic change. */
+  protected onFiltersChangedProgrammatically_(): void {
+    // OSS has no filter form.
   }
 
   onBottomIconDeselect(): void {
@@ -353,7 +392,7 @@ export class Time2LonPlots extends KeepTrackPlugin {
     // the now-settled container before drawing (covers environments without a
     // ResizeObserver).
     this.chart.resize();
-    this.chart.setOption(buildChartOption(data, this.getChartLabels_()), true);
+    this.chart.setOption(buildChartOption(data, this.getChartLabels_(), this.getSelectedSatId_()), true);
   }
 
   /** Resolves the chart's user-facing strings once per render. */

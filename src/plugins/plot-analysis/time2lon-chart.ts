@@ -22,6 +22,9 @@ export interface Time2LonChartLabels {
   empty: string;
 }
 
+/** Color of the selected object's trace: bright amber so it stands out from the country palette. */
+export const HIGHLIGHT_COLOR = '#ffc400';
+
 /** Widest the default longitude window is allowed to open to. */
 const LON_LIMIT = 180;
 /** Fallback half-window (deg) when the data spans a single longitude. */
@@ -61,10 +64,62 @@ export const computeLonRange = (data: Time2LonSatLine[]): { min: number; max: nu
   };
 };
 
-/** Builds the echarts option for the waterfall plot. */
-export const buildChartOption = (data: Time2LonSatLine[], labels: Time2LonChartLabels): echarts.EChartsOption => {
+/** One echarts line series for a satellite; the selected object gets a distinct, labelled style. */
+const buildSeries = (sat: Time2LonSatLine, isHighlighted: boolean) => {
+  const base = {
+    type: 'line' as const,
+    name: sat.country,
+    id: sat.satId.toString(),
+    data: sat.points,
+    symbol: 'circle',
+    symbolSize: 10,
+    lineStyle: { width: 1 },
+    itemStyle: { opacity: 1 },
+    emphasis: {
+      focus: 'series' as const,
+      itemStyle: { opacity: 1 },
+      lineStyle: {
+        color: '#fff',
+        width: 3,
+      },
+    },
+  };
+
+  if (!isHighlighted) {
+    return base;
+  }
+
+  return {
+    ...base,
+    z: 10,
+    symbolSize: 12,
+    color: HIGHLIGHT_COLOR,
+    lineStyle: { width: 3, color: HIGHLIGHT_COLOR },
+    itemStyle: { opacity: 1, color: HIGHLIGHT_COLOR, borderColor: '#000', borderWidth: 1 },
+    endLabel: {
+      show: true,
+      formatter: sat.satName,
+      color: HIGHLIGHT_COLOR,
+      fontWeight: 'bold' as const,
+      fontSize: 13,
+      textBorderColor: '#000',
+      textBorderWidth: 2,
+    },
+  };
+};
+
+/**
+ * Builds the echarts option for the waterfall plot. When `highlightSatId` matches a
+ * plotted line (the user's selected object), that trace is drawn last in a distinct
+ * color with a name label so it can be found without hovering.
+ */
+export const buildChartOption = (data: Time2LonSatLine[], labels: Time2LonChartLabels, highlightSatId: number | null = null): echarts.EChartsOption => {
   const range = computeLonRange(data) ?? { min: -LON_LIMIT, max: LON_LIMIT };
   const isEmpty = data.length === 0;
+  const isHighlight = (sat: Time2LonSatLine) => highlightSatId !== null && sat.satId === highlightSatId;
+  // Draw the highlighted line last so it sits on top, and so the legend swatch for its
+  // country keeps the palette color of an ordinary series.
+  const ordered = [...data.filter((sat) => !isHighlight(sat)), ...data.filter(isHighlight)];
 
   return {
     animation: false,
@@ -176,23 +231,6 @@ export const buildChartOption = (data: Time2LonSatLine[], labels: Time2LonChartL
         yAxisIndex: [0],
       },
     ],
-    series: data.map((sat) => ({
-      type: 'line' as const,
-      name: sat.country,
-      id: sat.satId.toString(),
-      data: sat.points,
-      symbol: 'circle',
-      symbolSize: 10,
-      lineStyle: { width: 1 },
-      itemStyle: { opacity: 1 },
-      emphasis: {
-        focus: 'series' as const,
-        itemStyle: { opacity: 1 },
-        lineStyle: {
-          color: '#fff',
-          width: 3,
-        },
-      },
-    })),
+    series: ordered.map((sat) => buildSeries(sat, isHighlight(sat))),
   };
 };

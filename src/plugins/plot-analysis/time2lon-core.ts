@@ -115,6 +115,63 @@ export const isSatelliteAllowed = (sat: Satellite, filters: Time2LonFilters, all
   return true;
 };
 
+/** The boolean filter toggles that gate an object by type/status or by catalog source. */
+type Time2LonToggleKey = 'activePayloads' | 'inactivePayloads' | 'rocketBodies' | 'debris' | 'celestrak' | 'vimpel';
+
+/** The type/status toggle that controls whether `sat` is shown, or null for non-plottable types. */
+const typeToggleFor = (sat: Satellite): Time2LonToggleKey | null => {
+  switch (sat.type) {
+    case SpaceObjectType.PAYLOAD:
+      return sat.status === PayloadStatus.OPERATIONAL ? 'activePayloads' : 'inactivePayloads';
+    case SpaceObjectType.ROCKET_BODY:
+      return 'rocketBodies';
+    case SpaceObjectType.DEBRIS:
+      return 'debris';
+    default:
+      return null;
+  }
+};
+
+/**
+ * When the user has an object selected that sits inside the plot's orbital band
+ * (eccentricity / period / inclination window) but is hidden by the type, status or
+ * source toggles (for example a non-operational drifting GEO payload under the default
+ * "Active Payloads" filter), return a copy of the filters with that object's category and
+ * source switched on so it is plotted alongside everything else in its class. Returns
+ * the same filters object unchanged when nothing needs to change, when there is no
+ * selection, or when the object is outside the band.
+ */
+export const widenFiltersForSelection = (filters: Time2LonFilters, sat: Satellite | null | undefined): Time2LonFilters => {
+  if (!sat) {
+    return filters;
+  }
+
+  const typeKey = typeToggleFor(sat);
+
+  if (!typeKey) {
+    return filters;
+  }
+
+  const isInBand =
+    sat.eccentricity <= filters.maxEccentricity &&
+    sat.period >= filters.minPeriod &&
+    sat.period <= filters.maxPeriod &&
+    sat.inclination >= filters.minInclination &&
+    sat.inclination <= filters.maxInclination;
+
+  if (!isInBand) {
+    return filters;
+  }
+
+  const sourceKey: Time2LonToggleKey = sat.source === CatalogSource.VIMPEL ? 'vimpel' : 'celestrak';
+
+  if (filters[typeKey] && filters[sourceKey]) {
+    return filters;
+  }
+
+  return { ...filters, [typeKey]: true, [sourceKey]: true };
+};
+
 /**
  * Counts objects per country code, picks the top N, and returns a Map from raw
  * country code to human-readable display name. Codes outside the top N map to

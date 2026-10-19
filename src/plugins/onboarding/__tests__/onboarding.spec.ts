@@ -8,6 +8,8 @@ import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
  */
 test.describe('Onboarding Power Tour Hub', () => {
   test('hub opens standalone, Time & Scenarios completes, progress persists', async ({ page }) => {
+    // Boots the app twice (the reload checks persistence), so it needs more than the 60 s default.
+    test.setTimeout(120_000);
     await waitForAppReady(page, {
       plugins: { OnboardingPlugin: { enabled: true } },
     });

@@ -281,6 +281,21 @@ describe('ReportsPlugin report generation', () => {
     expect(p().buildContext_(defaultSat).options.startTime.getTime()).toBe(new Date('2026-10-18T18:45:00Z').getTime());
   });
 
+  it('buildContext_ does not backdate a report made minutes after the previous one', () => {
+    const timeManager = ServiceLocator.getTimeManager();
+    const t0 = new Date('2026-10-18T17:45:50Z');
+    const realNow = vi.spyOn(Date, 'now').mockReturnValue(1_000_000);
+
+    timeManager.simulationTimeObj = new Date(t0);
+    EventBus.getInstance().emit(EventBusEvent.staticOffsetChange, 0);
+    expect(p().buildContext_(defaultSat).options.startTime.getTime()).toBe(new Date('2026-10-18T17:45:00Z').getTime());
+
+    // The menu stays open and the clock runs for 3 minutes (real and sim): a fresh report starts now.
+    realNow.mockReturnValue(1_000_000 + 3 * 60_000);
+    timeManager.simulationTimeObj = new Date(t0.getTime() + 3 * 60_000);
+    expect(p().buildContext_(defaultSat).options.startTime.getTime()).toBe(new Date('2026-10-18T17:48:00Z').getTime());
+  });
+
   it('findReportPasses_ returns one continuous window for an object that never leaves the field of regard', () => {
     vi.spyOn(p(), 'findPasses_').mockReturnValue([]);
     vi.spyOn(ServiceLocator.getCatalogManager(), 'calcSatrec').mockReturnValue(defaultSat.satrec as never);

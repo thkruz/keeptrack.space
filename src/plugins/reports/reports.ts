@@ -201,13 +201,17 @@ export class ReportsPlugin extends KeepTrackPlugin {
   protected conjHalfWidthSec_: number = CONJUNCTION_DEFAULT_HALF_WIDTH_SEC;
 
   /**
-   * Start minute shared by every report generated in one menu session. Without it a
-   * running clock moves the floored start between two back-to-back reports (LLA at 17:45,
-   * Sun/Eclipse at 17:46 for the "same" inputs). Cleared when the menu opens or the user
-   * jumps the clock, and ignored once the clock has drifted past {@link START_ANCHOR_MAX_DRIFT_MS_}.
+   * Start minute shared by back-to-back reports. Without it a running clock moves the floored
+   * start between two reports made seconds apart (LLA at 17:45, Sun/Eclipse at 17:46 for the
+   * "same" inputs). It only chains reports made in quick succession: a report more than
+   * {@link START_ANCHOR_MAX_GAP_MS_} of real time after the previous one, or more than
+   * {@link START_ANCHOR_MAX_DRIFT_MS_} of sim time after the anchor, starts at the current minute,
+   * so leaving the menu open never backdates a later report. Cleared when the menu opens or the
+   * user jumps the clock.
    */
-  private startAnchor_: { startMs: number; simMs: number } | null = null;
-  private static readonly START_ANCHOR_MAX_DRIFT_MS_ = 15 * 60 * 1000;
+  private startAnchor_: { startMs: number; lastRealMs: number } | null = null;
+  private static readonly START_ANCHOR_MAX_GAP_MS_ = 2 * 60 * 1000;
+  private static readonly START_ANCHOR_MAX_DRIFT_MS_ = 5 * 60 * 1000;
 
   /**
    * Register a new report generator
@@ -358,6 +362,12 @@ export class ReportsPlugin extends KeepTrackPlugin {
   // Side menu HTML (v13 card UI)
   // =========================================================================
 
+  /**
+   * Select labels carry no `for` attribute on purpose: Materialize v2's
+   * FormSelect moves a `for`-linked label inside its generated wrapper, and the
+   * destroy() that every re-init (initMaterialSelects / refreshMaterialSelect)
+   * runs first deletes that wrapper, label included.
+   */
   private buildSideMenuHtml_(): string {
     const reports = ReportsPlugin.getRegisteredReports();
     const orbitReports = reports.filter((r) => ReportsPlugin.sectionOf_(r) === 'orbit');
@@ -386,23 +396,23 @@ export class ReportsPlugin extends KeepTrackPlugin {
             <div class="kt-field-row">
               <div class="input-field col s12">
                 <select id="reports-window">${this.buildWindowOptions_()}</select>
-                <label for="reports-window">${l('options.window')}</label>
+                <label>${l('options.window')}</label>
               </div>
             </div>
             <div class="kt-field-row">
               <div class="input-field col s6">
                 <select id="reports-step">${this.buildStepOptions_()}</select>
-                <label for="reports-step">${l('options.step')}</label>
+                <label>${l('options.step')}</label>
               </div>
               <div class="input-field col s6">
                 <select id="reports-format">${this.buildFormatOptions_()}</select>
-                <label for="reports-format">${l('options.format')}</label>
+                <label>${l('options.format')}</label>
               </div>
             </div>
             <div class="kt-field-row">
               <div class="input-field col s12">
                 <select id="reports-conj-window">${this.buildConjWindowOptions_()}</select>
-                <label for="reports-conj-window">${l('options.conjWindow')}</label>
+                <label>${l('options.conjWindow')}</label>
               </div>
             </div>
           </section>
@@ -721,21 +731,29 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
   /**
    * First sample time (whole minute) for a report generated at `generatedAt`. Reuses the
-   * session anchor while it is still close to the clock so back-to-back reports with the
-   * same settings start on the same sample even with the clock running.
+   * anchor for back-to-back reports (see {@link startAnchor_}) so the same settings start on
+   * the same sample even with the clock running; otherwise starts at the current minute.
    */
   private resolveStartMs_(generatedAt: Date): number {
     const simMs = generatedAt.getTime();
+    const realMs = Date.now();
     const anchor = this.startAnchor_;
 
-    if (anchor && simMs >= anchor.startMs && simMs - anchor.simMs <= ReportsPlugin.START_ANCHOR_MAX_DRIFT_MS_) {
+    if (
+      anchor &&
+      simMs >= anchor.startMs &&
+      simMs - anchor.startMs <= ReportsPlugin.START_ANCHOR_MAX_DRIFT_MS_ &&
+      realMs - anchor.lastRealMs <= ReportsPlugin.START_ANCHOR_MAX_GAP_MS_
+    ) {
+      anchor.lastRealMs = realMs;
+
       return anchor.startMs;
     }
 
     const floored = new Date(simMs);
 
     floored.setUTCSeconds(0, 0);
-    this.startAnchor_ = { startMs: floored.getTime(), simMs };
+    this.startAnchor_ = { startMs: floored.getTime(), lastRealMs: realMs };
 
     return floored.getTime();
   }

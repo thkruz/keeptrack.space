@@ -18,11 +18,45 @@
         "preset_asat_fy1c": "ASAT, Fengyun-1C (mayor energía)",
         "preset_venting": "Baja Energía / Venteo",
         "preset_custom": "Personalizado",
-        "radialDeltaV": "Radial (m/s)",
-        "inTrackDeltaV": "En la Trayectoria (m/s)",
-        "crossTrackDeltaV": "Transversal a la Trayectoria (m/s)",
-        "dispersionHint": "Cambio de velocidad aleatorio aplicado a cada fragmento (1 sigma). El componente en la trayectoria estira la nube a lo largo de la órbita; el transversal la abre a través del plano orbital; el radial la sube y la baja. Eventos típicos: explosiones de unos 10 a 100 m/s, colisiones de unos 100 a 300 m/s.",
-        "piecesSection": "Cantidad"
+        "dispersionHint": "Cambio de velocidad aleatorio aplicado a cada fragmento. En la trayectoria estira la nube a lo largo de la órbita; transversal la abre a través del plano orbital; radial la eleva y la desciende. Velocidades medias típicas: explosiones de unos 10 a 100 m/s, colisiones de unos 100 a 300 m/s.",
+        "piecesSection": "Cantidad",
+        "frameLabel": "Sistema de Coordenadas",
+        "frame_rtn": "RTN / RIC (marco orbital local)",
+        "frame_ntw": "NTW (Alineado con la Velocidad)",
+        "frame_eci": "ECI (X, Y, Z Inerciales; TEME)",
+        "modelLabel": "Modelo de Dispersión",
+        "model_gaussian": "Gaussiano (Desv. Est. 1σ por eje)",
+        "model_maxwellian": "Maxwell isotrópico (vel. media objetivo)",
+        "model_uniform": "Uniforme (±Velocidad Máx. por eje)",
+        "axis1_rtn": "Radial",
+        "axis2_rtn": "En la Trayectoria",
+        "axis3_rtn": "Transversal",
+        "axis1_ntw": "Normal (N)",
+        "axis2_ntw": "Velocidad (T)",
+        "axis3_ntw": "Transversal (W)",
+        "axis1_eci": "X",
+        "axis2_eci": "Y",
+        "axis3_eci": "Z",
+        "axis1_rtn_tooltip": "A lo largo del vector de posición, alejándose de la Tierra. Eleva y desciende los fragmentos.",
+        "axis2_rtn_tooltip": "En el plano orbital, perpendicular a la radial, hacia la dirección del movimiento. Estira la nube a lo largo de la órbita.",
+        "axis3_rtn_tooltip": "A lo largo de la normal orbital (r × v). Abre la nube en abanico a través del plano orbital.",
+        "axis1_ntw_tooltip": "En el plano orbital, perpendicular a la velocidad y apuntando hacia afuera. Coincide con la radial en una órbita circular.",
+        "axis2_ntw_tooltip": "A lo largo del vector velocidad. Es el que cambia más directamente la energía orbital (periodo).",
+        "axis3_ntw_tooltip": "A lo largo de la normal orbital (r × v). Es el mismo eje que el transversal de RTN.",
+        "axis1_eci_tooltip": "Eje X inercial TEME, hacia el equinoccio vernal.",
+        "axis2_eci_tooltip": "Eje Y inercial TEME, 90° al este de X en el plano ecuatorial.",
+        "axis3_eci_tooltip": "Eje Z inercial TEME, hacia el polo norte celeste.",
+        "unitSigma": "1σ m/s",
+        "unitMax": "±máx m/s",
+        "unitTooltip_gaussian": "El valor es la desviación estándar 1σ de una gaussiana de media cero en este eje.",
+        "unitTooltip_maxwellian": "Isotrópico: todos los ejes usan la σ derivada de la velocidad media de eyección.",
+        "unitTooltip_uniform": "El valor es la semianchura: cada fragmento se extrae de forma uniforme entre -max y +max en este eje.",
+        "meanSpeed": "Velocidad Media de Eyección (m/s)",
+        "meanSpeedTooltip": "Media objetivo de la velocidad total |Δv|. Cada eje se extrae de una gaussiana con σ = μ / 1.596, de modo que la velocidad total sigue una distribución de Maxwell-Boltzmann.",
+        "maxTotalSpeed": "Velocidad Total Máx. (m/s)",
+        "maxTotalSpeedOff": "Desactivado",
+        "maxTotalSpeedTooltip": "Opcional. Los fragmentos cuya Δv aleatoria total supere este valor se vuelven a extraer, lo que recorta la cola extrema sin distorsionar el resto de la distribución. Déjelo en blanco para no aplicar límite.",
+        "axesCaption": "Valores por eje, {unit}"
       },
       "buttons": {
         "createBreakup": "Crear Desintegración",
@@ -34,7 +68,8 @@
       },
       "toasts": {
         "cleared": "Desintegración borrada. Escombros eliminados.",
-        "fragmentsReentered": "{count} fragmentos reentraron y no fueron creados."
+        "fragmentsReentered": "{count} fragmentos reentraron y no fueron creados.",
+        "fragmentsFailed": "{count} fragmentos no pudieron ajustarse a una órbita o no tenían un espacio libre en el catálogo y no se crearon."
       },
       "help": {
         "overview": "El Menú de Desintegración simula la desintegración de un satélite en su posición actual. Genera piezas de escombros desde la ubicación exacta del satélite seleccionado, cada una saliendo con un pequeño cambio de velocidad aleatorio (delta-V), para que pueda ver cómo la nube de escombros se forma y se dispersa con el tiempo. Como trabaja a partir del vector de estado del satélite, admite cualquier régimen orbital.",
@@ -45,7 +80,9 @@
         "howToUse": "<ol><li>Seleccione cualquier satélite. El icono permanece deshabilitado hasta que se seleccione un satélite.</li><li>Abra el Menú de Desintegración y ajuste la dispersión delta-V y el número de piezas.</li><li>Haga clic en <strong>Crear Desintegración</strong>. Las piezas se generan en la posición actual del satélite y la barra de búsqueda se llena con los nuevos escombros para que pueda ver toda la nube.</li><li>Acelere el tiempo para ver cómo la nube se dispersa a lo largo de la órbita.</li></ol>",
         "tip1": "Funciona en cualquier régimen orbital, incluyendo LEO, MEO, GEO y órbitas muy elípticas (HEO), porque cada fragmento se propaga a partir del vector de estado del satélite original en el punto de desintegración.",
         "tip2": "La desintegración es simulada y solo existe en memoria. Use Borrar Desintegración para eliminar los escombros, o recargue la página. El satélite original en sí nunca se modifica.",
-        "tip3": "Todas las piezas se crean como objetos de tipo escombro, por lo que los esquemas de color y filtros basados en escombros se les aplican de inmediato."
+        "tip3": "Todas las piezas se crean como objetos de tipo escombro, por lo que los esquemas de color y filtros basados en escombros se les aplican de inmediato.",
+        "dispersionModelsHeading": "Sistemas y Modelos de Dispersión",
+        "dispersionModels": "<ul><li><strong>Sistema de Coordenadas</strong>: <strong>RTN / RIC</strong> (predeterminado) usa los ejes radial, en la trayectoria (transversal) y transversal a la trayectoria. <strong>NTW</strong> alinea el segundo eje con el vector velocidad, lo que difiere de RTN en órbitas excéntricas. <strong>ECI</strong> aplica los valores directamente a los ejes inerciales X, Y y Z (TEME, el sistema que usa SGP4).</li><li><strong>Gaussiano</strong> (predeterminado): cada eje se extrae de forma independiente de una distribución normal de media cero con la 1σ introducida. Con la misma σ en los tres ejes, la velocidad total sigue una distribución de Maxwell-Boltzmann con media 2σ√(2/π) ≈ 1.596σ, así que 54.2 m/s por eje da una velocidad media de 86.5 m/s.</li><li><strong>Maxwelliano Isotrópico</strong>: introduzca directamente la velocidad media de eyección objetivo y la σ por eje se calcula automáticamente.</li><li><strong>Uniforme</strong>: cada eje se extrae de forma uniforme entre -max y +max.</li><li><strong>Velocidad Total Máx.</strong> (opcional): los fragmentos más rápidos que el límite se vuelven a extraer, lo que elimina valores atípicos y conserva la forma de la distribución por debajo del límite.</li></ul>La lectura bajo los campos muestra la velocidad media, RMS y del percentil 99 esperadas antes de crear la desintegración. Los fragmentos cuya nueva órbita tenga un perigeo por debajo de 100 km se reportan como reingresados y no se crean."
       },
       "errorMsgs": {
         "SatelliteNotFound": "¡Satélite no encontrado!",
@@ -53,6 +90,14 @@
         "InvalidStartNum": "¡Número de inicio de satélite inválido! ¡Restableciendo a 90000!",
         "InvalidSlotRange": "Número inicial de satélite fuera de rango. Use {start} a {end}.",
         "BreakupGeneratorFailed": "¡El generador de ruptura falló!"
+      },
+      "stats": {
+        "meanSpeed": "Velocidad media esperada",
+        "rmsSpeed": "Velocidad RMS",
+        "p99Speed": "Percentil 99",
+        "derivedSigma": "σ por eje = {sigma} m/s (igual en todos los sistemas)",
+        "capRejects": "El límite vuelve a extraer el {percent}% de los fragmentos",
+        "capTooLow": "El límite está muy por debajo de la dispersión: muchos fragmentos quedarán exactamente en el límite."
       }
     }
   }

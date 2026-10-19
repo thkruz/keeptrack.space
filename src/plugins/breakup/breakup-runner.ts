@@ -33,16 +33,20 @@ import { CatalogManager } from '@app/app/data/catalog-manager';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { Satellite, SpaceObjectType, Tle, TleLine1, TleLine2 } from '@ootk/src/main';
 import {
+  applyDeltaV,
   BreakupVariationParams,
   buildFragmentTle,
+  computeFrameBasis,
   computeImpactBias,
   computeRicBasis,
-  DeltaVComponentsKms,
-  DeltaVSpreadMps,
+  DEFAULT_DELTA_V_FRAME,
+  dispersionFromParams,
+  frameToInertial,
   isAnalystRangeValid,
+  MS_TO_KMS,
   makeRng,
-  RicBasis,
-  sampleDeltaV,
+  SubOrbitalFragmentError,
+  sampleDispersion,
   Vec3,
 } from './breakup-core';
 
@@ -69,8 +73,10 @@ export type BreakupRunError = 'invalidSlotRange' | 'parentStateUnavailable' | 'n
 export interface BreakupRunResult {
   /** Analyst catalog ids that were activated as debris pieces. */
   createdIds: number[];
-  /** Fragments skipped because they reentered / were sub-orbital. */
+  /** Fragments skipped because their perigee was too low (they reenter). */
   reenteredCount: number;
+  /** Fragments skipped for any other reason (no SGP4 fit, or no free analyst slot). */
+  failedCount: number;
   /** Hard-failure discriminator, or null when at least one piece was created. */
   error: BreakupRunError;
 }
@@ -82,106 +88,124 @@ export interface BreakupRunResult {
  *
  * The breakup is evaluated at the parent's exact TEME state at `epoch` (any
  * orbital regime), and the fragment cloud is reproducible for a given
- * (startNum, count, spread) via a seeded RNG.
+ * (startNum, count, dispersion) via a seeded RNG.
  *
  * @param sat - The (TLE-backed) parent satellite.
- * @param params - Parsed breakup parameters (count, per-axis Δv spread, start slot).
+ * @param params - Parsed breakup parameters (count, frame, dispersion model and values, start slot).
  * @param epoch - Breakup time; also the fragment TLE epoch.
  * @param impact - Optional kinetic impact that biases the cloud along the impactor's
  *   momentum; omit for an isotropic (explosion-style) breakup.
  * @returns The created ids, count of skipped reentering fragments, and any hard error.
  */
 export function runBreakup(sat: Satellite, params: BreakupVariationParams, epoch: Date, impact?: KineticImpact): BreakupRunResult {
-  const { breakupCount, radialDeltaV, inTrackDeltaV, crossTrackDeltaV, startNum } = params;
+  const { breakupCount, startNum } = params;
+  const noFragments = (error: BreakupRunError): BreakupRunResult => ({ createdIds: [], reenteredCount: 0, failedCount: 0, error });
 
   // Guard the analyst-slot range so pieces never overwrite real catalog satellites
   // (below the block) or unallocated slots (above it).
   if (!isAnalystRangeValid(startNum, breakupCount, CatalogManager.ANALYST_START_ID, settingsManager.maxAnalystSats)) {
-    return { createdIds: [], reenteredCount: 0, error: 'invalidSlotRange' };
+    return noFragments('invalidSlotRange');
   }
 
   const parentState = sat.eci(epoch);
 
   if (!parentState?.position || !parentState.velocity) {
-    return { createdIds: [], reenteredCount: 0, error: 'parentStateUnavailable' };
+    return noFragments('parentStateUnavailable');
   }
 
-  const basis = computeRicBasis(parentState.position, parentState.velocity);
-  const spread: DeltaVSpreadMps = { radial: radialDeltaV, inTrack: inTrackDeltaV, crossTrack: crossTrackDeltaV };
+  const { position, velocity } = parentState;
+  const frameBasis = computeFrameBasis(params.frame ?? DEFAULT_DELTA_V_FRAME, position, velocity);
+  const dispersion = dispersionFromParams(params);
   // A kinetic impact biases the whole cloud along the impactor's velocity relative
-  // to the target (projected into RIC); an isotropic breakup has no bias.
-  const bias = impact
-    ? computeImpactBias(
-        {
-          x: impact.velocityTeme.x - parentState.velocity.x,
-          y: impact.velocityTeme.y - parentState.velocity.y,
-          z: impact.velocityTeme.z - parentState.velocity.z,
-        },
-        basis,
-        impact.transferFraction
-      )
-    : undefined;
-  // Seed from the parameters so a given configuration produces a reproducible cloud.
-  const rng = makeRng((startNum ^ breakupCount ^ Math.round((inTrackDeltaV + radialDeltaV + crossTrackDeltaV) * 1000)) >>> 0);
+  // to the target (projected into RIC); an isotropic breakup has no bias. The bias
+  // is a fixed inertial offset, so it adds after the frame rotation of each draw.
+  const zero: Vec3 = { x: 0, y: 0, z: 0 };
+  let biasKms = zero;
+
+  if (impact) {
+    const ric = computeRicBasis(position, velocity);
+    const relativeVelocity = { x: impact.velocityTeme.x - velocity.x, y: impact.velocityTeme.y - velocity.y, z: impact.velocityTeme.z - velocity.z };
+
+    biasKms = applyDeltaV(zero, ric, computeImpactBias(relativeVelocity, ric, impact.transferFraction));
+  }
+  const rng = makeRng(seedFor_(params));
 
   const createdIds: number[] = [];
   let reenteredCount = 0;
+  let failedCount = 0;
 
   for (let i = 0; i < breakupCount; i++) {
-    const dv = sampleDeltaV(rng, spread, bias);
-    const id = injectFragment_(startNum + i, i + 1, { position: parentState.position, velocity: parentState.velocity, basis, dv }, epoch);
+    const dvMps = frameToInertial(frameBasis, sampleDispersion(rng, dispersion));
+    const deltaVKms = { x: dvMps.x * MS_TO_KMS + biasKms.x, y: dvMps.y * MS_TO_KMS + biasKms.y, z: dvMps.z * MS_TO_KMS + biasKms.z };
+    const outcome = injectFragment_(startNum + i, i + 1, { position, velocity, deltaVKms }, epoch);
 
-    if (id === null) {
+    if (outcome === 'reentered') {
       reenteredCount++;
+    } else if (outcome === 'failed') {
+      failedCount++;
     } else {
-      createdIds.push(id);
+      createdIds.push(outcome);
     }
   }
 
   return {
     createdIds,
     reenteredCount,
+    failedCount,
     error: createdIds.length === 0 ? 'noFragmentsCreated' : null,
   };
 }
 
-/** The parent state and sampled Δv needed to build one fragment. */
+/**
+ * Seed from the parameters so a given configuration produces a reproducible
+ * cloud. For the default Gaussian/RTN/no-cap case this is the original seed, so
+ * existing configurations keep their clouds.
+ */
+function seedFor_(params: BreakupVariationParams): number {
+  const { breakupCount, radialDeltaV, inTrackDeltaV, crossTrackDeltaV, startNum } = params;
+  const spreadSum = params.model === 'maxwellian' ? (params.meanSpeed ?? 0) : inTrackDeltaV + radialDeltaV + crossTrackDeltaV;
+
+  return (startNum ^ breakupCount ^ Math.round(spreadSum * 1000) ^ Math.round((params.maxTotalSpeed ?? 0) * 1000)) >>> 0;
+}
+
+/** The parent state and inertial Δv needed to build one fragment. */
 interface FragmentInput {
   position: Vec3;
   velocity: Vec3;
-  basis: RicBasis;
-  dv: DeltaVComponentsKms;
+  /** Fragment Δv in TEME (km/s). */
+  deltaVKms: Vec3;
 }
 
 /**
  * Build one fragment's TLE, activate its reserved analyst slot, and seed its
- * render position. Returns the catalog id on success, or null when the fragment
- * is sub-orbital / unrepresentable (the caller counts it as reentered).
+ * render position. Returns the catalog id on success, 'reentered' when the
+ * fragment's perigee is too low, or 'failed' when it cannot be represented
+ * (no SGP4 fit, propagation failure, or no reserved slot for the number).
  *
  * @param sccNum6 - The 6-digit analyst catalog number for this fragment.
  * @param pieceIndex - 1-based fragment index (for the piece name).
- * @param input - Parent state, RIC basis, and sampled Δv.
+ * @param input - Parent state and inertial Δv.
  * @param epoch - Breakup time (fragment TLE epoch).
  */
-function injectFragment_(sccNum6: number, pieceIndex: number, input: FragmentInput, epoch: Date): number | null {
+function injectFragment_(sccNum6: number, pieceIndex: number, input: FragmentInput, epoch: Date): number | 'reentered' | 'failed' {
   const catalogManagerInstance = ServiceLocator.getCatalogManager();
   const orbitManagerInstance = ServiceLocator.getOrbitManager();
   const a5Num = Tle.convert6DigitToA5(sccNum6.toString());
   const pieceSatId = catalogManagerInstance.sccNum2Id(a5Num);
 
   if (!pieceSatId) {
-    return null;
+    return 'failed';
   }
 
   let pieceTle1: TleLine1;
   let pieceTle2: TleLine2;
 
   try {
-    ({ tle1: pieceTle1, tle2: pieceTle2 } = buildFragmentTle(epoch, input.position, input.velocity, input.basis, input.dv, a5Num));
-  } catch {
-    // Degenerate / sub-orbital fragment (hyperbolic Δv, or perigee below the
-    // surface from a large Δv on a low orbit). Skip it, never abort the cloud.
-    return null;
+    ({ tle1: pieceTle1, tle2: pieceTle2 } = buildFragmentTle(epoch, input.position, input.velocity, input.deltaVKms, a5Num));
+  } catch (err) {
+    // Perigee too low (reenters), or a degenerate state SGP4 cannot fit. Skip
+    // the fragment, never abort the cloud.
+    return err instanceof SubOrbitalFragmentError ? 'reentered' : 'failed';
   }
 
   let newSat: Satellite;
@@ -199,11 +223,13 @@ function injectFragment_(sccNum6: number, pieceIndex: number, input: FragmentInp
       active: true,
     });
   } catch {
-    return null;
+    return 'failed';
   }
 
+  // The epoch position is the breakup point (the parent's altitude), so this only
+  // catches an SGP4 propagation failure; low perigees were rejected above.
   if (SatMath.altitudeCheck(newSat.satrec!, epoch) <= 1) {
-    return null;
+    return 'failed';
   }
 
   catalogManagerInstance.objectCache[pieceSatId] = newSat;

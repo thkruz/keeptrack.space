@@ -43,3 +43,41 @@
 #breakup-clear-btn .kt-action-label {
   color: var(--color-danger, #ff5252);
 }
+
+/* Live delta-V statistics readout under the dispersion inputs. */
+#breakup-menu .breakup-dv-stats {
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+}
+#breakup-menu .breakup-dv-warning {
+  color: var(--color-warning, #ffb300);
+}
+#breakup-menu .breakup-dv-unit {
+  margin-bottom: 0;
+}
+
+/*
+ * Axis labels: the three columns are ~100px, and translated axis names (and NTW's
+ * "(W)" suffixes) need two lines. A floating label is absolutely positioned, so a
+ * second line would run into the input; put these labels in normal flow instead,
+ * bottom-aligned in a two-line box so the three inputs stay level.
+ */
+#hc-dv-axes .kt-field-row .input-field.col {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+}
+#hc-dv-axes .input-field > label,
+#hc-dv-axes .input-field > label.active {
+  /* The label follows its input in the DOM; show it above. */
+  order: -1;
+  position: static;
+  transform: none;
+  display: flex;
+  align-items: flex-end;
+  min-height: 2.4em;
+  margin-bottom: 2px;
+  font-size: 0.8rem;
+  line-height: 1.2;
+  white-space: normal;
+}

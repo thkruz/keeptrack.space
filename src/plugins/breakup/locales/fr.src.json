@@ -18,11 +18,45 @@
         "preset_asat_fy1c": "ASAT, Fengyun-1C (énergie plus élevée)",
         "preset_venting": "Basse énergie / dégazage",
         "preset_custom": "Personnalisé",
-        "radialDeltaV": "Radial (m/s)",
-        "inTrackDeltaV": "Le long de l'orbite (m/s)",
-        "crossTrackDeltaV": "Hors plan orbital (m/s)",
-        "dispersionHint": "Changement de vitesse aléatoire appliqué à chaque fragment (1 sigma). La composante le long de l'orbite étire le nuage le long de la trajectoire ; la composante hors plan l'étale à travers le plan orbital ; la composante radiale le monte et le descend. Événements typiques : explosions d'environ 10 à 100 m/s, collisions d'environ 100 à 300 m/s.",
-        "piecesSection": "Nombre"
+        "dispersionHint": "Variation de vitesse aléatoire appliquée à chaque fragment. Le long de l'orbite, elle étire le nuage le long de l'orbite ; hors plan, elle le déploie de part et d'autre du plan orbital ; en radial, elle l'élève et l'abaisse. Vitesses moyennes typiques : explosions environ 10 à 100 m/s, collisions environ 100 à 300 m/s.",
+        "piecesSection": "Nombre",
+        "frameLabel": "Repère de coordonnées",
+        "frame_rtn": "RTN / RIC (repère orbital local)",
+        "frame_ntw": "NTW (aligné sur la vitesse)",
+        "frame_eci": "ECI (X, Y, Z inertiels ; TEME)",
+        "modelLabel": "Modèle de dispersion",
+        "model_gaussian": "Gaussien (écart type 1σ par axe)",
+        "model_maxwellian": "Maxwellien isotrope (vitesse moyenne cible)",
+        "model_uniform": "Uniforme (±vitesse max. par axe)",
+        "axis1_rtn": "Radial",
+        "axis2_rtn": "Le long de l'orbite",
+        "axis3_rtn": "Hors plan orbital",
+        "axis1_ntw": "Normale (N)",
+        "axis2_ntw": "Vitesse (T)",
+        "axis3_ntw": "Hors plan orbital (W)",
+        "axis1_eci": "X",
+        "axis2_eci": "Y",
+        "axis3_eci": "Z",
+        "axis1_rtn_tooltip": "Le long du vecteur position, en s'éloignant de la Terre. Élève et abaisse les fragments.",
+        "axis2_rtn_tooltip": "Dans le plan orbital, perpendiculaire au radial, dans le sens du mouvement. Étire le nuage le long de l'orbite.",
+        "axis3_rtn_tooltip": "Le long de la normale à l'orbite (r × v). Déploie le nuage en éventail de part et d'autre du plan orbital.",
+        "axis1_ntw_tooltip": "Dans le plan orbital, perpendiculaire à la vitesse et orienté vers l'extérieur. Correspond au radial sur une orbite circulaire.",
+        "axis2_ntw_tooltip": "Le long du vecteur vitesse. Modifie le plus directement l'énergie orbitale (période).",
+        "axis3_ntw_tooltip": "Le long de la normale à l'orbite (r × v). Même axe que l'axe hors plan de RTN.",
+        "axis1_eci_tooltip": "Axe X inertiel TEME, vers l'équinoxe vernal.",
+        "axis2_eci_tooltip": "Axe Y inertiel TEME, 90° à l'est de X dans le plan équatorial.",
+        "axis3_eci_tooltip": "Axe Z inertiel TEME, vers le pôle nord céleste.",
+        "unitSigma": "1σ m/s",
+        "unitMax": "±max m/s",
+        "unitTooltip_gaussian": "La valeur est l'écart type 1σ d'une gaussienne de moyenne nulle sur cet axe.",
+        "unitTooltip_maxwellian": "Isotrope : chaque axe utilise le σ dérivé de la vitesse moyenne d'éjection.",
+        "unitTooltip_uniform": "La valeur est la demi-largeur : chaque fragment est tiré uniformément entre -max et +max sur cet axe.",
+        "meanSpeed": "Vitesse moyenne d'éjection (m/s)",
+        "meanSpeedTooltip": "Moyenne cible de la vitesse totale |Δv|. Chaque axe est tiré d'une gaussienne avec σ = μ / 1.596, de sorte que la vitesse totale suit une distribution de Maxwell-Boltzmann.",
+        "maxTotalSpeed": "Vitesse totale max. (m/s)",
+        "maxTotalSpeedOff": "Désactivé",
+        "maxTotalSpeedTooltip": "Facultatif. Les fragments dont le Δv aléatoire total dépasse cette valeur sont tirés à nouveau, ce qui coupe la queue extrême sans déformer le reste de la distribution. Laisser vide pour aucun plafond.",
+        "axesCaption": "Valeurs par axe, {unit}"
       },
       "buttons": {
         "createBreakup": "Créer une fragmentation",
@@ -34,7 +68,8 @@
       },
       "toasts": {
         "cleared": "Fragmentation effacée. Débris supprimés.",
-        "fragmentsReentered": "{count} fragments sont rentrés dans l'atmosphère et n'ont pas été créés."
+        "fragmentsReentered": "{count} fragments sont rentrés dans l'atmosphère et n'ont pas été créés.",
+        "fragmentsFailed": "{count} fragments n'ont pas pu être ajustés à une orbite ou n'avaient pas d'emplacement libre dans le catalogue et n'ont pas été créés."
       },
       "help": {
         "overview": "Le menu Fragmentation simule la fragmentation d'un satellite à sa position actuelle. Il génère des fragments de débris à l'emplacement exact du satellite sélectionné, chacun partant avec un petit changement de vitesse aléatoire (delta-V), afin que vous puissiez observer le nuage de débris se former et s'étendre au fil du temps. Comme il fonctionne à partir du vecteur d'état du satellite, il prend en charge tous les régimes orbitaux.",
@@ -45,7 +80,9 @@
         "howToUse": "<ol><li>Sélectionnez n'importe quel satellite. L'icône reste désactivée tant qu'aucun satellite n'est sélectionné.</li><li>Ouvrez le menu Fragmentation et ajustez la dispersion delta-V et le nombre de fragments.</li><li>Cliquez sur <strong>Créer une fragmentation</strong>. Les fragments sont générés à la position actuelle du satellite et la barre de recherche se remplit avec les nouveaux débris pour que vous puissiez voir tout le nuage.</li><li>Accélérez le temps pour observer le nuage se disperser le long de l'orbite.</li></ol>",
         "tip1": "Fonctionne dans tous les régimes orbitaux, y compris LEO, MEO, GEO et les orbites très elliptiques (HEO), car chaque fragment est propagé à partir du vecteur d'état du satellite parent au point de fragmentation.",
         "tip2": "La fragmentation est simulée et n'existe qu'en mémoire. Utilisez Effacer la fragmentation pour supprimer les débris, ou rechargez la page. Le satellite parent lui-même n'est jamais modifié.",
-        "tip3": "Tous les fragments sont créés comme des objets de type débris, donc les schémas de couleurs et les filtres basés sur les débris s'y appliquent immédiatement."
+        "tip3": "Tous les fragments sont créés comme des objets de type débris, donc les schémas de couleurs et les filtres basés sur les débris s'y appliquent immédiatement.",
+        "dispersionModelsHeading": "Repères et modèles de dispersion",
+        "dispersionModels": "<ul><li><strong>Repère de coordonnées</strong> : <strong>RTN / RIC</strong> (par défaut) utilise les axes radial, le long de l'orbite (transverse) et hors plan orbital. <strong>NTW</strong> aligne le deuxième axe sur le vecteur vitesse, ce qui diffère de RTN sur les orbites excentriques. <strong>ECI</strong> applique les valeurs directement aux axes inertiels X, Y et Z (TEME, le repère utilisé par SGP4).</li><li><strong>Gaussien</strong> (par défaut) : chaque axe est tiré indépendamment d'une loi normale de moyenne nulle avec le 1σ saisi. Avec le même σ sur les trois axes, la vitesse totale suit une distribution de Maxwell-Boltzmann de moyenne 2σ√(2/π) ≈ 1.596σ, donc 54.2 m/s par axe donne une vitesse moyenne de 86.5 m/s.</li><li><strong>Maxwellien isotrope</strong> : saisissez directement la vitesse moyenne d'éjection cible et le σ par axe est calculé pour vous.</li><li><strong>Uniforme</strong> : chaque axe est tiré uniformément entre -max et +max.</li><li><strong>Vitesse totale max.</strong> (facultatif) : les fragments plus rapides que le plafond sont tirés à nouveau, ce qui élimine les valeurs aberrantes et conserve la forme de la distribution sous le plafond.</li></ul>L'affichage sous les champs indique la vitesse moyenne, RMS et au 99e centile attendue avant de créer la fragmentation. Les fragments dont la nouvelle orbite a un périgée inférieur à 100 km sont signalés comme rentrés dans l'atmosphère et ne sont pas créés."
       },
       "errorMsgs": {
         "SatelliteNotFound": "Satellite introuvable !",
@@ -53,6 +90,14 @@
         "InvalidStartNum": "Numéro de départ du satellite invalide ! Valeur par défaut : 90000 !",
         "InvalidSlotRange": "Numéro de satellite initial hors plage. Utilisez {start} à {end}.",
         "BreakupGeneratorFailed": "Échec du générateur de fragmentation !"
+      },
+      "stats": {
+        "meanSpeed": "Vitesse moyenne attendue",
+        "rmsSpeed": "Vitesse RMS",
+        "p99Speed": "99e centile",
+        "derivedSigma": "σ par axe = {sigma} m/s (identique dans chaque repère)",
+        "capRejects": "Le plafond fait retirer {percent}% des fragments",
+        "capTooLow": "Le plafond est très inférieur à la dispersion : de nombreux fragments se retrouveront exactement au plafond."
       }
     }
   }

@@ -13,7 +13,18 @@ import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
 import type { DsResultRow } from '@app/webworker/debris-screening-messages';
-import { CatalogObject, CatalogScreener, cappedScreeningCovarianceFromTle, EpochUTC, Hours, Kilometers, Satellite, ScreeningResult, Seconds } from '@ootk/src/main';
+import {
+  CatalogObject,
+  CatalogScreener,
+  cappedScreeningCovarianceFromTle,
+  DEFAULT_SHELL_PAD_KM,
+  EpochUTC,
+  Hours,
+  Kilometers,
+  Satellite,
+  ScreeningResult,
+  Seconds,
+} from '@ootk/src/main';
 import frameInspectPng from '@public/img/icons/frame-inspect.png';
 import tableChartPng from '@public/img/icons/table-chart.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -102,6 +113,24 @@ export class DebrisScreening extends KeepTrackPlugin {
 
   /** How many completed runs getRecentScreeningRuns() retains. */
   static readonly MAX_RETAINED_RUNS = 5;
+
+  /**
+   * Radial pad (km) of the apogee / perigee pre-filter for a U / V / W box
+   * (half-widths). A secondary inside the box is at most the box half-diagonal
+   * from the primary, so its altitude differs from the primary's by at most
+   * that much; DEFAULT_SHELL_PAD_KM adds the mean-to-osculating margin (Hoots
+   * et al. 1984). Without the box term a 500 km box silently dropped every
+   * object whose shell sat more than 10 km above or below the primary's
+   * (scenario 3: ION SCV-017 and STARLINK-6240, 110 and 120 km from 63218).
+   */
+  static shellPadKm(uKm: number, vKm: number, wKm: number): Kilometers {
+    return (Math.hypot(uKm, vKm, wKm) + DEFAULT_SHELL_PAD_KM) as Kilometers;
+  }
+
+  /** Whether two altitude bands (perigee / apogee altitudes, km), widened by `padKm`, overlap. */
+  static shellsCanMeet(primary: { perigee: number; apogee: number }, secondary: { perigee: number; apogee: number }, padKm: number): boolean {
+    return !(secondary.perigee - padKm > primary.apogee || primary.perigee - padKm > secondary.apogee);
+  }
 
   isRequireSatelliteSelected = true;
   isIconDisabledOnLoad = true;
@@ -714,8 +743,9 @@ export class DebrisScreening extends KeepTrackPlugin {
         covariance,
       };
 
-      // Build secondaries array with orbital shell pre-filtering
+      // Build secondaries array with orbital shell pre-filtering, padded by the box size
       const secondaries: CatalogObject[] = [];
+      const shellPad = DebrisScreening.shellPadKm(uVal, vVal, wVal);
 
       catalogManager.objectCache.forEach((obj) => {
         // instanceof excludes OemSatellite, which lacks tle1/tle2/apogee/perigee
@@ -725,8 +755,8 @@ export class DebrisScreening extends KeepTrackPlugin {
         }
         const sat2 = obj;
 
-        // Basic orbital shell filtering
-        if (sat2.perigee > sat.apogee || sat.perigee > sat2.apogee) {
+        // Basic orbital shell filtering: only shells that can reach the box
+        if (!DebrisScreening.shellsCanMeet(sat, sat2, shellPad)) {
           return;
         }
 
@@ -759,6 +789,8 @@ export class DebrisScreening extends KeepTrackPlugin {
           searchStepSize: 240 as Seconds,
           // Coarse-to-fine keeps the synchronous fallback usable on multi-day windows
           tcaSearchMode: 'coarse-to-fine',
+          // ootk's own shell filter defaults to a 10 km pad; widen it to the box as above
+          shellPad,
         });
 
         // Filter by individual RIC components (box filter, not spherical)

@@ -8,7 +8,17 @@
  */
 
 import type { DsSecondaryData } from '@app/app/threads/debris-screening-thread-manager';
-import { ConjunctionAssessment, cappedScreeningCovarianceFromTle, EpochUTC, type Kilometers, ScreeningFilter, type Seconds, StateCovariance, Tle } from '@ootk/src/main';
+import {
+  ConjunctionAssessment,
+  cappedScreeningCovarianceFromTle,
+  DEFAULT_SHELL_PAD_KM,
+  EpochUTC,
+  type Kilometers,
+  ScreeningFilter,
+  type Seconds,
+  StateCovariance,
+  Tle,
+} from '@ootk/src/main';
 import { type DsMsgStartScreening, type DsResultRow, type DsWorkerInMsg, DsWorkerMsgType, DsWorkerOutMsgType } from './debris-screening-messages';
 import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
@@ -175,7 +185,7 @@ function handleStartScreening_(msg: DsMsgStartScreening): void {
     }
 
     // Phase 1: Coarse filter
-    const candidateIndices = ScreeningFilter.filterCandidates(primaryTle, secondaryTles);
+    const candidateIndices = ScreeningFilter.filterCandidates(primaryTle, secondaryTles, (Math.hypot(uVal, vVal, wVal) + DEFAULT_SHELL_PAD_KM) as Kilometers);
 
     postMessage({
       typ: DsWorkerOutMsgType.PROGRESS,

@@ -23,9 +23,14 @@ import { KeyboardComponent } from '@app/engine/plugins/components/keyboard/keybo
 import { KeepTrack } from '@app/keeptrack';
 import { TranslationKey, t7e } from '@app/locales/keys';
 import { EventBus } from '../events/event-bus';
+import { buildHelpHtml } from '../plugins/components/help/help-html';
+import { getGeneralHelpConfig } from '../ui/help/general-help';
 import { html } from './development/formatter';
 import { getEl } from './get-el';
 import { PersistenceManager, StorageKey } from './persistence-manager';
+
+/** Owner id of the Shift+F1 binding; the general help lists the shortcuts registered under it. */
+const ADVICE_MANAGER_ID = 'AdviceManager';
 
 export class AdviceManager {
   private helpHeaderDOM: HTMLElement;
@@ -81,21 +86,41 @@ export class AdviceManager {
     this.helpHeaderDOM = getEl('help-header')!;
     this.helpTextDOM = getEl('help-text')!;
 
-    new KeyboardComponent('AdviceManager', [
+    new KeyboardComponent(ADVICE_MANAGER_ID, [
       {
         key: 'F1',
         code: 'F1',
         shift: true,
         description: t7e('keyboard.descriptions.openHelp' as TranslationKey),
-        callback: () => {
-          if (this.isAdviceOpen) {
-            this.closeAdvice();
-          } else {
-            EventBus.getInstance().emit(EventBusEvent.onHelpMenuClick);
-          }
-        },
+        callback: () => this.onHelpKey_(),
       },
     ]).init();
+  }
+
+  /**
+   * Shift+F1: closes an open help; otherwise asks the open menu or active view for its help (at
+   * most one plugin answers, see KeepTrackPlugin.resolveHelpTarget) and falls back to the general
+   * KeepTrack help when nothing answered.
+   */
+  private onHelpKey_(): void {
+    if (this.isAdviceOpen) {
+      this.closeAdvice();
+
+      return;
+    }
+
+    EventBus.getInstance().emit(EventBusEvent.onHelpMenuClick);
+
+    if (!this.isAdviceOpen) {
+      this.showGeneralHelp();
+    }
+  }
+
+  /** Shows the app-level help used when no menu or view is open. */
+  public showGeneralHelp(): void {
+    const config = getGeneralHelpConfig();
+
+    this.showAdvice(config.title, buildHelpHtml(config, ADVICE_MANAGER_ID));
   }
 
   public isEnabled(): boolean {

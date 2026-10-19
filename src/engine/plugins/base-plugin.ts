@@ -180,6 +180,22 @@ export abstract class KeepTrackPlugin {
   helpBody: string;
 
   /**
+   * How this plugin takes part in answering a help request (Shift+F1). See
+   * {@link KeepTrackPlugin.resolveHelpTarget}.
+   *
+   * - `'auto'` (default): a side-menu plugin answers while its menu is open. A camera/view mode
+   *   (or a plain toggle with its own UI) answers while active and no side menu is open. Layer and
+   *   settings toggles never answer, since they have no menu of their own to explain.
+   * - `'view'`: answer like a full-screen view while active, even when grouped as a layer toggle
+   *   (for example a full-screen overlay).
+   * - `'none'`: never answer.
+   */
+  helpRole: 'auto' | 'view' | 'none' = 'auto';
+
+  /** True once this plugin registered help content (config or title/body). */
+  protected hasHelp_ = false;
+
+  /**
    * Whether the bottom icon is disabled by default.
    */
   isIconDisabledOnLoad = false;
@@ -480,6 +496,7 @@ export abstract class KeepTrackPlugin {
     if (hasHelp(this)) {
       const helpConfig = this.getHelpConfig();
 
+      this.hasHelp_ = true;
       this.helpComponent_ = new HelpComponent(this.id, helpConfig, () => this.isHelpTarget_());
       this.helpComponent_.init();
     } else if (this.helpTitle && this.helpBody) {
@@ -1622,30 +1639,53 @@ export abstract class KeepTrackPlugin {
   }
 
   /**
+   * Picks the single plugin that answers a help request (Shift+F1), or null when the general
+   * KeepTrack help should be shown instead (see AdviceManager).
+   *
+   * Only active plugins that registered help are candidates, in this order:
+   * 1. a plugin whose side menu is open;
+   * 2. an active overlay (`helpRole: 'view'`, or a plain toggle with no utility group);
+   * 3. an active camera/view mode (Flat Map, Polar View, Astronomy, Planetarium, ...).
+   *
+   * Layer and settings toggles (Covariance Ellipsoids and the like) stay "active" for as long as
+   * the layer is on, so they never answer by default: otherwise they would hijack Shift+F1 from
+   * whatever the user is actually looking at.
+   */
+  static resolveHelpTarget(): KeepTrackPlugin | null {
+    const candidates = PluginRegistry.plugins.filter((plugin) => plugin.isMenuButtonActive && plugin.hasHelp_ && plugin.helpRole !== 'none');
+
+    return (
+      candidates.find((plugin) => plugin.helpRole === 'auto' && Boolean(plugin.sideMenuElementName)) ??
+      candidates.find((plugin) => plugin.isHelpOverlay_()) ??
+      candidates.find((plugin) => plugin.helpRole === 'auto' && !plugin.sideMenuElementName && plugin.utilityGroup === UtilityGroup.CAMERA_MODE) ??
+      null
+    );
+  }
+
+  /** An active surface without a side menu that is not a camera mode or a layer/settings toggle. */
+  private isHelpOverlay_(): boolean {
+    if (this.helpRole === 'view') {
+      return true;
+    }
+
+    return this.helpRole === 'auto' && !this.sideMenuElementName && this.utilityGroup === null;
+  }
+
+  /**
+   * Whether this plugin should answer a help request (Shift+F1). Exactly one plugin (or none)
+   * answers; see {@link KeepTrackPlugin.resolveHelpTarget}.
+   */
+  protected isHelpTarget_(): boolean {
+    return KeepTrackPlugin.resolveHelpTarget() === this;
+  }
+
+  /**
    * Registers a callback function to show help text when the help menu button is clicked.
    * @param helpTitle The title of the help text to show.
    * @param helpText The help text to show.
    */
-  /**
-   * Whether this plugin should answer a help request (Shift+F1 or the help button).
-   *
-   * Plugins with a side menu answer whenever their menu is active. Toggle-only plugins (layer
-   * toggles such as Covariance Ellipsoids) stay "active" for as long as the toggle is on, so they
-   * would otherwise override the help of whichever side menu the user is actually looking at. They
-   * only answer when no side-menu plugin is active.
-   */
-  protected isHelpTarget_(): boolean {
-    if (!this.isMenuButtonActive) {
-      return false;
-    }
-    if (this.sideMenuElementName) {
-      return true;
-    }
-
-    return !PluginRegistry.plugins.some((plugin) => plugin !== this && plugin.isMenuButtonActive && Boolean(plugin.sideMenuElementName));
-  }
-
   registerHelp(helpTitle: string, helpText: string) {
+    this.hasHelp_ = true;
     EventBus.getInstance().on(EventBusEvent.onHelpMenuClick, (): boolean => {
       if (this.isHelpTarget_()) {
         adviceManagerInstance.showAdvice(helpTitle, helpText);

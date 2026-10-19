@@ -1,0 +1,10 @@
+{
+  "generalHelp": {
+    "title": "KeepTrack Help",
+    "overview": "No menu or view is open, so this is the general KeepTrack help. Every menu and view has its own help.",
+    "howToUse": "Open the drawer and pick a tool to open its menu, or switch to a view such as the Flat Map or Polar View. Then press Shift+F1 to see the help for that menu or view. Click an object on the globe to select it and see its details.",
+    "tip1": "Layers you turn on (for example covariance ellipsoids) have no menu of their own, so Shift+F1 keeps showing this general help while only layers are on.",
+    "tip2": "Click anywhere on this panel to close it.",
+    "shortcutClose": "Close the help"
+  }
+}

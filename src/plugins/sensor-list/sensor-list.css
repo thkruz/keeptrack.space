@@ -85,10 +85,24 @@
   overflow: hidden;
 }
 
+/* Long station names (e.g. the SODA ground stations) wrap onto a second line
+ * instead of being clipped, so the row grows past the shared 40px height. */
+#sensor-list-content .sensor-row {
+  height: auto;
+  min-height: 40px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+#sensor-list-content .sensor-row .kt-action-label {
+  white-space: normal;
+}
+
 #sensor-list-content .sensor-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
 }
 
 #sensor-list-content .sensor-system {

@@ -166,7 +166,8 @@
         "rise": "Sorgere",
         "set": "Tramonto",
         "maxEl": "El. max",
-        "unknown": "Sconosciuto"
+        "unknown": "Sconosciuto",
+        "inView": "In vista"
       },
       "maskLimited": "maschera",
       "maskLimitedTitle": "Questo bordo è fissato dalla maschera d'orizzonte del sensore, non dalla sua elevazione minima",

@@ -26,6 +26,31 @@ type LookAngleData = TearrData & { canStationObserve: boolean };
 /** Shorthand for this plugin's locale keys. */
 const l = (key: string): string => t7e(`plugins.LookAnglesPlugin.${key}` as Parameters<typeof t7e>[0]);
 
+/**
+ * Compact UTC stamp (`YYYYMMDDTHHMMSSZ`) for export file names, built from a look-angle
+ * `time` string (`yyyy-mm-dd HH:MM:ss`, already UTC). Returns '' when the input has no full date.
+ */
+export const compactUtcStamp = (time: string | undefined): string => {
+  const digits = (time ?? '').replace(/\D/gu, '').slice(0, 14);
+
+  if (digits.length < 14) {
+    return '';
+  }
+
+  return `${digits.slice(0, 8)}T${digits.slice(8, 14)}Z`;
+};
+
+/** Makes a string safe for a download file name (no spaces, slashes or parentheses). */
+export const fileSafeName = (name: string): string =>
+  name
+    .replace(/[^\w.-]+/gu, '_')
+    .replace(/_+/gu, '_')
+    .replace(/^_|_$/gu, '');
+
+/** Rounds to a fixed number of decimals and keeps the value numeric, so XLSX writes a number cell. */
+export const roundOrNull = (value: number | null | undefined, decimals: number): number | null =>
+  typeof value === 'number' && Number.isFinite(value) ? Number(value.toFixed(decimals)) : null;
+
 export class LookAnglesPlugin extends KeepTrackPlugin {
   readonly id = 'LookAnglesPlugin';
   dependencies_ = [SelectSatManager.name];
@@ -129,19 +154,41 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       sensorDisplayName = 'Unknown Sensor';
     }
 
-    const csvData = this.lastlooksArray_.map((look) => ({
-      Time: dateFormat(look.time, 'isoDateTime', false),
-      Type: LookAnglesPlugin.tearrTypeToString_(look.type as TearrType),
-      Azimuth: look.az?.toFixed(1) ?? 'Unknown',
-      Elevation: look.el?.toFixed(1) ?? 'Unknown',
-      Range: look.rng?.toFixed(0) ?? 'Unknown',
-      Sensor: sensorDisplayName,
-    }));
-
     const lookAnglesSat = this.selectSatManager_.getSelectedSat() as Satellite;
 
-    saveXlsx(csvData, `${sensorDisplayName ?? 'unk'}-${lookAnglesSat.sccNum6 ?? lookAnglesSat.sccNum}-look-angles`);
+    saveXlsx(
+      LookAnglesPlugin.buildExportRows_(this.lastlooksArray_, sensorDisplayName),
+      LookAnglesPlugin.buildExportFileName_(sensorDisplayName, `${lookAnglesSat.sccNum6 ?? lookAnglesSat.sccNum}`, this.lastlooksArray_[0]?.time)
+    );
   };
+
+  /** Export rows. Numeric columns stay numbers (not toFixed strings) so the XLSX has number cells. */
+  private static buildExportRows_(looks: TearrData[], sensorDisplayName: string): Record<string, string | number | null>[] {
+    return looks.map((look) => ({
+      Time: dateFormat(look.time, 'isoDateTime', false),
+      Type: LookAnglesPlugin.tearrTypeToString_(look.type),
+      Azimuth: roundOrNull(look.az, 1),
+      Elevation: roundOrNull(look.el, 1),
+      Range: roundOrNull(look.rng, 1),
+      Sensor: sensorDisplayName,
+    }));
+  }
+
+  /**
+   * File name for a look-angles export: sensor, object, and the UTC start time of the first
+   * row, so successive pass exports for the same object no longer overwrite each other.
+   */
+  private static buildExportFileName_(sensorName: string, objId: string, firstTime: string | undefined): string {
+    const stamp = compactUtcStamp(firstTime);
+    const parts = [fileSafeName(sensorName) || 'unk', fileSafeName(objId) || 'unk'];
+
+    if (stamp) {
+      parts.push(stamp);
+    }
+    parts.push('look-angles');
+
+    return parts.join('-');
+  }
   sideMenuSecondaryOptions = {
     width: 300,
     zIndex: 3,
@@ -336,12 +383,10 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
     tdT.appendChild(document.createTextNode(l('table.time')));
 
-    // If isRiseSetOnly is true, add a column for type
+    // Type column: Rise/Set/Max El in rise-set mode, "In View" for every sample otherwise
     const tdType: HTMLTableCellElement = tr.insertCell();
 
-    if (lookAngleData.length > 0 && typeof lookAngleData[0].type !== 'undefined') {
-      tdType.appendChild(document.createTextNode(l('table.type')));
-    }
+    tdType.appendChild(document.createTextNode(l('table.type')));
 
     const tdE = tr.insertCell();
 
@@ -406,7 +451,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
       if (tdType) {
         tdType = tr.insertCell();
-        tdType.appendChild(document.createTextNode(this.tearrTypeToString_(entry.type ?? TearrType.UNKNOWN)));
+        tdType.appendChild(document.createTextNode(this.tearrTypeToString_(entry.type)));
         if (entry.maskLimited) {
           tdType.appendChild(LookAnglesPlugin.createMaskMarker_());
         }
@@ -439,7 +484,15 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     return marker;
   }
 
-  private static tearrTypeToString_(type: TearrType): string {
+  /**
+   * Label for a row's pass type. Rows without a type come from the full (not rise/set only)
+   * table, where every emitted sample is inside the sensor's field of view: label them "In View".
+   */
+  private static tearrTypeToString_(type?: TearrType): string {
+    if (typeof type === 'undefined') {
+      return l('msgs.inView');
+    }
+
     switch (type) {
       case TearrType.RISE:
         return l('msgs.rise');

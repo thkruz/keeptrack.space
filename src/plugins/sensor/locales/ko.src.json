@@ -166,7 +166,8 @@
         "rise": "상승",
         "set": "하강",
         "maxEl": "최대 고도각",
-        "unknown": "알 수 없음"
+        "unknown": "알 수 없음",
+        "inView": "시야 내"
       },
       "maskLimited": "마스크",
       "maskLimitedTitle": "이 경계는 센서의 최소 고각이 아니라 지평선 마스크로 정해집니다",

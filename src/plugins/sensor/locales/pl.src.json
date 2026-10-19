@@ -166,7 +166,8 @@
         "rise": "Wschód",
         "set": "Zachód",
         "maxEl": "Maks. El.",
-        "unknown": "Nieznany"
+        "unknown": "Nieznany",
+        "inView": "W zasięgu"
       },
       "maskLimited": "maska",
       "maskLimitedTitle": "Tę krawędź wyznacza maska horyzontu sensora, a nie jego minimalna elewacja",

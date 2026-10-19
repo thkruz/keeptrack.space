@@ -166,7 +166,8 @@
         "rise": "上昇",
         "set": "下降",
         "maxEl": "最大仰角",
-        "unknown": "不明"
+        "unknown": "不明",
+        "inView": "視野内"
       },
       "maskLimited": "マスク",
       "maskLimitedTitle": "この境界はセンサーの最小仰角ではなく地平線マスクで決まります",

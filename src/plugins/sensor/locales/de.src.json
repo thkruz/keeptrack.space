@@ -166,7 +166,8 @@
         "rise": "Aufgang",
         "set": "Untergang",
         "maxEl": "Max. El.",
-        "unknown": "Unbekannt"
+        "unknown": "Unbekannt",
+        "inView": "Im Sichtfeld"
       },
       "maskLimited": "Maske",
       "maskLimitedTitle": "Diese Kante wird durch die Horizontmaske des Sensors bestimmt, nicht durch seine Mindestelevation",

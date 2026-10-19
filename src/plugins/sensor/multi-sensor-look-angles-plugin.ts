@@ -23,6 +23,7 @@ import { sensorGroups } from '../../app/data/catalogs/sensor-groups';
 import { SensorManager } from '../../app/sensors/sensorManager';
 import { ClickDragOptions, fileExcelPng, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { compactUtcStamp, roundOrNull } from './look-angles-plugin';
 import './multi-sensor-look-angles.css';
 
 /** Shorthand for this plugin's locale keys. */
@@ -109,17 +110,29 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
     }
 
     ServiceLocator.getSoundManager()?.play(SoundNames.EXPORT);
-    const exportData = lastArray.map((look) => ({
+    const sccNum6 = (this.selectSatManager_?.getSelectedSat() as Satellite | undefined)?.sccNum6 ?? '000000';
+    const { rows, fileName } = MultiSensorLookAnglesPlugin.buildExport_(lastArray, sccNum6);
+
+    saveXlsx(rows, fileName);
+  };
+
+  /**
+   * Export rows and file name. Numbers stay numbers (not toFixed strings) so the XLSX writes
+   * number cells, and the first row's UTC time is in the name so exports do not overwrite each other.
+   */
+  private static buildExport_(looks: TearrData[], sccNum6: string): { rows: Record<string, unknown>[]; fileName: string } {
+    const rows = looks.map((look) => ({
       time: look.time,
       sensor: look.objName,
-      az: look.az?.toFixed(2) ?? l('msgs.na'),
-      el: look.el?.toFixed(2) ?? l('msgs.na'),
-      rng: look.rng?.toFixed(2) ?? l('msgs.na'),
+      az: roundOrNull(look.az, 2),
+      el: roundOrNull(look.el, 2),
+      rng: roundOrNull(look.rng, 2),
       visible: look.visible,
     }));
+    const stamp = compactUtcStamp(looks[0]?.time);
 
-    saveXlsx(exportData, `multisite-${(this.selectSatManager_?.getSelectedSat() as Satellite | undefined)?.sccNum6 ?? '000000'}-look-angles`);
-  };
+    return { rows, fileName: `multisite-${sccNum6}${stamp ? `-${stamp}` : ''}-look-angles` };
+  }
   sideMenuSecondaryOptions: SideMenuSettingsOptions = {
     width: 300,
     leftOffset: null,

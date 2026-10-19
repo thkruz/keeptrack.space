@@ -166,7 +166,8 @@
         "rise": "Salida",
         "set": "Puesta",
         "maxEl": "El. máx.",
-        "unknown": "Desconocido"
+        "unknown": "Desconocido",
+        "inView": "En vista"
       },
       "maskLimited": "máscara",
       "maskLimitedTitle": "Este borde lo define la máscara de horizonte del sensor, no su elevación mínima",

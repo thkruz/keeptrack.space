@@ -166,7 +166,8 @@
         "rise": "Rise",
         "set": "Set",
         "maxEl": "Max El",
-        "unknown": "Unknown"
+        "unknown": "Unknown",
+        "inView": "In View"
       },
       "maskLimited": "mask",
       "maskLimitedTitle": "This edge is set by the sensor's horizon mask, not its minimum elevation",

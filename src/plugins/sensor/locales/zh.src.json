@@ -166,7 +166,8 @@
         "rise": "升起",
         "set": "落下",
         "maxEl": "最大仰角",
-        "unknown": "未知"
+        "unknown": "未知",
+        "inView": "在视野内"
       },
       "maskLimited": "遮罩",
       "maskLimitedTitle": "此边界由传感器的地平线遮罩决定，而非其最小仰角",

@@ -166,7 +166,8 @@
         "rise": "Lever",
         "set": "Coucher",
         "maxEl": "Élév. max.",
-        "unknown": "Inconnu"
+        "unknown": "Inconnu",
+        "inView": "En vue"
       },
       "maskLimited": "masque",
       "maskLimitedTitle": "Ce bord est fixé par le masque d'horizon du capteur, pas par son élévation minimale",

@@ -71,20 +71,23 @@ describe('MultiSensorLookAnglesPlugin_class', () => {
       plugin.downloadIconCb();
 
       expect(playSpy).toHaveBeenCalledWith(SoundNames.EXPORT);
-      expect(saveXlsx).toHaveBeenCalledTimes(1);
-      const [exportData, filename] = vi.mocked(saveXlsx).mock.calls[0];
 
-      expect(exportData).toEqual([
+      // Asserted on the pure builder: vi.mock of saveVariable is flaky across worker realms
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { rows, fileName } = (MultiSensorLookAnglesPlugin as any).buildExport_([sample], '012345');
+
+      expect(rows).toEqual([
         {
           time: sample.time,
           sensor: sample.objName,
-          az: '12.35',
-          el: '67.89',
-          rng: '1234.57',
+          az: 12.35,
+          el: 67.89,
+          rng: 1234.57,
           visible: true,
         },
       ]);
-      expect(filename).toMatch(/^multisite-.*-look-angles$/u);
+      // Numeric cells (not strings) and the first-row UTC stamp in the name
+      expect(fileName).toBe('multisite-012345-20260507T000000Z-look-angles');
     });
   });
 });

@@ -3,7 +3,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { LookAnglesPlugin } from '@app/plugins/sensor/look-angles-plugin';
+import { compactUtcStamp, fileSafeName, LookAnglesPlugin, roundOrNull } from '@app/plugins/sensor/look-angles-plugin';
 import { Degrees, Kilometers } from '@ootk/src/main';
 import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -114,6 +114,32 @@ describe('LookAnglesPlugin look-angle computation', () => {
     expect(toStr(TearrType.SET)).toBe('Set');
     expect(toStr(TearrType.MAX_EL)).toBe('Max El');
     expect(toStr(TearrType.UNKNOWN)).toBe('Unknown');
+    // Full-table rows (rise/set off) carry no type: every emitted sample is in view
+    expect(toStr(undefined)).toBe('In View');
+  });
+
+  it('populateSideMenuTable_ labels untyped rows "In View" (rise/set off), never "Unknown"', () => {
+    const base = { time: '2026-10-16 06:00:00', az: 120 as Degrees, el: 25 as Degrees, rng: 39524 as Kilometers, objName: 'COD', canStationObserve: false };
+
+    p().populateSideMenuTable_([base, { ...base, time: '2026-10-16 06:10:00' }], ServiceLocator.getTimeManager());
+
+    const rows = getEl('looks')!.querySelectorAll('tr');
+
+    expect(rows[0].textContent).toContain('Type');
+    expect(rows[1].textContent).toContain('In View');
+    expect(rows[2].textContent).toContain('In View');
+    expect(getEl('looks')!.textContent).not.toContain('Unknown');
+  });
+
+  it('compactUtcStamp, fileSafeName and roundOrNull build export-friendly values', () => {
+    expect(compactUtcStamp('2026-10-16 06:03:07')).toBe('20261016T060307Z');
+    expect(compactUtcStamp('2026-10-16T06:03:07.000Z')).toBe('20261016T060307Z');
+    expect(compactUtcStamp('')).toBe('');
+    expect(compactUtcStamp(undefined)).toBe('');
+    expect(fileSafeName('Custom Sensor (Flagstaff 0.5m)')).toBe('Custom_Sensor_Flagstaff_0.5m');
+    expect(roundOrNull(12.345678, 1)).toBe(12.3);
+    expect(roundOrNull(null, 1)).toBeNull();
+    expect(roundOrNull(Number.NaN, 1)).toBeNull();
   });
 
   it('settingsRisesetChange_ toggles isRiseSetOnly_ and throws on a missing event', () => {
@@ -148,5 +174,27 @@ describe('LookAnglesPlugin look-angle computation', () => {
     // Runs the full mapping path (sensor display name, csv build) through to export.
     expect(() => plugin.downloadIconCb()).not.toThrow();
     expect(getSelSpy).toHaveBeenCalled();
+  });
+
+  it('export rows are numeric and the file name carries sensor + UTC pass start', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cls = LookAnglesPlugin as any;
+    const looks = [
+      { time: '2026-10-16 06:03:07', az: 120.04 as Degrees, el: 10.06 as Degrees, rng: 1500.26 as Kilometers, objName: 'COD', type: TearrType.RISE },
+      { time: '2026-10-16 06:03:08', az: 120.5 as Degrees, el: 10.2 as Degrees, rng: 1499.8 as Kilometers, objName: 'COD' },
+    ];
+    const rows = cls.buildExportRows_(looks, 'Custom Sensor (Flagstaff 0.5m)') as Record<string, unknown>[];
+
+    expect(rows[0].Azimuth).toBe(120);
+    expect(rows[0].Elevation).toBe(10.1);
+    expect(rows[0].Range).toBe(1500.3);
+    expect(rows[0].Type).toBe('Rise');
+    expect(rows[1].Type).toBe('In View');
+    expect(typeof rows[1].Azimuth).toBe('number');
+
+    expect(cls.buildExportFileName_('Custom Sensor (Flagstaff 0.5m)', '063218', looks[0].time)).toBe('Custom_Sensor_Flagstaff_0.5m-063218-20261016T060307Z-look-angles');
+    // Two passes for the same object no longer share a name
+    expect(cls.buildExportFileName_('S', '063218', '2026-10-20 17:22:00')).not.toBe(cls.buildExportFileName_('S', '063218', '2026-10-16 06:03:07'));
+    expect(cls.buildExportFileName_('S', '063218', undefined)).toBe('S-063218-look-angles');
   });
 });

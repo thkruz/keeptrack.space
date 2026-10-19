@@ -166,7 +166,8 @@
         "rise": "Východ",
         "set": "Západ",
         "maxEl": "Max. El.",
-        "unknown": "Neznámé"
+        "unknown": "Neznámé",
+        "inView": "V dohledu"
       },
       "maskLimited": "maska",
       "maskLimitedTitle": "Tuto hranu určuje maska horizontu senzoru, ne jeho minimální elevace",

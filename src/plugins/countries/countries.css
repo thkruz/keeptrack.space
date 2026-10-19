@@ -6,7 +6,6 @@
   gap: 8px;
   flex: 1 1 auto;
   min-width: 0;
-  overflow: hidden;
 }
 
 #countries-menu .country-flag {
@@ -15,10 +14,21 @@
   height: 15px;
 }
 
+/* Long organization names (NATO, ESA, ...) in es/fr/ru/uk/pl/it are wider than the
+ * row; wrap them instead of clipping with an ellipsis. */
 #countries-menu .country-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: normal;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+#countries-menu .country-option.kt-action {
+  height: auto;
+  min-height: 40px;
+  padding-top: 6px;
+  padding-bottom: 6px;
 }
 
 #countries-menu .country-count {

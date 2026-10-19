@@ -1,0 +1,22 @@
+{
+  "plugins": {
+    "EpochAge": {
+      "badge": {
+        "caution": "Wiek epoki: średni, {days}",
+        "low": "Wiek epoki: niski, {days}",
+        "poor": "Wiek epoki: bardzo niski, {days}"
+      },
+      "tooltip": "Czas między symulacją a epoką zestawu elementów. Średni powyżej 3 dni, niski powyżej 7, bardzo niski powyżej 14: im starsze elementy, tym bardziej pozycje odbiegają od rzeczywistości.",
+      "toast": {
+        "poor": "W tym momencie elementy mają ponad 14 dni. Pozycje mogą się różnić o dziesiątki kilometrów lub więcej."
+      },
+      "settings": {
+        "sectionLabel": "Wiek epoki",
+        "showEpochAge": {
+          "label": "Pokaż plakietkę wieku epoki",
+          "helpText": "Ostrzegaj, gdy czas symulacji jest oddalony o ponad 3 dni od epoki elementów wybranego satelity."
+        }
+      }
+    }
+  }
+}

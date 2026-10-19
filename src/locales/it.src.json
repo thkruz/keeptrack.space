@@ -165,5 +165,10 @@
     "satNotFound": "Satellite \"{val}\" non trovato!",
     "intldesNotFound": "Designatore internazionale \"{val}\" non trovato!",
     "deepSpaceNoEphemeris": "{name} è un oggetto dello spazio profondo. Le sue effemeridi non sono ancora disponibili in KeepTrack."
+  },
+  "searchManager": {
+    "resultCountOne": "1 risultato",
+    "resultCount": "{count} risultati",
+    "resultCountLimited": "Mostrati {shown} di {total} risultati"
   }
 }

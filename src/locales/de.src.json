@@ -448,5 +448,10 @@
     "satNotFound": "Satellit \"{val}\" wurde nicht gefunden!",
     "intldesNotFound": "Internationale Kennung \"{val}\" wurde nicht gefunden!",
     "deepSpaceNoEphemeris": "{name} ist ein Objekt im tiefen Weltraum. Seine Ephemeriden sind in KeepTrack noch nicht verfügbar."
+  },
+  "searchManager": {
+    "resultCountOne": "1 Ergebnis",
+    "resultCount": "{count} Ergebnisse",
+    "resultCountLimited": "{shown} von {total} Ergebnissen angezeigt"
   }
 }

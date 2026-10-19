@@ -27,12 +27,18 @@
  */
 
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import { Degrees, J2000, Kilometers, LlaVec3, MILLISECONDS_PER_SECOND, PosVel, Satellite } from '@ootk/src/main';
+import { Degrees, J2000, Kilometers, LlaVec3, MILLISECONDS_PER_SECOND, PosVel, Satellite, Tle, TleLine1 } from '@ootk/src/main';
 
 /** A structured report table: a header row plus pre-formatted string cells. */
 export interface ReportTable {
   headers: string[];
   rows: string[][];
+}
+
+/** A titled table printed in the text output above the main table. */
+export interface ReportSection {
+  title: string;
+  table: ReportTable;
 }
 
 /**
@@ -49,6 +55,21 @@ export interface ReportData {
   table?: ReportTable;
   /** Message shown in place of rows when the table is empty (e.g. "No passes found"). */
   emptyMessage?: string;
+  /**
+   * When true the CSV download starts with the metadata {@link header} as `#` comment
+   * rows (station, window) before the table. Off by default so pure data CSVs stay clean.
+   */
+  csvIncludeHeader?: boolean;
+  /** Extra titled tables shown in the text output before the main table (CSV carries only the main table). */
+  sections?: ReportSection[];
+  /** Title printed above the main table in the text output. */
+  tableTitle?: string;
+  /**
+   * Structured payload for the JSON output. When set, JSON downloads this value
+   * instead of the header-keyed rows of {@link table} (the conjunction reports put
+   * their ConjunctionAnalysisState here).
+   */
+  json?: unknown;
   /** @deprecated Legacy raw CSV-ish body. Prefer {@link table}. */
   body?: string;
   /** @deprecated Legacy fixed-width column count. */
@@ -60,13 +81,111 @@ export interface ReportData {
 /** Sun-illumination state of the satellite, mapped to display strings by the core. */
 export type SunIllumination = 'sun' | 'penumbral' | 'umbral' | 'unknown';
 
+/**
+ * Why a pass window edge is the report window edge rather than a real rise/set:
+ * `continuous` = in view for the whole window, `start`/`end` = already in view at the
+ * window start / still in view at the window end.
+ */
+export type ReportPassEdge = 'continuous' | 'start' | 'end';
+
 /** A single in-view pass window over a sensor. */
 export interface ReportPass {
   aos: Date;
   los: Date;
   maxEl: number;
   maxElTime: Date;
+  /** Set when the window is clipped by the report interval (see {@link ReportPassEdge}). */
+  edge?: ReportPassEdge;
 }
+
+/** Visibility at one instant, as the edge-pass scan needs it. */
+export interface ReportVisibilitySample {
+  inView: boolean;
+  el: number;
+}
+
+/** Report-table note for a clipped pass window. */
+const PASS_EDGE_NOTE: Record<ReportPassEdge, string> = {
+  continuous: 'continuous',
+  start: 'in view at start',
+  end: 'in view at end',
+};
+
+/**
+ * Adds the pass windows a rise/set finder cannot see: an object already in view at the
+ * report start, still in view at the report end, or in view the whole time (a GEO that
+ * never sets). The last case returns ONE window spanning the whole report interval,
+ * flagged `continuous`. Pure: visibility is sampled through `sampleAt`.
+ * @param passes Rise-to-set passes found inside the window (sorted by AOS).
+ * @param opts The report window.
+ * @param scanStepSec Sampling step for the edge scans, in seconds.
+ * @param sampleAt Visibility at an instant (in the sensor's field of regard + elevation).
+ */
+export const addWindowEdgePasses = (passes: ReportPass[], opts: ReportOptions, scanStepSec: number, sampleAt: (date: Date) => ReportVisibilitySample | null): ReportPass[] => {
+  const startMs = opts.startTime.getTime();
+  const endMs = startMs + opts.windowSec * MILLISECONDS_PER_SECOND;
+  const stepMs = Math.max(1, scanStepSec) * MILLISECONDS_PER_SECOND;
+
+  if (endMs <= startMs) {
+    return passes;
+  }
+
+  /** Walks from `fromMs` toward `toMs` while in view; returns the last in-view time and the peak. */
+  const scan = (fromMs: number, toMs: number): { lastInMs: number; maxEl: number; maxElMs: number; reachedEnd: boolean } => {
+    const dir = toMs >= fromMs ? 1 : -1;
+    let lastInMs = fromMs;
+    let maxEl = Number.NEGATIVE_INFINITY;
+    let maxElMs = fromMs;
+    let ms = fromMs;
+
+    for (;;) {
+      const sample = sampleAt(new Date(ms));
+
+      if (!sample?.inView) {
+        return { lastInMs, maxEl, maxElMs, reachedEnd: false };
+      }
+      lastInMs = ms;
+      if (sample.el > maxEl) {
+        maxEl = sample.el;
+        maxElMs = ms;
+      }
+      if (ms === toMs) {
+        return { lastInMs, maxEl, maxElMs, reachedEnd: true };
+      }
+      const next = ms + dir * stepMs;
+
+      // Clamp so the final sample lands exactly on the far edge.
+      ms = dir > 0 ? Math.min(next, toMs) : Math.max(next, toMs);
+    }
+  };
+
+  const result = [...passes];
+
+  if (sampleAt(new Date(startMs))?.inView) {
+    const fwd = scan(startMs, endMs);
+
+    if (fwd.reachedEnd) {
+      return [{ aos: new Date(startMs), los: new Date(endMs), maxEl: fwd.maxEl, maxElTime: new Date(fwd.maxElMs), edge: 'continuous' }];
+    }
+
+    const first = result[0];
+
+    if (!first || first.aos.getTime() > fwd.lastInMs) {
+      result.unshift({ aos: new Date(startMs), los: new Date(fwd.lastInMs), maxEl: fwd.maxEl, maxElTime: new Date(fwd.maxElMs), edge: 'start' });
+    }
+  }
+
+  if (sampleAt(new Date(endMs))?.inView) {
+    const back = scan(endMs, startMs);
+    const last = result.at(-1);
+
+    if (!last || last.los.getTime() < back.lastInMs) {
+      result.push({ aos: new Date(back.lastInMs), los: new Date(endMs), maxEl: back.maxEl, maxElTime: new Date(back.maxElMs), edge: 'end' });
+    }
+  }
+
+  return result;
+};
 
 /** Time window controls shared by the time-series reports. */
 export interface ReportOptions {
@@ -96,7 +215,7 @@ const HEADER_RULE = '-'.repeat(31);
 /**
  * Minimal shape the position/time-series generators need from a report target.
  * Full TLE-backed satellites satisfy it, but so do ephemeris-driven objects
- * (OemSatellite) and ballistic missiles (MissileObject) — anything that can be
+ * (OemSatellite) and ballistic missiles (MissileObject): anything that can be
  * sampled for a position over time.
  */
 export interface ReportableObject {
@@ -111,7 +230,28 @@ export interface ReportableObject {
 /** A report target that can additionally express itself as an orbit (COES). */
 export interface OrbitalReportableObject extends ReportableObject {
   toJ2000(date?: Date): J2000;
+  /** TLE line 1, present for TLE-backed satellites (ephemeris-only objects have none). */
+  tle1?: string;
 }
+
+const MS_PER_DAY = 24 * 60 * 60 * MILLISECONDS_PER_SECOND;
+
+/** The epoch encoded in a TLE's line 1, or null when the line is missing or unparseable. */
+export const tleEpochFromLine1 = (tle1: string | undefined): Date | null => {
+  if (!tle1 || tle1.length < 32) {
+    return null;
+  }
+
+  const year = Tle.epochYearFull(tle1 as TleLine1);
+  const dayOfYear = Tle.epochDay(tle1);
+
+  if (!Number.isFinite(year) || !Number.isFinite(dayOfYear)) {
+    return null;
+  }
+
+  // Day-of-year 1.0 is 00:00 UTC on 1 January.
+  return new Date(Date.UTC(year, 0, 1) + (dayOfYear - 1) * MS_PER_DAY);
+};
 
 /** File-safe id for report filenames: the SCC number when present, else the name. */
 const reportId = (sat: ReportableObject): string => sat.sccNum || (sat.name || 'object').replace(/[^\w.-]+/gu, '_');
@@ -160,6 +300,13 @@ export const buildReportHeader = (title: string, sat: HeaderSat, sensor: Detaile
   return satData + sensorData;
 };
 
+/** One header line stating the sampled interval, so two reports can be compared at a glance. */
+export const buildReportWindowLine = (opts: ReportOptions): string => {
+  const endMs = opts.startTime.getTime() + opts.windowSec * MILLISECONDS_PER_SECOND;
+
+  return `Report Window: ${formatReportTime(opts.startTime)} to ${formatReportTime(new Date(endMs))} UTC, Step: ${Math.max(1, opts.stepSec)} s\n\n`;
+};
+
 /**
  * Azimuth/Elevation/Range report. Samples the look angle at {@link ReportOptions.stepSec}
  * inside each in-view pass window (found by the injected pass finder) rather than
@@ -167,7 +314,7 @@ export const buildReportHeader = (title: string, sat: HeaderSat, sensor: Detaile
  * regard and never blocks on a multi-day on-thread scan.
  */
 export const generateAerReport = (sat: Satellite, sensor: DetailedSensor, opts: ReportOptions, deps: ReportCoreDeps, generatedAt: Date): ReportData => {
-  const header = buildReportHeader('Azimuth Elevation Range Report', sat, sensor, generatedAt);
+  const header = buildReportHeader('Azimuth Elevation Range Report', sat, sensor, generatedAt) + buildReportWindowLine(opts);
   const rows: string[][] = [];
   const stepMs = Math.max(1, opts.stepSec) * MILLISECONDS_PER_SECOND;
   const passes = deps.findPasses(sensor, opts);
@@ -195,7 +342,7 @@ export const generateAerReport = (sat: Satellite, sensor: DetailedSensor, opts: 
 
 /** Latitude/Longitude/Altitude ground track over the report window. */
 export const generateLlaReport = (sat: ReportableObject, opts: ReportOptions, generatedAt: Date): ReportData => {
-  const header = buildReportHeader('Latitude Longitude Altitude Report', sat, null, generatedAt);
+  const header = buildReportHeader('Latitude Longitude Altitude Report', sat, null, generatedAt) + buildReportWindowLine(opts);
   const rows: string[][] = [];
   const stepMs = Math.max(1, opts.stepSec) * MILLISECONDS_PER_SECOND;
   const endMs = opts.startTime.getTime() + opts.windowSec * MILLISECONDS_PER_SECOND;
@@ -220,7 +367,7 @@ export const generateLlaReport = (sat: ReportableObject, opts: ReportOptions, ge
 
 /** Earth Centered Inertial (TEME) position and velocity over the report window. */
 export const generateEciReport = (sat: ReportableObject, opts: ReportOptions, generatedAt: Date): ReportData => {
-  const header = buildReportHeader('Earth Centered Inertial (TEME) Report', sat, null, generatedAt);
+  const header = buildReportHeader('Earth Centered Inertial (TEME) Report', sat, null, generatedAt) + buildReportWindowLine(opts);
   const rows: string[][] = [];
   const stepMs = Math.max(1, opts.stepSec) * MILLISECONDS_PER_SECOND;
   const endMs = opts.startTime.getTime() + opts.windowSec * MILLISECONDS_PER_SECOND;
@@ -254,22 +401,36 @@ export const generateEciReport = (sat: ReportableObject, opts: ReportOptions, ge
   };
 };
 
-/** Classical orbital elements at the satellite's current epoch (J2000). */
-export const generateCoesReport = (sat: OrbitalReportableObject, generatedAt: Date): ReportData => {
-  const header = buildReportHeader('Classic Orbit Elements Report', sat, null, generatedAt);
-  const el = sat.toJ2000().toClassicalElements();
+/**
+ * Classical orbital elements at the report epoch. The elements are OSCULATING:
+ * they come from the propagated J2000 state vector at the simulation time the
+ * report covers (`stateEpoch`), not from the TLE's mean elements, so apogee,
+ * perigee and mean motion differ slightly from the catalog (TLE mean) values.
+ * Both epochs are printed so the convention is explicit.
+ */
+export const generateCoesReport = (sat: OrbitalReportableObject, generatedAt: Date, stateEpoch: Date = generatedAt): ReportData => {
+  const header =
+    `${buildReportHeader('Classical Orbital Elements Report', sat, null, generatedAt)}` +
+    'Note: osculating elements (J2000) at the state epoch, derived from the propagated state vector.\n' +
+    'They differ from the TLE mean elements used for catalog apogee/perigee.\n\n';
+  const el = sat.toJ2000(stateEpoch).toClassicalElements();
+  const tleEpoch = tleEpochFromLine1(sat.tle1);
   const rows: string[][] = [
-    ['Epoch', formatReportTime(el.epoch.toDateTime())],
+    ['Element Set', 'Osculating (J2000)'],
+    ['TLE Epoch (UTC)', tleEpoch ? formatReportTime(tleEpoch) : 'N/A'],
+    ['State Epoch (osculating, UTC)', formatReportTime(el.epoch.toDateTime())],
     ['Apogee', `${el.apogee.toFixed(3)} km`],
     ['Perigee', `${el.perigee.toFixed(3)} km`],
-    ['Inclination', `${el.inclination.toFixed(3)}°`],
-    ['Right Ascension', `${el.rightAscensionDegrees.toFixed(3)}°`],
-    ['Argument of Perigee', `${el.argPerigeeDegrees.toFixed(3)}°`],
-    ['True Anomaly', `${el.trueAnomalyDegrees.toFixed(3)}°`],
-    ['Eccentricity', el.eccentricity.toFixed(3)],
+    ['Inclination', `${el.inclinationDegrees.toFixed(4)}°`],
+    ['Right Ascension', `${el.rightAscensionDegrees.toFixed(4)}°`],
+    ['Argument of Perigee', `${el.argPerigeeDegrees.toFixed(4)}°`],
+    ['True Anomaly', `${el.trueAnomalyDegrees.toFixed(4)}°`],
+    // Seven places like a TLE: near-circular LEO orbits (e ~ 1e-4) would print as 0.000 at three.
+    ['Eccentricity', el.eccentricity.toFixed(7)],
     ['Period', `${el.period.toFixed(3)} min`],
     ['Semi-Major Axis', `${el.semimajorAxis.toFixed(3)} km`],
-    ['Mean Motion', `${el.meanMotion.toFixed(3)} rev/day`],
+    // ClassicalElements.meanMotion is rad/s; revsPerDay is the rev/day value.
+    ['Mean Motion', `${el.revsPerDay.toFixed(8)} rev/day`],
   ];
 
   return {
@@ -281,22 +442,33 @@ export const generateCoesReport = (sat: OrbitalReportableObject, generatedAt: Da
 
 /** Rise/set visibility windows over a sensor for the report window. */
 export const generateVisibilityWindowsReport = (sat: Satellite, sensor: DetailedSensor, opts: ReportOptions, deps: ReportCoreDeps, generatedAt: Date): ReportData => {
-  const header = buildReportHeader('Visibility Windows Report', sat, sensor, generatedAt);
+  const header = buildReportHeader('Visibility Windows Report', sat, sensor, generatedAt) + buildReportWindowLine(opts);
   const passes = deps.findPasses(sensor, opts);
+  // A Note column only when a window is clipped by the report interval (e.g. a GEO that never sets)
+  const hasNotes = passes.some((pass) => typeof pass.edge !== 'undefined');
   const rows = passes.map((pass, idx) => {
     const durationMin = (pass.los.getTime() - pass.aos.getTime()) / (MILLISECONDS_PER_SECOND * 60);
+    const row = [`${idx + 1}`, formatReportTime(pass.aos), formatReportTime(pass.los), durationMin.toFixed(2), pass.maxEl.toFixed(1), formatReportTime(pass.maxElTime)];
 
-    return [`${idx + 1}`, formatReportTime(pass.aos), formatReportTime(pass.los), durationMin.toFixed(2), pass.maxEl.toFixed(3), formatReportTime(pass.maxElTime)];
+    if (hasNotes) {
+      row.push(pass.edge ? PASS_EDGE_NOTE[pass.edge] : '');
+    }
+
+    return row;
   });
+  const headers = ['Pass #', 'Rise Time (UTC)', 'Set Time (UTC)', 'Duration (min)', 'Max Elevation(°)', 'Max Elevation Time (UTC)'];
+
+  if (hasNotes) {
+    headers.push('Note');
+  }
 
   return {
     filename: `visibility-windows-${sat.sccNum}`,
     header,
-    table: {
-      headers: ['Pass #', 'Rise Time (UTC)', 'Set Time (UTC)', 'Duration (min)', 'Max Elevation(°)', 'Max Elevation Time (UTC)'],
-      rows,
-    },
+    table: { headers, rows },
     emptyMessage: 'No passes found in the report window!',
+    // The station block (name, lat/lon/alt, mask, window) travels with the CSV too
+    csvIncludeHeader: true,
   };
 };
 
@@ -316,7 +488,7 @@ const ECLIPSE_LABEL: Record<SunIllumination, string> = {
 
 /** Sun illumination + eclipse timing over the report window (for power/thermal work). */
 export const generateSunEclipseReport = (sat: ReportableObject, opts: ReportOptions, deps: ReportCoreDeps, generatedAt: Date): ReportData => {
-  const header = buildReportHeader('Sun/Eclipse Analysis Report', sat, null, generatedAt);
+  const header = buildReportHeader('Sun/Eclipse Analysis Report', sat, null, generatedAt) + buildReportWindowLine(opts);
   const rows: string[][] = [];
   const stepMs = Math.max(1, opts.stepSec) * MILLISECONDS_PER_SECOND;
   const endMs = opts.startTime.getTime() + opts.windowSec * MILLISECONDS_PER_SECOND;

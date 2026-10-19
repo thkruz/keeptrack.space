@@ -91,6 +91,17 @@ export class OrbitalSettings {
    * 1.0 = No Fade
    */
   orbitFadeFactor = 0.6;
+  /**
+   * Dim the selected/hovered orbit line where the object is in Earth's shadow
+   * (cylindrical umbra test in the orbit cruncher).
+   */
+  isDrawOrbitEclipse = true;
+  /**
+   * Alpha multiplier for orbit-line vertices in Earth's shadow.
+   *
+   * 0.0 = shadowed arc hidden, 1.0 = no dimming
+   */
+  orbitEclipseAlpha = 0.35;
 
   /**
    * Show Orbits in ECF vs ECI
@@ -129,6 +140,20 @@ export class OrbitalSettings {
    * Negative values will cause the cone to clip into the earth, but that may be desired for some use cases.
    */
   coneDistanceFromEarth = 15 as Kilometers;
+
+  // Ground swath (SatelliteSwath plugin)
+  /**
+   * Draw the ground swath ribbon for the selected satellite. Off until the user turns it on;
+   * deliberately not persisted so the layer is never shown automatically on load.
+   */
+  isDrawSwath = false;
+  /**
+   * Draw the translucent field-of-regard fill beside the nadir swath. Driven by the Graphics
+   * menu's overall quality (Medium and above).
+   */
+  isDrawSwathFieldOfRegard = true;
+  /** Height (km) the swath ribbon is lifted above the WGS84 ellipsoid to avoid z-fighting. */
+  swathLiftKm = 2 as Kilometers;
 
   // Line Scan
   /**

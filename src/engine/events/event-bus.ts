@@ -16,6 +16,7 @@ export interface EngineEventMap {
   [EventBusEvent.bottomMenuClick]: [string];
   [EventBusEvent.hideSideMenus]: [];
   [EventBusEvent.orbitManagerInit]: [];
+  [EventBusEvent.orbitPathUpdated]: [number, Float32Array, [number, number, number], number | undefined, number | undefined, boolean];
   [EventBusEvent.drawManagerLoadScene]: [];
   [EventBusEvent.drawOptionalScenery]: [];
   [EventBusEvent.drawOverlay]: [];
@@ -211,18 +212,26 @@ export class EventBus {
    */
   once<T extends EventBusEvent>(event: T, cb: (...args: EngineEventMap[T]) => void) {
     this.verifyEvent_(event);
-    // Add the callback
-    this.events[event].push({
-      cb: (...args: EngineEventMap[T]) => {
-        cb(...args);
-        // if this.unregister is not null
-        if (this.events[event]) {
-          // Remove the callback after it has been called once
-          this.unregister(event, cb);
-        } else {
-          errorManagerInstance.log(`Callback for event ${event} was not found in unregister.`);
+    let isFired = false;
+    const wrapper = (...args: EngineEventMap[T]) => {
+      if (isFired) {
+        return;
+      }
+      isFired = true;
+      /*
+       * Unregister the wrapper itself (not the original cb, which was never registered) and defer it
+       * past the current emit loop so splicing does not skip the next listener.
+       */
+      queueMicrotask(() => {
+        if (this.events[event]?.some((listener) => listener.cb === wrapper)) {
+          this.unregister(event, wrapper);
         }
-      },
+      });
+      cb(...args);
+    };
+
+    this.events[event].push({
+      cb: wrapper,
       event: <T>(<unknown>null),
     });
   }

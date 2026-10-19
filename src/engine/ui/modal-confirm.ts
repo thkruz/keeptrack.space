@@ -18,6 +18,8 @@ export class ModalConfirm extends DraggableModal {
 
   private onConfirm: (() => void) | null = null;
   private options: ConfirmModalOptions = {};
+  /** Bound once so close() can actually remove the listener added by open(). */
+  private readonly keyDownHandler_ = (event: KeyboardEvent): void => this.handleKeyDown(event);
 
   private constructor() {
     if (ModalConfirm.instance_) {
@@ -82,14 +84,43 @@ export class ModalConfirm extends DraggableModal {
     if (confirmButton) {
       confirmButton.addEventListener('click', () => this.handleConfirm());
     }
-
-    // Allow ESC key to cancel
-    document.addEventListener('keydown', this.handleKeyDown.bind(this));
   }
 
   private handleKeyDown(event: KeyboardEvent): void {
-    if (event.key === 'Escape' && this.boxEl?.style.display !== 'none') {
+    if (event.key === 'Escape' && this.boxEl?.isConnected && this.boxEl.style.display !== 'none') {
+      // Escape belongs to the confirm while it is up, not to menus or overlays underneath it.
+      event.preventDefault();
+      event.stopImmediatePropagation();
       this.handleCancel();
+    }
+  }
+
+  /**
+   * The DOM is only built on the first open, so every later open has to write
+   * the caller's wording into it. Without this a logout confirm shown after a
+   * "Overwrite saved search?" confirm kept the overwrite wording while its
+   * button ran the logout callback.
+   */
+  private renderOptions_(): void {
+    const { title = '', message = '', confirmText = '', cancelText = '', isDestructive = false } = this.options;
+    const titleEl = this.boxEl?.querySelector('.draggable-box__title h3');
+    const messageEl = this.boxEl?.querySelector('.confirm-modal__message');
+    const confirmButton = this.getElement('confirm-action-btn');
+    const cancelButton = this.getElement('cancel-action-btn');
+
+    if (titleEl) {
+      titleEl.innerHTML = title;
+    }
+    if (messageEl) {
+      messageEl.innerHTML = message;
+    }
+    if (confirmButton) {
+      confirmButton.textContent = confirmText;
+      confirmButton.classList.toggle('confirm-modal__btn--destructive', isDestructive);
+      confirmButton.classList.toggle('confirm-modal__btn--primary', !isDestructive);
+    }
+    if (cancelButton) {
+      cancelButton.textContent = cancelText;
     }
   }
 
@@ -126,12 +157,14 @@ export class ModalConfirm extends DraggableModal {
       ...options,
     };
 
-    // Update the modal title if provided
-    if (options?.title) {
-      this.title = options.title;
-    }
+    this.title = this.options.title ?? '';
 
     super.open();
+    this.renderOptions_();
+
+    // Capture phase so the confirm handles Escape before anything underneath it.
+    document.removeEventListener('keydown', this.keyDownHandler_, true);
+    document.addEventListener('keydown', this.keyDownHandler_, true);
   }
 
   /**
@@ -178,8 +211,7 @@ export class ModalConfirm extends DraggableModal {
   }
 
   close(): void {
-    // Clean up event listeners
-    document.removeEventListener('keydown', this.handleKeyDown.bind(this));
+    document.removeEventListener('keydown', this.keyDownHandler_, true);
 
     super.close();
 

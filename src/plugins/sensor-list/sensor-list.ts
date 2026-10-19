@@ -98,7 +98,12 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
           content: t7e('plugins.SensorListPlugin.help.howToUse'),
         },
       ],
-      tips: [t7e('plugins.SensorListPlugin.help.tip1'), t7e('plugins.SensorListPlugin.help.tip2'), t7e('plugins.SensorListPlugin.help.tip3')],
+      tips: [
+        t7e('plugins.SensorListPlugin.help.tip1'),
+        t7e('plugins.SensorListPlugin.help.tip2'),
+        t7e('plugins.SensorListPlugin.help.tip3'),
+        t7e('plugins.SensorListPlugin.help.tipGroundStations' as Parameters<typeof t7e>[0]),
+      ],
       shortcuts: [
         { keys: ['S'], description: t7e('plugins.SensorListPlugin.help.shortcutToggle') },
         { keys: ['Ctrl', 'Home'], description: t7e('plugins.SensorListPlugin.help.shortcutCamera') },

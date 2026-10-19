@@ -1,3 +1,4 @@
+import type { GraphicsQualityLevel } from '@app/engine/plugins/core/plugin-capabilities';
 import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { errorManagerInstance } from '../engine/utils/errorManager';
 import { PersistenceManager, StorageKey } from '../engine/utils/persistence-manager';
@@ -24,6 +25,8 @@ export interface PersistedSettingEntry {
 }
 
 const bool = (raw: string): boolean => raw === 'true';
+
+const GRAPHICS_QUALITY_LEVELS_: readonly GraphicsQualityLevel[] = ['low', 'medium', 'high', 'ultra'];
 
 export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
   {
@@ -84,6 +87,45 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
       if (level >= 1 && level <= 3) {
         sm.covarianceConfidenceLevel = level;
       }
+    },
+  },
+  {
+    key: StorageKey.SETTINGS_DRAW_ORBIT_ECLIPSE,
+    serialize: (sm) => String(sm.isDrawOrbitEclipse),
+    deserialize: (sm, raw) => {
+      sm.isDrawOrbitEclipse = bool(raw);
+    },
+  },
+  {
+    key: StorageKey.SETTINGS_DRAW_SWATH_FIELD_OF_REGARD,
+    serialize: (sm) => String(sm.isDrawSwathFieldOfRegard),
+    deserialize: (sm, raw) => {
+      sm.isDrawSwathFieldOfRegard = bool(raw);
+    },
+  },
+  {
+    key: StorageKey.SETTINGS_DRAW_FLAG_DECALS,
+    serialize: (sm) => String(sm.isDrawFlagDecals),
+    deserialize: (sm, raw) => {
+      sm.isDrawFlagDecals = bool(raw);
+    },
+  },
+  {
+    key: StorageKey.SETTINGS_FLAG_DECAL_SCALE,
+    serialize: (sm) => String(sm.flagDecalScale),
+    deserialize: (sm, raw) => {
+      const value = Number.parseFloat(raw);
+
+      if (Number.isFinite(value) && value >= 0.2 && value <= 0.6) {
+        sm.flagDecalScale = value;
+      }
+    },
+  },
+  {
+    key: StorageKey.SETTINGS_SHOW_EPOCH_AGE,
+    serialize: (sm) => String(sm.isShowEpochAge),
+    deserialize: (sm, raw) => {
+      sm.isShowEpochAge = bool(raw);
     },
   },
   {
@@ -212,6 +254,15 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
     serialize: (sm) => String(sm.isFocusOnSatelliteWhenSelected),
     deserialize: (sm, raw) => {
       sm.isFocusOnSatelliteWhenSelected = bool(raw);
+    },
+  },
+  {
+    key: StorageKey.GRAPHICS_SETTINGS_QUALITY_LEVEL,
+    serialize: (sm) => sm.graphicsQuality ?? null,
+    deserialize: (sm, raw) => {
+      if (GRAPHICS_QUALITY_LEVELS_.includes(raw as GraphicsQualityLevel)) {
+        sm.graphicsQuality = raw as GraphicsQualityLevel;
+      }
     },
   },
   /*

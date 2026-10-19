@@ -3,7 +3,7 @@
     "BreakupAnalysis": {
       "bottomIconLabel": "Breakup Analysis",
       "title": "Breakup Analysis",
-      "helpBody": "The Breakup Analysis plugin provides a database of major satellite breakup events in history. Select an event to view detailed information including the parent object, breakup cause, timeline from launch to breakup, and fragment dispersion analysis. The plugin searches the current catalog for tracked debris matching each event and displays statistical analysis of altitude ranges, eccentricity, and inclination distributions.",
+      "helpBody": "The Breakup Analysis plugin provides a database of major satellite breakup events in history. Select an event to view detailed information including the parent object, breakup cause, timeline from launch to breakup, and fragment dispersion analysis. The plugin searches the current catalog for tracked debris matching each event and displays statistical analysis of altitude ranges, eccentricity, and inclination distributions. Each event shows the international designator of the parent launch and the parent's NORAD number, so two events of the same rocket family (for example two CZ-6A upper stage breakups) cannot be confused.",
       "sections": {
         "events": "Events",
         "debrisStatistics": "Debris Statistics",
@@ -66,7 +66,8 @@
         "perigee": "Perigee",
         "apogee": "Apogee",
         "incDeg": "Inc (°)",
-        "ecc": "Ecc"
+        "ecc": "Ecc",
+        "intlDes": "Int'l Designator"
       },
       "errorMsgs": {
         "parentNotFound": "Parent object is not in the current catalog.",

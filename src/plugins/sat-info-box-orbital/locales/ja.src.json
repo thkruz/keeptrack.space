@@ -3,11 +3,11 @@
     "title": "軌道データ",
     "Apogee": {
       "label": "遠地点",
-      "tooltip": "軌道上で最も高い点"
+      "tooltip": "軌道の最高高度（赤道半径 6378.137 km からの高さ）"
     },
     "Perigee": {
       "label": "近地点",
-      "tooltip": "軌道上で最も低い点"
+      "tooltip": "軌道の最低高度（赤道半径 6378.137 km からの高さ）"
     },
     "Inclination": {
       "label": "傾斜角",
@@ -52,25 +52,30 @@
       "label": "速度",
       "tooltip": "衛星の現在の速度（地球に近いほど速い）"
     },
+    "GPEpoch": {
+      "label": "GPエポック",
+      "tooltip": "伝播に使用される軌道要素セットのエポック"
+    },
     "AgeOfGP": {
       "label": "GPの経過時間",
-      "tooltip": "公式軌道計算からの経過時間（古いGPデータは通常精度が低い）",
+      "tooltip": "GPエポックから現在のシミュレーション時刻までの時間（古いGPデータは通常精度が低い。負の値はエポックがシミュレーション時刻より後であることを示す）",
       "days": "日",
       "hours": "時間",
       "epochYear": "エポック年",
-      "epochDay": "エポック日"
+      "epochDay": "エポック日",
+      "epochAfterSimTime": "GPエポックはシミュレーション時刻より後"
     },
     "RadialSigma": {
       "label": "半径方向シグマ",
-      "tooltip": "半径方向の不確かさ（メートル）"
+      "tooltip": "半径方向の1シグマ位置不確かさ（GPエポック時点のTLE由来共分散、RIC座標系）。Pcと接近レポートと同じ値です。"
     },
     "InTrackSigma": {
       "label": "軌道方向シグマ",
-      "tooltip": "軌道方向の不確かさ（メートル）"
+      "tooltip": "軌道方向の1シグマ位置不確かさ（GPエポック時点のTLE由来共分散、RIC座標系）。Pcと接近レポートと同じ値です。"
     },
     "CrossTrackSigma": {
       "label": "横方向シグマ",
-      "tooltip": "横方向の不確かさ（メートル）"
+      "tooltip": "横方向の1シグマ位置不確かさ（GPエポック時点のTLE由来共分散、RIC座標系）。Pcと接近レポートと同じ値です。"
     },
     "meter": "m",
     "kilometer": "km",

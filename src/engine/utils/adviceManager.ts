@@ -23,9 +23,14 @@ import { KeyboardComponent } from '@app/engine/plugins/components/keyboard/keybo
 import { KeepTrack } from '@app/keeptrack';
 import { TranslationKey, t7e } from '@app/locales/keys';
 import { EventBus } from '../events/event-bus';
+import { buildHelpHtml } from '../plugins/components/help/help-html';
+import { getGeneralHelpConfig } from '../ui/help/general-help';
 import { html } from './development/formatter';
 import { getEl } from './get-el';
 import { PersistenceManager, StorageKey } from './persistence-manager';
+
+/** Owner id of the Shift+F1 binding; the general help lists the shortcuts registered under it. */
+const ADVICE_MANAGER_ID = 'AdviceManager';
 
 export class AdviceManager {
   private helpHeaderDOM: HTMLElement;
@@ -34,6 +39,19 @@ export class AdviceManager {
   private isAdviceEnabled = true;
   private isAdviceOpen = false;
   private tutIconDOM: HTMLElement;
+  /** Element that had focus when the help opened, so closing hands focus back to it. */
+  private returnFocusEl_: HTMLElement | null = null;
+  private isEscapeBound_ = false;
+  private readonly onOuterClick_ = (): void => this.closeAdvice();
+  private readonly onKeyDown_ = (event: KeyboardEvent): void => {
+    if (event.key !== 'Escape' || !this.isAdviceOpen) {
+      return;
+    }
+    // The help overlay sits on top of everything, so Escape closes it before any menu underneath.
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    this.closeAdvice();
+  };
 
   public clearAdvice(): void {
     this.helpHeaderDOM?.classList.remove('help-header-sel');
@@ -68,22 +86,41 @@ export class AdviceManager {
     this.helpHeaderDOM = getEl('help-header')!;
     this.helpTextDOM = getEl('help-text')!;
 
-    new KeyboardComponent('AdviceManager', [
+    new KeyboardComponent(ADVICE_MANAGER_ID, [
       {
         key: 'F1',
         code: 'F1',
         shift: true,
         description: t7e('keyboard.descriptions.openHelp' as TranslationKey),
-        callback: () => {
-          if (this.isAdviceOpen) {
-            this.isAdviceOpen = false;
-            this.helpOuterDOM.style.display = 'none';
-          } else {
-            EventBus.getInstance().emit(EventBusEvent.onHelpMenuClick);
-          }
-        },
+        callback: () => this.onHelpKey_(),
       },
     ]).init();
+  }
+
+  /**
+   * Shift+F1: closes an open help; otherwise asks the open menu or active view for its help (at
+   * most one plugin answers, see KeepTrackPlugin.resolveHelpTarget) and falls back to the general
+   * KeepTrack help when nothing answered.
+   */
+  private onHelpKey_(): void {
+    if (this.isAdviceOpen) {
+      this.closeAdvice();
+
+      return;
+    }
+
+    EventBus.getInstance().emit(EventBusEvent.onHelpMenuClick);
+
+    if (!this.isAdviceOpen) {
+      this.showGeneralHelp();
+    }
+  }
+
+  /** Shows the app-level help used when no menu or view is open. */
+  public showGeneralHelp(): void {
+    const config = getGeneralHelpConfig();
+
+    this.showAdvice(config.title, buildHelpHtml(config, ADVICE_MANAGER_ID));
   }
 
   public isEnabled(): boolean {
@@ -118,13 +155,40 @@ export class AdviceManager {
       return;
     }
 
+    const active = document.activeElement;
+
+    this.returnFocusEl_ = active instanceof HTMLElement && !this.helpOuterDOM.contains(active) ? active : null;
+
     this.helpOuterDOM.style.display = 'block';
     this.helpHeaderDOM.innerHTML = header;
     this.helpTextDOM.innerHTML = text;
-    this.helpOuterDOM.addEventListener('click', () => {
-      this.isAdviceOpen = false;
+    // Same function reference every time, so repeated opens never stack listeners.
+    this.helpOuterDOM.addEventListener('click', this.onOuterClick_);
+
+    if (!this.isEscapeBound_) {
+      // Capture phase: Escape must reach the help before menus or the camera keys below it.
+      document.addEventListener('keydown', this.onKeyDown_, true);
+      this.isEscapeBound_ = true;
+    }
+  }
+
+  /** Hides the help overlay (click, Escape or Shift+F1) and returns focus to the page. */
+  public closeAdvice(): void {
+    this.isAdviceOpen = false;
+
+    if (this.helpOuterDOM) {
       this.helpOuterDOM.style.display = 'none';
-    });
+    }
+
+    const returnTo = this.returnFocusEl_;
+
+    this.returnFocusEl_ = null;
+
+    if (returnTo?.isConnected && returnTo !== document.body) {
+      returnTo.focus();
+    } else if (document.activeElement instanceof HTMLElement && this.helpOuterDOM?.contains(document.activeElement)) {
+      document.activeElement.blur();
+    }
   }
 }
 

@@ -18,11 +18,45 @@
         "preset_asat_fy1c": "ASAT, Fengyun-1C (höhere Energie)",
         "preset_venting": "Niederenergetisch / Ausgasen",
         "preset_custom": "Benutzerdefiniert",
-        "radialDeltaV": "Radial (m/s)",
-        "inTrackDeltaV": "In Bahnrichtung (m/s)",
-        "crossTrackDeltaV": "Quer zur Bahn (m/s)",
-        "dispersionHint": "Zufällige Geschwindigkeitsänderung, die auf jedes Fragment angewendet wird (1 Sigma). In Bahnrichtung streckt die Wolke entlang der Umlaufbahn; quer zur Bahn fächert sie über die Bahnebene auf; radial hebt und senkt sie. Typische Ereignisse: Explosionen etwa 10 bis 100 m/s, Kollisionen etwa 100 bis 300 m/s.",
-        "piecesSection": "Anzahl"
+        "dispersionHint": "Zufällige Geschwindigkeitsänderung, die auf jedes Fragment angewendet wird. In Bahnrichtung streckt die Wolke entlang der Bahn; quer zur Bahn fächert sie über die Bahnebene auf; radial hebt und senkt sie. Typische mittlere Geschwindigkeiten: Explosionen etwa 10 bis 100 m/s, Kollisionen etwa 100 bis 300 m/s.",
+        "piecesSection": "Anzahl",
+        "frameLabel": "Koordinatensystem",
+        "frame_rtn": "RTN / RIC (lokales Bahnsystem)",
+        "frame_ntw": "NTW (geschwindigkeitsorientiert)",
+        "frame_eci": "ECI (inertial X, Y, Z; TEME)",
+        "modelLabel": "Streuungsmodell",
+        "model_gaussian": "Gauß (1σ Standardabweichung pro Achse)",
+        "model_maxwellian": "Isotrop Maxwell (Ziel-Mittelgeschw.)",
+        "model_uniform": "Gleichverteilt (±Max. pro Achse)",
+        "axis1_rtn": "Radial",
+        "axis2_rtn": "In Bahnrichtung",
+        "axis3_rtn": "Quer zur Bahn",
+        "axis1_ntw": "Normal (N)",
+        "axis2_ntw": "Geschwindigkeit (T)",
+        "axis3_ntw": "Quer zur Bahn (W)",
+        "axis1_eci": "X",
+        "axis2_eci": "Y",
+        "axis3_eci": "Z",
+        "axis1_rtn_tooltip": "Entlang des Positionsvektors, von der Erde weg. Hebt und senkt die Fragmente.",
+        "axis2_rtn_tooltip": "In der Bahnebene, senkrecht zur Radialrichtung, in Bewegungsrichtung. Streckt die Wolke entlang der Bahn.",
+        "axis3_rtn_tooltip": "Entlang der Bahnnormalen (r × v). Fächert die Wolke quer zur Bahnebene auf.",
+        "axis1_ntw_tooltip": "In der Bahnebene, senkrecht zur Geschwindigkeit und nach außen gerichtet. Entspricht auf einer Kreisbahn der Radialrichtung.",
+        "axis2_ntw_tooltip": "Entlang des Geschwindigkeitsvektors. Ändert die Bahnenergie (Umlaufzeit) am direktesten.",
+        "axis3_ntw_tooltip": "Entlang der Bahnnormalen (r × v). Dieselbe Achse wie RTN quer zur Bahn.",
+        "axis1_eci_tooltip": "Inertiale TEME-X-Achse, zum Frühlingspunkt.",
+        "axis2_eci_tooltip": "Inertiale TEME-Y-Achse, 90° östlich von X in der Äquatorebene.",
+        "axis3_eci_tooltip": "Inertiale TEME-Z-Achse, zum nördlichen Himmelspol.",
+        "unitSigma": "1σ m/s",
+        "unitMax": "±max m/s",
+        "unitTooltip_gaussian": "Der Wert ist die 1σ-Standardabweichung einer mittelwertfreien Gaußverteilung auf dieser Achse.",
+        "unitTooltip_maxwellian": "Isotrop: Jede Achse verwendet das aus der mittleren Auswurfgeschwindigkeit abgeleitete σ.",
+        "unitTooltip_uniform": "Der Wert ist die halbe Breite: Jedes Fragment wird auf dieser Achse gleichverteilt zwischen -max und +max gezogen.",
+        "meanSpeed": "Mittlere Auswurfgeschwindigkeit (m/s)",
+        "meanSpeedTooltip": "Zielmittelwert der Gesamtgeschwindigkeit |Δv|. Jede Achse wird aus einer Gaußverteilung mit σ = μ / 1.596 gezogen, sodass die Gesamtgeschwindigkeit einer Maxwell-Boltzmann-Verteilung folgt.",
+        "maxTotalSpeed": "Max. Gesamtgeschwindigkeit (m/s)",
+        "maxTotalSpeedOff": "Aus",
+        "maxTotalSpeedTooltip": "Optional. Fragmente, deren zufällige Gesamt-Δv diesen Wert überschreitet, werden neu gezogen. Das kappt die extremen Ausläufer, ohne den Rest der Verteilung zu verzerren. Leer lassen für keine Begrenzung.",
+        "axesCaption": "Werte je Achse, {unit}"
       },
       "buttons": {
         "createBreakup": "Zerfall erstellen",
@@ -34,7 +68,8 @@
       },
       "toasts": {
         "cleared": "Zerfall gelöscht. Trümmer entfernt.",
-        "fragmentsReentered": "{count} Fragmente sind wiedereingetreten und wurden nicht erstellt."
+        "fragmentsReentered": "{count} Fragmente sind wiedereingetreten und wurden nicht erstellt.",
+        "fragmentsFailed": "{count} Fragmente konnten keiner Bahn angepasst werden oder hatten keinen freien Katalogplatz und wurden nicht erstellt."
       },
       "help": {
         "overview": "Das Zerfall-Menü simuliert das Auseinanderbrechen eines Satelliten an seiner aktuellen Position. Es erzeugt Trümmerteile an der exakten Position des ausgewählten Satelliten, wobei jedes Teil mit einer kleinen zufälligen Geschwindigkeitsänderung (Delta-V) abgeht, sodass Sie beobachten können, wie sich die Trümmerwolke bildet und mit der Zeit ausbreitet. Da es vom Zustandsvektor des Satelliten ausgeht, unterstützt es jeden Bahnbereich.",
@@ -45,7 +80,9 @@
         "howToUse": "<ol><li>Wählen Sie einen beliebigen Satelliten aus. Das Symbol bleibt deaktiviert, bis ein Satellit ausgewählt ist.</li><li>Öffnen Sie das Zerfall-Menü und passen Sie die Delta-V-Streuung und die Teileanzahl an.</li><li>Klicken Sie auf <strong>Zerfall erstellen</strong>. Die Teile werden an der aktuellen Position des Satelliten erzeugt und die Suchleiste füllt sich mit den neuen Trümmern, sodass Sie die gesamte Wolke sehen können.</li><li>Beschleunigen Sie die Zeit, um zu beobachten, wie sich die Wolke entlang der Umlaufbahn verteilt.</li></ol>",
         "tip1": "Funktioniert in jedem Bahnbereich, einschließlich LEO, MEO, GEO und stark elliptischen (HEO) Umlaufbahnen, da jedes Fragment vom Zustandsvektor des Muttersatelliten am Zerfallspunkt propagiert wird.",
         "tip2": "Der Zerfall ist nur simuliert und existiert nur im Speicher. Verwenden Sie Zerfall löschen, um die Trümmer zu entfernen, oder laden Sie die Seite neu. Der Muttersatellit selbst wird nie verändert.",
-        "tip3": "Alle Teile werden als Objekte vom Typ Trümmer erstellt, sodass trümmerbasierte Farbschemata und Filter sofort auf sie angewendet werden."
+        "tip3": "Alle Teile werden als Objekte vom Typ Trümmer erstellt, sodass trümmerbasierte Farbschemata und Filter sofort auf sie angewendet werden.",
+        "dispersionModelsHeading": "Koordinatensysteme und Streuungsmodelle",
+        "dispersionModels": "<ul><li><strong>Koordinatensystem</strong>: <strong>RTN / RIC</strong> (Standard) verwendet die Achsen radial, in Bahnrichtung (transversal) und quer zur Bahn. <strong>NTW</strong> richtet die zweite Achse am Geschwindigkeitsvektor aus, was sich auf exzentrischen Bahnen von RTN unterscheidet. <strong>ECI</strong> wendet die Werte direkt auf die inertialen Achsen X, Y und Z an (TEME, das von SGP4 verwendete System).</li><li><strong>Gauß</strong> (Standard): Jede Achse wird unabhängig aus einer mittelwertfreien Normalverteilung mit dem eingegebenen 1σ gezogen. Mit demselben σ auf allen drei Achsen folgt die Gesamtgeschwindigkeit einer Maxwell-Boltzmann-Verteilung mit dem Mittelwert 2σ√(2/π) ≈ 1.596σ, sodass 54.2 m/s pro Achse eine mittlere Geschwindigkeit von 86.5 m/s ergeben.</li><li><strong>Isotrop Maxwell</strong>: Geben Sie die mittlere Ziel-Auswurfgeschwindigkeit direkt ein, und das σ pro Achse wird für Sie abgeleitet.</li><li><strong>Gleichverteilt</strong>: Jede Achse wird gleichverteilt zwischen -max und +max gezogen.</li><li><strong>Max. Gesamtgeschwindigkeit</strong> (optional): Fragmente, die schneller als die Begrenzung sind, werden neu gezogen. Das entfernt Ausreißer und erhält die Form der Verteilung unterhalb der Begrenzung.</li></ul>Die Anzeige unter den Eingaben zeigt die erwartete mittlere, RMS- und 99.-Perzentil-Geschwindigkeit, bevor Sie den Zerfall erstellen. Fragmente, deren neue Bahn ein Perigäum unter 100 km hat, werden als wiedereingetreten gemeldet und nicht erstellt."
       },
       "errorMsgs": {
         "SatelliteNotFound": "Satellit nicht gefunden!",
@@ -53,6 +90,14 @@
         "InvalidStartNum": "Ungültige Satellitenstartnummer! Standardmäßig auf 90000 gesetzt!",
         "InvalidSlotRange": "Anfangs-Satellitennummer außerhalb des gültigen Bereichs. Verwenden Sie {start} bis {end}.",
         "BreakupGeneratorFailed": "Zerfallsgenerator fehlgeschlagen!"
+      },
+      "stats": {
+        "meanSpeed": "Erwartete mittlere Geschwindigkeit",
+        "rmsSpeed": "RMS-Geschwindigkeit",
+        "p99Speed": "99. Perzentil",
+        "derivedSigma": "σ pro Achse = {sigma} m/s (in jedem System gleich)",
+        "capRejects": "Die Begrenzung zieht {percent}% der Fragmente neu",
+        "capTooLow": "Die Begrenzung liegt weit unter der Streuung: Viele Fragmente liegen genau auf der Begrenzung."
       }
     }
   }

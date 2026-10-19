@@ -29,13 +29,16 @@ export interface DsSatelliteData {
   radius: number;
 }
 
-/** A single screening result row — plain numbers only, no class instances. */
+/** A single screening result row; plain numbers only, no class instances. */
 export interface DsResultRow {
   secondaryId: string;
   tcaMs: number;
   missDistance: number;
+  /** Signed radial component (km) of the secondary relative to the primary, primary RIC (ootk v8) */
   radialDistance: number;
+  /** Signed in-track component (km), primary RIC */
   intrackDistance: number;
+  /** Signed cross-track component (km), primary RIC */
   crosstrackDistance: number;
   relativeVelocity: number;
   probabilityOfCollision: number | null;

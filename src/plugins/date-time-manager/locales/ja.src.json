@@ -43,7 +43,12 @@
         "now": "現在",
         "done": "完了",
         "pause": "一時停止",
-        "propagation": "伝播"
+        "propagation": "伝播",
+        "month": "月",
+        "year": "年",
+        "goTo": "移動 (UTC)",
+        "goToTooltip": "UTC の日付と時刻 (YYYY-MM-DD HH:MM:SS) を入力して Enter を押します。秒と時刻は省略できます。",
+        "goToInvalid": "無効な日付です。UTC 形式 YYYY-MM-DD HH:MM:SS を使用してください。"
       }
     }
   }

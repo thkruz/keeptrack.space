@@ -26,6 +26,10 @@
       "label": "国",
       "tooltip": "原産国"
     },
+    "ModelFlag": {
+      "label": "モデルの国旗",
+      "tooltip": "3Dモデルに描画される国旗：カタログの指定があればそれ、なければ所属国"
+    },
     "LaunchSite": {
       "label": "打上げ場所",
       "tooltip": "オブジェクトが打ち上げられた場所"
@@ -51,6 +55,20 @@
       "tooltip": "選択中のセンサーから現在のシミュレーション時刻に観測される見かけの視等級"
     },
     "estimatedSuffix": "（推定）",
-    "unknown": "不明"
+    "unknown": "不明",
+    "graphics": {
+      "sectionLabel": "衛星モデル",
+      "flagDecals": {
+        "label": "モデルに国旗を表示",
+        "helpText": "選択した衛星の3Dモデルの手前側に、所有国の国旗を投影します"
+      },
+      "flagDecalScale": {
+        "label": "国旗のサイズ",
+        "helpText": "モデルの大きさに対する国旗の幅（0.2〜0.6）"
+      }
+    },
+    "Secondary": {
+      "ricConvention": "RIC = 副対象 − 主対象（主対象のRIC座標系）。"
+    }
   }
 }

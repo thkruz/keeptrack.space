@@ -38,3 +38,21 @@
   color: #ffb74d;
   border: 1px solid rgba(255, 183, 77, 0.4);
 }
+
+/* Translated action labels (de/es/fr/ru/uk/pl/it) run longer than the row, and the
+ * shared nowrap + ellipsis clips them. Let the label wrap to a second line and let
+ * the row grow to fit instead of the fixed 40px height. */
+#catalog-browser-menu .kt-action {
+  height: auto;
+  min-height: 40px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+#catalog-browser-menu .kt-action-label {
+  min-width: 0;
+  white-space: normal;
+  text-overflow: clip;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}

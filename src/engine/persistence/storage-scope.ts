@@ -84,7 +84,16 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.STARS_SETTINGS]: StorageScope.Account,
   [StorageKey.STEREO_MAP_SETTINGS]: StorageScope.Account,
 
+  // --- Device: custom sensor definitions (per-browser, like the other tool inputs)
+  [StorageKey.CUSTOM_SENSORS]: StorageScope.Device,
+
   // --- Device: hardware/perf-dependent graphics --------------------------------
+  [StorageKey.SETTINGS_DRAW_ORBIT_ECLIPSE]: StorageScope.Device,
+  [StorageKey.SETTINGS_DRAW_SWATH_FIELD_OF_REGARD]: StorageScope.Device,
+  [StorageKey.SETTINGS_DRAW_FLAG_DECALS]: StorageScope.Device,
+  [StorageKey.SETTINGS_FLAG_DECAL_SCALE]: StorageScope.Device,
+  [StorageKey.SETTINGS_SHOW_EPOCH_AGE]: StorageScope.Device,
+  [StorageKey.GRAPHICS_SETTINGS_QUALITY_LEVEL]: StorageScope.Device,
   [StorageKey.GRAPHICS_SETTINGS_GODRAYS_SAMPLES]: StorageScope.Device,
   [StorageKey.GRAPHICS_SETTINGS_GODRAYS_DECAY]: StorageScope.Device,
   [StorageKey.GRAPHICS_SETTINGS_GODRAYS_EXPOSURE]: StorageScope.Device,
@@ -139,6 +148,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.BEST_PASS_SETTINGS]: StorageScope.Device,
   [StorageKey.PROXIMITY_OPS_SETTINGS]: StorageScope.Device,
   [StorageKey.BREAKUP_SETTINGS]: StorageScope.Device,
+  [StorageKey.SATELLITE_SWATH_SETTINGS]: StorageScope.Device,
   [StorageKey.REPORTS_SETTINGS]: StorageScope.Device,
   [StorageKey.CALCULATOR_SETTINGS]: StorageScope.Device,
   [StorageKey.SEISMIC_ACTIVITY_SETTINGS]: StorageScope.Device,

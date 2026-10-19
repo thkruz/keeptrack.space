@@ -45,6 +45,13 @@ import './proximity-ops.css';
 // search math moved into the pure core module.
 export type { ProximityOpsEvent } from './proximity-ops-core';
 
+/**
+ * LEO single-satellite pre-filter: candidates must be within this many degrees
+ * of the target's inclination AND RAAN. The form note, help text, and empty
+ * state all print this value, so the copy cannot drift from the filter.
+ */
+export const LEO_PLANE_TOLERANCE_DEG = 5;
+
 /** Persisted shape for the last-used search inputs (StorageKey.PROXIMITY_OPS_SETTINGS). */
 interface ProximityOpsSettings {
   maxDis: string;
@@ -69,6 +76,8 @@ export class ProximityOps extends KeepTrackPlugin {
   private threadManager_: ProximityOpsThreadManager | null = null;
   /** True while an all-vs-all worker survey is running (the submit row acts as Cancel). */
   private isSearching_ = false;
+  /** Co-orbital candidates screened by the last single-satellite search; null for all-vs-all. */
+  private lastCandidateCount_: number | null = null;
   /** The most recent sat-to-sat line drawn on a results-row click (for replacement). */
   private approachLine_: RemovableLine | null = null;
   /** Active results-table sort column (defaults to chronological by date). */
@@ -101,7 +110,7 @@ export class ProximityOps extends KeepTrackPlugin {
       sections: [
         {
           heading: t7e('help.overview'),
-          content: t7e('plugins.ProximityOps.help.overview'),
+          content: t7e('plugins.ProximityOps.help.overview').replace('{deg}', LEO_PLANE_TOLERANCE_DEG.toString()),
           image: {
             src: 'img/help/proximity-ops/proximity-ops-menu.png',
             alt: t7e('plugins.ProximityOps.help.imgAlt'),
@@ -162,6 +171,7 @@ export class ProximityOps extends KeepTrackPlugin {
             <label for="proximity-ops-duration" class="active">${t7e('plugins.ProximityOps.searchDuration')}</label>
           </div>
         </div>
+        <div id="proximity-ops-scope-note" class="kt-note proximity-ops-scope-note">${t7e('plugins.ProximityOps.scopeNote').replace('{deg}', LEO_PLANE_TOLERANCE_DEG.toString())}</div>
       </section>
 
       <section class="kt-section">
@@ -399,6 +409,9 @@ export class ProximityOps extends KeepTrackPlugin {
       return;
     }
 
+    // Single-satellite searches only screen the co-orbital candidates (the list includes the primary).
+    this.lastCandidateCount_ = request.mode === 'single' ? Math.max(0, request.sats.length - 1) : null;
+
     if (this.canUseWorker_()) {
       this.runWorkerSearch_(request);
 
@@ -514,7 +527,7 @@ export class ProximityOps extends KeepTrackPlugin {
     this.updateCount_(this.RPOs.length);
 
     if (this.RPOs.length === 0) {
-      ServiceLocator.getUiManager().toast(t7e('plugins.ProximityOps.noRposFound'), ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(this.emptyResultMessage_(), ToastMsgType.caution, true);
     }
 
     // Keep the results panel open on completion so the count / empty-state shows.
@@ -586,6 +599,19 @@ export class ProximityOps extends KeepTrackPlugin {
     }
   }
 
+  /**
+   * Empty-state copy. A single-satellite search names how many co-orbital
+   * candidates it screened and points crossing traffic at Debris Screening;
+   * all-vs-all surveys keep the plain message.
+   */
+  private emptyResultMessage_(): string {
+    if (this.lastCandidateCount_ === null) {
+      return t7e('plugins.ProximityOps.noRposFound');
+    }
+
+    return t7e('plugins.ProximityOps.noRposFoundCoorbital').replace('{count}', this.lastCandidateCount_.toString());
+  }
+
   private updateCount_(count: number): void {
     const el = getEl('proximity-ops-count', true);
 
@@ -594,7 +620,7 @@ export class ProximityOps extends KeepTrackPlugin {
     }
 
     if (count === 0) {
-      el.textContent = t7e('plugins.ProximityOps.noRposFound');
+      el.textContent = this.emptyResultMessage_();
 
       return;
     }
@@ -718,7 +744,10 @@ export class ProximityOps extends KeepTrackPlugin {
         const raan2 = SatMath.normalizeRaan(sat, nowDate);
 
         return (
-          sat.tle1 && 180 - Math.abs(Math.abs(primarySat.inclination - sat.inclination) - 180) < 5 && 360 - Math.abs(Math.abs(raan1 - raan2) - 360) < 5 && sat.id !== primarySatID
+          sat.tle1 &&
+          180 - Math.abs(Math.abs(primarySat.inclination - sat.inclination) - 180) < LEO_PLANE_TOLERANCE_DEG &&
+          360 - Math.abs(Math.abs(raan1 - raan2) - 360) < LEO_PLANE_TOLERANCE_DEG &&
+          sat.id !== primarySatID
         );
       });
     } else {

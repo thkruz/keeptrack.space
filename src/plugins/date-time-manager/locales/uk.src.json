@@ -43,7 +43,12 @@
         "now": "Зараз",
         "done": "Готово",
         "pause": "Пауза",
-        "propagation": "Пропагування"
+        "propagation": "Пропагування",
+        "month": "Місяць",
+        "year": "Рік",
+        "goTo": "Перейти (UTC)",
+        "goToTooltip": "Введіть дату й час UTC (YYYY-MM-DD HH:MM:SS) та натисніть Enter. Секунди й час необов'язкові.",
+        "goToInvalid": "Неправильна дата. Використовуйте формат UTC YYYY-MM-DD HH:MM:SS."
       }
     }
   }

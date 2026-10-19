@@ -3,7 +3,8 @@
   "$doc": "Two layers. `presets` = named single-menu runs (plugin + menuRoot, for `npm run locale-matrix -- <name>`). `preconditions` = per-menu setup hints keyed by the side-menu-parent element id, consumed by --sweep whole-app mode: only menus that need a selected sat / sensor / catalog / custom setup need an entry here; every other v13 menu is discovered and opened automatically with no config.",
   "preconditions": {
     "editSat-menu": { "needsCatalog": true, "selectSat": "25544" },
-    "MissileSimulatorPlugin-menu": { "needsCatalog": true }
+    "MissileSimulatorPlugin-menu": { "needsCatalog": true },
+    "satellite-swath-menu": { "evaluate": ["window.keepTrack.api.getPluginByName('SatelliteSwath').openSideMenu()"] }
   },
   "presets": {
     "catalog-management": {

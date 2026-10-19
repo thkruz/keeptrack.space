@@ -394,7 +394,9 @@ export class SatInfoBox extends KeepTrackPlugin {
       const sat = obj as Satellite;
 
       setInnerHtml(EL.INTL_DES, sat.intlDes === 'none' ? notAvailable : sat.intlDes);
-      if (sat.source && sat.source === CatalogSource.VIMPEL) {
+      // Synthetic JSC objects have no NORAD number; real ones served from a
+      // newer Vimpel elset keep theirs.
+      if (sat.source === CatalogSource.VIMPEL && /^0*$/u.test(sat.sccNum ?? '')) {
         setInnerHtml(EL.OBJNUM, notAvailable);
         setInnerHtml(EL.INTL_DES, notAvailable);
       } else {

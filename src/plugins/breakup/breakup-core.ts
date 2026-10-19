@@ -4,19 +4,20 @@
  * breakup-core.ts holds the DOM-free, catalog-free physics for the Breakup
  * simulator. Fragments are modelled the way a real breakup behaves: every piece
  * leaves the parent's exact position at the breakup instant with a small random
- * velocity change (delta-V) sampled in the radial / in-track / cross-track (RIC)
- * frame. The fragment state is then fit to SGP4 *mean* elements with `rv2tle`
- * (a TLE built straight from osculating elements lands kilometres off, because
- * SGP4 expects Brouwer mean elements). This works in ANY orbital regime
- * (LEO/MEO/GEO/HEO/elliptical) - unlike the old OrbitFinder "rotate the ground
- * track over a lat/lon" approach, which only approximated a near-circular breakup.
+ * velocity change (delta-V). The delta-V is sampled per axis in a selectable
+ * frame (RTN, NTW or inertial) from a selectable dispersion model (per-axis
+ * Gaussian, isotropic Maxwellian from a target mean speed, or a uniform box),
+ * with an optional cap on the total speed. The fragment state is then fit to
+ * SGP4 *mean* elements with `rv2tle` (a TLE built straight from osculating
+ * elements lands kilometres off, because SGP4 expects Brouwer mean elements).
+ * This works in ANY orbital regime (LEO/MEO/GEO/HEO/elliptical).
  *
  * Everything here works in the TEME frame (the SGP4 output frame KeepTrack uses),
- * so there is no J2000-vs-TEME frame mismatch.
+ * so there is no J2000-vs-TEME frame mismatch. The "ECI" frame option is TEME.
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2025 Kruczek Labs LLC
+ * @Copyright (C) 2025-2026 Kruczek Labs LLC
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -40,14 +41,53 @@ export const MS_TO_KMS = 0.001;
 /** A spliced TLE line must be exactly this long. */
 const TLE_LINE_LENGTH = 69;
 
-/** Max mean motion (rev/day) the TLE format / ootk parser accepts; beyond this an orbit is sub-orbital. */
-const MAX_TLE_MEAN_MOTION = 18;
+/** Earth gravitational parameter (km^3/s^2) and equatorial radius (km), WGS-72 as used by SGP4/TLEs. */
+const EARTH_MU = 398600.8;
+const EARTH_RADIUS_KM = 6378.135;
+
+/**
+ * Fragments whose fitted mean perigee is below this altitude reenter within about
+ * one revolution, so they are reported as reentered instead of created.
+ */
+export const MIN_PERIGEE_ALT_KM = 100;
+
+/** rv2tle convergence target, and the residual beyond which a fit is rejected as unconverged. */
+const FIT_TOLERANCE_KM = 0.05;
+const MAX_FIT_ERROR_KM = 0.5;
+
+/** Mean of a chi(3) variable: E|z| for z ~ N(0, I3) is 2*sqrt(2/pi) ~= 1.5957691216. */
+export const MAXWELL_MEAN_PER_SIGMA = 2 * Math.sqrt(2 / Math.PI);
 
 /** A simple cartesian 3-vector (km for position, km/s for velocity). */
 export type Vec3 = RvVector;
 
+/** Three per-axis values in the order of the menu's three inputs. */
+export type AxisTriple = [number, number, number];
+
 /**
- * Event-type presets that fill the per-axis delta-V fields (one-sigma, m/s).
+ * Frame the three delta-V inputs are expressed in. Inputs keep the same physical
+ * slots across frames so the presets stay meaningful: slot 1 ~ radial, slot 2 ~
+ * along-track, slot 3 ~ cross-track (the ECI slots are plain X, Y, Z).
+ *   - rtn: Radial, Transverse (in-track), Normal (cross-track)
+ *   - ntw: in-plane Normal to velocity, Tangential (along velocity), cross-track W
+ *   - eci: inertial TEME X, Y, Z
+ */
+export type DeltaVFrame = 'rtn' | 'ntw' | 'eci';
+export const DELTA_V_FRAMES: readonly DeltaVFrame[] = ['rtn', 'ntw', 'eci'];
+export const DEFAULT_DELTA_V_FRAME: DeltaVFrame = 'rtn';
+
+/**
+ * How each fragment's delta-V is drawn.
+ *   - gaussian: independent N(0, sigma_i^2) per axis (inputs are 1-sigma)
+ *   - maxwellian: isotropic Gaussian whose resultant speed has the entered mean
+ *   - uniform: independent U(-max_i, +max_i) per axis (inputs are half-widths)
+ */
+export type DispersionModel = 'gaussian' | 'maxwellian' | 'uniform';
+export const DISPERSION_MODELS: readonly DispersionModel[] = ['gaussian', 'maxwellian', 'uniform'];
+export const DEFAULT_DISPERSION_MODEL: DispersionModel = 'gaussian';
+
+/**
+ * Event-type presets that fill the per-axis delta-V fields (one-sigma, m/s, RTN).
  *
  * Magnitudes are grounded in the NASA Standard Breakup Model (EVOLVE 4.0):
  * fragment delta-V is log-normal, mu_v = 0.2*log10(A/M)+1.85 (explosion) or
@@ -93,16 +133,6 @@ export function getBreakupPreset(id: string): BreakupPreset | null {
   return BREAKUP_PRESETS.find((p) => p.id === id) ?? null;
 }
 
-/** Per-axis delta-V spread (standard deviation), in metres per second, as entered in the menu. */
-export interface DeltaVSpreadMps {
-  /** Radial (toward/away from Earth) spread. */
-  radial: number;
-  /** In-track (along velocity) spread - dominates how the cloud stretches along the orbit. */
-  inTrack: number;
-  /** Cross-track (out of plane) spread - dominates how the cloud fans across the orbit plane. */
-  crossTrack: number;
-}
-
 /** A sampled delta-V for one fragment, in km/s, expressed in RIC components. */
 export interface DeltaVComponentsKms {
   r: number;
@@ -117,6 +147,20 @@ export interface RicBasis {
   crossTrack: Vec3;
 }
 
+/** Orthonormal basis of a {@link DeltaVFrame}, axes in input-slot order. */
+export type FrameBasis = readonly [Vec3, Vec3, Vec3];
+
+/** Everything needed to draw one fragment's delta-V (all speeds m/s). */
+export interface DeltaVDispersion {
+  model: DispersionModel;
+  /** Per-axis values in slot order: 1-sigma (gaussian) or half-width (uniform). Ignored by maxwellian. */
+  axes: AxisTriple;
+  /** Target mean resultant speed (maxwellian only). */
+  meanSpeed: number;
+  /** Cap on the resultant speed, applied by rejection; 0 means no cap. */
+  maxTotalSpeed: number;
+}
+
 /** Raw (string) form values read from the menu, before parsing. */
 export interface BreakupRawForm {
   radialDv: string;
@@ -124,21 +168,37 @@ export interface BreakupRawForm {
   crossTrackDv: string;
   count: string;
   startNum: string;
+  /** Optional so callers with only the three axis fields (the interceptor) keep the defaults. */
+  frame?: string;
+  model?: string;
+  meanSpeed?: string;
+  maxTotalSpeed?: string;
 }
 
 /** Parsed, numeric breakup parameters. */
 export interface BreakupVariationParams {
   /** Number of debris pieces to create. */
   breakupCount: number;
-  /** Radial delta-V spread (m/s). */
+  /** Slot-1 delta-V value (m/s): radial in RTN, N in NTW, X in ECI. */
   radialDeltaV: number;
-  /** In-track delta-V spread (m/s). */
+  /** Slot-2 delta-V value (m/s): in-track in RTN, T (along velocity) in NTW, Y in ECI. */
   inTrackDeltaV: number;
-  /** Cross-track delta-V spread (m/s). */
+  /** Slot-3 delta-V value (m/s): cross-track in RTN, W in NTW, Z in ECI. */
   crossTrackDeltaV: number;
   /** First analyst catalog number assigned to the pieces. */
   startNum: number;
+  /** Frame of the three slot values; defaults to RTN. */
+  frame?: DeltaVFrame;
+  /** Dispersion model; defaults to per-axis Gaussian. */
+  model?: DispersionModel;
+  /** Target mean resultant speed (m/s), maxwellian only. */
+  meanSpeed?: number;
+  /** Resultant speed cap (m/s); 0 or absent means no cap. */
+  maxTotalSpeed?: number;
 }
+
+/** Thrown by {@link buildFragmentTle} when the fragment's orbit reenters (perigee too low or sub-orbital). */
+export class SubOrbitalFragmentError extends Error {}
 
 // --- Minimal vector helpers (kept local so the core has no class-construction quirks) ---
 
@@ -196,10 +256,8 @@ export function nextGaussian(rng: () => number): number {
   return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
 }
 
-/** Clamp a number to [min, max]. */
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value));
-}
+const parseFrame_ = (value: string | undefined): DeltaVFrame => DELTA_V_FRAMES.find((f) => f === value) ?? DEFAULT_DELTA_V_FRAME;
+const parseModel_ = (value: string | undefined): DispersionModel => DISPERSION_MODELS.find((m) => m === value) ?? DEFAULT_DISPERSION_MODEL;
 
 /**
  * Parse the raw menu strings into numeric parameters. An invalid start number
@@ -210,9 +268,6 @@ function clamp(value: number, min: number, max: number): number {
  */
 export function parseBreakupParams(raw: BreakupRawForm, defaultStartNum: number): { params: BreakupVariationParams; startNumWasInvalid: boolean } {
   const breakupCount = parseInt(raw.count);
-  const radialDeltaV = parseFloat(raw.radialDv);
-  const inTrackDeltaV = parseFloat(raw.inTrackDv);
-  const crossTrackDeltaV = parseFloat(raw.crossTrackDv);
   let startNum = parseInt(raw.startNum);
   let startNumWasInvalid = false;
 
@@ -222,17 +277,36 @@ export function parseBreakupParams(raw: BreakupRawForm, defaultStartNum: number)
   }
 
   // Negative spreads are meaningless (the distribution is already symmetric); floor at 0.
-  const nonNeg = (n: number) => (isNaN(n) ? 0 : Math.max(0, n));
+  // An empty or invalid cap reads as 0, which means "no cap".
+  const nonNeg = (s: string | undefined) => {
+    const n = parseFloat(s ?? '');
+
+    return isNaN(n) ? 0 : Math.max(0, n);
+  };
 
   return {
     params: {
       breakupCount: isNaN(breakupCount) ? 0 : breakupCount,
-      radialDeltaV: nonNeg(radialDeltaV),
-      inTrackDeltaV: nonNeg(inTrackDeltaV),
-      crossTrackDeltaV: nonNeg(crossTrackDeltaV),
+      radialDeltaV: nonNeg(raw.radialDv),
+      inTrackDeltaV: nonNeg(raw.inTrackDv),
+      crossTrackDeltaV: nonNeg(raw.crossTrackDv),
       startNum,
+      frame: parseFrame_(raw.frame),
+      model: parseModel_(raw.model),
+      meanSpeed: nonNeg(raw.meanSpeed),
+      maxTotalSpeed: nonNeg(raw.maxTotalSpeed),
     },
     startNumWasInvalid,
+  };
+}
+
+/** Collect the sampling inputs from parsed params, filling the frame/model defaults. */
+export function dispersionFromParams(params: BreakupVariationParams): DeltaVDispersion {
+  return {
+    model: params.model ?? DEFAULT_DISPERSION_MODEL,
+    axes: [params.radialDeltaV, params.inTrackDeltaV, params.crossTrackDeltaV],
+    meanSpeed: params.meanSpeed ?? 0,
+    maxTotalSpeed: params.maxTotalSpeed ?? 0,
   };
 }
 
@@ -250,32 +324,99 @@ export function computeRicBasis(position: Vec3, velocity: Vec3): RicBasis {
   return { radial, inTrack, crossTrack };
 }
 
-/** Zero bias — the isotropic default (an explosion/venting has no preferred direction). */
-const NO_BIAS: DeltaVComponentsKms = { r: 0, i: 0, c: 0 };
+/**
+ * Build the orthonormal basis of `frame` for a parent state, axes in input-slot order.
+ *   - rtn: [R = r/|r|, T = N x R, N = (r x v)/|r x v|]; R x T = N
+ *   - ntw: [N = T x W, T = v/|v|, W = (r x v)/|r x v|]; N x T = W
+ *   - eci: [X, Y, Z]
+ */
+export function computeFrameBasis(frame: DeltaVFrame, position: Vec3, velocity: Vec3): FrameBasis {
+  switch (frame) {
+    case 'ntw': {
+      const t = unit_(velocity);
+      const w = unit_(cross_(position, velocity));
+
+      return [cross_(t, w), t, w];
+    }
+    case 'eci':
+      return [
+        { x: 1, y: 0, z: 0 },
+        { x: 0, y: 1, z: 0 },
+        { x: 0, y: 0, z: 1 },
+      ];
+    case 'rtn':
+    default: {
+      const ric = computeRicBasis(position, velocity);
+
+      return [ric.radial, ric.inTrack, ric.crossTrack];
+    }
+  }
+}
+
+/** Rotate frame components into the inertial frame: sum of c_i * basis_i. */
+export function frameToInertial(basis: FrameBasis, components: AxisTriple): Vec3 {
+  return add_(add_(scale_(basis[0], components[0]), scale_(basis[1], components[1])), scale_(basis[2], components[2]));
+}
+
+/** Per-axis 1-sigma (m/s) of a Gaussian-family dispersion, or null for the uniform box. */
+export function gaussianSigmas(dispersion: DeltaVDispersion): AxisTriple | null {
+  switch (dispersion.model) {
+    case 'gaussian':
+      return [...dispersion.axes];
+    case 'maxwellian': {
+      const sigma = dispersion.meanSpeed / MAXWELL_MEAN_PER_SIGMA;
+
+      return [sigma, sigma, sigma];
+    }
+    default:
+      return null;
+  }
+}
+
+const length3_ = (v: AxisTriple): number => Math.hypot(v[0], v[1], v[2]);
+
+/** One uncapped draw (m/s, frame components). */
+function drawOnce_(rng: () => number, dispersion: DeltaVDispersion): AxisTriple {
+  const sigmas = gaussianSigmas(dispersion);
+
+  if (sigmas) {
+    return [sigmas[0] * nextGaussian(rng), sigmas[1] * nextGaussian(rng), sigmas[2] * nextGaussian(rng)];
+  }
+  const [a, b, c] = dispersion.axes;
+
+  return [a * (2 * rng() - 1), b * (2 * rng() - 1), c * (2 * rng() - 1)];
+}
+
+/** Redraws allowed before a capped sample is pulled onto the cap sphere instead. */
+const MAX_CAP_ATTEMPTS = 1000;
 
 /**
- * Sample one fragment's delta-V (km/s) in RIC components. Each axis is an
- * independent Gaussian whose standard deviation is the entered spread (m/s),
- * clamped to +/-3 sigma so a rare Box-Muller outlier cannot fling a fragment
- * onto a wildly different orbit.
- *
- * An optional `biasKms` shifts the mean of every fragment along a fixed RIC
- * direction. This models a kinetic impact, where the whole cloud's centre of
- * mass gains the impactor's momentum (a hypervelocity intercept is not
- * isotropic); the sign of the radial component is what makes an ascending hit
- * add radial energy and a descending hit drop perigee toward reentry.
- * @param rng - Seeded uniform source.
- * @param spread - Per-axis 1-sigma spread (m/s).
- * @param biasKms - Optional RIC mean shift (km/s); defaults to isotropic (no bias).
+ * Sample one fragment's delta-V (m/s) as frame components. With a cap, whole
+ * vectors whose resultant exceeds it are redrawn (rejection sampling), so the
+ * accepted cloud is the original distribution truncated at the cap, with no
+ * per-axis clipping. If the cap rejects nearly everything (see
+ * {@link DispersionStats.acceptance}), a sample still over it after
+ * {@link MAX_CAP_ATTEMPTS} draws is scaled onto the cap sphere.
  */
-export function sampleDeltaV(rng: () => number, spread: DeltaVSpreadMps, biasKms: DeltaVComponentsKms = NO_BIAS): DeltaVComponentsKms {
-  const axis = (sigmaMps: number) => clamp(nextGaussian(rng), -3, 3) * sigmaMps * MS_TO_KMS;
+export function sampleDispersion(rng: () => number, dispersion: DeltaVDispersion): AxisTriple {
+  let sample = drawOnce_(rng, dispersion);
+  const cap = dispersion.maxTotalSpeed;
 
-  return {
-    r: biasKms.r + axis(spread.radial),
-    i: biasKms.i + axis(spread.inTrack),
-    c: biasKms.c + axis(spread.crossTrack),
-  };
+  if (!(cap > 0)) {
+    return sample;
+  }
+  for (let attempt = 1; attempt < MAX_CAP_ATTEMPTS && length3_(sample) > cap; attempt++) {
+    sample = drawOnce_(rng, dispersion);
+  }
+  const speed = length3_(sample);
+
+  if (speed > cap) {
+    const s = cap / speed;
+
+    sample = [sample[0] * s, sample[1] * s, sample[2] * s];
+  }
+
+  return sample;
 }
 
 /**
@@ -305,35 +446,54 @@ export function applyDeltaV(velocity: Vec3, basis: RicBasis, dv: DeltaVComponent
 }
 
 /**
- * Build one debris fragment's TLE pair from the parent's TEME state and a sampled
- * delta-V, stamping the analyst SCC number. The fragment is fit so SGP4
+ * Mean-element perigee altitude (km) from a TLE line 2: a from the mean motion,
+ * then a(1 - e) minus the Earth radius.
+ */
+export function perigeeAltitudeFromTle2(tle2: string): number {
+  const meanMotionRevPerDay = parseFloat(tle2.substring(52, 63));
+  const eccentricity = parseFloat(`0.${tle2.substring(26, 33)}`);
+  const n = (meanMotionRevPerDay * 2 * Math.PI) / 86400;
+  const a = Math.cbrt(EARTH_MU / (n * n));
+
+  return a * (1 - eccentricity) - EARTH_RADIUS_KM;
+}
+
+/**
+ * Build one debris fragment's TLE pair from the parent's TEME state and an
+ * inertial delta-V, stamping the analyst SCC number. The fragment is fit so SGP4
  * reproduces (parent position, parent velocity + delta-V) at the breakup epoch,
  * so every fragment leaves the breakup point. Works in any orbital regime.
  *
  * @param epoch - Breakup time (state vector epoch).
  * @param position - Parent TEME position (km) at the breakup time.
  * @param velocity - Parent TEME velocity (km/s) at the breakup time.
- * @param basis - RIC basis for the parent state.
- * @param dv - Sampled delta-V (km/s, RIC components).
+ * @param deltaVKms - Fragment delta-V in TEME (km/s).
  * @param a5Num - 5-char alpha-5 analyst satellite number to stamp.
- * @throws if SGP4 mean elements cannot be fit to the fragment state.
+ * @throws {SubOrbitalFragmentError} if the fragment's perigee is below {@link MIN_PERIGEE_ALT_KM}.
+ * @throws {Error} if SGP4 mean elements cannot be fit to the fragment state.
  */
-export function buildFragmentTle(epoch: Date, position: Vec3, velocity: Vec3, basis: RicBasis, dv: DeltaVComponentsKms, a5Num: string): { tle1: TleLine1; tle2: TleLine2 } {
-  const newVelocity = applyDeltaV(velocity, basis, dv);
-  const fit = rv2tle(epoch, position, newVelocity, { maxIterations: 15, toleranceKm: 0.05 });
+export function buildFragmentTle(epoch: Date, position: Vec3, velocity: Vec3, deltaVKms: Vec3, a5Num: string): { tle1: TleLine1; tle2: TleLine2 } {
+  const newVelocity = add_(velocity, deltaVKms);
+  const fit = rv2tle(epoch, position, newVelocity, { maxIterations: 15, toleranceKm: FIT_TOLERANCE_KM });
 
   if (!fit) {
     throw new Error('Failed to fit SGP4 mean elements to the fragment state');
   }
 
-  // A large delta-V on a low orbit can drop a fragment's perigee below the surface
-  // (it would reenter). Such a state has a mean motion the TLE format can't hold
-  // (the parser rejects > 18 rev/day, ~sub-orbital). Reject it here so the caller
-  // skips this fragment instead of throwing deep inside the Satellite constructor.
+  // A large delta-V on a low orbit can drop a fragment's perigee into the
+  // atmosphere or below the surface. The breakup point itself is always at the
+  // parent's altitude, so check the orbit's perigee, not the epoch position.
   const meanMotion = parseFloat(fit.tle2.substring(52, 63));
+  const perigeeAltKm = perigeeAltitudeFromTle2(fit.tle2);
 
-  if (!(meanMotion > 0 && meanMotion <= MAX_TLE_MEAN_MOTION)) {
-    throw new Error(`Fragment is sub-orbital (mean motion ${meanMotion.toFixed(2)} rev/day) and would reenter`);
+  if (!(meanMotion > 0) || !(perigeeAltKm >= MIN_PERIGEE_ALT_KM)) {
+    throw new SubOrbitalFragmentError(`Fragment is sub-orbital (perigee ${perigeeAltKm.toFixed(0)} km) and would reenter`);
+  }
+
+  // rv2tle returns its best attempt even when it did not converge; a fragment
+  // that does not start at the breakup point is wrong, so refuse it.
+  if (fit.positionErrorKm > MAX_FIT_ERROR_KM) {
+    throw new Error(`SGP4 fit did not converge (${fit.positionErrorKm.toFixed(2)} km residual)`);
   }
 
   // rv2tle stamps a fixed 5-char SCC ("00001"); replace it with the analyst number.
@@ -367,4 +527,160 @@ export function isAnalystRangeValid(startNum: number, count: number, analystStar
   }
 
   return startNum >= analystStart && startNum + count <= analystStart + analystCount;
+}
+
+// =========================================================================
+// Theoretical ensemble statistics (live menu readout)
+// =========================================================================
+
+/** Theoretical properties of the resultant speed |dv| for a dispersion (m/s). */
+export interface DispersionStats {
+  meanSpeed: number;
+  rmsSpeed: number;
+  p99Speed: number;
+  /** Fraction of raw draws inside the cap (1 with no cap). */
+  acceptance: number;
+}
+
+const SQRT_2_OVER_PI = Math.sqrt(2 / Math.PI);
+
+/** erf(x), Abramowitz & Stegun 7.1.26 (|error| < 1.5e-7), ample for a display readout. */
+function erf_(x: number): number {
+  const sign = x < 0 ? -1 : 1;
+  const ax = Math.abs(x);
+  const t = 1 / (1 + 0.3275911 * ax);
+  const poly = t * (0.254829592 + t * (-0.284496736 + t * (1.421413741 + t * (-1.453152027 + t * 1.061405429))));
+
+  return sign * (1 - poly * Math.exp(-ax * ax));
+}
+
+/*
+ * chi(3) helpers for t = |z|, z ~ N(0, I3) (density sqrt(2/pi) t^2 e^(-t^2/2)):
+ *   cdf(T)        = erf(T/sqrt2) - sqrt(2/pi) T e^(-T^2/2)
+ *   E[t;   t<=T]  = sqrt(2/pi) (2 - (T^2 + 2) e^(-T^2/2))
+ *   E[t^2; t<=T]  = 3 erf(T/sqrt2) - sqrt(2/pi) (T^3 + 3T) e^(-T^2/2)
+ */
+const chi3Cdf_ = (t: number): number => erf_(t / Math.SQRT2) - SQRT_2_OVER_PI * t * Math.exp((-t * t) / 2);
+const chi3PartialMean_ = (t: number): number => SQRT_2_OVER_PI * (2 - (t * t + 2) * Math.exp((-t * t) / 2));
+const chi3PartialSecond_ = (t: number): number => 3 * erf_(t / Math.SQRT2) - SQRT_2_OVER_PI * (t * t * t + 3 * t) * Math.exp((-t * t) / 2);
+
+const SPHERE_POINTS = 2048;
+let sphereCache_: AxisTriple[] | null = null;
+
+/** Near-uniform unit directions (Fibonacci sphere) for averaging over directions. */
+function spherePoints_(): AxisTriple[] {
+  if (!sphereCache_) {
+    const golden = Math.PI * (3 - Math.sqrt(5));
+
+    sphereCache_ = Array.from({ length: SPHERE_POINTS }, (_, i) => {
+      const z = 1 - (2 * (i + 0.5)) / SPHERE_POINTS;
+      const r = Math.sqrt(1 - z * z);
+
+      return [r * Math.cos(golden * i), r * Math.sin(golden * i), z] as AxisTriple;
+    });
+  }
+
+  return sphereCache_;
+}
+
+/** Solve f(s) = target for a non-decreasing f on [0, hi] by bisection. */
+function bisect_(f: (s: number) => number, target: number, hi: number): number {
+  let lo = 0;
+  let top = hi;
+
+  for (let i = 0; i < 60; i++) {
+    const mid = (lo + top) / 2;
+
+    if (f(mid) < target) {
+      lo = mid;
+    } else {
+      top = mid;
+    }
+  }
+
+  return (lo + top) / 2;
+}
+
+/**
+ * Gaussian-family stats. A zero-mean Gaussian with per-axis sigma_i is x = k(u) t u
+ * with u a uniform direction, t ~ chi(3) independent of u, and
+ * k(u) = sqrt(sum sigma_i^2 u_i^2). So every speed statistic is a chi(3) statistic
+ * averaged over directions; for equal sigmas k is constant and the result is exact
+ * (mean = 2 sigma sqrt(2/pi), RMS = sqrt3 sigma).
+ */
+function gaussianStats_(sigmas: AxisTriple, cap: number): DispersionStats {
+  const isIsotropic = sigmas[0] === sigmas[1] && sigmas[1] === sigmas[2];
+  const scales = (isIsotropic ? [[1, 0, 0] as AxisTriple] : spherePoints_()).map((u) =>
+    Math.sqrt(sigmas[0] ** 2 * u[0] ** 2 + sigmas[1] ** 2 * u[1] ** 2 + sigmas[2] ** 2 * u[2] ** 2)
+  );
+  const hasCap = cap > 0;
+  const avg = (f: (k: number) => number) => scales.reduce((sum, k) => sum + f(k), 0) / scales.length;
+  // P(|x| <= s); a zero scale is a point mass at 0.
+  const cdf = (s: number) => avg((k) => (k === 0 ? 1 : chi3Cdf_(s / k)));
+
+  const acceptance = hasCap ? cdf(cap) : 1;
+
+  if (!(acceptance > 0)) {
+    return { meanSpeed: cap, rmsSpeed: cap, p99Speed: cap, acceptance: 0 };
+  }
+
+  const meanSpeed = hasCap ? avg((k) => (k === 0 ? 0 : k * chi3PartialMean_(cap / k))) / acceptance : avg((k) => k * MAXWELL_MEAN_PER_SIGMA);
+  const second = hasCap ? avg((k) => (k === 0 ? 0 : k * k * chi3PartialSecond_(cap / k))) / acceptance : avg((k) => 3 * k * k);
+  // chi(3) upper tail beyond 10 is ~1e-21, so 10 * max sigma always brackets P99.
+  const hi = hasCap ? cap : 10 * Math.max(...sigmas);
+
+  return {
+    meanSpeed,
+    rmsSpeed: Math.sqrt(second),
+    p99Speed: bisect_(cdf, 0.99 * acceptance, hi),
+    acceptance,
+  };
+}
+
+const UNIFORM_GRID = 40;
+
+/** Uniform-box stats by midpoint quadrature over the box (no closed form for the mean or P99). */
+function uniformStats_(halfWidths: AxisTriple, cap: number): DispersionStats {
+  const nodes = halfWidths.map((a) => (a > 0 ? Array.from({ length: UNIFORM_GRID }, (_, i) => a * ((2 * (i + 0.5)) / UNIFORM_GRID - 1)) : [0]));
+  const total = nodes[0].length * nodes[1].length * nodes[2].length;
+  const accepted: number[] = [];
+  const hasCap = cap > 0;
+
+  for (const x of nodes[0]) {
+    for (const y of nodes[1]) {
+      for (const z of nodes[2]) {
+        const s = Math.hypot(x, y, z);
+
+        if (!hasCap || s <= cap) {
+          accepted.push(s);
+        }
+      }
+    }
+  }
+
+  if (accepted.length === 0) {
+    return { meanSpeed: cap, rmsSpeed: cap, p99Speed: cap, acceptance: 0 };
+  }
+
+  const sorted = Float64Array.from(accepted).sort();
+  const mean = sorted.reduce((sum, s) => sum + s, 0) / sorted.length;
+  const second = sorted.reduce((sum, s) => sum + s * s, 0) / sorted.length;
+
+  return {
+    meanSpeed: mean,
+    rmsSpeed: Math.sqrt(second),
+    p99Speed: sorted[Math.min(sorted.length - 1, Math.floor(0.99 * sorted.length))],
+    acceptance: accepted.length / total,
+  };
+}
+
+/**
+ * Theoretical mean, RMS and 99th-percentile resultant speed (m/s) of a
+ * dispersion, including the truncation from an optional cap. The frame does not
+ * enter: rotating the per-axis draw into the inertial frame preserves its length.
+ */
+export function computeDispersionStats(dispersion: DeltaVDispersion): DispersionStats {
+  const sigmas = gaussianSigmas(dispersion);
+
+  return sigmas ? gaussianStats_(sigmas, dispersion.maxTotalSpeed) : uniformStats_(dispersion.axes, dispersion.maxTotalSpeed);
 }

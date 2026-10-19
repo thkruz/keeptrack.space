@@ -4,23 +4,22 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { PhasedOrbitSatellite } from '@app/app/objects/phased-orbit-satellite';
-import { SensorMath } from '@app/app/sensors/sensor-math';
 import { SolarBody } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
-import { getCatalogReferenceDate } from '@app/engine/utils/catalog-reference-time';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, eci2lla, Kilometers, MINUTES_PER_DAY, Satellite } from '@ootk/src/main';
+import { BaseObject, eci2lla, Kilometers, MINUTES_PER_DAY, Satellite, Tle, TleLine1 } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { EL, SECTIONS } from './sat-info-box-orbital-html';
+import { screeningSigmasKm } from './screening-sigmas';
 
 export class SatInfoBoxOrbital extends KeepTrackPlugin {
   readonly id = 'SatInfoBoxOrbital';
@@ -81,21 +80,18 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       { key: t7e('SatInfoBoxOrbital.Altitude.label'), id: EL.ALTITUDE, tooltip: t7e('SatInfoBoxOrbital.Altitude.tooltip'), value: 'xxx km' },
       { key: t7e('SatInfoBoxOrbital.Period.label'), id: EL.PERIOD, tooltip: t7e('SatInfoBoxOrbital.Period.tooltip'), value: 'xxx min' },
       { key: t7e('SatInfoBoxOrbital.Velocity.label'), id: EL.VELOCITY, tooltip: t7e('SatInfoBoxOrbital.Velocity.tooltip'), value: 'xxx km/s' },
+      { key: t7e('SatInfoBoxOrbital.GPEpoch.label'), id: EL.GP_EPOCH, tooltip: t7e('SatInfoBoxOrbital.GPEpoch.tooltip'), value: 'xxxx-xx-xx xx:xx:xx UTC' },
       { key: t7e('SatInfoBoxOrbital.AgeOfGP.label'), id: EL.ELSET_AGE, tooltip: t7e('SatInfoBoxOrbital.AgeOfGP.tooltip'), value: 'xxx.xxxx' },
       { key: t7e('SatInfoBoxOrbital.RadialSigma.label'), id: EL.UNCERTAINTY_RADIAL, tooltip: t7e('SatInfoBoxOrbital.RadialSigma.tooltip'), value: 'xxx.xxxx' },
       { key: t7e('SatInfoBoxOrbital.InTrackSigma.label'), id: EL.UNCERTAINTY_INTRACK, tooltip: t7e('SatInfoBoxOrbital.InTrackSigma.tooltip'), value: 'xxx.xxxx' },
       { key: t7e('SatInfoBoxOrbital.CrossTrackSigma.label'), id: EL.UNCERTAINTY_CROSSTRACK, tooltip: t7e('SatInfoBoxOrbital.CrossTrackSigma.tooltip'), value: 'xxx.xxxx' },
     ];
 
-    if (!settingsManager.plugins.SatInfoBoxOrbital!.isShowCovariance) {
-      /*
-       * Remove the covariance rows (Radial Sigma, In Track Sigma, Cross Track Sigma) if the setting is disabled
-       * These rows are at indices 12, 13, and 14 in the 'rows' array
-       */
-      rows.splice(12, 3);
-    }
+    const covarianceIds: string[] = [EL.UNCERTAINTY_RADIAL, EL.UNCERTAINTY_INTRACK, EL.UNCERTAINTY_CROSSTRACK];
+    // Drop the covariance rows (Radial, In Track, Cross Track Sigma) when the setting is disabled
+    const visibleRows = settingsManager.plugins.SatInfoBoxOrbital!.isShowCovariance ? rows : rows.filter((row) => !covarianceIds.includes(row.id));
 
-    return rows
+    return visibleRows
       .map(
         (row) => html`
         <div class="sat-info-row sat-only-info">
@@ -124,11 +120,14 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       this.updateOemOrbitalElements_(obj);
     }
 
+    // Only objects propagated from a GP element set (TLE) have a GP epoch; OEM, missiles, etc. show N/A
+    setInnerHtml(EL.GP_EPOCH, obj instanceof Satellite ? SatInfoBoxOrbital.formatGpEpoch(obj.tle1) : 'N/A');
+
     if (this.updateAltitudeAndVelocity_(obj) === false) {
       return;
     }
 
-    this.updateCovariance_();
+    this.updateCovariance_(obj);
     this.updateSecondarySatellite_(obj);
   }
 
@@ -159,15 +158,15 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
   }
 
   private updateElsetAgeElement_(obj: Satellite): void {
-    const now: Date | number | string = getCatalogReferenceDate();
-    const daysold = obj.ageOfElset(now);
-    const age = daysold >= 1 ? daysold : daysold * 24;
-    const units = daysold >= 1 ? t7e('SatInfoBoxOrbital.AgeOfGP.days') : t7e('SatInfoBoxOrbital.AgeOfGP.hours');
+    // Age of GP is measured against the SIMULATION clock, not the wall clock, so it follows time jumps and reads
+    // negative when the sim time is before the element set epoch.
+    const simTime = ServiceLocator.getTimeManager().simulationTimeObj;
+    const ageText = SatInfoBoxOrbital.formatElsetAge(obj.ageOfElset(simTime));
 
     const elsetAgeDom = getEl(EL.ELSET_AGE);
 
     if (elsetAgeDom) {
-      elsetAgeDom.innerHTML = `${age.toFixed(2)} ${units}`;
+      elsetAgeDom.innerHTML = ageText;
       elsetAgeDom.dataset.position = 'top';
       elsetAgeDom.dataset.delay = '50';
       elsetAgeDom.setAttribute(
@@ -175,6 +174,54 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
         `${t7e('SatInfoBoxOrbital.AgeOfGP.epochYear')}: ${obj.tle1.substring(18, 20)}<br/>
            ${t7e('SatInfoBoxOrbital.AgeOfGP.epochDay')}: ${obj.tle1.substring(20, 28)}`
       );
+    }
+  }
+
+  /**
+   * Formats an element set age (in days, signed) for the Age of GP row. Ages under one day show in hours. A negative
+   * age means the GP epoch is after the simulation time; it keeps the minus sign and adds a short localized note.
+   */
+  static formatElsetAge(daysOld: number): string {
+    if (!Number.isFinite(daysOld)) {
+      return 'N/A';
+    }
+
+    const absDays = Math.abs(daysOld);
+    const isDays = absDays >= 1;
+    const magnitude = isDays ? absDays : absDays * 24;
+    const units = isDays ? t7e('SatInfoBoxOrbital.AgeOfGP.days') : t7e('SatInfoBoxOrbital.AgeOfGP.hours');
+    // Treat anything that rounds to 0.00 as zero so the row never shows "-0.00"
+    const isFuture = daysOld < 0 && magnitude.toFixed(2) !== '0.00';
+
+    if (!isFuture) {
+      return `${magnitude.toFixed(2)} ${units}`;
+    }
+
+    return `-${magnitude.toFixed(2)} ${units} (${t7e('SatInfoBoxOrbital.AgeOfGP.epochAfterSimTime')})`;
+  }
+
+  /**
+   * Formats the epoch of a GP element set as `YYYY-MM-DD HH:MM:SS UTC`, or 'N/A' when the TLE has no parsable epoch.
+   * Uses the same 57 year pivot as {@link Tle.calcElsetAge}, which drives the Age of GP row.
+   */
+  static formatGpEpoch(tle1: TleLine1 | undefined | null): string {
+    if (typeof tle1 !== 'string' || tle1.length < 32) {
+      return 'N/A';
+    }
+
+    try {
+      const year = Tle.epochYearFull(tle1);
+      const dayOfYear = Tle.epochDay(tle1);
+      // Round to the millisecond so float noise cannot turn :38.000 into :37.999
+      const epochMs = Math.round(Date.UTC(year, 0, 1) + (dayOfYear - 1) * 86400000);
+
+      if (!Number.isFinite(epochMs)) {
+        return 'N/A';
+      }
+
+      return `${new Date(epochMs).toISOString().slice(0, 19).replace('T', ' ')} UTC`;
+    } catch {
+      return 'N/A';
     }
   }
 
@@ -254,10 +301,16 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     }
   }
 
-  private updateCovariance_(): void {
-    const covMatrix = PluginRegistry.getPlugin(SelectSatManager)!.primarySatCovMatrix;
+  /**
+   * Sigma rows: 1-sigma R / I / C of the TLE-derived screening covariance at the GP epoch, the
+   * same numbers the Conjunction Report prints and the model Pc is computed from. Deliberately not
+   * SelectSatManager.primarySatCovMatrix: that holds ellipsoid display radii, which are scaled by
+   * the confidence level and replaced by the Pro Covariance plugin's measured covariance.
+   */
+  private updateCovariance_(obj: BaseObject): void {
+    const sigmas = obj instanceof Satellite ? screeningSigmasKm(obj.tle1, obj.tle2) : null;
 
-    if (!covMatrix) {
+    if (!sigmas) {
       setInnerHtml(EL.UNCERTAINTY_RADIAL, t7e('SatInfoBoxOrbital.unknown'));
       setInnerHtml(EL.UNCERTAINTY_CROSSTRACK, t7e('SatInfoBoxOrbital.unknown'));
       setInnerHtml(EL.UNCERTAINTY_INTRACK, t7e('SatInfoBoxOrbital.unknown'));
@@ -265,24 +318,18 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       return;
     }
 
-    let covRadial = covMatrix[0];
-    let covCrossTrack = covMatrix[1];
-    let covInTrack = covMatrix[2];
+    setInnerHtml(EL.UNCERTAINTY_RADIAL, SatInfoBoxOrbital.formatSigmaKm(sigmas.radial));
+    setInnerHtml(EL.UNCERTAINTY_INTRACK, SatInfoBoxOrbital.formatSigmaKm(sigmas.inTrack));
+    setInnerHtml(EL.UNCERTAINTY_CROSSTRACK, SatInfoBoxOrbital.formatSigmaKm(sigmas.crossTrack));
+  }
 
-    const useKm = covRadial > 0.5 && covCrossTrack > 0.5 && covInTrack > 0.5;
-
-    if (useKm) {
-      setInnerHtml(EL.UNCERTAINTY_RADIAL, `${(covMatrix[0]).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
-      setInnerHtml(EL.UNCERTAINTY_CROSSTRACK, `${(covMatrix[1]).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
-      setInnerHtml(EL.UNCERTAINTY_INTRACK, `${(covMatrix[2]).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
-    } else {
-      covRadial *= 1000;
-      covCrossTrack *= 1000;
-      covInTrack *= 1000;
-      setInnerHtml(EL.UNCERTAINTY_RADIAL, `${covRadial.toFixed(2)} ${t7e('SatInfoBoxOrbital.meter')}`);
-      setInnerHtml(EL.UNCERTAINTY_CROSSTRACK, `${covCrossTrack.toFixed(2)} ${t7e('SatInfoBoxOrbital.meter')}`);
-      setInnerHtml(EL.UNCERTAINTY_INTRACK, `${covInTrack.toFixed(2)} ${t7e('SatInfoBoxOrbital.meter')}`);
+  /** A 1-sigma value (km) with its unit: meters below 1 km, km (3 decimals, as in the reports) above. */
+  static formatSigmaKm(sigmaKm: number): string {
+    if (sigmaKm < 1) {
+      return `${(sigmaKm * 1000).toFixed(1)} ${t7e('SatInfoBoxOrbital.meter')}`;
     }
+
+    return `${sigmaKm.toFixed(3)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
   }
 
   private updateSecondarySatellite_(obj: BaseObject): void {
@@ -294,7 +341,11 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
     const sat = obj as Satellite;
     const ric = secondarySatObj.toRIC(sat, ServiceLocator.getTimeManager().simulationTimeObj);
-    const dist = SensorMath.distanceString(sat, secondarySatObj).split(' ')[2];
+    /*
+     * Linear range comes from the same main-thread SGP4 states as R/I/C. The cruncher-buffer positions lag a
+     * time jump by up to two cruncher cycles, so mixing the two sources showed a stale range on first paint.
+     */
+    const dist = ric.range.toFixed(2);
 
     const satDistanceElement = getEl('sat-sec-dist');
     const satRadiusElement = getEl('sat-sec-rad');

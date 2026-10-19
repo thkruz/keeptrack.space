@@ -1,7 +1,14 @@
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { hasBottomIcon, hasHelp, hasSecondaryMenu, hasSideMenu } from '@app/engine/plugins/core/plugin-capabilities';
 import { getEl } from '@app/engine/utils/get-el';
 import { DebrisScreening } from '@app/plugins/debris-screening/debris-screening';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import type { DsResultRow } from '@app/webworker/debris-screening-messages';
+import { CatalogScreener, EpochUTC, Satellite, ScreeningResult } from '@ootk/src/main';
+import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -76,6 +83,22 @@ describe('DebrisScreening_form', () => {
     expect(getEl('ds-u')).toBeDefined();
     expect(getEl('ds-v')).toBeDefined();
     expect(getEl('ds-w')).toBeDefined();
+  });
+
+  it('offers time windows up to 7 days (96 h and 168 h)', () => {
+    websiteInit(debrisScreeningPlugin);
+    const options = Array.from((getEl('ds-time') as HTMLSelectElement).options).map((o) => [o.value, o.textContent?.trim()]);
+
+    expect(options).toEqual([
+      ['1', '1 Hour'],
+      ['4', '4 Hours'],
+      ['8', '8 Hours'],
+      ['24', '24 Hours'],
+      ['48', '48 Hours'],
+      ['72', '72 Hours'],
+      ['96', '4 Days'],
+      ['168', '7 Days'],
+    ]);
   });
 
   it('should have Draw Box and Clear Box buttons', () => {
@@ -160,5 +183,202 @@ describe('DebrisScreening_formatting', () => {
     expect((plugin as any).formatPc_(1.23e-6)).toBe('1.23e-6');
     expect((plugin as any).formatPc_(1e-13)).toBe('<1e-12');
     expect((plugin as any).formatPc_()).toBe('N/A');
+  });
+});
+
+describe('DebrisScreening_follows_selection', () => {
+  let plugin: DebrisScreening;
+  const satA = new Satellite({ ...defaultSat, id: 0, sccNum: '25544' });
+  const satB = new Satellite({ ...defaultSat, id: 1, sccNum: '43013' });
+  const staleRow: DsResultRow = {
+    secondaryId: '11111',
+    tcaMs: Date.UTC(2022, 0, 1),
+    missDistance: 1,
+    radialDistance: 0.1,
+    intrackDistance: 0.5,
+    crosstrackDistance: 0.2,
+    relativeVelocity: 7,
+    probabilityOfCollision: 1e-5,
+    riskScore: 0.5,
+  };
+
+  type Internals = { rows_: DsResultRow[]; renderRows_: (rows: DsResultRow[]) => void };
+
+  const openWithResultsFor = (sat: Satellite) => {
+    plugin.isMenuButtonActive = true;
+    (getEl('ds-scc') as HTMLInputElement).value = sat.sccNum;
+    const internals = plugin as unknown as Internals;
+
+    internals.rows_ = [staleRow];
+    internals.renderRows_(internals.rows_);
+  };
+
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager]);
+    plugin = new DebrisScreening();
+    websiteInit(plugin);
+  });
+
+  it('updates the SCC# field and clears stale results when the selection changes while open', () => {
+    const onSelectSpy = vi.spyOn(plugin as unknown as { onSelectSatData_: (obj: unknown) => void }, 'onSelectSatData_');
+
+    openWithResultsFor(satA);
+    expect(getEl('ds-results-body')!.querySelectorAll('tr')).toHaveLength(1);
+
+    EventBus.getInstance().emit(EventBusEvent.selectSatData, satB, satB.id);
+
+    expect(onSelectSpy).toHaveBeenCalled();
+    expect((getEl('ds-scc') as HTMLInputElement).value).toBe('43013');
+    expect((plugin as unknown as Internals).rows_).toHaveLength(0);
+    expect(getEl('ds-results-body')!.querySelectorAll('tr')).toHaveLength(0);
+    expect(getEl('ds-results-count')!.textContent).toBe('0 conjunctions found');
+  });
+
+  it('keeps results when the same satellite is re-selected', () => {
+    openWithResultsFor(satA);
+
+    EventBus.getInstance().emit(EventBusEvent.selectSatData, satA, satA.id);
+
+    expect((getEl('ds-scc') as HTMLInputElement).value).toBe('25544');
+    expect((plugin as unknown as Internals).rows_).toHaveLength(1);
+  });
+
+  it('does nothing while the menu is closed', () => {
+    openWithResultsFor(satA);
+    plugin.isMenuButtonActive = false;
+
+    EventBus.getInstance().emit(EventBusEvent.selectSatData, satB, satB.id);
+
+    expect((getEl('ds-scc') as HTMLInputElement).value).toBe('25544');
+    expect((plugin as unknown as Internals).rows_).toHaveLength(1);
+  });
+});
+
+describe('DebrisScreening_recent_runs', () => {
+  let plugin: DebrisScreening;
+
+  /** A screener result shaped like ootk's (only the fields toRow_ reads). */
+  const fakeResult = (primaryId: string, secondaryId: string, pc: number): ScreeningResult =>
+    ({
+      primaryId,
+      secondaryId,
+      riskScore: 0.5,
+      event: {
+        tca: EpochUTC.fromDateTime(new Date(Date.UTC(2022, 0, 1, 1))),
+        missDistance: 0.5,
+        radialDistance: 0.1,
+        intrackDistance: 0.2,
+        crosstrackDistance: 0.1,
+        relativeVelocity: 7,
+        probabilityOfCollision: pc,
+      },
+    }) as unknown as ScreeningResult;
+
+  /** Run the synchronous screening path for one primary, with the screener stubbed. */
+  const runScreening = (sccNum: string, id: number, hours = 72): void => {
+    const sat = new Satellite({ ...defaultSat, id, sccNum });
+    const catalog = ServiceLocator.getCatalogManager();
+
+    vi.spyOn(catalog, 'sccNum2Id').mockReturnValue(id as never);
+    vi.spyOn(catalog, 'getObject').mockReturnValue(sat as never);
+    catalog.objectCache = [] as never;
+    vi.spyOn(CatalogScreener, 'screenOneToMany').mockReturnValue([fakeResult(sccNum, `S${sccNum}`, 1e-5)]);
+    (getEl('ds-scc') as HTMLInputElement).value = sccNum;
+    (getEl('ds-time') as HTMLInputElement).value = String(hours);
+
+    plugin.onFormSubmit();
+    vi.advanceTimersByTime(1000);
+  };
+
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager]);
+    plugin = new DebrisScreening();
+    websiteInit(plugin);
+    vi.spyOn(plugin as unknown as { calculateCovarianceFromSatellite: () => unknown }, 'calculateCovarianceFromSatellite').mockReturnValue(undefined);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('retains two runs newest first with their primary ids and windows', () => {
+    const startMs = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
+
+    runScreening('25544', 0, 24);
+    runScreening('43013', 1, 48);
+
+    const runs = plugin.getRecentScreeningRuns();
+
+    expect(runs.map((run) => run.primaryId)).toEqual(['43013', '25544']);
+    expect(runs[0].rows.map((row) => row.secondaryId)).toEqual(['S43013']);
+    expect(runs[1].rows.map((row) => row.secondaryId)).toEqual(['S25544']);
+    expect(runs[1].startTimeMs).toBe(startMs);
+    expect(runs[1].endTimeMs).toBe(startMs + 24 * 3600 * 1000);
+    expect(runs[0].endTimeMs! - runs[0].startTimeMs!).toBe(48 * 3600 * 1000);
+  });
+
+  it('evicts the oldest run once a sixth run completes', () => {
+    ['10001', '10002', '10003', '10004', '10005', '10006'].forEach((scc, i) => {
+      runScreening(scc, i + 10);
+    });
+
+    const runs = plugin.getRecentScreeningRuns();
+
+    expect(runs).toHaveLength(DebrisScreening.MAX_RETAINED_RUNS);
+    expect(runs.map((run) => run.primaryId)).toEqual(['10006', '10005', '10004', '10003', '10002']);
+  });
+
+  it('keeps the run history when the target change clears the results table', () => {
+    runScreening('25544', 0);
+
+    (plugin as unknown as { onTargetChanged_: () => void }).onTargetChanged_();
+
+    expect((plugin as unknown as { rows_: unknown[] }).rows_).toHaveLength(0);
+    expect(plugin.getRecentScreeningRuns()).toHaveLength(1);
+    expect(plugin.getRecentScreeningRuns()[0].rows).toHaveLength(1);
+  });
+
+  it('is reachable through PluginRegistry, the way the Reports plugin reads it', () => {
+    runScreening('25544', 0);
+
+    const registered = PluginRegistry.getPlugin(DebrisScreening);
+
+    expect(registered).toBe(plugin);
+    expect(registered!.getRecentScreeningRuns()[0].primaryId).toBe('25544');
+  });
+});
+
+describe('DebrisScreening_results_panel_z_order', () => {
+  let plugin: DebrisScreening;
+
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager]);
+    plugin = new DebrisScreening();
+    websiteInit(plugin);
+  });
+
+  it('closes the results panel when another plugin opens its side menu', () => {
+    const close = vi.spyOn(plugin, 'closeSecondaryMenu');
+    const other = { bottomIconElementName: 'other-menu-icon', sideMenuElementName: 'other-menu' };
+    const toggle = { bottomIconElementName: 'toggle-icon', sideMenuElementName: '' };
+
+    vi.spyOn(PluginRegistry, 'plugins', 'get').mockReturnValue([plugin, other, toggle] as never);
+    plugin.isSideMenuSettingsOpen = true;
+
+    // Its own icon and a plugin without a side menu leave the panel alone.
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, 'toggle-icon');
+    expect(close).not.toHaveBeenCalled();
+
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, 'other-menu-icon');
+    expect(close).toHaveBeenCalledTimes(1);
+  });
+
+  it('does nothing when the results panel is closed', () => {
+    const close = vi.spyOn(plugin, 'closeSecondaryMenu');
+
+    plugin.isSideMenuSettingsOpen = false;
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, 'other-menu-icon');
+    expect(close).not.toHaveBeenCalled();
   });
 });

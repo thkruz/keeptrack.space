@@ -1,3 +1,4 @@
+import { FLAG_ATLAS_PATH, type FlagSource, flagAtlasRect, resolveFlagKey } from '@app/app/data/catalogs/flag-resolver';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { ModelResolver } from '@app/app/rendering/mesh/model-resolver';
 import { EciArr3, GetSatType } from '@app/engine/core/interfaces';
@@ -11,8 +12,11 @@ import { ServiceLocator } from '../core/service-locator';
 import { errorManagerInstance } from '../utils/errorManager';
 import { BufferAttribute } from './buffer-attribute';
 import { OcclusionProgram } from './draw-manager/post-processing';
+import { GlUtils } from './gl-utils';
 import { Material } from './material';
+import { computeDecalBasis, type DecalBasis } from './mesh/decal-math';
 import { OBJLoader } from './mesh/loaders/webgl-obj-loader';
+import type { MeshBounds } from './mesh/mesh-bounds';
 import { MeshRegistry } from './mesh/mesh-registry';
 import { MeshRenderer } from './mesh/mesh-renderer';
 
@@ -59,6 +63,8 @@ export type MeshModel = {
   geometry?: Geometry;
   material?: Material;
   layout?: Layout;
+  /** Model-space bounds (km) computed once at load; drives the flag decal size and centre. */
+  bounds?: MeshBounds;
 };
 
 export interface MeshObject {
@@ -69,6 +75,11 @@ export interface MeshObject {
   inSun: number;
   model: MeshModel;
   isRotationStable: boolean;
+  /**
+   * Flag decal for this object, resolved once when `id` changes: the atlas rect as
+   * (u0, v0, width, height) and whether the object has a flag at all.
+   */
+  flag?: { objectId: number; enabled: boolean; cell: Float32Array };
 }
 
 export class MeshManager {
@@ -81,7 +92,17 @@ export class MeshManager {
     model: null as unknown as MeshModel,
     isRotationStable: false,
     rotation: { x: 0, y: 0, z: 0 } as Vec3<Degrees>,
+    flag: { objectId: -2, enabled: false, cell: new Float32Array(4) },
   };
+
+  /** Model-space decal basis, rewritten each frame the flag is drawn (no allocation). */
+  readonly decalBasis: DecalBasis = { dir: vec3.create(), u: vec3.create(), v: vec3.create() };
+  /** Same axis swap Camera.calculatePMatrix appends to the projection: (x, y, z) -> (x, z, -y). */
+  private static readonly ECI_TO_GL_VIEW_ = mat4.fromValues(1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1);
+  /** ECI_TO_GL_VIEW_ * camMatrix * mvMatrix_ for the frame being drawn. */
+  private readonly decalModelView_ = mat4.create();
+  private flagAtlasTexture_: WebGLTexture | null = null;
+  private flagAtlasState_: 'idle' | 'loading' | 'ready' | 'failed' = 'idle';
 
   mvMatrix_: mat4;
   nMatrix_: mat3;
@@ -167,6 +188,7 @@ export class MeshManager {
       return;
     }
     this.currentMeshObject.id = 0;
+    this.setFlag_(null, -1);
     this.currentMeshObject.inSun = 1;
     this.currentMeshObject.isRotationStable = false;
 
@@ -207,6 +229,10 @@ export class MeshManager {
     this.lightDirection = null;
 
     this.updateModel_(selectedDate, sat);
+
+    if (this.currentMeshObject.flag?.objectId !== this.currentMeshObject.id) {
+      this.setFlag_(sat as unknown as FlagSource, this.currentMeshObject.id);
+    }
 
     const meshName = this.currentMeshObject.model?.name;
 
@@ -385,6 +411,69 @@ export class MeshManager {
     } catch {
       // Don't Let meshManager break everything
     }
+  }
+
+  /**
+   * Resolve and cache the flag cell for the object now in `currentMeshObject` (override, then
+   * country, then none). Runs only when the selected object changes.
+   */
+  private setFlag_(obj: FlagSource | null, objectId: number): void {
+    const flag = this.currentMeshObject.flag ?? { objectId: -2, enabled: false, cell: new Float32Array(4) };
+    const rect = obj ? flagAtlasRect(resolveFlagKey(obj)) : null;
+
+    flag.objectId = objectId;
+    flag.enabled = rect !== null;
+    if (rect) {
+      flag.cell[0] = rect[0];
+      flag.cell[1] = rect[1];
+      flag.cell[2] = rect[2] - rect[0];
+      flag.cell[3] = rect[3] - rect[1];
+    }
+    this.currentMeshObject.flag = flag;
+  }
+
+  /**
+   * Per-draw flag decal setup. Returns the atlas texture when the decal should be drawn this
+   * frame (setting on, object has a flag, model has bounds, atlas loaded) after writing
+   * {@link decalBasis}; otherwise null. The atlas loads lazily on the first frame that wants it.
+   */
+  prepareFlagDecal(camMatrix: mat4): WebGLTexture | null {
+    const flag = this.currentMeshObject.flag;
+    const bounds = this.currentMeshObject.model?.bounds;
+
+    if (!settingsManager.isFlagDecalsFeatureEnabled || !settingsManager.isDrawFlagDecals || !flag?.enabled || !bounds || bounds.radius <= 0 || !this.mvMatrix_) {
+      return null;
+    }
+    if (this.flagAtlasState_ !== 'ready') {
+      this.loadFlagAtlas_();
+
+      return null;
+    }
+
+    // camMatrix space is Z-up (camera looks along +Y); the projection matrix swaps it into
+    // OpenGL view space. Apply the same swap so the decal's "up" is screen up.
+    mat4.multiply(this.decalModelView_, camMatrix, this.mvMatrix_);
+    mat4.multiply(this.decalModelView_, MeshManager.ECI_TO_GL_VIEW_, this.decalModelView_);
+    computeDecalBasis(this.decalModelView_, bounds.center, this.decalBasis);
+
+    return this.flagAtlasTexture_;
+  }
+
+  private loadFlagAtlas_(): void {
+    if (this.flagAtlasState_ !== 'idle' || !this.gl_) {
+      return;
+    }
+    this.flagAtlasState_ = 'loading';
+    GlUtils.initTexture(this.gl_, `${settingsManager.installDirectory}${FLAG_ATLAS_PATH}`)
+      .then((texture) => {
+        this.flagAtlasTexture_ = texture;
+        this.flagAtlasState_ = 'ready';
+      })
+      .catch((err: unknown) => {
+        // One attempt only; the model still draws, just without a flag.
+        this.flagAtlasState_ = 'failed';
+        errorManagerInstance.warn('Failed to load the flag atlas', err);
+      });
   }
 
   updatePosition(targetPosition: { x: Kilometers; y: Kilometers; z: Kilometers }) {

@@ -568,6 +568,23 @@ describe('SearchManager interactions', () => {
     expect(rows.length).toBe(results.length);
     // totalFound (50) > results.length renders the "showing N of M" banner.
     expect(document.getElementById('search-results')!.querySelector('.search-result-limit')).not.toBeNull();
+    expect(document.getElementById('search-results')!.querySelector('.search-result-count')!.textContent).toContain('50');
+  });
+
+  it('fillResultBox always shows how many objects matched, even below the limit', () => {
+    const sat = new Satellite({ ...defaultSat, id: 0, sccNum: '25544' });
+
+    ServiceLocator.getCatalogManager().objectCache = [sat] as never;
+    ServiceLocator.getDotsManager().positionData = null as never;
+    const row = { id: 0, searchType: SearchResultType.OBJECT_NAME, strIndex: 0, patlen: 3 };
+
+    mgr.fillResultBox([row, row, row], ServiceLocator.getCatalogManager(), 3);
+    const countEl = document.getElementById('search-results')!.querySelector('.search-result-count')!;
+
+    expect(countEl.textContent).toContain('3');
+    expect(countEl.textContent).not.toContain('Showing');
+    // The count line is not a selectable result row.
+    expect(document.querySelectorAll('.search-result').length).toBe(3);
   });
 
   it('addListeners_ routes the input event to doSearch and the icon click to toggleSearch', () => {
@@ -647,5 +664,27 @@ describe('SearchManager interactions', () => {
     p().updateSelectedResult_(rows);
 
     expect((rows[1] as HTMLElement).classList.contains('search-result--selected')).toBe(true);
+  });
+
+  it('right-click and pointer leave on the results list clear the stuck hover card', () => {
+    const setHoverId = vi.fn();
+
+    vi.spyOn(ServiceLocator, 'getHoverManager').mockReturnValue({ setHoverId } as never);
+    document.body.insertAdjacentHTML('beforeend', '<div id="sat-hoverbox" style="display: flex;"></div>');
+    p().addListeners_();
+    const resultsEl = document.getElementById('search-results')!;
+
+    ServiceLocator.getUiManager().searchHoverSatId = 5;
+    resultsEl.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true }));
+    expect(ServiceLocator.getUiManager().searchHoverSatId).toBe(-1);
+    expect(setHoverId).toHaveBeenCalledWith(-1);
+    expect(document.getElementById('sat-hoverbox')!.style.display).toBe('none');
+
+    document.getElementById('sat-hoverbox')!.style.display = 'flex';
+    ServiceLocator.getUiManager().searchHoverSatId = 6;
+    resultsEl.dispatchEvent(new Event('pointerleave'));
+    expect(ServiceLocator.getUiManager().searchHoverSatId).toBe(-1);
+    expect(document.getElementById('sat-hoverbox')!.style.display).toBe('none');
+    document.getElementById('sat-hoverbox')!.remove();
   });
 });

@@ -26,6 +26,10 @@
       "label": "国家",
       "tooltip": "原产国"
     },
+    "ModelFlag": {
+      "label": "模型旗帜",
+      "tooltip": "绘制在三维模型上的旗帜：若目录有指定则使用指定值，否则使用所属国家"
+    },
     "LaunchSite": {
       "label": "发射场",
       "tooltip": "对象被发射时所在的位置"
@@ -51,6 +55,20 @@
       "tooltip": "在当前仿真时间从所选传感器观测到的视星等"
     },
     "estimatedSuffix": "（估算）",
-    "unknown": "未知"
+    "unknown": "未知",
+    "graphics": {
+      "sectionLabel": "卫星模型",
+      "flagDecals": {
+        "label": "在模型上显示国旗",
+        "helpText": "将所属国家的国旗投影到所选卫星三维模型朝向您的一侧"
+      },
+      "flagDecalScale": {
+        "label": "旗帜大小",
+        "helpText": "旗帜宽度占模型尺寸的比例（0.2 至 0.6）"
+      }
+    },
+    "Secondary": {
+      "ricConvention": "RIC = 次目标减主目标，位于主目标的 RIC 坐标系中。"
+    }
   }
 }

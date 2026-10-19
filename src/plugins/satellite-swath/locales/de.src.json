@@ -1,0 +1,61 @@
+{
+  "plugins": {
+    "SatelliteSwath": {
+      "bottomIconLabel": "Bodenstreifen",
+      "title": "Bodenstreifen",
+      "sections": {
+        "sensor": "Sensor",
+        "display": "Anzeige"
+      },
+      "labels": {
+        "preset": "Voreinstellung",
+        "inputMode": "Eingabe der Abdeckung",
+        "modeWidth": "Streifenbreite (km)",
+        "modeFov": "Sichtfeld (Grad)",
+        "swathWidthKm": "Streifenbreite (km)",
+        "fovDeg": "Sichtfeld (Grad)",
+        "maxOffNadirDeg": "Max. Neigung aus Nadir (Grad)",
+        "minSunElevDeg": "Min. Sonnenhöhe (Grad)",
+        "daylightOnly": "Nur bei Tageslicht",
+        "nadirReadout": "Nadirbreite etwa {km} km (FOV {fov}°)",
+        "nadirReadoutUnknown": "Nadirbreite für diesen Orbit unbekannt",
+        "presetsIllustrative": "Voreinstellungen sind illustrativ, keine veröffentlichten Spezifikationen."
+      },
+      "presets": {
+        "hrEo": "Optisch, hohe Auflösung",
+        "mrEo": "Optisch, mittlere Auflösung",
+        "wide": "Weitwinkel-Imager",
+        "custom": "Benutzerdefiniert"
+      },
+      "commands": {
+        "toggle": "Bodenstreifen umschalten",
+        "openSettings": "Bodenstreifen-Einstellungen öffnen"
+      },
+      "shortcuts": {
+        "toggle": "Bodenstreifen umschalten"
+      },
+      "graphics": {
+        "sectionLabel": "Bodenstreifen",
+        "drawSwath": {
+          "label": "Bodenstreifen zeichnen",
+          "helpText": "Zeigt den Aufnahmestreifen des ausgewählten Satelliten entlang seiner gezeichneten Bahn."
+        },
+        "fieldOfRegardFill": {
+          "label": "Field-of-Regard-Füllung",
+          "helpText": "Zeichnet neben dem Nadirstreifen den durchscheinenden Bereich, den der Sensor durch Neigen erreicht."
+        }
+      },
+      "errorMsgs": {
+        "outOfRange": "Geben Sie eine Zahl zwischen {min} und {max} ein.",
+        "beyondHorizon": "Dieser Streifen reicht von der Höhe dieses Satelliten über den Horizont hinaus. Geben Sie höchstens {max} km ein."
+      },
+      "help": {
+        "overview": "Zeigt, wo der Sensor des ausgewählten Satelliten entlang der gezeichneten Bahn aufnehmen kann: einen deckenden Nadirstreifen und ein durchscheinendes Field of Regard bis zur Neigungsgrenze. Abschnitte, in denen die Sonne am Subsatellitenpunkt unter der Mindesthöhe steht, werden abgedunkelt oder mit „Nur bei Tageslicht“ ausgeblendet. Ein Fächer folgt dem Satelliten von seiner Position zu den Streifenrändern.",
+        "howToUse": "Wählen Sie einen Satelliten und schalten Sie die Ebene Bodenstreifen ein. Wählen Sie eine Voreinstellung oder geben Sie Streifenbreite oder Sichtfeld, die maximale Neigung aus Nadir und die minimale Sonnenhöhe ein. Die Einstellungen werden pro Satellit gespeichert.",
+        "tip1": "Voreinstellungen sind illustrativ und keine veröffentlichten Spezifikationen eines realen Sensors.",
+        "tip2": "Die Field-of-Regard-Füllung folgt auch der Qualitätsstufe im Grafikmenü (ab Mittel).",
+        "flatMap": "Im Flachkartenmodus wird der Streifen ausgeblendet."
+      }
+    }
+  }
+}

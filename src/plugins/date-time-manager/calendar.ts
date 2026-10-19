@@ -6,6 +6,8 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { setInnerHtml } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
+import './date-time-manager.css';
+import { formatUtcDateTime, parseUtcDateTime } from './parse-utc-date-time';
 
 const dt = (key: string) => t7e(`plugins.DateTimeManager.${key}` as Parameters<typeof t7e>[0]);
 
@@ -15,12 +17,18 @@ export class Calendar {
   private simulationDate: Date;
   private propagationRate: number = 1;
   private isVisible: boolean = false;
+  private isEscapeCancel_ = false;
   /** attachEvents() runs after every render; the container persists, so only bind its click once */
   private isContainerClickBound_ = false;
 
   // PropRate Slider limits
   private readonly propRateLimitMin = -20;
   private readonly propRateLimitMax = 20;
+
+  /** Year dropdown range (Sputnik onward); the typed-entry field reaches any other year. */
+  private static readonly YEAR_SELECT_MIN_ = 1957;
+  private static readonly YEAR_SELECT_FUTURE_SPAN_ = 30;
+  static readonly GOTO_INPUT_ID = 'calendar-datetime-input';
 
   constructor(containerId: string) {
     this.containerId = containerId;
@@ -61,9 +69,18 @@ export class Calendar {
           <span class="ui-icon ui-icon-circle-triangle-e">${dt('next')}</span>
         </a>
         <div class="ui-datepicker-title">
-          <span class="ui-datepicker-month">${this.getUTCMonthName(this.calendarDate.getUTCMonth())}</span>&nbsp;
-          <span class="ui-datepicker-year">${this.calendarDate.getUTCFullYear()}</span>
+          <select class="ui-datepicker-month browser-default" data-handler="selectMonth" data-event="change" aria-label="${dt('calendar.month')}">
+            ${this.renderMonthOptions_()}
+          </select>
+          <select class="ui-datepicker-year browser-default" data-handler="selectYear" data-event="change" aria-label="${dt('calendar.year')}">
+            ${this.renderYearOptions_()}
+          </select>
         </div>
+      </div>
+      <div class="ui-datepicker-goto">
+        <label for="${Calendar.GOTO_INPUT_ID}" class="ui-datepicker-goto-label">${dt('calendar.goTo')}</label>
+        <input id="${Calendar.GOTO_INPUT_ID}" type="text" class="ui-datepicker-goto-input browser-default keyboard-priority" spellcheck="false" autocomplete="off"
+          placeholder="YYYY-MM-DD HH:MM:SS" value="${formatUtcDateTime(this.simulationDate)}" kt-tooltip="${dt('calendar.goToTooltip')}" />
       </div>
       <table class="ui-datepicker-calendar">
         <thead>
@@ -111,6 +128,23 @@ export class Calendar {
       nextButton.addEventListener('click', this.goToNextMonth.bind(this));
     }
 
+    document.querySelector('#ui-datepicker-div select.ui-datepicker-month')?.addEventListener('change', (e) => {
+      this.jumpToMonthYear_(parseInt((e.target as HTMLSelectElement).value, 10), this.calendarDate.getUTCFullYear());
+    });
+    document.querySelector('#ui-datepicker-div select.ui-datepicker-year')?.addEventListener('change', (e) => {
+      this.jumpToMonthYear_(this.calendarDate.getUTCMonth(), parseInt((e.target as HTMLSelectElement).value, 10));
+    });
+
+    const gotoInput = document.getElementById(Calendar.GOTO_INPUT_ID) as HTMLInputElement | null;
+
+    gotoInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        this.applyTypedDateTime_(gotoInput);
+      }
+      // Escape is handled by the picker-wide listener (see showDatePicker)
+    });
+
     document.querySelectorAll('#ui-datepicker-div td[data-handler="selectDay"]').forEach((td) => {
       td.addEventListener('click', (event) => this.selectDay(event));
     });
@@ -150,6 +184,11 @@ export class Calendar {
         }
       });
       timeInput.addEventListener('blur', () => {
+        if (this.isEscapeCancel_) {
+          this.isEscapeCancel_ = false;
+
+          return;
+        }
         this.onTextInputChange();
       });
     }
@@ -351,7 +390,7 @@ export class Calendar {
         <dl>
           <dt class="ui_tpicker_time_label">${dt('calendar.time')}</dt>
           <dd class="ui_tpicker_time">
-            <input id="calendar-time-input" class="ui_tpicker_time_input keyboard-priority" value="${this.formatTime(hours, minutes, seconds)}">
+            <input id="calendar-time-input" class="ui_tpicker_time_input keyboard-priority" value="${this.formatTime(hours, minutes, seconds, this.simulationDate.getUTCMilliseconds())}">
             <span id="calendar-time-prop-rate">(x${propRate.toString()})</span>
           </dd>
           <dt class="ui_tpicker_hour_label">${dt('calendar.hour')}</dt>
@@ -456,16 +495,79 @@ export class Calendar {
     return dayNames[dayIndex];
   }
 
-  private goToPreviousMonth(): void {
-    this.calendarDate.setMonth(this.calendarDate.getUTCMonth() - 1);
+  private renderMonthOptions_(): string {
+    const currentMonth = this.calendarDate.getUTCMonth();
+    let options = '';
+
+    for (let m = 0; m < 12; m++) {
+      options += `<option value="${m}"${m === currentMonth ? ' selected' : ''}>${this.getUTCMonthName(m)}</option>`;
+    }
+
+    return options;
+  }
+
+  private renderYearOptions_(): string {
+    const currentYear = this.calendarDate.getUTCFullYear();
+    const minYear = Math.min(Calendar.YEAR_SELECT_MIN_, currentYear);
+    const maxYear = Math.max(new Date().getUTCFullYear() + Calendar.YEAR_SELECT_FUTURE_SPAN_, currentYear);
+    let options = '';
+
+    for (let y = maxYear; y >= minYear; y--) {
+      options += `<option value="${y}"${y === currentYear ? ' selected' : ''}>${y}</option>`;
+    }
+
+    return options;
+  }
+
+  /**
+   * Moves the visible month without changing the simulation time (same as the
+   * prev/next arrows). Pins the day to the 1st so e.g. Jan 31 -> Feb does not
+   * roll over into March.
+   */
+  private jumpToMonthYear_(month: number, year: number): void {
+    if (!Number.isFinite(month) || !Number.isFinite(year)) {
+      return;
+    }
+
+    // Normalize month overflow (-1 -> previous December) against a fixed base year,
+    // then apply the real year so years 0-99 are not remapped to 1900-1999.
+    const target = new Date(Date.UTC(2000, month, 1));
+
+    target.setUTCFullYear(year + target.getUTCFullYear() - 2000);
+    this.calendarDate = target;
     this.render();
     this.attachEvents();
   }
 
-  private goToNextMonth(): void {
-    this.calendarDate.setMonth(this.calendarDate.getUTCMonth() + 1);
+  /**
+   * Applies the typed UTC date/time from the "Go to" field. Invalid text is
+   * flagged and left in place so the user can correct it.
+   */
+  private applyTypedDateTime_(input: HTMLInputElement): void {
+    const parsed = parseUtcDateTime(input.value);
+
+    if (!parsed) {
+      input.classList.add('invalid');
+      ServiceLocator.getUiManager().toast(dt('calendar.goToInvalid'), ToastMsgType.caution);
+
+      return;
+    }
+
+    input.classList.remove('invalid');
+    this.simulationDate = parsed;
+    this.calendarDate = new Date(parsed);
+    this.datetimeInputFormChange();
+    this.updateTimeInput();
     this.render();
     this.attachEvents();
+  }
+
+  private goToPreviousMonth(): void {
+    this.jumpToMonthYear_(this.calendarDate.getUTCMonth() - 1, this.calendarDate.getUTCFullYear());
+  }
+
+  private goToNextMonth(): void {
+    this.jumpToMonthYear_(this.calendarDate.getUTCMonth() + 1, this.calendarDate.getUTCFullYear());
   }
 
   private selectDay(event: Event): void {
@@ -530,11 +632,10 @@ export class Calendar {
       return;
     }
 
-    this.isVisible = !this.isVisible;
-    const datepicker = document.getElementById('ui-datepicker-div');
-
-    if (datepicker) {
-      datepicker.style.display = this.isVisible ? 'block' : 'none';
+    if (this.isVisible) {
+      this.hideDatePicker();
+    } else {
+      this.showDatePicker();
     }
   }
 
@@ -546,6 +647,8 @@ export class Calendar {
     }
 
     this.isVisible = true;
+    document.removeEventListener('keydown', this.onEscapeKeyDown_);
+    document.addEventListener('keydown', this.onEscapeKeyDown_);
     const datepicker = document.getElementById('ui-datepicker-div');
 
     if (datepicker) {
@@ -553,8 +656,27 @@ export class Calendar {
     }
   }
 
+  /**
+   * Escape closes the picker without applying any partially typed time or date.
+   * Enter still applies through the inputs' own handlers.
+   */
+  private readonly onEscapeKeyDown_ = (e: KeyboardEvent): void => {
+    if (e.key !== 'Escape' || !this.isVisible) {
+      return;
+    }
+
+    // Drop the typed text first so the blur that hiding triggers cannot apply it
+    this.isEscapeCancel_ = true;
+    this.updateTimeInput(true);
+    (document.activeElement as HTMLElement | null)?.blur?.();
+    this.hideDatePicker();
+    // Blur may not fire when nothing was focused; do not leave the cancel flag armed
+    this.isEscapeCancel_ = false;
+  };
+
   hideDatePicker(): void {
     this.isVisible = false;
+    document.removeEventListener('keydown', this.onEscapeKeyDown_);
     const datepicker = document.getElementById('ui-datepicker-div');
 
     if (datepicker) {
@@ -613,50 +735,58 @@ export class Calendar {
       return;
     }
 
-    // Expecting 6 or 8 characters (HHMMSS or HH:MM:SS)
-    if (timeInput.value.length < 6 || timeInput.value.length > 8) {
-      errorManagerInstance.warn('Invalid time format entered! Expected HH:MM:SS or HHMMSS');
+    // Accepts HH:MM:SS, HHMMSS, and either with a fractional second (.s up to .sss)
+    const match = /^(?<h>\d{2}):?(?<m>\d{2}):?(?<s>\d{2})(?:\.(?<f>\d{1,3}))?$/u.exec(timeInput.value.trim());
+
+    if (!match?.groups) {
+      errorManagerInstance.warn('Invalid time format entered! Expected HH:MM:SS, HH:MM:SS.s or HHMMSS');
 
       return;
     }
 
-    // Expecting format HH:MM:SS or HHMMSS
-    if (!timeInput.value.includes(':') && timeInput.value.length === 6) {
-      timeInput.value = `${timeInput.value.slice(0, 2)}:${timeInput.value.slice(2, 4)}:${timeInput.value.slice(4, 6)}`;
-    }
+    const hours = parseInt(match.groups.h, 10);
+    const minutes = parseInt(match.groups.m, 10);
+    const seconds = parseInt(match.groups.s, 10);
+    const milliseconds = match.groups.f ? parseInt(match.groups.f.padEnd(3, '0'), 10) : 0;
 
-    const timeParts = timeInput.value.split(':');
+    this.simulationDate.setUTCHours(Math.max(0, Math.min(23, hours)));
+    this.simulationDate.setUTCMinutes(Math.max(0, Math.min(59, minutes)));
+    this.simulationDate.setUTCSeconds(Math.max(0, Math.min(59, seconds)));
+    this.simulationDate.setUTCMilliseconds(milliseconds);
 
-    if (timeParts.length === 3) {
-      const hours = parseInt(timeParts[0], 10);
-      const minutes = parseInt(timeParts[1], 10);
-      const seconds = parseInt(timeParts[2], 10);
-
-      if (!isNaN(hours) && !isNaN(minutes) && !isNaN(seconds)) {
-        this.simulationDate.setUTCHours(Math.max(0, Math.min(23, hours)));
-        this.simulationDate.setUTCMinutes(Math.max(0, Math.min(59, minutes)));
-        this.simulationDate.setUTCSeconds(Math.max(0, Math.min(59, seconds)));
-
-        this.datetimeInputFormChange();
-        this.updateTimeInput();
-        this.render();
-        this.attachEvents();
-      }
-    }
+    this.datetimeInputFormChange();
+    this.updateTimeInput();
+    this.render();
+    this.attachEvents();
   }
 
-  private updateTimeInput(): void {
+  private updateTimeInput(force = false): void {
     setInnerHtml('calendar-time-prop-rate', `(x${this.propagationRate.toString()})`);
 
     const timeInput = document.getElementById('calendar-time-input') as HTMLInputElement;
 
+    const gotoInput = document.getElementById(Calendar.GOTO_INPUT_ID) as HTMLInputElement | null;
+
+    // Do not clobber text the user is in the middle of typing.
+    if (gotoInput && (force || document.activeElement !== gotoInput)) {
+      gotoInput.value = formatUtcDateTime(this.simulationDate);
+      gotoInput.classList.remove('invalid');
+    }
+
     if (timeInput) {
-      timeInput.value = `${this.formatTime(this.simulationDate.getUTCHours(), this.simulationDate.getUTCMinutes(), this.simulationDate.getUTCSeconds())}`;
+      timeInput.value = this.formatTime(
+        this.simulationDate.getUTCHours(),
+        this.simulationDate.getUTCMinutes(),
+        this.simulationDate.getUTCSeconds(),
+        this.simulationDate.getUTCMilliseconds()
+      );
     }
   }
 
-  private formatTime(hours: number, minutes: number, seconds: number): string {
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  private formatTime(hours: number, minutes: number, seconds: number, milliseconds = 0): string {
+    const fraction = milliseconds > 0 ? `.${milliseconds.toString().padStart(3, '0').replace(/0+$/u, '')}` : '';
+
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}${fraction}`;
   }
 
   public getSelectedDate(): Date | null {

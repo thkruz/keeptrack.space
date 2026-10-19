@@ -1,0 +1,61 @@
+{
+  "plugins": {
+    "SatelliteSwath": {
+      "bottomIconLabel": "Fauchée au sol",
+      "title": "Fauchée au sol",
+      "sections": {
+        "sensor": "Capteur",
+        "display": "Affichage"
+      },
+      "labels": {
+        "preset": "Préréglage",
+        "inputMode": "Saisie de l'empreinte",
+        "modeWidth": "Largeur de fauchée (km)",
+        "modeFov": "Champ de vision (degrés)",
+        "swathWidthKm": "Largeur de fauchée (km)",
+        "fovDeg": "Champ de vision (degrés)",
+        "maxOffNadirDeg": "Dépointage max. (degrés)",
+        "minSunElevDeg": "Élévation solaire min. (degrés)",
+        "daylightOnly": "Jour uniquement",
+        "nadirReadout": "Largeur au nadir env. {km} km (FOV {fov}°)",
+        "nadirReadoutUnknown": "Largeur au nadir inconnue pour cette orbite",
+        "presetsIllustrative": "Les préréglages sont illustratifs, pas des spécifications publiées."
+      },
+      "presets": {
+        "hrEo": "Optique haute résolution",
+        "mrEo": "Optique résolution moyenne",
+        "wide": "Imageur grand champ",
+        "custom": "Personnalisé"
+      },
+      "commands": {
+        "toggle": "Basculer la fauchée au sol",
+        "openSettings": "Ouvrir les réglages de la fauchée au sol"
+      },
+      "shortcuts": {
+        "toggle": "Basculer la fauchée au sol"
+      },
+      "graphics": {
+        "sectionLabel": "Fauchée au sol",
+        "drawSwath": {
+          "label": "Dessiner la fauchée au sol",
+          "helpText": "Affiche la fauchée d'imagerie du satellite sélectionné le long de son orbite tracée."
+        },
+        "fieldOfRegardFill": {
+          "label": "Remplissage du champ accessible",
+          "helpText": "Dessine, à côté de la fauchée au nadir, la bande translucide que le capteur atteint en dépointant."
+        }
+      },
+      "errorMsgs": {
+        "outOfRange": "Saisissez un nombre entre {min} et {max}.",
+        "beyondHorizon": "Cette fauchée dépasse l'horizon depuis l'altitude de ce satellite. Saisissez au plus {max} km."
+      },
+      "help": {
+        "overview": "Montre où le capteur du satellite sélectionné peut prendre des images le long de l'orbite tracée : une fauchée au nadir opaque et un champ accessible translucide jusqu'à la limite de dépointage. Les portions où le Soleil est sous l'élévation minimale au point subsatellite sont atténuées, ou masquées avec Jour uniquement. Un éventail suit le satellite de sa position aux bords de la fauchée.",
+        "howToUse": "Sélectionnez un satellite et activez la couche Fauchée au sol. Choisissez un préréglage ou saisissez une largeur de fauchée ou un champ de vision, le dépointage maximal et l'élévation solaire minimale. Les réglages sont mémorisés par satellite.",
+        "tip1": "Les préréglages sont illustratifs et ne sont les spécifications publiées d'aucun capteur réel.",
+        "tip2": "Le remplissage du champ accessible suit aussi le niveau de qualité du menu Graphismes (Moyen et plus).",
+        "flatMap": "La fauchée est masquée en mode carte plane."
+      }
+    }
+  }
+}

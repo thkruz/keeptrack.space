@@ -43,7 +43,7 @@ import {
   MINUTES_PER_DAY,
   Sun as OotkSun,
   estimateRcs as ootkEstimateRcs,
-  mag2db as ootkMag2db,
+  pow2db as ootkPow2db,
   relativeVelocity as ootkRelativeVelocity,
   PosVel,
   RAD2DEG,
@@ -78,16 +78,16 @@ export { SunStatus } from '@ootk/src/main';
 
 export abstract class SatMath {
   /**
-   * Converts magnitude to decibels.
-   * @param magnitude The magnitude to convert.
-   * @deprecated Use mag2db() from ootk instead.
+   * Converts a power-like ratio (e.g. RCS in m^2) to decibels (10 log10).
+   * @param power The power-like quantity to convert.
+   * @deprecated Use pow2db() from ootk instead.
    */
-  static mag2db(magnitude: number) {
-    if (magnitude <= 0) {
+  static pow2db(power: number) {
+    if (power <= 0) {
       return Number.NaN; // KeepTrack returns NaN instead of throwing
     }
 
-    return ootkMag2db(magnitude);
+    return ootkPow2db(power);
   }
 
   /**
@@ -251,13 +251,17 @@ export abstract class SatMath {
       throw new Error('Distance to satellite is null');
     }
 
-    const phaseAngle = Math.acos(
-      <number>numeric.dot([-sat.position.x, -sat.position.y, -sat.position.z], [sat.position.x + sun.eci.x, -sat.position.y + sun.eci.y, -sat.position.z + sun.eci.z]) /
-        (Math.sqrt((-sat.position.x) ** 2 + (-sat.position.y) ** 2 + (-sat.position.z) ** 2) *
-          Math.sqrt((-sat.position.x + sun.eci.x) ** 2 + (-sat.position.y + sun.eci.y) ** 2 + (-sat.position.z + sun.eci.z) ** 2))
-    );
+    /*
+     * Phase angle: the angle at the satellite between the direction to the Sun and the direction to
+     * the observer (the sensor site), so the observer's geometry is used rather than the geocenter.
+     */
+    const observer = sensor.eci(propTime);
+    const toSun = [sun.eci.x - sat.position.x, sun.eci.y - sat.position.y, sun.eci.z - sat.position.z];
+    const toObserver = [observer.x - sat.position.x, observer.y - sat.position.y, observer.z - sat.position.z];
+    const cosPhase = <number>numeric.dot(toSun, toObserver) / (Math.hypot(toSun[0], toSun[1], toSun[2]) * Math.hypot(toObserver[0], toObserver[1], toObserver[2]));
+    const phaseAngle = Math.acos(Math.max(-1, Math.min(1, cosPhase)));
 
-    // The object is likely eclipsing the sun
+    // Degenerate geometry (zero-length vector) or the Sun directly behind the object: treat as not visible
     if (Number.isNaN(phaseAngle)) {
       return 30;
     }
@@ -274,7 +278,10 @@ export abstract class SatMath {
     const arg = Math.sin(phaseAngle) + (Math.PI - phaseAngle) * Math.cos(phaseAngle);
     const term3 = -2.5 * Math.log10(arg);
 
-    return intrinsicMagnitude + term2 + term3;
+    const visMag = intrinsicMagnitude + term2 + term3;
+
+    // A phase angle of 180 deg gives log10(0); report the not-visible sentinel instead of Infinity
+    return Number.isFinite(visMag) ? Math.min(visMag, 30) : 30;
   }
 
   /**
@@ -290,6 +297,24 @@ export abstract class SatMath {
       return false;
     }
 
+    if (!SatMath.isInSectorBox_(sensor, az, el, rng)) {
+      return false;
+    }
+
+    // Horizon mask: the effective floor is max(minEl, mask(az)); the box above already enforced minEl.
+    if (typeof sensor.getMaskElevationAt === 'function') {
+      const maskEl = sensor.getMaskElevationAt(az);
+
+      if (maskEl !== null && el < maskEl) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /** Legacy az/el/range box test (primary and secondary face), without the horizon mask. */
+  private static isInSectorBox_(sensor: DetailedSensor, az: Degrees, el: Degrees, rng: Kilometers): boolean {
     if (sensor.minAz > sensor.maxAz) {
       if (
         ((az >= sensor.minAz || az <= sensor.maxAz) && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng) ||
@@ -614,20 +639,14 @@ export abstract class SatMath {
       points,
       getOffsetTimeObj,
       (params: { eciPts: TemeVec3; eciPts2: TemeVec3; velPts: TemeVec3<KilometersPerSecond>; velPts2: TemeVec3<KilometersPerSecond>; offset: number }) => {
-        const vel1 = {
-          total: 0,
-          ...params.velPts,
-        };
-        const vel2 = {
-          total: 0,
-          ...params.velPts2,
-        };
-
-        sat.position = params.eciPts;
-        sat.velocity = vel1;
-        sat2.position = params.eciPts2;
-        sat2.velocity = vel2;
-        const ric = RIC.fromPosVel(sat, sat2).position;
+        /*
+         * Work on plain state copies. Writing the samples onto the live catalog objects left the primary's and
+         * secondary's .position several orbits ahead of the sim clock until the next cruncher update, which any
+         * readout of .position (the info box Linear range, the 3D line) would then show.
+         */
+        const state1 = { position: { ...params.eciPts }, velocity: { ...params.velPts } };
+        const state2 = { position: { ...params.eciPts2 }, velocity: { ...params.velPts2 } };
+        const ric = RIC.fromPosVel(state1, state2).position;
 
         return { x: ric.x, y: ric.y, z: ric.z };
       },

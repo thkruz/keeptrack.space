@@ -149,6 +149,18 @@ describe('OrbitCruncherThreadManager', () => {
       });
     });
 
+    it('sendSettingsUpdate carries an orbit fade factor when given', () => {
+      const { mgr, worker } = makeMgr();
+
+      mgr.sendSettingsUpdate(3, 0.25);
+
+      expect(lastMsg(worker)).toEqual({
+        typ: OrbitCruncherMsgType.SETTINGS_UPDATE,
+        numberOfOrbitsToDraw: 3,
+        orbitFadeFactor: 0.25,
+      });
+    });
+
     it('increments seqNum on each sendInit', () => {
       const { mgr, worker } = makeMgr();
 

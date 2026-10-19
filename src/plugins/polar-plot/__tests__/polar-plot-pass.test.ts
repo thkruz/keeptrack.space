@@ -83,6 +83,11 @@ describe('buildPolarPass', () => {
     expect(pass!.culmination.toISOString()).toBe('2026-05-31T00:05:00.000Z');
   });
 
+  it('carries the mask-limited flag from the pass row', () => {
+    expect(buildPolarPass(row({ MASK_LIMITED: true }), [sample])!.maskLimited).toBe(true);
+    expect(buildPolarPass(row(), [sample])!.maskLimited).toBe(false);
+  });
+
   it('returns null when there are no samples', () => {
     expect(buildPolarPass(row(), [])).toBeNull();
   });

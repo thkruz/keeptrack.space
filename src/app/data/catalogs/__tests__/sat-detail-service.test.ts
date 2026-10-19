@@ -62,6 +62,18 @@ describe('SatDetailDataService', () => {
       expect(sat.manufacturer).toBe('Boeing');
     });
 
+    it('never fetches for analyst objects, which have no catalog record', async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(respond([{ MISSION: 'Should not land' }]));
+      const sat = satWith('90000');
+
+      sat.derivedFromSccNum = '39084';
+      await satDetailService.fetchSatDetail(sat);
+
+      // Earlier tests' fetches can still be in flight on the shared spy; only the analyst id matters here
+      expect(fetchSpy.mock.calls.some((call) => String(call[0]).includes('/90000'))).toBe(false);
+      expect(sat.mission).toBe('');
+    });
+
     it('does not re-fetch once detail has been merged', async () => {
       vi.spyOn(globalThis, 'fetch').mockResolvedValue(respond([{ MISSION: 'First' }]));
       const sat = satWith('50012');

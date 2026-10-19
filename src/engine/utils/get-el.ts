@@ -26,8 +26,32 @@ export const getEl = (id: string, isExpectedMissing = false): HTMLElement | null
   // DEBUG: Use this code for finding bad requests
 };
 
+/**
+ * Upper bound (ms) on how long a deferred DOM write may wait for an idle period.
+ *
+ * Without a deadline, `requestIdleCallback` only fires when the browser finds idle
+ * time between frames. A render loop that saturates the main thread (slow GPU,
+ * software rendering, a remote desktop session, headless Chromium) never yields any,
+ * so the write is starved forever and the UI keeps its placeholder markup.
+ */
+export const IDLE_WRITE_TIMEOUT_MS = 100;
+
+/**
+ * Run `cb` during the next idle period, but no later than {@link IDLE_WRITE_TIMEOUT_MS}.
+ * Falls back to `setTimeout` where `requestIdleCallback` is unavailable (Safari).
+ */
+export const requestIdleWrite = (cb: () => void): void => {
+  if (typeof globalThis.requestIdleCallback === 'function') {
+    globalThis.requestIdleCallback(cb, { timeout: IDLE_WRITE_TIMEOUT_MS });
+
+    return;
+  }
+
+  setTimeout(cb, 0);
+};
+
 export const setInnerHtml = (id: string, html: string) => {
-  requestIdleCallback(() => {
+  requestIdleWrite(() => {
     const el = getEl(id, true);
 
     if (!el) {

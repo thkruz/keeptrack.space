@@ -1,0 +1,61 @@
+{
+  "plugins": {
+    "SatelliteSwath": {
+      "bottomIconLabel": "Ground Swath",
+      "title": "Ground Swath",
+      "sections": {
+        "sensor": "Sensor",
+        "display": "Display"
+      },
+      "labels": {
+        "preset": "Preset",
+        "inputMode": "Footprint input",
+        "modeWidth": "Swath width (km)",
+        "modeFov": "Field of view (deg)",
+        "swathWidthKm": "Swath width (km)",
+        "fovDeg": "Field of view (deg)",
+        "maxOffNadirDeg": "Max off-nadir tilt (deg)",
+        "minSunElevDeg": "Min Sun elevation (deg)",
+        "daylightOnly": "Daylight only",
+        "nadirReadout": "Nadir width about {km} km (FOV {fov}°)",
+        "nadirReadoutUnknown": "Nadir width unknown for this orbit",
+        "presetsIllustrative": "Presets are illustrative, not published specifications."
+      },
+      "presets": {
+        "hrEo": "High-resolution optical",
+        "mrEo": "Medium-resolution optical",
+        "wide": "Wide-field imager",
+        "custom": "Custom"
+      },
+      "commands": {
+        "toggle": "Toggle Ground Swath",
+        "openSettings": "Open Ground Swath Settings"
+      },
+      "shortcuts": {
+        "toggle": "Toggle the ground swath"
+      },
+      "graphics": {
+        "sectionLabel": "Ground Swath",
+        "drawSwath": {
+          "label": "Draw ground swath",
+          "helpText": "Show the imaging swath of the selected satellite along its drawn orbit."
+        },
+        "fieldOfRegardFill": {
+          "label": "Field-of-regard fill",
+          "helpText": "Draw the translucent strip the sensor can reach by tilting, beside the nadir swath."
+        }
+      },
+      "errorMsgs": {
+        "outOfRange": "Enter a number between {min} and {max}.",
+        "beyondHorizon": "That swath reaches past the horizon from this satellite's altitude. Enter at most {max} km."
+      },
+      "help": {
+        "overview": "Draws where the selected satellite's sensor can image along the drawn orbit: an opaque nadir swath and a translucent field of regard out to the tilt limit. Stretches where the Sun is below the minimum elevation at the sub-point are dimmed, or hidden with Daylight only. A fan follows the satellite from its position to the swath edges.",
+        "howToUse": "Select a satellite and turn on the Ground Swath layer. Pick a preset or enter a swath width or field of view, the maximum off-nadir tilt and the minimum Sun elevation. Settings are remembered per satellite.",
+        "tip1": "Presets are illustrative, not published specifications for any real sensor.",
+        "tip2": "The field-of-regard fill also follows the Graphics menu quality level (Medium and above).",
+        "flatMap": "The swath is hidden in flat-map mode."
+      }
+    }
+  }
+}

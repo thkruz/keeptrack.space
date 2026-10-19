@@ -9,7 +9,9 @@
       },
       "labels": {
         "shareLink": "Odkaz ke sdílení",
-        "url": "URL ke sdílení"
+        "url": "URL ke sdílení",
+        "includeTime": "Zahrnout aktuální čas",
+        "includeTimeTooltip": "Připne do odkazu aktuální čas simulace. Ve výchozím stavu vypnuto, aby příjemci viděli stejný pohled ve svém aktuálním čase."
       },
       "buttons": {
         "copyLink": "Kopírovat odkaz",

@@ -18,11 +18,45 @@
         "preset_asat_fy1c": "ASAT, Fengyun-1C (higher energy)",
         "preset_venting": "Low-Energy / Venting",
         "preset_custom": "Custom",
-        "radialDeltaV": "Radial (m/s)",
-        "inTrackDeltaV": "In-Track (m/s)",
-        "crossTrackDeltaV": "Cross-Track (m/s)",
-        "dispersionHint": "Random velocity change applied to each fragment (1 sigma). In-track stretches the cloud along the orbit; cross-track fans it across the orbital plane; radial raises and lowers it. Typical events: explosions about 10 to 100 m/s, collisions about 100 to 300 m/s.",
-        "piecesSection": "Count"
+        "dispersionHint": "Random velocity change applied to each fragment. In-track stretches the cloud along the orbit; cross-track fans it across the orbital plane; radial raises and lowers it. Typical mean speeds: explosions about 10 to 100 m/s, collisions about 100 to 300 m/s.",
+        "piecesSection": "Count",
+        "frameLabel": "Coordinate Frame",
+        "frame_rtn": "RTN / RIC (Radial, In-Track, Cross-Track)",
+        "frame_ntw": "NTW (Velocity-Aligned)",
+        "frame_eci": "ECI (Inertial X, Y, Z; TEME)",
+        "modelLabel": "Dispersion Model",
+        "model_gaussian": "Gaussian (1σ Std Dev per axis)",
+        "model_maxwellian": "Isotropic Maxwellian (Target Mean Speed)",
+        "model_uniform": "Uniform (±Max Speed per axis)",
+        "axis1_rtn": "Radial",
+        "axis2_rtn": "In-Track",
+        "axis3_rtn": "Cross-Track",
+        "axis1_ntw": "Normal (N)",
+        "axis2_ntw": "Velocity (T)",
+        "axis3_ntw": "Cross-Track (W)",
+        "axis1_eci": "X",
+        "axis2_eci": "Y",
+        "axis3_eci": "Z",
+        "axis1_rtn_tooltip": "Along the position vector, away from Earth. Raises and lowers the fragments.",
+        "axis2_rtn_tooltip": "In the orbital plane, perpendicular to radial, toward the direction of motion. Stretches the cloud along the orbit.",
+        "axis3_rtn_tooltip": "Along the orbit normal (r × v). Fans the cloud across the orbital plane.",
+        "axis1_ntw_tooltip": "In the orbital plane, perpendicular to the velocity and pointing outward. Matches radial on a circular orbit.",
+        "axis2_ntw_tooltip": "Along the velocity vector. Changes the orbital energy (period) most directly.",
+        "axis3_ntw_tooltip": "Along the orbit normal (r × v). The same axis as RTN cross-track.",
+        "axis1_eci_tooltip": "Inertial TEME X axis, toward the vernal equinox.",
+        "axis2_eci_tooltip": "Inertial TEME Y axis, 90° east of X in the equatorial plane.",
+        "axis3_eci_tooltip": "Inertial TEME Z axis, toward the celestial north pole.",
+        "unitSigma": "1σ m/s",
+        "unitMax": "±max m/s",
+        "unitTooltip_gaussian": "The value is the 1σ standard deviation of a zero-mean Gaussian on this axis.",
+        "unitTooltip_maxwellian": "Isotropic: every axis uses the σ derived from the mean ejection speed.",
+        "unitTooltip_uniform": "The value is the half-width: each fragment is drawn evenly between -max and +max on this axis.",
+        "meanSpeed": "Mean Ejection Speed (m/s)",
+        "meanSpeedTooltip": "Target mean of the total speed |Δv|. Each axis is drawn from a Gaussian with σ = μ / 1.596, so the total speed follows a Maxwell-Boltzmann distribution.",
+        "maxTotalSpeed": "Max Total Speed (m/s)",
+        "maxTotalSpeedOff": "Off",
+        "maxTotalSpeedTooltip": "Optional. Fragments whose total random Δv exceeds this value are redrawn, which trims the extreme tail without distorting the rest of the distribution. Leave blank for no cap.",
+        "axesCaption": "Per-axis values, {unit}"
       },
       "buttons": {
         "createBreakup": "Create Breakup",
@@ -34,7 +68,8 @@
       },
       "toasts": {
         "cleared": "Breakup cleared. Debris removed.",
-        "fragmentsReentered": "{count} fragments reentered and were not created."
+        "fragmentsReentered": "{count} fragments reentered and were not created.",
+        "fragmentsFailed": "{count} fragments could not be fit to an orbit or had no free catalog slot and were not created."
       },
       "help": {
         "overview": "The Breakup menu simulates a satellite breaking apart at its current position. It spawns debris pieces from the selected satellite's exact location, each leaving with a small random velocity change (delta-V), so you can watch the debris cloud form and spread over time. Because it works from the satellite's state vector, it supports any orbital regime.",
@@ -45,7 +80,9 @@
         "howToUse": "<ol><li>Select any satellite. The icon stays disabled until a satellite is selected.</li><li>Open the Breakup menu and adjust the delta-V dispersion and piece count.</li><li>Click <strong>Create Breakup</strong>. The pieces are generated at the satellite's current position and the search bar fills with the new debris so you can see the whole cloud.</li><li>Speed up time to watch the cloud disperse along the orbit.</li></ol>",
         "tip1": "Works in any orbital regime, including LEO, MEO, GEO, and highly elliptical (HEO) orbits, because every fragment is propagated from the parent's state vector at the breakup point.",
         "tip2": "The breakup is simulated and in-memory only. Use Clear Breakup to remove the debris, or reload the page. The parent satellite itself is never modified.",
-        "tip3": "All pieces are created as debris-type objects, so debris-based color schemes and filters apply to them immediately."
+        "tip3": "All pieces are created as debris-type objects, so debris-based color schemes and filters apply to them immediately.",
+        "dispersionModelsHeading": "Frames and Dispersion Models",
+        "dispersionModels": "<ul><li><strong>Coordinate Frame</strong>: <strong>RTN / RIC</strong> (default) uses radial, in-track (transverse) and cross-track axes. <strong>NTW</strong> aligns the second axis with the velocity vector, which differs from RTN on eccentric orbits. <strong>ECI</strong> applies the values directly to the inertial X, Y and Z axes (TEME, the frame SGP4 uses).</li><li><strong>Gaussian</strong> (default): each axis is drawn independently from a zero-mean normal distribution with the entered 1σ. With the same σ on all three axes, the total speed follows a Maxwell-Boltzmann distribution with mean 2σ√(2/π) ≈ 1.596σ, so 54.2 m/s per axis gives a mean speed of 86.5 m/s.</li><li><strong>Isotropic Maxwellian</strong>: enter the target mean ejection speed directly and the per-axis σ is derived for you.</li><li><strong>Uniform</strong>: each axis is drawn evenly between -max and +max.</li><li><strong>Max Total Speed</strong> (optional): fragments faster than the cap are redrawn, which removes outliers and keeps the shape of the distribution below the cap.</li></ul>The readout under the inputs shows the expected mean, RMS and 99th-percentile speed before you create the breakup. Fragments whose new orbit has a perigee below 100 km are reported as reentered and are not created."
       },
       "errorMsgs": {
         "SatelliteNotFound": "Satellite not found!",
@@ -53,6 +90,14 @@
         "InvalidStartNum": "Invalid satellite starting number! Defaulting to 90000!",
         "InvalidSlotRange": "Initial satellite number out of range. Use {start} to {end}.",
         "BreakupGeneratorFailed": "Breakup Generator Failed!"
+      },
+      "stats": {
+        "meanSpeed": "Expected mean speed",
+        "rmsSpeed": "RMS speed",
+        "p99Speed": "99th percentile",
+        "derivedSigma": "Per-axis σ = {sigma} m/s (the same in every frame)",
+        "capRejects": "The cap redraws {percent}% of fragments",
+        "capTooLow": "The cap is far below the spread: many fragments will sit exactly at the cap."
       }
     }
   }

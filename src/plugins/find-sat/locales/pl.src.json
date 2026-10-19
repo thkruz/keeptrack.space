@@ -8,11 +8,11 @@
         "imgAlt": "Menu Znajdź satelitę z filtrami typu obiektu, kraju, parametrów orbitalnych i czujnika",
         "imgCaption": "Menu Znajdź satelitę. Każde wypełnione pole dodatkowo zawęża wyszukiwanie.",
         "filtersHeading": "Dostępne filtry",
-        "filters": "<ul><li><strong>Typ obiektu</strong>: ładunki, człony rakietowe, odłamki. Możesz wybrać kilka typów naraz; wybranie konkretnego typu odznacza \"Wszystkie\".</li><li><strong>Kraj</strong>: jeden lub więcej krajów wynoszących.</li><li><strong>Platforma satelitarna / Ładunek / Kształt / Źródło</strong>: cechy fizyczne oraz dotyczące źródła danych.</li><li><strong>Azymut / Elewacja / Zasięg</strong>: bieżące kąty obserwacji z wybranego czujnika. Wymagają wcześniejszego wybrania czujnika.</li><li><strong>Parametry orbitalne</strong>: Inklinacja, Okres, Rektascensja i Argument perycentrum.</li><li><strong>Wiek TLE</strong>: jak dawno zaktualizowano dane orbitalne, w godzinach.</li><li><strong>RCS</strong>: przekrój radarowy w m².</li></ul>Każdy filtr liczbowy ma pole <strong>Margines</strong> określające akceptowany zakres wokół podanej wartości. Pozostaw je puste, aby użyć rozsądnej wartości domyślnej (na przykład ±5° dla kątów).",
-        "howToUse": "<ol><li>Otwórz menu z dolnego paska lub naciśnij Ctrl+F.</li><li>Wybierz z list rozwijanych jeden lub więcej typów obiektów i krajów.</li><li>Wprowadź kryteria liczbowe i opcjonalnie zawęź lub poszerz ich marginesy.</li><li>Kliknij <strong>Znajdź satelity</strong>. Pasujące obiekty zostaną załadowane do paska wyszukiwania u góry i wyróżnione na globusie.</li><li>Kliknij <strong>Eksportuj dane</strong>, aby zapisać bieżące wyniki jako plik CSV.</li></ol>",
+        "filters": "<ul><li><strong>Typ obiektu</strong>: ładunki, człony rakietowe, odłamki. Możesz wybrać kilka typów naraz; wybranie konkretnego typu odznacza \"Wszystkie\".</li><li><strong>Kraj</strong>: jeden lub więcej krajów wynoszących.</li><li><strong>Platforma satelitarna / Ładunek / Kształt / Źródło</strong>: cechy fizyczne oraz dotyczące źródła danych.</li><li><strong>Azymut / Elewacja / Zasięg</strong>: bieżące kąty obserwacji z wybranego czujnika. Wymagają wcześniejszego wybrania czujnika.</li><li><strong>Parametry orbitalne</strong>: Inklinacja, Okres, Rektascensja i Argument perycentrum.</li><li><strong>Wiek TLE</strong>: jak dawno zaktualizowano dane orbitalne, w godzinach.</li><li><strong>RCS</strong>: przekrój radarowy w m².</li><li><strong>Perygeum / Apogeum</strong>: najniższa i najwyższa wysokość orbity w km. Połącz je, aby wyodrębnić pas wysokości, na przykład powłokę szczątków.</li><li><strong>Status operacyjny</strong>: Aktywny, Nieaktywny lub Nieznany, na podstawie tego samego statusu katalogowego, który pokazuje wiersz Status w oknie informacji. Człony rakiet i szczątki zawsze liczą się jako Nieaktywne. Obiekty oznaczone w wynikach jako Spłonięte (brak prawidłowej pozycji w bieżącym czasie symulacji) liczą się jako Nieaktywne. Niedawno wystrzelone obiekty, którym katalog nie przypisał jeszcze typu obiektu, zachowują swój kod statusu, więc Aktywny bez wybranego typu obiektu może je również obejmować.</li></ul>Każdy filtr liczbowy ma pole <strong>Margines</strong> określające akceptowany zakres wokół podanej wartości. Pozostaw je puste, aby użyć rozsądnej wartości domyślnej (na przykład ±5° dla kątów).",
+        "howToUse": "<ol><li>Otwórz menu z panelu lub naciśnij Ctrl+F.</li><li>Wybierz z list rozwijanych jeden lub więcej typów obiektów i krajów.</li><li>Wprowadź kryteria liczbowe i opcjonalnie zawęź lub poszerz ich marginesy.</li><li>Kliknij <strong>Znajdź satelity</strong>. Pasujące obiekty zostaną załadowane do paska wyszukiwania u góry i wyróżnione na globusie.</li><li>Kliknij <strong>Eksportuj wyniki</strong>, aby zapisać wszystkie wyniki w arkuszu kalkulacyjnym, także te ponad limitem wyszukiwania, z kolumnami perygeum, apogeum i statusu.</li></ol>",
         "tip1": "Filtry łączą się logiką AND: każde kryterium musi pasować. Jeśli nie otrzymujesz wyników, najpierw usuń najbardziej restrykcyjny filtr.",
         "tip2": "Azymut, elewacja i zasięg są mierzone od aktualnie wybranego czujnika, więc przed ich użyciem wybierz czujnik.",
-        "tip3": "Liczba wyników jest ograniczona. Jeśli ostrzeżenie informuje o osiągnięciu limitu, zawęź kryteria, aby mieć pewność, że widzisz wszystko.",
+        "tip3": "Globus pokazuje najwyżej tyle wyników, ile ustawiono w \"Maks. wyników wyszukiwania\" (Ustawienia > Ustawienia wyszukiwania), dzięki czemu liczba rysowanych orbit pozostaje rozsądna. Gdy wyszukiwanie osiągnie ten limit, licznik pokazuje \"Wyświetlono X z Y wyników\", a Eksportuj wyniki i tak zapisuje wszystkie Y.",
         "tip4": "Ponieważ wyniki trafiają do paska wyszukiwania, możesz przekazać je do dowolnego innego menu działającego na bieżącym wyszukiwaniu lub doprecyzować je, wpisując tekst.",
         "shortcutToggle": "Przełącz menu Znajdź satelitę"
       },
@@ -50,20 +50,31 @@
         "argOfPerigeeMargin": "Margines (°)",
         "all": "Wszystkie",
         "findSatellites": "Znajdź satelity",
-        "exportData": "Eksportuj dane",
+        "exportData": "Eksportuj wyniki",
         "sectionClassification": "Klasyfikacja",
         "sectionLookAngles": "Kąty obserwacji",
         "sectionOrbital": "Elementy orbitalne",
         "sectionPhysical": "Fizyczne i dane",
         "sensorNote": "Kąty obserwacji wymagają wybranego sensora.",
-        "resultCount": "Liczba wyników: {count}"
+        "resultCount": "Liczba wyników: {count}",
+        "operationalStatus": "Status operacyjny",
+        "statusActive": "Aktywny",
+        "statusInactive": "Nieaktywny",
+        "statusUnknown": "Nieznany",
+        "statusDecayed": "Spłonięty",
+        "perigee": "Perygeum (km)",
+        "perigeeMargin": "Margines (km)",
+        "apogee": "Apogeum (km)",
+        "apogeeMargin": "Margines (km)",
+        "resultCountCapped": "Wyświetlono {shown} z {total} wyników (ustawienie limitu wyszukiwania: Ustawienia > Ustawienia wyszukiwania > Maks. wyników wyszukiwania). Eksport obejmuje wszystkie {total}."
       },
       "errorMsgs": {
         "NoSatellitesFound": "Nie znaleziono satelitów",
         "NoSearchCriteriaEntered": "Nie podano kryteriów wyszukiwania",
-        "TooManyResults": "Zbyt wiele wyników, ograniczono do {limit}",
+        "TooManyResults": "Wyświetlono {limit} z {total} wyników. Zwiększ \"Maks. wyników wyszukiwania\" w Ustawieniach wyszukiwania, aby zobaczyć więcej; eksport i tak zapisuje wszystkie wyniki.",
         "TryFindingFirst": "Najpierw spróbuj wyszukać satelity!",
-        "SearchFailed": "Wyszukiwanie nie powiodło się: {error}"
+        "SearchFailed": "Wyszukiwanie nie powiodło się: {error}",
+        "NothingToExport": "Brak wyników z danymi orbitalnymi do eksportu"
       }
     }
   }

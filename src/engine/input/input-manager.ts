@@ -686,7 +686,14 @@ export class InputManager {
     return ctx.surface === 'earth' ? item.isRmbOnEarth : item.isRmbOffEarth;
   }
 
-  public openRmbMenu(clickedSatId: number = -1) {
+  /**
+   * Opens the right-click menu.
+   *
+   * @param clickedSatId object under the cursor (-1 for none)
+   * @param canvasPoint canvas-relative click point. When omitted the input camera's last known
+   * mouse position is used.
+   */
+  public openRmbMenu(clickedSatId: number = -1, canvasPoint?: { x: number; y: number }) {
     if (!settingsManager.isAllowRightClick) {
       return;
     }
@@ -732,22 +739,87 @@ export class InputManager {
 
     EventBus.getInstance().emit(EventBusEvent.rightBtnMenuOpen, ctx);
 
-    // Count every visible row (plugin items AND built-ins) to estimate menu height
+    const inputCamera = ServiceLocator.getViewportManager()?.getInputCamera() ?? ServiceLocator.getMainCamera();
+    const clickX = canvasPoint?.x ?? inputCamera.state.mouseX;
+    const clickY = canvasPoint?.y ?? inputCamera.state.mouseY;
+
+    this.positionRmbMenu_(rightBtnMenuDOM, canvasDOM, clickX, clickY);
+  }
+
+  /**
+   * Places the (already visible) right-click menu at the click point, flipping it left/up when it
+   * would overflow the canvas, clamping it inside the canvas, and pushing it clear of any open
+   * left-docked side menu.
+   *
+   * The menu is measured only after it is displayed and populated: a display:none element reports
+   * a 0x0 size, which is what made the old fixed-offset math unreliable.
+   */
+  private positionRmbMenu_(menuEl: HTMLElement, canvasEl: HTMLElement, clickX: number, clickY: number): void {
     const menuUl = getEl('right-btn-menu-ul', true);
     const numMenuItems = menuUl ? Array.from(menuUl.children).filter((child) => (<HTMLElement>child).style.display !== 'none').length : this.rmbMenuItems.length;
 
-    /*
-     * Offset size is based on size in style.css
-     * TODO: Make this dynamic
-     */
-    const inputCamera = ServiceLocator.getViewportManager()?.getInputCamera() ?? ServiceLocator.getMainCamera();
-    const offsetX = inputCamera.state.mouseX < canvasDOM.clientWidth / 2 ? 0 : -1 * 180;
-    const offsetY = inputCamera.state.mouseY < canvasDOM.clientHeight / 2 ? 0 : numMenuItems * -25;
+    menuEl.style.textAlign = 'center';
+    menuEl.style.position = 'absolute';
 
-    rightBtnMenuDOM.style.textAlign = 'center';
-    rightBtnMenuDOM.style.position = 'absolute';
-    rightBtnMenuDOM.style.left = `${inputCamera.state.mouseX + offsetX}px`;
-    rightBtnMenuDOM.style.top = `${inputCamera.state.mouseY + offsetY}px`;
+    const x = Number.isFinite(clickX) ? clickX : 0;
+    const y = Number.isFinite(clickY) ? clickY : 0;
+
+    // Provisional placement so the measured rect reflects the real offset parent.
+    menuEl.style.left = `${x}px`;
+    menuEl.style.top = `${y}px`;
+
+    const menuRect = menuEl.getBoundingClientRect();
+    // Fallbacks match the sizes in style.css for environments without layout (jsdom).
+    const menuW = menuRect.width || menuEl.offsetWidth || 180;
+    const menuH = menuRect.height || menuEl.offsetHeight || numMenuItems * 25;
+    const boundsW = canvasEl.clientWidth || window.innerWidth;
+    const boundsH = canvasEl.clientHeight || window.innerHeight;
+
+    let left = x + menuW > boundsW ? x - menuW : x;
+    let top = y + menuH > boundsH ? y - menuH : y;
+
+    left = Math.max(0, Math.min(left, boundsW - menuW));
+    top = Math.max(0, Math.min(top, boundsH - menuH));
+
+    // Client-space origin of the menu's offset parent, derived from the provisional placement.
+    const originX = menuRect.width > 0 ? menuRect.left - x : 0;
+    const originY = menuRect.height > 0 ? menuRect.top - y : 0;
+    const sideMenuRight = InputManager.getOpenSideMenuRightEdge_(originY + top, originY + top + menuH);
+
+    if (sideMenuRight !== null && originX + left < sideMenuRight) {
+      left = Math.min(sideMenuRight - originX, Math.max(0, boundsW - menuW));
+    }
+
+    menuEl.style.left = `${left}px`;
+    menuEl.style.top = `${top}px`;
+  }
+
+  /**
+   * Right edge (client px) of the widest open left-docked side menu that vertically overlaps the
+   * given client-space band, or null when none does.
+   */
+  private static getOpenSideMenuRightEdge_(bandTop: number, bandBottom: number): number | null {
+    let rightEdge: number | null = null;
+
+    document.querySelectorAll<HTMLElement>('.side-menu-parent').forEach((sideMenu) => {
+      if (sideMenu.style.display === 'none') {
+        return;
+      }
+
+      const rect = sideMenu.getBoundingClientRect();
+
+      // Only left-docked menus (starting in the left half of the window) push the context menu right.
+      if (rect.width <= 0 || rect.height <= 0 || rect.left > window.innerWidth / 2) {
+        return;
+      }
+      if (rect.bottom <= bandTop || rect.top >= bandBottom) {
+        return;
+      }
+
+      rightEdge = Math.max(rightEdge ?? -Infinity, rect.right);
+    });
+
+    return rightEdge;
   }
 
   /* istanbul ignore next */

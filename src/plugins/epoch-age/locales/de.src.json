@@ -1,0 +1,22 @@
+{
+  "plugins": {
+    "EpochAge": {
+      "badge": {
+        "caution": "Epochenalter: mäßig, {days}",
+        "low": "Epochenalter: gering, {days}",
+        "poor": "Epochenalter: sehr gering, {days}"
+      },
+      "tooltip": "Zeit zwischen Simulation und Epoche des Bahnelementsatzes. Mäßig ab 3 Tagen, gering ab 7, sehr gering ab 14: Je älter die Elemente, desto stärker weichen die Positionen ab.",
+      "toast": {
+        "poor": "Die Bahnelemente sind zu diesem Zeitpunkt älter als 14 Tage. Positionen können um zehn Kilometer oder mehr abweichen."
+      },
+      "settings": {
+        "sectionLabel": "Epochenalter",
+        "showEpochAge": {
+          "label": "Epochenalter-Hinweis anzeigen",
+          "helpText": "Warnen, wenn die Simulationszeit mehr als 3 Tage von der Elementepoche des ausgewählten Satelliten entfernt ist."
+        }
+      }
+    }
+  }
+}

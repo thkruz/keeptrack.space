@@ -27,6 +27,8 @@ export interface BreakupLabels {
   estDebris: string;
   // Event info labels
   parentObject: string;
+  /** International designator (launch prefix) of the event's parent launch. */
+  intlDes: string;
   country: string;
   orbitType: string;
   breakupAltitude: string;
@@ -73,7 +75,10 @@ export const buildEventListTable = (events: BreakupEvent[], labels: BreakupLabel
   for (const evt of events) {
     rows += html`
       <tr class="breakup-analysis-event-row link" data-event-id="${evt.id}">
-        <td class="ba-cell-left">${evt.name}</td>
+        <td class="ba-cell-left">
+          ${evt.name}
+          <div class="ba-event-ids">${evt.intlDesPrefix} | ${labels.norad} ${evt.parentNoradId.toString()}</div>
+        </td>
         <td>${evt.breakupDate}</td>
         <td>${evt.cause}</td>
         <td>${evt.altitudeKm.toString()}</td>
@@ -100,7 +105,8 @@ export const buildEventListTable = (events: BreakupEvent[], labels: BreakupLabel
   `;
 };
 
-const infoItem = (label: string, value: string): string => html`
+/** One label/value cell of the info grid (exported so Pro cards match the curated layout). */
+export const infoItem = (label: string, value: string): string => html`
   <div class="breakup-info-item">
     <span class="breakup-info-label">${label}</span>
     <span class="breakup-info-value">${value}</span>
@@ -113,6 +119,7 @@ export const buildEventInfoCard = (event: BreakupEvent, yearsToBreakup: string, 
     <p class="breakup-description">${event.description}</p>
     <div class="breakup-info-grid">
       ${infoItem(labels.parentObject, `${event.parentName} (${event.parentNoradId.toString()})`)}
+      ${infoItem(labels.intlDes, event.intlDesPrefix)}
       ${infoItem(labels.country, event.country)}
       ${infoItem(labels.orbitType, event.orbitType)}
       ${infoItem(labels.breakupAltitude, `${event.altitudeKm.toString()} ${labels.km}`)}
@@ -124,13 +131,16 @@ export const buildEventInfoCard = (event: BreakupEvent, yearsToBreakup: string, 
   </section>
 `;
 
-export const buildStatsCard = (summary: EventSummary, labels: BreakupLabels): string => {
-  const { tracked, estimated, trackingRatio, counts, altStats, eccStats, incStats } = summary;
-  const typeValue = `${counts.payloads.toString()} / ${counts.rocketBodies.toString()} / ${counts.debris.toString()}`;
+/**
+ * The min/max/mean/spread dispersion table for a summary, or the empty-state
+ * note when nothing is tracked. Shared by the curated stats card and the Pro
+ * live-analysis card.
+ */
+export const buildDispersionTable = (summary: EventSummary, labels: BreakupLabels): string => {
+  const { tracked, altStats, eccStats, incStats } = summary;
 
-  const dispersion =
-    tracked > 0
-      ? html`
+  return tracked > 0
+    ? html`
       <div class="kt-section-label" style="margin-top:12px;">${labels.fragmentDispersion}</div>
       <table class="breakup-dispersion-table center-align">
         <thead>
@@ -174,7 +184,13 @@ export const buildStatsCard = (summary: EventSummary, labels: BreakupLabels): st
         </tbody>
       </table>
     `
-      : html`<p class="ba-empty-state">${labels.noTrackedDebris}</p>`;
+    : html`<p class="ba-empty-state">${labels.noTrackedDebris}</p>`;
+};
+
+export const buildStatsCard = (summary: EventSummary, labels: BreakupLabels): string => {
+  const { tracked, estimated, trackingRatio, counts } = summary;
+  const typeValue = `${counts.payloads.toString()} / ${counts.rocketBodies.toString()} / ${counts.debris.toString()}`;
+  const dispersion = buildDispersionTable(summary, labels);
 
   return html`
     <section class="kt-section breakup-stats-card">

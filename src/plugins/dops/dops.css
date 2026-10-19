@@ -1,3 +1,28 @@
 #dops-form {
   margin-bottom: 1rem;
 }
+/*
+ * v13 dense-form fixes (docs-local/ui/v13-menu-style.md). The location card
+ * stacks two rows of two fields (four fields per row did not fit the menu
+ * width), plus the Pro constellation select below them, so every stacked row
+ * needs headroom for its floating label; the first row only needs the
+ * section-label gap. Lives in the OSS CSS because OSS and Pro share #dops-menu.
+ */
+#dops-menu .kt-field-row .input-field.col {
+  margin-top: 20px;
+}
+
+#dops-menu .kt-section-label + .kt-field-row .input-field.col {
+  margin-top: 8px;
+}
+
+/* Focus indication: KeepTrack's underline instead of the app-wide outline,
+ * which would overlap the floating label above each field. */
+#dops-menu .input-field input:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#dops-menu .input-field input:focus-visible {
+  outline: none;
+}

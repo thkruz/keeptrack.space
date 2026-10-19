@@ -9,7 +9,9 @@
       },
       "labels": {
         "shareLink": "Link do udostępniania",
-        "url": "Adres URL do udostępniania"
+        "url": "Adres URL do udostępniania",
+        "includeTime": "Uwzględnij bieżący czas",
+        "includeTimeTooltip": "Przypina bieżący czas symulacji w linku. Domyślnie wyłączone, aby odbiorcy widzieli ten sam widok we własnym bieżącym czasie."
       },
       "buttons": {
         "copyLink": "Kopiuj link",

@@ -34,10 +34,10 @@ test.describe('PlanetsMenuPlugin', () => {
 
     await expect(sideMenu).toBeVisible({ timeout: 5_000 });
 
-    // Verify v13 section labels (use exact text to avoid matching title or partial matches)
-    await expect(sideMenu.locator('.kt-section-label', { hasText: /^Planets$/u })).toBeAttached();
-    await expect(sideMenu.locator('.kt-section-label', { hasText: /^Dwarf Planets$/u })).toBeAttached();
-    await expect(sideMenu.locator('.kt-section-label', { hasText: /^Other Celestial Bodies$/u })).toBeAttached();
+    // Verify the v13 section labels of the Sun-outward tour (exact text avoids matching the title)
+    for (const label of [/^Star$/u, /^Terrestrial Planets$/u, /^Asteroid Belt$/u, /^Gas Giants$/u, /^Ice Giants$/u, /^Trans-Neptunian Objects$/u]) {
+      await expect(sideMenu.locator('.kt-section-label', { hasText: label })).toBeAttached();
+    }
 
     // Filter field narrows the list to matching bodies
     const filter = sideMenu.locator('#planets-filter-input');
@@ -63,10 +63,9 @@ test.describe('PlanetsMenuPlugin', () => {
     await expect(sideMenu.locator('[data-planet="Moon"]')).toBeAttached();
     await expect(sideMenu.locator('[data-planet="Sun"]')).toBeAttached();
 
-    // Verify disabled moons are present
-    const disabledMoons = sideMenu.locator('.planets-menu-disabled');
-
-    expect(await disabledMoons.count()).toBeGreaterThan(0);
+    // Every listed body is implemented (PLANNED_BODIES in planets-bodies.ts is empty), so no row
+    // renders as a disabled "planned" entry. Raise this when a planned body is added again.
+    await expect(sideMenu.locator('.planets-menu-disabled')).toHaveCount(0);
 
     // The planets RMB entry was removed (redundant with side menu, 'P' key, palette)
     await expect(page.locator('#planets-rmb')).not.toBeAttached();

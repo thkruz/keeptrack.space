@@ -3,11 +3,11 @@
     "title": "Dane orbitalne",
     "Apogee": {
       "label": "Apogeum",
-      "tooltip": "Najwyższy punkt orbity"
+      "tooltip": "Najwyższa wysokość orbity nad promieniem równikowym (6378,137 km)"
     },
     "Perigee": {
       "label": "Perygeum",
-      "tooltip": "Najniższy punkt orbity"
+      "tooltip": "Najniższa wysokość orbity nad promieniem równikowym (6378,137 km)"
     },
     "Inclination": {
       "label": "Inklinacja",
@@ -52,25 +52,30 @@
       "label": "Prędkość",
       "tooltip": "Bieżąca prędkość satelity (większa im bliżej Ziemi)"
     },
+    "GPEpoch": {
+      "label": "Epoka GP",
+      "tooltip": "Epoka zestawu elementów użytego do propagacji"
+    },
     "AgeOfGP": {
       "label": "Wiek param. orb.",
-      "tooltip": "Czas od oficjalnego obliczenia orbity (starsze dane są zwykle mniej dokładne)",
+      "tooltip": "Czas od epoki danych do bieżącego czasu symulacji (starsze dane są zwykle mniej dokładne; wartość ujemna oznacza, że epoka jest późniejsza niż czas symulacji)",
       "days": "Dni",
       "hours": "Godziny",
       "epochYear": "Rok epoki",
-      "epochDay": "Dzień epoki"
+      "epochDay": "Dzień epoki",
+      "epochAfterSimTime": "epoka danych jest późniejsza niż czas symulacji"
     },
     "RadialSigma": {
       "label": "Sigma radialna",
-      "tooltip": "Niepewność radialna (metry)"
+      "tooltip": "Radialna niepewność położenia 1 sigma z kowariancji wyznaczonej z TLE w epoce GP (układ RIC). Te same wartości wykorzystują Pc i raport koniunkcji."
     },
     "InTrackSigma": {
       "label": "Sigma wzdłuż toru",
-      "tooltip": "Niepewność wzdłuż toru (metry)"
+      "tooltip": "Niepewność położenia wzdłuż toru 1 sigma z kowariancji wyznaczonej z TLE w epoce GP (układ RIC). Te same wartości wykorzystują Pc i raport koniunkcji."
     },
     "CrossTrackSigma": {
       "label": "Sigma poprzeczna",
-      "tooltip": "Niepewność poprzeczna (metry)"
+      "tooltip": "Poprzeczna niepewność położenia 1 sigma z kowariancji wyznaczonej z TLE w epoce GP (układ RIC). Te same wartości wykorzystują Pc i raport koniunkcji."
     },
     "meter": "m",
     "kilometer": "km",

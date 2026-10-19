@@ -132,6 +132,11 @@ export type lookanglesRow = {
   MAXIMUM_ELEVATION: string | null;
   /** Epoch ms at which MAXIMUM_ELEVATION occurs (optional; set by findPassesForSat). */
   MAXIMUM_ELEVATION_DTG?: number | null;
+  /**
+   * True when the pass's AOS or LOS was produced by the sensor's horizon mask rather than
+   * its flat minimum elevation (optional; set by findPassesForSat).
+   */
+  MASK_LIMITED?: boolean;
   SENSOR_TO_SUN_AZIMUTH: string | null;
   SENSOR_TO_SUN_ELEVATION: string | null;
 };

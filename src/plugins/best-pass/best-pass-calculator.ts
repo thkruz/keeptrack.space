@@ -28,7 +28,7 @@
 
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { lookanglesRow } from '@app/engine/core/interfaces';
-import { eci2rae, Kilometers, MINUTES_PER_DAY, SatelliteRecord, TAU } from '@ootk/src/main';
+import { Degrees, eci2rae, Kilometers, MINUTES_PER_DAY, SatelliteRecord, TAU } from '@ootk/src/main';
 
 /** Default per-satellite cap on how many passes are collected before truncating. */
 export const DEFAULT_MAX_RESULTS = 5000;
@@ -172,6 +172,14 @@ export const findPassesForSat = (
   let passMaxElTime: Date | null = null;
   let start3 = false;
   let stop3 = false;
+  /** True when this pass's AOS was produced by the horizon mask. */
+  let startMasked = false;
+  /** True when the last emitted pass's LOS was produced by the horizon mask. */
+  let lastStopMasked = false;
+
+  /** The out-of-view neighbour of an edge sample is mask-blocked: the mask made this edge. */
+  const isMaskEdge = (rae: PassRae): boolean =>
+    rae.az !== null && rae.el !== null && typeof sensor.isMaskBlocked === 'function' && sensor.isMaskBlocked(rae.az as Degrees, rae.el as Degrees);
 
   const propagateBestPass = (now: Date): lookanglesRow => {
     const aer = getRae(now, satrec, sensor) as Required<PassRae>;
@@ -190,6 +198,7 @@ export const findPassesForSat = (
       if (aer.el <= HORIZON_ELEVATION_DEG) {
         start3 = true;
       }
+      startMasked = isMaskEdge(aer1);
       sTime = now;
       sAz = aer.az.toFixed(0);
       sEl = aer.el.toFixed(1);
@@ -214,6 +223,8 @@ export const findPassesForSat = (
         const tic = durationMs / 1000 || 0;
         const sunRae = eci2rae(now, sunEciKm(now), sensor);
 
+        lastStopMasked = isMaskEdge(aer1);
+
         return {
           START_DTG: sTime.getTime(),
           SATELLITE_ID: satId,
@@ -235,6 +246,7 @@ export const findPassesForSat = (
           MAXIMUM_ELEVATION_DTG: (passMaxElTime ?? sTime).getTime(),
           SENSOR_TO_SUN_AZIMUTH: sunRae.az.toFixed(1),
           SENSOR_TO_SUN_ELEVATION: sunRae.el.toFixed(1),
+          MASK_LIMITED: startMasked || lastStopMasked,
         };
       }
     }
@@ -261,6 +273,7 @@ export const findPassesForSat = (
     passMaxElTime = null;
     start3 = false;
     stop3 = false;
+    startMasked = false;
   };
 
   for (let i = 0; i < looksLength * 24 * 60 * 60; i += looksInterval) {
@@ -276,7 +289,13 @@ export const findPassesForSat = (
     if (row.PASS_SCORE !== null) {
       passes.push(row);
       resetPassState();
-      i += orbitalPeriod * 60 * 0.75; // NOSONAR skip most of one orbit to avoid re-detecting this pass
+      /*
+       * Skip most of one orbit to avoid re-detecting this pass, unless the horizon mask
+       * cut it short: then the same overflight re-emerges minutes later as a second contact.
+       */
+      if (!lastStopMasked) {
+        i += orbitalPeriod * 60 * 0.75; // NOSONAR
+      }
     }
   }
 

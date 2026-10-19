@@ -17,6 +17,10 @@
         "maxRange": "Portée max",
         "band": "Bande",
         "beamWidth": "Largeur de faisceau",
+        "horizonMask": "Masque d'horizon",
+        "horizonMaskPoints": "{{count}} sommets",
+        "source": "Source",
+        "retrievedOn": ", consulté le {{date}}",
         "unknown": "Inconnu",
         "details": "Détails",
         "visualizations": "Visualisations"
@@ -38,7 +42,7 @@
         "imgCaption": "Info Capteur pour un radar sélectionné, y compris ses limites d'azimut, d'élévation et de portée.",
         "fieldsHeading": "Signification des Champs",
         "fields": "<ul><li><strong>Latitude / Longitude</strong> : l'emplacement au sol du capteur.</li><li><strong>Azimut min / max</strong> : l'arc de boussole que le capteur peut couvrir.</li><li><strong>Élévation min / max</strong> : jusqu'où il peut regarder au-dessus de l'horizon, du plus bas au plus haut.</li><li><strong>Portée min / max</strong> : la fenêtre de distance dans laquelle il peut suivre, en km.</li><li><strong>Bande / Largeur de faisceau</strong> : bande de fréquence du radar et largeur du faisceau ; masquées pour les capteurs optiques et les observateurs.</li></ul>Ensemble, les limites d'azimut, d'élévation et de portée définissent le volume du champ de vision dessiné sur le globe.",
-        "howToUse": "<ol><li>Sélectionnez un capteur dans le menu Capteurs.</li><li>Ouvrez Info Capteur depuis la barre inférieure.</li><li>Utilisez <strong>Ajouter une ligne vers le Soleil</strong> ou <strong>Ajouter une ligne vers la Lune</strong> pour tracer une ligne depuis le capteur. C'est pratique pour repérer les fenêtres d'exclusion solaire ou les interférences du clair de lune pour les capteurs optiques. Cliquez à nouveau sur le bouton pour supprimer la ligne.</li></ol>",
+        "howToUse": "<ol><li>Sélectionnez un capteur dans le menu Capteurs.</li><li>Ouvrez Info Capteur depuis le tiroir des extensions.</li><li>Utilisez <strong>Ajouter une ligne vers le Soleil</strong> ou <strong>Ajouter une ligne vers la Lune</strong> pour tracer une ligne depuis le capteur. C'est pratique pour repérer les fenêtres d'exclusion solaire ou les interférences du clair de lune pour les capteurs optiques. Cliquez à nouveau sur le bouton pour supprimer la ligne.</li></ol>",
         "tip1": "Les boutons de ligne vers le soleil et la lune nécessitent exactement un capteur sélectionné ; ils refuseront de tracer lorsqu'un réseau entier est actif.",
         "tip2": "Les paramètres des capteurs sont basés sur des données publiques et peuvent ne pas être parfaitement exacts. Les corrections sont les bienvenues à admin@keeptrack.space.",
         "tip3": "Pour expérimenter avec d'autres limites de champ de vision, construisez plutôt une copie de ce capteur dans le menu Capteur Personnalisé, car ce menu est en lecture seule."
@@ -52,7 +56,7 @@
         "imgAlt": "Le menu Capteur personnalisé avec les champs d'emplacement et de champ de vision",
         "imgCaption": "Définissez l'emplacement et le champ de vision, puis ajoutez le capteur.",
         "fieldsHeading": "Définir le Capteur",
-        "fields": "Définissez la <strong>Latitude</strong>, la <strong>Longitude</strong> et l'<strong>Altitude au-dessus du niveau de la mer (km)</strong>, puis choisissez le <strong>Type de capteur</strong> : observateur, optique, radar à antenne réseau à commande de phase ou mécanique. Cocher <strong>Télescope</strong> donne une vue complète à 360 degrés en azimut avec un masque d'élévation de 10 degrés et une portée illimitée ; décochez-la pour définir vous-même les limites d'azimut, d'élévation et de portée.",
+        "fields": "Définissez la <strong>Latitude</strong>, la <strong>Longitude</strong> et l'<strong>Altitude au-dessus du niveau de la mer (km)</strong>, puis choisissez le <strong>Type de capteur</strong> : observateur, optique, radar à antenne réseau à commande de phase ou mécanique. Cocher <strong>Télescope</strong> donne une vue complète à 360 degrés en azimut avec un masque d'élévation de 10 degrés et une portée illimitée ; décochez-la pour définir vous-même les limites d'azimut, d'élévation et de portée. <strong>Masque d'horizon</strong> : paires facultatives <code>azimut,élévation minimale</code>, une par ligne (2 à 72 points, azimut de 0 à 359, élévation de 0 à 89). L'élévation est interpolée entre les points et boucle à 360. Un passage interrompu par le masque est signalé comme deux contacts.",
         "howToUse": "<ol><li>Ouvrez le menu <strong>Capteur personnalisé</strong> (mode Créer), ou faites un clic droit n'importe où sur la Terre et choisissez <strong>Créer un capteur ici</strong> ou <strong>Créer un observateur ici</strong> pour préremplir l'emplacement.</li><li>Ajustez les champs, ou cliquez sur <strong>Utiliser la géolocalisation</strong> pour utiliser votre propre position (HTTPS uniquement).</li><li>Cliquez sur <strong>Ajouter un capteur personnalisé</strong>. Le nouveau capteur apparaît sur le globe et dans le panneau de la liste des capteurs actifs.</li><li>Activez <strong>Remplacer le capteur</strong> pour remplacer le capteur principal au lieu d'en ajouter un autre ; <strong>Effacer les capteurs personnalisés</strong> les supprime tous.</li></ol>",
         "tip1": "Pour modifier les paramètres d'un vrai capteur, sélectionnez-le d'abord dans le menu Capteurs ; le formulaire se préremplit avec ses valeurs afin que vous puissiez les ajuster et le rajouter.",
         "tip2": "Plusieurs capteurs personnalisés se cumulent : chaque ajout devient un capteur actif supplémentaire, ce qui est un moyen facile de simuler un petit réseau."
@@ -89,7 +93,9 @@
         "tooltipMinEl": "Élévation en degrés (ex : 10)",
         "tooltipMaxEl": "Élévation en degrés (ex : 90)",
         "tooltipMinRange": "Portée en kilomètres (ex : 500)",
-        "tooltipMaxRange": "Portée en kilomètres (ex : 20000)"
+        "tooltipMaxRange": "Portée en kilomètres (ex : 20000)",
+        "horizonMask": "Masque d'horizon (az,él par ligne)",
+        "tooltipHorizonMask": "Facultatif. Points azimut,élévation en degrés, un par ligne ou séparés par des points-virgules. L'élévation minimale est interpolée entre les points et boucle à 360. De 2 à 72 points, 0 <= az < 360, 0 <= él <= 89."
       },
       "rmbMenu": {
         "title": "Créer",
@@ -121,7 +127,11 @@
         "maxRangeValue": "La portée maximum du capteur personnalisé doit être supérieure ou égale à 0 km.",
         "invalidNumber": "Les valeurs du capteur personnalisé doivent être des nombres valides.",
         "elOrder": "L'élévation minimale du capteur personnalisé ne doit pas dépasser l'élévation maximale.",
-        "rangeOrder": "La portée minimale du capteur personnalisé ne doit pas dépasser la portée maximale."
+        "rangeOrder": "La portée minimale du capteur personnalisé ne doit pas dépasser la portée maximale.",
+        "maskBadPair": "Masque d'horizon : impossible d'utiliser « {{pair}} ». Saisissez az,él avec 0 <= az < 360 et 0 <= él <= 89.",
+        "maskDuplicateAz": "Masque d'horizon : l'azimut de « {{pair}} » apparaît plusieurs fois.",
+        "maskTooFew": "Le masque d'horizon nécessite au moins 2 points.",
+        "maskTooMany": "Le masque d'horizon accepte au plus 72 points."
       },
       "sections": {
         "identity": "Identité",
@@ -156,15 +166,18 @@
         "rise": "Lever",
         "set": "Coucher",
         "maxEl": "Élév. max.",
-        "unknown": "Inconnu"
+        "unknown": "Inconnu",
+        "inView": "En vue"
       },
+      "maskLimited": "masque",
+      "maskLimitedTitle": "Ce bord est fixé par le masque d'horizon du capteur, pas par son élévation minimale",
       "help": {
         "overview": "Angles de visée calcule les données de pointage dont un capteur a besoin pour suivre le satellite sélectionné : l'heure, l'azimut, l'élévation et la distance de chaque prochaine opportunité d'observation. C'est le pont entre voir un passage en 3D et pointer réellement une antenne ou un télescope vers lui.",
         "imgAlt": "Le tableau des angles de visée avec heures, azimuts, élévations et distances",
         "imgCaption": "Chaque ligne est une solution de pointage ; cliquez sur l'une d'elles pour amener l'horloge à ce moment.",
         "readingHeading": "Lire le Tableau",
         "reading": "Chaque ligne indique l'<strong>Heure</strong>, l'élévation (<strong>Élév.</strong>), l'azimut (<strong>Az.</strong>) et la distance (<strong>Dist.</strong>) du satellite vu depuis le capteur, ainsi que s'il est optiquement <strong>Visible</strong>. Avec <strong>Afficher uniquement les heures de lever et de coucher</strong> activé, le tableau se réduit aux événements de lever, d'élévation maximale et de coucher de chaque passage, étiquetés dans la colonne <strong>Type</strong>.",
-        "howToUse": "<ol><li>Sélectionnez à la fois un capteur et un satellite ; l'icône inférieure reste désactivée tant que les deux ne sont pas définis.</li><li>Ouvrez <strong>Angles de visée</strong> depuis la barre inférieure. Le tableau se calcule automatiquement.</li><li>Ouvrez le panneau des paramètres pour basculer le mode lever/coucher ou modifier la <strong>Durée du calcul (jours)</strong> et l'<strong>Intervalle (secondes)</strong>.</li><li>Cliquez sur une ligne pour amener l'horloge de la simulation à ce moment, ou utilisez le bouton de téléchargement pour exporter le tableau.</li></ol>",
+        "howToUse": "<ol><li>Sélectionnez à la fois un capteur et un satellite ; son icône dans le tiroir des extensions reste désactivée tant que les deux ne sont pas définis.</li><li>Ouvrez <strong>Angles de visée</strong> depuis le tiroir des extensions. Le tableau se calcule automatiquement.</li><li>Ouvrez le panneau des paramètres pour basculer le mode lever/coucher ou modifier la <strong>Durée du calcul (jours)</strong> et l'<strong>Intervalle (secondes)</strong>.</li><li>Cliquez sur une ligne pour amener l'horloge de la simulation à ce moment, ou utilisez le bouton de téléchargement pour exporter le tableau.</li></ol>",
         "tip1": "Le mode lever/coucher est le moyen le plus rapide de savoir quand vous pourrez voir le satellite la prochaine fois ; passez au tableau complet quand vous avez besoin d'angles de pointage seconde par seconde.",
         "tip2": "Cliquer sur une ligne préserve votre état de lecture, de sorte qu'une horloge en pause reste en pause à la nouvelle heure."
       }
@@ -196,7 +209,7 @@
         "imgCaption": "Chaque ligne associe un moment du passage au capteur qui le voit.",
         "readingHeading": "Lire le Tableau",
         "reading": "Les lignes sont triées chronologiquement sur tous les sites activés, chacune indiquant l'<strong>Heure</strong>, l'élévation (<strong>Élév.</strong>), l'azimut (<strong>Az.</strong>), la distance (<strong>Dist.</strong>), le <strong>Capteur</strong> concerné et la visibilité optique. Le panneau de sélection des capteurs détermine quels sites sont calculés : les capteurs verts sont inclus et les rouges exclus.",
-        "howToUse": "<ol><li>Sélectionnez un satellite ; l'icône inférieure reste désactivée tant qu'aucun n'est sélectionné. Aucune sélection de capteur n'est nécessaire.</li><li>Ouvrez <strong>Angles multi-sites</strong> depuis la barre inférieure. Le réseau d'alerte aux missiles par défaut est calculé automatiquement.</li><li>Activez ou désactivez des capteurs dans le panneau de la liste des capteurs pour modifier le réseau.</li><li>Cliquez sur une ligne pour sélectionner ce capteur et amener l'horloge à ce moment, ou exportez le tableau avec le bouton de téléchargement.</li></ol>",
+        "howToUse": "<ol><li>Sélectionnez un satellite ; son icône dans le tiroir des extensions reste désactivée tant qu'aucun n'est sélectionné. Aucune sélection de capteur n'est nécessaire.</li><li>Ouvrez <strong>Angles multi-sites</strong> depuis le tiroir des extensions. Le réseau d'alerte aux missiles par défaut est calculé automatiquement.</li><li>Activez ou désactivez des capteurs dans le panneau de la liste des capteurs pour modifier le réseau.</li><li>Cliquez sur une ligne pour sélectionner ce capteur et amener l'horloge à ce moment, ou exportez le tableau avec le bouton de téléchargement.</li></ol>",
         "tip1": "Utilisez-le pour planifier les transferts : là où la couverture d'un capteur se termine, la ligne suivante montre quel site prend le relais du satellite.",
         "tip2": "Les sites optiques n'affichent la visibilité que lorsque les conditions d'éclairage permettent une observation réelle ; les radars affichent toujours N/D."
       }

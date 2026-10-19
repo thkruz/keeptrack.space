@@ -47,6 +47,17 @@ export interface OrbitCruncherInMsgSatelliteUpdate {
   isEcfOutput: boolean;
   isPolarViewEcf?: boolean;
   seqNum?: number;
+  /**
+   * Sun position in ECI (km) at `simulationTime`, computed on the main thread with
+   * `Sun.eci()`. One vector per request: the Sun moves under 0.05 deg per LEO
+   * period, and about 1 deg over a GEO/deep-space day, which is acceptable for
+   * a visual cue. Omitted (or `isDrawOrbitEclipse` false) disables dimming.
+   */
+  sunEci?: [number, number, number];
+  /** Dim the vertices that sit in Earth's shadow. */
+  isDrawOrbitEclipse?: boolean;
+  /** Multiplier applied to a shadowed vertex's alpha (0..1). */
+  orbitEclipseAlpha?: number;
 }
 
 export interface OrbitCruncherInMsgMissileUpdate {
@@ -78,6 +89,8 @@ export interface OrbitCruncherInMsgChangeOrbitType {
 export interface OrbitCruncherInMsgSettingsUpdate {
   typ: OrbitCruncherMsgType.SETTINGS_UPDATE;
   numberOfOrbitsToDraw: number;
+  /** New orbit fade factor; omitted keeps the current one. */
+  orbitFadeFactor?: number;
 }
 
 export type OrbitCruncherInMsgs =
@@ -109,6 +122,12 @@ export interface OrbitCruncherOutMsgPoints {
   satId: number;
   /** Echoes the seqNum the worker was on when it produced these points. Main thread drops stale responses. */
   seqNum?: number;
+  /** Julian date of sample 0. Set for TLE satellites only (missile and empty responses omit it). */
+  sampleJd0?: number;
+  /** Minutes between consecutive samples. Set together with {@link sampleJd0}. */
+  sampleStepMin?: number;
+  /** True when the points are Earth-fixed (ECF output or polar view), false for TEME. */
+  isEcf?: boolean;
 }
 
 // ─── Object Cache Types (used inside the worker) ───────────────────────────

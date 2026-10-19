@@ -83,6 +83,51 @@ describe('UrlManager.parseGetVariables', () => {
   });
 });
 
+describe('UrlManager sun parameter', () => {
+  beforeEach(() => {
+    setupStandardEnvironment();
+  });
+
+  // Legacy counts snap to the nearest GodraySamples member (-1, 24, 36, 52, 80).
+  const CASES: [string, number][] = [
+    ['16', 24],
+    ['32', 36],
+    ['64', 52],
+    ['128', 80],
+    ['36', 36],
+    ['low', 24],
+    ['ultra', 80],
+  ];
+
+  for (const [raw, expected] of CASES) {
+    it(`sun=${raw} sets ${expected} godray samples`, () => {
+      setLocation(`?sun=${raw}`);
+      UrlManager.parseGetVariables(settingsManager);
+
+      expect(settingsManager.godraysSamples).toBe(expected);
+      expect(settingsManager.isDrawSun).toBe(true);
+      expect(settingsManager.isDisableGodrays).toBe(false);
+    });
+  }
+
+  it('sun=potato uses the sun texture with godrays off', () => {
+    setLocation('?sun=potato');
+    UrlManager.parseGetVariables(settingsManager);
+
+    expect(settingsManager.godraysSamples).toBe(-1);
+    expect(settingsManager.isUseSunTexture).toBe(true);
+    expect(settingsManager.isDisableGodrays).toBe(true);
+  });
+
+  it('sun=off hides the sun', () => {
+    setLocation('?sun=off');
+    UrlManager.parseGetVariables(settingsManager);
+
+    expect(settingsManager.isDrawSun).toBe(false);
+    expect(settingsManager.isDisableGodrays).toBe(true);
+  });
+});
+
 describe('UrlManager.getKeyValuePairs', () => {
   it('keeps a wrapped external URL intact, including its own query string', () => {
     setLocation('/?tle=%22https://celestrak.org/NORAD/elements/supplemental/sup-gp.php?INTDES=2026-123&FORMAT=csv%22&external-only=true');
@@ -201,6 +246,22 @@ describe('UrlManager.getShareUrl', () => {
 
     expect(typeof url).toBe('string');
     expect(url).toContain('zoom=0.50');
+  });
+
+  it('does not pin the simulation time by default, even when the clock is offset', () => {
+    ServiceLocator.getTimeManager().staticOffset = 86400e3;
+
+    expect(UrlManager.getShareUrl()).not.toContain('date=');
+    expect(UrlManager.getShareUrl(false)).not.toContain('date=');
+  });
+
+  it('pins the simulation time when isIncludeTime is set', () => {
+    const tm = ServiceLocator.getTimeManager();
+
+    tm.dynamicOffsetEpoch = Date.UTC(2024, 7, 15, 6, 30);
+    tm.staticOffset = 0;
+
+    expect(UrlManager.getShareUrl(true, true)).toContain('date=2024-08-15T06:30:00.000Z');
   });
 
   it('does not navigate (leaves window.location unchanged)', () => {

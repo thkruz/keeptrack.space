@@ -21,9 +21,10 @@ const SUN_APPARENT_MAGNITUDE = -26.74;
 const DEFAULT_ALBEDO = 0.2;
 
 /**
- * Geometric factor for a diffuse Lambert sphere at zero phase angle:
- *   I_back / P_intercepted = 2 / (3π)
- * Without it the back-scattered radiance is overstated by ~5 magnitudes.
+ * Lambert-sphere phase function at the 90 deg standard-magnitude phase angle:
+ *   F(φ) = (2 / 3π) · ((π - φ)·cos φ + sin φ), so F(90°) = 2 / (3π).
+ * Standard magnitude is defined at 1000 km and 90 deg phase (McCants), which is
+ * also what `SatMath.calculateVisMag` assumes when it adds its own phase term.
  */
 const LAMBERT_SPHERE_FACTOR = 2 / (3 * Math.PI);
 
@@ -195,15 +196,16 @@ export const deriveCrossSectionAreaM2 = (sat: Satellite): number | null => {
 };
 
 /**
- * Diffuse Lambert sphere intrinsic magnitude at the 1000 km reference range.
+ * Diffuse Lambert sphere standard magnitude (1000 km range, 90 deg phase).
  *
- *   m = M_sun + 5·log10(d_ref_m) - 2.5·log10((2/3π) · albedo · area_m2)
+ *   m = M_sun + 5·log10(d_ref_m) - 2.5·log10(albedo · (area_m2 / π) · F(90°))
  *
- * Derived from `m_obs - M_sun = -2.5·log10(F_reflected / F_sun_at_observer)`
- * with the Lambert-sphere back-scattered intensity I = (2/3π)·P_intercepted.
- * Reference distance is fixed at 1000 km; the constants collapse to a single
- * additive term but are kept explicit to make alternative reference distances
- * trivial to drop in later.
+ * with the area taken as the sphere's projected area, so r² = area / π, and
+ * F(90°) = 2 / (3π). This is the same convention as ootk `estimateVmagFromRcs`
+ * (v8), so a geometry-derived estimate and an RCS-derived one agree: for
+ * albedo 0.2 it reduces to m = 7.93 - 2.5·log10(area_m2). Reference distance is
+ * fixed at 1000 km; the constants are kept explicit to make alternative
+ * reference distances trivial to drop in later.
  */
 export const estimateStdMagFromProperties = (areaM2: number, albedo: number = DEFAULT_ALBEDO): number => {
   if (!(areaM2 > 0) || !(albedo > 0)) {
@@ -213,7 +215,7 @@ export const estimateStdMagFromProperties = (areaM2: number, albedo: number = DE
   // Convert km → m so it shares units with area's m² inside the log term.
   const dRefMeters = STD_REFERENCE_DISTANCE_KM * 1000;
 
-  return SUN_APPARENT_MAGNITUDE + 5 * Math.log10(dRefMeters) - 2.5 * Math.log10(LAMBERT_SPHERE_FACTOR * albedo * areaM2);
+  return SUN_APPARENT_MAGNITUDE + 5 * Math.log10(dRefMeters) - 2.5 * Math.log10(LAMBERT_SPHERE_FACTOR * albedo * (areaM2 / Math.PI));
 };
 
 /**

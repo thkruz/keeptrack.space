@@ -1,0 +1,10 @@
+{
+  "generalHelp": {
+    "title": "KeepTrack-Hilfe",
+    "overview": "Es ist kein Menü und keine Ansicht geöffnet, daher wird die allgemeine KeepTrack-Hilfe angezeigt. Jedes Menü und jede Ansicht hat eine eigene Hilfe.",
+    "howToUse": "Öffnen Sie die Seitenleiste und wählen Sie ein Werkzeug, um sein Menü zu öffnen, oder wechseln Sie zu einer Ansicht wie der flachen Karte oder der Polaransicht. Drücken Sie dann Shift+F1, um die Hilfe für dieses Menü oder diese Ansicht zu sehen. Klicken Sie auf ein Objekt auf dem Globus, um es auszuwählen und seine Details zu sehen.",
+    "tip1": "Eingeschaltete Ebenen (zum Beispiel Kovarianzellipsoide) haben kein eigenes Menü. Solange nur Ebenen aktiv sind, zeigt Shift+F1 weiterhin diese allgemeine Hilfe.",
+    "tip2": "Klicken Sie irgendwo auf dieses Feld, um es zu schließen.",
+    "shortcutClose": "Hilfe schließen"
+  }
+}

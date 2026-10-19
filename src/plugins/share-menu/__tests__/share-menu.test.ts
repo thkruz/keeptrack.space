@@ -56,6 +56,32 @@ describe('ShareMenuPlugin methods', () => {
     expect(input.value).toBe('https://keeptrack.space/?zoom=0.50');
   });
 
+  it('requests a URL without the time by default and with it once "Include current time" is checked', () => {
+    const spy = vi
+      .spyOn(UrlManager, 'getShareUrl')
+      .mockImplementation((_isMaxData?: boolean, isIncludeTime?: boolean) =>
+        isIncludeTime ? 'https://keeptrack.space/?date=2024-08-15T00:00:00.000Z' : 'https://keeptrack.space/?zoom=0.50'
+      );
+    const checkbox = getEl(ShareMenuPlugin.INCLUDE_TIME_ID) as HTMLInputElement;
+    const input = getEl(ShareMenuPlugin.URL_INPUT_ID) as HTMLInputElement;
+
+    expect(checkbox.checked).toBe(false);
+
+    plugin.isMenuButtonActive = true;
+    plugin.onBottomIconClick();
+    expect(spy).toHaveBeenLastCalledWith(true, false);
+    expect(input.value).not.toContain('date=');
+
+    checkbox.checked = true;
+    checkbox.dispatchEvent(new Event('change'));
+    expect(spy).toHaveBeenLastCalledWith(true, true);
+    expect(input.value).toContain('date=');
+
+    checkbox.checked = false;
+    checkbox.dispatchEvent(new Event('change'));
+    expect(input.value).not.toContain('date=');
+  });
+
   it('does not refresh the URL field when the menu is being closed', () => {
     const spy = vi.spyOn(UrlManager, 'getShareUrl').mockReturnValue('https://keeptrack.space/?zoom=0.50');
 

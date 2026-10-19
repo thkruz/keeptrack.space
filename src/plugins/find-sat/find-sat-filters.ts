@@ -7,7 +7,7 @@
  * caller-supplied resolver so the sensor/time/position lookup stays in the
  * plugin while the filtering logic lives here.
  */
-import { Degrees, Hours, Minutes, Satellite } from '@ootk/src/main';
+import { Degrees, Hours, Kilometers, Minutes, PayloadStatus, Satellite, SpaceObjectType } from '@ootk/src/main';
 
 /** Range-azimuth-elevation triple as produced by the plugin's resolver. */
 export interface LookAngle {
@@ -70,3 +70,69 @@ export const filterByLookAngle = (sats: Satellite[], resolver: LookAngleResolver
 
     return rae[axis] >= min && rae[axis] <= max;
   });
+
+/** Keep satellites whose perigee altitude (km) falls within [min, max]; missing perigee is excluded. */
+export const filterByPerigee = (sats: Satellite[], min: Kilometers, max: Kilometers): Satellite[] =>
+  sats.filter((sat) => typeof sat.perigee === 'number' && sat.perigee >= min && sat.perigee <= max);
+
+/** Keep satellites whose apogee altitude (km) falls within [min, max]; missing apogee is excluded. */
+export const filterByApogee = (sats: Satellite[], min: Kilometers, max: Kilometers): Satellite[] =>
+  sats.filter((sat) => typeof sat.apogee === 'number' && sat.apogee >= min && sat.apogee <= max);
+
+/** Coarse operational status buckets offered by the Operational Status filter. */
+export type OperationalStatus = 'active' | 'inactive' | 'unknown';
+
+/** Every bucket, in display order. */
+export const OPERATIONAL_STATUSES: readonly OperationalStatus[] = ['active', 'inactive', 'unknown'];
+
+/**
+ * Reports whether an object has decayed at the current simulation time. The
+ * plugin supplies one backed by the propagated position buffer (a 0,0,0
+ * position is what the search results list labels "Decayed"), so the filter,
+ * the list and the export agree on the same object.
+ */
+export type DecayedPredicate = (sat: Satellite) => boolean;
+
+/**
+ * Buckets a catalog object's operational status.
+ *
+ * An object that has decayed at the current simulation time (per the optional
+ * `isDecayed` predicate) is always inactive, whatever its catalog code says: a
+ * stale "operational" code must not put a reentered object in the Active set.
+ *
+ * Otherwise the catalog `status` field decides (the same field behind the info
+ * box's "Status" row): operational, partially operational, backup/standby,
+ * spare and extended mission count as active; non-operational and decayed as
+ * inactive; anything else as unknown. Rocket bodies and debris carry no status
+ * code but can never be operational, so they are bucketed as inactive. Objects
+ * whose catalog type is not yet set (SpaceObjectType.UNKNOWN, typically recent
+ * launches still being classified) keep their status code, so they can count
+ * as active.
+ */
+export const getOperationalStatus = (sat: Satellite, isDecayed?: DecayedPredicate): OperationalStatus => {
+  if (sat.type === SpaceObjectType.ROCKET_BODY || sat.type === SpaceObjectType.DEBRIS) {
+    return 'inactive';
+  }
+
+  if (isDecayed?.(sat)) {
+    return 'inactive';
+  }
+
+  switch (sat.status) {
+    case PayloadStatus.OPERATIONAL:
+    case PayloadStatus.PARTIALLY_OPERATIONAL:
+    case PayloadStatus.BACKUP_STANDBY:
+    case PayloadStatus.SPARE:
+    case PayloadStatus.EXTENDED_MISSION:
+      return 'active';
+    case PayloadStatus.NONOPERATIONAL:
+    case PayloadStatus.DECAYED:
+      return 'inactive';
+    default:
+      return 'unknown';
+  }
+};
+
+/** Keep objects whose operational status bucket is in the requested list. */
+export const filterByOperationalStatus = (sats: Satellite[], statuses: OperationalStatus[], isDecayed?: DecayedPredicate): Satellite[] =>
+  sats.filter((sat) => statuses.includes(getOperationalStatus(sat, isDecayed)));

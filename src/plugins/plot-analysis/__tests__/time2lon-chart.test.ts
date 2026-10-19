@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { buildChartOption, computeLonRange, Time2LonChartLabels } from '@app/plugins/plot-analysis/time2lon-chart';
+import { buildChartOption, computeLonRange, HIGHLIGHT_COLOR, Time2LonChartLabels } from '@app/plugins/plot-analysis/time2lon-chart';
 import { Time2LonSatLine } from '@app/plugins/plot-analysis/time2lon-core';
 
 const labels: Time2LonChartLabels = {
@@ -102,5 +102,37 @@ describe('time2lon-chart buildChartOption', () => {
     const option = buildChartOption([line()], labels) as any;
 
     expect(option.tooltip.formatter({ data: undefined })).toBe('');
+  });
+});
+
+describe('time2lon-chart selected object highlight', () => {
+  const galaxy15 = line({
+    satId: 28884,
+    satName: 'GALAXY 15',
+    points: [
+      { value: [-69.212, 0], satName: 'GALAXY 15', satId: 28884 },
+      { value: [-73.822, 1394.79], satName: 'GALAXY 15', satId: 28884 },
+    ],
+  });
+
+  it('draws the selected object last, in the highlight color, with a name label', () => {
+    const option = buildChartOption([galaxy15, line()], labels, 28884) as any;
+    const last = option.series[option.series.length - 1];
+
+    expect(last.id).toBe('28884');
+    expect(last.lineStyle.color).toBe(HIGHLIGHT_COLOR);
+    expect(last.itemStyle.color).toBe(HIGHLIGHT_COLOR);
+    expect(last.lineStyle.width).toBeGreaterThan(option.series[0].lineStyle.width);
+    expect(last.endLabel.show).toBe(true);
+    expect(last.endLabel.formatter).toBe('GALAXY 15');
+  });
+
+  it('leaves every series unstyled when there is no selection or it is not plotted', () => {
+    for (const highlightId of [null, 99999]) {
+      const option = buildChartOption([galaxy15, line()], labels, highlightId) as any;
+
+      expect(option.series.map((s: any) => s.id)).toEqual(['28884', '1']);
+      expect(option.series.every((s: any) => !s.endLabel && !s.lineStyle.color)).toBe(true);
+    }
   });
 });

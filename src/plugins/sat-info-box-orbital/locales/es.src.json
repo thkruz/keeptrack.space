@@ -3,11 +3,11 @@
     "title": "Datos Orbitales",
     "Apogee": {
       "label": "Apogeo",
-      "tooltip": "Punto más alto en la órbita"
+      "tooltip": "Altitud máxima de la órbita sobre el radio ecuatorial (6378,137 km)"
     },
     "Perigee": {
       "label": "Perigeo",
-      "tooltip": "Punto más bajo en la órbita"
+      "tooltip": "Altitud mínima de la órbita sobre el radio ecuatorial (6378,137 km)"
     },
     "Inclination": {
       "label": "Inclinación",
@@ -52,25 +52,30 @@
       "label": "Velocidad",
       "tooltip": "Velocidad actual del satélite (mayor cuanto más cerca de la Tierra)"
     },
+    "GPEpoch": {
+      "label": "Época GP",
+      "tooltip": "Época del conjunto de elementos usado para la propagación"
+    },
     "AgeOfGP": {
       "label": "Edad del GP",
-      "tooltip": "Tiempo desde el cálculo oficial de la órbita (datos GP más antiguos suelen ser menos precisos)",
+      "tooltip": "Tiempo desde la época del GP hasta la hora actual de la simulación (los datos GP más antiguos suelen ser menos precisos; un valor negativo indica que la época es posterior a la hora de simulación)",
       "days": "Días",
       "hours": "Horas",
       "epochYear": "Año de época",
-      "epochDay": "Día de época"
+      "epochDay": "Día de época",
+      "epochAfterSimTime": "la época del GP es posterior a la hora de simulación"
     },
     "RadialSigma": {
       "label": "Sigma Radial",
-      "tooltip": "Incertidumbre radial (metros)"
+      "tooltip": "Incertidumbre de posición radial a 1 sigma según la covarianza derivada del TLE en la época GP (marco RIC). Son los mismos valores que usan la Pc y el informe de conjunción."
     },
     "InTrackSigma": {
       "label": "Sigma en Trayectoria",
-      "tooltip": "Incertidumbre en trayectoria (metros)"
+      "tooltip": "Incertidumbre de posición a lo largo de la trayectoria a 1 sigma según la covarianza derivada del TLE en la época GP (marco RIC). Son los mismos valores que usan la Pc y el informe de conjunción."
     },
     "CrossTrackSigma": {
       "label": "Sigma Cruzada",
-      "tooltip": "Incertidumbre cruzada (metros)"
+      "tooltip": "Incertidumbre de posición transversal a 1 sigma según la covarianza derivada del TLE en la época GP (marco RIC). Son los mismos valores que usan la Pc y el informe de conjunción."
     },
     "meter": "m",
     "kilometer": "km",

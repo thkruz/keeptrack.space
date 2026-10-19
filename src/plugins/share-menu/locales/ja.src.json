@@ -9,7 +9,9 @@
       },
       "labels": {
         "shareLink": "共有リンク",
-        "url": "共有用URL"
+        "url": "共有用URL",
+        "includeTime": "現在時刻を含める",
+        "includeTimeTooltip": "リンクに現在のシミュレーション時刻を固定します。既定ではオフで、受信者は自分のライブ時刻で同じビューを表示します。"
       },
       "buttons": {
         "copyLink": "リンクをコピー",

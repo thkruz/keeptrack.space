@@ -1,0 +1,61 @@
+{
+  "plugins": {
+    "SatelliteSwath": {
+      "bottomIconLabel": "地面幅宽",
+      "title": "地面幅宽",
+      "sections": {
+        "sensor": "传感器",
+        "display": "显示"
+      },
+      "labels": {
+        "preset": "预设",
+        "inputMode": "覆盖范围输入方式",
+        "modeWidth": "幅宽 (km)",
+        "modeFov": "视场角 (度)",
+        "swathWidthKm": "幅宽 (km)",
+        "fovDeg": "视场角 (度)",
+        "maxOffNadirDeg": "最大偏离星下点角 (度)",
+        "minSunElevDeg": "最小太阳高度角 (度)",
+        "daylightOnly": "仅白天",
+        "nadirReadout": "星下点幅宽约 {km} km (视场角 {fov}°)",
+        "nadirReadoutUnknown": "无法计算此轨道的星下点幅宽",
+        "presetsIllustrative": "预设仅为示意，并非公开发布的规格。"
+      },
+      "presets": {
+        "hrEo": "高分辨率光学",
+        "mrEo": "中分辨率光学",
+        "wide": "宽视场成像仪",
+        "custom": "自定义"
+      },
+      "commands": {
+        "toggle": "切换地面幅宽",
+        "openSettings": "打开地面幅宽设置"
+      },
+      "shortcuts": {
+        "toggle": "切换地面幅宽"
+      },
+      "graphics": {
+        "sectionLabel": "地面幅宽",
+        "drawSwath": {
+          "label": "绘制地面幅宽",
+          "helpText": "沿已绘制的轨道显示所选卫星的成像幅宽。"
+        },
+        "fieldOfRegardFill": {
+          "label": "可观测范围填充",
+          "helpText": "在星下点幅宽旁绘制传感器侧摆可达的半透明条带。"
+        }
+      },
+      "errorMsgs": {
+        "outOfRange": "请输入 {min} 到 {max} 之间的数字。",
+        "beyondHorizon": "该幅宽超出了此卫星高度可见的地平线。请输入不超过 {max} 公里。"
+      },
+      "help": {
+        "overview": "显示所选卫星的传感器沿已绘制轨道可以成像的区域：不透明的星下点幅宽，以及延伸到侧摆极限的半透明可观测范围。星下点太阳高度低于最小值的区段会变暗，开启“仅白天”后则隐藏。扇形从卫星位置延伸到幅宽边缘并随卫星移动。",
+        "howToUse": "选择一颗卫星并打开地面幅宽图层。选择预设，或输入幅宽或视场角、最大偏离星下点角和最小太阳高度角。设置按卫星分别保存。",
+        "tip1": "预设仅为示意，并非任何真实传感器的公开规格。",
+        "tip2": "可观测范围填充也会跟随图形菜单的画质等级（中等及以上）。",
+        "flatMap": "平面地图模式下不显示幅宽。"
+      }
+    }
+  }
+}

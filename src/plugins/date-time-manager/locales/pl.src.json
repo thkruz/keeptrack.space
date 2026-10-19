@@ -43,7 +43,12 @@
         "now": "Teraz",
         "done": "Gotowe",
         "pause": "Pauza",
-        "propagation": "Propagacja"
+        "propagation": "Propagacja",
+        "month": "Miesiąc",
+        "year": "Rok",
+        "goTo": "Przejdź do (UTC)",
+        "goToTooltip": "Wpisz datę i godzinę UTC (YYYY-MM-DD HH:MM:SS) i naciśnij Enter. Sekundy i godzina są opcjonalne.",
+        "goToInvalid": "Nieprawidłowa data. Użyj formatu UTC YYYY-MM-DD HH:MM:SS."
       }
     }
   }

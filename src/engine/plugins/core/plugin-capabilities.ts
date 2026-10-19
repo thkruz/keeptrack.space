@@ -782,6 +782,27 @@ export function requiresSatellite(plugin: unknown): plugin is IRequiresSatellite
 export type SettingControlType = 'toggle' | 'number' | 'select' | 'button';
 
 /**
+ * Overall graphics quality levels, lowest first. The Graphics menu's master
+ * selector sets every quality-aware control to the value it declares for the
+ * chosen level (see {@link ISettingQualityRule}).
+ */
+export type GraphicsQualityLevel = 'low' | 'medium' | 'high' | 'ultra';
+
+/**
+ * How a control follows the Graphics menu's overall quality selector. This rule
+ * is the only place a control's "minimum quality" lives: nothing else may
+ * hard-code which level enables which feature.
+ *
+ * - `minLevel` (toggles): on when the overall level is at or above `minLevel`, off below it.
+ * - `byLevel` (selects / numbers): the explicit value for every level. Select
+ *   values are the option `value` strings.
+ */
+export type ISettingQualityRule = { minLevel: GraphicsQualityLevel } | { byLevel: Record<GraphicsQualityLevel, string | number | boolean> };
+
+/** Which menu renders a settings contribution. */
+export type SettingsMenuTarget = 'general' | 'graphics';
+
+/**
  * Fields shared by every settings control variant. Not intended to be used
  * directly - consume {@link ISettingControl} instead.
  */
@@ -816,6 +837,13 @@ interface ISettingControlBase {
    * (read-only) state - e.g., feature gated behind a pro license.
    */
   isDisabled?: () => boolean;
+
+  /**
+   * How this control follows the Graphics menu's overall quality selector.
+   * Absent means the selector never touches it. Ignored for buttons (they hold
+   * no value) and for controls whose {@link isAvailable} returns false.
+   */
+  quality?: ISettingQualityRule;
 }
 
 /**
@@ -895,6 +923,15 @@ export interface ISettingsContribution {
   order?: number;
 
   /**
+   * Which menu renders this section. `'general'` (the default) is the Settings
+   * menu; `'graphics'` is the Graphics menu. Each menu ignores the other's
+   * sections. To add a graphics setting, return a contribution with
+   * `target: 'graphics'` - never edit the Graphics menu directly.
+   * @default 'general'
+   */
+  target?: SettingsMenuTarget;
+
+  /**
    * Controls rendered inside this section, in declaration order.
    */
   controls: ISettingControl[];
@@ -914,8 +951,28 @@ export interface ISettingsContributor {
 }
 
 /**
+ * Interface for plugins that contribute several sections, possibly to different
+ * menus (e.g. one `'general'` and one `'graphics'`). A plugin may implement this
+ * alongside {@link ISettingsContributor}; the collector concatenates both.
+ */
+export interface ISettingsMultiContributor {
+  /**
+   * Returns this plugin's settings sections, in display order. Called on the
+   * same schedule as {@link ISettingsContributor.getSettingsContribution}.
+   */
+  getSettingsContributions(): ISettingsContribution[];
+}
+
+/**
  * Type guard to check if a plugin contributes a settings section.
  */
 export function hasSettingsContribution(plugin: unknown): plugin is ISettingsContributor {
   return typeof plugin === 'object' && plugin !== null && 'getSettingsContribution' in plugin;
+}
+
+/**
+ * Type guard to check if a plugin contributes several settings sections.
+ */
+export function hasSettingsContributions(plugin: unknown): plugin is ISettingsMultiContributor {
+  return typeof plugin === 'object' && plugin !== null && 'getSettingsContributions' in plugin;
 }

@@ -21,38 +21,44 @@
         "h8": "8 heures",
         "h24": "24 heures",
         "h48": "48 heures",
-        "h72": "72 heures"
+        "h72": "72 heures",
+        "d4": "4 jours",
+        "d7": "7 jours"
       },
       "uLabel": "U (Radial)",
-      "vLabel": "V (Le long de la trajectoire)",
-      "wLabel": "W (Transverse)",
+      "vLabel": "V (Tangentielle)",
+      "wLabel": "W (Normale)",
       "screenForDebris": "Rechercher des débris",
       "drawBox": "Dessiner la boîte",
       "clearBox": "Effacer la boîte",
       "table": {
         "secondary": "Secondaire",
+        "secondaryName": "Nom secondaire",
+        "secondaryCospar": "ID COSPAR",
         "tca": "TCA",
         "missKm": "Distance (km)",
         "rKm": "R (km)",
         "iKm": "I (km)",
         "cKm": "C (km)",
+        "relVelocity": "Vit. relative (km/s)",
         "pc": "Pc",
         "risk": "Risque"
       },
       "errorMsgs": {
         "InvalidSatellite": "Satellite sélectionné invalide",
         "ScreeningFailed": "Échec de l'analyse",
-        "NoResultsToExport": "Aucun résultat à exporter"
+        "NoResultsToExport": "Aucun résultat à exporter",
+        "SecondaryNotSelectable": "Impossible de sélectionner {id} : absent du catalogue chargé. L'horloge saute quand même à son TCA."
       },
       "help": {
         "overview": "La Détection de Débris exécute une évaluation de conjonctions du satellite sélectionné par rapport au reste du catalogue. Elle trouve chaque objet qui entre dans une boîte de criblage définie autour du satellite pendant la fenêtre temporelle choisie, puis classe les rencontres par probabilité de collision.",
         "imgAlt": "Le menu Détection de Débris avec les options de fenêtre temporelle et de boîte de criblage",
         "imgCaption": "Définissez la fenêtre temporelle et la boîte de criblage RIC, puis analysez le satellite sélectionné par rapport au catalogue.",
         "boxHeading": "La boîte de criblage",
-        "box": "Le volume de criblage est défini en coordonnées RIC relatives au satellite : <strong>U (Radial)</strong> correspond aux variations d'altitude orbitale, <strong>V (Le long de la trajectoire)</strong> suit la direction de vol et <strong>W (Transverse)</strong> va de côté à côté. La taille radiale compte le plus : la plupart des rencontres se séparent nettement en altitude, donc un U serré avec des V et W plus larges est le choix habituel. <strong>Dessiner la boîte</strong> affiche le volume autour du satellite dans la vue 3D ; <strong>Effacer la boîte</strong> le supprime.",
+        "box": "Le volume de criblage est défini en coordonnées RIC relatives au satellite : <strong>U (Radial)</strong> correspond aux variations d'altitude orbitale, <strong>V (Tangentielle)</strong> suit la direction de vol et <strong>W (Normale)</strong> va de côté à côté. La taille radiale compte le plus : la plupart des rencontres se séparent nettement en altitude, donc un U serré avec des V et W plus larges est le choix habituel. <strong>Dessiner la boîte</strong> affiche le volume autour du satellite dans la vue 3D ; <strong>Effacer la boîte</strong> le supprime.",
         "resultsHeading": "Lire les résultats",
         "results": "Chaque ligne du tableau de résultats est une conjonction prévue : <strong>Secondaire</strong> est l'autre objet, <strong>TCA</strong> est l'heure de l'approche au plus près, <strong>Distance (km)</strong> est la distance de passage totale avec ses composantes <strong>R</strong>, <strong>I</strong> et <strong>C</strong>, <strong>Pc</strong> est la probabilité de collision et <strong>Risque</strong> la classe comme Critique, Élevé, Moyen ou Faible. Cliquez sur une ligne pour sélectionner l'objet secondaire et amener l'horloge au TCA ; le menu reste ouvert pour que vous puissiez parcourir les événements. <strong>Exporter CSV</strong> enregistre le tableau.",
-        "howToUse": "<ol><li>Sélectionnez un satellite ; l'icône du bas est désactivée tant qu'aucun n'est sélectionné.</li><li>Ouvrez <strong>Détection de Débris</strong> depuis le menu inférieur. Le numéro SCC du satellite se remplit automatiquement.</li><li>Choisissez une <strong>Fenêtre temporelle</strong> (1 à 72 heures) et ajustez si besoin les tailles de boîte <strong>U</strong>, <strong>V</strong> et <strong>W</strong>.</li><li>Cliquez sur <strong>Rechercher des débris</strong>. Le panneau de résultats s'ouvre avec les conjonctions trouvées, classées pour examen.</li><li>Cliquez sur n'importe quelle ligne pour inspecter cette rencontre à son heure d'approche au plus près.</li></ol>",
+        "howToUse": "<ol><li>Sélectionnez un satellite ; son icône dans le tiroir des extensions est désactivée tant qu'aucun n'est sélectionné.</li><li>Ouvrez <strong>Détection de Débris</strong> depuis le tiroir des extensions. Le numéro SCC du satellite se remplit automatiquement.</li><li>Choisissez une <strong>Fenêtre temporelle</strong> (1 heure à 7 jours) et ajustez si besoin les tailles de boîte <strong>U</strong>, <strong>V</strong> et <strong>W</strong>.</li><li>Cliquez sur <strong>Rechercher des débris</strong>. Le panneau de résultats s'ouvre avec les conjonctions trouvées, classées pour examen.</li><li>Cliquez sur n'importe quelle ligne pour inspecter cette rencontre à son heure d'approche au plus près.</li></ol>",
         "tip1": "Des fenêtres plus longues et des boîtes plus grandes trouvent plus de rencontres mais prennent plus de temps à calculer ; commencez avec les valeurs par défaut et n'élargissez que si vous avez besoin de plus de couverture.",
         "tip2": "Cliquer sur une ligne préserve l'état de lecture : si l'horloge était en pause, elle reste en pause au TCA.",
         "tip3": "Les niveaux de risque sont des seuils de Pc : au-dessus de 1e-4 c'est Critique, au-dessus de 1e-6 Élevé et au-dessus de 1e-8 Moyen."
@@ -61,7 +67,13 @@
         "parameters": "Paramètres",
         "searchBox": "Zone de recherche RIC",
         "results": "Résultats"
-      }
+      },
+      "ricConvention": "Convention de signe RIC : secondaire moins primaire, dans le repère RIC du primaire (+R radial vers l'extérieur, +I dans le sens de la vitesse du primaire, +C = R x I, la normale à l'orbite).",
+      "pcInputs": "Entrées du Pc : rayon de corps dur {hbr} m ({primary} m primaire + {secondary} m secondaire) pour chaque paire. Covariance : estimée à partir du TLE de chaque objet (le modèle des sigmas de l'encadré d'informations, à {sigma} sigma), et non d'un CDM.",
+      "parentTag": "parent de ce satellite d'analyste",
+      "showParentRows": "Afficher la ligne parente ({count})",
+      "notInCatalog": "(absent du catalogue chargé)",
+      "resultsCapped": "Affichage des {limit} premières conjonctions sur {total} (Pc la plus élevée d'abord)"
     }
   }
 }

@@ -1,12 +1,11 @@
 import { SoundNames } from '@app/engine/audio/sounds';
 import { MenuMode } from '@app/engine/core/interfaces';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
 import { StorageKey } from '@app/engine/persistence/storage-key';
-import { hasSettingsContribution, ICommandPaletteCommand, IHelpConfig, IKeyboardShortcut, ISettingsContribution } from '@app/engine/plugins/core/plugin-capabilities';
+import { ICommandPaletteCommand, IHelpConfig, IKeyboardShortcut, ISettingsContribution } from '@app/engine/plugins/core/plugin-capabilities';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
@@ -14,6 +13,7 @@ import { t7e } from '@app/locales/keys';
 import { applyPersistedSetting } from '@app/settings/persisted-settings-table';
 import settingsPng from '@public/img/icons/settings.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { collectSettingsContributions } from './settings-contributions';
 import { attachSettingControlListeners, renderSettingsSection } from './settings-control-renderer';
 import './settings-menu.css';
 import { getOwnSettingsSections, resetOwnSettings } from './settings-menu-controls';
@@ -183,33 +183,9 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
   }
 
+  /** Plugin-contributed sections routed to this menu (`target` absent or `'general'`). */
   private static collectPluginContributions_(): ISettingsContribution[] {
-    const contributions: { contribution: ISettingsContribution; manifestOrder: number }[] = [];
-
-    PluginRegistry.plugins.forEach((plugin, manifestOrder) => {
-      if (hasSettingsContribution(plugin)) {
-        try {
-          contributions.push({ contribution: plugin.getSettingsContribution(), manifestOrder });
-        } catch (err) {
-          // A misbehaving plugin must not break the settings menu.
-          // eslint-disable-next-line no-console
-          console.error(`SettingsMenuPlugin: ${plugin.id}.getSettingsContribution() threw`, err);
-        }
-      }
-    });
-
-    return contributions
-      .sort((a, b) => {
-        const orderA = a.contribution.order ?? Number.POSITIVE_INFINITY;
-        const orderB = b.contribution.order ?? Number.POSITIVE_INFINITY;
-
-        if (orderA !== orderB) {
-          return orderA - orderB;
-        }
-
-        return a.manifestOrder - b.manifestOrder;
-      })
-      .map(({ contribution }) => contribution);
+    return collectSettingsContributions('general');
   }
 
   /**

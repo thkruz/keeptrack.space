@@ -100,7 +100,7 @@ describe('DetailedSensor.isRaeInFov (explicit boresight-centric fovParams)', () 
         boresightEl: 90 as Degrees,
         halfAngle: 80 as Degrees,
         minorHalfAngle: 1 as Degrees,
-        rollAngle: 90 as Degrees,
+        rollAngle: 0 as Degrees,
         minRange: 50 as Kilometers,
         maxRange: 3057 as Kilometers,
         minElevation: 10 as Degrees,

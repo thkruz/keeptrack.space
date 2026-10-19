@@ -12,6 +12,7 @@
 import {
   CommLink,
   Degrees,
+  ElevationMask,
   FieldOfView,
   FieldOfViewParams,
   GroundStation,
@@ -19,12 +20,14 @@ import {
   Kilometers,
   MechanicalRadar,
   Milliseconds,
+  maskMinElevation,
   OpticalSensor,
   PhasedArrayRadar,
   Satellite,
   Sensor,
   SensorType,
   SpaceObjectType,
+  sortElevationMasks,
   TtcAntenna,
   ZoomValue,
 } from '@ootk/src/main';
@@ -89,6 +92,15 @@ export interface DetailedSensorParams extends Omit<GroundStationParams, 'id'> {
    */
   fovParams?: FieldOfViewParams;
 
+  /**
+   * Azimuth-dependent horizon mask. The effective minimum elevation is always
+   * `max(minEl, mask(az))`. Applied on both the fovParams (ootk cone) path and the
+   * legacy az/el box path.
+   */
+  elevationMasks?: ElevationMask[];
+  /** Treat elevationMasks as piecewise-linear vertices (SODA style) rather than step sectors. */
+  interpolateMask?: boolean;
+
   // Additional metadata
   /** Sensor ID for identification */
   sensorId?: number;
@@ -110,6 +122,12 @@ export interface DetailedSensorParams extends Omit<GroundStationParams, 'id'> {
   id?: number;
   /** Volume sensor flag */
   volume?: boolean;
+  /** True for user-created sensors; identity flag independent of the display name */
+  isCustomSensor?: boolean;
+  /** Where the site coordinates were published (station presets) */
+  sourceUrl?: string;
+  /** ISO date (YYYY-MM-DD) the source was retrieved */
+  sourceRetrieved?: string;
 }
 
 /**
@@ -136,7 +154,7 @@ export interface DetailedSensorParams extends Omit<GroundStationParams, 'id'> {
  */
 /** A single failed field-of-view bound, with the offending value and the limit it broke. */
 export interface FovRejectReason {
-  kind: 'minRange' | 'maxRange' | 'minEl' | 'maxEl' | 'azimuth' | 'cone';
+  kind: 'minRange' | 'maxRange' | 'minEl' | 'maxEl' | 'mask' | 'azimuth' | 'cone';
   value: number;
   limit: number;
   /** Upper azimuth bound, only for `azimuth`. */
@@ -191,6 +209,11 @@ export class DetailedSensor extends GroundStation {
    */
   fovParams?: FieldOfViewParams;
 
+  /** Horizon mask entries as supplied (public so they survive structured clone to workers). */
+  elevationMasks?: ElevationMask[];
+  /** True when elevationMasks are interpolated vertices. */
+  interpolateMask?: boolean;
+
   // Additional metadata
   sensorId?: number;
   changeObjectInterval?: Milliseconds;
@@ -201,6 +224,10 @@ export class DetailedSensor extends GroundStation {
   operator?: string;
   isVolumetric?: boolean;
   volume?: boolean;
+  /** True for user-created sensors; identity flag independent of the display name */
+  isCustomSensor?: boolean;
+  sourceUrl?: string;
+  sourceRetrieved?: string;
 
   /**
    * ECI position - used for calculateIsInSun.
@@ -210,6 +237,8 @@ export class DetailedSensor extends GroundStation {
 
   /** Internal sensor attached to this ground station */
   private sensor_?: Sensor;
+  /** Mask entries pre-sorted once for the legacy hot path (empty when no mask). */
+  private maskSorted_: ElevationMask[] = [];
 
   constructor(params: DetailedSensorParams) {
     // Build GroundStation params
@@ -252,6 +281,11 @@ export class DetailedSensor extends GroundStation {
     this.boresightEl = params.boresightEl;
     this.beamwidth = params.beamwidth;
     this.fovParams = params.fovParams;
+    this.elevationMasks = params.elevationMasks && params.elevationMasks.length > 0 ? params.elevationMasks : undefined;
+    this.interpolateMask = this.elevationMasks ? (params.interpolateMask ?? false) : undefined;
+    if (this.elevationMasks) {
+      this.maskSorted_ = this.interpolateMask ? sortElevationMasks(this.elevationMasks) : this.elevationMasks;
+    }
 
     // Additional metadata
     this.sensorId = params.sensorId ?? params.id;
@@ -263,6 +297,9 @@ export class DetailedSensor extends GroundStation {
     this.operator = params.operator;
     this.isVolumetric = params.isVolumetric;
     this.volume = params.volume;
+    this.isCustomSensor = params.isCustomSensor;
+    this.sourceUrl = params.sourceUrl;
+    this.sourceRetrieved = params.sourceRetrieved;
 
     // Create internal sensor if we have FOV data
     this.initializeSensor_();
@@ -369,7 +406,7 @@ export class DetailedSensor extends GroundStation {
   private buildFieldOfViewParams_(): FieldOfViewParams {
     // Explicit boresight-centric FOV takes priority over the legacy derivation
     if (this.fovParams) {
-      return { ...this.fovParams };
+      return { ...this.fovParams, ...this.maskFovParams_() };
     }
 
     // Calculate boresight from center of azimuth sector
@@ -398,7 +435,75 @@ export class DetailedSensor extends GroundStation {
       minRange: this.minRng,
       maxRange: this.maxRng,
       minElevation: clampedMinEl as Degrees,
+      ...this.maskFovParams_(),
     };
+  }
+
+  /**
+   * The mask fields to merge into FieldOfViewParams. Sensor-level masks win over any
+   * mask already inside fovParams; with no sensor-level mask the fovParams mask is kept.
+   */
+  private maskFovParams_(): Pick<FieldOfViewParams, 'elevationMasks' | 'interpolate'> {
+    if (!this.elevationMasks) {
+      return {};
+    }
+
+    return { elevationMasks: this.elevationMasks, interpolate: this.interpolateMask };
+  }
+
+  /**
+   * Effective minimum elevation at an azimuth for the legacy path:
+   * `max(floorEl, mask(az))`. Returns floorEl unchanged when there is no mask.
+   */
+  private getMinElevationAt_(az: Degrees, floorEl: Degrees = this.minEl): Degrees {
+    if (this.maskSorted_.length === 0) {
+      return floorEl;
+    }
+
+    return maskMinElevation(this.maskSorted_, az, this.interpolateMask ?? false, floorEl) as Degrees;
+  }
+
+  /**
+   * True when a look angle clears the sensor's flat minEl but sits under the horizon mask,
+   * i.e. the mask (not minEl) is what hides it. Pass tools use this on the out-of-view
+   * sample next to a pass edge to flag the pass as mask-limited.
+   */
+  isMaskBlocked(az: Degrees, el: Degrees): boolean {
+    if (el < this.minEl) {
+      return false;
+    }
+    const maskEl = this.getMaskElevationAt(az);
+
+    return maskEl !== null && el < maskEl;
+  }
+
+  /** True when this sensor carries a horizon mask (sensor-level or inside fovParams). */
+  hasElevationMask(): boolean {
+    return this.getMaskVertexCount() > 0;
+  }
+
+  /** Number of horizon mask entries in effect (0 when unmasked). */
+  getMaskVertexCount(): number {
+    return this.maskSorted_.length > 0 ? this.maskSorted_.length : (this.fovParams?.elevationMasks?.length ?? 0);
+  }
+
+  /**
+   * Horizon mask elevation at an azimuth, ignoring the sensor's flat minEl (0 floor), or
+   * null when the sensor has no mask. Used by pass tools to tell a mask edge from a
+   * minEl edge and by the polar plot to draw the masked annulus.
+   */
+  getMaskElevationAt(az: Degrees): Degrees | null {
+    if (this.maskSorted_.length > 0) {
+      return maskMinElevation(this.maskSorted_, az, this.interpolateMask ?? false, -90) as Degrees;
+    }
+
+    const fov = this.fovParams?.elevationMasks?.length ? this.getFieldOfView() : undefined;
+
+    if (fov) {
+      return maskMinElevation(fov.elevationMasks, az, fov.interpolateMask, -90) as Degrees;
+    }
+
+    return null;
   }
 
   /**
@@ -508,6 +613,16 @@ export class DetailedSensor extends GroundStation {
     }
 
     if (this.fovParams && this.sensor_) {
+      const fov = this.sensor_.fieldOfView;
+
+      if (rng >= fov.minRange && rng <= fov.maxRange && el >= fov.minElevation) {
+        const floor = fov.getMinElevation(az);
+
+        if (el < floor) {
+          return { kind: 'mask', value: el, limit: floor };
+        }
+      }
+
       return { kind: 'cone', value: el, limit: el };
     }
 
@@ -519,6 +634,11 @@ export class DetailedSensor extends GroundStation {
     }
     if (el < this.minEl) {
       return { kind: 'minEl', value: el, limit: this.minEl };
+    }
+    const maskFloor = this.getMinElevationAt_(az);
+
+    if (el < maskFloor) {
+      return { kind: 'mask', value: el, limit: maskFloor };
     }
     if (el > this.maxEl) {
       return { kind: 'maxEl', value: el, limit: this.maxEl };
@@ -533,15 +653,11 @@ export class DetailedSensor extends GroundStation {
    */
   private checkFovBoundsLegacy_(az: Degrees, el: Degrees, rng: Kilometers): boolean {
     // Primary FOV check
-    const inPrimaryFov = this.checkFovBounds_(az, el, rng, this.minAz, this.maxAz, this.minEl, this.maxEl, this.minRng, this.maxRng);
-
-    if (inPrimaryFov) {
-      return true;
-    }
+    let inBox = this.checkFovBounds_(az, el, rng, this.minAz, this.maxAz, this.minEl, this.maxEl, this.minRng, this.maxRng);
 
     // Secondary FOV check if defined
-    if (this.minAz2 !== undefined && this.maxAz2 !== undefined) {
-      return this.checkFovBounds_(
+    if (!inBox && this.minAz2 !== undefined && this.maxAz2 !== undefined) {
+      inBox = this.checkFovBounds_(
         az,
         el,
         rng,
@@ -554,7 +670,16 @@ export class DetailedSensor extends GroundStation {
       );
     }
 
-    return false;
+    /*
+     * The horizon mask is a site property, so it applies to both faces. It runs last, only for
+     * targets already inside a box (which enforced the flat minEl), keeping the common reject
+     * path (out of range / azimuth) as cheap as an unmasked sensor: max(minEl, mask) holds.
+     */
+    if (!inBox || this.maskSorted_.length === 0) {
+      return inBox;
+    }
+
+    return el >= maskMinElevation(this.maskSorted_, az, this.interpolateMask ?? false, -90);
   }
 
   /**
@@ -637,6 +762,8 @@ export class DetailedSensor extends GroundStation {
       boresightEl: this.boresightEl ? [...this.boresightEl] : undefined,
       beamwidth: this.beamwidth,
       fovParams: this.fovParams ? { ...this.fovParams } : undefined,
+      elevationMasks: this.elevationMasks ? this.elevationMasks.map((m) => ({ ...m })) : undefined,
+      interpolateMask: this.interpolateMask,
       sensorId: this.sensorId,
       changeObjectInterval: this.changeObjectInterval,
       commLinks: this.commLinks ? [...this.commLinks] : undefined,
@@ -646,6 +773,9 @@ export class DetailedSensor extends GroundStation {
       operator: this.operator,
       isVolumetric: this.isVolumetric,
       volume: this.volume,
+      isCustomSensor: this.isCustomSensor,
+      sourceUrl: this.sourceUrl,
+      sourceRetrieved: this.sourceRetrieved,
       active: this.active,
       metadata: this.metadata ? { ...this.metadata } : undefined,
     });

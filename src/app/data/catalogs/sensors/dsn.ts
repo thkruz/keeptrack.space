@@ -33,6 +33,9 @@ export const dsnSensors = <SensorList>{
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: 'https://www.nasa.gov/communicating-with-missions/dsn/',
+    // Citation from the SODA ground-station catalog (see ground-stations.ts)
+    sourceUrl: 'https://www.wikidata.org/wiki/Q618630',
+    sourceRetrieved: '2026-09-25',
     country: 'United States',
     operator: Operators.NASA,
   }),
@@ -58,6 +61,9 @@ export const dsnSensors = <SensorList>{
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: 'https://www.nasa.gov/communicating-with-missions/dsn/',
+    // Citation from the SODA ground-station catalog (see ground-stations.ts)
+    sourceUrl: 'https://www.wikidata.org/wiki/Q618721',
+    sourceRetrieved: '2026-09-19',
     country: 'Spain',
     operator: Operators.NASA,
   }),
@@ -83,6 +89,9 @@ export const dsnSensors = <SensorList>{
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: 'https://www.nasa.gov/communicating-with-missions/dsn/',
+    // Citation from the SODA ground-station catalog (see ground-stations.ts)
+    sourceUrl: 'https://www.wikidata.org/wiki/Q1032865',
+    sourceRetrieved: '2026-09-19',
     country: 'Australia',
     operator: Operators.NASA,
   }),

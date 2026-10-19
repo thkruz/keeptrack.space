@@ -21,7 +21,9 @@
         "h8": "8 hodin",
         "h24": "24 hodin",
         "h48": "48 hodin",
-        "h72": "72 hodin"
+        "h72": "72 hodin",
+        "d4": "4 dny",
+        "d7": "7 dní"
       },
       "uLabel": "U (radiální)",
       "vLabel": "V (podélná)",
@@ -31,18 +33,22 @@
       "clearBox": "Vymazat rámeček",
       "table": {
         "secondary": "Sekundární",
+        "secondaryName": "Název sekundárního",
+        "secondaryCospar": "COSPAR ID",
         "tca": "TCA",
         "missKm": "Minutí (km)",
         "rKm": "R (km)",
         "iKm": "I (km)",
         "cKm": "C (km)",
+        "relVelocity": "Rel. rychlost (km/s)",
         "pc": "Pc",
         "risk": "Riziko"
       },
       "errorMsgs": {
         "InvalidSatellite": "Vybrán neplatný satelit",
         "ScreeningFailed": "Screening selhal",
-        "NoResultsToExport": "Žádné výsledky k exportu"
+        "NoResultsToExport": "Žádné výsledky k exportu",
+        "SecondaryNotSelectable": "Nelze vybrat {id}: není v načteném katalogu. Čas přesto přeskočí na jeho TCA."
       },
       "help": {
         "overview": "Screening trosek provádí vyhodnocení konjunkcí vybraného satelitu vůči zbytku katalogu. Najde každý objekt, který se během zvoleného časového okna dostane do screeningového rámečku definovaného kolem satelitu, a setkání seřadí podle pravděpodobnosti kolize.",
@@ -52,7 +58,7 @@
         "box": "Screeningový objem je definován v souřadnicích RIC vzhledem k satelitu: <strong>U (radiální)</strong> je nahoru a dolů ve výšce orbity, <strong>V (podélná)</strong> je ve směru letu a <strong>W (příčná)</strong> je do stran. Nejvíce záleží na radiálním rozměru: většina setkání se čistě rozdělí podle výšky, takže obvyklou volbou je těsné U a širší V a W. <strong>Nakreslit rámeček</strong> vykreslí objem kolem satelitu ve 3D zobrazení; <strong>Vymazat rámeček</strong> jej odstraní.",
         "resultsHeading": "Čtení výsledků",
         "results": "Každý řádek tabulky výsledků je jedna předpovězená konjunkce: <strong>Sekundární</strong> je druhý objekt, <strong>TCA</strong> je čas nejbližšího přiblížení, <strong>Minutí (km)</strong> je celková vzdálenost minutí se složkami <strong>R</strong>, <strong>I</strong> a <strong>C</strong>, <strong>Pc</strong> je pravděpodobnost kolize a <strong>Riziko</strong> ji klasifikuje jako Kritická, Vysoká, Střední nebo Nízká. Kliknutím na řádek vyberete sekundární objekt a přesunete čas na TCA; menu zůstane otevřené, takže můžete procházet jednotlivé události. <strong>Exportovat CSV</strong> tabulku uloží.",
-        "howToUse": "<ol><li>Vyberte satelit; dokud žádný není vybrán, je spodní ikona neaktivní.</li><li>Otevřete <strong>Screening trosek</strong> ze spodního menu. Číslo SCC satelitu se doplní automaticky.</li><li>Zvolte <strong>Časové okno</strong> (1 až 72 hodin) a podle potřeby upravte rozměry rámečku <strong>U</strong>, <strong>V</strong> a <strong>W</strong>.</li><li>Klikněte na <strong>Provést screening trosek</strong>. Otevře se panel výsledků s nalezenými konjunkcemi seřazenými k posouzení.</li><li>Kliknutím na libovolný řádek prozkoumáte dané setkání v čase nejbližšího přiblížení.</li></ol>",
+        "howToUse": "<ol><li>Vyberte satelit; dokud žádný není vybrán, je ikona v panelu je neaktivní.</li><li>Otevřete <strong>Screening trosek</strong> z panelu. Číslo SCC satelitu se doplní automaticky.</li><li>Zvolte <strong>Časové okno</strong> (1 hodina až 7 dní) a podle potřeby upravte rozměry rámečku <strong>U</strong>, <strong>V</strong> a <strong>W</strong>.</li><li>Klikněte na <strong>Provést screening trosek</strong>. Otevře se panel výsledků s nalezenými konjunkcemi seřazenými k posouzení.</li><li>Kliknutím na libovolný řádek prozkoumáte dané setkání v čase nejbližšího přiblížení.</li></ol>",
         "tip1": "Delší okna a větší rámečky najdou více setkání, ale výpočet trvá déle; začněte s výchozími hodnotami a rozšiřujte je, jen pokud potřebujete větší pokrytí.",
         "tip2": "Kliknutí na řádek zachová stav přehrávání: pokud byl čas pozastaven, zůstane pozastaven na TCA.",
         "tip3": "Úrovně rizika jsou prahy na Pc: nad 1e-4 je Kritická, nad 1e-6 Vysoká a nad 1e-8 Střední."
@@ -61,7 +67,13 @@
         "parameters": "Parametry",
         "searchBox": "Vyhledávací pole RIC",
         "results": "Výsledky"
-      }
+      },
+      "ricConvention": "Znaménková konvence RIC: sekundární mínus primární, v RIC soustavě primárního objektu (+R radiálně ven, +I ve směru rychlosti primárního objektu, +C = R x I, normála dráhy).",
+      "pcInputs": "Vstupy Pc: poloměr tělesa {hbr} m ({primary} m primární + {secondary} m sekundární) pro každou dvojici. Kovariance: odhadnutá z TLE každého objektu (model za sigmami v informačním panelu, {sigma} sigma), ne z CDM.",
+      "parentTag": "rodič tohoto analytického satelitu",
+      "showParentRows": "Zobrazit řádek rodiče ({count})",
+      "notInCatalog": "(není v načteném katalogu)",
+      "resultsCapped": "Zobrazeno prvních {limit} z {total} konjunkcí (podle nejvyšší Pc)"
     }
   }
 }

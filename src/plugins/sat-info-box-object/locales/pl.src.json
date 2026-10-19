@@ -26,6 +26,10 @@
       "label": "Kraj",
       "tooltip": "Kraj pochodzenia"
     },
+    "ModelFlag": {
+      "label": "Flaga modelu",
+      "tooltip": "Flaga rysowana na modelu 3D: nadpisanie z katalogu, w przeciwnym razie kraj pochodzenia"
+    },
     "LaunchSite": {
       "label": "Miejsce startu",
       "tooltip": "Miejsce, z którego obiekt został wystrzelony"
@@ -51,6 +55,20 @@
       "tooltip": "Obserwowana jasność wizualna z wybranego sensora w bieżącym czasie symulacji"
     },
     "estimatedSuffix": "(szac.)",
-    "unknown": "Nieznany"
+    "unknown": "Nieznany",
+    "graphics": {
+      "sectionLabel": "Modele satelitów",
+      "flagDecals": {
+        "label": "Flaga kraju na modelu",
+        "helpText": "Rzutuje flagę kraju właściciela na model 3D wybranego satelity, na stronę zwróconą do Ciebie"
+      },
+      "flagDecalScale": {
+        "label": "Rozmiar flagi",
+        "helpText": "Szerokość flagi jako ułamek rozmiaru modelu (0,2 do 0,6)"
+      }
+    },
+    "Secondary": {
+      "ricConvention": "RIC = obiekt wtórny minus główny, w układzie RIC obiektu głównego."
+    }
   }
 }

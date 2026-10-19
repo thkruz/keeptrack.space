@@ -158,6 +158,13 @@ export class SearchManager {
       ServiceLocator.getHoverManager().setHoverId(-1);
       ServiceLocator.getUiManager().searchHoverSatId = -1;
     });
+    /*
+     * A right-click on a row (or the pointer leaving the list while a context
+     * menu is up) never produced a mouseout, so the hover card for that row
+     * stayed pinned mid-screen. Clear it explicitly on both.
+     */
+    getEl('search-results')?.addEventListener('contextmenu', () => SearchManager.clearSearchHover_());
+    getEl('search-results')?.addEventListener('pointerleave', () => SearchManager.clearSearchHover_());
     getEl('search')?.addEventListener('input', () => {
       const searchStr = (<HTMLInputElement>getEl('search')).value;
 
@@ -221,6 +228,25 @@ export class SearchManager {
           searchInput.placeholder = `${currentPlaceholder} (F)`;
         }
       }
+    }
+  }
+
+  /** Drops the search-row hover preview, including the hover card itself. */
+  private static clearSearchHover_(): void {
+    ServiceLocator.getUiManager().searchHoverSatId = -1;
+    ServiceLocator.getHoverManager().setHoverId(-1);
+
+    const inputManager = ServiceLocator.getInputManager();
+
+    if (inputManager?.mouse) {
+      inputManager.mouse.mouseSat = -1;
+    }
+
+    // setHoverId() is a no-op while the context menu is open, so hide the card directly too.
+    const hoverBox = getEl('sat-hoverbox', true);
+
+    if (hoverBox) {
+      hoverBox.style.display = 'none';
     }
   }
 
@@ -468,6 +494,26 @@ export class SearchManager {
     );
   }
 
+  /**
+   * Count line at the top of the results list: "N results", or "Showing N of M
+   * results" when the search limit cut the list.
+   */
+  private static resultCountHtml_(shown: number, totalFound?: number): string {
+    let text: string;
+
+    if (typeof totalFound === 'number' && totalFound > shown) {
+      text = t7e('searchManager.resultCountLimited' as TranslationKey)
+        .replace('{shown}', shown.toString())
+        .replace('{total}', totalFound.toString());
+    } else if (shown === 1) {
+      text = t7e('searchManager.resultCountOne' as TranslationKey);
+    } else {
+      text = t7e('searchManager.resultCount' as TranslationKey).replace('{count}', shown.toString());
+    }
+
+    return `<div class="search-result-limit search-result-count">${text}</div>`;
+  }
+
   fillResultBox(results: SearchResult[], catalogManagerInstance: CatalogManager, totalFound?: number) {
     const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
     const dotsManagerInstance = ServiceLocator.getDotsManager();
@@ -477,9 +523,7 @@ export class SearchManager {
     const resultsBox = getEl('search-results', true);
     let htmlStr = '';
 
-    if (totalFound && totalFound > results.length) {
-      htmlStr += `<div class="search-result-limit">Showing ${results.length} results of ${totalFound} found</div>`;
-    }
+    htmlStr += SearchManager.resultCountHtml_(results.length, totalFound);
 
     htmlStr += results.reduce((html, result) => {
       const obj = <Satellite | OemSatellite | MissileObject>satData[result.id];

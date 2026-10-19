@@ -6,6 +6,8 @@
       "labels": {
         "categorySurveillance": "Nadzór przestrzeni kosmicznej",
         "categoryTtc": "Kontrola satelitów i łączność",
+        "groundStationsHeader": "Stacje naziemne",
+        "groundStationsAll": "Wszystkie stacje naziemne",
         "missingData": "Brak danych",
         "tooltipSensorsInFov": "Wizualizuj zasięg czujników"
       },
@@ -25,10 +27,11 @@
         "imgCaption": "Czujniki są pogrupowane według sieci. Kliknij nagłówek grupy, aby wybrać całą sieć naraz.",
         "sensorTypesHeading": "Typy czujników",
         "sensorTypes": "<ul><li><strong>Radary z anteną fazowaną</strong>: szerokie, szybkie skanowanie; zazwyczaj ograniczone do niskiej orbity okołoziemskiej (LEO).</li><li><strong>Radary mechaniczne</strong>: obrotowe anteny, których można używać zarówno wobec LEO, jak i orbity geostacjonarnej (GEO).</li><li><strong>Teleskopy optyczne</strong>: używane głównie dla GEO i dalekiego kosmosu; działają tylko w nocy przy bezchmurnym niebie, podczas gdy radary działają w dzień i w nocy.</li><li><strong>Anteny TT&C</strong>: sterowalne anteny łączności (DSN, ESTRACK, SCN, Galileo), które śledzą współpracujące satelity za pomocą ich radiowego łącza w dół; nie potrafią wykrywać obiektów niewspółpracujących ani odłamków.</li></ul>",
-        "howToUse": "<ol><li>Otwórz menu z dolnego paska lub naciśnij S.</li><li>Kliknij pojedynczy czujnik, aby go wybrać. Kamera przeleci do jego lokalizacji.</li><li>Lub kliknij nagłówek grupy (np. \"All Space Surveillance Network Sensors\"), aby wybrać całą sieć, co świetnie nadaje się do wizualizacji zasięgu.</li><li>Użyj <strong>Resetuj czujnik</strong>, aby wyczyścić wybór.</li></ol>",
+        "howToUse": "<ol><li>Otwórz menu z panelu lub naciśnij S.</li><li>Kliknij pojedynczy czujnik, aby go wybrać. Kamera przeleci do jego lokalizacji.</li><li>Lub kliknij nagłówek grupy (np. \"All Space Surveillance Network Sensors\"), aby wybrać całą sieć, co świetnie nadaje się do wizualizacji zasięgu.</li><li>Użyj <strong>Resetuj czujnik</strong>, aby wyczyścić wybór.</li></ol>",
         "tip1": "Wiele obliczeń (np. kąty obserwacji) wymaga pojedynczego czujnika. Jeśli wybrano całą sieć, użyj zamiast tego menu wielostanowiskowych kątów obserwacji lub wybieraj czujniki pojedynczo.",
         "tip2": "Każdy czujnik jest też dostępny z palety poleceń: wpisz nazwę czujnika, aby przełączyć się bez otwierania tego menu.",
         "tip3": "Parametry czujników pochodzą z publicznie dostępnych danych; możesz je przejrzeć w menu informacji o czujniku. Poprawki są mile widziane pod adresem admin@keeptrack.space.",
+        "tipGroundStations": "Stacje naziemne to ustawienia z podanym źródłem (link i data pobrania w Informacjach o sensorze). Współrzędne to punkty odniesienia lokalizacji, a nie centra fazowe anten, a minimalna elewacja to konwencja sieci: 10° dla kompleksów dalekiego kosmosu, 5° dla stacji LEO.",
         "shortcutToggle": "Przełącz menu czujników",
         "shortcutCamera": "Skieruj kamerę na bieżący czujnik"
       },

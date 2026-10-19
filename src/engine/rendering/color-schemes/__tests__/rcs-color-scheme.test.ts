@@ -38,7 +38,7 @@ describe('RcsColorScheme', () => {
       }
     });
 
-    it('defaults the unknown toggle to ON — no-data renders as translucent grey by default for consistency with std-mag', () => {
+    it('defaults the unknown toggle to ON, no-data renders as translucent grey by default for consistency with std-mag', () => {
       expect(scheme.objectTypeFlags.rcsUnknown).toBe(true);
     });
 
@@ -69,7 +69,7 @@ describe('RcsColorScheme', () => {
     it('hides objects with no RCS signal when the user disables the unknown toggle', () => {
       const sat = ColorSchemeTestUtils.createMockSatellite({});
 
-      // Null out every signal — including vmag, since the new vmag-derived
+      // Null out every signal; including vmag, since the new vmag-derived
       // estimator layer would otherwise rescue an object with photometry.
       (sat as any).rcs = null;
       (sat as any).vmag = null;
@@ -108,13 +108,16 @@ describe('RcsColorScheme', () => {
   });
 
   describe('bucket assignment with fallback thresholds', () => {
-    // Fallback thresholds: [0.005, 0.01, 0.05, 0.1, 1, 10]
+    // Fallback thresholds: [0.005, 0.01, 0.05, 0.1, 1.0, 30] (0.1 and 1.0 m² are the Space-Track size-bin edges)
     it.each([
       [0.001, 'rcsXXXSmall'],
       [0.008, 'rcsXXSmall'],
       [0.03, 'rcsXSmall'],
       [0.08, 'rcsSmall'],
       [0.5, 'rcsMed'],
+      // Space-Track MEDIUM is 0.1 <= rcs < 1.0 m², LARGE is >= 1.0 m²
+      [0.9, 'rcsMed'],
+      [1.0, 'rcsLarge'],
       [5, 'rcsLarge'],
       [50, 'rcsXLarge'],
     ])('assigns rcs %f m² to %s before calculateParams runs', (rcs, expectedSlug) => {
@@ -216,7 +219,7 @@ describe('RcsColorScheme', () => {
       expect(tinyResult.color).not.toBe(issResult.color);
     });
 
-    it('exercises the estimator cascade — catalog-mined values feed into bucketing', () => {
+    it('exercises the estimator cascade, catalog-mined values feed into bucketing', () => {
       // 10 sats with known RCS (build the bus-mean stat), plus 10 with no rcs
       // but matching bus → catalog-mined; both groups feed the quantile.
       for (let i = 0; i < 10; i++) {

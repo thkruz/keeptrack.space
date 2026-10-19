@@ -52,6 +52,8 @@ import { UiValidation } from './ui-validation';
 
 export class UiManager {
   private static readonly LONG_TIMER_DELAY = MILLISECONDS_PER_SECOND * 100;
+  /** Upper bound for an isLong toast that is not critical or an error. */
+  private static readonly LONG_NON_CRITICAL_MAX_MS = MILLISECONDS_PER_SECOND * 20;
   private static readonly TOAST_TEMPLATE_ID = 'kt-toast';
 
   private isFooterVisible_ = true;
@@ -68,8 +70,6 @@ export class UiManager {
   isCurrentlyTyping = false;
   isUiVisible = true;
   lastBoxUpdateTime = 0;
-  lastNextPassCalcSatId = -1;
-  lastNextPassCalcSensorShortName: string;
   lastToast: string;
   searchManager: SearchManager;
   updateInterval = 1000;
@@ -151,19 +151,32 @@ export class UiManager {
    */
   private readonly dismissedToasts_ = new WeakSet<Toast>();
 
-  private dismissToast_(toast: Toast) {
-    if (this.dismissedToasts_.has(toast)) {
-      return;
-    }
-    this.dismissedToasts_.add(toast);
-    try {
-      toast.dismiss();
-    } catch {
-      // Materialize's teardown is not idempotent (see class comment). Every dismiss is
-      // routed through this guard, so this only fires if the library changes; a stale
-      // toast must never reach the global error trapper (#1425, #1433).
-    }
-    this.activeToastList_ = this.activeToastList_.filter((t) => t !== toast);
+  /**
+   * Replaces the toast's own `dismiss()` with a once-only version. Guarding only
+   * KeepTrack's callers is not enough: a swipe or mouse drag makes Materialize call
+   * `toast.dismiss()` itself from `Toast._onDragEnd`, and KeepTrack's auto-dismiss timer
+   * then queued a second teardown (#1425). Wrapping the instance routes every caller,
+   * the library included, through `dismissedToasts_`.
+   */
+  private guardDismiss_(toast: Toast) {
+    const libraryDismiss = toast.dismiss.bind(toast);
+
+    toast.dismiss = () => {
+      this.activeToastList_ = this.activeToastList_.filter((t) => t !== toast);
+      if (this.dismissedToasts_.has(toast)) {
+        return;
+      }
+      this.dismissedToasts_.add(toast);
+      try {
+        libraryDismiss();
+      } catch {
+        /*
+         * Only covers the synchronous part; the container teardown runs later in a library
+         * setTimeout, which is why the once-only guard above is the real fix. A stale toast
+         * must never reach the global error trapper (#1425, #1433).
+         */
+      }
+    };
   }
 
   dismissAllToasts() {
@@ -171,7 +184,7 @@ export class UiManager {
 
     this.activeToastList_ = [];
     toasts.forEach((toast) => {
-      this.dismissToast_(toast);
+      toast.dismiss();
     });
   }
 
@@ -190,6 +203,44 @@ export class UiManager {
     template.id = UiManager.TOAST_TEMPLATE_ID;
     template.innerHTML = '<div><img class="kt-toast-icon" alt="" /><span class="kt-toast-msg"></span><div class="kt-toast-progress"></div></div>';
     document.body.appendChild(template);
+  }
+
+  /**
+   * How long a toast stays up. Every errorManager warn/info/log toast passes
+   * isLong, which used to mean 100 s for all of them: a "Max Results" caution
+   * sat over the search results for over a minute. Only critical and error
+   * toasts keep the long timer; everything else auto-dismisses within
+   * LONG_NON_CRITICAL_MAX_MS even when isLong is set.
+   */
+  private static toastDuration_(toastText: string, type: ToastMsgType, isLong: boolean): number {
+    // About 100 ms per character so longer messages stay readable.
+    const readingTime = toastText.length * 100;
+
+    if (!isLong) {
+      return Math.min(Math.max(readingTime, 4000), 12000);
+    }
+
+    if (type === ToastMsgType.critical || type === ToastMsgType.error) {
+      return UiManager.LONG_TIMER_DELAY;
+    }
+
+    return Math.min(Math.max(readingTime, 8000), UiManager.LONG_NON_CRITICAL_MAX_MS);
+  }
+
+  /**
+   * The toast container spans the full width of the page under the top menu
+   * (#toast-container min-width: 100%), so while any toast was up the whole
+   * band swallowed clicks meant for the search results and menus beneath it.
+   * The container lets clicks through; only the toast card itself takes them
+   * (click dismisses it).
+   */
+  private static makeToastClickThrough_(toastEl: HTMLElement): void {
+    const container = toastEl.parentElement;
+
+    if (container) {
+      container.style.pointerEvents = 'none';
+    }
+    toastEl.style.pointerEvents = 'auto';
   }
 
   private makeToast_(toastText: string, type: ToastMsgType, isLong = false) {
@@ -233,9 +284,11 @@ export class UiManager {
      * displayLength: Infinity disables Materialize's own 20 ms auto-dismiss interval. The
      * library's dismiss() is not idempotent, and its timer never consulted dismissedToasts_,
      * so a tap on a toast that was already fading tore the container down twice (#1425,
-     * #1433). KeepTrack owns the auto-dismiss below and routes it through dismissToast_.
+     * #1433). KeepTrack owns the auto-dismiss below; guardDismiss_ makes every dismiss once-only.
      */
     const toastMsg = new Toast({ text: '', toastId: UiManager.TOAST_TEMPLATE_ID, displayLength: Infinity });
+
+    this.guardDismiss_(toastMsg);
     const toastEl = toastMsg.el;
 
     const icon = toastEl.querySelector<HTMLImageElement>('.kt-toast-icon');
@@ -252,21 +305,15 @@ export class UiManager {
 
     // Add an on click event to dismiss the toast
     toastEl.addEventListener('click', () => {
-      this.dismissToast_(toastMsg);
+      toastMsg.dismiss();
     });
 
     toastEl.addEventListener('contextmenu', () => {
       this.dismissAllToasts();
     });
 
-    if (isLong) {
-      toastMsg.timeRemaining = UiManager.LONG_TIMER_DELAY;
-    } else {
-      // timeRemaining should be based on the length of the toast text, with a minimum of 4 seconds and a maximum of 12 seconds
-      const calculatedTime = toastText.length * 100;
-
-      toastMsg.timeRemaining = Math.min(Math.max(calculatedTime, 4000), 12000);
-    }
+    toastMsg.timeRemaining = UiManager.toastDuration_(toastText, type, isLong);
+    UiManager.makeToastClickThrough_(toastEl);
 
     // Auto-dismiss progress bar (part of the template)
     const progressBar = toastEl.querySelector<HTMLElement>('.kt-toast-progress');
@@ -275,10 +322,10 @@ export class UiManager {
       progressBar.style.animationDuration = `${toastMsg.timeRemaining}ms`;
     }
 
-    // Auto-dismiss goes through the same guarded path as click / contextmenu, so a toast
-    // can only ever be torn down once no matter which trigger fires first.
+    // Auto-dismiss, click, contextmenu and a library swipe all share the guarded dismiss(),
+    // so a toast can only ever be torn down once no matter which trigger fires first.
     setTimeout(() => {
-      this.dismissToast_(toastMsg);
+      toastMsg.dismiss();
     }, toastMsg.timeRemaining);
 
     switch (type) {

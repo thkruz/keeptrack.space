@@ -198,6 +198,12 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true },
   },
   {
+    configKey: 'EpochAge',
+    ossImport: () => import('./epoch-age/epoch-age'),
+    ossClassName: 'EpochAge',
+    defaultConfig: { enabled: true, hideBottomIcon: true },
+  },
+  {
     configKey: 'SoundToggle',
     ossImport: () => import('./sound-toggle/sound-toggle'),
     ossClassName: 'SoundToggle',
@@ -308,6 +314,8 @@ export const pluginManifest: PluginDescriptor[] = [
     configKey: 'ReportsPlugin',
     ossImport: () => import('./reports/reports'),
     ossClassName: 'ReportsPlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/reports-pro/reports-pro') : undefined,
+    proClassName: 'ReportsPro',
     defaultConfig: { enabled: true, order: 50 },
   },
   {
@@ -408,6 +416,8 @@ export const pluginManifest: PluginDescriptor[] = [
     configKey: 'BreakupAnalysis',
     ossImport: () => import('./breakup-analysis/breakup-analysis'),
     ossClassName: 'BreakupAnalysis',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/breakup-analysis-pro/breakup-analysis-pro') : undefined,
+    proClassName: 'BreakupAnalysisPro',
     defaultConfig: { enabled: true, order: 74 },
   },
   {
@@ -552,6 +562,18 @@ export const pluginManifest: PluginDescriptor[] = [
     proClassName: 'SatelliteFovPro',
     defaultConfig: { enabled: true, order: 75 },
     isLoginRequired: true,
+  },
+  {
+    configKey: 'SatelliteSwath',
+    ossImport: () => import('./satellite-swath/satellite-swath'),
+    ossClassName: 'SatelliteSwath',
+    defaultConfig: { enabled: true, order: 76 },
+  },
+  {
+    configKey: 'ImagingOpportunities',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/imaging-opportunities/imaging-opportunities') : undefined,
+    proClassName: 'ImagingOpportunities',
+    defaultConfig: { enabled: true, order: 77 },
   },
   {
     configKey: 'StereoMap',
@@ -837,6 +859,8 @@ export const pluginManifest: PluginDescriptor[] = [
     configKey: 'RicPlot',
     ossImport: () => import('./plot-analysis/ric-plots'),
     ossClassName: 'RicPlot',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/plot-analysis/ric-plots-pro') : undefined,
+    proClassName: 'RicPlotPro',
     defaultConfig: { enabled: true, order: 262 },
   },
   {
@@ -928,6 +952,8 @@ export const pluginManifest: PluginDescriptor[] = [
   },
   {
     configKey: 'GraphicsMenuPlugin',
+    ossImport: () => import('./graphics-menu/graphics-menu'),
+    ossClassName: 'GraphicsMenuPlugin',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/graphics-menu/graphics-menu') : undefined,
     proClassName: 'GraphicsMenuPlugin',
     defaultConfig: { enabled: true, order: 591 },

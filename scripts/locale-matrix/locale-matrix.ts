@@ -264,7 +264,10 @@ const heuristicsScript = (menuRoot: string): string => `(() => {
     //  - <select>/<textarea> clip long option/wrapped text inside a fixed box,
     //    so scrollWidth just reports their widest content, not a broken layout.
     // A control that pushes past the card edge is still caught by check #2.
-    const selfOverflowExempt = tag === 'select' || tag === 'textarea' || (tag === 'input' && (type === 'checkbox' || type === 'radio'));
+    // The Materialize select trigger is a readonly <input> standing in for the <select>: it ends a
+    //    long option with an ellipsis, but an input's scrollWidth still reports the full value.
+    const isSelectTrigger = tag === 'input' && el.classList.contains('select-dropdown');
+    const selfOverflowExempt = tag === 'select' || tag === 'textarea' || isSelectTrigger || (tag === 'input' && (type === 'checkbox' || type === 'radio'));
     // 1. Content wider than its own VISIBLE box, and not an intentional scroller.
     if (el.clientWidth > 4 && !selfOverflowExempt && el.scrollWidth - el.clientWidth > 2 && cs.overflowX !== 'auto' && cs.overflowX !== 'scroll') {
       push('horizontalOverflow', el, el.scrollWidth - el.clientWidth);

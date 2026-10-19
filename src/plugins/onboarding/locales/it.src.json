@@ -212,7 +212,7 @@
             },
             "jumpToMoment": {
               "title": "Salta a un momento",
-              "body": "Imposta data e ora esatte con il calendario per vedere il cielo in quell'istante."
+              "body": "Imposta data e ora esatte con il calendario per vedere il cielo in quell'istante. Dopo un salto il satellite selezionato si aggiorna subito; gli altri satelliti impiegano circa un secondo per assestarsi."
             },
             "timeSlider": {
               "title": "Scorri la linea temporale",

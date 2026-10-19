@@ -26,6 +26,10 @@
       "label": "국가",
       "tooltip": "출신 국가"
     },
+    "ModelFlag": {
+      "label": "모델 국기",
+      "tooltip": "3D 모델에 그려지는 국기: 카탈로그 지정값이 있으면 그것, 없으면 소속 국가"
+    },
     "LaunchSite": {
       "label": "발사장",
       "tooltip": "객체가 발사된 위치"
@@ -51,6 +55,20 @@
       "tooltip": "현재 시뮬레이션 시간에 선택된 센서에서 관측되는 겉보기 시등급"
     },
     "estimatedSuffix": "(추정)",
-    "unknown": "알 수 없음"
+    "unknown": "알 수 없음",
+    "graphics": {
+      "sectionLabel": "위성 모델",
+      "flagDecals": {
+        "label": "모델에 국기 표시",
+        "helpText": "선택한 위성의 3D 모델에서 사용자를 향한 면에 소유 국가의 국기를 투영합니다"
+      },
+      "flagDecalScale": {
+        "label": "국기 크기",
+        "helpText": "모델 크기 대비 국기 너비 (0.2~0.6)"
+      }
+    },
+    "Secondary": {
+      "ricConvention": "RIC = 보조 객체 빼기 주 객체, 주 객체의 RIC 좌표계 기준."
+    }
   }
 }

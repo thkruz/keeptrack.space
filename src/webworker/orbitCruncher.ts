@@ -15,6 +15,7 @@ import {
   OrbitCruncherSatelliteObject,
   OrbitDrawTypes,
 } from './orbit-cruncher-messages';
+import { eclipseFactor } from './orbit-eclipse';
 import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
 /** Earth's sidereal rotation rate (rad/s) — the rate GMST advances. */
@@ -27,6 +28,30 @@ let orbitFadeFactor = 1.0;
 let numberOfOrbitsToDraw = 1;
 /** Tracks the last catalog-swap seqNum; per-id update messages older than this are discarded as stale. */
 let currentSeqNum = 0;
+
+/** Unit Sun vector for the request being processed; reused, never reallocated. */
+const sunUnit_ = { x: 1, y: 0, z: 0 };
+/** Alpha multiplier for shadowed vertices in the current request; 1 disables dimming. */
+let eclipseAlpha_ = 1;
+
+/** Read the per-request eclipse inputs. Leaves dimming off when they are missing or invalid. */
+const setEclipseInputs_ = (data: OrbitCruncherInMsgSatelliteUpdate): void => {
+  eclipseAlpha_ = 1;
+  const sun = data.sunEci;
+
+  if (!data.isDrawOrbitEclipse || !sun || typeof data.orbitEclipseAlpha !== 'number') {
+    return;
+  }
+  const mag = Math.sqrt(sun[0] * sun[0] + sun[1] * sun[1] + sun[2] * sun[2]);
+
+  if (!(mag > 0) || !Number.isFinite(mag)) {
+    return;
+  }
+  sunUnit_.x = sun[0] / mag;
+  sunUnit_.y = sun[1] / mag;
+  sunUnit_.z = sun[2] / mag;
+  eclipseAlpha_ = Math.min(Math.max(data.orbitEclipseAlpha, 0), 1);
+};
 
 const isStaleUpdate_ = (seqNum?: number): boolean => typeof seqNum === 'number' && seqNum < currentSeqNum;
 
@@ -48,6 +73,7 @@ export const onMessage = (m: { data: OrbitCruncherInMsgs }) => {
         break;
       }
       handleMsgSatelliteUpdate_(msg);
+      setEclipseInputs_(msg);
       updateOrbitData_(msg);
       break;
     case OrbitCruncherMsgType.MISSILE_UPDATE:
@@ -55,6 +81,7 @@ export const onMessage = (m: { data: OrbitCruncherInMsgs }) => {
         break;
       }
       handleMsgMissileUpdate_(msg);
+      eclipseAlpha_ = 1;
       updateOrbitData_(msg);
       break;
     case OrbitCruncherMsgType.SETTINGS_UPDATE:
@@ -104,6 +131,9 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
 
   const len = numberOfSegments + 1;
   let i = 0;
+  // Sample timing for TLE satellites, echoed so the main thread can recover each vertex's time.
+  let sampleJd0: number | undefined;
+  let sampleStepMin: number | undefined;
   // Calculate Missile Orbits
 
   if ((objCache[id] as OrbitCruncherMissileObject).missile) {
@@ -203,6 +233,9 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
     // For polar view, center the orbit on the current position (±half period)
     const orbitStart = isPolarViewEcf ? quantizedNow - period / 2 : quantizedNow;
 
+    sampleJd0 = satrec.jdsatepoch + orbitStart / 1440.0;
+    sampleStepMin = timeslice;
+
     if (orbitType === OrbitDrawTypes.ORBIT) {
       while (i < len) {
         drawTleOrbitSegment_(orbitStart, i, timeslice, id, isEcfOutput, points, len, isPolarViewEcf, satrec.jdsatepoch);
@@ -225,6 +258,9 @@ const updateOrbitData_ = (data: OrbitCruncherInMsgSatelliteUpdate | OrbitCrunche
       anchor,
       satId: id,
       seqNum: currentSeqNum,
+      sampleJd0,
+      sampleStepMin,
+      isEcf: isEcfOutput || isPolarViewEcf,
     },
     { transfer: [pointsOut.buffer as ArrayBuffer] }
   );
@@ -279,6 +315,8 @@ const drawTleOrbitSegmentTrail_ = (
   }
 
   let pos = sv.position as TemeVec3;
+  // Shadow test on the inertial position, before any ECF rotation.
+  const shade = eclipseAlpha_ < 1 ? eclipseFactor(pos, sunUnit_, eclipseAlpha_) : 1;
 
   if (isPolarViewEcf || isEcfOutput) {
     const gmst = Sgp4.gstime(jdsatepoch + t / 1440.0);
@@ -288,7 +326,8 @@ const drawTleOrbitSegmentTrail_ = (
   pointsOut[i * 4] = pos.x;
   pointsOut[i * 4 + 1] = pos.y;
   pointsOut[i * 4 + 2] = pos.z;
-  pointsOut[i * 4 + 3] = i < len / 40 ? Math.min(orbitFadeFactor * (len / 40 / (2 * (i + 1))), 1.0) : 0.0;
+  // Multiplying keeps the sign of w (negative w flags the head vertex downstream).
+  pointsOut[i * 4 + 3] = (i < len / 40 ? Math.min(orbitFadeFactor * (len / 40 / (2 * (i + 1))), 1.0) : 0.0) * shade;
 };
 
 const drawTleOrbitSegment_ = (
@@ -315,6 +354,8 @@ const drawTleOrbitSegment_ = (
   }
 
   let pos = sv.position as TemeVec3;
+  // Shadow test on the inertial position, before any ECF rotation.
+  const shade = eclipseAlpha_ < 1 ? eclipseFactor(pos, sunUnit_, eclipseAlpha_) : 1;
 
   if (isPolarViewEcf || isEcfOutput) {
     const gmst = Sgp4.gstime(jdsatepoch + t / 1440.0);
@@ -324,7 +365,8 @@ const drawTleOrbitSegment_ = (
   pointsOut[i * 4] = pos.x;
   pointsOut[i * 4 + 1] = pos.y;
   pointsOut[i * 4 + 2] = pos.z;
-  pointsOut[i * 4 + 3] = Math.min(orbitFadeFactor * (len / (i + 1)), 1.0);
+  // Multiplying keeps the sign of w (negative w flags the head vertex downstream).
+  pointsOut[i * 4 + 3] = Math.min(orbitFadeFactor * (len / (i + 1)), 1.0) * shade;
 };
 
 const handleMsgInit_ = (data: OrbitCruncherInMsgInit) => {
@@ -414,6 +456,9 @@ const handleMsgMissileUpdate_ = (data: OrbitCruncherInMsgMissileUpdate) => {
 
 const handleMsgSettingsUpdate_ = (data: OrbitCruncherInMsgSettingsUpdate) => {
   numberOfOrbitsToDraw = data.numberOfOrbitsToDraw ?? numberOfOrbitsToDraw;
+  if (typeof data.orbitFadeFactor === 'number') {
+    orbitFadeFactor = data.orbitFadeFactor;
+  }
 };
 
 const handleMsgChangeOrbitType = (data: OrbitCruncherInMsgChangeOrbitType) => {

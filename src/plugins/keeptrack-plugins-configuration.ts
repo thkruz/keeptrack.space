@@ -42,6 +42,7 @@ export type KeepTrackPluginsConfiguration = {
   GithubLinkPlugin?: PluginConfiguration;
   LinkedInLinkPlugin?: PluginConfiguration;
   ClassificationBar?: PluginConfiguration;
+  EpochAge?: PluginConfiguration;
   SoundManager?: PluginConfiguration;
   SoundToggle?: PluginConfiguration;
   EarthAtmosphere?: PluginConfiguration;
@@ -94,6 +95,8 @@ export type KeepTrackPluginsConfiguration = {
   PolarView?: PluginConfiguration;
   MultiView?: PluginConfiguration;
   SatelliteFov?: PluginConfiguration;
+  SatelliteSwath?: PluginConfiguration;
+  ImagingOpportunities?: PluginConfiguration;
   StereoMap?: PluginConfiguration;
   Planetarium?: PluginConfiguration;
   Astronomy?: PluginConfiguration;

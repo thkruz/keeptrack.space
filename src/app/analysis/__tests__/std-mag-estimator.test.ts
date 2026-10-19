@@ -6,7 +6,7 @@ import {
   KNOWN_OBJECT_MAGNITUDES,
   lookupKnownVmag,
 } from '@app/app/analysis/std-mag-estimator';
-import { Satellite, SpaceObjectType } from '@ootk/src/main';
+import { estimateVmagFromRcs, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { describe, expect, it } from 'vitest';
 
 const makeSat = (overrides: Partial<Satellite>): Satellite =>
@@ -135,6 +135,23 @@ describe('estimateStdMagFromProperties', () => {
     const bright = estimateStdMagFromProperties(2.0, 0.5);
 
     expect(bright).toBeLessThan(dark);
+  });
+
+  it('pins a 1 m² object at albedo 0.2 to standard magnitude 7.93', () => {
+    // Standard magnitude: 1000 km range, 90 deg phase, Lambert sphere with r² = A / π.
+    //   reflected = 0.2 · (1 / π) · (2 / 3π) / (1e6 m)² = 1.3509e-14
+    //   m = -26.74 - 2.5 · log10(1.3509e-14) = -26.74 + 34.673 = 7.933
+    // ootk v7 estimateVmagFromRcs gave about -1.3 for 1 m², which is ISS-bright and wrong;
+    // v8 fixed its constant to this same value.
+    expect(estimateStdMagFromProperties(1, 0.2)).toBeCloseTo(7.933, 3);
+    // 100 m² is 2.5 · log10(100) = 5 magnitudes brighter: 2.933.
+    expect(estimateStdMagFromProperties(100, 0.2)).toBeCloseTo(2.933, 3);
+  });
+
+  it('agrees with ootk estimateVmagFromRcs, so geometry- and RCS-derived estimates match', () => {
+    for (const area of [0.01, 0.5, 1, 14, 399]) {
+      expect(estimateStdMagFromProperties(area, 0.2)).toBeCloseTo(estimateVmagFromRcs(area, 0.2)!, 10);
+    }
   });
 
   it('returns +Infinity for zero or negative area', () => {

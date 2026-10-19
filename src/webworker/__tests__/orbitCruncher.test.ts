@@ -494,3 +494,108 @@ describe('orbitCruncher worker - draw modes and edge paths', () => {
     expect(res.pointsOut.every((v) => v === 0)).toBe(true);
   });
 });
+
+/*
+ * Eclipse dimming in the cruncher. Synthetic TLEs built for these tests
+ * (checksums computed by hand with the mod-10 rule).
+ */
+describe('orbitCruncher eclipse dimming', () => {
+  // GEO, i = 0.05 deg, RAAN 0, argp 0, MA 180 at the 2026 March equinox
+  // (2026-03-20 14:46 UTC = day 79.61528): the satellite sits on -X at epoch.
+  const GEO1 = '1 90001U 26001A   26079.61528000  .00000000  00000-0  00000-0 0  9995';
+  const GEO2 = '2 90001   0.0500   0.0000 0000100   0.0000 180.0000  1.00273791    18';
+  // Dawn-dusk-like SSO: 700 km, i = 98.19 deg, RAAN 0, at the 2026 June solstice
+  // (2026-06-21 08:24 UTC = day 172.35).
+  const SSO1 = '1 90002U 26001A   26172.35000000  .00000000  00000-0  00000-0 0  9996';
+  const SSO2 = '2 90002  98.1900   0.0000 0001000   0.0000   0.0000 14.58000000    10';
+  const SEGS = 720;
+  const ALPHA = 0.35;
+  const AU = 149597870.7;
+
+  let out: { payload: unknown }[] = [];
+
+  beforeEach(() => {
+    out = [];
+    globalThis.postMessage = vi.fn((payload: unknown) => {
+      out.push({ payload });
+    }) as unknown as typeof globalThis.postMessage;
+    // Fade factor 1 so every lit vertex has w = 1 and shadowed ones w = ALPHA.
+    onMessage({
+      data: {
+        typ: MSG.INIT,
+        numSegs: SEGS,
+        objData: JSON.stringify([
+          { tle1: GEO1, tle2: GEO2 },
+          { tle1: SSO1, tle2: SSO2 },
+        ]),
+        orbitFadeFactor: 1,
+        numberOfOrbitsToDraw: 1,
+        seqNum: 50,
+      },
+    } as unknown as Parameters<typeof onMessage>[0]);
+    onMessage({ data: { typ: MSG.CHANGE_ORBIT_TYPE, orbitType: OrbitDrawTypes.ORBIT } } as unknown as Parameters<typeof onMessage>[0]);
+  });
+
+  const request = (id: number, simulationTime: number, sunEci: [number, number, number], isDrawOrbitEclipse = true): Float32Array => {
+    out = [];
+    onMessage({
+      data: { typ: MSG.SATELLITE_UPDATE, id, simulationTime, isEcfOutput: false, seqNum: 50, sunEci, isDrawOrbitEclipse, orbitEclipseAlpha: ALPHA },
+    } as unknown as Parameters<typeof onMessage>[0]);
+
+    const last = out.at(-1) as { payload: { pointsOut: Float32Array } };
+
+    return last.payload.pointsOut;
+  };
+
+  const dimmedFlags = (points: Float32Array): boolean[] => {
+    const flags: boolean[] = [];
+
+    // Vertex SEGS repeats vertex 0 one period later; count one period only.
+    for (let i = 0; i < SEGS; i++) {
+      flags.push(Math.abs(points[i * 4 + 3] - ALPHA) < 1e-6);
+    }
+
+    return flags;
+  };
+
+  it('dims one contiguous ~70 min arc for GEO at equinox midnight', () => {
+    // March equinox: Sun at RA 0h, dec 0 -> unit +X (TEME vs J2000 offset is ~0.3 deg).
+    const points = request(0, Date.UTC(2026, 2, 20, 14, 46, 0), [AU, 0, 0]);
+    const flags = dimmedFlags(points);
+    const dimmed = flags.filter(Boolean).length;
+    // Cyclic run count: number of lit -> dimmed transitions around the loop.
+    let runs = 0;
+
+    for (let i = 0; i < SEGS; i++) {
+      if (flags[i] && !flags[(i + SEGS - 1) % SEGS]) {
+        runs++;
+      }
+    }
+
+    // Step = 1436.07 min / 720 = 1.9945 min. Expected shadow arc for a cylinder of
+    // radius 6378.14 km at r = 42164 km: 2 * asin(6378.14 / 42164) = 17.40 deg of
+    // 360 deg -> 0.04834 * 1436.07 min = 69.4 min.
+    const stepMin = 1436.07 / SEGS;
+
+    expect(runs).toBe(1);
+    expect(dimmed * stepMin).toBeGreaterThan(69.4 - 10);
+    expect(dimmed * stepMin).toBeLessThan(69.4 + 10);
+  });
+
+  it('dims nothing for a high-beta dawn-dusk SSO at the June solstice', () => {
+    // June solstice: Sun at RA 90 deg, dec 23.44 deg -> (0, cos 23.44, sin 23.44).
+    // Orbit normal for RAAN 0, i 98.19: (0, -sin i, cos i) = (0, -0.9898, -0.1425).
+    // sin(beta) = -0.9081 - 0.0567 = -0.9648, so the closest approach to the shadow
+    // axis is r * |sin beta| = 7078 * 0.9648 = 6829 km > 6378 km: never shadowed.
+    const sun: [number, number, number] = [0, AU * 0.917477, AU * 0.397777];
+    const points = request(1, Date.UTC(2026, 5, 21, 8, 24, 0), sun);
+
+    expect(dimmedFlags(points).filter(Boolean)).toHaveLength(0);
+  });
+
+  it('dims nothing when isDrawOrbitEclipse is false', () => {
+    const points = request(0, Date.UTC(2026, 2, 20, 14, 46, 0), [AU, 0, 0], false);
+
+    expect(dimmedFlags(points).filter(Boolean)).toHaveLength(0);
+  });
+});

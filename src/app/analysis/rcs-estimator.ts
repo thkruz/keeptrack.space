@@ -276,12 +276,12 @@ export const estimateRcsFromVmag = (sat: Satellite): number | null => {
     return null;
   }
 
-  // Inverse of:
-  //   vmag = M_sun + 5·log10(d_ref_m) - 2.5·log10((2/3π)·albedo·A)
+  // Inverse of (standard magnitude at 90 deg phase, r² = A / π):
+  //   vmag = M_sun + 5·log10(d_ref_m) - 2.5·log10((2/3π)·albedo·A/π)
   // Solving for A:
-  //   A = 10^((M_sun + 5·log10(d_ref_m) - vmag) / 2.5) / ((2/3π)·albedo)
+  //   A = π · 10^((M_sun + 5·log10(d_ref_m) - vmag) / 2.5) / ((2/3π)·albedo)
   const logExp = (SUN_APPARENT_MAGNITUDE + 5 * Math.log10(STD_REFERENCE_DISTANCE_M) - vmag) / 2.5;
-  const area = 10 ** logExp / (LAMBERT_SPHERE_FACTOR * DEFAULT_ALBEDO);
+  const area = (Math.PI * 10 ** logExp) / (LAMBERT_SPHERE_FACTOR * DEFAULT_ALBEDO);
 
   if (!Number.isFinite(area) || area <= 0) {
     return null;

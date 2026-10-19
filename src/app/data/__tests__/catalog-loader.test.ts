@@ -201,4 +201,17 @@ describe('Catalog Loader', () => {
       expect(CatalogLoader.parseTceContent('   ')).toEqual([]);
     });
   });
+
+  describe('isTleContent', () => {
+    it('accepts 2-line and 3LE text, with or without CRLF line endings', () => {
+      expect(CatalogLoader.isTleContent(['1 25544U 98067A', '2 25544  51.6400'].join('\n'))).toBe(true);
+      expect(CatalogLoader.isTleContent(['ISS (ZARYA)', '1 25544U 98067A', '2 25544  51.6400'].join('\r\n'))).toBe(true);
+    });
+
+    it('rejects a plain-text notice and other non-TLE bodies (#1447)', () => {
+      expect(CatalogLoader.isTleContent('No GP data found')).toBe(false);
+      expect(CatalogLoader.isTleContent('No GP data found\n')).toBe(false);
+      expect(CatalogLoader.isTleContent(['<!DOCTYPE html>', '<html>'].join('\n'))).toBe(false);
+    });
+  });
 });

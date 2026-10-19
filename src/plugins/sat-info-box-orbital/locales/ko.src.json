@@ -3,11 +3,11 @@
     "title": "궤도 데이터",
     "Apogee": {
       "label": "원지점",
-      "tooltip": "궤도에서 가장 높은 지점"
+      "tooltip": "궤도의 최고 고도 (적도 반지름 6378.137 km 기준)"
     },
     "Perigee": {
       "label": "근지점",
-      "tooltip": "궤도에서 가장 낮은 지점"
+      "tooltip": "궤도의 최저 고도 (적도 반지름 6378.137 km 기준)"
     },
     "Inclination": {
       "label": "경사각",
@@ -52,25 +52,30 @@
       "label": "속도",
       "tooltip": "위성의 현재 속도 (지구에 가까울수록 더 빠름)"
     },
+    "GPEpoch": {
+      "label": "GP 기점",
+      "tooltip": "전파에 사용되는 궤도 요소 세트의 기점(에포크)"
+    },
     "AgeOfGP": {
       "label": "GP 데이터 연령",
-      "tooltip": "공식 궤도 계산 이후 경과 시간 (오래된 GP 데이터는 보통 정확도가 낮음)",
+      "tooltip": "GP 에포크부터 현재 시뮬레이션 시각까지의 시간 (오래된 GP 데이터는 보통 정확도가 낮음, 음수는 에포크가 시뮬레이션 시각 이후임을 의미)",
       "days": "일",
       "hours": "시간",
       "epochYear": "에포크 연도",
-      "epochDay": "에포크 일"
+      "epochDay": "에포크 일",
+      "epochAfterSimTime": "GP 에포크가 시뮬레이션 시각 이후임"
     },
     "RadialSigma": {
       "label": "반경 시그마",
-      "tooltip": "반경 불확실성 (미터)"
+      "tooltip": "반경 방향 1시그마 위치 불확도(GP 에포크 기준 TLE 유도 공분산, RIC 좌표계). Pc 및 근접 보고서와 같은 값입니다."
     },
     "InTrackSigma": {
       "label": "궤도 내 시그마",
-      "tooltip": "궤도 내 불확실성 (미터)"
+      "tooltip": "궤도 방향 1시그마 위치 불확도(GP 에포크 기준 TLE 유도 공분산, RIC 좌표계). Pc 및 근접 보고서와 같은 값입니다."
     },
     "CrossTrackSigma": {
       "label": "횡단 시그마",
-      "tooltip": "횡단 불확실성 (미터)"
+      "tooltip": "횡방향 1시그마 위치 불확도(GP 에포크 기준 TLE 유도 공분산, RIC 좌표계). Pc 및 근접 보고서와 같은 값입니다."
     },
     "meter": "m",
     "kilometer": "km",

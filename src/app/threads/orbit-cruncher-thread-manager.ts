@@ -1,7 +1,16 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
 import { OrbitCruncherInMsgs, OrbitCruncherMsgType, OrbitCruncherOutMsgPoints, OrbitDrawTypes } from '@app/webworker/orbit-cruncher-messages';
 import { Degrees, Kilometers } from '@ootk/src/main';
+
+/** Eclipse-dimming inputs forwarded with a satellite orbit request. */
+export interface OrbitEclipseParams {
+  sunEci: [number, number, number];
+  isDrawOrbitEclipse: boolean;
+  orbitEclipseAlpha: number;
+}
 
 export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
   readonly WEB_WORKER_CODE: string = 'js/orbitCruncher.js';
@@ -32,7 +41,7 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
     });
   }
 
-  sendSatelliteUpdate(id: number, simulationTime: number, isEcfOutput: boolean, isPolarViewEcf?: boolean, tle1?: string, tle2?: string): void {
+  sendSatelliteUpdate(id: number, simulationTime: number, isEcfOutput: boolean, isPolarViewEcf?: boolean, tle1?: string, tle2?: string, eclipse?: OrbitEclipseParams): void {
     this.postMessage({
       typ: OrbitCruncherMsgType.SATELLITE_UPDATE,
       id,
@@ -42,6 +51,9 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
       tle1,
       tle2,
       seqNum: this.currentSeqNum_,
+      sunEci: eclipse?.sunEci,
+      isDrawOrbitEclipse: eclipse?.isDrawOrbitEclipse,
+      orbitEclipseAlpha: eclipse?.orbitEclipseAlpha,
     });
   }
 
@@ -73,10 +85,11 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
     });
   }
 
-  sendSettingsUpdate(numberOfOrbitsToDraw: number): void {
+  sendSettingsUpdate(numberOfOrbitsToDraw: number, orbitFadeFactor?: number): void {
     this.postMessage({
       typ: OrbitCruncherMsgType.SETTINGS_UPDATE,
       numberOfOrbitsToDraw,
+      orbitFadeFactor,
     });
   }
 
@@ -135,5 +148,7 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
     gl.bufferData(gl.ARRAY_BUFFER, pointsOut, gl.DYNAMIC_DRAW);
 
     orbitManager.inProgress_[satId] = false;
+
+    EventBus.getInstance().emit(EventBusEvent.orbitPathUpdated, satId, pointsOut, data.anchor ?? [0, 0, 0], data.sampleJd0, data.sampleStepMin, data.isEcf === true);
   }
 }

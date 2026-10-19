@@ -1,0 +1,41 @@
+/* SatelliteSwath settings menu (v13 cards). */
+#satellite-swath-menu {
+  width: 350px;
+}
+
+#satellite-swath-menu .swath-hidden {
+  display: none;
+}
+
+/* Dense-form fixes from docs-local/ui/v13-menu-style.md: stacked-field headroom ... */
+#satellite-swath-menu .kt-field-row .input-field.col {
+  margin-top: 20px;
+}
+
+#satellite-swath-menu .kt-section-label + .kt-field-row .input-field.col {
+  margin-top: 8px;
+}
+
+/* ... and the focus underline in place of the app-wide outline. */
+#satellite-swath-menu .input-field input:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+
+#satellite-swath-menu .input-field input:focus-visible {
+  outline: none;
+}
+
+#satellite-swath-menu .swath-switch {
+  margin: 8px 6px;
+}
+
+#satellite-swath-menu .swath-switch label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#satellite-swath-menu #swath-nadir-readout {
+  margin-top: 12px;
+}

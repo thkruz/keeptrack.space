@@ -1,0 +1,55 @@
+{
+  "plugins": {
+    "GraphicsMenuPlugin": {
+      "title": "Menu grafiky",
+      "bottomIconLabel": "Menu grafiky",
+      "filterPlaceholder": "Filtrovat nastavení grafiky...",
+      "sections": {
+        "display": "Zobrazení",
+        "orbits": "Orbity"
+      },
+      "labels": {
+        "overallQuality": "Celková kvalita",
+        "autoReduced": "Automaticky sníženo kvůli výkonu",
+        "blackEarth": "Vykreslit černou Zemi",
+        "grayscaleEarth": "Vykreslit Zemi v odstínech šedi",
+        "ambientLighting": "Okolní osvětlení Země",
+        "nightAsDay": "Vykreslovat noc jako den",
+        "graticule": "Vykreslovat zeměpisnou síť",
+        "politicalMap": "Vykreslovat státní hranice",
+        "dimOrbitInEclipse": "Ztlumit orbitu v zatmění",
+        "orbitEclipseAlpha": "Síla ztlumení v zatmění",
+        "orbitFadeFactor": "Slábnutí čáry orbity"
+      },
+      "tooltips": {
+        "blackEarth": "Skryje textury Země",
+        "grayscaleEarth": "Změní Zemi na odstíny šedi",
+        "ambientLighting": "Vypnutím skryjete okolní osvětlení",
+        "nightAsDay": "Osvětlí noční stranu Země, jako by byl den",
+        "graticule": "Vykreslí na Zemi čáry zeměpisné šířky a délky",
+        "politicalMap": "Vykreslí na Zemi hranice států",
+        "dimOrbitInEclipse": "Ztlumí část orbity vybraného satelitu, kde je satelit ve stínu Země",
+        "orbitEclipseAlpha": "Neprůhlednost čáry orbity ve stínu Země: 0,05 ji téměř skryje, 1 znamená bez ztlumení",
+        "orbitFadeFactor": "Jak daleko zůstává čára orbity jasná, než zeslábne: nižší hodnoty slábnou dříve"
+      },
+      "options": {
+        "low": "Nízká",
+        "medium": "Střední",
+        "high": "Vysoká",
+        "ultra": "Ultra",
+        "custom": "Vlastní"
+      },
+      "buttons": {
+        "resetToDefaults": "Obnovit výchozí"
+      },
+      "help": {
+        "overview": "Menu Grafika určuje vzhled scény. Zvolte úroveň <strong>Celková kvalita</strong> a nastavte tak najednou všechna nastavení, která na kvalitě závisí, a pak upravte jednotlivá nastavení v kartách níže. Změny se projeví okamžitě a zůstanou uloženy mezi relacemi.",
+        "imgAlt": "Menu Grafika s volbou celkové kvality a kartami nastavení",
+        "imgCaption": "Volba celkové kvality nahoře, karty nastavení pod ní a Obnovit výchozí dole.",
+        "howToUse": "<ol><li>Otevřete <strong>Menu Grafika</strong> z panelu ve skupině Nastavení.</li><li>Klikněte na <strong>Nízká</strong>, <strong>Střední</strong>, <strong>Vysoká</strong> nebo <strong>Ultra</strong> a nastavte tak jedním krokem vše, co na kvalitě závisí.</li><li>Změnou libovolného nastavení níže doladíte vzhled; volba pak ukáže <strong>Vlastní</strong>.</li><li>Do pole filtru napište název nastavení, které hledáte.</li><li>Kliknutím na <strong>Obnovit výchozí</strong> vrátíte všechna nastavení grafiky.</li></ol>",
+        "tip1": "Volba ukazuje Vlastní, kdykoli vaše nastavení přesně neodpovídá žádné úrovni. Zvolte úroveň znovu a vrátíte se k ní.",
+        "tip2": "Když klesne snímková frekvence, KeepTrack může sám vypnout náročné efekty. Menu pak upozorní, že nastavení byla automaticky snížena."
+      }
+    }
+  }
+}

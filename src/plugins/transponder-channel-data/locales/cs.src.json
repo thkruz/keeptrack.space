@@ -27,7 +27,7 @@
         "imgCaption": "Každý řádek je jeden kanál s údaji o paprsku, frekvenci, systému a šifrování.",
         "columnsHeading": "Čtení tabulky",
         "columns": "<ul><li><strong>TV kanál</strong>: název vysílací služby.</li><li><strong>Paprsek</strong>: anténní paprsek satelitu, který kanál přenáší a určuje oblast pokrytí.</li><li><strong>Frekvence</strong>: sestupná frekvence a polarizace.</li><li><strong>Systém</strong> a <strong>SR/FEC</strong>: přenosový standard (například DVB-S2) se symbolovou rychlostí a dopřednou korekcí chyb.</li><li><strong>Video</strong> a <strong>Jazyk</strong>: kodek a jazyky zvuku.</li><li><strong>Šifrování</strong>: zda je kanál volně šiřitelný, nebo kódovaný, a jakým systémem.</li></ul>",
-        "howToUse": "<ol><li>Vyberte vysílací satelit; spodní ikona se aktivuje pouze u satelitů se známými daty o kanálech.</li><li>Otevřete nabídku ze spodní lišty nebo stiskněte <strong>T</strong>. Seznam kanálů se stáhne a vyplní tabulku.</li><li>Pomocí tlačítka stažení v záhlaví exportujte tabulku jako tabulkový soubor.</li></ol>",
+        "howToUse": "<ol><li>Vyberte vysílací satelit; ikona pluginu v panelu se aktivuje pouze u satelitů se známými daty o kanálech.</li><li>Otevřete nabídku z panelu nebo stiskněte <strong>T</strong>. Seznam kanálů se stáhne a vyplní tabulku.</li><li>Pomocí tlačítka stažení v záhlaví exportujte tabulku jako tabulkový soubor.</li></ol>",
         "tip1": "Podporované satelity jsou registrovány jako konstelace TV satelity v nabídce Konstelace, což je nejrychlejší způsob, jak najít satelit k prozkoumání.",
         "tip2": "Data o kanálech pocházejí z KeepTrack API a odrážejí veřejné seznamy; vyžadují připojení k internetu.",
         "shortcutToggle": "Přepnout nabídku Frekvence satelitu"

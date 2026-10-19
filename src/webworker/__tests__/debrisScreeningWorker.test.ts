@@ -44,7 +44,7 @@ describe('debrisScreeningWorker', () => {
       primary: sat('PRIMARY'),
       secondaries: [sat('SECONDARY')],
       startTimeMs: Date.UTC(2008, 8, 20, 0, 0, 0),
-      endTimeMs: Date.UTC(2008, 8, 20, 1, 0, 0),
+      endTimeMs: Date.UTC(2008, 8, 20, 0, 10, 0),
       searchStepSize: 60,
       uVal: 1,
       vVal: 1,

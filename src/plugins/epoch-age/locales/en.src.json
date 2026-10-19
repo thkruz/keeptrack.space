@@ -1,0 +1,22 @@
+{
+  "plugins": {
+    "EpochAge": {
+      "badge": {
+        "caution": "Epoch age: fair, {days}",
+        "low": "Epoch age: low, {days}",
+        "poor": "Epoch age: very low, {days}"
+      },
+      "tooltip": "Time between the simulation and the element set epoch. Fair past 3 days, low past 7, very low past 14: positions drift further from reality the older the elements are.",
+      "toast": {
+        "poor": "Elements are more than 14 days old at this time. Positions may be off by tens of kilometres or more."
+      },
+      "settings": {
+        "sectionLabel": "Epoch Age",
+        "showEpochAge": {
+          "label": "Show Epoch Age Badge",
+          "helpText": "Warn when the simulation time is more than 3 days from the selected satellite's element epoch."
+        }
+      }
+    }
+  }
+}

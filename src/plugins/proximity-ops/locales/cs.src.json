@@ -48,19 +48,21 @@
         "date": "Datum"
       },
       "help": {
-        "overview": "Blízké operace (RPO) vyhledávají nadcházející blízká setkání mezi satelity: kosmickou loď manévrující poblíž jiné, koorbitální inspekci nebo prostě dva objekty driftující blízko sebe. Zadejte satelit (nebo prohledejte celý orbitální režim) a funkce vrátí každé předpovězené setkání v rámci vašich prahů vzdálenosti a rychlosti.",
+        "overview": "Rendezvous and Proximity Operations (RPO) hledá pomalá souběžná přiblížení, například inspekční nebo servisní družici pracující u cíle, a prověřuje jen objekty, které sdílejí orbitální rovinu cíle (sklon a RAAN do {deg}° v LEO, blízké pozice v délce v GEO). Rychlá křížení mezi různými drahami jsou záměrně vyloučena; pro ně použijte <strong>Debris Screening</strong>. Zadejte satelit (nebo prověřte celý orbitální režim) a nástroj vrátí souběžná setkání v rámci vašich prahů vzdálenosti a rychlosti.",
         "imgAlt": "Nabídka RPO s parametry vyhledávání",
         "imgCaption": "Nastavte prahy a typ orbity, poté hledejte jeden satelit nebo všechny proti všem.",
         "modesHeading": "Režimy vyhledávání",
-        "modes": "Ve výchozím nastavení vyhledávání vezme zadané <strong>NORAD ID</strong> a prověří tento satelit proti zbytku jeho orbitálního režimu. Zaškrtnutí <strong>Geostacionární všechny vs všechny</strong> místo toho prověří každý GEO satelit proti všem ostatním, což je způsob, jak zmapovat aktivitu v celém pásu. <strong>Porovnat pouze náklady</strong> přeskočí trosky a tělesa raket a <strong>Ignorovat RSO Vimpel</strong> vyloučí objekty pocházející z katalogu JSC Vimpel.",
+        "modes": "Ve výchozím nastavení vyhledávání vezme zadané <strong>NORAD ID</strong> a prověří tento satelit proti blízkým objektům ve stejné orbitální rovině. Zaškrtnutí <strong>Geostacionární všechny vs všechny</strong> místo toho prověří každý GEO satelit proti všem ostatním, což je způsob, jak zmapovat aktivitu v celém pásu. <strong>Porovnat pouze náklady</strong> přeskočí trosky a tělesa raket a <strong>Ignorovat RSO Vimpel</strong> vyloučí objekty pocházející z katalogu JSC Vimpel.",
         "resultsHeading": "Čtení výsledků",
         "results": "Každý řádek spojuje <strong>Cíl</strong> a <strong>Pronásledovatel</strong> s jejich nejmenší hodnotou <strong>Rel. vzdálenost</strong>, <strong>Rel. rychlost</strong> a <strong>Datum</strong> setkání. Kliknutím na řádek vyberete oba satelity a přesunete kameru i hodiny k přiblížení; výsledky GEO také přepnou zobrazení orbit do ECF, takže relativní pohyb je snadno čitelný. Tlačítko stažení exportuje seznam jako soubor CSV.",
-        "howToUse": "<ol><li>Otevřete nabídku ze spodní lišty nebo stiskněte <strong>X</strong>.</li><li>Zvolte <strong>Typ orbity</strong> (geostacionární nebo nízká oběžná dráha) a nastavte <strong>Maximální prahová vzdálenost</strong>, <strong>Maximální relativní rychlost</strong> a <strong>Doba vyhledávání</strong>.</li><li>Zadejte <strong>NORAD ID</strong>, nebo zaškrtněte <strong>Geostacionární všechny vs všechny</strong> pro průzkum celého pásu.</li><li>Klikněte na <strong>Najít RPO</strong>. Dlouhá vyhledávání zobrazují průběh; výsledky se otevřou v panelu seznamu.</li><li>Kliknutím na libovolný řádek přeletíte k danému setkání.</li></ol>",
+        "howToUse": "<ol><li>Otevřete nabídku z panelu nebo stiskněte <strong>X</strong>.</li><li>Zvolte <strong>Typ orbity</strong> (geostacionární nebo nízká oběžná dráha) a nastavte <strong>Maximální prahová vzdálenost</strong>, <strong>Maximální relativní rychlost</strong> a <strong>Doba vyhledávání</strong>.</li><li>Zadejte <strong>NORAD ID</strong>, nebo zaškrtněte <strong>Geostacionární všechny vs všechny</strong> pro průzkum celého pásu.</li><li>Klikněte na <strong>Najít RPO</strong>. Dlouhá vyhledávání zobrazují průběh; výsledky se otevřou v panelu seznamu.</li><li>Kliknutím na libovolný řádek přeletíte k danému setkání.</li></ol>",
         "tip1": "Nízká relativní rychlost na malou vzdálenost odlišuje záměrné blízké operace od rychlého konjunkčního průletu; zpřísněte práh rychlosti, abyste odfiltrovali manévry.",
         "tip2": "Vyhledávání všech proti všem v GEO je náročné; nejprve zužte dobu trvání a poté ji rozšiřte, jakmile prahy vypadají správně.",
         "tip3": "Kliknutí na výsledek GEO přepne orbity do zobrazení vázaného na Zemi (ECF); oznámení vám sdělí, který režim je aktivní.",
         "shortcutToggle": "Přepnout nabídku RPO"
-      }
+      },
+      "scopeNote": "RPO hledá pomalá souběžná přiblížení: v LEO prověřuje jen objekty do {deg}° od sklonu a orbitální roviny cíle, v GEO jen blízké pozice v délce. Pro rychlá křížení z jiných drah použijte Debris Screening.",
+      "noRposFoundCoorbital": "Mezi {count} souběžnými objekty nebyla nalezena žádná RPO. Křížící provoz se zde neprověřuje; zkuste Debris Screening."
     }
   }
 }

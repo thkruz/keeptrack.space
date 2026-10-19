@@ -3,7 +3,7 @@
     "BreakupAnalysis": {
       "bottomIconLabel": "Analisi frammentazione",
       "title": "Analisi frammentazione",
-      "helpBody": "Il plugin Analisi frammentazione fornisce un database dei principali eventi di frammentazione satellitare nella storia. Seleziona un evento per visualizzare informazioni dettagliate, incluso l'oggetto principale, la causa della frammentazione, la cronologia dal lancio alla frammentazione e l'analisi della dispersione dei frammenti. Il plugin cerca nel catalogo attuale i detriti tracciati corrispondenti a ciascun evento e visualizza analisi statistiche degli intervalli di altitudine, eccentricità e distribuzioni di inclinazione.",
+      "helpBody": "Il plugin Analisi frammentazione fornisce un database dei principali eventi di frammentazione satellitare nella storia. Seleziona un evento per visualizzare informazioni dettagliate, incluso l'oggetto principale, la causa della frammentazione, la cronologia dal lancio alla frammentazione e l'analisi della dispersione dei frammenti. Il plugin cerca nel catalogo attuale i detriti tracciati corrispondenti a ciascun evento e visualizza analisi statistiche degli intervalli di altitudine, eccentricità e distribuzioni di inclinazione. Ogni evento mostra il designatore internazionale del lancio e il numero NORAD dell'oggetto padre, così due eventi della stessa famiglia di razzi (ad esempio due frammentazioni di stadi superiori CZ-6A) non si confondono.",
       "sections": {
         "events": "Eventi",
         "debrisStatistics": "Statistiche detriti",
@@ -66,7 +66,8 @@
         "perigee": "Perigeo",
         "apogee": "Apogeo",
         "incDeg": "Inc (°)",
-        "ecc": "Ecc"
+        "ecc": "Ecc",
+        "intlDes": "Designatore internazionale"
       },
       "errorMsgs": {
         "parentNotFound": "L'oggetto principale non è nel catalogo attuale.",

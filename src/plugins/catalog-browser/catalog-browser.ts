@@ -17,6 +17,7 @@ import { Satellite } from '@ootk/src/main';
 import satelliteAltPng from '@public/img/icons/satellite-alt.png';
 import { CatalogBrowserData } from './catalog-browser-data';
 import type { CatalogBrowserConfiguration } from './catalog-browser-settings';
+import { CelesTrakNoDataError } from './celestrak-no-data-error';
 import './catalog-browser.css';
 
 type T7eKey = Parameters<typeof t7e>[0];
@@ -272,6 +273,10 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
         throw new Error('Empty response from CelesTrak');
       }
 
+      if (!CatalogLoader.isTleContent(tleContent)) {
+        throw new CelesTrakNoDataError(tleContent);
+      }
+
       if (this.orbitalDataOnly_) {
         this.ensureCatalogCached_();
         const merged = this.mergeWithCache_(tleContent);
@@ -300,6 +305,13 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
   private classifyFetchError_(error: unknown): { messageKey: T7eKey; toastType: ToastMsgType; isTransient: boolean } {
     const status = (error as { status?: number } | null)?.status;
 
+    if (error instanceof CelesTrakNoDataError) {
+      return {
+        messageKey: 'plugins.CatalogBrowserPlugin.errorMsgs.NoData' as T7eKey,
+        toastType: ToastMsgType.caution,
+        isTransient: true,
+      };
+    }
     if (status === 403) {
       return {
         messageKey: 'plugins.CatalogBrowserPlugin.errorMsgs.Forbidden' as T7eKey,

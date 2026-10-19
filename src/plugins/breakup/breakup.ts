@@ -16,7 +16,7 @@ import {
   IKeyboardShortcut,
   ISideMenuConfig,
 } from '@app/engine/plugins/core/plugin-capabilities';
-import { initMaterialSelects } from '@app/engine/ui/material-select';
+import { initMaterialSelects, refreshMaterialSelect } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -25,20 +25,42 @@ import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite } from '@ootk/src/main';
 import streamPng from '@public/img/icons/stream.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { BREAKUP_PRESETS, BreakupRawForm, DEFAULT_BREAKUP_PRESET, getBreakupPreset, parseBreakupParams } from './breakup-core';
+import {
+  BREAKUP_PRESETS,
+  BreakupRawForm,
+  BreakupVariationParams,
+  computeDispersionStats,
+  DEFAULT_BREAKUP_PRESET,
+  DEFAULT_DELTA_V_FRAME,
+  DEFAULT_DISPERSION_MODEL,
+  DELTA_V_FRAMES,
+  DeltaVFrame,
+  DISPERSION_MODELS,
+  DispersionModel,
+  dispersionFromParams,
+  gaussianSigmas,
+  getBreakupPreset,
+  parseBreakupParams,
+} from './breakup-core';
 import { clearBreakupPieces, runBreakup } from './breakup-runner';
 import './breakup.css';
 
 export interface BreakupParams {
   satId: number | null;
   breakupCount: number;
-  /** Radial delta-V spread (m/s). */
+  /** Slot-1 delta-V value (m/s): radial (RTN), N (NTW) or X (ECI). */
   radialDeltaV: number;
-  /** In-track delta-V spread (m/s). */
+  /** Slot-2 delta-V value (m/s): in-track (RTN), T (NTW) or Y (ECI). */
   inTrackDeltaV: number;
-  /** Cross-track delta-V spread (m/s). */
+  /** Slot-3 delta-V value (m/s): cross-track (RTN), W (NTW) or Z (ECI). */
   crossTrackDeltaV: number;
   startNum: number;
+  frame?: DeltaVFrame;
+  model?: DispersionModel;
+  /** Target mean resultant speed (m/s), maxwellian only. */
+  meanSpeed?: number;
+  /** Resultant speed cap (m/s); 0 means no cap. */
+  maxTotalSpeed?: number;
 }
 
 /** State captured on a successful breakup so it can be fully undone (Clear Breakup). */
@@ -187,20 +209,45 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
                 ≈1.54σ, so 40 m/s → ~60 m/s median (explosion fragments are ~10-100 m/s;
                 catastrophic collisions run ~100-300 m/s, small fragments to ~1 km/s).
               -->
-              <div class="kt-field-row">
-                <div class="input-field col s4">
-                  <input id="hc-dv-radial" type="number" min="0" step="1" value="40" />
-                  <label for="hc-dv-radial" class="active">${l('radialDeltaV')}</label>
-                </div>
-                <div class="input-field col s4">
-                  <input id="hc-dv-intrack" type="number" min="0" step="1" value="40" />
-                  <label for="hc-dv-intrack" class="active">${l('inTrackDeltaV')}</label>
-                </div>
-                <div class="input-field col s4">
-                  <input id="hc-dv-crosstrack" type="number" min="0" step="1" value="40" />
-                  <label for="hc-dv-crosstrack" class="active">${l('crossTrackDeltaV')}</label>
+              <div class="input-field col s12">
+                <select id="hc-dv-frame">
+                  ${DELTA_V_FRAMES.map((f) => `<option value="${f}"${f === DEFAULT_DELTA_V_FRAME ? ' selected' : ''}>${l(`frame_${f}`)}</option>`).join('')}
+                </select>
+                <label>${l('frameLabel')}</label>
+              </div>
+              <div class="input-field col s12">
+                <select id="hc-dv-model">
+                  ${DISPERSION_MODELS.map((m) => `<option value="${m}"${m === DEFAULT_DISPERSION_MODEL ? ' selected' : ''}>${l(`model_${m}`)}</option>`).join('')}
+                </select>
+                <label>${l('modelLabel')}</label>
+              </div>
+              <!-- Labels, the unit caption and tooltips are filled per frame/model by updateDispersionUi_(). -->
+              <div id="hc-dv-axes">
+                <div id="hc-dv-axes-unit" class="kt-note breakup-dv-unit"></div>
+                <div class="kt-field-row">
+                  <div class="input-field col s4">
+                    <input id="hc-dv-radial" type="number" min="0" step="any" value="40" kt-tooltip="" />
+                    <label id="hc-dv-radial-label" for="hc-dv-radial" class="active"></label>
+                  </div>
+                  <div class="input-field col s4">
+                    <input id="hc-dv-intrack" type="number" min="0" step="any" value="40" kt-tooltip="" />
+                    <label id="hc-dv-intrack-label" for="hc-dv-intrack" class="active"></label>
+                  </div>
+                  <div class="input-field col s4">
+                    <input id="hc-dv-crosstrack" type="number" min="0" step="any" value="40" kt-tooltip="" />
+                    <label id="hc-dv-crosstrack-label" for="hc-dv-crosstrack" class="active"></label>
+                  </div>
                 </div>
               </div>
+              <div id="hc-dv-mean-row" class="input-field col s12" style="display:none;">
+                <input id="hc-dv-mean" type="number" min="0" step="any" value="86.5" kt-tooltip="${l('meanSpeedTooltip')}" />
+                <label for="hc-dv-mean" class="active">${l('meanSpeed')}</label>
+              </div>
+              <div class="input-field col s12">
+                <input id="hc-dv-cap" type="number" min="0" step="any" value="" placeholder="${l('maxTotalSpeedOff')}" kt-tooltip="${l('maxTotalSpeedTooltip')}" />
+                <label for="hc-dv-cap" class="active">${l('maxTotalSpeed')}</label>
+              </div>
+              <div id="hc-dv-stats" class="kt-note breakup-dv-stats" aria-live="polite"></div>
               <div class="kt-note">${l('dispersionHint')}</div>
             </section>
             <section class="kt-section">
@@ -248,6 +295,10 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
         {
           heading: t7e('plugins.Breakup.help.parametersHeading'),
           content: t7e('plugins.Breakup.help.parameters'),
+        },
+        {
+          heading: t7e('plugins.Breakup.help.dispersionModelsHeading' as Parameters<typeof t7e>[0]),
+          content: t7e('plugins.Breakup.help.dispersionModels' as Parameters<typeof t7e>[0]),
         },
         {
           heading: t7e('help.howToUse'),
@@ -301,8 +352,17 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
       this.applyPreset_((e.target as HTMLSelectElement).value);
     });
 
+    // Frame/model change the meaning of the inputs; any edit moves off a preset.
+    for (const id of ['hc-dv-frame', 'hc-dv-model']) {
+      getEl(id)?.addEventListener('change', () => this.onDispersionEdited_());
+    }
+    for (const id of ['hc-dv-radial', 'hc-dv-intrack', 'hc-dv-crosstrack', 'hc-dv-mean', 'hc-dv-cap']) {
+      getEl(id)?.addEventListener('input', () => this.onDispersionEdited_());
+    }
+
     this.restoreInputs_();
     initMaterialSelects(getEl('breakup-menu') ?? document.body);
+    this.updateDispersionUi_();
     this.updateClearButton_();
   }
 
@@ -328,13 +388,14 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const { simulationTimeObj } = timeManager;
 
-    const { satId, breakupCount, radialDeltaV, inTrackDeltaV, crossTrackDeltaV, startNum, startNumWasInvalid } = Breakup.getFormData_(catalogManagerInstance);
+    const { satId, startNumWasInvalid, ...variation } = Breakup.getFormData_(catalogManagerInstance);
+    const { breakupCount } = variation;
 
     if (startNumWasInvalid) {
       errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.InvalidStartNum'));
     }
 
-    this.lastBreakupParams = { satId, breakupCount, radialDeltaV, inTrackDeltaV, crossTrackDeltaV, startNum };
+    this.lastBreakupParams = { satId, ...variation };
     this.persistInputs_();
 
     const mainsat = catalogManagerInstance.getSat(satId ?? -1);
@@ -352,7 +413,7 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     // The breakup happens at the parent's exact position/velocity at the current sim
     // time. The catalog-facing orchestration lives in runBreakup so other plugins
     // (e.g. the interceptor) can trigger a breakup at an arbitrary epoch too.
-    const result = runBreakup(mainsat, { breakupCount, radialDeltaV, inTrackDeltaV, crossTrackDeltaV, startNum }, simulationTimeObj);
+    const result = runBreakup(mainsat, variation, simulationTimeObj);
 
     if (result.error === 'invalidSlotRange') {
       errorManagerInstance.warn(
@@ -374,6 +435,12 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     if (result.reenteredCount > 0) {
       ServiceLocator.getUiManager().toast(
         t7e('plugins.Breakup.toasts.fragmentsReentered' as Parameters<typeof t7e>[0]).replace('{count}', result.reenteredCount.toString()),
+        ToastMsgType.caution
+      );
+    }
+    if (result.failedCount > 0) {
+      ServiceLocator.getUiManager().toast(
+        t7e('plugins.Breakup.toasts.fragmentsFailed' as Parameters<typeof t7e>[0]).replace('{count}', result.failedCount.toString()),
         ToastMsgType.caution
       );
     }
@@ -431,7 +498,10 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     ServiceLocator.getUiManager().toast(t7e('plugins.Breakup.toasts.cleared' as Parameters<typeof t7e>[0]), ToastMsgType.normal);
   }
 
-  /** Fill the per-axis delta-V fields from an event-type preset ("custom" is a no-op). */
+  /**
+   * Fill the per-axis delta-V fields from an event-type preset ("custom" is a
+   * no-op). Presets are RTN 1-sigma values, so the frame and model reset too.
+   */
   private applyPreset_(presetId: string): void {
     const preset = getBreakupPreset(presetId);
 
@@ -450,7 +520,118 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     set('hc-dv-radial', preset.radial);
     set('hc-dv-intrack', preset.inTrack);
     set('hc-dv-crosstrack', preset.crossTrack);
+    Breakup.setSelectValue_('hc-dv-frame', DEFAULT_DELTA_V_FRAME);
+    Breakup.setSelectValue_('hc-dv-model', DEFAULT_DISPERSION_MODEL);
+    this.updateDispersionUi_();
   }
+
+  /** A frame/model/value edit: re-label, refresh the readout, and drop to "custom" once off-preset. */
+  private onDispersionEdited_(): void {
+    const presetSelect = getEl('hc-event-preset', true) as HTMLSelectElement | null;
+    const preset = presetSelect ? getBreakupPreset(presetSelect.value) : null;
+
+    if (preset) {
+      const { params } = parseBreakupParams(Breakup.readRawForm_(), Breakup.DEFAULT_START_NUM);
+      const matches =
+        params.frame === DEFAULT_DELTA_V_FRAME &&
+        params.model === DEFAULT_DISPERSION_MODEL &&
+        params.radialDeltaV === preset.radial &&
+        params.inTrackDeltaV === preset.inTrack &&
+        params.crossTrackDeltaV === preset.crossTrack;
+
+      if (!matches) {
+        Breakup.setSelectValue_('hc-event-preset', 'custom');
+      }
+    }
+
+    this.updateDispersionUi_();
+  }
+
+  /** Set a styled select's value and re-render its Materialize trigger. */
+  private static setSelectValue_(id: string, value: string): void {
+    const select = getEl(id, true) as HTMLSelectElement | null;
+
+    if (select && select.value !== value) {
+      select.value = value;
+      refreshMaterialSelect(select);
+    }
+  }
+
+  /**
+   * Label the three axis inputs for the current frame and model (or swap them
+   * for the single mean-speed input), and refresh the live statistics readout.
+   */
+  private updateDispersionUi_(): void {
+    const l = (key: string) => t7e(`plugins.Breakup.labels.${key}` as Parameters<typeof t7e>[0]);
+    const { params } = parseBreakupParams(Breakup.readRawForm_(), Breakup.DEFAULT_START_NUM);
+    const frame = params.frame ?? DEFAULT_DELTA_V_FRAME;
+    const model = params.model ?? DEFAULT_DISPERSION_MODEL;
+    const isMaxwellian = model === 'maxwellian';
+    const axes = getEl('hc-dv-axes', true);
+    const meanRow = getEl('hc-dv-mean-row', true);
+    const unitCaption = getEl('hc-dv-axes-unit', true);
+
+    if (axes) {
+      axes.style.display = isMaxwellian ? 'none' : '';
+    }
+    if (meanRow) {
+      meanRow.style.display = isMaxwellian ? '' : 'none';
+    }
+    // One shared unit caption: "Radial (1σ m/s)" wraps in the three narrow columns.
+    if (unitCaption) {
+      unitCaption.textContent = l('axesCaption').replace('{unit}', l(model === 'uniform' ? 'unitMax' : 'unitSigma'));
+    }
+
+    const slots: [string, string][] = [
+      ['hc-dv-radial', 'axis1'],
+      ['hc-dv-intrack', 'axis2'],
+      ['hc-dv-crosstrack', 'axis3'],
+    ];
+
+    for (const [inputId, slot] of slots) {
+      const label = getEl(`${inputId}-label`, true);
+
+      if (label) {
+        label.textContent = l(`${slot}_${frame}`);
+      }
+      getEl(inputId, true)?.setAttribute('kt-tooltip', `${l(`${slot}_${frame}_tooltip`)}<br />${l(`unitTooltip_${model}`)}`);
+    }
+
+    this.updateStatsReadout_(params);
+  }
+
+  /** Show the theoretical mean / RMS / P99 resultant speed for the current inputs. */
+  private updateStatsReadout_(params: BreakupVariationParams): void {
+    const el = getEl('hc-dv-stats', true);
+
+    if (!el) {
+      return;
+    }
+
+    const s = (key: string) => t7e(`plugins.Breakup.stats.${key}` as Parameters<typeof t7e>[0]);
+    const dispersion = dispersionFromParams(params);
+    const stats = computeDispersionStats(dispersion);
+    const fmt = (v: number) => v.toFixed(1);
+    const lines = [
+      `${s('meanSpeed')}: <strong>${fmt(stats.meanSpeed)} m/s</strong>`,
+      `${s('rmsSpeed')}: ${fmt(stats.rmsSpeed)} m/s &middot; ${s('p99Speed')}: ${fmt(stats.p99Speed)} m/s`,
+    ];
+
+    if (dispersion.model === 'maxwellian') {
+      lines.push(s('derivedSigma').replace('{sigma}', fmt(gaussianSigmas(dispersion)?.[0] ?? 0)));
+    }
+    if (dispersion.maxTotalSpeed > 0) {
+      lines.push(s('capRejects').replace('{percent}', ((1 - stats.acceptance) * 100).toFixed(1)));
+      if (stats.acceptance < Breakup.LOW_CAP_ACCEPTANCE) {
+        lines.push(`<span class="breakup-dv-warning">${s('capTooLow')}</span>`);
+      }
+    }
+
+    el.innerHTML = lines.join('<br />');
+  }
+
+  /** Below this fraction of draws inside the cap, many fragments pile up on the cap sphere. */
+  private static readonly LOW_CAP_ACCEPTANCE = 0.005;
 
   /** Show the Clear Breakup action only when there is a breakup to undo. */
   private updateClearButton_(): void {
@@ -502,19 +683,39 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     }
   }
 
-  private static readonly PERSISTED_INPUT_IDS = ['hc-startNum', 'hc-event-preset', 'hc-dv-radial', 'hc-dv-intrack', 'hc-dv-crosstrack', 'hc-count'];
+  private static readonly PERSISTED_INPUT_IDS = [
+    'hc-startNum',
+    'hc-event-preset',
+    'hc-dv-frame',
+    'hc-dv-model',
+    'hc-dv-radial',
+    'hc-dv-intrack',
+    'hc-dv-crosstrack',
+    'hc-dv-mean',
+    'hc-dv-cap',
+    'hc-count',
+  ];
+
+  /** Read the raw form strings; missing optional fields fall back to the parser defaults. */
+  private static readRawForm_(): BreakupRawForm {
+    const value = (id: string) => (getEl(id, true) as HTMLInputElement | HTMLSelectElement | null)?.value ?? '';
+
+    return {
+      radialDv: value('hc-dv-radial'),
+      inTrackDv: value('hc-dv-intrack'),
+      crossTrackDv: value('hc-dv-crosstrack'),
+      count: value('hc-count'),
+      startNum: value('hc-startNum'),
+      frame: value('hc-dv-frame'),
+      model: value('hc-dv-model'),
+      meanSpeed: value('hc-dv-mean'),
+      maxTotalSpeed: value('hc-dv-cap'),
+    };
+  }
 
   private static getFormData_(catalogManagerInstance: CatalogManager) {
     const satId = catalogManagerInstance.sccNum2Id((<HTMLInputElement>getEl('hc-scc')).value);
-    const raw: BreakupRawForm = {
-      radialDv: (<HTMLInputElement>getEl('hc-dv-radial')).value,
-      inTrackDv: (<HTMLInputElement>getEl('hc-dv-intrack')).value,
-      crossTrackDv: (<HTMLInputElement>getEl('hc-dv-crosstrack')).value,
-      count: (<HTMLInputElement>getEl('hc-count')).value,
-      startNum: (<HTMLInputElement>getEl('hc-startNum')).value,
-    };
-
-    const { params, startNumWasInvalid } = parseBreakupParams(raw, Breakup.DEFAULT_START_NUM);
+    const { params, startNumWasInvalid } = parseBreakupParams(Breakup.readRawForm_(), Breakup.DEFAULT_START_NUM);
 
     return { satId, ...params, startNumWasInvalid };
   }

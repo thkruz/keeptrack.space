@@ -62,3 +62,21 @@
   box-shadow: 0 1px 0 0 var(--color-primary);
 }
 #settings-menu .input-field input:focus-visible { outline: none; }
+
+/* Translated action labels (de/es/fr/ru/uk/pl/it) run longer than the row, and the
+ * shared nowrap + ellipsis clips them. Let the label wrap to a second line and let
+ * the row grow to fit instead of the fixed 40px height. */
+#settings-menu .kt-action {
+  height: auto;
+  min-height: 40px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+#settings-menu .kt-action-label {
+  min-width: 0;
+  white-space: normal;
+  text-overflow: clip;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}

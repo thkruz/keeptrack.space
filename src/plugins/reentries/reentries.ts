@@ -1,4 +1,5 @@
 import { SatMath } from '@app/app/analysis/sat-math';
+import { apiFetch } from '@app/app/data/api-fetch';
 import { CatalogSearch } from '@app/app/data/catalog-search';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -13,12 +14,26 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { hideLoading, showLoading, showLoadingSticky } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
+import { settingsManager } from '@app/settings/settings';
 import { Degrees, RAD2DEG, Satellite, SpaceObjectType } from '@ootk/src/main';
 import sputnickPng from '@public/img/icons/sputnick.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './reentries.css';
 
 const TABS_ID = 'reentries-tabs';
+
+/**
+ * Satellite detail API fields the TIP table needs (mass and the dimensions the
+ * volume estimate uses), mapped to their Satellite property names. These are
+ * not in the bulk catalog; the detail service only loads them when an object is
+ * selected, which left the TIP Dry Mass and Volume columns blank until then.
+ */
+const TIP_DETAIL_FIELDS: [string, string][] = [
+  ['DRY_MASS', 'dryMass'],
+  ['LENGTH', 'length'],
+  ['DIAMETER', 'diameter'],
+  ['SPAN', 'span'],
+];
 
 export interface TipMsg {
   NORAD_CAT_ID: string;
@@ -42,11 +57,15 @@ export class Reentries extends KeepTrackPlugin {
   dependencies_ = [];
   private readonly tipDataSrc_ = 'https://r2.keeptrack.space/spacetrack-tip.json';
   protected selectSatIdOnCruncher_: number | null = null;
+  /** True when the deferred selection must not recentre the camera (fly-to-corridor mode). */
+  private isDeferredSelectWithoutRecenter_ = false;
   protected tipList_: TipMsg[] = [];
   protected reentryList_: Satellite[] = [];
   private isLoggedIn_ = false;
   private isFetching_ = false;
   private isFlyToCorridor_ = false;
+  /** NORAD IDs whose mass/size detail has already been requested for the TIP table. */
+  private readonly detailRequested_ = new Set<string>();
 
   // =========================================================================
   // Composition-based configuration methods
@@ -171,7 +190,8 @@ export class Reentries extends KeepTrackPlugin {
         },
       ],
       tips: [t7e('plugins.Reentries.help.tip1'), t7e('plugins.Reentries.help.tip2'), t7e('plugins.Reentries.help.tip3')],
-      shortcuts: [{ keys: ['R'], description: t7e('plugins.Reentries.help.shortcutToggle') }],
+      // Uppercase R only arrives with Shift held, so the chord is Shift+R (plain r is camera auto-rotate).
+      shortcuts: [{ keys: ['Shift', 'R'], description: t7e('plugins.Reentries.help.shortcutToggle') }],
     };
   }
 
@@ -179,8 +199,11 @@ export class Reentries extends KeepTrackPlugin {
     return [
       {
         key: 'R',
+        // evt.key is 'R' only while Shift is held; say so explicitly so the help reads Shift+R.
+        shift: true,
         // ctrl:false so Ctrl+Shift+R belongs to Video Director, not this toggle.
         ctrl: false,
+        description: t7e('plugins.Reentries.help.shortcutToggle'),
         callback: () => this.bottomMenuClicked(),
       },
     ];
@@ -199,9 +222,14 @@ export class Reentries extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.onCruncherMessage, () => {
       if (this.selectSatIdOnCruncher_ !== null) {
-        PluginRegistry.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
+        if (this.isDeferredSelectWithoutRecenter_) {
+          Reentries.selectWithoutRecentering_(this.selectSatIdOnCruncher_);
+        } else {
+          PluginRegistry.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
+        }
 
         this.selectSatIdOnCruncher_ = null;
+        this.isDeferredSelectWithoutRecenter_ = false;
       }
     });
   }
@@ -294,6 +322,7 @@ export class Reentries extends KeepTrackPlugin {
       .then((tipList: TipMsg[]) => {
         this.setTipList_(tipList);
         this.createTipTable_();
+        this.fetchMissingTipDetails_();
 
         if (this.tipList_.length === 0) {
           errorManagerInstance.warn(t7e('plugins.Reentries.errorMsgs.noTipData' as Parameters<typeof t7e>[0]));
@@ -392,7 +421,7 @@ export class Reentries extends KeepTrackPlugin {
     ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
 
     if (this.isFlyToCorridor_) {
-      this.flyToCorridor_(this.tipList_[row], decayEpoch);
+      this.flyToCorridor_(this.tipList_[row], decayEpoch, sat.id);
 
       return;
     }
@@ -400,19 +429,26 @@ export class Reentries extends KeepTrackPlugin {
     ServiceLocator.getUiManager().doSearch(`${sat.sccNum5 ?? sat.sccNum}`);
 
     this.selectSatIdOnCruncher_ = sat.id;
+    this.isDeferredSelectWithoutRecenter_ = false;
   }
 
   /**
    * Flies the camera to the predicted reentry corridor location for a TIP
-   * message. The object is deselected first so the camera looks at the ground
+   * message. The object is selected (so its info box, orbit and corridor show)
+   * without the camera recentring on it, so the camera looks at the ground
    * point on the globe rather than chasing the decaying satellite.
    */
-  private flyToCorridor_(tip: TipMsg, decayEpoch: Date): void {
+  private flyToCorridor_(tip: TipMsg, decayEpoch: Date, satId: number): void {
     const lat = <Degrees>Reentries.parseLat_(tip.LAT);
     const lon = <Degrees>Reentries.parseLon_(tip.LON);
     const camera = ServiceLocator.getMainCamera();
 
-    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
+    /*
+     * Select on the next cruncher update, like the follow path: right after the time jump the
+     * object has no propagated position yet and selectSat would refuse it.
+     */
+    this.selectSatIdOnCruncher_ = satId;
+    this.isDeferredSelectWithoutRecenter_ = true;
 
     /*
      * Defer one frame so the time jump propagates before lon2yaw resolves the
@@ -422,6 +458,22 @@ export class Reentries extends KeepTrackPlugin {
     requestAnimationFrame(() => {
       camera.lookAtLatLon(lat, lon, 0, decayEpoch);
     });
+  }
+
+  /**
+   * Select an object while keeping the camera where it is: selection normally
+   * switches to a satellite-centred camera (isFocusOnSatelliteWhenSelected), which
+   * would fight the corridor fly-to.
+   */
+  private static selectWithoutRecentering_(satId: number): void {
+    const isFocus = settingsManager.isFocusOnSatelliteWhenSelected;
+
+    settingsManager.isFocusOnSatelliteWhenSelected = false;
+    try {
+      PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satId);
+    } finally {
+      settingsManager.isFocusOnSatelliteWhenSelected = isFocus;
+    }
   }
 
   protected createTipTable_(): void {
@@ -477,7 +529,6 @@ export class Reentries extends KeepTrackPlugin {
     const unknown = t7e('Common.unknown');
     let rcs = reentered;
     let age = reentered;
-    let volume = reentered;
     let gammaDegrees = reentered;
 
     if (sat) {
@@ -508,27 +559,153 @@ export class Reentries extends KeepTrackPlugin {
       }
 
       age = sat ? `${sat.ageOfElset(new Date(), 'hours').toFixed(2)}` : unknown;
-
-      const span = sat?.span ? parseFloat(sat.span.replace(/[^0-9.]/gu, '')) : -1;
-      const length = sat?.length ? parseFloat(sat.length.replace(/[^0-9.]/gu, '')) : -1;
-      const diameter = sat?.diameter ? parseFloat(sat.diameter.replace(/[^0-9.]/gu, '')) : -1;
-
-      volume = span !== -1 && length !== -1 && diameter !== -1 ? `${((Math.PI / 6) * span * length * diameter).toFixed(2)}` : unknown;
     }
+
+    const massVolume = Reentries.tipMassVolume_(sat);
 
     Reentries.createCell_(tr, this.tipList_[i].NORAD_CAT_ID);
     Reentries.createCell_(tr, this.tipList_[i].DECAY_EPOCH);
     Reentries.createCell_(tr, this.lat2degrees_(this.tipList_[i].LAT));
     Reentries.createCell_(tr, this.lon2degrees_(this.tipList_[i].LON));
-    Reentries.createCell_(tr, this.tipList_[i].WINDOW);
+    Reentries.createCell_(tr, Reentries.formatTipWindow_(this.tipList_[i].WINDOW));
     Reentries.createCell_(tr, this.tipList_[i].NEXT_REPORT);
     Reentries.createCell_(tr, gammaDegrees);
     Reentries.createCell_(tr, rcs);
     Reentries.createCell_(tr, age);
-    Reentries.createCell_(tr, sat?.dryMass ?? reentered);
-    Reentries.createCell_(tr, volume);
+    Reentries.createCell_(tr, massVolume.dryMass);
+    Reentries.createCell_(tr, massVolume.volume);
 
     return tr;
+  }
+
+  /**
+   * TIP WINDOW is the plus/minus uncertainty around DECAY_EPOCH in minutes
+   * (USSPACECOM TIP convention), so the full window is twice this value. Show
+   * the sign so nobody reads 840 as the total width.
+   */
+  protected static formatTipWindow_(window: string): string {
+    const minutes = parseInt(window, 10);
+
+    return Number.isFinite(minutes) ? `\u00B1${minutes}` : window;
+  }
+
+  /** Dry mass and estimated volume cells for a TIP row ("Reentered" when the object is gone). */
+  private static tipMassVolume_(sat: Satellite | null): { dryMass: string; volume: string } {
+    if (!sat) {
+      const reentered = t7e('plugins.Reentries.labels.reentered' as Parameters<typeof t7e>[0]);
+
+      return { dryMass: reentered, volume: reentered };
+    }
+
+    const unknown = t7e('Common.unknown');
+    const toNumber = (value?: string): number => (value ? parseFloat(`${value}`.replace(/[^0-9.]/gu, '')) : NaN);
+    const span = toNumber(sat.span);
+    const length = toNumber(sat.length);
+    const diameter = toNumber(sat.diameter);
+    const volume = Number.isFinite(span) && Number.isFinite(length) && Number.isFinite(diameter) ? `${((Math.PI / 6) * span * length * diameter).toFixed(2)}` : unknown;
+    const dryMass = sat.dryMass ? `${sat.dryMass}` : unknown;
+
+    return { dryMass, volume };
+  }
+
+  /**
+   * Mass and size come from the per-object detail API, which is normally only
+   * called when an object is selected. Request it for every TIP object that
+   * lacks it and patch the Dry Mass / Volume cells in place when it arrives
+   * (rebuilding the table would re-index rows and drop Pro corridor layers).
+   */
+  private fetchMissingTipDetails_(): void {
+    const catalogManager = ServiceLocator.getCatalogManager();
+    const pending: Promise<boolean>[] = [];
+
+    for (const tip of this.tipList_) {
+      const sat = catalogManager.sccNum2Sat(tip.NORAD_CAT_ID);
+
+      if (!sat || sat.dryMass || this.detailRequested_.has(sat.sccNum)) {
+        continue;
+      }
+
+      this.detailRequested_.add(sat.sccNum);
+      pending.push(Reentries.fetchTipDetail_(sat));
+    }
+
+    if (pending.length === 0) {
+      return;
+    }
+
+    Promise.all(pending)
+      .then((results) => {
+        if (results.some(Boolean)) {
+          this.refreshTipDetailCells_();
+        }
+      })
+      .catch(() => {
+        // fetchTipDetail_ never rejects; nothing to recover.
+      });
+  }
+
+  /** Fetches mass/size for one object and merges any missing fields onto it. Resolves true when something changed. */
+  protected static async fetchTipDetail_(sat: Satellite): Promise<boolean> {
+    try {
+      const response = await apiFetch(`${settingsManager.dataSources.satDetail}${sat.sccNum}`);
+
+      if (!response.ok) {
+        return false;
+      }
+
+      let data = await response.json();
+
+      if (Array.isArray(data)) {
+        data = data[0];
+      } else if (data?.data && typeof data.data === 'object') {
+        data = data.data;
+      }
+
+      if (!data || typeof data !== 'object') {
+        return false;
+      }
+
+      const satRecord = sat as unknown as Record<string, unknown>;
+      let isChanged = false;
+
+      for (const [apiKey, satField] of TIP_DETAIL_FIELDS) {
+        const value = data[apiKey];
+
+        if (value !== undefined && value !== null && value !== '' && !satRecord[satField]) {
+          satRecord[satField] = value;
+          isChanged = true;
+        }
+      }
+
+      return isChanged;
+    } catch {
+      return false;
+    }
+  }
+
+  /** Rewrites the Dry Mass and Volume cells (the last two columns) of every TIP row from current object data. */
+  protected refreshTipDetailCells_(): void {
+    const tbl = getEl('reentries-tip-table', true) as HTMLTableElement | null;
+
+    if (!tbl) {
+      return;
+    }
+
+    const catalogManager = ServiceLocator.getCatalogManager();
+
+    for (const tr of Array.from(tbl.rows)) {
+      const rowIdx = tr.dataset.row;
+      const tip = typeof rowIdx === 'string' ? this.tipList_[parseInt(rowIdx, 10)] : undefined;
+
+      if (!tip || tr.cells.length < 2) {
+        continue;
+      }
+
+      const { dryMass, volume } = Reentries.tipMassVolume_(catalogManager.sccNum2Sat(tip.NORAD_CAT_ID));
+
+      tr.cells[tr.cells.length - 2].textContent = dryMass;
+      tr.cells[tr.cells.length - 1].textContent = volume;
+    }
   }
 
   // =========================================================================

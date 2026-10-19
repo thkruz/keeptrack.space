@@ -3,11 +3,11 @@
     "title": "Orbitální data",
     "Apogee": {
       "label": "Apogeum",
-      "tooltip": "Nejvyšší bod oběžné dráhy"
+      "tooltip": "Nejvyšší výška na oběžné dráze nad rovníkovým poloměrem (6378,137 km)"
     },
     "Perigee": {
       "label": "Perigeum",
-      "tooltip": "Nejnižší bod oběžné dráhy"
+      "tooltip": "Nejnižší výška na oběžné dráze nad rovníkovým poloměrem (6378,137 km)"
     },
     "Inclination": {
       "label": "Inklinace",
@@ -52,25 +52,30 @@
       "label": "Rychlost",
       "tooltip": "Aktuální rychlost satelitu (čím blíže k Zemi, tím vyšší)"
     },
+    "GPEpoch": {
+      "label": "Epocha GP",
+      "tooltip": "Epocha sady elementů použité pro propagaci"
+    },
     "AgeOfGP": {
       "label": "Stáří GP",
-      "tooltip": "Čas od výpočtu oficiální dráhy (starší data GP jsou obvykle méně přesná)",
+      "tooltip": "Čas od epochy GP do aktuálního času simulace (starší data GP jsou obvykle méně přesná; záporná hodnota znamená, že epocha je po čase simulace)",
       "days": "Dny",
       "hours": "Hodiny",
       "epochYear": "Rok epochy",
-      "epochDay": "Den epochy"
+      "epochDay": "Den epochy",
+      "epochAfterSimTime": "epocha GP je po čase simulace"
     },
     "RadialSigma": {
       "label": "Radiální sigma",
-      "tooltip": "Radiální nejistota (metry)"
+      "tooltip": "Radiální nejistota polohy 1 sigma z kovariance odvozené z TLE v epoše GP (soustava RIC). Stejné hodnoty používá Pc i zpráva o konjunkci."
     },
     "InTrackSigma": {
       "label": "Podélná sigma",
-      "tooltip": "Podélná nejistota (metry)"
+      "tooltip": "Nejistota polohy ve směru letu 1 sigma z kovariance odvozené z TLE v epoše GP (soustava RIC). Stejné hodnoty používá Pc i zpráva o konjunkci."
     },
     "CrossTrackSigma": {
       "label": "Příčná sigma",
-      "tooltip": "Příčná nejistota (metry)"
+      "tooltip": "Příčná nejistota polohy 1 sigma z kovariance odvozené z TLE v epoše GP (soustava RIC). Stejné hodnoty používá Pc i zpráva o konjunkci."
     },
     "meter": "m",
     "kilometer": "km",

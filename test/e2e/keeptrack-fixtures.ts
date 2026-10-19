@@ -14,6 +14,8 @@ export interface AppReadyOptions {
    * Use sparingly — prefer fixing the warning at the source.
    */
   consoleAllowlist?: AllowlistEntry[];
+  /** URL query string (without the leading `?`) to boot with, e.g. `date=...&rate=0`. */
+  query?: string;
 }
 
 const listenerByPage = new WeakMap<Page, ListenerHandle>();
@@ -66,7 +68,7 @@ export async function waitForAppReady(page: Page, options: AppReadyOptions = {})
     });
   });
 
-  await page.goto('/');
+  await page.goto(options.query ? `/?${options.query}` : '/');
   await page.waitForSelector('#loading-screen', { state: 'hidden', timeout: 45_000 });
 
   // Wait for the app to signal it is fully ready (all plugins, drawer, etc.)
@@ -82,6 +84,18 @@ export async function waitForAppReady(page: Page, options: AppReadyOptions = {})
  * include the captured text and source location so the cause is obvious
  * from CI logs alone.
  */
+/** Why an OSS-baseline screenshot spec skips on a Pro build. */
+export const OSS_BASELINE_SKIP = 'baseline captured on the OSS build (TimeSlider top bar); run against an OSS dist/ (npm run build)';
+
+/**
+ * True on a Pro build. Pro replaces the OSS TimeSlider with the access-timeline strip
+ * (manifest `enabled: !__IS_PRO__`), so the top bar, canvas height and rail differ and an
+ * OSS screenshot baseline can never match. Mirrors the OSS-build skip in the Pro specs.
+ */
+export async function isProBuild(page: Page): Promise<boolean> {
+  return (await page.locator('#time-slider-container').count()) === 0;
+}
+
 export function expectCleanBoot(page: Page): void {
   const handle = listenerByPage.get(page);
 

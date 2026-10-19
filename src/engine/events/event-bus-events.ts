@@ -22,6 +22,13 @@ export enum EventBusEvent {
   bottomMenuClick = 'bottomMenuClick',
   hideSideMenus = 'hideSideMenus',
   orbitManagerInit = 'orbitManagerInit',
+  /**
+   * Emitted when the orbit cruncher's path for one object reaches the GPU. Args: satId, the
+   * anchor-relative points (x, y, z, alpha), the float64 anchor, the Julian date of sample 0 and
+   * the minutes between samples (TLE satellites only, else undefined), and whether the points are
+   * Earth-fixed. The points array is reused by the next response; copy what you keep.
+   */
+  orbitPathUpdated = 'orbitPathUpdated',
   drawManagerLoadScene = 'drawManagerLoadScene',
   drawOptionalScenery = 'drawOptionalScenery',
   /**

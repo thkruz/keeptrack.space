@@ -86,6 +86,89 @@ describe('PluginDrawer', () => {
     expect(emitSpy).toHaveBeenCalledWith(EventBusEvent.bottomMenuClick, 'overflight-icon');
   });
 
+  describe('rail icon activation', () => {
+    const addItem = (pluginId: string): HTMLElement => {
+      const content = getEl('drawer-content', true)!;
+
+      content.insertAdjacentHTML('beforeend', `<div class="drawer-item" data-plugin-id="${pluginId}" role="button"><span class="drawer-item-label">${pluginId}</span></div>`);
+
+      return content.querySelector(`.drawer-item[data-plugin-id="${pluginId}"]`) as HTMLElement;
+    };
+
+    // The suite already runs on fake timers (standard environment).
+    it('a click that arrives with the pointer activates the plugin on the first click', () => {
+      buildDrawer();
+      const drawerEl = getEl('plugin-drawer')!;
+
+      drawerEl.classList.add('rail-mode');
+      const item = addItem('ric-plot-icon');
+      const emitSpy = vi.spyOn(EventBus.getInstance(), 'emit');
+
+      // Enter the rail and click in one motion (no hover dwell).
+      drawerEl.dispatchEvent(new MouseEvent('mouseenter'));
+      item.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+      item.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      vi.advanceTimersByTime(500);
+
+      expect(emitSpy).toHaveBeenCalledWith(EventBusEvent.bottomMenuClick, 'ric-plot-icon');
+      // The press cancelled the pending hover-expansion so the layout never moved under the cursor.
+      expect(drawerEl.classList.contains('rail-hover')).toBe(false);
+    });
+
+    it('resting on the rail still expands it after the hover-intent delay', () => {
+      buildDrawer();
+      const drawerEl = getEl('plugin-drawer')!;
+
+      drawerEl.classList.add('rail-mode');
+      drawerEl.dispatchEvent(new MouseEvent('mouseenter'));
+
+      expect(drawerEl.classList.contains('rail-hover')).toBe(false);
+      vi.advanceTimersByTime(300);
+      expect(drawerEl.classList.contains('rail-hover')).toBe(true);
+
+      drawerEl.dispatchEvent(new MouseEvent('mouseleave'));
+      expect(drawerEl.classList.contains('rail-hover')).toBe(false);
+    });
+
+    it('pressing the account row cancels a pending hover-expansion so the row cannot move', () => {
+      buildDrawer();
+      const drawerEl = getEl('plugin-drawer')!;
+      const account = getEl('drawer-user-account')!;
+
+      account.innerHTML = '<a id="user-account__login-btn" class="drawer-user-account__row">Login</a>';
+      drawerEl.classList.add('rail-mode');
+      drawerEl.dispatchEvent(new MouseEvent('mouseenter'));
+      account.firstElementChild!.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+      vi.advanceTimersByTime(500);
+
+      expect(drawerEl.classList.contains('rail-hover')).toBe(false);
+    });
+
+    it('anchors the account row directly above the rail toggle', () => {
+      buildDrawer();
+      const account = getEl('drawer-user-account')!;
+
+      // The status footer collapses in rail mode and expands on hover; it must sit ABOVE the account
+      // row so that expansion never slides the login row out from under the cursor.
+      expect(account.nextElementSibling?.id).toBe('drawer-rail-toggle');
+      expect(account.previousElementSibling?.id).toBe('drawer-status-footer');
+    });
+
+    it('activates the pressed item when the layout shifted between mousedown and mouseup', () => {
+      buildDrawer();
+      const item = addItem('ric-plot-icon');
+      const content = getEl('drawer-content', true)!;
+      const emitSpy = vi.spyOn(EventBus.getInstance(), 'emit');
+
+      item.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+      // mouseup landed elsewhere, so the browser fires click on the common ancestor.
+      content.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      vi.advanceTimersByTime(500);
+
+      expect(emitSpy).toHaveBeenCalledWith(EventBusEvent.bottomMenuClick, 'ric-plot-icon');
+    });
+  });
+
   it('toggleRailMode is a no-op in mobile mode', () => {
     settingsManager.isMobileModeEnabled = true;
     const drawer = buildDrawer();

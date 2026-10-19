@@ -96,6 +96,9 @@ describe('BreakupAnalysis behavior', () => {
     expect(getEl('breakup-analysis-detail')!.style.display).toBe('block');
     expect(getEl('breakup-analysis-event-info')!.innerHTML.length).toBeGreaterThan(0);
     expect(getEl('breakup-analysis-stats')!.innerHTML.length).toBeGreaterThan(0);
+    // The info card names the launch designator next to the parent NORAD.
+    expect(getEl('breakup-analysis-event-info')!.innerHTML).toContain('1999-025');
+    expect(getEl('breakup-analysis-event-info')!.innerHTML).toContain("Int'l Designator");
   });
 
   it('selectEvent_ ignores an unknown event id', () => {

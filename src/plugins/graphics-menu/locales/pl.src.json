@@ -1,0 +1,55 @@
+{
+  "plugins": {
+    "GraphicsMenuPlugin": {
+      "title": "Menu grafiki",
+      "bottomIconLabel": "Menu grafiki",
+      "filterPlaceholder": "Filtruj ustawienia grafiki...",
+      "sections": {
+        "display": "Wyświetlanie",
+        "orbits": "Orbity"
+      },
+      "labels": {
+        "overallQuality": "Jakość ogólna",
+        "autoReduced": "Automatycznie obniżono ze względu na wydajność",
+        "blackEarth": "Rysuj czarną Ziemię",
+        "grayscaleEarth": "Rysuj Ziemię w skali szarości",
+        "ambientLighting": "Oświetlenie otoczenia Ziemi",
+        "nightAsDay": "Rysuj noc jak dzień",
+        "graticule": "Rysuj siatkę kartograficzną",
+        "politicalMap": "Rysuj granice państw",
+        "dimOrbitInEclipse": "Przyciemnij orbitę w zaćmieniu",
+        "orbitEclipseAlpha": "Siła przyciemnienia w zaćmieniu",
+        "orbitFadeFactor": "Zanikanie linii orbity"
+      },
+      "tooltips": {
+        "blackEarth": "Ukrywa tekstury Ziemi",
+        "grayscaleEarth": "Zmienia Ziemię na skalę szarości",
+        "ambientLighting": "Wyłącz, aby ukryć oświetlenie otoczenia",
+        "nightAsDay": "Oświetla nocną stronę Ziemi tak, jakby był dzień",
+        "graticule": "Rysuje na Ziemi linie szerokości i długości geograficznej",
+        "politicalMap": "Rysuje na Ziemi granice krajów",
+        "dimOrbitInEclipse": "Przyciemnia część linii orbity, na której satelita jest w cieniu Ziemi",
+        "orbitEclipseAlpha": "Krycie linii orbity w cieniu Ziemi: 0,05 prawie ją ukrywa, 1 oznacza brak przyciemnienia",
+        "orbitFadeFactor": "Jak długo linia orbity pozostaje jasna, zanim zaniknie: niższe wartości zanikają wcześniej"
+      },
+      "options": {
+        "low": "Niska",
+        "medium": "Średnia",
+        "high": "Wysoka",
+        "ultra": "Ultra",
+        "custom": "Niestandardowa"
+      },
+      "buttons": {
+        "resetToDefaults": "Przywróć domyślne"
+      },
+      "help": {
+        "overview": "Menu Grafika decyduje o wyglądzie sceny. Wybierz poziom <strong>Jakość ogólna</strong>, aby ustawić naraz wszystkie ustawienia zależne od jakości, a potem dostosuj pojedyncze ustawienia w kartach poniżej. Zmiany działają od razu i są zachowywane między sesjami.",
+        "imgAlt": "Menu Grafika z wyborem jakości ogólnej i kartami ustawień",
+        "imgCaption": "Wybór jakości ogólnej na górze, karty ustawień poniżej i Przywróć domyślne na dole.",
+        "howToUse": "<ol><li>Otwórz <strong>Menu grafiki</strong> z panelu, w grupie Ustawienia.</li><li>Kliknij <strong>Niska</strong>, <strong>Średnia</strong>, <strong>Wysoka</strong> lub <strong>Ultra</strong>, aby jednym krokiem ustawić wszystko, co zależy od jakości.</li><li>Zmień dowolne ustawienie poniżej, aby dopracować wygląd; wybór pokaże wtedy <strong>Niestandardowa</strong>.</li><li>Wpisz nazwę w polu filtru, aby znaleźć ustawienie.</li><li>Kliknij <strong>Przywróć domyślne</strong>, aby przywrócić wszystkie ustawienia grafiki.</li></ol>",
+        "tip1": "Wybór pokazuje Niestandardowa, gdy Twoje ustawienia nie pasują dokładnie do żadnego poziomu. Wybierz poziom ponownie, aby do niego wrócić.",
+        "tip2": "Gdy spada liczba klatek, KeepTrack może sam wyłączyć kosztowne efekty. Menu informuje wtedy, że ustawienia zostały automatycznie obniżone."
+      }
+    }
+  }
+}

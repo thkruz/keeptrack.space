@@ -1,0 +1,61 @@
+{
+  "plugins": {
+    "SatelliteSwath": {
+      "bottomIconLabel": "地上観測幅",
+      "title": "地上観測幅",
+      "sections": {
+        "sensor": "センサー",
+        "display": "表示"
+      },
+      "labels": {
+        "preset": "プリセット",
+        "inputMode": "観測範囲の入力方法",
+        "modeWidth": "観測幅 (km)",
+        "modeFov": "視野角 (度)",
+        "swathWidthKm": "観測幅 (km)",
+        "fovDeg": "視野角 (度)",
+        "maxOffNadirDeg": "最大オフナディア角 (度)",
+        "minSunElevDeg": "最小太陽高度 (度)",
+        "daylightOnly": "昼間のみ",
+        "nadirReadout": "直下の観測幅 約 {km} km (FOV {fov}°)",
+        "nadirReadoutUnknown": "この軌道では直下の観測幅を計算できません",
+        "presetsIllustrative": "プリセットは例示であり、公表された仕様ではありません。"
+      },
+      "presets": {
+        "hrEo": "高分解能光学",
+        "mrEo": "中分解能光学",
+        "wide": "広視野イメージャ",
+        "custom": "カスタム"
+      },
+      "commands": {
+        "toggle": "地上観測幅の切り替え",
+        "openSettings": "地上観測幅の設定を開く"
+      },
+      "shortcuts": {
+        "toggle": "地上観測幅を切り替え"
+      },
+      "graphics": {
+        "sectionLabel": "地上観測幅",
+        "drawSwath": {
+          "label": "地上観測幅を描画",
+          "helpText": "選択した衛星の撮像幅を描画中の軌道に沿って表示します。"
+        },
+        "fieldOfRegardFill": {
+          "label": "観測可能範囲の塗りつぶし",
+          "helpText": "直下の観測幅の横に、センサーを傾けて届く半透明の帯を描画します。"
+        }
+      },
+      "errorMsgs": {
+        "outOfRange": "{min} から {max} までの数値を入力してください。",
+        "beyondHorizon": "この刈幅はこの衛星の高度から見た地平線を超えています。{max} km 以下を入力してください。"
+      },
+      "help": {
+        "overview": "選択した衛星のセンサーが描画中の軌道に沿って撮像できる範囲を示します。不透明な直下の観測幅と、傾斜限界までの半透明な観測可能範囲です。衛星直下点で太陽が最小高度より低い区間は暗く表示され、「昼間のみ」では非表示になります。扇形が衛星の位置から観測幅の端まで追従します。",
+        "howToUse": "衛星を選択し、地上観測幅レイヤーをオンにします。プリセットを選ぶか、観測幅または視野角、最大オフナディア角、最小太陽高度を入力します。設定は衛星ごとに保存されます。",
+        "tip1": "プリセットは例示であり、実在するセンサーの公表仕様ではありません。",
+        "tip2": "観測可能範囲の塗りつぶしはグラフィックメニューの品質レベル (中以上) にも従います。",
+        "flatMap": "フラットマップモードでは観測幅は表示されません。"
+      }
+    }
+  }
+}

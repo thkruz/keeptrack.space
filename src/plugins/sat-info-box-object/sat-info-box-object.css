@@ -1,0 +1,17 @@
+/**
+ * Styling for the Object Data / Secondary Satellite info box sections.
+ */
+
+/* RIC sign convention line above the Linear/Radial/In-Track/Cross-Track rows */
+#secondary-sat-info .sat-sec-convention-row {
+  display: block;
+}
+
+#secondary-sat-info .sat-sec-convention {
+  font-size: 11px;
+  line-height: 1.35;
+  font-style: italic;
+  opacity: 0.75;
+  padding: 2px 0 4px;
+  white-space: normal;
+}

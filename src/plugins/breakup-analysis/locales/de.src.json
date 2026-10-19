@@ -3,7 +3,7 @@
     "BreakupAnalysis": {
       "bottomIconLabel": "Zerfall-Analyse",
       "title": "Zerfall-Analyse",
-      "helpBody": "Das Zerfall-Analyse-Plugin bietet eine Datenbank der wichtigsten Satelliten-Zerfallereignisse in der Geschichte. Wählen Sie ein Ereignis aus, um detaillierte Informationen einschließlich des Ursprungsobjekts, der Zerfallursache, des Zeitrahmens vom Start bis zum Zerfall und der Trümmerverteilungsanalyse anzuzeigen. Das Plugin durchsucht den aktuellen Katalog nach verfolgten Trümmern, die mit jedem Ereignis übereinstimmen, und zeigt statistische Analysen der Höhenbereiche, Exzentrizität und Neigungsverteilungen an.",
+      "helpBody": "Das Zerfall-Analyse-Plugin bietet eine Datenbank der wichtigsten Satelliten-Zerfallereignisse in der Geschichte. Wählen Sie ein Ereignis aus, um detaillierte Informationen einschließlich des Ursprungsobjekts, der Zerfallursache, des Zeitrahmens vom Start bis zum Zerfall und der Trümmerverteilungsanalyse anzuzeigen. Das Plugin durchsucht den aktuellen Katalog nach verfolgten Trümmern, die mit jedem Ereignis übereinstimmen, und zeigt statistische Analysen der Höhenbereiche, Exzentrizität und Neigungsverteilungen an. Jedes Ereignis zeigt die internationale Kennung des Starts und die NORAD-Nummer des Ursprungsobjekts, sodass zwei Ereignisse derselben Raketenfamilie (zum Beispiel zwei Zerfälle von CZ-6A-Oberstufen) nicht verwechselt werden.",
       "sections": {
         "events": "Ereignisse",
         "debrisStatistics": "Trümmerstatistik",
@@ -66,7 +66,8 @@
         "perigee": "Perigäum",
         "apogee": "Apogäum",
         "incDeg": "Neig. (°)",
-        "ecc": "Exz."
+        "ecc": "Exz.",
+        "intlDes": "Internationale Kennung"
       },
       "errorMsgs": {
         "parentNotFound": "Das Ursprungsobjekt befindet sich nicht im aktuellen Katalog.",

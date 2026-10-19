@@ -1,4 +1,12 @@
-import { buildAllowedTypes, buildSatLine, buildTopCountries, computeOrbits, isSatelliteAllowed, Time2LonFilters } from '@app/plugins/plot-analysis/time2lon-core';
+import {
+  buildAllowedTypes,
+  buildSatLine,
+  buildTopCountries,
+  computeOrbits,
+  isSatelliteAllowed,
+  Time2LonFilters,
+  widenFiltersForSelection,
+} from '@app/plugins/plot-analysis/time2lon-core';
 import { CatalogSource, PayloadStatus, Satellite, SpaceObjectType } from '@ootk/src/main';
 
 const filters = (over: Partial<Time2LonFilters> = {}): Time2LonFilters => ({
@@ -148,5 +156,45 @@ describe('time2lon-core buildSatLine', () => {
   it('returns null when no point survives the window', () => {
     expect(buildSatLine(meta, [{ lon: 100, time: NOW - 60_000 }], NOW, 1440)).toBeNull();
     expect(buildSatLine(meta, [], NOW, 1440)).toBeNull();
+  });
+});
+
+describe('time2lon-core widenFiltersForSelection', () => {
+  // GALAXY 15 (28884) from the iteration-2 scenario-5 log: non-operational, drifting GEO.
+  const galaxy15 = sat({ status: PayloadStatus.NONOPERATIONAL, period: 1455.43, inclination: 3.85, eccentricity: 0.0018 });
+
+  it('turns on Inactive Payloads when the selected drifter is hidden by the default filter', () => {
+    const base = filters();
+
+    expect(isSatelliteAllowed(galaxy15, base, buildAllowedTypes(base))).toBe(false);
+
+    const widened = widenFiltersForSelection(base, galaxy15);
+
+    expect(widened).not.toBe(base);
+    expect(widened.inactivePayloads).toBe(true);
+    expect(widened.activePayloads).toBe(true); // the rest of the band stays visible
+    expect(isSatelliteAllowed(galaxy15, widened, buildAllowedTypes(widened))).toBe(true);
+  });
+
+  it('turns on the matching type and source toggles for rocket bodies, debris and Vimpel objects', () => {
+    expect(widenFiltersForSelection(filters(), sat({ type: SpaceObjectType.ROCKET_BODY })).rocketBodies).toBe(true);
+    expect(widenFiltersForSelection(filters(), sat({ type: SpaceObjectType.DEBRIS })).debris).toBe(true);
+    expect(widenFiltersForSelection(filters(), sat({ source: CatalogSource.VIMPEL })).vimpel).toBe(true);
+  });
+
+  it('returns the same filters when nothing needs to change', () => {
+    const base = filters();
+
+    expect(widenFiltersForSelection(base, null)).toBe(base);
+    expect(widenFiltersForSelection(base, sat())).toBe(base); // operational payload already shown
+    expect(widenFiltersForSelection(base, sat({ type: SpaceObjectType.STAR }))).toBe(base);
+  });
+
+  it('leaves the filters alone when the selection is outside the orbital band', () => {
+    const base = filters();
+
+    expect(widenFiltersForSelection(base, sat({ status: PayloadStatus.NONOPERATIONAL, period: 95 }))).toBe(base);
+    expect(widenFiltersForSelection(base, sat({ status: PayloadStatus.NONOPERATIONAL, inclination: 55 }))).toBe(base);
+    expect(widenFiltersForSelection(base, sat({ status: PayloadStatus.NONOPERATIONAL, eccentricity: 0.7 }))).toBe(base);
   });
 });

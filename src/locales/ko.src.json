@@ -165,5 +165,10 @@
     "satNotFound": "위성 \"{val}\"을(를) 찾을 수 없습니다!",
     "intldesNotFound": "국제 식별 부호 \"{val}\"을(를) 찾을 수 없습니다!",
     "deepSpaceNoEphemeris": "{name}은(는) 심우주 물체입니다. 해당 궤도력은 아직 KeepTrack에서 제공되지 않습니다."
+  },
+  "searchManager": {
+    "resultCountOne": "결과 1개",
+    "resultCount": "결과 {count}개",
+    "resultCountLimited": "{total}개 중 {shown}개 표시"
   }
 }

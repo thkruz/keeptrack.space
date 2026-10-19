@@ -1,0 +1,126 @@
+/*
+ * Graphics menu styles. The menu uses the shared v13 system (.kt-ui-v13 +
+ * kt-section/kt-action/...); see src/engine/ui/menu-v13.css. The OSS and Pro
+ * builds share the #graphics-menu root, so every per-menu rule lives here.
+ */
+
+/* ===== Overall quality selector ===== */
+
+/* A recessed segmented control matching the v13 tab row. Long translated
+ * level names ("Benutzerdefiniert", "Personnalisée") wrap the row onto a second
+ * line instead of clipping, so every label stays readable in full. */
+.kt-ui-v13 .gm-preset-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  background-color: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--color-dark-border);
+  border-radius: var(--kt-radius-md, 6px);
+}
+
+.kt-ui-v13 .gm-preset-row .gm-preset-btn {
+  flex: 1 0 auto;
+  height: 32px;
+  line-height: 32px;
+  padding: 0 8px;
+  margin: 0;
+  border: none;
+  border-radius: var(--kt-radius-sm, 4px);
+  background-color: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  text-transform: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.kt-ui-v13 .gm-preset-row .gm-preset-btn:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: var(--color-text-light, #f5f5f5);
+}
+
+/* The level the current settings match (derived, never stored). */
+.kt-ui-v13 .gm-preset-row .gm-preset-btn.gm-preset-active {
+  background-color: var(--color-primary);
+  color: var(--color-text-light, #f5f5f5);
+}
+
+/* "Custom" is a read-only state: it lights up but cannot be clicked. */
+.kt-ui-v13 .gm-preset-row .gm-preset-custom {
+  cursor: default;
+  font-style: italic;
+}
+
+.kt-ui-v13 .gm-preset-row .gm-preset-custom:not(.gm-preset-active):hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.kt-ui-v13 .gm-quality-note {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--color-dark-text-muted);
+}
+
+/* ===== Filter box ===== */
+.gm-filter-wrapper {
+  margin: 0 6px 12px;
+}
+
+#graphics-menu-filter {
+  box-sizing: border-box;
+  width: 100%;
+  height: 36px;
+  margin: 0;
+  padding: 0 12px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--color-dark-border);
+  border-radius: var(--kt-radius-md, 6px);
+  color: var(--color-text-light, #f5f5f5);
+  font-size: 13px;
+}
+
+#graphics-menu-filter::placeholder {
+  color: var(--color-dark-text-muted);
+}
+
+#graphics-menu-filter:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+/* ===== Dense-form fixes (see docs-local/ui/v13-menu-style.md) ===== */
+
+/* 1. Stacked select/number fields: keep the floating "active" label from
+   striking through the row above. A field that opens a card still needs room
+   for its floating label below the section label. */
+#graphics-menu .kt-field-row .input-field.col { margin-top: 20px; }
+#graphics-menu .kt-section-label + .kt-field-row .input-field.col { margin-top: 8px; }
+#graphics-menu .kt-section .input-field.col.s12 { margin-top: 18px; }
+#graphics-menu .kt-section-label + .input-field.col.s12 { margin-top: 24px; }
+
+/* Toggle rows: tighten the Materialize .row default and give the switches a
+   consistent vertical rhythm inside the card. */
+#graphics-menu .kt-section .switch.row { margin-bottom: 0; margin-top: 12px; }
+#graphics-menu .kt-section-label + .switch.row { margin-top: 4px; }
+
+/* 2. The standalone "Reset" action is a direct child of the form, so it would run
+   12px past the inset cards; subtract the side margins so the edges line up. */
+#graphics-menu-form > .kt-action {
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  margin: 8px 6px 0;
+}
+
+/* 3. Focus indication: swap the app-wide :focus-visible outline (which overlaps
+   the floating label) for KeepTrack's underline. */
+#graphics-menu .input-field input:focus {
+  border-bottom-color: var(--color-primary) !important;
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+#graphics-menu .input-field input:focus-visible { outline: none; }

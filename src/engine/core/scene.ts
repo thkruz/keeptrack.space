@@ -44,6 +44,7 @@ import { PoliticalMap } from '../rendering/draw-manager/political-map';
 import { SensorFovMeshFactory } from '../rendering/draw-manager/sensor-fov-mesh-factory';
 import { SkyBoxSphere } from '../rendering/draw-manager/skybox-sphere';
 import { Sun } from '../rendering/draw-manager/sun';
+import { SwathMeshFactory } from '../rendering/draw-manager/swath-mesh-factory';
 import { WorldMarkers } from '../rendering/draw-manager/world-markers';
 import { WebGLRenderer } from '../rendering/webgl-renderer';
 import { errorManagerInstance } from '../utils/errorManager';
@@ -111,6 +112,7 @@ export class Scene {
   sensorFovFactory: SensorFovMeshFactory;
   coneFactory: ConeMeshFactory;
   frustumFactory: FrustumMeshFactory;
+  swathFactory: SwathMeshFactory;
   /** The pizza box shaped search around a satellite. */
   searchBox: Box;
   frameBuffers = {
@@ -197,6 +199,7 @@ export class Scene {
     this.sensorFovFactory = new SensorFovMeshFactory();
     this.coneFactory = new ConeMeshFactory();
     this.frustumFactory = new FrustumMeshFactory();
+    this.swathFactory = new SwathMeshFactory();
 
     EventBus.getInstance().emit(EventBusEvent.SceneReady);
   }
@@ -228,6 +231,7 @@ export class Scene {
     this.sensorFovFactory.updateAll();
     this.coneFactory.updateAll();
     this.frustumFactory.updateAll();
+    this.swathFactory.updateAll();
   }
 
   updateWorldShift(simulationTime?: Date) {
@@ -335,6 +339,7 @@ export class Scene {
     this.sensorFovFactory.drawAll(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer as WebGLBuffer);
     this.coneFactory.drawAll(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer as WebGLBuffer);
     this.frustumFactory.drawAll(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer as WebGLBuffer);
+    this.swathFactory.drawAll(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer as WebGLBuffer);
     profiler.endGpu(GpuStage.fov);
   }
 

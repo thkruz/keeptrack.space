@@ -9,7 +9,9 @@
       },
       "labels": {
         "shareLink": "分享链接",
-        "url": "可分享的网址"
+        "url": "可分享的网址",
+        "includeTime": "包含当前时间",
+        "includeTimeTooltip": "在链接中固定当前模拟时间。默认关闭，以便接收者在其自己的实时时间看到相同的视图。"
       },
       "buttons": {
         "copyLink": "复制链接",

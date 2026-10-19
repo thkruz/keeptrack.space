@@ -32,6 +32,9 @@ export const estrackSensors = <SensorList>{
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>20000,
     url: 'https://www.esa.int/Enabling_Support/Operations/ESA_ground_stations',
+    // Citation from the SODA ground-station catalog (see ground-stations.ts)
+    sourceUrl: 'https://www.wikidata.org/wiki/Q4349991',
+    sourceRetrieved: '2026-09-19',
     country: 'Sweden',
     operator: Operators.ESA,
   }),
@@ -57,6 +60,9 @@ export const estrackSensors = <SensorList>{
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: 'https://www.esa.int/Enabling_Support/Operations/ESA_ground_stations',
+    // Citation from the SODA ground-station catalog (see ground-stations.ts)
+    sourceUrl: 'https://www.wikidata.org/wiki/Q3497409',
+    sourceRetrieved: '2026-09-19',
     country: 'Belgium',
     operator: Operators.ESA,
   }),
@@ -82,6 +88,9 @@ export const estrackSensors = <SensorList>{
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>20000,
     url: 'https://www.esa.int/Enabling_Support/Operations/ESA_ground_stations',
+    // Citation from the SODA ground-station catalog (see ground-stations.ts)
+    sourceUrl: 'https://www.wikidata.org/wiki/Q18354889',
+    sourceRetrieved: '2026-09-19',
     country: 'Portugal',
     operator: Operators.ESA,
   }),
@@ -107,6 +116,9 @@ export const estrackSensors = <SensorList>{
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: 'https://www.esa.int/Enabling_Support/Operations/ESA_ground_stations',
+    // Citation from the SODA ground-station catalog (see ground-stations.ts)
+    sourceUrl: 'https://www.wikidata.org/wiki/Q18126941',
+    sourceRetrieved: '2026-09-19',
     country: 'France',
     operator: Operators.ESA,
   }),
@@ -132,6 +144,9 @@ export const estrackSensors = <SensorList>{
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: 'https://www.esa.int/Enabling_Support/Operations/ESA_ground_stations',
+    // Citation from the SODA ground-station catalog (see ground-stations.ts)
+    sourceUrl: 'https://www.wikidata.org/wiki/Q4302461',
+    sourceRetrieved: '2026-09-19',
     country: 'Australia',
     operator: Operators.ESA,
   }),
@@ -157,6 +172,9 @@ export const estrackSensors = <SensorList>{
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: 'https://www.esa.int/Enabling_Support/Operations/ESA_ground_stations',
+    // Citation from the SODA ground-station catalog (see ground-stations.ts)
+    sourceUrl: 'https://www.wikidata.org/wiki/Q2889659',
+    sourceRetrieved: '2026-09-19',
     country: 'Spain',
     operator: Operators.ESA,
   }),
@@ -182,6 +200,9 @@ export const estrackSensors = <SensorList>{
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: 'https://www.esa.int/Enabling_Support/Operations/ESA_ground_stations',
+    // Citation from the SODA ground-station catalog (see ground-stations.ts)
+    sourceUrl: 'https://www.wikidata.org/wiki/Q6741341',
+    sourceRetrieved: '2026-09-19',
     country: 'Argentina',
     operator: Operators.ESA,
   }),

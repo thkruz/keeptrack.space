@@ -165,5 +165,10 @@
     "satNotFound": "衛星「{val}」が見つかりませんでした!",
     "intldesNotFound": "国際識別符号「{val}」が見つかりませんでした!",
     "deepSpaceNoEphemeris": "{name}は深宇宙の物体です。その軌道暦はまだKeepTrackでは利用できません。"
+  },
+  "searchManager": {
+    "resultCountOne": "1 件の結果",
+    "resultCount": "{count} 件の結果",
+    "resultCountLimited": "{total} 件中 {shown} 件を表示"
   }
 }

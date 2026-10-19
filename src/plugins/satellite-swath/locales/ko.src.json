@@ -1,0 +1,61 @@
+{
+  "plugins": {
+    "SatelliteSwath": {
+      "bottomIconLabel": "지상 관측 폭",
+      "title": "지상 관측 폭",
+      "sections": {
+        "sensor": "센서",
+        "display": "표시"
+      },
+      "labels": {
+        "preset": "프리셋",
+        "inputMode": "관측 범위 입력 방식",
+        "modeWidth": "관측 폭 (km)",
+        "modeFov": "시야각 (도)",
+        "swathWidthKm": "관측 폭 (km)",
+        "fovDeg": "시야각 (도)",
+        "maxOffNadirDeg": "최대 비천저각 (도)",
+        "minSunElevDeg": "최소 태양 고도 (도)",
+        "daylightOnly": "주간만",
+        "nadirReadout": "천저 관측 폭 약 {km} km (FOV {fov}°)",
+        "nadirReadoutUnknown": "이 궤도의 천저 관측 폭을 알 수 없음",
+        "presetsIllustrative": "프리셋은 예시이며 공개된 사양이 아닙니다."
+      },
+      "presets": {
+        "hrEo": "고해상도 광학",
+        "mrEo": "중해상도 광학",
+        "wide": "광시야 영상기",
+        "custom": "사용자 지정"
+      },
+      "commands": {
+        "toggle": "지상 관측 폭 전환",
+        "openSettings": "지상 관측 폭 설정 열기"
+      },
+      "shortcuts": {
+        "toggle": "지상 관측 폭 전환"
+      },
+      "graphics": {
+        "sectionLabel": "지상 관측 폭",
+        "drawSwath": {
+          "label": "지상 관측 폭 그리기",
+          "helpText": "선택한 위성의 촬영 폭을 그려진 궤도를 따라 표시합니다."
+        },
+        "fieldOfRegardFill": {
+          "label": "관측 가능 범위 채우기",
+          "helpText": "천저 관측 폭 옆에 센서를 기울여 닿는 반투명 띠를 그립니다."
+        }
+      },
+      "errorMsgs": {
+        "outOfRange": "{min}에서 {max} 사이의 숫자를 입력하세요.",
+        "beyondHorizon": "이 관측폭은 이 위성의 고도에서 보이는 지평선을 넘어섭니다. 최대 {max} km를 입력하세요."
+      },
+      "help": {
+        "overview": "선택한 위성의 센서가 그려진 궤도를 따라 촬영할 수 있는 곳을 보여 줍니다. 불투명한 천저 관측 폭과 기울기 한계까지의 반투명한 관측 가능 범위입니다. 위성 직하점에서 태양이 최소 고도보다 낮은 구간은 어둡게 표시되며, '주간만'을 켜면 숨겨집니다. 부채꼴이 위성 위치에서 관측 폭 가장자리까지 따라갑니다.",
+        "howToUse": "위성을 선택하고 지상 관측 폭 레이어를 켭니다. 프리셋을 고르거나 관측 폭 또는 시야각, 최대 비천저각, 최소 태양 고도를 입력합니다. 설정은 위성별로 저장됩니다.",
+        "tip1": "프리셋은 예시이며 실제 센서의 공개 사양이 아닙니다.",
+        "tip2": "관측 가능 범위 채우기는 그래픽 메뉴의 품질 수준(중간 이상)도 따릅니다.",
+        "flatMap": "평면 지도 모드에서는 관측 폭이 숨겨집니다."
+      }
+    }
+  }
+}

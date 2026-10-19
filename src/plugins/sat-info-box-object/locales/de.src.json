@@ -26,6 +26,10 @@
       "label": "Land",
       "tooltip": "Ursprungsland"
     },
+    "ModelFlag": {
+      "label": "Modellflagge",
+      "tooltip": "Auf dem 3D-Modell gezeichnete Flagge: die Katalogvorgabe, sonst das Herkunftsland"
+    },
     "LaunchSite": {
       "label": "Startplatz",
       "tooltip": "Ort, von dem das Objekt gestartet wurde"
@@ -51,6 +55,20 @@
       "tooltip": "Scheinbare visuelle Helligkeit, beobachtet vom ausgewählten Sensor zur aktuellen Simulationszeit"
     },
     "estimatedSuffix": "(gesch.)",
-    "unknown": "Unbekannt"
+    "unknown": "Unbekannt",
+    "graphics": {
+      "sectionLabel": "Satellitenmodelle",
+      "flagDecals": {
+        "label": "Landesflagge auf dem Modell",
+        "helpText": "Projiziert die Flagge des Eigentümerlandes auf das 3D-Modell des ausgewählten Satelliten, auf die Ihnen zugewandte Seite"
+      },
+      "flagDecalScale": {
+        "label": "Flaggengröße",
+        "helpText": "Flaggenbreite als Anteil der Modellgröße (0,2 bis 0,6)"
+      }
+    },
+    "Secondary": {
+      "ricConvention": "RIC = Sekundärobjekt minus Primärobjekt, im RIC-System des Primärobjekts."
+    }
   }
 }

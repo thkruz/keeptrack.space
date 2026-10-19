@@ -26,6 +26,10 @@
       "label": "Pays",
       "tooltip": "Pays d'origine"
     },
+    "ModelFlag": {
+      "label": "Drapeau du modèle",
+      "tooltip": "Drapeau dessiné sur le modèle 3D : celui imposé par le catalogue, sinon le pays d'origine"
+    },
     "LaunchSite": {
       "label": "Site de lancement",
       "tooltip": "Lieu de lancement de l'objet"
@@ -51,6 +55,20 @@
       "tooltip": "Magnitude visuelle apparente observée depuis le capteur sélectionné à l'heure de simulation actuelle"
     },
     "estimatedSuffix": "(est.)",
-    "unknown": "Inconnu"
+    "unknown": "Inconnu",
+    "graphics": {
+      "sectionLabel": "Modèles de satellites",
+      "flagDecals": {
+        "label": "Drapeau du pays sur le modèle",
+        "helpText": "Projette le drapeau du pays propriétaire sur le modèle 3D du satellite sélectionné, du côté tourné vers vous"
+      },
+      "flagDecalScale": {
+        "label": "Taille du drapeau",
+        "helpText": "Largeur du drapeau en fraction de la taille du modèle (0,2 à 0,6)"
+      }
+    },
+    "Secondary": {
+      "ricConvention": "RIC = secondaire moins primaire, dans le repère RIC du primaire."
+    }
   }
 }

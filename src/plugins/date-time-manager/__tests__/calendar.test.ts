@@ -67,6 +67,73 @@ describe('Calendar', () => {
     expect(() => c().goToNextMonth()).not.toThrow();
   });
 
+  it('month arrows move one UTC month and never skip a short month', () => {
+    cal.setDate(new Date(Date.UTC(2024, 0, 31, 12)));
+
+    c().goToNextMonth();
+    expect(c().calendarDate.getUTCMonth()).toBe(1);
+    expect(c().calendarDate.getUTCFullYear()).toBe(2024);
+
+    c().goToPreviousMonth();
+    c().goToPreviousMonth();
+    expect(c().calendarDate.getUTCMonth()).toBe(11);
+    expect(c().calendarDate.getUTCFullYear()).toBe(2023);
+  });
+
+  it('the month and year header dropdowns jump the visible month without changing sim time', () => {
+    cal.setDate(new Date(Date.UTC(2026, 9, 16, 12)));
+    const yearSel = document.querySelector('#ui-datepicker-div select.ui-datepicker-year') as HTMLSelectElement;
+
+    expect(yearSel).not.toBeNull();
+    yearSel.value = '2024';
+    yearSel.dispatchEvent(new Event('change'));
+
+    const monthSel = document.querySelector('#ui-datepicker-div select.ui-datepicker-month') as HTMLSelectElement;
+
+    monthSel.value = '7';
+    monthSel.dispatchEvent(new Event('change'));
+
+    expect(c().calendarDate.getUTCFullYear()).toBe(2024);
+    expect(c().calendarDate.getUTCMonth()).toBe(7);
+    expect((document.querySelector('#ui-datepicker-div select.ui-datepicker-year') as HTMLSelectElement).value).toBe('2024');
+    expect(cal.getSelectedDate()?.toISOString()).toBe('2026-10-16T12:00:00.000Z');
+    expect(ServiceLocator.getTimeManager().changeStaticOffset).not.toHaveBeenCalled();
+  });
+
+  it('the typed Go-to field applies a UTC date/time on Enter', () => {
+    cal.setDate(new Date(Date.UTC(2026, 9, 16, 12)));
+    const input = document.getElementById(Calendar.GOTO_INPUT_ID) as HTMLInputElement;
+
+    expect(input.value).toBe('2026-10-16 12:00:00');
+    input.value = '2024-08-15 06:30:00';
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+
+    expect(cal.getSelectedDate()?.toISOString()).toBe('2024-08-15T06:30:00.000Z');
+    expect(c().calendarDate.getUTCMonth()).toBe(7);
+    expect(ServiceLocator.getTimeManager().changeStaticOffset).toHaveBeenCalled();
+    expect((document.getElementById(Calendar.GOTO_INPUT_ID) as HTMLInputElement).value).toBe('2024-08-15 06:30:00');
+  });
+
+  it('the typed Go-to field flags invalid text and leaves the time alone', () => {
+    const toast = vi.fn();
+
+    ServiceLocator.getUiManager().toast = toast;
+    cal.setDate(new Date(Date.UTC(2026, 9, 16, 12)));
+    const input = document.getElementById(Calendar.GOTO_INPUT_ID) as HTMLInputElement;
+
+    input.value = '2024-02-30 00:00:00';
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+
+    expect(input.classList.contains('invalid')).toBe(true);
+    expect(toast).toHaveBeenCalled();
+    expect(cal.getSelectedDate()?.toISOString()).toBe('2026-10-16T12:00:00.000Z');
+
+    cal.showDatePicker();
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(input.value).toBe('2026-10-16 12:00:00');
+    expect(input.classList.contains('invalid')).toBe(false);
+  });
+
   it('setToNow, pauseProp and playProp adjust the propagation rate', () => {
     cal.setDate(new Date());
 
@@ -128,6 +195,41 @@ describe('Calendar', () => {
     // Too short -> rejected with a warning.
     input().value = '12';
     expect(() => c().onTextInputChange()).not.toThrow();
+  });
+
+  it('onTextInputChange accepts fractional seconds (HH:MM:SS.s)', () => {
+    cal.setDate(new Date(Date.UTC(2026, 0, 1)));
+    const input = () => document.getElementById('calendar-time-input') as HTMLInputElement;
+
+    input().value = '08:15:30.4';
+    c().onTextInputChange();
+
+    expect(c().simulationDate.getUTCSeconds()).toBe(30);
+    expect(c().simulationDate.getUTCMilliseconds()).toBe(400);
+    expect(input().value).toBe('08:15:30.4');
+  });
+
+  it('Escape closes the picker without applying a partially typed time', () => {
+    cal.setDate(new Date(Date.UTC(2026, 0, 1, 1, 2, 3)));
+    cal.showDatePicker();
+    const input = document.getElementById('calendar-time-input') as HTMLInputElement;
+
+    input.focus();
+    input.value = '23:59:59';
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+
+    expect(document.getElementById('ui-datepicker-div')!.style.display).toBe('none');
+    expect(c().simulationDate.getUTCHours()).toBe(1);
+    expect((document.getElementById('calendar-time-input') as HTMLInputElement).value).toBe('01:02:03');
+  });
+
+  it('Escape does nothing while the picker is closed', () => {
+    cal.setDate(new Date());
+    const hide = vi.spyOn(cal, 'hideDatePicker');
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+
+    expect(hide).not.toHaveBeenCalled();
   });
 
   it('onTextInputChange returns early when the input element is absent', () => {

@@ -1,0 +1,61 @@
+{
+  "plugins": {
+    "SatelliteSwath": {
+      "bottomIconLabel": "Fascia al suolo",
+      "title": "Fascia al suolo",
+      "sections": {
+        "sensor": "Sensore",
+        "display": "Visualizzazione"
+      },
+      "labels": {
+        "preset": "Preimpostazione",
+        "inputMode": "Input dell'impronta",
+        "modeWidth": "Larghezza fascia (km)",
+        "modeFov": "Campo visivo (gradi)",
+        "swathWidthKm": "Larghezza fascia (km)",
+        "fovDeg": "Campo visivo (gradi)",
+        "maxOffNadirDeg": "Inclinazione max fuori nadir (gradi)",
+        "minSunElevDeg": "Elevazione solare min. (gradi)",
+        "daylightOnly": "Solo luce diurna",
+        "nadirReadout": "Larghezza al nadir circa {km} km (FOV {fov}°)",
+        "nadirReadoutUnknown": "Larghezza al nadir sconosciuta per questa orbita",
+        "presetsIllustrative": "Le preimpostazioni sono illustrative, non specifiche pubblicate."
+      },
+      "presets": {
+        "hrEo": "Ottico ad alta risoluzione",
+        "mrEo": "Ottico a media risoluzione",
+        "wide": "Imager a campo largo",
+        "custom": "Personalizzato"
+      },
+      "commands": {
+        "toggle": "Attiva/disattiva fascia al suolo",
+        "openSettings": "Apri impostazioni fascia al suolo"
+      },
+      "shortcuts": {
+        "toggle": "Attiva/disattiva la fascia al suolo"
+      },
+      "graphics": {
+        "sectionLabel": "Fascia al suolo",
+        "drawSwath": {
+          "label": "Disegna fascia al suolo",
+          "helpText": "Mostra la fascia di ripresa del satellite selezionato lungo la sua orbita disegnata."
+        },
+        "fieldOfRegardFill": {
+          "label": "Riempimento campo di puntamento",
+          "helpText": "Disegna accanto alla fascia al nadir la banda traslucida che il sensore raggiunge inclinandosi."
+        }
+      },
+      "errorMsgs": {
+        "outOfRange": "Inserisci un numero tra {min} e {max}.",
+        "beyondHorizon": "Questa fascia va oltre l'orizzonte dalla quota di questo satellite. Inserisci al massimo {max} km."
+      },
+      "help": {
+        "overview": "Mostra dove il sensore del satellite selezionato può riprendere lungo l'orbita disegnata: una fascia al nadir opaca e un campo di puntamento traslucido fino al limite di inclinazione. I tratti in cui il Sole è sotto l'elevazione minima nel punto subsatellitare sono attenuati, o nascosti con Solo luce diurna. Un ventaglio segue il satellite dalla sua posizione ai bordi della fascia.",
+        "howToUse": "Seleziona un satellite e attiva il livello Fascia al suolo. Scegli una preimpostazione o inserisci larghezza della fascia o campo visivo, inclinazione massima fuori nadir ed elevazione solare minima. Le impostazioni vengono ricordate per ogni satellite.",
+        "tip1": "Le preimpostazioni sono illustrative, non specifiche pubblicate di alcun sensore reale.",
+        "tip2": "Il riempimento del campo di puntamento segue anche il livello di qualità del menu Grafica (Medio e superiori).",
+        "flatMap": "La fascia è nascosta nella modalità mappa piana."
+      }
+    }
+  }
+}

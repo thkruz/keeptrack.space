@@ -18,6 +18,7 @@ const fakePass = (maxEl = 40): PolarPass => ({
   maxEl: maxEl as any,
   culmination: new Date('2026-05-31T00:02:30Z'),
   durationMs: 5 * 60 * 1000,
+  maskLimited: false,
 });
 
 describe('PolarPlotPlugin updatePlot_/renderCurrent_', () => {

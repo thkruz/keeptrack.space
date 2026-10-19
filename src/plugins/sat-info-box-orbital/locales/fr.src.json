@@ -3,11 +3,11 @@
     "title": "Données Orbitales",
     "Apogee": {
       "label": "Apogée",
-      "tooltip": "Point le plus haut de l'orbite"
+      "tooltip": "Altitude maximale de l'orbite au-dessus du rayon équatorial (6378,137 km)"
     },
     "Perigee": {
       "label": "Périgée",
-      "tooltip": "Point le plus bas de l'orbite"
+      "tooltip": "Altitude minimale de l'orbite au-dessus du rayon équatorial (6378,137 km)"
     },
     "Inclination": {
       "label": "Inclinaison",
@@ -52,25 +52,30 @@
       "label": "Vitesse",
       "tooltip": "Vitesse actuelle du satellite (plus élevée lorsqu'il est plus proche de la Terre)"
     },
+    "GPEpoch": {
+      "label": "Époque GP",
+      "tooltip": "Époque du jeu d'éléments utilisé pour la propagation"
+    },
     "AgeOfGP": {
       "label": "Âge du GP",
-      "tooltip": "Temps depuis le calcul officiel de l'orbite (les données GP plus anciennes sont généralement moins précises)",
+      "tooltip": "Temps écoulé entre l'époque du GP et l'heure actuelle de la simulation (les données GP plus anciennes sont généralement moins précises ; une valeur négative signifie que l'époque est postérieure à l'heure de simulation)",
       "days": "Jours",
       "hours": "Heures",
       "epochYear": "Année d'époque",
-      "epochDay": "Jour d'époque"
+      "epochDay": "Jour d'époque",
+      "epochAfterSimTime": "l'époque du GP est postérieure à l'heure de simulation"
     },
     "RadialSigma": {
       "label": "Sigma Radial",
-      "tooltip": "Incertitude radiale (mètres)"
+      "tooltip": "Incertitude de position radiale à 1 sigma issue de la covariance dérivée du TLE à l'époque GP (repère RIC). Mêmes valeurs que celles utilisées pour la Pc et le rapport de conjonction."
     },
     "InTrackSigma": {
       "label": "Sigma Sur Piste",
-      "tooltip": "Incertitude sur piste (mètres)"
+      "tooltip": "Incertitude de position le long de la trace à 1 sigma issue de la covariance dérivée du TLE à l'époque GP (repère RIC). Mêmes valeurs que celles utilisées pour la Pc et le rapport de conjonction."
     },
     "CrossTrackSigma": {
       "label": "Sigma Hors Piste",
-      "tooltip": "Incertitude hors piste (mètres)"
+      "tooltip": "Incertitude de position transverse à 1 sigma issue de la covariance dérivée du TLE à l'époque GP (repère RIC). Mêmes valeurs que celles utilisées pour la Pc et le rapport de conjonction."
     },
     "meter": "m",
     "kilometer": "km",

@@ -3,7 +3,7 @@
     "BreakupAnalysis": {
       "bottomIconLabel": "Análisis de Fragmentación",
       "title": "Análisis de Fragmentación",
-      "helpBody": "El plugin de Análisis de Fragmentación proporciona una base de datos de los principales eventos de fragmentación de satélites en la historia. Seleccione un evento para ver información detallada, incluyendo el objeto principal, la causa de la fragmentación, la línea temporal desde el lanzamiento hasta la fragmentación y el análisis de dispersión de fragmentos. El plugin busca en el catálogo actual los restos rastreados que coinciden con cada evento y muestra análisis estadísticos de los rangos de altitud, excentricidad y distribuciones de inclinación.",
+      "helpBody": "El plugin de Análisis de Fragmentación proporciona una base de datos de los principales eventos de fragmentación de satélites en la historia. Seleccione un evento para ver información detallada, incluyendo el objeto principal, la causa de la fragmentación, la línea temporal desde el lanzamiento hasta la fragmentación y el análisis de dispersión de fragmentos. El plugin busca en el catálogo actual los restos rastreados que coinciden con cada evento y muestra análisis estadísticos de los rangos de altitud, excentricidad y distribuciones de inclinación. Cada evento muestra el designador internacional del lanzamiento y el número NORAD del objeto padre, para que no se confundan dos eventos de la misma familia de cohetes (por ejemplo, dos fragmentaciones de etapas superiores CZ-6A).",
       "sections": {
         "events": "Eventos",
         "debrisStatistics": "Estadísticas de Restos",
@@ -66,7 +66,8 @@
         "perigee": "Perigeo",
         "apogee": "Apogeo",
         "incDeg": "Inc (°)",
-        "ecc": "Exc"
+        "ecc": "Exc",
+        "intlDes": "Designador internacional"
       },
       "errorMsgs": {
         "parentNotFound": "El objeto principal no está en el catálogo actual.",

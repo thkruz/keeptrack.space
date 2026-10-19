@@ -17,6 +17,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import type { GraphicsQualityLevel } from '@app/engine/plugins/core/plugin-capabilities';
 import type {
   AtmosphereSettings,
   EarthBumpTextureQuality,
@@ -34,6 +35,13 @@ import type { SunTextureQuality } from '@app/engine/rendering/draw-manager/sun';
  * Graphics and rendering settings
  */
 export class GraphicsSettings {
+  /**
+   * The overall quality level last chosen in the Graphics menu. Informational:
+   * each control persists its own value, and the menu derives what it shows
+   * (a level or "Custom") from those values.
+   */
+  graphicsQuality: GraphicsQualityLevel = 'medium';
+
   // Earth Texture Quality Settings
   earthDayTextureQuality: EarthDayTextureQuality;
   earthNightTextureQuality: EarthNightTextureQuality;
@@ -419,6 +427,19 @@ export class GraphicsSettings {
    */
   modelsOnSatelliteViewOverride = false;
   noMeshManager = false;
+  /**
+   * Master switch for the flag decal feature. Off until the projection is reworked: the decal is
+   * projected along the camera direction, so the flag stays locked to the camera instead of
+   * turning with the body. While off the renderer, the Graphics menu card and the info box row
+   * are all hidden; the user setting below is kept for when the feature returns.
+   */
+  isFlagDecalsFeatureEnabled = false;
+  /** Project the owner country's flag onto the selected satellite's 3D model. */
+  isDrawFlagDecals = true;
+  /** Flag decal half-width as a fraction of the model's bounding radius (0.2 to 0.6). */
+  flagDecalScale = 0.35;
+  /** Opacity of the flag decal over the model's base colour (0 to 1). */
+  flagDecalAlpha = 0.9;
 
   // Advanced Graphics
   isDisableAsyncReadPixels = false;

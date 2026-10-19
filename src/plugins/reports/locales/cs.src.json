@@ -27,6 +27,18 @@
         "sunEclipse": {
           "name": "Analýza Slunce/zatmění",
           "description": "Generuje viditelnost Slunce a časy vstupu/výstupu do zatmění pro analýzu napájení a teploty"
+        },
+        "conjunction": {
+          "name": "Zpráva o konjunkci",
+          "description": "Největší přiblížení primárního a sekundárního objektu: TCA, vzdálenost míjení, RIC, relativní rychlost, Pc se vstupy a relativní geometrie kolem TCA"
+        },
+        "maneuver": {
+          "name": "Zpráva o manévru",
+          "description": "Porovná analytický satelit z nástroje Manévr s jeho rodičovským objektem: zážehy, střední elementy před a po a události screeningu, které manévr přidá nebo odstraní"
+        },
+        "screeningCompare": {
+          "name": "Porovnat poslední dva screeningy",
+          "description": "Porovná dva nejnovější běhy Debris Screening: přidané, odstraněné a nezměněné události"
         }
       },
       "commands": {
@@ -39,7 +51,8 @@
       "sections": {
         "orbitPosition": "Dráha a poloha",
         "sensor": "Senzor",
-        "options": "Možnosti výstupu"
+        "options": "Možnosti výstupu",
+        "conjunction": "Konjunkce a manévr"
       },
       "options": {
         "window": "Časové okno",
@@ -49,7 +62,9 @@
         "seconds": "{seconds} s",
         "format_text": "Text (zarovnaný)",
         "format_csv": "CSV",
-        "format_json": "JSON"
+        "format_json": "JSON",
+        "conjWindow": "Okno hledání konjunkce",
+        "plusMinusHours": "±{hours} h (celkem {span} h)"
       },
       "help": {
         "overview": "Menu zpráv generuje textové zprávy o vybraném satelitu: geometrii přeletů, polohu v čase, orbitální elementy, okna viditelnosti a analýzu zatmění. Každá zpráva se otevře ve vlastním okně, úhledně naformátovaná s tlačítkem pro stažení, připravená k vložení do jiných nástrojů nebo ke sdílení.",
@@ -57,12 +72,22 @@
         "imgCaption": "Každé tlačítko vygeneruje formátovanou textovou zprávu pro vybraný satelit.",
         "typesHeading": "Dostupné zprávy",
         "types": "<ul><li><strong>Azimut, elevace, vzdálenost</strong>: pozorovací úhly z vybraného senzoru během nadcházejících přeletů (vyžaduje senzor).</li><li><strong>Zeměpisná šířka, délka, výška</strong>: pozemní stopa v čase.</li><li><strong>Geocentrické inerciální souřadnice (ECI)</strong>: vektory polohy a rychlosti ECI v čase.</li><li><strong>Klasické orbitální elementy</strong>: keplerovské elementy v aktuální epoše.</li><li><strong>Okna viditelnosti</strong>: časy východu a západu s délkou přeletů (vyžaduje senzor).</li><li><strong>Analýza Slunce/zatmění</strong>: časy slunečního svitu a vstupu a výstupu do zatmění, užitečné pro analýzu napájení a teploty.</li></ul>",
-        "howToUse": "<ol><li>Vyberte satelit; spodní ikona je neaktivní, dokud žádný není vybrán.</li><li>Pro zprávy založené na senzoru vyberte také senzor.</li><li>Otevřete <strong>Zprávy</strong> ze spodní lišty a klikněte na tlačítko zprávy. Zpráva se otevře ve vyskakovacím okně.</li><li>Pomocí tlačítka pro stažení v okně zprávy ji uložíte jako textový soubor.</li></ol>",
+        "howToUse": "<ol><li>Vyberte satelit; ikona v panelu je neaktivní, dokud žádný není vybrán.</li><li>Pro zprávy založené na senzoru vyberte také senzor.</li><li>Otevřete <strong>Zprávy</strong> z panelu a klikněte na tlačítko zprávy. Zpráva se otevře ve vyskakovacím okně.</li><li>Pomocí tlačítka pro stažení v okně zprávy ji uložíte jako textový soubor.</li></ol>",
         "tip1": "Zprávy pokrývají několik dní dat; u zpráv založených na přeletech může generování trvat několik sekund.",
-        "tip2": "Pokud se okno se zprávou nezobrazí, obvyklým viníkem je blokování vyskakovacích oken ve vašem prohlížeči; povolte vyskakovací okna pro tento web."
+        "tip2": "Pokud se okno se zprávou nezobrazí, obvyklým viníkem je blokování vyskakovacích oken ve vašem prohlížeči; povolte vyskakovací okna pro tento web.",
+        "conjunctionHeading": "Zprávy o konjunkci a manévru",
+        "conjunction": "<ul><li><strong>Zpráva o konjunkci</strong>: vyžaduje primární a sekundární objekt. Najde největší přiblížení v okně kolem aktuálního času a uvede TCA, vzdálenost míjení, R/I/C se znaménkem (sekundární minus primární, v soustavě primárního objektu), relativní rychlost, Pc s poloměrem tuhého tělesa a zdrojem kovariance a relativní geometrii od 5 minut před do 5 minut po TCA.</li><li><strong>Zpráva o manévru</strong>: vyberte analytický satelit vytvořený nástrojem Manévr. Uvede zážehy, střední elementy před a po a po spuštění Debris Screening pro rodiče i analytický satelit také události, které manévr přidá, odstraní nebo ponechá beze změny.</li><li><strong>Porovnat poslední dva screeningy</strong>: porovná dva nejnovější běhy Debris Screening.</li></ul>Výstup JSON těchto zpráv je úplný strojově čitelný stav analýzy."
       },
       "errorMsgs": {
-        "notSupportedForObject": "Tento report není pro vybraný objekt k dispozici."
+        "notSupportedForObject": "Tento report není pro vybraný objekt k dispozici.",
+        "generationFailed": "Generování zprávy selhalo",
+        "parentNotFound": "Rodičovský objekt {scc} není v katalogu"
+      },
+      "reasons": {
+        "selectSecondary": "Nejprve vyberte sekundární objekt",
+        "selectAnalyst": "Vyberte analytický satelit vytvořený nástrojem Manévr",
+        "needTwoRuns": "Nejprve spusťte Debris Screening alespoň dvakrát",
+        "screeningRunsMissing": "Porovnání screeningu není k dispozici: spusťte Debris Screening pro {parent} a pro {analyst} ve stejném okně a poté tuto zprávu vygenerujte znovu."
       }
     }
   }

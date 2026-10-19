@@ -12,10 +12,17 @@ import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { KeyboardComponent } from '../plugins/components/keyboard/keyboard-component';
 import { AtmosphereSettings, EarthTextureStyle } from '../rendering/draw-manager/earth-quality-enums';
+import { GodraySamples, parseGodraySamplesParam } from '../rendering/draw-manager/godray-samples';
 import { errorManagerInstance } from '../utils/errorManager';
 import { getEl } from '../utils/get-el';
 import { waitForCruncher } from '../utils/waitForCruncher';
 
+/*
+ * Restore ordering rule: when a link carries both `search=` and `sat=`/`intldes=`, the search
+ * runs first (deferred behind the position cruncher) and the selection is re-applied after it
+ * completes. doSearch hides the info box, so selecting first left the object selected with the
+ * info box closed. Single-parameter links behave as before.
+ */
 export abstract class UrlManager {
   private static selectedSat_: Satellite | null = null;
   private static searchString_: string = '';
@@ -242,13 +249,17 @@ export abstract class UrlManager {
       EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
         switch (key) {
           case 'search':
-            this.handleSearchParam_(kv.search);
+            this.handleSearchParam_(kv.search, () => this.reapplySelectionParam_(kv));
             break;
           case 'intldes':
-            this.handleIntldesParam_(kv[key]);
+            if (!this.isSearchDeferred_(kv)) {
+              this.handleIntldesParam_(kv[key]);
+            }
             break;
           case 'sat':
-            this.handleSatParam_(kv[key]);
+            if (!this.isSearchDeferred_(kv)) {
+              this.handleSatParam_(kv[key]);
+            }
             break;
           case 'misl':
             this.handleMislParam_(kv[key]);
@@ -305,11 +316,17 @@ export abstract class UrlManager {
    * This is a pure builder: it reads live state but performs no navigation and
    * ignores the live-update / disable settings (those are the writer's concern).
    * Heavy params are progressively dropped to keep the URL under MAX_URL_LENGTH_.
-   * @param isMaxData When true, include extended/heavy params (date, external TLEs, etc.).
+   *
+   * The simulation time (`date=`) is NOT pinned by default: a colleague opening the
+   * link should see the same objects, search and camera at their own live time rather
+   * than a frozen clock. Pass `isIncludeTime` (the Share menu's "Include current time"
+   * checkbox) to re-add it. Incoming `date=` params from older links still parse.
+   * @param isMaxData When true, include extended/heavy params (external TLEs, etc.).
+   * @param isIncludeTime When true, pin the current simulation time with `date=`.
    * @returns The full shareable URL string.
    */
   // eslint-disable-next-line complexity
-  static getShareUrl(isMaxData: boolean = true): string {
+  static getShareUrl(isMaxData: boolean = true, isIncludeTime: boolean = false): string {
     const timeManagerInstance = ServiceLocator.getTimeManager();
     const mainCamera = ServiceLocator.getMainCamera();
 
@@ -317,8 +334,8 @@ export abstract class UrlManager {
     let url = arr[0];
     const paramSlices = [] as string[];
 
-    // Handle Time First
-    if (isMaxData || timeManagerInstance.staticOffset < -1000 || timeManagerInstance.staticOffset > 1000) {
+    // Handle Time First (opt-in only, see doc comment)
+    if (isIncludeTime) {
       const epochMs = timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset;
 
       if (Number.isFinite(epochMs)) {
@@ -490,7 +507,7 @@ export abstract class UrlManager {
    * pipeline is live) fixes it. Waiting for the cruncher makes the on-load search
    * behave like a manual one. Mirrors ColorSchemeManager.calcColorBufsNextCruncher().
    */
-  private static handleSearchParam_(searchString: string) {
+  private static handleSearchParam_(searchString: string, onDone?: () => void) {
     if (settingsManager.disableUI) {
       return;
     }
@@ -503,6 +520,7 @@ export abstract class UrlManager {
         uiManagerInstance.toast(`Search for "${searchString}" found nothing!`, ToastMsgType.caution, true);
         uiManagerInstance.searchManager.hideResults();
       }
+      onDone?.();
     };
 
     const satCruncher = ServiceLocator.getCatalogManager()?.satCruncherThread?.worker;
@@ -524,6 +542,21 @@ export abstract class UrlManager {
       isRunCbOnFailure: true,
       maxRetries: 5,
     });
+  }
+
+  /** True when `search=` will run (deferred) and so owns applying `sat=` / `intldes=` afterwards. */
+  private static isSearchDeferred_(kv: Record<string, string>): boolean {
+    return typeof kv.search === 'string' && !settingsManager.disableUI;
+  }
+
+  /** Applies `intldes=` / `sat=` after the deferred search, so doSearch cannot hide the info box. */
+  private static reapplySelectionParam_(kv: Record<string, string>) {
+    if (typeof kv.intldes === 'string') {
+      this.handleIntldesParam_(kv.intldes);
+    }
+    if (typeof kv.sat === 'string') {
+      this.handleSatParam_(kv.sat);
+    }
   }
 
   private static handleIntldesParam_(val: string) {
@@ -904,31 +937,26 @@ export abstract class UrlManager {
     settingsManager.isUseSunTexture = false;
     settingsManager.isDisableGodrays = false;
 
-    switch (val) {
-      case 'off':
-        settingsManager.isDrawSun = false;
-        settingsManager.isUseSunTexture = false;
-        settingsManager.isDisableGodrays = true;
-        break;
-      case 'potato':
-        settingsManager.godraysSamples = -1; // GodraySamples.OFF
-        settingsManager.isUseSunTexture = true;
-        settingsManager.isDisableGodrays = true;
-        break;
-      case 'low':
-        settingsManager.godraysSamples = 16; // GodraySamples.LOW
-        break;
-      case 'medium':
-        settingsManager.godraysSamples = 32; // GodraySamples.MEDIUM
-        break;
-      case 'high':
-        settingsManager.godraysSamples = 64; // GodraySamples.HIGH
-        break;
-      case 'ultra':
-        settingsManager.godraysSamples = 128; // GodraySamples.ULTRA
-        break;
-      default:
-        errorManagerInstance.warn(`Unknown sun parameter: ${val}`);
+    if (val === 'off') {
+      settingsManager.isDrawSun = false;
+      settingsManager.isDisableGodrays = true;
+
+      return;
+    }
+
+    // 'potato' is the sun texture without godrays; anything else names a level or a sample count.
+    const samples = val === 'potato' ? GodraySamples.OFF : parseGodraySamplesParam(val);
+
+    if (samples === null) {
+      errorManagerInstance.warn(`Unknown sun parameter: ${val}`);
+
+      return;
+    }
+
+    settingsManager.godraysSamples = samples;
+    if (samples === GodraySamples.OFF) {
+      settingsManager.isUseSunTexture = true;
+      settingsManager.isDisableGodrays = true;
     }
   }
 

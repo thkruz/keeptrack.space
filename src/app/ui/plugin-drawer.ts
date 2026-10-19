@@ -45,6 +45,23 @@ export class PluginDrawer {
   private isRailMode_ = false;
   private readonly badges_: Map<string, DrawerBadge> = new Map();
   private hasItems_ = false;
+  /** Pending rail hover-expansion (hover intent), or -1. */
+  private railHoverTimer_ = -1;
+  /** Drawer item under the pointer at the last mousedown, used if the layout shifts before mouseup. */
+  private pressedItem_: HTMLElement | null = null;
+  private pressedAt_ = 0;
+
+  /**
+   * Rail hover-expansion waits this long before widening the drawer. Expanding reflows the whole
+   * column (search box and top actions appear, collapsed groups fold, group headers become
+   * clickable), so expanding instantly on mouseenter moved the icon out from under a cursor that
+   * entered and clicked in one motion: the click landed on a header or empty space and the first
+   * click only "expanded the drawer". With the delay, an aimed click activates the icon it was
+   * aimed at, and resting on the rail still expands it to show labels.
+   */
+  private static readonly RAIL_HOVER_INTENT_MS = 250;
+  /** A press older than this is not used to resolve a click. */
+  private static readonly PRESS_MEMORY_MS = 1000;
 
   init(): void {
     this.isMobileMode_ = settingsManager.isMobileModeEnabled;
@@ -251,8 +268,12 @@ export class PluginDrawer {
       '  <div id="drawer-getting-started-slot" class="drawer-getting-started-slot"></div>',
       '  <div id="drawer-content" class="drawer-content"></div>',
       '</div>',
-      '<div id="drawer-user-account" class="drawer-user-account"></div>',
+      // The status footer sits ABOVE the account row so the account row is anchored directly on
+      // the rail toggle. In rail mode the status footer collapses to zero height and expands on
+      // rail hover; if it sat below the account row, that expansion would slide the login row out
+      // from under the cursor (and leave the rail toggle in its place).
       '<div id="drawer-status-footer" class="drawer-status-footer-container"></div>',
+      '<div id="drawer-user-account" class="drawer-user-account"></div>',
       '<div id="drawer-rail-toggle" class="drawer-rail-toggle" role="button" aria-label="Toggle rail mode">',
       `  <img class="drawer-rail-toggle-icon" src="${leftPanelClosePng}" alt="" />`,
       '  <span class="drawer-rail-toggle-label">Collapse</span>',
@@ -356,8 +377,18 @@ export class PluginDrawer {
     const drawerContent = getEl('drawer-content', true);
 
     if (drawerContent) {
+      drawerContent.addEventListener('mousedown', (evt: MouseEvent) => {
+        // Freeze the rail layout for the rest of this press so the item cannot move between
+        // mousedown and mouseup, and remember what was pressed.
+        this.cancelRailHoverTimer_();
+        this.pressedItem_ = (evt.target as HTMLElement).closest('.drawer-item');
+        this.pressedAt_ = Date.now();
+      });
+
       drawerContent.addEventListener('click', (evt: Event) => {
-        const itemEl = (evt.target as HTMLElement).closest('.drawer-item') as HTMLElement | null;
+        const itemEl = (evt.target as HTMLElement).closest<HTMLElement>('.drawer-item') ?? this.consumePressedItem_();
+
+        this.pressedItem_ = null;
 
         if (!itemEl) {
           return;
@@ -537,11 +568,24 @@ export class PluginDrawer {
       const drawer = this.drawerEl_;
 
       drawer.addEventListener('mouseenter', () => {
-        if (drawer.classList.contains('rail-mode')) {
-          drawer.classList.add('rail-hover');
+        if (!drawer.classList.contains('rail-mode') || drawer.classList.contains('rail-hover')) {
+          return;
         }
+        this.cancelRailHoverTimer_();
+        this.railHoverTimer_ = window.setTimeout(() => {
+          this.railHoverTimer_ = -1;
+          if (drawer.classList.contains('rail-mode')) {
+            drawer.classList.add('rail-hover');
+          }
+        }, PluginDrawer.RAIL_HOVER_INTENT_MS);
+      });
+      // Any press inside the rail (drawer items, the account row, the status footer) cancels a
+      // pending hover-expansion so the row under the cursor cannot reflow before mouseup.
+      drawer.addEventListener('mousedown', () => {
+        this.cancelRailHoverTimer_();
       });
       drawer.addEventListener('mouseleave', () => {
+        this.cancelRailHoverTimer_();
         drawer.classList.remove('rail-hover');
       });
 
@@ -551,6 +595,7 @@ export class PluginDrawer {
       if (railToggleEl) {
         railToggleEl.addEventListener('mouseenter', (evt) => {
           evt.stopPropagation();
+          this.cancelRailHoverTimer_();
           drawer.classList.remove('rail-hover');
         });
       }
@@ -882,7 +927,31 @@ export class PluginDrawer {
 
   // ---- Rail Mode ----
 
+  private cancelRailHoverTimer_(): void {
+    if (this.railHoverTimer_ !== -1) {
+      window.clearTimeout(this.railHoverTimer_);
+      this.railHoverTimer_ = -1;
+    }
+  }
+
+  /**
+   * The item pressed at mousedown, when the click itself resolved to no item (mousedown and
+   * mouseup hit different elements because the drawer reflowed in between). Stale or detached
+   * presses are ignored.
+   */
+  private consumePressedItem_(): HTMLElement | null {
+    const pressed = this.pressedItem_;
+
+    this.pressedItem_ = null;
+    if (!pressed || !pressed.isConnected || Date.now() - this.pressedAt_ > PluginDrawer.PRESS_MEMORY_MS) {
+      return null;
+    }
+
+    return pressed;
+  }
+
   private enterRailMode_(): void {
+    this.cancelRailHoverTimer_();
     this.drawerEl_?.classList.remove('rail-hover');
     this.drawerEl_?.classList.add('rail-mode');
     document.documentElement.style.setProperty('--drawer-offset', '60px');
@@ -890,6 +959,7 @@ export class PluginDrawer {
   }
 
   private exitRailMode_(): void {
+    this.cancelRailHoverTimer_();
     this.drawerEl_?.classList.remove('rail-hover', 'rail-mode');
     document.documentElement.style.setProperty('--drawer-offset', '0px');
     this.updateRailToggleIcon_(false);

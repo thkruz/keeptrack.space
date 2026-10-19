@@ -1,3 +1,4 @@
+import { formatCustomSensorLocation, resolveCustomSensorName } from '@app/app/sensors/custom-sensor-identity';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { GeolocationPosition, SensorGeolocation } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -122,8 +123,14 @@ export class UiGeolocation {
       (<HTMLInputElement>getEl('cs-maxrange')).value = '50000';
 
       setInnerHtml('sensor-type', 'Telescope');
-      setInnerHtml('sensor-info-title', 'Custom Sensor');
-      setInnerHtml('sensor-country', 'Custom Sensor');
+      // Prefer the name the user typed; textContent so markup in the name is never parsed
+      const typedName = (getEl('cs-uiName', true) as HTMLInputElement | null)?.value;
+      const sensorInfoTitleDom = getEl('sensor-info-title', true);
+
+      if (sensorInfoTitleDom) {
+        sensorInfoTitleDom.textContent = resolveCustomSensorName(typedName);
+      }
+      setInnerHtml('sensor-country', formatCustomSensorLocation(settingsManager.geolocation.lat, settingsManager.geolocation.lon));
     } catch {
       // Optional UI elements - don't throw an error if they don't exist
       errorManagerInstance.debug('Error updating custom sensor UI. Is the plugin loaded?');

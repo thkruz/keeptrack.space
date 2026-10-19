@@ -165,5 +165,10 @@
     "satNotFound": "未找到卫星\"{val}\"!",
     "intldesNotFound": "未找到国际编号\"{val}\"!",
     "deepSpaceNoEphemeris": "{name}是深空物体,其星历尚未在 KeepTrack 中提供。"
+  },
+  "searchManager": {
+    "resultCountOne": "1 个结果",
+    "resultCount": "{count} 个结果",
+    "resultCountLimited": "显示 {total} 个结果中的 {shown} 个"
   }
 }

@@ -49,6 +49,7 @@ export abstract class DraggableModal extends DraggableBox {
 
     if (this.boxEl) {
       showEl(this.boxEl);
+      this.raiseAboveOtherModals_();
       const modalContent = getEl(`${this.boxId}`)!;
 
       if (this.width) {
@@ -62,6 +63,33 @@ export abstract class DraggableModal extends DraggableBox {
     } else {
       errorManagerInstance.log(`Failed to open modal: ${this.boxId}`);
     }
+  }
+
+  /**
+   * Every modal overlay shares the same CSS z-index, so DOM order decided which
+   * one won: a modal built earlier (e.g. the shared confirm) opened from inside
+   * one built later (e.g. the profile) rendered behind it. The modal opened most
+   * recently always goes on top of every other visible overlay.
+   */
+  private raiseAboveOtherModals_(): void {
+    if (!this.boxEl) {
+      return;
+    }
+
+    let maxZ = 0;
+
+    for (const overlay of Array.from(document.querySelectorAll<HTMLElement>('.draggable-modal-overlay'))) {
+      if (overlay === this.boxEl || overlay.style.display === 'none') {
+        continue;
+      }
+      const z = Number.parseInt(overlay.style.zIndex || getComputedStyle(overlay).zIndex, 10);
+
+      if (Number.isFinite(z) && z > maxZ) {
+        maxZ = z;
+      }
+    }
+
+    this.boxEl.style.zIndex = maxZ > 0 ? (maxZ + 1).toString() : '';
   }
 
   protected initDraggabilly_() {

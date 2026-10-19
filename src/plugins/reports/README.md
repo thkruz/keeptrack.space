@@ -148,3 +148,40 @@ const sensorRequiredReport: ReportGenerator = {
   },
 };
 ```
+
+## Conjunction and Maneuver Reports
+
+Three reports live in the "Conjunction and Maneuver" card (`section: 'conjunction'`):
+
+| Report | Prerequisite (disabled with this tooltip otherwise) |
+| --- | --- |
+| Conjunction Report | a secondary object ("Select a secondary object first") |
+| Maneuver Report | an analyst satellite with `derivedFromSccNum` ("Select an analyst satellite created by the Maneuver tool") |
+| Compare Last Two Screening Runs | two retained Debris Screening runs |
+
+The math is pure and lives in `conjunction-report-core.ts` (closest approach via
+`findApproachMinima`, Pc via ootk `ConjunctionAssessment` with the Debris Screening
+hard-body radii and covariance) and `screening-diff.ts` (introduced / removed /
+unchanged / appeared / dropped classification). Each report builds a
+`ConjunctionAnalysisState` (`src/engine/conjunction/analysis-state.ts`, versioned by
+`schemaVersion`) and the JSON output is that state, unchanged. Text adds titled
+sections (`ReportData.sections`); CSV carries the main table only.
+
+A report can declare `unavailableReason(obj)`; a non-null string disables its row,
+becomes its tooltip, and hides its command palette entry.
+
+### External accessors (duck-typed, optional)
+
+The Reports plugin reads two accessors from other plugins. Until they exist the
+reports degrade instead of failing.
+
+- **Debris Screening** (`src/plugins/debris-screening/debris-screening.ts`):
+  `getRecentScreeningRuns(): readonly ScreeningRunInput[]`, newest first, where each run
+  is `{ primaryId: string; startTimeMs: number | null; endTimeMs: number | null; boxKm?: { radial; intrack; crosstrack } | null; rows: DsResultRow[] }`.
+  Debris Screening keeps one run per object and window (a re-run replaces the earlier one), and
+  the Maneuver Report pairs the parent and analyst runs by window (`pickScreeningRunPair`), so
+  the two may be screened in either order. Without it the Maneuver Report states "Screening diff unavailable" and the comparison
+  row stays disabled.
+- **Maneuver** (Pro, plugin id `ManeuverPlugin`):
+  `getBurnChain(sccNum: string): BurnChain | null` (the `burn-history.ts` chain). Without
+  it the Maneuver Report states "Burn parameters unavailable".

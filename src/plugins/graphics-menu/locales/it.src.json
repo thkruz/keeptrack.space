@@ -1,0 +1,55 @@
+{
+  "plugins": {
+    "GraphicsMenuPlugin": {
+      "title": "Menu grafica",
+      "bottomIconLabel": "Menu grafica",
+      "filterPlaceholder": "Filtra impostazioni grafiche...",
+      "sections": {
+        "display": "Visualizzazione",
+        "orbits": "Orbite"
+      },
+      "labels": {
+        "overallQuality": "Qualità complessiva",
+        "autoReduced": "Ridotto automaticamente per le prestazioni",
+        "blackEarth": "Disegna la Terra nera",
+        "grayscaleEarth": "Disegna la Terra in scala di grigi",
+        "ambientLighting": "Illuminazione ambientale della Terra",
+        "nightAsDay": "Mostra la notte come giorno",
+        "graticule": "Mostra il reticolo",
+        "politicalMap": "Mostra i confini politici",
+        "dimOrbitInEclipse": "Attenua l'orbita in eclissi",
+        "orbitEclipseAlpha": "Intensità dell'attenuazione in eclissi",
+        "orbitFadeFactor": "Dissolvenza della linea dell'orbita"
+      },
+      "tooltips": {
+        "blackEarth": "Nasconde le texture della Terra",
+        "grayscaleEarth": "Trasforma la Terra in scala di grigi",
+        "ambientLighting": "Disattiva per nascondere l'illuminazione ambientale",
+        "nightAsDay": "Illumina il lato notturno della Terra come se fosse giorno",
+        "graticule": "Disegna le linee di latitudine e longitudine sulla Terra",
+        "politicalMap": "Disegna i confini dei paesi sulla Terra",
+        "dimOrbitInEclipse": "Attenua la parte della linea d'orbita in cui il satellite è nell'ombra della Terra",
+        "orbitEclipseAlpha": "Opacità della linea dell'orbita nell'ombra della Terra: 0,05 la nasconde quasi, 1 significa nessuna attenuazione",
+        "orbitFadeFactor": "Per quanto tratto la linea dell'orbita resta luminosa prima di dissolversi: valori più bassi si dissolvono prima"
+      },
+      "options": {
+        "low": "Bassa",
+        "medium": "Media",
+        "high": "Alta",
+        "ultra": "Ultra",
+        "custom": "Personalizzata"
+      },
+      "buttons": {
+        "resetToDefaults": "Ripristina predefiniti"
+      },
+      "help": {
+        "overview": "Il menu Grafica controlla l'aspetto della scena. Scegli un livello di <strong>Qualità complessiva</strong> per impostare in un colpo tutte le opzioni legate alla qualità, poi regola le singole opzioni nelle schede qui sotto. Le modifiche si applicano subito e restano salvate tra una sessione e l'altra.",
+        "imgAlt": "Il menu Grafica con il selettore della qualità complessiva e le schede delle impostazioni",
+        "imgCaption": "Il selettore della qualità complessiva in alto, le schede delle impostazioni sotto e Ripristina predefiniti in fondo.",
+        "howToUse": "<ol><li>Apri il <strong>Menu grafica</strong> dal pannello, nel gruppo Impostazioni.</li><li>Fai clic su <strong>Bassa</strong>, <strong>Media</strong>, <strong>Alta</strong> o <strong>Ultra</strong> per impostare in un solo passo tutte le opzioni legate alla qualità.</li><li>Modifica un'impostazione qui sotto per rifinire l'aspetto; il selettore mostrerà <strong>Personalizzata</strong>.</li><li>Scrivi nel campo filtro per trovare un'impostazione per nome.</li><li>Fai clic su <strong>Ripristina predefiniti</strong> per riportare tutte le impostazioni grafiche ai valori iniziali.</li></ol>",
+        "tip1": "Il selettore mostra Personalizzata quando le tue impostazioni non corrispondono esattamente a nessun livello. Scegli di nuovo un livello per tornarci.",
+        "tip2": "Se la frequenza dei fotogrammi cala, KeepTrack può disattivare da solo gli effetti più pesanti. Il menu indica allora che le impostazioni sono state ridotte automaticamente."
+      }
+    }
+  }
+}

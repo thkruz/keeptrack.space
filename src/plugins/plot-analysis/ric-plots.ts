@@ -1,3 +1,4 @@
+import { SatMath } from '@app/app/analysis/sat-math';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -22,7 +23,7 @@ import './ric-plots.css';
 export class RicPlot extends KeepTrackPlugin {
   readonly id = 'RicPlot';
   dependencies_: string[] = [SelectSatManager.name];
-  private readonly selectSatManager_: SelectSatManager;
+  protected readonly selectSatManager_: SelectSatManager;
 
   constructor() {
     super();
@@ -62,7 +63,7 @@ export class RicPlot extends KeepTrackPlugin {
   static readonly DEFAULT_ORBITS = 5;
   orbitsSelectId = 'ric-orbits-select';
   assessmentId = 'ric-assessment';
-  private orbits_ = RicPlot.DEFAULT_ORBITS;
+  protected orbits_ = RicPlot.DEFAULT_ORBITS;
 
   getHelpConfig(): IHelpConfig {
     return {
@@ -163,6 +164,8 @@ export class RicPlot extends KeepTrackPlugin {
       empty: t7e('plugins.RicPlot.chart.empty'),
       unitKm: t7e('plugins.RicPlot.chart.unitKm'),
       unitMin: t7e('plugins.RicPlot.chart.unitMin'),
+      relSpeed: t7e('plugins.RicPlot.chart.relSpeed'),
+      unitKmS: t7e('plugins.RicPlot.chart.unitKmS'),
     };
   }
 
@@ -190,7 +193,7 @@ export class RicPlot extends KeepTrackPlugin {
   }
 
   /** Fill the header with the two satellite numbers and the relationship badge. */
-  private updateInfo_(points: RicPoint[]): void {
+  protected updateInfo_(points: RicPoint[]): void {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const satP = catalogManagerInstance.getObject(this.selectSatManager_.selectedSat) as Satellite | null;
     const satS = this.selectSatManager_.secondarySatObj;
@@ -229,7 +232,10 @@ export class RicPlot extends KeepTrackPlugin {
     });
 
     assessmentEl.dataset.relationship = assessment.relationship;
-    assessmentEl.innerHTML = this.renderAssessment_(assessment);
+    // The first sample is the current simulation time, so it is the range "now".
+    const rangeNowKm = points.length > 0 ? points[0].range : NaN;
+
+    assessmentEl.innerHTML = this.renderAssessment_(assessment, rangeNowKm);
   }
 
   private static readonly RELATIONSHIP_LABEL_KEYS: Record<RicRelationship, string> = {
@@ -240,7 +246,7 @@ export class RicPlot extends KeepTrackPlugin {
     unknown: 'plugins.RicPlot.assessment.unknown',
   };
 
-  private renderAssessment_(assessment: RicAssessment): string {
+  private renderAssessment_(assessment: RicAssessment, rangeNowKm: number): string {
     const label = t7e(RicPlot.RELATIONSHIP_LABEL_KEYS[assessment.relationship] as Parameters<typeof t7e>[0]);
     const title = t7e('plugins.RicPlot.assessment.title');
 
@@ -250,11 +256,15 @@ export class RicPlot extends KeepTrackPlugin {
 
     const planeTxt = `Δ${t7e('plugins.RicPlot.assessment.plane')} ${assessment.planeAngleDeg.toFixed(1)}°`;
     const periodTxt = `ΔP ${assessment.periodDiffPct.toFixed(1)}%`;
-    const rangeTxt = `${t7e('plugins.RicPlot.chart.range')} ${assessment.maxRangeKm.toFixed(0)} ${t7e('plugins.RicPlot.chart.unitKm')}`;
+    const unitKm = t7e('plugins.RicPlot.chart.unitKm');
+    // The maximum is taken over the whole plotted window, so say so: it is not the current range.
+    const maxRangeLabel = t7e('plugins.RicPlot.assessment.maxRange').replace('{orbits}', this.orbits_.toString());
+    const maxRangeTxt = `${maxRangeLabel} ${assessment.maxRangeKm.toFixed(0)} ${unitKm}`;
+    const rangeNowTxt = Number.isFinite(rangeNowKm) ? ` · ${t7e('plugins.RicPlot.assessment.rangeNow')} ${rangeNowKm.toFixed(1)} ${unitKm}` : '';
 
     return `
       <span class="ric-assessment-label">${title}: ${label}</span>
-      <span class="ric-assessment-metrics">${planeTxt} · ${periodTxt} · ${rangeTxt}</span>`;
+      <span class="ric-assessment-metrics">${planeTxt} · ${periodTxt} · ${maxRangeTxt}${rangeNowTxt}</span>`;
   }
 
   getPlotData(): RicPoint[] {
@@ -283,6 +293,7 @@ export class RicPlot extends KeepTrackPlugin {
       // so the time axis matches the propagated samples and spans the full 5-orbit window.
       const offsetMin = (idx * satS.period * NUMBER_OF_ORBITS) / NUMBER_OF_POINTS;
       const range = Math.hypot(point.x, point.y, point.z);
+      const sampleTime = new Date(now + offsetMin * 60 * 1000);
 
       return {
         t: offsetMin,
@@ -290,8 +301,27 @@ export class RicPlot extends KeepTrackPlugin {
         i: point.y,
         c: point.z,
         range,
-        iso: new Date(now + offsetMin * 60 * 1000).toISOString(),
+        iso: sampleTime.toISOString(),
+        relSpeed: RicPlot.relativeSpeedKmS(satP, satS, sampleTime),
       };
     });
+  }
+
+  /**
+   * Relative speed |v_secondary - v_primary| (km/s) at a time, from the same SGP4 state the RIC
+   * samples use. Undefined when either propagation fails (SatMath.getEci returns a zero state).
+   */
+  static relativeSpeedKmS(satP: Satellite, satS: Satellite, date: Date): number | undefined {
+    const p = SatMath.getEci(satP, date);
+    const s = SatMath.getEci(satS, date);
+    const isZero = (v: { x: number; y: number; z: number }) => v.x === 0 && v.y === 0 && v.z === 0;
+
+    if (!p?.velocity || !s?.velocity || isZero(p.position) || isZero(s.position)) {
+      return undefined;
+    }
+
+    const speed = Math.hypot(s.velocity.x - p.velocity.x, s.velocity.y - p.velocity.y, s.velocity.z - p.velocity.z);
+
+    return Number.isFinite(speed) ? speed : undefined;
   }
 }

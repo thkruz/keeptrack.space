@@ -3,7 +3,7 @@
     "BreakupAnalysis": {
       "bottomIconLabel": "Analyse de Fragmentation",
       "title": "Analyse de Fragmentation",
-      "helpBody": "Le plugin d'Analyse de Fragmentation fournit une base de données des principaux événements de fragmentation de satellites dans l'histoire. Sélectionnez un événement pour voir des informations détaillées, y compris l'objet parent, la cause de la fragmentation, la chronologie du lancement à la fragmentation et l'analyse de la dispersion des fragments. Le plugin recherche dans le catalogue actuel les débris suivis correspondant à chaque événement et affiche des analyses statistiques des plages d'altitude, d'excentricité et des distributions d'inclinaison.",
+      "helpBody": "Le plugin d'Analyse de Fragmentation fournit une base de données des principaux événements de fragmentation de satellites dans l'histoire. Sélectionnez un événement pour voir des informations détaillées, y compris l'objet parent, la cause de la fragmentation, la chronologie du lancement à la fragmentation et l'analyse de la dispersion des fragments. Le plugin recherche dans le catalogue actuel les débris suivis correspondant à chaque événement et affiche des analyses statistiques des plages d'altitude, d'excentricité et des distributions d'inclinaison. Chaque événement affiche la désignation internationale du lancement et le numéro NORAD de l'objet parent, afin de ne pas confondre deux événements de la même famille de lanceurs (par exemple deux fragmentations d'étages supérieurs CZ-6A).",
       "sections": {
         "events": "Événements",
         "debrisStatistics": "Statistiques des débris",
@@ -66,7 +66,8 @@
         "perigee": "Périgée",
         "apogee": "Apogée",
         "incDeg": "Inc (°)",
-        "ecc": "Exc"
+        "ecc": "Exc",
+        "intlDes": "Désignation internationale"
       },
       "errorMsgs": {
         "parentNotFound": "L'objet parent n'est pas dans le catalogue actuel.",

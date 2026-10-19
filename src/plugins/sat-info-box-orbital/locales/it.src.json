@@ -3,11 +3,11 @@
     "title": "Dati orbitali",
     "Apogee": {
       "label": "Apogeo",
-      "tooltip": "Punto più alto dell'orbita"
+      "tooltip": "Quota massima dell'orbita sopra il raggio equatoriale (6378,137 km)"
     },
     "Perigee": {
       "label": "Perigeo",
-      "tooltip": "Punto più basso dell'orbita"
+      "tooltip": "Quota minima dell'orbita sopra il raggio equatoriale (6378,137 km)"
     },
     "Inclination": {
       "label": "Inclinazione",
@@ -52,25 +52,30 @@
       "label": "Velocità",
       "tooltip": "Velocità attuale del satellite (più alta quanto più è vicino alla Terra)"
     },
+    "GPEpoch": {
+      "label": "Epoca GP",
+      "tooltip": "Epoca del set di elementi usato per la propagazione"
+    },
     "AgeOfGP": {
       "label": "Età del GP",
-      "tooltip": "Tempo trascorso dal calcolo ufficiale dell'orbita (dati GP più vecchi sono generalmente meno precisi)",
+      "tooltip": "Tempo dall'epoca del GP all'ora corrente della simulazione (dati GP più vecchi sono generalmente meno precisi; un valore negativo indica che l'epoca è successiva all'ora di simulazione)",
       "days": "Giorni",
       "hours": "Ore",
       "epochYear": "Anno dell'epoca",
-      "epochDay": "Giorno dell'epoca"
+      "epochDay": "Giorno dell'epoca",
+      "epochAfterSimTime": "l'epoca del GP è successiva all'ora di simulazione"
     },
     "RadialSigma": {
       "label": "Sigma radiale",
-      "tooltip": "Incertezza radiale (metri)"
+      "tooltip": "Incertezza di posizione radiale a 1 sigma dalla covarianza derivata dal TLE all'epoca GP (sistema RIC). Stessi valori usati per la Pc e dal rapporto di congiunzione."
     },
     "InTrackSigma": {
       "label": "Sigma lungo traccia",
-      "tooltip": "Incertezza lungo traccia (metri)"
+      "tooltip": "Incertezza di posizione lungo la traccia a 1 sigma dalla covarianza derivata dal TLE all'epoca GP (sistema RIC). Stessi valori usati per la Pc e dal rapporto di congiunzione."
     },
     "CrossTrackSigma": {
       "label": "Sigma trasversale",
-      "tooltip": "Incertezza trasversale (metri)"
+      "tooltip": "Incertezza di posizione trasversale a 1 sigma dalla covarianza derivata dal TLE all'epoca GP (sistema RIC). Stessi valori usati per la Pc e dal rapporto di congiunzione."
     },
     "meter": "m",
     "kilometer": "km",

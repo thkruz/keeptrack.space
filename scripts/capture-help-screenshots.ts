@@ -35,6 +35,8 @@ interface CaptureRecipe {
   settings?: Record<string, unknown>;
   /** Drive the UI into the state to capture. Must leave the plugin's menu open. */
   steps: (page: Page) => Promise<void>;
+  /** Viewport override for menus taller than the default 900px (side menus are viewport-height). */
+  viewport?: { width: number; height: number };
   /** Element screenshots to save. insetLeft crops overlaying UI (e.g. the icon rail). */
   shots: { name: string; selector: string; insetLeft?: number }[];
 }
@@ -223,6 +225,8 @@ const RECIPES: CaptureRecipe[] = [
       await page.locator('#breakup-menu').waitFor({ state: 'visible', timeout: 10_000 });
       await page.waitForTimeout(500);
     },
+    // Tall enough to include the live delta-V statistics readout under the inputs.
+    viewport: { width: 1600, height: 1180 },
     shots: [{ name: 'breakup-menu', selector: '#breakup-menu' }],
   },
   {
@@ -986,6 +990,18 @@ const RECIPES: CaptureRecipe[] = [
     shots: [{ name: 'companion-link-menu', selector: '#companion-link-menu' }],
   },
   {
+    id: 'transit-finder',
+    plugins: {
+      TransitFinderPlugin: { enabled: true },
+    },
+    steps: async (page) => {
+      await openPluginMenu(page, 'transit-finder-icon');
+      await page.locator('#transit-finder-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.waitForTimeout(500);
+    },
+    shots: [{ name: 'transit-finder-menu', selector: '#transit-finder-menu' }],
+  },
+  {
     id: 'graphics-menu',
     plugins: { GraphicsMenuPlugin: { enabled: true } },
     steps: async (page) => {
@@ -1011,7 +1027,7 @@ const RECIPES: CaptureRecipe[] = [
 ];
 
 const runRecipe = async (browser: Browser, recipe: CaptureRecipe): Promise<void> => {
-  const context = await browser.newContext({ viewport: VIEWPORT });
+  const context = await browser.newContext({ viewport: recipe.viewport ?? VIEWPORT });
   const page = await context.newPage();
 
   try {

@@ -3,11 +3,11 @@
     "title": "Orbitale Daten",
     "Apogee": {
       "label": "Apogäum",
-      "tooltip": "Höchster Punkt der Umlaufbahn"
+      "tooltip": "Höchste Höhe der Umlaufbahn über dem Äquatorradius (6378,137 km)"
     },
     "Perigee": {
       "label": "Perigäum",
-      "tooltip": "Tiefster Punkt der Umlaufbahn"
+      "tooltip": "Niedrigste Höhe der Umlaufbahn über dem Äquatorradius (6378,137 km)"
     },
     "Inclination": {
       "label": "Inklination",
@@ -52,25 +52,30 @@
       "label": "Geschwindigkeit",
       "tooltip": "Aktuelle Geschwindigkeit des Satelliten (höher, je näher an der Erde)"
     },
+    "GPEpoch": {
+      "label": "GP-Epoche",
+      "tooltip": "Epoche des für die Propagation verwendeten Elementsatzes"
+    },
     "AgeOfGP": {
       "label": "Alter der GP",
-      "tooltip": "Zeit seit offizieller Umlaufbahnberechnung (ältere GP-Daten sind meist weniger genau)",
+      "tooltip": "Zeit von der GP-Epoche bis zur aktuellen Simulationszeit (ältere GP-Daten sind meist weniger genau; negativ bedeutet, dass die Epoche nach der Simulationszeit liegt)",
       "days": "Tage",
       "hours": "Stunden",
       "epochYear": "Epoche Jahr",
-      "epochDay": "Epoche Tag"
+      "epochDay": "Epoche Tag",
+      "epochAfterSimTime": "GP-Epoche liegt nach der Simulationszeit"
     },
     "RadialSigma": {
       "label": "Radiale Sigma",
-      "tooltip": "Radiale Unsicherheit (Meter)"
+      "tooltip": "1-Sigma-Positionsunsicherheit radial aus der TLE-basierten Kovarianz zur GP-Epoche (RIC-System). Dieselben Werte nutzen Pc und der Konjunktionsbericht."
     },
     "InTrackSigma": {
       "label": "In-Track Sigma",
-      "tooltip": "Unsicherheit in Flugrichtung (Meter)"
+      "tooltip": "1-Sigma-Positionsunsicherheit in Flugrichtung aus der TLE-basierten Kovarianz zur GP-Epoche (RIC-System). Dieselben Werte nutzen Pc und der Konjunktionsbericht."
     },
     "CrossTrackSigma": {
       "label": "Cross-Track Sigma",
-      "tooltip": "Unsicherheit quer zur Flugrichtung (Meter)"
+      "tooltip": "1-Sigma-Positionsunsicherheit quer zur Flugrichtung aus der TLE-basierten Kovarianz zur GP-Epoche (RIC-System). Dieselben Werte nutzen Pc und der Konjunktionsbericht."
     },
     "meter": "m",
     "kilometer": "km",

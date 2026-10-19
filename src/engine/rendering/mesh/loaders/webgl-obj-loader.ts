@@ -4,6 +4,7 @@ import { Layout, MeshMap, OBJ } from 'webgl-obj-loader';
 import { BufferAttribute } from '../../buffer-attribute';
 import { Material } from '../../material';
 import type { MeshModel } from '../../mesh-manager';
+import { computeMeshBounds } from '../mesh-bounds';
 import { MeshLoader } from '../mesh-loader';
 
 export class OBJLoader extends MeshLoader {
@@ -112,6 +113,8 @@ export class OBJLoader extends MeshLoader {
           useUint32Indices: useUint32,
         },
         layout,
+        // Same 0.001 m -> km factor as the vertex buffer above, so the box matches aVertexPosition.
+        bounds: computeMeshBounds(mesh[meshName].vertices ?? [], 0.001),
         geometry: {
           positions: new Float32Array(mesh[meshName].vertices),
           normals: new Float32Array(mesh[meshName].vertexNormals),

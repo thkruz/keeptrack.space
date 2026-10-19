@@ -1299,51 +1299,97 @@ export class DotsManager {
 
     // TODO: Decouple OEM logic from TLE logic
 
-    if (!settingsManager.lowPerf && (renderer.dtAdjusted > settingsManager.minimumDrawDt || Math.abs(this.lastUpdateSimTime - simTime) > 1000)) {
-      if (Number(PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
-        const obj = ServiceLocator.getCatalogManager().objectCache[PluginRegistry.getPlugin(SelectSatManager)!.selectedSat] as Satellite | MissileObject;
+    const isInterpolationFrame = renderer.dtAdjusted > settingsManager.minimumDrawDt || Math.abs(this.lastUpdateSimTime - simTime) > 1000;
 
-        if (obj instanceof Satellite) {
-          const sat = obj as Satellite;
-          const now = ServiceLocator.getTimeManager().simulationTimeObj;
-          const pv = sat.eci(now);
-
-          if (!pv) {
-            return;
-          }
-          this.positionData[Number(sat.id) * 3] = pv.position.x;
-          this.positionData[Number(sat.id) * 3 + 1] = pv.position.y;
-          this.positionData[Number(sat.id) * 3 + 2] = pv.position.z;
-          this.velocityData[Number(sat.id) * 3] = pv.velocity.x;
-          this.velocityData[Number(sat.id) * 3 + 1] = pv.velocity.y;
-          this.velocityData[Number(sat.id) * 3 + 2] = pv.velocity.z;
-        } else if (obj instanceof OemSatellite) {
-          const sat = obj as OemSatellite;
-          const now = (ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000) as Seconds;
-          // WARN: Necessary for orbit history
-          const pv = sat.updatePosAndVel(now);
-
-          if (!pv) {
-            return;
-          }
-          this.positionData[Number(sat.id) * 3] = pv[0];
-          this.positionData[Number(sat.id) * 3 + 1] = pv[1];
-          this.positionData[Number(sat.id) * 3 + 2] = pv[2];
-          this.velocityData[Number(sat.id) * 3] = pv[3];
-          this.velocityData[Number(sat.id) * 3 + 1] = pv[4];
-          this.velocityData[Number(sat.id) * 3 + 2] = pv[5];
-        }
-      }
-
+    if (!settingsManager.lowPerf && isInterpolationFrame) {
       if ((settingsManager.centerBody === SolarBody.Earth || settingsManager.centerBody === SolarBody.Moon) && !settingsManager.isSkipTleInterpolation) {
         this.interpolatePositionsOfTleSatellites_(renderer);
       }
+    }
+
+    /*
+     * The selected primary and secondary are recomputed on the main thread every frame, after the cloud-wide
+     * interpolation so the exact state is not pushed forward by one extra dt. This runs while paused as well:
+     * after a time jump the next cruncher message still carries pre-jump positions and would otherwise
+     * overwrite the slots until the worker catches up (1-2 s), which showed a wrong primary-secondary line,
+     * secondary covariance bubble and dot. Every other dot stays on the worker.
+     */
+    if (!settingsManager.lowPerf) {
+      this.updateSelectedPositionsOnMainThread_(isInterpolationFrame);
     }
 
     this.interpolatePositionsOfOemSatellites();
     this.interpolatePositionsOfMissiles_();
 
     this.lastUpdateSimTime = simTime;
+  }
+
+  /**
+   * Overwrite the selected primary's and secondary's position/velocity slots with a main-thread propagation at
+   * the current simulation time. Only these two objects are recomputed (one SGP4 call each); the rest of the
+   * cloud stays on the position cruncher.
+   * @param isInterpolationFrame - true when the legacy dt gate passed; OEM primaries are only advanced then,
+   * since their history update is not meant to run on every paused frame.
+   */
+  private updateSelectedPositionsOnMainThread_(isInterpolationFrame: boolean): void {
+    const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);
+
+    if (!selectSatManager) {
+      return;
+    }
+
+    const catalogManager = ServiceLocator.getCatalogManager();
+    const simTimeObj = ServiceLocator.getTimeManager().simulationTimeObj;
+    const primaryId = Number(selectSatManager.selectedSat ?? -1);
+    const secondaryId = Number(selectSatManager.secondarySat ?? -1);
+
+    if (primaryId > -1) {
+      const obj = catalogManager.objectCache[primaryId];
+
+      if (obj instanceof Satellite) {
+        this.writeSatelliteStateFromSgp4_(obj, simTimeObj);
+      } else if (obj instanceof OemSatellite && isInterpolationFrame) {
+        // WARN: Necessary for orbit history
+        const pv = obj.updatePosAndVel((simTimeObj.getTime() / 1000) as Seconds);
+
+        if (pv) {
+          this.writeSlot_(Number(obj.id), pv[0], pv[1], pv[2], pv[3], pv[4], pv[5]);
+        }
+      }
+    }
+
+    if (secondaryId > -1 && secondaryId !== primaryId) {
+      const obj = catalogManager.objectCache[secondaryId];
+
+      if (obj instanceof Satellite) {
+        this.writeSatelliteStateFromSgp4_(obj, simTimeObj);
+      }
+    }
+  }
+
+  private writeSatelliteStateFromSgp4_(sat: Satellite, simTimeObj: Date): void {
+    const pv = sat.eci(simTimeObj);
+
+    if (!pv) {
+      return;
+    }
+
+    this.writeSlot_(Number(sat.id), pv.position.x, pv.position.y, pv.position.z, pv.velocity.x, pv.velocity.y, pv.velocity.z);
+  }
+
+  private writeSlot_(id: number, px: number, py: number, pz: number, vx: number, vy: number, vz: number): void {
+    const i3 = id * 3;
+
+    if (i3 + 2 >= this.positionData.length || i3 + 2 >= this.velocityData.length) {
+      return;
+    }
+
+    this.positionData[i3] = px;
+    this.positionData[i3 + 1] = py;
+    this.positionData[i3 + 2] = pz;
+    this.velocityData[i3] = vx;
+    this.velocityData[i3 + 1] = vy;
+    this.velocityData[i3 + 2] = vz;
   }
 
   /**

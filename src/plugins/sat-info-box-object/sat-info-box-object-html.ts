@@ -6,6 +6,7 @@ export const EL = {
   TYPE: 'sat-type',
   STATUS: 'sat-status',
   COUNTRY: 'sat-country',
+  MODEL_FLAG: 'sat-model-flag',
   SITE_ROW: 'sat-site-row',
   LAUNCH_SITE: 'sat-launchSite',
   LAUNCH_PAD: 'sat-launchPad',
@@ -22,4 +23,6 @@ export const EL = {
   RAD: 'sat-sec-rad',
   INTRACK: 'sat-sec-intrack',
   CROSSTRACK: 'sat-sec-crosstrack',
+  /** One-line RIC sign convention for the R/I/C values below it. */
+  RIC_CONVENTION: 'sat-sec-ric-convention',
 };

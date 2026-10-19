@@ -1,6 +1,6 @@
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
-import { OrbitCruncherThreadManager } from '@app/app/threads/orbit-cruncher-thread-manager';
+import { OrbitCruncherThreadManager, OrbitEclipseParams } from '@app/app/threads/orbit-cruncher-thread-manager';
 import { CameraType } from '@app/engine/camera/camera-type';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { KeepTrack } from '@app/keeptrack';
@@ -9,7 +9,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { SettingsManager } from '@app/settings/settings';
 import { OrbitDrawTypes } from '@app/webworker/orbit-cruncher-messages';
-import { BaseObject, Degrees, Kilometers, Satellite } from '@ootk/src/main';
+import { BaseObject, Degrees, Kilometers, Satellite, Sun } from '@ootk/src/main';
 import { mat4 } from 'gl-matrix';
 import { Camera } from '../../engine/camera/camera';
 import { GetSatType } from '../../engine/core/interfaces';
@@ -94,6 +94,56 @@ export class OrbitManager {
   /** Stores the float64 anchor for an object's (anchor-relative) orbit buffer. */
   setOrbitAnchor(satId: number, anchor: [number, number, number]): void {
     this.orbitAnchors_.set(satId, anchor);
+  }
+
+  /**
+   * Eclipse inputs reused for every orbit request. With constant selected-sat
+   * redraw a request goes out nearly every frame, so the Sun vector is only
+   * recomputed when sim time has moved more than {@link SUN_REFRESH_MS_} (the
+   * Sun moves ~0.04 deg per 5 min, far below what the dimmed arc can show).
+   */
+  private readonly eclipseParams_: OrbitEclipseParams = { sunEci: [0, 0, 0], isDrawOrbitEclipse: false, orbitEclipseAlpha: 1 };
+  private sunEciTimeMs_ = Number.NaN;
+  private static readonly SUN_REFRESH_MS_ = 5 * 60 * 1000;
+
+  private getEclipseParams_(simTimeMs: number): OrbitEclipseParams | undefined {
+    // A non-finite sim time (mocked clocks, a bad URL date) must never take orbit
+    // lines down with it: astronomy-engine throws on an invalid Date. Draw undimmed.
+    if (!settingsManager.isDrawOrbitEclipse || !Number.isFinite(simTimeMs)) {
+      return undefined;
+    }
+    const params = this.eclipseParams_;
+
+    if (!(Math.abs(simTimeMs - this.sunEciTimeMs_) <= OrbitManager.SUN_REFRESH_MS_)) {
+      let sun: { x: number; y: number; z: number };
+
+      try {
+        sun = Sun.eci(new Date(simTimeMs));
+      } catch {
+        // The dimmed arc is a cue; an orbit request must never fail because of it.
+        return undefined;
+      }
+
+      params.sunEci[0] = sun.x;
+      params.sunEci[1] = sun.y;
+      params.sunEci[2] = sun.z;
+      this.sunEciTimeMs_ = simTimeMs;
+    }
+    params.isDrawOrbitEclipse = true;
+    params.orbitEclipseAlpha = settingsManager.orbitEclipseAlpha;
+
+    return params;
+  }
+
+  /** Re-request the active orbits after an eclipse setting change. */
+  orbitEclipseSettingChanged(): void {
+    this.reRequestActiveOrbits_();
+  }
+
+  /** Push a changed orbitFadeFactor to the orbit cruncher and redraw the visible orbits. */
+  orbitFadeSettingChanged(): void {
+    this.orbitThreadMgr.sendSettingsUpdate(settingsManager.numberOfEcfOrbitsToDraw, settingsManager.orbitFadeFactor);
+    this.reRequestActiveOrbits_();
   }
 
   orbitThreadMgr = new OrbitCruncherThreadManager(KeepTrack.getInstance().threads);
@@ -334,7 +384,8 @@ export class OrbitManager {
     // Re-request active orbits when time jumps while in ECF mode,
     // because ECF coordinates depend on GMST (Earth rotation)
     EventBus.getInstance().on(EventBusEvent.staticOffsetChange, () => {
-      if (settingsManager.isOrbitCruncherInEcf) {
+      // The dimmed eclipse arc also depends on the Sun direction at the new time.
+      if (settingsManager.isOrbitCruncherInEcf || settingsManager.isDrawOrbitEclipse) {
         this.reRequestActiveOrbits_();
       }
     });
@@ -442,13 +493,16 @@ export class OrbitManager {
   }
 
   changeOrbitBufferData(id: number, tle1: string, tle2: string): void {
+    const simTime = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
+
     this.orbitThreadMgr.sendSatelliteUpdate(
       id,
-      ServiceLocator.getTimeManager().simulationTimeObj.getTime(),
+      simTime,
       settingsManager.isOrbitCruncherInEcf,
       ServiceLocator.getMainCamera().cameraType === CameraType.POLAR_VIEW,
       tle1,
-      tle2
+      tle2,
+      this.getEclipseParams_(simTime)
     );
   }
 
@@ -492,7 +546,7 @@ export class OrbitManager {
         this.setVariableLengthOrbitBuffer_(id, obj.getOrbitPath(), obj.orbitPathAnchor_);
       } else {
         // Then it is a satellite
-        this.orbitThreadMgr.sendSatelliteUpdate(Number(id), simTime, settingsManager.isOrbitCruncherInEcf, isPolarView);
+        this.orbitThreadMgr.sendSatelliteUpdate(Number(id), simTime, settingsManager.isOrbitCruncherInEcf, isPolarView, undefined, undefined, this.getEclipseParams_(simTime));
         this.inProgress_[id] = true;
       }
     }

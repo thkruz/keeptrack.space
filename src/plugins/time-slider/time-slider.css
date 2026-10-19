@@ -28,3 +28,48 @@
 #time-slider-container-slider {
   width: 100%;
 }
+/*
+ * Eclipse and epoch-trust bands, drawn under the handle. Colours are RGB triples
+ * so slider-bands-core can vary the alpha per band via rgba(var(--x), a).
+ */
+:root {
+  --time-slider-eclipse-rgb: 120, 150, 255;
+  --time-slider-trust-rgb: 255, 170, 40;
+  /* Fraction of the band height each layer takes when both are shown. */
+  --band-share: 0.5;
+}
+
+html[data-theme='light'] {
+  --time-slider-eclipse-rgb: 30, 50, 140;
+  --time-slider-trust-rgb: 200, 110, 0;
+}
+
+#time-slider-container-slider {
+  position: relative;
+}
+
+.time-slider-bands {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -6px;
+  height: 12px;
+  pointer-events: none;
+  z-index: 0;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: left top;
+}
+
+.time-slider-bands--split {
+  background-size:
+    100% calc(100% * var(--band-share)),
+    100% calc(100% * (1 - var(--band-share)));
+  background-position:
+    left top,
+    left bottom;
+}
+
+#time-slider-container-slider .ui-slider-handle {
+  z-index: 1;
+}

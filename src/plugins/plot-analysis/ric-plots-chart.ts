@@ -25,6 +25,8 @@ export interface RicPoint {
   range: number;
   /** ISO timestamp of the sample, used in tooltips. */
   iso: string;
+  /** Relative speed |v_secondary - v_primary| (km/s), shown in the tooltip when known. */
+  relSpeed?: number;
 }
 
 /** All user-facing strings the chart needs, resolved by the caller. */
@@ -38,6 +40,10 @@ export interface RicChartLabels {
   empty: string;
   unitKm: string;
   unitMin: string;
+  /** Tooltip label for the relative speed row; the row is omitted when absent. */
+  relSpeed?: string;
+  /** Unit for the relative speed row (km/s). */
+  unitKmS?: string;
 }
 
 const COLORS = {
@@ -106,8 +112,13 @@ export const buildRicChartOption = (points: RicPoint[], labels: RicChartLabels):
       trigger: 'axis',
       formatter: (params) => {
         const arr = Array.isArray(params) ? params : [params];
-        const first = arr[0] as { axisValue?: number };
+        const first = arr[0] as { axisValue?: number; dataIndex?: number };
         const time = typeof first?.axisValue === 'number' ? first.axisValue.toFixed(1) : '';
+        const sample = typeof first?.dataIndex === 'number' ? points[first.dataIndex] : undefined;
+        const relSpeedRow =
+          labels.relSpeed && typeof sample?.relSpeed === 'number' && Number.isFinite(sample.relSpeed)
+            ? `<div style="margin-top: 4px;">${labels.relSpeed}: <b>${sample.relSpeed.toFixed(3)} ${labels.unitKmS ?? 'km/s'}</b></div>`
+            : '';
         const rows = arr
           .map((p) => {
             const point = p as { color?: string; seriesName?: string; value?: number[] };
@@ -130,6 +141,7 @@ export const buildRicChartOption = (points: RicPoint[], labels: RicChartLabels):
           <div style="text-align: left;">
             <div><b>${time} ${labels.unitMin}</b></div>
             ${rows}
+            ${relSpeedRow}
           </div>`;
       },
     },

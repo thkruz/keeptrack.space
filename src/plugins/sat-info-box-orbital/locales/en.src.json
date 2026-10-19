@@ -3,11 +3,11 @@
     "title": "Orbital Data",
     "Apogee": {
       "label": "Apogee",
-      "tooltip": "Highest Point in the Orbit"
+      "tooltip": "Highest altitude in the orbit, above the equatorial radius (6378.137 km)"
     },
     "Perigee": {
       "label": "Perigee",
-      "tooltip": "Lowest Point in the Orbit"
+      "tooltip": "Lowest altitude in the orbit, above the equatorial radius (6378.137 km)"
     },
     "Inclination": {
       "label": "Inclination",
@@ -52,25 +52,30 @@
       "label": "Velocity",
       "tooltip": "Current Velocity of the Satellite (Higher the Closer to Earth it Is)"
     },
+    "GPEpoch": {
+      "label": "GP Epoch",
+      "tooltip": "Epoch of the element set used for propagation"
+    },
     "AgeOfGP": {
       "label": "Age of GP",
-      "tooltip": "Time Since Official Orbit Calculated (Older GP Data is Less Accurate Usually)",
+      "tooltip": "Time from the GP epoch to the current simulation time (older GP data is usually less accurate; negative means the epoch is after the sim time)",
       "days": "Days",
       "hours": "Hours",
       "epochYear": "Epoch Year",
-      "epochDay": "Epoch Day"
+      "epochDay": "Epoch Day",
+      "epochAfterSimTime": "GP epoch is after sim time"
     },
     "RadialSigma": {
       "label": "Radial Sigma",
-      "tooltip": "Radial Uncertainty (meters)"
+      "tooltip": "1-sigma radial position uncertainty from the TLE-derived covariance at the GP epoch (RIC frame). Same values Pc and the Conjunction Report use."
     },
     "InTrackSigma": {
       "label": "In Track Sigma",
-      "tooltip": "In Track Uncertainty (meters)"
+      "tooltip": "1-sigma in-track position uncertainty from the TLE-derived covariance at the GP epoch (RIC frame). Same values Pc and the Conjunction Report use."
     },
     "CrossTrackSigma": {
       "label": "Cross Track Sigma",
-      "tooltip": "Cross Track Uncertainty (meters)"
+      "tooltip": "1-sigma cross-track position uncertainty from the TLE-derived covariance at the GP epoch (RIC frame). Same values Pc and the Conjunction Report use."
     },
     "meter": "m",
     "kilometer": "km",

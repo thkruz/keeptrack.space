@@ -2,7 +2,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { MenuMode } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { Reentries, TipMsg } from '@app/plugins/reentries/reentries';
 import { SpaceObjectType } from '@ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -449,6 +452,128 @@ describe('Reentries_class', () => {
 
       expect(rafSpy).not.toHaveBeenCalled();
       expect(plugin['selectSatIdOnCruncher_']).toBe(5);
+    });
+  });
+
+  describe('TIP row click selection (UX validation scenario 4)', () => {
+    it('selects the object on the next cruncher update and leaves the menu open', () => {
+      const plugin = new Reentries();
+
+      websiteInit(plugin);
+      plugin['isMenuButtonActive'] = true;
+      plugin['tipList_'] = [{ ...mockTipData[0] }];
+      plugin['isFlyToCorridor_'] = false;
+
+      vi.spyOn(ServiceLocator.getCatalogManager(), 'sccNum2Sat').mockReturnValue({ id: 5, sccNum: '25544', sccNum5: '25544' } as any);
+      const selectSat = vi.fn();
+
+      vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue({ selectSat } as any);
+
+      plugin['tipEventClicked_'](0);
+      EventBus.getInstance().emit(EventBusEvent.onCruncherMessage);
+
+      expect(selectSat).toHaveBeenCalledWith(5);
+      expect(plugin['selectSatIdOnCruncher_']).toBeNull();
+      expect(plugin.isMenuButtonActive).toBe(true);
+    });
+  });
+
+  describe('TIP window label', () => {
+    it('shows the TIP window as a plus/minus value', () => {
+      expect(Reentries['formatTipWindow_']('840')).toBe('±840');
+      expect(Reentries['formatTipWindow_']('')).toBe('');
+    });
+
+    it('labels the header column as plus/minus minutes', () => {
+      const plugin = new Reentries();
+
+      websiteInit(plugin);
+      plugin['tipList_'] = [{ ...mockTipData[0], WINDOW: '120' }];
+      plugin['createTipTable_']();
+
+      const table = document.getElementById('reentries-tip-table') as HTMLTableElement;
+
+      // NORAD, Decay, Lat, Lon, Window...
+      expect(table.rows[0].cells[4].textContent).toBe('Window (± min)');
+      expect(table.rows[1].cells[4].textContent).toBe('±120');
+    });
+  });
+
+  describe('help text matches the UI', () => {
+    it('documents the Shift+R chord the plugin actually registers', () => {
+      const plugin = new Reentries();
+      const [shortcut] = plugin.getKeyboardShortcuts();
+
+      expect(shortcut.key).toBe('R');
+      expect(shortcut.shift).toBe(true);
+      expect(shortcut.ctrl).toBe(false);
+      expect(shortcut.description).toBeTruthy();
+      expect(plugin.getHelpConfig().shortcuts![0].keys).toStrictEqual(['Shift', 'R']);
+      expect(plugin.getHelpConfig().sections!.find((s) => s.content.includes('Shift+R'))).toBeDefined();
+    });
+
+    it('describes red rows as reentered objects, matching createReentryRow_', () => {
+      const tabs = new Reentries().getHelpConfig().sections![1].content;
+
+      expect(tabs).toContain('red means the object has reentered');
+      expect(tabs).not.toContain('red means perigee below 120 km');
+    });
+
+    it('the shortcut callback toggles the menu', () => {
+      const plugin = new Reentries();
+
+      websiteInit(plugin);
+      const spy = vi.spyOn(plugin, 'bottomMenuClicked').mockImplementation(() => undefined);
+
+      plugin.getKeyboardShortcuts()[0].callback();
+
+      expect(spy).toHaveBeenCalled();
+    });
+  });
+
+  describe('TIP dry mass and volume', () => {
+    it('fills the Dry Mass and Volume cells once detail data arrives', async () => {
+      const plugin = new Reentries();
+
+      websiteInit(plugin);
+      const sat = { id: 5, sccNum: '58435', eccentricity: 0.001, ageOfElset: () => 5.6, toClassicalElements: () => ({ trueAnomaly: 0 }), rcs: '10' } as any;
+
+      vi.spyOn(ServiceLocator.getCatalogManager(), 'sccNum2Sat').mockReturnValue(sat);
+      global.fetch = vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ DRY_MASS: '6500', LENGTH: '6.3', DIAMETER: '2.7', SPAN: '6.3' }),
+        })
+      ) as vi.Mock;
+
+      plugin['tipList_'] = [{ ...mockTipData[0], NORAD_CAT_ID: '58435' }];
+      plugin['createTipTable_']();
+
+      const table = document.getElementById('reentries-tip-table') as HTMLTableElement;
+      const row = table.rows[1];
+
+      expect(row.cells[9].textContent).toBe('Unknown');
+
+      plugin['fetchMissingTipDetails_']();
+      await vi.waitFor(() => expect(row.cells[9].textContent).toBe('6500'));
+
+      expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('58435'), undefined);
+      expect(row.cells[10].textContent).toBe(((Math.PI / 6) * 6.3 * 6.3 * 2.7).toFixed(2));
+    });
+
+    it('does not request detail twice for the same object', () => {
+      const plugin = new Reentries();
+
+      websiteInit(plugin);
+      vi.spyOn(ServiceLocator.getCatalogManager(), 'sccNum2Sat').mockReturnValue({ sccNum: '58435' } as any);
+      const fetchSpy = vi.spyOn(Reentries as any, 'fetchTipDetail_').mockResolvedValue(false);
+
+      plugin['tipList_'] = [{ ...mockTipData[0], NORAD_CAT_ID: '58435' }];
+      plugin['fetchMissingTipDetails_']();
+      plugin['fetchMissingTipDetails_']();
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
     });
   });
 

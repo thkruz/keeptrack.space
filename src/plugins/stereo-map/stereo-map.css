@@ -36,3 +36,11 @@
 #map-menu-secondary .input-field input:focus-visible {
   outline: none;
 }
+/* The shared title bar bleeds -1rem left/right to cancel the default 1rem
+ * .side-menu side padding. addHtml() zeroes this menu's padding for the
+ * full-bleed canvas, so the bleed would push the title bar (and its close
+ * button) 16px past the menu edge. */
+#map-menu-content > .side-menu-title-bar {
+  margin-left: 0;
+  margin-right: 0;
+}

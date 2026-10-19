@@ -990,6 +990,18 @@ const RECIPES: CaptureRecipe[] = [
     shots: [{ name: 'companion-link-menu', selector: '#companion-link-menu' }],
   },
   {
+    id: 'transit-finder',
+    plugins: {
+      TransitFinderPlugin: { enabled: true },
+    },
+    steps: async (page) => {
+      await openPluginMenu(page, 'transit-finder-icon');
+      await page.locator('#transit-finder-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      await page.waitForTimeout(500);
+    },
+    shots: [{ name: 'transit-finder-menu', selector: '#transit-finder-menu' }],
+  },
+  {
     id: 'graphics-menu',
     plugins: { GraphicsMenuPlugin: { enabled: true } },
     steps: async (page) => {

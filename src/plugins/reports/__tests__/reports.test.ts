@@ -1,9 +1,12 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable dot-notation */
 /* eslint-disable no-new */
+import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { ReportsPlugin } from '@app/plugins/reports/reports';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -253,6 +256,44 @@ describe('ReportsPlugin report generation', () => {
     expect(data.header).toContain('Visibility Windows');
     expect(data.table!.headers).toContain('Pass #');
     expect(data.table!.rows.length).toBe(1);
+  });
+
+  it('buildContext_ keeps the same start minute for back-to-back reports while the clock runs', () => {
+    const timeManager = ServiceLocator.getTimeManager();
+    const t0 = new Date('2026-10-18T17:45:50Z');
+
+    timeManager.simulationTimeObj = new Date(t0);
+    const first = p().buildContext_(defaultSat).options.startTime.getTime();
+
+    // The clock runs on 40 s: the floored minute would move to 17:46
+    timeManager.simulationTimeObj = new Date(t0.getTime() + 40_000);
+    const second = p().buildContext_(defaultSat).options.startTime.getTime();
+
+    expect(first).toBe(new Date('2026-10-18T17:45:00Z').getTime());
+    expect(second).toBe(first);
+
+    // A clock jump (staticOffsetChange) re-anchors on the next report
+    EventBus.getInstance().emit(EventBusEvent.staticOffsetChange, 0);
+    expect(p().buildContext_(defaultSat).options.startTime.getTime()).toBe(new Date('2026-10-18T17:46:00Z').getTime());
+
+    // Drifting far past the anchor also re-anchors
+    timeManager.simulationTimeObj = new Date(t0.getTime() + 60 * 60_000);
+    expect(p().buildContext_(defaultSat).options.startTime.getTime()).toBe(new Date('2026-10-18T18:45:00Z').getTime());
+  });
+
+  it('findReportPasses_ returns one continuous window for an object that never leaves the field of regard', () => {
+    vi.spyOn(p(), 'findPasses_').mockReturnValue([]);
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'calcSatrec').mockReturnValue(defaultSat.satrec as never);
+    vi.spyOn(SatMath, 'getRae').mockReturnValue({ az: 120 as never, el: 30 as never, rng: 39000 as never });
+    vi.spyOn(SatMath, 'checkIsInView').mockReturnValue(true);
+    const options = { startTime, windowSec: 24 * 60 * 60, stepSec: 60 };
+
+    const passes = p().findReportPasses_(defaultSat, makeFakeSensor(), options);
+
+    expect(passes).toHaveLength(1);
+    expect(passes[0].edge).toBe('continuous');
+    expect(passes[0].aos.getTime()).toBe(startTime.getTime());
+    expect(passes[0].los.getTime()).toBe(startTime.getTime() + 24 * 60 * 60 * 1000);
   });
 
   it('visibility-windows generator throws without a sensor', () => {

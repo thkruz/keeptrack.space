@@ -55,6 +55,11 @@ export interface ReportData {
   table?: ReportTable;
   /** Message shown in place of rows when the table is empty (e.g. "No passes found"). */
   emptyMessage?: string;
+  /**
+   * When true the CSV download starts with the metadata {@link header} as `#` comment
+   * rows (station, window) before the table. Off by default so pure data CSVs stay clean.
+   */
+  csvIncludeHeader?: boolean;
   /** Extra titled tables shown in the text output before the main table (CSV carries only the main table). */
   sections?: ReportSection[];
   /** Title printed above the main table in the text output. */
@@ -76,13 +81,111 @@ export interface ReportData {
 /** Sun-illumination state of the satellite, mapped to display strings by the core. */
 export type SunIllumination = 'sun' | 'penumbral' | 'umbral' | 'unknown';
 
+/**
+ * Why a pass window edge is the report window edge rather than a real rise/set:
+ * `continuous` = in view for the whole window, `start`/`end` = already in view at the
+ * window start / still in view at the window end.
+ */
+export type ReportPassEdge = 'continuous' | 'start' | 'end';
+
 /** A single in-view pass window over a sensor. */
 export interface ReportPass {
   aos: Date;
   los: Date;
   maxEl: number;
   maxElTime: Date;
+  /** Set when the window is clipped by the report interval (see {@link ReportPassEdge}). */
+  edge?: ReportPassEdge;
 }
+
+/** Visibility at one instant, as the edge-pass scan needs it. */
+export interface ReportVisibilitySample {
+  inView: boolean;
+  el: number;
+}
+
+/** Report-table note for a clipped pass window. */
+const PASS_EDGE_NOTE: Record<ReportPassEdge, string> = {
+  continuous: 'continuous',
+  start: 'in view at start',
+  end: 'in view at end',
+};
+
+/**
+ * Adds the pass windows a rise/set finder cannot see: an object already in view at the
+ * report start, still in view at the report end, or in view the whole time (a GEO that
+ * never sets). The last case returns ONE window spanning the whole report interval,
+ * flagged `continuous`. Pure: visibility is sampled through `sampleAt`.
+ * @param passes Rise-to-set passes found inside the window (sorted by AOS).
+ * @param opts The report window.
+ * @param scanStepSec Sampling step for the edge scans, in seconds.
+ * @param sampleAt Visibility at an instant (in the sensor's field of regard + elevation).
+ */
+export const addWindowEdgePasses = (passes: ReportPass[], opts: ReportOptions, scanStepSec: number, sampleAt: (date: Date) => ReportVisibilitySample | null): ReportPass[] => {
+  const startMs = opts.startTime.getTime();
+  const endMs = startMs + opts.windowSec * MILLISECONDS_PER_SECOND;
+  const stepMs = Math.max(1, scanStepSec) * MILLISECONDS_PER_SECOND;
+
+  if (endMs <= startMs) {
+    return passes;
+  }
+
+  /** Walks from `fromMs` toward `toMs` while in view; returns the last in-view time and the peak. */
+  const scan = (fromMs: number, toMs: number): { lastInMs: number; maxEl: number; maxElMs: number; reachedEnd: boolean } => {
+    const dir = toMs >= fromMs ? 1 : -1;
+    let lastInMs = fromMs;
+    let maxEl = Number.NEGATIVE_INFINITY;
+    let maxElMs = fromMs;
+    let ms = fromMs;
+
+    for (;;) {
+      const sample = sampleAt(new Date(ms));
+
+      if (!sample?.inView) {
+        return { lastInMs, maxEl, maxElMs, reachedEnd: false };
+      }
+      lastInMs = ms;
+      if (sample.el > maxEl) {
+        maxEl = sample.el;
+        maxElMs = ms;
+      }
+      if (ms === toMs) {
+        return { lastInMs, maxEl, maxElMs, reachedEnd: true };
+      }
+      const next = ms + dir * stepMs;
+
+      // Clamp so the final sample lands exactly on the far edge.
+      ms = dir > 0 ? Math.min(next, toMs) : Math.max(next, toMs);
+    }
+  };
+
+  const result = [...passes];
+
+  if (sampleAt(new Date(startMs))?.inView) {
+    const fwd = scan(startMs, endMs);
+
+    if (fwd.reachedEnd) {
+      return [{ aos: new Date(startMs), los: new Date(endMs), maxEl: fwd.maxEl, maxElTime: new Date(fwd.maxElMs), edge: 'continuous' }];
+    }
+
+    const first = result[0];
+
+    if (!first || first.aos.getTime() > fwd.lastInMs) {
+      result.unshift({ aos: new Date(startMs), los: new Date(fwd.lastInMs), maxEl: fwd.maxEl, maxElTime: new Date(fwd.maxElMs), edge: 'start' });
+    }
+  }
+
+  if (sampleAt(new Date(endMs))?.inView) {
+    const back = scan(endMs, startMs);
+    const last = result.at(-1);
+
+    if (!last || last.los.getTime() < back.lastInMs) {
+      result.push({ aos: new Date(back.lastInMs), los: new Date(endMs), maxEl: back.maxEl, maxElTime: new Date(back.maxElMs), edge: 'end' });
+    }
+  }
+
+  return result;
+};
 
 /** Time window controls shared by the time-series reports. */
 export interface ReportOptions {
@@ -197,6 +300,13 @@ export const buildReportHeader = (title: string, sat: HeaderSat, sensor: Detaile
   return satData + sensorData;
 };
 
+/** One header line stating the sampled interval, so two reports can be compared at a glance. */
+export const buildReportWindowLine = (opts: ReportOptions): string => {
+  const endMs = opts.startTime.getTime() + opts.windowSec * MILLISECONDS_PER_SECOND;
+
+  return `Report Window: ${formatReportTime(opts.startTime)} to ${formatReportTime(new Date(endMs))} UTC, Step: ${Math.max(1, opts.stepSec)} s\n\n`;
+};
+
 /**
  * Azimuth/Elevation/Range report. Samples the look angle at {@link ReportOptions.stepSec}
  * inside each in-view pass window (found by the injected pass finder) rather than
@@ -204,7 +314,7 @@ export const buildReportHeader = (title: string, sat: HeaderSat, sensor: Detaile
  * regard and never blocks on a multi-day on-thread scan.
  */
 export const generateAerReport = (sat: Satellite, sensor: DetailedSensor, opts: ReportOptions, deps: ReportCoreDeps, generatedAt: Date): ReportData => {
-  const header = buildReportHeader('Azimuth Elevation Range Report', sat, sensor, generatedAt);
+  const header = buildReportHeader('Azimuth Elevation Range Report', sat, sensor, generatedAt) + buildReportWindowLine(opts);
   const rows: string[][] = [];
   const stepMs = Math.max(1, opts.stepSec) * MILLISECONDS_PER_SECOND;
   const passes = deps.findPasses(sensor, opts);
@@ -232,7 +342,7 @@ export const generateAerReport = (sat: Satellite, sensor: DetailedSensor, opts: 
 
 /** Latitude/Longitude/Altitude ground track over the report window. */
 export const generateLlaReport = (sat: ReportableObject, opts: ReportOptions, generatedAt: Date): ReportData => {
-  const header = buildReportHeader('Latitude Longitude Altitude Report', sat, null, generatedAt);
+  const header = buildReportHeader('Latitude Longitude Altitude Report', sat, null, generatedAt) + buildReportWindowLine(opts);
   const rows: string[][] = [];
   const stepMs = Math.max(1, opts.stepSec) * MILLISECONDS_PER_SECOND;
   const endMs = opts.startTime.getTime() + opts.windowSec * MILLISECONDS_PER_SECOND;
@@ -257,7 +367,7 @@ export const generateLlaReport = (sat: ReportableObject, opts: ReportOptions, ge
 
 /** Earth Centered Inertial (TEME) position and velocity over the report window. */
 export const generateEciReport = (sat: ReportableObject, opts: ReportOptions, generatedAt: Date): ReportData => {
-  const header = buildReportHeader('Earth Centered Inertial (TEME) Report', sat, null, generatedAt);
+  const header = buildReportHeader('Earth Centered Inertial (TEME) Report', sat, null, generatedAt) + buildReportWindowLine(opts);
   const rows: string[][] = [];
   const stepMs = Math.max(1, opts.stepSec) * MILLISECONDS_PER_SECOND;
   const endMs = opts.startTime.getTime() + opts.windowSec * MILLISECONDS_PER_SECOND;
@@ -332,22 +442,33 @@ export const generateCoesReport = (sat: OrbitalReportableObject, generatedAt: Da
 
 /** Rise/set visibility windows over a sensor for the report window. */
 export const generateVisibilityWindowsReport = (sat: Satellite, sensor: DetailedSensor, opts: ReportOptions, deps: ReportCoreDeps, generatedAt: Date): ReportData => {
-  const header = buildReportHeader('Visibility Windows Report', sat, sensor, generatedAt);
+  const header = buildReportHeader('Visibility Windows Report', sat, sensor, generatedAt) + buildReportWindowLine(opts);
   const passes = deps.findPasses(sensor, opts);
+  // A Note column only when a window is clipped by the report interval (e.g. a GEO that never sets)
+  const hasNotes = passes.some((pass) => typeof pass.edge !== 'undefined');
   const rows = passes.map((pass, idx) => {
     const durationMin = (pass.los.getTime() - pass.aos.getTime()) / (MILLISECONDS_PER_SECOND * 60);
+    const row = [`${idx + 1}`, formatReportTime(pass.aos), formatReportTime(pass.los), durationMin.toFixed(2), pass.maxEl.toFixed(1), formatReportTime(pass.maxElTime)];
 
-    return [`${idx + 1}`, formatReportTime(pass.aos), formatReportTime(pass.los), durationMin.toFixed(2), pass.maxEl.toFixed(1), formatReportTime(pass.maxElTime)];
+    if (hasNotes) {
+      row.push(pass.edge ? PASS_EDGE_NOTE[pass.edge] : '');
+    }
+
+    return row;
   });
+  const headers = ['Pass #', 'Rise Time (UTC)', 'Set Time (UTC)', 'Duration (min)', 'Max Elevation(°)', 'Max Elevation Time (UTC)'];
+
+  if (hasNotes) {
+    headers.push('Note');
+  }
 
   return {
     filename: `visibility-windows-${sat.sccNum}`,
     header,
-    table: {
-      headers: ['Pass #', 'Rise Time (UTC)', 'Set Time (UTC)', 'Duration (min)', 'Max Elevation(°)', 'Max Elevation Time (UTC)'],
-      rows,
-    },
+    table: { headers, rows },
     emptyMessage: 'No passes found in the report window!',
+    // The station block (name, lat/lon/alt, mask, window) travels with the CSV too
+    csvIncludeHeader: true,
   };
 };
 
@@ -367,7 +488,7 @@ const ECLIPSE_LABEL: Record<SunIllumination, string> = {
 
 /** Sun illumination + eclipse timing over the report window (for power/thermal work). */
 export const generateSunEclipseReport = (sat: ReportableObject, opts: ReportOptions, deps: ReportCoreDeps, generatedAt: Date): ReportData => {
-  const header = buildReportHeader('Sun/Eclipse Analysis Report', sat, null, generatedAt);
+  const header = buildReportHeader('Sun/Eclipse Analysis Report', sat, null, generatedAt) + buildReportWindowLine(opts);
   const rows: string[][] = [];
   const stepMs = Math.max(1, opts.stepSec) * MILLISECONDS_PER_SECOND;
   const endMs = opts.startTime.getTime() + opts.windowSec * MILLISECONDS_PER_SECOND;

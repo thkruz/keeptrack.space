@@ -58,6 +58,7 @@ import {
 } from './conjunction-report-core';
 import { buildDownloadPayload, buildPreviewText, ReportFormat } from './report-formatter';
 import {
+  addWindowEdgePasses,
   generateAerReport,
   generateCoesReport,
   generateEciReport,
@@ -200,6 +201,15 @@ export class ReportsPlugin extends KeepTrackPlugin {
   protected conjHalfWidthSec_: number = CONJUNCTION_DEFAULT_HALF_WIDTH_SEC;
 
   /**
+   * Start minute shared by every report generated in one menu session. Without it a
+   * running clock moves the floored start between two back-to-back reports (LLA at 17:45,
+   * Sun/Eclipse at 17:46 for the "same" inputs). Cleared when the menu opens or the user
+   * jumps the clock, and ignored once the clock has drifted past {@link START_ANCHOR_MAX_DRIFT_MS_}.
+   */
+  private startAnchor_: { startMs: number; simMs: number } | null = null;
+  private static readonly START_ANCHOR_MAX_DRIFT_MS_ = 15 * 60 * 1000;
+
+  /**
    * Register a new report generator
    * This can be called by any plugin to add custom reports
    * @param report The report generator to register
@@ -260,6 +270,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
     // Default toggle behavior handled by base class. Screening runs and the
     // secondary can change while the menu is closed, so refresh the rows.
     this.updateReportAvailability_();
+    // A new menu session starts from the current clock
+    this.startAnchor_ = null;
   }
 
   getSideMenuConfig(): ISideMenuConfig {
@@ -456,6 +468,10 @@ export class ReportsPlugin extends KeepTrackPlugin {
     EventBus.getInstance().on(EventBusEvent.resetSensor, () => this.updateReportAvailability_());
     EventBus.getInstance().on(EventBusEvent.selectSatData, () => this.updateReportAvailability_());
     EventBus.getInstance().on(EventBusEvent.setSecondarySat, () => this.updateReportAvailability_());
+    // A clock jump is a new set of inputs: the next report re-anchors its start
+    EventBus.getInstance().on(EventBusEvent.staticOffsetChange, () => {
+      this.startAnchor_ = null;
+    });
   }
 
   private uiManagerFinal_(): void {
@@ -691,9 +707,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   protected buildContext_(sat: ReportTarget): ReportContext {
     // The report Date keeps seconds; the tables still start on the whole minute.
     const generatedAt = this.getStartTime_();
-    const startTime = new Date(generatedAt.getTime());
-
-    startTime.setUTCSeconds(0);
+    const startTime = new Date(this.resolveStartMs_(generatedAt));
     const options: ReportOptions = { startTime, windowSec: this.windowSec_, stepSec: this.stepSec_ };
 
     return {
@@ -706,6 +720,27 @@ export class ReportsPlugin extends KeepTrackPlugin {
   }
 
   /**
+   * First sample time (whole minute) for a report generated at `generatedAt`. Reuses the
+   * session anchor while it is still close to the clock so back-to-back reports with the
+   * same settings start on the same sample even with the clock running.
+   */
+  private resolveStartMs_(generatedAt: Date): number {
+    const simMs = generatedAt.getTime();
+    const anchor = this.startAnchor_;
+
+    if (anchor && simMs >= anchor.startMs && simMs - anchor.simMs <= ReportsPlugin.START_ANCHOR_MAX_DRIFT_MS_) {
+      return anchor.startMs;
+    }
+
+    const floored = new Date(simMs);
+
+    floored.setUTCSeconds(0, 0);
+    this.startAnchor_ = { startMs: floored.getTime(), simMs };
+
+    return floored.getTime();
+  }
+
+  /**
    * Builds the application-state dependencies the pure generators need. Everything
    * is computed lazily inside the closures so non-sensor reports (e.g. COES) never
    * trigger the satrec/pass machinery.
@@ -714,9 +749,29 @@ export class ReportsPlugin extends KeepTrackPlugin {
     return {
       // Pass finding needs a satrec, so it only exists for TLE-backed satellites;
       // sensor reports are gated to those, this guard just keeps the closure total.
-      findPasses: (sensor, opts) => (sat instanceof Satellite ? this.findPasses_(sat, sensor, opts) : []),
+      findPasses: (sensor, opts) => (sat instanceof Satellite ? this.findReportPasses_(sat, sensor, opts) : []),
       sunStatusAt: (date) => ReportsPlugin.sunStatusAt_(sat, date),
     };
+  }
+
+  /**
+   * Passes for the AER and Visibility Windows reports: the rise-to-set passes plus the
+   * windows clipped by the report interval. An object that never sets (GEO) yields one
+   * `continuous` window spanning the whole interval instead of an empty table.
+   */
+  protected findReportPasses_(sat: Satellite, sensor: DetailedSensor, opts: ReportOptions): ReportPass[] {
+    const satrec = ServiceLocator.getCatalogManager().calcSatrec(sat);
+    const sampleAt = (date: Date) => {
+      const rae = SatMath.getRae(date, satrec, sensor, true);
+
+      if (rae.el === null) {
+        return null;
+      }
+
+      return { inView: SatMath.checkIsInView(sensor, rae as Parameters<typeof SatMath.checkIsInView>[1]), el: rae.el };
+    };
+
+    return addWindowEdgePasses(this.findPasses_(sat, sensor, opts), opts, Math.min(opts.stepSec, 30), sampleAt);
   }
 
   /** Finds in-view passes via the shared best-pass finder, mapping rows to {@link ReportPass}. */

@@ -1,7 +1,9 @@
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { buildDownloadPayload } from '@app/plugins/reports/report-formatter';
 import {
+  addWindowEdgePasses,
   buildReportHeader,
+  buildReportWindowLine,
   formatReportTime,
   generateAerReport,
   generateCoesReport,
@@ -210,6 +212,128 @@ describe('reports-core', () => {
       const data = generateLlaReport(gappy as never, opts, generatedAt);
 
       expect(data.table!.rows).toHaveLength(0);
+    });
+  });
+
+  describe('addWindowEdgePasses (objects that do not rise and set inside the window)', () => {
+    const win: ReportOptions = { startTime, windowSec: 3600, stepSec: 60 };
+    const endMs = startTime.getTime() + 3600_000;
+    const at = (min: number) => new Date(startTime.getTime() + min * 60_000);
+
+    it('a GEO that never sets gives ONE continuous window spanning the whole interval', () => {
+      const result = addWindowEdgePasses([], win, 30, (d) => ({ inView: true, el: 30 + (d.getTime() === at(20).getTime() ? 5 : 0) }));
+
+      expect(result).toHaveLength(1);
+      expect(result[0].aos.getTime()).toBe(startTime.getTime());
+      expect(result[0].los.getTime()).toBe(endMs);
+      expect(result[0].edge).toBe('continuous');
+      expect(result[0].maxEl).toBe(35);
+      expect(result[0].maxElTime.getTime()).toBe(at(20).getTime());
+    });
+
+    it('adds a clipped window for an object in view at the start and at the end', () => {
+      // In view for the first 10 min and the last 5 min; one normal pass in between.
+      const mid: ReportPass = { aos: at(25), los: at(35), maxEl: 50, maxElTime: at(30) };
+      const inView = (d: Date) => d.getTime() <= at(10).getTime() || d.getTime() >= at(55).getTime() || (d >= mid.aos && d <= mid.los);
+      const result = addWindowEdgePasses([mid], win, 30, (d) => ({ inView: inView(d), el: 20 }));
+
+      expect(result).toHaveLength(3);
+      expect(result[0]).toMatchObject({ edge: 'start' });
+      expect(result[0].aos.getTime()).toBe(startTime.getTime());
+      expect(result[0].los.getTime()).toBe(at(10).getTime());
+      expect(result[1]).toBe(mid);
+      expect(result[2]).toMatchObject({ edge: 'end' });
+      expect(result[2].aos.getTime()).toBe(at(55).getTime());
+      expect(result[2].los.getTime()).toBe(endMs);
+    });
+
+    it('leaves passes alone when the object is out of view at both edges', () => {
+      const result = addWindowEdgePasses([onePass], win, 30, () => ({ inView: false, el: -5 }));
+
+      expect(result).toStrictEqual([onePass]);
+    });
+
+    it('does not duplicate a pass the finder already starts at the window start', () => {
+      const first: ReportPass = { aos: startTime, los: at(8), maxEl: 40, maxElTime: at(4) };
+      const result = addWindowEdgePasses([first], win, 30, (d) => ({ inView: d.getTime() <= at(8).getTime(), el: 20 }));
+
+      expect(result).toStrictEqual([first]);
+    });
+
+    it('treats a null sample (no propagation) as out of view', () => {
+      expect(addWindowEdgePasses([], win, 30, () => null)).toStrictEqual([]);
+    });
+  });
+
+  describe('continuous windows in the AER and Visibility Windows reports', () => {
+    const continuous: ReportPass = {
+      aos: startTime,
+      los: new Date(startTime.getTime() + opts.windowSec * 1000),
+      maxEl: 36,
+      maxElTime: new Date(startTime.getTime() + 3600_000),
+      edge: 'continuous',
+    };
+    const geoDeps: ReportCoreDeps = { ...deps, findPasses: () => [continuous] };
+
+    it('Visibility Windows prints one row flagged "continuous" spanning the interval', () => {
+      const data = generateVisibilityWindowsReport(defaultSat, fakeSensor, opts, geoDeps, generatedAt);
+
+      expect(data.table!.headers.at(-1)).toBe('Note');
+      expect(data.table!.rows).toHaveLength(1);
+      expect(data.table!.rows[0][1]).toBe('2022-01-01 00:00:00');
+      expect(data.table!.rows[0][2]).toBe('2022-01-01 06:00:00');
+      expect(data.table!.rows[0].at(-1)).toBe('continuous');
+    });
+
+    it('AER samples the whole interval at the report step', () => {
+      const data = generateAerReport(defaultSat, fakeSensor, opts, geoDeps, generatedAt);
+
+      // 6 h at 60 s, both edges inclusive
+      expect(data.table!.rows).toHaveLength(6 * 60 + 1);
+      expect(data.table!.rows[0][0]).toBe('2022-01-01 00:00:00');
+    });
+
+    it('Visibility Windows has no Note column when no window is clipped', () => {
+      const data = generateVisibilityWindowsReport(defaultSat, fakeSensor, opts, deps, generatedAt);
+
+      expect(data.table!.headers).not.toContain('Note');
+    });
+  });
+
+  describe('station header in the Visibility Windows CSV', () => {
+    it('the CSV starts with the station block and window as # comment rows, then the table', () => {
+      const data = generateVisibilityWindowsReport(defaultSat, fakeSensor, opts, deps, generatedAt);
+      const csv = buildDownloadPayload(data, 'csv').content;
+      const lines = csv.split('\n');
+
+      expect(lines[0]).toBe('# Visibility Windows Report');
+      expect(csv).toContain('# Sensor: FAKE');
+      expect(csv).toContain('# Latitude: 10');
+      expect(csv).toContain('# Longitude: 20');
+      expect(csv).toContain('# Altitude: 0');
+      expect(csv).toContain('# Report Window: 2022-01-01 00:00:00 to 2022-01-01 06:00:00 UTC, Step: 60 s');
+      const tableStart = lines.findIndex((line) => !line.startsWith('#'));
+
+      expect(lines[tableStart]).toBe('Pass #,Rise Time (UTC),Set Time (UTC),Duration (min),Max Elevation(°),Max Elevation Time (UTC)');
+    });
+
+    it('pure time-series CSVs (LLA) stay data-only', () => {
+      const csv = buildDownloadPayload(generateLlaReport(defaultSat, opts, generatedAt), 'csv').content;
+
+      expect(csv.startsWith('Time (UTC),')).toBe(true);
+    });
+  });
+
+  describe('LLA and Sun/Eclipse share the first sample for the same inputs', () => {
+    it('both start at opts.startTime and print the same Report Window line', () => {
+      const lla = generateLlaReport(defaultSat, opts, generatedAt);
+      const sun = generateSunEclipseReport(defaultSat, opts, deps, generatedAt);
+
+      expect(lla.table!.rows[0][0]).toBe(sun.table!.rows[0][0]);
+      expect(lla.table!.rows[0][0]).toBe('2022-01-01 00:00:00');
+      expect(lla.table!.rows).toHaveLength(sun.table!.rows.length);
+      expect(lla.header).toContain(buildReportWindowLine(opts).trim());
+      expect(sun.header).toContain(buildReportWindowLine(opts).trim());
     });
   });
 });

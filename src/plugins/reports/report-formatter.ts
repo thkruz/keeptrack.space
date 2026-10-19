@@ -109,6 +109,18 @@ const csvCell = (cell: string): string => (/[",\n]/u.test(cell) ? `"${cell.repla
 /** Serializes the table as comma-separated values (data only, no metadata header). */
 export const tableToCsv = (table: ReportTable): string => [table.headers, ...table.rows].map((row) => row.map(csvCell).join(',')).join('\n');
 
+/**
+ * The metadata header as leading `#` comment rows for a CSV preamble (blank lines dropped).
+ * Spreadsheet and pandas (`comment='#'`) readers skip them; the table follows unchanged.
+ */
+export const headerToCsvComments = (header: string): string =>
+  header
+    .split('\n')
+    .map((line) => line.trimEnd())
+    .filter((line) => line.length > 0)
+    .map((line) => `# ${line}`)
+    .join('\n');
+
 /** Serializes the data rows as an array of header-keyed JSON objects. */
 export const tableToJson = (table: ReportTable): string => {
   const records = table.rows.map((row) => {
@@ -148,14 +160,19 @@ export const buildPreviewText = (data: ReportData): string => {
 
 /**
  * Builds the download payload for the chosen format. Text keeps the metadata header;
- * CSV is the main table only; JSON is {@link ReportData.json} when set, else the rows.
+ * CSV is the main table only (plus a `#` comment preamble of the header when the report sets
+ * {@link ReportData.csvIncludeHeader}); JSON is {@link ReportData.json} when set, else the rows.
  */
 export const buildDownloadPayload = (data: ReportData, format: ReportFormat): DownloadPayload => {
   const table = resolveReportTable(data);
 
   switch (format) {
-    case 'csv':
-      return { content: tableToCsv(table), ext: 'csv', mime: 'text/csv;charset=utf-8' };
+    case 'csv': {
+      const preamble = data.csvIncludeHeader ? headerToCsvComments(data.header) : '';
+      const content = preamble ? `${preamble}\n${tableToCsv(table)}` : tableToCsv(table);
+
+      return { content, ext: 'csv', mime: 'text/csv;charset=utf-8' };
+    }
     case 'json':
       return {
         content: data.json === undefined ? tableToJson(table) : JSON.stringify(data.json, null, 2),

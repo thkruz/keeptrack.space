@@ -70,8 +70,6 @@ export class UiManager {
   isCurrentlyTyping = false;
   isUiVisible = true;
   lastBoxUpdateTime = 0;
-  lastNextPassCalcSatId = -1;
-  lastNextPassCalcSensorShortName: string;
   lastToast: string;
   searchManager: SearchManager;
   updateInterval = 1000;

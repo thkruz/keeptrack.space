@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
+import { estimateStdMag } from '@app/app/analysis/std-mag-estimator';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { DetailedSensor, RfSensor } from '@app/app/sensors/DetailedSensor';
@@ -45,12 +46,36 @@ const EL = {
 
 const l = (key: string): string => t7e(`plugins.SatInfoBoxSensor.${key}` as Parameters<typeof t7e>[0]);
 
+/** Real-time floor between two Next Pass searches for the same object and sensor (the search is heavy). */
+const NEXT_PASS_MIN_REAL_INTERVAL_MS = 1000;
+/** A backwards sim-clock move larger than this invalidates the cached Next Pass. */
+const NEXT_PASS_BACKWARD_TOLERANCE_MS = 1000;
+/** With no pass found, search again once the sim clock has used up this much of the 2-day horizon. */
+const NEXT_PASS_NO_RESULT_REFRESH_MS = 86400e3;
+/** While in view, refresh once the shown pass start is this far behind the sim clock (catches jumps into a later pass). */
+const NEXT_PASS_IN_VIEW_REFRESH_MS = 3600e3;
+/** `SensorMath.nextpass` returns 'yyyy-mm-dd HH:MM:ss' in UTC. */
+const NEXT_PASS_TIME_PATTERN = /^(?<y>\d{4})-(?<mo>\d{2})-(?<d>\d{2}) (?<h>\d{2}):(?<mi>\d{2}):(?<s>\d{2})$/u;
+
+/** What the last Next Pass search was run for, all times in epoch milliseconds. */
+export interface NextPassCache {
+  satId: number;
+  sensorName: string;
+  /** Sim time the search started from. */
+  calcSimMs: number;
+  /** Wall-clock time of the search, for throttling. */
+  calcRealMs: number;
+  /** Start of the pass found, or null when the result is not a time ('No Passes in 2 Days', 'Beyond Max Range', ...). */
+  resultMs: number | null;
+}
+
 export class SatInfoBoxSensor extends KeepTrackPlugin {
   readonly id = 'SatInfoBoxSensor';
   dependencies_: string[] = [SatInfoBox.name];
 
   // Starting values of the collapsable sections
   private readonly isSensorSectionCollapsed_ = true;
+  private nextPassCache_: NextPassCache | null = null;
 
   addHtml(): void {
     super.addHtml();
@@ -86,8 +111,8 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       { key: 'Azimuth', id: EL.AZIMUTH, tooltip: 'Angle (Left/Right) from the Sensor', value: 'XX deg' },
       { key: 'Elevation', id: EL.ELEVATION, tooltip: 'Angle (Up/Down) from the Sensor', value: 'XX deg' },
       { key: l('labels.reason'), id: EL.REASON, tooltip: l('tooltips.reason'), value: '-' },
-      { key: 'RA', id: EL.RA, tooltip: 'Right Ascension', value: 'XX deg' },
-      { key: 'Dec', id: EL.DEC, tooltip: 'Declination', value: 'XX deg' },
+      { key: l('labels.ra'), id: EL.RA, tooltip: l('tooltips.ra'), value: 'XX deg' },
+      { key: l('labels.dec'), id: EL.DEC, tooltip: l('tooltips.dec'), value: 'XX deg' },
       { key: 'Beam Width', id: EL.BEAMWIDTH, tooltip: "Linear Width at Target's Range", value: 'xxxx km' },
       { key: 'Max Tmx Time', id: EL.MAX_TMX, tooltip: 'Time for RF/Light to Reach Target and Back', value: 'xxxx ms' },
       { key: 'Sun', id: EL.SUN, tooltip: 'Does the Sun Impact the Sensor', value: '-' },
@@ -365,40 +390,89 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       // Always update Sun status - hides the row when no sensor, computes when sensor active
       this.calculateSunStatus_(obj);
 
-      const nextPassElement = getEl('sat-nextpass');
-
-      if (sensorManagerInstance.isSensorSelected()) {
-        const uiManagerInstance = ServiceLocator.getUiManager();
-
-        /*
-         * If we didn't just calculate next pass time for this satellite and sensor combination do it
-         * TODO: Make new logic for this to allow it to be updated while selected
-         */
-        if (
-          (PluginRegistry.getPlugin(SelectSatManager)!.selectedSat !== uiManagerInstance.lastNextPassCalcSatId ||
-            sensorManagerInstance.currentSensors[0].objName !== uiManagerInstance.lastNextPassCalcSensorShortName) &&
-          !obj.isMissile()
-        ) {
-          const nextPassText = this.calculateNextPassText_(obj, sensorManagerInstance);
-
-          if (nextPassElement) {
-            nextPassElement.innerHTML = nextPassText;
-          }
-
-          /*
-           *  IDEA: Code isInSun()
-           * sun.getXYZ();
-           * lineManager.create('ref',[sun.sunvar.position.x,sun.sunvar.position.y,sun.sunvar.position.z]);
-           */
-        }
-        uiManagerInstance.lastNextPassCalcSatId = PluginRegistry.getPlugin(SelectSatManager)!.selectedSat;
-        uiManagerInstance.lastNextPassCalcSensorShortName = sensorManagerInstance.currentSensors[0]?.objName ?? '';
-      } else if (nextPassElement) {
-        nextPassElement.innerHTML = 'Unavailable';
-      }
+      this.updateNextPass_(obj, sensorManagerInstance, timeManagerInstance);
     } catch {
       errorManagerInstance.debug('Error updating satellite info!');
     }
+  }
+
+  /**
+   * Next Pass is searched forward from the simulation clock. The search is heavy, so the result is
+   * cached, but the cache must follow the sim clock: a time jump (backwards, or forwards past the
+   * cached pass) has to trigger a new search or the row shows a pass computed for another time.
+   */
+  private updateNextPass_(obj: BaseObject, sensorManagerInstance: SensorManager, timeManagerInstance: TimeManager): void {
+    const nextPassElement = getEl(EL.NEXT_PASS, true);
+
+    if (!sensorManagerInstance.isSensorSelected()) {
+      this.nextPassCache_ = null;
+      if (nextPassElement) {
+        nextPassElement.innerHTML = l('values.unavailable');
+      }
+
+      return;
+    }
+
+    if (obj.isMissile()) {
+      return;
+    }
+
+    const satId = PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? obj.id;
+    const sensorName = sensorManagerInstance.currentSensors[0]?.objName ?? '';
+    const simNowMs = timeManagerInstance.simulationTimeObj.getTime();
+    const realNowMs = Date.now();
+    const isInView = !!sensorManagerInstance.currentTEARR?.inView;
+
+    if (!SatInfoBoxSensor.shouldRecalcNextPass_(this.nextPassCache_, { satId, sensorName, simNowMs, realNowMs, isInView })) {
+      return;
+    }
+
+    const nextPassText = this.calculateNextPassText_(obj, sensorManagerInstance);
+    const resultMs = SatInfoBoxSensor.parseNextPassTime_(nextPassText);
+
+    this.nextPassCache_ = { satId, sensorName, calcSimMs: simNowMs, calcRealMs: realNowMs, resultMs };
+
+    if (nextPassElement) {
+      nextPassElement.innerHTML = resultMs === null ? nextPassText : `${nextPassText} UTC`;
+    }
+  }
+
+  /** Decides whether the cached Next Pass is stale for the current object, sensor and sim time. */
+  static shouldRecalcNextPass_(cache: NextPassCache | null, now: { satId: number; sensorName: string; simNowMs: number; realNowMs: number; isInView: boolean }): boolean {
+    if (cache?.satId !== now.satId || cache.sensorName !== now.sensorName) {
+      return true;
+    }
+
+    if (now.realNowMs - cache.calcRealMs < NEXT_PASS_MIN_REAL_INTERVAL_MS) {
+      return false;
+    }
+
+    // The sim clock went backwards: an earlier pass may now be next.
+    if (now.simNowMs < cache.calcSimMs - NEXT_PASS_BACKWARD_TOLERANCE_MS) {
+      return true;
+    }
+
+    if (cache.resultMs === null) {
+      return now.simNowMs - cache.calcSimMs > NEXT_PASS_NO_RESULT_REFRESH_MS;
+    }
+
+    if (now.simNowMs > cache.resultMs) {
+      // Pass over (or jumped past it), or a long time inside one pass / a jump into a later pass.
+      return !now.isInView || now.simNowMs - cache.resultMs > NEXT_PASS_IN_VIEW_REFRESH_MS;
+    }
+
+    return false;
+  }
+
+  /** Parses the UTC time `SensorMath.nextpass` returns; null for its non-time answers. */
+  static parseNextPassTime_(text: string): number | null {
+    const g = NEXT_PASS_TIME_PATTERN.exec(text)?.groups;
+
+    if (!g) {
+      return null;
+    }
+
+    return Date.UTC(Number(g.y), Number(g.mo) - 1, Number(g.d), Number(g.h), Number(g.mi), Number(g.s));
   }
 
   private calculateNextPassText_(obj: BaseObject, sensorManagerInstance: SensorManager): string {
@@ -542,6 +616,56 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     }
   }
 
+  /**
+   * Topocentric RA/Dec of `obj` seen from `sensor`, both evaluated at the simulation time `simTime`
+   * (never the wall clock). Both state vectors are J2000 (TEME/ITRF rotated with precession and
+   * nutation), so the result is referred to the J2000 mean equator and equinox. It is the geometric
+   * direction: no refraction, aberration or light-time correction.
+   */
+  static computeTopocentricRaDec_(obj: Satellite | OemSatellite, sensor: DetailedSensor, simTime: Date): { ra: number; dec: number } {
+    const raDec = RadecTopocentric.fromStateVector(obj.toJ2000(simTime), sensor.toJ2000(simTime));
+    const ra = ((raDec.rightAscensionDegrees % 360) + 360) % 360;
+
+    return { ra, dec: raDec.declinationDegrees };
+  }
+
+  /**
+   * Same intrinsic (standard) magnitude the Object Data card's Apparent Mag uses: the catalog value
+   * when present, otherwise the preset/physics estimate. Without this the Vis Mag fell back to a
+   * flat 8.0 for objects with no catalog vmag and disagreed with Apparent Mag by several magnitudes.
+   */
+  static intrinsicMagOverride_(sat: Satellite): number | undefined {
+    if (typeof sat.vmag === 'number' && !Number.isNaN(sat.vmag)) {
+      return undefined;
+    }
+
+    return estimateStdMag(sat) ?? undefined;
+  }
+
+  private static updateRaDec_(elements: { ra: HTMLElement | null; dec: HTMLElement | null }, obj: BaseObject, sensor: DetailedSensor, simTime: Date): void {
+    let raText = 'N/A';
+    let decText = 'N/A';
+
+    if (obj instanceof Satellite || obj instanceof OemSatellite) {
+      try {
+        const { ra, dec } = SatInfoBoxSensor.computeTopocentricRaDec_(obj, sensor, simTime);
+
+        raText = `${ra.toFixed(4)}°`;
+        decText = `${dec.toFixed(4)}°`;
+      } catch {
+        raText = l('values.unableToCalculate');
+        decText = raText;
+      }
+    }
+
+    if (elements.ra) {
+      elements.ra.innerHTML = raText;
+    }
+    if (elements.dec) {
+      elements.dec.innerHTML = decText;
+    }
+  }
+
   private updateSatTearrInFov_(
     elements: {
       az: HTMLElement | null;
@@ -587,20 +711,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       }
     }
 
-    const currentSat = PluginRegistry.getPlugin(SelectSatManager)!.getSelectedSat() as Satellite;
-    const currentSensor = sensorManagerInstance.currentSensors[0];
-
-    const raDec = RadecTopocentric.fromStateVector(currentSat.toJ2000(), currentSensor.toJ2000());
-
-    if (elements.ra) {
-      const rawRa = raDec.rightAscensionDegrees;
-      const rightAscensionDegrees = ((rawRa % 360) + 360) % 360;
-
-      elements.ra.innerHTML = `${(rightAscensionDegrees).toFixed(4)}°`;
-    }
-    if (elements.dec) {
-      elements.dec.innerHTML = `${(raDec.declinationDegrees).toFixed(4)}°`;
-    }
+    SatInfoBoxSensor.updateRaDec_(elements, obj, sensorManagerInstance.currentSensors[0], timeManagerInstance.simulationTimeObj);
 
     const sun = ServiceLocator.getScene().sun;
 
@@ -612,7 +723,13 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       } else {
         const sat = obj as Satellite;
 
-        elements.vmag.innerHTML = SatMath.calculateVisMag(sat, sensorManagerInstance.currentSensors[0], timeManagerInstance.simulationTimeObj, sun).toFixed(2);
+        elements.vmag.innerHTML = SatMath.calculateVisMag(
+          sat,
+          sensorManagerInstance.currentSensors[0],
+          timeManagerInstance.simulationTimeObj,
+          sun,
+          SatInfoBoxSensor.intrinsicMagOverride_(sat)
+        ).toFixed(2);
       }
     }
     let beamwidthString = 'Unknown';

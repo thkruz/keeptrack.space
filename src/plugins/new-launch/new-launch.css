@@ -97,3 +97,17 @@
   color: var(--color-dark-text);
   background: rgb(255 255 255 / 8%);
 }
+
+/*
+ * Long launch-facility names ("Hammaguira Space Track Range - Interarmy Special
+ * Vehicles Test Centre") ran under the select caret. Reserve the caret's width
+ * on the trigger and end the visible text with an ellipsis; the full name stays
+ * readable in the open dropdown.
+ */
+#newLaunch-menu .select-wrapper input.select-dropdown {
+  width: calc(100% - 28px);
+  padding-right: 28px !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

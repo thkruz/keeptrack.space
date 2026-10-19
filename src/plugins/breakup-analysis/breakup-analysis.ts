@@ -233,7 +233,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
             ${this.buildEventListPrefixHtml_()}
             <section class="kt-section">
               <div class="kt-section-label">${s('events')}</div>
-              ${buildEventListTable(BREAKUP_EVENTS, labels)}
+              <div class="ba-table-scroll">${buildEventListTable(BREAKUP_EVENTS, labels)}</div>
             </section>
           </div>
           <div id="breakup-analysis-detail" style="display:none;">

@@ -35,9 +35,31 @@
   text-align: left;
 }
 
+/* Five columns in a ~330px card: at 13px with 6px cell padding even English
+ * ran 3px past the card, and longer header words (Russian "Оценка обломков",
+ * German "Gesch. Trümmer") pushed it 30px+ out. Tighter type and padding, no
+ * header letter-spacing, and a wrappable designator line keep it inside. */
 #breakup-analysis-event-table {
-  line-height: 1.4;
-  font-size: 13px;
+  line-height: 1.35;
+  font-size: 12px;
+}
+
+#breakup-analysis-event-table th,
+#breakup-analysis-event-table td {
+  padding: 4px 3px;
+}
+
+#breakup-analysis-event-table .ba-table-header th {
+  letter-spacing: 0;
+}
+
+#breakup-analysis-event-table .ba-event-ids {
+  white-space: normal;
+}
+
+/* Safety net for a future longer locale: scroll inside the card, never past it. */
+#breakup-analysis-menu .ba-table-scroll {
+  overflow-x: auto;
 }
 
 .breakup-analysis-event-row:hover,

@@ -645,8 +645,8 @@ describe('calculateVisMag_method', () => {
     expect(visMag).toBeGreaterThan(0);
   });
 
-  // Test if the method returns a huge number when the satellite is eclipsing the sun
-  it('test_satellite_eclipsing_sun', () => {
+  // A satellite between the observer and the Sun (phase angle near 180 deg) is very dim
+  it('test_satellite_backlit_by_sun', () => {
     const sat = defaultSat.clone();
 
     sat.position = {
@@ -665,6 +665,28 @@ describe('calculateVisMag_method', () => {
       z: DISTANCE_TO_SUN,
     } as TemeVec3;
     const visMag = SatMath.calculateVisMag(sat, sensor, propTime, sun);
+
+    expect(visMag).toBeGreaterThan(15);
+    expect(visMag).toBeLessThanOrEqual(30);
+  });
+
+  // Degenerate geometry (satellite at the Sun's position) returns the not-visible sentinel
+  it('test_degenerate_geometry_returns_sentinel', () => {
+    const sat = defaultSat.clone();
+
+    sat.position = {
+      x: DISTANCE_TO_SUN,
+      y: DISTANCE_TO_SUN,
+      z: DISTANCE_TO_SUN,
+    } as TemeVec3;
+    const sun = {} as Sun;
+
+    sun.eci = {
+      x: DISTANCE_TO_SUN,
+      y: DISTANCE_TO_SUN,
+      z: DISTANCE_TO_SUN,
+    } as TemeVec3;
+    const visMag = SatMath.calculateVisMag(sat, defaultSensor, new Date(), sun);
 
     expect(visMag).toBe(30);
   });

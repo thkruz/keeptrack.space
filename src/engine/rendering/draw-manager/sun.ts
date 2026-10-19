@@ -208,11 +208,10 @@ export class Sun {
       return [this.eci.x, this.eci.y, this.eci.z];
     }
 
+    // Do not cache a position for another time: the renderer's eci must stay at the simulation time
     const eci = Scene.getInstance().earth.getTeme(simulationTimeObj, SolarBody.Sun).position.toArray();
 
-    this.eci = { x: <Kilometers>-eci[0], y: <Kilometers>-eci[1], z: <Kilometers>-eci[2] };
-
-    return [this.eci.x, this.eci.y, this.eci.z];
+    return [<Kilometers>-eci[0], <Kilometers>-eci[1], <Kilometers>-eci[2]];
   }
 
   updateEci() {

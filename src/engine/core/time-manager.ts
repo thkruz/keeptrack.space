@@ -99,9 +99,12 @@ export class TimeManager {
       return;
     }
 
-    this.staticOffset = this.simulationTimeObj.getTime() - Date.now();
+    // One clock read: a paused sim time is dynamicOffsetEpoch + staticOffset, so two reads can drift it by 1 ms
+    const now = Date.now();
+
+    this.staticOffset = this.simulationTimeObj.getTime() - now;
     // Changing propRate or dynamicOffsetEpoch before calculating the staticOffset will give incorrect results
-    this.dynamicOffsetEpoch = Date.now();
+    this.dynamicOffsetEpoch = now;
     this.calculateSimulationTime();
 
     this.synchronize();
@@ -178,14 +181,17 @@ export class TimeManager {
   }
 
   init() {
-    this.dynamicOffsetEpoch = Date.now();
-    this.simulationTimeObj = new Date();
+    // One clock read: a paused sim time is dynamicOffsetEpoch + staticOffset, so two reads can drift it by 1 ms
+    const now = Date.now();
 
-    this.propFrozen = Date.now(); // for when propRate 0
+    this.dynamicOffsetEpoch = now;
+    this.simulationTimeObj = new Date(now);
+
+    this.propFrozen = now; // for when propRate 0
     this.realTime = <Milliseconds>this.propFrozen; // (initialized as Date.now)
     this.propRate = settingsManager.propRate ?? 1.0; // time rate multiplier for propagation
 
-    this.staticOffset = settingsManager.simulationTime ? settingsManager.simulationTime.getTime() - Date.now() : 0;
+    this.staticOffset = settingsManager.simulationTime ? settingsManager.simulationTime.getTime() - now : 0;
 
     // Initialize
     this.calculateSimulationTime();

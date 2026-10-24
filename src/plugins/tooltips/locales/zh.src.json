@@ -1,0 +1,10 @@
+{
+  "plugins": {
+    "Tooltips": {
+      "errorMsgs": {
+        "missingAttribute": "无法创建工具提示：元素没有 kt-tooltip 属性。",
+        "missingElement": "无法创建工具提示：元素为 null 或未定义。"
+      }
+    }
+  }
+}

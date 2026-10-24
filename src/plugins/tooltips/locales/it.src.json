@@ -1,0 +1,10 @@
+{
+  "plugins": {
+    "Tooltips": {
+      "errorMsgs": {
+        "missingAttribute": "Impossibile creare il tooltip: l'elemento non ha l'attributo kt-tooltip.",
+        "missingElement": "Impossibile creare il tooltip: l'elemento è nullo o non definito."
+      }
+    }
+  }
+}

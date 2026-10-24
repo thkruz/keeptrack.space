@@ -1,0 +1,10 @@
+{
+  "plugins": {
+    "Tooltips": {
+      "errorMsgs": {
+        "missingAttribute": "ツールチップを作成できませんでした: 要素に kt-tooltip 属性がありません。",
+        "missingElement": "ツールチップを作成できませんでした: 要素が null または未定義です。"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "plugins": {
+    "Tooltips": {
+      "errorMsgs": {
+        "missingAttribute": "No se pudo crear la información emergente: el elemento no tiene el atributo kt-tooltip.",
+        "missingElement": "No se pudo crear la información emergente: el elemento es nulo o no está definido."
+      }
+    }
+  }
+}

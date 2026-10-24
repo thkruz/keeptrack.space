@@ -3,6 +3,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
+import { t7e } from '@app/locales/keys';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 
 /**
@@ -62,7 +63,7 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       const text = el.getAttribute(this.tooltipTag);
 
       if (!text) {
-        errorManagerInstance.warn('Failed to create tooltip: Element has no kt-tooltip attribute.');
+        errorManagerInstance.warn(t7e('plugins.Tooltips.errorMsgs.missingAttribute'));
 
         return;
       }
@@ -77,7 +78,7 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     }
 
     if (!el) {
-      errorManagerInstance.warn('Failed to create tooltip: Element is null or undefined.');
+      errorManagerInstance.warn(t7e('plugins.Tooltips.errorMsgs.missingElement'));
 
       return;
     }

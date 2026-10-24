@@ -1,4 +1,5 @@
 // import 'webgl-lint';
+import { t7e } from '@app/locales/keys';
 import { vec3 } from 'gl-matrix';
 import { errorManagerInstance } from '../utils/errorManager';
 import { BufferAttribute } from './buffer-attribute';
@@ -66,7 +67,7 @@ export abstract class GlUtils {
         if (window.location.hostname === 'localhost') {
           throw new Error(`Uniform ${uniform} not found in program ${program}`);
         } else {
-          errorManagerInstance.warn(`Uniform ${uniform} not found in program ${program}`);
+          errorManagerInstance.warn(t7e('errorMsgs.Rendering.uniformNotFound').replace('{uniform}', uniform).replace('{program}', String(program)));
         }
       }
 

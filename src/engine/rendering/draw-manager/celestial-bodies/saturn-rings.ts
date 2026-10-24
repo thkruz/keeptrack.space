@@ -22,6 +22,7 @@
 import { SolarBody } from '@app/engine/core/interfaces';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { t7e } from '@app/locales/keys';
 import { DEG2RAD, TemeVec3 } from '@ootk/src/main';
 import { Body, BackdatePosition as backdatePosition, KM_PER_AU, RotationAxis as rotationAxis } from 'astronomy-engine';
 import { vec3 } from 'gl-matrix';
@@ -94,7 +95,7 @@ export class SaturnRings extends CelestialBody {
       this.mesh.geometry.initVao(this.mesh.program);
       this.isLoaded_ = true;
     } catch (e) {
-      errorManagerInstance.warn(`Error initializing ${this.getName()}:`, e);
+      errorManagerInstance.warn(t7e('errorMsgs.Rendering.bodyInitError').replace('{name}', this.getName()), e);
     }
   }
 

@@ -2,6 +2,7 @@ import { FLAG_ATLAS_PATH, type FlagSource, flagAtlasRect, resolveFlagKey } from 
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { ModelResolver } from '@app/app/rendering/mesh/model-resolver';
 import { EciArr3, GetSatType } from '@app/engine/core/interfaces';
+import { t7e } from '@app/locales/keys';
 import { BaseObject, DEG2RAD, Degrees, Kilometers, PayloadStatus, Radians, Satellite, SpaceObjectType, Sun, TemeVec3, Vec3, Vector3D } from '@ootk/src/main';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { Layout, Mesh } from 'webgl-obj-loader';
@@ -151,7 +152,7 @@ export class MeshManager {
 
       this.isReady = true;
     } catch {
-      errorManagerInstance.warn('Meshes failed to load!');
+      errorManagerInstance.warn(t7e('errorMsgs.Rendering.meshesLoadFailed'));
     }
   }
 
@@ -472,7 +473,7 @@ export class MeshManager {
       .catch((err: unknown) => {
         // One attempt only; the model still draws, just without a flag.
         this.flagAtlasState_ = 'failed';
-        errorManagerInstance.warn('Failed to load the flag atlas', err);
+        errorManagerInstance.warn(t7e('errorMsgs.Rendering.flagAtlasLoadFailed'), err);
       });
   }
 

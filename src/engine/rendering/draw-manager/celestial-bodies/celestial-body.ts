@@ -1,6 +1,7 @@
 /**
  * Base class for rendering non-Earth celestial bodies (Moon, Mars, etc.)
  */
+
 import { SatMath } from '@app/app/analysis/sat-math';
 import { Planet } from '@app/app/objects/planet';
 import { EciArr3, rgbaArray, SolarBody } from '@app/engine/core/interfaces';
@@ -16,6 +17,7 @@ import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { DEG2RAD, EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, SpaceObjectType, TEME, TemeVec3, Vector3D } from '@ootk/src/main';
 import { Body, BackdatePosition as backdatePosition, KM_PER_AU, RotationAxis as rotationAxis } from 'astronomy-engine';
@@ -196,7 +198,7 @@ export abstract class CelestialBody {
 
       this.isLoaded_ = true;
     } catch (e) {
-      errorManagerInstance.warn(`Error initializing ${this.getName()}:`, e);
+      errorManagerInstance.warn(t7e('errorMsgs.Rendering.bodyInitError').replace('{name}', this.getName()), e);
     }
   }
 
@@ -208,7 +210,7 @@ export abstract class CelestialBody {
         this.mesh.material.map = texture;
       })
       .catch((e) => {
-        errorManagerInstance.warn(`Error updating texture for ${this.getName()}:`, e);
+        errorManagerInstance.warn(t7e('errorMsgs.Rendering.bodyTextureError').replace('{name}', this.getName()), e);
       });
   }
 

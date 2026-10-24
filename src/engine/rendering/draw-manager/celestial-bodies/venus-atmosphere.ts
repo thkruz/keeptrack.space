@@ -22,6 +22,7 @@
 import { EciArr3, SolarBody } from '@app/engine/core/interfaces';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { t7e } from '@app/locales/keys';
 import { DEG2RAD } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
@@ -156,7 +157,7 @@ export class VenusAtmosphere extends CelestialBody {
 
       this.isLoaded_ = true;
     } catch (e) {
-      errorManagerInstance.warn(`Error initializing ${this.getName()} atmosphere:`, e);
+      errorManagerInstance.warn(t7e('errorMsgs.Rendering.atmosphereInitError').replace('{name}', this.getName()), e);
     }
 
     // Nothing here awaits - the only async work, the cloud texture, is deferred to draw.
@@ -183,7 +184,7 @@ export class VenusAtmosphere extends CelestialBody {
       })
       .catch((e) => {
         this.isTextureRequested_ = false;
-        errorManagerInstance.warn(`Error loading ${this.getName()} atmosphere texture (attempt ${this.textureAttempts_}):`, e);
+        errorManagerInstance.warn(t7e('errorMsgs.Rendering.atmosphereTextureError').replace('{name}', this.getName()).replace('{attempt}', String(this.textureAttempts_)), e);
       });
   }
 

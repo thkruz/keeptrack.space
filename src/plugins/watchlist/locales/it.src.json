@@ -35,7 +35,10 @@
       "errorMsgs": {
         "NoradAlreadyInList": "NORAD: {sccNum} già nell'elenco!",
         "ObjectAlreadyInList": "Oggetto {id} già nell'elenco!",
-        "SatNotFound": "Satellite {id} non trovato!"
+        "SatNotFound": "Satellite {id} non trovato!",
+        "ListFileFormatIncorrect": "Formato del file elenco non corretto",
+        "ErrorReadingList": "Errore durante la lettura dell'elenco!",
+        "ErrorSavingList": "Errore durante il salvataggio dell'elenco!"
       },
       "settings": {
         "satLabelMode": {

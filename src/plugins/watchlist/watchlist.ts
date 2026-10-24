@@ -452,7 +452,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
         obj.id = sat.id;
         obj.inView = false;
       } else {
-        errorManagerInstance.warn('List File Format Incorrect');
+        errorManagerInstance.warn(t7e('plugins.WatchlistPlugin.errorMsgs.ListFileFormatIncorrect'));
 
         return [];
       }
@@ -869,7 +869,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     const target = evt.target;
 
     if (!target) {
-      errorManagerInstance.error(new Error('target is null'), 'watchlist.ts', 'Error reading list!');
+      errorManagerInstance.error(new Error('target is null'), 'watchlist.ts', t7e('plugins.WatchlistPlugin.errorMsgs.ErrorReadingList'));
 
       return;
     }
@@ -879,7 +879,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     }
 
     if (evt.target.error) {
-      errorManagerInstance.error(evt.target.error, 'watchlist.ts', 'Error reading list!');
+      errorManagerInstance.error(evt.target.error, 'watchlist.ts', t7e('plugins.WatchlistPlugin.errorMsgs.ErrorReadingList'));
 
       return;
     }
@@ -899,13 +899,13 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
         newWatchlist = [];
       }
     } catch {
-      errorManagerInstance.warn('List File Format Incorrect');
+      errorManagerInstance.warn(t7e('plugins.WatchlistPlugin.errorMsgs.ListFileFormatIncorrect'));
 
       return;
     }
 
     if (newWatchlist.length === 0) {
-      errorManagerInstance.warn('List File Format Incorrect');
+      errorManagerInstance.warn(t7e('plugins.WatchlistPlugin.errorMsgs.ListFileFormatIncorrect'));
 
       return;
     }
@@ -941,7 +941,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
       saveAs(blob, 'watchlist.json');
     } catch (e) {
       if (!isThisNode()) {
-        errorManagerInstance.error(e, 'watchlist.ts', 'Error saving list!');
+        errorManagerInstance.error(e, 'watchlist.ts', t7e('plugins.WatchlistPlugin.errorMsgs.ErrorSavingList'));
       }
     }
     evt.preventDefault();
@@ -962,7 +962,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
 
       return savedSatList;
     } catch {
-      errorManagerInstance.warn('List File Format Incorrect');
+      errorManagerInstance.warn(t7e('plugins.WatchlistPlugin.errorMsgs.ListFileFormatIncorrect'));
 
       return [];
     }

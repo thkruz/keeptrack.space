@@ -35,7 +35,10 @@
       "errorMsgs": {
         "NoradAlreadyInList": "NORAD: {sccNum} вже у списку!",
         "ObjectAlreadyInList": "Об'єкт {id} вже у списку!",
-        "SatNotFound": "Супутник {id} не знайдено!"
+        "SatNotFound": "Супутник {id} не знайдено!",
+        "ListFileFormatIncorrect": "Неправильний формат файлу списку",
+        "ErrorReadingList": "Помилка читання списку!",
+        "ErrorSavingList": "Помилка збереження списку!"
       },
       "settings": {
         "satLabelMode": {

@@ -32,7 +32,6 @@ export class VcrPlugin extends KeepTrackPlugin {
   private rewindBtn_: HTMLElement | null = null;
   private playPauseBtn_: HTMLElement | null = null;
   private fastForwardBtn_: HTMLElement | null = null;
-  private scenario_: ScenarioData | null = null;
 
   getKeyboardShortcuts(): IKeyboardShortcut[] {
     return [
@@ -77,10 +76,17 @@ export class VcrPlugin extends KeepTrackPlugin {
     });
   }
 
+  /**
+   * The live scenario. ScenarioManagementPlugin.updateScenario() replaces its scenario object,
+   * so a reference cached at addJs() time goes stale after the first bounds change.
+   */
+  private get scenario_(): ScenarioData | null {
+    return PluginRegistry.getPlugin(ScenarioManagementPlugin)?.scenario ?? null;
+  }
+
   addJs(): void {
     super.addJs();
 
-    this.scenario_ = PluginRegistry.getPlugin(ScenarioManagementPlugin)?.scenario ?? null;
     this.forwardRewindSpeed = (settingsManager.plugins?.[this.id] as { forwardRewindSpeed?: number })?.forwardRewindSpeed ?? VcrPlugin.DEFAULT_FORWARD_REWIND_SPEED_;
 
     EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {

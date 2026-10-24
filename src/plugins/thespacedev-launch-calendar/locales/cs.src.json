@@ -23,7 +23,8 @@
       "msgs": {
         "fetching": "Načítání nadcházejících startů...",
         "unknown": "Neznámé",
-        "tbd": "Bude upřesněno"
+        "tbd": "Bude upřesněno",
+        "apiUnavailable": "{url} není dostupné!"
       },
       "help": {
         "overview": "Další starty zobrazují seznam nadcházejících orbitálních startů z celého světa, načítaný živě z knihovny startů The Space Devs: startovní okno, misi, místo startu, agenturu a zemi každého z nich. Názvy misí a míst startu odkazují na další informace, pokud jsou k dispozici.",

@@ -202,7 +202,7 @@ export class TheSpaceDevLaunchCalendarPlugin extends KeepTrackPlugin {
     fetch(`https://${apiUrl}.thespacedevs.com/2.0.0/launch/upcoming/?format=json&limit=20&mode=detailed`)
       .then((resp) => resp.json())
       .then((data) => this.processData(data))
-      .catch(() => errorManagerInstance.warn(`https://${apiUrl}.thespacedevs.com/2.0.0/ is Unavailable!`))
+      .catch(() => errorManagerInstance.warn(l('msgs.apiUnavailable').replace('{url}', `https://${apiUrl}.thespacedevs.com/2.0.0/`)))
       .finally(() => {
         this.isFetching_ = false;
         hideAsyncIndicator();

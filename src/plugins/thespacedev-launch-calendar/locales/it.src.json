@@ -23,7 +23,8 @@
       "msgs": {
         "fetching": "Recupero dei prossimi lanci...",
         "unknown": "Sconosciuto",
-        "tbd": "Da definire"
+        "tbd": "Da definire",
+        "apiUnavailable": "{url} non è disponibile!"
       },
       "help": {
         "overview": "Prossimi lanci elenca i lanci orbitali imminenti in tutto il mondo, recuperati in tempo reale dalla libreria di lanci di The Space Devs: finestra di lancio, missione, sito di lancio, agenzia e paese per ciascuno. I nomi di missioni e siti rimandano ad approfondimenti quando disponibili.",

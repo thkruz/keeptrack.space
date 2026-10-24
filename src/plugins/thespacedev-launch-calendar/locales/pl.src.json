@@ -23,7 +23,8 @@
       "msgs": {
         "fetching": "Pobieranie nadchodzących startów...",
         "unknown": "Nieznane",
-        "tbd": "Do ustalenia"
+        "tbd": "Do ustalenia",
+        "apiUnavailable": "{url} jest niedostępny!"
       },
       "help": {
         "overview": "Następne starty wyświetlają nadchodzące starty orbitalne z całego świata, pobierane na żywo z biblioteki startów The Space Devs: okno startowe, misję, miejsce startu, agencję i kraj każdego z nich. Nazwy misji i miejsc startu zawierają odnośniki do dodatkowych informacji, jeśli są dostępne.",

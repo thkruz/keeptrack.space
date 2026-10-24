@@ -23,7 +23,8 @@
       "msgs": {
         "fetching": "Bevorstehende Starts werden geladen...",
         "unknown": "Unbekannt",
-        "tbd": "Noch offen"
+        "tbd": "Noch offen",
+        "apiUnavailable": "{url} ist nicht erreichbar!"
       },
       "help": {
         "overview": "Nächste Starts listet bevorstehende orbitale Starts weltweit auf, live aus der Startbibliothek von The Space Devs abgerufen: Startfenster, Mission, Startplatz, Agentur und Land für jeden Start. Missions- und Standortnamen verlinken, sofern verfügbar, auf weiterführende Informationen.",

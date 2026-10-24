@@ -23,7 +23,8 @@
       "msgs": {
         "fetching": "Récupération des prochains lancements...",
         "unknown": "Inconnu",
-        "tbd": "À déterminer"
+        "tbd": "À déterminer",
+        "apiUnavailable": "{url} est indisponible !"
       },
       "help": {
         "overview": "Prochains lancements répertorie les lancements orbitaux à venir dans le monde entier, récupérés en direct depuis la bibliothèque de lancements de The Space Devs : la fenêtre de lancement, la mission, le site de lancement, l'agence et le pays de chacun. Les noms de missions et de sites renvoient vers des informations complémentaires lorsqu'elles sont disponibles.",

@@ -23,7 +23,8 @@
       "msgs": {
         "fetching": "Obteniendo próximos lanzamientos...",
         "unknown": "Desconocido",
-        "tbd": "Por determinar"
+        "tbd": "Por determinar",
+        "apiUnavailable": "¡{url} no está disponible!"
       },
       "help": {
         "overview": "Próximos Lanzamientos muestra los próximos lanzamientos orbitales de todo el mundo, obtenidos en vivo de la biblioteca de lanzamientos de The Space Devs: la ventana de lanzamiento, la misión, el sitio de lanzamiento, la agencia y el país de cada uno. Los nombres de misiones y sitios enlazan a más información cuando está disponible.",

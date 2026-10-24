@@ -23,7 +23,8 @@
       "msgs": {
         "fetching": "Fetching upcoming launches...",
         "unknown": "Unknown",
-        "tbd": "TBD"
+        "tbd": "TBD",
+        "apiUnavailable": "{url} is Unavailable!"
       },
       "help": {
         "overview": "Next Launches lists upcoming orbital launches worldwide, pulled live from The Space Devs launch library: the launch window, mission, launch site, agency, and country for each. Mission and site names link to further reading where available.",

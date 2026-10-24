@@ -2,6 +2,19 @@ import { LocaleInformation, Localization } from '@app/locales/locales';
 import i18next from 'i18next';
 
 describe('Locales', () => {
+  it('synchronizes document language to the resolved supported locale', async () => {
+    for (const [requested, expected] of [
+      ['de-DE', 'de'],
+      ['en', 'en'],
+      ['de', 'de'],
+      ['unsupported', 'en'],
+      ['en', 'en'],
+    ]) {
+      await i18next.changeLanguage(requested);
+      expect(document.documentElement.lang).toBe(expected);
+    }
+  });
+
   const flatMapOfAllKeys: string[] = [];
 
   const setup = (Localization: LocaleInformation) => {

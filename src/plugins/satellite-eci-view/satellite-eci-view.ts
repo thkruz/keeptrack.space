@@ -49,7 +49,7 @@ export class SatelliteEciView extends KeepTrackPlugin {
     return [
       {
         id: 'SatelliteEciView.activate',
-        label: 'Switch to Satellite ECI View',
+        label: t7e('plugins.SatelliteEciView.commandPalette.activate'),
         category: 'View',
         callback: () => this.bottomMenuClicked(),
       },

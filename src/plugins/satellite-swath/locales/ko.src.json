@@ -19,7 +19,8 @@
         "daylightOnly": "주간만",
         "nadirReadout": "천저 관측 폭 약 {km} km (FOV {fov}°)",
         "nadirReadoutUnknown": "이 궤도의 천저 관측 폭을 알 수 없음",
-        "presetsIllustrative": "프리셋은 예시이며 공개된 사양이 아닙니다."
+        "presetsIllustrative": "프리셋은 예시이며 공개된 사양이 아닙니다.",
+        "close": "닫기"
       },
       "presets": {
         "hrEo": "고해상도 광학",

@@ -19,7 +19,8 @@
         "daylightOnly": "Solo luce diurna",
         "nadirReadout": "Larghezza al nadir circa {km} km (FOV {fov}°)",
         "nadirReadoutUnknown": "Larghezza al nadir sconosciuta per questa orbita",
-        "presetsIllustrative": "Le preimpostazioni sono illustrative, non specifiche pubblicate."
+        "presetsIllustrative": "Le preimpostazioni sono illustrative, non specifiche pubblicate.",
+        "close": "Chiudi"
       },
       "presets": {
         "hrEo": "Ottico ad alta risoluzione",

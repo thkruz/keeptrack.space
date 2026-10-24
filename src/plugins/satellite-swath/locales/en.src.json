@@ -19,7 +19,8 @@
         "daylightOnly": "Daylight only",
         "nadirReadout": "Nadir width about {km} km (FOV {fov}°)",
         "nadirReadoutUnknown": "Nadir width unknown for this orbit",
-        "presetsIllustrative": "Presets are illustrative, not published specifications."
+        "presetsIllustrative": "Presets are illustrative, not published specifications.",
+        "close": "Close"
       },
       "presets": {
         "hrEo": "High-resolution optical",

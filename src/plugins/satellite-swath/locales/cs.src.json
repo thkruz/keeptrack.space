@@ -19,7 +19,8 @@
         "daylightOnly": "Jen za denního světla",
         "nadirReadout": "Šířka v nadiru asi {km} km (FOV {fov}°)",
         "nadirReadoutUnknown": "Šířka v nadiru pro tuto dráhu neznámá",
-        "presetsIllustrative": "Předvolby jsou ilustrativní, nejde o zveřejněné specifikace."
+        "presetsIllustrative": "Předvolby jsou ilustrativní, nejde o zveřejněné specifikace.",
+        "close": "Zavřít"
       },
       "presets": {
         "hrEo": "Optický, vysoké rozlišení",

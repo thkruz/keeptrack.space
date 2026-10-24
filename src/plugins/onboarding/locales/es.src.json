@@ -63,16 +63,16 @@
         }
       },
       "bridge": {
-        "title": "Ya conoces lo básico",
+        "title": "Temas del recorrido básico",
         "body": "¿Quieres el kit del operador? Sensores, listas de seguimiento y flujos rápidos con teclado. Unos dos minutos más.",
-        "recap1": "Encontraste y seleccionaste un satélite",
-        "recap2": "Leíste sus datos orbitales en vivo",
-        "recap3": "Controlaste el tiempo de la simulación"
+        "recap1": "Buscar y seleccionar satélites",
+        "recap2": "Leer datos orbitales en vivo",
+        "recap3": "Controlar el tiempo de simulación"
       },
       "account": {
         "title": "¿Guardar tu progreso?",
         "body": "Una cuenta gratuita lleva tu configuración contigo a cualquier dispositivo.",
-        "bodyPower": "Una cuenta gratuita lleva la lista de seguimiento y el sensor que acabas de configurar a cualquier dispositivo.",
+        "bodyPower": "Una cuenta gratuita conserva sus listas y ajustes de sensores en cualquier dispositivo.",
         "benefit1": "Sincroniza tus ajustes y tu lista entre dispositivos",
         "benefit2": "Elimina los anuncios",
         "benefit3": "Desbloquea gratis todo el conjunto de herramientas Pro"

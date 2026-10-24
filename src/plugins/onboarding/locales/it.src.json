@@ -63,16 +63,16 @@
         }
       },
       "bridge": {
-        "title": "Conosci le basi",
+        "title": "Argomenti del tour di base",
         "body": "Vuoi il kit dell'operatore? Sensori, watchlist e flussi rapidi da tastiera. Circa altri due minuti.",
-        "recap1": "Trovato e selezionato un satellite",
-        "recap2": "Letto i suoi dati orbitali in tempo reale",
-        "recap3": "Controllato il tempo della simulazione"
+        "recap1": "Trovare e selezionare satelliti",
+        "recap2": "Leggere dati orbitali in tempo reale",
+        "recap3": "Controllare il tempo della simulazione"
       },
       "account": {
         "title": "Salvare i tuoi progressi?",
         "body": "Un account gratuito porta la tua configurazione su qualsiasi dispositivo.",
-        "bodyPower": "Un account gratuito porta la watchlist e il sensore appena configurati su qualsiasi dispositivo.",
+        "bodyPower": "Un account gratuito mantiene liste e impostazioni dei sensori su ogni dispositivo.",
         "benefit1": "Sincronizza impostazioni e watchlist tra dispositivi",
         "benefit2": "Rimuovi la pubblicità",
         "benefit3": "Sblocca gratis l'intero set di strumenti Pro"

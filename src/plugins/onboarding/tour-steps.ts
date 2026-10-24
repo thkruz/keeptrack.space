@@ -344,6 +344,8 @@ export const buildBasicsSteps = (): TourStep[] => [
     },
     placement: 'left',
     isAvailable: () => isCatalogLoaded() && isSatSelected(),
+    // Nothing is selected when the tour starts; the user selects in b4, so decide when the step is reached.
+    isAvailabilityDeferred: true,
   },
   {
     id: 'b6-time',
@@ -359,7 +361,12 @@ export const buildBasicsSteps = (): TourStep[] => [
     kind: 'coachmark',
     title: l('steps.b7Drawer.title'),
     body: l('steps.b7Drawer.body'),
-    target: () => getEl('drawer-hamburger', true),
+    // The hamburger only shows on mobile; on desktop the drawer rail itself is always visible.
+    target: () => {
+      const hamburger = getEl('drawer-hamburger', true);
+
+      return isVisible(hamburger) ? hamburger : getEl('plugin-drawer', true);
+    },
     placement: 'right',
   },
 ];

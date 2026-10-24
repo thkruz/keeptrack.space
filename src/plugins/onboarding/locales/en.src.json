@@ -63,16 +63,16 @@
         }
       },
       "bridge": {
-        "title": "You know the basics",
+        "title": "Basics tour covered",
         "body": "Want the operator toolkit? Sensors, watchlists, and keyboard-speed workflows. About two more minutes.",
-        "recap1": "Found and selected a satellite",
-        "recap2": "Read its live orbit data",
-        "recap3": "Controlled simulation time"
+        "recap1": "Finding and selecting satellites",
+        "recap2": "Reading live orbit data",
+        "recap3": "Controlling simulation time"
       },
       "account": {
         "title": "Save your progress?",
         "body": "A free account keeps your setup with you on any device.",
-        "bodyPower": "A free account keeps the watchlist and sensor you just set up with you on any device.",
+        "bodyPower": "A free account keeps your watchlist and sensor settings with you on any device.",
         "benefit1": "Sync your settings and watchlist across devices",
         "benefit2": "Remove ads",
         "benefit3": "Unlock the full Pro toolset for free"

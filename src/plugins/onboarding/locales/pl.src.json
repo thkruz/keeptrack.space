@@ -63,16 +63,16 @@
         }
       },
       "bridge": {
-        "title": "Znasz już podstawy",
+        "title": "Tematy podstawowej wycieczki",
         "body": "Chcesz zestaw operatora? Sensory, listy obserwacyjne i szybka praca z klawiaturą. Około dwóch minut więcej.",
-        "recap1": "Znaleziono i wybrano satelitę",
-        "recap2": "Odczytano jego dane orbitalne na żywo",
-        "recap3": "Sterowano czasem symulacji"
+        "recap1": "Wyszukiwanie i wybieranie satelitów",
+        "recap2": "Odczytywanie bieżących danych orbitalnych",
+        "recap3": "Sterowanie czasem symulacji"
       },
       "account": {
         "title": "Zapisać postępy?",
         "body": "Darmowe konto zabiera Twoją konfigurację na każde urządzenie.",
-        "bodyPower": "Darmowe konto zabiera właśnie skonfigurowaną listę obserwacyjną i sensor na każde urządzenie.",
+        "bodyPower": "Bezpłatne konto zachowuje listy i ustawienia czujników na każdym urządzeniu.",
         "benefit1": "Synchronizuj ustawienia i listę między urządzeniami",
         "benefit2": "Usuń reklamy",
         "benefit3": "Odblokuj za darmo pełny zestaw narzędzi Pro"

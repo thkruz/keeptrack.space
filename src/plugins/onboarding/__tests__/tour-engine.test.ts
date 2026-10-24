@@ -1,5 +1,7 @@
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { AdviceManager } from '@app/engine/utils/adviceManager';
 import { TourEngine, type TourStep } from '@app/plugins/onboarding/tour-engine';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
@@ -56,6 +58,91 @@ describe('TourEngine', () => {
     engine.next();
     expect(onFinish).toHaveBeenCalledWith('completed', 'two');
     expect(document.getElementById('kt-tour-root')).toBeNull();
+    engine.stop();
+  });
+
+  it('contains centered-card focus and shortcuts, then restores focus', () => {
+    const trigger = document.createElement('button');
+
+    document.body.appendChild(trigger);
+    trigger.focus();
+    ServiceLocator.getInputManager().keyboard.keyStates.set('ArrowUp', true);
+    const engine = new TourEngine({ steps: [{ id: 'card', kind: 'card', title: 'Card', body: 'Body' }], texts: TEXTS, onFinish });
+
+    engine.start();
+    expect(ServiceLocator.getInputManager().keyboard.keyStates.size).toBe(0);
+    const popover = document.querySelector<HTMLElement>('.kt-tour-popover')!;
+    const buttons = Array.from(popover.querySelectorAll<HTMLButtonElement>('button')).filter((button) => !button.closest('.start-hidden'));
+    const leaked = vi.fn();
+
+    document.addEventListener('keydown', leaked);
+    document.addEventListener('keyup', leaked);
+    expect(popover.getAttribute('aria-modal')).toBe('true');
+    buttons.at(-1)!.focus();
+    buttons.at(-1)!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true }));
+    expect(document.activeElement).toBe(buttons[0]);
+    buttons[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true }));
+    expect(document.activeElement).toBe(buttons.at(-1));
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: '9', bubbles: true }));
+    document.dispatchEvent(new KeyboardEvent('keyup', { key: '9', bubbles: true }));
+    expect(leaked).not.toHaveBeenCalled();
+    engine.stop();
+    expect(document.activeElement).toBe(trigger);
+    document.removeEventListener('keydown', leaked);
+    document.removeEventListener('keyup', leaked);
+  });
+
+  it('allows coachmark target controls to receive keys', () => {
+    const target = document.getElementById('tour-target')!;
+    const listener = vi.fn();
+
+    target.addEventListener('keydown', listener);
+    const engine = new TourEngine({ steps: [coachmark('target')], texts: TEXTS, onFinish });
+
+    engine.start();
+    expect(document.querySelector('.kt-tour-popover')!.getAttribute('aria-modal')).toBe('false');
+    target.dispatchEvent(new KeyboardEvent('keydown', { key: 'x', bubbles: true }));
+    expect(listener).toHaveBeenCalledOnce();
+    engine.stop();
+  });
+
+  it('yields keyboard ownership to help opened over a centered tour card', () => {
+    const engine = new TourEngine({ steps: [{ id: 'card', kind: 'card', title: 'Card', body: 'Body' }], texts: TEXTS, onFinish });
+
+    engine.start();
+    document.body.insertAdjacentHTML('beforeend', '<div id="help-outer-container" style="display:none;"><span id="help-header"></span><span id="help-text"></span></div>');
+    const help = new AdviceManager();
+    const internal = help as unknown as { helpOuterDOM: HTMLElement; helpHeaderDOM: HTMLElement; helpTextDOM: HTMLElement };
+
+    internal.helpOuterDOM = document.getElementById('help-outer-container')!;
+    internal.helpHeaderDOM = document.getElementById('help-header')!;
+    internal.helpTextDOM = document.getElementById('help-text')!;
+    help.showAdvice('Help', 'body');
+    const tab = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+
+    document.dispatchEvent(tab);
+    expect(tab.defaultPrevented).toBe(true);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    expect(internal.helpOuterDOM.style.display).toBe('none');
+    expect(engine.isActive).toBe(true);
+    help.closeAdvice();
+    engine.stop();
+  });
+
+  it('yields focus and keyboard ownership to a foreground application modal', () => {
+    const engine = new TourEngine({ steps: [{ id: 'card', kind: 'card', title: 'Card', body: 'Body' }], texts: TEXTS, onFinish });
+
+    engine.start();
+    document.body.insertAdjacentHTML('beforeend', '<div class="draggable-modal-overlay" style="display:block"><button id="foreground-modal-button">Cancel</button></div>');
+    const button = document.getElementById('foreground-modal-button')!;
+    const keyListener = vi.fn();
+
+    button.addEventListener('keydown', keyListener);
+    button.focus();
+    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    expect(document.activeElement).toBe(button);
+    expect(keyListener).toHaveBeenCalledOnce();
+    expect(engine.isActive).toBe(true);
     engine.stop();
   });
 

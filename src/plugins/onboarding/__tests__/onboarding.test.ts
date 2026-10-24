@@ -114,6 +114,21 @@ describe('OnboardingPlugin behavior', () => {
     expect(raw).toContain('"persona":"operator"');
   });
 
+  it('describes covered features after Next-only navigation without claiming satellite actions', () => {
+    const internal = plugin as unknown as { startBasics_(): void; engine_: { next(): void; stop(): void }; track_(event: string, data?: unknown): void };
+    const track = vi.spyOn(internal, 'track_');
+
+    internal.startBasics_();
+    for (let index = 0; index < 20 && !document.querySelector('[data-tour-button="power"]'); index++) {
+      internal.engine_.next();
+    }
+    expect(document.querySelector('.kt-tour-recap')!.textContent).toContain('Finding and selecting satellites');
+    expect(document.querySelector('.kt-tour-recap')!.textContent).not.toContain('Found and selected');
+    expect(track.mock.calls.some(([event]) => event === 'onboarding_step_covered')).toBe(true);
+    expect(track.mock.calls.some(([event]) => event === 'onboarding_step_completed')).toBe(false);
+    internal.engine_.stop();
+  });
+
   it('startPowerTour opens the hub card with chapter rows', () => {
     plugin.startPowerTour(true);
 

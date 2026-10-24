@@ -63,16 +63,16 @@
         }
       },
       "bridge": {
-        "title": "Die Grundlagen sitzen",
+        "title": "Themen der Grundlagen-Tour",
         "body": "Lust auf das Operator-Toolkit? Sensoren, Beobachtungslisten und schnelle Tastatur-Workflows. Etwa zwei weitere Minuten.",
-        "recap1": "Einen Satelliten gefunden und ausgewählt",
-        "recap2": "Seine Live-Orbitdaten gelesen",
-        "recap3": "Die Simulationszeit gesteuert"
+        "recap1": "Satelliten finden und auswählen",
+        "recap2": "Live-Orbitdaten lesen",
+        "recap3": "Simulationszeit steuern"
       },
       "account": {
         "title": "Fortschritt speichern?",
         "body": "Ein kostenloses Konto nimmt Ihre Einrichtung auf jedes Gerät mit.",
-        "bodyPower": "Ein kostenloses Konto nimmt die gerade eingerichtete Beobachtungsliste und den Sensor auf jedes Gerät mit.",
+        "bodyPower": "Ein kostenloses Konto hält Ihre Beobachtungslisten und Sensoreinstellungen auf allen Geräten bereit.",
         "benefit1": "Einstellungen und Beobachtungsliste geräteübergreifend synchronisieren",
         "benefit2": "Werbung entfernen",
         "benefit3": "Das komplette Pro-Toolset kostenlos freischalten"

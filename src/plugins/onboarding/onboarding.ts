@@ -371,8 +371,10 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
         this.track_('onboarding_step_viewed', { tier: 'basics', stepId: step.id, index, total });
       },
       onStepExit: (step, reason) => {
-        if (reason === 'next' || reason === 'action') {
+        if (reason === 'action') {
           this.track_('onboarding_step_completed', { tier: 'basics', stepId: step.id, mode: reason });
+        } else if (reason === 'next') {
+          this.track_('onboarding_step_covered', { tier: 'basics', stepId: step.id, mode: reason });
         }
       },
       onFinish: (reason, lastStepId) => {

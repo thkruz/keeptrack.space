@@ -63,16 +63,16 @@
         }
       },
       "bridge": {
-        "title": "Základy máte za sebou",
+        "title": "Témata základní prohlídky",
         "body": "Chcete operátorskou výbavu? Senzory, seznamy sledování a rychlou práci s klávesnicí. Zhruba dvě minuty navíc.",
-        "recap1": "Našli a vybrali jste družici",
-        "recap2": "Přečetli jste její živá orbitální data",
-        "recap3": "Ovládli jste čas simulace"
+        "recap1": "Hledání a výběr družic",
+        "recap2": "Čtení živých orbitálních dat",
+        "recap3": "Ovládání času simulace"
       },
       "account": {
         "title": "Uložit váš postup?",
         "body": "Bezplatný účet přenese vaše nastavení na jakékoli zařízení.",
-        "bodyPower": "Bezplatný účet přenese právě nastavený seznam sledování a senzor na jakékoli zařízení.",
+        "bodyPower": "Bezplatný účet uchová seznamy a nastavení senzorů na všech zařízeních.",
         "benefit1": "Synchronizace nastavení a seznamu sledování mezi zařízeními",
         "benefit2": "Odstranění reklam",
         "benefit3": "Bezplatné odemčení celé sady nástrojů Pro"

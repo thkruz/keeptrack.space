@@ -63,16 +63,16 @@
         }
       },
       "bridge": {
-        "title": "Vous maîtrisez les bases",
+        "title": "Sujets du parcours de base",
         "body": "Envie du kit opérateur ? Capteurs, listes de suivi et raccourcis clavier. Environ deux minutes de plus.",
-        "recap1": "Trouvé et sélectionné un satellite",
-        "recap2": "Lu ses données orbitales en direct",
-        "recap3": "Contrôlé le temps de la simulation"
+        "recap1": "Trouver et sélectionner des satellites",
+        "recap2": "Lire les données orbitales en direct",
+        "recap3": "Contrôler le temps de simulation"
       },
       "account": {
         "title": "Sauvegarder votre progression ?",
         "body": "Un compte gratuit emporte votre configuration sur tous vos appareils.",
-        "bodyPower": "Un compte gratuit emporte la liste de suivi et le capteur que vous venez de configurer sur tous vos appareils.",
+        "bodyPower": "Un compte gratuit conserve vos listes et paramètres de capteur sur tous vos appareils.",
         "benefit1": "Synchronisez vos paramètres et votre liste entre appareils",
         "benefit2": "Supprimez les publicités",
         "benefit3": "Débloquez gratuitement tous les outils Pro"
